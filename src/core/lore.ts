@@ -8,6 +8,7 @@ import { evaluate, type CbsEnv } from './cbs';
 import { tokens } from './gnet';
 import { messageText } from './refs';
 import type { Chat, LoreEntry } from './types';
+import { hasVirtual, isVirtual } from './world/virtual';
 import { readDirectory, type AppendixWhen } from './world/directory';
 import { parseWorld } from './world/engine';
 import { WORLD_KEY } from './world/output';
@@ -162,13 +163,13 @@ const otherTriggers = (w: AppendixWhen) => w.withParent || w.target || w.places.
  */
 export function syncDecorators(lore: LoreEntry[] | undefined, mode: LoreMode): LoreEntry[] | null {
   const books = lore ?? [];
-  if (!hasSlots(books)) return null;
+  if (!hasSlots(books) && !hasVirtual(books)) return null;
   const kinds = folderKeys(books);
   // 해금이 걸린 부록은 Risu가 직접 켜는 방식에서도 켜지 않게 둔다 (해금 상태는 플러그인만 안다)
   const locked = new Set(readDirectory(books).appendices.filter((r) => r.unlock).map((r) => r.lore));
   let n = 0;
   const next = books.map((e) => {
-    if (!managedHere(e, kinds)) return e;
+    if (!managedHere(e, kinds) || isVirtual(e)) return e;
     const content = str(e.content);
     const on = hasDontActivate(content);
     const keep = mode === 'plugin' || (kinds.get(str(e.folder)) === 'appendix' && locked.has(str(e.comment)));
@@ -190,7 +191,8 @@ export function managedEntries(lore: LoreEntry[] | undefined): ManagedEntry[] {
   const books = lore ?? [];
   const hit = cache.get(books);
   if (hit) return hit;
-  if (!hasSlots(books)) {
+  // 자리 항목이 있는 카드(옛 방식: Risu 가 자리 항목으로 끼움) 또는 가상 로어북이 붙은 카드(플러그인이 요청에 직접 끼움)
+  if (!hasSlots(books) && !hasVirtual(books)) {
     cache.set(books, []);
     return [];
   }
@@ -377,6 +379,8 @@ export interface LoreOptions {
 }
 
 export const DEFAULT_DEPTH = 10;
+/** 카드에 토큰 예산이 없을 때 (깡통봇 등) 기본값 (사용자 2026-10-27: 깊이 10 · 예산 99999) */
+export const DEFAULT_BUDGET = 99999;
 
 /** 채팅에서 상태 신호를 읽는다 */
 export function loreState(chat: Chat): LoreState {
@@ -565,7 +569,7 @@ export const sameVars = (ss: Record<string, unknown> | undefined, vars: Record<s
 export function loreOptions(char: { name?: string; globalLore?: LoreEntry[]; loreSettings?: unknown }, chat: Chat, mode: LoreMode, user = ''): LoreOptions & { mode: LoreMode } {
   const ls = (char.loreSettings ?? {}) as { scanDepth?: unknown; tokenBudget?: unknown };
   const depth = Number(ls.scanDepth) > 0 ? Number(ls.scanDepth) : DEFAULT_DEPTH;
-  const total = Number(ls.tokenBudget) > 0 ? Number(ls.tokenBudget) : 0;
+  const total = Number(ls.tokenBudget) > 0 ? Number(ls.tokenBudget) : DEFAULT_BUDGET;
   const slots = new Set(LORE_KINDS.map((k) => SLOTS[k].comment));
   const always = (char.globalLore ?? []).filter((e) => e.alwaysActive && e.mode !== 'folder' && !slots.has(str(e.comment))).reduce((n, e) => n + tokens(str(e.content)), 0);
   return {
@@ -632,4 +636,41 @@ export function trimRoster<M extends { content?: unknown }>(messages: M[]): M[] 
       sec.replace(/^- ([^(\n]+?) \([^\n]*\n?/gm, (line, name: string) => (names.has(name.trim().toLowerCase()) ? '' : line)));
     return next === c ? m : { ...m, content: next };
   });
+}
+
+// ── 요청에 직접 끼우기 (자리 로어북 없는 카드, 2026-10-27) ──
+
+export interface LoreBlockPart {
+  /** Risu 로어북 순서와 같은 자리 번호 (Tag 100 · Faction 101 · Roster 102 · 세력 200 · 시드 399 · 특수 400 · 괴이 500 · 요원 600) */
+  order: number;
+  text: string;
+}
+
+/** 고른 로어 글을 자리 번호와 함께 (slotTexts 의 결과를 순서대로) */
+export function slotParts(texts: Record<LoreKind, string>): LoreBlockPart[] {
+  return LORE_KINDS.filter((k) => texts[k]?.trim()).map((k) => ({ order: SLOTS[k].order, text: texts[k].trim() }));
+}
+
+/** 자리 번호 순으로 이어 한 덩어리 글 */
+export function joinLoreBlock(parts: LoreBlockPart[]): string {
+  return parts
+    .filter((p) => p.text.trim())
+    .sort((a, b) => a.order - b.order)
+    .map((p) => p.text.trim())
+    .join('\n\n');
+}
+
+/**
+ * 로어 덩어리를 요청에 끼운다: 첫 대화 메시지(system 이 아닌 첫 메시지) 바로 앞, 없으면 맨 끝.
+ * Risu 가 로어북을 넣던 자리(본 프롬프트 뒤·대화 앞)와 같다. 표식(LORE_MARK)으로 한 번만 끼운다
+ */
+export const LORE_MARK = '<!-- goei:lore -->';
+export function insertLoreBlock<M extends { role?: string; content?: unknown }>(messages: M[], block: string, firstChat?: string): M[] {
+  if (!block.trim() || messages.some((m) => typeof m?.content === 'string' && m.content.startsWith(LORE_MARK))) return messages;
+  const msg = { role: 'system', content: `${LORE_MARK}\n${block.trim()}` } as M;
+  // 첫 대화 메시지: 채팅의 첫 글이 들어 있는 메시지. 못 찾으면 system 아닌 첫 메시지
+  const key = firstChat?.trim().slice(0, 80);
+  let at = key ? messages.findIndex((m) => m?.role !== 'system' && typeof m?.content === 'string' && m.content.includes(key)) : -1;
+  if (at < 0) at = messages.findIndex((m) => m?.role !== 'system');
+  return at < 0 ? [...messages, msg] : [...messages.slice(0, at), msg, ...messages.slice(at)];
 }

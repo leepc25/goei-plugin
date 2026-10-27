@@ -39,8 +39,9 @@ test('기본 켬: 시작값은 조직×조직 표, 유저 소속 기준. 구간�
   const store = T.emptyStore();
   const live = S.liveness(c);
   const f = F.factionNow(store, 'B00', [], 'A00', s);
-  assert.equal(f.base, -25);
-  assert.equal(f.stage.id, 'wary', '가짜 관리국 → 관리국 소속 유저: −25 경계');
+  assert.equal(f.base, -80, '세력 관계 격자: 가짜 관리국 → 관리국 적대 (2026-10-27, 격자 값이 평판 시작값)');
+  assert.equal(f.stage.id, 'hostile');
+  assert.equal(F.factionNow(store, 'C00', [], 'A00', s).base, -40, '백일몽 → 관리국 경계');
   assert.equal(F.factionNow(store, 'A00', [], 'A00', s).stage.id, 'neutral');
   // 계기 합과 메시지당 ±10, 범위 ±100
   const log = [
@@ -50,10 +51,10 @@ test('기본 켬: 시작값은 조직×조직 표, 유저 소속 기준. 구간�
   ];
   store.log = log;
   const changes = S.liveChanges(store, live);
-  assert.equal(F.factionNow(store, 'B00', changes, 'A00', s).value, -85, '−25 −10(상한) −50');
+  assert.equal(F.factionNow(store, 'B00', changes, 'A00', s).value, -100, '−80 −10(상한) −50 → 바닥 −100');
   assert.equal(F.factionNow(store, 'B00', changes, 'A00', s).stage.id, 'hostile');
   const cut = chat(['user', '출근', 'u1'], ['char', 'x', 'c1']);
-  assert.equal(F.factionNow(store, 'B00', S.liveChanges(store, S.liveness(cut)), 'A00', s).value, -35, 'c2 가 사라지면 그 계기도');
+  assert.equal(F.factionNow(store, 'B00', S.liveChanges(store, S.liveness(cut)), 'A00', s).value, -90, 'c2 가 사라지면 그 계기도');
   store.log.push({ id: '4', anchor: 'c2', seq: 2, src: 'manual', who: T.factionWho('B00'), kind: 'cue', pin: 40, reason: '고정' });
   assert.equal(F.factionNow(store, 'B00', S.liveChanges(store, live), 'A00', s).stage.id, 'favorable');
 });
@@ -67,7 +68,7 @@ test('갱신기: 장면 세력 자료, 판단은 모델(낱말 거르기 없음)
   assert.deepEqual(input.factions, ['A00'], '확정 구간(m3·m4)에 나온 세력과 장면 인물 소속만. 가짜 관리국은 맥락 구간(m2)에만 있어 빠짐');
   assert.ok(input.data.factions_now.some((f) => f.code === 'A00' && f.stage === '중립'));
   const input1 = U.buildUpdate(c, store, [1], { settings: s, system: 'S', values: {}, names, factionNames: { A00: '관리국', B00: '가짜 관리국' } });
-  assert.ok(input1.factions.includes('B00') && input1.data.factions_now.some((f) => f.code === 'B00' && f.stage === '경계'));
+  assert.ok(input1.factions.includes('B00') && input1.data.factions_now.some((f) => f.code === 'B00' && f.stage === '적대'), '격자: 가짜 관리국 → 관리국 적대');
   const r = {
     faction_cues: [
       { faction: '관리국', cue: '큰도움', m: 'm4', quote: '공식 포상을 내렸다', reason: '공식 포상' },
@@ -111,11 +112,11 @@ test('필드 목격 경로: 명단 인물은 원래 값, 몹은 절반(소수점
   const live = S.liveness(c);
   const changes = S.liveChanges(store, live);
   const s = settings();
-  assert.equal(F.factionNow(store, 'B00', changes, 'A00', s).value, -25 + 3 + 1, '도움 3 + 몹 도움 1 (몹 작은친절 0.5→0)');
-  assert.equal(F.factionNow(store, 'C00', changes, 'A00', s).value, -25 - 25, '몹 목격 중대위반 −50 → −25');
+  assert.equal(F.factionNow(store, 'B00', changes, 'A00', s).value, -80 + 3 + 1, '도움 3 + 몹 도움 1 (몹 작은친절 0.5→0)');
+  assert.equal(F.factionNow(store, 'C00', changes, 'A00', s).value, -40 - 25, '몹 목격 중대위반 −50 → −25');
   const store2 = T.emptyStore();
   Fd.applyFieldEvent(store2, c, ev('e2', 'quest', { faction: 'B00', named: false }), '주인공', { mobWeight: 'full' });
-  assert.equal(F.factionNow(store2, 'B00', S.liveChanges(store2, live), 'A00', s).value, -22);
+  assert.equal(F.factionNow(store2, 'B00', S.liveChanges(store2, live), 'A00', s).value, -77);
   const store3 = T.emptyStore();
   Fd.applyFieldEvent(store3, c, ev('e2', 'quest', { faction: 'B00', named: false }), '주인공', { mobWeight: 'off' });
   assert.equal(store3.log.length, 0);
@@ -132,7 +133,7 @@ test('본편 주입: 장면 세력 가운데 중립이 아닌 것만, 주입 끄
   const c2 = chat(['user', '출근', 'u1'], ['char', '쟈알디가 왔다.', 'c1'], ['user', 'x', 'u2'], ['char', '가짜 관리국이 공문을 보냈다. 쟈알디가 읽었다.', 'c2']);
   const out = R.peopleBlockFor(c2, { settings: s, store, sheetOf: () => null, factionNames: { A00: '관리국', B00: '가짜 관리국' } });
   assert.match(out.text, /## Factions → \{\{user\}\}/);
-  assert.match(out.text, /- 가짜 관리국 → \{\{user\}\}: Wary\./, '가짜 관리국 −25 경계');
+  assert.match(out.text, /- 가짜 관리국 → \{\{user\}\}: Hostile\./, '격자: 가짜 관리국 → 관리국 적대');
   assert.ok(!/- 관리국 → /.test(out.text), '관리국은 중립이라 생략');
   const off = settings({ factionInject: false });
   assert.ok(!R.peopleBlockFor(c2, { settings: off, store, sheetOf: () => null }).text.includes('Factions'));
@@ -150,9 +151,9 @@ test('메시지당 변화 상한 설정: 기본 10, 0 이면 한도 없음, 인�
   store.log = [1, 2, 3].map((i) => ({ id: `f${i}`, anchor: 'c1', seq: i, src: 'story', who, kind: 'cue', cue: '큰도움', reason: 'r' }))
     .concat([1, 2, 3].map((i) => ({ id: `p${i}`, anchor: 'c1', seq: i + 3, src: 'story', who: '쟈알디', kind: 'cue', cue: '큰도움', reason: 'r' })));
   const changes = S.liveChanges(store, live);
-  assert.equal(F.factionNow(store, 'B00', changes, 'A00', s).value, -25 + 10, '세 번 +5 → 상한 10');
-  assert.equal(F.factionNow(store, 'B00', changes, 'A00', settings({ turnCap: 0 })).value, -25 + 15, '0 = 한도 없음');
-  assert.equal(F.factionNow(store, 'B00', changes, 'A00', settings({ turnCap: 12 })).value, -25 + 12);
+  assert.equal(F.factionNow(store, 'B00', changes, 'A00', s).value, -80 + 10, '세 번 +5 → 상한 10');
+  assert.equal(F.factionNow(store, 'B00', changes, 'A00', settings({ turnCap: 0 })).value, -80 + 15, '0 = 한도 없음');
+  assert.equal(F.factionNow(store, 'B00', changes, 'A00', settings({ turnCap: 12 })).value, -80 + 12);
   assert.equal(A.affinityOf(store.people.쟈알디, changes, 0, { turnCap: 0 }), 15);
   assert.equal(A.affinityOf(store.people.쟈알디, changes, 0, {}), 10);
   assert.equal(St.peopleSettings({ $pp_turn_cap: '250' }).turnCap, 100, '범위 0~100');
@@ -168,7 +169,7 @@ test('필드 상한 묶음: 같은 메시지 뒤 여러 방문·장면은 상한
   const live = S.liveness(c);
   const changes = S.liveChanges(store, live);
   const s = settings();
-  assert.equal(F.factionNow(store, 'B00', changes, 'A00', s).value, -25 + 30, '묶음 3개 × 상한 10 (각 4×3=12 → 10)');
+  assert.equal(F.factionNow(store, 'B00', changes, 'A00', s).value, -80 + 30, '묶음 3개 × 상한 10 (각 4×3=12 → 10)');
   assert.equal(A.affinityOf(store.people.쟈알디, changes, 0, { turnCap: 10 }), 30);
   assert.ok(store.log.every((x) => x.group && x.group.startsWith('c1|')));
 });

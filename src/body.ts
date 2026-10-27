@@ -7,6 +7,11 @@ import { readPersona, USER_MARK } from './host/user';
 import { hasSceneCard, renderSceneCards } from './core/dispatch';
 import { CONTEXT as GN_CONTEXT, GN_RAW, gnetSettings, mainContext, readGnet, userNick } from './core/gnet';
 import { mainContextRules } from './core/gnetPrompt';
+import { ALWAYS_BOOKS, isVirtual, stripVirtual, withWorldLore } from './core/world/virtual';
+import { guideText, RP_HEAD } from './core/guides';
+import { evaluate } from './core/cbs';
+import { shouldKeepSeed } from './core/request';
+import { messageText } from './core/refs';
 import { processRequest, unwrapCalls, unwrapScenes, type PromptMessage } from './core/request';
 import { HISTORY as PH_HISTORY, hasCall, mainContext as phoneMainContext, phoneSettings, PH_STATE, PH_BULLETINS, readBulletins, readPhone, renderCalls } from './core/phone';
 import { mainContextRules as phoneRules } from './core/phonePrompt';
@@ -27,7 +32,7 @@ import { cleanOutput, hasWorldTags, parseCatalog, processOutput, readDirectory }
 import { basicSettings, missingBasicVars, worldSettings } from './core/settings';
 import { staleFactionVars } from './core/factions';
 import { supplementAssets } from './host/asset';
-import { loadContext, updateCharacterLore, updateChat } from './host/risu';
+import { loadContext, updateCharacterLore, updateChat, getChar } from './host/risu';
 import { WatchState, type WatchSnapshot } from './core/watch';
 import { createFab, type Fab } from './host/overlay';
 import { BRAND } from './ui/brand';
@@ -35,19 +40,25 @@ import { cardPalette as themedCardPalette, currentTheme, onThemeChange, repaintT
 import { hasImgTag, IMG_RECENT, imgTagsKnown, renderImgTags, setImgHidden, stripOldImgTags } from './core/imgtag';
 import { loadModuleAssets, modulePicker } from './host/assets';
 import { getPrefs } from './core/settings';
-import { openApp, openWiki } from './ui/app';
+import { openApp, openInstall, openWiki } from './ui/app';
+import { isGoeiLore } from './core/install';
+import { loadStoredTokenizer, loadStoredWikiPack } from './host/install';
+import { setInstalledHook } from './host/hooks';
 import { GHOST_ICON } from './ui/icons';
 import { landingHtml as renderLanding } from './ui/landing';
 import { loadPrefs } from './host/prefs';
 import { isWaiting, setWaiting } from './host/waiting';
-import { syncDecorators, computeLore, hasUnlockTag, loreOptions, patchSlots, readUnlocked, sameVars, stripUnlockTags, trimRoster, unlockedValue, unlockTags, UNLOCK_VAR, type LoreMode } from './core/lore';
+import { syncDecorators, computeLore, hasUnlockTag, loreOptions, patchSlots, readUnlocked, sameVars, stripUnlockTags, trimRoster, unlockedValue, unlockTags, UNLOCK_VAR, type LoreMode, hasSlots, insertLoreBlock, joinLoreBlock, LORE_KINDS, slotParts, slotVar, type LoreBlockPart, type LoreKind } from './core/lore';
 import { advValue } from './core/advanced';
 import { userInfo } from './host/user';
 import { applyPlayer, hidePlayerTag, playerAgent, playerBlock } from './core/player';
 import { withFieldFacts, withInterludes } from './core/interlude';
 import { fieldRecord } from './core/field';
 import { buildImgPrompt, imgCharacters, imgPromptConfig, stripImgLore } from './core/imgprompt';
-import { withStatusBlock } from './core/statusctx';
+import { withStatusBlock, type StatusShape } from './core/statusctx';
+import { colConfig, fillStatusSection, setStatusColumns, usedCols } from './core/world/statuscols';
+import { activeAnomalyNote } from './core/world/records';
+import { aliveAnchors, readWallet, walletBalance, WALLET_START_DEFAULT } from './core/wallet';
 import { visitRecord } from './core/visit';
 import { visitContextRules } from './core/visitPrompt';
 import { withPeopleBlock, peopleBlockFor, insertBlock } from './core/people/request';
@@ -90,7 +101,8 @@ async function onBeforeRequest<M extends PromptMessage>(messages: M[], type: str
       messages = at < 0 ? [...messages, ...add] : [...messages.slice(0, at), ...add, ...messages.slice(at)];
     }
     // 지난 응답의 상태창 줄은 지우고 마지막 한 줄만 직전 상태 블록으로 (core/statusctx.ts). 신분 칸이 빠졌으면 아는 값을 채운다
-    messages = withStatusBlock(messages, await knownIdentity().catch(() => ''));
+    // 칸 구성(설정)대로 다시 만들고 잔고 칸은 장부 값으로 (core/world/statuscols.ts · core/wallet.ts)
+    messages = withStatusBlock(messages, await knownIdentity().catch(() => ''), await statusShape().catch(() => undefined));
     // 장면 인물의 살아 있는 기록 (core/people). 절 단위 혼합이면 그 인물의 시트 원문은 빼고 기록으로 대신한다
     messages = await withPeople(messages).catch(() => messages);
     // 이미지 태그 지침 (core/imgprompt): 카드 로어북 「Asset」 대신 설정으로 조립. 옛 카드의 로어북 본문이 남아 있으면 지운다
@@ -124,14 +136,14 @@ function loreFor(char: LoreChar, chat: Chat, input?: string) {
 
 /** 고른 로어북을 자리 항목이 읽는 채팅 변수에 적는다 (요청 전이라 Risu가 세고 넘치면 오래된 채팅을 지운다) */
 async function storeLore(charIndex: number, chatIndex: number, input?: string): Promise<void> {
-  let char = (await risuai.getCharacterFromIndex(charIndex)) as LoreChar | null;
-  if (!char || !readManifest(char.globalLore)) return;
+  let char = await getChar<LoreChar>(charIndex);
+  if (!char || !isGoeiLore(char.globalLore)) return;
   // 이 채팅의 보내는 방식에 맞게 네 폴더 항목 첫 줄(@@dont_activate)을 맞춘다. 사용자가 새로 넣은 항목도 같이
   const cur0 = (await risuai.getChatFromIndex(charIndex, chatIndex)) as Chat | null;
   const mode = advValue(cur0?.scriptstate, 'gen', 'lore_mode') as LoreMode;
   if (syncDecorators(char.globalLore, mode)) {
     await updateCharacterLore(charIndex, (lore) => syncDecorators(lore, mode));
-    char = ((await risuai.getCharacterFromIndex(charIndex)) as LoreChar | null) ?? char;
+    char = (await getChar<LoreChar>(charIndex)) ?? char;
   }
   const c = char;
   await updateChat(charIndex, chatIndex, (cur) => {
@@ -152,27 +164,66 @@ async function onInput(text: string): Promise<string> {
   return text;
 }
 
-/** 요청 직전: 다시 굴리기·자동 전송처럼 입력을 거치지 않았으면 지금 채팅으로 다시 골라 요청 속 글을 바꾼다 */
+/**
+ * 요청 직전 로어: 자리 로어북이 있는 옛 카드는 Risu 가 자리 항목으로 끼우므로 다시 골라 요청 속 글만 바꾼다(patchSlots).
+ * 자리 로어북이 없는 카드(2026-10-27: 자리 항목·Start Lore·Tag·Faction·Roster 를 카드에서 뺌)는 플러그인이 한 덩어리로 직접 끼운다:
+ * RP 지침(카드 description 에 없을 때) → 🏷️Tag 100 → 📜Faction 101 → 🙂Roster 102 → 세력 200 → 시드 399(첫 전송) → 특수 400 → 괴이 500 → 요원 600
+ */
 async function fixLore<M extends PromptMessage>(messages: M[]): Promise<M[]> {
   const charIndex = await risuai.getCurrentCharacterIndex();
-  const char = (await risuai.getCharacterFromIndex(charIndex)) as LoreChar | null;
+  const char = await getChar<LoreChar>(charIndex);
   const chat = (await risuai.getChatFromIndex(charIndex, await risuai.getCurrentChatIndex())) as Chat | null;
   if (!char || !chat) return messages;
   const got = loreFor(char, chat);
-  if (!got || sameVars(chat.scriptstate, got.vars)) return messages;
-  return patchSlots(messages, chat.scriptstate, got.vars).messages;
+  const real = stripVirtual(char.globalLore ?? []);
+  setStatusColumns(chat.scriptstate);
+  if (hasSlots(real)) {
+    if (!got || sameVars(chat.scriptstate, got.vars)) return messages;
+    return patchSlots(messages, chat.scriptstate, got.vars).messages;
+  }
+  const parts: LoreBlockPart[] = [];
+  const env = { vars: chat.scriptstate ?? {}, char: char.name, user: userInfo().name };
+  // 🏷️Tag 의 상태창 절은 이 채팅의 칸 구성에서 만든다 (`{status_section}` 자리)
+  const cols = usedCols(colConfig(chat.scriptstate));
+  for (const b of ALWAYS_BOOKS) {
+    const e = (char.globalLore ?? []).find((x) => isVirtual(x) && x.comment === b.name);
+    if (e && typeof e.content === 'string') parts.push({ order: b.order, text: evaluate(b.kind === 'tag' ? fillStatusSection(e.content, cols) : e.content, env) });
+  }
+  if (got) {
+    // 괴이 공통 머리말은 괴이 묶음 맨 앞에 한 번만 (기록마다 붙이지 않는다. 2026-10-27)
+    const note = activeAnomalyNote().trim();
+    const texts = Object.fromEntries(LORE_KINDS.map((k) => [k, got.vars[slotVar(k)] ?? ''])) as Record<LoreKind, string>;
+    if (note && texts.anomaly?.trim() && !texts.anomaly.includes(note)) texts.anomaly = `${note}\n\n${texts.anomaly}`;
+    parts.push(...slotParts(texts));
+  }
+  // 시드(첫 장면 강제 로어): 카드에 📕Start Lore 가 없으면 플러그인이. 수명은 processRequest 가 표식으로 다룬다
+  const seed = String(chat.scriptstate?.['$seed_lore'] ?? '');
+  if (seed && shouldKeepSeed(chat) && !real.some((e) => e.comment === '📕Start Lore')) parts.push({ order: 399, text: seed });
+  if (!messages.some((m) => typeof m?.content === 'string' && m.content.includes(RP_HEAD))) parts.push({ order: 0, text: guideText('RP') });
+  const first = chat.message?.find((m) => typeof m.data === 'string' && m.data.trim())?.data;
+  return insertLoreBlock(messages, joinLoreBlock(parts), first ? messageText(first) : undefined);
 }
 
 /** 캐릭터로 플레이: 페르소나 자리에 그 요원 로어북과 틀 지침, 페르소나 이름은 요원 이름으로 */
 async function withPlayer<M extends PromptMessage>(messages: M[]): Promise<M[]> {
   const charIndex = await risuai.getCurrentCharacterIndex();
-  const char = (await risuai.getCharacterFromIndex(charIndex)) as LoreChar | null;
+  const char = await getChar<LoreChar>(charIndex);
   const chat = (await risuai.getChatFromIndex(charIndex, await risuai.getCurrentChatIndex())) as Chat | null;
   const agent = char && chat ? playerAgent(char.globalLore, chat.scriptstate) : undefined;
   if (!char || !chat || !agent) return messages;
   const env = { vars: chat.scriptstate ?? {}, char: char.name, user: agent.name };
   const out = applyPlayer(messages, playerBlock(char.globalLore, agent, env), await readPersona(), userInfo().name, agent.name);
   return basicSettings(char.globalLore, chat.scriptstate).assetPlayer ? out : hidePlayerTag(out, [agent.english]);
+}
+
+/** 이 채팅의 상태창 모양: 사용하는 칸과 장부 잔고 (잔고 칸을 쓸 때만). 파서에도 칸 구성을 알린다 */
+async function statusShape(): Promise<StatusShape> {
+  const chat = (await risuai.getChatFromIndex(await risuai.getCurrentCharacterIndex(), await risuai.getCurrentChatIndex())) as Chat | null;
+  const vars = chat?.scriptstate ?? {};
+  setStatusColumns(vars);
+  const cfg = colConfig(vars);
+  const wallet = chat && cfg.wallet !== 'off' ? walletBalance(readWallet(vars, getPrefs().walletStart ?? WALLET_START_DEFAULT), aliveAnchors(chat)) : null;
+  return { cols: usedCols(cfg), wallet };
 }
 
 /** 플러그인이 마지막으로 알아낸 유저 신분 (`조직/직급`). 없으면 빈 문자열 */
@@ -192,7 +243,7 @@ async function withPeople<M extends PromptMessage>(messages: M[]): Promise<M[]> 
   if (!settings.on || settings.inject === 'off') return messages;
   const store = peopleStore(chat);
   if (!Object.keys(store.people).length) return messages;
-  const char = (await risuai.getCharacterFromIndex(charIndex)) as LoreChar | null;
+  const char = await getChar<LoreChar>(charIndex);
   if (!char) return messages;
   const me = playerAgent(char.globalLore, chat.scriptstate);
   const lastUser = [...messages].reverse().find((m) => m?.role === 'user');
@@ -213,7 +264,7 @@ async function withPeople<M extends PromptMessage>(messages: M[]): Promise<M[]> 
 async function withImgPrompt<M extends PromptMessage>(messages: M[]): Promise<M[]> {
   const charIndex = await risuai.getCurrentCharacterIndex();
   const chat = (await risuai.getChatFromIndex(charIndex, await risuai.getCurrentChatIndex())) as Chat | null;
-  const char = (await risuai.getCharacterFromIndex(charIndex)) as LoreChar | null;
+  const char = await getChar<LoreChar>(charIndex);
   if (!chat || !char) return messages;
   const s = basicSettings(char.globalLore, chat.scriptstate);
   const out = stripImgLore(messages);
@@ -230,7 +281,7 @@ async function withVisit<M extends PromptMessage>(messages: M[]): Promise<M[]> {
   const charIndex = await risuai.getCurrentCharacterIndex();
   const chat = (await risuai.getChatFromIndex(charIndex, await risuai.getCurrentChatIndex())) as Chat | null;
   if (!chat || (!visitRecord(chat).turns.length && !fieldRecord(chat).events.length)) return messages;
-  const char = (await risuai.getCharacterFromIndex(charIndex)) as LoreChar | null;
+  const char = await getChar<LoreChar>(charIndex);
   const me = char ? playerAgent(char.globalLore, chat.scriptstate) : undefined;
   return withFieldFacts(withInterludes(messages, chat, char ? visitContextRules({ char }) : null, me?.name || userInfo().name || '주인공'), chat);
 }
@@ -249,7 +300,7 @@ async function moduleContext(scene: string): Promise<string[]> {
   if (!chat || (!wantGnet && !wantPhone && !wantWiki)) return [];
   applyAdvanced(ss);
   if (rulesCache?.charIndex !== charIndex) {
-    const char = (await risuai.getCharacterFromIndex(charIndex)) as { globalLore?: LoreEntry[] } | null;
+    const char = await getChar<{ globalLore?: LoreEntry[] }>(charIndex);
     const src = { char: { globalLore: char?.globalLore }, chat };
     rulesCache = { charIndex, gnet: mainContextRules(src), phone: phoneRules(src), wiki: wikiContextRules(char?.globalLore), registry: buildRegistry(char?.globalLore) };
   }
@@ -312,9 +363,11 @@ async function applyUnlocks(char: { globalLore?: LoreEntry[] }, charIndex: numbe
 async function onOutput(arg: { char: unknown; chat: unknown; characterIndex: number; chatIndex: number; messageIndex: number }): Promise<void> {
   setWaiting(false);
   try {
-    const char = arg.char as { globalLore?: LoreEntry[] } | null;
+    const raw0 = arg.char as { globalLore?: LoreEntry[] } | null;
     const chat = arg.chat as Chat | null;
-    if (!char || !chat || !readManifest(char.globalLore)) return; // 다른 봇: 아무것도 안 함
+    if (!raw0 || !chat || !isGoeiLore(raw0.globalLore)) return; // 다른 봇: 아무것도 안 함
+    // 이벤트의 캐릭터는 카드 그대로라 세계 데이터(가상 로어북)가 없다. 경량 카드는 명부 폴더가 가상이라 이걸 빼면 상황판 처리가 통째로 건너뛰어진다 (2026-10-27)
+    const char = { ...raw0, globalLore: withWorldLore(raw0.globalLore) };
     const raw = chat.message?.[arg.messageIndex]?.data;
     if (typeof raw !== 'string') return;
     let latest: Chat | null = null;
@@ -474,7 +527,7 @@ async function redrawAfterLoad(): Promise<void> {
     await assetsFirst;
     if (isWaiting()) return;
     const ctx = await loadContext();
-    if (!ctx || !readManifest(ctx.char.globalLore)) return;
+    if (!ctx || !isGoeiLore(ctx.char.globalLore)) return;
     if (!ctx.chat.message.some((m) => typeof m.data === 'string' && m.data.includes('<img='))) return;
     await updateChat(ctx.charIndex, ctx.chatIndex, (cur) => ({ ...cur }));
   } catch {
@@ -502,7 +555,8 @@ function displayNow(text: string): string {
     if (hasImgTag(out)) {
       const pick = modulePicker();
       const self = userInfo().name;
-      if (liteNow || imgTagsKnown(out, pick, self)) out = renderImgTags(out, pick, getPrefs().imgShow ?? IMG_RECENT.def, self);
+      // 우리 메시지(판정 뒤이거나 상태창 같은 표식이 있는 글)면 늘 그린다. 그래야 표시 범위 밖 메시지에서 태그 글자가 남지 않는다
+      if (ours || imgTagsKnown(out, pick, self)) out = renderImgTags(out, pick, getPrefs().imgShow ?? IMG_RECENT.def, self);
     }
     if (out.includes(UNSENT_MARK)) out = renderUnsentMark(out, unsentMarkHtml());
     if (wantsOpeningHint(text)) out += openingHintHtml();
@@ -528,8 +582,8 @@ async function readSnapshot(fab: Fab): Promise<WatchSnapshot> {
 async function isLiteCharacter(charIndex: number): Promise<boolean> {
   if (charIndex < 0) return false;
   try {
-    const char = (await risuai.getCharacterFromIndex(charIndex)) as { globalLore?: LoreEntry[] } | null;
-    const lite = !!readManifest(char?.globalLore);
+    const char = await getChar<{ globalLore?: LoreEntry[] }>(charIndex);
+    const lite = isGoeiLore(char?.globalLore);
     if (lite && char) prefetchFactions(char as never); // 시작 화면을 열 때 사진이 하나씩 늦게 뜨지 않게
     return lite;
   } catch {
@@ -553,6 +607,8 @@ async function readTheme(snap: WatchSnapshot): Promise<void> {
 // 괴이봇 Lite 채팅 화면에서만 보이는 플로팅 버튼 + 그 화면에 들어올 때마다 접속 효과
 function startWatcher(fab: Fab): () => void {
   const state = new WatchState();
+  // 설치·점검으로 카드가 바뀌면 다음 차례에 다시 판정 (플로팅 버튼이 바로 생기게)
+  setInstalledHook(() => state.forget());
   let stopped = false;
   let timer: ReturnType<typeof setTimeout> | undefined;
   const tick = async () => {
@@ -580,6 +636,7 @@ function startWatcher(fab: Fab): () => void {
   void tick();
   return () => {
     stopped = true;
+    setInstalledHook(null);
     clearTimeout(timer);
   };
 }
@@ -589,12 +646,16 @@ export interface BodyHandlers {
   input: typeof onInput;
   output: typeof onOutput;
   display: typeof onDisplay;
+  /** 깡통봇 설치·점검 화면 (시작기의 햄버거 단추) */
+  install: () => Promise<void>;
   unload: () => Promise<void>;
 }
 
 /** 본체 시작: 설정을 읽고 플로팅 버튼·채팅 감시를 켠다. Risu에 거는 처리기는 시작기(main.ts)가 대신 걸고 여기로 넘긴다 */
 export async function start(): Promise<BodyHandlers> {
   await loadPrefs();
+  await loadStoredWikiPack();
+  await loadStoredTokenizer();
   // 채팅 속 이미지 태그가 쓸 모듈 에셋 이름 (창을 열 때도 다시 읽는다)
   assetsFirst = loadModuleAssets();
   void redrawAfterLoad();
@@ -621,6 +682,7 @@ export async function start(): Promise<BodyHandlers> {
     input: onInput,
     output: onOutput,
     display: onDisplay,
+    install: () => openInstall(),
     unload: async () => {
       stopWatcher?.();
       await fab?.remove().catch(() => {});

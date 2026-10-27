@@ -1,10 +1,12 @@
-// 이미지 태그 지침을 설정으로: 틀·대상 캐릭터(명부+자료+추가−끔, 주인공 규칙)·표정 세트·조립·옛 로어북 블록 제거
+// 이미지 태그 지침을 설정으로: 틀·대상 캐릭터(명부+추가−끔, 주인공 규칙)·표정 세트·조립·옛 로어북 블록 제거
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { imgprompt, settings } from '../dist-test/core.mjs';
 
 const { imgPromptConfig, imgCandidates, imgCharacters, buildImgPrompt, stripImgLore, applyImgConfig, IMG_PROMPT_DEFAULT, IMG_KEYWORDS_DEFAULT } = imgprompt;
-const bookLore = [{ comment: 'Image tag', content: JSON.stringify({ characters: ['Jyaldi', 'Avensha', 'Brownie'], kor_to_eng: { 쟈알디: 'Jyaldi' } }) }];
+import { imgDirLore } from './fixtures/imgdir.mjs';
+// 명부만 본다 (v0.16.66: 로어북 「Image tag」「Asset」 없음)
+const bookLore = imgDirLore([{ name: '쟈알디', english: 'Jyaldi' }, { name: '아벤샤', english: 'Avensha' }, { name: '브라우니', english: 'Brownie' }]);
 
 test('설정 읽기: 비어 있으면 기본 틀·기본 표정, 이름은 금지 문자 제거', () => {
   const c = imgPromptConfig({});
@@ -16,10 +18,10 @@ test('설정 읽기: 비어 있으면 기본 틀·기본 표정, 이름은 금�
   assert.deepEqual(d.keywords, ['happy', 'sad']);
 });
 
-test('대상 캐릭터: 명부 영문명 + Image tag 목록 + 추가 − 끔, 주인공 규칙', () => {
+test('대상 캐릭터: 명부 영문명 + 추가 − 끔, 주인공 규칙', () => {
   const cfg = imgPromptConfig({ imgNamesExtra: ['Secriem'], imgNamesOff: ['Brownie'] });
   const cands = imgCandidates(bookLore, cfg);
-  assert.ok(cands.some((c) => c.name === 'Jyaldi' && c.source === 'book') && cands.some((c) => c.name === 'Secriem' && c.source === 'extra'));
+  assert.ok(cands.some((c) => c.name === 'Jyaldi' && c.korean === '쟈알디' && c.source === 'directory') && cands.some((c) => c.name === 'Secriem' && c.source === 'extra'));
   const names = imgCharacters(bookLore, cfg, { assetPlayer: false, playerEnglish: 'Jyaldi' });
   assert.deepEqual(names, ['Avensha', 'Secriem'], '끈 Brownie 와 주인공 요원 Jyaldi 는 빠짐');
   const withUser = imgCharacters(bookLore, cfg, { assetPlayer: true, userName: '영지' });

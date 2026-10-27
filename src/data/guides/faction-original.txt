@@ -1,0 +1,81 @@
+## Faction
+
+This reference describes the world to the GM. Public labels, hidden affiliations, doctrine, and internal information are known to an NPC only through that NPC's actual access.
+
+{{#if {{not_equal::{{getvar::st_faction}}::B00}}}}### Management Bureau [A00]
+A secret organization that protects humanity and its civilization from abnormal phenomena. The Bureau relies on a few elite superhumans rather than mass manpower, hides in plain sight through perception technology.{{/if}}
+{{#if {{equal::{{getvar::st_faction}}::B00}}}}### Fake Management Bureau [A00]
+Regarded by the opposing Bureau as an organization of monsters imitating it. It appears at deviant hotspots, combats hostile entities, and kills agents of the opposing Bureau.{{/if}}
+
+{{#if {{equal::{{getvar::st_faction}}::B00}}}}### Management Bureau [B00]
+The organization that controls this world's secrets. Its agents call anomalies deviant phenomena and hostile entities 'I-mul', and answer both with systematized force.{{/if}}
+{{#if {{not_equal::{{getvar::st_faction}}::B00}}}}### Fake Management Bureau [B00]
+the Bureau's absolute enemy and an organizational anomaly officially classified as "anomaly; communication impossible." No recognition, negotiation, or coexistence is permitted; every confirmed manifestation is subject to immediate elimination.{{/if}}
+
+### Baekilmong Co., Ltd [C00]
+A pharmaceutical conglomerate that commercializes the abnormal. Its public business is pharmaceuticals; its true product is Kkumgyeol, harvested from human survival inside horror.
+
+### Civilian [D00]
+Ordinary people outside the anomalous world, unaware of its hidden factions and dangers.
+
+### Freelancer [E00]
+Independent operators registered with the Association who receive missions through its brokering system. They are not employees, but contractors who pay the Association for the legal right to operate.
+
+### Special Disaster Response Association
+A private association that licenses freelancers and brokers anomaly missions, taking a commission at every step. Operating without its license is illegal, so its exploitative rates go unchallenged.
+
+### Jungnim Underground Shopping Center
+The underground economy beneath Jungnim-dong for goods and services no legal channel provides, run by fixers, fences, backalley doctors, and loan sharks. Business is openly predatory, payment comes first.
+
+### Vatican
+The Holy See's covert combat arm, dispatching battle nuns and paladins against vampires, sorcerers, and heresies. It operates in Korea under civilian cover, outside the institutional order, and cooperates only when a shared threat outranks doctrine.
+
+### Islam
+The militant holy arm of Islam, whose champions summon legions of warrior spirits from Mecca. Like the Vatican it overwhelms sorcery as a matter of natural law, and the two share a standing blood-feud. 
+
+### Walpurgis Society
+The organized body of the world's sorcerers, ruled by the Society Head with the Ten Witches beneath. Individually its practitioners are devastating, but the priesthoods counter them so thoroughly that the mage world has never risen openly and survives hidden among humans.
+
+### Vampires
+An ancient bloodline power under the True Ancestor, expanding by turning humans into ghouls and raising the chosen into vampires. Its society is riven by factional and territorial struggle. The Vatican hunts it, and the classic banes hold in full.
+
+### Mumyeong Chanrangyo
+A doomsday faith worshipping Ireum-nim, which holds that the world's root is the tale itself. Its sects discover, cultivate, and feed anomalies as acts of devotion, believing that becoming meaningful enough will earn survival past the end.
+
+### The Troupe
+An anomalous theatrical order whose plays and musicals are themselves anomalies, opened in real theaters. Inside its works narrative is authority, and the audience becomes the cast.
+
+### The Hospital
+An anomalous medical order that makes diseases and cures them, pursuing a more perfect human through endless experimentation. Whoever enters and fails to leave is admitted as material, and in time as staff.
+
+### The Aestheticism
+A singular art entity, the only individual counted among the great powers. It kills people as compositions and never forgets a work. Official guidance for an encounter is to run.
+
+### The World Politics Forum
+An internet board with a madhouse reputation, where a meaningful share of the lunacy is real survivor testimony. Both Bureaus monitor it, and users who post or search carelessly disappear.{{getvar::fac_extra}}
+
+## Faction Doctrine and Relations
+
+The following describes each faction's beliefs, institutional policies, and established relationships.
+
+### Mutual Perception
+- {{#if {{not_equal::{{getvar::st_faction}}::B00}}}}Management Bureau{{/if}}{{#if {{equal::{{getvar::st_faction}}::B00}}}}Fake Management Bureau{{/if}} [A00] is recognized as the genuine Bureau by its own members, Baekilmong Co., Ltd [C00], Freelancer [E00], and other underworld actors familiar with both organizations. They regard {{#if {{equal::{{getvar::st_faction}}::B00}}}}Management Bureau{{/if}}{{#if {{not_equal::{{getvar::st_faction}}::B00}}}}Fake Management Bureau{{/if}} [B00] as an anomalous imitation. The latter's members hold the reverse conviction: they are the genuine Bureau, and their counterpart is the imitation.
+- Regardless of the reference labels above, members of each Bureau call their own organization the “Management Bureau” and their counterpart the “Fake Management Bureau.”
+- Civilian [D00] generally knows neither the hidden world nor the true nature of its factions.
+
+### External Doctrine
+- {{#if {{not_equal::{{getvar::st_faction}}::B00}}}}Management Bureau{{/if}}{{#if {{equal::{{getvar::st_faction}}::B00}}}}Fake Management Bureau{{/if}} [A00] pursues exclusive control and secrecy over the hidden world, monitoring and restricting outside factions. It avoids indiscriminate abduction and slaughter, but may temporarily cooperate with outside factions or even anomalies when its objectives require it. The opposing Bureau is the sole categorical exception: a target for elimination, never cooperation.
+- {{#if {{equal::{{getvar::st_faction}}::B00}}}}Management Bureau{{/if}}{{#if {{not_equal::{{getvar::st_faction}}::B00}}}}Fake Management Bureau{{/if}} [B00] classifies all supernatural factions outside itself as “I-mul.” Its doctrine centers on strict secrecy, control, and eradication of the hidden world. Anomalies, psychics, and other superhumans are targets for suppression and extermination; groups that know of or exploit the hidden world are also subject to abduction, brainwashing, and elimination. It rejects coexistence with these groups.
+- Baekilmong Co., Ltd [C00], Freelancer [E00], and other neutral actors prioritize profit and survival over disputes of legitimacy. They evade the surveillance and restrictions of {{#if {{not_equal::{{getvar::st_faction}}::B00}}}}Management Bureau{{/if}}{{#if {{equal::{{getvar::st_faction}}::B00}}}}Fake Management Bureau{{/if}} [A00] or cooperate through unofficial channels. They avoid open involvement with {{#if {{equal::{{getvar::st_faction}}::B00}}}}Management Bureau{{/if}}{{#if {{not_equal::{{getvar::st_faction}}::B00}}}}Fake Management Bureau{{/if}} [B00], where contact risks abduction, brainwashing, or death.
+
+### Inter-Bureau Hostility
+- Neither Bureau recognizes the other's legitimacy. Both hunt opposing personnel, destroy facilities, and disrupt operations. Once an opposing agent is identified, any delay in elimination serves an operational purpose, such as surveillance, deception, avoiding a losing engagement, or preventing civilian exposure.
+- Both Bureaus reject negotiation, joint operations, and intelligence sharing with each other, even against a common enemy or during a crisis. Personal bonds do not legitimize collaboration; collusion with the opposing Bureau is treated as betrayal.
+
+### Independent Operations and Cooperation
+- Factions and anomalous forces pursue their own operations and objectives independently of {{user}}. Overlapping activity may produce unexpected encounters, competing objectives, interference, or confrontation.
+- Hostility includes direct combat, covert infiltration, compromised personnel, planted assets, manipulated information, and concealed influence.
+- Cooperation may involve joint operations, intelligence exchanges, shared access, negotiated boundaries, or temporary division of responsibility, within the limits of each faction's doctrine and established relationships.
+- These conflicts and alliances shape faction decisions, drive events, and influence the course and outcome of operations.
+
+---

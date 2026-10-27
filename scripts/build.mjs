@@ -10,7 +10,7 @@ if (process.env.GOEI_BUILD_VERSION) pkg.version = process.env.GOEI_BUILD_VERSION
 const updateBase = String(process.env.GOEI_UPDATE_BASE ?? pkg.goei?.updateBase ?? '').replace(/\/+$/, '');
 const header = [
   '//@name goei-plugin',
-  '//@display-name 괴이: ANOMALY',
+  `//@display-name 괴이: ANOMALY v${pkg.version}`,
   '//@api 3.0',
   `//@version ${pkg.version}`,
   ...(updateBase ? [`//@update-url ${updateBase}/goei-plugin.js`] : []),
@@ -30,7 +30,7 @@ const common = {
   charset: 'utf8',
   minify: false,
   legalComments: 'none',
-  loader: { '.css': 'text' },
+  loader: { '.css': 'text', '.txt': 'text' },
   write: false,
 };
 
@@ -118,6 +118,7 @@ await build({
   format: 'esm',
   target: 'es2022',
   charset: 'utf8',
+  loader: { '.txt': 'text' },
   outfile: 'dist-test/core.mjs',
 });
 
@@ -176,6 +177,30 @@ await build({ ...common, entryPoints: ['src/game/action/engine/demo.ts'], format
 }
 await build({ entryPoints: ['src/game/action/audio/music.ts', 'src/game/action/audio/songs.ts', 'src/game/action/audio/index.ts'], bundle: true, format: 'esm', target: 'es2022', outdir: 'dist-test/audio' });
 
+// 토크나이저 순위표 (o200k_base, js-tiktoken MIT): 플러그인이 설치·점검에서 받아 저장소에 둔다 (core/tokenizer.ts). 200KB 조각 + 목록
+{
+  const ranks = (await import('js-tiktoken/ranks/o200k_base')).default;
+  const text = JSON.stringify({ pat_str: ranks.pat_str, special_tokens: ranks.special_tokens, bpe_ranks: ranks.bpe_ranks });
+  for (const f of readdirSync('dist')) if (/^tok-o200k\.\d+\.txt$/.test(f)) unlinkSync(`dist/${f}`);
+  const PART = 200_000;
+  const parts = [];
+  let buf = '';
+  let bytes = 0;
+  for (const ch of text) {
+    const n = Buffer.byteLength(ch);
+    if (bytes + n > PART) (parts.push(buf), (buf = ''), (bytes = 0));
+    buf += ch;
+    bytes += n;
+  }
+  if (buf) parts.push(buf);
+  const names = parts.map((p, i) => {
+    const name = `tok-o200k.${i + 1}.txt`;
+    writeFileSync(`dist/${name}`, p);
+    return name;
+  });
+  writeFileSync('dist/tok-o200k.json', JSON.stringify({ name: 'o200k_base', parts: names, length: text.length, digest: createHash('sha1').update(text).digest('hex').slice(0, 12) }));
+  console.log({ tokenizer: 'o200k_base', parts: names.length, chars: text.length });
+}
 const info = {
   version: pkg.version,
   bytes: Buffer.byteLength(code),

@@ -1,5 +1,7 @@
-// 상태창 [▣|날짜|시각|날씨|기온|위치|목표(|동행|투입|신분)]: 원본은 카드 정규식으로 그려서 칸 하나만 어긋나도 통째로 깨졌다.
+// 상태창 [▣|날짜|시각|날씨|기온|위치|목표(|동행|투입|신분|잔고)]: 원본은 카드 정규식으로 그려서 칸 하나만 어긋나도 통째로 깨졌다.
 // 플러그인이 너그럽게 읽는다: 칸이 모자라거나 남아도, 전각 기호·공백이 섞여도, 닫는 괄호가 없어도.
+// 칸 구성(statuscols.ts): 이 채팅의 지금 구성·기록된 구성·알려진 모양 중 칸 수가 맞는 것으로 먼저 읽고, 아니면 모양으로 날짜·시각·기온을 찾는다.
+import { parseWalletCell, shapeFor, type ColId } from './statuscols';
 
 export interface StatusTag {
   /** 원문 (화면에서 바꿀 자리) */
@@ -17,6 +19,8 @@ export interface StatusTag {
   deployed: boolean | null;
   /** 신분 칸 (9칸 상태창, 2026-10-26): 유저의 `조직/직급`. 없으면 빈 문자열 */
   identity: string;
+  /** 잔고 칸 (10칸, 2026-10-27): 숫자만 남긴 글 ('1230000'). 칸이 없거나 못 읽으면 빈 문자열 */
+  wallet: string;
 }
 
 // 여는 기호: [▣ 【▣ ［▣ (▣ 앞 공백 허용). 닫는 기호가 없으면 줄 끝까지
@@ -29,34 +33,56 @@ export function hasStatusTag(text: string): boolean {
   return typeof text === 'string' && /[[【［]\s*▣\s*[|｜]/.test(text);
 }
 
-/** 동행·투입 칸 (뒤 두 칸). 비어 있으면 옛 상태창 */
-function extras(x: string[]): { companions: string[]; deployed: boolean | null; identity: string } {
-  const none = (t: string) => !t || t === '없음' || t === '-' || t === '—';
-  const companions = none(x[0] ?? '') ? [] : x[0].split(/[,，、]/).map((n) => n.trim()).filter((n) => n && !none(n));
+const none = (t: string) => !t || t === '없음' || t === '-' || t === '—';
+const splitNames = (t: string) => (none(t) ? [] : t.split(/[,，、]/).map((n) => n.trim()).filter((n) => n && !none(n)));
+const walletText = (t: string) => {
+  const n = none(t) ? null : parseWalletCell(t);
+  return n === null ? '' : String(n);
+};
+
+/** 동행·투입·신분·잔고 칸 (뒤 칸들). 비어 있으면 옛 상태창 */
+function extras(x: string[]): { companions: string[]; deployed: boolean | null; identity: string; wallet: string } {
   const d = (x[1] ?? '').trim();
   const id = (x[2] ?? '').trim();
-  return { companions, deployed: x.length < 2 ? null : none(d) ? false : /투입|deployed/i.test(d), identity: none(id) ? '' : id };
+  return { companions: splitNames(x[0] ?? ''), deployed: x.length < 2 ? null : none(d) ? false : /투입|deployed/i.test(d), identity: none(id) ? '' : id, wallet: walletText(x[3] ?? '') };
 }
 
-/** 위치 뒤 칸들: 목표(괴이), 동행, 투입. 칸이 더 많으면 목표에 이어 붙이던 옛 방식 대신 뒤 칸은 버린다 */
-function tail(rest: string[]): { target: string; companions: string[]; deployed: boolean | null; identity: string } {
+/** 위치 뒤 칸들: 목표(괴이), 동행, 투입, 신분, 잔고. 칸이 더 많으면 목표에 이어 붙이던 옛 방식 대신 뒤 칸은 버린다 */
+function tail(rest: string[]): { target: string; companions: string[]; deployed: boolean | null; identity: string; wallet: string } {
   const clean = (t: string) => (t === '없음' || t === '-' || t === '—' ? '' : t);
   const after = rest.slice(1);
   if (after.length <= 1) return { target: clean(after[0] ?? ''), ...extras([]) };
-  return { target: clean(after[0]), ...extras(after.slice(1, 4)) };
+  return { target: clean(after[0]), ...extras(after.slice(1, 5)) };
 }
 
-/** 칸을 나눠 이름 붙이기. 여섯 칸이 정확하면 순서대로, 아니면 모양으로 날짜·시각·기온을 먼저 찾는다 */
+/** 칸 구성대로 이름 붙이기 (구성에 없는 칸은 빈 값, 투입 칸이 없으면 null) */
+function byShape(f: string[], shape: ColId[]): Omit<StatusTag, 'raw'> {
+  const clean = (t: string) => (none(t) ? '' : t);
+  const get = (id: ColId) => {
+    const i = shape.indexOf(id);
+    return i < 0 ? '' : (f[i] ?? '').trim();
+  };
+  const d = get('deployed');
+  return {
+    date: get('date'),
+    time: get('time'),
+    weather: clean(get('weather')),
+    temp: clean(get('temp')),
+    place: clean(get('place')),
+    target: clean(get('target')),
+    companions: splitNames(get('companions')),
+    deployed: shape.includes('deployed') ? (none(d) ? false : /투입|deployed/i.test(d)) : null,
+    identity: clean(get('identity')),
+    wallet: walletText(get('wallet')),
+  };
+}
+
+/** 칸을 나눠 이름 붙이기. 칸 수가 아는 모양과 맞고 날짜·시각 자리가 맞으면 그 순서대로, 아니면 모양으로 날짜·시각·기온을 먼저 찾는다 */
 function fieldsOf(inner: string): Omit<StatusTag, 'raw'> {
   const f = inner.split(/[|｜]/).map((s) => s.trim());
   while (f.length && f[f.length - 1] === '') f.pop();
-  const clean = (t: string) => (t === '없음' || t === '-' || t === '—' ? '' : t);
-  if (f.length === 6 && DATE_RE.test(f[0]) && TIME_RE.test(f[1])) {
-    return { date: f[0], time: f[1], weather: f[2], temp: f[3], place: f[4], target: clean(f[5]), ...extras([]) };
-  }
-  if ((f.length === 8 || f.length === 9) && DATE_RE.test(f[0]) && TIME_RE.test(f[1])) {
-    return { date: f[0], time: f[1], weather: f[2], temp: f[3], place: f[4], target: clean(f[5]), ...extras(f.slice(6)) };
-  }
+  const shape = shapeFor(f.length);
+  if (shape && DATE_RE.test(f[shape.indexOf('date')] ?? '') && TIME_RE.test(f[shape.indexOf('time')] ?? '')) return byShape(f, shape);
   const rest = [...f];
   const take = (re: RegExp) => {
     const i = rest.findIndex((x) => re.test(x));
@@ -137,23 +163,32 @@ export interface StatusTimeline {
   last: { raw: string; minute: number } | null;
   /** 모은 상태창 원문 전부 */
   seen: Set<string>;
+  /** 상태창 원문 → 바로 앞 상태창의 잔고 (둘 다 읽혔을 때만) */
+  prevWallet: Map<string, number>;
+  /** 마지막으로 읽힌 잔고 */
+  lastWallet: number | null;
 }
 
 /** 채팅 응답들의 상태창 시각을 차례로 모아 「지난 장면」을 찾는다 */
 export function statusTimeline(texts: string[]): StatusTimeline {
   const prev = new Map<string, number>();
+  const prevWallet = new Map<string, number>();
   const seen = new Set<string>();
   let start: number | null = null;
   let last: { raw: string; minute: number } | null = null;
+  let lastWallet: number | null = null;
   for (const t of texts) {
     for (const tag of findStatusTags(t)) {
       const m = statusMinute(tag.date, tag.time);
       seen.add(tag.raw.trim());
+      const w = tag.wallet ? Number(tag.wallet) : null;
+      if (w !== null && lastWallet !== null && !prevWallet.has(tag.raw.trim())) prevWallet.set(tag.raw.trim(), lastWallet);
+      if (w !== null) lastWallet = w;
       if (m === null) continue;
       if (start === null) start = m;
       if (last !== null && !prev.has(tag.raw.trim())) prev.set(tag.raw.trim(), last.minute);
       last = { raw: tag.raw.trim(), minute: m };
     }
   }
-  return { prev, start, last, seen };
+  return { prev, start, last, seen, prevWallet, lastWallet };
 }

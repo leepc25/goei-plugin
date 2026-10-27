@@ -2,6 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
 import { settings as S, asset as A, DEFAULT_SETTINGS } from '../dist-test/core.mjs';
+import { imgDirLore } from './fixtures/imgdir.mjs';
 
 const REAL = '/mnt/project-files/analysis/extracted/module.json';
 const realLore = existsSync(REAL) ? (() => { const m = JSON.parse(readFileSync(REAL, 'utf8')); return m.lorebook ?? m.module?.lorebook; })() : null;
@@ -35,24 +36,25 @@ test('chat variables override, invalid values fall back', () => {
   assert.equal(S.basicDefaults(book({ 기본설정: { 통합관제: false } })).anomalyOn, false);
 });
 
-const IMG = {
-  characters: ['Aileen', 'Lee Ha'],
-  sfw_keywords: ['default', 'smile', 'angry'],
-  kor_to_eng: { 에일린: 'Aileen', 이하: 'Lee Ha' },
-};
-const imgLore = [{ comment: 'Image tag', content: JSON.stringify(IMG) }];
+const imgLore = imgDirLore([{ name: '에일린', english: 'Aileen' }, { name: '이하', english: 'Lee Ha' }]);
+const KW = ['default', 'smile', 'angry'];
 
-test('Image tag data is validated', () => {
-  const d = A.readImageData(imgLore);
+test('이미지 자료: 명부 한글 이름·영문명·별칭 + 설정 목록·표정으로 조립, 비면 오류', () => {
+  const d = A.imageDataFrom(imgLore, [], KW);
   assert.deepEqual(d.characters, ['Aileen', 'Lee Ha']);
   assert.equal(d.aliases.get('에일린'), 'Aileen');
-  assert.throws(() => A.readImageData([]), /Image tag/);
-  assert.throws(() => A.readImageData([{ comment: 'Image tag', content: '{"characters":["Bad_Name"],"sfw_keywords":["a"]}' }]), /사용할 수 없는/);
-  assert.throws(() => A.readImageData([{ comment: 'Image tag', content: '{"characters":["A"],"sfw_keywords":["a"],"kor_to_eng":{"가":"B"}}' }]), /characters에 없는/);
+  assert.equal(d.aliases.get('lee ha'), 'Lee Ha');
+  const picked = A.imageDataFrom(imgLore, ['Aileen', 'Secriem'], KW);
+  assert.deepEqual(picked.characters, ['Aileen', 'Secriem'], '설정 목록대로 고르고, 명부에 없는 임의 이름도 넣음');
+  assert.equal(picked.aliases.has('이하'), false);
+  const al = A.imageDataFrom(imgDirLore([{ name: '쟈알디', english: 'Jyaldi', aliases: ['쟐디'] }, { name: '쟐디', english: 'Jaldi' }]), [], KW);
+  assert.equal(al.aliases.get('쟐디'), false, '둘을 가리키는 별칭은 못 씀');
+  assert.throws(() => A.imageDataFrom([], [], KW), /출력 대상이 없습니다/);
+  assert.throws(() => A.imageDataFrom(imgLore, [], []), /표정 세트/);
 });
 
 test('asset pass numbers paragraphs, keeps the status block and enforces limits', () => {
-  const d = A.readImageData(imgLore);
+  const d = A.imageDataFrom(imgLore, [], KW);
   const body = '<img=Aileen_default>\n\n에일린이 웃었다.\n\n바람이 분다.\n\n에일린은 화가 났다.\n\n에일린이 다시 웃었다.\n[▣|상태|12:00]';
   const job = A.planAsset(body, d, 2);
   assert.ok(job);
@@ -105,7 +107,7 @@ test('주인공 이미지: 기본 끔, 켜면 Asset 로어북의 {{user}} 금지
 });
 
 test('보조모델: 주인공 이미지를 끄면 주인공은 태그 후보에서 빠진다', () => {
-  const data = A.readImageData([{ comment: 'Image tag', content: JSON.stringify({ characters: ['Jyaldi', 'Aileen'], sfw_keywords: ['default'], kor_to_eng: { 쟈알디: 'Jyaldi', 에일린: 'Aileen' } }) }]);
+  const data = A.imageDataFrom(imgDirLore([{ name: '쟈알디', english: 'Jyaldi' }, { name: '에일린', english: 'Aileen' }]), [], ['default']);
   const text = '쟈알디가 문을 열었다.\n\n에일린이 웃었다.';
   assert.deepEqual(A.planAsset(text, data, 2).messages[0].content.match(/## Allowed Character Names.*\n(.*)/)[1], 'Jyaldi | Aileen');
   assert.deepEqual(A.planAsset(text, data, 2, ['Jyaldi']).messages[0].content.match(/## Allowed Character Names.*\n(.*)/)[1], 'Aileen');
@@ -125,7 +127,7 @@ test('페르소나 이름 태그는 표정과 상관없이 유저 사진 칸', a
 });
 
 test('보조모델도 같은 구조: ON이면 {{user}} 금지 줄을 빼고 페르소나를 명단에', () => {
-  const base = A.readImageData([{ comment: 'Image tag', content: JSON.stringify({ characters: ['Aileen'], sfw_keywords: ['default', 'smile'], kor_to_eng: { 에일린: 'Aileen' } }) }]);
+  const base = A.imageDataFrom(imgDirLore([{ name: '에일린', english: 'Aileen' }]), [], ['default', 'smile']);
   const text = '영지가 웃었다.\n\n에일린이 웃었다.';
   const off = A.planAsset(text, base, 2).messages[0].content;
   assert.match(off, /DO NOT tag \{\{user\}\}/);

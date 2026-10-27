@@ -282,21 +282,66 @@ WIKI_PACK_HEAD = 'GOEIWIKI1:'  # core/wiki.ts WIKI_PACK_HEAD와 같게
 
 
 def add_wiki_base(entries):
-    """card/wiki-base.json(scripts/wiki-import.mjs가 모은 위키 기본 문서)을 「📖위키」 폴더의 항목 하나로 넣는다.
-    문서가 많아(2MB 넘음) 카드가 무거워지지 않게 {제목: 본문} JSON을 gzip+base64로 줄인다. 플러그인이 창을 열 때 한 번 푼다(core/wiki.ts prepareBaseDocs).
-    키 없는 비활성 항목이라 모델 프롬프트에는 들어가지 않는다"""
-    path = ROOT / 'card' / 'wiki-base.json'
-    if not path.exists():
-        return entries
-    docs = json.loads(path.read_text(encoding='utf-8'))
-    entries = [e for e in entries if e.get('folder') != WIKI_FOLDER_KEY and e.get('key') != WIKI_FOLDER_KEY]
+    """「📖위키」 폴더(사용자 문서 자리)만 카드에 둔다. 기본 문서 묶음은 2026-10-27부터 카드 밖(release/wiki-base.N.txt)에서 플러그인이 받아
+    저장소(pluginStorage)에 둔다 (core/wiki.ts prepareBaseDocs · host/install.ts). 옛 카드의 「📖위키 기본 문서」 항목은 뺀다"""
+    entries = [e for e in entries if e.get('folder') != WIKI_FOLDER_KEY and e.get('key') != WIKI_FOLDER_KEY and e.get('comment') != WIKI_PACK_COMMENT]
     entries.append({'key': WIKI_FOLDER_KEY, 'comment': WIKI_FOLDER_NAME, 'content': '', 'mode': 'folder', 'insertorder': 100,
                     'alwaysActive': False, 'secondkey': '', 'selective': False, 'bookVersion': 2})
-    raw = json.dumps(docs, ensure_ascii=False, separators=(',', ':')).encode('utf-8')
-    packed = WIKI_PACK_HEAD + base64.b64encode(gzip.compress(raw, compresslevel=9, mtime=0)).decode('ascii')
-    entries.append({'key': '', 'secondkey': '', 'comment': WIKI_PACK_COMMENT, 'content': packed, 'mode': 'normal', 'insertorder': 0,
-                    'alwaysActive': False, 'selective': False, 'useRegex': False, 'folder': WIKI_FOLDER_KEY, 'bookVersion': 2})
     return entries
+
+
+WIKI_PACK_FILE = 'wiki-base.json'
+
+
+def wiki_pack():
+    """card/wiki-base.json(scripts/wiki-import.mjs가 모은 위키 기본 문서) → {제목: 본문} JSON 을 gzip+base64 로 줄인 글 한 덩어리.
+    플러그인이 받아 저장소에 두고 창을 열 때 한 번 푼다 (core/wiki.ts prepareBaseDocs). 없으면 None"""
+    path = ROOT / 'card' / 'wiki-base.json'
+    if not path.exists():
+        return None
+    docs = json.loads(path.read_text(encoding='utf-8'))
+    raw = json.dumps(docs, ensure_ascii=False, separators=(',', ':')).encode('utf-8')
+    return WIKI_PACK_HEAD + base64.b64encode(gzip.compress(raw, compresslevel=9, mtime=0)).decode('ascii')
+
+
+def write_parts(folder, stem, text, extra=None):
+    """글 한 덩어리를 200KB 조각(stem.N.txt)으로 나눠 쓰고 목록(stem.json)을 둔다 (Risu 웹 프록시는 1MB 넘는 파일을 못 받는다). 지난 조각은 지운다"""
+    folder = Path(folder)
+    for old in folder.glob(f'{stem}.*.txt'):
+        old.unlink()
+    parts, buf, size = [], [], 0
+    for ch in text:
+        n = len(ch.encode('utf-8'))
+        if size + n > UPDATE_PART_BYTES:
+            parts.append(''.join(buf))
+            buf, size = [], 0
+        buf.append(ch)
+        size += n
+    if buf:
+        parts.append(''.join(buf))
+    names = []
+    for i, part in enumerate(parts, 1):
+        name = f'{stem}.{i}.txt'
+        (folder / name).write_text(part, encoding='utf-8')
+        names.append(name)
+    index = {'parts': names, 'length': len(text.encode('utf-16-le')) // 2, 'digest': hashlib.sha1(text.encode('utf-8')).hexdigest()[:12], **(extra or {})}
+    (folder / f'{stem}.json').write_text(json.dumps(index, ensure_ascii=False), encoding='utf-8')
+    return index
+
+
+INSTALL_DIR = ROOT / 'src' / 'data' / 'install'
+
+
+def write_install_data(greetings, greeting_index, pictures, lore, icon):
+    """깡통봇 설치용 플러그인 데이터 (core/install.ts 가 내장): 인사말 57개와 키→번호, 카드 사진 목록, 기본 명부(Directory), 아이콘 지문"""
+    INSTALL_DIR.mkdir(parents=True, exist_ok=True)
+    directory = json.loads(next(e for e in lore if e.get('comment') == 'Directory')['content'])
+    dump = lambda name, obj: (INSTALL_DIR / name).write_text(json.dumps(obj, ensure_ascii=False, separators=(',', ':')), encoding='utf-8')
+    dump('greetings.json', {'index': greeting_index, 'texts': greetings})
+    dump('pictures.json', pictures)
+    dump('directory.json', directory)
+    dump('icon.json', {'file': 'icon.png', 'digest': hashlib.sha1(icon).hexdigest()[:12], 'bytes': len(icon)} if icon else {})
+    return directory
 
 
 # 본편 로어북 고르기 (플러그인 core/lore.ts). 네 폴더 항목은 @@dont_activate로 Risu가 켜지 않고,
@@ -417,20 +462,18 @@ def lore_activation(entries):
         if not e.get('content', '').lstrip().startswith(DONT_ACTIVATE):
             e['content'] = DONT_ACTIVATE + '\n' + e.get('content', '')
         prints[name] = sorted({before, key_print(e['key'])})
-    if edits:
+    if edits and any(kinds.values()):
         raise SystemExit(f'키 정리 실패: 로어북을 찾지 못했어요 {sorted(edits)}')
-    settings = next(e for e in entries if e.get('mode') == 'folder' and e.get('comment') == SETTINGS_FOLDER_NAME)
+    # 자리 항목(📚Lore slot)은 더 넣지 않는다 (2026-10-27): 플러그인이 요청에 직접 끼운다 (core/lore.ts insertLoreBlock)
     names = {c for c, _, _ in LORE_SLOTS}
     entries = [e for e in entries if e.get('comment') not in names]
-    for comment, var, order in LORE_SLOTS:
-        entries.append({'key': '', 'secondkey': '', 'comment': comment, 'content': '{{getvar::' + var + '}}', 'mode': 'normal',
-                        'insertorder': order, 'alwaysActive': True, 'selective': False, 'useRegex': False,
-                        'folder': settings['key'], 'bookVersion': 2})
     return entries, prints
 
 
 # 원본 지침 문장 고치기 (주석 이름, 옛 문장, 새 문장). 옛 문장이 없으면 빌드를 멈춘다
 LORE_PATCHES = [
+    # 괴담넷 성격 전환 (2026-10-26 사용자): 설정 lb_cfg_lb-gn.style = gal 괴담갤(일반) / net 괴담넷(업계, 기본) / wpf 세정게. 큰 틀은 그대로, 소개·기본 말투·기본 주제만 분기. 문안은 card/gnet-style.json
+    *[('GNet', v['old'], v['new']) for v in json.loads((ROOT / 'card' / 'gnet-style.json').read_text(encoding='utf-8')).values()],
     # 콘쥬스 20세 대학생 (2026-10-26 사용자 지시). 위키·게임 시트·대사도 같이 바꿈
     ('콘쥬스', '- Age: 17, a high school student', '- Age: 20, a university student'),
     ('콘쥬스', 'Agent. A minor attached to the team, deployed only when', 'Agent. The youngest member of the team, deployed only when'),
@@ -590,6 +633,27 @@ def drop_settings(entries):
     return [e for e in entries if e.get('comment') not in SETTINGS_BOOKS]
 
 
+# 플러그인이 들고 가는 로어북 (docs/설계안_세계편집.md, 2026-10-27 사용자 결정): 지침·상시 지침·자리 항목·시드 통로·세계 폴더 전부.
+# 명부(Directory)로 옮기는 일(migrate_directory·add_appendix_data)은 이 함수 전에 끝나야 한다 (폴더 항목을 보고 명부 행을 만든다)
+PLUGIN_BOOKS = ('GNet', 'Phone', 'Wiki', 'Directive', 'Visit', 'LB Backend', '🏷️Tag', '📜Faction', '🙂Roster', '📕Start Lore', 'Asset', 'Image tag')
+PLUGIN_FOLDERS = ('세계', '세력', '조직', '요원', '괴이', '파밍', '부록')
+
+
+def drop_plugin_lore(entries):
+    """플러그인에 내장한 지침·세계 로어북과 그 폴더를 카드에서 뺀다. 남는 것: ⚙️설정(Directory·매니페스트)·📖위키 폴더"""
+    folders = {e['key'] for e in entries if e.get('mode') == 'folder' and _folder_word(e.get('comment')) in PLUGIN_FOLDERS}
+    out = []
+    for e in entries:
+        if e.get('mode') == 'folder' and e.get('key') in folders:
+            continue
+        if e.get('folder') in folders:
+            continue
+        if e.get('comment') in PLUGIN_BOOKS or str(e.get('comment', '')).startswith('📚Lore slot'):
+            continue
+        out.append(e)
+    return out
+
+
 UPDATE_FILE = 'card-update.json'
 # Risu 웹은 외부 파일을 프록시로 받는데, 1MB 넘는 파일은 제대로 못 받는다(v0.16.3에서 빈 객체가 옴).
 # 그래서 카드 데이터를 작은 조각(card-update.N.txt)으로 나누고 card-update.json에는 목록만 둔다.
@@ -685,15 +749,16 @@ def add_wiki_assets(data, others):
     return added
 
 
-# 이미지 태그 로어북 2개 (사용자 2026-10-22, 예전 에셋 모듈에서 옮김): Asset = 메인 모델 출력 지침(언제나 켬), Image tag = 보조 모델 자료(core/asset.ts)
+# 이미지 태그 로어북 원문 보관 (사용자 2026-10-22, 예전 에셋 모듈에서 옮김). v0.16.66부터 카드에는 넣지 않는다: Asset(메인 모델 지침)은 설정으로 조립(core/imgprompt.ts), Image tag(보조 모델 자료)는 명부에서 조립(core/asset.ts imageDataFrom)
 IMAGE_LORE = ROOT / 'card' / 'image-lore.json'
 
 
 def add_image_lore(lore):
     """이미지 태그 로어북을 ⚙️설정 폴더에 넣는다. 같은 이름이 카드에 있으면 바꾼다.
     「Asset」(메인 모델 지침)은 v0.16.64부터 플러그인이 설정으로 조립해 요청에 끼우므로 카드에 넣지 않고, 있던 것도 뺀다 (core/imgprompt.ts)"""
-    books = [b for b in json.loads(IMAGE_LORE.read_text(encoding='utf-8'))['data'] if b['comment'] != 'Asset']
-    names = {b['comment'] for b in books} | {'Asset'}
+    # v0.16.66: 「Image tag」(보조 모델 자료)도 명부(한글 이름·영문명·별칭)+설정으로 조립하므로 카드에서 뺀다 (사용자 2026-10-27). 둘 다 있던 것도 지운다
+    books = [b for b in json.loads(IMAGE_LORE.read_text(encoding='utf-8'))['data'] if b['comment'] not in ('Asset', 'Image tag')]
+    names = {b['comment'] for b in books} | {'Asset', 'Image tag'}
     settings = next(e for e in lore if e.get('mode') == 'folder' and e.get('comment') == SETTINGS_FOLDER_NAME)
     return [e for e in lore if e.get('comment') not in names] + [{**b, 'folder': settings['key']} for b in books]
 
@@ -789,9 +854,15 @@ def main(src, dst):
     data['character_version'] = version
     data['description'] = patch_desc(data.get('description', ''))
     lore = [e for e in lore if e.get('comment') not in (MANIFEST_COMMENT, OLD_MANIFEST)]
-    lore = add_visit_guide(add_image_lore(add_wiki_base(add_appendix_data(migrate_directory(add_extra_lore(tidy_guides(patch_lore(drop_settings(lore)))))))))
-    lore, manifest['keys'] = lore_activation(lore)
+    # 지침·세계 로어북은 플러그인 내장(2026-10-27): 명부로 옮기는 일까지 끝낸 뒤 카드에서 뺀다. 카드에 남는 글 로어북은 Directory·매니페스트·위키 기본 문서
+    lore = drop_plugin_lore(add_wiki_base(add_appendix_data(migrate_directory(add_extra_lore(patch_lore(drop_settings(lore)))))))
+    lore, _prints = lore_activation(lore)
     settings = next(e for e in lore if e.get('mode') == 'folder' and e.get('comment') == SETTINGS_FOLDER_NAME)
+    # 폴더 key: 플러그인이 이름 대신 key 로 폴더를 찾고(이름을 바꿔도 됨), 점검이 없어진 것을 안다 (2026-10-27 설계안 9절)
+    manifest['keys'] = {'settings': settings['key'], 'wiki': WIKI_FOLDER_KEY}
+    pack = wiki_pack()
+    if pack:
+        manifest['wiki'] = {'digest': hashlib.sha1(pack.encode('utf-8')).hexdigest()[:12], 'length': len(pack.encode('utf-16-le')) // 2}
     lore.append({
         'key': MANIFEST_KEY, 'secondkey': '', 'insertorder': 0, 'comment': MANIFEST_COMMENT,
         'content': json.dumps(manifest, ensure_ascii=False), 'mode': 'normal', 'alwaysActive': False,
@@ -805,8 +876,10 @@ def main(src, dst):
     data['name'] = CARD_NAME
     data['first_mes'] = LANDING
     data['alternate_greetings'] = greetings
-    data['creator_notes'] = creator_notes(data.get('creator_notes'))
-    risu['backgroundHTML'] = status_css(risu.get('backgroundHTML'))
+    # 2026-10-27 사용자: 제작 노트는 비우고, RP 지침(description)은 플러그인이 요청에 끼우고(core/guides.ts RP), 옛 상태창 CSS 는 쓰는 곳이 없어 비운다
+    data['creator_notes'] = ''
+    data['description'] = ''
+    risu['backgroundHTML'] = ''
     risu['lowLevelAccess'] = False
     risu['virtualscript'] = ''
     risu.pop('triggerscript', None)
@@ -832,11 +905,19 @@ def main(src, dst):
     payload = update_payload(data, risu, lite_module, version, min_plugin)
     parts = write_update(Path(dst).parent, payload)
     pic_files = write_pictures(Path(dst).parent, pictures, data, others)
+    # 위키 기본 문서 묶음 · 아이콘: release 에서 플러그인이 받는다 (깡통봇 설치, 카드에 없는 기본 문서)
+    wiki_parts = write_parts(Path(dst).parent, 'wiki-base', pack, {'version': version})['parts'] if pack else []
+    icon_asset = next((a for a in data.get('assets', []) if a.get('type') == 'icon'), None)
+    icon = others.get(str(icon_asset.get('uri', '')).replace('embeded://', '')) if icon_asset else None
+    if icon:
+        (Path(dst).parent / 'icon.png').write_bytes(icon)
+    write_install_data(greetings, greeting_index, pictures, lore, icon)
     # 창이 열릴 때 받는 작은 버전 정보 (플러그인·카드를 같은 버전으로 함께 낸다)
     Path(dst).with_name('version.json').write_text(json.dumps(
         {'card': version, 'plugin': version, 'minPlugin': payload['minPlugin']}), encoding='utf-8')
     print(json.dumps({
         'output': str(dst), 'update': UPDATE_FILE, 'parts': parts, 'greetings': len(greetings), 'lore': len(lore), 'regex': len(kept_regex), 'wikiAssets': wiki_assets, 'maps': maps, 'pictures': pic_files,
+        'wikiParts': len(wiki_parts), 'icon': bool(icon),
         'backgroundHTML': len(risu['backgroundHTML']), 'first_mes': len(LANDING),
     }, ensure_ascii=False))
 

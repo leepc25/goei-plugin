@@ -132,13 +132,19 @@ function docsIn(entries: LoreEntry[]): WikiDoc[] {
 // 카드 기본 문서 묶음: 카드 무게를 줄이려고 {제목: 본문} JSON을 gzip+base64로 줄여 로어북 항목 하나에 담는다 (tools/build_lite_card.py add_wiki_base)
 export const WIKI_PACK_HEAD = 'GOEIWIKI1:';
 let pack: { src: string; docs: WikiDoc[] } | null = null;
+/** 플러그인 저장소에 받아 둔 묶음 (2026-10-27: 카드 대신 release/wiki-base 에서 받는다, host/install.ts). 카드에 묶음이 있으면 카드 것이 먼저 */
+let stored: string | null = null;
+export function setStoredWikiPack(text: string | null): void {
+  stored = text && text.startsWith(WIKI_PACK_HEAD) ? text : null;
+}
+export const storedWikiPack = () => stored;
 
 function packEntry(lore: LoreEntry[]): string | null {
   for (const e of lore) {
     const c = e?.content;
     if (typeof c === 'string' && c.startsWith(WIKI_PACK_HEAD)) return c;
   }
-  return null;
+  return stored;
 }
 
 /** 기본 문서 묶음을 풀어 둔다 (창을 열 때 한 번). 같은 묶음이면 다시 풀지 않는다. 풀 수 없는 환경이면 묶음 없이 지나간다 */

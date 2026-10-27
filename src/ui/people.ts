@@ -320,8 +320,8 @@ export function peopleSettingsPane(ctx: ChatContext, canChat = true): string {
   const state = ctx.chat.scriptstate;
   const v = (k: string) => ppValue(state, k);
   const s = peopleSettings(state);
-  const onoff = (k: string) => seg(k, v(k) === '1' ? '1' : '0', [['1', '켬'], ['0', '끔']]);
-  const intro = `<p class="ps-note pp-intro">본편 응답이 끝날 때마다 <b>보조 모델이 그 응답을 한 번 읽어</b> 인물별 기록(기본정보·성격·현재 상태·인간관계·호감·호칭…)을 쌓고, 다음 본편 요청과 필드(대사·신분)가 그 기록을 읽어요. 로어북 시트는 시작값이고, 이 기록이 이야기에 따라 바뀌어요. 비용: 응답당 보조 모델 호출 1회(갱신 모델을 메인으로 두면 메인 1회).</p>`;
+  const onoff = (k: string) => seg(k, v(k) === '1' ? '1' : '0', [['1', 'ON'], ['0', 'OFF']]);
+  const intro = `<p class="ps-note">본편 응답이 끝날 때마다 <b>보조 모델이 그 응답을 한 번 읽어</b> 인물별 기록(기본정보·성격·현재 상태·인간관계·호감·호칭…)을 쌓고, 다음 본편 요청과 필드(대사·신분)가 그 기록을 읽어요. 로어북 시트는 시작값이고, 이 기록이 이야기에 따라 바뀌어요. 비용: 응답당 보조 모델 호출 1회(갱신 모델을 메인으로 두면 메인 1회).</p>`;
   const main = [
     row('인물 기록', onoff('on'), '끄면 응답을 읽지 않고, 본편에도 기록을 넣지 않아요. 메인 설정 「상황판 → 인물 기록」과 같은 값이에요.'),
     row('갱신 시점', seg('when', s.when, [['turn', '매 턴'], ['manual', '수동']]), '수동이면 인물 화면의 「지금 갱신」을 눌렀을 때만 읽어요.'),
@@ -329,7 +329,7 @@ export function peopleSettingsPane(ctx: ChatContext, canChat = true): string {
     row('지침', seg('prompt', s.prompt, [['detailed', '자세히'], ['compact', '간결']]), '자세히 = 리수폿 원문 규칙+설명. 간결 = 같은 규칙·설명 축약, 토큰 약 1/3.'),
     row('기록 언어', seg('lang', s.lang, [['ko', '한국어'], ['en', '영어']]), '기록 본문(항목·이유·메모)을 쓰는 언어. 이름·인용·호칭은 늘 원문. 영어는 같은 내용이면 토큰이 절반쯤이고, 위키 화면에도 영어로 보여요.'),
     row('본편에 넣기', seg('inject', s.inject, [['split', '절 단위 혼합'], ['append', '시트 전체+기록'], ['record', '기록만'], ['off', '안 넣음']]), '절 단위 혼합: 시트의 Identity·Character 절은 기록으로 대신하고 나머지 절은 원문 그대로.'),
-    row('Director', seg('director', s.director, [['off', '끔'], ['facts', '사실형(뒤)'], ['scene', '연출형(앞)']]), '사실형은 갱신기에 얹어 다음 턴 메모를 남기고, 연출형은 본편 요청 앞에 짧은 지시를 한 번 더 만들어요.'),
+    row('Director', seg('director', s.director, [['off', 'OFF'], ['facts', '사실형(뒤)'], ['scene', '연출형(앞)']]), '사실형은 갱신기에 얹어 다음 턴 메모를 남기고, 연출형은 본편 요청 앞에 짧은 지시를 한 번 더 만들어요.'),
     row('호감 변화 속도', seg('speed', String(s.speed), [['0.5', '0.5'], ['1', '1'], ['1.5', '1.5'], ['2', '2']])),
     row('메시지당 변화 상한', `<label class="st-range pp-range"><input type="range" min="0" max="100" step="1" value="${s.turnCap}" data-input="pp-cap" data-change="pp-cap" aria-label="메시지당 변화 상한"><output>${s.turnCap === 0 ? '한도 없음' : `±${s.turnCap}`}</output></label>`, '메시지 하나(필드는 장면 하나)에서 호감·세력 평판이 움직일 수 있는 최대. 0이면 한도 없음. 중대위반(−50)은 늘 한도 밖. 리수폿 기본 ±10.'),
   ].join('');
@@ -374,7 +374,7 @@ export function peopleSettingsPane(ctx: ChatContext, canChat = true): string {
     ${peopleUi.notice ? `<div class="gx-err" role="alert">${esc(peopleUi.notice)}</div>` : ''}
     <div class="ph-form-body ps">
       ${intro}
-      ${group('', main)}
+      ${group('인물 기록', main)}
       ${fold('pp-feat', '기능', features)}
       ${fold('pp-new', '새 인물', newPeople)}
       ${director}
@@ -512,8 +512,8 @@ export function factionView(ctx: ChatContext, code: string): string {
   return `<div class="ph-room nw-pane pp-pane">${head(f.name, `세력 평판 · 시작값 ${f.base}${code === uf ? ' · 주인공 소속' : ''}`)}
     <article class="nw-doc pp-doc">
       ${peopleUi.notice ? `<div class="gx-err" role="alert">${esc(peopleUi.notice)}</div>` : ''}
-      <section class="pp-card"><h4 title="세력이 주인공을 어떻게 보는지 (−100~100). 본편에서는 갱신기 모델이 판단한 일로, 필드에서는 그 소속이 목격한 일로 바뀌어요">평판</h4>${factionBar(f.value, s.factionBounds)}${edit}</section>
-      <section class="pp-card"><h4 title="필드에서 이 세력의 이름 없는 몹이 주인공을 처음 봤을 때">구간별 몹 반응</h4>${mob}</section>
+      <section class="pp-card"><h4 title="세력이 주인공을 어떻게 보는지 (−100~100). 본편에서는 갱신기 모델이 판단한 일로, 필드에서는 그 소속이 목격한 일로 바뀌어요">평판</h4><div class="pp-card-body">${factionBar(f.value, s.factionBounds)}${edit}</div></section>
+      <section class="pp-card"><h4 title="필드에서 이 세력의 이름 없는 몹이 주인공을 처음 봤을 때">구간별 몹 반응</h4><div class="pp-card-body">${mob}</div></section>
       <details class="ps-adv-sub pp-log" data-keep="pp-log"${keepOpen('pp-log')}><summary>변경 기록<b>${mine.length}</b></summary>${mine.length ? `<ul class="pp-entries">${mine.map((c) => changeRow(ctx, c, live)).join('')}</ul>` : '<p class="ps-note">아직 변경 기록이 없어요. 시작값은 조직×조직 표에서 와요.</p>'}</details>
     </article>${toast('pp', peopleUi.info, (t) => {
       if (peopleUi.info === t) peopleUi.info = '';
@@ -588,7 +588,7 @@ function entryRow(ctx: ChatContext, who: string, slot: SlotId, e: Entry, live: L
   return `<li class="pp-entry${dead ? ' dead' : ''}${e.void ? ' void' : ''}${e.pin ? ' pinned' : ''}">
     <div class="pp-entry-main">${srcIcon(e.src)}<span class="pp-text">${esc(e.text)}</span></div>
     <div class="pp-entry-meta">${meta}${stateMark(st)}
-      <span class="pp-entry-btns"><button class="ph-tool sm${e.pin ? ' on' : ''}" data-action="pp-pin" data-value="${esc(key)}" title="${e.pin ? '고정 풀기' : '고정: 갱신기가 이 항목을 바꾸거나 지우지 못하게'}" aria-label="고정" aria-pressed="${!!e.pin}">${ICONS.pin}</button>${voidBtn('pp-void', key, !!e.void)}</span></div>
+      <span class="pp-entry-btns"><button class="gx-mini pp-mini${e.pin ? ' on' : ''}" data-action="pp-pin" data-value="${esc(key)}" title="${e.pin ? '고정 풀기' : '고정: 갱신기가 이 항목을 바꾸거나 지우지 못하게 잠가요'}" aria-pressed="${!!e.pin}">${e.pin ? '고정됨' : '고정'}</button>${voidBtn('pp-void', key, !!e.void)}</span></div>
     ${evidenceBox(ctx, live, key, e.anchor, e.quote)}
   </li>`;
 }
@@ -599,12 +599,12 @@ function extraCards(ctx: ChatContext, p: Person, changes: Change[]): string {
   const out: string[] = [];
   if (f.has('taste')) {
     const band = tasteOf(p, changes);
-    out.push(`<section class="pp-card"><h4 title="주인공이 이 인물의 취향에 맞는 정도. 호감과 다른 축">취향 띠(첫인상)</h4><p class="pp-extra">${band === null ? '<span class="pp-addr-none">아직 판정 전 — 실제로 마주치면 한 번 정해져요</span>' : `<b>${band > 0 ? '+' : ''}${band}</b> ${esc(TASTE_STAGES[band]?.ko ?? '')}`}</p></section>`);
+    out.push(`<section class="pp-card"><h4 title="주인공이 이 인물의 취향에 맞는 정도. 호감과 다른 축">취향 띠(첫인상)</h4><div class="pp-card-body"><p class="pp-extra">${band === null ? '<span class="pp-addr-none">아직 판정 전 — 실제로 마주치면 한 번 정해져요</span>' : `<b>${band > 0 ? '+' : ''}${band}</b> ${esc(TASTE_STAGES[band]?.ko ?? '')}`}</p></div></section>`);
   }
   if (f.has('openness')) {
     const v = opennessOf(p, changes);
     const st = v === null ? null : opennessStage(v);
-    out.push(`<section class="pp-card"><h4 title="성인 인물의 성적 개방도와 피임 태도 (0~300)">음란도</h4><p class="pp-extra">${v === null ? '<span class="pp-addr-none">아직 없음 — 근거가 있을 때만 시작값이 생겨요</span>' : `<b>${st!.label}</b> ${Math.round(v)}/300 · 피임: ${esc(st!.contraception)}`}</p></section>`);
+    out.push(`<section class="pp-card"><h4 title="성인 인물의 성적 개방도와 피임 태도 (0~300)">음란도</h4><div class="pp-card-body"><p class="pp-extra">${v === null ? '<span class="pp-addr-none">아직 없음 — 근거가 있을 때만 시작값이 생겨요</span>' : `<b>${st!.label}</b> ${Math.round(v)}/300 · 피임: ${esc(st!.contraception)}`}</p></div></section>`);
   }
   return out.join('');
 }
@@ -662,8 +662,8 @@ export function personView(ctx: ChatContext, name: string): string {
   return `<div class="ph-room nw-pane pp-pane">${head(name, sub, tidyBtn)}
     <article class="nw-doc pp-doc">
       ${peopleUi.notice ? `<div class="gx-err" role="alert">${esc(peopleUi.notice)}</div>` : ''}
-      <section class="pp-card"><h4 title="주인공에 대한 호감. 계기가 쌓여 8단계로 바뀌고, 본편 요청에 단계별 행동 방향으로 들어가요">호감</h4>${affinityBar(aff.value)}${affEdit}</section>${extraCards(ctx, p, changes)}
-      <section class="pp-card"><h4 title="이 인물이 주인공을 부르는 말과 말투(존댓말·반말…)">호칭</h4>${addrEdit}</section>
+      <section class="pp-card"><h4 title="주인공에 대한 호감. 계기가 쌓여 8단계로 바뀌고, 본편 요청에 단계별 행동 방향으로 들어가요">호감</h4><div class="pp-card-body">${affinityBar(aff.value)}${affEdit}</div></section>${extraCards(ctx, p, changes)}
+      <section class="pp-card"><h4 title="이 인물이 주인공을 부르는 말과 말투(존댓말·반말…)">호칭</h4><div class="pp-card-body">${addrEdit}</div></section>
       ${slots || '<p class="ps-note">아직 칸에 적힌 항목이 없어요.</p>'}
       ${log}
     </article>${toast('pp', peopleUi.info, (t) => {

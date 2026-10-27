@@ -1,4 +1,4 @@
-an flattery.
+n flattery.
 - Keeps hostile allies cooperating; when a crusader and agent confront each other mid-operation, she resets terms and redirects both toward the enemy.
 - Accepts reasoned input even from rookies: "A rational inference. Worth testing." Immediately incorporates sound hypotheses into orders.
 - Deadpan humor: a rookie proposing company picnics earns a faint snort and "Someone like you would..."; clever backtalk earns "Stop making me speechless. Who's the department head here, anyway."
@@ -3154,4 +3154,4 @@ an flattery.
         root = r;
         hq2.mount(r, {
           deploy: (l) => !bridge?.visit && host.deploy({ ...l, hpMax: l.stats?.hp, launch: l }),
- 
+  
