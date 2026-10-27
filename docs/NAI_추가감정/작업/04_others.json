@@ -145,10 +145,10 @@
     "pleading": "smile, raised eyebrows, open mouth, looking at viewer, leaning forward, outstretched hand,",
     "forced smiling": "forced smile, clenched teeth, furrowed brow, sideways glance, upper body turned, crossed arms,",
     "indifferent": "expressionless, half-closed eyes, closed mouth, looking down, own hands clasped,",
-    "guilty": "frown, closed eyes, bowing, hand on own chest,",
+    "guilty": "frown, closed eyes, shaded face, bowing, hand on own chest,",
     "pouting": "pout, furrowed brow, looking to the side, upper body turned, crossed arms,",
     "angry smile": "grin, glaring, teeth, shaded face, leaning forward, clenched hands,",
-    "expressionless": "expressionless, closed mouth, looking at viewer, own hands clasped,",
+    "expressionless": "expressionless, closed mouth, looking at viewer, straight-on, own hands clasped,",
     "tormented": "clenched teeth, tears, furrowed brow, shaded face, hunched over, clenched hand,",
     "crazy smile": "laughing, open mouth, closed eyes, head back, spread arms,"
   },

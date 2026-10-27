@@ -213,10 +213,10 @@
 | pleading | `smile, raised eyebrows, open mouth, looking at viewer, leaning forward, outstretched hand,` | 애원 대신 「형제여! 나를 따르시오!」 입양의 손 |
 | forced smiling | `forced smile, clenched teeth, furrowed brow, sideways glance, upper body turned, crossed arms,` | 블라렛과 합동 작전 — 이를 악물고 팔짱 |
 | indifferent | `expressionless, half-closed eyes, closed mouth, looking down, own hands clasped,` | 마법을 맞고도 그대로 전진하는 무덤덤(그림 serious 깍지) |
-| guilty | `frown, closed eyes, bowing, hand on own chest,` | 형제를 못 지킴 — 가슴에 손 얹고 숙이는 사죄의 예 |
+| guilty | `frown, closed eyes, shaded face, bowing, hand on own chest,` | 형제를 못 지킴 — 가슴에 손 얹고 숙이는 사죄의 예 |
 | pouting | `pout, furrowed brow, looking to the side, upper body turned, crossed arms,` | 「형님한테는 비밀」을 알게 된 큰형님의 서운함 |
 | angry smile | `grin, glaring, teeth, shaded face, leaning forward, clenched hands,` | 「사악한 신은 여기서 불타리라!」(그림 angry 주먹) |
-| expressionless | `expressionless, closed mouth, looking at viewer, own hands clasped,` | 그림 serious 기본 깍지 |
+| expressionless | `expressionless, closed mouth, looking at viewer, straight-on, own hands clasped,` | 그림 serious 기본 깍지 |
 | tormented | `clenched teeth, tears, furrowed brow, shaded face, hunched over, clenched hand,` | 다친 형제를 업고 빠져나오듯 이를 악물고 우는 얼굴 |
 | crazy smile | `laughing, open mouth, closed eyes, head back, spread arms,` | 광기 대신 광희 — 「하하! 기분이 아주 좋소!」 춤 직전 |
 

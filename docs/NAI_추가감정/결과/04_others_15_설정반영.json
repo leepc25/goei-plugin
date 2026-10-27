@@ -1037,7 +1037,7 @@
     {
       "id": "1792745537135",
       "name": "Saladin_guilty",
-      "scenePrompt": "frown, closed eyes, bowing, hand on own chest,",
+      "scenePrompt": "frown, closed eyes, shaded face, bowing, hand on own chest,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792745537135
@@ -1061,7 +1061,7 @@
     {
       "id": "1792745537138",
       "name": "Saladin_expressionless",
-      "scenePrompt": "expressionless, closed mouth, looking at viewer, own hands clasped,",
+      "scenePrompt": "expressionless, closed mouth, looking at viewer, straight-on, own hands clasped,",
       "queueCount": 0,
       "images": [],
       "createdAt": 1792745537138
