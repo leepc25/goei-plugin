@@ -23,15 +23,20 @@ ROOMS = {
            'op': ('none', [[1985, 145], [2095, 125], [2095, 540], [1985, 480]])},
     floor=[[0, 510], [236, 452], [1955, 452], [2172, 565], [2172, 724], [0, 724]],
     blocks=[(425, 500, 452, 120)],
-    objs=[('songil_reception_counter', 'S', 900, 500, 2.4, 0.7, 1.1), ('songil_reception_chair', 'S', 900, 468, 0.65, 0.5, 1.0),
-          ('songil_bench_teal', 'S', 420, 580, 1.7, 0.5, 0.8), ('songil_bench_ivory', 'S', 700, 580, 1.7, 0.5, 0.8)]),
+    objs=[('songil_reception_counter', 'S', 900, 565, 2.4, 0.7, 1.1), ('songil_reception_chair', 'S', 900, 505, 0.65, 0.5, 1.0),
+          ('songil_bench_teal', 'S', 280, 580, 1.7, 0.5, 0.8), ('songil_bench_ivory', 'S', 560, 580, 1.7, 0.5, 0.8)]),
   'jinryo': dict(s=0.76, wall=540,
+    spots=[dict(id='bed', x=900, y=600, verb='눕기', act=['liesit', 'doze'], seat=dict(x=900, y=560)),
+           dict(id='doctor', x=430, y=545, verb='앉기', face=1, act=['chairsit', 'seatthink'], seat=dict(x=426, y=528))],
     doors={'out': ('none', [[40, 60], [200, 115], [200, 580], [40, 640]])},
     floor=[[0, 660], [280, 552], [1590, 552], [1880, 650], [1880, 837], [0, 837]],
     blocks=[(1000, 1375, 560, 160), (1400, 1530, 560, 300), (1590, 1830, 650, 999)],
     objs=[('songil_doctor_desk', 'S', 560, 630, 1.4, 0.7, 0.75), ('songil_doctor_chair', 'N', 560, 700, 0.6, 0.5, 1.0),
           ('songil_patient_chair', 'E', 330, 680, 0.5, 0.5, 0.85), ('songil_exam_bed', 'E', 1180, 760, 1.9, 0.7, 0.7)]),
   'op': dict(s=0.76, wall=500,
+    floorS=[[0, 480], [215, 398], [1392, 398], [1392, 653], [0, 653]],
+    blocksS=[[290, 470, 400, 999], [925, 1380, 405, 999]],
+    spots=[dict(id='table', x=735, y=470, verb='눕기', act=['liesit', 'doze'], seat=dict(x=735, y=452))],
     doors={'out': ('none', [[45, 73], [215, 100], [215, 527], [45, 590]])},
     floor=[[0, 620], [300, 510], [1810, 510], [1832, 520], [1832, 859], [0, 859]],
     blocks=[(385, 690, 515, 200), (690, 1240, 620, 130), (415, 690, 645, 120), (1265, 1495, 645, 120), (1080, 1175, 535, 300), (1215, 1810, 520, 300)],
@@ -43,15 +48,20 @@ ROOMS = {
     objs=[('youngchang_chair_owner', 'S', 900, 640, 0.7, 0.6, 1.1), ('youngchang_desk', 'S', 900, 720, 1.5, 0.75, 0.78),
           ('youngchang_chair_customer', 'N', 900, 810, 0.5, 0.5, 0.9)]),
   'daebak': dict(s=1.07, wall=378,
+    spots=[dict(id='sofa', x=500, y=520, verb='앉기', act=['chairsit', 'seatthink'], seat=dict(x=500, y=500)),
+           dict(id='poker', x=1925, y=650, verb='앉기', act=['chairsit', 'seatthink'], seat=dict(x=1925, y=630))],
     doors={'out': ('none', [[25, 35], [205, 55], [205, 440], [25, 475]])},
     floor=[[0, 485], [210, 450], [605, 384], [2172, 384], [2172, 724], [0, 724]],
     blocks=[(1180, 1460, 505, 999), (2110, 2172, 600, 999), (240, 300, 410, 200), (600, 750, 380, 200), (740, 950, 384, 120)],
     objs=[('daebak_sofa', 'S', 470, 470, 2.1, 0.9, 0.85), ('daebak_coffee_table', 'S', 470, 560, 1.2, 0.6, 0.45),
           ('daebak_reception_chair', 'S', 900, 450, 0.65, 0.6, 1.1), ('daebak_reception_counter', 'S', 900, 540, 2.4, 0.7, 1.05),
-          ('daebak_poker_chair_ochre', 'S', 1790, 520, 0.6, 0.6, 1.0), ('daebak_poker_chair_red', 'E', 1560, 610, 0.6, 0.6, 1.0),
-          ('daebak_poker_chair_tan', 'W', 2030, 610, 0.6, 0.6, 1.0), ('daebak_poker_table', 'S', 1790, 610, 2.0, 1.1, 0.8),
-          ('daebak_poker_chair_green', 'N', 1790, 700, 0.6, 0.6, 1.0)]),
+          ('daebak_poker_chair_ochre', 'S', 1800, 430, 0.6, 0.6, 1.0), ('daebak_poker_chair_red', 'E', 1590, 515, 0.6, 0.6, 1.0),
+          ('daebak_poker_chair_tan', 'W', 2010, 515, 0.6, 0.6, 1.0), ('daebak_poker_table', 'S', 1800, 515, 2.0, 1.1, 0.8),
+          ('daebak_poker_chair_green', 'N', 1800, 590, 0.6, 0.6, 1.0)]),
   'heolgap': dict(s=0.85, wall=445,
+    floorS=[[0, 527], [255, 394], [1062, 394], [1062, 470], [1440, 684], [0, 684]],
+    blocksS=[[268, 463, 400, 999]],
+    spots=[],
     doors={'out': ('none', [[30, 40], [225, 75], [225, 540], [30, 600]])},
     floor=[[0, 620], [300, 452], [1953, 452], [1953, 805], [0, 805]],
     blocks=[(500, 1265, 655, 160), (1560, 1953, 720, 999), (315, 545, 535, 999), (1405, 1600, 495, 999)],
@@ -59,7 +69,7 @@ ROOMS = {
 }
 
 man = {a['id']: a for a in json.load(open(Z / 'manifest.json'))['assets']}
-gen = {}
+gen, spots = {}, {}
 for room, R in ROOMS.items():
     s = R['s']; im = bg(room)
     W, H = round(im.width * s), round(im.height * s)
@@ -95,8 +105,9 @@ for room, R in ROOMS.items():
         depth = round((wm if side and aid != 'songil_exam_bed' else dm) * 82 * k)
         objs.append(dict(id=f'o{i}', file=f, x=cx - w // 2, y=fy - h, w=w, h=h, sortY=fy,
                          solid=[dict(x0=cx - w // 2 + 4, x1=cx + w // 2 - 4, y0=fy - depth, y1=fy, h=round(hm * PX * k))]))
-    gen[f'jr_{room}'] = dict(file=f'jr_{room}', w=W, h=H, under=True, lane=lane, floor=[[S(x), S(y)] for x, y in R['floor']],
-                              blocks=[[S(a), S(b), S(c), d] for a, b, c, d in R['blocks']], doors=doors, lamps=[], windows=[], objects=objs)
+    gen[f'jr_{room}'] = dict(file=f'jr_{room}', w=W, h=H, under=True, lane=lane, floor=R.get('floorS') or [[S(x), S(y)] for x, y in R['floor']],
+                              blocks=R['blocksS'] if 'blocksS' in R else [[S(a), S(b), S(c), d] for a, b, c, d in R['blocks']], doors=doors, lamps=[], windows=[], objects=objs)
+    spots[f'jr_{room}'] = R.get('spots', [])
     print(room, W, H, 'wall', wall, 'objs', [(o['file'], o['w'], o['h']) for o in objs])
 
 files = sorted(p.stem for p in OUT.glob('jr_*.webp')) + sorted(p.stem for p in OUT.glob('jo_*.webp'))
@@ -104,4 +115,6 @@ Path('src/game/action/hq/jrRooms.gen.ts').write_text(
     '// tools/jr/rooms.py 가 만든다. 손대지 말 것: 좌표를 고치려면 rooms.py를 고쳐 다시 돌린다.\n'
     "import type { PaintedScene } from './painted';\n\n"
     f'export const JR_ROOMS: Record<string, PaintedScene> = {json.dumps(gen, ensure_ascii=False)};\n'
+    "import type { HqSpot } from './map';\n"
+    f'export const JR_ROOM_SPOTS: Record<string, HqSpot[]> = {json.dumps(spots, ensure_ascii=False)};\n'
     f'export const JR_ROOM_FILES: string[] = {json.dumps([f for f in files if f.startswith("jo_") or f[3:] in ROOMS])};\n')

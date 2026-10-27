@@ -7,6 +7,7 @@ import type { HqSave } from './state';
 import { placeOpen } from './logic';
 import { ROOMS, mirror, type Room, type RoomFix } from './rooms';
 import { PAINTED, PAINTED_LANE, doorX } from './painted';
+import { JR_ROOM_SPOTS } from './jrRooms.gen';
 
 export type SceneId =
   | 'street' | 'pasta' | 'lobby' | 'swat' | 'f2' | 'f3' | 'office' | 'interview' | 'lounge' | 'wc' | 'wc3'
@@ -237,18 +238,18 @@ export const HQ_SCENES: HqScene[] = [
     { id: 'youngchang', kind: 'steel', to: 'jr_youngchang', toDoor: 'out', label: '창고 B-7 (영창 컨설팅)' },
   ]),
   // 가게 안 (GPT 빈 방 + GPT 가구, tools/jr/rooms.py)
-  floorHall('jr_daebak', '대박 알선', 'B1', [{ id: 'out', kind: 'glass', to: 'jr_b1', toDoor: 'daebak', label: '나가기' }]),
-  floorHall('jr_heolgap', '헐값 매입', 'B1', [{ id: 'out', kind: 'door', to: 'jr_alley', toDoor: 'heolgap', label: '나가기' }]),
-  floorHall('jr_youngchang', '영창 컨설팅', 'B2', [{ id: 'out', kind: 'steel', to: 'jr_b2', toDoor: 'youngchang', label: '나가기' }]),
+  floorHall('jr_daebak', '대박 알선', 'B1', [{ id: 'out', kind: 'glass', to: 'jr_b1', toDoor: 'daebak', label: '나가기' }], { spots: JR_ROOM_SPOTS.jr_daebak }),
+  floorHall('jr_heolgap', '헐값 매입', 'B1', [{ id: 'out', kind: 'door', to: 'jr_alley', toDoor: 'heolgap', label: '나가기' }], { spots: JR_ROOM_SPOTS.jr_heolgap }),
+  floorHall('jr_youngchang', '영창 컨설팅', 'B2', [{ id: 'out', kind: 'steel', to: 'jr_b2', toDoor: 'youngchang', label: '나가기' }], { spots: JR_ROOM_SPOTS.jr_youngchang }),
   floorHall('jr_songil', '손길 의원', 'B1', [
     { id: 'out', kind: 'glass', to: 'jr_b1', toDoor: 'songil', label: '나가기' },
     { id: 'jinryo', kind: 'door', to: 'jr_jinryo', toDoor: 'out', label: '진료실' },
     { id: 'wc', kind: 'door', locked: true, label: '화장실' },
     { id: 'store', kind: 'door', locked: true, label: '창고' },
     { id: 'op', kind: 'door', to: 'jr_op', toDoor: 'out', label: '수술실' },
-  ]),
-  floorHall('jr_jinryo', '진료실', 'B1', [{ id: 'out', kind: 'door', to: 'jr_songil', toDoor: 'jinryo', label: '대기실로' }]),
-  floorHall('jr_op', '수술실', 'B1', [{ id: 'out', kind: 'door', to: 'jr_songil', toDoor: 'op', label: '대기실로' }]),
+  ], { spots: JR_ROOM_SPOTS.jr_songil }),
+  floorHall('jr_jinryo', '진료실', 'B1', [{ id: 'out', kind: 'door', to: 'jr_songil', toDoor: 'jinryo', label: '대기실로' }], { spots: JR_ROOM_SPOTS.jr_jinryo }),
+  floorHall('jr_op', '수술실', 'B1', [{ id: 'out', kind: 'door', to: 'jr_songil', toDoor: 'op', label: '대기실로' }], { spots: JR_ROOM_SPOTS.jr_op }),
 ];
 export const SCENE_BY_ID = Object.fromEntries(HQ_SCENES.map((s) => [s.id, s])) as Record<SceneId, HqScene>;
 
