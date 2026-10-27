@@ -1,7 +1,9 @@
 // 공통 기록 편집기: 목록 → 상세. 기본 칸(종류별 schema) + 추가 칸 + 순서 + 글로 가져오기 + 칸별 토큰·합계 + 조립 글 보기 + 읽기 전용.
 import type { Directory } from '../../core/world/directory';
 import { emptyRecord, moveField, moveFieldTo, parseImport, putRecord, recordText, removeRecord, resetRecord, type ImportResult } from '../../core/world/draft';
-import { defaultRecord, fieldOrder, fieldValue, isDefaultRecord, worldRecord, worldRecords, type ExtraField, type WorldOverrides, type WorldRecord } from '../../core/world/records';
+import { defaultRecord, fieldOrder, fieldValue, isDefaultRecord, worldAnomalyNote, worldRecord, worldRecords, type ExtraField, type WorldOverrides, type WorldRecord } from '../../core/world/records';
+import { ANOMALY_NOTE } from '../../core/world/schema';
+import { orgOf } from '../../core/world/directory';
 import { FIELDS, WORLD_KIND_LABEL, type FieldDef, type WorldKind } from '../../core/world/schema';
 import { tokens } from '../../core/gnet';
 import type { ChatContext } from '../../host/risu';
@@ -12,6 +14,8 @@ import { edUi, overridesOf, setOverrides } from './index';
 const esc = (s: unknown) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]!);
 
 export const recUi = {
+  /** 괴이 공통 머리말 칸 펼침 */
+  noteOpen: false,
   preview: false,
   importOpen: false,
   importText: '',
@@ -75,13 +79,15 @@ const basicPanel = (ctx: ChatContext, kind: WorldKind, name: string, d: Director
   return p ? placePanel(p, ctx) : '';
 };
 
-function fieldRow(kind: WorldKind, rec: WorldRecord, def: FieldDef, name: string): string {
+function fieldRow(kind: WorldKind, rec: WorldRecord, def: FieldDef, name: string, auto = ''): string {
   const v = recUi.variant ? rec.variants?.[recUi.variant]?.[def.id] ?? '' : rec.fields[def.id] ?? '';
   const key = `${kind}|${name}|${def.id}`;
   const tok = tokens(v);
+  // 비어 있으면 자동으로 채워지는 칸(요원 소속 표기)은 그 값을 흐리게 보여 준다 (2026-10-27: 「소속이 텅 비어 있다」)
+  const ph = recUi.variant ? '비우면 기본 글' : auto ? `자동: ${auto}` : '';
   const ctl = def.type === 'line'
-    ? `<input data-input="ed-field" data-key="${esc(key)}" value="${esc(v)}" autocomplete="off" placeholder="${recUi.variant ? '비우면 기본 글' : ''}">`
-    : `<textarea data-input="ed-field" data-key="${esc(key)}" rows="${Math.min(14, Math.max(3, v.split('\n').length + 1))}" placeholder="${recUi.variant ? '비우면 기본 글' : ''}">${esc(v)}</textarea>`;
+    ? `<input data-input="ed-field" data-key="${esc(key)}" value="${esc(v)}" autocomplete="off" placeholder="${esc(ph)}">`
+    : `<textarea data-input="ed-field" data-key="${esc(key)}" rows="${Math.min(14, Math.max(3, v.split('\n').length + 1))}" placeholder="${esc(ph)}">${esc(v)}</textarea>`;
   return `<div class="gw-field" data-field-row="${esc(def.id)}" draggable="true">
     <div class="gw-field-head"><span class="gw-grip" title="끌어서 순서 바꾸기">${ICONS.grip}</span><b>${esc(def.label)}</b><small class="gw-ftitle">${esc(def.title)}</small>${def.hint ? `<span class="gw-fhint" title="${esc(def.hint)}">?</span>` : ''}<span class="gw-ftok">${tok ? `${tok}토큰` : ''}</span>
       <span class="gw-fmove"><button class="gx-mini icon" data-action="ed-field-up" data-value="${esc(def.id)}" aria-label="위로">${ICONS.up}</button><button class="gx-mini icon" data-action="ed-field-down" data-value="${esc(def.id)}" aria-label="아래로">${ICONS.down}</button></span></div>
@@ -108,6 +114,7 @@ export function recordPage(ctx: ChatContext, kind: WorldKind, over: WorldOverrid
       <button class="gx-mini" data-action="ed-add-toggle" aria-expanded="${recUi.adding}">${ICONS.plus}추가</button></div>
     ${recUi.adding ? `<div class="gw-add"><input name="ed-new-name" placeholder="새 ${WORLD_KIND_LABEL[kind]} 이름 (한글)" data-enter="ed-add" autocomplete="off"><button class="gx-mini" data-action="ed-add" data-take="ed-new-name">만들기</button>
       <p class="gx-muted">${kind === 'agent' ? '요원은 만든 뒤 「기본 정보」에서 영문명·소속·부서를 채워요. 영문명은 그림 에셋 이름과 같아야 해요.' : kind === 'org' ? '조직은 만든 뒤 「기본 정보」에서 영문명·코드를 정해요.' : '만든 뒤 기본 정보에서 영문명·별칭을 채워요.'}</p></div>` : ''}
+    ${kind === 'anomaly' ? anomalyNoteBox(over) : ''}
     <div class="gw-list">${recordList(ctx, kind, over, q)}</div></aside>`;
   const rec = sel ? worldRecord(kind, sel, over) : null;
   const bucket = (over[kind] ?? {}) as Record<string, Partial<WorldRecord> & { deleted?: boolean }>;
@@ -124,7 +131,14 @@ export function recordPage(ctx: ChatContext, kind: WorldKind, over: WorldOverrid
         return i >= 0 ? extraRow(kind, rec, rec.extra[i], i, sel) : '';
       }
       const def = defs.find((f) => f.id === id);
-      return def ? fieldRow(kind, rec, def, sel) : '';
+      if (!def) return '';
+      let auto = '';
+      if (kind === 'agent' && def.id === 'organization') {
+        const a = d.agents.find((x) => x.lore === sel);
+        const o = a ? orgOf(d.orgs, a.affiliation) : undefined;
+        auto = o ? `${o.spec.english || o.name} (명부 소속 「${o.name}」 · 시점별 호칭 표)` : a?.affiliation ? `${a.affiliation} (명부 소속)` : '명부에 소속이 없어요';
+      }
+      return fieldRow(kind, rec, def, sel, auto);
     });
     const lines = rec.extra.map((e, i) => (e.kind === 'line' ? extraRow(kind, rec, e, i, sel) : '')).join('');
     const text = recordText(kind, sel, rec, d);
@@ -179,9 +193,27 @@ function current(ctx: ChatContext, kind: WorldKind): { name: string; rec: WorldR
 }
 
 /** 입력칸: 칸 글·추가 칸 글·이름·가져오기 글 */
+/** 괴이 공통 머리말 (목록 위): 모든 괴이 앞에 한 번 들어가는 글. 카드에 저장, 기본으로 되돌리기 */
+function anomalyNoteBox(over: WorldOverrides): string {
+  const note = worldAnomalyNote(over);
+  const edited = over.anomalyNote !== undefined;
+  return `<details class="gw-anote"${recUi.noteOpen ? ' open' : ''}><summary data-action="ed-anote-toggle"><b>괴이 공통 머리말</b><small>${edited ? '고침 · ' : ''}약 ${tokens(note).toLocaleString()}토큰</small></summary>
+    <p class="gx-muted">모든 괴이 로어 앞에 한 번만 들어가는 공통 지침이에요 (괴이마다 붙지 않아요).</p>
+    <textarea data-input="ed-anote" rows="5">${esc(note)}</textarea>
+    <div class="gx-row-btns"><button class="gx-mini" data-action="ed-anote-reset" ${edited ? '' : 'disabled'}>기본으로</button></div></details>`;
+}
+
 export function recordInput(name: string, key: string, value: string, ctx: ChatContext): boolean {
   if (name === 'ed-import') {
     recUi.importText = value;
+    return true;
+  }
+  if (name === 'ed-anote') {
+    const over = overridesOf(ctx);
+    const next: WorldOverrides = { ...over };
+    if (value === ANOMALY_NOTE) delete next.anomalyNote;
+    else next.anomalyNote = value;
+    setOverrides(next);
     return true;
   }
   const [kind, recName, id] = key.split('|') as [WorldKind, string, string];
@@ -226,6 +258,15 @@ export async function recordAction(action: string, value: string | undefined, ct
       const cur = current(ctx, kind);
       if (!cur || kind !== 'agent') return false;
       setOverrides(putRecord(cur.over, kind, cur.name, { ...cur.rec, rosterOff: !cur.rec.rosterOff }));
+      return true;
+    }
+    case 'ed-anote-toggle':
+      recUi.noteOpen = !recUi.noteOpen;
+      return false;
+    case 'ed-anote-reset': {
+      const next: WorldOverrides = { ...overridesOf(ctx) };
+      delete next.anomalyNote;
+      setOverrides(next);
       return true;
     }
     case 'ed-preview':

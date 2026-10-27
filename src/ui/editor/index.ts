@@ -9,7 +9,7 @@ import { LEGACY_DATA } from '../../core/lorebooks';
 import { getPrefs } from '../../core/settings';
 import { updateCharacterLore, type ChatContext } from '../../host/risu';
 import { savePrefs } from '../../host/prefs';
-import { directoryDraft, directoryInput, directoryView, dirUi, dirty as dirDirty, handleDirectory, resetDirectory } from '../directory';
+import { cropValue, directoryDraft, directoryExtList, directoryInput, directoryPhotoList, directoryView, dirUi, dirty as dirDirty, handleDirectory, resetDirectory, setCrop } from '../directory';
 import { handleImgPrompt, imgInput, imgPromptPane } from '../imgprompt';
 import { ICONS } from '../icons';
 import editorCss from './style.css';
@@ -119,6 +119,27 @@ function ensureRoot(): HTMLElement {
       return;
     }
     if (imgInput(name, el.value)) return;
+    // 명부 패널 재사용 부분의 입력 (사진 고르기 검색·얼굴 틀 크기·후보 검색): 패널(app.ts)과 같은 처리 (2026-10-27: 편집 창에서 안 먹던 문제)
+    if (name === 'dir-photo-q' && ctx) {
+      dirUi.pickQ = el.value;
+      const box = root?.querySelector('.dir-pics');
+      if (box) box.innerHTML = directoryPhotoList(ctx);
+      return;
+    }
+    if (name === 'dir-crop-size') {
+      const key = el.dataset.key ?? '';
+      const [x, y] = cropValue(key);
+      setCrop(key, [x, y, Number(el.value)]);
+      const frame = root?.querySelector<HTMLElement>('[data-crop] .dir-crop-frame');
+      if (frame) frame.style.width = `${el.value}%`;
+      return;
+    }
+    if (name === 'dir-ext-q' && ctx) {
+      dirUi.addQ = el.value;
+      const box = root?.querySelector('.dir-ext-list');
+      if (box) box.innerHTML = directoryExtList(ctx);
+      return;
+    }
     if (ctx && recordInput(name, el.dataset.key ?? '', el.value, ctx)) return void touched();
     if (ctx && relationsInput(name, el.dataset.key ?? '', el.value, ctx)) return void touched();
     if (guideInput(name, el.dataset.key ?? '', el.value)) return void touched();

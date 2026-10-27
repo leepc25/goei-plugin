@@ -69,6 +69,7 @@ export function overrideCount(over: WorldOverrides): number {
   let n = 0;
   for (const k of Object.keys(over) as (keyof WorldOverrides)[]) {
     if (k === 'relations') n += Object.keys(over.relations?.pairs ?? {}).length + (over.relations?.common !== undefined ? 1 : 0);
+    else if (k === 'anomalyNote') n += over.anomalyNote !== undefined ? 1 : 0;
     else n += Object.keys(over[k] ?? {}).length;
   }
   return n;

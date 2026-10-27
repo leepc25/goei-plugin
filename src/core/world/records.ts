@@ -6,7 +6,7 @@ import anomaliesJson from '../../data/world/anomalies.json';
 import sitesJson from '../../data/world/sites.json';
 import appendicesJson from '../../data/world/appendices.json';
 import relationsJson from '../../data/world/relations.json';
-import { FIELDS, type WorldKind } from './schema';
+import { FIELDS, type WorldKind, ANOMALY_NOTE } from './schema';
 
 /** 기록별 추가 칸. kind=line 은 요원 Identity·Appearance 절의 「- 이름: 값」 한 줄(sec 절, at 칸 뒤·'' 이면 절 맨 앞), block 은 절 하나(맨 뒤) */
 export interface ExtraField {
@@ -83,7 +83,12 @@ export interface WorldOverrides {
   site?: Record<string, Partial<WorldRecord>>;
   appendix?: Record<string, Partial<WorldRecord>>;
   relations?: { pairs?: Record<string, RelationCell | null>; common?: string };
+  /** 괴이 공통 머리말 (없으면 schema.ts ANOMALY_NOTE). 요청의 괴이 묶음 맨 앞에 한 번만 들어간다 (2026-10-27 사용자: 괴이마다 박지 말고 한 곳에서 고치게) */
+  anomalyNote?: string;
 }
+
+/** 괴이 공통 머리말 (덧쓰기 → 기본) */
+export const worldAnomalyNote = (over?: WorldOverrides | null): string => (typeof over?.anomalyNote === 'string' ? over.anomalyNote : ANOMALY_NOTE);
 
 const str = (v: unknown) => (typeof v === 'string' ? v : '');
 const obj = (v: unknown): Record<string, unknown> => (v && typeof v === 'object' && !Array.isArray(v) ? (v as Record<string, unknown>) : {});
@@ -171,11 +176,13 @@ export const defaultRecord = (kind: WorldKind, name: string): WorldRecord | unde
 // ── 지금 보고 있는 카드의 세계 (가상 로어북을 만들 때 기록해 둔다. 인물 기록의 세력 시작값 등이 읽는다) ──
 /** 기본 세력 코드 → 기본 세계의 조직 이름 (명부를 읽기 전·시험에서도 격자를 코드로 찾을 수 있게) */
 export const BUILTIN_ORG_CODES: Record<string, string> = { A00: '관리국', B00: '가짜 관리국', C00: '백일몽', D00: '민간인', E00: '프리랜서' };
-let active: { relations: Relations; orgCodes: Record<string, string> } = { relations: DEFAULT_RELATIONS, orgCodes: { ...BUILTIN_ORG_CODES } };
-export function setActiveWorld(relations: Relations, orgCodes: Record<string, string>): void {
-  active = { relations, orgCodes: { ...BUILTIN_ORG_CODES, ...orgCodes } };
+let active: { relations: Relations; orgCodes: Record<string, string>; anomalyNote: string } = { relations: DEFAULT_RELATIONS, orgCodes: { ...BUILTIN_ORG_CODES }, anomalyNote: ANOMALY_NOTE };
+export function setActiveWorld(relations: Relations, orgCodes: Record<string, string>, anomalyNote: string = ANOMALY_NOTE): void {
+  active = { relations, orgCodes: { ...BUILTIN_ORG_CODES, ...orgCodes }, anomalyNote };
 }
 export const activeRelations = (): Relations => active.relations;
+/** 지금 카드의 괴이 공통 머리말 (body.ts 가 괴이 묶음 앞에 한 번 넣는다) */
+export const activeAnomalyNote = (): string => active.anomalyNote;
 /** 조직 코드(A00)나 이름 → 격자의 조직 이름 */
 export const activeOrgName = (codeOrName: string): string => active.orgCodes[codeOrName] ?? codeOrName;
 

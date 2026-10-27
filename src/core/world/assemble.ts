@@ -2,7 +2,7 @@
 // 빈 칸은 절을 찍지 않는다. 칸 제목과 다른 절 제목은 이식 때 ##### 로 글 안에 남겼으므로 그대로 나온다.
 import type { AgentRow, AppendixRow, Directory, OrgRow, PlaceRow } from './directory';
 import { orgOf } from './directory';
-import { AGENT_FIELDS, ANOMALY_FIELDS, ANOMALY_NOTE, APPENDIX_FIELDS, ORG_FIELDS, SITE_FIELDS, type FieldDef } from './schema';
+import { AGENT_FIELDS, ANOMALY_FIELDS, APPENDIX_FIELDS, ORG_FIELDS, SITE_FIELDS, type FieldDef } from './schema';
 import { fieldOrder, fieldValue, type ExtraField, type WorldRecord } from './records';
 
 const VAR = '{{getvar::st_faction}}';
@@ -78,11 +78,11 @@ function sections(rec: WorldRecord, defs: FieldDef[], faction?: string, skip: st
   return out;
 }
 
-/** 괴이 로어 글: 고정 머리말 + 절들 */
+/** 괴이 로어 글: 제목 + 절들. 공통 머리말(ANOMALY_NOTE·덧쓰기)은 요청의 괴이 묶음 앞에 한 번만 (body.ts, records.ts activeAnomalyNote) */
 export function assembleAnomaly(rec: WorldRecord, p: PlaceRow, faction?: string): string {
   const title = rec.title || `${p.english || p.label} (${p.label})`;
   const head = rec.titleRaw ? `### Instructions for the Implementation of ${title}` : `### Instructions for the Implementation of the Anomaly - ${title}`;
-  return [head, ANOMALY_NOTE, ...sections(rec, ANOMALY_FIELDS, faction)].join('\n\n');
+  return [head, ...sections(rec, ANOMALY_FIELDS, faction)].join('\n\n');
 }
 
 /** 파밍(미스틱 사이트) 로어 글 */

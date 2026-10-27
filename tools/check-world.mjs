@@ -20,9 +20,12 @@ for (const e of lore) {
 }
 const ALIAS = { 협회: '특수재난대응협회', '이슬람 서울중앙성원': '이슬람', '발푸르기스 협회': '발푸르기스' };
 const bodyOnly = (t) => t.split('\n').filter((l) => !/^#{3,6} /.test(l) && !/^\[Affiliation code: \w+\]$/.test(l.trim())).join('\n').replace(/\n{3,}/g, '\n\n').trim();
+// 괴이 공통 머리말은 2026-10-27부터 기록마다 붙지 않고 요청의 괴이 묶음 앞에 한 번만 (records.ts activeAnomalyNote) → 원문에서 떼고 비교
+const SIM_NOTE = /\n*\[Simulation-only\][^\n]*\n*/g;
 const norm = (t) =>
   String(t)
     .replace(/\r/g, '')
+    .replace(SIM_NOTE, '\n\n')
     .replace(/^\s*@@dont_activate[ \t]*\n/, '')
     .replace(/\n+---\s*$/, '')
     .replace(/ \{\{\/if\}\}/g, '{{/if}}')

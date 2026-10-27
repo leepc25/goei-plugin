@@ -5,7 +5,7 @@ import type { LoreEntry } from '../types';
 import { readDirectory, readDirectoryData, type Directory } from './directory';
 import { assembleAgent, assembleAnomaly, assembleAppendix, assembleOrg, assembleSite } from './assemble';
 import { assembleFaction, assembleRoster } from './faction';
-import { setActiveWorld, worldRecords, worldRelations, type WorldOverrides, type WorldRecord } from './records';
+import { setActiveWorld, worldRecords, worldRelations, type WorldOverrides, type WorldRecord, worldAnomalyNote } from './records';
 import type { WorldKind } from './schema';
 import { guideText } from '../guides';
 import { FACTION_BOOK, TAG_BOOK } from '../factions';
@@ -130,7 +130,7 @@ export function withWorldLore(lore: LoreEntry[] | undefined): LoreEntry[] {
     e.content = `@@dont_activate\n${content}\n\n---`;
   }
   // 인물 기록의 세력 시작값 등이 읽는 「지금 세계」: 관계 격자와 코드→조직 이름
-  setActiveWorld(worldRelations(overrides), Object.fromEntries(dir.orgs.flatMap((o) => (o.faction ? [[o.faction, o.name]] : []))));
+  setActiveWorld(worldRelations(overrides), Object.fromEntries(dir.orgs.flatMap((o) => (o.faction ? [[o.faction, o.name]] : []))), worldAnomalyNote(overrides));
   // 상시 지침(🏷️Tag·📜Faction·🙂Roster): 카드에 없으면 가상으로. 요청에는 플러그인이 직접 끼운다 (core/lore.ts insertLoreBlock)
   const missingAlways = ALWAYS_BOOKS.filter((b) => !existing.has(b.name));
   if (missingAlways.length) {

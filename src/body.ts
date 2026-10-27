@@ -57,6 +57,7 @@ import { fieldRecord } from './core/field';
 import { buildImgPrompt, imgCharacters, imgPromptConfig, stripImgLore } from './core/imgprompt';
 import { withStatusBlock, type StatusShape } from './core/statusctx';
 import { colConfig, fillStatusSection, setStatusColumns, usedCols } from './core/world/statuscols';
+import { activeAnomalyNote } from './core/world/records';
 import { aliveAnchors, readWallet, walletBalance, WALLET_START_DEFAULT } from './core/wallet';
 import { visitRecord } from './core/visit';
 import { visitContextRules } from './core/visitPrompt';
@@ -188,7 +189,13 @@ async function fixLore<M extends PromptMessage>(messages: M[]): Promise<M[]> {
     const e = (char.globalLore ?? []).find((x) => isVirtual(x) && x.comment === b.name);
     if (e && typeof e.content === 'string') parts.push({ order: b.order, text: evaluate(b.kind === 'tag' ? fillStatusSection(e.content, cols) : e.content, env) });
   }
-  if (got) parts.push(...slotParts(Object.fromEntries(LORE_KINDS.map((k) => [k, got.vars[slotVar(k)] ?? ''])) as Record<LoreKind, string>));
+  if (got) {
+    // 괴이 공통 머리말은 괴이 묶음 맨 앞에 한 번만 (기록마다 붙이지 않는다. 2026-10-27)
+    const note = activeAnomalyNote().trim();
+    const texts = Object.fromEntries(LORE_KINDS.map((k) => [k, got.vars[slotVar(k)] ?? ''])) as Record<LoreKind, string>;
+    if (note && texts.anomaly?.trim() && !texts.anomaly.includes(note)) texts.anomaly = `${note}\n\n${texts.anomaly}`;
+    parts.push(...slotParts(texts));
+  }
   // 시드(첫 장면 강제 로어): 카드에 📕Start Lore 가 없으면 플러그인이. 수명은 processRequest 가 표식으로 다룬다
   const seed = String(chat.scriptstate?.['$seed_lore'] ?? '');
   if (seed && shouldKeepSeed(chat) && !real.some((e) => e.comment === '📕Start Lore')) parts.push({ order: 399, text: seed });
