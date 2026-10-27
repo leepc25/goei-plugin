@@ -151,7 +151,7 @@
     }
     return { next, lore: lore.count, scripts: scripts.count, fields: fields3 };
   }
-  var PLUGIN_VERSION = true ? "0.17.5" : "0";
+  var PLUGIN_VERSION = true ? "0.17.6" : "0";
 
   // src/core/pictures.ts
   function pictures(m) {

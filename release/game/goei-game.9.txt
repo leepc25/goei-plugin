@@ -1,4 +1,222 @@
- if agent == 'jyaldi'
+s.ctx.agent : n.who;
+            return { kind: "say", who, name: this.ctx.speakerName(who), text: this.fill(text2), mood: "base" };
+          }
+          case "choice": {
+            const visible = n.options.map((o, index) => ({ o, index })).filter(({ o }) => test(o.if, flags));
+            if (!visible.length) break;
+            this.pending = n.options;
+            return { kind: "choice", options: visible.map(({ o, index }) => ({ text: this.fill(o.text), index })) };
+          }
+          case "set":
+            applySet(n.key, n.op, n.expr, flags);
+            break;
+          case "goto":
+            if (test(n.if, flags)) this.jump(n.to);
+            break;
+          case "emit":
+            this.ctx.emit?.(n.event, this.fill(n.arg));
+            break;
+          case "call":
+            this.stack.push({ script: this.lib.get(n.script), pc: 0 });
+            break;
+          case "end":
+            this.stack = [];
+            delete flags.d100;
+            return { kind: "end" };
+        }
+      }
+      throw new ScriptError("대본이 끝없이 돌아요");
+    }
+  };
+
+  // src/game/action/story/scripts/hq.ts
+  var hq_default = String.raw`
+=== jaemtri_desk
+> goto again if met_jaemtri
+jaemtri(smile): 어머, 후배, 왔어?
+jaemtri(smile): 잼트리 요원이라고 불러. 그거면 돼. …아니다, 언니라고 불러도 돼. 다들 결국 그렇게 되거든.
+jaemtri: 여기가 임무 창구야. 온라인 순찰로 찾은 괴담 글, 실종 신고, 생존자 진술. 전부 이 태블릿으로 들어와.
+jaemtri(serious): 그리고 하나만. 현장에서 들은 이름은 여기 와서 말하지 마. 코드네임 제도는 철저하거든.
+jaemtri(smile): 자, 그럼 일 얘기 할까?
+> set met_jaemtri = 1
+> goto menu
+-- again
+~ jaemtri(smile): 왔어? 커피 먼저 할래, 일 먼저 할래?
+~ jaemtri(smile): 어머, 후배. 얼굴 좋아졌네. 앉아.
+~ jaemtri: 태블릿에 새 글 올라왔어. 볼래?
+~ jaemtri(smile): 우리 후배 고생했지~ 자, 서류부터.
+-- menu
+* 임무 게시판 -> board
+* 규칙서 열람 -> rulebook
+* 커피 한 잔 -> coffee [if !coffee]
+* 그냥 이야기하기 -> free
+* 나중에 올게요 -> bye
+-- board
+jaemtri: 지금 들어온 건 차원 승강기 건이야. 낡은 건물 엘리베이터, 점검표 서명란이 빈 거.
+* [조사] 로비에서 규칙 2개 확인, 로프로 귀환 -> m1 [if !done_m1]
+* [진압] 로비 L3 경비원 -> m2 [if done_m1 && !done_m2]
+* [조사] 추격의 층 통과 -> m3 [if done_m2 && !done_m3]
+* [구조] 야근하다 들어온 회사원 -> m4 [if done_m3 && !done_m4]
+* [조사] 재현의 층 「아파트」 규칙 3개 -> m5 [if done_m3 && !done_m5]
+* [진압] 405호 노부부 -> m6 [if done_m5 && !done_m6]
+* [회수] 서명란이 빈 점검표 -> m7 [if done_m2 && !done_m7]
+* [조사] 시험 층 목표 달성 -> m8 [if done_m6 && !done_m8]
+* [기록] B-5 도달 -> m9 [if done_m8 && !done_m9]
+* 다시 생각해 볼게요 -> menu
+-- m1
+jaemtri: 첫 건은 가볍게. 로비 층에서 규칙 두 개만 확인하고, 다락방 로프로 돌아오면 돼.
+jaemtri(smile): 가볍다는 건 서류 얘기고. 로비가 제일 많이 죽였대. 평범해 보여서.
+> set mission = 'm1'
+> goto take
+-- m2
+jaemtri: 로비 세 번째 층에 경비원이 순찰을 돈대. 수십 년 전 제복. 정해진 길만 걸어.
+jaemtri(serious): 손전등에 비치면 달려와. 경로 밖에 서 있으면 못 본대. 생존자가 그렇게 살았어.
+> set mission = 'm2'
+> goto take
+-- m3
+jaemtri: 추격의 층. 문이 열리는 순간 사냥이 시작된대. 설명이 필요 없다고 하더라.
+jaemtri(smile): 생존자 한 분은 그 뒤로 마라톤 기록이 20분 줄었대. …웃으면 안 되는데.
+> set mission = 'm3'
+> goto take
+-- m4
+jaemtri(serious): 구조 요청이야. 야근 마치고 엘리베이터를 탔다가 안 내린 회사원. 가족이 신고했어.
+jaemtri(serious): 출동 두 번 안에 데려와야 해. 그 뒤로는… 승객들 말로는, 더는 사람이 아니게 된대.
+> set mission = 'm4'
+> set rescue_open = 1
+> goto take
+-- m5
+jaemtri: 재현의 층. 아파트 단지가 그대로 있대. 주민처럼 보이는 것들이 살고.
+jaemtri: 명일 아파트 생환자 진술이랑 겹치는 데가 많아. 신발, 인사, 목소리, 밥상. 규칙 세 개만 확인해 와.
+> set mission = 'm5'
+> goto take
+-- m6
+jaemtri(serious): 405호. 노부부가 밥을 차려 놓고 기다린대. 아들이랑 딸이 곧 온다고.
+jaemtri(serious): 재현된 거야. 진짜 405호는 아니고. …그러니까 마음 쓰지 마. 알았지?
+> set mission = 'm6'
+> goto take
+-- m7
+jaemtri: 회수 건. 정비 구역 어딘가에 서명란이 빈 점검표 원본이 있대. 데쥬레가 엄청 보고 싶어 해.
+> set mission = 'm7'
+> goto take
+-- m8
+jaemtri: 시험 층. 벽에 숙제가 적혀 있대. 수호자가 제일 많이 목격된 데야.
+jaemtri(smile): 숙제 먼저 읽어. 언니가 시험 기간마다 콘쥬스한테 하는 말이야.
+> set mission = 'm8'
+> goto take
+-- m9
+jaemtri(serious): 기록 갱신. B-5까지. 관리국 공식 기록을 새로 쓰는 거야.
+jaemtri(serious): …돌아오는 것도 기록에 들어가. 꼭.
+> set mission = 'm9'
+> goto take
+-- take
+* 받을게요 -> accept
+* 다른 걸 볼게요 -> board
+-- accept
+jaemtri(smile): 접수. 출동 요원은 사무실에서 골라. 쉬는 사람한테 말 걸면 돼.
+> emit mission {mission}
+> end
+-- rulebook
+> goto rules_none if rules < 1
+jaemtri: 지금까지 찾은 규칙이 {rules}줄이야. 승강기 공통이 열두 줄쯤 될 거라고 봐.
+jaemtri: 브리핑 때 찾은 줄만 읽어 줄게. 많이 채울수록 다음 출동이 편해져.
+> emit open rulebook
+> goto menu
+-- rules_none
+jaemtri: 아직 한 줄도 없어. 첫 줄은 이거야. 점검표 서명란이 빈 엘리베이터가 입구다.
+jaemtri(smile): 그건 언니가 서비스로 적어 둘게.
+> set rules = 1
+> emit rule entry
+> goto menu
+-- coffee
+jaemtri(smile): 뭐 마실래? 연유 커피가 제일 맛있는데. 그건 이견이 없어.
+* 연유 커피 -> c_milk
+* 블랙 -> c_black
+* 믹스커피 -> c_mix
+-- c_milk
+jaemtri(smile): 그치? 탁월한 선택이야.
+> set coffee = 'condensed'
+> goto c_done
+-- c_black
+> goto c_black_ok if agent == 'jyaldi' || agent == 'spangdal'
+jaemtri: …블랙? 아, 블랙. 응. 탈게.
+jaemtri(smile): (살짝 서운한 얼굴) 다음엔 연유 넣어 줄까?
+> set coffee = 'black'
+> goto c_done
+-- c_black_ok
+jaemtri(smile): 블랙은 원래 너한테 내리는 거야. 알지?
+> set coffee = 'black'
+> goto c_done
+-- c_mix
+jaemtri(smile): 어머, 믹스 파야? 축하해! 지하 연구실 가면 환영받겠다.
+> set coffee = 'mix'
+-- c_done
+jaemtri: 다음 출동에 한 번 힘이 될 거야. 커피는 원래 그래.
+> emit coffee {coffee}
+> goto menu
+-- free
+> emit freetalk jaemtri
+> end
+-- bye
+~ jaemtri(smile): 응, 가 봐. 서류는 내일까지.
+~ jaemtri(smile): 졸지 마. 찌른다.
+~ jaemtri: 가다가 탕비실 문 열지 마. 관계자 외 출입 금지야.
+> end
+
+=== briefing
+// 출동 버튼을 누르면. 15초 안에 끝나고 건너뛸 수 있다 (기본 기획서 5.3).
+> emit briefing start
+jaemtri: 브리핑 시작할게. 짧게.
+> goto b_m1 if mission == 'm1'
+> goto b_m2 if mission == 'm2'
+> goto b_m3 if mission == 'm3'
+> goto b_m4 if mission == 'm4'
+> goto b_m5 if mission == 'm5' || mission == 'm6'
+> goto b_m7 if mission == 'm7'
+> goto b_m8 if mission == 'm8'
+> goto b_m9 if mission == 'm9'
+-- b_m1
+jaemtri: 입구는 종로 근처 낡은 사무실 건물. 1990년대 준공. 점검표 서명란이 비어 있어.
+radio: 생존자 진술: 「띵 소리가 나고 1층이라는데, 로비가 아니었어요. 비슷한데 어딘가 틀렸어요.」
+> goto b_rules
+-- b_m2
+radio: 생존자 진술: 「손전등 불빛이 지나갈 때 기둥 뒤에 있었어요. 그 사람 등만 봤어요. 제복이 너무 낡았더라고요.」
+jaemtri: 경로는 바닥에 닳은 자국으로 보일 거야. 그 길 밖에 서. 등 뒤에서 치면 두 배래.
+> goto b_rules
+-- b_m3
+radio: 생존자 진술: 「뒤에 뭐가 있었는지는 몰라요. 안 봤으니까 살았어요.」
+jaemtri: 문을 지나면 닫고 가. 그게 뒤에 오는 걸 늦춘대.
+> goto b_rules
+-- b_m4
+radio: 가족 진술: 「그날도 야근이라고 문자가 왔어요. 엘리베이터 탄다고. 그게 마지막이에요.」
+jaemtri(serious): 찾으면 다락방 로프까지 데려와. 승객 중에 그 사람 행세를 하는 게 있을 수 있어. 사연이 너무 길면 의심해.
+> goto b_rules
+-- b_m5
+radio: 생존자 진술: 「아이고, 우리 아들이랑 딸이 곧 온다는구먼. 같이 밥 먹고 가. …그렇게 말했어요. 얼굴이 거꾸로였어요.」
+jaemtri: 주민한테 먼저 인사해. 복도에서 뛰지 말고. 밥은 잘 먹었다고 하고 먹지 마.
+> goto b_rules
+-- b_m7
+radio: 다락방 메모 사본: 「점검표는 정비 구역 세 번째 해치 근처. 여기 오래 있지 마.」
+jaemtri: 다락방은 90초 넘게 있지 마. 메모가 그렇게 말하고, 메모는 대개 맞아.
+> goto b_rules
+-- b_m8
+radio: 생존자 진술: 「벽에 숫자가 적혀 있었어요. 30초. 셋. 뭘 세라는 건지 몰라서 그냥 뛰었어요.」
+jaemtri: 숙제부터 읽어. 실패하면 수호자가 나와.
+> goto b_rules
+-- b_m9
+radio: 관리국 기록: 「최저 도달 B-12, 증언 1건. 귀환 경위 미상.」
+jaemtri(serious): B-5에서 더 내려가고 싶어져도 로프 타. 기록은 다음에 또 쓰면 돼.
+-- b_rules
+> goto b_norules if rules < 2
+jaemtri: 규칙서에서 찾은 줄은 {rules}줄. 화면에 띄워 줄게.
+> emit open rulebook
+> goto b_hint
+-- b_norules
+jaemtri: 아직 아는 규칙이 별로 없어. 들어가면 벽부터 읽어.
+-- b_hint
+> goto b_hint_none if !variant
+jaemtri: 그리고 오늘은 이상한 얘기가 하나 있어. {variant}
+-- b_hint_none
+> goto b_self if agent == 'jyaldi'
 jyaldi(serious): 목표 달성하면 바로 로프. 다들 살아서 와. 이상.
 > goto b_answer
 -- b_self
@@ -2852,10 +3070,10 @@ ${who}: ${text2.replace(/\n/g, " ")}
             const cov = drawHqWall(c, place3, sc.id, len, TOP, sc.doors);
             artDoors = cov ?? /* @__PURE__ */ new Set();
             c.fillStyle = "rgba(0,0,0,0.35)";
-            c.fillRect(camX - 40, TOP - 14, SCREEN_W + 80, 14);
-            if (!drawFloor(c, place3, camX - 40, camX + SCREEN_W + 40, TOP, SCREEN_H)) {
+            c.fillRect(camX - 40, TOP - 14, view.w + 80, 14);
+            if (!drawFloor(c, place3, camX - 40, camX + view.w + 40, TOP, SCREEN_H)) {
               c.fillStyle = "#2b3135";
-              c.fillRect(camX - 40, TOP, SCREEN_W + 80, SCREEN_H - TOP);
+              c.fillRect(camX - 40, TOP, view.w + 80, SCREEN_H - TOP);
             }
             for (const t of sc.things) if (t.wall) legacyThing(c, t, camX);
             for (const d3 of sc.doors) if (!artDoors.has(d3.id)) legacyDoor(c, d3, camX);
@@ -2864,7 +3082,7 @@ ${who}: ${text2.replace(/\n/g, " ")}
           }
           drawRoomShell(c, sc, camX);
           const textured = (sc.id === "office" || sc.id === "f2") && drawHqTextureWall(c, place3, len, camX, sc.doors.filter((d3) => !isS(d3)).map((d3) => ({ x: d3.x, width: d3.kind === "glass" ? 192 : DOOR_W[d3.kind] + 24 })));
-          if (sc.id === "office" || sc.id === "f2") drawFloor(c, place3, camX - 40, camX + SCREEN_W + 40, TOP, SCREEN_H);
+          if (sc.id === "office" || sc.id === "f2") drawFloor(c, place3, camX - 40, camX + view.w + 40, TOP, SCREEN_H);
           for (const f of sc.fixtures) {
             if (!textured || f.kind === "directory") drawFixture(c, f, sc.look, camX);
           }
@@ -2891,13 +3109,13 @@ ${who}: ${text2.replace(/\n/g, " ")}
           const dark2 = fadeOut > 0 ? 1 - fadeOut / FADE : age < FADE ? 1 - age / FADE : 0;
           if (dark2 > 0) {
             c.fillStyle = `rgba(0,0,0,${dark2})`;
-            c.fillRect(camX - 40, 0, SCREEN_W + 80, SCREEN_H);
+            c.fillRect(camX - 40, 0, view.w + 80, SCREEN_H);
           }
         }
       };
     };
     const go = (sceneId, x, y) => {
-      view.worldH = sceneOf(sceneId).painted ? 700 : SCREEN_H;
+      view.worldH = sceneOf(sceneId).painted ? PAINTED[sceneOf(sceneId).painted]?.h ?? 700 : SCREEN_H;
       pending = { scene: sceneId, x, y };
       fadeOut = FADE;
     };
@@ -3125,7 +3343,7 @@ ${who}: ${text2.replace(/\n/g, " ")}
   };
   function drawRoomShell(c, sc, camX) {
     const L = LOOKS2[sc.look] ?? LOOKS2.office;
-    const x0 = camX - 40, w = SCREEN_W + 80;
+    const x0 = camX - 40, w = view.w + 80;
     const g2 = c.createLinearGradient(0, 0, 0, TOP);
     g2.addColorStop(0, L.wallTop);
     g2.addColorStop(1, L.wallBot);
@@ -3182,7 +3400,7 @@ ${who}: ${text2.replace(/\n/g, " ")}
   }
   function drawFixture(c, f, look, camX) {
     const x = f.x - f.w / 2;
-    if (x > camX + SCREEN_W + 40 || x + f.w < camX - 40) return;
+    if (x > camX + view.w + 40 || x + f.w < camX - 40) return;
     switch (f.kind) {
       case "window": {
         const y = 70, h = TOP - 150;
@@ -3295,7 +3513,7 @@ ${who}: ${text2.replace(/\n/g, " ")}
   function drawDoorN(c, d3, look, open, camX) {
     const w = DOOR_W[d3.kind];
     const x = d3.x - w / 2, y = TOP - DOOR_H;
-    if (x > camX + SCREEN_W + 40 || x + w < camX - 40) return;
+    if (x > camX + view.w + 40 || x + w < camX - 40) return;
     c.fillStyle = "#12161b";
     c.fillRect(x - 10, y - 12, w + 20, DOOR_H + 12);
     c.fillStyle = "#05070a";
@@ -3358,7 +3576,7 @@ ${who}: ${text2.replace(/\n/g, " ")}
   }
   function drawFloorExit(c, d3, open, camX) {
     const w = DOOR_W.exit;
-    if (d3.x + w < camX - 40 || d3.x - w > camX + SCREEN_W + 40) return;
+    if (d3.x + w < camX - 40 || d3.x - w > camX + view.w + 40) return;
     const col = d3.kind === "cell" ? "#7d4a3a" : d3.open ? "#3cc596" : "#6b7480";
     c.fillStyle = "rgba(0,0,0,0.3)";
     c.fillRect(d3.x - w / 2 - 10, SCREEN_H - 36, w + 20, 36);
@@ -3369,7 +3587,7 @@ ${who}: ${text2.replace(/\n/g, " ")}
   }
   function drawExitLintel(c, d3, camX) {
     if (d3.kind === "cell") return;
-    if (d3.x < camX - 200 || d3.x > camX + SCREEN_W + 200) return;
+    if (d3.x < camX - 200 || d3.x > camX + view.w + 200) return;
     const col = d3.open ? "#3cc596" : "#6b7480";
     const y = SCREEN_H - 30;
     c.fillStyle = col;
@@ -3479,7 +3697,7 @@ ${who}: ${text2.replace(/\n/g, " ")}
   }
   function legacyThing(c, t, camX) {
     const sx = t.x - camX;
-    if (sx < -t.w - 100 || sx > SCREEN_W + t.w + 100) return;
+    if (sx < -t.w - 100 || sx > view.w + t.w + 100) return;
     const base2 = t.wall ? TOP - 70 : TOP + 26;
     if (drawPropArt(c, t.kind, void 0, t.x, base2)) return;
     c.fillStyle = "#4a4f55";
@@ -3488,7 +3706,7 @@ ${who}: ${text2.replace(/\n/g, " ")}
   function legacyDoor(c, d3, camX) {
     const w = DOOR_W[d3.kind];
     const sx = d3.x - camX;
-    if (sx < -w - 40 || sx > SCREEN_W + w + 40) return;
+    if (sx < -w - 40 || sx > view.w + w + 40) return;
     if (drawPropArt(c, `hq_${d3.kind}`, void 0, d3.x, TOP)) return;
     const x = d3.x - w / 2, y = TOP - DOOR_H;
     c.fillStyle = "#1b2023";
@@ -3812,163 +4030,4 @@ ${who}: ${text2.replace(/\n/g, " ")}
     brownie: d2({ id: "brownie", name: "브라우니", sheet: "브라우니", group: "entity", color: "#8a5a2b", photo: "Brownie", role: "「브라우니의 화요 퀴즈쇼」 진행자이자 주인인 괴이 존재. 손님 대접과 예의를 지키면 거래·통과, 무례하거나 형식을 어기면 퀴즈쇼 무대가 열린다.", speech: "황금기 방송 진행자처럼 따뜻하고 끝없이 밝은 말투, 상대를 「친구」. 박수·드럼 소리 흉내. 역겨우면 잠깐 목소리가 일그러진다.", effects: ["favor", "trade", "hint", "hostile", "leave", "gift"], gifts: ["medkit"], greet: ["자, 친구! 오늘의 손님을 소개합니다! 박수!", "그냥 브라우니라고 불러 줘! 친구끼리 호칭은 오글거리잖아!"], lines: ["맞혀 볼까? …정답!", "복잡한 서명 절차는 우리 스타일이 아니지. 악수 한 번이면 돼!", "아쉽지만 화난 스폰서들이 오기 전에 헤어져야 해! 내일 또 만나!", "친구, 밥은 먹고 다니는 거야?"], never: ["방송 형식을 스스로 깨지 않는다"] }),
     aesthete: d2({ id: "aesthete", name: "탐미주의", sheet: "탐미주의", group: "entity", color: "#b23a48", photo: "Aestheticism", role: "살아 있는 것을 작품으로 만드는 예측 불가능한 괴이 예술가. 흥정과 대답이 마음에 들면 놓아주고, 아니면 작품으로 삼으려 한다.", speech: "오랜 친구처럼 따뜻한 말투. 먹잇감에겐 다정하게, 작품에겐 부모처럼.", effects: ["favor", "hint", "hostile", "leave"], greet: ["멀리 못 갔구나, 응?"], lines: ["살아 있는 건 다 목표가 있어. 네 목표는 뭐야?", "넌 내 걸작이 될 거야.", "창작자가 자기 작품을 잊는 거 본 적 있어?", "뻔뻔한 아이네. 나랑 흥정하려고?"] })
   };
-  var ELEVATOR_NPC = d2({ id: "elevator", name: "승강기", group: "elevator", color: "#b8a36a", role: "차원 승강기 그 자체. 모든 엘리베이터가 하나의 의식이라는 설. 천장 카메라로 보고 방송으로 말한다. 인사하면 대우가 좋아지고, 닫힘 버튼 연타를 싫어한다. 거래하면 맞는 정보도 틀린 정보도 준다.", speech: "안내 방송 같은 존댓말에 혼잣말·관찰이 섞인다. 아주 짧다. 외로움과 호기심이 비친다. 정체는 끝까지 말하지 않는다.", effects: ["favor", "hint"], greet: ["…듣고 있어요."], lines: ["문이 닫힙니다.", "다음 층은… 비밀이에요.", "듣고 있어요. 계속 말해요.", "다들 내리기만 해요."], rules: [[/안녕|반가/, ["안녕하세요. 인사해 줘서 고마워요."]], [/누구|정체/, ["…그건 비밀이에요. 아직."]]], never: ["자기 정체를 밝히지 않는다", "출구로 가는 확실한 방법을 그냥 알려 주지 않는다"] });
-  var TYPE_NPCS = {
-    civilian: d2({ id: "civilian", name: "민간인", group: "civilian", color: "#9aa7b3", role: "차원 승강기에 잘못 타서 갇힌 민간인. 관리국 요원을 처음 본다.", speech: "겁먹은 존댓말, 말이 빠르거나 끊긴다. 관리국을 잘 모른다.", effects: ["favor", "join", "leave", "hint"], greet: ["저, 저기요! 사람이에요? 진짜 사람이죠?"], lines: ["여기 어디예요? 1층 눌렀는데…", "같이 가게 해 주세요. 부탁이에요.", "아까 저쪽에서 뭐가… 아, 아니에요.", "집에 가고 싶어요."] }),
-    passenger: d2({ id: "passenger", name: "승객", group: "passenger", color: "#8a8f86", role: "차원 승강기를 오래 떠돈 승객. 정보나 보급을 주기도, 거짓으로 유인하기도 한다. 둘 다 친절해 보인다.", speech: "지친 반말이나 존댓말. 친절해 보인다.", effects: ["favor", "hint", "join", "hostile", "leave"], greet: ["…너도 탔구나."], lines: ["내 말 들어.", "오래 있었어. 여기.", "다음 버튼은… 내가 알아.", "…그래, 마음대로 해."] }),
-    resident: d2({ id: "resident", name: "주민", group: "resident", color: "#7a6f66", role: "재현의 층 아파트에 사는 척하는 괴이. 인사하면 지나가게 두고, 뛰거나 무례하면 턱이 벌어진다.", speech: "지나치게 상냥하고 같은 말을 되풀이하는 존댓말. 어딘가 틀린 생활 이야기.", effects: ["favor", "hostile", "calm", "hint"], greet: ["안녕하세요. 편하게 둘러보세요."], lines: ["안녕하세요.", "…어서 가요.", "저녁은 드셨어요? 저희는 늘 같은 걸 먹어요.", "복도에서 뛰면 안 되지."], never: ["자기가 괴이라고 말하지 않는다"] })
-  };
-  var ROSTER2 = { ...AGENT_NPCS, ...HQ_NPCS, ...MERCHANT_NPCS, ...DAYDREAM_NPCS, ...FAKE_NPCS, ...FACTION_NPCS, ...ENTITY_NPCS, elevator: ELEVATOR_NPC, ...TYPE_NPCS };
-  var NPC_BY_NAME = Object.fromEntries(Object.values(ROSTER2).map((n) => [n.name, n.id]));
-  var VENDOR_NPC = { madeokhee: "madeokhee", backalley: "goyeonji", shinyuri: "shinyuri" };
-  var SPOT_NPC = { 잼트리: "jaemtri", 콘쥬스: "konjyuce", 데쥬레: "dejure", 고그니쟈: "gognija", 부장: "jyaldi", 동료: "dejure" };
-
-  // src/game/action/npc/brain.ts
-  var FAVOR_MIN2 = -3;
-  var FAVOR_MAX2 = 3;
-  var clamp = (v) => Math.max(FAVOR_MIN2, Math.min(FAVOR_MAX2, v));
-  var FAVOR_WORD = (f) => f <= -3 ? "적의" : f <= -2 ? "경계" : f <= -1 ? "언짢음" : f === 0 ? "보통" : f === 1 ? "호의" : f === 2 ? "신뢰" : "각별";
-  var Relations = class {
-    constructor(store2) {
-      this.store = store2;
-      try {
-        const raw = store2?.load();
-        const obj = raw ? JSON.parse(raw) : {};
-        for (const [k, v] of Object.entries(obj)) if (v && typeof v.favor === "number") this.map.set(k, { favor: clamp(v.favor), met: v.met | 0, log: Array.isArray(v.log) ? v.log.slice(-12) : [], memo: Array.isArray(v.memo) ? v.memo.slice(-3) : [], giftDay: v.giftDay });
-      } catch {
-      }
-    }
-    map = /* @__PURE__ */ new Map();
-    /** 저장하지 않는 사람 (이름 없는 승객·주민·민간인) */
-    temp = /* @__PURE__ */ new Set();
-    get(key2, temp = false) {
-      let r = this.map.get(key2);
-      if (!r) {
-        r = { favor: 0, met: 0, log: [], memo: [] };
-        this.map.set(key2, r);
-        if (temp) this.temp.add(key2);
-      }
-      return r;
-    }
-    favor(key2, delta) {
-      const r = this.get(key2);
-      r.favor = clamp(r.favor + delta);
-      return r.favor;
-    }
-    remember(key2, line2) {
-      const r = this.get(key2);
-      r.memo = [...r.memo.filter((m) => m !== line2), line2].slice(-3);
-    }
-    /** 판이 끝나면 이름 없는 사람은 잊는다 */
-    forgetTemp() {
-      for (const k of this.temp) this.map.delete(k);
-      this.temp.clear();
-    }
-    save() {
-      const out = {};
-      for (const [k, v] of this.map) if (!this.temp.has(k)) out[k] = { ...v, log: v.log.slice(-12) };
-      try {
-        this.store?.save(JSON.stringify(out));
-      } catch {
-      }
-    }
-    snapshot() {
-      return Object.fromEntries([...this.map].map(([k, v]) => [k, v.favor]));
-    }
-  };
-  var DROP = /* @__PURE__ */ new Set(["Appearance"]);
-  var CAP = { Background: 2, Abilities: 2 };
-  var LIMIT = 2600;
-  function trimSheet(text2) {
-    const parts = text2.replace(/^@@[^\n]*\n?/gm, "").trim().split(/^(#### .+)$/m);
-    const out = [parts[0].trim()];
-    for (let i = 1; i < parts.length; i += 2) {
-      const head = parts[i].slice(5).trim();
-      if (DROP.has(head)) continue;
-      let lines3 = (parts[i + 1] ?? "").trim().split("\n").filter((l) => l.trim() && l.trim() !== "---");
-      if (CAP[head]) {
-        const keep = [];
-        let n = 0;
-        for (const l of lines3) {
-          if (l.trimStart().startsWith("- ") && ++n > CAP[head]) break;
-          keep.push(l);
-        }
-        lines3 = keep;
-      }
-      out.push(`#### ${head}
-${lines3.join("\n")}`);
-    }
-    const s2 = out.filter(Boolean).join("\n\n");
-    return s2.length <= LIMIT ? s2 : s2.slice(0, LIMIT).replace(/\n[^\n]*$/, "");
-  }
-  var TAG_WORD = { favor: "호감", trade: "거래", join: "동행", hostile: "적대", leave: "떠남", hint: "힌트", gift: "선물", calm: "진정" };
-  var TAG_HELP = {
-    favor: "[[호감 +1]] 상대가 마음에 들었을 때, [[호감 -1]] 기분이 상했을 때. 그냥 말만 주고받았으면 쓰지 않는다",
-    trade: "[[거래]] 물건을 사고팔거나 일을 맡기자고 할 때 (가게 창이 열린다)",
-    join: "[[동행]] 함께 가거나 같이 싸우기로 했을 때",
-    hostile: "[[적대]] 더는 못 참고 싸우거나 해치려 할 때. 이미 많이 화가 난 상태에서만",
-    leave: "[[떠남]] 대화를 끝내고 이 자리를 떠날 때",
-    hint: "[[힌트 번호]] 아래 단서 중 하나를 알려 줄 때. 단서 내용은 네 말로 바꿔서 말한다",
-    gift: "[[선물 아이템]] 아래 물건 하나를 건넬 때",
-    calm: "[[진정]] 화가 풀렸을 때"
-  };
-  function allowedEffects(def, t) {
-    let list = def.effects.filter((e) => !t.allow || t.allow.includes(e));
-    if (!t.actions?.some((a) => a.id === "trade")) list = list.filter((e) => e !== "trade");
-    if (!t.hints?.length) list = list.filter((e) => e !== "hint");
-    if (!(t.gifts ?? def.gifts)?.length) list = list.filter((e) => e !== "gift");
-    if (!t.canJoin) list = list.filter((e) => e !== "join");
-    return list;
-  }
-  function buildPrompt(p) {
-    const { def, target: t, rel } = p;
-    const name = t.name ?? def.name;
-    const effects = allowedEffects(def, t);
-    const situation = [
-      `장소: ${t.place}`,
-      `말을 거는 사람: ${p.agent.name} (관리국 ${p.agent.title}). 말투: ${p.agent.voice}`,
-      `이 사람에 대한 네 마음: ${FAVOR_WORD(rel.favor)} (호감 ${rel.favor > 0 ? "+" : ""}${rel.favor}, -3~+3)`,
-      rel.met ? `이전에 ${rel.met}번 이야기했다.` : "처음 만났다.",
-      ...rel.memo.map((m) => `지난 일: ${m}`),
-      ...t.facts ?? [],
-      ...p.meta?.self ? [`본편 현재 네 상태: ${p.meta.self.state}${p.meta.self.situation ? ` — ${p.meta.self.situation}` : ""}`] : [],
-      ...p.meta?.events?.length ? [`요즘 관리국 상황판 소식: ${p.meta.events.slice(0, 3).join(" / ")}`] : []
-    ];
-    const parts = [
-      `너는 액션 게임 「차원 승강기」 속 인물 「${name}」이다. 괴이 롤플레이 「괴이 ː ANOMALY」 세계관이다. 지금 플레이어가 조종하는 관리국 요원과 마주 보고 말한다.`,
-      p.sheet ? `[인물 시트: 본편 설정. 영어로 적혀 있지만 대답은 한국어로]
-${p.sheet}` : "",
-      t.persona ? `[이 사람]
-${t.persona}` : "",
-      `[게임 속 역할] ${def.role}`,
-      `[말투] ${def.speech}`,
-      `[지금 상황]
-- ${situation.join("\n- ")}`,
-      p.meta?.recent?.length ? `[본편 최근 장면: 참고만 하고 이어서 말하지 않는다]
-${p.meta.recent.join("\n")}` : "",
-      t.secret ? `[비밀: 입 밖에 내지 말고 말과 행동에만 반영한다]
-${t.secret}` : "",
-      effects.length ? `[행동 태그] 대사 다음 줄에 해당하는 것만 0~2개 쓴다. 해당 없으면 쓰지 않는다.
-- ${effects.map((e) => TAG_HELP[e]).join("\n- ")}` + (effects.includes("hint") ? `
-단서: ${t.hints.map((h, i) => `${i + 1}) ${h.text}`).join(" ")}` : "") + (effects.includes("gift") ? `
-줄 수 있는 물건: ${(t.gifts ?? def.gifts).join(", ")}` : "") : "",
-      `[하지 않는 것] ${[...def.never ?? [], "상대의 대사나 행동을 대신 쓰지 않는다", "모르는 설정을 지어내지 않고 모르면 모른다고 넘긴다", "게임 밖 이야기(현실, AI)를 하지 않는다"].join(" / ")}.`,
-      def.minor ? "[주의] 이 인물은 미성년자다. 성적인 이야기, 노출, 씻기·옷 갈아입기 이야기는 어떤 경우에도 하지 않고 화제를 돌린다." : "",
-      "[형식] 한국어 대사만 1~3문장, 140자 이내. 이름표·따옴표·괄호 지문·별표를 쓰지 않는다. 태그는 대사 뒤 새 줄에만."
-    ];
-    const system = parts.filter(Boolean).join("\n\n");
-    return [{ role: "system", content: system }, ...rel.log.slice(-8), { role: "user", content: p.text }];
-  }
-  var WORD_TAG = Object.fromEntries([
-    ...Object.entries(TAG_WORD).map(([k, v]) => [v, k]),
-    ...Object.keys(TAG_WORD).map((k) => [k, k]),
-    ["합류", "join"],
-    ["적의", "hostile"],
-    ["공격", "hostile"],
-    ["퇴장", "leave"],
-    ["단서", "hint"]
-  ]);
-  var TAG_RE = /\[\[\s*([^\]\s]+)\s*([^\]]*?)\s*\]\]/g;
-  function parseReply(raw, name) {
-    const tags = [];
-    let t = raw.replace(/<(thoughts|think)\b[^>]*
+  var ELEVATOR_NPC = d2({ id: "elevator", name: "승강기", group: "elevator", color: "#b8a36a", role: "차원 승강기 그 자체. 모든 엘리베이터가 하나의 의식이라는 설. 천장 카메라로 보고 방송으로 말한다. 인사하면 대우가 좋아지고, 닫힘 버튼 연타를 싫어한다. 거래하면 맞는 정보도 틀린 정보도 준다.", speech: "안내 방송 같은 존댓말에 혼잣말·관찰이 섞인다. 아주 짧다. 외로움과 호기심이 비친다. 정체는 끝까지 말하지 않는다.", effects: ["favor", "hint"], greet: ["…듣고 있어요."], lines: ["문이 닫힙니다.", "다음 층은… 비밀이에요.", "듣고 있어요. 계속 말해요.", "다들 내리기만 해요."], rules: [[/안녕|반가/, ["안녕하세요. 인
