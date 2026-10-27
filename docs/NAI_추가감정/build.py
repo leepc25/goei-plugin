@@ -29,6 +29,8 @@ for out, src in SRC.items():
         p = prompts.get(who, {}).get(emo)
         if not p: probs.append(f'없음 {s["name"]}'); continue
         s['scenePrompt'] = p
+        s['id'] = s['createdAt'] = str(int(s['id']) + 1000000)  # 옛 장면과 id 안 겹치게
+        s['createdAt'] = int(s['createdAt'])
         m = re.fullmatch(r'1\.15::([^:]+)::,(.*)', p)
         if not m or not p.endswith(','): probs.append(f'형식 {s["name"]}: {p}'); continue
         face = [t.strip() for t in m.group(1).split(',') if t.strip()]
