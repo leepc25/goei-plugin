@@ -17,7 +17,7 @@ DIR[20] = "east"
 DIR[21] = "south"
 DIR[30] = "east"
 DIR[31] = "east"
-for _n in (32, 33, 34): DIR[_n] = "east"   # 끝 장 지정: 18 = 14를 돌아서기 끝 장(수건 두른 옆모습)으로 끝나게 다시
+for _n in (32, 33, 34, 35): DIR[_n] = "east"   # 끝 장 지정: 18 = 14를 돌아서기 끝 장(수건 두른 옆모습)으로 끝나게 다시
 POSE_SIDE = "standing upright seen from the side, facing east"
 STEPS = {
  1: ("57", "Standing with the back to the viewer in front of a locker. First she wraps a large plain white bath towel around her body under the arms and holds it closed. Then, keeping the towel wrapped the whole time, she takes off the jacket, vest, shirt, trousers and shoes underneath it and lets them drop out of the frame. The towel always covers her from the armpits to the middle of the thighs. Last frame: standing with the back to the viewer, barefoot, wrapped in the white towel from the armpits to mid-thigh, bare shoulders, arms and lower legs, ponytail unchanged."),
@@ -44,6 +44,9 @@ STEPS[32] = ("REG_E", "Standing still seen from the side facing east, relaxed, a
 STEPS[33] = ("REG_E", "Standing seen from the side facing east, getting undressed for a shower. She takes off the jacket, then the vest, then the shirt, then the shoes, then the trousers, one piece at a time, each piece clearly sliding off the body and dropping out of the frame, until she stands bare, relaxed, arms at the sides. No towel. Last frame: standing seen from the side facing east, barefoot, no clothes, ponytail unchanged. Draw only the woman, no locker, furniture, shower or wall.")   # 12장 옷 벗기
 STEPS[34] = STEPS[33]   # 16장 옷 벗기
 FRAMES = {33: 12, 34: 16}
+STEPS[35] = ("REG_E", "Seen from the side facing east, she undresses for a shower with clear body movements, in this order: she grips the jacket lapels with both hands, pushes the jacket back off her shoulders, pulls each arm out of the sleeves and drops it. She unbuttons the vest and the shirt down the front with her fingers, opens them, slides them off her shoulders and pulls her arms out and drops them. She bends forward at the waist, hooks both thumbs into the waistband and pushes the trousers down to the ankles, then lifts one foot and then the other to step out of them, taking the shoes off with them. She straightens up and stands bare, relaxed, arms at the sides. No towel. Last frame: standing seen from the side facing east, barefoot, no clothes, ponytail unchanged. Draw only the woman, no locker, furniture, shower or wall.")   # 손 동작 쓴 16장 옷 벗기
+FRAMES[35] = 16
+
 
 STEPS[31] = ("REG_E", "Standing seen from the side facing east in front of a locker, getting undressed for a shower. She takes off the jacket, vest, shirt, trousers and shoes one by one and drops them out of the frame, until she stands bare, relaxed, arms at the sides. No towel. Last frame: standing seen from the side facing east, barefoot, no clothes, ponytail unchanged.")   # 수건 없이 바로 옷 벗기 시험
 STEPS[30] = ("REG_E", "Standing seen from the side facing east in front of a locker. First she wraps a large plain white bath towel around her body under the arms and holds it closed. Then, keeping the towel wrapped the whole time, she takes off the jacket, vest, shirt, trousers and shoes underneath it and lets them drop out of the frame. The towel always covers her from the armpits to the middle of the thighs. Last frame: standing seen from the side facing east, barefoot, wrapped in the white towel from the armpits to mid-thigh, bare shoulders, arms and lower legs, ponytail unchanged.")   # 옆모습 옷 벗기
