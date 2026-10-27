@@ -1,26 +1,242 @@
 [
  {
-  "key": "5.3_탐미주의",
-  "row": "19",
+  "key": "2.1_사장",
+  "row": "76",
   "why": [
-   "누운 몸이 그림판보다 김 → 무릎 굽혀 눕기"
+   "멈춤(6%)"
   ],
-  "cond": "The game moves the body through the air in code, so draw the fall in place and low. She is tall: when lying she must lie compact with both knees bent up and the arms folded on the chest, so the whole lying body fits inside the frame with space at both sides.",
+  "cond": "The motion must be clearly visible from frame to frame, with the whole body moving.",
   "no_end": false,
-  "end_same": false,
-  "v3": false,
-  "action": "The game moves the body through the air in code, so draw the fall in place and low. She is tall: when lying she must lie compact with both knees bent up and the arms folded on the chest, so the whole lying body fits inside the frame with space at both sides. Get knocked off the feet: the body tips backward and drops onto the back on the floor in place, the knees bending up as she lands, ending lying on the back with the knees bent and the arms on the chest."
+  "action": "The motion must be clearly visible from frame to frame, with the whole body moving. Lying still on the back, the chest rises and falls slowly with sleepy breathing; the head, arms and legs do not move. Seen from the side the whole time. The last frame matches the first. Move with perfectly still, precise, unhurried movements. Draw only the character; no chair, desk, table, bed, wall, other furniture or background."
  },
  {
-  "key": "5.3_탐미주의",
-  "row": "18-3",
+  "key": "2.4_이기석",
+  "row": "76",
   "why": [
-   "누운 몸이 그림판보다 김 → 무릎 굽혀 눕기"
+   "멈춤(4%)"
   ],
-  "cond": "The game moves the body through the air in code, so draw the launch in place and low. She is tall: when lying she must lie compact with both knees bent up and the arms folded on the chest, so the whole lying body fits inside the frame with space at both sides.",
+  "cond": "The motion must be clearly visible from frame to frame, with the whole body moving.",
   "no_end": false,
-  "end_same": false,
-  "v3": false,
-  "action": "The game moves the body through the air in code, so draw the launch in place and low. She is tall: when lying she must lie compact with both knees bent up and the arms folded on the chest, so the whole lying body fits inside the frame with space at both sides. Get launched: the body bends back as if lifted off the feet, curls in the air in place, and lands on the back with the knees bent up and the arms on the chest."
+  "action": "The motion must be clearly visible from frame to frame, with the whole body moving. Lying still on the back, the chest rises and falls slowly with sleepy breathing; the head, arms and legs do not move. Seen from the side the whole time. The last frame matches the first. Move with big stage-show gestures and booming showman energy. Draw only the character; no chair, desk, table, bed, wall, other furniture or background."
+ },
+ {
+  "key": "3.1_청달래",
+  "row": "76",
+  "why": [
+   "멈춤(4%)"
+  ],
+  "cond": "The motion must be clearly visible from frame to frame, with the whole body moving.",
+  "no_end": false,
+  "action": "The motion must be clearly visible from frame to frame, with the whole body moving. Lying still on the back, the chest rises and falls slowly with sleepy breathing; the head, arms and legs do not move. Seen from the side the whole time. The last frame matches the first. Move with a cold, regal, slow and heavy presence. Draw only the character; no chair, desk, table, bed, wall, other furniture or background."
+ },
+ {
+  "key": "3.4_진나솔",
+  "row": "76",
+  "why": [
+   "멈춤(4%)"
+  ],
+  "cond": "The motion must be clearly visible from frame to frame, with the whole body moving.",
+  "no_end": false,
+  "action": "The motion must be clearly visible from frame to frame, with the whole body moving. Lying still on the back, the chest rises and falls slowly with sleepy breathing; the head, arms and legs do not move. Seen from the side the whole time. The last frame matches the first. Move with a bored, sharp face and minimal, efficient movements. Draw only the character; no chair, desk, table, bed, wall, other furniture or background."
+ },
+ {
+  "key": "3.10_고영은",
+  "row": "76",
+  "why": [
+   "멈춤(4%)"
+  ],
+  "cond": "The motion must be clearly visible from frame to frame, with the whole body moving.",
+  "no_end": false,
+  "action": "The motion must be clearly visible from frame to frame, with the whole body moving. Lying still on the back, the chest rises and falls slowly with sleepy breathing; the head, arms and legs do not move. Seen from the side the whole time. The last frame matches the first. Move with a soft ordinary face and careful, gentle hands. Draw only the character; no chair, desk, table, bed, wall, other furniture or background."
+ },
+ {
+  "key": "4.5_마덕희",
+  "row": "76",
+  "why": [
+   "멈춤(6%)"
+  ],
+  "cond": "The motion must be clearly visible from frame to frame, with the whole body moving.",
+  "no_end": false,
+  "action": "The motion must be clearly visible from frame to frame, with the whole body moving. Lying still on the back, the chest rises and falls slowly with sleepy breathing; the head, arms and legs do not move. Seen from the side the whole time. The last frame matches the first. Move with a calm dimpled smile and small, deliberate dealer's hands. Draw only the character; no chair, desk, table, bed, wall, other furniture or background."
+ },
+ {
+  "key": "4.9_살라딘",
+  "row": "76",
+  "why": [
+   "멈춤(5%)"
+  ],
+  "cond": "The motion must be clearly visible from frame to frame, with the whole body moving.",
+  "no_end": false,
+  "action": "The motion must be clearly visible from frame to frame, with the whole body moving. Lying still on the back, the chest rises and falls slowly with sleepy breathing; the head, arms and legs do not move. Seen from the side the whole time. The last frame matches the first. Move with a broad warm brotherly bearing and powerful, steady movements. Draw only the character; no chair, desk, table, bed, wall, other furniture or background."
+ },
+ {
+  "key": "6.3_가짜관리국검사C",
+  "row": "76",
+  "why": [
+   "멈춤(4%)"
+  ],
+  "cond": "The motion must be clearly visible from frame to frame, with the whole body moving.",
+  "no_end": false,
+  "action": "The motion must be clearly visible from frame to frame, with the whole body moving. Lying still on the back, the chest rises and falls slowly with sleepy breathing; the head, arms and legs do not move. Seen from the side the whole time. The last frame matches the first. Move with a cold, silent, quick and light manner. Draw only the character; no chair, desk, table, bed, wall, other furniture or background."
+ },
+ {
+  "key": "6.4_가짜관리국진압A",
+  "row": "76",
+  "why": [
+   "멈춤(4%)"
+  ],
+  "cond": "The motion must be clearly visible from frame to frame, with the whole body moving.",
+  "no_end": false,
+  "action": "The motion must be clearly visible from frame to frame, with the whole body moving. Lying still on the back, the chest rises and falls slowly with sleepy breathing; the head, arms and legs do not move. Seen from the side the whole time. The last frame matches the first. Move with an exact, stiff, textbook military manner. Draw only the character; no chair, desk, table, bed, wall, other furniture or background."
+ },
+ {
+  "key": "6.5_가짜관리국진압B",
+  "row": "76",
+  "why": [
+   "멈춤(5%)"
+  ],
+  "cond": "The motion must be clearly visible from frame to frame, with the whole body moving.",
+  "no_end": false,
+  "action": "The motion must be clearly visible from frame to frame, with the whole body moving. Lying still on the back, the chest rises and falls slowly with sleepy breathing; the head, arms and legs do not move. Seen from the side the whole time. The last frame matches the first. Move with a blunt, heavy, steady front-line manner. Draw only the character; no chair, desk, table, bed, wall, other furniture or background."
+ },
+ {
+  "key": "6.6_가짜관리국진압C",
+  "row": "76",
+  "why": [
+   "멈춤(3%)"
+  ],
+  "cond": "The motion must be clearly visible from frame to frame, with the whole body moving.",
+  "no_end": false,
+  "action": "The motion must be clearly visible from frame to frame, with the whole body moving. Lying still on the back, the chest rises and falls slowly with sleepy breathing; the head, arms and legs do not move. Seen from the side the whole time. The last frame matches the first. Move with a quick, nimble, wary manner. Draw only the character; no chair, desk, table, bed, wall, other furniture or background."
+ },
+ {
+  "key": "6.8_불량배남2",
+  "row": "76",
+  "why": [
+   "멈춤(2%)"
+  ],
+  "cond": "The motion must be clearly visible from frame to frame, with the whole body moving.",
+  "no_end": false,
+  "action": "The motion must be clearly visible from frame to frame, with the whole body moving. Lying still on the back, the chest rises and falls slowly with sleepy breathing; the head, arms and legs do not move. Seen from the side the whole time. The last frame matches the first. Move with a tight-lipped hard stare and slow, heavy, unhurried movements. Draw only the character; no chair, desk, table, bed, wall, other furniture or background."
+ },
+ {
+  "key": "6.16_경찰여2",
+  "row": "136",
+  "why": [
+   "몸이 커짐 ×2.2"
+  ],
+  "cond": "Draw only the character's own body and the weapon it already holds: no motion blur, no slash trails, no smears, no flashes or effects. Keep the exact same outfit, colors, body size and proportions in every frame.",
+  "no_end": false,
+  "action": "Draw only the character's own body and the weapon it already holds: no motion blur, no slash trails, no smears, no flashes or effects. Keep the exact same outfit, colors, body size and proportions in every frame. Standing facing the viewer, raise a flashlight to shoulder height and sweep it slowly from left to right, then lower it. No light beam is drawn. Keep the body facing straight toward the viewer. The last frame matches the first. Move with a quick-eyed, slightly hasty, brisk manner. Draw "
+ },
+ {
+  "key": "6.17_관리국남A",
+  "row": "76",
+  "why": [
+   "멈춤(4%)"
+  ],
+  "cond": "The motion must be clearly visible from frame to frame, with the whole body moving.",
+  "no_end": false,
+  "action": "The motion must be clearly visible from frame to frame, with the whole body moving. Lying still on the back, the chest rises and falls slowly with sleepy breathing; the head, arms and legs do not move. Seen from the side the whole time. The last frame matches the first. Move with a stolid, dependable, square-shouldered manner. Draw only the character; no chair, desk, table, bed, wall, other furniture or background."
+ },
+ {
+  "key": "6.19_관리국여A",
+  "row": "76",
+  "why": [
+   "멈춤(5%)"
+  ],
+  "cond": "The motion must be clearly visible from frame to frame, with the whole body moving.",
+  "no_end": false,
+  "action": "The motion must be clearly visible from frame to frame, with the whole body moving. Lying still on the back, the chest rises and falls slowly with sleepy breathing; the head, arms and legs do not move. Seen from the side the whole time. The last frame matches the first. Move with small, neat, precise office-worker movements. Draw only the character; no chair, desk, table, bed, wall, other furniture or background."
+ },
+ {
+  "key": "6.20_관리국여B",
+  "row": "76",
+  "why": [
+   "멈춤(4%)"
+  ],
+  "cond": "The motion must be clearly visible from frame to frame, with the whole body moving.",
+  "no_end": false,
+  "action": "The motion must be clearly visible from frame to frame, with the whole body moving. Lying still on the back, the chest rises and falls slowly with sleepy breathing; the head, arms and legs do not move. Seen from the side the whole time. The last frame matches the first. Move with a cold, taciturn, distant manner. Draw only the character; no chair, desk, table, bed, wall, other furniture or background."
+ },
+ {
+  "key": "6.24_백일몽여B",
+  "row": "76",
+  "why": [
+   "멈춤(6%)"
+  ],
+  "cond": "The motion must be clearly visible from frame to frame, with the whole body moving.",
+  "no_end": false,
+  "action": "The motion must be clearly visible from frame to frame, with the whole body moving. Lying still on the back, the chest rises and falls slowly with sleepy breathing; the head, arms and legs do not move. Seen from the side the whole time. The last frame matches the first. Move with a wary, catlike, low and quick manner. Draw only the character; no chair, desk, table, bed, wall, other furniture or background."
+ },
+ {
+  "key": "6.27_협회여1",
+  "row": "76",
+  "why": [
+   "멈춤(5%)"
+  ],
+  "cond": "The motion must be clearly visible from frame to frame, with the whole body moving.",
+  "no_end": false,
+  "action": "The motion must be clearly visible from frame to frame, with the whole body moving. Lying still on the back, the chest rises and falls slowly with sleepy breathing; the head, arms and legs do not move. Seen from the side the whole time. The last frame matches the first. Move with a calm, quiet, businesslike manner. Draw only the character; no chair, desk, table, bed, wall, other furniture or background."
+ },
+ {
+  "key": "6.28_협회여2",
+  "row": "76",
+  "why": [
+   "멈춤(5%)"
+  ],
+  "cond": "The motion must be clearly visible from frame to frame, with the whole body moving.",
+  "no_end": false,
+  "action": "The motion must be clearly visible from frame to frame, with the whole body moving. Lying still on the back, the chest rises and falls slowly with sleepy breathing; the head, arms and legs do not move. Seen from the side the whole time. The last frame matches the first. Move with a cautious, gentle, reluctant manner. Draw only the character; no chair, desk, table, bed, wall, other furniture or background."
+ },
+ {
+  "key": "6.34_프리랜서여1",
+  "row": "76",
+  "why": [
+   "멈춤(5%)"
+  ],
+  "cond": "The motion must be clearly visible from frame to frame, with the whole body moving.",
+  "no_end": false,
+  "action": "The motion must be clearly visible from frame to frame, with the whole body moving. Lying still on the back, the chest rises and falls slowly with sleepy breathing; the head, arms and legs do not move. Seen from the side the whole time. The last frame matches the first. Move with a confident, light, sleeves-rolled veteran manner. Draw only the character; no chair, desk, table, bed, wall, other furniture or background."
+ },
+ {
+  "key": "6.42_상인남4",
+  "row": "76",
+  "why": [
+   "멈춤(4%)"
+  ],
+  "cond": "The motion must be clearly visible from frame to frame, with the whole body moving.",
+  "no_end": false,
+  "action": "The motion must be clearly visible from frame to frame, with the whole body moving. Lying still on the back, the chest rises and falls slowly with sleepy breathing; the head, arms and legs do not move. Seen from the side the whole time. The last frame matches the first. Move with a deadpan, businesslike, restrained manner. Draw only the character; no chair, desk, table, bed, wall, other furniture or background."
+ },
+ {
+  "key": "6.65_시민여3",
+  "row": "76",
+  "why": [
+   "멈춤(5%)"
+  ],
+  "cond": "The motion must be clearly visible from frame to frame, with the whole body moving.",
+  "no_end": false,
+  "action": "The motion must be clearly visible from frame to frame, with the whole body moving. Lying still on the back, the chest rises and falls slowly with sleepy breathing; the head, arms and legs do not move. Seen from the side the whole time. The last frame matches the first. Move with a no-nonsense neighborhood auntie's manner, a hand on the hip. Draw only the character; no chair, desk, table, bed, wall, other furniture or background."
+ },
+ {
+  "key": "6.68_시민여6",
+  "row": "76",
+  "why": [
+   "멈춤(4%)"
+  ],
+  "cond": "The motion must be clearly visible from frame to frame, with the whole body moving.",
+  "no_end": false,
+  "action": "The motion must be clearly visible from frame to frame, with the whole body moving. Lying still on the back, the chest rises and falls slowly with sleepy breathing; the head, arms and legs do not move. Seen from the side the whole time. The last frame matches the first. Move with a lively, restless manner, touching the ponytail. Draw only the character; no chair, desk, table, bed, wall, other furniture or background."
+ },
+ {
+  "key": "6.70_시민여8",
+  "row": "76",
+  "why": [
+   "멈춤(5%)"
+  ],
+  "cond": "The motion must be clearly visible from frame to frame, with the whole body moving.",
+  "no_end": false,
+  "action": "The motion must be clearly visible from frame to frame, with the whole body moving. Lying still on the back, the chest rises and falls slowly with sleepy breathing; the head, arms and legs do not move. Seen from the side the whole time. The last frame matches the first. Move with a shy, timid manner, sleeves pulled over the hands. Draw only the character; no chair, desk, table, bed, wall, other furniture or background."
  }
 ]
