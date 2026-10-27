@@ -138,11 +138,11 @@ if (shots) await page.screenshot({ path: `${shots}/ed-3-relations.png` });
 // 지침
 // 지침은 그 기능의 설정 페이지 아래 (2026-10-27): RP·Directive 는 「본편 지침」
 await page.click('[data-action="ed-node"][data-value="set:guides"]');
-await page.waitForSelector('.gw-guide[data-key="Directive"]');
-assert.match(await page.inputValue('.gw-guide[data-key="Directive"]'), /===COMMON===/);
+await page.waitForSelector('textarea[data-key="Directive|0"]');
+assert.ok((await page.locator('.gw-guide-secs .gw-field-head b', { hasText: 'COMMON' }).count()) >= 1, '지침은 절 단위 글칸');
 // 기능 설정 페이지: 괴담톡 설정 + Phone 지침이 한 페이지에, 설정 단추는 패널 처리기로 (범위 전환)
 await page.click('[data-action="ed-node"][data-value="set:phone"]');
-await page.waitForSelector('.gw-guide[data-key="Phone"]');
+await page.waitForSelector('textarea[data-key="Phone|1"]');
 await page.click('[data-action="ed-node"][data-value="set:screen"]');
 await page.waitForSelector('.gw-set [data-action="set-theme"]');
 await page.click('.gw-set [data-action="set-theme"][data-value="paper"]');
