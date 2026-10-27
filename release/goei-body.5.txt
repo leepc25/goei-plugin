@@ -1,4 +1,41 @@
- Recurrence
+onal use.
+
+###### Public Worship Hall / Private Temple
+- The public hall is distinct from the Leader's secret temple. Before large congregations he preaches through the Saint and displays his real power as benevolent proof. The Saint believes these outings help others.
+- The private temple is outwardly ordinary, inconspicuous, and architecturally unextravagant, concealing its importance. Its lowest level holds the Leader's secluded quarters, accessible through blood-manipulated mechanisms; human women may be drugged and hypnotized there for feeding.
+- The highest level isolates the Saint until the Leader wants his power or presence. Social dependency conceals the household's crimes and turns the supposed divine authority into a controlled asset.`,
+          rules: "##### Blood as Orders, Information, and Access\n- Household vampire blood carries encoded intent or information as well as nourishment. A vampire knowing a location can encode it in blood for another to learn by drinking.\n- The Leader's Blood Bats carry remote commands like physical letters. Daesik normally waits hidden at his base, swallows the construct to receive its intent, and performs the assignment secretly at night.\n- Blood can anomalously release a conventional lock when fed into its keyhole without the correct key. Daesik can also put his own blood in a human's mouth to cause temporary unconsciousness.",
+          entities: `##### Household and Saint
+###### Cult Leader
+- An unnamed male vampire, neither originally an ancient power nor part of a greater vampire succession. A chance encounter turned him; discovering blood-supported effective immortality, he adopted that existence. His fraud and manipulation skills predate finding the Saint.
+- He built the cult around the man's holiness, then turned his wife and son, enjoying wealth, status, blood, and local political influence through the resulting family. He cites his wife's cancer as his reason for turning her.
+- Publicly benevolent, privately an imprisoner, exploiter, manipulator, and creator of servitors. Stronger than the other household vampires and more skilled with blood, he extends claws and fangs, wraps himself in a dense blood aura, and weaponizes scattered blood offensively.
+- Killing him can yield "Cult Leader's Crown of Thorns (교주의 가시 면류관)."
+
+###### Saint
+- An unnamed adult human male exceeding roughly 150 kg, with extremely pale porcelain-like skin and a round, childlike appearance. His mentality is markedly juvenile: trusting, innocent, direct, and emotionally like a young child.
+- Innate holiness predates this cult and any association with established religion. Its unmistakable sacred presence is perceptible without belief and makes worship understandable to ordinary observers. It differs enough from conventional Christian holiness that the vampire Leader can stand near him without destruction.
+- He means well, considers the Leader a caring father figure, and believes he is protected and taken out to help believers. Isolation prevents understanding of the hidden vampire system. He is an exploited asset, not automatically a hostile religious operator.
+- Sufficiently abnormal external means can separate holiness from his body completely, removing the sacred presence and leaving him physically ordinary. The observed removal also produced severe memory loss and an abrupt shift to ordinary adult-like thought. This suggests a connection between holiness and arrested development; it is not an established explanation of his true nature.
+
+###### Daesik (대식이)
+- A male vampire created directly by the Leader, serving as disposable household labor. "Daesik" is his master's degrading slave-like name, not a respected family identity.
+- Simple-minded, submissive, conditioned to obey, and acutely sensitive to stronger vampires' moods. He calls himself the Leader's close aide but is routinely mistreated by the family, accumulating deep resentment rather than affectionate loyalty.
+- He creates ghouls from designated unbelievers at the Leader's order, maintains that force, abducts people, moves villa captives, and follows Blood Bat assignments. He is skilled at moving unnoticed and hiding in darkness; blood gives him temporary human incapacitation and receipt of commands or geographical knowledge.
+- Once the Leader's authority breaks, his hatred of master and family can surface violently.
+
+###### Wife and Do-jun (도준)
+- The adult wife retains a youthful appearance through vampirism, with ordinary enhanced vampire strength, elongated claws, and fangs. Cult protection lets her enjoy nightlife freely. She participates in exploitation yet remains intensely attached to her son.
+- Do-jun is comparatively young and inexperienced, treats Daesik as an inferior servant, and relies on his father's authority to threaten others and demand captives.
+- Neither possesses the Leader's central religious authority; their household status derives from marriage and descent. Vampire family power, human cult control, and the Saint's holiness must not be treated as one interchangeable hierarchy.`
+        },
+        extra: [],
+        title: "The Saint's City (성자의 도시)"
+      },
+      "불이 꺼진 관리국": {
+        keys: "Bureau with the Lights Out, 불이 꺼진 관리국",
+        fields: {
+          identity: `##### Blackout and Recurrence
 - The Bureau's existing warning: "If the lights go out, trust nothing and run. The Bureau's lights do not go out."
 - A recurring reality inversion in the Management Bureau's underground containment facility, most often during ordinary tooth-tree maintenance and tooth-fairy duty. In the confirmed onset, an opened gift box contains the accompanying senior agent's severed head; her headless body kills the victim. The event then restarts at the containment-floor elevator with the senior normal beside them. Once the anomalous phase begins, the lights fail.
 - The ordinary corridor grid becomes a vast, completely dark labyrinth overlapping an apparent "Fake Bureau." People may possess coherent memories and faction knowledge validating that claim, but the event never establishes which Bureau is genuine. People, locations, affiliations, interpretations, and exits progressively lose credibility.
@@ -806,42 +843,4 @@ Three rules are engraved in the floor:
           survival: "##### Punishment and Confirmed Escape\n- Rule violations ignite spontaneous immolation after a variable delay of seconds to several minutes. The fire spreads slowly and relentlessly, allowing recognition of the mistake. It is punishment, not conventional fire, and cannot be extinguished.\n- Severity appears to scale with the violation: minor infractions cause localized burns that can heal after survival; moderate ones cause partial immolation, sometimes survivable with rapid treatment; major ones consume the victim within minutes, with no recorded survivors.\n- The only confirmed escape is one complete cycle of 7 internal days obeying every rule without exception. At completion, the entrance unlocks normally around dawn for an estimated 10–15 minutes. Missing it restarts the cycle; multi-cycle survivors report increasing hostility each iteration.\n- Keep absolute silence during restricted hours. When Room 203 becomes audible, remain motionless until its sounds stop. Do not establish eye contact with Residents. Previous victims' belongings may contain useful information; the goshiwon wants occupants to stay, and its lure must be resisted.",
           space: `##### Rooms and Shared Spaces
 ###### Hallways and Residential Rooms
-- Narrow halls have peeling, decades-old floral wallpaper, stained carpet of unidentifiable original color, and flickering fluorescent lights buzzing with electrical interference. Layout subtly changes between visits to the same floor.
-- Each floor's functional communal bathroom sits at the corridor's end, unsettlingly clean as if recently used despite the apparent abandonment. The midnight singing rule applies here.
-- Coffin-like 2–3 pyeong rooms contain a thin mattress on a raised platform, cramped desk, inadequate desk lamp, and excessively humming mini-fridge. A single window may not open onto the exterior; thin walls transmit neighbors' breathing, movement, and mattress-spring creaks. Abandoned rooms retain victims' possessions.
-
-###### Room 203 and Its Occupant (He/Him)
-- The door is ordinary faded wood with a cheap brass handle, but its surroundings are unnaturally silent. Rare glimpses reveal "something vast compressed into an impossibly small space": writhing masses, overlapping forms, and geometries that "folded in on themselves."
-- Normal manifestation is sound: rhythmic wall scratching suggesting counting or timekeeping, wet breathing echoing through quiet hallways, and heavy impacts as if a massive body were shifting inside a cramped container.
-- True nature is unknown, inferred from rules, sounds, and glimpses. He appears to be the central authority, source of punishment fire, and rule enforcer, aware of activity throughout the building and able to direct punishment anywhere instantaneously. This reach is distinct from the documented delay before ignition.
-- Far from 203, survivors still feel pressure behind their eyes and a vast intelligence tracking their position, heartbeat, and thoughts of disobedience. Its apparent attention is constant: no sleep, rest, or looking away. Management cannot control him.
-
-###### Impossible Elevator and Apparitions
-- No lift exists in normal operation. When one manifests, it is a rusty industrial service lift with grinding machinery, suited to an old factory rather than lodging. Observe the prostration/bowing rule and wait for the occupant to enter 203.
-- Apparitions appear only with the elevator, taking the forms of loved ones and speaking through shaft walls and doors between floors. Emotional appeals and false urgency aim to induce violations.
-- Close inspection reveals wrong blinking frequency, exact phrase loops, subtly unphysical jerks, knowledge they should lack, or ignorance of familiar details. Some break character to mock resistance or express frustration. Familiar appearance is part of the lure.
-
-###### Rooftop Loop
-- A rusty door labeled "rooftop", crumbling concrete steps, and apparent open sky promise escape. The door is usually locked from inside and can be forced, but crossing returns to a lower-floor hallway, an impossible room, or the same access door seen from behind. It does not provide the apparent rooftop exit.
-
-###### Lobby, Kitchen, and Laundry
-- The small entrance lobby is staged decay: dusty artificial plants whose leaves crumble when touched, a wall TV showing static or one frozen unidentifiable frame, and a vending machine dispensing expired goods in faded packaging.
-- "Residents" gather around 6–8 PM by wall clocks, silently sitting on the worn couch without reading or talking, standing at the machine without buying, or facing walls as if waiting or meditating.
-- The second-floor kitchen's stove never heats, its fridge is unplugged with the cord coiled beside it, and orange sink water smells faintly of rust and organic matter. Earlier victims' food varies from impossible preservation to extreme decay regardless of expiration dates. Consequences of eating it are undocumented, not established as harmless.
-- A shared basement laundry room is observed despite Rule 5 denying a basement. Its door appears intermittently at the bottom of the ground-floor stairwell.`,
-          entities: "##### The Residents\n- Translucent humanoids wear dated tracksuits, worn slippers, and faded shirts advertising defunct companies. They read textless newspapers, drink from empty cups, or patiently stare at windows and walls.\n- Direct eye contact causes immediate aggression: the Resident stops, turns, and pursues with a furious contorted face and open-mouthed scream inaudible to human ears.\n- Recorded populations range from two to twenty, apparently increasing during rule violations and decreasing in quiet periods. Their mundane routines do not imply safe interaction."
-        },
-        extra: [],
-        title: "Saetbyeol Goshiwon (샛별 고시원)",
-        order: [
-          "identity",
-          "rules",
-          "survival",
-          "space",
-          "entities"
-        ]
-      },
-      유계역: {
-        keys: "Yu-gye Station, 유계역",
-        fields: {
-          entry: "##### Entrances, Text, and Navigation\n- A subway station absent from official Metro maps, with physical entrances that appear and relocate without warning across run-down city districts: abandoned neighborhoods, half-demolished blocks, and quiet residential pockets.\n- Spotless white tiles and crisp 幽界驛 hanja signs contrast with collapsing shops and weed-cracked pavement. Any person crossing a manifested entrance is accepted; an ordinary commuter may mistake it for a newly opened station and be lost without recognizing an abduction.\n- Written text inside carries high-intensity c
+- Narrow halls have peeling, decades-old floral wallpaper, sta

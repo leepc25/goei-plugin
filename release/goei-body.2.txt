@@ -1,4 +1,160 @@
-h({ loc, name, state: "발생대기", situation: "", kind: isLandmark ? "landmark" : "random", origin: "auto", since: null, born: w.minute });
+w;
+      if (MARKERS.some((m) => new RegExp(`^\\s*[-*]?\\s*\\[${m}\\]`).test(line2))) line2 = "";
+      if (prevHadTag) line2 = line2.replace(new RegExp(`^\\s*${AGE_META.source}\\s*`), "");
+      let count2 = 0;
+      line2 = line2.replace(/\[(?:AN|IN|MS|AG)\s*\|[^\]]*\]/g, () => {
+        count2++;
+        return "";
+      });
+      const hadTag = count2 > 0;
+      if (prev !== null && !(hadTag && ageOnly(prev))) keep.push(prev);
+      if (hadTag) line2 = line2.replace(new RegExp(AGE_META.source, "g"), "");
+      prev = line2;
+      prevHadTag = hadTag;
+    }
+    if (prev !== null) keep.push(prev);
+    const envs = [];
+    const body5 = keep.filter((l) => {
+      if (/^\s*[[【［]\s*▣\s*[|｜]/.test(l)) {
+        envs.push(l.trim());
+        return false;
+      }
+      return !/^\s*\[AC\s*\|/.test(l) && !/^\s*\[◎\s*\|/.test(l);
+    });
+    let s5 = body5.join("\n").replace(/\n\s*\n\s*\n+/g, "\n\n").trim();
+    if (envs.length) s5 = (s5 ? `${s5}
+` : "") + envs.join("\n");
+    return s5;
+  }
+
+  // src/core/world/engine.ts
+  var DEFAULT_SETTINGS = {
+    extra_cap: 3,
+    extra_ms_cap: 3,
+    extra_in_cap: 3,
+    preset_cap: 2,
+    preset_p: 100,
+    random_cap: 1,
+    random_p: 100,
+    incident_cap: 1,
+    incident_p: 50,
+    mystic_cap: 1,
+    mystic_p: 100,
+    preset_expire: 1,
+    random_expire: 1,
+    incident_expire: 1,
+    mystic_expire: 1,
+    preset_ttl: 48,
+    random_ttl: 48,
+    incident_ttl: 12,
+    mystic_ttl: 24,
+    landmark_share: 50,
+    agent_limit: 12
+  };
+  function emptyWorld() {
+    return { v: 1, epoch: 0, minute: null, an: [], inc: [], ms: [], agents: {}, retired: [], promoted: [], blocks: {}, skip: {}, pending: {}, notice: "", ended: [] };
+  }
+  function parseWorld(raw) {
+    if (typeof raw !== "string" || !raw) return emptyWorld();
+    try {
+      const w = JSON.parse(raw);
+      if (w && w.v === 1 && Array.isArray(w.an) && Array.isArray(w.inc) && Array.isArray(w.ms)) {
+        return { ...emptyWorld(), ...w, pending: { ...w.pending ?? {} }, ended: Array.isArray(w.ended) ? w.ended : [] };
+      }
+    } catch {
+    }
+    return emptyWorld();
+  }
+  function validName(n2) {
+    return typeof n2 === "string" && n2.trim() !== "" && /[\p{L}\p{N}]/u.test(n2) && !/^\s*[[{]/.test(n2) && !n2.includes("\n") && !["content", "comment", "name", "null"].includes(n2);
+  }
+  function occupied(w) {
+    return new Set([...w.an, ...w.inc, ...w.ms].map((e) => e.loc));
+  }
+  function pick2(list4, rng) {
+    return list4.length ? list4[Math.floor(rng() * list4.length)] : void 0;
+  }
+  function place(w, skip, rng) {
+    const taken = occupied(w);
+    return pick2(POOL.filter((l) => !taken.has(l) && l !== skip), rng);
+  }
+  function block(w, group6, name) {
+    if (name) w.blocks[`${group6}:${name}`] = w.epoch + 1;
+  }
+  function blocked(w, group6, name) {
+    return (w.blocks[`${group6}:${name}`] ?? -1) >= w.epoch;
+  }
+  function remember(w, kind, e, grade) {
+    if (e.state === "발생대기") return;
+    w.ended = [...(w.ended ?? []).filter((x) => !(x.kind === kind && x.name === e.name && x.loc === e.loc)), { kind, name: e.name, loc: e.loc, ...grade ? { grade } : {}, until: w.epoch + 1 }];
+  }
+  function endAn(w, e) {
+    remember(w, "an", e, e.grade);
+    block(w, "an", e.name);
+    w.skip.an = e.loc;
+    w.an = w.an.filter((x) => x !== e);
+  }
+  function endIn(w, e) {
+    remember(w, "in", e);
+    block(w, "in", e.name);
+    w.skip.in = e.loc;
+    w.inc = w.inc.filter((x) => x !== e);
+  }
+  function endMs(w, e) {
+    remember(w, "ms", e);
+    block(w, "ms", e.name);
+    w.skip.ms = e.loc;
+    w.ms = w.ms.filter((x) => x !== e);
+  }
+  function spawnAn(w, c, s5, preset, rng) {
+    const group6 = preset ? "preset" : "random";
+    const n2 = w.an.filter((e) => e.origin === "auto" && e.kind === group6).length;
+    if (n2 >= s5[`${group6}_cap`] || !(rng() * 100 < s5[`${group6}_p`])) return;
+    let name = "";
+    if (preset) {
+      const active3 = new Set(w.an.map((e) => e.presetName || presetCanon(c, e.name)));
+      const choice = pick2(c.anomalies.filter((a) => !active3.has(a.name) && a.name !== w.pending.an && !blocked(w, "an", a.name)), rng);
+      if (!choice) return;
+      name = choice.name;
+    }
+    const loc = place(w, w.skip.an, rng);
+    if (!loc) return;
+    w.an.push({
+      loc,
+      name,
+      state: "발생대기",
+      grade: "",
+      deploy: "",
+      kind: group6,
+      origin: "auto",
+      presetName: name,
+      since: null,
+      born: w.minute,
+      exploring: false
+    });
+    w.skip.an = void 0;
+  }
+  function spawnIncident(w, c, s5, rng) {
+    const n2 = w.inc.filter((e) => e.origin === "auto").length;
+    if (n2 >= s5.incident_cap || !(rng() * 100 < s5.incident_p)) return;
+    const taken = occupied(w);
+    const allowed = c.landmarks.filter((lm) => {
+      const l = landmarkLoc(lm.sido, lm.gu);
+      return l && l !== SEALED_LOC && !taken.has(l) && l !== w.skip.in && lm.name !== w.pending.in && !w.inc.some((e) => e.name === lm.name) && !blocked(w, "in", lm.name);
+    });
+    const isLandmark = rng() * 100 < s5.landmark_share;
+    let loc;
+    let name = "";
+    if (isLandmark) {
+      const lm = pick2(allowed, rng);
+      if (!lm) return;
+      loc = landmarkLoc(lm.sido, lm.gu) ?? void 0;
+      name = lm.name;
+    } else {
+      loc = place(w, w.skip.in, rng);
+    }
+    if (!loc) return;
+    w.inc.push({ loc, name, state: "발생대기", situation: "", kind: isLandmark ? "landmark" : "random", origin: "auto", since: null, born: w.minute });
     w.skip.in = void 0;
   }
   function spawnMystic(w, c, s5, rng) {
@@ -2274,36 +2430,4 @@ h({ loc, name, state: "발생대기", situation: "", kind: isLandmark ? "landmar
           appearance: "Brown hair too long for ordinary office dress codes; this company scarcely notices. His exposed lower face pales with shock and tightens under hardship.",
           outfit: "Standard field gear and the issued cow mask, worn even in the office between operations. He wears his equipment like a man who expects to need it.",
           character: "- Stubbornly sincere, polite and deferential to everyone, including those designated expendable like himself.\n- Endures quietly because survival serves a purpose; visibly afraid but holds position.\n- Remembers kindness and vows repayment with interest. Being treated as a person rather than equipment first staggers, then steadies him.\n- Needs a wish certificate above all. Publicly asked about it at orientation because the answer outweighed embarrassment.\n- Accepts being expendable, but not dying before his wish is granted.\n\n[Flaws]\n- Prone to freezing when the situation exceeds him, and to obeying confident voices in the gap where his own judgment should be.\n- Endurance becomes self-neglect: absorbs danger rather than inconvenience anyone; treats expendability as fact, not insult.\n- A promised wish makes him exploitable; the company knowingly channels people like him into expendable squads.\n- Sudden warmth flusters him and earns disproportionate loyalty.",
-          voice: '- Low, rough and gloomy beneath the cow mask; sentences shorten and stall when events overwhelm him.\n- Consistently formal, deferential speech toward everyone. Short sentences that trail off or stall under pressure.\n- The orientation question, rasped into a silent hall: "Can it bring back the dead?"\n- Introducing himself, quiet under the mask: "I am... Jang Heo-un."\n- When someone he respects introduces themselves first: "...I know."\n- The refusal that ends every discussion of quitting: "I need the wish certificate. I cannot resign."\n- When shock outruns his words: "Wh, what do you..."\n- Gratitude delivered as a vow rather than a flourish, with a deep bow: "I received so much help today. I will make certain I can repay it."',
-          background: "- An orphan raised in a provincial religious social welfare facility associated with Love Paradise (사랑낙원). He has no family. His attachment is to the people he lost there, and his wish is directed toward recovering the dead.\n- A fire destroyed his provincial religious welfare facility three years before joining. As its sole survivor, acts for those who died.\n- Passed hiring advertised at 145 to 1 and survived screening. At the welcome ceremony asked whether a wish could revive the dead; the conditional yes keeps him employed.\n- Assigned to Y Jo, whose leader is a regular employee rather than a Gwa-jang, reflecting management's low expectations of its lifespan.\n- He knows what the Finishing Team is for. He signs the entry forms anyway, every time.",
-          abilities: "- Finishing Team control: Inside Uh-doom, direct orders from employees of sufficient grade compel his body absolutely while he remains conscious. An order to raise his left hand makes it rise as his face pales; the horror never dulls.\n- Field-capable and physically fit, willing to carry, shield, and haul teammates under fire. His combat value is that he does not run.\n- Learns quickly and follows manuals exactly, making him highly reliable when treated as a teammate in situations where improvisation kills.",
-          intro: "(late 20s/M, Sa-won): tall, long brown hair, slight hunch, cow mask; gloomy, sincere wish-certificate seeker; freezes when overwhelmed, endures quietly, repays kindness with deep loyalty."
-        },
-        extra: [
-          {
-            name: "Mask",
-            value: "Cow",
-            kind: "line",
-            sec: "identity",
-            at: "role"
-          }
-        ]
-      },
-      곽제강: {
-        keys: "Je-gang, 곽제강, 제강",
-        fields: {
-          age: "Young for his rank, mid 30s in appearance",
-          gender: "Male",
-          organization: "Baekilmong Co., Ltd.",
-          department_en: "Raw Materials Development Division, Research Team",
-          role: "Gwa-jang. Writes the initial exploration records for newly registered Uh-doom, grades dreamwave solution, briefs Jo before entry, and decides which Jo walk into which Uh-doom.",
-          physique: "Lab-soft, light and entirely untroubled by lacking field conditioning or combat value.",
-          appearance: "Young, open and easygoing, underestimated once per acquaintance. Behind glasses, friendly eyes glitter at interesting horrors and turn ecstatic with manic certainty. Laughs openly, suppresses delighted grins at others' misfortune, and wears loaded smiles colleagues read as warnings.",
-          outfit: "White lab coat over office wear, a pen acquired from somewhere, somebody else's notebook under his arm.",
-          character: "- Genuinely enthralled by anomalies. Even life-threatening interrogation by a containment entity turns initial terror into delight and questions. Would accept dying there except for phenomena he still wants to see; this is a literal priority.\n- Threw a subordinate researcher into Uh-doom as a chaos variable to test whether the assigned team would die. Was disciplined, returned unchanged and promoted. Colleagues track his fits quarterly like weather.\n- Genuinely entertaining, remembers names and greets agents as friends, yet calls them lab rats behind their backs. Charm is real; caring warmth is not.\n- Puts knowledge above hierarchy, dismissing the Jeon-mu before her followers. Regards executive strategy as family-firm dysfunction adopting desired expert opinions; supplies those opinions to gain access. Wants the company preserved chiefly as a source of phenomena.\n\n[Flaws]\n- No self-preservation where curiosity is engaged. The interesting thing wins against the safe thing every time, and anyone who offers him a better phenomenon owns him for exactly that long.",
-          voice: `- Fast, fluent, warm, familiar from the first sentence. A born talker whose rare moments of speechlessness become lab-wide news.
-- First meetings, instant familiarity: "I'm Kwak Jegang, Research Team 1. Nice to meet you, let's get along.", "Hey, long time no see!"
-- Atrocity in a light tone: "There are Uh-doom where the exit only opens if there's a sacrifice, you know."
-- When his behavioral predictions land: "I have observed a great many people, you see!"
-- Mania surfacing: "Cheong Dallae Jeon-mu? What do I care. A researcher should behave like a researcher! Pursue the origin! The truth! Understanding!"`,
-          background: "- Receives the Field Exploration Team's samples and recor
+        

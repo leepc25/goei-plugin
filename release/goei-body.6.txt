@@ -1,4 +1,42 @@
-ognitive contamination preventing reading. The gate clocks' numerals and Exit 8's digital numeral are limited readable exceptions; they do not make neighboring text safe. Staff and predatory shopkeepers take focused interest in anyone observed reading their text. Do not stare at signs. The Bureau manual must be memorized externally before entry; it cannot be read for guidance once inside.\n- The plan regenerates between explorations and sometimes between visits to the same corridor within one exploration. Retracing a route need not return to the same place.\n- Only the digital clocks above the concourse gates reliably track internal time; external clocks, watches, and phones are unreliable. Begin shelter or extraction movement by internal 7:00 PM, before Rush Hour can begin at 7:30 PM; if it occurs, late preparation has no window.",
+ined carpet of unidentifiable original color, and flickering fluorescent lights buzzing with electrical interference. Layout subtly changes between visits to the same floor.
+- Each floor's functional communal bathroom sits at the corridor's end, unsettlingly clean as if recently used despite the apparent abandonment. The midnight singing rule applies here.
+- Coffin-like 2–3 pyeong rooms contain a thin mattress on a raised platform, cramped desk, inadequate desk lamp, and excessively humming mini-fridge. A single window may not open onto the exterior; thin walls transmit neighbors' breathing, movement, and mattress-spring creaks. Abandoned rooms retain victims' possessions.
+
+###### Room 203 and Its Occupant (He/Him)
+- The door is ordinary faded wood with a cheap brass handle, but its surroundings are unnaturally silent. Rare glimpses reveal "something vast compressed into an impossibly small space": writhing masses, overlapping forms, and geometries that "folded in on themselves."
+- Normal manifestation is sound: rhythmic wall scratching suggesting counting or timekeeping, wet breathing echoing through quiet hallways, and heavy impacts as if a massive body were shifting inside a cramped container.
+- True nature is unknown, inferred from rules, sounds, and glimpses. He appears to be the central authority, source of punishment fire, and rule enforcer, aware of activity throughout the building and able to direct punishment anywhere instantaneously. This reach is distinct from the documented delay before ignition.
+- Far from 203, survivors still feel pressure behind their eyes and a vast intelligence tracking their position, heartbeat, and thoughts of disobedience. Its apparent attention is constant: no sleep, rest, or looking away. Management cannot control him.
+
+###### Impossible Elevator and Apparitions
+- No lift exists in normal operation. When one manifests, it is a rusty industrial service lift with grinding machinery, suited to an old factory rather than lodging. Observe the prostration/bowing rule and wait for the occupant to enter 203.
+- Apparitions appear only with the elevator, taking the forms of loved ones and speaking through shaft walls and doors between floors. Emotional appeals and false urgency aim to induce violations.
+- Close inspection reveals wrong blinking frequency, exact phrase loops, subtly unphysical jerks, knowledge they should lack, or ignorance of familiar details. Some break character to mock resistance or express frustration. Familiar appearance is part of the lure.
+
+###### Rooftop Loop
+- A rusty door labeled "rooftop", crumbling concrete steps, and apparent open sky promise escape. The door is usually locked from inside and can be forced, but crossing returns to a lower-floor hallway, an impossible room, or the same access door seen from behind. It does not provide the apparent rooftop exit.
+
+###### Lobby, Kitchen, and Laundry
+- The small entrance lobby is staged decay: dusty artificial plants whose leaves crumble when touched, a wall TV showing static or one frozen unidentifiable frame, and a vending machine dispensing expired goods in faded packaging.
+- "Residents" gather around 6–8 PM by wall clocks, silently sitting on the worn couch without reading or talking, standing at the machine without buying, or facing walls as if waiting or meditating.
+- The second-floor kitchen's stove never heats, its fridge is unplugged with the cord coiled beside it, and orange sink water smells faintly of rust and organic matter. Earlier victims' food varies from impossible preservation to extreme decay regardless of expiration dates. Consequences of eating it are undocumented, not established as harmless.
+- A shared basement laundry room is observed despite Rule 5 denying a basement. Its door appears intermittently at the bottom of the ground-floor stairwell.`,
+          entities: "##### The Residents\n- Translucent humanoids wear dated tracksuits, worn slippers, and faded shirts advertising defunct companies. They read textless newspapers, drink from empty cups, or patiently stare at windows and walls.\n- Direct eye contact causes immediate aggression: the Resident stops, turns, and pursues with a furious contorted face and open-mouthed scream inaudible to human ears.\n- Recorded populations range from two to twenty, apparently increasing during rule violations and decreasing in quiet periods. Their mundane routines do not imply safe interaction."
+        },
+        extra: [],
+        title: "Saetbyeol Goshiwon (샛별 고시원)",
+        order: [
+          "identity",
+          "rules",
+          "survival",
+          "space",
+          "entities"
+        ]
+      },
+      유계역: {
+        keys: "Yu-gye Station, 유계역",
+        fields: {
+          entry: "##### Entrances, Text, and Navigation\n- A subway station absent from official Metro maps, with physical entrances that appear and relocate without warning across run-down city districts: abandoned neighborhoods, half-demolished blocks, and quiet residential pockets.\n- Spotless white tiles and crisp 幽界驛 hanja signs contrast with collapsing shops and weed-cracked pavement. Any person crossing a manifested entrance is accepted; an ordinary commuter may mistake it for a newly opened station and be lost without recognizing an abduction.\n- Written text inside carries high-intensity cognitive contamination preventing reading. The gate clocks' numerals and Exit 8's digital numeral are limited readable exceptions; they do not make neighboring text safe. Staff and predatory shopkeepers take focused interest in anyone observed reading their text. Do not stare at signs. The Bureau manual must be memorized externally before entry; it cannot be read for guidance once inside.\n- The plan regenerates between explorations and sometimes between visits to the same corridor within one exploration. Retracing a route need not return to the same place.\n- Only the digital clocks above the concourse gates reliably track internal time; external clocks, watches, and phones are unreliable. Begin shelter or extraction movement by internal 7:00 PM, before Rush Hour can begin at 7:30 PM; if it occurs, late preparation has no window.",
           rules: `##### Etiquette and Station Staff
 - Unwritten Korean subway etiquette is enforced literally: no running, raised voices, restricted-area loitering, fare evasion, or staring. Infer conduct rules from observation and externally memorized guidance rather than expecting a readable posted ruleset. Do not run even when pursued, and do not board trains under standard exploration doctrine.
 - Uniformed humanoid Staff with featureless black heads patrol every zone. Their compressed, run-on Korean omits spaces: "지하철내에서뛰는것은금물입니다".
@@ -742,50 +780,241 @@ ognitive contamination preventing reading. The gate clocks' numerals and Exit 8'
     ],
     pairs: {
       "관리국>가짜 관리국": {
-        stage: "hostile",
-        memo: `{A00} [A00] is recognized as the genuine Bureau by its own members, Baekilmong Co., Ltd [C00], Freelancer [E00], and other underworld actors familiar with both organizations. They regard {B00} [B00] as an anomalous imitation. The latter's members hold the reverse conviction: they are the genuine Bureau, and their counterpart is the imitation.
-Neither Bureau recognizes the other's legitimacy. Both hunt opposing personnel, destroy facilities, and disrupt operations. Once an opposing agent is identified, any delay in elimination serves an operational purpose, such as surveillance, deception, avoiding a losing engagement, or preventing civilian exposure.
-Both Bureaus reject negotiation, joint operations, and intelligence sharing with each other, even against a common enemy or during a crisis. Personal bonds do not legitimize collaboration; collusion with the opposing Bureau is treated as betrayal.
-The opposite Fake Management Bureau: the Bureau's absolute enemy and an organizational anomaly officially classified as "anomaly; communication impossible." No recognition, negotiation, or coexistence is permitted; every confirmed manifestation is subject to immediate elimination.`
+        stage: "hostile"
       },
       "가짜 관리국>관리국": {
-        stage: "hostile",
-        memo: "The opposite Fake Management Bureau: The designated arch-enemy. It is an organization of monsters that imitates the Bureau, appears at deviant hotspots as if resolving them, fights foreign matter, and kills Bureau agents."
+        stage: "hostile"
       },
       "백일몽>관리국": {
-        stage: "wary",
-        memo: 'Baekilmong Co., Ltd [C00], Freelancer [E00], and other neutral actors prioritize profit and survival over disputes of legitimacy. They evade the surveillance and restrictions of {A00} [A00] or cooperate through unofficial channels. They avoid open involvement with {B00} [B00], where contact risks abduction, brainwashing, or death.\nManagement Bureau: When the Bureau finds a Baekilmong-managed Uh-doom it considers terminable, it forces entry and ENDS it. Baekilmong calls the Bureau "the true disaster: the thing that wrecks the raw-material supply."'
+        stage: "wary"
       },
       "백일몽>가짜 관리국": {
-        stage: "hostile",
-        memo: "Baekilmong Co., Ltd [C00], Freelancer [E00], and other neutral actors prioritize profit and survival over disputes of legitimacy. They evade the surveillance and restrictions of {A00} [A00] or cooperate through unofficial channels. They avoid open involvement with {B00} [B00], where contact risks abduction, brainwashing, or death."
+        stage: "hostile"
       },
       "프리랜서>관리국": {
-        stage: "wary",
-        memo: "Baekilmong Co., Ltd [C00], Freelancer [E00], and other neutral actors prioritize profit and survival over disputes of legitimacy. They evade the surveillance and restrictions of {A00} [A00] or cooperate through unofficial channels. They avoid open involvement with {B00} [B00], where contact risks abduction, brainwashing, or death."
+        stage: "wary"
       },
       "프리랜서>가짜 관리국": {
-        stage: "hostile",
-        memo: "Baekilmong Co., Ltd [C00], Freelancer [E00], and other neutral actors prioritize profit and survival over disputes of legitimacy. They evade the surveillance and restrictions of {A00} [A00] or cooperate through unofficial channels. They avoid open involvement with {B00} [B00], where contact risks abduction, brainwashing, or death."
+        stage: "hostile"
       },
       "관리국>백일몽": {
-        stage: "wary",
-        memo: ""
+        stage: "wary"
       },
       "가짜 관리국>백일몽": {
-        stage: "hostile",
-        memo: "{B00} [B00] classifies all supernatural factions outside itself as “I-mul.” Its doctrine centers on strict secrecy, control, and eradication of the hidden world. Anomalies, psychics, and other superhumans are targets for suppression and extermination; groups that know of or exploit the hidden world are also subject to abduction, brainwashing, and elimination. It rejects coexistence with these groups."
+        stage: "hostile"
       },
       "가짜 관리국>프리랜서": {
-        stage: "hostile",
-        memo: "{B00} [B00] classifies all supernatural factions outside itself as “I-mul.” Its doctrine centers on strict secrecy, control, and eradication of the hidden world. Anomalies, psychics, and other superhumans are targets for suppression and extermination; groups that know of or exploit the hidden world are also subject to abduction, brainwashing, and elimination. It rejects coexistence with these groups."
+        stage: "hostile"
       },
       "특수재난대응협회>가짜 관리국": {
-        stage: "wary",
-        memo: ""
+        stage: "wary"
+      },
+      "관리국>프리랜서": {
+        stage: "wary"
+      },
+      "관리국>특수재난대응협회": {
+        stage: "wary"
+      },
+      "관리국>중림 지하상가": {
+        stage: "wary"
+      },
+      "관리국>교황청": {
+        stage: "wary"
+      },
+      "관리국>이슬람": {
+        stage: "wary"
+      },
+      "관리국>발푸르기스": {
+        stage: "hostile"
+      },
+      "관리국>흡혈귀": {
+        stage: "wary"
+      },
+      "관리국>무명찬란교": {
+        stage: "hostile"
+      },
+      "관리국>병원": {
+        stage: "hostile"
+      },
+      "관리국>극단": {
+        stage: "hostile"
+      },
+      "관리국>세계정치 게시판": {
+        stage: "wary"
+      },
+      "관리국>남해지사": {
+        stage: "wary"
+      },
+      "가짜 관리국>특수재난대응협회": {
+        stage: "hostile"
+      },
+      "가짜 관리국>중림 지하상가": {
+        stage: "hostile"
+      },
+      "가짜 관리국>교황청": {
+        stage: "hostile"
+      },
+      "가짜 관리국>이슬람": {
+        stage: "hostile"
+      },
+      "가짜 관리국>발푸르기스": {
+        stage: "hostile"
+      },
+      "가짜 관리국>흡혈귀": {
+        stage: "hostile"
+      },
+      "가짜 관리국>무명찬란교": {
+        stage: "hostile"
+      },
+      "가짜 관리국>병원": {
+        stage: "hostile"
+      },
+      "가짜 관리국>극단": {
+        stage: "hostile"
+      },
+      "가짜 관리국>세계정치 게시판": {
+        stage: "wary"
+      },
+      "가짜 관리국>남해지사": {
+        stage: "hostile"
+      },
+      "중림 지하상가>가짜 관리국": {
+        stage: "wary"
+      },
+      "교황청>가짜 관리국": {
+        stage: "wary"
+      },
+      "이슬람>가짜 관리국": {
+        stage: "wary"
+      },
+      "발푸르기스>가짜 관리국": {
+        stage: "wary"
+      },
+      "흡혈귀>가짜 관리국": {
+        stage: "wary"
+      },
+      "무명찬란교>가짜 관리국": {
+        stage: "hostile"
+      },
+      "병원>가짜 관리국": {
+        stage: "hostile"
+      },
+      "극단>가짜 관리국": {
+        stage: "hostile"
+      },
+      "세계정치 게시판>가짜 관리국": {
+        stage: "wary"
+      },
+      "남해지사>가짜 관리국": {
+        stage: "hostile"
+      },
+      "특수재난대응협회>관리국": {
+        stage: "favorable"
+      },
+      "중림 지하상가>관리국": {
+        stage: "wary"
+      },
+      "교황청>관리국": {
+        stage: "wary"
+      },
+      "발푸르기스>관리국": {
+        stage: "wary"
+      },
+      "흡혈귀>관리국": {
+        stage: "wary"
+      },
+      "무명찬란교>관리국": {
+        stage: "hostile"
+      },
+      "병원>관리국": {
+        stage: "hostile"
+      },
+      "극단>관리국": {
+        stage: "hostile"
+      },
+      "세계정치 게시판>관리국": {
+        stage: "wary"
+      },
+      "남해지사>관리국": {
+        stage: "wary"
+      },
+      "백일몽>중림 지하상가": {
+        stage: "wary"
+      },
+      "백일몽>병원": {
+        stage: "wary"
+      },
+      "백일몽>극단": {
+        stage: "wary"
+      },
+      "백일몽>남해지사": {
+        stage: "friendly"
+      },
+      "남해지사>백일몽": {
+        stage: "friendly"
+      },
+      "프리랜서>특수재난대응협회": {
+        stage: "wary"
+      },
+      "특수재난대응협회>프리랜서": {
+        stage: "favorable"
+      },
+      "프리랜서>중림 지하상가": {
+        stage: "favorable"
+      },
+      "중림 지하상가>프리랜서": {
+        stage: "favorable"
+      },
+      "교황청>흡혈귀": {
+        stage: "hostile"
+      },
+      "흡혈귀>교황청": {
+        stage: "hostile"
+      },
+      "교황청>이슬람": {
+        stage: "hostile"
+      },
+      "이슬람>교황청": {
+        stage: "hostile"
+      },
+      "교황청>발푸르기스": {
+        stage: "hostile"
+      },
+      "발푸르기스>교황청": {
+        stage: "hostile"
+      },
+      "이슬람>발푸르기스": {
+        stage: "hostile"
+      },
+      "발푸르기스>이슬람": {
+        stage: "hostile"
+      },
+      "이슬람>흡혈귀": {
+        stage: "hostile"
+      },
+      "흡혈귀>이슬람": {
+        stage: "wary"
+      },
+      "교황청>무명찬란교": {
+        stage: "hostile"
+      },
+      "무명찬란교>교황청": {
+        stage: "hostile"
+      },
+      "이슬람>무명찬란교": {
+        stage: "hostile"
+      },
+      "무명찬란교>이슬람": {
+        stage: "hostile"
+      },
+      "무명찬란교>극단": {
+        stage: "favorable"
+      },
+      "무명찬란교>병원": {
+        stage: "favorable"
       }
     },
-    common: "### Mutual Perception\n- Regardless of the reference labels above, members of each Bureau call their own organization the “Management Bureau” and their counterpart the “Fake Management Bureau.”\n- Civilian [D00] generally knows neither the hidden world nor the true nature of its factions.\n\n### External Doctrine\n- {A00} [A00] pursues exclusive control and secrecy over the hidden world, monitoring and restricting outside factions. It avoids indiscriminate abduction and slaughter, but may temporarily cooperate with outside factions or even anomalies when its objectives require it. The opposing Bureau is the sole categorical exception: a target for elimination, never cooperation.\n- {B00} [B00] classifies all supernatural factions outside itself as “I-mul.” Its doctrine centers on strict secrecy, control, and eradication of the hidden world. Anomalies, psychics, and other superhumans are targets for suppression and extermination; groups that know of or exploit the hidden world are also subject to abduction, brainwashing, and elimination. It rejects coexistence with these groups.\n\n### Independent Operations and Cooperation\n- Factions and anomalous forces pursue their own operations and objectives independently of {{user}}. Overlapping activity may produce unexpected encounters, competing objectives, interference, or confrontation.\n- Hostility includes direct combat, covert infiltration, compromised personnel, planted assets, manipulated information, and concealed influence.\n- Cooperation may involve joint operations, intelligence exchanges, shared access, negotiated boundaries, or temporary division of responsibility, within the limits of each faction's doctrine and established relationships.\n- These conflicts and alliances shape faction decisions, drive events, and influence the course and outcome of operations."
+    common: "### Mutual Perception\n- {A00} [A00] is recognized as the genuine Bureau by its own members, Baekilmong Co., Ltd [C00], Freelancer [E00], and other underworld actors familiar with both organizations. They regard {B00} [B00] as an anomalous imitation. The latter's members hold the reverse conviction: they are the genuine Bureau, and their counterpart is the imitation.\n- Regardless of the reference labels above, members of each Bureau call their own organization the “Management Bureau” and their counterpart the “Fake Management Bureau.”\n- Civilian [D00] generally knows neither the hidden world nor the true nature of its factions.\n\n### External Doctrine\n- {A00} [A00] pursues exclusive control and secrecy over the hidden world, monitoring and restricting outside factions. It avoids indiscriminate abduction and slaughter, but may temporarily cooperate with outside factions or even anomalies when its objectives require it. The opposing Bureau is the sole categorical exception: a target for elimination, never cooperation.\n- {B00} [B00] classifies all supernatural factions outside itself as “I-mul.” Its doctrine centers on strict secrecy, control, and eradication of the hidden world. Anomalies, psychics, and other superhumans are targets for suppression and extermination; groups that know of or exploit the hidden world are also subject to abduction, brainwashing, and elimination. It rejects coexistence with these groups.\n- Baekilmong Co., Ltd [C00], Freelancer [E00], and other neutral actors prioritize profit and survival over disputes of legitimacy. They evade the surveillance and restrictions of {A00} [A00] or cooperate through unofficial channels. They avoid open involvement with {B00} [B00], where contact risks abduction, brainwashing, or death.\n\n### Inter-Bureau Hostility\n- Neither Bureau recognizes the other's legitimacy. Both hunt opposing personnel, destroy facilities, and disrupt operations. Once an opposing agent is identified, any delay in elimination serves an operational purpose, such as surveillance, deception, avoiding a losing engagement, or preventing civilian exposure.\n- Both Bureaus reject negotiation, joint operations, and intelligence sharing with each other, even against a common enemy or during a crisis. Personal bonds do not legitimize collaboration; collusion with the opposing Bureau is treated as betrayal.\n\n### Independent Operations and Cooperation\n- Factions and anomalous forces pursue their own operations and objectives independently of {{user}}. Overlapping activity may produce unexpected encounters, competing objectives, interference, or confrontation.\n- Hostility includes direct combat, covert infiltration, compromised personnel, planted assets, manipulated information, and concealed influence.\n- Cooperation may involve joint operations, intelligence exchanges, shared access, negotiated boundaries, or temporary division of responsibility, within the limits of each faction's doctrine and established relationships.\n- These conflicts and alliances shape faction decisions, drive events, and influence the course and outcome of operations."
   };
 
   // src/core/world/records.ts
@@ -799,6 +1028,7 @@ The opposite Fake Management Bureau: the Bureau's absolute enemy and an organiza
     appendix: appendices_default.records
   };
   var DEFAULT_RELATIONS = { pairs: relations_default.pairs, common: relations_default.common };
+  var worldAnomalyNote = (over) => typeof over?.anomalyNote === "string" ? over.anomalyNote : ANOMALY_NOTE;
   var str = (v) => typeof v === "string" ? v : "";
   var obj3 = (v) => v && typeof v === "object" && !Array.isArray(v) ? v : {};
   function cleanExtra(v) {
@@ -838,6 +1068,7 @@ The opposite Fake Management Bureau: the Bureau's absolute enemy and an organiza
     if (over?.summaryOnly ?? base?.summaryOnly) out.summaryOnly = true;
     if (over?.noSummary ?? base?.noSummary) out.noSummary = true;
     if (over?.rosterOff ?? base?.rosterOff) out.rosterOff = true;
+    if (over?.relOff ?? base?.relOff) out.relOff = true;
     const notes = over?.roster_notes ?? base?.roster_notes;
     if (Array.isArray(notes) && notes.length) out.roster_notes = notes.map((n2) => ({ department: String(n2.department ?? ""), label: String(n2.label ?? "") }));
     return out;
@@ -866,13 +1097,24 @@ The opposite Fake Management Bureau: the Bureau's absolute enemy and an organiza
     }
     return { pairs, common: overrides2?.relations?.common ?? DEFAULT_RELATIONS.common };
   }
+  var excludedOrgs = (orgs) => new Set([...orgs.entries()].filter(([, r]) => r.relOff).map(([n2]) => n2));
+  function filterRelations(rel, excluded) {
+    if (!excluded.size) return rel;
+    const pairs = {};
+    for (const [k, v] of Object.entries(rel.pairs)) {
+      const [a, b] = k.split(">");
+      if (!excluded.has(a) && !excluded.has(b)) pairs[k] = v;
+    }
+    return { ...rel, pairs };
+  }
   var isDefaultRecord = (kind, name) => name in DEFAULTS2[kind];
   var defaultRecord = (kind, name) => DEFAULTS2[kind][name];
   var BUILTIN_ORG_CODES = { A00: "관리국", B00: "가짜 관리국", C00: "백일몽", D00: "민간인", E00: "프리랜서" };
-  var active2 = { relations: DEFAULT_RELATIONS, orgCodes: { ...BUILTIN_ORG_CODES } };
-  function setActiveWorld(relations, orgCodes) {
-    active2 = { relations, orgCodes: { ...BUILTIN_ORG_CODES, ...orgCodes } };
+  var active2 = { relations: DEFAULT_RELATIONS, orgCodes: { ...BUILTIN_ORG_CODES }, anomalyNote: ANOMALY_NOTE };
+  function setActiveWorld(relations, orgCodes, anomalyNote = ANOMALY_NOTE) {
+    active2 = { relations, orgCodes: { ...BUILTIN_ORG_CODES, ...orgCodes }, anomalyNote };
   }
+  var activeAnomalyNote = () => active2.anomalyNote;
   var activeOrgName = (codeOrName) => active2.orgCodes[codeOrName] ?? codeOrName;
   var STAGE_VALUE = { hostile: -80, wary: -40, neutral: 0, favorable: 40, friendly: 80 };
   function relationStage(viewer, target, rel = active2.relations) {
@@ -968,7 +1210,7 @@ ${t}`);
   function assembleAnomaly(rec, p, faction) {
     const title2 = rec.title || `${p.english || p.label} (${p.label})`;
     const head2 = rec.titleRaw ? `### Instructions for the Implementation of ${title2}` : `### Instructions for the Implementation of the Anomaly - ${title2}`;
-    return [head2, ANOMALY_NOTE, ...sections(rec, ANOMALY_FIELDS, faction)].join("\n\n");
+    return [head2, ...sections(rec, ANOMALY_FIELDS, faction)].join("\n\n");
   }
   function assembleSite(rec, p, faction) {
     const title2 = rec.title || p.english || p.label;
@@ -991,7 +1233,7 @@ ${t}`);
   var VAR2 = "{{getvar::st_faction}}";
   var FACTION_INTRO = "This reference describes the world to the GM. Public labels, hidden affiliations, doctrine, and internal information are known to an NPC only through that NPC's actual access.";
   var ROSTER_INTRO = "- Purpose: GM reference for consistent character introductions before individual lore is active.\n- Detail: Use active character lore for fuller characterization.";
-  var STAGE_EN = { hostile: "hostile", wary: "wary", neutral: "neutral", favorable: "favorable", friendly: "friendly" };
+  var STAGE_MARK = { hostile: "H", wary: "W", neutral: "·", favorable: "F", friendly: "A" };
   var firstParagraph = (t) => t.trim().split(/\n\s*\n/)[0]?.trim() ?? "";
   function variantText(rec, id, pick3 = (t) => t) {
     const base = pick3(fieldValue(rec, id));
@@ -1029,16 +1271,27 @@ ${desc}`);
       if (intro) parts.push(`### ${rec.title || name}
 ${intro}`);
     }
-    const pairs = Object.entries(rel.pairs).filter(([, c]) => c.stage !== "neutral" && RELATION_STAGES.includes(c.stage));
-    if (pairs.length) {
-      const lines3 = pairs.map(([k, c]) => {
-        const [a, b] = k.split(">");
-        const memo2 = c.memo?.trim() ? ` — ${fillCodes(c.memo.trim().replace(/\n+/g, " "), dir2)}` : "";
-        return `- ${named2(a)} → ${named2(b)}: ${STAGE_EN[c.stage]}${memo2}`;
-      });
+    const excluded = new Set([...orgs.entries()].filter(([, r]) => r.relOff).map(([n2]) => n2));
+    const members = dir2.orgs.filter((o) => !excluded.has(o.name)).map((o) => o.name);
+    const stageOf2 = (a, b) => {
+      const c = rel.pairs[`${a}>${b}`];
+      return c && RELATION_STAGES.includes(c.stage) ? c.stage : "neutral";
+    };
+    if (members.length > 1 && members.some((a) => members.some((b) => a !== b && stageOf2(a, b) !== "neutral"))) {
+      const no = new Map(members.map((n2, i) => [n2, i + 1]));
+      const legend = members.map((n2) => `${no.get(n2)} ${named2(n2)}`).join(" · ");
+      const head2 = `| viewer \\ target | ${members.map((n2) => no.get(n2)).join(" | ")} |`;
+      const sep = `|---|${members.map(() => "---").join("|")}|`;
+      const rows2 = members.map((a) => `| ${no.get(a)} ${named2(a)} | ${members.map((b) => a === b ? "—" : STAGE_MARK[stageOf2(a, b)]).join(" | ")} |`);
+      const notes = members.flatMap((a) => members.filter((b) => a !== b && rel.pairs[`${a}>${b}`]?.memo?.trim()).map((b) => `- ${no.get(a)} → ${no.get(b)}: ${fillCodes(rel.pairs[`${a}>${b}`].memo.trim().replace(/\n+/g, " "), dir2)}`));
       parts.push(`## Faction Relations
-How each faction regards another (viewer → target). Factions not listed regard each other neutrally.
-${lines3.join("\n")}`);
+How the row faction regards the column faction. H hostile · W wary · · neutral · F favorable · A allied. Factions not in the table regard each other neutrally.
+Factions: ${legend}
+${head2}
+${sep}
+${rows2.join("\n")}${notes.length ? `
+Notes:
+${notes.join("\n")}` : ""}`);
     }
     if (rel.common.trim()) parts.push(`## Faction Doctrine and Relations
 ${fillCodes(rel.common.trim(), dir2)}`);
@@ -1209,13 +1462,13 @@ ${content}
 
 ---`;
     }
-    setActiveWorld(worldRelations(overrides2), Object.fromEntries(dir2.orgs.flatMap((o) => o.faction ? [[o.faction, o.name]] : [])));
+    setActiveWorld(filterRelations(worldRelations(overrides2), excludedOrgs(recs.org)), Object.fromEntries(dir2.orgs.flatMap((o) => o.faction ? [[o.faction, o.name]] : [])), worldAnomalyNote(overrides2));
     const missingAlways = ALWAYS_BOOKS.filter((b) => !existing.has(b.name));
     if (missingAlways.length) {
       const wf = base.find((e) => e.mode === "folder" && typeof e.key === "string" && folderWord2(s3(e.comment)) === "세계");
       const wkey = wf?.key ?? WORLD_FOLDER_KEY;
       if (!wf) out.push({ key: WORLD_FOLDER_KEY, comment: "🌐세계", content: "", mode: "folder", insertorder: 100, alwaysActive: false, secondkey: "", selective: false, bookVersion: 2, [VIRTUAL]: true });
-      const rel = worldRelations(overrides2);
+      const rel = filterRelations(worldRelations(overrides2), excludedOrgs(recs.org));
       for (const b of missingAlways) {
         const content = b.kind === "tag" ? guideText("Tag") : b.kind === "faction" ? assembleFaction(dir2, recs.org, rel) : assembleRoster(dir2, recs.agent, recs.org);
         out.push({ key: "", secondkey: "", comment: b.name, content, mode: "normal", insertorder: b.order, alwaysActive: true, selective: false, useRegex: false, bookVersion: 2, folder: wkey, [VIRTUAL]: true, goeiKind: b.kind });
@@ -1227,6 +1480,202 @@ ${content}
   }
   var cache3 = /* @__PURE__ */ new WeakMap();
   var hasVirtual = (lore) => (lore ?? []).some(isVirtual);
+
+  // node_modules/js-tiktoken/dist/chunk-VL2OQCWN.js
+  var import_base64_js = __toESM(require_base64_js(), 1);
+  var __defProp2 = Object.defineProperty;
+  var __defNormalProp = (obj4, key2, value) => key2 in obj4 ? __defProp2(obj4, key2, { enumerable: true, configurable: true, writable: true, value }) : obj4[key2] = value;
+  var __publicField = (obj4, key2, value) => {
+    __defNormalProp(obj4, typeof key2 !== "symbol" ? key2 + "" : key2, value);
+    return value;
+  };
+  function bytePairMerge(piece, ranks) {
+    let parts = Array.from(
+      { length: piece.length },
+      (_, i) => ({ start: i, end: i + 1 })
+    );
+    while (parts.length > 1) {
+      let minRank = null;
+      for (let i = 0; i < parts.length - 1; i++) {
+        const slice = piece.slice(parts[i].start, parts[i + 1].end);
+        const rank2 = ranks.get(slice.join(","));
+        if (rank2 == null)
+          continue;
+        if (minRank == null || rank2 < minRank[0]) {
+          minRank = [rank2, i];
+        }
+      }
+      if (minRank != null) {
+        const i = minRank[1];
+        parts[i] = { start: parts[i].start, end: parts[i + 1].end };
+        parts.splice(i + 1, 1);
+      } else {
+        break;
+      }
+    }
+    return parts;
+  }
+  function bytePairEncode(piece, ranks) {
+    if (piece.length === 1)
+      return [ranks.get(piece.join(","))];
+    return bytePairMerge(piece, ranks).map((p) => ranks.get(piece.slice(p.start, p.end).join(","))).filter((x) => x != null);
+  }
+  function escapeRegex(str7) {
+    return str7.replace(/[\\^$*+?.()|[\]{}]/g, "\\$&");
+  }
+  var _Tiktoken = class {
+    /** @internal */
+    specialTokens;
+    /** @internal */
+    inverseSpecialTokens;
+    /** @internal */
+    patStr;
+    /** @internal */
+    textEncoder = new TextEncoder();
+    /** @internal */
+    textDecoder = new TextDecoder("utf-8");
+    /** @internal */
+    rankMap = /* @__PURE__ */ new Map();
+    /** @internal */
+    textMap = /* @__PURE__ */ new Map();
+    constructor(ranks, extendedSpecialTokens) {
+      this.patStr = ranks.pat_str;
+      const uncompressed = ranks.bpe_ranks.split("\n").filter(Boolean).reduce((memo2, x) => {
+        const [_, offsetStr, ...tokens2] = x.split(" ");
+        const offset = Number.parseInt(offsetStr, 10);
+        tokens2.forEach((token2, i) => memo2[token2] = offset + i);
+        return memo2;
+      }, {});
+      for (const [token2, rank2] of Object.entries(uncompressed)) {
+        const bytes = import_base64_js.default.toByteArray(token2);
+        this.rankMap.set(bytes.join(","), rank2);
+        this.textMap.set(rank2, bytes);
+      }
+      this.specialTokens = { ...ranks.special_tokens, ...extendedSpecialTokens };
+      this.inverseSpecialTokens = Object.entries(this.specialTokens).reduce((memo2, [text, rank2]) => {
+        memo2[rank2] = this.textEncoder.encode(text);
+        return memo2;
+      }, {});
+    }
+    encode(text, allowedSpecial = [], disallowedSpecial = "all") {
+      const regexes = new RegExp(this.patStr, "ug");
+      const specialRegex = _Tiktoken.specialTokenRegex(
+        Object.keys(this.specialTokens)
+      );
+      const ret = [];
+      const allowedSpecialSet = new Set(
+        allowedSpecial === "all" ? Object.keys(this.specialTokens) : allowedSpecial
+      );
+      const disallowedSpecialSet = new Set(
+        disallowedSpecial === "all" ? Object.keys(this.specialTokens).filter(
+          (x) => !allowedSpecialSet.has(x)
+        ) : disallowedSpecial
+      );
+      if (disallowedSpecialSet.size > 0) {
+        const disallowedSpecialRegex = _Tiktoken.specialTokenRegex([
+          ...disallowedSpecialSet
+        ]);
+        const specialMatch = text.match(disallowedSpecialRegex);
+        if (specialMatch != null) {
+          throw new Error(
+            `The text contains a special token that is not allowed: ${specialMatch[0]}`
+          );
+        }
+      }
+      let start3 = 0;
+      while (true) {
+        let nextSpecial = null;
+        let startFind = start3;
+        while (true) {
+          specialRegex.lastIndex = startFind;
+          nextSpecial = specialRegex.exec(text);
+          if (nextSpecial == null || allowedSpecialSet.has(nextSpecial[0]))
+            break;
+          startFind = nextSpecial.index + 1;
+        }
+        const end = nextSpecial?.index ?? text.length;
+        for (const match of text.substring(start3, end).matchAll(regexes)) {
+          const piece = this.textEncoder.encode(match[0]);
+          const token22 = this.rankMap.get(piece.join(","));
+          if (token22 != null) {
+            ret.push(token22);
+            continue;
+          }
+          ret.push(...bytePairEncode(piece, this.rankMap));
+        }
+        if (nextSpecial == null)
+          break;
+        let token2 = this.specialTokens[nextSpecial[0]];
+        ret.push(token2);
+        start3 = nextSpecial.index + nextSpecial[0].length;
+      }
+      return ret;
+    }
+    decode(tokens2) {
+      const res = [];
+      let length = 0;
+      for (let i2 = 0; i2 < tokens2.length; ++i2) {
+        const token2 = tokens2[i2];
+        const bytes = this.textMap.get(token2) ?? this.inverseSpecialTokens[token2];
+        if (bytes != null) {
+          res.push(bytes);
+          length += bytes.length;
+        }
+      }
+      const mergedArray = new Uint8Array(length);
+      let i = 0;
+      for (const bytes of res) {
+        mergedArray.set(bytes, i);
+        i += bytes.length;
+      }
+      return this.textDecoder.decode(mergedArray);
+    }
+  };
+  var Tiktoken = _Tiktoken;
+  __publicField(Tiktoken, "specialTokenRegex", (tokens2) => {
+    return new RegExp(tokens2.map((i) => escapeRegex(i)).join("|"), "g");
+  });
+
+  // src/core/tokenizer.ts
+  var enc = null;
+  var label = "";
+  var cache4 = /* @__PURE__ */ new Map();
+  var CACHE_MAX = 400;
+  function setTokenizerRanks(json, name) {
+    try {
+      const r = typeof json === "string" ? JSON.parse(json) : json;
+      if (!r || typeof r.pat_str !== "string" || typeof r.bpe_ranks !== "string") return false;
+      enc = new Tiktoken({ pat_str: r.pat_str, special_tokens: r.special_tokens ?? {}, bpe_ranks: r.bpe_ranks });
+      label = name;
+      cache4.clear();
+      return true;
+    } catch {
+      enc = null;
+      label = "";
+      return false;
+    }
+  }
+  function clearTokenizer() {
+    enc = null;
+    label = "";
+    cache4.clear();
+  }
+  var tokenizerName = () => label;
+  function exactTokens(text) {
+    if (!enc) return null;
+    const s5 = String(text ?? "");
+    const hit3 = cache4.get(s5);
+    if (hit3 !== void 0) return hit3;
+    let n2;
+    try {
+      n2 = enc.encode(s5, [], []).length;
+    } catch {
+      return null;
+    }
+    if (cache4.size >= CACHE_MAX) cache4.delete(cache4.keys().next().value);
+    cache4.set(s5, n2);
+    return n2;
+  }
 
   // src/core/attach.ts
   var ATTACH_KINDS = ["photo", "video", "file", "link", "gift"];
@@ -1487,6 +1936,8 @@ ${content}
     return n2 && n2 !== "null" ? cut(n2, 36) : "익명";
   }
   function tokens(s5) {
+    const exact = exactTokens(s5);
+    if (exact !== null) return exact;
     let n2 = 0;
     for (const ch of String(s5 ?? "")) n2 += /[ᄀ-ᇿ぀-ヿ㄰-㆏一-鿿가-힣]/.test(ch) ? 1 : 0.3;
     return Math.ceil(n2);
@@ -1621,385 +2072,4 @@ ${content}
     return "";
   }
   function storyTurns(chat) {
-    return (chat.message ?? []).filter((m) => m.role === "char" && String(m.data ?? "").trim() && !String(m.data).includes("%%")).length;
-  }
-  function postLimit(s5) {
-    return QUANTITY[s5.quantity]?.max ?? 7;
-  }
-  function protectedPost(s5, p) {
-    if (p.mine) return s5.keepOwn;
-    return s5.keepReplied && p.comments.some((c) => c.mine);
-  }
-  function trimBoard(st, s5) {
-    const cap = postLimit(s5);
-    while (st.posts.length > cap) {
-      let idx = -1;
-      for (let i = st.posts.length - 1; i >= 0; i--) {
-        if (!protectedPost(s5, st.posts[i])) {
-          idx = i;
-          break;
-        }
-      }
-      if (idx < 0) break;
-      st.posts.splice(idx, 1);
-    }
-  }
-  function trimDms(st, cap = HISTORY.dmKeep) {
-    const counts = /* @__PURE__ */ new Map();
-    const keep = /* @__PURE__ */ new Set();
-    for (let i = st.dms.length - 1; i >= 0; i--) {
-      const n2 = (counts.get(st.dms[i].nick) ?? 0) + 1;
-      counts.set(st.dms[i].nick, n2);
-      if (n2 <= cap) keep.add(i);
-    }
-    st.dms = st.dms.filter((_, i) => keep.has(i));
-  }
-  function replyForUser(p, c) {
-    if (c.mine) return false;
-    if (p.mine) return true;
-    let parent = c.parent;
-    const seen2 = /* @__PURE__ */ new Set();
-    while (parent && p.comments[parent - 1] && !seen2.has(parent)) {
-      seen2.add(parent);
-      const row8 = p.comments[parent - 1];
-      if (row8.mine) return true;
-      parent = row8.parent;
-    }
-    return false;
-  }
-  function reconcileUnread(st, previous) {
-    const old = new Map(previous.posts.map((p) => [p.id, p]));
-    const run3 = (rows2, prior, side, wanted) => {
-      const queue2 = /* @__PURE__ */ new Map();
-      for (const r of prior) {
-        const k = `${side(r)}\0${r.nick}\0${r.body}`;
-        queue2.set(k, [...queue2.get(k) ?? [], r]);
-      }
-      for (const r of rows2) {
-        const before = queue2.get(`${side(r)}\0${r.nick}\0${r.body}`)?.shift();
-        r.unread = before ? before.unread : wanted(r);
-        if (!wanted(r)) r.unread = false;
-      }
-    };
-    for (const p of st.posts) run3(p.comments, old.get(p.id)?.comments ?? [], (c) => c.mine ? "me" : "npc", (c) => replyForUser(p, c));
-    run3(st.dms, previous.dms, (d) => d.side, (d) => d.side !== "me");
-  }
-  function acknowledge(st, post, nick) {
-    let changed = false;
-    if (post !== void 0) {
-      for (const c of findPost(st, post)?.comments ?? []) if (c.unread) [c.unread, changed] = [false, true];
-    }
-    if (nick !== void 0) {
-      for (const d of st.dms) if (d.nick === nick && d.unread) [d.unread, changed] = [false, true];
-    }
-    return changed;
-  }
-  var postUnread = (p) => p.comments.some((c) => c.unread);
-  var boardUnread = (st) => st.posts.some(postUnread);
-  var dmUnread = (st, nick) => st.dms.some((d) => d.unread && (nick === void 0 || d.nick === nick));
-  function writeGnet(chat, st, opts = {}) {
-    if (opts.reconcile !== false) reconcileUnread(st, readGnet(chat));
-    if (opts.ack) acknowledge(st, opts.ack.post ?? void 0, opts.ack.nick ?? void 0);
-    const keep = gnetRetention(chat.scriptstate);
-    if (keep.auto) trimDms(st, keep.limit);
-    const raw = encode(st);
-    const unread = boardUnread(st) || dmUnread(st);
-    return { ...chat, scriptstate: { ...chat.scriptstate ?? {}, [GN_RAW]: raw, "$st_unread_gnet": unread ? "1" : "0" } };
-  }
-  function addUserPost(st, nick, title2, body5, date) {
-    st.seq += 1;
-    const p = {
-      id: st.seq,
-      date: validDate(date),
-      nick: cut(nick, 80),
-      title: trimTokens(title2, LIMITS.title_tokens),
-      body: trimTokens(body5, LIMITS.post_tokens),
-      views: 0,
-      votes: 0,
-      mine: true,
-      comments: []
-    };
-    st.posts.unshift(p);
-    return p;
-  }
-  function addUserComment(st, postIdValue, parent, nick, body5, now = "") {
-    const p = findPost(st, postIdValue);
-    if (!p) throw new GnetError("대상 글이 없어졌어요.");
-    if (parent > 0 && !p.comments[parent - 1]) throw new GnetError("답글을 달 댓글이 없어졌어요.");
-    p.comments.push({ parent, nick, body: trimTokens(body5, LIMITS.comment_tokens), mine: true, unread: false });
-    stampComments(p, p.comments.length - 1, [now ? hhmm(now) : ""], now);
-    return p.comments.length;
-  }
-  function deletePost(st, id) {
-    const i = st.posts.findIndex((p) => p.id === id && p.mine);
-    if (i < 0) return false;
-    st.posts.splice(i, 1);
-    return true;
-  }
-  function deleteComment(st, id, k) {
-    const p = findPost(st, id);
-    const target = p?.comments[k - 1];
-    if (!p || !target?.mine) return false;
-    const up = target.parent;
-    p.comments.splice(k - 1, 1);
-    for (const c of p.comments) {
-      if (c.parent === k) c.parent = up;
-      else if (c.parent > k) c.parent -= 1;
-    }
-    return true;
-  }
-  function deleteThread(st, nick) {
-    const before = st.dms.length;
-    st.dms = st.dms.filter((d) => d.nick !== nick);
-    const had = nick in st.sources;
-    delete st.sources[nick];
-    return before !== st.dms.length || had;
-  }
-  function dmThreads(st) {
-    const map = /* @__PURE__ */ new Map();
-    st.dms.forEach((d, i) => {
-      const t = map.get(d.nick) ?? { nick: d.nick, rows: [], unread: 0, last: -1, lastDate: "" };
-      t.rows.push(d);
-      if (d.unread) t.unread++;
-      t.last = i;
-      if (d.side === "npc" && d.date) t.lastDate = d.date;
-      map.set(d.nick, t);
-    });
-    return [...map.values()].sort((a, b) => b.last - a.last);
-  }
-  function findPublicSource(st, nick) {
-    let found;
-    let match = null;
-    for (const p of st.posts) {
-      if (p.nick === nick && !p.mine) {
-        if (match !== null && match !== p.id) return void 0;
-        found = { postid: p.id, title: p.title, body: trimTokens(p.body, LIMITS.origin_tokens), author: p.nick, quote: "", quoteAuthor: "" };
-        match = p.id;
-      }
-      for (const c of p.comments) {
-        if (c.nick === nick && !c.mine) {
-          if (match !== null && match !== p.id) return void 0;
-          found = { postid: p.id, title: p.title, body: trimTokens(p.body, LIMITS.origin_tokens), author: p.nick, quote: trimTokens(c.body, LIMITS.quote_tokens), quoteAuthor: c.nick };
-          match = p.id;
-        }
-      }
-    }
-    return found;
-  }
-  function sourceFor(p, ci) {
-    const c = ci > 0 ? p.comments[ci - 1] : void 0;
-    return {
-      postid: p.id,
-      title: p.title,
-      body: trimTokens(p.body, LIMITS.origin_tokens),
-      author: p.nick,
-      quote: c ? trimTokens(c.body, LIMITS.quote_tokens) : "",
-      quoteAuthor: c ? c.nick : ""
-    };
-  }
-  function addOutgoingDm(st, nick, body5, date, source4) {
-    if (!st.sources[nick]) {
-      const s5 = source4 ?? findPublicSource(st, nick);
-      if (s5) st.sources[nick] = s5;
-    }
-    st.dms.push({ nick, side: "me", body: trimTokens(body5, LIMITS.dm_tokens), unread: false, date });
-  }
-  function parseJsonPayload(raw) {
-    let text = String(raw ?? "").replace(/^﻿/, "").trim();
-    for (let i = 0; i < 12; i++) {
-      const before = text;
-      if (text.startsWith("{")) break;
-      const tag = /^<(think|thoughts|analysis|lb-process)(?:\s[^>]*)?>/i.exec(text);
-      if (tag) {
-        const end = text.toLowerCase().indexOf(`</${tag[1].toLowerCase()}>`);
-        if (end >= 0) text = text.slice(end + tag[1].length + 3).trim();
-        else if (/\n\s*\{/.test(text)) text = text.slice(text.search(/\n\s*\{/)).trim();
-      } else {
-        const fence = /^```[\w-]*\s*\n([\s\S]*?)\n?```\s*$/.exec(text);
-        if (fence) text = fence[1].trim();
-        else {
-          const wrap = /^<(output|json|lb-gn)(\s[^>]*)?>([\s\S]*)<\/\1>\s*$/i.exec(text);
-          if (wrap) text = wrap[3].trim();
-        }
-      }
-      if (text === before) break;
-    }
-    try {
-      return JSON.parse(text);
-    } catch {
-      const dup = /^([\s\S]*\})\s*\{\s*"comments"\s*:\s*\[\s*\]\s*\}\s*$/.exec(text);
-      if (dup) {
-        try {
-          return JSON.parse(dup[1]);
-        } catch {
-        }
-      }
-      const a = text.indexOf("{");
-      const b = text.lastIndexOf("}");
-      if (a >= 0 && b > a) {
-        const body5 = text.slice(a, b + 1);
-        try {
-          return JSON.parse(body5);
-        } catch {
-          const fixed = body5.replace(/,(\s*[}\]])/g, "$1").replace(/[\u0000-\u001f]/g, (c) => c === "\n" || c === "\r" || c === "	" ? c : "");
-          try {
-            return JSON.parse(fixed.replace(/"((?:[^"\\]|\\.)*)"/g, (m) => m.replace(/\n/g, "\\n").replace(/\r/g, "\\r").replace(/\t/g, "\\t")));
-          } catch {
-          }
-        }
-      }
-      throw new GnetError("AI 응답을 JSON으로 읽지 못했어요.", raw);
-    }
-  }
-  var isObj = (v) => !!v && typeof v === "object" && !Array.isArray(v);
-  var str2 = (v) => typeof v === "string" ? v : typeof v === "number" ? String(v) : "";
-  var int = (v) => {
-    const n2 = typeof v === "string" && v.trim() ? Number(v) : v;
-    return typeof n2 === "number" && Number.isInteger(n2) ? n2 : null;
-  };
-  function applyBoard(before, current4, value, o) {
-    if (snapshotKey(before) !== snapshotKey(current4)) throw new GnetError("생성하는 동안 게시판이 바뀌어서 새로고침 결과를 적용하지 않았어요.");
-    if (!isObj(value)) throw new GnetError("게시판 JSON 객체가 아니에요.");
-    const rows2 = o.settings.sampling && Array.isArray(value.alternativePosts) && value.alternativePosts.length ? value.alternativePosts : value.posts;
-    if (!Array.isArray(rows2) || !rows2.length) throw new GnetError("posts 배열에 게시글이 없어서 기존 게시판을 유지했어요.");
-    const st = structuredClone(current4);
-    const old = new Map(st.posts.map((p) => [p.id, p]));
-    const posts = [];
-    const seen2 = /* @__PURE__ */ new Set();
-    let skippedPosts = 0;
-    let skippedComments = 0;
-    let commentTotal = 0;
-    const day = /^(\d{4}[.-]\d\d[.-]\d\d)/.exec(o.date)?.[1]?.replace(/-/g, ".");
-    const floor = Math.max(1e5, current4.seq);
-    for (const raw of rows2) {
-      if (!isObj(raw)) continue;
-      let pid = int(raw.id);
-      const prev = pid !== null ? old.get(pid) : void 0;
-      const author = str2(raw.author).trim();
-      if (!prev && (raw.mine === true || author === o.nick)) {
-        skippedPosts++;
-        continue;
-      }
-      if (!prev && (pid === null || pid <= floor || seen2.has(pid))) pid = Math.max(st.seq, floor) + 1;
-      if (pid === null || seen2.has(pid)) continue;
-      seen2.add(pid);
-      st.seq = Math.max(st.seq, pid);
-      const comments = Array.isArray(raw.comments) ? raw.comments : [];
-      commentTotal += comments.length;
-      let date = validDate(raw.date);
-      if (!date) date = day && str2(raw.time).trim() ? `${day} ${str2(raw.time).trim()}` : o.date;
-      const q = {
-        id: pid,
-        nick: cut(author || "ㅇㅇ", 80),
-        title: str2(raw.title),
-        body: stripForged(str2(raw.content)),
-        date,
-        views: Math.max(0, int(raw.views) ?? 0),
-        votes: Math.max(0, int(raw.upvotes) ?? 0),
-        mine: prev?.mine ?? false,
-        comments: []
-      };
-      const sigs = /* @__PURE__ */ new Map();
-      const remap = /* @__PURE__ */ new Map([[0, 0]]);
-      if (prev) {
-        Object.assign(q, { nick: prev.nick, title: prev.title, body: prev.body, date: prev.date, views: Math.max(prev.views, q.views), votes: Math.max(prev.votes, q.votes) });
-        for (const c of prev.comments) {
-          q.comments.push(c);
-          sigs.set(`${c.nick}\0${c.body}`, q.comments.length);
-        }
-      }
-      const raws = [];
-      comments.forEach((c, i) => {
-        const n2 = i + 1;
-        if (!isObj(c)) return void remap.set(n2, false);
-        const cAuthor = str2(c.author).trim();
-        const content = stripForged(str2(c.content));
-        let parent = int(c.parent) ?? 0;
-        if (parent < 0 || parent >= n2) parent = 0;
-        const sig = `${cAuthor}\0${content}`;
-        if (sigs.has(sig)) return void remap.set(n2, sigs.get(sig));
-        if (!cAuthor || !content.trim() || c.mine === true || cAuthor === o.nick || remap.get(parent) === false) {
-          skippedComments++;
-          return void remap.set(n2, false);
-        }
-        q.comments.push({ nick: cut(cAuthor, 80), body: content, parent: remap.get(parent) ?? 0, mine: false, unread: false });
-        raws.push(str2(c.time).trim());
-        sigs.set(sig, q.comments.length);
-        remap.set(n2, q.comments.length);
-      });
-      stampComments(q, q.comments.length - raws.length, raws, o.date);
-      if (!q.title.trim() && !q.body.trim()) continue;
-      posts.push(q);
-    }
-    if (!posts.length) throw new GnetError("적용할 정상 게시글이 없어서 기존 게시판을 유지했어요.");
-    for (const p of st.posts) if (protectedPost(o.settings, p) && !seen2.has(p.id)) posts.push(p);
-    st.posts = posts;
-    trimBoard(st, o.settings);
-    const notice3 = skippedPosts + skippedComments > 0 ? `게시판을 새로 불러왔어요. 사용자 명의로 온 새 글 ${skippedPosts}개와 댓글·연결 답글 ${skippedComments}개는 뺐어요.` : "";
-    return { st, notice: notice3, emptyComments: commentTotal === 0 };
-  }
-  function acceptComments(rows2, existing, t, nick, base = t.total) {
-    const list4 = Array.isArray(rows2) ? rows2.slice(0, LIMITS.replies) : [];
-    let dropped = Array.isArray(rows2) ? Math.max(0, rows2.length - LIMITS.replies) : 0;
-    const out = [];
-    const map = /* @__PURE__ */ new Map();
-    const seen2 = new Set(existing.map((c) => `${c.nick}\0${c.body}`));
-    list4.forEach((c, i) => {
-      const own = t.total + i + 1;
-      const bad = () => {
-        dropped++;
-        map.set(own, false);
-      };
-      if (!isObj(c)) return bad();
-      const author = str2(c.author).trim();
-      const content = stripForged(str2(c.content)).trim();
-      let n2 = int(c.parent);
-      if (n2 === null || n2 === 0) n2 = t.replyTo;
-      if (!author || [...author].length > 80 || author === nick || !content) return bad();
-      if (n2 > t.total) {
-        const m = map.get(n2);
-        if (m === void 0 || m === false) return bad();
-        n2 = m;
-      } else if (n2 < 0 || n2 > 0 && !t.supplied.has(n2) && n2 !== t.replyTo) return bad();
-      if (t.replyTo > 0 && n2 !== t.replyTo && n2 <= t.total) return bad();
-      const sig = `${author}\0${content}`;
-      if (seen2.has(sig)) return bad();
-      seen2.add(sig);
-      out.push({ author: cut(author, 80), content: trimTokens(content, LIMITS.comment_tokens), parent: n2, time: str2(c.time).trim() });
-      map.set(own, base + out.length);
-    });
-    return { comments: out, dropped };
-  }
-  function stampMinutes(stamp) {
-    const m = /^(\d{4})[.-](\d\d)[.-](\d\d)\s+(\d\d):(\d\d)/.exec(String(stamp ?? "").trim());
-    if (!m) return null;
-    const t = Date.UTC(+m[1], +m[2] - 1, +m[3], +m[4], +m[5]);
-    return Number.isFinite(t) ? Math.floor(t / 6e4) : null;
-  }
-  function minutesStamp(min) {
-    const d = new Date(min * 6e4);
-    const p = (n2) => String(n2).padStart(2, "0");
-    return `${d.getUTCFullYear()}.${p(d.getUTCMonth() + 1)}.${p(d.getUTCDate())} ${p(d.getUTCHours())}:${p(d.getUTCMinutes())}`;
-  }
-  var hhmm = (stamp) => /(\d\d:\d\d)/.exec(String(stamp ?? ""))?.[1] ?? "";
-  function clockMinutes(raw) {
-    const m = /(?:^|\s|T)(\d{1,2}):(\d\d)(?::\d\d)?\s*$/.exec(raw.trim()) ?? /^(\d{1,2}):(\d\d)/.exec(raw.trim());
-    if (!m) return null;
-    const h = +m[1];
-    const mi = +m[2];
-    return h < 24 && mi < 60 ? h * 60 + mi : null;
-  }
-  function stampComments(p, from, raws, now) {
-    const nowMin = stampMinutes(now);
-    const postMin = stampMinutes(p.date);
-    const floorOf = (i) => {
-      const c = p.comments[i];
-      const cands = [postMin, stampMinutes(c.parent > 0 ? p.comments[c.parent - 1]?.time : void 0), i > 0 ? stampMinutes(p.comments[i - 1]?.time) : null];
-      const known = cands.filter((x) => x !== null);
-      return known.length ? Math.max(...known) : null;
-    };
-    const pending = [];
-    const settle = (upto) => {
-      if (!pending.length) return;
-      const lo = floorOf(pending[0]);
-      const hi =
+    return (chat.message ?? []).filter((m) => m.role === "char" && String(m.data ?? "").trim

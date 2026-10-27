@@ -1,4 +1,697 @@
-eight / 2), Math.min(r.height - half, e.clientY - r.top));
+ction, value, label2, x, y, cls, count2 = 0) {
+    return `<button class="gx-pin ${cls}" style="left:${x}%;top:${y}%" data-action="${action}" data-value="${esc26(value)}" aria-label="${esc26(label2)}">
+    <span class="gx-dot"></span><span class="gx-pname">${esc26(label2)}${count2 ? `<b>${count2}</b>` : ""}</span></button>`;
+  }
+  function hotClass(list4) {
+    if (!list4.length) return "";
+    const kinds = new Set(list4.map((e) => e.kind));
+    return ` hot hot-${kinds.size === 1 ? [...kinds][0] : "all"}`;
+  }
+  var narrow2 = () => matchMedia("(max-width: 760px)").matches;
+  function mapBar(x) {
+    const code2 = field3.region;
+    const options = ["01", ...MAP_CODES].map((c) => `<option value="${c}"${c === code2 ? " selected" : ""}>${c === "01" ? "전국" : esc26(regionName(c))}</option>`).join("");
+    const bar = `<div class="gx-mapbar">
+      <select class="gx-select" data-change="map-region" aria-label="지역">${options}</select>
+      <div class="gx-mapfind"><input class="gx-search" type="search" placeholder="장소 검색" value="${esc26(field3.mapq)}" data-input="map-query" aria-label="장소 검색" autocomplete="off">
+        <div class="gx-mapsug">${mapSuggest(x.catalog)}</div></div>
+    </div>`;
+    return bar;
+  }
+  function mapCanvas(ctx2, x, events, env3) {
+    const code2 = field3.region;
+    const url = mapImage(ctx2, code2, env3);
+    const byPlace = /* @__PURE__ */ new Map();
+    for (const e of events) {
+      const k = placeKey(e, x.catalog);
+      byPlace.set(k, [...byPlace.get(k) ?? [], e]);
+    }
+    let pins = "";
+    if (code2 === "01") {
+      for (const [nn, label2, px, py] of NATION_PINS) {
+        const here = events.filter((e) => sidoOf(e.loc) === nn);
+        pins += pin("map-region", nn, label2, px, py, `nation${hotClass(here)}`, here.length);
+      }
+    } else {
+      (SIGUN[code2] ?? []).forEach((gu, i) => {
+        const xy = REGION_PINS[code2]?.[i];
+        const loc = `${code2}-${i}`;
+        if (!xy) return;
+        const here = byPlace.get(loc) ?? [];
+        const sel = field3.place === loc || sameTarget(field3.target, loc) ? " sel" : "";
+        pins += pin("map-place", loc, gu, xy[0], xy[1], `${loc === SEALED_LOC ? "sealed" : ""}${hotClass(here)}${sel}`, here.length > 1 ? here.length : 0);
+      });
+      for (const lm of x.catalog.landmarks) {
+        if (lm.sido !== code2) continue;
+        const key2 = `fac:${lm.name}`;
+        const here = byPlace.get(key2) ?? [];
+        const sel = field3.place === key2 || sameTarget(field3.target, key2) ? " sel" : "";
+        pins += pin("map-place", key2, lm.label || lm.name, lm.x, lm.y, `fac${hotClass(here)}${sel}`);
+      }
+    }
+    const img = url ? `<img class="gx-mapimg" src="${esc26(url)}" alt="${esc26(code2 === "01" ? "전국" : regionName(code2))} 지도">` : `<div class="gx-mapph">${mapUrls[code2] === null ? "지도 이미지를 찾지 못했어요" : "지도 불러오는 중…"}</div>`;
+    return `${narrow2() ? "" : mapBar(x)}
+    <div class="gx-canvas${url ? "" : " ph"}"${url ? ` data-map="${code2}"` : ""}><div class="gx-mapzoom">${img}${pins}</div>${url ? mapZoomControls(code2 !== "01") : ""}</div>`;
+  }
+  function mapSuggest(c) {
+    const q = field3.mapq.trim().toLowerCase();
+    if (!q) return "";
+    const hits = [];
+    for (const code2 of MAP_CODES) {
+      (SIGUN[code2] ?? []).forEach((gu, i) => {
+        if (`${regionName(code2)} ${gu}`.toLowerCase().includes(q)) hits.push({ value: `${code2}|${code2}-${i}`, name: gu, sub: regionName(code2) });
+      });
+    }
+    for (const lm of c.landmarks) {
+      if (!MAP_CODES.includes(lm.sido)) continue;
+      if (`${lm.name} ${lm.label ?? ""}`.toLowerCase().includes(q)) hits.push({ value: `${lm.sido}|fac:${lm.name}`, name: lm.label || lm.name, sub: `${regionName(lm.sido)} ${lm.gu}`.trim() });
+    }
+    if (!hits.length) return '<p class="gx-sugnone">일치하는 장소가 없어요.</p>';
+    return hits.slice(0, 8).map((h) => `<button class="gx-sugi" data-action="map-jump" data-value="${esc26(h.value)}"><b>${esc26(h.name)}</b><small>${esc26(h.sub)}</small></button>`).join("");
+  }
+  function mapSuggestFor(ctx2, q) {
+    field3.mapq = q;
+    const x = readCtx(ctx2);
+    return typeof x === "string" ? "" : mapSuggest(x.catalog);
+  }
+  var artCtx = null;
+  function eventRow(e, x, agents) {
+    const w = x.world;
+    const src = e.kind === "an" ? w.an[e.index] : e.kind === "in" ? w.inc[e.index] : w.ms[e.index];
+    const since = src && "since" in src ? elapsedText(w.minute, src.since) : "";
+    const an = e.kind === "an" ? w.an[e.index] : void 0;
+    const badge2 = e.kind === "an" ? an?.exploring ? '<span class="gx-badge op">탐사 중</span>' : '<span class="gx-badge live">활성</span>' : e.kind === "in" ? '<span class="gx-badge hot">진행</span>' : '<span class="gx-badge live">출현</span>';
+    const names4 = codesToNames(e.people || "없음", x.catalog, x.faction).split(/\s*,\s*/).map((n2) => n2.trim());
+    return evCard({
+      kind: e.kind,
+      name: e.name,
+      grade: e.grade,
+      loc: `${esc26(locName(e.loc))}${since ? ` · ${since}` : ""}`,
+      badge: badge2,
+      chips: peopleChips(x.char, names4, agents, factionNames(x.catalog, x.faction)[x.faction] ?? ""),
+      extra: e.report ? `<span class="gx-evc-sit" title="${esc26(e.report)}">${esc26(e.report)}</span>` : "",
+      key: e.key,
+      open: "pick-event",
+      art: artCtx ? evArt(artCtx, e.name, e.kind, `${locName(e.loc)} ${e.report ?? ""}`) : void 0,
+      pop: e.key,
+      locCode: e.loc,
+      selected: field3.target?.type === "event" && field3.target.key === e.key,
+      confirmEnd: field3.confirmEnd === e.key
+    });
+  }
+  function placeCard(key2, c, on2) {
+    let name;
+    let sub;
+    let wiki2;
+    if (key2.startsWith("fac:")) {
+      const lm = c.landmarks.find((l) => l.name === key2.slice(4));
+      name = lm?.label || lm?.name || key2.slice(4);
+      sub = lm ? placeWhere(lm.sido, lm.gu) : "거점";
+      wiki2 = lm?.name ?? name;
+    } else {
+      const full = locName(key2);
+      const cut2 = full.lastIndexOf(" ");
+      name = cut2 > 0 ? full.slice(cut2 + 1) : full;
+      sub = cut2 > 0 ? full.slice(0, cut2) : "";
+      wiki2 = full;
+    }
+    const tag = on2 ? '<span class="gx-badge gx-goaltag">목표</span>' : "";
+    return `<li class="gx-evc go gx-placecard${on2 ? " sel" : ""}" data-action="pick-place" data-value="${esc26(key2)}"><i class="gx-gmark pl">${ICONS.pin}</i><span class="gx-evc-main"><span class="gx-evc-top"><span class="gx-evc-name"><b>${esc26(name)}</b>${tag}</span>
+    <span class="gx-evc-act"><button class="gx-icon" data-action="wiki-goto" data-value="${esc26(wiki2)}" title="위키" aria-label="${esc26(name)} 위키">${ICONS.wiki}</button></span></span>
+    <small>${esc26(sub || "장소")}</small></span></li>`;
+  }
+  function situations(x, events) {
+    const counts = { all: events.length, an: 0, in: 0, ms: 0 };
+    for (const e of events) counts[e.kind]++;
+    const chips3 = ["all", "an", "in", "ms"].map((f) => `<button class="gx-chip${field3.filter === f ? " on" : ""}" data-action="map-filter" data-value="${f}">${f === "all" ? "전체" : KIND_LABEL4[f]}<b>${counts[f]}</b></button>`).join("");
+    const agents = new Map(rosterFor(x.world, x.catalog, x.faction, x.settings.agent_limit).map((p) => [p.name, p]));
+    const shown2 = events.filter((e) => (field3.filter === "all" || e.kind === field3.filter) && (!field3.place || placeKey(e, x.catalog) === field3.place));
+    const place2 = field3.place ? placeCard(field3.place, x.catalog, sameTarget(field3.target, field3.place)) : "";
+    const cancel = cancelChip("map-unplace", !!(field3.place || field3.target));
+    const gone = field3.place ? "" : endedShown(x.world).filter((e) => field3.filter === "all" || e.kind === field3.filter).map((e) => endedCard(e, (n2, k) => artCtx ? evArt(artCtx, n2, k) : void 0)).join("");
+    const empty = !x.on ? "상황판이 꺼져 있어 발생한 상황이 없어요. 지도에서 장소를 골라 이동할 수 있어요." : field3.place || field3.filter !== "all" ? "조건에 맞는 상황이 없어요." : "지금 발생한 상황이 없어요. 지도에서 장소를 골라 이동할 수 있어요.";
+    return `<div class="gx-chips gx-sitbar">${chips3}${cancel}</div>
+    ${shown2.length || place2 || gone ? `<ul class="gx-evcs">${place2}${shown2.map((e) => eventRow(e, x, agents)).join("")}${gone}</ul>` : `<p class="gx-none">${empty}</p>`}`;
+  }
+  function cancelChip(action, on2) {
+    return `<button class="gx-chip gx-unplace" data-action="${action}" ${on2 ? 'title="선택 풀기"' : "disabled"}>취소</button>`;
+  }
+  function lockedState(x, id) {
+    const rec = x.world.agents[id];
+    return agentLocked(rec) ? rec.st : null;
+  }
+  function teamPanel(x, goal, action, label2, busy5, ctx2) {
+    const roster = rosterFor(x.world, x.catalog, x.faction, x.settings.agent_limit);
+    if (!x.supportOn) field3.support = 0;
+    const used = field3.team.length + field3.support;
+    const chips3 = roster.map((p) => {
+      const on2 = field3.team.includes(p.id);
+      const lock = lockedState(x, p.id);
+      const full = !on2 && used >= TEAM_MAX;
+      const st = x.world.agents[p.id]?.st ?? "미정";
+      const sit = x.world.agents[p.id]?.situation ?? "";
+      {
+        const c = ctx2 ? agentContact(ctx2, p.id) : null;
+        const act = c ? `<span class="gx-acard-act"><button class="gx-acard-tool" data-action="agent-talk" data-value="${esc26(p.id)}" title="괴담톡" aria-label="${esc26(p.name)}에게 톡">${ICONS.phone}</button><button class="gx-acard-tool" data-action="wiki-goto" data-value="${esc26(c.wiki)}" title="위키" aria-label="${esc26(p.name)} 위키">${ICONS.wiki}</button></span>` : "";
+        const off = !!lock || full;
+        return `<div class="gx-acard pick wide${on2 ? " on" : ""}${off ? " off" : ""}" role="button" tabindex="${off ? -1 : 0}" data-action="team-toggle" data-value="${esc26(p.id)}" aria-pressed="${on2}" aria-disabled="${off}"
+          ${lock ? `title="${esc26(`${stLabel(lock)} 상태라 편성할 수 없어요`)}"` : ""}>${agentInner(x.char, p, st, sit, act)}<span class="gx-acard-check" aria-hidden="true">✓</span></div>`;
+      }
+    }).join("");
+    const support = x.supportOn ? `<div class="gx-acard pick gx-scard${field3.support > 0 ? " on" : ""}">
+      <span class="gx-ava sq">${ICONS.group}</span>
+      <span class="gx-acard-txt"><span class="gx-acard-top"><b>지원 인원</b></span><small>등록 요원 외 일반 인원</small></span>
+      <span class="gx-scard-step">
+        <button class="gx-step" data-action="support" data-value="-1" ${field3.support <= 0 ? "disabled" : ""} aria-label="지원 인원 줄이기">−</button>
+        <b>${field3.support}</b>
+        <button class="gx-step" data-action="support" data-value="1" ${used >= TEAM_MAX ? "disabled" : ""} aria-label="지원 인원 늘리기">+</button>
+      </span>
+    </div>` : "";
+    const ready = !!goal && validTeam(field3.team.length, field3.support) && !busy5;
+    const go2 = `<button class="gx-start" data-action="${action}" ${ready ? "" : "disabled"}>${busy5 ? "보내는 중…" : esc26(label2)}</button>`;
+    lastGo = go2;
+    return `<section class="gx-team">
+    <div class="gx-goal"><span>목표</span><b${goal ? "" : ' class="none"'}>${goal ? esc26(goal) : "미정"}</b><em>${used + 1} / 4</em></div>
+    ${roster.length || support ? `<div class="gx-acards pick">${chips3}${support}</div>` : '<p class="gx-none">편성할 수 있는 요원이 없어요.</p>'}
+    ${roster.length ? "" : support ? '<p class="gx-none">편성할 수 있는 요원이 없어요.</p>' : ""}
+    ${narrow2() ? "" : noteBox()}
+    ${narrow2() ? "" : go2}
+  </section>`;
+  }
+  var lastGo = "";
+  function noteBox() {
+    return `<label class="gx-note">
+      <textarea rows="2" aria-label="작전 메모"${field3.note.trim() ? ' class="filled"' : ""} data-input="field-note" placeholder="이번 작전에서 원하는 전개나 행동이 있으면 적어 주세요.">${esc26(field3.note)}</textarea></label>`;
+  }
+  function fieldDrawer(x, withMap) {
+    if (!narrow2()) return "";
+    if (field3.step === "team") return drawerBox(noteBox(), "gx-notedrawer", `<div class="gx-mgo">${lastGo}</div>`);
+    return withMap ? drawerBox(mapBar(x), "gx-mapdrawer") : "";
+  }
+  function stepBar(goal, swap) {
+    const used = field3.team.length + field3.support + 1;
+    const b = (k, n2, label2, sub) => `<button class="gx-stepb${field3.step === k ? " on" : ""}" data-action="field-step" data-value="${k}" aria-pressed="${field3.step === k}"><i>${n2}</i><span><b>${label2}</b><small>${esc26(sub)}</small></span></button>`;
+    const sw = swap ? `<button class="gx-stepswap" data-action="tab" data-value="${swap}" aria-label="${swap === "map" ? "임무로 전환" : "커스텀으로 전환"}">${ICONS.swap}<span>${swap === "map" ? "임무" : "커스텀"}</span></button>` : "";
+    return `<div class="gx-stepbar${sw ? " has-swap" : ""}">${b("goal", "1", "목표", goal ?? "고르기")}${b("team", "2", "편성", `${used} / 4`)}${sw}</div>`;
+  }
+  function toStep(step, env3) {
+    field3.step = step;
+    env3.render();
+    const body5 = document.querySelector(".gx .gx-body");
+    if (body5 && matchMedia("(max-width: 760px)").matches) body5.scrollTop = 0;
+  }
+  function mapTab(ctx2, env3, notice3, busy5) {
+    artCtx = ctx2;
+    const x = readCtx(ctx2);
+    if (typeof x === "string") return `<div class="gx-empty">${esc26(x)}</div>`;
+    const events = x.on ? activeEvents(x.world) : [];
+    const t = field3.target;
+    if (t?.type === "event" && !events.some((e) => e.key === t.key)) field3.target = null;
+    const goal = field3.target ? targetName(field3.target) : null;
+    return `<main class="gx-body gx-field gx-map" data-step="${field3.step}">
+    ${stepBar(goal, "mission")}
+    <div class="gx-mapcol">${mapCanvas(ctx2, x, events, env3)}
+      <section class="gx-sec gx-sits" aria-label="상황">${situations(x, events)}</section></div>
+    <div class="gx-sidecol">
+      ${notice3 ? `<div class="${noticeClass(notice3)}" role="alert">${esc26(notice3)}</div>` : ""}
+      ${teamPanel(x, goal, "depart", "출발", busy5, ctx2)}
+    </div>
+  </main>${fieldDrawer(x, true)}`;
+  }
+  function missionCatalog(c, kind) {
+    if (kind === "an") return c.anomalies.map((a) => ({ name: a.name, sub: a.english }));
+    if (kind === "ms") return c.mysticSites.map((m) => ({ name: m.name, sub: m.english }));
+    return c.landmarks.map((l) => ({ name: l.name, sub: placeWhere(l.sido, l.gu) }));
+  }
+  function missionStatus(x, kind, name) {
+    const w = x.world;
+    if (kind === "an") {
+      if (w.pending.an === name) return '<span class="gx-badge wait">요청 대기</span>';
+      const e = w.an.find((a) => a.presetName === name || a.name === name);
+      if (e) return `<span class="gx-badge ${e.state === "활성" ? "live" : "wait"}">${e.state === "활성" ? "발생 중" : "발생 예정"}</span>`;
+    } else if (kind === "ms") {
+      if (w.pending.ms === name) return '<span class="gx-badge wait">요청 대기</span>';
+      if (w.ms.some((m) => m.name === name)) return '<span class="gx-badge live">출현</span>';
+    } else {
+      if (w.pending.in === name) return '<span class="gx-badge wait">요청 대기</span>';
+      if (w.inc.some((i) => i.name === name)) return '<span class="gx-badge hot">사건 진행</span>';
+    }
+    return "";
+  }
+  function missionList(ctx2, opening = false) {
+    const x = readCtx(ctx2);
+    if (typeof x === "string") return "";
+    const q = field3.query.trim().toLowerCase();
+    const row8 = (kind, r) => {
+      const sel = field3.mname === r.name && field3.mpick === kind;
+      const val = `${kind}:${esc26(r.name)}`;
+      const open3 = field3.mopen === `${kind}:${r.name}`;
+      const art = evArt(ctx2, r.name, kind);
+      const link = kind === "lm" ? baseLink(ctx2, r.name) : null;
+      if (link) r = { ...r, sub: [link.org, r.sub].filter(Boolean).join(" · ") };
+      const status2 = missionStatus(x, kind, r.name);
+      const bg = art.pic ? ` style="background-image:url('${esc26(art.pic)}')"` : "";
+      const cap = `<span class="gx-evart-name"><b>${esc26(r.name)}</b>${r.sub ? `<small>${esc26(r.sub)}</small>` : ""}</span>`;
+      const capOpen = (mark4) => `<span class="gx-evart-name"><span class="gx-evart-l1"><b>${esc26(r.name)}</b>${mark4}</span>${r.sub ? `<small>${esc26(r.sub)}</small>` : ""}</span>`;
+      const wikiBtn = opening ? "" : `<button class="gx-evbtn gx-mx-wiki" data-action="wiki-goto" data-value="${esc26(link?.doc ?? r.name)}" title="위키" aria-label="${esc26(r.name)} 위키">${ICONS.wiki}</button>`;
+      if (!open3) {
+        return `<li class="gx-ev gx-mx${sel ? " sel" : ""}${wikiBtn ? " has-wiki" : ""}"><button class="gx-mx-art k-${kind}${art.pic ? "" : " none"}" data-action="mission-open" data-value="${val}" aria-expanded="false"${bg}>
+        ${status2 ? `<span class="gx-evart-top">${status2}</span>` : ""}<span class="gx-evart-cap">${cap}</span></button>${wikiBtn}</li>`;
+      }
+      const mark3 = sel ? targetMark(true, "mission-unpick", "") : targetMark(false, "mission-pick", val);
+      return `<li class="gx-ev gx-mx open${sel ? " sel" : ""}"><div class="gx-mx-art k-${kind}${art.pic ? "" : " none"}" data-action="mission-open" data-value="${val}"${bg}>
+      <span class="gx-evart-top">${status2}<span class="gx-evart-act"><button class="gx-evbtn" data-action="mission-open" data-value="${val}" aria-label="접기" title="접기">${ICONS.up}</button>${wikiBtn}</span></span>
+      <span class="gx-evart-cap">${capOpen(mark3)}${art.desc ? `<span class="gx-evc-desc">${esc26(art.desc)}</span>` : ""}</span></div></li>`;
+    };
+    const hit3 = (r) => `${r.name} ${r.sub}`.toLowerCase().includes(q);
+    if (!q) {
+      const rows2 = missionCatalog(x.catalog, field3.mkind);
+      if (!rows2.length) return '<p class="gx-none">일치하는 대상이 없어요.</p>';
+      return `<ul class="gx-list gx-mlist">${rows2.map((r) => row8(field3.mkind, r)).join("")}</ul>`;
+    }
+    const order = [field3.mkind, ...["an", "ms", "lm"].filter((k) => k !== field3.mkind)];
+    const groups = order.map((k) => ({ k, rows: missionCatalog(x.catalog, k).filter(hit3) })).filter((g) => g.rows.length).map((g) => `<li class="gx-mgrp">${MISSION_LABEL[g.k]}<small>${g.rows.length}</small></li>${g.rows.map((r) => row8(g.k, r)).join("")}`).join("");
+    return groups ? `<ul class="gx-list gx-mlist">${groups}</ul>` : '<p class="gx-none">일치하는 대상이 없어요.</p>';
+  }
+  function missionTab(ctx2, opening, notice3, busy5) {
+    const x = readCtx(ctx2);
+    if (typeof x === "string") return `<div class="gx-empty">${esc26(x)}</div>`;
+    const segs = ["an", "ms", "lm"].map((k) => `<button class="gx-chip${field3.mkind === k ? " on" : ""}" data-action="mission-kind" data-value="${k}" aria-pressed="${field3.mkind === k}">${MISSION_LABEL[k]}</button>`).join("");
+    const p = x.world.pending;
+    const pend = ["an", "ms", "in"].filter((k) => p[k]).map((k) => `<div class="gx-ctxbar"><span>요청 대기 · ${esc26(p[k])}</span><button class="gx-mini" data-action="mission-cancel" data-value="${k}">요청 취소</button></div>`).join("");
+    const intro = opening ? '<p class="gx-hint">커스텀 임무로 시작해요. 목표와 동행을 고르고 작전 개시를 누르면 바로 첫 장면이 시작돼요.</p>' : "";
+    return `<main class="gx-body gx-field gx-mission" data-step="${field3.step}">
+    ${stepBar(field3.mname, opening ? void 0 : "map")}
+    <div class="gx-mapcol">
+      ${intro}
+      <div class="gx-mfilter">${segs}<input class="gx-search" type="search" placeholder="검색" value="${esc26(field3.query)}" data-input="mission-query" aria-label="검색">${cancelChip("mission-unpick", !!field3.mname)}</div>
+      <div class="gx-mbox">${missionList(ctx2, opening)}</div>
+    </div>
+    <div class="gx-sidecol">
+      ${notice3 ? `<div class="${noticeClass(notice3)}" role="alert">${esc26(notice3)}</div>` : ""}
+      ${x.world.notice && x.on ? `<div class="gx-hint">${esc26(x.world.notice)}</div>` : ""}
+      ${pend}
+      ${teamPanel(x, field3.mname, "mission-send", opening ? "작전 개시" : "임무 요청", busy5, opening ? void 0 : ctx2)}
+    </div>
+  </main>${fieldDrawer(x, false)}`;
+  }
+  function newMessage2(data) {
+    const id = typeof crypto?.randomUUID === "function" ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+    return { role: "user", data, time: Date.now(), chatId: id };
+  }
+  function placeRecord(chat, card2, note) {
+    const record = note.trim() ? `${card2}
+
+${note.trim()}` : card2;
+    const message = (chat.message ?? []).slice();
+    const last2 = message[message.length - 1];
+    if (last2?.role === "user" && hasSceneCard(last2.data)) message[message.length - 1] = { ...last2, data: record };
+    else message.push(newMessage2(record));
+    return { ...chat, message };
+  }
+  function partyNames(x, team) {
+    const roster = rosterFor(x.world, x.catalog, x.faction, x.settings.agent_limit);
+    return team.map((id) => {
+      const p = roster.find((r) => r.id === id);
+      if (!p || lockedState(x, id)) throw new DirectiveError("편성할 수 없게 된 요원이 있어요. 편성을 다시 확인해 주세요.");
+      return p.name || p.english;
+    });
+  }
+  function partyLabel(names4, support) {
+    return ["나", ...names4, ...support > 0 ? [`지원 ×${support}`] : []].join(", ");
+  }
+  async function compose2(ctx2, env3, build) {
+    env3.setBusy(true);
+    env3.setNotice("");
+    env3.render();
+    try {
+      await updateChat(ctx2.charIndex, ctx2.chatIndex, (latest) => {
+        const x = ctxOf(ctx2, latest);
+        return build(latest, x).chat;
+      });
+      resetField();
+      const sent = await sendNow();
+      env3.setBusy(false);
+      if (!sent) await markUnsent(ctx2.charIndex, ctx2.chatIndex).catch(() => {
+      });
+      await env3.close();
+      await env3.refresh();
+    } catch (error) {
+      env3.setBusy(false);
+      env3.setNotice(error instanceof Error ? error.message : String(error));
+      env3.render();
+    }
+  }
+  function depart(ctx2, env3) {
+    const target = field3.target;
+    const note = field3.note;
+    const team = [...field3.team];
+    const support = field3.support;
+    return compose2(ctx2, env3, (latest, x) => {
+      if (!target) throw new DirectiveError("목표가 정해지지 않았어요.");
+      if (!validTeam(team.length, support)) throw new DirectiveError("요원과 지원 인원을 다시 확인해 주세요.");
+      if (support > 0 && !x.supportOn) throw new DirectiveError("지원 투입이 꺼져 있어요. 설정 탭에서 켜거나 지원 인원을 빼 주세요.");
+      const d = parseDirective(ctx2.char.globalLore);
+      let dest;
+      if (target.type === "event") {
+        const ev = activeEvents(x.world).find((e) => e.key === target.key);
+        if (!x.on || !ev) throw new DirectiveError("선택한 상황이 끝났거나 바뀌었어요. 다시 골라 주세요.");
+        dest = destination(d, ev.name, locName(ev.loc));
+      } else if (target.type === "facility") {
+        const lm = x.catalog.landmarks.find((l) => l.name === target.name);
+        if (!lm) throw new DirectiveError("시설 목록이 바뀌었어요. 다시 골라 주세요.");
+        dest = destination(d, lm.name, lm.gu ? `${regionName(lm.sido)} ${lm.gu}` : placeWhere(lm.sido, ""));
+      } else {
+        dest = destination(d, locName(target.loc));
+      }
+      const names4 = partyNames(x, team);
+      const body5 = sceneDirective(d, dest, names4, support, false);
+      return { chat: placeRecord(latest, sceneRecord({ target: targetName(target), party: partyLabel(names4, support) }, body5), note) };
+    });
+  }
+  function sendMission(ctx2, env3, opening) {
+    const kind = field3.mpick;
+    const name = field3.mname;
+    const note = field3.note;
+    const team = [...field3.team];
+    const support = field3.support;
+    return compose2(ctx2, env3, (latest, x) => {
+      if (!name) throw new DirectiveError("목표가 정해지지 않았어요.");
+      if (!validTeam(team.length, support)) throw new DirectiveError("요원과 지원 인원을 다시 확인해 주세요.");
+      if (support > 0 && !x.supportOn) throw new DirectiveError("지원 투입이 꺼져 있어요. 설정 탭에서 켜거나 지원 인원을 빼 주세요.");
+      const d = parseDirective(ctx2.char.globalLore);
+      let dest = destination(d, name);
+      if (kind === "lm") {
+        const lm = x.catalog.landmarks.find((l) => l.name === name);
+        if (lm) dest = destination(d, name, placeWhere(lm.sido, lm.gu));
+      } else if (kind === "ms") {
+        const site = x.world.ms.find((m) => m.name === name);
+        if (site) dest = destination(d, name, locName(site.loc));
+      }
+      const names4 = partyNames(x, team);
+      let chat = latest;
+      if (x.on) {
+        const w = structuredClone(x.world);
+        const last2 = (latest.message ?? []).at(-1);
+        if (last2?.role === "user" && hasSceneCard(String(last2.data ?? ""))) for (const k of ["an", "ms", "in"]) cancelMission(w, k);
+        const err = requestMission(w, x.catalog, x.settings, kind, name);
+        if (err) throw new DirectiveError(err);
+        chat = { ...chat, scriptstate: { ...chat.scriptstate ?? {}, ...worldVars(w, x.catalog, x.settings, x.faction) } };
+      }
+      const body5 = sceneDirective(d, dest, names4, support, opening);
+      return { chat: placeRecord(chat, sceneRecord({ target: name, party: partyLabel(names4, support) }, body5), note) };
+    });
+  }
+  async function saveWorld(ctx2, env3, change) {
+    env3.setBusy(true);
+    env3.setNotice("");
+    try {
+      await updateChat(ctx2.charIndex, ctx2.chatIndex, (latest) => {
+        const x = ctxOf(ctx2, latest);
+        const w = structuredClone(x.world);
+        const err = change(w, x);
+        if (err) throw new Error(err);
+        const prev = prevWorldVars(latest.scriptstate, (p) => change(p, x));
+        return { ...latest, scriptstate: { ...latest.scriptstate ?? {}, ...worldVars(w, x.catalog, x.settings, x.faction), ...prev } };
+      });
+      env3.setBusy(false);
+      await env3.refresh();
+    } catch (error) {
+      env3.setBusy(false);
+      env3.setNotice(error instanceof Error ? error.message : String(error));
+      env3.render();
+    }
+  }
+  function showOnMap(ctx2, key2) {
+    const x = readCtx(ctx2);
+    if (typeof x === "string" || !x.on) return false;
+    const ev = activeEvents(x.world).find((e) => e.key === key2);
+    if (!ev) return false;
+    field3.region = sidoOf(ev.loc);
+    field3.place = placeKey(ev, x.catalog);
+    field3.filter = "all";
+    field3.confirmEnd = null;
+    return true;
+  }
+  async function handleField(action, value, ctx2, env3, opening) {
+    const v = value ?? "";
+    switch (action) {
+      case "map-region":
+        field3.region = v === "01" || MAP_CODES.includes(v) ? v : "01";
+        field3.place = null;
+        field3.confirmEnd = null;
+        env3.render();
+        return true;
+      case "map-jump":
+      case "map-place": {
+        let v2 = value ?? "";
+        if (action === "map-jump") {
+          const [code2, key2] = v2.split("|");
+          if (!MAP_CODES.includes(code2) || !key2) return true;
+          field3.region = code2;
+          field3.mapq = "";
+          v2 = key2;
+        }
+        field3.confirmEnd = null;
+        if (action === "map-place" && isPC() && field3.place === v2 && sameTarget(field3.target, v2)) {
+          field3.place = null;
+          field3.target = null;
+          env3.render();
+          return true;
+        }
+        field3.place = v2;
+        const x = readCtx(ctx2);
+        const here = typeof x === "string" || !x.on ? [] : activeEvents(x.world).filter((e) => placeKey(e, x.catalog) === v2);
+        if (!here.length) field3.target = placeTarget(v2);
+        env3.render();
+        return true;
+      }
+      case "map-unplace":
+        field3.place = null;
+        field3.target = null;
+        field3.confirmEnd = null;
+        toStep("goal", env3);
+        return true;
+      case "map-filter":
+        field3.filter = ["all", "an", "in", "ms"].includes(v) ? v : "all";
+        env3.render();
+        return true;
+      case "pick-place":
+        if (isPC() && sameTarget(field3.target, v)) {
+          field3.target = null;
+          env3.render();
+          return true;
+        }
+        field3.target = placeTarget(v);
+        toStep("team", env3);
+        return true;
+      case "field-step":
+        toStep(v === "team" ? "team" : "goal", env3);
+        return true;
+      case "pick-event": {
+        const x = readCtx(ctx2);
+        if (typeof x === "string") return true;
+        const ev = activeEvents(x.world).find((e) => e.key === v);
+        if (!ev) return true;
+        if (sameTarget(field3.target, ev.key)) {
+          field3.target = null;
+          field3.confirmEnd = null;
+          env3.render();
+          return true;
+        }
+        field3.target = { type: "event", key: ev.key, kind: ev.kind, name: ev.name, loc: ev.loc };
+        field3.region = sidoOf(ev.loc);
+        field3.confirmEnd = null;
+        toStep("team", env3);
+        return true;
+      }
+      case "end-event":
+        if (field3.confirmEnd !== v) {
+          field3.confirmEnd = v;
+          env3.render();
+          return true;
+        }
+        field3.confirmEnd = null;
+        if (field3.target?.type === "event" && field3.target.key === v) field3.target = null;
+        await saveWorld(ctx2, env3, (w) => endEvent(w, v) ? null : "이미 끝났거나 바뀐 상황이에요.");
+        return true;
+      case "team-toggle": {
+        const tx = readCtx(ctx2);
+        if (typeof tx !== "string" && lockedState(tx, v)) return true;
+        const i = field3.team.indexOf(v);
+        if (i >= 0) field3.team.splice(i, 1);
+        else if (field3.team.length + field3.support < TEAM_MAX) field3.team.push(v);
+        env3.render();
+        return true;
+      }
+      case "support": {
+        const next = field3.support + (Number(v) > 0 ? 1 : -1);
+        if (next >= 0 && validTeam(field3.team.length, next)) field3.support = next;
+        env3.render();
+        return true;
+      }
+      case "depart":
+        await depart(ctx2, env3);
+        return true;
+      case "mission-kind":
+        if (v === "an" || v === "ms" || v === "lm") {
+          field3.mkind = v;
+          field3.query = "";
+        }
+        env3.render();
+        return true;
+      case "mission-open":
+        field3.mopen = field3.mopen === v ? "" : v;
+        env3.render();
+        return true;
+      case "mission-pick": {
+        const m = v.match(/^(an|ms|lm):([\s\S]*)$/);
+        const kind = m?.[1] ?? field3.mkind;
+        const name = m ? m[2] : v;
+        if (isPC() && field3.mname === name && field3.mpick === kind && field3.mopen !== `${kind}:${name}`) {
+          field3.mname = null;
+          env3.render();
+          return true;
+        }
+        field3.mname = name;
+        field3.mpick = kind;
+        toStep("team", env3);
+        return true;
+      }
+      case "mission-cancel":
+        if (v === "an" || v === "ms" || v === "in") await saveWorld(ctx2, env3, (w) => (cancelMission(w, v), null));
+        return true;
+      case "mission-unpick":
+        field3.mname = null;
+        toStep("goal", env3);
+        return true;
+      case "mission-send":
+        await sendMission(ctx2, env3, opening);
+        return true;
+    }
+    return false;
+  }
+
+  // src/ui/app.ts
+  var walletUi = { open: false, notice: "" };
+  var VEIL = { dark: "3, 7, 9", light: "20, 30, 28", paper: "40, 30, 15" };
+  function paintVeil(el, dim) {
+    const veil = VEIL[el.dataset.theme] ?? VEIL.dark;
+    el.style.background = `rgba(${veil}, ${dim / 100})`;
+  }
+  var root2 = null;
+  var view2 = { kind: "loading" };
+  var draft = { lang: "ko" };
+  var busy4 = false;
+  var notice2 = "";
+  var GNET_ON = true;
+  var TABS2 = ["board", "map", "mission", ...GNET_ON ? ["gnet"] : [], "phone", "wiki", "field"];
+  var tab = "board";
+  var repick = false;
+  var pickerPrefs = false;
+  var lastChat = "";
+  var env2 = {
+    render: () => render2(),
+    refresh: () => refresh(),
+    close: () => close(),
+    setNotice: (text) => {
+      notice2 = text;
+    },
+    setBusy: (on2) => {
+      busy4 = on2;
+    }
+  };
+  var wikiEnv = {
+    render: () => render2(),
+    refresh: () => refresh(),
+    current: () => view2.kind === "started" ? view2.ctx : null
+  };
+  var gnetEnv = wikiEnv;
+  var settingsEnv = { render: () => render2(), refresh: () => refresh() };
+  var peopleEnv = settingsEnv;
+  var shown = false;
+  var phoneEnv = {
+    render: () => render2(),
+    refresh: () => refresh(),
+    visible: () => shown && tab === "phone" && view2.kind === "started",
+    close: async () => {
+      await close();
+      await refresh();
+    }
+  };
+  var esc27 = (s5) => String(s5 ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+  function ensureRoot2() {
+    if (root2) return root2;
+    setImageRedraw(() => {
+      if (view2.kind === "picker") renderPicker();
+      else render2();
+      if (editorOpen()) render();
+    });
+    const style = document.createElement("style");
+    style.textContent = style_default2;
+    document.head.appendChild(style);
+    root2 = document.createElement("div");
+    root2.className = "gx";
+    document.body.appendChild(root2);
+    root2.addEventListener("toggle", (ev) => rememberPanel(ev.target), true);
+    const picker2 = document.createElement("input");
+    picker2.type = "file";
+    picker2.accept = "image/*";
+    picker2.multiple = true;
+    picker2.hidden = true;
+    document.body.appendChild(picker2);
+    let pickFor = "";
+    picker2.addEventListener("change", () => {
+      const files2 = [...picker2.files ?? []];
+      picker2.value = "";
+      if (files2.length) void addPhotos(pickFor, files2);
+    });
+    let downOutside = false;
+    root2.addEventListener("pointerdown", (ev) => downOutside = ev.target === root2);
+    root2.addEventListener("click", (ev) => {
+      const t = ev.target;
+      if (t === root2) {
+        if (downOutside) void handle2("close");
+        downOutside = false;
+        return;
+      }
+      const pick3 = t.closest("[data-pick-photo]");
+      if (pick3) {
+        if (pick3.hasAttribute("disabled") || busy4) return;
+        pickFor = pick3.dataset.pickPhoto ?? "";
+        picker2.click();
+        return;
+      }
+      const zoom = t.closest("[data-zoom-photo]")?.querySelector("img");
+      if (zoom?.getAttribute("src")) return zoomPhoto(zoom.src, zoom.alt);
+      const pickMap = t.closest("[data-base-pick]");
+      if (pickMap) {
+        const img = pickMap.querySelector("img")?.getBoundingClientRect();
+        if (!img || !img.width || !img.height) return;
+        const x = (ev.clientX - img.left) / img.width * 100;
+        const y = (ev.clientY - img.top) / img.height * 100;
+        if (x < 0 || x > 100 || y < 0 || y > 100) return;
+        return void handle2("dir-base-xy", `${x.toFixed(1)}|${y.toFixed(1)}|${pickMap.dataset.basePick}`);
+      }
+      const el = t.closest("[data-action]");
+      if (!el || el.hasAttribute("disabled")) return;
+      const take = el.dataset.take ? root2?.querySelector(`[name="${el.dataset.take}"]`)?.value : void 0;
+      void handle2(el.dataset.action, take ?? el.dataset.value);
+    });
+    root2.addEventListener("pointerdown", (ev) => {
+      const box = ev.target.closest?.("[data-crop]");
+      const img = box?.querySelector("img");
+      if (!box || !img) return;
+      ev.preventDefault();
+      const key2 = box.dataset.crop ?? "";
+      const frame = box.querySelector(".dir-crop-frame");
+      const move = (e) => {
+        const r = img.getBoundingClientRect();
+        if (!r.width || !r.height) return;
+        const w = cropValue(key2)[2];
+        const half = w / 100 * r.width / 2;
+        const px = Math.max(Math.min(half, r.width / 2), Math.min(r.width - half, e.clientX - r.left));
+        const py = Math.max(Math.min(half, r.height / 2), Math.min(r.height - half, e.clientY - r.top));
         const c = [px / r.width * 100, py / r.height * 100, w];
         setCrop(key2, c);
         if (frame) Object.assign(frame.style, { left: `${c[0]}%`, top: `${c[1]}%` });
@@ -24,7 +717,7 @@ eight / 2), Math.min(r.height - half, e.clientY - r.top));
       const group6 = row8.dataset.agentGroup ?? "";
       const rows2 = [...box.querySelectorAll("[data-agent-row]")].filter((r) => r !== row8 && r.dataset.agentGroup === group6);
       let drop = null;
-      const mark2 = (next) => {
+      const mark3 = (next) => {
         drop?.el.classList.remove("drop-before", "drop-after");
         drop = next;
         drop?.el.classList.add(drop.after ? "drop-after" : "drop-before");
@@ -37,7 +730,7 @@ eight / 2), Math.min(r.height - half, e.clientY - r.top));
           const d = Math.abs(e.clientY - (b.top + b.height / 2));
           if (d < gap) [gap, best] = [d, { el: r, after: e.clientY > b.top + b.height / 2 }];
         }
-        if (best?.el !== drop?.el || best?.after !== drop?.after) mark2(best);
+        if (best?.el !== drop?.el || best?.after !== drop?.after) mark3(best);
       };
       row8.classList.add("dragging");
       box.classList.add("dir-dragging");
@@ -49,7 +742,7 @@ eight / 2), Math.min(r.height - half, e.clientY - r.top));
         row8.classList.remove("dragging");
         box.classList.remove("dir-dragging");
         const target = drop;
-        mark2(null);
+        mark3(null);
         if (target) void handle2("dir-move", `${target.after ? "after" : "before"}|${grip.dataset.dragAgent}|${target.el.dataset.agentRow}`);
       };
       grip.addEventListener("pointermove", move);
@@ -105,102 +798,8 @@ eight / 2), Math.min(r.height - half, e.clientY - r.top));
       const input2 = form.querySelector("input");
       if (form.dataset.submit) void handle2(form.dataset.submit, input2?.value ?? "");
     });
-    root2.addEventListener("change", (ev) => {
-      const el = ev.target;
-      if (el?.dataset?.change) void handle2(el.dataset.change, el.dataset.key ? `${el.dataset.key}=${el.value}` : el.value);
-    });
-    root2.addEventListener("input", (ev) => {
-      const el = ev.target;
-      if (el?.dataset?.input === "dim" && root2) {
-        paintVeil(root2, Number(el.value));
-        const out = el.parentElement?.querySelector("output");
-        if (out) out.textContent = `${el.value}%`;
-        return;
-      }
-      if (el?.dataset?.input === "pp-cap") {
-        const out = el.parentElement?.querySelector("output");
-        if (out) out.textContent = Number(el.value) === 0 ? "한도 없음" : `±${el.value}`;
-        return;
-      }
-      if (el?.dataset?.input === "pct" || el?.dataset?.input === "count") {
-        const out = el.parentElement?.querySelector("output");
-        if (out) out.textContent = `${el.value}${el.dataset.input === "pct" ? "%" : "개"}`;
-        return;
-      }
-      if (el?.dataset?.input === "wiki-query" && view2.kind === "started") {
-        wiki.query = el.value;
-        const box2 = root2?.querySelector(".nw .ph-content");
-        if (box2) box2.innerHTML = wikiList(view2.ctx);
-        return;
-      }
-      if (el?.dataset?.input === "wiki-home-query" && view2.kind === "started") {
-        wiki.homeQuery = el.value;
-        const box2 = root2?.querySelector(".nw-hero-res");
-        if (box2) box2.innerHTML = wikiHomeResults(view2.ctx);
-        return;
-      }
-      if (el?.dataset?.input && wikiInput(el.dataset.input, el.value)) return;
-      if (el?.dataset?.input && peopleInput(el.dataset.input, el.value)) return;
-      if (el?.dataset?.input && imgInput(el.dataset.input, el.value)) return;
-      if (el?.dataset?.input === "gn-draft") return void (gnet.draft = el.value);
-      if (el?.dataset?.input === "gn-to") return void (gnet.to = el.value);
-      if (el?.dataset?.input === "gn-att") return void attachInput(gnet.attach, el.dataset.key, el.value);
-      if (el?.dataset?.input === "ph-query" && view2.kind === "started") {
-        const box2 = root2?.querySelector(".ph-content");
-        if (box2) box2.innerHTML = phoneContent(view2.ctx, el.value);
-        return;
-      }
-      if (el?.dataset?.input === "ph-pick-q" && view2.kind === "started") {
-        phoneInput("ph-pick-q", el.value);
-        const box2 = root2?.querySelector(".ph-pick");
-        if (box2) box2.innerHTML = phonePickList(view2.ctx);
-        return;
-      }
-      if (el?.dataset?.input === "dir-q" && (view2.kind === "started" || view2.kind === "picker")) {
-        dirUi.q = el.value;
-        const box2 = root2?.querySelector(".dir-list");
-        if (box2) box2.innerHTML = directoryList(view2.ctx);
-        return;
-      }
-      if (el?.dataset?.input === "dir-crop-size") {
-        const key2 = el.dataset.key ?? "";
-        const [x, y] = cropValue(key2);
-        setCrop(key2, [x, y, Number(el.value)]);
-        const frame = root2?.querySelector("[data-crop] .dir-crop-frame");
-        if (frame) frame.style.width = `${el.value}%`;
-        return;
-      }
-      if (el?.dataset?.input === "dir-photo-q" && (view2.kind === "started" || view2.kind === "picker")) {
-        dirUi.pickQ = el.value;
-        const box2 = root2?.querySelector(".dir-pics");
-        if (box2) box2.innerHTML = directoryPhotoList(view2.ctx);
-        return;
-      }
-      if (el?.dataset?.input === "dir-ext-q" && (view2.kind === "started" || view2.kind === "picker")) {
-        dirUi.addQ = el.value;
-        const box2 = root2?.querySelector(".dir-ext-list");
-        if (box2) box2.innerHTML = directoryExtList(view2.ctx);
-        return;
-      }
-      if (el?.dataset?.input === "dir") return void directoryInput(el.dataset.key ?? "", el.value, root2?.querySelector(".dir-bar") ?? null);
-      if (el?.dataset?.input && phoneInput(el.dataset.input, el.value, el.dataset.key)) return;
-      if (el?.dataset?.input === "field-note") return void (field2.note = el.value);
-      if (el?.dataset?.input === "map-query" && view2.kind === "started") {
-        const box2 = root2?.querySelector(".gx-mapsug");
-        if (box2) box2.innerHTML = mapSuggestFor(view2.ctx, el.value);
-        return;
-      }
-      if (el?.dataset?.input === "start-note") {
-        const had = !!(draft.situation ?? "").trim();
-        draft.situation = el.value;
-        if (had !== !!el.value.trim()) root2?.querySelector(".gx-foot .gx-start")?.toggleAttribute("disabled", !el.value.trim() || busy4);
-        return;
-      }
-      if (el?.dataset?.input !== "mission-query") return;
-      field2.query = el.value;
-      const box = root2?.querySelector(".gx-mbox");
-      if (box && (view2.kind === "started" || view2.kind === "opening")) box.innerHTML = missionList(view2.ctx, view2.kind === "opening");
-    });
+    root2.addEventListener("change", (ev) => panelChange(ev.target));
+    root2.addEventListener("input", (ev) => panelInput(ev.target));
     bindAgentTips(root2);
     bindPeopleStatus(() => {
       if (shown && view2.kind === "started") render2();
@@ -217,6 +816,100 @@ eight / 2), Math.min(r.height - half, e.clientY - r.top));
       void close();
     });
     return root2;
+  }
+  function panelChange(el) {
+    if (el?.dataset?.change) void handle2(el.dataset.change, el.dataset.key ? `${el.dataset.key}=${el.value}` : el.value);
+  }
+  function panelInput(el) {
+    if (el?.dataset?.input === "dim" && root2) {
+      paintVeil(root2, Number(el.value));
+      const out = el.parentElement?.querySelector("output");
+      if (out) out.textContent = `${el.value}%`;
+      return;
+    }
+    if (el?.dataset?.input === "pp-cap") {
+      const out = el.parentElement?.querySelector("output");
+      if (out) out.textContent = Number(el.value) === 0 ? "한도 없음" : `±${el.value}`;
+      return;
+    }
+    if (el?.dataset?.input === "pct" || el?.dataset?.input === "count") {
+      const out = el.parentElement?.querySelector("output");
+      if (out) out.textContent = `${el.value}${el.dataset.input === "pct" ? "%" : "개"}`;
+      return;
+    }
+    if (el?.dataset?.input === "wiki-query" && view2.kind === "started") {
+      wiki.query = el.value;
+      const box2 = root2?.querySelector(".nw .ph-content");
+      if (box2) box2.innerHTML = wikiList(view2.ctx);
+      return;
+    }
+    if (el?.dataset?.input === "wiki-home-query" && view2.kind === "started") {
+      wiki.homeQuery = el.value;
+      const box2 = root2?.querySelector(".nw-hero-res");
+      if (box2) box2.innerHTML = wikiHomeResults(view2.ctx);
+      return;
+    }
+    if (el?.dataset?.input && wikiInput(el.dataset.input, el.value)) return;
+    if (el?.dataset?.input && peopleInput(el.dataset.input, el.value)) return;
+    if (el?.dataset?.input && imgInput(el.dataset.input, el.value)) return;
+    if (el?.dataset?.input === "gn-draft") return void (gnet.draft = el.value);
+    if (el?.dataset?.input === "gn-to") return void (gnet.to = el.value);
+    if (el?.dataset?.input === "gn-att") return void attachInput(gnet.attach, el.dataset.key, el.value);
+    if (el?.dataset?.input === "ph-query" && view2.kind === "started") {
+      const box2 = root2?.querySelector(".ph-content");
+      if (box2) box2.innerHTML = phoneContent(view2.ctx, el.value);
+      return;
+    }
+    if (el?.dataset?.input === "ph-pick-q" && view2.kind === "started") {
+      phoneInput("ph-pick-q", el.value);
+      const box2 = root2?.querySelector(".ph-pick");
+      if (box2) box2.innerHTML = phonePickList(view2.ctx);
+      return;
+    }
+    if (el?.dataset?.input === "dir-q" && (view2.kind === "started" || view2.kind === "picker")) {
+      dirUi.q = el.value;
+      const box2 = root2?.querySelector(".dir-list");
+      if (box2) box2.innerHTML = directoryList(view2.ctx);
+      return;
+    }
+    if (el?.dataset?.input === "dir-crop-size") {
+      const key2 = el.dataset.key ?? "";
+      const [x, y] = cropValue(key2);
+      setCrop(key2, [x, y, Number(el.value)]);
+      const frame = root2?.querySelector("[data-crop] .dir-crop-frame");
+      if (frame) frame.style.width = `${el.value}%`;
+      return;
+    }
+    if (el?.dataset?.input === "dir-photo-q" && (view2.kind === "started" || view2.kind === "picker")) {
+      dirUi.pickQ = el.value;
+      const box2 = root2?.querySelector(".dir-pics");
+      if (box2) box2.innerHTML = directoryPhotoList(view2.ctx);
+      return;
+    }
+    if (el?.dataset?.input === "dir-ext-q" && (view2.kind === "started" || view2.kind === "picker")) {
+      dirUi.addQ = el.value;
+      const box2 = root2?.querySelector(".dir-ext-list");
+      if (box2) box2.innerHTML = directoryExtList(view2.ctx);
+      return;
+    }
+    if (el?.dataset?.input === "dir") return void directoryInput(el.dataset.key ?? "", el.value, root2?.querySelector(".dir-bar") ?? null);
+    if (el?.dataset?.input && phoneInput(el.dataset.input, el.value, el.dataset.key)) return;
+    if (el?.dataset?.input === "field-note") return void (field3.note = el.value);
+    if (el?.dataset?.input === "map-query" && view2.kind === "started") {
+      const box2 = root2?.querySelector(".gx-mapsug");
+      if (box2) box2.innerHTML = mapSuggestFor(view2.ctx, el.value);
+      return;
+    }
+    if (el?.dataset?.input === "start-note") {
+      const had = !!(draft.situation ?? "").trim();
+      draft.situation = el.value;
+      if (had !== !!el.value.trim()) root2?.querySelector(".gx-foot .gx-start")?.toggleAttribute("disabled", !el.value.trim() || busy4);
+      return;
+    }
+    if (el?.dataset?.input !== "mission-query") return;
+    field3.query = el.value;
+    const box = root2?.querySelector(".gx-mbox");
+    if (box && (view2.kind === "started" || view2.kind === "opening")) box.innerHTML = missionList(view2.ctx, view2.kind === "opening");
   }
   async function addPhotos(prefix, files2) {
     if (view2.kind !== "started") return;
@@ -376,8 +1069,18 @@ eight / 2), Math.min(r.height - half, e.clientY - r.top));
     if (featCtx && action.startsWith("gn-") && await handleGnet(action, value, featCtx, gnetEnv)) return;
     if (featCtx && action.startsWith("ph-") && await handlePhone(action, value, featCtx, phoneEnv)) return;
     if (action === "ed-open") {
-      if (!(view2.kind === "started" || view2.kind === "picker")) return;
-      openEditor({ ctx: () => view2.kind === "started" || view2.kind === "picker" ? view2.ctx : null, refresh: () => refresh(), theme: () => root2?.dataset.theme ?? "dark" }, value || void 0);
+      if (!(view2.kind === "started" || view2.kind === "picker" || view2.kind === "opening")) return;
+      if (view2.kind === "picker") pickerPrefs = true;
+      settingsUi.scope = view2.kind === "started" ? settingsUi.scope === "defaults" ? "defaults" : "chat" : "defaults";
+      openEditor({
+        ctx: () => view2.kind === "started" || view2.kind === "picker" || view2.kind === "opening" ? view2.ctx : null,
+        refresh: () => refresh(),
+        theme: () => root2?.dataset.theme ?? "dark",
+        handle: (a, v) => handle2(a, v),
+        input: panelInput,
+        change: panelChange,
+        canChat: () => view2.kind === "started"
+      }, value || void 0);
       return;
     }
     if (action === "install-open") {
@@ -389,10 +1092,11 @@ eight / 2), Math.min(r.height - half, e.clientY - r.top));
       return render2();
     }
     if (action === "prefs-open" || action === "prefs-close") {
-      pickerPrefs = action === "prefs-open";
       resetSettings();
       resetDirectory();
       settingsUi.scope = "defaults";
+      if (action === "prefs-open") return handle2("ed-open", "set:screen");
+      pickerPrefs = false;
       return render2();
     }
     if ((view2.kind === "started" || view2.kind === "picker" && pickerPrefs) && action.startsWith("dir-")) {
@@ -411,19 +1115,15 @@ eight / 2), Math.min(r.height - half, e.clientY - r.top));
       return;
     }
     if (action === "upd-go") {
-      if (view2.kind === "started") tab = "settings", settingsUi.scope = "chat";
-      else if (view2.kind === "picker") pickerPrefs = true;
-      render2();
-      root2?.querySelector(".upd-ver")?.closest(".ps-group")?.scrollIntoView({ block: "start" });
-      return;
+      return handle2("ed-open", "set:update");
     }
     if (action.startsWith("upd-") && (view2.kind === "started" || view2.kind === "picker") && await handleUpdate(action, view2.ctx, settingsEnv)) return;
     if (action === "pick-event" && view2.kind === "started" && tab !== "map") {
       await handleField(action, value, view2.ctx, env2, false);
-      if (field2.target?.type === "event" && field2.target.key === value && showOnMap(view2.ctx, value ?? "")) {
+      if (field3.target?.type === "event" && field3.target.key === value && showOnMap(view2.ctx, value ?? "")) {
         tab = "map";
         evUi.pop = "";
-        field2.step = "goal";
+        field3.step = "goal";
         notice2 = "";
         render2();
       }
@@ -473,10 +1173,11 @@ eight / 2), Math.min(r.height - half, e.clientY - r.top));
         if (value === tab && value !== "board" && !matchMedia("(max-width: 760px)").matches) value = "board";
       // falls through
       case "tab":
+        if (value === "settings") return handle2("ed-open", "set:screen");
         tab = TABS2.includes(value) ? value : "board";
         notice2 = "";
         if (tab === "wiki" && ["people", "person", "docs", "faction"].includes(wiki.view)) resetWiki();
-        field2.confirmEnd = null;
+        field3.confirmEnd = null;
         resetSettings();
         render2();
         if (view2.kind === "started" && tab === "phone") openCheck(view2.ctx, phoneEnv);
@@ -510,12 +1211,11 @@ eight / 2), Math.min(r.height - half, e.clientY - r.top));
         await removeMarkAt(Number(value));
         return render2();
       case "feature-set":
-        if (!(view2.kind === "started" || view2.kind === "picker" && pickerPrefs)) return;
-        if (value === "phone" || value === "wiki" || value === "visit" || value === "people" || value === "image" || value === "gnet" && GNET_ON) settingsUi.page = value;
-        return render2();
+        if (value === "phone" || value === "wiki" || value === "visit" || value === "people" || value === "image" || value === "gnet" && GNET_ON) return handle2("ed-open", `set:${value}`);
+        return;
       case "ops-sel":
         opsUi.sel = value ?? "";
-        field2.confirmEnd = null;
+        field3.confirmEnd = null;
         render2();
         if (matchMedia("(max-width: 760px)").matches) root2?.querySelector(".gx-opview")?.scrollIntoView({ block: "start", behavior: "smooth" });
         return;
@@ -696,7 +1396,7 @@ eight / 2), Math.min(r.height - half, e.clientY - r.top));
     <div class="gx-head-act">
       ${gameShown() ? `<button class="gx-x gx-fieldbtn${tab === "field" ? " on" : ""}" data-action="tab" data-value="field" aria-label="필드" title="필드">${ICONS.game}</button>` : ""}
       <button class="gx-x gx-idbtn" data-action="id-card" aria-label="내 ID카드">${userInfo().photo ? `<img src="${esc27(userInfo().photo)}" alt="">` : ICONS.idcard}</button>
-      <button class="gx-x${tab === "settings" ? " on" : ""}" data-action="tab" data-value="settings" aria-label="설정">${ICONS.settings}${hasUpdate(ctx2) ? '<span class="gx-xdot" aria-label="새 버전"></span>' : ""}</button>
+      <button class="gx-x" data-action="ed-open" data-value="set:screen" aria-label="설정">${ICONS.settings}${hasUpdate(ctx2) ? '<span class="gx-xdot" aria-label="새 버전"></span>' : ""}</button>
       <button class="gx-x" data-action="close" aria-label="닫기">${ICONS.close}</button></div>
   </header>`;
   }
@@ -727,6 +1427,7 @@ eight / 2), Math.min(r.height - half, e.clientY - r.top));
   var pageKey = () => `${tab}|${settingsUi.page}|${wiki.view}|${wiki.title}`;
   function render2() {
     if (!root2) return;
+    if (editorOpen() && editorOnSettings()) queueMicrotask(() => render());
     const nav = view2.kind === "started";
     const scroller = root2.querySelector(".gx-body");
     const keep = scroller && root2.dataset.tab === tab ? scroller.scrollTop : 0;
@@ -800,7 +1501,7 @@ eight / 2), Math.min(r.height - half, e.clientY - r.top));
     if (tab === "wiki") s5.w = { view: wiki.view, title: wiki.title, list: wiki.listOpen };
     if (tab === "phone") s5.p = { sub: phone.sub, tab: phone.tab, view: phone.view, room: phone.room, n: phone.openNotice };
     if (tab === "gnet") s5.g = { sub: gnet.sub, open: gnet.open, dm: gnet.openDm, s: gnet.settings, c: gnet.compose?.kind === "post" || gnet.compose?.kind === "newdm" ? gnet.compose : null };
-    if (tab === "map" || tab === "mission") s5.f = field2.step;
+    if (tab === "map" || tab === "mission") s5.f = field3.step;
     if (tab === "settings") s5.d = dirUi.open;
     if (tab === "board" && agUi.pop) s5.a = agUi.pop;
     return s5;
@@ -846,13 +1547,13 @@ eight / 2), Math.min(r.height - half, e.clientY - r.top));
   function applyNav(s5) {
     tab = s5.tab;
     notice2 = "";
-    field2.confirmEnd = null;
+    field3.confirmEnd = null;
     if (s5.w) Object.assign(wiki, { view: s5.w.view, title: s5.w.title, listOpen: s5.w.list });
     if (s5.p) Object.assign(phone, { sub: s5.p.sub, tab: s5.p.tab, view: s5.p.view, room: s5.p.room, openNotice: s5.p.n });
     if (s5.g) Object.assign(gnet, { sub: s5.g.sub, open: s5.g.open, openDm: s5.g.dm, settings: s5.g.s, compose: s5.g.c });
     if (s5.d !== void 0) dirUi.open = s5.d;
     agUi.pop = s5.a ?? "";
-    if (s5.f && s5.f !== field2.step) return void handle2("field-step", s5.f);
+    if (s5.f && s5.f !== field3.step) return void handle2("field-step", s5.f);
     render2();
   }
   var fieldShown = false;
@@ -935,8 +1636,6 @@ eight / 2), Math.min(r.height - half, e.clientY - r.top));
       case "opening":
         return `${header("커스텀 임무 · 첫 장면 고르기", '<button class="gx-x" data-action="repick" aria-label="시작 설정 다시 고르기">' + ICONS.back + "</button>")}<div class="gx-content">${missionTab(view2.ctx, true, notice2, busy4)}</div>`;
       case "picker":
-        if (pickerPrefs)
-          return `${header("새 채팅 기본 설정", `<button class="gx-x" data-action="prefs-close" aria-label="시작 화면으로">${ICONS.back}</button>`)}<div class="gx-content">${settingsTab(view2.ctx, settingsUi.scope === "chat" ? "defaults" : settingsUi.scope, false)}</div>`;
         return `${header(view2.staged ? "첫 전송 전까지 다시 고를 수 있어요" : "새 작전 준비", `<button class="gx-x" data-action="prefs-open" aria-label="설정">${ICONS.settings}${hasUpdate(view2.ctx) ? '<span class="gx-xdot" aria-label="새 버전"></span>' : ""}</button>`)}<div class="gx-content">${updateBanner(view2.ctx)}${picker()}</div>`;
     }
   }
@@ -985,7 +1684,7 @@ eight / 2), Math.min(r.height - half, e.clientY - r.top));
   function tabs() {
     const unreadPhone = view2.kind === "started" && phoneUnread(view2.ctx);
     const cur = tab === "mission" ? "map" : tab;
-    const item2 = (id, label, icon2, cls = "", badge2 = "") => `<button class="gx-nb${cls ? ` ${cls}` : ""}${(cls === "mob" ? cur === id : tab === id) ? " on" : ""}" data-action="${cls === "mob" ? "tab" : "nav-tab"}" data-value="${id}" aria-current="${tab === id ? "page" : "false"}">${icon2}<span>${label}</span>${badge2}</button>`;
+    const item2 = (id, label2, icon2, cls = "", badge2 = "") => `<button class="gx-nb${cls ? ` ${cls}` : ""}${(cls === "mob" ? cur === id : tab === id) ? " on" : ""}" data-action="${cls === "mob" ? "tab" : "nav-tab"}" data-value="${id}" aria-current="${tab === id ? "page" : "false"}">${icon2}<span>${label2}</span>${badge2}</button>`;
     const ctx2 = view2.kind === "started" ? view2.ctx : null;
     return `<nav class="gx-nav" aria-label="주요 화면">
     ${ctx2 ? brand(ctx2) : ""}
@@ -997,7 +1696,7 @@ eight / 2), Math.min(r.height - half, e.clientY - r.top));
     ${GNET_ON ? item2("gnet", gnetLabel(ctx2?.chat.scriptstate), ICONS.gnet) : ""}
     ${item2("wiki", "위키", ICONS.wiki)}
     ${gameShown() ? item2("field", "필드", ICONS.game, "desk") : ""}
-    ${item2("settings", "설정", ICONS.settings, "desk", ctx2 && hasUpdate(ctx2) ? '<span class="gx-nbadge dot" aria-label="새 버전"></span>' : "")}
+    <button class="gx-nb desk" data-action="ed-open" data-value="set:screen">${ICONS.settings}<span>설정</span>${ctx2 && hasUpdate(ctx2) ? '<span class="gx-nbadge dot" aria-label="새 버전"></span>' : ""}</button>
     <span class="gx-nav-gap"></span>
     ${ctx2 ? navHistBar(markOf(navState())) : ""}
     ${mbarHtml([
@@ -1023,7 +1722,7 @@ eight / 2), Math.min(r.height - half, e.clientY - r.top));
     const st = lastStatusFields((ctx2.chat.message ?? []).filter((m) => m.role === "char").slice(-6).map((m) => m.data));
     const time2 = (w ? clock(w.minute) : "") || [st?.date, st?.time].filter(Boolean).join(" ");
     const weather = [st?.weather, st?.temp].filter(Boolean).join(" ");
-    const line2 = (label, value) => value ? `<span class="gx-op-ln"><i>${label}</i><em>${esc27(value)}</em></span>` : "";
+    const line2 = (label2, value) => value ? `<span class="gx-op-ln"><i>${label2}</i><em>${esc27(value)}</em></span>` : "";
     const meta = time2 || weather ? `<span class="gx-op-meta"><span>${esc27(time2)}</span><span>${esc27(weather)}</span></span>` : "";
     const status2 = line2("위치", st?.place ?? "") + line2("목표", st?.target ?? "") + meta || (w && w.minute === null ? '<span class="gx-op-wait">첫 응답 뒤에 위치·시각이 채워져요.</span>' : "");
     const u = userInfo();
@@ -1034,14 +1733,14 @@ eight / 2), Math.min(r.height - half, e.clientY - r.top));
     const photo = photoUrl2 ? `<span class="gx-id-photo"><img src="${esc27(photoUrl2)}" alt=""></span>` : `<span class="gx-id-photo none">${ICONS.idcard}</span>`;
     return `<div class="gx-id">${img ? `<span class="gx-id-bg" style="background-image:url('${esc27(img)}')"></span>` : ""}
       ${photo}
-      <span class="gx-id-who"><b>${esc27(name)}</b><small>${esc27([f ? selfName(ctx2, f.code, f.name) : "소속 없음", pa?.rank ?? ""].filter(Boolean).join(" · "))}</small>${walletChip(ctx2)}</span>
-      ${status2 ? `<span class="gx-op-st">${status2}</span>` : ""}
+      <span class="gx-id-who"><b>${esc27(name)}</b><small>${esc27([f ? selfName(ctx2, f.code, f.name) : "소속 없음", pa?.rank ?? ""].filter(Boolean).join(" · "))}</small></span>
+      ${status2 || walletChip(ctx2) ? `<span class="gx-op-st">${walletChip(ctx2)}${status2}</span>` : ""}
     </div>`;
   }
   function walletChip(ctx2) {
     if (colConfig(ctx2.chat.scriptstate).wallet === "off") return "";
     const w = readWallet(ctx2.chat.scriptstate, getPrefs().walletStart ?? WALLET_START_DEFAULT);
-    return `<button class="gx-wallet" data-action="wallet-pop" aria-label="잔고·가계부" title="가계부">${esc27(formatWon(walletBalance(w, aliveAnchors(ctx2.chat))))}</button>`;
+    return `<button class="gx-op-ln gx-wallet" data-action="wallet-pop" aria-label="잔고·가계부" title="가계부"><i>잔고</i><em>${esc27(formatWon(walletBalance(w, aliveAnchors(ctx2.chat))))}</em></button>`;
   }
   function walletPop(ctx2) {
     if (!walletUi.open) return "";
@@ -1096,7 +1795,7 @@ eight / 2), Math.min(r.height - half, e.clientY - r.top));
     const add = (kind, i, locCode, c) => {
       const key2 = keys.get(`${kind}${i}`);
       if (!key2) return;
-      cards.push({ ...c, kind, key: key2, id: key2, locCode, open: "board-map", confirmEnd: field2.confirmEnd === key2, selected: field2.target?.type === "event" && field2.target.key === key2, art: evArt(ctx2, c.name, kind, `${locName(locCode)} ${String(c.extra ?? "").replace(/<[^>]*>/g, " ")}`) });
+      cards.push({ ...c, kind, key: key2, id: key2, locCode, open: "board-map", confirmEnd: field3.confirmEnd === key2, selected: field3.target?.type === "event" && field3.target.key === key2, art: evArt(ctx2, c.name, kind, `${locName(locCode)} ${String(c.extra ?? "").replace(/<[^>]*>/g, " ")}`) });
     };
     const since = (m) => elapsedText(w.minute, m);
     const sit = (t) => t ? `<span class="gx-evc-sit">${esc27(t)}</span>` : "";
@@ -1133,7 +1832,7 @@ eight / 2), Math.min(r.height - half, e.clientY - r.top));
     });
     const promo = w.promoted.length ? `<p class="gx-hint">결번 충원: ${esc27(w.promoted.join(", "))}</p>` : "";
     const live = (list4) => list4.filter((e) => e.state !== "발생대기").length;
-    const cnt = (cls, label, n2) => `<em class="${cls}">${label}<i>${n2}</i></em>`;
+    const cnt = (cls, label2, n2) => `<em class="${cls}">${label2}<i>${n2}</i></em>`;
     const limit = worldSettings(ctx2.char.globalLore, ctx2.chat.scriptstate).agent_limit;
     const counts = cnt("an", "괴이", live(w.an)) + cnt("in", "사건", live(w.inc)) + cnt("ms", "특수", live(w.ms));
     const clock2 = boardClock(ctx2);
@@ -1399,7 +2098,14 @@ ${fields3}${NOTE}`;
       const e = (char.globalLore ?? []).find((x) => isVirtual(x) && x.comment === b.name);
       if (e && typeof e.content === "string") parts.push({ order: b.order, text: evaluate(b.kind === "tag" ? fillStatusSection(e.content, cols) : e.content, env3) });
     }
-    if (got) parts.push(...slotParts(Object.fromEntries(LORE_KINDS.map((k) => [k, got.vars[slotVar(k)] ?? ""]))));
+    if (got) {
+      const note = activeAnomalyNote().trim();
+      const texts = Object.fromEntries(LORE_KINDS.map((k) => [k, got.vars[slotVar(k)] ?? ""]));
+      if (note && texts.anomaly?.trim() && !texts.anomaly.includes(note)) texts.anomaly = `${note}
+
+${texts.anomaly}`;
+      parts.push(...slotParts(texts));
+    }
     const seed = String(chat.scriptstate?.["$seed_lore"] ?? "");
     if (seed && shouldKeepSeed(chat) && !real.some((e) => e.comment === "📕Start Lore")) parts.push({ order: 399, text: seed });
     if (!messages.some((m) => typeof m?.content === "string" && m.content.includes(RP_HEAD))) parts.push({ order: 0, text: guideText("RP") });
@@ -1762,6 +2468,7 @@ ${fields3}${NOTE}`;
   async function start2() {
     await loadPrefs();
     await loadStoredWikiPack();
+    await loadStoredTokenizer();
     assetsFirst = loadModuleAssets();
     void redrawAfterLoad();
     setWikiOpener((title2) => void openWiki2(title2));
@@ -1797,5 +2504,5 @@ ${fields3}${NOTE}`;
   }
 
   // src/body-entry.ts
-  globalThis.__goeiBody = { version: "0.17.2", start: start2 };
+  globalThis.__goeiBody = { version: "0.17.3", start: start2 };
 })();

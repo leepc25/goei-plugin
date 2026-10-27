@@ -1,4 +1,385 @@
- upto ?? nowMin ?? lo;
+() && !String(m.data).includes("%%")).length;
+  }
+  function postLimit(s5) {
+    return QUANTITY[s5.quantity]?.max ?? 7;
+  }
+  function protectedPost(s5, p) {
+    if (p.mine) return s5.keepOwn;
+    return s5.keepReplied && p.comments.some((c) => c.mine);
+  }
+  function trimBoard(st, s5) {
+    const cap = postLimit(s5);
+    while (st.posts.length > cap) {
+      let idx = -1;
+      for (let i = st.posts.length - 1; i >= 0; i--) {
+        if (!protectedPost(s5, st.posts[i])) {
+          idx = i;
+          break;
+        }
+      }
+      if (idx < 0) break;
+      st.posts.splice(idx, 1);
+    }
+  }
+  function trimDms(st, cap = HISTORY.dmKeep) {
+    const counts = /* @__PURE__ */ new Map();
+    const keep = /* @__PURE__ */ new Set();
+    for (let i = st.dms.length - 1; i >= 0; i--) {
+      const n2 = (counts.get(st.dms[i].nick) ?? 0) + 1;
+      counts.set(st.dms[i].nick, n2);
+      if (n2 <= cap) keep.add(i);
+    }
+    st.dms = st.dms.filter((_, i) => keep.has(i));
+  }
+  function replyForUser(p, c) {
+    if (c.mine) return false;
+    if (p.mine) return true;
+    let parent = c.parent;
+    const seen2 = /* @__PURE__ */ new Set();
+    while (parent && p.comments[parent - 1] && !seen2.has(parent)) {
+      seen2.add(parent);
+      const row8 = p.comments[parent - 1];
+      if (row8.mine) return true;
+      parent = row8.parent;
+    }
+    return false;
+  }
+  function reconcileUnread(st, previous) {
+    const old = new Map(previous.posts.map((p) => [p.id, p]));
+    const run3 = (rows2, prior, side, wanted) => {
+      const queue2 = /* @__PURE__ */ new Map();
+      for (const r of prior) {
+        const k = `${side(r)}\0${r.nick}\0${r.body}`;
+        queue2.set(k, [...queue2.get(k) ?? [], r]);
+      }
+      for (const r of rows2) {
+        const before = queue2.get(`${side(r)}\0${r.nick}\0${r.body}`)?.shift();
+        r.unread = before ? before.unread : wanted(r);
+        if (!wanted(r)) r.unread = false;
+      }
+    };
+    for (const p of st.posts) run3(p.comments, old.get(p.id)?.comments ?? [], (c) => c.mine ? "me" : "npc", (c) => replyForUser(p, c));
+    run3(st.dms, previous.dms, (d) => d.side, (d) => d.side !== "me");
+  }
+  function acknowledge(st, post, nick) {
+    let changed = false;
+    if (post !== void 0) {
+      for (const c of findPost(st, post)?.comments ?? []) if (c.unread) [c.unread, changed] = [false, true];
+    }
+    if (nick !== void 0) {
+      for (const d of st.dms) if (d.nick === nick && d.unread) [d.unread, changed] = [false, true];
+    }
+    return changed;
+  }
+  var postUnread = (p) => p.comments.some((c) => c.unread);
+  var boardUnread = (st) => st.posts.some(postUnread);
+  var dmUnread = (st, nick) => st.dms.some((d) => d.unread && (nick === void 0 || d.nick === nick));
+  function writeGnet(chat, st, opts = {}) {
+    if (opts.reconcile !== false) reconcileUnread(st, readGnet(chat));
+    if (opts.ack) acknowledge(st, opts.ack.post ?? void 0, opts.ack.nick ?? void 0);
+    const keep = gnetRetention(chat.scriptstate);
+    if (keep.auto) trimDms(st, keep.limit);
+    const raw = encode(st);
+    const unread = boardUnread(st) || dmUnread(st);
+    return { ...chat, scriptstate: { ...chat.scriptstate ?? {}, [GN_RAW]: raw, "$st_unread_gnet": unread ? "1" : "0" } };
+  }
+  function addUserPost(st, nick, title2, body5, date) {
+    st.seq += 1;
+    const p = {
+      id: st.seq,
+      date: validDate(date),
+      nick: cut(nick, 80),
+      title: trimTokens(title2, LIMITS.title_tokens),
+      body: trimTokens(body5, LIMITS.post_tokens),
+      views: 0,
+      votes: 0,
+      mine: true,
+      comments: []
+    };
+    st.posts.unshift(p);
+    return p;
+  }
+  function addUserComment(st, postIdValue, parent, nick, body5, now = "") {
+    const p = findPost(st, postIdValue);
+    if (!p) throw new GnetError("대상 글이 없어졌어요.");
+    if (parent > 0 && !p.comments[parent - 1]) throw new GnetError("답글을 달 댓글이 없어졌어요.");
+    p.comments.push({ parent, nick, body: trimTokens(body5, LIMITS.comment_tokens), mine: true, unread: false });
+    stampComments(p, p.comments.length - 1, [now ? hhmm(now) : ""], now);
+    return p.comments.length;
+  }
+  function deletePost(st, id) {
+    const i = st.posts.findIndex((p) => p.id === id && p.mine);
+    if (i < 0) return false;
+    st.posts.splice(i, 1);
+    return true;
+  }
+  function deleteComment(st, id, k) {
+    const p = findPost(st, id);
+    const target = p?.comments[k - 1];
+    if (!p || !target?.mine) return false;
+    const up = target.parent;
+    p.comments.splice(k - 1, 1);
+    for (const c of p.comments) {
+      if (c.parent === k) c.parent = up;
+      else if (c.parent > k) c.parent -= 1;
+    }
+    return true;
+  }
+  function deleteThread(st, nick) {
+    const before = st.dms.length;
+    st.dms = st.dms.filter((d) => d.nick !== nick);
+    const had = nick in st.sources;
+    delete st.sources[nick];
+    return before !== st.dms.length || had;
+  }
+  function dmThreads(st) {
+    const map = /* @__PURE__ */ new Map();
+    st.dms.forEach((d, i) => {
+      const t = map.get(d.nick) ?? { nick: d.nick, rows: [], unread: 0, last: -1, lastDate: "" };
+      t.rows.push(d);
+      if (d.unread) t.unread++;
+      t.last = i;
+      if (d.side === "npc" && d.date) t.lastDate = d.date;
+      map.set(d.nick, t);
+    });
+    return [...map.values()].sort((a, b) => b.last - a.last);
+  }
+  function findPublicSource(st, nick) {
+    let found;
+    let match = null;
+    for (const p of st.posts) {
+      if (p.nick === nick && !p.mine) {
+        if (match !== null && match !== p.id) return void 0;
+        found = { postid: p.id, title: p.title, body: trimTokens(p.body, LIMITS.origin_tokens), author: p.nick, quote: "", quoteAuthor: "" };
+        match = p.id;
+      }
+      for (const c of p.comments) {
+        if (c.nick === nick && !c.mine) {
+          if (match !== null && match !== p.id) return void 0;
+          found = { postid: p.id, title: p.title, body: trimTokens(p.body, LIMITS.origin_tokens), author: p.nick, quote: trimTokens(c.body, LIMITS.quote_tokens), quoteAuthor: c.nick };
+          match = p.id;
+        }
+      }
+    }
+    return found;
+  }
+  function sourceFor(p, ci) {
+    const c = ci > 0 ? p.comments[ci - 1] : void 0;
+    return {
+      postid: p.id,
+      title: p.title,
+      body: trimTokens(p.body, LIMITS.origin_tokens),
+      author: p.nick,
+      quote: c ? trimTokens(c.body, LIMITS.quote_tokens) : "",
+      quoteAuthor: c ? c.nick : ""
+    };
+  }
+  function addOutgoingDm(st, nick, body5, date, source4) {
+    if (!st.sources[nick]) {
+      const s5 = source4 ?? findPublicSource(st, nick);
+      if (s5) st.sources[nick] = s5;
+    }
+    st.dms.push({ nick, side: "me", body: trimTokens(body5, LIMITS.dm_tokens), unread: false, date });
+  }
+  function parseJsonPayload(raw) {
+    let text = String(raw ?? "").replace(/^﻿/, "").trim();
+    for (let i = 0; i < 12; i++) {
+      const before = text;
+      if (text.startsWith("{")) break;
+      const tag = /^<(think|thoughts|analysis|lb-process)(?:\s[^>]*)?>/i.exec(text);
+      if (tag) {
+        const end = text.toLowerCase().indexOf(`</${tag[1].toLowerCase()}>`);
+        if (end >= 0) text = text.slice(end + tag[1].length + 3).trim();
+        else if (/\n\s*\{/.test(text)) text = text.slice(text.search(/\n\s*\{/)).trim();
+      } else {
+        const fence = /^```[\w-]*\s*\n([\s\S]*?)\n?```\s*$/.exec(text);
+        if (fence) text = fence[1].trim();
+        else {
+          const wrap = /^<(output|json|lb-gn)(\s[^>]*)?>([\s\S]*)<\/\1>\s*$/i.exec(text);
+          if (wrap) text = wrap[3].trim();
+        }
+      }
+      if (text === before) break;
+    }
+    try {
+      return JSON.parse(text);
+    } catch {
+      const dup = /^([\s\S]*\})\s*\{\s*"comments"\s*:\s*\[\s*\]\s*\}\s*$/.exec(text);
+      if (dup) {
+        try {
+          return JSON.parse(dup[1]);
+        } catch {
+        }
+      }
+      const a = text.indexOf("{");
+      const b = text.lastIndexOf("}");
+      if (a >= 0 && b > a) {
+        const body5 = text.slice(a, b + 1);
+        try {
+          return JSON.parse(body5);
+        } catch {
+          const fixed = body5.replace(/,(\s*[}\]])/g, "$1").replace(/[\u0000-\u001f]/g, (c) => c === "\n" || c === "\r" || c === "	" ? c : "");
+          try {
+            return JSON.parse(fixed.replace(/"((?:[^"\\]|\\.)*)"/g, (m) => m.replace(/\n/g, "\\n").replace(/\r/g, "\\r").replace(/\t/g, "\\t")));
+          } catch {
+          }
+        }
+      }
+      throw new GnetError("AI 응답을 JSON으로 읽지 못했어요.", raw);
+    }
+  }
+  var isObj = (v) => !!v && typeof v === "object" && !Array.isArray(v);
+  var str2 = (v) => typeof v === "string" ? v : typeof v === "number" ? String(v) : "";
+  var int = (v) => {
+    const n2 = typeof v === "string" && v.trim() ? Number(v) : v;
+    return typeof n2 === "number" && Number.isInteger(n2) ? n2 : null;
+  };
+  function applyBoard(before, current4, value, o) {
+    if (snapshotKey(before) !== snapshotKey(current4)) throw new GnetError("생성하는 동안 게시판이 바뀌어서 새로고침 결과를 적용하지 않았어요.");
+    if (!isObj(value)) throw new GnetError("게시판 JSON 객체가 아니에요.");
+    const rows2 = o.settings.sampling && Array.isArray(value.alternativePosts) && value.alternativePosts.length ? value.alternativePosts : value.posts;
+    if (!Array.isArray(rows2) || !rows2.length) throw new GnetError("posts 배열에 게시글이 없어서 기존 게시판을 유지했어요.");
+    const st = structuredClone(current4);
+    const old = new Map(st.posts.map((p) => [p.id, p]));
+    const posts = [];
+    const seen2 = /* @__PURE__ */ new Set();
+    let skippedPosts = 0;
+    let skippedComments = 0;
+    let commentTotal = 0;
+    const day = /^(\d{4}[.-]\d\d[.-]\d\d)/.exec(o.date)?.[1]?.replace(/-/g, ".");
+    const floor = Math.max(1e5, current4.seq);
+    for (const raw of rows2) {
+      if (!isObj(raw)) continue;
+      let pid = int(raw.id);
+      const prev = pid !== null ? old.get(pid) : void 0;
+      const author = str2(raw.author).trim();
+      if (!prev && (raw.mine === true || author === o.nick)) {
+        skippedPosts++;
+        continue;
+      }
+      if (!prev && (pid === null || pid <= floor || seen2.has(pid))) pid = Math.max(st.seq, floor) + 1;
+      if (pid === null || seen2.has(pid)) continue;
+      seen2.add(pid);
+      st.seq = Math.max(st.seq, pid);
+      const comments = Array.isArray(raw.comments) ? raw.comments : [];
+      commentTotal += comments.length;
+      let date = validDate(raw.date);
+      if (!date) date = day && str2(raw.time).trim() ? `${day} ${str2(raw.time).trim()}` : o.date;
+      const q = {
+        id: pid,
+        nick: cut(author || "ㅇㅇ", 80),
+        title: str2(raw.title),
+        body: stripForged(str2(raw.content)),
+        date,
+        views: Math.max(0, int(raw.views) ?? 0),
+        votes: Math.max(0, int(raw.upvotes) ?? 0),
+        mine: prev?.mine ?? false,
+        comments: []
+      };
+      const sigs = /* @__PURE__ */ new Map();
+      const remap = /* @__PURE__ */ new Map([[0, 0]]);
+      if (prev) {
+        Object.assign(q, { nick: prev.nick, title: prev.title, body: prev.body, date: prev.date, views: Math.max(prev.views, q.views), votes: Math.max(prev.votes, q.votes) });
+        for (const c of prev.comments) {
+          q.comments.push(c);
+          sigs.set(`${c.nick}\0${c.body}`, q.comments.length);
+        }
+      }
+      const raws = [];
+      comments.forEach((c, i) => {
+        const n2 = i + 1;
+        if (!isObj(c)) return void remap.set(n2, false);
+        const cAuthor = str2(c.author).trim();
+        const content = stripForged(str2(c.content));
+        let parent = int(c.parent) ?? 0;
+        if (parent < 0 || parent >= n2) parent = 0;
+        const sig = `${cAuthor}\0${content}`;
+        if (sigs.has(sig)) return void remap.set(n2, sigs.get(sig));
+        if (!cAuthor || !content.trim() || c.mine === true || cAuthor === o.nick || remap.get(parent) === false) {
+          skippedComments++;
+          return void remap.set(n2, false);
+        }
+        q.comments.push({ nick: cut(cAuthor, 80), body: content, parent: remap.get(parent) ?? 0, mine: false, unread: false });
+        raws.push(str2(c.time).trim());
+        sigs.set(sig, q.comments.length);
+        remap.set(n2, q.comments.length);
+      });
+      stampComments(q, q.comments.length - raws.length, raws, o.date);
+      if (!q.title.trim() && !q.body.trim()) continue;
+      posts.push(q);
+    }
+    if (!posts.length) throw new GnetError("적용할 정상 게시글이 없어서 기존 게시판을 유지했어요.");
+    for (const p of st.posts) if (protectedPost(o.settings, p) && !seen2.has(p.id)) posts.push(p);
+    st.posts = posts;
+    trimBoard(st, o.settings);
+    const notice3 = skippedPosts + skippedComments > 0 ? `게시판을 새로 불러왔어요. 사용자 명의로 온 새 글 ${skippedPosts}개와 댓글·연결 답글 ${skippedComments}개는 뺐어요.` : "";
+    return { st, notice: notice3, emptyComments: commentTotal === 0 };
+  }
+  function acceptComments(rows2, existing, t, nick, base = t.total) {
+    const list4 = Array.isArray(rows2) ? rows2.slice(0, LIMITS.replies) : [];
+    let dropped = Array.isArray(rows2) ? Math.max(0, rows2.length - LIMITS.replies) : 0;
+    const out = [];
+    const map = /* @__PURE__ */ new Map();
+    const seen2 = new Set(existing.map((c) => `${c.nick}\0${c.body}`));
+    list4.forEach((c, i) => {
+      const own = t.total + i + 1;
+      const bad = () => {
+        dropped++;
+        map.set(own, false);
+      };
+      if (!isObj(c)) return bad();
+      const author = str2(c.author).trim();
+      const content = stripForged(str2(c.content)).trim();
+      let n2 = int(c.parent);
+      if (n2 === null || n2 === 0) n2 = t.replyTo;
+      if (!author || [...author].length > 80 || author === nick || !content) return bad();
+      if (n2 > t.total) {
+        const m = map.get(n2);
+        if (m === void 0 || m === false) return bad();
+        n2 = m;
+      } else if (n2 < 0 || n2 > 0 && !t.supplied.has(n2) && n2 !== t.replyTo) return bad();
+      if (t.replyTo > 0 && n2 !== t.replyTo && n2 <= t.total) return bad();
+      const sig = `${author}\0${content}`;
+      if (seen2.has(sig)) return bad();
+      seen2.add(sig);
+      out.push({ author: cut(author, 80), content: trimTokens(content, LIMITS.comment_tokens), parent: n2, time: str2(c.time).trim() });
+      map.set(own, base + out.length);
+    });
+    return { comments: out, dropped };
+  }
+  function stampMinutes(stamp) {
+    const m = /^(\d{4})[.-](\d\d)[.-](\d\d)\s+(\d\d):(\d\d)/.exec(String(stamp ?? "").trim());
+    if (!m) return null;
+    const t = Date.UTC(+m[1], +m[2] - 1, +m[3], +m[4], +m[5]);
+    return Number.isFinite(t) ? Math.floor(t / 6e4) : null;
+  }
+  function minutesStamp(min) {
+    const d = new Date(min * 6e4);
+    const p = (n2) => String(n2).padStart(2, "0");
+    return `${d.getUTCFullYear()}.${p(d.getUTCMonth() + 1)}.${p(d.getUTCDate())} ${p(d.getUTCHours())}:${p(d.getUTCMinutes())}`;
+  }
+  var hhmm = (stamp) => /(\d\d:\d\d)/.exec(String(stamp ?? ""))?.[1] ?? "";
+  function clockMinutes(raw) {
+    const m = /(?:^|\s|T)(\d{1,2}):(\d\d)(?::\d\d)?\s*$/.exec(raw.trim()) ?? /^(\d{1,2}):(\d\d)/.exec(raw.trim());
+    if (!m) return null;
+    const h = +m[1];
+    const mi = +m[2];
+    return h < 24 && mi < 60 ? h * 60 + mi : null;
+  }
+  function stampComments(p, from, raws, now) {
+    const nowMin = stampMinutes(now);
+    const postMin = stampMinutes(p.date);
+    const floorOf = (i) => {
+      const c = p.comments[i];
+      const cands = [postMin, stampMinutes(c.parent > 0 ? p.comments[c.parent - 1]?.time : void 0), i > 0 ? stampMinutes(p.comments[i - 1]?.time) : null];
+      const known = cands.filter((x) => x !== null);
+      return known.length ? Math.max(...known) : null;
+    };
+    const pending = [];
+    const settle = (upto) => {
+      if (!pending.length) return;
+      const lo = floorOf(pending[0]);
+      const hi = upto ?? nowMin ?? lo;
       if (lo === null || hi === null) return void (pending.length = 0);
       const span = Math.max(0, hi - lo);
       pending.forEach((idx, k) => {
@@ -66,8 +447,8 @@
     const kept = plain3.split("\n").filter((line2) => {
       const t = line2.trim();
       const note = /^[(\[](.*)[)\]]$/.exec(t)?.[1];
-      const label = note?.replace(/：/g, ":").match(/^\s*(.*?)\s*:/)?.[1]?.toLowerCase();
-      const dup = !!label && ["첨부파일", "첨부 파일", "첨부자료", "첨부 자료", "첨부", "attachment", "attached file"].includes(label);
+      const label2 = note?.replace(/：/g, ":").match(/^\s*(.*?)\s*:/)?.[1]?.toLowerCase();
+      const dup = !!label2 && ["첨부파일", "첨부 파일", "첨부자료", "첨부 자료", "첨부", "attachment", "attached file"].includes(label2);
       return literal.has(t) || !dup;
     });
     const records = attachmentRecords(input2).map((r) => r.text);
@@ -312,6 +693,7 @@ ${JSON.stringify({ feature: "gnet", records })}
     if (!same(base.roster_notes, full.roster_notes)) out.roster_notes = full.roster_notes ?? [];
     if (!!base.noSummary !== !!full.noSummary) out.noSummary = !!full.noSummary;
     if (!!base.rosterOff !== !!full.rosterOff) out.rosterOff = !!full.rosterOff;
+    if (!!base.relOff !== !!full.relOff) out.relOff = !!full.relOff;
     return Object.keys(out).length ? out : void 0;
   }
   function putRecord(over, kind, name, full) {
@@ -342,6 +724,7 @@ ${JSON.stringify({ feature: "gnet", records })}
     let n2 = 0;
     for (const k of Object.keys(over)) {
       if (k === "relations") n2 += Object.keys(over.relations?.pairs ?? {}).length + (over.relations?.common !== void 0 ? 1 : 0);
+      else if (k === "anomalyNote") n2 += over.anomalyNote !== void 0 ? 1 : 0;
       else n2 += Object.keys(over[k] ?? {}).length;
     }
     return n2;
@@ -1314,10 +1697,10 @@ ${body5}` : `##### ${sec.title}`);
     return added;
   }
   function invitationPacket(st, candidates, allowed) {
-    const ok2 = allowed && candidates.length >= 2;
+    const ok = allowed && candidates.length >= 2;
     return {
-      allowed: ok2,
-      maxNew: ok2 ? LIMITS2.invitations : 0,
+      allowed: ok,
+      maxNew: ok ? LIMITS2.invitations : 0,
       candidates,
       existingGroups: Object.values(st.rooms).filter((r) => r.kind === "group").map((r) => ({ name: roomLabel(r), members: r.members }))
     };
@@ -2199,14 +2582,14 @@ ${recent > 0 ? `{{#when {{greater_equal::{{chat_index}}::{{? {{lastmessageid}}-$
     ["인시던트 RP 유지 시간", "incident_ttl", 8760, true],
     ["미스틱 사이트 RP 유지 시간", "mystic_ttl", 8760, true],
     ["인시던트 중 거점 비율", "landmark_share", 100, false]
-  ].map(([label, key2, max, fraction]) => ({ key: key2, label, max, fraction }));
+  ].map(([label2, key2, max, fraction]) => ({ key: key2, label: label2, max, fraction }));
   var wgKey = (key2) => `$wg_${key2}`;
   function worldValue(f, v) {
     const n2 = num2(v);
     if (n2 === null || n2 < 0 || f.max !== null && n2 > f.max || !f.fraction && !Number.isInteger(n2)) return null;
     return n2;
   }
-  var cache4 = /* @__PURE__ */ new WeakMap();
+  var cache5 = /* @__PURE__ */ new WeakMap();
   var MARK_MAX = 5;
   var DIM_DEFAULT = 50;
   var prefs = { basic: {}, world: {} };
@@ -2244,6 +2627,7 @@ ${recent > 0 ? `{{#when {{greater_equal::{{chat_index}}::{{? {{lastmessageid}}-$
     const status2 = o.status === "off" || o.status === "light" || o.status === "dark" || o.status === "paper" ? o.status : void 0;
     const size = imgSize(o.imgSize);
     const fold3 = imgFold(o.imgFold);
+    const imgFoldOn = o.imgFoldOn === false ? false : void 0;
     const show = imgRecent(o.imgShow);
     const send2 = imgRecent(o.imgSend);
     const marks2 = (Array.isArray(o.marks) ? o.marks : []).filter((m) => !!m && typeof m === "object" && typeof m.name === "string" && !!m.s && typeof m.s.tab === "string").slice(0, MARK_MAX).map((m) => ({ s: m.s, name: m.name.slice(0, 80) }));
@@ -2260,12 +2644,12 @@ ${recent > 0 ? `{{#when {{greater_equal::{{chat_index}}::{{? {{lastmessageid}}-$
     for (const k of GUIDE_NAMES) setGuideOverride(k, guides[k]);
     const relationsSym = o.relationsSym === false ? false : void 0;
     const walletStart = int2(o.walletStart, 0, 1e12);
-    prefs = { basic, world, ...walletStart !== null ? { walletStart } : {}, ...editorWidth !== null ? { editorWidth } : {}, ...Object.keys(guides).length ? { guides } : {}, ...relationsSym === false ? { relationsSym } : {}, ...theme ? { theme } : {}, ...imgPrompt ? { imgPrompt } : {}, ...imgNamesOff.length ? { imgNamesOff } : {}, ...imgNamesExtra.length ? { imgNamesExtra } : {}, ...imgKeywords.length ? { imgKeywords } : {}, ...Object.keys(vars).length ? { vars } : {}, ...nav ? { nav } : {}, ...agents ? { agents } : {}, ...dim !== null ? { dim } : {}, ...status2 ? { status: status2 } : {}, ...size !== null ? { imgSize: size } : {}, ...fold3 !== null ? { imgFold: fold3 } : {}, ...show !== null ? { imgShow: show } : {}, ...send2 !== null ? { imgSend: send2 } : {}, ...marks2.length ? { marks: marks2 } : {} };
+    prefs = { basic, world, ...walletStart !== null ? { walletStart } : {}, ...editorWidth !== null ? { editorWidth } : {}, ...Object.keys(guides).length ? { guides } : {}, ...relationsSym === false ? { relationsSym } : {}, ...theme ? { theme } : {}, ...imgPrompt ? { imgPrompt } : {}, ...imgNamesOff.length ? { imgNamesOff } : {}, ...imgNamesExtra.length ? { imgNamesExtra } : {}, ...imgKeywords.length ? { imgKeywords } : {}, ...Object.keys(vars).length ? { vars } : {}, ...nav ? { nav } : {}, ...agents ? { agents } : {}, ...dim !== null ? { dim } : {}, ...status2 ? { status: status2 } : {}, ...size !== null ? { imgSize: size } : {}, ...fold3 !== null ? { imgFold: fold3 } : {}, ...imgFoldOn === false ? { imgFoldOn } : {}, ...show !== null ? { imgShow: show } : {}, ...send2 !== null ? { imgSend: send2 } : {}, ...marks2.length ? { marks: marks2 } : {} };
     return prefs;
   }
   function readSettingsBook(lore) {
     const list4 = lore ?? [];
-    const hit3 = cache4.get(list4);
+    const hit3 = cache5.get(list4);
     if (hit3) return hit3;
     let out = { basic: {}, world: {} };
     for (const name of ["Settings", "통합설정"]) {
@@ -2280,7 +2664,7 @@ ${recent > 0 ? `{{#when {{greater_equal::{{chat_index}}::{{? {{lastmessageid}}-$
       }
       break;
     }
-    cache4.set(list4, out);
+    cache5.set(list4, out);
     return out;
   }
   function num2(v) {
@@ -2374,7 +2758,7 @@ ${recent > 0 ? `{{#when {{greater_equal::{{chat_index}}::{{? {{lastmessageid}}-$
 
   // src/host/overlay.ts
   var OPENING_CSS = '.default-chat-screen:has(.chat-message-container) [data-goei-card="opening"]{display:none!important}';
-  var chatCss = (t) => cardVarsCss(t) + LANDING_CSS + OPENING_CSS + statusCss(getPrefs().status ?? "auto", t) + imgCss(getPrefs().imgSize, getPrefs().imgFold, imgHidden());
+  var chatCss = (t) => cardVarsCss(t) + LANDING_CSS + OPENING_CSS + statusCss(getPrefs().status ?? "auto", t) + imgCss(getPrefs().imgSize, getPrefs().imgFoldOn === false ? 100 : getPrefs().imgFold, imgHidden());
   function themeVars(sel) {
     return Object.keys(PALETTES).map((t) => {
       const p = PALETTES[t];
@@ -2472,9 +2856,9 @@ ${themeVars("[x-goei-fab]")}
   100% { transform: translate(0); }
 }
 `;
-  var FAB_HTML = (label) => `<span data-gr></span><span data-gr></span>
+  var FAB_HTML = (label2) => `<span data-gr></span><span data-gr></span>
 <span data-gl aria-hidden="true"><span data-gs></span><span data-gt>ANOMALY SIMULATION</span></span>
-<button type="button" aria-label="${label}">${GHOST_ICON}</button>`;
+<button type="button" aria-label="${label2}">${GHOST_ICON}</button>`;
   async function body() {
     const doc2 = await risuai.getRootDocument();
     if (!doc2) return null;
@@ -2723,8 +3107,8 @@ ${themeVars("[x-goei-fab]")}
   }
 
   // src/core/advanced.ts
-  var chip = (key2, label, def, v) => ({ key: key2, label, type: "bool", def: String(def), ...v ? { v } : {} });
-  var num3 = (key2, label, def, min, max, unit, extra = {}) => ({ key: key2, label, type: "num", def, min, max, unit, ...extra });
+  var chip = (key2, label2, def, v) => ({ key: key2, label: label2, type: "bool", def: String(def), ...v ? { v } : {} });
+  var num3 = (key2, label2, def, min, max, unit, extra = {}) => ({ key: key2, label: label2, type: "num", def, min, max, unit, ...extra });
   var TOK = "토큰";
   var budget = num3("budget", "요청 토큰 상한", 0, 0, 2e5, TOK, { zero: "공통", hint: "넘으면 2차 참조, 관련 로어북, 오래된 채팅 순으로 줄여요" });
   var turns = (def) => num3("turns", "채팅 참고", def, 0, 200, "턴", { zero: "안 봄" });
@@ -3344,11 +3728,11 @@ ${req.docRequest.trim()}`;
   function reviewLinks(body5, title2, canon2) {
     const seen2 = /* @__PURE__ */ new Set();
     const self = canon2(title2);
-    return body5.replace(/➡️([^➡\n]{0,120}?)➡️/g, (_all, label) => {
-      const t = label.trim();
-      if (!t || /[[\]|]/.test(t) || !validTitle(t)) return label;
+    return body5.replace(/➡️([^➡\n]{0,120}?)➡️/g, (_all, label2) => {
+      const t = label2.trim();
+      if (!t || /[[\]|]/.test(t) || !validTitle(t)) return label2;
       const c = canon2(t);
-      if (c === self || seen2.has(c)) return label;
+      if (c === self || seen2.has(c)) return label2;
       seen2.add(c);
       return `➡️${t}➡️`;
     });
@@ -3891,406 +4275,4 @@ ROLE BINDING (application-owned metadata):
 ${JSON.stringify(identity)}`;
     outro += `
 ${b.language}`;
-    return `${intro}
-${outro}${attachments ? `
-
-${b.read("ATTACHMENTS.READ")}` : ""}`;
-  }
-  function pack2(src, b, guideline, format, extras2, factionNames2, identity) {
-    const n2 = trimTurns(HISTORY.turns);
-    const story = n2 ? storyText(recentTurns(src.chat, n2)) : "";
-    const t = refToggles(src.chat.scriptstate, "gn");
-    const rows2 = collectRefs(src, {
-      scope: "gnet",
-      text: `${extras2}
-${story}`,
-      description: t.description,
-      authors: t.authors,
-      persona: t.persona,
-      active: t.active,
-      related: t.related && !trimRelated(),
-      secondary: t.secondary && !trimSecondary(),
-      extra: [{ source: "현재 발생 상황", content: b.read("LB.EXTRA") }]
-    });
-    const material = `[참고 자료 — 작중 인물에게 자동 공개되지 않음]
-${refText(rows2)}
-[최근 본문]
-${story}
-[현재 작업]
-${extras2}`;
-    const attachments = hasAttachment(material);
-    return {
-      messages: [
-        { role: "system", content: factionCodesToNames(systemText(b, guideline, format, identity, attachments), factionNames2) },
-        { role: "user", content: factionCodesToNames(material, factionNames2) }
-      ]
-    };
-  }
-  function incomingRules(b, plan) {
-    return plan.allowed ? `${b.read("INCOMING.GUIDELINE")}
-${b.read("INCOMING.COMBINED")}` : b.read("INCOMING.DISABLED");
-  }
-  function activityRules(b, posts) {
-    return b.read(posts.length ? "ACTIVITY.GUIDELINE" : "ACTIVITY.DISABLED");
-  }
-  function commentTimeRule(now) {
-    return `Comment time: every NEW comment (including replies and activity comments) also has "time": "HH:MM", the 24-hour narrative time it was posted. It must be after its post and after the comment it replies to, and not later than the current narrative time${now ? ` (${now})` : ""}. Space comments realistically: quick replies minutes apart, slower threads hours apart. Supplied "time" values on existing comments are records; never change them.`;
-  }
-  function boardJson(posts) {
-    return JSON.stringify({
-      posts: posts.map((p) => ({
-        author: p.nick,
-        id: p.id,
-        title: p.title,
-        time: /(\d\d:\d\d)/.exec(p.date)?.[1] ?? "",
-        date: p.date,
-        views: p.views,
-        upvotes: p.votes,
-        content: p.body,
-        mine: p.mine,
-        comments: p.comments.map((c) => ({ author: c.nick, ...whenField(p, c), content: c.body, parent: c.parent, mine: c.mine }))
-      }))
-    });
-  }
-  function refreshPrompt(src, st, plan, nick, factionNames2) {
-    const s5 = gnetSettings(src.chat.scriptstate);
-    const b = gnetBooks(src);
-    const range = QUANTITY[s5.quantity]?.range ?? "5-7";
-    const guideline = [
-      `${b.read("LB")}
-
-${b.read("BOARD.GUIDELINE")}`,
-      b.read("AUTO.GUIDELINE").replace(/__GN_POST_RANGE__/g, range),
-      `${b.read("ATTACHMENTS")}
-${incomingRules(b, plan)}`
-    ].join("\n\n");
-    let format = `${b.read("AUTO.FORMAT")}
-${commentTimeRule(dateNow(src.chat))}`;
-    if (s5.sampling) {
-      format += "\nDiversity sampling is ON. Include alternativePosts alongside posts and incoming. posts and alternativePosts are two meaningfully different complete boards, each following the same post/comment schema and configured quantity. Sample each from low-probability possibilities below 0.10 and order them by probability descending. The application validates both and uses alternativePosts, the second candidate.";
-    }
-    const protectedIds = [];
-    const reference = st.posts.filter((p, i) => {
-      const prot = protectedPost(s5, p);
-      if (prot) protectedIds.push(p.id);
-      return i < HISTORY.refresh || prot;
-    });
-    const extras2 = fill2(b.read("EXTENSION.REQUEST"), {
-      TIME: dateNow(src.chat),
-      USER_NICK: nick,
-      KEEP_OWN: String(s5.keepOwn),
-      KEEP_REPLIED: String(s5.keepReplied),
-      PROTECTED: protectedIds.join(","),
-      POST_LIMIT: String(postLimit(s5)),
-      NEXT_ID: String(st.seq || 1e5),
-      ACTION: b.read("ACTION.REFRESH"),
-      BOARD: boardJson(reference)
-    }) + incomingTask(plan);
-    return pack2(src, b, guideline, format, extras2, factionNames2);
-  }
-  function postPrompt(src, st, input2, plan, factionNames2) {
-    const b = gnetBooks(src);
-    const activity = activityContext(st, null);
-    const guideline = [b.read("LB"), b.read("ATTACHMENTS"), b.read("TITLE.GUIDELINE"), b.read("REACT.GUIDELINE"), b.read("PUBLIC.GUIDELINE"), incomingRules(b, plan), activityRules(b, activity.posts)].join("\n\n");
-    const extras2 = input2 + incomingTask(plan, activity.posts);
-    return { ...pack2(src, b, guideline, `${b.read("PUBLIC.POST_FORMAT")}
-${commentTimeRule(dateNow(src.chat))}`, extras2, factionNames2), activity };
-  }
-  function commentPrompt(src, st, postId2, replyTo, body5, plan, nick, factionNames2, action = `The protagonist publicly commented: ${body5}`) {
-    const b = gnetBooks(src);
-    const p = findPost(st, postId2);
-    if (!p) throw new GnetError("대상 글이 없어졌어요.");
-    const limit = replyTo > 0 ? HISTORY.comment : HISTORY.post;
-    const total = p.comments.length;
-    const selected = /* @__PURE__ */ new Set();
-    for (let i = Math.max(1, total - limit + 1); i <= total; i++) selected.add(i);
-    if (replyTo > 0) selected.add(replyTo);
-    for (const i of [...selected]) {
-      let n2 = i;
-      const seen2 = /* @__PURE__ */ new Set();
-      while (p.comments[n2 - 1] && !seen2.has(n2)) {
-        seen2.add(n2);
-        selected.add(n2);
-        n2 = p.comments[n2 - 1].parent;
-      }
-    }
-    const comments = p.comments.map((c, i) => ({ index: i + 1, parent: c.parent, author: c.nick, ...whenField(p, c), content: c.body, mine: c.mine })).filter((c) => selected.has(c.index));
-    const task = JSON.stringify({
-      post: { id: p.id, author: p.nick, title: p.title, content: p.body },
-      comments,
-      commentCount: total,
-      replyTo,
-      action,
-      userHandle: nick
-    });
-    const activity = activityContext(st, p.id);
-    const guideline = [b.read("LB"), b.read("ATTACHMENTS"), b.read("REACT.GUIDELINE"), b.read("PUBLIC.GUIDELINE"), incomingRules(b, plan), activityRules(b, activity.posts)].join("\n\n");
-    const extras2 = task + incomingTask(plan, activity.posts);
-    return { ...pack2(src, b, guideline, `${b.read("PUBLIC.REACT_FORMAT")}
-${commentTimeRule(dateNow(src.chat))}`, extras2, factionNames2), activity, supplied: selected, total };
-  }
-  var POST_REFRESH_ACTION = "Time has passed since this post was last viewed. The protagonist did nothing on this post. Other readers return to it: add a few new comments or replies that continue the existing discussion naturally, each from someone other than the protagonist, without repeating earlier comments.";
-  function publicBoard(st, query) {
-    const ranked = st.posts.map((p, i) => ({ p, i, hit: !!p.title && query.includes(p.title) || new RegExp(`#${p.id}(?![\\d.])`).test(query) }));
-    ranked.sort((a, b) => a.hit !== b.hit ? a.hit ? -1 : 1 : a.i - b.i);
-    const rows2 = [];
-    let used = 0;
-    const cap = 6e3;
-    for (const { p } of ranked) {
-      if (rows2.length >= 8) break;
-      const comments = p.comments.slice(-12).map((c, j, arr) => ({ id: p.comments.length - arr.length + j + 1, parent: c.parent, author: c.nick, ...whenField(p, c), content: trimTokens(c.body, LIMITS.quote_tokens) }));
-      const row8 = { id: p.id, title: p.title, author: p.nick, date: p.date, content: trimTokens(p.body, LIMITS.origin_tokens), comments };
-      while (JSON.stringify(row8).length > (cap - used) * 2 && row8.comments.length) row8.comments.shift();
-      const n2 = Math.ceil(JSON.stringify(row8).length / 2);
-      if (used + n2 <= cap) {
-        rows2.push(row8);
-        used += n2;
-      }
-    }
-    if (!rows2.length) return null;
-    return {
-      access: "Published GNet material available for reference when this conversation mentions, shares or consults a post. Discuss its supplied details naturally. Availability alone does not establish that everyone already read it, the real identity behind a handle, or truth of its claims. No private notes or unsent drafts are included.",
-      posts: rows2
-    };
-  }
-  function dmPrompt(src, st, nick, latest, userHandle, factionNames2) {
-    const b = gnetBooks(src);
-    const source4 = st.sources[nick];
-    let anchor = b.read("DM.NO-ORIGIN");
-    if (source4) {
-      anchor = [
-        `Original forum post #${source4.postid} (preserved at first contact):`,
-        `Title: ${source4.title}`,
-        `Posted by: ${source4.author}`,
-        `Post text: ${source4.body}`,
-        source4.quote ? `Referenced public comment — author: ${source4.quoteAuthor.trim() || "[not retained; do not attribute to the contact]"}
-${source4.quote}` : ""
-      ].join("\n");
-    }
-    const lines3 = [];
-    for (let i = st.dms.length - 1; i >= 0 && lines3.length < HISTORY.dmHistory; i--) {
-      const d = st.dms[i];
-      if (d.nick !== nick) continue;
-      lines3.unshift({
-        speaker: d.side === "me" ? "user" : "npc_correspondent",
-        handle: d.side === "me" ? userHandle : nick,
-        date: d.date,
-        content: d.side === "me" ? d.body : trimTokens(d.body, LIMITS.history_tokens)
-      });
-    }
-    let task = `Current story time: ${dateNow(src.chat)}
-${fill2(b.read("DM.REQUEST"), { NICK: nick, ORIGIN: anchor, HISTORY: JSON.stringify(lines3) })}`;
-    const pub = publicBoard(st, `${latest}
-${anchor}`);
-    if (pub) task += `
-PUBLIC BOARD REFERENCE:
-${JSON.stringify(pub)}`;
-    const identity = { speaker: { role: "npc_correspondent", handle: nick }, owner: { role: "user", handle: userHandle, personaName: "주인공", referenceOnly: true } };
-    return pack2(src, b, `${b.read("DM.GUIDELINE")}
-
-${b.read("ATTACHMENTS")}`, b.read("DM.FORMAT"), task, factionNames2, identity);
-  }
-  function retryMessages(prompt, raw, error) {
-    return [
-      ...prompt.messages,
-      { role: "assistant", content: raw },
-      {
-        role: "user",
-        content: `<system>
-Validation error!
-Your previous output did not adhere to the required format, or contained invalid data.
-Error message: ${error}
-Please fix your last output into correct structure as previously instructed, while keeping the data intact.
-Only print the corrected data wrapped in the required node, without apologies, explanations, or any preambles.
-</system>`
-      }
-    ];
-  }
-  function mainContextRules(src) {
-    const g = policySections(src.char.globalLore, "GNet");
-    return g.MAIN_CONTEXT?.trim() || null;
-  }
-
-  // src/core/request.ts
-  function userTurns(chat) {
-    let n2 = 0;
-    let prev = "";
-    for (const m of chat.message ?? []) {
-      if (m.role === "user" && prev !== "user") n2++;
-      prev = m.role;
-    }
-    return n2;
-  }
-  function shouldKeepSeed(chat) {
-    return userTurns(chat) < 2;
-  }
-  function processRequest(messages, chat) {
-    const keep = shouldKeepSeed(chat);
-    let changed = false;
-    const out = messages.map((m) => {
-      if (typeof m.content !== "string" || !m.content.includes(SEED_OPEN)) return m;
-      changed = true;
-      return { ...m, content: applySeedLifetime(m.content, keep) };
-    });
-    return { messages: out, changed };
-  }
-  function unwrapScenes(messages) {
-    if (!messages.some((m) => m?.role === "user" && hasSceneCard(m.content))) return { messages, changed: false };
-    const out = [];
-    for (let i = 0; i < messages.length; i++) {
-      const m = messages[i];
-      if (m?.role !== "user" || !hasSceneCard(m.content)) {
-        out.push(m);
-        continue;
-      }
-      const END = "%%/SCENE_CARD%%";
-      const end = m.content.lastIndexOf(END);
-      const tail2 = end >= 0 ? m.content.slice(end + END.length).trim() : "";
-      let content = stripSceneCard(end >= 0 ? m.content.slice(0, end + END.length) : m.content);
-      const extra = tail2 ? [tail2] : [];
-      const next = messages[i + 1];
-      if (next?.role === "user" && typeof next.content === "string" && !hasSceneCard(next.content)) {
-        if (next.content.trim()) extra.push(next.content.trim());
-        i++;
-      }
-      if (extra.length) content = withUserInput(null, content, extra.join("\n\n"));
-      out.push({ ...m, content });
-    }
-    return { messages: out, changed: true };
-  }
-  function unwrapCalls(messages) {
-    if (!messages.some((m) => m?.role === "user" && hasCall(m.content))) return { messages, changed: false };
-    const out = [];
-    for (let i = 0; i < messages.length; i++) {
-      const m = messages[i];
-      if (m?.role !== "user" || !hasCall(m.content)) {
-        out.push(m);
-        continue;
-      }
-      let content = stripCall(m.content);
-      const next = messages[i + 1];
-      if (next?.role === "user" && typeof next.content === "string" && !hasCall(next.content) && !hasSceneCard(next.content) && next.content.trim()) {
-        content = `${content}
-
-${next.content.trim()}`;
-        i++;
-      }
-      out.push({ ...m, content });
-    }
-    return { messages: out, changed: true };
-  }
-
-  // src/core/lore.ts
-  var LORE_KINDS = ["org", "site", "anomaly", "agent"];
-  var SLOTS2 = {
-    org: { comment: "📚Lore slot · Faction", name: "goei_lore_org", order: 200, label: "세력" },
-    site: { comment: "📚Lore slot · Mystic", name: "goei_lore_site", order: 400, label: "특수" },
-    anomaly: { comment: "📚Lore slot · Anomaly", name: "goei_lore_anomaly", order: 500, label: "괴이" },
-    agent: { comment: "📚Lore slot · Agent", name: "goei_lore_agent", order: 600, label: "요원" }
-  };
-  var slotVar = (k) => `$${SLOTS2[k].name}`;
-  var DONT_ACTIVATE = "@@dont_activate";
-  var FOLDER_KIND = { 세력: "org", 조직: "org", 파밍: "site", 괴이: "anomaly", 요원: "agent" };
-  var APPENDIX = "부록";
-  var folderWord3 = (name) => name.replace(/[^\p{L}\p{N}]/gu, "");
-  var str4 = (v) => typeof v === "string" ? v : "";
-  var CONFIRM_KEYS = /* @__PURE__ */ new Set([
-    "어두운 정원",
-    "거대한 세상",
-    "욕망의 방",
-    "학교의 악몽",
-    "성자의 도시",
-    "눈먼 자들의 저택",
-    "검은 그늘 속에서",
-    "한여름 밤의 꿈",
-    "금지된 비디오",
-    "금지된 영상",
-    "생체 공장",
-    "생체공장",
-    "해피엔딩",
-    "붉은 숙녀",
-    "타락한 성당",
-    "미스테리 월드",
-    "어드벤쳐 파크",
-    "교회",
-    "강변",
-    "지하실",
-    "미술관",
-    "병원",
-    "극단",
-    "세계정치",
-    "세계 정치",
-    "기독교 상점",
-    "헐값 매입",
-    "대박 알선",
-    "사장",
-    "국장",
-    // 흔한 영어 이름·낱말과 같은 키 (2026-10-21: Jay는 흔한 이름, 브라우니는 과자)
-    "Jay",
-    "Brownie",
-    "브라우니",
-    "Yu-ri",
-    "Route 16",
-    "Red Lady"
-  ]);
-  var JOSA = [
-    "에게서",
-    "에게",
-    "한테",
-    "께서",
-    "께",
-    "이랑",
-    "하고",
-    "까지",
-    "부터",
-    "마저",
-    "조차",
-    "처럼",
-    "보다",
-    "밖에",
-    "으로",
-    "로서",
-    "로",
-    "이나",
-    "이든",
-    "이라도",
-    "라도",
-    "에서",
-    "에는",
-    "에도",
-    "에",
-    "엔",
-    "은",
-    "는",
-    "이",
-    "가",
-    "을",
-    "를",
-    "의",
-    "와",
-    "과",
-    "랑",
-    "도",
-    "만",
-    "나",
-    "든",
-    "였",
-    "여",
-    "야",
-    "예요",
-    "라",
-    "란",
-    "아"
-  ];
-  var HONOR2 = ["님", "씨", "쌤", "선배", "언니", "오빠", "누나", "형", "양", "군", "팀장", "대리", "반장", "국장", "이사", "원장", "수녀", "신부", "요원"];
-  var SUFFIXES2 = [.../* @__PURE__ */ new Set([...HONOR2, ...JOSA])].sort((a, b) => b.length - a.length);
-  var MARKERS2 = ["괴담", "괴이", "괴현상", "측", "소속", "직원", "쪽 사람"];
-  var OPEN = `「『"'“‘<《〈[(【`;
-  var CLOSE = `」』"'”’>》〉])】`;
-  var EN_TITLE = /(?:^|[^a-z])(?:chief|ban-?jang|team-?jang|leader|agent|director|manager|officer|mr\.?|ms\.?|mrs\.?|sir|madam)\s+$/;
-  var EN_STOP = /* @__PURE__ */ new Set(["the", "of", "and", "with", "a", "an", "in", "on", "to", "for"]);
-  var isLetter = (c) => !!c && /[\p{L}\p{N}]/u.test(c);
-  var hangul = (s5) => /[가-힣]/.test(s5);
-  var syllables = (s5) => [...s5.replace(/\s+/g, "")].length;
-  var escRe = (s5) => s5.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-  function keyRegex(key2, en2, person = fals
+    re

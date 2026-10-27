@@ -1,4 +1,32 @@
-floral notes signal nearby Butterfly's Dream activity. Body-warm air and resistance underfoot accelerate fatigue, sweating, and dehydration.
+y Resident\n###### Jellyfish (해파리)\n- Luminous entities drifting beneath the false night sky above the sixth floor and deeper hospital spaces. Their presence is consistent with the soul-jellyfish manifestations found throughout other Hospital facilities.\n- They provide a dim blue ambient light and remain visually detached from the immediate feeding cycle. Their exact relationship to Gangbuk's taste research is not externally obvious, but prolonged direct observation should still be treated as hazardous."
+        },
+        extra: [],
+        title: "Gangbuk Special Hospital (강북 특설병원)",
+        order: [
+          "identity",
+          "entry",
+          "rules",
+          "space",
+          "entities"
+        ]
+      },
+      강변: {
+        keys: "강변",
+        fields: {
+          identity: "- A god-like river anomaly manifested as vast submerged fleshspace and a personified deep core. River, territory, residents, generated anomalies, and core are one entity.\n- It genuinely answers prayers with effectively unrestricted scale, interpreted through its own generative process. Demonstrated output can create world-ending conditions.\n- Acquisitive by nature: it collects people, abilities, behavior, memories, possible futures, and even unrelated anomalous techniques, reproducing or incorporating them into later encounters.",
+          entry: "- Direct River Crossing: a sufficiently anomalous section of the river surface can form a traversable membrane leading downward into the Outer Fleshways.\n- Bridge Ritual: bridges leading toward small island parks can act as entry points when crossed with deliberate intent. Keeping the right hand on the railing and continuing forward produces increasing vertigo and nausea; at peak disorientation, closing the eyes and continuing without reopening them completes the transfer into the Riverside.\n- Midnight Reopening: at exactly 00:00, locations previously used for entry can reactivate. Running water begins producing an unnatural humming sound, and the prior incursion point becomes capable of transferring entrants into the interior again.\n- Entry is not limited to unusual-looking locations. The surface river, bridge, island park, and surrounding public space can remain completely ordinary until the transfer condition is fulfilled.",
+          notes: "##### Surface Incidents and Information Exposure\n- Surface activity does not require physical emergence of the fleshspace. The Riverside can produce urban-legend-like incidents through ordinary city environments, particularly deaths involving sealed spaces, household devices, or circumstances behaving according to folkloric rather than physical causality.\n- It can also externalize anomalous lure material. One recurring form resembles an irregular honeycomb-like mass with the odor of burned human remains; prolonged proximity or handling produces increasingly strong self-destructive impulses.\n- It perceives in-setting writing about itself: recorded analysis, inferred mechanisms, weaknesses, and countermeasures become available even without approaching the river. Keep critical analysis out of such records.",
+          rules: `##### Adaptive Rules and Passage Tolls
+- Residents learn detection methods, combat habits, abilities, and individual behavior, then counter them. For example, parasites hide in genuine corpses after learning that approaching consciousness is detected. Vary tactics before dedicated counters form.
+- Strong, coordinated group expectations can temporarily shape corridors or barriers into real structural constraints. Prevent individual fears or expectations from dominating that shared construction; the Riverside gradually adapts and overcomes it, so it cannot provide permanent protection.
+- At irregular intervals, deeper routes close until one member stays behind for a separate confrontation, chosen by that interval, while the rest proceed. A successfully paid gate never charges twice. Select the remaining member tactically: confrontations favor different capabilities.
+- Residents favor attrition through harassment, diversions, ambushes, contamination, disorientation, and repeated small engagements. Exhaustion, dehydration, mental deterioration, and depleted supplies can defeat a lost group before it reaches the core.
+- Fresh blood accelerates nearby tissue pulsation and can attract scavenger forms from deeper layers. Parasitized hosts that reach terminal conversion may undergo a sudden contamination burst: the body freezes, limbs contort through unnatural angles with audible fractures, and the internal parasite or transformed host becomes immediately active.
+- The Riverside's generated disasters are tied to accumulated "tomorrows": possible outcomes, absorbed paths, and collected future events that can later be expressed as anomalous incidents. The Doomsday Clock anchors the current output cycle.`,
+          space: `##### Zones
+###### Outer Fleshways
+- Broad territory beneath the river membrane: nearly identical warm pink pulsing corridors extend in multiple directions. Thick mud-like floors sink around ankles; walls seep clear fluid, vein-like drainage carries warm liquid, and corners flex under pressure. Unnecessary contact makes tissue pulse harder or defend itself; avoid needless wall contact and bloodshed.
+- Foul meat odor is normal; sweet floral notes signal nearby Butterfly's Dream activity. Body-warm air and resistance underfoot accelerate fatigue, sweating, and dehydration.
 - Slightly widened intersections serve as rendezvous points. Routes shift between incursions; navigate in real time. Prolonged stationary waits increase exposure to roaming residents and spontaneous anomalies.
 
 ###### Blood-Spray Ambush Corridors
@@ -768,41 +796,4 @@ floral notes signal nearby Butterfly's Dream activity. Body-warm air and resista
 
 ###### Human Livestock Facility / Nightlife District
 - A residential villa holds numerous captives blindfolded and bound like animals, available as blood sources or individual family selections. The household maintains this supply separately from its public worship.
-- Clubs still operate. The wife frequents a private room in one and is recognized enough for Daesik to enter under her authority. She and Do-jun exploit the captives; the son lives separately and orders women from the villa for personal use.
-
-###### Public Worship Hall / Private Temple
-- The public hall is distinct from the Leader's secret temple. Before large congregations he preaches through the Saint and displays his real power as benevolent proof. The Saint believes these outings help others.
-- The private temple is outwardly ordinary, inconspicuous, and architecturally unextravagant, concealing its importance. Its lowest level holds the Leader's secluded quarters, accessible through blood-manipulated mechanisms; human women may be drugged and hypnotized there for feeding.
-- The highest level isolates the Saint until the Leader wants his power or presence. Social dependency conceals the household's crimes and turns the supposed divine authority into a controlled asset.`,
-          rules: "##### Blood as Orders, Information, and Access\n- Household vampire blood carries encoded intent or information as well as nourishment. A vampire knowing a location can encode it in blood for another to learn by drinking.\n- The Leader's Blood Bats carry remote commands like physical letters. Daesik normally waits hidden at his base, swallows the construct to receive its intent, and performs the assignment secretly at night.\n- Blood can anomalously release a conventional lock when fed into its keyhole without the correct key. Daesik can also put his own blood in a human's mouth to cause temporary unconsciousness.",
-          entities: `##### Household and Saint
-###### Cult Leader
-- An unnamed male vampire, neither originally an ancient power nor part of a greater vampire succession. A chance encounter turned him; discovering blood-supported effective immortality, he adopted that existence. His fraud and manipulation skills predate finding the Saint.
-- He built the cult around the man's holiness, then turned his wife and son, enjoying wealth, status, blood, and local political influence through the resulting family. He cites his wife's cancer as his reason for turning her.
-- Publicly benevolent, privately an imprisoner, exploiter, manipulator, and creator of servitors. Stronger than the other household vampires and more skilled with blood, he extends claws and fangs, wraps himself in a dense blood aura, and weaponizes scattered blood offensively.
-- Killing him can yield "Cult Leader's Crown of Thorns (교주의 가시 면류관)."
-
-###### Saint
-- An unnamed adult human male exceeding roughly 150 kg, with extremely pale porcelain-like skin and a round, childlike appearance. His mentality is markedly juvenile: trusting, innocent, direct, and emotionally like a young child.
-- Innate holiness predates this cult and any association with established religion. Its unmistakable sacred presence is perceptible without belief and makes worship understandable to ordinary observers. It differs enough from conventional Christian holiness that the vampire Leader can stand near him without destruction.
-- He means well, considers the Leader a caring father figure, and believes he is protected and taken out to help believers. Isolation prevents understanding of the hidden vampire system. He is an exploited asset, not automatically a hostile religious operator.
-- Sufficiently abnormal external means can separate holiness from his body completely, removing the sacred presence and leaving him physically ordinary. The observed removal also produced severe memory loss and an abrupt shift to ordinary adult-like thought. This suggests a connection between holiness and arrested development; it is not an established explanation of his true nature.
-
-###### Daesik (대식이)
-- A male vampire created directly by the Leader, serving as disposable household labor. "Daesik" is his master's degrading slave-like name, not a respected family identity.
-- Simple-minded, submissive, conditioned to obey, and acutely sensitive to stronger vampires' moods. He calls himself the Leader's close aide but is routinely mistreated by the family, accumulating deep resentment rather than affectionate loyalty.
-- He creates ghouls from designated unbelievers at the Leader's order, maintains that force, abducts people, moves villa captives, and follows Blood Bat assignments. He is skilled at moving unnoticed and hiding in darkness; blood gives him temporary human incapacitation and receipt of commands or geographical knowledge.
-- Once the Leader's authority breaks, his hatred of master and family can surface violently.
-
-###### Wife and Do-jun (도준)
-- The adult wife retains a youthful appearance through vampirism, with ordinary enhanced vampire strength, elongated claws, and fangs. Cult protection lets her enjoy nightlife freely. She participates in exploitation yet remains intensely attached to her son.
-- Do-jun is comparatively young and inexperienced, treats Daesik as an inferior servant, and relies on his father's authority to threaten others and demand captives.
-- Neither possesses the Leader's central religious authority; their household status derives from marriage and descent. Vampire family power, human cult control, and the Saint's holiness must not be treated as one interchangeable hierarchy.`
-        },
-        extra: [],
-        title: "The Saint's City (성자의 도시)"
-      },
-      "불이 꺼진 관리국": {
-        keys: "Bureau with the Lights Out, 불이 꺼진 관리국",
-        fields: {
-          identity: `##### Blackout and
+- Clubs still operate. The wife frequents a private room in one and is recognized enough for Daesik to enter under her authority. She and Do-jun exploit the captives; the son lives separately and orders women from the villa for pers

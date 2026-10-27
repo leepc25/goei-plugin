@@ -1,6 +1,133 @@
-// goei-body 0.17.2
+// goei-body 0.17.3
 "use strict";
 (() => {
+  var __create = Object.create;
+  var __defProp = Object.defineProperty;
+  var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
+  var __getOwnPropNames = Object.getOwnPropertyNames;
+  var __getProtoOf = Object.getPrototypeOf;
+  var __hasOwnProp = Object.prototype.hasOwnProperty;
+  var __commonJS = (cb, mod2) => function __require() {
+    return mod2 || (0, cb[__getOwnPropNames(cb)[0]])((mod2 = { exports: {} }).exports, mod2), mod2.exports;
+  };
+  var __copyProps = (to, from, except, desc) => {
+    if (from && typeof from === "object" || typeof from === "function") {
+      for (let key2 of __getOwnPropNames(from))
+        if (!__hasOwnProp.call(to, key2) && key2 !== except)
+          __defProp(to, key2, { get: () => from[key2], enumerable: !(desc = __getOwnPropDesc(from, key2)) || desc.enumerable });
+    }
+    return to;
+  };
+  var __toESM = (mod2, isNodeMode, target) => (target = mod2 != null ? __create(__getProtoOf(mod2)) : {}, __copyProps(
+    // If the importer is in node compatibility mode or this is not an ESM
+    // file that has been converted to a CommonJS file using a Babel-
+    // compatible transform (i.e. "__esModule" has not been set), then set
+    // "default" to the CommonJS "module.exports" for node compatibility.
+    isNodeMode || !mod2 || !mod2.__esModule ? __defProp(target, "default", { value: mod2, enumerable: true }) : target,
+    mod2
+  ));
+
+  // node_modules/base64-js/index.js
+  var require_base64_js = __commonJS({
+    "node_modules/base64-js/index.js"(exports) {
+      "use strict";
+      exports.byteLength = byteLength;
+      exports.toByteArray = toByteArray;
+      exports.fromByteArray = fromByteArray;
+      var lookup = [];
+      var revLookup = [];
+      var Arr = typeof Uint8Array !== "undefined" ? Uint8Array : Array;
+      var code2 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+      for (i = 0, len = code2.length; i < len; ++i) {
+        lookup[i] = code2[i];
+        revLookup[code2.charCodeAt(i)] = i;
+      }
+      var i;
+      var len;
+      revLookup["-".charCodeAt(0)] = 62;
+      revLookup["_".charCodeAt(0)] = 63;
+      function getLens(b64) {
+        var len2 = b64.length;
+        if (len2 % 4 > 0) {
+          throw new Error("Invalid string. Length must be a multiple of 4");
+        }
+        var validLen = b64.indexOf("=");
+        if (validLen === -1) validLen = len2;
+        var placeHoldersLen = validLen === len2 ? 0 : 4 - validLen % 4;
+        return [validLen, placeHoldersLen];
+      }
+      function byteLength(b64) {
+        var lens = getLens(b64);
+        var validLen = lens[0];
+        var placeHoldersLen = lens[1];
+        return (validLen + placeHoldersLen) * 3 / 4 - placeHoldersLen;
+      }
+      function _byteLength(b64, validLen, placeHoldersLen) {
+        return (validLen + placeHoldersLen) * 3 / 4 - placeHoldersLen;
+      }
+      function toByteArray(b64) {
+        var tmp;
+        var lens = getLens(b64);
+        var validLen = lens[0];
+        var placeHoldersLen = lens[1];
+        var arr = new Arr(_byteLength(b64, validLen, placeHoldersLen));
+        var curByte = 0;
+        var len2 = placeHoldersLen > 0 ? validLen - 4 : validLen;
+        var i2;
+        for (i2 = 0; i2 < len2; i2 += 4) {
+          tmp = revLookup[b64.charCodeAt(i2)] << 18 | revLookup[b64.charCodeAt(i2 + 1)] << 12 | revLookup[b64.charCodeAt(i2 + 2)] << 6 | revLookup[b64.charCodeAt(i2 + 3)];
+          arr[curByte++] = tmp >> 16 & 255;
+          arr[curByte++] = tmp >> 8 & 255;
+          arr[curByte++] = tmp & 255;
+        }
+        if (placeHoldersLen === 2) {
+          tmp = revLookup[b64.charCodeAt(i2)] << 2 | revLookup[b64.charCodeAt(i2 + 1)] >> 4;
+          arr[curByte++] = tmp & 255;
+        }
+        if (placeHoldersLen === 1) {
+          tmp = revLookup[b64.charCodeAt(i2)] << 10 | revLookup[b64.charCodeAt(i2 + 1)] << 4 | revLookup[b64.charCodeAt(i2 + 2)] >> 2;
+          arr[curByte++] = tmp >> 8 & 255;
+          arr[curByte++] = tmp & 255;
+        }
+        return arr;
+      }
+      function tripletToBase64(num4) {
+        return lookup[num4 >> 18 & 63] + lookup[num4 >> 12 & 63] + lookup[num4 >> 6 & 63] + lookup[num4 & 63];
+      }
+      function encodeChunk(uint8, start3, end) {
+        var tmp;
+        var output = [];
+        for (var i2 = start3; i2 < end; i2 += 3) {
+          tmp = (uint8[i2] << 16 & 16711680) + (uint8[i2 + 1] << 8 & 65280) + (uint8[i2 + 2] & 255);
+          output.push(tripletToBase64(tmp));
+        }
+        return output.join("");
+      }
+      function fromByteArray(uint8) {
+        var tmp;
+        var len2 = uint8.length;
+        var extraBytes = len2 % 3;
+        var parts = [];
+        var maxChunkLength = 16383;
+        for (var i2 = 0, len22 = len2 - extraBytes; i2 < len22; i2 += maxChunkLength) {
+          parts.push(encodeChunk(uint8, i2, i2 + maxChunkLength > len22 ? len22 : i2 + maxChunkLength));
+        }
+        if (extraBytes === 1) {
+          tmp = uint8[len2 - 1];
+          parts.push(
+            lookup[tmp >> 2] + lookup[tmp << 4 & 63] + "=="
+          );
+        } else if (extraBytes === 2) {
+          tmp = (uint8[len2 - 2] << 8) + uint8[len2 - 1];
+          parts.push(
+            lookup[tmp >> 10] + lookup[tmp >> 4 & 63] + lookup[tmp << 2 & 63] + "="
+          );
+        }
+        return parts.join("");
+      }
+    }
+  });
+
   // src/data/guides/gnet.txt
   var gnet_default = `<!-- GNet: 괴담넷 생성 지침. 플러그인이 요청마다 필요한 섹션만 골라 씁니다. 자동 활성화 OFF / 키워드 비움. 섹션 구분 줄은 그대로 두세요. -->
 
@@ -1453,9 +1580,9 @@ ${body5.slice(at).replace(/^\s+/, "")}
     out.push(`Situation ${k}`);
     return out;
   }
-  function baseShared(name, label = "") {
-    const hay = clean(`${name} ${label}`);
-    const hits = rank(KINDS_BASE, name, label, name).filter((key2) => KINDS_BASE.find(([k]) => k === key2)[1].some((w) => hit(hay, w)));
+  function baseShared(name, label2 = "") {
+    const hay = clean(`${name} ${label2}`);
+    const hits = rank(KINDS_BASE, name, label2, name).filter((key2) => KINDS_BASE.find(([k]) => k === key2)[1].some((w) => hit(hay, w)));
     return [...hits, "Shared Base Hideout", "Shared Base Office"].map((k) => k.startsWith("Shared") ? k : `Shared Base ${k}`);
   }
   function orgShared(name, type = "org", text = "") {
@@ -1617,9 +1744,9 @@ ${body5.slice(at).replace(/^\s+/, "")}
     const out = [];
     for (const r of rows2) {
       if (!Array.isArray(r) || r.length !== 5) continue;
-      const label = s2(r[1]);
-      if (!label) continue;
-      out.push({ lore: s2(r[2]) || label, label, english: s2(r[3]), aliases: list2(r[4]), preset: r[0] === true, inFolder: false });
+      const label2 = s2(r[1]);
+      if (!label2) continue;
+      out.push({ lore: s2(r[2]) || label2, label: label2, english: s2(r[3]), aliases: list2(r[4]), preset: r[0] === true, inFolder: false });
     }
     return out;
   }
@@ -2625,160 +2752,4 @@ ${body5.slice(at).replace(/^\s+/, "")}
     let prevHadTag = false;
     const ageOnly = (l) => l !== null && new RegExp(`^\\s*${AGE_META.source}\\s*$`).test(l);
     for (const raw of lines3) {
-      let line2 = raw;
-      if (MARKERS.some((m) => new RegExp(`^\\s*[-*]?\\s*\\[${m}\\]`).test(line2))) line2 = "";
-      if (prevHadTag) line2 = line2.replace(new RegExp(`^\\s*${AGE_META.source}\\s*`), "");
-      let count2 = 0;
-      line2 = line2.replace(/\[(?:AN|IN|MS|AG)\s*\|[^\]]*\]/g, () => {
-        count2++;
-        return "";
-      });
-      const hadTag = count2 > 0;
-      if (prev !== null && !(hadTag && ageOnly(prev))) keep.push(prev);
-      if (hadTag) line2 = line2.replace(new RegExp(AGE_META.source, "g"), "");
-      prev = line2;
-      prevHadTag = hadTag;
-    }
-    if (prev !== null) keep.push(prev);
-    const envs = [];
-    const body5 = keep.filter((l) => {
-      if (/^\s*[[【［]\s*▣\s*[|｜]/.test(l)) {
-        envs.push(l.trim());
-        return false;
-      }
-      return !/^\s*\[AC\s*\|/.test(l) && !/^\s*\[◎\s*\|/.test(l);
-    });
-    let s5 = body5.join("\n").replace(/\n\s*\n\s*\n+/g, "\n\n").trim();
-    if (envs.length) s5 = (s5 ? `${s5}
-` : "") + envs.join("\n");
-    return s5;
-  }
-
-  // src/core/world/engine.ts
-  var DEFAULT_SETTINGS = {
-    extra_cap: 3,
-    extra_ms_cap: 3,
-    extra_in_cap: 3,
-    preset_cap: 2,
-    preset_p: 100,
-    random_cap: 1,
-    random_p: 100,
-    incident_cap: 1,
-    incident_p: 50,
-    mystic_cap: 1,
-    mystic_p: 100,
-    preset_expire: 1,
-    random_expire: 1,
-    incident_expire: 1,
-    mystic_expire: 1,
-    preset_ttl: 48,
-    random_ttl: 48,
-    incident_ttl: 12,
-    mystic_ttl: 24,
-    landmark_share: 50,
-    agent_limit: 12
-  };
-  function emptyWorld() {
-    return { v: 1, epoch: 0, minute: null, an: [], inc: [], ms: [], agents: {}, retired: [], promoted: [], blocks: {}, skip: {}, pending: {}, notice: "", ended: [] };
-  }
-  function parseWorld(raw) {
-    if (typeof raw !== "string" || !raw) return emptyWorld();
-    try {
-      const w = JSON.parse(raw);
-      if (w && w.v === 1 && Array.isArray(w.an) && Array.isArray(w.inc) && Array.isArray(w.ms)) {
-        return { ...emptyWorld(), ...w, pending: { ...w.pending ?? {} }, ended: Array.isArray(w.ended) ? w.ended : [] };
-      }
-    } catch {
-    }
-    return emptyWorld();
-  }
-  function validName(n2) {
-    return typeof n2 === "string" && n2.trim() !== "" && /[\p{L}\p{N}]/u.test(n2) && !/^\s*[[{]/.test(n2) && !n2.includes("\n") && !["content", "comment", "name", "null"].includes(n2);
-  }
-  function occupied(w) {
-    return new Set([...w.an, ...w.inc, ...w.ms].map((e) => e.loc));
-  }
-  function pick2(list4, rng) {
-    return list4.length ? list4[Math.floor(rng() * list4.length)] : void 0;
-  }
-  function place(w, skip, rng) {
-    const taken = occupied(w);
-    return pick2(POOL.filter((l) => !taken.has(l) && l !== skip), rng);
-  }
-  function block(w, group6, name) {
-    if (name) w.blocks[`${group6}:${name}`] = w.epoch + 1;
-  }
-  function blocked(w, group6, name) {
-    return (w.blocks[`${group6}:${name}`] ?? -1) >= w.epoch;
-  }
-  function remember(w, kind, e, grade) {
-    if (e.state === "발생대기") return;
-    w.ended = [...(w.ended ?? []).filter((x) => !(x.kind === kind && x.name === e.name && x.loc === e.loc)), { kind, name: e.name, loc: e.loc, ...grade ? { grade } : {}, until: w.epoch + 1 }];
-  }
-  function endAn(w, e) {
-    remember(w, "an", e, e.grade);
-    block(w, "an", e.name);
-    w.skip.an = e.loc;
-    w.an = w.an.filter((x) => x !== e);
-  }
-  function endIn(w, e) {
-    remember(w, "in", e);
-    block(w, "in", e.name);
-    w.skip.in = e.loc;
-    w.inc = w.inc.filter((x) => x !== e);
-  }
-  function endMs(w, e) {
-    remember(w, "ms", e);
-    block(w, "ms", e.name);
-    w.skip.ms = e.loc;
-    w.ms = w.ms.filter((x) => x !== e);
-  }
-  function spawnAn(w, c, s5, preset, rng) {
-    const group6 = preset ? "preset" : "random";
-    const n2 = w.an.filter((e) => e.origin === "auto" && e.kind === group6).length;
-    if (n2 >= s5[`${group6}_cap`] || !(rng() * 100 < s5[`${group6}_p`])) return;
-    let name = "";
-    if (preset) {
-      const active3 = new Set(w.an.map((e) => e.presetName || presetCanon(c, e.name)));
-      const choice = pick2(c.anomalies.filter((a) => !active3.has(a.name) && a.name !== w.pending.an && !blocked(w, "an", a.name)), rng);
-      if (!choice) return;
-      name = choice.name;
-    }
-    const loc = place(w, w.skip.an, rng);
-    if (!loc) return;
-    w.an.push({
-      loc,
-      name,
-      state: "발생대기",
-      grade: "",
-      deploy: "",
-      kind: group6,
-      origin: "auto",
-      presetName: name,
-      since: null,
-      born: w.minute,
-      exploring: false
-    });
-    w.skip.an = void 0;
-  }
-  function spawnIncident(w, c, s5, rng) {
-    const n2 = w.inc.filter((e) => e.origin === "auto").length;
-    if (n2 >= s5.incident_cap || !(rng() * 100 < s5.incident_p)) return;
-    const taken = occupied(w);
-    const allowed = c.landmarks.filter((lm) => {
-      const l = landmarkLoc(lm.sido, lm.gu);
-      return l && l !== SEALED_LOC && !taken.has(l) && l !== w.skip.in && lm.name !== w.pending.in && !w.inc.some((e) => e.name === lm.name) && !blocked(w, "in", lm.name);
-    });
-    const isLandmark = rng() * 100 < s5.landmark_share;
-    let loc;
-    let name = "";
-    if (isLandmark) {
-      const lm = pick2(allowed, rng);
-      if (!lm) return;
-      loc = landmarkLoc(lm.sido, lm.gu) ?? void 0;
-      name = lm.name;
-    } else {
-      loc = place(w, w.skip.in, rng);
-    }
-    if (!loc) return;
-    w.inc.pus
+      let line2 = ra
