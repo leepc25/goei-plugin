@@ -7,6 +7,7 @@ import { readPersona, USER_MARK } from './host/user';
 import { hasSceneCard, renderSceneCards } from './core/dispatch';
 import { CONTEXT as GN_CONTEXT, GN_RAW, gnetSettings, mainContext, readGnet, userNick } from './core/gnet';
 import { mainContextRules } from './core/gnetPrompt';
+import { withWorldLore } from './core/world/virtual';
 import { processRequest, unwrapCalls, unwrapScenes, type PromptMessage } from './core/request';
 import { HISTORY as PH_HISTORY, hasCall, mainContext as phoneMainContext, phoneSettings, PH_STATE, PH_BULLETINS, readBulletins, readPhone, renderCalls } from './core/phone';
 import { mainContextRules as phoneRules } from './core/phonePrompt';
@@ -27,7 +28,7 @@ import { cleanOutput, hasWorldTags, parseCatalog, processOutput, readDirectory }
 import { basicSettings, missingBasicVars, worldSettings } from './core/settings';
 import { staleFactionVars } from './core/factions';
 import { supplementAssets } from './host/asset';
-import { loadContext, updateCharacterLore, updateChat } from './host/risu';
+import { loadContext, updateCharacterLore, updateChat, getChar } from './host/risu';
 import { WatchState, type WatchSnapshot } from './core/watch';
 import { createFab, type Fab } from './host/overlay';
 import { BRAND } from './ui/brand';
@@ -124,14 +125,14 @@ function loreFor(char: LoreChar, chat: Chat, input?: string) {
 
 /** 고른 로어북을 자리 항목이 읽는 채팅 변수에 적는다 (요청 전이라 Risu가 세고 넘치면 오래된 채팅을 지운다) */
 async function storeLore(charIndex: number, chatIndex: number, input?: string): Promise<void> {
-  let char = (await risuai.getCharacterFromIndex(charIndex)) as LoreChar | null;
+  let char = await getChar<LoreChar>(charIndex);
   if (!char || !readManifest(char.globalLore)) return;
   // 이 채팅의 보내는 방식에 맞게 네 폴더 항목 첫 줄(@@dont_activate)을 맞춘다. 사용자가 새로 넣은 항목도 같이
   const cur0 = (await risuai.getChatFromIndex(charIndex, chatIndex)) as Chat | null;
   const mode = advValue(cur0?.scriptstate, 'gen', 'lore_mode') as LoreMode;
   if (syncDecorators(char.globalLore, mode)) {
     await updateCharacterLore(charIndex, (lore) => syncDecorators(lore, mode));
-    char = ((await risuai.getCharacterFromIndex(charIndex)) as LoreChar | null) ?? char;
+    char = (await getChar<LoreChar>(charIndex)) ?? char;
   }
   const c = char;
   await updateChat(charIndex, chatIndex, (cur) => {
@@ -155,7 +156,7 @@ async function onInput(text: string): Promise<string> {
 /** 요청 직전: 다시 굴리기·자동 전송처럼 입력을 거치지 않았으면 지금 채팅으로 다시 골라 요청 속 글을 바꾼다 */
 async function fixLore<M extends PromptMessage>(messages: M[]): Promise<M[]> {
   const charIndex = await risuai.getCurrentCharacterIndex();
-  const char = (await risuai.getCharacterFromIndex(charIndex)) as LoreChar | null;
+  const char = await getChar<LoreChar>(charIndex);
   const chat = (await risuai.getChatFromIndex(charIndex, await risuai.getCurrentChatIndex())) as Chat | null;
   if (!char || !chat) return messages;
   const got = loreFor(char, chat);
@@ -166,7 +167,7 @@ async function fixLore<M extends PromptMessage>(messages: M[]): Promise<M[]> {
 /** 캐릭터로 플레이: 페르소나 자리에 그 요원 로어북과 틀 지침, 페르소나 이름은 요원 이름으로 */
 async function withPlayer<M extends PromptMessage>(messages: M[]): Promise<M[]> {
   const charIndex = await risuai.getCurrentCharacterIndex();
-  const char = (await risuai.getCharacterFromIndex(charIndex)) as LoreChar | null;
+  const char = await getChar<LoreChar>(charIndex);
   const chat = (await risuai.getChatFromIndex(charIndex, await risuai.getCurrentChatIndex())) as Chat | null;
   const agent = char && chat ? playerAgent(char.globalLore, chat.scriptstate) : undefined;
   if (!char || !chat || !agent) return messages;
@@ -192,7 +193,7 @@ async function withPeople<M extends PromptMessage>(messages: M[]): Promise<M[]> 
   if (!settings.on || settings.inject === 'off') return messages;
   const store = peopleStore(chat);
   if (!Object.keys(store.people).length) return messages;
-  const char = (await risuai.getCharacterFromIndex(charIndex)) as LoreChar | null;
+  const char = await getChar<LoreChar>(charIndex);
   if (!char) return messages;
   const me = playerAgent(char.globalLore, chat.scriptstate);
   const lastUser = [...messages].reverse().find((m) => m?.role === 'user');
@@ -213,7 +214,7 @@ async function withPeople<M extends PromptMessage>(messages: M[]): Promise<M[]> 
 async function withImgPrompt<M extends PromptMessage>(messages: M[]): Promise<M[]> {
   const charIndex = await risuai.getCurrentCharacterIndex();
   const chat = (await risuai.getChatFromIndex(charIndex, await risuai.getCurrentChatIndex())) as Chat | null;
-  const char = (await risuai.getCharacterFromIndex(charIndex)) as LoreChar | null;
+  const char = await getChar<LoreChar>(charIndex);
   if (!chat || !char) return messages;
   const s = basicSettings(char.globalLore, chat.scriptstate);
   const out = stripImgLore(messages);
@@ -230,7 +231,7 @@ async function withVisit<M extends PromptMessage>(messages: M[]): Promise<M[]> {
   const charIndex = await risuai.getCurrentCharacterIndex();
   const chat = (await risuai.getChatFromIndex(charIndex, await risuai.getCurrentChatIndex())) as Chat | null;
   if (!chat || (!visitRecord(chat).turns.length && !fieldRecord(chat).events.length)) return messages;
-  const char = (await risuai.getCharacterFromIndex(charIndex)) as LoreChar | null;
+  const char = await getChar<LoreChar>(charIndex);
   const me = char ? playerAgent(char.globalLore, chat.scriptstate) : undefined;
   return withFieldFacts(withInterludes(messages, chat, char ? visitContextRules({ char }) : null, me?.name || userInfo().name || '주인공'), chat);
 }
@@ -249,7 +250,7 @@ async function moduleContext(scene: string): Promise<string[]> {
   if (!chat || (!wantGnet && !wantPhone && !wantWiki)) return [];
   applyAdvanced(ss);
   if (rulesCache?.charIndex !== charIndex) {
-    const char = (await risuai.getCharacterFromIndex(charIndex)) as { globalLore?: LoreEntry[] } | null;
+    const char = await getChar<{ globalLore?: LoreEntry[] }>(charIndex);
     const src = { char: { globalLore: char?.globalLore }, chat };
     rulesCache = { charIndex, gnet: mainContextRules(src), phone: phoneRules(src), wiki: wikiContextRules(char?.globalLore), registry: buildRegistry(char?.globalLore) };
   }
@@ -529,7 +530,7 @@ async function readSnapshot(fab: Fab): Promise<WatchSnapshot> {
 async function isLiteCharacter(charIndex: number): Promise<boolean> {
   if (charIndex < 0) return false;
   try {
-    const char = (await risuai.getCharacterFromIndex(charIndex)) as { globalLore?: LoreEntry[] } | null;
+    const char = await getChar<{ globalLore?: LoreEntry[] }>(charIndex);
     const lite = !!readManifest(char?.globalLore);
     if (lite && char) prefetchFactions(char as never); // 시작 화면을 열 때 사진이 하나씩 늦게 뜨지 않게
     return lite;

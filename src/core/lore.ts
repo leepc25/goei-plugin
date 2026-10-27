@@ -8,6 +8,7 @@ import { evaluate, type CbsEnv } from './cbs';
 import { tokens } from './gnet';
 import { messageText } from './refs';
 import type { Chat, LoreEntry } from './types';
+import { isVirtual } from './world/virtual';
 import { readDirectory, type AppendixWhen } from './world/directory';
 import { parseWorld } from './world/engine';
 import { WORLD_KEY } from './world/output';
@@ -168,7 +169,7 @@ export function syncDecorators(lore: LoreEntry[] | undefined, mode: LoreMode): L
   const locked = new Set(readDirectory(books).appendices.filter((r) => r.unlock).map((r) => r.lore));
   let n = 0;
   const next = books.map((e) => {
-    if (!managedHere(e, kinds)) return e;
+    if (!managedHere(e, kinds) || isVirtual(e)) return e;
     const content = str(e.content);
     const on = hasDontActivate(content);
     const keep = mode === 'plugin' || (kinds.get(str(e.folder)) === 'appendix' && locked.has(str(e.comment)));

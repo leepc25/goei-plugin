@@ -5,6 +5,7 @@ import { listDocs, prepareBaseDocs } from '../core/wiki';
 import type { Chat, LoreEntry } from '../core/types';
 import { statusHtml, type StatusContext } from '../ui/status';
 import { armChatClick, elements, hit, onChatClick } from './chatclicks';
+import { getChar } from './risu';
 
 let ctx: StatusContext = { timeline: null, terms: [] };
 /** 위키 이름을 누르면 (app.ts가 채운다) */
@@ -18,7 +19,7 @@ export function setWikiOpener(f: (title: string) => void): void {
 export async function refreshStatusContext(charIndex: number, chatIndex: number): Promise<void> {
   if (charIndex < 0 || chatIndex < 0) return;
   const chat = (await risuai.getChatFromIndex(charIndex, chatIndex)) as Chat | null;
-  const char = (await risuai.getCharacterFromIndex(charIndex)) as { globalLore?: LoreEntry[] } | null;
+  const char = await getChar<{ globalLore?: LoreEntry[] }>(charIndex);
   if (!chat) return;
   const texts = (chat.message ?? []).filter((m) => m.role === 'char' && typeof m.data === 'string').map((m) => m.data);
   await prepareBaseDocs(char?.globalLore).catch(() => undefined);

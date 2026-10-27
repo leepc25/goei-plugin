@@ -7,3 +7,7 @@ export * from './registry';
 export * from './directory';
 export * from './calendar';
 export * from './status';
+export * from './schema';
+export * from './records';
+export * from './assemble';
+export * from './virtual';

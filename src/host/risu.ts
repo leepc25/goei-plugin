@@ -1,3 +1,4 @@
+import { stripVirtual, withWorldLore } from '../core/world/virtual';
 import type { Chat, LoreEntry } from '../core/types';
 import { applyAdvanced } from '../core/advanced';
 
@@ -24,6 +25,8 @@ export async function loadContext(): Promise<ChatContext | null> {
   const char = (await risuai.getCharacterFromIndex(charIndex)) as CharacterSnapshot | null;
   const chat = (await risuai.getChatFromIndex(charIndex, chatIndex)) as Chat | null;
   if (!char || !chat) return null;
+  // 세계 데이터(기본 + 카드 덧쓰기)를 가상 로어북으로 붙인다. 저장할 때는 updateCharacterLore 가 뺀다
+  char.globalLore = withWorldLore(char.globalLore);
   chat.message ??= [];
   return { charIndex, chatIndex, char, chat };
 }
@@ -59,8 +62,15 @@ async function saveChat(charIndex: number, chatIndex: number, mutate: (chat: Cha
 export async function updateCharacterLore(charIndex: number, mutate: (lore: LoreEntry[]) => LoreEntry[] | null): Promise<boolean> {
   const latest = (await risuai.getCharacterFromIndex(charIndex)) as CharacterSnapshot | null;
   if (!latest) throw new Error('캐릭터를 찾을 수 없어요.');
-  const next = mutate(latest.globalLore ?? []);
+  const next = mutate(stripVirtual(latest.globalLore ?? []));
   if (!next) return false;
-  await risuai.setCharacterToIndex(charIndex, { ...latest, globalLore: next });
+  await risuai.setCharacterToIndex(charIndex, { ...latest, globalLore: stripVirtual(next) });
   return true;
+}
+
+/** 캐릭터 읽기 (로어북에 세계 데이터 가상 항목을 붙여서). 읽기 전용 — 저장은 updateCharacterLore 로 */
+export async function getChar<T extends { globalLore?: LoreEntry[] } = CharacterSnapshot>(charIndex: number): Promise<T | null> {
+  const char = (await risuai.getCharacterFromIndex(charIndex)) as T | null;
+  if (char) char.globalLore = withWorldLore(char.globalLore);
+  return char;
 }

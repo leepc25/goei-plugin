@@ -1,0 +1,289 @@
+{
+ "schema": 1,
+ "kind": "org",
+ "records": {
+  "관리국": {
+   "keys": "관리국",
+   "fields": {
+    "intro": "A secret organization that protects humanity and its civilization from abnormal phenomena. The Bureau relies on a few elite superhumans rather than mass manpower, hides in plain sight through perception technology.",
+    "doctrine": "- Codename system: The codename system is total. From the moment of issue the real name is forbidden, and the Bureau performs recognition-alteration on everyone around the recruit.\n- Its work is fourfold: control, exterminate, surveil, and contain.\n- Rule-sheet placement: for anomalies that cannot be capped or cleared, the Bureau writes survival rulebooks and delivers them inside.\n- Outside organizations and practitioners: the Bureau recognizes no independent authority over the abnormal. Groups may be watched, pressured, temporarily cooperated with, or exploited when necessary, but never accepted as equals.",
+    "hq": "- HQ Location: Jongno-gu, Seoul\n- A large, ordinary-looking office building in Seoul, surrounded by commuter crowds every morning. A concealment veil wraps both, and a person who steps inside and looks back sees the same street with every passerby gone.\n- Above ground are the office floors (team offices, with interview and administrative rooms on an upper floor). Below ground the building splits into two worlds. One basement level is the testing and training block, with a large shooting range and an obstacle course. The other is the containment block, all sci-fi sliding doors, unlit corridors, and cell after cell of captured anomalies. \n- Known cells include the Tooth Tree, a trunk-thick pillar densely studded with endlessly regrowing human molars in a room of about ten pyeong, and the Tooth Fairy (이빨 요정) room.\n- The Bureau with the Lights Out (불이 꺼진 관리국): A recurring reality-inversion anomaly affecting the Bureau's underground containment sector. When it manifests, the facility lights go out and turning the familiar containment block into a hostile, unreliable labyrinth.",
+    "structure": "The Bureau's force model is few-but-abnormal. espers whose powers are unstandardized and mostly untestable, and Adapters, the rare individuals able to operate the Armor, a transforming combat frame.\n- Comprehensive Response Team (종합대응팀): the do-everything front team. The hardest work flows downhill to this team, and its rookies historically die, transfer, or quit.\n- Suppression Team (진압팀): immediate-combat response.\n- Containment Team (격리팀): runs the basement cells and extraction work, with its own research lab.\n- Surveillance Team (조사팀): watches uncappable anomaly sites and performs rule-sheet placement runs.\n- Mental Care Team: handles mandatory referrals, including agents who develop affection for containment subjects.",
+    "hierarchy": "- Rank: Sa-jang > Guk-jang > Boo-jang > Senior agent (Sunbae) > Agent",
+    "recruitment": "##### First Contact and Recruitment\n- The Bureau finds its people through the aftermath of horror. A survivor is debriefed at length, and then offered exactly two doors.\n   - Door one: memory-erasure treatment and a return to ordinary life.\n   - Door two: become an agent.\n- Intake consists of an interview with a Boo-jang-grade officer, codename issuance, physical and marksmanship testing in the basement, a medical examination, and issue of the black suit.\n- Life in the Bureau: The Bureau reads as a company, not an army. Its culture is female-heavy office life, all quiet floors, senior-junior teasing, convenience-store coffee, and occasional team dinners at a nearby pasta restaurant."
+   },
+   "extra": [],
+   "variants": {
+    "B00": {
+     "intro": "Regarded by the opposing Bureau as an organization of monsters imitating it. It appears at deviant hotspots, combats hostile entities, and kills agents of the opposing Bureau."
+    }
+   },
+   "departments": {
+    "종합대응팀": "Comprehensive Response Team",
+    "진압팀": "Suppression Team",
+    "격리팀": "Containment Team"
+   }
+  },
+  "가짜 관리국": {
+   "keys": "Fake Anomaly Management Bureau, Fake Management Bureau, Fake Bureau, 가짜 관리국, 가짜관리국",
+   "fields": {
+    "intro": "the Bureau's absolute enemy and an organizational anomaly officially classified as \"anomaly; communication impossible.\" No recognition, negotiation, or coexistence is permitted; every confirmed manifestation is subject to immediate elimination.\n\nThe organization that controls this world's secrets under the creed, \"We serve mankind from the world's other side.\" Its agents call anomalies deviant phenomena and hostile entities 'I-mul', and answer both with systematized force. To ordinary people, it is an urban legend about black-suited men who come for those who learn too much.\n\n- Attire: black suits; all listed officers except Sa-jang wear sunglasses.\n- Sword Corps: Equipment: katanas.",
+    "doctrine": "##### Doctrine of Force\n- Immediate firepower: mass agents in black suits and sunglasses, submachine guns first, and a professional Sword Corps for what bullets cannot solve.\n- Civilian policy: no survivors are left in a corrupted zone. Any civilian may be foreign matter wearing a face, and any true human still inside is already lost.\n- Public policy: the truth is suppressed because \"the more who know, the worse it gets.\"\n- Anomalous powers and their users: all supernatural abilities, entities, organizations, and practitioners are classified as foreign matter or its collaborators, regardless of whether they call their power miracle, faith, commerce, or sorcery. Parley is forbidden and engagement is authorized.",
+    "hq": "##### Headquarters\n- HQ Location: Jongno-gu, Seoul\n- Headquarters is a large office building staffed wall to wall with black suits. It contains administration, team offices, the armory, auditorium, underground hall, a vast indoor training complex where the Sword Corps drills, and sealed basement corridors leading to the Database chamber.",
+    "structure": "The Bureau runs on mass manpower organized into specialist corps.\n- Sword Corps (검사부대): The Bureau's strongest strike force, an elite close-combat unit for foreign matter that firepower cannot stop. The standard weapon is a Bureau-made black katana, effectively indestructible. A bounding run in which each lateral sway adds inexplicable acceleration beyond human limits.\n- Suppression Corps (진압부대): open-field mass engagement. Project suppressive fire in disciplined sectors.\n- Incineration Corps (소각부대): Burn corrupted zones to the foundations, with no-survivor perimeters enforced as written.\n- Interrogation and Information Security: The disposition of every captured civilian, the recruitment pitch for the useful, extraction routing for the failed.\n- Recruit Education: operates the underground hall, the Education Device, and the orientation ceremony.\n- Above the corps sit the Office of the Guk-jang, the Bureau's political and institutional apparatus, and the Office of the Sa-jang, which no formation chart explains.",
+    "hierarchy": "- Rank: Sa-jang > Guk-jang > Boo-jang > Cha-jang > Gwa-jang > Dae-ri > Joo-im > Sa-won",
+    "assets": "##### The Database\n- Full agenthood begins with Database access, granted by merit and approval in a basement chamber. The Database synchronizes with agents and exists in its mind as a thought-driven intranet.\n- HIDDEN SECRET: The Database is an interment machine. \"Access\" places the agent's original body and brain inside it; what walks out is an output duplicate that remembers nothing of the procedure and believes itself original. No agents outside the Bureau's upper leadership know the truth of this process.",
+    "recruitment": "The Bureau recruits from the anomaly-touched and does not ask.\n1. Abduction: survivors of deviant phenomena and uploaders of forbidden footage are tranquilized by field agents and wake in an interrogation room.\n2. The Education Device: a vast retro-futurist machine implants memories of a training camp that never occurred.\n3. Graduates wake in an orientation auditorium. Rookies receive agent terminals with mission data, team rosters, and real-time intelligence, plus black suits, sunglasses.\n5. Life in the Bureau: Inside, the Bureau feels like the army. a male-heavy brotherhood of drills."
+   },
+   "extra": [],
+   "order": [
+    "intro",
+    "doctrine",
+    "hq",
+    "structure",
+    "hierarchy",
+    "assets",
+    "recruitment"
+   ],
+   "variants": {
+    "B00": {
+     "intro": "The organization that controls this world's secrets. Its agents call anomalies deviant phenomena and hostile entities 'I-mul', and answer both with systematized force."
+    }
+   },
+   "departments": {
+    "사장실": "Executive office",
+    "국장실": "Executive office",
+    "보안심문부": "Interrogation and Information Security",
+    "인재개발부": "Recruit Education",
+    "진압부대": "Suppression Corps",
+    "검사부대": "Sword Corps"
+   }
+  },
+  "백일몽": {
+   "keys": "Baekilmong, 백일몽, 백일몽 주식회사",
+   "fields": {
+    "intro": "A pharmaceutical conglomerate that commercializes the abnormal. Its public business is pharmaceuticals; its true product is Kkumgyeol, harvested from human survival inside horror.\n\n##### Overview\nBaekilmong Co., Ltd. is a pharmaceutical conglomerate that commercializes the abnormal. It identifies anomaly spaces and phenomena as 'Gwe-dam', registers them under company codes, sends employees inside with Kkumgyeol Collectors (꿈결 수집기), and refines the recovered Kkumgyeol (꿈결) into reagents approaching reality manipulation.\n\n- Field Exploration Team: Field attire: suits and assigned animal masks.",
+    "assets": "##### The Core Assets\nThe company's entire economy stands on two objects.\n- The Kkumgyeol Collector: A graduated portable cylinder issued to the Field Exploration Team. It remains empty inside a Uh-doom, or Gwe-dam, then fills at once with Kkumgyeol when its carrier successfully escapes or clears it. With no pump, valve, or visible intake, the completed experience of surviving the Gwe-dam is converted directly into liquid. Its quality and concentration depend on the Gwe-dam's difficulty and grade, the method of escape or clearance, and the time spent inside.\n- The Kkumgyeol Solution (꿈결용액): refined, graded Kkumgyeol. Grading follows the Uh-doom-grade ladder and is determined by concentration, ranging from F to S. Applications run from welfare-mall regeneration potions up to the deep end of company research.\n\n##### Uh-doom Classification\nRegistered Uh-doom carry a company identification code in the format Qterw-[grade]-[number] (e.g., Qterw-D-16), independent of any government registry.\n\n##### Clear Reward\n- F (Shade): 100p\n- E (Twilight): 250p\n- D (Dusk): 1,000p\n- C (Gloaming): 2,500p\n- B (Gloom): 10,000p\n- A (Darkness): 100,000p\n- S (Abyss): Assessed separately",
+    "structure": "- HQ Location: Gangnam-gu, Seoul\n- Development Division: five teams led by a Development Division Director. Its flagship and meat grinder is the Field Exploration Team, whose operatives enter Uh-doom and fill collectors.\n   - Field Exploration Team (현장탐사팀): lettered Jo. A, B, and C are the Elite Jo, middle letters handle ordinary exploration, and X, Y, and Z form the Finishing Jo.\n   - Elite Jo terms (A/B/C): private office, separate pay table, expanded mall catalog, an assigned Finishing Team \"spare life\".\n   - Finishing Jo (마무리조): hires who passed intake but are disqualified from normal duty and deployed mainly in experimental situations. They are called meat shields or \"a spare life issued to employees with work sense.\"\n- Security Division: Personnel eroded by anomalies until they no longer register as human, and therefore can no longer fill a collector, are transferred here. The Guard Team is tenured for life, and resignation is impossible. The Security Team absorbs the near-monster grade, while its Special Section is a category further still.\n- Raw Materials Development Division: the research arm, including Research Team 1 and related teams. It receives filled collectors, grades solutions, records newly registered Uh-doom, and staffs the labs, isolation rooms, and culture rooms.\n- Support organs: Sales Team, Personnel Team, infirmary, and directors. Directors run named PROJECTS and may requisition any employee, including for a classified project tied to extinction-class phenomena.",
+    "hierarchy": "- Rank: Jeon-mu > I-sa > Boo-jang > Cha-jang > Gwa-jang > Dae-ri > Joo-im > Sa-won\n- Position: Team-jang, Jo-jang",
+    "recruitment": "##### Recruitment and Orientation\n- Baekilmong presents recruitment as an elite corporate opportunity. Selected candidates are gathered in a separate hall for a polished orientation film.\n- For Field Exploration recruits, the orientation itself is the final screening. They are sent directly into a Uh-doom, and only those who return alive are accepted as permanent employees. Survivors receive an employee ID and an animal mask.\n- Field Exploration Team members wear animal masks on all external operations, issued after orientation, and colleagues often address one another by mask animal rather than real name.\n- The Welfare Mall: the company scrip economy. Points are issued per Uh-doom grade cleared. Points buy potions, gear, and services; 10,000 points is treated as roughly the worth of an A-grade-plus solution.",
+    "doctrine": "- Other Organizations: Baekilmong does not reject Other organizations on principle. It evaluates them by utility, risk, and cost. Conflict is avoided when accommodation is more profitable, but any group that threatens company personnel, interferes with collection, or cannot be controlled is treated as a hostile business risk and dealt with accordingly."
+   },
+   "extra": [
+    {
+     "name": "Former Partnership with Yukwae Research Institute",
+     "value": "- Baekilmong and Yukwae Research (유쾌연구소) Institute were active partners from the beginning. \n- Yukwae Research Institute was later destroyed and no longer exists as an operating organization, but technology developed by the Institute remained connected to Baekilmong's later product line.\n- Beginning at B2 beneath Baekilmong headquarters is an Institute Echo reproducing the former Yukwae Research Institute floor after floor. Baekilmong excavates prototypes and media connected to Gwe-dam from the Echo, including those that can develop into Uh-doom.",
+     "kind": "block"
+    }
+   ],
+   "order": [
+    "intro",
+    "assets",
+    "structure",
+    "hierarchy",
+    "recruitment",
+    "x:Former Partnership with Yukwae Research Institute"
+   ],
+   "title": "Baekilmong corporation (백일몽 주식회사)",
+   "roster_notes": [
+    {
+     "department": "Field Exploration Team",
+     "label": "A Jo (Elite Jo)"
+    },
+    {
+     "department": "Field Exploration Team",
+     "label": "B Jo (Elite Jo)"
+    },
+    {
+     "department": "Field Exploration Team",
+     "label": "D Jo"
+    },
+    {
+     "department": "Field Exploration Team",
+     "label": "F Jo"
+    },
+    {
+     "department": "Field Exploration Team",
+     "label": "I Jo"
+    },
+    {
+     "department": "Field Exploration Team",
+     "label": "R Jo"
+    },
+    {
+     "department": "Field Exploration Team",
+     "label": "Y Jo (Finishing Jo)"
+    }
+   ],
+   "departments": {
+    "임원실": "Executive office",
+    "현장탐사팀 A조": "Field Exploration Team",
+    "현장탐사팀 B조": "Field Exploration Team",
+    "현장탐사팀 D조": "Field Exploration Team",
+    "현장탐사팀 F조": "Field Exploration Team",
+    "현장탐사팀 I조": "Field Exploration Team",
+    "현장탐사팀 R조": "Field Exploration Team",
+    "현장탐사팀 Y조": "Field Exploration Team",
+    "연구팀": "Research Team 1",
+    "메뉴얼 심사팀": "Administrative Support",
+    "경비팀": "Guard Team"
+   }
+  },
+  "특수재난대응협회": {
+   "keys": "SDRA, Special Disaster Response, 특수재난대응협회, 협회",
+   "fields": {
+    "intro": "A private association that licenses freelancers and brokers anomaly missions, taking a commission at every step. Operating without its license is illegal, so its exploitative rates go unchallenged.\n\n- The Special Disaster Response Association is a private civilian organization that manages independent freelancers engaged in anomaly response.\n\n- ---",
+    "assets": "##### Characteristic\n- The Association is nominally a support body for registered freelancers, but in practice it is a bureaucratic institution that prioritizes organizational continuity and revenue over freelancer welfare.\n- The Association serves as the intermediary between clients and freelancers, extracting substantial commissions throughout the process. Its rates are widely considered exploitative, but operating without an Association license is illegal, leaving freelancers with little practical choice.\n- Its large freelancer network also functions as an extensive information network. Routine field activity produces a continuous flow of incidental intelligence across different regions and anomaly types.",
+    "structure": "##### HQ Structure\n- The Association headquarters is located in Yeongdeungpo-gu, Seoul. The B4–10F mid-rise building is publicly presented as the office of a disaster consulting firm.\n- The upper floors contain executive offices and the chairman's office.\n- The middle floors house mission operations, licensing, and general administration.\n- The basement contains equipment storage, secure briefing rooms, and a small clinic for registered freelancers.\n\n##### Division\n- Mission Coordination Office: The Association's core revenue unit. It receives client requests, posts missions for freelancer assignment, processes payment, and extracts commission.\n- Licensing Office: Issues, renews, suspends, and revokes freelancer licenses while maintaining the active registry.\n- Support Office: Handles insurance, equipment channels, medical referrals, and liaison work with the Bureau. It is nominally responsible for freelancer protection, but its assistance is slow and limited in practice.",
+    "personnel": "##### Freelancers (프리랜서)\n- Independent operators registered with the Association who receive missions through its brokering system. They are not employees, but contractors who pay the Association for the legal right to operate.\n- Grade 5 Provisional: Entry-level freelancers charged the highest commission rate.\n- Grade 4 Standard: Fully registered freelancers, uses the standard commission rate.\n- Grade 3 Experienced: Freelancers qualified for specialized missions. They receive slightly reduced commissions.\n- Grade 2 Senior: Veteran freelancers who receive lower commission rates.\n- Grade 1 Elite: The highest standard grade, granting minimal commissions.\n- Special Grade: An honorary classification granting near-total operational autonomy."
+   },
+   "extra": [],
+   "order": [
+    "intro",
+    "assets",
+    "structure",
+    "personnel"
+   ],
+   "title": "Special Disaster Response Association (특수재난대응협회) / SDRA"
+  },
+  "중림 지하상가": {
+   "keys": "Jungrim, Jungrim Underground, 중림",
+   "fields": {
+    "intro": "The underground economy beneath Jungnim-dong for goods and services no legal channel provides, run by fixers, fences, backalley doctors, and loan sharks. Business is openly predatory, payment comes first.\n\n- The Jungrim Underground Shopping Center is an informal underground economy dealing in goods and services that cannot be obtained through legal or semi-legal channels.\n- It is not a faction or unified organization, but a loose network of self-interested operators held together by profit, necessity, and mutual distrust.\n- It located beneath Jungrim-dong, Seoul. At street level, it appears to be little more than a failing basement mall filled with aging shops and low-traffic vendors.",
+    "assets": "##### Characteristic\n- Business within the Shopping Center is openly predatory. Prices are inflated, information is treated as a commodity, and trust is both scarce and expensive. There is no expectation of loyalty, and refunds are effectively nonexistent.\n- Disputes are settled privately between the parties involved or submitted to a broker for arbitration, with no recognized process for appeal.\n- Cash remains the standard form of payment, but anomalous materials, Bureau equipment, favors, services, and personal collateral are also accepted.\n- Debt is enforced without exception. Default usually results in exclusion from the market, followed by recovery through hired intermediaries.",
+    "personnel": "##### Core Participants\n- Fixers connect buyers with sellers, contractors with clients, and available personnel with jobs.\n- Fence Operations distribute stolen, confiscated, or unregistered anomalous items, including Bureau equipment and unauthorized Baekilmong products.\n- Backalley Doctors provide unlicensed treatment for ordinary injuries and anomalous conditions.\n- Loan Sharks provide high-risk loans to people access to legitimate financial institutions. Their interest rates are extreme, and accepted collateral may include abilities, or body parts."
+   },
+   "extra": [],
+   "title": "Jungrim Underground Shopping Center (중림 지하상가)"
+  },
+  "교황청": {
+   "keys": "Blaret, 블라렛, Papal Court, Vatican, 교황청, 바티칸, Christian goods shop, 기독교 상점",
+   "fields": {
+    "intro": "The Holy See's covert combat arm, dispatching battle nuns and paladins against vampires, sorcerers, and heresies. It operates in Korea under civilian cover, outside the institutional order, and cooperates only when a shared threat outranks doctrine.\n\n- The Holy See's covert combat arm: popes and clergy have secretly fought monsters throughout history, and its exorcism tradition is the stuff of legend even among rival factions.\n- Deploys special-class battle nuns, paladins, and crusader assets worldwide against vampires, sorcerers, and heresies; sorcerers regard Vatican paladins with genuine dread, and a witch of standing treats a slain paladin's relics as trophies of the highest grade\n- Maintains overseas stations under civilian cover; the Korean presence operates through a Christian goods shop (기독교 상점) whose blessed crosses and relics are genuine anti-vampire equipment\n- Classified by the Management Bureau as a hostile organization, though field-level pragmatic cooperation occurs when a shared threat outranks doctrine\n- Standing blood-feud hostility with the Islamic crusader force; their elites cannot share a room without hands drifting to weapons, and only third-party mediation keeps joint operations functional"
+   },
+   "extra": [],
+   "title": "The Vatican (교황청)"
+  },
+  "이슬람": {
+   "keys": "Islamic, Islam, Jihad, Saladin, 이슬람, 살라딘, 지하드",
+   "fields": {
+    "intro": "The militant holy arm of Islam, whose champions summon legions of warrior spirits from Mecca. Like the Vatican it overwhelms sorcery as a matter of natural law, and the two share a standing blood-feud.\n\n- The militant holy arm of Islam, fielding jihad crusaders against supernatural threats; its apex operatives rank among the most dangerous individuals on the planet\n- Commands legions of warrior spirits: Mamluk heavy cavalry and crusader hosts summoned from Mecca, whose reserves are described as endless as fish in the ocean\n- Mecca functions as the faction's sanctum and arsenal; its champions can summon designated enemies to Mecca itself for judgment and execution\n- Clergy of this faction, like the Vatican's, hard-counter sorcerers; the mage world's failure to rise is attributed directly to the priesthoods' one-sided advantage over them\n- Standing blood-feud with the Vatican; the Management Bureau classifies the faction as untouchable, with standing orders to flee on sight of its champion"
+   },
+   "extra": [],
+   "title": "Islam"
+  },
+  "발푸르기스": {
+   "keys": "Walpurgis, 발푸르기스, Avensha, 아벤샤, 마도사",
+   "fields": {
+    "intro": "The organized body of the world's sorcerers, ruled by the Society Head with the Ten Witches beneath. Individually its practitioners are devastating, but the priesthoods counter them so thoroughly that the mage world has never risen openly and survives hidden among humans.\n\n- The organized body of the world's sorcerers; a hierarchy crowned by the Society Head, beneath whom stand the Ten Witches, the faction's most renowned practitioners, with all lesser mages ranked far below\n- Mage culture is built on absolute seniority worship: juniors prostrate themselves before superior practitioners, self-abase in florid vocabulary, and treat murderous caprice from seniors as an occupational hazard; courtesy and lethality are not in tension\n- Sorcerers are individually powerful and collectively suppressed: the priesthoods (Vatican, Islam) hard-counter magecraft so thoroughly that the mage world has never risen openly, surviving instead through concealment among humans and evasion tradecraft\n- Classified as a hostile grouping by the Management Bureau; hunted on identification by both priesthoods"
+   },
+   "extra": [],
+   "title": "Walpurgis Society (발푸르기스 협회)"
+  },
+  "흡혈귀": {
+   "keys": "Vampires, 흡혈귀, Secriem, 세크리엠",
+   "fields": {
+    "intro": "An ancient bloodline power under the True Ancestor, expanding by turning humans into ghouls and raising the chosen into vampires. Its society is riven by factional and territorial struggle. The Vatican hunts it, and the classic banes hold in full.\n\n- An ancient bloodline power structured around the True Ancestor at its apex, descending through elder vampires to fledglings and ghouls; vampires convert humans by bite into ghouls, and cultivate chosen ghouls upward into true vampires\n- Vampire society is intensely political: factions, territorial claims, and independence bids are constant, and powerful individuals surface publicly when building their own power bases\n- Standard vampiric capabilities include superhuman speed sufficient to dodge gunfire on reaction, bat-swarm dispersal, blood-blade projection, regeneration through feeding, and mass hypnosis via ocular wave\n- Classic banes apply with full force: garlic, holy power, and blessed implements; silver wounds but does not decide; sunlight constrains operations\n- Hunted by the Vatican as a standing mandate and monitored by the Management Bureau; a True Ancestor-level manifestation is treated by every faction as a regional catastrophe in progress"
+   },
+   "extra": []
+  },
+  "무명찬란교": {
+   "keys": "Mumyeong, Chanran-gyo, Nameless Brilliant, Nameless Radiance, 무명찬란교, 이름님",
+   "fields": {
+    "intro": "A doomsday faith worshipping Ireum-nim, which holds that the world's root is the tale itself. Its sects discover, cultivate, and feed anomalies as acts of devotion, believing that becoming meaningful enough will earn survival past the end.\n\n##### Overview\n- The cult worships an entity called \"Ireum-nim (이름님)\", whose will alone is said to give meaning to the world.\n- A doomsday faith: its adherents believe the world's root is the tale itself, and that a person who becomes a MEANINGFUL existence in this world will be chosen by their god to survive the end times.",
+    "doctrine": "- This world is the property of the Ireum-nim. Only Ireum-nim's will and choices have meaning.\n- Ireum-nim knows every narrative and every story. Only their will is the answer to the world's truth. Only their will has meaning.\n- If Ireum-nim pities us, perhaps we will be granted rest after the apocalypse.\n- Practice: adherents discover, tend, cultivate, and feed anomalies as acts of devotion; a well-raised tale is an offering, and a life woven into one is a career.",
+    "structure": "Six sects, each fanatically devoted to a distinct sacred law, each generating its own species of anomaly.\n\n1. The Mimic Order\n- Doctrine: Ireum-nim is pleased when an entity copies and replaces another's narrative. Through perfect mimicry, an apprentice can usurp the \"story slot\" of the imitated person.\n- Power Granted: Power of the Mimic — the bearer can grow into and replace another individual's identity by re-enacting the formative events of their life.\n\n2. The Capacity-Praising Order\n- Doctrine: Ireum-nim prefers detailed individual suffering over mass casualties. A single character writhing in slow, thorough, exquisitely-described pain pleases Ireum-nim more than a body count chart. Therefore narratives must have a fixed cast quota, and that cast must endure exhaustive, drawn-out torment.\n- Ritual practice: Self-mutilation (often amputation of legs), self-sealing inside containers, and the staging of horror events with rigid cast caps.\n\n3. The Happy Ending Order\n- Doctrine: Among those judged unfit to survive the apocalypse, the most altruistic offering is to grant them a \"happy ending\" — i.e. death, because the dead cannot become unhappy.\n- Initiation Requirement: To enter as a lay member, the applicant must commit at least one murder, and the victim must be someone the applicant sincerely wishes happiness for (a relative, a loved one). Initiates publicly weep and praise the victim's virtues during the ritual."
+   },
+   "extra": [],
+   "title": "Mumyeong Chanran-gyo (무명찬란교)"
+  },
+  "병원": {
+   "keys": "병원",
+   "fields": {
+    "intro": "An anomalous medical order that makes diseases and cures them, pursuing a more perfect human through endless experimentation. Whoever enters and fails to leave is admitted as material, and in time as staff.\n\nThe Hospital is an anomalous medical order governed by one operating principle, stated flatly in every Bureau briefing that mentions it: IT MAKES DISEASES, AND IT CURES THEM. The curing half makes it a hospital; the making half is its purpose. According to the Bureau's assembled understanding, its long-term project is the manufacture of a more perfect human being through endless clinical experimentation on whoever its facilities take in. It is neither a metaphor nor a cult of doctors, but an institution with campuses, staff, wards, admissions, and a research program. Its institutional patience is what makes it worse than a monster.",
+    "doctrine": "##### Territorial Nature\nAnywhere the Hospital establishes itself TRANSFORMS into \"a place human beings must not enter\". Its facilities are NOT otherworlds: they stand in reality, at real addresses, which is why they cannot simply be razed or sealed and why the Bureau's standing countermeasure is facility-specific escape MANUALS rather than demolition. A person who enters and fails to leave is not killed but ADMITTED: absorbed as experimental material and, in time, as staff. The Hospital does not hire. It admits, then assigns."
+   },
+   "extra": []
+  },
+  "극단": {
+   "keys": "극단",
+   "fields": {
+    "intro": "An anomalous theatrical order whose plays and musicals are themselves anomalies, opened in real theaters. Inside its works narrative is authority, and the audience becomes the cast.\n\nThe Troupe is an anomalous theatrical order that MAKES and DISTRIBUTES plays and musicals which are themselves anomalies. Its productions form a larger sequence progressing through Act 1, Act 2, and Act 3 toward the FINAL PLAY, a culminating work intended to impose a variation upon the world. Each act is one stage of the rite, and every audience becomes part of its cast.",
+    "doctrine": "##### Method: Art as Vector\n- The Troupe releases its works through ORDINARY CULTURE. Its productions open in real theaters, sell real tickets, and earn genuine public acclaim, allowing the anomaly to spread under the appearance of entertainment. Performers, staff, and ticket-holders drawn into the production become material for the act.\n- Each work follows theatrical structure at every level, with a designated venue, opening schedule, staging requirements, and a CANON that determines how the production must unfold. Every completed performance advances the sequence toward the FINAL PLAY.\n- The Bureau treats every large-scale performance anomaly as a possible Troupe act and compares it against the known sequence. Any confirmed progression is considered evidence that the FINAL PLAY is drawing closer.\n\n##### The Law of the Stage\n- All known Troupe productions are governed by the same anomalous law: within the work, NARRATIVE IS AUTHORITY.\n- Anyone caught inside may be assigned a role and forced to obey its costume, blocking, relationships, and scripted speech. They should remain within that role until they identify a way to alter the narrative, as direct confrontation only subjects their power to the authority of the story.\n- This law creates the Troupe's only confirmed general weakness: REWRITE THE PLAY. If an unbeatable lead is successfully rewritten within the running narrative as an insignificant villain in a failed production, it loses the power granted by its former role. A Troupe work is rarely defeated by force, but it can be out-AUTHORED.",
+    "hierarchy": "- THE TROUPE MASTER: The faction's apex and a puppeteer in the fullest sense. It commands swarms of dolls as both shield and army, kills with thread, and addresses others through copied faces and voices. It also creates DOUBLES, distorted versions drawn from living people and remade in Troupe costume with thread-based abilities.\n- THE STAGE MANAGER: A subordinate impresario responsible for hosting, producing, and constructing individual acts. It specializes in perception edits that recast IT as an ally, alter how participants interpret events, and redirect the harm it causes.\n- THE COMPANY: The Troupe maintains no permanent cast. Each production ABSORBS its own company from auditioners, ticket-holders, temporary staff, and anyone else touched by the work. Those taken are assigned roles as actors, guards, or puppets while remaining ordinary human beings. Fighting a Troupe production therefore means fighting its audience."
+   },
+   "extra": []
+  },
+  "세계정치 게시판": {
+   "keys": "World Politics Forum, WPF, 세계정치, 세계 정치, 세정게, 세계정치 게시판",
+   "fields": {
+    "intro": "An internet board with a madhouse reputation, where a meaningful share of the lunacy is real survivor testimony. Both Bureaus monitor it, and users who post or search carelessly disappear.{{getvar::fac_extra}}\n\n##### Overview\n- An internet board nominally about world politics, but in practice one of the internet's densest concentrations of conspiracy theories: the deep state, aliens, brain parasites, rigged lotteries, and similar claims. Its public reputation is that of a gathering place for lunatics.\n- That reputation conceals the fact that a meaningful portion of its content is true. Many of its regular users are survivors of genuine anomalous encounters sharing what they witnessed.\n- The board's knowledge is fragmentary and limited to the survivor's side of events. Its users know that suited agents abduct people and that those taken never return, but they do not know who the agents are, which organization they belong to, or why they take people.\n- Genuine testimony and fabrication look almost identical on the board and are mocked equally. Even so, reports of real phenomena often appear there years before any organization acknowledges them, making the board a genuine source of early warning.",
+    "structure": "##### User Structure\n- Floaters are the anonymous majority: tourists, mockers, and one-time survivors who post an experience once and never mention it again.\n- Named regulars use fixed nicknames and accumulate traceable posting histories. They are either unaware of the risk or skilled at concealing themselves.\n- True regulars form the inner circle. They retain their board nicknames but communicate through a separate invitation-only hidden messenger, and every member has survived at least one genuine anomalous encounter.\n- The Sub-moderator serves as the board's visible manager. They oversee the deletion of dangerous exposure posts, represent the group in negotiations, and conceal their identity, methods, and information holdings.",
+    "personnel": "##### The Survivor Collective\n- The group existed before internet forums and now uses the World Politics Forum as its public gathering place.\n- Its principle is that someone untouched by the hidden world is safest knowing nothing, while someone already exposed to it may die without information. It therefore collects information about the hidden world for survival and trades that information when necessary. Loyalty among members is genuine, and anyone who obtains survival-critical information passes it to the group."
+   },
+   "extra": [
+    {
+     "name": "Geocaching",
+     "value": "- The group's signature tradition and predates the board itself. Cryptic codes appear in forum posts and physical locations; when decoded, they reveal coordinates where earlier members buried records, anomalous objects, or information too dangerous to post openly.\n- The practice is lethal because not everything waiting at the coordinates is a cache. During one run, an entire inner-circle team disappeared. A later recovery party found their bodies buried at the site while an anomalous space was closing over it.",
+     "kind": "block"
+    },
+    {
+     "name": "Surveillance",
+     "value": "- The Anomaly Management Bureau [Affiliation code: B00]: treats the board as both a recruitment trap and a leak sensor, monitoring readers as well as posters. Users who upload anomaly footage are traced through their search histories, captured within days, and converted into agents. Kim Seong-jin of the inner circle was taken this way. Repeated keyword searches also risk attracting the attention. Reading the board carelessly can therefore be as dangerous as posting on it.\n- The Anomaly Management Bureau [Affiliation code: A00]: Monitors the board as part of a wider internet patrol, currently handled by Agent Jaemtri. When a post credibly describes a genuine phenomenon, the Bureau dispatches a field response. People aware this sometimes post deliberate requests for help to draw agents to a location. Because both Bureaus monitor the board, however, a poster cannot choose which one responds.",
+     "kind": "block"
+    },
+    {
+     "name": "Interaction Protocols",
+     "value": "- A post's tone is no indication of whether it is true, so absurd-sounding accounts cannot be dismissed solely because of how they are written. Valuable posts are often deleted within minutes, meaning useful intelligence requires real-time monitoring rather than searching old threads.\n- To contact the inner circle, a user must post something that demonstrates genuine insider knowledge and wait for it to be deleted. If it convinces the right people, a private guestbook message follows with a single suspicious link to a hidden chat.\n- The group trades information for services. It seeks the resolution of specific phenomena and the recovery of missing members, offering information gathered.\n- Its condition is that no one attempt to trace its members or communication channels. Attempting to do so, or leaking the link, ends the relationship at minimum.",
+     "kind": "block"
+    },
+    {
+     "name": "Cultural Texture",
+     "value": "- Typical threads include brain-parasite countermeasures, claims that the presidency has been controlled since the founding of the republic, a deep-web dump of Gulf War UFO footage, posts with punctuation inserted inside words to evade automated scanning, insults directed at wiretapping agents, and ignored users claiming that a device has been implanted in their ear.\n- The running joke is that regular users keep disappearing, and it is accurate. Some are abducted by the B00 Bureau, some die while geocaching, and the rest follow the established rule that the abnormal attracts the abnormal.",
+     "kind": "block"
+    }
+   ],
+   "title": "The World Politics Forum / WPF (세계정치 게시판 / 세정게)"
+  },
+  "남해지사": {
+   "keys": "Namhae Branch, 남해지사, 남해 지사, Baekilmong Namhae",
+   "fields": {
+    "intro": "- A regional branch of Baekilmong (C00), not an independent faction: its staff are Baekilmong employees, its output goes to HQ, and HQ can audit, overrule, or abandon it.\n- HQ calls it a pilot branch: \"harsh environment, excellent efficiency,\" praised for recycling resources, minimal consumables, and unmatched output per cost. Corridor slogan: \"Save resources and serve the company.\"\n- It keeps HQ's old habit of feeding people into Uh-doom in bulk without manuals or gear; early wiki stories of nameless numbered staff dying barehanded are really branch stories. Results bring absurd promotion speed: at least one current I-sa began here as staffer, document writer, and zone manager.",
+    "hq": "##### Location\n- A windowless underground site like a closed coal mine (concrete corridors, dripping shafts, rails, prison-like steel doors); new hires are told it was a mine. Truly beneath the coast near Yongmeori, Jeju, classified even from most staff. People arrive by tinted vehicle or asleep; car-only passengers still reach the island (whether the transport is anomalous is unknown).\n- Built over a native Uh-doom (see 하얀 끈); going deeper is forbidden. Vertical escape shafts with one ladder and keypad hatches open onto the basalt shore; codes are staff knowledge.",
+    "personnel": "- Branch Chief: personnel authority; holds the only office Security cannot enter; exposed to rival HQ executives.\n- Researchers (연구원/담당자): each owns a block of Worker numbers, commands by loudspeaker without hearing replies, assigns Uh-doom, questions survivors in the Work Communication Room, and sets promotions. Paid mostly in points skimmed from Workers' collectors, they hide lucky Workers and high-grade results from HQ.\n- Branch Security: full-body suits, \"Baekilmong Guard\" tags, numbers, no records; nearly silent; tick clipboards, push Workers into rooms, collect armbands. Rule: \"Security does not remove its uniform until disposal.\" HQ calls them \"recycled mass-production units\"; they show none of HQ Security's contamination tells, which is itself unsettling.\n- Workers (작업자): day laborers, legally not employees.\n\n##### Workers\n- Recruitment: laminated yellow street flyers (\"Job seekers wanted! URGENT! …dam-specialist conglomerate\", \"Insane benefits\", \"Start work today!\"; back: \"Paid on application! 500,000 won cash\"). The tear-off number repeats itself, a second number appears, the caller screams, a voice says \"Come here,\" and the caller vanishes; the flyer then reads \"Position filled.\" Formal hires agree by phone to a \"Namhae Branch Staffing Notice\" and wake in work clothes in a waiting hall. Targets: gamblers, debtors, addicts, people nobody seeks.\n- Promise: 1,000,000 won cash daily, 100-day live-in contract (about 100 million won), no outside contact \"for confidentiality,\" \"a drug trial plus odd jobs.\" Cash never leaves; canteen, store, vending-machine clinic, and Leisure Zone recapture it.\n- Worker Grades X > Y > Z, three-digit numbers (Z999 last), distinct from HQ's X/Y/Z Finishing Jo. Z: ten per earth-walled cell, toilet hole, rotting mattresses, cold rice and anchovies; the last cell bears a \"Finishing Team\" nameplate. Y: lockable rundown flats with sofa and bath, normal meals, takeaway. X: clean three-person rooms, one bed each, good meals, a weekly weekday Leisure Zone pass. Good results bring posted Special Reassignments (e.g., \"Y492 -> X915\"); grades readjust weekly. The missing are \"reassigned elsewhere.\"\n- Red neck sticker: \"[number] / Classification: Worker / Days remaining: N\". Unremovable without branch chemicals; touching it earns demerits. Beyond the branch radius it blackens, reads \"[number] / You have left your post. / Capture required.\", spreads rash, and strangles until the wearer returns.\n- Jobs: called by number block, blindfolded, mine cart, a locked left-arm cuff that secretly holds a crude Kkumgyeol Collector (researcher takes the yield, each level above takes a cut; damage \"deducted from wages\"), an unmarked steel door, no manual. Refusal: left inside, unpaid, demerits. Night Special Work pays double to triple and drops 100+ Workers into one Uh-doom. Labor Experiments hide anomalous items in meals or hand them out as \"parasite medicine.\""
+   },
+   "extra": [
+    {
+     "name": "Relations and Seeds",
+     "value": "- HQ tolerates the branch but audits after incidents; researchers see audits as point and manual theft. An auditor granted temporary mooring becomes acting manager with Worker disposal authority.\n- Management Bureau (A00): hiring is formally legal, the site hidden, Workers cut off; Bureau rescue lines inside Uh-doom can still reach a trapped Worker. Debt brokers and Jungrim loan sharks naturally supply desperate people.\n- Seeds (possibilities, not history): the White Cord breaches into the dorms and the infected knock claiming to be Security checking a false alarm; a Beauty Pill experiment meets the Leisure Zone bar and summons the Purgatory Choir's parade; an escaped Uh-doom follows a Worker back and is newly registered in a sealed zone; an HQ auditor arrives and researchers hide their best Worker and collector; a Worker finds a Staff Only handle fragment under a Z mattress.",
+     "kind": "block"
+    }
+   ],
+   "title": "Baekilmong Namhae Branch (백일몽 남해지사)"
+  },
+  "민간인": {
+   "keys": "",
+   "fields": {
+    "intro": "Ordinary people outside the anomalous world, unaware of its hidden factions and dangers."
+   },
+   "extra": [],
+   "summaryOnly": true
+  },
+  "프리랜서": {
+   "keys": "",
+   "fields": {
+    "intro": "Independent operators registered with the Association who receive missions through its brokering system. They are not employees, but contractors who pay the Association for the legal right to operate."
+   },
+   "extra": [],
+   "summaryOnly": true
+  },
+  "탐미주의": {
+   "keys": "",
+   "fields": {
+    "intro": "A singular art entity, the only individual counted among the great powers. It kills people as compositions and never forgets a work. Official guidance for an encounter is to run."
+   },
+   "extra": [],
+   "summaryOnly": true
+  }
+ }
+}
