@@ -91,9 +91,15 @@ await page.click('[data-action="prefs-open"]');
 await page.waitForSelector('.gw .gw-win');
 assert.ok(await page.$('.gw-set .gw-setbody .ps-group'), '설정 페이지(화면)');
 assert.ok(await page.$('[data-action="ed-node"][data-value="set:gnet"]'), '설정 트리');
-await page.click('[data-action="ed-node"][data-value="set:image"]');
+// 탭 → 노드 (2026-10-27: 왼쪽 목록은 탭마다 달라서, 노드를 누르기 전에 그 탭을 누른다)
+const tabOfNode = (n) => (n.startsWith('guide:') ? 'guide' : n === 'install' || n === 'set:update' || n.startsWith('manage:') ? 'manage' : n.startsWith('set:') ? 'set' : 'world');
+async function goNode(n) {
+  await page.click(`[data-action="ed-tab"][data-value="${tabOfNode(n)}"]`);
+  await page.click(`[data-action="ed-node"][data-value="${n}"]`);
+}
+await goNode('set:image');
 await page.waitForSelector('.gw-set [data-action="set-asset"]');
-await page.click('[data-action="ed-node"][data-value="agent"]');
+await goNode('agent');
 if (shots) await page.screenshot({ path: `${shots}/ed-1-agents.png` });
 assert.ok((await page.locator('.gw-row').count()) >= 55, '요원 목록');
 await page.click('.gw-row:has-text("쟈알디")');
@@ -121,7 +127,7 @@ assert.ok((await page.textContent('.gw-map')).includes('성격'));
 await page.click('[data-action="ed-import-apply"]');
 await page.waitForFunction(() => document.querySelector('textarea[data-key="agent|쟈알디|character"]')?.value.includes('장난스럽다'));
 // 세력 관계: 왼쪽 조직 목록 → 오른쪽에 「고른 조직 → 다른 조직」 줄마다 단계 (2026-10-27 새 레이아웃)
-await page.click('[data-action="ed-node"][data-value="relations"]');
+await goNode('relations');
 await page.waitForSelector('.gw-rel-rows');
 await page.click('[data-action="ed-rel-pick"][data-value="극단"]');
 await page.waitForFunction(() => document.querySelector('.gw-head h2')?.textContent?.startsWith('극단'));
@@ -137,13 +143,13 @@ await page.fill('input[data-input="ed-rel-memo"][data-key="극단>병원"]', '�
 if (shots) await page.screenshot({ path: `${shots}/ed-3-relations.png` });
 // 지침
 // 지침은 그 기능의 설정 페이지 아래 (2026-10-27): RP·Directive 는 「본편 지침」
-await page.click('[data-action="ed-node"][data-value="set:guides"]');
+await goNode('guide:Directive');
 await page.waitForSelector('textarea[data-key="Directive|0"]');
 assert.ok((await page.locator('.gw-guide-secs .gw-field-head b', { hasText: 'COMMON' }).count()) >= 1, '지침은 절 단위 글칸');
 // 기능 설정 페이지: 괴담톡 설정 + Phone 지침이 한 페이지에, 설정 단추는 패널 처리기로 (범위 전환)
-await page.click('[data-action="ed-node"][data-value="set:phone"]');
+await goNode('guide:Phone');
 await page.waitForSelector('textarea[data-key="Phone|1"]');
-await page.click('[data-action="ed-node"][data-value="set:screen"]');
+await goNode('set:screen');
 await page.waitForSelector('.gw-set [data-action="set-theme"]');
 await page.click('.gw-set [data-action="set-theme"][data-value="paper"]');
 await page.waitForFunction(() => document.querySelector('.gw-set [data-action="set-theme"][data-value="paper"]')?.classList.contains('on'));
@@ -174,7 +180,7 @@ assert.deepEqual(errors, []);
 // 5단계: 설치 · 점검 (괴이 카드: 로어북·인사말 있음, 사진은 없음). 설정 패널의 「설치 · 점검」 단추로 다시 연다
 await page.click('[data-action="prefs-open"]');
 await page.waitForFunction(() => document.querySelector('.gw')?.hidden === false);
-await page.click('[data-action="ed-node"][data-value="install"]');
+await goNode('install');
 await page.waitForSelector('.gw-install .gw-inst-list');
 const inst = await page.textContent('.gw-install');
 assert.ok(inst.includes('인사말') && inst.includes('카드 사진') && inst.includes('위키 기본 문서'), inst.slice(0, 300));

@@ -19,7 +19,7 @@ const HELP: Record<GuideName, string> = {
   Tag: '상황판 태그 지침. 상태창 절은 `{status_section}` 자리에 설정 「상황판 → 상태창 칸」의 구성대로 자동으로 만들어져요(형식·규칙·예시). 그 자리표와 {{getvar::…}} 자리표는 그대로 두세요.',
 };
 
-export function guidePage(name: GuideName): string {
+export function guidePage(name: GuideName, crumb = ''): string {
   const text = guideUi.draft[name] ?? guideText(name);
   const dirty = guideUi.draft[name] !== undefined && guideUi.draft[name] !== guideText(name);
   // 절 단위 글칸 (2026-10-27 사용자): 구분 줄(@@SECTION·===·##)은 플러그인이 들고, 사용자는 절 본문만 고친다
@@ -28,7 +28,10 @@ export function guidePage(name: GuideName): string {
     .map((p, i) => `<div class="gw-field"><div class="gw-field-head"><b>${esc(p.title)}</b>${p.head && p.head !== '\n' ? `<small class="gw-ftitle">${esc(p.head.trim())}</small>` : ''}<span class="gw-ftok">${tokens(p.body) ? `${tokens(p.body).toLocaleString()}토큰` : ''}</span></div>
       <textarea data-input="ed-guide-sec" data-key="${name}|${i}" rows="3" spellcheck="false">${esc(p.body)}</textarea></div>`)
     .join('');
-  return `<div class="gw-page"><header class="gw-head"><h3>${esc(GUIDE_LABEL[name])} 지침<small>이 기기 공통${guideOverridden(name) ? ' · 고침' : ' · 기본'} · ${parts.length}절</small></h3>
+  const title = crumb
+    ? `<div class="gw-crumb">${esc(crumb)}</div><h2>${esc(GUIDE_LABEL[name])}<small>이 기기 공통${guideOverridden(name) ? ' · 고침' : ' · 기본'} · ${parts.length}절</small></h2>`
+    : `<h3>${esc(GUIDE_LABEL[name])} 지침<small>이 기기 공통${guideOverridden(name) ? ' · 고침' : ' · 기본'} · ${parts.length}절</small></h3>`;
+  return `<div class="gw-page${crumb ? ' gw-set' : ''}"><header class="gw-head">${title}
       <div class="gw-head-act"><span class="gw-tokens">${tokenizerName() ? '' : '약 '}${tokens(text).toLocaleString()}토큰</span>
         <button class="gx-mini" data-action="ed-guide-save" data-value="${name}" ${dirty ? '' : 'disabled'}>${ICONS.pen}지침 저장</button>
         <button class="gx-mini" data-action="ed-guide-reset" data-value="${name}" ${guideOverridden(name) || dirty ? '' : 'disabled'}>기본으로</button></div>
