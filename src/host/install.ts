@@ -109,19 +109,33 @@ export async function installPictures(charIndex: number, progress: Progress): Pr
   const char = (await risuai.getCharacterFromIndex(charIndex)) as Record<string, unknown> | null;
   if (!char) throw new Error('캐릭터를 찾을 수 없어요.');
   const { state } = await checkInstall(charIndex);
-  const get = state.pictures.missing;
-  if (!get.length) return 0;
-  let last = 0;
-  const rows = await fetchPictures(char.additionalAssets, { get, replaced: 0, added: get.length, bytes: state.pictures.bytes }, (n, phase) => {
-    if (n - last >= 10 || n === 0 || n === get.length) {
-      last = n;
-      progress(`사진 ${phase === 'get' ? '받는' : '저장'} 중 ${n}/${get.length}`);
+  const all = state.pictures.missing;
+  if (!all.length) return 0;
+  // 100장씩 받아 받은 만큼 바로 캐릭터에 저장한다: 1,751장(93MB)을 받다 끊겨도 다시 누르면 이어서 받는다
+  const CHUNK = 100;
+  let saved = 0;
+  let assets: unknown = char.additionalAssets;
+  for (let i = 0; i < all.length; i += CHUNK) {
+    const get = all.slice(i, i + CHUNK);
+    const bytes = get.reduce((n, p) => n + (Number(p[3]) || 0), 0);
+    let last = 0;
+    try {
+      assets = await fetchPictures(assets, { get, replaced: 0, added: get.length, bytes }, (n, phase) => {
+        if (n - last >= 10 || n === 0 || n === get.length) {
+          last = n;
+          progress(`사진 ${phase === 'get' ? '받는' : '저장'} 중 ${saved + n}/${all.length}`);
+        }
+      });
+    } catch (error) {
+      if (saved) throw new Error(`${saved}/${all.length}장까지 받았어요. ${error instanceof Error ? error.message : String(error)}`);
+      throw error;
     }
-  });
-  const fresh = ((await risuai.getCharacterFromIndex(charIndex)) ?? char) as Record<string, unknown>;
-  await risuai.setCharacterToIndex(charIndex, { ...fresh, additionalAssets: rows });
+    const fresh = ((await risuai.getCharacterFromIndex(charIndex)) ?? char) as Record<string, unknown>;
+    await risuai.setCharacterToIndex(charIndex, { ...fresh, additionalAssets: assets });
+    saved += get.length;
+  }
   forgetImages();
-  return get.length;
+  return saved;
 }
 
 /** 아이콘: release/icon.png 를 받아 저장하고 메인 아이콘으로. 설치 전 아이콘은 기록해 둔다 (「이전 아이콘으로」) */

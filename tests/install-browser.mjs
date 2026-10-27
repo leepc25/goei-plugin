@@ -141,8 +141,8 @@ async function pickCustom(page, row = '.gx-mlist li.gx-mx') {
   console.log('gw', await page.evaluate(() => { const g = document.querySelector('.gw'); return g ? `hidden=${g.hidden} install=${!!g.querySelector('.gw-install')} text=${g.textContent?.slice(0, 120)}` : 'none'; }));
   assert.ok(await page.$('.gw-install'), '설치 창');
   // 로어북·인사말 심기 → 괴이 카드가 됨 → 창을 닫으면 플로팅 버튼이 생겨야 (감시가 다시 판정)
-  await page.click('[data-action="ed-inst-lore"]');
-  await page.waitForFunction(() => document.querySelector('.gw-install')?.textContent?.includes('끝났어요'));
+  await page.click('[data-action="ed-inst-all"]');
+  await page.waitForFunction(() => document.querySelector('.gw-install')?.textContent?.includes('끝났어요'), null, { timeout: 60000 });
   assert.equal(await page.evaluate(() => JSON.parse(window.__char.globalLore.find((e) => e.comment === 'Plugin manifest').content).plugin), 'goei-plugin');
   assert.match(await page.evaluate(() => window.__char.name), /^괴이 . ANOMALY$/, '깡통봇 이름을 BRAND.name 으로 바꾼다 (기본 켬)');
   await page.click('.gw [data-action="ed-close"]');

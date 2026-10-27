@@ -162,11 +162,11 @@ await page.waitForFunction(() => document.querySelector('.gw')?.hidden === false
 await page.waitForSelector('.gw-install .ps-row');
 const inst = await page.textContent('.gw-install');
 assert.ok(inst.includes('인사말') && inst.includes('카드 사진') && inst.includes('위키 기본 문서'), inst.slice(0, 300));
-assert.ok((await page.locator('.gw-inst-no').count()) >= 1, '사진·아이콘은 없음으로');
+assert.ok((await page.locator('.gw-inst-no').count()) >= 1, '사진·아이콘은 ✗');
 const setBefore = await page.evaluate(() => window.__calls.setChar);
-await page.click('[data-action="ed-inst-lore"]');
-await page.waitForFunction(() => document.querySelector('.gw-install')?.textContent?.includes('끝났어요'));
-assert.equal(await page.evaluate(() => window.__calls.setChar), setBefore + 1, '로어북·인사말 다시 맞추기 → 캐릭터 저장 1회');
+await page.click('[data-action="ed-inst-all"]');
+await page.waitForFunction(() => document.querySelector('.gw-install')?.textContent?.includes('끝났어요'), null, { timeout: 60000 });
+assert.ok((await page.evaluate(() => window.__calls.setChar)) >= setBefore + 1, '설치 → 캐릭터 저장');
 assert.equal(await page.evaluate(() => window.__char.alternateGreetings.length), 57, '있는 인사말은 늘지 않음');
 assert.ok(await page.evaluate(() => JSON.parse(window.__char.globalLore.find((e) => e.comment === 'Plugin manifest').content).keys.settings.startsWith('\uf000folder:')), '매니페스트 폴더 key');
 console.log('PASS 설치 · 점검: 상태 표 → 로어북·인사말 다시 맞추기');
