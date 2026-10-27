@@ -205,8 +205,8 @@ await build({ ...common, entryPoints: ['src/game/action/engine/demo.ts'], format
     hqDoor[key] = `data:image/png;base64,${readFileSync(`game-pack/hq-door-round2/${key}.png`).toString('base64')}`;
   }
   const hqField = {};
-  for (const f of readdirSync('game-pack/hq-field').filter((f) => f.endsWith('.webp'))) {
-    hqField[f.slice(0, -5)] = `data:image/webp;base64,${readFileSync(`game-pack/hq-field/${f}`).toString('base64')}`;
+  for (const pack of ['hq-field', 'jr-field']) for (const f of readdirSync(`game-pack/${pack}`).filter((f) => f.endsWith('.webp'))) {
+    hqField[f.slice(0, -5)] = `data:image/webp;base64,${readFileSync(`game-pack/${pack}/${f}`).toString('base64')}`;
   }
   const code = readFileSync('dist-test/engine-demo.js', 'utf8').replace(/<\/script/gi, '<\\/script');
   const html = `<!doctype html><html lang="ko"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"><title>관리국 액션 · 전투 시연</title><style>html,body{margin:0;height:100%;background:#000;overflow:hidden}#box{position:fixed;inset:0}</style><div id="box"></div><script>window.__GOEI_ENGINE_ART__=${JSON.stringify(art)};window.__GOEI_BG_ART__=${JSON.stringify(bg)};window.__GOEI_ITEM_ART__=${JSON.stringify(items)};window.__GOEI_HQ_DOOR_ROUND2__=${JSON.stringify(hqDoor)};window.__GOEI_HQ_FIELD__=${JSON.stringify(hqField)};window.__GOEI_TEST_PEOPLE__=${JSON.stringify(testPeople)}</script><script type="module">${code}</script></html>`;

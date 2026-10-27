@@ -50,7 +50,7 @@ export function mountGame(box: HTMLElement, bridge?: Partial<GameBridge>): () =>
   const urlOf = bridge?.assets ? (f: string) => bridge.assets!.url('jyaldi', f) : undefined;
   const releaseHqArt = prepareHqTextures(bridge?.assets ? f => bridge.assets!.url('hq-textures', f) : undefined);
   const releaseDoorArt = prepareHqDoorRound2(bridge?.assets ? f => bridge.assets!.url('hq-door-round2', f) : undefined);
-  const releaseField = prepareHqField(bridge?.assets ? f => bridge.assets!.url('hq-field', f) : undefined);
+  const releaseField = prepareHqField(bridge?.assets ? (pack, f) => bridge.assets!.url(pack, f) : undefined);
   // 필드 시험: 사용자 PixelLab 시험 캐릭터 (임시)
   // 주인공 그림(에일린 테스트룸 완성본): 늘 받는다 (쟈알디 그림은 뺐다, 2026-10-25)
   const testPeople = prepareTestPeople(bridge?.assets ? f => bridge.assets!.url('test-people', f) : undefined, bridge?.assets ? f => bridge.assets!.bytes('test-people', f) : undefined);
