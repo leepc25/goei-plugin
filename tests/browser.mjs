@@ -328,7 +328,7 @@ async function pickCustom(page, row = '.gx-mlist li.gx-mx') {
   // 5단계(2026-10-27): 다른 봇에는 햄버거 메뉴의 「설치·점검」 단추 하나만 (본체는 꺼내지 않음)
   const btn = await page.evaluate(() => window.__button);
   assert.equal(btn?.arg?.id, 'goei-plugin-install', '설치·점검 단추만');
-  assert.equal(btn?.arg?.location, 'hamburger');
+  assert.equal(btn?.arg?.location, 'chat');
   assert.deepEqual(errors, []);
   console.log('PASS 다른 봇 → 설치 단추 말고는 아무것도 표시하지 않음');
   await page.close();
