@@ -233,6 +233,7 @@
   }
   var installCtx = null;
   async function openInstall() {
+    if (!shown) await openApp();
     installCtx = await loadContext().catch(() => null);
     if (!installCtx) {
       ensureRoot2();
@@ -1760,5 +1761,5 @@ ${fields3}${NOTE}`;
   }
 
   // src/body-entry.ts
-  globalThis.__goeiBody = { version: "0.17.0", start: start2 };
+  globalThis.__goeiBody = { version: "0.17.1", start: start2 };
 })();
