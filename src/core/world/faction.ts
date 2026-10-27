@@ -59,7 +59,7 @@ export function assembleFaction(dir: Directory, orgs: Map<string, WorldRecord>, 
     if (intro) parts.push(`### ${rec.title || name}\n${intro}`);
   }
   const excluded = new Set([...orgs.entries()].filter(([, r]) => r.relOff).map(([n]) => n));
-  // 관계는 표 하나로 (사용자 2026-10-27): 행 = 보는 쪽, 열 = 대상, 글자 한 개. 메모는 편집 참고용이라 안 들어간다
+  // 관계는 표 하나로 (사용자 2026-10-27): 행 = 보는 쪽, 열 = 대상, 글자 한 개. 메모가 있는 칸만 표 아래 Notes 로
   const members = dir.orgs.filter((o) => !excluded.has(o.name)).map((o) => o.name);
   const stageOf = (a: string, b: string): RelationStage => {
     const c = rel.pairs[`${a}>${b}`];
@@ -71,7 +71,9 @@ export function assembleFaction(dir: Directory, orgs: Map<string, WorldRecord>, 
     const head = `| viewer \\ target | ${members.map((n) => no.get(n)).join(' | ')} |`;
     const sep = `|---|${members.map(() => '---').join('|')}|`;
     const rows = members.map((a) => `| ${no.get(a)} ${named(a)} | ${members.map((b) => (a === b ? '—' : STAGE_MARK[stageOf(a, b)])).join(' | ')} |`);
-    parts.push(`## Faction Relations\nHow the row faction regards the column faction. H hostile · W wary · · neutral · F favorable · A allied. Factions not in the table regard each other neutrally.\nFactions: ${legend}\n${head}\n${sep}\n${rows.join('\n')}`);
+    // 메모는 기본값이 비어 있고(사용자 2026-10-27), 사용자가 쓴 칸만 표 아래에 한 줄씩
+    const notes = members.flatMap((a) => members.filter((b) => a !== b && rel.pairs[`${a}>${b}`]?.memo?.trim()).map((b) => `- ${no.get(a)} → ${no.get(b)}: ${fillCodes(rel.pairs[`${a}>${b}`]!.memo!.trim().replace(/\n+/g, ' '), dir)}`));
+    parts.push(`## Faction Relations\nHow the row faction regards the column faction. H hostile · W wary · · neutral · F favorable · A allied. Factions not in the table regard each other neutrally.\nFactions: ${legend}\n${head}\n${sep}\n${rows.join('\n')}${notes.length ? `\nNotes:\n${notes.join('\n')}` : ''}`);
   }
   if (rel.common.trim()) parts.push(`## Faction Doctrine and Relations\n${fillCodes(rel.common.trim(), dir)}`);
   return parts.join('\n\n') + '\n\n---';

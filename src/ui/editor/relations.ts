@@ -71,7 +71,7 @@ export function relationsPage(ctx: ChatContext, over: WorldOverrides, rulesOnly:
     ? `<div class="gw-rel-memo"><div class="gw-rel-memo-head"><b>${esc(sa)} → ${esc(sb)}</b>
         <div class="gx-segs gx-segs-sm">${RELATION_STAGES.map((s) => `<button class="gx-seg${(cell?.stage ?? 'neutral') === s ? ' on' : ''}" data-action="ed-rel-stage" data-value="${s}">${RELATION_LABEL[s]}</button>`).join('')}</div>
         <button class="gx-mini" data-action="ed-rel-clear">중립으로</button></div>
-        <textarea data-input="ed-rel-memo" data-key="${esc(sel)}" rows="4" placeholder="메모 (편집 참고용. 모델에는 표만 들어가요)">${esc(cell?.memo ?? '')}</textarea></div>`
+        <textarea data-input="ed-rel-memo" data-key="${esc(sel)}" rows="4" placeholder="메모 (선택). 쓰면 표 아래에 「1 → 2: 메모」 한 줄로 모델에 들어가요. 단계만으로 안 되는 것만">${esc(cell?.memo ?? '')}</textarea></div>`
     : '<p class="gx-muted">칸을 누르면 단계가 한 단계 바뀌고, 아래에 메모 칸이 열려요.</p>';
   const fac = assembleFaction(d, recs, rel);
   return `<div class="gw-page"><header class="gw-head"><h2>세력 관계</h2>
