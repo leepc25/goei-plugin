@@ -63,7 +63,7 @@ let zoom = 0, zx = W / 2, zy = H / 2, dShake = 0;
 let hitstop = 0, shake = 0, flash = 0, dark = 0, cut = 0, speed = 1, showNo = false, showDummy = true, counter = false, last = performance.now();
 let freeSuper = false, showArmor = true, showCancelMark = true;
 // 필살기 게이지: 때려 맞히거나 맞으면 참. 다 차면 몸에 금빛 기운
-function gainSp(v) { if (P.noGain > P.t) return; const was = P.sp; P.sp = Math.min(100, P.sp + v); if (was < 100 && P.sp >= 100) { sfx('ability'); ring(P.x, P.y - 110 * K(P.y), 140, 0.4, '#ffd34a', 6); flash = 0.06; fx.push({ k: 'num', x: P.x - 50, y: P.y - 260 * K(P.y), v: '필살기 준비', t: 1.0 }); } }
+function gainSp(v) { if (P.noGain > P.t) return; v *= env.mod ? env.mod.sp() : 1; const was = P.sp; P.sp = Math.min(100, P.sp + v); if (was < 100 && P.sp >= 100) { sfx('ability'); ring(P.x, P.y - 110 * K(P.y), 140, 0.4, '#ffd34a', 6); flash = 0.06; fx.push({ k: 'num', x: P.x - 50, y: P.y - 260 * K(P.y), v: '필살기 준비', t: 1.0 }); } }
 function spReady() { if (freeSuper || P.sp >= 100) { if (!freeSuper) P.sp = 0; return true; } sfx('empty'); fx.push({ k: 'num', x: P.x - 50, y: P.y - 250 * K(P.y), v: '게이지 부족', t: 0.7 }); return false; }
 let fx = [];
 const items = [];   // 바닥 아이템(반짝임)
@@ -154,7 +154,7 @@ function fireEv(e) {
     const endX = hitD ? D.x - P.face * 14 : (P.face > 0 ? W + 20 : VX0 - 20);
     if (VFX.tracer) { const tt = Math.abs(endX - p.x) / 3400; { const g = mzAng(), gp = MZ_GAP * K(P.y), sx = p.x + P.face * Math.cos(g) * gp, sy = p.y + Math.sin(g) * gp; fx.push({ k: 'bullet', x: sx, y: sy, x2: endX, y2: sy + Math.abs(endX - sx) * Math.tan(g) + (Math.random() - 0.5) * 24, t: tt, t0: tt }); } if (hitD) later(tt, () => { if (!vfx('bullet_hit_body', endX, p.y, 2)) sparks(endX, p.y, 4, false, '#fff6d0'); }); } else fx.push({ k: 'tracer', x: p.x, y: p.y, x2: endX, t: big ? 0.12 : 0.06, big });
     shake = Math.max(shake, big ? 9 : 2.5);
-    if (hitD) { sfx('hit', { strength: big ? 2 : 1, kind: 'bullet' }); hurtDummy(D, big ? 40 : e.ev === 'shotS' ? 9 : 7, big ? 'heavy' : 'light'); sparks(endX, p.y, big ? 16 : 5, big); if (big) hitstop = 0.08; }
+    if (hitD) { sfx('hit', { strength: big ? 2 : 1, kind: 'bullet' }); hurtDummy(D, big ? 40 : e.ev === 'shotS' ? 9 : 7, big ? 'heavy' : 'light', { src: 'ranged' }); sparks(endX, p.y, big ? 16 : 5, big); if (big) hitstop = 0.08; }
   } else if (e.ev === 'beam') {
     const p = P.relMz || muzzle(), lv = P.chargeLv; P.relMz = null;
     muzzleFlash(p, true); sfx('shot'); sfx('hit', { strength: 3, kind: 'bullet' });
@@ -164,7 +164,7 @@ function fireEv(e) {
     else fx.push({ k: 'beam', x: p.x, y: p.y, dir: P.face, t: 0.22 + lv * 0.08, t0: 0.22 + lv * 0.08, w: W_, c: col, lv });
     if (lv >= 3) { flash = 0.2; dust(P.x - P.face * 30, P.y, 10, 1.6); }
     shake = [0, 8, 15, 24][lv];
-    for (const D of targets().filter(D => Math.abs(D.y - P.y) < 30 + W_ && (D.x - P.x) * P.face > 0)) { hitstop = [0, 0.08, 0.15, 0.24][lv]; hurtDummy(D, [0, 30, 60, 110][lv], lv >= 2 ? 'launch' : 'heavy'); sparks(D.x, p.y, 10 + lv * 10, true, col); ring(D.x, p.y, 50 + lv * 30, 0.3, col, 4); }
+    for (const D of targets().filter(D => Math.abs(D.y - P.y) < 30 + W_ && (D.x - P.x) * P.face > 0)) { hitstop = [0, 0.08, 0.15, 0.24][lv]; hurtDummy(D, [0, 30, 60, 110][lv], lv >= 2 ? 'launch' : 'heavy', { src: 'ranged' }); sparks(D.x, p.y, 10 + lv * 10, true, col); ring(D.x, p.y, 50 + lv * 30, 0.3, col, 4); }
   } else if (e.ev === 'cut') { sfx('super'); cut = 1.1; dark = 2.6; flash = 0.15; hitstop = 0.25; }
   else if (e.ev === 'scan') { sfx('ability'); fx.push({ k: 'scan', x: P.x, y: P.y - 190, dir: P.face, t: 0.55, t0: 0.55 }); }
   else if (e.ev === 'mark') { for (const D of targets().filter(D => (D.x - P.x) * P.face > 0 && Math.abs(D.y - P.y) < 120)) { marks.set(D.body, 6); ring(D.x, D.y - 230, 40, 0.3, '#ff5a4a', 3); } }
@@ -184,7 +184,7 @@ function fireEv(e) {
     if (ddx > 30 && ddx < dist + 40 && Math.abs(D.y - P.y) < 70) {
       const bulletY = p.y + ddx * Math.tan(ang), dk = K(D.y);
       if (bulletY > D.y - D.z - 220 * dk && bulletY < D.y - D.z + 10) {
-        later(ddx / 3200, () => { hurtDummy(D, 7, 'light', { push: 5 }); if (!vfx('bullet_hit_body', D.x - dir * 10, bulletY, 2)) sparks(D.x, bulletY, 4, false, '#fff6d0'); hitstop = Math.max(hitstop, 0.012); });
+        later(ddx / 3200, () => { hurtDummy(D, 7, 'light', { push: 5, src: 'ranged' }); if (!vfx('bullet_hit_body', D.x - dir * 10, bulletY, 2)) sparks(D.x, bulletY, 4, false, '#fff6d0'); hitstop = Math.max(hitstop, 0.012); });
       }
     }
     }
@@ -202,14 +202,14 @@ function fireEv(e) {
 function explode(x, y, gy, hitD, dmg = 140) {
   sfx('hit', { strength: 3, kind: 'super' });
   shake = Math.max(shake, 14); flash = Math.max(flash, dmg >= 140 ? 0.2 : 0.04); if (hitD) hitstop = 0.2;
-  if (VFX['eileen-rpg-explosion']) { vfx('eileen-rpg-explosion', x, gy - 4, 2.4); ring(x, gy, 220, 0.45, 'rgba(255,230,180,.9)', 6, 0.28); if (!vfx('crater', x, gy, 2.2, { hold: 2.5, under: true })) fx.push({ k: 'scorch', x, y: gy, r: 90, t: 3.5 }); dust(x, gy, 10, 2); for (const D of targets()) if (Math.abs(D.x - x) < 200 && Math.abs(D.y - gy) < 70) hurtDummy(D, dmg, 'launch'); return; }
+  if (VFX['eileen-rpg-explosion']) { vfx('eileen-rpg-explosion', x, gy - 4, 2.4); ring(x, gy, 220, 0.45, 'rgba(255,230,180,.9)', 6, 0.28); if (!vfx('crater', x, gy, 2.2, { hold: 2.5, under: true })) fx.push({ k: 'scorch', x, y: gy, r: 90, t: 3.5 }); dust(x, gy, 10, 2); for (const D of targets()) if (Math.abs(D.x - x) < 200 && Math.abs(D.y - gy) < 70) hurtDummy(D, dmg, 'launch', { src: 'blast' }); return; }
   for (let i = 0; i < 26; i++) { const a = Math.random() * Math.PI * 2, v = 80 + Math.random() * 380; fx.push({ k: 'fire', x, y, vx: Math.cos(a) * v, vy: Math.sin(a) * v * 0.7 - 60, r: 10 + Math.random() * 16, t: 0.5 + Math.random() * 0.4, t0: 0.9 }); }
   for (let i = 0; i < 16; i++) fx.push({ k: 'smoke', x: x + (Math.random() - 0.5) * 80, y: y + (Math.random() - 0.5) * 50, vx: (Math.random() - 0.5) * 60, vy: -40 - Math.random() * 70, r: 16 + Math.random() * 14, t: 1.4 + Math.random() * 0.6, t0: 2 });
   sparks(x, y, 40, true, '#ffb347');
   ring(x, gy, 220, 0.45, 'rgba(255,230,180,.9)', 6, 0.28);
   fx.push({ k: 'scorch', x, y: gy, r: 90, t: 3.5 });
   dust(x, gy, 14, 2.2);
-  for (const D of targets()) if (Math.abs(D.x - x) < 200 && Math.abs(D.y - gy) < 70) hurtDummy(D, dmg, 'launch');
+  for (const D of targets()) if (Math.abs(D.x - x) < 200 && Math.abs(D.y - gy) < 70) hurtDummy(D, dmg, 'launch', { src: 'blast' });
 }
 function backblast(p) {
   p = { x: P.x - P.face * 70 * K(P.y), y: p.y };   // 발사관 뒤 = 몸 뒤쪽
@@ -268,7 +268,7 @@ function dodge() {
   if (!dx && !dy) dx = -P.face;                        // 아무 방향 없으면 뒤로
   if (dx && dx === P.face && P.prevFace === -dx && P.t - P.faceT < 0.3) P.face = P.prevFace;   // 뒤쪽 키로 막 돌아선 경우 = 뒤 회피
   const fwd = dx * P.face > 0, len = Math.hypot(dx, dy);
-  sfx('evade'); P.dodgeV = { x: dx / len * 780, y: dy / len * 520 }; P.inv = 0.3; P.ghostT = 0.2;
+  sfx('evade'); const dk_ = env.mod ? env.mod.speed() : 1; P.dodgeV = { x: dx / len * 780 * dk_, y: dy / len * 520 * dk_ }; P.inv = 0.3; P.ghostT = 0.2;
   P.pvx = 0; P.pdec = 0;
   act(fwd ? '16_1' : '16', { seq: S(R(0, 7), 0.04).map((e, i) => i >= 6 ? { ...e, cancel: true } : e), onEnd: () => { P.dodgeV = null; afterBuf(toIdle); } });
 }
@@ -363,7 +363,7 @@ function proveSuper() { if (!spReady()) return; P.noGain = P.t + 12; superMove(t
 // ── 이동·점프 ──
 function jump() {
   P.mode = 'air'; P.vz = 0; P.jumps = 1; P.airAtk = false; P.spin = 0;
-  P.airVX = (down('run') || P.runLatch) ? 430 : 250; P.takeoff = 0.06; sfx('jump');
+  P.airVX = ((down('run') || P.runLatch) ? 430 : 250) * (env.mod ? env.mod.speed() : 1); P.takeoff = 0.06; sfx('jump');
   play('7', { seq: S([0, 1], 0.03) });
 }
 function doubleJump() {
@@ -556,7 +556,7 @@ function update(dt) {
       if (dx || dy) {
         if (P.armed) P.armed = false;
         if (dx && dx !== P.face) { P.prevFace = P.face; P.faceT = P.t; P.face = dx; }
-        const sp = (running ? 430 : 230) * (P.dying ? 0.6 : 1);
+        const sp = (running ? 430 : 230) * (P.dying ? 0.6 : 1) * (env.mod ? env.mod.speed() : 1);
         P.x += dx * sp * dt; P.y += dy * sp * 0.55 * dt;
         const id = running && !P.dying ? '5' : '4';
         if (!P.clip || P.clip.id !== id) play(id, { fps: id === '5' ? 15 : P.dying ? 7 : 11, loopFrom: id === '5' ? 1 : 0 });

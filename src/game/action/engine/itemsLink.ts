@@ -208,7 +208,12 @@ export function linkItems(w: World, run: RunConfigCore & { launch?: { items?: ({
         if (f.type === 'heal') p.hp = Math.min(p.hpMax, p.hp + p.hpMax * f.ratio);
         else if (f.type === 'cure') p.hp = Math.min(p.hpMax, p.hp + p.hpMax * (f.heal ?? 0));
         else if (f.type === 'gauge') p.gauge = Math.min(100, p.gauge + f.amount * 100);
-        else if (f.type === 'energy') p.skillCd = 0;
+        else if (f.type === 'energy') {
+          p.skillCd = 0;
+          // 에일린(테스트룸 코어): 능력 자원 = 총열 열. 열을 식히고 과열을 푼다
+          const core = (p as unknown as { core?: { P: { heat: number; overT: number } } }).core;
+          if (core) { core.P.heat = Math.max(0, core.P.heat - f.amount); core.P.overT = 0; }
+        }
         else if (f.type === 'ward') p.ward += f.hits;
       } else if (e.t === 'pickup' && e.kind === 'heal') {
         p.hp = Math.min(p.hpMax, p.hp + pickupHealAmount(p.hpMax, e.amount));

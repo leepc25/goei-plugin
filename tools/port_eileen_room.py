@@ -132,6 +132,27 @@ sub("  env.clamp(P);", """  // 물건 위에서 걸어 나가면 떨어진다
   env.clamp(P);""")
 sub("if (!vfx('land_dust', P.x, P.y, 2.2)) dust(P.x, P.y, 5);", "if (!vfx('land_dust', P.x, P.y - P.z, 2.2)) dust(P.x, P.y - P.z, 5);")
 sub("  shadow(P.x + fx0, P.y, P.z + lift * kk,", "  const gz0 = env.ground(P.x, P.y);   // 물건 위면 그림자도 그 윗면에\n  shadow(P.x + fx0, P.y - gz0, P.z - gz0 + lift * kk,")
+# 능력치·상태 효과 배율 (docs/게임_성장_경제_설계.md 2-2·6장, 2026-10-27): env.mod 가 있으면 이동·회피·점프 속도와 필살 게이지 차는 양에 곱한다.
+# 원거리 공격은 o.src = 'ranged' 로 표시해 플레이어가 힘 대신 사격 배율을 쓴다
+sub('function gainSp(v) { if (P.noGain > P.t) return; const was = P.sp; P.sp = Math.min(100, P.sp + v);',
+    'function gainSp(v) { if (P.noGain > P.t) return; v *= env.mod ? env.mod.sp() : 1; const was = P.sp; P.sp = Math.min(100, P.sp + v);')
+sub('        const sp = (running ? 430 : 230) * (P.dying ? 0.6 : 1);',
+    '        const sp = (running ? 430 : 230) * (P.dying ? 0.6 : 1) * (env.mod ? env.mod.speed() : 1);')
+sub("sfx('evade'); P.dodgeV = { x: dx / len * 780, y: dy / len * 520 };",
+    "sfx('evade'); const dk_ = env.mod ? env.mod.speed() : 1; P.dodgeV = { x: dx / len * 780 * dk_, y: dy / len * 520 * dk_ };")
+sub("  P.airVX = (down('run') || P.runLatch) ? 430 : 250;",
+    "  P.airVX = ((down('run') || P.runLatch) ? 430 : 250) * (env.mod ? env.mod.speed() : 1);")
+sub("hurtDummy(D, big ? 40 : e.ev === 'shotS' ? 9 : 7, big ? 'heavy' : 'light');",
+    "hurtDummy(D, big ? 40 : e.ev === 'shotS' ? 9 : 7, big ? 'heavy' : 'light', { src: 'ranged' });")
+sub("hurtDummy(D, [0, 30, 60, 110][lv], lv >= 2 ? 'launch' : 'heavy');",
+    "hurtDummy(D, [0, 30, 60, 110][lv], lv >= 2 ? 'launch' : 'heavy', { src: 'ranged' });")
+sub("hurtDummy(D, 7, 'light', { push: 5 });",
+    "hurtDummy(D, 7, 'light', { push: 5, src: 'ranged' });")
+# 폭발(로켓·필살)은 o.src = 'blast': 힘·사격 배율 없음
+sub("for (const D of targets()) if (Math.abs(D.x - x) < 200 && Math.abs(D.y - gy) < 70) hurtDummy(D, dmg, 'launch'); return; }",
+    "for (const D of targets()) if (Math.abs(D.x - x) < 200 && Math.abs(D.y - gy) < 70) hurtDummy(D, dmg, 'launch', { src: 'blast' }); return; }")
+sub("  for (const D of targets()) if (Math.abs(D.x - x) < 200 && Math.abs(D.y - gy) < 70) hurtDummy(D, dmg, 'launch');",
+    "  for (const D of targets()) if (Math.abs(D.x - x) < 200 && Math.abs(D.y - gy) < 70) hurtDummy(D, dmg, 'launch', { src: 'blast' });")
 # 디버그 표시 줄 없애기
 sub("  if (showNo) { ctx.fillStyle = '#fff'; ctx.font = '14px monospace'; ctx.fillText(`${id} · ${f + 1}/${a.n} · ${kk.toFixed(2)}배`, P.x - 60, P.y + 26); }\n", "")
 # 쓰러짐·웅크림·주저앉음 (사용자 2026-10-25): 쓰러진 뒤 좌우 = 엎드려 기기, 위 = 일어나기. 웅크림·주저앉음도 위 = 일어나기

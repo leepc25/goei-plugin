@@ -46,6 +46,8 @@ export class EileenPlayer extends Player {
   private started = false;
   private lastTickAt = 0;
   private lastFrameAt = 0;
+  /** 마지막으로 코어에서 받아 온 게이지 (바깥에서 바뀌었는지 보려고) */
+  private gaugeSeen = 0;
   /** 방어 게이지 0..100 (사용자 2026-10-25: 방어를 무제한으로 못 하게). 막아낸 공격만큼만 깎이고, 안 맞으면 다시 찬다
    * (막고만 있으면 줄지 않는다). 맞아서 바닥나면 가드가 깨져 잠깐 휘청이고, 40까지 차오를 때까지 다시 못 막는다 */
   guard = 100;
@@ -68,9 +70,11 @@ export class EileenPlayer extends Player {
       sfx: (type: string, extra: Record<string, unknown>) => eileenHooks.sfx({ type, ...extra }),
       font: (n: number) => pfont(n).f,
       targets: () => this.targets(),
+      // 능력치(본부 출동 stats)·상태 효과 배율 (docs/게임_성장_경제_설계.md 2-2·6장)
+      mod: { speed: () => this.speedMul(), sp: () => this.spMul() },
       // 물건 윗면은 이미 그 높이에 있을 때만 땅이다 (아래에서 걸어 들어가면 올라서지 않고 막힌다)
       ground: (x: number, y: number) => { const p = this.platformAt(x, y); return p && this.core.P.z >= p.h - 10 ? p.h : 0; },
-      hurt: (t: { body: Body }, dmg: number, kind: string, face: 1 | -1, hitstop: number, o: { push?: number }) => this.hurtTarget(t.body, dmg, kind, face, hitstop, o),
+      hurt: (t: { body: Body }, dmg: number, kind: string, face: 1 | -1, hitstop: number, o: { push?: number; src?: 'ranged' | 'blast' }) => this.hurtTarget(t.body, dmg, kind, face, hitstop, o),
       clamp: (P: { x: number; y: number }) => {
         const w = this.world;
         if (!w) return;
@@ -111,11 +115,25 @@ export class EileenPlayer extends Player {
     return this.world;
   }
 
-  private hurtTarget(t: Body, dmg: number, kind: string, face: 1 | -1, hitstop: number, o: { push?: number }) {
+  /** 이동·회피·점프 속도 배율: 능력치 speed × 상태 효과 */
+  protected speedMul(): number {
+    return (this.progression?.stats.speed ?? 1) * (this.statusMod?.speed() ?? 1);
+  }
+  /** 필살 게이지 차는 배율: 능력치 charge × 상태 효과 */
+  protected spMul(): number {
+    return (this.progression?.stats.charge ?? 1) * (this.statusMod?.sp() ?? 1);
+  }
+  /** 상태 효과가 거는 배율 (src/game/combat/status.ts 가 채운다) */
+  statusMod?: { speed(): number; sp(): number };
+
+  private hurtTarget(t: Body, dmg: number, kind: string, face: 1 | -1, hitstop: number, o: { push?: number; src?: 'ranged' | 'blast' }) {
     const w = this.world as (WorldView & { kills: number; emit(e: unknown): void }) | null;
     if (!w || !t.alive) return;
     const r = REACT[kind] ?? REACT.light;
-    const hit: Hit = { x0: t.x - 1, x1: t.x + 1, z0: 0, z1: 400, y: t.y, dy: 999, attackId: newAttackId(), dmg: dmg * this.dmgMul, react: r.react, dir: face, push: o.push ?? r.push, lift: r.lift, stop: 0, strength: r.strength };
+    // 근접·기술은 힘, 원거리(사격·충전탄·제압사격)는 사격 배율 (폭발은 배율 없음: 엔진 progressionHit 'ability'와 같음)
+    const st = this.progression?.stats;
+    const scale = (o.src === 'ranged' ? st?.aim : o.src === 'blast' ? 1 : st?.power) ?? 1;
+    const hit: Hit = { x0: t.x - 1, x1: t.x + 1, z0: 0, z1: 400, y: t.y, dy: 999, attackId: newAttackId(), dmg: dmg * this.dmgMul * scale, react: r.react, dir: face, push: o.push ?? r.push, lift: r.lift, stop: 0, strength: r.strength };
     const res = t.applyHit(hit, w);
     if (res.kind === 'immune') return;
     // 맞은 적은 테스트룸 멈춤만큼 멈춘다
@@ -162,9 +180,13 @@ export class EileenPlayer extends Player {
       world.say('부적이 대신 맞았다', 1);
       return { kind: 'immune' };
     }
-    const armored = this.core.armored();
-    this.hp = Math.max(0, this.hp - (armored ? Math.round(hit.dmg * 0.5) : hit.dmg));
-    world.emit({ type: 'hurt', x: this.x, dmg: hit.dmg, hp: this.hp });
+    // 경직 저항(poise): 이 값 이하 세기의 공격엔 움찔하지 않는다 (피해는 받음). 세기가 없으면 반응으로 어림한다
+    const strength = hit.strength ?? (hit.react === 'down' || hit.react === 'launch' ? 3 : hit.react === 'stagger' ? 2 : 1);
+    const armored = this.core.armored() || strength <= (this.progression?.stats.poise ?? 0);
+    // 방어(defense): 받는 피해 감소 (가드·무적·부적 뒤 실제 체력 피해에만, 엔진 defendedHit과 같음)
+    const taken = hit.dmg * (1 - (this.progression?.stats.defense ?? 0)) * (this.core.armored() ? 0.5 : 1);
+    this.hp = Math.max(0, this.hp - Math.round(taken));
+    world.emit({ type: 'hurt', x: this.x, dmg: taken, hp: this.hp });
     if (!this.lowWarned && this.hp < this.hpMax * 0.3) {
       this.lowWarned = true;
       world.emit({ type: 'hp:low' });
@@ -276,7 +298,9 @@ export class EileenPlayer extends Player {
     this.px = this.x; this.py = this.y; this.pz = this.z; // 보간 없이 지금 자리 (장마다 움직인다)
     this.synced.x = this.x; this.synced.y = this.y;
     this.dir = P.face > 0 ? 1 : -1;
-    this.gauge = P.sp;
+    // 엔진·아이템이 게이지를 바꿨으면(각성제 등) 먼저 코어 필살 게이지에 넘긴다 (코어 값으로 덮어써서 아이템이 헛돌던 문제)
+    if (this.gauge !== this.gaugeSeen) P.sp = Math.max(0, Math.min(100, this.gauge));
+    this.gauge = this.gaugeSeen = P.sp;
     this.running = this.core.P.mode === 'ground' && this.heldNames.has('run');
   }
 
