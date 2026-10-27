@@ -603,11 +603,11 @@ function settingsView(ctx: ChatContext, back = true): string {
   const on = v('mode') !== '0';
   const rows = on
     ? `${group(gnetLabel(ctx.chat.scriptstate), [
-        row('게시판 사용', seg('power', '1', [['1', '켜기'], ['0', '끄기']])),
+        row('게시판 사용', seg('power', '1', [['1', 'ON'], ['0', 'OFF']])),
         row('모델', seg('mode', v('mode') === '1' ? '1' : '2', [['1', '메인'], ['2', '보조']])),
         row('새로고침', seg('lazy', ['0', 'open'].includes(v('lazy')) ? v('lazy') : '1', [['1', '수동'], ['open', '창을 열 때'], ['0', '매 턴']]), LAZY_HINT[v('lazy')] ?? LAZY_HINT['1']),
         row('채팅에 반영', seg('context', v('context') === '1' ? '1' : '0', [['0', '포함'], ['1', '빼기']]), '지금 장면과 관련된 글과 쪽지가 채팅 요청에 참고로 붙어요'),
-        row('다양성 강화', seg('sampling', v('sampling') === '1' ? '1' : '0', [['0', '끄기'], ['1', '켜기']])),
+        row('다양성 강화', seg('sampling', v('sampling') === '1' ? '1' : '0', [['0', 'OFF'], ['1', 'ON']])),
       ].join(''))}
       ${group('게시판', [
         row('게시글 수', seg('quantity', v('quantity'), Object.entries(QUANTITY).map(([k, q]) => [k, q.label]))),
@@ -621,10 +621,10 @@ function settingsView(ctx: ChatContext, back = true): string {
       ].join(''))}
       ${group('쪽지', [
         row('선쪽지 받기', seg('incoming', v('incoming') === '0' ? '0' : '1', [['1', '받기'], ['0', '안 받기']])),
-        row('쪽지 자동 정리', `<span class="ph-inline">${seg('storage', keep.auto ? '1' : '0', [['1', '켜기'], ['0', '끄기']])}${keep.auto ? `<input class="gx-search ph-pct" type="number" min="1" max="${STORAGE_MAX}" data-change="gn-keep" value="${keep.limit}" aria-label="상대별 쪽지 보관 상한"><span>통</span>` : ''}</span>`, `상대마다 최근 ${keep.limit}통만 남겨요`),
+        row('쪽지 자동 정리', `<span class="ph-inline">${seg('storage', keep.auto ? '1' : '0', [['1', 'ON'], ['0', 'OFF']])}${keep.auto ? `<input class="gx-search ph-pct" type="number" min="1" max="${STORAGE_MAX}" data-change="gn-keep" value="${keep.limit}" aria-label="상대별 쪽지 보관 상한"><span>통</span>` : ''}</span>`, `상대마다 최근 ${keep.limit}통만 남겨요`),
       ].join(''))}
       ${advancedBox('gn', ctx.chat.scriptstate)}`
-    : group(gnetLabel(ctx.chat.scriptstate), row('게시판 사용', seg('power', '0', [['1', '켜기'], ['0', '끄기']]), '꺼 두면 게시판 생성과 채팅 반영을 멈춰요. 저장된 글과 쪽지는 남아요'));
+    : group(gnetLabel(ctx.chat.scriptstate), row('게시판 사용', seg('power', '0', [['1', 'ON'], ['0', 'OFF']]), '꺼 두면 게시판 생성과 채팅 반영을 멈춰요. 저장된 글과 쪽지는 남아요'));
   return `<div class="ph-form">${paneHead(`${gnetLabel(ctx.chat.scriptstate)} 설정`, '', defaultsButtons('gn'), back)}${defaultsConfirm('gn')}<div class="ph-form-body ps">${rows}</div></div>`;
 }
 

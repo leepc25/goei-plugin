@@ -131,18 +131,11 @@
 }
 
 /* 설치 · 점검 */
-.gw-install .ps-group { margin-top: 14px; }
-.gw-install .ps-label b { margin-right: 6px; }
-.gw-inst-ok { font-size: 12px; font-weight: 700; color: var(--signal); }
-.gw-inst-no { font-size: 12px; font-weight: 700; color: var(--danger, #e0656a); }
-.gw-inst-all { margin: 10px 0 4px; }
-.gw-inst-all .gx-mini.primary { padding: 8px 16px; font-size: 14px; }
+.gw-inst-ok { font-size: 13px; font-weight: 700; color: var(--signal); white-space: nowrap; }
+.gw-inst-no { font-size: 13px; font-weight: 700; color: var(--danger, #e0656a); white-space: nowrap; }
 
 .gw-roster { display: flex; align-items: center; gap: 10px; margin: 0 0 10px; }
 .gw-roster small { color: var(--dim); }
-.gw-inst-list { list-style: none; margin: 8px 0 0; padding: 0; display: flex; flex-direction: column; gap: 4px; }
-.gw-inst-list li { display: flex; align-items: baseline; gap: 8px; font-size: 14px; }
-.gw-inst-list li small { color: var(--dim); }
 .gw-anote { margin: 0 8px 8px; padding: 6px 10px; border: 1px solid var(--line); border-radius: 10px; background: var(--panel); }
 .gw-anote summary { cursor: pointer; display: flex; align-items: baseline; gap: 8px; font-size: 13px; }
 .gw-anote summary small { color: var(--dim); }
@@ -174,15 +167,15 @@
 .gw-set-guide .gw-head h3 small { font-size: 12px; color: var(--dim); font-weight: 500; }
 .gw-setbody { max-width: 980px; }
 .gw-setbody .ps-group { margin-bottom: 14px; }
-.gw-setbody .ph-room-head { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
-.gw-setbody .ph-room-head .ph-act { margin-left: auto; }
 .gw .gx-segs { display: inline-flex; gap: 2px; padding: 3px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
 .gw .gx-seg { min-height: 32px; padding: 0 12px; border: 0; border-radius: 9px; background: transparent; color: var(--dim); font: inherit; font-weight: 600; cursor: pointer; }
 .gw .gx-seg.on { background: var(--accent-bg); color: var(--text); }
 .gw-rel-members { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin: 0 0 10px; }
 .gw-rel-members .gx-select { flex: 0 0 auto; width: auto; min-width: 0; }
 .gw-rel-members > span { font-size: 12px; font-weight: 700; color: var(--dim); margin-right: 4px; }
-/* 기능 설정 페이지: 안쪽 머리(제목 중복)는 숨기고 단추만 오른쪽에 */
-.gw-setbody .ph-room-head .ph-room-title { display: none; }
-.gw-setbody .ph-room-head { justify-content: flex-end; margin: -46px 0 10px; min-height: 0; }
-.gw-setbody .st-prehint { margin: 0 0 12px; font-size: 12.5px; }
+/* 기능 설정 페이지(괴담넷·괴담톡·위키·필드·인물 기록): 안쪽 머리는 떼어 창 머리로 (settings.ts featurePane). 판 여백은 없애 카드 폭을 다른 페이지와 같게 */
+.gw-setbody .ph-form { display: contents; }
+.gw-setbody .ph-form-body { padding: 0; overflow: visible; gap: 14px; }
+.gw-setbody .ps-defconfirm { margin: 0 0 12px; }
+.gw-setbody .ps-group h3 small { margin-left: 8px; font-size: 12px; font-weight: 500; }
+.gw-setbody .st-cols.ps-row-block { padding: 6px 14px; }

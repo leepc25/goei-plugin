@@ -4,7 +4,6 @@ import { checkInstall, dropTokenizer, dropWikiPack, installIcon, installLoreAndG
 import type { ChatContext } from '../../host/risu';
 import { notifyInstalled } from '../../host/hooks';
 import { BRAND } from '../brand';
-import { ICONS } from '../icons';
 
 const esc = (s: unknown) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]!);
 const mb = (n: number) => (n >= 1e6 ? `${(n / 1e6).toFixed(1)}MB` : `${Math.max(1, Math.round(n / 1e3))}KB`);
@@ -38,21 +37,21 @@ export async function refreshInstall(ctx: ChatContext): Promise<void> {
   }
 }
 
-const mark = (b: boolean) => (b ? '<span class="gw-inst-ok">✓</span>' : '<span class="gw-inst-no">✗</span>');
+const mark = (b: boolean) => (b ? '<span class="gw-inst-ok">✓ 있음</span>' : '<span class="gw-inst-no">✗ 없음</span>');
 
-/** 한 줄 점검표: 항목 · 상태 · 설명 */
+/** 점검표: 다른 설정 페이지와 같은 줄 모양 (이름·설명 왼쪽, 상태 오른쪽) */
 function statusList(s: InstallState): string {
-  const li = (ok: boolean, label: string, note: string) => `<li>${mark(ok)}<b>${label}</b><small>${note}</small></li>`;
+  const li = (ok: boolean, label: string, note: string) => `<div class="ps-row"><div class="ps-label"><b>${label}</b><small>${note}</small></div><div class="ps-ctl">${mark(ok)}</div></div>`;
   const loreOk = s.settingsFolder && s.directory && s.manifest && s.wikiFolder;
   const pics = s.pictures;
-  return `<ul class="gw-inst-list">
+  return `<section class="ps-group"><h3>점검</h3><div class="ps-rows gw-inst-list">
     ${li(loreOk, '카드 로어북', loreOk ? '⚙️설정 폴더 · 명부 · Plugin manifest · 📖위키 폴더' : [!s.settingsFolder && '⚙️설정 폴더', !s.directory && '명부(Directory)', !s.manifest && 'Plugin manifest', !s.wikiFolder && '📖위키 폴더'].filter(Boolean).join(' · ') + ' 없음')}
     ${li(s.greetings.ok, '인사말', s.greetings.ok ? `${s.greetings.total}개` : `${s.greetings.total - s.greetings.missing.length}/${s.greetings.total}개`)}
     ${li(!pics.missing.length, '카드 사진', pics.missing.length ? `${pics.total - pics.missing.length}/${pics.total}장 (약 ${mb(pics.bytes)} 받아야 함)` : `${pics.total}장`)}
     ${li(s.icon, '아이콘', s.icon ? '플러그인 아이콘이 메인' : '다른 아이콘')}
     ${li(s.wikiPack, '위키 기본 문서', s.wikiPack ? '저장소에 있음 (이 기기 공통)' : '없음 (약 1MB)')}
-    ${li(s.tokenizer, '토크나이저 (o200k_base)', s.tokenizer ? '저장소에 있음 (이 기기 공통) — 토큰 수를 정확히 세요' : '없음 (약 2MB) — 받기 전엔 토큰 수가 어림값')}
-  </ul>`;
+    ${li(s.tokenizer, '토크나이저 (o200k_base)', s.tokenizer ? '저장소에 있음 (이 기기 공통). 토큰 수를 정확히 세요' : '없음 (약 2MB). 받기 전엔 토큰 수가 어림값')}
+  </div></section>`;
 }
 
 export function installPage(ctx: ChatContext): string {
@@ -66,27 +65,28 @@ export function installPage(ctx: ChatContext): string {
   const name = String(ctx.char.name ?? '이 캐릭터');
   const head = s.goei
     ? missing.length
-      ? `<p class="gx-hint">${esc(name)}: 빠진 것 ${missing.length}개. 아래 단추 하나로 전부 채워요.</p>`
-      : `<p class="gx-hint">${esc(name)}: 모두 갖춰져 있어요.</p>`
-    : `<p class="gx-hint">${esc(name)}는 아직 ${esc(BRAND.name)} 카드가 아니에요. 아래 단추 하나로 설정 폴더·명부·인사말·사진·아이콘·위키 기본 문서를 전부 심어요. 기존 로어북·인사말·에셋은 그대로 두고 덧붙여요.</p>`;
+      ? `${esc(name)}: 빠진 것 ${missing.length}개. 오른쪽 단추 하나로 전부 채워요.`
+      : `${esc(name)}: 모두 갖춰져 있어요.`
+    : `${esc(name)}는 아직 ${esc(BRAND.name)} 카드가 아니에요. 오른쪽 단추 하나로 설정 폴더·명부·인사말·사진·아이콘·위키 기본 문서·토크나이저를 전부 심어요.`;
   const main = busy
     ? `<button class="gx-mini primary" disabled>${esc(instUi.progress || '설치하는 중…')}</button>`
     : allDone
       ? `<button class="gx-mini" data-action="ed-inst-all">다시 점검·맞추기</button>`
       : `<button class="gx-mini primary" data-action="ed-inst-all">${s.goei ? '빠진 것 전부 채우기' : `${esc(BRAND.name)} 설치`}</button>`;
-  return `<div class="gw-page gw-install"><header class="gw-head"><h2>설치 · 점검</h2><p class="gx-muted">플러그인이 카드에 두는 것들이에요. 빠진 것은 전부 한 번에 채워요. 사진은 받다 끊겨도 받은 만큼 저장되니 다시 누르면 이어서 받아요.</p></header>
-    ${head}
-    ${statusList(s)}
-    <div class="gx-row-btns gw-inst-all">${main}</div>
+  return `<div class="gw-page gw-set gw-install"><header class="gw-head"><h2>설치 · 점검</h2><div class="gw-head-act">${main}</div>
+      <p class="gx-muted">${head} 기존 로어북·인사말·에셋은 그대로 두고 덧붙여요. 사진은 받다 끊겨도 받은 만큼 저장되니 다시 누르면 이어서 받아요.</p></header>
     ${instUi.notice ? `<div class="gx-err" role="alert">${esc(instUi.notice)}</div>` : ''}
     ${instUi.info ? `<p class="gx-hint">${esc(instUi.info)}</p>` : ''}
-    <details class="ps-adv"><summary class="ps-adv-sum"><b>세부 선택</b></summary><div class="ps-adv-body">
-      <div class="ps-row"><div class="ps-label"><b>봇 이름</b><small>설치할 때 봇 이름을 「${esc(BRAND.name)}」로 바꿀지. 지금 이름: ${esc(name)}</small></div><div class="ps-ctl"><button class="gx-chip${instUi.setName ? ' on' : ''}" data-action="ed-inst-name" aria-pressed="${instUi.setName}" ${busy ? 'disabled' : ''}>${esc(BRAND.name)}로</button></div></div>
+    <div class="gx-settings gw-setbody">
+    ${statusList(s)}
+    <section class="ps-group"><h3>세부 선택</h3><div class="ps-rows">
+      <div class="ps-row"><div class="ps-label"><b>봇 이름</b><small>설치할 때 봇 이름을 「${esc(BRAND.name)}」로 바꿀지. 지금 이름: ${esc(name)}</small></div><div class="ps-ctl"><div class="gx-segs gx-segs-sm"><button class="gx-seg${instUi.setName ? ' on' : ''}" data-action="ed-inst-name" aria-pressed="${instUi.setName}" ${busy || instUi.setName ? 'disabled' : ''}>바꿈</button><button class="gx-seg${instUi.setName ? '' : ' on'}" data-action="ed-inst-name" aria-pressed="${!instUi.setName}" ${busy || !instUi.setName ? 'disabled' : ''}>그대로</button></div></div></div>
       ${instUi.iconPrev ? `<div class="ps-row"><div class="ps-label"><b>이전 아이콘</b><small>설치 전 아이콘으로 되돌려요 (아이콘 목록에는 둘 다 남아요).</small></div><div class="ps-ctl"><button class="gx-mini" data-action="ed-inst-icon-back" ${busy ? 'disabled' : ''}>이전 아이콘으로</button></div></div>` : ''}
       ${s.wikiPack ? `<div class="ps-row"><div class="ps-label"><b>위키 기본 문서</b><small>이 기기 저장소에서 지워요. 다시 받으려면 위 단추.</small></div><div class="ps-ctl"><button class="gx-mini" data-action="ed-inst-wiki-drop" ${busy ? 'disabled' : ''}>저장소에서 지우기</button></div></div>` : ''}
       ${s.tokenizer ? `<div class="ps-row"><div class="ps-label"><b>토크나이저</b><small>이 기기 저장소에서 지워요 (토큰 수는 어림값으로).</small></div><div class="ps-ctl"><button class="gx-mini" data-action="ed-inst-tok-drop" ${busy ? 'disabled' : ''}>저장소에서 지우기</button></div></div>` : ''}
-    </div></details>
-    <p class="gx-muted">${ICONS.book} 설치 뒤 새 채팅을 열면 시작 화면이 떠요.</p>
+    </div></section>
+    <p class="ps-note">설치 뒤 새 채팅을 열면 시작 화면이 떠요.</p>
+    </div>
   </div>`;
 }
 

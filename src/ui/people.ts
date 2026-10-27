@@ -320,8 +320,8 @@ export function peopleSettingsPane(ctx: ChatContext, canChat = true): string {
   const state = ctx.chat.scriptstate;
   const v = (k: string) => ppValue(state, k);
   const s = peopleSettings(state);
-  const onoff = (k: string) => seg(k, v(k) === '1' ? '1' : '0', [['1', '켬'], ['0', '끔']]);
-  const intro = `<p class="ps-note pp-intro">본편 응답이 끝날 때마다 <b>보조 모델이 그 응답을 한 번 읽어</b> 인물별 기록(기본정보·성격·현재 상태·인간관계·호감·호칭…)을 쌓고, 다음 본편 요청과 필드(대사·신분)가 그 기록을 읽어요. 로어북 시트는 시작값이고, 이 기록이 이야기에 따라 바뀌어요. 비용: 응답당 보조 모델 호출 1회(갱신 모델을 메인으로 두면 메인 1회).</p>`;
+  const onoff = (k: string) => seg(k, v(k) === '1' ? '1' : '0', [['1', 'ON'], ['0', 'OFF']]);
+  const intro = `<p class="ps-note">본편 응답이 끝날 때마다 <b>보조 모델이 그 응답을 한 번 읽어</b> 인물별 기록(기본정보·성격·현재 상태·인간관계·호감·호칭…)을 쌓고, 다음 본편 요청과 필드(대사·신분)가 그 기록을 읽어요. 로어북 시트는 시작값이고, 이 기록이 이야기에 따라 바뀌어요. 비용: 응답당 보조 모델 호출 1회(갱신 모델을 메인으로 두면 메인 1회).</p>`;
   const main = [
     row('인물 기록', onoff('on'), '끄면 응답을 읽지 않고, 본편에도 기록을 넣지 않아요. 메인 설정 「상황판 → 인물 기록」과 같은 값이에요.'),
     row('갱신 시점', seg('when', s.when, [['turn', '매 턴'], ['manual', '수동']]), '수동이면 인물 화면의 「지금 갱신」을 눌렀을 때만 읽어요.'),
@@ -329,7 +329,7 @@ export function peopleSettingsPane(ctx: ChatContext, canChat = true): string {
     row('지침', seg('prompt', s.prompt, [['detailed', '자세히'], ['compact', '간결']]), '자세히 = 리수폿 원문 규칙+설명. 간결 = 같은 규칙·설명 축약, 토큰 약 1/3.'),
     row('기록 언어', seg('lang', s.lang, [['ko', '한국어'], ['en', '영어']]), '기록 본문(항목·이유·메모)을 쓰는 언어. 이름·인용·호칭은 늘 원문. 영어는 같은 내용이면 토큰이 절반쯤이고, 위키 화면에도 영어로 보여요.'),
     row('본편에 넣기', seg('inject', s.inject, [['split', '절 단위 혼합'], ['append', '시트 전체+기록'], ['record', '기록만'], ['off', '안 넣음']]), '절 단위 혼합: 시트의 Identity·Character 절은 기록으로 대신하고 나머지 절은 원문 그대로.'),
-    row('Director', seg('director', s.director, [['off', '끔'], ['facts', '사실형(뒤)'], ['scene', '연출형(앞)']]), '사실형은 갱신기에 얹어 다음 턴 메모를 남기고, 연출형은 본편 요청 앞에 짧은 지시를 한 번 더 만들어요.'),
+    row('Director', seg('director', s.director, [['off', 'OFF'], ['facts', '사실형(뒤)'], ['scene', '연출형(앞)']]), '사실형은 갱신기에 얹어 다음 턴 메모를 남기고, 연출형은 본편 요청 앞에 짧은 지시를 한 번 더 만들어요.'),
     row('호감 변화 속도', seg('speed', String(s.speed), [['0.5', '0.5'], ['1', '1'], ['1.5', '1.5'], ['2', '2']])),
     row('메시지당 변화 상한', `<label class="st-range pp-range"><input type="range" min="0" max="100" step="1" value="${s.turnCap}" data-input="pp-cap" data-change="pp-cap" aria-label="메시지당 변화 상한"><output>${s.turnCap === 0 ? '한도 없음' : `±${s.turnCap}`}</output></label>`, '메시지 하나(필드는 장면 하나)에서 호감·세력 평판이 움직일 수 있는 최대. 0이면 한도 없음. 중대위반(−50)은 늘 한도 밖. 리수폿 기본 ±10.'),
   ].join('');
@@ -374,7 +374,7 @@ export function peopleSettingsPane(ctx: ChatContext, canChat = true): string {
     ${peopleUi.notice ? `<div class="gx-err" role="alert">${esc(peopleUi.notice)}</div>` : ''}
     <div class="ph-form-body ps">
       ${intro}
-      ${group('', main)}
+      ${group('인물 기록', main)}
       ${fold('pp-feat', '기능', features)}
       ${fold('pp-new', '새 인물', newPeople)}
       ${director}

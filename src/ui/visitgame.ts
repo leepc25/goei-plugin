@@ -13,7 +13,7 @@ type Item =
 
 const GROUPS: [string, Item[]][] = [
   ['화면', [
-    { key: 'crt', label: 'CRT 모니터', type: 'pick', opts: [['off', '끄기'], ['screen', '화면 효과'], ['curved', '곡면까지']] },
+    { key: 'crt', label: 'CRT 모니터', type: 'pick', opts: [['off', 'OFF'], ['screen', '화면 효과'], ['curved', '곡면까지']] },
     { key: 'charSize', label: '화면 확대', type: 'pct', min: 1, max: 1.6, step: 0.05 },
     { key: 'bright', label: '밝기', type: 'pct', min: 0.7, max: 1.4, step: 0.05 },
     { key: 'shake', label: '화면 흔들림', type: 'pct', min: 0, max: 1, step: 0.25 },
@@ -27,7 +27,7 @@ const GROUPS: [string, Item[]][] = [
     { key: 'sfx', label: '효과음', type: 'pct', min: 0, max: 1, step: 0.1 },
   ]],
   ['조작', [
-    { key: 'touch', label: '터치 버튼', type: 'pick', opts: [['auto', '자동'], ['on', '항상'], ['off', '끄기']] },
+    { key: 'touch', label: '터치 버튼', type: 'pick', opts: [['auto', '자동'], ['on', '항상'], ['off', 'OFF']] },
     { key: 'touchSize', label: '버튼 크기', type: 'pct', min: 0.7, max: 1.4, step: 0.05 },
     { key: 'touchAlpha', label: '버튼 진하기', type: 'pct', min: 0.3, max: 1, step: 0.05 },
     { key: 'stickRun', label: '스틱 끝까지 밀면 달리기', type: 'on' },
@@ -46,7 +46,7 @@ function control(it: Item, s: UiSettings): string {
   const cur = s[it.key];
   const seg = (v: string, label: string, on: boolean) => `<button class="gx-seg${on ? ' on' : ''}" data-action="visit-ui" data-value="${it.key}=${v}" aria-pressed="${on}">${esc(label)}</button>`;
   if (it.type === 'pick') return `<div class="gx-segs gx-segs-sm">${it.opts.map(([v, l]) => seg(v, l, cur === v)).join('')}</div>`;
-  if (it.type === 'on') return `<div class="gx-segs gx-segs-sm">${seg('1', '켜기', cur === true)}${seg('0', '끄기', cur === false)}</div>`;
+  if (it.type === 'on') return `<div class="gx-segs gx-segs-sm">${seg('1', 'ON', cur === true)}${seg('0', 'OFF', cur === false)}</div>`;
   return `<span class="adv-num"><input class="gx-search" type="number" inputmode="numeric" min="${Math.round(it.min * 100)}" max="${Math.round(it.max * 100)}" step="${Math.round(it.step * 100)}" data-change="visit-ui" data-key="${it.key}" value="${Math.round(Number(cur) * 100)}" aria-label="${esc(it.label)}"><span>%</span></span>`;
 }
 

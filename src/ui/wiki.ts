@@ -544,8 +544,8 @@ function settingsView(ctx: ChatContext): string {
       ${line('분량', seg('wiki-length', s.length, [['short', '짧게'], ['standard', '보통'], ['detailed', '상세']]))}
       ${line('작성 모드', seg('wiki-mode', s.mode, [['expand', '확장'], ['faithful', '원본 충실']]))}
       ${line('모델', seg('wiki-model', s.model, [['main', '메인'], ['aux', '보조']]))}
-      ${line('다시 쓸 때 이전 문서 참고', seg('wiki-refresh_previous', s.refreshPrevious ? '1' : '0', [['1', '켜기'], ['0', '끄기']]))}
-      ${line('채팅에 반영', seg('wiki-context', wikiContextOn(ctx.chat.scriptstate) ? '1' : '0', [['1', '켜기'], ['0', '끄기']]), '채팅에 나온 문서가 채팅 요청에 참고로 붙어요')}
+      ${line('다시 쓸 때 이전 문서 참고', seg('wiki-refresh_previous', s.refreshPrevious ? '1' : '0', [['1', 'ON'], ['0', 'OFF']]))}
+      ${line('채팅에 반영', seg('wiki-context', wikiContextOn(ctx.chat.scriptstate) ? '1' : '0', [['1', 'ON'], ['0', 'OFF']]), '채팅에 나온 문서가 채팅 요청에 참고로 붙어요')}
     </div></section>
     <section class="ps-group"><h3>공용 지침</h3><div class="ps-rows"><div class="ps-row">
       <textarea class="gx-search nw-reqbox" data-change="wiki-request" rows="3" placeholder="모든 문서에 덧붙일 말투·형식·관점">${esc(req)}</textarea></div></div></section>
@@ -635,7 +635,7 @@ function docView(ctx: ChatContext): string {
   const req = String(ctx.chat.scriptstate?.['$nw_writing_request'] ?? '');
   const rewrite = open
     ? `<section class="nw-rewrite">${docReqBox(req)}
-        <div class="nw-rwrow"><span>이전 문서 참고</span><div class="gx-segs gx-segs-sm">${([['1', '켜기'], ['0', '끄기']] as const).map(([v, l]) => `<button class="gx-seg${(wiki.rewritePrev ? '1' : '0') === v ? ' on' : ''}" data-action="wiki-rw-prev" data-value="${v}" aria-pressed="${(wiki.rewritePrev ? '1' : '0') === v}">${l}</button>`).join('')}</div></div>
+        <div class="nw-rwrow"><span>이전 문서 참고</span><div class="gx-segs gx-segs-sm">${([['1', 'ON'], ['0', 'OFF']] as const).map(([v, l]) => `<button class="gx-seg${(wiki.rewritePrev ? '1' : '0') === v ? ' on' : ''}" data-action="wiki-rw-prev" data-value="${v}" aria-pressed="${(wiki.rewritePrev ? '1' : '0') === v}">${l}</button>`).join('')}</div></div>
         <div class="gx-row-btns"><button class="gx-mini ps-save" data-action="wiki-rw-go" data-value="${esc(doc.title)}" ${job ? 'disabled' : ''}>${job?.title === doc.title ? '작성하는 중…' : '다시 쓰기'}</button><button class="gx-mini" data-action="wiki-rw-cancel">취소</button></div></section>`
     : '';
   const sub = [e ? CAT_LABEL[e.cat] : '', doc.base ? '기본 문서' : m?.created ? when(m.created) : ''].filter(Boolean).join(' · ');

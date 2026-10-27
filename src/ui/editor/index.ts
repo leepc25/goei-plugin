@@ -259,21 +259,29 @@ function settingsPage(ctx: ChatContext, page: SetPage): string {
   const sec = (s: SettingsSection) => settingsSection(ctx, scope, canChat, s);
   const guide = (g: GuideName) => `<div class="gw-set-guide">${guidePage(g).replace(/^<div class="gw-page">/, '<div class="gw-page gw-page-inner">')}</div>`;
   let body = '';
+  let act = '';
+  const feat = (p: 'gnet' | 'phone' | 'wiki' | 'visit' | 'people', g?: GuideName) => {
+    const r = featurePane(ctx, p, canChat);
+    act = r.act;
+    return r.body + (g ? guide(g) : '');
+  };
   switch (page) {
     case 'screen': body = sec('screen'); break;
     case 'image': body = sec('image') + `<section class="ps-group"><h3>이미지 지침</h3><div class="ps-rows">${imgPromptPane(ctx)}</div></section>`; break;
     case 'board': body = sec('board') + guide('Tag'); break;
-    case 'gnet': body = featurePane(ctx, 'gnet', canChat) + guide('GNet'); break;
-    case 'phone': body = featurePane(ctx, 'phone', canChat) + guide('Phone'); break;
-    case 'wiki': body = featurePane(ctx, 'wiki', canChat) + guide('Wiki'); break;
-    case 'visit': body = featurePane(ctx, 'visit', canChat) + guide('Visit'); break;
-    case 'people': body = featurePane(ctx, 'people', canChat); break;
+    case 'gnet': body = feat('gnet', 'GNet'); break;
+    case 'phone': body = feat('phone', 'Phone'); break;
+    case 'wiki': body = feat('wiki', 'Wiki'); break;
+    case 'visit': body = feat('visit', 'Visit'); break;
+    case 'people': body = feat('people'); break;
     case 'guides': body = guide('RP') + guide('Directive'); break;
     case 'adv': body = sec('adv'); break;
     case 'update': body = sec('update'); break;
   }
+  // 머리는 모든 페이지가 같다: 제목 왼쪽, 오른쪽에 범위(이 채팅/새 채팅 기본값) 또는 그 기능의 단추(덮어쓰기·불러오기). 시작 전이면 같은 글귀
   const showScope = ['screen', 'image', 'board', 'adv'].includes(page);
-  return `<div class="gw-page gw-set"><header class="gw-head"><h2>${esc(title)}</h2>${showScope ? `<div class="gw-head-act">${scopeSeg}</div>` : ''}</header>
+  const right = showScope ? scopeSeg : `${canChat ? '' : '<span class="gw-tokens">새 채팅 기본값 (시작 전)</span>'}${act}`;
+  return `<div class="gw-page gw-set"><header class="gw-head"><h2>${esc(title)}</h2>${right ? `<div class="gw-head-act">${right}</div>` : ''}</header>
     ${settingsNotices()}
     <div class="gx-settings gw-setbody">${body}</div></div>`;
 }

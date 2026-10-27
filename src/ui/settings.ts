@@ -93,7 +93,7 @@ function statusColsTable(cfg: ColConfig, busy: boolean): string {
     const hint = c.locked ? '늘 사용' : c.feature ? `끄면 ${c.feature}도 꺼져요` : '';
     return `<div class="st-col-row${m === 'off' ? ' off' : ''}"><div class="st-col-name"><b>${c.label}</b>${hint ? `<small>${hint}</small>` : ''}</div>${use}${show}</div>`;
   });
-  return `<div class="st-cols">${rows.join('')}</div>`;
+  return `<div class="st-cols ps-row-block">${rows.join('')}</div>`;
 }
 
 /** 시작 잔고 입력 (원). 숫자 또는 「120만 원」 */
@@ -217,12 +217,22 @@ export function settingsNotices(): string {
 }
 
 /** 기능별 설정 화면의 본문 (편집 창용: 뒤로 단추·main 없이) */
-export function featurePane(ctx: ChatContext, page: NonNullable<typeof settingsUi.page>, canChat: boolean): string {
-  const html = featurePage(ctx, page, canChat);
-  return html
+export function featurePane(ctx: ChatContext, page: NonNullable<typeof settingsUi.page>, canChat: boolean): { body: string; act: string } {
+  let html = featurePage(ctx, page, canChat)
     .replace(/^<main class="gx-body gx-settings st-featpage">/, '')
     .replace(/<\/main>$/, '')
-    .replace(/<button class="ph-tool ph-back" data-action="set-feat-back"[^>]*>[\s\S]*?<\/button>/, '');
+    .replace(/<p class="gx-hint st-prehint">[\s\S]*?<\/p>/, '');
+  // 안쪽 머리(뒤로·제목·단추)는 떼고, 단추(덮어쓰기·불러오기 등)만 창 머리 오른쪽으로 (2026-10-27: 모든 설정 페이지가 같은 머리)
+  let act = '';
+  html = html.replace(/<header class="ph-room-head[^"]*">([\s\S]*?)<\/header>/, (_m, inner: string) => {
+    act = inner
+      .replace(/<button class="ph-tool ph-back"[^>]*>[\s\S]*?<\/button>/, '')
+      .replace(/<div class="ph-room-title">[\s\S]*?<\/div>/, '')
+      .replace(/^<span class="ph-act">([\s\S]*)<\/span>$/, '$1')
+      .trim();
+    return '';
+  });
+  return { body: html, act };
 }
 
 export function settingsTab(ctx: ChatContext, scope: SettingsScope = 'chat', canChat = true, only?: SettingsSection): string {
@@ -277,12 +287,9 @@ export function settingsTab(ctx: ChatContext, scope: SettingsScope = 'chat', can
       field('지원 투입', seg('set-support', s.supportOn ? '1' : '0', [['1', 'ON'], ['0', 'OFF']], busy), '편성에서 등록 요원 외의 일반 지원 인원을 더할 수 있어요.'),
       field('인물 기록', seg('set-people', peopleOn ? '1' : '0', [['1', 'ON'], ['0', 'OFF']], busy), scope === 'chat' ? '응답마다 보조 모델이 한 번 읽어 인물의 상태·관계·호감을 기록하고, 본편 요청이 그 기록을 읽어요. 세부는 「기능별 설정 → 인물 기록」에서.' : '새 채팅을 인물 기록을 켠 채로 시작할지 정해요.'),
     ].join(''))}
-    <details class="ps-adv st-colsbox" data-keep="status-cols"${keepOpen('status-cols')}><summary class="ps-adv-sum"><b>상태창 칸</b><small>${usedCols(colCfg).length}칸 사용</small></summary><div class="ps-adv-body">
-      <p class="ps-note">응답 끝의 상태 태그 <code>[▣|…]</code>에 들어가는 칸이에요. 「안 씀」으로 하면 태그에서 그 칸이 빠지고(모델에 모양을 알려 줘요), 「숨김」은 태그에는 두고 채팅 속 상태창 상자에서만 가려요.${scope === 'chat' ? ' 바꾼 구성은 이 채팅에 바로 적용되고 바뀐 시점이 기록돼요.' : ' 새 채팅의 기본 구성이에요.'}</p>
-      ${statusColsTable(colCfg, busy)}
-      ${colCfg.wallet !== 'off' ? field('시작 잔고', wonInput(walletStart, busy), scope === 'chat' ? `이 채팅 장부의 시작 잔고예요. 지금 잔고 ${esc(formatWon(walletNow))}. 거래 내역과 수정은 ID카드의 잔고 칩에서.` : '새 채팅 장부의 시작 잔고예요. 거래는 인물 기록 갱신기가 본문에서 금액이 적힌 것만 뽑아 더하고 빼요.') : ''}
-    </div></details>
-    <details class="ps-adv st-world" data-keep="world-gen"${keepOpen('world-gen')}><summary class="ps-adv-sum"><b>괴이 발생</b></summary><div class="ps-adv-body"><p class="ps-note">응답을 처리할 때마다 판정해요. 상한을 0으로 하면 그 종류는 자동으로 생기지 않아요.</p>
+    ${group(`상태창 칸 <small>${usedCols(colCfg).length}칸 사용</small>`, `${statusColsTable(colCfg, busy)}${colCfg.wallet !== 'off' ? field('시작 잔고', wonInput(walletStart, busy), scope === 'chat' ? `이 채팅 장부의 시작 잔고예요. 지금 잔고 ${esc(formatWon(walletNow))}. 거래 내역과 수정은 ID카드의 잔고 칩에서.` : '새 채팅 장부의 시작 잔고예요. 거래는 인물 기록 갱신기가 본문에서 금액이 적힌 것만 뽑아 더하고 빼요.') : ''}`,
+      `응답 끝의 상태 태그 <code>[▣|…]</code>에 들어가는 칸이에요. 「안 씀」으로 하면 태그에서 그 칸이 빠지고(모델에 모양을 알려 줘요), 「숨김」은 태그에는 두고 채팅 속 상태창 상자에서만 가려요.${scope === 'chat' ? ' 바꾼 구성은 이 채팅에 바로 적용되고 바뀐 시점이 기록돼요.' : ' 새 채팅의 기본 구성이에요.'}`)}
+    <section class="ps-group"><h3>괴이 발생</h3><p class="ps-note">응답을 처리할 때마다 판정해요. 상한을 0으로 하면 그 종류는 자동으로 생기지 않아요.</p>
       <div class="ps-cards">
         ${worldKind(world, 'preset', '프리셋 괴이', busy)}${worldKind(world, 'random', '랜덤 괴이', busy)}
         ${worldKind(world, 'incident', '사건', busy)}${worldKind(world, 'mystic', '특수', busy)}
@@ -290,7 +297,7 @@ export function settingsTab(ctx: ChatContext, scope: SettingsScope = 'chat', can
           ${worldRow(world, 'extra_cap', '괴이', '개', busy)}${worldRow(world, 'extra_in_cap', '사건', '개', busy)}${worldRow(world, 'extra_ms_cap', '특수', '개', busy)}</div>
           <p class="ps-note">직접 고르거나 RP 중에 새로 등장한 것을 상한과 따로 기록할 수 있는 개수예요.</p></div>
       </div>
-    </div></details>`,
+    </section>`,
     adv: `${advSections('gen', scope === 'chat' ? ctx.chat.scriptstate : getPrefs().vars, scope === 'chat' && canChat ? { 1: loreCheckBox(ctx) } : {})}`,
     update: `${updateGroup(ctx)}`,
   };
