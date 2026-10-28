@@ -159,6 +159,9 @@ function loreSources(lore: ChatContext['char']['globalLore']): Map<string, strin
   return out;
 }
 
+/** 로어북이 든 폴더 이름 (다른 폴더에서 온 후보의 출처 표시) */
+export const loreSourceOf = (ctx: ChatContext, name: string): string => loreSources(ctx.char.globalLore).get(name) ?? '';
+
 /** 다른 폴더에서 발생 후보로 고를 수 있는 로어북 (설정 폴더·폴더 없는 것·이미 있는 것 제외) */
 export function directoryExtList(ctx: ChatContext): string {
   const d = draftOf(ctx);
