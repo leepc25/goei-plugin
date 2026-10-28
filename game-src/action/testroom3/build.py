@@ -122,7 +122,7 @@ def parse_flips(tr):
     """「좌우 반전」이 적힌 문장의 줄 번호"""
     out = set()
     for line in tr.splitlines():
-        for sent in re.split(r"(?<=[.。])\s", line):
+        for sent in re.split(r"(?<=[.。])\s| · ", line):
             if "반전" in sent:
                 sent = re.sub(r"(동|서|남동|남서)?\(?(E|W|SE|SW)?\)?판", " ", re.sub(r"\([^)]*\)", "", sent))
                 for lid in re.findall(r"(?<![\d~.])(" + LID + r")(?![\d~장])", sent):

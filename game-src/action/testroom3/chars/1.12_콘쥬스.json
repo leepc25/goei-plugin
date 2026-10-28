@@ -372,62 +372,101 @@
   "skill": {
    "name": "바리케이드 번쩍",
    "anim": "22",
-   "fps": 9,
+   "fps": 8,
    "armor": [
     1,
     6
    ],
    "events": [
     {
-     "f": 4,
+     "f": 1,
      "fx": [
       {
-       "t": "v",
+       "t": "carry",
        "vfx": "x3-o-1.12-barricade",
-       "at": "body",
-       "dy": -170,
        "scale": 0.9,
-       "hold": 0.12
+       "pts": {
+        "1": [
+         45,
+         44
+        ],
+        "2": [
+         42,
+         44
+        ],
+        "3": [
+         36,
+         92
+        ],
+        "4": [
+         0,
+         248
+        ],
+        "5": [
+         0,
+         248
+        ],
+        "6": [
+         12,
+         244
+        ]
+       }
       }
      ]
     },
     {
-     "f": 6,
-     "hold": 0.15,
+     "f": 7,
+     "hold": 0.12,
      "fx": [
       {
-       "t": "v",
+       "t": "toss",
        "vfx": "x3-o-1.12-barricade",
-       "at": "front",
-       "dx": 150,
-       "mode": "bottom",
-       "hold": 2.6,
-       "fade": 0.3
-      },
-      {
-       "t": "v",
-       "vfx": "x3-c-ground-shockwave",
-       "at": "front",
-       "dx": 150,
-       "scale": 0.45,
-       "under": true,
-       "tint": "#ffffff",
-       "hit": {
-        "dmg": 255,
-        "kind": "launch"
-       }
-      },
-      {
-       "t": "v",
-       "vfx": "x3-c-dust-puff",
-       "at": "front",
-       "dx": 150,
-       "scale": 1,
-       "tint": "#d8c8b0"
+       "scale": 0.9,
+       "from": [
+        95,
+        190
+       ],
+       "dx": 230,
+       "land": 48,
+       "arc": 110,
+       "time": 0.34,
+       "then": [
+        {
+         "t": "v",
+         "vfx": "x3-o-1.12-barricade",
+         "at": "spot",
+         "dx": 0,
+         "mode": "bottom",
+         "hold": 2.6,
+         "fade": 0.3
+        },
+        {
+         "t": "v",
+         "vfx": "x3-c-ground-shockwave",
+         "at": "spot",
+         "dx": 0,
+         "scale": 0.45,
+         "under": true,
+         "tint": "#ffffff",
+         "hit": {
+          "dmg": 255,
+          "kind": "launch"
+         }
+        },
+        {
+         "t": "v",
+         "vfx": "x3-c-dust-puff",
+         "at": "spot",
+         "dx": 0,
+         "scale": 1,
+         "tint": "#d8c8b0"
+        }
+       ]
       }
      ]
     }
-   ]
+   ],
+   "_note": "10-28 사용자: 머리 위에 생겼다 앞에 다시 생김, 던지는 것도 아님 → 22번 다시 뽑음(쪼그려 잡기·머리 위로·앞으로 내던지기) + 바리케이드가 장마다 손을 따라감(carry) → 포물선으로 날아가(toss) 앞에 쿵 박혀 섬"
   },
   "charge": {
    "name": "실 꿰기 질주",

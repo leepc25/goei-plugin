@@ -78,7 +78,7 @@ const FLAT = new Set(['19', '20', '38', '38_1', '43', '45']);   // 바닥에 몸
 const LIE = new Set(['20', '38', '38_1', '39', '40', '41', '42', '42_1', '43', '45']);
 const lieFrom = a => a.bot.indexOf(Math.min(...a.bot)) + 1;   // 날아가 쓰러지기: 가장 높이 뜬 장 다음부터 땅
 const lyingF = (a, f) => (a.bot[f] - a.top[f]) < 0.55 * (a.bot[0] - a.top[0]) && a.bot[f] >= a.floor - 24;   // 몸이 눕고 바닥 가까이 내려온 장
-const FALLS = new Set(['18_3', '44']);   // 서서 시작해 눕는 줄: 누운 장만 몸통 아랫선으로
+const FALLS = new Set(['18_3', '44', '75', '76', '77']);   // 서서 시작해 눕는 줄: 누운 장만 몸통 아랫선으로(눕기 75~77도 10-28: 허공에 눕는 인물 → 바닥. 침대 높이는 나중에 물건에 맞춤)
 // 누운 장 판정(10-28 고침): 바닥에서 떠 있게 그린 그림도 누운 것으로 봄(몸 높이만 봄). 누운 장들은 같은 바닥선(몸통 아랫선의 가운데 값)을 써서 반복 때 들썩이지 않게
 const lowF = (a, f) => (a.bot[f] - a.top[f]) < 0.55 * (a.bot[0] - a.top[0]);
 function lieLine(a) { if (a._lie != null) return a._lie; const v = a.bot.map((b, f) => f).filter(f => lowF(a, f)).map(f => (a.mbot || a.bot)[f]).sort((x, y) => x - y); return (a._lie = v.length ? v[v.length >> 1] + 3 : null); }
@@ -326,6 +326,12 @@ function strike(h, y) {
 // 공용 바닥 파괴(전 인물 통일): 땅이 터지고 돌 부스러기가 튄 뒤 갈라진 구덩이가 남았다가 흐려짐. 바닥 층(캐릭터 뒤)
 function craterAt(x, gy, k, hold = 3) { if (!vfx('ground-crater2', x, gy, k, { under: true, back: true, hold, fade: 0.6, flip: Math.random() < 0.5 })) fx.push({ k: 'scorch', x, y: gy, r: 50 * k, t: hold }); }
 const FX = {
+  // 손에 든 물건: 이 동작 동안 장마다 {장: [앞 dx, 바닥에서 가운데 높이]} 자리에 이펙트 그림 한 장(콘쥬스 바리케이드, 10-28)
+  carry(s) { fx.push({ k: 'carry', vfx: s.vfx, pts: s.pts, clip: P.clip, sc: s.scale || 1, t: 9 }); },
+  // 손에서 앞으로 포물선을 그리며 던짐 → 떨어진 자리에서 then 실행(at: 'spot')
+  toss(s) { const k = K(P.y), f = P.face, [dx0, h0] = s.from || [60, 200]; for (const e of fx) if (e.k === 'carry' && e.clip === P.clip) e.t = 0;
+    const x0 = P.x + f * dx0 * k, x1 = P.x + f * (s.dx || 220) * k, T = s.time || 0.32;
+    fx.push({ k: 'toss', vfx: s.vfx, x0, x1, y0: P.y - h0 * k, y1: P.y - (s.land || 50) * k, arc: (s.arc || 90) * k, gy: P.y, sc: (s.scale || 1) * k, flip: f < 0, t: T, t0: T, rot: (s.spin || 0) * f, then: s.then }); },
   // 맞은 자리에서 동전이 튀어 바닥에 떨어져 돌다 멈춤(로제몬 D)
   coinDrop(s, c) { const p = posOf({ at: 'target', ...s }, c); fx.push({ k: 'coin', x: p.x, y: p.hy, vx: -P.face * 90, vy: -320, g: p.gy, t: 1.6 }); },
   // 눈빛 번쩍(보라 점 2개)
@@ -467,7 +473,7 @@ const FX = {
   zoom(s) { zoom = s.v || 0.06; zx = P.x + P.face * 200; zy = P.y - 120; },
   text(s, c) { const q = c.pt || D, p = s.at === 'target' ? { x: q.x, y: q.y - (q.z || 0) - 260 * K(q.y) } : { x: P.x, y: P.y - 270 * K(P.y) }; fx.push({ k: 'num', x: p.x - 30, y: p.y, v: s.v, t: s.time || 1.2, big: s.big }); },
   // 돌진: 그 장을 잡은 채 앞으로 미끄러짐, 샌드백을 지나며 한 번 맞힘
-  dash(s) { P.dash = { v: s.speed || 1500, t: s.time || 0.45, hit: s.hit, delay: s.delay, done: false }; P.ghostT = Math.max(P.ghostT, s.time || 0.45); sfx('evade'); },
+  dash(s) { P.dash = { v: s.speed || 1500, t: s.time || 0.45, hit: s.hit, delay: s.delay, stop: s.stop, done: false }; P.ghostT = Math.max(P.ghostT, s.time || 0.45); sfx('evade'); },
   // 뒤로 펄쩍(데쥬레): 무적 + 뒤로 이동
   hop(s) { P.dodgeV = { x: -P.face * (s.v || 900), y: 0 }; P.inv = Math.max(P.inv, s.inv || 1); P.z = 0; if (s.text) fx.push({ k: 'num', x: P.x - 10, y: P.y - 270 * K(P.y), v: s.text, t: 0.8 }); },
   // 띄워 고정(게슈간): 샌드백을 h만큼 띄워 time초 공중에
@@ -865,7 +871,11 @@ function sitChair() {
 }
 function rise(fast) { const s = P.seat; if (!s) return toIdle(); const n = nOf(s.sit); reverseOut(s.sit, R(n - 1, 0), fast ? 0.04 : SEAT_F, () => { P.seat = null; renderChairBox(); if (fast === 'hit') hit(); else toIdle(); }); P.mode = 'seatUp'; }
 function seatAct(kind) {
-  const s = P.seat, id = s && s.acts[kind]; if (!id || !has(id)) return;
+  const s = P.seat, id = s && s.acts[kind];
+  if (!id || !has(id)) {   // 지금 방향에 없는 줄이면 그 줄이 있는 방향으로 앉은 뒤 이어서(정면 전용 줄 등)
+    const t = SEATS.find(t => t.acts[kind] && has(t.acts[kind]) && has(t.sit)); if (!t) return;
+    P.seat = null; sitAt(t.dir); later(nOf(t.sit) * SEAT_F + 0.15, () => P.seat && P.seat.dir === t.dir && seatAct(kind)); return;
+  }
   const n = nOf(id);
   if (SEAT_LOOP.has(id)) { play(id, { seq: S(R(0, n - 1), 0.16), loopFrom: 0 }); P.clip.breathe = false; }
   else play(id, { seq: S(R(0, n - 1), 0.14), onEnd: seatIdle });
@@ -909,15 +919,23 @@ const SCENES = [
     ['누운 채 움찔', () => P.mode === 'down' ? flinch() : (knock(), later(1.2, flinch))], ['일어나기', () => P.mode === 'down' && getUp()], ['스턴', () => stun()],
     ['사망(서서)', () => { if (P.mode === 'dead') die(); die(); }], ['사망(누워서)', () => { if (P.mode === 'dead') die(); knock(); later(1.4, () => { P.mode = 'down'; die(); }); }], ['되살리기', () => P.mode === 'dead' && die()]], () => true],
 ];
+// 그 인물에게 줄이 없어 아무것도 안 하는 버튼은 숨김(사용자 10-28: 이길환 끄덕·손 작업)
+function canRun(fn) {
+  const src = fn.toString(), k = src.match(/seatAct\('(\w+)'\)/), d = src.match(/sitAt\('(\w+)'\)/), ids = [...src.matchAll(/id: '([^']+)'/g)].map(m => m[1]);
+  if (k) return SEATS.some(t => t.acts[k[1]] && has(t.acts[k[1]]) && has(t.sit));
+  if (d) return SEATS.some(t => t.dir === d[1] && has(t.sit));
+  if (ids.length) return ids.some(id => has(id) && !['50', '57'].includes(id));
+  return true;
+}
 function sitAt(dir) { if (P.seat) return; seatIdx = SEATS.findIndex(s => s.dir === dir) - 1; P.scene = null; sitChair(); }
 function renderScenes() {
   const box = document.getElementById('scenes'); box.innerHTML = '';
   const g = document.createElement('div'); g.className = 'scn'; box.append(g);
   const row = (name, items) => { const h = document.createElement('b'); h.textContent = name; const l = document.createElement('div'); l.className = 'list';
-    for (const [lab, fn] of items) { const b = document.createElement('button'); b.textContent = lab; b.onclick = () => { if (P.mode === 'dead' && !/사망|되살리기/.test(lab)) die(); fn(); cv.focus(); }; l.append(b); }
+    for (const [lab, fn] of items) { if (!canRun(fn)) continue; const b = document.createElement('button'); b.textContent = lab; b.onclick = () => { if (P.mode === 'dead' && !/사망|되살리기/.test(lab)) die(); fn(); cv.focus(); }; l.append(b); }
     g.append(h, l); };
   for (const [name, items, ok] of SCENES) if (ok()) row(name, items);
-  const used = new Set(['50', '57', '60', '61', '62', '63', '64', '65', '66', '68', '69', '70', '71', '72', '73', '106', '96', '97', '98', '99', '105', '100', '101', '102', '103', '104', '75', '76', '77', '169']);
+  const used = new Set(['50', '57', '60', '61', '62', '63', '64', '65', '66', '68', '69', '70', '71', '72', '73', '106', '148', '149', '167', '67', '96', '97', '98', '99', '105', '100', '101', '102', '103', '104', '75', '76', '77', '169']);
   const life = lifeIds().filter(id => !used.has(id));
   if (life.length) row('생활·직무', [['정면 대기', () => runScene([{ id: '50', n: 4, d: 0.2 }])], ['후면 대기', () => runScene([{ id: '57', n: 4, d: 0.2 }])], ...life.map(id => [`${id.replace('_', '-')} ${A[id].name}`, () => playLife(id)])]);
 }
@@ -1076,6 +1094,8 @@ function updateFx(dt) {
     }
     else if (e.k === 'lob') {}
     else if (e.k === 'firewall' && Math.random() < dt * 40) fx.push({ k: 'fire', x: e.x + (Math.random() - 0.5) * e.w, y: e.y - Math.random() * 10, vx: (Math.random() - 0.5) * 30, vy: -250 - Math.random() * 300, r: 6 + Math.random() * 8, t: 0.5, t0: 0.6 });
+    else if (e.k === 'carry') { if (P.clip !== e.clip) e.t = 0; }
+    else if (e.k === 'toss') { if (e.t - dt <= 0 && e.then) { const pt = { x: e.x1, y: e.gy, z: 0 }; runFx(e.then, { pt }); e.then = null; } }
     else if (e.k === 'shell' || e.k === 'coin') { e.x += e.vx * dt; e.y += e.vy * dt; e.vy += 1400 * dt; if (e.y > e.g) { e.y = e.g; e.vy *= -0.35; e.vx *= 0.6; } }
   }
   for (const e of fx) if (e.k === 'timer' && e.t <= 0 && !e.done) { e.done = true; e.fn(); }
@@ -1138,7 +1158,7 @@ function update(dt) {
   if (P.overT > 0) { P.overT -= dt; P.heat = 100 * Math.max(0, P.overT) / 2.6; if (Math.random() < dt * 6) { const p = P.armed ? muzzle() : { x: P.x + P.face * 30 * K(P.y), y: P.y - 150 * K(P.y) }; steam(p.x, p.y, 1.2); } }
   else if (P.t - P.lastShot > 0.35) P.heat = Math.max(0, P.heat - 30 * dt);
   if (P.ghostT > 0) { P.ghostT -= dt; P.ghostN = (P.ghostN || 0) + dt; if (P.clip && P.ghostN > 0.05 && !(P.ghostN = 0)) fx.push({ k: 'ghost', id: P.clip.id, f: curF(), x: P.x, y: P.y, z: P.z, face: P.face, t: 0.18, t0: 0.18 }); }
-  if (P.dash) { const d = P.dash; P.x += P.face * d.v * dt; d.t -= dt; if (!d.done && showDummy && Math.abs(D.y - P.y) < 70 && Math.abs(D.x - P.x) < 70 * K(P.y)) { d.done = true; if (d.hit !== null) { const h = d.hit || { dmg: 40, kind: 'blow' }; d.delay ? later(d.delay, () => strike(h)) : strike(h); } } if (d.t <= 0 || P.x < 75 || P.x > W - 75) P.dash = null; }
+  if (P.dash) { const d = P.dash; P.x += P.face * d.v * dt; d.t -= dt; if (!d.done && showDummy && Math.abs(D.y - P.y) < 70 && Math.abs(D.x - P.x) < 70 * K(P.y)) { d.done = true; if (d.hit !== null) { const h = d.hit || { dmg: 40, kind: 'blow' }; d.delay ? later(d.delay, () => strike(h)) : strike(h); } if (d.stop) d.t = Math.min(d.t, d.stop); } if (d.t <= 0 || P.x < 75 || P.x > W - 75) P.dash = null; }
   if (P.dodgeV) { P.x += P.dodgeV.x * dt; P.y += P.dodgeV.y * dt; P.dodgeV.x *= Math.pow(0.004, dt); P.dodgeV.y *= Math.pow(0.004, dt); }
   if (P.pvx) { P.x += P.face * P.pvx * dt; const s = Math.sign(P.pvx); P.pvx -= s * P.pdec * dt; if (Math.sign(P.pvx) !== s) P.pvx = 0; }
   const dx = (down('right') ? 1 : 0) - (down('left') ? 1 : 0), dy = (down('down') ? 1 : 0) - (down('up') ? 1 : 0);
@@ -1428,6 +1448,8 @@ function drawFx(glow) {
     else if (e.k === 'mote') { ctx.fillStyle = e.c; ctx.globalAlpha = k; ctx.fillRect(e.x - 2, e.y - 2, 4, 4); ctx.globalAlpha = 1; }
     else if (e.k === 'fire') { const c = k > 0.8 ? '255,255,230' : k > 0.55 ? '255,214,90' : k > 0.3 ? '255,120,30' : '120,30,20'; ctx.fillStyle = `rgba(${c},${Math.min(1, k * 1.6)})`; ctx.beginPath(); ctx.arc(e.x, e.y, e.r, 0, Math.PI * 2); ctx.fill(); }
     else if (e.k === 'shell') { ctx.fillStyle = '#e8c35a'; ctx.fillRect(e.x - 2, e.y - 1, 5, 3); }
+    else if (e.k === 'carry') { const pt = e.pts[curF()]; if (pt) { const k = K(P.y); drawVfxAt(e.vfx, P.x + P.face * pt[0] * k, P.y - P.z - pt[1] * k, e.sc * k, 0, P.face < 0); } }
+    else if (e.k === 'toss') { const u = 1 - e.t / e.t0, x = e.x0 + (e.x1 - e.x0) * u, y = e.y0 + (e.y1 - e.y0) * u - e.arc * 4 * u * (1 - u); ctx.save(); ctx.translate(x, y); ctx.rotate(e.rot * u); drawVfxAt(e.vfx, 0, 0, e.sc, 0, e.flip); ctx.restore(); }
     else if (e.k === 'coin') { ctx.save(); ctx.translate(e.x, e.y - 6); ctx.scale(e.vy === 0 && Math.abs(e.vx) < 5 ? 1 : Math.abs(Math.cos(e.t * 16)) * 0.85 + 0.15, 1); drawIcon('coin', 0, 0, 0.9, CH.color); ctx.restore(); }
     else if (e.k === 'eyes') { const a = e.t / e.t0; ctx.fillStyle = e.c; ctx.globalAlpha = a; for (const ox of [-6, 6]) { ctx.fillRect(e.x + ox - 3, e.y - 2, 6, 4); ctx.fillRect(e.x + ox - 9 * a - 1, e.y - 1, 18 * a + 2, 2); } ctx.globalAlpha = 1; }
     else if (e.k === 'beam') {

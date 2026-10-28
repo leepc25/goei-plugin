@@ -18,9 +18,9 @@
   "img": "north"
  },
  "73": {
-  "dx": -35.0,
+  "dx": -30.0,
   "dy": -8.0,
   "s": 1.0,
-  "img": "south-east"
+  "img": "C02:south"
  }
 }
