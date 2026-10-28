@@ -12,7 +12,7 @@ export const plugin = readFileSync(process.env.PLUGIN || new URL('../dist/goei-p
 export const bodyCode = readFileSync(new URL('../dist/goei-body.js', import.meta.url), 'utf8');
 
 /** 가짜 risuai. window.__counts 에 getChatFromIndex·getCharacterFromIndex 호출 수를 센다 */
-export function hostScript(char, chat, { rootDom = true, noBody = false } = {}) {
+export function hostScript(char, chat, { rootDom = true, noBody = false, prefs = null } = {}) {
   return `
     window.__calls = { setChat: [], show: [], hide: 0, replacers: [], listeners: [], handlers: {} };
     window.__counts = { chat: 0, char: 0, setChat: 0, setChar: 0 };
@@ -37,6 +37,7 @@ export function hostScript(char, chat, { rootDom = true, noBody = false } = {}) 
     });
     window.__store = {};
     if (!${noBody}) window.__store['p:goei:body'] = ${JSON.stringify(bodyCode)};
+    if (${JSON.stringify(prefs)}) window.__store['p:goei:prefs'] = ${JSON.stringify(JSON.stringify(prefs))};
     window.__rootDoc = ${rootDom} ? { querySelector: async (q) => wrap(document.querySelector(q)), querySelectorAll: async (q) => [...document.querySelectorAll(q)].map(wrap), createElement: async (t) => wrap(document.createElement(t)) } : null;
     window.__char = ${JSON.stringify(char)};
     window.__liteChar = window.__char;
@@ -85,7 +86,7 @@ export async function launch() {
   return browser;
 }
 
-export async function boot(browser, char, chat, { viewport = { width: 1100, height: 900 }, touch = false, rootDom = true, noBody = false, fixtureDir = '' } = {}) {
+export async function boot(browser, char, chat, { viewport = { width: 1100, height: 900 }, touch = false, rootDom = true, noBody = false, fixtureDir = '', prefs = null } = {}) {
   const page = await browser.newPage({ viewport, ...(touch ? { hasTouch: true, isMobile: true } : {}) });
   const errors = [];
   page.on('pageerror', (e) => errors.push(e.message));
@@ -96,7 +97,7 @@ export async function boot(browser, char, chat, { viewport = { width: 1100, heig
   });
   await page.setContent('<!doctype html><html><head><meta charset="utf-8"></head><body style="margin:0;height:100vh"><div class="default-chat-screen" style="height:100%;background:#f3f3f3"><button id="other" style="margin:40px">다른 버튼</button></div></body></html>');
   await page.addScriptTag({ content: "document.addEventListener('submit', (e) => { e.preventDefault(); e.stopImmediatePropagation(); }, true);" });
-  await page.addScriptTag({ content: hostScript(char, chat, { rootDom, noBody }) });
+  await page.addScriptTag({ content: hostScript(char, chat, { rootDom, noBody, prefs }) });
   await page.addScriptTag({ content: `(async () => { ${plugin}\n })().catch(e => { window.__bootError = String(e); });` });
   await page.waitForFunction(() => window.__calls.replacers.length || window.__bootError);
   assert.equal(await page.evaluate(() => window.__bootError ?? null), null);

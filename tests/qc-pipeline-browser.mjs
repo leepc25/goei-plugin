@@ -544,6 +544,22 @@ const unresolved = (t) => [...new Set((t.match(/\{\{[^}]*\}\}/g) ?? []))].filter
   await page.close();
 }
 
+// ── 7) 기기 설정 imgSend·imgShow 0/1 (부팅 때 저장소에 넣는다) ──
+for (const [send, show, keepTags, when] of [[0, 0, 4, false], [2, 1, 1, true]]) {
+  const { page, errors } = await boot(browser, fixture, { message: [{ role: 'user', data: 'hi' }], scriptstate: { $st_faction: 'A00', $st_lang: 'ko', $st_fm: '2' } }, { fixtureDir, prefs: { imgSend: send, imgShow: show } });
+  await waitLite(page);
+  await R.section(`7-${send} imgSend ${send}·imgShow ${show}: 요청의 태그 ${send ? `최근 ${send}개` : '전부'}, 표시 조건 ${when ? '있음' : '없음'}`, async () => {
+    const msgs = [sys('S'), ...Array.from({ length: 8 }, (_, i) => (i % 2 ? bot(`답 ${i} <img=Jyaldi_smile>`) : usr(`말 ${i}`))), usr('끝')];
+    const out = await request(page, msgs);
+    assert.equal(out.filter((m) => m.role !== 'system' && m.content.includes('<img=')).length, keepTags);
+    const h = await display(page, '앞 <img=Jyaldi_smile> 뒤');
+    assert.equal(h.includes('{{#when'), when, h);
+    assert.ok(h.includes('{{raw::Jyaldi_smile}}'));
+  });
+  assert.deepEqual(errors, []);
+  await page.close();
+}
+
 await browser.close();
 console.log(`\n${R.results.length - R.failed()}/${R.results.length} 통과`);
 process.exit(R.failed() ? 1 : 0);
