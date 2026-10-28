@@ -1,10 +1,9 @@
 // 적 시험장: 엔진 약속(WorldView·Body)을 흉내 내는 작은 세계 + 회색 상자 요원. 적 모듈만 단독으로 돌려 보기 위한 것.
 // 실제 게임 통합은 「게임 전투와 조작」의 engine/modules.ts가 한다.
-import { ALL_DEFS, DEF_BY_KIND, Enemy, createEnemy, guardianSpawn, isThreat, moveTiming, planEncounter, budgetFor, signalEnemies, DROP_LABEL, rollIntrusion } from '../index';
+import { ALL_DEFS, DEF_BY_KIND, Enemy, createEnemy, isThreat, moveTiming, planEncounter, budgetFor, signalEnemies, DROP_LABEL, rollIntrusion } from '../index';
 import { overlap } from '../geom';
 import { ROLE_LABEL, FLOOR_TYPES, type Body, type FloorType, type GameEvent, type Hit, type WorldView } from '../types';
 import type { FloorPlan } from '../../engine/contract';
-import type { GuardianDef } from '../guardians';
 import type { Spawn } from '../spawn';
 import { ArenaPlayer, Bullet, type Keys } from './player';
 import { ROSTER } from '../roster';
@@ -198,10 +197,6 @@ export class ArenaWorld implements WorldView {
     this.banner = `파도 ${this.waveIdx + 1}/${this.waves.length}`;
     this.bannerT = 40;
     this.waveIdx++;
-  }
-  spawnGuardian() {
-    for (const s of guardianSpawn(this.floorType)) this.spawn(s.kind, s.x, s.y);
-    if (this.floorType === 'service') this.spawn('predator', 1000, 590);
   }
 
   interact() {
@@ -559,15 +554,13 @@ export function describe(kind: string): string {
       return `${a.move.label}(예고 ${t.tele}·유효 ${t.active}·마무리 ${t.recover}틱)`;
     })
     .join(', ');
-  const g = d as GuardianDef;
-  return `${d.label} — ${d.faction === 'guardian' ? '수호자' : ROLE_LABEL[d.role]}${d.mid ? '·중간 보스' : ''} · 체력 ${d.hp} · 아머 ${armor}${d.price ? ' · 가격 ' + d.price : ''}\n${d.note}${g.rule ? '\n약점: ' + g.rule : d.weak ? '\n약점: ' + d.weak : ''}${atk ? '\n공격: ' + atk : ''}`;
+  return `${d.label} — ${d.faction === 'guardian' ? '수호자' : ROLE_LABEL[d.role]}${d.mid ? '·중간 보스' : ''} · 체력 ${d.hp} · 아머 ${armor}${d.price ? ' · 가격 ' + d.price : ''}\n${d.note}${d.weak ? '\n약점: ' + d.weak : ''}${atk ? '\n공격: ' + atk : ''}`;
 }
 
 export const GROUPS: { label: string; kinds: string[] }[] = [
   { label: '차원 승강기', kinds: ROSTER.filter((d) => d.faction === 'elevator').map((d) => d.kind) },
   { label: '재현 · 아파트', kinds: ROSTER.filter((d) => d.faction === 'replica' && d.price > 0).map((d) => d.kind) },
   { label: '가짜 관리국 · 백일몽', kinds: ROSTER.filter((d) => d.faction === 'bureau' || d.faction === 'daydream').map((d) => d.kind) },
-  { label: '수호자', kinds: ALL_DEFS.filter((d) => d.faction === 'guardian' && d.kind !== 'elder_m').map((d) => d.kind) },
 ];
 export { FLOOR_TYPES };
 export type { Hit };

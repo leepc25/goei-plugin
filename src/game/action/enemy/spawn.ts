@@ -3,7 +3,6 @@
 // 수가 아니라 질: 화면당 8체 상한. 남는 예산은 파도 수(2→3)와 정예 접사(출혈·경 아머·빠름·재생)로 쓴다.
 // 겹치지 않게: 직전 3방과 같은 조합이면 다시 뽑는다.
 import { ROSTER, ROSTER_BY_KIND, INTRUDERS, type EnemyDef } from './roster';
-import { GUARDIAN_FOR } from './guardians';
 import type { Affix } from './enemy';
 import type { FloorType } from './types';
 import type { SpawnSpec } from '../engine/contract';
@@ -155,14 +154,6 @@ function shuffled<T>(a: T[], r: () => number): T[] {
 /** 엔진 약속의 모양: 파도 목록 (SpawnSpec[][]). x·y는 area 기준 월드 좌표 */
 export function spawnWave(budget: number, floorType: FloorType | string, depth: number, rng: () => number, area: Area = DEFAULT_AREA, opts: Partial<PlanOpts> = {}): Spawn[][] {
   return planEncounter({ budget, floor: (floorType as FloorType) ?? 'lobby', depth, rand: rng, area, ...opts }).waves;
-}
-
-/** 층 끝 수호자 방 편성 */
-export function guardianSpawn(floor: FloorType | string, area: Area = DEFAULT_AREA): Spawn[] {
-  const kinds = GUARDIAN_FOR[floor as FloorType] ?? [];
-  const mid = (area.x0 + area.x1) / 2;
-  const y = (area.y0 + area.y1) / 2;
-  return kinds.map((kind, i) => ({ kind, x: kinds.length > 1 ? mid + (i === 0 ? 140 : 260) : floor === 'b12' ? mid : mid + 260, y, boss: true, wave: 0 }));
 }
 
 /** 난입 굴리기 (스테이지 설계서 15장): 가짜 관리국 25%(어디든), 백일몽 30%(B-2 이하) — 출동당 확률이라 방마다는 낮게 */

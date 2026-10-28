@@ -487,7 +487,7 @@ export class Game {
         c.fillText('ANOMALY SIMULATION', SCREEN_W / 2, 120);
         c.font = pfont(58).f;
         c.fillStyle = '#e8eef0';
-        c.fillText('관리국 · 차원 승강기', SCREEN_W / 2, 190);
+        c.fillText('괴이 ː ANOMALY', SCREEN_W / 2, 190);
         this.drawMenu('', this.titleItems, false);
         c.fillStyle = '#8e9aa1';
         c.font = pfont(20).f;

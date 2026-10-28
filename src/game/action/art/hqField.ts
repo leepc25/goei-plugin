@@ -515,22 +515,6 @@ function pixelArrow(c: CanvasRenderingContext2D, x: number, y: number, U: number
   c.restore();
 }
 
-/** 출동 준비가 됐을 때: 승합차 위에 떠 있는 화살표. 차가 화면 왼쪽 밖이면 화면 왼쪽 끝 허공에 떠서 왼쪽을 가리킨다 */
-export function drawDepartArrow(c: CanvasRenderingContext2D, camX: number, now: number): void {
-  const VAN = { x: 370, y: 128 };
-  const left = camX + 46;
-  const pinned = VAN.x < left;
-  const bob = Math.sin(now / 280) * 5;
-  const glow = 0.5 + 0.5 * Math.sin(now / 280);
-  const x = pinned ? left : VAN.x, y = VAN.y + bob;
-  c.save();
-  c.globalCompositeOperation = 'lighter';
-  const g = c.createRadialGradient(x, y - 20, 0, x, y - 20, 46);
-  g.addColorStop(0, `rgba(255,200,80,${0.25 + 0.15 * glow})`); g.addColorStop(1, 'rgba(255,200,80,0)');
-  c.fillStyle = g; c.fillRect(x - 46, y - 66, 92, 92);
-  c.restore();
-  pixelArrow(c, x, y, 6, pinned ? Math.PI / 2 : 0);
-}
 
 /* ───────── 엘리베이터 호출 단추: 층을 고르면 초록 ───────── */
 const greenCache = new Map<string, { cv: HTMLCanvasElement; x: number; y: number } | null>();

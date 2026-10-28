@@ -3,8 +3,6 @@
 // 방 안 배치는 hq/rooms.ts(위에서 본 m 좌표)에서 화면 px로 바꾼다. 집기는 막는 상자다.
 // 출입: 복도 북쪽 벽 문(N)으로 들어간 방은 방 아래(S)로 들어오고 나간다. 복도 아래 문(S)으로 들어간 방은 방 북쪽 벽 문으로.
 import type { PlaceId } from './data';
-import type { HqSave } from './state';
-import { placeOpen } from './logic';
 import { ROOMS, mirror, type Room, type RoomFix } from './rooms';
 import { PAINTED, PAINTED_LANE, doorX } from './painted';
 
@@ -53,8 +51,6 @@ export interface HqSpot {
   seat?: { x: number; y: number };
   /** E를 누르면 자막 한 줄 */
   say?: string;
-  /** 출동 차량: 출동 준비가 됐으면 출발 */
-  depart?: boolean;
   /** 필드 가게 (src/game/world/fieldShop.ts SHOPS id): E로 거래 창 */
   shop?: string;
 }
@@ -249,7 +245,7 @@ export const HQ_SCENES: HqScene[] = [
   floorHall('b3', '지하 주차장', 'B3', [
     { id: 'supply', kind: 'steel', place: 'supply', label: '보급실' },
     { id: 'elev', kind: 'elevator' },
-  ], { spots: [{ id: 'van', x: 370, y: LANE_TOP + 50, verb: '출동', depart: true }] }),
+  ]),
   // ── 중림 지하상가 (중립지역, 그림 4장). 지상 입구 → 지하 1층 앞골목 → (가운데 통로) 뒷골목 / (동쪽 계단) 지하 2층 ──
   floorHall('jr_entry', '중림 지하상가 입구', 'out', [
     { id: 'west', kind: 'exit', side: 'S', to: 'street', toDoor: 'jr', label: '종로로 (임시)' },
@@ -311,15 +307,14 @@ const START = { scene: 'office' as SceneId, x: M(4), y: LANE_TOP + 170 };
 export interface HqMapView {
   scenes: (HqScene & { doors: (HqDoor & { open: boolean })[]; spots: (HqSpot & { open: boolean })[] })[];
   elevator: (typeof ELEVATOR[number] & { open: boolean })[];
-  /** 지금 시작할 장면: 출근·귀환은 사무실, 후송 직후는 의무실 침대 앞 */
+  /** 지금 시작할 장면 (사무실) */
   start: { scene: SceneId; x: number; y?: number };
 }
-export function hqMap(s: HqSave, justEvacuated = false): HqMapView {
-  const ok = (p?: PlaceId) => !p || placeOpen(s, p);
-  const bed = SCENE_BY_ID.clinic.spots[0];
+/** 문은 잠금 칸이 없으면 다 열린다. 옛 본부 메뉴 자리(place가 붙은 자리: 임무·장비·감정 …)는 출동과 같이 지워서 닫는다 (2026-10-28) */
+export function hqMap(): HqMapView {
   return {
-    scenes: HQ_SCENES.map((sc) => ({ ...sc, doors: sc.doors.map((d) => ({ ...d, open: !d.locked && (d.kind !== 'cell' || !!d.place) && ok(d.needs ?? d.place) })), spots: sc.spots.map((p) => ({ ...p, open: ok(p.place) })) })),
-    elevator: ELEVATOR.map((e) => ({ ...e, open: ok(e.needs) })),
-    start: justEvacuated ? { scene: 'clinic', x: bed.x, y: bed.y } : START,
+    scenes: HQ_SCENES.map((sc) => ({ ...sc, doors: sc.doors.map((d) => ({ ...d, open: !d.locked && (d.kind !== 'cell' || !!d.place) })), spots: sc.spots.map((p) => ({ ...p, open: !p.place })) })),
+    elevator: ELEVATOR.map((e) => ({ ...e, open: true })),
+    start: START,
   };
 }

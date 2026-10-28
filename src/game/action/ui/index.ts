@@ -244,7 +244,7 @@ export function mountGameShell(box: HTMLElement, o: ShellOptions = {}): Shell {
       menu.open({
         id: 'title',
         look: 'title',
-        title: o.title ?? '차원 승강기',
+        title: o.title ?? '괴이 ː ANOMALY',
         sub: o.sub ?? 'ANOMALY SIMULATION · 관리국 액션',
         noBack: true,
         // 필드: 저장 이어하기가 없다 (본편 상황판이 곧 저장). 입장 판정은 onNew가 한다

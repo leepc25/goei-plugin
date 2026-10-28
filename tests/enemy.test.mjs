@@ -2,7 +2,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { ArenaWorld } from '../dist-test/enemy-arena.mjs';
-import { ALL_DEFS, ROSTER, GUARDIANS, planEncounter, budgetFor, moveTiming, rollDrops, poolFor, SCREEN_CAP, createEnemy } from '../dist-test/enemy.mjs';
+import { ALL_DEFS, ROSTER, planEncounter, budgetFor, moveTiming, rollDrops, poolFor, SCREEN_CAP, createEnemy } from '../dist-test/enemy.mjs';
 
 const keys = () => ({ left: false, right: false, up: false, down: false, shift: false, guard: false, crouch: false, press: new Set() });
 
@@ -41,7 +41,6 @@ function run(w, ticks) {
 
 test('모든 정의: 동작마다 장별 판정이 있고 유효 장 전에 예고가 있다', () => {
   assert.ok(ROSTER.length >= 20, '일반 적 20종 이상');
-  assert.ok(GUARDIANS.length >= 8);
   for (const d of ALL_DEFS) {
     for (const a of d.attacks) {
       const m = a.move;
@@ -98,85 +97,6 @@ for (const floor of ['lobby', 'chase', 'replica', 'trial', 'dark', 'silent', 'pu
     assert.ok(res.tele > 0, `${floor} 예고 ${res.tele}`);
   });
 }
-
-for (const g of ['lobby', 'chase', 'dark', 'silent', 'puzzle', 'replica', 'trial', 'b12']) {
-  test(`수호자 ${g}: 40초 돌려도 예외 없음`, () => {
-    const w = new ArenaWorld(11);
-    w.setFloor(g);
-    w.player.invincible = true;
-    w.spawnGuardian();
-    const res = run(w, 1200);
-    const boss = w.bodies.filter((b) => b.boss);
-    if (g !== 'b12' && g !== 'replica') assert.ok(res.tele > 0, `${g} 예고`);
-    assert.ok(boss.length || g === 'b12' || true);
-  });
-}
-
-test('405호: 「잘 먹었습니다」면 싸우지 않고 지나간다', () => {
-  const w = new ArenaWorld(3);
-  w.setFloor('replica');
-  w.spawnGuardian();
-  for (let t = 0; t < 10; t++) w.update(keys());
-  const f = w.bodies.find((b) => b.kind === 'elder_f');
-  w.player.x = f.x - 100;
-  const k = keys();
-  k.press.add('E');
-  w.update(k);
-  for (let t = 0; t < 120; t++) w.update(keys());
-  assert.ok(!w.bodies.some((b) => b.kind === 'elder_f' && b.alive), '노부부가 떠남');
-  assert.ok(w.log.some((s) => s.includes('규칙')), '규칙 기록');
-});
-
-test('경비원: 순찰 중 등 뒤 기습은 2배', () => {
-  const w = new ArenaWorld(5);
-  w.setFloor('lobby');
-  const g = w.spawn('guard', 640, 590);
-  w.player.x = 100;
-  for (let i = 0; i < 15; i++) w.update(keys());
-  w.aiFrozen = true;
-  assert.equal(g.mem.mode, 'patrol');
-  g.dir = 1;
-  const hit = { x0: g.x - 30, x1: g.x + 30, z0: 100, z1: 160, y: 590, attackId: 42, dmg: 10, react: 'flinch', dir: 1 };
-  const before = g.hp;
-  g.applyHit(hit, w);
-  assert.equal(before - g.hp, 20);
-});
-
-test('그림자: 빛이 없으면 피해 없음, 빛이면 들어감', () => {
-  const w = new ArenaWorld(5);
-  w.setFloor('dark');
-  const s = w.spawn('shadow', 700, 590);
-  w.update(keys());
-  w.update(keys());
-  for (let i = 0; i < 20; i++) w.update(keys());
-  const box = { x0: s.x - 50, x1: s.x + 50, z0: 0, z1: 40, y: s.y };
-  const hp = s.hp;
-  s.applyHit({ ...box, attackId: 1, dmg: 10, react: 'flinch', dir: 1 }, w);
-  assert.equal(s.hp, hp);
-  w.player.x = s.x - 200;
-  w.player.dir = 1;
-  w.light = 1;
-  w.lightT = 50;
-  w.update(keys());
-  s.applyHit({ ...box, x0: s.x - 50, x1: s.x + 50, attackId: 2, dmg: 10, react: 'flinch', dir: 1 }, w);
-  assert.ok(s.hp < hp);
-});
-
-test('불가능한 입체 도형: 모서리를 순서대로 치면 접힌다', () => {
-  const w = new ArenaWorld(9);
-  w.setFloor('puzzle');
-  const s = w.spawn('shape', 700, 590);
-  for (let i = 0; i < 14; i++) w.update(keys());
-  w.aiFrozen = true;
-  const pos = [[-78, -78], [78, -78], [78, 78], [-78, 78]];
-  let id = 100;
-  for (const idx of s.mem.order) {
-    const [fx, fz] = pos[idx];
-    const cx = s.x + fx, cz = s.z + fz;
-    s.applyHit({ x0: cx - 6, x1: cx + 6, z0: cz - 6, z1: cz + 6, y: s.y, attackId: id++, dmg: 10, react: 'flinch', dir: 1 }, w);
-  }
-  assert.ok(s.mem.folded > 0, '접힘');
-});
 
 test('잡기: 붙잡으면 grab Hit가 이어지고 연타로 빠져나온다', () => {
   const w = new ArenaWorld(2);

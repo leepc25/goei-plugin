@@ -42,7 +42,6 @@ app.innerHTML = `
 <div class="bar">
   <select id="floor">${FLOOR_TYPES.map((t) => `<option value="${t}">${FLOOR_LABEL[t]}</option>`).join('')}</select>
   <button id="wave">편성</button>
-  <button id="guard">수호자</button>
   <button id="pick">적 고르기</button>
   <button id="more">☰</button>
   <span class="depth opt"><button id="dm">−</button><span id="dl"></span><button id="dp">+</button></span>
@@ -106,11 +105,6 @@ $<HTMLSelectElement>('floor').onchange = (e) => {
 $('wave').onclick = () => w.spawnPlan();
 $('bureau').onclick = () => w.spawnPlan('bureau');
 $('dream').onclick = () => w.spawnPlan('daydream');
-$('guard').onclick = () => {
-  w.spawnGuardian();
-  const g = { lobby: 'guard', trial: 'proctor', chase: 'legs', dark: 'shadow', silent: 'noise', puzzle: 'shape', replica: 'elder_f', b12: 'touchers', service: 'predator' }[floor];
-  if (g) showInfo(describe(g));
-};
 const toggle = (id: string, get: () => boolean, set: (v: boolean) => void) => {
   const b = $(id);
   b.onclick = () => (set(!get()), b.classList.toggle('on', get()));
@@ -257,6 +251,5 @@ function frame(now: number) {
 }
 requestAnimationFrame(frame);
 
-// 시작: 고른 층의 수호자 또는 편성 하나
-if (q.get('spawn') === 'guardian') w.spawnGuardian();
-else if (q.get('spawn') !== 'none') w.spawnPlan();
+// 시작: 편성 하나
+if (q.get('spawn') !== 'none') w.spawnPlan();

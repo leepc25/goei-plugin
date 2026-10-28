@@ -10,7 +10,7 @@ import type { FloorPlan, StageApi, StageModule, WorldView } from './contract';
 import { SCREEN_H, SCREEN_W } from './contract';
 import { HQ_PLACE, drawFloor, drawHqWall, drawPropArt, drawHqTextureWall } from '../art/bg';
 import { drawHqDoorRound2 } from '../art/hqDoorRound2';
-import { drawCallLit, drawDepartArrow, drawHqField, drawHqFieldLight, drawHqFieldObject, drawHqSigns, hasHqField } from '../art/hqField';
+import { drawCallLit, drawHqField, drawHqFieldLight, drawHqFieldObject, drawHqSigns, hasHqField } from '../art/hqField';
 import { drawVisitAgent, visitAgentTop } from '../art/visitAgents';
 import { drawTestMan, hasTestPeople, testManTop, testPlayerTop } from '../art/testPeople';
 import { persp, view as fieldView } from './view';
@@ -41,14 +41,10 @@ export interface HubHost {
   overlay?(c: CanvasRenderingContext2D, people: { name: string; x: number; y: number; top: number }[], player: { name: string; x: number; y: number; top: number }): void;
   /** 필드 시각 (시, 0~24). 없으면 시간대 조명은 기기 시계 */
   hour?(): number | null;
-  /** 출동 차량 앞 E: 출발했으면 null, 아니면 자막 한 줄 */
-  depart?(): string | null;
   /** 앉기·눕기 자리에 앉았다 (시간 보내기 고르기) */
   sat?(): void;
   /** 필드 가게 자리: 거래 창을 연다. 못 열면(문 닫음 등) 자막 한 줄 */
   shop?(id: string): string | null;
-  /** 출동 준비가 됐나 (B3 승합차 화살표) */
-  armed?(): boolean;
   /** 필드 세계 (src/game/world): 있으면 visitors 대신 움직이는 행위자를 그린다 */
   life?: HubLife;
 }
@@ -220,8 +216,6 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
         if (!sc.legacy) for (const d of sc.doors) if (isS(d)) drawExitLintel(c, d, camX);
         if (sc.painted) drawHqFieldLight(c, sc.painted, camX, host.hour?.() ?? null, now);
         // 엘리베이터 앞 방향 안내(drawHqGuide)는 사용자 지시로 끔 (2026-10-25)
-        // 출동 준비가 됐으면 B3 승합차 위 화살표
-        if (sc.painted === 'b3' && host.armed?.()) drawDepartArrow(c, camX, now);
         // 주인공 그림은 쟈알디 그림이라 머리 높이도 쟈알디 기준
         // 말풍선·이름표는 화면 px 그대로 (필드 zoom을 되돌려 글자 도트가 고르게). top은 원근까지 곱한 화면 px
         const z = fieldView.zoom;
@@ -391,11 +385,6 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
         }
         if (s.place) return host.openPlace(s.place);
         if (s.say) return a.world.say(s.say, 3);
-        if (s.depart) {
-          const m = host.depart?.();
-          if (m) a.world.say(m, 3);
-          return;
-        }
         if (s.seat && s.act?.[0]) {
           const exit = clearSpot(s.x, s.y ?? a.world.player.y, solids, scene.lane ?? LANE);
           (a.world.player as Player).sit(s.act[0], s.seat.x, s.seat.y, s.face ?? 1, exit);

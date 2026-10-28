@@ -59,7 +59,7 @@ const el = <K extends keyof HTMLElementTagNameMap>(tag: K, props: Record<string,
 const btn = (label: string, on: () => void) => el('button', { type: 'button', onclick: on }, label);
 
 root.append(
-  el('h1', {}, '소리 시험실 · 차원 승강기'),
+  el('h1', {}, '소리 시험실'),
   el('p', { className: 'sub' }, '녹음 파일 없이 전부 코드로 만든 효과음·음악·환경음입니다. 먼저 아래 노란 버튼을 눌러 주세요. 아이폰은 무음 스위치를 꺼야 들릴 수 있습니다.'),
 );
 

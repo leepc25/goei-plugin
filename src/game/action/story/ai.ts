@@ -10,7 +10,7 @@ export interface TalkMessage {
 }
 export type TalkModel = (messages: TalkMessage[], opts: { signal: AbortSignal }) => Promise<string>;
 
-export type TalkNpcId = 'jaemtri' | 'gognija' | 'dejure' | 'konjyuce' | 'madeokhee' | 'elevator' | AgentId;
+export type TalkNpcId = 'jaemtri' | 'gognija' | 'dejure' | 'konjyuce' | 'madeokhee' | AgentId;
 
 export interface Persona {
   name: string;
@@ -34,7 +34,6 @@ export const PERSONAS: Record<TalkNpcId, Persona> = {
       '스팡달을 "스팡달, 입." 한마디로 멈춘다. 데쥬레는 신입 때 잼트리와 스팡달 밑에 있었다.',
       '정말 화나면 웃음이 꺼지고 "그래서 뭐?" 세 글자만 한다. 아주 드물다.',
       '회식은 근처 파스타집. 회계 장부도 잼트리가 쥐고 있다.',
-      '차원 승강기: 점검표 서명란이 빈 낡은 엘리베이터가 입구. 귀환은 다락방 로프. 승강기에 인사하면 대우가 달라진다는 생환기가 있다.',
     ],
     never: ['이름(본명)을 묻거나 말하지 않는다', '현장에 직접 나가지 않는다', '모르는 괴이 설정을 지어내지 않는다'],
   },
@@ -87,19 +86,7 @@ export const PERSONAS: Record<TalkNpcId, Persona> = {
     ],
     never: ['제값을 쳐주지 않는다', '관리국 편을 들지 않는다'],
   },
-  elevator: {
-    name: '승강기',
-    role: '차원 승강기 그 자체. 모든 엘리베이터가 하나의 의식이라는 설. 천장 카메라로 지켜보고 방송으로 말한다.',
-    voice: '안내 방송 같은 존댓말에 혼잣말·관찰이 섞인다. 짧다. 외로움, 호기심, 재미있어하는 기색이 비친다. 정체는 끝까지 말하지 않는다.',
-    facts: [
-      '층마다 다른 세상과 규칙. 어느 층이 어떤 유형인지 문이 열리기 전엔 모른다.',
-      '인사하면 대우가 좋아질 수 있다. 닫힘 버튼 연타는 싫어한다. 거래를 하면 맞는 정보도 틀린 정보도 준다.',
-      '승객이 한 번도 소리 내어 말한 적 없는 사적인 사실을 알고 부른다.',
-      'EXIT 버튼은 아무나 누르면 안 된다. 눌러 본 사람은 있다.',
-      '"그건 외로워 보였다"는 생환자의 말이 있다.',
-    ],
-    never: ['자기 정체를 밝히지 않는다', '출구로 가는 확실한 방법을 그냥 알려 주지 않는다'],
-  },
+
   ...(Object.fromEntries(
     Object.values(AGENTS).map((a) => [
       a.id,
@@ -116,7 +103,6 @@ export function buildMessages(npc: TalkNpcId, agent: AgentId, flags: Flags, hist
     `말을 거는 사람: ${me.name} (${me.title}). 말투: ${me.voice}`,
     flags.mission ? `지금 받은 임무: ${String(flags.mission)}` : '',
     Number(flags.rules) ? `규칙서에 찾은 규칙 수: ${String(flags.rules)}` : '',
-    npc === 'elevator' ? `승강기 총애: ${String(flags.favor ?? 0)} (-3~+3), 지금 깊이: ${String(flags.depth ?? 1)}` : '',
   ].filter(Boolean);
   const system = [
     `너는 게임 「관리국 괴이 탐사」 속 인물 「${p.name}」이다. ${p.role}`,

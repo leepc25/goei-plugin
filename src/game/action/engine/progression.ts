@@ -1,5 +1,20 @@
-// 본부 출동 계약의 확정된 수치만 전투에 연결한다. 출동 중 강화(dmgMul)와 별도다.
-import type { AgentStats, MissionLaunch } from '../hq/contract';
+// 요원 능력치를 전투에 연결한다. 출동 중 강화(dmgMul)와 별도다.
+// 옛 본부 출동(MissionLaunch)은 지웠다(2026-10-28). launch가 없으면 기본 수치다.
+/** 기본 능력치. 걸리는 값은 피해·속도·경직 배율 */
+export interface AgentStats {
+  hp: number;
+  /** 근접 피해 배율 */
+  power: number;
+  /** 원거리 피해 배율 */
+  aim: number;
+  /** 받는 피해 감소 (0~0.5) */
+  defense: number;
+  speed: number;
+  /** 경직 저항 0~3 */
+  poise: number;
+  /** 필살 게이지 충전 배율 */
+  charge: number;
+}
 import type { Hit, RunConfigCore } from './contract';
 import type { MoveDef } from './moves';
 
@@ -11,7 +26,7 @@ export interface RunProgression {
   readonly fromHq: boolean;
 }
 
-type ProgressionRun = RunConfigCore & { launch?: Pick<MissionLaunch, 'stats' | 'relics' | 'moves' | 'agent'> };
+type ProgressionRun = RunConfigCore & { launch?: { stats?: AgentStats; relics?: string[]; moves?: string[]; agent?: string } };
 const NEUTRAL: AgentStats = { hp: 220, power: 1, aim: 1, defense: 0, speed: 1, poise: 0, charge: 1 };
 const positive = (value: unknown, fallback: number) => typeof value === 'number' && Number.isFinite(value) && value > 0 ? value : fallback;
 

@@ -122,8 +122,6 @@ await build({
   outfile: 'dist-test/core.mjs',
 });
 
-// 회색 상자 순수 시뮬레이션 (화면·조작 시연판·본부 시연판이 아직 쓴다). 시험: tests/graybox.test.mjs
-await build({ entryPoints: ['src/game/action/graybox/sim.ts'], bundle: true, format: 'esm', target: 'es2022', outfile: 'dist-test/graybox-sim.mjs' });
 
 // 게임 엔진 시연판 (전투·조작·장면 관리). 쟈알디 그림 묶음(game-pack/jyaldi)을 내장한 단일 HTML.
 await build({ ...common, entryPoints: ['src/game/action/engine/demo.ts'], format: 'esm', minify: true, write: true, outfile: 'dist-test/engine-demo.js' });
@@ -168,7 +166,7 @@ await build({ ...common, entryPoints: ['src/game/action/engine/demo.ts'], format
 {
   const out = await build({ ...common, entryPoints: ['src/game/action/audio/demo.ts'], format: 'esm', minify: true });
   const code = out.outputFiles[0].text.replace(/<\/script/gi, '<\\/script');
-  const html = `<!doctype html><html lang="ko"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>소리 시험실 · 차원 승강기</title><body><script type="module">${code}</script></body></html>`;
+  const html = `<!doctype html><html lang="ko"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>소리 시험실</title><body><script type="module">${code}</script></body></html>`;
   writeFileSync('dist/goei-sound.html', html);
   mkdirSync('release/demo', { recursive: true });
   writeFileSync('release/demo/goei-sound.html', html);

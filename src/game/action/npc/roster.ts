@@ -6,7 +6,7 @@
 //   greet·lines 모델이 없거나 실패했을 때의 미리 쓴 대사
 import type { AgentId } from '../story/types';
 
-export type NpcGroup = 'agent' | 'hq' | 'merchant' | 'daydream' | 'fake' | 'faction' | 'entity' | 'elevator' | 'civilian' | 'passenger' | 'resident';
+export type NpcGroup = 'agent' | 'hq' | 'merchant' | 'daydream' | 'fake' | 'faction' | 'entity';
 export type EffectKind = 'favor' | 'trade' | 'join' | 'hostile' | 'leave' | 'hint' | 'gift' | 'calm';
 
 export interface NpcDef {
@@ -103,16 +103,7 @@ export const ENTITY_NPCS: Record<string, NpcDef> = {
   aesthete: d({ id: 'aesthete', name: '탐미주의', sheet: '탐미주의', group: 'entity', color: '#b23a48', photo: 'Aestheticism', role: '살아 있는 것을 작품으로 만드는 예측 불가능한 괴이 예술가. 흥정과 대답이 마음에 들면 놓아주고, 아니면 작품으로 삼으려 한다.', speech: '오랜 친구처럼 따뜻한 말투. 먹잇감에겐 다정하게, 작품에겐 부모처럼.', effects: ['favor', 'hint', 'hostile', 'leave'], greet: ['멀리 못 갔구나, 응?'], lines: ['살아 있는 건 다 목표가 있어. 네 목표는 뭐야?', '넌 내 걸작이 될 거야.', '창작자가 자기 작품을 잊는 거 본 적 있어?', '뻔뻔한 아이네. 나랑 흥정하려고?'] }),
 };
 
-export const ELEVATOR_NPC: NpcDef = d({ id: 'elevator', name: '승강기', group: 'elevator', color: '#b8a36a', role: '차원 승강기 그 자체. 모든 엘리베이터가 하나의 의식이라는 설. 천장 카메라로 보고 방송으로 말한다. 인사하면 대우가 좋아지고, 닫힘 버튼 연타를 싫어한다. 거래하면 맞는 정보도 틀린 정보도 준다.', speech: '안내 방송 같은 존댓말에 혼잣말·관찰이 섞인다. 아주 짧다. 외로움과 호기심이 비친다. 정체는 끝까지 말하지 않는다.', effects: ['favor', 'hint'], greet: ['…듣고 있어요.'], lines: ['문이 닫힙니다.', '다음 층은… 비밀이에요.', '듣고 있어요. 계속 말해요.', '다들 내리기만 해요.'], rules: [[/안녕|반가/, ['안녕하세요. 인사해 줘서 고마워요.']], [/누구|정체/, ['…그건 비밀이에요. 아직.']]], never: ['자기 정체를 밝히지 않는다', '출구로 가는 확실한 방법을 그냥 알려 주지 않는다'] });
-
-/** 이름 없는 사람: 구조할 민간인·떠도는 승객·사는 척하는 주민. 판마다 성격 한 줄을 붙인다 */
-export const TYPE_NPCS: Record<string, NpcDef> = {
-  civilian: d({ id: 'civilian', name: '민간인', group: 'civilian', color: '#9aa7b3', role: '차원 승강기에 잘못 타서 갇힌 민간인. 관리국 요원을 처음 본다.', speech: '겁먹은 존댓말, 말이 빠르거나 끊긴다. 관리국을 잘 모른다.', effects: ['favor', 'join', 'leave', 'hint'], greet: ['저, 저기요! 사람이에요? 진짜 사람이죠?'], lines: ['여기 어디예요? 1층 눌렀는데…', '같이 가게 해 주세요. 부탁이에요.', '아까 저쪽에서 뭐가… 아, 아니에요.', '집에 가고 싶어요.'] }),
-  passenger: d({ id: 'passenger', name: '승객', group: 'passenger', color: '#8a8f86', role: '차원 승강기를 오래 떠돈 승객. 정보나 보급을 주기도, 거짓으로 유인하기도 한다. 둘 다 친절해 보인다.', speech: '지친 반말이나 존댓말. 친절해 보인다.', effects: ['favor', 'hint', 'join', 'hostile', 'leave'], greet: ['…너도 탔구나.'], lines: ['내 말 들어.', '오래 있었어. 여기.', '다음 버튼은… 내가 알아.', '…그래, 마음대로 해.'] }),
-  resident: d({ id: 'resident', name: '주민', group: 'resident', color: '#7a6f66', role: '재현의 층 아파트에 사는 척하는 괴이. 인사하면 지나가게 두고, 뛰거나 무례하면 턱이 벌어진다.', speech: '지나치게 상냥하고 같은 말을 되풀이하는 존댓말. 어딘가 틀린 생활 이야기.', effects: ['favor', 'hostile', 'calm', 'hint'], greet: ['안녕하세요. 편하게 둘러보세요.'], lines: ['안녕하세요.', '…어서 가요.', '저녁은 드셨어요? 저희는 늘 같은 걸 먹어요.', '복도에서 뛰면 안 되지.'], never: ['자기가 괴이라고 말하지 않는다'] }),
-};
-
-export const ROSTER: Record<string, NpcDef> = { ...AGENT_NPCS, ...HQ_NPCS, ...MERCHANT_NPCS, ...DAYDREAM_NPCS, ...FAKE_NPCS, ...FACTION_NPCS, ...ENTITY_NPCS, elevator: ELEVATOR_NPC, ...TYPE_NPCS };
+export const ROSTER: Record<string, NpcDef> = { ...AGENT_NPCS, ...HQ_NPCS, ...MERCHANT_NPCS, ...DAYDREAM_NPCS, ...FAKE_NPCS, ...FACTION_NPCS, ...ENTITY_NPCS };
 
 /** 이름(한국어) → id */
 export const NPC_BY_NAME: Record<string, string> = Object.fromEntries(Object.values(ROSTER).map((n) => [n.name, n.id]));
