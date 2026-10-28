@@ -616,7 +616,8 @@
       "t": "dash",
       "speed": 1500,
       "time": 0.28,
-      "hit": null
+      "hit": null,
+      "stop": 0.01
      },
      {
       "t": "later",

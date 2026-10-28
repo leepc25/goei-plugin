@@ -375,7 +375,7 @@
        "fx": [
         {
          "t": "melee",
-         "range": 150,
+         "range": 160,
          "hit": {
           "dmg": 73,
           "kind": "light",
@@ -484,13 +484,7 @@
       "at": "front",
       "dx": 90,
       "h": 70,
-      "scale": 1.2,
-      "hit": {
-       "dmg": 136,
-       "kind": "down",
-       "stop": 0.16,
-       "shake": 12
-      }
+      "scale": 1.2
      },
      {
       "t": "v",
@@ -507,7 +501,15 @@
       "dx": 90,
       "scale": 0.8,
       "tint": "#C9A24A",
-      "under": true
+      "under": true,
+      "hit": {
+       "dmg": 136,
+       "kind": "down",
+       "stop": 0.16,
+       "shake": 12,
+       "vfx": "x3-c-hit-spark-heavy",
+       "vs": 1
+      }
      },
      {
       "t": "shake",
@@ -557,7 +559,7 @@
     {
      "anim": "13",
      "fps": 16,
-     "push": 700,
+     "push": 450,
      "events": [
       {
        "f": 1,
@@ -598,7 +600,7 @@
     {
      "anim": "13",
      "fps": 16,
-     "push": 600,
+     "push": 300,
      "events": [
       {
        "f": 1,
@@ -639,7 +641,7 @@
     {
      "anim": "13",
      "fps": 16,
-     "push": 600,
+     "push": 300,
      "events": [
       {
        "f": 1,

@@ -570,9 +570,9 @@
       "t": "v",
       "vfx": "x3-2.14-S-pulse-band",
       "at": "hand",
-      "dx": 90,
+      "dx": 130,
       "scale": 0.6,
-      "r": 70,
+      "r": 100,
       "hit": {
        "dmg": 38,
        "kind": "light",
@@ -624,9 +624,9 @@
       "t": "v",
       "vfx": "x3-2.14-S2-radar-sweep",
       "at": "self",
-      "scale": 0.85,
+      "scale": 1.2,
       "under": true,
-      "r": 210,
+      "r": 230,
       "delay": 0.45,
       "hit": {
        "dmg": 128,

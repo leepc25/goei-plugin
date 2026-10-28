@@ -599,7 +599,6 @@
       "kind": "orb",
       "vfx": "x3-3.16-S0-shadow-band",
       "size": 0.35,
-      "dy": 120,
       "speed": 1400,
       "life": 0.2,
       "hit": {
@@ -608,7 +607,10 @@
        "vfx": "x3-c-hit-spark-light",
        "vs": 1.4,
        "tint": "#E2C23A"
-      }
+      },
+      "at": "front",
+      "dx": 0,
+      "h": 15
      }
     ],
     "1": [
@@ -625,7 +627,6 @@
       "kind": "orb",
       "vfx": "x3-3.16-S0-shadow-band",
       "size": 0.35,
-      "dy": 120,
       "speed": 1500,
       "life": 0.45,
       "hit": {
@@ -643,7 +644,10 @@
         "scale": 0.35,
         "under": true
        }
-      ]
+      ],
+      "at": "front",
+      "dx": 0,
+      "h": 15
      }
     ],
     "2": [

@@ -14,7 +14,10 @@ def png(url): return Image.open(io.BytesIO(subprocess.run(["curl","-sSf","--retr
 name,w,h,desc=sys.argv[1],int(sys.argv[2]),int(sys.argv[3]),sys.argv[4]
 ndir=int(sys.argv[5]) if len(sys.argv)>5 else 8; src=sys.argv[6] if len(sys.argv)>6 else None
 EIL="e38c681f-5063-487e-8965-a324815912eb"
-ref=png(req("GET",f"/characters/{EIL}")["rotation_urls"]["south"])
+import os
+REF=os.environ.get("STYLE_REF")   # 화풍·크기 참조를 다른 그림으로(예: C01 1배 의자). 없으면 에일린
+ref=Image.open(REF).convert("RGBA") if REF else png(req("GET",f"/characters/{EIL}")["rotation_urls"]["south"])
+if REF: ref=ref.crop(ref.getbbox())
 if ref.width>w or ref.height>h:   # 화풍 참조는 캔버스보다 크면 안 됨 → 몸통 부분을 잘라 씀(크기 바꾸지 않음)
     bb=ref.getbbox(); cx=(bb[0]+bb[2])//2; top=bb[1]+20
     ref=ref.crop((max(0,cx-w//2),top,max(0,cx-w//2)+min(w,ref.width),top+min(h,ref.height-top)))

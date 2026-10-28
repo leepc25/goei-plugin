@@ -625,7 +625,8 @@
       "hit": {
        "dmg": 20,
        "kind": "heavy"
-      }
+      },
+      "stop": 0.01
      },
      {
       "t": "v",
@@ -705,7 +706,8 @@
          "t": "dash",
          "speed": 1500,
          "time": 0.22,
-         "hit": null
+         "hit": null,
+         "stop": 0.01
         }
        ]
       }
@@ -745,7 +747,8 @@
          "t": "dash",
          "speed": 1500,
          "time": 0.22,
-         "hit": null
+         "hit": null,
+         "stop": 0.01
         }
        ]
       }
