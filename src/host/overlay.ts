@@ -318,13 +318,15 @@ export async function createFab(onOpen: () => void): Promise<Fab> {
     ids = [];
     for (const { target, type, id } of old) await target.removeEventListener(type, id).catch(() => {});
   };
+  // 옛 Risu 문서 객체에 리스너 메서드가 없으면 버튼 상자에 건다 (없어서 버튼이 통째로 안 뜨는 것보다 낫다)
+  const moveTarget: SafeEl = typeof (doc as Partial<SafeEl> | null)?.addEventListener === 'function' ? (doc as unknown as SafeEl) : host;
   const bind = async () => {
     await unbind();
     for (const [target, type, fn] of [
       [host, 'pointerdown', onDown],
-      [doc, 'pointermove', onMove],
-      [doc, 'pointerup', onUp],
-      [doc, 'pointercancel', onUp],
+      [moveTarget, 'pointermove', onMove],
+      [moveTarget, 'pointerup', onUp],
+      [moveTarget, 'pointercancel', onUp],
       [host, 'click', onClick],
     ] as const) {
       ids.push({ target, type, id: await target.addEventListener(type, fn as (e: unknown) => void, { passive: true }) });

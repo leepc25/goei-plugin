@@ -38,7 +38,7 @@ export function hostScript(char, chat, { rootDom = true, noBody = false, prefs =
     window.__store = {};
     if (!${noBody}) window.__store['p:goei:body'] = ${JSON.stringify(bodyCode)};
     if (${JSON.stringify(prefs)}) window.__store['p:goei:prefs'] = ${JSON.stringify(JSON.stringify(prefs))};
-    window.__rootDoc = ${rootDom} ? { querySelector: async (q) => wrap(document.querySelector(q)), querySelectorAll: async (q) => [...document.querySelectorAll(q)].map(wrap), createElement: async (t) => wrap(document.createElement(t)) } : null;
+    window.__rootDoc = ${rootDom} ? { ...wrap(document.documentElement), querySelector: async (q) => wrap(document.querySelector(q)), querySelectorAll: async (q) => [...document.querySelectorAll(q)].map(wrap), createElement: async (t) => wrap(document.createElement(t)) } : null;
     window.__char = ${JSON.stringify(char)};
     window.__liteChar = window.__char;
     window.__chat = ${JSON.stringify(chat)};
