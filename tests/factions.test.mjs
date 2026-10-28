@@ -147,3 +147,13 @@ test('괴담톡: 새 세력 전용 탭과 모두 공개 탭', () => {
   assert.deepEqual(dir.tabs.map((x) => x.id), ['T04', 'T105']);
   assert.deepEqual(dir.contacts.map((x) => x.name), ['블라렛']);
 });
+
+test('v0.17 카드(🏷️Tag·📜Faction 로어북 없음): 플러그인 내장 Tag 지침의 자리표시자로 새 세력이 나온다 (2026-10-28 QC)', () => {
+  // 카드에서 상시 지침을 뺀 경량 카드. 가상 📜Faction(goeiVirtual, 명부 조직을 직접 나열)은 자리 판단에서 뺀다
+  const lite = base().filter((e) => e.comment !== '🏷️Tag' && e.comment !== '📜Faction');
+  assert.equal(placeholdersReady(lite), true, '내장 Tag 지침에는 자리표시자가 있음');
+  assert.equal(placeholdersReady([...lite, { comment: '📜Faction', content: '## Faction\n\n### X\nx\n\n## Rules\n---', goeiVirtual: true }]), true, '가상 Faction 은 무시');
+  // 카드에 옛 Tag 로어북이 있으면 그것으로 판단 (자리 없으면 false)
+  assert.equal(placeholdersReady([...lite, { comment: '🏷️Tag', content: TAG }]), false);
+  assert.ok(factionList(withWalpurgis(lite)).some((f) => f.code === 'F00'), '시작 화면에 새 세력');
+});

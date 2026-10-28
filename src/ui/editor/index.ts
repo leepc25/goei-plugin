@@ -545,6 +545,7 @@ export async function handle(action: string, value?: string): Promise<void> {
       edUi.q = '';
       edUi.drawer = false;
       edUi.notice = '';
+      dirUi.adding = false;
       if (edUi.node === 'base') resetDirectory();
       syncSettingsPage();
       if (edUi.node === 'install') {
@@ -562,6 +563,11 @@ export async function handle(action: string, value?: string): Promise<void> {
   if (!ctx) return;
   if (action.startsWith('dir-')) {
     await handleDirectory(action, value, ctx, env);
+    // 다른 폴더에서 넣은 후보는 바로 골라 기본 정보(발생 후보·빼기)를 보여 준다
+    if (action === 'dir-ext-add' && value && isKind(edUi.node) && directoryDraft(ctx)[edUi.node === 'site' ? 'sites' : 'anomalies'].some((p) => p.lore === value)) {
+      edUi.sel[edUi.node] = value;
+      render();
+    }
     return;
   }
   if (action.startsWith('ip-')) {

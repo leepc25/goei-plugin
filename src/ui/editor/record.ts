@@ -9,7 +9,7 @@ import { orgOf } from '../../core/world/directory';
 import { FIELDS, WORLD_KIND_LABEL, type FieldDef, type WorldKind } from '../../core/world/schema';
 import { tokens } from '../../core/gnet';
 import type { ChatContext } from '../../host/risu';
-import { agentPanel, appendixPanel, directoryDraft, orgPanel, placePanel } from '../directory';
+import { agentPanel, appendixPanel, directoryDraft, directoryExtList, dirUi, loreSourceOf, orgPanel, placePanel } from '../directory';
 import { ICONS } from '../icons';
 import { edUi, overridesOf, setOverrides } from './index';
 
@@ -67,7 +67,10 @@ function rowsOf(ctx: ChatContext, kind: WorldKind, over: WorldOverrides): { name
     const sub =
       kind === 'agent' ? d.agents.find((a) => a.lore === name)?.english ?? '' : kind === 'org' ? d.orgs.find((o) => o.name === name)?.spec.english ?? '' : (d.anomalies.find((p) => p.lore === name) ?? d.sites.find((p) => p.lore === name))?.english ?? '';
     const state = bucket[name]?.deleted ? 'deleted' : !isDefaultRecord(kind, name) ? 'new' : bucket[name] ? 'edited' : 'default';
-    return { name, sub: sub || (rec ? '' : '로어 칸 없음'), state, preset: presetOf(d, kind, name) };
+    // 괴이·파밍 폴더 밖 로어북을 발생 후보로 넣은 줄: 출처 폴더를 보여 준다 (명부의 「다른 폴더에서 온 후보」, 사용자 2026-10-21)
+    const place = kind === 'anomaly' || kind === 'site' ? (kind === 'anomaly' ? d.anomalies : d.sites).find((p) => p.lore === name) : undefined;
+    const outside = place && !place.inFolder ? `다른 폴더에서 온 후보${loreSourceOf(ctx, name) ? ` · ${loreSourceOf(ctx, name)}` : ''}` : '';
+    return { name, sub: [sub, outside].filter(Boolean).join(' · ') || (rec ? '' : '로어 칸 없음'), state, preset: presetOf(d, kind, name) };
   });
 }
 
@@ -142,9 +145,12 @@ export function recordPage(ctx: ChatContext, kind: WorldKind, over: WorldOverrid
   const pick = `<select class="gw-list-pick" data-change="ed-sel" aria-label="${WORLD_KIND_LABEL[kind]} 고르기">${rowsOf(ctx, kind, over)
     .map((r) => `<option value="${esc(r.name)}"${r.name === sel ? ' selected' : ''}>${esc(r.name)}${r.sub ? ` · ${esc(r.sub)}` : ''}${r.state === 'deleted' ? ' (지움)' : r.state === 'new' ? ' (추가)' : r.state === 'edited' ? ' (고침)' : ''}</option>`)
     .join('')}</select>`;
+  // 괴이·파밍: 다른 폴더의 로어북을 발생 후보로 넣는 칸 (예전 명부 「후보 추가」. 2026-10-27 명부를 기록 화면에 합치며 빠졌던 것, 2026-10-28 QC 되살림)
+  const ext = kind === 'anomaly' || kind === 'site';
   const list = `<aside class="gw-list-pane">
     <div class="gw-list-tools">${pick}<input class="dir-search" type="search" data-input="ed-q" value="${esc(q)}" placeholder="${WORLD_KIND_LABEL[kind]} 검색" aria-label="검색">
-      <button class="gx-mini" data-action="ed-add-toggle" aria-expanded="${recUi.adding}">${ICONS.plus}추가</button></div>
+      <button class="gx-mini" data-action="ed-add-toggle" aria-expanded="${recUi.adding}">${ICONS.plus}추가</button>${ext ? `<button class="gx-mini${dirUi.adding ? ' on' : ''}" data-action="dir-add-toggle" aria-expanded="${dirUi.adding}" title="다른 폴더의 로어북을 발생 후보로">${ICONS.plus}폴더 밖</button>` : ''}</div>
+    ${ext && dirUi.adding ? `<div class="gw-add dir-ext"><input class="gx-search" data-input="dir-ext-q" value="${esc(dirUi.addQ)}" placeholder="다른 폴더의 로어북 이름·폴더 검색" aria-label="후보로 넣을 로어북 검색" autocomplete="off"><div class="dir-ext-list">${directoryExtList(ctx)}</div></div>` : ''}
     ${recUi.adding ? `<div class="gw-add"><input name="ed-new-name" placeholder="새 ${WORLD_KIND_LABEL[kind]} 이름 (한글)" data-enter="ed-add" autocomplete="off"><button class="gx-mini" data-action="ed-add" data-take="ed-new-name">만들기</button>
       <p class="gx-muted">${kind === 'agent' ? '요원은 만든 뒤 「기본 정보」에서 영문명·소속·부서를 채워요. 영문명은 그림 에셋 이름과 같아야 해요.' : kind === 'org' ? '조직은 만든 뒤 「기본 정보」에서 영문명·코드를 정해요.' : '만든 뒤 기본 정보에서 영문명·별칭을 채워요.'}</p></div>` : ''}
     ${kind === 'anomaly' ? anomalyNoteBox(over) : ''}
