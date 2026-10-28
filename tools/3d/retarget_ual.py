@@ -52,6 +52,19 @@ for p in srcs:
 
 def wrest(arm, name):
     return arm.matrix_world @ arm.data.bones[name].matrix_local
+
+# 앞 방향 맞추기: UAL은 -Y를 보고 Tripo 모델은 +X를 본다. 그대로 옮기면 다리·팔이 몸 옆으로 휘둘린다(안짱다리·팔 벌린 점프).
+# 쉬는 자세의 오른 허벅지→왼 허벅지 방향(바닥 평면)으로 각자 좌우 축을 재고, 원본 뼈대를 대상 쪽으로 돌려 놓는다.
+def fwd(arm, r, l):
+    v = wrest(arm, l).translation - wrest(arm, r).translation
+    return math.atan2(v.y, v.x)
+tf = fwd(T, pre('RightUpLeg'), pre('LeftUpLeg'))
+for S in sources:
+    M_ = mapof(S)
+    d = tf - fwd(S, M_['RightUpLeg'], M_['LeftUpLeg'])
+    S.matrix_world = Matrix.Rotation(d, 4, 'Z') @ S.matrix_world
+    print('앞 맞춤', S.name, round(math.degrees(d)), '도')
+bpy.context.view_layer.update()
 def rot(m):
     return m.to_quaternion()
 

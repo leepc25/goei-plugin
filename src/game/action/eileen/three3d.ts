@@ -49,6 +49,10 @@ let ready: {
   r: THREE.WebGLRenderer; fx: OutlineEffect; scene: THREE.Scene; cam: THREE.OrthographicCamera; root: THREE.Object3D;
   mixer: THREE.AnimationMixer; actions: Record<string, THREE.AnimationAction>; current: string; key: string;
   hips: THREE.Object3D | null; hipsY: number;
+  /** 한 번 재생 동작을 2D 판정 장에 맞추는 시계: 마지막 장 번호, 그 장이 시작된 때, 장 하나 길이(초, 동작 번호별 추정) */
+  fLast: number; fT: number; fDur: Record<string, number>;
+  /** 거울 (왼쪽을 볼 땐 좌우를 뒤집어 그린다: 2D 그림처럼 자세가 늘 카메라 쪽을 보게) */
+  mir: number;
   yaw: number; lastX: number; lastY: number; lastT: number;
 } | null = null;
 let failed = false;
@@ -94,7 +98,7 @@ export async function prepareEileen3D(bytes: Uint8Array | null): Promise<void> {
     const actions: Record<string, THREE.AnimationAction> = {};
     for (const c of g.animations) actions[c.name] = mixer.clipAction(c);
     const hips = g.scene.getObjectByName('mixamorigHips') ?? null;
-    ready = { r, fx, scene, cam, root, mixer, actions, current: '', key: '', hips, hipsY: hips ? hips.position.y : 0, yaw: 0, lastX: 0, lastY: 0, lastT: performance.now() };
+    ready = { r, fx, scene, cam, root, mixer, actions, current: '', key: '', hips, hipsY: hips ? hips.position.y : 0, fLast: -1, fT: 0, fDur: {}, mir: 1, yaw: 0, lastX: 0, lastY: 0, lastT: performance.now() };
     addEventListener('keydown', (e) => { if (e.code === 'F8') eileen3D.on = !eileen3D.on; });
   } catch (e) {
     failed = true;
@@ -114,25 +118,41 @@ export function drawEileen3D(ctx: CanvasRenderingContext2D, b: Body3D): boolean 
   let c = MODE[b.mode] ?? CLIP[b.id] ?? L('Idle');
   if (c.a === 'Idle' && b.armed) c = L('PistolIdle');
   if (!s.actions[c.a]) c = L('Idle');
-  // 바뀌면 처음부터, 짧게 섞는다 (같은 동작으로 다시 들어온 연타는 다시 재생)
+  // 바뀌면 처음부터, 짧게 섞는다. 같은 번호로 처음 장부터 다시 들어오면(연타) 다시 재생
   const key = c.a + ':' + b.id;
-  if (key !== s.key) {
+  if (key !== s.key || (!c.loop && b.f < s.fLast)) {
     const next = s.actions[c.a], prev = s.actions[s.current];
     next.reset(); next.setLoop(c.loop ? THREE.LoopRepeat : THREE.LoopOnce, Infinity); next.clampWhenFinished = !c.loop;
-    next.timeScale = c.speed ?? 1; next.enabled = true; next.setEffectiveWeight(1); next.play();
-    if (prev && prev !== next) next.crossFadeFrom(prev, c.loop ? 0.18 : 0.08, false);
-    s.current = c.a; s.key = key;
+    // 반복 동작은 원래 속도, 한 번 동작은 아래에서 2D 장 진행에 맞춰 시간을 직접 준다
+    next.timeScale = c.loop ? c.speed ?? 1 : 0; next.enabled = true; next.setEffectiveWeight(1); next.play();
+    if (prev && prev !== next) next.crossFadeFrom(prev, c.loop ? 0.18 : 0.06, false);
+    s.current = c.a; s.key = key; s.fLast = b.f; s.fT = now;
+  }
+  const act = s.actions[c.a];
+  if (!c.loop) {
+    // 2D 판정이 때리는 순간에 3D 주먹도 뻗도록: 진행률 = (지금 장 + 장 안에서 흐른 몫) / 전체 장 수
+    if (b.f !== s.fLast) {
+      if (b.f > s.fLast) s.fDur[b.id] = 0.5 * (s.fDur[b.id] ?? 0.07) + 0.5 * Math.min(0.4, (now - s.fT) / 1000 / (b.f - s.fLast));
+      s.fLast = b.f; s.fT = now;
+    }
+    const fd = s.fDur[b.id] ?? 0.07;
+    const prog = Math.min(1, (b.f + Math.min(1, (now - s.fT) / 1000 / fd)) / Math.max(1, b.n));
+    act.time = prog * act.getClip().duration * 0.999;
   }
   s.mixer.update(dt);
   // 공중에선 게임이 높이(z)를 준다: 점프 동작의 엉덩이 상승은 빼서 두 번 뜨지 않게
   if (s.hips && (b.mode === 'air' || /^Jump/.test(c.a))) s.hips.position.y = s.hipsY;
-  // 방향: 걸으면 걷는 쪽(360°), 서 있으면 마지막 방향, 공격·사격은 좌우 판정 쪽(팔이 보이게 카메라 쪽으로 비스듬히)
+  // 방향: 걸으면 걷는 쪽(360°), 서 있으면 마지막 방향, 공격·사격은 좌우 판정 쪽(살짝 카메라 쪽)
   const mx = b.x - s.lastX, my = b.y - s.lastY; s.lastX = b.x; s.lastY = b.y;
   const moving = Math.hypot(mx, my) > 0.4 && Math.hypot(mx, my) < 60;
   const attack = /^(Jab|Cross|Hook|Pistol|Spell|Slide)/.test(c.a);
-  const want = attack ? yawOf(b.face, 0.75) : moving ? yawOf(mx, my * 1.6) : s.yaw;
+  const want = attack ? yawOf(b.face, 0.2) : moving ? yawOf(mx, my * 1.6) : s.yaw;
   s.yaw = turn(s.yaw, want, Math.min(1, dt * (attack ? 24 : 12)));
-  s.root.rotation.y = s.yaw;
+  // 왼쪽을 보면 거울로: 권투 자세처럼 한쪽 어깨가 앞인 동작이 왼쪽에서 등을 보이지 않게. 위아래로 걸을 땐 바꾸지 않는다(깜빡임 방지)
+  const cx = Math.cos(s.yaw);
+  if (cx < -0.3) s.mir = -1; else if (cx > 0.3) s.mir = 1;
+  s.root.scale.x = s.mir;
+  s.root.rotation.y = s.mir < 0 ? s.yaw - Math.PI : s.yaw;
   s.fx.render(s.scene, s.cam);
   const k = b.k * (BODY / PX);
   const dw = W * k, dh = H * k;
