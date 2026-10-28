@@ -583,10 +583,48 @@ def build_char(cfg, force=False):
     for lid, an in cfg["anims"].items():   # 이름은 설정 것을 씀
         if lid in A: A[lid]["name"] = an.get("name", lid)
     payload = {k: v for k, v in cfg.items() if k not in ("anims",)}
+    payload["reachY"] = reach_y(cfg, ("14", "7"))   # 점프 공격: 가장 앞으로 나간 손발의 높이(장마다) → 맞는 높이(10-28 「점프 공격 타점이 안 맞음」)
+    payload["turn19"] = turn_after_down(cfg)   # 쓰러진 뒤 잇는 줄인데 머리 방향이 반대로 그려진 줄(10-28 이기석 기기: 머리·발이 뿅 바뀜) → 방에서 몸 방향을 돌려 이음
     payload["chairAuto"] = chair_auto(cfg)   # 의자 자동 맞춤(chairfit.py). 손으로 맞춘 값은 설정 chars/<키>.json 의 "chair"가 이김
     js.write_text("(window.__C=window.__C||{})[" + json.dumps(key, ensure_ascii=False) + "]=" +
                   json.dumps({"cfg": payload, "A": A}, ensure_ascii=False, separators=(",", ":")) + ";\n", encoding="utf-8")
     return js.stat().st_size, rebuilt
+
+
+def reach_y(cfg, ids):
+    out = {}
+    for lid in ids:
+        an = cfg["anims"].get(lid)
+        if not an or an.get("frames"): continue
+        ys = []
+        for f in sorted((src_dir(cfg, an) / an["folder"]).glob("[0-9][0-9].png")):
+            im = Image.open(f).convert("RGBA")
+            if an.get("mirror"): im = im.transpose(Image.FLIP_LEFT_RIGHT)
+            arr = np.array(im)[:, :, 3] > 40; cols = np.nonzero(arr.any(axis=0))[0]
+            if not len(cols): ys.append(None); continue
+            r = np.nonzero(arr[:, max(0, cols.max() - 10):cols.max() + 1].any(axis=1))[0]
+            ys.append(int(r.mean()))
+        out[lid] = ys
+    return out
+
+
+def turn_after_down(cfg):
+    """19(쓰러지기) 끝 장에서 시작하는 줄(기기·움찔·누워 사망·일어나기)의 첫 장이 19 끝 장과 좌우가 반대면 그 줄 번호"""
+    def frame(lid, last):
+        an = cfg["anims"].get(lid)
+        if not an: return None
+        fs = sorted((src_dir(cfg, an) / an["folder"]).glob("[0-9][0-9].png"))
+        if not fs: return None
+        im = Image.open(fs[-1 if last else 0]).convert("RGBA")
+        if an.get("mirror"): im = im.transpose(Image.FLIP_LEFT_RIGHT)
+        return np.array(im)[:, :, 3] > 40
+    end = frame("19", True); out = []
+    if end is None: return out
+    for lid in ("38", "43", "45", "20"):
+        st = frame(lid, False)
+        if st is None or st.shape != end.shape: continue
+        if (st[:, ::-1] ^ end).sum() < 0.7 * (st ^ end).sum(): out.append(lid)
+    return out
 
 
 def load_vfx():
@@ -641,6 +679,7 @@ def main():
             cfg = deep_merge(auto, json.loads(p.read_text(encoding="utf-8")))
         cp = HERE / "chairs" / f"{ch['key']}.json"   # 의자 손 맞춤(qa/fit_chair.py)
         if cp.exists(): cfg["chair"] = json.loads(cp.read_text(encoding="utf-8"))
+        for lid in cfg.get("drop") or []: cfg["anims"].pop(lid, None)   # 인물마다 테스트룸에서 뺄 줄(파일은 그대로) — 곽성주 155 고기 굽기(사용자 10-28)
             # 사람이 지운 줄은 지운 채로, 새로 생긴 줄은 자동값으로
         if only is not None and ch["key"] not in only:
             js = OUT / "chars" / f"c{ch['key'].split('_')[0]}.js"

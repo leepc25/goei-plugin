@@ -151,7 +151,7 @@ const BAL = () => CH.bal || {};
 const isHot = () => !!(CH.ranged && CH.ranged.heat) || BAL().gun === 'rapid';
 function cdReady(k) { const t = (P.cd[k] || 0) - P.t; if (t <= 0) return true; sfx('empty'); fx.push({ k: 'num', x: P.x - 40, y: P.y - 250 * K(P.y), v: `쿨타임 ${t.toFixed(1)}초`, t: 0.6 }); return false; }
 function setCd(k) { const v = (BAL().cd || {})[k]; if (v) P.cd[k] = P.t + v; }
-const atkDmg = (id, big) => { const a = BAL().atk || {}; return a[id] ?? (big ? 34 : 12); };
+const atkDmg = (id, big) => { const a = BAL().atk || {}; const v = a[id] ?? (big ? 34 : 12); return id === '14' && big ? Math.round(v * 1.8) : v; };   // 점프 강공격(내려찍기)은 약의 1.8배(10-28 「점프 강·약 피해 같음」)
 function gainSp(v) { if (P.noGain > P.t) return; const was = P.sp; P.sp = Math.min(100, P.sp + v); if (was < 100 && P.sp >= 100) { sfx('ability'); flash = 0.06; fx.push({ k: 'num', x: P.x - 50, y: P.y - 260 * K(P.y), v: '필살기 준비', t: 1.0 }); } }
 function spReady() { if (freeSuper || P.sp >= 100) { if (!freeSuper) P.sp = 0; return true; } sfx('empty'); fx.push({ k: 'num', x: P.x - 50, y: P.y - 250 * K(P.y), v: '게이지 부족', t: 0.7 }); return false; }
 let charScale = store.get('size', 1), persp = true;
@@ -248,7 +248,7 @@ const dust = (x, y, n, s = 1) => { for (let i = 0; i < n; i++) fx.push({ k: 'dus
 // 총 쏠 때 불꽃은 그림에 그려진 것만 씀 — 코드는 탄피만
 function muzzleFlash(p, big) { if (!(CH.gun || []).length) return; for (let i = 0; i < (big ? 3 : 1); i++) fx.push({ k: 'shell', x: p.x - P.face * 30, y: p.y, vx: -P.face * (80 + Math.random() * 80), vy: -220 - Math.random() * 120, g: P.y, t: 1.2 }); }
 
-function inReach(hx, pad = 60, hh = 100, wide = false) { pad *= K(P.y); const dk = K(D.y), hOk = wide ? hh > D.z - 300 * dk && hh < D.z + 360 * dk : hh > D.z - 110 * dk && hh < D.z + 240 * dk; return showDummy && Math.abs(D.y - P.y) < (wide ? 100 : 64) && (D.x - P.x) * P.face > (wide ? -60 : -20) && Math.abs(D.x - hx) < pad && hOk; }
+function inReach(hx, pad = 60, hh = 100, wide = false) { pad *= K(P.y); const dk = K(D.y), hOk = wide ? P.z < D.z + 215 * dk && hh > D.z - 120 * dk : hh > D.z - 110 * dk && hh < D.z + 240 * dk; /* 공중공격: 발이 허수아비 머리(190)보다 낮게 내려왔을 때만(10-28 허공에서 맞던 것) */ return showDummy && Math.abs(D.y - P.y) < (wide ? 100 : 64) && (D.x - P.x) * P.face > (wide ? -60 : -20) && Math.abs(D.x - hx) < pad && hOk; }
 function hurtDummy(dmg, kind) {
   if (D.mark > 0) dmg = Math.round(dmg * 1.5);
   D.hp = Math.max(0, D.hp - dmg); D.hits++; if (!P.inSuper) gainSp(dmg * 0.45); D.hitT = 1.0; D.flash = 0.09;
@@ -275,13 +275,13 @@ function fireEv(e) {
   const id = P.clip.id, a = A[id], f = e.f;
   if (e.ev === 'hit' || e.ev === 'hitH') {
     const big = e.ev !== 'hit';
-    const p = framePt(id, f, a.reach[f], a.h * (e.hy || 0.42));
+    const ry = id === '14' && CH.reachY && CH.reachY['14'] && CH.reachY['14'][f], p = framePt(id, f, a.reach[f], ry != null && ry !== false ? ry : a.h * (e.hy || 0.42));   // 점프 공격은 앞으로 뻗은 손발 높이에서
     const wide = id === '14';   // 공중공격은 판정을 넓게(사용자 2026-10-25): 앞뒤 160·위아래·깊이 넓게
     if (inReach(p.x, wide ? 160 : big ? 100 : 70, P.y - p.y, wide)) {
       hitstop = big ? 0.16 : 0.085; shake = big ? 16 : 8; dShake = big ? 11 : 7; P.connected = true;
       hurtDummy(atkDmg(id, big), e.kind || (big ? 'heavy' : 'light'));
       sfx('hit', { strength: big ? 3 : 1, kind: (CH.kick || []).includes(id) ? 'kick' : undefined });
-      const cx = D.x - P.face * 18 * K(D.y);
+      const cx = D.x - P.face * 18 * K(D.y); p.y = Math.max(D.y - D.z - 185 * K(D.y), Math.min(D.y - D.z - 15 * K(D.y), p.y));   // 불꽃은 허수아비 몸 위에
       if (!vfx(big ? 'hit_heavy' : 'hit_light', cx, p.y, big ? 2 : 2.4, { flip: P.face < 0 })) fx.push({ k: 'impact', x: cx, y: p.y, dir: P.face, t: big ? 0.16 : 0.1, t0: big ? 0.16 : 0.1, big });
       sparks(cx, p.y, big ? 30 : 12, big, Math.random() < 0.5 ? '#ffffff' : '#d6ecff');
       ring(cx, p.y, big ? 110 : 50, big ? 0.24 : 0.14, '#ffffff', big ? 7 : 3);
@@ -762,8 +762,9 @@ function doubleJump() {
 }
 function jumpAttack(heavyKind) {
   if (!has('14')) return;
-  P.airAtk = true;
-  play('14', { seq: atkSeq('14', heavyKind).map((e, i, s) => ({ ...(e.ev ? { ...e, ev: heavyKind ? 'hitH' : 'hit', kind: heavyKind ? 'spike' : undefined } : e), d: i === s.length - 1 ? 9 : e.d })) });
+  P.airAtk = true; P.airHit = false; P.airHeavy = !!heavyKind;
+  // 맞는 장 하나만 보던 것 → 뻗은 장부터 착지까지 닿으면 한 번 맞음(10-28 「점프 공격 타점이 안 맞음」). 판정은 갱신 쪽(air)에서
+  play('14', { seq: atkSeq('14', heavyKind).map((e, i, s) => { const { ev, ...r } = e; return { ...r, d: i === s.length - 1 ? 9 : e.d }; }) });
 }
 function land() {
   sfx('land'); P.z = 0; P.vz = 0; P.airAtk = false; shake = Math.max(shake, 2); if (!vfx('land_dust', P.x, P.y, 2.2, { bottom: true })) dust(P.x, P.y, 5);
@@ -820,6 +821,7 @@ function knock() {
 function getUp() { if (!has('20')) return toIdle(); sfx('wakeup'); P.knockT = 0; act('20', { seq: S(R(0, nOf('20') - 1), 0.06), onEnd: () => { P.wakeArmor = 0.6; afterBuf(toIdle); } }); }
 function belly() {
   if (!has('38')) return;
+  if (P.mode === 'down' && (CH.turn19 || []).includes('38')) P.face = -P.face;   // 기기 첫 장이 누운 장과 좌우 반대로 그려짐 → 몸을 돌려 머리 자리 유지(10-28 이기석)
   P.mode = 'belly';
   if (has('38_1')) return play('38', { seq: S(R(0, Math.min(4, nOf('38') - 1)), 0.1), onEnd: () => { if (P.mode === 'belly') play('38_1', { seq: S(R(0, nOf('38_1') - 2), 0.12), loopFrom: 0 }); } });   // 38은 배 깐 장(5장)까지, 이어 38_1 포복 반복(끝 장 = 첫 장이라 뺌)
   const lp = LP('38') || R(Math.min(4, nOf('38') - 1), nOf('38') - 1);
@@ -1197,6 +1199,7 @@ function update(dt) {
       P.y += dy * 140 * dt;
       P.z += P.vz * dt; P.vz -= 2700 * dt;
       P.spin = Math.max(0, P.spin - dt);
+      if (P.airAtk && !P.airHit && P.clip && P.clip.id === '14' && curF() >= impactOf('14')) { const was = D.hits; fireEv({ f: curF(), ev: P.airHeavy ? 'hitH' : 'hit', kind: P.airHeavy ? 'spike' : undefined }); if (D.hits !== was) P.airHit = true; }
       if (P.z <= 0 && P.vz < 0) { land(); break; }
       if (!P.airAtk && P.spin <= 0) {
         const j = jf(), f = P.vz > 380 ? j.rise : P.vz > -380 ? (P.vz > 0 ? j.top : j.fall) : j.fall2;
@@ -1734,6 +1737,6 @@ document.getElementById('ps').onchange = e => persp = e.target.checked;
 renderBinds(); cv.focus(); requestAnimationFrame(loop);
 const want = (location.hash.slice(1) && decodeURIComponent(location.hash.slice(1))) || store.get('char', null);
 setChar(INDEX.some(c => c.key === want) ? want : (INDEX[0] && INDEX[0].key));
-window.__room = { setChar, get CK() { return CK; }, get P() { return P; }, get A() { return A; }, get D() { return D; }, get fx() { return fx; }, onPress, onRelease, held, binds };
+window.__room = { setChar, get CK() { return CK; }, get P() { return P; }, get A() { return A; }, get D() { return D; }, get fx() { return fx; }, onPress, onRelease, held, binds, sitAt, toIdle, rise };
 </script>
 </body></html>
