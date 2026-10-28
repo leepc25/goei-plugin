@@ -122,6 +122,13 @@ await build({
   outfile: 'dist-test/core.mjs',
 });
 
+// 시험용: 원본 카드의 module.json (tests/realcard.mjs 가 찾는다. 「실제 카드」 시험 15개가 이걸 읽는다). python3 가 없으면 그 시험들은 건너뛴다
+if (existsSync('card/원본_봇카드.jpeg')) {
+  const { spawnSync } = await import('node:child_process');
+  const r = spawnSync('python3', ['-I', 'tests/extract_module.py'], { encoding: 'utf8' });
+  if (r.status !== 0) console.log(`실제 카드 module.json 을 풀지 못했어요 (실제 카드 시험은 건너뜀): ${(r.stderr || r.error?.message || '').trim().split('\n').pop()}`);
+}
+
 // 회색 상자 순수 시뮬레이션 (화면·조작 시연판·본부 시연판이 아직 쓴다). 시험: tests/graybox.test.mjs
 await build({ entryPoints: ['src/game/action/graybox/sim.ts'], bundle: true, format: 'esm', target: 'es2022', outfile: 'dist-test/graybox-sim.mjs' });
 

@@ -6,7 +6,7 @@ import {
   saveDoc, settings, mainContext, addUserPost, addOutgoingDm,
 } from '../dist-test/core.mjs';
 
-const REAL = '/mnt/project-files/analysis/extracted/module.json';
+import { REAL } from './realcard.mjs';
 const realLore = existsSync(REAL) ? (() => { const m = JSON.parse(readFileSync(REAL, 'utf8')); return m.lorebook ?? m.module?.lorebook; })() : null;
 const { advValue, advChanged, applyAdvanced, refToggles, budgetFor, genSettings, advResetVars } = advanced;
 

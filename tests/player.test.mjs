@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
 import { applyPlayer, playerBlock, playerAgent, playableAgents, PLAYER_HEAD, migrateLore, parseCatalog, rosterFor, emptyWorld, lore as L } from '../dist-test/core.mjs';
 
-const REAL = '/mnt/project-files/analysis/extracted/module.json';
+import { REAL } from './realcard.mjs';
 const books = existsSync(REAL) ? (() => { const m = JSON.parse(readFileSync(REAL, 'utf8')); return migrateLore(m.lorebook ?? m.module?.lorebook); })() : null;
 
 test('applyPlayer: 페르소나 설명 자리를 주인공 글로, 페르소나 이름은 요원 이름으로', () => {
