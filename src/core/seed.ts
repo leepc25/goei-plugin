@@ -1,3 +1,4 @@
+import { evaluate, type CbsEnv } from './cbs';
 import type { LoreEntry } from './types';
 import { seedSection } from './world/directory';
 
@@ -33,6 +34,18 @@ export function buildSeed(lore: LoreEntry[], faction: string, fm: number, names?
   }
   const joined = parts.join('\n\n');
   return { text: joined ? `${SEED_OPEN}\n${joined}\n${SEED_CLOSE}` : '', missing };
+}
+
+/** 요청에 끼울 시드 본문: 표식과 로어북 장식 줄(@@dont_activate 등)을 떼고 CBS를 푼다 (플러그인이 직접 끼우는 카드, QC 2026-10-28) */
+export function seedBody(text: string, env: CbsEnv): string {
+  const inner = String(text ?? '').replace(SEED_MARKER, '');
+  if (!inner.trim()) return '';
+  return evaluate(inner, env)
+    .split('\n')
+    .filter((l) => !/^\s*@@[\w-]+(?:\s.*)?$/.test(l))
+    .join('\n')
+    .replace(/\n{3,}/g, '\n\n')
+    .trim();
 }
 
 const SEED_BLOCK = /%%SEED%%[\s\S]*?%%\/SEED%%\n?/g;

@@ -554,8 +554,10 @@ export function computeLore(lore: LoreEntry[] | undefined, chat: Chat, o: LoreOp
   if (!entries.length) return null;
   const msgs = loreMessages(chat, o.input, o.mode === 'risu');
   const picks = o.mode === 'risu' ? pickLoreRisu(entries, msgs, o.depth) : pickLore(entries, msgs, loreState(chat), o, msgs.at(-1)?.role === 'user');
-  // Risu가 직접 켤 때는 자리를 비운다 (picks는 확인 화면에 보일 Risu 방식 추정)
-  const texts = o.mode === 'risu' ? null : slotTexts(picks, o.env);
+  // Risu가 직접 켤 때는 자리를 비운다 (picks는 확인 화면에 보일 Risu 방식 추정).
+  // 자리 항목이 없는 카드의 가상 항목(플러그인 세계 데이터)은 Risu가 볼 수 없으니, Risu 방식으로 고른 것을 플러그인이 끼운다 (QC 2026-10-28)
+  const books = lore ?? [];
+  const texts = o.mode === 'risu' ? (hasSlots(books) ? null : slotTexts(picks.filter((p) => isVirtual(books[p.entry.index])), o.env)) : slotTexts(picks, o.env);
   const locked = texts ? lockedAppendices(entries, picks, readUnlocked(chat.scriptstate)) : [];
   for (const e of locked) texts![e.kind] = [texts![e.kind], unlockHint(e)].filter(Boolean).join('\n\n');
   return { picks, vars: Object.fromEntries(LORE_KINDS.map((k) => [slotVar(k), texts?.[k] ?? ''])), locked };
@@ -665,12 +667,16 @@ export function joinLoreBlock(parts: LoreBlockPart[]): string {
  * Risu 가 로어북을 넣던 자리(본 프롬프트 뒤·대화 앞)와 같다. 표식(LORE_MARK)으로 한 번만 끼운다
  */
 export const LORE_MARK = '<!-- goei:lore -->';
-export function insertLoreBlock<M extends { role?: string; content?: unknown }>(messages: M[], block: string, firstChat?: string): M[] {
+export function insertLoreBlock<M extends { role?: string; content?: unknown }>(messages: M[], block: string, firstChat?: string | string[]): M[] {
   if (!block.trim() || messages.some((m) => typeof m?.content === 'string' && m.content.startsWith(LORE_MARK))) return messages;
   const msg = { role: 'system', content: `${LORE_MARK}\n${block.trim()}` } as M;
-  // 첫 대화 메시지: 채팅의 첫 글이 들어 있는 메시지. 못 찾으면 system 아닌 첫 메시지
-  const key = firstChat?.trim().slice(0, 80);
-  let at = key ? messages.findIndex((m) => m?.role !== 'system' && typeof m?.content === 'string' && m.content.includes(key)) : -1;
+  // 첫 대화 메시지: 첫 장면(인사말)이나 채팅의 첫 글이 들어 있는 메시지 (앞에 준 것부터). 못 찾으면 system 아닌 첫 메시지
+  const keys = (Array.isArray(firstChat) ? firstChat : [firstChat]).map((k) => (k ?? '').trim().slice(0, 80)).filter(Boolean);
+  let at = -1;
+  for (const key of keys) {
+    at = messages.findIndex((m) => m?.role !== 'system' && typeof m?.content === 'string' && m.content.includes(key));
+    if (at >= 0) break;
+  }
   if (at < 0) at = messages.findIndex((m) => m?.role !== 'system');
   return at < 0 ? [...messages, msg] : [...messages.slice(0, at), msg, ...messages.slice(at)];
 }

@@ -38,7 +38,8 @@ export function renderStatus(text: string): string {
   if (!tags.length) return text;
   armChatClick('status');
   let out = text;
-  for (const t of tags) out = out.replace(t.raw, statusHtml(t, ctx));
+  // 바꿀 글을 함수로 (문자열이면 `$&` 같은 치환 기호가 상태창 값에 있을 때 깨진다)
+  for (const t of tags) out = out.replace(t.raw, () => statusHtml(t, ctx));
   return out;
 }
 
