@@ -130,6 +130,7 @@ const phoneEnv: PhoneEnv = {
   render: () => render(),
   refresh: () => refresh(),
   visible: () => shown && tab === 'phone' && view.kind === 'started',
+  current: () => (view.kind === 'started' ? view.ctx : null),
   close: async () => {
     await close();
     await refresh();
