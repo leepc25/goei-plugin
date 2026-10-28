@@ -391,7 +391,7 @@
        "life": 0.5,
        "pierce": true,
        "hit": {
-        "dmg": 138,
+        "dmg": 130,
         "kind": "heavy",
         "n": 2,
         "mid": "light",
@@ -468,7 +468,7 @@
       "speed": 1700,
       "time": 0.42,
       "hit": {
-       "dmg": 92,
+       "dmg": 125,
        "kind": "stun",
        "n": 4,
        "mid": "light",
@@ -520,7 +520,7 @@
       "center": false,
       "color": "rgba(176,16,42,.8)",
       "hit": {
-       "dmg": 83,
+       "dmg": 108,
        "kind": "launch"
       }
      },
@@ -555,16 +555,16 @@
         "t": "v",
         "vfx": "x3-c-slash-arc",
         "at": "front",
-        "dx": 133,
+        "dx": 60,
         "h": 140,
         "scale": 0.9,
         "tint": "#B0102A",
         "hit": {
-         "dmg": 101,
+         "dmg": 132,
          "kind": "launch",
          "stop": 0.14
         },
-        "r": 91.1
+        "r": 111.1
        }
       ]
      }
@@ -588,7 +588,7 @@
        "w": 1.05,
        "dy": -80,
        "hit": {
-        "dmg": 56,
+        "dmg": 71,
         "kind": "stun"
        }
       },
@@ -624,7 +624,7 @@
          "at": "target",
          "scale": 0.7,
          "hit": {
-          "dmg": 75,
+          "dmg": 96,
           "kind": "light",
           "n": 2,
           "every": 0.1
@@ -664,7 +664,7 @@
        "life": 1.0,
        "pierce": true,
        "hit": {
-        "dmg": 210,
+        "dmg": 268,
         "kind": "blow",
         "n": 3,
         "mid": "heavy",
@@ -691,17 +691,18 @@
   "speed": "fast",
   "gun": "none",
   "atk": {
-   "9": 13,
+   "9": 14,
    "10": 14,
    "11": 17,
    "12": 23,
    "13": 18,
-   "14": 19
+   "14": 20
   },
   "cd": {
    "skill": 2
   },
-  "shotDmg": 10
+  "shotDmg": 10,
+  "superType": "aoe"
  },
  "skills_2판": {
   "skill": {

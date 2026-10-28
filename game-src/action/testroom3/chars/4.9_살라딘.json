@@ -366,7 +366,7 @@
        "scale": 0.8,
        "tint": "#e8ecf4",
        "hit": {
-        "dmg": 36,
+        "dmg": 37,
         "kind": "light"
        },
        "r": 91.2
@@ -407,7 +407,7 @@
        "scale": 0.85,
        "tint": "#e8ecf4",
        "hit": {
-        "dmg": 42,
+        "dmg": 43,
         "kind": "heavy"
        },
        "r": 91.8
@@ -470,7 +470,7 @@
       "under": true,
       "r": 231.2,
       "hit": {
-       "dmg": 50,
+       "dmg": 75,
        "kind": "heavy"
       }
      }
@@ -496,7 +496,7 @@
       "tint": "#9fc4ec",
       "r": 60,
       "hit": {
-       "dmg": 101,
+       "dmg": 150,
        "kind": "launch"
       }
      },
@@ -524,7 +524,7 @@
         "tint": "#9fc4ec",
         "r": 60,
         "hit": {
-         "dmg": 101,
+         "dmg": 150,
          "kind": "launch"
         }
        }
@@ -556,7 +556,7 @@
         "tint": "#9fc4ec",
         "r": 60,
         "hit": {
-         "dmg": 80,
+         "dmg": 114,
          "kind": "launch"
         }
        }
@@ -586,7 +586,7 @@
         "tint": "#9fc4ec",
         "r": 60,
         "hit": {
-         "dmg": 80,
+         "dmg": 114,
          "kind": "launch"
         }
        }
@@ -616,7 +616,7 @@
         "tint": "#9fc4ec",
         "r": 60,
         "hit": {
-         "dmg": 80,
+         "dmg": 114,
          "kind": "launch"
         }
        }
@@ -646,7 +646,7 @@
         "tint": "#9fc4ec",
         "r": 60,
         "hit": {
-         "dmg": 80,
+         "dmg": 114,
          "kind": "launch"
         }
        }
@@ -676,7 +676,7 @@
         "tint": "#9fc4ec",
         "r": 60,
         "hit": {
-         "dmg": 80,
+         "dmg": 114,
          "kind": "launch"
         }
        }
@@ -706,7 +706,7 @@
         "tint": "#9fc4ec",
         "r": 60,
         "hit": {
-         "dmg": 80,
+         "dmg": 114,
          "kind": "launch"
         }
        }
@@ -736,7 +736,7 @@
         "tint": "#9fc4ec",
         "r": 60,
         "hit": {
-         "dmg": 80,
+         "dmg": 114,
          "kind": "launch"
         }
        }
@@ -797,11 +797,19 @@
      "f": 6,
      "fx": [
       {
+       "t": "v",
+       "vfx": "x3-4.9-F-blue-cavalry",
+       "at": "screen",
+       "w": 1.0,
+       "dy": 30,
+       "hold": 0.6
+      },
+      {
        "t": "sweep",
        "time": 1.6,
        "color": "#2a5a9a",
        "hit": {
-        "dmg": 67,
+        "dmg": 63,
         "kind": "blow",
         "n": 5
        }
@@ -883,18 +891,19 @@
   "speed": "slow",
   "gun": "rapid",
   "atk": {
-   "9": 19,
-   "10": 20,
-   "11": 24,
-   "12": 32,
-   "13": 25,
-   "14": 27
+   "9": 17,
+   "10": 18,
+   "11": 22,
+   "12": 29,
+   "13": 23,
+   "14": 25
   },
   "cd": {
    "skill": 2
   },
   "shotDmg": 6,
-  "heatPer": 9
+  "heatPer": 9,
+  "superType": "aoe"
  },
  "skills_2판": {
   "skill": {

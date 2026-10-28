@@ -382,7 +382,7 @@
          "t": "melee",
          "range": 150,
          "hit": {
-          "dmg": 60,
+          "dmg": 52,
           "kind": "light",
           "vfx": "x3-c-hit-spark-light",
           "vs": 2,
@@ -404,7 +404,7 @@
          "t": "melee",
          "range": 160,
          "hit": {
-          "dmg": 90,
+          "dmg": 78,
           "kind": "heavy",
           "vfx": "x3-c-hit-spark-light",
           "vs": 2.6,
@@ -443,7 +443,7 @@
       "speed": 1300,
       "time": 0.32,
       "hit": {
-       "dmg": 36,
+       "dmg": 75,
        "kind": "blow",
        "stop": 0.12,
        "shake": 10,
@@ -471,7 +471,7 @@
       "t": "melee",
       "range": 200,
       "hit": {
-       "dmg": 72,
+       "dmg": 150,
        "kind": "launch",
        "stop": 0.14,
        "shake": 10,
@@ -485,7 +485,7 @@
       "t": "melee",
       "range": 200,
       "hit": {
-       "dmg": 63,
+       "dmg": 83,
        "kind": "launch",
        "stop": 0.1,
        "vfx": "x3-c-hit-spark-heavy",
@@ -500,7 +500,7 @@
         "t": "melee",
         "range": 170,
         "hit": {
-         "dmg": 120,
+         "dmg": 157,
          "kind": "spike",
          "stop": 0.18,
          "shake": 14,
@@ -591,11 +591,10 @@
          "each": [
           {
            "t": "v",
-           "vfx": "x3-c-hit-spark-light",
-           "scale": 2,
-           "tint": "#B8D86A",
+           "vfx": "x3-1.3-F-olive-stomp",
+           "scale": 0.7,
            "hit": {
-            "dmg": 37,
+            "dmg": 62,
             "kind": "stun",
             "stop": 0.06,
             "shake": 5
@@ -638,12 +637,11 @@
          "each": [
           {
            "t": "v",
-           "vfx": "x3-c-hit-spark-heavy",
-           "scale": 1.6,
-           "tint": "#9BC75A",
+           "vfx": "x3-1.3-F-olive-stomp",
+           "scale": 0.7,
            "boom": 1,
            "hit": {
-            "dmg": 74,
+            "dmg": 124,
             "kind": "down",
             "stop": 0.12,
             "shake": 10,
@@ -667,7 +665,7 @@
          "t": "melee",
          "range": 200,
          "hit": {
-          "dmg": 61,
+          "dmg": 102,
           "kind": "launch",
           "stop": 0.14,
           "shake": 10,
@@ -687,10 +685,17 @@
        "f": 6,
        "fx": [
         {
+         "t": "v",
+         "vfx": "x3-1.3-F-olive-stomp",
+         "at": "target",
+         "scale": 1.1,
+         "boom": 2
+        },
+        {
          "t": "melee",
          "range": 220,
          "hit": {
-          "dmg": 87,
+          "dmg": 146,
           "kind": "down",
           "stop": 0.2,
           "shake": 16,
@@ -860,15 +865,16 @@
   "gun": "thrown",
   "atk": {
    "9": 15,
-   "10": 16,
-   "11": 19,
-   "12": 26,
-   "13": 20,
-   "14": 22
+   "10": 15,
+   "11": 18,
+   "12": 25,
+   "13": 19,
+   "14": 21
   },
   "cd": {
    "skill": 2
   },
-  "shotDmg": 7
+  "shotDmg": 7,
+  "superType": "aoe"
  }
 }

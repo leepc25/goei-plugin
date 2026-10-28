@@ -524,7 +524,7 @@
        "t": "melee",
        "range": 200,
        "hit": {
-        "dmg": 90,
+        "dmg": 130,
         "kind": "heavy",
         "vfx": "x3-c-hit-spark-light",
         "vs": 1.6,
@@ -574,7 +574,7 @@
       "t": "melee",
       "range": 170,
       "hit": {
-       "dmg": 36,
+       "dmg": 75,
        "kind": "light",
        "vfx": "x3-c-hit-spark-light",
        "vs": 1.4,
@@ -603,7 +603,7 @@
       "t": "melee",
       "range": 260,
       "hit": {
-       "dmg": 72,
+       "dmg": 150,
        "kind": "down",
        "vfx": "x3-c-hit-spark-heavy",
        "vs": 0.7,
@@ -637,18 +637,17 @@
        },
        {
         "t": "v",
-        "vfx": "x3-c-ground-shockwave",
+        "vfx": "x3-4.1-S2-heel-stomp",
         "at": "self",
         "dx": 20,
-        "scale": 0.9,
-        "tint": "#8C1F2E",
+        "scale": 0.5,
         "under": true
        },
        {
         "t": "melee",
         "range": 280,
         "hit": {
-         "dmg": 120,
+         "dmg": 240,
          "kind": "down",
          "vfx": "x3-c-hit-spark-heavy",
          "vs": 0.9,
@@ -691,7 +690,7 @@
        "scale": 2.5,
        "flip": false,
        "hit": {
-        "dmg": 30,
+        "dmg": 37,
         "kind": "light",
         "vfx": "x3-c-hit-spark-light",
         "vs": 1.6,
@@ -712,7 +711,7 @@
        "flip": false,
        "rot": 3.1416,
        "hit": {
-        "dmg": 30,
+        "dmg": 37,
         "kind": "light",
         "vfx": "x3-c-hit-spark-light",
         "vs": 1.6,
@@ -732,7 +731,7 @@
        "scale": 2.5,
        "flip": false,
        "hit": {
-        "dmg": 30,
+        "dmg": 37,
         "kind": "light",
         "vfx": "x3-c-hit-spark-light",
         "vs": 1.6,
@@ -753,7 +752,7 @@
        "flip": false,
        "boom": 2,
        "hit": {
-        "dmg": 41,
+        "dmg": 51,
         "kind": "light",
         "n": 2,
         "every": 0.08,
@@ -779,7 +778,7 @@
       {
        "t": "hit",
        "hit": {
-        "dmg": 127,
+        "dmg": 157,
         "kind": "down",
         "stop": 0.2,
         "shake": 16,
@@ -803,15 +802,16 @@
   "gun": "thrown",
   "atk": {
    "9": 15,
-   "10": 16,
-   "11": 19,
-   "12": 26,
-   "13": 20,
-   "14": 22
+   "10": 15,
+   "11": 18,
+   "12": 25,
+   "13": 19,
+   "14": 21
   },
   "cd": {
    "skill": 2
   },
-  "shotDmg": 7
+  "shotDmg": 7,
+  "superType": "aoe"
  }
 }

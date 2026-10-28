@@ -529,7 +529,7 @@
        "scale": 1.3,
        "r": 90,
        "hit": {
-        "dmg": 126,
+        "dmg": 130,
         "kind": "down",
         "n": 2,
         "mid": "light",
@@ -602,7 +602,7 @@
       "speed": 1400,
       "life": 0.2,
       "hit": {
-       "dmg": 50,
+       "dmg": 75,
        "kind": "light",
        "vfx": "x3-c-hit-spark-light",
        "vs": 1.4,
@@ -630,7 +630,7 @@
       "speed": 1500,
       "life": 0.45,
       "hit": {
-       "dmg": 101,
+       "dmg": 150,
        "kind": "launch",
        "vfx": "x3-c-hit-spark-light",
        "vs": 1.6,
@@ -661,7 +661,7 @@
       "delay": 0.3,
       "boom": 1,
       "hit": {
-       "dmg": 168,
+       "dmg": 240,
        "kind": "launch",
        "vfx": "x3-c-hit-spark-heavy",
        "vs": 0.8,
@@ -737,7 +737,7 @@
          "scale": 0.45,
          "under": true,
          "hit": {
-          "dmg": 79,
+          "dmg": 74,
           "kind": "launch",
           "vfx": "x3-c-hit-spark-heavy",
           "vs": 0.6,
@@ -760,7 +760,7 @@
        "delay": 0.2,
        "boom": 3,
        "hit": {
-        "dmg": 261,
+        "dmg": 246,
         "kind": "blow",
         "stop": 0.2,
         "shake": 18,
@@ -800,8 +800,8 @@
   "speed": "normal",
   "gun": "none",
   "atk": {
-   "9": 16,
-   "10": 17,
+   "9": 15,
+   "10": 16,
    "11": 20,
    "12": 27,
    "13": 21,
@@ -810,6 +810,7 @@
   "cd": {
    "skill": 2
   },
-  "shotDmg": 10
+  "shotDmg": 10,
+  "superType": "aoe"
  }
 }

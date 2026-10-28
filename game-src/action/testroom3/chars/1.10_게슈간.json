@@ -377,7 +377,7 @@
        "time": 1.2,
        "color": "#6EC6FF",
        "hit": {
-        "dmg": 102,
+        "dmg": 130,
         "kind": "light"
        }
       }
@@ -411,7 +411,7 @@
       "r": 80,
       "delay": 0.2,
       "hit": {
-       "dmg": 41,
+       "dmg": 75,
        "kind": "light",
        "stop": 0.1,
        "shake": 8
@@ -447,7 +447,7 @@
        {
         "t": "hit",
         "hit": {
-         "dmg": 82,
+         "dmg": 150,
          "kind": "blow",
          "stop": 0.12,
          "shake": 10
@@ -480,7 +480,7 @@
       "depth": 110,
       "delay": 0.35,
       "hit": {
-       "dmg": 136,
+       "dmg": 240,
        "kind": "down",
        "stop": 0.2,
        "shake": 15
@@ -534,7 +534,7 @@
          "h": 170,
          "time": 1.6,
          "hit": {
-          "dmg": 36,
+          "dmg": 38,
           "kind": "light"
          }
         }
@@ -568,7 +568,7 @@
          "under": true,
          "r": 100,
          "hit": {
-          "dmg": 264,
+          "dmg": 282,
           "kind": "spike",
           "stop": 0.22,
           "shake": 16
@@ -782,14 +782,15 @@
   "atk": {
    "9": 12,
    "10": 13,
-   "11": 15,
-   "12": 21,
-   "13": 16,
-   "14": 17
+   "11": 16,
+   "12": 22,
+   "13": 17,
+   "14": 18
   },
   "cd": {
    "skill": 2
   },
-  "shotDmg": 10
+  "shotDmg": 10,
+  "superType": "aoe"
  }
 }

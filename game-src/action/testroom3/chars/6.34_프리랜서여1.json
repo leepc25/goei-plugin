@@ -249,7 +249,7 @@
        "t": "melee",
        "range": 160,
        "hit": {
-        "dmg": 50,
+        "dmg": 47,
         "kind": "light"
        }
       }
@@ -262,7 +262,7 @@
        "t": "melee",
        "range": 160,
        "hit": {
-        "dmg": 88,
+        "dmg": 83,
         "kind": "launch"
        }
       }
@@ -286,7 +286,7 @@
       "t": "melee",
       "range": 170,
       "hit": {
-       "dmg": 55,
+       "dmg": 75,
        "kind": "heavy"
       }
      }
@@ -297,7 +297,7 @@
       "speed": 1200,
       "time": 0.22,
       "hit": {
-       "dmg": 110,
+       "dmg": 150,
        "kind": "heavy"
       }
      }
@@ -307,7 +307,7 @@
       "t": "melee",
       "range": 170,
       "hit": {
-       "dmg": 184,
+       "dmg": 240,
        "kind": "launch"
       }
      },

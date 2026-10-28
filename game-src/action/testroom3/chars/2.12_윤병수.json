@@ -604,7 +604,7 @@
        "fade": 0.15,
        "r": 150,
        "hit": {
-        "dmg": 53,
+        "dmg": 72,
         "kind": "launch",
         "n": 6,
         "every": 0.12,
@@ -670,7 +670,7 @@
         "boom": 2,
         "r": 40,
         "hit": {
-         "dmg": 38,
+         "dmg": 75,
          "kind": "heavy",
          "stop": 0.12,
          "shake": 10
@@ -710,7 +710,7 @@
         "boom": 2,
         "r": 40,
         "hit": {
-         "dmg": 77,
+         "dmg": 150,
          "kind": "launch",
          "stop": 0.12,
          "shake": 10
@@ -751,7 +751,7 @@
         "boom": 2,
         "r": 40,
         "hit": {
-         "dmg": 43,
+         "dmg": 80,
          "kind": "launch",
          "stop": 0.12,
          "shake": 10
@@ -793,7 +793,7 @@
           "boom": 2,
           "r": 40,
           "hit": {
-           "dmg": 43,
+           "dmg": 80,
            "kind": "launch",
            "stop": 0.12,
            "shake": 10
@@ -837,7 +837,7 @@
           "boom": 2,
           "r": 40,
           "hit": {
-           "dmg": 43,
+           "dmg": 80,
            "kind": "down",
            "stop": 0.12,
            "shake": 10
@@ -899,7 +899,7 @@
           "fade": 0.1,
           "r": 90,
           "hit": {
-           "dmg": 91,
+           "dmg": 69,
            "kind": "heavy",
            "n": 2,
            "every": 0.1,
@@ -936,7 +936,7 @@
             "fade": 0.1,
             "r": 90,
             "hit": {
-             "dmg": 91,
+             "dmg": 69,
              "kind": "heavy",
              "n": 2,
              "every": 0.1,
@@ -961,7 +961,7 @@
          "boom": 3,
          "r": 200,
          "hit": {
-          "dmg": 229,
+          "dmg": 175,
           "kind": "launch",
           "stop": 0.16,
           "shake": 16
@@ -989,7 +989,7 @@
            "boom": 3,
            "r": 200,
            "hit": {
-            "dmg": 229,
+            "dmg": 175,
             "kind": "down",
             "stop": 0.16,
             "shake": 16
@@ -1065,15 +1065,16 @@
   "atk": {
    "9": 13,
    "10": 14,
-   "11": 16,
-   "12": 22,
-   "13": 17,
+   "11": 17,
+   "12": 23,
+   "13": 18,
    "14": 19
   },
   "cd": {
    "skill": 2
   },
   "shotDmg": 7,
-  "heatPer": 9
+  "heatPer": 9,
+  "superType": "single"
  }
 }

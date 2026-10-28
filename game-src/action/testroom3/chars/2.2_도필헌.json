@@ -350,7 +350,7 @@
          "speed": 1300,
          "time": 0.25,
          "hit": {
-          "dmg": 102,
+          "dmg": 130,
           "kind": "down",
           "vfx": "x3-c-hit-spark-light",
           "vs": 1.6,
@@ -425,7 +425,7 @@
       "tint": "#C9A046",
       "r": 70,
       "hit": {
-       "dmg": 41,
+       "dmg": 75,
        "kind": "heavy",
        "vfx": "x3-c-hit-spark-heavy",
        "vs": 0.7,
@@ -444,7 +444,7 @@
       "rot": -0.6,
       "tint": "#C9A046",
       "hit": {
-       "dmg": 82,
+       "dmg": 150,
        "kind": "launch"
       }
      }
@@ -462,7 +462,7 @@
         "t": "melee",
         "range": 240,
         "hit": {
-         "dmg": 55,
+         "dmg": 97,
          "kind": "launch",
          "vfx": "x3-c-hit-spark-heavy",
          "vs": 0.7,
@@ -479,7 +479,7 @@
         "t": "melee",
         "range": 240,
         "hit": {
-         "dmg": 45,
+         "dmg": 79,
          "kind": "launch",
          "vfx": "x3-c-hit-spark-heavy",
          "vs": 0.7,
@@ -500,7 +500,7 @@
         "under": true,
         "tint": "#C9A046",
         "hit": {
-         "dmg": 36,
+         "dmg": 64,
          "kind": "heavy"
         },
         "r": 231.2
@@ -542,7 +542,7 @@
          "speed": 1700,
          "time": 0.7,
          "hit": {
-          "dmg": 111,
+          "dmg": 126,
           "kind": "down",
           "vfx": "x3-c-hit-spark-light",
           "vs": 1.6,
@@ -585,7 +585,7 @@
          "tint": "#C9A046",
          "r": 70,
          "hit": {
-          "dmg": 67,
+          "dmg": 76,
           "kind": "heavy"
          }
         }
@@ -610,7 +610,7 @@
          "rot": -0.6,
          "tint": "#C9A046",
          "hit": {
-          "dmg": 67,
+          "dmg": 76,
           "kind": "launch"
          },
          "r": 91.4
@@ -630,7 +630,7 @@
          "t": "melee",
          "range": 260,
          "hit": {
-          "dmg": 111,
+          "dmg": 126,
           "kind": "launch",
           "n": 2,
           "mid": "launch",
@@ -659,14 +659,13 @@
        "fx": [
         {
          "t": "v",
-         "vfx": "x3-c-ground-shockwave",
+         "vfx": "x3-2.2-F-brass-landing",
          "at": "screen",
-         "w": 1.05,
-         "tint": "#C9A046",
+         "w": 0.98,
          "under": true,
          "boom": 3,
          "hit": {
-          "dmg": 170,
+          "dmg": 194,
           "kind": "blow",
           "stop": 0.2,
           "shake": 16
@@ -815,16 +814,17 @@
   "speed": "slow",
   "gun": "none",
   "atk": {
-   "9": 16,
-   "10": 17,
-   "11": 20,
-   "12": 28,
-   "13": 21,
-   "14": 23
+   "9": 15,
+   "10": 16,
+   "11": 19,
+   "12": 26,
+   "13": 20,
+   "14": 22
   },
   "cd": {
    "skill": 2
   },
-  "shotDmg": 10
+  "shotDmg": 10,
+  "superType": "aoe"
  }
 }

@@ -406,7 +406,7 @@
        "dx": 150,
        "scale": 1,
        "hit": {
-        "dmg": 102,
+        "dmg": 130,
         "kind": "down",
         "vfx": "x3-c-hit-spark-heavy",
         "vs": 0.7,
@@ -459,7 +459,7 @@
       "tint": "#bcd4e4",
       "r": 90,
       "hit": {
-       "dmg": 41,
+       "dmg": 75,
        "kind": "heavy"
       }
      }
@@ -470,7 +470,7 @@
       "speed": 1300,
       "time": 0.4,
       "hit": {
-       "dmg": 82,
+       "dmg": 150,
        "kind": "down",
        "vfx": "x3-c-hit-spark-heavy",
        "vs": 0.7,
@@ -510,7 +510,7 @@
       "under": true,
       "tint": "#bcd4e4",
       "hit": {
-       "dmg": 136,
+       "dmg": 240,
        "kind": "launch",
        "n": 2,
        "mid": "stun",
@@ -554,7 +554,7 @@
          "at": "target",
          "scale": 1,
          "hit": {
-          "dmg": 73,
+          "dmg": 48,
           "kind": "down",
           "vfx": "x3-c-hit-spark-heavy",
           "vs": 0.6,
@@ -584,7 +584,7 @@
          "at": "target",
          "scale": 1,
          "hit": {
-          "dmg": 73,
+          "dmg": 48,
           "kind": "down",
           "vfx": "x3-c-hit-spark-heavy",
           "vs": 0.6,
@@ -614,7 +614,7 @@
          "at": "target",
          "scale": 1,
          "hit": {
-          "dmg": 73,
+          "dmg": 48,
           "kind": "down",
           "vfx": "x3-c-hit-spark-heavy",
           "vs": 0.6,
@@ -664,7 +664,7 @@
            "scale": 1.2,
            "tint": "#d8c8b0",
            "hit": {
-            "dmg": 82,
+            "dmg": 54,
             "kind": "down"
            }
           }
@@ -689,7 +689,7 @@
          "w": 1.05,
          "boom": 3,
          "hit": {
-          "dmg": 185,
+          "dmg": 122,
           "kind": "launch",
           "stop": 0.2,
           "shake": 16
@@ -861,16 +861,17 @@
   "speed": "slow",
   "gun": "thrown",
   "atk": {
-   "9": 16,
-   "10": 17,
-   "11": 20,
-   "12": 28,
-   "13": 21,
-   "14": 23
+   "9": 15,
+   "10": 16,
+   "11": 19,
+   "12": 26,
+   "13": 20,
+   "14": 22
   },
   "cd": {
    "skill": 2
   },
-  "shotDmg": 7
+  "shotDmg": 7,
+  "superType": "aoe"
  }
 }

@@ -353,7 +353,7 @@
        "scale": 1.1,
        "r": 170,
        "hit": {
-        "dmg": 34,
+        "dmg": 43,
         "kind": "light"
        }
       }
@@ -370,7 +370,7 @@
        "scale": 1.5,
        "r": 170,
        "hit": {
-        "dmg": 68,
+        "dmg": 87,
         "kind": "heavy"
        }
       }
@@ -405,7 +405,7 @@
       "tint": "#ffcf9a",
       "r": 70,
       "hit": {
-       "dmg": 41,
+       "dmg": 75,
        "kind": "heavy"
       }
      }
@@ -416,7 +416,7 @@
       "speed": 1300,
       "time": 0.35,
       "hit": {
-       "dmg": 82,
+       "dmg": 150,
        "kind": "down"
       }
      },
@@ -437,15 +437,15 @@
     "2": [
      {
       "t": "v",
-      "vfx": "x3-c-ground-shockwave",
-      "at": "self",
-      "scale": 1.4,
-      "under": true,
-      "tint": "#ffcf9a",
+      "vfx": "x3-2.3-S2-sonic-waves",
+      "at": "hand",
+      "scale": 0.7,
       "hit": {
-       "dmg": 129,
+       "dmg": 228,
        "kind": "heavy"
-      }
+      },
+      "r": 368.0,
+      "dx": 10
      },
      {
       "t": "later",
@@ -453,15 +453,15 @@
       "fx": [
        {
         "t": "v",
-        "vfx": "x3-c-ground-shockwave",
-        "at": "self",
-        "scale": 1.4,
-        "under": true,
-        "tint": "#ffcf9a",
+        "vfx": "x3-2.3-S2-sonic-waves",
+        "at": "hand",
+        "scale": 0.7,
         "hit": {
-         "dmg": 129,
+         "dmg": 228,
          "kind": "heavy"
-        }
+        },
+        "r": 368.0,
+        "dx": 10
        }
       ]
      },
@@ -471,15 +471,15 @@
       "fx": [
        {
         "t": "v",
-        "vfx": "x3-c-ground-shockwave",
-        "at": "self",
-        "scale": 1.4,
-        "under": true,
-        "tint": "#ffcf9a",
+        "vfx": "x3-2.3-S2-sonic-waves",
+        "at": "hand",
+        "scale": 0.7,
         "hit": {
-         "dmg": 195,
+         "dmg": 344,
          "kind": "down"
-        }
+        },
+        "r": 368.0,
+        "dx": 10
        }
       ]
      }
@@ -532,7 +532,7 @@
        "at": "screen",
        "w": 1.05,
        "hit": {
-        "dmg": 69,
+        "dmg": 73,
         "kind": "stun"
        }
       }
@@ -549,7 +549,7 @@
        "scale": 1.4,
        "boom": 2,
        "hit": {
-        "dmg": 233,
+        "dmg": 248,
         "kind": "blow",
         "n": 4,
         "mid": "heavy",
@@ -705,16 +705,17 @@
   "speed": "slow",
   "gun": "none",
   "atk": {
-   "9": 16,
-   "10": 17,
-   "11": 20,
-   "12": 28,
-   "13": 21,
-   "14": 23
+   "9": 15,
+   "10": 16,
+   "11": 19,
+   "12": 26,
+   "13": 20,
+   "14": 22
   },
   "cd": {
    "skill": 2
   },
-  "shotDmg": 10
+  "shotDmg": 10,
+  "superType": "aoe"
  }
 }

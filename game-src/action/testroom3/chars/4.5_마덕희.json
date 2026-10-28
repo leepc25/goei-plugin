@@ -377,7 +377,7 @@
          "t": "melee",
          "range": 180,
          "hit": {
-          "dmg": 73,
+          "dmg": 54,
           "kind": "light",
           "vfx": "x3-c-hit-spark-light",
           "vs": 1.4,
@@ -400,7 +400,7 @@
          "t": "melee",
          "range": 180,
          "hit": {
-          "dmg": 102,
+          "dmg": 76,
           "kind": "heavy",
           "vfx": "x3-c-hit-spark-light",
           "vs": 1.8,
@@ -444,7 +444,7 @@
       "t": "melee",
       "range": 190,
       "hit": {
-       "dmg": 41,
+       "dmg": 75,
        "kind": "blow",
        "vfx": "x3-c-hit-spark-heavy",
        "vs": 0.8
@@ -457,7 +457,7 @@
       "speed": 1500,
       "time": 0.26,
       "hit": {
-       "dmg": 82,
+       "dmg": 150,
        "kind": "down",
        "vfx": "x3-c-hit-spark-heavy",
        "vs": 1
@@ -482,7 +482,7 @@
       "t": "melee",
       "range": 190,
       "hit": {
-       "dmg": 95,
+       "dmg": 168,
        "kind": "down",
        "stop": 0.16,
        "shake": 12,
@@ -509,7 +509,7 @@
       "under": true,
       "delay": 0.12,
       "hit": {
-       "dmg": 41,
+       "dmg": 72,
        "kind": "launch",
        "vfx": "x3-c-hit-spark-heavy",
        "vs": 0.8
@@ -590,7 +590,7 @@
          "t": "melee",
          "range": 160,
          "hit": {
-          "dmg": 39,
+          "dmg": 42,
           "kind": "light",
           "vfx": "x3-c-hit-spark-light",
           "vs": 1.6,
@@ -631,7 +631,7 @@
          "t": "melee",
          "range": 160,
          "hit": {
-          "dmg": 39,
+          "dmg": 42,
           "kind": "light",
           "vfx": "x3-c-hit-spark-light",
           "vs": 1.6,
@@ -672,7 +672,7 @@
          "t": "melee",
          "range": 160,
          "hit": {
-          "dmg": 39,
+          "dmg": 42,
           "kind": "light",
           "vfx": "x3-c-hit-spark-light",
           "vs": 1.6,
@@ -699,7 +699,7 @@
          "h": 70,
          "scale": 1.4,
          "hit": {
-          "dmg": 98,
+          "dmg": 105,
           "kind": "down",
           "stop": 0.2,
           "shake": 16
@@ -723,7 +723,7 @@
          "under": true,
          "delay": 0.1,
          "hit": {
-          "dmg": 84,
+          "dmg": 90,
           "kind": "launch"
          },
          "r": 300,
@@ -771,17 +771,18 @@
   "speed": "slow",
   "gun": "thrown",
   "atk": {
-   "9": 16,
-   "10": 17,
-   "11": 20,
-   "12": 28,
-   "13": 21,
-   "14": 23
+   "9": 15,
+   "10": 16,
+   "11": 19,
+   "12": 26,
+   "13": 20,
+   "14": 22
   },
   "cd": {
    "skill": 2
   },
-  "shotDmg": 7
+  "shotDmg": 7,
+  "superType": "aoe"
  },
  "skills_2판": {
   "skill": {

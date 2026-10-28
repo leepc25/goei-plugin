@@ -472,11 +472,11 @@
        "t": "v",
        "vfx": "x3-1.2-D-needle-burst",
        "at": "front",
-       "dx": 135,
-       "r": 80,
+       "dx": 60,
+       "r": 100.0,
        "delay": 0.06,
        "hit": {
-        "dmg": 138,
+        "dmg": 130,
         "kind": "launch",
         "stop": 0.14,
         "shake": 10,
@@ -518,7 +518,7 @@
         "life": 0.6,
         "color": "#1a0f24",
         "hit": {
-         "dmg": 18,
+         "dmg": 25,
          "kind": "light",
          "stop": 0.04,
          "shake": 4
@@ -536,7 +536,7 @@
       "r": 200,
       "delay": 0.15,
       "hit": {
-       "dmg": 110,
+       "dmg": 150,
        "kind": "launch",
        "stop": 0.16,
        "shake": 12,
@@ -556,7 +556,7 @@
       "depth": 110,
       "delay": 0.08,
       "hit": {
-       "dmg": 188,
+       "dmg": 239,
        "kind": "down",
        "n": 3,
        "mid": "launch",
@@ -623,7 +623,7 @@
          "r": 80,
          "delay": 0.06,
          "hit": {
-          "dmg": 103,
+          "dmg": 97,
           "kind": "launch",
           "stop": 0.08,
           "shake": 8
@@ -644,7 +644,7 @@
        "w": 1.05,
        "boom": 3,
        "hit": {
-        "dmg": 237,
+        "dmg": 222,
         "kind": "down",
         "n": 2,
         "mid": "launch",
@@ -879,17 +879,18 @@
   "speed": "fast",
   "gun": "none",
   "atk": {
-   "9": 13,
+   "9": 14,
    "10": 14,
    "11": 17,
    "12": 23,
    "13": 18,
-   "14": 19
+   "14": 20
   },
   "cd": {
    "skill": 2
   },
-  "shotDmg": 10
+  "shotDmg": 10,
+  "superType": "aoe"
  },
  "fallRev": true
 }

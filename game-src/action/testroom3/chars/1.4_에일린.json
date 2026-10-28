@@ -427,7 +427,7 @@
       "kind": "bullet",
       "big": true,
       "hit": {
-       "dmg": 38,
+       "dmg": 75,
        "kind": "heavy"
       }
      }
@@ -437,7 +437,7 @@
       "t": "beam",
       "lv": 1,
       "hit": {
-       "dmg": 77,
+       "dmg": 150,
        "kind": "heavy"
       }
      }
@@ -447,7 +447,7 @@
       "t": "beam",
       "lv": 2,
       "hit": {
-       "dmg": 128,
+       "dmg": 240,
        "kind": "launch"
       }
      }
@@ -490,7 +490,7 @@
          "t": "proj",
          "kind": "bullet",
          "hit": {
-          "dmg": 23,
+          "dmg": 30,
           "kind": "light"
          }
         }
@@ -504,7 +504,7 @@
          "kind": "bullet",
          "big": true,
          "hit": {
-          "dmg": 105,
+          "dmg": 138,
           "kind": "heavy"
          }
         }
@@ -541,6 +541,7 @@
    "skill2": 4
   },
   "shotDmg": 7,
-  "heatPer": 9
+  "heatPer": 9,
+  "superType": "single"
  }
 }

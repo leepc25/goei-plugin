@@ -497,7 +497,7 @@
        "t": "melee",
        "range": 160,
        "hit": {
-        "dmg": 30,
+        "dmg": 26,
         "kind": "light",
         "vfx": "x3-c-hit-spark-light",
         "vs": 1.2,
@@ -518,7 +518,7 @@
        "t": "melee",
        "range": 160,
        "hit": {
-        "dmg": 75,
+        "dmg": 65,
         "kind": "light",
         "n": 3,
         "mid": "light",
@@ -538,7 +538,7 @@
        "t": "melee",
        "range": 160,
        "hit": {
-        "dmg": 44,
+        "dmg": 38,
         "kind": "heavy",
         "vfx": "x3-c-hit-spark-light",
         "vs": 1.6,
@@ -574,7 +574,7 @@
       "speed": 1600,
       "life": 1.2,
       "hit": {
-       "dmg": 36,
+       "dmg": 75,
        "kind": "light",
        "vfx": "x3-c-hit-spark-light",
        "vs": 1.4,
@@ -589,7 +589,7 @@
       "speed": 1700,
       "life": 1.2,
       "hit": {
-       "dmg": 22,
+       "dmg": 45,
        "kind": "light",
        "vfx": "x3-c-hit-spark-light",
        "vs": 1.3,
@@ -606,7 +606,7 @@
         "speed": 1700,
         "life": 1.2,
         "hit": {
-         "dmg": 22,
+         "dmg": 45,
          "kind": "light",
          "vfx": "x3-c-hit-spark-light",
          "vs": 1.3,
@@ -625,7 +625,7 @@
         "speed": 1700,
         "life": 1.2,
         "hit": {
-         "dmg": 29,
+         "dmg": 60,
          "kind": "heavy",
          "vfx": "x3-c-hit-spark-light",
          "vs": 1.8,
@@ -655,9 +655,9 @@
       "fx": [
        {
         "t": "melee",
-        "range": 170,
+        "range": 190,
         "hit": {
-         "dmg": 120,
+         "dmg": 240,
          "kind": "down",
          "vfx": "x3-c-hit-spark-light",
          "vs": 1.5,
@@ -733,7 +733,7 @@
        "dy": 30,
        "tint": "#2C3E66",
        "hit": {
-        "dmg": 32,
+        "dmg": 39,
         "kind": "stun"
        }
       }
@@ -765,7 +765,7 @@
          "scale": 0.3,
          "tint": "#e8f0ff",
          "hit": {
-          "dmg": 19,
+          "dmg": 23,
           "kind": "light",
           "stop": 0.03,
           "vfx": "x3-c-hit-spark-light",
@@ -788,7 +788,7 @@
       {
        "t": "hit",
        "hit": {
-        "dmg": 173,
+        "dmg": 211,
         "kind": "blow",
         "stop": 0.18,
         "shake": 14,
@@ -810,14 +810,15 @@
   "atk": {
    "9": 13,
    "10": 14,
-   "11": 16,
-   "12": 22,
-   "13": 17,
+   "11": 17,
+   "12": 23,
+   "13": 18,
    "14": 19
   },
   "cd": {
    "skill": 2
   },
-  "shotDmg": 7
+  "shotDmg": 7,
+  "superType": "aoe"
  }
 }

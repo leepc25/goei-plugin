@@ -9,13 +9,16 @@ M3 = HERE.parent / "motion3"; CH = HERE / "chars"
 
 # 역할별 근접 초당 피해(DPS). 샌드백 HP 400 기준: 보통 인물이 약공 연타로 10초 안팎
 DPS = {"striker": 46, "bruiser": 42, "tank": 34, "ranged": 32, "support": 30, "control": 34}
-SPEED = {"fast": 0.88, "normal": 1.0, "slow": 1.18}          # 같은 길이라도 굼뜬 인물은 한 대가 더 아프게
+SPEED = {"fast": 0.9, "normal": 1.0, "slow": 1.1}   # 10-29: 차이 좁힘(굼뜬 인물 평타가 특출나던 것)          # 같은 길이라도 굼뜬 인물은 한 대가 더 아프게
 ROW = {"9": 1.0, "10": 1.0, "11": 1.15, "12": 1.25, "13": 1.1, "14": 1.6}   # 약1·약2·약3(마무리)·강·돌진·점프(4장으로 짧아 높게)
 SKILL_CD = 2   # 고유기술 실제 쿨타임(초, 10-28 사용자: 연사만 안 되게 짧게 + 위력 올림)
 ATK_BASE = {"9": 15, "10": 16, "11": 19, "12": 26, "13": 20, "14": 22}   # 약1·약2·약3·강·돌진·점프 기준 피해(10-28)
-ROLE_MUL = {"striker": 1.0, "bruiser": 1.05, "tank": 1.1, "ranged": 0.85, "support": 0.85, "control": 0.9}
+ROLE_MUL = {"striker": 1.0, "bruiser": 1.03, "tank": 1.05, "ranged": 0.88, "support": 0.88, "control": 0.92}   # 10-29: 좁힘
 CD = {"striker": 6, "bruiser": 8, "tank": 10, "ranged": 7, "support": 9, "control": 9}   # 고유기술 쿨타임(초)
-SUPER = {"striker": 340, "bruiser": 340, "ranged": 320, "control": 300, "tank": 280, "support": 260}   # 10-28: 필살기가 가장 세게(전엔 180이라 D·충전보다 약했음)
+# 10-29 사용자: 기술 총량은 인물마다 엇비슷하게(역할로 벌리지 않음) · 계층(평타 한 대 15~26 < 0단 < 고유기 < 1단 < 2단 < 필살기) · 필살기는 한 대상 막대(단일형) 또는 광역(광역형)
+BUDGET = {"skill": 130, "c0": 75, "c1": 150, "c2": 240}
+SUPER_SINGLE, SUPER_AOE = 420, 320   # 샌드백 한 대상 기준: 단일형은 더 세게, 광역형은 화면 전체에 뿌리는 대신 한 대상엔 조금 덜
+SUPER = {r: SUPER_AOE for r in ("striker", "bruiser", "ranged", "control", "tank", "support")}
 SKILL_SEC = 3.0   # 고유기 피해 = 평타 몇 초분(10-28: 쿨 2초인데 예산이 옛 쿨 6~10초 기준이라 필살기보다 셌음)
 CHARGE_F = {"0": 1.2, "1": 2.4, "2": 4.0}   # 충전 단계: 반드시 0 < 1 < 2
 GUN = {  # 원거리 기본공격: 약한 단발은 쿨타임 없이, 강한 것·연발은 과열이나 쿨타임
@@ -86,6 +89,22 @@ def load_eff(path):
             if est > 0 and m[key][n] > 0: EFF[(key, n)] = m[key][n] / est
 
 
+def super_type(o):
+    """필살기 갈래: 화면 전체·휩쓸기·쏟아짐·넓은 고리 판정이 있으면 광역(aoe), 아니면 단일(single)"""
+    acc = []
+    def walk(x):
+        if isinstance(x, dict):
+            t = x.get("t")
+            if t in ("screen", "sweep", "rain", "barrage", "wave") or (t in ("v", "firewall") and x.get("at") == "screen" and x.get("hit")) \
+               or (t == "circle" and x.get("r", 260) >= 300) or (t == "v" and x.get("hit") and (x.get("w", 0) >= 0.8 or x.get("r", 0) >= 300)):
+                acc.append(t)
+            for v in x.values(): walk(v)
+        elif isinstance(x, list):
+            for v in x: walk(v)
+    walk(o)
+    return "aoe" if acc else "single"
+
+
 def main():
     cls = {c["key"]: c for c in json.loads((ROOT / "docs" / "밸런스_분류.json").read_text())}
     rows = []
@@ -98,7 +117,7 @@ def main():
         elif key in cls:
             c = cls[key]; role, gun, speed, mul, hp = c["role"], c["gun"], c["speed"], 1.0, 100
         else: continue
-        dps = DPS[role] * mul; hitf = d.get("hit", {})
+        dps = DPS[role] * mul; hitf = d.get("hit", {}); nm = mul if key.startswith("6.") else 1   # NPC 는 피해 배율
         atk = {}
         for r, f in ROW.items():
             n = frames(key, r) or 0
@@ -117,15 +136,15 @@ def main():
         info = {}
         if sk.get("skill"):
             # 사용자 2026-10-28: 평타 몇 번 수준 기술에 5~10초 쿨은 아무도 안 씀 → 쿨타임은 라이브 고유기(75틱 = 2.5초)에 가깝게 3초, 피해 예산은 그대로
-            bal["cd"]["skill"] = SKILL_CD; info["skill"] = rescale(sk["skill"], dps * SKILL_SEC, EFF.get((key, "skill"), 1))
+            bal["cd"]["skill"] = SKILL_CD; info["skill"] = rescale(sk["skill"], BUDGET["skill"] * nm, EFF.get((key, "skill"), 1))
         if sk.get("skill2"):
-            bal["cd"]["skill2"] = SKILL_CD + 2; info["skill2"] = rescale(sk["skill2"], dps * SKILL_SEC * 1.3)
+            bal["cd"]["skill2"] = SKILL_CD + 2; info["skill2"] = rescale(sk["skill2"], BUDGET["skill"] * 1.2 * nm)
         if sk.get("charge"):
             # 충전기는 쿨타임 없음(사용자 2026-10-26: 모으는 시간이 곧 대가)
             lv = sk["charge"].get("lv", {})
             for k, f in CHARGE_F.items():
-                if k in lv: info[f"charge{k}"] = rescale(lv[k], dps * f, EFF.get((key, "c" + k), 1))
-        if sk.get("super"): info["super"] = rescale(sk["super"], SUPER[role] * (mul if key.startswith("6.") else 1), EFF.get((key, "super"), 1))
+                if k in lv: info[f"charge{k}"] = rescale(lv[k], BUDGET["c" + k] * nm, EFF.get((key, "c" + k), 1))
+        if sk.get("super"): bal["superType"] = super_type(sk["super"]); info["super"] = rescale(sk["super"], (SUPER_AOE if bal["superType"] == "aoe" else SUPER_SINGLE) * nm, EFF.get((key, "super"), 1))
         if key.startswith("6."): bal["hp"] = hp
         d["bal"] = bal; p.write_text(json.dumps(d, ensure_ascii=False, indent=1))
         rows.append((key, role, speed, gun, atk, bal, info))

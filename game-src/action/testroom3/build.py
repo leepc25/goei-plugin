@@ -588,6 +588,7 @@ def build_char(cfg, force=False):
     payload["turn19"] = turn_after_down(cfg)   # 쓰러진 뒤 잇는 줄인데 머리 방향이 반대로 그려진 줄(10-28 이기석 기기: 머리·발이 뿅 바뀜) → 방에서 몸 방향을 돌려 이음
     payload["lie19"] = settled_loop(A.get("19"))   # 누운 반복 장(10-29)
     payload["seam"] = seam_map(A)   # 동작 끝 → 대기 이음새(10-29)
+    payload["cycle"] = cycle_map(A)   # 걷기·뛰기 반복 구간(10-29)
     payload["chairAuto"] = chair_auto(cfg)   # 의자 자동 맞춤(chairfit.py). 손으로 맞춘 값은 설정 chars/<키>.json 의 "chair"가 이김
     js.write_text("(window.__C=window.__C||{})[" + json.dumps(key, ensure_ascii=False) + "]=" +
                   json.dumps({"cfg": payload, "A": A}, ensure_ascii=False, separators=(",", ":")) + ";\n", encoding="utf-8")
@@ -636,6 +637,30 @@ def seam_map(A):
         for st, f0 in firsts.items():
             u = (last | f0).sum(); d = (last ^ f0).sum() / u if u else 0; best = min(best, d)
         out[lid] = round(float(best), 2)
+    return out
+
+
+def cycle_map(A):
+    """걷기(4)·뛰기(5) 반복: 끝→첫 장이 이웃 장 차이보다 크게 튀면(뚝 끊김) 가장 잘 닫히는 부분 구간 [첫, 끝](1부터)"""
+    import statistics
+    def masks(a):
+        sheet = Image.open(io.BytesIO(base64.b64decode(a["src"].split(",", 1)[1]))).convert("RGBA"); m = np.array(sheet)[:, :, 3] > 40
+        return [m[:, i * a["cw"]:(i + 1) * a["cw"]] for i in range(a["n"])]
+    def place(a, m, f):
+        cv = np.zeros((700, 700), bool); H, W = m.shape
+        x0 = 350 - int(a["cx"][f] + a["w"] / 2 - a["ox"]); y0 = 600 - int(a["bot"][f] - a["oy"])
+        x0 = max(0, min(700 - W, x0)); y0 = max(0, min(700 - H, y0)); cv[y0:y0 + H, x0:x0 + W] = m; return cv
+    out = {}
+    for lid in ("4", "5"):
+        a = A.get(lid)
+        if not a or a["n"] < 6: continue
+        ms = masks(a); n = a["n"]; P_ = [place(a, ms[i], i) for i in range(n)]
+        def d(i, j):
+            u = (P_[i] | P_[j]).sum(); return (P_[i] ^ P_[j]).sum() / u if u else 0
+        neigh = statistics.median(d(i, i + 1) for i in range(n - 1)); full = d(n - 1, 0)
+        if full <= 1.4 * neigh: continue
+        best = min(((d(j, i), i, j) for i in range(0, 3) for j in range(n - 1, max(n - 4, i + 3), -1)), default=None)
+        if best and best[0] < 0.8 * full and best[0] <= 1.3 * neigh: out[lid] = [best[1] + 1, best[2] + 1]
     return out
 
 

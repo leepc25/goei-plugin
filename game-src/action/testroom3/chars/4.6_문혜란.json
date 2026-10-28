@@ -379,7 +379,7 @@
        "t": "melee",
        "range": 170,
        "hit": {
-        "dmg": 51,
+        "dmg": 33,
         "kind": "light"
        }
       }
@@ -401,7 +401,7 @@
        "t": "melee",
        "range": 170,
        "hit": {
-        "dmg": 51,
+        "dmg": 33,
         "kind": "light"
        }
       }
@@ -415,7 +415,7 @@
        "t": "melee",
        "range": 160,
        "hit": {
-        "dmg": 99,
+        "dmg": 64,
         "kind": "down",
         "vfx": "x3-c-hit-spark-heavy",
         "vs": 0.8
@@ -463,7 +463,7 @@
       "speed": 1600,
       "time": 0.32,
       "hit": {
-       "dmg": 41,
+       "dmg": 75,
        "kind": "launch",
        "vfx": "x3-c-hit-spark-heavy",
        "vs": 1
@@ -499,7 +499,7 @@
       "t": "melee",
       "range": 200,
       "hit": {
-       "dmg": 82,
+       "dmg": 150,
        "kind": "blow",
        "stop": 0.16,
        "shake": 12
@@ -522,7 +522,7 @@
         "speed": 1800,
         "life": 0.5,
         "hit": {
-         "dmg": 6,
+         "dmg": 10,
          "kind": "light"
         }
        }
@@ -553,7 +553,7 @@
          {
           "t": "hit",
           "hit": {
-           "dmg": 27,
+           "dmg": 45,
            "kind": "down",
            "stop": 0.1
           }
@@ -598,7 +598,7 @@
          "life": 0.9,
          "dy": -10,
          "hit": {
-          "dmg": 12,
+          "dmg": 16,
           "kind": "light",
           "stop": 0.03,
           "shake": 3
@@ -646,7 +646,7 @@
        "tint": "#d8dde6",
        "under": true,
        "hit": {
-        "dmg": 155,
+        "dmg": 209,
         "kind": "launch",
         "stop": 0.22,
         "shake": 18
@@ -680,16 +680,17 @@
   "gun": "thrown",
   "atk": {
    "9": 14,
-   "10": 14,
+   "10": 15,
    "11": 17,
-   "12": 23,
+   "12": 24,
    "13": 18,
    "14": 20
   },
   "cd": {
    "skill": 2
   },
-  "shotDmg": 7
+  "shotDmg": 7,
+  "superType": "single"
  },
  "skills_2판": {
   "skill": {

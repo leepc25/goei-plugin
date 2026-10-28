@@ -409,7 +409,7 @@
        "at": "target",
        "scale": 1.3,
        "hit": {
-        "dmg": 102,
+        "dmg": 130,
         "kind": "light",
         "stop": 0.14
        }
@@ -441,7 +441,7 @@
       "speed": 1300,
       "time": 0.3,
       "hit": {
-       "dmg": 41,
+       "dmg": 75,
        "kind": "heavy",
        "vfx": "x3-c-hit-spark-light",
        "vs": 1.6
@@ -492,7 +492,7 @@
         "tint": "#e8e4dc",
         "r": 134.4,
         "hit": {
-         "dmg": 82,
+         "dmg": 150,
          "kind": "heavy"
         }
        },
@@ -565,7 +565,7 @@
         "h": 120,
         "scale": 1,
         "hit": {
-         "dmg": 136,
+         "dmg": 240,
          "kind": "blow",
          "stop": 0.16,
          "shake": 12
@@ -689,7 +689,7 @@
          "scale": 1.5,
          "tint": "#e8e4dc",
          "hit": {
-          "dmg": 261,
+          "dmg": 278,
           "kind": "heavy",
           "stop": 0.22,
           "shake": 18
@@ -717,7 +717,7 @@
       {
        "t": "hit",
        "hit": {
-        "dmg": 39,
+        "dmg": 42,
         "kind": "down",
         "stop": 0.05
        }
@@ -752,15 +752,16 @@
   "atk": {
    "9": 12,
    "10": 13,
-   "11": 15,
-   "12": 21,
-   "13": 16,
-   "14": 17
+   "11": 16,
+   "12": 22,
+   "13": 17,
+   "14": 18
   },
   "cd": {
    "skill": 2
   },
-  "shotDmg": 10
+  "shotDmg": 10,
+  "superType": "aoe"
  },
  "skills_2판": {
   "skill": {

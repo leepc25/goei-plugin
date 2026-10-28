@@ -508,7 +508,7 @@
        "r": 190,
        "depth": 90,
        "hit": {
-        "dmg": 90,
+        "dmg": 130,
         "kind": "stun",
         "noVfx": true,
         "stop": 0.08,
@@ -551,7 +551,7 @@
       "scale": 1.4,
       "r": 80,
       "hit": {
-       "dmg": 36,
+       "dmg": 75,
        "kind": "heavy",
        "vfx": "x3-c-hit-spark-light",
        "vs": 1.4
@@ -563,7 +563,7 @@
       "t": "melee",
       "range": 160,
       "hit": {
-       "dmg": 69,
+       "dmg": 150,
        "n": 3,
        "every": 0.13,
        "mid": "light",
@@ -581,7 +581,7 @@
       "speed": 1200,
       "time": 0.4,
       "hit": {
-       "dmg": 120,
+       "dmg": 240,
        "kind": "down",
        "vfx": "x3-c-hit-spark-heavy",
        "vs": 0.7,
@@ -662,7 +662,7 @@
            "scale": 1.2,
            "tint": "#ffffff",
            "hit": {
-            "dmg": 46,
+            "dmg": 57,
             "kind": "stun",
             "noVfx": true,
             "stop": 0.06,
@@ -689,7 +689,7 @@
        "depth": 220,
        "boom": 2,
        "hit": {
-        "dmg": 84,
+        "dmg": 103,
         "kind": "down",
         "vfx": "x3-c-hit-spark-light",
         "vs": 1.5,
@@ -713,7 +713,7 @@
        "depth": 220,
        "boom": 2,
        "hit": {
-        "dmg": 130,
+        "dmg": 160,
         "kind": "down",
         "vfx": "x3-c-hit-spark-light",
         "vs": 1.5,
@@ -742,15 +742,16 @@
   "gun": "thrown",
   "atk": {
    "9": 15,
-   "10": 16,
-   "11": 19,
-   "12": 26,
-   "13": 20,
-   "14": 22
+   "10": 15,
+   "11": 18,
+   "12": 25,
+   "13": 19,
+   "14": 21
   },
   "cd": {
    "skill": 2
   },
-  "shotDmg": 7
+  "shotDmg": 7,
+  "superType": "aoe"
  }
 }

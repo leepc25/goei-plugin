@@ -379,7 +379,7 @@
        "speed": 1500,
        "life": 0.75,
        "hit": {
-        "dmg": 29,
+        "dmg": 39,
         "kind": "light",
         "vfx": "x3-c-dust-puff",
         "tint": "#d8b878"
@@ -397,7 +397,7 @@
        "speed": 1500,
        "life": 0.75,
        "hit": {
-        "dmg": 29,
+        "dmg": 39,
         "kind": "light",
         "vfx": "x3-c-dust-puff",
         "tint": "#d8b878"
@@ -415,7 +415,7 @@
        "speed": 1500,
        "life": 0.75,
        "hit": {
-        "dmg": 38,
+        "dmg": 51,
         "kind": "heavy",
         "vfx": "x3-c-dust-puff",
         "vs": 1.6,
@@ -449,7 +449,7 @@
       "fade": 0.3,
       "r": 70,
       "hit": {
-       "dmg": 38,
+       "dmg": 75,
        "kind": "heavy"
       }
      }
@@ -470,7 +470,7 @@
       "r": 200,
       "delay": 0.2,
       "hit": {
-       "dmg": 77,
+       "dmg": 150,
        "kind": "down"
       }
      },
@@ -514,7 +514,7 @@
       "r": 200,
       "delay": 0.2,
       "hit": {
-       "dmg": 91,
+       "dmg": 170,
        "kind": "down"
       }
      },
@@ -549,10 +549,10 @@
         "t": "v",
         "vfx": "x3-4.10-S2-sand-pillar",
         "at": "front",
-        "dx": 260,
-        "r": 80,
+        "dx": 60,
+        "r": 100.0,
         "hit": {
-         "dmg": 108,
+         "dmg": 202,
          "kind": "launch"
         }
        }
@@ -566,10 +566,10 @@
         "t": "v",
         "vfx": "x3-4.10-S2-sand-pillar",
         "at": "front",
-        "dx": 455,
-        "r": 80,
+        "dx": 60,
+        "r": 100.0,
         "hit": {
-         "dmg": 108,
+         "dmg": 202,
          "kind": "launch"
         }
        }
@@ -583,10 +583,10 @@
         "t": "v",
         "vfx": "x3-4.10-S2-sand-pillar",
         "at": "front",
-        "dx": 650,
-        "r": 80,
+        "dx": 60,
+        "r": 100.0,
         "hit": {
-         "dmg": 120,
+         "dmg": 225,
          "kind": "launch"
         }
        },
@@ -684,16 +684,17 @@
   "gun": "none",
   "atk": {
    "9": 15,
-   "10": 16,
-   "11": 19,
-   "12": 26,
-   "13": 20,
-   "14": 22
+   "10": 15,
+   "11": 18,
+   "12": 25,
+   "13": 19,
+   "14": 21
   },
   "cd": {
    "skill": 2
   },
-  "shotDmg": 12
+  "shotDmg": 12,
+  "superType": "aoe"
  },
  "skills_2판": {
   "skill": {

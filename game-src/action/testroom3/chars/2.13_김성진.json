@@ -528,7 +528,7 @@
        "t": "proj",
        "kind": "bullet",
        "hit": {
-        "dmg": 27,
+        "dmg": 37,
         "kind": "light"
        }
       },
@@ -554,7 +554,7 @@
        "t": "proj",
        "kind": "bullet",
        "hit": {
-        "dmg": 27,
+        "dmg": 37,
         "kind": "light"
        }
       },
@@ -581,7 +581,7 @@
        "t": "proj",
        "kind": "bullet",
        "hit": {
-        "dmg": 41,
+        "dmg": 56,
         "kind": "heavy"
        }
       },
@@ -623,7 +623,7 @@
       "time": 0.22,
       "stop": 0.05,
       "hit": {
-       "dmg": 19,
+       "dmg": 71,
        "kind": "stun",
        "n": 2,
        "every": 0.14,
@@ -639,7 +639,7 @@
       "speed": 1300,
       "time": 0.35,
       "hit": {
-       "dmg": 77,
+       "dmg": 150,
        "kind": "down",
        "stop": 0.14,
        "shake": 12,
@@ -668,7 +668,7 @@
       "time": 0.24,
       "stop": 0.04,
       "hit": {
-       "dmg": 128,
+       "dmg": 240,
        "kind": "blow",
        "stop": 0.2,
        "shake": 16,
@@ -720,6 +720,20 @@
      "fx": [
       {
        "t": "v",
+       "vfx": "x3-2.13-F-bullet-fan",
+       "at": "hand",
+       "dx": 20,
+       "scale": 1.1,
+       "hit": {
+        "dmg": 18,
+        "kind": "light",
+        "n": 3
+       },
+       "r": 380,
+       "depth": 140
+      },
+      {
+       "t": "v",
        "vfx": "x3-c-muzzle-flash",
        "at": "hand",
        "dx": 10,
@@ -729,7 +743,7 @@
        "t": "proj",
        "kind": "bullet",
        "hit": {
-        "dmg": 10,
+        "dmg": 6,
         "kind": "light"
        },
        "spread": 0.5
@@ -748,6 +762,20 @@
      "fx": [
       {
        "t": "v",
+       "vfx": "x3-2.13-F-bullet-fan",
+       "at": "hand",
+       "dx": 20,
+       "scale": 1.5,
+       "hit": {
+        "dmg": 36,
+        "kind": "blow",
+        "n": 4
+       },
+       "r": 500,
+       "depth": 160
+      },
+      {
+       "t": "v",
        "vfx": "x3-c-muzzle-flash",
        "at": "hand",
        "dx": 10,
@@ -763,7 +791,7 @@
          "kind": "bullet",
          "big": true,
          "hit": {
-          "dmg": 22,
+          "dmg": 13,
           "kind": "down"
          },
          "spread": 0.6
@@ -794,14 +822,15 @@
   "atk": {
    "9": 13,
    "10": 14,
-   "11": 16,
-   "12": 22,
-   "13": 17,
+   "11": 17,
+   "12": 23,
+   "13": 18,
    "14": 19
   },
   "cd": {
    "skill": 2
   },
-  "shotDmg": 11
+  "shotDmg": 11,
+  "superType": "aoe"
  }
 }

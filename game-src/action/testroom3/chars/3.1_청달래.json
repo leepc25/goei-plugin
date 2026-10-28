@@ -508,7 +508,7 @@
        "r": 90,
        "delay": 0.4,
        "hit": {
-        "dmg": 102,
+        "dmg": 130,
         "kind": "down",
         "stop": 0.14,
         "shake": 8,
@@ -554,7 +554,7 @@
       "scale": 1.4,
       "r": 60,
       "hit": {
-       "dmg": 41,
+       "dmg": 75,
        "kind": "light"
       }
      }
@@ -569,7 +569,7 @@
       "r": 300,
       "depth": 50,
       "hit": {
-       "dmg": 82,
+       "dmg": 150,
        "kind": "heavy",
        "stop": 0.12,
        "shake": 10
@@ -596,7 +596,7 @@
       "r": 140,
       "delay": 0.25,
       "hit": {
-       "dmg": 109,
+       "dmg": 240,
        "kind": "blow",
        "stop": 0.18,
        "shake": 14
@@ -610,7 +610,7 @@
         "r": 220,
         "fade": 0.4,
         "hit": {
-         "dmg": 27,
+         "dmg": 59,
          "kind": "launch"
         }
        }
@@ -659,7 +659,7 @@
        "w": 1.05,
        "dy": 30,
        "hit": {
-        "dmg": 86,
+        "dmg": 91,
         "kind": "launch",
         "stop": 0.12,
         "shake": 14
@@ -676,7 +676,7 @@
          "w": 1.05,
          "dy": 30,
          "hit": {
-          "dmg": 86,
+          "dmg": 91,
           "kind": "launch",
           "stop": 0.12,
           "shake": 14
@@ -695,7 +695,7 @@
          "w": 1.05,
          "dy": 30,
          "hit": {
-          "dmg": 129,
+          "dmg": 137,
           "kind": "down",
           "stop": 0.12,
           "shake": 14
@@ -730,16 +730,17 @@
   "gun": "none",
   "atk": {
    "9": 14,
-   "10": 14,
+   "10": 15,
    "11": 17,
-   "12": 23,
+   "12": 24,
    "13": 18,
    "14": 20
   },
   "cd": {
    "skill": 2
   },
-  "shotDmg": 10
+  "shotDmg": 10,
+  "superType": "aoe"
  },
  "crawlRev": true
 }

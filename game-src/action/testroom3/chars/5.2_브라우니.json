@@ -412,7 +412,7 @@
        "tint": "#fff6c0",
        "r": 110,
        "hit": {
-        "dmg": 42,
+        "dmg": 54,
         "kind": "light"
        }
       }
@@ -431,7 +431,7 @@
        "tint": "#fff6c0",
        "r": 110,
        "hit": {
-        "dmg": 60,
+        "dmg": 76,
         "kind": "heavy"
        }
       }
@@ -468,7 +468,7 @@
       "h": 60,
       "scale": 1.1,
       "hit": {
-       "dmg": 41,
+       "dmg": 75,
        "kind": "down",
        "stop": 0.16,
        "shake": 12
@@ -512,7 +512,7 @@
         "under": true,
         "r": 231.2,
         "hit": {
-         "dmg": 82,
+         "dmg": 150,
          "kind": "down",
          "stop": 0.14
         }
@@ -533,7 +533,7 @@
       "scale": 2,
       "r": 128,
       "hit": {
-       "dmg": 55,
+       "dmg": 97,
        "kind": "light"
       }
      },
@@ -549,7 +549,7 @@
         "scale": 2,
         "r": 128,
         "hit": {
-         "dmg": 81,
+         "dmg": 143,
          "kind": "down"
         }
        }
@@ -590,7 +590,7 @@
        "w": 1.05,
        "tint": "#fff6c0",
        "hit": {
-        "dmg": 60,
+        "dmg": 64,
         "kind": "launch",
         "stop": 0.12
        }
@@ -620,7 +620,7 @@
        "w": 1.05,
        "tint": "#fff6c0",
        "hit": {
-        "dmg": 60,
+        "dmg": 64,
         "kind": "launch",
         "stop": 0.12
        }
@@ -650,7 +650,7 @@
        "w": 1.05,
        "tint": "#fff6c0",
        "hit": {
-        "dmg": 60,
+        "dmg": 64,
         "kind": "launch",
         "stop": 0.12
        }
@@ -680,7 +680,7 @@
        "h": 60,
        "scale": 1.8,
        "hit": {
-        "dmg": 120,
+        "dmg": 128,
         "kind": "down",
         "stop": 0.22,
         "shake": 18
@@ -713,17 +713,18 @@
   "speed": "slow",
   "gun": "none",
   "atk": {
-   "9": 16,
-   "10": 17,
-   "11": 20,
-   "12": 28,
-   "13": 21,
-   "14": 23
+   "9": 15,
+   "10": 16,
+   "11": 19,
+   "12": 26,
+   "13": 20,
+   "14": 22
   },
   "cd": {
    "skill": 2
   },
-  "shotDmg": 10
+  "shotDmg": 10,
+  "superType": "aoe"
  },
  "skills_2판": {
   "skill": {

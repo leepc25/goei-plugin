@@ -596,15 +596,14 @@
      "fx": [
       {
        "t": "v",
-       "vfx": "x3-c-vertical-blade-line",
+       "vfx": "x3-2.9-S2-textbook-cut",
        "at": "front",
-       "dx": 161,
+       "dx": 60,
        "dy": 50,
-       "scale": 0.9,
-       "tint": "#3fe0d0",
-       "r": 60,
+       "scale": 1.0,
+       "r": 100.0,
        "hit": {
-        "dmg": 138,
+        "dmg": 130,
         "kind": "down",
         "vfx": "x3-c-hit-spark-heavy",
         "vs": 0.8,
@@ -655,18 +654,18 @@
       "t": "v",
       "vfx": "x3-c-slash-arc",
       "at": "front",
-      "dx": 160,
+      "dx": 60,
       "scale": 0.6,
       "rot": -0.6,
       "tint": "#bff7f0",
       "hit": {
-       "dmg": 55,
+       "dmg": 75,
        "kind": "light",
        "vfx": "x3-c-hit-spark-light",
        "vs": 2,
        "tint": "#bff7f0"
       },
-      "r": 91.7
+      "r": 166.7
      }
     ],
     "1": [
@@ -675,7 +674,7 @@
       "speed": 1500,
       "time": 0.35,
       "hit": {
-       "dmg": 110,
+       "dmg": 150,
        "kind": "heavy",
        "vfx": "x3-c-hit-spark-heavy",
        "vs": 0.7,
@@ -729,18 +728,18 @@
         "each": [
          {
           "t": "v",
-          "vfx": "x3-c-vertical-blade-line",
+          "vfx": "x3-2.9-S2-textbook-cut",
           "dy": 50,
-          "scale": 0.9,
-          "tint": "#3fe0d0",
-          "r": 60,
+          "scale": 1.2,
+          "r": 83.3,
           "hit": {
-           "dmg": 184,
+           "dmg": 240,
            "kind": "down",
            "vfx": "x3-c-hit-spark-heavy",
            "vs": 0.8,
            "tint": "#bff7f0"
-          }
+          },
+          "dx": 60
          },
          {
           "t": "v",
@@ -805,7 +804,7 @@
        "fade": 0.3,
        "delay": 0.45,
        "hit": {
-        "dmg": 340,
+        "dmg": 320,
         "kind": "blow",
         "stop": 0.22,
         "shake": 16,
@@ -882,6 +881,7 @@
   "cd": {
    "skill": 2
   },
-  "shotDmg": 10
+  "shotDmg": 10,
+  "superType": "aoe"
  }
 }

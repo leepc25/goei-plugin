@@ -508,9 +508,9 @@
      "fx": [
       {
        "t": "melee",
-       "range": 140,
+       "range": 190,
        "hit": {
-        "dmg": 102,
+        "dmg": 130,
         "kind": "launch",
         "vfx": "x3-c-hit-spark-light",
         "vs": 1.8,
@@ -548,7 +548,7 @@
       "size": 0.8,
       "pierce": false,
       "hit": {
-       "dmg": 8,
+       "dmg": 15,
        "kind": "light",
        "vfx": "x3-c-hit-spark-light",
        "tint": "#F2C230",
@@ -565,7 +565,7 @@
       "size": 0.8,
       "pierce": false,
       "hit": {
-       "dmg": 8,
+       "dmg": 15,
        "kind": "light",
        "vfx": "x3-c-hit-spark-light",
        "tint": "#F2C230",
@@ -582,7 +582,7 @@
       "size": 0.8,
       "pierce": false,
       "hit": {
-       "dmg": 8,
+       "dmg": 15,
        "kind": "light",
        "vfx": "x3-c-hit-spark-light",
        "tint": "#F2C230",
@@ -599,7 +599,7 @@
       "size": 0.8,
       "pierce": false,
       "hit": {
-       "dmg": 8,
+       "dmg": 15,
        "kind": "light",
        "vfx": "x3-c-hit-spark-light",
        "tint": "#F2C230",
@@ -616,7 +616,7 @@
       "size": 0.8,
       "pierce": false,
       "hit": {
-       "dmg": 8,
+       "dmg": 15,
        "kind": "light",
        "vfx": "x3-c-hit-spark-light",
        "tint": "#F2C230",
@@ -648,7 +648,7 @@
         "size": 0.9,
         "pierce": true,
         "hit": {
-         "dmg": 9,
+         "dmg": 15,
          "kind": "light",
          "vfx": "x3-c-hit-spark-light",
          "tint": "#F2C230",
@@ -671,7 +671,7 @@
         "size": 0.9,
         "pierce": true,
         "hit": {
-         "dmg": 9,
+         "dmg": 15,
          "kind": "light",
          "vfx": "x3-c-hit-spark-light",
          "tint": "#F2C230",
@@ -694,7 +694,7 @@
         "size": 0.9,
         "pierce": true,
         "hit": {
-         "dmg": 9,
+         "dmg": 15,
          "kind": "light",
          "vfx": "x3-c-hit-spark-light",
          "tint": "#F2C230",
@@ -717,7 +717,7 @@
         "size": 0.9,
         "pierce": true,
         "hit": {
-         "dmg": 9,
+         "dmg": 15,
          "kind": "light",
          "vfx": "x3-c-hit-spark-light",
          "tint": "#F2C230",
@@ -740,7 +740,7 @@
         "size": 0.9,
         "pierce": true,
         "hit": {
-         "dmg": 9,
+         "dmg": 15,
          "kind": "light",
          "vfx": "x3-c-hit-spark-light",
          "tint": "#F2C230",
@@ -763,7 +763,7 @@
         "size": 0.9,
         "pierce": true,
         "hit": {
-         "dmg": 9,
+         "dmg": 15,
          "kind": "light",
          "vfx": "x3-c-hit-spark-light",
          "tint": "#F2C230",
@@ -786,7 +786,7 @@
         "size": 0.9,
         "pierce": true,
         "hit": {
-         "dmg": 9,
+         "dmg": 15,
          "kind": "light",
          "vfx": "x3-c-hit-spark-light",
          "tint": "#F2C230",
@@ -809,7 +809,7 @@
         "size": 0.9,
         "pierce": true,
         "hit": {
-         "dmg": 26,
+         "dmg": 44,
          "kind": "heavy",
          "vfx": "x3-c-hit-spark-light",
          "tint": "#F2C230",
@@ -832,7 +832,7 @@
       "range": 700,
       "depth": 90,
       "hit": {
-       "dmg": 91,
+       "dmg": 160,
        "n": 5,
        "every": 0.1,
        "mid": "light",
@@ -899,6 +899,13 @@
          }
         }
        ]
+      },
+      {
+       "t": "v",
+       "vfx": "x3-3.11-F-coin-storm",
+       "at": "screen",
+       "w": 1.0,
+       "dy": -120
       }
      ]
     },
@@ -965,6 +972,13 @@
      "hold": 0.35,
      "fx": [
       {
+       "t": "v",
+       "vfx": "x3-3.11-F-coin-storm",
+       "at": "screen",
+       "w": 1.0,
+       "dy": -80
+      },
+      {
        "t": "rain",
        "icon": "coin",
        "n": 60,
@@ -978,7 +992,7 @@
       {
        "t": "hit",
        "hit": {
-        "dmg": 142,
+        "dmg": 152,
         "n": 6,
         "every": 0.1,
         "mid": "light",
@@ -1030,15 +1044,16 @@
   "gun": "thrown",
   "atk": {
    "9": 14,
-   "10": 14,
+   "10": 15,
    "11": 17,
-   "12": 23,
+   "12": 24,
    "13": 18,
    "14": 20
   },
   "cd": {
    "skill": 2
   },
-  "shotDmg": 7
+  "shotDmg": 7,
+  "superType": "aoe"
  }
 }

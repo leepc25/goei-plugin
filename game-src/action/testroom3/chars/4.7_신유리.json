@@ -432,7 +432,7 @@
        "t": "melee",
        "range": 150,
        "hit": {
-        "dmg": 61,
+        "dmg": 57,
         "kind": "light",
         "vfx": "x3-c-hit-spark-light",
         "vs": 1.4
@@ -456,7 +456,7 @@
        "t": "melee",
        "range": 150,
        "hit": {
-        "dmg": 77,
+        "dmg": 73,
         "kind": "light",
         "vfx": "x3-c-hit-spark-light",
         "vs": 1.6,
@@ -490,7 +490,7 @@
       "t": "melee",
       "range": 120,
       "hit": {
-       "dmg": 55,
+       "dmg": 75,
        "kind": "stun",
        "vfx": "x3-c-hit-spark-light",
        "vs": 1.6
@@ -503,7 +503,7 @@
       "speed": 1500,
       "time": 0.27,
       "hit": {
-       "dmg": 110,
+       "dmg": 150,
        "kind": "down",
        "vfx": "x3-c-hit-spark-heavy",
        "vs": 0.8
@@ -534,7 +534,7 @@
       "speed": 1500,
       "time": 0.27,
       "hit": {
-       "dmg": 78,
+       "dmg": 102,
        "kind": "down"
       }
      },
@@ -552,16 +552,16 @@
         "t": "v",
         "vfx": "x3-c-hit-spark-heavy",
         "at": "front",
-        "dx": 151,
+        "dx": 60,
         "h": 20,
         "scale": 1.1,
         "hit": {
-         "dmg": 106,
+         "dmg": 138,
          "kind": "down",
          "stop": 0.18,
          "shake": 14
         },
-        "r": 58.2
+        "r": 90.9
        },
        {
         "t": "v",
@@ -573,11 +573,10 @@
        },
        {
         "t": "v",
-        "vfx": "x3-c-ground-shockwave",
+        "vfx": "x3-4.7-S2-steel-stomp",
         "at": "front",
         "dx": 70,
-        "scale": 0.8,
-        "tint": "#d8dde6",
+        "scale": 0.55,
         "under": true
        },
        {
@@ -616,7 +615,7 @@
          "t": "pull",
          "dist": 140,
          "hit": {
-          "dmg": 24,
+          "dmg": 30,
           "kind": "pull"
          }
         },
@@ -653,7 +652,7 @@
           {
            "t": "hit",
            "hit": {
-            "dmg": 30,
+            "dmg": 37,
             "kind": "light",
             "stop": 0.06,
             "shake": 9
@@ -680,7 +679,7 @@
        "scale": 0.8,
        "tint": "#d8dde6",
        "hit": {
-        "dmg": 36,
+        "dmg": 44,
         "kind": "light"
        }
       }
@@ -698,7 +697,7 @@
        "tint": "#d8dde6",
        "flip": false,
        "hit": {
-        "dmg": 36,
+        "dmg": 44,
         "kind": "light"
        }
       }
@@ -715,7 +714,7 @@
        "scale": 0.9,
        "tint": "#d8dde6",
        "hit": {
-        "dmg": 41,
+        "dmg": 51,
         "kind": "light"
        }
       }
@@ -735,7 +734,7 @@
       {
        "t": "hit",
        "hit": {
-        "dmg": 113,
+        "dmg": 140,
         "kind": "blow",
         "stop": 0.2,
         "shake": 14
@@ -771,17 +770,18 @@
   "speed": "fast",
   "gun": "thrown",
   "atk": {
-   "9": 13,
+   "9": 14,
    "10": 14,
    "11": 17,
    "12": 23,
    "13": 18,
-   "14": 19
+   "14": 20
   },
   "cd": {
    "skill": 2
   },
-  "shotDmg": 7
+  "shotDmg": 7,
+  "superType": "single"
  },
  "skills_2판": {
   "skill": {

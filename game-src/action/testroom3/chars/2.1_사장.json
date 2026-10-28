@@ -369,7 +369,7 @@
        "r": 125,
        "delay": 0.25,
        "hit": {
-        "dmg": 138,
+        "dmg": 130,
         "kind": "launch",
         "vfx": "x3-c-hit-spark-light",
         "vs": 1.6,
@@ -451,7 +451,7 @@
         "t": "melee",
         "range": 280,
         "hit": {
-         "dmg": 55,
+         "dmg": 75,
          "kind": "heavy"
         }
        }
@@ -506,7 +506,7 @@
         "scale": 0.9,
         "tint": "#c8c8d0",
         "hit": {
-         "dmg": 110,
+         "dmg": 150,
          "kind": "launch"
         }
        }
@@ -577,7 +577,7 @@
         "dy": 220,
         "delay": 0.25,
         "hit": {
-         "dmg": 184,
+         "dmg": 240,
          "kind": "down",
          "stop": 0.16
         }
@@ -684,7 +684,7 @@
          "scale": 1.1,
          "rot": -0.785,
          "hit": {
-          "dmg": 340,
+          "dmg": 320,
           "kind": "launch",
           "stop": 0.25,
           "shake": 18
@@ -933,16 +933,17 @@
   "speed": "fast",
   "gun": "none",
   "atk": {
-   "9": 13,
+   "9": 14,
    "10": 14,
    "11": 17,
    "12": 23,
    "13": 18,
-   "14": 19
+   "14": 20
   },
   "cd": {
    "skill": 2
   },
-  "shotDmg": 10
+  "shotDmg": 10,
+  "superType": "aoe"
  }
 }

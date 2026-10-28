@@ -397,7 +397,7 @@
        "r": 40,
        "boom": 1,
        "hit": {
-        "dmg": 43,
+        "dmg": 58,
         "kind": "light",
         "stop": 0.06
        }
@@ -423,7 +423,7 @@
        "r": 40,
        "boom": 1,
        "hit": {
-        "dmg": 53,
+        "dmg": 72,
         "kind": "light",
         "stop": 0.08
        }
@@ -465,7 +465,7 @@
       "r": 40,
       "boom": 1,
       "hit": {
-       "dmg": 38,
+       "dmg": 75,
        "kind": "light"
       }
      }
@@ -492,7 +492,7 @@
         "boom": 1,
         "dx": 700,
         "hit": {
-         "dmg": 51,
+         "dmg": 100,
          "kind": "heavy",
          "stop": 0.04,
          "shake": 4
@@ -515,7 +515,7 @@
         "boom": 1,
         "dx": 600,
         "hit": {
-         "dmg": 51,
+         "dmg": 100,
          "kind": "heavy",
          "stop": 0.04,
          "shake": 4
@@ -538,7 +538,7 @@
         "boom": 1,
         "dx": 500,
         "hit": {
-         "dmg": 51,
+         "dmg": 100,
          "kind": "heavy",
          "stop": 0.04,
          "shake": 4
@@ -561,7 +561,7 @@
         "boom": 1,
         "dx": 400,
         "hit": {
-         "dmg": 51,
+         "dmg": 100,
          "kind": "heavy",
          "stop": 0.04,
          "shake": 4
@@ -584,7 +584,7 @@
         "boom": 1,
         "dx": 300,
         "hit": {
-         "dmg": 51,
+         "dmg": 100,
          "kind": "heavy",
          "stop": 0.04,
          "shake": 4
@@ -615,7 +615,7 @@
         "boom": 1,
         "dx": 300,
         "hit": {
-         "dmg": 12,
+         "dmg": 10,
          "kind": "heavy",
          "stop": 0.03,
          "shake": 3
@@ -638,7 +638,7 @@
         "boom": 1,
         "dx": 150,
         "hit": {
-         "dmg": 12,
+         "dmg": 10,
          "kind": "heavy",
          "stop": 0.03,
          "shake": 3
@@ -661,7 +661,7 @@
         "boom": 1,
         "dx": 0,
         "hit": {
-         "dmg": 12,
+         "dmg": 10,
          "kind": "heavy",
          "stop": 0.03,
          "shake": 3
@@ -705,7 +705,7 @@
         "r": 50,
         "depth": 140,
         "hit": {
-         "dmg": 91,
+         "dmg": 77,
          "kind": "launch",
          "stop": 0.16,
          "shake": 12
@@ -1140,16 +1140,17 @@
   "speed": "fast",
   "gun": "none",
   "atk": {
-   "9": 11,
-   "10": 12,
-   "11": 14,
-   "12": 19,
-   "13": 15,
-   "14": 16
+   "9": 12,
+   "10": 13,
+   "11": 15,
+   "12": 21,
+   "13": 16,
+   "14": 17
   },
   "cd": {
    "skill": 2
   },
-  "shotDmg": 12
+  "shotDmg": 12,
+  "superType": "aoe"
  }
 }

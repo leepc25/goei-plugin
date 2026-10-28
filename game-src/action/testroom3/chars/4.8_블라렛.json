@@ -431,7 +431,7 @@
        "h": 90,
        "scale": 1.1,
        "hit": {
-        "dmg": 126,
+        "dmg": 130,
         "kind": "down",
         "vfx": "x3-c-hit-spark-heavy",
         "vs": 1,
@@ -481,7 +481,7 @@
         "t": "proj",
         "kind": "bullet",
         "hit": {
-         "dmg": 25,
+         "dmg": 38,
          "kind": "light"
         }
        }
@@ -499,7 +499,7 @@
         "kind": "bullet",
         "spread": 0.1,
         "hit": {
-         "dmg": 17,
+         "dmg": 25,
          "kind": "light",
          "stop": 0.03
         }
@@ -515,7 +515,7 @@
       "dx": 160,
       "scale": 1.15,
       "hit": {
-       "dmg": 168,
+       "dmg": 240,
        "kind": "blow",
        "n": 3,
        "mid": "light",
@@ -567,7 +567,7 @@
            "at": "target",
            "scale": 1.1,
            "hit": {
-            "dmg": 93,
+            "dmg": 54,
             "kind": "down",
             "stop": 0.1,
             "shake": 10
@@ -614,7 +614,7 @@
          "at": "screen",
          "scale": 2.1,
          "hit": {
-          "dmg": 243,
+          "dmg": 142,
           "kind": "launch",
           "n": 2,
           "mid": "heavy",
@@ -654,7 +654,7 @@
         {
          "t": "hit",
          "hit": {
-          "dmg": 212,
+          "dmg": 124,
           "kind": "blow",
           "stop": 0.2,
           "shake": 16
@@ -688,13 +688,14 @@
    "10": 15,
    "11": 18,
    "12": 24,
-   "13": 18,
+   "13": 19,
    "14": 20
   },
   "cd": {
    "skill": 2
   },
-  "shotDmg": 9
+  "shotDmg": 9,
+  "superType": "aoe"
  },
  "skills_2판": {
   "skill": {

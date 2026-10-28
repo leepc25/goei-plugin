@@ -415,7 +415,7 @@
        "t": "melee",
        "range": 170,
        "hit": {
-        "dmg": 18,
+        "dmg": 17,
         "kind": "light",
         "stop": 0.1
        }
@@ -445,7 +445,7 @@
        "tint": "#7a8aa0",
        "delay": 0.1,
        "hit": {
-        "dmg": 55,
+        "dmg": 52,
         "kind": "light"
        }
       }
@@ -459,7 +459,7 @@
        "t": "melee",
        "range": 200,
        "hit": {
-        "dmg": 65,
+        "dmg": 61,
         "kind": "blow"
        }
       }
@@ -500,7 +500,7 @@
       "pierce": true,
       "dy": 0,
       "hit": {
-       "dmg": 55,
+       "dmg": 75,
        "kind": "heavy"
       }
      }
@@ -537,7 +537,7 @@
       "pierce": true,
       "dy": 0,
       "hit": {
-       "dmg": 102,
+       "dmg": 139,
        "kind": "heavy"
       }
      },
@@ -596,10 +596,26 @@
         "at": "target",
         "scale": 1,
         "hit": {
-         "dmg": 184,
+         "dmg": 240,
          "kind": "launch",
          "stop": 0.18
         }
+       }
+      ]
+     },
+     {
+      "t": "later",
+      "in": 0.5,
+      "fx": [
+       {
+        "t": "v",
+        "vfx": "x3-2.7-S2-cross-burst",
+        "at": "target",
+        "scale": 0.8
+       },
+       {
+        "t": "flash",
+        "v": 0.08
        }
       ]
      }
@@ -650,11 +666,19 @@
          "scale": 0.8,
          "tint": "#7a8aa0",
          "hit": {
-          "dmg": 28,
+          "dmg": 26,
           "kind": "light"
          }
         }
        ]
+      },
+      {
+       "t": "v",
+       "vfx": "x3-2.7-F-blade-lines",
+       "at": "screen",
+       "w": 1.0,
+       "dy": -60,
+       "hold": 1.2
       }
      ]
     },
@@ -669,7 +693,7 @@
        "rot": 1.2,
        "tint": "#7a8aa0",
        "hit": {
-        "dmg": 34,
+        "dmg": 32,
         "kind": "light"
        }
       }
@@ -686,7 +710,7 @@
        "rot": -1.0,
        "tint": "#7a8aa0",
        "hit": {
-        "dmg": 34,
+        "dmg": 32,
         "kind": "light"
        }
       }
@@ -702,7 +726,7 @@
        "scale": 1.2,
        "tint": "#7a8aa0",
        "hit": {
-        "dmg": 34,
+        "dmg": 32,
         "kind": "heavy"
        }
       }
@@ -712,6 +736,13 @@
      "f": 10,
      "hold": 0.4,
      "fx": [
+      {
+       "t": "v",
+       "vfx": "x3-2.7-F-blade-lines",
+       "at": "screen",
+       "w": 1.0,
+       "dy": -60
+      },
       {
        "t": "flash",
        "v": 0.12
@@ -734,7 +765,7 @@
          "scale": 0.8,
          "tint": "#7a8aa0",
          "hit": {
-          "dmg": 154,
+          "dmg": 145,
           "kind": "launch",
           "stop": 0.22,
           "shake": 16
@@ -753,7 +784,7 @@
          "scale": 0.6,
          "under": true,
          "hit": {
-          "dmg": 55,
+          "dmg": 52,
           "kind": "spike"
          }
         }
@@ -1022,6 +1053,7 @@
   "cd": {
    "skill": 2
   },
-  "shotDmg": 10
+  "shotDmg": 10,
+  "superType": "aoe"
  }
 }

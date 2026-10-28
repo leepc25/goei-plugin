@@ -587,7 +587,7 @@
        "scale": 1.1,
        "r": 70,
        "hit": {
-        "dmg": 63,
+        "dmg": 43,
         "kind": "light",
         "vfx": "x3-c-hit-spark-light",
         "vs": 1.4
@@ -602,7 +602,7 @@
        "t": "pull",
        "dist": 220,
        "hit": {
-        "dmg": 32,
+        "dmg": 22,
         "kind": "pull",
         "noVfx": true,
         "stop": 0.05,
@@ -622,7 +622,7 @@
         {
          "t": "hit",
          "hit": {
-          "dmg": 94,
+          "dmg": 65,
           "kind": "down",
           "vfx": "x3-c-hit-spark-heavy",
           "vs": 0.7,
@@ -665,7 +665,7 @@
       "t": "melee",
       "range": 180,
       "hit": {
-       "dmg": 50,
+       "dmg": 75,
        "kind": "heavy",
        "vfx": "x3-c-hit-spark-heavy",
        "vs": 0.6
@@ -681,7 +681,7 @@
       "scale": 2.2,
       "r": 260,
       "hit": {
-       "dmg": 101,
+       "dmg": 150,
        "kind": "blow",
        "vfx": "x3-c-hit-spark-heavy",
        "vs": 0.8,
@@ -707,7 +707,7 @@
       "t": "pull",
       "dist": 120,
       "hit": {
-       "dmg": 24,
+       "dmg": 34,
        "kind": "pull",
        "noVfx": true,
        "stop": 0.04,
@@ -721,7 +721,7 @@
        {
         "t": "hit",
         "hit": {
-         "dmg": 144,
+         "dmg": 206,
          "kind": "down",
          "vfx": "x3-c-hit-spark-heavy",
          "stop": 0.18,
@@ -803,7 +803,7 @@
        "time": 1.2,
        "color": "#E6E2D3",
        "hit": {
-        "dmg": 26,
+        "dmg": 32,
         "kind": "light",
         "noVfx": true
        }
@@ -825,7 +825,7 @@
        "t": "melee",
        "range": 220,
        "hit": {
-        "dmg": 94,
+        "dmg": 116,
         "kind": "light",
         "vfx": "x3-c-hit-spark-heavy",
         "vs": 0.7,
@@ -851,7 +851,7 @@
        "t": "melee",
        "range": 220,
        "hit": {
-        "dmg": 219,
+        "dmg": 271,
         "kind": "blow",
         "vfx": "x3-c-hit-spark-heavy",
         "stop": 0.24,
@@ -892,16 +892,17 @@
   "speed": "slow",
   "gun": "thrown",
   "atk": {
-   "9": 19,
-   "10": 20,
-   "11": 24,
-   "12": 32,
-   "13": 25,
-   "14": 27
+   "9": 17,
+   "10": 18,
+   "11": 22,
+   "12": 29,
+   "13": 23,
+   "14": 25
   },
   "cd": {
    "skill": 2
   },
-  "shotDmg": 7
+  "shotDmg": 7,
+  "superType": "single"
  }
 }

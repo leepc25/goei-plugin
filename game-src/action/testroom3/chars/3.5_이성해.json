@@ -559,7 +559,7 @@
        "t": "melee",
        "range": 190,
        "hit": {
-        "dmg": 138,
+        "dmg": 130,
         "kind": "heavy",
         "vfx": "x3-c-hit-spark-heavy",
         "vs": 0.6,
@@ -600,7 +600,7 @@
       "tint": "#5EC4D6",
       "r": 70,
       "hit": {
-       "dmg": 55,
+       "dmg": 75,
        "kind": "light",
        "noVfx": true,
        "stop": 0.1,
@@ -615,7 +615,7 @@
       "time": 0.3,
       "delay": 0.12,
       "hit": {
-       "dmg": 110,
+       "dmg": 150,
        "kind": "launch",
        "vfx": "x3-c-hit-spark-heavy",
        "vs": 0.7,
@@ -651,7 +651,7 @@
       "speed": 1000,
       "time": 0.5,
       "hit": {
-       "dmg": 188,
+       "dmg": 239,
        "n": 3,
        "every": 0.15,
        "mid": "light",
@@ -718,7 +718,7 @@
        "t": "pull",
        "dist": 200,
        "hit": {
-        "dmg": 30,
+        "dmg": 37,
         "kind": "pull",
         "noVfx": true,
         "stop": 0.05,
@@ -751,7 +751,7 @@
        "t": "melee",
        "range": 220,
        "hit": {
-        "dmg": 62,
+        "dmg": 77,
         "kind": "heavy",
         "vfx": "x3-c-hit-spark-light",
         "vs": 1.4
@@ -800,7 +800,7 @@
        "tint": "#9aa0a6",
        "boom": 3,
        "hit": {
-        "dmg": 247,
+        "dmg": 306,
         "kind": "blow",
         "vfx": "x3-c-hit-spark-heavy",
         "stop": 0.2,
@@ -822,17 +822,18 @@
   "speed": "fast",
   "gun": "thrown",
   "atk": {
-   "9": 13,
+   "9": 14,
    "10": 14,
    "11": 17,
    "12": 23,
    "13": 18,
-   "14": 19
+   "14": 20
   },
   "cd": {
    "skill": 2
   },
-  "shotDmg": 7
+  "shotDmg": 7,
+  "superType": "single"
  },
  "fallRev": true
 }

@@ -510,7 +510,7 @@
          "t": "melee",
          "range": 150,
          "hit": {
-          "dmg": 113,
+          "dmg": 59,
           "kind": "light",
           "vfx": "x3-c-hit-spark-light",
           "vs": 1.4
@@ -531,7 +531,7 @@
          "t": "melee",
          "range": 170,
          "hit": {
-          "dmg": 138,
+          "dmg": 71,
           "kind": "heavy",
           "vfx": "x3-c-hit-spark-heavy",
           "vs": 0.6
@@ -589,7 +589,7 @@
         "speed": 1400,
         "time": 0.35,
         "hit": {
-         "dmg": 55,
+         "dmg": 75,
          "kind": "down",
          "vfx": "x3-c-hit-spark-heavy",
          "vs": 0.6
@@ -611,7 +611,7 @@
       "speed": 1300,
       "time": 0.38,
       "hit": {
-       "dmg": 110,
+       "dmg": 150,
        "n": 2,
        "every": 0.3,
        "mid": "light",
@@ -636,9 +636,9 @@
      },
      {
       "t": "melee",
-      "range": 170,
+      "range": 190,
       "hit": {
-       "dmg": 184,
+       "dmg": 240,
        "kind": "blow",
        "vfx": "x3-c-hit-spark-heavy",
        "vs": 0.7,
@@ -739,7 +739,7 @@
          "t": "melee",
          "range": 170,
          "hit": {
-          "dmg": 94,
+          "dmg": 70,
           "kind": "heavy",
           "vfx": "x3-c-hit-spark-heavy",
           "vs": 0.6,
@@ -762,7 +762,7 @@
          "t": "melee",
          "range": 170,
          "hit": {
-          "dmg": 120,
+          "dmg": 90,
           "kind": "down",
           "vfx": "x3-c-hit-spark-light",
           "vs": 1.5
@@ -833,7 +833,7 @@
          "t": "melee",
          "range": 170,
          "hit": {
-          "dmg": 94,
+          "dmg": 70,
           "kind": "heavy",
           "vfx": "x3-c-hit-spark-heavy",
           "vs": 0.6,
@@ -856,7 +856,7 @@
          "t": "melee",
          "range": 170,
          "hit": {
-          "dmg": 120,
+          "dmg": 90,
           "kind": "down",
           "vfx": "x3-c-hit-spark-light",
           "vs": 1.5
@@ -927,20 +927,19 @@
          "vfx": "x3-c-ground-crack",
          "at": "front",
          "dx": 40,
-         "scale": 1.6,
+         "scale": 0.8,
          "under": true,
          "boom": 3
         },
         {
          "t": "v",
-         "vfx": "x3-c-ground-shockwave",
+         "vfx": "x3-3.9-F-purple-smash",
          "at": "front",
          "dx": 40,
-         "scale": 1.3,
          "under": true,
-         "r": 260,
+         "r": 400,
          "hit": {
-          "dmg": 353,
+          "dmg": 264,
           "n": 2,
           "every": 0.2,
           "mid": "down",
@@ -948,7 +947,9 @@
           "vfx": "x3-c-hit-spark-heavy",
           "stop": 0.22,
           "shake": 20
-         }
+         },
+         "w": 0.95,
+         "depth": 120
         }
        ]
       }
@@ -972,16 +973,17 @@
   "speed": "fast",
   "gun": "thrown",
   "atk": {
-   "9": 13,
+   "9": 14,
    "10": 14,
    "11": 17,
    "12": 23,
    "13": 18,
-   "14": 19
+   "14": 20
   },
   "cd": {
    "skill": 2
   },
-  "shotDmg": 7
+  "shotDmg": 7,
+  "superType": "aoe"
  }
 }

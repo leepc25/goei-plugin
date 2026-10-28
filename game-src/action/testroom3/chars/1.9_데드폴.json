@@ -396,7 +396,7 @@
        "r": 231.2,
        "depth": 90,
        "hit": {
-        "dmg": 102,
+        "dmg": 130,
         "kind": "heavy",
         "stop": 0.1,
         "shake": 8
@@ -432,7 +432,7 @@
       "t": "proj",
       "kind": "bullet",
       "hit": {
-       "dmg": 20,
+       "dmg": 38,
        "kind": "light"
       }
      },
@@ -444,7 +444,7 @@
         "t": "proj",
         "kind": "bullet",
         "hit": {
-         "dmg": 20,
+         "dmg": 38,
          "kind": "light"
         }
        }
@@ -457,7 +457,7 @@
       "speed": 1600,
       "time": 0.45,
       "hit": {
-       "dmg": 82,
+       "dmg": 150,
        "kind": "blow",
        "stop": 0.16,
        "shake": 12,
@@ -489,7 +489,7 @@
         "t": "proj",
         "kind": "bullet",
         "hit": {
-         "dmg": 30,
+         "dmg": 53,
          "kind": "light"
         }
        }
@@ -504,7 +504,7 @@
         "kind": "bullet",
         "big": true,
         "hit": {
-         "dmg": 45,
+         "dmg": 80,
          "kind": "down",
          "stop": 0.12,
          "shake": 8
@@ -584,7 +584,7 @@
          "tint": "#8FA4FF",
          "r": 60,
          "hit": {
-          "dmg": 218,
+          "dmg": 249,
           "kind": "launch",
           "stop": 0.2,
           "shake": 14
@@ -604,7 +604,7 @@
         {
          "t": "hit",
          "hit": {
-          "dmg": 62,
+          "dmg": 71,
           "kind": "spike",
           "stop": 0.16,
           "shake": 14
@@ -800,7 +800,7 @@
   "speed": "fast",
   "gun": "single",
   "atk": {
-   "9": 15,
+   "9": 14,
    "10": 15,
    "11": 18,
    "12": 25,
@@ -810,6 +810,7 @@
   "cd": {
    "skill": 2
   },
-  "shotDmg": 9
+  "shotDmg": 9,
+  "superType": "aoe"
  }
 }

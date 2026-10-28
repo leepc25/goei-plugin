@@ -1334,5 +1334,133 @@
   "kind": "own",
   "mode": "center",
   "desc": "A huge storm of gold coins for a finishing move: hundreds of small golden coins with square holes punched in the middle stream across the whole frame in three thick horizontal rivers that cross from left to right, spinning and glinting, then scatter and rain downward in a dense glittering shower that fades out. Very large: fills the full frame width and most of its height. Flashy and rich, 10 frames. Colors: gold, yellow, amber, white glints. A standalone effect, not attached to any hand or character. Size reference only: the given character. Pixel art effect, transparent background, crisp hard-edged pixels, no blur, no background scenery. Draw only the effect: no people, no character body or hands, no creatures, monsters, animals, faces, letters or numbers."
+ },
+ {
+  "name": "x3-3.12-F-ground-fan",
+  "key": "3.12_장허운",
+  "row": "필살기 전용(10-29)",
+  "kind": "own",
+  "mode": "bottom",
+  "desc": "A huge fan-shaped ground eruption for a finishing move: starting from a planted foot at the bottom center, the floor splits and bursts upward in a widening fan toward the right, brown earth and grey stone slabs heaving up in a wedge, big cracks spreading, chunks of ground and dust flung high, then the debris falls back leaving a broken cratered fan of floor that fades. Very large: wider than four character heights, flat perspective on the ground. Heavy and violent, 10 frames. Colors: brown earth, grey stone, pale dust, dark cracks. A standalone effect, not attached to any hand or character. Size reference only: the given character. Pixel art effect, transparent background, crisp hard-edged pixels, no blur, no background scenery. Draw only the effect: no people, no character body or hands, no creatures, monsters, animals, faces, letters or numbers."
+ },
+ {
+  "name": "x3-3.8-F-crater-ring",
+  "key": "3.8_박민성",
+  "row": "필살기 전용(10-29)",
+  "kind": "own",
+  "mode": "bottom",
+  "desc": "A huge sit-down crush impact for a finishing move: the floor caves in into a round bowl-shaped crater at the center, and a thick flat ring of grey-brown dust and shockwave rushes outward along the ground to the full frame width, with floor chunks and a spray of sweat-like white droplets thrown up, then the dust settles leaving the dark crater. Very large: wider than four character heights, flat perspective ellipse. Heavy and dramatic, 10 frames. Colors: grey-brown dust, dark crater, pale stone, white droplets. A standalone effect, not attached to any hand or character. Size reference only: the given character. Pixel art effect, transparent background, crisp hard-edged pixels, no blur, no background scenery. Draw only the effect: no people, no character body or hands, no creatures, monsters, animals, faces, letters or numbers."
+ },
+ {
+  "name": "x3-3.9-F-purple-smash",
+  "key": "3.9_백사헌",
+  "row": "필살기 전용(10-29)",
+  "kind": "own",
+  "mode": "bottom",
+  "desc": "A huge knee-drop ground smash for a finishing move: a violent impact point on the floor with a bright violet flash, the ground splitting into long jagged cracks that race outward in all directions glowing purple from inside, slabs of floor tilting up, dark debris and purple sparks bursting upward, then a wide flat purple shock ring spreading to the frame edges and fading. Very large: wider than four character heights, flat perspective on the ground. Brutal and flashy, 10 frames. Colors: violet, magenta glow, black-grey floor, white flash core. A standalone effect, not attached to any hand or character. Size reference only: the given character. Pixel art effect, transparent background, crisp hard-edged pixels, no blur, no background scenery. Draw only the effect: no people, no character body or hands, no creatures, monsters, animals, faces, letters or numbers."
+ },
+ {
+  "name": "x3-4.4-F-peach-dust-ring",
+  "key": "4.4_윤지아",
+  "row": "필살기 전용(10-29)",
+  "kind": "own",
+  "mode": "bottom",
+  "desc": "A huge peach-colored dust shockwave for a finishing move: a body is slammed down and a thick flat ring of apricot-peach dust and pale light bursts outward along the floor, growing to the full frame width, billowing at the edge with soft rolling dust clouds, a second brighter inner ring following, then dissolving into drifting dust. Very large: wider than four character heights, low flat perspective ellipse. Soft colors but dramatic motion, 10 frames. Colors: apricot, peach, cream, light brown dust. A standalone effect, not attached to any hand or character. Size reference only: the given character. Pixel art effect, transparent background, crisp hard-edged pixels, no blur, no background scenery. Draw only the effect: no people, no character body or hands, no creatures, monsters, animals, faces, letters or numbers."
+ },
+ {
+  "name": "x3-1.12-F-dust-charge",
+  "key": "1.12_콘쥬스",
+  "row": "필살기 전용(10-29)",
+  "kind": "own",
+  "mode": "bottom",
+  "desc": "A huge dust charge trail for a finishing move: a long thick horizontal band of churning grey-brown dust clouds racing from left to right along the floor across the whole frame, with pink wind streaks whipping through it, small debris tumbling, and at the right end a violent slam into a wall with a star-shaped crack burst and a puff of dust, then everything settles and fades. Very large: fills the full frame width. Energetic and fun but powerful, 10 frames. Colors: grey-brown dust, white highlights, pink streaks, dark cracks. A standalone effect, not attached to any hand or character. Size reference only: the given character. Pixel art effect, transparent background, crisp hard-edged pixels, no blur, no background scenery. Draw only the effect: no people, no character body or hands, no creatures, monsters, animals, faces, letters or numbers."
+ },
+ {
+  "name": "x3-2.13-F-bullet-fan",
+  "key": "2.13_김성진",
+  "row": "필살기 전용(10-29)",
+  "kind": "own",
+  "mode": "center",
+  "desc": "A huge fan of pistol bullet tracers for a finishing move: from a single point at the left, dozens of bright yellow-white tracer lines fan out toward the right across the whole frame, sweeping from top to bottom in a wedge, each with a hot white head and fading orange tail, with big muzzle flash bursts at the origin and small sparks where the lines end, repeated in quick waves, then fading. Very large: fills the full frame width. Loud and flashy, 10 frames. Colors: yellow-white tracers, orange, white flash. A standalone effect, not attached to any hand or character. Size reference only: the given character. Pixel art effect, transparent background, crisp hard-edged pixels, no blur, no background scenery. Draw only the effect: no people, no character body or hands, no creatures, monsters, animals, faces, letters or numbers."
+ },
+ {
+  "name": "x3-2.7-F-blade-lines",
+  "key": "2.7_고영훈",
+  "row": "필살기 전용(10-29)",
+  "kind": "own",
+  "mode": "center",
+  "desc": "A huge burst of five slash lines for a finishing move: five long thin blade trails crossing the whole frame at once in different directions (two straight horizontal, two diagonal, one bent once), drawn in dark navy-grey, then all five flash blinding white at the same instant with a bright glare and sparks along their length, and fade. Very large: fills the full frame. Cold, precise and sharp, 8 frames. Colors: navy grey lines, white flash, pale blue sparks. A standalone effect, not attached to any hand or character. Size reference only: the given character. Pixel art effect, transparent background, crisp hard-edged pixels, no blur, no background scenery. Draw only the effect: no people, no character body or hands, no creatures, monsters, animals, faces, letters or numbers."
+ },
+ {
+  "name": "x3-4.9-F-blue-cavalry",
+  "key": "4.9_살라딘",
+  "row": "필살기 전용(10-29)",
+  "kind": "own",
+  "mode": "bottom",
+  "desc": "A huge ghostly blue cavalry charge for a finishing move: a wide band of translucent blue silhouettes of charging warriors on horseback in several overlapping rows, drawn as simple glowing blue shapes without faces, rushing from left to right across the whole frame low along the ground, with blue dust clouds and light streaks trailing behind them, then dissolving into blue mist. Very large: fills the full frame width, about two character heights tall. Majestic and overwhelming, 10 frames. Colors: cobalt blue, cyan glow, white highlights, pale blue dust. A standalone effect, not attached to any hand or character. Size reference only: the given character. Pixel art effect, transparent background, crisp hard-edged pixels, no blur, no background scenery. Draw only the effect: no people, no character body or hands, no creatures, monsters, animals, faces, letters or numbers."
+ },
+ {
+  "name": "x3-1.11-S2-thread-clash",
+  "key": "1.11_로제몬",
+  "row": "전용(10-29)",
+  "kind": "own",
+  "mode": "center",
+  "desc": "Three glowing violet threads converge from three directions into one single point, pulling taut, then a violent collision burst explodes at that point: a jagged violet and white star flash, thread fragments snapping outward, a quick shock ring and falling sparkles. Medium-large: about one and a half character heights wide. Fast, 8 frames. Colors: violet, magenta, white core. A standalone effect, not attached to any hand or character. Size reference only: the given character. Pixel art effect, transparent background, crisp hard-edged pixels, no blur, no background scenery. Draw only the effect: no people, no character body or hands, no creatures, monsters, animals, faces, letters or numbers."
+ },
+ {
+  "name": "x3-2.3-S2-sonic-waves",
+  "key": "2.3_이길환",
+  "row": "전용(10-29)",
+  "kind": "own",
+  "mode": "center",
+  "desc": "Three thick apricot-orange sound waves pushing forward from a single point in front of a microphone, drawn as stacked curved arcs like the right half of a speaker icon, each arc rippling with visible vibration lines and small musical distortion zigzags, growing larger as they travel to the right and fading. Large: about two character heights wide. 8 frames. Colors: apricot orange, warm yellow, white highlights. A standalone effect, not attached to any hand or character. Size reference only: the given character. Pixel art effect, transparent background, crisp hard-edged pixels, no blur, no background scenery. Draw only the effect: no people, no character body or hands, no creatures, monsters, animals, faces, letters or numbers."
+ },
+ {
+  "name": "x3-2.7-S2-cross-burst",
+  "key": "2.7_고영훈",
+  "row": "전용(10-29)",
+  "kind": "own",
+  "mode": "center",
+  "desc": "Three long white sword slash lines cross through one point at three angles forming a six-pointed star, then the crossing point erupts with a blinding white flash, the slash lines flaring wide with navy-grey edges and scattering sharp splinters of light, then fading. Large: about two character heights wide. Fast, 8 frames. Colors: white, navy grey, pale blue sparks. A standalone effect, not attached to any hand or character. Size reference only: the given character. Pixel art effect, transparent background, crisp hard-edged pixels, no blur, no background scenery. Draw only the effect: no people, no character body or hands, no creatures, monsters, animals, faces, letters or numbers."
+ },
+ {
+  "name": "x3-2.9-S2-textbook-cut",
+  "key": "2.9_송주익",
+  "row": "전용(10-29)",
+  "kind": "own",
+  "mode": "bottom",
+  "desc": "A perfect vertical downward sword cut: a tall straight teal-white blade line slams from top to the floor, the floor splits in a short straight crack with teal light bursting out of it, small stone chips jump up on both sides, and a thin teal afterimage line lingers then fades. Tall: about one and a half character heights tall, narrow. Fast, 8 frames. Colors: teal, cyan, white, grey stone. A standalone effect, not attached to any hand or character. Size reference only: the given character. Pixel art effect, transparent background, crisp hard-edged pixels, no blur, no background scenery. Draw only the effect: no people, no character body or hands, no creatures, monsters, animals, faces, letters or numbers."
+ },
+ {
+  "name": "x3-3.3-S2-v-blade",
+  "key": "3.3_백석주",
+  "row": "전용(10-29)",
+  "kind": "own",
+  "mode": "center",
+  "desc": "A sharp green hand-blade afterimage drawn as a big V shape: first a diagonal stroke slashing down and forward, then a long stroke rising steeply upward, both made of bright jade-green light with white edges, leaving a fading green V-shaped trail with small green sparks at the bottom corner. Large: about one and a half character heights tall. Fast, 8 frames. Colors: jade green, emerald, white. A standalone effect, not attached to any hand or character. Size reference only: the given character. Pixel art effect, transparent background, crisp hard-edged pixels, no blur, no background scenery. Draw only the effect: no people, no character body or hands, no creatures, monsters, animals, faces, letters or numbers."
+ },
+ {
+  "name": "x3-4.1-S2-heel-stomp",
+  "key": "4.1_차여진",
+  "row": "전용(10-29)",
+  "kind": "own",
+  "mode": "bottom",
+  "desc": "Two high heels slam down side by side onto the floor: a sharp double impact point flashes, then a wide flat crimson shock ring bursts outward along the floor with a second inner ring, the floor cracks in a starburst under the impact, and red-tinted dust and small debris jump up, then fade. Large: about two and a half character heights wide, flat perspective on the ground. 8 frames. Colors: deep crimson, wine red, pale pink highlights, grey dust. A standalone effect, not attached to any hand or character. Size reference only: the given character. Pixel art effect, transparent background, crisp hard-edged pixels, no blur, no background scenery. Draw only the effect: no people, no character body or hands, no creatures, monsters, animals, faces, letters or numbers."
+ },
+ {
+  "name": "x3-4.7-S2-steel-stomp",
+  "key": "4.7_신유리",
+  "row": "전용(10-29)",
+  "kind": "own",
+  "mode": "bottom",
+  "desc": "A steel-toe boot heel stomps straight down: a heavy metallic grey-blue impact flash with sharp angular spark shards, the floor buckles into a shallow cracked dent, and a low wave of grey dust and small concrete chunks bursts outward in a ring along the floor, then settles. Medium-large: about two character heights wide, flat on the ground. Heavy, 8 frames. Colors: steel grey, cold blue-white, dark grey, pale dust. A standalone effect, not attached to any hand or character. Size reference only: the given character. Pixel art effect, transparent background, crisp hard-edged pixels, no blur, no background scenery. Draw only the effect: no people, no character body or hands, no creatures, monsters, animals, faces, letters or numbers."
+ },
+ {
+  "name": "x3-4.9-S2-rising-line",
+  "key": "4.9_살라딘",
+  "row": "전용(10-29)",
+  "kind": "own",
+  "mode": "bottom",
+  "desc": "A long straight line of translucent glowing blue spectral spear-like silhouettes of warriors erupts from the floor one after another, from left to right like a wave, each rising out of a blue ripple in the ground with blue mist and dust, then sinking and fading while the next one rises further right. Very long: about five character heights wide, about one character height tall. 10 frames. Colors: cobalt blue, cyan glow, white highlights, pale blue mist. A standalone effect, not attached to any hand or character. Size reference only: the given character. Pixel art effect, transparent background, crisp hard-edged pixels, no blur, no background scenery. Draw only the effect: no people, no character body or hands, no creatures, monsters, animals, faces, letters or numbers."
  }
 ]

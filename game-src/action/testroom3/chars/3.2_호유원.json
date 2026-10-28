@@ -536,9 +536,9 @@
      "fx": [
       {
        "t": "melee",
-       "range": 140,
+       "range": 200,
        "hit": {
-        "dmg": 7,
+        "dmg": 9,
         "kind": "pull",
         "stop": 0.05,
         "shake": 3
@@ -567,12 +567,12 @@
        "t": "v",
        "vfx": "x3-3.2-D-foxfire-burst",
        "at": "hand",
-       "dx": 121,
+       "dx": 40,
        "scale": 0.55,
-       "r": 80,
+       "r": 220,
        "boom": 1,
        "hit": {
-        "dmg": 95,
+        "dmg": 121,
         "kind": "blow",
         "stop": 0.16,
         "shake": 12
@@ -602,7 +602,7 @@
       "speed": 1100,
       "life": 0.45,
       "hit": {
-       "dmg": 41,
+       "dmg": 75,
        "kind": "heavy",
        "vfx": "x3-3.2-D-foxfire-burst",
        "vs": 0.25
@@ -619,7 +619,7 @@
       "r": 200,
       "delay": 0.25,
       "hit": {
-       "dmg": 68,
+       "dmg": 125,
        "kind": "heavy",
        "n": 4,
        "every": 0.12,
@@ -638,7 +638,7 @@
       "r": 300,
       "delay": 0.35,
       "hit": {
-       "dmg": 136,
+       "dmg": 240,
        "kind": "blow",
        "stop": 0.18,
        "shake": 14
@@ -727,7 +727,7 @@
       {
        "t": "hit",
        "hit": {
-        "dmg": 300,
+        "dmg": 320,
         "kind": "down",
         "stop": 0.18,
         "shake": 14
@@ -764,15 +764,16 @@
   "gun": "none",
   "atk": {
    "9": 14,
-   "10": 14,
+   "10": 15,
    "11": 17,
-   "12": 23,
+   "12": 24,
    "13": 18,
    "14": 20
   },
   "cd": {
    "skill": 2
   },
-  "shotDmg": 10
+  "shotDmg": 10,
+  "superType": "aoe"
  }
 }

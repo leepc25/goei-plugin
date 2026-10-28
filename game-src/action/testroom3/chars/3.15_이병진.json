@@ -533,7 +533,7 @@
        "t": "melee",
        "range": 200,
        "hit": {
-        "dmg": 101,
+        "dmg": 129,
         "kind": "light",
         "n": 2,
         "mid": "light",
@@ -579,7 +579,7 @@
       "t": "melee",
       "range": 150,
       "hit": {
-       "dmg": 41,
+       "dmg": 75,
        "kind": "heavy",
        "vfx": "x3-c-hit-spark-light",
        "vs": 1.6,
@@ -600,7 +600,7 @@
       "t": "melee",
       "range": 160,
       "hit": {
-       "dmg": 29,
+       "dmg": 53,
        "kind": "light",
        "vfx": "x3-c-hit-spark-light",
        "vs": 1.4,
@@ -630,7 +630,7 @@
         "t": "melee",
         "range": 230,
         "hit": {
-         "dmg": 53,
+         "dmg": 97,
          "kind": "heavy",
          "vfx": "x3-c-hit-spark-light",
          "vs": 2,
@@ -646,7 +646,7 @@
       "speed": 1100,
       "time": 0.3,
       "hit": {
-       "dmg": 136,
+       "dmg": 240,
        "kind": "down",
        "vfx": "x3-c-hit-spark-light",
        "vs": 1.6,
@@ -679,9 +679,9 @@
       "fx": [
        {
         "t": "melee",
-        "range": 160,
+        "range": 190,
         "hit": {
-         "dmg": 67,
+         "dmg": 118,
          "kind": "light",
          "vfx": "x3-c-hit-spark-light",
          "vs": 1.4,
@@ -742,7 +742,7 @@
            "tint": "#D23C3C",
            "dy": -60,
            "hit": {
-            "dmg": 47,
+            "dmg": 50,
             "kind": "light",
             "vfx": "x3-c-hit-spark-light",
             "vs": 1.6,
@@ -768,7 +768,7 @@
            "tint": "#D23C3C",
            "dy": -60,
            "hit": {
-            "dmg": 47,
+            "dmg": 50,
             "kind": "light",
             "vfx": "x3-c-hit-spark-light",
             "vs": 1.6,
@@ -791,7 +791,7 @@
          "boom": 3,
          "delay": 0.45,
          "hit": {
-          "dmg": 206,
+          "dmg": 220,
           "kind": "launch",
           "stop": 0.2,
           "shake": 18,
@@ -831,16 +831,17 @@
   "speed": "slow",
   "gun": "thrown",
   "atk": {
-   "9": 16,
-   "10": 17,
-   "11": 20,
-   "12": 28,
-   "13": 21,
-   "14": 23
+   "9": 15,
+   "10": 16,
+   "11": 19,
+   "12": 26,
+   "13": 20,
+   "14": 22
   },
   "cd": {
    "skill": 2
   },
-  "shotDmg": 7
+  "shotDmg": 7,
+  "superType": "aoe"
  }
 }

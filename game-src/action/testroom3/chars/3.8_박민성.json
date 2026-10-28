@@ -548,7 +548,7 @@
          "scale": 1.5,
          "r": 90,
          "hit": {
-          "dmg": 102,
+          "dmg": 130,
           "kind": "heavy",
           "vfx": "x3-c-hit-spark-heavy",
           "vs": 0.6,
@@ -586,7 +586,7 @@
       "t": "melee",
       "range": 140,
       "hit": {
-       "dmg": 41,
+       "dmg": 75,
        "kind": "light",
        "vfx": "x3-c-hit-spark-heavy",
        "vs": 0.5
@@ -599,7 +599,7 @@
       "speed": 1400,
       "time": 0.45,
       "hit": {
-       "dmg": 82,
+       "dmg": 150,
        "kind": "blow",
        "vfx": "x3-c-hit-spark-heavy",
        "vs": 0.7,
@@ -628,7 +628,7 @@
       "t": "melee",
       "range": 180,
       "hit": {
-       "dmg": 39,
+       "dmg": 69,
        "kind": "launch",
        "vfx": "x3-c-hit-spark-light",
        "vs": 1.5
@@ -647,7 +647,7 @@
         "tint": "#d9cbb5",
         "boom": 2,
         "hit": {
-         "dmg": 97,
+         "dmg": 171,
          "kind": "down",
          "vfx": "x3-c-hit-spark-heavy",
          "vs": 0.6,
@@ -682,7 +682,7 @@
          "t": "pull",
          "dist": 160,
          "hit": {
-          "dmg": 24,
+          "dmg": 28,
           "kind": "pull",
           "noVfx": true,
           "stop": 0.05,
@@ -699,7 +699,7 @@
          "speed": 1500,
          "time": 0.6,
          "hit": {
-          "dmg": 54,
+          "dmg": 62,
           "kind": "heavy",
           "vfx": "x3-c-hit-spark-heavy",
           "vs": 0.6
@@ -754,20 +754,18 @@
          "vfx": "x3-c-ground-crack",
          "at": "self",
          "dx": -20,
-         "scale": 1.6,
+         "scale": 0.9,
          "under": true,
          "boom": 3
         },
         {
          "t": "v",
-         "vfx": "x3-c-ground-shockwave",
+         "vfx": "x3-3.8-F-crater-ring",
          "at": "self",
-         "scale": 1.8,
          "under": true,
-         "tint": "#d9cbb5",
-         "r": 300,
+         "r": 420,
          "hit": {
-          "dmg": 199,
+          "dmg": 229,
           "n": 2,
           "every": 0.15,
           "mid": "heavy",
@@ -775,7 +773,9 @@
           "vfx": "x3-c-hit-spark-heavy",
           "stop": 0.22,
           "shake": 20
-         }
+         },
+         "w": 0.98,
+         "depth": 120
         },
         {
          "t": "flash",
@@ -799,17 +799,18 @@
   "speed": "slow",
   "gun": "thrown",
   "atk": {
-   "9": 19,
-   "10": 21,
-   "11": 25,
-   "12": 34,
-   "13": 26,
-   "14": 29
+   "9": 17,
+   "10": 18,
+   "11": 22,
+   "12": 30,
+   "13": 23,
+   "14": 25
   },
   "cd": {
    "skill": 2
   },
-  "shotDmg": 7
+  "shotDmg": 7,
+  "superType": "aoe"
  },
  "skip": {
   "73": [

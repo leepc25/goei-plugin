@@ -406,7 +406,7 @@
        "life": 0.46,
        "size": 0.9,
        "hit": {
-        "dmg": 62,
+        "dmg": 90,
         "kind": "heavy",
         "vfx": "x3-c-hit-spark-light",
         "vs": 1.6
@@ -426,7 +426,7 @@
           {
            "t": "hit",
            "hit": {
-            "dmg": 28,
+            "dmg": 40,
             "kind": "light"
            }
           }
@@ -475,7 +475,7 @@
       "under": true,
       "tint": "#E6C14A",
       "hit": {
-       "dmg": 36,
+       "dmg": 75,
        "kind": "launch"
       }
      }
@@ -490,7 +490,7 @@
       "size": 0.9,
       "pierce": true,
       "hit": {
-       "dmg": 72,
+       "dmg": 150,
        "kind": "heavy",
        "vfx": "x3-c-hit-spark-heavy",
        "vs": 0.6,
@@ -518,7 +518,7 @@
         "scale": 2.5,
         "tint": "#c8c8c8",
         "hit": {
-         "dmg": 120,
+         "dmg": 240,
          "kind": "down",
          "stop": 0.16
         }
@@ -565,7 +565,7 @@
        "at": "target",
        "dy": -40,
        "hit": {
-        "dmg": 34,
+        "dmg": 42,
         "kind": "launch"
        }
       }
@@ -583,7 +583,7 @@
          "vfx": "x3-o-2.4-prosthetic-arm",
          "dy": -40,
          "hit": {
-          "dmg": 34,
+          "dmg": 42,
           "kind": "launch"
          }
         }
@@ -603,7 +603,7 @@
          "vfx": "x3-o-2.4-prosthetic-arm",
          "dy": -40,
          "hit": {
-          "dmg": 34,
+          "dmg": 42,
           "kind": "launch"
          }
         }
@@ -631,7 +631,7 @@
        "tint": "#E6C14A",
        "r": 100,
        "hit": {
-        "dmg": 56,
+        "dmg": 69,
         "kind": "heavy"
        }
       }
@@ -665,7 +665,7 @@
        "under": true,
        "boom": 3,
        "hit": {
-        "dmg": 103,
+        "dmg": 126,
         "kind": "spike",
         "stop": 0.2,
         "shake": 16
@@ -876,14 +876,15 @@
   "atk": {
    "9": 13,
    "10": 14,
-   "11": 16,
-   "12": 22,
-   "13": 17,
+   "11": 17,
+   "12": 23,
+   "13": 18,
    "14": 19
   },
   "cd": {
    "skill": 2
   },
-  "shotDmg": 10
+  "shotDmg": 10,
+  "superType": "aoe"
  }
 }

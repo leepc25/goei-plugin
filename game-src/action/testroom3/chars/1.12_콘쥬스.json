@@ -449,7 +449,7 @@
          "under": true,
          "tint": "#ffffff",
          "hit": {
-          "dmg": 102,
+          "dmg": 130,
           "kind": "launch"
          }
         },
@@ -490,7 +490,7 @@
       "speed": 1400,
       "time": 0.22,
       "hit": {
-       "dmg": 41,
+       "dmg": 75,
        "kind": "heavy"
       }
      },
@@ -508,7 +508,7 @@
       "speed": 1600,
       "time": 0.4,
       "hit": {
-       "dmg": 82,
+       "dmg": 150,
        "kind": "launch"
       }
      },
@@ -531,7 +531,7 @@
         "speed": 1500,
         "time": 0.24,
         "hit": {
-         "dmg": 45,
+         "dmg": 80,
          "kind": "blow"
         }
        },
@@ -552,11 +552,11 @@
         "t": "v",
         "vfx": "x3-c-dust-cloud-large",
         "at": "front",
-        "dx": 120,
+        "dx": 60,
         "scale": 0.5,
         "tint": "#d8c8b0",
         "hit": {
-         "dmg": 45,
+         "dmg": 80,
          "kind": "heavy"
         }
        }
@@ -586,7 +586,7 @@
          "speed": 1600,
          "time": 0.6,
          "hit": {
-          "dmg": 140,
+          "dmg": 160,
           "kind": "launch"
          }
         },
@@ -603,6 +603,14 @@
            "tint": "#d8c8b0"
           }
          ]
+        },
+        {
+         "t": "v",
+         "vfx": "x3-1.12-F-dust-charge",
+         "at": "screen",
+         "w": 0.8,
+         "dy": 60,
+         "under": true
         }
        ]
       }
@@ -625,11 +633,19 @@
        "f": 6,
        "fx": [
         {
+         "t": "v",
+         "vfx": "x3-1.12-F-dust-charge",
+         "at": "screen",
+         "w": 1.0,
+         "dy": 40,
+         "under": true
+        },
+        {
          "t": "dash",
          "speed": 800,
          "time": 0.6,
          "hit": {
-          "dmg": 210,
+          "dmg": 240,
           "kind": "blow",
           "stop": 0.16
          }
@@ -661,7 +677,7 @@
            "scale": 1.2,
            "boom": 2,
            "hit": {
-            "dmg": 140,
+            "dmg": 160,
             "kind": "down",
             "stop": 0.2,
             "shake": 16
@@ -809,15 +825,17 @@
   "gun": "heavy",
   "atk": {
    "9": 16,
-   "10": 18,
-   "11": 21,
-   "12": 29,
-   "13": 22,
-   "14": 24
+   "10": 17,
+   "11": 20,
+   "12": 27,
+   "13": 21,
+   "14": 23
   },
   "cd": {
+   "shot": 2.5,
    "skill": 2
   },
-  "shotDmg": 30
+  "shotDmg": 30,
+  "superType": "aoe"
  }
 }

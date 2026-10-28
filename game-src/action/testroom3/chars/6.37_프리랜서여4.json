@@ -256,7 +256,7 @@
        "size": 0.6,
        "life": 0.4,
        "hit": {
-        "dmg": 69,
+        "dmg": 65,
         "kind": "light"
        }
       }
@@ -277,7 +277,7 @@
        "size": 0.6,
        "life": 0.4,
        "hit": {
-        "dmg": 69,
+        "dmg": 65,
         "kind": "light"
        }
       }
@@ -301,7 +301,7 @@
       "t": "melee",
       "range": 170,
       "hit": {
-       "dmg": 55,
+       "dmg": 75,
        "kind": "heavy"
       }
      }
@@ -312,7 +312,7 @@
       "speed": 1200,
       "time": 0.22,
       "hit": {
-       "dmg": 110,
+       "dmg": 150,
        "kind": "heavy"
       }
      }
@@ -322,7 +322,7 @@
       "t": "melee",
       "range": 170,
       "hit": {
-       "dmg": 184,
+       "dmg": 401,
        "kind": "launch"
       }
      },

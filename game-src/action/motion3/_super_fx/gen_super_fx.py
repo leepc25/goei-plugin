@@ -3,7 +3,7 @@
 import json, sys, subprocess, time
 from pathlib import Path
 HERE = Path(__file__).resolve().parent; M3 = HERE.parent
-P = json.loads((HERE / "prompts.json").read_text())
+P = json.loads((HERE / (sys.argv[3] if len(sys.argv) > 3 else "prompts.json")).read_text())
 a, b = (int(sys.argv[1]) if len(sys.argv) > 1 else 0), (int(sys.argv[2]) if len(sys.argv) > 2 else len(P))
 for e in P[a:b]:
     key = e["key"]; name = e["name"]
@@ -15,5 +15,5 @@ for e in P[a:b]:
     print(r.stdout[-600:], r.stderr[-400:], flush=True)
     man = json.loads((M3 / "fx3_manifest.json").read_text())
     if not any(m["name"] == name for m in man):
-        man.append({"name": name, "key": key, "row": "필살기 전용(10-29)", "kind": "own", "mode": e["mode"], "desc": e["desc"]}); (M3 / "fx3_manifest.json").write_text(json.dumps(man, ensure_ascii=False, indent=1))
+        man.append({"name": name, "key": key, "row": "전용(10-29)", "kind": "own", "mode": e["mode"], "desc": e["desc"]}); (M3 / "fx3_manifest.json").write_text(json.dumps(man, ensure_ascii=False, indent=1))
 print("끝")

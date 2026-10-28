@@ -257,9 +257,9 @@
      "fx": [
       {
        "t": "melee",
-       "range": 140,
+       "range": 190,
        "hit": {
-        "dmg": 38,
+        "dmg": 65,
         "kind": "light"
        }
       }
@@ -270,9 +270,9 @@
      "fx": [
       {
        "t": "melee",
-       "range": 140,
+       "range": 190,
        "hit": {
-        "dmg": 38,
+        "dmg": 65,
         "kind": "light"
        }
       }
@@ -283,9 +283,9 @@
      "fx": [
       {
        "t": "melee",
-       "range": 150,
+       "range": 190,
        "hit": {
-        "dmg": 62,
+        "dmg": 106,
         "kind": "heavy"
        }
       }
@@ -309,7 +309,7 @@
       "t": "melee",
       "range": 170,
       "hit": {
-       "dmg": 55,
+       "dmg": 75,
        "kind": "heavy"
       }
      }
@@ -320,7 +320,7 @@
       "speed": 1200,
       "time": 0.22,
       "hit": {
-       "dmg": 110,
+       "dmg": 150,
        "kind": "heavy"
       }
      }
@@ -330,7 +330,7 @@
       "t": "melee",
       "range": 170,
       "hit": {
-       "dmg": 184,
+       "dmg": 240,
        "kind": "launch"
       }
      },

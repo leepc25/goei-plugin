@@ -582,7 +582,7 @@
        "speed": 1050,
        "time": 0.34,
        "hit": {
-        "dmg": 90,
+        "dmg": 130,
         "kind": "heavy",
         "stop": 0.16,
         "shake": 12,
@@ -627,7 +627,7 @@
       "scale": 0.6,
       "r": 60,
       "hit": {
-       "dmg": 36,
+       "dmg": 75,
        "kind": "light",
        "vfx": "x3-c-hit-spark-light",
        "vs": 2,
@@ -646,7 +646,7 @@
       "fade": 0.3,
       "r": 150,
       "hit": {
-       "dmg": 40,
+       "dmg": 83,
        "kind": "heavy",
        "n": 6,
        "every": 0.14,
@@ -665,7 +665,7 @@
       "scale": 1.2,
       "r": 150,
       "hit": {
-       "dmg": 28,
+       "dmg": 56,
        "kind": "heavy"
       }
      },
@@ -674,7 +674,7 @@
       "speed": 1500,
       "time": 0.45,
       "hit": {
-       "dmg": 92,
+       "dmg": 184,
        "kind": "down",
        "stop": 0.16,
        "shake": 12,
@@ -747,7 +747,7 @@
         {
          "t": "hit",
          "hit": {
-          "dmg": 23,
+          "dmg": 25,
           "kind": "light",
           "vfx": "x3-c-hit-spark-light",
           "vs": 2,
@@ -770,7 +770,7 @@
         {
          "t": "hit",
          "hit": {
-          "dmg": 23,
+          "dmg": 25,
           "kind": "light",
           "vfx": "x3-c-hit-spark-light",
           "vs": 2,
@@ -793,7 +793,7 @@
         {
          "t": "hit",
          "hit": {
-          "dmg": 23,
+          "dmg": 25,
           "kind": "light",
           "vfx": "x3-c-hit-spark-light",
           "vs": 2,
@@ -816,7 +816,7 @@
         {
          "t": "hit",
          "hit": {
-          "dmg": 23,
+          "dmg": 25,
           "kind": "light",
           "vfx": "x3-c-hit-spark-light",
           "vs": 2,
@@ -839,7 +839,7 @@
         {
          "t": "hit",
          "hit": {
-          "dmg": 87,
+          "dmg": 94,
           "kind": "blow",
           "vfx": "x3-c-hit-spark-heavy",
           "vs": 0.7,
@@ -877,7 +877,7 @@
          "hold": 0.4,
          "fade": 0.3,
          "hit": {
-          "dmg": 114,
+          "dmg": 124,
           "kind": "down",
           "n": 4,
           "every": 0.12,
@@ -928,16 +928,17 @@
   "speed": "fast",
   "gun": "none",
   "atk": {
-   "9": 11,
-   "10": 12,
-   "11": 14,
-   "12": 19,
-   "13": 15,
-   "14": 16
+   "9": 12,
+   "10": 13,
+   "11": 15,
+   "12": 21,
+   "13": 16,
+   "14": 17
   },
   "cd": {
    "skill": 2
   },
-  "shotDmg": 10
+  "shotDmg": 10,
+  "superType": "aoe"
  }
 }
