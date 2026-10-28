@@ -662,7 +662,7 @@ function drawPlayer() {
   else if (P.sp >= 100) tint = { c: '#ffd34a', over: 0, ea: 0.35 + 0.3 * (0.5 + 0.5 * Math.sin(P.t * 4)), glow: true };   // 필살기 준비: 금빛 외곽선이 은은하게
   else if (P.hp <= 25) tint = { c: '#d0101a', over: 0.42 * (0.5 + 0.5 * Math.sin(P.t * Math.PI * 2 * 1.3)), noEdge: true };
   else if (P.mode === 'charge') { const lv = P.charge >= 2 ? 3 : P.charge > 1.3 ? 2 : P.charge > 0.5 ? 1 : 0; tint = { c: CH_COL[lv], over: 0.1 + 0.12 * Math.sin(P.t * 20) }; }
-  if (!(env.draw3d && env.draw3d(ctx, { id, f, n: a.n, x: P.x, y: P.y, z: P.z + (KNOCK_ARC[id] ? KNOCK_ARC[id][f] || 0 : 0), face: P.face, k: kk, t: P.t }))) drawSprite(id, f, P.x, P.y, P.z, P.face, 1, tint);
+  if (!(env.draw3d && env.draw3d(ctx, { id, f, n: a.n, x: P.x, y: P.y, z: P.z, face: P.face, k: kk, t: P.t, mode: P.mode, armed: P.armed, combat: P.combat }))) drawSprite(id, f, P.x, P.y, P.z, P.face, 1, tint);
   if (P.mode === 'charge') { const m = muzzle(); drawVfxAt('charge_gather', m.x, m.y, 1.4 + P.charge * 0.7, P.t); }
   if (P.status) {   // 상태이상
     const top = P.y - P.z - (BASE(a) - a.top[f]) * kk, hgt = (BASE(a) - a.top[f]) * kk;
