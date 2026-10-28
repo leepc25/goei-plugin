@@ -3,7 +3,7 @@ import { refreshStatusContext, renderStatus, setWikiOpener } from './host/status
 import { openingShown, refreshOpeningHint, setOpeningHint, setRepickOpener, wantsOpeningHint } from './host/openinghint';
 import { hasStatusTag } from './core/world';
 import { isUnsent, renderStartCards, renderUnsentMark, START_MARK, stripStartCard, stripUnsentMark, UNSENT_MARK } from './core/dispatch';
-import { readPersona, USER_MARK } from './host/user';
+import { readPersona, readUser, USER_MARK } from './host/user';
 import { hasSceneCard, renderSceneCards } from './core/dispatch';
 import { CONTEXT as GN_CONTEXT, GN_RAW, gnetSettings, mainContext, readGnet, userNick } from './core/gnet';
 import { mainContextRules } from './core/gnetPrompt';
@@ -18,21 +18,21 @@ import { mainContextRules as phoneRules } from './core/phonePrompt';
 import { advNum, applyAdvanced } from './core/advanced';
 import { fitTotal, type ContextPart } from './core/budget';
 import { makeFocus, sceneText } from './core/focus';
-import { buildRegistry, type Registry } from './core/world/registry';
+import { buildRegistry } from './core/world/registry';
 import { wikiContextOn, wikiContextRules, wikiMainContext } from './core/wiki';
 import { chatPhase } from './core/start';
 import { autoRefresh } from './ui/phone';
 import { autoRefreshGnet } from './ui/gnet';
 import { Joint } from './host/joint';
 import { prefetchFactions } from './ui/images';
-import { SEED_OPEN } from './core/seed';
+import { SEED_CLOSE, SEED_OPEN, seedBody } from './core/seed';
 import { readManifest } from './core/start';
 import type { Chat, LoreEntry } from './core/types';
 import { cleanOutput, hasWorldTags, parseCatalog, processOutput, readDirectory } from './core/world';
 import { basicSettings, missingBasicVars, worldSettings } from './core/settings';
 import { staleFactionVars } from './core/factions';
 import { supplementAssets } from './host/asset';
-import { loadContext, updateCharacterLore, updateChat, getChar } from './host/risu';
+import { loadContext, updateCharacterLore, updateChat, getChar, type ChatContext, type CharacterSnapshot } from './host/risu';
 import { WatchState, type WatchSnapshot } from './core/watch';
 import { createFab, type Fab } from './host/overlay';
 import { BRAND } from './ui/brand';
@@ -48,7 +48,7 @@ import { GHOST_ICON } from './ui/icons';
 import { landingHtml as renderLanding } from './ui/landing';
 import { loadPrefs } from './host/prefs';
 import { isWaiting, setWaiting } from './host/waiting';
-import { syncDecorators, computeLore, hasUnlockTag, loreOptions, patchSlots, readUnlocked, sameVars, stripUnlockTags, trimRoster, unlockedValue, unlockTags, UNLOCK_VAR, type LoreMode, hasSlots, insertLoreBlock, joinLoreBlock, LORE_KINDS, slotParts, slotVar, type LoreBlockPart, type LoreKind } from './core/lore';
+import { syncDecorators, computeLore, hasUnlockTag, loreOptions, patchSlots, readUnlocked, sameVars, stripDecorators, stripUnlockTags, trimRoster, unlockedValue, unlockTags, UNLOCK_VAR, type LoreMode, hasSlots, insertLoreBlock, joinLoreBlock, LORE_KINDS, slotParts, slotTexts, slotVar, type LoreBlockPart, type LoreKind } from './core/lore';
 import { advValue } from './core/advanced';
 import { userInfo } from './host/user';
 import { applyPlayer, hidePlayerTag, playerAgent, playerBlock } from './core/player';
@@ -56,7 +56,7 @@ import { withFieldFacts, withInterludes } from './core/interlude';
 import { fieldRecord } from './core/field';
 import { buildImgPrompt, imgCharacters, imgPromptConfig, stripImgLore } from './core/imgprompt';
 import { withStatusBlock, type StatusShape } from './core/statusctx';
-import { colConfig, fillStatusSection, setStatusColumns, usedCols } from './core/world/statuscols';
+import { colConfig, fillStatusSection, usedCols } from './core/world/statuscols';
 import { activeAnomalyNote } from './core/world/records';
 import { aliveAnchors, readWallet, walletBalance, WALLET_START_DEFAULT } from './core/wallet';
 import { visitRecord } from './core/visit';
@@ -87,33 +87,39 @@ async function onBeforeRequest<M extends PromptMessage>(messages: M[], type: str
   }
   // 오래된 메시지의 이미지 태그는 요청에서 뺀다 (원본 「🖼️에셋리퀘제거」)
   if (liteNow || messages.some((m) => typeof m?.content === 'string' && imgTagsKnown(m.content, modulePicker()))) messages = stripOldImgTags(messages, getPrefs().imgSend ?? IMG_RECENT.def);
+  // 채팅·캐릭터는 요청마다 한 번만 읽어 모든 단계에 넘긴다 (QC 2026-10-28: 단계마다 따로 읽어 요청 하나에 채팅 9번·캐릭터 3번을 읽고 세계 로어를 3번 조립했다)
+  let ctx: ChatContext | null = null;
   if (liteNow) {
+    ctx = await loadContext().catch(() => null);
+    // 유저 이름(상태창 지침·명부의 {{user}})은 채팅에 그려진 숨은 칸에서 읽는다. 새로고침 뒤 창을 열지 않고 보내면 비어 있다
+    await readUser().catch(() => undefined);
     messages = stripHistoryTags(messages);
-    messages = await fixLore(messages).catch(() => messages);
-    messages = await withPlayer(messages).catch(() => messages);
-    messages = await withVisit(messages).catch(() => messages);
-    messages = trimRoster(messages);
-    const ctx = await moduleContext(sceneText(messages)).catch(() => [] as string[]);
-    if (ctx.length) {
-      // 마지막 사용자 메시지 바로 앞에 (원본은 맨 끝). 모델이 이번 행동보다 참고 기록을 「지금 할 일」로 읽지 않게
-      const at = messages.map((m) => m?.role).lastIndexOf('user');
-      const add = ctx.map((c) => ({ role: 'system', content: c }) as M);
-      messages = at < 0 ? [...messages, ...add] : [...messages.slice(0, at), ...add, ...messages.slice(at)];
+    if (ctx) {
+      const c = ctx;
+      messages = safe(() => fixLore(messages, c), messages);
+      messages = await withPlayer(messages, c).catch(() => messages);
+      messages = safe(() => withVisit(messages, c), messages);
+      messages = trimRoster(messages);
+      const mctx = safe(() => moduleContext(sceneText(messages), c), [] as string[]);
+      if (mctx.length) {
+        // 마지막 사용자 메시지 바로 앞에 (원본은 맨 끝). 모델이 이번 행동보다 참고 기록을 「지금 할 일」로 읽지 않게
+        const at = messages.map((m) => m?.role).lastIndexOf('user');
+        const add = mctx.map((t) => ({ role: 'system', content: t }) as M);
+        messages = at < 0 ? [...messages, ...add] : [...messages.slice(0, at), ...add, ...messages.slice(at)];
+      }
+      // 지난 응답의 상태창 줄은 지우고 마지막 한 줄만 직전 상태 블록으로 (core/statusctx.ts). 신분 칸이 빠졌으면 아는 값을 채운다
+      // 칸 구성(설정)대로 다시 만들고 잔고 칸은 장부 값으로 (core/world/statuscols.ts · core/wallet.ts)
+      messages = withStatusBlock(messages, safe(() => knownIdentity(c), ''), safe(() => statusShape(c), undefined));
+      // 장면 인물의 살아 있는 기록 (core/people). 절 단위 혼합이면 그 인물의 시트 원문은 빼고 기록으로 대신한다
+      messages = await withPeople(messages, c).catch(() => messages);
+      // 이미지 태그 지침 (core/imgprompt): 카드 로어북 「Asset」 대신 설정으로 조립. 옛 카드의 로어북 본문이 남아 있으면 지운다
+      messages = safe(() => withImgPrompt(messages, c), messages);
     }
-    // 지난 응답의 상태창 줄은 지우고 마지막 한 줄만 직전 상태 블록으로 (core/statusctx.ts). 신분 칸이 빠졌으면 아는 값을 채운다
-    // 칸 구성(설정)대로 다시 만들고 잔고 칸은 장부 값으로 (core/world/statuscols.ts · core/wallet.ts)
-    messages = withStatusBlock(messages, await knownIdentity().catch(() => ''), await statusShape().catch(() => undefined));
-    // 장면 인물의 살아 있는 기록 (core/people). 절 단위 혼합이면 그 인물의 시트 원문은 빼고 기록으로 대신한다
-    messages = await withPeople(messages).catch(() => messages);
-    // 이미지 태그 지침 (core/imgprompt): 카드 로어북 「Asset」 대신 설정으로 조립. 옛 카드의 로어북 본문이 남아 있으면 지운다
-    messages = await withImgPrompt(messages).catch(() => messages);
   }
   // 시드 표식이 없는 요청은 아무것도 읽지 않고 바로 돌려보낸다 (매 전송마다 드는 비용을 0에 가깝게).
   if (!messages.some((m) => typeof m?.content === 'string' && m.content.includes(SEED_OPEN))) return messages;
   try {
-    const charIndex = await risuai.getCurrentCharacterIndex();
-    const chatIndex = await risuai.getCurrentChatIndex();
-    const chat = (await risuai.getChatFromIndex(charIndex, chatIndex)) as Chat | null;
+    const chat = ctx?.chat ?? ((await risuai.getChatFromIndex(await risuai.getCurrentCharacterIndex(), await risuai.getCurrentChatIndex())) as Chat | null);
     if (!chat) return messages;
     // 요청 도중에는 채팅을 저장하지 않는다. 응답이 붙기 전에 채팅 객체를 바꾸면 응답이 사라질 수 있다.
     // 남은 seed_lore 변수는 여기서 걸러지므로 두 번째 전송부터는 모델에 가지 않는다.
@@ -124,27 +130,48 @@ async function onBeforeRequest<M extends PromptMessage>(messages: M[], type: str
   }
 }
 
+/** 한 단계가 실패해도 요청은 그대로 나간다 (예외는 기록만) */
+function safe<T>(run: () => T, fallback: T): T {
+  try {
+    return run();
+  } catch (error) {
+    console.log(`[goei] 요청 가공 단계 실패: ${error instanceof Error ? error.message : String(error)}`);
+    return fallback;
+  }
+}
+
 // ── 본편 로어북 고르기 (core/lore.ts) ──
 
 type LoreChar = { name?: string; globalLore?: LoreEntry[]; loreSettings?: unknown };
 
+/** CBS 환경의 유저 이름: 아직 모르면 `{{user}}`를 그대로 둔다 (빈 이름으로 풀면 「's current …」처럼 깨진다. QC 2026-10-28) */
+const userOrTag = () => userInfo().name || undefined;
+
 function loreFor(char: LoreChar, chat: Chat, input?: string) {
   const mode = advValue(chat.scriptstate, 'gen', 'lore_mode') as LoreMode;
   const player = playerAgent(char.globalLore, chat.scriptstate);
-  return computeLore(char.globalLore, chat, { ...loreOptions(char, chat, mode, userInfo().name), input, ...(player ? { exclude: [player.lore] } : {}) });
+  return computeLore(char.globalLore, chat, { ...loreOptions(char, chat, mode, userOrTag()), input, ...(player ? { exclude: [player.lore] } : {}) });
 }
 
-/** 고른 로어북을 자리 항목이 읽는 채팅 변수에 적는다 (요청 전이라 Risu가 세고 넘치면 오래된 채팅을 지운다) */
-async function storeLore(charIndex: number, chatIndex: number, input?: string): Promise<void> {
-  let char = await getChar<LoreChar>(charIndex);
+/** 고른 로어북을 자리 항목이 읽는 채팅 변수에 적는다 (요청 전이라 Risu가 세고 넘치면 오래된 채팅을 지운다).
+ *  자리 항목이 없는 카드는 플러그인이 요청 직전에 직접 끼우므로 변수를 적지 않는다 (턴마다 채팅 저장 한 번과 변수 수십 KB 를 아낀다. QC 2026-10-28) */
+async function storeLore(charIndex: number, chatIndex: number, input?: string, known?: { char: LoreChar; chat: Chat }): Promise<void> {
+  // 부르는 쪽이 방금 읽은 캐릭터·채팅이 있으면 다시 읽지 않는다 (응답 처리에서는 리스너가 준 것)
+  let char = known?.char ?? (await getChar<LoreChar>(charIndex));
   if (!char || !isGoeiLore(char.globalLore)) return;
   // 이 채팅의 보내는 방식에 맞게 네 폴더 항목 첫 줄(@@dont_activate)을 맞춘다. 사용자가 새로 넣은 항목도 같이
-  const cur0 = (await risuai.getChatFromIndex(charIndex, chatIndex)) as Chat | null;
+  const cur0 = known?.chat ?? ((await risuai.getChatFromIndex(charIndex, chatIndex)) as Chat | null);
   const mode = advValue(cur0?.scriptstate, 'gen', 'lore_mode') as LoreMode;
   if (syncDecorators(char.globalLore, mode)) {
-    await updateCharacterLore(charIndex, (lore) => syncDecorators(lore, mode));
+    // 저장 함수는 카드 로어북(가상 항목 없음)을 주므로 세계 데이터를 다시 붙여 판정하고 진짜 항목만 돌려준다
+    // (자리 항목 없는 카드는 가상 항목이 있어야 「플러그인이 고르는 카드」로 알아본다. 안 그러면 사용자가 넣은 항목의 줄이 영영 안 맞춰졌다. QC 2026-10-28)
+    await updateCharacterLore(charIndex, (lore) => {
+      const next = syncDecorators(withWorldLore(lore), mode);
+      return next ? stripVirtual(next) : null;
+    });
     char = (await getChar<LoreChar>(charIndex)) ?? char;
   }
+  if (!hasSlots(stripVirtual(char.globalLore ?? []))) return;
   const c = char;
   await updateChat(charIndex, chatIndex, (cur) => {
     const got = loreFor(c, cur, input);
@@ -164,92 +191,102 @@ async function onInput(text: string): Promise<string> {
   return text;
 }
 
+/** 이 채팅의 첫 장면(인사말) 원문. 없으면 '' */
+function greetingOf(char: CharacterSnapshot, chat: Chat): string {
+  const fm = Number(chat.fmIndex);
+  const alt = char.alternateGreetings;
+  const text = Number.isInteger(fm) && fm >= 0 ? alt?.[fm] : typeof char.firstMessage === 'string' ? char.firstMessage : undefined;
+  return typeof text === 'string' ? text : '';
+}
+
 /**
  * 요청 직전 로어: 자리 로어북이 있는 옛 카드는 Risu 가 자리 항목으로 끼우므로 다시 골라 요청 속 글만 바꾼다(patchSlots).
  * 자리 로어북이 없는 카드(2026-10-27: 자리 항목·Start Lore·Tag·Faction·Roster 를 카드에서 뺌)는 플러그인이 한 덩어리로 직접 끼운다:
  * RP 지침(카드 description 에 없을 때) → 🏷️Tag 100 → 📜Faction 101 → 🙂Roster 102 → 세력 200 → 시드 399(첫 전송) → 특수 400 → 괴이 500 → 요원 600
  */
-async function fixLore<M extends PromptMessage>(messages: M[]): Promise<M[]> {
-  const charIndex = await risuai.getCurrentCharacterIndex();
-  const char = await getChar<LoreChar>(charIndex);
-  const chat = (await risuai.getChatFromIndex(charIndex, await risuai.getCurrentChatIndex())) as Chat | null;
-  if (!char || !chat) return messages;
+function fixLore<M extends PromptMessage>(messages: M[], { char, chat }: ChatContext): M[] {
   const got = loreFor(char, chat);
   const real = stripVirtual(char.globalLore ?? []);
-  setStatusColumns(chat.scriptstate);
   if (hasSlots(real)) {
     if (!got || sameVars(chat.scriptstate, got.vars)) return messages;
     return patchSlots(messages, chat.scriptstate, got.vars).messages;
   }
   const parts: LoreBlockPart[] = [];
-  const env = { vars: chat.scriptstate ?? {}, char: char.name, user: userInfo().name };
+  const env = { vars: chat.scriptstate ?? {}, char: char.name, user: userOrTag() };
   // 🏷️Tag 의 상태창 절은 이 채팅의 칸 구성에서 만든다 (`{status_section}` 자리)
   const cols = usedCols(colConfig(chat.scriptstate));
   for (const b of ALWAYS_BOOKS) {
     const e = (char.globalLore ?? []).find((x) => isVirtual(x) && x.comment === b.name);
     if (e && typeof e.content === 'string') parts.push({ order: b.order, text: evaluate(b.kind === 'tag' ? fillStatusSection(e.content, cols) : e.content, env) });
   }
+  // 시드(첫 장면 강제 로어): 카드에 📕Start Lore 가 없으면 플러그인이. 수명은 processRequest 가 표식으로 다룬다.
+  // 장식 줄을 떼고 CBS 를 푼 글을 넣고, 같은 글이 고른 로어에도 있으면 그쪽을 뺀다 (같은 인물 글을 두 번 보내지 않게. QC 2026-10-28)
+  const seedRaw = String(chat.scriptstate?.['$seed_lore'] ?? '');
+  let seed = seedRaw && shouldKeepSeed(chat) && !real.some((e) => e.comment === '📕Start Lore') ? seedBody(seedRaw, env) : '';
+  // 캐릭터로 플레이: 주인공 요원 글은 주인공 자리(withPlayer)에 따로 들어가니 시드에서 뺀다
+  const me = playerAgent(char.globalLore, chat.scriptstate);
+  const mine = me ? (char.globalLore ?? []).find((e) => e.mode !== 'folder' && e.comment === me.lore) : undefined;
+  if (seed && mine && typeof mine.content === 'string') {
+    const text = stripDecorators(evaluate(mine.content, env)).trim();
+    if (text) seed = seed.split(text).join('').replace(/\n{3,}/g, '\n\n').trim();
+  }
+  if (seed) parts.push({ order: 399, text: `${SEED_OPEN}\n${seed}\n${SEED_CLOSE}` });
   if (got) {
+    const picks = seed ? got.picks.filter((p) => !seed.includes(stripDecorators(evaluate(p.entry.content, env)).trim())) : got.picks;
+    const texts = picks.length === got.picks.length ? (Object.fromEntries(LORE_KINDS.map((k) => [k, got.vars[slotVar(k)] ?? ''])) as Record<LoreKind, string>) : slotTexts(picks, env);
     // 괴이 공통 머리말은 괴이 묶음 맨 앞에 한 번만 (기록마다 붙이지 않는다. 2026-10-27)
     const note = activeAnomalyNote().trim();
-    const texts = Object.fromEntries(LORE_KINDS.map((k) => [k, got.vars[slotVar(k)] ?? ''])) as Record<LoreKind, string>;
     if (note && texts.anomaly?.trim() && !texts.anomaly.includes(note)) texts.anomaly = `${note}\n\n${texts.anomaly}`;
     parts.push(...slotParts(texts));
   }
-  // 시드(첫 장면 강제 로어): 카드에 📕Start Lore 가 없으면 플러그인이. 수명은 processRequest 가 표식으로 다룬다
-  const seed = String(chat.scriptstate?.['$seed_lore'] ?? '');
-  if (seed && shouldKeepSeed(chat) && !real.some((e) => e.comment === '📕Start Lore')) parts.push({ order: 399, text: seed });
   if (!messages.some((m) => typeof m?.content === 'string' && m.content.includes(RP_HEAD))) parts.push({ order: 0, text: guidePrompt('RP') });
+  // 끼울 자리: 첫 장면(인사말) 앞, 없으면 채팅의 첫 글 앞 (Risu 가 로어북을 넣던 자리 = 대화 앞)
   const first = chat.message?.find((m) => typeof m.data === 'string' && m.data.trim())?.data;
-  return insertLoreBlock(messages, joinLoreBlock(parts), first ? messageText(first) : undefined);
+  return insertLoreBlock(messages, joinLoreBlock(parts), [greetingOf(char, chat), first ? messageText(first) : '']);
 }
 
 /** 캐릭터로 플레이: 페르소나 자리에 그 요원 로어북과 틀 지침, 페르소나 이름은 요원 이름으로 */
-async function withPlayer<M extends PromptMessage>(messages: M[]): Promise<M[]> {
-  const charIndex = await risuai.getCurrentCharacterIndex();
-  const char = await getChar<LoreChar>(charIndex);
-  const chat = (await risuai.getChatFromIndex(charIndex, await risuai.getCurrentChatIndex())) as Chat | null;
-  const agent = char && chat ? playerAgent(char.globalLore, chat.scriptstate) : undefined;
-  if (!char || !chat || !agent) return messages;
+async function withPlayer<M extends PromptMessage>(messages: M[], { char, chat }: ChatContext): Promise<M[]> {
+  const agent = playerAgent(char.globalLore, chat.scriptstate);
+  if (!agent) return messages;
   const env = { vars: chat.scriptstate ?? {}, char: char.name, user: agent.name };
   const out = applyPlayer(messages, playerBlock(char.globalLore, agent, env), await readPersona(), userInfo().name, agent.name);
   return basicSettings(char.globalLore, chat.scriptstate).assetPlayer ? out : hidePlayerTag(out, [agent.english]);
 }
 
-/** 이 채팅의 상태창 모양: 사용하는 칸과 장부 잔고 (잔고 칸을 쓸 때만). 파서에도 칸 구성을 알린다 */
-async function statusShape(): Promise<StatusShape> {
-  const chat = (await risuai.getChatFromIndex(await risuai.getCurrentCharacterIndex(), await risuai.getCurrentChatIndex())) as Chat | null;
-  const vars = chat?.scriptstate ?? {};
-  setStatusColumns(vars);
+/** 이 채팅의 상태창 모양: 사용하는 칸과 장부 잔고 (잔고 칸을 쓸 때만). 파서에는 loadContext 가 칸 구성을 알렸다 */
+function statusShape({ chat }: ChatContext): StatusShape {
+  const vars = chat.scriptstate ?? {};
   const cfg = colConfig(vars);
-  const wallet = chat && cfg.wallet !== 'off' ? walletBalance(readWallet(vars, getPrefs().walletStart ?? WALLET_START_DEFAULT), aliveAnchors(chat)) : null;
+  const wallet = cfg.wallet !== 'off' ? walletBalance(readWallet(vars, getPrefs().walletStart ?? WALLET_START_DEFAULT), aliveAnchors(chat)) : null;
   return { cols: usedCols(cfg), wallet };
 }
 
 /** 플러그인이 마지막으로 알아낸 유저 신분 (`조직/직급`). 없으면 빈 문자열 */
-async function knownIdentity(): Promise<string> {
-  const chat = (await risuai.getChatFromIndex(await risuai.getCurrentCharacterIndex(), await risuai.getCurrentChatIndex())) as Chat | null;
-  if (!chat || !peopleSettings(chat.scriptstate).on) return '';
+function knownIdentity({ chat }: ChatContext): string {
+  if (!peopleSettings(chat.scriptstate).on) return '';
   return identityText(peopleStore(chat).identity);
 }
 
 /** 인물 기록 블록: 마지막 사용자 메시지 앞에 (core/people/request.ts). 채팅은 바꾸지 않는다 */
-async function withPeople<M extends PromptMessage>(messages: M[]): Promise<M[]> {
-  const charIndex = await risuai.getCurrentCharacterIndex();
-  const chatIndex = await risuai.getCurrentChatIndex();
-  const chat = (await risuai.getChatFromIndex(charIndex, chatIndex)) as Chat | null;
-  if (!chat) return messages;
+async function withPeople<M extends PromptMessage>(messages: M[], { char, chat }: ChatContext): Promise<M[]> {
   const settings = peopleSettings(chat.scriptstate);
   if (!settings.on || settings.inject === 'off') return messages;
   const store = peopleStore(chat);
   if (!Object.keys(store.people).length) return messages;
-  const char = await getChar<LoreChar>(charIndex);
-  if (!char) return messages;
   const me = playerAgent(char.globalLore, chat.scriptstate);
   const lastUser = [...messages].reverse().find((m) => m?.role === 'user');
   const input = typeof lastUser?.content === 'string' ? lastUser.content : '';
   const user = me?.name || userInfo().name || '주인공';
-  const opts = { settings, store, sheetOf: (name: string) => bookText({ char, chat }, name) || null, temperOf, extraNames: extraNames(), input, user, factionNames: factionNamesOf(char.globalLore) };
+  // 시트 원문은 로어 덩어리에 들어간 글과 같은 변환(장식 줄 떼기·같은 CBS 환경)으로 읽어야 split·record 모드가 요청에서 그 글을 찾아 뺄 수 있다
+  // (bookText 는 @@dont_activate 줄을 남기고 {{user}}를 「주인공」으로 풀어 한 번도 맞지 않았다. QC 2026-10-28)
+  const env = { vars: chat.scriptstate ?? {}, char: char.name, user: userOrTag() };
+  const sheetOf = (name: string): string | null => {
+    const e = (char.globalLore ?? []).find((x) => x.mode !== 'folder' && x.comment === name && typeof x.content === 'string');
+    const text = e ? stripDecorators(evaluate(e.content as string, env)).trim() : '';
+    return text || bookText({ char, chat }, name) || null;
+  };
+  const opts = { settings, store, sheetOf, temperOf, extraNames: extraNames(), input, user, factionNames: factionNamesOf(char.globalLore) };
   let out = withPeopleBlock(messages, chat, opts);
   // 연출형 Director (선택): 장면 인물에 대해 본편 앞 보조 1회. 실패·지연이면 메모 없이 진행
   if (settings.director === 'scene') {
@@ -261,11 +298,7 @@ async function withPeople<M extends PromptMessage>(messages: M[]): Promise<M[]> 
 }
 
 /** 이미지 태그 지침: 에셋 출력 켬 + 메인 모델일 때 요청 맨 끝에 (로어북 Asset 의 @@depth 0 과 같은 자리). 보조 모델이면 지침 없이 옛 블록만 지운다 */
-async function withImgPrompt<M extends PromptMessage>(messages: M[]): Promise<M[]> {
-  const charIndex = await risuai.getCurrentCharacterIndex();
-  const chat = (await risuai.getChatFromIndex(charIndex, await risuai.getCurrentChatIndex())) as Chat | null;
-  const char = await getChar<LoreChar>(charIndex);
-  if (!chat || !char) return messages;
+function withImgPrompt<M extends PromptMessage>(messages: M[], { char, chat }: ChatContext): M[] {
   const s = basicSettings(char.globalLore, chat.scriptstate);
   const out = stripImgLore(messages);
   if (!s.assetOn || s.assetModel !== 'main') return out;
@@ -277,35 +310,24 @@ async function withImgPrompt<M extends PromptMessage>(messages: M[]): Promise<M[
 }
 
 /** 본부 막간: 대화가 일어난 메시지 바로 뒤에 끼운다 (core/interlude.ts). 채팅은 바꾸지 않는다 */
-async function withVisit<M extends PromptMessage>(messages: M[]): Promise<M[]> {
-  const charIndex = await risuai.getCurrentCharacterIndex();
-  const chat = (await risuai.getChatFromIndex(charIndex, await risuai.getCurrentChatIndex())) as Chat | null;
-  if (!chat || (!visitRecord(chat).turns.length && !fieldRecord(chat).events.length)) return messages;
-  const char = await getChar<LoreChar>(charIndex);
-  const me = char ? playerAgent(char.globalLore, chat.scriptstate) : undefined;
-  return withFieldFacts(withInterludes(messages, chat, char ? visitContextRules({ char }) : null, me?.name || userInfo().name || '주인공'), chat);
+function withVisit<M extends PromptMessage>(messages: M[], { char, chat }: ChatContext): M[] {
+  if (!visitRecord(chat).turns.length && !fieldRecord(chat).events.length) return messages;
+  const me = playerAgent(char.globalLore, chat.scriptstate);
+  return withFieldFacts(withInterludes(messages, chat, visitContextRules({ char }), me?.name || userInfo().name || '주인공'), chat);
 }
 
-let rulesCache: { charIndex: number; gnet: string | null; phone: string | null; wiki: string | null; registry: Registry } | null = null;
-
-/** 괴담넷 글·쪽지, 괴담톡 대화·공지, 위키 문서를 본편 요청의 마지막 사용자 메시지 앞에 참고 기록으로 (원본 editRequest + RC.gnetContext·phoneContext·wikiContext). 기록이 없거나 꺼 두면 빈 목록 */
-async function moduleContext(scene: string): Promise<string[]> {
-  const charIndex = await risuai.getCurrentCharacterIndex();
-  const chatIndex = await risuai.getCurrentChatIndex();
-  const chat = (await risuai.getChatFromIndex(charIndex, chatIndex)) as Chat | null;
-  const ss = chat?.scriptstate;
+/** 괴담넷 글·쪽지, 괴담톡 대화·공지, 위키 문서를 본편 요청의 마지막 사용자 메시지 앞에 참고 기록으로 (원본 editRequest + RC.gnetContext·phoneContext·wikiContext). 기록이 없거나 꺼 두면 빈 목록.
+ *  지침·명부는 요청마다 다시 읽는다 (캐릭터 번호로 캐시하면 지침·명부를 고쳐도 옛것이 남았다. 명부 읽기는 10ms 안쪽. QC 2026-10-28) */
+function moduleContext(scene: string, { char, chat }: ChatContext): string[] {
+  const ss = chat.scriptstate;
   const wantGnet = !!ss?.[GN_RAW] && gnetSettings(ss).enabled && gnetSettings(ss).context;
   const wantPhone = (!!ss?.[PH_STATE] || !!ss?.[PH_BULLETINS]) && phoneSettings(ss).context;
   const wantWiki = wikiContextOn(ss);
-  if (!chat || (!wantGnet && !wantPhone && !wantWiki)) return [];
+  if (!wantGnet && !wantPhone && !wantWiki) return [];
   applyAdvanced(ss);
-  if (rulesCache?.charIndex !== charIndex) {
-    const char = await getChar<{ globalLore?: LoreEntry[] }>(charIndex);
-    const src = { char: { globalLore: char?.globalLore }, chat };
-    rulesCache = { charIndex, gnet: mainContextRules(src), phone: phoneRules(src), wiki: wikiContextRules(char?.globalLore), registry: buildRegistry(char?.globalLore) };
-  }
-  const focus = makeFocus(scene, rulesCache.registry);
-  const rules = rulesCache;
+  const src = { char: { globalLore: char.globalLore }, chat };
+  const rules = { gnet: mainContextRules(src), phone: phoneRules(src), wiki: wikiContextRules(char.globalLore) };
+  const focus = makeFocus(scene, buildRegistry(char.globalLore));
   // 기능마다 반영 상한 안에서 고르고, 합이 「본편 반영 총 상한」을 넘으면 상한을 나눠 다시 고른다 (core/budget.ts fitTotal)
   const parts: ContextPart[] = [];
   if (wantGnet && rules.gnet) {
@@ -393,7 +415,7 @@ async function onOutput(arg: { char: unknown; chat: unknown; characterIndex: num
       })) ?? now;
     }
     // 다음 요청에 넣을 로어북을 미리 골라 둔다 (다시 굴리기·자동 전송은 입력 처리를 거치지 않는다)
-    await storeLore(arg.characterIndex, arg.chatIndex).catch(() => {});
+    await storeLore(arg.characterIndex, arg.chatIndex, undefined, { char, chat: now }).catch(() => {});
     // 막혔던 요청을 사용자가 전송 버튼으로 보냈으면 카드의 「전송을 눌러 주세요」·취소를 없앤다
     if (now.message.some((m) => typeof m.data === 'string' && isUnsent(m.data))) now = (await updateChat(arg.characterIndex, arg.chatIndex, clearUnsent)) ?? now;
     // 인물 기록 갱신 (core/people): 매 턴 설정이면 보조 모델 1회. 다른 보조 호출 앞에, 병렬 설정이 아니면 끝날 때까지 차례로
@@ -403,7 +425,7 @@ async function onOutput(arg: { char: unknown; chat: unknown; characterIndex: num
     }
     // 보조모델 이미지 태그 보충 (설정이 보조모델일 때). 끝난 뒤 괴담톡 확인 (보조 모델을 겹쳐 부르지 않게)
     // 상태창 「지난 장면」 목록을 새 응답까지 넣어 다시
-    await refreshStatusContext(arg.characterIndex, arg.chatIndex).catch(() => {});
+    await refreshStatusContext(arg.characterIndex, arg.chatIndex, { char, chat: now }).catch(() => {});
     await supplementAssets({ charIndex: arg.characterIndex, chatIndex: arg.chatIndex, lore: char.globalLore, chat: now, messageIndex: arg.messageIndex });
     // 괴담톡 자동 새 메시지 확인 → 괴담넷 자동 새로고침 (설정이 켜져 있을 때, 같은 응답에는 한 번. 따로 부를 때는 겹치지 않게 차례로)
     const phoneAuto = phoneSettings(now.scriptstate).auto;
