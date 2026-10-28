@@ -435,7 +435,8 @@ const FX = {
     if (showDummy && Math.abs(D.y - P.y) < 30 + w && (D.x - P.x) * P.face > 0) strike(s.hit || { dmg: 30 * lv, kind: lv >= 2 ? 'launch' : 'heavy' }, p.y);
   },
   // 앞 범위 타격(그림 없는 판정 상자)
-  melee(s, c) { const r = Math.max(s.range || 170, 175) * K(P.y), x = P.x + P.face * r * 0.6;   // 평타(170)만큼은 닿게(10-29: 140 같은 짧은 사거리는 평타 거리의 상대를 못 맞혔음) if (near(x, P.y, r * 0.6 + 30, s.depth || 64) && (D.x - P.x) * P.face > -20) strike(s.hit); },
+  // melee 사거리는 평타(170)만큼은 닿게(10-29: 140 같은 짧은 사거리는 평타 거리의 상대를 못 맞혔음)
+  melee(s, c) { const r = Math.max(s.range || 170, 175) * K(P.y), x = P.x + P.face * r * 0.6; if (near(x, P.y, r * 0.6 + 30, s.depth || 64) && (D.x - P.x) * P.face > -20) strike(s.hit); },
   // 바닥 가시: 검은 바늘 n개가 솟음
   spikes(s, c) {
     const p = posOf({ at: 'front', ...s }, c), n = s.n || 5, sp = (s.spread || 70) * p.k;
