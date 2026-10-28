@@ -688,7 +688,7 @@
        "speed": 520,
        "time": 0.15,
        "hit": null,
-       "stop": true
+       "stop": 0.02
       },
       {
        "t": "v",
@@ -718,7 +718,7 @@
        "speed": 520,
        "time": 0.15,
        "hit": null,
-       "stop": true
+       "stop": 0.02
       },
       {
        "t": "v",
@@ -748,7 +748,7 @@
        "speed": 520,
        "time": 0.15,
        "hit": null,
-       "stop": true
+       "stop": 0.02
       },
       {
        "t": "v",

@@ -958,15 +958,14 @@
          "t": "v",
          "vfx": "x3-c-explosion-large",
          "scale": 0.4,
-         "r": 112.5,
+         "r": 110,
          "boom": 2,
          "hit": {
           "dmg": 84,
           "kind": "down",
           "stop": 0.08,
           "shake": 10
-         },
-         "dx": 170
+         }
         }
        ]
       }

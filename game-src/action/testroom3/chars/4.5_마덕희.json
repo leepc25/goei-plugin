@@ -716,17 +716,18 @@
         },
         {
          "t": "v",
-         "vfx": "x3-c-ground-shockwave",
+         "vfx": "x3-4.5-F-brass-ring",
          "at": "front",
          "dx": 90,
-         "w": 1.05,
-         "tint": "#C9A24A",
+         "w": 0.95,
          "under": true,
          "delay": 0.1,
          "hit": {
           "dmg": 84,
           "kind": "launch"
-         }
+         },
+         "r": 300,
+         "depth": 120
         },
         {
          "t": "shake",

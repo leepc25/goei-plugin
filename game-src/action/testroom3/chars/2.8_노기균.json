@@ -723,7 +723,7 @@
       "speed": 700,
       "time": 0.5,
       "hit": null,
-      "stop": true
+      "stop": 0.02
      },
      {
       "t": "v",

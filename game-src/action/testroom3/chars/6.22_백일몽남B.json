@@ -305,7 +305,7 @@
       "speed": 1200,
       "time": 0.25,
       "hit": null,
-      "stop": true
+      "stop": 0.02
      },
      {
       "t": "repeat",
@@ -346,7 +346,7 @@
       "speed": 1200,
       "time": 0.25,
       "hit": null,
-      "stop": true
+      "stop": 0.02
      },
      {
       "t": "repeat",

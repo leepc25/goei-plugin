@@ -579,7 +579,7 @@
        "speed": 1000,
        "time": 0.26,
        "hit": null,
-       "stop": true
+       "stop": 0.02
       },
       {
        "t": "v",
@@ -649,7 +649,7 @@
       "speed": 900,
       "time": 0.15,
       "hit": null,
-      "stop": true
+      "stop": 0.02
      },
      {
       "t": "v",
@@ -709,7 +709,7 @@
       "speed": 1300,
       "time": 0.55,
       "hit": null,
-      "stop": true
+      "stop": 0.02
      },
      {
       "t": "v",
@@ -740,8 +740,7 @@
            "vfx": "x3-c-hit-spark-heavy",
            "vs": 0.8,
            "tint": "#bff7f0"
-          },
-          "dx": 161
+          }
          },
          {
           "t": "v",

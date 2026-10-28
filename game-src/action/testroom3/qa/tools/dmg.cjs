@@ -1,10 +1,10 @@
 const { chromium } = require('playwright'); const path = require('path'); const fs = require('fs');
-const [,, html, outp, par] = process.argv;
+const [,, html, outp, par, only] = process.argv;   // only: 쉼표로 키 목록
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 (async () => {
   const b = await chromium.launch();
   const p0 = await b.newPage(); await p0.goto('file://' + path.resolve(html)); await p0.waitForFunction(() => window.__room && window.__room.CK);
-  const keys = await p0.evaluate(() => [...document.querySelectorAll('#chsel option')].map(o => o.value)); await p0.close();
+  const keys = (await p0.evaluate(() => [...document.querySelectorAll('#chsel option')].map(o => o.value))).filter(k => !only || only.split(',').includes(k)); await p0.close();
   const res = {}; let qi = 0;
   const worker = async () => {
     const p = await b.newPage({ viewport: { width: 1400, height: 900 } }); await p.goto('file://' + path.resolve(html)); await p.waitForFunction(() => window.__room && window.__room.CK);

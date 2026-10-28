@@ -490,7 +490,7 @@
        "speed": 900,
        "time": 0.22,
        "hit": null,
-       "stop": true
+       "stop": 0.02
       },
       {
        "t": "v",
