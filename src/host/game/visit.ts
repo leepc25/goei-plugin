@@ -1,3 +1,4 @@
+import { uid } from './uid';
 import type { GameVisit, VisitState } from '../../game/bridge';
 import { cardSnapshot } from '../../core/gamelink';
 import { anchorOf, visitRecord, visitRoom, withoutOldLore, withVisitTurn, type VisitTurn } from '../../core/visit';
@@ -120,7 +121,7 @@ export function createVisit(): GameVisit {
         const extra = got.extra.map(e => ({ agentId: bystanders.find(b => b.name === e.speaker)!.id, name: e.speaker, line: e.line }));
         lastExchange = { at: Date.now(), model, messages: prompt.messages, raw, reply: [reply, ...extra.map(e => `${e.name}: ${e.line}`)].join('\n') };
         // If the active chat changes during inference, save only to the captured origin.
-        const turn: VisitTurn = { id: crypto.randomUUID(), at: Date.now(), agentId, name: a.name, user: text, reply, anchor, room: visitRoom(a) ?? undefined, ...(me ? { visitor: me.name } : {}), ...(act ? { act } : {}), ...(extra.length ? { extra } : {}) };
+        const turn: VisitTurn = { id: uid(), at: Date.now(), agentId, name: a.name, user: text, reply, anchor, room: visitRoom(a) ?? undefined, ...(me ? { visitor: me.name } : {}), ...(act ? { act } : {}), ...(extra.length ? { extra } : {}) };
         const char = await risuai.getCharacterFromIndex(c.charIndex) as { chaId?: string } | null;
         if (!char || char.chaId !== c.char.chaId) throw new Error('원래 카드가 바뀌어 대화를 저장하지 못했어요.');
         const saved = await updateChat(c.charIndex, c.chatIndex, chat => {

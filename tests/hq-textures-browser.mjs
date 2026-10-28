@@ -26,15 +26,15 @@ for (const mobile of [false, true]) {
   assert.ok(office.wall.length, '사무실 벽 그림이 그려진다');
   assert.ok(office.floor, '사무실 바닥 그림(무늬)이 깔린다');
   await page.screenshot({ path: `${out}/${mobile ? 'mobile' : 'pc'}-office.png` });
-  // 2층 복도로: 사무실 아래 출입(S)에서 E
+  // 사무실 아래 출입(S)에서 E → 그 층 복도(3층 f3). 복도는 확정 배경 그림(hq-field, painted)
   const door = await page.evaluate(() => window.__goeiEngine.world.stage.current().doors.find((d) => d.to));
   await page.evaluate(([x]) => { const w = window.__goeiEngine.world; w.player.x = x; w.player.y = 640; }, [door.x]);
   await page.waitForFunction(() => !!window.__goeiEngine.world.stage.nearInfo(), null, { timeout: 5000 });
   await page.keyboard.press('KeyE');
-  await page.waitForFunction(() => window.__goeiEngine.world.floor.id === 'hq:f2', null, { timeout: 10000 });
+  await page.waitForFunction((to) => window.__goeiEngine.world.floor.id === `hq:${to}`, door.to, { timeout: 10000 });
   await page.waitForTimeout(800);
   const corridor = await page.evaluate(() => { const s = window.__goeiEngine.world.stage.current(); const known = new Set(Object.values(window.__GOEI_BG_ART__).flatMap((g) => Object.values(g))); return { painted: s.painted, field: [...window.artDraws].some((u) => !known.has(u)) }; });
-  assert.equal(corridor.painted, 'f2');
+  assert.equal(corridor.painted, door.to);
   assert.ok(corridor.field, '복도 장면 그림(hq-field)이 그려진다');
   assert.deepEqual(errors, []);
   await page.screenshot({ path: `${out}/${mobile ? 'mobile' : 'pc'}-corridor.png` });

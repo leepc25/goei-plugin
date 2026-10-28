@@ -240,7 +240,7 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
           }
           c.restore();
         }
-        // 세계 관찰 창 (개발 도구): 화면 왼쪽 위, 화면 px 그대로
+        // 세계 관찰 창 (개발 도구): 화면 오른쪽 위, 화면 px 그대로
         const obs = host.life?.observer(sc.id);
         if (obs) drawObserver(c, obs);
         // 출입 표식과 잠금 이유는 render.ts / HUD가 같은 조사 대상으로 표시한다.

@@ -50,6 +50,7 @@ export class AiEileen extends EileenPlayer {
       free: ['ground', 'chain', 'block'].includes(me.mode),
       air: me.mode === 'air',
       stunned: ['down', 'belly', 'stun'].includes(me.mode) || this.phase === 'down',
+      lying: (me.mode === 'down' || me.mode === 'belly') && this.phase !== 'down',
       hp: this.hp / this.hpMax, sp: me.sp ?? 0, guard: this.guard,
     };
     const d = this.brain.tick(self, foeSense(world.player as unknown as Body));

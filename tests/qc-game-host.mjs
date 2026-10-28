@@ -102,6 +102,31 @@ export function startedChat(extra = {}) {
   };
 }
 
+/** 세계(상황판)가 시작된 진행 중인 채팅: 빈 채팅으로 boot 한 뒤 창에서 소속 A00 → 시작, 봇 응답 하나(상황판 태그·상태줄)를 출력 처리기로 읽힌다
+ *  (tests/browser.mjs startedWithReply 와 같다). startedChat() 만으로는 $goei_world 가 없어 요원 방·세계 시각이 비어 있다. 끝나면 창은 닫힌다 */
+export async function startWorldChat(page) {
+  await openPanel(page);
+  await waitSel(page, '.gx-fac');
+  await page.click('.gx-fac[data-value="A00"]');
+  await page.click('.gx-start');
+  await page.waitForFunction(() => window.__calls.setChat.length >= 1);
+  const world = JSON.parse(await page.evaluate(() => window.__chat.scriptstate.$goei_world));
+  const preset = world.an.find((e) => e.kind === 'preset');
+  const geo = JSON.parse(readFileSync(new URL('../src/data/geo.json', import.meta.url), 'utf8'));
+  const [code, idx] = preset.loc.split('-');
+  const where = `${geo.sido[code]} ${geo.sigun[code][Number(idx)]}`;
+  const reply = ['본문', `[AN|${where}|${preset.name}|활성|A|P001]`, '[AG|P001|작전투입|현장]', '[AG|P002|휴게|사무실]', '[AG|P003|휴게|휴게실]', '[▣|2025.01.01|10:20 AM|☀️|4°C|관리국 본부|없음]'].join('\n');
+  await page.evaluate(async (reply) => {
+    window.__chat.scriptstate.$ph_auto = '0';
+    window.__chat.message.push({ role: 'user', data: '시작', chatId: 'm1' }, { role: 'char', data: reply, chatId: 'm2' });
+    const c = window.__chat;
+    await window.__calls.listeners[0]({ char: JSON.parse(JSON.stringify(window.__char)), chat: JSON.parse(JSON.stringify(c)), characterIndex: 0, chatIndex: 0, messageIndex: c.message.length - 1 });
+    document.querySelector('[data-action="close"]')?.click();
+    const g = document.querySelector('.gx'); if (g) g.style.display = 'none';
+  }, reply);
+  return { preset, where };
+}
+
 /** dist/game/ 파일 이름 → 바이트(base64) */
 export function gameFiles() {
   const gdir = new URL('game/', DIST);
@@ -140,11 +165,15 @@ export async function boot(browser, char, chat, { viewport = { width: 1100, heig
   return { page, errors };
 }
 
+/** waitForSelector 는 찾은 요소 손잡이(ElementHandle)를 돌려주고, 놓지 않으면 DevTools 쪽이 그 요소를 붙잡아 닫은 게임 화면(캔버스·엔진·다리)이 GC 되지 않는다.
+ *  누수 측정을 흐리므로 기다리기만 하고 손잡이는 바로 놓는다 */
+export const waitSel = (page, sel, o) => page.waitForSelector(sel, o).then((h) => h?.dispose());
+
 /** 플로팅 버튼 → 창 열기 */
 export async function openPanel(page) {
   await page.waitForFunction(() => document.querySelector('[x-goei-fab]')?.style.display === 'block', null, { timeout: 8000 });
   await page.click('[x-goei-fab] button');
-  await page.waitForSelector('.gx-head');
+  await waitSel(page, '.gx-head');
 }
 
 /** 필드 탭(게임 시작 화면)까지 */
@@ -152,20 +181,21 @@ export async function openField(page) {
   // PC 는 왼쪽 메뉴 줄(nav-tab), 폰은 머리의 필드 단추(tab): 보이는 쪽을 누른다
   const btn = page.locator('[data-value="field"]:visible').first();
   await btn.click();
-  await page.waitForSelector('.gx-game .gx-gl');
+  // 시작 화면은 파일·저장 칸·본편을 읽은 뒤(home()) 채워진다: 묶음이 생길 때까지
+  await waitSel(page, '.gx-game .gx-gl .ps-group', { timeout: 15000 });
 }
 
 /** 시작 화면 「들어가기」 → 엔진 캔버스 */
 export async function enterGame(page) {
-  await page.waitForSelector('.gx-gl [data-g="play"]:not([disabled])');
+  await waitSel(page, '.gx-gl [data-g="play"]:not([disabled])');
   await page.click('.gx-gl [data-g="play"]');
-  await page.waitForSelector('.gx-game-box .goei-engine canvas', { timeout: 20000 });
+  await waitSel(page, '.gx-game-box .goei-engine canvas', { timeout: 20000 });
   await page.waitForFunction(() => !!window.__goeiEngine, null, { timeout: 20000 });
 }
 
 /** 제목 화면 → 필드 입장 → 본부 (field-harness.enterHub 와 같다) */
 export async function enterHub(page) {
-  await page.waitForFunction(() => window.__goeiEngine);
+  await page.waitForFunction(() => !!window.__goeiEngine); // !! : 엔진 객체 손잡이를 돌려받아 붙잡지 않게
   for (let i = 0; i < 80 && !(await page.evaluate(() => !!window.__goeiEngine?.inHub && !!window.__goeiEngine.world)); i++) {
     const btn = page.locator('.gx-game button:visible', { hasText: /필드 입장|새로 시작|들어가기|계속|확인|닫기/ }).first();
     if (await btn.count()) await btn.click().catch(() => {});

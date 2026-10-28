@@ -21,6 +21,11 @@ export async function openField({ width = 1873, height = 1082, panel = true, car
   const errors = [];
   page.on('pageerror', (e) => errors.push(e.message));
   page.on('console', (m) => m.type() === 'error' && errors.push(m.text()));
+  // 주소 ?seed·hour: about:blank 에서는 history.replaceState 가 막힌다 → 가짜 주소로 먼저 가고(setContent 는 주소를 유지) 그 위에 내용을 쓴다
+  if (query) {
+    await page.route('http://goei.test/**', (r) => r.fulfill({ contentType: 'text/html', body: '<!doctype html><html></html>' }));
+    await page.goto(`http://goei.test/${query.startsWith('?') ? query : `?${query}`}`);
+  }
   // 상황창: 왼쪽 메뉴 줄 · 가운데 본문(필드) · 오른쪽 신분증 줄 (리스 플러그인 창 흉내)
   await page.setContent(`<!doctype html><html><head><meta charset="utf-8"><style>
     html,body{margin:0;height:100%;background:#111}
@@ -29,7 +34,6 @@ export async function openField({ width = 1873, height = 1082, panel = true, car
     .gx-game{position:absolute;inset:0}.gx-game-box{position:absolute;inset:0}
     .gx-game.gx-panelfull{position:absolute;inset:0;z-index:60}
   </style></head><body><div class="gx-panel">${panel ? '<div class="side"></div>' : ''}<main class="gx-fieldhost"><div class="gx-game"><div class="gx-game-box" id="box"></div></div></main>${panel ? '<div class="side"></div>' : ''}</div></body></html>`);
-  if (query) await page.evaluate((q) => history.replaceState(null, '', q), query.startsWith('?') ? query : `?${query}`);
   await page.addScriptTag({ content: code });
   await page.evaluate(async ({ packs, card, uiPrefs, people }) => {
     const unb = (s) => Uint8Array.from(atob(s), (c) => c.charCodeAt(0));

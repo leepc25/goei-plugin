@@ -15,6 +15,8 @@ export interface SelfSense {
   air: boolean;
   /** 맞고 있음·다운·스턴 */
   stunned: boolean;
+  /** 누워 있음 (다운·엎드림, 쓰러져 끝난 것은 아님): 일어나기 버튼을 눌러야 일어난다 (8-2) */
+  lying?: boolean;
   hp: number; // 0~1
   sp: number; // 필살 게이지 0~100
   guard: number; // 방어 게이지 0~100
@@ -105,6 +107,8 @@ export class FighterBrain {
   /** 플레이어 버릇 (10장): 점프·회피 반격 횟수 → 대공·유인 가중 */
   private habit = { jump: 0, attack: 0 };
   private lastFoe: FoeSense | null = null;
+  /** 누운 뒤 일어나기까지 남은 틱 (8-2: 바로 / 늦게 +10~20틱). null = 아직 안 고름 */
+  private wakeT: number | null = null;
   constructor(readonly id: string, readonly grade: Grade, readonly difficulty: Difficulty, readonly persona: Persona, private rng: Rng, private squad?: Squad, private squadKey: object = {}) {
     this.g = GRADE[grade];
     this.d = DIFF[difficulty];
@@ -128,8 +132,14 @@ export class FighterBrain {
     if (me.stunned) {
       this.script = [];
       this.squad?.give(this.squadKey, this.id);
+      // 다운: 일어나기(점프 버튼)를 눌러야 일어난다. 누르지 않으면 무적으로 누운 채 대련이 끝나지 않았다 (8-2 기상 시점: 바로 / 늦게)
+      if (me.lying) {
+        if (this.wakeT === null) this.wakeT = this.chance(0.5) ? 0 : 10 + Math.floor(this.rng() * 11);
+        if (this.wakeT-- <= 0) { out.press.push('jump'); this.wakeT = null; }
+      } else this.wakeT = null;
       return this.finish(out);
     }
+    this.wakeT = null;
     const dx = foe.x - me.x, dist = Math.abs(dx), dy = foe.y - me.y;
     const toward: Btn = dx > 0 ? 'right' : 'left';
     const away: Btn = dx > 0 ? 'left' : 'right';

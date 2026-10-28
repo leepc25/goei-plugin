@@ -80,3 +80,16 @@ test('같은 씨앗이면 같은 판단', () => {
   const go = () => pressed(run(new B.FighterBrain('a', 'B', 'normal', persona, R.mulberry32(9)), 200, (i) => me({ x: 400 + i }), (i) => foe({ x: 800 - i, attacking: i % 40 < 6 }))).join(',');
   assert.equal(go(), go());
 });
+
+test('다운되면 바로 또는 10~20틱 뒤 일어나기(점프)를 누른다 — 누운 채 무적으로 멈추지 않는다 (QC 2026-10-28)', () => {
+  for (let seed = 1; seed <= 20; seed++) {
+    const br = new B.FighterBrain('a', 'B', 'normal', persona, R.mulberry32(seed));
+    const ds = run(br, 30, me({ free: false, stunned: true, lying: true }), foe({ x: 700 }));
+    const at = ds.findIndex((d) => d.press.includes('jump'));
+    assert.ok(at === 0 || (at >= 10 && at <= 21), `씨앗 ${seed}: ${at}틱에 일어남`);
+    assert.ok(ds.every((d) => d.press.every((b) => b === 'jump')), '누운 동안 다른 버튼은 누르지 않는다');
+  }
+  // 스턴(서서 휘청임)은 연타로 빨리 풀지 않는다: 누르지 않음
+  const st = new B.FighterBrain('a', 'B', 'normal', persona, R.mulberry32(5));
+  assert.deepEqual(pressed(run(st, 30, me({ free: false, stunned: true, lying: false }), foe({ x: 700 }))), []);
+});

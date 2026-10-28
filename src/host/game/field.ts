@@ -1,10 +1,12 @@
 // 필드 장부 기록 (플러그인 쪽). 사건을 게임을 연 채팅에만 쌓는다: 채팅이 바뀌면 기록하지 않는다.
+import { uid } from './uid';
 import type { GameField, GameFieldEvent } from '../../game/bridge';
 import { anchorOf } from '../../core/visit';
 import { withFieldEvent, type FieldKind } from '../../core/field';
 import { loadContext, updateChat } from '../risu';
 import { cardSnapshot } from '../../core/gamelink';
 import { lastStatusFields } from '../../core/world/tags';
+import { statusClockMinute } from '../../core/world/status';
 import { entryDecision, presence } from '../../core/fieldgate';
 import { siteFor } from '../../core/fieldsites';
 import { peopleStore, withPeople } from '../../core/people/store';
@@ -28,8 +30,7 @@ export function createField(): GameField {
       const st = lastStatusFields(((c.chat.message ?? []) as { role?: string; data?: string }[]).filter(m => m.role === 'char').slice(-6).map(m => String(m.data ?? '')));
       const me = snap.agents.find(a => a.id === snap.player);
       const p = presence({ player: !!me, state: me?.state, target: st?.target, deployed: st?.deployed ?? null, override: forced });
-      const t = /(\d{1,2}):(\d{2})/.exec(st?.time ?? '');
-      const minute = snap.minute ?? (t ? Number(t[1]) * 60 + Number(t[2]) : null);
+      const minute = snap.minute ?? statusClockMinute(st);
       return { ...entryDecision(p), site: siteFor(snap.faction).site.id, minute };
     },
     record(ev: GameFieldEvent) {
@@ -40,7 +41,7 @@ export function createField(): GameField {
         const c = await loadContext();
         if (!c || c.charIndex !== origin.charIndex || c.chatIndex !== origin.chatIndex || c.char.chaId !== origin.char.chaId || c.chat.id !== origin.chat.id) return;
         if (!KINDS.includes(ev.kind as FieldKind)) return;
-        const event = { id: crypto.randomUUID(), at: Date.now(), anchor: anchorOf(c.chat), kind: ev.kind as FieldKind, text: ev.text, scene: ev.scene, who: ev.who, weight: ev.weight, fact: ev.fact, ...(ev.witness && typeof ev.witness.faction === 'string' ? { witness: { faction: ev.witness.faction, named: !!ev.witness.named } } : {}), ...(typeof ev.visit === 'string' && ev.visit ? { visit: ev.visit } : {}) };
+        const event = { id: uid(), at: Date.now(), anchor: anchorOf(c.chat), kind: ev.kind as FieldKind, text: ev.text, scene: ev.scene, who: ev.who, weight: ev.weight, fact: ev.fact, ...(ev.witness && typeof ev.witness.faction === 'string' ? { witness: { faction: ev.witness.faction, named: !!ev.witness.named } } : {}), ...(typeof ev.visit === 'string' && ev.visit ? { visit: ev.visit } : {}) };
         await updateChat(c.charIndex, c.chatIndex, (chat) => {
           if (chat.id !== c.chat.id) return null;
           let next = withFieldEvent(chat, event);

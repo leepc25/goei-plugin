@@ -134,7 +134,8 @@ function hqAdapter(saves: SaveSlots, bridge: Partial<GameBridge> | undefined, ui
   const readWallet = () => void b?.wallet?.balance().then((n) => { fieldWallet.won = n; }).catch(() => {});
   readPeople();
   readWallet();
-  b?.people?.onChange(() => { readPeople(); readWallet(); });
+  // 구독은 dispose에서 푼다 (풀지 않으면 열고 닫을 때마다 본체의 구독 목록에 다리·카드 스냅숏이 남아 한 번에 10MB씩 쌓였다)
+  const offPeople = b?.people?.onChange(() => { readPeople(); readWallet(); });
   /** 필드 거래: 같은 장부에 출처 「필드」로 적는다 (+ 들어옴, − 나감). 가게·거래 화면이 이걸 부른다 */
   const pay = async (amount: number, memo: string): Promise<number | null> => {
     const after = (await b?.wallet?.add(amount, memo, { place: fieldClock.place || undefined, time: fieldClock.sec === null ? undefined : clockText(fieldClock.sec) }).catch(() => null)) ?? null;
@@ -338,6 +339,7 @@ function hqAdapter(saves: SaveSlots, bridge: Partial<GameBridge> | undefined, ui
     unmount: () => hq.unmount(),
     dispose: () => {
       if (typeof window !== 'undefined') { window.removeEventListener('goei:talk-closed', onTalkClosed); window.removeEventListener('keydown', onObserveKey); }
+      offPeople?.();
       eileenHooks.extraTargets = undefined;
       const g = globalThis as { __goeiWorld?: unknown; __goeiWallet?: unknown };
       delete g.__goeiWorld;

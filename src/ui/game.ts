@@ -289,8 +289,12 @@ async function onClick(e: MouseEvent): Promise<void> {
 export const gameOpen = () => !!layer;
 const hiddenSubs = new Set<(hidden: boolean) => void>();
 /** 다른 탭으로 갈 때: 게임을 떼어 두고 멈춘다. 돌아오면 다시 붙인다 (닫지 않는다, 2026-10-23 사용자) */
+let hidden = false;
 export function hideGame(): void {
-  if (!layer?.isConnected) return;
+  // 창을 다시 그리면(탭 바꿈) 틀이 먼저 바뀌어 게임 층이 이미 떨어져 있을 수 있다: 연결 여부가 아니라 「숨김」 표식으로 한 번만 알린다
+  // (예전엔 isConnected 로 거르다 탭을 바꿔도 멈춤 알림이 안 가 게임이 떼어진 채 계속 돌았다 — 일시정지·소리 끔·저장 없음, QC 2026-10-28)
+  if (!layer || hidden) return;
+  hidden = true;
   layer.remove();
   hiddenSubs.forEach((f) => f(true));
 }
@@ -331,14 +335,14 @@ export function closeGame(): void {
   layer = null;
   onExit = null;
   hiddenSubs.clear();
+  hidden = false;
   view = 'home';
   busy = '';
 }
 
 /** 창을 다시 그린 뒤: 열려 있던 게임을 새 창 틀에 다시 붙인다 */
 export function reattachGame(panel: Element | null): void {
-  if (!layer || !panel || layer.parentElement === panel) return;
-  const was = layer.isConnected;
+  if (!layer || !panel || (layer.parentElement === panel && !hidden)) return;
   panel.append(layer);
-  if (!was) hiddenSubs.forEach((f) => f(false));
+  if (hidden) { hidden = false; hiddenSubs.forEach((f) => f(false)); }
 }
