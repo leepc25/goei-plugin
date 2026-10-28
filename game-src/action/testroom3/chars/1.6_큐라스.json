@@ -382,6 +382,529 @@
      "f": 2,
      "fx": [
       {
+       "t": "v",
+       "vfx": "x3-1.6-D-snap-spark",
+       "at": "hand",
+       "scale": 0.45
+      },
+      {
+       "t": "v",
+       "vfx": "x3-c-explosion-small",
+       "at": "target",
+       "h": 210,
+       "scale": 2.0,
+       "tint": "#B8FF8A",
+       "r": 40,
+       "boom": 1,
+       "hit": {
+        "dmg": 50,
+        "kind": "light",
+        "stop": 0.06
+       }
+      }
+     ]
+    },
+    {
+     "f": 5,
+     "fx": [
+      {
+       "t": "v",
+       "vfx": "x3-1.6-D-snap-spark",
+       "at": "hand",
+       "scale": 0.45
+      },
+      {
+       "t": "v",
+       "vfx": "x3-c-explosion-small",
+       "at": "target",
+       "h": 120,
+       "scale": 2.0,
+       "tint": "#B8FF8A",
+       "r": 40,
+       "boom": 1,
+       "hit": {
+        "dmg": 62,
+        "kind": "light",
+        "stop": 0.08
+       }
+      }
+     ]
+    }
+   ]
+  },
+  "charge": {
+   "name": "지속 포격",
+   "hold": "23",
+   "release": "24",
+   "releaseLv": {
+    "0": "15"
+   },
+   "fireLv": {
+    "0": 3
+   },
+   "levels": [
+    0.5,
+    1.2
+   ],
+   "fire": 2,
+   "lv": {
+    "0": [
+     {
+      "t": "v",
+      "vfx": "x3-1.6-D-snap-spark",
+      "at": "hand",
+      "scale": 0.45
+     },
+     {
+      "t": "v",
+      "vfx": "x3-c-explosion-small",
+      "at": "target",
+      "h": 20,
+      "scale": 2.6,
+      "tint": "#B8FF8A",
+      "r": 40,
+      "boom": 1,
+      "hit": {
+       "dmg": 38,
+       "kind": "light"
+      }
+     }
+    ],
+    "1": [
+     {
+      "t": "v",
+      "vfx": "x3-1.6-D-snap-spark",
+      "at": "hand",
+      "scale": 0.45
+     },
+     {
+      "t": "later",
+      "in": 0.0,
+      "fx": [
+       {
+        "t": "v",
+        "vfx": "x3-c-explosion-small",
+        "at": "front",
+        "h": 20,
+        "scale": 2.2,
+        "tint": "#B8FF8A",
+        "r": 40,
+        "boom": 1,
+        "dx": 700,
+        "hit": {
+         "dmg": 12,
+         "kind": "heavy",
+         "stop": 0.04,
+         "shake": 4
+        }
+       }
+      ]
+     },
+     {
+      "t": "later",
+      "in": 0.12,
+      "fx": [
+       {
+        "t": "v",
+        "vfx": "x3-c-explosion-small",
+        "at": "front",
+        "h": 20,
+        "scale": 2.2,
+        "tint": "#B8FF8A",
+        "r": 40,
+        "boom": 1,
+        "dx": 600,
+        "hit": {
+         "dmg": 12,
+         "kind": "heavy",
+         "stop": 0.04,
+         "shake": 4
+        }
+       }
+      ]
+     },
+     {
+      "t": "later",
+      "in": 0.24,
+      "fx": [
+       {
+        "t": "v",
+        "vfx": "x3-c-explosion-small",
+        "at": "front",
+        "h": 20,
+        "scale": 2.2,
+        "tint": "#B8FF8A",
+        "r": 40,
+        "boom": 1,
+        "dx": 500,
+        "hit": {
+         "dmg": 12,
+         "kind": "heavy",
+         "stop": 0.04,
+         "shake": 4
+        }
+       }
+      ]
+     },
+     {
+      "t": "later",
+      "in": 0.36,
+      "fx": [
+       {
+        "t": "v",
+        "vfx": "x3-c-explosion-small",
+        "at": "front",
+        "h": 20,
+        "scale": 2.2,
+        "tint": "#B8FF8A",
+        "r": 40,
+        "boom": 1,
+        "dx": 400,
+        "hit": {
+         "dmg": 12,
+         "kind": "heavy",
+         "stop": 0.04,
+         "shake": 4
+        }
+       }
+      ]
+     },
+     {
+      "t": "later",
+      "in": 0.48,
+      "fx": [
+       {
+        "t": "v",
+        "vfx": "x3-c-explosion-small",
+        "at": "front",
+        "h": 20,
+        "scale": 2.2,
+        "tint": "#B8FF8A",
+        "r": 40,
+        "boom": 1,
+        "dx": 300,
+        "hit": {
+         "dmg": 12,
+         "kind": "heavy",
+         "stop": 0.04,
+         "shake": 4
+        }
+       }
+      ]
+     }
+    ],
+    "2": [
+     {
+      "t": "v",
+      "vfx": "x3-1.6-D-snap-spark",
+      "at": "hand",
+      "scale": 0.45
+     },
+     {
+      "t": "later",
+      "in": 0.0,
+      "fx": [
+       {
+        "t": "v",
+        "vfx": "x3-c-explosion-small",
+        "at": "front",
+        "h": 20,
+        "scale": 2.0,
+        "tint": "#B8FF8A",
+        "r": 40,
+        "boom": 1,
+        "dx": 700,
+        "hit": {
+         "dmg": 8,
+         "kind": "heavy",
+         "stop": 0.03,
+         "shake": 3
+        }
+       }
+      ]
+     },
+     {
+      "t": "later",
+      "in": 0.1,
+      "fx": [
+       {
+        "t": "v",
+        "vfx": "x3-c-explosion-small",
+        "at": "front",
+        "h": 20,
+        "scale": 2.0,
+        "tint": "#B8FF8A",
+        "r": 40,
+        "boom": 1,
+        "dx": 600,
+        "hit": {
+         "dmg": 8,
+         "kind": "heavy",
+         "stop": 0.03,
+         "shake": 3
+        }
+       }
+      ]
+     },
+     {
+      "t": "later",
+      "in": 0.2,
+      "fx": [
+       {
+        "t": "v",
+        "vfx": "x3-c-explosion-small",
+        "at": "front",
+        "h": 20,
+        "scale": 2.0,
+        "tint": "#B8FF8A",
+        "r": 40,
+        "boom": 1,
+        "dx": 500,
+        "hit": {
+         "dmg": 8,
+         "kind": "heavy",
+         "stop": 0.03,
+         "shake": 3
+        }
+       }
+      ]
+     },
+     {
+      "t": "later",
+      "in": 0.4,
+      "fx": [
+       {
+        "t": "v",
+        "vfx": "x3-1.6-D-snap-spark",
+        "at": "hand",
+        "scale": 0.45
+       },
+       {
+        "t": "v",
+        "vfx": "x3-1.6-S2-fire-wall",
+        "at": "front",
+        "dx": 480,
+        "dy": -45,
+        "scale": 0.75,
+        "loop": 2,
+        "fade": 0.4,
+        "under": true,
+        "r": 50,
+        "depth": 60
+       },
+       {
+        "t": "v",
+        "vfx": "x3-1.6-S2-fire-wall",
+        "at": "front",
+        "dx": 486,
+        "dy": 0,
+        "scale": 0.75,
+        "loop": 2,
+        "fade": 0.4,
+        "under": false,
+        "r": 50,
+        "depth": 140,
+        "hit": {
+         "dmg": 60,
+         "kind": "launch",
+         "stop": 0.16,
+         "shake": 12
+        }
+       },
+       {
+        "t": "v",
+        "vfx": "x3-1.6-S2-fire-wall",
+        "at": "front",
+        "dx": 492,
+        "dy": 45,
+        "scale": 0.75,
+        "loop": 2,
+        "fade": 0.4,
+        "under": false,
+        "r": 50,
+        "depth": 60
+       }
+      ]
+     }
+    ]
+   }
+  },
+  "super": {
+   "name": "지휘",
+   "sub": "「왼쪽 괜찮아? 형님 괜찮아?」",
+   "anim": "25",
+   "fps": 7,
+   "events": [
+    {
+     "f": 1,
+     "fx": [
+      {
+       "t": "dark",
+       "v": 1.4
+      },
+      {
+       "t": "screen",
+       "spots": 5,
+       "every": 0.03,
+       "each": [
+        {
+         "t": "v",
+         "vfx": "x3-c-explosion-small",
+         "at": "front",
+         "h": 40,
+         "scale": 2.0,
+         "tint": "#B8FF8A",
+         "r": 40,
+         "boom": 1,
+         "hit": {
+          "dmg": 20,
+          "kind": "heavy",
+          "stop": 0.06,
+          "shake": 5
+         }
+        }
+       ]
+      },
+      {
+       "t": "shake",
+       "v": 4
+      }
+     ]
+    },
+    {
+     "f": 3,
+     "fx": [
+      {
+       "t": "screen",
+       "spots": 5,
+       "every": 0.03,
+       "each": [
+        {
+         "t": "v",
+         "vfx": "x3-c-explosion-small",
+         "at": "front",
+         "h": 50,
+         "scale": 2.8,
+         "tint": "#B8FF8A",
+         "r": 40,
+         "boom": 1,
+         "hit": {
+          "dmg": 22,
+          "kind": "heavy",
+          "stop": 0.06,
+          "shake": 6
+         }
+        }
+       ]
+      },
+      {
+       "t": "shake",
+       "v": 6
+      }
+     ]
+    },
+    {
+     "f": 5,
+     "fx": [
+      {
+       "t": "screen",
+       "spots": 5,
+       "every": 0.03,
+       "each": [
+        {
+         "t": "v",
+         "vfx": "x3-c-explosion-small",
+         "at": "front",
+         "h": 60,
+         "scale": 3.6,
+         "tint": "#B8FF8A",
+         "r": 40,
+         "boom": 1,
+         "hit": {
+          "dmg": 24,
+          "kind": "heavy",
+          "stop": 0.07,
+          "shake": 8
+         }
+        }
+       ]
+      },
+      {
+       "t": "shake",
+       "v": 8
+      }
+     ]
+    },
+    {
+     "f": 7,
+     "fx": [
+      {
+       "t": "screen",
+       "spots": 5,
+       "every": 0.03,
+       "each": [
+        {
+         "t": "v",
+         "vfx": "x3-c-explosion-small",
+         "at": "front",
+         "h": 70,
+         "scale": 4.6,
+         "tint": "#B8FF8A",
+         "r": 40,
+         "boom": 1,
+         "hit": {
+          "dmg": 26,
+          "kind": "heavy",
+          "stop": 0.08,
+          "shake": 10
+         }
+        }
+       ]
+      },
+      {
+       "t": "shake",
+       "v": 10
+      }
+     ]
+    },
+    {
+     "f": 9,
+     "hold": 0.4,
+     "fx": [
+      {
+       "t": "v",
+       "vfx": "x3-1.6-F-fire-wall-wide",
+       "at": "screen",
+       "w": 1.05,
+       "dy": -60,
+       "boom": 3,
+       "delay": 0.25,
+       "hit": {
+        "dmg": 75,
+        "kind": "launch",
+        "stop": 0.2,
+        "shake": 14
+       }
+      },
+      {
+       "t": "shake",
+       "v": 14
+      }
+     ]
+    }
+   ]
+  }
+ },
+ "skills_2판": {
+  "skill": {
+   "name": "요격",
+   "anim": "22",
+   "fps": 10,
+   "events": [
+    {
+     "f": 2,
+     "fx": [
+      {
        "t": "blast",
        "at": "hand",
        "scale": 0.35

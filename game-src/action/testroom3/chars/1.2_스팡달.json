@@ -432,6 +432,253 @@
      "f": 3,
      "fx": [
       {
+       "t": "v",
+       "vfx": "x3-1.2-D-shadow-pool",
+       "at": "self",
+       "under": true
+      },
+      {
+       "t": "hide",
+       "mode": "out",
+       "dur": 0.18
+      }
+     ]
+    },
+    {
+     "f": 5,
+     "fx": [
+      {
+       "t": "teleport",
+       "to": "behind",
+       "dist": 85,
+       "puddle": false
+      },
+      {
+       "t": "v",
+       "vfx": "x3-1.2-D-shadow-pool",
+       "at": "self",
+       "under": true
+      },
+      {
+       "t": "hide",
+       "mode": "in",
+       "dur": 0.14
+      },
+      {
+       "t": "dark",
+       "v": 0.18
+      },
+      {
+       "t": "v",
+       "vfx": "x3-1.2-D-needle-burst",
+       "at": "front",
+       "dx": 80,
+       "r": 80,
+       "delay": 0.06,
+       "hit": {
+        "dmg": 138,
+        "kind": "launch",
+        "stop": 0.14,
+        "shake": 10,
+        "vfx": "x3-c-hit-spark-heavy",
+        "tint": "#7A3FB0"
+       }
+      }
+     ]
+    }
+   ]
+  },
+  "charge": {
+   "name": "가시 격자",
+   "hold": "23",
+   "release": "24",
+   "releaseLv": {
+    "0": "15"
+   },
+   "fireLv": {
+    "0": 3
+   },
+   "levels": [
+    0.5,
+    1.2
+   ],
+   "fire": 4,
+   "lv": {
+    "0": [
+     {
+      "t": "repeat",
+      "n": 3,
+      "every": 0.08,
+      "fx": [
+       {
+        "t": "proj",
+        "kind": "spike",
+        "speed": 1700,
+        "pierce": true,
+        "life": 0.6,
+        "color": "#1a0f24",
+        "hit": {
+         "dmg": 18,
+         "kind": "light",
+         "stop": 0.04,
+         "shake": 4
+        }
+       }
+      ]
+     }
+    ],
+    "1": [
+     {
+      "t": "v",
+      "vfx": "x3-1.2-S1-spike-lance",
+      "at": "self",
+      "dx": 270,
+      "r": 200,
+      "delay": 0.15,
+      "hit": {
+       "dmg": 92,
+       "kind": "launch",
+       "stop": 0.16,
+       "shake": 12,
+       "vfx": "x3-c-hit-spark-heavy",
+       "tint": "#7A3FB0"
+      }
+     }
+    ],
+    "2": [
+     {
+      "t": "v",
+      "vfx": "x3-1.2-S2-spike-lattice",
+      "at": "front",
+      "dx": 230,
+      "scale": 1.3,
+      "r": 220,
+      "depth": 110,
+      "delay": 0.08,
+      "hit": {
+       "dmg": 110,
+       "kind": "down",
+       "n": 3,
+       "mid": "launch",
+       "every": 0.25,
+       "stop": 0.16,
+       "shake": 12
+      }
+     },
+     {
+      "t": "dark",
+      "v": 0.25
+     }
+    ]
+   }
+  },
+  "super": {
+   "name": "우습네. 정말.",
+   "sub": "「뒤를 보는 버릇을 들여.」",
+   "anim": "25",
+   "fps": 9,
+   "events": [
+    {
+     "f": 1,
+     "fx": [
+      {
+       "t": "dark",
+       "v": 2.6
+      },
+      {
+       "t": "v",
+       "vfx": "x3-1.2-D-shadow-pool",
+       "at": "self",
+       "under": true
+      },
+      {
+       "t": "hide",
+       "mode": "out",
+       "dur": 0.2
+      }
+     ]
+    },
+    {
+     "f": 4,
+     "hold": 0.4,
+     "fx": [
+      {
+       "t": "hide",
+       "mode": "in",
+       "dur": 0.15
+      },
+      {
+       "t": "screen",
+       "spots": 6,
+       "every": 0.14,
+       "each": [
+        {
+         "t": "v",
+         "vfx": "x3-1.2-D-shadow-pool",
+         "under": true
+        },
+        {
+         "t": "v",
+         "vfx": "x3-1.2-D-needle-burst",
+         "r": 80,
+         "delay": 0.06,
+         "hit": {
+          "dmg": 55,
+          "kind": "launch",
+          "stop": 0.08,
+          "shake": 8
+         }
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "f": 8,
+     "hold": 0.35,
+     "fx": [
+      {
+       "t": "v",
+       "vfx": "x3-1.2-F-spike-forest",
+       "at": "screen",
+       "w": 1.05,
+       "boom": 3,
+       "hit": {
+        "dmg": 125,
+        "kind": "down",
+        "n": 2,
+        "mid": "launch",
+        "every": 0.3,
+        "stop": 0.22,
+        "shake": 16
+       }
+      },
+      {
+       "t": "v",
+       "vfx": "x3-1.2-F-eyes-in-dark",
+       "at": "screen",
+       "dy": -170,
+       "scale": 2.2
+      },
+      {
+       "t": "shake",
+       "v": 16
+      }
+     ]
+    }
+   ]
+  }
+ },
+ "skills_2판": {
+  "skill": {
+   "name": "그림자 이동",
+   "anim": "22",
+   "fps": 10,
+   "events": [
+    {
+     "f": 3,
+     "fx": [
+      {
        "t": "puddle",
        "at": "self",
        "r": 70,

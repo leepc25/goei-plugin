@@ -430,6 +430,247 @@
  "skills": {
   "skill": {
    "name": "죄, 죄송해요!",
+   "steps": [
+    {
+     "anim": "11",
+     "fps": 14,
+     "upto": 4,
+     "events": [
+      {
+       "f": 4,
+       "fx": [
+        {
+         "t": "v",
+         "vfx": "x3-c-air-ring",
+         "at": "hand",
+         "dx": 30,
+         "scale": 1.6,
+         "tint": "#FF7EB6"
+        },
+        {
+         "t": "melee",
+         "range": 140,
+         "hit": {
+          "dmg": 50,
+          "kind": "heavy",
+          "stop": 0.1,
+          "shake": 8
+         }
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "anim": "22",
+     "fps": 10,
+     "events": [
+      {
+       "f": 1,
+       "fx": [
+        {
+         "t": "hop",
+         "v": 700,
+         "inv": 1
+        },
+        {
+         "t": "v",
+         "vfx": "x3-c-dust-puff",
+         "at": "self",
+         "scale": 1.3,
+         "tint": "#d8ccb8"
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  "charge": {
+   "name": "증언 재현",
+   "hold": "23",
+   "release": "24",
+   "armed": true,
+   "levels": [
+    0.5,
+    1.2
+   ],
+   "fire": 3,
+   "lv": {
+    "0": [
+     {
+      "t": "v",
+      "vfx": "x3-1.8-S0-tail-sweep",
+      "at": "front",
+      "dx": 160,
+      "h": 100,
+      "scale": 1.5,
+      "r": 160,
+      "hit": {
+       "dmg": 40,
+       "kind": "light",
+       "stop": 0.06
+      }
+     }
+    ],
+    "1": [
+     {
+      "t": "v",
+      "vfx": "x3-1.8-S1-dash-trail",
+      "at": "front",
+      "dx": 200,
+      "h": 110,
+      "scale": 1.2
+     },
+     {
+      "t": "later",
+      "in": 0.05,
+      "fx": [
+       {
+        "t": "v",
+        "vfx": "x3-1.8-S1-dash-trail",
+        "at": "front",
+        "dx": 460,
+        "h": 110,
+        "scale": 1.2
+       }
+      ]
+     },
+     {
+      "t": "later",
+      "in": 0.1,
+      "fx": [
+       {
+        "t": "v",
+        "vfx": "x3-1.8-S1-dash-trail",
+        "at": "front",
+        "dx": 720,
+        "h": 110,
+        "scale": 1.2
+       }
+      ]
+     },
+     {
+      "t": "melee",
+      "range": 620,
+      "hit": {
+       "dmg": 70,
+       "kind": "heavy",
+       "stop": 0.12,
+       "shake": 10
+      }
+     }
+    ],
+    "2": [
+     {
+      "t": "v",
+      "vfx": "x3-1.8-S2-wire-box",
+      "at": "front",
+      "dx": 300,
+      "scale": 0.85,
+      "r": 230,
+      "depth": 110,
+      "delay": 0.2,
+      "hit": {
+       "dmg": 95,
+       "kind": "down",
+       "n": 2,
+       "mid": "launch",
+       "every": 0.35,
+       "stop": 0.16,
+       "shake": 12
+      }
+     },
+     {
+      "t": "later",
+      "in": 0.35,
+      "fx": [
+       {
+        "t": "hop",
+        "v": 500,
+        "inv": 0.4
+       }
+      ]
+     }
+    ]
+   }
+  },
+  "super": {
+   "name": "이건 꽝이에요",
+   "sub": "「주, 죽는 거 아니죠…?」",
+   "anim": "25",
+   "fps": 8,
+   "armed": true,
+   "events": [
+    {
+     "f": 2,
+     "hold": 0.3,
+     "fx": [
+      {
+       "t": "v",
+       "vfx": "x3-1.8-F-laser-sweep",
+       "at": "screen",
+       "w": 1.05,
+       "delay": 0.1,
+       "hit": {
+        "dmg": 60,
+        "kind": "launch",
+        "n": 4,
+        "mid": "light",
+        "every": 0.15,
+        "stop": 0.06,
+        "shake": 6
+       }
+      }
+     ]
+    },
+    {
+     "f": 7,
+     "hold": 0.3,
+     "fx": [
+      {
+       "t": "screen",
+       "spots": 5,
+       "every": 0.0,
+       "each": [
+        {
+         "t": "v",
+         "vfx": "x3-1.8-F-grid-burst",
+         "scale": 0.9,
+         "r": 90,
+         "delay": 0.6,
+         "hit": {
+          "dmg": 90,
+          "kind": "down",
+          "stop": 0.2,
+          "shake": 14
+         }
+        }
+       ]
+      },
+      {
+       "t": "later",
+       "in": 0.6,
+       "fx": [
+        {
+         "t": "shake",
+         "v": 14
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "f": 11,
+     "hold": 0.3,
+     "fx": []
+    }
+   ]
+  }
+ },
+ "skills_2판": {
+  "skill": {
+   "name": "죄, 죄송해요!",
    "anim": "22",
    "fps": 10,
    "events": [

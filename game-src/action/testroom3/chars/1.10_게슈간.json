@@ -358,6 +358,258 @@
      "f": 3,
      "fx": [
       {
+       "t": "v",
+       "vfx": "x3-1.10-D-warp-ring",
+       "at": "target",
+       "scale": 1.3,
+       "under": true,
+       "hold": 1.0,
+       "fade": 0.3
+      }
+     ]
+    },
+    {
+     "f": 6,
+     "fx": [
+      {
+       "t": "lift",
+       "h": 130,
+       "time": 1.2,
+       "color": "#6EC6FF",
+       "hit": {
+        "dmg": 150,
+        "kind": "light"
+       }
+      }
+     ]
+    }
+   ]
+  },
+  "charge": {
+   "name": "던지기 / 짓뭉개기",
+   "hold": "23",
+   "release": "24",
+   "releaseLv": {
+    "0": "15",
+    "2": "12"
+   },
+   "fireLv": {
+    "0": 4,
+    "2": 4
+   },
+   "levels": [
+    0.5,
+    1.2
+   ],
+   "fire": 5,
+   "lv": {
+    "0": [
+     {
+      "t": "v",
+      "vfx": "x3-1.10-S0-force-drop",
+      "at": "target",
+      "r": 80,
+      "delay": 0.2,
+      "hit": {
+       "dmg": 41,
+       "kind": "light",
+       "stop": 0.1,
+       "shake": 8
+      }
+     }
+    ],
+    "1": [
+     {
+      "t": "v",
+      "vfx": "x3-1.10-D-warp-ring",
+      "at": "target",
+      "scale": 1.2,
+      "under": true
+     },
+     {
+      "t": "lift",
+      "h": 170,
+      "time": 0.4,
+      "color": "#6EC6FF"
+     },
+     {
+      "t": "later",
+      "in": 0.4,
+      "fx": [
+       {
+        "t": "v",
+        "vfx": "x3-1.10-S1-warp-trail",
+        "at": "target",
+        "h": 150,
+        "dx": -80,
+        "scale": 1.4
+       },
+       {
+        "t": "hit",
+        "hit": {
+         "dmg": 70,
+         "kind": "blow",
+         "stop": 0.12,
+         "shake": 10
+        }
+       }
+      ]
+     },
+     {
+      "t": "later",
+      "in": 1.0,
+      "fx": [
+       {
+        "t": "v",
+        "vfx": "x3-c-ground-shockwave",
+        "at": "target",
+        "scale": 0.6,
+        "tint": "#6EC6FF",
+        "under": true
+       }
+      ]
+     }
+    ],
+    "2": [
+     {
+      "t": "v",
+      "vfx": "x3-1.10-S2-warp-crush",
+      "at": "front",
+      "dx": 300,
+      "r": 280,
+      "depth": 110,
+      "delay": 0.35,
+      "hit": {
+       "dmg": 110,
+       "kind": "down",
+       "stop": 0.2,
+       "shake": 15
+      }
+     },
+     {
+      "t": "later",
+      "in": 0.4,
+      "fx": [
+       {
+        "t": "v",
+        "vfx": "x3-c-ground-crack",
+        "at": "front",
+        "dx": 300,
+        "scale": 1.2,
+        "under": true
+       },
+       {
+        "t": "shake",
+        "v": 12
+       }
+      ]
+     }
+    ]
+   }
+  },
+  "super": {
+   "name": "가리키고, 보고, 쥐고",
+   "sub": "「…끝.」",
+   "anim": "25",
+   "fps": 8,
+   "events": [
+    {
+     "f": 3,
+     "fx": [
+      {
+       "t": "screen",
+       "spots": 5,
+       "every": 0.06,
+       "each": [
+        {
+         "t": "v",
+         "vfx": "x3-1.10-D-warp-ring",
+         "scale": 1.3,
+         "under": true,
+         "hold": 1.4,
+         "fade": 0.3
+        },
+        {
+         "t": "lift",
+         "h": 170,
+         "time": 1.6,
+         "hit": {
+          "dmg": 19,
+          "kind": "light"
+         }
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "f": 5,
+     "hold": 0.3,
+     "fx": [
+      {
+       "t": "flash",
+       "v": 0.06
+      }
+     ]
+    },
+    {
+     "f": 7,
+     "hold": 0.3,
+     "fx": [
+      {
+       "t": "screen",
+       "spots": 5,
+       "every": 0.02,
+       "each": [
+        {
+         "t": "v",
+         "vfx": "x3-c-ground-crack",
+         "scale": 1.0,
+         "under": true,
+         "r": 100,
+         "hit": {
+          "dmg": 141,
+          "kind": "spike",
+          "stop": 0.22,
+          "shake": 16
+         }
+        }
+       ]
+      },
+      {
+       "t": "v",
+       "vfx": "x3-c-ground-shockwave",
+       "at": "screen",
+       "w": 1.05,
+       "tint": "#6EC6FF",
+       "under": true
+      },
+      {
+       "t": "v",
+       "vfx": "x3-c-dust-cloud-large",
+       "at": "screen",
+       "w": 1.05,
+       "tint": "#a89c88"
+      },
+      {
+       "t": "shake",
+       "v": 16
+      }
+     ]
+    }
+   ]
+  }
+ },
+ "skills_2판": {
+  "skill": {
+   "name": "고정",
+   "anim": "22",
+   "fps": 10,
+   "events": [
+    {
+     "f": 3,
+     "fx": [
+      {
        "t": "ring",
        "at": "target",
        "r": 60,

@@ -349,6 +349,708 @@
      "hold": 0.12,
      "fx": [
       {
+       "t": "v",
+       "vfx": "x3-1.1-D-palm-blast",
+       "at": "hand",
+       "dx": 70,
+       "r": 120,
+       "depth": 80,
+       "delay": 0.08,
+       "boom": 2,
+       "hit": {
+        "dmg": 168,
+        "kind": "blow",
+        "stop": 0.16,
+        "shake": 12,
+        "vfx": "x3-c-hit-spark-heavy",
+        "tint": "#FFB060"
+       }
+      },
+      {
+       "t": "later",
+       "in": 0.15,
+       "fx": [
+        {
+         "t": "v",
+         "vfx": "x3-1.1-D-scorch-mark",
+         "at": "front",
+         "dx": 170,
+         "scale": 1.4,
+         "under": true,
+         "hold": 1.5,
+         "fade": 0.6
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  "charge": {
+   "name": "구역 정리",
+   "hold": "23",
+   "release": "24",
+   "levels": [
+    0.5,
+    1.2
+   ],
+   "fire": 1,
+   "lv": {
+    "0": [
+     {
+      "t": "v",
+      "vfx": "x3-1.1-S-chain-blast",
+      "at": "front",
+      "dx": 135,
+      "dy": 0,
+      "scale": 0.9,
+      "r": 54.0,
+      "depth": 75,
+      "boom": 1,
+      "hit": {
+       "dmg": 11,
+       "kind": "light"
+      }
+     },
+     {
+      "t": "v",
+      "vfx": "x3-1.1-D-scorch-mark",
+      "at": "front",
+      "dx": 135,
+      "dy": 4,
+      "scale": 1.08,
+      "under": true,
+      "hold": 1.2,
+      "fade": 0.6
+     },
+     {
+      "t": "later",
+      "in": 0.14,
+      "fx": [
+       {
+        "t": "v",
+        "vfx": "x3-1.1-S-chain-blast",
+        "at": "front",
+        "dx": 276,
+        "dy": 0,
+        "scale": 1.0,
+        "r": 60.0,
+        "depth": 75,
+        "boom": 1,
+        "hit": {
+         "dmg": 11,
+         "kind": "light"
+        }
+       },
+       {
+        "t": "v",
+        "vfx": "x3-1.1-D-scorch-mark",
+        "at": "front",
+        "dx": 276,
+        "dy": 4,
+        "scale": 1.2,
+        "under": true,
+        "hold": 1.2,
+        "fade": 0.6
+       }
+      ]
+     },
+     {
+      "t": "later",
+      "in": 0.28,
+      "fx": [
+       {
+        "t": "v",
+        "vfx": "x3-1.1-S-chain-blast",
+        "at": "front",
+        "dx": 452,
+        "dy": 0,
+        "scale": 1.25,
+        "r": 75.0,
+        "depth": 75,
+        "boom": 1,
+        "hit": {
+         "dmg": 30,
+         "kind": "down",
+         "stop": 0.14,
+         "shake": 10
+        }
+       },
+       {
+        "t": "v",
+        "vfx": "x3-1.1-D-scorch-mark",
+        "at": "front",
+        "dx": 452,
+        "dy": 4,
+        "scale": 1.5,
+        "under": true,
+        "hold": 1.2,
+        "fade": 0.6
+       }
+      ]
+     }
+    ],
+    "1": [
+     {
+      "t": "v",
+      "vfx": "x3-1.1-S-chain-blast",
+      "at": "front",
+      "dx": 130,
+      "dy": 0,
+      "scale": 0.9,
+      "r": 54.0,
+      "depth": 75,
+      "boom": 1,
+      "hit": {
+       "dmg": 6,
+       "kind": "light"
+      }
+     },
+     {
+      "t": "v",
+      "vfx": "x3-1.1-D-scorch-mark",
+      "at": "front",
+      "dx": 130,
+      "dy": 4,
+      "scale": 1.08,
+      "under": true,
+      "hold": 1.2,
+      "fade": 0.6
+     },
+     {
+      "t": "later",
+      "in": 0.12,
+      "fx": [
+       {
+        "t": "v",
+        "vfx": "x3-1.1-S-chain-blast",
+        "at": "front",
+        "dx": 260,
+        "dy": 0,
+        "scale": 1.0,
+        "r": 60.0,
+        "depth": 75,
+        "boom": 1,
+        "hit": {
+         "dmg": 6,
+         "kind": "light"
+        }
+       },
+       {
+        "t": "v",
+        "vfx": "x3-1.1-D-scorch-mark",
+        "at": "front",
+        "dx": 260,
+        "dy": 4,
+        "scale": 1.2,
+        "under": true,
+        "hold": 1.2,
+        "fade": 0.6
+       }
+      ]
+     },
+     {
+      "t": "later",
+      "in": 0.24,
+      "fx": [
+       {
+        "t": "v",
+        "vfx": "x3-1.1-S-chain-blast",
+        "at": "front",
+        "dx": 400,
+        "dy": 0,
+        "scale": 1.1,
+        "r": 66.0,
+        "depth": 75,
+        "boom": 1,
+        "hit": {
+         "dmg": 6,
+         "kind": "light"
+        }
+       },
+       {
+        "t": "v",
+        "vfx": "x3-1.1-D-scorch-mark",
+        "at": "front",
+        "dx": 400,
+        "dy": 4,
+        "scale": 1.32,
+        "under": true,
+        "hold": 1.2,
+        "fade": 0.6
+       }
+      ]
+     },
+     {
+      "t": "later",
+      "in": 0.36,
+      "fx": [
+       {
+        "t": "v",
+        "vfx": "x3-1.1-S-chain-blast",
+        "at": "front",
+        "dx": 560,
+        "dy": 0,
+        "scale": 1.35,
+        "r": 81.0,
+        "depth": 75,
+        "boom": 1,
+        "hit": {
+         "dmg": 34,
+         "kind": "launch",
+         "stop": 0.14,
+         "shake": 10,
+         "vfx": "x3-c-hit-spark-heavy",
+         "tint": "#FFB060"
+        }
+       },
+       {
+        "t": "v",
+        "vfx": "x3-1.1-D-scorch-mark",
+        "at": "front",
+        "dx": 560,
+        "dy": 4,
+        "scale": 1.62,
+        "under": true,
+        "hold": 1.2,
+        "fade": 0.6
+       }
+      ]
+     },
+     {
+      "t": "v",
+      "vfx": "x3-1.1-S-chain-blast",
+      "at": "front",
+      "dx": 130,
+      "dy": -22,
+      "scale": 0.9,
+      "r": 54.0,
+      "depth": 50,
+      "boom": 1,
+      "hit": {
+       "dmg": 6,
+       "kind": "light"
+      }
+     },
+     {
+      "t": "v",
+      "vfx": "x3-1.1-D-scorch-mark",
+      "at": "front",
+      "dx": 130,
+      "dy": -18,
+      "scale": 1.08,
+      "under": true,
+      "hold": 1.2,
+      "fade": 0.6
+     },
+     {
+      "t": "later",
+      "in": 0.12,
+      "fx": [
+       {
+        "t": "v",
+        "vfx": "x3-1.1-S-chain-blast",
+        "at": "front",
+        "dx": 260,
+        "dy": -44,
+        "scale": 1.0,
+        "r": 60.0,
+        "depth": 50,
+        "boom": 1,
+        "hit": {
+         "dmg": 6,
+         "kind": "light"
+        }
+       },
+       {
+        "t": "v",
+        "vfx": "x3-1.1-D-scorch-mark",
+        "at": "front",
+        "dx": 260,
+        "dy": -40,
+        "scale": 1.2,
+        "under": true,
+        "hold": 1.2,
+        "fade": 0.6
+       }
+      ]
+     },
+     {
+      "t": "later",
+      "in": 0.24,
+      "fx": [
+       {
+        "t": "v",
+        "vfx": "x3-1.1-S-chain-blast",
+        "at": "front",
+        "dx": 400,
+        "dy": -66,
+        "scale": 1.1,
+        "r": 66.0,
+        "depth": 50,
+        "boom": 1,
+        "hit": {
+         "dmg": 6,
+         "kind": "light"
+        }
+       },
+       {
+        "t": "v",
+        "vfx": "x3-1.1-D-scorch-mark",
+        "at": "front",
+        "dx": 400,
+        "dy": -62,
+        "scale": 1.32,
+        "under": true,
+        "hold": 1.2,
+        "fade": 0.6
+       }
+      ]
+     },
+     {
+      "t": "later",
+      "in": 0.36,
+      "fx": [
+       {
+        "t": "v",
+        "vfx": "x3-1.1-S-chain-blast",
+        "at": "front",
+        "dx": 560,
+        "dy": -88,
+        "scale": 1.35,
+        "r": 81.0,
+        "depth": 50,
+        "boom": 1,
+        "hit": {
+         "dmg": 34,
+         "kind": "launch",
+         "stop": 0.14,
+         "shake": 10,
+         "vfx": "x3-c-hit-spark-heavy",
+         "tint": "#FFB060"
+        }
+       },
+       {
+        "t": "v",
+        "vfx": "x3-1.1-D-scorch-mark",
+        "at": "front",
+        "dx": 560,
+        "dy": -84,
+        "scale": 1.62,
+        "under": true,
+        "hold": 1.2,
+        "fade": 0.6
+       }
+      ]
+     },
+     {
+      "t": "v",
+      "vfx": "x3-1.1-S-chain-blast",
+      "at": "front",
+      "dx": 130,
+      "dy": 22,
+      "scale": 0.9,
+      "r": 54.0,
+      "depth": 50,
+      "boom": 1,
+      "hit": {
+       "dmg": 6,
+       "kind": "light"
+      }
+     },
+     {
+      "t": "v",
+      "vfx": "x3-1.1-D-scorch-mark",
+      "at": "front",
+      "dx": 130,
+      "dy": 26,
+      "scale": 1.08,
+      "under": true,
+      "hold": 1.2,
+      "fade": 0.6
+     },
+     {
+      "t": "later",
+      "in": 0.12,
+      "fx": [
+       {
+        "t": "v",
+        "vfx": "x3-1.1-S-chain-blast",
+        "at": "front",
+        "dx": 260,
+        "dy": 44,
+        "scale": 1.0,
+        "r": 60.0,
+        "depth": 50,
+        "boom": 1,
+        "hit": {
+         "dmg": 6,
+         "kind": "light"
+        }
+       },
+       {
+        "t": "v",
+        "vfx": "x3-1.1-D-scorch-mark",
+        "at": "front",
+        "dx": 260,
+        "dy": 48,
+        "scale": 1.2,
+        "under": true,
+        "hold": 1.2,
+        "fade": 0.6
+       }
+      ]
+     },
+     {
+      "t": "later",
+      "in": 0.24,
+      "fx": [
+       {
+        "t": "v",
+        "vfx": "x3-1.1-S-chain-blast",
+        "at": "front",
+        "dx": 400,
+        "dy": 66,
+        "scale": 1.1,
+        "r": 66.0,
+        "depth": 50,
+        "boom": 1,
+        "hit": {
+         "dmg": 6,
+         "kind": "light"
+        }
+       },
+       {
+        "t": "v",
+        "vfx": "x3-1.1-D-scorch-mark",
+        "at": "front",
+        "dx": 400,
+        "dy": 70,
+        "scale": 1.32,
+        "under": true,
+        "hold": 1.2,
+        "fade": 0.6
+       }
+      ]
+     },
+     {
+      "t": "later",
+      "in": 0.36,
+      "fx": [
+       {
+        "t": "v",
+        "vfx": "x3-1.1-S-chain-blast",
+        "at": "front",
+        "dx": 560,
+        "dy": 88,
+        "scale": 1.35,
+        "r": 81.0,
+        "depth": 50,
+        "boom": 1,
+        "hit": {
+         "dmg": 34,
+         "kind": "launch",
+         "stop": 0.14,
+         "shake": 10,
+         "vfx": "x3-c-hit-spark-heavy",
+         "tint": "#FFB060"
+        }
+       },
+       {
+        "t": "v",
+        "vfx": "x3-1.1-D-scorch-mark",
+        "at": "front",
+        "dx": 560,
+        "dy": 92,
+        "scale": 1.62,
+        "under": true,
+        "hold": 1.2,
+        "fade": 0.6
+       }
+      ]
+     }
+    ],
+    "2": [
+     {
+      "t": "v",
+      "vfx": "x3-1.1-S2-zone-blast",
+      "at": "self",
+      "scale": 1.1,
+      "r": 270,
+      "depth": 120,
+      "delay": 0.12,
+      "boom": 3,
+      "hit": {
+       "dmg": 67,
+       "kind": "launch",
+       "n": 2,
+       "mid": "heavy",
+       "stop": 0.18,
+       "shake": 14,
+       "vfx": "x3-c-hit-spark-heavy",
+       "tint": "#FFB060"
+      }
+     },
+     {
+      "t": "v",
+      "vfx": "x3-c-ground-shockwave",
+      "at": "self",
+      "scale": 1.2,
+      "tint": "#FF9A5A",
+      "under": true
+     },
+     {
+      "t": "shake",
+      "v": 10
+     }
+    ]
+   }
+  },
+  "super": {
+   "name": "보면 알아",
+   "sub": "「설명하기 어려워. 보면 알아.」",
+   "anim": "25",
+   "fps": 9,
+   "events": [
+    {
+     "f": 1,
+     "fx": [
+      {
+       "t": "flash",
+       "v": 0.18
+      }
+     ]
+    },
+    {
+     "f": 8,
+     "hold": 0.25,
+     "fx": [
+      {
+       "t": "screen",
+       "spots": 8,
+       "every": 0.05,
+       "each": [
+        {
+         "t": "v",
+         "vfx": "x3-1.1-S-chain-blast",
+         "scale": 1.6,
+         "r": 90,
+         "boom": 1,
+         "hit": {
+          "dmg": 16,
+          "kind": "down",
+          "stop": 0.06,
+          "shake": 8
+         }
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "f": 9,
+     "hold": 0.2,
+     "fx": [
+      {
+       "t": "screen",
+       "spots": 8,
+       "every": 0.04,
+       "each": [
+        {
+         "t": "v",
+         "vfx": "x3-c-explosion-large",
+         "scale": 0.4,
+         "r": 110,
+         "boom": 2,
+         "hit": {
+          "dmg": 22,
+          "kind": "down",
+          "stop": 0.08,
+          "shake": 10
+         }
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "f": 10,
+     "hold": 0.35,
+     "fx": [
+      {
+       "t": "flash",
+       "v": 0.22
+      },
+      {
+       "t": "shake",
+       "v": 20
+      },
+      {
+       "t": "screen",
+       "spots": 8,
+       "every": 0.0,
+       "each": [
+        {
+         "t": "v",
+         "vfx": "x3-1.1-F-fire-pillar",
+         "scale": 0.75,
+         "r": 110,
+         "boom": 3,
+         "hit": {
+          "dmg": 49,
+          "kind": "launch",
+          "n": 3,
+          "mid": "heavy",
+          "stop": 0.2,
+          "shake": 18,
+          "vfx": "x3-c-hit-spark-heavy",
+          "tint": "#FFB060"
+         }
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "f": 12,
+     "hold": 0.4,
+     "fx": [
+      {
+       "t": "v",
+       "vfx": "x3-c-dust-cloud-large",
+       "at": "self",
+       "scale": 0.9,
+       "tint": "#5a5050",
+       "fade": 0.8
+      },
+      {
+       "t": "v",
+       "vfx": "x3-c-smoke",
+       "at": "body",
+       "dx": -30,
+       "scale": 1.6,
+       "tint": "#4a4444"
+      }
+     ]
+    }
+   ]
+  }
+ },
+ "skills_2판": {
+  "skill": {
+   "name": "근접 폭파",
+   "anim": "22",
+   "fps": 11,
+   "armor": [
+    3,
+    5
+   ],
+   "events": [
+    {
+     "f": 4,
+     "hold": 0.12,
+     "fx": [
+      {
        "t": "self",
        "vfx": "jyaldi-palm-blast2",
        "strength": 2,

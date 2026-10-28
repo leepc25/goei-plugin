@@ -380,6 +380,273 @@
      "f": 3,
      "fx": [
       {
+       "t": "ring",
+       "at": "front",
+       "dx": 220,
+       "r": 60,
+       "color": "#E8D23A",
+       "time": 0.4
+      }
+     ]
+    },
+    {
+     "f": 4,
+     "hold": 0.15,
+     "fx": [
+      {
+       "t": "v",
+       "vfx": "x3-1.5-D-hatch-arc",
+       "at": "front",
+       "dx": 220,
+       "r": 70,
+       "delay": 0.1,
+       "boom": 1,
+       "hit": {
+        "dmg": 150,
+        "kind": "launch",
+        "stop": 0.14,
+        "shake": 10,
+        "vfx": "x3-c-hit-spark-light",
+        "vs": 3,
+        "tint": "#E8D23A"
+       }
+      }
+     ]
+    }
+   ]
+  },
+  "charge": {
+   "name": "꽤 깊지!",
+   "hold": "23",
+   "release": "24",
+   "armed": true,
+   "levels": [
+    0.5,
+    1.2
+   ],
+   "fire": 5,
+   "lv": {
+    "0": [
+     {
+      "t": "v",
+      "vfx": "x3-1.5-S0-floor-plate",
+      "at": "front",
+      "dx": 130,
+      "scale": 1.2,
+      "r": 70,
+      "delay": 0.08,
+      "hit": {
+       "dmg": 45,
+       "kind": "launch",
+       "stop": 0.08,
+       "shake": 6
+      }
+     }
+    ],
+    "1": [
+     {
+      "t": "v",
+      "vfx": "x3-1.5-S1-shutter",
+      "at": "front",
+      "dx": 320,
+      "r": 180,
+      "delay": 0.12,
+      "boom": 1,
+      "hit": {
+       "dmg": 90,
+       "kind": "down",
+       "stop": 0.16,
+       "shake": 12,
+       "vfx": "x3-c-hit-spark-heavy",
+       "tint": "#E8D23A"
+      }
+     }
+    ],
+    "2": [
+     {
+      "t": "v",
+      "vfx": "x3-1.5-S2-floor-pit",
+      "at": "front",
+      "dx": 320,
+      "r": 300,
+      "depth": 110,
+      "delay": 0.2,
+      "under": true,
+      "hit": {
+       "dmg": 110,
+       "kind": "down",
+       "n": 2,
+       "mid": "launch",
+       "every": 0.55,
+       "stop": 0.16,
+       "shake": 14
+      }
+     },
+     {
+      "t": "later",
+      "in": 0.7,
+      "fx": [
+       {
+        "t": "shake",
+        "v": 12
+       },
+       {
+        "t": "v",
+        "vfx": "x3-c-dust-puff",
+        "at": "front",
+        "dx": 320,
+        "scale": 2,
+        "tint": "#c8c0a8"
+       }
+      ]
+     }
+    ]
+   }
+  },
+  "super": {
+   "name": "오오, 그 녀석은 성질이 좀 있지!",
+   "sub": "「자네, 커피는 다 마셨나!」",
+   "anim": "25",
+   "fps": 8,
+   "events": [
+    {
+     "f": 1,
+     "fx": [
+      {
+       "t": "dark",
+       "v": 2.0
+      },
+      {
+       "t": "repeat",
+       "n": 4,
+       "every": 0.25,
+       "fx": [
+        {
+         "t": "ring",
+         "at": "self",
+         "r": 640,
+         "color": "#E8D23A",
+         "w": 6,
+         "time": 0.2
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "f": 2,
+     "hold": 0.3,
+     "fx": [
+      {
+       "t": "v",
+       "vfx": "x3-1.5-F-vault-door",
+       "at": "screen",
+       "dy": -90,
+       "under": true,
+       "hold": 1.6,
+       "fade": 0.4
+      }
+     ]
+    },
+    {
+     "f": 3,
+     "hold": 0.45,
+     "fx": [
+      {
+       "t": "later",
+       "in": 0.5,
+       "fx": [
+        {
+         "t": "v",
+         "vfx": "x3-1.5-F-yellow-eyes",
+         "at": "screen",
+         "dy": -110,
+         "under": true
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "f": 5,
+     "hold": 0.2,
+     "fx": [
+      {
+       "t": "v",
+       "vfx": "x3-1.5-F-roar-blast",
+       "at": "screen",
+       "w": 1.0,
+       "boom": 3,
+       "delay": 0.2,
+       "hit": {
+        "dmg": 70,
+        "kind": "blow",
+        "stop": 0.16,
+        "shake": 16
+       }
+      },
+      {
+       "t": "shake",
+       "v": 16
+      },
+      {
+       "t": "later",
+       "in": 0.45,
+       "fx": [
+        {
+         "t": "screen",
+         "spots": 6,
+         "every": 0.12,
+         "each": [
+          {
+           "t": "v",
+           "vfx": "x3-1.5-D-hatch-arc",
+           "r": 70,
+           "delay": 0.08,
+           "hit": {
+            "dmg": 30,
+            "kind": "launch",
+            "stop": 0.08,
+            "shake": 8
+           }
+          }
+         ]
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "f": 6,
+     "to": 11,
+     "rep": 2,
+     "d": 0.1,
+     "fx": []
+    },
+    {
+     "f": 12,
+     "hold": 0.3,
+     "fx": [
+      {
+       "t": "shake",
+       "v": 10
+      }
+     ]
+    }
+   ]
+  }
+ },
+ "skills_2판": {
+  "skill": {
+   "name": "비상 장치 가동",
+   "anim": "22",
+   "fps": 9,
+   "armed": true,
+   "events": [
+    {
+     "f": 3,
+     "fx": [
+      {
        "t": "text",
        "at": "target",
        "v": "경고!"

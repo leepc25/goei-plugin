@@ -372,6 +372,263 @@
    "events": [
     {
      "f": 3,
+     "hold": 0.4,
+     "fx": [
+      {
+       "t": "v",
+       "vfx": "x3-1.9-D-clock-ring",
+       "at": "body",
+       "dx": 30,
+       "scale": 1.6
+      }
+     ]
+    },
+    {
+     "f": 5,
+     "fx": [
+      {
+       "t": "v",
+       "vfx": "x3-c-ground-shockwave",
+       "at": "self",
+       "scale": 0.7,
+       "tint": "#5A6FC0",
+       "under": true,
+       "r": 170,
+       "depth": 90,
+       "hit": {
+        "dmg": 60,
+        "kind": "heavy",
+        "stop": 0.1,
+        "shake": 8
+       }
+      }
+     ]
+    }
+   ]
+  },
+  "charge": {
+   "name": "냄새 맡기",
+   "hold": "23",
+   "release": "24",
+   "armed": true,
+   "releaseLv": {
+    "0": "15",
+    "1": "13",
+    "2": "15"
+   },
+   "fireLv": {
+    "0": 4,
+    "1": 2,
+    "2": 4
+   },
+   "levels": [
+    0.5,
+    1.2
+   ],
+   "fire": 3,
+   "lv": {
+    "0": [
+     {
+      "t": "proj",
+      "kind": "bullet",
+      "hit": {
+       "dmg": 20,
+       "kind": "light"
+      }
+     },
+     {
+      "t": "later",
+      "in": 0.12,
+      "fx": [
+       {
+        "t": "proj",
+        "kind": "bullet",
+        "hit": {
+         "dmg": 20,
+         "kind": "light"
+        }
+       }
+      ]
+     }
+    ],
+    "1": [
+     {
+      "t": "dash",
+      "speed": 1600,
+      "time": 0.45,
+      "hit": {
+       "dmg": 90,
+       "kind": "blow",
+       "stop": 0.16,
+       "shake": 12,
+       "vfx": "x3-c-hit-spark-heavy",
+       "tint": "#5A6FC0"
+      }
+     },
+     {
+      "t": "later",
+      "in": 0.45,
+      "fx": [
+       {
+        "t": "v",
+        "vfx": "x3-c-dust-puff",
+        "at": "self",
+        "scale": 1.4,
+        "tint": "#c8c0b0"
+       }
+      ]
+     }
+    ],
+    "2": [
+     {
+      "t": "repeat",
+      "n": 3,
+      "every": 0.18,
+      "fx": [
+       {
+        "t": "proj",
+        "kind": "bullet",
+        "hit": {
+         "dmg": 18,
+         "kind": "light"
+        }
+       }
+      ]
+     },
+     {
+      "t": "later",
+      "in": 0.6,
+      "fx": [
+       {
+        "t": "proj",
+        "kind": "bullet",
+        "big": true,
+        "hit": {
+         "dmg": 26,
+         "kind": "down",
+         "stop": 0.12,
+         "shake": 8
+        }
+       }
+      ]
+     }
+    ]
+   }
+  },
+  "super": {
+   "name": "여기서 제가 한 번 죽으면",
+   "sub": "「시간이 벌리니까요.」",
+   "anim": "25",
+   "fps": 7,
+   "events": [
+    {
+     "f": 3,
+     "hold": 0.45,
+     "fx": [
+      {
+       "t": "repeat",
+       "n": 5,
+       "every": 0.09,
+       "fx": [
+        {
+         "t": "v",
+         "vfx": "x3-c-ricochet-spark",
+         "at": "body",
+         "dx": 40,
+         "scale": 2
+        }
+       ]
+      },
+      {
+       "t": "shake",
+       "v": 5
+      }
+     ]
+    },
+    {
+     "f": 8,
+     "hold": 0.5,
+     "fx": [
+      {
+       "t": "gray",
+       "time": 1.6
+      },
+      {
+       "t": "later",
+       "in": 0.4,
+       "fx": [
+        {
+         "t": "v",
+         "vfx": "x3-1.9-F-clock-ring-huge",
+         "at": "body",
+         "scale": 1.7
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "f": 9,
+     "hold": 0.3,
+     "fx": [
+      {
+       "t": "screen",
+       "spots": 4,
+       "every": 0.1,
+       "each": [
+        {
+         "t": "v",
+         "vfx": "x3-c-explosion-small",
+         "h": 110,
+         "scale": 3,
+         "tint": "#8FA4FF",
+         "r": 60,
+         "hit": {
+          "dmg": 140,
+          "kind": "launch",
+          "stop": 0.2,
+          "shake": 14
+         }
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "f": 11,
+     "fx": [
+      {
+       "t": "screen",
+       "spots": 0,
+       "each": [
+        {
+         "t": "hit",
+         "hit": {
+          "dmg": 40,
+          "kind": "spike",
+          "stop": 0.16,
+          "shake": 14
+         }
+        }
+       ]
+      },
+      {
+       "t": "shake",
+       "v": 12
+      }
+     ]
+    }
+   ]
+  }
+ },
+ "skills_2판": {
+  "skill": {
+   "name": "되감기",
+   "anim": "22",
+   "fps": 9,
+   "events": [
+    {
+     "f": 3,
      "fx": [
       {
        "t": "ring",
