@@ -29,7 +29,7 @@ function hostScript(char, chat) {
       remove: async () => { el.remove(); }, addClass: async (c) => { el.classList.add(c); }, removeClass: async (c) => { el.classList.remove(c); }, hasClass: async (c) => el.classList.contains(c), textContent: async () => el.textContent,
     });
     window.__store = { 'p:goei:body': ${JSON.stringify(bodyCode)} };
-    window.__rootDoc = { querySelector: async (q) => wrap(document.querySelector(q)), querySelectorAll: async (q) => [...document.querySelectorAll(q)].map(wrap), createElement: async (t) => wrap(document.createElement(t)), body: wrap(document.body), head: wrap(document.head) };
+    window.__rootDoc = { ...wrap(document.documentElement), querySelector: async (q) => wrap(document.querySelector(q)), querySelectorAll: async (q) => [...document.querySelectorAll(q)].map(wrap), createElement: async (t) => wrap(document.createElement(t)), body: wrap(document.body), head: wrap(document.head) };
     window.__char = ${JSON.stringify(char)};
     window.__chat = ${JSON.stringify(chat)};
     const clone = (v) => JSON.parse(JSON.stringify(v));
