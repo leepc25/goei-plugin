@@ -424,7 +424,7 @@
        "t": "melee",
        "range": 150,
        "hit": {
-        "dmg": 92,
+        "dmg": 61,
         "kind": "light",
         "vfx": "x3-c-hit-spark-light",
         "vs": 1.4
@@ -448,7 +448,7 @@
        "t": "melee",
        "range": 150,
        "hit": {
-        "dmg": 115,
+        "dmg": 77,
         "kind": "light",
         "vfx": "x3-c-hit-spark-light",
         "vs": 1.6,
@@ -495,7 +495,7 @@
       "speed": 1500,
       "time": 0.27,
       "hit": {
-       "dmg": 92,
+       "dmg": 110,
        "kind": "down",
        "vfx": "x3-c-hit-spark-heavy",
        "vs": 0.8
@@ -526,7 +526,7 @@
       "speed": 1500,
       "time": 0.27,
       "hit": {
-       "dmg": 62,
+       "dmg": 78,
        "kind": "down"
       }
      },
@@ -548,7 +548,7 @@
         "h": 20,
         "scale": 1.1,
         "hit": {
-         "dmg": 85,
+         "dmg": 106,
          "kind": "down",
          "stop": 0.18,
          "shake": 14
@@ -607,7 +607,7 @@
          "t": "pull",
          "dist": 140,
          "hit": {
-          "dmg": 13,
+          "dmg": 24,
           "kind": "pull"
          }
         },
@@ -644,7 +644,7 @@
           {
            "t": "hit",
            "hit": {
-            "dmg": 16,
+            "dmg": 30,
             "kind": "light",
             "stop": 0.06,
             "shake": 9
@@ -671,7 +671,7 @@
        "scale": 0.8,
        "tint": "#d8dde6",
        "hit": {
-        "dmg": 19,
+        "dmg": 36,
         "kind": "light"
        }
       }
@@ -689,7 +689,7 @@
        "tint": "#d8dde6",
        "flip": false,
        "hit": {
-        "dmg": 19,
+        "dmg": 36,
         "kind": "light"
        }
       }
@@ -706,7 +706,7 @@
        "scale": 0.9,
        "tint": "#d8dde6",
        "hit": {
-        "dmg": 22,
+        "dmg": 41,
         "kind": "light"
        }
       }
@@ -726,7 +726,7 @@
       {
        "t": "hit",
        "hit": {
-        "dmg": 60,
+        "dmg": 113,
         "kind": "blow",
         "stop": 0.2,
         "shake": 14

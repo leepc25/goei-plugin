@@ -603,7 +603,7 @@
        "tint": "#3fe0d0",
        "r": 60,
        "hit": {
-        "dmg": 207,
+        "dmg": 138,
         "kind": "down",
         "vfx": "x3-c-hit-spark-heavy",
         "vs": 0.8,
@@ -672,7 +672,7 @@
       "speed": 1500,
       "time": 0.35,
       "hit": {
-       "dmg": 92,
+       "dmg": 110,
        "kind": "heavy",
        "vfx": "x3-c-hit-spark-heavy",
        "vs": 0.7,
@@ -731,7 +731,7 @@
           "tint": "#3fe0d0",
           "r": 60,
           "hit": {
-           "dmg": 147,
+           "dmg": 184,
            "kind": "down",
            "vfx": "x3-c-hit-spark-heavy",
            "vs": 0.8,
@@ -801,7 +801,7 @@
        "fade": 0.3,
        "delay": 0.45,
        "hit": {
-        "dmg": 180,
+        "dmg": 340,
         "kind": "blow",
         "stop": 0.22,
         "shake": 16,

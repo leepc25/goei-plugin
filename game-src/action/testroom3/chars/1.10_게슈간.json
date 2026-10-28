@@ -377,7 +377,7 @@
        "time": 1.2,
        "color": "#6EC6FF",
        "hit": {
-        "dmg": 230,
+        "dmg": 102,
         "kind": "light"
        }
       }
@@ -447,7 +447,7 @@
        {
         "t": "hit",
         "hit": {
-         "dmg": 68,
+         "dmg": 82,
          "kind": "blow",
          "stop": 0.12,
          "shake": 10
@@ -480,7 +480,7 @@
       "depth": 110,
       "delay": 0.35,
       "hit": {
-       "dmg": 109,
+       "dmg": 136,
        "kind": "down",
        "stop": 0.2,
        "shake": 15
@@ -534,7 +534,7 @@
          "h": 170,
          "time": 1.6,
          "hit": {
-          "dmg": 19,
+          "dmg": 36,
           "kind": "light"
          }
         }
@@ -568,7 +568,7 @@
          "under": true,
          "r": 100,
          "hit": {
-          "dmg": 141,
+          "dmg": 264,
           "kind": "spike",
           "stop": 0.22,
           "shake": 16

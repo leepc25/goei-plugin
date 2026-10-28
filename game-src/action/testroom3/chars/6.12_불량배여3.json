@@ -229,5 +229,6 @@
   "cd": {},
   "shotDmg": 8,
   "hp": 90
- }
+ },
+ "fallRev": true
 }

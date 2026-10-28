@@ -509,7 +509,7 @@
        "t": "melee",
        "range": 200,
        "hit": {
-        "dmg": 255,
+        "dmg": 102,
         "kind": "heavy",
         "vfx": "x3-c-hit-spark-heavy",
         "vs": 0.7,
@@ -595,7 +595,7 @@
       "t": "melee",
       "range": 520,
       "hit": {
-       "dmg": 34,
+       "dmg": 82,
        "kind": "down",
        "n": 2,
        "mid": "pull",
@@ -611,7 +611,7 @@
       "t": "melee",
       "range": 170,
       "hit": {
-       "dmg": 33,
+       "dmg": 41,
        "kind": "blow",
        "vfx": "x3-c-hit-spark-heavy",
        "vs": 0.7,
@@ -638,7 +638,7 @@
         "scale": 0.6,
         "tint": "#8a6440",
         "hit": {
-         "dmg": 76,
+         "dmg": 95,
          "kind": "down",
          "shake": 12,
          "vfx": "x3-c-hit-spark-heavy",
@@ -700,7 +700,7 @@
        "t": "melee",
        "range": 200,
        "hit": {
-        "dmg": 24,
+        "dmg": 48,
         "kind": "down",
         "vfx": "x3-c-hit-spark-heavy",
         "vs": 0.8,
@@ -729,7 +729,7 @@
        "t": "melee",
        "range": 200,
        "hit": {
-        "dmg": 24,
+        "dmg": 48,
         "kind": "down",
         "vfx": "x3-c-hit-spark-heavy",
         "vs": 0.8,
@@ -758,7 +758,7 @@
        "t": "melee",
        "range": 200,
        "hit": {
-        "dmg": 24,
+        "dmg": 48,
         "kind": "down",
         "vfx": "x3-c-hit-spark-heavy",
         "vs": 0.8,
@@ -823,7 +823,7 @@
        "t": "melee",
        "range": 620,
        "hit": {
-        "dmg": 68,
+        "dmg": 136,
         "kind": "launch",
         "stop": 0.2,
         "shake": 16,
@@ -857,5 +857,6 @@
    "skill": 2
   },
   "shotDmg": 30
- }
+ },
+ "fallRev": true
 }

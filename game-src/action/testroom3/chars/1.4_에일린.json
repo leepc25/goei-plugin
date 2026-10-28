@@ -437,7 +437,7 @@
       "t": "beam",
       "lv": 1,
       "hit": {
-       "dmg": 64,
+       "dmg": 77,
        "kind": "heavy"
       }
      }
@@ -447,7 +447,7 @@
       "t": "beam",
       "lv": 2,
       "hit": {
-       "dmg": 102,
+       "dmg": 128,
        "kind": "launch"
       }
      }
@@ -490,7 +490,7 @@
          "t": "proj",
          "kind": "bullet",
          "hit": {
-          "dmg": 33,
+          "dmg": 23,
           "kind": "light"
          }
         }
@@ -504,7 +504,7 @@
          "kind": "bullet",
          "big": true,
          "hit": {
-          "dmg": 147,
+          "dmg": 105,
           "kind": "heavy"
          }
         }

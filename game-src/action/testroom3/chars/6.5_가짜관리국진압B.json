@@ -257,7 +257,7 @@
          "scale": 0.4,
          "tint": "#d8cfb4",
          "hit": {
-          "dmg": 277,
+          "dmg": 139,
           "kind": "heavy"
          },
          "r": 120
@@ -305,7 +305,7 @@
       "size": 0.7,
       "dy": 0,
       "hit": {
-       "dmg": 25,
+       "dmg": 30,
        "kind": "light"
       }
      },
@@ -320,7 +320,7 @@
         "size": 0.7,
         "dy": 0,
         "hit": {
-         "dmg": 25,
+         "dmg": 30,
          "kind": "light"
         }
        }
@@ -337,7 +337,7 @@
         "size": 0.7,
         "dy": 0,
         "hit": {
-         "dmg": 42,
+         "dmg": 51,
          "kind": "heavy"
         }
        }
@@ -357,7 +357,7 @@
         "size": 0.7,
         "dy": -30,
         "hit": {
-         "dmg": 12,
+         "dmg": 15,
          "kind": "light"
         }
        },
@@ -368,7 +368,7 @@
         "size": 0.7,
         "dy": 0,
         "hit": {
-         "dmg": 12,
+         "dmg": 15,
          "kind": "light"
         }
        },
@@ -379,7 +379,7 @@
         "size": 0.7,
         "dy": 30,
         "hit": {
-         "dmg": 12,
+         "dmg": 15,
          "kind": "light"
         }
        }
@@ -397,7 +397,7 @@
         "scale": 0.6,
         "tint": "#d8cfb4",
         "hit": {
-         "dmg": 41,
+         "dmg": 51,
          "kind": "down"
         },
         "r": 120

@@ -501,17 +501,32 @@
        "f": 1,
        "fx": [
         {
-         "t": "v",
-         "vfx": "x3-3.8-D-muffler-hood",
-         "at": "body",
-         "dx": -28,
-         "dy": -55,
-         "hold": 0.45,
-         "fade": 0.15
+         "t": "shake",
+         "v": 2
         },
         {
          "t": "shake",
-         "v": 2
+         "v": 3
+        },
+        {
+         "t": "later",
+         "in": 0.2,
+         "fx": [
+          {
+           "t": "shake",
+           "v": 3
+          }
+         ]
+        },
+        {
+         "t": "later",
+         "in": 0.4,
+         "fx": [
+          {
+           "t": "shake",
+           "v": 3
+          }
+         ]
         }
        ]
       }
@@ -533,7 +548,7 @@
          "scale": 1.5,
          "r": 90,
          "hit": {
-          "dmg": 255,
+          "dmg": 102,
           "kind": "heavy",
           "vfx": "x3-c-hit-spark-heavy",
           "vs": 0.6,
@@ -545,7 +560,8 @@
       }
      ]
     }
-   ]
+   ],
+   "_note": "10-28 사용자: 「이상한 거 생김」 → 머플러 두건 그림(x3-3.8-D-muffler-hood)이 몸에 안 감기고 허공에 물음표처럼 떠서 뺌(파일은 둠). 굳기는 흔들림만"
   },
   "charge": {
    "name": "문 담당",
@@ -583,7 +599,7 @@
       "speed": 1400,
       "time": 0.45,
       "hit": {
-       "dmg": 68,
+       "dmg": 82,
        "kind": "blow",
        "vfx": "x3-c-hit-spark-heavy",
        "vs": 0.7,
@@ -612,7 +628,7 @@
       "t": "melee",
       "range": 180,
       "hit": {
-       "dmg": 31,
+       "dmg": 39,
        "kind": "launch",
        "vfx": "x3-c-hit-spark-light",
        "vs": 1.5
@@ -631,7 +647,7 @@
         "tint": "#d9cbb5",
         "boom": 2,
         "hit": {
-         "dmg": 78,
+         "dmg": 97,
          "kind": "down",
          "vfx": "x3-c-hit-spark-heavy",
          "vs": 0.6,
@@ -666,7 +682,7 @@
          "t": "pull",
          "dist": 160,
          "hit": {
-          "dmg": 7,
+          "dmg": 24,
           "kind": "pull",
           "noVfx": true,
           "stop": 0.05,
@@ -683,7 +699,7 @@
          "speed": 1500,
          "time": 0.6,
          "hit": {
-          "dmg": 16,
+          "dmg": 54,
           "kind": "heavy",
           "vfx": "x3-c-hit-spark-heavy",
           "vs": 0.6
@@ -751,7 +767,7 @@
          "tint": "#d9cbb5",
          "r": 300,
          "hit": {
-          "dmg": 59,
+          "dmg": 199,
           "n": 2,
           "every": 0.15,
           "mid": "heavy",

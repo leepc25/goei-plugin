@@ -290,12 +290,6 @@
    6
   ],
   "19": [
-   6,
-   7,
-   8,
-   9,
-   10,
-   11,
    12
   ],
   "21": [
@@ -437,7 +431,7 @@
        "h": 90,
        "scale": 1.1,
        "hit": {
-        "dmg": 252,
+        "dmg": 126,
         "kind": "down",
         "vfx": "x3-c-hit-spark-heavy",
         "vs": 1,
@@ -505,7 +499,7 @@
         "kind": "bullet",
         "spread": 0.1,
         "hit": {
-         "dmg": 14,
+         "dmg": 17,
          "kind": "light",
          "stop": 0.03
         }
@@ -521,7 +515,7 @@
       "dx": 160,
       "scale": 1.15,
       "hit": {
-       "dmg": 45,
+       "dmg": 168,
        "kind": "blow",
        "n": 3,
        "mid": "light",
@@ -573,7 +567,7 @@
            "at": "target",
            "scale": 1.1,
            "hit": {
-            "dmg": 21,
+            "dmg": 93,
             "kind": "down",
             "stop": 0.1,
             "shake": 10
@@ -620,7 +614,7 @@
          "at": "screen",
          "scale": 2.1,
          "hit": {
-          "dmg": 55,
+          "dmg": 243,
           "kind": "launch",
           "n": 2,
           "mid": "heavy",
@@ -660,7 +654,7 @@
         {
          "t": "hit",
          "hit": {
-          "dmg": 48,
+          "dmg": 212,
           "kind": "blow",
           "stop": 0.2,
           "shake": 16

@@ -476,7 +476,7 @@
        "r": 80,
        "delay": 0.06,
        "hit": {
-        "dmg": 207,
+        "dmg": 138,
         "kind": "launch",
         "stop": 0.14,
         "shake": 10,
@@ -536,7 +536,7 @@
       "r": 200,
       "delay": 0.15,
       "hit": {
-       "dmg": 92,
+       "dmg": 110,
        "kind": "launch",
        "stop": 0.16,
        "shake": 12,
@@ -556,7 +556,7 @@
       "depth": 110,
       "delay": 0.08,
       "hit": {
-       "dmg": 49,
+       "dmg": 188,
        "kind": "down",
        "n": 3,
        "mid": "launch",
@@ -623,7 +623,7 @@
          "r": 80,
          "delay": 0.06,
          "hit": {
-          "dmg": 32,
+          "dmg": 103,
           "kind": "launch",
           "stop": 0.08,
           "shake": 8
@@ -644,7 +644,7 @@
        "w": 1.05,
        "boom": 3,
        "hit": {
-        "dmg": 74,
+        "dmg": 237,
         "kind": "down",
         "n": 2,
         "mid": "launch",
@@ -890,5 +890,6 @@
    "skill": 2
   },
   "shotDmg": 10
- }
+ },
+ "fallRev": true
 }

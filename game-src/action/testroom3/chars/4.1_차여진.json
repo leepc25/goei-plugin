@@ -524,7 +524,7 @@
        "t": "melee",
        "range": 200,
        "hit": {
-        "dmg": 202,
+        "dmg": 90,
         "kind": "heavy",
         "vfx": "x3-c-hit-spark-light",
         "vs": 1.6,
@@ -603,7 +603,7 @@
       "t": "melee",
       "range": 260,
       "hit": {
-       "dmg": 60,
+       "dmg": 72,
        "kind": "down",
        "vfx": "x3-c-hit-spark-heavy",
        "vs": 0.7,
@@ -647,7 +647,7 @@
         "t": "melee",
         "range": 280,
         "hit": {
-         "dmg": 96,
+         "dmg": 120,
          "kind": "down",
          "vfx": "x3-c-hit-spark-heavy",
          "vs": 0.9,
@@ -690,7 +690,7 @@
        "scale": 2.5,
        "flip": false,
        "hit": {
-        "dmg": 14,
+        "dmg": 30,
         "kind": "light",
         "vfx": "x3-c-hit-spark-light",
         "vs": 1.6,
@@ -711,7 +711,7 @@
        "flip": false,
        "rot": 3.1416,
        "hit": {
-        "dmg": 14,
+        "dmg": 30,
         "kind": "light",
         "vfx": "x3-c-hit-spark-light",
         "vs": 1.6,
@@ -731,7 +731,7 @@
        "scale": 2.5,
        "flip": false,
        "hit": {
-        "dmg": 14,
+        "dmg": 30,
         "kind": "light",
         "vfx": "x3-c-hit-spark-light",
         "vs": 1.6,
@@ -752,7 +752,7 @@
        "flip": false,
        "boom": 2,
        "hit": {
-        "dmg": 19,
+        "dmg": 41,
         "kind": "light",
         "n": 2,
         "every": 0.08,
@@ -778,7 +778,7 @@
       {
        "t": "hit",
        "hit": {
-        "dmg": 59,
+        "dmg": 127,
         "kind": "down",
         "stop": 0.2,
         "shake": 16,

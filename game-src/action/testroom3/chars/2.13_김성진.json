@@ -528,7 +528,7 @@
        "t": "proj",
        "kind": "bullet",
        "hit": {
-        "dmg": 48,
+        "dmg": 27,
         "kind": "light"
        }
       },
@@ -554,7 +554,7 @@
        "t": "proj",
        "kind": "bullet",
        "hit": {
-        "dmg": 48,
+        "dmg": 27,
         "kind": "light"
        }
       },
@@ -581,7 +581,7 @@
        "t": "proj",
        "kind": "bullet",
        "hit": {
-        "dmg": 72,
+        "dmg": 41,
         "kind": "heavy"
        }
       },
@@ -637,7 +637,7 @@
       "speed": 1300,
       "time": 0.35,
       "hit": {
-       "dmg": 64,
+       "dmg": 77,
        "kind": "down",
        "stop": 0.14,
        "shake": 12,
@@ -664,7 +664,7 @@
       "t": "melee",
       "range": 140,
       "hit": {
-       "dmg": 102,
+       "dmg": 128,
        "kind": "blow",
        "stop": 0.2,
        "shake": 16,
@@ -725,7 +725,7 @@
        "t": "proj",
        "kind": "bullet",
        "hit": {
-        "dmg": 9,
+        "dmg": 10,
         "kind": "light"
        },
        "spread": 0.5
@@ -759,7 +759,7 @@
          "kind": "bullet",
          "big": true,
          "hit": {
-          "dmg": 21,
+          "dmg": 22,
           "kind": "down"
          },
          "spread": 0.6

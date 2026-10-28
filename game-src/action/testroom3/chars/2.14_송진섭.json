@@ -544,7 +544,7 @@
        "kind": "bullet",
        "big": true,
        "hit": {
-        "dmg": 168,
+        "dmg": 96,
         "kind": "down",
         "vfx": "x3-c-hit-spark-heavy",
         "vs": 0.6
@@ -591,7 +591,7 @@
       "scale": 1.15,
       "r": 160,
       "hit": {
-       "dmg": 41,
+       "dmg": 77,
        "kind": "heavy",
        "vfx": "x3-c-hit-spark-light",
        "vs": 2.4,
@@ -612,7 +612,7 @@
         "rot": 3.1416,
         "r": 120,
         "hit": {
-         "dmg": 23,
+         "dmg": 43,
          "kind": "heavy"
         }
        }
@@ -629,7 +629,7 @@
       "r": 210,
       "delay": 0.45,
       "hit": {
-       "dmg": 102,
+       "dmg": 128,
        "kind": "blow",
        "stop": 0.14,
        "shake": 12,
@@ -742,7 +742,7 @@
            "r": 40,
            "tint": "#ffb04a",
            "hit": {
-            "dmg": 39,
+            "dmg": 69,
             "kind": "launch",
             "stop": 0.14,
             "shake": 14
@@ -782,7 +782,7 @@
            "scale": 0.6,
            "boom": 3,
            "hit": {
-            "dmg": 141,
+            "dmg": 251,
             "kind": "launch",
             "stop": 0.18,
             "shake": 18

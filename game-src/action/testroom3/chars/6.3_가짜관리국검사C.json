@@ -257,7 +257,7 @@
        "speed": 1500,
        "time": 0.2,
        "hit": {
-        "dmg": 241,
+        "dmg": 107,
         "kind": "light",
         "vfx": "x3-c-slash-arc",
         "vs": 1.2,
@@ -312,7 +312,7 @@
       "speed": 1300,
       "time": 0.24,
       "hit": {
-       "dmg": 71,
+       "dmg": 86,
        "kind": "heavy",
        "vfx": "x3-c-slash-arc",
        "vs": 1.4,
@@ -362,7 +362,7 @@
           "scale": 1.3,
           "tint": "#c9d2e0",
           "hit": {
-           "dmg": 23,
+           "dmg": 29,
            "kind": "launch",
            "vfx": "x3-c-slash-arc",
            "tint": "#c9d2e0"
@@ -377,7 +377,7 @@
           "scale": 1.3,
           "tint": "#c9d2e0",
           "hit": {
-           "dmg": 23,
+           "dmg": 29,
            "kind": "launch",
            "vfx": "x3-c-slash-arc",
            "tint": "#c9d2e0"
@@ -392,7 +392,7 @@
           "scale": 1.3,
           "tint": "#c9d2e0",
           "hit": {
-           "dmg": 23,
+           "dmg": 29,
            "kind": "launch",
            "vfx": "x3-c-slash-arc",
            "tint": "#c9d2e0"
@@ -407,7 +407,7 @@
           "scale": 1.3,
           "tint": "#c9d2e0",
           "hit": {
-           "dmg": 23,
+           "dmg": 29,
            "kind": "launch",
            "vfx": "x3-c-slash-arc",
            "tint": "#c9d2e0"
@@ -422,7 +422,7 @@
           "scale": 1.3,
           "tint": "#c9d2e0",
           "hit": {
-           "dmg": 23,
+           "dmg": 29,
            "kind": "launch",
            "vfx": "x3-c-slash-arc",
            "tint": "#c9d2e0"

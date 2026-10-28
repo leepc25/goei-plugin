@@ -379,7 +379,7 @@
        "speed": 1500,
        "life": 0.75,
        "hit": {
-        "dmg": 51,
+        "dmg": 29,
         "kind": "light",
         "vfx": "x3-c-dust-puff",
         "tint": "#d8b878"
@@ -397,7 +397,7 @@
        "speed": 1500,
        "life": 0.75,
        "hit": {
-        "dmg": 51,
+        "dmg": 29,
         "kind": "light",
         "vfx": "x3-c-dust-puff",
         "tint": "#d8b878"
@@ -415,7 +415,7 @@
        "speed": 1500,
        "life": 0.75,
        "hit": {
-        "dmg": 67,
+        "dmg": 38,
         "kind": "heavy",
         "vfx": "x3-c-dust-puff",
         "vs": 1.6,
@@ -470,7 +470,7 @@
       "r": 200,
       "delay": 0.2,
       "hit": {
-       "dmg": 64,
+       "dmg": 77,
        "kind": "down"
       }
      },
@@ -514,7 +514,7 @@
       "r": 200,
       "delay": 0.2,
       "hit": {
-       "dmg": 22,
+       "dmg": 91,
        "kind": "down"
       }
      },
@@ -552,7 +552,7 @@
         "dx": 260,
         "r": 80,
         "hit": {
-         "dmg": 26,
+         "dmg": 108,
          "kind": "launch"
         }
        }
@@ -569,7 +569,7 @@
         "dx": 455,
         "r": 80,
         "hit": {
-         "dmg": 26,
+         "dmg": 108,
          "kind": "launch"
         }
        }
@@ -586,7 +586,7 @@
         "dx": 650,
         "r": 80,
         "hit": {
-         "dmg": 29,
+         "dmg": 120,
          "kind": "launch"
         }
        },
@@ -631,7 +631,7 @@
        "w": 1.05,
        "delay": 0.75,
        "hit": {
-        "dmg": 36,
+        "dmg": 213,
         "kind": "blow",
         "n": 5,
         "mid": "heavy",

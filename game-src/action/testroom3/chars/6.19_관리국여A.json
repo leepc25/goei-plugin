@@ -246,7 +246,7 @@
        "t": "melee",
        "range": 160,
        "hit": {
-        "dmg": 126,
+        "dmg": 63,
         "kind": "stun",
         "n": 2,
         "mid": "light"
@@ -296,7 +296,7 @@
       "speed": 1300,
       "time": 0.22,
       "hit": {
-       "dmg": 84,
+       "dmg": 101,
        "kind": "down"
       }
      }
@@ -307,7 +307,7 @@
       "speed": 1300,
       "time": 0.22,
       "hit": {
-       "dmg": 134,
+       "dmg": 168,
        "kind": "down"
       }
      },

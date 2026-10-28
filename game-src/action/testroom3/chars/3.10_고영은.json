@@ -508,7 +508,7 @@
        "r": 190,
        "depth": 90,
        "hit": {
-        "dmg": 202,
+        "dmg": 90,
         "kind": "stun",
         "noVfx": true,
         "stop": 0.08,
@@ -563,7 +563,7 @@
       "t": "melee",
       "range": 160,
       "hit": {
-       "dmg": 20,
+       "dmg": 69,
        "n": 3,
        "every": 0.13,
        "mid": "light",
@@ -581,7 +581,7 @@
       "speed": 1200,
       "time": 0.4,
       "hit": {
-       "dmg": 96,
+       "dmg": 120,
        "kind": "down",
        "vfx": "x3-c-hit-spark-heavy",
        "vs": 0.7,
@@ -662,7 +662,7 @@
            "scale": 1.2,
            "tint": "#ffffff",
            "hit": {
-            "dmg": 25,
+            "dmg": 46,
             "kind": "stun",
             "noVfx": true,
             "stop": 0.06,
@@ -689,7 +689,7 @@
        "depth": 220,
        "boom": 2,
        "hit": {
-        "dmg": 45,
+        "dmg": 84,
         "kind": "down",
         "vfx": "x3-c-hit-spark-light",
         "vs": 1.5,
@@ -713,7 +713,7 @@
        "depth": 220,
        "boom": 2,
        "hit": {
-        "dmg": 70,
+        "dmg": 130,
         "kind": "down",
         "vfx": "x3-c-hit-spark-light",
         "vs": 1.5,

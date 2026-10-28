@@ -282,7 +282,7 @@
        "t": "melee",
        "range": 160,
        "hit": {
-        "dmg": 104,
+        "dmg": 69,
         "kind": "light",
         "n": 2,
         "mid": "light",
@@ -348,7 +348,7 @@
         "t": "melee",
         "range": 160,
         "hit": {
-         "dmg": 31,
+         "dmg": 37,
          "kind": "heavy",
          "n": 3,
          "mid": "light",
@@ -393,7 +393,7 @@
         "len": 150,
         "color": "#1c1a22",
         "hit": {
-         "dmg": 147,
+         "dmg": 184,
          "kind": "launch"
         }
        }

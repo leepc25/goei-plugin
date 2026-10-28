@@ -405,7 +405,7 @@
        "time": 0.2,
        "delay": 0.75,
        "hit": {
-        "dmg": 69,
+        "dmg": 138,
         "kind": "launch",
         "n": 3,
         "mid": "light",
@@ -473,7 +473,7 @@
       "r": 160,
       "delay": 0.45,
       "hit": {
-       "dmg": 92,
+       "dmg": 110,
        "kind": "launch",
        "vfx": "x3-c-slash-arc",
        "vs": 1,
@@ -499,7 +499,7 @@
         "speed": 2000,
         "time": 0.22,
         "hit": {
-         "dmg": 74,
+         "dmg": 184,
          "kind": "launch",
          "n": 2,
          "mid": "heavy",
@@ -580,7 +580,7 @@
        "scale": 0.9,
        "tint": "#ffffff",
        "hit": {
-        "dmg": 180,
+        "dmg": 340,
         "kind": "launch",
         "stop": 0.3,
         "shake": 20,

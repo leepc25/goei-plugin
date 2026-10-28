@@ -485,7 +485,7 @@
        "t": "melee",
        "range": 130,
        "hit": {
-        "dmg": 60,
+        "dmg": 27,
         "kind": "light",
         "vfx": "x3-c-hit-spark-light",
         "vs": 1.6,
@@ -506,7 +506,7 @@
        "t": "melee",
        "range": 140,
        "hit": {
-        "dmg": 48,
+        "dmg": 21,
         "kind": "light",
         "vfx": "x3-c-hit-spark-light",
         "vs": 1.2,
@@ -527,7 +527,7 @@
        "t": "melee",
        "range": 140,
        "hit": {
-        "dmg": 48,
+        "dmg": 21,
         "kind": "light",
         "vfx": "x3-c-hit-spark-light",
         "vs": 1.2,
@@ -549,7 +549,7 @@
        "t": "melee",
        "range": 140,
        "hit": {
-        "dmg": 72,
+        "dmg": 32,
         "kind": "heavy",
         "vfx": "x3-c-hit-spark-light",
         "vs": 1.8,
@@ -574,14 +574,18 @@
    "lv": {
     "0": [
      {
-      "t": "proj",
-      "kind": "orb",
+      "t": "toss",
       "vfx": "x3-o-3.13-sample-vial",
-      "rot": 14,
-      "dy": -150,
-      "speed": 900,
-      "life": 0.16,
-      "size": 1.4
+      "scale": 1.0,
+      "from": [
+       40,
+       140
+      ],
+      "dx": 180,
+      "land": 20,
+      "arc": 110,
+      "time": 0.16,
+      "spin": 10
      },
      {
       "t": "later",
@@ -615,34 +619,46 @@
     ],
     "1": [
      {
-      "t": "proj",
-      "kind": "orb",
+      "t": "toss",
       "vfx": "x3-o-3.13-sample-vial",
-      "rot": 14,
-      "dy": -150,
-      "speed": 900,
-      "life": 0.16,
-      "size": 1.4
+      "scale": 1.0,
+      "from": [
+       40,
+       140
+      ],
+      "dx": 170,
+      "land": 20,
+      "arc": 110,
+      "time": 0.16,
+      "spin": 10
      },
      {
-      "t": "proj",
-      "kind": "orb",
+      "t": "toss",
       "vfx": "x3-o-3.13-sample-vial",
-      "rot": -12,
-      "dy": -170,
-      "speed": 1000,
-      "life": 0.3,
-      "size": 1.4
+      "scale": 1.0,
+      "from": [
+       40,
+       140
+      ],
+      "dx": 320,
+      "land": 20,
+      "arc": 110,
+      "time": 0.3,
+      "spin": 10
      },
      {
-      "t": "proj",
-      "kind": "orb",
+      "t": "toss",
       "vfx": "x3-o-3.13-sample-vial",
-      "rot": 16,
-      "dy": -190,
-      "speed": 1050,
-      "life": 0.42,
-      "size": 1.4
+      "scale": 1.0,
+      "from": [
+       40,
+       140
+      ],
+      "dx": 470,
+      "land": 20,
+      "arc": 110,
+      "time": 0.44,
+      "spin": 10
      },
      {
       "t": "later",
@@ -664,7 +680,7 @@
         "scale": 1.4,
         "r": 70,
         "hit": {
-         "dmg": 19,
+         "dmg": 41,
          "kind": "light",
          "vfx": "x3-c-hit-spark-light",
          "vs": 1.3,
@@ -693,7 +709,7 @@
         "scale": 1.6,
         "r": 70,
         "hit": {
-         "dmg": 19,
+         "dmg": 41,
          "kind": "light",
          "vfx": "x3-c-hit-spark-light",
          "vs": 1.3,
@@ -722,7 +738,7 @@
         "scale": 1.8,
         "r": 75,
         "hit": {
-         "dmg": 29,
+         "dmg": 62,
          "kind": "down",
          "vfx": "x3-c-hit-spark-light",
          "vs": 1.6,
@@ -734,14 +750,18 @@
     ],
     "2": [
      {
-      "t": "proj",
-      "kind": "orb",
+      "t": "toss",
       "vfx": "x3-o-3.13-flask",
-      "rot": 9,
-      "dy": -190,
-      "speed": 950,
-      "life": 0.5,
-      "size": 1.3
+      "scale": 1.0,
+      "from": [
+       40,
+       140
+      ],
+      "dx": 450,
+      "land": 20,
+      "arc": 160,
+      "time": 0.5,
+      "spin": 12
      },
      {
       "t": "later",
@@ -764,7 +784,7 @@
         "delay": 0.15,
         "boom": 2,
         "hit": {
-         "dmg": 84,
+         "dmg": 136,
          "kind": "launch",
          "vfx": "x3-c-hit-spark-heavy",
          "vs": 0.8,
@@ -788,7 +808,7 @@
           "tint": "#B79CF0",
           "under": true,
           "hit": {
-           "dmg": 25,
+           "dmg": 40,
            "kind": "heavy"
           }
          }
@@ -797,7 +817,8 @@
       ]
      }
     ]
-   }
+   },
+   "_note": "10-28 사용자: 약병이 머리 위 천장 끝에서 날아감 → 손에서 포물선(toss)으로 터지는 자리에 떨어짐"
   },
   "super": {
    "name": "분기별 기상 특보",
@@ -847,7 +868,7 @@
        "at": "screen",
        "w": 1.05,
        "hit": {
-        "dmg": 14,
+        "dmg": 29,
         "kind": "light",
         "n": 2,
         "every": 0.3
@@ -873,7 +894,7 @@
            "scale": 2,
            "boom": 1,
            "hit": {
-            "dmg": 17,
+            "dmg": 35,
             "kind": "light",
             "vfx": "x3-c-hit-spark-light",
             "vs": 1.8,
@@ -905,7 +926,7 @@
        "scale": 1.1,
        "boom": 3,
        "hit": {
-        "dmg": 81,
+        "dmg": 166,
         "kind": "launch",
         "stop": 0.2,
         "shake": 16,

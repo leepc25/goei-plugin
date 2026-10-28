@@ -509,7 +509,7 @@
        "t": "melee",
        "range": 140,
        "hit": {
-        "dmg": 230,
+        "dmg": 102,
         "kind": "launch",
         "vfx": "x3-c-hit-spark-light",
         "vs": 1.8,
@@ -647,7 +647,7 @@
         "size": 0.9,
         "pierce": true,
         "hit": {
-         "dmg": 7,
+         "dmg": 9,
          "kind": "light",
          "vfx": "x3-c-hit-spark-light",
          "tint": "#F2C230",
@@ -670,7 +670,7 @@
         "size": 0.9,
         "pierce": true,
         "hit": {
-         "dmg": 7,
+         "dmg": 9,
          "kind": "light",
          "vfx": "x3-c-hit-spark-light",
          "tint": "#F2C230",
@@ -693,7 +693,7 @@
         "size": 0.9,
         "pierce": true,
         "hit": {
-         "dmg": 7,
+         "dmg": 9,
          "kind": "light",
          "vfx": "x3-c-hit-spark-light",
          "tint": "#F2C230",
@@ -716,7 +716,7 @@
         "size": 0.9,
         "pierce": true,
         "hit": {
-         "dmg": 7,
+         "dmg": 9,
          "kind": "light",
          "vfx": "x3-c-hit-spark-light",
          "tint": "#F2C230",
@@ -739,7 +739,7 @@
         "size": 0.9,
         "pierce": true,
         "hit": {
-         "dmg": 7,
+         "dmg": 9,
          "kind": "light",
          "vfx": "x3-c-hit-spark-light",
          "tint": "#F2C230",
@@ -762,7 +762,7 @@
         "size": 0.9,
         "pierce": true,
         "hit": {
-         "dmg": 7,
+         "dmg": 9,
          "kind": "light",
          "vfx": "x3-c-hit-spark-light",
          "tint": "#F2C230",
@@ -785,7 +785,7 @@
         "size": 0.9,
         "pierce": true,
         "hit": {
-         "dmg": 7,
+         "dmg": 9,
          "kind": "light",
          "vfx": "x3-c-hit-spark-light",
          "tint": "#F2C230",
@@ -808,7 +808,7 @@
         "size": 0.9,
         "pierce": true,
         "hit": {
-         "dmg": 20,
+         "dmg": 26,
          "kind": "heavy",
          "vfx": "x3-c-hit-spark-light",
          "tint": "#F2C230",
@@ -831,7 +831,7 @@
       "range": 700,
       "depth": 90,
       "hit": {
-       "dmg": 22,
+       "dmg": 91,
        "n": 5,
        "every": 0.1,
        "mid": "light",
@@ -889,7 +889,7 @@
          "size": 0.9,
          "pierce": true,
          "hit": {
-          "dmg": 1,
+          "dmg": 6,
           "kind": "light",
           "vfx": "x3-c-hit-spark-light",
           "tint": "#F2C230",
@@ -918,7 +918,7 @@
          "size": 0.9,
          "pierce": true,
          "hit": {
-          "dmg": 1,
+          "dmg": 6,
           "kind": "light",
           "vfx": "x3-c-hit-spark-light",
           "tint": "#F2C230",
@@ -947,7 +947,7 @@
          "size": 0.9,
          "pierce": true,
          "hit": {
-          "dmg": 1,
+          "dmg": 6,
           "kind": "light",
           "vfx": "x3-c-hit-spark-light",
           "tint": "#F2C230",
@@ -977,7 +977,7 @@
       {
        "t": "hit",
        "hit": {
-        "dmg": 23,
+        "dmg": 142,
         "n": 6,
         "every": 0.1,
         "mid": "light",

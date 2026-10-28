@@ -57,7 +57,7 @@
        "t": "melee",
        "range": 160,
        "hit": {
-        "dmg": 252,
+        "dmg": 126,
         "kind": "heavy"
        }
       }
@@ -105,7 +105,7 @@
       "speed": 1300,
       "time": 0.22,
       "hit": {
-       "dmg": 84,
+       "dmg": 101,
        "kind": "down"
       }
      }
@@ -116,7 +116,7 @@
       "speed": 1300,
       "time": 0.22,
       "hit": {
-       "dmg": 134,
+       "dmg": 168,
        "kind": "down"
       }
      },

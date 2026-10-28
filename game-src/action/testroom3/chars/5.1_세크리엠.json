@@ -391,7 +391,7 @@
        "life": 0.5,
        "pierce": true,
        "hit": {
-        "dmg": 104,
+        "dmg": 138,
         "kind": "heavy",
         "n": 2,
         "mid": "light",
@@ -468,7 +468,7 @@
       "speed": 1700,
       "time": 0.42,
       "hit": {
-       "dmg": 23,
+       "dmg": 92,
        "kind": "stun",
        "n": 4,
        "mid": "light",
@@ -520,7 +520,7 @@
       "center": false,
       "color": "rgba(176,16,42,.8)",
       "hit": {
-       "dmg": 66,
+       "dmg": 83,
        "kind": "launch"
       }
      },
@@ -560,7 +560,7 @@
         "scale": 0.9,
         "tint": "#B0102A",
         "hit": {
-         "dmg": 81,
+         "dmg": 101,
          "kind": "launch",
          "stop": 0.14
         }
@@ -587,7 +587,7 @@
        "w": 1.05,
        "dy": -80,
        "hit": {
-        "dmg": 12,
+        "dmg": 56,
         "kind": "stun"
        }
       },
@@ -623,7 +623,7 @@
          "at": "target",
          "scale": 0.7,
          "hit": {
-          "dmg": 16,
+          "dmg": 75,
           "kind": "light",
           "n": 2,
           "every": 0.1
@@ -663,7 +663,7 @@
        "life": 1.0,
        "pierce": true,
        "hit": {
-        "dmg": 45,
+        "dmg": 210,
         "kind": "blow",
         "n": 3,
         "mid": "heavy",

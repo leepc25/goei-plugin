@@ -584,7 +584,7 @@ def build_char(cfg, force=False):
     for lid, an in cfg["anims"].items():   # 이름은 설정 것을 씀
         if lid in A: A[lid]["name"] = an.get("name", lid)
     payload = {k: v for k, v in cfg.items() if k not in ("anims",)}
-    payload["reachY"] = reach_y(cfg, ("14", "7"))   # 점프 공격: 가장 앞으로 나간 손발의 높이(장마다) → 맞는 높이(10-28 「점프 공격 타점이 안 맞음」)
+    payload["reachY"] = reach_y(cfg, ("14", "7", "23"))   # 점프 공격: 가장 앞으로 나간 손발의 높이(장마다) → 맞는 높이(10-28 「점프 공격 타점이 안 맞음」)
     payload["turn19"] = turn_after_down(cfg)   # 쓰러진 뒤 잇는 줄인데 머리 방향이 반대로 그려진 줄(10-28 이기석 기기: 머리·발이 뿅 바뀜) → 방에서 몸 방향을 돌려 이음
     payload["chairAuto"] = chair_auto(cfg)   # 의자 자동 맞춤(chairfit.py). 손으로 맞춘 값은 설정 chars/<키>.json 의 "chair"가 이김
     js.write_text("(window.__C=window.__C||{})[" + json.dumps(key, ensure_ascii=False) + "]=" +

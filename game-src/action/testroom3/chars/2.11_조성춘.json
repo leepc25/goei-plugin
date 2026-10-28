@@ -582,7 +582,7 @@
        "speed": 1050,
        "time": 0.34,
        "hit": {
-        "dmg": 202,
+        "dmg": 90,
         "kind": "heavy",
         "stop": 0.16,
         "shake": 12,
@@ -646,7 +646,7 @@
       "fade": 0.3,
       "r": 150,
       "hit": {
-       "dmg": 10,
+       "dmg": 40,
        "kind": "heavy",
        "n": 6,
        "every": 0.14,
@@ -665,7 +665,7 @@
       "scale": 1.2,
       "r": 150,
       "hit": {
-       "dmg": 22,
+       "dmg": 28,
        "kind": "heavy"
       }
      },
@@ -674,7 +674,7 @@
       "speed": 1500,
       "time": 0.45,
       "hit": {
-       "dmg": 74,
+       "dmg": 92,
        "kind": "down",
        "stop": 0.16,
        "shake": 12,
@@ -747,7 +747,7 @@
         {
          "t": "hit",
          "hit": {
-          "dmg": 5,
+          "dmg": 23,
           "kind": "light",
           "vfx": "x3-c-hit-spark-light",
           "vs": 2,
@@ -770,7 +770,7 @@
         {
          "t": "hit",
          "hit": {
-          "dmg": 5,
+          "dmg": 23,
           "kind": "light",
           "vfx": "x3-c-hit-spark-light",
           "vs": 2,
@@ -793,7 +793,7 @@
         {
          "t": "hit",
          "hit": {
-          "dmg": 5,
+          "dmg": 23,
           "kind": "light",
           "vfx": "x3-c-hit-spark-light",
           "vs": 2,
@@ -816,7 +816,7 @@
         {
          "t": "hit",
          "hit": {
-          "dmg": 5,
+          "dmg": 23,
           "kind": "light",
           "vfx": "x3-c-hit-spark-light",
           "vs": 2,
@@ -839,7 +839,7 @@
         {
          "t": "hit",
          "hit": {
-          "dmg": 19,
+          "dmg": 87,
           "kind": "blow",
           "vfx": "x3-c-hit-spark-heavy",
           "vs": 0.7,
@@ -877,7 +877,7 @@
          "hold": 0.4,
          "fade": 0.3,
          "hit": {
-          "dmg": 25,
+          "dmg": 114,
           "kind": "down",
           "n": 4,
           "every": 0.12,

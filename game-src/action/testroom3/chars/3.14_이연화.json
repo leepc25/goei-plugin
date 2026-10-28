@@ -521,7 +521,7 @@
        "t": "melee",
        "range": 200,
        "hit": {
-        "dmg": 202,
+        "dmg": 90,
         "kind": "heavy",
         "vfx": "x3-c-hit-spark-light",
         "vs": 2,
@@ -609,7 +609,7 @@
       "t": "melee",
       "range": 650,
       "hit": {
-       "dmg": 30,
+       "dmg": 72,
        "kind": "down",
        "n": 2,
        "mid": "light",
@@ -651,7 +651,7 @@
         "r": 170,
         "delay": 0.3,
         "hit": {
-         "dmg": 96,
+         "dmg": 120,
          "kind": "stun",
          "vfx": "x3-c-hit-spark-light",
          "vs": 1.2,
@@ -719,7 +719,7 @@
        "t": "melee",
        "range": 320,
        "hit": {
-        "dmg": 21,
+        "dmg": 39,
         "kind": "pull",
         "vfx": "x3-c-hit-spark-light",
         "vs": 1.4,
@@ -759,7 +759,7 @@
        "scale": 1.4,
        "boom": 3,
        "hit": {
-        "dmg": 77,
+        "dmg": 143,
         "kind": "blow",
         "stop": 0.18,
         "shake": 14,
@@ -823,7 +823,7 @@
        "t": "melee",
        "range": 900,
        "hit": {
-        "dmg": 28,
+        "dmg": 52,
         "kind": "stun"
        }
       }
@@ -836,7 +836,7 @@
        "t": "melee",
        "range": 900,
        "hit": {
-        "dmg": 14,
+        "dmg": 26,
         "kind": "down"
        }
       }

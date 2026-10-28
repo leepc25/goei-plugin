@@ -241,7 +241,7 @@
        "t": "melee",
        "range": 160,
        "hit": {
-        "dmg": 218,
+        "dmg": 97,
         "kind": "heavy"
        }
       }
@@ -280,7 +280,7 @@
       "size": 0.7,
       "dy": 60,
       "hit": {
-       "dmg": 65,
+       "dmg": 78,
        "kind": "down"
       }
      }
@@ -294,7 +294,7 @@
       "pierce": true,
       "life": 1.2,
       "hit": {
-       "dmg": 103,
+       "dmg": 129,
        "kind": "heavy"
       }
      },

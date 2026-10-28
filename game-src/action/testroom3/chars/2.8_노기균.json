@@ -554,7 +554,7 @@
        "speed": 900,
        "time": 0.15,
        "hit": {
-        "dmg": 14,
+        "dmg": 31,
         "kind": "light",
         "vfx": "x3-c-hit-spark-light",
         "vs": 1.5
@@ -583,7 +583,7 @@
        "tint": "#ffe4de",
        "r": 60,
        "hit": {
-        "dmg": 193,
+        "dmg": 429,
         "kind": "launch",
         "vfx": "x3-c-hit-spark-heavy",
         "vs": 0.8,
@@ -644,92 +644,6 @@
       "tint": "#ffe4de",
       "r": 70,
       "hit": {
-       "dmg": 21,
-       "kind": "light",
-       "vfx": "x3-c-hit-spark-light",
-       "vs": 2
-      }
-     },
-     {
-      "t": "later",
-      "in": 0.13,
-      "fx": [
-       {
-        "t": "v",
-        "vfx": "x3-c-slash-arc",
-        "at": "front",
-        "dx": 110,
-        "scale": 0.7,
-        "rot": -0.7,
-        "tint": "#ffe4de",
-        "hit": {
-         "dmg": 21,
-         "kind": "light",
-         "vfx": "x3-c-hit-spark-light",
-         "vs": 2
-        }
-       }
-      ]
-     },
-     {
-      "t": "later",
-      "in": 0.26,
-      "fx": [
-       {
-        "t": "v",
-        "vfx": "x3-c-slash-arc",
-        "at": "front",
-        "dx": 110,
-        "scale": 0.7,
-        "rot": 0.7,
-        "tint": "#ffe4de",
-        "hit": {
-         "dmg": 21,
-         "kind": "light",
-         "vfx": "x3-c-hit-spark-light",
-         "vs": 2
-        }
-       }
-      ]
-     },
-     {
-      "t": "later",
-      "in": 0.39,
-      "fx": [
-       {
-        "t": "v",
-        "vfx": "x3-c-slash-arc",
-        "at": "front",
-        "dx": 110,
-        "scale": 0.85,
-        "tint": "#ffe4de",
-        "hit": {
-         "dmg": 29,
-         "kind": "heavy",
-         "vfx": "x3-c-hit-spark-heavy",
-         "vs": 0.7
-        }
-       }
-      ]
-     }
-    ],
-    "2": [
-     {
-      "t": "dash",
-      "speed": 700,
-      "time": 0.5,
-      "hit": null
-     },
-     {
-      "t": "v",
-      "vfx": "x3-c-vertical-blade-line",
-      "at": "front",
-      "dx": 110,
-      "dy": 40,
-      "scale": 0.8,
-      "tint": "#ffe4de",
-      "r": 70,
-      "hit": {
        "dmg": 25,
        "kind": "light",
        "vfx": "x3-c-hit-spark-light",
@@ -780,6 +694,92 @@
      },
      {
       "t": "later",
+      "in": 0.39,
+      "fx": [
+       {
+        "t": "v",
+        "vfx": "x3-c-slash-arc",
+        "at": "front",
+        "dx": 110,
+        "scale": 0.85,
+        "tint": "#ffe4de",
+        "hit": {
+         "dmg": 35,
+         "kind": "heavy",
+         "vfx": "x3-c-hit-spark-heavy",
+         "vs": 0.7
+        }
+       }
+      ]
+     }
+    ],
+    "2": [
+     {
+      "t": "dash",
+      "speed": 700,
+      "time": 0.5,
+      "hit": null
+     },
+     {
+      "t": "v",
+      "vfx": "x3-c-vertical-blade-line",
+      "at": "front",
+      "dx": 110,
+      "dy": 40,
+      "scale": 0.8,
+      "tint": "#ffe4de",
+      "r": 70,
+      "hit": {
+       "dmg": 38,
+       "kind": "light",
+       "vfx": "x3-c-hit-spark-light",
+       "vs": 2
+      }
+     },
+     {
+      "t": "later",
+      "in": 0.13,
+      "fx": [
+       {
+        "t": "v",
+        "vfx": "x3-c-slash-arc",
+        "at": "front",
+        "dx": 110,
+        "scale": 0.7,
+        "rot": -0.7,
+        "tint": "#ffe4de",
+        "hit": {
+         "dmg": 38,
+         "kind": "light",
+         "vfx": "x3-c-hit-spark-light",
+         "vs": 2
+        }
+       }
+      ]
+     },
+     {
+      "t": "later",
+      "in": 0.26,
+      "fx": [
+       {
+        "t": "v",
+        "vfx": "x3-c-slash-arc",
+        "at": "front",
+        "dx": 110,
+        "scale": 0.7,
+        "rot": 0.7,
+        "tint": "#ffe4de",
+        "hit": {
+         "dmg": 38,
+         "kind": "light",
+         "vfx": "x3-c-hit-spark-light",
+         "vs": 2
+        }
+       }
+      ]
+     },
+     {
+      "t": "later",
       "in": 0.42,
       "fx": [
        {
@@ -800,7 +800,7 @@
         "pierce": true,
         "life": 1.0,
         "hit": {
-         "dmg": 72,
+         "dmg": 109,
          "kind": "down",
          "stop": 0.14,
          "shake": 12,
@@ -838,7 +838,7 @@
        "under": true,
        "r": 170,
        "hit": {
-        "dmg": 31,
+        "dmg": 71,
         "kind": "light"
        }
       },
@@ -872,7 +872,7 @@
            "tint": "#ffe4de",
            "r": 70,
            "hit": {
-            "dmg": 46,
+            "dmg": 105,
             "kind": "launch",
             "vfx": "x3-c-hit-spark-heavy",
             "vs": 0.7,
@@ -922,7 +922,7 @@
       {
        "t": "hit",
        "hit": {
-        "dmg": 103,
+        "dmg": 235,
         "kind": "spike",
         "stop": 0.16,
         "shake": 16,

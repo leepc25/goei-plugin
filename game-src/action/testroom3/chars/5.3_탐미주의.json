@@ -409,7 +409,7 @@
        "at": "target",
        "scale": 1.3,
        "hit": {
-        "dmg": 230,
+        "dmg": 102,
         "kind": "light",
         "stop": 0.14
        }
@@ -492,7 +492,7 @@
         "tint": "#e8e4dc",
         "r": 180,
         "hit": {
-         "dmg": 68,
+         "dmg": 82,
          "kind": "heavy"
         }
        },
@@ -565,7 +565,7 @@
         "h": 120,
         "scale": 1,
         "hit": {
-         "dmg": 109,
+         "dmg": 136,
          "kind": "blow",
          "stop": 0.16,
          "shake": 12
@@ -689,7 +689,7 @@
          "scale": 1.5,
          "tint": "#e8e4dc",
          "hit": {
-          "dmg": 139,
+          "dmg": 261,
           "kind": "heavy",
           "stop": 0.22,
           "shake": 18
@@ -717,7 +717,7 @@
       {
        "t": "hit",
        "hit": {
-        "dmg": 21,
+        "dmg": 39,
         "kind": "down",
         "stop": 0.05
        }

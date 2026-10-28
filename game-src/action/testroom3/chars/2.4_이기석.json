@@ -341,12 +341,6 @@
    8
   ],
   "19": [
-   6,
-   7,
-   8,
-   9,
-   10,
-   11,
    12
   ],
   "23": [
@@ -412,7 +406,7 @@
        "life": 0.46,
        "size": 0.9,
        "hit": {
-        "dmg": 140,
+        "dmg": 62,
         "kind": "heavy",
         "vfx": "x3-c-hit-spark-light",
         "vs": 1.6
@@ -432,7 +426,7 @@
           {
            "t": "hit",
            "hit": {
-            "dmg": 63,
+            "dmg": 28,
             "kind": "light"
            }
           }
@@ -496,7 +490,7 @@
       "size": 0.9,
       "pierce": true,
       "hit": {
-       "dmg": 60,
+       "dmg": 72,
        "kind": "heavy",
        "vfx": "x3-c-hit-spark-heavy",
        "vs": 0.6,
@@ -524,7 +518,7 @@
         "scale": 2.5,
         "tint": "#c8c8c8",
         "hit": {
-         "dmg": 96,
+         "dmg": 120,
          "kind": "down",
          "stop": 0.16
         }
@@ -571,7 +565,7 @@
        "at": "target",
        "dy": -40,
        "hit": {
-        "dmg": 18,
+        "dmg": 34,
         "kind": "launch"
        }
       }
@@ -589,7 +583,7 @@
          "vfx": "x3-o-2.4-prosthetic-arm",
          "dy": -40,
          "hit": {
-          "dmg": 18,
+          "dmg": 34,
           "kind": "launch"
          }
         }
@@ -609,7 +603,7 @@
          "vfx": "x3-o-2.4-prosthetic-arm",
          "dy": -40,
          "hit": {
-          "dmg": 18,
+          "dmg": 34,
           "kind": "launch"
          }
         }
@@ -637,7 +631,7 @@
        "tint": "#E6C14A",
        "r": 100,
        "hit": {
-        "dmg": 30,
+        "dmg": 56,
         "kind": "heavy"
        }
       }
@@ -671,7 +665,7 @@
        "under": true,
        "boom": 3,
        "hit": {
-        "dmg": 55,
+        "dmg": 103,
         "kind": "spike",
         "stop": 0.2,
         "shake": 16
