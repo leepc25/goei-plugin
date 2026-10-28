@@ -375,7 +375,7 @@
        "fx": [
         {
          "t": "melee",
-         "range": 160,
+         "range": 180,
          "hit": {
           "dmg": 73,
           "kind": "light",
@@ -398,7 +398,7 @@
        "fx": [
         {
          "t": "melee",
-         "range": 160,
+         "range": 180,
          "hit": {
           "dmg": 102,
           "kind": "heavy",
