@@ -22,6 +22,9 @@ button.cap{border-color:var(--acc);color:var(--acc)}
 #status{font:12px ui-monospace,monospace;margin-top:6px;color:var(--dim)}
 #pick{display:flex;gap:6px;align-items:center}
 #chsel{min-width:150px}
+.scn{display:grid;grid-template-columns:96px minmax(0,1fr);gap:4px 8px;align-items:start;font-size:12px}
+.scn>b{color:var(--acc);padding-top:3px}
+.scn .list button{font-size:12px}
 .sw{display:inline-block;width:12px;height:12px;border-radius:3px;vertical-align:-1px}
 #skills div{margin:2px 0}
 </style></head><body>
@@ -30,6 +33,7 @@ button.cap{border-color:var(--acc);color:var(--acc)}
 <div>
 <canvas id="cv" width="1280" height="720" tabindex="0" aria-label="테스트룸 화면"></canvas>
 <div id="status"></div>
+<div class="card" style="margin-top:10px"><h2>장면 시험 <span class="m">(누르면 바로 틂 · 방향키로 끊음)</span></h2><div id="scenes"></div></div>
 <div class="card" style="margin-top:10px"><h2>조작 요약</h2><div id="help" class="m"></div></div>
 </div>
 <div>
@@ -43,8 +47,8 @@ button.cap{border-color:var(--acc);color:var(--acc)}
 <div class="row"><label><input id="sa" type="checkbox" checked> 슈퍼아머 테두리 보기</label></div>
 <div class="row"><label><input id="chair" type="checkbox" checked> 앉을 때 의자 그림(C01 1배 · 판정 전)</label></div>
 </div>
-<div class="card"><h2>키 바꾸기 <span class="m">(단추를 누르고 새 키 · Esc 취소)</span></h2><div class="binds" id="binds"></div>
-<div class="row"><button id="reset">기본값으로</button></div></div>
+<details class="card"><summary><h2 style="display:inline">키 바꾸기</h2> <span class="m">(펼쳐서 단추를 누르고 새 키 · Esc 취소)</span></summary><div class="binds" id="binds"></div>
+<div class="row"><button id="reset">기본값으로</button></div></details>
 <div class="card"><h2>동작 하나씩 보기 <span class="m">(누르면 그 줄을 틂)</span></h2><div id="list"></div></div>
 </div>
 </div>
@@ -840,6 +844,49 @@ function seatHit(strong) {
   if (s.dir === 'side' && has('169')) { sfx('hurt', { strength: 2 }); P.hp = Math.max(1, P.hp - 18); shake = 8; P.mode = 'act'; play('169', { seq: S(R(0, nOf('169') - 1), 0.08), onEnd: () => { dust(P.x, P.y, 6, 1.2); sfx('down'); lieLoop(); } }); return; }
   P.mode = 'ground'; knock();
 }
+// ── 장면 시험(10-28): 여러 줄을 이어 틂. 단계 {id, n(되풀이), rev(거꾸로), hold(끝 장 머무는 초), d(한 장 초)} ──
+function runScene(steps, label) {
+  P.seat = null; P.z = 0; P.combat = false; P.armed = false; P.mode = 'act'; P.scene = label; let i = 0;
+  const next = () => {
+    if (P.scene !== label) return;
+    while (i < steps.length && !has(steps[i].id)) i++;
+    if (i >= steps.length) { P.scene = null; return toIdle(); }
+    const st = steps[i++], n = nOf(st.id), fr = st.rev ? R(n - 1, 0) : R(0, n - 1), seq = [];
+    for (let k = 0; k < (st.n || 1); k++) seq.push(...S(fr, st.d || 0.13));
+    if (st.hold) seq.push({ f: fr[fr.length - 1], d: st.hold });
+    P.mode = 'act'; play(st.id, { seq, onEnd: next });
+  };
+  if (label) fx.push({ k: 'num', x: P.x - 60, y: P.y - 280 * K(P.y), v: label, t: 1.4 });
+  next();
+}
+const SCENES = [
+  ['의자', [['정면 앉기', () => sitAt('front')], ['옆 앉기', () => sitAt('side')], ['후면 앉기', () => sitAt('back')],
+    ['앉아 수다', () => seatAct('talk')], ['앉아 먹기', () => seatAct('eat')], ['앉아 마시기', () => seatAct('drink')], ['앉아 타자', () => seatAct('type')],
+    ['앉아 졸기', () => seatAct('doze')], ['기대 쉬기', () => seatAct('lean')], ['일어나기', () => P.seat && rise()],
+    ['앉은 채 맞기(약)', () => P.seat && seatHit(false)], ['앉은 채 맞기(강) · 옆 = 굴러떨어지기', () => P.seat && seatHit(true)]], () => has('60') || has('96')],
+  ['샤워', [['한 번에(벗기→걷기→물→씻기→입기)', () => runScene([{ id: 'SH_A', d: 0.12 }, { id: 'SH_B', n: 2 }, { id: 'SH_D', n: 3 }, { id: 'SH_E', n: 3 }, { id: 'SH_A', rev: true, d: 0.1 }], '샤워')],
+    ['옷 벗기', () => runScene([{ id: 'SH_A', d: 0.12, hold: 0.6 }], '옷 벗기')], ['맨몸 걷기', () => runScene([{ id: 'SH_B', n: 4 }])], ['물 맞으며 쉬기', () => runScene([{ id: 'SH_D', n: 4 }])],
+    ['몸 씻기', () => runScene([{ id: 'SH_E', n: 4 }])], ['옷 입기(벗기 거꾸로)', () => runScene([{ id: 'SH_A', rev: true, d: 0.1 }], '옷 입기')]], () => has('SH_A')],
+  ['화장실', [['남 소변(서서)', () => runScene([{ id: '57', hold: 0.4 }, { id: '100', n: 2 }, { id: '57', hold: 0.4 }], '소변')],
+    ['앉아 볼일', () => runScene([{ id: '101' }, { id: '102', n: 4 }, { id: '103' }], '볼일')], ['손 씻기', () => runScene([{ id: '57', hold: 1.0 }, { id: '104' }], '손 씻기')]], () => has('101') || has('100')],
+  ['눕기', [['눕기 → 쉬기·졸기', () => runScene([{ id: '75' }, { id: '76', n: 4, d: 0.2 }, { id: '75', rev: true }])], ['눕기 → 아파하기', () => runScene([{ id: '75' }, { id: '77', n: 2 }, { id: '75', rev: true }])]], () => has('75')],
+  ['피격·사망', [['맞기', () => takeHit('hit')], ['맞기 하단', () => takeHit('low')], ['크게 밀려나기', () => takeHit('push')], ['띄워지기', () => takeHit('launch')], ['날아가 쓰러지기', () => takeHit('knock')],
+    ['누운 채 움찔', () => P.mode === 'down' ? flinch() : (knock(), later(1.2, flinch))], ['일어나기', () => P.mode === 'down' && getUp()], ['스턴', () => stun()],
+    ['사망(서서)', () => { if (P.mode === 'dead') die(); die(); }], ['사망(누워서)', () => { if (P.mode === 'dead') die(); knock(); later(1.4, () => { P.mode = 'down'; die(); }); }], ['되살리기', () => P.mode === 'dead' && die()]], () => true],
+];
+function sitAt(dir) { if (P.seat) return; seatIdx = SEATS.findIndex(s => s.dir === dir) - 1; P.scene = null; sitChair(); }
+function renderScenes() {
+  const box = document.getElementById('scenes'); box.innerHTML = '';
+  const g = document.createElement('div'); g.className = 'scn'; box.append(g);
+  const row = (name, items) => { const h = document.createElement('b'); h.textContent = name; const l = document.createElement('div'); l.className = 'list';
+    for (const [lab, fn] of items) { const b = document.createElement('button'); b.textContent = lab; b.onclick = () => { if (P.mode === 'dead' && !/사망|되살리기/.test(lab)) die(); fn(); cv.focus(); }; l.append(b); }
+    g.append(h, l); };
+  for (const [name, items, ok] of SCENES) if (ok()) row(name, items);
+  const used = new Set(['50', '57', '60', '61', '62', '63', '64', '65', '66', '69', '70', '71', '73', '96', '97', '98', '99', '105', '100', '101', '102', '103', '104', '75', '76', '77', '169']);
+  const life = lifeIds().filter(id => !used.has(id));
+  if (life.length) row('생활·직무', [['정면 대기', () => runScene([{ id: '50', n: 4, d: 0.2 }])], ['후면 대기', () => runScene([{ id: '57', n: 4, d: 0.2 }])], ...life.map(id => [`${id.replace('_', '-')} ${A[id].name}`, () => playLife(id)])]);
+}
+
 // ── 생활·직무 줄: , . 로 차례로 틀기(목록 단추와 같음) ──
 let lifeI = -1;
 const lifeIds = () => Object.keys(A).filter(id => /^\d+/.test(id) && parseInt(id) >= 50 && id !== '169').sort((a, b) => parseFloat(a.replace('_', '.')) - parseFloat(b.replace('_', '.')));
@@ -881,6 +928,7 @@ function onPress(a) {
   if (a === 'hit' && P.mode === 'down') return flinch();
   if (['hit', 'knock', 'hitLow', 'push', 'launch'].includes(a)) { if (P.mode !== 'down' && P.mode !== 'belly') return takeHit({ hit: 'hit', knock: 'knock', hitLow: 'low', push: 'push', launch: 'launch' }[a]); }
   if ((P.mode === 'flee' || P.mode === 'back') && !['left', 'right', 'up', 'down', 'run'].includes(a)) toIdle();
+  if (P.scene && ['left', 'right', 'up', 'down'].includes(a)) { P.scene = null; return toIdle(); }
   const m = P.mode;
   if (m === 'air') {
     if (a === 'jump' && P.jumps < 2) doubleJump();
@@ -908,10 +956,10 @@ function onPress(a) {
     }
     return;
   }
-  if (m === 'down') { if (a === 'crawl') return belly(); if (a === 'jump' || a === 'up' || a === 'light') return getUp(); return; }
+  if (m === 'down') { if (a === 'crawl') return belly(); if (['jump', 'up', 'light', 'left', 'right', 'down', 'run'].includes(a)) return getUp(); return; }   // 누운 채 방향키·달리기도 일어나기(10-28: 쓰러진 뒤 「달리기가 안 됨」으로 보였음)
   if (m === 'belly') { if (a === 'jump' || a === 'crawl') return getUp(); return; }
   if (m === 'stun') { P.stunT -= 0.18; return; }
-  if (m === 'sit' || m === 'scoot') { if (a === 'sit') reverseOut('39', R(Math.max(0, sitLp()[0] - 1), 0), 0.05); return; }
+  if (m === 'sit' || m === 'scoot') { if (['sit', 'jump', 'left', 'right', 'up', 'run'].includes(a)) reverseOut('39', R(Math.max(0, sitLp()[0] - 1), 0), 0.05); return; }   // 주저앉은 채 방향키·점프도 일어나기
   if (m === 'crouch' || m === 'crawl4') { if (a === 'crouch') { if (m === 'crawl4') toIdle(); else reverseOut('41', R(Math.max(0, crLp()[0] - 1), 0), 0.06); } return; }
   if (m !== 'ground') return;
   const running = down('run') || P.runLatch;
@@ -1047,6 +1095,7 @@ function update(dt) {
   // 고유기술 키를 길게 누르면 충전으로
   updateDummy(dt);
   tickClip(dt);
+  if (P.clip && (P.clip.id === 'SH_D' || P.clip.id === 'SH_E') && Math.random() < dt * 60) { const k = K(P.y); fx.push({ k: 'mote', x: P.x + (Math.random() - 0.5) * 70 * k, y: P.y - (230 + Math.random() * 40) * k, vy: 700 + Math.random() * 200, c: 'rgba(170,220,255,.8)', t: 0.3 }); }   // 샤워 물줄기(코드)
   P.inv = Math.max(0, P.inv - dt); P.wakeArmor = Math.max(0, (P.wakeArmor || 0) - dt);
   if (P.overT > 0) { P.overT -= dt; P.heat = 100 * Math.max(0, P.overT) / 2.6; if (Math.random() < dt * 6) { const p = P.armed ? muzzle() : { x: P.x + P.face * 30 * K(P.y), y: P.y - 150 * K(P.y) }; steam(p.x, p.y, 1.2); } }
   else if (P.t - P.lastShot > 0.35) P.heat = Math.max(0, P.heat - 30 * dt);
@@ -1433,6 +1482,8 @@ function drawHud() {
   ctx.fillStyle = '#000a'; ctx.fillRect(20, 20, 260, 16);
   ctx.fillStyle = P.hp <= 25 ? (Math.sin(P.t * 7) > 0 ? '#ff2a2a' : '#8a1010') : '#5fd17a'; ctx.fillRect(20, 20, 260 * P.hp / 100, 16);
   ctx.fillStyle = '#fff'; ctx.font = 'bold 13px sans-serif'; ctx.fillText(`${CH.name || '…'} HP ${P.hp}`, 26, 33);
+  const stt = P.dying ? `빈사 중: 달리기 안 됨 (${keyName(binds.dying)}로 끄기)` : P.mode === 'down' ? '쓰러짐: 방향키·점프로 일어나기' : P.mode === 'dead' ? `사망: ${keyName(binds.die)}로 되살리기` : P.seat ? `앉음: ${keyName(binds.pick)}로 일어나기` : P.mode === 'sit' ? '주저앉음: 방향키·점프로 일어나기' : P.mode === 'crouch' ? `웅크림: ${keyName(binds.crouch)}로 일어나기(방향키 = 네발로 기기)` : '';
+  if (stt) { ctx.font = 'bold 15px sans-serif'; ctx.fillStyle = '#000a'; ctx.fillRect(290, 18, ctx.measureText(stt).width + 16, 22); ctx.fillStyle = '#ffd36a'; ctx.fillText(stt, 298, 34); }
   ctx.fillStyle = '#000a'; ctx.fillRect(20, H - 40, 300, 14);
   ctx.fillStyle = P.sp >= 100 ? (Math.sin(P.t * 10) > 0 ? '#ffe27a' : '#ffb800') : '#d9a520'; ctx.fillRect(20, H - 40, 300 * P.sp / 100, 14);
   ctx.fillStyle = '#fff'; ctx.font = 'bold 12px sans-serif'; ctx.fillText(P.sp >= 100 ? '필살기 준비!' : `필살기 ${Math.floor(P.sp)}%`, 326, H - 29);
@@ -1538,6 +1589,7 @@ function renderChar() {
   const line = (lab, key, sp) => sp ? `<div>${lab} ${key} 「${sp.name}」 <span class="m">${(sp.events || (sp.steps || []).flatMap(s => s.events || [])).flatMap(e => e.fx || []).map(f => f.t).filter((v, i, a) => a.indexOf(v) === i).join('·') || Object.values(sp.lv || {}).flat().map(f => f.t).filter((v, i, a) => a.indexOf(v) === i).join('·')}</span></div>` : '';
   document.getElementById('skills').innerHTML = `<div><b>${CH.name}</b> · ${CH.armed ? '무기 있음' : '무기 없음(원거리·충전·필살기 = 전투 자세에서)'}</div>` +
     line('고유기술', k('skill'), sk.skill) + line('충전', `${k('skill')} 길게 / ${k('charge')}`, sk.charge) + line('필살기', k('super'), sk.super) + line('둘째 기술', k('skill2'), sk.skill2);
+  renderScenes();
   const list = document.getElementById('list'); list.innerHTML = '';
   const num = id => parseFloat(id.replace(/^W/, '0').replace('_', '.')) || 0;
   const GROUPS = [['전투', id => /^(3|3_0|W|W_1|[4-9]|1[0-7]|16_1|2[2-5]|5_1|22_1)$/.test(id)], ['피격·쓰러짐', id => /^(18|18_\d|19|20|21|4[3-5]|169)$/.test(id)],

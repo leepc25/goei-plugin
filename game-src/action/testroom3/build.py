@@ -242,6 +242,17 @@ def life_line(lid):
     return bool(m) and int(m.group(1)) >= 50
 
 
+# 샤워 세트 2판(_test/<키>/샤워2_*): A 옷 벗기 → B 맨몸 걷기 · D 물 맞으며 쉬기 · E 몸 씻기(반복), 옷 입기 = A 거꾸로 (사용자 10-28: 테스트룸에서 시험)
+SHOWER = {"A": "샤워 옷 벗기", "B": "샤워 맨몸 걷기", "D": "샤워 물 맞으며 쉬기", "E": "샤워 몸 씻기"}
+def shower_anims(key):
+    d = M3 / "_test" / key
+    if not d.exists(): return {}
+    tj = M3 / "_test" / "shower_targets.json"
+    side = (json.loads(tj.read_text()).get(key) or {}).get("dir", "east") if tj.exists() else "east"
+    return {f"SH_{s}": {"folder": f"샤워2_{s}", "src": "test", "mirror": side == "west", "name": n}
+            for s, n in SHOWER.items() if any((d / f"샤워2_{s}").glob("[0-9][0-9].png"))}
+
+
 def auto_cfg(ch):
     key = ch["key"]
     if key == EILEEN_KEY: return eileen_cfg(ch)
@@ -264,6 +275,7 @@ def auto_cfg(ch):
         # 「좌우 반전」이 적힌 줄: 인물 기본 방향 그대로 뽑은 판인데 실제로는 반대쪽을 봄 → 반대로
         if lid in flips and pick == lid and fd in (ch["dir"], "SW" if ch["dir"] == "W" else "SE"): west = not west
         anims[lid] = {"folder": pick, "mirror": west, "name": (rows.get(lid) or (BASE_NAME.get(lid, lid),))[0]}
+    anims.update(shower_anims(key))
     pk = picks.get("picks", {})
     def pidx(name, line, default):
         v = pk.get(name)
@@ -314,6 +326,7 @@ def eileen_cfg(ch):
             if lid in ("3_0", "19"): continue   # 전투 자세·쓰러지기는 2판 그대로
             fd = folder_dir(lid, rows, "E")
             anims[lid] = {"folder": lid, "src": "m3", "mirror": fd in ("W", "SW", "NW"), "name": (rows.get(lid) or (BASE_NAME.get(lid, lid),))[0]}
+    anims.update(shower_anims(EILEEN_KEY))
     return {"key": EILEEN_KEY, "name": "에일린", "dir": "E", "color": "#CFC7A6", "src": "eileen", "armed": True, "anims": anims,
             "picks": {"combat": 4, "weapon": 4, "apex": 4, "run": 4, "crawl4": 6},
             "loops": {"1": [1, 2], "19": [9, 11], "21": [2, 3, 4, 5, 6, 7, 8], "23": [5, 6, 7, 8], "39": [8, 9, 10, 11, 12], "41": [5, 6, 7, 8], "42": [5, 6, 7, 8, 9, 10, 11, 12], "15": [4, 5]},
@@ -498,6 +511,7 @@ def encode(sheet):
 
 
 def src_dir(cfg, an=None):
+    if an and an.get("src") == "test": return M3 / "_test" / cfg["key"]
     if an and an.get("src") == "m3": return M3 / cfg["key"]
     return EIL / "motion_v3" if cfg.get("src") == "eileen" else M3 / cfg["key"]
 
