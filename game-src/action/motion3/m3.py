@@ -206,11 +206,7 @@ def run_job(path):
         if mode == "v3": body.pop("subject_description"); body.pop("initial_pose")   # v3는 두 칸을 안 받음
         if start_img is not None: body["custom_start_frame"] = b64(start_img)
         if end is not None: body["end_frame"] = b64(end)
-        ch = req("GET", f"/characters/{T['cid']}")
-        for a in ch["animations"]:
-            if a.get("display_name", "").startswith(f"v3 {f} "):
-                req("DELETE", f"/characters/{T['cid']}/animations/{a['animation_group_id']}")
-                log(key, f"이전 판 지움: {a.get('display_name')}")
+        # 이전 판은 PixelLab 서버에서 지우지 않는다(10-27 사용자 규칙: 결과물 삭제 금지). 로컬은 save()가 _old/로 옮김
         while True:
             try:
                 res = req("POST", "/characters/animations", body); break

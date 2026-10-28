@@ -123,6 +123,7 @@ if __name__ == "__main__":
         d[ARGS[3]] = {"dx": cur["dx"], "dy": cur["dy"], "s": 1.0, "img": cur["img"]}
         cp.write_text(json.dumps(d, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
         print(json.dumps(render_lines(key, outp), ensure_ascii=False)); sys.exit()
+    if len(ARGS) > 2 and ARGS[2] == "set":   # 방향 값: set front|side|back dx=.. dy=.. img=..
         cfg, p = load(key); _, vals = values(cfg)
         view = ARGS[3]
         for kv in ARGS[4:]:
