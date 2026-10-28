@@ -104,9 +104,10 @@ export function imgCharacters(lore: LoreEntry[] | undefined, cfg: ImgPromptConfi
 export function buildImgPrompt(cfg: ImgPromptConfig, characters: string[], assetPlayer: boolean): string {
   const userSkip = assetPlayer ? '' : '{{user}}, ';
   const userRule = assetPlayer ? '' : '- Do not create tags for {{user}}.';
+  // 바꿀 글은 함수로 넘긴다: 이름·표정에 $& 같은 글자가 있어도 replace 특수 문자로 풀리지 않게 (QC 2026-10-28)
   return cfg.template
-    .replace(/\{characters\}/g, characters.join(', '))
-    .replace(/\{keywords\}/g, cfg.keywords.join(', '))
+    .replace(/\{characters\}/g, () => characters.join(', '))
+    .replace(/\{keywords\}/g, () => cfg.keywords.join(', '))
     .replace(/\{user_skip\}/g, userSkip)
     .replace(/\{user_rule\}\n?/g, userRule ? `${userRule}\n` : '')
     .replace(/\n{3,}/g, '\n\n')

@@ -147,16 +147,18 @@ function openTitle(ctx: ChatContext, raw: string, from: 'link' | 'direct' | 'sea
 }
 
 /** 검색줄 Enter·검색: 정확히 맞는 제목이면 바로 열고, 아무것도 안 맞으면 그 제목으로 작성 화면. 나머지는 왼쪽 목록이 걸러 보여 준다 */
-function search(ctx: ChatContext, q: string) {
+/** 문서·작성 화면으로 갔으면 true. 못 찾으면 목록을 펼치고 false */
+function search(ctx: ChatContext, q: string): boolean {
   const query = q.trim();
   wiki.query = query;
-  if (!query) return;
+  if (!query) return false;
   const own = ownDoc(ctx, query);
   const c = own ? { title: own, known: true } : canonicalTitle(registry(ctx), source(ctx), query);
-  if (findDoc(ctx.chat, c.title, ctx.char.globalLore)) return go('doc', c.title, query);
-  if (c.known) return openTitle(ctx, c.title, 'direct');
+  if (findDoc(ctx.chat, c.title, ctx.char.globalLore)) return go('doc', c.title, query), true;
+  if (c.known) return openTitle(ctx, c.title, 'direct'), true;
   // 여러 개가 걸리면 목록을 펼쳐 고르게. 하나도 없으면 목록에 「없어요 · 작성하기」가 뜬다 (바로 작성 화면으로 가지 않는다)
   wiki.listOpen = true;
+  return false;
 }
 
 // ── 생성 ──
@@ -879,11 +881,13 @@ export async function handleWiki(action: string, value: string | undefined, ctx:
       // 메인의 분류 칸: 서랍을 그 탭으로 연다
       Object.assign(wiki, { tab: (TABS.some(([t]) => t === v) ? v : 'all') as Tab, listOpen: true, query: '' });
       break;
-    case 'wiki-search':
+    case 'wiki-search': {
       wiki.homeQuery = '';
-      search(ctx, v);
-      if (wiki.view === 'compose' || wiki.view === 'doc') wiki.listOpen = false;
+      // 검색으로 문서·작성 화면에 갔을 때만 목록을 접는다. 못 찾으면 search 가 목록을 펼쳐 「없어요 · 작성하기」를 보이는데,
+      // 예전엔 문서를 보던 중이면 곧바로 다시 접혀 검색이 아무 반응 없는 것처럼 보였다 (QC 2026-10-28)
+      if (search(ctx, v) && (wiki.view === 'compose' || wiki.view === 'doc')) wiki.listOpen = false;
       break;
+    }
     case 'wiki-pick':
       // 왼쪽 목록에서 고르기. PC는 열린 항목을 다시 누르면 닫힌다
       if ((wiki.view === 'doc' || wiki.view === 'compose') && canon(ctx)(v) === wiki.title && wide()) {
