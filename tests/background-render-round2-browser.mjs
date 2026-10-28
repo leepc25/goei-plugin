@@ -7,7 +7,7 @@ import { readFileSync, readdirSync, existsSync, mkdirSync, writeFileSync } from 
 import { execFileSync } from 'node:child_process';
 import { build } from 'esbuild';
 const require = createRequire(import.meta.url);
-const { chromium } = require(process.env.PLAYWRIGHT_MODULE || '/opt/codex/cua_node/lib/node_modules/playwright');
+const { chromium } = require(process.env.PLAYWRIGHT_MODULE || 'playwright');
 const out = 'out/background-render-round2';
 mkdirSync(out, { recursive: true });
 const pack = {};
@@ -29,7 +29,7 @@ const server = createServer((req, res) => {
 });
 await new Promise(r => server.listen(0, '127.0.0.1', r));
 const url = `http://127.0.0.1:${server.address().port}`;
-const browser = await chromium.launch({ executablePath: process.env.CHROMIUM_PATH || '/usr/bin/chromium', headless: true, args: ['--no-sandbox'] });
+const browser = await chromium.launch({ executablePath: process.env.CHROMIUM_PATH || undefined, headless: true, args: ['--no-sandbox'] });
 const errors = [], report = {};
 try {
   const page = await browser.newPage();

@@ -5,7 +5,7 @@ import { createRequire } from 'node:module';
 import { createServer } from 'node:http';
 import { readFile, writeFile, mkdir } from 'node:fs/promises';
 const require=createRequire(import.meta.url);
-const {chromium}=require(process.env.PLAYWRIGHT_MODULE||'/opt/codex/cua_node/lib/node_modules/playwright');
+const {chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
 const out='out/navigation-feedback-round2';await mkdir(out,{recursive:true});
 const common={bundle:true,write:false,format:'esm',loader:{'.css':'text'}};
 const game=await readFile('dist/goei-action-game.html','utf8');
@@ -26,7 +26,7 @@ window.fixture=(compact=false)=>{
 const fixtureHtml=`<!doctype html><meta charset="utf-8"><style>body{margin:0;background:#000}canvas{width:100%;max-height:100vh;object-fit:contain}</style><canvas width="1280" height="720"></canvas><script type="module">${fixture.outputFiles[0].text}</script>`;
 const server=createServer((req,res)=>{res.setHeader('Content-Type','text/html');res.end(req.url.startsWith('/fixture')?fixtureHtml:game)});
 await new Promise(r=>server.listen(0,'127.0.0.1',r));const url=`http://127.0.0.1:${server.address().port}`;
-const browser=await chromium.launch({executablePath:process.env.CHROMIUM_PATH||'/usr/bin/chromium',headless:true,args:['--no-sandbox']});
+const browser=await chromium.launch({executablePath:process.env.CHROMIUM_PATH || undefined,headless:true,args:['--no-sandbox']});
 const errors=[],report=[];
 try {
  for(const [name,width,height,touch] of [['pc',1280,720,false],['mobile',844,390,true],['small-mobile',667,375,true]].filter(v=>!process.env.NAV_VIEW||v[0]===process.env.NAV_VIEW)) {
@@ -79,10 +79,12 @@ try {
  await hq.waitForFunction(()=>window.__goeiEngine.world?.floor.id==='hq:office'&&!window.__goeiEngine.mods.blocking());
  const door=await hq.evaluate(()=>window.__goeiEngine.world.stage.current().doors.find(d=>d.to));
  const walk=async(key,axis,value,sign)=>{await hq.keyboard.down(key);await hq.waitForFunction(({axis,value,sign})=>sign*(window.__goeiEngine.world.player[axis]-value)>=0,{axis,value,sign},{timeout:25000});await hq.keyboard.up(key);};
- await walk('ArrowUp','y',486,-1);await walk('ArrowRight','x',door.x+78,1);await walk('ArrowDown','y',676,1);await walk('ArrowLeft','x',door.x+20,-1);
+ // 2026-10-25 이후 사무실 출입구는 아래쪽(S) 한 곳(→ 3층 복도): 아래 통로로 내려가 문 x 까지 옆으로, 안내가 뜰 때까지 아래로
+ await walk('ArrowDown','y',640,1);{const px=await hq.evaluate(()=>window.__goeiEngine.world.player.x);if(px>door.x)await walk('ArrowLeft','x',door.x+10,-1);else await walk('ArrowRight','x',door.x-10,1);}
+ await hq.keyboard.down('ArrowDown');await hq.waitForFunction(()=>!!window.__goeiEngine.world.stage.nearInfo(),null,{timeout:3000});await hq.keyboard.up('ArrowDown');
  await hq.screenshot({path:out+'/pc-hq-exit.png'});await hq.keyboard.press('KeyE');
- await hq.waitForFunction(()=>window.__goeiEngine.world.floor.id==='hq:f2',{},{timeout:5000});
- report.push('HQ: 새로 시작 → 가구를 돌아 첫 출구까지 키보드 이동 → E → 2층 복도 PASS');await hq.close();
+ await hq.waitForFunction((to)=>window.__goeiEngine.world.floor.id==='hq:'+to,door.to,{timeout:5000});
+ report.push('HQ: 새로 시작 → 가구를 돌아 첫 출구까지 키보드 이동 → E → 복도 PASS');await hq.close();
  assert.deepEqual(errors,[]);
  console.log(report.join('\n'));await writeFile(`${out}/browser-report.json`,JSON.stringify({report,errors},null,2));
 }finally{await browser.close();await new Promise(r=>server.close(r));}

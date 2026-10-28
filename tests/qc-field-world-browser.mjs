@@ -268,5 +268,39 @@ for (const stage of ['hostile', 'wary']) {
   ok('다시 붙인 뒤 대화 시계 한 번 · F9 전환', `${before}→${after}`);
   await browser.close();
 }
+// ── ⑥ 창 크기·터치: PC 상황창(1100×900, 좌우 메뉴 줄) · 폰 세로 390×844 · 폰 가로 844×390 (터치) ──
+//  본부까지 들어가 화면 캔버스가 상자를 채우는지, 터치면 스틱·단추가 보이는지, 임무 창(잼트리 책상 E)이 뜨면 터치 조작이 숨고 창 단추를 손가락으로 누를 수 있는지, 프레임 시간
+for (const vp of [{ width: 1100, height: 900, panel: true, touch: false }, { width: 390, height: 844, panel: false, touch: true }, { width: 844, height: 390, panel: false, touch: true }]) {
+  const { browser, page, errors } = await openField({ ...vp, query: '?seed=5', card: card(10 * 60) });
+  await enterHub(page);
+  const fit = await page.evaluate(() => { const c = window.__goeiEngine.canvas.getBoundingClientRect(), b = document.getElementById('box').getBoundingClientRect(); return { cw: Math.round(c.width), ch: Math.round(c.height), bw: Math.round(b.width), bh: Math.round(b.height), inside: c.left >= b.left - 1 && c.right <= b.right + 1 && c.top >= b.top - 1 && c.bottom <= b.bottom + 1 }; });
+  // 폰 세로는 돌려서 꽉 채운다(통합 규격 3장): 돌린 캔버스는 상자 안에 들어가기만 보면 된다
+  assert.ok(fit.inside, `캔버스가 상자 안 ${JSON.stringify(fit)}`);
+  assert.ok((fit.cw * fit.ch) / (fit.bw * fit.bh) > 0.5, `캔버스가 상자를 채운다 ${JSON.stringify(fit)}`);
+  const tpShown = () => page.evaluate(() => { const t = document.querySelector('.tp'); return !!t && getComputedStyle(t).display !== 'none' && getComputedStyle(t).visibility !== 'hidden' && t.getBoundingClientRect().width > 0; });
+  if (vp.touch) assert.ok(await tpShown(), '터치 조작이 보인다');
+  // 프레임 시간 (rAF 간격, 3초)
+  const fps = await page.evaluate(() => new Promise((res) => { const ts = []; const f = (t) => { ts.push(t); if (ts.length < 180) requestAnimationFrame(f); else { const d = ts.slice(1).map((x, i) => x - ts[i]).sort((a, b) => a - b); res({ med: +d[d.length >> 1].toFixed(1), p95: +d[Math.floor(d.length * 0.95)].toFixed(1) }); } }; requestAnimationFrame(f); }));
+  // 잼트리 책상 E → 임무 창: 터치 조작 숨김, 창 단추를 탭으로 누를 수 있다
+  await page.evaluate(() => { const w = window.__goeiEngine.world; const s = w.stage.current().spots.find((q) => q.id === 'jaemtri'); w.player.x = s.x; w.player.y = s.y; });
+  await page.waitForTimeout(250);
+  await page.keyboard.press('KeyE');
+  await page.waitForSelector('[data-mission]', { state: 'visible', timeout: 5000 }).then((h) => h.dispose());
+  await page.waitForTimeout(300);
+  if (vp.touch) {
+    assert.equal(await tpShown(), false, '임무 창이 뜨면 터치 조작을 숨긴다');
+    const btn = page.locator('[data-mission]').first();
+    const box = await btn.boundingBox();
+    const top = await page.evaluate(([x, y]) => { const el = document.elementFromPoint(x, y); return el?.closest('[data-mission]') ? 'mission' : el?.className ?? ''; }, [box.x + box.width / 2, box.y + box.height / 2]);
+    assert.equal(top, 'mission', `임무 단추 위에 다른 것이 겹친다 (${top})`);
+  }
+  await page.keyboard.press('Escape');
+  await page.waitForTimeout(400);
+  if (vp.touch) assert.ok(await tpShown(), '창을 닫으면 터치 조작이 돌아온다');
+  if (shots) await page.screenshot({ path: `${shots}/vp-${vp.width}x${vp.height}.png` });
+  assert.deepEqual(errors, [], `오류 ${errors}`);
+  ok(`창 ${vp.width}×${vp.height}${vp.touch ? ' 터치' : ''}`, `캔버스 ${fit.cw}×${fit.ch} / 상자 ${fit.bw}×${fit.bh} · 프레임 중앙 ${fps.med}ms · 95% ${fps.p95}ms`);
+  await browser.close();
+}
 console.log(results.join('\n'));
 console.log('qc-field-world-browser 통과');

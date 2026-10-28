@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {createRequire} from 'node:module';
 import {build} from 'esbuild';
 const require=createRequire(import.meta.url);
-const {chromium}=require(process.env.PLAYWRIGHT_MODULE || '/opt/codex/cua_node/lib/node_modules/playwright');
+const {chromium}=require(process.env.PLAYWRIGHT_MODULE || 'playwright');
 const bundle=await build({stdin:{contents:`
 import {createHq} from './src/game/action/hq/view';
 import {newSave,saveText} from './src/game/action/hq/state';
@@ -30,7 +30,7 @@ window.prepareActive=async function() {
  session.setCheckpoint(null);session.setMeta({deepest:9});hq.state.active=null;hq.openMenu();
 };
 `,resolveDir:process.cwd()},bundle:true,format:'iife',write:false,loader:{'.css':'text'}});
-const browser=await chromium.launch({executablePath:process.env.CHROMIUM_PATH||'/usr/bin/chromium',headless:true,args:['--no-sandbox']});
+const browser=await chromium.launch({executablePath:process.env.CHROMIUM_PATH||undefined,headless:true,args:['--no-sandbox']});
 const errors=[];
 try {
  for(const mobile of [false,true]) {
@@ -41,7 +41,11 @@ try {
   await page.click('[data-rest="day"]');
   assert.deepEqual(await page.evaluate(()=>({day:hq.state.day,budget:hq.state.currencies.budget,injury:hq.state.agents.jyaldi.injured,fatigue:hq.state.agents.jyaldi.fatigue,runs:hq.state.runs})),{day:2,budget:0,injury:0,fatigue:0,runs:0});
   await page.evaluate(()=>hq.openPlace('jaemtri'));await page.click('[data-act="brief"]');await page.click('[data-act="deploy"]');
-  assert.equal(await page.evaluate(()=>deployments.length),1,'휴식 뒤 실제 브리핑 버튼으로 출동');
+  // 2026-10-25 사용자: 브리핑의 「출동」은 출동 준비(B3 승합차)만 하고, 실제 출동은 승합차에서 E(depart). 걷지 않는 창(walk:false)도 같다
+  assert.equal(await page.evaluate(()=>deployments.length),0,'브리핑 단추는 출동 준비만');
+  assert.equal(await page.evaluate(()=>hq.armed()),true,'출동 준비됨');
+  assert.equal(await page.evaluate(()=>hq.depart()),null,'승합차에서 출발');
+  assert.equal(await page.evaluate(()=>deployments.length),1,'휴식 뒤 브리핑 → 승합차로 출동');
   await page.evaluate(()=>window.setup());await page.click('[data-rest="day"]');
   await page.evaluate(()=>{session.setMeta({deepest:3});hq.openMenu()});
   await page.click('[data-saveslot="1"]');await page.waitForSelector('[data-loadslot="1"]');

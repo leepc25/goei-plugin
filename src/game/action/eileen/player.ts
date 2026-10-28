@@ -80,6 +80,11 @@ export class EileenPlayer extends Player {
     });
   }
 
+  /** 엔진 동작(줍기·마시기·붕대 등 MOVES)은 옛 주인공 그림용이다. 에일린은 테스트룸 코어가 스스로 그리고, 이 몸의 tick 은 move 를
+   *  진행·해제하지 않는다: 걸면 영원히 남아 첫 E·줍기·아이템 사용 뒤로 아이템을 다시 못 쓰고(useItem 이 move 로 막힘)
+   *  저장 지점(canCheckpoint)도 다시 오지 않았다 (QC 2026-10-28). 그래서 걸지 않는다 */
+  play(_key: string, _world: WorldView): void {}
+
   /** 발 자리 아래 올라설 물건 (데스크 등) */
   private platformAt(x: number, y: number) {
     const ps = (this.world?.floor as { platforms?: { x0: number; x1: number; y0: number; y1: number; h: number }[] } | undefined)?.platforms;

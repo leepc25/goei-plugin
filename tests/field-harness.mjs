@@ -11,13 +11,13 @@ try { ({ chromium } = require('playwright')); } catch { ({ chromium } = createRe
 
 const DIST = resolve(new URL('../dist/game', import.meta.url).pathname);
 
-/** 선택: card = bridge.card() 가 줄 본편 스냅숏(시각 minute 등), uiPrefs = $hq_ui 설정 JSON 글, people = 인물 기록·세력 평판 (factions 배열), query = 주소 ?seed=…&hour=… */
-export async function openField({ width = 1873, height = 1082, panel = true, card = null, uiPrefs = null, people = null, query = '' } = {}) {
+/** 선택: touch = 폰 흉내(hasTouch·isMobile), card = bridge.card() 가 줄 본편 스냅숏(시각 minute 등), uiPrefs = $hq_ui 설정 JSON 글, people = 인물 기록·세력 평판 (factions 배열), query = 주소 ?seed=…&hour=… */
+export async function openField({ width = 1873, height = 1082, panel = true, card = null, uiPrefs = null, people = null, query = '', touch = false } = {}) {
   const code = readFileSync(`${DIST}/goei-game.js`, 'utf8');
   const packs = {};
   for (const f of readdirSync(DIST)) if (f.endsWith('.pack')) packs[f.replace(/\.pack$/, '')] = readFileSync(`${DIST}/${f}`).toString('base64');
   const b = await chromium.launch();
-  const page = await b.newPage({ viewport: { width, height } });
+  const page = await b.newPage({ viewport: { width, height }, ...(touch ? { hasTouch: true, isMobile: true } : {}) });
   const errors = [];
   page.on('pageerror', (e) => errors.push(e.message));
   page.on('console', (m) => m.type() === 'error' && errors.push(m.text()));
@@ -27,7 +27,7 @@ export async function openField({ width = 1873, height = 1082, panel = true, car
     await page.goto(`http://goei.test/${query.startsWith('?') ? query : `?${query}`}`);
   }
   // 상황창: 왼쪽 메뉴 줄 · 가운데 본문(필드) · 오른쪽 신분증 줄 (리스 플러그인 창 흉내)
-  await page.setContent(`<!doctype html><html><head><meta charset="utf-8"><style>
+  await page.setContent(`<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>
     html,body{margin:0;height:100%;background:#111}
     .gx-panel{position:absolute;inset:14px;display:grid;grid-template-columns:${panel ? '72px 1fr 220px' : '1fr'};border-radius:24px;overflow:hidden;background:#05080a}
     .side{background:#1a2226}.gx-fieldhost{position:relative;overflow:hidden}

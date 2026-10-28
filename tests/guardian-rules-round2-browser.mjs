@@ -7,7 +7,7 @@ import { createServer } from 'node:http';
 import { readFile, writeFile, mkdir } from 'node:fs/promises';
 import { createRequire } from 'node:module';
 const require=createRequire(import.meta.url);
-const { chromium }=require(process.env.PLAYWRIGHT_MODULE || '/opt/codex/cua_node/lib/node_modules/playwright');
+const { chromium }=require(process.env.PLAYWRIGHT_MODULE || 'playwright');
 const artifactDir=process.env.GUARDIAN_ARTIFACT_DIR || '/tmp/guardian-rules-round2-browser';
 await mkdir(artifactDir,{recursive:true});
 const fixture=await build({stdin:{resolveDir:process.cwd(),contents:`
@@ -49,7 +49,7 @@ await new Promise(r=>server.listen(0,'127.0.0.1',r));
 let browser;
 const result={checks:[],errors:[]};
 try {
- browser=await chromium.launch({executablePath:process.env.CHROMIUM_PATH || '/usr/bin/chromium',headless:true,args:['--no-sandbox']});
+ browser=await chromium.launch({executablePath:process.env.CHROMIUM_PATH || undefined,headless:true,args:['--no-sandbox']});
  const page=await browser.newPage({viewport:{width:1280,height:720}});
  page.on('pageerror',e=>result.errors.push(String(e)));
  const url='http://127.0.0.1:'+server.address().port;

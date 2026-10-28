@@ -5,7 +5,7 @@ import { createServer } from 'node:http';
 import { readFile } from 'node:fs/promises';
 import { build } from 'esbuild';
 const require=createRequire(import.meta.url);
-const {chromium}=require(process.env.PLAYWRIGHT_MODULE||'/opt/codex/cua_node/lib/node_modules/playwright');
+const {chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
 const fixture=await build({stdin:{contents:`import {VideoPlayer} from './src/game/action/story/video';window.video=new VideoPlayer(document.body);`,resolveDir:process.cwd()},bundle:true,format:'iife',write:false,loader:{'.css':'text'}});
 const server=createServer(async(req,res)=>{
  if(req.url==='/fixture')return res.end('<body><script src="/fixture.js"></script>');
@@ -18,30 +18,27 @@ const server=createServer(async(req,res)=>{
  res.setHeader('Content-Type','text/html');res.end(await readFile('dist/goei-action-game.html'));
 });
 await new Promise(r=>server.listen(0,'127.0.0.1',r));const url=`http://127.0.0.1:${server.address().port}`;
-const browser=await chromium.launch({executablePath:'/usr/bin/chromium',headless:true,args:['--no-sandbox']});const errors=[];
+const browser=await chromium.launch({executablePath:process.env.CHROMIUM_PATH||undefined,headless:true,args:['--no-sandbox']});const errors=[];
 try{
  const page=await browser.newPage({viewport:{width:1280,height:720}});page.on('pageerror',e=>errors.push(String(e)));
  await page.goto(url);await page.waitForFunction(()=>window.__goeiEngine);
  await page.getByText('새로 시작',{exact:true}).click();await page.waitForTimeout(1500);await page.evaluate(()=>window.__goeiStory.skip());
  await page.waitForFunction(()=>window.__goeiEngine.world?.floor.id==='hq:office'&&!window.__goeiEngine.mods.blocking());
  const door=await page.evaluate(()=>window.__goeiEngine.world.stage.current().doors.find(d=>d.to));
- // 위치 주입 없이 책상 아래 안전 통로 → 오른쪽 문 x → 북쪽 출입구로 걷는다.
- const walk=async(key,axis,value,sign)=>{
-  await page.keyboard.down(key);
-  await page.waitForFunction(({axis,value,sign})=>sign*(window.__goeiEngine.world.player[axis]-value)>=0,{axis,value,sign},{timeout:20000});
-  await page.keyboard.up(key);
- };
- await walk('ArrowDown','y',620,1);
- await walk('ArrowRight','x',door.x,1);
- await walk('ArrowUp','y',446,-1);
+ // 위치 주입 없이 걸어서 나간다. 2026-10-25 이후 사무실 출입구는 아래쪽(S) 한 곳(→ 3층 복도 f3): 아래 통로로 내려가 문 x 까지 옆으로, 안내가 뜰 때까지 아래로
+ const walk=async(key,cond,ms=20000)=>{await page.keyboard.down(key);await page.waitForFunction(cond,null,{timeout:ms});await page.keyboard.up(key);};
+ const dir=door.x<await page.evaluate(()=>window.__goeiEngine.world.player.x)?'ArrowLeft':'ArrowRight';
+ await walk('ArrowDown',()=>window.__goeiEngine.world.player.y>=640);
+ await page.keyboard.down(dir);await page.waitForFunction((x)=>Math.abs(window.__goeiEngine.world.player.x-x)<=12,door.x,{timeout:20000});await page.keyboard.up(dir);
+ await walk('ArrowDown',()=>!!window.__goeiEngine.world.stage.nearInfo(),3000);
  await page.keyboard.press('KeyE');
- await page.waitForFunction(()=>window.__goeiEngine.world.floor.id==='hq:f2',{timeout:3000});
+ await page.waitForFunction((to)=>window.__goeiEngine.world.floor.id==='hq:'+to,door.to,{timeout:5000});
  await page.waitForTimeout(400);
  const arrivalX=await page.evaluate(()=>window.__goeiEngine.world.player.x);
  await page.keyboard.down('ArrowRight');await page.waitForTimeout(400);await page.keyboard.up('ArrowRight');
  assert.ok(await page.evaluate(()=>window.__goeiEngine.world.player.x)>arrivalX,'복도 도착 후 이동 입력 재개');
- await page.screenshot({path:'/workspace/goei-hq-door-fixed.png'});
- console.log('PASS 새로 시작 → 첫 방 가구를 돌아 문까지 걷기 → E → 2층 복도');
+ await page.screenshot({path:(process.env.SHOTS||'/tmp')+'/goei-hq-door-fixed.png'});
+ console.log('PASS 새로 시작 → 첫 방에서 문까지 걷기 → E → 복도');
  await page.goto(url+'/fixture');
  await page.evaluate(()=>{
   window.drawn=[];window.done=0;const draw=CanvasRenderingContext2D.prototype.drawImage;
