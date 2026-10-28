@@ -27,11 +27,12 @@ export class PadReader {
       this.prev.clear();
       return;
     }
-    if (this.index !== p.index || this.connected !== p.id) {
+    const idx = p.index ?? 0;
+    if (this.index !== idx || this.connected !== p.id) {
       this.hub.releaseSource('pad');
       this.prev.clear();
     }
-    this.index = p.index;
+    this.index = idx;
     this.connected = p.id;
     const want = new Map<string, boolean>();
     const set = (code: string, on: boolean) => want.set(code, (want.get(code) ?? false) || on);

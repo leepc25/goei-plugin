@@ -7,9 +7,10 @@ import { mkdirSync } from 'node:fs';
 import { pathToFileURL } from 'node:url';
 import { resolve } from 'node:path';
 const require = createRequire(import.meta.url);
-const { chromium } = require(process.env.PLAYWRIGHT_MODULE || `${execSync('npm root -g').toString().trim()}/playwright`);
+let chromium;
+try { ({ chromium } = require(process.env.PLAYWRIGHT_MODULE || 'playwright')); } catch { ({ chromium } = require(`${execSync('npm root -g').toString().trim()}/playwright`)); }
 const url = process.env.GAME_URL || pathToFileURL(resolve('dist/goei-action-game.html')).href;
-const browser = await chromium.launch({ executablePath: process.env.CHROMIUM_PATH || '/usr/bin/chromium', headless: true, args: ['--no-sandbox'] });
+const browser = await chromium.launch({ executablePath: process.env.CHROMIUM_PATH || undefined, headless: true, args: ['--no-sandbox'] });
 const shots = process.env.SHOTS;
 if (shots) mkdirSync(shots, { recursive: true });
 const errors = [];
@@ -45,11 +46,18 @@ try {
     await idle(page);
     await page.evaluate(() => { const w = window.__goeiEngine.world; w.player.x = w.props.find(p => p.id === 'spot:jaemtri').x; });
     await page.keyboard.press('KeyE');
-    await page.waitForSelector('.gnp:not([hidden])');
-    await page.keyboard.press('KeyE');
+    // 잼트리 임무 책상은 E 한 번에 바로 임무 창 (2026-10-25 사용자). 잼트리 본인이 책상 옆에 서 있으면 「대화」 자리가 더 가까워 대화창이 먼저 뜬다: 그때만 E 한 번 더
+    await page.waitForSelector('.gnp:not([hidden]), [data-mission]', { state: 'visible' });
+    if (await page.locator('.gnp:not([hidden])').count()) { await page.keyboard.press('Escape'); await page.waitForTimeout(200); await page.evaluate(() => { const w = window.__goeiEngine.world; const s = w.stage.current().spots.find((q) => q.id === 'jaemtri'); w.player.x = s.x; w.player.y = s.y; }); await page.waitForTimeout(200); await page.keyboard.press('KeyE'); }
     await page.locator('[data-mission]').first().click();
     await page.locator('[data-act=brief]').click();
     await page.locator('[data-act=deploy]').click();
+    // 출동 준비 → B3 주차장 승합차 앞에서 E (사용자 2026-10-25)
+    await page.waitForFunction(() => !document.querySelector('[data-act=deploy]'));
+    await page.evaluate(() => window.__goeiEngine.world.stage.jump('b3', 370, 470));
+    await page.waitForFunction(() => window.__goeiEngine.world?.floor?.id === 'hq:b3' && window.__goeiEngine.world.props.some((q) => q.id === 'spot:van'));
+    await page.waitForTimeout(300);
+    await page.keyboard.press('KeyE');
     await page.waitForFunction(() => window.__goeiEngine.world && !window.__goeiEngine.inHub);
     await idle(page);
     await page.evaluate(() => {

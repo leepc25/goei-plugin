@@ -6,7 +6,7 @@ import { readFile, writeFile, mkdir } from 'node:fs/promises';
 import { join, resolve } from 'node:path';
 import { build } from 'esbuild';
 const require = createRequire(import.meta.url);
-const { chromium } = require(process.env.PLAYWRIGHT_MODULE || '/opt/codex/cua_node/lib/node_modules/playwright');
+const { chromium } = require(process.env.PLAYWRIGHT_MODULE || 'playwright');
 const output = resolve('dist-test/items-combat-round2-browser');
 await mkdir(output, { recursive: true });
 const bundled = await build({ stdin: { contents: `
@@ -23,7 +23,7 @@ await writeFile(join(output, 'items-combat-round2-current.html'), current);
 const server = createServer((req, res) => { res.setHeader('Content-Type', 'text/html'); res.end(req.url.startsWith('/current') ? current : original); });
 await new Promise(r => server.listen(0, '127.0.0.1', r));
 const url = `http://127.0.0.1:${server.address().port}`;
-const browser = await chromium.launch({ executablePath: process.env.CHROMIUM_PATH || '/usr/bin/chromium', headless: true, args: ['--no-sandbox'] });
+const browser = await chromium.launch({ executablePath: process.env.CHROMIUM_PATH || undefined, headless: true, args: ['--no-sandbox'] });
 const errors = [], results = [];
 try {
   const page = await browser.newPage({ viewport: { width: 1280, height: 720 } });
@@ -45,6 +45,14 @@ try {
   await page.waitForFunction(n => window.__goeiEngine.world.itemRun.loadout[0]?.n === n - 1, before.n);
   assert.equal(await page.evaluate(() => window.__goeiEngine.world.player.hp), before.hp + before.max * .35);
   results.push('현재 소스: Digit1 회복·정확히 한 개 소비');
+  // 에일린 몸에 줍기·마시기 동작(move)이 남아 두 번째 아이템을 못 쓰던 결함 (QC 2026-10-28): 1초 뒤 move 가 없고 다시 쓸 수 있다
+  await page.waitForTimeout(1000);
+  assert.equal(await page.evaluate(() => window.__goeiEngine.world.player.move), null, '에일린: 아이템 사용 뒤 move 가 남지 않는다');
+  await page.evaluate(() => { const p = window.__goeiEngine.world.player; p.hp = p.hpMax / 2; });
+  await press('Digit1');
+  // 두 번째 사용: 한 개 더 줄고(다 쓰면 칸이 빈다) 다시 회복된다
+  await page.waitForFunction(([n, hp]) => (window.__goeiEngine.world.itemRun.loadout[0]?.n ?? 0) === n - 2 && window.__goeiEngine.world.player.hp > hp, [before.n, before.hp], { timeout: 5000 });
+  results.push('에일린: 두 번째 Digit1 도 쓰인다 (move 고착 회귀)');
 
   await load('/current');
   const ready = () => page.waitForFunction(() => { const p = window.__goeiEngine.world.player; return !p.move && p.phase === 'free'; });
@@ -96,52 +104,11 @@ try {
   });
   await page.waitForFunction(() => window.__goeiEngine.world.player.reserve === 32);
   assert.equal((await state()).ents[0].ammoLeft, 7);
-  const ammo = (await state()).ammo;
-  await press('KeyS');
-  await ready(); // 첫 S는 홀스터에서 꺼내기, 두 번째 S가 사격.
-  await press('KeyS');
-  await page.waitForFunction(n => window.__goeiEngine.world.player.ammo < n, ammo);
-  results.push('탄약 31→32, 바닥 잔탄 7 보존 및 실제 S 사격 소비');
+  results.push('탄약 31→32, 바닥 잔탄 7 보존');
   await ready();
-
-  await page.evaluate(() => {
-    const w = window.__goeiEngine.world, I = window.itemsRound2.items, p = w.player;
-    w.itemField.ents.length = 0;
-    Object.assign(I.spawnPickup(w.itemField, 'weapon', p.x, p.y, 'pipe'), { z: 0, vz: 0, vx: 0, vy: 0, age: 1 });
-  });
-  await press('KeyE');
-  await page.waitForFunction(() => window.__goeiEngine.world.itemRun.held?.id === 'pipe');
-  await ready();
-  await page.evaluate(() => {
-    const w = window.__goeiEngine.world, p = w.player;
-    const e = window.itemsRound2.createEnemy('fb_smg', p.x + 75, p.y, () => .5);
-    e.set('idle'); e.hp = e.hpMax = 40; e.brain = { think() {} };
-    w.bodies.push(e); window.itemsRound2.enemy = e;
-  });
-  await press('KeyA');
-  await page.waitForFunction(() => window.itemsRound2.enemy.hp < 40);
-  await ready();
-  await page.evaluate(() => { const w = window.__goeiEngine.world, e = window.itemsRound2.enemy; e.x = w.player.x + 75; e.y = w.player.y; e.vx = 0; });
-  await press('KeyA');
-  await page.waitForFunction(() => window.itemsRound2.enemy.hp <= 0);
-  assert.equal((await state()).held.uses, 6);
-  assert.equal(await page.evaluate(() => window.__goeiEngine.world.kills), 1);
-  results.push('E 쇠파이프 획득 → A 두 번으로 실제 적 처치, 내구 8→6·처치 1');
-  await ready();
-
-  await page.evaluate(() => {
-    const w = window.__goeiEngine.world, I = window.itemsRound2.items, p = w.player;
-    w.itemRun.held = null; w.itemField.ents.length = 0; w.bodies = w.bodies.filter(b => b.team !== 'enemy');
-    I.placeProp(w.itemField, 'chair', p.x + 45, p.y);
-  });
-  await page.waitForTimeout(100); await press('KeyE');
-  await page.waitForFunction(() => window.__goeiEngine.world.itemRun.carry?.prop === 'chair');
-  await ready(); await press('KeyA');
-  await page.waitForFunction(() => !window.__goeiEngine.world.itemRun.carry);
-  await page.waitForFunction(() => window.__goeiEngine.world.itemField.projs.length === 0);
-  assert.equal((await state()).ents.some(e => e.prop === 'chair'), false);
-  results.push('의자 E 들기 → A 투척 → 착지 후 원본·투사체 소멸');
-  await ready();
+  // 예전 「S 사격으로 탄약 소비」「쇠파이프 E 들고 A 두 번 처치」「의자 E 들기 → A 투척」은 엔진 몸(쟈알디 키)의 연동이다.
+  // 2026-10-25 주인공이 에일린(테스트룸 키트)이 되어 빌드한 게임에서는 늘 에일린 몸이고, 에일린 사격은 엔진 탄약을 쓰지 않고
+  // 든 무기·의자 들기도 연결돼 있지 않다 (docs/게임_성장_경제_설계.md 0장 「에일린에 대부분 미연결」과 같은 결정 대기). 그래서 뺐다 — docs/qc/05_game.md
 
   for (const id of ['flash', 'smoke']) {
     await page.evaluate(id => {

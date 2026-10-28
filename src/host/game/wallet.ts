@@ -1,4 +1,5 @@
 // 게임 다리: 가계부 (core/wallet.ts). 필드 가게·거래가 본편과 같은 장부에 적는다. 게임을 연 채팅에만 쓴다 (채팅이 바뀌면 안 씀, field.ts 와 같음).
+import { uid } from './uid';
 import type { GameWallet } from '../../game/bridge';
 import { anchorOf } from '../../core/visit';
 import { aliveAnchors, readWallet, walletBalance, walletVars, withFieldTrade, WALLET_START_DEFAULT } from '../../core/wallet';
@@ -34,7 +35,7 @@ export function createWallet(): GameWallet {
         let after: number | null = null;
         await updateChat(c.charIndex, c.chatIndex, (chat) => {
           if (chat.id !== c.chat.id) return null;
-          const w = withFieldTrade(readWallet(chat.scriptstate, start()), anchorOf(chat), amount, String(memo ?? ''), `f_${crypto.randomUUID()}`, where ?? {});
+          const w = withFieldTrade(readWallet(chat.scriptstate, start()), anchorOf(chat), amount, String(memo ?? ''), `f_${uid()}`, where ?? {});
           const next = { ...chat, scriptstate: { ...(chat.scriptstate ?? {}), ...walletVars(w) } };
           after = balanceOf(next);
           return next;

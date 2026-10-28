@@ -5,19 +5,20 @@ import { createServer } from 'node:http';
 import { readFile,writeFile,mkdir } from 'node:fs/promises';
 import { createRequire } from 'node:module';
 const require=createRequire(import.meta.url);
-const {chromium}=require(process.env.PLAYWRIGHT_MODULE||'/opt/codex/cua_node/lib/node_modules/playwright');
+const {chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
 const html=await readFile(process.env.GAME_HTML||'dist/goei-action-game.html');
 const output=process.env.SHOTS||'out/child-door-dist';await mkdir(output,{recursive:true});
 const server=createServer((req,res)=>{res.setHeader('Content-Type','text/html; charset=utf-8');res.end(html)});
 await new Promise(r=>server.listen(0,'127.0.0.1',r));
-const browser=await chromium.launch({executablePath:process.env.CHROMIUM_PATH||'/usr/bin/chromium',headless:true,args:['--no-sandbox']});
+const browser=await chromium.launch({executablePath:process.env.CHROMIUM_PATH||undefined,headless:true,args:['--no-sandbox']});
 const results=[],errors=[];
 try{
  for(const phone of [false,true]){
   const viewport=phone?{width:844,height:390}:{width:1280,height:720};
   const context=await browser.newContext({viewport,hasTouch:phone,isMobile:phone});const page=await context.newPage();
   page.on('pageerror',e=>errors.push(String(e)));
-  await page.goto(`http://127.0.0.1:${server.address().port}`);await page.waitForFunction(()=>window.__goeiEngine&&window.__goeiStory);
+  // 시연판은 제목 화면(일시정지 상태)으로 열린다: ?start=stage=elevator 로 바로 출동 화면에서 시작 (제목이 떠 있으면 paused 라 대화 종료를 영원히 기다림)
+  await page.goto(`http://127.0.0.1:${server.address().port}/?start=stage=elevator`);await page.waitForFunction(()=>window.__goeiEngine?.world&&window.__goeiStory);
   const setup=await page.evaluate(()=>{
    const g=window.__goeiEngine;g.deploy({seed:4,agent:'jyaldi',stageId:'elevator'});
    const w=g.world,s=w.stage,run=w.run;window.childDoorEvents=[];w.on(e=>childDoorEvents.push(e));

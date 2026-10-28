@@ -76,7 +76,8 @@ try {
     await page.waitForSelector('.mn-row .mn-tog');
     // CRT 켜기: 첫 항목
     await page.keyboard.press('Enter');
-    assert.ok(await page.evaluate(() => document.querySelector('.gs').classList.contains('crt')), 'CRT 켜짐');
+    // WebGL 브라운관(ui/crt.ts)이 붙으면 .crt 클래스(CSS 대체)는 안 붙는다: data-crt 표식으로 본다
+    assert.ok(await page.evaluate(() => document.querySelector('.gs').dataset.crt !== 'off' && (document.querySelector('.gs').classList.contains('crt') || document.querySelector('.gs-crtgl')?.style.display === 'block')), 'CRT 켜짐');
     await page.screenshot({ path: `${shots}/pc-settings.png` });
     await page.keyboard.press('Escape');
     await page.keyboard.press('Escape');
@@ -94,7 +95,7 @@ try {
     await page.keyboard.press('KeyZ');
     // 가짜 게임패드: X 버튼 = 근접(KeyA)
     await page.evaluate(() => {
-      const pad = { id: '시험 패드', connected: true, buttons: Array.from({ length: 17 }, () => ({ pressed: false, value: 0 })), axes: [0, 0, 0, 0] };
+      const pad = { id: '시험 패드', index: 0, connected: true, buttons: Array.from({ length: 17 }, () => ({ pressed: false, value: 0 })), axes: [0, 0, 0, 0] };
       window.__pad = pad;
       navigator.getGamepads = () => [pad];
     });
@@ -102,9 +103,10 @@ try {
     await wait(100);
     assert.ok(await page.evaluate(() => window.__ui.shell.input.held('KeyA')), '패드 X = A');
     await page.evaluate(() => ((window.__pad.buttons[2] = { pressed: false, value: 0 }), (window.__pad.axes[0] = 1)));
+    // 어두운 층의 적에게 맞아 경직(hurt) 중이면 그동안 못 움직인다: 3초 안에 20px 이상 가면 된다
     const px0 = await page.evaluate(() => window.__ui.run.player.x);
-    await wait(500);
-    assert.ok((await page.evaluate(() => window.__ui.run.player.x)) > px0 + 20, '패드 스틱 이동');
+    const moved = await page.waitForFunction((px0) => window.__ui.run.player.x > px0 + 20, px0, { timeout: 3000 }).then(() => true, () => false);
+    assert.ok(moved, '패드 스틱 이동');
     await page.evaluate(() => (window.__pad.axes[0] = 0));
     await page.close();
   }

@@ -41,7 +41,7 @@ const server = createServer(async (req, res) => {
   res.setHeader('Content-Type', 'text/html'); res.end(await readFile('dist/goei-action-game.html'));
 });
 await new Promise(r => server.listen(0, '127.0.0.1', r));
-const browser = await chromium.launch({ executablePath: process.env.CHROMIUM_PATH || '/usr/bin/chromium', headless: true, args: ['--no-sandbox', '--autoplay-policy=user-gesture-required'] });
+const browser = await chromium.launch({ executablePath: process.env.CHROMIUM_PATH || undefined, headless: true, args: ['--no-sandbox', '--autoplay-policy=user-gesture-required'] });
 const page = await browser.newPage({ viewport: { width: 1280, height: 720 } });
 const errors = [];
 page.on('pageerror', e => errors.push(String(e)));
@@ -54,7 +54,7 @@ await page.addInitScript(() => {
 async function skipStory() {
   for (let i = 0; i < 6; i++) {
     for (const selector of ['.gsy-vskip', '.gsy-skip']) {
-      const b = page.locator(selector); if (await b.isVisible()) await b.click();
+      const b = page.locator(selector); if (await b.isVisible()) await b.click({ timeout: 1000 }).catch(() => {}); // 보였다가 컷이 끝나 사라지면 30초 기다리던 경쟁
     }
     await page.waitForTimeout(100);
   }

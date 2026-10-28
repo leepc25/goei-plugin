@@ -40,3 +40,14 @@ test('전각 쉼표·가운뎃점으로 나눈 동행도 읽는다', () => {
   const [t] = findStatusTags('[▣|2025.01.01|02:47 AM|☀️|4°C|거리|없음|쟈알디，에일린、데드폴|없음]');
   assert.deepEqual(t.companions, ['쟈알디', '에일린', '데드폴']);
 });
+
+test('상태줄 시각 → 필드 시계 분: 오전·오후, 날짜 없으면 그날의 분 (QC 2026-10-28: 「02:47 PM」을 2시로 읽던 것)', async () => {
+  const { statusClockMinute, statusMinute } = await import('../dist-test/core.mjs');
+  assert.equal(statusClockMinute({ date: '2025.01.01', time: '10:20 AM' }), statusMinute('2025.01.01', '10:20 AM'));
+  assert.equal(statusClockMinute({ date: '2025.01.01', time: '02:47 PM' }) % 1440, 14 * 60 + 47);
+  assert.equal(statusClockMinute({ date: '', time: '02:47 PM' }), 14 * 60 + 47);
+  assert.equal(statusClockMinute({ time: '12:05 AM' }), 5);
+  assert.equal(statusClockMinute({ time: '오후 9시' }), 21 * 60);
+  assert.equal(statusClockMinute({ time: '' }), null);
+  assert.equal(statusClockMinute(null), null);
+});
