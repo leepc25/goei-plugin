@@ -1,0 +1,261 @@
+{
+ "frames": [
+  {
+   "filename": "x3-4-6-d-baton-arcs 0.png",
+   "frame": {
+    "x": 0,
+    "y": 0,
+    "w": 304,
+    "h": 344
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 304,
+    "h": 344
+   },
+   "sourceSize": {
+    "w": 304,
+    "h": 344
+   },
+   "pivot": {
+    "x": 0.5131578947368421,
+    "y": 0.5232558139534884
+   },
+   "duration": 56
+  },
+  {
+   "filename": "x3-4-6-d-baton-arcs 1.png",
+   "frame": {
+    "x": 304,
+    "y": 0,
+    "w": 304,
+    "h": 344
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 304,
+    "h": 344
+   },
+   "sourceSize": {
+    "w": 304,
+    "h": 344
+   },
+   "pivot": {
+    "x": 0.5131578947368421,
+    "y": 0.5232558139534884
+   },
+   "duration": 56
+  },
+  {
+   "filename": "x3-4-6-d-baton-arcs 2.png",
+   "frame": {
+    "x": 608,
+    "y": 0,
+    "w": 304,
+    "h": 344
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 304,
+    "h": 344
+   },
+   "sourceSize": {
+    "w": 304,
+    "h": 344
+   },
+   "pivot": {
+    "x": 0.5131578947368421,
+    "y": 0.5232558139534884
+   },
+   "duration": 56
+  },
+  {
+   "filename": "x3-4-6-d-baton-arcs 3.png",
+   "frame": {
+    "x": 0,
+    "y": 344,
+    "w": 304,
+    "h": 344
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 304,
+    "h": 344
+   },
+   "sourceSize": {
+    "w": 304,
+    "h": 344
+   },
+   "pivot": {
+    "x": 0.5131578947368421,
+    "y": 0.5232558139534884
+   },
+   "duration": 56
+  },
+  {
+   "filename": "x3-4-6-d-baton-arcs 4.png",
+   "frame": {
+    "x": 304,
+    "y": 344,
+    "w": 304,
+    "h": 344
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 304,
+    "h": 344
+   },
+   "sourceSize": {
+    "w": 304,
+    "h": 344
+   },
+   "pivot": {
+    "x": 0.5131578947368421,
+    "y": 0.5232558139534884
+   },
+   "duration": 56
+  },
+  {
+   "filename": "x3-4-6-d-baton-arcs 5.png",
+   "frame": {
+    "x": 608,
+    "y": 344,
+    "w": 304,
+    "h": 344
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 304,
+    "h": 344
+   },
+   "sourceSize": {
+    "w": 304,
+    "h": 344
+   },
+   "pivot": {
+    "x": 0.5131578947368421,
+    "y": 0.5232558139534884
+   },
+   "duration": 56
+  },
+  {
+   "filename": "x3-4-6-d-baton-arcs 6.png",
+   "frame": {
+    "x": 0,
+    "y": 688,
+    "w": 304,
+    "h": 344
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 304,
+    "h": 344
+   },
+   "sourceSize": {
+    "w": 304,
+    "h": 344
+   },
+   "pivot": {
+    "x": 0.5131578947368421,
+    "y": 0.5232558139534884
+   },
+   "duration": 56
+  },
+  {
+   "filename": "x3-4-6-d-baton-arcs 7.png",
+   "frame": {
+    "x": 304,
+    "y": 688,
+    "w": 304,
+    "h": 344
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 304,
+    "h": 344
+   },
+   "sourceSize": {
+    "w": 304,
+    "h": 344
+   },
+   "pivot": {
+    "x": 0.5131578947368421,
+    "y": 0.5232558139534884
+   },
+   "duration": 56
+  },
+  {
+   "filename": "x3-4-6-d-baton-arcs 8.png",
+   "frame": {
+    "x": 608,
+    "y": 688,
+    "w": 304,
+    "h": 344
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 304,
+    "h": 344
+   },
+   "sourceSize": {
+    "w": 304,
+    "h": 344
+   },
+   "pivot": {
+    "x": 0.5131578947368421,
+    "y": 0.5232558139534884
+   },
+   "duration": 56
+  }
+ ],
+ "meta": {
+  "app": "PixelLab VFX Creator",
+  "image": "x3-4-6-d-baton-arcs.png",
+  "format": "RGBA8888",
+  "size": {
+   "w": 912,
+   "h": 1032
+  },
+  "scale": "1",
+  "anchor": {
+   "kind": "origin",
+   "x": 156,
+   "y": 180
+  },
+  "frameTags": [
+   {
+    "name": "x3-4-6-d-baton-arcs",
+    "from": 0,
+    "to": 8,
+    "direction": "forward"
+   }
+  ]
+ }
+}

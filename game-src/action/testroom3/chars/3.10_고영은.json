@@ -508,7 +508,7 @@
        "r": 190,
        "depth": 90,
        "hit": {
-        "dmg": 130,
+        "dmg": 270,
         "kind": "stun",
         "noVfx": true,
         "stop": 0.08,
@@ -662,7 +662,7 @@
            "scale": 1.2,
            "tint": "#ffffff",
            "hit": {
-            "dmg": 57,
+            "dmg": 68,
             "kind": "stun",
             "noVfx": true,
             "stop": 0.06,
@@ -689,7 +689,7 @@
        "depth": 220,
        "boom": 2,
        "hit": {
-        "dmg": 103,
+        "dmg": 122,
         "kind": "down",
         "vfx": "x3-c-hit-spark-light",
         "vs": 1.5,
@@ -713,7 +713,7 @@
        "depth": 220,
        "boom": 2,
        "hit": {
-        "dmg": 160,
+        "dmg": 190,
         "kind": "down",
         "vfx": "x3-c-hit-spark-light",
         "vs": 1.5,
@@ -749,7 +749,7 @@
    "14": 21
   },
   "cd": {
-   "skill": 2
+   "skill": 5
   },
   "shotDmg": 7,
   "superType": "aoe"

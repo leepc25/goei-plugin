@@ -449,7 +449,7 @@
          "under": true,
          "tint": "#ffffff",
          "hit": {
-          "dmg": 130,
+          "dmg": 270,
           "kind": "launch"
          }
         },
@@ -531,7 +531,7 @@
         "speed": 1500,
         "time": 0.24,
         "hit": {
-         "dmg": 128,
+         "dmg": 80,
          "kind": "blow"
         }
        },
@@ -556,7 +556,7 @@
         "scale": 0.5,
         "tint": "#d8c8b0",
         "hit": {
-         "dmg": 128,
+         "dmg": 80,
          "kind": "heavy"
         }
        }
@@ -586,7 +586,7 @@
          "speed": 1600,
          "time": 0.6,
          "hit": {
-          "dmg": 160,
+          "dmg": 190,
           "kind": "launch"
          }
         },
@@ -645,7 +645,7 @@
          "speed": 800,
          "time": 0.6,
          "hit": {
-          "dmg": 240,
+          "dmg": 285,
           "kind": "blow",
           "stop": 0.16
          }
@@ -677,7 +677,7 @@
            "scale": 1.2,
            "boom": 2,
            "hit": {
-            "dmg": 160,
+            "dmg": 190,
             "kind": "down",
             "stop": 0.2,
             "shake": 16
@@ -833,7 +833,7 @@
   },
   "cd": {
    "shot": 2.5,
-   "skill": 2
+   "skill": 5
   },
   "shotDmg": 30,
   "superType": "aoe"

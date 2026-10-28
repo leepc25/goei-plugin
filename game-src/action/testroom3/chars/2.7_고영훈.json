@@ -415,7 +415,7 @@
        "t": "melee",
        "range": 170,
        "hit": {
-        "dmg": 17,
+        "dmg": 35,
         "kind": "light",
         "stop": 0.1
        }
@@ -445,7 +445,7 @@
        "tint": "#7a8aa0",
        "delay": 0.1,
        "hit": {
-        "dmg": 52,
+        "dmg": 108,
         "kind": "light"
        }
       }
@@ -459,13 +459,15 @@
        "t": "melee",
        "range": 200,
        "hit": {
-        "dmg": 61,
+        "dmg": 127,
         "kind": "blow"
        }
       }
      ]
     }
-   ]
+   ],
+   "hitVfx": "x3-2.7-D-shadow-stab",
+   "hitScale": 0.7
   },
   "charge": {
    "name": "셋으로 나눈다",
@@ -666,7 +668,7 @@
          "scale": 0.8,
          "tint": "#7a8aa0",
          "hit": {
-          "dmg": 26,
+          "dmg": 31,
           "kind": "light"
          }
         }
@@ -693,7 +695,7 @@
        "rot": 1.2,
        "tint": "#7a8aa0",
        "hit": {
-        "dmg": 32,
+        "dmg": 38,
         "kind": "light"
        }
       }
@@ -710,7 +712,7 @@
        "rot": -1.0,
        "tint": "#7a8aa0",
        "hit": {
-        "dmg": 32,
+        "dmg": 38,
         "kind": "light"
        }
       }
@@ -726,7 +728,7 @@
        "scale": 1.2,
        "tint": "#7a8aa0",
        "hit": {
-        "dmg": 32,
+        "dmg": 38,
         "kind": "heavy"
        }
       }
@@ -765,7 +767,7 @@
          "scale": 0.8,
          "tint": "#7a8aa0",
          "hit": {
-          "dmg": 145,
+          "dmg": 172,
           "kind": "launch",
           "stop": 0.22,
           "shake": 16
@@ -784,7 +786,7 @@
          "scale": 0.6,
          "under": true,
          "hit": {
-          "dmg": 52,
+          "dmg": 62,
           "kind": "spike"
          }
         }
@@ -1051,7 +1053,7 @@
    "14": 22
   },
   "cd": {
-   "skill": 2
+   "skill": 5
   },
   "shotDmg": 10,
   "superType": "aoe"

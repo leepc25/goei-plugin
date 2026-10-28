@@ -257,7 +257,7 @@
          "scale": 0.4,
          "tint": "#d8cfb4",
          "hit": {
-          "dmg": 142,
+          "dmg": 295,
           "kind": "launch",
           "n": 2,
           "mid": "light"
@@ -424,7 +424,7 @@
    "14": 25
   },
   "cd": {
-   "skill": 2
+   "skill": 5
   },
   "shotDmg": 7,
   "heatPer": 9,

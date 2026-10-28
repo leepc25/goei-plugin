@@ -158,7 +158,7 @@
        "t": "melee",
        "range": 160,
        "hit": {
-        "dmg": 124,
+        "dmg": 258,
         "kind": "heavy"
        }
       }
@@ -204,6 +204,13 @@
     ],
     "2": [
      {
+      "t": "v",
+      "vfx": "x3-npc-pierce-shot",
+      "at": "hand",
+      "dx": 307,
+      "scale": 0.6
+     },
+     {
       "t": "proj",
       "kind": "orb",
       "speed": 2000,
@@ -236,7 +243,7 @@
    "14": 19
   },
   "cd": {
-   "skill": 2
+   "skill": 5
   },
   "shotDmg": 9,
   "hp": 110

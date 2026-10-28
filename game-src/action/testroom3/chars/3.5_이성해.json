@@ -559,7 +559,7 @@
        "t": "melee",
        "range": 190,
        "hit": {
-        "dmg": 130,
+        "dmg": 270,
         "kind": "heavy",
         "vfx": "x3-c-hit-spark-heavy",
         "vs": 0.6,
@@ -568,7 +568,9 @@
       }
      ]
     }
-   ]
+   ],
+   "hitVfx": "x3-3.5-D-chop-ripple",
+   "hitScale": 1.0
   },
   "charge": {
    "name": "안녕하세여! 실례합니다아!",
@@ -718,7 +720,7 @@
        "t": "pull",
        "dist": 200,
        "hit": {
-        "dmg": 37,
+        "dmg": 42,
         "kind": "pull",
         "noVfx": true,
         "stop": 0.05,
@@ -751,7 +753,7 @@
        "t": "melee",
        "range": 220,
        "hit": {
-        "dmg": 77,
+        "dmg": 88,
         "kind": "heavy",
         "vfx": "x3-c-hit-spark-light",
         "vs": 1.4
@@ -800,7 +802,7 @@
        "tint": "#9aa0a6",
        "boom": 3,
        "hit": {
-        "dmg": 306,
+        "dmg": 350,
         "kind": "blow",
         "vfx": "x3-c-hit-spark-heavy",
         "stop": 0.2,
@@ -830,7 +832,7 @@
    "14": 20
   },
   "cd": {
-   "skill": 2
+   "skill": 5
   },
   "shotDmg": 7,
   "superType": "single"

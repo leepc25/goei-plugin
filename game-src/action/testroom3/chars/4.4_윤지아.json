@@ -521,7 +521,7 @@
        "t": "melee",
        "range": 130,
        "hit": {
-        "dmg": 129,
+        "dmg": 268,
         "kind": "heavy",
         "n": 2,
         "mid": "light",
@@ -533,7 +533,9 @@
       }
      ]
     }
-   ]
+   ],
+   "hitVfx": "x3-4.4-D-wrist-twist",
+   "hitScale": 1.0
   },
   "charge": {
    "name": "오늘 날씨 진짜 이상하죠?",
@@ -655,7 +657,7 @@
          "t": "melee",
          "range": 170,
          "hit": {
-          "dmg": 95,
+          "dmg": 109,
           "kind": "down",
           "vfx": "x3-c-hit-spark-heavy",
           "vs": 0.8,
@@ -705,7 +707,7 @@
          "t": "melee",
          "range": 170,
          "hit": {
-          "dmg": 95,
+          "dmg": 109,
           "kind": "down",
           "vfx": "x3-c-hit-spark-heavy",
           "vs": 0.8,
@@ -759,7 +761,7 @@
          "t": "melee",
          "range": 170,
          "hit": {
-          "dmg": 115,
+          "dmg": 131,
           "kind": "down",
           "vfx": "x3-c-hit-spark-heavy",
           "vs": 1,
@@ -791,7 +793,7 @@
           {
            "t": "hit",
            "hit": {
-            "dmg": 115,
+            "dmg": 131,
             "kind": "down",
             "stop": 0.16,
             "shake": 14,
@@ -834,7 +836,7 @@
    "14": 17
   },
   "cd": {
-   "skill": 2
+   "skill": 5
   },
   "shotDmg": 7,
   "superType": "single"

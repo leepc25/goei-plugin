@@ -554,7 +554,7 @@
        "speed": 900,
        "time": 0.15,
        "hit": {
-        "dmg": 130,
+        "dmg": 135,
         "kind": "light",
         "vfx": "x3-c-hit-spark-light",
         "vs": 1.5
@@ -583,7 +583,7 @@
        "tint": "#ffe4de",
        "r": 100.0,
        "hit": {
-        "dmg": 1812,
+        "dmg": 1882,
         "kind": "launch",
         "vfx": "x3-c-hit-spark-heavy",
         "vs": 0.8,
@@ -603,7 +603,9 @@
       }
      ]
     }
-   ]
+   ],
+   "hitVfx": "x3-2.8-D-bounce-cut",
+   "hitScale": 0.8
   },
   "charge": {
    "name": "검증 대련",
@@ -845,7 +847,7 @@
        "under": true,
        "r": 231.2,
        "hit": {
-        "dmg": 55,
+        "dmg": 65,
         "kind": "light"
        }
       },
@@ -879,7 +881,7 @@
            "tint": "#ffe4de",
            "r": 70,
            "hit": {
-            "dmg": 82,
+            "dmg": 97,
             "kind": "launch",
             "vfx": "x3-c-hit-spark-heavy",
             "vs": 0.7,
@@ -943,7 +945,7 @@
       {
        "t": "hit",
        "hit": {
-        "dmg": 183,
+        "dmg": 217,
         "kind": "spike",
         "stop": 0.16,
         "shake": 16,
@@ -994,7 +996,7 @@
    "14": 20
   },
   "cd": {
-   "skill": 2
+   "skill": 5
   },
   "shotDmg": 10,
   "superType": "aoe"

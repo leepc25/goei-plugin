@@ -509,7 +509,7 @@
        "t": "melee",
        "range": 200,
        "hit": {
-        "dmg": 130,
+        "dmg": 270,
         "kind": "heavy",
         "vfx": "x3-c-hit-spark-heavy",
         "vs": 0.7,
@@ -531,7 +531,9 @@
       }
      ]
     }
-   ]
+   ],
+   "hitVfx": "x3-3.12-D-landing-shove",
+   "hitScale": 0.6
   },
   "charge": {
    "name": "기둥 들기",
@@ -701,7 +703,7 @@
        "t": "melee",
        "range": 200,
        "hit": {
-        "dmg": 72,
+        "dmg": 82,
         "kind": "down",
         "vfx": "x3-c-hit-spark-heavy",
         "vs": 0.8,
@@ -731,7 +733,7 @@
        "t": "melee",
        "range": 200,
        "hit": {
-        "dmg": 72,
+        "dmg": 82,
         "kind": "down",
         "vfx": "x3-c-hit-spark-heavy",
         "vs": 0.8,
@@ -761,7 +763,7 @@
        "t": "melee",
        "range": 200,
        "hit": {
-        "dmg": 72,
+        "dmg": 82,
         "kind": "down",
         "vfx": "x3-c-hit-spark-heavy",
         "vs": 0.8,
@@ -827,7 +829,7 @@
        "t": "melee",
        "range": 620,
        "hit": {
-        "dmg": 204,
+        "dmg": 233,
         "kind": "launch",
         "stop": 0.2,
         "shake": 16,
@@ -859,7 +861,7 @@
   },
   "cd": {
    "shot": 2.5,
-   "skill": 2
+   "skill": 5
   },
   "shotDmg": 30,
   "superType": "single"

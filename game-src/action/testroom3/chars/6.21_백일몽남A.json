@@ -262,7 +262,7 @@
        "t": "melee",
        "range": 160,
        "hit": {
-        "dmg": 130,
+        "dmg": 270,
         "kind": "light",
         "n": 2,
         "mid": "light",
@@ -285,7 +285,9 @@
       }
      ]
     }
-   ]
+   ],
+   "hitVfx": "x3-npc-claw",
+   "hitScale": 0.7
   },
   "charge": {
    "name": "가면 짐승",
@@ -395,8 +397,30 @@
         }
        }
       ]
+     },
+     {
+      "t": "later",
+      "in": 0.3,
+      "fx": [
+       {
+        "t": "v",
+        "vfx": "x3-npc-shadow-spikes",
+        "at": "front",
+        "dx": 230,
+        "scale": 0.7,
+        "under": true
+       }
+      ]
      }
     ]
+   },
+   "hitVfx": {
+    "0": "x3-npc-claw",
+    "1": "x3-npc-claw"
+   },
+   "hitScale": {
+    "0": 0.6,
+    "1": 0.8
    }
   }
  },
@@ -414,7 +438,7 @@
    "14": 20
   },
   "cd": {
-   "skill": 2
+   "skill": 5
   },
   "shotDmg": 9,
   "hp": 110

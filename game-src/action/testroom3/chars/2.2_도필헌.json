@@ -350,7 +350,7 @@
          "speed": 1300,
          "time": 0.25,
          "hit": {
-          "dmg": 130,
+          "dmg": 270,
           "kind": "down",
           "vfx": "x3-c-hit-spark-light",
           "vs": 1.6,
@@ -393,7 +393,9 @@
       }
      ]
     }
-   ]
+   ],
+   "hitVfx": "x3-2.2-D-sweep-arc",
+   "hitScale": 0.6
   },
   "charge": {
    "name": "값을 매기지",
@@ -542,7 +544,7 @@
          "speed": 1700,
          "time": 0.7,
          "hit": {
-          "dmg": 67,
+          "dmg": 80,
           "kind": "down",
           "vfx": "x3-c-hit-spark-light",
           "vs": 1.6,
@@ -585,7 +587,7 @@
          "tint": "#C9A046",
          "r": 70,
          "hit": {
-          "dmg": 41,
+          "dmg": 48,
           "kind": "heavy"
          }
         }
@@ -610,7 +612,7 @@
          "rot": -0.6,
          "tint": "#C9A046",
          "hit": {
-          "dmg": 41,
+          "dmg": 48,
           "kind": "launch"
          },
          "r": 91.4
@@ -630,7 +632,7 @@
          "t": "melee",
          "range": 260,
          "hit": {
-          "dmg": 67,
+          "dmg": 80,
           "kind": "launch",
           "n": 2,
           "mid": "launch",
@@ -665,7 +667,7 @@
          "under": true,
          "boom": 3,
          "hit": {
-          "dmg": 104,
+          "dmg": 123,
           "kind": "blow",
           "stop": 0.2,
           "shake": 16
@@ -822,7 +824,7 @@
    "14": 22
   },
   "cd": {
-   "skill": 2
+   "skill": 5
   },
   "shotDmg": 10,
   "superType": "aoe"

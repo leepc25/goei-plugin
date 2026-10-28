@@ -257,7 +257,7 @@
        "speed": 1500,
        "time": 0.2,
        "hit": {
-        "dmg": 136,
+        "dmg": 282,
         "kind": "light",
         "vfx": "x3-c-slash-arc",
         "vs": 1.2,
@@ -331,6 +331,19 @@
      }
     ],
     "2": [
+     {
+      "t": "later",
+      "in": 0.4,
+      "fx": [
+       {
+        "t": "v",
+        "vfx": "x3-npc-katana-line",
+        "at": "self",
+        "dx": -200,
+        "scale": 0.6
+       }
+      ]
+     },
      {
       "t": "hide",
       "mode": "out",
@@ -456,7 +469,7 @@
    "14": 21
   },
   "cd": {
-   "skill": 2
+   "skill": 5
   },
   "shotDmg": 9,
   "hp": 120

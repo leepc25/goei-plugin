@@ -405,7 +405,7 @@
        "time": 0.2,
        "delay": 0.75,
        "hit": {
-        "dmg": 131,
+        "dmg": 272,
         "kind": "launch",
         "n": 3,
         "mid": "light",
@@ -429,7 +429,9 @@
       }
      ]
     }
-   ]
+   ],
+   "hitVfx": "x3-2.6-D-delayed-cuts",
+   "hitScale": 0.6
   },
   "charge": {
    "name": "간파",
@@ -580,7 +582,7 @@
        "scale": 0.9,
        "tint": "#ffffff",
        "hit": {
-        "dmg": 320,
+        "dmg": 380,
         "kind": "launch",
         "stop": 0.3,
         "shake": 20,
@@ -767,7 +769,7 @@
    "14": 20
   },
   "cd": {
-   "skill": 2
+   "skill": 5
   },
   "shotDmg": 10,
   "superType": "aoe"

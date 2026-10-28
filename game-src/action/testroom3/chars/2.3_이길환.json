@@ -353,7 +353,7 @@
        "scale": 1.1,
        "r": 170,
        "hit": {
-        "dmg": 43,
+        "dmg": 89,
         "kind": "light"
        }
       }
@@ -370,7 +370,7 @@
        "scale": 1.5,
        "r": 170,
        "hit": {
-        "dmg": 87,
+        "dmg": 181,
         "kind": "heavy"
        }
       }
@@ -532,7 +532,7 @@
        "at": "screen",
        "w": 1.05,
        "hit": {
-        "dmg": 73,
+        "dmg": 87,
         "kind": "stun"
        }
       }
@@ -549,7 +549,7 @@
        "scale": 1.4,
        "boom": 2,
        "hit": {
-        "dmg": 247,
+        "dmg": 293,
         "kind": "blow",
         "n": 4,
         "mid": "heavy",
@@ -713,7 +713,7 @@
    "14": 22
   },
   "cd": {
-   "skill": 2
+   "skill": 5
   },
   "shotDmg": 10,
   "superType": "aoe"

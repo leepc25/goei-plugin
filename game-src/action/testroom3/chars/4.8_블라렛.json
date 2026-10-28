@@ -431,7 +431,7 @@
        "h": 90,
        "scale": 1.1,
        "hit": {
-        "dmg": 130,
+        "dmg": 270,
         "kind": "down",
         "vfx": "x3-c-hit-spark-heavy",
         "vs": 1,
@@ -567,7 +567,7 @@
            "at": "target",
            "scale": 1.1,
            "hit": {
-            "dmg": 54,
+            "dmg": 64,
             "kind": "down",
             "stop": 0.1,
             "shake": 10
@@ -614,7 +614,7 @@
          "at": "screen",
          "scale": 2.1,
          "hit": {
-          "dmg": 142,
+          "dmg": 169,
           "kind": "launch",
           "n": 2,
           "mid": "heavy",
@@ -654,7 +654,7 @@
         {
          "t": "hit",
          "hit": {
-          "dmg": 124,
+          "dmg": 147,
           "kind": "blow",
           "stop": 0.2,
           "shake": 16
@@ -692,7 +692,7 @@
    "14": 20
   },
   "cd": {
-   "skill": 2
+   "skill": 5
   },
   "shotDmg": 9,
   "superType": "aoe"

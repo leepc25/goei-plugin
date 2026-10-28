@@ -246,7 +246,7 @@
        "t": "melee",
        "range": 160,
        "hit": {
-        "dmg": 130,
+        "dmg": 270,
         "kind": "down"
        }
       }
@@ -265,7 +265,9 @@
       }
      ]
     }
-   ]
+   ],
+   "hitVfx": "x3-npc-takedown",
+   "hitScale": 0.4
   },
   "charge": {
    "name": "돌입 제압",
@@ -324,6 +326,12 @@
       ]
      }
     ]
+   },
+   "hitVfx": {
+    "2": "x3-npc-takedown"
+   },
+   "hitScale": {
+    "2": 0.6
    }
   }
  },
@@ -341,7 +349,7 @@
    "14": 23
   },
   "cd": {
-   "skill": 2
+   "skill": 5
   },
   "shotDmg": 9,
   "hp": 120

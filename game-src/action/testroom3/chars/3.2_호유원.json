@@ -538,7 +538,7 @@
        "t": "melee",
        "range": 200,
        "hit": {
-        "dmg": 9,
+        "dmg": 19,
         "kind": "pull",
         "stop": 0.05,
         "shake": 3
@@ -572,7 +572,7 @@
        "r": 220,
        "boom": 1,
        "hit": {
-        "dmg": 121,
+        "dmg": 251,
         "kind": "blow",
         "stop": 0.16,
         "shake": 12
@@ -727,7 +727,7 @@
       {
        "t": "hit",
        "hit": {
-        "dmg": 320,
+        "dmg": 380,
         "kind": "down",
         "stop": 0.18,
         "shake": 14
@@ -771,7 +771,7 @@
    "14": 20
   },
   "cd": {
-   "skill": 2
+   "skill": 5
   },
   "shotDmg": 10,
   "superType": "aoe"

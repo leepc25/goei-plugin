@@ -256,7 +256,7 @@
        "size": 0.6,
        "life": 0.4,
        "hit": {
-        "dmg": 65,
+        "dmg": 135,
         "kind": "light"
        }
       }
@@ -277,13 +277,15 @@
        "size": 0.6,
        "life": 0.4,
        "hit": {
-        "dmg": 65,
+        "dmg": 135,
         "kind": "light"
        }
       }
      ]
     }
-   ]
+   ],
+   "hitVfx": "x3-npc-heavy-impact",
+   "hitScale": 0.6
   },
   "charge": {
    "name": "모은 한 방 · 내려찍기",
@@ -335,6 +337,14 @@
       "tint": "#d8cfb4"
      }
     ]
+   },
+   "hitVfx": {
+    "2": "x3-npc-heavy-impact",
+    "1": "x3-npc-heavy-impact"
+   },
+   "hitScale": {
+    "2": 0.9,
+    "1": 0.7
    }
   }
  },
@@ -352,7 +362,7 @@
    "14": 22
   },
   "cd": {
-   "skill": 2
+   "skill": 5
   },
   "shotDmg": 9,
   "hp": 110

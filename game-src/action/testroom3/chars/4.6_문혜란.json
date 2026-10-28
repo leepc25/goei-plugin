@@ -379,7 +379,7 @@
        "t": "melee",
        "range": 170,
        "hit": {
-        "dmg": 33,
+        "dmg": 69,
         "kind": "light"
        }
       }
@@ -401,7 +401,7 @@
        "t": "melee",
        "range": 170,
        "hit": {
-        "dmg": 33,
+        "dmg": 69,
         "kind": "light"
        }
       }
@@ -415,7 +415,7 @@
        "t": "melee",
        "range": 160,
        "hit": {
-        "dmg": 64,
+        "dmg": 133,
         "kind": "down",
         "vfx": "x3-c-hit-spark-heavy",
         "vs": 0.8
@@ -430,7 +430,9 @@
       }
      ]
     }
-   ]
+   ],
+   "hitVfx": "x3-4.6-D-baton-arcs",
+   "hitScale": 0.7
   },
   "charge": {
    "name": "앉아, 앉아",
@@ -598,7 +600,7 @@
          "life": 0.9,
          "dy": -10,
          "hit": {
-          "dmg": 19,
+          "dmg": 22,
           "kind": "light",
           "stop": 0.03,
           "shake": 3
@@ -646,7 +648,7 @@
        "tint": "#d8dde6",
        "under": true,
        "hit": {
-        "dmg": 249,
+        "dmg": 285,
         "kind": "launch",
         "stop": 0.22,
         "shake": 18
@@ -687,7 +689,7 @@
    "14": 20
   },
   "cd": {
-   "skill": 2
+   "skill": 5
   },
   "shotDmg": 7,
   "superType": "single"

@@ -375,7 +375,8 @@
      "d": 0.05,
      "fx": [
       {
-       "t": "suppress"
+       "t": "suppress",
+       "dmg": 18
       }
      ]
     }
@@ -490,7 +491,7 @@
          "t": "proj",
          "kind": "bullet",
          "hit": {
-          "dmg": 20,
+          "dmg": 21,
           "kind": "light"
          }
         }
@@ -504,7 +505,7 @@
          "kind": "bullet",
          "big": true,
          "hit": {
-          "dmg": 90,
+          "dmg": 94,
           "kind": "heavy"
          }
         }
@@ -537,8 +538,8 @@
   "gun": "rapid",
   "atk": {},
   "cd": {
-   "skill": 2,
-   "skill2": 4
+   "skill": 5,
+   "skill2": 7
   },
   "shotDmg": 7,
   "heatPer": 9,

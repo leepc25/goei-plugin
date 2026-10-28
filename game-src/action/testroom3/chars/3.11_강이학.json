@@ -510,7 +510,7 @@
        "t": "melee",
        "range": 190,
        "hit": {
-        "dmg": 130,
+        "dmg": 270,
         "kind": "launch",
         "vfx": "x3-c-hit-spark-light",
         "vs": 1.8,
@@ -521,7 +521,9 @@
       }
      ]
     }
-   ]
+   ],
+   "hitVfx": "x3-3.11-D-gold-uppercut",
+   "hitScale": 1.0
   },
   "charge": {
    "name": "협상 테이블",
@@ -890,7 +892,7 @@
          "size": 0.9,
          "pierce": true,
          "hit": {
-          "dmg": 9,
+          "dmg": 11,
           "kind": "light",
           "vfx": "x3-c-hit-spark-light",
           "tint": "#F2C230",
@@ -926,7 +928,7 @@
          "size": 0.9,
          "pierce": true,
          "hit": {
-          "dmg": 9,
+          "dmg": 11,
           "kind": "light",
           "vfx": "x3-c-hit-spark-light",
           "tint": "#F2C230",
@@ -955,7 +957,7 @@
          "size": 0.9,
          "pierce": true,
          "hit": {
-          "dmg": 9,
+          "dmg": 11,
           "kind": "light",
           "vfx": "x3-c-hit-spark-light",
           "tint": "#F2C230",
@@ -992,7 +994,7 @@
       {
        "t": "hit",
        "hit": {
-        "dmg": 222,
+        "dmg": 264,
         "n": 6,
         "every": 0.1,
         "mid": "light",
@@ -1051,7 +1053,7 @@
    "14": 20
   },
   "cd": {
-   "skill": 2
+   "skill": 5
   },
   "shotDmg": 7,
   "superType": "aoe"

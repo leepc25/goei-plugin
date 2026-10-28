@@ -391,7 +391,7 @@
        "life": 0.5,
        "pierce": true,
        "hit": {
-        "dmg": 130,
+        "dmg": 270,
         "kind": "heavy",
         "n": 2,
         "mid": "light",
@@ -588,7 +588,7 @@
        "w": 1.05,
        "dy": -80,
        "hit": {
-        "dmg": 71,
+        "dmg": 84,
         "kind": "stun"
        }
       },
@@ -624,7 +624,7 @@
          "at": "target",
          "scale": 0.7,
          "hit": {
-          "dmg": 96,
+          "dmg": 114,
           "kind": "light",
           "n": 2,
           "every": 0.1
@@ -664,7 +664,7 @@
        "life": 1.0,
        "pierce": true,
        "hit": {
-        "dmg": 268,
+        "dmg": 318,
         "kind": "blow",
         "n": 3,
         "mid": "heavy",
@@ -699,7 +699,7 @@
    "14": 20
   },
   "cd": {
-   "skill": 2
+   "skill": 5
   },
   "shotDmg": 10,
   "superType": "aoe"

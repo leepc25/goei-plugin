@@ -75,7 +75,7 @@
        "t": "melee",
        "range": 140,
        "hit": {
-        "dmg": 47,
+        "dmg": 98,
         "kind": "light"
        }
       }
@@ -96,7 +96,7 @@
          "size": 0.6,
          "life": 0.4,
          "hit": {
-          "dmg": 41,
+          "dmg": 85,
           "kind": "light"
          }
         }
@@ -104,7 +104,9 @@
       }
      ]
     }
-   ]
+   ],
+   "hitVfx": "x3-npc-heavy-impact",
+   "hitScale": 0.6
   },
   "charge": {
    "name": "모은 한 방 · 정강이 돌려차기",
@@ -156,6 +158,14 @@
       "tint": "#d8cfb4"
      }
     ]
+   },
+   "hitVfx": {
+    "2": "x3-npc-heavy-impact",
+    "1": "x3-npc-heavy-impact"
+   },
+   "hitScale": {
+    "2": 0.9,
+    "1": 0.7
    }
   }
  },
@@ -173,7 +183,7 @@
    "14": 22
   },
   "cd": {
-   "skill": 2
+   "skill": 5
   },
   "shotDmg": 9,
   "hp": 110

@@ -379,7 +379,7 @@
        "speed": 1500,
        "life": 0.75,
        "hit": {
-        "dmg": 39,
+        "dmg": 81,
         "kind": "light",
         "vfx": "x3-c-dust-puff",
         "tint": "#d8b878"
@@ -397,7 +397,7 @@
        "speed": 1500,
        "life": 0.75,
        "hit": {
-        "dmg": 39,
+        "dmg": 81,
         "kind": "light",
         "vfx": "x3-c-dust-puff",
         "tint": "#d8b878"
@@ -415,7 +415,7 @@
        "speed": 1500,
        "life": 0.75,
        "hit": {
-        "dmg": 51,
+        "dmg": 106,
         "kind": "heavy",
         "vfx": "x3-c-dust-puff",
         "vs": 1.6,
@@ -631,7 +631,7 @@
        "w": 1.05,
        "delay": 0.75,
        "hit": {
-        "dmg": 317,
+        "dmg": 376,
         "kind": "blow",
         "n": 5,
         "mid": "heavy",
@@ -691,7 +691,7 @@
    "14": 21
   },
   "cd": {
-   "skill": 2
+   "skill": 5
   },
   "shotDmg": 12,
   "superType": "aoe"
@@ -878,5 +878,6 @@
     }
    ]
   }
- }
+ },
+ "noBackSit": true
 }

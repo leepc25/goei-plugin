@@ -396,7 +396,7 @@
        "r": 231.2,
        "depth": 90,
        "hit": {
-        "dmg": 130,
+        "dmg": 270,
         "kind": "heavy",
         "stop": 0.1,
         "shake": 8
@@ -584,7 +584,7 @@
          "tint": "#8FA4FF",
          "r": 60,
          "hit": {
-          "dmg": 249,
+          "dmg": 296,
           "kind": "launch",
           "stop": 0.2,
           "shake": 14
@@ -604,7 +604,7 @@
         {
          "t": "hit",
          "hit": {
-          "dmg": 71,
+          "dmg": 84,
           "kind": "spike",
           "stop": 0.16,
           "shake": 14
@@ -808,7 +808,7 @@
    "14": 21
   },
   "cd": {
-   "skill": 2
+   "skill": 5
   },
   "shotDmg": 9,
   "superType": "aoe"

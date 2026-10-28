@@ -397,7 +397,7 @@
        "r": 40,
        "boom": 1,
        "hit": {
-        "dmg": 58,
+        "dmg": 120,
         "kind": "light",
         "stop": 0.06
        }
@@ -423,7 +423,7 @@
        "r": 40,
        "boom": 1,
        "hit": {
-        "dmg": 72,
+        "dmg": 150,
         "kind": "light",
         "stop": 0.08
        }
@@ -757,7 +757,7 @@
          "r": 40,
          "boom": 1,
          "hit": {
-          "dmg": 39,
+          "dmg": 46,
           "kind": "heavy",
           "stop": 0.06,
           "shake": 5
@@ -789,7 +789,7 @@
          "r": 40,
          "boom": 1,
          "hit": {
-          "dmg": 42,
+          "dmg": 50,
           "kind": "heavy",
           "stop": 0.06,
           "shake": 6
@@ -821,7 +821,7 @@
          "r": 40,
          "boom": 1,
          "hit": {
-          "dmg": 46,
+          "dmg": 55,
           "kind": "heavy",
           "stop": 0.07,
           "shake": 8
@@ -853,7 +853,7 @@
          "r": 40,
          "boom": 1,
          "hit": {
-          "dmg": 50,
+          "dmg": 59,
           "kind": "heavy",
           "stop": 0.08,
           "shake": 10
@@ -880,7 +880,7 @@
        "boom": 3,
        "delay": 0.25,
        "hit": {
-        "dmg": 143,
+        "dmg": 170,
         "kind": "launch",
         "stop": 0.2,
         "shake": 14
@@ -1148,7 +1148,7 @@
    "14": 17
   },
   "cd": {
-   "skill": 2
+   "skill": 5
   },
   "shotDmg": 12,
   "superType": "aoe"

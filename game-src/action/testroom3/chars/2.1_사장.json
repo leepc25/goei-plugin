@@ -369,7 +369,7 @@
        "r": 125,
        "delay": 0.25,
        "hit": {
-        "dmg": 130,
+        "dmg": 270,
         "kind": "launch",
         "vfx": "x3-c-hit-spark-light",
         "vs": 1.6,
@@ -684,7 +684,7 @@
          "scale": 1.1,
          "rot": -0.785,
          "hit": {
-          "dmg": 320,
+          "dmg": 380,
           "kind": "launch",
           "stop": 0.25,
           "shake": 18
@@ -941,7 +941,7 @@
    "14": 20
   },
   "cd": {
-   "skill": 2
+   "skill": 5
   },
   "shotDmg": 10,
   "superType": "aoe"

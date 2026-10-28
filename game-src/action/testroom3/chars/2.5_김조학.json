@@ -406,7 +406,7 @@
        "dx": 150,
        "scale": 1,
        "hit": {
-        "dmg": 130,
+        "dmg": 270,
         "kind": "down",
         "vfx": "x3-c-hit-spark-heavy",
         "vs": 0.7,
@@ -554,7 +554,7 @@
          "at": "target",
          "scale": 1,
          "hit": {
-          "dmg": 48,
+          "dmg": 57,
           "kind": "down",
           "vfx": "x3-c-hit-spark-heavy",
           "vs": 0.6,
@@ -584,7 +584,7 @@
          "at": "target",
          "scale": 1,
          "hit": {
-          "dmg": 48,
+          "dmg": 57,
           "kind": "down",
           "vfx": "x3-c-hit-spark-heavy",
           "vs": 0.6,
@@ -614,7 +614,7 @@
          "at": "target",
          "scale": 1,
          "hit": {
-          "dmg": 48,
+          "dmg": 57,
           "kind": "down",
           "vfx": "x3-c-hit-spark-heavy",
           "vs": 0.6,
@@ -664,7 +664,7 @@
            "scale": 1.2,
            "tint": "#d8c8b0",
            "hit": {
-            "dmg": 54,
+            "dmg": 64,
             "kind": "down"
            }
           }
@@ -689,7 +689,7 @@
          "w": 1.05,
          "boom": 3,
          "hit": {
-          "dmg": 122,
+          "dmg": 145,
           "kind": "launch",
           "stop": 0.2,
           "shake": 16
@@ -869,7 +869,7 @@
    "14": 22
   },
   "cd": {
-   "skill": 2
+   "skill": 5
   },
   "shotDmg": 7,
   "superType": "aoe"

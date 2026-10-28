@@ -508,7 +508,7 @@
        "r": 90,
        "delay": 0.4,
        "hit": {
-        "dmg": 130,
+        "dmg": 270,
         "kind": "down",
         "stop": 0.14,
         "shake": 8,
@@ -659,7 +659,7 @@
        "w": 1.05,
        "dy": 30,
        "hit": {
-        "dmg": 91,
+        "dmg": 108,
         "kind": "launch",
         "stop": 0.12,
         "shake": 14
@@ -676,7 +676,7 @@
          "w": 1.05,
          "dy": 30,
          "hit": {
-          "dmg": 91,
+          "dmg": 108,
           "kind": "launch",
           "stop": 0.12,
           "shake": 14
@@ -695,7 +695,7 @@
          "w": 1.05,
          "dy": 30,
          "hit": {
-          "dmg": 137,
+          "dmg": 163,
           "kind": "down",
           "stop": 0.12,
           "shake": 14
@@ -737,7 +737,7 @@
    "14": 20
   },
   "cd": {
-   "skill": 2
+   "skill": 5
   },
   "shotDmg": 10,
   "superType": "aoe"

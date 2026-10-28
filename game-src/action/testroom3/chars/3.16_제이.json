@@ -529,7 +529,7 @@
        "scale": 1.3,
        "r": 90,
        "hit": {
-        "dmg": 130,
+        "dmg": 270,
         "kind": "down",
         "n": 2,
         "mid": "light",
@@ -737,7 +737,7 @@
          "scale": 0.45,
          "under": true,
          "hit": {
-          "dmg": 74,
+          "dmg": 88,
           "kind": "launch",
           "vfx": "x3-c-hit-spark-heavy",
           "vs": 0.6,
@@ -760,7 +760,7 @@
        "delay": 0.2,
        "boom": 3,
        "hit": {
-        "dmg": 246,
+        "dmg": 292,
         "kind": "blow",
         "stop": 0.2,
         "shake": 18,
@@ -808,7 +808,7 @@
    "14": 23
   },
   "cd": {
-   "skill": 2
+   "skill": 5
   },
   "shotDmg": 10,
   "superType": "aoe"

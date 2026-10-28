@@ -451,7 +451,7 @@
          "t": "melee",
          "range": 140,
          "hit": {
-          "dmg": 130,
+          "dmg": 270,
           "kind": "heavy",
           "stop": 0.1,
           "shake": 8
@@ -484,7 +484,9 @@
       }
      ]
     }
-   ]
+   ],
+   "hitVfx": "x3-1.8-D-pink-push",
+   "hitScale": 0.8
   },
   "charge": {
    "name": "증언 재현",
@@ -613,7 +615,7 @@
        "w": 1.05,
        "delay": 0.1,
        "hit": {
-        "dmg": 128,
+        "dmg": 152,
         "kind": "launch",
         "n": 4,
         "mid": "light",
@@ -640,7 +642,7 @@
          "r": 90,
          "delay": 0.6,
          "hit": {
-          "dmg": 192,
+          "dmg": 228,
           "kind": "down",
           "stop": 0.2,
           "shake": 14
@@ -836,7 +838,7 @@
    "14": 22
   },
   "cd": {
-   "skill": 2
+   "skill": 5
   },
   "shotDmg": 9,
   "superType": "aoe"

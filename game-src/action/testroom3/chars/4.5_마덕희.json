@@ -377,7 +377,7 @@
          "t": "melee",
          "range": 180,
          "hit": {
-          "dmg": 54,
+          "dmg": 112,
           "kind": "light",
           "vfx": "x3-c-hit-spark-light",
           "vs": 1.4,
@@ -400,7 +400,7 @@
          "t": "melee",
          "range": 180,
          "hit": {
-          "dmg": 76,
+          "dmg": 158,
           "kind": "heavy",
           "vfx": "x3-c-hit-spark-light",
           "vs": 1.8,
@@ -411,7 +411,9 @@
       }
      ]
     }
-   ]
+   ],
+   "hitVfx": "x3-4.5-D-brass-slap",
+   "hitScale": 1.4
   },
   "charge": {
    "name": "80. 얘기 끝났어요",
@@ -590,7 +592,7 @@
          "t": "melee",
          "range": 160,
          "hit": {
-          "dmg": 42,
+          "dmg": 50,
           "kind": "light",
           "vfx": "x3-c-hit-spark-light",
           "vs": 1.6,
@@ -631,7 +633,7 @@
          "t": "melee",
          "range": 160,
          "hit": {
-          "dmg": 42,
+          "dmg": 50,
           "kind": "light",
           "vfx": "x3-c-hit-spark-light",
           "vs": 1.6,
@@ -672,7 +674,7 @@
          "t": "melee",
          "range": 160,
          "hit": {
-          "dmg": 42,
+          "dmg": 50,
           "kind": "light",
           "vfx": "x3-c-hit-spark-light",
           "vs": 1.6,
@@ -699,7 +701,7 @@
          "h": 70,
          "scale": 1.4,
          "hit": {
-          "dmg": 105,
+          "dmg": 125,
           "kind": "down",
           "stop": 0.2,
           "shake": 16
@@ -723,7 +725,7 @@
          "under": true,
          "delay": 0.1,
          "hit": {
-          "dmg": 90,
+          "dmg": 107,
           "kind": "launch"
          },
          "r": 300,
@@ -779,7 +781,7 @@
    "14": 22
   },
   "cd": {
-   "skill": 2
+   "skill": 5
   },
   "shotDmg": 7,
   "superType": "aoe"

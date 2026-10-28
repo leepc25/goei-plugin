@@ -514,6 +514,13 @@
      "fx": [
       {
        "t": "v",
+       "vfx": "x3-4.1-D-crimson-thrust",
+       "at": "hand",
+       "dx": 110,
+       "scale": 0.6
+      },
+      {
+       "t": "v",
        "vfx": "x3-c-slash-arc",
        "at": "hand",
        "dx": 60,
@@ -524,7 +531,7 @@
        "t": "melee",
        "range": 200,
        "hit": {
-        "dmg": 130,
+        "dmg": 270,
         "kind": "heavy",
         "vfx": "x3-c-hit-spark-light",
         "vs": 1.6,
@@ -690,7 +697,7 @@
        "scale": 2.5,
        "flip": false,
        "hit": {
-        "dmg": 37,
+        "dmg": 44,
         "kind": "light",
         "vfx": "x3-c-hit-spark-light",
         "vs": 1.6,
@@ -711,7 +718,7 @@
        "flip": false,
        "rot": 3.1416,
        "hit": {
-        "dmg": 37,
+        "dmg": 44,
         "kind": "light",
         "vfx": "x3-c-hit-spark-light",
         "vs": 1.6,
@@ -731,7 +738,7 @@
        "scale": 2.5,
        "flip": false,
        "hit": {
-        "dmg": 37,
+        "dmg": 44,
         "kind": "light",
         "vfx": "x3-c-hit-spark-light",
         "vs": 1.6,
@@ -752,7 +759,7 @@
        "flip": false,
        "boom": 2,
        "hit": {
-        "dmg": 51,
+        "dmg": 61,
         "kind": "light",
         "n": 2,
         "every": 0.08,
@@ -778,7 +785,7 @@
       {
        "t": "hit",
        "hit": {
-        "dmg": 157,
+        "dmg": 186,
         "kind": "down",
         "stop": 0.2,
         "shake": 16,
@@ -809,7 +816,7 @@
    "14": 21
   },
   "cd": {
-   "skill": 2
+   "skill": 5
   },
   "shotDmg": 7,
   "superType": "aoe"

@@ -257,7 +257,7 @@
          "scale": 0.4,
          "tint": "#d8cfb4",
          "hit": {
-          "dmg": 143,
+          "dmg": 297,
           "kind": "heavy"
          },
          "r": 120
@@ -422,7 +422,7 @@
    "14": 25
   },
   "cd": {
-   "skill": 2
+   "skill": 5
   },
   "shotDmg": 7,
   "heatPer": 9,

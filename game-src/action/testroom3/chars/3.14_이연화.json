@@ -521,7 +521,7 @@
        "t": "melee",
        "range": 200,
        "hit": {
-        "dmg": 130,
+        "dmg": 270,
         "kind": "heavy",
         "vfx": "x3-c-hit-spark-light",
         "vs": 2,
@@ -530,7 +530,9 @@
       }
      ]
     }
-   ]
+   ],
+   "hitVfx": "x3-3.14-D-palm-ring",
+   "hitScale": 0.7
   },
   "charge": {
    "name": "배합 실험",
@@ -719,7 +721,7 @@
        "t": "melee",
        "range": 320,
        "hit": {
-        "dmg": 63,
+        "dmg": 72,
         "kind": "pull",
         "vfx": "x3-c-hit-spark-light",
         "vs": 1.4,
@@ -759,7 +761,7 @@
        "scale": 1.4,
        "boom": 3,
        "hit": {
-        "dmg": 231,
+        "dmg": 264,
         "kind": "blow",
         "stop": 0.18,
         "shake": 14,
@@ -823,7 +825,7 @@
        "t": "melee",
        "range": 900,
        "hit": {
-        "dmg": 84,
+        "dmg": 96,
         "kind": "stun"
        }
       }
@@ -836,7 +838,7 @@
        "t": "melee",
        "range": 900,
        "hit": {
-        "dmg": 42,
+        "dmg": 48,
         "kind": "down"
        }
       }
@@ -859,7 +861,7 @@
    "14": 21
   },
   "cd": {
-   "skill": 2
+   "skill": 5
   },
   "shotDmg": 7,
   "superType": "single"

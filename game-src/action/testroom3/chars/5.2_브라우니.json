@@ -412,7 +412,7 @@
        "tint": "#fff6c0",
        "r": 110,
        "hit": {
-        "dmg": 54,
+        "dmg": 112,
         "kind": "light"
        }
       }
@@ -431,13 +431,15 @@
        "tint": "#fff6c0",
        "r": 110,
        "hit": {
-        "dmg": 76,
+        "dmg": 158,
         "kind": "heavy"
        }
       }
      ]
     }
-   ]
+   ],
+   "hitVfx": "x3-5.2-D-clap-blast",
+   "hitScale": 1.2
   },
   "charge": {
    "name": "정답은?",
@@ -590,7 +592,7 @@
        "w": 1.05,
        "tint": "#fff6c0",
        "hit": {
-        "dmg": 64,
+        "dmg": 76,
         "kind": "launch",
         "stop": 0.12
        }
@@ -620,7 +622,7 @@
        "w": 1.05,
        "tint": "#fff6c0",
        "hit": {
-        "dmg": 64,
+        "dmg": 76,
         "kind": "launch",
         "stop": 0.12
        }
@@ -650,7 +652,7 @@
        "w": 1.05,
        "tint": "#fff6c0",
        "hit": {
-        "dmg": 64,
+        "dmg": 76,
         "kind": "launch",
         "stop": 0.12
        }
@@ -680,7 +682,7 @@
        "h": 60,
        "scale": 1.8,
        "hit": {
-        "dmg": 128,
+        "dmg": 152,
         "kind": "down",
         "stop": 0.22,
         "shake": 18
@@ -721,7 +723,7 @@
    "14": 22
   },
   "cd": {
-   "skill": 2
+   "skill": 5
   },
   "shotDmg": 10,
   "superType": "aoe"

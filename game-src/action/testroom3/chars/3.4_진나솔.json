@@ -553,6 +553,13 @@
      "f": 2,
      "fx": [
       {
+       "t": "v",
+       "vfx": "x3-3.4-D-thread-yank",
+       "at": "hand",
+       "dx": 260,
+       "scale": 0.7
+      },
+      {
        "t": "proj",
        "kind": "knife",
        "color": "#8E5CC9",
@@ -560,7 +567,7 @@
        "speed": 2200,
        "life": 0.5,
        "hit": {
-        "dmg": 23,
+        "dmg": 48,
         "kind": "light",
         "vfx": "x3-c-hit-spark-light",
         "tint": "#8E5CC9"
@@ -579,7 +586,7 @@
            "t": "pull",
            "dist": 260,
            "hit": {
-            "dmg": 45,
+            "dmg": 93,
             "kind": "pull",
             "noVfx": true,
             "stop": 0.06,
@@ -595,7 +602,7 @@
           {
            "t": "hit",
            "hit": {
-            "dmg": 62,
+            "dmg": 129,
             "kind": "down",
             "vfx": "x3-c-hit-spark-heavy",
             "vs": 0.6
@@ -755,7 +762,7 @@
          "scale": 1.4,
          "tint": "#8E5CC9",
          "hit": {
-          "dmg": 16,
+          "dmg": 19,
           "kind": "light",
           "noVfx": true,
           "stop": 0.03,
@@ -809,7 +816,7 @@
          "scale": 1.6,
          "tint": "#ffffff",
          "hit": {
-          "dmg": 306,
+          "dmg": 363,
           "n": 5,
           "every": 0.08,
           "mid": "light",
@@ -839,7 +846,7 @@
    "14": 20
   },
   "cd": {
-   "skill": 2
+   "skill": 5
   },
   "shotDmg": 7,
   "superType": "aoe"

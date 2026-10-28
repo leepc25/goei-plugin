@@ -359,6 +359,13 @@
      "fx": [
       {
        "t": "v",
+       "vfx": "x3-4.9-D-blade-volley",
+       "at": "hand",
+       "dx": 144,
+       "scale": 0.6
+      },
+      {
+       "t": "v",
        "vfx": "x3-c-slash-arc",
        "at": "front",
        "dx": 142,
@@ -366,7 +373,7 @@
        "scale": 0.8,
        "tint": "#e8ecf4",
        "hit": {
-        "dmg": 38,
+        "dmg": 79,
         "kind": "light"
        },
        "r": 91.2
@@ -375,7 +382,7 @@
        "t": "proj",
        "kind": "bullet",
        "hit": {
-        "dmg": 12,
+        "dmg": 25,
         "kind": "light"
        }
       }
@@ -389,7 +396,7 @@
        "kind": "bullet",
        "spread": 0.06,
        "hit": {
-        "dmg": 12,
+        "dmg": 25,
         "kind": "light"
        }
       }
@@ -407,7 +414,7 @@
        "scale": 0.85,
        "tint": "#e8ecf4",
        "hit": {
-        "dmg": 44,
+        "dmg": 91,
         "kind": "heavy"
        },
        "r": 91.8
@@ -416,7 +423,7 @@
        "t": "proj",
        "kind": "bullet",
        "hit": {
-        "dmg": 12,
+        "dmg": 25,
         "kind": "light"
        }
       }
@@ -430,7 +437,7 @@
        "kind": "bullet",
        "spread": 0.06,
        "hit": {
-        "dmg": 12,
+        "dmg": 25,
         "kind": "light"
        }
       }
@@ -809,7 +816,7 @@
        "time": 1.6,
        "color": "#2a5a9a",
        "hit": {
-        "dmg": 62,
+        "dmg": 74,
         "kind": "blow",
         "n": 5
        }
@@ -899,7 +906,7 @@
    "14": 25
   },
   "cd": {
-   "skill": 2
+   "skill": 5
   },
   "shotDmg": 6,
   "heatPer": 9,

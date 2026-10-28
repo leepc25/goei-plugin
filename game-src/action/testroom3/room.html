@@ -330,6 +330,7 @@ function strike(h, y) {
     const hy = y ?? D.y - D.z - 110 * K(D.y);
     if (!h.noVfx) { if (h.vfx && VFX[h.vfx]) vfx(h.vfx, D.x, hy, (h.vs || 1) * K(D.y), { center: true, flip: P.face < 0, tint: h.tint }); else if (!vfx(big ? 'hit_heavy' : 'hit_light', D.x, hy, big ? 1.8 : 2.2, { flip: P.face < 0 })) sparks(D.x, hy, 10, big); }   // h.vfx: 맞는 자리 그림(3판 타격 불꽃 등)
     if (h.text) fx.push({ k: 'num', x: D.x - 30, y: hy - 70, v: h.text, t: 1.2 });
+    const hv = P.hitVfx; if (hv && P.t < hv.until && P.t - hv.last > 0.12 && VFX[hv.n]) { hv.last = P.t; (VFX[hv.n].mode === 'bottom' ? vfx(hv.n, D.x, D.y, hv.s * K(D.y), { bottom: true, flip: P.face < 0 }) : vfx(hv.n, D.x, hy, hv.s * K(D.y), { center: true, flip: P.face < 0 })); }   // 기술 전용 타격 그림을 맞는 자리에(10-29: 이펙트가 엉뚱한 곳에 나오지 않게)
   };
   for (let i = 0; i < n; i++) i ? later(i * (h.every || 0.1), () => one(i)) : one(0);
 }
@@ -566,7 +567,7 @@ const FX = {
     const ddx = (D.x - p.x) * dir;
     if (showDummy && ddx > 30 && ddx < dist + 40 && Math.abs(D.y - P.y) < 70) {
       const bulletY = p.y + ddx * Math.tan(ang), dk = K(D.y);
-      if (bulletY > D.y - D.z - 220 * dk && bulletY < D.y - D.z + 10) later(ddx / 3200, () => { hurtDummy(7, 'light'); D.vx += dir * 140; D.stag = Math.max(D.stag, 0.45); vfx('bullet_hit_body', D.x - dir * 10, bulletY, 2); hitstop = Math.max(hitstop, 0.012); shake = Math.max(shake, 3); });
+      if (bulletY > D.y - D.z - 220 * dk && bulletY < D.y - D.z + 10) later(ddx / 3200, () => { hurtDummy(s.dmg || 7, 'light'); D.vx += dir * 140; D.stag = Math.max(D.stag, 0.45); vfx('bullet_hit_body', D.x - dir * 10, bulletY, 2); hitstop = Math.max(hitstop, 0.012); shake = Math.max(shake, 3); });
     }
   },
   // 에일린: 판독 표적 → 포격
@@ -733,13 +734,13 @@ function doSkill(sp, then) {
   if (sp.armed) ensureArmed(go); else { P.armed = false; go(); }
 }
 // 여러 동작을 잇는 기술(steps): 고유기술·둘째 기술·NPC 특수공격도 필살기처럼 차례로
-function runSkill(sp, then) { if (!sp) return; const steps = sp.steps || [sp]; const go = i => i >= steps.length ? (then ? then() : (P.skArmor = false, (CH.armed && sp.armed) || (P.armed = false), afterBuf(toIdle))) : doSkill({ ...steps[i], armed: steps[i].armed ?? sp.armed, armor: steps[i].armor ?? (i ? undefined : sp.armor) }, () => go(i + 1)); go(0); }
+function runSkill(sp, then) { if (!sp) return; P.hitVfx = sp.hitVfx ? { n: sp.hitVfx, s: sp.hitScale || 1, until: P.t + (sp.hitFor || 2.5), last: -9 } : null; const steps = sp.steps || [sp]; const go = i => i >= steps.length ? (then ? then() : (P.skArmor = false, (CH.armed && sp.armed) || (P.armed = false), afterBuf(toIdle))) : doSkill({ ...steps[i], armed: steps[i].armed ?? sp.armed, armor: steps[i].armor ?? (i ? undefined : sp.armor) }, () => go(i + 1)); go(0); }
 function skill() { if (!cdReady('skill')) return; setCd('skill'); const sp = CH.skills.skill; if (sp && sp.alt && P.buffT > 0 && CH.skills[sp.alt]) return runSkill(CH.skills[sp.alt]); runSkill(sp); }
 function skill2() { if (!CH.skills.skill2 || !cdReady('skill2')) return; setCd('skill2'); runSkill(CH.skills.skill2); }
 function superMove() {
   const sp = CH.skills.super; if (!sp) return;
   if (!spReady()) return;
-  P.inSuper = true; P.noGain = P.t + 8;
+  P.inSuper = true; P.noGain = P.t + 8; P.hitVfx = null;
   // 컷인: 화면 정지 + 요원 색 띠 + 기술명
   sfx('super'); cut = 1.1; dark = 1.6; flash = 0.12; hitstop = 0.9;
   const steps = sp.steps || [sp];
@@ -762,6 +763,7 @@ function charge() {
 }
 function release() {
   const sp = CH.skills.charge, lv = chLv(), list = (sp.lv || {})[lv] || [];
+  { const hv = (sp.hitVfx || {})[lv]; P.hitVfx = hv ? { n: hv, s: (sp.hitScale || {})[lv] || 1, until: P.t + 2.5, last: -9 } : null; }   // 충전 단계별 전용 타격 그림(10-29)
   P.chargeLv = lv; P.relMz = muzzle();
   const rl = (sp.releaseLv && sp.releaseLv[lv]) || sp.release, rid = has(rl) ? rl : idleId(), n = nOf(rid);
   if (sp.fireOnRelease) { runFx(list, { o: P.relMz, lv }); P.skArmor = true; return act(rid, { seq: S(R(Math.min(1, n - 1), n - 1), 0.06), onEnd: () => { P.skArmor = false; afterBuf(toIdle); } }); }
@@ -890,8 +892,9 @@ function renderChairBox() {
 const CHAIR = {}; for (const [k, v] of Object.entries(window.__CHAIR || {})) { CHAIR[k] = new Image(); CHAIR[k].src = v; }
 function seatIdle() { const s = P.seat; P.mode = 'seat'; const n = nOf(s.sit); play(s.sit, { seq: [{ f: n - 1, d: 9 }], loopFrom: 0 }); P.clip.breathe = true; }
 function sitChair() {
-  for (let k = 1; k <= SEATS.length; k++) { const s = SEATS[(seatIdx + k) % SEATS.length]; if (has(s.sit)) { seatIdx = SEATS.indexOf(s); break; } }
-  const s = SEATS[seatIdx]; if (!s || !has(s.sit)) return;
+  const okSeat = s => has(s.sit) && !(CH.noBackSit && s.dir === 'back');   // 후면 앉기 그림이 실패한 인물(앉지 않고 섬)은 후면 자리를 건너뜀(10-29 아벤샤)
+  for (let k = 1; k <= SEATS.length; k++) { const s = SEATS[(seatIdx + k) % SEATS.length]; if (okSeat(s)) { seatIdx = SEATS.indexOf(s); break; } }
+  const s = SEATS[seatIdx]; if (!s || !okSeat(s)) return;
   P.combat = false; P.armed = false; P.mode = 'seat'; P.seat = { ...s, x: P.x, y: P.y, face: P.face };
   play(s.sit, { seq: S(R(0, nOf(s.sit) - 1), SEAT_F), onEnd: seatIdle }); renderChairBox();
 }
@@ -953,7 +956,7 @@ function canRun(fn) {
   if (ids.length) return ids.some(id => has(id) && !['50', '57'].includes(id));
   return true;
 }
-function sitAt(dir) { if (P.seat) return; seatIdx = SEATS.findIndex(s => s.dir === dir) - 1; P.scene = null; sitChair(); }
+function sitAt(dir) { if (P.seat) return; if (dir === 'back' && CH.noBackSit) dir = 'side'; seatIdx = SEATS.findIndex(s => s.dir === dir) - 1; P.scene = null; sitChair(); }
 function renderScenes() {
   const box = document.getElementById('scenes'); box.innerHTML = '';
   const g = document.createElement('div'); g.className = 'scn'; box.append(g);

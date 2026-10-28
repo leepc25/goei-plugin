@@ -582,7 +582,7 @@
        "speed": 1050,
        "time": 0.34,
        "hit": {
-        "dmg": 130,
+        "dmg": 270,
         "kind": "heavy",
         "stop": 0.16,
         "shake": 12,
@@ -600,7 +600,9 @@
       }
      ]
     }
-   ]
+   ],
+   "hitVfx": "x3-2.11-D-sweat-punch",
+   "hitScale": 0.9
   },
   "charge": {
    "name": "실황 중계",
@@ -747,7 +749,7 @@
         {
          "t": "hit",
          "hit": {
-          "dmg": 25,
+          "dmg": 30,
           "kind": "light",
           "vfx": "x3-c-hit-spark-light",
           "vs": 2,
@@ -770,7 +772,7 @@
         {
          "t": "hit",
          "hit": {
-          "dmg": 25,
+          "dmg": 30,
           "kind": "light",
           "vfx": "x3-c-hit-spark-light",
           "vs": 2,
@@ -793,7 +795,7 @@
         {
          "t": "hit",
          "hit": {
-          "dmg": 25,
+          "dmg": 30,
           "kind": "light",
           "vfx": "x3-c-hit-spark-light",
           "vs": 2,
@@ -816,7 +818,7 @@
         {
          "t": "hit",
          "hit": {
-          "dmg": 25,
+          "dmg": 30,
           "kind": "light",
           "vfx": "x3-c-hit-spark-light",
           "vs": 2,
@@ -839,7 +841,7 @@
         {
          "t": "hit",
          "hit": {
-          "dmg": 95,
+          "dmg": 113,
           "kind": "blow",
           "vfx": "x3-c-hit-spark-heavy",
           "vs": 0.7,
@@ -877,7 +879,7 @@
          "hold": 0.4,
          "fade": 0.3,
          "hit": {
-          "dmg": 125,
+          "dmg": 148,
           "kind": "down",
           "n": 4,
           "every": 0.12,
@@ -936,7 +938,7 @@
    "14": 17
   },
   "cd": {
-   "skill": 2
+   "skill": 5
   },
   "shotDmg": 10,
   "superType": "aoe"

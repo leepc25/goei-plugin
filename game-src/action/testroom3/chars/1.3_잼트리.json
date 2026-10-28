@@ -382,7 +382,7 @@
          "t": "melee",
          "range": 150,
          "hit": {
-          "dmg": 52,
+          "dmg": 108,
           "kind": "light",
           "vfx": "x3-c-hit-spark-light",
           "vs": 2,
@@ -404,7 +404,7 @@
          "t": "melee",
          "range": 160,
          "hit": {
-          "dmg": 78,
+          "dmg": 162,
           "kind": "heavy",
           "vfx": "x3-c-hit-spark-light",
           "vs": 2.6,
@@ -415,7 +415,9 @@
       }
      ]
     }
-   ]
+   ],
+   "hitVfx": "x3-1.3-D-finger-jab",
+   "hitScale": 1.0
   },
   "charge": {
    "name": "정보 정리",
@@ -594,7 +596,7 @@
            "vfx": "x3-1.3-F-olive-stomp",
            "scale": 0.7,
            "hit": {
-            "dmg": 75,
+            "dmg": 89,
             "kind": "stun",
             "stop": 0.06,
             "shake": 5
@@ -641,7 +643,7 @@
            "scale": 0.7,
            "boom": 1,
            "hit": {
-            "dmg": 149,
+            "dmg": 177,
             "kind": "down",
             "stop": 0.12,
             "shake": 10,
@@ -665,7 +667,7 @@
          "t": "melee",
          "range": 200,
          "hit": {
-          "dmg": 123,
+          "dmg": 146,
           "kind": "launch",
           "stop": 0.14,
           "shake": 10,
@@ -695,7 +697,7 @@
          "t": "melee",
          "range": 220,
          "hit": {
-          "dmg": 176,
+          "dmg": 209,
           "kind": "down",
           "stop": 0.2,
           "shake": 16,
@@ -872,7 +874,7 @@
    "14": 21
   },
   "cd": {
-   "skill": 2
+   "skill": 5
   },
   "shotDmg": 7,
   "superType": "aoe"

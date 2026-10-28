@@ -548,7 +548,7 @@
          "scale": 1.5,
          "r": 90,
          "hit": {
-          "dmg": 130,
+          "dmg": 270,
           "kind": "heavy",
           "vfx": "x3-c-hit-spark-heavy",
           "vs": 0.6,
@@ -561,7 +561,9 @@
      ]
     }
    ],
-   "_note": "10-28 사용자: 「이상한 거 생김」 → 머플러 두건 그림(x3-3.8-D-muffler-hood)이 몸에 안 감기고 허공에 물음표처럼 떠서 뺌(파일은 둠). 굳기는 흔들림만"
+   "_note": "10-28 사용자: 「이상한 거 생김」 → 머플러 두건 그림(x3-3.8-D-muffler-hood)이 몸에 안 감기고 허공에 물음표처럼 떠서 뺌(파일은 둠). 굳기는 흔들림만",
+   "hitVfx": "x3-3.8-D-double-palm",
+   "hitScale": 0.8
   },
   "charge": {
    "name": "문 담당",
@@ -682,7 +684,7 @@
          "t": "pull",
          "dist": 160,
          "hit": {
-          "dmg": 28,
+          "dmg": 33,
           "kind": "pull",
           "noVfx": true,
           "stop": 0.05,
@@ -699,7 +701,7 @@
          "speed": 1500,
          "time": 0.6,
          "hit": {
-          "dmg": 62,
+          "dmg": 74,
           "kind": "heavy",
           "vfx": "x3-c-hit-spark-heavy",
           "vs": 0.6
@@ -765,7 +767,7 @@
          "under": true,
          "r": 420,
          "hit": {
-          "dmg": 229,
+          "dmg": 272,
           "n": 2,
           "every": 0.15,
           "mid": "heavy",
@@ -807,7 +809,7 @@
    "14": 25
   },
   "cd": {
-   "skill": 2
+   "skill": 5
   },
   "shotDmg": 7,
   "superType": "aoe"

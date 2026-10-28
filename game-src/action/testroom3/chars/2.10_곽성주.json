@@ -643,7 +643,7 @@
        "r": 210,
        "delay": 0.12,
        "hit": {
-        "dmg": 130,
+        "dmg": 270,
         "kind": "heavy",
         "vfx": "x3-c-hit-spark-heavy",
         "vs": 0.6,
@@ -742,7 +742,7 @@
         "t": "proj",
         "kind": "bullet",
         "hit": {
-         "dmg": 6,
+         "dmg": 5,
          "kind": "light"
         },
         "spread": 0.2
@@ -761,7 +761,7 @@
         "scale": 0.8,
         "r": 56.2,
         "hit": {
-         "dmg": 34,
+         "dmg": 29,
          "kind": "light",
          "stop": 0.03,
          "shake": 3
@@ -789,7 +789,7 @@
         "scale": 0.8,
         "r": 45,
         "hit": {
-         "dmg": 34,
+         "dmg": 29,
          "kind": "light",
          "stop": 0.03,
          "shake": 3
@@ -817,7 +817,7 @@
         "scale": 0.8,
         "r": 45,
         "hit": {
-         "dmg": 34,
+         "dmg": 29,
          "kind": "light",
          "stop": 0.03,
          "shake": 3
@@ -845,7 +845,7 @@
         "scale": 0.8,
         "r": 45,
         "hit": {
-         "dmg": 34,
+         "dmg": 29,
          "kind": "light",
          "stop": 0.03,
          "shake": 3
@@ -873,7 +873,7 @@
         "scale": 0.8,
         "r": 45,
         "hit": {
-         "dmg": 34,
+         "dmg": 29,
          "kind": "light",
          "stop": 0.03,
          "shake": 3
@@ -901,7 +901,7 @@
         "scale": 0.8,
         "r": 45,
         "hit": {
-         "dmg": 34,
+         "dmg": 29,
          "kind": "light",
          "stop": 0.03,
          "shake": 3
@@ -929,7 +929,7 @@
         "scale": 0.8,
         "r": 45,
         "hit": {
-         "dmg": 34,
+         "dmg": 29,
          "kind": "light",
          "stop": 0.03,
          "shake": 3
@@ -957,7 +957,7 @@
         "scale": 0.8,
         "r": 45,
         "hit": {
-         "dmg": 34,
+         "dmg": 29,
          "kind": "light",
          "stop": 0.03,
          "shake": 3
@@ -985,7 +985,7 @@
         "scale": 0.8,
         "r": 45,
         "hit": {
-         "dmg": 34,
+         "dmg": 29,
          "kind": "light",
          "stop": 0.03,
          "shake": 3
@@ -1013,7 +1013,7 @@
         "scale": 0.8,
         "r": 45,
         "hit": {
-         "dmg": 57,
+         "dmg": 49,
          "kind": "down",
          "stop": 0.03,
          "shake": 3
@@ -1067,7 +1067,7 @@
         "under": true,
         "r": 231.2,
         "hit": {
-         "dmg": 88,
+         "dmg": 75,
          "kind": "heavy"
         }
        }
@@ -1137,7 +1137,7 @@
        "t": "proj",
        "kind": "bullet",
        "hit": {
-        "dmg": 11,
+        "dmg": 13,
         "kind": "light"
        },
        "spread": 0.6
@@ -1179,7 +1179,7 @@
          "size": 0.8,
          "life": 1.6,
          "hit": {
-          "dmg": 90,
+          "dmg": 107,
           "kind": "launch",
           "stop": 0.16,
           "shake": 16
@@ -1227,7 +1227,7 @@
    "14": 25
   },
   "cd": {
-   "skill": 2
+   "skill": 5
   },
   "shotDmg": 6,
   "heatPer": 9,

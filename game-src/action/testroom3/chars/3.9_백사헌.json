@@ -510,7 +510,7 @@
          "t": "melee",
          "range": 150,
          "hit": {
-          "dmg": 59,
+          "dmg": 123,
           "kind": "light",
           "vfx": "x3-c-hit-spark-light",
           "vs": 1.4
@@ -531,7 +531,7 @@
          "t": "melee",
          "range": 170,
          "hit": {
-          "dmg": 71,
+          "dmg": 147,
           "kind": "heavy",
           "vfx": "x3-c-hit-spark-heavy",
           "vs": 0.6
@@ -552,7 +552,9 @@
       }
      ]
     }
-   ]
+   ],
+   "hitVfx": "x3-3.9-D-sneak-punch",
+   "hitScale": 0.8
   },
   "charge": {
    "name": "역안",
@@ -739,7 +741,7 @@
          "t": "melee",
          "range": 170,
          "hit": {
-          "dmg": 70,
+          "dmg": 83,
           "kind": "heavy",
           "vfx": "x3-c-hit-spark-heavy",
           "vs": 0.6,
@@ -762,7 +764,7 @@
          "t": "melee",
          "range": 170,
          "hit": {
-          "dmg": 90,
+          "dmg": 107,
           "kind": "down",
           "vfx": "x3-c-hit-spark-light",
           "vs": 1.5
@@ -833,7 +835,7 @@
          "t": "melee",
          "range": 170,
          "hit": {
-          "dmg": 70,
+          "dmg": 83,
           "kind": "heavy",
           "vfx": "x3-c-hit-spark-heavy",
           "vs": 0.6,
@@ -856,7 +858,7 @@
          "t": "melee",
          "range": 170,
          "hit": {
-          "dmg": 90,
+          "dmg": 107,
           "kind": "down",
           "vfx": "x3-c-hit-spark-light",
           "vs": 1.5
@@ -939,7 +941,7 @@
          "under": true,
          "r": 400,
          "hit": {
-          "dmg": 264,
+          "dmg": 314,
           "n": 2,
           "every": 0.2,
           "mid": "down",
@@ -981,7 +983,7 @@
    "14": 20
   },
   "cd": {
-   "skill": 2
+   "skill": 5
   },
   "shotDmg": 7,
   "superType": "aoe"

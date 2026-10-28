@@ -534,6 +534,13 @@
      "fx": [
       {
        "t": "v",
+       "vfx": "x3-2.14-D-headshot",
+       "at": "hand",
+       "dx": 280,
+       "scale": 0.7
+      },
+      {
+       "t": "v",
        "vfx": "x3-c-muzzle-flash",
        "at": "hand",
        "dx": 10,
@@ -544,7 +551,7 @@
        "kind": "bullet",
        "big": true,
        "hit": {
-        "dmg": 130,
+        "dmg": 270,
         "kind": "down",
         "vfx": "x3-c-hit-spark-heavy",
         "vs": 0.6
@@ -742,7 +749,7 @@
            "r": 40,
            "tint": "#ffb04a",
            "hit": {
-            "dmg": 57,
+            "dmg": 68,
             "kind": "launch",
             "stop": 0.14,
             "shake": 14
@@ -782,7 +789,7 @@
            "scale": 0.6,
            "boom": 3,
            "hit": {
-            "dmg": 206,
+            "dmg": 245,
             "kind": "launch",
             "stop": 0.18,
             "shake": 18
@@ -828,7 +835,7 @@
    "14": 19
   },
   "cd": {
-   "skill": 2
+   "skill": 5
   },
   "shotDmg": 11,
   "superType": "aoe"

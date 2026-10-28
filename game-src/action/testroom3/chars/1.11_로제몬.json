@@ -407,7 +407,7 @@
        "life": 0.5,
        "size": 1,
        "hit": {
-        "dmg": 130,
+        "dmg": 270,
         "kind": "turn",
         "vfx": "x3-c-hit-spark-light",
         "vs": 1.2
@@ -429,7 +429,9 @@
      "hold": 0.1
     }
    ],
-   "_note": "10-28 사용자: A(원거리)와 똑같다 → 문서대로 눈빛 번쩍 + 동전 + 맞은 적이 등 돌려 2m 걸어감 + 동전 바닥에 떨어짐"
+   "_note": "10-28 사용자: A(원거리)와 똑같다 → 문서대로 눈빛 번쩍 + 동전 + 맞은 적이 등 돌려 2m 걸어감 + 동전 바닥에 떨어짐",
+   "hitVfx": "x3-1.11-D-coin-flash",
+   "hitScale": 1.2
   },
   "charge": {
    "name": "인형술",
@@ -645,7 +647,7 @@
          "scale": 2,
          "tint": "#B04FD0",
          "hit": {
-          "dmg": 32,
+          "dmg": 38,
           "kind": "light"
          }
         }
@@ -668,7 +670,7 @@
          "scale": 0.6,
          "tint": "#B04FD0",
          "hit": {
-          "dmg": 48,
+          "dmg": 57,
           "kind": "light"
          }
         }
@@ -696,7 +698,7 @@
        "scale": 1.5,
        "boom": 3,
        "hit": {
-        "dmg": 240,
+        "dmg": 285,
         "kind": "blow",
         "stop": 0.22,
         "shake": 16
@@ -882,7 +884,7 @@
    "14": 22
   },
   "cd": {
-   "skill": 2
+   "skill": 5
   },
   "shotDmg": 10,
   "superType": "aoe"
