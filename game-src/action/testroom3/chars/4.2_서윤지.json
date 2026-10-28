@@ -388,7 +388,7 @@
   "heat": false,
   "_note": "조항 글자 줄"
  },
- "skills": {
+ "skills_2판": {
   "skill": {
    "name": "업무 관련 금품 수수 불가",
    "anim": "22",
@@ -524,6 +524,308 @@
         "kind": "down",
         "stop": 0.2
        }
+      }
+     ]
+    }
+   ]
+  }
+ },
+ "skills": {
+  "skill": {
+   "name": "업무 관련 금품 수수 불가",
+   "anim": "22",
+   "fps": 10,
+   "armed": true,
+   "armor": [
+    2,
+    6
+   ],
+   "events": [
+    {
+     "f": 3,
+     "hold": 0.3,
+     "fx": [
+      {
+       "t": "v",
+       "vfx": "x3-4.2-D-square-reflect-plane",
+       "at": "hand",
+       "dx": 25,
+       "scale": 1.6,
+       "hold": 0.2
+      },
+      {
+       "t": "melee",
+       "range": 160,
+       "hit": {
+        "dmg": 22,
+        "kind": "heavy",
+        "vfx": "x3-c-hit-spark-light",
+        "vs": 1.6,
+        "tint": "#c8e0c6"
+       }
+      }
+     ]
+    }
+   ]
+  },
+  "charge": {
+   "name": "처리 기록",
+   "hold": "23",
+   "release": "9",
+   "levels": [
+    0.5,
+    1.2
+   ],
+   "fps": 12,
+   "fire": 5,
+   "releaseLv": {
+    "1": "11",
+    "2": "13"
+   },
+   "fireLv": {
+    "1": 1,
+    "2": 2
+   },
+   "lv": {
+    "0": [
+     {
+      "t": "v",
+      "vfx": "x3-c-slash-arc",
+      "at": "hand",
+      "dx": 40,
+      "scale": 0.45,
+      "tint": "#9CB89A"
+     },
+     {
+      "t": "melee",
+      "range": 170,
+      "hit": {
+       "dmg": 20,
+       "kind": "light",
+       "vfx": "x3-c-hit-spark-light",
+       "vs": 1.5,
+       "tint": "#c8e0c6"
+      }
+     }
+    ],
+    "1": [
+     {
+      "t": "v",
+      "vfx": "x3-4.2-S1-bracket-trail",
+      "at": "hand",
+      "dx": 50,
+      "dy": 64
+     },
+     {
+      "t": "melee",
+      "range": 190,
+      "hit": {
+       "dmg": 34,
+       "kind": "launch",
+       "n": 3,
+       "mid": "light",
+       "every": 0.14,
+       "vfx": "x3-c-hit-spark-light",
+       "vs": 1.5,
+       "tint": "#c8e0c6"
+      }
+     }
+    ],
+    "2": [
+     {
+      "t": "dash",
+      "speed": 1600,
+      "time": 0.3,
+      "hit": {
+       "dmg": 8,
+       "kind": "heavy"
+      }
+     },
+     {
+      "t": "v",
+      "vfx": "x3-c-dust-puff",
+      "at": "self",
+      "scale": 1.5,
+      "tint": "#b0b8a8"
+     },
+     {
+      "t": "later",
+      "in": 0.3,
+      "fx": [
+       {
+        "t": "v",
+        "vfx": "x3-4.2-D-square-reflect-plane",
+        "at": "hand",
+        "dx": 40,
+        "scale": 3
+       },
+       {
+        "t": "melee",
+        "range": 200,
+        "hit": {
+         "dmg": 45,
+         "kind": "blow",
+         "vfx": "x3-c-hit-spark-heavy",
+         "vs": 0.8,
+         "tint": "#c8e0c6"
+        }
+       }
+      ]
+     }
+    ]
+   }
+  },
+  "super": {
+   "name": "수정 요청 없음",
+   "sub": "「적힌 것은 하나도 봐주지 않습니다.」",
+   "armed": true,
+   "steps": [
+    {
+     "anim": "23",
+     "fps": 14,
+     "events": [
+      {
+       "f": 2,
+       "hold": 0.4,
+       "fx": [
+        {
+         "t": "gray",
+         "time": 0.5
+        }
+       ]
+      },
+      {
+       "f": 6,
+       "hold": 0.3,
+       "fx": [
+        {
+         "t": "scan",
+         "style": "grid",
+         "color": "#9CB89A",
+         "time": 0.9
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "anim": "13",
+     "fps": 16,
+     "events": [
+      {
+       "f": 2,
+       "fx": [
+        {
+         "t": "dash",
+         "speed": 1500,
+         "time": 0.22,
+         "hit": null
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "anim": "10",
+     "fps": 16,
+     "events": [
+      {
+       "f": 6,
+       "hold": 0.08,
+       "fx": [
+        {
+         "t": "melee",
+         "range": 170,
+         "hit": {
+          "dmg": 20,
+          "kind": "spike",
+          "vfx": "x3-c-hit-spark-heavy",
+          "vs": 0.7,
+          "tint": "#c8e0c6"
+         }
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "anim": "13",
+     "fps": 16,
+     "events": [
+      {
+       "f": 2,
+       "fx": [
+        {
+         "t": "dash",
+         "speed": 1500,
+         "time": 0.22,
+         "hit": null
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "anim": "10",
+     "fps": 16,
+     "events": [
+      {
+       "f": 6,
+       "hold": 0.08,
+       "fx": [
+        {
+         "t": "melee",
+         "range": 170,
+         "hit": {
+          "dmg": 20,
+          "kind": "spike",
+          "vfx": "x3-c-hit-spark-heavy",
+          "vs": 0.7,
+          "tint": "#c8e0c6"
+         }
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "anim": "25",
+     "fps": 10,
+     "events": [
+      {
+       "f": 9,
+       "hold": 0.5,
+       "fx": [
+        {
+         "t": "shake",
+         "v": 18
+        },
+        {
+         "t": "v",
+         "vfx": "x3-c-ground-crack",
+         "at": "front",
+         "dx": 60,
+         "scale": 1
+        },
+        {
+         "t": "v",
+         "vfx": "x3-4.2-F-square-shock-ring",
+         "at": "self",
+         "dx": 60,
+         "scale": 2.3,
+         "under": true,
+         "boom": 3,
+         "hit": {
+          "dmg": 50,
+          "kind": "down",
+          "stop": 0.2,
+          "shake": 16,
+          "vfx": "x3-c-hit-spark-heavy",
+          "vs": 1.1,
+          "tint": "#c8e0c6"
+         }
+        }
+       ]
       }
      ]
     }

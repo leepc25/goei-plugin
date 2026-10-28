@@ -379,7 +379,7 @@
   "heat": false,
   "_note": "사탕"
  },
- "skills": {
+ "skills_2판": {
   "skill": {
    "name": "사탕",
    "anim": "22",
@@ -504,6 +504,315 @@
        "edge": false
       }
      ]
+    }
+   ]
+  }
+ },
+ "skills": {
+  "skill": {
+   "name": "잠깐만요",
+   "anim": "22",
+   "fps": 10,
+   "events": [
+    {
+     "f": 3,
+     "hold": 0.22,
+     "fx": [
+      {
+       "t": "melee",
+       "range": 130,
+       "hit": {
+        "dmg": 22,
+        "kind": "heavy",
+        "n": 2,
+        "mid": "light",
+        "every": 0.15,
+        "vfx": "x3-c-hit-spark-light",
+        "vs": 1.4,
+        "tint": "#ffd6bd"
+       }
+      }
+     ]
+    }
+   ]
+  },
+  "charge": {
+   "name": "오늘 날씨 진짜 이상하죠?",
+   "hold": "23",
+   "release": "13",
+   "levels": [
+    0.5,
+    1.2
+   ],
+   "fps": 12,
+   "fire": 3,
+   "releaseLv": {
+    "1": "14",
+    "2": "12"
+   },
+   "fireLv": {
+    "1": 2,
+    "2": 5
+   },
+   "lv": {
+    "0": [
+     {
+      "t": "dash",
+      "speed": 1100,
+      "time": 0.25,
+      "hit": {
+       "dmg": 28,
+       "kind": "heavy",
+       "vfx": "x3-c-hit-spark-light",
+       "vs": 1.8,
+       "tint": "#ffd6bd"
+      }
+     },
+     {
+      "t": "v",
+      "vfx": "x3-c-dust-puff",
+      "at": "self",
+      "scale": 1.5,
+      "tint": "#e8c4a8"
+     }
+    ],
+    "1": [
+     {
+      "t": "dash",
+      "speed": 1700,
+      "time": 0.3,
+      "hit": {
+       "dmg": 36,
+       "kind": "down",
+       "vfx": "x3-c-hit-spark-heavy",
+       "vs": 0.7,
+       "tint": "#ffd6bd"
+      }
+     },
+     {
+      "t": "v",
+      "vfx": "x3-c-dust-puff",
+      "at": "self",
+      "scale": 1.5,
+      "tint": "#e8c4a8"
+     }
+    ],
+    "2": [
+     {
+      "t": "melee",
+      "range": 170,
+      "hit": {
+       "dmg": 40,
+       "kind": "down",
+       "vfx": "x3-c-hit-spark-heavy",
+       "vs": 0.8,
+       "tint": "#ffd6bd"
+      }
+     },
+     {
+      "t": "v",
+      "vfx": "x3-c-ground-shockwave",
+      "at": "front",
+      "dx": 70,
+      "scale": 0.5,
+      "tint": "#F4A97A",
+      "under": true
+     },
+     {
+      "t": "v",
+      "vfx": "x3-c-dust-puff",
+      "at": "front",
+      "dx": 70,
+      "scale": 2.2,
+      "tint": "#e8c4a8"
+     }
+    ]
+   }
+  },
+  "super": {
+   "name": "시술 준비 끝",
+   "sub": "「시술 준비 끝.」",
+   "steps": [
+    {
+     "anim": "12",
+     "fps": 12,
+     "events": [
+      {
+       "f": 2,
+       "fx": [
+        {
+         "t": "teleport",
+         "to": "front",
+         "dist": 90,
+         "puddle": false
+        }
+       ]
+      },
+      {
+       "f": 5,
+       "hold": 0.2,
+       "fx": [
+        {
+         "t": "melee",
+         "range": 170,
+         "hit": {
+          "dmg": 25,
+          "kind": "down",
+          "vfx": "x3-c-hit-spark-heavy",
+          "vs": 0.8,
+          "tint": "#ffd6bd"
+         }
+        },
+        {
+         "t": "v",
+         "vfx": "x3-c-ground-shockwave",
+         "at": "front",
+         "dx": 70,
+         "scale": 0.5,
+         "tint": "#F4A97A",
+         "under": true
+        },
+        {
+         "t": "v",
+         "vfx": "x3-c-dust-puff",
+         "at": "front",
+         "dx": 70,
+         "scale": 2.2,
+         "tint": "#e8c4a8"
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "anim": "12",
+     "fps": 12,
+     "events": [
+      {
+       "f": 2,
+       "fx": [
+        {
+         "t": "teleport",
+         "to": "front",
+         "dist": 90,
+         "puddle": false
+        }
+       ]
+      },
+      {
+       "f": 5,
+       "hold": 0.2,
+       "fx": [
+        {
+         "t": "melee",
+         "range": 170,
+         "hit": {
+          "dmg": 25,
+          "kind": "down",
+          "vfx": "x3-c-hit-spark-heavy",
+          "vs": 0.8,
+          "tint": "#ffd6bd"
+         }
+        },
+        {
+         "t": "v",
+         "vfx": "x3-c-ground-shockwave",
+         "at": "front",
+         "dx": 70,
+         "scale": 1.0,
+         "tint": "#F4A97A",
+         "under": true
+        },
+        {
+         "t": "v",
+         "vfx": "x3-c-dust-puff",
+         "at": "front",
+         "dx": 70,
+         "scale": 3,
+         "tint": "#e8c4a8"
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "anim": "12",
+     "fps": 12,
+     "events": [
+      {
+       "f": 2,
+       "fx": [
+        {
+         "t": "teleport",
+         "to": "front",
+         "dist": 90,
+         "puddle": false
+        }
+       ]
+      },
+      {
+       "f": 5,
+       "hold": 0.4,
+       "fx": [
+        {
+         "t": "shake",
+         "v": 16
+        },
+        {
+         "t": "melee",
+         "range": 170,
+         "hit": {
+          "dmg": 30,
+          "kind": "down",
+          "vfx": "x3-c-hit-spark-heavy",
+          "vs": 1,
+          "tint": "#ffd6bd"
+         }
+        },
+        {
+         "t": "v",
+         "vfx": "x3-c-ground-shockwave",
+         "at": "front",
+         "dx": 70,
+         "scale": 2.4,
+         "tint": "#F4A97A",
+         "under": true,
+         "boom": 3
+        },
+        {
+         "t": "v",
+         "vfx": "x3-c-dust-cloud-large",
+         "at": "front",
+         "dx": 70,
+         "scale": 1.2,
+         "tint": "#e8c4a8",
+         "under": true
+        },
+        {
+         "t": "later",
+         "in": 0.15,
+         "fx": [
+          {
+           "t": "hit",
+           "hit": {
+            "dmg": 30,
+            "kind": "down",
+            "stop": 0.16,
+            "shake": 14,
+            "vfx": "x3-c-hit-spark-heavy",
+            "vs": 1.1,
+            "tint": "#ffd6bd"
+           }
+          }
+         ]
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "anim": "25",
+     "fps": 12
     }
    ]
   }
