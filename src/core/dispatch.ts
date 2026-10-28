@@ -222,5 +222,5 @@ export function renderSceneCards(text: string, render: (s: SceneSummary) => stri
 export function withUserInput(d: Pick<Directive, 'format'> | null, body: string, extra: string): string {
   if (!extra.trim()) return body;
   const tpl = d?.format.user_input ?? 'Situation:\n[[INPUT]]';
-  return `${body}\n\n${tpl.replace(/\[\[INPUT\]\]/g, extra)}`;
+  return `${body}\n\n${tpl.replace(/\[\[INPUT\]\]/g, () => extra)}`; // 함수로: 적은 글의 $& 같은 치환 패턴이 지시문을 망가뜨리지 않게
 }

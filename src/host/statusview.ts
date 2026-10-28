@@ -38,7 +38,8 @@ export function renderStatus(text: string): string {
   if (!tags.length) return text;
   armChatClick('status');
   let out = text;
-  for (const t of tags) out = out.replace(t.raw, statusHtml(t, ctx));
+  // 치환 문자열이 아니라 함수로: 태그 글에 $& · $' 같은 치환 패턴이 들어 있으면 원문 태그가 두 번 들어가거나 뒷글이 끼어든다 (QC 2026-10-28)
+  for (const t of tags) out = out.replace(t.raw, () => statusHtml(t, ctx));
   return out;
 }
 

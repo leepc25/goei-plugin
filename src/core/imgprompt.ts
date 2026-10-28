@@ -105,9 +105,9 @@ export function buildImgPrompt(cfg: ImgPromptConfig, characters: string[], asset
   const userSkip = assetPlayer ? '' : '{{user}}, ';
   const userRule = assetPlayer ? '' : '- Do not create tags for {{user}}.';
   return cfg.template
-    .replace(/\{characters\}/g, characters.join(', '))
-    .replace(/\{keywords\}/g, cfg.keywords.join(', '))
-    .replace(/\{user_skip\}/g, userSkip)
+    .replace(/\{characters\}/g, () => characters.join(', '))
+    .replace(/\{keywords\}/g, () => cfg.keywords.join(', '))
+    .replace(/\{user_skip\}/g, () => userSkip)
     .replace(/\{user_rule\}\n?/g, userRule ? `${userRule}\n` : '')
     .replace(/\n{3,}/g, '\n\n')
     .trim();
