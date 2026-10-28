@@ -105,7 +105,7 @@ function fieldRow(kind: WorldKind, rec: WorldRecord, def: FieldDef, name: string
   const ph = recUi.variant ? '비우면 기본 글' : auto ? `자동: ${auto}` : '';
   const ctl = def.type === 'line'
     ? `<input data-input="ed-field" data-key="${esc(key)}" value="${esc(v)}" autocomplete="off" placeholder="${esc(ph)}">`
-    : `<textarea data-input="ed-field" data-key="${esc(key)}" rows="3" placeholder="${esc(ph)}">${esc(v)}</textarea>`;
+    : `<textarea data-input="ed-field" data-key="${esc(key)}" rows="3" placeholder="${esc(ph)}">\n${esc(v)}</textarea>`;
   return `<div class="gw-field" data-field-row="${esc(def.id)}" draggable="true">
     <div class="gw-field-head"><span class="gw-grip" title="끌어서 순서 바꾸기">${ICONS.grip}</span><b>${esc(def.label)}</b><small class="gw-ftitle">${esc(def.title)}</small>${def.hint ? `<span class="gw-fhint" title="${esc(def.hint)}">?</span>` : ''}<span class="gw-ftok">${tok ? `${tok}토큰` : ''}</span>
       <span class="gw-fmove"><button class="gx-mini icon" data-action="ed-field-up" data-value="${esc(def.id)}" aria-label="위로">${ICONS.up}</button><button class="gx-mini icon" data-action="ed-field-down" data-value="${esc(def.id)}" aria-label="아래로">${ICONS.down}</button></span></div>
@@ -118,7 +118,7 @@ function extraRow(kind: WorldKind, rec: WorldRecord, e: ExtraField, i: number, n
   const place = e.kind === 'line' ? `<small class="gw-ftitle">${e.sec === 'appearance' ? 'Appearance' : 'Identity'} 절 · 한 줄${e.at ? ` · ${esc(e.at)} 뒤` : ' · 맨 앞'}</small>` : '<small class="gw-ftitle">절</small>';
   const ctl = e.kind === 'line'
     ? `<input data-input="ed-extra" data-key="${esc(key)}" value="${esc(e.value)}" autocomplete="off">`
-    : `<textarea data-input="ed-extra" data-key="${esc(key)}" rows="3">${esc(e.value)}</textarea>`;
+    : `<textarea data-input="ed-extra" data-key="${esc(key)}" rows="3">\n${esc(e.value)}</textarea>`;
   return `<div class="gw-field extra" data-field-row="${esc(id)}" draggable="${e.kind === 'block'}">
     <div class="gw-field-head"><span class="gw-grip">${e.kind === 'block' ? ICONS.grip : ''}</span><input class="gw-xname" data-input="ed-extra-name" data-key="${esc(key)}" value="${esc(e.name)}" aria-label="칸 이름">${place}<span class="gw-ftok">${tokens(e.value) ? `${tokens(e.value)}토큰` : ''}</span>
       <span class="gw-fmove">${e.kind === 'block' ? `<button class="gx-mini icon" data-action="ed-field-up" data-value="${esc(id)}" aria-label="위로">${ICONS.up}</button><button class="gx-mini icon" data-action="ed-field-down" data-value="${esc(id)}" aria-label="아래로">${ICONS.down}</button>` : ''}<button class="gx-mini icon danger" data-action="ed-extra-del" data-value="${i}" aria-label="칸 지우기">${ICONS.trash}</button></span></div>
@@ -251,7 +251,8 @@ export function recordInput(name: string, key: string, value: string, ctx: ChatC
   // 기록 칸 입력만. 다른 글칸(지침 절 `GNet|0` 등)의 열쇠를 종류|이름으로 읽으면 없는 종류로 worldRecords 가 터져 그 뒤 처리기(지침 초안)까지 막혔다 (QC 2026-10-28)
   if (name !== 'ed-field' && name !== 'ed-extra' && name !== 'ed-extra-name') return false;
   const [kind, recName, id] = key.split('|') as [WorldKind, string, string];
-  if (!kind || !recName) return false;
+  // 기록 종류가 아닌 키(지침 절 「RP|3」 등)는 내 것이 아니다 (2026-10-28 QC: 지침 글칸 입력이 여기서 터져 지침 편집이 통째로 안 됐다)
+  if (!(kind in FIELDS) || !recName) return false;
   const over = overridesOf(ctx);
   const rec = structuredClone(worldRecord(kind, recName, over) ?? emptyRecord());
   if (name === 'ed-field') {

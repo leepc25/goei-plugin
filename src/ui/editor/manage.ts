@@ -214,6 +214,7 @@ export async function manageAction(action: string, root: HTMLElement | null): Pr
         if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) throw new Error('설정 JSON 이 아니에요.');
         await savePrefs(() => parsed as ReturnType<typeof getPrefs>);
         manUi.importText = '';
+        manUi.sizes = null;
         manUi.info = '설정을 가져왔어요. 창을 닫았다 열면 전부 반영돼요.';
       } catch (error) {
         manUi.notice = `가져오지 못했어요: ${error instanceof Error ? error.message : String(error)}`;

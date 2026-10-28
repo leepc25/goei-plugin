@@ -12,12 +12,14 @@ import { savePrefs } from '../../host/prefs';
 import { cropValue, directoryDraft, directoryExtList, directoryInput, directoryPhotoList, directoryView, dirUi, dirty as dirDirty, handleDirectory, resetDirectory, setCrop } from '../directory';
 import { handleImgPrompt, imgInput, imgPromptPane } from '../imgprompt';
 import { ICONS } from '../icons';
+import { labelSwitches } from '../controls';
+import { rememberPanel } from '../panels';
 import editorCss from './style.css';
 import { recordCount, recordList, recordPage, recordAction, recordInput, recUi } from './record';
 import { relationsPage, relationsAction, relationsInput } from './relations';
-import { guidePage, guideAction, guideInput, guideUi } from './guides';
+import { guidePage, guideAction, guideBarSync, guideInput, guideUi } from './guides';
 import { isRuleNode, ruleAction, ruleInput, rulePage, ruleTreeItems } from './rules';
-import { ensureManage, isManageNode, manageAction, manageInput, managePage, type ManageNode } from './manage';
+import { ensureManage, isManageNode, manageAction, manageInput, managePage, manUi, type ManageNode } from './manage';
 import { installAction, installPage, instUi, refreshInstall } from './install';
 import { featurePane, settingsNotices, settingsSection, settingsUi, type SettingsSection } from '../settings';
 import { CFG, GN_DEFAULTS, gnetLabel } from '../../core/gnet';
@@ -98,6 +100,8 @@ export function openEditor(h: EditorHost, node?: EditorNode): void {
   edUi.open = true;
   if (node) edUi.node = legacyNode(node);
   edUi.notice = '';
+  // 저장소 사용량은 창을 열 때마다 다시 읽는다 (2026-10-28 QC: 처음 한 번만 읽어 설정을 바꿔도 크기가 그대로였다)
+  manUi.sizes = null;
   syncSettingsPage();
   ensureRoot();
   render();
@@ -131,6 +135,8 @@ function ensureRoot(): HTMLElement {
   root = document.createElement('div');
   root.className = 'gw';
   document.body.appendChild(root);
+  // 접는 칸(details data-keep)의 펼침을 기억한다: 조작 뒤 창을 다시 그려도 접히지 않게 (2026-10-28 QC: 패널만 기억하고 편집 창은 안 했다)
+  root.addEventListener('toggle', (ev) => rememberPanel(ev.target as HTMLDetailsElement), true);
   root.addEventListener('click', (ev) => {
     const t = ev.target as HTMLElement;
     if (t === root) return void run('ed-close');
@@ -198,7 +204,12 @@ function ensureRoot(): HTMLElement {
       return;
     }
     if (ruleInput(name, el.dataset.key ?? '', el.value)) return;
-    if (manageInput(name, el.value)) return;
+    if (manageInput(name, el.value)) {
+      // 가져오기 「적용」 단추는 글칸이 비었을 때 잠겨 그려진다: 다시 그리지 않으니 여기서 풀어 준다 (2026-10-28 QC: 붙여 넣어도 계속 잠겨 있던 문제)
+      const btn = root?.querySelector<HTMLButtonElement>('[data-action="man-import"]');
+      if (btn) btn.disabled = !el.value.trim();
+      return;
+    }
     // 설정 페이지의 입력(슬라이더·검색·규칙 글칸 등)은 패널과 같은 처리기로
     host?.input?.(el as HTMLInputElement);
   });
@@ -206,6 +217,8 @@ function ensureRoot(): HTMLElement {
     const el = ev.target as HTMLSelectElement;
     if (el?.dataset?.input === 'dir-crop-size') return render();
     if (el?.dataset?.change?.startsWith('ed-')) return void run(el.dataset.change, el.value);
+    // 명부 드롭다운(거점 지역·시군구)·이미지 지침 체크는 이 창의 처리기로: 패널 처리기로 보내면 패널만 다시 그려 지도·시군구 목록·체크 표시가 그대로였다 (2026-10-28 QC)
+    if (el?.dataset?.change?.startsWith('dir-') || el?.dataset?.change?.startsWith('ip-')) return void run(el.dataset.change, el.dataset.key ? `${el.dataset.key}=${el.value}` : el.value);
     host?.change?.(el);
   });
   root.addEventListener('submit', (ev) => {
@@ -220,7 +233,11 @@ function ensureRoot(): HTMLElement {
       ev.preventDefault();
       void run(el.dataset.enter, el.value);
     }
-    if (ev.key === 'Escape' && !edUi.confirm) void run('ed-close');
+  });
+  // Esc 는 문서 전체에서 받는다: 단추를 누르면 창을 다시 그려 포커스가 body 로 가므로 창 요소의 keydown 만으론 한 번 누른 뒤엔 안 먹었다 (2026-10-28 QC).
+  // 패널(app.ts)의 Esc 처리기는 편집 창이 떠 있으면 비켜 준다
+  document.addEventListener('keydown', (ev) => {
+    if (ev.key === 'Escape' && edUi.open && !edUi.confirm) void run('ed-close');
   });
   // 칸 순서 끌기 (손잡이)
   let drag: string | null = null;
@@ -255,6 +272,7 @@ function ensureRoot(): HTMLElement {
 function touched(): void {
   const bar = root?.querySelector('.gw-save');
   if (bar) bar.outerHTML = saveBar();
+  if (root && isGuideNode(edUi.node)) guideBarSync(root, edUi.node.slice(6));
 
   const tok = root?.querySelector('.gw-tokens');
   const ctx = host?.ctx();
@@ -397,7 +415,12 @@ function guideNodePage(ctx: ChatContext, n: GuideNode): string {
 
 function body(ctx: ChatContext): string {
   const n = edUi.node;
-  if (isKind(n)) return recordPage(ctx, n, overridesOf(ctx), edUi.q, edUi.sel[n] ?? '');
+  if (isKind(n)) {
+    // 기본 정보 칸은 명부 판(directory.ts)의 dir-* 동작을 쓰고, 그 처리기는 dirUi.kind 로 줄을 찾는다.
+    // 거점 페이지를 다녀오면 kind 가 'base' 로 남아 괴이 「발생 ON/OFF」 등이 요원 줄에서 찾다 아무 일도 안 했다 (2026-10-28 QC)
+    dirUi.kind = n;
+    return recordPage(ctx, n, overridesOf(ctx), edUi.q, edUi.sel[n] ?? '');
+  }
   if (n === 'base') {
     // 거점: 지도에 찍히는 장소. 명부 패널의 거점 탭을 그대로 (종류 탭·사용법은 CSS 로 숨김). 호칭·괴담톡 탭은 조직 기록의 기본 정보에
     dirUi.kind = 'base';
@@ -451,6 +474,7 @@ export function render(): void {
     <main class="gw-body">${ctx ? body(ctx) : '<p class="gx-err">채팅 정보를 읽지 못했어요. 창을 닫고 다시 열어 주세요.</p>'}</main>
     ${confirm}
   </div>`;
+  labelSwitches(root);
 }
 
 const env = { render: () => render(), refresh: async () => { await host?.refresh(); render(); } };
@@ -517,6 +541,7 @@ export async function handle(action: string, value?: string): Promise<void> {
     }
     case 'ed-node':
       edUi.node = legacyNode(value ?? 'agent');
+      if (edUi.node === 'manage:backup') manUi.sizes = null;
       edUi.q = '';
       edUi.drawer = false;
       edUi.notice = '';

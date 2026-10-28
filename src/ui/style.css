@@ -411,7 +411,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
 .gx-mbox { max-height: calc(min(100vh - 28px, 950px) - 222px); overflow-y: auto; }
 /* 커스텀 탭: PC 오른쪽 편성은 임무 탭과 같은 칸 너비·구조 (v0.16.21, 사용자 요청) */
 .gx-mlist { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; align-content: start; }
-.gx-mlist li.gx-mgrp { grid-column: 1 / -1; border: 0; background: none; box-shadow: none; padding: 6px 2px 0; font-size: 12px; font-weight: 700; color: var(--muted); display: flex; gap: 6px; align-items: baseline; }
+.gx-mlist li.gx-mgrp { grid-column: 1 / -1; border: 0; background: none; box-shadow: none; padding: 6px 2px 0; font-size: 12px; font-weight: 700; color: var(--dim); display: flex; gap: 6px; align-items: baseline; }
 .gx-mlist li.gx-mgrp:first-child { padding-top: 0; }
 .gx-mlist li.gx-mgrp small { font-weight: 400; }
 .gx-mapcol .gx-segs { align-self: flex-start; }

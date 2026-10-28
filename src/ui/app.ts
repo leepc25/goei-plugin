@@ -20,6 +20,7 @@ import { editorOnSettings, editorOpen, openEditor, render as editorRender, type 
 import { agentPanel, agentPopup, agUi, bindAgentTips, type AgentItem } from './agents';
 import css from './style.css';
 import { GHOST_ICON, ICONS } from './icons';
+import { labelSwitches } from './controls';
 import { bindMbar, mbarHtml } from './mbar';
 import { bindDrawer, closeDrawer, drawerHtml } from './drawer';
 import { addMark, isMarked, markCandidates, markPop, marks, markSlots, markUi, navHistBar, removeMarkAt } from './marks';
@@ -346,6 +347,8 @@ function ensureRoot(): HTMLElement {
   bindPeopleHold(root);
   document.addEventListener('keydown', (ev) => {
     if (ev.key !== 'Escape') return;
+    // 설정·세계 편집 창이 떠 있으면 그 창이 닫힌다 (editor/index.ts). 뒤의 패널까지 같이 닫지 않는다
+    if (editorOpen()) return;
     // 필드에서 Esc는 게임 일시정지 메뉴 (창을 닫지 않는다, 2026-10-23 사용자)
     if (tab === 'field' && view.kind === 'started') return;
     if (evUi.pop || agUi.pop) {
@@ -630,7 +633,13 @@ async function handle(action: string, value?: string): Promise<void> {
   if (evUi.pop && action !== 'ev-pop' && action !== 'end-event') evUi.pop = '';
   if (agUi.pop && action !== 'agent-info') agUi.pop = '';
   if (action.startsWith('adv-') && (view.kind === 'started' || (view.kind === 'picker' && pickerPrefs))) {
-    await handleAdvanced(action, value, view.ctx, { render, refresh }, view.kind === 'started' ? 'chat' : 'defaults');
+    // 범위: 시작 뒤엔 설정 창 범위(이 채팅/새 채팅 기본값). 시작 전엔 「고급」(gen)은 새 채팅 기본값, 기능 페이지(괴담넷·괴담톡·위키·필드)의
+    // 고급 칸은 그 페이지의 다른 값처럼 이 채팅 (2026-10-28 QC: 시작 전 기능 페이지에서 고급 칩을 누르면 기본값에만 적혀 화면이 안 바뀌었다)
+    const feat = (value ?? '').split(/[:=]/)[0];
+    // 기능 페이지(gn·ph·wk·hq·pp)는 범위 전환이 없고 늘 이 채팅 값을 보여 준다: 시작 뒤 범위가 「새 채팅 기본값」이어도 이 채팅에
+    // (2026-10-28 QC: 고급 페이지에서 기본값으로 바꿔 두고 괴담넷 고급 칩을 누르면 기본값에만 적혀 화면이 안 바뀌었다)
+    const scope = feat !== 'gen' ? 'chat' : view.kind === 'started' ? (settingsUi.scope === 'defaults' ? 'defaults' : 'chat') : 'defaults';
+    await handleAdvanced(action, value, view.ctx, { render, refresh }, scope);
     return;
   }
   // 시작 전(시작 패널 → 설정)에도 기능별 설정 페이지가 열려 있으면 그 기능의 단추를 받는다 (2026-10-26 사용자). chat 객체·scriptstate 는 있다
@@ -694,7 +703,10 @@ async function handle(action: string, value?: string): Promise<void> {
   }
   // visit-*: 필드 설정 화면 (2026-10-23: 이 경로가 없어 뒤로가기·기록 지우기가 안 먹었다)
   if (view.kind === 'started' && (action.startsWith('set-') || action.startsWith('visit-'))) {
-    if (!settingsUi.busy) await handleSettings(action, value, view.ctx, settingsEnv, settingsUi.scope === 'defaults' ? 'chat' : settingsUi.scope);
+    // 설정 창의 범위(이 채팅 / 새 채팅 기본값)를 그대로 따른다. 2026-10-28 QC: 「새 채팅 기본값」을 골라도 'chat' 으로 바꿔 보내서
+    // 화면은 기본값을 보여 주는데 값은 이 채팅에 적히던 문제. 테마만은 화면 페이지(범위 전환 없음)에 있어 시작 뒤엔 늘 이 채팅에
+    const scope = action === 'set-theme' ? 'chat' : settingsUi.scope === 'defaults' ? 'defaults' : 'chat';
+    if (!settingsUi.busy) await handleSettings(action, value, view.ctx, settingsEnv, scope);
     return;
   }
   if (action === 'upd-go') {
@@ -959,6 +971,9 @@ async function start(): Promise<void> {
     if (plan.seedMissing.length) console.log(`[goei] 시작 자료 누락: ${plan.seedMissing.join(', ')}`);
     busy = false;
     repick = false;
+    // 시작 전 설정 창은 「새 채팅 기본값」 범위였다. 시작한 뒤 처음 여는 설정 창은 이 채팅부터 (2026-10-28 QC)
+    settingsUi.scope = 'chat';
+    pickerPrefs = false;
     if (plan.kind === 'preset') {
       // 커스텀 임무: 창을 닫지 않고 바로 목표·동행 고르기로
       resetField(true);
@@ -1128,6 +1143,7 @@ function render(): void {
     if (el && gnKeep[i]) el.scrollTop = gnKeep[i];
   });
   hydratePhotos(root);
+  labelSwitches(root);
   bindMapZoom(root);
   bindMbar(root, () => void run('close'));
   bindDrawer(root, () => void run('mk-pop'));
@@ -1493,7 +1509,8 @@ function board(ctx: ChatContext): string {
     return `<div class="gx-empty"><p>이 채팅은 상황판 없이 시작했어요.</p>
       <p class="gx-muted">켜면 괴이·사건·특수가 발생하고, 다음 응답부터 모델이 상황판 태그를 함께 적어요.</p>
       ${notice ? `<div class="${noticeClass(notice)}" role="alert">${esc(notice)}</div>` : ''}
-      <button class="gx-start" data-action="world-on" ${busy ? 'disabled' : ''}>${busy ? '켜는 중…' : '상황판 켜기'}</button></div>`;
+      <button class="gx-start" data-action="world-on" ${busy ? 'disabled' : ''}>${busy ? '켜는 중…' : '상황판 켜기'}</button></div>${boardDrawer()}`;
+    // ↑ 상황판을 끈 채팅도 폰 하단 즐겨찾기 서랍은 그대로 (2026-10-28 QC: 꺼 두면 서랍째 사라졌다)
   }
   let catalog: Catalog;
   try {
