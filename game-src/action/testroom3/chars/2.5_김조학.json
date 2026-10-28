@@ -454,7 +454,7 @@
       "t": "v",
       "vfx": "x3-c-hit-spark-heavy",
       "at": "front",
-      "dx": 140,
+      "dx": 161,
       "scale": 0.6,
       "tint": "#bcd4e4",
       "r": 90,
@@ -666,7 +666,9 @@
            "hit": {
             "dmg": 82,
             "kind": "down"
-           }
+           },
+           "dx": 164,
+           "r": 42.5
           }
          ]
         }

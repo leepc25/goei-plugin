@@ -582,7 +582,7 @@
        "t": "v",
        "vfx": "x3-3.6-D-space-rift",
        "at": "front",
-       "dx": 120,
+       "dx": 138,
        "dy": -10,
        "scale": 1.1,
        "r": 70,
@@ -776,7 +776,8 @@
        "t": "dash",
        "speed": 700,
        "time": 0.2,
-       "hit": null
+       "hit": null,
+       "stop": true
       },
       {
        "t": "v",

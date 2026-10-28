@@ -653,7 +653,8 @@
       "t": "dash",
       "speed": 700,
       "time": 0.15,
-      "hit": null
+      "hit": null,
+      "stop": true
      },
      {
       "t": "melee",
@@ -699,7 +700,9 @@
             "kind": "light",
             "vfx": "x3-c-hit-spark-light",
             "tint": "#cfd6e0"
-           }
+           },
+           "dx": 170,
+           "r": 32.1
           },
           {
            "t": "tether",

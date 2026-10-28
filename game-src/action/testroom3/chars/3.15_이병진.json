@@ -615,7 +615,8 @@
         "t": "dash",
         "speed": 600,
         "time": 0.15,
-        "hit": null
+        "hit": null,
+        "stop": true
        },
        {
         "t": "v",
@@ -746,7 +747,9 @@
             "vfx": "x3-c-hit-spark-light",
             "vs": 1.6,
             "tint": "#ff8a8a"
-           }
+           },
+           "dx": 170,
+           "r": 32.1
           }
          ]
         }
@@ -772,7 +775,9 @@
             "vfx": "x3-c-hit-spark-light",
             "vs": 1.6,
             "tint": "#ff8a8a"
-           }
+           },
+           "dx": 170,
+           "r": 32.1
           }
          ]
         }

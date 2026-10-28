@@ -586,10 +586,57 @@ def build_char(cfg, force=False):
     payload = {k: v for k, v in cfg.items() if k not in ("anims",)}
     payload["reachY"] = reach_y(cfg, ("14", "7", "23"))   # 점프 공격: 가장 앞으로 나간 손발의 높이(장마다) → 맞는 높이(10-28 「점프 공격 타점이 안 맞음」)
     payload["turn19"] = turn_after_down(cfg)   # 쓰러진 뒤 잇는 줄인데 머리 방향이 반대로 그려진 줄(10-28 이기석 기기: 머리·발이 뿅 바뀜) → 방에서 몸 방향을 돌려 이음
+    payload["lie19"] = settled_loop(A.get("19"))   # 누운 반복 장(10-29)
+    payload["seam"] = seam_map(A)   # 동작 끝 → 대기 이음새(10-29)
     payload["chairAuto"] = chair_auto(cfg)   # 의자 자동 맞춤(chairfit.py). 손으로 맞춘 값은 설정 chars/<키>.json 의 "chair"가 이김
     js.write_text("(window.__C=window.__C||{})[" + json.dumps(key, ensure_ascii=False) + "]=" +
                   json.dumps({"cfg": payload, "A": A}, ensure_ascii=False, separators=(",", ":")) + ";\n", encoding="utf-8")
     return js.stat().st_size, rebuilt
+
+
+def settled_loop(a, thr=0.12):
+    """19 쓰러지기의 「다 누운 장」(1부터): 끝 장과 같은 자세인 꼬리 장들. 표의 반복 구간에 아직 무릎을 세운 장이 섞이면 되풀이될 때 활어처럼 퍼덕임(사용자 10-29).
+    방과 같은 바닥 기준(눕는 장은 mbot+3)·좌우 가운데(cx)로 맞춘 뒤 마스크 차이 비율 < thr 인 장만"""
+    if not a or a.get("n", 0) < 2: return None
+    sheet = Image.open(io.BytesIO(base64.b64decode(a["src"].split(",", 1)[1]))).convert("RGBA")
+    m = np.array(sheet)[:, :, 3] > 40; n, cw, ch = a["n"], a["cw"], a["ch"]
+    lf = a["bot"].index(min(a["bot"])) + 1
+    base = lambda f: a["mbot"][f] + 3 if f >= lf else min(a["h"] - 4, a["floor"])
+    def canvas(f):
+        fr = m[:, f * cw:(f + 1) * cw]; cv = np.zeros((a["h"] + 400, cw + 400), bool)
+        y0 = 300 - int(base(f)) + a["oy"]; x0 = 200 - int(a["cx"][f])
+        cv[y0:y0 + ch, x0:x0 + cw] = fr
+        return cv
+    last = canvas(n - 1); out = [n]
+    for f in range(n - 2, max(lf - 1, 0) - 1, -1):
+        c = canvas(f); u = (c | last).sum()
+        if u and (c ^ last).sum() / u < thr: out.insert(0, f + 1)
+        else: break
+    return out
+
+
+def seam_map(A):
+    """줄 끝 장 → 대기(3 또는 1) 첫 장의 마스크 차이 비율(몸 가운데·발 바닥 맞춤). 방이 되돌림 장을 넣을지 정함(10-29)"""
+    def masks(a):
+        sheet = Image.open(io.BytesIO(base64.b64decode(a["src"].split(",", 1)[1]))).convert("RGBA"); m = np.array(sheet)[:, :, 3] > 40
+        return [m[:, i * a["cw"]:(i + 1) * a["cw"]] for i in range(a["n"])]
+    def place(a, m, f):
+        cv = np.zeros((700, 700), bool); H, W = m.shape
+        x0 = 350 - int(a["cx"][f] + a["w"] / 2 - a["ox"]); y0 = 600 - int(a["bot"][f] - a["oy"])
+        x0 = max(0, min(700 - W, x0)); y0 = max(0, min(700 - H, y0)); cv[y0:y0 + H, x0:x0 + W] = m; return cv
+    firsts = {}
+    for st in ("3", "1"):
+        if st in A: firsts[st] = place(A[st], masks(A[st])[0], 0)
+    if not firsts: return {}
+    out = {}
+    for lid in ("9", "10", "11", "12", "13", "16", "16_1", "17", "18", "18_1", "20", "22", "24", "25", "26", "27", "28", "29", "30", "31", "32", "33", "34", "35"):
+        a = A.get(lid)
+        if not a or a["n"] < 2: continue
+        last = place(a, masks(a)[-1], a["n"] - 1); best = 1.0
+        for st, f0 in firsts.items():
+            u = (last | f0).sum(); d = (last ^ f0).sum() / u if u else 0; best = min(best, d)
+        out[lid] = round(float(best), 2)
+    return out
 
 
 def reach_y(cfg, ids):

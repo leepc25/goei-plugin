@@ -472,7 +472,7 @@
        "t": "v",
        "vfx": "x3-1.2-D-needle-burst",
        "at": "front",
-       "dx": 80,
+       "dx": 135,
        "r": 80,
        "delay": 0.06,
        "hit": {

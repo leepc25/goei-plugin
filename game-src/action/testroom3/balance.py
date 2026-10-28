@@ -22,7 +22,8 @@ GUN = {  # 원거리 기본공격: 약한 단발은 쿨타임 없이, 강한 것
     # 사용자 2026-10-26: 연속으로 계속 나가면 안 됨 → 연사(rapid)만 누른 채 연사 + 과열, 나머지는 한 번 누르면 한 발 + 최소 간격(쿨)
     # 사용자 2026-10-28: 단발은 쿨타임 넣지 말 것 → 단발(single·thrown·heavy·none)은 쿨타임 없이 한 번 누르면 한 발(동작 길이가 곧 간격)
     "single": dict(shotDmg=9), "thrown": dict(shotDmg=7),
-    "rapid": dict(shotDmg=6, heatPer=9), "heavy": dict(shotDmg=30), "none": dict(shotDmg=10)}
+    # 사용자 2026-10-29: 연타·강력한 원거리는 과열이나 쿨 필수, 단발인데 쿨 있는 건 쿨 제거 → heavy(30)만 쿨 2.5초, single·thrown·none은 쿨 없음
+    "rapid": dict(shotDmg=6, heatPer=9), "heavy": dict(shotDmg=30, cd=2.5), "none": dict(shotDmg=10)}
 # NPC(6.x): 종류 → (역할, 원거리, 손 빠르기, 피해 배율, 게임 HP)
 NPC = [("가짜관리국진압", "bruiser", "rapid", "normal", 1.1, 140), ("가짜관리국검사", "control", "single", "normal", 1.05, 120),
        ("관리국", "bruiser", "single", "normal", 1.0, 120), ("백일몽", "striker", "single", "fast", 1.0, 110),

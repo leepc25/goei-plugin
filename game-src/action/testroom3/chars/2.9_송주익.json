@@ -578,7 +578,8 @@
        "t": "dash",
        "speed": 1000,
        "time": 0.26,
-       "hit": null
+       "hit": null,
+       "stop": true
       },
       {
        "t": "v",
@@ -597,7 +598,7 @@
        "t": "v",
        "vfx": "x3-c-vertical-blade-line",
        "at": "front",
-       "dx": 95,
+       "dx": 161,
        "dy": 50,
        "scale": 0.9,
        "tint": "#3fe0d0",
@@ -647,13 +648,14 @@
       "t": "dash",
       "speed": 900,
       "time": 0.15,
-      "hit": null
+      "hit": null,
+      "stop": true
      },
      {
       "t": "v",
       "vfx": "x3-c-slash-arc",
       "at": "front",
-      "dx": 100,
+      "dx": 160,
       "scale": 0.6,
       "rot": -0.6,
       "tint": "#bff7f0",
@@ -663,7 +665,8 @@
        "vfx": "x3-c-hit-spark-light",
        "vs": 2,
        "tint": "#bff7f0"
-      }
+      },
+      "r": 91.7
      }
     ],
     "1": [
@@ -705,7 +708,8 @@
       "t": "dash",
       "speed": 1300,
       "time": 0.55,
-      "hit": null
+      "hit": null,
+      "stop": true
      },
      {
       "t": "v",
@@ -736,7 +740,8 @@
            "vfx": "x3-c-hit-spark-heavy",
            "vs": 0.8,
            "tint": "#bff7f0"
-          }
+          },
+          "dx": 161
          },
          {
           "t": "v",

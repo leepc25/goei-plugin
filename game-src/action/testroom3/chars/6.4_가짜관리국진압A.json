@@ -253,7 +253,7 @@
          "t": "v",
          "vfx": "x3-c-ground-shockwave",
          "at": "front",
-         "dx": 90,
+         "dx": 167,
          "scale": 0.4,
          "tint": "#d8cfb4",
          "hit": {

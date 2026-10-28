@@ -687,7 +687,8 @@
        "t": "dash",
        "speed": 520,
        "time": 0.15,
-       "hit": null
+       "hit": null,
+       "stop": true
       },
       {
        "t": "v",
@@ -716,7 +717,8 @@
        "t": "dash",
        "speed": 520,
        "time": 0.15,
-       "hit": null
+       "hit": null,
+       "stop": true
       },
       {
        "t": "v",
@@ -745,7 +747,8 @@
        "t": "dash",
        "speed": 520,
        "time": 0.15,
-       "hit": null
+       "hit": null,
+       "stop": true
       },
       {
        "t": "v",

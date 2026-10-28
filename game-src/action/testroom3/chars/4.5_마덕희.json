@@ -479,18 +479,22 @@
     ],
     "2": [
      {
-      "t": "v",
-      "vfx": "x3-c-hit-spark-heavy",
-      "at": "front",
-      "dx": 90,
-      "h": 70,
-      "scale": 1.2
+      "t": "melee",
+      "range": 190,
+      "hit": {
+       "dmg": 95,
+       "kind": "down",
+       "stop": 0.16,
+       "shake": 12,
+       "vfx": "x3-c-hit-spark-heavy",
+       "vs": 1
+      }
      },
      {
       "t": "v",
       "vfx": "x3-c-ground-crack",
       "at": "front",
-      "dx": 90,
+      "dx": 142,
       "scale": 0.8,
       "under": true
      },
@@ -498,17 +502,17 @@
       "t": "v",
       "vfx": "x3-c-ground-shockwave",
       "at": "front",
-      "dx": 90,
-      "scale": 0.8,
+      "dx": 142,
+      "scale": 0.9,
+      "r": 240,
       "tint": "#C9A24A",
       "under": true,
+      "delay": 0.12,
       "hit": {
-       "dmg": 136,
-       "kind": "down",
-       "stop": 0.16,
-       "shake": 12,
+       "dmg": 41,
+       "kind": "launch",
        "vfx": "x3-c-hit-spark-heavy",
-       "vs": 1
+       "vs": 0.8
       }
      },
      {
@@ -691,7 +695,7 @@
          "t": "v",
          "vfx": "x3-c-hit-spark-heavy",
          "at": "front",
-         "dx": 90,
+         "dx": 134,
          "h": 70,
          "scale": 1.4,
          "hit": {
@@ -699,7 +703,8 @@
           "kind": "down",
           "stop": 0.2,
           "shake": 16
-         }
+         },
+         "r": 57.9
         },
         {
          "t": "v",

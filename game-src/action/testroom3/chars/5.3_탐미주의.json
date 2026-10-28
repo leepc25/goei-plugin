@@ -488,9 +488,9 @@
         "vfx": "x3-c-shard-burst",
         "at": "self",
         "h": 110,
-        "scale": 2,
+        "scale": 1.6,
         "tint": "#e8e4dc",
-        "r": 105,
+        "r": 134.4,
         "hit": {
          "dmg": 82,
          "kind": "heavy"

@@ -511,7 +511,7 @@
        "t": "v",
        "vfx": "x3-3.3-D-green-palm-print",
        "at": "front",
-       "dx": 60,
+       "dx": 145,
        "r": 70,
        "hit": {
         "dmg": 17,
@@ -530,7 +530,7 @@
        "t": "v",
        "vfx": "x3-3.3-D-green-palm-print",
        "at": "front",
-       "dx": 60,
+       "dx": 145,
        "r": 70,
        "hit": {
         "dmg": 17,
@@ -591,7 +591,7 @@
       "t": "v",
       "vfx": "x3-c-slash-arc",
       "at": "hand",
-      "dx": 30,
+      "dx": 93,
       "scale": 0.8,
       "rot": 0.7,
       "tint": "#2E8B57",
@@ -738,7 +738,8 @@
          "t": "dash",
          "speed": 900,
          "time": 0.22,
-         "hit": null
+         "hit": null,
+         "stop": true
         },
         {
          "t": "v",

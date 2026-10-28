@@ -489,7 +489,8 @@
        "t": "dash",
        "speed": 900,
        "time": 0.22,
-       "hit": null
+       "hit": null,
+       "stop": true
       },
       {
        "t": "v",

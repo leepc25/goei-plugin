@@ -464,7 +464,7 @@
       "t": "v",
       "vfx": "x3-c-hit-spark-heavy",
       "at": "front",
-      "dx": 120,
+      "dx": 151,
       "h": 60,
       "scale": 1.1,
       "hit": {
@@ -472,7 +472,8 @@
        "kind": "down",
        "stop": 0.16,
        "shake": 12
-      }
+      },
+      "r": 58.2
      },
      {
       "t": "v",
@@ -487,7 +488,8 @@
       "t": "dash",
       "speed": 1500,
       "time": 0.25,
-      "hit": null
+      "hit": null,
+      "stop": true
      },
      {
       "t": "later",
@@ -505,10 +507,10 @@
         "t": "v",
         "vfx": "x3-c-ground-shockwave",
         "at": "self",
-        "scale": 0.8,
+        "scale": 0.93,
         "tint": "#fff6c0",
         "under": true,
-        "r": 230,
+        "r": 231.2,
         "hit": {
          "dmg": 82,
          "kind": "down",

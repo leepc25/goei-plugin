@@ -390,10 +390,10 @@
        "t": "v",
        "vfx": "x3-c-ground-shockwave",
        "at": "self",
-       "scale": 0.7,
+       "scale": 0.93,
        "tint": "#5A6FC0",
        "under": true,
-       "r": 170,
+       "r": 231.2,
        "depth": 90,
        "hit": {
         "dmg": 102,

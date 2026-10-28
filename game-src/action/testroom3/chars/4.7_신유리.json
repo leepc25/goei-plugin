@@ -552,7 +552,7 @@
         "t": "v",
         "vfx": "x3-c-hit-spark-heavy",
         "at": "front",
-        "dx": 70,
+        "dx": 151,
         "h": 20,
         "scale": 1.1,
         "hit": {
@@ -560,7 +560,8 @@
          "kind": "down",
          "stop": 0.18,
          "shake": 14
-        }
+        },
+        "r": 58.2
        },
        {
         "t": "v",

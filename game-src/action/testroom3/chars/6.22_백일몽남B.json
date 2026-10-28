@@ -289,13 +289,14 @@
       "t": "v",
       "vfx": "x3-c-slash-arc",
       "at": "front",
-      "dx": 70,
+      "dx": 142,
       "scale": 0.8,
       "tint": "#9a9a9a",
       "hit": {
        "dmg": 55,
        "kind": "light"
-      }
+      },
+      "r": 91.2
      }
     ],
     "1": [
@@ -303,7 +304,8 @@
       "t": "dash",
       "speed": 1200,
       "time": 0.25,
-      "hit": null
+      "hit": null,
+      "stop": true
      },
      {
       "t": "repeat",
@@ -343,7 +345,8 @@
       "t": "dash",
       "speed": 1200,
       "time": 0.25,
-      "hit": null
+      "hit": null,
+      "stop": true
      },
      {
       "t": "repeat",

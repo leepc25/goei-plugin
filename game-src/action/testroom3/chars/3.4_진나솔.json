@@ -760,7 +760,9 @@
           "noVfx": true,
           "stop": 0.03,
           "shake": 2
-         }
+         },
+         "dx": 170,
+         "r": 32.1
         }
        ]
       }
@@ -773,7 +775,8 @@
        "t": "dash",
        "speed": 1800,
        "time": 0.45,
-       "hit": null
+       "hit": null,
+       "stop": true
       },
       {
        "t": "v",
@@ -815,7 +818,9 @@
           "kind": "launch",
           "stop": 0.18,
           "shake": 14
-         }
+         },
+         "dx": 170,
+         "r": 28.1
         }
        ]
       }

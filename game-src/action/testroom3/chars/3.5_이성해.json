@@ -594,7 +594,7 @@
       "t": "v",
       "vfx": "x3-c-hit-spark-heavy",
       "at": "front",
-      "dx": 80,
+      "dx": 166,
       "dy": -30,
       "scale": 0.7,
       "tint": "#5EC4D6",

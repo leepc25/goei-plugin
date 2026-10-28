@@ -757,9 +757,9 @@
         "t": "v",
         "vfx": "x3-2.10-S-bullet-dirt",
         "at": "front",
-        "dx": 110,
+        "dx": 170,
         "scale": 0.8,
-        "r": 45,
+        "r": 56.2,
         "hit": {
          "dmg": 19,
          "kind": "light",
@@ -1062,10 +1062,10 @@
         "t": "v",
         "vfx": "x3-c-ground-shockwave",
         "at": "self",
-        "scale": 0.45,
+        "scale": 0.93,
         "tint": "#ffffff",
         "under": true,
-        "r": 150,
+        "r": 231.2,
         "hit": {
          "dmg": 49,
          "kind": "heavy"

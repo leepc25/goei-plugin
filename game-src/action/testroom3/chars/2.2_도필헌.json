@@ -420,7 +420,7 @@
       "t": "v",
       "vfx": "x3-c-air-ring",
       "at": "front",
-      "dx": 110,
+      "dx": 117,
       "scale": 1.4,
       "tint": "#C9A046",
       "r": 70,
@@ -496,13 +496,14 @@
         "t": "v",
         "vfx": "x3-c-ground-shockwave",
         "at": "self",
-        "scale": 0.7,
+        "scale": 0.93,
         "under": true,
         "tint": "#C9A046",
         "hit": {
          "dmg": 36,
          "kind": "heavy"
-        }
+        },
+        "r": 231.2
        }
       ]
      }
@@ -579,7 +580,7 @@
          "t": "v",
          "vfx": "x3-c-air-ring",
          "at": "front",
-         "dx": 110,
+         "dx": 117,
          "scale": 1.4,
          "tint": "#C9A046",
          "r": 70,
@@ -603,7 +604,7 @@
          "t": "v",
          "vfx": "x3-c-slash-arc",
          "at": "front",
-         "dx": 100,
+         "dx": 151,
          "dy": -30,
          "scale": 0.7,
          "rot": -0.6,
@@ -611,7 +612,8 @@
          "hit": {
           "dmg": 67,
           "kind": "launch"
-         }
+         },
+         "r": 91.4
         }
        ]
       }

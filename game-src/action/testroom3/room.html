@@ -70,7 +70,7 @@ const cf = (id, f) => Math.max(0, Math.min(nOf(id) - 1, f));
 const LP = id => { const l = CH.loops && CH.loops[id]; return l && l.length ? l.map(f => cf(id, f - 1)) : null; };
 const PK = (name, id) => cf(id, ((CH.picks || {})[name] || nOf(id)) - 1);
 const idleId = () => has('3') ? '3' : '1';
-const BASE = a => a.h - 4;   // 땅 동작 기준선: 캔버스 아래 4px
+const BASE = a => Math.min(a.h - 4, a.floor);   // 땅 동작 기준선: 캔버스 아래 4px. 그 줄의 가장 낮은 점이 그보다 위면(PixelLab이 몸을 위쪽에 그림) 그 점을 땅으로(10-29 사용자: 서 있을 때 발보다 높이 쓰러지고 그림자와 벌어짐)
 const arcOf = id => CH.arc && CH.arc[id];
 const ROOT = new Set(['38_1', '40', '37_1', '42_1']);   // 기는 동작: 몸을 제자리에 두고 이동은 코드로
 // 누운·앉은 동작은 PixelLab이 몸을 캔버스 위쪽에 그려서 떠 보임 → 그 장의 맨 아래 픽셀을 바닥에 맞춤(사용자 2026-10-25)
@@ -433,7 +433,7 @@ const FX = {
     if (showDummy && Math.abs(D.y - P.y) < 30 + w && (D.x - P.x) * P.face > 0) strike(s.hit || { dmg: 30 * lv, kind: lv >= 2 ? 'launch' : 'heavy' }, p.y);
   },
   // 앞 범위 타격(그림 없는 판정 상자)
-  melee(s, c) { const r = (s.range || 170) * K(P.y), x = P.x + P.face * r * 0.6; if (near(x, P.y, r * 0.6 + 30, s.depth || 64) && (D.x - P.x) * P.face > -20) strike(s.hit); },
+  melee(s, c) { const r = Math.max(s.range || 170, 175) * K(P.y), x = P.x + P.face * r * 0.6;   // 평타(170)만큼은 닿게(10-29: 140 같은 짧은 사거리는 평타 거리의 상대를 못 맞혔음) if (near(x, P.y, r * 0.6 + 30, s.depth || 64) && (D.x - P.x) * P.face > -20) strike(s.hit); },
   // 바닥 가시: 검은 바늘 n개가 솟음
   spikes(s, c) {
     const p = posOf({ at: 'front', ...s }, c), n = s.n || 5, sp = (s.spread || 70) * p.k;
@@ -599,7 +599,10 @@ const COMMON = {
 
 // ── 흐름 ──
 function toIdle() { P.mode = 'ground'; P.clip = null; P.combo = 0; P.idleT = 0; P.inSuper = false; }
-function act(id, o = {}) { P.mode = o.mode || 'act'; play(id, { ...o, onEnd: o.onEnd || (() => afterBuf(toIdle)) }); }
+// 동작 끝 → 대기 자세로 뚝 끊기는 줄(빌드가 잰 이음새 seam ≥ 0.35)은 끝 장에서 두 장 거꾸로 짧게 되짚어 자세를 되돌린 뒤 대기(10-29 사용자: 동작 사이가 뚝뚝 끊김). 다음 입력을 예약했으면 바로 넘어감
+const needReturn = id => !!(CH.seam && CH.seam[id] >= 0.35 && A[id] && A[id].n >= 4);
+const returnSeq = id => { const n = A[id].n; return S([n - 2, Math.max(0, n - 4)], 0.045); };
+function act(id, o = {}) { P.mode = o.mode || 'act'; const end = o.onEnd || (() => afterBuf(toIdle)); play(id, { ...o, onEnd: !o.onEnd && !o.seq ? (() => { if (!P.buf && needReturn(id)) { P.clip = null; play(id, { seq: returnSeq(id), onEnd: end }); } else end(); }) : end }); }
 function reverseOut(id, frames, d, then) { P.mode = 'act'; play(id, { seq: S(frames, d), onEnd: then || (() => afterBuf(toIdle)) }); }
 // 무기 있는 인물: 꺼내기(W) → 무기 자세 장. 무기 없는 인물: 꺼내기 없이 바로 겨눈 자세(W-1)
 function ensureArmed(then) {
@@ -792,7 +795,8 @@ function takeHit(kind) {
 }
 // 공격 종류 → 피격 동작(사용자 2026-10-25): 약 = 맞기 상단(18) · 강 = 맞기 하단(18-1) · 날리기 = 크게 밀려나기(18-2) · 띄우기 = 띄워지기(18-3) · 다운 = 쓰러지기(19) · 누운 채 = 움찔(43) · HP 0 = 사망(44 서서 / 45 누워서)
 function hitAs(id, push, dmg, d = 0.055) { if (!has(id)) return hit(); gainSp(10); sfx('hurt', { strength: 2 }); P.combat = true; P.combo = 0; P.armed = false; pushP(push, 1100); flash = 0.05; shake = Math.max(shake, 6); P.hp = Math.max(1, P.hp - dmg); act(id, { seq: [{ f: 0, d: 0.02 }, ...S(R(1, nOf(id) - 1), d)] }); }
-function lieLoop() { const n = nOf('19'), lp = LP('19') || [n - 1]; P.mode = 'down'; play('19', { seq: lp.map(f => ({ f, d: lp.length <= 2 ? 0.6 : 0.3 })), loopFrom: 0 }); }
+const LIE19 = () => CH.lie19 && CH.lie19.length ? CH.lie19.map(f => cf('19', f - 1)) : LP('19');   // 누운 반복 = 빌드가 잰 「다 누운 장」만(10-29: 표의 반복 구간에 무릎 세운 장이 섞여 활어처럼 퍼덕임)
+function lieLoop() { const n = nOf('19'), lp = LIE19() || [n - 1]; P.mode = 'down'; play('19', { seq: lp.map(f => ({ f, d: lp.length <= 2 ? 0.6 : 0.3 })), loopFrom: 0 }); }
 function launched() {
   if (!has('18_3')) return knock();
   gainSp(20); sfx('hurt', { strength: 2 }); P.combat = true; P.combo = 0; P.armed = false; pushP(-380, 700); shake = 8; P.hp = Math.max(1, P.hp - 18);
@@ -815,7 +819,7 @@ function hit() { if (!has('18')) return; gainSp(10); sfx('hurt'); P.combat = tru
 function knock() {
   if (!has('19')) return hit();
   gainSp(20); sfx('hurt', { strength: 2 }); P.combat = true; P.combo = 0; P.armed = false; if (CH.fallRev) P.face = -P.face; pushP(CH.fallRev ? 560 : -560, 650);   // fallRev: 19가 앞으로 엎어지게 그려진 인물 → 몸을 돌려 맞은 반대쪽에 머리가 떨어지게(10-28 이성해 등) shake = 8; P.hp = Math.max(1, P.hp - 18);
-  const n = nOf('19'), lp = LP('19') || [n - 1], fall = R(0, Math.max(0, lp[0] - 1));
+  const n = nOf('19'), lp = LIE19() || [n - 1], fall = R(0, Math.max(0, lp[0] - 1));
   P.mode = 'act';
   const dustAt = Math.max(1, Math.round(fall.length * 0.65));
   play('19', { seq: [...S(fall, 0.07).map((e, i) => i === dustAt ? { ...e, ev: 'dust' } : e), ...lp.map(f => ({ f, d: lp.length <= 2 ? 0.6 : 0.3 }))], loopFrom: fall.length });

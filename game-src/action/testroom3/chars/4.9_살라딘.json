@@ -361,14 +361,15 @@
        "t": "v",
        "vfx": "x3-c-slash-arc",
        "at": "front",
-       "dx": 100,
+       "dx": 142,
        "h": 100,
        "scale": 0.8,
        "tint": "#e8ecf4",
        "hit": {
         "dmg": 36,
         "kind": "light"
-       }
+       },
+       "r": 91.2
       },
       {
        "t": "proj",
@@ -401,14 +402,15 @@
        "t": "v",
        "vfx": "x3-c-slash-arc",
        "at": "front",
-       "dx": 100,
+       "dx": 137,
        "h": 100,
        "scale": 0.85,
        "tint": "#e8ecf4",
        "hit": {
         "dmg": 42,
         "kind": "heavy"
-       }
+       },
+       "r": 91.8
       },
       {
        "t": "proj",
@@ -463,10 +465,10 @@
       "t": "v",
       "vfx": "x3-c-ground-shockwave",
       "at": "self",
-      "scale": 0.8,
+      "scale": 0.93,
       "tint": "#3A8FE0",
       "under": true,
-      "r": 230,
+      "r": 231.2,
       "hit": {
        "dmg": 50,
        "kind": "heavy"
@@ -549,7 +551,7 @@
         "t": "v",
         "vfx": "x3-c-dust-puff",
         "at": "front",
-        "dx": 130,
+        "dx": 143,
         "scale": 1.2,
         "tint": "#9fc4ec",
         "r": 60,
