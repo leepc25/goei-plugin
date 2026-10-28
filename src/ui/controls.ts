@@ -17,3 +17,15 @@ export function onOffSwitch(items: [string, string][], cur: string, action: stri
   const on = cur === onV;
   return switchHtml({ action, value: valueOf(on ? offV : onV), on, disabled });
 }
+
+/**
+ * 이름 없는 스위치에 줄 이름을 aria-label 로 붙인다 (2026-10-28 QC: seg 도우미가 만든 스위치는 글자가 없어 읽어 주기가 「버튼」뿐이었다).
+ * 그린 뒤 한 번 훑는다 (패널·편집 창 render 끝에서). 줄(.ps-row·.dir-line·.st-col-row)의 이름 글자를 쓴다
+ */
+export function labelSwitches(root: ParentNode): void {
+  root.querySelectorAll<HTMLButtonElement>('button.gx-switch[role="switch"]:not([aria-label])').forEach((b) => {
+    const row = b.closest<HTMLElement>('.ps-row, .dir-line, .st-col-row, .dir-in');
+    const name = row?.querySelector<HTMLElement>('.ps-label > b, .st-col-name > b, :scope > span:first-child')?.textContent?.replace(/\s+/g, ' ').trim();
+    if (name) b.setAttribute('aria-label', name);
+  });
+}
