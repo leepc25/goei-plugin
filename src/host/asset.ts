@@ -36,6 +36,9 @@ export async function supplementAssets(t: AssetTarget): Promise<void> {
     // 명부 + 설정(이미지 지침)의 대상 목록·표정 세트로 자료를 조립한다 (메인 모델 지침과 같은 목록)
     const cfg = imgPromptConfig(getPrefs());
     const picked = imgCharacters(t.lore, cfg, { assetPlayer: s.assetPlayer, playerEnglish: agent?.english || undefined, userName: userInfo().name });
+    // 출력 대상을 설정에서 전부 껐으면 보충하지 않는다. imageDataFrom 은 빈 목록을 「명부 전부」로 읽어서, 다 꺼도 보조 모델이 명부 전원에게
+    // 태그를 붙였다(메인 모델 경로 body.ts withImgPrompt 는 지침을 안 넣음). 2026-10-28 QC (tests/browser.mjs 16절)
+    if (!picked.length) throw new AssetError('이미지 자료 오류 (characters): 출력 대상이 없습니다. 명부에 요원이 있는지, 설정에서 전부 끄지 않았는지 확인하세요.');
     const tuned = imageDataFrom(t.lore, picked, cfg.keywords);
     const data = s.assetPlayer ? withUser(tuned, agent ? undefined : userInfo().name) : tuned;
     const exclude = agent && !s.assetPlayer ? [agent.english, data.aliases.get(agent.name.toLowerCase())].filter((v): v is string => typeof v === 'string' && !!v) : [];
