@@ -22,7 +22,7 @@ const server = createServer(async (req, res) => {
 });
 await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
 const url = `http://127.0.0.1:${server.address().port}`;
-const browser = await chromium.launch({ executablePath: process.env.CHROMIUM_PATH || '/usr/bin/chromium', headless: true, args: ['--no-sandbox'] });
+const browser = await chromium.launch({ executablePath: process.env.CHROMIUM_PATH || undefined, headless: true, args: ['--no-sandbox'] });
 const errors = [];
 const ctx = await browser.newContext({ viewport: { width: 1280, height: 900 } });
 const page = await ctx.newPage();
@@ -35,8 +35,8 @@ const snapshot = () => page.evaluate(() => {
 async function skipStory() {
   for (let i = 0; i < 6; i++) {
     for (const selector of ['.gsy-vskip', '.gsy-skip']) {
-      const button = page.locator(selector);
-      if (await button.isVisible()) await button.click();
+      // 건너뛰기 단추는 영상 위에서 깜빡여 Playwright 의 「안정」 판정을 못 받는다: DOM 클릭으로
+      await page.evaluate((sel) => { const b = document.querySelector(sel); if (b && b.offsetParent) b.click(); }, selector);
     }
     await page.waitForTimeout(100);
   }
@@ -51,12 +51,19 @@ async function deploy() {
     w.stage.onInteract(w.api, w.floor, w.props.find(p => p.id === 'spot:jaemtri'));
   });
   await page.locator('[data-mission="m1"]').click();
+  if (await page.locator('[data-act="brief"]').isDisabled()) throw new Error(`브리핑 단추 비활성: ${(await page.locator('.goei-engine-hq').innerText()).replace(/\s+/g, ' ').slice(0, 400)}`);
   await page.locator('[data-act="brief"]').click();
   await page.locator('[data-act="deploy"]').click();
+  // 출동 준비 → B3 주차장 승합차 앞에서 E (사용자 2026-10-25)
+  await page.waitForFunction(() => !document.querySelector('[data-act=deploy]'));
+  await page.evaluate(() => window.__goeiEngine.world.stage.jump('b3', 370, 470));
+  await page.waitForFunction(() => window.__goeiEngine.world?.floor?.id === 'hq:b3' && window.__goeiEngine.world.props.some((q) => q.id === 'spot:van'));
+  await page.waitForTimeout(300);
+  await page.keyboard.press('KeyE');
   await skipStory();
   await page.waitForFunction(() => window.__goeiEngine?.world && !window.__goeiEngine.inHub);
   const s = await snapshot();
-  assert.equal(s.hq.active.agent, 'jyaldi');
+  assert.equal(s.hq.active.agent, 'eileen'); // 주인공은 에일린 (engine/modules.ts runAgent)
   assert.equal(s.hq.active.runId, s.checkpoint.run.launch.runId);
   return s.hq.active.runId;
 }

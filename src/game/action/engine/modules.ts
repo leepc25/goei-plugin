@@ -91,10 +91,15 @@ let observing = false;
 const observerOn = () => observing;
 const wonText = (n: number) => `${n < 0 ? '−' : ''}₩ ${Math.abs(Math.trunc(n)).toLocaleString('en-US')}`;
 
-function hqAdapter(saves: SaveSlots, bridge: Partial<GameBridge> | undefined, ui: { chooseFloor: HubHost['chooseFloor']; sfx: (n: string) => void; closed?: () => void; resuming?: () => boolean; overlay?: HubHost['overlay']; rules?: () => ClockRules; choose?: (o: { title: string; lines?: string[]; options: string[]; cancel?: boolean }) => Promise<number> }): HqModuleLike & { close(): void; goto(place: string): void; state(): { day: number; rescued: string[] }; visitReady: Promise<void>; visitor(): { agentId: string; name: string } } {
+function hqAdapter(saves: SaveSlots, bridge: Partial<GameBridge> | undefined, ui: { chooseFloor: HubHost['chooseFloor']; sfx: (n: string) => void; closed?: () => void; resuming?: () => boolean; overlay?: HubHost['overlay']; rules?: () => ClockRules; choose?: (o: { title: string; lines?: string[]; options: string[]; cancel?: boolean }) => Promise<number> }): HqModuleLike & { close(): void; goto(place: string): void; state(): { day: number; rescued: string[] }; visitReady: Promise<void>; visitor(): { agentId: string; name: string }; dispose(): void } {
   const hq = createHq();
   const b = bridge as (Partial<GameBridge> & { slot?: number; photo?: (name: string) => string | undefined }) | undefined;
   const slot = b?.slot ?? 0;
+  // 필드 시각·장소·잔고·관찰 창은 모듈 변수라 게임을 닫았다 다시 열어도 남아 있었다 (다른 채팅의 시각이 이어지고 본편 시각을 다시 읽지 않음). 열 때마다 새로
+  fieldClock.sec = null;
+  fieldClock.place = '';
+  fieldWallet.won = null;
+  observing = false;
   // 본부 걷기는 엔진 벨트 장면(engine/hub.ts): 건물 지도는 본부 모듈 map(), 엔진은 장면 옮기기·그리기. 메뉴 창(DOM)만 본부 모듈이 띄운다
   let root: HTMLElement | null = null;
   // 본부 방문: 상태 태그로 정한 방(사무실·휴게실·의무실)에 요원을 세운다. 들어가기 전에 한 번 읽는다
@@ -150,8 +155,10 @@ function hqAdapter(saves: SaveSlots, bridge: Partial<GameBridge> | undefined, ui
   const seed = seedParam ? (Number(seedParam) >>> 0 || hashSeed(seedParam)) : (Date.now() >>> 0);
   let sim: WorldSim | null = null;
   // 모델 대화 한 번(창을 열고 닫을 때까지) = 시계 +10분 (사용자 확정 2026-10-26)
-  if (typeof window !== 'undefined') window.addEventListener('goei:talk-closed', () => { if (fieldClock.sec !== null) fieldClock.sec += rules().talk * 60; });
-  if (typeof window !== 'undefined') window.addEventListener('keydown', (e) => { if (e.key === 'F9' || e.key === '`') { observing = !observing; e.preventDefault(); } });
+  // 창(window) 리스너는 dispose에서 뗀다 (떼지 않으면 열고 닫을 때마다 쌓여 대화 한 번에 시계가 n번 가고 F9가 두 번 눌린 셈이 됐다)
+  const onTalkClosed = () => { if (fieldClock.sec !== null) fieldClock.sec += rules().talk * 60; };
+  const onObserveKey = (e: KeyboardEvent) => { if (e.key === 'F9' || e.key === '`') { observing = !observing; e.preventDefault(); } };
+  if (typeof window !== 'undefined') { window.addEventListener('goei:talk-closed', onTalkClosed); window.addEventListener('keydown', onObserveKey); }
   const world = () => {
     if (!sim && ready) {
       sim = createHqWorld(hq.map(), seed, present.filter((p) => ROOM_SCENE[p.room]).map((p) => ({ name: p.name, scene: ROOM_SCENE[p.room] })), hasVisitClip, { stance: (f) => factionBy.get(f)?.stage ?? null });
@@ -281,7 +288,8 @@ function hqAdapter(saves: SaveSlots, bridge: Partial<GameBridge> | undefined, ui
           if (!o) return;
           if (fieldClock.sec !== null) fieldClock.sec += o.minutes * 60;
           const at = fieldClock.sec === null ? '' : clockText(fieldClock.sec);
-          if (at) void b?.field?.record({ kind: 'wait', text: `${fieldClock.place || '필드'}에서 시간을 보냈다 (${at})`, scene: fieldClock.place || undefined, weight: 1, fact: { key: '필드 시각', value: at } }).catch(() => {});
+          // 장부 사건 종류에 'wait'는 없다 (core/field.ts KINDS): 넣어도 버려져 시각 사실이 안 남았다 → 행동(act)으로
+          if (at) void b?.field?.record({ kind: 'act', text: `${fieldClock.place || '필드'}에서 시간을 보냈다 (${at})`, scene: fieldClock.place || undefined, weight: 1, fact: { key: '필드 시각', value: at } }).catch(() => {});
         }).catch(() => {});
       },
       armed: () => hq.armed(),
@@ -328,6 +336,13 @@ function hqAdapter(saves: SaveSlots, bridge: Partial<GameBridge> | undefined, ui
       if (l) hq.onReturn({ ...(r as unknown as RunResult), runId: (r as unknown as RunResult).runId ?? l.runId } as RunResult, l);
     },
     unmount: () => hq.unmount(),
+    dispose: () => {
+      if (typeof window !== 'undefined') { window.removeEventListener('goei:talk-closed', onTalkClosed); window.removeEventListener('keydown', onObserveKey); }
+      eileenHooks.extraTargets = undefined;
+      const g = globalThis as { __goeiWorld?: unknown; __goeiWallet?: unknown };
+      delete g.__goeiWorld;
+      delete g.__goeiWallet;
+    },
   };
 }
 
@@ -521,6 +536,7 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
   });
   // 출동 지도 (Z·Tab·M, 터치 「지도」): 열린 동안 게임이 멈춘다. 구석 미니맵은 늘
   let mapOpen = false;
+  let touchHiddenByHq = false;
   let guardA = 0; // 방어 게이지 불투명도
   const offMapKey = shell.input.on((code, down) => {
     if (!down) return;
@@ -896,6 +912,12 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
     },
     onPlay: () => shell.play(),
     frame: (dt) => {
+      // 본부 메뉴 창(임무 창구 등)·엘리베이터 층 단추가 떠 있으면 터치 조작을 숨긴다: 폰에서 왼쪽 스틱 영역이 창 위에 겹쳐 단추를 못 눌렀다 (NPC 대화창과 같은 규칙)
+      const hqUp = !!game?.inHub && (!!hq.isOpen?.() || !floorBox.hidden);
+      if (hqUp !== touchHiddenByHq) {
+        touchHiddenByHq = hqUp;
+        shell.touch.setVisible(!hqUp && shell.mode === 'play' && !shell.menu.isOpen && !npc.isOpen());
+      }
       ffx.opt = { shake: shell.settings.shake, flash: shell.settings.flash, numbers: shell.settings.numbers };
       ffx.update(shell.paused ? 0 : dt);
       { const o = ffx.camera(); shell.canvas.style.translate = o.x || o.y ? `${o.x}px ${o.y}px` : ''; }
@@ -1088,6 +1110,7 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
       if (openingT) clearTimeout(openingT);
       window.removeEventListener('keydown', hqKeys, true);
       window.removeEventListener('keydown', floorKeys, true);
+      hq.dispose();
       saveFlags();
       storyRoot.removeEventListener(VIDEO_AUDIO_EVENT, attachVideoAudio);
       story.dispose();

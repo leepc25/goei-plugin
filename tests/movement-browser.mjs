@@ -6,7 +6,8 @@ import { createRequire } from 'node:module';
 import { createServer } from 'node:http';
 import { readFile, mkdir } from 'node:fs/promises';
 const require=createRequire(import.meta.url);
-const {chromium}=require(process.env.PLAYWRIGHT_MODULE||'/opt/codex/cua_node/lib/node_modules/playwright');
+let chromium;
+try { ({ chromium } = require(process.env.PLAYWRIGHT_MODULE || 'playwright')); } catch { ({ chromium } = require('/opt/codex/cua_node/lib/node_modules/playwright')); }
 const fixture=await build({stdin:{contents:`
 import {Game} from './src/game/action/engine/game';
 import {loadArt} from './src/game/action/engine/art';
@@ -25,7 +26,7 @@ const server=createServer(async(req,res)=>{
  }catch(e){res.writeHead(500).end(String(e))}
 });
 await new Promise(r=>server.listen(0,'127.0.0.1',r));
-const browser=await chromium.launch({executablePath:process.env.CHROMIUM_PATH||'/usr/bin/chromium',headless:true,args:['--no-sandbox']});
+const browser=await chromium.launch({executablePath:process.env.CHROMIUM_PATH||undefined,headless:true,args:['--no-sandbox']});
 const errors=[],shots=process.env.SHOTS;
 if(shots)await mkdir(shots,{recursive:true});
 try{

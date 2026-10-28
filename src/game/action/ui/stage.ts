@@ -111,6 +111,8 @@ export function mountStage(box: HTMLElement): Stage {
       crt ??= mountCrt(stageEl, canvas);
       if (crt) crt.setOn(on, mode === 'curved');
       root.classList.toggle('crt', on && !crt);
+      // 켜짐 표식(WebGL·CSS 어느 쪽이든): 시험·스타일이 읽는다
+      root.dataset.crt = on ? mode : 'off';
     },
     setBright(v) {
       canvas.style.filter = Math.abs(v - 1) < 0.01 ? '' : `brightness(${v})`;
@@ -129,6 +131,8 @@ export function mountStage(box: HTMLElement): Stage {
     },
     dispose() {
       ro.disconnect();
+      crt?.dispose(); // WebGL 브라운관의 rAF·캔버스도 거둔다 (닫은 뒤 계속 돌던 누수)
+      crt = null;
       root.remove();
     },
   };

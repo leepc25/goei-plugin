@@ -73,12 +73,10 @@ try {
     // 본부 = 엔진 벨트 장면: 잼트리 자리 앞에서 E
     await page.waitForFunction(() => window.__goeiEngine.inHub && window.__goeiEngine.world);
     await page.waitForTimeout(300);
-    await page.evaluate(() => { const w = window.__goeiEngine.world; w.player.x = w.props.find((q) => q.id === 'jaemtri' || q.id === 'spot:jaemtri').x; });
+    await page.evaluate(() => { const w = window.__goeiEngine.world; const s = w.stage.current().spots.find((q) => q.id === 'jaemtri'); w.player.x = s.x; if (s.y !== undefined) w.player.y = s.y; });
     await page.waitForTimeout(100);
     await page.keyboard.press('KeyE');
-    // 자리 주인과 대화창이 먼저 열린다 (NPC 자유 대화). E 한 번 더 = 원래 창구
-    await page.waitForSelector('.gnp:not([hidden])');
-    await page.keyboard.press('KeyE');
+    // 잼트리 임무 책상은 E 한 번에 바로 임무 창 (2026-10-25 사용자: 일하는 자리는 대화로 빠지지 않는다)
     await page.waitForSelector('[data-mission]', { state: 'visible' });
     const desk = await page.locator('.hq-talk').allTextContents();
     assert.ok(desk.some((t) => t.includes('잼트리')), `잼트리 말칸 ${desk}`);
@@ -91,7 +89,13 @@ try {
     assert.doesNotMatch(brief, /부장\s*목표/, '부장 기본 문장이 남아 있음');
     await S(page, `${label}-2-brief`);
     await page.click('[data-act=deploy]');
-    await page.waitForFunction(() => window.__goeiEngine.world);
+    // 출동 준비 → B3 주차장 승합차 앞에서 E (사용자 2026-10-25). 본부(hub) 안에서는 custom 사건 말풍선이 나지 않는다
+    await page.waitForFunction(() => !document.querySelector('[data-act=deploy]'));
+    await page.evaluate(() => window.__goeiEngine.world.stage.jump('b3', 370, 470));
+    await page.waitForFunction(() => window.__goeiEngine.world?.floor?.id === 'hq:b3' && window.__goeiEngine.world.props.some((q) => q.id === 'spot:van'));
+    await page.waitForTimeout(300);
+    await page.keyboard.press('KeyE');
+    await page.waitForFunction(() => window.__goeiEngine.world && !window.__goeiEngine.inHub);
     await page.waitForTimeout(500);
     // 첫 출동이면 엔진이 첫 투입 컷신 영상을 튼다. PC는 시험 영상을 두고 재생·자막·Esc 건너뛰기를 보고, 폰은 영상이 없어 바로 넘어가야 한다
     if (withVideo) {

@@ -9,7 +9,7 @@ const { chromium } = require(process.env.PLAYWRIGHT_MODULE || 'playwright');
 const url = process.env.GAME_URL || 'http://127.0.0.1:8765/dist/goei-action-game.html';
 const shots = resolve(process.env.SHOTS || 'out/exploration-ui');
 mkdirSync(shots, { recursive: true });
-const browser = await chromium.launch({ executablePath: process.env.CHROMIUM_PATH || '/usr/bin/chromium', headless: true, args: ['--no-sandbox'] });
+const browser = await chromium.launch({ executablePath: process.env.CHROMIUM_PATH || undefined, headless: true, args: ['--no-sandbox'] });
 const errors = [];
 try {
   for (const [name, width, height, touch] of [['pc', 1280, 720, false], ['mobile', 844, 390, true], ['small-mobile', 667, 375, true]]) {
@@ -35,7 +35,7 @@ try {
     await page.waitForTimeout(350);
     await page.screenshot({ path: `${shots}/${name}-minimap.png` });
     const toggle = async () => {
-      if (!touch) return page.keyboard.press('Tab');
+      if (!touch) return page.keyboard.press('KeyM'); // 에일린 키 배치: 지도 = M (Tab은 지원 요원)
       // TouchPad hit-tests coordinates on its root; the visual buttons have pointer-events:none.
       const box = await page.locator('[data-id="map"]').boundingBox();
       await page.touchscreen.tap(box.x + box.width / 2, box.y + box.height / 2);

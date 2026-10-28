@@ -50,22 +50,22 @@ async function run(view, tag) {
   await page.getByText('새로 시작').click();
   await page.waitForFunction(() => window.__goeiEngine.inHub && window.__goeiEngine.world);
   await page.waitForTimeout(1500);
-  // 잼트리 앞에서 E → 대화창
-  await page.evaluate(() => { const w = window.__goeiEngine.world; w.player.x = w.props.find((q) => q.id === 'spot:jaemtri').x; });
+  // 잼트리 임무 책상은 E = 임무 창 (2026-10-25 사용자: 일하는 자리에서 대화로 빠져 헷갈림). 자유 대화는 「요원」 자리(사무실 요원들)에서
+  const goSpot = (id) => page.evaluate((id) => { const w = window.__goeiEngine.world; const s = w.stage.current().spots.find((q) => q.id === id); w.player.x = s.x; if (s.y !== undefined) w.player.y = s.y; }, id);
+  await goSpot('agents');
   await page.waitForTimeout(150);
   await page.keyboard.press('KeyE');
   await page.waitForSelector('.gnp:not([hidden])');
-  assert.match(await page.textContent('.gnp-name'), /잼트리/);
+  assert.ok((await page.textContent('.gnp-name')).trim(), '대화 상대 이름');
   await S('1-hq-open');
   await page.fill('.gnp-in', '오늘 임무 있어요?');
   await page.press('.gnp-in', 'Enter');
   await page.waitForFunction(() => !document.querySelector('.gnp-log p.wait'));
   const log1 = await page.textContent('.gnp-log');
-  assert.match(log1, /창구에 올려/);
+  assert.match(log1, /듣고 있어요|창구에 올려/);
   assert.doesNotMatch(log1, /\[\[/, '태그는 화면에 안 보인다');
   assert.match(log1, /호감 ↑/);
   const sys = await page.evaluate(() => window.__prompts[0][0].content);
-  assert.match(sys, /잼트리/);
   assert.match(sys, /젖은 복도/, '상황판 사건이 들어간다');
   assert.doesNotMatch(sys, /오늘은 좀 쉬자/, '최근 채팅은 기본으로 안 보낸다');
   // 보낸 뒤 입력칸에서 빠지면(키보드 닫힘) 창은 아래 배치로 돌아온다
@@ -84,13 +84,22 @@ async function run(view, tag) {
     await page.evaluate(() => document.getElementById('fakekb').remove());
     await page.evaluate(() => document.activeElement.blur());
   }
-  // 입력칸에서 Esc로 빠져나와 E = 원래 하던 일(임무 창구). 일시정지 메뉴는 열리지 않는다
+  // 입력칸에서 Esc로 빠져나와 E = 원래 하던 일(사무실 창). 일시정지 메뉴는 열리지 않는다
   await page.focus('.gnp-in');
   await page.keyboard.press('Escape');
   assert.ok(await page.isVisible('.gnp'), 'Esc는 입력칸에서만 빠진다');
   await page.keyboard.press('KeyE');
-  await page.waitForSelector('[data-mission]', { state: 'visible' });
+  await page.waitForSelector('.goei-engine-hq:not([hidden])', { state: 'visible' });
+  assert.equal(await page.locator('.mn.on').count(), 0, '일시정지 메뉴는 열리지 않는다');
   await S('3-hq-place');
+  await page.keyboard.press('Escape');
+  await page.waitForTimeout(300);
+  // 잼트리 책상: E 한 번에 바로 임무 창
+  await goSpot('jaemtri');
+  await page.waitForTimeout(150);
+  await page.keyboard.press('KeyE');
+  await page.waitForSelector('[data-mission]', { state: 'visible' });
+  assert.equal(await page.locator('.gnp:not([hidden])').count(), 0, '임무 책상에서는 대화창이 먼저 뜨지 않는다');
   await page.keyboard.press('Escape');
   await page.waitForTimeout(300);
   // 사무실 요원: 다른 요원으로 바꾸기 버튼
@@ -116,7 +125,8 @@ async function run(view, tag) {
   // 실제 층: 백일몽 탐사원(이재헌)에게 단서 묻기 → 이 층 규칙 단서 하나
   await page.evaluate(() => window.__goeiNpc.talk.close());
   await page.evaluate(() => window.__goeiEngine.start_new('elevator'));
-  await page.waitForFunction(() => window.__goeiEngine.world?.floor.id.startsWith('floor'));
+  // 층 id는 방 진행 뒤 'room:…' (옛 'floor…' 아님): 본부 밖 실제 층이면 된다
+  await page.waitForFunction(() => window.__goeiEngine.world && !window.__goeiEngine.inHub && !window.__goeiEngine.world.floor.id.startsWith('hq:'));
   await page.waitForTimeout(2500);
   await page.evaluate(() => { const w = window.__goeiEngine.world; w.player.x = 1100; });
   await page.waitForTimeout(300);
