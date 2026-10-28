@@ -601,6 +601,16 @@ def load_vfx():
                                 pivot=[piv(fr0["pivot"]["x"], fr0["frame"]["w"]), piv(fr0["pivot"]["y"], fr0["frame"]["h"])],
                                 src="data:image/png;base64," + base64.b64encode(js.with_suffix(".png").read_bytes()).decode())
             if js.stem in man: VFX[js.stem]["mode"] = man[js.stem]["mode"]
+            # 그림 칸 아래 빈 줄(바닥에 세울 때 떠 보이지 않게, 10-28 고르고디오 바닥 금이 위에 생김): 모든 장에서 그림이 닿는 가장 아래 줄
+            try:
+                sh = np.array(Image.open(js.with_suffix(".png")).convert("RGBA"))[:, :, 3] > 30
+                low = 0
+                for f in meta["frames"]:
+                    r = f["frame"]; sub = sh[r["y"]:r["y"] + r["h"], r["x"]:r["x"] + r["w"]]
+                    ys = np.nonzero(sub.any(axis=1))[0]
+                    if len(ys): low = max(low, int(ys.max()) + 1)
+                VFX[js.stem]["bpad"] = max(0, fr0["frame"]["h"] - low) if low else 0
+            except Exception: pass
     return VFX
 
 

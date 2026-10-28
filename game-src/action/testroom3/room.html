@@ -825,10 +825,10 @@ const crLp = () => LP('41') || R(Math.min(4, nOf('41') - 1), nOf('41') - 1);
 function crouch() { if (!has('41')) return; P.mode = 'crouch'; const lp = crLp(); play('41', { seq: [...S(R(0, lp[0] - 1), 0.08), ...S(lp, 0.11)], loopFrom: lp[0] }); }
 
 // ── 의자 앉기(3판 정면 60 · 옆 96 · 후면 61) — 라이브 seat: 4틱(0.133초)마다 한 장, E로 거꾸로 일어남 ──
-const SEATS = [{ dir: 'front', sit: '60', img: 'south', acts: { talk: '62', eat: '64', drink: '65', type: '63', doze: '66', lean: '73' } },
+const SEATS = [{ dir: 'front', sit: '60', img: 'south', acts: { talk: '62', eat: '64', drink: '65', type: '63', doze: '66', lean: '73', nod: '68', craft: '106' } },
                { dir: 'side', sit: '96', img: 'east', acts: { talk: '97', eat: '98', drink: '99', type: '105', doze: '54' } },
-               { dir: 'back', sit: '61', img: 'north', acts: { talk: '70', eat: '71', drink: '71', type: '69' } }];
-const SEAT_LOOP = new Set(['63', '64', '66', '73', '98', '105', '54', '69', '71']);   // 「반복, 첫 장 유지」 줄
+               { dir: 'back', sit: '61', img: 'north', acts: { talk: '70', eat: '71', drink: '71', type: '69', look: '72' } }];
+const SEAT_LOOP = new Set(['63', '64', '66', '73', '98', '105', '54', '69', '71', '106']);   // 「반복, 첫 장 유지」 줄
 const SEAT_F = 0.133;
 let seatIdx = -1, showChair = true;
 // 의자 맞춤 {dx(앞쪽 +), dy(아래 +), s}: 설정 chars/<키>.json "chair" > 이 브라우저에서 미세 조정한 값 > 빌드 자동값(chairfit.py)
@@ -889,7 +889,7 @@ function runScene(steps, label) {
 const SCENES = [
   ['의자', [['정면 앉기', () => sitAt('front')], ['옆 앉기', () => sitAt('side')], ['후면 앉기', () => sitAt('back')],
     ['앉아 수다', () => seatAct('talk')], ['앉아 먹기', () => seatAct('eat')], ['앉아 마시기', () => seatAct('drink')], ['앉아 타자', () => seatAct('type')],
-    ['앉아 졸기', () => seatAct('doze')], ['기대 쉬기', () => seatAct('lean')], ['일어나기', () => P.seat && rise()],
+    ['앉아 졸기', () => seatAct('doze')], ['기대 쉬기', () => seatAct('lean')], ['앉아 일하다 고개 들어 끄덕(정면)', () => seatAct('nod')], ['앉아 손 작업(정면)', () => seatAct('craft')], ['앉은 채 돌아보기(후면)', () => seatAct('look')], ['일어나기', () => P.seat && rise()],
     ['앉은 채 맞기(약)', () => P.seat && seatHit(false)], ['앉은 채 맞기(강) · 옆 = 굴러떨어지기', () => P.seat && seatHit(true)]], () => has('60') || has('96')],
   ['샤워', [['한 번에(벗기→걷기→물→씻기→입기)', () => runScene([{ id: 'SH_A', d: 0.12 }, { id: 'SH_B', n: 2 }, { id: 'SH_D', n: 3 }, { id: 'SH_E', n: 3 }, { id: 'SH_A', rev: true, d: 0.1 }], '샤워')],
     ['옷 벗기', () => runScene([{ id: 'SH_A', d: 0.12, hold: 0.6 }], '옷 벗기')], ['맨몸 걷기', () => runScene([{ id: 'SH_B', n: 4 }])], ['물 맞으며 쉬기', () => runScene([{ id: 'SH_D', n: 4 }])],
@@ -909,7 +909,7 @@ function renderScenes() {
     for (const [lab, fn] of items) { const b = document.createElement('button'); b.textContent = lab; b.onclick = () => { if (P.mode === 'dead' && !/사망|되살리기/.test(lab)) die(); fn(); cv.focus(); }; l.append(b); }
     g.append(h, l); };
   for (const [name, items, ok] of SCENES) if (ok()) row(name, items);
-  const used = new Set(['50', '57', '60', '61', '62', '63', '64', '65', '66', '69', '70', '71', '73', '96', '97', '98', '99', '105', '100', '101', '102', '103', '104', '75', '76', '77', '169']);
+  const used = new Set(['50', '57', '60', '61', '62', '63', '64', '65', '66', '68', '69', '70', '71', '72', '73', '106', '96', '97', '98', '99', '105', '100', '101', '102', '103', '104', '75', '76', '77', '169']);
   const life = lifeIds().filter(id => !used.has(id));
   if (life.length) row('생활·직무', [['정면 대기', () => runScene([{ id: '50', n: 4, d: 0.2 }])], ['후면 대기', () => runScene([{ id: '57', n: 4, d: 0.2 }])], ...life.map(id => [`${id.replace('_', '-')} ${A[id].name}`, () => playLife(id)])]);
 }
@@ -1346,7 +1346,7 @@ function drawSheets(under = false) {
     const [fx0, fy0, fw, fh] = sheetFrame(v, e.loop ? (e.t0 - e.t) % e.dur : e.t0 - e.t);
     ctx.save(); if (e.fade && e.t < e.fade) ctx.globalAlpha = e.t / e.fade; ctx.translate(Math.round(e.x), Math.round(e.y)); if (e.rot) ctx.rotate(e.rot); ctx.scale(e.flip ? -e.s : e.s, e.s);
     if (e.anchor === 'right') ctx.drawImage(img, fx0, fy0, fw, fh, -fw, -fh / 2, fw, fh);
-    else if (e.bottom) ctx.drawImage(img, fx0, fy0, fw, fh, -fw / 2, -fh, fw, fh);
+    else if (e.bottom) ctx.drawImage(img, fx0, fy0, fw, fh, -fw / 2, -fh + (v.bpad || 0), fw, fh);   // 칸 아래 빈 줄만큼 내려 그림 밑동을 바닥에
     else if (e.center) ctx.drawImage(img, fx0, fy0, fw, fh, -fw / 2, -fh / 2, fw, fh);
     else ctx.drawImage(img, fx0, fy0, fw, fh, -fw * v.pivot[0], -fh * v.pivot[1], fw, fh);
     ctx.restore();
