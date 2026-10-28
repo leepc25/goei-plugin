@@ -38,7 +38,7 @@ REL = "hands stay in front of the body or at the head and face, elbows never go 
 STEPS = {
  "A": ("REG", 16, None, f"Seen from the side facing {D}, {pro} undresses for a shower with clear body movements, in this order: {SEQ}. {Pro} straightens up and stands bare, relaxed, arms at the sides. No towel. Last frame: standing {side}, barefoot, no clothes. {DRAW}"),
  "B": ("A", 8, "loop", f"Walking {side} in place, barefoot, bare, no clothes, no towel. Natural relaxed walk cycle, arms swinging a little. {DRAW}"),
- "D": ("A", 8, "loop", f"Standing bare under a warm shower {side}, relaxed: tilts the head back with the eyes closed, letting the water run over the face, slowly smooths both hands down over the face and the back of the neck, breathes out and relaxes the shoulders. {REL}. No towel, no soap. {DRAW}"),
+ "D": ("A", 8, "loop", f"Standing bare under a warm shower {side}, relaxed: tilts the head back with the eyes closed, letting warm water from above, outside the frame, run over the face (there is no shower head anywhere in the picture, nothing above the head), slowly smooths both hands down over the face and the back of the neck, breathes out and relaxes the shoulders. {REL}. No towel, no soap. {DRAW}"),
  "E": ("A", 8, "loop", f"Standing bare under a shower {side}, relaxed, the head slightly lowered: rubs one hand along the opposite upper arm and shoulder, then switches hands, then rubs the chest and stomach lightly. {REL}. No towel, no soap. {DRAW}"),
 }
 def b64(im):
