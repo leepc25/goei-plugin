@@ -32,6 +32,12 @@ const unresolved = (t) => [...new Set((t.match(/\{\{[^}]*\}\}/g) ?? []))].filter
   await page.evaluate((t) => { window.__chat.message.push({ role: 'user', data: t, chatId: 'u1' }); }, first);
   const base = [sys('SYSTEM PROMPT'), bot(greeting), usr(first)];
 
+  await R.section('1-0 시작 메시지 아래 첫 행동 안내: 첫 전송 전에만', async () => {
+    const h = await display(page, greeting);
+    assert.ok(h.includes('data-goei-card="opening"') && h.includes('data-goei-repick'), '첫 장면 아래 안내');
+    assert.ok(!(await display(page, '다른 글')).includes('data-goei-card="opening"'));
+  });
+
   await R.section('1-1 첫 전송: 로어 덩어리 하나, 순서, 시드, {{user}} 보존, 장식 줄 없음, 중복 없음', async () => {
     await resetCounts(page);
     const out = await request(page, base);
@@ -47,6 +53,7 @@ const unresolved = (t) => [...new Set((t.match(/\{\{[^}]*\}\}/g) ?? []))].filter
     assert.equal((b.match(/## RP Guidance/g) ?? []).length, 1, 'RP 지침 한 번');
     assert.equal((b.match(/^## Status/gm) ?? []).length, 1, '상태창 절 한 번');
     assert.equal((b.match(/### Character - Jyaldi/g) ?? []).length, 1, '시드와 고른 로어가 겹치면 한 번만');
+    assert.ok(!/^- Jyaldi \(/m.test(b) && /^- Aileen \(/m.test(b), '전체 로어가 들어간 인물은 Roster 한 줄 소개에서 빠짐 (trimRoster)');
     assert.ok(b.includes('### Character - Jaemtri') && b.includes('### Character - Spangdal'), '시드(A00-2: 관리국·쟈알디·잼트리·스팡달)');
     assert.ok(!b.includes('%%SEED%%') && !b.includes('%%/SEED%%'), '시드 표식은 모델에 가지 않음');
     assert.ok(!b.includes('@@dont_activate'), '장식 줄은 보내지 않음');
@@ -56,6 +63,7 @@ const unresolved = (t) => [...new Set((t.match(/\{\{[^}]*\}\}/g) ?? []))].filter
     assert.ok(out.at(-1).content.startsWith('## Inserting Character Visual Images'), '이미지 지침은 맨 끝');
     assert.ok(out.at(-1).content.includes('Jyaldi') && out.at(-1).content.includes('Do not create tags for {{user}}'), '주인공 이미지 OFF 기본');
     assert.equal(out.filter((m) => m.role === 'user').length, 1);
+    assert.ok(!(await display(page, greeting)).includes('data-goei-card="opening"'), '첫 전송 뒤에는 안내 없음');
   });
 
   await R.section('1-2 첫 전송 다시 굴리기: 시드 유지 · 두 번째 전송부터 시드 제거', async () => {
@@ -483,6 +491,33 @@ const unresolved = (t) => [...new Set((t.match(/\{\{[^}]*\}\}/g) ?? []))].filter
     const n = (await counts(page)).setChat;
     await page.evaluate(async () => { await window.__calls.listeners[0]({ char: { name: '다른 봇', globalLore: [] }, chat: { message: [{ role: 'char', data: '[AN|x|y|활성|B|없음]' }], scriptstate: { $st_anomaly_on: '1' } }, characterIndex: 1, chatIndex: 0, messageIndex: 0 }); });
     assert.equal((await counts(page)).setChat, n, '다른 봇은 저장하지 않음');
+  });
+  await R.section('5-5 보조 모델 이미지 태그 보충: 마지막 응답에만, 실패하면 본문 그대로·안내만', async () => {
+    await setVars(page, { $pp_on: '0', $st_asset_model: 'aux', $st_asset_on: '1' });
+    await page.evaluate(() => { window.__llm = [{ type: 'success', result: JSON.stringify([{ line: 1, tag: '<img=Jyaldi_smile>' }]) }]; window.__calls.llm = []; });
+    await page.evaluate(() => { window.__chat.message.push({ role: 'user', data: '다섯', chatId: 'u5' }, { role: 'char', data: '쟈알디가 웃었다.\n\n그리고 걸어갔다.\n[▣|2025.01.01|05:00 AM|☀️|4°C|관리국|없음]', chatId: 'c5' }); });
+    await output(page);
+    let c = await chat(page);
+    assert.equal((await page.evaluate(() => window.__calls.llm.length)), 1, '보조 모델 1회');
+    assert.ok(c.message.at(-1).data.includes('<img=Jyaldi_smile>') && c.message.at(-1).data.endsWith('[▣|2025.01.01|05:00 AM|☀️|4°C|관리국|없음]'), `태그 보충·상태창 유지: ${c.message.at(-1).data}`);
+    assert.ok(!(await display(page, c.message.at(-1).data)).includes('<img='), '표시에서는 그림 칸');
+    await page.evaluate(() => { window.__llm = [{ type: 'fail', result: 'boom' }]; window.__calls.llm = []; });
+    await page.evaluate(() => { window.__chat.message.push({ role: 'user', data: '여섯', chatId: 'u6' }, { role: 'char', data: '스팡달이 왔다.\n[▣|2025.01.01|05:10 AM|☀️|4°C|관리국|없음]', chatId: 'c6' }); });
+    await output(page);
+    c = await chat(page);
+    assert.equal(c.message.at(-1).data, '스팡달이 왔다.\n[▣|2025.01.01|05:10 AM|☀️|4°C|관리국|없음]', '실패하면 본문 그대로');
+    assert.ok(String(c.scriptstate.$goei_asset_note).includes('보조 모델'), '실패 이유는 변수에');
+    await setVars(page, { $st_asset_model: 'main' });
+  });
+  await R.section('5-4 응답 처리 한 번의 읽기·저장 횟수 (인물 기록 끔·보조 모델 없음)', async () => {
+    await setVars(page, { $pp_on: '0' });
+    await page.evaluate(() => { window.__calls.llm = []; window.__chat.message.push({ role: 'user', data: '넷', chatId: 'u4' }, { role: 'char', data: '넷째 답.\n[AG|P002|내근|서류]\n[▣|2025.01.01|04:00 AM|☀️|4°C|관리국|없음]', chatId: 'c4' }); });
+    await resetCounts(page);
+    await output(page);
+    const c = await counts(page);
+    console.log(`  output reads chat=${c.chat} char=${c.char} saves chat=${c.setChat} char=${c.setChar}`);
+    assert.ok(c.chat <= 2 && c.char <= 1 && c.setChat === 1, `읽기 chat≤2·char≤1, 저장 1: ${JSON.stringify(c)}`);
+    assert.equal((await page.evaluate(() => (window.__calls.llm ?? []).length)), 0, '보조 모델 호출 없음');
   });
   assert.deepEqual(errors, []);
   await page.close();

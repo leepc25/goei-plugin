@@ -16,10 +16,11 @@ export function setWikiOpener(f: (title: string) => void): void {
 }
 
 /** 이 채팅의 상태창 시각 목록과 위키 이름을 다시 모은다 */
-export async function refreshStatusContext(charIndex: number, chatIndex: number): Promise<void> {
+export async function refreshStatusContext(charIndex: number, chatIndex: number, known?: { chat: Chat; char: { globalLore?: LoreEntry[] } | null }): Promise<void> {
   if (charIndex < 0 || chatIndex < 0) return;
-  const chat = (await risuai.getChatFromIndex(charIndex, chatIndex)) as Chat | null;
-  const char = await getChar<{ globalLore?: LoreEntry[] }>(charIndex);
+  // 부르는 쪽이 방금 읽은 채팅·캐릭터가 있으면 다시 읽지 않는다 (응답 처리)
+  const chat = known?.chat ?? ((await risuai.getChatFromIndex(charIndex, chatIndex)) as Chat | null);
+  const char = known ? known.char : await getChar<{ globalLore?: LoreEntry[] }>(charIndex);
   if (!chat) return;
   const texts = (chat.message ?? []).filter((m) => m.role === 'char' && typeof m.data === 'string').map((m) => m.data);
   await prepareBaseDocs(char?.globalLore).catch(() => undefined);

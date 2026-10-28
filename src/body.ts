@@ -155,11 +155,12 @@ function loreFor(char: LoreChar, chat: Chat, input?: string) {
 
 /** 고른 로어북을 자리 항목이 읽는 채팅 변수에 적는다 (요청 전이라 Risu가 세고 넘치면 오래된 채팅을 지운다).
  *  자리 항목이 없는 카드는 플러그인이 요청 직전에 직접 끼우므로 변수를 적지 않는다 (턴마다 채팅 저장 한 번과 변수 수십 KB 를 아낀다. QC 2026-10-28) */
-async function storeLore(charIndex: number, chatIndex: number, input?: string): Promise<void> {
-  let char = await getChar<LoreChar>(charIndex);
+async function storeLore(charIndex: number, chatIndex: number, input?: string, known?: { char: LoreChar; chat: Chat }): Promise<void> {
+  // 부르는 쪽이 방금 읽은 캐릭터·채팅이 있으면 다시 읽지 않는다 (응답 처리에서는 리스너가 준 것)
+  let char = known?.char ?? (await getChar<LoreChar>(charIndex));
   if (!char || !isGoeiLore(char.globalLore)) return;
   // 이 채팅의 보내는 방식에 맞게 네 폴더 항목 첫 줄(@@dont_activate)을 맞춘다. 사용자가 새로 넣은 항목도 같이
-  const cur0 = (await risuai.getChatFromIndex(charIndex, chatIndex)) as Chat | null;
+  const cur0 = known?.chat ?? ((await risuai.getChatFromIndex(charIndex, chatIndex)) as Chat | null);
   const mode = advValue(cur0?.scriptstate, 'gen', 'lore_mode') as LoreMode;
   if (syncDecorators(char.globalLore, mode)) {
     // 저장 함수는 카드 로어북(가상 항목 없음)을 주므로 세계 데이터를 다시 붙여 판정하고 진짜 항목만 돌려준다
@@ -414,7 +415,7 @@ async function onOutput(arg: { char: unknown; chat: unknown; characterIndex: num
       })) ?? now;
     }
     // 다음 요청에 넣을 로어북을 미리 골라 둔다 (다시 굴리기·자동 전송은 입력 처리를 거치지 않는다)
-    await storeLore(arg.characterIndex, arg.chatIndex).catch(() => {});
+    await storeLore(arg.characterIndex, arg.chatIndex, undefined, { char, chat: now }).catch(() => {});
     // 막혔던 요청을 사용자가 전송 버튼으로 보냈으면 카드의 「전송을 눌러 주세요」·취소를 없앤다
     if (now.message.some((m) => typeof m.data === 'string' && isUnsent(m.data))) now = (await updateChat(arg.characterIndex, arg.chatIndex, clearUnsent)) ?? now;
     // 인물 기록 갱신 (core/people): 매 턴 설정이면 보조 모델 1회. 다른 보조 호출 앞에, 병렬 설정이 아니면 끝날 때까지 차례로
@@ -424,7 +425,7 @@ async function onOutput(arg: { char: unknown; chat: unknown; characterIndex: num
     }
     // 보조모델 이미지 태그 보충 (설정이 보조모델일 때). 끝난 뒤 괴담톡 확인 (보조 모델을 겹쳐 부르지 않게)
     // 상태창 「지난 장면」 목록을 새 응답까지 넣어 다시
-    await refreshStatusContext(arg.characterIndex, arg.chatIndex).catch(() => {});
+    await refreshStatusContext(arg.characterIndex, arg.chatIndex, { char, chat: now }).catch(() => {});
     await supplementAssets({ charIndex: arg.characterIndex, chatIndex: arg.chatIndex, lore: char.globalLore, chat: now, messageIndex: arg.messageIndex });
     // 괴담톡 자동 새 메시지 확인 → 괴담넷 자동 새로고침 (설정이 켜져 있을 때, 같은 응답에는 한 번. 따로 부를 때는 겹치지 않게 차례로)
     const phoneAuto = phoneSettings(now.scriptstate).auto;
