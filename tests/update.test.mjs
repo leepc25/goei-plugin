@@ -1,4 +1,5 @@
 import { test } from 'node:test';
+import { REAL } from './realcard.mjs';
 import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
 import { compareVersions, cardVersion, mergeByName, planUpdate, isPayload, readManifest, directoryData, readDirectory } from '../dist-test/core.mjs';
@@ -52,7 +53,6 @@ test('실제 카드 업데이트 파일: 형식·매니페스트 버전', { skip
   assert.deepEqual([plan.fields, plan.lore.replaced, plan.lore.added, plan.lore.kept], [[], 0, 0, 0]);
 });
 
-const REAL = '/mnt/project-files/analysis/extracted/module.json';
 test('예전 카드 업데이트: 괴이봇 명부 → Directory, 옛 데이터 로어북은 명부로 옮기고 지움', { skip: !existsSync(PAYLOAD) || !existsSync(REAL) }, () => {
   const index = JSON.parse(readFileSync(PAYLOAD, 'utf8'));
   const p = JSON.parse(index.parts.map((n) => readFileSync(new URL(n, PAYLOAD), 'utf8')).join(''));

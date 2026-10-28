@@ -8,7 +8,7 @@ import {
   WIKI_DEFAULTS, validTitle, sceneRecord, stripModules, prepareBaseDocs, baseDocs, WIKI_PACK_HEAD,
 } from '../dist-test/core.mjs';
 
-const REAL = '/mnt/project-files/analysis/extracted/module.json';
+import { REAL } from './realcard.mjs';
 const realLore = existsSync(REAL) ? (() => { const m = JSON.parse(readFileSync(REAL, 'utf8')); return m.lorebook ?? m.module?.lorebook; })() : null;
 
 test('cbs: getvar, if/else, when forms, comparisons, unknown tags kept', () => {

@@ -97,7 +97,7 @@ async function onBeforeRequest<M extends PromptMessage>(messages: M[], type: str
     if (ctx) {
       const c = ctx;
       messages = safe(() => fixLore(messages, c), messages);
-      messages = await withPlayer(messages, c).catch(() => messages);
+      messages = await withPlayer(messages, c).catch((e) => safe(() => { throw e; }, messages));
       messages = safe(() => withVisit(messages, c), messages);
       messages = trimRoster(messages);
       const mctx = safe(() => moduleContext(sceneText(messages), c), [] as string[]);
@@ -111,7 +111,7 @@ async function onBeforeRequest<M extends PromptMessage>(messages: M[], type: str
       // 칸 구성(설정)대로 다시 만들고 잔고 칸은 장부 값으로 (core/world/statuscols.ts · core/wallet.ts)
       messages = withStatusBlock(messages, safe(() => knownIdentity(c), ''), safe(() => statusShape(c), undefined));
       // 장면 인물의 살아 있는 기록 (core/people). 절 단위 혼합이면 그 인물의 시트 원문은 빼고 기록으로 대신한다
-      messages = await withPeople(messages, c).catch(() => messages);
+      messages = await withPeople(messages, c).catch((e) => safe(() => { throw e; }, messages));
       // 이미지 태그 지침 (core/imgprompt): 카드 로어북 「Asset」 대신 설정으로 조립. 옛 카드의 로어북 본문이 남아 있으면 지운다
       messages = safe(() => withImgPrompt(messages, c), messages);
     }
@@ -632,9 +632,12 @@ async function readTheme(snap: WatchSnapshot): Promise<void> {
 function startWatcher(fab: Fab | null): () => void {
   const state = new WatchState();
   // 설치·점검으로 카드가 바뀌면 다음 차례에 다시 판정 (플로팅 버튼이 바로 생기게)
-  setInstalledHook(() => state.forget());
+  setInstalledHook(() => {
+    state.forget();
+  });
   let stopped = false;
   let timer: ReturnType<typeof setTimeout> | undefined;
+  let shownChat = '';
   const tick = async () => {
     try {
       const snap = await readSnapshot(fab);
@@ -642,15 +645,16 @@ function startWatcher(fab: Fab | null): () => void {
       if (stopped) return;
       const next = state.update(snap, lite);
       liteNow = state.lite;
-      if (next.changed) {
-        if (next.fabVisible) {
-          await readTheme(snap).catch(() => {});
-          await refreshStatusContext(snap.charIndex, snap.chatIndex).catch(() => {});
-          await refreshOpeningHint(snap.charIndex, snap.chatIndex).catch(() => {});
-        }
-        // 접속 효과는 버튼 자리에서 버튼이 나타나며 (v0.16.22)
-        await fab?.setVisible(next.fabVisible, next.intro);
+      // 같은 봇 안에서 채팅만 바꿔도(버튼은 그대로) 그 채팅의 배색·상태창 칸 구성·시작 안내로 (QC 2026-10-28: 앞 채팅 것이 남았다)
+      const chatKey = next.fabVisible ? `${snap.charIndex}:${snap.chatIndex}` : '';
+      if (next.fabVisible && (next.changed || chatKey !== shownChat)) {
+        await readTheme(snap).catch(() => {});
+        await refreshStatusContext(snap.charIndex, snap.chatIndex).catch(() => {});
+        await refreshOpeningHint(snap.charIndex, snap.chatIndex).catch(() => {});
       }
+      shownChat = chatKey;
+      // 접속 효과는 버튼 자리에서 버튼이 나타나며 (v0.16.22)
+      if (next.changed) await fab?.setVisible(next.fabVisible, next.intro);
     } catch (error) {
       console.log(`[goei] 채팅 감시 실패: ${error instanceof Error ? error.message : String(error)}`);
     } finally {

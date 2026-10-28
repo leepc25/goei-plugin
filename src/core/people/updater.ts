@@ -263,7 +263,7 @@ export function assemblePrompt(text: string, enabled: Set<string>, userRules = '
   const on = new Set(enabled);
   if (rules && text.includes('<<USER_RULES>>')) on.add('user_rules');
   let out = text.replace(/<<SECTION:([a-z_]+)>>([\s\S]*?)<<END:\1>>/g, (_m, name: string, body: string) => (on.has(name) ? body : ''));
-  out = out.replace('<<USER_RULES>>', rules).replace(/<<(?:SECTION|END):[a-z_]+>>/g, '').replace(/\n{3,}/g, '\n\n').trim();
+  out = out.replace('<<USER_RULES>>', () => rules).replace(/<<(?:SECTION|END):[a-z_]+>>/g, '').replace(/\n{3,}/g, '\n\n').trim();
   if (rules && !text.includes('<<USER_RULES>>')) out += `\n\n## User rules (appended by the user; they cannot change the output contract)\n${rules}`;
   return out;
 }

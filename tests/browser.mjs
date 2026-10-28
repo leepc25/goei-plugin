@@ -138,26 +138,25 @@ async function pickCustom(page, row = '.gx-mlist li.gx-mx') {
   // 2026-10-27: 설정은 창 하나 (시작 전엔 새 채팅 기본값만)
   await page.waitForSelector('.gw .gw-set');
   assert.equal(await page.$('.gw-set [data-action="set-scope"][data-value="chat"]'), null, '시작 전에는 「이 채팅」 없음');
+  // 2026-10-27 구조: 왼쪽 위 구역 타일(기능·세계·지침·점검) + 그 구역의 목록. 세계 목록은 「세계」 타일을 누르면 보인다
+  await page.click('[data-action="ed-tab"][data-value="world"]');
   assert.ok(await page.$('[data-action="ed-node"][data-value="agent"]'), '시작 전에도 세계 편집 트리');
+  await page.click('[data-action="ed-tab"][data-value="set"]');
   await page.click('[data-action="ed-node"][data-value="set:board"]');
-  await page.waitForSelector('.st-colsbox summary');
+  // 2026-10-27 설정 창 재작성: 상태창 칸 표는 접힘(summary) 없이 「상태창 칸」 묶음 안에, 괴이 발생도 접힘 없이 묶음
+  await page.waitForSelector('.st-cols .st-col-row');
   // 4단계: 상태창 칸 표 (새 채팅 기본값) — 잠긴 칸은 끌 수 없고, 끈 칸은 표시 조작이 잠긴다
-  if (await page.$('.st-colsbox summary')) {
-  await page.click('.st-colsbox summary');
   assert.equal(await page.locator('.st-col-row').count(), 10, '상태창 칸 10개');
   assert.equal(await page.isDisabled('[data-action="set-col"][data-value="date:use:0"]'), true, '날짜는 사용을 끌 수 없음');
   await page.click('[data-action="set-col"][data-value="weather:use:0"]');
   await page.waitForSelector('.st-col-row.off');
   assert.equal(await page.isDisabled('[data-action="set-col"][data-value="weather:show:1"]'), true, '안 쓰는 칸은 표시 조작 잠김');
-  assert.ok((await page.textContent('.st-colsbox summary')).includes('9칸 사용'));
+  assert.ok((await page.textContent('.gw-set')).includes('9칸 사용'));
   await page.click('[data-action="set-col"][data-value="weather:use:1"]');
-  await page.waitForFunction(() => document.querySelector('.st-colsbox summary')?.textContent?.includes('10칸 사용'));
+  await page.waitForFunction(() => document.querySelector('.gw-set')?.textContent?.includes('10칸 사용'));
   await page.fill('.st-won', '120만');
   await page.dispatchEvent('.st-won', 'change');
   await page.waitForFunction(() => document.querySelector('.st-won')?.value === '1,200,000');
-  }
-  assert.equal(await page.evaluate(() => document.querySelector('.st-world').open), false, '괴이 발생은 접혀 있음');
-  await page.click('.st-world > summary');
   await page.click('[data-action="set-world"][data-value="incident_cap:+"]');
   await page.waitForFunction(() => JSON.parse(window.__store['p:goei:prefs'] || '{}').world?.incident_cap === 2);
   await page.click('[data-action="ed-node"][data-value="set:screen"]');
@@ -227,7 +226,7 @@ async function pickCustom(page, row = '.gx-mlist li.gx-mx') {
   await page.waitForSelector('.gx-settings');
   await page.click('[data-action="set-theme"][data-value="light"]');
   await page.waitForFunction(() => window.__chat.scriptstate.$st_fixed_theme === 'light' && document.querySelector('.gx').dataset.theme === 'light');
-  await page.click('[data-action="prefs-close"]');
+  await page.click('.gw [data-action="ed-close"]'); // 2026-10-27: 설정은 편집 창 하나, 닫기는 ed-close
   await page.waitForSelector('.gx-fac.on');
   assert.equal((await page.locator('.gx-panel').boundingBox()).width <= 1024, true, '시작 전 창은 설정 폭');
   assert.deepEqual(errors, []);
@@ -704,7 +703,7 @@ if (fixture.globalLore.some((e) => String(e.comment).startsWith('📚Lore slot')
       await page.click('#msg .x-risu-gst-link');
       await page.waitForSelector('.gx-nb.on[data-value="wiki"], .nw-doc, .nw-write', { timeout: 15000 });
       // 설정 「상태창」: 페이퍼 → 그린 상자도 바로 바뀜, 미표시 → 숨김
-      await page.click('.gx-nav .gx-nb:not(.mob)[data-value="settings"]');
+      await page.click('.gx-nav .gx-nb.desk[data-action="ed-open"]');
       await page.click('[data-action="set-status"][data-value="paper"]');
       await page.waitForFunction(() => JSON.parse(window.__store['p:goei:prefs'] || '{}').status === 'paper');
       assert.equal(await page.evaluate(() => getComputedStyle(document.querySelector('#msg .x-risu-gst')).backgroundColor), 'rgb(250, 245, 233)');
@@ -719,6 +718,8 @@ if (fixture.globalLore.some((e) => String(e.comment).startsWith('📚Lore slot')
       await page.evaluate((h) => document.querySelector('#msg').insertAdjacentHTML('beforeend', h), risu(img));
       const box = () => page.evaluate(() => { const c = getComputedStyle(document.querySelector('#msg .x-risu-gim')); return [c.display, c.maxWidth, c.aspectRatio]; });
       assert.deepEqual((await box()).slice(1), ['512px', '832 / 826.88']);
+      await page.click('[data-action="ed-node"][data-value="set:image"]'); // 2026-10-27: 이미지 설정은 「캐릭터 이미지」 페이지
+      await page.waitForSelector('[data-change="set-img-size"]');
       await page.$eval('[data-change="set-img-size"]', (el) => { el.value = '150'; el.dispatchEvent(new Event('input', { bubbles: true })); el.dispatchEvent(new Event('change', { bubbles: true })); });
       await page.waitForFunction(() => getComputedStyle(document.querySelector('#msg .x-risu-gim')).maxWidth === '768px');
       await page.waitForFunction(() => JSON.parse(window.__store['p:goei:prefs'] || '{}').imgSize === 150);
@@ -1612,7 +1613,7 @@ if (fixture.globalLore.some(packed)) {
   assert.equal(ss0.$st_agent_limit, '12');
   assert.equal(ss0.$st_support_on, '1');
   await open(page);
-  await page.click('.gx-nav .gx-nb:not(.mob)[data-value="settings"]');
+  await page.click('.gx-nav .gx-nb.desk[data-action="ed-open"]');
   await page.waitForSelector('.gx-settings');
   assert.ok((await page.textContent('.st-step b')).includes('12명'));
   assert.equal(await page.getAttribute('[data-action="set-theme"][data-value="dark"]', 'aria-pressed'), 'true', '새 채팅 테마 기본은 다크');
@@ -1646,7 +1647,7 @@ if (fixture.globalLore.some(packed)) {
   await page.click('.gx-nav .gx-nb:not(.mob)[data-value="board"]');
   await page.waitForSelector('.gx-board .gx-agrow');
   assert.equal(await page.locator('.gx-board .gx-agmon').count(), 0);
-  await page.click('.gx-nav .gx-nb:not(.mob)[data-value="settings"]');
+  await page.click('.gx-nav .gx-nb.desk[data-action="ed-open"]');
   await page.waitForSelector('[data-action="set-agents"]');
   // 지원 투입 끄기 → 지도 편성에서 지원 인원 칸이 사라진다
   await page.click('[data-action="set-support"][data-value="0"]');
@@ -1661,7 +1662,7 @@ if (fixture.globalLore.some(packed)) {
   assert.equal(await page.locator('.gx-mlist .sel').count(), 0, '취소하면 커스텀 목표가 풀림');
   assert.equal(await page.locator('.gx-scard').count(), 0, '지원 투입 OFF면 지원 인원 카드 없음');
   // 에셋: 보조모델 + 캐릭터당 1장
-  await page.click('.gx-nav .gx-nb:not(.mob)[data-value="settings"]');
+  await page.click('.gx-nav .gx-nb.desk[data-action="ed-open"]');
   await page.waitForSelector('[data-action="set-asset-model"]');
   assert.equal(await page.$('[data-action="set-asset-limit"]'), null, '메인모델이면 캐릭터당 이미지 수 없음');
   await page.click('[data-action="set-asset-model"][data-value="aux"]');
@@ -1708,7 +1709,7 @@ if (fixture.globalLore.some(packed)) {
   await page.waitForFunction(() => window.__chat.scriptstate.$st_anomaly_on === '0' && window.__chat.scriptstate.$an_report === '');
   await page.click('.gx-nav .gx-nb:not(.mob)[data-value="board"]');
   await page.waitForSelector('[data-action="world-on"]');
-  await page.click('.gx-nav .gx-nb:not(.mob)[data-value="settings"]');
+  await page.click('.gx-nav .gx-nb.desk[data-action="ed-open"]');
   await page.click('[data-action="set-anomaly"][data-value="on"]');
   await page.waitForFunction(() => window.__chat.scriptstate.$st_anomaly_on === '1' && /NEW \[AN\|/.test(window.__chat.scriptstate.$an_report));
   await page.setViewportSize({ width: 390, height: 844 });
@@ -2051,7 +2052,7 @@ if (fixture.globalLore.some(packed)) {
   assert.equal(book.조직['관리국'].hidden, true);
   assert.ok(book.요원.쟈알디.roster_for.includes('F00') && book.요원.쟈알디.phone_tabs.includes('T105'));
   // 시작 화면: 관리국은 숨고 비밀 결사가 보임, 첫 장면은 직접 입력·커스텀 임무 두 개
-  await page.click('[data-action="prefs-close"]');
+  await page.click('.gw [data-action="ed-close"]'); // 2026-10-27: 설정은 편집 창 하나, 닫기는 ed-close
   await page.waitForSelector('.gx-facs');
   assert.equal(await page.$('[data-action="faction"][data-value="A00"]'), null, '숨긴 기본 세력');
   await page.click('[data-action="faction"][data-value="F00"]');

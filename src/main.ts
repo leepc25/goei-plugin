@@ -130,10 +130,15 @@ async function onInput(text: string): Promise<string> {
 }
 
 async function onDisplay(text: string): Promise<string> {
-  if (body) return body.display(text);
-  if (!ours(text)) return text;
-  const b = await ensure();
-  return b ? b.display(text) : text;
+  if (!body && !ours(text)) return text;
+  try {
+    const b = body ?? (await ensure());
+    return b ? await b.display(text) : text;
+  } catch (error) {
+    // 그리기가 실패해도 메시지는 원문으로 보이게 (처리기 예외가 Risu 메시지 그리기를 막지 않게)
+    console.log(`[goei] 메시지 그리기 실패: ${error instanceof Error ? error.message : String(error)}`);
+    return text;
+  }
 }
 
 /** 괴이 카드를 열면 본체를 꺼낸다. 본체가 뜨면 감시는 본체가 맡는다 */
@@ -172,21 +177,27 @@ for (const permission of ['replacer', 'mainDom', 'sendChat']) {
     /* 옛 Risu에는 없을 수 있다. 그러면 기능을 켤 때 Risu가 묻는다 */
   }
 }
-await risuai.addRisuReplacer('beforeRequest', onBeforeRequest);
-await risuai.addRisuChatListener('output', onOutput);
-await risuai.addRisuScriptHandler('display', onDisplay);
-try {
-  await risuai.addRisuScriptHandler('input', onInput);
-} catch {
-  // 입력 처리기가 없는 옛 Risu: 로어북은 응답 뒤·요청 직전에만 고른다
-}
+// 처리기는 하나씩 건다: 하나가 거부·실패해도(권한 거부 등) 나머지와 감시는 켠다 (QC 2026-10-28: 예전엔 첫 실패에서 시작기 전체가 멈췄다)
+const hook = async (what: string, f: () => Promise<unknown>): Promise<void> => {
+  try {
+    await f();
+  } catch (error) {
+    console.log(`[goei] ${what} 처리기를 걸지 못했어요: ${error instanceof Error ? error.message : String(error)}`);
+  }
+};
+await hook('요청', () => risuai.addRisuReplacer('beforeRequest', onBeforeRequest));
+await hook('응답', () => risuai.addRisuChatListener('output', onOutput));
+await hook('표시', () => risuai.addRisuScriptHandler('display', onDisplay));
+// 입력 처리기가 없는 옛 Risu: 로어북은 응답 뒤·요청 직전에만 고른다
+await hook('입력', () => risuai.addRisuScriptHandler('input', onInput));
 watch();
 
-await risuai.onUnload(async () => {
+await hook('종료', () => risuai.onUnload(async () => {
   stopped = true;
   await body?.unload().catch(() => {});
-  await risuai.removeRisuReplacer('beforeRequest', onBeforeRequest);
-  await risuai.removeRisuChatListener('output', onOutput);
-  await risuai.removeRisuScriptHandler('display', onDisplay);
+  // 하나가 실패해도 나머지는 뗀다
+  await risuai.removeRisuReplacer('beforeRequest', onBeforeRequest).catch(() => {});
+  await risuai.removeRisuChatListener('output', onOutput).catch(() => {});
+  await risuai.removeRisuScriptHandler('display', onDisplay).catch(() => {});
   await risuai.removeRisuScriptHandler('input', onInput).catch(() => {});
-});
+}));

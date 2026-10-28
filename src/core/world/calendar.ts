@@ -26,12 +26,19 @@ function lunar(t: number): { m: number; d: number; leap: boolean } | null {
     }
   }
   if (!lunarFmt) return null;
+  const hit = lunarMemo.get(t);
+  if (hit !== undefined) return hit;
   const parts = lunarFmt.formatToParts(new Date(t));
   const month = parts.find((p) => p.type === 'month')?.value ?? '';
   const day = Number(parts.find((p) => p.type === 'day')?.value);
   const m = parseInt(month, 10);
-  return Number.isFinite(m) && Number.isFinite(day) ? { m, d: day, leap: /bis/.test(month) } : null;
+  const out = Number.isFinite(m) && Number.isFinite(day) ? { m, d: day, leap: /bis/.test(month) } : null;
+  if (lunarMemo.size >= 4096) lunarMemo.clear();
+  lunarMemo.set(t, out);
+  return out;
 }
+/** 대체공휴일 판정이 하루에 30번쯤 같은 날을 다시 묻는다: formatToParts 가 상태창 그리기 시간의 대부분이라 날짜별로 기억 (QC 2026-10-28, 새 날짜 상태창 2.2ms → 측정값은 docs/qc/06) */
+const lunarMemo = new Map<number, { m: number; d: number; leap: boolean } | null>();
 
 /** 그날의 (대체가 아닌) 공휴일 이름들 */
 function baseHolidays(t: number): string[] {

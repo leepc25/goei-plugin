@@ -4,7 +4,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import { settings as S, asset as A, DEFAULT_SETTINGS } from '../dist-test/core.mjs';
 import { imgDirLore } from './fixtures/imgdir.mjs';
 
-const REAL = '/mnt/project-files/analysis/extracted/module.json';
+import { REAL } from './realcard.mjs';
 const realLore = existsSync(REAL) ? (() => { const m = JSON.parse(readFileSync(REAL, 'utf8')); return m.lorebook ?? m.module?.lorebook; })() : null;
 const book = (obj) => [{ comment: 'Settings', content: JSON.stringify(obj) }];
 

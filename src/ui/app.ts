@@ -174,7 +174,7 @@ function ensureRoot(): HTMLElement {
   root.addEventListener('click', (ev) => {
     const t = ev.target as HTMLElement;
     if (t === root) {
-      if (downOutside) void handle('close');
+      if (downOutside) void run('close');
       downOutside = false;
       return;
     }
@@ -195,7 +195,7 @@ function ensureRoot(): HTMLElement {
       const x = ((ev as MouseEvent).clientX - img.left) / img.width * 100;
       const y = ((ev as MouseEvent).clientY - img.top) / img.height * 100;
       if (x < 0 || x > 100 || y < 0 || y > 100) return;
-      return void handle('dir-base-xy', `${x.toFixed(1)}|${y.toFixed(1)}|${pickMap.dataset.basePick}`);
+      return void run('dir-base-xy', `${x.toFixed(1)}|${y.toFixed(1)}|${pickMap.dataset.basePick}`);
     }
     const el = t.closest<HTMLElement>('[data-action]');
     if (!el || el.hasAttribute('disabled')) return;
@@ -204,7 +204,7 @@ function ensureRoot(): HTMLElement {
     const names = el.dataset.take?.split(',') ?? [];
     const val = (n: string) => root?.querySelector<HTMLInputElement>(`[name="${n}"]`)?.value ?? '';
     const take = !names.length ? undefined : names.length > 1 ? JSON.stringify(names.map(val)) : root?.querySelector<HTMLInputElement>(`[name="${names[0]}"]`)?.value;
-    void handle(el.dataset.action!, take ?? el.dataset.value);
+    void run(el.dataset.action!, take ?? el.dataset.value);
   });
   // 명부 얼굴 틀: 대표 사진을 누르거나 끌면 그 자리가 틀 가운데 (틀이 사진 밖으로 나가지 않게)
   root.addEventListener('pointerdown', (ev) => {
@@ -273,7 +273,7 @@ function ensureRoot(): HTMLElement {
       box.classList.remove('dir-dragging');
       const target = drop;
       mark(null);
-      if (target) void handle('dir-move', `${target.after ? 'after' : 'before'}|${grip.dataset.dragAgent}|${target.el.dataset.agentRow}`);
+      if (target) void run('dir-move', `${target.after ? 'after' : 'before'}|${grip.dataset.dragAgent}|${target.el.dataset.agentRow}`);
     };
     grip.addEventListener('pointermove', move);
     grip.addEventListener('pointerup', up);
@@ -320,18 +320,18 @@ function ensureRoot(): HTMLElement {
     if (ev.key === 'Enter' && !ev.shiftKey && !ev.isComposing && el?.dataset?.input === 'ph-draft' && matchMedia('(pointer: fine)').matches) {
       const send = root?.querySelector<HTMLButtonElement>('.ph-send');
       ev.preventDefault();
-      if (send && !send.disabled) void handle('ph-send', send.dataset.value);
+      if (send && !send.disabled) void run('ph-send', send.dataset.value);
       return;
     }
     if (ev.key !== 'Enter' || ev.isComposing || !el?.dataset?.enter) return;
     ev.preventDefault();
-    void handle(el.dataset.enter, el.value);
+    void run(el.dataset.enter, el.value);
   });
   root.addEventListener('submit', (ev) => {
     ev.preventDefault();
     const form = ev.target as HTMLFormElement;
     const input = form.querySelector('input');
-    if (form.dataset.submit) void handle(form.dataset.submit, input?.value ?? '');
+    if (form.dataset.submit) void run(form.dataset.submit, input?.value ?? '');
   });
   root.addEventListener('change', (ev) => panelChange(ev.target as HTMLSelectElement));
   // 검색어는 목록만 다시 그린다 (입력창 포커스 유지)
@@ -359,7 +359,7 @@ function ensureRoot(): HTMLElement {
 
 /** 패널의 change 이벤트 (편집 창의 설정 페이지에서도 같은 함수를 부른다) */
 function panelChange(el: HTMLSelectElement): void {
-  if (el?.dataset?.change) void handle(el.dataset.change, el.dataset.key ? `${el.dataset.key}=${el.value}` : el.value);
+  if (el?.dataset?.change) void run(el.dataset.change, el.dataset.key ? `${el.dataset.key}=${el.value}` : el.value);
 }
 
 /** 패널의 input 이벤트 (편집 창의 설정 페이지에서도 같은 함수를 부른다) */
@@ -619,6 +619,10 @@ async function stagedTheme(ctx: ChatContext, value: string | undefined): Promise
   render();
 }
 
+/** 리스너(클릭·Enter)에서 부를 때: 버린 Promise 의 실패를 기록한다 (아무 흔적 없이 조작이 안 먹는 것을 막는다. QC 2026-10-28) */
+const run = (action: string, value?: string): Promise<void> =>
+  handle(action, value).catch((error: unknown) => console.log(`[goei] 조작 실패(${action}): ${error instanceof Error ? error.message : String(error)}`));
+
 async function handle(action: string, value?: string): Promise<void> {
   if (busy) return;
   // 상황 상세 창 안의 버튼(위키·지도·목표)이나 다른 조작을 하면 창은 닫는다. 종료는 두 번 눌러야 해서 그대로 둔다
@@ -824,7 +828,7 @@ async function handle(action: string, value?: string): Promise<void> {
     case 'id-card': {
       // 모바일: 머리의 ID카드 버튼 → 왼쪽 패널과 같은 카드를 작은 창으로
       if (view.kind !== 'started') return;
-      showIdCard(idCard(view.ctx), (a, v) => void handle(a, v));
+      showIdCard(idCard(view.ctx), (a, v) => void run(a, v));
       return;
     }
     case 'wallet-pop':
@@ -1124,9 +1128,9 @@ function render(): void {
   });
   hydratePhotos(root);
   bindMapZoom(root);
-  bindMbar(root, () => void handle('close'));
-  bindDrawer(root, () => void handle('mk-pop'));
-  bindWikiSide(root, (v) => void handle('wiki-list', v));
+  bindMbar(root, () => void run('close'));
+  bindDrawer(root, () => void run('mk-pop'));
+  bindWikiSide(root, (v) => void run('wiki-list', v));
   bindFootnotes(root);
   const stBar = root.querySelector<HTMLElement>('.gx-settings > .st-scopebar');
   if (stBar) stBar.parentElement!.style.setProperty('--stbar', `${stBar.offsetHeight}px`);
@@ -1225,7 +1229,7 @@ function applyNav(s: NavState): void {
   if (s.d !== undefined) dirUi.open = s.d;
   agUi.pop = s.a ?? '';
   // 편성 단계는 목표를 골라야 갈 수 있으니 버튼과 같은 길로 (못 가면 목표 단계에 머문다)
-  if (s.f && s.f !== field.step) return void handle('field-step', s.f);
+  if (s.f && s.f !== field.step) return void run('field-step', s.f);
   render();
 }
 
@@ -1250,18 +1254,18 @@ function syncField(): void {
   if (gameOpen() && anchor !== fieldAnchor) closeGame();
   fieldAnchor = anchor;
   if (gameOpen()) reattachGame(host);
-  else openGame(host, () => void handle('game-close'));
+  else openGame(host, () => void run('game-close'));
 }
 
 /** 모바일 쓸기가 할 일 (브라우저 ←·→ 처럼): dir -1 뒤로, 1 앞으로. 갈 곳이 없으면 null */
 function navStep(dir: -1 | 1): (() => void) | null {
-  const go = (action: string, value?: string) => () => void handle(action, value);
+  const go = (action: string, value?: string) => () => void run(action, value);
   if (view.kind === 'picker') return dir < 0 && pickerPrefs ? go('prefs-close') : null;
   if (view.kind === 'opening') return dir < 0 ? go('repick') : null;
   if (view.kind !== 'started') return null;
-  if (gameOpen()) return dir < 0 ? () => void handle('game-close') : null;
-  if (evUi.pop && dir < 0) return () => void handle('ev-pop', evUi.pop);
-  if (agUi.pop && dir < 0) return () => void handle('agent-info', agUi.pop);
+  if (gameOpen()) return dir < 0 ? () => void run('game-close') : null;
+  if (evUi.pop && dir < 0) return () => void run('ev-pop', evUi.pop);
+  if (agUi.pop && dir < 0) return () => void run('agent-info', agUi.pop);
   if (!navHist.can(dir)) return null;
   return () => {
     const s = navHist.go(dir);

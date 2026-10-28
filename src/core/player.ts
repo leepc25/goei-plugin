@@ -75,7 +75,7 @@ export function applyPlayer<M extends { role?: unknown; content?: unknown }>(mes
     const esc = n.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     // 영문 이름은 낱말 경계로만 (Kim → Kimchi 안 바꿈)
     const re = new RegExp(/^[A-Za-z]/.test(n) ? `\\b${esc}\\b` : esc, 'g');
-    out = out.map((m) => (typeof m?.content === 'string' && re.test(m.content) ? { ...m, content: m.content.replace(re, agentName) } : m));
+    out = out.map((m) => (typeof m?.content === 'string' && re.test(m.content) ? { ...m, content: m.content.replace(re, () => agentName) } : m));
   }
   return out;
 }
