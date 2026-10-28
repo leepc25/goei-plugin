@@ -266,7 +266,9 @@ def auto_cfg(ch):
     order = list(BASE)
     for lid in sorted({re.sub(r"_(E|W|SE|SW|S|N|NE|NW)$", "", f) for f in folders}, key=lambda s: (order.index(s) if s in order else 999, s)):
         cands = [f for f in folders if re.sub(r"_(E|W|SE|SW|S|N|NE|NW)$", "", f) == lid]
-        good = [f for f in cands if f in ok or life_line(f)] if ok else cands
+        fail = set(picks.get("fail") or {})
+        # 통과 목록(ok)이 늦게 갱신된 줄(10-28 게슈간 18-2: 다시 뽑아 판정 통과했는데 ok에 없어 맞기로 대체됨) → 실패 기록만 빼고 다 씀
+        good = [f for f in cands if f in ok or life_line(f) or f.replace("_", "-") not in fail and f not in fail] if ok else cands
         if not good: continue
         want = variants.get(lid)
         pick = next((f for f in good if want and folder_dir(f, rows, ch["dir"]) == want and f != lid), None) or (lid if lid in good else good[0])

@@ -82,7 +82,8 @@ const FALLS = new Set(['18_3', '44']);   // 서서 시작해 눕는 줄: 누운 
 // 누운 장 판정(10-28 고침): 바닥에서 떠 있게 그린 그림도 누운 것으로 봄(몸 높이만 봄). 누운 장들은 같은 바닥선(몸통 아랫선의 가운데 값)을 써서 반복 때 들썩이지 않게
 const lowF = (a, f) => (a.bot[f] - a.top[f]) < 0.55 * (a.bot[0] - a.top[0]);
 function lieLine(a) { if (a._lie != null) return a._lie; const v = a.bot.map((b, f) => f).filter(f => lowF(a, f)).map(f => (a.mbot || a.bot)[f]).sort((x, y) => x - y); return (a._lie = v.length ? v[v.length >> 1] + 3 : null); }
-const groundBase = (id, a, f) => arcOf(id) ? a.bot[f] : FALLS.has(id) ? (lowF(a, f) && lieLine(a) != null ? lieLine(a) : Math.min(BASE(a), a.bot[f] + 2)) : (LIE.has(id) || (id === '19' && f >= lieFrom(a))) ? (FLAT.has(id) && lowF(a, f) && lieLine(a) != null ? lieLine(a) : FLAT.has(id) && a.mbot ? a.mbot[f] + 3 : a.bot[f] + 2) : BASE(a);   // 누운 장: 몸통 아래 선을 바닥에(늘어진 손발은 바닥 앞쪽으로 내려감)
+// 누운 장은 장마다 자기 몸통 아랫선을 바닥에(그림마다 높이가 달라 한 줄로 맞추면 위아래로 튐 — 10-28 데드폴)
+const groundBase = (id, a, f) => arcOf(id) ? a.bot[f] : FALLS.has(id) ? (lowF(a, f) && a.mbot ? a.mbot[f] + 3 : Math.min(BASE(a), a.bot[f] + 2)) : (LIE.has(id) || (id === '19' && f >= lieFrom(a))) ? (FLAT.has(id) && a.mbot ? a.mbot[f] + 3 : a.bot[f] + 2) : BASE(a);   // 누운 장: 몸통 아래 선을 바닥에(늘어진 손발은 바닥 앞쪽으로 내려감)
 const cv = document.getElementById('cv'); let ctx = cv.getContext('2d'); ctx.imageSmoothingEnabled = false;
 const FXS = 3, mkLayer = () => { const c = document.createElement('canvas'); c.width = 1280 / FXS; c.height = 720 / FXS; const g = c.getContext('2d'); g.imageSmoothingEnabled = false; return [c, g]; };
 const [fxNc, fxN] = mkLayer(), [fxLc, fxL] = mkLayer();
@@ -400,7 +401,8 @@ const FX = {
       muzzleFlash(p, s.big); sfx('shot');
       const hitD = showDummy && Math.abs(D.y - P.y) < 60 && (D.x - P.x) * dir > 0;
       const endX = hitD ? D.x - dir * 14 : (dir > 0 ? W + 20 : -20);
-      const tt = Math.abs(endX - p.x) / 3400, g = mzAng() + (s.spread ? (Math.random() - 0.5) * s.spread : 0), gp = MZ_GAP * K(P.y), sx = p.x + dir * Math.cos(g) * gp, sy = p.hy + Math.sin(g) * gp;
+      const tt = Math.abs(endX - p.x) / 3400, g = Math.max(-0.1, Math.min(0.1, mzAng())) + (s.spread ? (Math.random() - 0.5) * s.spread : 0),   // 반동으로 총구가 들린 장도 탄은 앞으로(10-28 데드폴 한 발이 허공으로)
+      gp = MZ_GAP * K(P.y), sx = p.x + dir * Math.cos(g) * gp, sy = p.hy + Math.sin(g) * gp;
       fx.push({ k: 'bullet', x: sx, y: sy, x2: endX, y2: sy + Math.abs(endX - sx) * Math.tan(g) + (Math.random() - 0.5) * 20, t: tt, t0: tt });
       shake = Math.max(shake, s.big ? 6 : 1.5);
       if (hitD) later(tt, () => { if (!vfx('bullet_hit_body', endX, p.hy, 2)) sparks(endX, p.hy, 4, false, '#fff6d0'); strike({ noVfx: true, stop: s.big ? 0.08 : 0.02, shake: s.big ? 9 : 2, ...(s.hit || { dmg: 7, kind: 'light' }) }); });
@@ -743,7 +745,7 @@ function jump() {
 }
 function doubleJump() {
   const j = jf();
-  sfx('jump', { pitch: 1.35 }); P.jumps = 2; P.vz = 1040; P.spin = 0.2; play('7', { seq: S([j.rise, j.top], 0.08) });
+  sfx('jump', { pitch: 1.35 }); P.jumps = 2; P.vz = 1040; const up = R(Math.min(1, j.top), j.top); P.spin = up.length * 0.045; play('7', { seq: S(up, 0.045) });   // 2단 점프: 오르는 장을 다 거쳐 부드럽게(10-28 게슈간 뚝뚝 끊김)
   if (!vfx('double_jump', P.x, P.y - P.z + 2, 2.2)) fx.push({ k: 'burst', x: P.x, y: P.y - P.z + 4, t: 0.3, t0: 0.3 });
   ring(P.x, P.y - P.z + 4, 70, 0.25, 'rgba(220,240,255,.9)', 4, 0.35);
 }

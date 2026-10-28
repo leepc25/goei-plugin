@@ -393,3 +393,11 @@
 10-28 08:05:43 61 후면 앉기 보냄 north 8장 시작=지정 끝=없음 약 1회
 10-28 08:06:02 73 정면 기대 쉬기 완료 9장 (94초)
 10-28 08:07:30 61 후면 앉기 완료 8장 (106초)
+10-28 11:54:14 69 후면 앉아 타자 보냄 north 8장 시작=지정 끝=지정 약 1회
+10-28 11:54:14 72 후면 앉은 채 돌아보기 보냄 north 8장 시작=지정 끝=지정 약 1회
+10-28 11:54:14 71 후면 앉아 먹기·마시기 보냄 north 8장 시작=지정 끝=지정 약 1회
+10-28 11:54:14 70 후면 앉아 수다 보냄 north 8장 시작=지정 끝=지정 약 1회
+10-28 11:56:01 72 후면 앉은 채 돌아보기 완료 8장 (107초)
+10-28 11:56:32 70 오류: Command '['curl', '-sSf', '--retry', '3', 'https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/64c11248-74f1-4365-bdcb-e6c6c0c55b89/animations/756bb9df-8d42-48da-8f37-580920b1dbef/north/0.png?t=1793188556']' returned non-zero exit status 35.
+10-28 11:56:51 71 오류: Command '['curl', '-sSf', '--retry', '3', 'https://backblaze.pixellab.ai/file/pixellab-characters/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/64c11248-74f1-4365-bdcb-e6c6c0c55b89/animations/2d48c591-b9ca-497c-9916-4f6e302749dc/north/3.png?t=1793188518']' returned non-zero exit status 56.
+10-28 11:57:00 69 후면 앉아 타자 완료 9장 (165초)
