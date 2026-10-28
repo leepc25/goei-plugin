@@ -382,7 +382,7 @@
          "t": "melee",
          "range": 150,
          "hit": {
-          "dmg": 54,
+          "dmg": 81,
           "kind": "light",
           "vfx": "x3-c-hit-spark-light",
           "vs": 2,
@@ -404,7 +404,7 @@
          "t": "melee",
          "range": 160,
          "hit": {
-          "dmg": 81,
+          "dmg": 122,
           "kind": "heavy",
           "vfx": "x3-c-hit-spark-light",
           "vs": 2.6,
@@ -860,15 +860,14 @@
   "gun": "thrown",
   "atk": {
    "9": 15,
-   "10": 14,
-   "11": 16,
-   "12": 23,
-   "13": 16,
-   "14": 12
+   "10": 16,
+   "11": 19,
+   "12": 26,
+   "13": 20,
+   "14": 22
   },
   "cd": {
-   "shot": 0.6,
-   "skill": 9
+   "skill": 2
   },
   "shotDmg": 7
  }

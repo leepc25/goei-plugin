@@ -399,7 +399,7 @@
        "t": "melee",
        "range": 170,
        "hit": {
-        "dmg": 39,
+        "dmg": 58,
         "kind": "light"
        }
       }
@@ -421,7 +421,7 @@
        "t": "melee",
        "range": 170,
        "hit": {
-        "dmg": 39,
+        "dmg": 58,
         "kind": "light"
        }
       }
@@ -435,7 +435,7 @@
        "t": "melee",
        "range": 160,
        "hit": {
-        "dmg": 75,
+        "dmg": 113,
         "kind": "down",
         "vfx": "x3-c-hit-spark-heavy",
         "vs": 0.8
@@ -573,7 +573,7 @@
          {
           "t": "hit",
           "hit": {
-           "dmg": 52,
+           "dmg": 53,
            "kind": "down",
            "stop": 0.1
           }
@@ -666,7 +666,7 @@
        "tint": "#d8dde6",
        "under": true,
        "hit": {
-        "dmg": 79,
+        "dmg": 77,
         "kind": "launch",
         "stop": 0.22,
         "shake": 18
@@ -699,16 +699,15 @@
   "speed": "normal",
   "gun": "thrown",
   "atk": {
-   "9": 13,
+   "9": 14,
    "10": 14,
-   "11": 16,
+   "11": 17,
    "12": 23,
-   "13": 16,
-   "14": 11
+   "13": 18,
+   "14": 20
   },
   "cd": {
-   "shot": 0.6,
-   "skill": 9
+   "skill": 2
   },
   "shotDmg": 7
  },

@@ -366,7 +366,7 @@
        "scale": 0.8,
        "tint": "#e8ecf4",
        "hit": {
-        "dmg": 48,
+        "dmg": 72,
         "kind": "light"
        }
       },
@@ -374,7 +374,7 @@
        "t": "proj",
        "kind": "bullet",
        "hit": {
-        "dmg": 16,
+        "dmg": 24,
         "kind": "light"
        }
       }
@@ -388,7 +388,7 @@
        "kind": "bullet",
        "spread": 0.06,
        "hit": {
-        "dmg": 16,
+        "dmg": 24,
         "kind": "light"
        }
       }
@@ -406,7 +406,7 @@
        "scale": 0.85,
        "tint": "#e8ecf4",
        "hit": {
-        "dmg": 57,
+        "dmg": 85,
         "kind": "heavy"
        }
       },
@@ -414,7 +414,7 @@
        "t": "proj",
        "kind": "bullet",
        "hit": {
-        "dmg": 16,
+        "dmg": 24,
         "kind": "light"
        }
       }
@@ -428,7 +428,7 @@
        "kind": "bullet",
        "spread": 0.06,
        "hit": {
-        "dmg": 16,
+        "dmg": 24,
         "kind": "light"
        }
       }
@@ -881,15 +881,15 @@
   "speed": "slow",
   "gun": "rapid",
   "atk": {
-   "9": 20,
+   "9": 19,
    "10": 20,
-   "11": 23,
-   "12": 33,
-   "13": 22,
-   "14": 20
+   "11": 24,
+   "12": 32,
+   "13": 25,
+   "14": 27
   },
   "cd": {
-   "skill": 8
+   "skill": 2
   },
   "shotDmg": 6,
   "heatPer": 9

@@ -526,6 +526,22 @@ def signature(cfg):
     return h.hexdigest()
 
 
+def chair_auto(cfg):
+    import chairfit
+    def last(lid):
+        an = cfg["anims"].get(lid)
+        if not an: return None
+        fs = sorted((src_dir(cfg, an) / an["folder"]).glob("[0-9][0-9].png"))
+        if not fs: return None
+        im = Image.open(fs[-1]).convert("RGBA")
+        return im.transpose(Image.FLIP_LEFT_RIGHT) if an.get("mirror") else im
+    try:
+        f = chairfit.fit(last("96"), last("60"), last("61"))
+        return {k: {kk: float(vv) for kk, vv in v.items()} for k, v in f.items()}
+    except Exception as e:
+        print("의자 맞춤 실패", cfg["key"], e); return {}
+
+
 def build_char(cfg, force=False):
     key = cfg["key"]
     js = OUT / "chars" / f"c{key.split('_')[0]}.js"   # 파일 이름은 ASCII만(Artifact 서버에서 한글 경로가 안 열림)
@@ -565,6 +581,7 @@ def build_char(cfg, force=False):
     for lid, an in cfg["anims"].items():   # 이름은 설정 것을 씀
         if lid in A: A[lid]["name"] = an.get("name", lid)
     payload = {k: v for k, v in cfg.items() if k not in ("anims",)}
+    payload["chairAuto"] = chair_auto(cfg)   # 의자 자동 맞춤(chairfit.py). 손으로 맞춘 값은 설정 chars/<키>.json 의 "chair"가 이김
     js.write_text("(window.__C=window.__C||{})[" + json.dumps(key, ensure_ascii=False) + "]=" +
                   json.dumps({"cfg": payload, "A": A}, ensure_ascii=False, separators=(",", ":")) + ";\n", encoding="utf-8")
     return js.stat().st_size, rebuilt
@@ -610,6 +627,8 @@ def main():
             cfg = auto
         else:
             cfg = deep_merge(auto, json.loads(p.read_text(encoding="utf-8")))
+        cp = HERE / "chairs" / f"{ch['key']}.json"   # 의자 손 맞춤(qa/fit_chair.py)
+        if cp.exists(): cfg["chair"] = json.loads(cp.read_text(encoding="utf-8"))
             # 사람이 지운 줄은 지운 채로, 새로 생긴 줄은 자동값으로
         if only is not None and ch["key"] not in only:
             js = OUT / "chars" / f"c{ch['key'].split('_')[0]}.js"
@@ -624,7 +643,7 @@ def main():
     room = (HERE / "room.html").read_text(encoding="utf-8")
     audio = (EIL / "testroom" / "audio.js").read_text(encoding="utf-8")
     html = room.replace("/*__INDEX__*/null", json.dumps(index, ensure_ascii=False)).replace("/*__AUDIO__*/", audio)
-    chair = {k: "data:image/png;base64," + base64.b64encode((ROOT / "game-src/action/objects/C01_사무의자_1배" / f"{k}.png").read_bytes()).decode() for k in ("south", "east", "north")}   # 의자 앉기용(판정 전)
+    chair = {k: "data:image/png;base64," + base64.b64encode((ROOT / "game-src/action/objects/C01_사무의자_1배" / f"{k}.png").read_bytes()).decode() for k in ("south", "south-east", "south-west", "east", "north", "north-east", "north-west")}   # 의자 앉기용(판정 전)
     (OUT / "vfx.js").write_text("window.__VFX=" + json.dumps(load_vfx(), separators=(",", ":")) + ";\nwindow.__CHAIR=" + json.dumps(chair) + ";\n", encoding="utf-8")   # 이펙트 그림은 따로(첫 화면 파일을 작게)
     if npc: html = html.replace("<title>요원 통합 테스트룸</title>", "<title>NPC 테스트룸</title>", 1).replace("<h1>요원 통합 테스트룸 ", "<h1>NPC 테스트룸 ", 1)
     (OUT / "index.html").write_text(html, encoding="utf-8")

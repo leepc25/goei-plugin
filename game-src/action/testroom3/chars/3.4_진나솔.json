@@ -560,7 +560,7 @@
        "speed": 2200,
        "life": 0.5,
        "hit": {
-        "dmg": 24,
+        "dmg": 36,
         "kind": "light",
         "vfx": "x3-c-hit-spark-light",
         "tint": "#8E5CC9"
@@ -579,7 +579,7 @@
            "t": "pull",
            "dist": 260,
            "hit": {
-            "dmg": 48,
+            "dmg": 72,
             "kind": "pull",
             "noVfx": true,
             "stop": 0.06,
@@ -595,7 +595,7 @@
           {
            "t": "hit",
            "hit": {
-            "dmg": 66,
+            "dmg": 99,
             "kind": "down",
             "vfx": "x3-c-hit-spark-heavy",
             "vs": 0.6
@@ -830,16 +830,15 @@
   "speed": "fast",
   "gun": "thrown",
   "atk": {
-   "9": 16,
-   "10": 16,
-   "11": 19,
-   "12": 27,
+   "9": 13,
+   "10": 14,
+   "11": 17,
+   "12": 23,
    "13": 18,
-   "14": 14
+   "14": 19
   },
   "cd": {
-   "shot": 0.6,
-   "skill": 6
+   "skill": 2
   },
   "shotDmg": 7
  }

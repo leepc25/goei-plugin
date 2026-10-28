@@ -379,7 +379,7 @@
        "speed": 1500,
        "life": 0.75,
        "hit": {
-        "dmg": 34,
+        "dmg": 51,
         "kind": "light",
         "vfx": "x3-c-dust-puff",
         "tint": "#d8b878"
@@ -397,7 +397,7 @@
        "speed": 1500,
        "life": 0.75,
        "hit": {
-        "dmg": 34,
+        "dmg": 51,
         "kind": "light",
         "vfx": "x3-c-dust-puff",
         "tint": "#d8b878"
@@ -415,7 +415,7 @@
        "speed": 1500,
        "life": 0.75,
        "hit": {
-        "dmg": 45,
+        "dmg": 67,
         "kind": "heavy",
         "vfx": "x3-c-dust-puff",
         "vs": 1.6,
@@ -683,16 +683,15 @@
   "speed": "slow",
   "gun": "none",
   "atk": {
-   "9": 16,
-   "10": 15,
-   "11": 17,
-   "12": 25,
-   "13": 17,
-   "14": 15
+   "9": 15,
+   "10": 16,
+   "11": 19,
+   "12": 26,
+   "13": 20,
+   "14": 22
   },
   "cd": {
-   "shot": 1.5,
-   "skill": 7
+   "skill": 2
   },
   "shotDmg": 12
  },

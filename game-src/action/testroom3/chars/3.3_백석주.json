@@ -516,7 +516,7 @@
        "dx": 60,
        "r": 70,
        "hit": {
-        "dmg": 19,
+        "dmg": 28,
         "kind": "light",
         "vfx": "x3-c-hit-spark-light",
         "stop": 0.05,
@@ -535,7 +535,7 @@
        "dx": 60,
        "r": 70,
        "hit": {
-        "dmg": 19,
+        "dmg": 28,
         "kind": "light",
         "vfx": "x3-c-hit-spark-light",
         "stop": 0.05,
@@ -557,7 +557,7 @@
        "scale": 1.4,
        "r": 80,
        "hit": {
-        "dmg": 96,
+        "dmg": 146,
         "kind": "stun",
         "vfx": "x3-c-hit-spark-heavy",
         "vs": 0.7,
@@ -839,16 +839,15 @@
   "speed": "normal",
   "gun": "none",
   "atk": {
-   "9": 12,
-   "10": 12,
-   "11": 14,
-   "12": 20,
-   "13": 13,
-   "14": 10
+   "9": 13,
+   "10": 14,
+   "11": 16,
+   "12": 22,
+   "13": 17,
+   "14": 19
   },
   "cd": {
-   "shot": 1.5,
-   "skill": 9
+   "skill": 2
   },
   "shotDmg": 10
  }

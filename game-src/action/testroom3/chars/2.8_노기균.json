@@ -554,7 +554,7 @@
        "speed": 900,
        "time": 0.15,
        "hit": {
-        "dmg": 9,
+        "dmg": 14,
         "kind": "light",
         "vfx": "x3-c-hit-spark-light",
         "vs": 1.5
@@ -583,7 +583,7 @@
        "tint": "#ffe4de",
        "r": 60,
        "hit": {
-        "dmg": 129,
+        "dmg": 193,
         "kind": "launch",
         "vfx": "x3-c-hit-spark-heavy",
         "vs": 0.8,
@@ -800,7 +800,7 @@
         "pierce": true,
         "life": 1.0,
         "hit": {
-         "dmg": 71,
+         "dmg": 72,
          "kind": "down",
          "stop": 0.14,
          "shake": 12,
@@ -965,16 +965,15 @@
   "speed": "fast",
   "gun": "none",
   "atk": {
-   "9": 17,
-   "10": 16,
-   "11": 18,
-   "12": 27,
+   "9": 13,
+   "10": 14,
+   "11": 17,
+   "12": 23,
    "13": 18,
-   "14": 14
+   "14": 19
   },
   "cd": {
-   "shot": 1.5,
-   "skill": 6
+   "skill": 2
   },
   "shotDmg": 10
  }

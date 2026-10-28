@@ -537,8 +537,8 @@
   "gun": "rapid",
   "atk": {},
   "cd": {
-   "skill": 7,
-   "skill2": 11
+   "skill": 2,
+   "skill2": 4
   },
   "shotDmg": 7,
   "heatPer": 9

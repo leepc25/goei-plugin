@@ -11,12 +11,16 @@ M3 = HERE.parent / "motion3"; CH = HERE / "chars"
 DPS = {"striker": 46, "bruiser": 42, "tank": 34, "ranged": 32, "support": 30, "control": 34}
 SPEED = {"fast": 0.88, "normal": 1.0, "slow": 1.18}          # 같은 길이라도 굼뜬 인물은 한 대가 더 아프게
 ROW = {"9": 1.0, "10": 1.0, "11": 1.15, "12": 1.25, "13": 1.1, "14": 1.6}   # 약1·약2·약3(마무리)·강·돌진·점프(4장으로 짧아 높게)
+SKILL_CD = 2   # 고유기술 실제 쿨타임(초, 10-28 사용자: 연사만 안 되게 짧게 + 위력 올림)
+ATK_BASE = {"9": 15, "10": 16, "11": 19, "12": 26, "13": 20, "14": 22}   # 약1·약2·약3·강·돌진·점프 기준 피해(10-28)
+ROLE_MUL = {"striker": 1.0, "bruiser": 1.05, "tank": 1.1, "ranged": 0.85, "support": 0.85, "control": 0.9}
 CD = {"striker": 6, "bruiser": 8, "tank": 10, "ranged": 7, "support": 9, "control": 9}   # 고유기술 쿨타임(초)
 SUPER = {"striker": 180, "bruiser": 180, "ranged": 180, "control": 160, "tank": 140, "support": 140}
 GUN = {  # 원거리 기본공격: 약한 단발은 쿨타임 없이, 강한 것·연발은 과열이나 쿨타임
     # 사용자 2026-10-26: 연속으로 계속 나가면 안 됨 → 연사(rapid)만 누른 채 연사 + 과열, 나머지는 한 번 누르면 한 발 + 최소 간격(쿨)
-    "single": dict(shotDmg=9, cd=0.45), "thrown": dict(shotDmg=7, cd=0.6),
-    "rapid": dict(shotDmg=6, heatPer=9), "heavy": dict(shotDmg=30, cd=2.5), "none": dict(shotDmg=10, cd=1.5)}
+    # 사용자 2026-10-28: 단발은 쿨타임 넣지 말 것 → 단발(single·thrown·heavy·none)은 쿨타임 없이 한 번 누르면 한 발(동작 길이가 곧 간격)
+    "single": dict(shotDmg=9), "thrown": dict(shotDmg=7),
+    "rapid": dict(shotDmg=6, heatPer=9), "heavy": dict(shotDmg=30), "none": dict(shotDmg=10)}
 # NPC(6.x): 종류 → (역할, 원거리, 손 빠르기, 피해 배율, 게임 HP)
 NPC = [("가짜관리국진압", "bruiser", "rapid", "normal", 1.1, 140), ("가짜관리국검사", "control", "single", "normal", 1.05, 120),
        ("관리국", "bruiser", "single", "normal", 1.0, 120), ("백일몽", "striker", "single", "fast", 1.0, 110),
@@ -80,7 +84,8 @@ def main():
             n = frames(key, r) or 0
             if not n: continue
             imp = int(hitf.get(r, max(1, n // 2)))
-            atk[r] = max(3, round(dps * dur(n, imp, r == "12") * f * SPEED[speed]))
+            # 10-28 사용자: 고르고디오 평타가 남들 두 배 → 동작 길이에 비례시키지 않고 줄마다 정한 기준 피해 × 역할·손 빠르기(차이를 좁게)
+            atk[r] = max(3, round(ATK_BASE[r] * ROLE_MUL[role] * SPEED[speed] * (mul if key.startswith("6.") else 1)))
         bal = {"role": role, "speed": speed, "gun": gun, "atk": atk, "cd": {}}
         g = dict(GUN.get(gun, {}))
         if role == "ranged" and "shotDmg" in g: g["shotDmg"] = round(g["shotDmg"] * 1.2)
@@ -91,9 +96,10 @@ def main():
         sk = d.get("skills") or {}
         info = {}
         if sk.get("skill"):
-            bal["cd"]["skill"] = CD[role]; info["skill"] = rescale(sk["skill"], dps * CD[role] * 0.5)
+            # 사용자 2026-10-28: 평타 몇 번 수준 기술에 5~10초 쿨은 아무도 안 씀 → 쿨타임은 라이브 고유기(75틱 = 2.5초)에 가깝게 3초, 피해 예산은 그대로
+            bal["cd"]["skill"] = SKILL_CD; info["skill"] = rescale(sk["skill"], dps * CD[role] * 0.75)
         if sk.get("skill2"):
-            bal["cd"]["skill2"] = CD[role] + 4; info["skill2"] = rescale(sk["skill2"], dps * (CD[role] + 4) * 0.5)
+            bal["cd"]["skill2"] = SKILL_CD + 2; info["skill2"] = rescale(sk["skill2"], dps * (CD[role] + 4) * 0.5)
         if sk.get("charge"):
             # 충전기는 쿨타임 없음(사용자 2026-10-26: 모으는 시간이 곧 대가)
             lv = sk["charge"].get("lv", {})

@@ -587,7 +587,7 @@
        "scale": 1.1,
        "r": 70,
        "hit": {
-        "dmg": 56,
+        "dmg": 84,
         "kind": "light",
         "vfx": "x3-c-hit-spark-light",
         "vs": 1.4
@@ -602,7 +602,7 @@
        "t": "pull",
        "dist": 220,
        "hit": {
-        "dmg": 28,
+        "dmg": 42,
         "kind": "pull",
         "noVfx": true,
         "stop": 0.05,
@@ -622,7 +622,7 @@
         {
          "t": "hit",
          "hit": {
-          "dmg": 84,
+          "dmg": 126,
           "kind": "down",
           "vfx": "x3-c-hit-spark-heavy",
           "vs": 0.7,
@@ -850,7 +850,7 @@
        "t": "melee",
        "range": 220,
        "hit": {
-        "dmg": 115,
+        "dmg": 116,
         "kind": "blow",
         "vfx": "x3-c-hit-spark-heavy",
         "stop": 0.24,
@@ -891,16 +891,15 @@
   "speed": "slow",
   "gun": "thrown",
   "atk": {
-   "9": 20,
+   "9": 19,
    "10": 20,
-   "11": 23,
-   "12": 33,
-   "13": 22,
-   "14": 17
+   "11": 24,
+   "12": 32,
+   "13": 25,
+   "14": 27
   },
   "cd": {
-   "shot": 0.6,
-   "skill": 8
+   "skill": 2
   },
   "shotDmg": 7
  }

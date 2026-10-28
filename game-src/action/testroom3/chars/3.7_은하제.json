@@ -527,7 +527,7 @@
        "size": 1.3,
        "life": 0.6,
        "hit": {
-        "dmg": 29,
+        "dmg": 44,
         "kind": "light",
         "vfx": "x3-c-hit-spark-light",
         "tint": "#cfd6e0"
@@ -551,7 +551,7 @@
            "t": "pull",
            "dist": 200,
            "hit": {
-            "dmg": 44,
+            "dmg": 66,
             "kind": "pull",
             "noVfx": true,
             "stop": 0.05,
@@ -567,7 +567,7 @@
           {
            "t": "hit",
            "hit": {
-            "dmg": 80,
+            "dmg": 120,
             "kind": "down",
             "vfx": "x3-c-hit-spark-heavy",
             "vs": 0.6
@@ -819,14 +819,13 @@
   "atk": {
    "9": 14,
    "10": 14,
-   "11": 16,
+   "11": 17,
    "12": 23,
-   "13": 15,
-   "14": 11
+   "13": 18,
+   "14": 20
   },
   "cd": {
-   "shot": 0.6,
-   "skill": 9
+   "skill": 2
   },
   "shotDmg": 7
  }
