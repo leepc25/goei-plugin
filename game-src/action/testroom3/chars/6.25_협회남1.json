@@ -332,5 +332,6 @@
   "shotDmg": 9,
   "hp": 110
  },
- "skills_2판": {}
+ "skills_2판": {},
+ "crawlRev": true
 }

@@ -591,7 +591,7 @@ const COMMON = {
   spikes(s, c, n0) { if (!VFX['fx-shadow']) return; const p = posOf({ at: 'front', ...s }, c); dropNew(n0, ['spikeG']); for (let i = 0; i < 3; i++) later(i * 0.05, () => vfx('fx-shadow', p.x + (i - 1) * 60 * p.k, p.gy + 8 * p.k, 2.2 * p.k, { bottom: true })); },
   grid(s, c, n0) { if (!VFX['fx-shadow']) return; const p = posOf({ at: 'front', ...s }, c), w = (s.w || 300) * p.k; for (let i = 0; i < 5; i++) later(i * 0.04, () => vfx('fx-shadow', p.x + (i - 2) * w / 5, p.gy + 8 * p.k, 2 * p.k, { bottom: true })); },
   firewall(s, c) { if (!VFX['fx-fire']) return; const p = s.at === 'screen' ? { x: W / 2, gy: FLOOR1 - 20, k: 1 } : posOf({ at: 'target', ...s }, c); const w = s.at === 'screen' ? W : (s.w || 160) * p.k, n = Math.max(1, Math.round(w / 220)); for (let i = 0; i < n; i++) vfx('fx-fire', p.x + (i - (n - 1) / 2) * w / n, p.gy + 6, 1.8 * p.k, { bottom: true, t: s.time || 3, loop: true }); },
-  flame(s) { if (!VFX['fx-fire']) return; const m = muzzle(), k = K(P.y); for (let i = 0; i < 3; i++) later(i * 0.12, () => vfx('fx-fire', m.x + P.face * (90 + i * 110) * k, P.y + 4, (1 + i * 0.3) * k, { bottom: true, flip: P.face < 0 })); },
+  flame(s) { if (!VFX['fx-fire']) return; const k = K(P.y), len = (s.len || 300); for (let i = 0; i < 3; i++) later(i * 0.08, () => { const m = muzzle(); vfx('fx-fire', m.x + P.face * (len * (i + 1) / 4) * k, m.y, (0.6 + i * 0.2) * k, { center: true, flip: P.face < 0 }); }); },   // 총구 높이에서 사거리(len) 안에만(10-28 윤병수: 바닥에 깔리고 사거리 밖까지 보였음)
   pillar(s, c) { if (s.vfx || !VFX['fx-pillar']) return; const p = posOf({ at: 'target', ...s }, c); vfx('fx-pillar', p.x, p.gy + 6 * p.k, 3 * p.k, { bottom: true, tint: colOf(s) }); },
 };
 
@@ -1214,7 +1214,7 @@ function update(dt) {
       if (lv > P.chargeShown) { P.chargeShown = lv; sfx('ability'); const m = muzzle(); ring(m.x, m.y, 30 + lv * 14, 0.3, CH_COL[Math.min(3, lv)], 3); flash = 0.04; }
       break;
     }
-    case 'belly': { const go = dx !== 0, looping = P.clip.id === '38_1' || P.clip.i >= 4; if (go) P.face = dx; P.clip.paused = !go && looping; if (go && looping) P.x += dx * 55 * dt; break; }
+    case 'belly': { const go = dx !== 0, looping = P.clip.id === '38_1' || P.clip.i >= 4; if (go) P.face = CH.crawlRev ? -dx : dx; P.clip.paused = !go && looping; if (go && looping) P.x += dx * 55 * dt; break; }
     case 'stun': P.stunT -= dt; if (P.stunT <= 0) reverseOut('21', [curF() > 1 ? 1 : curF(), 0], 0.07); break;
     case 'flee': if (!down('flee')) { toIdle(); break; } if (dx) P.face = dx; P.x += P.face * 400 * dt; P.y += dy * 180 * dt; break;
     case 'back': { if (!down('back')) { toIdle(); break; } if (P.clip && P.clip.id === '37_1') P.x -= P.face * 80 * dt; P.y += dy * 60 * dt; break; }

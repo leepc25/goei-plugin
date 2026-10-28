@@ -31,7 +31,7 @@ OUT = HERE / "out"
 CHARS = HERE / "chars"
 SKILLDOC = ROOT / "docs/요원_기술안.md"
 EILEEN_KEY = "1.4_에일린"
-VERSION = "3"   # 그림 처리 방식이 바뀌면 올림(캐시 무효)
+VERSION = "4"   # 그림 처리 방식이 바뀌면 올림(캐시 무효)
 
 # ───────────────────────── 문서 읽기 ─────────────────────────
 def roster():
@@ -124,6 +124,7 @@ def parse_flips(tr):
     for line in tr.splitlines():
         for sent in re.split(r"(?<=[.。])\s| · ", line):
             if "반전" in sent:
+                sent = re.sub(r"`([^`]*)`", lambda m: m.group(1) if re.fullmatch(r"\d+(?:[_-]\d+)?", m.group(1)) else " ", sent)   # 폴더 이름(`38_1_W`) 속 1·W를 줄 번호로 읽지 않게(10-28 윤병수 대기 반전). `38`·`38_1`처럼 줄 번호만이면 그대로
                 sent = re.sub(r"(동|서|남동|남서)?\(?(E|W|SE|SW)?\)?판", " ", re.sub(r"\([^)]*\)", "", sent))
                 for lid in re.findall(r"(?<![\d~.])(" + LID + r")(?![\d~장])", sent):
                     out.add(lid.replace("-", "_"))
@@ -460,7 +461,7 @@ def process(frames, aid, gun):
         bot.append(bb[3]); top.append(bb[1]); reach.append(bb[2] - w // 2); cx.append((bb[0] + bb[2]) // 2 - w // 2)
         arr = np.array(im)[:, :, 3] > 40
         cb = [int(np.nonzero(arr[:, x])[0].max()) for x in range(w) if arr[:, x].any()]   # 열마다 가장 아래 화소
-        mbot.append(int(np.percentile(cb, 60)) + 1 if cb else bb[3])   # 누운 몸의 바닥 닿는 선(늘어진 손발 끝 말고 몸통 아래)
+        mbot.append(int(np.percentile(cb, 85)) + 1 if cb else bb[3])   # 누운 몸의 바닥 닿는 선(늘어진 손발 끝 말고 몸통 아래). 60 → 85(10-28: 다리 든 사망·누운 장이 그림자 위로 뜸)
         lo = max(0, bb[3] - 26)
         xs = np.nonzero(arr[lo:bb[3]].any(axis=0))[0]
         if len(xs):
@@ -606,6 +607,25 @@ def reach_y(cfg, ids):
             ys.append(int(r.mean()))
         out[lid] = ys
     return out
+
+
+def crawl_rev(cfg):
+    """(안 씀: 자동 판정이 네발 기기·맨다리 인물에서 틀림 → chars/<키>.json "crawlRev"를 눈으로 보고 넣음, 10-28)"""
+    for lid, last in (("38_1", False), ("38", True)):
+        an = cfg["anims"].get(lid)
+        if not an: continue
+        fs = sorted((src_dir(cfg, an) / an["folder"]).glob("[0-9][0-9].png"))
+        if not fs: continue
+        im = Image.open(fs[-1 if last else 0]).convert("RGBA")
+        if an.get("mirror"): im = im.transpose(Image.FLIP_LEFT_RIGHT)
+        arr = np.array(im).astype(int); a = arr[:, :, 3] > 40; ys, xs = np.nonzero(a)
+        if not len(xs): return False
+        r, g, b = arr[:, :, 0], arr[:, :, 1], arr[:, :, 2]
+        skin = a & (r > 120) & (r > g + 12) & (g > b) & (r - b > 35)   # 얼굴·손(늘 기는 쪽 앞)
+        sy, sx = np.nonzero(skin); mid = xs.mean()
+        if len(sx) < 15: return bool(xs[ys <= ys.min() + 6].mean() < (xs.min() + xs.max()) / 2)
+        return bool(sx.mean() < mid)
+    return False
 
 
 def turn_after_down(cfg):

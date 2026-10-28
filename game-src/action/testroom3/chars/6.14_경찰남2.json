@@ -239,5 +239,6 @@
   "cd": {},
   "shotDmg": 8,
   "hp": 100
- }
+ },
+ "crawlRev": true
 }

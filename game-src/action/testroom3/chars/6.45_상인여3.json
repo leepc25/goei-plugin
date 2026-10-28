@@ -57,5 +57,6 @@
   "cd": {},
   "shotDmg": 6,
   "hp": 60
- }
+ },
+ "crawlRev": true
 }

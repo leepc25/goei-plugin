@@ -7,7 +7,6 @@
  "anims": {
   "1": {
    "folder": "1",
-   "mirror": false,
    "name": "평상 대기"
   },
   "2": {

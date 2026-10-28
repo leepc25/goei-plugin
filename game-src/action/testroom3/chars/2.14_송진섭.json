@@ -7,7 +7,6 @@
  "anims": {
   "1": {
    "folder": "1",
-   "mirror": true,
    "name": "평상 대기"
   },
   "2": {
@@ -26,7 +25,6 @@
   },
   "W": {
    "folder": "W",
-   "mirror": true,
    "name": "무기 꺼내기"
   },
   "W_1": {
