@@ -1236,11 +1236,13 @@ function drawPlayer() {
   else if (P.sp >= 100) tint = { c: '#ffd34a', over: 0, ea: 0.35 + 0.3 * (0.5 + 0.5 * Math.sin(P.t * 4)), glow: true };
   else if (P.hp <= 25 && P.mode !== 'dead') tint = { c: '#d0101a', over: 0.42 * (0.5 + 0.5 * Math.sin(P.t * Math.PI * 2 * 1.3)), noEdge: true };
   else if (P.mode === 'charge') { const lv = Math.min(3, chLv()); tint = { c: CH_COL[lv], over: 0.08 + 0.08 * Math.sin(P.t * 20), noEdge: true }; }
-  if (P.seat && showChair && CHAIR[P.seat.img] && CHAIR[P.seat.img].complete) {   // 의자: C01 사무 의자 1배(판정 전), 사람 뒤 층. 엉덩이 아래 = 좌석 앞 모서리 근처로 대략 맞춤
-    const im = CHAIR[P.seat.img], side = P.seat.dir === 'side';
-    ctx.save(); ctx.translate(Math.round(P.x - (side ? P.face * 18 * kk : 0)), Math.round(P.y + 2)); ctx.scale(P.face < 0 && side ? -kk : kk, kk); ctx.drawImage(im, -100, -173); ctx.restore();
-  }
+  // 의자: C01 사무 의자 1배(판정 전). 정면·옆은 사람 뒤 층, 후면은 등받이가 몸을 가리게 사람 앞 층(seat_fit.json front=true, 10-28 사용자 지적: 등받이를 뚫고 앉음)
+  const chair = () => { if (!(P.seat && showChair && CHAIR[P.seat.img] && CHAIR[P.seat.img].complete)) return; const im = CHAIR[P.seat.img], side = P.seat.dir === 'side';
+    ctx.save(); ctx.translate(Math.round(P.x - (side ? P.face * 18 * kk : 0)), Math.round(P.y + 2)); ctx.scale(P.face < 0 && side ? -kk : kk, kk); ctx.drawImage(im, -100, -173); ctx.restore(); };
+  const chairFront = P.seat && P.seat.dir === 'back';
+  if (!chairFront) chair();
   drawSprite(id, f, P.x, P.y, P.z, P.face, 1, tint, vis, c && c.breathe ? (Math.sin(P.t * 2.6) > 0 ? 1 : 0) : 0);
+  if (chairFront) chair();
   if (P.mode === 'charge') { const m = muzzle(); drawVfxAt('charge_gather', m.x, m.y, 1.2 + Math.min(1, P.charge) * 0.8, P.t); }
   if (P.status) {
     const top = P.y - P.z - (BASE(a) - a.top[f]) * kk, hgt = (BASE(a) - a.top[f]) * kk;
