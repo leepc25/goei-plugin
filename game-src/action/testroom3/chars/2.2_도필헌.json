@@ -331,6 +331,356 @@
  },
  "skills": {
   "skill": {
+   "name": "앉게.",
+   "steps": [
+    {
+     "anim": "22",
+     "fps": 10,
+     "upto": 3
+    },
+    {
+     "anim": "13",
+     "fps": 12,
+     "events": [
+      {
+       "f": 1,
+       "fx": [
+        {
+         "t": "dash",
+         "speed": 1300,
+         "time": 0.25,
+         "hit": {
+          "dmg": 110,
+          "kind": "down",
+          "vfx": "x3-c-hit-spark-light",
+          "vs": 1.6,
+          "tint": "#C9A046"
+         }
+        },
+        {
+         "t": "v",
+         "vfx": "x3-c-dust-puff",
+         "at": "self",
+         "under": true,
+         "tint": "#d8c8b0"
+        }
+       ]
+      },
+      {
+       "f": 3,
+       "fx": [
+        {
+         "t": "v",
+         "vfx": "x3-c-slash-arc",
+         "at": "front",
+         "dx": 80,
+         "dy": 80,
+         "scale": 0.45,
+         "tint": "#C9A046"
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "anim": "22",
+     "fps": 10,
+     "events": [
+      {
+       "f": 1,
+       "to": 3,
+       "d": 0.01
+      }
+     ]
+    }
+   ]
+  },
+  "charge": {
+   "name": "값을 매기지",
+   "hold": "23",
+   "release": "11",
+   "levels": [
+    0.5,
+    1.2
+   ],
+   "fire": 5,
+   "releaseLv": {
+    "0": "11",
+    "1": "10",
+    "2": "12"
+   },
+   "fireLv": {
+    "0": 5,
+    "1": 6,
+    "2": 1
+   },
+   "lv": {
+    "0": [
+     {
+      "t": "v",
+      "vfx": "x3-c-air-ring",
+      "at": "front",
+      "dx": 110,
+      "scale": 1.4,
+      "tint": "#C9A046",
+      "r": 70,
+      "hit": {
+       "dmg": 80,
+       "kind": "heavy",
+       "vfx": "x3-c-hit-spark-heavy",
+       "vs": 0.7,
+       "tint": "#C9A046"
+      }
+     }
+    ],
+    "1": [
+     {
+      "t": "v",
+      "vfx": "x3-c-slash-arc",
+      "at": "front",
+      "dx": 100,
+      "dy": -30,
+      "scale": 0.7,
+      "rot": -0.6,
+      "tint": "#C9A046",
+      "hit": {
+       "dmg": 100,
+       "kind": "launch"
+      }
+     }
+    ],
+    "2": [
+     {
+      "t": "pull",
+      "dist": 250
+     },
+     {
+      "t": "later",
+      "in": 0.25,
+      "fx": [
+       {
+        "t": "melee",
+        "range": 240,
+        "hit": {
+         "dmg": 60,
+         "kind": "launch",
+         "vfx": "x3-c-hit-spark-heavy",
+         "vs": 0.7,
+         "tint": "#C9A046"
+        }
+       }
+      ]
+     },
+     {
+      "t": "later",
+      "in": 0.4,
+      "fx": [
+       {
+        "t": "melee",
+        "range": 240,
+        "hit": {
+         "dmg": 50,
+         "kind": "launch",
+         "vfx": "x3-c-hit-spark-heavy",
+         "vs": 0.7,
+         "tint": "#C9A046"
+        }
+       }
+      ]
+     },
+     {
+      "t": "later",
+      "in": 0.62,
+      "fx": [
+       {
+        "t": "v",
+        "vfx": "x3-c-ground-shockwave",
+        "at": "self",
+        "scale": 0.7,
+        "under": true,
+        "tint": "#C9A046",
+        "hit": {
+         "dmg": 40,
+         "kind": "heavy"
+        }
+       }
+      ]
+     }
+    ]
+   }
+  },
+  "super": {
+   "name": "거짓말이 빠진 방",
+   "sub": "「자네 정도라면 당연히 알 줄 알았네.」",
+   "steps": [
+    {
+     "anim": "25",
+     "fps": 8,
+     "upto": 2,
+     "events": [
+      {
+       "f": 1,
+       "fx": [
+        {
+         "t": "dark",
+         "v": 2.5
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "anim": "13",
+     "fps": 12,
+     "events": [
+      {
+       "f": 1,
+       "fx": [
+        {
+         "t": "dash",
+         "speed": 1700,
+         "time": 0.7,
+         "hit": {
+          "dmg": 50,
+          "kind": "down",
+          "vfx": "x3-c-hit-spark-light",
+          "vs": 1.6,
+          "tint": "#C9A046"
+         }
+        },
+        {
+         "t": "repeat",
+         "n": 5,
+         "every": 0.14,
+         "fx": [
+          {
+           "t": "v",
+           "vfx": "x3-c-dust-puff",
+           "at": "self",
+           "under": true,
+           "tint": "#d8c8b0"
+          }
+         ]
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "anim": "11",
+     "fps": 12,
+     "events": [
+      {
+       "f": 5,
+       "fx": [
+        {
+         "t": "v",
+         "vfx": "x3-c-air-ring",
+         "at": "front",
+         "dx": 110,
+         "scale": 1.4,
+         "tint": "#C9A046",
+         "r": 70,
+         "hit": {
+          "dmg": 30,
+          "kind": "heavy"
+         }
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "anim": "10",
+     "fps": 12,
+     "events": [
+      {
+       "f": 6,
+       "fx": [
+        {
+         "t": "v",
+         "vfx": "x3-c-slash-arc",
+         "at": "front",
+         "dx": 100,
+         "dy": -30,
+         "scale": 0.7,
+         "rot": -0.6,
+         "tint": "#C9A046",
+         "hit": {
+          "dmg": 30,
+          "kind": "launch"
+         }
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "anim": "12",
+     "fps": 12,
+     "events": [
+      {
+       "f": 4,
+       "fx": [
+        {
+         "t": "melee",
+         "range": 260,
+         "hit": {
+          "dmg": 50,
+          "kind": "launch",
+          "n": 2,
+          "mid": "launch",
+          "every": 0.14,
+          "vfx": "x3-c-hit-spark-heavy",
+          "vs": 0.8,
+          "tint": "#C9A046"
+         }
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "anim": "25",
+     "fps": 8,
+     "events": [
+      {
+       "f": 1,
+       "to": 5,
+       "d": 0.01
+      },
+      {
+       "f": 7,
+       "hold": 0.35,
+       "fx": [
+        {
+         "t": "v",
+         "vfx": "x3-c-ground-shockwave",
+         "at": "screen",
+         "w": 1.05,
+         "tint": "#C9A046",
+         "under": true,
+         "boom": 3,
+         "hit": {
+          "dmg": 80,
+          "kind": "blow",
+          "stop": 0.2,
+          "shake": 16
+         }
+        },
+        {
+         "t": "flash",
+         "v": 0.1
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  }
+ },
+ "skills_2판": {
+  "skill": {
    "name": "담소나 나누겠나?",
    "anim": "22",
    "fps": 9,

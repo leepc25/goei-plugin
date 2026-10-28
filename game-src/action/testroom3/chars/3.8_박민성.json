@@ -375,7 +375,7 @@
   "heat": false,
   "_note": "짐 던지기"
  },
- "skills": {
+ "skills_2판": {
   "skill": {
    "name": "모방 머플러",
    "anim": "22",
@@ -479,6 +479,293 @@
       {
        "t": "text",
        "v": "다시는 안 해…"
+      }
+     ]
+    }
+   ]
+  }
+ },
+ "skills": {
+  "skill": {
+   "name": "모방 머플러",
+   "armor": [
+    1,
+    6
+   ],
+   "steps": [
+    {
+     "anim": "22",
+     "fps": 10,
+     "events": [
+      {
+       "f": 1,
+       "fx": [
+        {
+         "t": "v",
+         "vfx": "x3-3.8-D-muffler-hood",
+         "at": "body",
+         "dx": -28,
+         "dy": -55,
+         "hold": 0.45,
+         "fade": 0.15
+        },
+        {
+         "t": "shake",
+         "v": 2
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "anim": "9",
+     "fps": 12,
+     "events": [
+      {
+       "f": 7,
+       "hold": 0.1,
+       "fx": [
+        {
+         "t": "v",
+         "vfx": "x3-c-air-ring",
+         "at": "hand",
+         "dx": 30,
+         "scale": 1.5,
+         "r": 90,
+         "hit": {
+          "dmg": 80,
+          "kind": "heavy",
+          "vfx": "x3-c-hit-spark-heavy",
+          "vs": 0.6,
+          "stop": 0.12,
+          "shake": 10
+         }
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  "charge": {
+   "name": "문 담당",
+   "hold": "23",
+   "release": "24",
+   "levels": [
+    0.5,
+    1.2
+   ],
+   "fire": 2,
+   "releaseLv": {
+    "2": "15"
+   },
+   "fireLv": {
+    "0": 2,
+    "1": 2,
+    "2": 6
+   },
+   "lv": {
+    "0": [
+     {
+      "t": "melee",
+      "range": 140,
+      "hit": {
+       "dmg": 45,
+       "kind": "light",
+       "vfx": "x3-c-hit-spark-heavy",
+       "vs": 0.5
+      }
+     }
+    ],
+    "1": [
+     {
+      "t": "dash",
+      "speed": 1400,
+      "time": 0.45,
+      "hit": {
+       "dmg": 90,
+       "kind": "blow",
+       "vfx": "x3-c-hit-spark-heavy",
+       "vs": 0.7,
+       "stop": 0.12,
+       "shake": 12
+      }
+     },
+     {
+      "t": "repeat",
+      "n": 4,
+      "every": 0.1,
+      "fx": [
+       {
+        "t": "v",
+        "vfx": "x3-c-dust-puff",
+        "at": "self",
+        "dx": -30,
+        "scale": 1.4,
+        "tint": "#b8a48a"
+       }
+      ]
+     }
+    ],
+    "2": [
+     {
+      "t": "melee",
+      "range": 180,
+      "hit": {
+       "dmg": 40,
+       "kind": "launch",
+       "vfx": "x3-c-hit-spark-light",
+       "vs": 1.5
+      }
+     },
+     {
+      "t": "later",
+      "in": 0.7,
+      "fx": [
+       {
+        "t": "v",
+        "vfx": "x3-c-ground-shockwave",
+        "at": "target",
+        "scale": 0.9,
+        "under": true,
+        "tint": "#d9cbb5",
+        "boom": 2,
+        "hit": {
+         "dmg": 100,
+         "kind": "down",
+         "vfx": "x3-c-hit-spark-heavy",
+         "vs": 0.6,
+         "stop": 0.14,
+         "shake": 12
+        }
+       },
+       {
+        "t": "v",
+        "vfx": "x3-c-dust-puff",
+        "at": "target",
+        "scale": 2.2,
+        "tint": "#b8a48a"
+       }
+      ]
+     }
+    ]
+   }
+  },
+  "super": {
+   "name": "다시는 안 해",
+   "sub": "「다시는 안 해.」",
+   "steps": [
+    {
+     "anim": "25",
+     "fps": 9,
+     "events": [
+      {
+       "f": 2,
+       "fx": [
+        {
+         "t": "pull",
+         "dist": 160,
+         "hit": {
+          "dmg": 20,
+          "kind": "pull",
+          "noVfx": true,
+          "stop": 0.05,
+          "shake": 4
+         }
+        }
+       ]
+      },
+      {
+       "f": 4,
+       "fx": [
+        {
+         "t": "dash",
+         "speed": 1500,
+         "time": 0.6,
+         "hit": {
+          "dmg": 50,
+          "kind": "heavy",
+          "vfx": "x3-c-hit-spark-heavy",
+          "vs": 0.6
+         }
+        },
+        {
+         "t": "repeat",
+         "n": 5,
+         "every": 0.12,
+         "fx": [
+          {
+           "t": "v",
+           "vfx": "x3-c-dust-cloud-large",
+           "at": "self",
+           "dx": -60,
+           "scale": 0.45,
+           "tint": "#b8a48a"
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "f": 9,
+       "fx": [
+        {
+         "t": "v",
+         "vfx": "x3-c-dust-puff",
+         "at": "self",
+         "dx": 40,
+         "scale": 1.8,
+         "tint": "#b8a48a"
+        },
+        {
+         "t": "shake",
+         "v": 5
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "anim": "39",
+     "fps": 10,
+     "events": [
+      {
+       "f": 8,
+       "hold": 0.35,
+       "fx": [
+        {
+         "t": "v",
+         "vfx": "x3-c-ground-crack",
+         "at": "self",
+         "dx": -20,
+         "scale": 1.6,
+         "under": true,
+         "boom": 3
+        },
+        {
+         "t": "v",
+         "vfx": "x3-c-ground-shockwave",
+         "at": "self",
+         "scale": 1.8,
+         "under": true,
+         "tint": "#d9cbb5",
+         "r": 300,
+         "hit": {
+          "dmg": 180,
+          "n": 2,
+          "every": 0.15,
+          "mid": "heavy",
+          "kind": "launch",
+          "vfx": "x3-c-hit-spark-heavy",
+          "stop": 0.22,
+          "shake": 20
+         }
+        },
+        {
+         "t": "flash",
+         "v": 0.1
+        }
+       ]
       }
      ]
     }

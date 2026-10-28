@@ -332,7 +332,7 @@
   "heat": false,
   "_note": "동전 던지기"
  },
- "skills": {
+ "skills_2판": {
   "skill": {
    "name": "값 매기기",
    "anim": "22",
@@ -470,6 +470,548 @@
        "t": "bind",
        "time": 15,
        "color": "#e8c35a"
+      }
+     ]
+    }
+   ]
+  }
+ },
+ "skills": {
+  "skill": {
+   "name": "값 매기기",
+   "anim": "22",
+   "fps": 10,
+   "events": [
+    {
+     "f": 1,
+     "fx": [
+      {
+       "t": "dash",
+       "speed": 900,
+       "time": 0.22,
+       "hit": null
+      },
+      {
+       "t": "v",
+       "vfx": "x3-c-sparkle-dust",
+       "at": "body",
+       "dy": -80,
+       "scale": 0.1,
+       "tint": "#F2C230"
+      }
+     ]
+    },
+    {
+     "f": 5,
+     "hold": 0.1,
+     "fx": [
+      {
+       "t": "melee",
+       "range": 140,
+       "hit": {
+        "dmg": 70,
+        "kind": "launch",
+        "vfx": "x3-c-hit-spark-light",
+        "vs": 1.8,
+        "tint": "#F2C230",
+        "stop": 0.12,
+        "shake": 9
+       }
+      }
+     ]
+    }
+   ]
+  },
+  "charge": {
+   "name": "협상 테이블",
+   "hold": "23",
+   "release": "24",
+   "levels": [
+    0.5,
+    1.2
+   ],
+   "fire": 3,
+   "fireLv": {
+    "0": 3,
+    "1": 3,
+    "2": 6
+   },
+   "lv": {
+    "0": [
+     {
+      "t": "proj",
+      "kind": "coin",
+      "dy": -50,
+      "speed": 1500,
+      "life": 0.22,
+      "size": 0.8,
+      "pierce": false,
+      "hit": {
+       "dmg": 12,
+       "kind": "light",
+       "vfx": "x3-c-hit-spark-light",
+       "tint": "#F2C230",
+       "stop": 0.03,
+       "shake": 2
+      }
+     },
+     {
+      "t": "proj",
+      "kind": "coin",
+      "dy": -25,
+      "speed": 1500,
+      "life": 0.22,
+      "size": 0.8,
+      "pierce": false,
+      "hit": {
+       "dmg": 12,
+       "kind": "light",
+       "vfx": "x3-c-hit-spark-light",
+       "tint": "#F2C230",
+       "stop": 0.03,
+       "shake": 2
+      }
+     },
+     {
+      "t": "proj",
+      "kind": "coin",
+      "dy": 0,
+      "speed": 1500,
+      "life": 0.22,
+      "size": 0.8,
+      "pierce": false,
+      "hit": {
+       "dmg": 12,
+       "kind": "light",
+       "vfx": "x3-c-hit-spark-light",
+       "tint": "#F2C230",
+       "stop": 0.03,
+       "shake": 2
+      }
+     },
+     {
+      "t": "proj",
+      "kind": "coin",
+      "dy": 25,
+      "speed": 1500,
+      "life": 0.22,
+      "size": 0.8,
+      "pierce": false,
+      "hit": {
+       "dmg": 12,
+       "kind": "light",
+       "vfx": "x3-c-hit-spark-light",
+       "tint": "#F2C230",
+       "stop": 0.03,
+       "shake": 2
+      }
+     },
+     {
+      "t": "proj",
+      "kind": "coin",
+      "dy": 50,
+      "speed": 1500,
+      "life": 0.22,
+      "size": 0.8,
+      "pierce": false,
+      "hit": {
+       "dmg": 12,
+       "kind": "light",
+       "vfx": "x3-c-hit-spark-light",
+       "tint": "#F2C230",
+       "stop": 0.03,
+       "shake": 2
+      }
+     },
+     {
+      "t": "v",
+      "vfx": "x3-c-sparkle-dust",
+      "at": "front",
+      "dx": 140,
+      "dy": -110,
+      "scale": 0.25,
+      "tint": "#F2C230"
+     }
+    ],
+    "1": [
+     {
+      "t": "later",
+      "in": 0.0,
+      "fx": [
+       {
+        "t": "proj",
+        "kind": "coin",
+        "dy": 0,
+        "speed": 2000,
+        "life": 0.5,
+        "size": 0.9,
+        "pierce": true,
+        "hit": {
+         "dmg": 10,
+         "kind": "light",
+         "vfx": "x3-c-hit-spark-light",
+         "tint": "#F2C230",
+         "stop": 0.03,
+         "shake": 2
+        }
+       }
+      ]
+     },
+     {
+      "t": "later",
+      "in": 0.04,
+      "fx": [
+       {
+        "t": "proj",
+        "kind": "coin",
+        "dy": 0,
+        "speed": 2000,
+        "life": 0.5,
+        "size": 0.9,
+        "pierce": true,
+        "hit": {
+         "dmg": 10,
+         "kind": "light",
+         "vfx": "x3-c-hit-spark-light",
+         "tint": "#F2C230",
+         "stop": 0.03,
+         "shake": 2
+        }
+       }
+      ]
+     },
+     {
+      "t": "later",
+      "in": 0.08,
+      "fx": [
+       {
+        "t": "proj",
+        "kind": "coin",
+        "dy": 0,
+        "speed": 2000,
+        "life": 0.5,
+        "size": 0.9,
+        "pierce": true,
+        "hit": {
+         "dmg": 10,
+         "kind": "light",
+         "vfx": "x3-c-hit-spark-light",
+         "tint": "#F2C230",
+         "stop": 0.03,
+         "shake": 2
+        }
+       }
+      ]
+     },
+     {
+      "t": "later",
+      "in": 0.12,
+      "fx": [
+       {
+        "t": "proj",
+        "kind": "coin",
+        "dy": 0,
+        "speed": 2000,
+        "life": 0.5,
+        "size": 0.9,
+        "pierce": true,
+        "hit": {
+         "dmg": 10,
+         "kind": "light",
+         "vfx": "x3-c-hit-spark-light",
+         "tint": "#F2C230",
+         "stop": 0.03,
+         "shake": 2
+        }
+       }
+      ]
+     },
+     {
+      "t": "later",
+      "in": 0.16,
+      "fx": [
+       {
+        "t": "proj",
+        "kind": "coin",
+        "dy": 0,
+        "speed": 2000,
+        "life": 0.5,
+        "size": 0.9,
+        "pierce": true,
+        "hit": {
+         "dmg": 10,
+         "kind": "light",
+         "vfx": "x3-c-hit-spark-light",
+         "tint": "#F2C230",
+         "stop": 0.03,
+         "shake": 2
+        }
+       }
+      ]
+     },
+     {
+      "t": "later",
+      "in": 0.2,
+      "fx": [
+       {
+        "t": "proj",
+        "kind": "coin",
+        "dy": 0,
+        "speed": 2000,
+        "life": 0.5,
+        "size": 0.9,
+        "pierce": true,
+        "hit": {
+         "dmg": 10,
+         "kind": "light",
+         "vfx": "x3-c-hit-spark-light",
+         "tint": "#F2C230",
+         "stop": 0.03,
+         "shake": 2
+        }
+       }
+      ]
+     },
+     {
+      "t": "later",
+      "in": 0.24,
+      "fx": [
+       {
+        "t": "proj",
+        "kind": "coin",
+        "dy": 0,
+        "speed": 2000,
+        "life": 0.5,
+        "size": 0.9,
+        "pierce": true,
+        "hit": {
+         "dmg": 10,
+         "kind": "light",
+         "vfx": "x3-c-hit-spark-light",
+         "tint": "#F2C230",
+         "stop": 0.03,
+         "shake": 2
+        }
+       }
+      ]
+     },
+     {
+      "t": "later",
+      "in": 0.28,
+      "fx": [
+       {
+        "t": "proj",
+        "kind": "coin",
+        "dy": 0,
+        "speed": 2000,
+        "life": 0.5,
+        "size": 0.9,
+        "pierce": true,
+        "hit": {
+         "dmg": 30,
+         "kind": "heavy",
+         "vfx": "x3-c-hit-spark-light",
+         "tint": "#F2C230",
+         "vs": 1.4
+        }
+       }
+      ]
+     }
+    ],
+    "2": [
+     {
+      "t": "v",
+      "vfx": "x3-c-sparkle-dust",
+      "at": "target",
+      "scale": 0.3,
+      "tint": "#F2C230"
+     },
+     {
+      "t": "melee",
+      "range": 700,
+      "depth": 90,
+      "hit": {
+       "dmg": 130,
+       "n": 5,
+       "every": 0.1,
+       "mid": "light",
+       "kind": "down",
+       "vfx": "x3-c-hit-spark-light",
+       "tint": "#F2C230",
+       "vs": 1.4,
+       "stop": 0.12,
+       "shake": 10
+      }
+     },
+     {
+      "t": "tether",
+      "time": 0.6,
+      "color": "#F2C230"
+     }
+    ]
+   }
+  },
+  "super": {
+   "name": "매뉴얼만 지키면요",
+   "sub": "「매뉴얼만 지키면요.」",
+   "anim": "25",
+   "fps": 8,
+   "events": [
+    {
+     "f": 1,
+     "fx": [
+      {
+       "t": "v",
+       "vfx": "x3-c-sparkle-dust",
+       "at": "screen",
+       "w": 1.05,
+       "dy": -120,
+       "tint": "#F2C230",
+       "hold": 1.2,
+       "fade": 0.4
+      }
+     ]
+    },
+    {
+     "f": 3,
+     "fx": [
+      {
+       "t": "repeat",
+       "n": 8,
+       "every": 0.035,
+       "fx": [
+        {
+         "t": "proj",
+         "kind": "coin",
+         "dy": -60,
+         "speed": 2400,
+         "life": 0.7,
+         "size": 0.9,
+         "pierce": true,
+         "hit": {
+          "dmg": 6,
+          "kind": "light",
+          "vfx": "x3-c-hit-spark-light",
+          "tint": "#F2C230",
+          "stop": 0.03,
+          "shake": 2
+         }
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "f": 4,
+     "fx": [
+      {
+       "t": "repeat",
+       "n": 8,
+       "every": 0.035,
+       "fx": [
+        {
+         "t": "proj",
+         "kind": "coin",
+         "dy": 0,
+         "speed": 2400,
+         "life": 0.7,
+         "size": 0.9,
+         "pierce": true,
+         "hit": {
+          "dmg": 6,
+          "kind": "light",
+          "vfx": "x3-c-hit-spark-light",
+          "tint": "#F2C230",
+          "stop": 0.03,
+          "shake": 2
+         }
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "f": 5,
+     "fx": [
+      {
+       "t": "repeat",
+       "n": 8,
+       "every": 0.035,
+       "fx": [
+        {
+         "t": "proj",
+         "kind": "coin",
+         "dy": 50,
+         "speed": 2400,
+         "life": 0.7,
+         "size": 0.9,
+         "pierce": true,
+         "hit": {
+          "dmg": 6,
+          "kind": "light",
+          "vfx": "x3-c-hit-spark-light",
+          "tint": "#F2C230",
+          "stop": 0.03,
+          "shake": 2
+         }
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "f": 7,
+     "hold": 0.35,
+     "fx": [
+      {
+       "t": "rain",
+       "icon": "coin",
+       "n": 60,
+       "time": 0.8,
+       "color": "#F2C230"
+      },
+      {
+       "t": "flash",
+       "v": 0.1
+      },
+      {
+       "t": "hit",
+       "hit": {
+        "dmg": 120,
+        "n": 6,
+        "every": 0.1,
+        "mid": "light",
+        "kind": "down",
+        "vfx": "x3-c-hit-spark-light",
+        "tint": "#F2C230",
+        "vs": 1.4,
+        "stop": 0.12,
+        "shake": 12
+       }
+      }
+     ]
+    },
+    {
+     "f": 9,
+     "hold": 0.2,
+     "fx": [
+      {
+       "t": "screen",
+       "spots": 4,
+       "every": 0.08,
+       "each": [
+        {
+         "t": "tether",
+         "time": 0.7,
+         "color": "#F2C230"
+        },
+        {
+         "t": "v",
+         "vfx": "x3-c-sparkle-dust",
+         "scale": 0.2,
+         "tint": "#F2C230"
+        }
+       ]
       }
      ]
     }

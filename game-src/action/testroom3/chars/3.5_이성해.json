@@ -373,7 +373,7 @@
   "heat": false,
   "_note": "명함"
  },
- "skills": {
+ "skills_2판": {
   "skill": {
    "name": "죄송해여!",
    "anim": "22",
@@ -518,6 +518,294 @@
       {
        "t": "text",
        "v": "다들 데리고 나왔어여~"
+      }
+     ]
+    }
+   ]
+  }
+ },
+ "skills": {
+  "skill": {
+   "name": "죄송해여!",
+   "anim": "22",
+   "fps": 10,
+   "events": [
+    {
+     "f": 1,
+     "fx": [
+      {
+       "t": "hop",
+       "v": 1,
+       "inv": 0.35
+      }
+     ]
+    },
+    {
+     "f": 4,
+     "fx": [
+      {
+       "t": "dash",
+       "speed": 900,
+       "time": 0.12,
+       "hit": null
+      }
+     ]
+    },
+    {
+     "f": 5,
+     "hold": 0.1,
+     "fx": [
+      {
+       "t": "melee",
+       "range": 190,
+       "hit": {
+        "dmg": 90,
+        "kind": "heavy",
+        "vfx": "x3-c-hit-spark-heavy",
+        "vs": 0.6,
+        "tint": "#5EC4D6"
+       }
+      }
+     ]
+    }
+   ]
+  },
+  "charge": {
+   "name": "안녕하세여! 실례합니다아!",
+   "hold": "23",
+   "release": "24",
+   "levels": [
+    0.5,
+    1.2
+   ],
+   "fire": 3,
+   "releaseLv": {
+    "1": "13",
+    "2": "16_1"
+   },
+   "fireLv": {
+    "0": 3,
+    "1": 2,
+    "2": 2
+   },
+   "lv": {
+    "0": [
+     {
+      "t": "v",
+      "vfx": "x3-c-hit-spark-heavy",
+      "at": "front",
+      "dx": 80,
+      "dy": -30,
+      "scale": 0.7,
+      "tint": "#5EC4D6",
+      "r": 70,
+      "hit": {
+       "dmg": 50,
+       "kind": "light",
+       "noVfx": true,
+       "stop": 0.1,
+       "shake": 8
+      }
+     }
+    ],
+    "1": [
+     {
+      "t": "dash",
+      "speed": 1200,
+      "time": 0.3,
+      "delay": 0.12,
+      "hit": {
+       "dmg": 85,
+       "kind": "launch",
+       "vfx": "x3-c-hit-spark-heavy",
+       "vs": 0.7,
+       "tint": "#5EC4D6"
+      }
+     },
+     {
+      "t": "v",
+      "vfx": "x3-3.5-S1-sneaker-prints",
+      "at": "self",
+      "dx": -20,
+      "under": true,
+      "fade": 0.3
+     },
+     {
+      "t": "later",
+      "in": 0.15,
+      "fx": [
+       {
+        "t": "v",
+        "vfx": "x3-3.5-S1-sneaker-prints",
+        "at": "self",
+        "dx": -20,
+        "under": true,
+        "fade": 0.3
+       }
+      ]
+     }
+    ],
+    "2": [
+     {
+      "t": "dash",
+      "speed": 1000,
+      "time": 0.5,
+      "hit": {
+       "dmg": 120,
+       "n": 3,
+       "every": 0.15,
+       "mid": "light",
+       "kind": "down",
+       "vfx": "x3-c-hit-spark-light",
+       "vs": 1.4
+      }
+     },
+     {
+      "t": "v",
+      "vfx": "x3-3.5-S1-sneaker-prints",
+      "at": "self",
+      "dx": -20,
+      "under": true,
+      "fade": 0.3
+     },
+     {
+      "t": "later",
+      "in": 0.2,
+      "fx": [
+       {
+        "t": "v",
+        "vfx": "x3-3.5-S1-sneaker-prints",
+        "at": "self",
+        "dx": -20,
+        "under": true,
+        "fade": 0.3
+       }
+      ]
+     },
+     {
+      "t": "later",
+      "in": 0.3,
+      "fx": [
+       {
+        "t": "v",
+        "vfx": "x3-c-slash-arc",
+        "at": "hand",
+        "dx": 20,
+        "rot": 1.6,
+        "scale": 0.9
+       },
+       {
+        "t": "v",
+        "vfx": "x3-c-dust-puff",
+        "at": "front",
+        "dx": 60
+       }
+      ]
+     }
+    ]
+   }
+  },
+  "super": {
+   "name": "다들 데리고 나왔어여",
+   "sub": "「다들 데리고 나왔어여.」",
+   "anim": "25",
+   "fps": 8,
+   "events": [
+    {
+     "f": 2,
+     "fx": [
+      {
+       "t": "pull",
+       "dist": 200,
+       "hit": {
+        "dmg": 20,
+        "kind": "pull",
+        "noVfx": true,
+        "stop": 0.05,
+        "shake": 3
+       }
+      }
+     ]
+    },
+    {
+     "f": 3,
+     "fx": [
+      {
+       "t": "v",
+       "vfx": "x3-3.5-F-isolation-door",
+       "at": "target",
+       "dx": 110,
+       "boom": 2
+      },
+      {
+       "t": "shake",
+       "v": 8
+      }
+     ]
+    },
+    {
+     "f": 5,
+     "hold": 0.2,
+     "fx": [
+      {
+       "t": "melee",
+       "range": 220,
+       "hit": {
+        "dmg": 40,
+        "kind": "heavy",
+        "vfx": "x3-c-hit-spark-light",
+        "vs": 1.4
+       }
+      }
+     ]
+    },
+    {
+     "f": 7,
+     "fx": [
+      {
+       "t": "shake",
+       "v": 16
+      },
+      {
+       "t": "flash",
+       "v": 0.06
+      }
+     ]
+    },
+    {
+     "f": 9,
+     "hold": 0.3,
+     "fx": [
+      {
+       "t": "repeat",
+       "n": 3,
+       "every": 0.13,
+       "fx": [
+        {
+         "t": "flash",
+         "v": 0.08
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "f": 10,
+     "fx": [
+      {
+       "t": "v",
+       "vfx": "x3-c-shard-burst",
+       "at": "target",
+       "scale": 1.6,
+       "tint": "#9aa0a6",
+       "boom": 3,
+       "hit": {
+        "dmg": 160,
+        "kind": "blow",
+        "vfx": "x3-c-hit-spark-heavy",
+        "stop": 0.2,
+        "shake": 16
+       }
       }
      ]
     }

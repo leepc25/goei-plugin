@@ -402,6 +402,219 @@
       {
        "t": "dash",
        "speed": 2600,
+       "time": 0.2,
+       "delay": 0.75,
+       "hit": {
+        "dmg": 140,
+        "kind": "launch",
+        "n": 3,
+        "mid": "light",
+        "every": 0.05,
+        "vfx": "x3-c-slash-arc",
+        "vs": 1.3,
+        "tint": "#ffffff",
+        "stop": 0.22,
+        "shake": 12
+       }
+      }
+     ]
+    },
+    {
+     "f": 2,
+     "fx": [
+      {
+       "t": "hide",
+       "mode": "in",
+       "dur": 0.15
+      }
+     ]
+    }
+   ]
+  },
+  "charge": {
+   "name": "간파",
+   "hold": "23",
+   "release": "24",
+   "armed": true,
+   "levels": [
+    0.5,
+    1.2
+   ],
+   "fire": 3,
+   "fireLv": {
+    "2": 5
+   },
+   "lv": {
+    "0": [
+     {
+      "t": "v",
+      "vfx": "x3-c-vertical-blade-line",
+      "at": "front",
+      "dx": 130,
+      "scale": 0.8,
+      "tint": "#ffffff",
+      "r": 90,
+      "hit": {
+       "dmg": 70,
+       "kind": "light"
+      }
+     }
+    ],
+    "1": [
+     {
+      "t": "v",
+      "vfx": "x3-c-vertical-blade-line",
+      "at": "front",
+      "dx": 300,
+      "scale": 1.2,
+      "rot": 1.5708,
+      "tint": "#ffffff",
+      "hold": 0.4,
+      "r": 160,
+      "delay": 0.45,
+      "hit": {
+       "dmg": 110,
+       "kind": "launch",
+       "vfx": "x3-c-slash-arc",
+       "vs": 1,
+       "tint": "#ffffff",
+       "stop": 0.2
+      }
+     }
+    ],
+    "2": [
+     {
+      "t": "v",
+      "vfx": "x3-2.6-S2-lining-absorb",
+      "at": "body",
+      "dx": 40,
+      "scale": 1
+     },
+     {
+      "t": "later",
+      "in": 0.35,
+      "fx": [
+       {
+        "t": "dash",
+        "speed": 2000,
+        "time": 0.22,
+        "hit": {
+         "dmg": 150,
+         "kind": "launch",
+         "n": 2,
+         "mid": "heavy",
+         "every": 0.12,
+         "vfx": "x3-c-slash-arc",
+         "vs": 1.2,
+         "tint": "#ffffff",
+         "stop": 0.2
+        }
+       }
+      ]
+     }
+    ]
+   }
+  },
+  "super": {
+   "name": "건물 가르기",
+   "sub": "「연필심만 남아도 충분해.」",
+   "anim": "25",
+   "fps": 8,
+   "armed": true,
+   "events": [
+    {
+     "f": 1,
+     "hold": 0.2,
+     "fx": [
+      {
+       "t": "v",
+       "vfx": "x3-c-vertical-blade-line",
+       "at": "body",
+       "dx": 200,
+       "dy": -10,
+       "rot": 1.5708,
+       "scale": 1.2,
+       "tint": "#ffffff"
+      }
+     ]
+    },
+    {
+     "f": 6,
+     "hold": 0.15,
+     "fx": [
+      {
+       "t": "v",
+       "vfx": "x3-2.6-F-flash-cut",
+       "at": "screen",
+       "w": 1.05,
+       "dy": 130,
+       "hold": 0.3
+      },
+      {
+       "t": "flash",
+       "v": 0.14
+      }
+     ]
+    },
+    {
+     "f": 11,
+     "hold": 0.4,
+     "fx": [
+      {
+       "t": "screen",
+       "spots": 4,
+       "every": 0.03,
+       "each": [
+        {
+         "t": "v",
+         "vfx": "x3-c-shard-burst",
+         "scale": 0.6,
+         "tint": "#ffffff"
+        }
+       ]
+      },
+      {
+       "t": "v",
+       "vfx": "x3-c-shard-burst",
+       "at": "target",
+       "scale": 0.9,
+       "tint": "#ffffff",
+       "hit": {
+        "dmg": 200,
+        "kind": "launch",
+        "stop": 0.3,
+        "shake": 20,
+        "vfx": "x3-c-slash-arc",
+        "vs": 2,
+        "tint": "#ffffff"
+       }
+      },
+      {
+       "t": "shake",
+       "v": 18
+      }
+     ]
+    }
+   ]
+  }
+ },
+ "skills_2판": {
+  "skill": {
+   "name": "흉백",
+   "anim": "22",
+   "fps": 10,
+   "events": [
+    {
+     "f": 1,
+     "fx": [
+      {
+       "t": "hide",
+       "mode": "out",
+       "dur": 0.08
+      },
+      {
+       "t": "dash",
+       "speed": 2600,
        "time": 0.22,
        "delay": 0.4,
        "hit": {

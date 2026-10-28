@@ -380,7 +380,7 @@
   "heat": false,
   "_note": "예비 배터리"
  },
- "skills": {
+ "skills_2판": {
   "skill": {
    "name": "헤드램프",
    "anim": "22",
@@ -483,6 +483,247 @@
        "time": 10,
        "label": "규칙 위반 피해 0",
        "edge": false
+      }
+     ]
+    }
+   ]
+  }
+ },
+ "skills": {
+  "skill": {
+   "name": "헤드램프",
+   "anim": "22",
+   "fps": 10,
+   "events": [
+    {
+     "f": 5,
+     "hold": 0.15,
+     "fx": [
+      {
+       "t": "v",
+       "vfx": "x3-3.10-D-headlamp-cone",
+       "at": "body",
+       "dx": 200,
+       "dy": -90,
+       "r": 190,
+       "depth": 90,
+       "hit": {
+        "dmg": 45,
+        "kind": "stun",
+        "noVfx": true,
+        "stop": 0.08,
+        "shake": 4
+       }
+      },
+      {
+       "t": "flash",
+       "v": 0.1
+      }
+     ]
+    }
+   ]
+  },
+  "charge": {
+   "name": "중증도 분류",
+   "hold": "23",
+   "release": "24",
+   "levels": [
+    0.5,
+    1.2
+   ],
+   "fire": 3,
+   "releaseLv": {
+    "1": "11",
+    "2": "13"
+   },
+   "fireLv": {
+    "0": 3,
+    "1": 4,
+    "2": 1
+   },
+   "lv": {
+    "0": [
+     {
+      "t": "v",
+      "vfx": "x3-3.10-S0-bandage-band",
+      "at": "hand",
+      "dx": 70,
+      "scale": 1.4,
+      "r": 80,
+      "hit": {
+       "dmg": 50,
+       "kind": "heavy",
+       "vfx": "x3-c-hit-spark-light",
+       "vs": 1.4
+      }
+     }
+    ],
+    "1": [
+     {
+      "t": "melee",
+      "range": 160,
+      "hit": {
+       "dmg": 90,
+       "n": 3,
+       "every": 0.13,
+       "mid": "light",
+       "kind": "stun",
+       "vfx": "x3-c-hit-spark-heavy",
+       "vs": 0.6,
+       "stop": 0.12,
+       "shake": 10
+      }
+     }
+    ],
+    "2": [
+     {
+      "t": "dash",
+      "speed": 1200,
+      "time": 0.4,
+      "hit": {
+       "dmg": 120,
+       "kind": "down",
+       "vfx": "x3-c-hit-spark-heavy",
+       "vs": 0.7,
+       "stop": 0.16,
+       "shake": 14
+      },
+      "delay": 0.12
+     },
+     {
+      "t": "repeat",
+      "n": 3,
+      "every": 0.12,
+      "fx": [
+       {
+        "t": "v",
+        "vfx": "x3-c-dust-puff",
+        "at": "self",
+        "dx": -30,
+        "scale": 1.2
+       }
+      ]
+     },
+     {
+      "t": "later",
+      "in": 0.42,
+      "fx": [
+       {
+        "t": "v",
+        "vfx": "x3-c-ground-crack",
+        "at": "front",
+        "dx": 70,
+        "scale": 1.0,
+        "under": true
+       }
+      ]
+     }
+    ]
+   }
+  },
+  "super": {
+   "name": "R조의 양심",
+   "sub": "「매뉴얼 한 줄만 기억하면 돼요.」",
+   "anim": "25",
+   "fps": 8,
+   "events": [
+    {
+     "f": 5,
+     "hold": 0.35,
+     "fx": [
+      {
+       "t": "v",
+       "vfx": "x3-3.10-F-light-pillar",
+       "at": "body",
+       "dy": -280
+      },
+      {
+       "t": "later",
+       "in": 0.3,
+       "fx": [
+        {
+         "t": "v",
+         "vfx": "x3-3.10-F-light-cascade",
+         "at": "screen",
+         "w": 1.05
+        },
+        {
+         "t": "flash",
+         "v": 0.2
+        },
+        {
+         "t": "screen",
+         "spots": 5,
+         "every": 0.06,
+         "each": [
+          {
+           "t": "v",
+           "vfx": "x3-c-smoke",
+           "scale": 1.2,
+           "tint": "#ffffff",
+           "hit": {
+            "dmg": 40,
+            "kind": "stun",
+            "noVfx": true,
+            "stop": 0.06,
+            "shake": 5
+           }
+          }
+         ]
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "f": 8,
+     "hold": 0.2,
+     "fx": [
+      {
+       "t": "v",
+       "vfx": "x3-c-ground-shockwave",
+       "at": "self",
+       "w": 1.2,
+       "under": true,
+       "r": 460,
+       "depth": 220,
+       "boom": 2,
+       "hit": {
+        "dmg": 70,
+        "kind": "down",
+        "vfx": "x3-c-hit-spark-light",
+        "vs": 1.5,
+        "stop": 0.14,
+        "shake": 10
+       }
+      }
+     ]
+    },
+    {
+     "f": 10,
+     "hold": 0.3,
+     "fx": [
+      {
+       "t": "v",
+       "vfx": "x3-c-ground-shockwave",
+       "at": "self",
+       "w": 1.2,
+       "under": true,
+       "r": 460,
+       "depth": 220,
+       "boom": 2,
+       "hit": {
+        "dmg": 110,
+        "kind": "down",
+        "vfx": "x3-c-hit-spark-light",
+        "vs": 1.5,
+        "stop": 0.14,
+        "shake": 16
+       }
+      },
+      {
+       "t": "shake",
+       "v": 12
       }
      ]
     }

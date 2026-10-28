@@ -378,7 +378,7 @@
   "heat": false,
   "_note": "던진 조각"
  },
- "skills": {
+ "skills_2판": {
   "skill": {
    "name": "버터나이프 틈",
    "anim": "22",
@@ -562,6 +562,320 @@
         "stop": 0.22,
         "shake": 16
        }
+      }
+     ]
+    }
+   ]
+  }
+ },
+ "skills": {
+  "skill": {
+   "name": "버터나이프 틈",
+   "anim": "22",
+   "fps": 10,
+   "armed": true,
+   "events": [
+    {
+     "f": 3,
+     "fx": [
+      {
+       "t": "v",
+       "vfx": "x3-3.6-D-space-rift",
+       "at": "front",
+       "dx": 120,
+       "dy": -10,
+       "scale": 1.1,
+       "r": 70,
+       "hit": {
+        "dmg": 40,
+        "kind": "light",
+        "vfx": "x3-c-hit-spark-light",
+        "vs": 1.4
+       }
+      }
+     ]
+    },
+    {
+     "f": 6,
+     "fx": [
+      {
+       "t": "pull",
+       "dist": 220,
+       "hit": {
+        "dmg": 20,
+        "kind": "pull",
+        "noVfx": true,
+        "stop": 0.05,
+        "shake": 4
+       }
+      }
+     ]
+    },
+    {
+     "f": 8,
+     "hold": 0.12,
+     "fx": [
+      {
+       "t": "later",
+       "in": 0.1,
+       "fx": [
+        {
+         "t": "hit",
+         "hit": {
+          "dmg": 60,
+          "kind": "down",
+          "vfx": "x3-c-hit-spark-heavy",
+          "vs": 0.7,
+          "stop": 0.14,
+          "shake": 12
+         }
+        },
+        {
+         "t": "v",
+         "vfx": "x3-c-dust-puff",
+         "at": "target",
+         "scale": 1.5
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  "charge": {
+   "name": "손잡이 한 방",
+   "hold": "23",
+   "release": "24",
+   "levels": [
+    0.5,
+    1.2
+   ],
+   "fire": 2,
+   "releaseLv": {
+    "2": "12"
+   },
+   "fireLv": {
+    "0": 2,
+    "1": 2,
+    "2": 3
+   },
+   "lv": {
+    "0": [
+     {
+      "t": "melee",
+      "range": 180,
+      "hit": {
+       "dmg": 55,
+       "kind": "heavy",
+       "vfx": "x3-c-hit-spark-heavy",
+       "vs": 0.6
+      }
+     }
+    ],
+    "1": [
+     {
+      "t": "v",
+      "vfx": "x3-3.6-S1-white-shock-pillar",
+      "at": "hand",
+      "dx": 140,
+      "scale": 2.2,
+      "r": 260,
+      "hit": {
+       "dmg": 100,
+       "kind": "blow",
+       "vfx": "x3-c-hit-spark-heavy",
+       "vs": 0.8,
+       "stop": 0.16,
+       "shake": 14
+      }
+     },
+     {
+      "t": "later",
+      "in": 0.35,
+      "fx": [
+       {
+        "t": "v",
+        "vfx": "x3-c-wall-crack",
+        "at": "target",
+        "scale": 0.7
+       }
+      ]
+     }
+    ],
+    "2": [
+     {
+      "t": "pull",
+      "dist": 120,
+      "hit": {
+       "dmg": 20,
+       "kind": "pull",
+       "noVfx": true,
+       "stop": 0.04,
+       "shake": 3
+      }
+     },
+     {
+      "t": "later",
+      "in": 0.3,
+      "fx": [
+       {
+        "t": "hit",
+        "hit": {
+         "dmg": 120,
+         "kind": "down",
+         "vfx": "x3-c-hit-spark-heavy",
+         "stop": 0.18,
+         "shake": 16
+        }
+       },
+       {
+        "t": "v",
+        "vfx": "x3-c-ground-crack",
+        "at": "front",
+        "dx": 110,
+        "scale": 1.6,
+        "under": true,
+        "boom": 2
+       },
+       {
+        "t": "v",
+        "vfx": "x3-c-ground-shockwave",
+        "at": "front",
+        "dx": 110,
+        "scale": 1.2,
+        "under": true
+       }
+      ]
+     }
+    ]
+   }
+  },
+  "super": {
+   "name": "물리 퇴마",
+   "sub": "「물리 퇴마.」",
+   "anim": "25",
+   "fps": 8,
+   "events": [
+    {
+     "f": 1,
+     "fx": [
+      {
+       "t": "v",
+       "vfx": "x3-c-ground-crack",
+       "at": "self",
+       "dx": 20,
+       "scale": 0.7,
+       "under": true
+      }
+     ]
+    },
+    {
+     "f": 3,
+     "fx": [
+      {
+       "t": "dash",
+       "speed": 700,
+       "time": 0.2,
+       "hit": null
+      },
+      {
+       "t": "v",
+       "vfx": "x3-c-ground-crack",
+       "at": "self",
+       "dx": 20,
+       "scale": 0.7,
+       "under": true
+      }
+     ]
+    },
+    {
+     "f": 4,
+     "hold": 0.25,
+     "fx": [
+      {
+       "t": "pull",
+       "dist": 160
+      },
+      {
+       "t": "lift",
+       "h": 120,
+       "time": 1.2,
+       "color": "#E6E2D3",
+       "hit": {
+        "dmg": 20,
+        "kind": "light",
+        "noVfx": true
+       }
+      },
+      {
+       "t": "v",
+       "vfx": "x3-c-smoke",
+       "at": "target",
+       "scale": 1.4,
+       "tint": "#ffffff"
+      }
+     ]
+    },
+    {
+     "f": 6,
+     "hold": 0.12,
+     "fx": [
+      {
+       "t": "melee",
+       "range": 220,
+       "hit": {
+        "dmg": 70,
+        "kind": "light",
+        "vfx": "x3-c-hit-spark-heavy",
+        "vs": 0.7,
+        "stop": 0.14,
+        "shake": 12
+       }
+      }
+     ]
+    },
+    {
+     "f": 8,
+     "hold": 0.3,
+     "fx": [
+      {
+       "t": "v",
+       "vfx": "x3-3.6-F-white-lizard-silhouette",
+       "at": "body",
+       "dx": -90,
+       "scale": 1.4,
+       "under": true
+      },
+      {
+       "t": "melee",
+       "range": 220,
+       "hit": {
+        "dmg": 160,
+        "kind": "blow",
+        "vfx": "x3-c-hit-spark-heavy",
+        "stop": 0.24,
+        "shake": 20
+       }
+      },
+      {
+       "t": "v",
+       "vfx": "x3-c-air-ring",
+       "at": "hand",
+       "dx": 30,
+       "scale": 1.6
+      },
+      {
+       "t": "later",
+       "in": 0.4,
+       "fx": [
+        {
+         "t": "v",
+         "vfx": "x3-c-wall-crack",
+         "at": "target",
+         "scale": 1.1,
+         "boom": 2
+        }
+       ]
       }
      ]
     }

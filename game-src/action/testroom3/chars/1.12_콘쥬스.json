@@ -375,6 +375,275 @@
    "fps": 9,
    "armor": [
     1,
+    6
+   ],
+   "events": [
+    {
+     "f": 4,
+     "fx": [
+      {
+       "t": "v",
+       "vfx": "x3-o-1.12-barricade",
+       "at": "body",
+       "dy": -170,
+       "scale": 0.9,
+       "hold": 0.12
+      }
+     ]
+    },
+    {
+     "f": 6,
+     "hold": 0.15,
+     "fx": [
+      {
+       "t": "v",
+       "vfx": "x3-o-1.12-barricade",
+       "at": "front",
+       "dx": 150,
+       "mode": "bottom",
+       "hold": 2.6,
+       "fade": 0.3
+      },
+      {
+       "t": "v",
+       "vfx": "x3-c-ground-shockwave",
+       "at": "front",
+       "dx": 150,
+       "scale": 0.45,
+       "under": true,
+       "tint": "#ffffff",
+       "hit": {
+        "dmg": 120,
+        "kind": "launch"
+       }
+      },
+      {
+       "t": "v",
+       "vfx": "x3-c-dust-puff",
+       "at": "front",
+       "dx": 150,
+       "scale": 1,
+       "tint": "#d8c8b0"
+      }
+     ]
+    }
+   ]
+  },
+  "charge": {
+   "name": "실 꿰기 질주",
+   "hold": "23",
+   "release": "24",
+   "levels": [
+    0.5,
+    1.2
+   ],
+   "fire": 1,
+   "releaseLv": {
+    "1": "13"
+   },
+   "fireLv": {
+    "1": 1
+   },
+   "lv": {
+    "0": [
+     {
+      "t": "dash",
+      "speed": 1400,
+      "time": 0.22,
+      "hit": {
+       "dmg": 60,
+       "kind": "heavy"
+      }
+     },
+     {
+      "t": "v",
+      "vfx": "x3-c-dust-puff",
+      "at": "self",
+      "under": true,
+      "tint": "#d8c8b0"
+     }
+    ],
+    "1": [
+     {
+      "t": "dash",
+      "speed": 1600,
+      "time": 0.4,
+      "hit": {
+       "dmg": 100,
+       "kind": "launch"
+      }
+     },
+     {
+      "t": "v",
+      "vfx": "x3-c-dust-puff",
+      "at": "self",
+      "under": true,
+      "tint": "#d8c8b0"
+     }
+    ],
+    "2": [
+     {
+      "t": "repeat",
+      "n": 3,
+      "every": 0.26,
+      "fx": [
+       {
+        "t": "dash",
+        "speed": 1500,
+        "time": 0.24,
+        "hit": {
+         "dmg": 40,
+         "kind": "blow"
+        }
+       },
+       {
+        "t": "v",
+        "vfx": "x3-c-dust-puff",
+        "at": "self",
+        "under": true,
+        "tint": "#d8c8b0"
+       }
+      ]
+     },
+     {
+      "t": "later",
+      "in": 0.8,
+      "fx": [
+       {
+        "t": "v",
+        "vfx": "x3-c-dust-cloud-large",
+        "at": "front",
+        "dx": 120,
+        "scale": 0.5,
+        "tint": "#d8c8b0",
+        "hit": {
+         "dmg": 40,
+         "kind": "heavy"
+        }
+       }
+      ]
+     }
+    ]
+   }
+  },
+  "super": {
+   "name": "제가 다 치울게요!",
+   "sub": "「아저씨들은 뒤에 계세요!」",
+   "steps": [
+    {
+     "anim": "25",
+     "fps": 8,
+     "upto": 2
+    },
+    {
+     "anim": "13",
+     "fps": 12,
+     "events": [
+      {
+       "f": 1,
+       "fx": [
+        {
+         "t": "dash",
+         "speed": 1600,
+         "time": 0.6,
+         "hit": {
+          "dmg": 60,
+          "kind": "launch"
+         }
+        },
+        {
+         "t": "repeat",
+         "n": 4,
+         "every": 0.15,
+         "fx": [
+          {
+           "t": "v",
+           "vfx": "x3-c-dust-puff",
+           "at": "self",
+           "under": true,
+           "tint": "#d8c8b0"
+          }
+         ]
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "anim": "25",
+     "fps": 8,
+     "events": [
+      {
+       "f": 1,
+       "to": 2,
+       "d": 0.01
+      },
+      {
+       "f": 3,
+       "hold": 0.3
+      },
+      {
+       "f": 6,
+       "fx": [
+        {
+         "t": "dash",
+         "speed": 800,
+         "time": 0.6,
+         "hit": {
+          "dmg": 90,
+          "kind": "blow",
+          "stop": 0.16
+         }
+        },
+        {
+         "t": "v",
+         "vfx": "x3-c-dust-cloud-large",
+         "at": "front",
+         "dx": 220,
+         "scale": 0.8,
+         "tint": "#d8c8b0",
+         "fade": 0.4
+        }
+       ]
+      },
+      {
+       "f": 9,
+       "fx": [
+        {
+         "t": "later",
+         "in": 0.35,
+         "fx": [
+          {
+           "t": "v",
+           "vfx": "x3-c-wall-crack",
+           "at": "screen",
+           "dx": 590,
+           "dy": -60,
+           "scale": 1.2,
+           "boom": 2,
+           "hit": {
+            "dmg": 60,
+            "kind": "down",
+            "stop": 0.2,
+            "shake": 16
+           }
+          }
+         ]
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  }
+ },
+ "skills_2판": {
+  "skill": {
+   "name": "바리케이드 번쩍",
+   "anim": "22",
+   "fps": 9,
+   "armor": [
+    1,
     5
    ],
    "events": [

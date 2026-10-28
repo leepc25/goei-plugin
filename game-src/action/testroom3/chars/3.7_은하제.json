@@ -368,7 +368,7 @@
   "heat": false,
   "_note": "수갑 던지기"
  },
- "skills": {
+ "skills_2판": {
   "skill": {
    "name": "수갑",
    "anim": "22",
@@ -507,6 +507,308 @@
      ]
     }
    ]
+  }
+ },
+ "skills": {
+  "skill": {
+   "name": "수갑",
+   "anim": "22",
+   "fps": 10,
+   "events": [
+    {
+     "f": 2,
+     "fx": [
+      {
+       "t": "proj",
+       "kind": "cuff",
+       "vfx": "x3-o-3.7-handcuffs",
+       "rot": 10,
+       "speed": 1500,
+       "size": 1.3,
+       "life": 0.6,
+       "hit": {
+        "dmg": 20,
+        "kind": "light",
+        "vfx": "x3-c-hit-spark-light",
+        "tint": "#cfd6e0"
+       },
+       "end": [
+        {
+         "t": "tether",
+         "time": 0.8,
+         "color": "#cfd6e0"
+        },
+        {
+         "t": "bind",
+         "time": 0.2,
+         "color": "#cfd6e0"
+        },
+        {
+         "t": "later",
+         "in": 0.3,
+         "fx": [
+          {
+           "t": "pull",
+           "dist": 200,
+           "hit": {
+            "dmg": 30,
+            "kind": "pull",
+            "noVfx": true,
+            "stop": 0.05,
+            "shake": 4
+           }
+          }
+         ]
+        },
+        {
+         "t": "later",
+         "in": 0.65,
+         "fx": [
+          {
+           "t": "hit",
+           "hit": {
+            "dmg": 55,
+            "kind": "down",
+            "vfx": "x3-c-hit-spark-heavy",
+            "vs": 0.6
+           }
+          },
+          {
+           "t": "v",
+           "vfx": "x3-c-dust-puff",
+           "at": "target",
+           "scale": 1.4
+          }
+         ]
+        }
+       ]
+      }
+     ]
+    }
+   ],
+   "armed": true
+  },
+  "charge": {
+   "name": "지도 없는 층",
+   "hold": "23",
+   "release": "24",
+   "levels": [
+    0.5,
+    1.2
+   ],
+   "releaseLv": {
+    "0": "9",
+    "1": "13",
+    "2": "12"
+   },
+   "fireLv": {
+    "0": 5,
+    "1": 2,
+    "2": 3
+   },
+   "lv": {
+    "0": [
+     {
+      "t": "melee",
+      "range": 170,
+      "hit": {
+       "dmg": 50,
+       "kind": "heavy",
+       "vfx": "x3-c-hit-spark-light",
+       "vs": 1.6
+      }
+     }
+    ],
+    "1": [
+     {
+      "t": "dash",
+      "speed": 1100,
+      "time": 0.32,
+      "hit": {
+       "dmg": 85,
+       "kind": "down",
+       "vfx": "x3-c-hit-spark-heavy",
+       "vs": 0.7
+      }
+     },
+     {
+      "t": "v",
+      "vfx": "x3-c-dust-puff",
+      "at": "self",
+      "dx": -30
+     },
+     {
+      "t": "later",
+      "in": 0.15,
+      "fx": [
+       {
+        "t": "v",
+        "vfx": "x3-c-dust-puff",
+        "at": "self",
+        "dx": -30
+       }
+      ]
+     }
+    ],
+    "2": [
+     {
+      "t": "dash",
+      "speed": 700,
+      "time": 0.15,
+      "hit": null
+     },
+     {
+      "t": "melee",
+      "range": 190,
+      "hit": {
+       "dmg": 140,
+       "n": 4,
+       "every": 0.13,
+       "mid": "light",
+       "kind": "launch",
+       "vfx": "x3-c-hit-spark-heavy",
+       "vs": 0.6,
+       "stop": 0.14,
+       "shake": 12
+      }
+     }
+    ]
+   }
+  },
+  "super": {
+   "name": "통화 연결",
+   "sub": "「통화 연결.」",
+   "steps": [
+    {
+     "anim": "15",
+     "fps": 10,
+     "events": [
+      {
+       "f": 5,
+       "fx": [
+        {
+         "t": "screen",
+         "spots": 5,
+         "every": 0.12,
+         "each": [
+          {
+           "t": "v",
+           "vfx": "x3-o-3.7-handcuffs",
+           "scale": 1.4,
+           "dy": -20,
+           "hit": {
+            "dmg": 15,
+            "kind": "light",
+            "vfx": "x3-c-hit-spark-light",
+            "tint": "#cfd6e0"
+           }
+          },
+          {
+           "t": "tether",
+           "time": 3,
+           "color": "#cfd6e0"
+          }
+         ]
+        },
+        {
+         "t": "bind",
+         "time": 2.2,
+         "color": "#cfd6e0"
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "anim": "25",
+     "fps": 9,
+     "events": [
+      {
+       "f": 10,
+       "fx": [
+        {
+         "t": "shake",
+         "v": 4
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "anim": "22",
+     "fps": 10,
+     "events": [
+      {
+       "f": 4,
+       "hold": 0.2,
+       "fx": [
+        {
+         "t": "v",
+         "vfx": "x3-3.7-F-chain-wave",
+         "at": "screen",
+         "w": 1.05
+        },
+        {
+         "t": "screen",
+         "spots": 5,
+         "every": 0.1,
+         "each": [
+          {
+           "t": "v",
+           "vfx": "x3-c-dust-puff",
+           "scale": 1.6,
+           "hit": {
+            "dmg": 90,
+            "kind": "down",
+            "vfx": "x3-c-hit-spark-heavy",
+            "vs": 0.6
+           }
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "f": 6,
+       "fx": [
+        {
+         "t": "pull",
+         "dist": 240,
+         "hit": {
+          "dmg": 20,
+          "kind": "pull",
+          "noVfx": true
+         }
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "anim": "12",
+     "fps": 10,
+     "events": [
+      {
+       "f": 5,
+       "hold": 0.15,
+       "fx": [
+        {
+         "t": "melee",
+         "range": 200,
+         "hit": {
+          "dmg": 90,
+          "kind": "launch",
+          "vfx": "x3-c-hit-spark-heavy",
+          "stop": 0.2,
+          "shake": 16
+         }
+        }
+       ]
+      }
+     ]
+    }
+   ],
+   "armed": true
   }
  },
  "_note": "손으로 다듬음(표 「테스트룸」 절·fail 목록·기술안 3장). 그림 값은 자동. 다시 자동으로: build.py --reset 3.7_은하제",

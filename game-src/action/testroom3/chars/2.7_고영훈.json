@@ -400,6 +400,372 @@
  },
  "skills": {
   "skill": {
+   "name": "찔러.",
+   "anim": "22",
+   "fps": 8,
+   "armor": [
+    2,
+    7
+   ],
+   "events": [
+    {
+     "f": 2,
+     "fx": [
+      {
+       "t": "melee",
+       "range": 170,
+       "hit": {
+        "dmg": 20,
+        "kind": "light",
+        "stop": 0.1
+       }
+      }
+     ]
+    },
+    {
+     "f": 4,
+     "hold": 0.15,
+     "fx": [
+      {
+       "t": "summon",
+       "icon": "decoy",
+       "anim": "25",
+       "at": "target",
+       "dx": 70,
+       "time": 0.6,
+       "color": "#101014",
+       "alpha": 0.65,
+       "over": 0.9
+      },
+      {
+       "t": "v",
+       "vfx": "x3-c-slash-arc",
+       "at": "target",
+       "scale": 0.6,
+       "tint": "#7a8aa0",
+       "delay": 0.1,
+       "hit": {
+        "dmg": 60,
+        "kind": "light"
+       }
+      }
+     ]
+    },
+    {
+     "f": 7,
+     "hold": 0.1,
+     "fx": [
+      {
+       "t": "melee",
+       "range": 200,
+       "hit": {
+        "dmg": 70,
+        "kind": "blow"
+       }
+      }
+     ]
+    }
+   ]
+  },
+  "charge": {
+   "name": "셋으로 나눈다",
+   "hold": "23",
+   "release": "24",
+   "armed": true,
+   "levels": [
+    0.5,
+    1.2
+   ],
+   "fire": 3,
+   "lv": {
+    "0": [
+     {
+      "t": "summon",
+      "icon": "decoy",
+      "anim": "25",
+      "at": "front",
+      "dx": 60,
+      "time": 0.4,
+      "color": "#101014",
+      "alpha": 0.65,
+      "over": 0.9
+     },
+     {
+      "t": "proj",
+      "vfx": "x3-c-slash-arc",
+      "tint": "#7a8aa0",
+      "speed": 1600,
+      "life": 0.4,
+      "size": 0.6,
+      "pierce": true,
+      "dy": 0,
+      "hit": {
+       "dmg": 70,
+       "kind": "heavy"
+      }
+     }
+    ],
+    "1": [
+     {
+      "t": "summon",
+      "icon": "decoy",
+      "anim": "25",
+      "at": "front",
+      "dx": 60,
+      "time": 0.4,
+      "color": "#101014",
+      "alpha": 0.65,
+      "over": 0.9
+     },
+     {
+      "t": "proj",
+      "vfx": "x3-c-slash-arc",
+      "tint": "#7a8aa0",
+      "speed": 1600,
+      "life": 0.4,
+      "size": 0.6,
+      "pierce": true,
+      "dy": -50
+     },
+     {
+      "t": "proj",
+      "vfx": "x3-c-slash-arc",
+      "tint": "#7a8aa0",
+      "speed": 1600,
+      "life": 0.4,
+      "size": 0.6,
+      "pierce": true,
+      "dy": 0,
+      "hit": {
+       "dmg": 100,
+       "kind": "heavy"
+      }
+     },
+     {
+      "t": "proj",
+      "vfx": "x3-c-slash-arc",
+      "tint": "#7a8aa0",
+      "speed": 1600,
+      "life": 0.4,
+      "size": 0.6,
+      "pierce": true,
+      "dy": 50
+     }
+    ],
+    "2": [
+     {
+      "t": "summon",
+      "icon": "decoy",
+      "anim": "25",
+      "at": "target",
+      "dx": -90,
+      "time": 0.6,
+      "color": "#101014",
+      "alpha": 0.65,
+      "over": 0.9
+     },
+     {
+      "t": "summon",
+      "icon": "decoy",
+      "anim": "25",
+      "at": "target",
+      "dx": 90,
+      "time": 0.6,
+      "color": "#101014",
+      "alpha": 0.65,
+      "over": 0.9
+     },
+     {
+      "t": "summon",
+      "icon": "decoy",
+      "anim": "25",
+      "at": "target",
+      "dx": 0,
+      "time": 0.6,
+      "color": "#101014",
+      "alpha": 0.65,
+      "over": 0.9
+     },
+     {
+      "t": "later",
+      "in": 0.25,
+      "fx": [
+       {
+        "t": "v",
+        "vfx": "x3-2.7-S2-cross-slash",
+        "at": "target",
+        "scale": 1,
+        "hit": {
+         "dmg": 150,
+         "kind": "launch",
+         "stop": 0.18
+        }
+       }
+      ]
+     }
+    ]
+   }
+  },
+  "super": {
+   "name": "킹",
+   "sub": "「요점.」",
+   "anim": "25",
+   "fps": 8,
+   "armed": true,
+   "events": [
+    {
+     "f": 1,
+     "fx": [
+      {
+       "t": "screen",
+       "spots": 4,
+       "every": 0.05,
+       "each": [
+        {
+         "t": "summon",
+         "icon": "decoy",
+         "anim": "25",
+         "at": "target",
+         "dx": 0,
+         "time": 3.4,
+         "color": "#101014",
+         "alpha": 0.65,
+         "over": 0.9
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "f": 2,
+     "fx": [
+      {
+       "t": "screen",
+       "spots": 4,
+       "every": 0.12,
+       "each": [
+        {
+         "t": "v",
+         "vfx": "x3-c-slash-arc",
+         "scale": 0.8,
+         "tint": "#7a8aa0",
+         "hit": {
+          "dmg": 20,
+          "kind": "light"
+         }
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "f": 3,
+     "fx": [
+      {
+       "t": "v",
+       "vfx": "x3-c-slash-arc",
+       "at": "target",
+       "scale": 1.1,
+       "rot": 1.2,
+       "tint": "#7a8aa0",
+       "hit": {
+        "dmg": 25,
+        "kind": "light"
+       }
+      }
+     ]
+    },
+    {
+     "f": 5,
+     "fx": [
+      {
+       "t": "v",
+       "vfx": "x3-c-slash-arc",
+       "at": "target",
+       "scale": 1.1,
+       "rot": -1.0,
+       "tint": "#7a8aa0",
+       "hit": {
+        "dmg": 25,
+        "kind": "light"
+       }
+      }
+     ]
+    },
+    {
+     "f": 7,
+     "fx": [
+      {
+       "t": "v",
+       "vfx": "x3-c-slash-arc",
+       "at": "target",
+       "scale": 1.2,
+       "tint": "#7a8aa0",
+       "hit": {
+        "dmg": 25,
+        "kind": "heavy"
+       }
+      }
+     ]
+    },
+    {
+     "f": 10,
+     "hold": 0.4,
+     "fx": [
+      {
+       "t": "flash",
+       "v": 0.12
+      },
+      {
+       "t": "screen",
+       "spots": 4,
+       "every": 0,
+       "each": [
+        {
+         "t": "v",
+         "vfx": "x3-c-vertical-blade-line",
+         "scale": 1.2,
+         "rot": 1.5708,
+         "tint": "#ffffff"
+        },
+        {
+         "t": "v",
+         "vfx": "x3-c-hit-spark-heavy",
+         "scale": 0.8,
+         "tint": "#7a8aa0",
+         "hit": {
+          "dmg": 110,
+          "kind": "launch",
+          "stop": 0.22,
+          "shake": 16
+         }
+        }
+       ]
+      },
+      {
+       "t": "later",
+       "in": 0.5,
+       "fx": [
+        {
+         "t": "v",
+         "vfx": "x3-c-ground-crack",
+         "at": "target",
+         "scale": 0.6,
+         "under": true,
+         "hit": {
+          "dmg": 40,
+          "kind": "spike"
+         }
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  }
+ },
+ "skills_2판": {
+  "skill": {
    "name": "잡고 찌르게 해",
    "anim": "22",
    "fps": 8,

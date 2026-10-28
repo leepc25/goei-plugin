@@ -390,6 +390,328 @@
  },
  "skills": {
   "skill": {
+   "name": "책상 내려치기",
+   "anim": "22",
+   "fps": 10,
+   "armed": true,
+   "events": [
+    {
+     "f": 4,
+     "hold": 0.12,
+     "fx": [
+      {
+       "t": "v",
+       "vfx": "x3-2.5-D-slam-line",
+       "at": "front",
+       "dx": 150,
+       "scale": 1,
+       "hit": {
+        "dmg": 120,
+        "kind": "down",
+        "vfx": "x3-c-hit-spark-heavy",
+        "vs": 0.7,
+        "tint": "#bcd4e4"
+       }
+      },
+      {
+       "t": "v",
+       "vfx": "x3-c-paper-scatter",
+       "at": "front",
+       "dx": 150,
+       "scale": 0.5
+      },
+      {
+       "t": "shake",
+       "v": 4
+      }
+     ]
+    }
+   ]
+  },
+  "charge": {
+   "name": "선택적인 증거 제시",
+   "hold": "23",
+   "release": "24",
+   "armed": true,
+   "levels": [
+    0.5,
+    1.2
+   ],
+   "fire": 4,
+   "releaseLv": {
+    "0": "15",
+    "1": "13",
+    "2": "12"
+   },
+   "fireLv": {
+    "0": 4,
+    "1": 1,
+    "2": 5
+   },
+   "lv": {
+    "0": [
+     {
+      "t": "v",
+      "vfx": "x3-c-hit-spark-heavy",
+      "at": "front",
+      "dx": 140,
+      "scale": 0.6,
+      "tint": "#bcd4e4",
+      "r": 90,
+      "hit": {
+       "dmg": 70,
+       "kind": "heavy"
+      }
+     }
+    ],
+    "1": [
+     {
+      "t": "dash",
+      "speed": 1300,
+      "time": 0.4,
+      "hit": {
+       "dmg": 110,
+       "kind": "down",
+       "vfx": "x3-c-hit-spark-heavy",
+       "vs": 0.7,
+       "tint": "#bcd4e4"
+      }
+     },
+     {
+      "t": "v",
+      "vfx": "x3-c-dust-puff",
+      "at": "self",
+      "under": true,
+      "tint": "#d8c8b0"
+     }
+    ],
+    "2": [
+     {
+      "t": "v",
+      "vfx": "x3-2.5-D-slam-line",
+      "at": "front",
+      "dx": 60,
+      "scale": 1.4
+     },
+     {
+      "t": "v",
+      "vfx": "x3-c-ground-crack",
+      "at": "front",
+      "dx": 60,
+      "scale": 0.6,
+      "under": true
+     },
+     {
+      "t": "v",
+      "vfx": "x3-c-ground-shockwave",
+      "at": "front",
+      "dx": 60,
+      "scale": 1.1,
+      "under": true,
+      "tint": "#bcd4e4",
+      "hit": {
+       "dmg": 150,
+       "kind": "launch",
+       "n": 2,
+       "mid": "stun",
+       "every": 0.2
+      }
+     }
+    ]
+   }
+  },
+  "super": {
+   "name": "영상 올리기 전에",
+   "sub": "「뭘 올렸는지는 다 압니다.」",
+   "armed": true,
+   "steps": [
+    {
+     "anim": "25",
+     "fps": 8,
+     "upto": 6,
+     "events": [
+      {
+       "f": 1,
+       "fx": [
+        {
+         "t": "dark",
+         "v": 2.5
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "anim": "22",
+     "fps": 16,
+     "events": [
+      {
+       "f": 4,
+       "fx": [
+        {
+         "t": "v",
+         "vfx": "x3-2.5-D-slam-line",
+         "at": "target",
+         "scale": 1,
+         "hit": {
+          "dmg": 35,
+          "kind": "down",
+          "vfx": "x3-c-hit-spark-heavy",
+          "vs": 0.6,
+          "tint": "#bcd4e4"
+         }
+        },
+        {
+         "t": "v",
+         "vfx": "x3-c-paper-scatter",
+         "at": "target",
+         "scale": 0.5
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "anim": "22",
+     "fps": 16,
+     "events": [
+      {
+       "f": 4,
+       "fx": [
+        {
+         "t": "v",
+         "vfx": "x3-2.5-D-slam-line",
+         "at": "target",
+         "scale": 1,
+         "hit": {
+          "dmg": 35,
+          "kind": "down",
+          "vfx": "x3-c-hit-spark-heavy",
+          "vs": 0.6,
+          "tint": "#bcd4e4"
+         }
+        },
+        {
+         "t": "v",
+         "vfx": "x3-c-paper-scatter",
+         "at": "target",
+         "scale": 0.5
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "anim": "22",
+     "fps": 16,
+     "events": [
+      {
+       "f": 4,
+       "fx": [
+        {
+         "t": "v",
+         "vfx": "x3-2.5-D-slam-line",
+         "at": "target",
+         "scale": 1,
+         "hit": {
+          "dmg": 35,
+          "kind": "down",
+          "vfx": "x3-c-hit-spark-heavy",
+          "vs": 0.6,
+          "tint": "#bcd4e4"
+         }
+        },
+        {
+         "t": "v",
+         "vfx": "x3-c-paper-scatter",
+         "at": "target",
+         "scale": 0.5
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "anim": "25",
+     "fps": 8,
+     "events": [
+      {
+       "f": 1,
+       "to": 8,
+       "d": 0.01
+      },
+      {
+       "f": 10,
+       "hold": 0.25,
+       "fx": [
+        {
+         "t": "screen",
+         "spots": 3,
+         "every": 0.08,
+         "each": [
+          {
+           "t": "summon",
+           "icon": "decoy",
+           "anim": "13",
+           "time": 0.6,
+           "color": "#101014",
+           "alpha": 0.8,
+           "over": 0.9
+          },
+          {
+           "t": "v",
+           "vfx": "x3-c-dust-puff",
+           "scale": 1.2,
+           "tint": "#d8c8b0",
+           "hit": {
+            "dmg": 40,
+            "kind": "down"
+           }
+          }
+         ]
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "anim": "12",
+     "fps": 12,
+     "events": [
+      {
+       "f": 5,
+       "hold": 0.3,
+       "fx": [
+        {
+         "t": "v",
+         "vfx": "x3-2.5-D-slam-line",
+         "at": "screen",
+         "w": 1.05,
+         "boom": 3,
+         "hit": {
+          "dmg": 90,
+          "kind": "launch",
+          "stop": 0.2,
+          "shake": 16
+         }
+        },
+        {
+         "t": "v",
+         "vfx": "x3-c-ground-crack",
+         "at": "front",
+         "dx": 60,
+         "scale": 0.7,
+         "under": true
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  }
+ },
+ "skills_2판": {
+  "skill": {
    "name": "서류철",
    "anim": "22",
    "fps": 9,

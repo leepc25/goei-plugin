@@ -374,6 +374,323 @@
  },
  "skills": {
   "skill": {
+   "name": "돌아가.",
+   "anim": "22",
+   "fps": 10,
+   "events": [
+    {
+     "f": 4,
+     "hold": 0.1,
+     "fx": [
+      {
+       "t": "v",
+       "vfx": "x3-c-hit-spark-light",
+       "at": "body",
+       "dx": 10,
+       "dy": -80,
+       "scale": 0.8,
+       "tint": "#D9A0FF"
+      },
+      {
+       "t": "proj",
+       "kind": "coin",
+       "speed": 1300,
+       "life": 0.45,
+       "size": 1,
+       "hit": {
+        "dmg": 110,
+        "kind": "heavy",
+        "vfx": "x3-c-hit-spark-light",
+        "vs": 1.6
+       },
+       "end": [
+        {
+         "t": "v",
+         "vfx": "x3-c-dust-puff",
+         "at": "target",
+         "scale": 0.35,
+         "tint": "#c8b8a0"
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "f": 8,
+     "hold": 0.1
+    }
+   ]
+  },
+  "charge": {
+   "name": "인형술",
+   "hold": "23",
+   "release": "24",
+   "levels": [
+    0.5,
+    1.2
+   ],
+   "fire": 3,
+   "releaseLv": {
+    "0": "12",
+    "1": "24",
+    "2": "24"
+   },
+   "fireLv": {
+    "0": 5,
+    "1": 2,
+    "2": 3
+   },
+   "lv": {
+    "0": [
+     {
+      "t": "proj",
+      "vfx": "x3-c-thread-segment",
+      "tint": "#B04FD0",
+      "speed": 1800,
+      "life": 0.36,
+      "size": 2,
+      "hit": {
+       "dmg": 60,
+       "kind": "pull"
+      },
+      "end": [
+       {
+        "t": "tether",
+        "time": 0.5,
+        "color": "#9a5ad8"
+       },
+       {
+        "t": "v",
+        "vfx": "x3-c-dust-puff",
+        "at": "target",
+        "scale": 0.6,
+        "under": true,
+        "tint": "#c8b8a0"
+       }
+      ]
+     }
+    ],
+    "1": [
+     {
+      "t": "proj",
+      "vfx": "x3-c-thread-segment",
+      "tint": "#B04FD0",
+      "speed": 1800,
+      "life": 0.36,
+      "size": 2,
+      "hit": {
+       "dmg": 40,
+       "kind": "launch"
+      },
+      "end": [
+       {
+        "t": "tether",
+        "time": 0.9,
+        "color": "#9a5ad8"
+       },
+       {
+        "t": "later",
+        "in": 0.45,
+        "fx": [
+         {
+          "t": "v",
+          "vfx": "x3-c-ground-crack",
+          "at": "target",
+          "scale": 0.5,
+          "under": true
+         },
+         {
+          "t": "hit",
+          "hit": {
+           "dmg": 90,
+           "kind": "spike",
+           "vfx": "x3-c-hit-spark-heavy",
+           "vs": 0.8,
+           "tint": "#B04FD0",
+           "stop": 0.14,
+           "shake": 12
+          }
+         }
+        ]
+       }
+      ]
+     }
+    ],
+    "2": [
+     {
+      "t": "proj",
+      "vfx": "x3-c-thread-segment",
+      "tint": "#B04FD0",
+      "speed": 1800,
+      "life": 0.36,
+      "size": 2,
+      "dy": -40
+     },
+     {
+      "t": "proj",
+      "vfx": "x3-c-thread-segment",
+      "tint": "#B04FD0",
+      "speed": 1800,
+      "life": 0.36,
+      "size": 2,
+      "dy": 40
+     },
+     {
+      "t": "proj",
+      "vfx": "x3-c-thread-segment",
+      "tint": "#B04FD0",
+      "speed": 1800,
+      "life": 0.36,
+      "size": 2,
+      "hit": {
+       "dmg": 40,
+       "kind": "pull"
+      },
+      "end": [
+       {
+        "t": "tether",
+        "time": 0.6,
+        "color": "#9a5ad8"
+       },
+       {
+        "t": "later",
+        "in": 0.35,
+        "fx": [
+         {
+          "t": "v",
+          "vfx": "x3-c-hit-spark-heavy",
+          "at": "front",
+          "dx": 110,
+          "scale": 1,
+          "tint": "#B04FD0"
+         },
+         {
+          "t": "hit",
+          "hit": {
+           "dmg": 120,
+           "kind": "down",
+           "stop": 0.16,
+           "shake": 12
+          }
+         }
+        ]
+       }
+      ]
+     }
+    ]
+   }
+  },
+  "super": {
+   "name": "앙상블",
+   "sub": "「나 사무직이라니까?!」",
+   "anim": "25",
+   "fps": 8,
+   "events": [
+    {
+     "f": 1,
+     "hold": 0.25,
+     "fx": [
+      {
+       "t": "screen",
+       "spots": 5,
+       "every": 0.05,
+       "each": [
+        {
+         "t": "tether",
+         "time": 2.6,
+         "color": "#9a5ad8"
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "f": 3,
+     "fx": [
+      {
+       "t": "screen",
+       "spots": 5,
+       "every": 0.06,
+       "each": [
+        {
+         "t": "v",
+         "vfx": "x3-c-hit-spark-light",
+         "at": "target",
+         "scale": 2,
+         "tint": "#B04FD0",
+         "hit": {
+          "dmg": 20,
+          "kind": "light"
+         }
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "f": 5,
+     "fx": [
+      {
+       "t": "screen",
+       "spots": 5,
+       "every": 0.06,
+       "each": [
+        {
+         "t": "v",
+         "vfx": "x3-c-hit-spark-heavy",
+         "at": "target",
+         "scale": 0.6,
+         "tint": "#B04FD0",
+         "hit": {
+          "dmg": 30,
+          "kind": "light"
+         }
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "f": 7,
+     "fx": [
+      {
+       "t": "pull",
+       "dist": 300
+      }
+     ]
+    },
+    {
+     "f": 8,
+     "hold": 0.3,
+     "fx": [
+      {
+       "t": "v",
+       "vfx": "x3-1.11-F-clash-flash",
+       "at": "target",
+       "scale": 1.5,
+       "boom": 3,
+       "hit": {
+        "dmg": 150,
+        "kind": "blow",
+        "stop": 0.22,
+        "shake": 16
+       }
+      },
+      {
+       "t": "flash",
+       "v": 0.12
+      }
+     ]
+    },
+    {
+     "f": 10,
+     "hold": 0.15
+    }
+   ]
+  }
+ },
+ "skills_2판": {
+  "skill": {
    "name": "동전 던지기 최면",
    "anim": "22",
    "fps": 9,

@@ -358,7 +358,7 @@
   "heat": false,
   "_note": "박수 장풍(공기 고리)"
  },
- "skills": {
+ "skills_2판": {
   "skill": {
    "name": "너 승진",
    "anim": "22",
@@ -489,6 +489,340 @@
         "stop": 0.2,
         "shake": 14
        }
+      }
+     ]
+    }
+   ]
+  }
+ },
+ "skills": {
+  "skill": {
+   "name": "어깨 도장",
+   "anim": "22",
+   "fps": 10,
+   "push": 260,
+   "armor": [
+    2,
+    6
+   ],
+   "events": [
+    {
+     "f": 2,
+     "fx": [
+      {
+       "t": "v",
+       "vfx": "x3-3.3-D-green-palm-print",
+       "at": "front",
+       "dx": 60,
+       "r": 70,
+       "hit": {
+        "dmg": 12,
+        "kind": "light",
+        "vfx": "x3-c-hit-spark-light",
+        "stop": 0.05,
+        "shake": 3
+       }
+      }
+     ]
+    },
+    {
+     "f": 4,
+     "fx": [
+      {
+       "t": "v",
+       "vfx": "x3-3.3-D-green-palm-print",
+       "at": "front",
+       "dx": 60,
+       "r": 70,
+       "hit": {
+        "dmg": 12,
+        "kind": "light",
+        "vfx": "x3-c-hit-spark-light",
+        "stop": 0.05,
+        "shake": 3
+       }
+      }
+     ]
+    },
+    {
+     "f": 6,
+     "hold": 0.14,
+     "fx": [
+      {
+       "t": "v",
+       "vfx": "x3-c-air-ring",
+       "at": "front",
+       "dx": 110,
+       "dy": -70,
+       "scale": 1.4,
+       "r": 80,
+       "hit": {
+        "dmg": 60,
+        "kind": "stun",
+        "vfx": "x3-c-hit-spark-heavy",
+        "vs": 0.7,
+        "stop": 0.14,
+        "shake": 10
+       }
+      }
+     ]
+    }
+   ]
+  },
+  "charge": {
+   "name": "진입 전 점검",
+   "hold": "23",
+   "release": "24",
+   "levels": [
+    0.5,
+    1.2
+   ],
+   "releaseLv": {
+    "0": "9",
+    "1": "13",
+    "2": "24"
+   },
+   "fireLv": {
+    "0": 4,
+    "1": 3,
+    "2": 6
+   },
+   "lv": {
+    "0": [
+     {
+      "t": "v",
+      "vfx": "x3-c-slash-arc",
+      "at": "hand",
+      "dx": 30,
+      "scale": 0.8,
+      "rot": 0.7,
+      "tint": "#2E8B57",
+      "r": 90,
+      "hit": {
+       "dmg": 50,
+       "kind": "heavy",
+       "vfx": "x3-c-hit-spark-heavy",
+       "vs": 0.6
+      }
+     }
+    ],
+    "1": [
+     {
+      "t": "dash",
+      "speed": 1100,
+      "time": 0.28,
+      "hit": {
+       "dmg": 80,
+       "kind": "heavy",
+       "vfx": "x3-c-hit-spark-light",
+       "vs": 1.4
+      }
+     },
+     {
+      "t": "v",
+      "vfx": "x3-c-slash-arc",
+      "at": "hand",
+      "dx": 40,
+      "scale": 1.1,
+      "tint": "#2E8B57"
+     },
+     {
+      "t": "v",
+      "vfx": "x3-c-dust-puff",
+      "at": "self",
+      "dx": -40
+     }
+    ],
+    "2": [
+     {
+      "t": "dash",
+      "speed": 1300,
+      "time": 0.3,
+      "hit": {
+       "dmg": 130,
+       "n": 2,
+       "every": 0.16,
+       "mid": "heavy",
+       "kind": "launch",
+       "vfx": "x3-c-hit-spark-heavy",
+       "vs": 0.8,
+       "stop": 0.16,
+       "shake": 12
+      }
+     },
+     {
+      "t": "v",
+      "vfx": "x3-c-slash-arc",
+      "at": "hand",
+      "dx": 30,
+      "scale": 1.2,
+      "rot": 0.8,
+      "tint": "#2E8B57"
+     },
+     {
+      "t": "later",
+      "in": 0.16,
+      "fx": [
+       {
+        "t": "v",
+        "vfx": "x3-c-slash-arc",
+        "at": "hand",
+        "dx": 30,
+        "scale": 1.4,
+        "rot": -1.0,
+        "tint": "#2E8B57"
+       }
+      ]
+     }
+    ]
+   }
+  },
+  "super": {
+   "name": "A조에 온 걸 환영해",
+   "sub": "「A조에 온 걸 환영해.」",
+   "steps": [
+    {
+     "anim": "25",
+     "fps": 8,
+     "events": [
+      {
+       "f": 2,
+       "fx": [
+        {
+         "t": "v",
+         "vfx": "x3-c-sparkle-dust",
+         "at": "body",
+         "dy": -120,
+         "scale": 0.35,
+         "tint": "#2E8B57"
+        }
+       ]
+      },
+      {
+       "f": 4,
+       "hold": 0.35,
+       "fx": [
+        {
+         "t": "v",
+         "vfx": "x3-3.3-F-rewind-ring",
+         "at": "front",
+         "dx": 320,
+         "under": true,
+         "delay": 0.4,
+         "hit": {
+          "dmg": 20,
+          "kind": "heavy",
+          "noVfx": true,
+          "stop": 0.05,
+          "shake": 4
+         }
+        }
+       ]
+      },
+      {
+       "f": 6,
+       "hold": 0.3,
+       "fx": [
+        {
+         "t": "zoom",
+         "v": 0.06
+        },
+        {
+         "t": "shake",
+         "v": 6
+        }
+       ]
+      },
+      {
+       "f": 7,
+       "fx": [
+        {
+         "t": "dash",
+         "speed": 900,
+         "time": 0.22,
+         "hit": null
+        },
+        {
+         "t": "v",
+         "vfx": "x3-c-slash-arc",
+         "at": "hand",
+         "dx": 30,
+         "rot": 0.6,
+         "tint": "#2E8B57"
+        },
+        {
+         "t": "melee",
+         "range": 220,
+         "hit": {
+          "dmg": 50,
+          "n": 2,
+          "every": 0.12,
+          "kind": "light",
+          "vfx": "x3-c-hit-spark-light",
+          "vs": 1.4
+         }
+        }
+       ]
+      },
+      {
+       "f": 9,
+       "hold": 0.15,
+       "fx": [
+        {
+         "t": "melee",
+         "range": 200,
+         "hit": {
+          "dmg": 50,
+          "kind": "launch",
+          "vfx": "x3-c-hit-spark-heavy",
+          "vs": 0.8
+         }
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "anim": "15",
+     "fps": 10,
+     "events": [
+      {
+       "f": 4,
+       "hold": 0.25,
+       "fx": [
+        {
+         "t": "v",
+         "vfx": "x3-c-air-ring",
+         "at": "hand",
+         "dx": 40,
+         "scale": 4,
+         "r": 260,
+         "boom": 2,
+         "hit": {
+          "dmg": 110,
+          "kind": "blow",
+          "vfx": "x3-c-hit-spark-heavy",
+          "stop": 0.22,
+          "shake": 18
+         }
+        },
+        {
+         "t": "flash",
+         "v": 0.12
+        },
+        {
+         "t": "later",
+         "in": 0.35,
+         "fx": [
+          {
+           "t": "v",
+           "vfx": "x3-c-wall-crack",
+           "at": "target",
+           "scale": 0.8
+          }
+         ]
+        }
+       ]
       }
      ]
     }

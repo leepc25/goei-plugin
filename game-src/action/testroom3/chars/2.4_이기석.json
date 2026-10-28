@@ -398,6 +398,300 @@
  },
  "skills": {
   "skill": {
+   "name": "의수 발사",
+   "anim": "9",
+   "fps": 11,
+   "armed": false,
+   "events": [
+    {
+     "f": 6,
+     "hold": 0.12,
+     "fx": [
+      {
+       "t": "proj",
+       "vfx": "x3-o-2.4-prosthetic-arm",
+       "kind": "arm",
+       "rot": 14,
+       "speed": 1200,
+       "life": 0.46,
+       "size": 0.9,
+       "hit": {
+        "dmg": 90,
+        "kind": "heavy",
+        "vfx": "x3-c-hit-spark-light",
+        "vs": 1.6
+       },
+       "end": [
+        {
+         "t": "v",
+         "vfx": "x3-c-ricochet-spark",
+         "at": "target",
+         "dy": 80,
+         "scale": 1.2
+        },
+        {
+         "t": "later",
+         "in": 0.35,
+         "fx": [
+          {
+           "t": "hit",
+           "hit": {
+            "dmg": 40,
+            "kind": "light"
+           }
+          }
+         ]
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  "charge": {
+   "name": "인류의 방패!",
+   "hold": "23",
+   "release": "24",
+   "armed": true,
+   "levels": [
+    0.5,
+    1.2
+   ],
+   "fire": 3,
+   "lv": {
+    "0": [
+     {
+      "t": "v",
+      "vfx": "x3-o-2.4-prosthetic-arm",
+      "at": "front",
+      "dx": 200,
+      "dy": 60,
+      "scale": 0.9
+     },
+     {
+      "t": "v",
+      "vfx": "x3-c-ground-crack",
+      "at": "front",
+      "dx": 200,
+      "scale": 0.4,
+      "under": true
+     },
+     {
+      "t": "v",
+      "vfx": "x3-c-ground-shockwave",
+      "at": "front",
+      "dx": 200,
+      "scale": 0.45,
+      "under": true,
+      "tint": "#E6C14A",
+      "hit": {
+       "dmg": 80,
+       "kind": "launch"
+      }
+     }
+    ],
+    "1": [
+     {
+      "t": "proj",
+      "vfx": "x3-o-2.4-prosthetic-arm",
+      "kind": "arm",
+      "speed": 1800,
+      "life": 0.4,
+      "size": 0.9,
+      "pierce": true,
+      "hit": {
+       "dmg": 110,
+       "kind": "heavy",
+       "vfx": "x3-c-hit-spark-heavy",
+       "vs": 0.6,
+       "tint": "#E6C14A"
+      }
+     }
+    ],
+    "2": [
+     {
+      "t": "v",
+      "vfx": "x3-o-2.4-prosthetic-arm",
+      "at": "body",
+      "dy": -170,
+      "scale": 1
+     },
+     {
+      "t": "later",
+      "in": 0.25,
+      "fx": [
+       {
+        "t": "v",
+        "vfx": "x3-c-slash-arc",
+        "at": "front",
+        "dx": 130,
+        "scale": 2.5,
+        "tint": "#c8c8c8",
+        "hit": {
+         "dmg": 150,
+         "kind": "down",
+         "stop": 0.16
+        }
+       },
+       {
+        "t": "v",
+        "vfx": "x3-c-dust-puff",
+        "at": "front",
+        "dx": 200,
+        "scale": 1.6,
+        "tint": "#d8c8b0"
+       }
+      ]
+     }
+    ]
+   }
+  },
+  "super": {
+   "name": "팀 발표",
+   "sub": "「다음 팀은…… 바로 여러분입니다!」",
+   "anim": "25",
+   "fps": 8,
+   "armed": true,
+   "events": [
+    {
+     "f": 1,
+     "fx": [
+      {
+       "t": "v",
+       "vfx": "x3-c-air-ring",
+       "at": "body",
+       "dy": -80,
+       "scale": 4,
+       "tint": "#E6C14A"
+      }
+     ]
+    },
+    {
+     "f": 2,
+     "fx": [
+      {
+       "t": "v",
+       "vfx": "x3-o-2.4-prosthetic-arm",
+       "at": "target",
+       "dy": -40,
+       "hit": {
+        "dmg": 30,
+        "kind": "launch"
+       }
+      }
+     ]
+    },
+    {
+     "f": 3,
+     "fx": [
+      {
+       "t": "screen",
+       "spots": 1,
+       "each": [
+        {
+         "t": "v",
+         "vfx": "x3-o-2.4-prosthetic-arm",
+         "dy": -40,
+         "hit": {
+          "dmg": 30,
+          "kind": "launch"
+         }
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "f": 4,
+     "fx": [
+      {
+       "t": "screen",
+       "spots": 1,
+       "each": [
+        {
+         "t": "v",
+         "vfx": "x3-o-2.4-prosthetic-arm",
+         "dy": -40,
+         "hit": {
+          "dmg": 30,
+          "kind": "launch"
+         }
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "f": 6,
+     "hold": 0.2,
+     "fx": [
+      {
+       "t": "v",
+       "vfx": "x3-o-2.4-prosthetic-arm",
+       "at": "body",
+       "dy": -170,
+       "scale": 1.2
+      },
+      {
+       "t": "v",
+       "vfx": "x3-c-slash-arc",
+       "at": "front",
+       "dx": 160,
+       "scale": 3,
+       "tint": "#E6C14A",
+       "r": 100,
+       "hit": {
+        "dmg": 50,
+        "kind": "heavy"
+       }
+      }
+     ]
+    },
+    {
+     "f": 9,
+     "hold": 0.35,
+     "fx": [
+      {
+       "t": "v",
+       "vfx": "x3-o-2.4-prosthetic-arm",
+       "at": "front",
+       "dx": 90,
+       "dy": 40
+      },
+      {
+       "t": "v",
+       "vfx": "x3-c-ground-crack",
+       "at": "front",
+       "dx": 90,
+       "scale": 0.6,
+       "under": true
+      },
+      {
+       "t": "v",
+       "vfx": "x3-c-ground-shockwave",
+       "at": "screen",
+       "w": 1.05,
+       "tint": "#E6C14A",
+       "under": true,
+       "boom": 3,
+       "hit": {
+        "dmg": 90,
+        "kind": "spike",
+        "stop": 0.2,
+        "shake": 16
+       }
+      }
+     ]
+    },
+    {
+     "f": 11,
+     "hold": 0.15
+    }
+   ]
+  }
+ },
+ "skills_2판": {
+  "skill": {
    "name": "의수 투척",
    "anim": "22",
    "fps": 10,

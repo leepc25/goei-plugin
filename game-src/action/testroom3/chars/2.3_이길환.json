@@ -358,6 +358,238 @@
    "armed": true,
    "events": [
     {
+     "f": 2,
+     "fx": [
+      {
+       "t": "v",
+       "vfx": "x3-2.3-D-howl-wave",
+       "at": "hand",
+       "dx": 90,
+       "scale": 1.1,
+       "r": 170,
+       "hit": {
+        "dmg": 40,
+        "kind": "light"
+       }
+      }
+     ]
+    },
+    {
+     "f": 4,
+     "fx": [
+      {
+       "t": "v",
+       "vfx": "x3-2.3-D-howl-wave",
+       "at": "hand",
+       "dx": 120,
+       "scale": 1.5,
+       "r": 170,
+       "hit": {
+        "dmg": 80,
+        "kind": "heavy"
+       }
+      }
+     ]
+    }
+   ]
+  },
+  "charge": {
+   "name": "충분히 이해합니다",
+   "hold": "23",
+   "release": "24",
+   "armed": true,
+   "levels": [
+    0.5,
+    1.2
+   ],
+   "fire": 3,
+   "releaseLv": {
+    "1": "13"
+   },
+   "fireLv": {
+    "1": 1
+   },
+   "lv": {
+    "0": [
+     {
+      "t": "v",
+      "vfx": "x3-c-air-ring",
+      "at": "hand",
+      "dx": 40,
+      "scale": 1.8,
+      "tint": "#ffcf9a",
+      "r": 70,
+      "hit": {
+       "dmg": 70,
+       "kind": "heavy"
+      }
+     }
+    ],
+    "1": [
+     {
+      "t": "dash",
+      "speed": 1300,
+      "time": 0.35,
+      "hit": {
+       "dmg": 110,
+       "kind": "down"
+      }
+     },
+     {
+      "t": "later",
+      "in": 0.4,
+      "fx": [
+       {
+        "t": "v",
+        "vfx": "x3-c-dust-puff",
+        "at": "self",
+        "under": true,
+        "tint": "#d8c8b0"
+       }
+      ]
+     }
+    ],
+    "2": [
+     {
+      "t": "v",
+      "vfx": "x3-c-ground-shockwave",
+      "at": "self",
+      "scale": 1.4,
+      "under": true,
+      "tint": "#ffcf9a",
+      "hit": {
+       "dmg": 40,
+       "kind": "heavy"
+      }
+     },
+     {
+      "t": "later",
+      "in": 0.45,
+      "fx": [
+       {
+        "t": "v",
+        "vfx": "x3-c-ground-shockwave",
+        "at": "self",
+        "scale": 1.4,
+        "under": true,
+        "tint": "#ffcf9a",
+        "hit": {
+         "dmg": 40,
+         "kind": "heavy"
+        }
+       }
+      ]
+     },
+     {
+      "t": "later",
+      "in": 0.9,
+      "fx": [
+       {
+        "t": "v",
+        "vfx": "x3-c-ground-shockwave",
+        "at": "self",
+        "scale": 1.4,
+        "under": true,
+        "tint": "#ffcf9a",
+        "hit": {
+         "dmg": 60,
+         "kind": "down"
+        }
+       }
+      ]
+     }
+    ]
+   }
+  },
+  "super": {
+   "name": "튜토리얼",
+   "sub": "「아, 아, 테스트, 테스트.」",
+   "anim": "25",
+   "fps": 8,
+   "armed": true,
+   "events": [
+    {
+     "f": 1,
+     "fx": [
+      {
+       "t": "dark",
+       "v": 2.5
+      },
+      {
+       "t": "v",
+       "vfx": "x3-c-air-ring",
+       "at": "hand",
+       "scale": 1,
+       "tint": "#ffcf9a"
+      },
+      {
+       "t": "later",
+       "in": 0.15,
+       "fx": [
+        {
+         "t": "v",
+         "vfx": "x3-c-air-ring",
+         "at": "hand",
+         "scale": 1.2,
+         "tint": "#ffcf9a"
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "f": 4,
+     "hold": 0.2,
+     "fx": [
+      {
+       "t": "v",
+       "vfx": "x3-2.3-D-howl-wave",
+       "at": "screen",
+       "w": 1.05,
+       "hit": {
+        "dmg": 40,
+        "kind": "stun"
+       }
+      }
+     ]
+    },
+    {
+     "f": 7,
+     "hold": 0.4,
+     "fx": [
+      {
+       "t": "v",
+       "vfx": "x3-2.3-F-howl-rings",
+       "at": "body",
+       "scale": 1.4,
+       "boom": 2,
+       "hit": {
+        "dmg": 140,
+        "kind": "blow",
+        "n": 4,
+        "mid": "heavy",
+        "every": 0.2,
+        "stop": 0.16,
+        "shake": 14
+       }
+      }
+     ]
+    },
+    {
+     "f": 11,
+     "hold": 0.15
+    }
+   ]
+  }
+ },
+ "skills_2판": {
+  "skill": {
+   "name": "아, 아, 테스트",
+   "anim": "22",
+   "fps": 9,
+   "armed": true,
+   "events": [
+    {
      "f": 4,
      "fx": [
       {
