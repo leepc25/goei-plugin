@@ -82,7 +82,9 @@ function hostScript(char, chat, { rootDom = true, noBody = false } = {}) {
       parseRisuChat: async (t) => String(t).replace(/\{\{user\}\}/g, window.__userName ?? '{{user}}'),
       nativeFetch: async (url) => { (window.__calls.fetch = window.__calls.fetch || []).push(url); const r = window.__fetch && window.__fetch(String(url)); return r ? { ok: true, status: 200, json: async () => r, text: async () => typeof r === 'string' ? r : JSON.stringify(r), arrayBuffer: async () => (r instanceof Uint8Array ? r : new TextEncoder().encode(typeof r === 'string' ? r : JSON.stringify(r))).slice().buffer } : { ok: false, status: 404, json: async () => null, text: async () => '', arrayBuffer: async () => new ArrayBuffer(0) }; },
     };
-    window.__assets = {};`;
+    window.__assets = {};
+    // 플러그인이 본편 요청에 끼우는 로어북 덩어리·이미지 지침(2026-10-27~)을 뺀 나머지. 요청 흐름 시험이 그 밖의 것만 보게
+    window.__core = (r) => r.filter((m) => !(m.role === 'system' && typeof m.content === 'string' && (m.content.startsWith('<!-- goei:lore -->') || m.content.startsWith('## Inserting Character Visual Images'))));`;
 }
 
 const browser = await chromium.launch();
@@ -835,11 +837,13 @@ async function startedWithReply(page, { phoneAuto = false } = {}) {
   const raw = await page.evaluate(() => window.__calls.handlers.display('%%SCENE_CARD:7b22746172676574223a2261222c227061727479223a22eb8298227d%%\nUse it\n%%/SCENE_CARD%%'));
   assert.ok(!raw.includes('SCENE_CARD') && !raw.includes('Use it'), raw);
   const req = await page.evaluate((t) => window.__calls.replacers[0]([{ role: 'system', content: 's' }, { role: 'user', content: t }], 'model'), rec.data);
-  assert.equal(req.length, 2);
-  assert.ok(!req[1].content.includes('SCENE_CARD') && req[1].content.endsWith('Situation:\n조용히 진입한다'), req[1].content);
+  // 2026-10-27 부터 플러그인이 로어북 덩어리·이미지 지침(system)을 끼우므로 사용자 메시지만 본다
+  const users = (r) => r.filter((m) => m.role === 'user');
+  assert.equal(users(req).length, 1);
+  assert.ok(!users(req)[0].content.includes('SCENE_CARD') && users(req)[0].content.endsWith('Situation:\n조용히 진입한다'), users(req)[0].content);
   const req2 = await page.evaluate((t) => window.__calls.replacers[0]([{ role: 'user', content: t }, { role: 'user', content: '그리고 문을 연다' }], 'model'), rec.data);
-  assert.equal(req2.length, 1);
-  assert.ok(req2[0].content.endsWith('Situation:\n조용히 진입한다\n\n그리고 문을 연다'), req2[0].content);
+  assert.equal(users(req2).length, 1);
+  assert.ok(users(req2)[0].content.endsWith('Situation:\n조용히 진입한다\n\n그리고 문을 연다'), users(req2)[0].content);
   // 장소 자체 선택: 아직 안 보낸 카드는 바꿔 끼운다
   await open(page);
   await page.waitForSelector('.gx-canvas');
@@ -1383,7 +1387,7 @@ if (fixture.globalLore.some(packed)) {
   assert.ok((await page.evaluate(() => window.__chat.scriptstate.$gn_raw)).includes('C|1846003|0|ㅁㄴㅇㄹ|손|0|0'), '올린 글은 바로 펼쳐지므로 읽음');
   if (shots) await page.screenshot({ path: `${shots}/14-gnet-board.png` });
   // 본편 요청에 기록이 붙는다 (마지막 사용자 메시지 바로 앞 system 메시지)
-  const req = await page.evaluate(() => window.__calls.replacers[0]([{ role: 'system', content: 's' }, { role: 'user', content: 'u' }], 'model'));
+  const req = await page.evaluate(async () => window.__core(await window.__calls.replacers[0]([{ role: 'system', content: 's' }, { role: 'user', content: 'u' }], 'model')));
   assert.equal(req[req.length - 1].content, 'u', '사용자 메시지가 맨 끝');
   const last = req[req.length - 2];
   assert.equal(last.role, 'system');
@@ -1393,14 +1397,14 @@ if (fixture.globalLore.some(packed)) {
   assert.equal(sub.length, 1, '보조 모델 요청에는 안 붙임');
   // 본편 반영 총 상한: 너무 작으면 아무 기록도 안 붙음
   await page.evaluate(() => { window.__chat.scriptstate.$gen_ctx_total = '10'; });
-  const tight = await page.evaluate(() => window.__calls.replacers[0]([{ role: 'user', content: 'u' }], 'model'));
+  const tight = await page.evaluate(async () => window.__core(await window.__calls.replacers[0]([{ role: 'user', content: 'u' }], 'model')));
   assert.equal(tight.length, 1, '총 상한 안에 못 들면 빼기');
   await page.evaluate(() => { delete window.__chat.scriptstate.$gen_ctx_total; });
   // 설정: 본편 반영 빼기
   await page.click('[data-action="gn-settings"]');
   await page.click('[data-action="gn-cfg"][data-value="context=1"]');
   await page.waitForFunction(() => window.__chat.scriptstate['$lb_cfg_lb-gn.context'] === '1');
-  const off = await page.evaluate(() => window.__calls.replacers[0]([{ role: 'user', content: 'u' }], 'model'));
+  const off = await page.evaluate(async () => window.__core(await window.__calls.replacers[0]([{ role: 'user', content: 'u' }], 'model')));
   assert.equal(off.length, 1);
   // 내 글 삭제 (두 번 눌러야)
   await page.click('[data-action="gn-settings"]');
@@ -1551,14 +1555,15 @@ if (fixture.globalLore.some(packed)) {
   const rec = await page.evaluate(() => window.__chat.message.at(-1).data);
   const card = await page.evaluate((r) => window.__calls.handlers.display(r), rec);
   assert.ok(card.includes('쟈알디') && card.includes('전화를 걸었다') && !card.includes('현장 상황 보고'));
-  const req = await page.evaluate((r) => window.__calls.replacers[0]([{ role: 'user', content: r }, { role: 'user', content: '빨리 받아' }], 'model'), rec);
+  const req = await page.evaluate(async (r) => window.__core(await window.__calls.replacers[0]([{ role: 'user', content: r }, { role: 'user', content: '빨리 받아' }], 'model')), rec);
   assert.equal(req[req.length - 1].content, '{{user}} places a phone call to 쟈알디.\n\n현장 상황 보고\n\n빨리 받아');
   // 본편 반영: 대화·공지가 마지막 사용자 메시지 바로 앞 system 메시지로
   const ctx = req[req.length - 2];
   assert.equal(ctx.role, 'system');
   assert.ok(ctx.content.includes('"feature":"phone"') && ctx.content.includes('선배 지금 어디예요?') && ctx.content.includes('지하 2층 출입 통제'));
   // 자동 확인: 본편 응답이 끝나면 한 번 (같은 응답에는 다시 안 함)
-  await page.evaluate(() => { window.__chat.scriptstate.$ph_auto = '1'; window.__chat.scriptstate.$cooldown_received_incoming = '-5'; });
+  // 인물 기록(기본 켬)도 응답마다 보조 모델을 부르므로 이 절은 괴담톡 호출만 세게 끈다
+  await page.evaluate(() => { window.__chat.scriptstate.$ph_auto = '1'; window.__chat.scriptstate.$cooldown_received_incoming = '-5'; window.__chat.scriptstate.$pp_on = '0'; });
   const n0 = await page.evaluate(() => window.__calls.llm.length);
   await page.evaluate(() => { window.__llm = [{ type: 'success', result: '{"updates":[],"announcements":[],"invitations":[]}' }]; });
   const fire = () => page.evaluate(async () => {
@@ -1858,7 +1863,7 @@ if (fixture.globalLore.some(packed)) {
   await page.waitForFunction(() => window.__chat.scriptstate['$lb_cfg_lb-gn.mode'] === '0');
   await page.waitForSelector('.gn-off');
   assert.equal(await page.locator('[data-action="gn-refresh"]').count(), 0);
-  const offReq = await page.evaluate(() => window.__calls.replacers[0]([{ role: 'user', content: 'u' }], 'model'));
+  const offReq = await page.evaluate(async () => window.__core(await window.__calls.replacers[0]([{ role: 'user', content: 'u' }], 'model')));
   assert.ok(!offReq.some((m) => m.content.includes('"feature":"gnet"')), '끄면 본편 반영 안 함');
   await page.click('[data-action="gn-cfg"][data-value="power=1"]');
   await page.waitForFunction(() => window.__chat.scriptstate['$lb_cfg_lb-gn.mode'] === '1');
