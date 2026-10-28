@@ -851,7 +851,7 @@
        "t": "melee",
        "range": 220,
        "hit": {
-        "dmg": 271,
+        "dmg": 272,
         "kind": "blow",
         "vfx": "x3-c-hit-spark-heavy",
         "stop": 0.24,

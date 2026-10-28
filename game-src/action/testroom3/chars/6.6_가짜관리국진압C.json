@@ -257,7 +257,7 @@
          "scale": 0.4,
          "tint": "#d8cfb4",
          "hit": {
-          "dmg": 141,
+          "dmg": 142,
           "kind": "launch",
           "n": 2,
           "mid": "light"
@@ -399,7 +399,7 @@
         "scale": 0.6,
         "tint": "#d8cfb4",
         "hit": {
-         "dmg": 72,
+         "dmg": 73,
          "kind": "down"
         },
         "r": 120

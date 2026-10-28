@@ -761,7 +761,7 @@
         "scale": 0.8,
         "r": 56.2,
         "hit": {
-         "dmg": 36,
+         "dmg": 34,
          "kind": "light",
          "stop": 0.03,
          "shake": 3
@@ -789,7 +789,7 @@
         "scale": 0.8,
         "r": 45,
         "hit": {
-         "dmg": 36,
+         "dmg": 34,
          "kind": "light",
          "stop": 0.03,
          "shake": 3
@@ -817,7 +817,7 @@
         "scale": 0.8,
         "r": 45,
         "hit": {
-         "dmg": 36,
+         "dmg": 34,
          "kind": "light",
          "stop": 0.03,
          "shake": 3
@@ -845,7 +845,7 @@
         "scale": 0.8,
         "r": 45,
         "hit": {
-         "dmg": 36,
+         "dmg": 34,
          "kind": "light",
          "stop": 0.03,
          "shake": 3
@@ -873,7 +873,7 @@
         "scale": 0.8,
         "r": 45,
         "hit": {
-         "dmg": 36,
+         "dmg": 34,
          "kind": "light",
          "stop": 0.03,
          "shake": 3
@@ -901,7 +901,7 @@
         "scale": 0.8,
         "r": 45,
         "hit": {
-         "dmg": 36,
+         "dmg": 34,
          "kind": "light",
          "stop": 0.03,
          "shake": 3
@@ -929,7 +929,7 @@
         "scale": 0.8,
         "r": 45,
         "hit": {
-         "dmg": 36,
+         "dmg": 34,
          "kind": "light",
          "stop": 0.03,
          "shake": 3
@@ -957,7 +957,7 @@
         "scale": 0.8,
         "r": 45,
         "hit": {
-         "dmg": 36,
+         "dmg": 34,
          "kind": "light",
          "stop": 0.03,
          "shake": 3
@@ -985,7 +985,7 @@
         "scale": 0.8,
         "r": 45,
         "hit": {
-         "dmg": 36,
+         "dmg": 34,
          "kind": "light",
          "stop": 0.03,
          "shake": 3
@@ -1013,7 +1013,7 @@
         "scale": 0.8,
         "r": 45,
         "hit": {
-         "dmg": 60,
+         "dmg": 57,
          "kind": "down",
          "stop": 0.03,
          "shake": 3
@@ -1067,7 +1067,7 @@
         "under": true,
         "r": 231.2,
         "hit": {
-         "dmg": 92,
+         "dmg": 88,
          "kind": "heavy"
         }
        }
@@ -1179,7 +1179,7 @@
          "size": 0.8,
          "life": 1.6,
          "hit": {
-          "dmg": 93,
+          "dmg": 90,
           "kind": "launch",
           "stop": 0.16,
           "shake": 16

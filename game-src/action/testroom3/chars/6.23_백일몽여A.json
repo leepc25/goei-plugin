@@ -282,7 +282,7 @@
        "t": "melee",
        "range": 190,
        "hit": {
-        "dmg": 128,
+        "dmg": 130,
         "kind": "light",
         "n": 2,
         "mid": "light",
@@ -350,7 +350,7 @@
         "t": "melee",
         "range": 190,
         "hit": {
-         "dmg": 154,
+         "dmg": 151,
          "kind": "heavy",
          "n": 3,
          "mid": "light",

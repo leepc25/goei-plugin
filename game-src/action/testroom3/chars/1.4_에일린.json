@@ -490,7 +490,7 @@
          "t": "proj",
          "kind": "bullet",
          "hit": {
-          "dmg": 30,
+          "dmg": 20,
           "kind": "light"
          }
         }
@@ -504,7 +504,7 @@
          "kind": "bullet",
          "big": true,
          "hit": {
-          "dmg": 138,
+          "dmg": 90,
           "kind": "heavy"
          }
         }

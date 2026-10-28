@@ -553,7 +553,7 @@
       "life": 0.36,
       "size": 2,
       "hit": {
-       "dmg": 52,
+       "dmg": 55,
        "kind": "pull"
       },
       "end": [
@@ -577,7 +577,7 @@
          {
           "t": "hit",
           "hit": {
-           "dmg": 159,
+           "dmg": 168,
            "kind": "down",
            "stop": 0.16,
            "shake": 12

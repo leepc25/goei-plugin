@@ -366,7 +366,7 @@
        "scale": 0.8,
        "tint": "#e8ecf4",
        "hit": {
-        "dmg": 37,
+        "dmg": 38,
         "kind": "light"
        },
        "r": 91.2
@@ -407,7 +407,7 @@
        "scale": 0.85,
        "tint": "#e8ecf4",
        "hit": {
-        "dmg": 43,
+        "dmg": 44,
         "kind": "heavy"
        },
        "r": 91.8
@@ -809,7 +809,7 @@
        "time": 1.6,
        "color": "#2a5a9a",
        "hit": {
-        "dmg": 63,
+        "dmg": 62,
         "kind": "blow",
         "n": 5
        }

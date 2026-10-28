@@ -246,7 +246,7 @@
        "t": "melee",
        "range": 160,
        "hit": {
-        "dmg": 128,
+        "dmg": 130,
         "kind": "stun",
         "n": 2,
         "mid": "light"

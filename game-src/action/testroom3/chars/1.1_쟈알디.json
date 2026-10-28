@@ -995,7 +995,7 @@
          "r": 110,
          "boom": 3,
          "hit": {
-          "dmg": 181,
+          "dmg": 182,
           "kind": "launch",
           "n": 3,
           "mid": "heavy",

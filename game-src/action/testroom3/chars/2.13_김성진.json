@@ -623,7 +623,7 @@
       "time": 0.22,
       "stop": 0.05,
       "hit": {
-       "dmg": 71,
+       "dmg": 74,
        "kind": "stun",
        "n": 2,
        "every": 0.14,
@@ -725,7 +725,7 @@
        "dx": 20,
        "scale": 1.1,
        "hit": {
-        "dmg": 18,
+        "dmg": 17,
         "kind": "light",
         "n": 3
        },
@@ -767,7 +767,7 @@
        "dx": 20,
        "scale": 1.5,
        "hit": {
-        "dmg": 36,
+        "dmg": 35,
         "kind": "blow",
         "n": 4
        },

@@ -492,7 +492,7 @@
         "boom": 1,
         "dx": 700,
         "hit": {
-         "dmg": 100,
+         "dmg": 150,
          "kind": "heavy",
          "stop": 0.04,
          "shake": 4
@@ -515,7 +515,7 @@
         "boom": 1,
         "dx": 600,
         "hit": {
-         "dmg": 100,
+         "dmg": 150,
          "kind": "heavy",
          "stop": 0.04,
          "shake": 4
@@ -538,7 +538,7 @@
         "boom": 1,
         "dx": 500,
         "hit": {
-         "dmg": 100,
+         "dmg": 150,
          "kind": "heavy",
          "stop": 0.04,
          "shake": 4
@@ -561,7 +561,7 @@
         "boom": 1,
         "dx": 400,
         "hit": {
-         "dmg": 100,
+         "dmg": 150,
          "kind": "heavy",
          "stop": 0.04,
          "shake": 4
@@ -584,7 +584,7 @@
         "boom": 1,
         "dx": 300,
         "hit": {
-         "dmg": 100,
+         "dmg": 150,
          "kind": "heavy",
          "stop": 0.04,
          "shake": 4

@@ -598,7 +598,7 @@
          "life": 0.9,
          "dy": -10,
          "hit": {
-          "dmg": 16,
+          "dmg": 19,
           "kind": "light",
           "stop": 0.03,
           "shake": 3
@@ -646,7 +646,7 @@
        "tint": "#d8dde6",
        "under": true,
        "hit": {
-        "dmg": 209,
+        "dmg": 249,
         "kind": "launch",
         "stop": 0.22,
         "shake": 18

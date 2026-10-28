@@ -521,7 +521,7 @@
        "t": "melee",
        "range": 130,
        "hit": {
-        "dmg": 127,
+        "dmg": 129,
         "kind": "heavy",
         "n": 2,
         "mid": "light",

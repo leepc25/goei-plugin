@@ -518,7 +518,7 @@
         "life": 0.6,
         "color": "#1a0f24",
         "hit": {
-         "dmg": 25,
+         "dmg": 38,
          "kind": "light",
          "stop": 0.04,
          "shake": 4
@@ -556,7 +556,7 @@
       "depth": 110,
       "delay": 0.08,
       "hit": {
-       "dmg": 239,
+       "dmg": 267,
        "kind": "down",
        "n": 3,
        "mid": "launch",
@@ -644,7 +644,7 @@
        "w": 1.05,
        "boom": 3,
        "hit": {
-        "dmg": 222,
+        "dmg": 223,
         "kind": "down",
         "n": 2,
         "mid": "launch",

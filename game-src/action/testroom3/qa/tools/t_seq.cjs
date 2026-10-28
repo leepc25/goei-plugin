@@ -7,7 +7,7 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
   await p.goto('file://' + path.resolve(html)); await p.waitForFunction(() => window.__room && window.__room.CK);
   await p.evaluate(k => window.__room.setChar(k), key); await p.waitForFunction(k => window.__room.CK === k, key);
   const cv = p.locator('#cv'); await cv.click(); await sleep(400);
-  await p.evaluate(px => { const P = window.__room.P; P.x = px; P.face = 1; }, +(process.env.PX || 500));
+  await p.evaluate(px => { const P = window.__room.P; P.x = px; P.face = 1; P.sp = 100; P.cd = {}; }, +(process.env.PX || 500));
   let n = 0;
   for (const st of steps) { const [k, ms] = st.split(':');
     if (k === 'shot') await cv.screenshot({ path: `${outp}_${n++}.png` });

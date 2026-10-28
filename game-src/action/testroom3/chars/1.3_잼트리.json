@@ -594,7 +594,7 @@
            "vfx": "x3-1.3-F-olive-stomp",
            "scale": 0.7,
            "hit": {
-            "dmg": 62,
+            "dmg": 75,
             "kind": "stun",
             "stop": 0.06,
             "shake": 5
@@ -641,7 +641,7 @@
            "scale": 0.7,
            "boom": 1,
            "hit": {
-            "dmg": 124,
+            "dmg": 149,
             "kind": "down",
             "stop": 0.12,
             "shake": 10,
@@ -665,7 +665,7 @@
          "t": "melee",
          "range": 200,
          "hit": {
-          "dmg": 102,
+          "dmg": 123,
           "kind": "launch",
           "stop": 0.14,
           "shake": 10,
@@ -695,7 +695,7 @@
          "t": "melee",
          "range": 220,
          "hit": {
-          "dmg": 146,
+          "dmg": 176,
           "kind": "down",
           "stop": 0.2,
           "shake": 16,

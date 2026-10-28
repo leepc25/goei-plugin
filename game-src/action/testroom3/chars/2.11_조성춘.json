@@ -646,7 +646,7 @@
       "fade": 0.3,
       "r": 150,
       "hit": {
-       "dmg": 83,
+       "dmg": 148,
        "kind": "heavy",
        "n": 6,
        "every": 0.14,
@@ -839,7 +839,7 @@
         {
          "t": "hit",
          "hit": {
-          "dmg": 94,
+          "dmg": 95,
           "kind": "blow",
           "vfx": "x3-c-hit-spark-heavy",
           "vs": 0.7,
@@ -877,7 +877,7 @@
          "hold": 0.4,
          "fade": 0.3,
          "hit": {
-          "dmg": 124,
+          "dmg": 125,
           "kind": "down",
           "n": 4,
           "every": 0.12,

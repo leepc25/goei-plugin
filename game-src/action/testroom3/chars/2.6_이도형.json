@@ -405,7 +405,7 @@
        "time": 0.2,
        "delay": 0.75,
        "hit": {
-        "dmg": 130,
+        "dmg": 131,
         "kind": "launch",
         "n": 3,
         "mid": "light",

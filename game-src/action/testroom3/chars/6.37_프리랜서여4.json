@@ -322,7 +322,7 @@
       "t": "melee",
       "range": 170,
       "hit": {
-       "dmg": 401,
+       "dmg": 240,
        "kind": "launch"
       }
      },

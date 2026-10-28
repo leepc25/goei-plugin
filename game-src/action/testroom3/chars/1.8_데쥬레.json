@@ -640,7 +640,7 @@
          "r": 90,
          "delay": 0.6,
          "hit": {
-          "dmg": 193,
+          "dmg": 192,
           "kind": "down",
           "stop": 0.2,
           "shake": 14

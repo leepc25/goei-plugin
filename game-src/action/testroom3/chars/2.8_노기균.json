@@ -554,7 +554,7 @@
        "speed": 900,
        "time": 0.15,
        "hit": {
-        "dmg": 29,
+        "dmg": 130,
         "kind": "light",
         "vfx": "x3-c-hit-spark-light",
         "vs": 1.5
@@ -583,7 +583,7 @@
        "tint": "#ffe4de",
        "r": 100.0,
        "hit": {
-        "dmg": 404,
+        "dmg": 1812,
         "kind": "launch",
         "vfx": "x3-c-hit-spark-heavy",
         "vs": 0.8,
@@ -807,7 +807,7 @@
         "pierce": true,
         "life": 1.0,
         "hit": {
-         "dmg": 141,
+         "dmg": 142,
          "kind": "down",
          "stop": 0.14,
          "shake": 12,

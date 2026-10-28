@@ -441,7 +441,7 @@
       "at": "hand",
       "scale": 0.7,
       "hit": {
-       "dmg": 228,
+       "dmg": 120,
        "kind": "heavy"
       },
       "r": 368.0,
@@ -457,7 +457,7 @@
         "at": "hand",
         "scale": 0.7,
         "hit": {
-         "dmg": 228,
+         "dmg": 120,
          "kind": "heavy"
         },
         "r": 368.0,
@@ -475,7 +475,7 @@
         "at": "hand",
         "scale": 0.7,
         "hit": {
-         "dmg": 344,
+         "dmg": 181,
          "kind": "down"
         },
         "r": 368.0,
@@ -549,7 +549,7 @@
        "scale": 1.4,
        "boom": 2,
        "hit": {
-        "dmg": 248,
+        "dmg": 247,
         "kind": "blow",
         "n": 4,
         "mid": "heavy",

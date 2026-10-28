@@ -537,7 +537,7 @@
       "pierce": true,
       "dy": 0,
       "hit": {
-       "dmg": 139,
+       "dmg": 142,
        "kind": "heavy"
       }
      },

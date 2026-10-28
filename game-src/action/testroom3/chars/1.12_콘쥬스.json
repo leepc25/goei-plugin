@@ -531,7 +531,7 @@
         "speed": 1500,
         "time": 0.24,
         "hit": {
-         "dmg": 80,
+         "dmg": 128,
          "kind": "blow"
         }
        },
@@ -556,7 +556,7 @@
         "scale": 0.5,
         "tint": "#d8c8b0",
         "hit": {
-         "dmg": 80,
+         "dmg": 128,
          "kind": "heavy"
         }
        }

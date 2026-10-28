@@ -623,7 +623,7 @@
       "speed": 1600,
       "time": 0.3,
       "hit": {
-       "dmg": 118,
+       "dmg": 35,
        "kind": "heavy"
       },
       "stop": 0.01
@@ -650,7 +650,7 @@
         "t": "melee",
         "range": 200,
         "hit": {
-         "dmg": 682,
+         "dmg": 205,
          "kind": "blow",
          "vfx": "x3-c-hit-spark-heavy",
          "vs": 0.8,

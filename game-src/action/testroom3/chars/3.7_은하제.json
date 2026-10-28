@@ -696,7 +696,7 @@
            "scale": 1.4,
            "dy": -20,
            "hit": {
-            "dmg": 37,
+            "dmg": 22,
             "kind": "light",
             "vfx": "x3-c-hit-spark-light",
             "tint": "#cfd6e0"
@@ -757,7 +757,7 @@
            "vfx": "x3-c-dust-puff",
            "scale": 1.6,
            "hit": {
-            "dmg": 231,
+            "dmg": 134,
             "kind": "down",
             "vfx": "x3-c-hit-spark-heavy",
             "vs": 0.6
@@ -774,7 +774,7 @@
          "t": "pull",
          "dist": 240,
          "hit": {
-          "dmg": 51,
+          "dmg": 30,
           "kind": "pull",
           "noVfx": true
          }
@@ -795,7 +795,7 @@
          "t": "melee",
          "range": 200,
          "hit": {
-          "dmg": 231,
+          "dmg": 134,
           "kind": "launch",
           "vfx": "x3-c-hit-spark-heavy",
           "stop": 0.2,

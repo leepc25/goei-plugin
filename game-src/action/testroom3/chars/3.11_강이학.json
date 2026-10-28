@@ -610,7 +610,7 @@
      {
       "t": "proj",
       "kind": "coin",
-      "dy": 50,
+      "dy": 10,
       "speed": 1500,
       "life": 0.22,
       "size": 0.8,
@@ -648,7 +648,7 @@
         "size": 0.9,
         "pierce": true,
         "hit": {
-         "dmg": 15,
+         "dmg": 17,
          "kind": "light",
          "vfx": "x3-c-hit-spark-light",
          "tint": "#F2C230",
@@ -671,7 +671,7 @@
         "size": 0.9,
         "pierce": true,
         "hit": {
-         "dmg": 15,
+         "dmg": 17,
          "kind": "light",
          "vfx": "x3-c-hit-spark-light",
          "tint": "#F2C230",
@@ -694,7 +694,7 @@
         "size": 0.9,
         "pierce": true,
         "hit": {
-         "dmg": 15,
+         "dmg": 17,
          "kind": "light",
          "vfx": "x3-c-hit-spark-light",
          "tint": "#F2C230",
@@ -717,7 +717,7 @@
         "size": 0.9,
         "pierce": true,
         "hit": {
-         "dmg": 15,
+         "dmg": 17,
          "kind": "light",
          "vfx": "x3-c-hit-spark-light",
          "tint": "#F2C230",
@@ -740,7 +740,7 @@
         "size": 0.9,
         "pierce": true,
         "hit": {
-         "dmg": 15,
+         "dmg": 17,
          "kind": "light",
          "vfx": "x3-c-hit-spark-light",
          "tint": "#F2C230",
@@ -763,7 +763,7 @@
         "size": 0.9,
         "pierce": true,
         "hit": {
-         "dmg": 15,
+         "dmg": 17,
          "kind": "light",
          "vfx": "x3-c-hit-spark-light",
          "tint": "#F2C230",
@@ -786,7 +786,7 @@
         "size": 0.9,
         "pierce": true,
         "hit": {
-         "dmg": 15,
+         "dmg": 17,
          "kind": "light",
          "vfx": "x3-c-hit-spark-light",
          "tint": "#F2C230",
@@ -809,7 +809,7 @@
         "size": 0.9,
         "pierce": true,
         "hit": {
-         "dmg": 44,
+         "dmg": 49,
          "kind": "heavy",
          "vfx": "x3-c-hit-spark-light",
          "tint": "#F2C230",
@@ -832,7 +832,7 @@
       "range": 700,
       "depth": 90,
       "hit": {
-       "dmg": 160,
+       "dmg": 240,
        "n": 5,
        "every": 0.1,
        "mid": "light",
@@ -890,7 +890,7 @@
          "size": 0.9,
          "pierce": true,
          "hit": {
-          "dmg": 6,
+          "dmg": 9,
           "kind": "light",
           "vfx": "x3-c-hit-spark-light",
           "tint": "#F2C230",
@@ -926,7 +926,7 @@
          "size": 0.9,
          "pierce": true,
          "hit": {
-          "dmg": 6,
+          "dmg": 9,
           "kind": "light",
           "vfx": "x3-c-hit-spark-light",
           "tint": "#F2C230",
@@ -949,13 +949,13 @@
         {
          "t": "proj",
          "kind": "coin",
-         "dy": 50,
+         "dy": 10,
          "speed": 2400,
          "life": 0.7,
          "size": 0.9,
          "pierce": true,
          "hit": {
-          "dmg": 6,
+          "dmg": 9,
           "kind": "light",
           "vfx": "x3-c-hit-spark-light",
           "tint": "#F2C230",
@@ -992,7 +992,7 @@
       {
        "t": "hit",
        "hit": {
-        "dmg": 152,
+        "dmg": 222,
         "n": 6,
         "every": 0.1,
         "mid": "light",

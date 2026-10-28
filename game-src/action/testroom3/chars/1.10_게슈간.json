@@ -447,7 +447,7 @@
        {
         "t": "hit",
         "hit": {
-         "dmg": 150,
+         "dmg": 300,
          "kind": "blow",
          "stop": 0.12,
          "shake": 10
@@ -480,7 +480,7 @@
       "depth": 110,
       "delay": 0.35,
       "hit": {
-       "dmg": 240,
+       "dmg": 384,
        "kind": "down",
        "stop": 0.2,
        "shake": 15

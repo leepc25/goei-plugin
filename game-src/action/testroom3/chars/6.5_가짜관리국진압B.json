@@ -357,7 +357,7 @@
         "size": 0.7,
         "dy": -30,
         "hit": {
-         "dmg": 23,
+         "dmg": 25,
          "kind": "light"
         }
        },
@@ -368,7 +368,7 @@
         "size": 0.7,
         "dy": 0,
         "hit": {
-         "dmg": 23,
+         "dmg": 25,
          "kind": "light"
         }
        },
@@ -379,7 +379,7 @@
         "size": 0.7,
         "dy": 30,
         "hit": {
-         "dmg": 23,
+         "dmg": 25,
          "kind": "light"
         }
        }
@@ -397,7 +397,7 @@
         "scale": 0.6,
         "tint": "#d8cfb4",
         "hit": {
-         "dmg": 79,
+         "dmg": 87,
          "kind": "down"
         },
         "r": 120

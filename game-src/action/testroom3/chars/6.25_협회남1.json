@@ -241,7 +241,7 @@
        "t": "melee",
        "range": 160,
        "hit": {
-        "dmg": 123,
+        "dmg": 124,
         "kind": "heavy"
        }
       },
@@ -286,9 +286,9 @@
       "kind": "orb",
       "speed": 1500,
       "size": 0.7,
-      "dy": 60,
+      "dy": 10,
       "hit": {
-       "dmg": 142,
+       "dmg": 143,
        "kind": "down"
       }
      }

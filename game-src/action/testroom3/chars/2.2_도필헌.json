@@ -542,7 +542,7 @@
          "speed": 1700,
          "time": 0.7,
          "hit": {
-          "dmg": 126,
+          "dmg": 67,
           "kind": "down",
           "vfx": "x3-c-hit-spark-light",
           "vs": 1.6,
@@ -585,7 +585,7 @@
          "tint": "#C9A046",
          "r": 70,
          "hit": {
-          "dmg": 76,
+          "dmg": 41,
           "kind": "heavy"
          }
         }
@@ -610,7 +610,7 @@
          "rot": -0.6,
          "tint": "#C9A046",
          "hit": {
-          "dmg": 76,
+          "dmg": 41,
           "kind": "launch"
          },
          "r": 91.4
@@ -630,7 +630,7 @@
          "t": "melee",
          "range": 260,
          "hit": {
-          "dmg": 126,
+          "dmg": 67,
           "kind": "launch",
           "n": 2,
           "mid": "launch",
@@ -665,7 +665,7 @@
          "under": true,
          "boom": 3,
          "hit": {
-          "dmg": 194,
+          "dmg": 104,
           "kind": "blow",
           "stop": 0.2,
           "shake": 16
