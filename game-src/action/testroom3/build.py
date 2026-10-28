@@ -235,7 +235,7 @@ def pingpong(key, anims):
 
 
 # 테스트룸에 넣지 않는 줄: 치료받기(78, 사용자 10-27 뺌), 12장 앉기 시험(60-1), 쓰러지기 시험 4종(19-1~19-4)
-DROP = {"78", "60_1", "19_1", "19_2", "19_3", "19_4"}
+DROP = {"78", "52_0", "52", "53", "54", "60_1", "19_1", "19_2", "19_3", "19_4"}
 # 생활·직무 줄(50번 이후)은 자동 검사 통과 목록(ok)에 없어도 넣음(기대 쉬기 30명 등은 그대로 써도 됨 — 인계 10-28)
 def life_line(lid):
     m = re.match(r"(\d+)", lid)
@@ -656,6 +656,7 @@ def main():
     audio = (EIL / "testroom" / "audio.js").read_text(encoding="utf-8")
     html = room.replace("/*__INDEX__*/null", json.dumps(index, ensure_ascii=False)).replace("/*__AUDIO__*/", audio)
     chair = {k: "data:image/png;base64," + base64.b64encode((ROOT / "game-src/action/objects/C01_사무의자_1배" / f"{k}.png").read_bytes()).decode() for k in ("south", "south-east", "south-west", "east", "north", "north-east", "north-west")}   # 의자 앉기용(판정 전)
+    chair.update({"C02:" + k: "data:image/png;base64," + base64.b64encode((ROOT / "game-src/action/objects/C02_기댄사무의자_1배_2차" / f"{k}.png").read_bytes()).decode() for k in ("south", "south-east", "south-west", "east", "west")})   # 등받이 기운 의자(기대 쉬기 73, 사용자 10-28)
     (OUT / "vfx.js").write_text("window.__VFX=" + json.dumps(load_vfx(), separators=(",", ":")) + ";\nwindow.__CHAIR=" + json.dumps(chair) + ";\n", encoding="utf-8")   # 이펙트 그림은 따로(첫 화면 파일을 작게)
     if npc: html = html.replace("<title>요원 통합 테스트룸</title>", "<title>NPC 테스트룸</title>", 1).replace("<h1>요원 통합 테스트룸 ", "<h1>NPC 테스트룸 ", 1)
     (OUT / "index.html").write_text(html, encoding="utf-8")

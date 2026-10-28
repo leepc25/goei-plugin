@@ -1,0 +1,111 @@
+{
+ "object_id": "cb444be2-d40e-46d1-99e0-5bafff9eb28e",
+ "job": {
+  "usage": {
+   "type": "generations",
+   "generations": 11.0
+  },
+  "id": "86576354-9362-485e-835d-e479494fc964",
+  "status": "completed",
+  "created_at": "2026-10-28T12:07:30.226943+00:00",
+  "last_response": {
+   "status": "completed",
+   "progress": 1,
+   "object_id": "cb444be2-d40e-46d1-99e0-5bafff9eb28e",
+   "image_size": {
+    "width": 200,
+    "height": 200
+   },
+   "frame_count": 8,
+   "single_frame": false,
+   "storage_urls": {
+    "east": "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/cb444be2-d40e-46d1-99e0-5bafff9eb28e/rotations/east.png",
+    "west": "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/cb444be2-d40e-46d1-99e0-5bafff9eb28e/rotations/west.png",
+    "north": "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/cb444be2-d40e-46d1-99e0-5bafff9eb28e/rotations/north.png",
+    "south": "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/cb444be2-d40e-46d1-99e0-5bafff9eb28e/rotations/south.png",
+    "north-east": "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/cb444be2-d40e-46d1-99e0-5bafff9eb28e/rotations/north-east.png",
+    "north-west": "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/cb444be2-d40e-46d1-99e0-5bafff9eb28e/rotations/north-west.png",
+    "south-east": "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/cb444be2-d40e-46d1-99e0-5bafff9eb28e/rotations/south-east.png",
+    "south-west": "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/cb444be2-d40e-46d1-99e0-5bafff9eb28e/rotations/south-west.png"
+   },
+   "billing_usage": {
+    "type": "generations",
+    "generations": 11.0
+   },
+   "generation_id": "e8b143b9-8e49-4a05-9265-d1c224453e69",
+   "billing_stages": [
+    {
+     "stage": "first_direction",
+     "usage": {
+      "usd": 0.0,
+      "type": "generations",
+      "generations": 6
+     },
+     "generation_id": "ab5f28cc-7cae-4bd3-b07e-0bd9be5755d1"
+    },
+    {
+     "stage": "rotations",
+     "usage": {
+      "usd": 0.0,
+      "type": "generations",
+      "generations": 5,
+      "cost_if_paid": 0.03240992045402527
+     },
+     "generation_id": "e8b143b9-8e49-4a05-9265-d1c224453e69"
+    }
+   ],
+   "billing_charged": true,
+   "generation_mode": "pro_flash",
+   "source_image_id": "16724880-fb8c-5094-acb3-cf2d18988b78",
+   "directions_count": 8,
+   "first_direction_generated": true
+  }
+ },
+ "object": {
+  "id": "cb444be2-d40e-46d1-99e0-5bafff9eb28e",
+  "name": "C02_기댄사무의자_1배_2차",
+  "state_name": "base",
+  "prompt": "The same plain office swivel chair as the style reference image, with exactly the same size, colors, fabric, frame and five-spoke base, but in a reclined position: the backrest is tilted far backward, about 35 degrees behind vertical, hinged at the back edge of the seat, as when someone leans all the way back. No armrests. The chair stands about 125 pixels tall overall, the seat about 64 pixels above the floor, the bottom of the casters near the bottom of the image. In side views the backrest clearly slants backward. Only the chair, centered, nothing else.",
+  "size": {
+   "width": 200,
+   "height": 200
+  },
+  "directions": 8,
+  "created_at": "2026-10-28T12:07:30.258531+00:00",
+  "view": "low top-down",
+  "rotation_urls": {
+   "south": "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/cb444be2-d40e-46d1-99e0-5bafff9eb28e/rotations/south.png",
+   "west": "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/cb444be2-d40e-46d1-99e0-5bafff9eb28e/rotations/west.png",
+   "east": "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/cb444be2-d40e-46d1-99e0-5bafff9eb28e/rotations/east.png",
+   "north": "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/cb444be2-d40e-46d1-99e0-5bafff9eb28e/rotations/north.png",
+   "south-east": "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/cb444be2-d40e-46d1-99e0-5bafff9eb28e/rotations/south-east.png",
+   "south-west": "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/cb444be2-d40e-46d1-99e0-5bafff9eb28e/rotations/south-west.png",
+   "north-east": "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/cb444be2-d40e-46d1-99e0-5bafff9eb28e/rotations/north-east.png",
+   "north-west": "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/cb444be2-d40e-46d1-99e0-5bafff9eb28e/rotations/north-west.png"
+  },
+  "storage_urls": {
+   "east": "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/cb444be2-d40e-46d1-99e0-5bafff9eb28e/rotations/east.png",
+   "west": "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/cb444be2-d40e-46d1-99e0-5bafff9eb28e/rotations/west.png",
+   "north": "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/cb444be2-d40e-46d1-99e0-5bafff9eb28e/rotations/north.png",
+   "south": "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/cb444be2-d40e-46d1-99e0-5bafff9eb28e/rotations/south.png",
+   "north-east": "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/cb444be2-d40e-46d1-99e0-5bafff9eb28e/rotations/north-east.png",
+   "north-west": "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/cb444be2-d40e-46d1-99e0-5bafff9eb28e/rotations/north-west.png",
+   "south-east": "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/cb444be2-d40e-46d1-99e0-5bafff9eb28e/rotations/south-east.png",
+   "south-west": "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/cb444be2-d40e-46d1-99e0-5bafff9eb28e/rotations/south-west.png"
+  },
+  "frame_urls": null,
+  "style_settings": {
+   "version": "v2.0.0+api",
+   "no_background": true,
+   "generation_mode": "pro_flash",
+   "source_image_id": "16724880-fb8c-5094-acb3-cf2d18988b78",
+   "first_frame_direction": "south"
+  },
+  "tags": [],
+  "status": "completed",
+  "group_id": "a26a79b1-8fdc-4da6-9238-acecd991ef7d",
+  "progress_percent": null,
+  "eta_seconds": null,
+  "animations": []
+ }
+}

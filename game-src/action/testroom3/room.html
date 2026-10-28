@@ -263,6 +263,7 @@ function hurtDummy(dmg, kind) {
   else if (kind === 'down') { D.vz = 260; D.vx = dir * 420; D.juggle++; D.bounced = true; }
   else if (kind === 'stun') { D.stunT = 1.4; D.vx = dir * 200; }
   else if (kind === 'pull') { D.vx = -dir * 520; }
+  else if (kind === 'turn') { D.turnT = 0.6; D.turnDir = dir; D.vx = 0; D.stag = 0.15; }   // 홱 뒤돌아 등을 보인 채 2m 밀려 걸어감(로제몬 D)
   else if (air) { D.juggle++; D.vz = Math.max(D.vz, (big ? 560 : 420) * Math.max(0.3, 1 - D.juggle * 0.12)); D.vx = dir * (big ? 160 : 70); }
   else D.vx = dir * (big ? 460 : 55);
   num(D.x + (Math.random() - 0.5) * 30, D.y - 200 - D.z, dmg, big);
@@ -325,6 +326,10 @@ function strike(h, y) {
 // 공용 바닥 파괴(전 인물 통일): 땅이 터지고 돌 부스러기가 튄 뒤 갈라진 구덩이가 남았다가 흐려짐. 바닥 층(캐릭터 뒤)
 function craterAt(x, gy, k, hold = 3) { if (!vfx('ground-crater2', x, gy, k, { under: true, back: true, hold, fade: 0.6, flip: Math.random() < 0.5 })) fx.push({ k: 'scorch', x, y: gy, r: 50 * k, t: hold }); }
 const FX = {
+  // 맞은 자리에서 동전이 튀어 바닥에 떨어져 돌다 멈춤(로제몬 D)
+  coinDrop(s, c) { const p = posOf({ at: 'target', ...s }, c); fx.push({ k: 'coin', x: p.x, y: p.hy, vx: -P.face * 90, vy: -320, g: p.gy, t: 1.6 }); },
+  // 눈빛 번쩍(보라 점 2개)
+  eyes(s, c) { const id = P.clip ? P.clip.id : restId(), a = A[id]; const e = framePt(id, P.clip ? curF() : 0, (a ? a.reach[0] * 0.15 : 6), a ? a.h * 0.88 : 180); fx.push({ k: 'eyes', x: e.x, y: e.y, t: s.time || 0.35, t0: s.time || 0.35, c: s.color || '#c58bff' }); },
   // 캐릭터 그림을 넣어 뽑은 이펙트(캐릭터는 지움): 캐릭터 발 자리·배율로 그려 손·몸 위치가 맞음. under(기본)면 캐릭터 뒤
   // hits: [{at 초, dx 앞 거리(그림 화소), r 너비, hit, crater 배율}] · craters: [{at, dx, dy(아래로 +), k}] 그림 속 폭발 밑동마다
   self(s, c) {
@@ -828,10 +833,10 @@ const crLp = () => LP('41') || R(Math.min(4, nOf('41') - 1), nOf('41') - 1);
 function crouch() { if (!has('41')) return; P.mode = 'crouch'; const lp = crLp(); play('41', { seq: [...S(R(0, lp[0] - 1), 0.08), ...S(lp, 0.11)], loopFrom: lp[0] }); }
 
 // ── 의자 앉기(3판 정면 60 · 옆 96 · 후면 61) — 라이브 seat: 4틱(0.133초)마다 한 장, E로 거꾸로 일어남 ──
-const SEATS = [{ dir: 'front', sit: '60', img: 'south', acts: { talk: '62', eat: '64', drink: '65', type: '63', doze: '66', lean: '73', nod: '68', craft: '106' } },
-               { dir: 'side', sit: '96', img: 'east', acts: { talk: '97', eat: '98', drink: '99', type: '105', doze: '54' } },
+const SEATS = [{ dir: 'front', sit: '60', img: 'south', acts: { talk: '62', eat: '64', drink: '65', type: '63', doze: '66', lean: '73', nod: '68', craft: '106', phone: '148', book: '149', paper: '167', call: '67' } },
+               { dir: 'side', sit: '96', img: 'east', acts: { talk: '97', eat: '98', drink: '99', type: '105' } },
                { dir: 'back', sit: '61', img: 'north', acts: { talk: '70', eat: '71', drink: '71', type: '69', look: '72' } }];
-const SEAT_LOOP = new Set(['63', '64', '66', '73', '98', '105', '54', '69', '71', '106']);   // 「반복, 첫 장 유지」 줄
+const SEAT_LOOP = new Set(['63', '64', '66', '73', '98', '105', '69', '71', '106', '148', '149', '167']);   // 「반복, 첫 장 유지」 줄
 const SEAT_F = 0.133;
 let seatIdx = -1, showChair = true;
 // 의자 맞춤 {dx(앞쪽 +), dy(아래 +), s}: 설정 chars/<키>.json "chair" > 이 브라우저에서 미세 조정한 값 > 빌드 자동값(chairfit.py)
@@ -892,7 +897,7 @@ function runScene(steps, label) {
 const SCENES = [
   ['의자', [['정면 앉기', () => sitAt('front')], ['옆 앉기', () => sitAt('side')], ['후면 앉기', () => sitAt('back')],
     ['앉아 수다', () => seatAct('talk')], ['앉아 먹기', () => seatAct('eat')], ['앉아 마시기', () => seatAct('drink')], ['앉아 타자', () => seatAct('type')],
-    ['앉아 졸기', () => seatAct('doze')], ['기대 쉬기', () => seatAct('lean')], ['앉아 일하다 고개 들어 끄덕(정면)', () => seatAct('nod')], ['앉아 손 작업(정면)', () => seatAct('craft')], ['앉은 채 돌아보기(후면)', () => seatAct('look')], ['일어나기', () => P.seat && rise()],
+    ['앉아 졸기', () => seatAct('doze')], ['기대 쉬기', () => seatAct('lean')], ['앉아 일하다 고개 들어 끄덕(정면)', () => seatAct('nod')], ['앉아 손 작업(정면)', () => seatAct('craft')], ['앉아 폰 보기(정면)', () => seatAct('phone')], ['앉아 책 읽기(정면)', () => seatAct('book')], ['앉아 신문 읽기(정면)', () => seatAct('paper')], ['앉아 통화(정면)', () => seatAct('call')], ['앉은 채 돌아보기(후면)', () => seatAct('look')], ['일어나기', () => P.seat && rise()],
     ['앉은 채 맞기(약)', () => P.seat && seatHit(false)], ['앉은 채 맞기(강) · 옆 = 굴러떨어지기', () => P.seat && seatHit(true)]], () => has('60') || has('96')],
   ['샤워', [['한 번에(벗기→걷기→물→씻기→입기)', () => runScene([{ id: 'SH_A', d: 0.12 }, { id: 'SH_B', n: 2 }, { id: 'SH_D', n: 3 }, { id: 'SH_E', n: 3 }, { id: 'SH_A', rev: true, d: 0.1 }], '샤워')],
     ['옷 벗기', () => runScene([{ id: 'SH_A', d: 0.12, hold: 0.6 }], '옷 벗기')], ['맨몸 걷기', () => runScene([{ id: 'SH_B', n: 4 }])], ['물 맞으며 쉬기', () => runScene([{ id: 'SH_D', n: 4 }])],
@@ -1071,7 +1076,7 @@ function updateFx(dt) {
     }
     else if (e.k === 'lob') {}
     else if (e.k === 'firewall' && Math.random() < dt * 40) fx.push({ k: 'fire', x: e.x + (Math.random() - 0.5) * e.w, y: e.y - Math.random() * 10, vx: (Math.random() - 0.5) * 30, vy: -250 - Math.random() * 300, r: 6 + Math.random() * 8, t: 0.5, t0: 0.6 });
-    else if (e.k === 'shell') { e.x += e.vx * dt; e.y += e.vy * dt; e.vy += 1400 * dt; if (e.y > e.g) { e.y = e.g; e.vy *= -0.35; e.vx *= 0.6; } }
+    else if (e.k === 'shell' || e.k === 'coin') { e.x += e.vx * dt; e.y += e.vy * dt; e.vy += 1400 * dt; if (e.y > e.g) { e.y = e.g; e.vy *= -0.35; e.vx *= 0.6; } }
   }
   for (const e of fx) if (e.k === 'timer' && e.t <= 0 && !e.done) { e.done = true; e.fn(); }
   fx = fx.filter(e => e.t > 0);
@@ -1083,6 +1088,7 @@ function updateDummy(dt) {
   if (D.bindT > 0) D.vx = 0;
   D.x += D.vx * dt; D.vx *= Math.pow(0.02, dt);
   D.stunT = Math.max(0, D.stunT - dt);
+  if (D.turnT > 0) { D.turnT = Math.max(0, D.turnT - dt); D.x += D.turnDir * 340 * dt; }
   D.liftT = Math.max(0, (D.liftT || 0) - dt);
   if (D.liftT > 0) { D.z += (D.liftH - D.z) * Math.min(1, dt * 8); D.vz = 0; D.vx = 0; D.ang = Math.sin(P.t * 6) * 0.15; }
   else if (D.z > 0 || D.vz > 0) {
@@ -1092,8 +1098,8 @@ function updateDummy(dt) {
       else { D.z = 0; D.vz = 0; D.juggle = 0; D.bounced = false; dust(D.x, D.y, 6); shake = Math.max(shake, 4); }
     }
   }
-  if (D.bindT <= 0) D.x += (860 - D.x) * Math.min(1, dt * 0.25);
-  if (counter && showDummy && D.stag === 0 && D.stunT === 0 && D.z === 0 && D.bindT === 0) {
+  if (D.bindT <= 0 && !(D.turnT > 0)) D.x += (860 - D.x) * Math.min(1, dt * 0.25);
+  if (counter && showDummy && D.stag === 0 && D.stunT === 0 && !(D.turnT > 0) && D.z === 0 && D.bindT === 0) {
     D.atkT -= dt;
     if (D.atkT < 0.45 && D.atkT > 0) D.wind = 1;
     if (D.atkT <= 0) {
@@ -1299,6 +1305,7 @@ function drawDummy() {
   ctx.fillStyle = '#3a2d22'; ctx.fillRect(-4, -40, 8, 40);
   ctx.fillStyle = D.flash > 0 ? '#ffffff' : D.wind ? '#c0503a' : '#9a6b3f'; ctx.fillRect(-26, -190, 52, 150);
   ctx.fillStyle = D.flash > 0 ? '#ffffff' : '#7d5531'; ctx.fillRect(-26, -150, 52, 6); ctx.fillRect(-26, -90, 52, 6);
+  if (D.turnT > 0) { const b = Math.abs(Math.sin(D.turnT * 18)) * 6; ctx.translate(0, -b); ctx.fillStyle = '#5a3b22'; ctx.fillRect(-26, -190, 52, 150); ctx.fillStyle = '#c58bff'; ctx.fillRect(-20, -184, 40, 4); ctx.fillStyle = '#f4e6ff'; ctx.font = 'bold 18px sans-serif'; ctx.textAlign = 'center'; ctx.fillText('등', 0, -112); ctx.textAlign = 'left'; }
   ctx.restore();
   const hb = D.y - D.z - 222 * dk;
   ctx.fillStyle = '#000a'; ctx.fillRect(D.x - 40, hb, 80, 7);
@@ -1421,6 +1428,8 @@ function drawFx(glow) {
     else if (e.k === 'mote') { ctx.fillStyle = e.c; ctx.globalAlpha = k; ctx.fillRect(e.x - 2, e.y - 2, 4, 4); ctx.globalAlpha = 1; }
     else if (e.k === 'fire') { const c = k > 0.8 ? '255,255,230' : k > 0.55 ? '255,214,90' : k > 0.3 ? '255,120,30' : '120,30,20'; ctx.fillStyle = `rgba(${c},${Math.min(1, k * 1.6)})`; ctx.beginPath(); ctx.arc(e.x, e.y, e.r, 0, Math.PI * 2); ctx.fill(); }
     else if (e.k === 'shell') { ctx.fillStyle = '#e8c35a'; ctx.fillRect(e.x - 2, e.y - 1, 5, 3); }
+    else if (e.k === 'coin') { ctx.save(); ctx.translate(e.x, e.y - 6); ctx.scale(e.vy === 0 && Math.abs(e.vx) < 5 ? 1 : Math.abs(Math.cos(e.t * 16)) * 0.85 + 0.15, 1); drawIcon('coin', 0, 0, 0.9, CH.color); ctx.restore(); }
+    else if (e.k === 'eyes') { const a = e.t / e.t0; ctx.fillStyle = e.c; ctx.globalAlpha = a; for (const ox of [-6, 6]) { ctx.fillRect(e.x + ox - 3, e.y - 2, 6, 4); ctx.fillRect(e.x + ox - 9 * a - 1, e.y - 1, 18 * a + 2, 2); } ctx.globalAlpha = 1; }
     else if (e.k === 'beam') {
       const x2 = e.dir > 0 ? W : 0, w = e.w * (0.4 + 0.6 * k), x0 = Math.min(e.x, x2), len = Math.abs(x2 - e.x);
       ctx.globalAlpha = 0.45 * k; ctx.fillStyle = e.c || '#a0dcff'; ctx.fillRect(x0, e.y - w, len, w * 2);

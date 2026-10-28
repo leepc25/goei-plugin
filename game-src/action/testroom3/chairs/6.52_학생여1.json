@@ -12,8 +12,8 @@
   "img": "east"
  },
  "back": {
-  "dx": 7.0,
-  "dy": -1.0,
+  "dx": 3.0,
+  "dy": 0.0,
   "s": 1.0,
   "img": "north-west"
  },

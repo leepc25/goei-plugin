@@ -14,6 +14,8 @@ from PIL import Image, ImageDraw
 import numpy as np
 
 CH = build.ROOT / "game-src/action/objects/C01_사무의자_1배"
+CH2 = build.ROOT / "game-src/action/objects/C02_기댄사무의자_1배_2차"   # 등받이 기운 의자(기대 쉬기 73): img=C02:<방향>
+def chair_png(name): return (CH2 / f"{name[4:]}.png") if name.startswith("C02:") else (CH / f"{name}.png")
 VIEWS = [("front", "60", "south"), ("side", "96", "east"), ("back", "61", "north")]
 # 앉은 채 하는 줄: 방향별. 자세가 크게 바뀌는 줄은 줄 번호로 따로 맞춤(set 73 img=north-west dx=.. dy=..)
 LINES = {"front": ["62", "63", "64", "65", "66", "73"], "side": ["97", "98", "99", "105"], "back": ["69", "70", "71"]}
@@ -62,7 +64,7 @@ def render(key, outp):
         for x in range(0, TW, 10): g.line([(x, 0), (x, TH)], fill=(100, 94, 86, 255))
         for y in range(0, TH, 10): g.line([(0, y), (TW, y)], fill=(100, 94, 86, 255))
         if im is not None:
-            p = vals[v]; c = Image.open(CH / f"{p.get('img', cn)}.png").convert("RGBA")
+            p = vals[v]; c = Image.open(chair_png(p.get('img', cn))).convert("RGBA")
             base = TH - 10   # 그림 바닥(BASE = h - 4)을 여기 맞춤
             ox, oy = TW // 2 - im.size[0] // 2, base - (im.size[1] - 4)
             cx, cy = round(TW / 2 + p["dx"] - 100), round(base + p["dy"] - 171)
@@ -98,7 +100,7 @@ def render_lines(key, outp):
         T = Image.new("RGBA", (TW, TH), (92, 86, 78, 255)); g = ImageDraw.Draw(T)
         for x in range(0, TW, 10): g.line([(x, 0), (x, TH)], fill=(100, 94, 86, 255))
         for y in range(0, TH, 10): g.line([(0, y), (TW, y)], fill=(100, 94, 86, 255))
-        c = Image.open(CH / f"{cn}.png").convert("RGBA"); base = TH - 10
+        c = Image.open(chair_png(cn)).convert("RGBA"); base = TH - 10
         ox, oy = TW // 2 - im.size[0] // 2, base - (im.size[1] - 4); cx, cy = round(TW / 2 + p["dx"] - 100), round(base + p["dy"] - 171)
         if v != "back": T.alpha_composite(c, (cx, cy)); T.alpha_composite(im, (ox, oy))
         else: T.alpha_composite(im, (ox, oy)); T.alpha_composite(c, (cx, cy))
@@ -109,10 +111,32 @@ def render_lines(key, outp):
     return out
 
 
+def render_back3(key, outp):
+    """후면 의자 방향 고르기: 같은 후면 앉기 그림에 north-west·north·north-east 의자를 나란히(지금 dx·dy 그대로)"""
+    cfg, _ = load(key)
+    ims, vals = values(cfg)
+    im = ims["back"]; p = vals["back"]
+    Z, TW, TH = 3, 220, 280
+    S = Image.new("RGB", (TW * Z * 3, TH * Z + 40), (40, 40, 44)); dr = ImageDraw.Draw(S)
+    for i, cn in enumerate(["north-west", "north", "north-east"]):
+        T = Image.new("RGBA", (TW, TH), (92, 86, 78, 255)); g = ImageDraw.Draw(T)
+        for x in range(0, TW, 10): g.line([(x, 0), (x, TH)], fill=(100, 94, 86, 255))
+        for y in range(0, TH, 10): g.line([(0, y), (TW, y)], fill=(100, 94, 86, 255))
+        c = Image.open(chair_png(cn)).convert("RGBA"); base = TH - 10
+        ox, oy = TW // 2 - im.size[0] // 2, base - (im.size[1] - 4); cx, cy = round(TW / 2 + p["dx"] - 100), round(base + p["dy"] - 171)
+        T.alpha_composite(im, (ox, oy)); T.alpha_composite(c, (cx, cy))
+        S.paste(T.convert("RGB").resize((TW * Z, TH * Z), Image.NEAREST), (i * TW * Z, 40))
+        dr.text((i * TW * Z + 8, 8), f"{key} back img={cn}{' (지금)' if cn == p.get('img') else ''} dx={p['dx']} dy={p['dy']}", fill=(255, 255, 255))
+    S.save(outp)
+    return p
+
+
 if __name__ == "__main__":
     key = ARGS[0]; outp = ARGS[1] if len(ARGS) > 1 else f"/tmp/fit_{key}.png"
     if len(ARGS) > 2 and ARGS[2] == "lines":   # fit_chair.py <키> out.png lines  → 앉은 채 하는 줄 전부
         print(json.dumps(render_lines(key, outp), ensure_ascii=False)); sys.exit()
+    if len(ARGS) > 2 and ARGS[2] == "back3":   # fit_chair.py <키> out.png back3  → 후면 의자 방향 3가지 나란히
+        print(json.dumps(render_back3(key, outp), ensure_ascii=False)); sys.exit()
     if len(ARGS) > 2 and ARGS[2] == "set" and ARGS[3] in LINE_VIEW:   # 줄 하나만 따로: set 73 img=north-west dx=.. dy=..
         cfg, p = load(key); _, vals = values(cfg)
         cur = {**vals[LINE_VIEW[ARGS[3]]], **((cfg.get("chair") or {}).get(ARGS[3]) or {})}

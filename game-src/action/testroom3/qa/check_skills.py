@@ -14,7 +14,7 @@ room = (HERE / "room.html").read_text(encoding="utf-8")
 blk = room.split("const FX = {", 1)[1].split("\nfunction runFx", 1)[0]
 PARTS = set(re.findall(r"^  (\w+)\((?:s|s, c)\)", blk, re.M))
 VFXN = {p.stem for d in (build.EIL / "vfx", HERE / "vfx") for p in d.glob("*.json") if p.with_suffix(".png").exists()}
-KINDS = {"light", "heavy", "launch", "blow", "down", "stun", "spike", "pull"}
+KINDS = {"light", "heavy", "launch", "blow", "down", "stun", "spike", "pull", "turn"}
 
 
 def walk(fx, path, errs, anims):

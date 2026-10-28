@@ -12,10 +12,10 @@
   "img": "east"
  },
  "back": {
-  "dx": 13.0,
+  "dx": 5.0,
   "dy": -4.0,
   "s": 1.0,
-  "img": "north"
+  "img": "north-west"
  },
  "73": {
   "dx": -25.0,

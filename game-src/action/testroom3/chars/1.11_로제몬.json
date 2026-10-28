@@ -379,6 +379,15 @@
    "fps": 10,
    "events": [
     {
+     "f": 2,
+     "fx": [
+      {
+       "t": "eyes",
+       "time": 0.45
+      }
+     ]
+    },
+    {
      "f": 4,
      "hold": 0.1,
      "fx": [
@@ -388,28 +397,28 @@
        "at": "body",
        "dx": 10,
        "dy": -80,
-       "scale": 0.8,
+       "scale": 0.5,
        "tint": "#D9A0FF"
       },
       {
        "t": "proj",
        "kind": "coin",
-       "speed": 1300,
-       "life": 0.45,
+       "speed": 1100,
+       "life": 0.5,
        "size": 1,
        "hit": {
         "dmg": 230,
-        "kind": "heavy",
+        "kind": "turn",
         "vfx": "x3-c-hit-spark-light",
-        "vs": 1.6
+        "vs": 1.2
        },
        "end": [
         {
-         "t": "v",
-         "vfx": "x3-c-dust-puff",
-         "at": "target",
-         "scale": 0.35,
-         "tint": "#c8b8a0"
+         "t": "coinDrop"
+        },
+        {
+         "t": "eyes",
+         "time": 0.3
         }
        ]
       }
@@ -419,7 +428,8 @@
      "f": 8,
      "hold": 0.1
     }
-   ]
+   ],
+   "_note": "10-28 사용자: A(원거리)와 똑같다 → 문서대로 눈빛 번쩍 + 동전 + 맞은 적이 등 돌려 2m 걸어감 + 동전 바닥에 떨어짐"
   },
   "charge": {
    "name": "인형술",
