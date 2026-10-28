@@ -205,7 +205,7 @@ function ensureRoot(): HTMLElement {
   root.addEventListener('change', (ev) => {
     const el = ev.target as HTMLSelectElement;
     if (el?.dataset?.input === 'dir-crop-size') return render();
-    if (el?.dataset?.change?.startsWith('ed-')) return void handle(el.dataset.change, el.value);
+    if (el?.dataset?.change?.startsWith('ed-')) return void run(el.dataset.change, el.value);
     host?.change?.(el);
   });
   root.addEventListener('submit', (ev) => {
@@ -245,7 +245,7 @@ function ensureRoot(): HTMLElement {
     const to = row.dataset.fieldRow ?? '';
     const from = drag;
     drag = null;
-    if (from && to && from !== to) void handle('ed-field-drop', `${from}|${to}`);
+    if (from && to && from !== to) void run('ed-field-drop', `${from}|${to}`);
   });
   root.addEventListener('dragend', () => root?.querySelectorAll('.drop-before, .dragging').forEach((x) => x.classList.remove('drop-before', 'dragging')));
   return root;

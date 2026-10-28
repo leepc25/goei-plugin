@@ -174,7 +174,7 @@ function ensureRoot(): HTMLElement {
   root.addEventListener('click', (ev) => {
     const t = ev.target as HTMLElement;
     if (t === root) {
-      if (downOutside) void handle('close');
+      if (downOutside) void run('close');
       downOutside = false;
       return;
     }
@@ -273,7 +273,7 @@ function ensureRoot(): HTMLElement {
       box.classList.remove('dir-dragging');
       const target = drop;
       mark(null);
-      if (target) void handle('dir-move', `${target.after ? 'after' : 'before'}|${grip.dataset.dragAgent}|${target.el.dataset.agentRow}`);
+      if (target) void run('dir-move', `${target.after ? 'after' : 'before'}|${grip.dataset.dragAgent}|${target.el.dataset.agentRow}`);
     };
     grip.addEventListener('pointermove', move);
     grip.addEventListener('pointerup', up);
@@ -331,7 +331,7 @@ function ensureRoot(): HTMLElement {
     ev.preventDefault();
     const form = ev.target as HTMLFormElement;
     const input = form.querySelector('input');
-    if (form.dataset.submit) void handle(form.dataset.submit, input?.value ?? '');
+    if (form.dataset.submit) void run(form.dataset.submit, input?.value ?? '');
   });
   root.addEventListener('change', (ev) => panelChange(ev.target as HTMLSelectElement));
   // 검색어는 목록만 다시 그린다 (입력창 포커스 유지)
@@ -359,7 +359,7 @@ function ensureRoot(): HTMLElement {
 
 /** 패널의 change 이벤트 (편집 창의 설정 페이지에서도 같은 함수를 부른다) */
 function panelChange(el: HTMLSelectElement): void {
-  if (el?.dataset?.change) void handle(el.dataset.change, el.dataset.key ? `${el.dataset.key}=${el.value}` : el.value);
+  if (el?.dataset?.change) void run(el.dataset.change, el.dataset.key ? `${el.dataset.key}=${el.value}` : el.value);
 }
 
 /** 패널의 input 이벤트 (편집 창의 설정 페이지에서도 같은 함수를 부른다) */
@@ -828,7 +828,7 @@ async function handle(action: string, value?: string): Promise<void> {
     case 'id-card': {
       // 모바일: 머리의 ID카드 버튼 → 왼쪽 패널과 같은 카드를 작은 창으로
       if (view.kind !== 'started') return;
-      showIdCard(idCard(view.ctx), (a, v) => void handle(a, v));
+      showIdCard(idCard(view.ctx), (a, v) => void run(a, v));
       return;
     }
     case 'wallet-pop':
@@ -1128,9 +1128,9 @@ function render(): void {
   });
   hydratePhotos(root);
   bindMapZoom(root);
-  bindMbar(root, () => void handle('close'));
-  bindDrawer(root, () => void handle('mk-pop'));
-  bindWikiSide(root, (v) => void handle('wiki-list', v));
+  bindMbar(root, () => void run('close'));
+  bindDrawer(root, () => void run('mk-pop'));
+  bindWikiSide(root, (v) => void run('wiki-list', v));
   bindFootnotes(root);
   const stBar = root.querySelector<HTMLElement>('.gx-settings > .st-scopebar');
   if (stBar) stBar.parentElement!.style.setProperty('--stbar', `${stBar.offsetHeight}px`);
@@ -1229,7 +1229,7 @@ function applyNav(s: NavState): void {
   if (s.d !== undefined) dirUi.open = s.d;
   agUi.pop = s.a ?? '';
   // 편성 단계는 목표를 골라야 갈 수 있으니 버튼과 같은 길로 (못 가면 목표 단계에 머문다)
-  if (s.f && s.f !== field.step) return void handle('field-step', s.f);
+  if (s.f && s.f !== field.step) return void run('field-step', s.f);
   render();
 }
 
@@ -1254,18 +1254,18 @@ function syncField(): void {
   if (gameOpen() && anchor !== fieldAnchor) closeGame();
   fieldAnchor = anchor;
   if (gameOpen()) reattachGame(host);
-  else openGame(host, () => void handle('game-close'));
+  else openGame(host, () => void run('game-close'));
 }
 
 /** 모바일 쓸기가 할 일 (브라우저 ←·→ 처럼): dir -1 뒤로, 1 앞으로. 갈 곳이 없으면 null */
 function navStep(dir: -1 | 1): (() => void) | null {
-  const go = (action: string, value?: string) => () => void handle(action, value);
+  const go = (action: string, value?: string) => () => void run(action, value);
   if (view.kind === 'picker') return dir < 0 && pickerPrefs ? go('prefs-close') : null;
   if (view.kind === 'opening') return dir < 0 ? go('repick') : null;
   if (view.kind !== 'started') return null;
-  if (gameOpen()) return dir < 0 ? () => void handle('game-close') : null;
-  if (evUi.pop && dir < 0) return () => void handle('ev-pop', evUi.pop);
-  if (agUi.pop && dir < 0) return () => void handle('agent-info', agUi.pop);
+  if (gameOpen()) return dir < 0 ? () => void run('game-close') : null;
+  if (evUi.pop && dir < 0) return () => void run('ev-pop', evUi.pop);
+  if (agUi.pop && dir < 0) return () => void run('agent-info', agUi.pop);
   if (!navHist.can(dir)) return null;
   return () => {
     const s = navHist.go(dir);
