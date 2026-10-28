@@ -26,3 +26,10 @@ Tripo API V3로 만든 첫 시험. 사용 크레딧 115 (잔액 885).
 - 결과 64MB(저장소에 넣지 않음, 작업 id로 다시 받는다). 앞머리가 눈 위로, 눈·얼굴이 살아 있다. `test_hq_body.png`, `test_hq_face.png`.
 - 다음: Blender에서 줄이기(노멀 맵 굽기) → 뼈대 → 카툰 렌더링.
 - 누적 사용 195크레딧, 잔액 805.
+
+## 게임용 묶음 (같은 날)
+
+- 고품질 모델을 4만 면으로 줄임(`tools/3d/lowpoly.py`) → Tripo 뼈대 f002fe63-5178-42f8-9af4-89e92d8fdf15(25) → 동작 984038f7(idle·walk·run, 30) · 19ab5619(jump·slash·shoot·hurt·fall, 50).
+- `eileen3d.glb` (2.5MB): `tools/3d/pack_char.py`로 2만 면, 색 텍스처 1024만, 동작 8개(NLA 트랙)를 한 파일로.
+- 동작 8개는 공용(Mixamo 뼈 이름). 다음 캐릭터는 모델·뼈대만 뽑고 동작은 Blender에서 옮긴다.
+- 누적 사용 300크레딧, 잔액 700.
