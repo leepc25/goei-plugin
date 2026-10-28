@@ -1,6 +1,7 @@
 // 플레이 세력 목록: 기본 다섯(A00~E00, scenarios.json) + 「괴이봇 명부」 조직 중 플레이 가능으로 켠 것(F00~).
 // 새 세력은 시작 화면에서 직접 입력·커스텀 임무로 시작하고, 태그·세력 로어북의 자리표시자 변수로 모델에게 알린다.
 import { directoryEntries } from './lorebooks';
+import { guideText } from './guides';
 import { SCENARIOS } from './scenarios';
 import type { Faction, FactionType, LoreEntry, Scenario, ScriptState } from './types';
 
@@ -83,8 +84,13 @@ function orgSpecs(lore: LoreEntry[]): [string, FactionSpec][] {
 
 /** 이 카드의 태그 로어북에 새 세력 자리표시자가 들어 있는지 */
 export function placeholdersReady(lore: LoreEntry[] | undefined): boolean {
-  const tag = loreText(lore ?? [], TAG_BOOK);
-  const fac = loreText(lore ?? [], FACTION_BOOK);
+  // v0.17 카드는 🏷️Tag 로어북이 없고 플러그인 내장 Tag 지침(src/data/guides/tag.txt, 자리표시자 있음)이 가상 항목으로 들어간다
+  // (core/world/virtual.ts). 카드에 없으면 그 지침 글로 판단한다. 2026-10-28 QC: 카드만 보다가 새 세력이 시작 화면에 안 나오고
+  // 명부에 「Tag 로어북에 자리가 없다」는 잘못된 안내가 떴다 (tests/browser.mjs 20절). 📜Faction 도 없으면 명부 조직으로 조립돼 자리가 필요 없다
+  // 가상 항목(goeiVirtual, core/world/virtual.ts VIRTUAL — 순환 import 를 피해 이름으로)은 플러그인이 조립한 것이라 뺀다: 가상 📜Faction 은 명부 조직을 직접 나열한다
+  const books = (lore ?? []).filter((e) => (e as Record<string, unknown>).goeiVirtual !== true);
+  const tag = books.some((e) => e.comment === TAG_BOOK) ? loreText(books, TAG_BOOK) : guideText('Tag');
+  const fac = loreText(books, FACTION_BOOK);
   return tag.includes('{{getvar::fac_codes}}') && tag.includes('{{getvar::fac_ac}}') && (!fac || placeFactionExtra(fac) === fac);
 }
 
