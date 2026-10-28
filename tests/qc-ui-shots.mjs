@@ -1,6 +1,6 @@
 // QC 03 사진: 시작 화면·첫 장면 고르기·상황판·설정 창 모든 페이지를 세 뷰포트(PC·폰 세로·폰 가로)로 찍는다.
 // 사용법: node tests/qc-ui-shots.mjs <fixture.json> <out-dir> [pc|phone|land|all]
-// 파일: <out>/<페이지>-<뷰포트>.png (페이지당 뷰포트당 1장)
+// 파일: <out>/<페이지>-<뷰포트>.jpg (페이지당 뷰포트당 1장)
 import { mkdirSync } from 'node:fs';
 import { boot, closeEditor, closeWin, goNode, launch, loadFixture, openEditor, openWin, setChat, sleep, VIEWPORTS } from './qc-settings-harness.mjs';
 
@@ -15,8 +15,15 @@ const name = (n) => n.replace(':', '-');
 
 for (const vp of vps) {
   const { page } = await boot(browser, fx, { message: [], scriptstate: {} }, vp);
-  const shot = (n) => page.screenshot({ path: `${out}/${n}-${vp}.png` });
+  // 용량(10MB 이하)을 위해 JPEG 품질 60
+  const shot = (n) => page.screenshot({ path: `${out}/${n}-${vp}.jpg`, type: 'jpeg', quality: 60 });
   await openWin(page);
+  // 빠진 설치 항목이 있으면 설치·점검 창이 먼저 뜬다 (그것도 한 장 찍고 닫는다)
+  await sleep(300);
+  if (await page.evaluate(() => document.querySelector('.gw')?.hidden === false)) {
+    await shot('start-install');
+    await closeEditor(page, true);
+  }
   await page.waitForSelector('.gx-fac');
   await page.evaluate(() => document.querySelector('.gx-fac[data-value="A00"]').click());
   await sleep(400);

@@ -174,8 +174,12 @@ for (const vp of vps) {
   await page.waitForSelector('.gx-tabhead');
   await openEditor(page, 'manage:backup');
   await page.waitForSelector('.gw textarea[data-input="man-import-text"]');
+  assert.equal(await page.isDisabled('.gw [data-action="man-import"]'), true, '빈 글칸이면 적용 잠김');
   await setInput(page, '.gw textarea[data-input="man-import-text"]', await page.evaluate(() => window.__store['p:goei:prefs']), 'input');
+  // 회귀: 붙여 넣으면 다시 그리지 않아도 「적용」이 풀린다
+  assert.equal(await page.isDisabled('.gw [data-action="man-import"]'), false, '글을 넣으면 적용 풀림');
   await clickSel(page, '.gw [data-action="man-import"]');
+  await page.waitForSelector('.gw [data-action="man-import-yes"]');
   await clickSel(page, '.gw [data-action="man-import-yes"]');
   await page.waitForFunction(() => document.querySelector('.gw .gw-head')?.textContent?.includes('가져왔어요'));
   await goNode(page, 'rule:new');
@@ -190,6 +194,7 @@ for (const vp of vps) {
   await goNode(page, 'manage:backup');
   await setInput(page, '.gw textarea[data-input="man-import-text"]', '{}', 'input');
   await clickSel(page, '.gw [data-action="man-import"]');
+  await page.waitForSelector('.gw [data-action="man-import-yes"]');
   await clickSel(page, '.gw [data-action="man-import-yes"]');
   await page.waitForFunction(() => document.querySelector('.gw .gw-head')?.textContent?.includes('가져왔어요'));
   assert.deepEqual(await prefsOf(page), { basic: {}, world: {} }, '빈 설정 가져오기');
@@ -199,7 +204,7 @@ for (const vp of vps) {
   await page.waitForSelector('.gw .gw-setbody .ps-row');
   const diag = await page.textContent('.gw .gw-setbody');
   assert.ok(diag.includes('괴이 카드') && diag.includes('진행 중') && diag.includes('메시지 2개'), `상태 점검 내용: ${diag.slice(0, 200)}`);
-  assert.ok(/플러그인\s*v\d+\.\d+\.\d+/.test(diag.replace(/\s+/g, ' ')), '플러그인 버전');
+  assert.ok(/플러그인[^·]{0,120}v\d+\.\d+\.\d+/.test(diag.replace(/\s+/g, ' ')), '플러그인 버전 (줄 이름 · 설명 · 배지 순)');
   await goNode(page, 'manage:log');
   await page.waitForSelector('.gw .gw-setbody');
   assert.ok((await page.textContent('.gw .gw-setbody')).includes('실패한 요청이 없어요'));
@@ -213,7 +218,7 @@ for (const vp of vps) {
   await page.waitForFunction(() => !document.querySelector('.gw .gw-setbody')?.textContent?.includes('…'));
   const exported = await page.$eval('.gw textarea[data-man-export]', (e) => e.value);
   assert.deepEqual(JSON.parse(exported), await prefsOf(page), '내보내기 JSON = 저장된 기기 설정');
-  const sizeTxt = await page.evaluate(() => [...document.querySelectorAll('.gw .ps-row')].find((r) => r.textContent.includes('기기 설정'))?.querySelector('.gw-tokens')?.textContent);
+  const sizeTxt = await page.evaluate(() => [...document.querySelectorAll('.gw .ps-row')].find((r) => r.querySelector('.gw-tokens') && r.textContent.includes('기기 설정'))?.querySelector('.gw-tokens')?.textContent);
   const rawLen = await page.evaluate(() => window.__store['p:goei:prefs'].length);
   assert.equal(sizeTxt, rawLen >= 1000 ? `${Math.round(rawLen / 1000)}KB` : `${rawLen}B`, `저장소 사용량 ${sizeTxt} (실제 ${rawLen})`);
   // 위키 기본 문서·토크나이저는 없음 → 「없음」, 지우기 단추 없음
@@ -222,14 +227,17 @@ for (const vp of vps) {
   // 가져오기: 잘못된 JSON → 오류, 배열 → 오류, 올바른 것 → 적용 (nav 사라짐)
   await setInput(page, '.gw textarea[data-input="man-import-text"]', '{broken', 'input');
   await clickSel(page, '.gw [data-action="man-import"]');
+  await page.waitForSelector('.gw [data-action="man-import-yes"]');
   await clickSel(page, '.gw [data-action="man-import-yes"]');
   await page.waitForFunction(() => document.querySelector('.gw .gx-err')?.textContent?.includes('가져오지 못했어요'));
   await setInput(page, '.gw textarea[data-input="man-import-text"]', '[1,2]', 'input');
   await clickSel(page, '.gw [data-action="man-import"]');
+  await page.waitForSelector('.gw [data-action="man-import-yes"]');
   await clickSel(page, '.gw [data-action="man-import-yes"]');
   await page.waitForFunction(() => document.querySelector('.gw .gx-err')?.textContent?.includes('설정 JSON 이 아니에요'));
   await setInput(page, '.gw textarea[data-input="man-import-text"]', '{"dim": 25, "nav": "bogus", "editorWidth": 30}', 'input');
   await clickSel(page, '.gw [data-action="man-import"]');
+  await page.waitForSelector('.gw [data-action="man-import-yes"]');
   await clickSel(page, '.gw [data-action="man-import-yes"]');
   await page.waitForFunction(() => document.querySelector('.gw .gw-head')?.textContent?.includes('가져왔어요'));
   assert.deepEqual(await prefsOf(page), { basic: {}, world: {}, dim: 25 }, '틀린 값은 버리고 맞는 값만');

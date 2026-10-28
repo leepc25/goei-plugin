@@ -1502,7 +1502,8 @@ function board(ctx: ChatContext): string {
     return `<div class="gx-empty"><p>이 채팅은 상황판 없이 시작했어요.</p>
       <p class="gx-muted">켜면 괴이·사건·특수가 발생하고, 다음 응답부터 모델이 상황판 태그를 함께 적어요.</p>
       ${notice ? `<div class="${noticeClass(notice)}" role="alert">${esc(notice)}</div>` : ''}
-      <button class="gx-start" data-action="world-on" ${busy ? 'disabled' : ''}>${busy ? '켜는 중…' : '상황판 켜기'}</button></div>`;
+      <button class="gx-start" data-action="world-on" ${busy ? 'disabled' : ''}>${busy ? '켜는 중…' : '상황판 켜기'}</button></div>${boardDrawer()}`;
+    // ↑ 상황판을 끈 채팅도 폰 하단 즐겨찾기 서랍은 그대로 (2026-10-28 QC: 꺼 두면 서랍째 사라졌다)
   }
   let catalog: Catalog;
   try {

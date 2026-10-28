@@ -16,6 +16,7 @@ const measure = (page) => page.evaluate(() => ({ listeners: window.__docListener
 
 for (const vp of vps) {
   const phone = vp !== 'pc';
+  const narrow = VIEWPORTS[vp].width <= 760; // 편집 창 한 열·서랍·쓸기 뒤로·상황판 서랍은 화면 760px 이하 (폰 가로 844 는 PC 배치)
   const { page, errors } = await boot(browser, fx, started(), vp);
   // ── 열기/닫기 50회 ──
   await openWin(page);
@@ -89,8 +90,9 @@ for (const vp of vps) {
       const u = await unresolved(page, '.gx');
       assert.deepEqual(u.bad, [], `${vp} ${t} 탭 ${tab}: 빈 배색 변수`);
       if (phone) {
-        const a = await auditDom(page, '.gx .gx-panel');
-        assert.deepEqual(a.overflow.filter((x) => !/gx-mclose|gx-mtrack|nw-rail|nw-panel|gx-fac-img|gx-facs|gx-scs/.test(x)), [], `${vp} ${t} 탭 ${tab}: 가로 넘침`);
+        // 쓸기 닫기 손잡이(gx-mclose)·가로 쓸기 목록(위키 레일·세력 사진·장면 띠)은 일부러 화면 밖까지 이어진다: 그 안쪽 요소까지 뺀다
+        const a = await auditDom(page, '.gx .gx-panel', '.gx-mclose, .gx-mtrack, .nw-rail, .nw-panel, .gx-fac-img, .gx-facs, .gx-scs');
+        assert.deepEqual(a.overflow, [], `${vp} ${t} 탭 ${tab}: 가로 넘침`);
       }
     }
   }
@@ -104,7 +106,7 @@ for (const vp of vps) {
   const curTab = () => page.evaluate(() => document.querySelector('.gx').dataset.tab);
   await goTab('wiki');
   await goTab('phone');
-  if (!phone) {
+  if (!narrow) {
     await clickSel(page, '.gx [data-action="nav-back"]');
     await page.waitForFunction(() => document.querySelector('.gx')?.dataset.tab === 'wiki');
     await clickSel(page, '.gx [data-action="nav-back"]');
@@ -138,7 +140,7 @@ for (const vp of vps) {
 
   // ── 즐겨찾기 5개 상한 ──
   const openMarks = async () => {
-    if (!phone) await clickSel(page, '.gx [data-action="mk-pop"]');
+    if (!narrow) await clickSel(page, '.gx [data-action="mk-pop"]');
     else await page.evaluate(() => [...document.querySelectorAll('.gx .gx-bdrawer [data-action="mk-pop"], .gx [data-action="mk-pop"]')].pop()?.click());
     await page.waitForSelector('.gx .mk-pop');
   };
@@ -146,7 +148,7 @@ for (const vp of vps) {
   for (const tab of ['board', 'wiki', 'phone', 'gnet', 'map', 'wallet']) {
     await goTab(tab);
     await openMarks();
-    const n = await page.locator('.gx .mk-pop .mk-rows .mk-row').count();
+    const n = ((await prefsOf(page)).marks ?? []).length;
     const here = await page.$('.gx .mk-pop [data-action="mk-here"]');
     if (tab === 'wallet') {
       assert.ok(!here || (await page.isDisabled('.gx .mk-pop [data-action="mk-here"]')), '5개면 「지금 화면」 잠김');
@@ -167,22 +169,24 @@ for (const vp of vps) {
   // 즐겨찾기로 이동
   await clickSel(page, '.gx .mk-pop [data-action="mk-go"][data-value="0"]');
   await page.waitForFunction(() => document.querySelector('.gx')?.dataset.tab === 'wiki');
-  if (phone) {
+  if (narrow) {
     await goTab('board');
+    // 회귀: 이 채팅은 상황판이 꺼져 있다(빈 화면). 그래도 서랍은 있어야 한다
     assert.equal(await page.locator('.gx .gx-bdrawer .mk-slot').count(), 5, '폰 상황판 서랍 다섯 칸');
   }
   await page.evaluate(() => { const p = JSON.parse(window.__store['p:goei:prefs'] ?? '{}'); delete p.marks; window.__store['p:goei:prefs'] = JSON.stringify(p); });
 
   // ── 메뉴 왼쪽/오른쪽 (PC) · 바깥 어둡기 단계 ──
   await openEditor(page, 'set:screen');
-  if (!phone) {
+  if (!narrow) {
     const navSide = () => page.evaluate(() => { const n = document.querySelector('.gx .gx-nav').getBoundingClientRect(); const p = document.querySelector('.gx .gx-panel').getBoundingClientRect(); return n.left - p.left < p.right - n.right ? 'left' : 'right'; });
     assert.equal(await navSide(), 'left');
     await clickSel(page, '.gw [data-action="set-nav"][data-value="right"]');
     await page.waitForFunction(() => document.querySelector('.gx')?.dataset.nav === 'right');
     assert.equal(await navSide(), 'right', '메뉴 오른쪽');
-    const popSide = async () => { await closeEditor(page); await openMarks(); const r = await page.$eval('.gx .mk-pop', (e) => e.getBoundingClientRect()); const p = await page.$eval('.gx .gx-panel', (e) => e.getBoundingClientRect()); await page.evaluate(() => document.querySelector('.gx .mk-pop [data-action="mk-pop"]')?.click()); await openEditor(page, 'set:screen'); return r.left - p.left < p.right - r.right ? 'left' : 'right'; };
-    assert.equal(await popSide(), 'right', '즐겨찾기 창도 오른쪽');
+    const popSide = async () => { await closeEditor(page); await openMarks(); const r = await page.$eval('.gx .mk-pop', (e) => e.getBoundingClientRect()); const n = await page.$eval('.gx .gx-nav', (e) => e.getBoundingClientRect()); await page.evaluate(() => document.querySelector('.gx .mk-pop [data-action="mk-pop"]')?.click()); await openEditor(page, 'set:screen'); return r.left >= n.right - 1 ? 'left' : r.right <= n.left + 1 ? 'right' : 'overlap'; };
+    // 즐겨찾기 창은 메뉴 바로 옆에 뜬다: 메뉴가 오른쪽이면 창은 메뉴의 왼쪽 가장자리 안쪽(겹치지 않음). 폭이 좁으면 창 가운데를 넘을 수 있어 좌우 거리로는 못 잰다
+    assert.equal(await popSide(), 'right', '즐겨찾기 창도 오른쪽 메뉴 옆 (메뉴와 겹치지 않음)');
     await clickSel(page, '.gw [data-action="set-nav"][data-value="left"]');
     await page.waitForFunction(() => document.querySelector('.gx')?.dataset.nav === 'left');
   }
@@ -195,12 +199,15 @@ for (const vp of vps) {
   }
   await closeEditor(page);
 
-  // ── 폰: 편집 창 서랍(메뉴) · 한 열 · 글칸 전체 폭 · 드롭다운 ──
-  if (phone) {
+  // ── 폰(760px 이하): 편집 창 서랍(메뉴) · 한 열 · 글칸 전체 폭 · 드롭다운 ──
+  if (narrow) {
     await openEditor(page, 'set:board');
     assert.equal(await page.evaluate(() => getComputedStyle(document.querySelector('.gw .gw-tree')).transform !== 'none'), true, '서랍은 숨어 있다');
+    // 회귀: 닫힌 서랍은 Tab·읽어 주기에서도 빠진다 (visibility hidden), 열면 보인다
+    assert.equal(await page.evaluate(() => getComputedStyle(document.querySelector('.gw .gw-tree')).visibility), 'hidden', '닫힌 서랍 visibility');
     await clickSel(page, '.gw [data-action="ed-drawer"]');
     await page.waitForFunction(() => document.querySelector('.gw .gw-win')?.classList.contains('drawer'));
+    await page.waitForFunction(() => getComputedStyle(document.querySelector('.gw .gw-tree')).visibility === 'visible');
     await clickSel(page, '.gw [data-action="ed-node"][data-value="set:image"]');
     await page.waitForFunction(() => !document.querySelector('.gw .gw-win')?.classList.contains('drawer') && document.querySelector('.gw .gw-tree-item.on')?.dataset.value === 'set:image');
     const cols = await page.evaluate(() => [...document.querySelectorAll('.gw .ps-row')].map((r) => getComputedStyle(r).gridTemplateColumns.trim().split(/\s+/).length));
@@ -223,6 +230,7 @@ for (const vp of vps) {
   const applyPrefs = async (json) => {
     await page.evaluate((j) => { const el = document.querySelector('.gw textarea[data-input="man-import-text"]'); el.value = j; el.dispatchEvent(new Event('input', { bubbles: true })); }, json);
     await clickSel(page, '.gw [data-action="man-import"]');
+    await page.waitForSelector('.gw [data-action="man-import-yes"]');
     await clickSel(page, '.gw [data-action="man-import-yes"]');
     await page.waitForFunction(() => document.querySelector('.gw .gw-head')?.textContent?.includes('가져왔어요'));
     await goNode(page, 'set:screen');
@@ -246,9 +254,15 @@ for (const vp of vps) {
   await openEditor(page, 'set:screen');
   await clickSel(page, '.gw [data-action="set-nav"][data-value="left"]');
   await sleep(150);
-  await page.mouse.click(2, 2);
-  await page.waitForFunction(() => document.querySelector('.gw')?.hidden === true);
-  assert.equal(await page.evaluate(() => document.querySelector('.gx')?.style.display), '', '바깥 클릭으로 편집 창만 닫힘');
+  if (!narrow) {
+    await page.mouse.click(2, 2);
+    await page.waitForFunction(() => document.querySelector('.gw')?.hidden === true);
+    assert.equal(await page.evaluate(() => document.querySelector('.gx')?.style.display), '', '바깥 클릭으로 편집 창만 닫힘');
+  } else {
+    // 760px 이하는 편집 창이 화면 전체라 바깥이 없다: 닫기 단추로
+    assert.equal(await page.evaluate(() => Math.round(document.querySelector('.gw .gw-win').getBoundingClientRect().width)), VIEWPORTS[vp].width, '폰 편집 창은 화면 전체');
+    await closeEditor(page);
+  }
   await page.keyboard.press('Escape');
   await page.waitForFunction(() => document.querySelector('.gx')?.style.display === 'none');
   assert.deepEqual(errors, [], `${vp}: 오류`);

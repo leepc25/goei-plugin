@@ -190,18 +190,19 @@ export async function setInput(page, sel, value, ev = 'change') {
 export const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 /** 접근성·넘침 점검: 글자 없는 단추, 가로 넘침 */
-export async function auditDom(page, rootSel) {
-  return page.evaluate((rootSel) => {
+export async function auditDom(page, rootSel, ignore = '') {
+  return page.evaluate(([rootSel, ignore]) => {
     const root = document.querySelector(rootSel);
     if (!root) return { missing: ['(no root)'], overflow: [], scrollW: 0 };
-    const vis = (el) => { const r = el.getBoundingClientRect(); return r.width > 0 && r.height > 0; };
+    const vis = (el) => { const r = el.getBoundingClientRect(); return r.width > 0 && r.height > 0 && getComputedStyle(el).visibility !== 'hidden'; };
     const missing = [...root.querySelectorAll('button')].filter((b) => vis(b) && !b.textContent.trim() && !b.getAttribute('aria-label') && !b.getAttribute('title') && !b.querySelector('img[alt]:not([alt=""])')).map((b) => b.outerHTML.slice(0, 120));
     const W = window.innerWidth;
     const overflow = [...root.querySelectorAll('*')].filter((el) => {
       if (!vis(el)) return false;
+      if (ignore && el.closest(ignore)) return false; // 일부러 화면 밖에 둔 것(쓸기 닫기 손잡이 등)과 그 안쪽
       const r = el.getBoundingClientRect();
       return r.right > W + 1 || r.left < -1;
     }).map((el) => `${el.tagName.toLowerCase()}.${[...el.classList].join('.')} right=${Math.round(el.getBoundingClientRect().right)}`);
     return { missing, overflow, scrollW: document.documentElement.scrollWidth };
-  }, rootSel);
+  }, [rootSel, ignore]);
 }

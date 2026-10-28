@@ -15,9 +15,20 @@ const PICK = { agent: '쟈알디', org: '극단', anomaly: '소라 랜드', site
 const dirOf = (page) => page.evaluate(() => JSON.parse(window.__char.globalLore.find((e) => e.comment === 'Directory').content));
 const dirty = (page) => page.evaluate(() => document.querySelector('.gw .gw-save')?.classList.contains('dirty') ?? false);
 const settle = () => sleep(120);
+/** 고친 것이 있으면 되돌리기(확인창 포함), 없으면 그대로 */
+async function revertAll(page) {
+  await settle();
+  if (!(await dirty(page))) return;
+  await clickSel(page, '.gw [data-action="ed-revert"]');
+  await page.waitForSelector('.gw [data-action="ed-revert-force"]');
+  await clickSel(page, '.gw [data-action="ed-revert-force"]');
+  await page.waitForFunction(() => !document.querySelector('.gw .gw-save')?.classList.contains('dirty'));
+}
 
 for (const vp of vps) {
   const phone = vp !== 'pc';
+  // 목록 대신 드롭다운: 화면 760px 이하, 또는 본문 칸이 600px 이하(폰 가로 844 는 편집 창 90% − 메뉴 칸이라 여기에 든다)
+  const narrow = vp !== 'pc';
   const { page, errors } = await boot(browser, fx, { message: [{ role: 'user', data: 'hi' }, { role: 'char', data: '본문' }], scriptstate: { $st_faction: 'A00', $st_lang: 'ko', $st_fm: '2' } }, vp);
   await openWin(page);
   await page.waitForSelector('.gx-tabhead');
@@ -35,8 +46,8 @@ for (const vp of vps) {
     // 폰: 목록·검색은 숨고 드롭다운 하나
     const listVisible = await page.evaluate(() => { const l = document.querySelector('.gw .gw-list'); return !!l && getComputedStyle(l).display !== 'none'; });
     const pickVisible = await page.evaluate(() => { const l = document.querySelector('.gw .gw-list-pick'); return !!l && getComputedStyle(l).display !== 'none'; });
-    assert.equal(listVisible, !phone, `${kind} ${vp}: 목록 ${phone ? '숨김' : '보임'}`);
-    assert.equal(pickVisible, phone, `${kind} ${vp}: 드롭다운 ${phone ? '보임' : '숨김'}`);
+    assert.equal(listVisible, !narrow, `${kind} ${vp}: 목록 ${narrow ? '숨김' : '보임'}`);
+    assert.equal(pickVisible, narrow, `${kind} ${vp}: 드롭다운 ${narrow ? '보임' : '숨김'}`);
     const opts = await page.locator('.gw .gw-list-pick option').count();
     assert.equal(opts, n, `${kind}: 드롭다운 항목 수`);
     const a = await auditDom(page, '.gw');
@@ -44,7 +55,7 @@ for (const vp of vps) {
     if (phone) assert.deepEqual(a.overflow, [], `${kind} ${vp}: 가로 넘침`);
     const pick = PICK[kind] ?? (await page.$eval('.gw .gw-list .gw-row b', (e) => e.textContent));
     // 검색
-    if (!phone) {
+    if (!narrow) {
       await setInput(page, '.gw [data-input="ed-q"]', pick.slice(0, 2), 'input');
       await settle();
       const hits = await page.$$eval('.gw .gw-list .gw-row b', (els) => els.map((e) => e.textContent));
@@ -74,7 +85,7 @@ for (const vp of vps) {
     await page.waitForFunction(() => !document.querySelector('.gw .gw-save')?.classList.contains('dirty') && document.querySelector('.gw .gw-save-state')?.textContent?.includes('저장됨'));
     const dir = await dirOf(page);
     assert.equal(dir.세계?.[kind]?.[pick]?.fields?.[fid], `qc ${kind} 글`, `${kind}: 카드 명부 세계.${kind}.${pick}.${fid}`);
-    assert.ok((await page.textContent(`.gw .gw-row[data-value="${pick}"]`)).includes('고침') || phone, `${kind}: 고침 배지`);
+    assert.ok((await page.textContent(`.gw .gw-row[data-value="${pick}"]`)).includes('고침') || narrow, `${kind}: 고침 배지`);
     // 기본으로 (ed-restore): 덧쓰기 지움 → 저장
     await clickSel(page, '.gw [data-action="ed-restore"]');
     await page.waitForFunction(() => document.querySelector('.gw .gw-save')?.classList.contains('dirty'));
@@ -227,7 +238,7 @@ for (const vp of vps) {
   await goNode(page, 'relations');
   await page.waitForSelector('.gw .gw-rel-rows');
   const pickOrg = async (name) => {
-    if (phone) await page.evaluate((n) => { const s = document.querySelector('.gw .gw-list-pick'); s.value = n; s.dispatchEvent(new Event('change', { bubbles: true })); }, name);
+    if (narrow) await page.evaluate((n) => { const s = document.querySelector('.gw .gw-list-pick'); s.value = n; s.dispatchEvent(new Event('change', { bubbles: true })); }, name);
     else await clickSel(page, `.gw [data-action="ed-rel-pick"][data-value="${name}"]`);
     await page.waitForFunction((n) => document.querySelector('.gw .gw-head h2')?.textContent?.startsWith(n), name);
   };
@@ -274,9 +285,8 @@ for (const vp of vps) {
   await clickSel(page, '.gw [data-action="ed-rel-preview"]');
   await page.waitForSelector('.gw .gw-preview');
   assert.ok((await page.textContent('.gw .gw-preview')).includes('The Troupe'), 'Faction 지침 보기');
-  await clickSel(page, '.gw [data-action="ed-revert"]');
-  await clickSel(page, '.gw [data-action="ed-revert-force"]');
-  await page.waitForFunction(() => !document.querySelector('.gw .gw-save')?.classList.contains('dirty'));
+  assert.equal(await dirty(page), true, '공통 규칙을 기본으로 돌려서 고친 것 있음');
+  await revertAll(page);
 
   // 거점: 목록 → 열기 → 보임/숨김·조직·지역 드롭다운·이름 바꾸기 → 저장. 지도 클릭 위치 (지도 그림이 있을 때)
   await goNode(page, 'base');
@@ -324,9 +334,7 @@ for (const vp of vps) {
   await clickSel(page, '.gw [data-action="dir-base-del"][data-value="시험 거점 2"]');
   await settle();
   assert.equal(await page.locator('.gw .gw-basepage .dir-row').count(), baseN, '지우기');
-  await clickSel(page, '.gw [data-action="ed-revert"]');
-  await clickSel(page, '.gw [data-action="ed-revert-force"]');
-  await page.waitForFunction(() => !document.querySelector('.gw .gw-save')?.classList.contains('dirty'));
+  await revertAll(page);
 
   // 괴이 공통 머리말: 고치면 덧쓰기, 기본으로
   await goNode(page, 'anomaly');
@@ -343,7 +351,7 @@ for (const vp of vps) {
   await clickSel(page, '.gw [data-action="ed-save"]');
   await page.waitForFunction(() => !document.querySelector('.gw .gw-save')?.classList.contains('dirty'));
   assert.equal((await dirOf(page)).세계?.anomalyNote, undefined);
-  // 발생 후보 토글 (목록 줄) → 명부 preset
+  // 발생 후보 토글 (목록 줄) → 명부 preset. 회귀: 바로 앞에서 거점 페이지를 다녀왔다 (dirUi.kind 가 base 로 남던 문제)
   await page.evaluate(() => { const s = document.querySelector('.gw .gw-list-pick'); s.value = '소라 랜드'; s.dispatchEvent(new Event('change', { bubbles: true })); });
   await page.waitForFunction(() => document.querySelector('.gw .gw-detail h2')?.textContent?.includes('소라 랜드'));
   await clickSel(page, '.gw .gw-detail h2 .gw-pre');
