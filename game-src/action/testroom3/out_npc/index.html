@@ -673,7 +673,8 @@ function shoot() {
       const a0 = lp[0], a1 = lp[lp.length - 1];
       for (let f = 0; f < a0; f++) s.push({ f, d: 0.035 });
       const to = s.length;
-      for (let f = a0; f <= a1; f++) s.push({ f, d: 0.06, ev: f === a0 ? 'shot' : undefined });
+      const fl = R(a0, a1).filter(f => a.flash[f]), fire = fl.length ? fl : [a0];   // 그림에 총구 불꽃이 있는 장마다 한 발(10-28 블라렛 쌍권총: 번갈아 쏘는데 1발만 나감)
+      for (let f = a0; f <= a1; f++) s.push({ f, d: 0.06, ev: fire.includes(f) ? 'shot' : undefined });
       if (isHot()) s[s.length - 1].rep = { key: 'shoot', to };   // 누른 채 연사는 과열 있는 연사 무기만(사용자 2026-10-26)
       for (let f = a1 + 1; f < a.n; f++) s.push({ f, d: 0.05 });
     } else {
