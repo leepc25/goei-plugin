@@ -57,7 +57,7 @@ let A = {}, IMG = {}, CH = { key: '', name: '', color: '#cfc7a6', picks: {}, loo
 const VFX = window.__VFX || {}; for (const k in VFX) { VFX[k].img = new Image(); VFX[k].img.src = VFX[k].src; }
 const vfxDur = name => VFX[name].frames.reduce((a, f) => a + f[4], 0) / 1000;
 // PixelLab 이펙트 그림: o.flip(좌우), o.rot(회전), o.anchor('right'), o.center(가운데 기준), o.loop, o.under(바닥 층)
-const vfx = (name, x, y, scale = 2, o = {}) => { if (!VFX[name]) return false; const d = vfxDur(name); const T = (o.t || d) + (o.hold || 0); const e = { k: 'sheet', name, x, y, s: scale, t0: T, t: T, dur: d, ...o }; o.back ? fx.unshift(e) : fx.push(e); return true; };   // back: 같은 층 맨 아래(다른 이펙트 밑)
+const vfx = (name, x, y, scale = 2, o = {}) => { if (!VFX[name]) return false; const d = vfxDur(name); const T = (o.t || d) + (o.hold || 0); const e = { k: 'sheet', name, x, y, s: scale, dur: d, ...o, t0: T, t: T }; o.back ? fx.unshift(e) : fx.push(e); return true; };   // back: 같은 층 맨 아래(다른 이펙트 밑)
 const has = id => !!A[id];
 const nOf = id => A[id] ? A[id].n : 0;
 const cf = (id, f) => Math.max(0, Math.min(nOf(id) - 1, f));
@@ -84,33 +84,30 @@ const store = { get(k, d) { try { const v = localStorage.getItem('room3.' + k); 
                 set(k, v) { try { localStorage.setItem('room3.' + k, JSON.stringify(v)); } catch {} } };
 
 // ── 키 ──
-const ACTIONS = [   // 라이브(본편 0.16.56, 에일린 등 요원 공통) 키 그대로 — src/game/action/engine/input.ts · ui/keys.ts. 아래 「테스트용」만 테스트룸 전용
- ['left','왼쪽','ArrowLeft'],['right','오른쪽','ArrowRight'],['up','위(안쪽) · 앉은 자세에서 일어나기','ArrowUp'],['down','아래(앞쪽) · 두 번 = 웅크리기','ArrowDown'],
- ['light','근접(연타 3타, 맞혀야 이어짐) · 뛰며 = 돌진 · 회피 직후 = 돌진 · 공중 = 점프 공격','KeyA'],['shoot','원거리(꺼내고 쏨, 연사 무기는 누른 채)','KeyS'],
- ['skill','고유기(짧게) · 길게 = 충전 → 떼면 방출','KeyD'],['block','가드(누른 채)','KeyQ'],['super','필살기(게이지 가득)','KeyW'],
- ['pick','상호작용 · 줍기 · 앉은 자리에서 일어나기','KeyE'],['jump','점프','Space'],['run','짧게 회피 · 누른 채 달리기(방향키 두 번도 달리기)','ShiftLeft'],
- ['item1','아이템 1 · 회복약','Digit1'],['item2','아이템 2 · 먹기(섭취)','Digit2'],['item3','아이템 3 · 떨어뜨리기(E로 줍기)','Digit3'],['item4','아이템 4 · 상태이상 바꾸기','Digit4'],
- ['support','지원 요원 호출(테스트룸 없음)','KeyC'],['map','지도(테스트룸: 조작 요약 보이기/숨기기)','KeyZ'],['auto','자동 전환(테스트룸 없음)','KeyX'],
- ['pause','메뉴(테스트룸: 멈춤)','Escape'],['weapon','재장전(테스트룸: 무기 꺼내기/넣기)','KeyR'],['hitbox','판정 보기(장 번호·판정)','KeyH'],
- ['heavy','숙련 기술 1 자리(테스트룸: 강 공격 · 공중 = 강한 점프 공격)','KeyF'],['skill2','숙련 기술 2 자리(테스트룸: 둘째 기술)','KeyG'],
- // ── 테스트용(라이브에 없는 것) ──
- ['prevChar','이전 인물','BracketLeft'],['nextChar','다음 인물','BracketRight'],
- ['hit','맞기 상단(약) · 누워 있으면 움찔','Digit5'],['hitLow','맞기 하단(강)','Digit6'],['push','크게 밀려나기','Digit7'],['launch','띄워지기','Digit8'],['knock','날아가 쓰러지기','Digit9'],['die','사망(서서/누워서) · 다시 누르면 되살림','Digit0'],
- ['stun','스턴(연타로 빨리 풀림)','Minus'],['dying','빈사 켜기/끄기','Equal'],['crawl','쓰러진 뒤 엎드려 기기','KeyT'],
- ['seat','의자에 앉기(누를 때마다 정면→옆→후면) · 앉아서 = 일어나기','Semicolon'],['lifePrev','생활·직무 이전 줄','Comma'],['lifeNext','생활·직무 다음 줄','Period'],
- ['respond','응대 · 앉아서 = 수다','KeyY'],['talk','말하며 손짓 · 앉아서 = 먹기','KeyU'],['nod','끄덕이기 · 앉아서 = 마시기','KeyI'],['shake','고개 젓기 · 앉아서 = 타자','KeyO'],
- ['angry','화내기 · 앉아서 = 졸기','KeyP'],['happy','기뻐하기 · 앉아서 = 기대 쉬기','KeyL'],['surprise','놀라기','KeyJ'],['notice','발견 반응','KeyK'],
- ['flee','도망(누른 채)','KeyV'],['back','뒷걸음질(누른 채)','KeyB'],['sit','주저앉기 켜기/끄기','KeyN'],['personal','개인 대기','KeyM'],['combat','전투 자세 켜기/끄기','Backslash'],
- ['dodge','회피만(따로 쓰고 싶을 때)',''],['charge','충전만(따로 쓰고 싶을 때, 누른 채)',''],
+const ACTIONS = [   // 사용자 2026-10-25 키 배치(앞으로 쓸 키) + 나머지는 테스트용
+ ['left','왼쪽','ArrowLeft'],['right','오른쪽','ArrowRight'],['up','안쪽(위)','ArrowUp'],['down','바깥쪽(아래)','ArrowDown'],
+ ['light','약 공격 · 뛰며 = 돌진 · 공중 = 점프 공격','KeyQ'],['heavy','강 공격(콤보 마무리) · 뛰며 = 돌진 · 공중 = 강한 점프 공격','KeyW'],['block','방어(누른 채)','KeyC'],
+ ['shoot','원거리(누른 채 = 연사)','KeyA'],['charge','충전(누른 채) → 떼면 방출','KeyS'],['skill','기술','KeyD'],['super','필살기','KeyF'],
+ ['weapon','무기 꺼내기/넣기(무기 없으면 겨눈 자세)','Tab'],['jump','점프 · 공중에서 2단','Space'],
+ ['run','짧게 = 회피(누른 방향, 없으면 뒤) · 길게 = 달리기','ShiftLeft'],['dodge','회피만(따로 쓰고 싶을 때)',''],
+ ['pick','상호작용 · 줍기 · 선택','KeyE'],['map','지도(테스트룸: 조작 요약 보이기/숨기기)','KeyM'],
+ ['combat','전투 자세 켜기/끄기','KeyR'],['sit','주저앉기 켜기/끄기','KeyZ'],
+ ['crouch','웅크리기 켜기/끄기(웅크려서 방향키 = 네발로 기기)','KeyX'],['flee','도망(누른 채)','KeyV'],['back','뒷걸음질(누른 채)','ControlLeft'],
+ // ── 테스트용 ──
+ ['prevChar','이전 인물','BracketLeft'],['nextChar','다음 인물','BracketRight'],['skill2','둘째 기술(있는 인물만)','KeyG'],
+ ['hit','맞기 상단(약) · 누워 있으면 움찔','Digit1'],['hitLow','맞기 하단(강)','KeyL'],['push','크게 밀려나기(날리기)','KeyN'],['launch','띄워지기(띄우기)','KeyB'],['die','사망(서 있으면 서서, 누워 있으면 누워서) · 다시 누르면 되살림','KeyT'],['knock','날아가 쓰러지기','Digit2'],['stun','스턴(연타로 빨리 풀림)','Digit3'],['crawl','쓰러진 뒤 엎드려 기기','Digit4'],
+ ['dying','빈사 켜기/끄기','Digit5'],['heal','회복약 먹기(섭취 + 회복 효과)','Digit6'],['drop','아이템 떨어뜨리기(E로 줍기)','Digit7'],['status','상태이상 바꾸기(독→불→전기→없음)','Digit8'],
+ ['eat','섭취','Digit9'],['personal','개인 대기','Digit0'],
+ // ── 10-28 추가(빈 키만 씀) ──
+ ['seat','의자에 앉기(누를 때마다 정면→옆→후면) · 앉아서 = 일어나기','Semicolon'],['lifePrev','생활·직무 이전 줄','Comma'],['lifeNext','생활·직무 다음 줄','Period'],['pause','멈춤','Escape'],
+ ['respond','응대','KeyY'],['talk','말하며 손짓','KeyU'],['nod','끄덕이기','KeyI'],['shake','고개 젓기','KeyO'],
+ ['angry','화내기','KeyP'],['happy','기뻐하기','KeyH'],['surprise','놀라기','KeyJ'],['notice','발견 반응','KeyK'],
 ];
 const DEF = Object.fromEntries(ACTIONS.map(a => [a[0], a[2]]));
-let binds = Object.assign({}, DEF, store.get('binds3', {}));
+let binds = Object.assign({}, DEF, store.get('binds2', {}));
 const held = new Set();
-// ── 라이브 조작값(본편 engine/player.ts·input.ts, 30틱/초) → 초 단위. 거리·속도는 인물 키(라이브 몸 264화소)에 맞춰 늘이고 줄임 ──
-const LIVE = { walk: 270, run: 540, walkY: 126, runY: 151, airWalk: 270, airRun: 480, jumpV: 930, grav: 2340, evade: 450, evadeKeep: 0.0054, evadeInv: 0.3, tap: 167, dbl: 267, chargeAfter: 0.3, body: 264 };
-const bodyK = () => K(P.y) * ((CH.h0 || 233) / LIVE.body);   // 이 인물·이 깊이에서 라이브 1화소가 화면 몇 화소인지
-const down = n => n === 'run' ? held.has(binds.run) && performance.now() - (runT || 0) > LIVE.tap : held.has(binds[n]);
-let runT = 0;   // Shift 누른 시각: 5틱(0.167초) 안에 떼면 회피, 넘게 누르면 달리기(라이브)
+const down = n => n === 'run' ? held.has(binds.run) && performance.now() - (runT || 0) > 180 : held.has(binds[n]);
+let runT = 0;   // Shift 누른 시각: 0.18초 안에 떼면 회피, 넘게 누르면 달리기
 const actOf = code => { for (const k in binds) if (binds[k] === code) return k; return null; };
 const keyName = c => !c ? '—' : c.replace(/^Key/, '').replace(/^Digit/, '').replace('ArrowLeft', '←').replace('ArrowRight', '→').replace('ArrowUp', '↑').replace('ArrowDown', '↓').replace('Space', '스페이스').replace('Semicolon', ';').replace('ShiftLeft', 'Shift').replace('ShiftRight', 'Shift').replace('BracketLeft', '[').replace('BracketRight', ']').replace('ControlLeft', 'Ctrl').replace('ControlRight', 'Ctrl').replace('Minus', '-').replace('Equal', '=').replace('Comma', ',').replace('Period', '.').replace('Backslash', '\\').replace('Escape', 'Esc');
 
@@ -148,7 +145,7 @@ const atkDmg = (id, big) => { const a = BAL().atk || {}; return a[id] ?? (big ? 
 function gainSp(v) { if (P.noGain > P.t) return; const was = P.sp; P.sp = Math.min(100, P.sp + v); if (was < 100 && P.sp >= 100) { sfx('ability'); flash = 0.06; fx.push({ k: 'num', x: P.x - 50, y: P.y - 260 * K(P.y), v: '필살기 준비', t: 1.0 }); } }
 function spReady() { if (freeSuper || P.sp >= 100) { if (!freeSuper) P.sp = 0; return true; } sfx('empty'); fx.push({ k: 'num', x: P.x - 50, y: P.y - 250 * K(P.y), v: '게이지 부족', t: 0.7 }); return false; }
 let charScale = store.get('size', 1), persp = true;
-const K = y => charScale * (persp ? (0.85 + 0.15 * Math.max(0, Math.min(1, (y - FLOOR0) / (FLOOR1 - FLOOR0)))) * 1.04 : 1);   // 원근: 라이브 view.ts FAR 0.85 → 앞 1
+const K = y => charScale * (persp ? 0.78 + 0.34 * (y - FLOOR0) / (FLOOR1 - FLOOR0) : 1);
 let fx = [];
 const items = [];
 let audio = null;
@@ -203,7 +200,6 @@ const canCancel = () => { const c = P.clip; if (!c || c.done) return true; retur
 function tickClip(dt) {
   const c = P.clip; if (!c || c.done || c.paused) return;
   c.t += dt;
-  if (c.holdKey && c.i >= c.holdAt && down(c.holdKey)) { c.t = 0; return; }   // D 누른 채: 충전으로 넘어갈지 기다림
   while (c.t >= c.seq[c.i].d) {
     c.t -= c.seq[c.i].d;
     const cur = c.seq[c.i];
@@ -494,7 +490,9 @@ const FX = {
     let sc = (s.scale || 1) * (s.at === 'screen' ? 1 : p.k);
     if (s.w) sc = W * s.w / fw;
     const flip = s.flip === false ? false : P.face < 0;
-    vfx(s.vfx, p.x, md === 'bottom' ? p.gy : p.hy, sc, { [md === 'bottom' ? 'bottom' : 'center']: true, flip, under: s.under, back: s.back, tint: s.tint, hold: s.hold, loop: !!s.loop, t: s.loop || undefined, fade: s.fade, rot: s.rot ? s.rot * (flip ? -1 : 1) : undefined });
+    const o = { [md === 'bottom' ? 'bottom' : 'center']: true, flip };   // 빈 값은 넣지 않음(undefined가 그림 시간 t를 덮어써 바로 지워지던 버그)
+    for (const [k, v] of Object.entries({ under: s.under, back: s.back, tint: s.tint, hold: s.hold, loop: s.loop ? true : undefined, t: s.loop || undefined, fade: s.fade, rot: s.rot ? s.rot * (flip ? -1 : 1) : undefined })) if (v !== undefined) o[k] = v;
+    vfx(s.vfx, p.x, md === 'bottom' ? p.gy : p.hy, sc, o);
     if (s.boom) boomSnd(s.boom, p.x);
     if (s.hit) { const r = (s.r ?? fw * 0.4) * sc, hy = md === 'bottom' ? p.gy - Math.min(fh * sc * 0.5, 110 * p.k) : p.hy; later(s.delay || 0, () => { if (s.at === 'screen' ? showDummy : near(p.x, p.gy, r + 20, (s.depth || 75) * (p.k || 1))) strike(s.hit, hy); }); }
     if (s.after) later(vfxDur(s.vfx) + (s.hold || 0), () => runFx(s.after, { ...c, pt: { x: p.x, y: p.gy, z: 0, dummy: c.pt && c.pt.dummy } }));
@@ -597,11 +595,10 @@ function light() {
   const L = comboIds(); if (!L.length) return;
   P.combat = true; P.armed = false;
   if (P.combo >= L.length) P.combo = 0;
-  if (P.combo > 0 && showDummy && !P.connected) P.combo = 0;   // 라이브: 맞혀야 다음 타로(헛치면 1타부터). 샌드백을 끄면 그냥 이어짐
   const id = L[P.combo]; P.combo++; sfx('whiff'); P.connected = false;
   const last = P.combo === L.length;   // 라이브 3타째(power) = 쓰러뜨림
   pushP(170, 900);
-  act(id, { seq: atkSeq(id, false).map(e => e.ev && last ? { ...e, kind: 'down' } : e), onEnd: () => {
+  act(id, { seq: atkSeq(id, false), onEnd: () => {
     if (P.combo >= L.length) { P.blowWin = P.t + 0.35; P.combo = 0; return afterBuf(toIdle); }
     if (P.buf) return afterBuf(toIdle);
     P.mode = 'chain'; P.chainT = 0.26;
@@ -627,7 +624,7 @@ function dodge() {
   if (dx && dx === P.face && P.prevFace === -dx && P.t - P.faceT < 0.3) P.face = P.prevFace;
   const fwd = dx * P.face > 0, len = Math.hypot(dx, dy);
   const id = fwd && has('16_1') ? '16_1' : has('16') ? '16' : null; if (!id) return;
-  sfx('evade'); const ev = LIVE.evade * bodyK(); P.dodgeV = { x: dx / len * ev, y: dy / len * ev * 0.55, keep: LIVE.evadeKeep }; P.inv = LIVE.evadeInv; P.ghostT = 0.2;
+  sfx('evade'); P.dodgeV = { x: dx / len * 780, y: dy / len * 520 }; P.inv = 0.3; P.ghostT = 0.2;
   P.pvx = 0; P.pdec = 0;
   const n = nOf(id), d = 0.32 / n;
   act(id, { seq: S(R(0, n - 1), d).map((e, i) => i >= n - 2 ? { ...e, cancel: true } : e), onEnd: () => { P.dodgeV = null; afterBuf(toIdle); } });
@@ -726,7 +723,7 @@ const jf = () => { const n = nOf('7'), ap = PK('apex', '7'); return { up: [0, Ma
 function jump() {
   if (!has('7')) return;
   P.mode = 'air'; P.z = 0; P.vz = 0; P.jumps = 1; P.airAtk = false; P.spin = 0;
-  P.airVX = ((down('run') || P.runLatch) ? LIVE.airRun : LIVE.airWalk) * bodyK(); P.takeoff = 0.06; sfx('jump');
+  P.airVX = (down('run') || P.runLatch) ? 430 : 250; P.takeoff = 0.06; sfx('jump');
   play('7', { seq: S(jf().up, 0.03) });
 }
 function doubleJump() {
@@ -862,11 +859,9 @@ function onPress(a) {
   if (a === 'prevChar' || a === 'nextChar') return stepChar(a === 'nextChar' ? 1 : -1);
   if (!CK) return;
   if (a === 'pause') { paused = !paused; return; }
-  if (a === 'hitbox') { showNo = !showNo; document.getElementById('hb').checked = showNo; return; }
-  if (a === 'support' || a === 'auto') { fx.push({ k: 'num', x: P.x - 60, y: P.y - 260 * K(P.y), v: a === 'support' ? '지원 호출: 테스트룸 없음' : '자동 전환: 테스트룸 없음', t: 0.9 }); return; }
   if (a === 'lifePrev' || a === 'lifeNext') { if (P.mode !== 'dead') stepLife(a === 'lifeNext' ? 1 : -1); return; }
   let dbl = false;
-  if (a === 'left' || a === 'right' || a === 'down') { const now = performance.now(); dbl = now - (P.lastTap[a] || 0) < LIVE.dbl; if (dbl && a !== 'down') P.runLatch = true; P.lastTap[a] = now; }
+  if (a === 'left' || a === 'right' || a === 'down') { const now = performance.now(); dbl = now - (P.lastTap[a] || 0) < 260; if (dbl && a !== 'down') P.runLatch = true; P.lastTap[a] = now; }
   // 앉은 자리
   if (P.mode === 'seat' || P.mode === 'seatUp') {
     if (P.mode === 'seatUp') return;
@@ -877,10 +872,9 @@ function onPress(a) {
     if (SA[a]) return seatAct(SA[a]);
     if (a !== 'die') return;
   }
-  if (a === 'item1' && P.mode === 'ground') { emote('26', 7); later(0.5, () => FX.heal({ v: 40 })); return; }
-  if (a === 'item2' && P.mode === 'ground') return emote('26', 7);
-  if (a === 'item3') { items.push({ x: P.x + P.face * 120, y: P.y, t0: P.t }); return; }
-  if (a === 'item4') { P.status = [null, 'status_poison', 'status_burn', 'status_shock'][([null, 'status_poison', 'status_burn', 'status_shock'].indexOf(P.status || null) + 1) % 4]; return; }
+  if (a === 'heal' && P.mode === 'ground') { emote('26', 7); later(0.5, () => FX.heal({ v: 40 })); return; }
+  if (a === 'drop') { items.push({ x: P.x + P.face * 120, y: P.y, t0: P.t }); return; }
+  if (a === 'status') { P.status = [null, 'status_poison', 'status_burn', 'status_shock'][([null, 'status_poison', 'status_burn', 'status_shock'].indexOf(P.status || null) + 1) % 4]; return; }
   if (a === 'dying') { P.dying = !P.dying; P.hp = P.dying ? 18 : 100; if (P.dying) sfx('hp:low'); return; }
   if (a === 'die') return die();
   if (P.mode === 'dead') return;
@@ -889,8 +883,8 @@ function onPress(a) {
   if ((P.mode === 'flee' || P.mode === 'back') && !['left', 'right', 'up', 'down', 'run'].includes(a)) toIdle();
   const m = P.mode;
   if (m === 'air') {
-    // 2단 점프 없음(라이브)
-    if ((a === 'light' || a === 'heavy') && !P.airAtk) jumpAttack(a === 'heavy');
+    if (a === 'jump' && P.jumps < 2) doubleJump();
+    else if ((a === 'light' || a === 'heavy') && !P.airAtk) jumpAttack(a === 'heavy');
     return;
   }
   if (m === 'chain') {
@@ -901,7 +895,6 @@ function onPress(a) {
     if (a === 'skill') return skillPress();
   }
   if (m === 'act') {
-    if (a === 'light' && P.clip && (P.clip.id === '16' || P.clip.id === '16_1') && P.clip.i <= 2) { P.dodgeV = null; P.buf = null; return slide(); }   // 라이브: 회피 첫 장들에서 A = 돌진
     const CANCEL_INTO = { skill: skillPress, super: superMove, shoot, charge, skill2 };
     if (CANCEL_INTO[a] && canCancel() && P.clip && ['9', '10', '11', '12', '13', '16', '16_1'].includes(P.clip.id)) { P.buf = null; return CANCEL_INTO[a](); }
     if (['light', 'heavy', 'dodge', 'jump'].includes(a)) {
@@ -919,7 +912,7 @@ function onPress(a) {
   if (m === 'belly') { if (a === 'jump' || a === 'crawl') return getUp(); return; }
   if (m === 'stun') { P.stunT -= 0.18; return; }
   if (m === 'sit' || m === 'scoot') { if (a === 'sit') reverseOut('39', R(Math.max(0, sitLp()[0] - 1), 0), 0.05); return; }
-  if (m === 'crouch' || m === 'crawl4') { if (a === 'crouch' || a === 'up' || a === 'jump' || (a === 'down' && dbl)) { if (m === 'crawl4') toIdle(); else reverseOut('41', R(Math.max(0, crLp()[0] - 1), 0), 0.06); } return; }
+  if (m === 'crouch' || m === 'crawl4') { if (a === 'crouch') { if (m === 'crawl4') toIdle(); else reverseOut('41', R(Math.max(0, crLp()[0] - 1), 0), 0.06); } return; }
   if (m !== 'ground') return;
   const running = down('run') || P.runLatch;
   const moving = down('left') || down('right') || down('up') || down('down');
@@ -944,6 +937,7 @@ function onPress(a) {
       if (!has('W')) { P.armed = false; return toIdle(); }
       return reverseOut('W', R(PK('weapon', 'W'), 0), 0.05, () => { P.armed = false; toIdle(); });
     case 'stun': return stun();
+    case 'eat': return emote('26', 7);
     case 'respond': { const n = nOf('28'); return emote('28', 7, { seq: [...S(R(0, n - 2), 0.1), { f: n - 1, d: 0.6 }, ...S(R(n - 2, 0), 0.1)] }); }
     case 'talk': { const lp = LP('29') || R(0, nOf('29') - 1); return emote('29', 7, { seq: [...S(lp, 0.16), ...S(lp, 0.16), { f: 0, d: 0.3 }] }); }
     case 'nod': return emote('30', 8, { seq: S([...R(0, nOf('30') - 1), ...R(0, nOf('30') - 1)], 1 / 8) });
@@ -956,26 +950,17 @@ function onPress(a) {
     case 'notice': { const n = nOf('33'), top = Math.min(4, n - 1); fx.push({ k: 'icon', v: '!', t: 1.0 }); return act('33', { seq: [...S(R(0, top - 1), 0.07), { f: top, d: 0.45 }, ...S(R(top - 1, 0), 0.04)] }); }
     case 'sit': return sit();
     case 'crouch': return crouch();
-    case 'down': if (dbl) return crouch(); return;   // 라이브: 아래 두 번 = 웅크리기
     case 'seat': return sitChair();
   }
 }
 // 고유기술 키: 짧게 = 고유기술, 길게(0.25초) = 충전
 let skDown = 0;
-// 라이브 D: 누르면 바로 고유기 → 누른 채면 앞 장(최대 3장째)에서 멈춰 기다리다 9틱(0.3초) 넘으면 충전으로 바뀜(쿨타임 돌려줌). 떼면 고유기가 이어짐
-function skillPress() {
-  P.skHold = true; skDown = P.t;
-  const sp = CH.skills.skill; if (!sp) return;   // 충전만 있는 인물: 길게 눌러야 충전
-  if ((P.cd.skill || 0) > P.t) return;   // 쿨타임이면 기다렸다 길게 = 충전, 짧게 떼면 「쿨타임」 표시(onRelease)
-  P.skFired = true; skill();
-  const c = P.clip; if (c && c.id) { const k = c.seq.findIndex(e => e.ev); c.holdKey = 'skill'; c.holdAt = Math.max(0, Math.min(2, (k < 0 ? 3 : k) - 1)); }
-}
+function skillPress() { return skill(); }   // 기술(D)은 누르면 바로. 충전은 S 따로(사용자 2026-10-25 키 배치)
 function onRelease(a) {
-  if (a === 'run' && performance.now() - runT <= LIVE.tap) return onPress('dodge');
+  if (a === 'run' && performance.now() - runT <= 180) return onPress('dodge');
   if (a === 'left' || a === 'right') { if (!down('left') && !down('right')) P.runLatch = false; }
   if (a === 'block' && P.mode === 'block') reverseOut('17', R(curF(), 0), 0.025);
   if ((a === 'charge' || a === 'skill') && P.mode === 'charge') return release();
-  if (a === 'skill') { if (P.skHold && !P.skFired && CH.skills.skill && P.mode !== 'charge') cdReady('skill'); P.skHold = false; P.skFired = false; if (P.clip) P.clip.holdKey = null; }
 }
 
 // ── 매 장 ──
@@ -1060,7 +1045,6 @@ function update(dt) {
   }
   if (hitstop > 0) { hitstop -= dt; return; }
   // 고유기술 키를 길게 누르면 충전으로
-  if (P.skHold && down('skill') && P.t - skDown > LIVE.chargeAfter && CH.skills.charge && (P.mode === 'ground' || P.mode === 'chain' || (P.mode === 'act' && P.clip && P.clip.holdKey === 'skill'))) { P.skHold = false; if (P.skFired) { P.cd.skill = 0; P.skFired = false; } P.skArmor = false; charge(); }
   updateDummy(dt);
   tickClip(dt);
   P.inv = Math.max(0, P.inv - dt); P.wakeArmor = Math.max(0, (P.wakeArmor || 0) - dt);
@@ -1068,7 +1052,7 @@ function update(dt) {
   else if (P.t - P.lastShot > 0.35) P.heat = Math.max(0, P.heat - 30 * dt);
   if (P.ghostT > 0) { P.ghostT -= dt; P.ghostN = (P.ghostN || 0) + dt; if (P.clip && P.ghostN > 0.05 && !(P.ghostN = 0)) fx.push({ k: 'ghost', id: P.clip.id, f: curF(), x: P.x, y: P.y, z: P.z, face: P.face, t: 0.18, t0: 0.18 }); }
   if (P.dash) { const d = P.dash; P.x += P.face * d.v * dt; d.t -= dt; if (!d.done && showDummy && Math.abs(D.y - P.y) < 70 && Math.abs(D.x - P.x) < 70 * K(P.y)) { d.done = true; if (d.hit !== null) { const h = d.hit || { dmg: 40, kind: 'blow' }; d.delay ? later(d.delay, () => strike(h)) : strike(h); } } if (d.t <= 0 || P.x < 75 || P.x > W - 75) P.dash = null; }
-  if (P.dodgeV) { P.x += P.dodgeV.x * dt; P.y += P.dodgeV.y * dt; const kp = Math.pow(P.dodgeV.keep || 0.004, dt); P.dodgeV.x *= kp; P.dodgeV.y *= kp; }
+  if (P.dodgeV) { P.x += P.dodgeV.x * dt; P.y += P.dodgeV.y * dt; P.dodgeV.x *= Math.pow(0.004, dt); P.dodgeV.y *= Math.pow(0.004, dt); }
   if (P.pvx) { P.x += P.face * P.pvx * dt; const s = Math.sign(P.pvx); P.pvx -= s * P.pdec * dt; if (Math.sign(P.pvx) !== s) P.pvx = 0; }
   const dx = (down('right') ? 1 : 0) - (down('left') ? 1 : 0), dy = (down('down') ? 1 : 0) - (down('up') ? 1 : 0);
   const running = down('run') || P.runLatch;
@@ -1079,8 +1063,8 @@ function update(dt) {
       if (dx || dy) {
         if (P.armed) P.armed = false;
         if (dx && dx !== P.face) { P.prevFace = P.face; P.faceT = P.t; P.face = dx; }
-        const bk = bodyK() * (P.dying ? 0.6 : 1);
-        P.x += dx * (running ? LIVE.run : LIVE.walk) * bk * dt; P.y += dy * (running ? LIVE.runY : LIVE.walkY) * bk * dt;
+        const sp = (running ? 430 : 230) * (P.dying ? 0.6 : 1);
+        P.x += dx * sp * dt; P.y += dy * sp * 0.55 * dt;
         const id = running && !P.dying && has('5') ? (has('5_1') ? '5_1' : '5') : '4';   // 5_1: 끝 장이 첫 장으로 닫힌 뛰기 반복(끝 장은 첫 장과 같아 뺌)
         if (!P.clip || P.clip.id !== id) id === '5_1' ? play(id, { seq: S(R(0, nOf(id) - 2), 1 / 15), loopFrom: 0 }) : play(id, { fps: id === '5' ? 15 : P.dying ? 7 : 11, loopFrom: 0 });
         if (id[0] === '5' && Math.random() < dt * 4) { if (!vfx('run_dust', P.x - P.face * 24, P.y, 2, { flip: P.face < 0 })) dust(P.x - P.face * 20, P.y, 1, 0.6); }
@@ -1100,10 +1084,10 @@ function update(dt) {
     case 'act': if (P.knockT > 0) { P.knockT -= dt; if (P.knockT <= 0) P.mode = 'down'; } break;
     case 'chain': P.chainT -= dt; if (P.chainT <= 0) chainExpire(); break;
     case 'air': {
-      if (P.takeoff > 0) { P.takeoff -= dt; if (P.takeoff <= 0) { P.vz = LIVE.jumpV * bodyK(); P.jumpG = LIVE.grav * bodyK(); dust(P.x, P.y, 3, 0.7); } else break; }
+      if (P.takeoff > 0) { P.takeoff -= dt; if (P.takeoff <= 0) { P.vz = 1180; dust(P.x, P.y, 3, 0.7); } else break; }
       if (dx) { P.x += dx * P.airVX * dt; if (!P.airAtk) P.face = dx; }
       P.y += dy * 140 * dt;
-      P.z += P.vz * dt; P.vz -= (P.jumpG || 2340) * dt;
+      P.z += P.vz * dt; P.vz -= 2700 * dt;
       P.spin = Math.max(0, P.spin - dt);
       if (P.z <= 0 && P.vz < 0) { land(); break; }
       if (!P.airAtk && P.spin <= 0) {
@@ -1536,7 +1520,6 @@ async function setChar(key) {
     await Promise.all(Object.keys(d.A).map(id => new Promise(r => { const im = new Image(); im.onload = im.onerror = r; im.src = d.A[id].src; imgs[id] = im; })));
     if (loading !== key) return;
     A = d.A; IMG = imgs; CH = Object.assign({ picks: {}, loops: {}, hit: {}, skills: {}, gun: [], kick: [], ranged: {} }, d.cfg); CK = key; silCache = {};
-    { const a = A['1'] || A[idleId()]; CH.h0 = a ? Math.max(...a.bot.map((b, i) => b - a.top[i])) : 233; }   // 인물 키(화소): 라이브 속도·거리 맞춤
     const keep = { sp: P.sp, status: P.status };   // 자리는 처음 자리로
     P = Object.assign(P0(), keep); fx = []; hitstop = 0; cut = 0; dark = 0; Object.assign(D, { x: 860, y: 600, vx: 0, z: 0, vz: 0, mark: 0, bindT: 0, stunT: 0 });
     chsel.value = key; store.set('char', key);
@@ -1601,20 +1584,20 @@ function renderBinds() {
   }
   const k = id => `<b>${keyName(binds[id])}</b>`;
   document.getElementById('help').innerHTML =
-    `<b>라이브 조작</b> · 이동 ${k('left')}${k('right')}${k('up')}${k('down')} · 달리기 ${k('run')} 누른 채 또는 방향키 두 번 · 회피 ${k('run')} 짧게 · 점프 ${k('jump')} · ` +
-    `근접 ${k('light')} 연타 3타(맞혀야 이어짐, 3타째 쓰러뜨림) · 뛰며/회피 직후 ${k('light')} = 돌진 · 공중 ${k('light')} = 점프 공격 · 원거리 ${k('shoot')} · ` +
-    `고유기 ${k('skill')} 짧게 · 충전 ${k('skill')} 길게(0.3초 넘게 누른 채, 떼면 방출) · 가드 ${k('block')} · 필살기 ${k('super')} · 상호작용 ${k('pick')} · 아래 두 번 = 웅크리기 · ` +
-    `아이템 ${k('item1')}~${k('item4')} · 지도 ${k('map')} · 멈춤 ${k('pause')} · 재장전 자리 ${k('weapon')} = 무기 꺼내기/넣기 · 판정 ${k('hitbox')} · 숙련 자리 ${k('heavy')} = 강 공격, ${k('skill2')} = 둘째 기술<br>` +
-    `<b>테스트용</b> · 인물 ${k('prevChar')} ${k('nextChar')} · 맞기 상단 ${k('hit')} · 하단 ${k('hitLow')} · 크게 밀려나기 ${k('push')} · 띄워지기 ${k('launch')} · 쓰러짐 ${k('knock')}(${k('jump')} 일어나기, ${k('crawl')} 엎드려 기기) · 사망 ${k('die')} · 스턴 ${k('stun')} · 빈사 ${k('dying')} · ` +
-    `의자 앉기 ${k('seat')}(정면→옆→후면, 앉아서 ${k('respond')} 수다 ${k('talk')} 먹기 ${k('nod')} 마시기 ${k('shake')} 타자 ${k('angry')} 졸기 ${k('happy')} 기대 쉬기, ${k('pick')}·${k('up')} 일어나기, 앉은 채 ${k('hit')} = 일어나며 맞기, ${k('hitLow')}~${k('knock')} = 옆이면 굴러떨어지기·정면/후면이면 쓰러지기) · ` +
-    `생활·직무 줄 ${k('lifePrev')} ${k('lifeNext')} · 감정 ${k('respond')}~${k('notice')} · 도망 ${k('flee')} · 뒷걸음 ${k('back')} · 주저앉기 ${k('sit')} · 개인 대기 ${k('personal')} · 전투 자세 ${k('combat')}`;
+    `인물 ${k('prevChar')} ${k('nextChar')} 또는 위 목록 · 이동 ${k('left')}${k('right')}${k('up')}${k('down')} · 달리기 ${k('run')} 길게 또는 방향키 두 번 · 점프 ${k('jump')}(공중에서 한 번 더 = 2단) · ` +
+    `약 ${k('light')} 연타 = 약1→약2→약3, 강 ${k('heavy')} = 마무리(단독·약1 뒤 스턴 / 약2 뒤 띄우기 / 약3 뒤 날리기) · 뛰며 약 = 돌진 · 공중에서 약/강 = 점프 공격 · ` +
+    `회피 ${k('run')} 짧게(누른 방향, 없으면 뒤) · 방어 ${k('block')} · 원거리 ${k('shoot')} · 기술 ${k('skill')} · 충전 ${k('charge')}(누른 채, 떼면 방출) · 필살기 ${k('super')} · ` +
+    `전투 자세 ${k('combat')} · 무기 ${k('weapon')} · 맞기 상단 ${k('hit')} · 하단 ${k('hitLow')} · 밀려나기 ${k('push')} · 띄워지기 ${k('launch')} · 사망 ${k('die')} · 쓰러짐 ${k('knock')}(${k('jump')} 일어나기, ${k('crawl')} 엎드려 기기) · 스턴 ${k('stun')} · 빈사 ${k('dying')} · ` +
+    `감정 ${k('respond')}~${k('surprise')} · 섭취 ${k('eat')} · 상호작용·줍기 ${k('pick')} · 조작 요약 ${k('map')} · 개인 대기 ${k('personal')} · 발견 ${k('notice')} · ` +
+    `도망 ${k('flee')} · 뒷걸음 ${k('back')} · 주저앉기 ${k('sit')} · 웅크리기 ${k('crouch')}<br>` +
+    `<b>10-28 추가</b> · 의자 앉기 ${k('seat')}(누를 때마다 정면→옆→후면 · 앉아서 ${k('respond')} 수다 ${k('talk')} 먹기 ${k('nod')} 마시기 ${k('shake')} 타자 ${k('angry')} 졸기 ${k('happy')} 기대 쉬기 · ${k('pick')}·${k('seat')} 일어나기 · 앉은 채 ${k('hit')} = 일어나며 맞기, ${k('knock')}·${k('push')}·${k('hitLow')}·${k('launch')} = 옆이면 굴러떨어지기, 정면·후면이면 쓰러지기) · 생활·직무 줄 ${k('lifePrev')} ${k('lifeNext')} · 멈춤 ${k('pause')}`;
   if (CK) renderChar();
 }
 function finishCapture(code) {
-  if (code !== 'Escape') { for (const k in binds) if (binds[k] === code) binds[k] = binds[capture.id]; binds[capture.id] = code; store.set('binds3', binds); }
+  if (code !== 'Escape') { for (const k in binds) if (binds[k] === code) binds[k] = binds[capture.id]; binds[capture.id] = code; store.set('binds2', binds); }
   capture = null; renderBinds();
 }
-document.getElementById('reset').onclick = () => { binds = { ...DEF }; store.set('binds3', binds); renderBinds(); };
+document.getElementById('reset').onclick = () => { binds = { ...DEF }; store.set('binds2', binds); renderBinds(); };
 const spd = document.getElementById('spd');
 spd.oninput = () => { speed = spd.value / 100; document.getElementById('spdv').textContent = (+speed.toFixed(2)) + '배'; };
 document.getElementById('hb').onchange = e => showNo = e.target.checked;
