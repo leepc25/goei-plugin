@@ -248,6 +248,8 @@ export function recordInput(name: string, key: string, value: string, ctx: ChatC
     setOverrides(next);
     return true;
   }
+  // 기록 칸 입력만. 다른 글칸(지침 절 `GNet|0` 등)의 열쇠를 종류|이름으로 읽으면 없는 종류로 worldRecords 가 터져 그 뒤 처리기(지침 초안)까지 막혔다 (QC 2026-10-28)
+  if (name !== 'ed-field' && name !== 'ed-extra' && name !== 'ed-extra-name') return false;
   const [kind, recName, id] = key.split('|') as [WorldKind, string, string];
   if (!kind || !recName) return false;
   const over = overridesOf(ctx);

@@ -61,6 +61,16 @@ async function saveChat(charIndex: number, chatIndex: number, mutate: (chat: Cha
   return next;
 }
 
+// 플러그인이 로어북을 바꿨을 때 알림 (본체의 지침·등록부 캐시를 비운다. QC 2026-10-28: 세계·지침 편집 뒤에도 캐릭터를 바꿀 때까지 옛 규칙이 요청에 들어갔다)
+const loreListeners = new Set<(charIndex: number) => void>();
+export function onLoreSaved(f: (charIndex: number) => void): () => void {
+  loreListeners.add(f);
+  return () => loreListeners.delete(f);
+}
+export function notifyLoreSaved(charIndex: number): void {
+  for (const f of loreListeners) f(charIndex);
+}
+
 /** 캐릭터 로어북을 바꾼다. 저장 직전에 최신 캐릭터를 다시 읽어 다른 곳의 변경을 덮어쓰지 않는다. */
 export async function updateCharacterLore(charIndex: number, mutate: (lore: LoreEntry[]) => LoreEntry[] | null): Promise<boolean> {
   const latest = (await risuai.getCharacterFromIndex(charIndex)) as CharacterSnapshot | null;
@@ -68,6 +78,7 @@ export async function updateCharacterLore(charIndex: number, mutate: (lore: Lore
   const next = mutate(stripVirtual(latest.globalLore ?? []));
   if (!next) return false;
   await risuai.setCharacterToIndex(charIndex, { ...latest, globalLore: stripVirtual(next) });
+  notifyLoreSaved(charIndex);
   return true;
 }
 

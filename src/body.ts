@@ -32,7 +32,7 @@ import { cleanOutput, hasWorldTags, parseCatalog, processOutput, readDirectory }
 import { basicSettings, missingBasicVars, worldSettings } from './core/settings';
 import { staleFactionVars } from './core/factions';
 import { supplementAssets } from './host/asset';
-import { loadContext, updateCharacterLore, updateChat, getChar } from './host/risu';
+import { loadContext, updateCharacterLore, updateChat, getChar, onLoreSaved } from './host/risu';
 import { WatchState, type WatchSnapshot } from './core/watch';
 import { createFab, type Fab } from './host/overlay';
 import { BRAND } from './ui/brand';
@@ -89,11 +89,13 @@ async function onBeforeRequest<M extends PromptMessage>(messages: M[], type: str
   if (liteNow || messages.some((m) => typeof m?.content === 'string' && imgTagsKnown(m.content, modulePicker()))) messages = stripOldImgTags(messages, getPrefs().imgSend ?? IMG_RECENT.def);
   if (liteNow) {
     messages = stripHistoryTags(messages);
-    messages = await fixLore(messages).catch(() => messages);
-    messages = await withPlayer(messages).catch(() => messages);
-    messages = await withVisit(messages).catch(() => messages);
+    // 단계가 실패하면 그 단계만 건너뛰되 까닭은 남긴다 (조용히 빠지면 로어·막간이 왜 안 들어갔는지 알 길이 없다. QC 2026-10-28)
+    const step = <T,>(name: string, fallback: T) => (error: unknown): T => (console.log(`[goei] 요청 조립 ${name} 실패: ${error instanceof Error ? error.message : String(error)}`), fallback);
+    messages = await fixLore(messages).catch(step('로어북', messages));
+    messages = await withPlayer(messages).catch(step('캐릭터로 플레이', messages));
+    messages = await withVisit(messages).catch(step('막간', messages));
     messages = trimRoster(messages);
-    const ctx = await moduleContext(sceneText(messages)).catch(() => [] as string[]);
+    const ctx = await moduleContext(sceneText(messages)).catch(step('참고 기록', [] as string[]));
     if (ctx.length) {
       // 마지막 사용자 메시지 바로 앞에 (원본은 맨 끝). 모델이 이번 행동보다 참고 기록을 「지금 할 일」로 읽지 않게
       const at = messages.map((m) => m?.role).lastIndexOf('user');
@@ -102,11 +104,11 @@ async function onBeforeRequest<M extends PromptMessage>(messages: M[], type: str
     }
     // 지난 응답의 상태창 줄은 지우고 마지막 한 줄만 직전 상태 블록으로 (core/statusctx.ts). 신분 칸이 빠졌으면 아는 값을 채운다
     // 칸 구성(설정)대로 다시 만들고 잔고 칸은 장부 값으로 (core/world/statuscols.ts · core/wallet.ts)
-    messages = withStatusBlock(messages, await knownIdentity().catch(() => ''), await statusShape().catch(() => undefined));
+    messages = withStatusBlock(messages, await knownIdentity().catch(step('신분', '')), await statusShape().catch(step('상태창 모양', undefined)));
     // 장면 인물의 살아 있는 기록 (core/people). 절 단위 혼합이면 그 인물의 시트 원문은 빼고 기록으로 대신한다
-    messages = await withPeople(messages).catch(() => messages);
+    messages = await withPeople(messages).catch(step('인물 기록', messages));
     // 이미지 태그 지침 (core/imgprompt): 카드 로어북 「Asset」 대신 설정으로 조립. 옛 카드의 로어북 본문이 남아 있으면 지운다
-    messages = await withImgPrompt(messages).catch(() => messages);
+    messages = await withImgPrompt(messages).catch(step('이미지 지침', messages));
   }
   // 시드 표식이 없는 요청은 아무것도 읽지 않고 바로 돌려보낸다 (매 전송마다 드는 비용을 0에 가깝게).
   if (!messages.some((m) => typeof m?.content === 'string' && m.content.includes(SEED_OPEN))) return messages;
@@ -286,7 +288,10 @@ async function withVisit<M extends PromptMessage>(messages: M[]): Promise<M[]> {
   return withFieldFacts(withInterludes(messages, chat, char ? visitContextRules({ char }) : null, me?.name || userInfo().name || '주인공'), chat);
 }
 
-let rulesCache: { charIndex: number; gnet: string | null; phone: string | null; wiki: string | null; registry: Registry } | null = null;
+/** 장면 초점용 등록부(요원·조직·괴이 이름)는 로어북에서 만드니 캐릭터마다 한 번만. 지침 규칙(MAIN_CONTEXT)은 이 기기 설정·추가 규칙을 따르므로 요청마다 다시 읽는다 (싸다) */
+let rulesCache: { charIndex: number; registry: Registry } | null = null;
+// 플러그인이 로어북(세계 편집·설치)을 저장하면 다음 요청에서 다시 만든다 (캐릭터 번호만 보면 같은 캐릭터의 편집이 반영되지 않는다. QC 2026-10-28)
+onLoreSaved(() => (rulesCache = null));
 
 /** 괴담넷 글·쪽지, 괴담톡 대화·공지, 위키 문서를 본편 요청의 마지막 사용자 메시지 앞에 참고 기록으로 (원본 editRequest + RC.gnetContext·phoneContext·wikiContext). 기록이 없거나 꺼 두면 빈 목록 */
 async function moduleContext(scene: string): Promise<string[]> {
@@ -301,11 +306,12 @@ async function moduleContext(scene: string): Promise<string[]> {
   applyAdvanced(ss);
   if (rulesCache?.charIndex !== charIndex) {
     const char = await getChar<{ globalLore?: LoreEntry[] }>(charIndex);
-    const src = { char: { globalLore: char?.globalLore }, chat };
-    rulesCache = { charIndex, gnet: mainContextRules(src), phone: phoneRules(src), wiki: wikiContextRules(char?.globalLore), registry: buildRegistry(char?.globalLore) };
+    rulesCache = { charIndex, registry: buildRegistry(char?.globalLore) };
   }
   const focus = makeFocus(scene, rulesCache.registry);
-  const rules = rulesCache;
+  // 규칙 글은 지침(이 기기 설정)·추가 규칙에서 오므로 캐시하지 않는다: 지침을 고치면 바로 다음 요청부터 (예전엔 캐릭터를 바꿀 때까지 옛 규칙)
+  const src = { char: { globalLore: undefined }, chat };
+  const rules = { gnet: mainContextRules(src), phone: phoneRules(src), wiki: wikiContextRules(undefined) };
   // 기능마다 반영 상한 안에서 고르고, 합이 「본편 반영 총 상한」을 넘으면 상한을 나눠 다시 고른다 (core/budget.ts fitTotal)
   const parts: ContextPart[] = [];
   if (wantGnet && rules.gnet) {
@@ -608,9 +614,13 @@ async function readTheme(snap: WatchSnapshot): Promise<void> {
 function startWatcher(fab: Fab): () => void {
   const state = new WatchState();
   // 설치·점검으로 카드가 바뀌면 다음 차례에 다시 판정 (플로팅 버튼이 바로 생기게)
-  setInstalledHook(() => state.forget());
+  setInstalledHook(() => {
+    state.forget();
+    rulesCache = null; // 설치로 로어북이 바뀌었다
+  });
   let stopped = false;
   let timer: ReturnType<typeof setTimeout> | undefined;
+  let shownChat = '';
   const tick = async () => {
     try {
       const snap = await readSnapshot(fab);
@@ -618,15 +628,16 @@ function startWatcher(fab: Fab): () => void {
       if (stopped) return;
       const next = state.update(snap, lite);
       liteNow = state.lite;
-      if (next.changed) {
-        if (next.fabVisible) {
-          await readTheme(snap).catch(() => {});
-          await refreshStatusContext(snap.charIndex, snap.chatIndex).catch(() => {});
-          await refreshOpeningHint(snap.charIndex, snap.chatIndex).catch(() => {});
-        }
-        // 접속 효과는 버튼 자리에서 버튼이 나타나며 (v0.16.22)
-        await fab.setVisible(next.fabVisible, next.intro);
+      // 같은 봇 안에서 채팅만 바꿔도(버튼은 그대로) 그 채팅의 배색·상태창 칸 구성·시작 안내로 (QC 2026-10-28: 앞 채팅 것이 남았다)
+      const chatKey = next.fabVisible ? `${snap.charIndex}:${snap.chatIndex}` : '';
+      if (next.fabVisible && (next.changed || chatKey !== shownChat)) {
+        await readTheme(snap).catch(() => {});
+        await refreshStatusContext(snap.charIndex, snap.chatIndex).catch(() => {});
+        await refreshOpeningHint(snap.charIndex, snap.chatIndex).catch(() => {});
       }
+      shownChat = chatKey;
+      // 접속 효과는 버튼 자리에서 버튼이 나타나며 (v0.16.22)
+      if (next.changed) await fab.setVisible(next.fabVisible, next.intro);
     } catch (error) {
       console.log(`[goei] 채팅 감시 실패: ${error instanceof Error ? error.message : String(error)}`);
     } finally {

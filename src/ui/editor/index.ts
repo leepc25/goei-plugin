@@ -133,7 +133,7 @@ function ensureRoot(): HTMLElement {
   document.body.appendChild(root);
   root.addEventListener('click', (ev) => {
     const t = ev.target as HTMLElement;
-    if (t === root) return void handle('ed-close');
+    if (t === root) return void run('ed-close');
     // 거점: 지역 지도를 누른 자리가 거점 위치 (%) — 패널(app.ts)과 같은 처리
     const pickMap = t.closest<HTMLElement>('[data-base-pick]');
     if (pickMap) {
@@ -142,12 +142,12 @@ function ensureRoot(): HTMLElement {
       const x = ((ev as MouseEvent).clientX - img.left) / img.width * 100;
       const y = ((ev as MouseEvent).clientY - img.top) / img.height * 100;
       if (x < 0 || x > 100 || y < 0 || y > 100) return;
-      return void handle('dir-base-xy', `${x.toFixed(1)}|${y.toFixed(1)}|${pickMap.dataset.basePick}`);
+      return void run('dir-base-xy', `${x.toFixed(1)}|${y.toFixed(1)}|${pickMap.dataset.basePick}`);
     }
     const el = t.closest<HTMLElement>('[data-action]');
     if (!el || el.hasAttribute('disabled')) return;
     const take = el.dataset.take ? root?.querySelector<HTMLInputElement | HTMLTextAreaElement>(`[name="${el.dataset.take}"]`)?.value : undefined;
-    void handle(el.dataset.action!, take ?? el.dataset.value);
+    void run(el.dataset.action!, take ?? el.dataset.value);
   });
   root.addEventListener('input', (ev) => {
     const el = ev.target as HTMLInputElement | HTMLTextAreaElement;
@@ -189,7 +189,14 @@ function ensureRoot(): HTMLElement {
     }
     if (ctx && recordInput(name, el.dataset.key ?? '', el.value, ctx)) return void touched();
     if (ctx && relationsInput(name, el.dataset.key ?? '', el.value, ctx)) return void touched();
-    if (guideInput(name, el.dataset.key ?? '', el.value)) return void touched();
+    if (guideInput(name, el.dataset.key ?? '', el.value)) {
+      touched();
+      // 지침 페이지의 「지침 저장」·「기본으로」는 그릴 때 disabled 가 정해져서, 글칸에 적어도 다시 그리기 전엔 눌리지 않았다 (QC 2026-10-28: 키보드로 고친 지침을 저장할 길이 없었다)
+      const key = el.dataset.key ?? '';
+      const g = key.includes('|') ? key.slice(0, key.lastIndexOf('|')) : key;
+      root?.querySelectorAll<HTMLButtonElement>(`[data-action="ed-guide-save"][data-value="${g}"], [data-action="ed-guide-reset"][data-value="${g}"]`).forEach((b) => (b.disabled = false));
+      return;
+    }
     if (ruleInput(name, el.dataset.key ?? '', el.value)) return;
     if (manageInput(name, el.value)) return;
     // 설정 페이지의 입력(슬라이더·검색·규칙 글칸 등)은 패널과 같은 처리기로
@@ -205,15 +212,15 @@ function ensureRoot(): HTMLElement {
     ev.preventDefault();
     const form = ev.target as HTMLFormElement;
     const input = form.querySelector('input');
-    if (form.dataset.submit) void handle(form.dataset.submit, input?.value ?? '');
+    if (form.dataset.submit) void run(form.dataset.submit, input?.value ?? '');
   });
   root.addEventListener('keydown', (ev) => {
     const el = ev.target as HTMLInputElement;
     if (ev.key === 'Enter' && el?.dataset?.enter && !(el instanceof HTMLTextAreaElement)) {
       ev.preventDefault();
-      void handle(el.dataset.enter, el.value);
+      void run(el.dataset.enter, el.value);
     }
-    if (ev.key === 'Escape' && !edUi.confirm) void handle('ed-close');
+    if (ev.key === 'Escape' && !edUi.confirm) void run('ed-close');
   });
   // 칸 순서 끌기 (손잡이)
   let drag: string | null = null;
@@ -468,6 +475,10 @@ async function save(ctx: ChatContext): Promise<void> {
   edUi.busy = false;
   render();
 }
+
+/** 리스너(클릭·Enter·Esc)에서 부를 때: 버린 Promise 의 실패를 기록한다 (QC 2026-10-28) */
+const run = (action: string, value?: string): Promise<void> =>
+  handle(action, value).catch((error: unknown) => console.log(`[goei] 편집 창 조작 실패(${action}): ${error instanceof Error ? error.message : String(error)}`));
 
 export async function handle(action: string, value?: string): Promise<void> {
   const ctx = host?.ctx() ?? null;

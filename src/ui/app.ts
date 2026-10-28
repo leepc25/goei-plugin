@@ -195,7 +195,7 @@ function ensureRoot(): HTMLElement {
       const x = ((ev as MouseEvent).clientX - img.left) / img.width * 100;
       const y = ((ev as MouseEvent).clientY - img.top) / img.height * 100;
       if (x < 0 || x > 100 || y < 0 || y > 100) return;
-      return void handle('dir-base-xy', `${x.toFixed(1)}|${y.toFixed(1)}|${pickMap.dataset.basePick}`);
+      return void run('dir-base-xy', `${x.toFixed(1)}|${y.toFixed(1)}|${pickMap.dataset.basePick}`);
     }
     const el = t.closest<HTMLElement>('[data-action]');
     if (!el || el.hasAttribute('disabled')) return;
@@ -204,7 +204,7 @@ function ensureRoot(): HTMLElement {
     const names = el.dataset.take?.split(',') ?? [];
     const val = (n: string) => root?.querySelector<HTMLInputElement>(`[name="${n}"]`)?.value ?? '';
     const take = !names.length ? undefined : names.length > 1 ? JSON.stringify(names.map(val)) : root?.querySelector<HTMLInputElement>(`[name="${names[0]}"]`)?.value;
-    void handle(el.dataset.action!, take ?? el.dataset.value);
+    void run(el.dataset.action!, take ?? el.dataset.value);
   });
   // 명부 얼굴 틀: 대표 사진을 누르거나 끌면 그 자리가 틀 가운데 (틀이 사진 밖으로 나가지 않게)
   root.addEventListener('pointerdown', (ev) => {
@@ -320,12 +320,12 @@ function ensureRoot(): HTMLElement {
     if (ev.key === 'Enter' && !ev.shiftKey && !ev.isComposing && el?.dataset?.input === 'ph-draft' && matchMedia('(pointer: fine)').matches) {
       const send = root?.querySelector<HTMLButtonElement>('.ph-send');
       ev.preventDefault();
-      if (send && !send.disabled) void handle('ph-send', send.dataset.value);
+      if (send && !send.disabled) void run('ph-send', send.dataset.value);
       return;
     }
     if (ev.key !== 'Enter' || ev.isComposing || !el?.dataset?.enter) return;
     ev.preventDefault();
-    void handle(el.dataset.enter, el.value);
+    void run(el.dataset.enter, el.value);
   });
   root.addEventListener('submit', (ev) => {
     ev.preventDefault();
@@ -618,6 +618,10 @@ async function stagedTheme(ctx: ChatContext, value: string | undefined): Promise
   }
   render();
 }
+
+/** 리스너(클릭·Enter)에서 부를 때: 버린 Promise 의 실패를 기록한다 (아무 흔적 없이 조작이 안 먹는 것을 막는다. QC 2026-10-28) */
+const run = (action: string, value?: string): Promise<void> =>
+  handle(action, value).catch((error: unknown) => console.log(`[goei] 조작 실패(${action}): ${error instanceof Error ? error.message : String(error)}`));
 
 async function handle(action: string, value?: string): Promise<void> {
   if (busy) return;
