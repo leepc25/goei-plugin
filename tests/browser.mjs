@@ -128,6 +128,40 @@ async function pickCustom(page, row = '.gx-mlist li.gx-mx') {
   await page.click('.gx-mlist li.gx-mx.open [data-action="mission-pick"]');
 }
 
+// 설정 창(2026-10-27 개편: 별도 창 .gw 하나, 탭 기능·세계·지침·점검 + 왼쪽 목록의 페이지 노드)
+const edTabOf = (n) => (n.startsWith('guide:') || n.startsWith('rule:') ? 'guide' : n === 'install' || n === 'set:update' || n.startsWith('manage:') ? 'manage' : n.startsWith('set:') ? 'set' : 'world');
+// 목록은 폰(760px 이하)에서 서랍에 숨으므로 DOM 에서 누른다 (tests/qc-settings-harness.mjs goNode 와 같음)
+async function edGo(page, node) {
+  await page.evaluate((t) => { if (!document.querySelector('.gw .gw-tree-item.on')?.closest('.gw-tree')?.querySelector(`[data-action="ed-node"]`) || document.querySelector(`.gw [data-action="ed-tab"][data-value="${t}"]:not(.on)`)) document.querySelector(`.gw [data-action="ed-tab"][data-value="${t}"]`)?.click(); }, edTabOf(node));
+  await page.waitForFunction((n) => !!document.querySelector(`.gw [data-action="ed-node"][data-value="${n}"]`), node);
+  await page.evaluate((n) => document.querySelector(`.gw [data-action="ed-node"][data-value="${n}"]`).click(), node);
+  await page.waitForFunction((n) => document.querySelector('.gw .gw-tree-item.on')?.dataset.value === n, node);
+}
+// 진행 중 채팅: 메뉴의 「설정」 / 시작 전: 「새 채팅 기본 설정」(prefs-open). 열면 화면 페이지에서 시작한다
+async function edOpen(page, node, { pre = false } = {}) {
+  await page.click(pre ? '.gx [data-action="prefs-open"]' : '.gx-nav .gx-nb.desk[data-action="ed-open"]');
+  await page.waitForFunction(() => { const g = document.querySelector('.gw'); return g && !g.hidden && g.querySelector('.gw-win'); });
+  if (node) await edGo(page, node);
+}
+async function edClose(page) {
+  await page.click('.gw .gw-top [data-action="ed-close"]');
+  await page.waitForFunction(() => document.querySelector('.gw')?.hidden === true);
+}
+// 설정 창 페이지 머리의 범위 칩 (이 채팅 / 새 채팅 기본값: 캐릭터 이미지·상황판·고급 페이지)
+async function edScope(page, scope) {
+  await page.click(`.gw [data-action="set-scope"][data-value="${scope}"]`);
+  await page.waitForSelector(`.gw [data-action="set-scope"][data-value="${scope}"].on`);
+}
+const stepShown = (page, action, key) => page.evaluate(([a, k]) => document.querySelector(`.gw [data-action="${a}"][data-value="${k}:+"]`)?.closest('.st-step')?.querySelector('b')?.textContent ?? '', [action, key]);
+
+// 필드(게임)에서 나오기: 필드 탭 안에서는 게임 머리(닫기·시작 화면 단추)를 숨기고(style.css .gx-fieldhost .gx-game .gx-head) 게임 안 「필드 나가기」
+// ·모바일 뒤로 쓸기가 같은 game-close 를 부른다(app.ts openGame 의 exit, navStep). 시험은 숨은 닫기 단추를 DOM 에서 눌러 그 길을 탄다
+const FIELD = '.gx-nav .gx-nb:not(.mob)[data-value="field"]';
+async function leaveField(page) {
+  await page.evaluate(() => document.querySelector('.gx-game [data-action="game-close"]').click());
+  await page.waitForFunction(() => !document.querySelector('.gx-game'));
+}
+
 // 1) 새 채팅: 백일몽 · English · 01 신입 OT
 {
   const { page, errors } = await boot(fixture, { message: [], scriptstate: {} });
@@ -1608,6 +1642,7 @@ if (fixture.globalLore.some(packed)) {
 }
 
 // 16) 설정: 카드 기본값 → 요원 표시 인원·지원 투입·에셋 출력 바꾸기 → 보조모델 이미지 태그 보충 → 상황판 끄기
+// 2026-10-27 설정 창 개편으로 옮김: 설정은 별도 창(.gw) 하나, 화면(테마·요원 칸)·캐릭터 이미지·상황판(요원 인원·지원 투입·괴이 발생) 페이지가 따로
 {
   const { page, errors } = await boot(fixture, { message: [], scriptstate: {} });
   await startedWithReply(page);
@@ -1618,45 +1653,55 @@ if (fixture.globalLore.some(packed)) {
   assert.equal(ss0.$st_agent_limit, '12');
   assert.equal(ss0.$st_support_on, '1');
   await open(page);
-  await page.click('.gx-nav .gx-nb.desk[data-action="ed-open"]');
-  await page.waitForSelector('.gx-settings');
-  assert.ok((await page.textContent('.st-step b')).includes('12명'));
-  assert.equal(await page.getAttribute('[data-action="set-theme"][data-value="dark"]', 'aria-pressed'), 'true', '새 채팅 테마 기본은 다크');
-  await page.click('[data-action="set-theme"][data-value="paper"]');
+  await edOpen(page, 'set:board');
+  assert.ok((await stepShown(page, 'set-agent', 'n')).includes('12명'));
+  await edGo(page, 'set:screen');
+  assert.equal(await page.getAttribute('.gw [data-action="set-theme"][data-value="dark"]', 'aria-pressed'), 'true', '새 채팅 테마 기본은 다크');
+  await page.click('.gw [data-action="set-theme"][data-value="paper"]');
   await page.waitForFunction(() => window.__chat.scriptstate.$st_fixed_theme === 'paper');
-  await page.waitForFunction(() => document.querySelector('[data-action="set-theme"][data-value="paper"]')?.getAttribute('aria-pressed') === 'true');
-  const kinds = await page.textContent('.ps-cards');
+  await page.waitForFunction(() => document.querySelector('.gw [data-action="set-theme"][data-value="paper"]')?.getAttribute('aria-pressed') === 'true');
+  await edGo(page, 'set:board');
+  const kinds = await page.textContent('.gw .ps-cards');
   assert.ok(kinds.includes('2개') && kinds.includes('100%') && kinds.includes('48시간'), kinds);
-  // 괴이 생성 수치: 이 채팅에만 ($wg_*)
-  await page.evaluate(() => { const d = document.querySelector('.st-world'); if (!d.open) d.querySelector('summary').click(); });
-  await page.click('[data-action="set-world"][data-value="preset_cap:+"]');
+  // 괴이 생성 수치: 이 채팅에만 ($wg_*). 2026-10-27: 접힘(.st-world) 없이 상황판 페이지의 「괴이 발생」 묶음
+  await page.click('.gw [data-action="set-world"][data-value="preset_cap:+"]');
   await page.waitForFunction(() => window.__chat.scriptstate.$wg_preset_cap === '3');
-  await page.click('[data-action="set-world"][data-value="incident_p:-"]');
+  await page.click('.gw [data-action="set-world"][data-value="incident_p:-"]');
   await page.waitForFunction(() => window.__chat.scriptstate.$wg_incident_p === '40');
-  // 설정은 하나: 「기본값으로 저장」을 누르면 지금 채팅 값이 새 채팅 기본값으로 (v0.16.23)
-  assert.equal(await page.$('[data-action="set-scope"][data-value="defaults"]'), null, '이 채팅/기본값 두 벌 없음');
-  await page.click('[data-action="set-bar"][data-value="save"]');
-  await page.waitForSelector('.st-barconfirm');
-  await page.click('[data-action="set-bar-yes"]');
+  // 새 채팅 기본값: 2026-10-27 개편으로 v0.16.23의 「기본값으로 저장(덮어쓰기)」 단추(set-bar)는 없어지고, 페이지 머리의 범위 칩
+  // 「이 채팅 / 새 채팅 기본값」으로 기본값을 바로 고친다 (src/ui/editor/index.ts settingsPage scopeSeg, docs/인계서.md 설정 창 구조).
+  // 그래서 「두 벌 없음」 단언은 「범위 칩이 있고 두 값이 섞이지 않음」으로 바꿨다
+  assert.ok(await page.$('.gw [data-action="set-scope"][data-value="defaults"]'), '새 채팅 기본값 범위 칩');
+  assert.equal(await page.locator('.gw [data-action="set-bar"]').count(), 0, '덮어쓰기 단추는 없어짐');
+  await edScope(page, 'defaults');
+  assert.equal(await stepShown(page, 'set-world', 'preset_cap'), '2개', '기본값 범위는 카드 기본값을 보여 줌 (이 채팅 값 3과 안 섞임)');
+  await page.click('.gw [data-action="set-world"][data-value="preset_cap:+"]');
   await page.waitForFunction(() => JSON.parse(window.__store['p:goei:prefs'] || '{}').world?.preset_cap === 3);
-  assert.equal(JSON.parse(await page.evaluate(() => window.__store['p:goei:prefs'])).theme, 'paper');
+  assert.equal(await page.evaluate(() => window.__chat.scriptstate.$wg_preset_cap), '3');
+  // 테마: 화면 페이지는 범위 칩이 없고 시작 뒤엔 늘 이 채팅에 저장된다(settings.ts 테마 줄 주석, 2026-10-28 QC B3).
+  // 새 채팅 테마 기본값은 시작 화면의 설정에서 정하므로(1절) 여기서 바꾼 paper 는 기본값에 들어가지 않는다
+  assert.equal(JSON.parse(await page.evaluate(() => window.__store['p:goei:prefs'])).theme, undefined, '시작 뒤 테마는 기본값을 건드리지 않음');
+  await edScope(page, 'chat');
   // 요원 표시 인원: 줄이면 상황판 요원 수와 요원 보고가 함께 바뀐다
-  await page.click('[data-action="set-agent"][data-value="n:-"]');
+  await page.click('.gw [data-action="set-agent"][data-value="n:-"]');
   await page.waitForFunction(() => window.__chat.scriptstate.$st_agent_limit === '11');
-  await page.waitForFunction(() => document.querySelector('.st-step b')?.textContent.includes('11명'));
+  await page.waitForFunction(() => document.querySelector('.gw [data-action="set-agent"][data-value="n:+"]')?.closest('.st-step')?.querySelector('b')?.textContent.includes('11명'));
   const agCount = await page.evaluate(() => (window.__chat.scriptstate.$ag_report.match(/- code: P\d+/g) || []).length);
   assert.ok(agCount <= 11);
-  // 요원 칸 모양: 목록으로 바꾸면 이 기기 공통 저장, 상황판이 목록으로
-  await page.click('[data-action="set-agents"][data-value="list"]');
+  // 요원 칸 모양(화면 페이지): 목록으로 바꾸면 이 기기 공통 저장, 상황판이 목록으로
+  await edGo(page, 'set:screen');
+  await page.click('.gw [data-action="set-agents"][data-value="list"]');
   await page.waitForFunction(() => JSON.parse(window.__store['p:goei:prefs'] || '{}').agents === 'list');
+  await edClose(page);
   await page.click('.gx-nav .gx-nb:not(.mob)[data-value="board"]');
   await page.waitForSelector('.gx-board .gx-agrow');
   assert.equal(await page.locator('.gx-board .gx-agmon').count(), 0);
-  await page.click('.gx-nav .gx-nb.desk[data-action="ed-open"]');
-  await page.waitForSelector('[data-action="set-agents"]');
+  await edOpen(page, 'set:board');
+  await page.waitForSelector('.gw [data-action="set-support"]');
   // 지원 투입 끄기 → 지도 편성에서 지원 인원 칸이 사라진다
-  await page.click('[data-action="set-support"][data-value="0"]');
+  await page.click('.gw [data-action="set-support"][data-value="0"]');
   await page.waitForFunction(() => window.__chat.scriptstate.$st_support_on === '0');
+  await edClose(page);
   await page.click('.gx-nav .gx-nb:not(.mob)[data-value="mission"]');
   await page.waitForSelector('.gx-mbox');
   await pickCustom(page, '.gx-mbox li.gx-mx');
@@ -1666,17 +1711,19 @@ if (fixture.globalLore.some(packed)) {
   await page.waitForFunction(() => document.querySelector('.gx-team .gx-goal b')?.classList.contains('none'));
   assert.equal(await page.locator('.gx-mlist .sel').count(), 0, '취소하면 커스텀 목표가 풀림');
   assert.equal(await page.locator('.gx-scard').count(), 0, '지원 투입 OFF면 지원 인원 카드 없음');
-  // 에셋: 보조모델 + 캐릭터당 1장
-  await page.click('.gx-nav .gx-nb.desk[data-action="ed-open"]');
-  await page.waitForSelector('[data-action="set-asset-model"]');
-  assert.equal(await page.$('[data-action="set-asset-limit"]'), null, '메인모델이면 캐릭터당 이미지 수 없음');
-  await page.click('[data-action="set-asset-model"][data-value="aux"]');
+  // 에셋(캐릭터 이미지 페이지): 보조모델 + 캐릭터당 1장
+  await edOpen(page, 'set:image');
+  await page.waitForSelector('.gw [data-action="set-asset-model"]');
+  assert.equal(await page.locator('.gw [data-action="set-asset-limit"]').count(), 0, '메인모델이면 캐릭터당 이미지 수 없음');
+  await page.click('.gw [data-action="set-asset-model"][data-value="aux"]');
   await page.waitForFunction(() => window.__chat.scriptstate.$st_asset_model === 'aux');
-  await page.click('[data-action="set-asset-limit"][data-value="1"]');
+  await page.click('.gw [data-action="set-asset-limit"][data-value="1"]');
   await page.waitForFunction(() => window.__chat.scriptstate.$st_asset_limit === '1');
   if (shots) await page.screenshot({ path: `${shots}/16-settings.png` });
+  // 인물 기록(기본 켬)도 응답마다 보조 모델을 부르므로 이 절은 이미지 태그 보충 호출만 세게 끈다 (15절과 같음)
+  await page.evaluate(() => { window.__chat.scriptstate.$pp_on = '0'; });
   await page.evaluate(() => {
-    window.__moduleLore = [{ comment: 'Image tag', content: JSON.stringify({ characters: ['Jyaldi'], sfw_keywords: ['default', 'smile'], kor_to_eng: { 쟈알디: 'Jyaldi' } }) }];
+    // 자료(쟈알디 → Jyaldi, 표정 default·smile …)는 v0.16.66부터 로어북 「Image tag」가 아니라 명부 + 이미지 지침 설정에서 온다
     window.__llm = [{ type: 'success', result: '[{"line":1,"tag":"<img=\\"Jyaldi_smile\\">"},{"line":2,"tag":"<img=\\"Jyaldi_default\\">"}]' }];
   });
   const n0 = await page.evaluate(() => (window.__calls.llm || []).length);
@@ -1692,30 +1739,33 @@ if (fixture.globalLore.some(packed)) {
   assert.match(sent.messages[0].content, /limit is 1 tag PER character/);
   const body = await page.evaluate(() => window.__chat.message.at(-1).data);
   assert.equal(body, '쟈알디가 웃었다.\n\n<img=Jyaldi_smile>\n\n쟈알디는 문을 열었다.\n[▣|2025.01.01|03:00 AM|☀️|4°C|관리국 본부|없음]', '캐릭터당 1장, 상태창은 그대로');
-  // 이미지 자료가 없으면 본문은 그대로 두고 설정 탭에 이유를 남긴다
-  // (카드에도 Image tag가 들었으니 시험 동안 카드 것도 뺀다)
-  const cardImageBook = await page.evaluate(() => {
-    window.__moduleLore = [];
-    const i = window.__char.globalLore.findIndex((e) => e.comment === 'Image tag');
-    return i < 0 ? null : window.__char.globalLore.splice(i, 1)[0];
-  });
+  // 이미지 자료가 없으면 본문은 그대로 두고 설정 탭에 이유를 남긴다.
+  // v0.16.66(사용자 2026-10-27): 로어북 「Image tag」는 더 쓰지 않고 명부 + 설정(이미지 지침의 출력 대상·표정 세트)으로 조립한다
+  // (src/host/asset.ts·core/asset.ts imageDataFrom). 그래서 「자료 없음」은 로어북을 빼는 대신 이미지 지침에서 출력 대상을 전부 끄는 것으로,
+  // 남기는 이유 글귀는 /Image tag/ 대신 「출력 대상이 없습니다」로 바꿨다
+  await page.waitForSelector('.gw input[data-change="ip-toggle"]');
+  for (let left = await page.locator('.gw input[data-change="ip-toggle"]:checked').count(); left > 0; left--) {
+    await page.locator('.gw input[data-change="ip-toggle"]:checked').first().click();
+    await page.waitForFunction((n) => document.querySelectorAll('.gw input[data-change="ip-toggle"]:checked').length === n, left - 1);
+  }
   await fire('쟈알디가 다시 웃었다.');
   assert.equal(await page.evaluate(() => window.__chat.message.at(-1).data), '쟈알디가 다시 웃었다.');
-  assert.match(await page.evaluate(() => window.__chat.scriptstate.$goei_asset_note), /Image tag/);
+  assert.match(await page.evaluate(() => window.__chat.scriptstate.$goei_asset_note), /출력 대상이 없습니다/);
   assert.equal(await page.evaluate(() => window.__calls.llm.length), n0 + 1, '자료가 없으면 모델을 부르지 않음');
-  if (cardImageBook) await page.evaluate((b) => window.__char.globalLore.push(b), cardImageBook);
   // 메인모델로 돌리면 보충하지 않는다
-  await page.click('[data-action="set-asset-model"][data-value="main"]');
+  await page.click('.gw [data-action="set-asset-model"][data-value="main"]');
   await page.waitForFunction(() => window.__chat.scriptstate.$st_asset_model === 'main');
-  // 상황판 끄기: 확인 → 상태 비움 → 다시 켜기
-  await page.click('[data-action="set-anomaly"][data-value="off"]');
-  await page.waitForSelector('.st-confirm');
-  await page.click('[data-action="set-anomaly"][data-value="off-yes"]');
+  // 상황판 끄기(상황판 페이지): 확인 → 상태 비움 → 다시 켜기
+  await edGo(page, 'set:board');
+  await page.click('.gw [data-action="set-anomaly"][data-value="off"]');
+  await page.waitForSelector('.gw .st-confirm');
+  await page.click('.gw [data-action="set-anomaly"][data-value="off-yes"]');
   await page.waitForFunction(() => window.__chat.scriptstate.$st_anomaly_on === '0' && window.__chat.scriptstate.$an_report === '');
+  await edClose(page);
   await page.click('.gx-nav .gx-nb:not(.mob)[data-value="board"]');
   await page.waitForSelector('[data-action="world-on"]');
-  await page.click('.gx-nav .gx-nb.desk[data-action="ed-open"]');
-  await page.click('[data-action="set-anomaly"][data-value="on"]');
+  await edOpen(page, 'set:board');
+  await page.click('.gw [data-action="set-anomaly"][data-value="on"]');
   await page.waitForFunction(() => window.__chat.scriptstate.$st_anomaly_on === '1' && /NEW \[AN\|/.test(window.__chat.scriptstate.$an_report));
   await page.setViewportSize({ width: 390, height: 844 });
   assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth), false);
@@ -1726,81 +1776,94 @@ if (fixture.globalLore.some(packed)) {
 }
 
 // 17) 카드 명부: 시작 전 설정에서 요원·조직·괴이 값을 고쳐 카드 로어북 「괴이봇 명부」에 저장
+// 2026-10-27 설정 창 개편으로 옮김: 명부는 설정 창 「세계」 탭의 기록 화면(요원·조직·괴이·파밍·부록)에 합쳐졌고, 명부 칸은 기록마다 「기본 정보」.
+// 저장은 창 머리의 「저장」(ed-save) 하나 (확인 없음, 세계 덧쓰기와 함께 카드 명부에)
 {
   const { page, errors } = await boot(fixture, { message: [], scriptstate: {} });
   await open(page);
   await page.waitForSelector('[data-action="prefs-open"]');
-  await page.click('[data-action="prefs-open"]');
-  await page.click('[data-action="set-scope"][data-value="card"]');
-  await page.waitForSelector('.dir');
-  const kinds = await page.textContent('.dir-kinds');
-  assert.ok(/괴이\s*63/.test(kinds) && /요원\s*55/.test(kinds) && /조직\s*17/.test(kinds) && /부록\s*4/.test(kinds), kinds);
-  // 부록: 본 항목별로 묶이고, 펼치면 본 항목·조건·해금 (해금은 이 채팅에 바로 적는다)
-  await page.click('[data-action="dir-kind"][data-value="appendix"]');
-  await page.waitForSelector('.dir-kinds [data-value="appendix"].on');
-  assert.equal(await page.$$eval('.dir-list .dir-row', (rows) => rows.length), 4);
-  assert.ok(!(await page.textContent('.dir-list')).includes('본 항목 없음'), '모두 본 항목을 찾음');
-  await page.click('[data-action="dir-open"][data-value="남해지사 · 숨은 진실"]');
-  await page.waitForSelector('[data-key="app:unlock|남해지사 · 숨은 진실"]');
-  assert.match(await page.textContent('.dir-panel'), /본 항목과 같은 세력 자리/);
+  await edOpen(page, 'anomaly', { pre: true });
+  // 종류별 개수: 명부 탭 머리(.dir-kinds) 대신 왼쪽 목록의 개수.
+  // 조직은 명부 17 + 세계 기록에만 있는 조직까지 센다(record.ts recordCount: 명부 줄 ∪ 세계 기록) → 18
+  const treeN = (k) => page.textContent(`.gw .gw-tree-item[data-value="${k}"] em`).then(Number);
+  assert.deepEqual([await treeN('anomaly'), await treeN('agent'), await treeN('org'), await treeN('appendix')], [63, 55, 18, 4]);
+  // 부록: 펼치면 본 항목·조건·해금 (해금은 이 채팅에 바로 적는다). 모두 본 항목을 찾음 (못 찾으면 기본 정보에 「본 항목을 찾지 못했어요」)
+  await edGo(page, 'appendix');
+  const apps = await page.$$eval('.gw .gw-list .gw-row', (rows) => rows.map((r) => r.dataset.value));
+  assert.equal(apps.length, 4);
+  for (const name of apps) {
+    await page.click(`.gw .gw-row[data-value="${name}"]`);
+    await page.waitForFunction((n) => document.querySelector('.gw .gw-detail h2')?.textContent?.includes(n), name);
+    assert.ok(!(await page.textContent('.gw .gw-basic')).includes('본 항목을 찾지 못했어요'), `본 항목 찾음: ${name}`);
+  }
+  await page.click('.gw .gw-row[data-value="남해지사 · 숨은 진실"]');
+  await page.waitForSelector('.gw [data-key="app:unlock|남해지사 · 숨은 진실"]');
+  assert.match(await page.textContent('.gw .gw-basic .dir-panel'), /본 항목과 같은 세력 자리/);
   if (shots) await page.screenshot({ path: `${shots}/17-directory-appendix.png` });
-  await page.click('[data-action="dir-kind"][data-value="anomaly"]');
-  assert.equal(await page.getAttribute('.dir-bar [data-value="save"]', 'disabled'), '', '고친 게 없으면 저장 못 함');
+  await edGo(page, 'anomaly');
+  assert.equal(await page.getAttribute('.gw [data-action="ed-save"]', 'disabled'), '', '고친 게 없으면 저장 못 함');
   // 괴이: 명일 아파트를 발생 후보에서 빼기
-  // 통합 검색: 탭과 상관없이 다섯 탭을 묶어 보여 주고, 고르면 그 탭으로 가서 펼친다
-  await page.click('[data-action="dir-kind"][data-value="agent"]');
-  await page.fill('[data-input="dir-q"]', '관리국');
-  await page.waitForFunction(() => document.querySelectorAll('.dir-list .dir-group').length >= 2);
+  // 검색: 예전 명부의 「통합 검색」(다섯 탭을 묶어 보여 주고 고르면 그 탭으로)은 개편으로 종류별 목록 검색(ed-q)이 됐다
+  // (04522112 「명부 항목을 기록 화면 맨 위에」). 그래서 묶음·탭 이동 단언 대신 종류별 검색이 이름으로 거르는지를 본다
+  await edGo(page, 'org');
+  await page.fill('.gw [data-input="ed-q"]', '관리국');
+  await page.waitForFunction(() => [...document.querySelectorAll('.gw .gw-list .gw-row')].length === 2);
   if (shots) await page.screenshot({ path: `${shots}/17-dir-search.png` });
-  await page.fill('[data-input="dir-q"]', '명일');
-  await page.click('.dir-head[data-value="anomaly|명일 아파트"]');
-  await page.waitForSelector('.dir-kinds [data-value="anomaly"].on');
-  assert.equal(await page.inputValue('[data-input="dir-q"]'), '');
-  await page.click('[data-action="dir-set"][data-value="preset|0|명일 아파트"]');
-  await page.waitForFunction(() => !document.querySelector('.dir-bar [data-value="save"]')?.disabled);
+  await edGo(page, 'anomaly');
+  await page.fill('.gw [data-input="ed-q"]', '명일');
+  await page.waitForFunction(() => { const r = [...document.querySelectorAll('.gw .gw-list .gw-row')]; return r.length >= 1 && r.every((x) => x.textContent.includes('명일')); });
+  await page.click('.gw .gw-row[data-value="명일 아파트"]');
+  await page.waitForFunction(() => document.querySelector('.gw .gw-detail h2')?.textContent?.includes('명일 아파트'));
+  await page.click('.gw .gw-detail [data-action="dir-set"][data-value="preset|0|명일 아파트"]');
+  await page.waitForFunction(() => !document.querySelector('.gw [data-action="ed-save"]')?.disabled);
   // 다른 폴더에서 온 후보: 기본으로는 없고(2026-10-21 사용자), 직접 넣으면 따로 묶고 출처 폴더를 보여 준다
-  await page.fill('[data-input="dir-q"]', '');
-  await page.click('[data-action="dir-kind"][data-value="anomaly"]');
-  assert.ok(!(await page.textContent('.dir-list')).includes('다른 폴더에서 온 후보'), '기본 명부엔 폴더 밖 후보 없음');
-  await page.click('[data-action="dir-add-toggle"]');
-  await page.fill('[data-input="dir-ext-q"]', '세력');
-  const extName = await page.getAttribute('.dir-ext-item', 'data-value');
+  // (2026-10-28 QC: 개편 때 이 칸이 빠졌던 것을 괴이·파밍 목록의 「폴더 밖」 단추로 되살림 — src/ui/editor/record.ts)
+  await page.fill('.gw [data-input="ed-q"]', '');
+  await page.waitForFunction(() => document.querySelectorAll('.gw .gw-list .gw-row').length > 2);
+  assert.ok(!(await page.textContent('.gw .gw-list')).includes('다른 폴더에서 온 후보'), '기본 명부엔 폴더 밖 후보 없음');
+  await page.click('.gw [data-action="dir-add-toggle"]');
+  await page.fill('.gw [data-input="dir-ext-q"]', '세력');
+  const extName = await page.getAttribute('.gw .dir-ext-item', 'data-value');
   assert.ok(extName);
-  await page.click('.dir-ext-item');
-  await page.waitForSelector(`.dir-head[data-value="${extName}"][aria-expanded="true"]`);
-  const listText = await page.textContent('.dir-list');
+  await page.click('.gw .dir-ext-item');
+  await page.waitForFunction((n) => document.querySelector('.gw .gw-rowbox.on .gw-row')?.dataset.value === n && document.querySelector('.gw .gw-detail h2')?.textContent?.includes(n), extName);
+  const listText = await page.textContent('.gw .gw-list');
   assert.ok(listText.includes('다른 폴더에서 온 후보') && listText.includes('🌆세력'), '출처 폴더 표시');
-  // 조직 추가 → 요원에게 고르기
-  await page.click('[data-action="dir-kind"][data-value="org"]');
-  await page.click('[data-action="dir-add-toggle"]');
-  await page.fill('[name="dir-org-new"]', '테스트 조직');
-  await page.click('[data-action="dir-org-add"]');
-  await page.waitForSelector('.dir-head[data-value="테스트 조직"]');
-  await page.click('[data-action="dir-org-toggle"][data-value="rosterFor|A00|테스트 조직"]');
-  // 기본 세력: 부르는 이름·괴담톡 전용 탭·첫 장면 로어북
-  await page.click('.dir-head[data-value="관리국"]');
-  await page.fill('[data-input="dir"][data-key="disp:B00|A00"]', '짝퉁 관리국');
-  await page.fill('[data-input="dir"][data-key="ptab:T01"]', '본부');
-  await page.fill('[data-input="dir"][data-key="seed:A00-8"]', '관리국, 쟈알디');
+  // 조직 추가 → 요원에게 고르기. 개편 뒤 새 조직은 세계 기록으로 만들고(ed-add) 저장해야 명부 줄(기본 정보: 요원 목록 세력·플레이 세력)이 생긴다
+  // → 카드 저장이 한 번 더 (예전엔 명부 초안에 바로 dir-org-add)
+  await edGo(page, 'org');
+  await page.click('.gw [data-action="ed-add-toggle"]');
+  await page.fill('.gw [name="ed-new-name"]', '테스트 조직');
+  await page.click('.gw [data-action="ed-add"]');
+  await page.waitForFunction(() => document.querySelector('.gw .gw-detail h2')?.textContent?.includes('테스트 조직'));
+  await page.click('.gw [data-action="ed-save"]');
+  await page.waitForFunction(() => window.__calls.setChar === 1);
+  await page.waitForSelector('.gw [data-action="dir-org-toggle"][data-value="rosterFor|A00|테스트 조직"]');
+  await page.click('.gw [data-action="dir-org-toggle"][data-value="rosterFor|A00|테스트 조직"]');
+  // 기본 세력: 부르는 이름·괴담톡 전용 탭·첫 장면 로어북 (관리국 조직 기록의 기본 정보)
+  await page.click('.gw .gw-row[data-value="관리국"]');
+  await page.waitForSelector('.gw [data-input="dir"][data-key="disp:B00|A00"]');
+  await page.fill('.gw [data-input="dir"][data-key="disp:B00|A00"]', '짝퉁 관리국');
+  await page.fill('.gw [data-input="dir"][data-key="ptab:T01"]', '본부');
+  await page.fill('.gw [data-input="dir"][data-key="seed:A00-8"]', '관리국, 쟈알디');
   if (shots) {
-    await page.evaluate(() => document.querySelector('[data-key="ptab:T01"]').scrollIntoView({ block: 'center' }));
+    await page.evaluate(() => document.querySelector('.gw [data-key="ptab:T01"]').scrollIntoView({ block: 'center' }));
     await page.screenshot({ path: `${shots}/17-directory-builtin.png` });
     const vp = page.viewportSize();
     await page.setViewportSize({ width: 390, height: 844 });
     await page.waitForTimeout(300);
-    await page.locator('[data-key="disp:none|A00"]').scrollIntoViewIfNeeded();
+    await page.locator('.gw [data-key="disp:none|A00"]').scrollIntoViewIfNeeded();
     await page.screenshot({ path: `${shots}/17-directory-builtin-mobile.png` });
     await page.setViewportSize(vp);
   }
-  await page.click('[data-action="dir-kind"][data-value="agent"]');
-  await page.fill('[data-input="dir-q"]', '쟈알디');
-  await page.click('.dir-head[data-value="agent|쟈알디"]');
-  await page.click('[data-action="dir-org-pick"][data-value="테스트 조직|쟈알디"]');
-  await page.fill('[data-input="dir"][data-key="rank|쟈알디"]', '국장');
+  await edGo(page, 'agent');
+  await page.fill('.gw [data-input="ed-q"]', '쟈알디');
+  await page.click('.gw .gw-row[data-value="쟈알디"]');
+  await page.click('.gw [data-action="dir-org-pick"][data-value="테스트 조직|쟈알디"]');
+  await page.fill('.gw [data-input="dir"][data-key="rank|쟈알디"]', '국장');
   if (shots) await page.screenshot({ path: `${shots}/17-directory.png` });
-  await page.click('.dir-bar [data-value="save"]');
-  await page.click('[data-action="dir-save"]');
-  await page.waitForFunction(() => window.__calls.setChar === 1);
+  await page.click('.gw [data-action="ed-save"]');
+  await page.waitForFunction(() => window.__calls.setChar === 2);
   const book = await page.evaluate(() => JSON.parse(window.__char.globalLore.find((e) => e.comment === 'Directory').content));
   assert.equal(book.괴이['명일 아파트'].preset, false);
   assert.equal(book.괴이[extName].preset, true, '다른 폴더 로어북을 발생 후보로 저장');
@@ -1813,10 +1876,10 @@ if (fixture.globalLore.some(packed)) {
   const entry = await page.evaluate(() => window.__char.globalLore.find((e) => e.comment === 'Directory'));
   assert.equal(entry.key, '');
   assert.equal(entry.alwaysActive, false);
-  await page.waitForFunction(() => document.querySelector('.gx-toast[data-toast="dir"]')?.textContent.includes('저장했어요'));
-  // 저장한 값으로 다시 읽힘: 새로고침 뒤에도 쟈알디는 테스트 조직
-  await page.fill('[data-input="dir-q"]', '쟈알디');
-  assert.ok((await page.textContent('.dir-list')).includes('테스트 조직'));
+  // 저장 알림: 예전 명부 토스트(.gx-toast[data-toast="dir"]) 대신 창 머리 알림
+  await page.waitForFunction(() => document.querySelector('.gw .gw-notice')?.textContent.includes('저장했어요'));
+  // 저장한 값으로 다시 읽힘: 새로 읽은 뒤에도 쟈알디는 테스트 조직
+  await page.waitForSelector('.gw [data-action="dir-org-pick"][data-value="테스트 조직|쟈알디"].on');
   await page.setViewportSize({ width: 390, height: 844 });
   assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth), false);
   if (shots) await page.screenshot({ path: `${shots}/17-directory-mobile.png` });
@@ -2016,40 +2079,41 @@ if (fixture.globalLore.some(packed)) {
 }
 
 // 20) 새 플레이 세력: 명부 조직을 플레이 세력으로 켜고(F00) 기본 세력 숨기기 → 시작 화면에서 그 세력으로 직접 입력 시작
+// 2026-10-27 설정 창 개편으로 옮김: 명부는 설정 창 「세계」 탭의 조직·요원 기록의 「기본 정보」. 새 조직은 세계 기록으로 만들어(ed-add)
+// 저장해야 명부 줄이 생기므로 카드 저장이 두 번 (17절과 같음)
 {
   const { page, errors } = await boot(fixture, { message: [], scriptstate: {} });
   await open(page);
   await page.waitForSelector('[data-action="prefs-open"]');
-  await page.click('[data-action="prefs-open"]');
-  await page.click('[data-action="set-scope"][data-value="card"]');
-  await page.waitForSelector('.dir');
-  await page.click('[data-action="dir-kind"][data-value="org"]');
-  await page.click('[data-action="dir-add-toggle"]');
-  await page.fill('[name="dir-org-new"]', '테스트 결사');
-  await page.click('[data-action="dir-org-add"]');
-  await page.waitForSelector('[data-action="dir-fac-play"][data-value="1|테스트 결사"]');
-  await page.click('[data-action="dir-fac-play"][data-value="1|테스트 결사"]');
-  await page.waitForSelector('.dir-code');
-  assert.equal(await page.textContent('.dir-code'), 'F00');
-  assert.equal(await page.$('[data-action="dir-fac-patch"]'), null, '새 Lite 카드에는 자리표시자가 이미 있음');
-  await page.click('[data-action="dir-fac-type"][data-value="freelancer|테스트 결사"]');
-  await page.fill('[data-key="org:title|테스트 결사"]', '비밀 결사');
-  await page.fill('[data-key="org:blurb|테스트 결사"]', '밤에만 움직이는 결사.');
-  await page.fill('[data-key="org:gm_name|테스트 결사"]', 'Test Society');
-  await page.fill('[data-key="org:gm_desc|테스트 결사"]', 'A secret society.');
+  await edOpen(page, 'org', { pre: true });
+  await page.click('.gw [data-action="ed-add-toggle"]');
+  await page.fill('.gw [name="ed-new-name"]', '테스트 결사');
+  await page.click('.gw [data-action="ed-add"]');
+  await page.waitForFunction(() => document.querySelector('.gw .gw-detail h2')?.textContent?.includes('테스트 결사'));
+  await page.click('.gw [data-action="ed-save"]');
+  await page.waitForFunction(() => window.__calls.setChar === 1);
+  await page.waitForSelector('.gw [data-action="dir-fac-play"][data-value="1|테스트 결사"]');
+  await page.click('.gw [data-action="dir-fac-play"][data-value="1|테스트 결사"]');
+  await page.waitForSelector('.gw .dir-code');
+  assert.equal(await page.textContent('.gw .dir-code'), 'F00');
+  assert.equal(await page.locator('.gw [data-action="dir-fac-patch"]').count(), 0, '새 Lite 카드에는 자리표시자가 이미 있음');
+  await page.click('.gw [data-action="dir-fac-type"][data-value="freelancer|테스트 결사"]');
+  await page.fill('.gw [data-key="org:title|테스트 결사"]', '비밀 결사');
+  await page.fill('.gw [data-key="org:blurb|테스트 결사"]', '밤에만 움직이는 결사.');
+  await page.fill('.gw [data-key="org:gm_name|테스트 결사"]', 'Test Society');
+  await page.fill('.gw [data-key="org:gm_desc|테스트 결사"]', 'A secret society.');
   if (shots) await page.screenshot({ path: `${shots}/20-faction-org.png` });
   // 기본 세력 숨기기
-  await page.click('.dir-head[data-value="관리국"]');
-  await page.click('[data-action="dir-fac-hide"][data-value="0|관리국"]');
+  await page.click('.gw .gw-row[data-value="관리국"]');
+  await page.click('.gw [data-action="dir-fac-hide"][data-value="0|관리국"]');
   // 요원 한 명을 새 세력으로
-  await page.click('[data-action="dir-kind"][data-value="agent"]');
-  await page.fill('[data-input="dir-q"]', '쟈알디');
-  await page.click('.dir-head[data-value="agent|쟈알디"]');
-  await page.click('[data-action="dir-org-pick"][data-value="테스트 결사|쟈알디"]');
-  assert.ok((await page.textContent('.dir-panel')).includes('비밀 결사') || (await page.textContent('.dir-panel')).includes('테스트 결사'));
-  await page.click('.dir-bar [data-value="save"]');
-  await page.click('[data-action="dir-save"]');
-  await page.waitForFunction(() => window.__calls.setChar === 1);
+  await edGo(page, 'agent');
+  await page.fill('.gw [data-input="ed-q"]', '쟈알디');
+  await page.click('.gw .gw-row[data-value="쟈알디"]');
+  await page.click('.gw [data-action="dir-org-pick"][data-value="테스트 결사|쟈알디"]');
+  assert.ok((await page.textContent('.gw .gw-basic .dir-panel')).includes('비밀 결사') || (await page.textContent('.gw .gw-basic .dir-panel')).includes('테스트 결사'));
+  await page.click('.gw [data-action="ed-save"]');
+  await page.waitForFunction(() => window.__calls.setChar === 2);
   const book = await page.evaluate(() => JSON.parse(window.__char.globalLore.find((e) => e.comment === 'Directory').content));
   const org = book.조직['테스트 결사'];
   assert.deepEqual([org.code, org.playable, org.type, org.title, org.gm_name], ['F00', true, 'freelancer', '비밀 결사', 'Test Society']);
@@ -2059,7 +2123,7 @@ if (fixture.globalLore.some(packed)) {
   // 시작 화면: 관리국은 숨고 비밀 결사가 보임, 첫 장면은 직접 입력·커스텀 임무 두 개
   await page.click('.gw [data-action="ed-close"]'); // 2026-10-27: 설정은 편집 창 하나, 닫기는 ed-close
   await page.waitForSelector('.gx-facs');
-  assert.equal(await page.$('[data-action="faction"][data-value="A00"]'), null, '숨긴 기본 세력');
+  assert.equal(await page.locator('[data-action="faction"][data-value="A00"]').count(), 0, '숨긴 기본 세력');
   await page.click('[data-action="faction"][data-value="F00"]');
   assert.ok((await page.textContent('[data-action="faction"][data-value="F00"]')).includes('밤에만 움직이는 결사.'));
   assert.equal(await page.$$eval('.gx-sc', (els) => els.length), 2);
@@ -2141,13 +2205,14 @@ if (fixture.globalLore.some(packed)) {
   await page.click('[data-action="upd-skip"]');
   assert.equal(await page.locator('.upd-banner').count(), 0, '건너뛰면 안내가 사라짐');
   assert.equal(await page.evaluate(() => window.__store['p:goei:update-skip']), '9.0.0|');
-  await page.click(':is([data-action="tab"], [data-action="nav-tab"])[data-value="settings"] >> nth=0');
-  await page.click('[data-action="upd-prepare"]');
-  await page.waitForSelector('.upd-plan');
+  // 2026-10-27 설정 창 개편: 업데이트는 설정 창 「점검」 탭의 업데이트 페이지 (패널 설정 탭은 없앰)
+  await edOpen(page, 'set:update');
+  await page.click('.gw [data-action="upd-prepare"]');
+  await page.waitForSelector('.gw .upd-plan');
   if (shots) await page.locator('.upd-plan').scrollIntoViewIfNeeded(), await page.screenshot({ path: `${shots}/update-settings.png` });
   assert.match(await page.textContent('.upd-plan'), /첫 안내/);
   assert.match(await page.textContent('.upd-plan'), /카드 사진: 바뀜 1 · 새로 1/);
-  await page.click('[data-action="upd-apply"]');
+  await page.click('.gw [data-action="upd-apply"]');
   await page.waitForFunction(() => window.__calls.setChar === 1);
   const ch = await page.evaluate(() => window.__char);
   const before = fixture.additionalAssets.find((r) => r[0] === changed);
@@ -2160,9 +2225,9 @@ if (fixture.globalLore.some(packed)) {
   assert.match(ch.globalLore.find((e) => e.comment === 'Directory')?.content ?? '"내가 고친 값"', /내가 고친 값/, '명부는 보존');
   assert.ok(ch.globalLore.some((e) => e.comment === '내가 넣은 로어북'), '직접 넣은 로어북 유지');
   assert.equal(ch.name, fixture.name, '이름 유지');
-  await page.waitForSelector('.gx-hint');
-  if (shots) await page.locator('.gx-hint').last().scrollIntoViewIfNeeded().catch(() => {}), await page.screenshot({ path: `${shots}/update-done.png` });
-  assert.match(await page.textContent('.gx-settings'), /v9\.0\.0으로 바꿨어요/);
+  await page.waitForSelector('.gw .gx-hint');
+  if (shots) await page.locator('.gw .gx-hint').last().scrollIntoViewIfNeeded().catch(() => {}), await page.screenshot({ path: `${shots}/update-done.png` });
+  assert.match(await page.textContent('.gw .gw-setbody'), /v9\.0\.0으로 바꿨어요/);
   assert.equal(await page.locator('.gx-xdot').count(), 0, '최신이면 점 없음');
   assert.deepEqual(errors, []);
   console.log('PASS 업데이트: 새 버전 안내·건너뛰기·카드 업데이트(명부·직접 넣은 로어북·이름 유지, 바뀐 카드 사진만 받기)');
@@ -2227,15 +2292,15 @@ if (fixture.globalLore.some(packed)) {
   await page.close();
 }
 
-// 게임 창 (ui/game.ts): 머리 게임 버튼 → 시작 화면. 게임 파일(코드 팩)이 없으면 받기, 받은 뒤 저장 칸에서 시작.
+// 게임 창 (ui/game.ts): 머리 게임 버튼 → 시작 화면. (2026-10-23 시작 화면을 설정 틀로 바꾸며 「이어하기」(.gx-gl-cont)는 「들어가기」([data-g=play])가 됨. v0.17.7: 게임은 「필드」 탭. 메뉴의 「필드」(.gx-nav [data-value=field])로 연다 — 옛 game-open 단추 자리) 게임 파일(코드 팩)이 없으면 받기, 받은 뒤 저장 칸에서 시작.
 // 정산 결과는 쌓아 두고 버튼을 눌러야만 채팅(전송 대기)과 기록 로어북에 쓴다.
 {
   const { page, errors } = await boot(fixture, { message: [], scriptstate: {} });
   await startedWithReply(page);
   await page.click('[x-goei-fab] button');
-  await page.click('[data-action="game-open"] >> nth=0');
+  await page.click(FIELD);
   await page.waitForSelector('.gx-gl [data-g="get"]');
-  assert.equal(await page.locator('.gx-gl-cont:not([disabled])').count(), 0, '파일 받기 전에는 시작 못 함');
+  assert.equal(await page.locator('.gx-gl [data-g="play"]:not([disabled])').count(), 0, '파일 받기 전에는 시작 못 함');
   await page.click('[data-g="get"]');
   await page.waitForSelector('.gx-settings [role=status]');
   assert.match(await page.textContent('.gx-settings [role=status]'), /받지 못했어요/);
@@ -2246,7 +2311,7 @@ if (fixture.globalLore.some(packed)) {
     window.__fetch = (u) => bytes[u.split('?')[0].split('/').pop()] ?? null;
   }, gameFiles);
   await page.click('[data-g="get"]');
-  await page.waitForSelector('.gx-gl .gx-gl-cont:not([disabled])');
+  await page.waitForSelector('.gx-gl [data-g="play"]:not([disabled])');
   assert.match(await page.evaluate(() => window.__store['p:goei:game:code'].slice(0, 30)), /^\/\/ goei-game /);
   if (shots) {
     await page.screenshot({ path: `${shots}/game-home.png` });
@@ -2256,33 +2321,38 @@ if (fixture.globalLore.some(packed)) {
     await page.setViewportSize({ width: 1100, height: 900 });
   }
   assert.match(await page.textContent('.gx-gl'), /요원 \d+명/, '본편 명부를 읽음');
-  await page.click('.gx-gl-cont');
+  await page.click('.gx-gl [data-g="play"]');
   await page.waitForSelector('.gx-game-box .goei-engine canvas');
   // 쟈알디 그림 팩을 받아 두었고, 엔진이 그 그림(blob 주소)을 쓴다
   assert.match(await page.evaluate(() => window.__store['p:goei:game:pack:jyaldi'].slice(0, 20)), /"hash"/);
   await page.waitForFunction(() => window.__goeiGameStats.urls() >= 2);
-  // 통합 규격 3장: 게임 중에는 캔버스가 창을 채운다 (폰 가로 높이 100%, 폰 세로는 돌려 채움, PC 1280×950에서 1280×720)
+  // 통합 규격 3장: 게임 중에는 캔버스가 칸을 채운다. 2026-10-23 사용자 결정으로 게임은 창(상황창) 틀 안 필드 칸에서만 돈다
+  // (src/ui/game.ts openGame 주석, host/game/viewport.ts inFrame: 돌려 보기 없음). 그래서 「창 전체의 절반 이상·폰 세로 돌려 채움·PC 1280 폭」 대신
+  // 「필드 칸 안에 들어가고, 칸의 가로나 세로 한쪽을 꽉 채우고, 페이지가 스크롤되지 않음」을 본다
   const fit = [];
   for (const [w, h] of [[844, 390], [390, 844], [1280, 950], [1100, 900]]) {
     await page.setViewportSize({ width: w, height: h });
     await page.waitForTimeout(400);
     const r = await page.evaluate(() => {
-      const c = document.querySelector('.goei-engine canvas');
-      const b = c.getBoundingClientRect();
-      return { w: Math.round(b.width), h: Math.round(b.height), scroll: document.scrollingElement.scrollHeight - innerHeight };
+      const b = document.querySelector('.goei-engine canvas').getBoundingClientRect();
+      const f = document.querySelector('.gx-fieldhost').getBoundingClientRect();
+      return { w: Math.round(b.width), h: Math.round(b.height), fw: Math.round(f.width), fh: Math.round(f.height), inside: b.left >= f.left - 1 && b.top >= f.top - 1 && b.right <= f.right + 1 && b.bottom <= f.bottom + 1, rot: !!document.querySelector('.gx-game.gx-rot'), scroll: document.scrollingElement.scrollHeight - innerHeight };
     });
-    fit.push(`${w}×${h} → ${r.w}×${r.h} (${Math.round((r.w * r.h * 100) / (w * h))}%)`);
+    fit.push(`${w}×${h} → ${r.w}×${r.h} / 칸 ${r.fw}×${r.fh}`);
     if (shots) await page.screenshot({ path: `${shots}/game-engine-${w}x${h}.png` });
-    if (w === 844) assert.ok(r.h >= 389 || r.w >= 389, `폰 가로 캔버스 ${r.w}×${r.h}`);
-    if (w === 1280) assert.ok(r.w >= 1280, `PC 캔버스 ${r.w}×${r.h}`);
-    assert.ok((r.w * r.h) / (w * h) >= 0.5, `캔버스가 창의 절반도 안 됨 ${w}×${h} → ${r.w}×${r.h}`);
+    assert.ok(r.inside, `캔버스가 필드 칸 밖으로 ${w}×${h} → ${JSON.stringify(r)}`);
+    assert.ok(r.w >= r.fw - 2 || r.h >= r.fh - 2, `캔버스가 필드 칸을 한쪽도 못 채움 ${w}×${h} → ${JSON.stringify(r)}`);
+    assert.equal(r.rot, false, '틀 안에서는 돌려 보이지 않음');
+    assert.ok(r.scroll <= 0, `페이지 스크롤 ${r.scroll}`);
   }
   console.log('FIT 게임 캔버스', fit.join(' · '));
   // 정산 결과가 쌓였을 때 (엔진은 본부 정산에서 bridge.report를 부른다. 여기서는 결과를 직접 넣는다)
   const before = await page.evaluate(() => window.__calls.setChat.length);
   await page.evaluate(() => (window.__store['p:goei:game:reports'] = JSON.stringify([{ at: 1, report: { id: 't1', mission: '조사: 로비 규칙', outcome: 'return', depth: 'L2', agents: [{ id: 'jyaldi', name: '쟈알디' }], rules: ['인사는 두 번'], loot: [], summary: '로프로 귀환' } }])));
   assert.equal(await page.evaluate(() => window.__calls.setChat.length), before, '결과만으로는 채팅을 바꾸지 않음');
-  await page.click('[data-g="home"]');
+  // 시작 화면(정산 결과)은 필드를 나왔다 다시 들어가면 보인다 (게임 머리의 「시작 화면」 단추는 필드 탭에서 숨김)
+  await leaveField(page);
+  await page.click(FIELD);
   await page.waitForSelector('[data-g="post"]');
   if (shots) await page.screenshot({ path: `${shots}/game-report.png` });
   await page.click('[data-g="post"]');
@@ -2296,19 +2366,21 @@ if (fixture.globalLore.some(packed)) {
   assert.equal(await page.evaluate(() => window.__chat.localLore.filter((e) => e.comment === '관리국 훈련 기록').length), 1);
   // 닫았다 다시 열면 저장 칸이 남아 있고, 코드는 다시 받지 않는다
   await page.evaluate(() => (window.__calls.fetch = []));
-  await page.click('[data-action="game-close"]');
+  await leaveField(page);
   assert.equal(await page.locator('.gx-game').count(), 0);
-  await page.click('[data-action="game-open"] >> nth=0');
-  await page.waitForSelector('.gx-gl-cont');
-  await page.click('.gx-gl-cont');
+  await page.click(FIELD);
+  await page.waitForSelector('.gx-gl [data-g="play"]');
+  await page.click('.gx-gl [data-g="play"]');
   await page.waitForSelector('.gx-game-box .goei-engine canvas');
   assert.equal(await page.evaluate(() => (window.__calls.fetch ?? []).filter((u) => /goei-game\.\d/.test(u)).length), 0, '코드는 저장해 둔 것');
-  // 게임 중에는 창 전체, 세로로 든 폰이면 돌려 보기 (따로 누르지 않아도)
+  // 게임 중에는 필드 칸 전체(gx-full). 2026-10-23 사용자: 게임은 창 틀 안에서만 돈다(전체화면이면 Risu 경고·메뉴·뒤로가기가 가려짐) →
+  // 틀 안(inFrame)에서는 세로로 든 폰이라도 돌려 보이지 않는다 (host/game/viewport.ts apply). 그래서 「돌려 보기」 단언을 「안 돌림」으로 바꿈
   await page.setViewportSize({ width: 390, height: 800 });
-  await page.waitForSelector('.gx-game.gx-full.gx-rot');
+  await page.waitForTimeout(300);
+  await page.waitForSelector('.gx-game.gx-full:not(.gx-rot)');
   await page.setViewportSize({ width: 1100, height: 900 });
   await page.waitForSelector('.gx-game.gx-full:not(.gx-rot)');
-  await page.click('[data-action="game-close"]');
+  await leaveField(page);
   assert.deepEqual(errors, []);
   console.log('PASS 게임 창: 파일 받기 실패 안내 → 받기(코드·쟈알디 팩) → 통합 엔진 시작 → 결과는 버튼으로만 채팅·로어북 → 다시 열면 이어하기 → 돌려 보기');
   await page.close();
@@ -2336,31 +2408,31 @@ if (fixture.globalLore.some(packed)) {
   await cdp.send('Emulation.setCPUThrottlingRate', { rate: 4 });
   const base = await heapMB();
   const t0 = Date.now();
-  await page.click('[data-action="game-open"] >> nth=0');
+  await page.click(FIELD);
   await page.waitForSelector('[data-g="get"]');
   const homeMs = Date.now() - t0;
   const t1 = Date.now();
   await page.click('[data-g="get"]');
-  await page.waitForSelector('.gx-gl-cont:not([disabled])');
+  await page.waitForSelector('.gx-gl [data-g="play"]:not([disabled])');
   const getMs = Date.now() - t1;
   const t2 = Date.now();
-  await page.click('.gx-gl-cont');
-  await page.waitForSelector('.gx-game-box .goei-engine canvas');
+  await page.click('.gx-gl [data-g="play"]');
+  await page.locator('.gx-game-box .goei-engine canvas').first().waitFor(); // waitForSelector 는 요소 손잡이를 돌려줘 닫은 캔버스(게임)를 붙잡아 힙 측정을 흐린다
   const playMs = Date.now() - t2;
   await page.waitForTimeout(3000);
   const playing = await heapMB();
   const cycles = [];
   for (let i = 0; i < 5; i++) {
-    await page.click('[data-action="game-close"]');
+    await leaveField(page);
     await page.waitForTimeout(100);
     cycles.push(await heapMB());
-    await page.click('[data-action="game-open"] >> nth=0');
-    await page.waitForSelector('.gx-gl-cont');
-    await page.click('.gx-gl-cont');
-    await page.waitForSelector('.gx-game-box .goei-engine canvas');
+    await page.click(FIELD);
+    await page.waitForSelector('.gx-gl [data-g="play"]');
+    await page.click('.gx-gl [data-g="play"]');
+    await page.locator('.gx-game-box .goei-engine canvas').first().waitFor(); // waitForSelector 는 요소 손잡이를 돌려줘 닫은 캔버스(게임)를 붙잡아 힙 측정을 흐린다
     await page.waitForTimeout(500);
   }
-  await page.click('[data-action="game-close"]');
+  await leaveField(page);
   const closed = await heapMB();
   const st = await page.evaluate(() => ({ code: { ...window.__goeiGameStats.code }, fetch: { ...window.__goeiGameStats.fetch }, urls: window.__goeiGameStats.urls() }));
   // 저장해 둔 코드를 새 페이지에서 꺼내 실행하는 시간 (본체의 메모리 캐시 없이)
@@ -2371,10 +2443,10 @@ if (fixture.globalLore.some(packed)) {
   await cdp2.send('Emulation.setCPUThrottlingRate', { rate: 4 });
   await startedWithReply(page2);
   await page2.click('[x-goei-fab] button');
-  await page2.click('[data-action="game-open"] >> nth=0');
-  await page2.waitForSelector('.gx-gl-cont:not([disabled])');
+  await page2.click(FIELD);
+  await page2.waitForSelector('.gx-gl [data-g="play"]:not([disabled])');
   const t3 = Date.now();
-  await page2.click('.gx-gl-cont');
+  await page2.click('.gx-gl [data-g="play"]');
   await page2.waitForSelector('.gx-game-box .goei-engine canvas');
   const warmMs = Date.now() - t3;
   const warm = await page2.evaluate(() => ({ ...window.__goeiGameStats.code, ...window.__goeiGameStats.game }));
@@ -2393,7 +2465,8 @@ if (fixture.globalLore.some(packed)) {
     window.__bigPack = out;
     return out.length;
   });
-  await page2.click('[data-g="home"]');
+  await leaveField(page2);
+  await page2.click(FIELD);
   await page2.waitForSelector('.gx-gl [data-g-file]', { state: 'attached' });
   const tb = Date.now();
   await page2.evaluate(async () => {
@@ -2418,34 +2491,48 @@ if (fixture.globalLore.some(packed)) {
   };
   console.log('MEASURE 게임 창', JSON.stringify(report));
   writeFileSync(new URL('../dist-test/game-measure.json', import.meta.url), JSON.stringify(report, null, 1));
-  assert.ok(closed - base < 8, `닫은 뒤 힙이 많이 남음 ${base} → ${closed}`);
+  // 기준: 처음 닫은 뒤(게임 코드 실행·받은 파일이 가짜 저장소 window.__store 에 문자열로 남은 뒤). 예전 기준(게임을 받기 전 base)은
+  // 받은 양(지금 약 9MB, 시험 가짜 저장소의 문자열)과 실행한 게임 코드까지 「남은 힙」으로 세어 누수와 섞였다 (2026-10-28 QC: 진짜 누수는 열고 닫을 때마다 ~10MB 씩 늘던 것, 고침)
+  assert.ok(closed - cycles[0] < 8, `열고 닫기를 되풀이하면 힙이 늘어남 ${cycles.join(' → ')} → ${closed}`);
+  assert.ok(Math.max(...cycles) - cycles[0] < 4, `닫을 때마다 힙이 쌓임 ${cycles.join(' → ')}`);
   console.log('PASS 게임 창 측정');
   await page.close();
   await page2.close();
 }
 
-// 17b) 설정 위 「설정·명부」 줄은 스크롤해도 위에 고정, 명부 탭에서는 그 아래 분류 줄도 함께 고정. 거점 탭은 조직 제목 없이 한 목록
+// 17b) 설정 창 머리 고정 · 화면 설정(메뉴 위치·창 바깥 불투명도) · 기능별 설정 페이지 · 거점 목록
+// 2026-10-27 설정 창 개편으로 옮김: 예전 패널 설정 탭의 「설정·명부」 줄(.st-scopebar)과 명부 분류 줄(.dir-kinds) 고정은, 설정 창(.gw)의
+// 머리(.gw-top: 저장·닫기)와 왼쪽 목록이 격자로 고정이고 본문만 스크롤하는 것으로 바뀌었다. 기능별 설정 단추(feature-set)는 「기능」 탭 목록의
+// 페이지(set:wiki·set:gnet…), 명부의 종류 탭은 「세계」 탭 목록. 그래서 같은 뜻(스크롤해도 머리·분류가 제자리, 기능 설정으로 바로 감)을 새 구조에서 본다
 for (const vp of [{ width: 1100, height: 900 }, { width: 390, height: 844 }]) {
   const { page, errors } = await boot(fixture, { message: [], scriptstate: {} }, vp);
   await startedWithReply(page);
   await open(page);
-  await page.locator(':is([data-action="tab"], [data-action="nav-tab"])[data-value="settings"]:visible').first().click();
-  await page.waitForSelector('.gx-settings > .st-scopebar');
-  const stuck = (sel) => page.evaluate((sel) => {
-    const body = document.querySelector('.gx-settings');
-    body.scrollTop = body.scrollHeight;
-    const b = body.getBoundingClientRect();
-    const r = document.querySelector(sel).getBoundingClientRect();
-    return { gap: Math.round(r.top - b.top), scrolled: body.scrollTop > 200 };
-  }, sel);
-  const a = await stuck('.gx-settings > .st-scopebar');
-  assert.ok(a.scrolled && a.gap <= 2, `설정 줄 고정 ${JSON.stringify(a)}`);
   const m = vp.width < 500 ? 'm' : 'pc';
+  if (m === 'pc') await edOpen(page, 'set:board');
+  else {
+    // 폰 하단 메뉴에는 설정이 없고 머리의 설정 단추로 연다
+    await page.click('.gx-head [data-action="ed-open"]');
+    await page.waitForFunction(() => { const g = document.querySelector('.gw'); return g && !g.hidden && g.querySelector('.gw-win'); });
+    await edGo(page, 'set:board');
+  }
+  // 본문에서 가장 긴 스크롤 칸을 끝까지 내려도 창 머리는 창 맨 위
+  const stuck = () => page.evaluate(() => {
+    const cands = [document.querySelector('.gw .gw-body'), ...document.querySelectorAll('.gw .gw-body *')].filter((e) => e && e.scrollHeight - e.clientHeight > 50 && /auto|scroll/.test(getComputedStyle(e).overflowY));
+    const body = cands.sort((x, y) => (y.scrollHeight - y.clientHeight) - (x.scrollHeight - x.clientHeight))[0];
+    body.scrollTop = body.scrollHeight;
+    const w = document.querySelector('.gw .gw-win').getBoundingClientRect();
+    const t = document.querySelector('.gw .gw-top').getBoundingClientRect();
+    return { gap: Math.round(t.top - w.top), scrolled: body.scrollTop > 200, topVisible: t.height > 0 };
+  });
+  const a = await stuck();
+  assert.ok(a.scrolled && a.gap <= 2 && a.topVisible, `설정 창 머리 고정 ${JSON.stringify(a)}`);
   if (shots) await page.screenshot({ path: `${shots}/17b-set-sticky-${m}.png` });
   if (m === 'pc') {
-    // 화면: 메뉴 오른쪽, 창 바깥 불투명도 0%
-    const setDim = (pg, n) => pg.$eval('input[data-input="dim"]', (el, v) => { el.value = String(v); el.dispatchEvent(new Event('input', { bubbles: true })); el.dispatchEvent(new Event('change', { bubbles: true })); }, n);
-    await page.click('[data-action="set-nav"][data-value="right"]');
+    // 화면: 메뉴 오른쪽, 창 바깥 불투명도 0% (설정 창의 「화면」 페이지)
+    await edGo(page, 'set:screen');
+    const setDim = (pg, n) => pg.$eval('.gw input[data-input="dim"]', (el, v) => { el.value = String(v); el.dispatchEvent(new Event('input', { bubbles: true })); el.dispatchEvent(new Event('change', { bubbles: true })); }, n);
+    await page.click('.gw [data-action="set-nav"][data-value="right"]');
     await page.waitForFunction(() => document.querySelector('.gx')?.dataset.nav === 'right');
     assert.ok(await page.evaluate(() => document.querySelector('.gx-nav').getBoundingClientRect().left > document.querySelector('.gx-content').getBoundingClientRect().left), '메뉴가 오른쪽');
     await setDim(page, 0);
@@ -2455,38 +2542,32 @@ for (const vp of [{ width: 1100, height: 900 }, { width: 390, height: 844 }]) {
     assert.equal(await page.evaluate(() => getComputedStyle(document.querySelector('.gx-hsep')).color === 'rgb(0, 0, 0)'), false, '글자색 변수 그대로');
     await setDim(page, 0);
     if (shots) await page.screenshot({ path: `${shots}/17b-nav-right.png` });
-    await page.click('[data-action="set-nav"][data-value="left"]');
+    await page.click('.gw [data-action="set-nav"][data-value="left"]');
     await setDim(page, 50);
-    // 기능별 설정: 맨 위 단추로 그 탭의 설정을 바로 연다
-    assert.ok(await page.evaluate(() => document.querySelector('.gx-settings .ps-group h3')?.textContent === '기능별 설정'), '기능별 설정이 맨 위');
-    await page.click('[data-action="feature-set"][data-value="wiki"]');
-    await page.waitForSelector('.nw-setpane');
-    await page.click(':is([data-action="tab"], [data-action="nav-tab"])[data-value="settings"]');
-    await page.click('[data-action="feature-set"][data-value="gnet"]');
-    await page.waitForFunction(() => document.querySelector('[data-action="gn-settings"]')?.getAttribute('aria-pressed') === 'true');
-    await page.click(':is([data-action="tab"], [data-action="nav-tab"])[data-value="settings"]');
-    await page.waitForSelector('.gx-settings .st-feats');
+    // 기능별 설정: 「기능」 탭 목록에서 그 기능의 설정 페이지를 바로 연다
+    assert.equal(await page.evaluate(() => document.querySelector('.gw .gw-tab')?.dataset.value), 'set', '기능 탭이 맨 앞');
+    await edGo(page, 'set:wiki');
+    await page.waitForSelector('.gw .nw-setpane');
+    await edGo(page, 'set:gnet');
+    await page.waitForSelector('.gw [data-action="gn-cfg"]');
     if (shots) {
-      await page.evaluate(() => document.querySelector('.st-world').scrollIntoView({ block: 'start' }));
+      await edGo(page, 'set:board');
+      await page.evaluate(() => document.querySelector('.gw .ps-cards').scrollIntoView({ block: 'start' }));
       await page.screenshot({ path: `${shots}/16-settings-lower.png` });
     }
   }
-  await page.click('[data-action="set-scope"][data-value="card"]');
-  await page.waitForSelector('.dir-kinds');
-  await page.click('[data-action="dir-kind"][data-value="agent"]');
-  await page.waitForTimeout(200);
-  const bar = await stuck('.gx-settings > .st-scopebar');
-  const kinds = await page.evaluate(() => {
-    const k = document.querySelector('.dir-kinds').getBoundingClientRect();
-    const t = document.querySelector('.gx-settings > .st-scopebar').getBoundingClientRect();
-    return Math.round(k.top - t.bottom);
-  });
-  assert.ok(bar.scrolled && bar.gap <= 2 && kinds >= 0 && kinds <= 10, `명부 두 줄 고정 ${JSON.stringify(bar)} ${kinds}`);
+  // 명부(세계 탭): 요원 기록을 끝까지 내려도 머리 고정, PC 는 목록 도구(검색·추가)도 제자리 (목록·상세가 따로 스크롤)
+  await edGo(page, 'agent');
+  await page.evaluate(() => { const s = document.querySelector('.gw .gw-list-pick'); s.value = '쟈알디'; s.dispatchEvent(new Event('change', { bubbles: true })); });
+  await page.waitForFunction(() => document.querySelector('.gw .gw-detail h2')?.textContent?.includes('쟈알디'));
+  const bar = await stuck();
+  const tools = await page.evaluate(() => { const t = document.querySelector('.gw .gw-list-tools').getBoundingClientRect(); const top = document.querySelector('.gw .gw-top').getBoundingClientRect(); return Math.round(t.top - top.bottom); });
+  // 폰(760 이하)은 사용자 규격(2026-10-27)대로 한 열: 목록 대신 맨 위 드롭다운이 본문과 같이 내려가므로 머리 고정만 본다
+  assert.ok(bar.scrolled && bar.gap <= 2 && (m !== 'pc' || (tools >= 0 && tools <= 10)), `명부 머리·목록 도구 고정 ${JSON.stringify(bar)} ${tools}`);
   if (shots) await page.screenshot({ path: `${shots}/17b-dir-sticky-${m}.png` });
-  await page.click('[data-action="dir-kind"][data-value="base"]');
-  await page.waitForSelector('.dir-row');
-  assert.equal(await page.locator('.dir .dir-group').count(), 0, '거점 탭은 조직 제목 없음');
-  await page.evaluate(() => { document.querySelector('.gx-settings').scrollTop = 0; });
+  await edGo(page, 'base');
+  await page.waitForSelector('.gw .gw-basepage .dir-row');
+  assert.equal(await page.locator('.gw .gw-basepage .dir .dir-group').count(), 0, '거점 탭은 조직 제목 없음');
   if (shots) await page.screenshot({ path: `${shots}/17b-bases-${m}.png` });
   assert.deepEqual(errors, []);
   await page.close();
