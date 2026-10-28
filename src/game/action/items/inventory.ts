@@ -1,15 +1,10 @@
-import { AMMO_PICKUP, ITEMS, RELICS, SIGNATURES, WEAPONS, type ItemEffect } from './data';
-/** 출동 하나 동안 요원이 들고 다니는 것. JSON 그대로 저장된다. DOM·엔진과 무관. */
+import { AMMO_PICKUP, ITEMS, SIGNATURES, WEAPONS, type ItemEffect } from './data';
+/** 한 판 동안 요원이 들고 다니는 것. JSON 그대로 저장된다. DOM·엔진과 무관.
+ * 옛 출동 현금·이상 파편·사채·회수물 가방은 2026-10-28에 지웠다. */
 
 export interface Slot {
   id: string;
   n: number;
-}
-export interface BagEntry {
-  id: string;
-  name: string;
-  value: number;
-  research: number;
 }
 export interface Held {
   id: string;
@@ -20,8 +15,6 @@ export interface ItemRun {
   agent: string;
   /** 1~4번 소모품. 칸 하나에 한 종류만 겹친다. */
   loadout: (Slot | null)[];
-  /** 회수물 가방 6칸 */
-  bag: (BagEntry | null)[];
   /** 고유 원거리 탄: 장전 수, 예비, 재장전 남은 시간 */
   mag: number;
   reserve: number;
@@ -31,10 +24,6 @@ export interface ItemRun {
   held: Held | null;
   /** 들고 있는 환경 물건(던지기 전) */
   carry: { prop: string; hp: number } | null;
-  cash: number;
-  shards: number;
-  /** 신유리 사채. 귀환 후 본부가 예산으로 갚는다. */
-  debt: number;
   /** 부적: 피격 무효 남은 횟수 */
   ward: number;
   itemCd: number;
@@ -53,8 +42,7 @@ export interface UseContext {
   gauge?: number;
 }
 
-export const SLOT_COUNT = 4,
-  BAG_COUNT = 6;
+export const SLOT_COUNT = 4;
 
 export function createItemRun(agent: string, loadout?: (Slot | null)[]): ItemRun {
   const sig = SIGNATURES[agent] ?? SIGNATURES.jyaldi;
@@ -66,16 +54,12 @@ export function createItemRun(agent: string, loadout?: (Slot | null)[]): ItemRun
   return {
     agent: sig.agent,
     loadout: slots,
-    bag: new Array(BAG_COUNT).fill(null),
     mag: sig.mag,
     reserve: sig.reserve,
     reloadT: 0,
     shotCd: 0,
     held: null,
     carry: null,
-    cash: 0,
-    shards: 0,
-    debt: 0,
     ward: 0,
     itemCd: 0,
   };
@@ -148,14 +132,6 @@ export function consumeWard(run: ItemRun): boolean {
   return true;
 }
 
-export function addRelic(run: ItemRun, id: string): boolean {
-  const def = RELICS[id];
-  const i = run.bag.indexOf(null);
-  if (!def || i < 0) return false;
-  run.bag[i] = { id, name: def.name, value: def.value, research: def.research };
-  return true;
-}
-export const bagFree = (run: ItemRun) => run.bag.filter(b => !b).length;
 
 /** 기존 엔진의 회복 조각 효과. 바닥에서 받을 수량 판정과 실제 HP 적용이 같은 값을 쓴다. */
 export const pickupHealAmount = (max: number, amount = 1) => max * 0.08 * amount;

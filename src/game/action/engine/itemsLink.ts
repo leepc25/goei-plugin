@@ -1,4 +1,4 @@
-// 아이템 모듈(items/) 연결: 1~4 소모품, 처치 드랍·자동 줍기(현금·파편·회복·탄·아이템·회수물), 섬광·연막 투척, 탄약 맞추기.
+// 아이템 모듈(items/) 연결: 1~4 소모품, 처치 드랍·자동 줍기(회복·탄·아이템), 섬광·연막 투척, 탄약 맞추기.
 // 환경 물건 들기(E)·던지기(A), 임시 무기 줍기(E)·휘두르기(A)·쏘기(S). 든 것은 캐릭터 그림과 따로 손 고정점에 그린다.
 import type { StatusSet } from '../../combat/status';
 import { drawItemHeld } from '../art/items';
@@ -11,7 +11,6 @@ import {
   createField,
   createItemRun,
   addItem,
-  addRelic,
   itemHit,
   pickupHealAmount,
   slowAt,
@@ -20,12 +19,6 @@ import {
   spawnEnemyDrops,
   strikeProps,
   furnishFloor,
-  openShop,
-  createShopPanel,
-  VENDORS,
-  type ShopPanel,
-  type Shop,
-  type VendorId,
   type EnemyDrop,
   stepField,
   toGameEvents,
@@ -123,14 +116,6 @@ function drawPropSized(c: CanvasRenderingContext2D, id: string, x: number, y: nu
   return true;
 }
 
-// 중림 상인 거래 창 (무대 위에 겹침). 열려 있으면 전투를 멈춘다: modules.ts의 blocking에서 itemsBlocking()
-let shopPanel: ShopPanel | null = null;
-export const itemsBlocking = () => !!shopPanel?.isOpen();
-export function mountItemsOverlay(root: HTMLElement) {
-  shopPanel?.dispose();
-  shopPanel = createShopPanel(root);
-  return () => (shopPanel?.dispose(), (shopPanel = null));
-}
 
 export function linkItems(w: World, run: RunConfigCore & { launch?: { items?: ({ id: string; n: number } | null)[] } }) {
   const loadout = run.launch?.items ?? [{ id: 'medkit', n: 2 }, { id: 'flash', n: 2 }, { id: 'adrenaline', n: 1 }, null];
@@ -142,21 +127,7 @@ export function linkItems(w: World, run: RunConfigCore & { launch?: { items?: ({
   p.reserve = ir.reserve;
   let lastReserve = ir.reserve;
   (w as unknown as { itemRun: ItemRun }).itemRun = ir;
-  w.recovery = {
-    has: id => ir.bag.some(b => b?.id === id),
-    add: id => addRelic(ir, id),
-    take: id => {
-      const i = ir.bag.findIndex(b => b?.id === id);
-      if (i < 0) return false;
-      ir.bag[i] = null;
-      return true;
-    },
-  };
   const recordInventory = () => {
-    w.notes.cash = ir.cash;
-    w.notes.shards = ir.shards;
-    w.notes.debt = ir.debt;
-    w.notes.bag = ir.bag.map(b => b ? { ...b } : null);
     w.notes.itemsLeft = ir.loadout.map(s => s ? { ...s } : null);
   };
   (w as unknown as { itemField: () => Field }).itemField = () => field;
@@ -331,29 +302,6 @@ export function linkItems(w: World, run: RunConfigCore & { launch?: { items?: ({
     }
   });
 
-  // 중림 상인: 층 모듈의 merchant 소품 앞 E
-  let shopSeed = run.seed ^ 0x5151;
-  const shops = new Map<string, Shop>();
-  w.interactHooks.push((prop) => {
-    if (prop?.kind !== 'merchant' || !shopPanel || shopPanel.isOpen()) return;
-    const ids = Object.keys(VENDORS) as VendorId[];
-    const vendor = ids.find((v) => prop.label?.includes(VENDORS[v].name)) ?? 'madeokhee';
-    const shopKey = JSON.stringify([w.floor.id, prop.id, vendor]);
-    let shop = shops.get(shopKey);
-    if (!shop) {
-      shop = openShop(vendor, ir, w.floor?.depth ?? 1, shopSeed + (w.floors | 0) * 131);
-      shops.set(shopKey, shop);
-    }
-    lastReserve = ir.reserve = p.reserve;
-    shopPanel.open(shop, ir, (r) => {
-      if (r.heal) p.hp = Math.min(p.hpMax, p.hp + p.hpMax * r.heal);
-      if (r.hpCost) p.hp = Math.max(1, p.hp - p.hpMax * r.hpCost);
-      apply([]);
-      syncCarry();
-      w.emit({ type: 'pickup', x: p.x, id: 'shop' });
-    }, () => w.say(VENDORS[vendor].bye, 2), () => ({ hp: p.hp, max: p.hpMax }));
-  });
-
   const hitSeen = new Set<string>();
   const overlapT = new WeakMap<object, number>();
   const lastX = new WeakMap<object, number>();
@@ -393,16 +341,15 @@ export function linkItems(w: World, run: RunConfigCore & { launch?: { items?: ({
     configurable: true,
   });
   w.itemState = {
-    snapshot: () => ({ inventory: ir, fields: [...fields], current: w.floor.id, lastReserve, shopSeed, shops: [...shops] }),
+    snapshot: () => ({ inventory: ir, fields: [...fields], current: w.floor.id, lastReserve }),
     restore(value) {
-      const s = value as { inventory: ItemRun; fields: [string, Field][]; current: string; lastReserve: number; shopSeed: number; shops?: [string, Shop][] };
+      const s = value as { inventory: ItemRun; fields: [string, Field][]; current: string; lastReserve: number };
       if (!s?.inventory || !Array.isArray(s.fields)) throw new Error('손상된 아이템 저장');
       Object.assign(ir, s.inventory);
       fields.clear(); for (const [k, v] of s.fields) fields.set(k, v);
       field = fields.get(s.current)!;
       if (!field) throw new Error('방 아이템 저장 누락');
-      lastReserve = s.lastReserve; shopSeed = s.shopSeed;
-      shops.clear(); for (const [k, v] of s.shops ?? []) shops.set(k, v);
+      lastReserve = s.lastReserve;
       syncSlots(); syncCarry();
     },
   };

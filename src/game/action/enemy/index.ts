@@ -2,7 +2,6 @@
 //   createEnemy(kind, x, y, rng, opts?)  → Enemy (엔진 Body: frame()·step()·applyHit()·draw())
 //   stepEnemies(world)                   → 모든 적 한 틱 (Body.step을 엔진이 직접 부르면 안 불러도 된다. 같은 틱 두 번은 무시)
 //   applyHit(enemy, hit, world)          → {kind, killed}
-//   spawnWave(budget, floorType, depth, rng, area?) → 파도별 SpawnSpec (위협 예산)
 //   signalEnemies(world, signal)         → 규칙 이행 신호 (인사·잘 먹었습니다·틈새 막기·그릇·문 닫기)
 //   setDropHook(fn)                      → 처치 드랍 (아이템 모듈 dropFromKill과 연결)
 //   isThreat(body)                       → 싸움 구간을 막는 적인가 (평화로운 주민·수호자 대기 상태는 아님)
@@ -17,7 +16,6 @@ import type { Body, Hit, HitResult, RuleSignal, WorldView } from './types';
 
 export { Enemy } from './enemy';
 export { ROSTER, ROSTER_BY_KIND } from './roster';
-export { budgetFor, planEncounter, spawnWave, rollIntrusion, poolFor, SCREEN_CAP } from './spawn';
 export { setDropHook, rollDrops, DROP_LABEL } from './drops';
 export { moveJson, moveTiming } from './frames';
 export { arenaStage } from './arenaStage';

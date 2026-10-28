@@ -13,8 +13,8 @@ import { charSize } from '../charSize';
 
 export { Fx, Hud, InputHub, Menu, PadReader, TouchPad, choiceScreen };
 export type { FxEvent, TransitionKind } from './fx';
-export type { HudState, HudItem, MapState } from './hud';
-export { drawHud, drawMap, label, plate, font, FONT, setHudItemIcon, drawHudItemIcon, statusHtml } from './hud';
+export type { HudState, HudItem } from './hud';
+export { drawHud, label, plate, font, FONT, setHudItemIcon, drawHudItemIcon, statusHtml } from './hud';
 export type { UiSettings } from './settings';
 export { W, H, mountStage } from './stage';
 export { drawTitleBg, drawGoSign } from './title';

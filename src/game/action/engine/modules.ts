@@ -21,10 +21,9 @@ import { syncNavigationButton } from '../ui/navigationButton';
 import type { Body, GameEvent, HqModuleLike, StageModule } from './contract';
 import type { EngineModules, Game } from './game';
 import { DEF_BY_KIND, arenaStage, createEnemy, isThreat } from '../enemy';
-import { bindEnemyInteractions } from './enemyInteractions';
 import { CUTSCENES, VIDEOS, mountStory, type AgentId, type StoryApi } from '../story';
 import type { SpeakerId } from '../story/types';
-import { itemsBlocking, linkItems, mountItemsOverlay } from './itemsLink';
+import { linkItems } from './itemsLink';
 import { makeHub, silhouette, type HubHost, type HubLife } from './hub';
 import { createHqWorld, hqDistrict } from '../../world/hq';
 import { isRegionMove } from '../../world/districts';
@@ -341,8 +340,6 @@ function hudState(w: World, shell: Shell): HudState {
     items: w.items.map((it) => ({ id: it?.id, label: it?.label ?? '', count: it?.n ?? 0 })),
     field: fieldClock.sec !== null || fieldClock.place || (w.stage?.id === 'hq' && fieldWallet.won !== null) ? { clock: fieldClock.sec === null ? undefined : clockText(fieldClock.sec), place: fieldClock.place || undefined, wallet: fieldWallet.won === null ? undefined : wonText(fieldWallet.won) } : undefined,
     floor: { depth: '', name: f.title },
-    favor: 0,
-    money: { cash: (w.notes.cash as number | undefined) ?? 0, budget: 0, research: 0, teeth: 0 },
     boss: boss ? { name: boss.label, hp: boss.hp, max: boss.hpMax } : null,
     // 아래 자막은 3초까지만 (바닥 띠를 오래 가리지 않게)
     message: w.subtitle && w.tick - w.subtitleAt < 90 ? w.subtitle.text : undefined,
@@ -493,7 +490,6 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
   shell.stage.root.appendChild(storyRoot);
   const attachVideoAudio = (event: Event) => audio.attachMedia((event as CustomEvent<VideoTrack>).detail);
   storyRoot.addEventListener(VIDEO_AUDIO_EVENT, attachVideoAudio);
-  const unmountItems = mountItemsOverlay(shell.stage.root);
   const savedFlags = (() => {
     try {
       return JSON.parse(localStorage.getItem('goei-game-story') ?? 'null') ?? undefined;
@@ -704,7 +700,7 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
     hq,
     hqLayer: () => shell.stage.ui,
     hud: false,
-    blocking: () => !!visit?.isOpen() || story.isBlocking() || itemsBlocking() || !floorBox.hidden || npc.isOpen() || !!fieldShop?.isOpen(),
+    blocking: () => !!visit?.isOpen() || story.isBlocking() || !floorBox.hidden || npc.isOpen() || !!fieldShop?.isOpen(),
     covered: () => story.isVideoPlaying(),
     listeners,
     surface: { canvas: shell.canvas, ctx: shell.ctx },
@@ -820,7 +816,6 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
       w.hitFx = false; // 맞을 때 효과는 껍데기 fx가 그린다
       if (run.stageId === 'hq') return void npc.attach(w, { hub: (hq.hub?.() ?? null) as never, hq: true }); // 본부 걷기: 아이템·대사 안내·전투 기록 없음
       w.threat = (b) => (DEF_BY_KIND[b.kind] ? isThreat(b as never) : true);
-      bindEnemyInteractions(w);
       w.on((e) => {
         if (e.type !== 'custom') return;
         const d = (e.data ?? {}) as { dmg?: number; text?: string; kind?: string; ticks?: number; debuff?: { kind?: string; ticks?: number } };
@@ -843,7 +838,6 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
     dispose: () => {
       offHidden?.();
       npc.dispose();
-      unmountItems();
       const g = globalThis as { __goeiStory?: unknown; __goeiStoryStart?: unknown; __goeiNpc?: unknown };
       delete g.__goeiStory;
       delete g.__goeiNpc;

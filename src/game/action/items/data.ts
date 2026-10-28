@@ -150,28 +150,9 @@ export const PROPS: Record<string, PropDef> = {
 };
 
 // ---------- 줍는 것 (바닥 드랍) ----------
-export type PickupKind = 'cash' | 'shard' | 'heal' | 'ammo' | 'item' | 'relic' | 'weapon';
-export interface RelicDef {
-  id: string;
-  name: string;
-  /** 중림 매입가 */
-  value: number;
-  /** 본부 감정 시 연구 자료 */
-  research: number;
-  rare?: boolean;
-}
-/** 회수물: 가방 6칸을 차지한다(14장). */
-export const RELICS: Record<string, RelicDef> = {
-  scrap: { id: 'scrap', name: '장비 조각', value: 20, research: 2 },
-  oddcoin: { id: 'oddcoin', name: '뒤집힌 동전', value: 35, research: 4 },
-  rustkey: { id: 'rustkey', name: '녹슨 승강기 열쇠', value: 45, research: 6 },
-  photo: { id: 'photo', name: '얼굴 없는 사진', value: 40, research: 8 },
-  checklist: { id: 'checklist', name: '서명란이 빈 점검표', value: 40, research: 8 },
-  tooth: { id: 'tooth', name: '누군가의 이빨', value: 25, research: 5 },
-  dreamcatcher: { id: 'dreamcatcher', name: '꿈결 수집기', value: 120, research: 30, rare: true },
-  blackbox: { id: 'blackbox', name: '승강기 블랙박스', value: 150, research: 40, rare: true },
-};
-/** 줍는 반경. 현금·파편·회복 조각·탄약은 작게 자동 흡수, 나머지는 E. */
+// 옛 출동 현금·이상 파편·회수물(가방·감정)은 차원 승강기 출동과 같이 지웠다 (2026-10-28).
+export type PickupKind = 'heal' | 'ammo' | 'item' | 'weapon';
+/** 줍는 반경. 회복 조각·탄약은 작게 자동 흡수, 나머지는 E. */
 export const PICKUP = { magnet: 46, touch: 30, interact: 80 } as const;
 
 // ---------- 드랍 표 ----------
@@ -179,146 +160,59 @@ export interface DropEntry {
   /** 나올 확률(0~1). 1이면 확정 */
   p: number;
   kind: PickupKind;
-  /** 현금 범위, 파편 수, 아이템·회수물·무기 후보 */
   min?: number;
   max?: number;
+  /** 아이템·무기 후보 */
   pool?: string[];
 }
 export const DROP_TABLES: Record<string, DropEntry[]> = {
   // 적 (기본 기획서 11.2)
   anomaly: [
-    { p: 0.7, kind: 'cash', min: 2, max: 6 },
     { p: 0.15, kind: 'heal' },
-    { p: 1, kind: 'shard', min: 1, max: 2 },
     { p: 0.12, kind: 'ammo' },
-    { p: 0.02, kind: 'relic', pool: ['scrap', 'oddcoin', 'tooth', 'photo'] },
   ],
   fakeAgent: [
-    { p: 0.9, kind: 'cash', min: 6, max: 14 },
     { p: 0.1, kind: 'heal' },
-    { p: 1, kind: 'shard', min: 1, max: 1 },
     { p: 0.3, kind: 'ammo' },
-    { p: 0.05, kind: 'relic', pool: ['scrap'] },
     { p: 0.06, kind: 'item', pool: ['flash', 'bandage'] },
   ],
   gunner: [
-    { p: 0.9, kind: 'cash', min: 6, max: 14 },
-    { p: 1, kind: 'shard', min: 1, max: 1 },
     { p: 0.45, kind: 'ammo' },
     { p: 0.3, kind: 'weapon', pool: ['smg'] },
     { p: 0.08, kind: 'weapon', pool: ['servicepistol', 'shotgun'] },
   ],
   swordsman: [
-    { p: 0.9, kind: 'cash', min: 8, max: 16 },
-    { p: 1, kind: 'shard', min: 1, max: 2 },
     { p: 0.5, kind: 'weapon', pool: ['katana'] },
   ],
   daydream: [
-    { p: 1, kind: 'cash', min: 14, max: 26 },
     { p: 0.1, kind: 'heal' },
-    { p: 1, kind: 'shard', min: 1, max: 1 },
-    { p: 0.03, kind: 'relic', pool: ['dreamcatcher'] },
   ],
   midboss: [
-    { p: 1, kind: 'cash', min: 30, max: 50 },
     { p: 1, kind: 'heal' },
-    { p: 1, kind: 'shard', min: 5, max: 5 },
     { p: 1, kind: 'ammo' },
-    { p: 1, kind: 'relic', pool: ['rustkey', 'photo', 'oddcoin'] },
   ],
   boss: [
-    { p: 1, kind: 'cash', min: 80, max: 120 },
     { p: 1, kind: 'heal' },
-    { p: 1, kind: 'shard', min: 10, max: 10 },
     { p: 1, kind: 'ammo' },
-    { p: 1, kind: 'relic', pool: ['blackbox'] },
   ],
   // 부서지는 물건
-  junk: [{ p: 0.35, kind: 'cash', min: 1, max: 3 }],
+  junk: [],
   crate: [
-    { p: 0.6, kind: 'cash', min: 2, max: 8 },
     { p: 0.25, kind: 'item', pool: ['medkit', 'bandage', 'salt', 'flash'] },
     { p: 0.25, kind: 'ammo' },
     { p: 0.15, kind: 'weapon', pool: ['pipe', 'chairleg', 'kitchenknife'] },
   ],
   drawer: [
-    { p: 0.8, kind: 'cash', min: 4, max: 12 },
     { p: 0.3, kind: 'item', pool: ['bandage', 'antidote', 'painkiller', 'sedative', 'energy'] },
-    { p: 0.1, kind: 'relic', pool: ['photo', 'tooth', 'oddcoin'] },
     { p: 0.12, kind: 'weapon', pool: ['kitchenknife'] },
   ],
-  mailbox: [
-    { p: 0.7, kind: 'cash', min: 3, max: 10 },
-    { p: 0.15, kind: 'relic', pool: ['photo', 'rustkey'] },
-  ],
+  mailbox: [],
   locker: [
     { p: 1, kind: 'ammo' },
     { p: 0.7, kind: 'item', pool: ['medkit', 'flash', 'smoke', 'charm'] },
     { p: 0.25, kind: 'weapon', pool: ['servicepistol', 'shotgun', 'pipe'] },
   ],
   hidden: [
-    { p: 1, kind: 'cash', min: 20, max: 40 },
     { p: 1, kind: 'item', pool: ['medkit', 'charm', 'adrenaline'] },
-    { p: 0.6, kind: 'relic', pool: ['rustkey', 'oddcoin', 'photo'] },
   ],
 };
-
-// ---------- 중림 상인 ----------
-export type VendorId = 'madeokhee' | 'backalley' | 'shinyuri' | 'vending';
-export interface VendorDef {
-  id: VendorId;
-  name: string;
-  title: string;
-  /** 출동 중 휴식방에 나올 확률 */
-  appear: number;
-  greet: string[];
-  bye: string;
-}
-export const VENDORS: Record<VendorId, VendorDef> = {
-  madeokhee: {
-    id: 'madeokhee',
-    name: '마덕희',
-    title: '중림 상인',
-    appear: 0.35,
-    greet: ['현금만 받아요. 관리국 결재는 여기서 안 통하고.', '주운 거 있으면 보여 줘요. 값은 내가 매겨.'],
-    bye: '또 살아서 오면 단골 해 줄게.',
-  },
-  backalley: {
-    id: 'backalley',
-    name: '고연지·윤지아',
-    title: '중림 뒷골목 의사',
-    appear: 0.12,
-    greet: ['어디 찢어졌어? 보여 줘 봐.', '선불이야. 마취는 별도고.'],
-    bye: '다음엔 덜 다쳐서 와.',
-  },
-  shinyuri: {
-    id: 'shinyuri',
-    name: '신유리',
-    title: '중림 사채',
-    appear: 0.1,
-    greet: ['급하지? 돈은 있어. 이자도 있고.', '관리국 예산으로 갚으면 돼. 못 갚으면 물건으로 받고.'],
-    bye: '날짜 잊지 마.',
-  },
-  vending: {
-    id: 'vending',
-    name: '무엇이든 자판기',
-    title: '특수 장소',
-    appear: 0.08,
-    greet: ['[동전을 넣으십시오. 또는 다른 것을.]'],
-    bye: '[이용해 주셔서 감사합니다.]',
-  },
-};
-/** 의사 시술 */
-export const CLINIC = [
-  { id: 'patch', name: '응급 봉합', price: 40, desc: '체력 50% 회복, 출혈 제거', heal: 0.5, cure: ['bleed'] as string[] },
-  { id: 'full', name: '전신 처치', price: 110, desc: '체력 전부 회복, 부상 제거', heal: 1, cure: ['bleed', 'injury'] },
-  { id: 'purge', name: '오염 세척', price: 90, desc: '오염 전부 제거', heal: 0, cure: ['taint'] },
-];
-/** 사채: 받는 현금 → 귀환 후 갚을 예산 */
-export const LOANS = [
-  { cash: 60, debt: 90 },
-  { cash: 120, debt: 190 },
-  { cash: 200, debt: 330 },
-];
-/** 깊이(층)마다 값이 오른다 */
-export const priceAt = (base: number, depth: number) => Math.round(base * (1 + Math.min(depth, 20) * 0.04));

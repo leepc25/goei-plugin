@@ -74,7 +74,7 @@ export interface Move {
 
 /** 드랍 (기본 기획서 11장). 줍기·가방은 아이템 모듈 몫이고 여기서는 굴린 결과만 넘긴다. */
 export interface Drop {
-  item: 'cash' | 'heal' | 'shard' | 'relic' | 'ammo' | 'dream' | 'key' | 'upgrade';
+  item: 'heal' | 'ammo';
   n: number;
 }
 
