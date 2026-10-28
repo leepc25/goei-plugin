@@ -363,7 +363,7 @@
   },
   "heat": false
  },
- "skills": {
+ "skills_2판": {
   "skill": {
    "name": "야 저거 봤냐",
    "anim": "22",
@@ -501,6 +501,274 @@
         "kind": "light"
        },
        "spread": 0.1
+      }
+     ]
+    }
+   ]
+  }
+ },
+ "skills": {
+  "skill": {
+   "name": "야 저거 봤냐",
+   "anim": "22",
+   "fps": 10,
+   "armed": true,
+   "events": [
+    {
+     "f": 3,
+     "fx": [
+      {
+       "t": "v",
+       "vfx": "x3-c-muzzle-flash",
+       "at": "hand",
+       "dx": 10,
+       "scale": 1
+      },
+      {
+       "t": "proj",
+       "kind": "bullet",
+       "hit": {
+        "dmg": 30,
+        "kind": "light"
+       }
+      },
+      {
+       "t": "dash",
+       "speed": 420,
+       "time": 0.1,
+       "hit": null
+      }
+     ]
+    },
+    {
+     "f": 4,
+     "fx": [
+      {
+       "t": "v",
+       "vfx": "x3-c-muzzle-flash",
+       "at": "hand",
+       "dx": 10,
+       "scale": 1
+      },
+      {
+       "t": "proj",
+       "kind": "bullet",
+       "hit": {
+        "dmg": 30,
+        "kind": "light"
+       }
+      },
+      {
+       "t": "dash",
+       "speed": 420,
+       "time": 0.1,
+       "hit": null
+      }
+     ]
+    },
+    {
+     "f": 6,
+     "hold": 0.12,
+     "fx": [
+      {
+       "t": "v",
+       "vfx": "x3-c-muzzle-flash",
+       "at": "hand",
+       "dx": 10,
+       "scale": 1
+      },
+      {
+       "t": "proj",
+       "kind": "bullet",
+       "hit": {
+        "dmg": 45,
+        "kind": "heavy"
+       }
+      },
+      {
+       "t": "dash",
+       "speed": 420,
+       "time": 0.1,
+       "hit": null
+      }
+     ]
+    }
+   ]
+  },
+  "charge": {
+   "name": "주운 거 다 써",
+   "hold": "23",
+   "release": "24",
+   "armed": false,
+   "levels": [
+    0.5,
+    1.2
+   ],
+   "fire": 3,
+   "releaseLv": {
+    "0": "10",
+    "1": "13",
+    "2": "12"
+   },
+   "fireLv": {
+    "0": 5,
+    "1": 2,
+    "2": 4
+   },
+   "lv": {
+    "0": [
+     {
+      "t": "melee",
+      "range": 150,
+      "hit": {
+       "dmg": 55,
+       "kind": "stun",
+       "n": 2,
+       "every": 0.14,
+       "mid": "light",
+       "vfx": "x3-c-hit-spark-light",
+       "vs": 2
+      }
+     }
+    ],
+    "1": [
+     {
+      "t": "dash",
+      "speed": 1300,
+      "time": 0.35,
+      "hit": {
+       "dmg": 85,
+       "kind": "down",
+       "stop": 0.14,
+       "shake": 12,
+       "vfx": "x3-c-hit-spark-heavy",
+       "vs": 0.7
+      }
+     },
+     {
+      "t": "later",
+      "in": 0.38,
+      "fx": [
+       {
+        "t": "v",
+        "vfx": "x3-c-dust-puff",
+        "at": "self",
+        "scale": 1.2,
+        "tint": "#d8cfc0"
+       }
+      ]
+     }
+    ],
+    "2": [
+     {
+      "t": "melee",
+      "range": 140,
+      "hit": {
+       "dmg": 130,
+       "kind": "blow",
+       "stop": 0.2,
+       "shake": 16,
+       "vfx": "x3-c-hit-spark-heavy",
+       "vs": 0.7
+      }
+     },
+     {
+      "t": "later",
+      "in": 0.15,
+      "fx": [
+       {
+        "t": "v",
+        "vfx": "x3-c-dust-puff",
+        "at": "self",
+        "scale": 1,
+        "tint": "#d8cfc0"
+       }
+      ]
+     }
+    ]
+   }
+  },
+  "super": {
+   "name": "생환 기록",
+   "sub": "「나 방금 멋있지 않았냐?」",
+   "anim": "25",
+   "fps": 8,
+   "armed": true,
+   "events": [
+    {
+     "f": 2,
+     "hold": 0.35,
+     "fx": [
+      {
+       "t": "v",
+       "vfx": "x3-c-dust-puff",
+       "at": "self",
+       "scale": 1,
+       "tint": "#d8cfc0"
+      }
+     ]
+    },
+    {
+     "f": 7,
+     "to": 11,
+     "rep": 3,
+     "d": 0.07,
+     "fx": [
+      {
+       "t": "v",
+       "vfx": "x3-c-muzzle-flash",
+       "at": "hand",
+       "dx": 10,
+       "scale": 1
+      },
+      {
+       "t": "proj",
+       "kind": "bullet",
+       "hit": {
+        "dmg": 5,
+        "kind": "light"
+       },
+       "spread": 0.5
+      },
+      {
+       "t": "dash",
+       "speed": 160,
+       "time": 0.07,
+       "hit": null
+      }
+     ]
+    },
+    {
+     "f": 12,
+     "hold": 0.6,
+     "fx": [
+      {
+       "t": "v",
+       "vfx": "x3-c-muzzle-flash",
+       "at": "hand",
+       "dx": 10,
+       "scale": 2
+      },
+      {
+       "t": "repeat",
+       "n": 8,
+       "every": 0.04,
+       "fx": [
+        {
+         "t": "proj",
+         "kind": "bullet",
+         "big": true,
+         "hit": {
+          "dmg": 12,
+          "kind": "down"
+         },
+         "spread": 0.6
+        }
+       ]
+      },
+      {
+       "t": "shake",
+       "v": 14
       }
      ]
     }

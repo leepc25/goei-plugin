@@ -408,7 +408,7 @@
   "heat": false,
   "_note": "짧게 화염"
  },
- "skills": {
+ "skills_2판": {
   "skill": {
    "name": "화염방사",
    "anim": "22",
@@ -578,6 +578,473 @@
       {
        "t": "text",
        "v": "채점 중…"
+      }
+     ]
+    }
+   ]
+  }
+ },
+ "skills": {
+  "skill": {
+   "name": "화염방사",
+   "anim": "22",
+   "fps": 8,
+   "armed": true,
+   "events": [
+    {
+     "f": 3,
+     "hold": 0.75,
+     "fx": [
+      {
+       "t": "v",
+       "vfx": "x3-2.12-D-flamethrower",
+       "at": "hand",
+       "dx": 150,
+       "scale": 1,
+       "rot": 0.22,
+       "loop": 0.35,
+       "fade": 0.15,
+       "r": 150,
+       "hit": {
+        "dmg": 110,
+        "kind": "launch",
+        "n": 6,
+        "every": 0.12,
+        "mid": "light",
+        "stop": 0.04,
+        "shake": 4
+       }
+      },
+      {
+       "t": "later",
+       "in": 0.35,
+       "fx": [
+        {
+         "t": "v",
+         "vfx": "x3-2.12-D-flamethrower",
+         "at": "hand",
+         "dx": 150,
+         "scale": 1,
+         "rot": -0.18,
+         "loop": 0.35,
+         "fade": 0.15,
+         "r": 150
+        }
+       ]
+      },
+      {
+       "t": "v",
+       "vfx": "x3-c-smoke",
+       "at": "front",
+       "dx": 330,
+       "dy": -60,
+       "scale": 0.8,
+       "tint": "#3a3634",
+       "fade": 0.6
+      }
+     ]
+    }
+   ]
+  },
+  "charge": {
+   "name": "수류탄",
+   "hold": "23",
+   "release": "24",
+   "levels": [
+    0.5,
+    1.2
+   ],
+   "fire": 2,
+   "lv": {
+    "0": [
+     {
+      "t": "lob",
+      "n": 1,
+      "dist": 200,
+      "time": 0.5,
+      "fuse": 0.6,
+      "end": [
+       {
+        "t": "v",
+        "vfx": "x3-c-explosion-small",
+        "scale": 2.5,
+        "tint": "#ffb04a",
+        "boom": 2,
+        "r": 40,
+        "hit": {
+         "dmg": 45,
+         "kind": "heavy",
+         "stop": 0.12,
+         "shake": 10
+        }
+       },
+       {
+        "t": "v",
+        "vfx": "x3-c-ground-crack",
+        "scale": 0.3,
+        "under": true,
+        "fade": 0.5
+       },
+       {
+        "t": "v",
+        "vfx": "x3-c-smoke",
+        "dy": -40,
+        "scale": 0.8,
+        "tint": "#5a5450",
+        "fade": 0.6
+       }
+      ]
+     }
+    ],
+    "1": [
+     {
+      "t": "lob",
+      "n": 1,
+      "dist": 500,
+      "time": 0.8,
+      "fuse": 0.2,
+      "end": [
+       {
+        "t": "v",
+        "vfx": "x3-c-explosion-small",
+        "scale": 3.6,
+        "tint": "#ffb04a",
+        "boom": 2,
+        "r": 40,
+        "hit": {
+         "dmg": 75,
+         "kind": "launch",
+         "stop": 0.12,
+         "shake": 10
+        }
+       },
+       {
+        "t": "v",
+        "vfx": "x3-c-ground-crack",
+        "scale": 0.45,
+        "under": true,
+        "fade": 0.5
+       },
+       {
+        "t": "v",
+        "vfx": "x3-c-smoke",
+        "dy": -40,
+        "scale": 0.8,
+        "tint": "#5a5450",
+        "fade": 0.6
+       }
+      ]
+     }
+    ],
+    "2": [
+     {
+      "t": "lob",
+      "n": 1,
+      "dist": 400,
+      "spread": 0,
+      "time": 0.7,
+      "fuse": 0.6,
+      "end": [
+       {
+        "t": "v",
+        "vfx": "x3-c-explosion-small",
+        "scale": 3,
+        "tint": "#ffb04a",
+        "boom": 2,
+        "r": 40,
+        "hit": {
+         "dmg": 40,
+         "kind": "launch",
+         "stop": 0.12,
+         "shake": 10
+        }
+       },
+       {
+        "t": "v",
+        "vfx": "x3-c-ground-crack",
+        "scale": 0.3,
+        "under": true,
+        "fade": 0.5
+       },
+       {
+        "t": "v",
+        "vfx": "x3-c-smoke",
+        "dy": -40,
+        "scale": 0.8,
+        "tint": "#5a5450",
+        "fade": 0.6
+       }
+      ]
+     },
+     {
+      "t": "later",
+      "in": 0.03,
+      "fx": [
+       {
+        "t": "lob",
+        "n": 1,
+        "dist": 600,
+        "time": 0.75,
+        "fuse": 0.3,
+        "end": [
+         {
+          "t": "v",
+          "vfx": "x3-c-explosion-small",
+          "scale": 3,
+          "tint": "#ffb04a",
+          "boom": 2,
+          "r": 40,
+          "hit": {
+           "dmg": 40,
+           "kind": "launch",
+           "stop": 0.12,
+           "shake": 10
+          }
+         },
+         {
+          "t": "v",
+          "vfx": "x3-c-ground-crack",
+          "scale": 0.3,
+          "under": true,
+          "fade": 0.5
+         },
+         {
+          "t": "v",
+          "vfx": "x3-c-smoke",
+          "dy": -40,
+          "scale": 0.8,
+          "tint": "#5a5450",
+          "fade": 0.6
+         }
+        ]
+       }
+      ]
+     },
+     {
+      "t": "later",
+      "in": 0.06,
+      "fx": [
+       {
+        "t": "lob",
+        "n": 1,
+        "dist": 800,
+        "time": 0.8,
+        "fuse": 0.0,
+        "end": [
+         {
+          "t": "v",
+          "vfx": "x3-c-explosion-small",
+          "scale": 3,
+          "tint": "#ffb04a",
+          "boom": 2,
+          "r": 40,
+          "hit": {
+           "dmg": 40,
+           "kind": "down",
+           "stop": 0.12,
+           "shake": 10
+          }
+         },
+         {
+          "t": "v",
+          "vfx": "x3-c-ground-crack",
+          "scale": 0.3,
+          "under": true,
+          "fade": 0.5
+         },
+         {
+          "t": "v",
+          "vfx": "x3-c-smoke",
+          "dy": -40,
+          "scale": 0.8,
+          "tint": "#5a5450",
+          "fade": 0.6
+         }
+        ]
+       }
+      ]
+     }
+    ]
+   }
+  },
+  "super": {
+   "name": "채점 중",
+   "sub": "「칭찬은 끝까지 듣고 해.」",
+   "anim": "25",
+   "fps": 7,
+   "armed": true,
+   "events": [
+    {
+     "f": 2,
+     "hold": 0.3,
+     "fx": [
+      {
+       "t": "summon",
+       "icon": "decoy",
+       "anim": "15",
+       "at": "target",
+       "dx": -130,
+       "time": 2.6,
+       "color": "#ffb066",
+       "alpha": 0.85,
+       "over": 0.3,
+       "tick": {
+        "every": 0.7,
+        "fx": [
+         {
+          "t": "v",
+          "vfx": "x3-2.12-D-flamethrower",
+          "at": "hand",
+          "dx": 90,
+          "scale": 0.6,
+          "loop": 0.25,
+          "fade": 0.1,
+          "r": 90,
+          "hit": {
+           "dmg": 24,
+           "kind": "heavy",
+           "n": 2,
+           "every": 0.1,
+           "mid": "light"
+          }
+         }
+        ]
+       }
+      },
+      {
+       "t": "later",
+       "in": 0.25,
+       "fx": [
+        {
+         "t": "summon",
+         "icon": "decoy",
+         "anim": "15",
+         "at": "target",
+         "dx": -220,
+         "time": 2.4,
+         "color": "#ffb066",
+         "alpha": 0.85,
+         "over": 0.3,
+         "tick": {
+          "every": 0.7,
+          "fx": [
+           {
+            "t": "v",
+            "vfx": "x3-2.12-D-flamethrower",
+            "at": "hand",
+            "dx": 90,
+            "scale": 0.6,
+            "loop": 0.25,
+            "fade": 0.1,
+            "r": 90,
+            "hit": {
+             "dmg": 24,
+             "kind": "heavy",
+             "n": 2,
+             "every": 0.1,
+             "mid": "light"
+            }
+           }
+          ]
+         }
+        }
+       ]
+      },
+      {
+       "t": "later",
+       "in": 2.7,
+       "fx": [
+        {
+         "t": "v",
+         "vfx": "x3-c-explosion-large",
+         "at": "target",
+         "dx": -60,
+         "scale": 0.45,
+         "boom": 3,
+         "r": 200,
+         "hit": {
+          "dmg": 60,
+          "kind": "launch",
+          "stop": 0.16,
+          "shake": 16
+         }
+        },
+        {
+         "t": "v",
+         "vfx": "x3-c-shard-burst",
+         "at": "target",
+         "dx": -60,
+         "dy": -60,
+         "scale": 1,
+         "tint": "#d8b890"
+        },
+        {
+         "t": "later",
+         "in": 0.25,
+         "fx": [
+          {
+           "t": "v",
+           "vfx": "x3-c-explosion-large",
+           "at": "target",
+           "dx": 40,
+           "scale": 0.45,
+           "boom": 3,
+           "r": 200,
+           "hit": {
+            "dmg": 60,
+            "kind": "down",
+            "stop": 0.16,
+            "shake": 16
+           }
+          },
+          {
+           "t": "v",
+           "vfx": "x3-c-shard-burst",
+           "at": "target",
+           "dx": 40,
+           "dy": -60,
+           "scale": 1,
+           "tint": "#d8b890"
+          }
+         ]
+        },
+        {
+         "t": "shake",
+         "v": 18
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "f": 7,
+     "hold": 0.6,
+     "fx": [
+      {
+       "t": "v",
+       "vfx": "x3-c-smoke",
+       "at": "body",
+       "dx": 25,
+       "dy": -120,
+       "scale": 0.9,
+       "tint": "#d0ccc8",
+       "fade": 0.8
+      }
+     ]
+    },
+    {
+     "f": 11,
+     "hold": 0.4,
+     "fx": [
+      {
+       "t": "v",
+       "vfx": "x3-c-smoke",
+       "at": "body",
+       "dx": 20,
+       "dy": -110,
+       "scale": 0.6,
+       "tint": "#d0ccc8",
+       "fade": 0.8
       }
      ]
     }

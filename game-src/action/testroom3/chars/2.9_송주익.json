@@ -388,7 +388,7 @@
   "heat": false,
   "_note": "칼바람"
  },
- "skills": {
+ "skills_2판": {
   "skill": {
    "name": "시범 베기",
    "anim": "22",
@@ -557,6 +557,300 @@
         "stop": 0.22,
         "shake": 15
        }
+      }
+     ]
+    }
+   ]
+  }
+ },
+ "skills": {
+  "skill": {
+   "name": "시범 베기",
+   "anim": "11",
+   "fps": 11,
+   "armed": true,
+   "events": [
+    {
+     "f": 1,
+     "hold": 0.26,
+     "fx": [
+      {
+       "t": "dash",
+       "speed": 1000,
+       "time": 0.26,
+       "hit": null
+      },
+      {
+       "t": "v",
+       "vfx": "x3-c-dust-puff",
+       "at": "self",
+       "scale": 0.8,
+       "tint": "#d8d2c4"
+      }
+     ]
+    },
+    {
+     "f": 4,
+     "hold": 0.14,
+     "fx": [
+      {
+       "t": "v",
+       "vfx": "x3-c-vertical-blade-line",
+       "at": "front",
+       "dx": 95,
+       "dy": 50,
+       "scale": 0.9,
+       "tint": "#3fe0d0",
+       "r": 60,
+       "hit": {
+        "dmg": 100,
+        "kind": "down",
+        "vfx": "x3-c-hit-spark-heavy",
+        "vs": 0.8,
+        "tint": "#bff7f0"
+       }
+      },
+      {
+       "t": "v",
+       "vfx": "x3-c-ground-crack",
+       "at": "front",
+       "dx": 95,
+       "scale": 0.3,
+       "under": true,
+       "fade": 0.4
+      },
+      {
+       "t": "v",
+       "vfx": "x3-c-dust-puff",
+       "at": "front",
+       "dx": 95,
+       "scale": 0.8,
+       "tint": "#d8d2c4"
+      }
+     ]
+    }
+   ]
+  },
+  "charge": {
+   "name": "선착",
+   "hold": "23",
+   "release": "24",
+   "armed": true,
+   "levels": [
+    0.5,
+    1.2
+   ],
+   "fire": 2,
+   "lv": {
+    "0": [
+     {
+      "t": "dash",
+      "speed": 900,
+      "time": 0.15,
+      "hit": null
+     },
+     {
+      "t": "v",
+      "vfx": "x3-c-slash-arc",
+      "at": "front",
+      "dx": 100,
+      "scale": 0.6,
+      "rot": -0.6,
+      "tint": "#bff7f0",
+      "hit": {
+       "dmg": 50,
+       "kind": "light",
+       "vfx": "x3-c-hit-spark-light",
+       "vs": 2,
+       "tint": "#bff7f0"
+      }
+     }
+    ],
+    "1": [
+     {
+      "t": "dash",
+      "speed": 1500,
+      "time": 0.35,
+      "hit": {
+       "dmg": 90,
+       "kind": "heavy",
+       "vfx": "x3-c-hit-spark-heavy",
+       "vs": 0.7,
+       "tint": "#bff7f0"
+      }
+     },
+     {
+      "t": "v",
+      "vfx": "x3-c-dust-puff",
+      "at": "self",
+      "scale": 1,
+      "tint": "#d8d2c4"
+     },
+     {
+      "t": "later",
+      "in": 0.3,
+      "fx": [
+       {
+        "t": "v",
+        "vfx": "x3-c-dust-puff",
+        "at": "self",
+        "scale": 1.1,
+        "tint": "#d8d2c4"
+       }
+      ]
+     }
+    ],
+    "2": [
+     {
+      "t": "dash",
+      "speed": 1300,
+      "time": 0.55,
+      "hit": null
+     },
+     {
+      "t": "v",
+      "vfx": "x3-c-dust-puff",
+      "at": "self",
+      "scale": 1,
+      "tint": "#d8d2c4"
+     },
+     {
+      "t": "later",
+      "in": 0.2,
+      "fx": [
+       {
+        "t": "screen",
+        "spots": 2,
+        "every": 0.22,
+        "each": [
+         {
+          "t": "v",
+          "vfx": "x3-c-vertical-blade-line",
+          "dy": 50,
+          "scale": 0.9,
+          "tint": "#3fe0d0",
+          "r": 60,
+          "hit": {
+           "dmg": 140,
+           "kind": "down",
+           "vfx": "x3-c-hit-spark-heavy",
+           "vs": 0.8,
+           "tint": "#bff7f0"
+          }
+         },
+         {
+          "t": "v",
+          "vfx": "x3-c-ground-crack",
+          "scale": 0.3,
+          "under": true,
+          "fade": 0.4
+         }
+        ]
+       }
+      ]
+     },
+     {
+      "t": "later",
+      "in": 0.75,
+      "fx": [
+       {
+        "t": "v",
+        "vfx": "x3-c-dust-puff",
+        "at": "front",
+        "dx": 30,
+        "scale": 1.3,
+        "tint": "#d8d2c4"
+       }
+      ]
+     }
+    ]
+   }
+  },
+  "super": {
+   "name": "예카테리나",
+   "sub": "「예카테리나니까요.」",
+   "anim": "25",
+   "fps": 8,
+   "armed": true,
+   "events": [
+    {
+     "f": 2,
+     "hold": 0.4,
+     "fx": [
+      {
+       "t": "v",
+       "vfx": "x3-c-sparkle-dust",
+       "at": "hand",
+       "scale": 0.25,
+       "tint": "#3fe0d0"
+      }
+     ]
+    },
+    {
+     "f": 6,
+     "hold": 0.3,
+     "fx": [
+      {
+       "t": "v",
+       "vfx": "x3-2.9-F-giant-blade",
+       "at": "screen",
+       "dx": 40,
+       "dy": -120,
+       "w": 0.85,
+       "hold": 0.2,
+       "fade": 0.3,
+       "delay": 0.45,
+       "hit": {
+        "dmg": 200,
+        "kind": "blow",
+        "stop": 0.22,
+        "shake": 16,
+        "vfx": "x3-c-hit-spark-heavy",
+        "vs": 1.2,
+        "tint": "#bff7f0"
+       }
+      },
+      {
+       "t": "later",
+       "in": 0.75,
+       "fx": [
+        {
+         "t": "v",
+         "vfx": "x3-c-wall-crack",
+         "at": "target",
+         "dy": -20,
+         "scale": 1,
+         "tint": "#3fe0d0"
+        },
+        {
+         "t": "shake",
+         "v": 14
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "f": 8,
+     "hold": 0.4,
+     "fx": [
+      {
+       "t": "shake",
+       "v": 10
+      }
+     ]
+    },
+    {
+     "f": 11,
+     "hold": 0.4,
+     "fx": [
+      {
+       "t": "v",
+       "vfx": "x3-c-sparkle-dust",
+       "at": "screen",
+       "dy": -120,
+       "w": 0.6,
+       "tint": "#3fe0d0"
       }
      ]
     }

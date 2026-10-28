@@ -362,7 +362,7 @@
   "heat": false,
   "_note": "통화 소리"
  },
- "skills": {
+ "skills_2판": {
   "skill": {
    "name": "확인했어요, ~님",
    "anim": "22",
@@ -524,6 +524,234 @@
       {
        "t": "text",
        "v": "구두가 예쁘네요~"
+      }
+     ]
+    }
+   ]
+  }
+ },
+ "skills": {
+  "skill": {
+   "name": "확인했어요, ~님",
+   "anim": "22",
+   "fps": 9,
+   "events": [
+    {
+     "f": 3,
+     "fx": [
+      {
+       "t": "melee",
+       "range": 140,
+       "hit": {
+        "dmg": 10,
+        "kind": "pull",
+        "stop": 0.05,
+        "shake": 3
+       }
+      }
+     ]
+    },
+    {
+     "f": 5,
+     "hold": 0.18,
+     "fx": [
+      {
+       "t": "v",
+       "vfx": "x3-3.2-D-hand-mark",
+       "at": "hand",
+       "dx": 30,
+       "scale": 1.2
+      }
+     ]
+    },
+    {
+     "f": 6,
+     "hold": 0.15,
+     "fx": [
+      {
+       "t": "v",
+       "vfx": "x3-3.2-D-foxfire-burst",
+       "at": "hand",
+       "dx": 50,
+       "scale": 0.55,
+       "r": 80,
+       "boom": 1,
+       "hit": {
+        "dmg": 130,
+        "kind": "blow",
+        "stop": 0.16,
+        "shake": 12
+       }
+      }
+     ]
+    }
+   ]
+  },
+  "charge": {
+   "name": "아홉 번째 대답",
+   "hold": "23",
+   "release": "24",
+   "armed": true,
+   "levels": [
+    0.5,
+    1.2
+   ],
+   "fire": 2,
+   "lv": {
+    "0": [
+     {
+      "t": "proj",
+      "kind": "orb",
+      "vfx": "x3-3.2-S0-foxfire-orb",
+      "size": 1.3,
+      "speed": 1100,
+      "life": 0.45,
+      "hit": {
+       "dmg": 50,
+       "kind": "heavy",
+       "vfx": "x3-3.2-D-foxfire-burst",
+       "vs": 0.25
+      }
+     }
+    ],
+    "1": [
+     {
+      "t": "v",
+      "vfx": "x3-3.2-S1-nine-tails",
+      "at": "front",
+      "dx": 110,
+      "scale": 0.8,
+      "r": 200,
+      "delay": 0.25,
+      "hit": {
+       "dmg": 90,
+       "kind": "heavy",
+       "n": 4,
+       "every": 0.12,
+       "mid": "light",
+       "stop": 0.05,
+       "shake": 5
+      }
+     }
+    ],
+    "2": [
+     {
+      "t": "v",
+      "vfx": "x3-3.2-S1-nine-tails",
+      "at": "self",
+      "scale": 1.25,
+      "r": 300,
+      "delay": 0.35,
+      "hit": {
+       "dmg": 130,
+       "kind": "blow",
+       "stop": 0.18,
+       "shake": 14
+      }
+     },
+     {
+      "t": "flash",
+      "v": 0.06
+     }
+    ]
+   }
+  },
+  "super": {
+   "name": "가장 소중한 것이 만나러 와요",
+   "sub": "「잘 보살펴 드릴게요, ~님.」",
+   "anim": "25",
+   "fps": 7,
+   "armed": true,
+   "events": [
+    {
+     "f": 3,
+     "hold": 0.5,
+     "fx": []
+    },
+    {
+     "f": 5,
+     "hold": 0.3,
+     "fx": [
+      {
+       "t": "v",
+       "vfx": "x3-3.2-F-foxfire-crown",
+       "at": "target",
+       "dy": -140,
+       "scale": 1,
+       "loop": 2.8,
+       "fade": 0.3
+      },
+      {
+       "t": "bind",
+       "time": 3.0,
+       "color": "#E0A43A"
+      },
+      {
+       "t": "later",
+       "in": 0.4,
+       "fx": [
+        {
+         "t": "screen",
+         "spots": 4,
+         "every": 0.4,
+         "each": [
+          {
+           "t": "v",
+           "vfx": "x3-c-hit-spark-heavy",
+           "dy": -110,
+           "scale": 0.8
+          },
+          {
+           "t": "v",
+           "vfx": "x3-c-dust-puff",
+           "scale": 1,
+           "tint": "#d8cfc0"
+          }
+         ]
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "f": 7,
+     "hold": 2.0,
+     "fx": []
+    },
+    {
+     "f": 10,
+     "hold": 0.6,
+     "fx": [
+      {
+       "t": "v",
+       "vfx": "x3-3.2-S0-foxfire-orb",
+       "at": "target",
+       "dy": -100,
+       "scale": 1.4
+      },
+      {
+       "t": "hit",
+       "hit": {
+        "dmg": 160,
+        "kind": "down",
+        "stop": 0.18,
+        "shake": 14
+       }
+      },
+      {
+       "t": "later",
+       "in": 0.25,
+       "fx": [
+        {
+         "t": "v",
+         "vfx": "x3-3.2-S0-foxfire-orb",
+         "at": "body",
+         "dx": 60,
+         "dy": -20,
+         "scale": 1.2,
+         "fade": 0.2
+        }
+       ]
       }
      ]
     }
