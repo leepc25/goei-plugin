@@ -11,6 +11,7 @@ import type { Body, Hit, HitResult, React, WBox, WorldView } from '../engine/con
 import type { Pad, Btn } from '../engine/input';
 import type { FrameInfo } from '../engine/art';
 import { createEileenCore } from './core';
+import { drawEileen3D } from './three3d';
 
 /** 테스트룸 동작 이름 ↔ 엔진 버튼 */
 /** 에일린 그림 배율 (사용자 2026-10-25: 문에 비해 작다 → 처음 맞춰 본 크기로). 걷는 띠 가운데쯤(y500)에서 약 270px, 맨 뒤 260px · 맨 앞 305px */
@@ -67,6 +68,8 @@ export class EileenPlayer extends Player {
       K: (y: number) => spr(y) * CHAR_K,
       sfx: (type: string, extra: Record<string, unknown>) => eileenHooks.sfx({ type, ...extra }),
       font: (n: number) => pfont(n).f,
+      // 3D 모델이 받아져 있으면 몸은 3D로 (시험, F8로 끄고 켜기)
+      draw3d: drawEileen3D,
       targets: () => this.targets(),
       // 물건 윗면은 이미 그 높이에 있을 때만 땅이다 (아래에서 걸어 들어가면 올라서지 않고 막힌다)
       ground: (x: number, y: number) => { const p = this.platformAt(x, y); return p && this.core.P.z >= p.h - 10 ? p.h : 0; },

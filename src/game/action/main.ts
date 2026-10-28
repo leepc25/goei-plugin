@@ -4,6 +4,7 @@ import { prepareTestPeople } from './art/testPeople';
 import { prepareHqField } from './art/hqField';
 import { eileenArt } from './art/testPeople';
 import { EileenPlayer } from './eileen/player';
+import { prepareEileen3D } from './eileen/three3d';
 import { playerFactory } from './engine/player';
 import { useEileenKeys } from './engine/input';
 import { useEileenControls } from './ui/keys';
@@ -53,6 +54,12 @@ export function mountGame(box: HTMLElement, bridge?: Partial<GameBridge>): () =>
   const releaseField = prepareHqField(bridge?.assets ? (pack, f) => bridge.assets!.url(pack, f) : undefined);
   // 필드 시험: 사용자 PixelLab 시험 캐릭터 (임시)
   // 주인공 그림(에일린 테스트룸 완성본): 늘 받는다 (쟈알디 그림은 뺐다, 2026-10-25)
+  // 에일린 3D (시험): 받아지면 몸 그림만 3D로. 없거나 실패하면 2D 그대로
+  {
+    const inline = (window as { __GOEI_EILEEN3D__?: string }).__GOEI_EILEEN3D__;
+    if (inline) void prepareEileen3D(Uint8Array.from(atob(inline), (c) => c.charCodeAt(0)));
+    else if (bridge?.assets) void bridge.assets.bytes('eileen-3d', 'eileen3d.glb').then(prepareEileen3D).catch(() => {});
+  }
   const testPeople = prepareTestPeople(bridge?.assets ? f => bridge.assets!.url('test-people', f) : undefined, bridge?.assets ? f => bridge.assets!.bytes('test-people', f) : undefined);
   const visitArt = bridge?.visit ? prepareVisitAgents(bridge.assets ? f => bridge.assets!.url('visit-agents', f) : undefined, bridge.assets ? f => bridge.assets!.bytes('visit-agents', f) : undefined) : null;
   void Promise.all([loadArt(urlOf, bridge?.assets ? f => bridge.assets!.bytes('jyaldi', f) : undefined), visitArt?.ready, testPeople?.ready]).then(([art]) => {
