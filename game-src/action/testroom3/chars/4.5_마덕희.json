@@ -365,6 +365,420 @@
  "skills": {
   "skill": {
    "name": "자기야, 이거 안 좋은 거네요",
+   "steps": [
+    {
+     "anim": "9",
+     "fps": 16,
+     "events": [
+      {
+       "f": 7,
+       "fx": [
+        {
+         "t": "melee",
+         "range": 150,
+         "hit": {
+          "dmg": 30,
+          "kind": "light",
+          "vfx": "x3-c-hit-spark-light",
+          "vs": 1.4,
+          "tint": "#C9A24A"
+         }
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "anim": "10",
+     "fps": 16,
+     "events": [
+      {
+       "f": 5,
+       "hold": 0.08,
+       "fx": [
+        {
+         "t": "melee",
+         "range": 160,
+         "hit": {
+          "dmg": 42,
+          "kind": "heavy",
+          "vfx": "x3-c-hit-spark-light",
+          "vs": 1.8,
+          "tint": "#C9A24A"
+         }
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  "charge": {
+   "name": "80. 얘기 끝났어요",
+   "hold": "23",
+   "release": "24",
+   "levels": [
+    0.5,
+    1.2
+   ],
+   "fire": 4,
+   "releaseLv": {
+    "1": "14",
+    "2": "12"
+   },
+   "fireLv": {
+    "1": 2,
+    "2": 5
+   },
+   "lv": {
+    "0": [
+     {
+      "t": "v",
+      "vfx": "x3-c-air-ring",
+      "at": "hand",
+      "dx": 30,
+      "scale": 1.6,
+      "tint": "#C9A24A"
+     },
+     {
+      "t": "melee",
+      "range": 190,
+      "hit": {
+       "dmg": 50,
+       "kind": "blow",
+       "vfx": "x3-c-hit-spark-heavy",
+       "vs": 0.8
+      }
+     }
+    ],
+    "1": [
+     {
+      "t": "dash",
+      "speed": 1500,
+      "time": 0.26,
+      "hit": {
+       "dmg": 75,
+       "kind": "down",
+       "vfx": "x3-c-hit-spark-heavy",
+       "vs": 1
+      }
+     },
+     {
+      "t": "later",
+      "in": 0.3,
+      "fx": [
+       {
+        "t": "v",
+        "vfx": "x3-c-dust-puff",
+        "at": "self",
+        "scale": 1.4,
+        "tint": "#cbbfa8"
+       }
+      ]
+     }
+    ],
+    "2": [
+     {
+      "t": "v",
+      "vfx": "x3-c-hit-spark-heavy",
+      "at": "front",
+      "dx": 90,
+      "h": 70,
+      "scale": 1.2,
+      "hit": {
+       "dmg": 85,
+       "kind": "down",
+       "stop": 0.16,
+       "shake": 12
+      }
+     },
+     {
+      "t": "v",
+      "vfx": "x3-c-ground-crack",
+      "at": "front",
+      "dx": 90,
+      "scale": 0.8,
+      "under": true
+     },
+     {
+      "t": "v",
+      "vfx": "x3-c-ground-shockwave",
+      "at": "front",
+      "dx": 90,
+      "scale": 0.8,
+      "tint": "#C9A24A",
+      "under": true
+     },
+     {
+      "t": "shake",
+      "v": 10
+     }
+    ]
+   }
+  },
+  "super": {
+   "name": "헐값매입",
+   "sub": "「자기 얼굴에 다 쓰여 있어요~」",
+   "steps": [
+    {
+     "anim": "25",
+     "fps": 8,
+     "events": [
+      {
+       "f": 3,
+       "fx": [
+        {
+         "t": "scan",
+         "style": "line",
+         "color": "#C9A24A",
+         "time": 0.8
+        }
+       ]
+      },
+      {
+       "f": 5,
+       "hold": 0.16
+      },
+      {
+       "f": 6,
+       "hold": 0.16
+      },
+      {
+       "f": 7,
+       "hold": 0.16
+      },
+      {
+       "f": 8,
+       "to": 12,
+       "d": 0.01
+      }
+     ]
+    },
+    {
+     "anim": "13",
+     "fps": 16,
+     "push": 700,
+     "events": [
+      {
+       "f": 1,
+       "fx": [
+        {
+         "t": "v",
+         "vfx": "x3-c-dust-puff",
+         "at": "self",
+         "scale": 1.2,
+         "tint": "#C9A24A"
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "anim": "9",
+     "fps": 16,
+     "events": [
+      {
+       "f": 7,
+       "fx": [
+        {
+         "t": "melee",
+         "range": 160,
+         "hit": {
+          "dmg": 28,
+          "kind": "light",
+          "vfx": "x3-c-hit-spark-light",
+          "vs": 1.6,
+          "tint": "#C9A24A"
+         }
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "anim": "13",
+     "fps": 16,
+     "push": 600,
+     "events": [
+      {
+       "f": 1,
+       "fx": [
+        {
+         "t": "v",
+         "vfx": "x3-c-dust-puff",
+         "at": "self",
+         "scale": 1.2,
+         "tint": "#C9A24A"
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "anim": "10",
+     "fps": 16,
+     "events": [
+      {
+       "f": 5,
+       "fx": [
+        {
+         "t": "melee",
+         "range": 160,
+         "hit": {
+          "dmg": 28,
+          "kind": "light",
+          "vfx": "x3-c-hit-spark-light",
+          "vs": 1.6,
+          "tint": "#C9A24A"
+         }
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "anim": "13",
+     "fps": 16,
+     "push": 600,
+     "events": [
+      {
+       "f": 1,
+       "fx": [
+        {
+         "t": "v",
+         "vfx": "x3-c-dust-puff",
+         "at": "self",
+         "scale": 1.2,
+         "tint": "#C9A24A"
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "anim": "11",
+     "fps": 16,
+     "events": [
+      {
+       "f": 4,
+       "fx": [
+        {
+         "t": "melee",
+         "range": 160,
+         "hit": {
+          "dmg": 28,
+          "kind": "light",
+          "vfx": "x3-c-hit-spark-light",
+          "vs": 1.6,
+          "tint": "#C9A24A"
+         }
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "anim": "12",
+     "fps": 10,
+     "events": [
+      {
+       "f": 5,
+       "hold": 0.25,
+       "fx": [
+        {
+         "t": "v",
+         "vfx": "x3-c-hit-spark-heavy",
+         "at": "front",
+         "dx": 90,
+         "h": 70,
+         "scale": 1.4,
+         "hit": {
+          "dmg": 70,
+          "kind": "down",
+          "stop": 0.2,
+          "shake": 16
+         }
+        },
+        {
+         "t": "v",
+         "vfx": "x3-c-ground-crack",
+         "at": "front",
+         "dx": 90,
+         "scale": 1.1,
+         "under": true
+        },
+        {
+         "t": "v",
+         "vfx": "x3-c-ground-shockwave",
+         "at": "front",
+         "dx": 90,
+         "w": 1.05,
+         "tint": "#C9A24A",
+         "under": true,
+         "delay": 0.1,
+         "hit": {
+          "dmg": 60,
+          "kind": "launch"
+         }
+        },
+        {
+         "t": "shake",
+         "v": 16
+        },
+        {
+         "t": "flash",
+         "v": 0.12
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "anim": "25",
+     "fps": 8,
+     "events": [
+      {
+       "f": 1,
+       "to": 7,
+       "d": 0.01
+      },
+      {
+       "f": 11,
+       "hold": 0.3
+      }
+     ]
+    }
+   ]
+  }
+ },
+ "_note": "손으로 다듬음(표 「테스트룸」 절·fail 목록·기술안 4장). 그림 값은 자동. 다시 자동으로: build.py --reset 4.5_마덕희",
+ "start": {
+  "11": 2,
+  "20": 2,
+  "19": 2,
+  "24": 2
+ },
+ "bal": {
+  "role": "control",
+  "speed": "slow",
+  "gun": "thrown",
+  "atk": {
+   "9": 16,
+   "10": 16,
+   "11": 19,
+   "12": 27,
+   "13": 18,
+   "14": 16
+  },
+  "cd": {
+   "shot": 0.6,
+   "skill": 9
+  },
+  "shotDmg": 7
+ },
+ "skills_2판": {
+  "skill": {
+   "name": "자기야, 이거 안 좋은 거네요",
    "anim": "22",
    "fps": 9,
    "events": [
@@ -468,30 +882,5 @@
     }
    ]
   }
- },
- "_note": "손으로 다듬음(표 「테스트룸」 절·fail 목록·기술안 4장). 그림 값은 자동. 다시 자동으로: build.py --reset 4.5_마덕희",
- "start": {
-  "11": 2,
-  "20": 2,
-  "19": 2,
-  "24": 2
- },
- "bal": {
-  "role": "control",
-  "speed": "slow",
-  "gun": "thrown",
-  "atk": {
-   "9": 16,
-   "10": 16,
-   "11": 19,
-   "12": 27,
-   "13": 18,
-   "14": 16
-  },
-  "cd": {
-   "shot": 0.6,
-   "skill": 9
-  },
-  "shotDmg": 7
  }
 }

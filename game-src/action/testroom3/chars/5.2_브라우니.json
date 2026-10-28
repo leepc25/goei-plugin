@@ -408,6 +408,336 @@
  },
  "skills": {
   "skill": {
+   "name": "박수!",
+   "anim": "22",
+   "fps": 9,
+   "events": [
+    {
+     "f": 5,
+     "fx": [
+      {
+       "t": "v",
+       "vfx": "x3-c-air-ring",
+       "at": "hand",
+       "dx": 50,
+       "scale": 2.4,
+       "tint": "#fff6c0",
+       "r": 110,
+       "hit": {
+        "dmg": 24,
+        "kind": "light"
+       }
+      }
+     ]
+    },
+    {
+     "f": 7,
+     "hold": 0.08,
+     "fx": [
+      {
+       "t": "v",
+       "vfx": "x3-c-air-ring",
+       "at": "hand",
+       "dx": 50,
+       "scale": 2.8,
+       "tint": "#fff6c0",
+       "r": 110,
+       "hit": {
+        "dmg": 34,
+        "kind": "heavy"
+       }
+      }
+     ]
+    }
+   ]
+  },
+  "charge": {
+   "name": "정답은?",
+   "hold": "23",
+   "release": "24",
+   "levels": [
+    0.5,
+    1.2
+   ],
+   "releaseLv": {
+    "0": "12",
+    "1": "14",
+    "2": "15"
+   },
+   "fire": 4,
+   "fireLv": {
+    "0": 4,
+    "1": 2,
+    "2": 3
+   },
+   "lv": {
+    "0": [
+     {
+      "t": "v",
+      "vfx": "x3-c-hit-spark-heavy",
+      "at": "front",
+      "dx": 120,
+      "h": 60,
+      "scale": 1.1,
+      "hit": {
+       "dmg": 60,
+       "kind": "down",
+       "stop": 0.16,
+       "shake": 12
+      }
+     },
+     {
+      "t": "v",
+      "vfx": "x3-c-dust-puff",
+      "at": "front",
+      "dx": 120,
+      "scale": 1.3
+     }
+    ],
+    "1": [
+     {
+      "t": "dash",
+      "speed": 1500,
+      "time": 0.25,
+      "hit": null
+     },
+     {
+      "t": "later",
+      "in": 0.27,
+      "fx": [
+       {
+        "t": "v",
+        "vfx": "x3-c-air-ring",
+        "at": "self",
+        "h": 120,
+        "scale": 2.6,
+        "tint": "#fff6c0"
+       },
+       {
+        "t": "v",
+        "vfx": "x3-c-ground-shockwave",
+        "at": "self",
+        "scale": 0.8,
+        "tint": "#fff6c0",
+        "under": true,
+        "r": 230,
+        "hit": {
+         "dmg": 65,
+         "kind": "down",
+         "stop": 0.14
+        }
+       },
+       {
+        "t": "shake",
+        "v": 10
+       }
+      ]
+     }
+    ],
+    "2": [
+     {
+      "t": "v",
+      "vfx": "x3-5.2-S2-broadcast-band",
+      "at": "hand",
+      "dx": 260,
+      "scale": 2,
+      "r": 128,
+      "hit": {
+       "dmg": 30,
+       "kind": "light"
+      }
+     },
+     {
+      "t": "later",
+      "in": 0.3,
+      "fx": [
+       {
+        "t": "v",
+        "vfx": "x3-5.2-S2-broadcast-band",
+        "at": "hand",
+        "dx": 260,
+        "scale": 2,
+        "r": 128,
+        "hit": {
+         "dmg": 45,
+         "kind": "down"
+        }
+       }
+      ]
+     }
+    ]
+   }
+  },
+  "super": {
+   "name": "화요퀴즈쇼",
+   "sub": "「친구! 다음 문제 나갑니다!」",
+   "anim": "25",
+   "fps": 8,
+   "events": [
+    {
+     "f": 2,
+     "fx": [
+      {
+       "t": "v",
+       "vfx": "x3-5.2-F-studio",
+       "at": "screen",
+       "w": 1.05,
+       "dy": -90,
+       "under": true,
+       "hold": 4,
+       "fade": 0.6
+      }
+     ]
+    },
+    {
+     "f": 8,
+     "hold": 0.35,
+     "fx": [
+      {
+       "t": "v",
+       "vfx": "x3-c-ground-shockwave",
+       "at": "screen",
+       "w": 1.05,
+       "tint": "#fff6c0",
+       "hit": {
+        "dmg": 40,
+        "kind": "launch",
+        "stop": 0.12
+       }
+      },
+      {
+       "t": "v",
+       "vfx": "x3-c-air-ring",
+       "at": "screen",
+       "dy": -200,
+       "scale": 5,
+       "tint": "#fff6c0"
+      },
+      {
+       "t": "shake",
+       "v": 14
+      }
+     ]
+    },
+    {
+     "f": 9,
+     "hold": 0.35,
+     "fx": [
+      {
+       "t": "v",
+       "vfx": "x3-c-ground-shockwave",
+       "at": "screen",
+       "w": 1.05,
+       "tint": "#fff6c0",
+       "hit": {
+        "dmg": 40,
+        "kind": "launch",
+        "stop": 0.12
+       }
+      },
+      {
+       "t": "v",
+       "vfx": "x3-c-air-ring",
+       "at": "screen",
+       "dy": -200,
+       "scale": 5,
+       "tint": "#fff6c0"
+      },
+      {
+       "t": "shake",
+       "v": 14
+      }
+     ]
+    },
+    {
+     "f": 10,
+     "hold": 0.35,
+     "fx": [
+      {
+       "t": "v",
+       "vfx": "x3-c-ground-shockwave",
+       "at": "screen",
+       "w": 1.05,
+       "tint": "#fff6c0",
+       "hit": {
+        "dmg": 40,
+        "kind": "launch",
+        "stop": 0.12
+       }
+      },
+      {
+       "t": "v",
+       "vfx": "x3-c-air-ring",
+       "at": "screen",
+       "dy": -200,
+       "scale": 5,
+       "tint": "#fff6c0"
+      },
+      {
+       "t": "shake",
+       "v": 14
+      }
+     ]
+    },
+    {
+     "f": 12,
+     "hold": 0.45,
+     "fx": [
+      {
+       "t": "v",
+       "vfx": "x3-c-hit-spark-heavy",
+       "at": "target",
+       "h": 60,
+       "scale": 1.8,
+       "hit": {
+        "dmg": 80,
+        "kind": "down",
+        "stop": 0.22,
+        "shake": 18
+       }
+      },
+      {
+       "t": "v",
+       "vfx": "x3-c-ground-crack",
+       "at": "target",
+       "scale": 1.2,
+       "under": true
+      },
+      {
+       "t": "shake",
+       "v": 18
+      }
+     ]
+    }
+   ]
+  }
+ },
+ "_note": "손으로 다듬음(표 「테스트룸」 절·fail 목록·기술안 5장). 그림 값은 자동. 다시 자동으로: build.py --reset 5.2_브라우니",
+ "start": {
+  "11": 4,
+  "20": 2,
+  "17": 3
+ },
+ "bal": {
+  "role": "control",
+  "speed": "slow",
+  "gun": "none",
+  "atk": {
+   "9": 17,
+   "10": 16,
+   "11": 19,
+   "12": 27,
+   "13": 18,
+   "14": 16
+  },
+  "cd": {
+   "shot": 1.5,
+   "skill": 9
+  },
+  "shotDmg": 10
+ },
+ "skills_2판": {
+  "skill": {
    "name": "박수 유도",
    "anim": "22",
    "fps": 9,
@@ -542,29 +872,5 @@
     }
    ]
   }
- },
- "_note": "손으로 다듬음(표 「테스트룸」 절·fail 목록·기술안 5장). 그림 값은 자동. 다시 자동으로: build.py --reset 5.2_브라우니",
- "start": {
-  "11": 4,
-  "20": 2,
-  "17": 3
- },
- "bal": {
-  "role": "control",
-  "speed": "slow",
-  "gun": "none",
-  "atk": {
-   "9": 17,
-   "10": 16,
-   "11": 19,
-   "12": 27,
-   "13": 18,
-   "14": 16
-  },
-  "cd": {
-   "shot": 1.5,
-   "skill": 9
-  },
-  "shotDmg": 10
  }
 }

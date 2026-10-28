@@ -370,6 +370,339 @@
    "fps": 10,
    "events": [
     {
+     "f": 4,
+     "fx": [
+      {
+       "t": "proj",
+       "kind": "orb",
+       "vfx": "x3-4.10-D-sand-bullet",
+       "speed": 1500,
+       "life": 0.75,
+       "hit": {
+        "dmg": 24,
+        "kind": "light",
+        "vfx": "x3-c-dust-puff",
+        "tint": "#d8b878"
+       }
+      }
+     ]
+    },
+    {
+     "f": 5,
+     "fx": [
+      {
+       "t": "proj",
+       "kind": "orb",
+       "vfx": "x3-4.10-D-sand-bullet",
+       "speed": 1500,
+       "life": 0.75,
+       "hit": {
+        "dmg": 24,
+        "kind": "light",
+        "vfx": "x3-c-dust-puff",
+        "tint": "#d8b878"
+       }
+      }
+     ]
+    },
+    {
+     "f": 6,
+     "fx": [
+      {
+       "t": "proj",
+       "kind": "orb",
+       "vfx": "x3-4.10-D-sand-bullet",
+       "speed": 1500,
+       "life": 0.75,
+       "hit": {
+        "dmg": 32,
+        "kind": "heavy",
+        "vfx": "x3-c-dust-puff",
+        "vs": 1.6,
+        "tint": "#d8b878"
+       }
+      }
+     ]
+    }
+   ]
+  },
+  "charge": {
+   "name": "흐르는 모래",
+   "hold": "23",
+   "release": "24",
+   "levels": [
+    0.5,
+    1.2
+   ],
+   "fire": 1,
+   "fireLv": {
+    "0": 5
+   },
+   "lv": {
+    "0": [
+     {
+      "t": "v",
+      "vfx": "x3-4.10-S0-sand-barrier",
+      "at": "front",
+      "dx": 130,
+      "hold": 1.2,
+      "fade": 0.3,
+      "r": 70,
+      "hit": {
+       "dmg": 40,
+       "kind": "heavy"
+      }
+     }
+    ],
+    "1": [
+     {
+      "t": "hide",
+      "mode": "out",
+      "dur": 0.15
+     },
+     {
+      "t": "v",
+      "vfx": "x3-4.10-S1-sand-stream",
+      "at": "front",
+      "dx": 330,
+      "scale": 1.6,
+      "under": true,
+      "r": 200,
+      "delay": 0.2,
+      "hit": {
+       "dmg": 60,
+       "kind": "down"
+      }
+     },
+     {
+      "t": "later",
+      "in": 0.1,
+      "fx": [
+       {
+        "t": "dash",
+        "speed": 1500,
+        "time": 0.42,
+        "hit": null
+       }
+      ]
+     },
+     {
+      "t": "later",
+      "in": 0.55,
+      "fx": [
+       {
+        "t": "hide",
+        "mode": "in",
+        "dur": 0.2
+       }
+      ]
+     }
+    ],
+    "2": [
+     {
+      "t": "hide",
+      "mode": "out",
+      "dur": 0.15
+     },
+     {
+      "t": "v",
+      "vfx": "x3-4.10-S1-sand-stream",
+      "at": "front",
+      "dx": 330,
+      "scale": 1.6,
+      "under": true,
+      "r": 200,
+      "delay": 0.2,
+      "hit": {
+       "dmg": 30,
+       "kind": "down"
+      }
+     },
+     {
+      "t": "later",
+      "in": 0.1,
+      "fx": [
+       {
+        "t": "dash",
+        "speed": 1500,
+        "time": 0.42,
+        "hit": null
+       }
+      ]
+     },
+     {
+      "t": "later",
+      "in": 0.55,
+      "fx": [
+       {
+        "t": "hide",
+        "mode": "in",
+        "dur": 0.2
+       }
+      ]
+     },
+     {
+      "t": "later",
+      "in": 0.75,
+      "fx": [
+       {
+        "t": "v",
+        "vfx": "x3-4.10-S2-sand-pillar",
+        "at": "front",
+        "dx": 260,
+        "r": 80,
+        "hit": {
+         "dmg": 35,
+         "kind": "launch"
+        }
+       }
+      ]
+     },
+     {
+      "t": "later",
+      "in": 0.87,
+      "fx": [
+       {
+        "t": "v",
+        "vfx": "x3-4.10-S2-sand-pillar",
+        "at": "front",
+        "dx": 455,
+        "r": 80,
+        "hit": {
+         "dmg": 35,
+         "kind": "launch"
+        }
+       }
+      ]
+     },
+     {
+      "t": "later",
+      "in": 0.99,
+      "fx": [
+       {
+        "t": "v",
+        "vfx": "x3-4.10-S2-sand-pillar",
+        "at": "front",
+        "dx": 650,
+        "r": 80,
+        "hit": {
+         "dmg": 40,
+         "kind": "launch"
+        }
+       },
+       {
+        "t": "shake",
+        "v": 10
+       }
+      ]
+     }
+    ]
+   }
+  },
+  "super": {
+   "name": "모래 해일",
+   "sub": "「제 실력을 증명할 수 있어서 너무 기뻐요!」",
+   "anim": "25",
+   "fps": 8,
+   "events": [
+    {
+     "f": 2,
+     "fx": [
+      {
+       "t": "v",
+       "vfx": "x3-4.10-S1-sand-stream",
+       "at": "screen",
+       "w": 1.05,
+       "dy": 60,
+       "under": true,
+       "hold": 1.5,
+       "fade": 0.5
+      }
+     ]
+    },
+    {
+     "f": 5,
+     "hold": 0.3,
+     "fx": [
+      {
+       "t": "v",
+       "vfx": "x3-4.10-F-sand-tsunami",
+       "at": "screen",
+       "w": 1.05,
+       "delay": 0.75,
+       "hit": {
+        "dmg": 170,
+        "kind": "blow",
+        "n": 5,
+        "mid": "heavy",
+        "every": 0.12,
+        "stop": 0.12,
+        "shake": 16
+       }
+      },
+      {
+       "t": "later",
+       "in": 0.7,
+       "fx": [
+        {
+         "t": "shake",
+         "v": 18
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "f": 9,
+     "hold": 0.4,
+     "fx": [
+      {
+       "t": "v",
+       "vfx": "x3-c-dust-cloud-large",
+       "at": "screen",
+       "w": 1.05,
+       "tint": "#d8b878"
+      },
+      {
+       "t": "shake",
+       "v": 12
+      }
+     ]
+    }
+   ]
+  }
+ },
+ "_note": "손으로 다듬음(표 「테스트룸」 절·fail 목록·기술안 4장). 그림 값은 자동. 다시 자동으로: build.py --reset 4.10_아벤샤",
+ "start": {
+  "11": 2,
+  "16_1": 2,
+  "22": 2
+ },
+ "bal": {
+  "role": "ranged",
+  "speed": "slow",
+  "gun": "none",
+  "atk": {
+   "9": 16,
+   "10": 15,
+   "11": 17,
+   "12": 25,
+   "13": 17,
+   "14": 15
+  },
+  "cd": {
+   "shot": 1.5,
+   "skill": 7
+  },
+  "shotDmg": 12
+ },
+ "skills_2판": {
+  "skill": {
+   "name": "모래 탄환",
+   "anim": "22",
+   "fps": 10,
+   "events": [
+    {
      "f": 3,
      "fx": [
       {
@@ -545,29 +878,5 @@
     }
    ]
   }
- },
- "_note": "손으로 다듬음(표 「테스트룸」 절·fail 목록·기술안 4장). 그림 값은 자동. 다시 자동으로: build.py --reset 4.10_아벤샤",
- "start": {
-  "11": 2,
-  "16_1": 2,
-  "22": 2
- },
- "bal": {
-  "role": "ranged",
-  "speed": "slow",
-  "gun": "none",
-  "atk": {
-   "9": 16,
-   "10": 15,
-   "11": 17,
-   "12": 25,
-   "13": 17,
-   "14": 15
-  },
-  "cd": {
-   "shot": 1.5,
-   "skill": 7
-  },
-  "shotDmg": 12
  }
 }

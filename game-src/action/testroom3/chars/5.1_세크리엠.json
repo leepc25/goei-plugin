@@ -384,6 +384,335 @@
      "f": 4,
      "fx": [
       {
+       "t": "proj",
+       "kind": "orb",
+       "vfx": "x3-5.1-D-blood-blades",
+       "speed": 1300,
+       "life": 0.5,
+       "pierce": true,
+       "hit": {
+        "dmg": 48,
+        "kind": "heavy",
+        "n": 2,
+        "mid": "light",
+        "every": 0.08,
+        "vfx": "x3-c-liquid-splash",
+        "vs": 0.5,
+        "tint": "#B0102A"
+       }
+      }
+     ]
+    }
+   ]
+  },
+  "charge": {
+   "name": "핏빛 안개",
+   "hold": "23",
+   "release": "24",
+   "levels": [
+    0.5,
+    1.2
+   ],
+   "fire": 2,
+   "releaseLv": {
+    "0": "16",
+    "2": "12"
+   },
+   "fireLv": {
+    "0": 1,
+    "2": 2
+   },
+   "lv": {
+    "0": [
+     {
+      "t": "hide",
+      "mode": "out",
+      "dur": 0.1
+     },
+     {
+      "t": "v",
+      "vfx": "x3-5.1-S-blood-mist",
+      "at": "body",
+      "scale": 0.6
+     },
+     {
+      "t": "hop",
+      "v": 1000,
+      "inv": 0.6
+     },
+     {
+      "t": "later",
+      "in": 0.35,
+      "fx": [
+       {
+        "t": "v",
+        "vfx": "x3-5.1-S-blood-gathering",
+        "at": "self"
+       },
+       {
+        "t": "hide",
+        "mode": "in",
+        "dur": 0.25
+       }
+      ]
+     }
+    ],
+    "1": [
+     {
+      "t": "hide",
+      "mode": "out",
+      "dur": 0.12
+     },
+     {
+      "t": "dash",
+      "speed": 1700,
+      "time": 0.42,
+      "hit": {
+       "dmg": 60,
+       "kind": "stun",
+       "n": 4,
+       "mid": "light",
+       "every": 0.08
+      }
+     },
+     {
+      "t": "repeat",
+      "n": 5,
+      "every": 0.09,
+      "fx": [
+       {
+        "t": "v",
+        "vfx": "x3-5.1-S-blood-mist",
+        "at": "body",
+        "scale": 0.6
+       }
+      ]
+     },
+     {
+      "t": "later",
+      "in": 0.45,
+      "fx": [
+       {
+        "t": "v",
+        "vfx": "x3-5.1-S-blood-gathering",
+        "at": "self"
+       },
+       {
+        "t": "hide",
+        "mode": "in",
+        "dur": 0.25
+       }
+      ]
+     }
+    ],
+    "2": [
+     {
+      "t": "hide",
+      "mode": "out",
+      "dur": 0.12
+     },
+     {
+      "t": "circle",
+      "vfx": "x3-5.1-S-blood-mist",
+      "r": 360,
+      "n": 8,
+      "scale": 0.45,
+      "center": false,
+      "color": "rgba(176,16,42,.8)",
+      "hit": {
+       "dmg": 45,
+       "kind": "launch"
+      }
+     },
+     {
+      "t": "later",
+      "in": 0.35,
+      "fx": [
+       {
+        "t": "teleport",
+        "to": "behind",
+        "dist": 85,
+        "puddle": false,
+        "color": "#B0102A"
+       },
+       {
+        "t": "v",
+        "vfx": "x3-5.1-S-blood-gathering",
+        "at": "self"
+       },
+       {
+        "t": "hide",
+        "mode": "in",
+        "dur": 0.15
+       }
+      ]
+     },
+     {
+      "t": "later",
+      "in": 0.5,
+      "fx": [
+       {
+        "t": "v",
+        "vfx": "x3-c-slash-arc",
+        "at": "front",
+        "dx": 80,
+        "h": 140,
+        "scale": 0.9,
+        "tint": "#B0102A",
+        "hit": {
+         "dmg": 55,
+         "kind": "launch",
+         "stop": 0.14
+        }
+       }
+      ]
+     }
+    ]
+   }
+  },
+  "super": {
+   "name": "붉은 눈",
+   "sub": "「눈을 마주쳤구나.」",
+   "anim": "25",
+   "fps": 8,
+   "events": [
+    {
+     "f": 4,
+     "hold": 0.35,
+     "fx": [
+      {
+       "t": "v",
+       "vfx": "x3-5.1-F-red-wave",
+       "at": "screen",
+       "w": 1.05,
+       "dy": -80,
+       "hit": {
+        "dmg": 30,
+        "kind": "stun"
+       }
+      },
+      {
+       "t": "flash",
+       "v": 0.08
+      }
+     ]
+    },
+    {
+     "f": 6,
+     "hold": 0.3,
+     "fx": [
+      {
+       "t": "hide",
+       "mode": "out",
+       "dur": 0.15
+      },
+      {
+       "t": "v",
+       "vfx": "x3-5.1-S-blood-mist",
+       "at": "body",
+       "scale": 0.6
+      },
+      {
+       "t": "screen",
+       "spots": 5,
+       "every": 0.12,
+       "each": [
+        {
+         "t": "v",
+         "vfx": "x3-5.1-S-blood-mist",
+         "at": "target",
+         "scale": 0.7,
+         "hit": {
+          "dmg": 40,
+          "kind": "light",
+          "n": 2,
+          "every": 0.1
+         }
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "f": 9,
+     "hold": 0.2,
+     "fx": [
+      {
+       "t": "v",
+       "vfx": "x3-5.1-S-blood-gathering",
+       "at": "self",
+       "scale": 1.1
+      },
+      {
+       "t": "hide",
+       "mode": "in",
+       "dur": 0.25
+      }
+     ]
+    },
+    {
+     "f": 11,
+     "hold": 0.45,
+     "fx": [
+      {
+       "t": "proj",
+       "kind": "orb",
+       "vfx": "x3-5.1-D-blood-blades",
+       "size": 4,
+       "speed": 1500,
+       "life": 1.0,
+       "pierce": true,
+       "hit": {
+        "dmg": 110,
+        "kind": "blow",
+        "n": 3,
+        "mid": "heavy",
+        "every": 0.08,
+        "stop": 0.2,
+        "shake": 18,
+        "vfx": "x3-c-liquid-splash",
+        "vs": 1,
+        "tint": "#B0102A"
+       }
+      },
+      {
+       "t": "shake",
+       "v": 16
+      }
+     ]
+    }
+   ]
+  }
+ },
+ "_note": "손으로 다듬음(표 「테스트룸」 절·fail 목록·기술안 5장). 그림 값은 자동. 다시 자동으로: build.py --reset 5.1_세크리엠",
+ "bal": {
+  "role": "striker",
+  "speed": "fast",
+  "gun": "none",
+  "atk": {
+   "9": 16,
+   "10": 16,
+   "11": 19,
+   "12": 27,
+   "13": 18,
+   "14": 17
+  },
+  "cd": {
+   "shot": 1.5,
+   "skill": 6
+  },
+  "shotDmg": 10
+ },
+ "skills_2판": {
+  "skill": {
+   "name": "피의 칼날",
+   "anim": "22",
+   "fps": 10,
+   "events": [
+    {
+     "f": 4,
+     "fx": [
+      {
        "t": "repeat",
        "n": 3,
        "every": 0.08,
@@ -564,24 +893,5 @@
     }
    ]
   }
- },
- "_note": "손으로 다듬음(표 「테스트룸」 절·fail 목록·기술안 5장). 그림 값은 자동. 다시 자동으로: build.py --reset 5.1_세크리엠",
- "bal": {
-  "role": "striker",
-  "speed": "fast",
-  "gun": "none",
-  "atk": {
-   "9": 16,
-   "10": 16,
-   "11": 19,
-   "12": 27,
-   "13": 18,
-   "14": 17
-  },
-  "cd": {
-   "shot": 1.5,
-   "skill": 6
-  },
-  "shotDmg": 10
  }
 }

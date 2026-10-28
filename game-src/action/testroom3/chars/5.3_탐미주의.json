@@ -401,6 +401,376 @@
    "events": [
     {
      "f": 5,
+     "hold": 0.15,
+     "fx": [
+      {
+       "t": "v",
+       "vfx": "x3-5.3-D-black-paint",
+       "at": "target",
+       "scale": 1.3,
+       "hit": {
+        "dmg": 60,
+        "kind": "light",
+        "stop": 0.14
+       }
+      }
+     ]
+    }
+   ]
+  },
+  "charge": {
+   "name": "갈아타기",
+   "hold": "23",
+   "release": "24",
+   "levels": [
+    0.5,
+    1.2
+   ],
+   "fire": 3,
+   "releaseLv": {
+    "2": "9"
+   },
+   "fireLv": {
+    "1": 1,
+    "2": 1
+   },
+   "lv": {
+    "0": [
+     {
+      "t": "dash",
+      "speed": 1300,
+      "time": 0.3,
+      "hit": {
+       "dmg": 45,
+       "kind": "heavy",
+       "vfx": "x3-c-hit-spark-light",
+       "vs": 1.6
+      }
+     }
+    ],
+    "1": [
+     {
+      "t": "shake",
+      "v": 4
+     },
+     {
+      "t": "summon",
+      "icon": "decoy",
+      "anim": "1",
+      "color": "#d8d4cc",
+      "alpha": 0.95,
+      "over": 0.95,
+      "at": "front",
+      "dx": 780,
+      "time": 0.6
+     },
+     {
+      "t": "summon",
+      "icon": "decoy",
+      "anim": "1",
+      "color": "#d8d4cc",
+      "alpha": 0.95,
+      "over": 0.95,
+      "at": "self",
+      "time": 0.35
+     },
+     {
+      "t": "hide",
+      "mode": "out",
+      "dur": 0.1
+     },
+     {
+      "t": "later",
+      "in": 0.3,
+      "fx": [
+       {
+        "t": "v",
+        "vfx": "x3-c-shard-burst",
+        "at": "self",
+        "h": 110,
+        "scale": 1,
+        "tint": "#e8e4dc",
+        "r": 180,
+        "hit": {
+         "dmg": 45,
+         "kind": "heavy"
+        }
+       },
+       {
+        "t": "dash",
+        "speed": 3000,
+        "time": 0.26,
+        "hit": null
+       }
+      ]
+     },
+     {
+      "t": "later",
+      "in": 0.6,
+      "fx": [
+       {
+        "t": "hide",
+        "mode": "in",
+        "dur": 0.1
+       }
+      ]
+     }
+    ],
+    "2": [
+     {
+      "t": "shake",
+      "v": 4
+     },
+     {
+      "t": "hide",
+      "mode": "out",
+      "dur": 0.1
+     },
+     {
+      "t": "later",
+      "in": 0.15,
+      "fx": [
+       {
+        "t": "teleport",
+        "to": "behind",
+        "dist": 85,
+        "puddle": false,
+        "color": "#d8d4cc"
+       },
+       {
+        "t": "summon",
+        "icon": "decoy",
+        "anim": "1",
+        "color": "#d8d4cc",
+        "alpha": 0.95,
+        "over": 0.95,
+        "at": "self",
+        "time": 0.25
+       },
+       {
+        "t": "hide",
+        "mode": "in",
+        "dur": 0.1
+       }
+      ]
+     },
+     {
+      "t": "later",
+      "in": 0.45,
+      "fx": [
+       {
+        "t": "v",
+        "vfx": "x3-c-hit-spark-heavy",
+        "at": "target",
+        "h": 120,
+        "scale": 1,
+        "hit": {
+         "dmg": 70,
+         "kind": "blow",
+         "stop": 0.16,
+         "shake": 12
+        }
+       }
+      ]
+     }
+    ]
+   }
+  },
+  "super": {
+   "name": "예술은 조각이다",
+   "sub": "「가만히 있어. 지금 너는 작품이야.」",
+   "anim": "25",
+   "fps": 7,
+   "events": [
+    {
+     "f": 2,
+     "fx": [
+      {
+       "t": "text",
+       "v": "아름다움이란 멈춘 순간의 …… 그러니까 …… 영원히 ……",
+       "time": 3
+      }
+     ]
+    },
+    {
+     "f": 4,
+     "hold": 0.3,
+     "fx": [
+      {
+       "t": "gray",
+       "time": 0.3
+      },
+      {
+       "t": "screen",
+       "spots": 3,
+       "every": 0.08,
+       "each": [
+        {
+         "t": "v",
+         "vfx": "x3-5.3-F-marble-pedestal",
+         "at": "target",
+         "scale": 1.4,
+         "hold": 1.4,
+         "under": true
+        },
+        {
+         "t": "text",
+         "v": "무제 #12",
+         "at": "target"
+        }
+       ]
+      },
+      {
+       "t": "lift",
+       "h": 50,
+       "time": 1.6,
+       "color": "#e8e4dc"
+      },
+      {
+       "t": "bind",
+       "time": 1.5,
+       "color": "#bbbbbb"
+      }
+     ]
+    },
+    {
+     "f": 6,
+     "fx": [
+      {
+       "t": "screen",
+       "spots": 3,
+       "every": 0.1,
+       "each": [
+        {
+         "t": "v",
+         "vfx": "x3-c-wall-crack",
+         "at": "target",
+         "h": 120,
+         "scale": 0.45
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "f": 7,
+     "fx": [
+      {
+       "t": "screen",
+       "spots": 3,
+       "every": 0.1,
+       "each": [
+        {
+         "t": "v",
+         "vfx": "x3-c-wall-crack",
+         "at": "target",
+         "h": 80,
+         "scale": 0.45,
+         "flip": false
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "f": 9,
+     "hold": 0.45,
+     "fx": [
+      {
+       "t": "screen",
+       "spots": 3,
+       "every": 0.06,
+       "each": [
+        {
+         "t": "v",
+         "vfx": "x3-c-shard-burst",
+         "at": "target",
+         "h": 110,
+         "scale": 1.5,
+         "tint": "#e8e4dc",
+         "hit": {
+          "dmg": 130,
+          "kind": "heavy",
+          "stop": 0.22,
+          "shake": 18
+         }
+        }
+       ]
+      },
+      {
+       "t": "v",
+       "vfx": "x3-c-dust-cloud-large",
+       "at": "screen",
+       "w": 1.05,
+       "tint": "#cfcac0"
+      },
+      {
+       "t": "shake",
+       "v": 16
+      }
+     ]
+    },
+    {
+     "f": 12,
+     "hold": 0.2,
+     "fx": [
+      {
+       "t": "hit",
+       "hit": {
+        "dmg": 20,
+        "kind": "down",
+        "stop": 0.05
+       }
+      }
+     ]
+    }
+   ]
+  }
+ },
+ "_note": "손으로 다듬음(표 「테스트룸」 절·fail 목록·기술안 5장). 그림 값은 자동. 다시 자동으로: build.py --reset 5.3_탐미주의",
+ "start": {
+  "11": 2,
+  "20": 2,
+  "19": 5
+ },
+ "clean": {
+  "32": [
+   [
+    2,
+    25
+   ],
+   [
+    3,
+    30
+   ]
+  ]
+ },
+ "bal": {
+  "role": "control",
+  "speed": "fast",
+  "gun": "none",
+  "atk": {
+   "9": 12,
+   "10": 12,
+   "11": 14,
+   "12": 20,
+   "13": 13,
+   "14": 10
+  },
+  "cd": {
+   "shot": 1.5,
+   "skill": 9
+  },
+  "shotDmg": 10
+ },
+ "skills_2판": {
+  "skill": {
+   "name": "물감",
+   "anim": "22",
+   "fps": 9,
+   "events": [
+    {
+     "f": 5,
      "fx": [
       {
        "t": "puddle",
@@ -545,41 +915,5 @@
     }
    ]
   }
- },
- "_note": "손으로 다듬음(표 「테스트룸」 절·fail 목록·기술안 5장). 그림 값은 자동. 다시 자동으로: build.py --reset 5.3_탐미주의",
- "start": {
-  "11": 2,
-  "20": 2,
-  "19": 5
- },
- "clean": {
-  "32": [
-   [
-    2,
-    25
-   ],
-   [
-    3,
-    30
-   ]
-  ]
- },
- "bal": {
-  "role": "control",
-  "speed": "fast",
-  "gun": "none",
-  "atk": {
-   "9": 12,
-   "10": 12,
-   "11": 14,
-   "12": 20,
-   "13": 13,
-   "14": 10
-  },
-  "cd": {
-   "shot": 1.5,
-   "skill": 9
-  },
-  "shotDmg": 10
  }
 }
