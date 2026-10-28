@@ -1,7 +1,7 @@
 // 시작기: Risu는 켜진 플러그인을 모든 봇에서 읽으므로, 플러그인 파일에는 이 작은 시작기만 둔다.
 // 괴이 카드를 열었을 때만 본체(src/body.ts → goei-body.js)를 꺼내 실행한다. 본체는 한 번 받아 pluginStorage에 두고
 // 플러그인을 업데이트해 판이 달라지면 다시 받는다. 다른 봇에서는 카드 확인과 표식 검사 말고는 아무것도 하지 않는다.
-import { BODY_KEY, bodyVersion, fetchBody, runBody, type Body } from './loader/body';
+import { BODY_KEY, BodyError, bodyVersion, fetchBody, runBody, type Body } from './loader/body';
 import { isGoeiCard } from './loader/card';
 import { closePanel, showPanel } from './loader/panel';
 
@@ -19,46 +19,86 @@ let stopped = false;
 /** 받기에 실패한 때. 메시지마다 다시 받으려 하지 않게, 카드를 다시 열거나 1분이 지나야 다시 시도한다 */
 let failedAt = 0;
 
+/** 마지막으로 본체를 시작하지 못한 까닭 (받기 창에 보인다) */
+let startError = '';
+/** 본체 코드 자체가 실행되지 않았나 (깨진 글·판 불일치). 본체는 돌았는데 시작 중에 실패한 것과 구분해, 깨진 코드만 저장소에서 지운다 */
+let codeBroken = false;
+
 /** 저장해 둔 본체를 읽고, 없거나 판이 다르면 받는다. 받지 못하면 받기 창을 띄우고 null */
 async function load(prompt: boolean): Promise<Body | null> {
   let code: string | null = null;
+  let fromStore = false;
   try {
     const saved: unknown = await risuai.pluginStorage.getItem(BODY_KEY);
-    if (typeof saved === 'string' && bodyVersion(saved) === VERSION) code = saved;
+    if (typeof saved === 'string' && bodyVersion(saved) === VERSION) (code = saved), (fromStore = true);
   } catch {
     // 아래에서 받는다
   }
   if (!code) {
     try {
       code = await fetchBody(VERSION);
-      await risuai.pluginStorage.setItem(BODY_KEY, code);
     } catch (error) {
       console.log(`[goei] 본체를 받지 못했어요: ${error instanceof Error ? error.message : String(error)}`);
       failedAt = Date.now();
       if (prompt) showPanel(VERSION, install);
       return null;
     }
+    await save(code);
   }
-  return start(code);
+  const b = await start(code);
+  if (!b) {
+    failedAt = Date.now();
+    // 저장해 둔 본체가 깨져 있으면(판은 맞는데 실행이 안 됨) 지워서 다음에 다시 받게 한다. 그냥 두면 플러그인 판이 바뀔 때까지 영영 안 뜬다
+    if (fromStore && codeBroken) await risuai.pluginStorage.removeItem(BODY_KEY).catch(() => {});
+    if (prompt) showPanel(VERSION, install, `본체를 시작하지 못했어요: ${startError}`);
+  }
+  return b;
+}
+
+/** 저장소에 둔다. 저장이 안 돼도(용량 초과 등) 이번에는 받은 본체로 그냥 돈다 */
+async function save(code: string): Promise<void> {
+  try {
+    await risuai.pluginStorage.setItem(BODY_KEY, code);
+  } catch (error) {
+    console.log(`[goei] 본체를 저장하지 못했어요 (다음에 다시 받아요): ${error instanceof Error ? error.message : String(error)}`);
+  }
 }
 
 async function start(code: string): Promise<Body | null> {
+  codeBroken = false;
+  let api: ReturnType<typeof runBody>;
   try {
-    const api = runBody(code, VERSION);
+    api = runBody(code, VERSION);
+  } catch (error) {
+    codeBroken = true;
+    startError = error instanceof Error ? error.message : String(error);
+    console.log(`[goei] 본체를 실행하지 못했어요: ${startError}`);
+    return null;
+  }
+  try {
     body = await api.start();
     return body;
   } catch (error) {
-    console.log(`[goei] 본체를 시작하지 못했어요: ${error instanceof Error ? error.message : String(error)}`);
+    startError = error instanceof Error ? error.message : String(error);
+    console.log(`[goei] 본체를 시작하지 못했어요: ${startError}`);
     return null;
   }
 }
 
-/** 받기 창에서 받았거나 파일로 넣은 본체 */
+/** 받기 창에서 받았거나 파일로 넣은 본체. 시작하지 못하면 창은 그대로 두고 까닭을 던진다 */
 async function install(code: string): Promise<void> {
-  await risuai.pluginStorage.setItem(BODY_KEY, code);
+  await save(code);
+  loading = start(code).then((b) => {
+    if (!b) loading = null;
+    return b;
+  });
+  const b = await loading;
+  if (!b) {
+    failedAt = Date.now();
+    if (codeBroken) await risuai.pluginStorage.removeItem(BODY_KEY).catch(() => {});
+    throw new BodyError(`본체를 시작하지 못했어요: ${startError}`);
+  }
   closePanel();
-  loading = start(code);
-  await loading;
 }
 
 /** 본체가 필요할 때 한 번만 불러온다. 실패하면 다음에 다시 시도 */

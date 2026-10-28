@@ -310,22 +310,24 @@ export async function createFab(onOpen: () => void): Promise<Fab> {
 
   // 리스너는 선택지용사처럼 버튼 상자(host)에 건다. 웹 Risu에서 플러그인을 업데이트하면 리스너가 지워져
   // 버튼이 모양만 남는 일이 있었다(껐다 켜면 살아남). 그래서 버튼이 다시 보일 때마다 새로 건다.
-  let ids: { type: string; id: string }[] = [];
+  // 끌기(move·up·cancel)는 본 문서(doc)에 건다: 2026-10 Risu 부터 SafeElement 리스너가 문서가 아니라 그 요소에만 걸려서,
+  // 버튼 상자에 걸면 손가락이 48px 상자를 벗어나는 순간 끌기가 끊긴다. 옛 Risu(문서 전체에 걸림)에서는 어느 쪽이든 같다
+  let ids: { target: SafeEl; type: string; id: string }[] = [];
   const unbind = async () => {
     const old = ids;
     ids = [];
-    for (const { type, id } of old) await host.removeEventListener(type, id).catch(() => {});
+    for (const { target, type, id } of old) await target.removeEventListener(type, id).catch(() => {});
   };
   const bind = async () => {
     await unbind();
-    for (const [type, fn] of [
-      ['pointerdown', onDown],
-      ['pointermove', onMove],
-      ['pointerup', onUp],
-      ['pointercancel', onUp],
-      ['click', onClick],
+    for (const [target, type, fn] of [
+      [host, 'pointerdown', onDown],
+      [doc, 'pointermove', onMove],
+      [doc, 'pointerup', onUp],
+      [doc, 'pointercancel', onUp],
+      [host, 'click', onClick],
     ] as const) {
-      ids.push({ type, id: await host.addEventListener(type, fn as (e: unknown) => void, { passive: true }) });
+      ids.push({ target, type, id: await target.addEventListener(type, fn as (e: unknown) => void, { passive: true }) });
     }
   };
   await bind();

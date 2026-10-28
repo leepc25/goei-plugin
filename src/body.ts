@@ -588,13 +588,14 @@ function displayNow(text: string): string {
   return out;
 }
 
-async function readSnapshot(fab: Fab): Promise<WatchSnapshot> {
+/** fab 이 없으면(본 화면 접근 권한 거부) 채팅 화면 여부를 알 수 없어 떠 있는 것으로 본다 */
+async function readSnapshot(fab: Fab | null): Promise<WatchSnapshot> {
   const none = { charIndex: -1, chatIndex: -1, chatScreen: false };
   try {
     const charIndex = await risuai.getCurrentCharacterIndex();
     if (!Number.isInteger(charIndex) || charIndex < 0) return none;
     const chatIndex = await risuai.getCurrentChatIndex();
-    const chatScreen = await fab.chatScreenVisible();
+    const chatScreen = fab ? await fab.chatScreenVisible() : true;
     return { charIndex, chatIndex: Number.isInteger(chatIndex) ? chatIndex : -1, chatScreen };
   } catch {
     return none;
@@ -626,8 +627,9 @@ async function readTheme(snap: WatchSnapshot): Promise<void> {
   if (changed && currentTheme() === before) repaintTheme();
 }
 
-// 괴이봇 Lite 채팅 화면에서만 보이는 플로팅 버튼 + 그 화면에 들어올 때마다 접속 효과
-function startWatcher(fab: Fab): () => void {
+// 괴이봇 Lite 채팅 화면에서만 보이는 플로팅 버튼 + 그 화면에 들어올 때마다 접속 효과.
+// fab 이 없어도(본 화면 접근 권한 거부) 감시는 돈다: liteNow 가 있어야 요청 손질·로어북 고르기·표시가 된다
+function startWatcher(fab: Fab | null): () => void {
   const state = new WatchState();
   // 설치·점검으로 카드가 바뀌면 다음 차례에 다시 판정 (플로팅 버튼이 바로 생기게)
   setInstalledHook(() => state.forget());
@@ -647,7 +649,7 @@ function startWatcher(fab: Fab): () => void {
           await refreshOpeningHint(snap.charIndex, snap.chatIndex).catch(() => {});
         }
         // 접속 효과는 버튼 자리에서 버튼이 나타나며 (v0.16.22)
-        await fab.setVisible(next.fabVisible, next.intro);
+        await fab?.setVisible(next.fabVisible, next.intro);
       }
     } catch (error) {
       console.log(`[goei] 채팅 감시 실패: ${error instanceof Error ? error.message : String(error)}`);
@@ -693,11 +695,13 @@ export async function start(): Promise<BodyHandlers> {
     stopWatcher = startWatcher(fab);
   } catch (error) {
     // 본 화면 접근 권한을 거부하면 플로팅 버튼 대신 채팅 메뉴 항목을 쓴다 (다른 봇에서는 눌러도 아무것도 안 뜸).
+    // 감시(괴이 카드 판정 liteNow)는 버튼 없이도 돌아야 요청 손질·로어북 고르기가 된다 (QC 2026-10-28)
     console.log(`[goei] 플로팅 버튼을 만들지 못했어요: ${error instanceof Error ? error.message : String(error)}`);
-    await risuai.registerButton(
-      { name: BRAND.name, icon: GHOST_ICON, iconType: 'html', location: 'chat', id: `${PLUGIN_ID}-chat` },
-      () => void openApp({ quietIfNotLite: true }),
-    );
+    fab = null;
+    stopWatcher = startWatcher(null);
+    await risuai
+      .registerButton({ name: BRAND.name, icon: GHOST_ICON, iconType: 'html', location: 'chat', id: `${PLUGIN_ID}-chat` }, () => void openApp({ quietIfNotLite: true }))
+      .catch((e: unknown) => console.log(`[goei] 채팅 메뉴 단추를 두지 못했어요: ${e instanceof Error ? e.message : String(e)}`));
   }
   return {
     beforeRequest: onBeforeRequest,

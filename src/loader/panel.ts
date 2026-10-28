@@ -23,7 +23,8 @@ export function closePanel(): void {
   void risuai.hideContainer();
 }
 
-export function showPanel(version: string, install: (code: string) => Promise<void>): void {
+/** message: 처음부터 보일 까닭 (저장해 둔 본체가 실행되지 않았을 때 등) */
+export function showPanel(version: string, install: (code: string) => Promise<void>, message = ''): void {
   if (root) return;
   root = document.createElement('div');
   root.innerHTML = `<style>${CSS}</style><div class="gl-back"><div class="gl-card" role="dialog" aria-label="괴이 ː ANOMALY">
@@ -37,6 +38,7 @@ export function showPanel(version: string, install: (code: string) => Promise<vo
   const msg = root.querySelector<HTMLElement>('.gl-msg')!;
   const btns = [...root.querySelectorAll<HTMLButtonElement>('button')];
   const say = (t: string) => ((msg.hidden = !t), (msg.textContent = t));
+  if (message) say(message);
   const run = async (get: () => Promise<string>) => {
     btns.forEach((b) => (b.disabled = true));
     say('받는 중');

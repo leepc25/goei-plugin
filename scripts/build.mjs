@@ -62,9 +62,15 @@ const partNames = bodyParts.map((p, i) => {
   writeFileSync(`dist/${name}`, p);
   return name;
 });
+/** 글 지문 (src/loader/body.ts bodyHash 와 같게): UTF-16 단위의 FNV-1a 32비트. 시작기가 조각을 이어 붙인 뒤 글자까지 맞는지 본다 */
+function textHash(text) {
+  let h = 0x811c9dc5;
+  for (let i = 0; i < text.length; i++) h = Math.imul(h ^ text.charCodeAt(i), 0x01000193) >>> 0;
+  return h.toString(16).padStart(8, '0');
+}
 writeFileSync(
   'dist/goei-body.json',
-  JSON.stringify({ version: pkg.version, parts: partNames, length: bodyCode.length }) + '\n',
+  JSON.stringify({ version: pkg.version, parts: partNames, length: bodyCode.length, hash: textHash(bodyCode) }) + '\n',
 );
 
 // 게임 코드 팩: 게임 코드는 본체에 넣지 않고 따로 받는다 (src/host/game/code.ts, src/game/entry.ts).

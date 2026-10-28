@@ -12,7 +12,8 @@ export class PicError extends Error {}
 
 type RisuFetch = (url: string, arg: Record<string, unknown>) => Promise<{ ok: boolean; data: unknown; status: number }>;
 
-async function digest(b: Uint8Array): Promise<string | null> {
+/** sha1 앞 12자 (카드 빌드 card_pictures 와 같게). 보안 컨텍스트가 아니라 crypto.subtle 이 없으면 null */
+export async function digest(b: Uint8Array): Promise<string | null> {
   try {
     const h = new Uint8Array(await crypto.subtle.digest('SHA-1', b as BufferSource));
     return [...h].map((x) => x.toString(16).padStart(2, '0')).join('').slice(0, 12);
@@ -58,10 +59,17 @@ export async function fetchPictures(
 ): Promise<unknown[]> {
   const got: [Picture, Uint8Array][] = [];
   let i = 0;
+  // 한 장이라도 실패하면 나머지 일꾼도 멈춘다 (QC 2026-10-28: 안 멈추면 실패를 알린 뒤에도 남은 수백 장을 계속 받으려 해 요청만 낭비)
+  let failed = false;
   const worker = async () => {
-    while (i < plan.get.length) {
+    while (i < plan.get.length && !failed) {
       const p = plan.get[i++];
-      got.push([p, await fetchPicture(p)]);
+      try {
+        got.push([p, await fetchPicture(p)]);
+      } catch (error) {
+        failed = true;
+        throw error;
+      }
       progress(got.length, 'get');
     }
   };
