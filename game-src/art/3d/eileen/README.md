@@ -33,3 +33,7 @@ Tripo API V3로 만든 첫 시험. 사용 크레딧 115 (잔액 885).
 - `eileen3d.glb` (2.5MB): `tools/3d/pack_char.py`로 2만 면, 색 텍스처 1024만, 동작 8개(NLA 트랙)를 한 파일로.
 - 동작 8개는 공용(Mixamo 뼈 이름). 다음 캐릭터는 모델·뼈대만 뽑고 동작은 Blender에서 옮긴다.
 - 누적 사용 300크레딧, 잔액 700.
+
+## 압축 (같은 날)
+
+- `npx -y gltfpack@0.22.0 -i eileen3d.glb -o eileen3d_p.glb -cc -kn -km` → 2.5MB → 0.56MB (meshopt). three.js 0.170 + MeshoptDecoder로 열어 동작 8개·2만 면 그대로 확인(`test_compress.png` 왼쪽 원본, 오른쪽 압축).
