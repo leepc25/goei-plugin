@@ -402,7 +402,7 @@
        "delay": 0.1,
        "boom": 1,
        "hit": {
-        "dmg": 150,
+        "dmg": 153,
         "kind": "launch",
         "stop": 0.14,
         "shake": 10,
@@ -436,7 +436,7 @@
       "r": 70,
       "delay": 0.08,
       "hit": {
-       "dmg": 45,
+       "dmg": 41,
        "kind": "launch",
        "stop": 0.08,
        "shake": 6
@@ -453,7 +453,7 @@
       "delay": 0.12,
       "boom": 1,
       "hit": {
-       "dmg": 90,
+       "dmg": 68,
        "kind": "down",
        "stop": 0.16,
        "shake": 12,
@@ -473,7 +473,7 @@
       "delay": 0.2,
       "under": true,
       "hit": {
-       "dmg": 110,
+       "dmg": 54,
        "kind": "down",
        "n": 2,
        "mid": "launch",
@@ -579,7 +579,7 @@
        "boom": 3,
        "delay": 0.2,
        "hit": {
-        "dmg": 70,
+        "dmg": 112,
         "kind": "blow",
         "stop": 0.16,
         "shake": 16
@@ -604,7 +604,7 @@
            "r": 70,
            "delay": 0.08,
            "hit": {
-            "dmg": 30,
+            "dmg": 48,
             "kind": "launch",
             "stop": 0.08,
             "shake": 8

@@ -382,7 +382,7 @@
          "t": "melee",
          "range": 150,
          "hit": {
-          "dmg": 40,
+          "dmg": 54,
           "kind": "light",
           "vfx": "x3-c-hit-spark-light",
           "vs": 2,
@@ -404,7 +404,7 @@
          "t": "melee",
          "range": 160,
          "hit": {
-          "dmg": 60,
+          "dmg": 81,
           "kind": "heavy",
           "vfx": "x3-c-hit-spark-light",
           "vs": 2.6,
@@ -443,7 +443,7 @@
       "speed": 1300,
       "time": 0.32,
       "hit": {
-       "dmg": 60,
+       "dmg": 36,
        "kind": "blow",
        "stop": 0.12,
        "shake": 10,
@@ -471,7 +471,7 @@
       "t": "melee",
       "range": 140,
       "hit": {
-       "dmg": 80,
+       "dmg": 60,
        "kind": "launch",
        "stop": 0.14,
        "shake": 10,
@@ -485,7 +485,7 @@
       "t": "melee",
       "range": 140,
       "hit": {
-       "dmg": 40,
+       "dmg": 33,
        "kind": "launch",
        "stop": 0.1,
        "vfx": "x3-c-hit-spark-heavy",
@@ -500,7 +500,7 @@
         "t": "melee",
         "range": 170,
         "hit": {
-         "dmg": 75,
+         "dmg": 63,
          "kind": "spike",
          "stop": 0.18,
          "shake": 14,
@@ -595,7 +595,7 @@
            "scale": 2,
            "tint": "#B8D86A",
            "hit": {
-            "dmg": 30,
+            "dmg": 20,
             "kind": "stun",
             "stop": 0.06,
             "shake": 5
@@ -643,7 +643,7 @@
            "tint": "#9BC75A",
            "boom": 1,
            "hit": {
-            "dmg": 60,
+            "dmg": 40,
             "kind": "down",
             "stop": 0.12,
             "shake": 10,
@@ -667,7 +667,7 @@
          "t": "melee",
          "range": 200,
          "hit": {
-          "dmg": 50,
+          "dmg": 33,
           "kind": "launch",
           "stop": 0.14,
           "shake": 10,
@@ -690,7 +690,7 @@
          "t": "melee",
          "range": 220,
          "hit": {
-          "dmg": 70,
+          "dmg": 47,
           "kind": "down",
           "stop": 0.2,
           "shake": 16,

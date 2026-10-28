@@ -451,7 +451,7 @@
          "t": "melee",
          "range": 140,
          "hit": {
-          "dmg": 50,
+          "dmg": 153,
           "kind": "heavy",
           "stop": 0.1,
           "shake": 8
@@ -507,7 +507,7 @@
       "scale": 1.5,
       "r": 160,
       "hit": {
-       "dmg": 40,
+       "dmg": 41,
        "kind": "light",
        "stop": 0.06
       }
@@ -554,7 +554,7 @@
       "t": "melee",
       "range": 620,
       "hit": {
-       "dmg": 70,
+       "dmg": 68,
        "kind": "heavy",
        "stop": 0.12,
        "shake": 10
@@ -572,7 +572,7 @@
       "depth": 110,
       "delay": 0.2,
       "hit": {
-       "dmg": 95,
+       "dmg": 54,
        "kind": "down",
        "n": 2,
        "mid": "launch",
@@ -613,7 +613,7 @@
        "w": 1.05,
        "delay": 0.1,
        "hit": {
-        "dmg": 60,
+        "dmg": 29,
         "kind": "launch",
         "n": 4,
         "mid": "light",
@@ -640,7 +640,7 @@
          "r": 90,
          "delay": 0.6,
          "hit": {
-          "dmg": 90,
+          "dmg": 44,
           "kind": "down",
           "stop": 0.2,
           "shake": 14

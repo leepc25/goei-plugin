@@ -582,7 +582,7 @@
        "speed": 1050,
        "time": 0.34,
        "hit": {
-        "dmg": 120,
+        "dmg": 135,
         "kind": "heavy",
         "stop": 0.16,
         "shake": 12,
@@ -627,7 +627,7 @@
       "scale": 0.6,
       "r": 60,
       "hit": {
-       "dmg": 45,
+       "dmg": 36,
        "kind": "light",
        "vfx": "x3-c-hit-spark-light",
        "vs": 2,
@@ -646,7 +646,7 @@
       "fade": 0.3,
       "r": 150,
       "hit": {
-       "dmg": 80,
+       "dmg": 10,
        "kind": "heavy",
        "n": 6,
        "every": 0.14,
@@ -665,7 +665,7 @@
       "scale": 1.2,
       "r": 150,
       "hit": {
-       "dmg": 30,
+       "dmg": 22,
        "kind": "heavy"
       }
      },
@@ -674,7 +674,7 @@
       "speed": 1500,
       "time": 0.45,
       "hit": {
-       "dmg": 100,
+       "dmg": 74,
        "kind": "down",
        "stop": 0.16,
        "shake": 12,
@@ -747,7 +747,7 @@
         {
          "t": "hit",
          "hit": {
-          "dmg": 16,
+          "dmg": 5,
           "kind": "light",
           "vfx": "x3-c-hit-spark-light",
           "vs": 2,
@@ -770,7 +770,7 @@
         {
          "t": "hit",
          "hit": {
-          "dmg": 16,
+          "dmg": 5,
           "kind": "light",
           "vfx": "x3-c-hit-spark-light",
           "vs": 2,
@@ -793,7 +793,7 @@
         {
          "t": "hit",
          "hit": {
-          "dmg": 16,
+          "dmg": 5,
           "kind": "light",
           "vfx": "x3-c-hit-spark-light",
           "vs": 2,
@@ -816,7 +816,7 @@
         {
          "t": "hit",
          "hit": {
-          "dmg": 16,
+          "dmg": 5,
           "kind": "light",
           "vfx": "x3-c-hit-spark-light",
           "vs": 2,
@@ -839,7 +839,7 @@
         {
          "t": "hit",
          "hit": {
-          "dmg": 70,
+          "dmg": 20,
           "kind": "blow",
           "vfx": "x3-c-hit-spark-heavy",
           "vs": 0.7,
@@ -877,7 +877,7 @@
          "hold": 0.4,
          "fade": 0.3,
          "hit": {
-          "dmg": 90,
+          "dmg": 26,
           "kind": "down",
           "n": 4,
           "every": 0.12,

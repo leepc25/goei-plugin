@@ -369,7 +369,7 @@
        "r": 125,
        "delay": 0.25,
        "hit": {
-        "dmg": 120,
+        "dmg": 138,
         "kind": "launch",
         "vfx": "x3-c-hit-spark-light",
         "vs": 1.6,
@@ -451,7 +451,7 @@
         "t": "melee",
         "range": 280,
         "hit": {
-         "dmg": 70,
+         "dmg": 55,
          "kind": "heavy"
         }
        }
@@ -506,7 +506,7 @@
         "scale": 0.9,
         "tint": "#c8c8d0",
         "hit": {
-         "dmg": 110,
+         "dmg": 92,
          "kind": "launch"
         }
        }
@@ -577,7 +577,7 @@
         "dy": 220,
         "delay": 0.25,
         "hit": {
-         "dmg": 150,
+         "dmg": 147,
          "kind": "down",
          "stop": 0.16
         }

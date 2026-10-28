@@ -559,7 +559,7 @@
        "t": "melee",
        "range": 190,
        "hit": {
-        "dmg": 90,
+        "dmg": 138,
         "kind": "heavy",
         "vfx": "x3-c-hit-spark-heavy",
         "vs": 0.6,
@@ -600,7 +600,7 @@
       "tint": "#5EC4D6",
       "r": 70,
       "hit": {
-       "dmg": 50,
+       "dmg": 55,
        "kind": "light",
        "noVfx": true,
        "stop": 0.1,
@@ -615,7 +615,7 @@
       "time": 0.3,
       "delay": 0.12,
       "hit": {
-       "dmg": 85,
+       "dmg": 92,
        "kind": "launch",
        "vfx": "x3-c-hit-spark-heavy",
        "vs": 0.7,
@@ -651,7 +651,7 @@
       "speed": 1000,
       "time": 0.5,
       "hit": {
-       "dmg": 120,
+       "dmg": 49,
        "n": 3,
        "every": 0.15,
        "mid": "light",
@@ -718,7 +718,7 @@
        "t": "pull",
        "dist": 200,
        "hit": {
-        "dmg": 20,
+        "dmg": 16,
         "kind": "pull",
         "noVfx": true,
         "stop": 0.05,
@@ -751,7 +751,7 @@
        "t": "melee",
        "range": 220,
        "hit": {
-        "dmg": 40,
+        "dmg": 33,
         "kind": "heavy",
         "vfx": "x3-c-hit-spark-light",
         "vs": 1.4
@@ -800,7 +800,7 @@
        "tint": "#9aa0a6",
        "boom": 3,
        "hit": {
-        "dmg": 160,
+        "dmg": 131,
         "kind": "blow",
         "vfx": "x3-c-hit-spark-heavy",
         "stop": 0.2,

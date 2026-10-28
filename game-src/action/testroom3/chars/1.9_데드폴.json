@@ -396,7 +396,7 @@
        "r": 170,
        "depth": 90,
        "hit": {
-        "dmg": 60,
+        "dmg": 170,
         "kind": "heavy",
         "stop": 0.1,
         "shake": 8
@@ -457,7 +457,7 @@
       "speed": 1600,
       "time": 0.45,
       "hit": {
-       "dmg": 90,
+       "dmg": 68,
        "kind": "blow",
        "stop": 0.16,
        "shake": 12,
@@ -489,7 +489,7 @@
         "t": "proj",
         "kind": "bullet",
         "hit": {
-         "dmg": 18,
+         "dmg": 24,
          "kind": "light"
         }
        }
@@ -504,7 +504,7 @@
         "kind": "bullet",
         "big": true,
         "hit": {
-         "dmg": 26,
+         "dmg": 35,
          "kind": "down",
          "stop": 0.12,
          "shake": 8
@@ -584,7 +584,7 @@
          "tint": "#8FA4FF",
          "r": 60,
          "hit": {
-          "dmg": 140,
+          "dmg": 109,
           "kind": "launch",
           "stop": 0.2,
           "shake": 14
@@ -604,7 +604,7 @@
         {
          "t": "hit",
          "hit": {
-          "dmg": 40,
+          "dmg": 31,
           "kind": "spike",
           "stop": 0.16,
           "shake": 14

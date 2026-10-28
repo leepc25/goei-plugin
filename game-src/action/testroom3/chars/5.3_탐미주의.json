@@ -409,7 +409,7 @@
        "at": "target",
        "scale": 1.3,
        "hit": {
-        "dmg": 60,
+        "dmg": 153,
         "kind": "light",
         "stop": 0.14
        }
@@ -441,7 +441,7 @@
       "speed": 1300,
       "time": 0.3,
       "hit": {
-       "dmg": 45,
+       "dmg": 41,
        "kind": "heavy",
        "vfx": "x3-c-hit-spark-light",
        "vs": 1.6
@@ -492,7 +492,7 @@
         "tint": "#e8e4dc",
         "r": 180,
         "hit": {
-         "dmg": 45,
+         "dmg": 68,
          "kind": "heavy"
         }
        },
@@ -565,7 +565,7 @@
         "h": 120,
         "scale": 1,
         "hit": {
-         "dmg": 70,
+         "dmg": 109,
          "kind": "blow",
          "stop": 0.16,
          "shake": 12
@@ -689,7 +689,7 @@
          "scale": 1.5,
          "tint": "#e8e4dc",
          "hit": {
-          "dmg": 130,
+          "dmg": 139,
           "kind": "heavy",
           "stop": 0.22,
           "shake": 18
@@ -717,7 +717,7 @@
       {
        "t": "hit",
        "hit": {
-        "dmg": 20,
+        "dmg": 21,
         "kind": "down",
         "stop": 0.05
        }

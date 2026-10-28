@@ -366,7 +366,7 @@
        "scale": 0.8,
        "tint": "#e8ecf4",
        "hit": {
-        "dmg": 30,
+        "dmg": 48,
         "kind": "light"
        }
       },
@@ -374,7 +374,7 @@
        "t": "proj",
        "kind": "bullet",
        "hit": {
-        "dmg": 10,
+        "dmg": 16,
         "kind": "light"
        }
       }
@@ -388,7 +388,7 @@
        "kind": "bullet",
        "spread": 0.06,
        "hit": {
-        "dmg": 10,
+        "dmg": 16,
         "kind": "light"
        }
       }
@@ -406,7 +406,7 @@
        "scale": 0.85,
        "tint": "#e8ecf4",
        "hit": {
-        "dmg": 36,
+        "dmg": 57,
         "kind": "heavy"
        }
       },
@@ -414,7 +414,7 @@
        "t": "proj",
        "kind": "bullet",
        "hit": {
-        "dmg": 10,
+        "dmg": 16,
         "kind": "light"
        }
       }
@@ -428,7 +428,7 @@
        "kind": "bullet",
        "spread": 0.06,
        "hit": {
-        "dmg": 10,
+        "dmg": 16,
         "kind": "light"
        }
       }
@@ -468,7 +468,7 @@
       "under": true,
       "r": 230,
       "hit": {
-       "dmg": 40,
+       "dmg": 50,
        "kind": "heavy"
       }
      }
@@ -494,7 +494,7 @@
       "tint": "#9fc4ec",
       "r": 60,
       "hit": {
-       "dmg": 55,
+       "dmg": 42,
        "kind": "launch"
       }
      },
@@ -522,7 +522,7 @@
         "tint": "#9fc4ec",
         "r": 60,
         "hit": {
-         "dmg": 55,
+         "dmg": 42,
          "kind": "launch"
         }
        }
@@ -554,7 +554,7 @@
         "tint": "#9fc4ec",
         "r": 60,
         "hit": {
-         "dmg": 40,
+         "dmg": 19,
          "kind": "launch"
         }
        }
@@ -584,7 +584,7 @@
         "tint": "#9fc4ec",
         "r": 60,
         "hit": {
-         "dmg": 40,
+         "dmg": 19,
          "kind": "launch"
         }
        }
@@ -614,7 +614,7 @@
         "tint": "#9fc4ec",
         "r": 60,
         "hit": {
-         "dmg": 40,
+         "dmg": 19,
          "kind": "launch"
         }
        }
@@ -644,7 +644,7 @@
         "tint": "#9fc4ec",
         "r": 60,
         "hit": {
-         "dmg": 40,
+         "dmg": 19,
          "kind": "launch"
         }
        }
@@ -674,7 +674,7 @@
         "tint": "#9fc4ec",
         "r": 60,
         "hit": {
-         "dmg": 40,
+         "dmg": 19,
          "kind": "launch"
         }
        }
@@ -704,7 +704,7 @@
         "tint": "#9fc4ec",
         "r": 60,
         "hit": {
-         "dmg": 40,
+         "dmg": 19,
          "kind": "launch"
         }
        }
@@ -734,7 +734,7 @@
         "tint": "#9fc4ec",
         "r": 60,
         "hit": {
-         "dmg": 40,
+         "dmg": 19,
          "kind": "launch"
         }
        }
@@ -799,7 +799,7 @@
        "time": 1.6,
        "color": "#2a5a9a",
        "hit": {
-        "dmg": 150,
+        "dmg": 36,
         "kind": "blow",
         "n": 5
        }
@@ -827,7 +827,7 @@
        "kind": "bullet",
        "spread": 0.08,
        "hit": {
-        "dmg": 6,
+        "dmg": 1,
         "kind": "light",
         "stop": 0.02
        }

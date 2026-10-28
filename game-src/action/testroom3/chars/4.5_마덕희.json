@@ -377,7 +377,7 @@
          "t": "melee",
          "range": 150,
          "hit": {
-          "dmg": 30,
+          "dmg": 64,
           "kind": "light",
           "vfx": "x3-c-hit-spark-light",
           "vs": 1.4,
@@ -400,7 +400,7 @@
          "t": "melee",
          "range": 160,
          "hit": {
-          "dmg": 42,
+          "dmg": 89,
           "kind": "heavy",
           "vfx": "x3-c-hit-spark-light",
           "vs": 1.8,
@@ -444,7 +444,7 @@
       "t": "melee",
       "range": 190,
       "hit": {
-       "dmg": 50,
+       "dmg": 41,
        "kind": "blow",
        "vfx": "x3-c-hit-spark-heavy",
        "vs": 0.8
@@ -457,7 +457,7 @@
       "speed": 1500,
       "time": 0.26,
       "hit": {
-       "dmg": 75,
+       "dmg": 68,
        "kind": "down",
        "vfx": "x3-c-hit-spark-heavy",
        "vs": 1
@@ -486,7 +486,7 @@
       "h": 70,
       "scale": 1.2,
       "hit": {
-       "dmg": 85,
+       "dmg": 109,
        "kind": "down",
        "stop": 0.16,
        "shake": 12
@@ -584,7 +584,7 @@
          "t": "melee",
          "range": 160,
          "hit": {
-          "dmg": 28,
+          "dmg": 21,
           "kind": "light",
           "vfx": "x3-c-hit-spark-light",
           "vs": 1.6,
@@ -625,7 +625,7 @@
          "t": "melee",
          "range": 160,
          "hit": {
-          "dmg": 28,
+          "dmg": 21,
           "kind": "light",
           "vfx": "x3-c-hit-spark-light",
           "vs": 1.6,
@@ -666,7 +666,7 @@
          "t": "melee",
          "range": 160,
          "hit": {
-          "dmg": 28,
+          "dmg": 21,
           "kind": "light",
           "vfx": "x3-c-hit-spark-light",
           "vs": 1.6,
@@ -693,7 +693,7 @@
          "h": 70,
          "scale": 1.4,
          "hit": {
-          "dmg": 70,
+          "dmg": 52,
           "kind": "down",
           "stop": 0.2,
           "shake": 16
@@ -717,7 +717,7 @@
          "under": true,
          "delay": 0.1,
          "hit": {
-          "dmg": 60,
+          "dmg": 45,
           "kind": "launch"
          }
         },

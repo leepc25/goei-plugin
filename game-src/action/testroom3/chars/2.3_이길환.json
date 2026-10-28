@@ -368,7 +368,7 @@
        "scale": 1.1,
        "r": 170,
        "hit": {
-        "dmg": 40,
+        "dmg": 51,
         "kind": "light"
        }
       }
@@ -385,7 +385,7 @@
        "scale": 1.5,
        "r": 170,
        "hit": {
-        "dmg": 80,
+        "dmg": 102,
         "kind": "heavy"
        }
       }
@@ -420,7 +420,7 @@
       "tint": "#ffcf9a",
       "r": 70,
       "hit": {
-       "dmg": 70,
+       "dmg": 41,
        "kind": "heavy"
       }
      }
@@ -431,7 +431,7 @@
       "speed": 1300,
       "time": 0.35,
       "hit": {
-       "dmg": 110,
+       "dmg": 68,
        "kind": "down"
       }
      },
@@ -458,7 +458,7 @@
       "under": true,
       "tint": "#ffcf9a",
       "hit": {
-       "dmg": 40,
+       "dmg": 31,
        "kind": "heavy"
       }
      },
@@ -474,7 +474,7 @@
         "under": true,
         "tint": "#ffcf9a",
         "hit": {
-         "dmg": 40,
+         "dmg": 31,
          "kind": "heavy"
         }
        }
@@ -492,7 +492,7 @@
         "under": true,
         "tint": "#ffcf9a",
         "hit": {
-         "dmg": 60,
+         "dmg": 47,
          "kind": "down"
         }
        }
@@ -547,7 +547,7 @@
        "at": "screen",
        "w": 1.05,
        "hit": {
-        "dmg": 40,
+        "dmg": 11,
         "kind": "stun"
        }
       }
@@ -564,7 +564,7 @@
        "scale": 1.4,
        "boom": 2,
        "hit": {
-        "dmg": 140,
+        "dmg": 37,
         "kind": "blow",
         "n": 4,
         "mid": "heavy",

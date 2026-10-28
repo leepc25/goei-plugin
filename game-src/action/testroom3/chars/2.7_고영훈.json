@@ -415,7 +415,7 @@
        "t": "melee",
        "range": 170,
        "hit": {
-        "dmg": 20,
+        "dmg": 18,
         "kind": "light",
         "stop": 0.1
        }
@@ -445,7 +445,7 @@
        "tint": "#7a8aa0",
        "delay": 0.1,
        "hit": {
-        "dmg": 60,
+        "dmg": 55,
         "kind": "light"
        }
       }
@@ -459,7 +459,7 @@
        "t": "melee",
        "range": 200,
        "hit": {
-        "dmg": 70,
+        "dmg": 64,
         "kind": "blow"
        }
       }
@@ -500,7 +500,7 @@
       "pierce": true,
       "dy": 0,
       "hit": {
-       "dmg": 70,
+       "dmg": 55,
        "kind": "heavy"
       }
      }
@@ -537,7 +537,7 @@
       "pierce": true,
       "dy": 0,
       "hit": {
-       "dmg": 100,
+       "dmg": 92,
        "kind": "heavy"
       }
      },
@@ -596,7 +596,7 @@
         "at": "target",
         "scale": 1,
         "hit": {
-         "dmg": 150,
+         "dmg": 147,
          "kind": "launch",
          "stop": 0.18
         }
@@ -650,7 +650,7 @@
          "scale": 0.8,
          "tint": "#7a8aa0",
          "hit": {
-          "dmg": 20,
+          "dmg": 15,
           "kind": "light"
          }
         }
@@ -669,7 +669,7 @@
        "rot": 1.2,
        "tint": "#7a8aa0",
        "hit": {
-        "dmg": 25,
+        "dmg": 18,
         "kind": "light"
        }
       }
@@ -686,7 +686,7 @@
        "rot": -1.0,
        "tint": "#7a8aa0",
        "hit": {
-        "dmg": 25,
+        "dmg": 18,
         "kind": "light"
        }
       }
@@ -702,7 +702,7 @@
        "scale": 1.2,
        "tint": "#7a8aa0",
        "hit": {
-        "dmg": 25,
+        "dmg": 18,
         "kind": "heavy"
        }
       }
@@ -734,7 +734,7 @@
          "scale": 0.8,
          "tint": "#7a8aa0",
          "hit": {
-          "dmg": 110,
+          "dmg": 81,
           "kind": "launch",
           "stop": 0.22,
           "shake": 16
@@ -753,7 +753,7 @@
          "scale": 0.6,
          "under": true,
          "hit": {
-          "dmg": 40,
+          "dmg": 29,
           "kind": "spike"
          }
         }

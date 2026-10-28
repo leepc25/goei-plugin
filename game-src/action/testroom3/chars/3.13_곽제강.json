@@ -485,7 +485,7 @@
        "t": "melee",
        "range": 130,
        "hit": {
-        "dmg": 10,
+        "dmg": 40,
         "kind": "light",
         "vfx": "x3-c-hit-spark-light",
         "vs": 1.6,
@@ -506,7 +506,7 @@
        "t": "melee",
        "range": 140,
        "hit": {
-        "dmg": 8,
+        "dmg": 32,
         "kind": "light",
         "vfx": "x3-c-hit-spark-light",
         "vs": 1.2,
@@ -527,7 +527,7 @@
        "t": "melee",
        "range": 140,
        "hit": {
-        "dmg": 8,
+        "dmg": 32,
         "kind": "light",
         "vfx": "x3-c-hit-spark-light",
         "vs": 1.2,
@@ -549,7 +549,7 @@
        "t": "melee",
        "range": 140,
        "hit": {
-        "dmg": 12,
+        "dmg": 48,
         "kind": "heavy",
         "vfx": "x3-c-hit-spark-light",
         "vs": 1.8,
@@ -603,7 +603,7 @@
         "scale": 1.5,
         "r": 70,
         "hit": {
-         "dmg": 25,
+         "dmg": 41,
          "kind": "launch",
          "vfx": "x3-c-hit-spark-light",
          "vs": 1.5,
@@ -664,7 +664,7 @@
         "scale": 1.4,
         "r": 70,
         "hit": {
-         "dmg": 12,
+         "dmg": 19,
          "kind": "light",
          "vfx": "x3-c-hit-spark-light",
          "vs": 1.3,
@@ -693,7 +693,7 @@
         "scale": 1.6,
         "r": 70,
         "hit": {
-         "dmg": 12,
+         "dmg": 19,
          "kind": "light",
          "vfx": "x3-c-hit-spark-light",
          "vs": 1.3,
@@ -722,7 +722,7 @@
         "scale": 1.8,
         "r": 75,
         "hit": {
-         "dmg": 18,
+         "dmg": 29,
          "kind": "down",
          "vfx": "x3-c-hit-spark-light",
          "vs": 1.6,
@@ -764,7 +764,7 @@
         "delay": 0.15,
         "boom": 2,
         "hit": {
-         "dmg": 50,
+         "dmg": 84,
          "kind": "launch",
          "vfx": "x3-c-hit-spark-heavy",
          "vs": 0.8,
@@ -788,7 +788,7 @@
           "tint": "#B79CF0",
           "under": true,
           "hit": {
-           "dmg": 15,
+           "dmg": 25,
            "kind": "heavy"
           }
          }
@@ -847,7 +847,7 @@
        "at": "screen",
        "w": 1.05,
        "hit": {
-        "dmg": 10,
+        "dmg": 14,
         "kind": "light",
         "n": 2,
         "every": 0.3
@@ -873,7 +873,7 @@
            "scale": 2,
            "boom": 1,
            "hit": {
-            "dmg": 12,
+            "dmg": 17,
             "kind": "light",
             "vfx": "x3-c-hit-spark-light",
             "vs": 1.8,
@@ -905,7 +905,7 @@
        "scale": 1.1,
        "boom": 3,
        "hit": {
-        "dmg": 60,
+        "dmg": 83,
         "kind": "launch",
         "stop": 0.2,
         "shake": 16,

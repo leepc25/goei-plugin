@@ -556,7 +556,7 @@
       "depth": 110,
       "delay": 0.08,
       "hit": {
-       "dmg": 110,
+       "dmg": 49,
        "kind": "down",
        "n": 3,
        "mid": "launch",
@@ -623,7 +623,7 @@
          "r": 80,
          "delay": 0.06,
          "hit": {
-          "dmg": 55,
+          "dmg": 32,
           "kind": "launch",
           "stop": 0.08,
           "shake": 8
@@ -644,7 +644,7 @@
        "w": 1.05,
        "boom": 3,
        "hit": {
-        "dmg": 125,
+        "dmg": 74,
         "kind": "down",
         "n": 2,
         "mid": "launch",

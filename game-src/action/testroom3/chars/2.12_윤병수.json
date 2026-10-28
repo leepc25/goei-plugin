@@ -606,7 +606,7 @@
        "fade": 0.15,
        "r": 150,
        "hit": {
-        "dmg": 110,
+        "dmg": 19,
         "kind": "launch",
         "n": 6,
         "every": 0.12,
@@ -672,7 +672,7 @@
         "boom": 2,
         "r": 40,
         "hit": {
-         "dmg": 45,
+         "dmg": 38,
          "kind": "heavy",
          "stop": 0.12,
          "shake": 10
@@ -712,7 +712,7 @@
         "boom": 2,
         "r": 40,
         "hit": {
-         "dmg": 75,
+         "dmg": 64,
          "kind": "launch",
          "stop": 0.12,
          "shake": 10
@@ -753,7 +753,7 @@
         "boom": 2,
         "r": 40,
         "hit": {
-         "dmg": 40,
+         "dmg": 34,
          "kind": "launch",
          "stop": 0.12,
          "shake": 10
@@ -795,7 +795,7 @@
           "boom": 2,
           "r": 40,
           "hit": {
-           "dmg": 40,
+           "dmg": 34,
            "kind": "launch",
            "stop": 0.12,
            "shake": 10
@@ -839,7 +839,7 @@
           "boom": 2,
           "r": 40,
           "hit": {
-           "dmg": 40,
+           "dmg": 34,
            "kind": "down",
            "stop": 0.12,
            "shake": 10
@@ -901,7 +901,7 @@
           "fade": 0.1,
           "r": 90,
           "hit": {
-           "dmg": 24,
+           "dmg": 20,
            "kind": "heavy",
            "n": 2,
            "every": 0.1,
@@ -938,7 +938,7 @@
             "fade": 0.1,
             "r": 90,
             "hit": {
-             "dmg": 24,
+             "dmg": 20,
              "kind": "heavy",
              "n": 2,
              "every": 0.1,
@@ -963,7 +963,7 @@
          "boom": 3,
          "r": 200,
          "hit": {
-          "dmg": 60,
+          "dmg": 50,
           "kind": "launch",
           "stop": 0.16,
           "shake": 16
@@ -991,7 +991,7 @@
            "boom": 3,
            "r": 200,
            "hit": {
-            "dmg": 60,
+            "dmg": 50,
             "kind": "down",
             "stop": 0.16,
             "shake": 16

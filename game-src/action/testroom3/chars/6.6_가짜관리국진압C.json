@@ -257,7 +257,7 @@
          "scale": 0.4,
          "tint": "#d8cfb4",
          "hit": {
-          "dmg": 20,
+          "dmg": 92,
           "kind": "launch",
           "n": 2,
           "mid": "light"
@@ -294,7 +294,7 @@
       "size": 0.7,
       "dy": 0,
       "hit": {
-       "dmg": 12,
+       "dmg": 55,
        "kind": "light"
       }
      }
@@ -307,7 +307,7 @@
       "size": 0.7,
       "dy": 0,
       "hit": {
-       "dmg": 6,
+       "dmg": 25,
        "kind": "light"
       }
      },
@@ -322,7 +322,7 @@
         "size": 0.7,
         "dy": 0,
         "hit": {
-         "dmg": 6,
+         "dmg": 25,
          "kind": "light"
         }
        }
@@ -339,7 +339,7 @@
         "size": 0.7,
         "dy": 0,
         "hit": {
-         "dmg": 10,
+         "dmg": 42,
          "kind": "heavy"
         }
        }
@@ -359,7 +359,7 @@
         "size": 0.7,
         "dy": -30,
         "hit": {
-         "dmg": 4,
+         "dmg": 12,
          "kind": "light"
         }
        },
@@ -370,7 +370,7 @@
         "size": 0.7,
         "dy": 0,
         "hit": {
-         "dmg": 4,
+         "dmg": 12,
          "kind": "light"
         }
        },
@@ -381,7 +381,7 @@
         "size": 0.7,
         "dy": 30,
         "hit": {
-         "dmg": 4,
+         "dmg": 12,
          "kind": "light"
         }
        }
@@ -399,7 +399,7 @@
         "scale": 0.6,
         "tint": "#d8cfb4",
         "hit": {
-         "dmg": 14,
+         "dmg": 41,
          "kind": "down"
         },
         "r": 120
@@ -420,9 +420,12 @@
    "10": 10,
    "11": 22,
    "12": 31,
-   "13": 21
+   "13": 21,
+   "14": 16
   },
-  "cd": {},
+  "cd": {
+   "skill": 8
+  },
   "shotDmg": 7,
   "heatPer": 9,
   "hp": 140

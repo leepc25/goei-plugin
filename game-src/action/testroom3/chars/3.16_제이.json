@@ -529,7 +529,7 @@
        "scale": 1.3,
        "r": 90,
        "hit": {
-        "dmg": 36,
+        "dmg": 84,
         "kind": "down",
         "n": 2,
         "mid": "light",
@@ -603,7 +603,7 @@
       "speed": 1400,
       "life": 0.2,
       "hit": {
-       "dmg": 18,
+       "dmg": 50,
        "kind": "light",
        "vfx": "x3-c-hit-spark-light",
        "vs": 1.4,
@@ -629,7 +629,7 @@
       "speed": 1500,
       "life": 0.45,
       "hit": {
-       "dmg": 30,
+       "dmg": 84,
        "kind": "launch",
        "vfx": "x3-c-hit-spark-light",
        "vs": 1.6,
@@ -657,7 +657,7 @@
       "delay": 0.3,
       "boom": 1,
       "hit": {
-       "dmg": 45,
+       "dmg": 134,
        "kind": "launch",
        "vfx": "x3-c-hit-spark-heavy",
        "vs": 0.8,
@@ -733,7 +733,7 @@
          "scale": 0.45,
          "under": true,
          "hit": {
-          "dmg": 18,
+          "dmg": 42,
           "kind": "launch",
           "vfx": "x3-c-hit-spark-heavy",
           "vs": 0.6,
@@ -756,7 +756,7 @@
        "delay": 0.2,
        "boom": 3,
        "hit": {
-        "dmg": 60,
+        "dmg": 138,
         "kind": "blow",
         "stop": 0.2,
         "shake": 18,

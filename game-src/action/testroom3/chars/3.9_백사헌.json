@@ -510,7 +510,7 @@
          "t": "melee",
          "range": 150,
          "hit": {
-          "dmg": 45,
+          "dmg": 62,
           "kind": "light",
           "vfx": "x3-c-hit-spark-light",
           "vs": 1.4
@@ -531,7 +531,7 @@
          "t": "melee",
          "range": 170,
          "hit": {
-          "dmg": 55,
+          "dmg": 76,
           "kind": "heavy",
           "vfx": "x3-c-hit-spark-heavy",
           "vs": 0.6
@@ -589,7 +589,7 @@
         "speed": 1400,
         "time": 0.35,
         "hit": {
-         "dmg": 70,
+         "dmg": 55,
          "kind": "down",
          "vfx": "x3-c-hit-spark-heavy",
          "vs": 0.6
@@ -611,7 +611,7 @@
       "speed": 1300,
       "time": 0.38,
       "hit": {
-       "dmg": 85,
+       "dmg": 46,
        "n": 2,
        "every": 0.3,
        "mid": "light",
@@ -638,7 +638,7 @@
       "t": "melee",
       "range": 170,
       "hit": {
-       "dmg": 130,
+       "dmg": 147,
        "kind": "blow",
        "vfx": "x3-c-hit-spark-heavy",
        "vs": 0.7,
@@ -739,7 +739,7 @@
          "t": "melee",
          "range": 170,
          "hit": {
-          "dmg": 40,
+          "dmg": 15,
           "kind": "heavy",
           "vfx": "x3-c-hit-spark-heavy",
           "vs": 0.6,
@@ -762,7 +762,7 @@
          "t": "melee",
          "range": 170,
          "hit": {
-          "dmg": 50,
+          "dmg": 19,
           "kind": "down",
           "vfx": "x3-c-hit-spark-light",
           "vs": 1.5
@@ -833,7 +833,7 @@
          "t": "melee",
          "range": 170,
          "hit": {
-          "dmg": 40,
+          "dmg": 15,
           "kind": "heavy",
           "vfx": "x3-c-hit-spark-heavy",
           "vs": 0.6,
@@ -856,7 +856,7 @@
          "t": "melee",
          "range": 170,
          "hit": {
-          "dmg": 50,
+          "dmg": 19,
           "kind": "down",
           "vfx": "x3-c-hit-spark-light",
           "vs": 1.5
@@ -940,7 +940,7 @@
          "under": true,
          "r": 260,
          "hit": {
-          "dmg": 150,
+          "dmg": 56,
           "n": 2,
           "every": 0.2,
           "mid": "down",

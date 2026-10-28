@@ -377,7 +377,7 @@
        "time": 1.2,
        "color": "#6EC6FF",
        "hit": {
-        "dmg": 150,
+        "dmg": 153,
         "kind": "light"
        }
       }
@@ -447,7 +447,7 @@
        {
         "t": "hit",
         "hit": {
-         "dmg": 70,
+         "dmg": 68,
          "kind": "blow",
          "stop": 0.12,
          "shake": 10
@@ -480,7 +480,7 @@
       "depth": 110,
       "delay": 0.35,
       "hit": {
-       "dmg": 110,
+       "dmg": 109,
        "kind": "down",
        "stop": 0.2,
        "shake": 15

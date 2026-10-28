@@ -543,7 +543,7 @@
        "t": "melee",
        "range": 140,
        "hit": {
-        "dmg": 10,
+        "dmg": 11,
         "kind": "pull",
         "stop": 0.05,
         "shake": 3
@@ -577,7 +577,7 @@
        "r": 80,
        "boom": 1,
        "hit": {
-        "dmg": 130,
+        "dmg": 142,
         "kind": "blow",
         "stop": 0.16,
         "shake": 12
@@ -607,7 +607,7 @@
       "speed": 1100,
       "life": 0.45,
       "hit": {
-       "dmg": 50,
+       "dmg": 41,
        "kind": "heavy",
        "vfx": "x3-3.2-D-foxfire-burst",
        "vs": 0.25
@@ -624,7 +624,7 @@
       "r": 200,
       "delay": 0.25,
       "hit": {
-       "dmg": 90,
+       "dmg": 17,
        "kind": "heavy",
        "n": 4,
        "every": 0.12,
@@ -643,7 +643,7 @@
       "r": 300,
       "delay": 0.35,
       "hit": {
-       "dmg": 130,
+       "dmg": 109,
        "kind": "blow",
        "stop": 0.18,
        "shake": 14

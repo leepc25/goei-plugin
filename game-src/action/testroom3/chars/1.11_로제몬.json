@@ -398,7 +398,7 @@
        "life": 0.45,
        "size": 1,
        "hit": {
-        "dmg": 110,
+        "dmg": 153,
         "kind": "heavy",
         "vfx": "x3-c-hit-spark-light",
         "vs": 1.6
@@ -450,7 +450,7 @@
       "life": 0.36,
       "size": 2,
       "hit": {
-       "dmg": 60,
+       "dmg": 41,
        "kind": "pull"
       },
       "end": [
@@ -479,7 +479,7 @@
       "life": 0.36,
       "size": 2,
       "hit": {
-       "dmg": 40,
+       "dmg": 21,
        "kind": "launch"
       },
       "end": [
@@ -502,7 +502,7 @@
          {
           "t": "hit",
           "hit": {
-           "dmg": 90,
+           "dmg": 47,
            "kind": "spike",
            "vfx": "x3-c-hit-spark-heavy",
            "vs": 0.8,
@@ -543,7 +543,7 @@
       "life": 0.36,
       "size": 2,
       "hit": {
-       "dmg": 40,
+       "dmg": 27,
        "kind": "pull"
       },
       "end": [
@@ -567,7 +567,7 @@
          {
           "t": "hit",
           "hit": {
-           "dmg": 120,
+           "dmg": 82,
            "kind": "down",
            "stop": 0.16,
            "shake": 12
@@ -619,7 +619,7 @@
          "scale": 2,
          "tint": "#B04FD0",
          "hit": {
-          "dmg": 20,
+          "dmg": 16,
           "kind": "light"
          }
         }
@@ -642,7 +642,7 @@
          "scale": 0.6,
          "tint": "#B04FD0",
          "hit": {
-          "dmg": 30,
+          "dmg": 24,
           "kind": "light"
          }
         }
@@ -670,7 +670,7 @@
        "scale": 1.5,
        "boom": 3,
        "hit": {
-        "dmg": 150,
+        "dmg": 120,
         "kind": "blow",
         "stop": 0.22,
         "shake": 16

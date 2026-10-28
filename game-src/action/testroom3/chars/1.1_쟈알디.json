@@ -470,7 +470,7 @@
         "depth": 75,
         "boom": 1,
         "hit": {
-         "dmg": 30,
+         "dmg": 29,
          "kind": "down",
          "stop": 0.14,
          "shake": 10
@@ -502,7 +502,7 @@
       "depth": 75,
       "boom": 1,
       "hit": {
-       "dmg": 6,
+       "dmg": 3,
        "kind": "light"
       }
      },
@@ -532,7 +532,7 @@
         "depth": 75,
         "boom": 1,
         "hit": {
-         "dmg": 6,
+         "dmg": 3,
          "kind": "light"
         }
        },
@@ -564,7 +564,7 @@
         "depth": 75,
         "boom": 1,
         "hit": {
-         "dmg": 6,
+         "dmg": 3,
          "kind": "light"
         }
        },
@@ -596,7 +596,7 @@
         "depth": 75,
         "boom": 1,
         "hit": {
-         "dmg": 34,
+         "dmg": 18,
          "kind": "launch",
          "stop": 0.14,
          "shake": 10,
@@ -628,7 +628,7 @@
       "depth": 50,
       "boom": 1,
       "hit": {
-       "dmg": 6,
+       "dmg": 3,
        "kind": "light"
       }
      },
@@ -658,7 +658,7 @@
         "depth": 50,
         "boom": 1,
         "hit": {
-         "dmg": 6,
+         "dmg": 3,
          "kind": "light"
         }
        },
@@ -690,7 +690,7 @@
         "depth": 50,
         "boom": 1,
         "hit": {
-         "dmg": 6,
+         "dmg": 3,
          "kind": "light"
         }
        },
@@ -722,7 +722,7 @@
         "depth": 50,
         "boom": 1,
         "hit": {
-         "dmg": 34,
+         "dmg": 18,
          "kind": "launch",
          "stop": 0.14,
          "shake": 10,
@@ -754,7 +754,7 @@
       "depth": 50,
       "boom": 1,
       "hit": {
-       "dmg": 6,
+       "dmg": 3,
        "kind": "light"
       }
      },
@@ -784,7 +784,7 @@
         "depth": 50,
         "boom": 1,
         "hit": {
-         "dmg": 6,
+         "dmg": 3,
          "kind": "light"
         }
        },
@@ -816,7 +816,7 @@
         "depth": 50,
         "boom": 1,
         "hit": {
-         "dmg": 6,
+         "dmg": 3,
          "kind": "light"
         }
        },
@@ -848,7 +848,7 @@
         "depth": 50,
         "boom": 1,
         "hit": {
-         "dmg": 34,
+         "dmg": 18,
          "kind": "launch",
          "stop": 0.14,
          "shake": 10,
@@ -963,7 +963,7 @@
          "r": 110,
          "boom": 2,
          "hit": {
-          "dmg": 22,
+          "dmg": 21,
           "kind": "down",
           "stop": 0.08,
           "shake": 10
@@ -997,7 +997,7 @@
          "r": 110,
          "boom": 3,
          "hit": {
-          "dmg": 49,
+          "dmg": 48,
           "kind": "launch",
           "n": 3,
           "mid": "heavy",

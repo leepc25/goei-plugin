@@ -424,7 +424,7 @@
        "t": "melee",
        "range": 150,
        "hit": {
-        "dmg": 30,
+        "dmg": 61,
         "kind": "light",
         "vfx": "x3-c-hit-spark-light",
         "vs": 1.4
@@ -448,7 +448,7 @@
        "t": "melee",
        "range": 150,
        "hit": {
-        "dmg": 38,
+        "dmg": 77,
         "kind": "light",
         "vfx": "x3-c-hit-spark-light",
         "vs": 1.6,
@@ -482,7 +482,7 @@
       "t": "melee",
       "range": 120,
       "hit": {
-       "dmg": 35,
+       "dmg": 55,
        "kind": "stun",
        "vfx": "x3-c-hit-spark-light",
        "vs": 1.6
@@ -495,7 +495,7 @@
       "speed": 1500,
       "time": 0.27,
       "hit": {
-       "dmg": 60,
+       "dmg": 92,
        "kind": "down",
        "vfx": "x3-c-hit-spark-heavy",
        "vs": 0.8
@@ -526,7 +526,7 @@
       "speed": 1500,
       "time": 0.27,
       "hit": {
-       "dmg": 40,
+       "dmg": 62,
        "kind": "down"
       }
      },
@@ -548,7 +548,7 @@
         "h": 20,
         "scale": 1.1,
         "hit": {
-         "dmg": 55,
+         "dmg": 85,
          "kind": "down",
          "stop": 0.18,
          "shake": 14
@@ -607,7 +607,7 @@
          "t": "pull",
          "dist": 140,
          "hit": {
-          "dmg": 15,
+          "dmg": 13,
           "kind": "pull"
          }
         },
@@ -644,7 +644,7 @@
           {
            "t": "hit",
            "hit": {
-            "dmg": 18,
+            "dmg": 16,
             "kind": "light",
             "stop": 0.06,
             "shake": 9
@@ -671,7 +671,7 @@
        "scale": 0.8,
        "tint": "#d8dde6",
        "hit": {
-        "dmg": 22,
+        "dmg": 19,
         "kind": "light"
        }
       }
@@ -689,7 +689,7 @@
        "tint": "#d8dde6",
        "flip": false,
        "hit": {
-        "dmg": 22,
+        "dmg": 19,
         "kind": "light"
        }
       }
@@ -706,7 +706,7 @@
        "scale": 0.9,
        "tint": "#d8dde6",
        "hit": {
-        "dmg": 26,
+        "dmg": 22,
         "kind": "light"
        }
       }
@@ -726,7 +726,7 @@
       {
        "t": "hit",
        "hit": {
-        "dmg": 70,
+        "dmg": 60,
         "kind": "blow",
         "stop": 0.2,
         "shake": 14

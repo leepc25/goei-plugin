@@ -554,7 +554,7 @@
        "speed": 900,
        "time": 0.15,
        "hit": {
-        "dmg": 8,
+        "dmg": 9,
         "kind": "light",
         "vfx": "x3-c-hit-spark-light",
         "vs": 1.5
@@ -583,7 +583,7 @@
        "tint": "#ffe4de",
        "r": 60,
        "hit": {
-        "dmg": 120,
+        "dmg": 129,
         "kind": "launch",
         "vfx": "x3-c-hit-spark-heavy",
         "vs": 0.8,
@@ -626,7 +626,7 @@
       "rot": 0.5,
       "tint": "#ffe4de",
       "hit": {
-       "dmg": 50,
+       "dmg": 55,
        "kind": "light",
        "vfx": "x3-c-hit-spark-light",
        "vs": 2
@@ -644,7 +644,7 @@
       "tint": "#ffe4de",
       "r": 70,
       "hit": {
-       "dmg": 22,
+       "dmg": 21,
        "kind": "light",
        "vfx": "x3-c-hit-spark-light",
        "vs": 2
@@ -663,7 +663,7 @@
         "rot": -0.7,
         "tint": "#ffe4de",
         "hit": {
-         "dmg": 22,
+         "dmg": 21,
          "kind": "light",
          "vfx": "x3-c-hit-spark-light",
          "vs": 2
@@ -684,7 +684,7 @@
         "rot": 0.7,
         "tint": "#ffe4de",
         "hit": {
-         "dmg": 22,
+         "dmg": 21,
          "kind": "light",
          "vfx": "x3-c-hit-spark-light",
          "vs": 2
@@ -704,7 +704,7 @@
         "scale": 0.85,
         "tint": "#ffe4de",
         "hit": {
-         "dmg": 30,
+         "dmg": 29,
          "kind": "heavy",
          "vfx": "x3-c-hit-spark-heavy",
          "vs": 0.7
@@ -800,7 +800,7 @@
         "pierce": true,
         "life": 1.0,
         "hit": {
-         "dmg": 70,
+         "dmg": 71,
          "kind": "down",
          "stop": 0.14,
          "shake": 12,
@@ -838,7 +838,7 @@
        "under": true,
        "r": 170,
        "hit": {
-        "dmg": 15,
+        "dmg": 31,
         "kind": "light"
        }
       },
@@ -872,7 +872,7 @@
            "tint": "#ffe4de",
            "r": 70,
            "hit": {
-            "dmg": 22,
+            "dmg": 46,
             "kind": "launch",
             "vfx": "x3-c-hit-spark-heavy",
             "vs": 0.7,
@@ -922,7 +922,7 @@
       {
        "t": "hit",
        "hit": {
-        "dmg": 50,
+        "dmg": 103,
         "kind": "spike",
         "stop": 0.16,
         "shake": 16,

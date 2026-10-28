@@ -438,7 +438,7 @@
        "h": 90,
        "scale": 1.1,
        "hit": {
-        "dmg": 90,
+        "dmg": 168,
         "kind": "down",
         "vfx": "x3-c-hit-spark-heavy",
         "vs": 1,
@@ -488,7 +488,7 @@
         "t": "proj",
         "kind": "bullet",
         "hit": {
-         "dmg": 28,
+         "dmg": 25,
          "kind": "light"
         }
        }
@@ -522,7 +522,7 @@
       "dx": 160,
       "scale": 1.15,
       "hit": {
-       "dmg": 80,
+       "dmg": 45,
        "kind": "blow",
        "n": 3,
        "mid": "light",
@@ -574,7 +574,7 @@
            "at": "target",
            "scale": 1.1,
            "hit": {
-            "dmg": 30,
+            "dmg": 21,
             "kind": "down",
             "stop": 0.1,
             "shake": 10
@@ -621,7 +621,7 @@
          "at": "screen",
          "scale": 2.1,
          "hit": {
-          "dmg": 80,
+          "dmg": 55,
           "kind": "launch",
           "n": 2,
           "mid": "heavy",
@@ -661,7 +661,7 @@
         {
          "t": "hit",
          "hit": {
-          "dmg": 70,
+          "dmg": 48,
           "kind": "blow",
           "stop": 0.2,
           "shake": 16
