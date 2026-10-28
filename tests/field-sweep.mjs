@@ -41,8 +41,8 @@ for (const id of scenes) {
   for (const s of sc.spots) {
     await closeAll();
     if (await ev((id) => window.__goeiEngine.world.stage.current().id !== id, id)) { await ev((id) => window.__goeiEngine.world.stage.jump(id, 400), id); await page.waitForTimeout(1300); }
-    // 앞 자리에서 앉은 채면(시간 보내기 창을 닫아도 앉아 있음) 다음 자리 안내가 안 뜬다: 옆으로 비켜 일어난 뒤 옮긴다 (qc-field-world 와 같은 순서)
-    await ev(() => { window.__goeiEngine.world.player.x += 200; }); await page.waitForTimeout(300);
+    // 앞 자리에 앉은 채면(시간 보내기 창을 닫아도 앉아 있음, 일어나기 = E) 다음 자리 안내가 안 뜬다: E 로 일어난 뒤 옮긴다
+    if (await ev(() => !!window.__goeiEngine.world.player.seat)) { await page.keyboard.press('KeyE'); await page.waitForFunction(() => !window.__goeiEngine.world.player.seat, null, { timeout: 5000 }); await page.waitForTimeout(200); }
     await ev(([x, y]) => { const w = window.__goeiEngine.world; w.player.x = x; w.player.y = y; }, [s.x, s.y ?? 560]);
     await page.waitForTimeout(300);
     const near = await ev(() => window.__goeiEngine.world.stage.nearInfo());

@@ -54,7 +54,7 @@ await page.addInitScript(() => {
 async function skipStory() {
   for (let i = 0; i < 6; i++) {
     for (const selector of ['.gsy-vskip', '.gsy-skip']) {
-      const b = page.locator(selector); if (await b.isVisible()) await b.click();
+      const b = page.locator(selector); if (await b.isVisible()) await b.click({ timeout: 1000 }).catch(() => {}); // 보였다가 컷이 끝나 사라지면 30초 기다리던 경쟁
     }
     await page.waitForTimeout(100);
   }
