@@ -89,7 +89,11 @@ export function ppValue(state: Record<string, unknown> | undefined, key: string)
 
 export function peopleSettings(state: Record<string, unknown> | undefined): PeopleSettings {
   const v = (k: string) => ppValue(state, k);
-  const num = (k: string, min: number, max: number) => Math.max(min, Math.min(max, Number(v(k)) || Number(PP_DEFAULTS[k])));
+  // 0 도 고른 값이다 (메시지당 변화 상한 0 = 한도 없음, 직전 쌍 0). 예전엔 `|| 기본값` 이라 0 이 기본값(10·1)으로 바뀌었다 (QC 2026-10-28)
+  const num = (k: string, min: number, max: number) => {
+    const n = Number(v(k));
+    return Math.max(min, Math.min(max, Number.isFinite(n) ? n : Number(PP_DEFAULTS[k])));
+  };
   const one = <T extends string>(k: string, list: readonly T[]): T => (list.includes(v(k) as T) ? (v(k) as T) : (PP_DEFAULTS[k] as T));
   return {
     on: v('on') === '1',

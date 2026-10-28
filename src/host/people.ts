@@ -168,12 +168,15 @@ export function statusIdentity(chat: Chat): ReturnType<typeof parseIdentity> {
 
 // ── 실행 ──
 
-let inflight: Promise<RunResult> | null = null;
-let pendingReason: string | null = null;
+/** 돌고 있는 갱신 수. 요청은 차례로 잇는다 (QC 2026-10-28: 예전엔 돌고 있을 때 들어온 요청의 이유·옵션(수동·범위)을 버리고
+ *  처음 요청의 옵션으로 한 번 더 돌았고, 부른 쪽은 처음 요청의 결과를 받았다) */
+let running = 0;
+let chain: Promise<unknown> = Promise.resolve();
+export const peopleUpdating = () => running > 0;
 
 export interface RunResult { ran: number; applied: number; skipped: string[]; errors: string[] }
 
-/** 안 읽은 응답을 묶음으로 읽어 기록에 반영한다. 이미 돌고 있으면 끝난 뒤 한 번 더 */
+/** 안 읽은 응답을 묶음으로 읽어 기록에 반영한다. 이미 돌고 있으면 끝난 뒤 이어서 (읽을 것이 없으면 바로 끝난다) */
 export interface RunScope {
   /** 읽을 응답 위치 (없으면 안 읽은 것). backfill·다시 읽기 */
   indexes?: number[];
@@ -182,19 +185,12 @@ export interface RunScope {
 }
 
 export function requestPeopleUpdate(reason: string, o: { manual?: boolean; scope?: RunScope } = {}): Promise<RunResult> {
-  if (inflight) {
-    pendingReason = reason;
-    return inflight;
-  }
-  inflight = runOnce(reason, o).finally(() => {
-    inflight = null;
-    if (pendingReason) {
-      const r = pendingReason;
-      pendingReason = null;
-      void requestPeopleUpdate(r, o);
-    }
+  running++;
+  const run = chain.then(() => runOnce(reason, o)).finally(() => {
+    running--;
   });
-  return inflight;
+  chain = run.catch(() => {});
+  return run;
 }
 
 async function waitNotBusy(): Promise<void> {
@@ -334,9 +330,10 @@ async function runOnce(reason: string, o: { manual?: boolean; scope?: RunScope }
       result.ran++;
       result.applied += diag.report ? diag.report.applied.entries + diag.report.applied.cues + diag.report.applied.address + diag.report.applied.docs + diag.report.applied.suspicion : 0;
     } catch (error) {
+      // 응답 원문이 오류에 붙어 있으면(형식 오류 재시도 끝) 먼저 꺼내야 단계가 parse 로 적힌다 (QC 2026-10-28: 늘 build 로 적혔다)
+      if (!diag.raw && error && typeof error === 'object' && 'raw' in error) diag.raw = String((error as { raw?: unknown }).raw ?? '');
       diag.stage = error instanceof LlmError ? 'model' : diag.raw ? 'parse' : 'build';
       diag.error = error instanceof Error ? error.message : String(error);
-      if (!diag.raw && error && typeof error === 'object' && 'raw' in error) diag.raw = String((error as { raw?: unknown }).raw ?? '');
       result.errors.push(diag.error);
       console.log(`[goei] 인물 기록 갱신 실패: ${diag.error}`);
     } finally {
@@ -380,7 +377,7 @@ export async function backfillPeople(turns: number): Promise<RunResult> {
 
 /** 인물별 다시 읽기: 이 인물의 이야기 기록을 지우고, 그 인물이 나온 최근 turns 개 응답을 이 인물만 대상으로 다시 읽는다. 읽음 표시는 그대로 */
 export async function rereadPerson(name: string, turns: number): Promise<RunResult & { cleared: number }> {
-  if (inflight) return { ran: 0, applied: 0, skipped: ['갱신이 돌고 있어요'], errors: [], cleared: 0 };
+  if (running) return { ran: 0, applied: 0, skipped: ['갱신이 돌고 있어요'], errors: [], cleared: 0 };
   const ctx = await loadContext().catch(() => null);
   if (!ctx) return { ran: 0, applied: 0, skipped: ['채팅을 읽지 못했어요'], errors: [], cleared: 0 };
   const store = peopleStore(ctx.chat);
@@ -400,7 +397,7 @@ export async function rereadPerson(name: string, turns: number): Promise<RunResu
 
 /** 인물 기록 「정리」: 보조 모델이 이 인물의 살아 있는 항목을 더 적은 항목으로 다시 쓴다 (사용자가 눌렀을 때만, 1회 호출) */
 export async function consolidatePerson(name: string): Promise<{ ok: boolean; message: string; report?: ConsolidateReport }> {
-  if (inflight) return { ok: false, message: '갱신이 돌고 있어요. 끝난 뒤 다시 눌러 주세요.' };
+  if (running) return { ok: false, message: '갱신이 돌고 있어요. 끝난 뒤 다시 눌러 주세요.' };
   const ctx = await loadContext().catch(() => null);
   if (!ctx) return { ok: false, message: '채팅을 읽지 못했어요.' };
   return consolidateInner(ctx, name, peopleSettings(ctx.chat.scriptstate));
@@ -442,6 +439,7 @@ async function consolidateInner(ctx: ChatContext, name: string, settings: People
     const msg = r.slots ? `정리: ${r.slots}칸, 항목 ${r.before} → ${r.after}${r.dropped.length ? ` (${r.dropped.length}칸은 결과가 맞지 않아 그대로)` : ''}` : `바뀐 칸이 없어요${r.dropped.length ? ` (${r.dropped[0].reason})` : ''}`;
     return { ok: true, message: msg, report: r };
   } catch (error) {
+    if (!diag.raw && error && typeof error === 'object' && 'raw' in error) diag.raw = String((error as { raw?: unknown }).raw ?? '');
     diag.stage = error instanceof LlmError ? 'model' : diag.raw ? 'parse' : 'build';
     diag.error = error instanceof Error ? error.message : String(error);
     return { ok: false, message: `정리 실패: ${diag.error}` };
