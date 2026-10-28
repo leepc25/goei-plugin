@@ -232,7 +232,205 @@
   },
   "heat": true
  },
- "skills": {},
+ "skills": {
+  "skill": {
+   "name": "튕겨 들어가는 발도",
+   "anim": "22",
+   "fps": 12,
+   "armed": false,
+   "events": [
+    {
+     "f": 3,
+     "fx": [
+      {
+       "t": "dash",
+       "speed": 1900,
+       "time": 0.28,
+       "hit": {
+        "dmg": 20,
+        "kind": "light",
+        "vfx": "x3-c-slash-arc",
+        "vs": 1.2,
+        "tint": "#c9d2e0"
+       }
+      }
+     ]
+    },
+    {
+     "f": 5,
+     "fx": [
+      {
+       "t": "v",
+       "vfx": "x3-c-slash-arc",
+       "at": "self",
+       "dx": -40,
+       "scale": 1.2,
+       "tint": "#c9d2e0"
+      }
+     ]
+    }
+   ]
+  },
+  "charge": {
+   "name": "발도 모으기",
+   "hold": "23",
+   "release": "24",
+   "levels": [
+    0.5,
+    1.2
+   ],
+   "fire": 4,
+   "armed": false,
+   "lv": {
+    "0": [
+     {
+      "t": "v",
+      "vfx": "x3-c-slash-arc",
+      "at": "front",
+      "dx": 60,
+      "scale": 0.9,
+      "tint": "#c9d2e0",
+      "hit": {
+       "dmg": 14,
+       "kind": "light"
+      }
+     }
+    ],
+    "1": [
+     {
+      "t": "dash",
+      "speed": 1300,
+      "time": 0.24,
+      "hit": {
+       "dmg": 24,
+       "kind": "heavy",
+       "vfx": "x3-c-slash-arc",
+       "vs": 1.4,
+       "tint": "#c9d2e0"
+      }
+     },
+     {
+      "t": "v",
+      "vfx": "x3-c-slash-arc",
+      "at": "front",
+      "dx": 120,
+      "scale": 1.6,
+      "tint": "#c9d2e0",
+      "under": false
+     }
+    ],
+    "2": [
+     {
+      "t": "hide",
+      "mode": "out",
+      "dur": 0.08
+     },
+     {
+      "t": "dash",
+      "speed": 2600,
+      "time": 0.38,
+      "hit": null
+     },
+     {
+      "t": "later",
+      "in": 0.38,
+      "fx": [
+       {
+        "t": "hide",
+        "mode": "in",
+        "dur": 0.12
+       },
+       {
+        "t": "later",
+        "in": 0.18,
+        "fx": [
+         {
+          "t": "v",
+          "vfx": "x3-c-slash-arc",
+          "at": "self",
+          "dx": -80,
+          "scale": 1.3,
+          "tint": "#c9d2e0",
+          "hit": {
+           "dmg": 32,
+           "kind": "launch",
+           "vfx": "x3-c-slash-arc",
+           "tint": "#c9d2e0"
+          },
+          "r": 55
+         },
+         {
+          "t": "v",
+          "vfx": "x3-c-slash-arc",
+          "at": "self",
+          "dx": -230,
+          "scale": 1.3,
+          "tint": "#c9d2e0",
+          "hit": {
+           "dmg": 32,
+           "kind": "launch",
+           "vfx": "x3-c-slash-arc",
+           "tint": "#c9d2e0"
+          },
+          "r": 55
+         },
+         {
+          "t": "v",
+          "vfx": "x3-c-slash-arc",
+          "at": "self",
+          "dx": -380,
+          "scale": 1.3,
+          "tint": "#c9d2e0",
+          "hit": {
+           "dmg": 32,
+           "kind": "launch",
+           "vfx": "x3-c-slash-arc",
+           "tint": "#c9d2e0"
+          },
+          "r": 55
+         },
+         {
+          "t": "v",
+          "vfx": "x3-c-slash-arc",
+          "at": "self",
+          "dx": -530,
+          "scale": 1.3,
+          "tint": "#c9d2e0",
+          "hit": {
+           "dmg": 32,
+           "kind": "launch",
+           "vfx": "x3-c-slash-arc",
+           "tint": "#c9d2e0"
+          },
+          "r": 55
+         },
+         {
+          "t": "v",
+          "vfx": "x3-c-slash-arc",
+          "at": "self",
+          "dx": -680,
+          "scale": 1.3,
+          "tint": "#c9d2e0",
+          "hit": {
+           "dmg": 32,
+           "kind": "launch",
+           "vfx": "x3-c-slash-arc",
+           "tint": "#c9d2e0"
+          },
+          "r": 55
+         },
+         {
+          "t": "shake",
+          "v": 12
+         }
+        ]
+       }
+      ]
+     }
+    ]
+   }
+  }
+ },
  "_note": "자동 생성. 값을 고치면 build가 그대로 씀. 다시 자동으로: build.py --reset 6.1_가짜관리국검사A",
  "bal": {
   "role": "control",
@@ -250,5 +448,6 @@
   },
   "shotDmg": 9,
   "hp": 120
- }
+ },
+ "skills_2판": {}
 }

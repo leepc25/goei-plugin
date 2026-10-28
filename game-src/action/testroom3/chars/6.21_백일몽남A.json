@@ -232,7 +232,171 @@
   },
   "heat": true
  },
- "skills": {},
+ "skills": {
+  "skill": {
+   "name": "늑대 덮치기",
+   "anim": "22",
+   "fps": 11,
+   "armed": false,
+   "events": [
+    {
+     "f": 4,
+     "fx": [
+      {
+       "t": "repeat",
+       "n": 2,
+       "every": 0.06,
+       "fx": [
+        {
+         "t": "v",
+         "vfx": "x3-c-slash-arc",
+         "at": "front",
+         "dx": 70,
+         "scale": 0.6,
+         "tint": "#9a9a9a",
+         "rot": 25
+        }
+       ]
+      },
+      {
+       "t": "melee",
+       "range": 160,
+       "hit": {
+        "dmg": 18,
+        "kind": "light",
+        "n": 2,
+        "mid": "light",
+        "every": 0.06
+       }
+      }
+     ]
+    },
+    {
+     "f": 6,
+     "fx": [
+      {
+       "t": "v",
+       "vfx": "x3-c-slash-arc",
+       "at": "front",
+       "dx": 80,
+       "scale": 0.6,
+       "tint": "#9a9a9a",
+       "rot": -25
+      }
+     ]
+    }
+   ]
+  },
+  "charge": {
+   "name": "가면 짐승",
+   "hold": "23",
+   "release": "24",
+   "levels": [
+    0.5,
+    1.2
+   ],
+   "fire": 4,
+   "armed": false,
+   "lv": {
+    "0": [
+     {
+      "t": "v",
+      "vfx": "x3-c-slash-arc",
+      "at": "front",
+      "dx": 70,
+      "scale": 0.8,
+      "tint": "#9a9a9a",
+      "hit": {
+       "dmg": 14,
+       "kind": "light"
+      }
+     }
+    ],
+    "1": [
+     {
+      "t": "dash",
+      "speed": 1200,
+      "time": 0.25,
+      "hit": null
+     },
+     {
+      "t": "repeat",
+      "n": 3,
+      "every": 0.08,
+      "fx": [
+       {
+        "t": "v",
+        "vfx": "x3-c-slash-arc",
+        "at": "front",
+        "dx": 80,
+        "scale": 0.8,
+        "tint": "#9a9a9a"
+       }
+      ]
+     },
+     {
+      "t": "later",
+      "in": 0.22,
+      "fx": [
+       {
+        "t": "melee",
+        "range": 160,
+        "hit": {
+         "dmg": 24,
+         "kind": "heavy",
+         "n": 3,
+         "mid": "light",
+         "every": 0.07
+        }
+       }
+      ]
+     }
+    ],
+    "2": [
+     {
+      "t": "dash",
+      "speed": 1200,
+      "time": 0.25,
+      "hit": null
+     },
+     {
+      "t": "repeat",
+      "n": 3,
+      "every": 0.08,
+      "fx": [
+       {
+        "t": "v",
+        "vfx": "x3-c-slash-arc",
+        "at": "front",
+        "dx": 80,
+        "scale": 0.8,
+        "tint": "#9a9a9a"
+       }
+      ]
+     },
+     {
+      "t": "later",
+      "in": 0.3,
+      "fx": [
+       {
+        "t": "spikes",
+        "at": "front",
+        "dx": 260,
+        "n": 12,
+        "spread": 230,
+        "len": 150,
+        "color": "#1c1a22",
+        "hit": {
+         "dmg": 30,
+         "kind": "launch"
+        }
+       }
+      ]
+     }
+    ]
+   }
+  }
+ },
  "_note": "자동 생성. 값을 고치면 build가 그대로 씀. 다시 자동으로: build.py --reset 6.21_백일몽남A",
  "bal": {
   "role": "striker",
@@ -250,5 +414,6 @@
   },
   "shotDmg": 9,
   "hp": 110
- }
+ },
+ "skills_2판": {}
 }

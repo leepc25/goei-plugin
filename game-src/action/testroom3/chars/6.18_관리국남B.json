@@ -43,7 +43,101 @@
   },
   "heat": false
  },
- "skills": {},
+ "skills": {
+  "skill": {
+   "name": "제압",
+   "anim": "22",
+   "fps": 11,
+   "armed": false,
+   "events": [
+    {
+     "f": 5,
+     "fx": [
+      {
+       "t": "melee",
+       "range": 160,
+       "hit": {
+        "dmg": 20,
+        "kind": "heavy"
+       }
+      }
+     ]
+    },
+    {
+     "f": 6,
+     "fx": [
+      {
+       "t": "v",
+       "vfx": "x3-c-ground-shockwave",
+       "at": "front",
+       "dx": 80,
+       "scale": 0.4,
+       "tint": "#d8cfb4"
+      }
+     ]
+    }
+   ]
+  },
+  "charge": {
+   "name": "돌입 제압",
+   "hold": "23",
+   "release": "24",
+   "levels": [
+    0.5,
+    1.2
+   ],
+   "fire": 4,
+   "armed": false,
+   "lv": {
+    "0": [
+     {
+      "t": "melee",
+      "range": 160,
+      "hit": {
+       "dmg": 16,
+       "kind": "heavy"
+      }
+     }
+    ],
+    "1": [
+     {
+      "t": "dash",
+      "speed": 1300,
+      "time": 0.22,
+      "hit": {
+       "dmg": 22,
+       "kind": "down"
+      }
+     }
+    ],
+    "2": [
+     {
+      "t": "dash",
+      "speed": 1300,
+      "time": 0.22,
+      "hit": {
+       "dmg": 26,
+       "kind": "down"
+      }
+     },
+     {
+      "t": "later",
+      "in": 0.26,
+      "fx": [
+       {
+        "t": "v",
+        "vfx": "x3-c-ground-shockwave",
+        "at": "front",
+        "dx": 60,
+        "scale": 0.8,
+        "tint": "#d8cfb4"
+       }
+      ]
+     }
+    ]
+   }
+  }
+ },
  "_note": "자동 생성. 값을 고치면 build가 그대로 씀. 다시 자동으로: build.py --reset 6.18_관리국남B",
  "bal": {
   "role": "bruiser",
@@ -61,5 +155,6 @@
   },
   "shotDmg": 9,
   "hp": 120
- }
+ },
+ "skills_2판": {}
 }

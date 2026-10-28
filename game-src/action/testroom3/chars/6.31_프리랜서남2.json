@@ -61,7 +61,104 @@
   },
   "heat": false
  },
- "skills": {},
+ "skills": {
+  "skill": {
+   "name": "팔꿈치로 쳐내고 근접 사격",
+   "anim": "22",
+   "fps": 11,
+   "armed": true,
+   "events": [
+    {
+     "f": 3,
+     "fx": [
+      {
+       "t": "melee",
+       "range": 140,
+       "hit": {
+        "dmg": 8,
+        "kind": "light"
+       }
+      }
+     ]
+    },
+    {
+     "f": 5,
+     "fx": [
+      {
+       "t": "repeat",
+       "n": 2,
+       "every": 0.08,
+       "fx": [
+        {
+         "t": "proj",
+         "kind": "orb",
+         "speed": 1700,
+         "size": 0.6,
+         "life": 0.4,
+         "hit": {
+          "dmg": 7,
+          "kind": "light"
+         }
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  "charge": {
+   "name": "모은 한 방 · 정강이 돌려차기",
+   "hold": "23",
+   "release": "24",
+   "levels": [
+    0.5,
+    1.2
+   ],
+   "fire": 4,
+   "armed": false,
+   "lv": {
+    "0": [
+     {
+      "t": "melee",
+      "range": 170,
+      "hit": {
+       "dmg": 18,
+       "kind": "heavy"
+      }
+     }
+    ],
+    "1": [
+     {
+      "t": "dash",
+      "speed": 1200,
+      "time": 0.22,
+      "hit": {
+       "dmg": 24,
+       "kind": "heavy"
+      }
+     }
+    ],
+    "2": [
+     {
+      "t": "melee",
+      "range": 170,
+      "hit": {
+       "dmg": 28,
+       "kind": "launch"
+      }
+     },
+     {
+      "t": "v",
+      "vfx": "x3-c-ground-shockwave",
+      "at": "front",
+      "dx": 120,
+      "scale": 0.8,
+      "tint": "#d8cfb4"
+     }
+    ]
+   }
+  }
+ },
  "_note": "자동 생성. 값을 고치면 build가 그대로 씀. 다시 자동으로: build.py --reset 6.31_프리랜서남2",
  "bal": {
   "role": "striker",
@@ -79,5 +176,6 @@
   },
   "shotDmg": 9,
   "hp": 110
- }
+ },
+ "skills_2판": {}
 }

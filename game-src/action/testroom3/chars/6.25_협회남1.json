@@ -227,7 +227,93 @@
   },
   "heat": true
  },
- "skills": {},
+ "skills": {
+  "skill": {
+   "name": "떼어내기",
+   "anim": "22",
+   "fps": 11,
+   "armed": false,
+   "events": [
+    {
+     "f": 5,
+     "fx": [
+      {
+       "t": "melee",
+       "range": 160,
+       "hit": {
+        "dmg": 16,
+        "kind": "heavy"
+       }
+      },
+      {
+       "t": "v",
+       "vfx": "x3-c-ground-shockwave",
+       "at": "front",
+       "dx": 110,
+       "scale": 0.35,
+       "tint": "#d8cfb4"
+      }
+     ]
+    }
+   ]
+  },
+  "charge": {
+   "name": "정조준",
+   "hold": "23",
+   "release": "24",
+   "levels": [
+    0.5,
+    1.2
+   ],
+   "fire": 4,
+   "armed": true,
+   "lv": {
+    "0": [
+     {
+      "t": "proj",
+      "kind": "orb",
+      "speed": 1500,
+      "size": 0.7,
+      "hit": {
+       "dmg": 12,
+       "kind": "light"
+      }
+     }
+    ],
+    "1": [
+     {
+      "t": "proj",
+      "kind": "orb",
+      "speed": 1500,
+      "size": 0.7,
+      "dy": 60,
+      "hit": {
+       "dmg": 16,
+       "kind": "down"
+      }
+     }
+    ],
+    "2": [
+     {
+      "t": "proj",
+      "kind": "orb",
+      "speed": 2000,
+      "size": 1.6,
+      "pierce": true,
+      "life": 1.2,
+      "hit": {
+       "dmg": 28,
+       "kind": "heavy"
+      }
+     },
+     {
+      "t": "shake",
+      "v": 6
+     }
+    ]
+   }
+  }
+ },
  "_note": "자동 생성. 값을 고치면 build가 그대로 씀. 다시 자동으로: build.py --reset 6.25_협회남1",
  "bal": {
   "role": "control",
@@ -244,5 +330,6 @@
   },
   "shotDmg": 9,
   "hp": 110
- }
+ },
+ "skills_2판": {}
 }

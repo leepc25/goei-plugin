@@ -113,7 +113,90 @@
   },
   "heat": false
  },
- "skills": {},
+ "skills": {
+  "skill": {
+   "name": "손전등 눈부시게 하고 치기",
+   "anim": "22",
+   "fps": 11,
+   "armed": false,
+   "events": [
+    {
+     "f": 4,
+     "fx": [
+      {
+       "t": "flash",
+       "v": 0.1
+      }
+     ]
+    },
+    {
+     "f": 5,
+     "fx": [
+      {
+       "t": "melee",
+       "range": 150,
+       "hit": {
+        "dmg": 16,
+        "kind": "stun"
+       }
+      }
+     ]
+    }
+   ]
+  },
+  "charge": {
+   "name": "모은 한 방 · 팔꿈치",
+   "hold": "23",
+   "release": "24",
+   "levels": [
+    0.5,
+    1.2
+   ],
+   "fire": 4,
+   "armed": false,
+   "lv": {
+    "0": [
+     {
+      "t": "melee",
+      "range": 170,
+      "hit": {
+       "dmg": 18,
+       "kind": "heavy"
+      }
+     }
+    ],
+    "1": [
+     {
+      "t": "dash",
+      "speed": 1200,
+      "time": 0.22,
+      "hit": {
+       "dmg": 24,
+       "kind": "heavy"
+      }
+     }
+    ],
+    "2": [
+     {
+      "t": "melee",
+      "range": 170,
+      "hit": {
+       "dmg": 28,
+       "kind": "launch"
+      }
+     },
+     {
+      "t": "v",
+      "vfx": "x3-c-ground-shockwave",
+      "at": "front",
+      "dx": 120,
+      "scale": 0.8,
+      "tint": "#d8cfb4"
+     }
+    ]
+   }
+  }
+ },
  "_note": "자동 생성. 값을 고치면 build가 그대로 씀. 다시 자동으로: build.py --reset 6.30_프리랜서남1",
  "bal": {
   "role": "striker",
@@ -131,5 +214,6 @@
   },
   "shotDmg": 9,
   "hp": 110
- }
+ },
+ "skills_2판": {}
 }

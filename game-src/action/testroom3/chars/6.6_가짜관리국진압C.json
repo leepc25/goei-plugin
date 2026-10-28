@@ -232,7 +232,184 @@
   },
   "heat": true
  },
- "skills": {},
+ "skills": {
+  "skill": {
+   "name": "개머리판",
+   "armed": false,
+   "steps": [
+    {
+     "anim": "23",
+     "fps": 22,
+     "upto": 8
+    },
+    {
+     "anim": "22",
+     "fps": 11,
+     "events": [
+      {
+       "f": 5,
+       "fx": [
+        {
+         "t": "v",
+         "vfx": "x3-c-ground-shockwave",
+         "at": "front",
+         "dx": 90,
+         "scale": 0.4,
+         "tint": "#d8cfb4",
+         "hit": {
+          "dmg": 20,
+          "kind": "launch",
+          "n": 2,
+          "mid": "light"
+         },
+         "r": 120
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "anim": "23",
+     "fps": 22,
+     "rev": true
+    }
+   ]
+  },
+  "charge": {
+   "name": "구역 탄막",
+   "hold": "23",
+   "release": "24",
+   "levels": [
+    0.5,
+    1.2
+   ],
+   "fire": 4,
+   "armed": false,
+   "lv": {
+    "0": [
+     {
+      "t": "proj",
+      "kind": "orb",
+      "speed": 1600,
+      "size": 0.7,
+      "dy": 0,
+      "hit": {
+       "dmg": 12,
+       "kind": "light"
+      }
+     }
+    ],
+    "1": [
+     {
+      "t": "proj",
+      "kind": "orb",
+      "speed": 1600,
+      "size": 0.7,
+      "dy": 0,
+      "hit": {
+       "dmg": 6,
+       "kind": "light"
+      }
+     },
+     {
+      "t": "later",
+      "in": 0.09,
+      "fx": [
+       {
+        "t": "proj",
+        "kind": "orb",
+        "speed": 1600,
+        "size": 0.7,
+        "dy": 0,
+        "hit": {
+         "dmg": 6,
+         "kind": "light"
+        }
+       }
+      ]
+     },
+     {
+      "t": "later",
+      "in": 0.18,
+      "fx": [
+       {
+        "t": "proj",
+        "kind": "orb",
+        "speed": 1600,
+        "size": 0.7,
+        "dy": 0,
+        "hit": {
+         "dmg": 10,
+         "kind": "heavy"
+        }
+       }
+      ]
+     }
+    ],
+    "2": [
+     {
+      "t": "repeat",
+      "n": 3,
+      "every": 0.12,
+      "fx": [
+       {
+        "t": "proj",
+        "kind": "orb",
+        "speed": 1600,
+        "size": 0.7,
+        "dy": -30,
+        "hit": {
+         "dmg": 4,
+         "kind": "light"
+        }
+       },
+       {
+        "t": "proj",
+        "kind": "orb",
+        "speed": 1600,
+        "size": 0.7,
+        "dy": 0,
+        "hit": {
+         "dmg": 4,
+         "kind": "light"
+        }
+       },
+       {
+        "t": "proj",
+        "kind": "orb",
+        "speed": 1600,
+        "size": 0.7,
+        "dy": 30,
+        "hit": {
+         "dmg": 4,
+         "kind": "light"
+        }
+       }
+      ]
+     },
+     {
+      "t": "later",
+      "in": 0.5,
+      "fx": [
+       {
+        "t": "v",
+        "vfx": "x3-c-ground-shockwave",
+        "at": "front",
+        "dx": 300,
+        "scale": 0.6,
+        "tint": "#d8cfb4",
+        "hit": {
+         "dmg": 14,
+         "kind": "down"
+        },
+        "r": 120
+       }
+      ]
+     }
+    ]
+   }
+  }
+ },
  "_note": "자동 생성. 값을 고치면 build가 그대로 씀. 다시 자동으로: build.py --reset 6.6_가짜관리국진압C",
  "bal": {
   "role": "bruiser",
@@ -249,5 +426,6 @@
   "shotDmg": 7,
   "heatPer": 9,
   "hp": 140
- }
+ },
+ "skills_2판": {}
 }

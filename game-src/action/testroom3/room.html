@@ -41,18 +41,20 @@ button.cap{border-color:var(--acc);color:var(--acc)}
 <div class="row">음악 <select id="song"></select> <label><input id="mute" type="checkbox"> 소리 끄기</label></div>
 <div class="row"><label><input id="fs" type="checkbox"> 필살기 게이지 무시(시험용)</label></div>
 <div class="row"><label><input id="sa" type="checkbox" checked> 슈퍼아머 테두리 보기</label></div>
+<div class="row"><label><input id="chair" type="checkbox" checked> 앉을 때 의자 그림(C01 1배 · 판정 전)</label></div>
 </div>
 <div class="card"><h2>키 바꾸기 <span class="m">(단추를 누르고 새 키 · Esc 취소)</span></h2><div class="binds" id="binds"></div>
 <div class="row"><button id="reset">기본값으로</button></div></div>
-<div class="card"><h2>동작 하나씩 보기</h2><div class="list" id="list"></div></div>
+<div class="card"><h2>동작 하나씩 보기 <span class="m">(누르면 그 줄을 틂)</span></h2><div id="list"></div></div>
 </div>
 </div>
 <script>/*__AUDIO__*/</script>
+<script src="vfx.js"></script>
 <script>
 // ── 인물 목록·이펙트 그림(빌드가 넣음). 인물 그림은 chars/<키>.js 를 고를 때 불러옴 ──
 const INDEX = /*__INDEX__*/null || [];
 let A = {}, IMG = {}, CH = { key: '', name: '', color: '#cfc7a6', picks: {}, loops: {}, hit: {}, skills: {}, gun: [], kick: [], ranged: {} }, CK = null;
-const VFX = /*__VFX__*/null || {}; for (const k in VFX) { VFX[k].img = new Image(); VFX[k].img.src = VFX[k].src; }
+const VFX = window.__VFX || {}; for (const k in VFX) { VFX[k].img = new Image(); VFX[k].img.src = VFX[k].src; }
 const vfxDur = name => VFX[name].frames.reduce((a, f) => a + f[4], 0) / 1000;
 // PixelLab 이펙트 그림: o.flip(좌우), o.rot(회전), o.anchor('right'), o.center(가운데 기준), o.loop, o.under(바닥 층)
 const vfx = (name, x, y, scale = 2, o = {}) => { if (!VFX[name]) return false; const d = vfxDur(name); const T = (o.t || d) + (o.hold || 0); const e = { k: 'sheet', name, x, y, s: scale, t0: T, t: T, dur: d, ...o }; o.back ? fx.unshift(e) : fx.push(e); return true; };   // back: 같은 층 맨 아래(다른 이펙트 밑)
@@ -82,30 +84,35 @@ const store = { get(k, d) { try { const v = localStorage.getItem('room3.' + k); 
                 set(k, v) { try { localStorage.setItem('room3.' + k, JSON.stringify(v)); } catch {} } };
 
 // ── 키 ──
-const ACTIONS = [   // 사용자 2026-10-25 키 배치(앞으로 쓸 키) + 나머지는 테스트용
- ['left','왼쪽','ArrowLeft'],['right','오른쪽','ArrowRight'],['up','안쪽(위)','ArrowUp'],['down','바깥쪽(아래)','ArrowDown'],
- ['light','약 공격 · 뛰며 = 돌진 · 공중 = 점프 공격','KeyQ'],['heavy','강 공격(콤보 마무리) · 뛰며 = 돌진 · 공중 = 강한 점프 공격','KeyW'],['block','방어(누른 채)','KeyC'],
- ['shoot','원거리(누른 채 = 연사)','KeyA'],['charge','충전(누른 채) → 떼면 방출','KeyS'],['skill','기술','KeyD'],['super','필살기','KeyF'],
- ['weapon','무기 꺼내기/넣기(무기 없으면 겨눈 자세)','Tab'],['jump','점프 · 공중에서 2단','Space'],
- ['run','짧게 = 회피(누른 방향, 없으면 뒤) · 길게 = 달리기','ShiftLeft'],['dodge','회피만(따로 쓰고 싶을 때)',''],
- ['pick','상호작용 · 줍기 · 선택','KeyE'],['map','지도(테스트룸: 조작 요약 보이기/숨기기)','KeyM'],
- ['combat','전투 자세 켜기/끄기','KeyR'],['sit','주저앉기 켜기/끄기','KeyZ'],
- ['crouch','웅크리기 켜기/끄기(웅크려서 방향키 = 네발로 기기)','KeyX'],['flee','도망(누른 채)','KeyV'],['back','뒷걸음질(누른 채)','ControlLeft'],
- // ── 테스트용 ──
- ['prevChar','이전 인물','BracketLeft'],['nextChar','다음 인물','BracketRight'],['skill2','둘째 기술(있는 인물만)','KeyG'],
- ['hit','맞기 상단(약) · 누워 있으면 움찔','Digit1'],['hitLow','맞기 하단(강)','KeyL'],['push','크게 밀려나기(날리기)','KeyN'],['launch','띄워지기(띄우기)','KeyB'],['die','사망(서 있으면 서서, 누워 있으면 누워서) · 다시 누르면 되살림','KeyT'],['knock','날아가 쓰러지기','Digit2'],['stun','스턴(연타로 빨리 풀림)','Digit3'],['crawl','쓰러진 뒤 엎드려 기기','Digit4'],
- ['dying','빈사 켜기/끄기','Digit5'],['heal','회복약 먹기(섭취 + 회복 효과)','Digit6'],['drop','아이템 떨어뜨리기(E로 줍기)','Digit7'],['status','상태이상 바꾸기(독→불→전기→없음)','Digit8'],
- ['eat','섭취','Digit9'],['personal','개인 대기','Digit0'],
- ['respond','응대','KeyY'],['talk','말하며 손짓','KeyU'],['nod','끄덕이기','KeyI'],['shake','고개 젓기','KeyO'],
- ['angry','화내기','KeyP'],['happy','기뻐하기','KeyH'],['surprise','놀라기','KeyJ'],['notice','발견 반응','KeyK'],
+const ACTIONS = [   // 라이브(본편 0.16.56, 에일린 등 요원 공통) 키 그대로 — src/game/action/engine/input.ts · ui/keys.ts. 아래 「테스트용」만 테스트룸 전용
+ ['left','왼쪽','ArrowLeft'],['right','오른쪽','ArrowRight'],['up','위(안쪽) · 앉은 자세에서 일어나기','ArrowUp'],['down','아래(앞쪽) · 두 번 = 웅크리기','ArrowDown'],
+ ['light','근접(연타 3타, 맞혀야 이어짐) · 뛰며 = 돌진 · 회피 직후 = 돌진 · 공중 = 점프 공격','KeyA'],['shoot','원거리(꺼내고 쏨, 연사 무기는 누른 채)','KeyS'],
+ ['skill','고유기(짧게) · 길게 = 충전 → 떼면 방출','KeyD'],['block','가드(누른 채)','KeyQ'],['super','필살기(게이지 가득)','KeyW'],
+ ['pick','상호작용 · 줍기 · 앉은 자리에서 일어나기','KeyE'],['jump','점프','Space'],['run','짧게 회피 · 누른 채 달리기(방향키 두 번도 달리기)','ShiftLeft'],
+ ['item1','아이템 1 · 회복약','Digit1'],['item2','아이템 2 · 먹기(섭취)','Digit2'],['item3','아이템 3 · 떨어뜨리기(E로 줍기)','Digit3'],['item4','아이템 4 · 상태이상 바꾸기','Digit4'],
+ ['support','지원 요원 호출(테스트룸 없음)','KeyC'],['map','지도(테스트룸: 조작 요약 보이기/숨기기)','KeyZ'],['auto','자동 전환(테스트룸 없음)','KeyX'],
+ ['pause','메뉴(테스트룸: 멈춤)','Escape'],['weapon','재장전(테스트룸: 무기 꺼내기/넣기)','KeyR'],['hitbox','판정 보기(장 번호·판정)','KeyH'],
+ ['heavy','숙련 기술 1 자리(테스트룸: 강 공격 · 공중 = 강한 점프 공격)','KeyF'],['skill2','숙련 기술 2 자리(테스트룸: 둘째 기술)','KeyG'],
+ // ── 테스트용(라이브에 없는 것) ──
+ ['prevChar','이전 인물','BracketLeft'],['nextChar','다음 인물','BracketRight'],
+ ['hit','맞기 상단(약) · 누워 있으면 움찔','Digit5'],['hitLow','맞기 하단(강)','Digit6'],['push','크게 밀려나기','Digit7'],['launch','띄워지기','Digit8'],['knock','날아가 쓰러지기','Digit9'],['die','사망(서서/누워서) · 다시 누르면 되살림','Digit0'],
+ ['stun','스턴(연타로 빨리 풀림)','Minus'],['dying','빈사 켜기/끄기','Equal'],['crawl','쓰러진 뒤 엎드려 기기','KeyT'],
+ ['seat','의자에 앉기(누를 때마다 정면→옆→후면) · 앉아서 = 일어나기','Semicolon'],['lifePrev','생활·직무 이전 줄','Comma'],['lifeNext','생활·직무 다음 줄','Period'],
+ ['respond','응대 · 앉아서 = 수다','KeyY'],['talk','말하며 손짓 · 앉아서 = 먹기','KeyU'],['nod','끄덕이기 · 앉아서 = 마시기','KeyI'],['shake','고개 젓기 · 앉아서 = 타자','KeyO'],
+ ['angry','화내기 · 앉아서 = 졸기','KeyP'],['happy','기뻐하기 · 앉아서 = 기대 쉬기','KeyL'],['surprise','놀라기','KeyJ'],['notice','발견 반응','KeyK'],
+ ['flee','도망(누른 채)','KeyV'],['back','뒷걸음질(누른 채)','KeyB'],['sit','주저앉기 켜기/끄기','KeyN'],['personal','개인 대기','KeyM'],['combat','전투 자세 켜기/끄기','Backslash'],
+ ['dodge','회피만(따로 쓰고 싶을 때)',''],['charge','충전만(따로 쓰고 싶을 때, 누른 채)',''],
 ];
 const DEF = Object.fromEntries(ACTIONS.map(a => [a[0], a[2]]));
-let binds = Object.assign({}, DEF, store.get('binds2', {}));
+let binds = Object.assign({}, DEF, store.get('binds3', {}));
 const held = new Set();
-const down = n => n === 'run' ? held.has(binds.run) && performance.now() - (runT || 0) > 180 : held.has(binds[n]);
-let runT = 0;   // Shift 누른 시각: 0.18초 안에 떼면 회피, 넘게 누르면 달리기
+// ── 라이브 조작값(본편 engine/player.ts·input.ts, 30틱/초) → 초 단위. 거리·속도는 인물 키(라이브 몸 264화소)에 맞춰 늘이고 줄임 ──
+const LIVE = { walk: 270, run: 540, walkY: 126, runY: 151, airWalk: 270, airRun: 480, jumpV: 930, grav: 2340, evade: 450, evadeKeep: 0.0054, evadeInv: 0.3, tap: 167, dbl: 267, chargeAfter: 0.3, body: 264 };
+const bodyK = () => K(P.y) * ((CH.h0 || 233) / LIVE.body);   // 이 인물·이 깊이에서 라이브 1화소가 화면 몇 화소인지
+const down = n => n === 'run' ? held.has(binds.run) && performance.now() - (runT || 0) > LIVE.tap : held.has(binds[n]);
+let runT = 0;   // Shift 누른 시각: 5틱(0.167초) 안에 떼면 회피, 넘게 누르면 달리기(라이브)
 const actOf = code => { for (const k in binds) if (binds[k] === code) return k; return null; };
-const keyName = c => !c ? '—' : c.replace(/^Key/, '').replace(/^Digit/, '').replace('ArrowLeft', '←').replace('ArrowRight', '→').replace('ArrowUp', '↑').replace('ArrowDown', '↓').replace('Space', '스페이스').replace('Semicolon', ';').replace('ShiftLeft', 'Shift').replace('ShiftRight', 'Shift').replace('BracketLeft', '[').replace('BracketRight', ']').replace('ControlLeft', 'Ctrl').replace('ControlRight', 'Ctrl');
+const keyName = c => !c ? '—' : c.replace(/^Key/, '').replace(/^Digit/, '').replace('ArrowLeft', '←').replace('ArrowRight', '→').replace('ArrowUp', '↑').replace('ArrowDown', '↓').replace('Space', '스페이스').replace('Semicolon', ';').replace('ShiftLeft', 'Shift').replace('ShiftRight', 'Shift').replace('BracketLeft', '[').replace('BracketRight', ']').replace('ControlLeft', 'Ctrl').replace('ControlRight', 'Ctrl').replace('Minus', '-').replace('Equal', '=').replace('Comma', ',').replace('Period', '.').replace('Backslash', '\\').replace('Escape', 'Esc');
 
 // ── 장 목록 도우미 ──
 const R = (a, b) => { const r = []; if (a <= b) for (let i = a; i <= b; i++) r.push(i); else for (let i = a; i >= b; i--) r.push(i); return r; };
@@ -129,7 +136,7 @@ const P0 = () => ({ x: 420, y: 580, z: 0, vz: 0, face: 1, mode: 'ground', combat
 let P = P0();
 const D = { juggle: 0, bounced: false, stunT: 0, x: 860, y: 600, vx: 0, z: 0, vz: 0, ang: 0, va: 0, hits: 0, hitT: 0, flash: 0, stag: 0, hp: 400, mark: 0, atkT: 2.2, wind: 0, bindT: 0, bindC: '#7A3FB0' };
 let zoom = 0, zx = W / 2, zy = H / 2, dShake = 0;
-let hitstop = 0, shake = 0, flash = 0, dark = 0, cut = 0, speed = 1, showNo = false, showDummy = true, counter = false, last = performance.now();
+let paused = false, hitstop = 0, shake = 0, flash = 0, dark = 0, cut = 0, speed = 1, showNo = false, showDummy = true, counter = false, last = performance.now();
 let freeSuper = false, showArmor = true, grayT = 0;
 // ── 밸런스(사용자 2026-10-25): 인물 설정 bal = { atk: {줄: 피해}, cd: {skill, skill2, charge, shot}, gun: single|rapid|heavy|thrown|none, shotDmg, heatPer }
 // 계산 근거·표: docs/밸런스_설계.md, 값은 game-src/action/testroom3/balance.py 가 넣음
@@ -141,7 +148,7 @@ const atkDmg = (id, big) => { const a = BAL().atk || {}; return a[id] ?? (big ? 
 function gainSp(v) { if (P.noGain > P.t) return; const was = P.sp; P.sp = Math.min(100, P.sp + v); if (was < 100 && P.sp >= 100) { sfx('ability'); flash = 0.06; fx.push({ k: 'num', x: P.x - 50, y: P.y - 260 * K(P.y), v: '필살기 준비', t: 1.0 }); } }
 function spReady() { if (freeSuper || P.sp >= 100) { if (!freeSuper) P.sp = 0; return true; } sfx('empty'); fx.push({ k: 'num', x: P.x - 50, y: P.y - 250 * K(P.y), v: '게이지 부족', t: 0.7 }); return false; }
 let charScale = store.get('size', 1), persp = true;
-const K = y => charScale * (persp ? 0.78 + 0.34 * (y - FLOOR0) / (FLOOR1 - FLOOR0) : 1);
+const K = y => charScale * (persp ? (0.85 + 0.15 * Math.max(0, Math.min(1, (y - FLOOR0) / (FLOOR1 - FLOOR0)))) * 1.04 : 1);   // 원근: 라이브 view.ts FAR 0.85 → 앞 1
 let fx = [];
 const items = [];
 let audio = null;
@@ -196,6 +203,7 @@ const canCancel = () => { const c = P.clip; if (!c || c.done) return true; retur
 function tickClip(dt) {
   const c = P.clip; if (!c || c.done || c.paused) return;
   c.t += dt;
+  if (c.holdKey && c.i >= c.holdAt && down(c.holdKey)) { c.t = 0; return; }   // D 누른 채: 충전으로 넘어갈지 기다림
   while (c.t >= c.seq[c.i].d) {
     c.t -= c.seq[c.i].d;
     const cur = c.seq[c.i];
@@ -263,7 +271,7 @@ function fireEv(e) {
     const p = framePt(id, f, a.reach[f], a.h * (e.hy || 0.42));
     const wide = id === '14';   // 공중공격은 판정을 넓게(사용자 2026-10-25): 앞뒤 160·위아래·깊이 넓게
     if (inReach(p.x, wide ? 160 : big ? 100 : 70, P.y - p.y, wide)) {
-      hitstop = big ? 0.16 : 0.085; shake = big ? 16 : 8; dShake = big ? 11 : 7;
+      hitstop = big ? 0.16 : 0.085; shake = big ? 16 : 8; dShake = big ? 11 : 7; P.connected = true;
       hurtDummy(atkDmg(id, big), e.kind || (big ? 'heavy' : 'light'));
       sfx('hit', { strength: big ? 3 : 1, kind: (CH.kick || []).includes(id) ? 'kick' : undefined });
       const cx = D.x - P.face * 18 * K(D.y);
@@ -303,7 +311,7 @@ function strike(h, y) {
     hitstop = Math.max(hitstop, h.stop ?? (big ? 0.14 : 0.07)); shake = Math.max(shake, h.shake ?? (big ? 12 : 5)); dShake = big ? 11 : 7;
     hurtDummy(Math.round((h.dmg || 20) / n), kind); sfx('hit', { strength: big ? 3 : 1, kind: h.sfx });
     const hy = y ?? D.y - D.z - 110 * K(D.y);
-    if (!h.noVfx) { if (!vfx(big ? 'hit_heavy' : 'hit_light', D.x, hy, big ? 1.8 : 2.2, { flip: P.face < 0 })) sparks(D.x, hy, 10, big); }
+    if (!h.noVfx) { if (h.vfx && VFX[h.vfx]) vfx(h.vfx, D.x, hy, (h.vs || 1) * K(D.y), { center: true, flip: P.face < 0, tint: h.tint }); else if (!vfx(big ? 'hit_heavy' : 'hit_light', D.x, hy, big ? 1.8 : 2.2, { flip: P.face < 0 })) sparks(D.x, hy, 10, big); }   // h.vfx: 맞는 자리 그림(3판 타격 불꽃 등)
     if (h.text) fx.push({ k: 'num', x: D.x - 30, y: hy - 70, v: h.text, t: 1.2 });
   };
   for (let i = 0; i < n; i++) i ? later(i * (h.every || 0.1), () => one(i)) : one(0);
@@ -394,7 +402,7 @@ const FX = {
       return;
     }
     sfx(s.sfx || 'whiff');
-    fx.push({ k: 'proj', kind: s.kind || 'orb', x: p.x, y: p.hy, gy: P.y, dir, v: s.speed || 1300, c: s.color || CH.color, size: (s.size || 1) * p.k, hit: s.hit, pierce: s.pierce, done: new Set(), t: s.life || 1.4, end: s.end });
+    fx.push({ k: 'proj', kind: s.kind || 'orb', vfx: s.vfx, tint: s.tint, rot: s.rot, x: p.x, y: p.hy + (s.dy || 0) * p.k, gy: P.y, dir, v: s.speed || 1300, c: s.color || CH.color, size: (s.size || 1) * p.k, hit: s.hit, pierce: s.pierce, done: new Set(), t: s.life || 1.4, end: s.end });
   },
   // 굵은 광선(충전): charge_beam 그림을 가로로 이어 붙임
   beam(s, c) {
@@ -472,6 +480,25 @@ const FX = {
   // 소리 고리: 손(마이크·입) 앞에서 n겹 퍼짐
   waves(s, c) { for (let i = 0; i < (s.n || 3); i++) later(i * 0.09, () => { const m = muzzle(); ring(m.x + P.face * 20, m.y, (s.r || 70) * (1 + i * 0.4), 0.35, s.color || '#ffcf9a', 4, 1); }); if (s.hit) FX.melee({ range: s.range || 260, hit: s.hit }, c); },
   hit(s) { if (s.hit) strike(s.hit); },   // 그림 없이 맞음만(화면 전체 기술의 샌드백 자리)
+  // 3판 이펙트 그림(x3-*) 한 장. 기준 배율 1 = 인물과 같은 화소 크기(인물 그림을 크기 기준으로 뽑음). mode(bottom·center)는 빌드가 목록에서 넣음
+  // at: hand | front(dx) | self | body(몸 가운데) | target(샌드백·화면 전체 각 자리) | screen(화면 가운데)
+  // scale · w(화면 폭에 대한 비율로 맞춤) · dx·dy(그림 화소, dy 아래로 +) · flip:false · tint(흰 공용 그림에 색) · under · hold · loop(초) · fade · rot · back
+  // 맞음: hit + r(기본 그림 폭 40%) + depth + delay. after: [부품] 그림이 끝난 뒤
+  v(s, c) {
+    const meta = VFX[s.vfx]; if (!meta) return;
+    const fw = meta.frames[0][2], fh = meta.frames[0][3], md = s.mode || meta.mode || 'center';
+    let p;
+    if (s.at === 'screen') p = { x: W / 2 + P.face * (s.dx || 0), gy: (FLOOR0 + FLOOR1) / 2 + 40 + (s.dy || 0), hy: H / 2 + (s.dy || 0), k: 1 };
+    else if (s.at === 'body') { const k = K(P.y); p = { x: P.x + P.face * (s.dx || 0) * k, gy: P.y, hy: P.y - P.z - (s.h ?? 110) * k + (s.dy || 0) * k, k }; }
+    else { p = posOf({ at: 'front', ...s }, c); if (s.dy) { p.gy += s.dy * p.k; p.hy += s.dy * p.k; } }
+    let sc = (s.scale || 1) * (s.at === 'screen' ? 1 : p.k);
+    if (s.w) sc = W * s.w / fw;
+    const flip = s.flip === false ? false : P.face < 0;
+    vfx(s.vfx, p.x, md === 'bottom' ? p.gy : p.hy, sc, { [md === 'bottom' ? 'bottom' : 'center']: true, flip, under: s.under, back: s.back, tint: s.tint, hold: s.hold, loop: !!s.loop, t: s.loop || undefined, fade: s.fade, rot: s.rot ? s.rot * (flip ? -1 : 1) : undefined });
+    if (s.boom) boomSnd(s.boom, p.x);
+    if (s.hit) { const r = (s.r ?? fw * 0.4) * sc, hy = md === 'bottom' ? p.gy - Math.min(fh * sc * 0.5, 110 * p.k) : p.hy; later(s.delay || 0, () => { if (s.at === 'screen' ? showDummy : near(p.x, p.gy, r + 20, (s.depth || 75) * (p.k || 1))) strike(s.hit, hy); }); }
+    if (s.after) later(vfxDur(s.vfx) + (s.hold || 0), () => runFx(s.after, { ...c, pt: { x: p.x, y: p.gy, z: 0, dummy: c.pt && c.pt.dummy } }));
+  },
   repeat(s, c) { for (let i = 0; i < (s.n || 3); i++) later(i * (s.every || 0.1), () => runFx(s.fx || [], c)); },
   gray(s) { grayT = Math.max(grayT, s.time || 1); },
   chance(s, c) { const ok = Math.random() < (s.p ?? 0.5); runFx(ok ? s.yes : s.no, c); },
@@ -570,9 +597,11 @@ function light() {
   const L = comboIds(); if (!L.length) return;
   P.combat = true; P.armed = false;
   if (P.combo >= L.length) P.combo = 0;
-  const id = L[P.combo]; P.combo++; sfx('whiff');
+  if (P.combo > 0 && showDummy && !P.connected) P.combo = 0;   // 라이브: 맞혀야 다음 타로(헛치면 1타부터). 샌드백을 끄면 그냥 이어짐
+  const id = L[P.combo]; P.combo++; sfx('whiff'); P.connected = false;
+  const last = P.combo === L.length;   // 라이브 3타째(power) = 쓰러뜨림
   pushP(170, 900);
-  act(id, { seq: atkSeq(id, false), onEnd: () => {
+  act(id, { seq: atkSeq(id, false).map(e => e.ev && last ? { ...e, kind: 'down' } : e), onEnd: () => {
     if (P.combo >= L.length) { P.blowWin = P.t + 0.35; P.combo = 0; return afterBuf(toIdle); }
     if (P.buf) return afterBuf(toIdle);
     P.mode = 'chain'; P.chainT = 0.26;
@@ -598,7 +627,7 @@ function dodge() {
   if (dx && dx === P.face && P.prevFace === -dx && P.t - P.faceT < 0.3) P.face = P.prevFace;
   const fwd = dx * P.face > 0, len = Math.hypot(dx, dy);
   const id = fwd && has('16_1') ? '16_1' : has('16') ? '16' : null; if (!id) return;
-  sfx('evade'); P.dodgeV = { x: dx / len * 780, y: dy / len * 520 }; P.inv = 0.3; P.ghostT = 0.2;
+  sfx('evade'); const ev = LIVE.evade * bodyK(); P.dodgeV = { x: dx / len * ev, y: dy / len * ev * 0.55, keep: LIVE.evadeKeep }; P.inv = LIVE.evadeInv; P.ghostT = 0.2;
   P.pvx = 0; P.pdec = 0;
   const n = nOf(id), d = 0.32 / n;
   act(id, { seq: S(R(0, n - 1), d).map((e, i) => i >= n - 2 ? { ...e, cancel: true } : e), onEnd: () => { P.dodgeV = null; afterBuf(toIdle); } });
@@ -640,6 +669,8 @@ function skillSeq(sp) {
     else s.push({ f, d: d0 });
     if (arm) s[s.length - 1].armor = f >= arm[0] && f <= arm[1];
   }
+  if (sp.rev) s.reverse();   // 거꾸로(견착 자세 풀기 등)
+  if (sp.upto) s.splice(sp.upto);   // 앞 몇 장만(1부터 센 장 수)
   return { id, s };
 }
 function doSkill(sp, then) {
@@ -653,8 +684,10 @@ function doSkill(sp, then) {
   };
   if (sp.armed) ensureArmed(go); else { P.armed = false; go(); }
 }
-function skill() { if (!cdReady('skill')) return; setCd('skill'); const sp = CH.skills.skill; if (sp && sp.alt && P.buffT > 0 && CH.skills[sp.alt]) return doSkill(CH.skills[sp.alt]); doSkill(sp); }
-function skill2() { if (!CH.skills.skill2 || !cdReady('skill2')) return; setCd('skill2'); doSkill(CH.skills.skill2); }
+// 여러 동작을 잇는 기술(steps): 고유기술·둘째 기술·NPC 특수공격도 필살기처럼 차례로
+function runSkill(sp, then) { if (!sp) return; const steps = sp.steps || [sp]; const go = i => i >= steps.length ? (then ? then() : (P.skArmor = false, (CH.armed && sp.armed) || (P.armed = false), afterBuf(toIdle))) : doSkill({ ...steps[i], armed: steps[i].armed ?? sp.armed, armor: steps[i].armor ?? (i ? undefined : sp.armor) }, () => go(i + 1)); go(0); }
+function skill() { if (!cdReady('skill')) return; setCd('skill'); const sp = CH.skills.skill; if (sp && sp.alt && P.buffT > 0 && CH.skills[sp.alt]) return runSkill(CH.skills[sp.alt]); runSkill(sp); }
+function skill2() { if (!CH.skills.skill2 || !cdReady('skill2')) return; setCd('skill2'); runSkill(CH.skills.skill2); }
 function superMove() {
   const sp = CH.skills.super; if (!sp) return;
   if (!spReady()) return;
@@ -693,7 +726,7 @@ const jf = () => { const n = nOf('7'), ap = PK('apex', '7'); return { up: [0, Ma
 function jump() {
   if (!has('7')) return;
   P.mode = 'air'; P.z = 0; P.vz = 0; P.jumps = 1; P.airAtk = false; P.spin = 0;
-  P.airVX = (down('run') || P.runLatch) ? 430 : 250; P.takeoff = 0.06; sfx('jump');
+  P.airVX = ((down('run') || P.runLatch) ? LIVE.airRun : LIVE.airWalk) * bodyK(); P.takeoff = 0.06; sfx('jump');
   play('7', { seq: S(jf().up, 0.03) });
 }
 function doubleJump() {
@@ -779,15 +812,75 @@ function sitLoop() { P.mode = 'sit'; play('39', { seq: S(sitLp(), 0.13), loopFro
 const crLp = () => LP('41') || R(Math.min(4, nOf('41') - 1), nOf('41') - 1);
 function crouch() { if (!has('41')) return; P.mode = 'crouch'; const lp = crLp(); play('41', { seq: [...S(R(0, lp[0] - 1), 0.08), ...S(lp, 0.11)], loopFrom: lp[0] }); }
 
+// ── 의자 앉기(3판 정면 60 · 옆 96 · 후면 61) — 라이브 seat: 4틱(0.133초)마다 한 장, E로 거꾸로 일어남 ──
+const SEATS = [{ dir: 'front', sit: '60', img: 'south', acts: { talk: '62', eat: '64', drink: '65', type: '63', doze: '66', lean: '73' } },
+               { dir: 'side', sit: '96', img: 'east', acts: { talk: '97', eat: '98', drink: '99', type: '105', doze: '54' } },
+               { dir: 'back', sit: '61', img: 'north', acts: { talk: '70', eat: '71', drink: '71', type: '69' } }];
+const SEAT_LOOP = new Set(['63', '64', '66', '73', '98', '105', '54', '69', '71']);   // 「반복, 첫 장 유지」 줄
+const SEAT_F = 0.133;
+let seatIdx = -1, showChair = true;
+const CHAIR = {}; for (const [k, v] of Object.entries(window.__CHAIR || {})) { CHAIR[k] = new Image(); CHAIR[k].src = v; }
+function seatIdle() { const s = P.seat; P.mode = 'seat'; const n = nOf(s.sit); play(s.sit, { seq: [{ f: n - 1, d: 9 }], loopFrom: 0 }); P.clip.breathe = true; }
+function sitChair() {
+  for (let k = 1; k <= SEATS.length; k++) { const s = SEATS[(seatIdx + k) % SEATS.length]; if (has(s.sit)) { seatIdx = SEATS.indexOf(s); break; } }
+  const s = SEATS[seatIdx]; if (!s || !has(s.sit)) return;
+  P.combat = false; P.armed = false; P.mode = 'seat'; P.seat = { ...s, x: P.x, y: P.y, face: P.face };
+  play(s.sit, { seq: S(R(0, nOf(s.sit) - 1), SEAT_F), onEnd: seatIdle });
+}
+function rise(fast) { const s = P.seat; if (!s) return toIdle(); const n = nOf(s.sit); reverseOut(s.sit, R(n - 1, 0), fast ? 0.04 : SEAT_F, () => { P.seat = null; if (fast === 'hit') hit(); else toIdle(); }); P.mode = 'seatUp'; }
+function seatAct(kind) {
+  const s = P.seat, id = s && s.acts[kind]; if (!id || !has(id)) return;
+  const n = nOf(id);
+  if (SEAT_LOOP.has(id)) { play(id, { seq: S(R(0, n - 1), 0.16), loopFrom: 0 }); P.clip.breathe = false; }
+  else play(id, { seq: S(R(0, n - 1), 0.14), onEnd: seatIdle });
+  P.mode = 'seat';
+}
+// 앉은 채 맞기: 약 = 앉기 거꾸로 빠르게 → 맞기 / 강 = 옆이면 굴러떨어지기(169) → 누움, 정면·후면이면 바로 쓰러지기(10-27 결정)
+function seatHit(strong) {
+  const s = P.seat;
+  if (!strong) return rise('hit');
+  P.seat = null;
+  if (s.dir === 'side' && has('169')) { sfx('hurt', { strength: 2 }); P.hp = Math.max(1, P.hp - 18); shake = 8; P.mode = 'act'; play('169', { seq: S(R(0, nOf('169') - 1), 0.08), onEnd: () => { dust(P.x, P.y, 6, 1.2); sfx('down'); lieLoop(); } }); return; }
+  P.mode = 'ground'; knock();
+}
+// ── 생활·직무 줄: , . 로 차례로 틀기(목록 단추와 같음) ──
+let lifeI = -1;
+const lifeIds = () => Object.keys(A).filter(id => /^\d+/.test(id) && parseInt(id) >= 50 && id !== '169').sort((a, b) => parseFloat(a.replace('_', '.')) - parseFloat(b.replace('_', '.')));
+function playLife(id) {
+  if (!A[id]) return;
+  P.seat = null; P.z = 0; P.combat = false; P.armed = false;
+  const n = nOf(id);
+  const lp = LP(id);
+  act(id, { seq: lp ? [...S(R(0, Math.max(0, lp[0] - 1)), 0.13), ...S(lp, 0.13), ...S(lp, 0.13), ...S(lp, 0.13)] : S(R(0, n - 1), 0.13) });
+  fx.push({ k: 'num', x: P.x - 60, y: P.y - 270 * K(P.y), v: `${id} ${A[id].name}`, t: 1.6 });
+}
+function stepLife(d) { const L = lifeIds(); if (!L.length) return; lifeI = (lifeI + d + L.length) % L.length; playLife(L[lifeI]); }
+
 function onPress(a) {
   if (a === 'run') { runT = performance.now(); return; }
   if (a === 'map') { const h = document.getElementById('help').parentElement; h.style.display = h.style.display === 'none' ? '' : 'none'; return; }
   if (a === 'prevChar' || a === 'nextChar') return stepChar(a === 'nextChar' ? 1 : -1);
   if (!CK) return;
-  if (a === 'left' || a === 'right') { const now = performance.now(); if (now - (P.lastTap[a] || 0) < 260) P.runLatch = true; P.lastTap[a] = now; }
-  if (a === 'heal' && P.mode === 'ground') { emote('26', 7); later(0.5, () => FX.heal({ v: 40 })); return; }
-  if (a === 'drop') { items.push({ x: P.x + P.face * 120, y: P.y, t0: P.t }); return; }
-  if (a === 'status') { P.status = [null, 'status_poison', 'status_burn', 'status_shock'][([null, 'status_poison', 'status_burn', 'status_shock'].indexOf(P.status || null) + 1) % 4]; return; }
+  if (a === 'pause') { paused = !paused; return; }
+  if (a === 'hitbox') { showNo = !showNo; document.getElementById('hb').checked = showNo; return; }
+  if (a === 'support' || a === 'auto') { fx.push({ k: 'num', x: P.x - 60, y: P.y - 260 * K(P.y), v: a === 'support' ? '지원 호출: 테스트룸 없음' : '자동 전환: 테스트룸 없음', t: 0.9 }); return; }
+  if (a === 'lifePrev' || a === 'lifeNext') { if (P.mode !== 'dead') stepLife(a === 'lifeNext' ? 1 : -1); return; }
+  let dbl = false;
+  if (a === 'left' || a === 'right' || a === 'down') { const now = performance.now(); dbl = now - (P.lastTap[a] || 0) < LIVE.dbl; if (dbl && a !== 'down') P.runLatch = true; P.lastTap[a] = now; }
+  // 앉은 자리
+  if (P.mode === 'seat' || P.mode === 'seatUp') {
+    if (P.mode === 'seatUp') return;
+    if (['seat', 'pick', 'up', 'jump'].includes(a)) return rise();
+    if (a === 'hit') return seatHit(false);
+    if (['hitLow', 'push', 'launch', 'knock'].includes(a)) return seatHit(true);
+    const SA = { respond: 'talk', talk: 'eat', nod: 'drink', shake: 'type', angry: 'doze', happy: 'lean' };
+    if (SA[a]) return seatAct(SA[a]);
+    if (a !== 'die') return;
+  }
+  if (a === 'item1' && P.mode === 'ground') { emote('26', 7); later(0.5, () => FX.heal({ v: 40 })); return; }
+  if (a === 'item2' && P.mode === 'ground') return emote('26', 7);
+  if (a === 'item3') { items.push({ x: P.x + P.face * 120, y: P.y, t0: P.t }); return; }
+  if (a === 'item4') { P.status = [null, 'status_poison', 'status_burn', 'status_shock'][([null, 'status_poison', 'status_burn', 'status_shock'].indexOf(P.status || null) + 1) % 4]; return; }
   if (a === 'dying') { P.dying = !P.dying; P.hp = P.dying ? 18 : 100; if (P.dying) sfx('hp:low'); return; }
   if (a === 'die') return die();
   if (P.mode === 'dead') return;
@@ -796,8 +889,8 @@ function onPress(a) {
   if ((P.mode === 'flee' || P.mode === 'back') && !['left', 'right', 'up', 'down', 'run'].includes(a)) toIdle();
   const m = P.mode;
   if (m === 'air') {
-    if (a === 'jump' && P.jumps < 2) doubleJump();
-    else if ((a === 'light' || a === 'heavy') && !P.airAtk) jumpAttack(a === 'heavy');
+    // 2단 점프 없음(라이브)
+    if ((a === 'light' || a === 'heavy') && !P.airAtk) jumpAttack(a === 'heavy');
     return;
   }
   if (m === 'chain') {
@@ -808,6 +901,7 @@ function onPress(a) {
     if (a === 'skill') return skillPress();
   }
   if (m === 'act') {
+    if (a === 'light' && P.clip && (P.clip.id === '16' || P.clip.id === '16_1') && P.clip.i <= 2) { P.dodgeV = null; P.buf = null; return slide(); }   // 라이브: 회피 첫 장들에서 A = 돌진
     const CANCEL_INTO = { skill: skillPress, super: superMove, shoot, charge, skill2 };
     if (CANCEL_INTO[a] && canCancel() && P.clip && ['9', '10', '11', '12', '13', '16', '16_1'].includes(P.clip.id)) { P.buf = null; return CANCEL_INTO[a](); }
     if (['light', 'heavy', 'dodge', 'jump'].includes(a)) {
@@ -825,7 +919,7 @@ function onPress(a) {
   if (m === 'belly') { if (a === 'jump' || a === 'crawl') return getUp(); return; }
   if (m === 'stun') { P.stunT -= 0.18; return; }
   if (m === 'sit' || m === 'scoot') { if (a === 'sit') reverseOut('39', R(Math.max(0, sitLp()[0] - 1), 0), 0.05); return; }
-  if (m === 'crouch' || m === 'crawl4') { if (a === 'crouch') { if (m === 'crawl4') toIdle(); else reverseOut('41', R(Math.max(0, crLp()[0] - 1), 0), 0.06); } return; }
+  if (m === 'crouch' || m === 'crawl4') { if (a === 'crouch' || a === 'up' || a === 'jump' || (a === 'down' && dbl)) { if (m === 'crawl4') toIdle(); else reverseOut('41', R(Math.max(0, crLp()[0] - 1), 0), 0.06); } return; }
   if (m !== 'ground') return;
   const running = down('run') || P.runLatch;
   const moving = down('left') || down('right') || down('up') || down('down');
@@ -857,23 +951,31 @@ function onPress(a) {
     case 'angry': return emote('32', 9);
     case 'happy': return emote('35', 8);
     case 'surprise': { const n = nOf('34'); return emote('34', 8, { seq: [...S(R(0, Math.min(1, n - 1)), 0.06), { f: Math.min(2, n - 1), d: 0.35 }, ...S(R(Math.min(3, n - 1), n - 1), 0.12)] }); }
-    case 'eat': return emote('26', 7);
     case 'pick': { const it = items.findIndex(it => Math.abs(it.x - P.x) < 110 && Math.abs(it.y - P.y) < 40); if (it >= 0) { items.splice(it, 1); later(0.45, () => { sfx('pickup'); FX.heal({ v: 20 }); }); } return emote('27', 8); }
     case 'personal': return emote('2', 7);
     case 'notice': { const n = nOf('33'), top = Math.min(4, n - 1); fx.push({ k: 'icon', v: '!', t: 1.0 }); return act('33', { seq: [...S(R(0, top - 1), 0.07), { f: top, d: 0.45 }, ...S(R(top - 1, 0), 0.04)] }); }
     case 'sit': return sit();
     case 'crouch': return crouch();
+    case 'down': if (dbl) return crouch(); return;   // 라이브: 아래 두 번 = 웅크리기
+    case 'seat': return sitChair();
   }
 }
 // 고유기술 키: 짧게 = 고유기술, 길게(0.25초) = 충전
 let skDown = 0;
-function skillPress() { return skill(); }   // 기술(D)은 누르면 바로. 충전은 S 따로(사용자 2026-10-25 키 배치)
+// 라이브 D: 누르면 바로 고유기 → 누른 채면 앞 장(최대 3장째)에서 멈춰 기다리다 9틱(0.3초) 넘으면 충전으로 바뀜(쿨타임 돌려줌). 떼면 고유기가 이어짐
+function skillPress() {
+  P.skHold = true; skDown = P.t;
+  const sp = CH.skills.skill; if (!sp) return;   // 충전만 있는 인물: 길게 눌러야 충전
+  if ((P.cd.skill || 0) > P.t) return;   // 쿨타임이면 기다렸다 길게 = 충전, 짧게 떼면 「쿨타임」 표시(onRelease)
+  P.skFired = true; skill();
+  const c = P.clip; if (c && c.id) { const k = c.seq.findIndex(e => e.ev); c.holdKey = 'skill'; c.holdAt = Math.max(0, Math.min(2, (k < 0 ? 3 : k) - 1)); }
+}
 function onRelease(a) {
-  if (a === 'run' && performance.now() - runT <= 180) return onPress('dodge');
+  if (a === 'run' && performance.now() - runT <= LIVE.tap) return onPress('dodge');
   if (a === 'left' || a === 'right') { if (!down('left') && !down('right')) P.runLatch = false; }
   if (a === 'block' && P.mode === 'block') reverseOut('17', R(curF(), 0), 0.025);
   if ((a === 'charge' || a === 'skill') && P.mode === 'charge') return release();
-  if (a === 'skill' && P.skHold) { P.skHold = false; if (['ground', 'chain', 'act'].includes(P.mode)) skill(); }
+  if (a === 'skill') { if (P.skHold && !P.skFired && CH.skills.skill && P.mode !== 'charge') cdReady('skill'); P.skHold = false; P.skFired = false; if (P.clip) P.clip.holdKey = null; }
 }
 
 // ── 매 장 ──
@@ -958,7 +1060,7 @@ function update(dt) {
   }
   if (hitstop > 0) { hitstop -= dt; return; }
   // 고유기술 키를 길게 누르면 충전으로
-  if (P.skHold && down('skill') && P.t - skDown > 0.25) { P.skHold = false; if (CH.skills.charge && ['ground', 'chain', 'act'].includes(P.mode)) { charge(); P.charge = 0.25; } }
+  if (P.skHold && down('skill') && P.t - skDown > LIVE.chargeAfter && CH.skills.charge && (P.mode === 'ground' || P.mode === 'chain' || (P.mode === 'act' && P.clip && P.clip.holdKey === 'skill'))) { P.skHold = false; if (P.skFired) { P.cd.skill = 0; P.skFired = false; } P.skArmor = false; charge(); }
   updateDummy(dt);
   tickClip(dt);
   P.inv = Math.max(0, P.inv - dt); P.wakeArmor = Math.max(0, (P.wakeArmor || 0) - dt);
@@ -966,7 +1068,7 @@ function update(dt) {
   else if (P.t - P.lastShot > 0.35) P.heat = Math.max(0, P.heat - 30 * dt);
   if (P.ghostT > 0) { P.ghostT -= dt; P.ghostN = (P.ghostN || 0) + dt; if (P.clip && P.ghostN > 0.05 && !(P.ghostN = 0)) fx.push({ k: 'ghost', id: P.clip.id, f: curF(), x: P.x, y: P.y, z: P.z, face: P.face, t: 0.18, t0: 0.18 }); }
   if (P.dash) { const d = P.dash; P.x += P.face * d.v * dt; d.t -= dt; if (!d.done && showDummy && Math.abs(D.y - P.y) < 70 && Math.abs(D.x - P.x) < 70 * K(P.y)) { d.done = true; if (d.hit !== null) { const h = d.hit || { dmg: 40, kind: 'blow' }; d.delay ? later(d.delay, () => strike(h)) : strike(h); } } if (d.t <= 0 || P.x < 75 || P.x > W - 75) P.dash = null; }
-  if (P.dodgeV) { P.x += P.dodgeV.x * dt; P.y += P.dodgeV.y * dt; P.dodgeV.x *= Math.pow(0.004, dt); P.dodgeV.y *= Math.pow(0.004, dt); }
+  if (P.dodgeV) { P.x += P.dodgeV.x * dt; P.y += P.dodgeV.y * dt; const kp = Math.pow(P.dodgeV.keep || 0.004, dt); P.dodgeV.x *= kp; P.dodgeV.y *= kp; }
   if (P.pvx) { P.x += P.face * P.pvx * dt; const s = Math.sign(P.pvx); P.pvx -= s * P.pdec * dt; if (Math.sign(P.pvx) !== s) P.pvx = 0; }
   const dx = (down('right') ? 1 : 0) - (down('left') ? 1 : 0), dy = (down('down') ? 1 : 0) - (down('up') ? 1 : 0);
   const running = down('run') || P.runLatch;
@@ -977,8 +1079,8 @@ function update(dt) {
       if (dx || dy) {
         if (P.armed) P.armed = false;
         if (dx && dx !== P.face) { P.prevFace = P.face; P.faceT = P.t; P.face = dx; }
-        const sp = (running ? 430 : 230) * (P.dying ? 0.6 : 1);
-        P.x += dx * sp * dt; P.y += dy * sp * 0.55 * dt;
+        const bk = bodyK() * (P.dying ? 0.6 : 1);
+        P.x += dx * (running ? LIVE.run : LIVE.walk) * bk * dt; P.y += dy * (running ? LIVE.runY : LIVE.walkY) * bk * dt;
         const id = running && !P.dying && has('5') ? (has('5_1') ? '5_1' : '5') : '4';   // 5_1: 끝 장이 첫 장으로 닫힌 뛰기 반복(끝 장은 첫 장과 같아 뺌)
         if (!P.clip || P.clip.id !== id) id === '5_1' ? play(id, { seq: S(R(0, nOf(id) - 2), 1 / 15), loopFrom: 0 }) : play(id, { fps: id === '5' ? 15 : P.dying ? 7 : 11, loopFrom: 0 });
         if (id[0] === '5' && Math.random() < dt * 4) { if (!vfx('run_dust', P.x - P.face * 24, P.y, 2, { flip: P.face < 0 })) dust(P.x - P.face * 20, P.y, 1, 0.6); }
@@ -998,10 +1100,10 @@ function update(dt) {
     case 'act': if (P.knockT > 0) { P.knockT -= dt; if (P.knockT <= 0) P.mode = 'down'; } break;
     case 'chain': P.chainT -= dt; if (P.chainT <= 0) chainExpire(); break;
     case 'air': {
-      if (P.takeoff > 0) { P.takeoff -= dt; if (P.takeoff <= 0) { P.vz = 1180; dust(P.x, P.y, 3, 0.7); } else break; }
+      if (P.takeoff > 0) { P.takeoff -= dt; if (P.takeoff <= 0) { P.vz = LIVE.jumpV * bodyK(); P.jumpG = LIVE.grav * bodyK(); dust(P.x, P.y, 3, 0.7); } else break; }
       if (dx) { P.x += dx * P.airVX * dt; if (!P.airAtk) P.face = dx; }
       P.y += dy * 140 * dt;
-      P.z += P.vz * dt; P.vz -= 2700 * dt;
+      P.z += P.vz * dt; P.vz -= (P.jumpG || 2340) * dt;
       P.spin = Math.max(0, P.spin - dt);
       if (P.z <= 0 && P.vz < 0) { land(); break; }
       if (!P.airAtk && P.spin <= 0) {
@@ -1053,7 +1155,7 @@ function shadow(x, y, z, w, s = 1, up = 0, extra = 0) {
   const rx = Math.max(16, w) * 0.58 * k, ry = (5 + extra) * k;
   ctx.fillStyle = `rgba(0,0,0,${0.42 * k})`; ctx.beginPath(); ctx.ellipse(x, y - up * s - 2 * k, rx, ry, 0, 0, Math.PI * 2); ctx.fill();
 }
-function drawSprite(id, f, x, y, z, face, alpha = 1, tint = null, clipFrac = 1) {
+function drawSprite(id, f, x, y, z, face, alpha = 1, tint = null, clipFrac = 1, breathe = 0) {
   const a = A[id], img = IMG[id]; if (!a || !img || !img.complete || !img.naturalWidth) return;
   f = Math.min(f, a.n - 1);
   const flip = face < 0;
@@ -1074,7 +1176,11 @@ function drawSprite(id, f, x, y, z, face, alpha = 1, tint = null, clipFrac = 1) 
     for (const [ox, oy] of offs) ctx.drawImage(s, dxp + ox, dyp + oy);
     ctx.globalAlpha = alpha;
   }
-  ctx.drawImage(img, f * a.cw, 0, a.cw, a.ch, dxp + a.ox, dyp + a.oy, a.cw, a.ch);
+  if (breathe) {   // 앉은 대기 코드 숨쉬기(사용자 10-27): 허리띠 위만 1화소 오르내림, 손·다리는 그대로
+    const wy = Math.max(1, Math.min(a.ch - 1, Math.round(a.top[f] + (a.bot[f] - a.top[f]) * 0.45 - a.oy)));
+    ctx.drawImage(img, f * a.cw, 0, a.cw, wy, dxp + a.ox, dyp + a.oy - breathe, a.cw, wy);
+    ctx.drawImage(img, f * a.cw, wy, a.cw, a.ch - wy, dxp + a.ox, dyp + a.oy + wy, a.cw, a.ch - wy);
+  } else ctx.drawImage(img, f * a.cw, 0, a.cw, a.ch, dxp + a.ox, dyp + a.oy, a.cw, a.ch);
   if (tint && tint.over) { ctx.globalAlpha = alpha * tint.over; ctx.drawImage(silhouette(id, f, tint.c), dxp, dyp); }
   ctx.restore();
 }
@@ -1097,7 +1203,11 @@ function drawPlayer() {
   else if (P.sp >= 100) tint = { c: '#ffd34a', over: 0, ea: 0.35 + 0.3 * (0.5 + 0.5 * Math.sin(P.t * 4)), glow: true };
   else if (P.hp <= 25 && P.mode !== 'dead') tint = { c: '#d0101a', over: 0.42 * (0.5 + 0.5 * Math.sin(P.t * Math.PI * 2 * 1.3)), noEdge: true };
   else if (P.mode === 'charge') { const lv = Math.min(3, chLv()); tint = { c: CH_COL[lv], over: 0.08 + 0.08 * Math.sin(P.t * 20), noEdge: true }; }
-  drawSprite(id, f, P.x, P.y, P.z, P.face, 1, tint, vis);
+  if (P.seat && showChair && CHAIR[P.seat.img] && CHAIR[P.seat.img].complete) {   // 의자: C01 사무 의자 1배(판정 전), 사람 뒤 층. 엉덩이 아래 = 좌석 앞 모서리 근처로 대략 맞춤
+    const im = CHAIR[P.seat.img], side = P.seat.dir === 'side';
+    ctx.save(); ctx.translate(Math.round(P.x - (side ? P.face * 18 * kk : 0)), Math.round(P.y + 2)); ctx.scale(P.face < 0 && side ? -kk : kk, kk); ctx.drawImage(im, -100, -173); ctx.restore();
+  }
+  drawSprite(id, f, P.x, P.y, P.z, P.face, 1, tint, vis, c && c.breathe ? (Math.sin(P.t * 2.6) > 0 ? 1 : 0) : 0);
   if (P.mode === 'charge') { const m = muzzle(); drawVfxAt('charge_gather', m.x, m.y, 1.2 + Math.min(1, P.charge) * 0.8, P.t); }
   if (P.status) {
     const top = P.y - P.z - (BASE(a) - a.top[f]) * kk, hgt = (BASE(a) - a.top[f]) * kk;
@@ -1285,6 +1395,7 @@ function drawMid() {
       ctx.fillStyle = '#0b0710'; ctx.beginPath(); ctx.moveTo(-4, 0); ctx.lineTo(0, -h); ctx.lineTo(4, 0); ctx.fill();
       ctx.restore();
     }
+    else if (e.k === 'proj' && e.vfx && VFX[e.vfx]) { ctx.save(); ctx.translate(e.x, e.y); if (e.rot) ctx.rotate(P.t * e.rot); drawVfxAt(e.vfx, 0, 0, e.size, P.t, e.dir < 0, e.tint); ctx.restore(); }   // 3판 그림 투사체(모래 탄·수갑·의수 등)
     else if (e.k === 'proj' && e.kind === 'orb' && VFX['fx-orb']) { drawVfxAt('fx-orb', e.x, e.y, 2.6 * e.size, P.t, e.dir < 0, e.c); }
     else if (e.k === 'proj') {
       const s = e.size, d = e.dir;
@@ -1403,7 +1514,7 @@ function draw() {
 }
 function loop(now) {
   const dt = Math.min(0.05, (now - last) / 1000) * speed; last = now;
-  try { update(dt); draw(); } catch (e) { document.getElementById('status').textContent = '오류: ' + e.message; console.error(e); }
+  try { if (!paused) update(dt); draw(); if (paused) { ctx.fillStyle = '#000a'; ctx.fillRect(W / 2 - 90, 20, 180, 36); ctx.fillStyle = '#fff'; ctx.font = 'bold 20px sans-serif'; ctx.fillText('멈춤 (Esc)', W / 2 - 50, 45); } } catch (e) { document.getElementById('status').textContent = '오류: ' + e.message; console.error(e); }
   requestAnimationFrame(loop);
 }
 
@@ -1425,6 +1536,7 @@ async function setChar(key) {
     await Promise.all(Object.keys(d.A).map(id => new Promise(r => { const im = new Image(); im.onload = im.onerror = r; im.src = d.A[id].src; imgs[id] = im; })));
     if (loading !== key) return;
     A = d.A; IMG = imgs; CH = Object.assign({ picks: {}, loops: {}, hit: {}, skills: {}, gun: [], kick: [], ranged: {} }, d.cfg); CK = key; silCache = {};
+    { const a = A['1'] || A[idleId()]; CH.h0 = a ? Math.max(...a.bot.map((b, i) => b - a.top[i])) : 233; }   // 인물 키(화소): 라이브 속도·거리 맞춤
     const keep = { sp: P.sp, status: P.status };   // 자리는 처음 자리로
     P = Object.assign(P0(), keep); fx = []; hitstop = 0; cut = 0; dark = 0; Object.assign(D, { x: 860, y: 600, vx: 0, z: 0, vz: 0, mark: 0, bindT: 0, stunT: 0 });
     chsel.value = key; store.set('char', key);
@@ -1444,10 +1556,21 @@ function renderChar() {
   document.getElementById('skills').innerHTML = `<div><b>${CH.name}</b> · ${CH.armed ? '무기 있음' : '무기 없음(원거리·충전·필살기 = 전투 자세에서)'}</div>` +
     line('고유기술', k('skill'), sk.skill) + line('충전', `${k('skill')} 길게 / ${k('charge')}`, sk.charge) + line('필살기', k('super'), sk.super) + line('둘째 기술', k('skill2'), sk.skill2);
   const list = document.getElementById('list'); list.innerHTML = '';
-  for (const id in A) {
-    const b = document.createElement('button'); b.textContent = A[id].name;
-    b.onclick = () => { P.z = 0; act(id, { fps: 8 }); cv.focus(); };
-    list.append(b);
+  const num = id => parseFloat(id.replace(/^W/, '0').replace('_', '.')) || 0;
+  const GROUPS = [['전투', id => /^(3|3_0|W|W_1|[4-9]|1[0-7]|16_1|2[2-5]|5_1|22_1)$/.test(id)], ['피격·쓰러짐', id => /^(18|18_\d|19|20|21|4[3-5]|169)$/.test(id)],
+    ['감정·반응·이동', id => num(id) >= 1 && num(id) < 50 && !/^(18|18_\d|19|20|21|4[3-5])$/.test(id)], ['앉기(의자)', id => /^(60|61|62|63|64|65|66|69|70|71|72|73|96|97|98|99|105|52|52_0|53|54)$/.test(id)],
+    ['생활·직무', id => num(id) >= 50]];
+  const used = new Set();
+  for (const [g, f] of GROUPS) {
+    const ids = Object.keys(A).filter(id => !used.has(id) && f(id)).sort((a, b) => num(a) - num(b)); if (!ids.length) continue;
+    const h = document.createElement('div'); h.className = 'm'; h.style.margin = '6px 0 3px'; h.textContent = `${g} (${ids.length})`; list.append(h);
+    const box = document.createElement('div'); box.className = 'list'; list.append(box);
+    for (const id of ids) {
+      used.add(id);
+      const b = document.createElement('button'); b.textContent = `${id.replace('_', '-')} ${A[id].name}`;
+      b.onclick = () => { if (num(id) >= 50 && id !== '169') playLife(id); else { P.seat = null; P.z = 0; act(id, { fps: 8 }); } cv.focus(); };
+      box.append(b);
+    }
   }
 }
 
@@ -1478,19 +1601,20 @@ function renderBinds() {
   }
   const k = id => `<b>${keyName(binds[id])}</b>`;
   document.getElementById('help').innerHTML =
-    `인물 ${k('prevChar')} ${k('nextChar')} 또는 위 목록 · 이동 ${k('left')}${k('right')}${k('up')}${k('down')} · 달리기 ${k('run')} 길게 또는 방향키 두 번 · 점프 ${k('jump')}(공중에서 한 번 더 = 2단) · ` +
-    `약 ${k('light')} 연타 = 약1→약2→약3, 강 ${k('heavy')} = 마무리(단독·약1 뒤 스턴 / 약2 뒤 띄우기 / 약3 뒤 날리기) · 뛰며 약 = 돌진 · 공중에서 약/강 = 점프 공격 · ` +
-    `회피 ${k('run')} 짧게(누른 방향, 없으면 뒤) · 방어 ${k('block')} · 원거리 ${k('shoot')} · 기술 ${k('skill')} · 충전 ${k('charge')}(누른 채, 떼면 방출) · 필살기 ${k('super')} · ` +
-    `전투 자세 ${k('combat')} · 무기 ${k('weapon')} · 맞기 상단 ${k('hit')} · 하단 ${k('hitLow')} · 밀려나기 ${k('push')} · 띄워지기 ${k('launch')} · 사망 ${k('die')} · 쓰러짐 ${k('knock')}(${k('jump')} 일어나기, ${k('crawl')} 엎드려 기기) · 스턴 ${k('stun')} · 빈사 ${k('dying')} · ` +
-    `감정 ${k('respond')}~${k('surprise')} · 섭취 ${k('eat')} · 상호작용·줍기 ${k('pick')} · 조작 요약 ${k('map')} · 개인 대기 ${k('personal')} · 발견 ${k('notice')} · ` +
-    `도망 ${k('flee')} · 뒷걸음 ${k('back')} · 주저앉기 ${k('sit')} · 웅크리기 ${k('crouch')}`;
+    `<b>라이브 조작</b> · 이동 ${k('left')}${k('right')}${k('up')}${k('down')} · 달리기 ${k('run')} 누른 채 또는 방향키 두 번 · 회피 ${k('run')} 짧게 · 점프 ${k('jump')} · ` +
+    `근접 ${k('light')} 연타 3타(맞혀야 이어짐, 3타째 쓰러뜨림) · 뛰며/회피 직후 ${k('light')} = 돌진 · 공중 ${k('light')} = 점프 공격 · 원거리 ${k('shoot')} · ` +
+    `고유기 ${k('skill')} 짧게 · 충전 ${k('skill')} 길게(0.3초 넘게 누른 채, 떼면 방출) · 가드 ${k('block')} · 필살기 ${k('super')} · 상호작용 ${k('pick')} · 아래 두 번 = 웅크리기 · ` +
+    `아이템 ${k('item1')}~${k('item4')} · 지도 ${k('map')} · 멈춤 ${k('pause')} · 재장전 자리 ${k('weapon')} = 무기 꺼내기/넣기 · 판정 ${k('hitbox')} · 숙련 자리 ${k('heavy')} = 강 공격, ${k('skill2')} = 둘째 기술<br>` +
+    `<b>테스트용</b> · 인물 ${k('prevChar')} ${k('nextChar')} · 맞기 상단 ${k('hit')} · 하단 ${k('hitLow')} · 크게 밀려나기 ${k('push')} · 띄워지기 ${k('launch')} · 쓰러짐 ${k('knock')}(${k('jump')} 일어나기, ${k('crawl')} 엎드려 기기) · 사망 ${k('die')} · 스턴 ${k('stun')} · 빈사 ${k('dying')} · ` +
+    `의자 앉기 ${k('seat')}(정면→옆→후면, 앉아서 ${k('respond')} 수다 ${k('talk')} 먹기 ${k('nod')} 마시기 ${k('shake')} 타자 ${k('angry')} 졸기 ${k('happy')} 기대 쉬기, ${k('pick')}·${k('up')} 일어나기, 앉은 채 ${k('hit')} = 일어나며 맞기, ${k('hitLow')}~${k('knock')} = 옆이면 굴러떨어지기·정면/후면이면 쓰러지기) · ` +
+    `생활·직무 줄 ${k('lifePrev')} ${k('lifeNext')} · 감정 ${k('respond')}~${k('notice')} · 도망 ${k('flee')} · 뒷걸음 ${k('back')} · 주저앉기 ${k('sit')} · 개인 대기 ${k('personal')} · 전투 자세 ${k('combat')}`;
   if (CK) renderChar();
 }
 function finishCapture(code) {
-  if (code !== 'Escape') { for (const k in binds) if (binds[k] === code) binds[k] = binds[capture.id]; binds[capture.id] = code; store.set('binds2', binds); }
+  if (code !== 'Escape') { for (const k in binds) if (binds[k] === code) binds[k] = binds[capture.id]; binds[capture.id] = code; store.set('binds3', binds); }
   capture = null; renderBinds();
 }
-document.getElementById('reset').onclick = () => { binds = { ...DEF }; store.set('binds2', binds); renderBinds(); };
+document.getElementById('reset').onclick = () => { binds = { ...DEF }; store.set('binds3', binds); renderBinds(); };
 const spd = document.getElementById('spd');
 spd.oninput = () => { speed = spd.value / 100; document.getElementById('spdv').textContent = (+speed.toFixed(2)) + '배'; };
 document.getElementById('hb').onchange = e => showNo = e.target.checked;
@@ -1498,6 +1622,7 @@ document.getElementById('dm').onchange = e => showDummy = e.target.checked;
 document.getElementById('ca').onchange = e => counter = e.target.checked;
 document.getElementById('fs').onchange = e => freeSuper = e.target.checked;
 document.getElementById('sa').onchange = e => showArmor = e.target.checked;
+document.getElementById('chair').onchange = e => showChair = e.target.checked;
 const songSel = document.getElementById('song');
 for (const id of ['', ...((window.GoeiAudio && window.GoeiAudio.SONG_IDS) || [])]) { const o = document.createElement('option'); o.value = id; o.textContent = id || '없음'; if (id === song) o.selected = true; songSel.append(o); }
 songSel.onchange = () => { song = songSel.value; store.set('song', song); if (started && audio) try { audio.music(song || null); } catch {} };

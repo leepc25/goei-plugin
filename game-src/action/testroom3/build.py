@@ -234,6 +234,14 @@ def pingpong(key, anims):
     return out
 
 
+# 테스트룸에 넣지 않는 줄: 치료받기(78, 사용자 10-27 뺌), 12장 앉기 시험(60-1), 쓰러지기 시험 4종(19-1~19-4)
+DROP = {"78", "60_1", "19_1", "19_2", "19_3", "19_4"}
+# 생활·직무 줄(50번 이후)은 자동 검사 통과 목록(ok)에 없어도 넣음(기대 쉬기 30명 등은 그대로 써도 됨 — 인계 10-28)
+def life_line(lid):
+    m = re.match(r"(\d+)", lid)
+    return bool(m) and int(m.group(1)) >= 50
+
+
 def auto_cfg(ch):
     key = ch["key"]
     if key == EILEEN_KEY: return eileen_cfg(ch)
@@ -242,12 +250,12 @@ def auto_cfg(ch):
     ok = set(picks.get("ok", []))
     rows, tr = md_rows(key)
     loops, hits, flips, variants = parse_loops(tr), parse_hits(tr), parse_flips(tr), parse_variant(tr)
-    folders = sorted(p.name for p in d.iterdir() if p.is_dir() and not p.name.startswith("_") and any(p.glob("[0-9][0-9].png")))
+    folders = sorted(p.name for p in d.iterdir() if p.is_dir() and not p.name.startswith("_") and p.name not in DROP and any(p.glob("[0-9][0-9].png")))
     anims = {}
     order = list(BASE)
     for lid in sorted({re.sub(r"_(E|W|SE|SW|S|N|NE|NW)$", "", f) for f in folders}, key=lambda s: (order.index(s) if s in order else 999, s)):
         cands = [f for f in folders if re.sub(r"_(E|W|SE|SW|S|N|NE|NW)$", "", f) == lid]
-        good = [f for f in cands if f in ok] if ok else cands
+        good = [f for f in cands if f in ok or life_line(f)] if ok else cands
         if not good: continue
         want = variants.get(lid)
         pick = next((f for f in good if want and folder_dir(f, rows, ch["dir"]) == want and f != lid), None) or (lid if lid in good else good[0])
@@ -296,6 +304,16 @@ EILEEN_LIST = [
 
 def eileen_cfg(ch):
     anims = {lid: {"folder": f, "mirror": d in ("W", "SW"), "name": n} for lid, f, d, n in EILEEN_LIST if any((EIL / "motion_v3" / f).glob("[0-9][0-9].png"))}
+    # 3판 추가 줄(motion3/1.4_에일린, 표 docs/동작표_3판/1.4_에일린.md): 2판에 없는 줄만
+    d3 = M3 / EILEEN_KEY
+    if d3.exists():
+        rows, _ = md_rows(EILEEN_KEY)
+        for p in sorted(d3.iterdir(), key=lambda p: p.name):
+            lid = p.name
+            if not p.is_dir() or lid.startswith("_") or lid in DROP or lid in anims or not any(p.glob("[0-9][0-9].png")): continue
+            if lid in ("3_0", "19"): continue   # 전투 자세·쓰러지기는 2판 그대로
+            fd = folder_dir(lid, rows, "E")
+            anims[lid] = {"folder": lid, "src": "m3", "mirror": fd in ("W", "SW", "NW"), "name": (rows.get(lid) or (BASE_NAME.get(lid, lid),))[0]}
     return {"key": EILEEN_KEY, "name": "에일린", "dir": "E", "color": "#CFC7A6", "src": "eileen", "armed": True, "anims": anims,
             "picks": {"combat": 4, "weapon": 4, "apex": 4, "run": 4, "crawl4": 6},
             "loops": {"1": [1, 2], "19": [9, 11], "21": [2, 3, 4, 5, 6, 7, 8], "23": [5, 6, 7, 8], "39": [8, 9, 10, 11, 12], "41": [5, 6, 7, 8], "42": [5, 6, 7, 8, 9, 10, 11, 12], "15": [4, 5]},
@@ -479,15 +497,16 @@ def encode(sheet):
     return "data:image/png;base64," + base64.b64encode(buf.getvalue()).decode()
 
 
-def src_dir(cfg):
+def src_dir(cfg, an=None):
+    if an and an.get("src") == "m3": return M3 / cfg["key"]
     return EIL / "motion_v3" if cfg.get("src") == "eileen" else M3 / cfg["key"]
 
 
 def signature(cfg):
     """그림 쪽 서명: 그림 파일·뒤집기·총 줄·지울 칸이 같으면 그림 처리를 건너뜀"""
     h = hashlib.sha1((VERSION + json.dumps([cfg["anims"], cfg.get("gun"), cfg.get("clean")], sort_keys=True, ensure_ascii=False)).encode())
-    d = src_dir(cfg)
     for lid, an in sorted(cfg["anims"].items()):
+        d = src_dir(cfg, an)
         for f in sorted((d / an["folder"]).glob("[0-9][0-9].png")):
             st = f.stat(); h.update(f"{f.name}{st.st_size}{st.st_mtime_ns}".encode())
     return h.hexdigest()
@@ -505,10 +524,10 @@ def build_char(cfg, force=False):
         if c.get("sig") == sig: A = c["A"]
     rebuilt = A is None
     if rebuilt:
-        d = src_dir(cfg)
         A = {}
         gun = set(cfg.get("gun", []))
         for lid, an in cfg["anims"].items():
+            d = src_dir(cfg, an)
             fs = sorted((d / an["folder"]).glob("[0-9][0-9].png"))
             if an.get("frames"):   # 고른 장만(1부터, 되풀이 가능). "3_0:4" = 다른 폴더의 장(끝 장을 전투 자세 장으로 닫을 때)
                 sel = []
@@ -539,6 +558,7 @@ def build_char(cfg, force=False):
 
 def load_vfx():
     VFX = {}
+    man = {m["name"]: m for m in json.loads((M3 / "fx3_manifest.json").read_text())} if (M3 / "fx3_manifest.json").exists() else {}
     for folder in (EIL / "vfx", HERE / "vfx"):
         if not folder.exists(): continue
         for js in sorted(folder.glob("*.json")):
@@ -549,6 +569,7 @@ def load_vfx():
             VFX[js.stem] = dict(frames=[[f["frame"]["x"], f["frame"]["y"], f["frame"]["w"], f["frame"]["h"], f["duration"]] for f in meta["frames"]],
                                 pivot=[piv(fr0["pivot"]["x"], fr0["frame"]["w"]), piv(fr0["pivot"]["y"], fr0["frame"]["h"])],
                                 src="data:image/png;base64," + base64.b64encode(js.with_suffix(".png").read_bytes()).decode())
+            if js.stem in man: VFX[js.stem]["mode"] = man[js.stem]["mode"]
     return VFX
 
 
@@ -559,6 +580,7 @@ def main():
     npc = "--npc" in args   # 일반 NPC(6.x)는 따로: out_npc/ (사용자 2026-10-25: 시연 파일 하나가 너무 커서 NPC는 별도)
     if npc: OUT = HERE / "out_npc"
     reset = set(args[args.index("--reset") + 1:]) if "--reset" in args else set()
+    only = set(args[args.index("--only") + 1].split(",")) if "--only" in args else None   # 이 인물만 다시 만듦(나머지는 있는 파일 그대로)
     CHARS.mkdir(exist_ok=True); (OUT / "chars").mkdir(parents=True, exist_ok=True)
     index = []
     for ch in roster():
@@ -575,15 +597,22 @@ def main():
         else:
             cfg = deep_merge(auto, json.loads(p.read_text(encoding="utf-8")))
             # 사람이 지운 줄은 지운 채로, 새로 생긴 줄은 자동값으로
-        size, rebuilt = build_char(cfg, force)
+        if only is not None and ch["key"] not in only:
+            js = OUT / "chars" / f"c{ch['key'].split('_')[0]}.js"
+            if not js.exists(): continue
+            size, rebuilt = js.stat().st_size, False
+        else:
+            size, rebuilt = build_char(cfg, force)
         index.append(dict(key=cfg["key"], name=cfg["name"], num=ch["num"], color=cfg.get("color"), dir=cfg["dir"], armed=cfg.get("armed"), kb=size // 1024))
         print(f"{'만듦' if rebuilt else '그대로'} {cfg['key']:<14} 줄 {len(cfg['anims']):>2} · {size / 1024 / 1024:.2f} MB")
     for old in (OUT / "chars").glob("*.js"):   # 목록에서 빠진 인물 파일 정리
         if old.stem not in {"c" + c["key"].split("_")[0] for c in index}: old.unlink()
     room = (HERE / "room.html").read_text(encoding="utf-8")
     audio = (EIL / "testroom" / "audio.js").read_text(encoding="utf-8")
-    html = room.replace("/*__INDEX__*/null", json.dumps(index, ensure_ascii=False)).replace("/*__VFX__*/null", json.dumps(load_vfx())).replace("/*__AUDIO__*/", audio)
-    if npc: html = html.replace("<title>요원 통합 테스트룸</title>", "<title>NPC 테스트룸</title>", 1)
+    html = room.replace("/*__INDEX__*/null", json.dumps(index, ensure_ascii=False)).replace("/*__AUDIO__*/", audio)
+    chair = {k: "data:image/png;base64," + base64.b64encode((ROOT / "game-src/action/objects/C01_사무의자_1배" / f"{k}.png").read_bytes()).decode() for k in ("south", "east", "north")}   # 의자 앉기용(판정 전)
+    (OUT / "vfx.js").write_text("window.__VFX=" + json.dumps(load_vfx(), separators=(",", ":")) + ";\nwindow.__CHAIR=" + json.dumps(chair) + ";\n", encoding="utf-8")   # 이펙트 그림은 따로(첫 화면 파일을 작게)
+    if npc: html = html.replace("<title>요원 통합 테스트룸</title>", "<title>NPC 테스트룸</title>", 1).replace("<h1>요원 통합 테스트룸 ", "<h1>NPC 테스트룸 ", 1)
     (OUT / "index.html").write_text(html, encoding="utf-8")
     print(OUT / "index.html", (OUT / "index.html").stat().st_size // 1024, "KB ·", len(index), "명")
 

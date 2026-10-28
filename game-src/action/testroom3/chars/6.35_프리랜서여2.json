@@ -232,7 +232,94 @@
   },
   "heat": true
  },
- "skills": {},
+ "skills": {
+  "skill": {
+   "name": "잡아 메다꽂기",
+   "anim": "22",
+   "fps": 11,
+   "armed": false,
+   "events": [
+    {
+     "f": 5,
+     "fx": [
+      {
+       "t": "melee",
+       "range": 140,
+       "hit": {
+        "dmg": 20,
+        "kind": "down"
+       }
+      }
+     ]
+    },
+    {
+     "f": 6,
+     "fx": [
+      {
+       "t": "v",
+       "vfx": "x3-c-ground-shockwave",
+       "at": "front",
+       "dx": 80,
+       "scale": 0.45,
+       "tint": "#d8cfb4"
+      }
+     ]
+    }
+   ]
+  },
+  "charge": {
+   "name": "모은 한 방 · 어깨 들이받기",
+   "hold": "23",
+   "release": "24",
+   "levels": [
+    0.5,
+    1.2
+   ],
+   "fire": 4,
+   "armed": false,
+   "lv": {
+    "0": [
+     {
+      "t": "melee",
+      "range": 170,
+      "hit": {
+       "dmg": 18,
+       "kind": "heavy"
+      }
+     }
+    ],
+    "1": [
+     {
+      "t": "dash",
+      "speed": 1200,
+      "time": 0.22,
+      "hit": {
+       "dmg": 24,
+       "kind": "heavy"
+      }
+     }
+    ],
+    "2": [
+     {
+      "t": "melee",
+      "range": 170,
+      "hit": {
+       "dmg": 28,
+       "kind": "launch"
+      }
+     },
+     {
+      "t": "v",
+      "vfx": "x3-c-ground-shockwave",
+      "at": "front",
+      "dx": 120,
+      "scale": 0.8,
+      "tint": "#d8cfb4"
+     }
+    ]
+   }
+  }
+ },
  "_note": "자동 생성. 값을 고치면 build가 그대로 씀. 다시 자동으로: build.py --reset 6.35_프리랜서여2",
  "bal": {
   "role": "striker",
@@ -250,5 +337,6 @@
   },
   "shotDmg": 9,
   "hp": 110
- }
+ },
+ "skills_2판": {}
 }
