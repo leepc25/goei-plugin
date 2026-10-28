@@ -278,7 +278,7 @@
  "4.10_아벤샤": {
   "dir": "east",
   "g": "woman",
-  "body": "a curvy woman with long wavy dark teal hair falling from under a raised hood",
+  "body": "a curvy woman with long wavy dark teal hair",
   "full": "a curvy woman with long wavy dark teal hair falling from under a raised hood, ankle-length dark plum purple hooded cape fastened at the throat with a green emerald brooch, black suit jacket and trousers, white shirt, black tie, black shoes"
  },
  "5.1_세크리엠": {
@@ -290,7 +290,7 @@
  "8.1_격리개체": {
   "dir": "east",
   "g": "creature",
-  "body": "a huge hunched black hairless containment monster with long clawed arms, small glowing yellow eyes, a wide mouth of white teeth and torn yellow-and-black hazard tape strips hanging from its shoulders",
+  "body": "a huge hunched black hairless containment monster with long clawed arms, small glowing yellow eyes",
   "full": "a huge hunched black hairless containment monster with long clawed arms, small glowing yellow eyes, a wide mouth of white teeth and torn yellow-and-black hazard tape strips hanging from its shoulders"
  },
  "9.1_진압A": {
@@ -578,7 +578,7 @@
  "6.54_시민남1": {
   "dir": "east",
   "g": "man",
-  "body": "an ordinary Korean man in his mid-twenties with a short black forward crop, slightly stocky build, olive sweatshirt",
+  "body": "an ordinary Korean man in his mid-twenties with a short black forward crop, slightly stocky build",
   "full": "an ordinary Korean man in his mid-twenties with a short black forward crop, slightly stocky build, olive sweatshirt, dark gray jogger trousers and white-and-gray sneakers"
  },
  "6.55_시민남2": {
@@ -614,7 +614,7 @@
  "6.60_시민남7": {
   "dir": "east",
   "g": "man",
-  "body": "an ordinary Korean man in his early twenties with slightly wavy short black hair and a modest fringe, lean build, muted blue pullover hooded sweatshirt with the hood down",
+  "body": "an ordinary Korean man in his early twenties with slightly wavy short black hair and a modest fringe, lean build",
   "full": "an ordinary Korean man in his early twenties with slightly wavy short black hair and a modest fringe, lean build, muted blue pullover hooded sweatshirt with the hood down, faded dark jeans and gray sneakers"
  },
  "6.61_시민남8": {
@@ -674,7 +674,7 @@
  "6.70_시민여8": {
   "dir": "east",
   "g": "woman",
-  "body": "an ordinary Korean woman in her early twenties with straight dark-brown hair just past the shoulders and a center part, dusty-pink sweatshirt",
+  "body": "an ordinary Korean woman in her early twenties with straight dark-brown hair just past the shoulders and a center part",
   "full": "an ordinary Korean woman in her early twenties with straight dark-brown hair just past the shoulders and a center part, dusty-pink sweatshirt, dark blue straight jeans and white sneakers"
  },
  "6.71_시민여9": {
