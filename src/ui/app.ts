@@ -631,7 +631,9 @@ async function handle(action: string, value?: string): Promise<void> {
     // 범위: 시작 뒤엔 설정 창 범위(이 채팅/새 채팅 기본값). 시작 전엔 「고급」(gen)은 새 채팅 기본값, 기능 페이지(괴담넷·괴담톡·위키·필드)의
     // 고급 칸은 그 페이지의 다른 값처럼 이 채팅 (2026-10-28 QC: 시작 전 기능 페이지에서 고급 칩을 누르면 기본값에만 적혀 화면이 안 바뀌었다)
     const feat = (value ?? '').split(/[:=]/)[0];
-    const scope = view.kind === 'started' ? (settingsUi.scope === 'defaults' ? 'defaults' : 'chat') : feat === 'gen' ? 'defaults' : 'chat';
+    // 기능 페이지(gn·ph·wk·hq·pp)는 범위 전환이 없고 늘 이 채팅 값을 보여 준다: 시작 뒤 범위가 「새 채팅 기본값」이어도 이 채팅에
+    // (2026-10-28 QC: 고급 페이지에서 기본값으로 바꿔 두고 괴담넷 고급 칩을 누르면 기본값에만 적혀 화면이 안 바뀌었다)
+    const scope = feat !== 'gen' ? 'chat' : view.kind === 'started' ? (settingsUi.scope === 'defaults' ? 'defaults' : 'chat') : 'defaults';
     await handleAdvanced(action, value, view.ctx, { render, refresh }, scope);
     return;
   }

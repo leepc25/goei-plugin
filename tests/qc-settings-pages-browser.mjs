@@ -98,9 +98,13 @@ async function sweepPage(page, pageId, mode, log) {
   let clicked = 0;
   for (;;) {
     const list = (await controls(page)).filter((c) => !SKIP_ACTION.test(c.action) && !CHANGE_SKIP.test(c.action));
-    const next = list.find((c) => !done.has(`${c.kind}|${c.action}|${c.value ?? ''}|${c.key ?? ''}|${c.row}|${c.name ?? ''}`));
+    // 입력칸·막대·드롭다운은 value 가 「지금 값」이라 열쇠에 넣으면 누를 때마다 새 조작으로 보여 400번까지 돌았다: 단추만 value 를 넣는다.
+    // 스테퍼 단추(adv-set=gn:x=25 → 24 → …)도 value 끝의 수가 매번 바뀌므로 수를 떼고 단추 글자(−/+)로 가른다
+    const id = (c) => `${c.kind}|${c.action}|${c.kind === 'button' || c.kind === 'switch' ? `${(c.value ?? '').replace(/=-?[\d.]+$/, '=#')}|${c.text}` : ''}|${c.key ?? ''}|${c.row}|${c.name ?? ''}`;
+    const next = list.find((c) => !done.has(id(c)));
     if (!next || guard++ > 400) break;
-    done.add(`${next.kind}|${next.action}|${next.value ?? ''}|${next.key ?? ''}|${next.row}|${next.name ?? ''}`);
+    done.add(id(next));
+    const t0 = Date.now();
     const before = await snap(page);
     await clickControl(page, next);
     await settle(page);
@@ -110,6 +114,7 @@ async function sweepPage(page, pageId, mode, log) {
     const wroteChat = after.setChat > before.setChat;
     const label = `[${pageId}/${mode}] ${next.row} · ${next.action}=${next.value ?? next.key}`;
     clicked++;
+    if (process.env.QC_VERBOSE) console.log(`  ${label} (${Date.now() - t0}ms)`);
     // 기대: 기능 페이지는 늘 채팅 변수. 그 밖은 「이 기기」 배지면 prefs, 아니면 범위대로
     const expect = FEATURE.has(pageId) ? 'chat' : next.device ? 'prefs' : next.badge === '이 채팅' ? 'chat' : next.badge === '새 채팅 기본값' ? 'prefs' : mode === 'chat' ? 'chat' : 'prefs';
     // 확인창을 여는 조작(상황판 끄기)·저장 안 하는 조작은 둘 다 안 바뀔 수 있다: 그건 따로 본다
@@ -123,6 +128,12 @@ async function sweepPage(page, pageId, mode, log) {
     if (!prefsChanged && !chatChanged && !wroteChat) {
       // 바뀐 게 없는 조작: 기록만 (같은 값으로 저장 생략 등)
       log.push(`${label}: 변화 없음`);
+      continue;
+    }
+    if (!prefsChanged && !chatChanged && wroteChat) {
+      // 「저장」 단추로 같은 글을 다시 저장: 채팅에 같은 값을 쓴다 (기기 설정은 안 건드림). 범위는 맞다
+      assert.equal(expect, 'chat', `${label}: 기본값 범위인데 채팅에 씀`);
+      log.push(`${label}: 같은 값 다시 저장`);
       continue;
     }
     if (expect === 'prefs') {
@@ -305,8 +316,10 @@ for (const vp of vps) {
       await page.evaluate((w) => document.querySelector(`.gw [data-action="set-editor-width"][data-value="${w}"]`).click(), w);
       await settle(page);
       const width = await page.evaluate(() => document.querySelector('.gw-win').getBoundingClientRect().width);
-      if (vp === 'pc') assert.ok(Math.abs(width - (1100 * Number(w)) / 100) < 4, `창 폭 ${w}% → ${width}`);
-      else assert.ok(Math.abs(width - VIEWPORTS[vp].width) < 2, `폰은 늘 전체 폭 (${w}% → ${width})`);
+      // 화면 760px 이하(폰 세로)만 늘 전체 폭. 폰 가로 844 는 PC 처럼 % 를 따른다
+      const W = VIEWPORTS[vp].width;
+      if (W > 760) assert.ok(Math.abs(width - (W * Number(w)) / 100) < 4, `창 폭 ${w}% → ${width}`);
+      else assert.ok(Math.abs(width - W) < 2, `폰은 늘 전체 폭 (${w}% → ${width})`);
     }
     for (const t of ['light', 'paper', 'dark']) {
       await page.evaluate((t) => document.querySelector(`.gw [data-action="set-theme"][data-value="${t}"]`).click(), t);
