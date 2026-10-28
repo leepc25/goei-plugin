@@ -350,7 +350,7 @@
   "heat": false,
   "_note": "투포환처럼 잔해"
  },
- "skills": {
+ "skills_2판": {
   "skill": {
    "name": "막아 서기",
    "anim": "22",
@@ -467,6 +467,369 @@
         "kind": "down",
         "stop": 0.2,
         "shake": 14
+       }
+      }
+     ]
+    }
+   ]
+  }
+ },
+ "skills": {
+  "skill": {
+   "name": "막아 서기",
+   "anim": "22",
+   "fps": 10,
+   "armor": [
+    3,
+    6
+   ],
+   "events": [
+    {
+     "f": 4,
+     "hold": 0.12,
+     "fx": [
+      {
+       "t": "v",
+       "vfx": "x3-c-dust-puff",
+       "at": "self",
+       "dx": 50,
+       "scale": 1.8,
+       "tint": "#8a6440"
+      },
+      {
+       "t": "v",
+       "vfx": "x3-c-ground-shockwave",
+       "at": "front",
+       "dx": 90,
+       "scale": 0.45,
+       "tint": "#8a6440",
+       "under": true
+      },
+      {
+       "t": "melee",
+       "range": 200,
+       "hit": {
+        "dmg": 35,
+        "kind": "heavy",
+        "vfx": "x3-c-hit-spark-heavy",
+        "vs": 0.7,
+        "tint": "#e8c9a0"
+       }
+      }
+     ]
+    },
+    {
+     "f": 5,
+     "hold": 0.3,
+     "fx": [
+      {
+       "t": "v",
+       "vfx": "x3-c-shard-burst",
+       "at": "hand",
+       "scale": 0.35,
+       "tint": "#a8a8a8"
+      }
+     ]
+    }
+   ]
+  },
+  "charge": {
+   "name": "기둥 들기",
+   "hold": "23",
+   "release": "10",
+   "levels": [
+    0.5,
+    1.2
+   ],
+   "fps": 12,
+   "fire": 6,
+   "releaseLv": {
+    "1": "13",
+    "2": "12"
+   },
+   "fireLv": {
+    "1": 4,
+    "2": 5
+   },
+   "lv": {
+    "0": [
+     {
+      "t": "melee",
+      "range": 140,
+      "hit": {
+       "dmg": 25,
+       "kind": "launch",
+       "vfx": "x3-c-hit-spark-heavy",
+       "vs": 0.6,
+       "tint": "#e8c9a0"
+      }
+     },
+     {
+      "t": "v",
+      "vfx": "x3-c-dust-puff",
+      "at": "front",
+      "dx": 70,
+      "scale": 1.2,
+      "tint": "#8a6440"
+     }
+    ],
+    "1": [
+     {
+      "t": "v",
+      "vfx": "x3-c-dust-puff",
+      "at": "self",
+      "dx": 40,
+      "scale": 2,
+      "tint": "#8a6440"
+     },
+     {
+      "t": "v",
+      "vfx": "x3-c-dust-cloud-large",
+      "at": "front",
+      "dx": 260,
+      "scale": 0.55,
+      "tint": "#8a6440",
+      "under": true
+     },
+     {
+      "t": "melee",
+      "range": 520,
+      "hit": {
+       "dmg": 40,
+       "kind": "down",
+       "n": 2,
+       "mid": "pull",
+       "every": 0.35,
+       "vfx": "x3-c-hit-spark-heavy",
+       "vs": 0.6,
+       "tint": "#e8c9a0"
+      }
+     }
+    ],
+    "2": [
+     {
+      "t": "melee",
+      "range": 170,
+      "hit": {
+       "dmg": 20,
+       "kind": "blow",
+       "vfx": "x3-c-hit-spark-heavy",
+       "vs": 0.7,
+       "tint": "#e8c9a0"
+      }
+     },
+     {
+      "t": "later",
+      "in": 0.55,
+      "fx": [
+       {
+        "t": "v",
+        "vfx": "x3-c-ground-shockwave",
+        "at": "target",
+        "scale": 0.9,
+        "tint": "#8a6440",
+        "under": true,
+        "boom": 2
+       },
+       {
+        "t": "v",
+        "vfx": "x3-c-dust-cloud-large",
+        "at": "target",
+        "scale": 0.6,
+        "tint": "#8a6440",
+        "hit": {
+         "dmg": 45,
+         "kind": "down",
+         "shake": 12,
+         "vfx": "x3-c-hit-spark-heavy",
+         "tint": "#e8c9a0"
+        }
+       }
+      ]
+     }
+    ]
+   }
+  },
+  "super": {
+   "name": "사람으로 대할 것",
+   "sub": "「사람으로 대할 것.」",
+   "anim": "25",
+   "fps": 9,
+   "armorAll": true,
+   "events": [
+    {
+     "f": 4,
+     "hold": 0.25,
+     "fx": [
+      {
+       "t": "shake",
+       "v": 16
+      },
+      {
+       "t": "flash",
+       "v": 0.12
+      },
+      {
+       "t": "v",
+       "vfx": "x3-c-ground-shockwave",
+       "at": "screen",
+       "w": 1.05,
+       "tint": "#8a6440",
+       "under": true,
+       "boom": 3
+      }
+     ]
+    },
+    {
+     "f": 5,
+     "fx": [
+      {
+       "t": "dash",
+       "speed": 520,
+       "time": 0.15,
+       "hit": null
+      },
+      {
+       "t": "v",
+       "vfx": "x3-c-shard-burst",
+       "at": "hand",
+       "scale": 0.3,
+       "tint": "#a8a8a8"
+      },
+      {
+       "t": "melee",
+       "range": 200,
+       "hit": {
+        "dmg": 25,
+        "kind": "down",
+        "vfx": "x3-c-hit-spark-heavy",
+        "vs": 0.8,
+        "tint": "#e8c9a0"
+       }
+      }
+     ]
+    },
+    {
+     "f": 7,
+     "fx": [
+      {
+       "t": "dash",
+       "speed": 520,
+       "time": 0.15,
+       "hit": null
+      },
+      {
+       "t": "v",
+       "vfx": "x3-c-shard-burst",
+       "at": "hand",
+       "scale": 0.3,
+       "tint": "#a8a8a8"
+      },
+      {
+       "t": "melee",
+       "range": 200,
+       "hit": {
+        "dmg": 25,
+        "kind": "down",
+        "vfx": "x3-c-hit-spark-heavy",
+        "vs": 0.8,
+        "tint": "#e8c9a0"
+       }
+      }
+     ]
+    },
+    {
+     "f": 9,
+     "fx": [
+      {
+       "t": "dash",
+       "speed": 520,
+       "time": 0.15,
+       "hit": null
+      },
+      {
+       "t": "v",
+       "vfx": "x3-c-shard-burst",
+       "at": "hand",
+       "scale": 0.3,
+       "tint": "#a8a8a8"
+      },
+      {
+       "t": "melee",
+       "range": 200,
+       "hit": {
+        "dmg": 25,
+        "kind": "down",
+        "vfx": "x3-c-hit-spark-heavy",
+        "vs": 0.8,
+        "tint": "#e8c9a0"
+       }
+      }
+     ]
+    },
+    {
+     "f": 11,
+     "hold": 0.45,
+     "fx": [
+      {
+       "t": "shake",
+       "v": 18
+      },
+      {
+       "t": "v",
+       "vfx": "x3-c-ground-crack",
+       "at": "front",
+       "dx": 120,
+       "scale": 1.2,
+       "boom": 2
+      },
+      {
+       "t": "later",
+       "in": 0.08,
+       "fx": [
+        {
+         "t": "v",
+         "vfx": "x3-c-ground-crack",
+         "at": "front",
+         "dx": 280,
+         "scale": 1.7
+        }
+       ]
+      },
+      {
+       "t": "later",
+       "in": 0.16,
+       "fx": [
+        {
+         "t": "v",
+         "vfx": "x3-c-ground-crack",
+         "at": "front",
+         "dx": 460,
+         "scale": 2.2,
+         "boom": 3
+        }
+       ]
+      },
+      {
+       "t": "v",
+       "vfx": "x3-c-dust-cloud-large",
+       "at": "front",
+       "dx": 300,
+       "scale": 1.1,
+       "tint": "#8a6440",
+       "under": true
+      },
+      {
+       "t": "melee",
+       "range": 620,
+       "hit": {
+        "dmg": 70,
+        "kind": "launch",
+        "stop": 0.2,
+        "shake": 16,
+        "vfx": "x3-c-hit-spark-heavy",
+        "vs": 1.2,
+        "tint": "#e8c9a0"
        }
       }
      ]

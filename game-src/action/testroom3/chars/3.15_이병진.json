@@ -382,7 +382,7 @@
   "heat": false,
   "_note": "빨간 잉크 점"
  },
- "skills": {
+ "skills_2판": {
   "skill": {
    "name": "빨간 펜",
    "anim": "22",
@@ -516,6 +516,318 @@
           "dmg": 160,
           "kind": "heavy"
          }
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  }
+ },
+ "skills": {
+  "skill": {
+   "name": "빨간 펜",
+   "anim": "22",
+   "fps": 10,
+   "armed": true,
+   "events": [
+    {
+     "f": 4,
+     "hold": 0.12,
+     "fx": [
+      {
+       "t": "v",
+       "vfx": "x3-3.15-D-red-slash-stroke",
+       "at": "body",
+       "scale": 1.1
+      },
+      {
+       "t": "melee",
+       "range": 200,
+       "hit": {
+        "dmg": 30,
+        "kind": "light",
+        "n": 2,
+        "mid": "light",
+        "every": 0.1,
+        "vfx": "x3-c-hit-spark-light",
+        "vs": 1.6,
+        "tint": "#ff8a8a"
+       }
+      }
+     ]
+    }
+   ]
+  },
+  "charge": {
+   "name": "급행 처리",
+   "hold": "23",
+   "release": "9",
+   "levels": [
+    0.5,
+    1.2
+   ],
+   "fps": 12,
+   "fire": 4,
+   "releaseLv": {
+    "1": "10",
+    "2": "13"
+   },
+   "fireLv": {
+    "1": 1,
+    "2": 3
+   },
+   "lv": {
+    "0": [
+     {
+      "t": "v",
+      "vfx": "x3-c-air-ring",
+      "at": "hand",
+      "dx": 15,
+      "scale": 1.2,
+      "tint": "#D23C3C"
+     },
+     {
+      "t": "melee",
+      "range": 150,
+      "hit": {
+       "dmg": 22,
+       "kind": "heavy",
+       "vfx": "x3-c-hit-spark-light",
+       "vs": 1.6,
+       "tint": "#ff8a8a"
+      }
+     }
+    ],
+    "1": [
+     {
+      "t": "v",
+      "vfx": "x3-c-air-ring",
+      "at": "hand",
+      "dx": 15,
+      "scale": 1.2,
+      "tint": "#D23C3C"
+     },
+     {
+      "t": "melee",
+      "range": 160,
+      "hit": {
+       "dmg": 14,
+       "kind": "light",
+       "vfx": "x3-c-hit-spark-light",
+       "vs": 1.4,
+       "tint": "#ff8a8a"
+      }
+     },
+     {
+      "t": "later",
+      "in": 0.5,
+      "fx": [
+       {
+        "t": "dash",
+        "speed": 600,
+        "time": 0.15,
+        "hit": null
+       },
+       {
+        "t": "v",
+        "vfx": "x3-c-air-ring",
+        "at": "hand",
+        "dx": 20,
+        "scale": 1.5,
+        "tint": "#D23C3C"
+       },
+       {
+        "t": "melee",
+        "range": 230,
+        "hit": {
+         "dmg": 26,
+         "kind": "heavy",
+         "vfx": "x3-c-hit-spark-light",
+         "vs": 2,
+         "tint": "#ff8a8a"
+        }
+       }
+      ]
+     }
+    ],
+    "2": [
+     {
+      "t": "dash",
+      "speed": 1100,
+      "time": 0.3,
+      "hit": {
+       "dmg": 30,
+       "kind": "down",
+       "vfx": "x3-c-hit-spark-light",
+       "vs": 1.6,
+       "tint": "#ff8a8a"
+      }
+     },
+     {
+      "t": "v",
+      "vfx": "x3-c-dust-puff",
+      "at": "self",
+      "scale": 1.6,
+      "tint": "#b8a898"
+     },
+     {
+      "t": "later",
+      "in": 0.15,
+      "fx": [
+       {
+        "t": "v",
+        "vfx": "x3-c-dust-puff",
+        "at": "self",
+        "scale": 1.8,
+        "tint": "#b8a898"
+       }
+      ]
+     },
+     {
+      "t": "later",
+      "in": 0.45,
+      "fx": [
+       {
+        "t": "melee",
+        "range": 160,
+        "hit": {
+         "dmg": 15,
+         "kind": "light",
+         "vfx": "x3-c-hit-spark-light",
+         "vs": 1.4,
+         "tint": "#ff8a8a"
+        }
+       }
+      ]
+     }
+    ]
+   }
+  },
+  "super": {
+   "name": "처음으로 쓸모 있어진 순간",
+   "sub": "「처음으로 쓸모 있어진 순간.」",
+   "armed": true,
+   "steps": [
+    {
+     "anim": "41",
+     "fps": 12
+    },
+    {
+     "anim": "25",
+     "fps": 9,
+     "events": [
+      {
+       "f": 4,
+       "hold": 0.25,
+       "fx": [
+        {
+         "t": "v",
+         "vfx": "x3-3.15-F-red-brush-fragments",
+         "at": "screen",
+         "dx": -260,
+         "scale": 1.6
+        },
+        {
+         "t": "v",
+         "vfx": "x3-3.15-F-red-brush-fragments",
+         "at": "screen",
+         "dx": 260,
+         "scale": 1.6,
+         "flip": false
+        }
+       ]
+      },
+      {
+       "f": 6,
+       "fx": [
+        {
+         "t": "screen",
+         "spots": 4,
+         "every": 0.05,
+         "each": [
+          {
+           "t": "v",
+           "vfx": "x3-c-vertical-blade-line",
+           "scale": 1.4,
+           "tint": "#D23C3C",
+           "dy": -60,
+           "hit": {
+            "dmg": 14,
+            "kind": "light",
+            "vfx": "x3-c-hit-spark-light",
+            "vs": 1.6,
+            "tint": "#ff8a8a"
+           }
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "f": 8,
+       "fx": [
+        {
+         "t": "screen",
+         "spots": 4,
+         "every": 0.05,
+         "each": [
+          {
+           "t": "v",
+           "vfx": "x3-c-vertical-blade-line",
+           "scale": 1.4,
+           "tint": "#D23C3C",
+           "dy": -60,
+           "hit": {
+            "dmg": 14,
+            "kind": "light",
+            "vfx": "x3-c-hit-spark-light",
+            "vs": 1.6,
+            "tint": "#ff8a8a"
+           }
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "f": 10,
+       "hold": 0.7,
+       "fx": [
+        {
+         "t": "v",
+         "vfx": "x3-3.15-F-red-square-seal",
+         "at": "screen",
+         "scale": 1.5,
+         "boom": 3,
+         "delay": 0.45,
+         "hit": {
+          "dmg": 60,
+          "kind": "launch",
+          "stop": 0.2,
+          "shake": 18,
+          "vfx": "x3-c-hit-spark-heavy",
+          "vs": 1.2,
+          "tint": "#ff6a6a"
+         }
+        },
+        {
+         "t": "later",
+         "in": 0.45,
+         "fx": [
+          {
+           "t": "shake",
+           "v": 18
+          },
+          {
+           "t": "v",
+           "vfx": "x3-c-ground-shockwave",
+           "at": "screen",
+           "w": 1.05,
+           "tint": "#D23C3C",
+           "under": true
+          }
+         ]
         }
        ]
       }

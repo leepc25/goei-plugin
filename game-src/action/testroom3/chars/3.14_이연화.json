@@ -380,7 +380,7 @@
   "heat": false,
   "_note": "병 입구에서 액체"
  },
- "skills": {
+ "skills_2판": {
   "skill": {
    "name": "잠깐만요",
    "anim": "22",
@@ -484,6 +484,361 @@
        "time": 12,
        "text": "작동 원리 재구성",
        "color": "#b8a0e8"
+      }
+     ]
+    }
+   ]
+  }
+ },
+ "skills": {
+  "skill": {
+   "name": "잠깐만요",
+   "anim": "22",
+   "fps": 10,
+   "events": [
+    {
+     "f": 4,
+     "hold": 0.22,
+     "fx": [
+      {
+       "t": "v",
+       "vfx": "x3-c-air-ring",
+       "at": "hand",
+       "dx": 20,
+       "scale": 1.8,
+       "tint": "#7d80d0"
+      },
+      {
+       "t": "v",
+       "vfx": "x3-c-ground-shockwave",
+       "at": "front",
+       "dx": 90,
+       "scale": 0.35,
+       "tint": "#7d80d0",
+       "under": true
+      },
+      {
+       "t": "melee",
+       "range": 200,
+       "hit": {
+        "dmg": 30,
+        "kind": "heavy",
+        "vfx": "x3-c-hit-spark-light",
+        "vs": 2,
+        "tint": "#c8caff"
+       }
+      }
+     ]
+    }
+   ]
+  },
+  "charge": {
+   "name": "배합 실험",
+   "hold": "23",
+   "release": "15",
+   "armed": true,
+   "levels": [
+    0.5,
+    1.2
+   ],
+   "fps": 12,
+   "fire": 5,
+   "releaseLv": {
+    "2": "24"
+   },
+   "fireLv": {
+    "2": 3
+   },
+   "lv": {
+    "0": [
+     {
+      "t": "v",
+      "vfx": "x3-c-liquid-splash",
+      "at": "hand",
+      "dx": 110,
+      "scale": 0.9,
+      "tint": "#6b6dbf",
+      "r": 110,
+      "hit": {
+       "dmg": 20,
+       "kind": "light",
+       "vfx": "x3-c-hit-spark-light",
+       "vs": 1.4,
+       "tint": "#c8caff"
+      }
+     }
+    ],
+    "1": [
+     {
+      "t": "v",
+      "vfx": "x3-c-liquid-splash",
+      "at": "hand",
+      "dx": 110,
+      "scale": 0.9,
+      "tint": "#6b6dbf"
+     },
+     {
+      "t": "later",
+      "in": 0.05,
+      "fx": [
+       {
+        "t": "v",
+        "vfx": "x3-c-liquid-splash",
+        "at": "hand",
+        "dx": 330,
+        "scale": 0.9,
+        "tint": "#6b6dbf"
+       }
+      ]
+     },
+     {
+      "t": "later",
+      "in": 0.1,
+      "fx": [
+       {
+        "t": "v",
+        "vfx": "x3-c-liquid-splash",
+        "at": "hand",
+        "dx": 550,
+        "scale": 0.9,
+        "tint": "#6b6dbf"
+       }
+      ]
+     },
+     {
+      "t": "melee",
+      "range": 650,
+      "hit": {
+       "dmg": 35,
+       "kind": "down",
+       "n": 2,
+       "mid": "light",
+       "every": 0.1,
+       "vfx": "x3-c-hit-spark-light",
+       "vs": 1.4,
+       "tint": "#c8caff"
+      }
+     }
+    ],
+    "2": [
+     {
+      "t": "proj",
+      "kind": "orb",
+      "vfx": "x3-o-3.14-reagent-bottle",
+      "rot": 12,
+      "dy": -200,
+      "speed": 800,
+      "life": 0.45,
+      "size": 1.5
+     },
+     {
+      "t": "later",
+      "in": 0.45,
+      "fx": [
+       {
+        "t": "v",
+        "vfx": "x3-c-glass-shatter",
+        "at": "front",
+        "dx": 380,
+        "h": 250,
+        "scale": 0.8
+       },
+       {
+        "t": "v",
+        "vfx": "x3-3.14-S2-reagent-rain",
+        "at": "front",
+        "dx": 380,
+        "r": 170,
+        "delay": 0.3,
+        "hit": {
+         "dmg": 30,
+         "kind": "stun",
+         "vfx": "x3-c-hit-spark-light",
+         "vs": 1.2,
+         "tint": "#c8caff"
+        }
+       },
+       {
+        "t": "later",
+        "in": 0.35,
+        "fx": [
+         {
+          "t": "v",
+          "vfx": "x3-c-smoke",
+          "at": "front",
+          "dx": 320,
+          "dy": 30,
+          "scale": 1.1,
+          "tint": "#5B5D8F"
+         },
+         {
+          "t": "v",
+          "vfx": "x3-c-smoke",
+          "at": "front",
+          "dx": 390,
+          "dy": 20,
+          "scale": 1.3,
+          "tint": "#5B5D8F"
+         },
+         {
+          "t": "v",
+          "vfx": "x3-c-smoke",
+          "at": "front",
+          "dx": 450,
+          "dy": 30,
+          "scale": 1.1,
+          "tint": "#5B5D8F"
+         }
+        ]
+       }
+      ]
+     }
+    ]
+   }
+  },
+  "super": {
+   "name": "과장님!",
+   "sub": "「과장님!」",
+   "anim": "25",
+   "fps": 9,
+   "events": [
+    {
+     "f": 3,
+     "hold": 0.15,
+     "fx": [
+      {
+       "t": "flash",
+       "v": 0.06
+      }
+     ]
+    },
+    {
+     "f": 6,
+     "fx": [
+      {
+       "t": "melee",
+       "range": 320,
+       "hit": {
+        "dmg": 15,
+        "kind": "pull",
+        "vfx": "x3-c-hit-spark-light",
+        "vs": 1.4,
+        "tint": "#c8caff"
+       }
+      }
+     ]
+    },
+    {
+     "f": 7,
+     "hold": 0.35,
+     "fx": [
+      {
+       "t": "shake",
+       "v": 12
+      },
+      {
+       "t": "v",
+       "vfx": "x3-c-ground-crack",
+       "at": "front",
+       "dx": 90,
+       "scale": 0.8
+      },
+      {
+       "t": "v",
+       "vfx": "x3-c-glass-shatter",
+       "at": "front",
+       "dx": 90,
+       "h": 20,
+       "scale": 0.8
+      },
+      {
+       "t": "v",
+       "vfx": "x3-3.14-F-reagent-explosion",
+       "at": "front",
+       "dx": 300,
+       "scale": 1.4,
+       "boom": 3,
+       "hit": {
+        "dmg": 55,
+        "kind": "blow",
+        "stop": 0.18,
+        "shake": 14,
+        "vfx": "x3-c-hit-spark-heavy",
+        "vs": 1,
+        "tint": "#b58cff"
+       }
+      }
+     ]
+    },
+    {
+     "f": 9,
+     "hold": 0.6,
+     "fx": [
+      {
+       "t": "v",
+       "vfx": "x3-c-smoke",
+       "at": "front",
+       "dx": 150,
+       "dy": 40,
+       "scale": 2.2,
+       "tint": "#3e3f6e"
+      },
+      {
+       "t": "v",
+       "vfx": "x3-c-smoke",
+       "at": "front",
+       "dx": 280,
+       "dy": 30,
+       "scale": 2.4,
+       "tint": "#3e3f6e"
+      },
+      {
+       "t": "v",
+       "vfx": "x3-c-smoke",
+       "at": "front",
+       "dx": 410,
+       "dy": 40,
+       "scale": 2.2,
+       "tint": "#3e3f6e"
+      },
+      {
+       "t": "v",
+       "vfx": "x3-c-smoke",
+       "at": "front",
+       "dx": 540,
+       "dy": 30,
+       "scale": 2.4,
+       "tint": "#3e3f6e"
+      },
+      {
+       "t": "v",
+       "vfx": "x3-c-smoke",
+       "at": "front",
+       "dx": 670,
+       "dy": 40,
+       "scale": 2.2,
+       "tint": "#3e3f6e"
+      },
+      {
+       "t": "melee",
+       "range": 900,
+       "hit": {
+        "dmg": 20,
+        "kind": "stun"
+       }
+      }
+     ]
+    },
+    {
+     "f": 12,
+     "fx": [
+      {
+       "t": "melee",
+       "range": 900,
+       "hit": {
+        "dmg": 10,
+        "kind": "down"
+       }
       }
      ]
     }
