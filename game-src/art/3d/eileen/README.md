@@ -19,3 +19,10 @@ Tripo API V3로 만든 첫 시험. 사용 크레딧 115 (잔액 885).
 - 텍스처 다시(v3.5, detailed, 정면·뒤 참고) `eileen_model_tex_detailed.glb`: aaccbfb5-757f-4eda-b65f-3b55678663b9, 20크레딧. 머리·옷 결은 또렷해졌지만 얼굴 피부가 회색으로 얼룩져 처음 텍스처(d45c0f57)가 낫다.
 - `tools/3d/toon.py`: 텍스처 색 × 2단 명암 + 뒤집은 껍질 외곽선. `test_toon.png` 위 = 처음 텍스처, 아래 = 다시 입힌 텍스처.
 - 남은 문제: 앞머리가 눈을 덮음(머리가 살짝 숙여짐), 얼굴 명암이 어두움.
+
+## 고품질 다시 뽑기 (같은 날, 채택 후보)
+
+- 정면 한 장 → image-to-model, v3.1, geometry_quality detailed, texture_quality detailed, PBR, 면 제한 없음: cddc6295-ffe7-431c-b26f-26f36d4f0863, 60크레딧.
+- 결과 64MB(저장소에 넣지 않음, 작업 id로 다시 받는다). 앞머리가 눈 위로, 눈·얼굴이 살아 있다. `test_hq_body.png`, `test_hq_face.png`.
+- 다음: Blender에서 줄이기(노멀 맵 굽기) → 뼈대 → 카툰 렌더링.
+- 누적 사용 195크레딧, 잔액 805.
