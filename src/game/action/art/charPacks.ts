@@ -162,7 +162,8 @@ export function drawCharClip(c: CanvasRenderingContext2D, nameOrKey: string, x: 
   shadow(c, x + (flip ? -ft[0] : ft[0]) * k, y, Math.min(80, ft[1]), k);
   snapTo(c, x, y);
   c.scale(flip ? -k : k, k);
-  c.drawImage(im, f * m.w, 0, m.w, m.h, -Math.round(m.w / 2), -base, m.w, m.h);
+  // 시트는 장마다 cw×ch 로 잘려 있고(ox, oy = 원본 128×256 안의 자리) — 코어 drawSprite 와 같은 식 (10-29: w 로 잘라 옆 장이 겹쳐 보이던 것)
+  c.drawImage(im, f * m.cw, 0, m.cw, m.ch, -Math.round(m.w / 2) + m.ox, -base + m.oy, m.cw, m.ch);
   c.restore();
   return true;
 }
@@ -185,8 +186,9 @@ export function charFace(nameOrKey: string, side = 44, flip = false): HTMLCanvas
   face.width = face.height = side;
   const o = face.getContext('2d')!;
   o.imageSmoothingEnabled = false;
-  const fx0 = m.w / 2 + (m.cx[0] ?? 0) + (a.cfg.dir === 'W' || a.cfg.dir === 'SW' ? -6 : 6);
-  const top = m.top[0] ?? 14;
+  // 얼굴 가운데 = 몸 중심에서 보는 쪽으로 6도트, 머리 꼭대기에서 조금 아래부터 (시트 좌표 = 원본 좌표 − ox/oy)
+  const fx0 = m.w / 2 + (m.cx[0] ?? 0) + (a.cfg.dir === 'W' || a.cfg.dir === 'SW' ? -6 : 6) - m.ox;
+  const top = (m.top[0] ?? 14) - m.oy;
   if (flip) { o.translate(side, 0); o.scale(-1, 1); }
   o.drawImage(a.IMG[id], Math.round(fx0 - side / 2), Math.max(0, top + 2), side, side, 0, 0, side, side);
   return face;
