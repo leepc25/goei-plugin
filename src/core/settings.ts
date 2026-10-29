@@ -141,6 +141,13 @@ export interface Mark {
   name: string;
 }
 export const MARK_MAX = 5;
+/** 즐겨찾기 기본값 (2026-10-29 사용자): 한 번도 저장한 적이 없을 때. 비우면 빈 채로 저장돼 다시 채우지 않는다 */
+export const DEFAULT_MARKS: Mark[] = [
+  { s: { tab: 'field' }, name: '필드' },
+  { s: { tab: 'wallet' }, name: '가계부' },
+  { s: { tab: 'records' }, name: '기록' },
+  { s: { tab: 'settings' }, name: '설정' },
+];
 
 /** 창 바깥 어둡기 기본값 (%). 예전엔 100%라 뒤 채팅이 거의 안 보였다 */
 export const DIM_DEFAULT = 50;
@@ -190,7 +197,7 @@ export function setPrefs(raw: unknown): Prefs {
   const imgFoldOn = o.imgFoldOn === false ? false : undefined;
   const show = imgRecent(o.imgShow);
   const send = imgRecent(o.imgSend);
-  const marks: Mark[] = (Array.isArray(o.marks) ? o.marks : [])
+  const marks: Mark[] = (Array.isArray(o.marks) ? o.marks : DEFAULT_MARKS)
     .filter((m): m is Mark => !!m && typeof m === 'object' && typeof (m as Mark).name === 'string' && !!(m as Mark).s && typeof (m as Mark).s.tab === 'string')
     .slice(0, MARK_MAX)
     .map((m) => ({ s: m.s, name: m.name.slice(0, 80) }));
