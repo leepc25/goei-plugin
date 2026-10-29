@@ -18,7 +18,8 @@ force = "--all" in args
 
 
 def webp(im):
-    o = io.BytesIO(); im.save(o, "WEBP", lossless=True, quality=100, method=6); return o.getvalue()
+    # method 6(최고 압축)은 시트 하나 2.6초(인물당 4분) — method 4는 0.04초에 용량 5% 차이. 무손실은 같다(10-29 사용자: 왜 이렇게 오래 걸리냐)
+    o = io.BytesIO(); im.save(o, "WEBP", lossless=True, quality=100, method=4); return o.getvalue()
 
 
 def from_data_uri(uri):
@@ -64,7 +65,11 @@ def write_fx():
 
 def one(item):
     ch, cfg = item
-    size, n = write_char(cfg)
+    d = PACKS / pack_id(cfg["key"])
+    if (d / "char.json").exists() and not force:   # 이미 끝난 인물은 건너뜀(--all 이면 다시)
+        size, n = sum(f.stat().st_size for f in d.iterdir()), len(json.loads((d / "char.json").read_text(encoding="utf-8"))["A"])
+    else:
+        size, n = write_char(cfg)
     print(f"{cfg['key']:<14} 줄 {n:>3} · {size / 1024 / 1024:.2f} MB", flush=True)
     return dict(key=cfg["key"], name=cfg["name"], num=ch["num"], pack=pack_id(cfg["key"]), color=cfg.get("color"), dir=cfg["dir"], armed=cfg.get("armed"), npc=cfg["key"].startswith("6."), kb=size // 1024)
 
