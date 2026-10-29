@@ -1,0 +1,235 @@
+{
+ "frames": [
+  {
+   "filename": "x3-3-11-d-gold-uppercut 0.png",
+   "frame": {
+    "x": 0,
+    "y": 0,
+    "w": 100,
+    "h": 212
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 100,
+    "h": 212
+   },
+   "sourceSize": {
+    "w": 100,
+    "h": 212
+   },
+   "pivot": {
+    "x": 0.43,
+    "y": 0.8962264150943396
+   },
+   "duration": 63
+  },
+  {
+   "filename": "x3-3-11-d-gold-uppercut 1.png",
+   "frame": {
+    "x": 100,
+    "y": 0,
+    "w": 100,
+    "h": 212
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 100,
+    "h": 212
+   },
+   "sourceSize": {
+    "w": 100,
+    "h": 212
+   },
+   "pivot": {
+    "x": 0.43,
+    "y": 0.8962264150943396
+   },
+   "duration": 63
+  },
+  {
+   "filename": "x3-3-11-d-gold-uppercut 2.png",
+   "frame": {
+    "x": 200,
+    "y": 0,
+    "w": 100,
+    "h": 212
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 100,
+    "h": 212
+   },
+   "sourceSize": {
+    "w": 100,
+    "h": 212
+   },
+   "pivot": {
+    "x": 0.43,
+    "y": 0.8962264150943396
+   },
+   "duration": 63
+  },
+  {
+   "filename": "x3-3-11-d-gold-uppercut 3.png",
+   "frame": {
+    "x": 0,
+    "y": 212,
+    "w": 100,
+    "h": 212
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 100,
+    "h": 212
+   },
+   "sourceSize": {
+    "w": 100,
+    "h": 212
+   },
+   "pivot": {
+    "x": 0.43,
+    "y": 0.8962264150943396
+   },
+   "duration": 63
+  },
+  {
+   "filename": "x3-3-11-d-gold-uppercut 4.png",
+   "frame": {
+    "x": 100,
+    "y": 212,
+    "w": 100,
+    "h": 212
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 100,
+    "h": 212
+   },
+   "sourceSize": {
+    "w": 100,
+    "h": 212
+   },
+   "pivot": {
+    "x": 0.43,
+    "y": 0.8962264150943396
+   },
+   "duration": 63
+  },
+  {
+   "filename": "x3-3-11-d-gold-uppercut 5.png",
+   "frame": {
+    "x": 200,
+    "y": 212,
+    "w": 100,
+    "h": 212
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 100,
+    "h": 212
+   },
+   "sourceSize": {
+    "w": 100,
+    "h": 212
+   },
+   "pivot": {
+    "x": 0.43,
+    "y": 0.8962264150943396
+   },
+   "duration": 63
+  },
+  {
+   "filename": "x3-3-11-d-gold-uppercut 6.png",
+   "frame": {
+    "x": 0,
+    "y": 424,
+    "w": 100,
+    "h": 212
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 100,
+    "h": 212
+   },
+   "sourceSize": {
+    "w": 100,
+    "h": 212
+   },
+   "pivot": {
+    "x": 0.43,
+    "y": 0.8962264150943396
+   },
+   "duration": 63
+  },
+  {
+   "filename": "x3-3-11-d-gold-uppercut 7.png",
+   "frame": {
+    "x": 100,
+    "y": 424,
+    "w": 100,
+    "h": 212
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 100,
+    "h": 212
+   },
+   "sourceSize": {
+    "w": 100,
+    "h": 212
+   },
+   "pivot": {
+    "x": 0.43,
+    "y": 0.8962264150943396
+   },
+   "duration": 63
+  }
+ ],
+ "meta": {
+  "app": "PixelLab VFX Creator",
+  "image": "x3-3-11-d-gold-uppercut.png",
+  "format": "RGBA8888",
+  "size": {
+   "w": 300,
+   "h": 636
+  },
+  "scale": "1",
+  "anchor": {
+   "kind": "origin",
+   "x": 43,
+   "y": 190
+  },
+  "frameTags": [
+   {
+    "name": "x3-3-11-d-gold-uppercut",
+    "from": 0,
+    "to": 7,
+    "direction": "forward"
+   }
+  ]
+ }
+}

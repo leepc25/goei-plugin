@@ -1,0 +1,235 @@
+{
+ "frames": [
+  {
+   "filename": "x3-2-14-d-headshot 0.png",
+   "frame": {
+    "x": 0,
+    "y": 0,
+    "w": 800,
+    "h": 88
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 800,
+    "h": 88
+   },
+   "sourceSize": {
+    "w": 800,
+    "h": 88
+   },
+   "pivot": {
+    "x": 0.935,
+    "y": 0.5
+   },
+   "duration": 42
+  },
+  {
+   "filename": "x3-2-14-d-headshot 1.png",
+   "frame": {
+    "x": 800,
+    "y": 0,
+    "w": 800,
+    "h": 88
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 800,
+    "h": 88
+   },
+   "sourceSize": {
+    "w": 800,
+    "h": 88
+   },
+   "pivot": {
+    "x": 0.935,
+    "y": 0.5
+   },
+   "duration": 42
+  },
+  {
+   "filename": "x3-2-14-d-headshot 2.png",
+   "frame": {
+    "x": 1600,
+    "y": 0,
+    "w": 800,
+    "h": 88
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 800,
+    "h": 88
+   },
+   "sourceSize": {
+    "w": 800,
+    "h": 88
+   },
+   "pivot": {
+    "x": 0.935,
+    "y": 0.5
+   },
+   "duration": 42
+  },
+  {
+   "filename": "x3-2-14-d-headshot 3.png",
+   "frame": {
+    "x": 0,
+    "y": 88,
+    "w": 800,
+    "h": 88
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 800,
+    "h": 88
+   },
+   "sourceSize": {
+    "w": 800,
+    "h": 88
+   },
+   "pivot": {
+    "x": 0.935,
+    "y": 0.5
+   },
+   "duration": 42
+  },
+  {
+   "filename": "x3-2-14-d-headshot 4.png",
+   "frame": {
+    "x": 800,
+    "y": 88,
+    "w": 800,
+    "h": 88
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 800,
+    "h": 88
+   },
+   "sourceSize": {
+    "w": 800,
+    "h": 88
+   },
+   "pivot": {
+    "x": 0.935,
+    "y": 0.5
+   },
+   "duration": 42
+  },
+  {
+   "filename": "x3-2-14-d-headshot 5.png",
+   "frame": {
+    "x": 1600,
+    "y": 88,
+    "w": 800,
+    "h": 88
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 800,
+    "h": 88
+   },
+   "sourceSize": {
+    "w": 800,
+    "h": 88
+   },
+   "pivot": {
+    "x": 0.935,
+    "y": 0.5
+   },
+   "duration": 42
+  },
+  {
+   "filename": "x3-2-14-d-headshot 6.png",
+   "frame": {
+    "x": 0,
+    "y": 176,
+    "w": 800,
+    "h": 88
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 800,
+    "h": 88
+   },
+   "sourceSize": {
+    "w": 800,
+    "h": 88
+   },
+   "pivot": {
+    "x": 0.935,
+    "y": 0.5
+   },
+   "duration": 42
+  },
+  {
+   "filename": "x3-2-14-d-headshot 7.png",
+   "frame": {
+    "x": 800,
+    "y": 176,
+    "w": 800,
+    "h": 88
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 800,
+    "h": 88
+   },
+   "sourceSize": {
+    "w": 800,
+    "h": 88
+   },
+   "pivot": {
+    "x": 0.935,
+    "y": 0.5
+   },
+   "duration": 42
+  }
+ ],
+ "meta": {
+  "app": "PixelLab VFX Creator",
+  "image": "x3-2-14-d-headshot.png",
+  "format": "RGBA8888",
+  "size": {
+   "w": 2400,
+   "h": 264
+  },
+  "scale": "1",
+  "anchor": {
+   "kind": "origin",
+   "x": 748,
+   "y": 44
+  },
+  "frameTags": [
+   {
+    "name": "x3-2-14-d-headshot",
+    "from": 0,
+    "to": 7,
+    "direction": "forward"
+   }
+  ]
+ }
+}

@@ -1,0 +1,12 @@
+[
+ {
+  "name": "고유기술 제압사격",
+  "frames": 8,
+  "action": "skill, suppressive fire: plant the feet wide, raise the submachine gun to the shoulder and fire a long continuous burst while sweeping the muzzle slowly across a wide arc from low to high and back, the upper body turning with the sweep and the shoulders shaking with the recoil, then lower the gun to the chest",
+  "prompt": "Plant feet wide and raise the submachine gun to the shoulder. Fire a long, continuous burst while sweeping the muzzle in a wide arc from low to high, shaking with recoil, before lowering the weapon to the chest.",
+  "usage": {
+   "type": "generations",
+   "generations": 0.05
+  }
+ }
+]

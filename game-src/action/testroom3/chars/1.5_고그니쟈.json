@@ -1,0 +1,831 @@
+{
+ "key": "1.5_고그니쟈",
+ "name": "고그니쟈",
+ "dir": "E",
+ "color": "#E8D23A",
+ "armed": true,
+ "anims": {
+  "1": {
+   "folder": "1",
+   "mirror": false,
+   "name": "평상 대기"
+  },
+  "2": {
+   "folder": "2",
+   "mirror": false,
+   "name": "개인 대기 (알약 씹기)"
+  },
+  "3_0": {
+   "folder": "3_0",
+   "mirror": false,
+   "name": "전투 자세 잡기"
+  },
+  "3": {
+   "folder": "3",
+   "mirror": false,
+   "name": "전투 대기"
+  },
+  "W": {
+   "folder": "W",
+   "mirror": false,
+   "name": "무기 꺼내기 (리모컨)"
+  },
+  "W_1": {
+   "folder": "W_1",
+   "mirror": false,
+   "name": "무기 대기"
+  },
+  "4": {
+   "folder": "4",
+   "mirror": false,
+   "name": "걷기"
+  },
+  "5": {
+   "folder": "5",
+   "mirror": false,
+   "name": "뛰기"
+  },
+  "6": {
+   "folder": "6",
+   "mirror": false,
+   "name": "제자리 점프"
+  },
+  "7": {
+   "folder": "7",
+   "mirror": false,
+   "name": "방향 점프"
+  },
+  "8": {
+   "folder": "8",
+   "mirror": false,
+   "name": "달리다 점프"
+  },
+  "9": {
+   "folder": "9",
+   "mirror": false,
+   "name": "약1 팔꿈치 찌르기"
+  },
+  "10": {
+   "folder": "10",
+   "mirror": false,
+   "name": "약2 어깨 들이받기"
+  },
+  "11": {
+   "folder": "11",
+   "mirror": false,
+   "name": "약3 두 손 밀치기"
+  },
+  "12": {
+   "folder": "12",
+   "mirror": false,
+   "name": "강 박치기"
+  },
+  "13": {
+   "folder": "13",
+   "mirror": false,
+   "name": "돌진 와락 덮치기"
+  },
+  "14": {
+   "folder": "14",
+   "mirror": false,
+   "name": "점프 공격 무릎 찍기"
+  },
+  "15": {
+   "folder": "15",
+   "mirror": false,
+   "name": "원거리 리모컨 조준 연타"
+  },
+  "16": {
+   "folder": "16",
+   "mirror": false,
+   "name": "뒤 회피 (만화식 뒷깡총)"
+  },
+  "16_1": {
+   "folder": "16_1",
+   "mirror": false,
+   "name": "앞 회피 (낮게 날아들기)"
+  },
+  "17": {
+   "folder": "17",
+   "mirror": false,
+   "name": "막기 (가운 여미기)"
+  },
+  "18": {
+   "folder": "18",
+   "mirror": false,
+   "name": "맞기"
+  },
+  "19": {
+   "folder": "19",
+   "mirror": false,
+   "name": "날아가 쓰러지기"
+  },
+  "20": {
+   "folder": "20",
+   "mirror": false,
+   "name": "일어나기"
+  },
+  "21": {
+   "folder": "21",
+   "mirror": false,
+   "name": "스턴"
+  },
+  "22": {
+   "folder": "22",
+   "mirror": false,
+   "name": "고유기술 「비상 장치 가동」"
+  },
+  "23": {
+   "folder": "23",
+   "mirror": false,
+   "name": "충전 「꽤 깊지!」 모으기"
+  },
+  "24": {
+   "folder": "24",
+   "mirror": false,
+   "name": "충전 방출"
+  },
+  "25": {
+   "folder": "25",
+   "mirror": false,
+   "name": "필살기 「오오, 그 녀석은 성질이 좀 있지!」"
+  },
+  "26": {
+   "folder": "26",
+   "mirror": false,
+   "name": "섭취 (한 번에 들이켜기)"
+  },
+  "27": {
+   "folder": "27",
+   "mirror": false,
+   "name": "줍기 (주워서 들여다보기)"
+  },
+  "28": {
+   "folder": "28",
+   "mirror": false,
+   "name": "응대"
+  },
+  "29": {
+   "folder": "29",
+   "mirror": false,
+   "name": "말하며 손짓 (강의)"
+  },
+  "30": {
+   "folder": "30",
+   "mirror": false,
+   "name": "끄덕이기"
+  },
+  "31": {
+   "folder": "31",
+   "mirror": false,
+   "name": "고개 젓기"
+  },
+  "32": {
+   "folder": "32",
+   "mirror": false,
+   "name": "화내기 (웃음 뚝)"
+  },
+  "33": {
+   "folder": "33",
+   "mirror": false,
+   "name": "발견 반응 (오오!)"
+  },
+  "34": {
+   "folder": "34",
+   "mirror": false,
+   "name": "놀라기"
+  },
+  "35": {
+   "folder": "35",
+   "mirror": false,
+   "name": "기뻐하기"
+  },
+  "36": {
+   "folder": "36",
+   "mirror": false,
+   "name": "도망"
+  },
+  "37": {
+   "folder": "37",
+   "mirror": false,
+   "name": "뒷걸음질 (움츠리기)"
+  },
+  "37_1": {
+   "folder": "37_1",
+   "mirror": false,
+   "name": "뒷걸음질 반복"
+  },
+  "38": {
+   "folder": "38",
+   "mirror": true,
+   "name": "엎드려 기기"
+  },
+  "38_1": {
+   "folder": "38_1",
+   "mirror": true,
+   "name": "엎드려 기기 반복"
+  },
+  "39": {
+   "folder": "39",
+   "mirror": false,
+   "name": "주저앉기"
+  },
+  "41": {
+   "folder": "41",
+   "mirror": false,
+   "name": "웅크려 떨기"
+  },
+  "42": {
+   "folder": "42",
+   "mirror": false,
+   "name": "네발로 기기"
+  },
+  "42_1": {
+   "folder": "42_1",
+   "mirror": false,
+   "name": "네발로 기기 반복"
+  }
+ },
+ "picks": {
+  "combat": 4,
+  "weapon": 4,
+  "apex": 4,
+  "run": 3,
+  "crawl4": 10
+ },
+ "loops": {
+  "36": [
+   2,
+   3,
+   4,
+   5,
+   6,
+   7,
+   8
+  ],
+  "15": [
+   2,
+   3,
+   4,
+   5,
+   6,
+   7
+  ],
+  "21": [
+   3,
+   4,
+   5,
+   6,
+   7
+  ],
+  "23": [
+   5,
+   6,
+   7,
+   8
+  ],
+  "19": [
+   7,
+   8,
+   9,
+   10,
+   11,
+   12
+  ],
+  "39": [
+   7,
+   8,
+   9,
+   10,
+   11,
+   12
+  ],
+  "41": [
+   4,
+   5,
+   6,
+   7,
+   8
+  ],
+  "1": [
+   1,
+   2,
+   3,
+   4
+  ],
+  "37_1": [
+   2,
+   3,
+   4,
+   5,
+   6,
+   7,
+   8,
+   9
+  ],
+  "42_1": [
+   2,
+   3,
+   4,
+   5,
+   6,
+   7,
+   8,
+   9
+  ]
+ },
+ "hit": {
+  "9": 5,
+  "10": 5,
+  "11": 5,
+  "12": 4,
+  "13": 4,
+  "14": 3,
+  "16_1": 6,
+  "16": 6
+ },
+ "gun": [
+  "W",
+  "W_1",
+  "15"
+ ],
+ "kick": [
+  "14"
+ ],
+ "ranged": {
+  "proj": {
+   "t": "proj",
+   "kind": "orb",
+   "speed": 1500,
+   "color": "#ff5a4a",
+   "hit": {
+    "dmg": 7,
+    "kind": "light"
+   }
+  },
+  "heat": false,
+  "_note": "10-28 사용자: 머리 한참 위에서 나가 안 맞음 → 리모컨 든 손에서 발사"
+ },
+ "skills": {
+  "skill": {
+   "name": "비상 장치 가동",
+   "anim": "22",
+   "fps": 9,
+   "armed": true,
+   "events": [
+    {
+     "f": 3,
+     "fx": []
+    },
+    {
+     "f": 4,
+     "hold": 0.15,
+     "fx": [
+      {
+       "t": "v",
+       "vfx": "x3-1.5-D-hatch-arc",
+       "at": "front",
+       "dx": 220,
+       "r": 70,
+       "delay": 0.1,
+       "boom": 1,
+       "hit": {
+        "dmg": 270,
+        "kind": "launch",
+        "stop": 0.14,
+        "shake": 10,
+        "vfx": "x3-c-hit-spark-light",
+        "vs": 3,
+        "tint": "#E8D23A"
+       }
+      }
+     ]
+    }
+   ]
+  },
+  "charge": {
+   "name": "꽤 깊지!",
+   "hold": "23",
+   "release": "24",
+   "armed": true,
+   "levels": [
+    0.5,
+    1.2
+   ],
+   "fire": 5,
+   "lv": {
+    "0": [
+     {
+      "t": "v",
+      "vfx": "x3-1.5-S0-floor-plate",
+      "at": "front",
+      "dx": 131,
+      "scale": 1.2,
+      "r": 70,
+      "delay": 0.08,
+      "hit": {
+       "dmg": 75,
+       "kind": "launch",
+       "stop": 0.08,
+       "shake": 6
+      }
+     }
+    ],
+    "1": [
+     {
+      "t": "v",
+      "vfx": "x3-1.5-S1-shutter",
+      "at": "front",
+      "dx": 320,
+      "r": 180,
+      "delay": 0.12,
+      "boom": 1,
+      "hit": {
+       "dmg": 150,
+       "kind": "down",
+       "stop": 0.16,
+       "shake": 12,
+       "vfx": "x3-c-hit-spark-heavy",
+       "tint": "#E8D23A"
+      }
+     }
+    ],
+    "2": [
+     {
+      "t": "v",
+      "vfx": "x3-1.5-S2-floor-pit",
+      "at": "front",
+      "dx": 320,
+      "r": 300,
+      "depth": 110,
+      "delay": 0.2,
+      "under": true,
+      "hit": {
+       "dmg": 240,
+       "kind": "down",
+       "n": 2,
+       "mid": "launch",
+       "every": 0.55,
+       "stop": 0.16,
+       "shake": 14
+      }
+     },
+     {
+      "t": "later",
+      "in": 0.7,
+      "fx": [
+       {
+        "t": "shake",
+        "v": 12
+       },
+       {
+        "t": "v",
+        "vfx": "x3-c-dust-puff",
+        "at": "front",
+        "dx": 320,
+        "scale": 2,
+        "tint": "#c8c0a8"
+       }
+      ]
+     }
+    ]
+   }
+  },
+  "super": {
+   "name": "오오, 그 녀석은 성질이 좀 있지!",
+   "sub": "「자네, 커피는 다 마셨나!」",
+   "anim": "25",
+   "fps": 8,
+   "events": [
+    {
+     "f": 1,
+     "fx": [
+      {
+       "t": "dark",
+       "v": 2.0
+      },
+      {
+       "t": "repeat",
+       "n": 4,
+       "every": 0.25,
+       "fx": []
+      }
+     ]
+    },
+    {
+     "f": 2,
+     "hold": 0.3,
+     "fx": [
+      {
+       "t": "v",
+       "vfx": "x3-1.5-F-vault-door",
+       "at": "screen",
+       "dy": -90,
+       "under": true,
+       "hold": 1.6,
+       "fade": 0.4
+      }
+     ]
+    },
+    {
+     "f": 3,
+     "hold": 0.45,
+     "fx": [
+      {
+       "t": "later",
+       "in": 0.5,
+       "fx": [
+        {
+         "t": "v",
+         "vfx": "x3-1.5-F-yellow-eyes",
+         "at": "screen",
+         "dy": -110,
+         "under": true
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "f": 5,
+     "hold": 0.2,
+     "fx": [
+      {
+       "t": "v",
+       "vfx": "x3-1.5-F-roar-blast",
+       "at": "screen",
+       "w": 1.0,
+       "boom": 3,
+       "delay": 0.2,
+       "hit": {
+        "dmg": 266,
+        "kind": "blow",
+        "stop": 0.16,
+        "shake": 16
+       }
+      },
+      {
+       "t": "shake",
+       "v": 16
+      },
+      {
+       "t": "later",
+       "in": 0.45,
+       "fx": [
+        {
+         "t": "screen",
+         "spots": 6,
+         "every": 0.12,
+         "each": [
+          {
+           "t": "v",
+           "vfx": "x3-1.5-D-hatch-arc",
+           "r": 70,
+           "delay": 0.08,
+           "hit": {
+            "dmg": 114,
+            "kind": "launch",
+            "stop": 0.08,
+            "shake": 8
+           }
+          }
+         ]
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "f": 6,
+     "to": 11,
+     "rep": 2,
+     "d": 0.1,
+     "fx": []
+    },
+    {
+     "f": 12,
+     "hold": 0.3,
+     "fx": [
+      {
+       "t": "shake",
+       "v": 10
+      }
+     ]
+    }
+   ]
+  }
+ },
+ "skills_2판": {
+  "skill": {
+   "name": "비상 장치 가동",
+   "anim": "22",
+   "fps": 9,
+   "armed": true,
+   "events": [
+    {
+     "f": 3,
+     "fx": [
+      {
+       "t": "text",
+       "at": "target",
+       "v": "경고!"
+      },
+      {
+       "t": "ring",
+       "at": "target",
+       "r": 70,
+       "color": "#ff3a2a"
+      }
+     ]
+    },
+    {
+     "f": 4,
+     "hold": 0.15,
+     "fx": [
+      {
+       "t": "summon",
+       "icon": "tube",
+       "at": "target",
+       "time": 2
+      },
+      {
+       "t": "bind",
+       "time": 2,
+       "color": "#9fd8ff"
+      },
+      {
+       "t": "later",
+       "in": 2,
+       "fx": [
+        {
+         "t": "shock",
+         "at": "target",
+         "r": 90,
+         "hit": {
+          "dmg": 153,
+          "kind": "down",
+          "text": "패대기"
+         }
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  "charge": {
+   "name": "꽤 깊지!",
+   "hold": "23",
+   "release": "24",
+   "armed": true,
+   "levels": [
+    0.5,
+    1.2
+   ],
+   "fire": 5,
+   "lv": {
+    "0": [
+     {
+      "t": "ring",
+      "at": "front",
+      "dx": 120,
+      "r": 60,
+      "color": "#ff3a2a"
+     }
+    ],
+    "1": [
+     {
+      "t": "summon",
+      "icon": "wall",
+      "at": "front",
+      "dx": 100,
+      "time": 5,
+      "color": "#ff3a2a"
+     },
+     {
+      "t": "text",
+      "v": "방벽 5초"
+     }
+    ],
+    "2": [
+     {
+      "t": "puddle",
+      "at": "front",
+      "dx": 300,
+      "r": 300,
+      "time": 1.4,
+      "color": "#ff3a2a"
+     },
+     {
+      "t": "melee",
+      "range": 520,
+      "depth": 110,
+      "hit": {
+       "dmg": 109,
+       "kind": "down",
+       "text": "격리"
+      }
+     }
+    ]
+   }
+  },
+  "super": {
+   "name": "오오, 그 녀석은 성질이 좀 있지!",
+   "sub": "「자네, 커피는 다 마셨나!」",
+   "anim": "25",
+   "fps": 8,
+   "events": [
+    {
+     "f": 2,
+     "fx": [
+      {
+       "t": "dark",
+       "v": 3.2
+      },
+      {
+       "t": "big",
+       "vfx": "sup-1.5"
+      }
+     ]
+    },
+    {
+     "f": 4,
+     "fx": [
+      {
+       "t": "sweep",
+       "time": 2.4,
+       "hit": {
+        "dmg": 32,
+        "n": 5,
+        "kind": "launch"
+       }
+      }
+     ]
+    },
+    {
+     "f": 6,
+     "to": 11,
+     "rep": 2,
+     "d": 0.1,
+     "fx": []
+    },
+    {
+     "f": 12,
+     "hold": 0.3,
+     "fx": [
+      {
+       "t": "text",
+       "v": "철컹!"
+      },
+      {
+       "t": "shake",
+       "v": 6
+      }
+     ]
+    }
+   ]
+  }
+ },
+ "_note": "손으로 다듬음(표 「테스트룸」 절·기술안). 그림 값은 자동. 다시 자동으로: build.py --reset 1.5_고그니쟈",
+ "skip": {
+  "6": [
+   3
+  ]
+ },
+ "clean": {
+  "8": [
+   [
+    2,
+    60
+   ],
+   [
+    3,
+    170
+   ]
+  ],
+  "38": [
+   [
+    1,
+    450
+   ]
+  ]
+ },
+ "bal": {
+  "role": "control",
+  "speed": "slow",
+  "gun": "single",
+  "atk": {
+   "9": 15,
+   "10": 16,
+   "11": 19,
+   "12": 26,
+   "13": 20,
+   "14": 22
+  },
+  "cd": {
+   "skill": 5
+  },
+  "shotDmg": 9,
+  "superType": "aoe"
+ }
+}

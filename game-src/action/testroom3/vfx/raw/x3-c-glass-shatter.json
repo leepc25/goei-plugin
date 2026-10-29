@@ -1,0 +1,209 @@
+{
+ "frames": [
+  {
+   "filename": "x3-c-glass-shatter 0.png",
+   "frame": {
+    "x": 0,
+    "y": 0,
+    "w": 99,
+    "h": 107
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 99,
+    "h": 107
+   },
+   "sourceSize": {
+    "w": 99,
+    "h": 107
+   },
+   "pivot": {
+    "x": 0.4444444444444444,
+    "y": 0.2803738317757009
+   },
+   "duration": 63
+  },
+  {
+   "filename": "x3-c-glass-shatter 1.png",
+   "frame": {
+    "x": 99,
+    "y": 0,
+    "w": 99,
+    "h": 107
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 99,
+    "h": 107
+   },
+   "sourceSize": {
+    "w": 99,
+    "h": 107
+   },
+   "pivot": {
+    "x": 0.4444444444444444,
+    "y": 0.2803738317757009
+   },
+   "duration": 63
+  },
+  {
+   "filename": "x3-c-glass-shatter 2.png",
+   "frame": {
+    "x": 198,
+    "y": 0,
+    "w": 99,
+    "h": 107
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 99,
+    "h": 107
+   },
+   "sourceSize": {
+    "w": 99,
+    "h": 107
+   },
+   "pivot": {
+    "x": 0.4444444444444444,
+    "y": 0.2803738317757009
+   },
+   "duration": 63
+  },
+  {
+   "filename": "x3-c-glass-shatter 3.png",
+   "frame": {
+    "x": 0,
+    "y": 107,
+    "w": 99,
+    "h": 107
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 99,
+    "h": 107
+   },
+   "sourceSize": {
+    "w": 99,
+    "h": 107
+   },
+   "pivot": {
+    "x": 0.4444444444444444,
+    "y": 0.2803738317757009
+   },
+   "duration": 63
+  },
+  {
+   "filename": "x3-c-glass-shatter 4.png",
+   "frame": {
+    "x": 99,
+    "y": 107,
+    "w": 99,
+    "h": 107
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 99,
+    "h": 107
+   },
+   "sourceSize": {
+    "w": 99,
+    "h": 107
+   },
+   "pivot": {
+    "x": 0.4444444444444444,
+    "y": 0.2803738317757009
+   },
+   "duration": 63
+  },
+  {
+   "filename": "x3-c-glass-shatter 5.png",
+   "frame": {
+    "x": 198,
+    "y": 107,
+    "w": 99,
+    "h": 107
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 99,
+    "h": 107
+   },
+   "sourceSize": {
+    "w": 99,
+    "h": 107
+   },
+   "pivot": {
+    "x": 0.4444444444444444,
+    "y": 0.2803738317757009
+   },
+   "duration": 63
+  },
+  {
+   "filename": "x3-c-glass-shatter 6.png",
+   "frame": {
+    "x": 0,
+    "y": 214,
+    "w": 99,
+    "h": 107
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 99,
+    "h": 107
+   },
+   "sourceSize": {
+    "w": 99,
+    "h": 107
+   },
+   "pivot": {
+    "x": 0.4444444444444444,
+    "y": 0.2803738317757009
+   },
+   "duration": 63
+  }
+ ],
+ "meta": {
+  "app": "PixelLab VFX Creator",
+  "image": "x3-c-glass-shatter.png",
+  "format": "RGBA8888",
+  "size": {
+   "w": 297,
+   "h": 321
+  },
+  "scale": "1",
+  "anchor": {
+   "kind": "origin",
+   "x": 44,
+   "y": 30
+  },
+  "frameTags": [
+   {
+    "name": "x3-c-glass-shatter",
+    "from": 0,
+    "to": 6,
+    "direction": "forward"
+   }
+  ]
+ }
+}

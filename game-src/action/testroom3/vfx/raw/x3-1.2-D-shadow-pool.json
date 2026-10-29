@@ -1,0 +1,235 @@
+{
+ "frames": [
+  {
+   "filename": "x3-1-2-d-shadow-pool 0.png",
+   "frame": {
+    "x": 0,
+    "y": 0,
+    "w": 224,
+    "h": 64
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 224,
+    "h": 64
+   },
+   "sourceSize": {
+    "w": 224,
+    "h": 64
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.5
+   },
+   "duration": 83
+  },
+  {
+   "filename": "x3-1-2-d-shadow-pool 1.png",
+   "frame": {
+    "x": 224,
+    "y": 0,
+    "w": 224,
+    "h": 64
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 224,
+    "h": 64
+   },
+   "sourceSize": {
+    "w": 224,
+    "h": 64
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.5
+   },
+   "duration": 83
+  },
+  {
+   "filename": "x3-1-2-d-shadow-pool 2.png",
+   "frame": {
+    "x": 448,
+    "y": 0,
+    "w": 224,
+    "h": 64
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 224,
+    "h": 64
+   },
+   "sourceSize": {
+    "w": 224,
+    "h": 64
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.5
+   },
+   "duration": 83
+  },
+  {
+   "filename": "x3-1-2-d-shadow-pool 3.png",
+   "frame": {
+    "x": 0,
+    "y": 64,
+    "w": 224,
+    "h": 64
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 224,
+    "h": 64
+   },
+   "sourceSize": {
+    "w": 224,
+    "h": 64
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.5
+   },
+   "duration": 83
+  },
+  {
+   "filename": "x3-1-2-d-shadow-pool 4.png",
+   "frame": {
+    "x": 224,
+    "y": 64,
+    "w": 224,
+    "h": 64
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 224,
+    "h": 64
+   },
+   "sourceSize": {
+    "w": 224,
+    "h": 64
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.5
+   },
+   "duration": 83
+  },
+  {
+   "filename": "x3-1-2-d-shadow-pool 5.png",
+   "frame": {
+    "x": 448,
+    "y": 64,
+    "w": 224,
+    "h": 64
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 224,
+    "h": 64
+   },
+   "sourceSize": {
+    "w": 224,
+    "h": 64
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.5
+   },
+   "duration": 83
+  },
+  {
+   "filename": "x3-1-2-d-shadow-pool 6.png",
+   "frame": {
+    "x": 0,
+    "y": 128,
+    "w": 224,
+    "h": 64
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 224,
+    "h": 64
+   },
+   "sourceSize": {
+    "w": 224,
+    "h": 64
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.5
+   },
+   "duration": 83
+  },
+  {
+   "filename": "x3-1-2-d-shadow-pool 7.png",
+   "frame": {
+    "x": 224,
+    "y": 128,
+    "w": 224,
+    "h": 64
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 224,
+    "h": 64
+   },
+   "sourceSize": {
+    "w": 224,
+    "h": 64
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.5
+   },
+   "duration": 83
+  }
+ ],
+ "meta": {
+  "app": "PixelLab VFX Creator",
+  "image": "x3-1-2-d-shadow-pool.png",
+  "format": "RGBA8888",
+  "size": {
+   "w": 672,
+   "h": 192
+  },
+  "scale": "1",
+  "anchor": {
+   "kind": "origin",
+   "x": 112,
+   "y": 32
+  },
+  "frameTags": [
+   {
+    "name": "x3-1-2-d-shadow-pool",
+    "from": 0,
+    "to": 7,
+    "direction": "forward"
+   }
+  ]
+ }
+}

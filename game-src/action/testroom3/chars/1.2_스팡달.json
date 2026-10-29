@@ -1,0 +1,896 @@
+{
+ "key": "1.2_스팡달",
+ "name": "스팡달",
+ "dir": "W",
+ "color": "#7A3FB0",
+ "armed": false,
+ "anims": {
+  "W_1": {
+   "folder": "W_1",
+   "mirror": true,
+   "name": "원거리 자세 대기"
+  },
+  "1": {
+   "folder": "1",
+   "mirror": true,
+   "name": "평상 대기"
+  },
+  "2": {
+   "folder": "2",
+   "mirror": true,
+   "name": "개인 대기 (가시 손질)"
+  },
+  "3": {
+   "folder": "3",
+   "mirror": true,
+   "name": "전투 대기"
+  },
+  "3_0": {
+   "folder": "3_0",
+   "mirror": true,
+   "name": "전투 자세 잡기"
+  },
+  "4": {
+   "folder": "4",
+   "mirror": true,
+   "name": "걷기"
+  },
+  "5": {
+   "folder": "5",
+   "mirror": true,
+   "name": "뛰기"
+  },
+  "6": {
+   "folder": "6",
+   "mirror": true,
+   "name": "제자리 점프"
+  },
+  "7": {
+   "folder": "7",
+   "mirror": true,
+   "name": "방향 점프 (덮치기)"
+  },
+  "8": {
+   "folder": "8",
+   "mirror": true,
+   "name": "달리다 점프"
+  },
+  "9": {
+   "folder": "9",
+   "mirror": true,
+   "name": "약1 손끝 찌르기"
+  },
+  "10": {
+   "folder": "10",
+   "mirror": true,
+   "name": "약2 뒷손 갈퀴 쓸기"
+  },
+  "11": {
+   "folder": "11",
+   "mirror": true,
+   "name": "약3 X자 벌려 가르기"
+  },
+  "12": {
+   "folder": "12",
+   "mirror": true,
+   "name": "강 바닥 짚고 솟기"
+  },
+  "13": {
+   "folder": "13",
+   "mirror": true,
+   "name": "돌진 공격 스쳐 가르기"
+  },
+  "14": {
+   "folder": "14",
+   "mirror": true,
+   "name": "점프 공격 할퀴어 내리기"
+  },
+  "15": {
+   "folder": "15",
+   "mirror": true,
+   "name": "원거리 공격 가시 던지기"
+  },
+  "16": {
+   "folder": "16",
+   "mirror": true,
+   "name": "뒤 회피 낮게 물러뛰기"
+  },
+  "16_1": {
+   "folder": "16_1",
+   "mirror": true,
+   "name": "앞 회피 파고들기"
+  },
+  "17": {
+   "folder": "17",
+   "mirror": true,
+   "name": "막기"
+  },
+  "18": {
+   "folder": "18",
+   "mirror": true,
+   "name": "맞기"
+  },
+  "19": {
+   "folder": "19",
+   "mirror": true,
+   "name": "날아가 쓰러지기"
+  },
+  "20": {
+   "folder": "20",
+   "mirror": true,
+   "name": "일어나기 (튀어 일어나기)"
+  },
+  "21": {
+   "folder": "21",
+   "mirror": true,
+   "name": "스턴"
+  },
+  "22": {
+   "folder": "22",
+   "mirror": true,
+   "name": "고유기술 「그림자 이동」"
+  },
+  "23": {
+   "folder": "23",
+   "mirror": true,
+   "name": "충전 「격자 구속」 모으기"
+  },
+  "24": {
+   "folder": "24",
+   "mirror": true,
+   "name": "충전 방출"
+  },
+  "25": {
+   "folder": "25",
+   "mirror": true,
+   "name": "필살기 「우습네. 정말.」"
+  },
+  "26": {
+   "folder": "26",
+   "mirror": true,
+   "name": "섭취"
+  },
+  "27": {
+   "folder": "27",
+   "mirror": true,
+   "name": "줍기"
+  },
+  "28": {
+   "folder": "28",
+   "mirror": true,
+   "name": "응대 (여보세요?)"
+  },
+  "29": {
+   "folder": "29",
+   "mirror": true,
+   "name": "말하며 손짓"
+  },
+  "30": {
+   "folder": "30",
+   "mirror": true,
+   "name": "끄덕이기"
+  },
+  "31": {
+   "folder": "31",
+   "mirror": true,
+   "name": "고개 젓기"
+  },
+  "32": {
+   "folder": "32",
+   "mirror": true,
+   "name": "화내기"
+  },
+  "33": {
+   "folder": "33",
+   "mirror": true,
+   "name": "발견 반응"
+  },
+  "34": {
+   "folder": "34",
+   "mirror": true,
+   "name": "놀라기"
+  },
+  "35": {
+   "folder": "35",
+   "mirror": true,
+   "name": "기뻐하기"
+  },
+  "36": {
+   "folder": "36",
+   "mirror": true,
+   "name": "도망"
+  },
+  "37": {
+   "folder": "37",
+   "mirror": true,
+   "name": "뒷걸음질 (움츠리기)"
+  },
+  "37_1": {
+   "folder": "37_1",
+   "mirror": true,
+   "name": "뒷걸음질 반복"
+  },
+  "38": {
+   "folder": "38",
+   "mirror": true,
+   "name": "엎드려 기기"
+  },
+  "38_1": {
+   "folder": "38_1",
+   "mirror": true,
+   "name": "엎드려 기기 반복"
+  },
+  "39": {
+   "folder": "39",
+   "mirror": true,
+   "name": "주저앉기"
+  },
+  "41": {
+   "folder": "41",
+   "mirror": true,
+   "name": "웅크려 떨기"
+  },
+  "42": {
+   "folder": "42",
+   "mirror": true,
+   "name": "네발로 기기"
+  },
+  "42_1": {
+   "folder": "42_1",
+   "mirror": true,
+   "name": "네발로 기기 반복"
+  }
+ },
+ "picks": {
+  "combat": 4,
+  "weapon": 4,
+  "apex": 4,
+  "run": 6,
+  "crawl4": 8
+ },
+ "loops": {
+  "1": [
+   1,
+   2,
+   3,
+   4
+  ],
+  "3": [
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7,
+   8
+  ],
+  "W_1": [
+   1,
+   2,
+   3
+  ],
+  "4": [
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7,
+   8
+  ],
+  "5": [
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7,
+   8
+  ],
+  "15": [
+   3,
+   4,
+   5
+  ],
+  "19": [
+   9,
+   10,
+   11,
+   12
+  ],
+  "21": [
+   2,
+   3,
+   4,
+   5,
+   6,
+   7
+  ],
+  "23": [
+   5,
+   6,
+   7,
+   8
+  ],
+  "29": [
+   1,
+   2,
+   3,
+   4
+  ],
+  "36": [
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7,
+   8
+  ],
+  "37_1": [
+   2,
+   3,
+   4,
+   5,
+   6,
+   7,
+   8,
+   9
+  ],
+  "38": [
+   5,
+   6,
+   7,
+   8,
+   9,
+   10,
+   11,
+   12
+  ],
+  "38_1": [
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7,
+   8
+  ],
+  "39": [
+   9,
+   10,
+   11,
+   12
+  ],
+  "41": [
+   4,
+   5,
+   6,
+   7,
+   8
+  ],
+  "42": [
+   5,
+   6,
+   7,
+   8,
+   9,
+   10,
+   11,
+   12
+  ],
+  "42_1": [
+   2,
+   3,
+   4,
+   5,
+   6,
+   7,
+   8,
+   9
+  ]
+ },
+ "hit": {
+  "9": 6,
+  "10": 5,
+  "11": 5,
+  "12": 2,
+  "13": 2,
+  "14": 4,
+  "15": 3,
+  "22": 5,
+  "24": 4,
+  "25": 8
+ },
+ "gun": [],
+ "kick": [],
+ "ranged": {
+  "proj": {
+   "t": "proj",
+   "kind": "spike",
+   "speed": 1500,
+   "color": "#7A3FB0",
+   "hit": {
+    "dmg": 9,
+    "kind": "light"
+   }
+  },
+  "heat": false
+ },
+ "skills": {
+  "skill": {
+   "name": "그림자 이동",
+   "anim": "22",
+   "fps": 10,
+   "events": [
+    {
+     "f": 3,
+     "fx": [
+      {
+       "t": "v",
+       "vfx": "x3-1.2-D-shadow-pool",
+       "at": "self",
+       "under": true
+      },
+      {
+       "t": "hide",
+       "mode": "out",
+       "dur": 0.18
+      }
+     ]
+    },
+    {
+     "f": 5,
+     "fx": [
+      {
+       "t": "teleport",
+       "to": "behind",
+       "dist": 85,
+       "puddle": false
+      },
+      {
+       "t": "v",
+       "vfx": "x3-1.2-D-shadow-pool",
+       "at": "self",
+       "under": true
+      },
+      {
+       "t": "hide",
+       "mode": "in",
+       "dur": 0.14
+      },
+      {
+       "t": "dark",
+       "v": 0.18
+      },
+      {
+       "t": "v",
+       "vfx": "x3-1.2-D-needle-burst",
+       "at": "front",
+       "dx": 60,
+       "r": 100.0,
+       "delay": 0.06,
+       "hit": {
+        "dmg": 270,
+        "kind": "launch",
+        "stop": 0.14,
+        "shake": 10,
+        "vfx": "x3-c-hit-spark-heavy",
+        "tint": "#7A3FB0"
+       }
+      }
+     ]
+    }
+   ]
+  },
+  "charge": {
+   "name": "가시 격자",
+   "hold": "23",
+   "release": "24",
+   "releaseLv": {
+    "0": "15"
+   },
+   "fireLv": {
+    "0": 3
+   },
+   "levels": [
+    0.5,
+    1.2
+   ],
+   "fire": 4,
+   "lv": {
+    "0": [
+     {
+      "t": "repeat",
+      "n": 3,
+      "every": 0.08,
+      "fx": [
+       {
+        "t": "proj",
+        "kind": "spike",
+        "speed": 1700,
+        "pierce": true,
+        "life": 0.6,
+        "color": "#1a0f24",
+        "hit": {
+         "dmg": 38,
+         "kind": "light",
+         "stop": 0.04,
+         "shake": 4
+        }
+       }
+      ]
+     }
+    ],
+    "1": [
+     {
+      "t": "v",
+      "vfx": "x3-1.2-S1-spike-lance",
+      "at": "self",
+      "dx": 270,
+      "r": 200,
+      "delay": 0.15,
+      "hit": {
+       "dmg": 150,
+       "kind": "launch",
+       "stop": 0.16,
+       "shake": 12,
+       "vfx": "x3-c-hit-spark-heavy",
+       "tint": "#7A3FB0"
+      }
+     }
+    ],
+    "2": [
+     {
+      "t": "v",
+      "vfx": "x3-1.2-S2-spike-lattice",
+      "at": "front",
+      "dx": 230,
+      "scale": 1.3,
+      "r": 220,
+      "depth": 110,
+      "delay": 0.08,
+      "hit": {
+       "dmg": 267,
+       "kind": "down",
+       "n": 3,
+       "mid": "launch",
+       "every": 0.25,
+       "stop": 0.16,
+       "shake": 12
+      }
+     },
+     {
+      "t": "dark",
+      "v": 0.25
+     }
+    ]
+   }
+  },
+  "super": {
+   "name": "우습네. 정말.",
+   "sub": "「뒤를 보는 버릇을 들여.」",
+   "anim": "25",
+   "fps": 9,
+   "events": [
+    {
+     "f": 1,
+     "fx": [
+      {
+       "t": "dark",
+       "v": 2.6
+      },
+      {
+       "t": "v",
+       "vfx": "x3-1.2-D-shadow-pool",
+       "at": "self",
+       "under": true
+      },
+      {
+       "t": "hide",
+       "mode": "out",
+       "dur": 0.2
+      }
+     ]
+    },
+    {
+     "f": 4,
+     "hold": 0.4,
+     "fx": [
+      {
+       "t": "hide",
+       "mode": "in",
+       "dur": 0.15
+      },
+      {
+       "t": "screen",
+       "spots": 6,
+       "every": 0.14,
+       "each": [
+        {
+         "t": "v",
+         "vfx": "x3-1.2-D-shadow-pool",
+         "under": true
+        },
+        {
+         "t": "v",
+         "vfx": "x3-1.2-D-needle-burst",
+         "r": 80,
+         "delay": 0.06,
+         "hit": {
+          "dmg": 115,
+          "kind": "launch",
+          "stop": 0.08,
+          "shake": 8
+         }
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "f": 8,
+     "hold": 0.35,
+     "fx": [
+      {
+       "t": "v",
+       "vfx": "x3-1.2-F-spike-forest",
+       "at": "screen",
+       "w": 1.05,
+       "boom": 3,
+       "hit": {
+        "dmg": 265,
+        "kind": "down",
+        "n": 2,
+        "mid": "launch",
+        "every": 0.3,
+        "stop": 0.22,
+        "shake": 16
+       }
+      },
+      {
+       "t": "v",
+       "vfx": "x3-1.2-F-eyes-in-dark",
+       "at": "screen",
+       "dy": -170,
+       "scale": 2.2
+      },
+      {
+       "t": "shake",
+       "v": 16
+      }
+     ]
+    }
+   ]
+  }
+ },
+ "skills_2판": {
+  "skill": {
+   "name": "그림자 이동",
+   "anim": "22",
+   "fps": 10,
+   "events": [
+    {
+     "f": 3,
+     "fx": [
+      {
+       "t": "puddle",
+       "at": "self",
+       "r": 70,
+       "time": 0.7,
+       "color": "#7A3FB0"
+      },
+      {
+       "t": "hide",
+       "mode": "out",
+       "dur": 0.18
+      }
+     ]
+    },
+    {
+     "f": 5,
+     "fx": [
+      {
+       "t": "teleport",
+       "to": "behind",
+       "dist": 85,
+       "color": "#7A3FB0"
+      },
+      {
+       "t": "hide",
+       "mode": "in",
+       "dur": 0.14
+      },
+      {
+       "t": "dark",
+       "v": 0.18
+      },
+      {
+       "t": "spikes",
+       "at": "front",
+       "dx": 45,
+       "n": 4,
+       "len": 150,
+       "spread": 30,
+       "hit": {
+        "dmg": 138,
+        "kind": "launch",
+        "text": "백어택"
+       }
+      },
+      {
+       "t": "buff",
+       "time": 2,
+       "label": "백어택 2배"
+      }
+     ]
+    }
+   ]
+  },
+  "charge": {
+   "name": "격자 구속",
+   "hold": "23",
+   "release": "24",
+   "levels": [
+    0.5,
+    1.2
+   ],
+   "fire": 4,
+   "lv": {
+    "0": [
+     {
+      "t": "spikes",
+      "at": "front",
+      "dx": 120,
+      "n": 3,
+      "hit": {
+       "dmg": 55,
+       "kind": "light"
+      }
+     }
+    ],
+    "1": [
+     {
+      "t": "grid",
+      "at": "front",
+      "dx": 220,
+      "w": 320,
+      "n": 16,
+      "bind": 2,
+      "hit": {
+       "dmg": 92,
+       "kind": "light"
+      }
+     }
+    ],
+    "2": [
+     {
+      "t": "grid",
+      "at": "front",
+      "dx": 260,
+      "w": 520,
+      "depth": 100,
+      "n": 28,
+      "bind": 3,
+      "hit": {
+       "dmg": 59,
+       "kind": "heavy"
+      }
+     },
+     {
+      "t": "later",
+      "in": 3,
+      "fx": [
+       {
+        "t": "spikes",
+        "at": "target",
+        "n": 5,
+        "len": 160,
+        "spread": 30,
+        "hit": {
+         "dmg": 88,
+         "kind": "launch"
+        }
+       }
+      ]
+     }
+    ]
+   }
+  },
+  "super": {
+   "name": "우습네. 정말.",
+   "sub": "「뒤를 보는 버릇을 들여.」",
+   "anim": "25",
+   "fps": 9,
+   "events": [
+    {
+     "f": 1,
+     "fx": [
+      {
+       "t": "dark",
+       "v": 2.4
+      },
+      {
+       "t": "big",
+       "vfx": "sup-1.2"
+      }
+     ]
+    },
+    {
+     "f": 4,
+     "hold": 0.3,
+     "fx": [
+      {
+       "t": "screen",
+       "spots": 5,
+       "every": 0.14,
+       "each": [
+        {
+         "t": "puddle",
+         "r": 60,
+         "time": 0.6,
+         "color": "#7A3FB0"
+        },
+        {
+         "t": "spikes",
+         "n": 4,
+         "len": 150,
+         "spread": 26,
+         "hit": {
+          "dmg": 55,
+          "kind": "launch",
+          "text": "백어택"
+         }
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "f": 8,
+     "hold": 0.2,
+     "fx": [
+      {
+       "t": "slash",
+       "at": "center",
+       "style": "x",
+       "size": 240,
+       "color": "#7A3FB0",
+       "hit": {
+        "dmg": 125,
+        "kind": "down",
+        "stop": 0.22,
+        "shake": 16
+       }
+      }
+     ]
+    }
+   ]
+  }
+ },
+ "_note": "기술은 손으로 적음(기술안 요약). 그림·장 값은 자동. 다시 자동으로: build.py --reset 1.2_스팡달",
+ "bal": {
+  "role": "striker",
+  "speed": "fast",
+  "gun": "none",
+  "atk": {
+   "9": 14,
+   "10": 14,
+   "11": 17,
+   "12": 23,
+   "13": 18,
+   "14": 20
+  },
+  "cd": {
+   "skill": 5
+  },
+  "shotDmg": 10,
+  "superType": "aoe"
+ },
+ "fallRev": true
+}

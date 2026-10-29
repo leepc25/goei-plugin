@@ -1,0 +1,1417 @@
+{
+ "key": "1.1_쟈알디",
+ "name": "쟈알디",
+ "dir": "W",
+ "color": "#C8283C",
+ "armed": true,
+ "anims": {
+  "W": {
+   "folder": "W",
+   "mirror": true,
+   "name": "무기 꺼내기"
+  },
+  "W_1": {
+   "folder": "W_1",
+   "mirror": true,
+   "name": "무기 대기"
+  },
+  "1": {
+   "folder": "1",
+   "mirror": true,
+   "name": "평상 대기"
+  },
+  "2": {
+   "folder": "2",
+   "mirror": true,
+   "name": "개인 대기"
+  },
+  "3": {
+   "folder": "3",
+   "mirror": true,
+   "name": "전투 대기"
+  },
+  "3_0": {
+   "folder": "3_0",
+   "mirror": true,
+   "name": "전투 자세 잡기"
+  },
+  "4": {
+   "folder": "4",
+   "mirror": true,
+   "name": "걷기"
+  },
+  "5": {
+   "folder": "5",
+   "mirror": true,
+   "name": "뛰기"
+  },
+  "6": {
+   "folder": "6",
+   "mirror": true,
+   "name": "제자리 점프"
+  },
+  "7": {
+   "folder": "7",
+   "mirror": true,
+   "name": "방향 점프"
+  },
+  "8": {
+   "folder": "8",
+   "mirror": true,
+   "name": "달리다 점프"
+  },
+  "9": {
+   "folder": "9",
+   "mirror": true,
+   "name": "약1 앞주먹 긴 잽"
+  },
+  "10": {
+   "folder": "10",
+   "mirror": true,
+   "name": "약2 뒷손 어퍼컷"
+  },
+  "11": {
+   "folder": "11",
+   "mirror": true,
+   "name": "약3 내려치기"
+  },
+  "12": {
+   "folder": "12",
+   "mirror": true,
+   "name": "강 내려찍기 발차기"
+  },
+  "13": {
+   "folder": "13",
+   "mirror": true,
+   "name": "돌진 어깨 들이받기"
+  },
+  "14": {
+   "folder": "14",
+   "mirror": true,
+   "name": "점프 공격 내려찍기 주먹"
+  },
+  "15": {
+   "folder": "15",
+   "mirror": true,
+   "name": "원거리 공격 권총"
+  },
+  "16": {
+   "folder": "16",
+   "mirror": true,
+   "name": "뒤 회피"
+  },
+  "16_1": {
+   "folder": "16_1",
+   "mirror": true,
+   "name": "앞 회피"
+  },
+  "17": {
+   "folder": "17",
+   "mirror": true,
+   "name": "막기"
+  },
+  "18": {
+   "folder": "18",
+   "mirror": true,
+   "name": "맞기"
+  },
+  "19": {
+   "folder": "19",
+   "mirror": true,
+   "name": "날아가 쓰러지기"
+  },
+  "20": {
+   "folder": "20",
+   "mirror": true,
+   "name": "일어나기"
+  },
+  "21": {
+   "folder": "21",
+   "mirror": true,
+   "name": "스턴"
+  },
+  "22": {
+   "folder": "22",
+   "mirror": true,
+   "name": "고유기술 「근접 폭파」"
+  },
+  "23": {
+   "folder": "23",
+   "mirror": true,
+   "name": "충전 「구역 정리」 모으기"
+  },
+  "24": {
+   "folder": "24",
+   "mirror": true,
+   "name": "충전 방출"
+  },
+  "25": {
+   "folder": "25",
+   "mirror": true,
+   "name": "필살기 「보면 알아」"
+  },
+  "26": {
+   "folder": "26",
+   "mirror": true,
+   "name": "섭취"
+  },
+  "27": {
+   "folder": "27",
+   "mirror": true,
+   "name": "줍기"
+  },
+  "28": {
+   "folder": "28",
+   "mirror": true,
+   "name": "응대"
+  },
+  "29": {
+   "folder": "29",
+   "mirror": true,
+   "name": "말하며 손짓"
+  },
+  "30": {
+   "folder": "30",
+   "mirror": true,
+   "name": "끄덕이기"
+  },
+  "31": {
+   "folder": "31",
+   "mirror": true,
+   "name": "고개 젓기"
+  },
+  "32": {
+   "folder": "32",
+   "mirror": true,
+   "name": "화내기"
+  },
+  "33": {
+   "folder": "33",
+   "mirror": true,
+   "name": "발견 반응"
+  },
+  "34": {
+   "folder": "34",
+   "mirror": true,
+   "name": "놀라기"
+  },
+  "35": {
+   "folder": "35",
+   "mirror": true,
+   "name": "기뻐하기"
+  },
+  "36": {
+   "folder": "36",
+   "mirror": true,
+   "name": "도망"
+  },
+  "37": {
+   "folder": "37",
+   "mirror": true,
+   "name": "뒷걸음질 (움츠리기)"
+  },
+  "37_1": {
+   "folder": "37_1",
+   "mirror": true,
+   "name": "뒷걸음질 반복"
+  },
+  "38": {
+   "folder": "38",
+   "mirror": false,
+   "name": "엎드려 기기"
+  },
+  "38_1": {
+   "folder": "38_1",
+   "mirror": false,
+   "name": "엎드려 기기 반복"
+  },
+  "39": {
+   "folder": "39",
+   "mirror": true,
+   "name": "주저앉기"
+  },
+  "41": {
+   "folder": "41",
+   "mirror": true,
+   "name": "웅크려 떨기"
+  },
+  "42": {
+   "folder": "42",
+   "mirror": true,
+   "name": "네발로 기기"
+  },
+  "42_1": {
+   "folder": "42_1",
+   "mirror": true,
+   "name": "네발로 기기 반복"
+  }
+ },
+ "picks": {
+  "combat": 4,
+  "weapon": 4,
+  "apex": 4,
+  "run": 2,
+  "crawl4": 8
+ },
+ "loops": {
+  "19": [
+   10,
+   11,
+   12
+  ],
+  "21": [
+   3,
+   4,
+   5,
+   6,
+   7,
+   8
+  ],
+  "23": [
+   3,
+   4,
+   5,
+   6,
+   7,
+   8
+  ],
+  "39": [
+   9,
+   10,
+   11,
+   12
+  ],
+  "41": [
+   2,
+   3,
+   4,
+   5,
+   6,
+   7,
+   8
+  ],
+  "42": [
+   5,
+   6,
+   7,
+   8,
+   9,
+   10,
+   11,
+   12
+  ]
+ },
+ "hit": {
+  "9": 5,
+  "10": 8,
+  "11": 4,
+  "12": 5,
+  "13": 3,
+  "14": 2,
+  "16_1": 2,
+  "22": 3,
+  "24": 1,
+  "25": 8
+ },
+ "gun": [
+  "W",
+  "W_1",
+  "15"
+ ],
+ "kick": [
+  "12"
+ ],
+ "ranged": {
+  "proj": {
+   "t": "proj",
+   "kind": "bullet",
+   "hit": {
+    "dmg": 8,
+    "kind": "light"
+   }
+  },
+  "heat": false
+ },
+ "skills": {
+  "skill": {
+   "name": "근접 폭파",
+   "anim": "22",
+   "fps": 11,
+   "armor": [
+    3,
+    5
+   ],
+   "events": [
+    {
+     "f": 4,
+     "hold": 0.12,
+     "fx": [
+      {
+       "t": "v",
+       "vfx": "x3-1.1-D-palm-blast",
+       "at": "hand",
+       "dx": 70,
+       "r": 120,
+       "depth": 80,
+       "delay": 0.08,
+       "boom": 2,
+       "hit": {
+        "dmg": 270,
+        "kind": "blow",
+        "stop": 0.16,
+        "shake": 12,
+        "vfx": "x3-c-hit-spark-heavy",
+        "tint": "#FFB060"
+       }
+      },
+      {
+       "t": "later",
+       "in": 0.15,
+       "fx": [
+        {
+         "t": "v",
+         "vfx": "x3-1.1-D-scorch-mark",
+         "at": "front",
+         "dx": 170,
+         "scale": 1.4,
+         "under": true,
+         "hold": 1.5,
+         "fade": 0.6
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  "charge": {
+   "name": "구역 정리",
+   "hold": "23",
+   "release": "24",
+   "levels": [
+    0.5,
+    1.2
+   ],
+   "fire": 1,
+   "lv": {
+    "0": [
+     {
+      "t": "v",
+      "vfx": "x3-1.1-S-chain-blast",
+      "at": "front",
+      "dx": 135,
+      "dy": 0,
+      "scale": 1.71,
+      "r": 75.6,
+      "depth": 75,
+      "boom": 1,
+      "hit": {
+       "dmg": 16,
+       "kind": "light"
+      }
+     },
+     {
+      "t": "v",
+      "vfx": "x3-1.1-D-scorch-mark",
+      "at": "front",
+      "dx": 135,
+      "dy": 4,
+      "scale": 1.08,
+      "under": true,
+      "hold": 1.2,
+      "fade": 0.6
+     },
+     {
+      "t": "later",
+      "in": 0.14,
+      "fx": [
+       {
+        "t": "v",
+        "vfx": "x3-1.1-S-chain-blast",
+        "at": "front",
+        "dx": 276,
+        "dy": 0,
+        "scale": 1.9,
+        "r": 84.0,
+        "depth": 75,
+        "boom": 1,
+        "hit": {
+         "dmg": 16,
+         "kind": "light"
+        }
+       },
+       {
+        "t": "v",
+        "vfx": "x3-1.1-D-scorch-mark",
+        "at": "front",
+        "dx": 276,
+        "dy": 4,
+        "scale": 1.2,
+        "under": true,
+        "hold": 1.2,
+        "fade": 0.6
+       }
+      ]
+     },
+     {
+      "t": "later",
+      "in": 0.28,
+      "fx": [
+       {
+        "t": "v",
+        "vfx": "x3-1.1-S-chain-blast",
+        "at": "front",
+        "dx": 452,
+        "dy": 0,
+        "scale": 2.38,
+        "r": 105.0,
+        "depth": 75,
+        "boom": 1,
+        "hit": {
+         "dmg": 43,
+         "kind": "down",
+         "stop": 0.14,
+         "shake": 10
+        }
+       },
+       {
+        "t": "v",
+        "vfx": "x3-1.1-D-scorch-mark",
+        "at": "front",
+        "dx": 452,
+        "dy": 4,
+        "scale": 1.5,
+        "under": true,
+        "hold": 1.2,
+        "fade": 0.6
+       }
+      ]
+     }
+    ],
+    "1": [
+     {
+      "t": "v",
+      "vfx": "x3-1.1-S-chain-blast",
+      "at": "front",
+      "dx": 130,
+      "dy": 0,
+      "scale": 1.71,
+      "r": 75.6,
+      "depth": 75,
+      "boom": 1,
+      "hit": {
+       "dmg": 18,
+       "kind": "light"
+      }
+     },
+     {
+      "t": "v",
+      "vfx": "x3-1.1-D-scorch-mark",
+      "at": "front",
+      "dx": 130,
+      "dy": 4,
+      "scale": 1.08,
+      "under": true,
+      "hold": 1.2,
+      "fade": 0.6
+     },
+     {
+      "t": "later",
+      "in": 0.12,
+      "fx": [
+       {
+        "t": "v",
+        "vfx": "x3-1.1-S-chain-blast",
+        "at": "front",
+        "dx": 260,
+        "dy": 0,
+        "scale": 1.9,
+        "r": 84.0,
+        "depth": 75,
+        "boom": 1,
+        "hit": {
+         "dmg": 18,
+         "kind": "light"
+        }
+       },
+       {
+        "t": "v",
+        "vfx": "x3-1.1-D-scorch-mark",
+        "at": "front",
+        "dx": 260,
+        "dy": 4,
+        "scale": 1.2,
+        "under": true,
+        "hold": 1.2,
+        "fade": 0.6
+       }
+      ]
+     },
+     {
+      "t": "later",
+      "in": 0.24,
+      "fx": [
+       {
+        "t": "v",
+        "vfx": "x3-1.1-S-chain-blast",
+        "at": "front",
+        "dx": 400,
+        "dy": 0,
+        "scale": 2.09,
+        "r": 92.4,
+        "depth": 75,
+        "boom": 1,
+        "hit": {
+         "dmg": 18,
+         "kind": "light"
+        }
+       },
+       {
+        "t": "v",
+        "vfx": "x3-1.1-D-scorch-mark",
+        "at": "front",
+        "dx": 400,
+        "dy": 4,
+        "scale": 1.32,
+        "under": true,
+        "hold": 1.2,
+        "fade": 0.6
+       }
+      ]
+     },
+     {
+      "t": "later",
+      "in": 0.36,
+      "fx": [
+       {
+        "t": "v",
+        "vfx": "x3-1.1-S-chain-blast",
+        "at": "front",
+        "dx": 560,
+        "dy": 0,
+        "scale": 2.56,
+        "r": 113.4,
+        "depth": 75,
+        "boom": 1,
+        "hit": {
+         "dmg": 113,
+         "kind": "launch",
+         "stop": 0.14,
+         "shake": 10,
+         "vfx": "x3-c-hit-spark-heavy",
+         "tint": "#FFB060"
+        }
+       },
+       {
+        "t": "v",
+        "vfx": "x3-1.1-D-scorch-mark",
+        "at": "front",
+        "dx": 560,
+        "dy": 4,
+        "scale": 1.62,
+        "under": true,
+        "hold": 1.2,
+        "fade": 0.6
+       }
+      ]
+     },
+     {
+      "t": "v",
+      "vfx": "x3-1.1-S-chain-blast",
+      "at": "front",
+      "dx": 130,
+      "dy": -22,
+      "scale": 1.71,
+      "r": 75.6,
+      "depth": 50,
+      "boom": 1,
+      "hit": {
+       "dmg": 18,
+       "kind": "light"
+      }
+     },
+     {
+      "t": "v",
+      "vfx": "x3-1.1-D-scorch-mark",
+      "at": "front",
+      "dx": 130,
+      "dy": -18,
+      "scale": 1.08,
+      "under": true,
+      "hold": 1.2,
+      "fade": 0.6
+     },
+     {
+      "t": "later",
+      "in": 0.12,
+      "fx": [
+       {
+        "t": "v",
+        "vfx": "x3-1.1-S-chain-blast",
+        "at": "front",
+        "dx": 260,
+        "dy": -44,
+        "scale": 1.9,
+        "r": 84.0,
+        "depth": 50,
+        "boom": 1,
+        "hit": {
+         "dmg": 18,
+         "kind": "light"
+        }
+       },
+       {
+        "t": "v",
+        "vfx": "x3-1.1-D-scorch-mark",
+        "at": "front",
+        "dx": 260,
+        "dy": -40,
+        "scale": 1.2,
+        "under": true,
+        "hold": 1.2,
+        "fade": 0.6
+       }
+      ]
+     },
+     {
+      "t": "later",
+      "in": 0.24,
+      "fx": [
+       {
+        "t": "v",
+        "vfx": "x3-1.1-S-chain-blast",
+        "at": "front",
+        "dx": 400,
+        "dy": -66,
+        "scale": 2.09,
+        "r": 92.4,
+        "depth": 50,
+        "boom": 1,
+        "hit": {
+         "dmg": 18,
+         "kind": "light"
+        }
+       },
+       {
+        "t": "v",
+        "vfx": "x3-1.1-D-scorch-mark",
+        "at": "front",
+        "dx": 400,
+        "dy": -62,
+        "scale": 1.32,
+        "under": true,
+        "hold": 1.2,
+        "fade": 0.6
+       }
+      ]
+     },
+     {
+      "t": "later",
+      "in": 0.36,
+      "fx": [
+       {
+        "t": "v",
+        "vfx": "x3-1.1-S-chain-blast",
+        "at": "front",
+        "dx": 560,
+        "dy": -88,
+        "scale": 2.56,
+        "r": 113.4,
+        "depth": 50,
+        "boom": 1,
+        "hit": {
+         "dmg": 113,
+         "kind": "launch",
+         "stop": 0.14,
+         "shake": 10,
+         "vfx": "x3-c-hit-spark-heavy",
+         "tint": "#FFB060"
+        }
+       },
+       {
+        "t": "v",
+        "vfx": "x3-1.1-D-scorch-mark",
+        "at": "front",
+        "dx": 560,
+        "dy": -84,
+        "scale": 1.62,
+        "under": true,
+        "hold": 1.2,
+        "fade": 0.6
+       }
+      ]
+     },
+     {
+      "t": "v",
+      "vfx": "x3-1.1-S-chain-blast",
+      "at": "front",
+      "dx": 130,
+      "dy": 22,
+      "scale": 1.71,
+      "r": 75.6,
+      "depth": 50,
+      "boom": 1,
+      "hit": {
+       "dmg": 18,
+       "kind": "light"
+      }
+     },
+     {
+      "t": "v",
+      "vfx": "x3-1.1-D-scorch-mark",
+      "at": "front",
+      "dx": 130,
+      "dy": 26,
+      "scale": 1.08,
+      "under": true,
+      "hold": 1.2,
+      "fade": 0.6
+     },
+     {
+      "t": "later",
+      "in": 0.12,
+      "fx": [
+       {
+        "t": "v",
+        "vfx": "x3-1.1-S-chain-blast",
+        "at": "front",
+        "dx": 260,
+        "dy": 44,
+        "scale": 1.9,
+        "r": 84.0,
+        "depth": 50,
+        "boom": 1,
+        "hit": {
+         "dmg": 18,
+         "kind": "light"
+        }
+       },
+       {
+        "t": "v",
+        "vfx": "x3-1.1-D-scorch-mark",
+        "at": "front",
+        "dx": 260,
+        "dy": 48,
+        "scale": 1.2,
+        "under": true,
+        "hold": 1.2,
+        "fade": 0.6
+       }
+      ]
+     },
+     {
+      "t": "later",
+      "in": 0.24,
+      "fx": [
+       {
+        "t": "v",
+        "vfx": "x3-1.1-S-chain-blast",
+        "at": "front",
+        "dx": 400,
+        "dy": 66,
+        "scale": 2.09,
+        "r": 92.4,
+        "depth": 50,
+        "boom": 1,
+        "hit": {
+         "dmg": 18,
+         "kind": "light"
+        }
+       },
+       {
+        "t": "v",
+        "vfx": "x3-1.1-D-scorch-mark",
+        "at": "front",
+        "dx": 400,
+        "dy": 70,
+        "scale": 1.32,
+        "under": true,
+        "hold": 1.2,
+        "fade": 0.6
+       }
+      ]
+     },
+     {
+      "t": "later",
+      "in": 0.36,
+      "fx": [
+       {
+        "t": "v",
+        "vfx": "x3-1.1-S-chain-blast",
+        "at": "front",
+        "dx": 560,
+        "dy": 88,
+        "scale": 2.56,
+        "r": 113.4,
+        "depth": 50,
+        "boom": 1,
+        "hit": {
+         "dmg": 113,
+         "kind": "launch",
+         "stop": 0.14,
+         "shake": 10,
+         "vfx": "x3-c-hit-spark-heavy",
+         "tint": "#FFB060"
+        }
+       },
+       {
+        "t": "v",
+        "vfx": "x3-1.1-D-scorch-mark",
+        "at": "front",
+        "dx": 560,
+        "dy": 92,
+        "scale": 1.62,
+        "under": true,
+        "hold": 1.2,
+        "fade": 0.6
+       }
+      ]
+     }
+    ],
+    "2": [
+     {
+      "t": "v",
+      "vfx": "x3-1.1-S2-zone-blast",
+      "at": "self",
+      "scale": 1.1,
+      "r": 270,
+      "depth": 120,
+      "delay": 0.12,
+      "boom": 3,
+      "hit": {
+       "dmg": 240,
+       "kind": "launch",
+       "n": 2,
+       "mid": "heavy",
+       "stop": 0.18,
+       "shake": 14,
+       "vfx": "x3-c-hit-spark-heavy",
+       "tint": "#FFB060"
+      }
+     },
+     {
+      "t": "v",
+      "vfx": "x3-c-ground-shockwave",
+      "at": "self",
+      "scale": 1.2,
+      "tint": "#FF9A5A",
+      "under": true
+     },
+     {
+      "t": "shake",
+      "v": 10
+     }
+    ]
+   }
+  },
+  "super": {
+   "name": "보면 알아",
+   "sub": "「설명하기 어려워. 보면 알아.」",
+   "anim": "25",
+   "fps": 9,
+   "events": [
+    {
+     "f": 1,
+     "fx": [
+      {
+       "t": "flash",
+       "v": 0.18
+      }
+     ]
+    },
+    {
+     "f": 8,
+     "hold": 0.25,
+     "fx": [
+      {
+       "t": "screen",
+       "spots": 8,
+       "every": 0.05,
+       "each": [
+        {
+         "t": "v",
+         "vfx": "x3-1.1-S-chain-blast",
+         "scale": 1.6,
+         "r": 90,
+         "boom": 1,
+         "hit": {
+          "dmg": 71,
+          "kind": "down",
+          "stop": 0.06,
+          "shake": 8
+         }
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "f": 9,
+     "hold": 0.2,
+     "fx": [
+      {
+       "t": "screen",
+       "spots": 8,
+       "every": 0.04,
+       "each": [
+        {
+         "t": "v",
+         "vfx": "x3-c-explosion-large",
+         "scale": 0.4,
+         "r": 110,
+         "boom": 2,
+         "hit": {
+          "dmg": 94,
+          "kind": "down",
+          "stop": 0.08,
+          "shake": 10
+         }
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "f": 10,
+     "hold": 0.35,
+     "fx": [
+      {
+       "t": "flash",
+       "v": 0.22
+      },
+      {
+       "t": "shake",
+       "v": 20
+      },
+      {
+       "t": "screen",
+       "spots": 8,
+       "every": 0.0,
+       "each": [
+        {
+         "t": "v",
+         "vfx": "x3-1.1-F-fire-pillar",
+         "scale": 0.75,
+         "r": 110,
+         "boom": 3,
+         "hit": {
+          "dmg": 216,
+          "kind": "launch",
+          "n": 3,
+          "mid": "heavy",
+          "stop": 0.2,
+          "shake": 18,
+          "vfx": "x3-c-hit-spark-heavy",
+          "tint": "#FFB060"
+         }
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "f": 12,
+     "hold": 0.4,
+     "fx": [
+      {
+       "t": "v",
+       "vfx": "x3-c-dust-cloud-large",
+       "at": "self",
+       "scale": 0.9,
+       "tint": "#5a5050",
+       "fade": 0.8
+      },
+      {
+       "t": "v",
+       "vfx": "x3-c-smoke",
+       "at": "body",
+       "dx": -30,
+       "scale": 1.6,
+       "tint": "#4a4444"
+      }
+     ]
+    }
+   ]
+  }
+ },
+ "skills_2판": {
+  "skill": {
+   "name": "근접 폭파",
+   "anim": "22",
+   "fps": 11,
+   "armor": [
+    3,
+    5
+   ],
+   "events": [
+    {
+     "f": 4,
+     "hold": 0.12,
+     "fx": [
+      {
+       "t": "self",
+       "vfx": "jyaldi-palm-blast2",
+       "strength": 2,
+       "hits": [
+        {
+         "at": 0.2,
+         "dx": 170,
+         "r": 120,
+         "hit": {
+          "dmg": 168,
+          "kind": "blow",
+          "stop": 0.16,
+          "shake": 12
+         }
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  "charge": {
+   "name": "구역 정리",
+   "hold": "23",
+   "release": "24",
+   "levels": [
+    0.5,
+    1.2
+   ],
+   "fire": 1,
+   "lv": {
+    "0": [
+     {
+      "t": "self",
+      "vfx": "jyaldi-chain-blast2",
+      "scale": 0.85,
+      "hits": [
+       {
+        "at": 0,
+        "dx": 135,
+        "r": 60,
+        "hit": {
+         "dmg": 11,
+         "kind": "light"
+        },
+        "dust": 1
+       },
+       {
+        "at": 0.14,
+        "dx": 276,
+        "r": 70,
+        "hit": {
+         "dmg": 11,
+         "kind": "light"
+        },
+        "dust": 1
+       },
+       {
+        "at": 0.28,
+        "dx": 452,
+        "r": 80,
+        "hit": {
+         "dmg": 28,
+         "kind": "heavy"
+        },
+        "dust": 1
+       }
+      ],
+      "craters": [
+       {
+        "at": 0.0,
+        "dx": 135,
+        "dy": 4,
+        "k": 0.6
+       },
+       {
+        "at": 0.14,
+        "dx": 276,
+        "dy": 6,
+        "k": 0.8
+       },
+       {
+        "at": 0.28,
+        "dx": 452,
+        "dy": 8,
+        "k": 1.0
+       }
+      ]
+     }
+    ],
+    "1": [
+     {
+      "t": "self",
+      "vfx": "jyaldi-chain-blast2",
+      "hits": [
+       {
+        "at": 0,
+        "dx": 140,
+        "r": 60,
+        "hit": {
+         "dmg": 14,
+         "kind": "light"
+        },
+        "dust": 1
+       },
+       {
+        "at": 0.14,
+        "dx": 280,
+        "r": 70,
+        "hit": {
+         "dmg": 14,
+         "kind": "light"
+        },
+        "dust": 1
+       },
+       {
+        "at": 0.28,
+        "dx": 455,
+        "r": 80,
+        "hit": {
+         "dmg": 56,
+         "kind": "down"
+        }
+       }
+      ],
+      "craters": [
+       {
+        "at": 0.0,
+        "dx": 135,
+        "dy": 4,
+        "k": 0.6
+       },
+       {
+        "at": 0.14,
+        "dx": 276,
+        "dy": 6,
+        "k": 0.8
+       },
+       {
+        "at": 0.28,
+        "dx": 452,
+        "dy": 8,
+        "k": 1.0
+       }
+      ]
+     }
+    ],
+    "2": [
+     {
+      "t": "self",
+      "vfx": "jyaldi-zone-blast2",
+      "scale": 1.1,
+      "strength": 3,
+      "hits": [
+       {
+        "at": 0.07,
+        "dx": 190,
+        "r": 110,
+        "depth": 110
+       },
+       {
+        "at": 0.07,
+        "dx": -190,
+        "r": 110,
+        "depth": 110
+       },
+       {
+        "at": 0.07,
+        "dx": 0,
+        "r": 90,
+        "depth": 110
+       }
+      ],
+      "hit": {
+       "dmg": 67,
+       "kind": "launch",
+       "n": 2,
+       "mid": "heavy"
+      },
+      "craters": [
+       {
+        "at": 0.1,
+        "dx": -216,
+        "dy": 28,
+        "k": 0.5
+       },
+       {
+        "at": 0.1,
+        "dx": -158,
+        "dy": 101,
+        "k": 0.5
+       },
+       {
+        "at": 0.1,
+        "dx": -153,
+        "dy": -49,
+        "k": 0.5
+       },
+       {
+        "at": 0.1,
+        "dx": 0,
+        "dy": 137,
+        "k": 0.5
+       },
+       {
+        "at": 0.1,
+        "dx": 155,
+        "dy": 104,
+        "k": 0.5
+       },
+       {
+        "at": 0.1,
+        "dx": 157,
+        "dy": -45,
+        "k": 0.5
+       },
+       {
+        "at": 0.1,
+        "dx": 217,
+        "dy": 34,
+        "k": 0.5
+       },
+       {
+        "at": 0.1,
+        "dx": 10,
+        "dy": -85,
+        "k": 0.5
+       }
+      ]
+     },
+     {
+      "t": "shake",
+      "v": 8
+     }
+    ]
+   }
+  },
+  "super": {
+   "name": "보면 알아",
+   "sub": "「설명하기 어려워. 보면 알아.」",
+   "anim": "25",
+   "fps": 9,
+   "events": [
+    {
+     "f": 8,
+     "hold": 0.25,
+     "fx": [
+      {
+       "t": "flash",
+       "v": 0.15
+      },
+      {
+       "t": "screen",
+       "spots": 10,
+       "every": 0.05,
+       "each": [
+        {
+         "t": "boom",
+         "vfx": "jyaldi-super-blast2",
+         "scaleR": [
+          1.0,
+          1.5
+         ],
+         "r": 110,
+         "shake": 10,
+         "hit": {
+          "dmg": 16,
+          "kind": "heavy",
+          "stop": 0.06,
+          "shake": 10
+         }
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "f": 9,
+     "hold": 0.2,
+     "fx": [
+      {
+       "t": "screen",
+       "spots": 12,
+       "every": 0.04,
+       "each": [
+        {
+         "t": "boom",
+         "vfx": "jyaldi-super-blast2",
+         "scaleR": [
+          1.2,
+          1.9
+         ],
+         "r": 110,
+         "shake": 10,
+         "hit": {
+          "dmg": 16,
+          "kind": "heavy",
+          "stop": 0.06,
+          "shake": 10
+         }
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "f": 10,
+     "fx": [
+      {
+       "t": "flash",
+       "v": 0.2
+      },
+      {
+       "t": "screen",
+       "spots": 0,
+       "each": [
+        {
+         "t": "boom",
+         "vfx": "jyaldi-super-blast2",
+         "scaleR": [
+          2.3,
+          2.6
+         ],
+         "r": 110,
+         "shake": 10,
+         "hit": {
+          "dmg": 49,
+          "kind": "launch",
+          "n": 3,
+          "mid": "heavy",
+          "stop": 0.2,
+          "shake": 18
+         }
+        }
+       ]
+      },
+      {
+       "t": "buff",
+       "time": 3,
+       "label": "공격력 +30%"
+      }
+     ]
+    }
+   ]
+  }
+ },
+ "_note": "기술은 손으로 적음(기술안 요약). 그림·장 값은 자동. 다시 자동으로: build.py --reset 1.1_쟈알디",
+ "bal": {
+  "role": "bruiser",
+  "speed": "normal",
+  "gun": "single",
+  "atk": {
+   "9": 15,
+   "10": 16,
+   "11": 20,
+   "12": 27,
+   "13": 21,
+   "14": 23
+  },
+  "cd": {
+   "skill": 5
+  },
+  "shotDmg": 9,
+  "superType": "aoe"
+ }
+}

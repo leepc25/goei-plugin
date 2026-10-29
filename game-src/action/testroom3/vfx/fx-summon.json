@@ -1,0 +1,339 @@
+{
+ "frames": [
+  {
+   "filename": "fx-summon 0.png",
+   "frame": {
+    "x": 0,
+    "y": 0,
+    "w": 128,
+    "h": 144
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 128,
+    "h": 144
+   },
+   "sourceSize": {
+    "w": 128,
+    "h": 144
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.8194444444444444
+   },
+   "duration": 83
+  },
+  {
+   "filename": "fx-summon 1.png",
+   "frame": {
+    "x": 128,
+    "y": 0,
+    "w": 128,
+    "h": 144
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 128,
+    "h": 144
+   },
+   "sourceSize": {
+    "w": 128,
+    "h": 144
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.8194444444444444
+   },
+   "duration": 83
+  },
+  {
+   "filename": "fx-summon 2.png",
+   "frame": {
+    "x": 256,
+    "y": 0,
+    "w": 128,
+    "h": 144
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 128,
+    "h": 144
+   },
+   "sourceSize": {
+    "w": 128,
+    "h": 144
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.8194444444444444
+   },
+   "duration": 83
+  },
+  {
+   "filename": "fx-summon 3.png",
+   "frame": {
+    "x": 384,
+    "y": 0,
+    "w": 128,
+    "h": 144
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 128,
+    "h": 144
+   },
+   "sourceSize": {
+    "w": 128,
+    "h": 144
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.8194444444444444
+   },
+   "duration": 83
+  },
+  {
+   "filename": "fx-summon 4.png",
+   "frame": {
+    "x": 0,
+    "y": 144,
+    "w": 128,
+    "h": 144
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 128,
+    "h": 144
+   },
+   "sourceSize": {
+    "w": 128,
+    "h": 144
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.8194444444444444
+   },
+   "duration": 83
+  },
+  {
+   "filename": "fx-summon 5.png",
+   "frame": {
+    "x": 128,
+    "y": 144,
+    "w": 128,
+    "h": 144
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 128,
+    "h": 144
+   },
+   "sourceSize": {
+    "w": 128,
+    "h": 144
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.8194444444444444
+   },
+   "duration": 83
+  },
+  {
+   "filename": "fx-summon 6.png",
+   "frame": {
+    "x": 256,
+    "y": 144,
+    "w": 128,
+    "h": 144
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 128,
+    "h": 144
+   },
+   "sourceSize": {
+    "w": 128,
+    "h": 144
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.8194444444444444
+   },
+   "duration": 83
+  },
+  {
+   "filename": "fx-summon 7.png",
+   "frame": {
+    "x": 384,
+    "y": 144,
+    "w": 128,
+    "h": 144
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 128,
+    "h": 144
+   },
+   "sourceSize": {
+    "w": 128,
+    "h": 144
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.8194444444444444
+   },
+   "duration": 83
+  },
+  {
+   "filename": "fx-summon 8.png",
+   "frame": {
+    "x": 0,
+    "y": 288,
+    "w": 128,
+    "h": 144
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 128,
+    "h": 144
+   },
+   "sourceSize": {
+    "w": 128,
+    "h": 144
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.8194444444444444
+   },
+   "duration": 83
+  },
+  {
+   "filename": "fx-summon 9.png",
+   "frame": {
+    "x": 128,
+    "y": 288,
+    "w": 128,
+    "h": 144
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 128,
+    "h": 144
+   },
+   "sourceSize": {
+    "w": 128,
+    "h": 144
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.8194444444444444
+   },
+   "duration": 83
+  },
+  {
+   "filename": "fx-summon 10.png",
+   "frame": {
+    "x": 256,
+    "y": 288,
+    "w": 128,
+    "h": 144
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 128,
+    "h": 144
+   },
+   "sourceSize": {
+    "w": 128,
+    "h": 144
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.8194444444444444
+   },
+   "duration": 83
+  },
+  {
+   "filename": "fx-summon 11.png",
+   "frame": {
+    "x": 384,
+    "y": 288,
+    "w": 128,
+    "h": 144
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 128,
+    "h": 144
+   },
+   "sourceSize": {
+    "w": 128,
+    "h": 144
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.8194444444444444
+   },
+   "duration": 83
+  }
+ ],
+ "meta": {
+  "app": "PixelLab VFX Creator",
+  "image": "fx-summon.png",
+  "format": "RGBA8888",
+  "size": {
+   "w": 512,
+   "h": 432
+  },
+  "scale": "1",
+  "anchor": {
+   "kind": "origin",
+   "x": 64,
+   "y": 118
+  },
+  "frameTags": [
+   {
+    "name": "fx-summon",
+    "from": 0,
+    "to": 11,
+    "direction": "forward"
+   }
+  ]
+ }
+}

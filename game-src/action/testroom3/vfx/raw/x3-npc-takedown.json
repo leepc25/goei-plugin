@@ -1,0 +1,235 @@
+{
+ "frames": [
+  {
+   "filename": "x3-npc-takedown 0.png",
+   "frame": {
+    "x": 0,
+    "y": 0,
+    "w": 488,
+    "h": 85
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 488,
+    "h": 85
+   },
+   "sourceSize": {
+    "w": 488,
+    "h": 85
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.5176470588235295
+   },
+   "duration": 63
+  },
+  {
+   "filename": "x3-npc-takedown 1.png",
+   "frame": {
+    "x": 488,
+    "y": 0,
+    "w": 488,
+    "h": 85
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 488,
+    "h": 85
+   },
+   "sourceSize": {
+    "w": 488,
+    "h": 85
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.5176470588235295
+   },
+   "duration": 63
+  },
+  {
+   "filename": "x3-npc-takedown 2.png",
+   "frame": {
+    "x": 976,
+    "y": 0,
+    "w": 488,
+    "h": 85
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 488,
+    "h": 85
+   },
+   "sourceSize": {
+    "w": 488,
+    "h": 85
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.5176470588235295
+   },
+   "duration": 63
+  },
+  {
+   "filename": "x3-npc-takedown 3.png",
+   "frame": {
+    "x": 0,
+    "y": 85,
+    "w": 488,
+    "h": 85
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 488,
+    "h": 85
+   },
+   "sourceSize": {
+    "w": 488,
+    "h": 85
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.5176470588235295
+   },
+   "duration": 63
+  },
+  {
+   "filename": "x3-npc-takedown 4.png",
+   "frame": {
+    "x": 488,
+    "y": 85,
+    "w": 488,
+    "h": 85
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 488,
+    "h": 85
+   },
+   "sourceSize": {
+    "w": 488,
+    "h": 85
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.5176470588235295
+   },
+   "duration": 63
+  },
+  {
+   "filename": "x3-npc-takedown 5.png",
+   "frame": {
+    "x": 976,
+    "y": 85,
+    "w": 488,
+    "h": 85
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 488,
+    "h": 85
+   },
+   "sourceSize": {
+    "w": 488,
+    "h": 85
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.5176470588235295
+   },
+   "duration": 63
+  },
+  {
+   "filename": "x3-npc-takedown 6.png",
+   "frame": {
+    "x": 0,
+    "y": 170,
+    "w": 488,
+    "h": 85
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 488,
+    "h": 85
+   },
+   "sourceSize": {
+    "w": 488,
+    "h": 85
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.5176470588235295
+   },
+   "duration": 63
+  },
+  {
+   "filename": "x3-npc-takedown 7.png",
+   "frame": {
+    "x": 488,
+    "y": 170,
+    "w": 488,
+    "h": 85
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 488,
+    "h": 85
+   },
+   "sourceSize": {
+    "w": 488,
+    "h": 85
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.5176470588235295
+   },
+   "duration": 63
+  }
+ ],
+ "meta": {
+  "app": "PixelLab VFX Creator",
+  "image": "x3-npc-takedown.png",
+  "format": "RGBA8888",
+  "size": {
+   "w": 1464,
+   "h": 255
+  },
+  "scale": "1",
+  "anchor": {
+   "kind": "origin",
+   "x": 244,
+   "y": 44
+  },
+  "frameTags": [
+   {
+    "name": "x3-npc-takedown",
+    "from": 0,
+    "to": 7,
+    "direction": "forward"
+   }
+  ]
+ }
+}

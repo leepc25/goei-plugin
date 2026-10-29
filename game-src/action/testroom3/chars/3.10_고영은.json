@@ -1,0 +1,759 @@
+{
+ "key": "3.10_고영은",
+ "name": "고영은",
+ "dir": "E",
+ "color": "#F2F0D8",
+ "armed": false,
+ "anims": {
+  "1": {
+   "folder": "1",
+   "mirror": false,
+   "name": "평상 대기"
+  },
+  "2": {
+   "folder": "2",
+   "mirror": false,
+   "name": "개인 대기 (단발 넘기고 이마 점검)"
+  },
+  "3_0": {
+   "folder": "3_0",
+   "mirror": false,
+   "name": "전투 자세 잡기 (이마 겨눔)"
+  },
+  "3": {
+   "folder": "3",
+   "mirror": false,
+   "name": "전투 대기"
+  },
+  "W_1": {
+   "folder": "W_1",
+   "mirror": false,
+   "name": "원거리 던지기 대기"
+  },
+  "4": {
+   "folder": "4",
+   "mirror": false,
+   "name": "걷기 (이마 비추며 살피기)"
+  },
+  "5": {
+   "folder": "5",
+   "mirror": false,
+   "name": "뛰기 (팔꿈치 벌어진 비운동가)"
+  },
+  "6": {
+   "folder": "6",
+   "mirror": false,
+   "name": "제자리 점프 (발 접는 점프)"
+  },
+  "7": {
+   "folder": "7",
+   "mirror": false,
+   "name": "방향 점프 (팔 휘저으며)"
+  },
+  "8": {
+   "folder": "8",
+   "mirror": false,
+   "name": "달리다 점프 (허들)"
+  },
+  "9": {
+   "folder": "9",
+   "mirror": false,
+   "name": "약1 눈 가리기 손바닥"
+  },
+  "10": {
+   "folder": "10",
+   "mirror": false,
+   "name": "약2 이마 들이밀기"
+  },
+  "11": {
+   "folder": "11",
+   "mirror": false,
+   "name": "약3 영은 쌤 꿀밤"
+  },
+  "12": {
+   "folder": "12",
+   "mirror": false,
+   "name": "강 심폐소생 압박"
+  },
+  "13": {
+   "folder": "13",
+   "mirror": false,
+   "name": "돌진 무릎 슬라이딩"
+  },
+  "14": {
+   "folder": "14",
+   "mirror": false,
+   "name": "점프 공격 두 발 밀기"
+  },
+  "15": {
+   "folder": "15",
+   "mirror": false,
+   "name": "원거리 언더핸드 던지기"
+  },
+  "16": {
+   "folder": "16",
+   "mirror": false,
+   "name": "뒤 회피 X 감싸 펄쩍"
+  },
+  "16_1": {
+   "folder": "16_1",
+   "mirror": false,
+   "name": "앞 회피 다이빙"
+  },
+  "17": {
+   "folder": "17",
+   "mirror": false,
+   "name": "막기 (등 뒤 감싸며)"
+  },
+  "18": {
+   "folder": "18",
+   "mirror": false,
+   "name": "맞기 (이마 감싸며)"
+  },
+  "19": {
+   "folder": "19",
+   "mirror": false,
+   "name": "날아가 쓰러지기"
+  },
+  "20": {
+   "folder": "20",
+   "mirror": false,
+   "name": "일어나기 (단발 넘기며)"
+  },
+  "21": {
+   "folder": "21",
+   "mirror": false,
+   "name": "스턴 (이마 감싸고 휘청)"
+  },
+  "22": {
+   "folder": "22",
+   "mirror": false,
+   "name": "고유기술 「헤드램프」"
+  },
+  "23": {
+   "folder": "23",
+   "mirror": false,
+   "name": "충전 「중증도 분류」 모으기"
+  },
+  "24": {
+   "folder": "24",
+   "mirror": false,
+   "name": "충전 방출 (동여매고 땀 닦기)"
+  },
+  "25": {
+   "folder": "25",
+   "mirror": false,
+   "name": "필살기 「R조의 양심」"
+  },
+  "26": {
+   "folder": "26",
+   "mirror": false,
+   "name": "섭취 (두 손으로 홀짝)"
+  },
+  "27": {
+   "folder": "27",
+   "mirror": false,
+   "name": "줍기 (무릎 꿇고 두 손으로)"
+  },
+  "28": {
+   "folder": "28",
+   "mirror": false,
+   "name": "응대 (「괜찮아요?」)"
+  },
+  "29": {
+   "folder": "29",
+   "mirror": false,
+   "name": "말하며 손짓 (짚어 세며 설명)"
+  },
+  "30": {
+   "folder": "30",
+   "mirror": false,
+   "name": "끄덕이기"
+  },
+  "31": {
+   "folder": "31",
+   "mirror": false,
+   "name": "고개 젓기"
+  },
+  "32": {
+   "folder": "32",
+   "mirror": false,
+   "name": "화내기 (영은 쌤 꾸짖기)"
+  },
+  "33": {
+   "folder": "33",
+   "mirror": false,
+   "name": "발견 반응 (이마로 비춰 보기)"
+  },
+  "34": {
+   "folder": "34",
+   "mirror": false,
+   "name": "놀라기 (두 손 입으로)"
+  },
+  "35": {
+   "folder": "35",
+   "mirror": false,
+   "name": "기뻐하기 (안도)"
+  },
+  "36": {
+   "folder": "36",
+   "mirror": false,
+   "name": "도망 (이마 비추며 허둥지둥)"
+  },
+  "37": {
+   "folder": "37",
+   "mirror": false,
+   "name": "뒷걸음질 (움츠리기, 감싸며)"
+  },
+  "37_1": {
+   "folder": "37_1",
+   "mirror": false,
+   "name": "뒷걸음질 반복"
+  },
+  "38": {
+   "folder": "38",
+   "mirror": false,
+   "name": "엎드려 기기"
+  },
+  "38_1": {
+   "folder": "38_1",
+   "mirror": false,
+   "name": "엎드려 기기 반복"
+  },
+  "39": {
+   "folder": "39",
+   "mirror": false,
+   "name": "주저앉기 (지쳐 무너짐)"
+  },
+  "41": {
+   "folder": "41",
+   "mirror": false,
+   "name": "웅크려 떨기 (머리 감싸기)"
+  },
+  "42": {
+   "folder": "42",
+   "mirror": false,
+   "name": "네발로 기기"
+  },
+  "42_1": {
+   "folder": "42_1",
+   "mirror": false,
+   "name": "네발로 기기 반복"
+  }
+ },
+ "picks": {
+  "combat": 4,
+  "weapon": 4,
+  "apex": 4,
+  "run": 3,
+  "crawl4": 8
+ },
+ "loops": {
+  "1": [
+   1,
+   2,
+   3,
+   4
+  ],
+  "3": [
+   1,
+   2,
+   3,
+   4
+  ],
+  "W_1": [
+   1,
+   2,
+   3,
+   4
+  ],
+  "4": [
+   3,
+   4,
+   5,
+   6,
+   7,
+   8
+  ],
+  "5": [
+   2,
+   3,
+   4,
+   5,
+   6,
+   7,
+   8
+  ],
+  "37_1": [
+   2,
+   3,
+   4,
+   5,
+   6,
+   7,
+   8,
+   9
+  ],
+  "38_1": [
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7,
+   8
+  ],
+  "42_1": [
+   2,
+   3,
+   4,
+   5,
+   6,
+   7,
+   8,
+   9
+  ],
+  "19": [
+   9,
+   10,
+   11,
+   12
+  ],
+  "21": [
+   2,
+   3,
+   4,
+   5,
+   6
+  ],
+  "23": [
+   3,
+   4,
+   5,
+   6,
+   7,
+   8
+  ],
+  "39": [
+   7,
+   8,
+   9,
+   10,
+   11,
+   12
+  ],
+  "41": [
+   3,
+   4,
+   5,
+   6,
+   7,
+   8
+  ]
+ },
+ "hit": {
+  "9": 4,
+  "10": 7,
+  "11": 4,
+  "12": 5,
+  "13": 3,
+  "14": 4,
+  "15": 6
+ },
+ "gun": [],
+ "kick": [
+  "13",
+  "14"
+ ],
+ "ranged": {
+  "proj": {
+   "t": "proj",
+   "kind": "card",
+   "hit": {
+    "dmg": 7,
+    "kind": "light"
+   },
+   "speed": 1400,
+   "color": "#f2d24a"
+  },
+  "heat": false,
+  "_note": "예비 배터리"
+ },
+ "skills_2판": {
+  "skill": {
+   "name": "헤드램프",
+   "anim": "22",
+   "fps": 9,
+   "events": [
+    {
+     "f": 3,
+     "fx": [
+      {
+       "t": "flash",
+       "v": 0.1
+      },
+      {
+       "t": "scan",
+       "style": "line",
+       "color": "#fff6c0",
+       "time": 0.4
+      },
+      {
+       "t": "melee",
+       "range": 320,
+       "hit": {
+        "dmg": 135,
+        "kind": "light",
+        "text": "눈부심"
+       }
+      },
+      {
+       "t": "bind",
+       "time": 1.5,
+       "color": "#fff6c0"
+      }
+     ]
+    }
+   ]
+  },
+  "charge": {
+   "name": "중증도 분류",
+   "hold": "23",
+   "release": "24",
+   "levels": [
+    0.5,
+    1.2
+   ],
+   "fire": 3,
+   "lv": {
+    "0": [
+     {
+      "t": "heal",
+      "v": 10
+     }
+    ],
+    "1": [
+     {
+      "t": "heal",
+      "v": 30
+     },
+     {
+      "t": "text",
+      "v": "출혈·독 해제"
+     }
+    ],
+    "2": [
+     {
+      "t": "heal",
+      "v": 25
+     },
+     {
+      "t": "text",
+      "v": "3명 회복"
+     }
+    ]
+   }
+  },
+  "super": {
+   "name": "R조의 양심",
+   "sub": "「매뉴얼 한 줄만 기억하면 돼요.」",
+   "anim": "25",
+   "fps": 8,
+   "events": [
+    {
+     "f": 3,
+     "fx": [
+      {
+       "t": "flash",
+       "v": 0.25
+      }
+     ]
+    },
+    {
+     "f": 5,
+     "fx": [
+      {
+       "t": "mark",
+       "time": 10,
+       "text": "약점 공개"
+      },
+      {
+       "t": "buff",
+       "time": 10,
+       "label": "규칙 위반 피해 0",
+       "edge": false
+      }
+     ]
+    }
+   ]
+  }
+ },
+ "skills": {
+  "skill": {
+   "name": "헤드램프",
+   "anim": "22",
+   "fps": 10,
+   "events": [
+    {
+     "f": 5,
+     "hold": 0.15,
+     "fx": [
+      {
+       "t": "v",
+       "vfx": "x3-3.10-D-headlamp-cone",
+       "at": "body",
+       "dx": 200,
+       "dy": -90,
+       "r": 190,
+       "depth": 90,
+       "hit": {
+        "dmg": 270,
+        "kind": "stun",
+        "noVfx": true,
+        "stop": 0.08,
+        "shake": 4
+       }
+      },
+      {
+       "t": "flash",
+       "v": 0.1
+      }
+     ]
+    }
+   ]
+  },
+  "charge": {
+   "name": "중증도 분류",
+   "hold": "23",
+   "release": "24",
+   "levels": [
+    0.5,
+    1.2
+   ],
+   "fire": 3,
+   "releaseLv": {
+    "1": "11",
+    "2": "13"
+   },
+   "fireLv": {
+    "0": 3,
+    "1": 4,
+    "2": 1
+   },
+   "lv": {
+    "0": [
+     {
+      "t": "v",
+      "vfx": "x3-3.10-S0-bandage-band",
+      "at": "hand",
+      "dx": 70,
+      "scale": 1.4,
+      "r": 80,
+      "hit": {
+       "dmg": 75,
+       "kind": "heavy",
+       "vfx": "x3-c-hit-spark-light",
+       "vs": 1.4
+      }
+     }
+    ],
+    "1": [
+     {
+      "t": "melee",
+      "range": 160,
+      "hit": {
+       "dmg": 150,
+       "n": 3,
+       "every": 0.13,
+       "mid": "light",
+       "kind": "stun",
+       "vfx": "x3-c-hit-spark-heavy",
+       "vs": 0.6,
+       "stop": 0.12,
+       "shake": 10
+      }
+     }
+    ],
+    "2": [
+     {
+      "t": "dash",
+      "speed": 1200,
+      "time": 0.4,
+      "hit": {
+       "dmg": 240,
+       "kind": "down",
+       "vfx": "x3-c-hit-spark-heavy",
+       "vs": 0.7,
+       "stop": 0.16,
+       "shake": 14
+      },
+      "delay": 0.12
+     },
+     {
+      "t": "repeat",
+      "n": 3,
+      "every": 0.12,
+      "fx": [
+       {
+        "t": "v",
+        "vfx": "x3-c-dust-puff",
+        "at": "self",
+        "dx": -30,
+        "scale": 1.2
+       }
+      ]
+     },
+     {
+      "t": "later",
+      "in": 0.42,
+      "fx": [
+       {
+        "t": "v",
+        "vfx": "x3-c-ground-crack",
+        "at": "front",
+        "dx": 70,
+        "scale": 1.0,
+        "under": true
+       }
+      ]
+     }
+    ]
+   }
+  },
+  "super": {
+   "name": "R조의 양심",
+   "sub": "「매뉴얼 한 줄만 기억하면 돼요.」",
+   "anim": "25",
+   "fps": 8,
+   "events": [
+    {
+     "f": 5,
+     "hold": 0.35,
+     "fx": [
+      {
+       "t": "v",
+       "vfx": "x3-3.10-F-light-pillar",
+       "at": "body",
+       "dy": -280
+      },
+      {
+       "t": "later",
+       "in": 0.3,
+       "fx": [
+        {
+         "t": "v",
+         "vfx": "x3-3.10-F-light-cascade",
+         "at": "screen",
+         "w": 1.05
+        },
+        {
+         "t": "flash",
+         "v": 0.2
+        },
+        {
+         "t": "screen",
+         "spots": 5,
+         "every": 0.06,
+         "each": [
+          {
+           "t": "v",
+           "vfx": "x3-c-smoke",
+           "scale": 1.2,
+           "tint": "#ffffff",
+           "hit": {
+            "dmg": 68,
+            "kind": "stun",
+            "noVfx": true,
+            "stop": 0.06,
+            "shake": 5
+           }
+          }
+         ]
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "f": 8,
+     "hold": 0.2,
+     "fx": [
+      {
+       "t": "v",
+       "vfx": "x3-c-dust-cloud-large",
+       "at": "self",
+       "w": 1.2,
+       "under": true,
+       "r": 460.0,
+       "depth": 220,
+       "boom": 2,
+       "hit": {
+        "dmg": 122,
+        "kind": "down",
+        "vfx": "x3-c-hit-spark-light",
+        "vs": 1.5,
+        "stop": 0.14,
+        "shake": 10
+       },
+       "scale": 1.0
+      }
+     ]
+    },
+    {
+     "f": 10,
+     "hold": 0.3,
+     "fx": [
+      {
+       "t": "v",
+       "vfx": "x3-c-dust-cloud-large",
+       "at": "self",
+       "w": 1.2,
+       "under": true,
+       "r": 460.0,
+       "depth": 220,
+       "boom": 2,
+       "hit": {
+        "dmg": 190,
+        "kind": "down",
+        "vfx": "x3-c-hit-spark-light",
+        "vs": 1.5,
+        "stop": 0.14,
+        "shake": 16
+       },
+       "scale": 1.0
+      },
+      {
+       "t": "shake",
+       "v": 12
+      }
+     ]
+    }
+   ]
+  }
+ },
+ "_note": "손으로 다듬음(표 「테스트룸」 절·fail 목록·기술안 3장). 그림 값은 자동. 다시 자동으로: build.py --reset 3.10_고영은",
+ "start": {
+  "18": 2,
+  "20": 2,
+  "34": 2
+ },
+ "bal": {
+  "role": "support",
+  "speed": "slow",
+  "gun": "thrown",
+  "atk": {
+   "9": 15,
+   "10": 15,
+   "11": 18,
+   "12": 25,
+   "13": 19,
+   "14": 21
+  },
+  "cd": {
+   "skill": 5
+  },
+  "shotDmg": 7,
+  "superType": "aoe"
+ }
+}

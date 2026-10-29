@@ -1,0 +1,287 @@
+{
+ "frames": [
+  {
+   "filename": "fx-pillar 0.png",
+   "frame": {
+    "x": 0,
+    "y": 0,
+    "w": 64,
+    "h": 128
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 64,
+    "h": 128
+   },
+   "sourceSize": {
+    "w": 64,
+    "h": 128
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.890625
+   },
+   "duration": 67
+  },
+  {
+   "filename": "fx-pillar 1.png",
+   "frame": {
+    "x": 64,
+    "y": 0,
+    "w": 64,
+    "h": 128
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 64,
+    "h": 128
+   },
+   "sourceSize": {
+    "w": 64,
+    "h": 128
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.890625
+   },
+   "duration": 67
+  },
+  {
+   "filename": "fx-pillar 2.png",
+   "frame": {
+    "x": 128,
+    "y": 0,
+    "w": 64,
+    "h": 128
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 64,
+    "h": 128
+   },
+   "sourceSize": {
+    "w": 64,
+    "h": 128
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.890625
+   },
+   "duration": 67
+  },
+  {
+   "filename": "fx-pillar 3.png",
+   "frame": {
+    "x": 192,
+    "y": 0,
+    "w": 64,
+    "h": 128
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 64,
+    "h": 128
+   },
+   "sourceSize": {
+    "w": 64,
+    "h": 128
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.890625
+   },
+   "duration": 67
+  },
+  {
+   "filename": "fx-pillar 4.png",
+   "frame": {
+    "x": 0,
+    "y": 128,
+    "w": 64,
+    "h": 128
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 64,
+    "h": 128
+   },
+   "sourceSize": {
+    "w": 64,
+    "h": 128
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.890625
+   },
+   "duration": 67
+  },
+  {
+   "filename": "fx-pillar 5.png",
+   "frame": {
+    "x": 64,
+    "y": 128,
+    "w": 64,
+    "h": 128
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 64,
+    "h": 128
+   },
+   "sourceSize": {
+    "w": 64,
+    "h": 128
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.890625
+   },
+   "duration": 67
+  },
+  {
+   "filename": "fx-pillar 6.png",
+   "frame": {
+    "x": 128,
+    "y": 128,
+    "w": 64,
+    "h": 128
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 64,
+    "h": 128
+   },
+   "sourceSize": {
+    "w": 64,
+    "h": 128
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.890625
+   },
+   "duration": 67
+  },
+  {
+   "filename": "fx-pillar 7.png",
+   "frame": {
+    "x": 192,
+    "y": 128,
+    "w": 64,
+    "h": 128
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 64,
+    "h": 128
+   },
+   "sourceSize": {
+    "w": 64,
+    "h": 128
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.890625
+   },
+   "duration": 67
+  },
+  {
+   "filename": "fx-pillar 8.png",
+   "frame": {
+    "x": 0,
+    "y": 256,
+    "w": 64,
+    "h": 128
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 64,
+    "h": 128
+   },
+   "sourceSize": {
+    "w": 64,
+    "h": 128
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.890625
+   },
+   "duration": 67
+  },
+  {
+   "filename": "fx-pillar 9.png",
+   "frame": {
+    "x": 64,
+    "y": 256,
+    "w": 64,
+    "h": 128
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 64,
+    "h": 128
+   },
+   "sourceSize": {
+    "w": 64,
+    "h": 128
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.890625
+   },
+   "duration": 67
+  }
+ ],
+ "meta": {
+  "app": "PixelLab VFX Creator",
+  "image": "fx-pillar.png",
+  "format": "RGBA8888",
+  "size": {
+   "w": 256,
+   "h": 384
+  },
+  "scale": "1",
+  "anchor": {
+   "kind": "origin",
+   "x": 32,
+   "y": 114
+  },
+  "frameTags": [
+   {
+    "name": "fx-pillar",
+    "from": 0,
+    "to": 9,
+    "direction": "forward"
+   }
+  ]
+ }
+}

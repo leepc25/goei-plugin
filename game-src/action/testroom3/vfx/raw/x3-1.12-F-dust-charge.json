@@ -1,0 +1,287 @@
+{
+ "frames": [
+  {
+   "filename": "x3-1-12-f-dust-charge 0.png",
+   "frame": {
+    "x": 0,
+    "y": 0,
+    "w": 477,
+    "h": 131
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 477,
+    "h": 131
+   },
+   "sourceSize": {
+    "w": 477,
+    "h": 131
+   },
+   "pivot": {
+    "x": 0.5136268343815513,
+    "y": 0.6412213740458015
+   },
+   "duration": 71
+  },
+  {
+   "filename": "x3-1-12-f-dust-charge 1.png",
+   "frame": {
+    "x": 477,
+    "y": 0,
+    "w": 477,
+    "h": 131
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 477,
+    "h": 131
+   },
+   "sourceSize": {
+    "w": 477,
+    "h": 131
+   },
+   "pivot": {
+    "x": 0.5136268343815513,
+    "y": 0.6412213740458015
+   },
+   "duration": 71
+  },
+  {
+   "filename": "x3-1-12-f-dust-charge 2.png",
+   "frame": {
+    "x": 954,
+    "y": 0,
+    "w": 477,
+    "h": 131
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 477,
+    "h": 131
+   },
+   "sourceSize": {
+    "w": 477,
+    "h": 131
+   },
+   "pivot": {
+    "x": 0.5136268343815513,
+    "y": 0.6412213740458015
+   },
+   "duration": 71
+  },
+  {
+   "filename": "x3-1-12-f-dust-charge 3.png",
+   "frame": {
+    "x": 1431,
+    "y": 0,
+    "w": 477,
+    "h": 131
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 477,
+    "h": 131
+   },
+   "sourceSize": {
+    "w": 477,
+    "h": 131
+   },
+   "pivot": {
+    "x": 0.5136268343815513,
+    "y": 0.6412213740458015
+   },
+   "duration": 71
+  },
+  {
+   "filename": "x3-1-12-f-dust-charge 4.png",
+   "frame": {
+    "x": 0,
+    "y": 131,
+    "w": 477,
+    "h": 131
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 477,
+    "h": 131
+   },
+   "sourceSize": {
+    "w": 477,
+    "h": 131
+   },
+   "pivot": {
+    "x": 0.5136268343815513,
+    "y": 0.6412213740458015
+   },
+   "duration": 71
+  },
+  {
+   "filename": "x3-1-12-f-dust-charge 5.png",
+   "frame": {
+    "x": 477,
+    "y": 131,
+    "w": 477,
+    "h": 131
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 477,
+    "h": 131
+   },
+   "sourceSize": {
+    "w": 477,
+    "h": 131
+   },
+   "pivot": {
+    "x": 0.5136268343815513,
+    "y": 0.6412213740458015
+   },
+   "duration": 71
+  },
+  {
+   "filename": "x3-1-12-f-dust-charge 6.png",
+   "frame": {
+    "x": 954,
+    "y": 131,
+    "w": 477,
+    "h": 131
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 477,
+    "h": 131
+   },
+   "sourceSize": {
+    "w": 477,
+    "h": 131
+   },
+   "pivot": {
+    "x": 0.5136268343815513,
+    "y": 0.6412213740458015
+   },
+   "duration": 71
+  },
+  {
+   "filename": "x3-1-12-f-dust-charge 7.png",
+   "frame": {
+    "x": 1431,
+    "y": 131,
+    "w": 477,
+    "h": 131
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 477,
+    "h": 131
+   },
+   "sourceSize": {
+    "w": 477,
+    "h": 131
+   },
+   "pivot": {
+    "x": 0.5136268343815513,
+    "y": 0.6412213740458015
+   },
+   "duration": 71
+  },
+  {
+   "filename": "x3-1-12-f-dust-charge 8.png",
+   "frame": {
+    "x": 0,
+    "y": 262,
+    "w": 477,
+    "h": 131
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 477,
+    "h": 131
+   },
+   "sourceSize": {
+    "w": 477,
+    "h": 131
+   },
+   "pivot": {
+    "x": 0.5136268343815513,
+    "y": 0.6412213740458015
+   },
+   "duration": 71
+  },
+  {
+   "filename": "x3-1-12-f-dust-charge 9.png",
+   "frame": {
+    "x": 477,
+    "y": 262,
+    "w": 477,
+    "h": 131
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 477,
+    "h": 131
+   },
+   "sourceSize": {
+    "w": 477,
+    "h": 131
+   },
+   "pivot": {
+    "x": 0.5136268343815513,
+    "y": 0.6412213740458015
+   },
+   "duration": 71
+  }
+ ],
+ "meta": {
+  "app": "PixelLab VFX Creator",
+  "image": "x3-1-12-f-dust-charge.png",
+  "format": "RGBA8888",
+  "size": {
+   "w": 1908,
+   "h": 393
+  },
+  "scale": "1",
+  "anchor": {
+   "kind": "origin",
+   "x": 245,
+   "y": 84
+  },
+  "frameTags": [
+   {
+    "name": "x3-1-12-f-dust-charge",
+    "from": 0,
+    "to": 9,
+    "direction": "forward"
+   }
+  ]
+ }
+}

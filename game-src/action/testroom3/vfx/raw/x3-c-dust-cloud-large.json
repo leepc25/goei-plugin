@@ -1,0 +1,339 @@
+{
+ "frames": [
+  {
+   "filename": "x3-c-dust-cloud-large 0.png",
+   "frame": {
+    "x": 0,
+    "y": 0,
+    "w": 540,
+    "h": 234
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 540,
+    "h": 234
+   },
+   "sourceSize": {
+    "w": 540,
+    "h": 234
+   },
+   "pivot": {
+    "x": 0.4925925925925926,
+    "y": 0.7564102564102564
+   },
+   "duration": 125
+  },
+  {
+   "filename": "x3-c-dust-cloud-large 1.png",
+   "frame": {
+    "x": 540,
+    "y": 0,
+    "w": 540,
+    "h": 234
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 540,
+    "h": 234
+   },
+   "sourceSize": {
+    "w": 540,
+    "h": 234
+   },
+   "pivot": {
+    "x": 0.4925925925925926,
+    "y": 0.7564102564102564
+   },
+   "duration": 125
+  },
+  {
+   "filename": "x3-c-dust-cloud-large 2.png",
+   "frame": {
+    "x": 1080,
+    "y": 0,
+    "w": 540,
+    "h": 234
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 540,
+    "h": 234
+   },
+   "sourceSize": {
+    "w": 540,
+    "h": 234
+   },
+   "pivot": {
+    "x": 0.4925925925925926,
+    "y": 0.7564102564102564
+   },
+   "duration": 125
+  },
+  {
+   "filename": "x3-c-dust-cloud-large 3.png",
+   "frame": {
+    "x": 1620,
+    "y": 0,
+    "w": 540,
+    "h": 234
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 540,
+    "h": 234
+   },
+   "sourceSize": {
+    "w": 540,
+    "h": 234
+   },
+   "pivot": {
+    "x": 0.4925925925925926,
+    "y": 0.7564102564102564
+   },
+   "duration": 125
+  },
+  {
+   "filename": "x3-c-dust-cloud-large 4.png",
+   "frame": {
+    "x": 0,
+    "y": 234,
+    "w": 540,
+    "h": 234
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 540,
+    "h": 234
+   },
+   "sourceSize": {
+    "w": 540,
+    "h": 234
+   },
+   "pivot": {
+    "x": 0.4925925925925926,
+    "y": 0.7564102564102564
+   },
+   "duration": 125
+  },
+  {
+   "filename": "x3-c-dust-cloud-large 5.png",
+   "frame": {
+    "x": 540,
+    "y": 234,
+    "w": 540,
+    "h": 234
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 540,
+    "h": 234
+   },
+   "sourceSize": {
+    "w": 540,
+    "h": 234
+   },
+   "pivot": {
+    "x": 0.4925925925925926,
+    "y": 0.7564102564102564
+   },
+   "duration": 125
+  },
+  {
+   "filename": "x3-c-dust-cloud-large 6.png",
+   "frame": {
+    "x": 1080,
+    "y": 234,
+    "w": 540,
+    "h": 234
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 540,
+    "h": 234
+   },
+   "sourceSize": {
+    "w": 540,
+    "h": 234
+   },
+   "pivot": {
+    "x": 0.4925925925925926,
+    "y": 0.7564102564102564
+   },
+   "duration": 125
+  },
+  {
+   "filename": "x3-c-dust-cloud-large 7.png",
+   "frame": {
+    "x": 1620,
+    "y": 234,
+    "w": 540,
+    "h": 234
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 540,
+    "h": 234
+   },
+   "sourceSize": {
+    "w": 540,
+    "h": 234
+   },
+   "pivot": {
+    "x": 0.4925925925925926,
+    "y": 0.7564102564102564
+   },
+   "duration": 125
+  },
+  {
+   "filename": "x3-c-dust-cloud-large 8.png",
+   "frame": {
+    "x": 0,
+    "y": 468,
+    "w": 540,
+    "h": 234
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 540,
+    "h": 234
+   },
+   "sourceSize": {
+    "w": 540,
+    "h": 234
+   },
+   "pivot": {
+    "x": 0.4925925925925926,
+    "y": 0.7564102564102564
+   },
+   "duration": 125
+  },
+  {
+   "filename": "x3-c-dust-cloud-large 9.png",
+   "frame": {
+    "x": 540,
+    "y": 468,
+    "w": 540,
+    "h": 234
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 540,
+    "h": 234
+   },
+   "sourceSize": {
+    "w": 540,
+    "h": 234
+   },
+   "pivot": {
+    "x": 0.4925925925925926,
+    "y": 0.7564102564102564
+   },
+   "duration": 125
+  },
+  {
+   "filename": "x3-c-dust-cloud-large 10.png",
+   "frame": {
+    "x": 1080,
+    "y": 468,
+    "w": 540,
+    "h": 234
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 540,
+    "h": 234
+   },
+   "sourceSize": {
+    "w": 540,
+    "h": 234
+   },
+   "pivot": {
+    "x": 0.4925925925925926,
+    "y": 0.7564102564102564
+   },
+   "duration": 125
+  },
+  {
+   "filename": "x3-c-dust-cloud-large 11.png",
+   "frame": {
+    "x": 1620,
+    "y": 468,
+    "w": 540,
+    "h": 234
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 540,
+    "h": 234
+   },
+   "sourceSize": {
+    "w": 540,
+    "h": 234
+   },
+   "pivot": {
+    "x": 0.4925925925925926,
+    "y": 0.7564102564102564
+   },
+   "duration": 125
+  }
+ ],
+ "meta": {
+  "app": "PixelLab VFX Creator",
+  "image": "x3-c-dust-cloud-large.png",
+  "format": "RGBA8888",
+  "size": {
+   "w": 2160,
+   "h": 702
+  },
+  "scale": "1",
+  "anchor": {
+   "kind": "origin",
+   "x": 266,
+   "y": 177
+  },
+  "frameTags": [
+   {
+    "name": "x3-c-dust-cloud-large",
+    "from": 0,
+    "to": 11,
+    "direction": "forward"
+   }
+  ]
+ }
+}

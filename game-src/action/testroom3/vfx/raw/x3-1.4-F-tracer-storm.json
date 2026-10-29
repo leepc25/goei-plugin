@@ -1,0 +1,287 @@
+{
+ "frames": [
+  {
+   "filename": "x3-1-4-f-tracer-storm 0.png",
+   "frame": {
+    "x": 0,
+    "y": 0,
+    "w": 960,
+    "h": 361
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 960,
+    "h": 361
+   },
+   "sourceSize": {
+    "w": 960,
+    "h": 361
+   },
+   "pivot": {
+    "x": 0.5052083333333334,
+    "y": 0.5013850415512465
+   },
+   "duration": 67
+  },
+  {
+   "filename": "x3-1-4-f-tracer-storm 1.png",
+   "frame": {
+    "x": 960,
+    "y": 0,
+    "w": 960,
+    "h": 361
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 960,
+    "h": 361
+   },
+   "sourceSize": {
+    "w": 960,
+    "h": 361
+   },
+   "pivot": {
+    "x": 0.5052083333333334,
+    "y": 0.5013850415512465
+   },
+   "duration": 67
+  },
+  {
+   "filename": "x3-1-4-f-tracer-storm 2.png",
+   "frame": {
+    "x": 1920,
+    "y": 0,
+    "w": 960,
+    "h": 361
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 960,
+    "h": 361
+   },
+   "sourceSize": {
+    "w": 960,
+    "h": 361
+   },
+   "pivot": {
+    "x": 0.5052083333333334,
+    "y": 0.5013850415512465
+   },
+   "duration": 67
+  },
+  {
+   "filename": "x3-1-4-f-tracer-storm 3.png",
+   "frame": {
+    "x": 2880,
+    "y": 0,
+    "w": 960,
+    "h": 361
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 960,
+    "h": 361
+   },
+   "sourceSize": {
+    "w": 960,
+    "h": 361
+   },
+   "pivot": {
+    "x": 0.5052083333333334,
+    "y": 0.5013850415512465
+   },
+   "duration": 67
+  },
+  {
+   "filename": "x3-1-4-f-tracer-storm 4.png",
+   "frame": {
+    "x": 0,
+    "y": 361,
+    "w": 960,
+    "h": 361
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 960,
+    "h": 361
+   },
+   "sourceSize": {
+    "w": 960,
+    "h": 361
+   },
+   "pivot": {
+    "x": 0.5052083333333334,
+    "y": 0.5013850415512465
+   },
+   "duration": 67
+  },
+  {
+   "filename": "x3-1-4-f-tracer-storm 5.png",
+   "frame": {
+    "x": 960,
+    "y": 361,
+    "w": 960,
+    "h": 361
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 960,
+    "h": 361
+   },
+   "sourceSize": {
+    "w": 960,
+    "h": 361
+   },
+   "pivot": {
+    "x": 0.5052083333333334,
+    "y": 0.5013850415512465
+   },
+   "duration": 67
+  },
+  {
+   "filename": "x3-1-4-f-tracer-storm 6.png",
+   "frame": {
+    "x": 1920,
+    "y": 361,
+    "w": 960,
+    "h": 361
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 960,
+    "h": 361
+   },
+   "sourceSize": {
+    "w": 960,
+    "h": 361
+   },
+   "pivot": {
+    "x": 0.5052083333333334,
+    "y": 0.5013850415512465
+   },
+   "duration": 67
+  },
+  {
+   "filename": "x3-1-4-f-tracer-storm 7.png",
+   "frame": {
+    "x": 2880,
+    "y": 361,
+    "w": 960,
+    "h": 361
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 960,
+    "h": 361
+   },
+   "sourceSize": {
+    "w": 960,
+    "h": 361
+   },
+   "pivot": {
+    "x": 0.5052083333333334,
+    "y": 0.5013850415512465
+   },
+   "duration": 67
+  },
+  {
+   "filename": "x3-1-4-f-tracer-storm 8.png",
+   "frame": {
+    "x": 0,
+    "y": 722,
+    "w": 960,
+    "h": 361
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 960,
+    "h": 361
+   },
+   "sourceSize": {
+    "w": 960,
+    "h": 361
+   },
+   "pivot": {
+    "x": 0.5052083333333334,
+    "y": 0.5013850415512465
+   },
+   "duration": 67
+  },
+  {
+   "filename": "x3-1-4-f-tracer-storm 9.png",
+   "frame": {
+    "x": 960,
+    "y": 722,
+    "w": 960,
+    "h": 361
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 960,
+    "h": 361
+   },
+   "sourceSize": {
+    "w": 960,
+    "h": 361
+   },
+   "pivot": {
+    "x": 0.5052083333333334,
+    "y": 0.5013850415512465
+   },
+   "duration": 67
+  }
+ ],
+ "meta": {
+  "app": "PixelLab VFX Creator",
+  "image": "x3-1-4-f-tracer-storm.png",
+  "format": "RGBA8888",
+  "size": {
+   "w": 3840,
+   "h": 1083
+  },
+  "scale": "1",
+  "anchor": {
+   "kind": "origin",
+   "x": 485,
+   "y": 181
+  },
+  "frameTags": [
+   {
+    "name": "x3-1-4-f-tracer-storm",
+    "from": 0,
+    "to": 9,
+    "direction": "forward"
+   }
+  ]
+ }
+}

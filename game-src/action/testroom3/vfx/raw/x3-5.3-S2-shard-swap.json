@@ -1,0 +1,235 @@
+{
+ "frames": [
+  {
+   "filename": "x3-5-3-s2-shard-swap 0.png",
+   "frame": {
+    "x": 0,
+    "y": 0,
+    "w": 335,
+    "h": 346
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 335,
+    "h": 346
+   },
+   "sourceSize": {
+    "w": 335,
+    "h": 346
+   },
+   "pivot": {
+    "x": 0.5582089552238806,
+    "y": 0.47398843930635837
+   },
+   "duration": 71
+  },
+  {
+   "filename": "x3-5-3-s2-shard-swap 1.png",
+   "frame": {
+    "x": 335,
+    "y": 0,
+    "w": 335,
+    "h": 346
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 335,
+    "h": 346
+   },
+   "sourceSize": {
+    "w": 335,
+    "h": 346
+   },
+   "pivot": {
+    "x": 0.5582089552238806,
+    "y": 0.47398843930635837
+   },
+   "duration": 71
+  },
+  {
+   "filename": "x3-5-3-s2-shard-swap 2.png",
+   "frame": {
+    "x": 670,
+    "y": 0,
+    "w": 335,
+    "h": 346
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 335,
+    "h": 346
+   },
+   "sourceSize": {
+    "w": 335,
+    "h": 346
+   },
+   "pivot": {
+    "x": 0.5582089552238806,
+    "y": 0.47398843930635837
+   },
+   "duration": 71
+  },
+  {
+   "filename": "x3-5-3-s2-shard-swap 3.png",
+   "frame": {
+    "x": 0,
+    "y": 346,
+    "w": 335,
+    "h": 346
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 335,
+    "h": 346
+   },
+   "sourceSize": {
+    "w": 335,
+    "h": 346
+   },
+   "pivot": {
+    "x": 0.5582089552238806,
+    "y": 0.47398843930635837
+   },
+   "duration": 71
+  },
+  {
+   "filename": "x3-5-3-s2-shard-swap 4.png",
+   "frame": {
+    "x": 335,
+    "y": 346,
+    "w": 335,
+    "h": 346
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 335,
+    "h": 346
+   },
+   "sourceSize": {
+    "w": 335,
+    "h": 346
+   },
+   "pivot": {
+    "x": 0.5582089552238806,
+    "y": 0.47398843930635837
+   },
+   "duration": 71
+  },
+  {
+   "filename": "x3-5-3-s2-shard-swap 5.png",
+   "frame": {
+    "x": 670,
+    "y": 346,
+    "w": 335,
+    "h": 346
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 335,
+    "h": 346
+   },
+   "sourceSize": {
+    "w": 335,
+    "h": 346
+   },
+   "pivot": {
+    "x": 0.5582089552238806,
+    "y": 0.47398843930635837
+   },
+   "duration": 71
+  },
+  {
+   "filename": "x3-5-3-s2-shard-swap 6.png",
+   "frame": {
+    "x": 0,
+    "y": 692,
+    "w": 335,
+    "h": 346
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 335,
+    "h": 346
+   },
+   "sourceSize": {
+    "w": 335,
+    "h": 346
+   },
+   "pivot": {
+    "x": 0.5582089552238806,
+    "y": 0.47398843930635837
+   },
+   "duration": 71
+  },
+  {
+   "filename": "x3-5-3-s2-shard-swap 7.png",
+   "frame": {
+    "x": 335,
+    "y": 692,
+    "w": 335,
+    "h": 346
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 335,
+    "h": 346
+   },
+   "sourceSize": {
+    "w": 335,
+    "h": 346
+   },
+   "pivot": {
+    "x": 0.5582089552238806,
+    "y": 0.47398843930635837
+   },
+   "duration": 71
+  }
+ ],
+ "meta": {
+  "app": "PixelLab VFX Creator",
+  "image": "x3-5-3-s2-shard-swap.png",
+  "format": "RGBA8888",
+  "size": {
+   "w": 1005,
+   "h": 1038
+  },
+  "scale": "1",
+  "anchor": {
+   "kind": "origin",
+   "x": 187,
+   "y": 164
+  },
+  "frameTags": [
+   {
+    "name": "x3-5-3-s2-shard-swap",
+    "from": 0,
+    "to": 7,
+    "direction": "forward"
+   }
+  ]
+ }
+}

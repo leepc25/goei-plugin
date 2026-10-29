@@ -1,0 +1,287 @@
+{
+ "frames": [
+  {
+   "filename": "x3-3-9-f-purple-smash 0.png",
+   "frame": {
+    "x": 0,
+    "y": 0,
+    "w": 1024,
+    "h": 420
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 1024,
+    "h": 420
+   },
+   "sourceSize": {
+    "w": 1024,
+    "h": 420
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.5595238095238095
+   },
+   "duration": 67
+  },
+  {
+   "filename": "x3-3-9-f-purple-smash 1.png",
+   "frame": {
+    "x": 1024,
+    "y": 0,
+    "w": 1024,
+    "h": 420
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 1024,
+    "h": 420
+   },
+   "sourceSize": {
+    "w": 1024,
+    "h": 420
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.5595238095238095
+   },
+   "duration": 67
+  },
+  {
+   "filename": "x3-3-9-f-purple-smash 2.png",
+   "frame": {
+    "x": 2048,
+    "y": 0,
+    "w": 1024,
+    "h": 420
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 1024,
+    "h": 420
+   },
+   "sourceSize": {
+    "w": 1024,
+    "h": 420
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.5595238095238095
+   },
+   "duration": 67
+  },
+  {
+   "filename": "x3-3-9-f-purple-smash 3.png",
+   "frame": {
+    "x": 3072,
+    "y": 0,
+    "w": 1024,
+    "h": 420
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 1024,
+    "h": 420
+   },
+   "sourceSize": {
+    "w": 1024,
+    "h": 420
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.5595238095238095
+   },
+   "duration": 67
+  },
+  {
+   "filename": "x3-3-9-f-purple-smash 4.png",
+   "frame": {
+    "x": 0,
+    "y": 420,
+    "w": 1024,
+    "h": 420
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 1024,
+    "h": 420
+   },
+   "sourceSize": {
+    "w": 1024,
+    "h": 420
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.5595238095238095
+   },
+   "duration": 67
+  },
+  {
+   "filename": "x3-3-9-f-purple-smash 5.png",
+   "frame": {
+    "x": 1024,
+    "y": 420,
+    "w": 1024,
+    "h": 420
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 1024,
+    "h": 420
+   },
+   "sourceSize": {
+    "w": 1024,
+    "h": 420
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.5595238095238095
+   },
+   "duration": 67
+  },
+  {
+   "filename": "x3-3-9-f-purple-smash 6.png",
+   "frame": {
+    "x": 2048,
+    "y": 420,
+    "w": 1024,
+    "h": 420
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 1024,
+    "h": 420
+   },
+   "sourceSize": {
+    "w": 1024,
+    "h": 420
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.5595238095238095
+   },
+   "duration": 67
+  },
+  {
+   "filename": "x3-3-9-f-purple-smash 7.png",
+   "frame": {
+    "x": 3072,
+    "y": 420,
+    "w": 1024,
+    "h": 420
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 1024,
+    "h": 420
+   },
+   "sourceSize": {
+    "w": 1024,
+    "h": 420
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.5595238095238095
+   },
+   "duration": 67
+  },
+  {
+   "filename": "x3-3-9-f-purple-smash 8.png",
+   "frame": {
+    "x": 0,
+    "y": 840,
+    "w": 1024,
+    "h": 420
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 1024,
+    "h": 420
+   },
+   "sourceSize": {
+    "w": 1024,
+    "h": 420
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.5595238095238095
+   },
+   "duration": 67
+  },
+  {
+   "filename": "x3-3-9-f-purple-smash 9.png",
+   "frame": {
+    "x": 1024,
+    "y": 840,
+    "w": 1024,
+    "h": 420
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 1024,
+    "h": 420
+   },
+   "sourceSize": {
+    "w": 1024,
+    "h": 420
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.5595238095238095
+   },
+   "duration": 67
+  }
+ ],
+ "meta": {
+  "app": "PixelLab VFX Creator",
+  "image": "x3-3-9-f-purple-smash.png",
+  "format": "RGBA8888",
+  "size": {
+   "w": 4096,
+   "h": 1260
+  },
+  "scale": "1",
+  "anchor": {
+   "kind": "origin",
+   "x": 512,
+   "y": 235
+  },
+  "frameTags": [
+   {
+    "name": "x3-3-9-f-purple-smash",
+    "from": 0,
+    "to": 9,
+    "direction": "forward"
+   }
+  ]
+ }
+}
