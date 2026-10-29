@@ -1038,14 +1038,8 @@ async function startedWithReply(page, { phoneAuto = false } = {}) {
   await page.fill('.gx-search', '소라');
   await page.waitForFunction(() => document.querySelector('.gx-mlist li.gx-mgrp')?.textContent.startsWith('괴이'));
   await pickCustom(page);
-  const __pk = await page.evaluate(() => ({ sel: !!document.querySelector('.gx-mx.sel'), goal: document.querySelector('.gx-goal')?.textContent?.trim(), sendDisabled: document.querySelector('[data-action="mission-send"]')?.disabled, aim: document.querySelector('.gx-mx.open .gx-aim')?.className }));
   await page.click('[data-action="mission-send"]');
-  try {
-    await page.waitForFunction(() => window.__chat.message.length === 1 && window.__chat.message[0].data.includes('소라 랜드'));
-  } catch (e) {
-    console.log('DEBUG mission-send', JSON.stringify({ pick: __pk, n: await page.evaluate(() => window.__chat.message.length), m0: await page.evaluate(() => String(window.__chat.message[0]?.data ?? '').slice(0, 60)), notice: await page.evaluate(() => document.querySelector('.gx-err, .gx-notice, .gx-alert')?.textContent), goal: await page.evaluate(() => document.querySelector('.gx-goal')?.textContent?.trim()), send: await page.evaluate(() => document.querySelector('[data-action="mission-send"]')?.outerHTML.slice(0, 140)) }));
-    throw e;
-  }
+  await page.waitForFunction(() => window.__chat.message.length === 1 && window.__chat.message[0].data.includes('소라 랜드'));
   // 첫 전송은 시드를 유지 (지시문 + 덧붙인 글 = 한 번)
   await page.evaluate(() => window.__chat.message.push({ role: 'user', data: '더' }));
   const seeded = await page.evaluate(() => window.__calls.replacers[0]([{ role: 'system', content: 'x %%SEED%%\nS\n%%/SEED%%\ny' }], 'model'));
@@ -3037,9 +3031,9 @@ if (fixture.globalLore.some(packed)) {
   await page.click('[data-action="rec-sub"][data-value="journal"]');
   await page.waitForSelector('.gx-jr-row');
   assert.equal(await page.locator('.gx-jr-row.mine').count(), 1, '내가 출동한 줄');
-  assert.equal(await page.evaluate(() => getComputedStyle(document.querySelector('.gx-jr-row.mine')).borderLeftWidth), '3px', '노란 왼쪽 선');
+  assert.equal(await page.evaluate(() => getComputedStyle(document.querySelector('.gx-jr-row.mine')).boxShadow).includes('inset'), true, '노란 왼쪽 선');
   const tiles = await page.textContent('.gx-jr-tiles');
-  for (const t of ['이번 달 종료', '내가 출동', '백그라운드', '오늘']) assert.ok(tiles.includes(t), `타일 ${t}`);
+  for (const t of ['이번 달', '내가 출동', 'BACKGROUND', 'TODAY']) assert.ok(tiles.includes(t), `타일 ${t}`);
   assert.ok((await page.textContent('.gx-jr-day h3')).includes('2025.01.01'), '날짜별 묶음');
   const jr = await page.textContent('.gx-jr-row');
   for (const t of ['04:11', preset.name, '나 · 쟈알디 · 스팡달', '보고서']) assert.ok(jr.includes(t), `일지 줄: ${t}`);

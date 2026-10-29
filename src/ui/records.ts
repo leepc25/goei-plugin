@@ -20,6 +20,7 @@ import { drawerHtml } from './drawer';
 import { defaultsAction, defaultsButtons, defaultsConfirm } from './defaults';
 import { ICONS } from './icons';
 import { avatar, stLabel } from './images';
+import { evArt } from './evpic';
 import { factionListView, factionView, peopleDocsView, peopleListView, personView, resetPeopleUi } from './people';
 import { toast } from './toast';
 
@@ -189,6 +190,38 @@ function pane(ctx: ChatContext): string {
   }
 }
 
+// ── 상황판 톤 부품 (2026-10-29 사용자 시안 docs/시안/기록_가계부_2): 모니터 판 · CCTV 화면 조각 · 요원 얼굴 ──
+
+/** 어두운 모니터 판 (상황판 CCTV 와 같은 결): 왼쪽 위 표지·제목, 오른쪽 위 시각, 아래 숫자 칸 */
+export function monitor(tag: string, title: string, clock: string, cells: { label: string; value: string; sub: string; tone?: 'mint' | 'amb' | 'red' | '' ; cls?: string }[], o: { live?: boolean; cls?: string } = {}): string {
+  return `<section class="gx-mon${o.cls ? ` ${o.cls}` : ''}"><div class="gx-mon-osd"><span><span class="gx-mon-tag${o.live ? ' live' : ''}"><i></i>${esc(tag)}</span><span class="gx-mon-title">${esc(title)}</span></span>${clock ? `<span>${esc(clock)}</span>` : ''}</div>
+    <div class="gx-mon-cells">${cells.map((c) => `<div class="gx-mon-cell${c.cls ? ` ${c.cls}` : ''}"><small>${esc(c.label)}</small><b class="${c.tone ?? ''}">${c.value}</b><span>${esc(c.sub)}</span></div>`).join('')}</div></section>`;
+}
+
+const camNo = (loc: string) => String((Array.from(loc).reduce((h, ch) => (h * 31 + ch.charCodeAt(0)) >>> 0, 7) % 40) + 1).padStart(2, '0');
+const region = (loc: string) => (locName(loc) || loc).split(/\s+/)[0] || '';
+
+/** CCTV 화면 조각: 그 괴이·사건의 그림(없으면 어두운 화면) + 카메라 번호·종료 시각 */
+function shot(ctx: ChatContext, name: string, kind: JournalKind, loc: string, at: number | null, cls = 'gx-shot'): string {
+  const art = kind === 'fd' ? null : evArt(ctx, name, kind).pic;
+  return `<span class="${cls}">${art ? `<img src="${esc(art)}" alt="" loading="lazy">` : ''}<span class="gx-shot-t">CAM-${camNo(loc)}${region(loc) ? ` · ${esc(region(loc))}` : ''}</span><span class="gx-shot-end">END ${esc(hhmm(at))}</span></span>`;
+}
+
+let faceCat: { lore: unknown; map: Map<string, string | undefined> } | null = null;
+/** 투입 요원 얼굴 (명부 영문명으로) */
+function faces(ctx: ChatContext, names: string[]): string {
+  if (!faceCat || faceCat.lore !== ctx.char.globalLore) {
+    let map = new Map<string, string | undefined>();
+    try {
+      map = new Map(parseCatalog(ctx.char.globalLore).people.map((p) => [p.name, p.english]));
+    } catch {
+      /* 명부를 못 읽으면 첫 글자 */
+    }
+    faceCat = { lore: ctx.char.globalLore, map };
+  }
+  return names.slice(0, 4).map((n) => avatar(ctx.char, faceCat!.map.get(n), n, 'gx-face')).join('');
+}
+
 // ── 일지 ──
 
 const FILTERS: [JournalFilter, string][] = [['all', '전체'], ['mine', '내가 출동'], ['bg', '백그라운드'], ['an', '괴이'], ['in', '사건']];
@@ -205,19 +238,17 @@ function journalPane(ctx: ChatContext): string {
   const kinds = (list: JournalRow[]) => [['an', '괴이'], ['in', '사건'], ['ms', '특수'], ['fd', '필드']].map(([k, l]) => [l, list.filter((r) => r.kind === k).length] as const).filter(([, n]) => n).map(([l, n]) => `${l} ${n}`).join(' · ');
   const durs = todayRows.map((r) => (r.at !== null && r.since !== null ? Math.max(0, r.at - r.since) : null)).filter((d): d is number => d !== null);
   const avg = durs.length ? Math.round(durs.reduce((a, b) => a + b, 0) / durs.length) : null;
-  const tile = (label: string, n: number, sub: string, cls = '') => `<div class="gx-wt-tile gx-jr-tile${cls ? ` ${cls}` : ''}"><small>${label}</small><b>${n}</b><span class="gx-wt-sub">${esc(sub)}</span></div>`;
-  const tiles = `<section class="gx-wt-tiles gx-jr-tiles">
-    ${tile(now === null ? '종료 전체' : '이번 달 종료', monthRows.length, kinds(monthRows) || '아직 없음', 'bal')}
-    ${tile('내가 출동', mineN, `보고서 ${reports.filter((r) => r.mine).length}건`)}
-    ${tile('백그라운드', rows.length - mineN, '요원 단독 처리')}
-    ${tile(`오늘${now !== null ? ` · ${ymd(now)}` : ''}`, todayRows.length, avg !== null ? `평균 소요 ${durText(avg)}` : todayRows.length ? '소요 미상' : '없음')}
-  </section>`;
+  const clockText = now === null ? '' : journalClock(now).replace(/^(\d\d)\.(\d\d)/, `${new Date(now * 60000).getUTCFullYear()}.$1.$2`);
+  const mon = monitor('ARCHIVE', 'BUREAU LOG · 관리국 일지', clockText, [
+    { label: now === null ? 'CLOSED · 전체' : 'CLOSED · 이번 달', value: String(monthRows.length), sub: kinds(monthRows) || '아직 없음', tone: 'mint' },
+    { label: 'DEPLOYED · 내가 출동', value: String(mineN), sub: `보고서 ${reports.filter((r) => r.mine).length}건`, tone: 'amb' },
+    { label: 'BACKGROUND', value: String(rows.length - mineN), sub: '요원 단독 처리' },
+    { label: `TODAY${now !== null ? ` · ${ymd(now)}` : ''}`, value: String(todayRows.length), sub: avg !== null ? `평균 소요 ${longDur(avg)}` : todayRows.length ? '소요 미상' : '없음' },
+  ], { cls: 'gx-jr-tiles' });
   const chips = FILTERS.map(([v, l]) => `<button class="gx-chip${rec.filter === v ? ' on' : ''}" data-action="rec-filter" data-value="${v}" aria-pressed="${rec.filter === v}">${l}</button>`).join('');
-  return `${tiles}
-    <section class="gx-card">
-      <header class="gx-card-head"><b>관리국 일지</b><small>종료된 괴이·사건·특수 전부 · 영구 보관</small><div class="gx-card-tools"><div class="gx-wt-chips">${chips}</div><input class="gx-wt-q" type="search" data-input="rec-q" value="${esc(rec.q)}" placeholder="찾기: 이름·장소·요원" aria-label="일지 찾기"></div></header>
-      <div class="gx-card-body gx-jr-list">${journalList(ctx)}</div>
-    </section>`;
+  return `${mon}
+    <div class="gx-rec-tools">${chips}<input class="gx-wt-q" type="search" data-input="rec-q" value="${esc(rec.q)}" placeholder="찾기: 이름·장소·요원" aria-label="일지 찾기"></div>
+    <div class="gx-jr-list">${journalList(ctx)}</div>`;
 }
 
 /** 일지 목록만 (찾기 칸을 칠 때 이 부분만 다시 그린다) */
@@ -228,7 +259,6 @@ export function journalList(ctx: ChatContext): string {
     && (!q || `${r.name} ${locName(r.loc)} ${r.agents.map((a) => a.name).join(' ')} ${r.result}`.toLowerCase().includes(q));
   const shown = rows.filter(pass).reverse();
   if (!shown.length) return `<p class="gx-wt-empty">${rows.length ? '맞는 줄이 없어요.' : '아직 종료된 상황이 없어요. 괴이·사건·특수가 종료되면 여기에 한 줄씩 쌓여요.'}</p>`;
-  // 날짜별 묶음 (최근 날짜부터). 시각을 모르는 줄은 「시각 없음」 묶음 맨 아래
   const groups: { day: string; rows: JournalRow[] }[] = [];
   for (const r of shown) {
     const day = dayOf(r.at);
@@ -237,17 +267,18 @@ export function journalList(ctx: ChatContext): string {
     else groups.push({ day, rows: [r] });
   }
   groups.sort((a, b) => (a.day === '' ? 1 : b.day === '' ? -1 : 0));
-  const cnt = (list: JournalRow[]) => [['an', '괴이'], ['in', '사건'], ['ms', '특수'], ['fd', '필드']].map(([k, l]) => [l, list.filter((r) => r.kind === k).length] as const).filter(([, n]) => n).map(([l, n]) => `${l} ${n}`).concat(list.some((r) => r.mine) ? [`내가 출동 ${list.filter((r) => r.mine).length}`] : []).join(' · ');
-  return groups.map((g) => `<section class="gx-jr-day"><h3><span>${esc(g.day || '시각 없음')}</span><em>${esc(cnt(g.rows))}</em></h3><ul>${g.rows.map(journalRow).join('')}</ul></section>`).join('');
+  const cnt = (list: JournalRow[]) => [['an', '괴이'], ['in', '사건'], ['ms', '특수'], ['fd', '필드']].map(([k, l]) => [l, list.filter((r) => r.kind === k).length] as const).filter(([, n]) => n).map(([l, n]) => `${l} ${n}`).join(' · ');
+  return groups.map((g) => `<section class="gx-jr-day"><h3><span>${esc(g.day || '시각 없음')}</span><em>${esc(cnt(g.rows))}</em></h3><ul>${g.rows.map((r) => journalRow(ctx, r)).join('')}</ul></section>`).join('');
 }
 
-function journalRow(r: JournalRow): string {
-  const dur = r.at !== null && r.since !== null ? durText(Math.max(0, r.at - r.since)) : '';
-  const tag = r.rpt ? `<span class="gx-jr-go">${ICONS.records}<span>보고서</span></span>` : `<span class="gx-jr-bg">${r.mine ? '내가 출동' : '백그라운드'}</span>`;
-  const inner = `<span class="gx-jr-time">${esc(hhmm(r.at))}</span>${gmark(r.kind, r.grade)}
-    <span class="gx-jr-main"><b>${esc(r.name)}</b><small>${JOURNAL_KIND_LABEL[r.kind]} · ${esc(locName(r.loc) || r.loc)}</small></span>
-    <span class="gx-jr-who">${esc(whoText(r) || '투입 없음')}</span>
-    <span class="gx-jr-res">${esc([r.result, dur].filter(Boolean).join(' · '))}</span>${tag}`;
+function journalRow(ctx: ChatContext, r: JournalRow): string {
+  const dur = r.at !== null && r.since !== null ? longDur(Math.max(0, r.at - r.since)) : '';
+  const names = r.agents.map((a) => a.name).filter(Boolean);
+  const inner = `${shot(ctx, r.name, r.kind, r.loc, r.at)}
+    <span class="gx-jr-main"><span class="gx-jr-l1">${gmark(r.kind, r.grade)}<b>${esc(r.name)}</b>${r.mine ? '<span class="gx-badge live">내가 출동</span>' : ''}</span>
+      <small>${[JOURNAL_KIND_LABEL[r.kind], locName(r.loc) || r.loc, dur ? `소요 ${dur}` : ''].filter(Boolean).map(esc).join(' · ')}</small>
+      <span class="gx-jr-who">${faces(ctx, names)}${esc(whoText(r) || '투입 없음')}${r.result ? ` <em>— ${esc(r.result)}</em>` : ''}</span></span>
+    <span class="gx-jr-side"><span class="gx-jr-time">${esc(hhmm(r.at))}</span>${r.rpt ? '<span class="gx-jr-go">보고서 ›</span>' : `<span class="gx-jr-bg">${r.mine ? '내가 출동' : '백그라운드'}</span>`}</span>`;
   const cls = `gx-jr-row${r.mine ? ' mine' : ''}`;
   return `<li>${r.rpt ? `<button class="${cls}" data-action="rec-open" data-value="${esc(r.rpt)}" aria-label="${esc(r.name)} 보고서">${inner}</button>` : `<div class="${cls}">${inner}</div>`}</li>`;
 }
@@ -266,24 +297,25 @@ const walletSum = (r: Report) => {
 function reportsPane(ctx: ChatContext): string {
   const all = readReports(ctx.chat).items;
   const shown = all.filter((r) => (rec.rfilter === 'mine' ? r.mine : !r.mine)).reverse();
-  const chips = RFILTERS.map(([v, l]) => `<button class="gx-chip${rec.rfilter === v ? ' on' : ''}" data-action="rec-rfilter" data-value="${v}" aria-pressed="${rec.rfilter === v}">${l}</button>`).join('');
+  const chips = RFILTERS.map(([v, l]) => `<button class="gx-chip${rec.rfilter === v ? ' on' : ''}" data-action="rec-rfilter" data-value="${v}" aria-pressed="${rec.rfilter === v}">${l} ${all.filter((r) => (v === 'mine' ? r.mine : !r.mine)).length}</button>`).join('');
   const cards = shown.map((r) => {
     const h = r.head;
-    const meta = [ymd(h.at) ? `${ymd(h.at)} ${hhmm(h.at)}` : '시각 없음', h.place || locName(h.loc) || h.loc, durText(h.duration)].filter(Boolean).join(' · ');
-    const who = [whoText(r), r.result].filter(Boolean).join(' · ');
+    const meta = [h.place || locName(h.loc) || h.loc, longDur(h.duration)].filter(Boolean).join(' · ');
+    const names = r.agents.map((a) => a.name).filter(Boolean);
     return `<button class="gx-rcard${r.mine ? ' mine' : ''}" data-action="rec-open" data-value="${esc(r.id)}">
-      <span class="gx-rcard-top"><span class="gx-rcard-no">${esc(r.no)}</span>${mineBadge(r)}${r.pin ? `<i class="gx-rcard-pin" title="고정">${ICONS.pin}</i>` : ''}</span>
-      <span class="gx-rcard-t">${gmark(r.kind, h.grade)}<b>${esc(h.name)}</b></span>
-      <span class="gx-rcard-meta">${esc(meta)}</span>
-      <span class="gx-rcard-who">${esc(who)}</span>
-      ${r.people?.length || (r.wallet?.length) ? `<span class="gx-rcard-sum">${peopleSum(r)}${walletSum(r)}</span>` : ''}
+      <span class="gx-rcard-shot">${shot(ctx, h.name, r.kind, h.loc, h.at, 'gx-shot big')}<span class="gx-rcard-no">${esc(r.no)}</span><span class="gx-rcard-stamp">CLOSED</span>${r.pin ? `<i class="gx-rcard-pin" title="고정">${ICONS.pin}</i>` : ''}</span>
+      <span class="gx-rcard-body">
+        <span class="gx-rcard-t">${gmark(r.kind, h.grade)}<b>${esc(h.name)}</b>${r.mine ? mineBadge(r) : ''}</span>
+        <span class="gx-rcard-meta">${esc(meta)}</span>
+        <span class="gx-rcard-who">${faces(ctx, names)}${esc(whoText(r) || '투입 없음')}</span>
+        ${r.result ? `<span class="gx-rcard-res">${esc(r.result)}</span>` : ''}
+        <span class="gx-rcard-sum">${peopleSum(r)}${walletSum(r)}${r.full ? '' : '<span class="gx-rcard-lite">간이 보고서</span>'}</span>
+      </span>
     </button>`;
   }).join('');
   const empty = all.length ? '맞는 보고서가 없어요.' : '아직 보고서가 없어요. 상황이 종료되면 그 순간의 기록이 보고서로 남아요.';
-  return `<section class="gx-card">
-      <header class="gx-card-head"><b>사건 보고서</b><small>${rec.rfilter === 'mine' ? '내가 출동한 사건' : '요원이 처리한 사건(간이)'} · 종료 시점 그대로 보관</small><div class="gx-card-tools"><div class="gx-wt-chips">${chips}</div></div></header>
-      <div class="gx-card-body">${cards ? `<div class="gx-rcards">${cards}</div>` : `<p class="gx-wt-empty">${empty}</p>`}</div>
-    </section>`;
+  return `<div class="gx-rec-tools">${chips}</div>
+    ${cards ? `<div class="gx-rcards">${cards}</div>` : `<p class="gx-wt-empty">${empty}</p>`}`;
 }
 
 // ── 보고서 페이지 ──

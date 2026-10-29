@@ -238,7 +238,7 @@ async function seen(page, where) {
     if (who) { await who.click(); await page.waitForTimeout(200); await audit(page, errors, '인물 기록 상세'); total++; }
   }
   await page.click('[data-action="rec-sub"][data-value="factions"]'); await page.waitForTimeout(150); await audit(page, errors, '기록 세력'); total++;
-  await page.click('.gx-nav-brand .gx-id-wallet'); await page.waitForFunction(() => document.querySelector('.gx')?.dataset.tab === 'wallet'); await audit(page, errors, '가계부'); await seen(page, '가계부'); total++;
+  await page.click('.gx-nav-brand .gx-wallet'); await page.waitForFunction(() => document.querySelector('.gx')?.dataset.tab === 'wallet'); await audit(page, errors, '가계부'); await seen(page, '가계부'); total++;
   await tab('field'); await audit(page, errors, '필드'); total++;
   // 설정 창: 인물 기록·괴담넷·괴담톡 설정 페이지와 세계 편집 트리 (명부 이름 등)
   await page.click('.gx-nav .gx-nb.desk[data-action="ed-open"]');

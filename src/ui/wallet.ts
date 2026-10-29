@@ -132,22 +132,17 @@ export function walletTab(ctx: ChatContext): string {
     ? `<div class="gx-wt-edit"><input type="text" name="wt-adj" inputmode="numeric" placeholder="예: 1,200,000 또는 120만" aria-label="잔고를 이 값으로" data-enter="wallet-adj"><button class="gx-mini" data-action="wallet-adj" data-take="wt-adj">저장</button><button class="gx-mini" data-action="wallet-edit">취소</button></div>`
     : '';
   return `<main class="gx-body gx-wallettab">
-    <section class="gx-wt-tiles">
-      <div class="gx-wt-tile bal">
-        <small>잔고</small>
-        <div class="gx-wt-balrow"><b>${esc(formatWon(balance))}</b>${editable ? `<button class="gx-wt-pen" data-action="wallet-edit" aria-label="잔고 고치기" title="잔고 고치기">${ICONS.pen}</button>` : ''}</div>
-        ${edit}
-        <span class="gx-wt-sub">시작 ${esc(formatWon(start))} · 거래 ${rows.length}건</span>
+    <section class="gx-mon gx-wt-tiles">
+      <div class="gx-mon-osd"><span><span class="gx-mon-tag live"><i></i>LEDGER</span><span class="gx-mon-title">가계부</span></span>${today ? `<span>${esc(today)}</span>` : ''}</div>
+      <div class="gx-mon-cells">
+        <div class="gx-mon-cell gx-wt-tile bal"><small>BALANCE · 잔고</small><div class="gx-wt-balrow"><b class="mint">${esc(formatWon(balance))}</b>${editable ? `<button class="gx-wt-pen" data-action="wallet-edit" aria-label="잔고 고치기" title="잔고 고치기">${ICONS.pen}</button>` : ''}</div>${edit}<span>시작 ${esc(formatWon(start))} · 거래 ${rows.length}건</span></div>
+        <div class="gx-mon-cell gx-wt-tile"><small>INCOME · 수입</small><b class="mint">+${esc(income.toLocaleString('en-US'))}</b><span>${inN}건</span></div>
+        <div class="gx-mon-cell gx-wt-tile"><small>SPEND · 지출</small><b class="red">${spend ? `−${esc(Math.abs(spend).toLocaleString('en-US'))}` : '0'}</b><span>${outN}건</span></div>
+        <div class="gx-mon-cell gx-wt-tile"><small>TODAY${today ? ` · ${esc(shortDay(today))}` : ''}</small><b class="${todayNet < 0 ? 'red' : todayNet > 0 ? 'mint' : ''}">${esc(formatDelta(todayNet) || '0')}</b><span>${todayRows.length}건</span></div>
       </div>
-      <div class="gx-wt-tile"><small>수입</small><b class="in">+${esc(income.toLocaleString('en-US'))}</b><span class="gx-wt-sub">${inN}건</span></div>
-      <div class="gx-wt-tile"><small>지출</small><b class="out">${spend ? `−${esc(Math.abs(spend).toLocaleString('en-US'))}` : '0'}</b><span class="gx-wt-sub">${outN}건</span></div>
-      <div class="gx-wt-tile"><small>오늘${today ? ` · ${esc(shortDay(today))}` : ''}</small><b class="${todayNet < 0 ? 'out' : todayNet > 0 ? 'in' : ''}">${esc(formatDelta(todayNet) || '0')}</b><span class="gx-wt-sub">${todayRows.length}건</span></div>
     </section>
     ${walletUi.notice ? `<div class="gx-err" role="alert">${esc(walletUi.notice)}</div>` : ''}
-    <section class="gx-card">
-      <header class="gx-card-head"><b>거래 내역</b><div class="gx-card-tools"><div class="gx-wt-chips">${chip('all', '전체')}${chip('in', '수입')}${chip('out', '지출')}</div>
-      <input class="gx-wt-q" type="search" data-input="wallet-q" value="${esc(walletUi.q)}" placeholder="찾기: 메모·근거" aria-label="거래 찾기"></div></header>
-      <div class="gx-card-body gx-wt-list">${walletList(ctx)}</div>
-    </section>
+    <div class="gx-rec-tools">${chip('all', '전체')}${chip('in', '수입')}${chip('out', '지출')}<input class="gx-wt-q" type="search" data-input="wallet-q" value="${esc(walletUi.q)}" placeholder="찾기: 메모·근거" aria-label="거래 찾기"></div>
+    <div class="gx-wt-list">${walletList(ctx)}</div>
   </main>`;
 }
