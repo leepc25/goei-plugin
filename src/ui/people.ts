@@ -264,7 +264,7 @@ function diagTable(ctx: ChatContext, keepRaw: boolean): string {
       ? r.stage === 'skip'
         ? `<span class="gx-badge wait">건너뜀 · ${esc(r.error ?? '')}</span>`
         : rep
-          ? `<span class="gx-badge live">반영 ${rep.applied.entries + rep.applied.cues + rep.applied.address + rep.applied.docs + rep.applied.suspicion + (rep.applied.taste ?? 0) + (rep.applied.openness ?? 0)}</span>${rep.dropped.length ? `<span class="gx-badge hot">버림 ${rep.dropped.length}</span>` : ''}${rep.held.length ? `<span class="gx-badge wait">보류 ${rep.held.length}</span>` : ''}`
+          ? `<span class="gx-badge live">반영 ${rep.applied.entries + rep.applied.cues + rep.applied.address + rep.applied.docs + rep.applied.suspicion + (rep.applied.taste ?? 0) + (rep.applied.openness ?? 0)}</span>${rep.applied.debriefs ? `<span class="gx-badge live">소감 ${rep.applied.debriefs}</span>` : ''}${rep.dropped.length ? `<span class="gx-badge hot">버림 ${rep.dropped.length}</span>` : ''}${rep.held.length ? `<span class="gx-badge wait">보류 ${rep.held.length}</span>` : ''}`
           : '<span class="gx-badge live">반영</span>'
       : `<span class="gx-badge bad">실패 · ${esc(r.stage ?? '')}</span><small class="pp-err">${esc(r.error ?? '')}</small>`;
     const sysText = r.system ?? '';
@@ -401,11 +401,11 @@ export function peopleHomeTile(ctx: ChatContext): string {
   const live = liveness(ctx.chat);
   const changed = changedPeople(store, ctx.chat, live).size;
   const sub = [count ? `${count}명` : '아직 없음', changed ? `바뀐 인물 ${changed}` : '', pending ? `등록 대기 ${pending}` : ''].filter(Boolean).join(' · ');
-  return `<button class="nw-tile k-pp" data-action="wiki-people"><span class="nw-tile-pics">${ICONS.group}</span><b>이 채팅의 인물${changed ? ' <i class="pp-dot" aria-label="변화 있음">●</i>' : ''}</b><small>${esc(sub)}</small></button>`;
+  return `<button class="nw-tile k-pp" data-action="rec-people"><span class="nw-tile-pics">${ICONS.group}</span><b>이 채팅의 인물${changed ? ' <i class="pp-dot" aria-label="변화 있음">●</i>' : ''}</b><small>${esc(sub)}</small></button>`;
 }
 
-function head(title: string, sub: string, right = ''): string {
-  return `<header class="ph-room-head"><button class="ph-tool ph-back" data-action="wiki-back" aria-label="뒤로">${ICONS.back}</button><div class="ph-room-title"><b>${esc(title)}</b>${sub ? `<small>${esc(sub)}</small>` : ''}</div>${right ? `<span class="ph-act">${right}</span>` : ''}</header>`;
+function head(title: string, sub: string, right = '', back = true): string {
+  return `<header class="ph-room-head${back ? '' : ' nw-noback'}">${back ? `<button class="ph-tool ph-back" data-action="rec-back" aria-label="뒤로">${ICONS.back}</button>` : ''}<div class="ph-room-title"><b>${esc(title)}</b>${sub ? `<small>${esc(sub)}</small>` : ''}</div>${right ? `<span class="ph-act">${right}</span>` : ''}</header>`;
 }
 
 const stageRange = (i: number) => `${i ? STAGES[i - 1].max + 1 : AFF_MIN}~${STAGES[i].max}`;
@@ -434,7 +434,7 @@ export function peopleListView(ctx: ChatContext): string {
     const facName = facs.some((f) => f.code === p.faction) ? '' : p.faction;
     const sd = seededOf(p);
     const sub = [facName ? `<span>${esc(facName)}</span>` : '', `<span title="이 인물이 주인공을 부르는 말과 말투">${esc(addr.toUser ? `「${addr.toUser}」 · ${addr.register}` : addr.register)}</span>`, `<span title="${esc(SEEDED_HELP[sd])}">${SEEDED_LABEL[sd]}</span>`].filter(Boolean).join(' · ');
-    return `<li class="ph-row"><button class="ph-main nw-row" data-action="wiki-person" data-value="${esc(p.name)}">
+    return `<li class="ph-row"><button class="ph-main nw-row" data-action="rec-person" data-value="${esc(p.name)}">
       <span class="ph-avatar nw-ava k-ag">${esc(p.name.slice(0, 1))}</span>
       <span class="ph-who"><span class="ph-who-top"><b>${esc(p.name)}${changed.has(p.name) ? ' <i class="pp-dot" title="마지막 갱신에서 바뀐 인물" aria-label="마지막 갱신에서 바뀜">●</i>' : ''}</b>${stageBadge(aff.value)}</span><small>${sub}</small></span></button></li>`;
   };
@@ -452,19 +452,35 @@ export function peopleListView(ctx: ChatContext): string {
     : '';
   const docsN = Object.values(store.docs).reduce((a, d) => a + liveEntries(d.entries, live).length, 0);
   const empty = !Object.keys(store.people).length && !pending.length ? '<div class="ph-blank"><p>아직 기록된 인물이 없어요.<br>본편에서 요원·인물이 등장하면 기록이 생겨요.</p></div>' : '';
-  return `<div class="ph-room nw-pane pp-pane">${head('이 채팅의 인물', `${Object.keys(store.people).length}명`, `<button class="ph-tool" data-action="wiki-docs" title="사건·장소·세력·물건" aria-label="기록 문서">${ICONS.book}</button>`)}
+  return `<div class="ph-room nw-pane pp-pane">${head('이 채팅의 인물', `${Object.keys(store.people).length}명`, `<button class="ph-tool" data-action="rec-docs" title="사건·장소·세력·물건" aria-label="기록 문서">${ICONS.book}</button>`, false)}
     <article class="nw-doc pp-doc">
       ${peopleUi.notice ? `<div class="gx-err" role="alert">${esc(peopleUi.notice)}</div>` : ''}
       ${updateBar(ctx)}
       ${pendingHtml}${sections}${empty}
-      ${factionSection(ctx, store, changes)}
-      ${docsN ? `<button class="gx-mini nw-more-btn" data-action="wiki-docs">${ICONS.book}사건·장소·세력·물건 기록 ${docsN}개</button>` : ''}
+      ${docsN ? `<button class="gx-mini nw-more-btn" data-action="rec-docs">${ICONS.book}사건·장소·세력·물건 기록 ${docsN}개</button>` : ''}
     </article>${toast('pp', peopleUi.info, (t) => {
       if (peopleUi.info === t) peopleUi.info = '';
     })}</div>`;
 }
 
-/** 세력 평판 절 (인물 목록 아래): 아는 세력 전부, 값·구간·시작값 */
+/** 기록 탭 「세력」 하위 탭 (2026-10-29: 위키 안 인물 목록 아래 절에서 독립 화면으로): 아는 세력 전부, 값·구간·시작값 */
+export function factionListView(ctx: ChatContext): string {
+  const store = peopleStore(ctx.chat);
+  const live = liveness(ctx.chat);
+  const changes = liveChanges(store, live);
+  const s = peopleSettings(ctx.chat.scriptstate);
+  const names = Object.fromEntries(factionList(ctx.char.globalLore).map((f) => [f.code, f.name]));
+  const n = s.features.has('faction_rep') ? knownFactionCodes(store, names).length : 0;
+  const body = s.features.has('faction_rep')
+    ? factionSection(ctx, store, changes) || '<div class="ph-blank"><p>아직 평판이 기록된 세력이 없어요.</p></div>'
+    : '<div class="ph-blank"><p>세력 평판 기능이 꺼져 있어요.<br>설정 → 인물 기록 → 기능에서 「세력 평판」을 켜면 여기에 쌓여요.</p></div>';
+  return `<div class="ph-room nw-pane pp-pane">${head('세력', n ? `${n}곳` : '', '', false)}
+    <article class="nw-doc pp-doc">${peopleUi.notice ? `<div class="gx-err" role="alert">${esc(peopleUi.notice)}</div>` : ''}${body}</article>${toast('pp', peopleUi.info, (t) => {
+      if (peopleUi.info === t) peopleUi.info = '';
+    })}</div>`;
+}
+
+/** 세력 평판 절: 아는 세력 전부, 값·구간·시작값 */
 function factionSection(ctx: ChatContext, store: PeopleStore, changes: Change[]): string {
   const s = peopleSettings(ctx.chat.scriptstate);
   if (!s.features.has('faction_rep')) return '';
@@ -473,7 +489,7 @@ function factionSection(ctx: ChatContext, store: PeopleStore, changes: Change[])
   const rows = knownFactionCodes(store, names).map((code) => {
     const f = factionNow(store, code, changes, uf, s, names);
     const mine = store.log.filter((c) => c.who === factionWho(code)).length;
-    return `<li class="ph-row"><button class="ph-main nw-row" data-action="wiki-faction" data-value="${esc(code)}">
+    return `<li class="ph-row"><button class="ph-main nw-row" data-action="rec-faction" data-value="${esc(code)}">
       <span class="ph-avatar nw-ava k-fac">${esc(f.name.slice(0, 1))}</span>
       <span class="ph-who"><span class="ph-who-top"><b>${esc(f.name)}</b><span class="gx-badge fs-${f.stage.id}" title="${esc(f.stage.mob)}">${esc(f.stage.label)}</span></span><small>${f.value} · 시작값 ${f.base}${code === uf ? ' · 주인공 소속' : ''}${mine ? ` · 기록 ${mine}` : ''}</small></span></button></li>`;
   }).join('');

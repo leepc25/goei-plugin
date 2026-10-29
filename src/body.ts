@@ -1,5 +1,5 @@
 import { clearUnsent, unsentShown } from './host/unsent';
-import { refreshStatusContext, renderStatus, setWikiOpener } from './host/statusview';
+import { chatCardsAt, refreshStatusContext, renderStatus, setRecordsOpener, setWikiOpener } from './host/statusview';
 import { openingShown, refreshOpeningHint, setOpeningHint, setRepickOpener, wantsOpeningHint } from './host/openinghint';
 import { hasStatusTag } from './core/world';
 import { isUnsent, renderStartCards, renderUnsentMark, START_MARK, stripStartCard, stripUnsentMark, UNSENT_MARK } from './core/dispatch';
@@ -39,7 +39,7 @@ import { cardPalette as themedCardPalette, currentTheme, onThemeChange, repaintT
 import { hasImgTag, IMG_RECENT, imgTagsKnown, renderImgTags, setImgHidden, stripOldImgTags } from './core/imgtag';
 import { loadModuleAssets, modulePicker } from './host/assets';
 import { getPrefs } from './core/settings';
-import { openApp, openInstall, openWiki } from './ui/app';
+import { openApp, openInstall, openRecords, openWiki } from './ui/app';
 import { isGoeiLore } from './core/install';
 import { loadStoredTokenizer, loadStoredWikiPack } from './host/install';
 import { loadWorldData } from './host/datapack';
@@ -454,6 +454,11 @@ async function onOutput(arg: { char: unknown; chat: unknown; characterIndex: num
         return vars ? { ...cur, scriptstate: { ...(cur.scriptstate ?? {}), ...vars } } : null;
       })) ?? now;
     }
+    // 상태창 「지난 장면」 목록·보고서 카드 열쇠 표를 새 응답까지 넣어 **먼저** 다시 모은다 (인물 기록 갱신을 기다리기 전에).
+    // 저장 직후 Risu 가 메시지를 다시 그릴 때 카드 열쇠 표가 비어 있으면 종료 응답 아래 보고서 카드가 안 나오고 다음 저장까지 기다려야 했다
+    await refreshStatusContext(arg.characterIndex, arg.chatIndex, { char, chat: now }).catch(() => {});
+    // 이번 응답에서 종료된 사건의 카드가 있으면 채팅을 그대로 한 번 저장해 그 메시지를 다시 그리게 한다 (설정 변경 때와 같은 기법)
+    if (latest && chatCardsAt(now, arg.messageIndex).length) now = (await updateChat(arg.characterIndex, arg.chatIndex, (cur) => ({ ...cur })).catch(() => null)) ?? now;
     // 다음 요청에 넣을 로어북을 미리 골라 둔다 (다시 굴리기·자동 전송은 입력 처리를 거치지 않는다)
     await storeLore(arg.characterIndex, arg.chatIndex, undefined, { char, chat: now }).catch(() => {});
     // 막혔던 요청을 사용자가 전송 버튼으로 보냈으면 카드의 「전송을 눌러 주세요」·취소를 없앤다
@@ -464,7 +469,7 @@ async function onOutput(arg: { char: unknown; chat: unknown; characterIndex: num
       if (!peopleSettings(now.scriptstate).parallel) await pp;
     }
     // 보조모델 이미지 태그 보충 (설정이 보조모델일 때). 끝난 뒤 괴담톡 확인 (보조 모델을 겹쳐 부르지 않게)
-    // 상태창 「지난 장면」 목록을 새 응답까지 넣어 다시
+    // 상태창 「지난 장면」 목록을 인물 기록 갱신 뒤 상태로 한 번 더
     await refreshStatusContext(arg.characterIndex, arg.chatIndex, { char, chat: now }).catch(() => {});
     await supplementAssets({ charIndex: arg.characterIndex, chatIndex: arg.chatIndex, lore: char.globalLore, chat: now, messageIndex: arg.messageIndex });
     // 괴담톡 자동 새 메시지 확인 → 괴담넷 자동 새로고침 (설정이 켜져 있을 때, 같은 응답에는 한 번. 따로 부를 때는 겹치지 않게 차례로)
@@ -741,6 +746,7 @@ export async function start(o: { prompt?: boolean } = {}): Promise<BodyHandlers>
   assetsFirst = loadModuleAssets();
   void redrawAfterLoad();
   setWikiOpener((title) => void openWiki(title));
+  setRecordsOpener((id) => void openRecords(id));
   setRepickOpener(() => void openApp({ quietIfNotLite: true }));
   let stopWatcher: (() => void) | null = null;
   let fab: Fab | null = null;

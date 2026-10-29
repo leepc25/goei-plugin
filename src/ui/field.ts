@@ -11,6 +11,8 @@ import {
   type MissionKind, NATION_PINS, parseCatalog, readWorld, REGION_PINS, regionName, requestMission, rosterFor, SEALED_LOC,
   SIGUN, type WorldEvent, worldOn, worldVars, type WorldSettings, type WorldState, codesToNames, landmarkLoc, landmarksOf, placeWhere, prevWorldVars,
 } from '../core/world';
+import { buildClosures, journalSettings, recordVars } from '../core/journal';
+import { chatCardsAt, refreshStatusContext } from '../host/statusview';
 import { assetUrl } from '../host/assets';
 import { updateChat, type CharacterSnapshot, type ChatContext } from '../host/risu';
 import { noticeClass, sendNow } from '../host/send';
@@ -679,18 +681,45 @@ export function sendMission(ctx: ChatContext, env: FieldEnv, opening: boolean): 
   });
 }
 
+/** 손 종료의 기준 메시지: 마지막 봇 응답 (상태창·위치·카드 열쇠를 거기서 읽는다). 응답이 없으면 마지막 메시지 */
+function closeIndexOf(chat: Chat): number {
+  const list = chat.message ?? [];
+  for (let i = list.length - 1; i >= 0; i--) if (list[i].role === 'char') return i;
+  return Math.max(0, list.length - 1);
+}
+
 async function saveWorld(ctx: ChatContext, env: FieldEnv, change: (w: WorldState, x: Ctx) => string | null): Promise<void> {
   env.setBusy(true);
   env.setNotice('');
   try {
-    await updateChat(ctx.charIndex, ctx.chatIndex, (latest) => {
+    let closedAt = -1;
+    const saved = await updateChat(ctx.charIndex, ctx.chatIndex, (latest) => {
       const x = ctxOf(ctx, latest);
       const w = structuredClone(x.world);
       const err = change(w, x);
       if (err) throw new Error(err);
       const prev = prevWorldVars(latest.scriptstate, (p) => change(p, x));
-      return { ...latest, scriptstate: { ...(latest.scriptstate ?? {}), ...worldVars(w, x.catalog, x.settings, x.faction), ...prev } };
+      const next: Chat = { ...latest, scriptstate: { ...(latest.scriptstate ?? {}), ...worldVars(w, x.catalog, x.settings, x.faction), ...prev } };
+      // 손으로 끝낸 상황도 일지·보고서에 (core/journal). 기준은 마지막 봇 응답 (마지막이 유저 메시지면 상태창이 없어 카드 열쇠·위치가 비었다)
+      if (w.closed?.length) {
+        const index = closeIndexOf(latest);
+        const built = buildClosures({ chat: next, index, world: w, closed: w.closed, catalog: x.catalog, faction: x.faction, settings: journalSettings(latest.scriptstate) });
+        if (built.rows.length) {
+          next.scriptstate = { ...next.scriptstate, ...recordVars(built.journal, built.reports) };
+          closedAt = index;
+        }
+      }
+      return next;
     });
+    // 손 종료로 보고서가 생겼으면 채팅 카드 열쇠 표를 다시 모으고, 카드가 붙을 응답이 있으면 채팅을 그대로 한 번 저장해 다시 그리게 한다
+    if (saved && closedAt >= 0) {
+      try {
+        await refreshStatusContext(ctx.charIndex, ctx.chatIndex, { chat: saved, char: ctx.char });
+        if (chatCardsAt(saved, closedAt).length) await updateChat(ctx.charIndex, ctx.chatIndex, (cur) => ({ ...cur }));
+      } catch {
+        /* 다시 못 그려도 종료는 저장됐다 (다음 저장·채팅 전환 때 보인다) */
+      }
+    }
     env.setBusy(false);
     await env.refresh();
   } catch (error) {

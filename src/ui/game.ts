@@ -215,6 +215,9 @@ async function play(slot: SlotId): Promise<void> {
       hiddenSubs.add(cb);
       return () => void hiddenSubs.delete(cb);
     });
+    // 진단·시험용 (게임이 두는 __goeiEngine 처럼) 플러그인 쪽 다리 — 이 채팅의 변수 `$goei_diag` 가 '1' 일 때만 페이지 전역에 둔다.
+    // 다리는 채팅 저장(필드 장부·일지·보고서)을 열어 주므로 평소엔 노출하지 않는다 (2026-10-29 검토). 닫으면 지운다
+    if ((await loadContext().catch(() => null))?.chat.scriptstate?.$goei_diag === '1') (globalThis as { __goeiBridge?: unknown }).__goeiBridge = bridge;
     const t1 = performance.now();
     unmount = mod.mount(box, bridge);
     gameStats.mountMs = Math.round(performance.now() - t1);
@@ -235,6 +238,7 @@ function stop(): void {
   generation++;
   unmount?.();
   unmount = null;
+  delete (globalThis as { __goeiBridge?: unknown }).__goeiBridge;
   releaseAll();
   gameStats.heapAfter = heap();
 }
