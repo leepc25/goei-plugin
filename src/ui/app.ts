@@ -58,7 +58,7 @@ import { basicDefaults, basicVars, DIM_DEFAULT, getPrefs, worldDefaults, worldSe
 import { colConfig } from '../core/world/statuscols';
 import { adjustWallet, walletEditable, aliveAnchors, formatWon, parseWon, readWallet, removeWalletEntry, walletBalance, walletVars, WALLET_START_DEFAULT } from '../core/wallet';
 import { walletHeadButton, walletList, walletOn, walletTab, walletUi as walletTabUi } from './wallet';
-import { applyRecordsNav, closeNotice, endedReport, fieldSheet, handleRecords, journalList, rec, recordsInput, recordsMarkName, recordsNav, recordsTab, resetRecords, type RecordsEnv } from './records';
+import { applyRecordsNav, closeToastHtml, endedReport, holdToast, releaseToast, syncCloseToast, fieldSheet, handleRecords, journalList, rec, recordsInput, recordsMarkName, recordsNav, recordsTab, resetRecords, type RecordsEnv } from './records';
 import { onReport } from '../core/journal';
 
 /** ID카드 잔고 칩 → 장부 창 (열림·입력 알림) */
@@ -1120,6 +1120,8 @@ function render(): void {
   // 설정 창의 설정 페이지는 패널 상태를 그대로 보여 주므로 패널을 다시 그릴 때 같이 그린다 (2026-10-27)
   if (editorOpen() && editorOnSettings()) queueMicrotask(() => editorRender());
   const nav = view.kind === 'started';
+  // 종료 알림 오버레이: 새 보고서가 있으면 한 번 띄운다 (창이 닫혀 있었으면 지금, 이 그리기에서)
+  if (view.kind === 'started') syncCloseToast(view.ctx.chat, render);
   // 다시 그려도 읽던 자리를 지킨다
   const scroller = root.querySelector('.gx-body');
   const keep = scroller && root.dataset.tab === tab ? scroller.scrollTop : 0;
@@ -1157,6 +1159,11 @@ function render(): void {
     root.querySelector('.dir-row.open')?.scrollIntoView({ block: 'center' });
   }
   root.dataset.tab = tab;
+  const toastEl = root.querySelector<HTMLElement>('.gx-rectoast');
+  if (toastEl) {
+    toastEl.addEventListener('pointerenter', holdToast);
+    toastEl.addEventListener('pointerleave', () => releaseToast(render));
+  }
   if (focusSel) {
     const el = [...root.querySelectorAll<HTMLInputElement>(focusSel)].find((x) => x.offsetParent);
     if (el) {
@@ -1396,7 +1403,7 @@ function body(): string {
       </div>`;
     case 'started':
       evSeenReset();
-      return `${tabs()}${startedHeader(view.ctx)}<div class="gx-content">${tab === 'settings' ? '' : updateBanner(view.ctx)}${notice && tab !== 'map' && tab !== 'mission' ? `<div class="${noticeClass(notice)} gx-notice" role="alert">${esc(notice)}</div>` : ''}${startedBody(view.ctx)}</div>${evPopup(boardClock(view.ctx))}${tab === 'board' ? agentPopup((n) => view.kind === 'started' && hasPersonRecord(view.ctx, n)) : ''}${markPop(markOf(navState()), recentMarks())}`;
+      return `${tabs()}${startedHeader(view.ctx)}<div class="gx-content">${tab === 'settings' ? '' : updateBanner(view.ctx)}${notice && tab !== 'map' && tab !== 'mission' ? `<div class="${noticeClass(notice)} gx-notice" role="alert">${esc(notice)}</div>` : ''}${startedBody(view.ctx)}</div>${evPopup(boardClock(view.ctx))}${tab === 'board' ? agentPopup((n) => view.kind === 'started' && hasPersonRecord(view.ctx, n)) : ''}${markPop(markOf(navState()), recentMarks())}${closeToastHtml()}`;
     case 'opening':
       return `${header('커스텀 임무 · 첫 장면 고르기', '<button class="gx-x" data-action="repick" aria-label="시작 설정 다시 고르기">' + ICONS.back + '</button>')}<div class="gx-content">${missionTab(view.ctx, true, notice, busy)}</div>`;
     case 'picker':
@@ -1631,7 +1638,6 @@ function board(ctx: ChatContext): string {
   const counts = cnt('an', '괴이', live(w.an)) + cnt('in', '사건', live(w.inc)) + cnt('ms', '특수', live(w.ms));
   const clock = boardClock(ctx);
   return `<main class="gx-body gx-board">
-    ${closeNotice(ctx.chat)}
     ${opsBoard(cards, { mapUrl: boardMapUrl(ctx, env), clock, counts, empty: '지금 발생한 상황이 없어요.' })}
     ${agentPanel(agents, getPrefs().agents ?? 'wall', { total: roster.length, org: findFaction(faction, factionList(ctx.char.globalLore))?.affiliation ?? '', extra: promo, empty: limit === 0 ? '설정에서 요원 표시 인원을 0명으로 해 두었어요.' : '이 소속에는 요원 명단이 없어요.' })}
   </main>${boardDrawer()}`;

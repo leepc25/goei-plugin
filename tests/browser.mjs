@@ -2926,23 +2926,25 @@ if (fixture.globalLore.some(packed)) {
   assert.ok(endHtml.indexOf('data-goei-status') < endHtml.indexOf('data-goei-card="report"'), '상태창 상자 다음에');
   assert.ok(!(await disp(enterReply)).includes('data-goei-card="report"'), '종료가 없는 응답엔 카드 없음');
   assert.ok(!(await page.evaluate(() => window.__chat.message.at(-1).data)).includes('data-goei-card'), '메시지 본문은 그대로');
-  const reqCard = await page.evaluate((t) => window.__calls.replacers[0]([{ role: 'user', content: '시작' }, { role: 'assistant', content: t }, { role: 'user', content: '다음' }], 'model'), endReply);
-  assert.ok(!reqCard.some((m) => /사건 보고서|data-goei-card|기록에서 보기/.test(String(m.content))), '모델 요청에는 카드가 없다');
-  // 상황판: 종료 알림 한 줄 · 종료 줄 보고서 아이콘 · 큰 보기 보고서 단추 · 「기록에서 전부 보기 ›」 (창은 위키 탭에서 숨겼으니 상황판으로)
+  // 상황판: 종료 알림 오버레이(창을 연 지금 한 번) · 종료 줄 보고서 아이콘 · 큰 보기 보고서 단추 · 「기록에서 전부 보기 ›」 (창은 위키 탭에서 숨겼으니 상황판으로)
   await open(page);
   await page.click('.gx-nav .gx-nb:not(.mob)[data-value="board"]');
   await page.waitForSelector('.gx-board');
-  assert.ok((await page.textContent('.gx-board .gx-recnote')).includes('보고서가 기록에 저장됐어요'), '종료 알림');
+  assert.ok((await page.textContent('.gx-panel > .gx-rectoast')).includes('보고서가 기록에 저장됐어요'), '종료 알림 오버레이 (흐름 밖, 창 위)');
+  assert.equal(await page.locator('.gx-board .gx-rectoast, .gx-board .gx-recnote').count(), 0, '알림이 본문 흐름 안에 없다');
+  await page.hover('.gx-rectoast');
+  await page.waitForTimeout(6500); // TOAST_MS(6초) 보다 길게
+  assert.equal(await page.locator('.gx-rectoast').count(), 1, '마우스를 올린 동안은 사라지지 않는다');
   assert.equal(await page.locator(`.gx-oprow.ended .gx-oprpt[data-value="${rpt.id}"]`).count(), 1, '종료 줄 보고서 아이콘');
   assert.equal(await page.locator('.gx-oprow.ended .gx-minetag').count(), 1, '종료 줄 「내가 출동」');
   assert.equal(await page.locator(`.gx-opview [data-action="rec-open"][data-value="${rpt.id}"]`).count(), 1, '큰 보기 보고서 단추');
   assert.ok((await page.textContent('.gx-oplog-foot')).includes('기록에서 전부 보기'));
-  await page.click('.gx-recnote [data-action="rec-note-x"]');
-  assert.equal(await page.locator('.gx-recnote').count(), 0, '알림 닫힘');
+  await page.click('.gx-rectoast [data-action="rec-toast-x"]');
+  assert.equal(await page.locator('.gx-rectoast').count(), 0, '알림 닫힘');
   await page.click('.gx-nav .gx-nb:not(.mob)[data-value="map"]');
   await page.click('.gx-nav .gx-nb:not(.mob)[data-value="board"]');
   await page.waitForSelector('.gx-board');
-  assert.equal(await page.locator('.gx-recnote').count(), 0, '닫은 알림은 다시 안 뜸');
+  assert.equal(await page.locator('.gx-rectoast').count(), 0, '닫은 알림은 다시 안 뜸 (보고서마다 한 번)');
   // 종료 줄 아이콘 → 보고서 페이지 (창이 아니라 기록 탭 안)
   await page.click('.gx-oprow.ended .gx-oprpt');
   await page.waitForSelector('.gx-records .gx-rpt');
@@ -2989,6 +2991,9 @@ if (fixture.globalLore.some(packed)) {
   assert.ok((await page.textContent('.gx-rpt-debrief')).includes('직접 요청'));
   const ddiag = JSON.parse(await page.evaluate(() => window.__store['p:goei-people-diag'] ?? '[]'));
   assert.ok(ddiag.at(-1).reason === 'debrief' && ddiag.at(-1).ok, '진단에 debrief 1회');
+  // 모델 요청에는 카드가 없다 (요청 가공기를 직접 부르면 「응답 대기 중」이 켜져 그 뒤의 저장(소감 쓰기)이 응답을 기다리므로, 소감 뒤에 확인한다)
+  const reqCard = await page.evaluate((t) => window.__calls.replacers[0]([{ role: 'user', content: '시작' }, { role: 'assistant', content: t }, { role: 'user', content: '다음' }], 'model'), endReply);
+  assert.ok(!reqCard.some((m) => /사건 보고서|data-goei-card|기록에서 보기/.test(String(m.content))), '모델 요청에는 카드가 없다');
   // 고정 → 채팅 변수 pin, 다시 누르면 풀림
   await page.click('.gx-rpt [data-action="rec-pin"]');
   await page.waitForFunction((id) => JSON.parse(window.__chat.scriptstate.$goei_reports).items.find((r) => r.id === id)?.pin === true, rpt.id);
@@ -3060,11 +3065,11 @@ if (fixture.globalLore.some(packed)) {
       await page.waitForFunction(() => document.querySelector('.gx-records .pp-pane .ph-room-title')?.textContent?.includes('이 채팅의 인물'));
     }
   }
-  // 설정 「기록」 묶음: 다섯 항목, 값은 이 채팅 변수 $jr_*, 기본값으로 저장 범위
+  // 설정 「기록」 묶음: 네 항목(일지 컨텍스트 설정은 2026-10-29 사용자 결정으로 뺌), 값은 이 채팅 변수 $jr_*, 기본값으로 저장 범위
   await edOpen(page, 'set:journal');
   await page.waitForSelector('.gw .gw-setbody');
   const st = await page.textContent('.gw .gw-setbody');
-  for (const t of ['채팅에 보고서 표시', '안 띄움', '내가 출동한 사건만', '전부', '일지를 본편 요청에 참고로 넣기', '소감 자동', '일지 상한', '보고서 상한']) assert.ok(st.includes(t), `기록 설정: ${t}`);
+  for (const t of ['채팅에 보고서 표시', '안 띄움', '내가 출동한 사건만', '전부', '소감 자동', '일지 상한', '보고서 상한']) assert.ok(st.includes(t), `기록 설정: ${t}`);
   assert.equal(await page.locator('.gw .gw-head [data-action="set-bar"]').count(), 2, '머리의 기본값으로 저장·불러오기');
   // 채팅에 보고서 표시 3단계: 끄면 이미 그려진 카드도 사라지고(열쇠 표 비움 + 채팅 그대로 다시 저장), 「전부」면 요원 처리 보고서도, 「내가 출동한 사건만」이면 그것만
   const saves0 = await page.evaluate(() => window.__calls.setChat.length);
@@ -3085,11 +3090,7 @@ if (fixture.globalLore.some(packed)) {
   assert.ok(mineHtml.split('data-goei-card="report"').length - 1 === 1 && mineHtml.includes(`data-goei-rec="${rpt.id}"`) && !mineHtml.includes('rbgqc'), '내가 출동한 사건만: 카드 하나');
   await page.click('.gw [data-action="jr-set"][data-value="chat_card=off"]');
   await page.waitForFunction(() => window.__chat.scriptstate.$jr_chat_card === 'off');
-  await page.click('.gw [data-action="jr-set"][data-value="ctx=1"]');
-  await page.waitForFunction(() => window.__chat.scriptstate.$jr_ctx === '10');
-  await page.waitForSelector('.gw [data-action="jr-step"][data-value="ctx:+"]');
-  await page.click('.gw [data-action="jr-step"][data-value="ctx:+"]');
-  await page.waitForFunction(() => window.__chat.scriptstate.$jr_ctx === '11');
+  assert.ok(!st.includes('참고로 넣기') && !(await page.$('.gw [data-action="jr-set"][data-value^="ctx="]')), '일지 컨텍스트 설정은 없다');
   await page.click('.gw [data-action="jr-step"][data-value="journal_cap:-"]');
   await page.waitForFunction(() => window.__chat.scriptstate.$jr_journal_cap === '400');
   await page.click('.gw [data-action="jr-step"][data-value="report_cap:+"]');

@@ -4,7 +4,7 @@ import assert from 'node:assert/strict';
 import {
   parseCatalog, DEFAULT_SETTINGS, applyOutput, bootstrap, parseWorld, serializeWorld, endEvent, activeEvents, processOutput, startWorldVars, readWorld, locName,
   TRAIL_CAP, buildClosures, readJournal, readReports, rewindClosures, trimJournal, trimReports, pinReport, recordVars, journalSettings, JR, JR_DEFAULTS,
-  journalBlock, withJournal, JOURNAL_HEAD, journalLine, mineReasons, periodOf, parseAgents, settings,
+  journalLine, mineReasons, periodOf, parseAgents, settings,
 } from '../dist-test/core.mjs';
 // 묶음 3: PNG 카드(순수 그리기)·소감 검사·저장
 import { paintReport, wrapText, PNG_W, PNG_H, validateDebrief, withDebriefs, endedInBatch, endedNowOf, DEBRIEF_PROMPT, emptyReports } from '../dist-test/core.mjs';
@@ -357,41 +357,14 @@ test('상한 설정대로 조립 때 잘린다', () => {
 
 test('기록 설정: 기본값·경계값·글자', () => {
   const d = journalSettings(undefined);
-  assert.deepEqual(d, { chatCard: 'mine', ctx: 0, debriefAuto: true, journalCap: 500, reportCap: 100 });
+  assert.deepEqual(d, { chatCard: 'mine', debriefAuto: true, journalCap: 500, reportCap: 100 });
   assert.equal(JR_DEFAULTS.chat_card, 'mine');
-  const s = journalSettings({ [JR('chat_card')]: 'off', [JR('ctx')]: '999', [JR('debrief_auto')]: '0', [JR('journal_cap')]: '-5', [JR('report_cap')]: 'abc' });
-  assert.deepEqual(s, { chatCard: 'off', ctx: 50, debriefAuto: false, journalCap: 100, reportCap: 100 });
+  const s = journalSettings({ [JR('chat_card')]: 'off', [JR('debrief_auto')]: '0', [JR('journal_cap')]: '-5', [JR('report_cap')]: 'abc' });
+  assert.deepEqual(s, { chatCard: 'off', debriefAuto: false, journalCap: 100, reportCap: 100 });
   assert.equal(journalSettings({ [JR('chat_card')]: 'all' }).chatCard, 'all');
   assert.equal(journalSettings({ [JR('chat_card')]: 'weird' }).chatCard, 'mine');
-  assert.equal(journalSettings({ [JR('ctx')]: '0' }).ctx, 0, '0 은 고른 값(끔)');
-  assert.equal(journalSettings({ [JR('ctx')]: '7.9' }).ctx, 7);
-  for (const k of ['$jr_chat_card', '$jr_ctx', '$jr_debrief_auto', '$jr_journal_cap', '$jr_report_cap']) assert.ok(settings.PREF_VAR.test(k), `${k} 는 「기본값으로 저장」 범위`);
+  for (const k of ['$jr_chat_card', '$jr_debrief_auto', '$jr_journal_cap', '$jr_report_cap']) assert.ok(settings.PREF_VAR.test(k), `${k} 는 「기본값으로 저장」 범위`);
   assert.ok(!settings.PREF_VAR.test('$goei_journal'), '기록 자체는 설정이 아니다');
-});
-
-// ── 컨텍스트 끼우기 ──
-
-test('일지 컨텍스트: 끔이면 요청 그대로, 켜면 최근 N건 한 줄씩을 마지막 사용자 메시지 앞 system 블록으로', () => {
-  const chat = play(MINE_TURNS);
-  const rows = [...readJournal(chat).rows, fakeRow(9, { name: '둘째 {{사건}} %%', mine: false, at: 60 * 24 * 10, agents: [{ id: '', name: '외부인', st: '' }] })];
-  const msgs = [{ role: 'system', content: '지침' }, { role: 'user', content: '첫 말' }, { role: 'assistant', content: '응답' }, { role: 'user', content: '다음 행동' }];
-  assert.deepEqual(withJournal(msgs, chat), msgs, '기본(끔)이면 아무것도 안 넣는다');
-  assert.equal(journalBlock(rows, 0), '');
-  assert.equal(journalBlock([], 5), '');
-  const on = { ...chat, scriptstate: { ...chat.scriptstate, ...recordVars({ v: 1, rows }, { v: 1, items: [] }), [JR('ctx')]: '1' } };
-  const out = withJournal(msgs, on);
-  assert.equal(out.length, 5);
-  assert.equal(out[3].role, 'system');
-  assert.equal(out[4].content, '다음 행동');
-  assert.ok(out[3].content.startsWith(`${JOURNAL_HEAD} 최근 1건`), out[3].content);
-  assert.ok(out[3].content.includes('둘째 ｛｛사건｝｝ ％％'), '템플릿 기호는 막는다');
-  assert.ok(!out[3].content.includes('관리국 본부'), 'N=1 이면 최근 한 줄만');
-  const two = journalBlock(rows, 5).split('\n');
-  assert.equal(two.length, 3, '머리 + 2줄 (N 이 줄 수보다 커도 있는 만큼)');
-  assert.equal(two[1], '- 01.01 12:30 · 사건 관리국 본부 · 서울특별시 종로구 · 투입 쟈알디·스팡달 · 복구 완료 (내가 출동)');
-  assert.equal(two[2], '- 01.11 00:00 · 사건 둘째 ｛｛사건｝｝ ％％ · 서울특별시 종로구 · 투입 외부인 · 처리 완료');
-  // 채팅 메시지는 손대지 않는다
-  assert.equal(on.message.length, chat.message.length);
 });
 
 // ── 묶음 3: PNG 카드 (core/journal/png.ts 순수 그리기) ──

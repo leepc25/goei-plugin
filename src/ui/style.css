@@ -2934,14 +2934,16 @@ button.mk-go:hover { color: var(--signal); }
 .gx-oplog-foot small { font-size: 12px; }
 .gx-oplog-foot button { padding: 6px 10px; border: 0; border-radius: 8px; background: transparent; color: var(--signal); font: inherit; font-size: 12.5px; font-weight: 700; white-space: nowrap; cursor: pointer; }
 .gx-oplog-foot button:hover { background: var(--accent-bg); }
-.gx-recnote { display: flex; align-items: center; gap: 10px; margin: 0 0 12px; padding: 10px 12px 10px 14px; border: 1px solid var(--accent-line); border-radius: 12px; background: var(--accent-bg); color: var(--text); font-size: 14px; }
-.gx-recnote > span { flex: 1; min-width: 0; display: flex; align-items: center; gap: 8px; overflow: hidden; white-space: nowrap; }
-.gx-recnote > span svg { flex: none; width: 18px; height: 18px; color: var(--signal); }
-.gx-recnote > span b { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.gx-recnote .gx-mini { flex: none; }
-.gx-recnote-x { flex: none; display: grid; place-items: center; width: 30px; height: 30px; padding: 0; border: 0; border-radius: 8px; background: transparent; color: var(--dim); cursor: pointer; }
-.gx-recnote-x svg { width: 16px; height: 16px; }
-.gx-board > .gx-recnote { margin-top: 0; }
+/* 종료 알림 오버레이 (2026-10-29): 창 머리 아래 가운데, 흐름 밖. 6초 뒤 사라짐·마우스 올리면 멈춤·X 닫기 (ui/records.ts 종료 알림 절) */
+.gx-rectoast { position: absolute; left: 50%; top: 74px; transform: translateX(-50%); z-index: 45; display: flex; align-items: center; gap: 10px; width: max-content; max-width: min(92%, 560px); padding: 10px 8px 10px 14px; border: 1px solid var(--accent-line); border-radius: 12px; background: var(--void); background-image: linear-gradient(var(--accent-bg), var(--accent-bg)); color: var(--text); font-size: 14px; box-shadow: var(--shadow); animation: gx-rectoast-in .22s ease-out; }
+@keyframes gx-rectoast-in { from { opacity: 0; transform: translate(-50%, -8px); } to { opacity: 1; transform: translate(-50%, 0); } }
+.gx-rectoast > span { flex: 1; min-width: 0; display: flex; align-items: center; gap: 8px; overflow: hidden; white-space: nowrap; }
+.gx-rectoast > span svg { flex: none; width: 18px; height: 18px; color: var(--signal); }
+.gx-rectoast > span b { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.gx-rectoast .gx-mini { flex: none; }
+.gx-rectoast-x { flex: none; display: grid; place-items: center; width: 30px; height: 30px; padding: 0; border: 0; border-radius: 8px; background: transparent; color: var(--dim); cursor: pointer; }
+.gx-rectoast-x:hover { color: var(--text); background: color-mix(in srgb, var(--sub) 12%, transparent); }
+.gx-rectoast-x svg { width: 16px; height: 16px; }
 
 /* ── 기록 탭 (일지 · 보고서 · 인물 · 세력) ── */
 .gx-records { display: flex; flex-direction: column; gap: 14px; }
@@ -3063,7 +3065,7 @@ button.gx-jr-row:hover { background: color-mix(in srgb, var(--text) 4%, transpar
   .gx-records .gx-rpt-sec { padding: 12px 14px; }
   .gx-rpt-people li { flex-wrap: wrap; }
   .gx-rpt-people q { flex-basis: 100%; white-space: normal; }
-  .gx-recnote { gap: 6px; padding: 8px 8px 8px 12px; font-size: 13px; }
+  .gx-rectoast { top: 62px; gap: 6px; padding: 8px 6px 8px 12px; font-size: 13px; }
 }
 
 /* ── 기록 묶음 3 (2026-10-29): 보고서 PNG 미리보기 · 필드 출동 종료 시트 ── */

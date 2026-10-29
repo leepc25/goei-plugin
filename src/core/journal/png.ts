@@ -3,7 +3,7 @@
 // DOM(캔버스 만들기·글꼴 기다리기·그림 읽기·내려받기)은 ui/reportpng.ts.
 // 세로 예산 (전체 보고서, 요원 2명·경과 6줄·결과 3줄·소감 2줄): 머리 52 · 그림 188 · 제목 90 · 타일 84 · 경과 ≤192 · 요원 ≤84 · 결과 ≤106 · 소감 ≤84 · 인물|가계부 두 열 ≤140 → 1068 ≤ 1088 (바닥글 자리 전)
 import { locName } from '../world/geo';
-import { journalClock } from './ctx';
+import { journalClock } from './line';
 import { JOURNAL_KIND_LABEL, type Report } from './types';
 
 export const PNG_W = 900;

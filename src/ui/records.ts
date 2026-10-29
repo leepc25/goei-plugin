@@ -3,7 +3,7 @@
 // 인물·개인 기록·기록 문서·세력 화면은 위키에서 옮겨 왔다 (ui/people.ts 의 화면 함수 그대로, 동작 이름만 rec-*).
 // 설정 「기록」 묶음(journalSettingsPane)도 여기: 채팅에 보고서 표시 · 일지를 본편 요청에 · 소감 자동 · 일지 상한 · 보고서 상한 ($jr_*).
 import {
-  JOURNAL_KIND_LABEL, JR, JR_CTX_MAX, JR_CTX_ON_DEFAULT, JR_JOURNAL_CAP, JR_REPORT_CAP, journalClock, journalSettings, jrValue, pinReport, readJournal, readReports, reportVars,
+  JOURNAL_KIND_LABEL, JR, JR_JOURNAL_CAP, JR_REPORT_CAP, journalClock, journalSettings, jrValue, pinReport, readJournal, readReports, reportVars,
   type JournalKind, type JournalRow, type Report,
 } from '../core/journal';
 import { debriefRunning, requestDebrief } from '../host/journal';
@@ -34,7 +34,7 @@ export interface RecordsEnv {
   refresh(): Promise<void>;
 }
 
-/** 기록 탭 상태 (채팅이 바뀌면 resetRecords). dismissed = 이 세션에서 닫은 종료 알림의 보고서 id (채팅 변수에 쓰지 않는다) */
+/** 기록 탭 상태 (채팅이 바뀌면 resetRecords). toast = 지금 떠 있는 종료 알림(오버레이) */
 export const rec = {
   sub: 'journal' as RecSub,
   view: 'list' as RecView,
@@ -45,7 +45,7 @@ export const rec = {
   notice: '',
   info: '',
   busy: false,
-  dismissed: '',
+  toast: null as null | { rpt: string; name: string },
   /** 「이미지로 저장」 뒤 미리보기 (내려받기가 막힌 곳은 길게 눌러 저장) */
   png: null as null | { url: string; name: string; no: string },
   /** 필드 출동이 끝나 방금 생긴 보고서 id (필드 탭 위 시트). 닫거나 보고서를 열면 비운다 */
@@ -65,7 +65,8 @@ function dropPng(): void {
 
 export function resetRecords(): void {
   dropPng();
-  Object.assign(rec, { sub: 'journal', view: 'list', id: '', filter: 'all', q: '', rfilter: 'mine', notice: '', info: '', busy: false, dismissed: '', fieldReport: '' });
+  Object.assign(rec, { sub: 'journal', view: 'list', id: '', filter: 'all', q: '', rfilter: 'mine', notice: '', info: '', busy: false, fieldReport: '' });
+  closeToast();
 }
 
 /** 앞뒤 이동·즐겨찾기에 적는 위치 */
@@ -352,11 +353,12 @@ export function endedReport(chat: Chat, kind: JournalKind, name: string, loc: st
  * 「마지막 응답」 = anchor 가 마지막 봇 응답의 열쇠이거나, 그 뒤 메시지(손 종료·필드 종료는 유저 메시지가 기준일 수 있다)의 열쇠인 줄.
  * 번호(idx)로 비교하지 않는다 — 메시지를 지워 번호가 줄면 옛 종료가 「방금 저장됨」으로 되살아났다. 지워진 메시지의 anchor 는 자리가 없어 빠진다.
  */
-export function closeNotice(chat: Chat): string {
+/** 방금(마지막 응답에서) 종료돼 보고서가 생긴 「내가 출동한」 사건. 없으면 null */
+function closeHit(chat: Chat): { rpt: string; name: string } | null {
   const list = Array.isArray(chat.message) ? chat.message : [];
   let last = -1;
   for (let i = list.length - 1; i >= 0; i--) if (list[i].role === 'char') { last = i; break; }
-  if (last < 0) return '';
+  if (last < 0) return null;
   const key = messageKey(list[last], last);
   const at = anchorPositions(chat);
   const recent = (anchor: string) => {
@@ -366,8 +368,47 @@ export function closeNotice(chat: Chat): string {
   };
   const rows = readJournal(chat).rows;
   const hit = [...rows].reverse().find((r) => r.mine && r.rpt && recent(r.anchor));
-  if (!hit || !hit.rpt || rec.dismissed === hit.rpt) return '';
-  return `<div class="gx-notice gx-recnote" role="status"><span>${ICONS.records}보고서가 기록에 저장됐어요 · <b>${esc(hit.name)}</b></span><button class="gx-mini" data-action="rec-open" data-value="${esc(hit.rpt)}">보기</button><button class="gx-recnote-x" data-action="rec-note-x" data-value="${esc(hit.rpt)}" aria-label="알림 닫기">${ICONS.close}</button></div>`;
+  return hit && hit.rpt ? { rpt: hit.rpt, name: hit.name } : null;
+}
+
+// ── 종료 알림 (오버레이, 2026-10-29 사용자 결정): 보고서마다 한 번만 — 창이 열려 있으면 종료된 그 자리에서, 닫혀 있었으면 다음에 열 때.
+// 흐름 안에 끼우지 않고 창 위에 띄운다. 6초 뒤 사라지고, 마우스를 올리면 멈추며, X 로 닫는다. 채팅 변수에는 쓰지 않는다 (이 세션 안에서 한 번)
+export const TOAST_MS = 6000;
+const noticed = new Set<string>();
+let toastTimer: ReturnType<typeof setTimeout> | null = null;
+
+function armToast(render: () => void): void {
+  holdToast();
+  toastTimer = setTimeout(() => {
+    toastTimer = null;
+    rec.toast = null;
+    render();
+  }, TOAST_MS);
+}
+/** 창을 그릴 때마다: 새로 종료된 보고서가 있고 아직 안 띄웠으면 띄운다 */
+export function syncCloseToast(chat: Chat, render: () => void): void {
+  const hit = closeHit(chat);
+  if (!hit || noticed.has(hit.rpt)) return;
+  noticed.add(hit.rpt);
+  rec.toast = hit;
+  armToast(render);
+}
+/** 마우스를 올린 동안 멈춤 */
+export function holdToast(): void {
+  if (toastTimer) clearTimeout(toastTimer);
+  toastTimer = null;
+}
+/** 마우스가 떠나면 다시 6초 */
+export function releaseToast(render: () => void): void {
+  if (rec.toast) armToast(render);
+}
+export function closeToast(): void {
+  holdToast();
+  rec.toast = null;
+}
+export function closeToastHtml(): string {
+  if (!rec.toast) return '';
+  return `<div class="gx-rectoast" role="status"><span>${ICONS.records}보고서가 기록에 저장됐어요 · <b>${esc(rec.toast.name)}</b></span><button class="gx-mini" data-action="rec-open" data-value="${esc(rec.toast.rpt)}">보기</button><button class="gx-rectoast-x" data-action="rec-toast-x" aria-label="알림 닫기">${ICONS.close}</button></div>`;
 }
 
 // ── 조작 ──
@@ -395,6 +436,7 @@ export async function handleRecords(action: string, value: string | undefined, c
       if (RFILTERS.some(([f]) => f === v)) rec.rfilter = v as ReportFilter;
       break;
     case 'rec-open':
+      closeToast();
       if (!readReports(ctx.chat).items.some((r) => r.id === v)) {
         rec.notice = '이 보고서는 상한에 밀려 지워졌거나 되감겨서 없어요.';
         break;
@@ -428,8 +470,8 @@ export async function handleRecords(action: string, value: string | undefined, c
       else Object.assign(rec, { sub: 'people', view: 'list', id: '' });
       resetPeopleUi();
       break;
-    case 'rec-note-x':
-      rec.dismissed = v;
+    case 'rec-toast-x':
+      closeToast();
       break;
     case 'rec-pin': {
       if (rec.busy || !v) return true;
@@ -528,10 +570,8 @@ function stepper(key: string, shown: string, canDown: boolean, canUp: boolean, l
 
 export function journalSettingsPane(ctx: ChatContext, canChat = true): string {
   const s = journalSettings(ctx.chat.scriptstate);
-  const ctxOn = s.ctx > 0;
   const rows = [
     row('채팅에 보고서 표시', seg('chat_card', s.chatCard, CHAT_CARD), '사건이 종료된 응답 아래에 보고서 카드를 띄워요. 보여 주기만 하고 본문·요청에는 들어가지 않아요. 끄면 이미 뜬 카드도 사라져요.'),
-    row('일지를 본편 요청에 참고로 넣기', `${seg('ctx', ctxOn ? '1' : '0', [['1', 'ON'], ['0', 'OFF']])}${ctxOn ? stepper('ctx', `최근 ${s.ctx}건`, s.ctx > 1, s.ctx < JR_CTX_MAX, '일지 건수') : ''}`, `끄면 모델은 일지를 모르고, 켜면 최근 N건을 한 줄씩 요청에만 끼워요 (채팅 메시지엔 안 넣음). 한 줄 ≈ 60자. 1~${JR_CTX_MAX}건.`),
     row('소감 자동', seg('debrief_auto', s.debriefAuto ? '1' : '0', [['1', 'ON'], ['0', 'OFF']]), '인물 기록 갱신기가 켜져 있을 때 그 호출에 「담당 요원 소감」 칸을 얹어요. 따로 부르지 않아요. 갱신기가 꺼져 있으면 보고서는 「소감 없음」.'),
     row('일지 상한', stepper('journal_cap', `${s.journalCap.toLocaleString('en-US')}줄`, s.journalCap > JR_JOURNAL_CAP.min, s.journalCap < JR_JOURNAL_CAP.max, '일지 상한'), `넘치면 오래된 줄부터 지워요 (${JR_JOURNAL_CAP.min.toLocaleString('en-US')}~${JR_JOURNAL_CAP.max.toLocaleString('en-US')}). 채팅 저장 크기에 더해져요.`),
     row('보고서 상한', stepper('report_cap', `${s.reportCap}건`, s.reportCap > JR_REPORT_CAP.min, s.reportCap < JR_REPORT_CAP.max, '보고서 상한'), `넘치면 오래된 보고서부터 지워요 (${JR_REPORT_CAP.min}~${JR_REPORT_CAP.max}). 고정한 보고서는 상한에 들지 않아요.`),
@@ -573,11 +613,8 @@ async function handleJournalSettings(action: string, v: string, ctx: ChatContext
     const key = v.slice(0, i);
     let val = v.slice(i + 1);
     if (key === 'chat_card') val = val === 'off' || val === 'all' ? val : 'mine';
-    else if (key === 'ctx') val = val === '0' ? '0' : String(Math.max(1, Math.min(JR_CTX_MAX, Number(val) || JR_CTX_ON_DEFAULT)));
     else if (key === 'debrief_auto') val = val === '0' ? '0' : '1';
     else return true;
-    // 켤 때 N 은 기본 10 (설계 5-11절)
-    if (key === 'ctx' && val !== '0' && v.slice(i + 1) === '1') val = String(JR_CTX_ON_DEFAULT);
     await setVars(ctx, env, { [JR(key)]: val });
     if (key === 'chat_card') {
       // 채팅 카드는 display 처리기가 그린다: 열쇠 표를 다시 모으고, 이미 그려진 메시지도 다시 그리게 채팅을 그대로 한 번 저장한다 (끄면 카드가 사라진다)
@@ -595,8 +632,7 @@ async function handleJournalSettings(action: string, v: string, ctx: ChatContext
     const s = journalSettings(ctx.chat.scriptstate);
     const dir = op === '+' ? 1 : -1;
     let next: number;
-    if (key === 'ctx') next = Math.max(1, Math.min(JR_CTX_MAX, s.ctx + dir));
-    else if (key === 'journal_cap') next = Math.max(JR_JOURNAL_CAP.min, Math.min(JR_JOURNAL_CAP.max, s.journalCap + dir * JR_JOURNAL_CAP.step));
+    if (key === 'journal_cap') next = Math.max(JR_JOURNAL_CAP.min, Math.min(JR_JOURNAL_CAP.max, s.journalCap + dir * JR_JOURNAL_CAP.step));
     else if (key === 'report_cap') next = Math.max(JR_REPORT_CAP.min, Math.min(JR_REPORT_CAP.max, s.reportCap + dir * JR_REPORT_CAP.step));
     else return true;
     if (String(next) === jrValue(ctx.chat.scriptstate, key)) return true;
