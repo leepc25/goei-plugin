@@ -58,7 +58,7 @@ import { cropValue, setCrop, directoryExtList, directoryInput, directoryPhotoLis
 import { basicDefaults, basicVars, DIM_DEFAULT, getPrefs, worldDefaults, worldSettings, worldVarsOf, type Mark } from '../core/settings';
 import { colConfig } from '../core/world/statuscols';
 import { adjustWallet, walletEditable, aliveAnchors, formatWon, parseWon, readWallet, removeWalletEntry, walletBalance, walletVars, WALLET_START_DEFAULT } from '../core/wallet';
-import { walletHeadButton, walletList, walletOn, walletTab, walletUi as walletTabUi } from './wallet';
+import { walletHeadButton, walletList, walletTab, walletUi as walletTabUi } from './wallet';
 import { applyRecordsNav, closeToastHtml, endedReport, holdToast, releaseToast, syncCloseToast, fieldSheet, handleRecords, journalList, rec, recordsInput, recordsMarkName, recordsNav, recordsTab, resetRecords, type RecordsEnv } from './records';
 import { onReport } from '../core/journal';
 
