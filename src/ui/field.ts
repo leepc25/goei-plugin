@@ -520,7 +520,7 @@ export function missionList(ctx: ChatContext, opening = false): string {
         ${status ? `<span class="gx-evart-top">${status}</span>` : ''}<span class="gx-evart-cap">${cap}</span></button>${wikiBtn}</li>`;
     }
     // 선택은 카드 가운데 큰 과녁 (2026-10-29 사용자, evcard aimMark). 펼친 카드에만
-    const aim = sel ? aimMark(true, 'mission-unpick', '') : aimMark(false, 'mission-pick', val);
+    const aim = sel ? aimMark(true, 'mission-unpick', '', val) : aimMark(false, 'mission-pick', val);
     return `<li class="gx-ev gx-mx open${sel ? ' sel' : ''}"><div class="gx-mx-art k-${kind}${art.pic ? '' : ' none'}" data-action="mission-open" data-value="${val}"${bg}>
       ${aim}<span class="gx-evart-top">${status}<span class="gx-evart-act"><button class="gx-evbtn" data-action="mission-open" data-value="${val}" aria-label="접기" title="접기">${ICONS.up}</button>${wikiBtn}</span></span>
       <span class="gx-evart-cap">${capOpen('')}${art.desc ? `<span class="gx-evc-desc">${esc(art.desc)}</span>` : ''}</span></div></li>`;

@@ -140,11 +140,24 @@ export function targetMark(on: boolean, action: string, value: string, btn = fal
 
 /** 카드 가운데 선택 과녁 (2026-10-29 사용자: 제목 옆 작은 표식은 누르기 어렵고 눈에 안 띈다 → FPS 조준점처럼 크고 반투명하게, 누르면 잠금 효과).
  *  상황판 CCTV·임무 상세·커스텀 임무 카드가 같은 것을 쓴다. 안 고름: 흐린 조준점 「목표 지정」 / 고름: 민트 잠금 「목표」. 다시 누르면 해제 */
-export function aimMark(on: boolean, action: string, value: string): string {
+// 과녁 효과는 누른 그 과녁에만, 상태가 바뀐 첫 그리기에서 한 번 (창은 조작마다 통째로 다시 그려서, 안 막으면 매번 효과가 다시 돈다)
+const aimHit = { key: '', wasOn: false, used: true };
+if (typeof document !== 'undefined') {
+  document.addEventListener('pointerdown', (ev) => {
+    const b = (ev.target as HTMLElement | null)?.closest?.<HTMLElement>('.gx-aim');
+    if (b) Object.assign(aimHit, { key: b.dataset.key ?? '', wasOn: b.classList.contains('on'), used: false });
+  }, true);
+}
+
+/** 카드 가운데 선택 과녁 (2026-10-29 사용자). 글자 없음. 안 고름: 크고 얇고 흐린 조준선이 천천히 돌고 숨 쉰다.
+ *  고르면 같은 중심에서 2/3 크기로 조여들며 붉게 잠기고(퍼지는 고리·모서리 괄호·빛나는 점), 해제하면 흰 고리와 함께 다시 커진다.
+ *  key = 카드 열쇠 (해제 동작은 값이 비어 있어 따로 받는다) */
+export function aimMark(on: boolean, action: string, value: string, key = value): string {
   const label = on ? '해제' : '선택';
-  return `<button class="gx-aim${on ? ' on' : ''}" data-action="${action}" data-value="${esc(value)}" aria-pressed="${on}" title="${label}" aria-label="${label}">
-    <svg viewBox="0 0 100 100" aria-hidden="true"><circle class="burst" cx="50" cy="50" r="30"/><g class="rot"><circle class="orb" cx="50" cy="50" r="46"/><path class="tick" d="M50 1v6M50 93v6M1 50h6M93 50h6M15.4 15.4l4.2 4.2M80.4 80.4l4.2 4.2M84.6 15.4l-4.2 4.2M19.6 80.4l-4.2 4.2"/></g><circle class="halo" cx="50" cy="50" r="34"/><circle class="ring" cx="50" cy="50" r="34"/><path class="arm" d="M50 12v12M50 76v12M12 50h12M76 50h12"/><path class="brk" d="M32 24h-8v8M68 24h8v8M32 76h-8v-8M68 76h8v-8"/><circle class="dot" cx="50" cy="50" r="3.5"/></svg>
-    <span class="gx-aim-l">${on ? '해제' : '선택'}</span></button>`;
+  const fx = !aimHit.used && aimHit.key === key && aimHit.wasOn !== on;
+  if (fx) aimHit.used = true;
+  return `<button class="gx-aim${on ? ' on' : ''}${fx ? ' fx' : ''}" data-action="${action}" data-value="${esc(value)}" data-key="${esc(key)}" aria-pressed="${on}" title="${label}" aria-label="${label}">
+    <svg viewBox="0 0 100 100" aria-hidden="true"><circle class="burst" cx="50" cy="50" r="34"/><g class="rot"><circle class="orb" cx="50" cy="50" r="46"/><path class="tick" d="M50 2v5M50 93v5M2 50h5M93 50h5"/></g><circle class="ring" cx="50" cy="50" r="34"/><path class="arm" d="M50 14v14M50 72v14M14 50h14M72 50h14"/><path class="brk" d="M30 22h-8v8M70 22h8v8M30 78h-8v-8M70 78h8v-8"/><circle class="dot" cx="50" cy="50" r="1.6"/></svg></button>`;
 }
 
 /** 상세 창 (상황판·임무 탭 공통, 창 맨 위에 하나): 상황판 CCTV와 같은 화면·효과 (2026-10-21 사용자). 가로 600px, 세로는 상황판 CCTV 비율.
