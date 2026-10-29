@@ -102,3 +102,27 @@ test('새 보고서 알림: 구독자에게 전해지고 마지막 알림이 남
   assert.deepEqual(got, ['rX']);
   assert.equal(lastReportNotice().id, 'rY');
 });
+
+test('같은 출동의 종료를 새 id 로 다시 받아도 (플러그인 다리가 두 번 불림) 보고서는 하나: 앞 종료 사건을 건너뛰고 같은 투입에 닿는다', () => {
+  const enter = ev('e1', 'enter_anomaly', '작전 투입: 젖은 복도', T0, { visit: 'v1' });
+  const kill = ev('e2', 'kill', '그림자를 처치했다', T0 + 60_000, { visit: 'v1', who: ['에일린'] });
+  const exit1 = ev('x1', 'exit_anomaly', '작전 종료 (귀환): 젖은 복도, 처치 1, 부상 0', T0 + 5 * 60_000, { visit: 'v1' });
+  let chat = chatWith([enter, kill, exit1]);
+  const first = buildFieldReport({ chat, exit: exit1, player: '나', site: '관리국 본부', baseMinute: BASE, settings: S });
+  assert.ok(first.added);
+  chat = { ...chat, scriptstate: { ...chat.scriptstate, ...recordVars(first.journal, first.reports) } };
+  const exit2 = ev('x2', 'exit_anomaly', '작전 종료 (귀환): 젖은 복도, 처치 1, 부상 0', T0 + 6 * 60_000, { visit: 'v1' });
+  chat = withFieldEvent(chat, exit2);
+  const again = buildFieldReport({ chat, exit: exit2, player: '나', site: '관리국 본부', baseMinute: BASE, settings: S });
+  assert.equal(again.added, false, '같은 투입 → 같은 id → 더하지 않는다');
+  assert.equal(again.report.id, first.report.id);
+  assert.equal(readJournal(chat).rows.filter((r) => r.kind === 'fd').length, 1);
+  assert.deepEqual(first.report.trail.map((t) => t.text), ['작전 투입: 젖은 복도', '(처치) 그림자를 처치했다', '작전 종료 (귀환): 젖은 복도, 처치 1, 부상 0']);
+  // 새 투입 뒤의 종료는 새 출동
+  const enter2 = ev('e9', 'enter_anomaly', '작전 투입: 명일 아파트', T0 + 10 * 60_000, { visit: 'v1' });
+  const exit3 = ev('x3', 'exit_anomaly', '작전 종료 (철수): 명일 아파트, 처치 0, 부상 1', T0 + 15 * 60_000, { visit: 'v1' });
+  chat = withFieldEvent(withFieldEvent(chat, enter2), exit3);
+  const third = buildFieldReport({ chat, exit: exit3, player: '나', site: '관리국 본부', baseMinute: BASE, settings: S });
+  assert.ok(third.added && third.report.id !== first.report.id && third.report.head.name === '명일 아파트');
+  assert.deepEqual(third.report.trail.map((t) => t.text), ['작전 투입: 명일 아파트', '작전 종료 (철수): 명일 아파트, 처치 0, 부상 1'], '앞 출동의 사건·종료는 안 섞인다');
+});

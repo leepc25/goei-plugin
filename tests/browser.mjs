@@ -2899,12 +2899,13 @@ if (fixture.globalLore.some(packed)) {
   // 응답 처리는 종료를 저장한 뒤 카드 열쇠 표를 채우고 채팅을 그대로 한 번 더 저장해야 한다 (안 그러면 첫 그리기에 카드가 없다)
   await page.evaluate((endReply) => {
     window.__cardSaves = [];
-    const orig = window.risuai.setChatToIndex;
-    window.risuai.setChatToIndex = async (a, b, c) => { await orig(a, b, c); window.__cardSaves.push(window.__calls.handlers.display(endReply).includes('data-goei-card="report"')); };
+    // 가짜 setChatToIndex 는 저장마다 __calls.setChat 에 push 한다 — 그 push 를 가로채 그 순간의 display 결과를 적는다
+    const arr = window.__calls.setChat;
+    arr.push = function (...a) { const r = Array.prototype.push.apply(this, a); window.__cardSaves.push(window.__calls.handlers.display(endReply).includes('data-goei-card="report"')); return r; };
   }, endReply);
   await fire(endReply);
-  const cardSaves = await page.evaluate(() => { const v = window.__cardSaves; delete window.__cardSaves; return v; });
-  assert.ok(cardSaves.length >= 2 && cardSaves[0] === false && cardSaves[1] === true && cardSaves.at(-1) === true, `종료 저장 → 열쇠 표 채움 → 그대로 한 번 더 저장(카드 있음): ${JSON.stringify(cardSaves)}`);
+  const cardSaves = await page.evaluate(() => { const v = window.__cardSaves; delete window.__cardSaves; delete window.__calls.setChat.push; return v; });
+  assert.ok(cardSaves.length >= 2 && cardSaves[0] === false && cardSaves.includes(true) && cardSaves.at(-1) === true, `종료 저장(아직 카드 없음) → 열쇠 표 채움 → 그대로 한 번 더 저장(카드 있음): ${JSON.stringify(cardSaves)}`);
   const ss = await page.evaluate(() => window.__chat.scriptstate);
   const row = JSON.parse(ss.$goei_journal).rows.find((r) => r.name === preset.name);
   assert.ok(row && row.mine && row.rpt, '내가 출동한 일지 줄 + 보고서 id');

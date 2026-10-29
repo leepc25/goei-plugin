@@ -91,6 +91,8 @@ export function buildFieldReport(input: FieldBuildInput): FieldBuildResult | nul
   const exitEv = xi >= 0 ? events[xi] : exit;
   if (exitEv.kind !== 'exit_anomaly') return null;
   const sameRun = (e: FieldEvent) => e.anchor === exitEv.anchor && (!exitEv.visit || !e.visit || e.visit === exitEv.visit);
+  // 같은 방문의 마지막 투입(enter_anomaly)까지 거슬러 간다. 사이에 있는 다른 종료 사건은 같은 출동을 거듭 받은 것(새 id 로 와도)이라
+  // 건너뛴다 — 그래야 id 가 같아 한 번만 적힌다 (QC 2026-10-29: 두 번째 종료에서 멈춰 투입 없는 새 보고서가 생겼다)
   let ei = -1;
   for (let i = (xi >= 0 ? xi : events.length) - 1; i >= 0; i--) {
     const e = events[i];
@@ -99,10 +101,9 @@ export function buildFieldReport(input: FieldBuildInput): FieldBuildResult | nul
       ei = i;
       break;
     }
-    if (e.kind === 'exit_anomaly') break;
   }
   const enter = ei >= 0 ? events[ei] : null;
-  const between = (ei >= 0 ? events.slice(ei + 1, xi >= 0 ? xi : undefined) : []).filter(sameRun);
+  const between = (ei >= 0 ? events.slice(ei + 1, xi >= 0 ? xi : undefined) : []).filter((e) => sameRun(e) && e.kind !== 'exit_anomaly');
   const name = fieldLabel(enter?.text, exitEv.text);
   const since = input.baseMinute;
   const dur = enter ? Math.max(1, Math.round((exitEv.at - enter.at) / 60000)) : null;
