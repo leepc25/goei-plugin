@@ -1,0 +1,235 @@
+{
+ "frames": [
+  {
+   "filename": "x3-1-9-s2-scent-shot 0.png",
+   "frame": {
+    "x": 0,
+    "y": 0,
+    "w": 293,
+    "h": 152
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 293,
+    "h": 152
+   },
+   "sourceSize": {
+    "w": 293,
+    "h": 152
+   },
+   "pivot": {
+    "x": 0.757679180887372,
+    "y": 0.40131578947368424
+   },
+   "duration": 63
+  },
+  {
+   "filename": "x3-1-9-s2-scent-shot 1.png",
+   "frame": {
+    "x": 293,
+    "y": 0,
+    "w": 293,
+    "h": 152
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 293,
+    "h": 152
+   },
+   "sourceSize": {
+    "w": 293,
+    "h": 152
+   },
+   "pivot": {
+    "x": 0.757679180887372,
+    "y": 0.40131578947368424
+   },
+   "duration": 63
+  },
+  {
+   "filename": "x3-1-9-s2-scent-shot 2.png",
+   "frame": {
+    "x": 586,
+    "y": 0,
+    "w": 293,
+    "h": 152
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 293,
+    "h": 152
+   },
+   "sourceSize": {
+    "w": 293,
+    "h": 152
+   },
+   "pivot": {
+    "x": 0.757679180887372,
+    "y": 0.40131578947368424
+   },
+   "duration": 63
+  },
+  {
+   "filename": "x3-1-9-s2-scent-shot 3.png",
+   "frame": {
+    "x": 0,
+    "y": 152,
+    "w": 293,
+    "h": 152
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 293,
+    "h": 152
+   },
+   "sourceSize": {
+    "w": 293,
+    "h": 152
+   },
+   "pivot": {
+    "x": 0.757679180887372,
+    "y": 0.40131578947368424
+   },
+   "duration": 63
+  },
+  {
+   "filename": "x3-1-9-s2-scent-shot 4.png",
+   "frame": {
+    "x": 293,
+    "y": 152,
+    "w": 293,
+    "h": 152
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 293,
+    "h": 152
+   },
+   "sourceSize": {
+    "w": 293,
+    "h": 152
+   },
+   "pivot": {
+    "x": 0.757679180887372,
+    "y": 0.40131578947368424
+   },
+   "duration": 63
+  },
+  {
+   "filename": "x3-1-9-s2-scent-shot 5.png",
+   "frame": {
+    "x": 586,
+    "y": 152,
+    "w": 293,
+    "h": 152
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 293,
+    "h": 152
+   },
+   "sourceSize": {
+    "w": 293,
+    "h": 152
+   },
+   "pivot": {
+    "x": 0.757679180887372,
+    "y": 0.40131578947368424
+   },
+   "duration": 63
+  },
+  {
+   "filename": "x3-1-9-s2-scent-shot 6.png",
+   "frame": {
+    "x": 0,
+    "y": 304,
+    "w": 293,
+    "h": 152
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 293,
+    "h": 152
+   },
+   "sourceSize": {
+    "w": 293,
+    "h": 152
+   },
+   "pivot": {
+    "x": 0.757679180887372,
+    "y": 0.40131578947368424
+   },
+   "duration": 63
+  },
+  {
+   "filename": "x3-1-9-s2-scent-shot 7.png",
+   "frame": {
+    "x": 293,
+    "y": 304,
+    "w": 293,
+    "h": 152
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 293,
+    "h": 152
+   },
+   "sourceSize": {
+    "w": 293,
+    "h": 152
+   },
+   "pivot": {
+    "x": 0.757679180887372,
+    "y": 0.40131578947368424
+   },
+   "duration": 63
+  }
+ ],
+ "meta": {
+  "app": "PixelLab VFX Creator",
+  "image": "x3-1-9-s2-scent-shot.png",
+  "format": "RGBA8888",
+  "size": {
+   "w": 879,
+   "h": 456
+  },
+  "scale": "1",
+  "anchor": {
+   "kind": "origin",
+   "x": 222,
+   "y": 61
+  },
+  "frameTags": [
+   {
+    "name": "x3-1-9-s2-scent-shot",
+    "from": 0,
+    "to": 7,
+    "direction": "forward"
+   }
+  ]
+ }
+}

@@ -1702,5 +1702,93 @@
   "kind": "own",
   "mode": "center",
   "desc": "A big two-handed palm shove burst: a wide brown-orange wall of compressed air bursting forward with two palm-shaped bright cores, flying sweat drops and dust, pushing outward then fading. Medium: about one and a half character heights tall. Fast, 8 frames. Colors: warm brown, orange, tan, white droplets. A standalone effect, not attached to any hand or character. Size reference only: the given character. Pixel art effect, transparent background, crisp hard-edged pixels, no blur, no background scenery. Draw only the effect: no people, no character body or hands, no creatures, monsters, animals, faces, letters or numbers."
+ },
+ {
+  "name": "x3-1.12-S2-thread-rush",
+  "key": "1.12_콘쥬스",
+  "row": "전용(10-29)",
+  "kind": "own",
+  "mode": "center",
+  "desc": "A rushing charge impact: several taut pale threads whip forward into one point, then a burst of grey-brown dust explodes outward with pink speed streaks and snapped thread ends flying. Medium-large: about one and a half character heights wide. Fast, 8 frames. Colors: grey-brown dust, pale beige thread, pink streaks, white flash. A standalone effect, not attached to any hand or character. Size reference only: the given character. Pixel art effect, transparent background, crisp hard-edged pixels, no blur, no background scenery. Draw only the effect: no people, no character body or hands, no creatures, monsters, animals, faces, letters or numbers."
+ },
+ {
+  "name": "x3-1.3-S2-olive-combo",
+  "key": "1.3_잼트리",
+  "row": "전용(10-29)",
+  "kind": "own",
+  "mode": "center",
+  "desc": "A two-hit combo impact: a sharp olive green star flash, then a heavier round burst of yellow-green light with leaf-shaped shards scattering outward and a short shock ring. Medium: about one and a quarter character heights wide. Fast, 8 frames. Colors: olive green, yellow-green, white core. A standalone effect, not attached to any hand or character. Size reference only: the given character. Pixel art effect, transparent background, crisp hard-edged pixels, no blur, no background scenery. Draw only the effect: no people, no character body or hands, no creatures, monsters, animals, faces, letters or numbers."
+ },
+ {
+  "name": "x3-1.9-S2-scent-shot",
+  "key": "1.9_데드폴",
+  "row": "전용(10-29)",
+  "kind": "own",
+  "mode": "center",
+  "desc": "A tracking shot impact: a dark blue-violet scent trail curls in and converges on a point, then a sharp indigo burst with smoky wisps and blue sparks bursts out. Medium: about one and a quarter character heights wide. Fast, 8 frames. Colors: indigo blue, slate violet, grey smoke, white sparks. A standalone effect, not attached to any hand or character. Size reference only: the given character. Pixel art effect, transparent background, crisp hard-edged pixels, no blur, no background scenery. Draw only the effect: no people, no character body or hands, no creatures, monsters, animals, faces, letters or numbers."
+ },
+ {
+  "name": "x3-2.12-S2-grenade-blast",
+  "key": "2.12_윤병수",
+  "row": "전용(10-29)",
+  "kind": "own",
+  "mode": "bottom",
+  "desc": "A grenade explosion on the floor: a bright orange-white flash, a rolling fireball rising into dark grey smoke, metal fragments and burning debris flung outward, scorch marks on the ground. Large: about two character heights wide. 10 frames. Colors: orange, yellow, white flash, dark grey smoke, black debris. A standalone effect, not attached to any hand or character. Size reference only: the given character. Pixel art effect, transparent background, crisp hard-edged pixels, no blur, no background scenery. Draw only the effect: no people, no character body or hands, no creatures, monsters, animals, faces, letters or numbers."
+ },
+ {
+  "name": "x3-2.13-S2-scrap-crash",
+  "key": "2.13_김성진",
+  "row": "전용(10-29)",
+  "kind": "own",
+  "mode": "center",
+  "desc": "A shoulder-charge crash impact: scraps of junk metal, bolts and broken pieces burst outward from one point with a yellow-white flash and lime green sparks, a few pieces tumbling. Medium-large: about one and a half character heights wide. Fast, 8 frames. Colors: lime green, yellow, white flash, grey metal. A standalone effect, not attached to any hand or character. Size reference only: the given character. Pixel art effect, transparent background, crisp hard-edged pixels, no blur, no background scenery. Draw only the effect: no people, no character body or hands, no creatures, monsters, animals, faces, letters or numbers."
+ },
+ {
+  "name": "x3-2.2-S2-appraisal-crush",
+  "key": "2.2_도필헌",
+  "row": "전용(10-29)",
+  "kind": "own",
+  "mode": "center",
+  "desc": "A heavy appraising slam: a brass price-tag shaped glint flashes, then a crushing brass impact burst with gold sparks and tan dust bursting outward and a thick brass shock ring. Medium-large: about one and a half character heights wide. 8 frames. Colors: brass, gold, tan dust, white. A standalone effect, not attached to any hand or character. Size reference only: the given character. Pixel art effect, transparent background, crisp hard-edged pixels, no blur, no background scenery. Draw only the effect: no people, no character body or hands, no creatures, monsters, animals, faces, letters or numbers."
+ },
+ {
+  "name": "x3-3.11-S2-deal-seal",
+  "key": "3.11_강이학",
+  "row": "전용(10-29)",
+  "kind": "own",
+  "mode": "center",
+  "desc": "A deal-sealing strike: a burst of spinning gold coins converges and shatters in a bright golden flash, gold chains snapping outward and yellow glints raining. Medium-large: about one and a half character heights wide. 8 frames. Colors: gold, yellow, amber, white glints. A standalone effect, not attached to any hand or character. Size reference only: the given character. Pixel art effect, transparent background, crisp hard-edged pixels, no blur, no background scenery. Draw only the effect: no people, no character body or hands, no creatures, monsters, animals, faces, letters or numbers."
+ },
+ {
+  "name": "x3-3.12-S2-pillar-slam",
+  "key": "3.12_장허운",
+  "row": "전용(10-29)",
+  "kind": "own",
+  "mode": "bottom",
+  "desc": "A heavy stone pillar slam on the floor: a huge impact crack bursts across the ground, brown earth and grey stone chunks fly up, a wall of pale dust rolls outward. Large: about two character heights wide, low on the ground. 10 frames. Colors: brown earth, grey stone, pale dust, dark cracks. A standalone effect, not attached to any hand or character. Size reference only: the given character. Pixel art effect, transparent background, crisp hard-edged pixels, no blur, no background scenery. Draw only the effect: no people, no character body or hands, no creatures, monsters, animals, faces, letters or numbers."
+ },
+ {
+  "name": "x3-3.15-S2-express-stamp",
+  "key": "3.15_이병진",
+  "row": "전용(10-29)",
+  "kind": "own",
+  "mode": "center",
+  "desc": "An express rush strike: red speed lines converge to a point, then a sharp crimson burst shaped like a stamped seal with red and white sparks and fluttering paper scraps. Medium: about one and a quarter character heights wide. Fast, 8 frames. Colors: crimson red, light red, white, grey-beige paper. A standalone effect, not attached to any hand or character. Size reference only: the given character. Pixel art effect, transparent background, crisp hard-edged pixels, no blur, no background scenery. Draw only the effect: no people, no character body or hands, no creatures, monsters, animals, faces, letters or numbers."
+ },
+ {
+  "name": "x3-3.7-S2-chain-bind",
+  "key": "3.7_은하제",
+  "row": "전용(10-29)",
+  "kind": "own",
+  "mode": "center",
+  "desc": "A binding chain strike: grey steel chains whip in from both sides and lock around one point, then a cold pale-blue shock burst with chain links scattering outward. Medium-large: about one and a half character heights wide. 8 frames. Colors: steel grey, pale blue-white, dark grey, white. A standalone effect, not attached to any hand or character. Size reference only: the given character. Pixel art effect, transparent background, crisp hard-edged pixels, no blur, no background scenery. Draw only the effect: no people, no character body or hands, no creatures, monsters, animals, faces, letters or numbers."
+ },
+ {
+  "name": "x3-3.8-S2-door-slam",
+  "key": "3.8_박민성",
+  "row": "전용(10-29)",
+  "kind": "own",
+  "mode": "center",
+  "desc": "A door-slam impact: a flat rectangular shock flash like a heavy door slamming shut, then warm brown splinters and tan dust burst outward with a short flat shock wave. Medium-large: about one and a half character heights wide. 8 frames. Colors: warm brown, orange, tan, white. A standalone effect, not attached to any hand or character. Size reference only: the given character. Pixel art effect, transparent background, crisp hard-edged pixels, no blur, no background scenery. Draw only the effect: no people, no character body or hands, no creatures, monsters, animals, faces, letters or numbers."
  }
 ]
