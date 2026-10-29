@@ -260,7 +260,8 @@ async function runOnce(reason: string, o: { manual?: boolean; scope?: RunScope }
       const walletStart = getPrefs().walletStart ?? WALLET_START_DEFAULT;
       const balance = walletOn ? walletBalance(readWallet(fresh.chat.scriptstate, walletStart), aliveAnchors(fresh.chat)) : null;
       // 소감 (core/journal/debrief): 설정 「소감 자동」이 켜져 있고 이 묶음에서 종료된 사건(보고서)이 있으면 같은 호출에 얹는다. 다시 읽기(only)는 제외
-      const ended = journalSettings(fresh.chat.scriptstate).debriefAuto && !o.scope?.only ? endedInBatch(readReports(fresh.chat), batches[b]).map(endedNowOf) : [];
+      const batchKeys = batches[b].map((i) => (fresh.chat.message[i] ? messageKey(fresh.chat.message[i], i) : '')).filter(Boolean);
+      const ended = journalSettings(fresh.chat.scriptstate).debriefAuto && !o.scope?.only ? endedInBatch(readReports(fresh.chat), batchKeys).map(endedNowOf) : [];
       const input = buildUpdate(fresh.chat, curStore, batches[b], { settings, system: '', values: Object.fromEntries(input0Names(curStore).map((n) => [n, valuesOf(n)])), names: allNames(), exclude, factionNames: factionNamesOf(fresh.char.globalLore), only: o.scope?.only, wallet: balance, ended });
       // 지침은 자료를 본 뒤 조립한다 (저장 상한을 넘긴 인물이 있으면 정리 절을 켠다)
       const sections = enabledSections(settings);

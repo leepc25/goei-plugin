@@ -1536,7 +1536,9 @@ async function openReportPage(page, id) {
   await nav(page, 'records');
   await page.waitForSelector('.gx-records');
   await page.click('[data-action="rec-sub"][data-value="reports"]');
-  await page.click('[data-action="rec-rfilter"][data-value="all"]');
+  // 칩은 「내가 출동」·「요원 처리」 둘뿐 (사용자 결정) — 보고서가 어느 쪽인지 보고 고른다
+  const mine = await page.evaluate((id) => JSON.parse(window.__chat.scriptstate.$goei_reports).items.find((r) => r.id === id)?.mine, id);
+  await page.click(`[data-action="rec-rfilter"][data-value="${mine ? 'mine' : 'bg'}"]`);
   await page.click(`.gx-rcard[data-value="${id}"]`);
   await page.waitForSelector('.gx-rpt');
 }
@@ -1654,10 +1656,12 @@ if (want('J3')) {
   assert.ok(!call.messages[0].content.includes('15c.') && call.messages[0].content.includes('after-action'), '갱신기 전체 지침이 아니라 짧은 전용 지침');
   await page.waitForFunction(() => document.querySelector('.gx-rpt-debrief')?.textContent?.includes('스팡달 소감'));
   assert.ok((await page.textContent('.gx-rpt-debrief')).includes('직접 요청'));
-  // 깨진 응답 → 재시도 1회 뒤 실패 안내, 보고서의 소감은 그대로
-  await page.evaluate(() => { window.__llm = [{ type: 'success', result: '{"debriefs":[' }, { type: 'success', result: '아님' }]; });
+  // 깨진 응답 → 단추 옆 글대로 **1회**만 (재시도 없음) 실패 안내, 보고서의 소감은 그대로
+  await page.evaluate(() => { window.__llm = [{ type: 'success', result: '{"debriefs":[' }, { type: 'success', result: '{"debriefs":[{"id":"x","who":"y","text":"재시도가 있었다면 이게 갔다"}]}' }]; });
   await page.click('.gx-rpt [data-action="rec-debrief"]');
-  await page.waitForFunction((n) => (window.__calls.llm ?? []).length === n + 3, n0, { timeout: 15000 });
+  await page.waitForFunction((n) => (window.__calls.llm ?? []).length === n + 2, n0, { timeout: 15000 });
+  await wait(400);
+  assert.equal(await llmCount(page), n0 + 2, '깨진 응답에도 보조 모델은 1회만 (2회 아님)');
   await page.waitForSelector('.gx-records .gx-err');
   assert.ok((await page.textContent('.gx-records .gx-err')).includes('소감을 쓰지 못했어요'));
   assert.equal((await lastReport(page)).debrief.who, '스팡달', '있던 소감 그대로');

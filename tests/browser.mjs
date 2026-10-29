@@ -2895,12 +2895,23 @@ if (fixture.globalLore.some(packed)) {
   const enterReply = ['진입', `[AN|${where}|${preset.name}|활성|A|P001, P002|셔터 안쪽으로 진입했다]`, '[AG|P002|작전투입|현장]', `[▣|2025.01.01|03:30 AM|☀️|4°C|${where} 지하|${preset.name}]`].join('\n');
   const endReply = ['종료', `[AN|${where}|${preset.name}|격리|A|P001, P002|격리 완료. 현장 봉쇄 해제]`, '[AG|P001|휴게|사무실]', '[AG|P002|부상|병원]', '[▣|2025.01.01|04:11 AM|☀️|4°C|관리국 본부|없음]'].join('\n');
   await fire(enterReply);
+  // 저장마다(가짜 Risu setChatToIndex) 그 자리에서 display 처리기를 불러 본다 — 실제 Risu 가 저장 직후 메시지를 다시 그리는 시점을 흉내.
+  // 응답 처리는 종료를 저장한 뒤 카드 열쇠 표를 채우고 채팅을 그대로 한 번 더 저장해야 한다 (안 그러면 첫 그리기에 카드가 없다)
+  await page.evaluate((endReply) => {
+    window.__cardSaves = [];
+    const orig = window.risuai.setChatToIndex;
+    window.risuai.setChatToIndex = async (a, b, c) => { await orig(a, b, c); window.__cardSaves.push(window.__calls.handlers.display(endReply).includes('data-goei-card="report"')); };
+  }, endReply);
   await fire(endReply);
+  const cardSaves = await page.evaluate(() => { const v = window.__cardSaves; delete window.__cardSaves; return v; });
+  assert.ok(cardSaves.length >= 2 && cardSaves[0] === false && cardSaves[1] === true && cardSaves.at(-1) === true, `종료 저장 → 열쇠 표 채움 → 그대로 한 번 더 저장(카드 있음): ${JSON.stringify(cardSaves)}`);
   const ss = await page.evaluate(() => window.__chat.scriptstate);
   const row = JSON.parse(ss.$goei_journal).rows.find((r) => r.name === preset.name);
   assert.ok(row && row.mine && row.rpt, '내가 출동한 일지 줄 + 보고서 id');
   const rpt = JSON.parse(ss.$goei_reports).items.find((r) => r.id === row.rpt);
-  assert.ok(rpt && rpt.full && rpt.trail.length === 1 && rpt.trail[0].text.includes('셔터'), '전체 보고서 · 경과 1(진입)');
+  assert.ok(rpt && rpt.full && rpt.trail.length === 2 && rpt.trail[0].text.includes('셔터') && rpt.trail[1].text === '격리 완료. 현장 봉쇄 해제', '전체 보고서 · 경과 2(진입 → 종료 글)');
+  assert.equal(rpt.result, '격리 완료. 현장 봉쇄 해제', '결과 = 종료 태그의 상황 글');
+  assert.equal(row.result, rpt.result);
   // 채팅 본문 자동 표시 (묶음 3, 설정 기본 「내가 출동한 사건만」): display 처리기가 종료 응답의 상태창 아래에 보고서 카드를 그린다. 본문·모델 요청에는 아무것도 안 들어간다
   const disp = (t) => page.evaluate((t) => window.__calls.handlers.display(t), t);
   const endHtml = await disp(endReply);
@@ -2984,7 +2995,8 @@ if (fixture.globalLore.some(packed)) {
   assert.ok((await page.textContent('.gx-rcard')).includes('내가 출동') && (await page.textContent('.gx-rcard')).includes(rpt.no));
   await page.click('[data-action="rec-rfilter"][data-value="bg"]');
   assert.equal(await page.locator('.gx-rcard').count(), 0, '요원 처리 칩: 없음');
-  await page.click('[data-action="rec-rfilter"][data-value="all"]');
+  assert.equal(await page.locator('[data-action="rec-rfilter"]').count(), 2, '칩은 「내가 출동」·「요원 처리」 둘뿐 (「전체」 없음)');
+  await page.click('[data-action="rec-rfilter"][data-value="mine"]');
   assert.equal(await page.locator('.gx-rcard').count(), 1);
   // 일지 탭: 요약 타일·줄(노란 왼쪽 선)·필터·찾기(목록만 다시 그림, 포커스 유지)
   await page.click('[data-action="rec-sub"][data-value="journal"]');
@@ -3081,8 +3093,17 @@ if (fixture.globalLore.some(packed)) {
   await page.waitForFunction(() => JSON.parse(window.__store['p:goei:prefs'] ?? '{}').vars?.$jr_chat_card === 'off');
   assert.equal(JSON.parse(await page.evaluate(() => window.__store['p:goei:prefs'])).vars.$jr_report_cap, '110', '보고서 상한도 기본값에');
   await edClose(page);
-  // 폰(390×844): 기록 탭 일지·보고서·보고서 페이지·상황판 알림 줄에 가로 넘침 없음
+  // PC 에서는 머리의 기록 단추가 안 보인다 (옆 메뉴에 있으니)
+  assert.equal(await page.locator('.gx-head-act .gx-recbtn:visible').count(), 0, 'PC 머리엔 기록 단추 없음');
+  // 폰(390×844): 머리에 「기록」 입구(필드 단추처럼) · 기록 탭 일지·보고서·보고서 페이지·상황판 알림 줄에 가로 넘침 없음
   await page.setViewportSize({ width: 390, height: 844 });
+  await page.click(':is([data-action="tab"], [data-action="nav-tab"])[data-value="board"]:visible');
+  await page.waitForSelector('.gx-board');
+  assert.equal(await page.locator('.gx-head-act .gx-recbtn:visible').count(), 1, '폰 머리에 기록 단추');
+  await page.click('.gx-head-act .gx-recbtn');
+  await page.waitForSelector('.gx-records');
+  assert.equal(await tabNow(), 'records');
+  assert.equal(await page.locator('.gx-head-act .gx-recbtn.on').count(), 1, '기록 탭이면 켜진 모양');
   await page.click(':is([data-action="tab"], [data-action="nav-tab"])[data-value="board"]:visible');
   await page.waitForSelector('.gx-board');
   const noOverflow = async (where) => {

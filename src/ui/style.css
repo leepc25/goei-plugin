@@ -611,8 +611,8 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
   .gx-mclose.l { right: 100%; }
   .gx-mclose.r { left: 100%; }
   .gx-mclose.ready { color: #fff; background: var(--danger); }
-  /* 필드: 모바일은 머리 버튼 (PC는 옆 메뉴) */
-  .gx .gx-head-act .gx-fieldbtn { display: grid; }
+  /* 필드·기록: 모바일은 머리 버튼 (PC는 옆 메뉴. 기록은 아래 바 다섯 칸에 자리가 없어 머리로, 2026-10-29) */
+  .gx .gx-head-act .gx-fieldbtn, .gx .gx-head-act .gx-recbtn { display: grid; }
   .gx-facs { grid-template-columns: none; grid-auto-flow: column; grid-auto-columns: 82%; overflow-x: auto; scroll-snap-type: x mandatory; padding-bottom: 6px; scrollbar-width: none; }
   .gx-fac { scroll-snap-align: start; }
   .gx-fac.has-img { min-height: 188px; }
@@ -2624,7 +2624,7 @@ button.mk-go:hover { color: var(--signal); }
 @media (prefers-reduced-motion: reduce) { .gx-opview.feed.k-an::after { animation: none; } }
 
 /* 필드 (2026-10-23 사용자): 창 본문 자리 안에서만 돈다. 머리·메뉴는 그대로, 게임 자체 머리는 숨긴다 (나가기는 Esc 메뉴) */
-.gx-head-act .gx-fieldbtn { display: none; }
+.gx-head-act .gx-fieldbtn, .gx-head-act .gx-recbtn { display: none; }
 .gx-body.gx-fieldhost { position: relative; padding: 0; overflow: hidden; scrollbar-gutter: auto; min-height: 0; }
 .gx-fieldhost .gx-game, .gx-fieldhost .gx-game.gx-full { position: absolute; inset: 0; z-index: auto; }
 .gx-fieldhost .gx-game .gx-head { display: none; }

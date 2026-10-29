@@ -40,10 +40,13 @@ export function endedNowOf(r: Report): EndedNow {
   };
 }
 
-/** 이 묶음(응답 번호들)에서 종료돼 아직 소감이 없는 보고서 (오래된 것부터, 최대 3건) */
-export function endedInBatch(reports: ReportStore, indexes: number[]): Report[] {
-  const set = new Set(indexes);
-  return reports.items.filter((r) => set.has(r.idx) && !r.debrief).slice(-ENDED_NOW_MAX);
+/**
+ * 이 묶음에서 종료돼 아직 소감이 없는 보고서 (오래된 것부터, 최대 3건).
+ * 묶음은 메시지 열쇠(messageKey) 목록 — 번호(idx)로 맞추면 앞 메시지를 지운 뒤 같은 번호가 된 다른 턴의 발췌로 옛 사건 소감을 쓰게 된다.
+ */
+export function endedInBatch(reports: ReportStore, keys: string[]): Report[] {
+  const set = new Set(keys);
+  return reports.items.filter((r) => set.has(r.anchor) && !r.debrief).slice(-ENDED_NOW_MAX);
 }
 
 export interface DebriefItem { id: string; who: string; text: string }

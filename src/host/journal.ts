@@ -61,8 +61,8 @@ export async function requestDebrief(reportId: string): Promise<DebriefResult> {
       { role: 'system', content: DEBRIEF_PROMPT },
       { role: 'user', content: dataText },
     ];
-    // 단추 옆 글대로 늘 보조 모델 1회 (인물 기록 설정의 모델과 무관)
-    const { raw, value } = await generate(messages, 'aux', parseUpdate, { retries: 1, retryModel: 'same', state: ctx.chat.scriptstate });
+    // 단추 옆 글대로 늘 보조 모델 **1회** (인물 기록 설정의 모델과 무관). 형식이 깨져도 다시 묻지 않고 실패로 끝낸다 (retries 0)
+    const { raw, value } = await generate(messages, 'aux', parseUpdate, { retries: 0, retryModel: 'same', state: ctx.chat.scriptstate });
     diag.raw = raw;
     diag.outChars = raw.length;
     let picked: DebriefItem | null = null;

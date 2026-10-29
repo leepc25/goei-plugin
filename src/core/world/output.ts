@@ -19,6 +19,10 @@ interface PrevState {
   faction: string;
   pick: string;
   aff: string;
+  /** 그 자리의 응답이 만든 일지 줄 id (리롤 되감기 대상. 없으면 옛 저장 → 번호로 되감는다) */
+  made?: string[];
+  /** 그 응답 바로 앞 메시지의 열쇠(messageKey). 같은 번호라도 앞 메시지가 다르면(앞 메시지를 지운 뒤 새 턴) 리롤이 아니다 */
+  pk?: string;
 }
 
 function readPrev(raw: unknown): PrevState | null {
@@ -90,9 +94,12 @@ export function processOutput(chat: Chat, messageIndex: number, raw: string, c: 
   // 이미 처리한 응답에 리스너가 다시 불린 경우 (태그도 없고 지문도 같음)
   if (!hasWorldTags(raw) && state[LAST_KEY] === fingerprint(index, clean)) return null;
 
-  // 리롤·다시 생성: 같은 자리의 이전 응답이 반영되기 전 상태로 돌아가서 이번 응답만 반영한다
+  // 리롤·다시 생성: 같은 자리의 이전 응답이 반영되기 전 상태로 돌아가서 이번 응답만 반영한다.
+  // 「같은 자리」 = 같은 번호 + 바로 앞 메시지가 같은 것(열쇠). Risu 는 리롤 때 새 chatId 를 주므로 응답 자체는 비교할 수 없고,
+  // 앞 메시지를 지운 뒤 새 턴이 같은 번호에 오면 앞 메시지(새 유저 메시지)의 열쇠가 다르다 — 그때 옛 상태로 돌아가거나 옛 일지를 되감으면 안 된다 (2026-10-29)
   const prev = readPrev(state[PREV_KEY]);
-  const reroll = prev?.i === index;
+  const pk = index > 0 && messages[index - 1] ? messageKey(messages[index - 1], index - 1) : '';
+  const reroll = prev?.i === index && (prev.pk === undefined || prev.pk === pk);
   const before: PrevState = reroll
     ? prev
     : {
@@ -101,6 +108,7 @@ export function processOutput(chat: Chat, messageIndex: number, raw: string, c: 
         faction: String(state['$st_faction'] ?? ''),
         pick: String(state['$st_pick'] ?? ''),
         aff: String(state['$ib_affiliation'] ?? ''),
+        pk,
       };
   const faction = before.faction;
   const base = parseWorld(before.world);
@@ -111,7 +119,6 @@ export function processOutput(chat: Chat, messageIndex: number, raw: string, c: 
   const vars: ScriptState = {
     ...worldVars(result.world, c, s, now),
     [LAST_KEY]: fingerprint(index, clean),
-    [PREV_KEY]: JSON.stringify(before),
   };
   if (reroll && !result.faction) {
     vars.$st_faction = before.faction;
@@ -126,14 +133,15 @@ export function processOutput(chat: Chat, messageIndex: number, raw: string, c: 
   const message = messages.slice();
   message[index] = { ...msg, data: clean };
   const next: Chat = { ...chat, message, scriptstate: { ...state, ...vars } };
-  // 일지·보고서 (core/journal): 리롤이면 이 번호의 자동 종료 기록을 먼저 되감고, 이번 응답의 종료를 새로 적는다
+  // 일지·보고서 (core/journal): 리롤이면 이 자리의 이전 응답이 만든 자동 종료 기록을 먼저 되감고, 이번 응답의 종료를 새로 적는다
   const closed = result.world.closed ?? [];
+  let made: string[] = [];
   if (reroll || closed.length) {
     let journal = readJournal(state);
     let rec = readReports(state);
     let changed = false;
     if (reroll) {
-      const r = rewindClosures(journal, rec, index);
+      const r = rewindClosures(journal, rec, before.made ?? index);
       journal = r.journal;
       rec = r.reports;
       changed = r.changed;
@@ -143,11 +151,14 @@ export function processOutput(chat: Chat, messageIndex: number, raw: string, c: 
       if (built.rows.length) {
         journal = built.journal;
         rec = built.reports;
+        made = built.rows.map((r) => r.id);
         changed = true;
       }
     }
     if (changed) Object.assign(next.scriptstate!, recordVars(journal, rec));
   }
+  // 리롤 기준 상태에 이번 응답이 만든 일지 줄 id 를 적는다 (다음 리롤이 바로 이 줄들만 되감게)
+  next.scriptstate![PREV_KEY] = JSON.stringify({ ...before, made });
   return next;
 }
 

@@ -100,14 +100,20 @@ export function pinReport(r: ReportStore, id: string, on: boolean): ReportStore 
 }
 
 /**
- * 리롤 되감기: 같은 번호(index)의 응답이 다시 반영될 때, 그 응답이 만들었던 일지 줄·보고서를 지운다.
+ * 리롤 되감기: 같은 자리의 응답이 다시 반영될 때, **바로 그 응답이 만들었던** 일지 줄·보고서를 지운다.
+ * 대상은 `$goei_prev` 가 적어 둔 그 응답의 일지 줄 id 목록(`made`)이다 — 메시지 번호(idx)로 지우면 앞 메시지를 지운 뒤 같은 번호에 온 무관한
+ * 리롤이 옛 기록을 지운다(일지는 영구 보관). id 목록이 없는 옛 `$goei_prev`(2026-10-29 이전 저장)만 번호로 지운다.
  * 수동(manual)·필드(field) 종료는 리롤 기준 상태에도 이미 반영돼 있어(prevWorldVars) 되살아나지 않으므로 두고, 고정한 보고서도 둔다.
  */
-export function rewindClosures(j: JournalStore, r: ReportStore, index: number): { journal: JournalStore; reports: ReportStore; changed: boolean } {
+export function rewindClosures(j: JournalStore, r: ReportStore, target: number | string[]): { journal: JournalStore; reports: ReportStore; changed: boolean } {
   const auto = (cause: string) => cause === 'model' || cause === 'ttl';
   const pinned = new Set(r.items.filter((x) => x.pin).map((x) => x.id));
-  const items = r.items.filter((x) => !(x.idx === index && auto(x.cause) && !x.pin));
-  const rows = j.rows.filter((row) => !(row.idx === index && auto(row.cause) && !(row.rpt && pinned.has(row.rpt))));
+  // 보고서 id 는 일지 줄 id 와 같은 해시 (`r…` ↔ `j…`)
+  const made = Array.isArray(target) ? new Set(target.map((id) => id.slice(1))) : null;
+  const hitRow = (row: JournalRow) => (made ? made.has(row.id.slice(1)) : row.idx === target);
+  const hitRpt = (x: Report) => (made ? made.has(x.id.slice(1)) : x.idx === target);
+  const items = r.items.filter((x) => !(hitRpt(x) && auto(x.cause) && !x.pin));
+  const rows = j.rows.filter((row) => !(hitRow(row) && auto(row.cause) && !(row.rpt && pinned.has(row.rpt))));
   const changed = items.length !== r.items.length || rows.length !== j.rows.length;
   return { journal: changed ? { v: 1, rows } : j, reports: changed ? { v: 1, items } : r, changed };
 }

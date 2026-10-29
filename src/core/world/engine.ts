@@ -275,6 +275,14 @@ function pushTrail(w: WorldState, e: Tracked, text: string) {
   trail.push({ m: w.minute, e: w.epoch, text: t });
   while (trail.length > TRAIL_CAP) trail.splice(1, 1);
 }
+/** 종료 태그의 상황 칸: 있으면 항목의 상황 글과 경과 마지막 줄로 (closed 스냅숏의 「결과」가 종료 글이 되게). 비어 있으면 그대로 */
+function closingText(w: WorldState, e: Tracked & { situation?: string }, situation: string | undefined, c: Catalog, faction: string) {
+  if (!situation) return;
+  const text = codesToNames(situation, c, faction);
+  if (!text.trim()) return;
+  e.situation = text;
+  pushTrail(w, e, text);
+}
 function endAn(w: WorldState, e: AnEntry, cause: CloseCause = 'model', cleared = false) {
   remember(w, 'an', e, e.grade);
   close(w, 'an', e, cause, cleared);
@@ -527,6 +535,8 @@ function applyAnomalies(w: WorldState, c: Catalog, s: WorldSettings, faction: st
         const names = [e.presetName, e.name, t.name].filter((n): n is string => validName(n));
         w.cleared = [...new Set([...(w.cleared ?? []), ...names])].slice(-200);
       }
+      // 종료 태그(격리·소멸·클리어)에 적힌 상황 글은 보고서 「결과」(마지막 상황 글)가 된다 — 끝내기 전에 경과에 넣는다 (사용자 결정 2026-10-29)
+      closingText(w, e, t.situation, c, faction);
       endAn(w, e, 'model', t.state === '클리어');
       continue;
     }
@@ -574,6 +584,7 @@ function applyIncidents(w: WorldState, c: Catalog, s: WorldSettings, faction: st
     }
     if (w.pending.in === t.name) w.pending.in = undefined;
     if (t.state === '종료') {
+      closingText(w, e, t.situation, c, faction);
       endIn(w, e);
       continue;
     }
@@ -602,6 +613,7 @@ function applyMysticSites(w: WorldState, c: Catalog, s: WorldSettings, faction: 
     }
     if (w.pending.ms === t.name) w.pending.ms = undefined;
     if (t.state === '소실') {
+      closingText(w, e, t.situation, c, faction);
       endMs(w, e);
       continue;
     }

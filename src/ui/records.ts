@@ -10,7 +10,7 @@ import { debriefRunning, requestDebrief } from '../host/journal';
 import { refreshStatusContext } from '../host/statusview';
 import { downloadPng, reportPng } from './reportpng';
 import type { RecordsNav } from '../core/navhist';
-import { messageKey } from '../core/people/store';
+import { anchorPositions, messageKey } from '../core/people/store';
 import type { Chat } from '../core/types';
 import { formatDelta, formatWon } from '../core/wallet';
 import { locName, parseCatalog, readWorld, worldOn } from '../core/world';
@@ -27,7 +27,7 @@ const esc = (s: unknown) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '
 export type RecSub = RecordsNav['sub'];
 export type RecView = RecordsNav['view'];
 export type JournalFilter = 'all' | 'mine' | 'bg' | 'an' | 'in';
-export type ReportFilter = 'mine' | 'bg' | 'all';
+export type ReportFilter = 'mine' | 'bg';
 
 export interface RecordsEnv {
   render(): void;
@@ -246,7 +246,8 @@ function journalRow(r: JournalRow): string {
 
 // ── 보고서 목록 ──
 
-const RFILTERS: [ReportFilter, string][] = [['mine', '내가 출동'], ['bg', '요원 처리'], ['all', '전체']];
+// 사용자 결정 「카드 목록(「내가 출동」/「요원 처리」 칩)」 — 두 칩뿐 (「전체」 칩은 결정에 없어 뺐다, 2026-10-29 검토)
+const RFILTERS: [ReportFilter, string][] = [['mine', '내가 출동'], ['bg', '요원 처리']];
 
 const peopleSum = (r: Report) => (r.people?.length ? `<span class="gx-rcard-aff">호감 ${r.people.map((p) => `<i class="${p.delta < 0 ? 'neg' : 'pos'}">${p.delta > 0 ? '+' : p.delta < 0 ? '−' : ''}${Math.abs(p.delta)}</i>`).join(' ')}</span>` : '');
 const walletSum = (r: Report) => {
@@ -256,7 +257,7 @@ const walletSum = (r: Report) => {
 
 function reportsPane(ctx: ChatContext): string {
   const all = readReports(ctx.chat).items;
-  const shown = all.filter((r) => (rec.rfilter === 'mine' ? r.mine : rec.rfilter === 'bg' ? !r.mine : true)).reverse();
+  const shown = all.filter((r) => (rec.rfilter === 'mine' ? r.mine : !r.mine)).reverse();
   const chips = RFILTERS.map(([v, l]) => `<button class="gx-wt-chip${rec.rfilter === v ? ' on' : ''}" data-action="rec-rfilter" data-value="${v}" aria-pressed="${rec.rfilter === v}">${l}</button>`).join('');
   const cards = shown.map((r) => {
     const h = r.head;
@@ -346,15 +347,25 @@ export function endedReport(chat: Chat, kind: JournalKind, name: string, loc: st
   return loose ? { rpt: loose.rpt, mine: loose.mine } : null;
 }
 
-/** 종료 알림 (상황판 맨 위 한 줄): 마지막 응답에서 내가 출동한 사건이 종료돼 보고서가 생겼으면. 닫으면 이 세션에서는 다시 안 뜬다 */
+/**
+ * 종료 알림 (상황판 맨 위 한 줄): 마지막 응답에서 내가 출동한 사건이 종료돼 보고서가 생겼으면. 닫으면 이 세션에서는 다시 안 뜬다.
+ * 「마지막 응답」 = anchor 가 마지막 봇 응답의 열쇠이거나, 그 뒤 메시지(손 종료·필드 종료는 유저 메시지가 기준일 수 있다)의 열쇠인 줄.
+ * 번호(idx)로 비교하지 않는다 — 메시지를 지워 번호가 줄면 옛 종료가 「방금 저장됨」으로 되살아났다. 지워진 메시지의 anchor 는 자리가 없어 빠진다.
+ */
 export function closeNotice(chat: Chat): string {
   const list = Array.isArray(chat.message) ? chat.message : [];
   let last = -1;
   for (let i = list.length - 1; i >= 0; i--) if (list[i].role === 'char') { last = i; break; }
   if (last < 0) return '';
   const key = messageKey(list[last], last);
+  const at = anchorPositions(chat);
+  const recent = (anchor: string) => {
+    if (anchor === key) return true;
+    const pos = at.get(anchor);
+    return pos !== undefined && pos >= last;
+  };
   const rows = readJournal(chat).rows;
-  const hit = [...rows].reverse().find((r) => r.mine && r.rpt && (r.anchor === key || r.idx >= last));
+  const hit = [...rows].reverse().find((r) => r.mine && r.rpt && recent(r.anchor));
   if (!hit || !hit.rpt || rec.dismissed === hit.rpt) return '';
   return `<div class="gx-notice gx-recnote" role="status"><span>${ICONS.records}보고서가 기록에 저장됐어요 · <b>${esc(hit.name)}</b></span><button class="gx-mini" data-action="rec-open" data-value="${esc(hit.rpt)}">보기</button><button class="gx-recnote-x" data-action="rec-note-x" data-value="${esc(hit.rpt)}" aria-label="알림 닫기">${ICONS.close}</button></div>`;
 }

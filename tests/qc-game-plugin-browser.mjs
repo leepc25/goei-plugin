@@ -154,6 +154,7 @@ const ok = (name, detail = '') => { results.push(`${name} · 통과${detail ? ` 
   for (let i = 0; i < 20; i++) {
     const t0 = Date.now();
     await enterGame(page);
+    if (i === 0) assert.equal(await page.evaluate(() => typeof window.__goeiBridge), 'undefined', '$goei_diag 없이는 플러그인 다리를 페이지 전역에 두지 않는다');
     if (i < 2) await enterHub(page); // 두 번은 본부까지 (세계 시뮬·장부·시계까지 돈다)
     else await page.waitForFunction(() => !!window.__goeiEngine, null, { timeout: 20000 });
     times.push(Date.now() - t0);
@@ -198,6 +199,8 @@ const ok = (name, detail = '') => { results.push(`${name} · 통과${detail ? ` 
   await openField(page);
   // 큰 본문 (2MB) 과 1~3 칸 쓰기·읽기·지우기·마지막 칸 (호스트 saves 직접)
   await page.evaluate(() => { window.__store['p:goei:game:slot:0'] = JSON.stringify({ schema: 'goei-session/1', revision: 1, hq: null, meta: null, checkpoint: null, pad: 'x'.repeat(2 * 1024 * 1024) }); });
+  // 플러그인 다리(window.__goeiBridge)는 이 채팅 변수 $goei_diag 가 '1' 일 때만 노출된다 (진단·시험용. 평소엔 페이지 전역에 저장 경로를 열지 않는다) — 이번 열기부터
+  await page.evaluate(() => { window.__chat.scriptstate.$goei_diag = '1'; });
   await enterGame(page); await enterHub(page);
   assert.ok(await page.evaluate(() => window.__goeiEngine.inHub), '2MB 저장으로도 본부 열림');
   const saved0 = await page.evaluate(() => { const l = JSON.parse(window.__store['p:goei:game:slots'] ?? '{"slots":[]}'); return { n: l.slots.length, last: l.last, size: (window.__store['p:goei:game:slot:0'] ?? '').length }; });
@@ -248,7 +251,7 @@ const ok = (name, detail = '') => { results.push(`${name} · 통과${detail ? ` 
   await page.keyboard.press('Escape'); await page.keyboard.press('Escape');
   ok('$hq_ui 채팅별 설정 저장');
   // 다리: 출동 종료 → 보고서 (기록 묶음 3): 플러그인이 exit_anomaly 를 받아 같은 저장에 일지 fd 줄·전체 보고서를 만들고, 필드 탭 위에 시트, lastReport 다리로 게임에 알린다
-  assert.ok(await page.evaluate(() => !!window.__goeiBridge?.field?.lastReport), '플러그인 다리 노출 (진단용)');
+  assert.ok(await page.evaluate(() => !!window.__goeiBridge?.field?.lastReport), '플러그인 다리 노출 ($goei_diag=1 진단용)');
   assert.equal(await page.evaluate(() => window.__goeiBridge.field.lastReport()), null, '출동 전엔 보고서 없음');
   await page.evaluate(async () => {
     const f = window.__goeiBridge.field;

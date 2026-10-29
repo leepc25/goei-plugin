@@ -51,7 +51,8 @@ test('모델 태그 종료가 closed 에 원인과 종료 직전 모습으로 �
   assert.equal(c.cause, 'model');
   assert.equal(c.entry.name, '관리국 본부');
   assert.equal(c.entry.deploy, 'P001');
-  assert.deepEqual(c.entry.trail.map((t) => t.text), ['정전', '복구 중'], '경과는 상황 글이 바뀐 시점만');
+  assert.deepEqual(c.entry.trail.map((t) => t.text), ['정전', '복구 중', '복구 완료'], '경과는 상황 글이 바뀐 시점만 + 종료 태그의 상황 글이 마지막 줄 (결과)');
+  assert.equal(c.entry.situation, '복구 완료', '종료 태그의 상황 글이 항목 상황에도');
   assert.equal(c.minute, w.minute);
   const saved = serializeWorld(w);
   assert.ok(!saved.includes('"closed"'));
@@ -71,6 +72,14 @@ test('괴이 클리어는 cleared 로, 발생대기 종료는 closed 에 안 쌓
   assert.equal(w.closed.length, 1);
   assert.equal(w.closed[0].cleared, true);
   assert.equal(w.closed[0].entry.touched, true);
+  assert.deepEqual(w.closed[0].entry.trail.map((t) => t.text), ['소리가 들림', '정리됨'], '괴이 종료 태그(클리어)의 상황 글도 경과 마지막 줄');
+  // 특수(소실)도 같다. 종료 태그에 상황 글이 없으면 경과는 그대로
+  let m = applyOutput(empty(), catalog, S, 'A00', `[MS|부산 중구|달빛 서점|출현|P002|책이 넘어감]\n${ST('10:00 AM')}`, rng).world;
+  m = applyOutput(m, catalog, S, 'A00', `[MS|부산 중구|달빛 서점|소실|P002|문이 사라짐]\n${ST('11:00 AM')}`, rng).world;
+  assert.deepEqual(m.closed[0].entry.trail.map((t) => t.text), ['책이 넘어감', '문이 사라짐']);
+  let n = applyOutput(empty(), catalog, S, 'A00', `${IN('진행', 'P001', '정전')}\n${ST('10:00 AM')}`, rng).world;
+  n = applyOutput(n, catalog, S, 'A00', `[IN|서울 종로구|관리국 본부|종료|P001]\n${ST('11:00 AM')}`, rng).world;
+  assert.deepEqual(n.closed[0].entry.trail.map((t) => t.text), ['정전'], '종료 태그에 상황 칸이 없으면 종료 직전 글이 결과');
 });
 
 test('자동 종료(ttl)는 cause ttl, 손으로 끝내면 manual', () => {
@@ -105,14 +114,17 @@ test('경과는 같은 글을 거듭 쌓지 않고 상한을 넘으면 첫 줄�
 // ── 조립: processOutput 으로 끝까지 ──
 
 /** 상황판이 켜진 채팅: 응답을 차례로 반영한다 (리스너가 부르는 processOutput 과 같은 길) */
+let nextId = 1;
 function play(turns, extra = {}) {
-  let chat = { message: [], scriptstate: { ...startWorldVars(catalog, S, 'A00', rng), $st_faction: 'A00', ...(extra.vars ?? {}) }, ...(extra.top ?? {}) };
+  let chat = extra.seed ?? { message: [], scriptstate: { ...startWorldVars(catalog, S, 'A00', rng), $st_faction: 'A00', ...(extra.vars ?? {}) }, ...(extra.top ?? {}) };
+  // ids: 실제 Risu 처럼 메시지마다 chatId 를 준다 (리롤·새 턴 구분 시험)
+  const id = () => (extra.ids ? { chatId: `m${nextId++}` } : {});
   for (const t of turns) {
     if (typeof t === 'string' || t.role === 'user') {
-      chat = { ...chat, message: [...chat.message, typeof t === 'string' ? { role: 'user', data: t } : t] };
+      chat = { ...chat, message: [...chat.message, typeof t === 'string' ? { role: 'user', data: t, ...id() } : { ...t, ...id() }] };
       continue;
     }
-    chat = { ...chat, message: [...chat.message, { role: 'char', data: t.data }] };
+    chat = { ...chat, message: [...chat.message, { role: 'char', data: t.data, ...id() }] };
     if (extra.before) chat = extra.before(chat) ?? chat;
     const next = processOutput(chat, chat.message.length - 1, t.data, catalog, S, rng);
     if (next) chat = next;
@@ -160,7 +172,7 @@ test('내가 출동한 사건이 종료되면 일지 줄과 전체 보고서(경
   assert.equal(row.cause, 'model');
   assert.equal(row.idx, 7);
   assert.equal(row.anchor, '#8');
-  assert.equal(row.result, '복구 중', '결과 = 마지막 상황 글 (종료 태그의 글은 반영 전이라 안 들어간다)');
+  assert.equal(row.result, '복구 완료', '결과 = 마지막 상황 글 = 종료 태그의 상황 글 (사용자 결정)');
   assert.deepEqual(row.agents, [{ id: 'P001', name: '쟈알디', st: '휴게' }, { id: 'P002', name: '스팡달', st: '부상' }]);
   assert.equal(row.at - row.since, 150, '10:00 → 12:30');
   const r = readReports(chat);
@@ -171,7 +183,8 @@ test('내가 출동한 사건이 종료되면 일지 줄과 전체 보고서(경
   assert.match(rep.no, /^RPT-0101-01$/);
   assert.equal(rep.head.duration, 150);
   assert.equal(rep.head.place, '서울 종로구 거리');
-  assert.deepEqual(rep.trail.map((t) => t.text), ['정전', '복구 중']);
+  assert.deepEqual(rep.trail.map((t) => t.text), ['정전', '복구 중', '복구 완료']);
+  assert.equal(rep.result, '복구 완료');
   assert.equal(rep.agents[1].situation, '치료 중');
   assert.equal(rep.statusKey, ST('12:30 PM', '없음', '없음', '없음'));
   // 인물: 기간(3~7) 안 살아 있는 cue 만 (인용이 본문에 있어야 산다), 세력 평판은 빼고, 합과 근거 인용
@@ -186,17 +199,27 @@ test('내가 출동한 사건이 종료되면 일지 줄과 전체 보고서(경
   assert.ok(!chat.scriptstate.$goei_world.includes('closed'));
 });
 
-test('출동 근거 다섯 가지를 따로 판정한다', () => {
+test('출동 근거(출동·동행·방문)를 따로 판정한다: 투입 ON·지시문·필드·동행·방문 대화, 목표 칸만은 투입 칸이 없을 때만', () => {
   const base = play(MINE_TURNS.slice(0, 6));
   const s = (o = {}) => ({ name: '관리국 본부', agentNames: ['쟈알디'], ...o });
   assert.deepEqual(mineReasons(base, 3, 5, s()).sort(), ['companion', 'deployed', 'scene']);
   // 출동 카드는 활성 응답 바로 앞 유저 메시지에 있어도 잡는다 (from-1)
   assert.ok(mineReasons({ ...base, message: base.message.map((m, i) => (i === 3 || i === 5 ? { ...m, data: m.data.replace(/\[▣[^\]]*\]/g, '') } : m)) }, 3, 5, s()).includes('scene'));
   assert.deepEqual(mineReasons(base, 4, 5, { name: '다른 사건', agentNames: ['스팡달'] }), []);
-  assert.deepEqual(mineReasons(base, 4, 5, { name: '다른 사건', agentNames: [], touched: true }), ['touched']);
+  // 목표 칸만(엔진 touched): 상태창에 투입 칸이 있으면(여기선 OFF) 출동이 아니다. 투입 칸이 없는 상태창(옛 6칸·칸을 끈 채팅)에서만 출동으로 본다
+  assert.deepEqual(mineReasons(base, 4, 5, { name: '다른 사건', agentNames: [], touched: true }), [], '투입 칸 있음 + 목표만 → 근거 없음');
+  const noDeployCol = { ...base, message: base.message.map((m) => (m.role === 'char' ? { ...m, data: m.data.replace(/\[▣\|([^\]]*)\]/g, (_, f) => `[▣|${f.split('|').slice(0, 6).join('|')}]`) } : m)) };
+  assert.deepEqual(mineReasons(noDeployCol, 4, 5, { name: '다른 사건', agentNames: [], touched: true }), ['touched'], '투입 칸 없음 + 목표 → 출동');
   const field = { ...base, goeiFieldV1: { events: [{ id: 'f1', at: 1, anchor: '#6', kind: 'enter_anomaly', text: '작전 투입: 관리국 본부' }] } };
   assert.ok(mineReasons(field, 4, 5, { name: '관리국 본부', agentNames: [] }).includes('field'));
   assert.ok(!mineReasons(field, 0, 1, { name: '관리국 본부', agentNames: [] }).includes('field'), '기간 밖 필드 사건은 근거가 아니다');
+  // 본부 방문 대화(core/visit.ts): 그 자리가 기간 안이고 오간 말에 사건 이름이 있으면 「방문」 근거
+  const visit = { ...base, goeiHqVisitV1: { turns: [{ id: 'v1', at: 1, agentId: 'P001', name: '쟈알디', user: '관리국 본부 쪽은 어때요?', reply: '정전이 길어지네요.', anchor: '#6' }] } };
+  assert.deepEqual(mineReasons(visit, 4, 5, { name: '관리국 본부', agentNames: [] }).sort(), ['deployed', 'visit']);
+  assert.deepEqual(mineReasons(visit, 4, 5, { name: '달빛 서점', agentNames: [] }), [], '방문 대화에 그 이름이 없으면 아니다');
+  assert.deepEqual(mineReasons({ ...visit, goeiHqVisitV1: { turns: [{ ...visit.goeiHqVisitV1.turns[0], user: '달빛 서점 다녀왔어요', reply: '네.' }] } }, 4, 5, { name: '달빛 서점', agentNames: [] }), ['visit']);
+  assert.deepEqual(mineReasons(visit, 0, 1, { name: '관리국 본부', agentNames: [] }), [], '기간 밖 방문 대화는 근거가 아니다');
+  assert.deepEqual(mineReasons({ ...visit, goeiHqVisitV1: { turns: [{ ...visit.goeiHqVisitV1.turns[0], user: '잘 지내요?', reply: '네.', extra: [{ agentId: 'P002', name: '스팡달', line: '달빛 서점 건은 제가 봤어요' }] }] } }, 4, 5, { name: '달빛 서점', agentNames: [] }), ['visit'], '옆 요원 말도');
   // 기간: startKey 가 있으면 그 메시지, 없으면 since 분 이상인 첫 상태창 응답, 그것도 없으면 종료 메시지
   const w = readWorld(base);
   assert.equal(w.inc[0].startKey, '#4');
@@ -223,9 +246,10 @@ test('백그라운드 사건은 간이 보고서(인물·가계부 없음)로, �
   assert.equal(rep.balance, undefined);
   assert.equal(rep.statusKey, undefined);
   assert.equal(rep.head.at, null, '분을 모르면 null');
-  assert.equal(rep.result, '정전');
+  assert.equal(rep.result, '복구', '종료 태그의 상황 글');
+  assert.deepEqual(rep.trail.map((t) => t.text), ['정전', '복구']);
   assert.deepEqual(rep.agents, [{ id: 'P002', name: '스팡달', st: '' }]);
-  assert.equal(journalLine(row), '- 시각 없음 · 사건 관리국 본부 · 서울특별시 종로구 · 투입 스팡달 · 정전');
+  assert.equal(journalLine(row), '- 시각 없음 · 사건 관리국 본부 · 서울특별시 종로구 · 투입 스팡달 · 복구');
 });
 
 test('리롤 되감기: 같은 번호의 응답을 다시 반영하면 그 응답의 자동 종료 기록은 지워지고 수동 종료는 남는다', () => {
@@ -251,6 +275,40 @@ test('리롤 되감기: 같은 번호의 응답을 다시 반영하면 그 응�
   const twice = buildClosures({ chat: { ...chat, scriptstate: { ...chat.scriptstate, ...recordVars(built.journal, built.reports) } }, index: i, world: w, closed: w.closed, catalog, faction: 'A00', settings: journalSettings(chat.scriptstate) });
   assert.equal(twice.rows.length, 0);
   assert.equal(twice.journal.rows.length, 1);
+});
+
+test('리롤 판정은 번호 + 앞 메시지 열쇠, 되감기는 그 응답이 만든 줄(id)만: 앞 메시지를 지운 뒤 같은 번호에 온 새 턴·리롤은 옛 일지·보고서·세계를 건드리지 않는다', () => {
+  let chat = play(MINE_TURNS, { ids: true });
+  const old = readJournal(chat).rows[0];
+  assert.equal(old.idx, 7);
+  const prev = JSON.parse(chat.scriptstate.$goei_prev);
+  assert.deepEqual(prev.made, [old.id], '$goei_prev 에 그 응답이 만든 일지 줄 id');
+  assert.equal(prev.pk, chat.message[6].chatId, '$goei_prev 에 앞 메시지 열쇠');
+  // 진짜 리롤 (Risu 는 새 chatId 를 준다): 앞 메시지가 같으니 되감긴다
+  const re = processOutput({ ...chat, message: chat.message.map((m, k) => (k === 7 ? { ...m, chatId: 'm99', data: `아직.\n${ST('12:30 PM')}` } : m)) }, 7, `아직.\n${ST('12:30 PM')}`, catalog, S, rng);
+  assert.equal(readJournal(re).rows.length, 0, '진짜 리롤이면 그 응답의 줄이 지워진다');
+  assert.equal(readWorld(re).inc.length, 1, '세계도 종료 전으로');
+  // 앞 메시지 0·1 을 지운다 (종료 응답은 번호 5 가 됨). 한 턴 진행하면 새 응답이 번호 7 에 온다 — 번호는 같지만 앞 유저 메시지가 다르다 → 리롤이 아니다
+  chat = { ...chat, message: chat.message.slice(2) };
+  chat = play(['괜찮아요?', C(`조용하다.\n${ST('01:00 PM')}`)], { seed: chat, ids: true });
+  assert.equal(chat.message.length, 8);
+  assert.equal(readJournal(chat).rows.length, 1, '옛 줄은 그대로 (번호만 같은 새 턴은 리롤이 아니다)');
+  assert.equal(readWorld(chat).inc.length, 0, '세계도 옛 상태로 돌아가지 않는다 (사건은 끝난 채)');
+  // 한 턴 더 가서 번호 9 의 응답을 리롤 (종료 없는 응답) → 옛 줄·보고서 그대로
+  chat = play(['산책', C(`아무 일 없음.\n${ST('01:30 PM')}`)], { seed: chat, ids: true });
+  assert.equal(JSON.parse(chat.scriptstate.$goei_prev).i, 9);
+  const i = 9;
+  const again = `다시.\n${ST('01:40 PM')}`;
+  chat = processOutput({ ...chat, message: chat.message.map((m, k) => (k === i ? { ...m, chatId: 'm98', data: again } : m)) }, i, again, catalog, S, rng);
+  assert.equal(readJournal(chat).rows.length, 1, '옛 줄은 그대로');
+  assert.equal(readReports(chat).items.length, 1, '옛 보고서도 그대로');
+  assert.deepEqual(JSON.parse(chat.scriptstate.$goei_prev).made, [], '종료 없는 응답은 만든 줄이 없다');
+  // 되감기 함수 자체: id 목록이 비면 아무것도 안 지우고, 옛 저장(목록 없음)은 번호로
+  const j = readJournal(chat), r = readReports(chat);
+  assert.equal(rewindClosures(j, r, []).changed, false);
+  assert.equal(rewindClosures(j, r, [old.id]).journal.rows.length, 0, 'id 로 지운다');
+  assert.equal(rewindClosures(j, r, 7).journal.rows.length, 0, '옛 $goei_prev(목록 없음)는 번호로');
+  assert.equal(rewindClosures(j, r, 5).changed, false);
 });
 
 // ── 저장: 상한·고정·연결 ──
@@ -330,7 +388,7 @@ test('일지 컨텍스트: 끔이면 요청 그대로, 켜면 최근 N건 한 �
   assert.ok(!out[3].content.includes('관리국 본부'), 'N=1 이면 최근 한 줄만');
   const two = journalBlock(rows, 5).split('\n');
   assert.equal(two.length, 3, '머리 + 2줄 (N 이 줄 수보다 커도 있는 만큼)');
-  assert.equal(two[1], '- 01.01 12:30 · 사건 관리국 본부 · 서울특별시 종로구 · 투입 쟈알디·스팡달 · 복구 중 (내가 출동)');
+  assert.equal(two[1], '- 01.01 12:30 · 사건 관리국 본부 · 서울특별시 종로구 · 투입 쟈알디·스팡달 · 복구 완료 (내가 출동)');
   assert.equal(two[2], '- 01.11 00:00 · 사건 둘째 ｛｛사건｝｝ ％％ · 서울특별시 종로구 · 투입 외부인 · 처리 완료');
   // 채팅 메시지는 손대지 않는다
   assert.equal(on.message.length, chat.message.length);
@@ -430,10 +488,11 @@ test('소감 검사: 이번 턴 종료 사건 id·투입 요원 이름·본문 �
   assert.equal(w2.applied, 0, '있던 소감은 자동으로 안 덮는다');
   const w3 = withDebriefs(w1.store, [{ id: 'r1', who: '스팡달', text: '다시' }], 'manual');
   assert.ok(w3.applied === 1 && w3.store.items[0].debrief.src === 'manual' && w3.store.items[0].debrief.text === '다시');
-  // 묶음 안 종료 사건: idx 가 묶음에 있고 소감이 아직 없는 것만, 최대 3건
-  const many = { v: 1, items: [1, 2, 3, 4, 5].map((i) => ({ ...rep, id: `r${i}`, idx: i, ...(i === 2 ? { debrief: { who: 'a', text: 'b', src: 'turn', at: '' } } : {}) })) };
-  assert.deepEqual(endedInBatch(many, [1, 2, 3, 4, 5]).map((r) => r.id), ['r3', 'r4', 'r5']);
-  assert.deepEqual(endedInBatch(many, [2, 7]).map((r) => r.id), []);
+  // 묶음 안 종료 사건: anchor(메시지 열쇠)가 묶음에 있고 소감이 아직 없는 것만, 최대 3건. 번호(idx)는 보지 않는다 (메시지 삭제로 번호가 밀려도 다른 턴 발췌로 소감을 쓰지 않게)
+  const many = { v: 1, items: [1, 2, 3, 4, 5].map((i) => ({ ...rep, id: `r${i}`, idx: i, anchor: `#${i + 1}`, ...(i === 2 ? { debrief: { who: 'a', text: 'b', src: 'turn', at: '' } } : {}) })) };
+  assert.deepEqual(endedInBatch(many, ['#2', '#3', '#4', '#5', '#6']).map((r) => r.id), ['r3', 'r4', 'r5']);
+  assert.deepEqual(endedInBatch(many, ['#3', '#8']).map((r) => r.id), []);
+  assert.deepEqual(endedInBatch({ v: 1, items: [{ ...rep, id: 'rA', idx: 12, anchor: 'cid-old' }] }, ['#13']).map((r) => r.id), [], '번호 12 가 지금 다른 턴이어도 열쇠가 다르면 안 얹는다');
   assert.ok(DEBRIEF_PROMPT.includes('"debriefs"') && !DEBRIEF_PROMPT.includes('{{'), '수동 지침은 짧고 템플릿 기호가 없다');
   assert.ok(DEBRIEF_PROMPT.length < 1500);
 });

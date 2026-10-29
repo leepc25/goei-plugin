@@ -30,15 +30,34 @@ export function setRecordsOpener(f: (id: string) => void): void {
 /** 채팅 카드 열쇠 표 (시험·진단용): 상태창 원문 → 보고서 id 들 */
 export const reportCardKeys = (): Map<string, string[]> => new Map([...cards].map(([k, v]) => [k, v.map((r) => r.id)]));
 
+/**
+ * 설정에 따라 채팅 카드를 둘 보고서를 상태창 원문별로 모은다. display 처리기는 글만 받아 메시지를 구분하지 못하므로,
+ * 같은 상태창 원문이 다른 응답(idx)의 보고서에도 있으면 **가장 뒤 응답 것만** 둔다 (옛 응답의 카드가 뒤 메시지 아래에 또 붙지 않게).
+ */
 function collectCards(chat: Chat): Map<string, Report[]> {
   const mode = journalSettings(chat.scriptstate).chatCard;
   const map = new Map<string, Report[]>();
   if (mode === 'off') return map;
   for (const r of readReports(chat).items) {
     if (!r.statusKey || (mode === 'mine' && !r.mine)) continue;
-    (map.get(r.statusKey) ?? map.set(r.statusKey, []).get(r.statusKey)!).push(r);
+    const list = map.get(r.statusKey);
+    if (!list) map.set(r.statusKey, [r]);
+    else if (list[0].idx === r.idx) list.push(r);
+    else if (r.idx > list[0].idx) map.set(r.statusKey, [r]);
   }
   return map;
+}
+
+/** 이 응답(번호)에서 종료돼 지금 설정으로 채팅 카드가 붙을 보고서 (응답 처리가 「다시 그리기」가 필요한지 볼 때) */
+export function chatCardsAt(chat: Chat, index: number): Report[] {
+  const out: Report[] = [];
+  for (const list of collectCards(chat).values()) for (const r of list) if (r.idx === index) out.push(r);
+  return out;
+}
+
+/** 열쇠 표만 다시 모은다 (저장 직후 다시 그릴 때 카드가 있게. 위키 이름·시각 목록은 그대로) */
+export function refreshReportCards(chat: Chat): void {
+  cards = collectCards(chat);
 }
 
 /** 이 채팅의 상태창 시각 목록과 위키 이름을 다시 모은다 */
