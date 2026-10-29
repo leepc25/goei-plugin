@@ -21,3 +21,13 @@ LIGHT: low and warm — the desk lamp and the lit cabinets are the main light; t
 
 STYLE: clean painted game art, crisp hard edges, bold readable shapes, moderate detail, no photo texture, no noise, no blur, no lens effects. NOT pixel art. No people, no animals, no text, letters, numbers or logos anywhere.
 ```
+
+## 3차 (2026-10-29, 2차도 실패 → 다시)
+
+```
+A wide game background painting, 1536x1024. Interior of a cramped, dim pawn shop in a run-down 1990s Seoul underground shopping arcade at night, seen straight on from slightly above, like a side-scrolling beat 'em up stage: the back wall runs across the upper part, and a wide empty stretch of old dark hardwood floor fills the lower part for characters to walk on.
+
+Against the burgundy, water-stained back wall stand four very different display cases: a tall narrow brass jewellery case glowing with gold rings and necklaces on black velvet; a wide low wooden case of old wristwatches in rows; a dark lacquered cabinet of bronze crafts (an incense burner, a lion, a cracked bell, celadon shards); and a dusty glass case of unlabeled oddities (a sealed jar with something dark inside, a cracked porcelain doll, a tarnished mask, a clockwork device). In the middle, a heavy dark wooden appraisal desk faces the viewer, carrying a brass balance scale, a magnifying glass on a stand, white gloves, a seal box, a document tray and a shaded lamp; an old wooden armchair behind it and a plain chair in front of it face each other. To one side, a doorway hung with a red-brown wooden bead curtain leads to a dark back room. A small iron safe, a short stack of old books, a low cabinet with trays, a folding screen in the corner, and a single round wall clock.
+
+Warm low light from the lamp and the lit cases; everything else sinks into brown-black shadow. Clean painted game art with crisp edges and clear shapes, no photo texture, no blur. No people, no text.
+```
