@@ -10,8 +10,8 @@ export type FrameKind = NonNullable<Prefs['frame']>;
 const EXTRA_W: Record<Exclude<FrameKind, 'none'>, number> = { tablet: 26 * 2 + 4, tactical: 64 * 2 + 6 * 2 };
 /** 틀이 창 위아래로 차지하는 높이(합) */
 const EXTRA_H: Record<Exclude<FrameKind, 'none'>, number> = { tablet: 26 * 2, tactical: 64 * 2 };
-/** 틀을 켰을 때 .gx 바깥 여백 (style.css 와 같은 값) */
-const PAD = 4;
+/** 틀을 켰을 때 .gx 바깥 여백 (style.css 와 같은 값). 전술은 모서리 범퍼 바닥이 본체 밖 6px 까지 나가서 그만큼 더 */
+const PAD: Record<Exclude<FrameKind, 'none'>, number> = { tablet: 4, tactical: 6 };
 /** 창 최대 폭 (style.css .gx-panel · .gx-panel.pre 와 같은 값) */
 const PANEL_W = { nav: 1280, pre: 1024 };
 /** 전술 틀일 때 창이 이보다 낮아지면 틀을 숨긴다 */
@@ -32,8 +32,8 @@ export function frameState(pref: FrameKind | undefined, nav: boolean): FrameStat
   if (matchMedia('(max-width: 760px)').matches || document.fullscreenElement) return { kind: 'none', hidden: false };
   const w = window.innerWidth;
   const h = window.innerHeight;
-  if (w < (nav ? PANEL_W.nav : PANEL_W.pre) + EXTRA_W[want] + PAD * 2) return { kind: 'none', hidden: true };
-  if (want === 'tactical' && h - PAD * 2 - EXTRA_H.tactical < TACTICAL_MIN_H) return { kind: 'none', hidden: true };
+  if (w < (nav ? PANEL_W.nav : PANEL_W.pre) + EXTRA_W[want] + PAD[want] * 2) return { kind: 'none', hidden: true };
+  if (want === 'tactical' && h - PAD.tactical * 2 - EXTRA_H.tactical < TACTICAL_MIN_H) return { kind: 'none', hidden: true };
   return { kind: want, hidden: false };
 }
 
