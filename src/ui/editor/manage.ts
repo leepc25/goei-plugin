@@ -35,6 +35,7 @@ const STORE: [string, string, string, string?][] = [
   // 2026-10-28 QC: 옛 키(goei:game-pack:action-normal-v4)는 쓰는 곳이 없어 늘 「없음」이었다. 실제 키로 (src/main.ts·host/game/code.ts·host/game/packs.ts)
   ['goei:body', '플러그인 본체', '괴이 카드를 열 때 받아 둔 goei-body.js. 플러그인 판이 바뀌면 다시 받아요'],
   ['goei:data-world', '세계 자료', '요원·조직·괴이·파밍·부록 기본 기록과 세력 관계 기본값. 본체가 뜰 때 받아 두고, 플러그인 판이 바뀌면 다시 받아요'],
+  ['goei:data-install', '설치 자료', '인사말·카드 사진 목록·기본 명부·아이콘 정보. 설치·점검을 처음 열 때 받아 두고, 플러그인 판이 바뀌면 다시 받아요'],
   ['goei:game:code', '게임 코드', '필드 게임 코드. 플러그인 판이 바뀌면 다시 받아요'],
   [GAME_PACKS, '게임 자산 팩', '필드 게임 그림·소리 묶음 (받은 팩 전부)'],
 ];

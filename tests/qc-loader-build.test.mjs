@@ -71,6 +71,13 @@ test('자료 팩 조각: 이어 붙이면 팩 글, 지문이 본체에 박혀 �
   assert.deepEqual([i.schema, i.kind, i.greetings.texts.length, i.icon.file], [1, 'install', 57, 'icon.png']);
   // 본체 크기: 자료를 뺀 뒤 (개선 나1 전 3.42MB · 18조각)
   assert.ok(Buffer.byteLength(body) < 2_300_000, `본체 ${Buffer.byteLength(body)} 바이트 < 2.3MB`);
+  // 세계 자료 한 파일(goei-data-world.txt, 릴리스 zip 에 넣어 받기 창의 「파일로 넣기」로): 조각을 이은 글과 같다
+  assert.equal(read('dist/goei-data-world.txt'), worldPackText(), 'goei-data-world.txt = 팩 글 전체');
+  // 시험용 예외 주입(src/body.ts faultOn 의 GOEI_TEST 블록)은 배포 본체에 없고 시험 본체(dist-test/goei-body.js)에만 있다
+  assert.ok(!body.includes('__goeiFaultSteps'), '배포 본체에 예외 주입 전역 읽기가 없음');
+  const testBody = read('dist-test/goei-body.js');
+  assert.ok(testBody.includes('__goeiFaultSteps'), '시험 본체에는 있음');
+  assert.equal(/^\/\/ goei-body (\S+)/.exec(testBody)?.[1], pkg.version, '시험 본체도 같은 판');
 });
 
 test('게임 코드 조각: 이어 붙이면 goei-game.js', { skip: !existsSync(new URL('dist/game/goei-game.js', root)) }, () => {
@@ -110,7 +117,9 @@ test('위키 기본 문서 조각(release): 이어 붙이면 GOEIWIKI1 묶음, �
 
 // release 폴더 자체의 짜임새: 시작기 머리의 판 = 본체 목록의 판 = 조각을 이은 본체 첫 줄의 판 = version.json = card-update.json.
 // (dist 와 같은 내용인지는 릴리스 때 사람이 복사하므로 여기서 대조하지 않는다. 소스를 고치면 당연히 달라진다)
-test('release 폴더: 시작기·본체 조각·version.json·card-update.json 이 같은 판', { skip: !existsSync(new URL('release/goei-body.json', root)) }, () => {
+// + 자료 팩(개선 나1)을 쓰는 본체(글에 goei-data-world 가 있음)면 release 에 goei-data-world.*·goei-data-install.* 이 있고 그 지문이 본체에 박힌 것과 같아야 한다
+//   (릴리스는 사람이 복사하므로 팩을 빠뜨리거나 옛 팩을 남기면 업데이트한 모든 사용자가 「올라오지 않았어요」에서 멈춘다)
+test('release 폴더: 시작기·본체 조각·version.json·card-update.json 이 같은 판, 자료 팩이 본체와 같은 지문', { skip: !existsSync(new URL('release/goei-body.json', root)) }, () => {
   const loader = read('release/goei-plugin.js');
   const ver = /^\/\/@version (\S+)/m.exec(loader)?.[1];
   assert.ok(ver, '시작기 머리에 //@version');
@@ -132,4 +141,16 @@ test('release 폴더: 시작기·본체 조각·version.json·card-update.json �
   assert.equal(text.length, upd.length);
   const game = JSON.parse(read('release/game/index.json'));
   assert.equal(game.version, ver, 'release/game/index.json 판');
+  if (body.includes('goei-data-world')) {
+    for (const name of ['goei-data-world', 'goei-data-install']) {
+      assert.ok(existsSync(new URL(`release/${name}.json`, root)), `release/${name}.json 이 있어야 함 (자료 팩을 쓰는 본체)`);
+      const index = JSON.parse(read(`release/${name}.json`));
+      assert.equal(index.version, ver, `${name}: 목록 판 = 시작기 판`);
+      const joined = index.parts.map((n) => read(`release/${n}`)).join('');
+      roundTrip('release', `${name}.json`, joined);
+      assert.equal(index.hash, fnv(joined), `${name}: 목록 hash = 조각을 이은 글 FNV`);
+      assert.equal(index.sha256, createHash('sha256').update(joined, 'utf8').digest('hex'), `${name}: 목록 sha256`);
+      assert.ok(body.includes(`"hash":"${index.hash}","sha256":"${index.sha256}","length":${index.length}`), `${name}: release 본체에 같은 지문이 박혀 있음 (팩과 본체가 같은 빌드)`);
+    }
+  }
 });

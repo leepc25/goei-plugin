@@ -17,11 +17,12 @@ export const PANEL_CSS = `
 
 let root: HTMLElement | null = null;
 
-export function closePanel(): void {
+/** keepContainer: 본체의 세계 자료 받기 창이 같은 컨테이너에 떠 있을 때 — 이 창만 거두고 컨테이너는 그대로 */
+export function closePanel(keepContainer = false): void {
   if (!root) return;
   root.remove();
   root = null;
-  void risuai.hideContainer();
+  if (!keepContainer) void risuai.hideContainer();
 }
 
 /** message: 처음부터 보일 까닭 (저장해 둔 본체가 실행되지 않았을 때 등) */
@@ -30,7 +31,7 @@ export function showPanel(version: string, install: (code: string) => Promise<vo
   root = document.createElement('div');
   root.innerHTML = `<style>${PANEL_CSS}</style><div class="gl-back"><div class="gl-card" role="dialog" aria-label="괴이 ː ANOMALY">
       <b>괴이 ː ANOMALY</b>
-      <p>플러그인 본체를 받지 못했어요. 다시 받거나, 릴리스 zip에 든 goei-body.js를 넣어 주세요.</p>
+      <p>플러그인 본체를 받지 못했어요. 다시 받거나, 릴리스 zip에 든 goei-body.js를 넣어 주세요. (이어서 세계 자료 goei-data-world.txt 도 창이 뜨면 넣어 주세요)</p>
       <p class="gl-msg" hidden></p>
       <div class="gl-act"><button class="primary" data-gl="get">다시 받기</button><button data-gl="file">파일로 넣기</button><button data-gl="close">닫기</button></div>
     </div></div>`;

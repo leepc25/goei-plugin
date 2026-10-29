@@ -4,7 +4,7 @@
 import { readFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import assert from 'node:assert/strict';
-import { launch, boot, startChat, request, output, display, input, chat, setVars, counts, resetCounts, waitLite, runner } from './qc-host.mjs';
+import { launch, boot, startChat, request, output, display, input, chat, setVars, counts, resetCounts, waitLite, runner, testBodyCode } from './qc-host.mjs';
 
 const fxPath = process.argv[2];
 if (!fxPath) throw new Error('사용법: node tests/qc-pipeline-browser.mjs <fixture.json>');
@@ -561,8 +561,9 @@ for (const [send, show, keepTags, when] of [[0, 0, 4, false], [2, 1, 1, true]]) 
 }
 
 // ── 8) 요청 조립 단계가 하나씩 던져도(예외 주입 globalThis.__goeiFaultSteps) 요청은 나가고 플러그인 표식은 없다 (개선 나3 정책: 막지 않고 표식만 지움) ──
+//        예외 주입 블록은 배포 본체에 없으므로(scripts/build.mjs dropLabels) 이 절만 시험 본체(dist-test/goei-body.js)로 돈다
 {
-  const { page, errors, logs } = await boot(browser, fixture, { message: [], scriptstate: {} }, { fixtureDir });
+  const { page, errors, logs } = await boot(browser, fixture, { message: [], scriptstate: {} }, { fixtureDir, body: testBodyCode });
   const saved = await startChat(page, 'A00', 2);
   const greeting = fixture.alternateGreetings[saved.fmIndex];
   const MARKERS = ['%%SCENE_CARD:', '%%/SCENE_CARD%%', '%%PHONE_CALL:', '%%/PHONE_CALL%%', '%%GOEI_START%%', '%%/GOEI_START%%', '%%GOEI_UNSENT%%', '%%SEED%%', '%%/SEED%%'];

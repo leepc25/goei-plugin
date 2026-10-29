@@ -4,7 +4,7 @@
 // 사용법: node tests/qc-static-risu-browser.mjs <fixture.json>
 import { readFileSync } from 'node:fs';
 import assert from 'node:assert/strict';
-import { launch, hostScript, plugin } from './qc-static-harness.mjs';
+import { launch, hostScript, plugin, testBodyCode } from './qc-static-harness.mjs';
 
 const fixture = JSON.parse(readFileSync(process.argv[2], 'utf8'));
 const chat = { message: [{ role: 'user', data: '안녕' }, { role: 'char', data: '첫 장면\n[▣|2025.01.01|02:47 AM|☀️|4°C|관리국 본부|없음]' }], scriptstate: { $st_faction: 'A00', $st_lang: 'ko', $st_fm: '1' } };
@@ -38,6 +38,7 @@ for (const denied of ['addRisuReplacer', 'addRisuChatListener', 'addRisuScriptHa
   await page.close();
 }
 // ── 본체 beforeRequest 가 통째로 던질 때(예외 주입 globalThis.__goeiFaultSteps = ['beforeRequest']): 시작기 catch → 본체 sanitize → 표식 없는 원문이 나간다
+//    예외 주입 블록은 배포 본체에 없으므로 이 절만 시험 본체(dist-test/goei-body.js)로
 {
   const page = await browser.newPage({ viewport: { width: 1100, height: 900 } });
   const errors = [];
@@ -45,7 +46,7 @@ for (const denied of ['addRisuReplacer', 'addRisuChatListener', 'addRisuScriptHa
   page.on('pageerror', (e) => errors.push(e.message));
   page.on('console', (m) => logs.push(m.text()));
   await page.setContent('<!doctype html><html><head><meta charset="utf-8"></head><body style="margin:0;height:100vh"><div class="default-chat-screen" style="height:100%"></div></body></html>');
-  await page.addScriptTag({ content: hostScript(fixture, chat) });
+  await page.addScriptTag({ content: hostScript(fixture, chat, { body: testBodyCode }) });
   await page.addScriptTag({ content: `(async () => { ${plugin}\n })().then(() => { window.__done = true; }).catch(e => { window.__bootError = String(e); });` });
   await page.waitForFunction(() => window.__done || window.__bootError, null, { timeout: 8000 });
   await page.waitForFunction(() => document.querySelector('[x-goei-fab]')?.style.display === 'block', null, { timeout: 8000 });

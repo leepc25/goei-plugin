@@ -21,8 +21,11 @@ export const bodyHash = (code: string): string => textHash(code);
  * 본체 코드를 실행한다. Risu 플러그인 칸은 nonce가 붙은 스크립트만 실행하므로(eval·blob 막힘)
  * 이 플러그인 스크립트의 nonce를 그대로 붙여 넣는다.
  */
-export function runBody(code: string, version: string): { start: () => Promise<Body> } {
-  const g = globalThis as unknown as { __goeiBody?: { version: string; start: () => Promise<Body> } };
+/** 본체 start 의 인자: prompt = 카드 열기·단추처럼 사용자가 시킨 시작 (본체는 세계 자료 받기 창을 이때만 다시 띄운다) */
+export type BodyStart = (o?: { prompt?: boolean }) => Promise<Body>;
+
+export function runBody(code: string, version: string): { start: BodyStart } {
+  const g = globalThis as unknown as { __goeiBody?: { version: string; start: BodyStart } };
   delete g.__goeiBody;
   const nonce = [...document.querySelectorAll('script')].map((s) => s.nonce).find(Boolean);
   const s = document.createElement('script');
@@ -30,7 +33,7 @@ export function runBody(code: string, version: string): { start: () => Promise<B
   s.textContent = code;
   document.head.append(s);
   s.remove();
-  const api = g.__goeiBody as { version: string; start: () => Promise<Body> } | undefined;
+  const api = g.__goeiBody as { version: string; start: BodyStart } | undefined;
   delete g.__goeiBody;
   if (!api || typeof api.start !== 'function') throw new BodyError('본체를 실행하지 못했어요.');
   if (api.version !== version) throw new BodyError(`본체 판(${api.version})이 플러그인(${version})과 달라요.`);

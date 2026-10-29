@@ -29,15 +29,16 @@ jobs:
           cd out
           cp ../dist/goei-plugin.js goei-plugin.js
           cp ../dist/goei-body.js goei-body.js
+          cp ../dist/goei-data-world.txt goei-data-world.txt
           mv card.charx goei-anomaly.charx
-          mkdir pack && cp goei-plugin.js goei-body.js pack/ && cp goei-anomaly.charx "pack/괴이_ANOMALY.charx"
-          (cd pack && zip -q "../goei-anomaly-${tag}.zip" goei-plugin.js goei-body.js 괴이_ANOMALY.charx)
+          mkdir pack && cp goei-plugin.js goei-body.js goei-data-world.txt pack/ && cp goei-anomaly.charx "pack/괴이_ANOMALY.charx"
+          (cd pack && zip -q "../goei-anomaly-${tag}.zip" goei-plugin.js goei-body.js goei-data-world.txt 괴이_ANOMALY.charx)
       - name: 릴리스
         env:
           GH_TOKEN: ${{ github.token }}
           TAG: ${{ steps.v.outputs.tag }}
         run: |
-          files=("out/goei-anomaly-${TAG}.zip#괴이_ANOMALY_${TAG}.zip (플러그인+카드)" "out/goei-plugin.js#goei-plugin.js (플러그인)" "out/goei-body.js#goei-body.js (본체, 못 받을 때 파일로 넣기)" "out/goei-anomaly.charx#괴이_ANOMALY.charx (카드)")
+          files=("out/goei-anomaly-${TAG}.zip#괴이_ANOMALY_${TAG}.zip (플러그인+카드)" "out/goei-plugin.js#goei-plugin.js (플러그인)" "out/goei-body.js#goei-body.js (본체, 못 받을 때 파일로 넣기)" "out/goei-data-world.txt#goei-data-world.txt (세계 자료, 못 받을 때 파일로 넣기)" "out/goei-anomaly.charx#괴이_ANOMALY.charx (카드)")
           if gh release view "$TAG" >/dev/null 2>&1; then
             for a in $(gh release view "$TAG" --json assets -q '.assets[].name'); do gh release delete-asset "$TAG" "$a" -y; done
             gh release upload "$TAG" "${files[@]}" --clobber
@@ -45,5 +46,5 @@ jobs:
           else
             gh release create "$TAG" --target "$GITHUB_SHA" "${files[@]}" \
               --title "괴이 ː ANOMALY ${TAG}" --prerelease \
-              --notes "처음 설치: zip을 받아 goei-plugin.js를 Risu 설정 → 플러그인에 추가하고, 괴이_ANOMALY.charx를 캐릭터로 가져오세요. 본체(goei-body.js)는 괴이 카드를 처음 열 때 자동으로 받고, 받지 못하면 뜨는 창에서 파일로 넣으면 됩니다. 그다음부터는 플러그인 탭과 창의 설정 → 업데이트에서 갱신됩니다."
+              --notes "처음 설치: zip을 받아 goei-plugin.js를 Risu 설정 → 플러그인에 추가하고, 괴이_ANOMALY.charx를 캐릭터로 가져오세요. 본체(goei-body.js)와 세계 자료(goei-data-world.txt)는 괴이 카드를 처음 열 때 자동으로 받고, 받지 못하면 뜨는 창에서 zip의 그 두 파일을 차례로 넣으면 됩니다. 그다음부터는 플러그인 탭과 창의 설정 → 업데이트에서 갱신됩니다."
           fi

@@ -11,11 +11,13 @@ export const { chromium } = require('playwright');
 
 export const plugin = readFileSync(process.env.PLUGIN || new URL('../dist/goei-plugin.js', import.meta.url), 'utf8');
 export const bodyCode = readFileSync(new URL('../dist/goei-body.js', import.meta.url), 'utf8');
+/** 시험 본체(scripts/build.mjs): 배포 본체와 같되 예외 주입 블록(globalThis.__goeiFaultSteps)만 남긴 것. 요청 조립 실패 절(qc-pipeline 8절)만 쓴다 */
+export const testBodyCode = readFileSync(new URL('../dist-test/goei-body.js', import.meta.url), 'utf8');
 /** 세계 자료 팩 (개선 나1): 본체처럼 가짜 저장소에 미리 둔다 (저장소에 자료가 있는 보통 경우). 받기 시험은 noBody 쪽에서 */
 export const worldPack = distWorldPack();
 
 /** 가짜 risuai. window.__counts 에 getChatFromIndex·getCharacterFromIndex 호출 수를 센다 */
-export function hostScript(char, chat, { rootDom = true, noBody = false, prefs = null } = {}) {
+export function hostScript(char, chat, { rootDom = true, noBody = false, prefs = null, body = bodyCode } = {}) {
   return `
     window.__calls = { setChat: [], show: [], hide: 0, replacers: [], listeners: [], handlers: {} };
     window.__counts = { chat: 0, char: 0, setChat: 0, setChar: 0 };
@@ -39,7 +41,7 @@ export function hostScript(char, chat, { rootDom = true, noBody = false, prefs =
       textContent: async () => el.textContent,
     });
     window.__store = {};
-    if (!${noBody}) window.__store['p:goei:body'] = ${JSON.stringify(bodyCode)};
+    if (!${noBody}) window.__store['p:goei:body'] = ${JSON.stringify(body)};
     if (!${noBody}) window.__store['p:goei:data-world'] = ${JSON.stringify(worldPack)};
     if (${JSON.stringify(prefs)}) window.__store['p:goei:prefs'] = ${JSON.stringify(JSON.stringify(prefs))};
     window.__rootDoc = ${rootDom} ? { ...wrap(document.documentElement), querySelector: async (q) => wrap(document.querySelector(q)), querySelectorAll: async (q) => [...document.querySelectorAll(q)].map(wrap), createElement: async (t) => wrap(document.createElement(t)) } : null;
@@ -90,7 +92,7 @@ export async function launch() {
   return browser;
 }
 
-export async function boot(browser, char, chat, { viewport = { width: 1100, height: 900 }, touch = false, rootDom = true, noBody = false, fixtureDir = '', prefs = null } = {}) {
+export async function boot(browser, char, chat, { viewport = { width: 1100, height: 900 }, touch = false, rootDom = true, noBody = false, fixtureDir = '', prefs = null, body = bodyCode } = {}) {
   const page = await browser.newPage({ viewport, ...(touch ? { hasTouch: true, isMobile: true } : {}) });
   const errors = [];
   page.on('pageerror', (e) => errors.push(e.message));
@@ -101,7 +103,7 @@ export async function boot(browser, char, chat, { viewport = { width: 1100, heig
   });
   await page.setContent('<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"></head><body style="margin:0;height:100vh"><div class="default-chat-screen" style="height:100%;background:#f3f3f3"><button id="other" style="margin:40px">다른 버튼</button></div></body></html>');
   await page.addScriptTag({ content: "document.addEventListener('submit', (e) => { e.preventDefault(); e.stopImmediatePropagation(); }, true);" });
-  await page.addScriptTag({ content: hostScript(char, chat, { rootDom, noBody, prefs }) });
+  await page.addScriptTag({ content: hostScript(char, chat, { rootDom, noBody, prefs, body }) });
   await page.addScriptTag({ content: `(async () => { ${plugin}\n })().catch(e => { window.__bootError = String(e); });` });
   await page.waitForFunction(() => window.__calls.replacers.length || window.__bootError);
   assert.equal(await page.evaluate(() => window.__bootError ?? null), null);

@@ -14,10 +14,12 @@ const require = createRequire(execSync('npm root -g').toString().trim() + '/');
 const { chromium } = require('playwright');
 export const plugin = readFileSync(new URL('../dist/goei-plugin.js', import.meta.url), 'utf8');
 export const bodyCode = readFileSync(new URL('../dist/goei-body.js', import.meta.url), 'utf8');
+/** 시험 본체(scripts/build.mjs): 예외 주입 블록(globalThis.__goeiFaultSteps)만 남긴 것. qc-static-risu 의 요청 처리기 실패 절만 쓴다 */
+export const testBodyCode = readFileSync(new URL('../dist-test/goei-body.js', import.meta.url), 'utf8');
 /** 세계 자료 팩 (개선 나1): 본체처럼 가짜 저장소에 미리 둔다 (저장소에 자료가 있는 보통 경우). 받기 시험은 noBody 쪽에서 */
 export const worldPack = distWorldPack();
 
-export function hostScript(char, chat) {
+export function hostScript(char, chat, { body = bodyCode } = {}) {
   return `
     window.__calls = { setChat: [], show: [], hide: 0, replacers: [], listeners: [], handlers: {}, api: {}, prefsSaves: 0 };
     const count = (k) => { window.__calls.api[k] = (window.__calls.api[k] || 0) + 1; };
@@ -41,7 +43,7 @@ export function hostScript(char, chat) {
       hasClass: async (c) => el.classList.contains(c),
       textContent: async () => el.textContent,
     });
-    window.__store = { 'p:goei:body': ${JSON.stringify(bodyCode)}, 'p:goei:data-world': ${JSON.stringify(worldPack)} };
+    window.__store = { 'p:goei:body': ${JSON.stringify(body)}, 'p:goei:data-world': ${JSON.stringify(worldPack)} };
     window.__rootDoc = { querySelector: async (q) => { count('dom.querySelector'); return wrap(document.querySelector(q)); }, querySelectorAll: async (q) => { const a = [...document.querySelectorAll(q)].map(wrap); return Object.assign(a, { length: async () => a.length, at: async (i) => a[i] }); }, createElement: async (t) => wrap(document.createElement(t)) };
     window.__char = ${JSON.stringify(char)};
     window.__chats = [${JSON.stringify(chat)}];

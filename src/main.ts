@@ -23,8 +23,8 @@ let failedAt = 0;
 let startError = '';
 /** 본체 코드 자체가 실행되지 않았나 (깨진 글·판 불일치). 본체는 돌았는데 시작 중에 실패한 것과 구분해, 깨진 코드만 저장소에서 지운다 */
 let codeBroken = false;
-/** 본체와 주고받는 고리 (개선 나1, host/datapanel.ts): 본체가 세계 자료 받기 창을 띄웠으면(__goeiBodyPanel) 시작기 창은 띄우지 않고,
- *  그 창에서 다시 받기에 성공하면 본체가 __goeiRelaunch 로 다시 띄워 달라고 한다 (옛 시작기에는 이 고리가 없어 본체가 채팅을 다시 그리게 한다) */
+/** 본체와 주고받는 고리 (개선 나1, host/datapanel.ts): 본체가 세계 자료 받기 창을 띄웠으면(__goeiBodyPanel) 시작기 창은 띄우지 않고(떠 있던 것은 거둠),
+ *  그 창에서 다시 받기·파일 넣기에 성공하면 본체가 __goeiRelaunch 로 다시 띄워 달라고 한다 */
 const link = globalThis as { __goeiBodyPanel?: boolean; __goeiRelaunch?: () => void };
 link.__goeiRelaunch = () => {
   if (!body && !stopped) void ensure(true);
@@ -51,7 +51,7 @@ async function load(prompt: boolean): Promise<Body | null> {
     }
     await save(code);
   }
-  const b = await start(code);
+  const b = await start(code, prompt);
   if (!b) {
     failedAt = Date.now();
     // 저장해 둔 본체가 깨져 있으면(판은 맞는데 실행이 안 됨) 지워서 다음에 다시 받게 한다. 그냥 두면 플러그인 판이 바뀔 때까지 영영 안 뜬다
@@ -70,7 +70,8 @@ async function save(code: string): Promise<void> {
   }
 }
 
-async function start(code: string): Promise<Body | null> {
+/** prompt: 카드 열기·단추처럼 사용자가 시킨 시작인지 — 본체는 세계 자료 받기 창을 이때만 다시 띄운다 (닫은 창이 표시·요청마다 되살아나지 않게) */
+async function start(code: string, prompt: boolean): Promise<Body | null> {
   codeBroken = false;
   let api: ReturnType<typeof runBody>;
   try {
@@ -82,7 +83,7 @@ async function start(code: string): Promise<Body | null> {
     return null;
   }
   try {
-    body = await api.start();
+    body = await api.start({ prompt });
     return body;
   } catch (error) {
     startError = error instanceof Error ? error.message : String(error);
@@ -91,10 +92,11 @@ async function start(code: string): Promise<Body | null> {
   }
 }
 
-/** 받기 창에서 받았거나 파일로 넣은 본체. 시작하지 못하면 창은 그대로 두고 까닭을 던진다 */
+/** 받기 창에서 받았거나 파일로 넣은 본체. 시작하지 못하면 창은 그대로 두고 까닭을 던진다.
+ *  본체가 세계 자료 받기 창을 띄웠으면(파일로 넣은 본체가 자료를 못 받음) 그 창이 안내를 이어받으므로 이 창은 컨테이너를 숨기지 않고 거둔다 (두 창이 겹치지 않게) */
 async function install(code: string): Promise<void> {
   await save(code);
-  loading = start(code).then((b) => {
+  loading = start(code, true).then((b) => {
     if (!b) loading = null;
     return b;
   });
@@ -102,6 +104,10 @@ async function install(code: string): Promise<void> {
   if (!b) {
     failedAt = Date.now();
     if (codeBroken) await risuai.pluginStorage.removeItem(BODY_KEY).catch(() => {});
+    if (link.__goeiBodyPanel) {
+      closePanel(true);
+      return;
+    }
     throw new BodyError(`본체를 시작하지 못했어요: ${startError}`);
   }
   closePanel();

@@ -24,12 +24,14 @@ mkdirSync('dist', { recursive: true });
 // 자료 팩 (QC 개선 나1, scripts/data-pack.mjs): 세계 자료·설치 자료는 본체에 번들하지 않고 goei-data-<이름>.json + .N.txt 로 따로 받는다.
 // 지문(hash·sha256·length)을 본체에 박아(define) 본체가 자기와 맞는 자료만 쓴다. 조각은 본체와 같은 200KB 이하
 const dataPacks = [packOf(WORLD_PACK_NAME, worldPackText(), pkg.version), packOf(INSTALL_PACK_NAME, installPackText(), pkg.version)];
-for (const f of readdirSync('dist')) if (/^goei-data-[a-z]+\.(\d+\.txt|json)$/.test(f)) unlinkSync(`dist/${f}`);
+for (const f of readdirSync('dist')) if (/^goei-data-[a-z]+\.(\d+\.)?(txt|json)$/.test(f)) unlinkSync(`dist/${f}`);
 for (const p of dataPacks) {
   p.parts.forEach((part, i) => writeFileSync(`dist/${p.partNames[i]}`, part));
   writeFileSync(`dist/${p.name}.json`, JSON.stringify(p.index) + '\n');
 }
 const [worldPack, installPack] = dataPacks;
+// 세계 자료를 한 파일로도 (goei-data-world.txt): 릴리스 zip 에 넣어, 네트워크가 막힌 환경에서 본체(goei-body.js)와 함께 받기 창에 파일로 넣는다 (host/datapanel.ts)
+writeFileSync(`dist/${worldPack.name}.txt`, worldPack.text);
 
 const define = {
   __UPDATE_BASE__: JSON.stringify(updateBase),
@@ -54,9 +56,16 @@ const code = header + loader.outputFiles[0].text;
 writeFileSync('dist/goei-plugin.js', code);
 
 // 본체: 첫 줄의 판으로 시작기와 맞는지 본다. 받을 때는 조각(goei-body.N.txt)으로 받는다 (Risu 웹 프록시는 1MB 넘는 파일을 못 받는다)
-const bodyOut = await build({ ...common, entryPoints: ['src/body-entry.ts'], format: 'iife' });
+// 배포 본체에서는 시험용 예외 주입 블록(src/body.ts faultOn 의 GOEI_TEST: 이름표)을 통째로 뺀다
+const bodyOut = await build({ ...common, entryPoints: ['src/body-entry.ts'], format: 'iife', dropLabels: ['GOEI_TEST'] });
 const bodyCode = `// goei-body ${pkg.version}\n` + bodyOut.outputFiles[0].text;
 writeFileSync('dist/goei-body.js', bodyCode);
+// 시험 본체: 같은 본체에 예외 주입 블록만 남긴 것. 요청 조립 실패 시험(tests/qc-pipeline-browser.mjs 8절·qc-static-risu-browser.mjs)만 이것을 쓴다
+mkdirSync('dist-test', { recursive: true });
+{
+  const t = await build({ ...common, entryPoints: ['src/body-entry.ts'], format: 'iife' });
+  writeFileSync('dist-test/goei-body.js', `// goei-body ${pkg.version}\n` + t.outputFiles[0].text);
+}
 for (const f of readdirSync('dist')) if (/^goei-body\.\d+\.txt$/.test(f)) unlinkSync(`dist/${f}`);
 const bodyParts = [];
 {

@@ -77,10 +77,15 @@ const WATCH_MS = 1000;
 /** 지금 보고 있는 캐릭터가 괴이봇 Lite인지 (감시 루프가 갱신). 다른 봇에서는 아무것도 하지 않기 위해 쓴다 */
 let liteNow = false;
 
-/** 시험용 예외 주입: 가짜 Risu 가 globalThis.__goeiFaultSteps 에 단계 이름 목록을 두면 그 단계가 던진다 (tests/qc-pipeline-browser.mjs). 실제 Risu 에는 없다 */
+/** 시험용 예외 주입: 가짜 Risu 가 globalThis.__goeiFaultSteps 에 단계 이름 목록을 두면 그 단계가 던진다 (tests/qc-pipeline-browser.mjs).
+ *  GOEI_TEST 이름표 블록은 배포 본체 빌드에서 통째로 빠지고(scripts/build.mjs dropLabels) 시험 본체(dist-test/goei-body.js)에만 남는다 */
 const faultOn = (name: string): boolean => {
-  const g = (globalThis as { __goeiFaultSteps?: unknown }).__goeiFaultSteps;
-  return Array.isArray(g) && g.includes(name);
+  let on = false;
+  GOEI_TEST: {
+    const g = (globalThis as { __goeiFaultSteps?: unknown }).__goeiFaultSteps;
+    on = Array.isArray(g) && g.includes(name);
+  }
+  return on;
 };
 const reason = (e: unknown) => (e instanceof Error ? e.message : String(e));
 
@@ -718,14 +723,15 @@ export interface BodyHandlers {
 
 /**
  * 본체 시작: 세계 자료를 넣고(저장소 → 없으면 받아 저장, QC 개선 나1), 설정을 읽고 플로팅 버튼·채팅 감시를 켠다.
- * Risu에 거는 처리기는 시작기(main.ts)가 대신 걸고 여기로 넘긴다. 세계 자료를 받지 못하면 받기 창(host/datapanel.ts)을 띄우고 던진다 — 처리기·화면은 켜지 않는다
+ * Risu에 거는 처리기는 시작기(main.ts)가 대신 걸고 여기로 넘긴다. 세계 자료를 받지 못하면 받기 창(host/datapanel.ts)을 띄우고 던진다 — 처리기·화면은 켜지 않는다.
+ * o.prompt: 카드 열기·단추처럼 사용자가 시킨 시작(시작기 main.ts 가 넘긴다). 받기 창은 prompt 거나 사용자가 닫은 적이 없을 때만 뜬다
  */
-export async function start(): Promise<BodyHandlers> {
+export async function start(o: { prompt?: boolean } = {}): Promise<BodyHandlers> {
   try {
     await loadWorldData();
   } catch (error) {
-    // 받기 창(까닭·다시 받기)은 본체가 띄운다 — 옛 시작기는 시작 실패에 아무 창도 띄우지 않으므로 (host/datapanel.ts)
-    showWorldDataPanel(reason(error));
+    // 받기 창(까닭·다시 받기·파일로 넣기)은 세계 자료를 받는 쪽인 본체가 띄운다 (host/datapanel.ts)
+    showWorldDataPanel(reason(error), !!o.prompt);
     throw error;
   }
   await loadPrefs();
