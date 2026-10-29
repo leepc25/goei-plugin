@@ -1526,4 +1526,144 @@ if (want('IP1')) {
   await page.close();
 }
 
+// ═══════════ 기록 · 소감 (묶음 3, docs/설계안_기록_보고서.md 6장) ═══════════
+// 종료 턴 응답 둘: 진입(활성·목표 = 이 괴이 → 내가 출동) → 종료(격리). 글에 쟈알디가 나와야 갱신기가 모델을 부른다 (장면 인물 없음이면 안 부름)
+const enterText = (where, preset) => ['쟈알디 부장이 셔터 앞에서 지시를 내렸다.', `[AN|${where}|${preset.name}|활성|A|P001, P002|셔터 안쪽으로 진입했다]`, '[AG|P002|작전투입|현장]', `[▣|2025.01.01|03:30 AM|☀️|4°C|${where} 지하|${preset.name}]`].join('\n');
+const endText = (where, preset) => ['쟈알디가 격리 완료를 보고했다.', `[AN|${where}|${preset.name}|격리|A|P001, P002|격리 완료. 현장 봉쇄 해제]`, '[AG|P001|휴게|사무실]', '[AG|P002|부상|병원]', '[▣|2025.01.01|04:11 AM|☀️|4°C|관리국 본부|없음]'].join('\n');
+const lastReport = (page) => page.evaluate(() => JSON.parse(window.__chat.scriptstate.$goei_reports ?? '{"items":[]}').items.at(-1) ?? null);
+async function openReportPage(page, id) {
+  await open(page);
+  await nav(page, 'records');
+  await page.waitForSelector('.gx-records');
+  await page.click('[data-action="rec-sub"][data-value="reports"]');
+  await page.click('[data-action="rec-rfilter"][data-value="all"]');
+  await page.click(`.gx-rcard[data-value="${id}"]`);
+  await page.waitForSelector('.gx-rpt');
+}
+
+// J1) 소감 자동(기본 켬): 종료 턴의 인물 기록 갱신 호출 1회에 ended_now 자료·debrief 절이 얹히고(호출 수 그대로), 응답 debriefs 가 검사 뒤 보고서에 src turn 으로. 사건당 1건, 종료 없는 턴엔 절·자료 없음
+if (want('J1')) {
+  const { page, errors } = await boot(fixture, { message: [], scriptstate: {} });
+  const { preset, where } = await startedWithReply(page);
+  // 갱신기 응답을 그때그때 만든다 (보고서 id 는 종료가 반영된 뒤에야 알 수 있다)
+  await page.evaluate(() => {
+    const orig = window.risuai.runLLMModel;
+    window.risuai.runLLMModel = async (o) => {
+      if (!window.__llmDyn) return orig(o);
+      (window.__calls.llm = window.__calls.llm || []).push(o);
+      await new Promise((r) => setTimeout(r, 100));
+      return window.__llmDyn(o);
+    };
+  });
+  const n0 = await llmCount(page);
+  await llm(page, [upd({ entries: [] })]);
+  await fireOutput(page, enterText(where, preset));
+  await page.waitForFunction((n) => (window.__calls.llm ?? []).length === n + 1, n0, { timeout: 8000 });
+  const c1 = await page.evaluate(() => window.__calls.llm.at(-1));
+  assert.equal(JSON.parse(c1.messages[1].content).ended_now, undefined, '종료 없는 턴: ended_now 없음');
+  assert.ok(!c1.messages[0].content.includes('Debrief'), '종료 없는 턴: 소감 절 없음');
+  await page.evaluate(() => {
+    window.__llmDyn = () => {
+      const r = JSON.parse(window.__chat.scriptstate.$goei_reports).items.at(-1);
+      return { type: 'success', result: JSON.stringify({ entries: [], debriefs: [{ id: r.id, who: '쟈알디', text: '셔터 안쪽은 좁았다. 스팡달이 다친 게 마음에 걸린다.' }, { id: r.id, who: '쟈알디', text: '둘째 것' }, { id: 'r_none', who: '쟈알디', text: '없는 사건' }] }) };
+    };
+  });
+  await fireOutput(page, endText(where, preset));
+  await page.waitForFunction((n) => (window.__calls.llm ?? []).length === n + 2, n0, { timeout: 8000 });
+  await page.waitForFunction(() => JSON.parse(window.__chat.scriptstate.$goei_reports ?? '{"items":[]}').items.some((r) => r.debrief), null, { timeout: 8000 });
+  await page.evaluate(() => { window.__llmDyn = null; });
+  const call = await page.evaluate(() => window.__calls.llm.at(-1));
+  assert.equal(call.mode, 'submodel');
+  assert.ok(call.messages[0].content.includes('15c. Debrief') && call.messages[0].content.includes('"debriefs"'), '지침에 소감 절 + 출력 칸');
+  const data = JSON.parse(call.messages[1].content);
+  assert.equal(data.ended_now.length, 1, 'ended_now 한 건');
+  assert.ok(data.ended_now[0].name === preset.name && data.ended_now[0].agents.includes('쟈알디') && data.ended_now[0].mine === true && data.want.debriefs === true, JSON.stringify(data.ended_now));
+  assert.ok(data.ended_now[0].trail_tail.some((t) => t.includes('셔터')), '경과 꼬리');
+  const rep = await lastReport(page);
+  assert.equal(rep.id, data.ended_now[0].id);
+  assert.deepEqual([rep.debrief.who, rep.debrief.src], ['쟈알디', 'turn']);
+  assert.ok(rep.debrief.text.startsWith('셔터 안쪽은 좁았다'));
+  const diag = JSON.parse(await page.evaluate(() => window.__store['p:goei-people-diag'] ?? '[]')).at(-1);
+  assert.equal(diag.report.applied.debriefs, 1, '진단: 소감 1');
+  assert.deepEqual(diag.report.dropped.filter((d) => d.kind === 'debrief').map((d) => d.reason), ['사건당 1건', '이번 턴에 종료된 사건이 아님']);
+  // 보고서 페이지에 소감 (종료 턴 갱신기), 설정 → 인물 기록 → 진단 목록에 「소감 1」
+  await openReportPage(page, rep.id);
+  const dtext = await page.textContent('.gx-rpt-debrief');
+  assert.ok(dtext.includes('쟈알디 소감') && dtext.includes('종료 턴 갱신기') && dtext.includes('셔터 안쪽은 좁았다'), dtext);
+  assert.equal(await page.locator('.gx-rpt [data-action="rec-debrief"]:not([disabled])').count(), 1, '소감 쓰기 단추는 살아 있다 (덮어쓰기)');
+  // 종료 없는 다음 턴: 다시 절·자료 없음, 있던 소감 그대로
+  await llm(page, [upd({ entries: [] })]);
+  await fireOutput(page, '쟈알디가 커피를 마셨다.');
+  await page.waitForFunction((n) => (window.__calls.llm ?? []).length === n + 3, n0, { timeout: 8000 });
+  await wait(300);
+  const c3 = await page.evaluate(() => window.__calls.llm.at(-1));
+  assert.equal(JSON.parse(c3.messages[1].content).ended_now, undefined);
+  assert.ok(!c3.messages[0].content.includes('15c. Debrief'));
+  assert.equal((await lastReport(page)).debrief.src, 'turn');
+  assert.deepEqual(errors, []);
+  console.log('PASS 소감 자동: 종료 턴 갱신 호출에 ended_now·debrief 절 (호출 1회 그대로) · 검사(사건당 1건·없는 사건) · 보고서 src turn · 진단 「소감 1」 · 종료 없는 턴엔 없음');
+  await page.close();
+}
+
+// J2) 소감 자동 끔 ($jr_debrief_auto=0): 종료 턴 갱신 호출은 그대로 1회지만 절·자료가 없고, 보고서는 「소감 없음」
+if (want('J2')) {
+  const { page, errors } = await boot(fixture, { message: [], scriptstate: {} });
+  const { preset, where } = await startedWithReply(page);
+  await page.evaluate(() => { window.__chat.scriptstate.$jr_debrief_auto = '0'; });
+  const n0 = await llmCount(page);
+  await llm(page, [upd({ entries: [] }), upd({ entries: [], debriefs: [{ id: 'x', who: '쟈알디', text: '보내도 안 받는다.' }] })]);
+  await fireOutput(page, enterText(where, preset));
+  await page.waitForFunction((n) => (window.__calls.llm ?? []).length === n + 1, n0, { timeout: 8000 });
+  await fireOutput(page, endText(where, preset));
+  await page.waitForFunction((n) => (window.__calls.llm ?? []).length === n + 2, n0, { timeout: 8000 });
+  await wait(500);
+  const call = await page.evaluate(() => window.__calls.llm.at(-1));
+  assert.ok(!call.messages[0].content.includes('Debrief'), '소감 절 없음');
+  const data = JSON.parse(call.messages[1].content);
+  assert.equal(data.ended_now, undefined);
+  assert.equal(data.want.debriefs, false);
+  const rep = await lastReport(page);
+  assert.ok(rep && rep.mine && !rep.debrief, '보고서는 있고 소감은 없음');
+  await openReportPage(page, rep.id);
+  assert.ok((await page.textContent('.gx-rpt')).includes('소감 없음'));
+  assert.deepEqual(errors, []);
+  console.log('PASS 소감 자동 끔: 갱신 호출은 그대로, 절·자료 없음, 보고서 「소감 없음」');
+  await page.close();
+}
+
+// J3) 인물 기록 갱신기 끔 ($pp_on=0): 종료 턴에 호출 0회 → 「소감 없음」. 그래도 보고서 페이지 「소감 쓰기」는 보조 모델 1회로 된다 (src manual)
+if (want('J3')) {
+  const { page, errors } = await boot(fixture, { message: [], scriptstate: {} });
+  const { preset, where } = await startedWithReply(page);
+  await page.evaluate(() => { window.__chat.scriptstate.$pp_on = '0'; });
+  const n0 = await llmCount(page);
+  await fireOutput(page, enterText(where, preset));
+  await fireOutput(page, endText(where, preset));
+  await wait(700);
+  assert.equal(await llmCount(page), n0, '갱신기 꺼짐: 종료 턴에 호출 0회');
+  const rep = await lastReport(page);
+  assert.ok(rep && rep.mine && !rep.debrief);
+  await openReportPage(page, rep.id);
+  assert.ok((await page.textContent('.gx-rpt')).includes('소감 없음'));
+  await page.evaluate((id) => { window.__llm = [ok0(JSON.stringify({ debriefs: [{ id, who: '스팡달', text: '병원 침대에서 쓴다. 다음엔 셔터부터 확인하자.' }] }))]; function ok0(s) { return { type: 'success', result: s }; } }, rep.id);
+  await page.click('.gx-rpt [data-action="rec-debrief"]');
+  await page.waitForFunction((id) => JSON.parse(window.__chat.scriptstate.$goei_reports).items.find((r) => r.id === id)?.debrief?.src === 'manual', rep.id, { timeout: 15000 });
+  assert.equal(await llmCount(page), n0 + 1, '수동 소감 = 1회');
+  const call = await page.evaluate(() => window.__calls.llm.at(-1));
+  assert.equal(call.mode, 'submodel');
+  assert.ok(!call.messages[0].content.includes('15c.') && call.messages[0].content.includes('after-action'), '갱신기 전체 지침이 아니라 짧은 전용 지침');
+  await page.waitForFunction(() => document.querySelector('.gx-rpt-debrief')?.textContent?.includes('스팡달 소감'));
+  assert.ok((await page.textContent('.gx-rpt-debrief')).includes('직접 요청'));
+  // 깨진 응답 → 재시도 1회 뒤 실패 안내, 보고서의 소감은 그대로
+  await page.evaluate(() => { window.__llm = [{ type: 'success', result: '{"debriefs":[' }, { type: 'success', result: '아님' }]; });
+  await page.click('.gx-rpt [data-action="rec-debrief"]');
+  await page.waitForFunction((n) => (window.__calls.llm ?? []).length === n + 3, n0, { timeout: 15000 });
+  await page.waitForSelector('.gx-records .gx-err');
+  assert.ok((await page.textContent('.gx-records .gx-err')).includes('소감을 쓰지 못했어요'));
+  assert.equal((await lastReport(page)).debrief.who, '스팡달', '있던 소감 그대로');
+  assert.deepEqual(errors, []);
+  console.log('PASS 갱신기 끔: 종료 턴 호출 0회·「소감 없음」 · 수동 「소감 쓰기」 1회(src manual) · 깨진 응답은 실패 안내');
+  await page.close();
+}
+
 await browser.close();

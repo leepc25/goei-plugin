@@ -2892,13 +2892,24 @@ if (fixture.globalLore.some(packed)) {
     await window.__calls.listeners[0]({ char: JSON.parse(JSON.stringify(window.__char)), chat: JSON.parse(JSON.stringify(c)), characterIndex: 0, chatIndex: 0, messageIndex: c.message.length - 1 });
     const g = document.querySelector('.gx'); if (g) g.style.display = 'none';
   }, reply);
-  await fire(['진입', `[AN|${where}|${preset.name}|활성|A|P001, P002|셔터 안쪽으로 진입했다]`, '[AG|P002|작전투입|현장]', `[▣|2025.01.01|03:30 AM|☀️|4°C|${where} 지하|${preset.name}]`].join('\n'));
-  await fire(['종료', `[AN|${where}|${preset.name}|격리|A|P001, P002|격리 완료. 현장 봉쇄 해제]`, '[AG|P001|휴게|사무실]', '[AG|P002|부상|병원]', '[▣|2025.01.01|04:11 AM|☀️|4°C|관리국 본부|없음]'].join('\n'));
+  const enterReply = ['진입', `[AN|${where}|${preset.name}|활성|A|P001, P002|셔터 안쪽으로 진입했다]`, '[AG|P002|작전투입|현장]', `[▣|2025.01.01|03:30 AM|☀️|4°C|${where} 지하|${preset.name}]`].join('\n');
+  const endReply = ['종료', `[AN|${where}|${preset.name}|격리|A|P001, P002|격리 완료. 현장 봉쇄 해제]`, '[AG|P001|휴게|사무실]', '[AG|P002|부상|병원]', '[▣|2025.01.01|04:11 AM|☀️|4°C|관리국 본부|없음]'].join('\n');
+  await fire(enterReply);
+  await fire(endReply);
   const ss = await page.evaluate(() => window.__chat.scriptstate);
   const row = JSON.parse(ss.$goei_journal).rows.find((r) => r.name === preset.name);
   assert.ok(row && row.mine && row.rpt, '내가 출동한 일지 줄 + 보고서 id');
   const rpt = JSON.parse(ss.$goei_reports).items.find((r) => r.id === row.rpt);
   assert.ok(rpt && rpt.full && rpt.trail.length === 1 && rpt.trail[0].text.includes('셔터'), '전체 보고서 · 경과 1(진입)');
+  // 채팅 본문 자동 표시 (묶음 3, 설정 기본 「내가 출동한 사건만」): display 처리기가 종료 응답의 상태창 아래에 보고서 카드를 그린다. 본문·모델 요청에는 아무것도 안 들어간다
+  const disp = (t) => page.evaluate((t) => window.__calls.handlers.display(t), t);
+  const endHtml = await disp(endReply);
+  assert.ok(endHtml.includes('data-goei-card="report"') && endHtml.includes('기록에서 보기') && endHtml.includes(`data-goei-rec="${rpt.id}"`) && endHtml.includes(rpt.no), '종료 응답 아래 보고서 카드');
+  assert.ok(endHtml.indexOf('data-goei-status') < endHtml.indexOf('data-goei-card="report"'), '상태창 상자 다음에');
+  assert.ok(!(await disp(enterReply)).includes('data-goei-card="report"'), '종료가 없는 응답엔 카드 없음');
+  assert.ok(!(await page.evaluate(() => window.__chat.message.at(-1).data)).includes('data-goei-card'), '메시지 본문은 그대로');
+  const reqCard = await page.evaluate((t) => window.__calls.replacers[0]([{ role: 'user', content: '시작' }, { role: 'assistant', content: t }, { role: 'user', content: '다음' }], 'model'), endReply);
+  assert.ok(!reqCard.some((m) => /사건 보고서|data-goei-card|기록에서 보기/.test(String(m.content))), '모델 요청에는 카드가 없다');
   // 상황판: 종료 알림 한 줄 · 종료 줄 보고서 아이콘 · 큰 보기 보고서 단추 · 「기록에서 전부 보기 ›」 (창은 위키 탭에서 숨겼으니 상황판으로)
   await open(page);
   await page.click('.gx-nav .gx-nb:not(.mob)[data-value="board"]');
@@ -2921,9 +2932,45 @@ if (fixture.globalLore.some(packed)) {
   assert.equal(await page.locator('.ev-pop, .gx-agpop').count(), 0, '창이 아니다');
   const rt = await page.textContent('.gx-rpt');
   for (const t of [rpt.no, preset.name, '내가 출동', '경과', '셔터 안쪽으로 진입했다', '투입 요원', '쟈알디', '결과', rpt.result, '소감 없음', '인물 기록 변화', '가계부', '종료 시점 잔고']) assert.ok(rt.includes(t), `보고서 페이지: ${t}`);
-  assert.equal(await page.locator('.gx-rpt [data-action="rec-png"][disabled]').count() + await page.locator('.gx-rpt [data-action="rec-debrief"][disabled]').count(), 2, '이미지로 저장·소감 쓰기 자리 (묶음 3 전까지 잠금)');
   assert.ok((await page.textContent('.gx-rpt [data-action="rec-debrief"]')).includes('보조 모델 1회'));
   assert.equal(await page.locator('.gx-rpt button:has-text("채팅에 넣기")').count(), 0, '수동 「채팅에 넣기」 없음');
+  // 「이미지로 저장」 (묶음 3): a.download 클릭을 가로채 PNG 한 장 — image/png · 900×1200 · 미리보기 창 (길게 눌러 저장 안내) → 닫기
+  await page.evaluate(() => {
+    window.__dl = [];
+    const orig = HTMLAnchorElement.prototype.click;
+    HTMLAnchorElement.prototype.click = function () { if (this.download) { window.__dl.push({ href: this.href, name: this.download }); return; } return orig.call(this); };
+  });
+  await page.click('.gx-rpt [data-action="rec-png"]');
+  await page.waitForFunction(() => (window.__dl ?? []).length === 1, null, { timeout: 20000 });
+  const png = await page.evaluate(async () => {
+    const d = window.__dl[0];
+    const b = await (await fetch(d.href)).blob();
+    const img = new Image();
+    img.src = d.href;
+    await img.decode();
+    return { name: d.name, type: b.type, size: b.size, w: img.naturalWidth, h: img.naturalHeight, dataLen: (await new Promise((r) => { const fr = new FileReader(); fr.onload = () => r(fr.result); fr.readAsDataURL(b); })).length };
+  });
+  assert.ok(png.name.startsWith('관리국_보고서_') && png.name.endsWith('.png') && png.type === 'image/png' && png.size > 10000 && png.dataLen > 10000, JSON.stringify(png));
+  assert.deepEqual([png.w, png.h], [900, 1200], 'PNG 900×1200');
+  await page.waitForSelector('.gx-pngpop .gx-png-img');
+  assert.ok((await page.textContent('.gx-pngpop')).includes(rpt.no));
+  await page.click('.gx-pngpop .gx-png-acts [data-action="rec-png-x"]');
+  assert.equal(await page.locator('.gx-pngpop').count(), 0, '미리보기 닫힘');
+  // 「소감 쓰기」 (묶음 3): 이 보고서 하나만 보조 모델 1회 — 짧은 전용 지침 + ended_now 한 건 → 검사 뒤 src manual 로 저장, 페이지에 소감
+  const llmBefore = await page.evaluate(() => (window.__calls.llm ?? []).length);
+  await page.evaluate((id) => { window.__llm = [{ type: 'success', result: JSON.stringify({ debriefs: [{ id, who: '스팡달', text: '셔터 안쪽은 생각보다 좁았다. 다들 무사해서 다행이다.' }] }) }]; }, rpt.id);
+  await page.click('.gx-rpt [data-action="rec-debrief"]');
+  await page.waitForFunction((id) => JSON.parse(window.__chat.scriptstate.$goei_reports).items.find((r) => r.id === id)?.debrief?.src === 'manual', rpt.id, { timeout: 15000 });
+  assert.equal(await page.evaluate(() => (window.__calls.llm ?? []).length), llmBefore + 1, '보조 모델 1회');
+  const dcall = await page.evaluate(() => window.__calls.llm.at(-1));
+  assert.equal(dcall.mode, 'submodel');
+  assert.ok(dcall.messages[0].content.includes('after-action') && dcall.messages[0].content.length < 1500, '짧은 전용 지침');
+  const ddata = JSON.parse(dcall.messages[1].content);
+  assert.ok(ddata.ended_now.length === 1 && ddata.ended_now[0].id === rpt.id && ddata.ended_now[0].agents.includes('스팡달') && Array.isArray(ddata.span), JSON.stringify(ddata.ended_now));
+  await page.waitForFunction(() => document.querySelector('.gx-rpt-debrief')?.textContent?.includes('스팡달 소감'));
+  assert.ok((await page.textContent('.gx-rpt-debrief')).includes('직접 요청'));
+  const ddiag = JSON.parse(await page.evaluate(() => window.__store['p:goei-people-diag'] ?? '[]'));
+  assert.ok(ddiag.at(-1).reason === 'debrief' && ddiag.at(-1).ok, '진단에 debrief 1회');
   // 고정 → 채팅 변수 pin, 다시 누르면 풀림
   await page.click('.gx-rpt [data-action="rec-pin"]');
   await page.waitForFunction((id) => JSON.parse(window.__chat.scriptstate.$goei_reports).items.find((r) => r.id === id)?.pin === true, rpt.id);
@@ -3000,6 +3047,23 @@ if (fixture.globalLore.some(packed)) {
   const st = await page.textContent('.gw .gw-setbody');
   for (const t of ['채팅에 보고서 표시', '안 띄움', '내가 출동한 사건만', '전부', '일지를 본편 요청에 참고로 넣기', '소감 자동', '일지 상한', '보고서 상한']) assert.ok(st.includes(t), `기록 설정: ${t}`);
   assert.equal(await page.locator('.gw .gw-head [data-action="set-bar"]').count(), 2, '머리의 기본값으로 저장·불러오기');
+  // 채팅에 보고서 표시 3단계: 끄면 이미 그려진 카드도 사라지고(열쇠 표 비움 + 채팅 그대로 다시 저장), 「전부」면 요원 처리 보고서도, 「내가 출동한 사건만」이면 그것만
+  const saves0 = await page.evaluate(() => window.__calls.setChat.length);
+  await page.click('.gw [data-action="jr-set"][data-value="chat_card=off"]');
+  await page.waitForFunction(() => window.__chat.scriptstate.$jr_chat_card === 'off');
+  await page.waitForFunction((n) => window.__calls.setChat.length >= n + 2, saves0, { timeout: 5000 });
+  assert.ok(!(await disp(endReply)).includes('data-goei-card="report"'), '안 띄움: 카드 없음');
+  // 같은 종료 응답에 요원 처리(백그라운드) 보고서가 하나 더 있는 것처럼 심는다
+  await page.evaluate((key) => { const s = JSON.parse(window.__chat.scriptstate.$goei_reports); const b = JSON.parse(JSON.stringify(s.items[0])); Object.assign(b, { id: 'rbgqc', no: 'RPT-0101-99', mine: false, full: false, statusKey: key, head: { ...b.head, name: '요원 처리 사건' } }); s.items.push(b); window.__chat.scriptstate.$goei_reports = JSON.stringify(s); }, rpt.statusKey);
+  await page.click('.gw [data-action="jr-set"][data-value="chat_card=all"]');
+  await page.waitForFunction(() => window.__chat.scriptstate.$jr_chat_card === 'all');
+  await page.waitForFunction((n) => window.__calls.setChat.length >= n + 4, saves0, { timeout: 5000 });
+  assert.equal((await disp(endReply)).split('data-goei-card="report"').length - 1, 2, '전부: 카드 둘');
+  await page.click('.gw [data-action="jr-set"][data-value="chat_card=mine"]');
+  await page.waitForFunction(() => window.__chat.scriptstate.$jr_chat_card === 'mine');
+  await page.waitForFunction((n) => window.__calls.setChat.length >= n + 6, saves0, { timeout: 5000 });
+  const mineHtml = await disp(endReply);
+  assert.ok(mineHtml.split('data-goei-card="report"').length - 1 === 1 && mineHtml.includes(`data-goei-rec="${rpt.id}"`) && !mineHtml.includes('rbgqc'), '내가 출동한 사건만: 카드 하나');
   await page.click('.gw [data-action="jr-set"][data-value="chat_card=off"]');
   await page.waitForFunction(() => window.__chat.scriptstate.$jr_chat_card === 'off');
   await page.click('.gw [data-action="jr-set"][data-value="ctx=1"]');

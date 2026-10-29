@@ -621,6 +621,8 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
   };
   // 대사·컷신: 말풍선은 늘, 대화창·컷신이 열리면 전투를 멈춘다
   let world: World | null = null;
+  /** 출동이 끝났다: 본부로 돌아오면 플러그인이 만든 보고서를 자막 한 줄로 알린다 (폰 전체화면에서는 플러그인 카드가 안 보인다) */
+  let reportSay = false;
   let runAgent: AgentId = 'eileen'; // 주인공은 에일린 (쟈알디는 부장 NPC)
   let openingOn = false; // 제목 화면 오프닝 영상이 도는 중 (메뉴가 열려 있어도 영상은 멈추지 않는다)
   const storyRoot = document.createElement('div');
@@ -1068,7 +1070,12 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
           const how = (e as unknown as { how: string }).how;
           const text = `작전 종료 (${how === 'evac' ? '후송' : how === 'withdraw' ? '철수' : '귀환'}): ${label}, 처치 ${w.kills}, 부상 ${Math.max(0, Math.round(w.player.hpMax - w.player.hp))}`;
           void bridge.field!.record({ kind: 'exit_anomaly', text, weight: 3, fact: { key: '작전', value: `종료 (${how === 'evac' ? '후송' : how === 'withdraw' ? '철수' : '귀환'})` } }).catch(() => {});
+          reportSay = !!bridge.field?.lastReport;
         });
+      }
+      if (reportSay && (run as { stageId?: string }).stageId === 'hq' && bridge?.field?.lastReport) {
+        reportSay = false;
+        void bridge.field.lastReport().then((r) => r && world === w && w.say(`보고서가 기록에 저장됐어요: ${r.title}`, 4)).catch(() => {});
       }
       cancelStoryForScene();
       world = w;

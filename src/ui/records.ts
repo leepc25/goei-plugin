@@ -6,6 +6,9 @@ import {
   JOURNAL_KIND_LABEL, JR, JR_CTX_MAX, JR_CTX_ON_DEFAULT, JR_JOURNAL_CAP, JR_REPORT_CAP, journalClock, journalSettings, jrValue, pinReport, readJournal, readReports, reportVars,
   type JournalKind, type JournalRow, type Report,
 } from '../core/journal';
+import { debriefRunning, requestDebrief } from '../host/journal';
+import { refreshStatusContext } from '../host/statusview';
+import { downloadPng, reportPng } from './reportpng';
 import type { RecordsNav } from '../core/navhist';
 import { messageKey } from '../core/people/store';
 import type { Chat } from '../core/types';
@@ -43,10 +46,26 @@ export const rec = {
   info: '',
   busy: false,
   dismissed: '',
+  /** 「이미지로 저장」 뒤 미리보기 (내려받기가 막힌 곳은 길게 눌러 저장) */
+  png: null as null | { url: string; name: string; no: string },
+  /** 필드 출동이 끝나 방금 생긴 보고서 id (필드 탭 위 시트). 닫거나 보고서를 열면 비운다 */
+  fieldReport: '',
 };
 
+function dropPng(): void {
+  if (rec.png) {
+    try {
+      URL.revokeObjectURL(rec.png.url);
+    } catch {
+      /* 이미 지워짐 */
+    }
+  }
+  rec.png = null;
+}
+
 export function resetRecords(): void {
-  Object.assign(rec, { sub: 'journal', view: 'list', id: '', filter: 'all', q: '', rfilter: 'mine', notice: '', info: '', busy: false, dismissed: '' });
+  dropPng();
+  Object.assign(rec, { sub: 'journal', view: 'list', id: '', filter: 'all', q: '', rfilter: 'mine', notice: '', info: '', busy: false, dismissed: '', fieldReport: '' });
 }
 
 /** 앞뒤 이동·즐겨찾기에 적는 위치 */
@@ -112,7 +131,42 @@ export function recordsTab(ctx: ChatContext): string {
   const note = toast('rec', rec.info, (t) => {
     if (rec.info === t) rec.info = '';
   });
-  return `<main class="gx-body gx-records">${tabs}${notice}${pane(ctx)}${note}</main>`;
+  return `<main class="gx-body gx-records">${tabs}${notice}${pane(ctx)}${note}</main>${pngModal()}`;
+}
+
+/** 「이미지로 저장」 미리보기 창: 내려받기는 이미 시작됐고, download 를 무시하는 곳(iOS)은 그림을 길게 눌러 저장 */
+function pngModal(): string {
+  if (!rec.png) return '';
+  return `<div class="gx-agpop gx-pngpop" data-action="rec-png-x" role="dialog" aria-label="보고서 이미지">
+    <div class="gx-agpop-card gx-pngcard" data-action="rec-png-keep">
+      <button class="gx-agpop-x" data-action="rec-png-x" aria-label="닫기">${ICONS.close}</button>
+      <b class="gx-png-title">${esc(rec.png.no)} · 900×1200</b>
+      <img class="gx-png-img" src="${esc(rec.png.url)}" alt="보고서 이미지">
+      <p class="ps-note">내려받기를 시작했어요. 저장이 안 되는 기기(아이폰 등)는 그림을 길게 눌러 저장하세요.</p>
+      <span class="gx-png-acts"><button class="gx-mini primary" data-action="rec-png-dl">${ICONS.down}다시 내려받기</button><button class="gx-mini" data-action="rec-png-x">닫기</button></span>
+    </div></div>`;
+}
+
+/** 필드 탭 위 시트 (시안 Field.dc.html): 출동이 끝나 보고서가 생겼을 때. 「보고서 보기」는 기록 페이지로, 「본부로」는 닫기 */
+export function fieldSheet(ctx: ChatContext): string {
+  if (!rec.fieldReport) return '';
+  const r = readReports(ctx.chat).items.find((x) => x.id === rec.fieldReport);
+  if (!r) return '';
+  const h = r.head;
+  const when = h.at !== null ? `${ymd(h.at)} ${hhmm(h.at)}` : '';
+  const who = r.agents.map((a) => a.name).filter(Boolean).join(' · ');
+  const line2 = [h.place || locName(h.loc) || h.loc, who, h.duration !== null ? longDur(h.duration) : ''].filter(Boolean).join(' · ');
+  const aff = r.people?.length ? `<span class="gx-fs-aff">호감 변화 ${r.people.map((p) => `<i class="${p.delta < 0 ? 'neg' : 'pos'}">${p.delta > 0 ? '+' : p.delta < 0 ? '−' : ''}${Math.abs(p.delta)}</i>`).join(' · ')}</span>` : '';
+  const sum = (r.wallet ?? []).reduce((a, t) => a + t.amount, 0);
+  const money = [sum ? `<span class="gx-fs-won ${sum < 0 ? 'out' : 'in'}">${sum < 0 ? '지출' : '수당'} ${esc(formatDelta(sum).replace(/^([+−-])/, '$1₩'))}</span>` : '', r.balance !== undefined ? `<span class="gx-fs-bal">잔고 ${esc(formatWon(r.balance))}</span>` : ''].filter(Boolean).join('');
+  return `<section class="gx-fieldsheet" role="status" aria-label="출동 종료">
+    <header><span class="gx-badge live">출동 종료</span><small>${esc(when)}</small></header>
+    <b class="gx-fs-title">${esc(h.name)} — ${esc(r.result.replace(/^작전 종료\s*(\([^)]*\))?:\s*[^,]*,?\s*/, '') || '귀환')}</b>
+    <p class="gx-fs-line">${esc(line2)}</p>
+    ${aff || money ? `<p class="gx-fs-sum">${aff}${money}</p>` : ''}
+    <p class="gx-fs-note">이 출동은 관리국 일지에 「내가 출동」으로 기록됐어요. 막간도 다음 본편 요청에 들어가요.</p>
+    <span class="gx-fs-acts"><button class="gx-mini" data-action="rec-field-x">본부로</button><button class="gx-mini primary" data-action="rec-open" data-value="${esc(r.id)}">보고서 보기</button></span>
+  </section>`;
 }
 
 function pane(ctx: ChatContext): string {
@@ -258,9 +312,10 @@ function reportPage(ctx: ChatContext, id: string): string {
       ? `<ul class="gx-rpt-wallet">${r.wallet.map((t) => `<li><span>${esc(t.memo || '(메모 없음)')}</span><b class="${t.amount < 0 ? 'out' : 'in'}">${esc(formatDelta(t.amount).replace(/^([+−-])/, '$1₩ '))}</b></li>`).join('')}${r.balance !== undefined ? `<li class="bal"><span>종료 시점 잔고</span><b>${esc(formatWon(r.balance))}</b></li>` : ''}</ul>`
       : `<p class="ps-note">이 사건 동안 거래가 없어요.${r.balance !== undefined ? ` 종료 시점 잔고 ${esc(formatWon(r.balance))}` : ''}</p>`}</section>`
     : '';
-  // 「이미지로 저장」·「소감 쓰기」 자리: 그리기·보조 모델 호출은 다음 묶음에서 붙는다 (단추 자리만, 잠금)
-  const acts = `<button class="gx-mini" data-action="rec-png" data-value="${esc(r.id)}" disabled title="준비 중">${ICONS.cctv}이미지로 저장</button>
-    <button class="gx-mini" data-action="rec-debrief" data-value="${esc(r.id)}" disabled title="준비 중">${ICONS.pen}소감 쓰기 <small>보조 모델 1회</small></button>
+  // 「이미지로 저장」= 캔버스 900×1200 PNG 내려받기 (ui/reportpng) · 「소감 쓰기」= 이 보고서만 보조 모델 1회 (host/journal). 「채팅에 넣기」는 없다 (결정)
+  const writing = debriefRunning(r.id);
+  const acts = `<button class="gx-mini" data-action="rec-png" data-value="${esc(r.id)}" ${rec.busy ? 'disabled' : ''} title="PNG 900×1200 한 장으로 내려받아요">${ICONS.cctv}이미지로 저장</button>
+    <button class="gx-mini" data-action="rec-debrief" data-value="${esc(r.id)}" ${rec.busy || writing ? 'disabled' : ''} title="이 보고서의 담당 요원 소감을 보조 모델 1회로 써요${r.debrief ? ' (있던 소감을 덮어써요)' : ''}">${ICONS.pen}${writing ? '소감 쓰는 중…' : '소감 쓰기'} <small>보조 모델 1회</small></button>
     <button class="gx-mini${r.pin ? ' on' : ''}" data-action="rec-pin" data-value="${esc(r.id)}" aria-pressed="${!!r.pin}" title="${r.pin ? '고정 풀기' : '고정: 상한에 밀려 지워지지 않아요'}" ${rec.busy ? 'disabled' : ''}>${ICONS.pin}${r.pin ? '고정됨' : '고정'}</button>`;
   return `<section class="gx-rpt">
     <header class="gx-rpt-head">${back}<b>보고서</b><span class="gx-rcard-no">${esc(r.no)}</span><span class="gx-rpt-acts">${acts}</span></header>
@@ -334,6 +389,7 @@ export async function handleRecords(action: string, value: string | undefined, c
         break;
       }
       Object.assign(rec, { sub: 'reports', view: 'report', id: v, notice: '' });
+      if (rec.fieldReport === v) rec.fieldReport = '';
       break;
     case 'rec-people':
       Object.assign(rec, { sub: 'people', view: 'list', id: '', notice: '' });
@@ -378,15 +434,65 @@ export async function handleRecords(action: string, value: string | undefined, c
       await env.refresh();
       return true;
     }
-    case 'rec-png':
-    case 'rec-debrief':
-      // 다음 묶음에서 붙는다 (단추는 잠겨 있다)
+    case 'rec-png': {
+      if (rec.busy || !v) return true;
+      const r = readReports(ctx.chat).items.find((x) => x.id === v);
+      if (!r) return true;
+      rec.busy = true;
+      rec.notice = '';
+      env.render();
+      try {
+        dropPng();
+        const png = await reportPng(ctx, r, document.querySelector('.gx'), orgText(ctx));
+        downloadPng(png);
+        rec.png = { url: png.url, name: png.name, no: r.no };
+        rec.info = `${png.name} 내려받기를 시작했어요.`;
+      } catch (error) {
+        rec.notice = `이미지를 만들지 못했어요: ${error instanceof Error ? error.message : String(error)}`;
+      }
+      rec.busy = false;
+      break;
+    }
+    case 'rec-png-dl':
+      if (rec.png) downloadPng({ blob: new Blob(), url: rec.png.url, name: rec.png.name });
       return true;
+    case 'rec-png-keep':
+      return true;
+    case 'rec-png-x':
+      dropPng();
+      break;
+    case 'rec-debrief': {
+      if (rec.busy || !v || debriefRunning(v)) return true;
+      rec.notice = '';
+      const run = requestDebrief(v);
+      env.render();
+      const r = await run;
+      if (r.ok) rec.info = r.message;
+      else rec.notice = r.message;
+      await env.refresh();
+      return true;
+    }
+    case 'rec-field-x':
+      rec.fieldReport = '';
+      break;
     default:
       return false;
   }
   env.render();
   return true;
+}
+
+/** PNG 머리 오른쪽 둘째 줄: 시작 소속의 조직 이름 (없으면 빈 글) */
+function orgText(ctx: ChatContext): string {
+  const code = String(ctx.chat.scriptstate?.['$st_faction'] ?? '');
+  if (!code) return '';
+  try {
+    const c = parseCatalog(ctx.char.globalLore);
+    const me = c.people.find((p) => p.affiliation === code);
+    return me?.department ? `${me.department}` : '';
+  } catch {
+    return '';
+  }
 }
 
 /** 입력칸 (다시 그리지 않음). 처리했으면 true — 찾기 칸은 app.ts 가 목록만 다시 그린다 */
@@ -462,6 +568,15 @@ async function handleJournalSettings(action: string, v: string, ctx: ChatContext
     // 켤 때 N 은 기본 10 (설계 5-11절)
     if (key === 'ctx' && val !== '0' && v.slice(i + 1) === '1') val = String(JR_CTX_ON_DEFAULT);
     await setVars(ctx, env, { [JR(key)]: val });
+    if (key === 'chat_card') {
+      // 채팅 카드는 display 처리기가 그린다: 열쇠 표를 다시 모으고, 이미 그려진 메시지도 다시 그리게 채팅을 그대로 한 번 저장한다 (끄면 카드가 사라진다)
+      try {
+        await refreshStatusContext(ctx.charIndex, ctx.chatIndex);
+        await updateChat(ctx.charIndex, ctx.chatIndex, (cur) => ({ ...cur }));
+      } catch {
+        /* 다시 못 그려도 설정은 저장됐다 (다음 채팅 전환 때 반영) */
+      }
+    }
     return true;
   }
   if (action === 'jr-step') {

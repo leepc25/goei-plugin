@@ -3065,3 +3065,27 @@ button.gx-jr-row:hover { background: color-mix(in srgb, var(--text) 4%, transpar
   .gx-rpt-people q { flex-basis: 100%; white-space: normal; }
   .gx-recnote { gap: 6px; padding: 8px 8px 8px 12px; font-size: 13px; }
 }
+
+/* ── 기록 묶음 3 (2026-10-29): 보고서 PNG 미리보기 · 필드 출동 종료 시트 ── */
+.gx-pngpop .gx-pngcard { width: 420px; max-width: 100%; gap: 10px; align-items: stretch; }
+.gx-png-title { font-size: 14px; font-family: var(--mono); color: var(--dim); padding-right: 36px; }
+.gx-png-img { display: block; width: 100%; height: auto; border: 1px solid var(--line); border-radius: 12px; background: var(--void); }
+.gx-pngcard .ps-note { margin: 0; font-size: 13px; color: var(--sub); }
+.gx-png-acts { display: flex; gap: 8px; justify-content: flex-end; }
+.gx-fieldhost { position: relative; }
+.gx-fieldsheet { position: absolute; left: 16px; right: 16px; bottom: 16px; z-index: 40; display: flex; flex-direction: column; gap: 6px; padding: 14px 16px; border: 1px solid var(--accent-line); border-radius: 16px; background: color-mix(in srgb, var(--panel) 94%, transparent); color: var(--text); box-shadow: 0 12px 32px rgba(0, 0, 0, .35); backdrop-filter: blur(6px); }
+.gx-fieldsheet header { display: flex; align-items: center; gap: 10px; }
+.gx-fieldsheet header small { font-family: var(--mono); font-size: 12px; color: var(--dim); }
+.gx-fs-title { font-size: 17px; font-weight: 800; line-height: 1.35; }
+.gx-fs-line, .gx-fs-sum, .gx-fs-note { margin: 0; font-size: 13.5px; color: var(--sub); }
+.gx-fs-sum { display: flex; flex-wrap: wrap; gap: 6px 14px; }
+.gx-fs-sum .pos { color: var(--signal); font-style: normal; font-weight: 700; }
+.gx-fs-sum .neg { color: var(--danger); font-style: normal; font-weight: 700; }
+.gx-fs-won.in { color: var(--signal); } .gx-fs-won.out { color: var(--danger); }
+.gx-fs-bal { font-family: var(--mono); }
+.gx-fs-note { font-size: 12.5px; color: var(--dim); }
+.gx-fs-acts { display: flex; gap: 8px; justify-content: flex-end; margin-top: 4px; }
+@media (max-width: 760px) {
+  .gx-fieldsheet { left: 8px; right: 8px; bottom: 8px; padding: 12px; }
+  .gx-fs-title { font-size: 15px; }
+}

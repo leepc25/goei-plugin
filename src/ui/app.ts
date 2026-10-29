@@ -58,7 +58,8 @@ import { basicDefaults, basicVars, DIM_DEFAULT, getPrefs, worldDefaults, worldSe
 import { colConfig } from '../core/world/statuscols';
 import { adjustWallet, walletEditable, aliveAnchors, formatWon, parseWon, readWallet, removeWalletEntry, walletBalance, walletVars, WALLET_START_DEFAULT } from '../core/wallet';
 import { walletHeadButton, walletList, walletOn, walletTab, walletUi as walletTabUi } from './wallet';
-import { applyRecordsNav, closeNotice, endedReport, handleRecords, journalList, rec, recordsInput, recordsMarkName, recordsNav, recordsTab, resetRecords, type RecordsEnv } from './records';
+import { applyRecordsNav, closeNotice, endedReport, fieldSheet, handleRecords, journalList, rec, recordsInput, recordsMarkName, recordsNav, recordsTab, resetRecords, type RecordsEnv } from './records';
+import { onReport } from '../core/journal';
 
 /** ID카드 잔고 칩 → 장부 창 (열림·입력 알림) */
 
@@ -561,6 +562,19 @@ export async function openWiki(title: string): Promise<void> {
   await openApp({ quietIfNotLite: true });
   if (view.kind === 'started') await handle('wiki-goto', title);
 }
+
+/** 채팅 속 보고서 카드의 「기록에서 보기」: 창을 열고 기록 › 보고서 페이지로 */
+export async function openRecords(id: string): Promise<void> {
+  await openApp({ quietIfNotLite: true });
+  if (view.kind === 'started') await handle('rec-open', id);
+}
+
+// 필드 출동이 끝나 보고서가 생기면 (host/game/field.ts → core/journal/notify) 필드 탭 위에 시트를 띄운다. 창이 닫혀 있으면 다음에 열 때 보인다
+onReport((n) => {
+  if (n.cause !== 'field') return;
+  rec.fieldReport = n.id;
+  if (shown && view.kind === 'started') void refresh();
+});
 
 async function refresh(): Promise<void> {
   try {
@@ -1353,8 +1367,8 @@ function startedBody(ctx: ChatContext): string {
     case 'records':
       return recordsTab(ctx);
     case 'field':
-      // 게임은 그린 뒤 이 자리에 붙인다 (afterRender → syncField)
-      return '<main class="gx-body gx-fieldhost"></main>';
+      // 게임은 그린 뒤 이 자리에 붙인다 (afterRender → syncField). 출동이 막 끝났으면 그 위에 보고서 시트 (ui/records fieldSheet)
+      return `<main class="gx-body gx-fieldhost">${fieldSheet(ctx)}</main>`;
     case 'settings':
     {
       // 설정은 상황판 위에서 여는 화면이라 상황판 서랍(즐겨찾기)도 그대로 둔다 (2026-10-20 사용자: 설정을 열면 서랍이 가려진 것처럼 보임).

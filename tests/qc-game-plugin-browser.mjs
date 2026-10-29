@@ -247,6 +247,45 @@ const ok = (name, detail = '') => { results.push(`${name} · 통과${detail ? ` 
   assert.equal(prefs.tScene, 10, '필드 시간 기본값도 같이 저장');
   await page.keyboard.press('Escape'); await page.keyboard.press('Escape');
   ok('$hq_ui 채팅별 설정 저장');
+  // 다리: 출동 종료 → 보고서 (기록 묶음 3): 플러그인이 exit_anomaly 를 받아 같은 저장에 일지 fd 줄·전체 보고서를 만들고, 필드 탭 위에 시트, lastReport 다리로 게임에 알린다
+  assert.ok(await page.evaluate(() => !!window.__goeiBridge?.field?.lastReport), '플러그인 다리 노출 (진단용)');
+  assert.equal(await page.evaluate(() => window.__goeiBridge.field.lastReport()), null, '출동 전엔 보고서 없음');
+  await page.evaluate(async () => {
+    const f = window.__goeiBridge.field;
+    await f.record({ kind: 'enter_anomaly', text: '작전 투입: 젖은 복도', weight: 3, visit: 'qc1', fact: { key: '작전', value: '투입 중 (젖은 복도)' } });
+    await f.record({ kind: 'kill', text: '그림자를 처치했다', who: ['에일린'], visit: 'qc1' });
+    await f.record({ kind: 'exit_anomaly', text: '작전 종료 (귀환): 젖은 복도, 처치 1, 부상 0', weight: 3, visit: 'qc1', fact: { key: '작전', value: '종료 (귀환)' } });
+  });
+  await page.waitForFunction(() => JSON.parse(window.__chat.scriptstate.$goei_journal ?? '{"rows":[]}').rows.some((r) => r.kind === 'fd'), null, { timeout: 5000 });
+  const fd = JSON.parse(await page.evaluate(() => window.__chat.scriptstate.$goei_journal)).rows.find((r) => r.kind === 'fd');
+  const frpt = JSON.parse(await page.evaluate(() => window.__chat.scriptstate.$goei_reports)).items.find((r) => r.id === fd.rpt);
+  assert.ok(fd.mine && fd.cause === 'field' && fd.name === '젖은 복도' && frpt?.full && frpt.mine, JSON.stringify(fd));
+  assert.deepEqual(frpt.trail.map((t) => t.text), ['작전 투입: 젖은 복도', '(처치) 그림자를 처치했다', '작전 종료 (귀환): 젖은 복도, 처치 1, 부상 0']);
+  assert.ok(frpt.agents.some((a) => a.name === '에일린') && frpt.agents.length >= 2, `투입 ${JSON.stringify(frpt.agents)}`);
+  assert.equal(frpt.statusKey, undefined, '필드 종료는 응답이 아니라 채팅 카드 열쇠가 없다');
+  assert.ok(frpt.head.since !== null && frpt.head.duration !== null && frpt.head.duration >= 1, `시각 ${JSON.stringify(frpt.head)}`);
+  const last = await page.evaluate(() => window.__goeiBridge.field.lastReport());
+  assert.ok(last && last.id === frpt.id && last.title === '젖은 복도' && last.summary.includes('에일린'), JSON.stringify(last));
+  await waitSel(page, '.gx-fieldsheet');
+  const sheet = await page.textContent('.gx-fieldsheet');
+  assert.ok(sheet.includes('출동 종료') && sheet.includes('젖은 복도') && sheet.includes('에일린') && sheet.includes('내가 출동'), sheet);
+  assert.ok(await page.evaluate(() => !!window.__goeiEngine && !!document.querySelector('.gx-game')), '시트가 떠도 게임은 붙어 있다');
+  if (shots) await page.screenshot({ path: `${shots}/qc-plugin-fieldsheet.png` });
+  await page.click('.gx-fieldsheet [data-action="rec-open"]');
+  await waitSel(page, '.gx-records .gx-rpt');
+  assert.ok((await page.textContent('.gx-rpt')).includes('필드 출동') && (await page.textContent('.gx-rpt')).includes('젖은 복도'));
+  assert.ok(await page.evaluate(() => !!window.__goeiEngine), '기록 탭으로 가도 게임은 떼어 둔 채 산다');
+  await page.locator('[data-value="field"]:visible').first().click();
+  await waitSel(page, '.gx-game .goei-engine canvas');
+  assert.equal(await page.locator('.gx-fieldsheet').count(), 0, '보고서를 열면 시트는 닫힘');
+  await waitSel(page, '.mn.on'); // 떼었다 붙이면 일시정지 메뉴가 열려 있다 → 닫기
+  await page.keyboard.press('Escape');
+  await page.waitForFunction(() => !document.querySelector('.mn.on'));
+  // 같은 출동을 다시 받아도 한 번 (같은 방문·같은 투입 사건)
+  await page.evaluate(async () => { await window.__goeiBridge.field.record({ kind: 'exit_anomaly', text: '작전 종료 (귀환): 젖은 복도, 처치 1, 부상 0', weight: 3, visit: 'qc1' }); });
+  await page.waitForTimeout(400);
+  assert.equal(JSON.parse(await page.evaluate(() => window.__chat.scriptstate.$goei_journal)).rows.filter((r) => r.kind === 'fd').length, 1, '중복 없음');
+  ok('다리: 출동 종료 → 일지 fd 줄·전체 보고서·필드 시트·lastReport', `${frpt.no} · ${last.summary}`);
   // 인물 대화: 요원 옆에서 E → 말풍선 입력 → 모델 응답 → 채팅 goeiHqVisitV1 에 기록, 본편 채팅 메시지는 늘지 않음
   const who = await page.evaluate(() => { const w = window.__goeiWorld; const a = w.actors.find((q) => q.def.kind === 'named'); return a ? { name: a.def.name, scene: a.scene, x: a.x, y: a.y } : null; });
   assert.ok(who, '필드에 선 요원이 있다');

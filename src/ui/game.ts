@@ -216,6 +216,8 @@ async function play(slot: SlotId): Promise<void> {
       hiddenSubs.add(cb);
       return () => void hiddenSubs.delete(cb);
     });
+    // 진단·시험용 (게임이 두는 __goeiEngine 처럼): 플러그인 쪽 다리. 닫으면 지운다
+    (globalThis as { __goeiBridge?: unknown }).__goeiBridge = bridge;
     const t1 = performance.now();
     unmount = mod.mount(box, bridge);
     gameStats.mountMs = Math.round(performance.now() - t1);
@@ -236,6 +238,7 @@ function stop(): void {
   generation++;
   unmount?.();
   unmount = null;
+  delete (globalThis as { __goeiBridge?: unknown }).__goeiBridge;
   releaseAll();
   gameStats.heapAfter = heap();
 }

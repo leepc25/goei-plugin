@@ -6,6 +6,8 @@ import {
   TRAIL_CAP, buildClosures, readJournal, readReports, rewindClosures, trimJournal, trimReports, pinReport, recordVars, journalSettings, JR, JR_DEFAULTS,
   journalBlock, withJournal, JOURNAL_HEAD, journalLine, mineReasons, periodOf, parseAgents, settings,
 } from '../dist-test/core.mjs';
+// 묶음 3: PNG 카드(순수 그리기)·소감 검사·저장
+import { paintReport, wrapText, PNG_W, PNG_H, validateDebrief, withDebriefs, endedInBatch, endedNowOf, DEBRIEF_PROMPT, emptyReports } from '../dist-test/core.mjs';
 
 const worldBook = {
   괴이: [
@@ -332,4 +334,106 @@ test('일지 컨텍스트: 끔이면 요청 그대로, 켜면 최근 N건 한 �
   assert.equal(two[2], '- 01.11 00:00 · 사건 둘째 ｛｛사건｝｝ ％％ · 서울특별시 종로구 · 투입 외부인 · 처리 완료');
   // 채팅 메시지는 손대지 않는다
   assert.equal(on.message.length, chat.message.length);
+});
+
+// ── 묶음 3: PNG 카드 (core/journal/png.ts 순수 그리기) ──
+
+/** 캔버스 2D 흉내: 호출을 기록만 한다. 글자 폭은 글자 수 × 8 */
+function fakeCtx() {
+  const calls = [];
+  const g = { fillStyle: '', strokeStyle: '', lineWidth: 1, font: '', textAlign: 'left', textBaseline: 'top', globalAlpha: 1, calls };
+  for (const m of ['fillRect', 'fillText', 'beginPath', 'moveTo', 'lineTo', 'quadraticCurveTo', 'closePath', 'fill', 'stroke', 'save', 'restore', 'clip', 'drawImage']) g[m] = (...a) => void calls.push([m, ...a]);
+  g.measureText = (t) => ({ width: [...String(t)].length * 8 });
+  return g;
+}
+const COLORS = { void: '#111', panel: '#222', line: '#333', text: '#eee', sub: '#ccc', dim: '#999', signal: '#5ee', amber: '#fb4', danger: '#f76', accentBg: '#143' };
+const pngReport = (over = {}) => ({
+  id: 'r1', no: 'RPT-0101-01', full: true, mine: true, kind: 'an', cause: 'model',
+  head: { name: '소라 랜드', grade: 'B', loc: '02-0', place: '종로 지하상가', born: 60 * 24 * 365 * 55 + 17 * 60, since: 60 * 24 * 365 * 55 + 17 * 60 + 13, at: 60 * 24 * 365 * 55 + 19 * 60, duration: 107 },
+  trail: Array.from({ length: 11 }, (_, i) => ({ m: 60 * 24 * 365 * 55 + 17 * 60 + i * 5, e: i, text: `경과 ${i + 1} 상황 글이 바뀌었다` })),
+  agents: [{ id: 'P001', name: '쟈알디', st: '작전투입', situation: '현장' }, { id: 'P002', name: '스팡달', st: '부상' }],
+  result: '격리 완료. 현장 봉쇄 해제 '.repeat(12),
+  people: [{ who: '쟈알디', delta: 6, quote: '수고했네', stage: '신뢰' }, { who: '스팡달', delta: -2 }],
+  wallet: [{ memo: '처리 수당', amount: 80000 }, { memo: '택시', amount: -12500 }],
+  balance: 207500, idx: 3, anchor: '#4', savedAt: '2025-01-01T00:00:00.000Z', ...over,
+});
+
+test('PNG 카드: 바탕 900×1200 부터, 머리·그림 틀·제목·시각 타일·경과(8줄+외 N건)·요원·인물·결과·가계부·바닥글 순서, 간이는 인물·가계부 없음', () => {
+  assert.equal(PNG_W, 900);
+  assert.equal(PNG_H, 1200);
+  const g = fakeCtx();
+  const r = paintReport(g, pngReport(), { colors: COLORS, sans: 'sans-serif', mono: 'monospace', art: null, org: '관리국 종합대응팀' });
+  assert.deepEqual(g.calls[0], ['fillRect', 0, 0, 900, 1200], '첫 호출이 바탕 전체');
+  assert.deepEqual(r.sections, ['bg', 'head', 'art-empty', 'title', 'tiles', 'trail', 'agents', 'result', 'people', 'wallet', 'foot']);
+  const texts = g.calls.filter((c) => c[0] === 'fillText').map((c) => c[1]);
+  for (const t of ['괴이 ː ANOMALY', 'INCIDENT REPORT · RPT-0101-01', '소라 랜드', '내가 출동', '발생', '투입', '종료', '소요', '1h 47m', '경과', '… 외 5건', '투입 요원', '쟈알디', '스팡달', '인물 기록 변화', '+6 → 신뢰', '−2', '결과', '가계부', '처리 수당', '+80,000', '−12,500', '종료 시점 잔고', '₩ 207,500', 'ANOMALY SIMULATION 2.4']) {
+    assert.ok(texts.some((x) => x.includes(t)), `글: ${t}`);
+  }
+  assert.equal(texts.filter((x) => /^경과 \d+ /.test(x)).length, 6, '경과 최대 6줄');
+  assert.ok(!g.calls.some((c) => c[0] === 'drawImage'), '그림이 없으면 drawImage 없음');
+  assert.ok(texts.every((t) => !/\{\{|%%/.test(t)));
+  // 바닥글은 늘 같은 자리 (y = 1200 − 48 − 28)
+  const foot = g.calls.find((c) => c[0] === 'fillText' && c[1] === 'ANOMALY SIMULATION 2.4');
+  assert.deepEqual(foot.slice(2), [48, 1124]);
+  // 간이 보고서: 인물·가계부 구역 없음, 「요원 처리」 배지
+  const g2 = fakeCtx();
+  const r2 = paintReport(g2, pngReport({ full: false, mine: false, people: undefined, wallet: undefined, balance: undefined, debrief: { who: '쟈알디', text: '힘들었다.', src: 'turn', at: '2025-01-01' } }), { colors: COLORS, sans: 'sans-serif', mono: 'monospace' });
+  assert.deepEqual(r2.sections, ['bg', 'head', 'art-empty', 'title', 'tiles', 'trail', 'agents', 'result', 'debrief', 'foot']);
+  const texts2 = g2.calls.filter((c) => c[0] === 'fillText').map((c) => c[1]);
+  assert.ok(texts2.includes('요원 처리') && texts2.includes('쟈알디 소감') && texts2.includes('힘들었다.'));
+  assert.ok(!texts2.includes('가계부') && !texts2.includes('인물 기록 변화'));
+  // 그림이 있으면 틀 안에 꽉 차게 (clip → drawImage → restore), 가로 804 틀에 1600×900 그림
+  const g3 = fakeCtx();
+  const r3 = paintReport(g3, pngReport(), { colors: COLORS, sans: 'sans-serif', mono: 'monospace', art: { img: 'IMG', w: 1600, h: 900 } });
+  assert.ok(r3.sections.includes('art'));
+  const di = g3.calls.findIndex((c) => c[0] === 'drawImage');
+  assert.ok(di > 0 && g3.calls.slice(0, di).some((c) => c[0] === 'clip') && g3.calls[di + 1][0] === 'restore', '자르기 → 그림 → 복원');
+  const [, img, , , dw, dh] = g3.calls[di];
+  assert.equal(img, 'IMG');
+  assert.ok(Math.abs(dw - 1600 * Math.max(804 / 1600, 170 / 900)) < 1e-6 && dh >= 170, `꽉 채움 ${dw}×${dh}`);
+});
+
+test('PNG 줄바꿈: 글자 단위, 최대 줄 수를 넘으면 마지막 줄 끝에 …', () => {
+  const g = fakeCtx();
+  assert.deepEqual(wrapText(g, '', 100, 3), []);
+  assert.deepEqual(wrapText(g, '가나다라마바사아자차', 40, 3), ['가나다라마', '바사아자차']);
+  assert.deepEqual(wrapText(g, '가나다라마바사아자차카타파하', 40, 2), ['가나다라마', '바사아자…']);
+  assert.deepEqual(wrapText(g, '짧다', 400, 1), ['짧다']);
+});
+
+// ── 묶음 3: 소감 검사·저장 (core/journal/debrief.ts) ──
+
+test('소감 검사: 이번 턴 종료 사건 id·투입 요원 이름·본문 규칙, 사건당 1건, manual 만 덮어쓴다', () => {
+  const rep = pngReport();
+  const ended = [endedNowOf(rep)];
+  assert.deepEqual(ended[0].agents, ['쟈알디', '스팡달']);
+  assert.equal(ended[0].trail_tail.length, 3);
+  assert.equal(ended[0].kind, '괴이');
+  assert.ok(ended[0].loc.includes('종로 지하상가'));
+  assert.equal(validateDebrief({ id: 'r9', who: '쟈알디', text: '현장은 조용했다. 다들 수고했다.' }, ended).ok, false);
+  assert.equal(validateDebrief({ id: 'r1', who: '쟈알디', text: '' }, ended).ok, false);
+  assert.equal(validateDebrief({ id: 'r1', who: '쟈알디', text: '{{user}} 덕분이다. 고맙다.' }, ended).ok, false);
+  assert.equal(validateDebrief(null, ended).ok, false);
+  const okOne = validateDebrief({ id: 'r1', who: '스팡달', text: '  팔이 아직  욱신거린다.\n그래도 다 끝났다. ' }, ended);
+  assert.ok(okOne.ok && okOne.value.who === '스팡달' && okOne.value.text === '팔이 아직 욱신거린다. 그래도 다 끝났다.');
+  const unknownWho = validateDebrief({ id: 'r1', who: '모르는사람', text: '현장은 조용했다. 다들 수고했다.' }, ended);
+  assert.ok(unknownWho.ok && unknownWho.value.who === '쟈알디', '모르는 이름이면 첫 요원');
+  const long = validateDebrief({ id: 'r1', who: '쟈알디', text: '가'.repeat(500) }, ended);
+  assert.ok(long.ok && long.value.text.length === 300, '300자에서 자름');
+  // 저장: 없는 id 무시, 같은 id 둘이면 첫 것, 있던 소감은 turn/backfill 로 안 덮고 manual 로는 덮는다
+  const store = { ...emptyReports(), items: [rep, { ...rep, id: 'r2', no: 'RPT-0101-02' }] };
+  const w1 = withDebriefs(store, [{ id: 'r1', who: '쟈알디', text: '첫 소감' }, { id: 'r1', who: '스팡달', text: '둘째' }, { id: 'r9', who: 'x', text: '없는 사건' }], 'turn', '2025-01-02T00:00:00.000Z');
+  assert.equal(w1.applied, 1);
+  assert.deepEqual(w1.store.items[0].debrief, { who: '쟈알디', text: '첫 소감', src: 'turn', at: '2025-01-02T00:00:00.000Z' });
+  assert.equal(w1.store.items[1].debrief, undefined);
+  const w2 = withDebriefs(w1.store, [{ id: 'r1', who: '스팡달', text: '다시' }], 'backfill');
+  assert.equal(w2.applied, 0, '있던 소감은 자동으로 안 덮는다');
+  const w3 = withDebriefs(w1.store, [{ id: 'r1', who: '스팡달', text: '다시' }], 'manual');
+  assert.ok(w3.applied === 1 && w3.store.items[0].debrief.src === 'manual' && w3.store.items[0].debrief.text === '다시');
+  // 묶음 안 종료 사건: idx 가 묶음에 있고 소감이 아직 없는 것만, 최대 3건
+  const many = { v: 1, items: [1, 2, 3, 4, 5].map((i) => ({ ...rep, id: `r${i}`, idx: i, ...(i === 2 ? { debrief: { who: 'a', text: 'b', src: 'turn', at: '' } } : {}) })) };
+  assert.deepEqual(endedInBatch(many, [1, 2, 3, 4, 5]).map((r) => r.id), ['r3', 'r4', 'r5']);
+  assert.deepEqual(endedInBatch(many, [2, 7]).map((r) => r.id), []);
+  assert.ok(DEBRIEF_PROMPT.includes('"debriefs"') && !DEBRIEF_PROMPT.includes('{{'), '수동 지침은 짧고 템플릿 기호가 없다');
+  assert.ok(DEBRIEF_PROMPT.length < 1500);
 });

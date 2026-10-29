@@ -1,5 +1,5 @@
 import { clearUnsent, unsentShown } from './host/unsent';
-import { refreshStatusContext, renderStatus, setWikiOpener } from './host/statusview';
+import { refreshStatusContext, renderStatus, setRecordsOpener, setWikiOpener } from './host/statusview';
 import { openingShown, refreshOpeningHint, setOpeningHint, setRepickOpener, wantsOpeningHint } from './host/openinghint';
 import { hasStatusTag } from './core/world';
 import { isUnsent, renderStartCards, renderUnsentMark, START_MARK, stripStartCard, stripUnsentMark, UNSENT_MARK } from './core/dispatch';
@@ -40,7 +40,7 @@ import { cardPalette as themedCardPalette, currentTheme, onThemeChange, repaintT
 import { hasImgTag, IMG_RECENT, imgTagsKnown, renderImgTags, setImgHidden, stripOldImgTags } from './core/imgtag';
 import { loadModuleAssets, modulePicker } from './host/assets';
 import { getPrefs } from './core/settings';
-import { openApp, openInstall, openWiki } from './ui/app';
+import { openApp, openInstall, openRecords, openWiki } from './ui/app';
 import { isGoeiLore } from './core/install';
 import { loadStoredTokenizer, loadStoredWikiPack } from './host/install';
 import { loadWorldData } from './host/datapack';
@@ -739,6 +739,7 @@ export async function start(): Promise<BodyHandlers> {
   assetsFirst = loadModuleAssets();
   void redrawAfterLoad();
   setWikiOpener((title) => void openWiki(title));
+  setRecordsOpener((id) => void openRecords(id));
   setRepickOpener(() => void openApp({ quietIfNotLite: true }));
   let stopWatcher: (() => void) | null = null;
   let fab: Fab | null = null;
