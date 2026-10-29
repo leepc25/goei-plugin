@@ -466,5 +466,11 @@
   "hp": 120
  },
  "skills_2판": {},
- "crawlRev": true
+ "crawlRev": true,
+ "skip": {
+  "19": [
+   1,
+   2
+  ]
+ }
 }
