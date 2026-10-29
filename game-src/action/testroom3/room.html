@@ -1303,8 +1303,9 @@ function drawSprite(id, f, x, y, z, face, alpha = 1, tint = null, clipFrac = 1, 
   }
   if (breathe) {   // 앉은 대기 코드 숨쉬기(사용자 10-27): 허리띠 위만 1화소 오르내림, 손·다리는 그대로
     const wy = Math.max(1, Math.min(a.ch - 1, Math.round(a.top[f] + (a.bot[f] - a.top[f]) * 0.45 - a.oy)));
-    ctx.drawImage(img, f * a.cw, 0, a.cw, wy, dxp + a.ox, dyp + a.oy - breathe, a.cw, wy);
+    // 아래를 먼저, 위는 경계 줄을 한 줄 더 겹쳐 그림 — 올린 1화소만큼 허리에 빈 줄이 생기던 것(사용자 10-29)
     ctx.drawImage(img, f * a.cw, wy, a.cw, a.ch - wy, dxp + a.ox, dyp + a.oy + wy, a.cw, a.ch - wy);
+    ctx.drawImage(img, f * a.cw, 0, a.cw, wy + breathe, dxp + a.ox, dyp + a.oy - breathe, a.cw, wy + breathe);
   } else ctx.drawImage(img, f * a.cw, 0, a.cw, a.ch, dxp + a.ox, dyp + a.oy, a.cw, a.ch);
   if (tint && tint.over) { ctx.globalAlpha = alpha * tint.over; ctx.drawImage(silhouette(id, f, tint.c), dxp, dyp); }
   ctx.restore();
