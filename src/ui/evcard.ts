@@ -141,10 +141,10 @@ export function targetMark(on: boolean, action: string, value: string, btn = fal
 /** 카드 가운데 선택 과녁 (2026-10-29 사용자: 제목 옆 작은 표식은 누르기 어렵고 눈에 안 띈다 → FPS 조준점처럼 크고 반투명하게, 누르면 잠금 효과).
  *  상황판 CCTV·임무 상세·커스텀 임무 카드가 같은 것을 쓴다. 안 고름: 흐린 조준점 「목표 지정」 / 고름: 민트 잠금 「목표」. 다시 누르면 해제 */
 export function aimMark(on: boolean, action: string, value: string): string {
-  const label = on ? '목표 해제' : '목표로 지정';
+  const label = on ? '해제' : '선택';
   return `<button class="gx-aim${on ? ' on' : ''}" data-action="${action}" data-value="${esc(value)}" aria-pressed="${on}" title="${label}" aria-label="${label}">
-    <svg viewBox="0 0 100 100" aria-hidden="true"><g class="rot"><circle class="orb" cx="50" cy="50" r="46"/><path class="tick" d="M50 1v6M50 93v6M1 50h6M93 50h6M15.4 15.4l4.2 4.2M80.4 80.4l4.2 4.2M84.6 15.4l-4.2 4.2M19.6 80.4l-4.2 4.2"/></g><circle class="ring" cx="50" cy="50" r="34"/><path class="arm" d="M50 12v12M50 76v12M12 50h12M76 50h12"/><path class="brk" d="M32 24h-8v8M68 24h8v8M32 76h-8v-8M68 76h8v-8"/><circle class="dot" cx="50" cy="50" r="3.5"/></svg>
-    <span class="gx-aim-l">${on ? '목표 고정' : '목표 지정'}</span></button>`;
+    <svg viewBox="0 0 100 100" aria-hidden="true"><g class="rot"><circle class="orb" cx="50" cy="50" r="46"/><path class="tick" d="M50 1v6M50 93v6M1 50h6M93 50h6M15.4 15.4l4.2 4.2M80.4 80.4l4.2 4.2M84.6 15.4l-4.2 4.2M19.6 80.4l-4.2 4.2"/></g><circle class="halo" cx="50" cy="50" r="34"/><circle class="ring" cx="50" cy="50" r="34"/><path class="arm" d="M50 12v12M50 76v12M12 50h12M76 50h12"/><path class="brk" d="M32 24h-8v8M68 24h8v8M32 76h-8v-8M68 76h8v-8"/><circle class="dot" cx="50" cy="50" r="3.5"/></svg>
+    <span class="gx-aim-l">${on ? '해제' : '선택'}</span></button>`;
 }
 
 /** 상세 창 (상황판·임무 탭 공통, 창 맨 위에 하나): 상황판 CCTV와 같은 화면·효과 (2026-10-21 사용자). 가로 600px, 세로는 상황판 CCTV 비율.

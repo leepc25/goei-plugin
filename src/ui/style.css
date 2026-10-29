@@ -2545,24 +2545,27 @@ button.mk-go:hover { color: var(--signal); }
 }
 /* 카드 가운데 선택 과녁 (evcard.ts aimMark, 2026-10-29): 조준선 — 천천히 도는 바깥 눈금 원, 숨 쉬듯 맥동하는 안 원, 네 방향 팔, 가운데 점.
    누르면 붉게 잠긴다: 눈금 원이 빨리 돌며 조여들고 모서리 괄호가 나타나고 점이 붉게 빛난다 */
-.gx-aim { position: absolute; left: 50%; top: 50%; z-index: 3; display: flex; flex-direction: column; align-items: center; gap: 4px; width: 160px; height: 160px; padding: 0; border: 0; background: none; color: rgba(255, 255, 255, .8); transform: translate(-50%, -50%); cursor: pointer; filter: drop-shadow(0 0 2px rgba(0, 0, 0, .9)) drop-shadow(0 2px 6px rgba(0, 0, 0, .7)); transition: color .15s ease; }
-.gx-aim svg { width: 112px; height: 112px; fill: none; stroke: currentColor; stroke-width: 2.6; stroke-linecap: round; overflow: visible; }
+.gx-aim { position: absolute; left: 50%; top: 50%; z-index: 3; display: flex; flex-direction: column; align-items: center; gap: 4px; width: 160px; height: 160px; padding: 0; border: 0; background: none; color: rgba(255, 255, 255, .55); opacity: .55; transform: translate(-50%, -50%); cursor: pointer; filter: drop-shadow(0 1px 2px rgba(0, 0, 0, .8)); transition: color .18s ease, opacity .18s ease; }
+.gx-aim svg { width: 112px; height: 112px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; overflow: visible; }
+.gx-aim .halo { stroke: none; fill: transparent; }
 .gx-aim .rot { transform-origin: 50% 50%; animation: gx-aim-spin 14s linear infinite; }
 .gx-aim .orb { stroke-dasharray: 3 7; opacity: .8; }
 .gx-aim .tick { stroke-width: 3; }
 .gx-aim .ring { transform-origin: 50% 50%; animation: gx-aim-breathe 2.4s ease-in-out infinite; }
 .gx-aim .brk { opacity: 0; stroke-width: 3.4; }
 .gx-aim .dot { fill: currentColor; stroke: none; }
-.gx-aim-l { padding: 3px 10px; border-radius: 999px; background: rgba(8, 12, 14, .62); font-size: 12px; font-weight: 800; letter-spacing: .1em; color: #fff; }
-.gx-aim:hover { color: #fff; }
+.gx-aim-l { font-size: 12.5px; font-weight: 800; letter-spacing: .18em; color: inherit; text-shadow: 0 1px 3px rgba(0, 0, 0, .9); }
+.gx-aim:hover { color: #fff; opacity: .9; }
 .gx-aim:active svg { transform: scale(.94); }
-.gx-aim.on { color: #ff5a4e; }
+.gx-aim.on { color: #ff6b5f; opacity: 1; filter: drop-shadow(0 0 3px rgba(0, 0, 0, .9)) drop-shadow(0 0 10px rgba(255, 59, 48, .75)) drop-shadow(0 6px 10px rgba(0, 0, 0, .6)); }
+.gx-aim.on svg { stroke-width: 3; }
+.gx-aim.on .halo { fill: radial-gradient(circle, rgba(255, 59, 48, .35), transparent 70%); fill: rgba(255, 59, 48, .22); filter: blur(4px); }
 .gx-aim.on .rot { animation-duration: 4s; }
 .gx-aim.on .orb { stroke-dasharray: 10 4; opacity: 1; animation: gx-aim-lock .5s cubic-bezier(.2, .9, .3, 1.2); }
 .gx-aim.on .ring { animation: gx-aim-lock .5s cubic-bezier(.2, .9, .3, 1.2); stroke-width: 3.4; }
 .gx-aim.on .brk { opacity: 1; animation: gx-aim-brk .5s ease-out; }
 .gx-aim.on .dot { r: 5; fill: #ff3b30; filter: drop-shadow(0 0 6px #ff3b30); animation: gx-aim-blink 1.2s ease-in-out infinite; }
-.gx-aim.on .gx-aim-l { background: rgba(255, 59, 48, .92); color: #fff; }
+.gx-aim.on .gx-aim-l { color: #fff; text-shadow: 0 0 8px rgba(255, 59, 48, .9), 0 1px 3px rgba(0, 0, 0, .9); }
 @keyframes gx-aim-spin { to { transform: rotate(360deg); } }
 @keyframes gx-aim-breathe { 0%, 100% { transform: scale(1); opacity: .75; } 50% { transform: scale(1.07); opacity: 1; } }
 @keyframes gx-aim-lock { from { transform: scale(1.6); transform-origin: 50% 50%; opacity: 0; } to { transform: scale(1); opacity: 1; } }
