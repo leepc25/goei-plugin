@@ -22,6 +22,7 @@
     { "name": "qc-settings-world", "file": "tests/qc-settings-world-browser.mjs", "group": "plugin", "args": ["fixture", "all"], "timeoutMin": 20, "frame": "tests/qc-settings-harness.mjs", "note": "세계 탭 전수" },
     { "name": "qc-settings-guides", "file": "tests/qc-settings-guides-browser.mjs", "group": "plugin", "args": ["fixture", "all"], "timeoutMin": 20, "frame": "tests/qc-settings-harness.mjs", "note": "지침·점검 탭" },
     { "name": "qc-settings-pages", "file": "tests/qc-settings-pages-browser.mjs", "group": "plugin", "args": ["fixture", "all"], "timeoutMin": 30, "frame": "tests/qc-settings-harness.mjs", "note": "설정 페이지 모든 조작 (3×1,255회)" },
+    { "name": "qc-frame", "file": "tests/qc-frame-browser.mjs", "group": "plugin", "args": ["fixture"], "timeoutMin": 10, "frame": "tests/qc-settings-harness.mjs", "note": "외부 프레임(일반·전술·없음): 창 폭 불변, 설정 저장·새로 고침 유지, 폰·좁은 창·전체화면 숨김, 설정 창엔 없음, SVG id 중복 없음" },
     { "name": "qc-static-xss", "file": "tests/qc-static-xss-browser.mjs", "group": "plugin", "args": ["fixture"], "timeoutMin": 10, "frame": "자체 boot(browser.mjs hostScript 축약 사본)", "note": "HTML 조각이 글자로만" },
     { "name": "qc-static-cache", "file": "tests/qc-static-cache-browser.mjs", "group": "plugin", "args": ["fixture"], "timeoutMin": 10, "frame": "tests/qc-static-harness.mjs", "note": "전역 상태가 채팅에 안 샘" },
     { "name": "qc-static-perf", "file": "tests/qc-static-perf-browser.mjs", "group": "plugin", "args": ["fixture"], "timeoutMin": 10, "frame": "tests/qc-static-harness.mjs", "note": "성능·자원 상한(부팅·display 1000건·열고 닫기 100번)" },
