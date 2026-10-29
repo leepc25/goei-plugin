@@ -3035,7 +3035,7 @@ if (fixture.globalLore.some(packed)) {
   await page.click('[data-action="rec-sub"][data-value="journal"]');
   await page.waitForSelector('.gx-jr-row');
   assert.equal(await page.locator('.gx-jr-row.mine').count(), 1, '내가 출동한 줄');
-  assert.equal(await page.evaluate(() => getComputedStyle(document.querySelector('.gx-jr-row.mine')).boxShadow).includes('inset'), true, '노란 왼쪽 선');
+  assert.ok((await page.evaluate(() => getComputedStyle(document.querySelector('.gx-jr-row.mine')).boxShadow)).includes('inset'), '노란 왼쪽 선');
   const tiles = await page.textContent('.gx-jr-tiles');
   for (const t of ['이번 달', '내가 출동', 'BACKGROUND', 'TODAY']) assert.ok(tiles.includes(t), `타일 ${t}`);
   assert.ok((await page.textContent('.gx-jr-day h3')).includes('2025.01.01'), '날짜별 묶음');
