@@ -197,7 +197,7 @@ for (const vp of vps) {
   await page.waitForSelector('.gw [data-action="man-import-yes"]');
   await clickSel(page, '.gw [data-action="man-import-yes"]');
   await page.waitForFunction(() => document.querySelector('.gw .gw-head')?.textContent?.includes('가져왔어요'));
-  assert.deepEqual(await prefsOf(page), { basic: {}, world: {} }, '빈 설정 가져오기');
+  { const p = await prefsOf(page); assert.deepEqual([p.basic, p.world, p.marksSeeded], [{}, {}, true], '빈 설정 가져오기'); assert.deepEqual(p.marks.map((m) => m.s.tab), ['field', 'wallet', 'records', 'settings'], '빈 설정이면 기본 즐겨찾기를 채움'); }
 
   // ── 점검 탭 ──
   await goNode(page, 'manage:diag');
@@ -240,7 +240,7 @@ for (const vp of vps) {
   await page.waitForSelector('.gw [data-action="man-import-yes"]');
   await clickSel(page, '.gw [data-action="man-import-yes"]');
   await page.waitForFunction(() => document.querySelector('.gw .gw-head')?.textContent?.includes('가져왔어요'));
-  assert.deepEqual(await prefsOf(page), { basic: {}, world: {}, dim: 25 }, '틀린 값은 버리고 맞는 값만');
+  { const { marks, marksSeeded, ...p } = await prefsOf(page); assert.deepEqual(p, { basic: {}, world: {}, dim: 25 }, '틀린 값은 버리고 맞는 값만'); assert.equal(marksSeeded, true); }
   // 복사 (헤드리스에선 클립보드가 막혀 글을 골라 둔다) · 내려받기
   await clickSel(page, '.gw [data-action="man-copy"]');
   await settle();

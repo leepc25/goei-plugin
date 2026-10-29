@@ -12,7 +12,8 @@ const browser = await launch();
 const started = () => ({ message: [{ role: 'user', data: 'hi' }, { role: 'char', data: '본문\n[▣|2025.01.01|02:47 AM|☀️|4°C|관리국 본부|목표]' }], scriptstate: { $st_faction: 'A00', $st_lang: 'ko', $st_fm: '2', $st_fixed_theme: 'dark' } });
 const EDITOR_NODES = ['set:screen', 'set:image', 'set:board', 'set:gnet', 'set:phone', 'set:wiki', 'set:visit', 'set:people', 'set:journal', 'set:adv', 'set:update', 'agent', 'org', 'anomaly', 'site', 'appendix', 'base', 'relations', 'guide:RP', 'guide:Image', 'rule:new', 'install', 'manage:diag', 'manage:log', 'manage:backup'];
 const PANEL_TABS = ['board', 'map', 'mission', 'phone', 'gnet', 'wiki', 'records', 'wallet'];
-const measure = (page) => page.evaluate(() => ({ listeners: window.__docListeners, nodes: document.querySelectorAll('*').length, styles: document.querySelectorAll('style').length }));
+// 유령 버튼은 다시 보일 때 리스너를 떼고 다시 건다(떼기마다 비동기) → 그게 끝난 뒤에 잰다
+const measure = async (page) => (await sleep(400), page.evaluate(() => ({ listeners: window.__docListeners, nodes: document.querySelectorAll('*').length, styles: document.querySelectorAll('style').length })));
 
 for (const vp of vps) {
   const phone = vp !== 'pc';
@@ -144,7 +145,12 @@ for (const vp of vps) {
     else await page.evaluate(() => [...document.querySelectorAll('.gx .gx-bdrawer [data-action="mk-pop"], .gx [data-action="mk-pop"]')].pop()?.click());
     await page.waitForSelector('.gx .mk-pop');
   };
-  await page.evaluate(() => { const p = JSON.parse(window.__store['p:goei:prefs'] ?? '{}'); delete p.marks; window.__store['p:goei:prefs'] = JSON.stringify(p); });
+  // 기본 즐겨찾기 4개(2026-10-29 사용자)가 처음부터 있다 → 화면에서 모두 지우고 시작
+  await openMarks();
+  while (await page.$('.gx .mk-pop [data-action="mk-del"]')) { await clickSel(page, '.gx .mk-pop [data-action="mk-del"]'); await sleep(60); }
+  assert.equal(((await prefsOf(page)).marks ?? []).length, 0, '기본 즐겨찾기 지움');
+  await page.evaluate(() => document.querySelector('.gx .mk-pop [data-action="mk-pop"]')?.click());
+  await sleep(80);
   for (const tab of ['board', 'wiki', 'phone', 'gnet', 'map', 'wallet']) {
     await goTab(tab);
     await openMarks();

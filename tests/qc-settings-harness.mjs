@@ -199,7 +199,9 @@ export async function setInput(page, sel, value, ev = 'change') {
 export const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 /** 접근성·넘침 점검: 글자 없는 단추, 가로 넘침 */
-export async function auditDom(page, rootSel, ignore = '') {
+export async function auditDom(page, rootSel, extraIgnore = '') {
+  // 폰 쓸기 닫기 손잡이(.gx-mclose)는 일부러 화면 밖에 둔다 — 2026-10-29 부터 폰 설정 창도 본 창과 같은 하단 바(mbar)를 쓴다
+  const ignore = ['.gx-mclose', extraIgnore].filter(Boolean).join(', ');
   return page.evaluate(([rootSel, ignore]) => {
     const root = document.querySelector(rootSel);
     if (!root) return { missing: ['(no root)'], overflow: [], scrollW: 0 };

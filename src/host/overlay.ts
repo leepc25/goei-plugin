@@ -329,7 +329,10 @@ export async function createFab(onOpen: () => void): Promise<Fab> {
   };
   // 옛 Risu 문서 객체에 리스너 메서드가 없으면 버튼 상자에 건다 (없어서 버튼이 통째로 안 뜨는 것보다 낫다)
   const moveTarget: SafeEl = typeof (doc as Partial<SafeEl> | null)?.addEventListener === 'function' ? (doc as unknown as SafeEl) : host;
-  const bind = async () => {
+  // 다시 걸기는 한 줄로 세운다: 리스너 걸고 떼기가 비동기라, 겹쳐 돌면 앞 차례가 걸던 것을 뒤 차례가 못 떼고 남긴다
+  let binding: Promise<void> = Promise.resolve();
+  const bind = () => (binding = binding.catch(() => {}).then(bindNow));
+  const bindNow = async () => {
     await unbind();
     for (const [target, type, fn] of [
       [host, 'pointerdown', onDown],

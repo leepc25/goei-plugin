@@ -19,9 +19,10 @@ const pkg = JSON.parse(read('package.json'));
 const VERSION = pkg.version;
 const plugin = read('dist/goei-plugin.js');
 const bodyCode = read('dist/goei-body.js');
-/** 옛 시작기: 사용자 기기에 이미 깔린 release/goei-plugin.js (본체 조각만 받는다). 새 본체는 세계 자료를 스스로 받아야 이 시작기로도 돈다 (개선 나1).
+/** 옛 시작기: 자료 팩 전 0.17.8 시작기 사본 tests/fixtures/old-loader-0.17.8.js (본체 조각만 받고 다시 띄울 고리가 없다). 0.18.0 부터 release/ 에는
+ *  고리 있는 새 시작기가 들어가 그걸 쓰면 「옛 시작기」 절이 새 시작기를 시험하게 된다. 새 본체는 세계 자료를 스스로 받아야 이 시작기로도 돈다 (개선 나1).
  *  판 글자만 지금 판으로 맞춘다 (시작기는 자기 판의 본체만 받고 실행하므로) */
-const oldLoader = (() => { const t = read('release/goei-plugin.js'); const v = /^\/\/@version (\S+)/m.exec(t)?.[1]; return v && v !== VERSION ? t.split(v).join(VERSION) : t; })();
+const oldLoader = (() => { const t = read('tests/fixtures/old-loader-0.17.8.js'); const v = /^\/\/@version (\S+)/m.exec(t)?.[1]; return v && v !== VERSION ? t.split(v).join(VERSION) : t; })();
 /** 세계 자료 팩 글 (본체에 박힌 지문과 같은 것). 본체가 있으면 가짜 저장소에 미리 둔다 (저장소에 자료가 있는 보통 경우) */
 const worldPack = distWorldPack();
 const manifest = JSON.parse(fixture.globalLore.find((e) => e.comment === 'Plugin manifest').content);
