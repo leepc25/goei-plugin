@@ -193,6 +193,15 @@ function scopeBar(scope: SettingsScope, canChat: boolean): string {
   return `<div class="st-scopebar">${tabs}${btns}</div>${confirm}`;
 }
 
+/** 편집 창 설정 페이지(캐릭터 이미지·상황판·고급) 머리의 「덮어쓰기」「불러오기」 (가3, 2026-10-29: 10-27 개편 때 빠진 단추 복구).
+ *  덮어쓰기 = 지금 채팅의 화면·상황판·괴이 발생·이미지·고급·인물 기록 설정을 새 채팅 기본값으로, 불러오기 = 그 반대. 처리는 set-bar / set-bar-yes / set-bar-no 그대로 */
+export const mainDefaultsButtons = (): string => `<span class="ps-defaults">${barButtons(settingsUi.busy)}</span>`;
+export function mainDefaultsConfirm(): string {
+  const c = settingsUi.confirm ? CONFIRM.chat[settingsUi.confirm] : null;
+  if (!c) return '';
+  return `<div class="st-confirm st-barconfirm ps-defconfirm"><p>${c[0]}</p><div class="gx-row-btns"><button class="gx-mini${settingsUi.confirm === 'load' ? ' danger' : ' ps-save'}" data-action="set-bar-yes" data-value="${settingsUi.confirm}">${c[1]}</button><button class="gx-mini" data-action="set-bar-no">취소</button></div></div>`;
+}
+
 const BACK = `<button class="ph-tool ph-back" data-action="set-feat-back" aria-label="설정으로">${ICONS.back}</button>`;
 /** 기능별 설정을 설정창 안에서 (각 기능의 설정 화면을 그대로 쓰고, 뒤로가기만 설정으로) */
 function featurePage(ctx: ChatContext, page: NonNullable<typeof settingsUi.page>, canChat: boolean): string {

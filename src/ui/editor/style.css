@@ -287,6 +287,7 @@
 .gw .gw-setbody .ph-form { display: contents; }
 .gw .gw-setbody .ph-form-body { display: flex; flex-direction: column; gap: 0; padding: 0; overflow: visible; }
 .gw .gw-setbody .ps-defconfirm { margin: 0 0 12px; }
+.gw .gw-set > .ps-defconfirm { margin: 0 0 14px; }
 .gw .ps-defaults { display: flex; flex-wrap: wrap; gap: var(--gap); }
 /* 업데이트 페이지 */
 .gw .upd-act { display: flex; flex-wrap: wrap; align-items: center; gap: var(--gap); padding: 10px var(--pad); border-top: 1px solid var(--hair); }

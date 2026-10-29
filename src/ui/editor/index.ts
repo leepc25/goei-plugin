@@ -21,7 +21,7 @@ import { guidePage, guideAction, guideBarSync, guideInput, guideUi } from './gui
 import { isRuleNode, ruleAction, ruleInput, rulePage, ruleTreeItems } from './rules';
 import { ensureManage, isManageNode, manageAction, manageInput, managePage, manUi, type ManageNode } from './manage';
 import { installAction, installPage, instUi, refreshInstall } from './install';
-import { featurePane, settingsNotices, settingsSection, settingsUi, type SettingsSection } from '../settings';
+import { featurePane, mainDefaultsButtons, mainDefaultsConfirm, settingsNotices, settingsSection, settingsUi, type SettingsSection } from '../settings';
 import { CFG, GN_DEFAULTS, gnetLabel } from '../../core/gnet';
 import { basicSettings } from '../../core/settings';
 import { worldOn } from '../../core/world';
@@ -354,7 +354,9 @@ function settingsPage(ctx: ChatContext, page: SetPage): string {
   }
   // 머리는 모든 페이지가 같다: 제목 왼쪽, 오른쪽에 범위(이 채팅/새 채팅 기본값) 또는 그 기능의 단추(덮어쓰기·불러오기). 시작 전이면 같은 글귀
   const showScope = ['image', 'board', 'adv'].includes(page);
-  const right = page === 'screen' ? '<span class="gw-tokens">이 기기 공통</span>' : showScope ? scopeSeg : `${canChat ? '' : '<span class="gw-tokens">새 채팅 기본값 (시작 전)</span>'}${act}`;
+  // 범위 칩 옆 「덮어쓰기」「불러오기」 (가3, 2026-10-29 사용자 「반영해줘」): 시작 뒤 이 채팅 범위에서만. 시작 전엔 기본값을 바로 고치니 없음
+  const defBtns = showScope && canChat && scope === 'chat' ? mainDefaultsButtons() : '';
+  const right = page === 'screen' ? '<span class="gw-tokens">이 기기 공통</span>' : showScope ? `${scopeSeg}${defBtns}` : `${canChat ? '' : '<span class="gw-tokens">새 채팅 기본값 (시작 전)</span>'}${act}`;
   const crumb = page === 'update' ? '관리' : page === 'screen' ? '설정 / 이 기기 공통' : `설정 / ${canChat ? (scope === 'chat' ? '이 채팅' : '새 채팅 기본값') : '새 채팅 기본값 · 시작 전'}`;
   const info = FEATURE_INFO[page];
   const on = featureState(ctx)[`set:${page}`];
@@ -365,6 +367,7 @@ function settingsPage(ctx: ChatContext, page: SetPage): string {
     ? `<p class="gx-muted">${esc(info.desc)} <span class="gw-eg">예) ${esc(info.example)}</span>${on === false && info.off ? ` <span class="gw-off-note">${esc(info.off)}</span>` : ''}</p></header>`
     : '</header>';
   return `<div class="gw-page gw-set"><header class="gw-head"><h2>${esc(title)}${badge}</h2>${right ? `<div class="gw-head-act">${right}</div>` : ''}${lead}
+    ${defBtns ? mainDefaultsConfirm() : ''}
     ${settingsNotices()}
     <div class="gx-settings gw-setbody">${body}</div></div>`;
 }

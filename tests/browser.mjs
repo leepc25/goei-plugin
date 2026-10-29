@@ -1668,12 +1668,13 @@ if (fixture.globalLore.some(packed)) {
   await page.waitForFunction(() => window.__chat.scriptstate.$wg_preset_cap === '3');
   await page.click('.gw [data-action="set-world"][data-value="incident_p:-"]');
   await page.waitForFunction(() => window.__chat.scriptstate.$wg_incident_p === '40');
-  // 새 채팅 기본값: 2026-10-27 개편으로 v0.16.23의 「기본값으로 저장(덮어쓰기)」 단추(set-bar)는 없어지고, 페이지 머리의 범위 칩
-  // 「이 채팅 / 새 채팅 기본값」으로 기본값을 바로 고친다 (src/ui/editor/index.ts settingsPage scopeSeg, docs/인계서.md 설정 창 구조).
-  // 그래서 「두 벌 없음」 단언은 「범위 칩이 있고 두 값이 섞이지 않음」으로 바꿨다
+  // 새 채팅 기본값: 2026-10-27 개편으로 페이지 머리의 범위 칩 「이 채팅 / 새 채팅 기본값」으로 기본값을 바로 고친다
+  // (src/ui/editor/index.ts settingsPage scopeSeg). 2026-10-29(가3): 그때 빠진 「덮어쓰기」「불러오기」(set-bar)를 범위 칩 옆에 되살렸다 —
+  // 이 채팅 범위에서만 보이고, 시작 전·기본값 범위에는 없다
   assert.ok(await page.$('.gw [data-action="set-scope"][data-value="defaults"]'), '새 채팅 기본값 범위 칩');
-  assert.equal(await page.locator('.gw [data-action="set-bar"]').count(), 0, '덮어쓰기 단추는 없어짐');
+  assert.equal(await page.locator('.gw [data-action="set-bar"]').count(), 2, '이 채팅 범위: 덮어쓰기·불러오기 단추');
   await edScope(page, 'defaults');
+  assert.equal(await page.locator('.gw [data-action="set-bar"]').count(), 0, '기본값 범위에는 덮어쓰기·불러오기 없음 (바로 고침)');
   assert.equal(await stepShown(page, 'set-world', 'preset_cap'), '2개', '기본값 범위는 카드 기본값을 보여 줌 (이 채팅 값 3과 안 섞임)');
   await page.click('.gw [data-action="set-world"][data-value="preset_cap:+"]');
   await page.waitForFunction(() => JSON.parse(window.__store['p:goei:prefs'] || '{}').world?.preset_cap === 3);
@@ -1682,6 +1683,24 @@ if (fixture.globalLore.some(packed)) {
   // 새 채팅 테마 기본값은 시작 화면의 설정에서 정하므로(1절) 여기서 바꾼 paper 는 기본값에 들어가지 않는다
   assert.equal(JSON.parse(await page.evaluate(() => window.__store['p:goei:prefs'])).theme, undefined, '시작 뒤 테마는 기본값을 건드리지 않음');
   await edScope(page, 'chat');
+  // 덮어쓰기: 확인 줄 → 지금 채팅 값(incident_p 40)이 새 채팅 기본값으로
+  await page.click('.gw [data-action="set-bar"][data-value="save"]');
+  await page.waitForSelector('.gw .st-barconfirm [data-action="set-bar-yes"][data-value="save"]');
+  await page.click('.gw [data-action="set-bar-no"]');
+  await page.waitForFunction(() => !document.querySelector('.gw .st-barconfirm'));
+  assert.notEqual(JSON.parse(await page.evaluate(() => window.__store['p:goei:prefs'] || '{}')).world?.incident_p, 40, '취소하면 기본값 그대로');
+  await page.click('.gw [data-action="set-bar"][data-value="save"]');
+  await page.click('.gw .st-barconfirm [data-action="set-bar-yes"][data-value="save"]');
+  await page.waitForFunction(() => JSON.parse(window.__store['p:goei:prefs'] || '{}').world?.incident_p === 40);
+  await page.waitForFunction(() => !document.querySelector('.gw .st-barconfirm'));
+  assert.equal(await page.evaluate(() => window.__chat.scriptstate.$wg_incident_p), '40', '덮어쓰기는 이 채팅 값을 건드리지 않음');
+  // 불러오기: 이 채팅 값을 30으로 바꾼 뒤 기본값(40)을 불러오면 되돌아온다
+  await page.click('.gw [data-action="set-world"][data-value="incident_p:-"]');
+  await page.waitForFunction(() => window.__chat.scriptstate.$wg_incident_p === '30');
+  await page.click('.gw [data-action="set-bar"][data-value="load"]');
+  await page.click('.gw .st-barconfirm [data-action="set-bar-yes"][data-value="load"]');
+  await page.waitForFunction(() => window.__chat.scriptstate.$wg_incident_p === '40');
+  await page.waitForFunction(() => document.querySelector('.gw [data-action="set-world"][data-value="incident_p:-"]')?.closest('.st-step')?.textContent.includes('40'));
   // 요원 표시 인원: 줄이면 상황판 요원 수와 요원 보고가 함께 바뀐다
   await page.click('.gw [data-action="set-agent"][data-value="n:-"]');
   await page.waitForFunction(() => window.__chat.scriptstate.$st_agent_limit === '11');
