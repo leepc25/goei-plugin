@@ -1,4 +1,112 @@
-ics ? pics.face(row10) : row10?.face ?? ""
+, ...protagonist ? { lore: protagonist } : {} },
+      ...input2.scene && Object.values(input2.scene).some(Boolean) ? { mainScene: Object.fromEntries(Object.entries(input2.scene).filter(([, v]) => v)) } : {},
+      universe,
+      recentStory,
+      ...advOn(ss, "hq", "interlude") && input2.elsewhere.length ? { earlierThisInterlude: input2.elsewhere } : {},
+      conversation: input2.conversation,
+      ...input2.act ? { did: input2.said } : { said: input2.said }
+    };
+    return {
+      limit,
+      bystanders: by.map((b) => b.name),
+      messages: [
+        { role: "system", content: factionCodesToNames(rules2(src, limit, by.length > 0), names4) },
+        { role: "user", content: factionCodesToNames(JSON.stringify(body5), names4) }
+      ]
+    };
+  }
+  var agentLore = (src, loreName2) => bookText(src, loreName2);
+  var SENTENCE_END = /[.!?…~。！？]["'」』”’)]*$/;
+  function cleanLine(text4, speaker, prose = false) {
+    let s5 = cleanOutput(String(text4 ?? ""));
+    s5 = s5.replace(/<(think|thoughts)\b[^>]*>[\s\S]*?<\/\1\s*>/gi, "");
+    s5 = s5.replace(/\*[^*\n]*\*/g, " ").replace(/[（(][^()（）\n]*[)）]/g, " ");
+    const lines3 = s5.split("\n").map((l) => l.trim()).filter(Boolean);
+    const quoted = !prose ? [] : lines3.flatMap((l) => [...l.matchAll(/[「"“『]([^」"”』]{1,})[」"”』]/g)].map((m) => m[1]));
+    s5 = (quoted.length ? quoted : lines3).join(" ");
+    const esc34 = speaker.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    s5 = s5.replace(new RegExp(`^\\s*${esc34}\\s*[:：]\\s*`), "").replace(/^[「"“『]|[」"”』]$/g, "");
+    return s5.replace(/\s+/g, " ").trim();
+  }
+  function clipLine(s5, limit) {
+    const chars = [...s5];
+    if (chars.length <= limit) return s5;
+    const head3 = chars.slice(0, limit).join("");
+    let cut4 = -1;
+    for (let i = head3.length; i > 0; i--) if (SENTENCE_END.test(head3.slice(0, i))) {
+      cut4 = i;
+      break;
+    }
+    return cut4 > 0 ? head3.slice(0, cut4).trim() : `${chars.slice(0, limit - 1).join("").trim()}…`;
+  }
+  function parseVisitLine(raw, speaker, limit) {
+    let text4 = "";
+    let prose = false;
+    try {
+      const v = parseJsonPayload(raw);
+      if (v && typeof v === "object" && typeof v.line === "string") text4 = v.line;
+    } catch {
+    }
+    if (!text4) prose = true;
+    if (!text4) text4 = String(raw ?? "").replace(/^```[\w-]*\s*|```\s*$/g, "").replace(/^\s*\{[\s\S]*?"line"\s*:\s*"/, "").replace(/"\s*\}\s*$/, "");
+    const line2 = clipLine(cleanLine(text4, speaker, prose), limit);
+    if (!line2) throw new VisitError("모델 응답에서 대사를 찾지 못했어요.");
+    return line2;
+  }
+  function parseVisitGroup(raw, speaker, bystanders, limit) {
+    let rows2 = null;
+    try {
+      const v = parseJsonPayload(raw);
+      if (v && Array.isArray(v.lines)) rows2 = v.lines.filter((r) => !!r && typeof r === "object");
+      else if (v && typeof v.line === "string") rows2 = [{ speaker, line: v.line }];
+    } catch {
+    }
+    if (!rows2) return { line: parseVisitLine(raw, speaker, limit), extra: [] };
+    const name = (x) => String(x ?? "").trim();
+    const say2 = (r) => clipLine(cleanLine(String(r.line ?? ""), name(r.speaker)), limit);
+    const mine = rows2.find((r) => name(r.speaker) === speaker) ?? rows2.find((r) => !name(r.speaker));
+    const line2 = mine ? say2(mine) : "";
+    if (!line2) throw new VisitError("모델 응답에서 대사를 찾지 못했어요.");
+    const extra = [];
+    for (const r of rows2) {
+      const who = name(r.speaker);
+      if (r === mine || !bystanders.includes(who) || extra.some((e) => e.speaker === who)) continue;
+      const l = say2(r);
+      if (l) extra.push({ speaker: who, line: l });
+      if (extra.length >= 2) break;
+    }
+    return { line: line2, extra };
+  }
+
+  // src/host/game/uid.ts
+  var uid2 = () => typeof crypto !== "undefined" && typeof crypto.randomUUID === "function" ? crypto.randomUUID() : `${Date.now().toString(36)}-${Math.random().toString(36).slice(2)}${Math.random().toString(36).slice(2)}`;
+
+  // src/core/gamelink.ts
+  function cardSnapshot(char, chat, pics) {
+    const lore = char.globalLore ?? [];
+    const dir2 = readDirectory(lore);
+    const world2 = readWorld(chat);
+    let people = [];
+    try {
+      people = parseCatalog(lore).people;
+    } catch {
+      people = dir2.agents;
+    }
+    const rows2 = new Map(dir2.agents.map((a) => [a.id, a]));
+    const agents = people.map((p) => {
+      const rec2 = world2.agents[p.id];
+      const row10 = rows2.get(p.id);
+      return {
+        id: p.id,
+        name: p.name,
+        english: p.english,
+        affiliation: p.affiliation,
+        rank: p.rank,
+        state: rec2?.st ?? "미정",
+        situation: rec2?.situation ?? "",
+        locked: agentLocked(rec2) || world2.retired.includes(p.id),
+        photo: row10 && pics ? pics.main(row10) : row10?.photo ?? "",
+        face: row10 && pics ? pics.face(row10) : row10?.face ?? ""
       };
     });
     const events = activeEvents(world2).map((e) => ({
@@ -290,8 +398,12 @@ ics ? pics.face(row10) : row10?.face ?? ""
     const seg8 = (v, label2, on3) => `<button class="gx-seg${on3 ? " on" : ""}" data-action="visit-ui" data-value="${it.key}=${v}" aria-pressed="${on3}">${esc21(label2)}</button>`;
     if (it.type === "pick") return `<div class="gx-segs gx-segs-sm">${it.opts.map(([v, l]) => seg8(v, l, cur === v)).join("")}</div>`;
     if (it.type === "on") return switchHtml({ action: "visit-ui", value: `${it.key}=${cur === true ? "0" : "1"}`, on: cur === true, label: it.label });
-    if (it.type === "min") return `<span class="adv-num"><input class="gx-search" type="number" inputmode="numeric" min="${it.min}" max="${it.max}" step="${it.step}" data-change="visit-ui" data-key="${it.key}" value="${Math.round(Number(cur))}" aria-label="${esc21(it.label)}"><span>분</span></span>`;
-    return `<span class="adv-num"><input class="gx-search" type="number" inputmode="numeric" min="${Math.round(it.min * 100)}" max="${Math.round(it.max * 100)}" step="${Math.round(it.step * 100)}" data-change="visit-ui" data-key="${it.key}" value="${Math.round(Number(cur) * 100)}" aria-label="${esc21(it.label)}"><span>%</span></span>`;
+    const step = (shown2, lo2, hi2, down, up) => `<div class="st-step"><button class="gx-step" data-action="visit-ui" data-value="${it.key}=${down}" ${lo2 <= 0 ? "disabled" : ""} aria-label="${esc21(it.label)} 줄이기">−</button>
+    <b>${esc21(shown2)}</b><button class="gx-step" data-action="visit-ui" data-value="${it.key}=${up}" ${hi2 <= 0 ? "disabled" : ""} aria-label="${esc21(it.label)} 늘리기">+</button></div>`;
+    const n2 = Number(cur);
+    if (it.type === "min") return step(`${Math.round(n2)}분`, n2 - it.min, it.max - n2, Math.max(it.min, Math.round(n2 - it.step)), Math.min(it.max, Math.round(n2 + it.step)));
+    const pc = Math.round(n2 * 100), st = Math.round(it.step * 100), lo = Math.round(it.min * 100), hi = Math.round(it.max * 100);
+    return step(`${pc}%`, pc - lo, hi - pc, Math.max(lo, pc - st), Math.min(hi, pc + st));
   }
   function gameUiSections(state) {
     const s5 = gameUiOf(state);
@@ -1592,12 +1704,14 @@ ${prettyJson2(r.data ?? "")}`)}</textarea>` : ""}
   }
   var SUBS = [["journal", "일지"], ["reports", "보고서"], ["people", "인물"], ["factions", "세력"]];
   function recordsTab(ctx2) {
-    const tabs2 = `<div class="gx-segs gx-rec-tabs" role="tablist">${SUBS.map(([v, l]) => `<button role="tab" class="gx-seg${rec.sub === v ? " on" : ""}" data-action="rec-sub" data-value="${v}" aria-selected="${rec.sub === v}" aria-pressed="${rec.sub === v}">${l}</button>`).join("")}</div>`;
+    const tabs2 = `<div class="ph-tabs gx-rec-tabs" role="tablist">${SUBS.map(([v, l]) => `<button role="tab" class="ph-tab${rec.sub === v ? " on" : ""}" data-action="rec-sub" data-value="${v}" aria-selected="${rec.sub === v}" aria-pressed="${rec.sub === v}">${l}</button>`).join("")}</div>`;
     const notice3 = rec.notice ? `<div class="gx-err" role="alert">${esc24(rec.notice)}</div>` : "";
     const note = toast("rec", rec.info, (t) => {
       if (rec.info === t) rec.info = "";
     });
-    return `<main class="gx-body gx-records">${tabs2}${notice3}${pane(ctx2)}${note}</main>${pngModal()}`;
+    const SUB_ICON = { journal: ICONS.list, reports: ICONS.records, people: ICONS.group, factions: ICONS.org };
+    const drawer = matchMedia("(max-width: 760px)").matches ? drawerHtml(SUBS.map(([v, l]) => `<button class="ph-tool" data-action="rec-sub" data-value="${v}" aria-label="${l}" title="${l}" aria-pressed="${rec.sub === v}">${SUB_ICON[v]}<span class="ph-tool-l">${l}</span></button>`).join(""), "", "gx-rdrawer") : "";
+    return `<main class="gx-body gx-records">${tabs2}${notice3}${pane(ctx2)}${note}</main>${pngModal()}${drawer}`;
   }
   function pngModal() {
     if (!rec.png) return "";
@@ -1666,7 +1780,7 @@ ${prettyJson2(r.data ?? "")}`)}</textarea>` : ""}
     ${tile2("백그라운드", rows2.length - mineN, "요원 단독 처리")}
     ${tile2(`오늘${now !== null ? ` · ${ymd2(now)}` : ""}`, todayRows.length, avg !== null ? `평균 소요 ${durText(avg)}` : todayRows.length ? "소요 미상" : "없음")}
   </section>`;
-    const chips3 = FILTERS.map(([v, l]) => `<button class="gx-wt-chip${rec.filter === v ? " on" : ""}" data-action="rec-filter" data-value="${v}" aria-pressed="${rec.filter === v}">${l}</button>`).join("");
+    const chips3 = FILTERS.map(([v, l]) => `<button class="gx-chip${rec.filter === v ? " on" : ""}" data-action="rec-filter" data-value="${v}" aria-pressed="${rec.filter === v}">${l}</button>`).join("");
     return `${tiles}
     <p class="gx-rec-lead">종료된 괴이·사건·특수 전부 · 영구 보관 · 가계부는 사원증의 잔고에서</p>
     <div class="gx-wt-tools"><div class="gx-wt-chips">${chips3}</div><input class="gx-wt-q" type="search" data-input="rec-q" value="${esc24(rec.q)}" placeholder="찾기: 이름·장소·요원" aria-label="일지 찾기"></div>
@@ -1708,7 +1822,7 @@ ${prettyJson2(r.data ?? "")}`)}</textarea>` : ""}
   function reportsPane(ctx2) {
     const all = readReports(ctx2.chat).items;
     const shown2 = all.filter((r) => rec.rfilter === "mine" ? r.mine : !r.mine).reverse();
-    const chips3 = RFILTERS.map(([v, l]) => `<button class="gx-wt-chip${rec.rfilter === v ? " on" : ""}" data-action="rec-rfilter" data-value="${v}" aria-pressed="${rec.rfilter === v}">${l}</button>`).join("");
+    const chips3 = RFILTERS.map(([v, l]) => `<button class="gx-chip${rec.rfilter === v ? " on" : ""}" data-action="rec-rfilter" data-value="${v}" aria-pressed="${rec.rfilter === v}">${l}</button>`).join("");
     const cards2 = shown2.map((r) => {
       const h = r.head;
       const meta = [ymd2(h.at) ? `${ymd2(h.at)} ${hhmm3(h.at)}` : "시각 없음", h.place || locName(h.loc) || h.loc, durText(h.duration)].filter(Boolean).join(" · ");
@@ -2140,7 +2254,7 @@ ${prettyJson2(r.data ?? "")}`)}</textarea>` : ""}
   }
   var mainDefaultsButtons = () => {
     const off = settingsUi.busy ? "disabled" : "";
-    return `<span class="ps-defaults"><button class="st-act save" data-action="set-bar" data-value="save" ${off}>${ICONS.pen}기본값으로 저장</button><button class="st-act" data-action="set-bar" data-value="load" ${off}>${ICONS.refresh}기본값 불러오기</button></span>`;
+    return `<span class="ps-defaults"><button class="st-act save" data-action="set-bar" data-value="save" title="기본값으로 저장" aria-label="기본값으로 저장" ${off}>${ICONS.pen}<span>기본값으로 저장</span></button><button class="st-act" data-action="set-bar" data-value="load" title="기본값 불러오기" aria-label="기본값 불러오기" ${off}>${ICONS.refresh}<span>기본값 불러오기</span></button></span>`;
   };
   function mainDefaultsConfirm() {
     const c = settingsUi.confirm ? CONFIRM.chat[settingsUi.confirm] : null;
@@ -2199,9 +2313,8 @@ ${prettyJson2(r.data ?? "")}`)}</textarea>` : ""}
       screen: `${group4("화면", [
         // 테마는 채팅마다 ($st_fixed_theme, 원본 ensureDefaults) — 시작 뒤엔 이 채팅, 시작 전엔 새 채팅 기본값 (2026-10-28 QC: 「이 기기」 배지가 붙어 있었지만 실제로는 채팅에 저장됐다)
         field2("테마", seg7("set-theme", theme, [["light", "라이트"], ["dark", "다크"], ["paper", "페이퍼"]], busy5), `채팅 화면의 캐릭터 이미지 배경과 상태창(「테마」를 골랐을 때) 배색이에요. ${scope === "chat" ? "이 채팅에 저장돼요. 새 채팅의 기본값은 시작 화면의 설정에서 정해요." : "새 채팅이 시작할 때 쓸 배색이에요."}`, scope === "chat" ? "chat" : "defaults"),
-        field2("상태창", seg7("set-status", getPrefs().status ?? "auto", [["auto", "테마"], ["dark", "다크"], ["light", "라이트"], ["paper", "페이퍼"], ["off", "미표시"]], busy5), "채팅 속 상태창의 배색이에요. 「테마」는 위 테마를 따라가요. 미표시를 고르면 상자만 숨기고, 모델은 상태 태그를 계속 써요.", "device"),
         field2("메뉴 위치", seg7("set-nav", getPrefs().nav ?? "left", [["left", "왼쪽"], ["right", "오른쪽"]], busy5), "PC 창에서 메뉴 목록을 놓을 쪽이에요.", "device"),
-        field2("위키 목록 위치", seg7("set-wiki-side", getPrefs().wikiSide ?? "left", [["left", "왼쪽"], ["right", "오른쪽"]], busy5), "PC 창에서 위키의 세로바와 숨은 목록 서랍을 놓을 쪽이에요. 모바일은 늘 오른쪽 아래 「목록」 책갈피예요.", "device"),
+        field2("위키 목록 위치", seg7("set-wiki-side", getPrefs().wikiSide ?? "right", [["left", "왼쪽"], ["right", "오른쪽"]], busy5), "위키의 세로바와 숨은 목록 서랍을 놓을 쪽이에요. 폰의 「목록」 책갈피도 같은 쪽으로 가요.", "device"),
         field2("요원 칸", seg7("set-agents", getPrefs().agents ?? "wall", [["wall", "모니터"], ["list", "목록"]], busy5), "상황판 요원 칸 모양이에요.", "device"),
         field2("창 바깥 불투명도", dimSlider(getPrefs().dim ?? DIM_DEFAULT, busy5), "창 뒤 채팅 화면을 가리는 정도예요. 0%면 그대로 보이고 100%면 다 가려요.", "device"),
         // 창 둘레 기기 틀 (2026-10-29 사용자, ui/frame.ts). 좁아서 숨긴 상태는 app.ts 가 .gx 에 data-frame-hidden 으로 적는다
@@ -2227,11 +2340,6 @@ ${prettyJson2(r.data ?? "")}`)}</textarea>` : ""}
         field2("지원 투입", seg7("set-support", s5.supportOn ? "1" : "0", [["1", "ON"], ["0", "OFF"]], busy5), "편성에서 등록 요원 외의 일반 지원 인원을 더할 수 있어요."),
         field2("인물 기록", seg7("set-people", peopleOn ? "1" : "0", [["1", "ON"], ["0", "OFF"]], busy5), scope === "chat" ? "응답마다 보조 모델이 한 번 읽어 인물의 상태·관계·호감을 기록하고, 본편 요청이 그 기록을 읽어요. 세부는 「기능별 설정 → 인물 기록」에서." : "새 채팅을 인물 기록을 켠 채로 시작할지 정해요.")
       ].join(""))}
-    ${group4(
-        `상태창 칸 <small>${usedCols(colCfg).length}칸 사용</small>`,
-        `${statusColsTable(colCfg, busy5)}${colCfg.wallet !== "off" ? field2("시작 잔고", wonInput(walletStart, busy5, startLocked), scope === "chat" ? `이 채팅 장부의 시작 잔고예요. 지금 잔고 ${esc25(formatWon(walletNow))}. 거래 내역은 가계부 탭에서.${startLocked ? " 이야기가 시작돼서 잠겼어요(아래 「잔고 직접 수정」을 켜면 바꿀 수 있어요)." : ""}` : "새 채팅 장부의 시작 잔고예요. 거래는 인물 기록 갱신기가 본문에서 금액이 적힌 것만 뽑아 더하고 빼요.") : ""}${colCfg.wallet !== "off" ? field2("잔고 직접 수정", seg7("set-wallet-edit", walletEdit ? "1" : "0", [["1", "ON"], ["0", "OFF"]], busy5), "켜면 가계부에서 잔고를 고치고 거래를 지울 수 있고, 진행 중인 채팅의 시작 잔고도 바꿀 수 있어요. 이야기 밖에서 바뀐 잔고는 모델이 이유를 몰라 대화가 길어질수록 앞뒤가 꼬이기 쉬워서 기본은 꺼 둬요.") : ""}`,
-        `응답 끝의 상태 태그 <code>[▣|…]</code>에 들어가는 칸이에요. 「안 씀」으로 하면 태그에서 그 칸이 빠지고(모델에 모양을 알려 줘요), 「숨김」은 태그에는 두고 채팅 속 상태창 상자에서만 가려요.${scope === "chat" ? " 바꾼 구성은 이 채팅에 바로 적용되고 바뀐 시점이 기록돼요." : " 새 채팅의 기본 구성이에요."}`
-      )}
     <section class="ps-group"><h3>괴이 발생</h3><p class="ps-note">응답을 처리할 때마다 판정해요. 상한을 0으로 하면 그 종류는 자동으로 생기지 않아요.</p>
       <div class="ps-cards">
         ${worldKind(world2, "preset", "프리셋 괴이", busy5)}${worldKind(world2, "random", "랜덤 괴이", busy5)}
@@ -2241,6 +2349,16 @@ ${prettyJson2(r.data ?? "")}`)}</textarea>` : ""}
           <p class="ps-note">직접 고르거나 RP 중에 새로 등장한 것을 상한과 따로 기록할 수 있는 개수예요.</p></div>
       </div>
     </section>`,
+      // 상태창: 배색(이 기기)과 칸 구성(이 채팅). 2026-10-29 사용자: 상황판 페이지에 섞여 있던 것을 따로 뺌
+      status: `${group4("상태창", [
+        field2("상태창", seg7("set-status", getPrefs().status ?? "auto", [["auto", "테마"], ["dark", "다크"], ["light", "라이트"], ["paper", "페이퍼"], ["off", "미표시"]], busy5), "채팅 속 상태창의 배색이에요. 「테마」는 위 테마를 따라가요. 미표시를 고르면 상자만 숨기고, 모델은 상태 태그를 계속 써요.", "device")
+      ].join(""))}
+    ${group4(
+        `상태창 칸 <small>${usedCols(colCfg).length}칸 사용</small>`,
+        `${statusColsTable(colCfg, busy5)}${colCfg.wallet !== "off" ? field2("시작 잔고", wonInput(walletStart, busy5, startLocked), scope === "chat" ? `이 채팅 장부의 시작 잔고예요. 지금 잔고 ${esc25(formatWon(walletNow))}. 거래 내역은 가계부 탭에서.${startLocked ? " 이야기가 시작돼서 잠겼어요(아래 「잔고 직접 수정」을 켜면 바꿀 수 있어요)." : ""}` : "새 채팅 장부의 시작 잔고예요. 거래는 인물 기록 갱신기가 본문에서 금액이 적힌 것만 뽑아 더하고 빼요.") : ""}${colCfg.wallet !== "off" ? field2("잔고 직접 수정", seg7("set-wallet-edit", walletEdit ? "1" : "0", [["1", "ON"], ["0", "OFF"]], busy5), "켜면 가계부에서 잔고를 고치고 거래를 지울 수 있고, 진행 중인 채팅의 시작 잔고도 바꿀 수 있어요. 이야기 밖에서 바뀐 잔고는 모델이 이유를 몰라 대화가 길어질수록 앞뒤가 꼬이기 쉬워서 기본은 꺼 둬요.") : ""}`,
+        `응답 끝의 상태 태그 <code>[▣|…]</code>에 들어가는 칸이에요. 「안 씀」으로 하면 태그에서 그 칸이 빠지고(모델에 모양을 알려 줘요), 「숨김」은 태그에는 두고 채팅 속 상태창 상자에서만 가려요.${scope === "chat" ? " 바꾼 구성은 이 채팅에 바로 적용되고 바뀐 시점이 기록돼요." : " 새 채팅의 기본 구성이에요."}`
+      )}
+`,
       adv: `${advSections("gen", scope === "chat" ? ctx2.chat.scriptstate : getPrefs().vars, scope === "chat" && canChat ? { 1: loreCheckBox(ctx2) } : {})}`,
       update: `${updateGroup(ctx2)}`
     };
@@ -2379,7 +2497,7 @@ ${prettyJson2(r.data ?? "")}`)}</textarea>` : ""}
       return true;
     }
     if (action === "set-wiki-side") {
-      if (v === "left" || v === "right") await saveDefaults(env3, (p) => ({ ...p, wikiSide: v === "right" ? "right" : void 0 }));
+      if (v === "left" || v === "right") await saveDefaults(env3, (p) => ({ ...p, wikiSide: v }));
       return true;
     }
     if (action === "set-frame") {
@@ -2559,7 +2677,7 @@ ${prettyJson2(r.data ?? "")}`)}</textarea>` : ""}
   }
 
   // src/ui/editor/index.ts
-  var SET_PAGES = ["screen", "image", "board", "gnet", "phone", "wiki", "visit", "people", "journal", "adv", "update"];
+  var SET_PAGES = ["screen", "image", "board", "status", "gnet", "phone", "wiki", "visit", "people", "journal", "adv", "update"];
   var isSetNode = (n2) => n2.startsWith("set:") && SET_PAGES.includes(n2.slice(4));
   var isGuideNode = (n2) => n2.startsWith("guide:");
   var TABS2 = [["set", "기능", ICONS.settings], ["world", "세계", ICONS.map], ["guide", "지침", ICONS.book], ["manage", "점검", ICONS.refresh]];
@@ -2765,14 +2883,14 @@ ${prettyJson2(r.data ?? "")}`)}</textarea>` : ""}
     if (tok2 && ctx2 && isKind3(edUi.node)) tok2.outerHTML = recUi.tokensHtml(ctx2, edUi.node, overridesOf(ctx2));
   }
   var isKind3 = (n2) => ["agent", "org", "anomaly", "site", "appendix"].includes(n2);
-  var SET_LABEL = { screen: "화면", image: "캐릭터 이미지", board: "상황판", gnet: "괴담넷", phone: "괴담톡", wiki: "위키", visit: "필드", people: "인물 기록", journal: "기록", adv: "고급", update: "업데이트" };
-  var SET_ICON = { screen: ICONS.settings, image: ICONS.cctv, board: ICONS.grid, gnet: ICONS.gnet, phone: ICONS.phone, wiki: ICONS.wiki, visit: ICONS.game, people: ICONS.group, journal: ICONS.records, adv: ICONS.pen, update: ICONS.refresh };
+  var SET_LABEL = { screen: "화면", image: "캐릭터 이미지", board: "상황판", status: "상태창", gnet: "괴담넷", phone: "괴담톡", wiki: "위키", visit: "필드", people: "인물 기록", journal: "기록", adv: "고급", update: "업데이트" };
+  var SET_ICON = { screen: ICONS.settings, image: ICONS.cctv, board: ICONS.grid, status: ICONS.list, gnet: ICONS.gnet, phone: ICONS.phone, wiki: ICONS.wiki, visit: ICONS.game, people: ICONS.group, journal: ICONS.records, adv: ICONS.pen, update: ICONS.refresh };
   var setItem = (p) => [`set:${p}`, SET_LABEL[p], SET_ICON[p]];
   var guideItem = (g2) => [`guide:${g2}`, g2 === "Image" ? "이미지" : GUIDE_LABEL[g2], ICONS.book];
   function treeOf(tab2) {
     switch (tab2) {
       case "set":
-        return [{ title: "기능", items: ["screen", "image", "board", "gnet", "phone", "wiki", "visit", "people", "journal", "adv"].map(setItem) }];
+        return [{ title: "기능", items: ["screen", "image", "board", "status", "gnet", "phone", "wiki", "visit", "people", "journal", "adv"].map(setItem) }];
       case "world":
         return [{ title: "세계", items: [["agent", "요원", ICONS.person], ["org", "조직", ICONS.org], ["anomaly", "괴이", ICONS.spook], ["site", "파밍", ICONS.star], ["appendix", "부록", ICONS.book], ["base", "거점", ICONS.pin], ["relations", "세력 관계", ICONS.grid]] }];
       case "guide":
@@ -2832,6 +2950,9 @@ ${prettyJson2(r.data ?? "")}`)}</textarea>` : ""}
       case "board":
         body5 = sec("board");
         break;
+      case "status":
+        body5 = sec("status");
+        break;
       case "gnet":
         body5 = feat("gnet");
         break;
@@ -2858,16 +2979,15 @@ ${prettyJson2(r.data ?? "")}`)}</textarea>` : ""}
         break;
     }
     const chatPage = page !== "screen" && page !== "update";
-    const defBtns = chatPage && canChat ? mainDefaultsButtons() : "";
     act = act.replace(/<span class="ps-defaults">[\s\S]*?<\/span>/, "").trim();
-    const right = page === "screen" ? '<span class="gw-tokens">이 기기 공통</span>' : chatPage ? `${canChat ? "" : '<span class="gw-tokens">새 채팅 기본값 (시작 전)</span>'}${defBtns}${act}` : act;
+    const right = chatPage && !canChat ? `<span class="gw-tokens">새 채팅 기본값 (시작 전)</span>${act}` : act;
     const info = FEATURE_INFO[page];
     const on3 = featureState(ctx2)[`set:${page}`];
     const badge3 = on3 === void 0 ? "" : `<span class="gw-state${on3 ? "" : " off"}">${on3 ? "켬" : "끔"}</span>`;
     if (info) body5 = body5.replace(/<p class="ps-note">본편 응답이 끝날 때마다[\s\S]*?<\/p>/, "").replace(/<section class="ps-group"><p class="ps-note">필드에서 만난 사람과[\s\S]*?<\/section>/, "");
     const lead = info ? `<p class="gx-muted">${esc26(info.desc)}${info.example ? ` <span class="gw-eg">예) ${esc26(info.example)}</span>` : ""}${on3 === false && info.off ? ` <span class="gw-off-note">${esc26(info.off)}</span>` : ""}</p></header>` : "</header>";
     return `<div class="gw-page gw-set"><header class="gw-head"><h2>${esc26(title2)}${badge3}</h2>${right ? `<div class="gw-head-act">${right}</div>` : ""}${lead}
-    ${defBtns ? mainDefaultsConfirm() : ""}
+    ${canChat ? mainDefaultsConfirm() : ""}
     ${settingsNotices()}
     <div class="gx-settings gw-setbody">${body5}</div></div>`;
   }
@@ -2904,7 +3024,7 @@ ${prettyJson2(r.data ?? "")}`)}</textarea>` : ""}
   function guideNodePage(ctx2, n2) {
     const g2 = n2.slice(6);
     const crumb = `지침 / ${g2 === "RP" || g2 === "Directive" || g2 === "Tag" ? "기본 지침" : "기능별 지침"}`;
-    if (g2 === "Image") return `<div class="gw-page gw-set"><header class="gw-head"><h2>이미지 지침</h2><p class="gx-muted">카드 로어북 대신 플러그인이 만드는 이미지 태그 지침이에요. 지침 틀, 출력 대상 캐릭터(명부에서 자동), 표정 세트를 여기서 관리해요.</p></header><div class="gx-settings gw-setbody"><section class="ps-group"><div class="ps-rows">${imgPromptPane(ctx2)}</div></section></div></div>`;
+    if (g2 === "Image") return `<div class="gw-page gw-set"><header class="gw-head"><h2>이미지 지침</h2><p class="gx-muted">카드 로어북 대신 플러그인이 만드는 이미지 태그 지침이에요. 지침 틀, 출력 대상 캐릭터(명부에서 자동), 표정 세트를 여기서 관리해요.</p></header><div class="gx-settings gw-setbody gw-imgp">${imgPromptPane(ctx2)}</div></div>`;
     return guidePage(g2, crumb);
   }
   function body3(ctx2) {
@@ -2934,6 +3054,7 @@ ${prettyJson2(r.data ?? "")}`)}</textarea>` : ""}
     }
     return installPage(ctx2);
   }
+  var lastDrawn = "";
   function render() {
     if (!root || !edUi.open || !host) return;
     const ctx2 = host.ctx();
@@ -2948,185 +3069,10 @@ ${prettyJson2(r.data ?? "")}`)}</textarea>` : ""}
     edUi.last[tab2] = edUi.node;
     const tabs2 = TABS2.map(([id, label2, icon2]) => `<button class="gw-tab${tab2 === id ? " on" : ""}" role="tab" aria-selected="${tab2 === id}" data-action="ed-tab" data-value="${id}">${icon2}<span>${label2}</span></button>`).join("");
     const dirty2 = anyDirty();
-    root.innerHTML = `<div class="gw-win${edUi.drawer ? " drawer" : ""}">
-    <header class="gw-top">
-      <button class="gx-x gw-menu" data-action="ed-drawer" aria-label="메뉴">${ICONS.list}</button>
-      <span class="gw-brand">${GHOST_ICON}</span><b>설정</b>
-      ${edUi.notice ? `<span class="gw-notice err">${esc26(edUi.notice)}</span>` : edUi.info ? `<span class="gw-notice">${esc26(edUi.info)}</span>` : ""}
-      <div class="gw-top-right">${tab2 === "world" || dirty2 ? saveBar() : ""}<button class="gx-x" data-action="ed-close" aria-label="닫기">${ICONS.close}</button></div>
-    </header>
-    <nav class="gw-tree"><div class="gw-tabs" role="tablist">${tabs2}</div>${tree(ctx2)}</nav>
-    <main class="gw-body">${ctx2 ? body3(ctx2) : '<p class="gx-err">채팅 정보를 읽지 못했어요. 창을 닫고 다시 열어 주세요.</p>'}</main>
-    ${confirm2}
-  </div>`;
-    labelSwitches(root);
-  }
-  var env = { render: () => render(), refresh: async () => {
-    await host?.refresh();
-    render();
-  } };
-  async function save2(ctx2) {
-    if (edUi.busy) return;
-    edUi.busy = true;
-    edUi.notice = "";
-    render();
-    try {
-      const d = directoryDraft(ctx2);
-      const over = overridesOf(ctx2);
-      const data3 = { ...directoryData(d), 세계: over };
-      await updateCharacterLore(ctx2.charIndex, (lore) => withDirectory(lore, data3).filter((e) => !d.folders || !LEGACY_DATA.includes(String(e.comment ?? ""))));
-      dirUi.draft = null;
-      edUi.from = null;
-      edUi.info = "카드에 저장했어요";
-      await host?.refresh();
-    } catch (error) {
-      edUi.notice = `저장하지 못했어요: ${error instanceof Error ? error.message : String(error)}`;
-    }
-    edUi.busy = false;
-    render();
-  }
-  var run3 = (action, value) => handle(action, value).catch((error) => console.log(`[goei] 편집 창 조작 실패(${action}): ${error instanceof Error ? error.message : String(error)}`));
-  async function handle(action, value) {
-    const ctx2 = host?.ctx() ?? null;
-    switch (action) {
-      case "ed-close":
-        if (anyDirty()) {
-          edUi.confirm = "close";
-          return render();
-        }
-        return closeEditor();
-      case "ed-close-force":
-        dirUi.draft = null;
-        edUi.from = null;
-        return closeEditor();
-      case "ed-confirm-no":
-        edUi.confirm = "";
-        return render();
-      case "ed-revert":
-        edUi.confirm = "reset";
-        return render();
-      case "ed-revert-force":
-        edUi.confirm = "";
-        dirUi.draft = null;
-        edUi.from = null;
-        edUi.info = "카드 값으로 되돌렸어요";
-        return render();
-      case "ed-save":
-        if (ctx2) await save2(ctx2);
-        return;
-      case "ed-drawer":
-        edUi.drawer = !edUi.drawer;
-        return render();
-      case "ed-tab": {
-        const t = value ?? "set";
-        return handle("ed-node", edUi.last[t] ?? firstOf(t));
-      }
-      case "ed-node":
-        edUi.node = legacyNode(value ?? "agent");
-        if (edUi.node === "manage:backup") manUi.sizes = null;
-        edUi.q = "";
-        edUi.drawer = false;
-        edUi.notice = "";
-        dirUi.adding = false;
-        if (edUi.node === "base") resetDirectory();
-        syncSettingsPage();
-        if (edUi.node === "install") {
-          instUi.notice = "";
-          instUi.info = "";
-          instUi.forChar = -1;
-        }
-        return render();
-      case "ed-width": {
-        const w = Math.max(50, Math.min(100, Number(value) || 90));
-        await savePrefs((p) => ({ ...p, editorWidth: w }));
-        return render();
-      }
-    }
-    if (!ctx2) return;
-    if (action.startsWith("dir-")) {
-      await handleDirectory(action, value, ctx2, env);
-      if (action === "dir-ext-add" && value && isKind3(edUi.node) && directoryDraft(ctx2)[edUi.node === "site" ? "sites" : "anomalies"].some((p) => p.lore === value)) {
-        edUi.sel[edUi.node] = value;
-        render();
-      }
-      return;
-    }
-    if (action.startsWith("ip-")) {
-      await handleImgPrompt(action, value, { render });
-      return;
-    }
-    if (action.startsWith("ed-rel-") || action.startsWith("ed-rules")) {
-      if (await relationsAction(action, value, ctx2)) render();
-      return;
-    }
-    if (action.startsWith("ed-guide-")) {
-      if (await guideAction(action, value)) render();
-      return;
-    }
-    if (action.startsWith("man-")) {
-      if (await manageAction(action, root)) render();
-      return;
-    }
-    if (action.startsWith("ed-rule-")) {
-      const r = await ruleAction(action, value);
-      if (typeof r === "string") edUi.node = r;
-      if (r) render();
-      return;
-    }
-    if (await installAction(action, ctx2, env)) return;
-    if (isKind3(edUi.node) && await recordAction(action, value, ctx2, edUi.node)) render();
-    else if (host?.handle && !action.startsWith("ed-")) {
-      await host.handle(action, value);
-      render();
-    }
-  }
-
-  // src/ui/clouds.ts
-  var N = 256;
-  function lattice(seed, g2) {
-    const a = new Float32Array(g2 * g2);
-    let s5 = seed >>> 0;
-    for (let i = 0; i < a.length; i++) {
-      s5 = s5 * 1664525 + 1013904223 >>> 0;
-      a[i] = s5 / 4294967296;
-    }
-    return a;
-  }
-  function noise(lat, g2, x, y) {
-    const xi = Math.floor(x), yi = Math.floor(y);
-    const fx = x - xi, fy = y - yi;
-    const sx = fx * fx * (3 - 2 * fx), sy = fy * fy * (3 - 2 * fy);
-    const x0 = (xi % g2 + g2) % g2, y0 = (yi % g2 + g2) % g2, x1 = (x0 + 1) % g2, y1 = (y0 + 1) % g2;
-    const a = lat[y0 * g2 + x0] + (lat[y0 * g2 + x1] - lat[y0 * g2 + x0]) * sx;
-    const b = lat[y1 * g2 + x0] + (lat[y1 * g2 + x1] - lat[y1 * g2 + x0]) * sx;
-    return a + (b - a) * sy;
-  }
-  function fbm(seed, base, oct) {
-    const lats = Array.from({ length: oct }, (_, o) => lattice(seed + o * 101, base << o));
-    return (u, v) => {
-      let t = 0, amp = 0.5, sum = 0;
-      for (let o = 0; o < oct; o++) {
-        const g2 = base << o;
-        t += noise(lats[o], g2, u * g2, v * g2) * amp;
-        sum += amp;
-        amp *= 0.5;
-      }
-      return t / sum;
-    };
-  }
-  function draw(seed) {
-    const c = document.createElement("canvas");
-    c.width = c.height = N;
-    const x = c.getContext("2d");
-    if (!x) return null;
-    const main = fbm(seed, 4, 6);
-    const warp = fbm(seed + 7, 3, 3);
-    const img = x.createImageData(N, N);
-    const sh = x.createImageData(N, N);
-    for (let j = 0; j < N; j++) {
-      for (let i = 0; i < N; i++) {
-        const u = i / N, v = j / N;
-        const w = warp(u, v) - 0.5;
-        const n2 = main(u + w * 0.35, v + w * 0.2);
-        const d = Math.min(1, Math.max(0, (n2 - 0.5) / 0.22));
-   
+    const KEEP2 = [".gw-body", ".gw-tree", ".gw-list", ".nw-groups"];
+    const sameNode = lastDrawn === edUi.node;
+    const keep = sameNode ? KEEP2.map((q) => root.querySelector(q)?.scrollTop ?? 0) : [];
+    const act = document.activeElement;
+    const focusSel = sameNode && act && root.contains(act) && (act.dataset?.input || act.dataset?.change || act.getAttribute("name")) ? `${act.tagName.toLowerCase()}${act.dataset?.input ? `[data-input="${CSS.escape(act.dataset.input)}"]` : act.dataset?.change ? `[data-change="${CSS.escape(act.dataset.change)}"]` : `[name="${CSS.escape(act.getAttribute("name"))}"]`}${act.dataset?.key ? `[data-key="${CSS.escape(act.dataset.key)}"]` : ""}` : "";
+    const caret = focusSel && typeof act.selectionStart === "number" ? [act.selectionStart, act.selectionEnd ?? act.selectionStart] : null;
+    lastDrawn = edUi.n

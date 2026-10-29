@@ -1,4 +1,7 @@
-== "user");
+(e.name));
+    if (!entries2.length) return null;
+    const msgs4 = loreMessages(chat, o.input, o.mode === "risu");
+    const picks = o.mode === "risu" ? pickLoreRisu(entries2, msgs4, o.depth) : pickLore(entries2, msgs4, loreState(chat), o, msgs4.at(-1)?.role === "user");
     const books = lore ?? [];
     const texts = o.mode === "risu" ? hasSlots(books) ? null : slotTexts(picks.filter((p) => isVirtual(books[p.entry.index])), o.env) : slotTexts(picks, o.env);
     const locked = texts ? lockedAppendices(entries2, picks, readUnlocked(chat.scriptstate)) : [];
@@ -2206,8 +2209,7 @@ ${String(r.result ?? "").slice(0, 300)}`, String(r.result ?? ""));
       tool("ph-refresh", ICONS.refresh, "새 메시지 확인", busy5 ? "disabled" : "", "새로고침"),
       tool("ph-group", ICONS.group, "단톡 만들기", busy5 ? "disabled" : "", "단톡"),
       tool("ph-add", ICONS.addUser, "연락처 추가", "", "추가"),
-      tool("ph-call", ICONS.call, "전화 걸기", 'data-value=""', "전화"),
-      tool("ph-settings", ICONS.settings, "괴담톡 설정", phone.view === "settings" ? 'aria-pressed="true"' : "", "설정")
+      tool("ph-call", ICONS.call, "전화 걸기", 'data-value=""', "전화")
     ].join("");
     return `<main class="gx-body ph ph-app ${detail ? "is-detail" : "is-list"}">
     <section class="ph-side" aria-label="괴담톡 목록">
@@ -3073,8 +3075,7 @@ ${String(r.result ?? "").slice(0, 300)}`, String(r.result ?? ""));
       tool2("gn-refresh", ICONS.refresh, "게시판 새로고침", busy5 ? "disabled" : "", "새로고침"),
       tool2("gn-write", ICONS.pen, "글쓰기", gnet.compose?.kind === "post" ? 'aria-pressed="true"' : "", "글쓰기"),
       tool2("gn-newdm", ICONS.mail, "새 쪽지", gnet.compose?.kind === "newdm" ? 'aria-pressed="true"' : "", "쪽지"),
-      tool2("gn-nick", ICONS.idcard, "닉네임 바꾸기", gnet.editNick ? 'aria-pressed="true"' : "", "닉네임"),
-      tool2("gn-settings", ICONS.settings, `${gnetLabel(ctx2.chat.scriptstate)} 설정`, gnet.settings ? 'aria-pressed="true"' : "", "설정")
+      tool2("gn-nick", ICONS.idcard, "닉네임 바꾸기", gnet.editNick ? 'aria-pressed="true"' : "", "닉네임")
     ].join("");
     const subBtn = (id, label2, extra = "") => `<button class="ph-sub${gnet.sub === id ? " on" : ""}" data-action="gn-sub" data-value="${id}" aria-pressed="${gnet.sub === id}">${label2}${extra}</button>`;
     return `<main class="gx-body ph ph-app gn ${kind ? "is-detail" : "is-list"}">
@@ -3861,4 +3862,4 @@ Next Paragraph Text
     }
     /**
      * lite: 이번 캐릭터가 괴이봇 Lite인지 (needsCharacterCheck가 false면 생략, 이전 값 유지).
-     * intro: 괴이봇 Lite 채팅 화면에 
+     * intro: 괴이봇 Lite 채팅 화면에 새로 들어

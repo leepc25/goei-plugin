@@ -1,4 +1,12 @@
-t),
+g(v[ST.supportOn]) ?? d.supportOn
+    };
+  }
+  function basicVars(s5) {
+    return {
+      [ST.assetOn]: s5.assetOn ? "1" : "0",
+      [ST.assetModel]: s5.assetModel,
+      [ST.assetPlayer]: s5.assetPlayer ? "1" : "0",
+      [ST.assetLimit]: String(s5.assetLimit),
       [ST.agentLimit]: String(s5.agentLimit),
       [ST.supportOn]: s5.supportOn ? "1" : "0"
     };
@@ -4237,7 +4245,4 @@ Do not invent, reveal, or hint at the hidden information before it is unlocked. 
     return msgs4.filter((m) => m.data);
   }
   function computeLore(lore, chat, o) {
-    const entries2 = managedEntries(lore).filter((e) => !o.exclude?.includes(e.name));
-    if (!entries2.length) return null;
-    const msgs4 = loreMessages(chat, o.input, o.mode === "risu");
-    const picks = o.mode === "risu" ? pickLoreRisu(entries2, msgs4, o.depth) : pickLore(entries2, msgs4, loreState(chat), o, msgs4.at(-1)?.role =
+    const entries2 = managedEntries(lore).filter((e) => !o.exclude?.includes

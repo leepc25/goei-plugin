@@ -4463,6 +4463,12 @@ ${recent > 0 ? `{{#when {{greater_equal::{{chat_index}}::{{? {{lastmessageid}}-$
   }
   var cache4 = /* @__PURE__ */ new WeakMap();
   var MARK_MAX = 5;
+  var DEFAULT_MARKS = [
+    { s: { tab: "field" }, name: "필드" },
+    { s: { tab: "wallet" }, name: "가계부" },
+    { s: { tab: "records" }, name: "기록" },
+    { s: { tab: "settings" }, name: "설정" }
+  ];
   var DIM_DEFAULT = 50;
   var prefs = { basic: {}, world: {} };
   var PREF_VAR = /^(\$ph_(model|auto|status|related|context|incoming|incoming_chance|group_invites|group_invite_chance|announcements|announcement_gap|announcement_history|announcement_page_size|all_contacts|anomaly_contacts|storage_(auto|limit)_(dm|group|notice))|\$lb_cfg_lb-gn\.[a-z_]+|\$gn_storage_(auto|limit)_dm|\$nw_(mode|model|length|refresh_previous|writing_request|context)|\$ph_context_(messages|announcements)|\$(ph|nw)_adv_[a-z_]+|\$hq_(adv_[a-z_]+|ui)|\$gen_[a-z_]+|\$pp_[a-z_]+|\$jr_[a-z_]+|\$st_col_[a-z]+|\$st_wallet_edit)$/;
@@ -4494,7 +4500,7 @@ ${recent > 0 ? `{{#when {{greater_equal::{{chat_index}}::{{? {{lastmessageid}}-$
       for (const [k, v] of Object.entries(o.vars)) if (PREF_VAR.test(k) && typeof v === "string") vars[k] = v;
     }
     const nav = o.nav === "right" ? "right" : void 0;
-    const wikiSide = o.wikiSide === "right" ? "right" : void 0;
+    const wikiSide = o.wikiSide === "left" ? "left" : o.wikiSide === "right" ? "right" : void 0;
     const agents = o.agents === "list" ? "list" : void 0;
     const dim = int2(o.dim, 0, 100);
     const status2 = o.status === "off" || o.status === "light" || o.status === "dark" || o.status === "paper" ? o.status : void 0;
@@ -4503,7 +4509,7 @@ ${recent > 0 ? `{{#when {{greater_equal::{{chat_index}}::{{? {{lastmessageid}}-$
     const imgFoldOn = o.imgFoldOn === false ? false : void 0;
     const show = imgRecent(o.imgShow);
     const send2 = imgRecent(o.imgSend);
-    const marks2 = (Array.isArray(o.marks) ? o.marks : []).filter((m) => !!m && typeof m === "object" && typeof m.name === "string" && !!m.s && typeof m.s.tab === "string").slice(0, MARK_MAX).map((m) => ({ s: m.s, name: m.name.slice(0, 80) }));
+    const marks2 = (Array.isArray(o.marks) ? o.marks : DEFAULT_MARKS).filter((m) => !!m && typeof m === "object" && typeof m.name === "string" && !!m.s && typeof m.s.tab === "string").slice(0, MARK_MAX).map((m) => ({ s: m.s, name: m.name.slice(0, 80) }));
     const strList = (v, max, len) => Array.isArray(v) ? v.filter((x) => typeof x === "string" && !!x.trim()).map((x) => x.trim().slice(0, len)).slice(0, max) : [];
     const imgPrompt = typeof o.imgPrompt === "string" && o.imgPrompt.trim() ? o.imgPrompt.slice(0, 6e3) : void 0;
     const imgNamesOff = strList(o.imgNamesOff, 200, 40);
@@ -4593,12 +4599,4 @@ ${recent > 0 ? `{{#when {{greater_equal::{{chat_index}}::{{? {{lastmessageid}}-$
       assetPlayer: flag(v[ST.assetPlayer]) ?? d.assetPlayer,
       assetLimit: int2(v[ST.assetLimit], 1, 4) ?? d.assetLimit,
       agentLimit: int2(v[ST.agentLimit], 0, AGENT_MAX) ?? d.agentLimit,
-      supportOn: flag(v[ST.supportOn]) ?? d.supportOn
-    };
-  }
-  function basicVars(s5) {
-    return {
-      [ST.assetOn]: s5.assetOn ? "1" : "0",
-      [ST.assetModel]: s5.assetModel,
-      [ST.assetPlayer]: s5.assetPlayer ? "1" : "0",
-      [ST.assetLimit]: String(s5.assetLimi
+      supportOn: fla

@@ -3793,7 +3793,7 @@ tions: "Kang Ihak, pleased to meet you! Senior Staff, Employee!", "Haha.", "Okay
     }
   }
   var mod = {
-    version: "0.18.0",
+    version: "0.18.1",
     mount: (box2, bridge) => mountPlay(box2, bridge)
   };
   globalThis.__goeiGame = mod;

@@ -1,4 +1,17 @@
- now, which choices stay open). Do not repeat the previous staging method; never use delay merely to block the user's choices; never force a hook action every turn; never expose numbers or diagnostics verbatim.",
+ty alone never establish a high baseline. Allowed values: 0 (conservative, guarded, or no evidence), 90 (shy curiosity or plausibly receptive; the maximum supported by personality alone), 150 (explicit sexual interest, open attitude or experience), 210 (clearly proactive or adventurous experience or preference), 270 (explicitly highly indulgent or unrestrained evidence). A label like married is never enough. Without explicit background support, leave the value absent during ordinary scenes; a qualifying confirmed intimacy trigger in the span (intentional handholding, embrace, intimate pressing, kiss, caress, exposure, sexual proposition, or stronger consensual adult contact) may create it as `init 0` plus a separate `event`. Ordinary conversation, work proximity, accidental touch or non-intimate contact creates nothing.",
+    "- **New actual reactions (`op: event`, `delta`)**: +1 a small voluntary new reaction actually shown during relevant light contact, gaze or conversation · +3 a meaningful new reaction to mutually accepted relevant contact or atmosphere, including recognizing one's own welcoming response · +5 a new positive relevant experience the person actually and voluntarily accepted or initiated · +10 a rare and important personal milestone in a consensual situation between adults · −2 withdrawing from embarrassment or newly regaining composure · −4 closing off after uncomfortable contact, interruption or a broken mood · −5 a reaction clearly blocked by disgust, fear or shame. Increased affinity, nonsexual kindness, appearance, another person's reaction, routine repetition, ordinary recurring marital relations, alcohol and reduced resistance are not rewards. Never count coercion, an ignored refusal or an impaired ability to choose as a positive event. Never count baseline evidence again as an event, and never add the same event again because it was redescribed or rerolled.",
+    "- Stages and contraception attitude are computed by the program from the value (0–60 Chaste: must use contraception · –120 Shy: hesitant but still asks · –180 Open: non-use acceptable on a 'safe day' as a belief · –240 Awakened: pays little attention · –300 Indulgent: prefers non-use). You never compute the total or the stage; return only `init` values and `event` deltas with `m`, a verbatim `quote` and a Korean `reason`. Up to 3 events per person per response.",
+    "<<END:openness>>",
+    "<<SECTION:rhythm>>",
+    "## 14. Narrative rhythm and hooks — Risupot rhythm",
+    "",
+    "This feature tracks scene tension and aftermath, chapter flow, and the advancement and payoff of clues actually planted. It never adds an event every turn or forces the story into a shape; when emotion, goals or conflict are already moving, respect that flow. It is recorded as `docs` of type `rhythm` with fixed keys:",
+    "- `scene` (one record, upsert): text starts with `[phase:baseline|build_up|peak|aftermath|cooldown] [engagement:active|idle|intentional_rest]`, then the actual tension factors, evidence of meaningful quiet or stagnation, and the staging method actually applied. Phases may be skipped or repeated; do not attach a preparation phase to a sudden event, and do not cover a scene that needs aftermath with the next stimulus. Rest, mourning, lingering emotion and accepting a feeling are meaningful progression, never boredom. Review stagnation only when the same topic or purposeless talk continues across two or more confirmed turns; a short user input alone is not stagnation.",
+    "- `chapter` (upsert): the chapter's shared theme, turning points and important event links, reviewed only after an actual scene cycle ends through a new location, date or subject.",
+    "- `arc` (upsert): a long-term narrative assessment of the relationship's actual turning points and unresolved tension, reviewed only at a chapter boundary or an important event. Never duplicate the relationship entries or an affinity stage, and never overwrite them with rhythm vocabulary.",
+    "- `hook:<short name>` (one per clue): text starts with `[stage:seeded|hinted|escalated|payoff_ready|resolved|retired] [tier:short|mid|long]`, then the evidence of the clue actually planted, its scale, payoff condition, actual advancement and links. Register a hook only when it actually appeared in completed text; never from a plan. Advance a stage only when the span actually shows it; at most one hook action per response.",
+    "- `pending` (upsert): an unconfirmed next development attached to an already planted hook, kept separate from facts and from a person's confirmed intent; never a future event with a confirmed date or place. When a prior pending development did not occur, never mark it complete.",
+    "- `rhythm_note` (when `next_note` is true): one English memo ≤200 chars for the model that writes the next reply — the current phase, whether existing tension is moving or the scene is genuine aftermath, and at most one allowed hook action (what evidence it comes from, what could enter the scene, why now, which choices stay open). Do not repeat the previous staging method; never use delay merely to block the user's choices; never force a hook action every turn; never expose numbers or diagnostics verbatim.",
     "<<END:rhythm>>",
     "<<SECTION:faction_rep>>",
     "## 15a. Faction standing — how each organization regards the user",
@@ -1260,7 +1273,6 @@ Return the JSON object.` }
     const label2 = open3 ? "목록 접기" : "목록 펼치기";
     return `<nav class="nw-rail" aria-label="위키 메뉴">
     ${tool3("wiki-home", ICONS.wiki, "위키 메인", wiki.view === "home" ? 'aria-pressed="true"' : "")}
-    ${tool3("wiki-settings", ICONS.settings, "위키 설정", wiki.view === "settings" ? 'aria-pressed="true"' : "")}
     <button class="nw-grab" type="button" data-action="wiki-list" aria-expanded="${open3}" aria-label="${label2}" title="${label2}"><span class="nw-grab-ico${open3 ? "" : " flip"}">${ICONS.back}</span></button>
   </nav>`;
   }
@@ -1431,8 +1443,7 @@ Return the JSON object.` }
     ${drawerHtml([
       tool3("wiki-home", ICONS.wiki, "위키 메인", wiki.view === "home" ? 'aria-pressed="true"' : "", "메인"),
       tool3("wiki-find", ICONS.search, "위키 검색", "", "검색"),
-      tool3("wiki-list", ICONS.list, open3 ? "목록 접기" : "목록 펼치기", `aria-pressed="${open3}"`, "목록"),
-      tool3("wiki-settings", ICONS.settings, "위키 설정", wiki.view === "settings" ? 'aria-pressed="true"' : "", "설정")
+      tool3("wiki-list", ICONS.list, open3 ? "목록 접기" : "목록 펼치기", `aria-pressed="${open3}"`, "목록")
     ].join(""))}
     ${note}
   </main>`;
@@ -1550,7 +1561,7 @@ Return the JSON object.` }
       const dx = (e.changedTouches[0]?.clientX ?? t0.x) - t0.x;
       const dy = (e.changedTouches[0]?.clientY ?? t0.y) - t0.y;
       t0 = null;
-      const fromLeft = wide() && root3.closest("[data-wiki-side]")?.dataset.wikiSide !== "right";
+      const fromLeft = root3.closest("[data-wiki-side]")?.dataset.wikiSide === "left";
       const out = fromLeft ? dx < -36 : dx > 36;
       if (out && Math.abs(dx) > Math.abs(dy) * 1.5 && wiki.listOpen) act("close");
     }, { passive: true });
@@ -1561,7 +1572,8 @@ Return the JSON object.` }
       if (e0 === null) return;
       const dx = (e.changedTouches[0]?.clientX ?? e0) - e0;
       e0 = null;
-      if (dx < -24 && !wiki.listOpen) act("open");
+      const leftSide = root3.closest("[data-wiki-side]")?.dataset.wikiSide === "left";
+      if ((leftSide ? dx > 24 : dx < -24) && !wiki.listOpen) act("open");
     }, { passive: true });
   }
   var wide = () => !matchMedia("(max-width: 760px)").matches;
@@ -2338,112 +2350,4 @@ ${recentStory.map((m) => m.text).join("\n")}`,
     const body5 = {
       agent: { name: input2.agent.name, ...input2.agent.rank ? { rank: input2.agent.rank } : {}, lore: input2.agent.lore, status: input2.agent.state, situation: input2.agent.situation, where: ROOM2[input2.agent.room] ?? input2.agent.room },
       ...by.length ? { bystanders: by.map((b) => ({ name: b.name, ...b.rank ? { rank: b.rank } : {}, lore: b.lore, status: b.state, situation: b.situation })) } : {},
-      protagonist: { name: input2.visitor, ...protagonist ? { lore: protagonist } : {} },
-      ...input2.scene && Object.values(input2.scene).some(Boolean) ? { mainScene: Object.fromEntries(Object.entries(input2.scene).filter(([, v]) => v)) } : {},
-      universe,
-      recentStory,
-      ...advOn(ss, "hq", "interlude") && input2.elsewhere.length ? { earlierThisInterlude: input2.elsewhere } : {},
-      conversation: input2.conversation,
-      ...input2.act ? { did: input2.said } : { said: input2.said }
-    };
-    return {
-      limit,
-      bystanders: by.map((b) => b.name),
-      messages: [
-        { role: "system", content: factionCodesToNames(rules2(src, limit, by.length > 0), names4) },
-        { role: "user", content: factionCodesToNames(JSON.stringify(body5), names4) }
-      ]
-    };
-  }
-  var agentLore = (src, loreName2) => bookText(src, loreName2);
-  var SENTENCE_END = /[.!?…~。！？]["'」』”’)]*$/;
-  function cleanLine(text4, speaker, prose = false) {
-    let s5 = cleanOutput(String(text4 ?? ""));
-    s5 = s5.replace(/<(think|thoughts)\b[^>]*>[\s\S]*?<\/\1\s*>/gi, "");
-    s5 = s5.replace(/\*[^*\n]*\*/g, " ").replace(/[（(][^()（）\n]*[)）]/g, " ");
-    const lines3 = s5.split("\n").map((l) => l.trim()).filter(Boolean);
-    const quoted = !prose ? [] : lines3.flatMap((l) => [...l.matchAll(/[「"“『]([^」"”』]{1,})[」"”』]/g)].map((m) => m[1]));
-    s5 = (quoted.length ? quoted : lines3).join(" ");
-    const esc34 = speaker.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-    s5 = s5.replace(new RegExp(`^\\s*${esc34}\\s*[:：]\\s*`), "").replace(/^[「"“『]|[」"”』]$/g, "");
-    return s5.replace(/\s+/g, " ").trim();
-  }
-  function clipLine(s5, limit) {
-    const chars = [...s5];
-    if (chars.length <= limit) return s5;
-    const head3 = chars.slice(0, limit).join("");
-    let cut4 = -1;
-    for (let i = head3.length; i > 0; i--) if (SENTENCE_END.test(head3.slice(0, i))) {
-      cut4 = i;
-      break;
-    }
-    return cut4 > 0 ? head3.slice(0, cut4).trim() : `${chars.slice(0, limit - 1).join("").trim()}…`;
-  }
-  function parseVisitLine(raw, speaker, limit) {
-    let text4 = "";
-    let prose = false;
-    try {
-      const v = parseJsonPayload(raw);
-      if (v && typeof v === "object" && typeof v.line === "string") text4 = v.line;
-    } catch {
-    }
-    if (!text4) prose = true;
-    if (!text4) text4 = String(raw ?? "").replace(/^```[\w-]*\s*|```\s*$/g, "").replace(/^\s*\{[\s\S]*?"line"\s*:\s*"/, "").replace(/"\s*\}\s*$/, "");
-    const line2 = clipLine(cleanLine(text4, speaker, prose), limit);
-    if (!line2) throw new VisitError("모델 응답에서 대사를 찾지 못했어요.");
-    return line2;
-  }
-  function parseVisitGroup(raw, speaker, bystanders, limit) {
-    let rows2 = null;
-    try {
-      const v = parseJsonPayload(raw);
-      if (v && Array.isArray(v.lines)) rows2 = v.lines.filter((r) => !!r && typeof r === "object");
-      else if (v && typeof v.line === "string") rows2 = [{ speaker, line: v.line }];
-    } catch {
-    }
-    if (!rows2) return { line: parseVisitLine(raw, speaker, limit), extra: [] };
-    const name = (x) => String(x ?? "").trim();
-    const say2 = (r) => clipLine(cleanLine(String(r.line ?? ""), name(r.speaker)), limit);
-    const mine = rows2.find((r) => name(r.speaker) === speaker) ?? rows2.find((r) => !name(r.speaker));
-    const line2 = mine ? say2(mine) : "";
-    if (!line2) throw new VisitError("모델 응답에서 대사를 찾지 못했어요.");
-    const extra = [];
-    for (const r of rows2) {
-      const who = name(r.speaker);
-      if (r === mine || !bystanders.includes(who) || extra.some((e) => e.speaker === who)) continue;
-      const l = say2(r);
-      if (l) extra.push({ speaker: who, line: l });
-      if (extra.length >= 2) break;
-    }
-    return { line: line2, extra };
-  }
-
-  // src/host/game/uid.ts
-  var uid2 = () => typeof crypto !== "undefined" && typeof crypto.randomUUID === "function" ? crypto.randomUUID() : `${Date.now().toString(36)}-${Math.random().toString(36).slice(2)}${Math.random().toString(36).slice(2)}`;
-
-  // src/core/gamelink.ts
-  function cardSnapshot(char, chat, pics) {
-    const lore = char.globalLore ?? [];
-    const dir2 = readDirectory(lore);
-    const world2 = readWorld(chat);
-    let people = [];
-    try {
-      people = parseCatalog(lore).people;
-    } catch {
-      people = dir2.agents;
-    }
-    const rows2 = new Map(dir2.agents.map((a) => [a.id, a]));
-    const agents = people.map((p) => {
-      const rec2 = world2.agents[p.id];
-      const row10 = rows2.get(p.id);
-      return {
-        id: p.id,
-        name: p.name,
-        english: p.english,
-        affiliation: p.affiliation,
-        rank: p.rank,
-        state: rec2?.st ?? "미정",
-        situation: rec2?.situation ?? "",
-        locked: agentLocked(rec2) || world2.retired.includes(p.id),
-        photo: row10 && pics ? pics.main(row10) : row10?.photo ?? "",
-        face: row10 && p
+      protagonist: { name: input2.visitor

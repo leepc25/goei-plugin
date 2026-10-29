@@ -1,4 +1,4 @@
-// goei-body 0.18.0
+// goei-body 0.18.1
 "use strict";
 (() => {
   var __create = Object.create;

@@ -1,4 +1,4 @@
-새로 들어온 순간마다 true (다른 봇·설정 화면에서 돌아올 때 포함).
+온 순간마다 true (다른 봇·설정 화면에서 돌아올 때 포함).
      */
     update(s5, lite) {
       if (s5.charIndex !== this.charIndex) this.isLite = lite ?? false;
@@ -221,7 +221,7 @@
     }
     return { next, lore: lore.count, scripts: scripts.count, fields: fields3 };
   }
-  var PLUGIN_VERSION = true ? "0.18.0" : "0";
+  var PLUGIN_VERSION = true ? "0.18.1" : "0";
 
   // src/core/pictures.ts
   function pictures(m) {
@@ -2123,6 +2123,70 @@
     }
   }
 
+  // src/ui/mbar.ts
+  function mbarHtml(items) {
+    const x = (side) => `<span class="gx-mclose ${side}" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg><span>닫기</span></span>`;
+    return `<div class="gx-mbar"><div class="gx-mtrack">${x("l")}${items.join("")}${x("r")}</div></div>`;
+  }
+  var rubber = (dx, w) => Math.sign(dx) * (Math.abs(dx) / (1 + Math.abs(dx) / (4 * w)));
+  function bindMbar(root3, onClose) {
+    const bar = root3.querySelector(".gx-mbar");
+    const track2 = bar?.querySelector(".gx-mtrack");
+    if (!bar || !track2) return;
+    const closeW = () => track2.querySelector(".gx-mclose")?.offsetWidth || 72;
+    let x0 = 0;
+    let y0 = 0;
+    let id = null;
+    let dragging = false;
+    let shown2 = 0;
+    let ready = false;
+    const paint = () => {
+      track2.style.transform = shown2 ? `translateX(${shown2}px)` : "";
+      const was = ready;
+      ready = Math.abs(shown2) >= closeW();
+      track2.querySelectorAll(".gx-mclose").forEach((el) => el.classList.toggle("ready", ready));
+      if (ready && !was) navigator.vibrate?.(8);
+    };
+    const end = () => {
+      if (id === null) return;
+      id = null;
+      if (!dragging) return;
+      const close3 = ready;
+      track2.classList.add("back");
+      shown2 = 0;
+      paint();
+      setTimeout(() => track2.classList.remove("back"), 260);
+      if (close3) onClose();
+    };
+    bar.addEventListener("pointerdown", (e) => {
+      if (e.button !== 0) return;
+      id = e.pointerId;
+      x0 = e.clientX;
+      y0 = e.clientY;
+      dragging = false;
+      track2.classList.remove("back");
+    });
+    bar.addEventListener("pointermove", (e) => {
+      if (e.pointerId !== id) return;
+      const dx = e.clientX - x0;
+      if (!dragging) {
+        if (Math.abs(dx) < 8 || Math.abs(dx) < Math.abs(e.clientY - y0)) return;
+        dragging = true;
+        bar.setPointerCapture?.(e.pointerId);
+      }
+      shown2 = rubber(dx, closeW());
+      paint();
+    });
+    bar.addEventListener("pointerup", end);
+    bar.addEventListener("pointercancel", end);
+    bar.addEventListener("click", (e) => {
+      if (!dragging) return;
+      dragging = false;
+      e.stopPropagation();
+      e.preventDefault();
+    }, true);
+  }
+
   // src/ui/editor/style.css
   var style_default = `/* 설정·세계 편집 창 (.gw). 2026-10-27 전면 재작성: 한 규격.
    ─ 규격 변수 하나씩: 조작 높이 --h 34, 모서리 --r 8, 틈 --gap 8, 안 여백 --pad 14, 이름 칸 --label 200, 입력칸 --ctl 320.
@@ -2284,7 +2348,7 @@
 .gw .gw-basepage .dir-add input { flex: 1; min-width: 0; }
 
 /* ── 조작: 전부 같은 높이·모서리·선·글자 ── */
-.gw .gx-mini, .gw .gx-chip, .gw .gw-pre, .gw .gx-select, .gw select, .gw .gx-segs, .gw .adv-step, .gw .st-step, .gw .ph-tool, .gw .adv-num,
+.gw .gx-mini, .gw .gx-chip, .gw .gw-pre, .gw .gx-select, .gw select, .gw .gx-segs, .gw .adv-step, .gw .st-step, .gw .ph-tool:not(.ph-tools > .ph-tool), .gw .adv-num,
 .gw input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="file"]):not([type="hidden"]) { height: var(--h); min-height: var(--h); max-height: var(--h); margin: 0; padding: 0 12px; border: 1px solid var(--line); border-radius: var(--r); background: var(--void); color: var(--text); font: inherit; font-size: 13px; font-weight: 500; line-height: 1; vertical-align: middle; }
 .gw input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="file"]):not([type="hidden"])::placeholder { color: var(--dim); }
 .gw input:focus, .gw select:focus, .gw textarea:focus { outline: none; border-color: var(--signal); }
@@ -2447,8 +2511,27 @@
 
 /* ── 좁은 화면 ── */
 @media (max-width: 760px) {
+  /* 창 머리의 「기본값으로 저장/불러오기」는 폰에서 아이콘만 (글자까지 두면 메뉴·제목·X 와 한 줄에 안 들어간다) */
+  .gw .gw-top .ps-defaults { gap: 4px; }
+  .gw .gw-top .ps-defaults .st-act { padding: 0 8px; gap: 0; }
+  .gw .gw-top .ps-defaults .st-act span { display: none; }
+  .gw .gw-top .ps-defaults .st-act svg { width: 16px; height: 16px; }
   .gw { padding: 0; }
-  .gw-win { width: 100%; height: 100%; border-radius: 0; border: 0; grid-template-columns: minmax(0, 1fr); grid-template-rows: 52px minmax(0, 1fr); grid-template-areas: "top" "body"; }
+  .gw-win { width: 100%; height: 100%; border-radius: 0; border: 0; grid-template-columns: minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr) auto auto; grid-template-areas: 'top' 'body' 'drawer' 'nav'; }
+  /* 폰: 설정은 본 창의 한 화면처럼 (2026-10-29 사용자) — 머리는 본 창 모양, 아래 숨은 서랍(기능·세계·지침·점검) + 본 창 하단 바 */
+  .gw-win > .gw-phead { grid-area: top; display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-bottom: 1px solid var(--line); background: var(--panel); }
+  .gw-win > .gw-phead .gx-tabhead { flex: 1; min-width: 0; }
+  .gw-win > .gw-phead .gx-tabhead b { font-size: 19px; font-weight: 800; white-space: nowrap; }
+  .gw-win > .gw-phead .gw-menu { display: grid; width: 40px; height: 40px; }
+  .gw-win > .gw-phead .gx-head-act { gap: 4px; margin-left: auto; }
+  .gw-win > .gw-phead .gx-head-act > .gx-x { width: 40px; height: 40px; }
+  .gw-win > .ph-drawer { grid-area: drawer; margin: 0; }
+  .gw-win > .ph-drawer .ph-tools { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  /* 서랍 단추는 본 창 서랍(.ph-drawer .ph-tools .ph-tool)과 같은 규칙을 그대로 (입력칸 규칙에서 뺐다) */
+  .gw-win > .ph-drawer .ph-tool[aria-pressed="true"] { background: var(--accent-bg); color: var(--signal); }
+  .gw-win > .gw-nav { grid-area: nav; position: static; border: 0; border-top: 1px solid var(--panel2); background: var(--void); }
+  .gw-win.phone .gw-tree { top: var(--gw-top-h, 60px); }
+
   .gw-menu { display: inline-flex; }
   .gw-tree { position: absolute; top: 52px; left: 0; bottom: 0; width: 260px; transform: translateX(-100%); visibility: hidden; transition: transform .18s, visibility .18s; z-index: 3; box-shadow: var(--shadow); }
   /* 닫힌 서랍은 화면 밖에 있어도 Tab·읽어 주기에 걸렸다 → visibility 로 숨김 (2026-10-28 QC) */
@@ -2474,6 +2557,19 @@
   .gw .ps-ctl > input, .gw .ps-ctl > select, .gw .dir-in > input, .gw .dir-in > select, .gw .st-range { width: 100%; }
   .gw .dir-in:has(> .dir-photo) > span:first-child, .gw .dir-in > .dir-photo, .gw .dir-in:has(> .dir-photo) > small, .gw .dir-in:has(> .dir-photo) > .dir-ext { grid-column: 1; }
 }
+
+/* 이미지 지침 페이지 (ui/imgprompt.ts): 묶음마다 카드, 입력칸·단추·목록에 여백 (2026-10-29 사용자: 입력칸이 바깥 테두리에 붙고 단추·목록이 다닥다닥) */
+.gw .gw-imgp > article { display: flex; flex-direction: column; gap: 18px; }
+.gw .gw-imgp .ps-group { margin: 0; padding: 16px 18px 18px; border: 1px solid var(--line); border-radius: 10px; background: var(--panel); }
+.gw .gw-imgp .ps-group > h3 { margin: 0 0 4px; }
+.gw .gw-imgp .ps-group > .ps-note { margin: 0 0 12px; }
+.gw .gw-imgp textarea.gx-search, .gw .gw-imgp input.gx-search { width: 100%; box-sizing: border-box; margin: 0; }
+.gw .gw-imgp .gx-row-btns { margin-top: 12px; gap: 10px; justify-content: flex-end; }
+.gw .gw-imgp .ip-names { gap: 10px; }
+.gw .gw-imgp .ip-name { padding: 10px 12px; }
+.gw .gw-imgp .ip-extra { margin-top: 12px; gap: 10px; }
+.gw .gw-imgp .ip-preview { margin-top: 14px; padding: 14px 16px; }
+.gw .gw-imgp .gx-err, .gw .gw-imgp .gx-hint { margin: 0; }
 `;
 
   // src/ui/editor/record.ts
@@ -3180,126 +3276,4 @@ ${esc15(p.body)}</textarea></div>`).join("");
         await saveRules(rules3.map((r) => r.id === value ? { ...r, on: !r.on } : r));
         return true;
       case "ed-rule-to": {
-        const [id, t] = (value ?? "").split("|");
-        if (!RULE_TARGETS.includes(t)) return true;
-        await saveRules(rules3.map((r) => r.id === id ? { ...r, to: r.to.includes(t) ? r.to.filter((x) => x !== t) : [...r.to, t] } : r));
-        return true;
-      }
-      case "ed-rule-del":
-        ruleUi.confirmDel = value ?? "";
-        return true;
-      case "ed-rule-del-no":
-        ruleUi.confirmDel = "";
-        return true;
-      case "ed-rule-del-yes": {
-        ruleUi.confirmDel = "";
-        await saveRules(rules3.filter((r) => r.id !== value));
-        const rest = getUserRules();
-        return rest.length ? `rule:${rest[0].id}` : "guide:RP";
-      }
-    }
-    return true;
-  }
-
-  // src/core/people/seed.ts
-  var SEED_SECTIONS = { Identity: "identity", Character: "personality" };
-  var FIXED_SECTIONS = ["Appearance", "Voice", "Background", "Abilities"];
-  function parseSheet(text4) {
-    const lines3 = String(text4 ?? "").replace(/\r/g, "").split("\n");
-    const out = { title: "", sections: {} };
-    let cur = null;
-    for (const line2 of lines3) {
-      const h3 = /^###\s+(.+?)\s*$/.exec(line2);
-      const h4 = /^####\s+(.+?)\s*$/.exec(line2);
-      if (h3 && !h4) {
-        out.title = h3[1];
-        cur = null;
-        continue;
-      }
-      if (h4) {
-        cur = h4[1];
-        out.sections[cur] = "";
-        continue;
-      }
-      if (cur !== null) out.sections[cur] += (out.sections[cur] ? "\n" : "") + line2;
-    }
-    for (const k of Object.keys(out.sections)) out.sections[k] = out.sections[k].trim();
-    return out;
-  }
-  function bullets(section3) {
-    const out = [];
-    let label2 = "";
-    for (const raw of section3.split("\n")) {
-      const line2 = raw.trim();
-      if (!line2) continue;
-      const tag = /^\[([^\]]+)\]$/.exec(line2);
-      if (tag) {
-        label2 = tag[1];
-        continue;
-      }
-      const b = /^[-*•]\s+(.+)$/.exec(line2);
-      const text4 = b ? b[1] : line2;
-      out.push(label2 ? `[${label2}] ${text4}` : text4);
-    }
-    return out;
-  }
-  function seedPerson(name, sheet, base = {}, now = (/* @__PURE__ */ new Date()).toISOString()) {
-    const p = {
-      name,
-      faction: base.faction ?? "",
-      seeded: { from: sheet ? "lore" : base.address ? "dialogue" : "none", at: now, ...sheet ? { hash: hash(sheet) } : {} },
-      slots: {},
-      affinity: { base: base.affinityBase ?? 0 },
-      address: base.address ?? { toUser: "", register: "존댓말" },
-      express: base.express ?? 1,
-      aliases: base.aliases ?? []
-    };
-    if (sheet) {
-      const s5 = parseSheet(sheet);
-      for (const [section3, slot] of Object.entries(SEED_SECTIONS)) {
-        const body5 = s5.sections[section3];
-        if (!body5) continue;
-        const list4 = bullets(body5).map((text4, i) => ({ id: entryId(name, slot, "#0", i, text4), text: plain2(text4, 300), src: "seed", anchor: "#0", seq: i }));
-        if (list4.length) p.slots[slot] = list4;
-      }
-    }
-    return p;
-  }
-  function fixedSections(sheet) {
-    const s5 = parseSheet(sheet);
-    return FIXED_SECTIONS.filter((n2) => s5.sections[n2]).map((n2) => ({ name: n2, body: s5.sections[n2] }));
-  }
-
-  // src/core/people/inject.ts
-  var REGISTER_EN = { 존댓말: "formal (존댓말)", 반말: "informal (반말)", 혼합: "mixed formal/informal", 하게체: "hage-che (archaic, superior-to-junior)", 하오체: "hao-che (archaic, dignified formal)" };
-  var EXPRESS_TAIL = {
-    0: "Expression: almost never shown; appears only through actions and priorities, not words.",
-    1: "Expression: restrained; small, deniable cues (pauses, gaze, delayed replies).",
-    2: "Expression: visible but controlled.",
-    3: "Expression: open and immediate."
-  };
-  var lines2 = (list4) => list4.map((e) => `- ${plain2(e.text, 300)}`).join("\n");
-  var TRIM_ORDER = ["history", "knowledge", "behavior", "scene", "threads"];
-  function personBlock(p, store, live, changes, o = {}) {
-    const user = o.user ?? "{{user}}";
-    const kept = {};
-    for (const k of Object.keys(p.slots)) kept[k] = liveEntries(p.slots[k], live);
-    if (o.maxChars) {
-      const size = () => Object.values(kept).reduce((n2, l) => n2 + (l ?? []).reduce((m, e) => m + e.text.length + 3, 0), 0);
-      for (const k of TRIM_ORDER) while (size() > o.maxChars && kept[k]?.length) kept[k].shift();
-    }
-    const slot = (k) => kept[k] ?? [];
-    const out = [`## ${p.name} (living record · updated in this chat)`];
-    const mode2 = o.mode ?? "split";
-    if (o.sheet && mode2 === "append") out.push(o.sheet.trim());
-    const id = slot("identity");
-    if (id.length) out.push("Identity:\n" + lines2(id));
-    const per = slot("personality");
-    if (per.length) out.push("Personality:\n" + lines2(per));
-    if (o.sheet && mode2 === "split") for (const s5 of fixedSections(o.sheet)) out.push(`${s5.name}:
-${s5.body}`);
-    const st = slot("state");
-    if (st.length) out.push("Current state:\n" + lines2(st));
-    const kn = slot("knowledge");
-    if (kn.length) out.push("Knows:\n" + lines2(kn));
-    if (o.unknown?.length) out.push("Does not know (has not witnessed o
+        const [id, t] = (value ?? "").split(

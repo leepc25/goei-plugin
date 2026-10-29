@@ -1,4 +1,126 @@
-r been told):\n" + o.unknown.map((u) => `- ${plain2(u, 120)}`).join("\n"));
+"|");
+        if (!RULE_TARGETS.includes(t)) return true;
+        await saveRules(rules3.map((r) => r.id === id ? { ...r, to: r.to.includes(t) ? r.to.filter((x) => x !== t) : [...r.to, t] } : r));
+        return true;
+      }
+      case "ed-rule-del":
+        ruleUi.confirmDel = value ?? "";
+        return true;
+      case "ed-rule-del-no":
+        ruleUi.confirmDel = "";
+        return true;
+      case "ed-rule-del-yes": {
+        ruleUi.confirmDel = "";
+        await saveRules(rules3.filter((r) => r.id !== value));
+        const rest = getUserRules();
+        return rest.length ? `rule:${rest[0].id}` : "guide:RP";
+      }
+    }
+    return true;
+  }
+
+  // src/core/people/seed.ts
+  var SEED_SECTIONS = { Identity: "identity", Character: "personality" };
+  var FIXED_SECTIONS = ["Appearance", "Voice", "Background", "Abilities"];
+  function parseSheet(text4) {
+    const lines3 = String(text4 ?? "").replace(/\r/g, "").split("\n");
+    const out = { title: "", sections: {} };
+    let cur = null;
+    for (const line2 of lines3) {
+      const h3 = /^###\s+(.+?)\s*$/.exec(line2);
+      const h4 = /^####\s+(.+?)\s*$/.exec(line2);
+      if (h3 && !h4) {
+        out.title = h3[1];
+        cur = null;
+        continue;
+      }
+      if (h4) {
+        cur = h4[1];
+        out.sections[cur] = "";
+        continue;
+      }
+      if (cur !== null) out.sections[cur] += (out.sections[cur] ? "\n" : "") + line2;
+    }
+    for (const k of Object.keys(out.sections)) out.sections[k] = out.sections[k].trim();
+    return out;
+  }
+  function bullets(section3) {
+    const out = [];
+    let label2 = "";
+    for (const raw of section3.split("\n")) {
+      const line2 = raw.trim();
+      if (!line2) continue;
+      const tag = /^\[([^\]]+)\]$/.exec(line2);
+      if (tag) {
+        label2 = tag[1];
+        continue;
+      }
+      const b = /^[-*•]\s+(.+)$/.exec(line2);
+      const text4 = b ? b[1] : line2;
+      out.push(label2 ? `[${label2}] ${text4}` : text4);
+    }
+    return out;
+  }
+  function seedPerson(name, sheet, base = {}, now = (/* @__PURE__ */ new Date()).toISOString()) {
+    const p = {
+      name,
+      faction: base.faction ?? "",
+      seeded: { from: sheet ? "lore" : base.address ? "dialogue" : "none", at: now, ...sheet ? { hash: hash(sheet) } : {} },
+      slots: {},
+      affinity: { base: base.affinityBase ?? 0 },
+      address: base.address ?? { toUser: "", register: "존댓말" },
+      express: base.express ?? 1,
+      aliases: base.aliases ?? []
+    };
+    if (sheet) {
+      const s5 = parseSheet(sheet);
+      for (const [section3, slot] of Object.entries(SEED_SECTIONS)) {
+        const body5 = s5.sections[section3];
+        if (!body5) continue;
+        const list4 = bullets(body5).map((text4, i) => ({ id: entryId(name, slot, "#0", i, text4), text: plain2(text4, 300), src: "seed", anchor: "#0", seq: i }));
+        if (list4.length) p.slots[slot] = list4;
+      }
+    }
+    return p;
+  }
+  function fixedSections(sheet) {
+    const s5 = parseSheet(sheet);
+    return FIXED_SECTIONS.filter((n2) => s5.sections[n2]).map((n2) => ({ name: n2, body: s5.sections[n2] }));
+  }
+
+  // src/core/people/inject.ts
+  var REGISTER_EN = { 존댓말: "formal (존댓말)", 반말: "informal (반말)", 혼합: "mixed formal/informal", 하게체: "hage-che (archaic, superior-to-junior)", 하오체: "hao-che (archaic, dignified formal)" };
+  var EXPRESS_TAIL = {
+    0: "Expression: almost never shown; appears only through actions and priorities, not words.",
+    1: "Expression: restrained; small, deniable cues (pauses, gaze, delayed replies).",
+    2: "Expression: visible but controlled.",
+    3: "Expression: open and immediate."
+  };
+  var lines2 = (list4) => list4.map((e) => `- ${plain2(e.text, 300)}`).join("\n");
+  var TRIM_ORDER = ["history", "knowledge", "behavior", "scene", "threads"];
+  function personBlock(p, store, live, changes, o = {}) {
+    const user = o.user ?? "{{user}}";
+    const kept = {};
+    for (const k of Object.keys(p.slots)) kept[k] = liveEntries(p.slots[k], live);
+    if (o.maxChars) {
+      const size = () => Object.values(kept).reduce((n2, l) => n2 + (l ?? []).reduce((m, e) => m + e.text.length + 3, 0), 0);
+      for (const k of TRIM_ORDER) while (size() > o.maxChars && kept[k]?.length) kept[k].shift();
+    }
+    const slot = (k) => kept[k] ?? [];
+    const out = [`## ${p.name} (living record · updated in this chat)`];
+    const mode2 = o.mode ?? "split";
+    if (o.sheet && mode2 === "append") out.push(o.sheet.trim());
+    const id = slot("identity");
+    if (id.length) out.push("Identity:\n" + lines2(id));
+    const per = slot("personality");
+    if (per.length) out.push("Personality:\n" + lines2(per));
+    if (o.sheet && mode2 === "split") for (const s5 of fixedSections(o.sheet)) out.push(`${s5.name}:
+${s5.body}`);
+    const st = slot("state");
+    if (st.length) out.push("Current state:\n" + lines2(st));
+    const kn = slot("knowledge");
+    if (kn.length) out.push("Knows:\n" + lines2(kn));
+    if (o.unknown?.length) out.push("Does not know (has not witnessed or been told):\n" + o.unknown.map((u) => `- ${plain2(u, 120)}`).join("\n"));
     const rel = slot("relationship");
     const relUser = rel.filter((e) => !e.target || e.target === "@user");
     const relOther = rel.filter((e) => e.target && e.target !== "@user");
@@ -3911,17 +4033,4 @@ ${rules3}`;
     "## 13. Openness (shown to the user as 음란도) — Risupot openness.score",
     "",
     "An accumulated value 0…300 for an adult person, tracking how openly that person responds in intimate contexts. `openness_now` in `people` is `{value, stage}` or null. Preserve an existing value, including zero; never reinitialize.",
-    "- **Baseline (once, `op: init`)**: when `openness_now` is null, inspect only what the record and span actually give: core traits and values, intimacy style, emotion expression and defense, explicit sexual experience or attitude, explicit contraception conditions, initiative versus receptivity in intimate contexts, boundaries and trust prerequisites, novelty or risk attitude specifically in intimacy, shame/guilt/taboo inhibition, and verified actual behavior over fantasy or words. Unknown contributes nothing. Marriage, sociability, affection, initiative or generic impulsivity alone never establish a high baseline. Allowed values: 0 (conservative, guarded, or no evidence), 90 (shy curiosity or plausibly receptive; the maximum supported by personality alone), 150 (explicit sexual interest, open attitude or experience), 210 (clearly proactive or adventurous experience or preference), 270 (explicitly highly indulgent or unrestrained evidence). A label like married is never enough. Without explicit background support, leave the value absent during ordinary scenes; a qualifying confirmed intimacy trigger in the span (intentional handholding, embrace, intimate pressing, kiss, caress, exposure, sexual proposition, or stronger consensual adult contact) may create it as `init 0` plus a separate `event`. Ordinary conversation, work proximity, accidental touch or non-intimate contact creates nothing.",
-    "- **New actual reactions (`op: event`, `delta`)**: +1 a small voluntary new reaction actually shown during relevant light contact, gaze or conversation · +3 a meaningful new reaction to mutually accepted relevant contact or atmosphere, including recognizing one's own welcoming response · +5 a new positive relevant experience the person actually and voluntarily accepted or initiated · +10 a rare and important personal milestone in a consensual situation between adults · −2 withdrawing from embarrassment or newly regaining composure · −4 closing off after uncomfortable contact, interruption or a broken mood · −5 a reaction clearly blocked by disgust, fear or shame. Increased affinity, nonsexual kindness, appearance, another person's reaction, routine repetition, ordinary recurring marital relations, alcohol and reduced resistance are not rewards. Never count coercion, an ignored refusal or an impaired ability to choose as a positive event. Never count baseline evidence again as an event, and never add the same event again because it was redescribed or rerolled.",
-    "- Stages and contraception attitude are computed by the program from the value (0–60 Chaste: must use contraception · –120 Shy: hesitant but still asks · –180 Open: non-use acceptable on a 'safe day' as a belief · –240 Awakened: pays little attention · –300 Indulgent: prefers non-use). You never compute the total or the stage; return only `init` values and `event` deltas with `m`, a verbatim `quote` and a Korean `reason`. Up to 3 events per person per response.",
-    "<<END:openness>>",
-    "<<SECTION:rhythm>>",
-    "## 14. Narrative rhythm and hooks — Risupot rhythm",
-    "",
-    "This feature tracks scene tension and aftermath, chapter flow, and the advancement and payoff of clues actually planted. It never adds an event every turn or forces the story into a shape; when emotion, goals or conflict are already moving, respect that flow. It is recorded as `docs` of type `rhythm` with fixed keys:",
-    "- `scene` (one record, upsert): text starts with `[phase:baseline|build_up|peak|aftermath|cooldown] [engagement:active|idle|intentional_rest]`, then the actual tension factors, evidence of meaningful quiet or stagnation, and the staging method actually applied. Phases may be skipped or repeated; do not attach a preparation phase to a sudden event, and do not cover a scene that needs aftermath with the next stimulus. Rest, mourning, lingering emotion and accepting a feeling are meaningful progression, never boredom. Review stagnation only when the same topic or purposeless talk continues across two or more confirmed turns; a short user input alone is not stagnation.",
-    "- `chapter` (upsert): the chapter's shared theme, turning points and important event links, reviewed only after an actual scene cycle ends through a new location, date or subject.",
-    "- `arc` (upsert): a long-term narrative assessment of the relationship's actual turning points and unresolved tension, reviewed only at a chapter boundary or an important event. Never duplicate the relationship entries or an affinity stage, and never overwrite them with rhythm vocabulary.",
-    "- `hook:<short name>` (one per clue): text starts with `[stage:seeded|hinted|escalated|payoff_ready|resolved|retired] [tier:short|mid|long]`, then the evidence of the clue actually planted, its scale, payoff condition, actual advancement and links. Register a hook only when it actually appeared in completed text; never from a plan. Advance a stage only when the span actually shows it; at most one hook action per response.",
-    "- `pending` (upsert): an unconfirmed next development attached to an already planted hook, kept separate from facts and from a person's confirmed intent; never a future event with a confirmed date or place. When a prior pending development did not occur, never mark it complete.",
-    "- `rhythm_note` (when `next_note` is true): one English memo ≤200 chars for the model that writes the next reply — the current phase, whether existing tension is moving or the scene is genuine aftermath, and at most one allowed hook action (what evidence it comes from, what could enter the scene, why
+    "- **Baseline (once, `op: init`)**: when `openness_now` is null, inspect only what the record and span actually give: core traits and values, intimacy style, emotion expression and defense, explicit sexual experience or attitude, explicit contraception conditions, initiative versus receptivity in intimate contexts, boundaries and trust prerequisites, novelty or risk attitude specifically in intimacy, shame/guilt/taboo inhibition, and verified actual behavior over fantasy or words. Unknown contributes nothing. Marriage, sociability, affection, initiative or generic impulsivi

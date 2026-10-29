@@ -128,6 +128,16 @@ async function cardAction(page, name, action, scope = '') {
   await page.click(`.ev-pop [data-action="${action}"]`);
 }
 // 커스텀 목록: 그림 띠를 눌러 펼친 뒤 「이 …로 선택」 (2026-10-20 그림 카드)
+// 커스텀 임무 화면으로 (2026-10-29: 왼쪽 메뉴의 「커스텀」이 없어져 임무 탭의 전환 단추로)
+async function goMission(page) {
+  // 시작 전(첫 장면 고르기)의 커스텀 목록도 .gx-mission 이라, 시작 뒤 창(메뉴)이 그려진 다음 지금 탭으로 판단한다
+  await page.waitForSelector('.gx-nav .gx-nb:not(.mob)[data-value="map"]');
+  if (await page.evaluate(() => document.querySelector('.gx')?.dataset.tab === 'mission' && !!document.querySelector('.gx-mission'))) return;
+  await page.click('.gx-nav .gx-nb:not(.mob)[data-value="map"]');
+  await page.waitForSelector('.gx-mswap[data-value="mission"]');
+  await page.click('.gx-mswap[data-value="mission"]');
+  await page.waitForFunction(() => document.querySelector('.gx')?.dataset.tab === 'mission' && !!document.querySelector('.gx-mission'));
+}
 async function pickCustom(page, row = '.gx-mlist li.gx-mx') {
   await page.locator(`${row} [data-action="mission-open"]`).first().click();
   await page.click('.gx-mlist li.gx-mx.open [data-action="mission-pick"]');
@@ -154,7 +164,10 @@ async function featSet(page, node) {
   if (open) {
     await page.evaluate(() => document.querySelector('.gw .gw-top [data-action="ed-close"]').click());
     await page.waitForFunction(() => document.querySelector('.gw')?.hidden === true);
-  } else await edOpen(page, node);
+  } else {
+    await edOpen(page, node);
+    await page.waitForSelector('.gw .gw-setbody');
+  }
 }
 async function edClose(page) {
   await page.click('.gw .gw-top [data-action="ed-close"]');
@@ -201,6 +214,9 @@ async function leaveField(page) {
   await page.fill('.st-won', '120만');
   await page.dispatchEvent('.st-won', 'change');
   await page.waitForFunction(() => document.querySelector('.st-won')?.value === '1,200,000');
+  // 괴이 발생 설정은 「상황판」 페이지 (상태창 칸은 2026-10-29 부터 「상태창」 페이지)
+  await page.click('[data-action="ed-node"][data-value="set:board"]');
+  await page.waitForSelector('[data-action="set-world"][data-value="incident_cap:+"]');
   await page.click('[data-action="set-world"][data-value="incident_cap:+"]');
   await page.waitForFunction(() => JSON.parse(window.__store['p:goei:prefs'] || '{}').world?.incident_cap === 2);
   await page.click('[data-action="ed-node"][data-value="set:screen"]');
@@ -590,7 +606,7 @@ if (fixture.globalLore.some((e) => String(e.comment).startsWith('📚Lore slot')
     await page.setViewportSize({ width: 1600, height: Number(process.env.VH || 1200) });
     await page.evaluate(() => { document.querySelector('.gx-body').scrollTop = 0; });
     await page.screenshot({ path: `${shots}/9-board-wide.png` });
-    await page.click('.gx-mswap[data-value="mission"]');
+    await goMission(page);
     await pickCustom(page);
     await page.waitForTimeout(200);
     await page.screenshot({ path: `${shots}/9-mission-wide.png` });
@@ -1022,8 +1038,14 @@ async function startedWithReply(page, { phoneAuto = false } = {}) {
   await page.fill('.gx-search', '소라');
   await page.waitForFunction(() => document.querySelector('.gx-mlist li.gx-mgrp')?.textContent.startsWith('괴이'));
   await pickCustom(page);
+  const __pk = await page.evaluate(() => ({ sel: !!document.querySelector('.gx-mx.sel'), goal: document.querySelector('.gx-goal')?.textContent?.trim(), sendDisabled: document.querySelector('[data-action="mission-send"]')?.disabled, aim: document.querySelector('.gx-mx.open .gx-aim')?.className }));
   await page.click('[data-action="mission-send"]');
-  await page.waitForFunction(() => window.__chat.message.length === 1 && window.__chat.message[0].data.includes('소라 랜드'));
+  try {
+    await page.waitForFunction(() => window.__chat.message.length === 1 && window.__chat.message[0].data.includes('소라 랜드'));
+  } catch (e) {
+    console.log('DEBUG mission-send', JSON.stringify({ pick: __pk, n: await page.evaluate(() => window.__chat.message.length), m0: await page.evaluate(() => String(window.__chat.message[0]?.data ?? '').slice(0, 60)), notice: await page.evaluate(() => document.querySelector('.gx-err, .gx-notice, .gx-alert')?.textContent), goal: await page.evaluate(() => document.querySelector('.gx-goal')?.textContent?.trim()), send: await page.evaluate(() => document.querySelector('[data-action="mission-send"]')?.outerHTML.slice(0, 140)) }));
+    throw e;
+  }
   // 첫 전송은 시드를 유지 (지시문 + 덧붙인 글 = 한 번)
   await page.evaluate(() => window.__chat.message.push({ role: 'user', data: '더' }));
   const seeded = await page.evaluate(() => window.__calls.replacers[0]([{ role: 'system', content: 'x %%SEED%%\nS\n%%/SEED%%\ny' }], 'model'));
@@ -1031,13 +1053,13 @@ async function startedWithReply(page, { phoneAuto = false } = {}) {
   // 진행 중 채팅: 커스텀 임무 탭에서 미스틱 사이트 요청
   await page.evaluate(() => { window.__chat.message.push({ role: 'char', data: '응답' }); const g = document.querySelector('.gx'); if (g) g.style.display = 'none'; });
   await open(page);
-  await page.click('.gx-mswap[data-value="mission"]');
+  await goMission(page);
   await page.click('[data-action="mission-kind"][data-value="ms"]');
   await pickCustom(page);
   const site = (await page.textContent('.gx-goal b')).trim();
   // 다른 탭에 다녀와도 고른 목표 유지
   await page.click('.gx-nav .gx-nb:not(.mob)[data-value="wiki"]');
-  await page.click('.gx-mswap[data-value="mission"]');
+  await goMission(page);
   assert.equal((await page.textContent('.gx-goal b')).trim(), site, '탭 이동 뒤에도 목표 유지');
   if (shots) await page.screenshot({ path: `${shots}/12-mission-tab.png` });
   await page.click('[data-action="mission-send"]');
@@ -1048,7 +1070,7 @@ async function startedWithReply(page, { phoneAuto = false } = {}) {
   // 요청 취소
   await open(page);
   // 이미 커스텀 탭이면 다시 누르지 않는다 (한 번 더 누르면 상황판으로 간다)
-  if (!(await page.$('.gx-mission'))) await page.click('.gx-mswap[data-value="mission"]');
+  await goMission(page);
   await page.click('[data-action="mission-cancel"][data-value="ms"]');
   await page.waitForFunction(() => !JSON.parse(window.__chat.scriptstate.$goei_world).pending.ms);
   // 목록의 「위키」: 위키 탭의 그 제목으로
@@ -1219,25 +1241,15 @@ if (fixture.globalLore.some(packed)) {
   // 목록, 설정, 작성 지침, 삭제
   // 설정은 따로 (괴담톡·괴담넷처럼), 「기본값으로 저장」은 플러그인 저장소에
   await featSet(page, 'set:wiki');
-  await page.click('[data-action="wiki-length"][data-value="short"]');
+  await page.click('.gw [data-action="wiki-length"][data-value="short"]');
   await page.waitForFunction(() => window.__chat.scriptstate.$nw_length === 'short');
-  await page.fill('.nw-reqbox', '목격담 위주로');
-  await page.dispatchEvent('.nw-reqbox', 'change');
+  await page.fill('.gw .nw-reqbox', '목격담 위주로');
+  await page.dispatchEvent('.gw .nw-reqbox', 'change');
   await page.waitForFunction(() => window.__chat.scriptstate.$nw_writing_request === '목격담 위주로');
-  // 「덮어쓰기」「불러오기」: 메인 설정처럼 한 번 더 확인 (v0.16.26)
-  await page.click('[data-action="wiki-def-ask"][data-value="save"]');
-  await page.waitForSelector('.ps-defconfirm');
-  if (shots) await page.screenshot({ path: `${shots}/13-wiki-settings-confirm.png` });
-  await page.click('[data-action="wiki-def-yes"]');
-  await page.waitForFunction(() => JSON.parse(window.__store['p:goei:prefs'] || '{}').vars?.$nw_length === 'short');
-  await page.waitForSelector('.gx-toast');
-  if (shots) await page.screenshot({ path: `${shots}/13-wiki-settings.png` });
-  await page.click('[data-action="wiki-length"][data-value="detailed"]');
+  // 칸별 「덮어쓰기」「불러오기」는 없다 — 창 머리의 「기본값으로 저장/불러오기」가 설정 전부를 한 번에 (2026-10-29 사용자 설계)
+  assert.equal(await page.locator('.gw [data-action="wiki-def-ask"]').count(), 0, '칸별 기본값 단추 없음');
+  await page.click('.gw [data-action="wiki-length"][data-value="detailed"]');
   await page.waitForFunction(() => window.__chat.scriptstate.$nw_length === 'detailed');
-  await page.click('[data-action="wiki-def-ask"][data-value="load"]');
-  await page.click('[data-action="wiki-def-yes"]');
-  await page.waitForFunction(() => window.__chat.scriptstate.$nw_length === 'short');
-  assert.equal(await page.locator('.ps-defconfirm').count(), 0);
   await featSet(page, 'set:wiki');
   // 위키 메인: 최근 문서 카드, 아직 없는 링크는 작성이 필요한 문서로
   await page.click('.nw-rail [data-action="wiki-home"]');
@@ -1253,9 +1265,10 @@ if (fixture.globalLore.some(packed)) {
   // 세로바를 옆으로 끌면 목록이 본문 위로 펼쳐진다 (본문 칸 너비는 그대로)
   const paneW = await page.evaluate(() => document.querySelector('.nw-main').getBoundingClientRect().width);
   const g = await page.locator('.nw-grab').boundingBox();
-  await page.mouse.move(g.x + 10, g.y + 100);
+  // 2026-10-29: 목록 위치 기본이 오른쪽이라 세로바를 왼쪽(안쪽)으로 끈다
+  await page.mouse.move(g.x + g.width - 10, g.y + 100);
   await page.mouse.down();
-  await page.mouse.move(g.x + 120, g.y + 100, { steps: 4 });
+  await page.mouse.move(g.x + g.width - 120, g.y + 100, { steps: 4 });
   await page.mouse.up();
   await page.waitForSelector('.nw-app.list-open');
   assert.equal(await page.evaluate(() => document.querySelector('.nw-main').getBoundingClientRect().width), paneW);
@@ -1460,7 +1473,7 @@ if (fixture.globalLore.some(packed)) {
   await page.evaluate(() => { delete window.__chat.scriptstate.$gen_ctx_total; });
   // 설정: 본편 반영 빼기
   await featSet(page, 'set:gnet');
-  await page.click('[data-action="gn-cfg"][data-value="context=1"]');
+  await page.click('.gw [data-action="gn-cfg"][data-value="context=1"]');
   await page.waitForFunction(() => window.__chat.scriptstate['$lb_cfg_lb-gn.context'] === '1');
   const off = await page.evaluate(async () => window.__core(await window.__calls.replacers[0]([{ role: 'user', content: 'u' }], 'model')));
   assert.equal(off.length, 1);
@@ -1765,7 +1778,7 @@ if (fixture.globalLore.some(packed)) {
   await page.click('.gw [data-action="set-support"][data-value="0"]');
   await page.waitForFunction(() => window.__chat.scriptstate.$st_support_on === '0');
   await edClose(page);
-  await page.click('.gx-mswap[data-value="mission"]');
+  await goMission(page);
   await page.waitForSelector('.gx-mbox');
   await pickCustom(page, '.gx-mbox li.gx-mx');
   await page.waitForSelector('.gx-team');
@@ -1983,24 +1996,25 @@ if (fixture.globalLore.some(packed)) {
   if (shots) await page.screenshot({ path: `${shots}/18-gnet-attach.png` });
   // 괴담넷 끄기 → 탭은 안내만, 본편 반영 멈춤 → 켜면 고른 모델로
   await featSet(page, 'set:gnet');
-  await page.click('[data-action="gn-cfg"][data-value="mode=1"]');
+  await page.click('.gw [data-action="gn-cfg"][data-value="mode=1"]');
   await page.waitForFunction(() => window.__chat.scriptstate['$lb_cfg_lb-gn.mode'] === '1');
-  await page.click('[data-action="gn-cfg"][data-value="power=0"]');
+  await page.click('.gw [data-action="gn-cfg"][data-value="power=0"]');
   await page.waitForFunction(() => window.__chat.scriptstate['$lb_cfg_lb-gn.mode'] === '0');
   await page.waitForSelector('.gn-off');
   assert.equal(await page.locator('[data-action="gn-refresh"]').count(), 0);
   const offReq = await page.evaluate(async () => window.__core(await window.__calls.replacers[0]([{ role: 'user', content: 'u' }], 'model')));
   assert.ok(!offReq.some((m) => m.content.includes('"feature":"gnet"')), '끄면 본편 반영 안 함');
-  await page.click('[data-action="gn-cfg"][data-value="power=1"]');
+  await page.click('.gw [data-action="gn-cfg"][data-value="power=1"]');
   await page.waitForFunction(() => window.__chat.scriptstate['$lb_cfg_lb-gn.mode'] === '1');
   // 쪽지 보관 한도
-  await page.waitForSelector('[data-change="gn-keep"]');
-  await page.fill('[data-change="gn-keep"]', '3');
-  await page.dispatchEvent('[data-change="gn-keep"]', 'change');
+  await page.waitForSelector('.gw [data-change="gn-keep"]');
+  await page.fill('.gw [data-change="gn-keep"]', '3');
+  await page.dispatchEvent('.gw [data-change="gn-keep"]', 'change');
   await page.waitForFunction(() => window.__chat.scriptstate.$gn_storage_limit_dm === '3');
   // 본편 응답마다 새로고침: 응답이 끝나면 게시판을 한 번 새로 불러온다
-  await page.click('[data-action="gn-cfg"][data-value="lazy=0"]');
+  await page.click('.gw [data-action="gn-cfg"][data-value="lazy=0"]');
   await page.waitForFunction(() => window.__chat.scriptstate['$lb_cfg_lb-gn.lazy'] === '0');
+  await featSet(page, 'set:gnet'); // 설정 창 닫기 (아래는 괴담넷 판 조작)
   const n0 = await page.evaluate(() => window.__calls.llm.length);
   await page.evaluate(() => { window.__llm = [{ type: 'success', result: JSON.stringify({ posts: [{ author: '새벽', id: 1846100, title: '자동으로 온 글', time: '03:00', views: 1, upvotes: 0, content: '방금', comments: [] }], incoming: [] }) }]; });
   await page.evaluate(async () => {
