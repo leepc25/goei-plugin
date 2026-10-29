@@ -8,8 +8,8 @@ import type { GameAssets, GameBridge } from '../../bridge';
 import { persp, view } from './view';
 import { KEYMAP } from './input';
 import { drawGuardBar } from '../ui/pixelHud';
-import { Room3Player, room3Hooks } from '../room3/player';
-import { AiRoom3 } from '../room3/ai';
+import { FighterPlayer, fighterHooks } from '../fighter/player';
+import { FighterAi } from '../fighter/ai';
 import { charArt, charFace, charTop, drawCharClip, hasCharClip, loadChar } from '../art/charPacks';
 import { setPixelScale } from './contract';
 import { mountTalk } from '../../talk';
@@ -214,7 +214,7 @@ function hqAdapter(bridge: Partial<GameBridge> | undefined, ui: { chooseFloor: H
   const clockView = () => { const c = new FieldClock(fieldClock.sec === null ? null : fieldClock.sec / 60); return c; };
   // 필드 행위자를 에일린 공격 표적으로 (전투 몸이 아니므로 가짜 몸을 건넨다. 보이는 장면만)
   let lifeScene = '';
-  room3Hooks.extraTargets = () => {
+  fighterHooks.extraTargets = () => {
     const w = sim;
     if (!w || !lifeScene) return [];
     return w.inScene(lifeScene).filter((a) => a.act !== 'down').map((a) => ({
@@ -288,7 +288,7 @@ function hqAdapter(bridge: Partial<GameBridge> | undefined, ui: { chooseFloor: H
       if (!charArt(look)) { void loadChar(look); continue; }
       const b = spawn({ kind: `ai-char:${look}`, x: a.x, y: a.y });
       if (!b) continue;
-      if (!(b instanceof AiRoom3)) { b.alive = false; continue; }
+      if (!(b instanceof FighterAi)) { b.alive = false; continue; }
       if (!w.toFight(a.def.id)) { b.alive = false; continue; }
       // 몸 = 몹 등급 체력 (docs/게임_성장_경제_설계.md 2-3). 이름표는 원형 이름
       b.hp = b.hpMax = Math.max(1, a.hpMax ?? b.hpMax);
@@ -365,7 +365,7 @@ function hqAdapter(bridge: Partial<GameBridge> | undefined, ui: { chooseFloor: H
 
 /** 주인공 머리 꼭대기 (발 기준 화면 px, 음수, 원근 미포함) */
 function heroTop(p: World['player']): number {
-  return p instanceof Room3Player ? charTop(p.art.key) : -230;
+  return p instanceof FighterPlayer ? charTop(p.art.key) : -230;
 }
 
 function hudState(w: World, shell: Shell): HudState {
@@ -373,7 +373,7 @@ function hudState(w: World, shell: Shell): HudState {
   const boss = w.boss();
   const f = w.floor;
   return {
-    agent: { name: p.label ?? '쟈알디', color: p instanceof Room3Player ? p.art.cfg.color : '#c0453a', portrait: p instanceof Room3Player ? charFace(p.art.key, 64, p.dir < 0) : null },
+    agent: { name: p.label ?? '쟈알디', color: p instanceof FighterPlayer ? p.art.cfg.color : '#c0453a', portrait: p instanceof FighterPlayer ? charFace(p.art.key, 64, p.dir < 0) : null },
     hp: p.hp,
     maxHp: p.hpMax,
     energy: p.skillCd > 0 ? 75 - p.skillCd : 75,
@@ -507,14 +507,14 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
   const unknownKinds = new Set<string>();
   const enemyFactory: EnemyFactory = (spec, w) => {
     // 통합 테스트룸 인물 AI: 'ai-char' = 주인공과 같은 인물, 'ai-char:<이름>' = 그 인물 팩(받아 둔 것만). 대련('ai-eileen')도 주인공이 인물 팩이면 그 인물로
-    if ((spec.kind === 'ai-char' || spec.kind.startsWith('ai-char:') || spec.kind === 'ai-eileen') && w.player instanceof Room3Player) {
+    if ((spec.kind === 'ai-char' || spec.kind.startsWith('ai-char:') || spec.kind === 'ai-eileen') && w.player instanceof FighterPlayer) {
       const who = spec.kind.startsWith('ai-char:') ? spec.kind.slice(8) : '';
       const art = who ? charArt(who) : w.player.art;
       if (!art) { void loadChar(who); return fallbackEnemy(spec, w); }
       if (aiN === 0) squad = new Squad(DIFF[aiDiff].melee);
       const n = ++aiN;
       const personas = [{ aggression: 0.75, patience: 0.35, zoning: 0.2, courage: 0.9 }, { aggression: 0.35, patience: 0.8, zoning: 0.3, courage: 0.8 }, { aggression: 0.4, patience: 0.5, zoning: 0.85, courage: 0.7 }];
-      const ai = new AiRoom3((w.player as unknown as { clips: ConstructorParameters<typeof AiRoom3>[0] }).clips, art, { id: `ai${n}`, grade: 'B', difficulty: aiDiff, persona: personas[(n - 1) % personas.length], seed: 1000 + n, squad, label: `AI ${art.cfg.name} ${n}` });
+      const ai = new FighterAi((w.player as unknown as { clips: ConstructorParameters<typeof FighterAi>[0] }).clips, art, { id: `ai${n}`, grade: 'B', difficulty: aiDiff, persona: personas[(n - 1) % personas.length], seed: 1000 + n, squad, label: `AI ${art.cfg.name} ${n}` });
       ai.x = spec.x; ai.y = spec.y;
       ai.hp = ai.hpMax = 160;
       return ai as never;
@@ -731,7 +731,7 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
     storyRoot.style.visibility = shell.paused ? 'hidden' : '';
   };
   // 에일린 테스트룸 전투의 소리는 화면 효과 없이 소리만
-  room3Hooks.sfx = (e) => audio.event(e as never);
+  fighterHooks.sfx = (e) => audio.event(e as never);
   const listeners: ((e: GameEvent) => void)[] = [
     (e) => {
       audio.event(e as never);
@@ -788,8 +788,8 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
       let cardEnd = 0;
       if (game?.inHub && !mods.blocking?.() && !shell.paused) {
         const me = hq.visitor();
-        const name = me.name || (w.player instanceof Room3Player ? w.player.label : '방문자');
-        const face = w.player instanceof Room3Player ? charFace(w.player.art.key, 64, w.player.dir < 0) : null;
+        const name = me.name || (w.player instanceof FighterPlayer ? w.player.label : '방문자');
+        const face = w.player instanceof FighterPlayer ? charFace(w.player.art.key, 64, w.player.dir < 0) : null;
         // 좌상단 초상화 상자 (사용자 2026-10-25: 위 목표 띠 대신)
         shell.hud.drawFieldCard(ctx, { name, face, hp: w.player.hp, maxHp: w.player.hpMax, gauge: w.player.gauge, compact: hs.compact, top: true, items: hs.items, device: hs.device, status: hs.status }, dt);
         // 오른쪽 위 필드 시각·장소·잔고 (관찰 창이 켜져 있으면 그 자리라 숨김)
@@ -822,7 +822,7 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
         }
       }
       // 방어 게이지: 캐릭터 머리 위, 막는 중·회복 중에만 (가득 차면 천천히 사라진다)
-      const ep = w.player instanceof Room3Player ? w.player : null;
+      const ep = w.player instanceof FighterPlayer ? w.player : null;
       if (ep && !mods.blocking?.() && !shell.paused) {
         const show = ep.guard < 99.5 || ep.core.P.mode === 'block';
         guardA = show ? Math.min(1, guardA + dt * 8) : Math.max(0, guardA - dt * 2.5);

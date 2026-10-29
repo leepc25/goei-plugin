@@ -1,4 +1,4 @@
-// 통합 테스트룸 인물 플레이어(10-29 본 게임 탑재): 테스트룸 전투·생활(room3/core.ts, 테스트룸 코드 그대로)을 엔진 플레이어 자리에 꽂는다.
+// 인물 플레이어: 인물 전투·생활 엔진(fighter/core.ts)을 엔진 플레이어 자리에 꽂는다.
 // eileen/player.ts(에일린 시험판)를 126명 공용으로 일반화한 것: 그림·설정은 인물 팩(art/charPacks.ts)에서, 이펙트·의자는 action-fx 팩에서.
 // 엔진과 맞닿는 곳만 여기서 한다: 입력(Pad → 테스트룸 동작), 위치 동기화, 적에게 맞히기(env.hurt → 적 applyHit), 적에게 맞기(applyHit → core.takeHit),
 // 체력·게이지(게임 값), 그리기(바닥 층·몸·이펙트 층·화면 효과). 판정 크기·반응은 테스트룸 값을 게임 적 반응 등급으로 옮긴다.
@@ -11,7 +11,7 @@ import { CHAR_K, charFx, type CharArt } from '../art/charPacks';
 import type { Body, Hit, HitResult, React, WBox, WorldView } from '../engine/contract';
 import type { Pad, Btn } from '../engine/input';
 import type { FrameInfo } from '../engine/art';
-import { createRoom3Core } from './core';
+import { createFighterCore } from './core';
 import { StatusSet } from '../../combat/status';
 
 /** 테스트룸 동작 이름 ↔ 엔진 버튼 */
@@ -35,11 +35,11 @@ const REACT: Record<string, { react: React; push: number; lift: number; strength
 };
 
 /** 다른 모듈이 붙이는 곳. sfx: 효과음. extraTargets: 전투 몸이 아닌 필드 행위자도 때릴 수 있게 (src/game/world, 엔진 modules가 채운다) */
-export const room3Hooks: { sfx: (e: Record<string, unknown>) => void; extraTargets?: () => { body: Body; x: number; y: number; z: number }[] } = { sfx: () => {} };
+export const fighterHooks: { sfx: (e: Record<string, unknown>) => void; extraTargets?: () => { body: Body; x: number; y: number; z: number }[] } = { sfx: () => {} };
 
-type Core = ReturnType<typeof createRoom3Core>;
+type Core = ReturnType<typeof createFighterCore>;
 
-export class Room3Player extends Player {
+export class FighterPlayer extends Player {
   core: Core;
   private world: WorldView | null = null;
   private heldNames = new Set<string>();
@@ -69,11 +69,11 @@ export class Room3Player extends Player {
     // 멈춤(히트스톱)은 테스트룸 코드가 스스로 한다: 엔진이 플레이어에 거는 멈춤은 받지 않는다
     Object.defineProperty(this, 'stop', { get: () => 0, set: () => {}, configurable: true });
     const fx = charFx();
-    this.core = createRoom3Core({
+    this.core = createFighterCore({
       A: art.A, IMG: art.IMG, CH: art.cfg, VFX: fx?.VFX ?? {}, CHAIR: fx?.CHAIR ?? {},
       held: this.heldNames,
       K: (y: number) => spr(y) * CHAR_K,
-      sfx: (type: string, extra: Record<string, unknown>) => room3Hooks.sfx({ type, ...extra }),
+      sfx: (type: string, extra: Record<string, unknown>) => fighterHooks.sfx({ type, ...extra }),
       font: (n: number) => pfont(n).f,
       targets: () => this.targets(),
       // 능력치(본부 출동 stats)·상태 효과 배율 (docs/게임_성장_경제_설계.md 2-2·6장)
@@ -114,7 +114,7 @@ export class Room3Player extends Player {
   }
   /** 전투 몸이 아닌 필드 행위자 (주인공만) */
   protected extraFoes(): { body: Body; x: number; y: number; z: number }[] {
-    return room3Hooks.extraTargets?.() ?? [];
+    return fighterHooks.extraTargets?.() ?? [];
   }
   /** AI 쪽에서 쓰는 지금 월드 */
   protected get worldNow(): WorldView | null {

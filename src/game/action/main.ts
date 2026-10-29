@@ -1,7 +1,7 @@
 // 게임 진입점. 플러그인(코드 팩)과 시연판이 모두 이것 하나를 부른다: mountGame(box, bridge) → 정리 함수.
 import type { GameBridge } from '../bridge';
 import { prepareHqField } from './art/hqField';
-import { Room3Player } from './room3/player';
+import { FighterPlayer } from './fighter/player';
 import { prepareCharPacks, loadChar } from './art/charPacks';
 import { playerFactory } from './engine/player';
 import { useEileenKeys } from './engine/input';
@@ -60,7 +60,7 @@ export function mountGame(box: HTMLElement, bridge?: Partial<GameBridge>): () =>
     stage.remove();
     root.style.display = 'block';
     // 인물 팩이 있으면 테스트룸 전투 플레이어와 키 배치로
-    if (hero) { playerFactory.make = (clips) => new Room3Player(clips, hero); useEileenKeys(); useEileenControls(); }
+    if (hero) { playerFactory.make = (clips) => new FighterPlayer(clips, hero); useEileenKeys(); useEileenControls(); }
     const wiring = engineModules(root, bridge);
     game = new Game(wiring.box, art, wiring.mods);
     wiring.bind(game);

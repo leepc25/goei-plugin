@@ -1,8 +1,9 @@
 // @ts-nocheck
-// 통합 테스트룸 전투·생활 그대로 (tools/port_room3.py 가 game-src/action/testroom3/room.html 에서 떼어 와 만든 파일. 손으로 고치지 말고 변환기를 고친다).
-// 바뀐 것: 샌드백(D) → env.targets()의 실제 적(가장 가까운 앞 상대 + 범위 검사에 든 상대 전부), 화면 고정값 → 보이는 화면(VX0~W)·게임 바닥, 키 → env.held, 소리 → env.sfx, 체력 → 게임.
+// 인물 전투·생활 엔진 (게임 원본). 처음엔 통합 테스트룸(room.html)에서 떼어 왔지만 2026-10-29부터 이 파일이 원본이다: 여기서 고친다.
+// 테스트룸은 이 엔진을 불러다 쓰는 시험장(src/game/action/fighter/testroom.ts).
+// 게임과 맞닿는 곳: 표적 = env.targets()의 실제 적(T = 지금 가장 가까운 앞 상대 + 범위 검사에 든 상대 전부), 화면 = 보이는 화면(VX0~W)·게임 바닥, 키 = env.held, 소리 = env.sfx, 체력 = 게임.
 // env: { A, IMG, CH, VFX, CHAIR, held:Set, K(y), sfx(type, extra), font(n), targets():[{body,x,y,z}], hurt(D, dmg, kind, face, hitstop, o), clamp(P), ground(x,y), mod?:{speed(),sp()}, heal?(v) }
-export function createRoom3Core(env) {
+export function createFighterCore(env) {
   const VFX = env.VFX || {}, CHAIR = env.CHAIR || {};
   let VX0 = 0, W = 1280, H = 720, FLOOR0 = 440, FLOOR1 = 669;
   const down = n => env.held.has(n);

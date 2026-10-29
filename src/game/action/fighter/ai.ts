@@ -1,9 +1,9 @@
-// 전투 AI 상대(10-29 본 게임 탑재): 통합 테스트룸 인물 키트(room3/player.ts)를 가상 버튼으로 조종하는 적 몸 (docs/전투_AI_설계.md 3장 「AI도 플레이어와 같은 버튼」).
+// 전투 AI 상대(10-29 본 게임 탑재): 인물 플레이어(fighter/player.ts)를 가상 버튼으로 조종하는 적 몸 (docs/전투_AI_설계.md 3장 「AI도 플레이어와 같은 버튼」).
 // eileen/aiFighter.ts 를 126명 공용으로: 어떤 인물 팩이든 같은 두뇌를 그 키트에 붙인다(13장).
 import type { Body, WorldView } from '../engine/contract';
 import type { Btn as PadBtn, Pad } from '../engine/input';
 import type { FrameInfo } from '../engine/art';
-import { Room3Player } from './player';
+import { FighterPlayer } from './player';
 import type { CharArt } from '../art/charPacks';
 import { FighterBrain, Squad, type Btn, type Difficulty, type FoeSense, type Grade, type Persona, type SelfSense } from '../../combat/brain';
 import { mulberry32 } from '../../world/rng';
@@ -24,7 +24,7 @@ export function foeSense(b: Body): FoeSense {
   };
 }
 
-export class AiRoom3 extends Room3Player {
+export class FighterAi extends FighterPlayer {
   readonly brain: FighterBrain;
   private pad: Pad = { held: new Set(), pressed: new Set(), released: new Set(), mx: 0, my: 0, evade: false, run: false, downDouble: false };
   constructor(clips: Record<string, FrameInfo[]>, art: CharArt, o: { id: string; grade: Grade; difficulty: Difficulty; persona: Persona; seed: number; squad?: Squad; label?: string }) {

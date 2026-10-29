@@ -1,6 +1,6 @@
 // 인물 팩(game-pack/char-<번호>/: 줄마다 WebP 무손실 시트 + char.json{cfg, A})과 공용 이펙트·의자 팩(game-pack/action-fx/)을 받는다.
 // tools/build_char_packs.py 가 테스트룸 빌더(game-src/action/testroom3/build.py)의 측정값·설정을 그대로 옮겨 만든 것이라,
-// 테스트룸 room.html 에서 이식한 room3/core.ts 가 바로 쓴다(A = 줄 측정값, IMG = 시트, CH = 설정, VFX = 이펙트, CHAIR = 의자).
+// 인물 엔진 fighter/core.ts 가 바로 쓴다(A = 줄 측정값, IMG = 시트, CH = 설정, VFX = 이펙트, CHAIR = 의자).
 // 필드 생태계(hub.ts drawLiveActor)도 같은 그림으로 생활 클립을 그린다: 클립 이름(docs/필드_클립_이름_약속.md) ↔ 줄 번호는 아래 FIELD_CLIP.
 import { snapTo, spr } from '../engine/view';
 

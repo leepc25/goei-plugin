@@ -10,9 +10,9 @@ import { Fighter } from './fighter';
 import type { Player } from './player';
 import type { World } from './world';
 import { drawSupply } from './itemsLink';
-import { Room3Player } from '../room3/player';
+import { FighterPlayer } from '../fighter/player';
 /** 테스트룸 코어로 움직이는 플레이어 (통합 테스트룸 인물): 스스로 그리고 장마다 실제 시간으로 움직인다 */
-const corePlayer = (p: unknown): p is Room3Player => p instanceof Room3Player;
+const corePlayer = (p: unknown): p is FighterPlayer => p instanceof FighterPlayer;
 
 const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
 
