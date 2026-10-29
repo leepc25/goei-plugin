@@ -1,4 +1,37 @@
-온 순간마다 true (다른 봇·설정 화면에서 돌아올 때 포함).
+1 || list4[i]?.role !== "char" || list4[i].data !== job.original) return null;
+        const message = list4.slice();
+        message[i] = { ...list4[i], data: next };
+        return { ...latest, message, scriptstate: { ...latest.scriptstate ?? {}, [ASSET_NOTE]: "" } };
+      });
+      if (!saved) console.log("[goei] 이미지 태그: 그새 응답이 바뀌어 저장하지 않았어요.");
+    } catch (error) {
+      const why = error instanceof AssetError ? error.message : `보조 모델 호출 실패: ${error instanceof Error ? error.message : String(error)}`;
+      console.log(`[goei] 이미지 태그 보충 실패: ${why}`);
+      await note(why.slice(0, 300));
+    } finally {
+      running = false;
+    }
+  }
+
+  // src/core/watch.ts
+  var WatchState = class {
+    charIndex = -2;
+    active = false;
+    isLite = false;
+    /** 지금 캐릭터가 괴이봇 Lite인지 (채팅 화면 여부와 무관) */
+    get lite() {
+      return this.charIndex >= 0 && this.isLite;
+    }
+    needsCharacterCheck(s5) {
+      return s5.charIndex !== this.charIndex;
+    }
+    /** 이 캐릭터를 다시 판정하게 한다 (설치로 로어북이 바뀌었을 때: 같은 캐릭터라 그냥 두면 「괴이 카드 아님」이 남는다) */
+    forget() {
+      this.charIndex = -2;
+    }
+    /**
+     * lite: 이번 캐릭터가 괴이봇 Lite인지 (needsCharacterCheck가 false면 생략, 이전 값 유지).
+     * intro: 괴이봇 Lite 채팅 화면에 새로 들어온 순간마다 true (다른 봇·설정 화면에서 돌아올 때 포함).
      */
     update(s5, lite) {
       if (s5.charIndex !== this.charIndex) this.isLite = lite ?? false;
@@ -221,7 +254,7 @@
     }
     return { next, lore: lore.count, scripts: scripts.count, fields: fields3 };
   }
-  var PLUGIN_VERSION = true ? "0.18.1" : "0";
+  var PLUGIN_VERSION = true ? "0.18.2" : "0";
 
   // src/core/pictures.ts
   function pictures(m) {
@@ -297,8 +330,10 @@
     const want = pictures(m).length ? pictures(m) : inst.pictures;
     const missingPics = want.filter((p) => !have.has(p[0]));
     let directory2 = false;
+    let directoryGaps = 0;
     try {
       directory2 = !!readDirectoryData(lore);
+      directoryGaps = directoryGapCount(lore ?? []);
     } catch {
       directory2 = false;
     }
@@ -306,6 +341,7 @@
       goei: !!m || directory2,
       manifest: !!m,
       directory: directory2,
+      directoryGaps,
       settingsFolder: !!findFolder(lore, "settings"),
       wikiFolder: !!findFolder(lore, "wiki"),
       greetings: { ok: !missing.length, missing, total: Object.keys(inst.greetings.index).length },
@@ -350,6 +386,46 @@
   }
   var entry2 = (comment, content, folder, extra = {}) => ({ key: "", secondkey: "", insertorder: 0, comment, content, mode: "normal", alwaysActive: false, selective: false, useRegex: false, folder, bookVersion: 2, ...extra });
   var folderEntry = (comment, key2) => ({ key: key2, comment, content: "", mode: "folder", insertorder: 100, alwaysActive: false, secondkey: "", selective: false, bookVersion: 2 });
+  var isObj2 = (v) => !!v && typeof v === "object" && !Array.isArray(v);
+  var empty = (v) => v === void 0 || v === null || v === "" || Array.isArray(v) && !v.length || isObj2(v) && !Object.keys(v).length;
+  function fillDirectory(cur, def) {
+    const out = { ...cur };
+    let gaps = 0;
+    for (const [k, dv] of Object.entries(def)) {
+      if (k === "_help") continue;
+      const cv = out[k];
+      if (empty(cv)) {
+        if (!empty(dv)) out[k] = dv, gaps++;
+        continue;
+      }
+      if (k === "괴담톡 탭") {
+        if (isObj2(cv) && empty(cv.tabs) && isObj2(dv) && !empty(dv.tabs)) out[k] = dv, gaps++;
+        continue;
+      }
+      if (!isObj2(cv) || !isObj2(dv)) continue;
+      const sec = { ...cv };
+      for (const [name, de] of Object.entries(dv)) {
+        const ce = sec[name];
+        if (ce === void 0) {
+          sec[name] = de;
+          gaps++;
+        } else if (isObj2(ce) && isObj2(de)) {
+          const row10 = { ...ce };
+          for (const [f, fv] of Object.entries(de)) if (empty(row10[f]) && !empty(fv)) row10[f] = fv, gaps++;
+          sec[name] = row10;
+        }
+      }
+      out[k] = sec;
+    }
+    return { data: out, gaps };
+  }
+  function directoryGapCount(lore) {
+    const parts = directoryEntries(lore).filter((e) => typeof e.content === "string" && e.content.trim());
+    if (!parts.length) return 0;
+    const cur = readDirectoryData(lore);
+    if (!cur) return -1;
+    return data2 ? fillDirectory(cur, installData().directory).gaps : 0;
+  }
   function installLore(lore, greetings) {
     const out = [...lore ?? []];
     let settings = findFolder(out, "settings");
@@ -359,13 +435,21 @@
     }
     const settingsKey = str5(settings.key);
     const dir2 = directoryEntries(out).filter((e) => typeof e.content === "string" && e.content.trim());
-    if (!dir2.length) {
+    const cur = dir2.length ? readDirectoryData(out) : null;
+    if (!dir2.length || !cur) {
+      for (const e of dir2) e.comment = `${String(e.comment)} (읽을 수 없어 보관)`;
       const stale = out.findIndex((e) => e.comment === DIRECTORY_COMMENT);
       const fresh2 = entry2(DIRECTORY_COMMENT, JSON.stringify(installData().directory), settingsKey);
       if (stale >= 0) out[stale] = fresh2;
       else out.push(fresh2);
     } else {
       for (const e of dir2) if (!e.folder) e.folder = settingsKey;
+      const filled = fillDirectory(cur, installData().directory);
+      if (filled.gaps) {
+        const first = out.indexOf(dir2[0]);
+        out[first] = { ...dir2[0], comment: DIRECTORY_COMMENT, content: JSON.stringify(filled.data) };
+        for (let i = out.length - 1; i >= 0; i--) if (i !== first && dir2.includes(out[i])) out.splice(i, 1);
+      }
     }
     let wiki2 = findFolder(out, "wiki");
     if (!wiki2) {
@@ -385,7 +469,8 @@
   function installSummary(s5) {
     const out = [];
     if (!s5.settingsFolder) out.push("⚙️설정 폴더 없음");
-    if (!s5.directory) out.push("명부(Directory) 없음");
+    if (!s5.directory) out.push(s5.directoryGaps < 0 ? "명부(Directory)를 읽을 수 없음" : "명부(Directory) 없음");
+    else if (s5.directoryGaps > 0) out.push(`명부에 빠진 칸 ${s5.directoryGaps}개`);
     if (!s5.manifest) out.push("Plugin manifest 없음");
     if (!s5.wikiFolder) out.push("📖위키 폴더 없음");
     if (!s5.greetings.ok) out.push(`인사말 ${s5.greetings.missing.length}/${s5.greetings.total}개 없음`);
@@ -3235,45 +3320,4 @@ ${esc15(p.body)}</textarea></div>`).join("");
       return `<div class="gw-page gw-set"><header class="gw-head"><h2>추가 규칙<small>이 기기 공통</small></h2>
         <div class="gw-head-act"><span class="gw-tokens">${rules3.length}/${RULE_MAX}</span><button class="gx-mini primary" data-action="ed-rule-new" ${rules3.length >= RULE_MAX ? "disabled" : ""}>${ICONS.plus}새 규칙</button></div>
         ${ruleUi.info ? `<p class="gx-hint">${esc16(ruleUi.info)}</p>` : ""}<p class="gx-muted">기본 지침을 고치지 않고 내 규칙을 덧붙여요. 규칙마다 어느 지침에 붙일지 고르면, 그 지침의 늘 쓰이는 절 끝에 「User Rules」로 들어가요. 이 기기의 모든 채팅에 적용돼요. 예) 「대사 길이」 규칙을 본편·필드에 붙이기: "한 번에 한 사람이 세 문장 넘게 말하지 않는다."</p></header>
-      ${rules3.length ? `<section class="ps-group"><h3>지금 있는 규칙 <small>${rules3.length}개</small></h3><div class="ps-rows">${rules3.map((x) => `<div class="ps-row"><div class="ps-label"><b>${esc16(x.title || "(제목 없음)")}</b><small>${x.to.map((t) => RULE_TARGET_LABEL[t]).join(" · ") || "붙일 곳 없음"} · ${x.on ? "켬" : "끔"}</small></div><div class="ps-ctl"><button class="gx-mini" data-action="ed-node" data-value="rule:${esc16(x.id)}">열기</button></div></div>`).join("")}</div></section>` : ""}
-    </div>`;
-    }
-    const chips3 = RULE_TARGETS.map((t) => `<button class="gx-chip${r.to.includes(t) ? " on" : ""}" data-action="ed-rule-to" data-value="${esc16(`${r.id}|${t}`)}" aria-pressed="${r.to.includes(t)}">${RULE_TARGET_LABEL[t]}</button>`).join("");
-    const del = ruleUi.confirmDel === r.id ? `<button class="gx-mini danger" data-action="ed-rule-del-yes" data-value="${esc16(r.id)}">정말 지우기</button><button class="gx-mini" data-action="ed-rule-del-no">취소</button>` : `<button class="gx-mini danger" data-action="ed-rule-del" data-value="${esc16(r.id)}">${ICONS.trash}지우기</button>`;
-    return `<div class="gw-page gw-set"><header class="gw-head"><h2>${esc16(r.title.trim() || "(제목 없음)")}<small>추가 규칙 · 이 기기 공통</small><span class="gw-state${r.on ? "" : " off"}">${r.on ? "켬" : "끔"}</span></h2>
-      <div class="gw-head-act"><span class="gw-tokens">${tokenizerName() ? "" : "약 "}${tokens(r.text).toLocaleString()}토큰</span>${del}</div>
-      <p class="gx-muted">${r.to.length ? `${r.to.map((t) => RULE_TARGET_LABEL[t]).join(" · ")} 지침 끝에 붙어요.` : "붙일 곳을 고르면 그 지침 끝에 붙어요."} 바꾸면 바로 저장돼요.</p>${ruleUi.info ? `<p class="gx-hint">${esc16(ruleUi.info)}</p>` : ""}</header>
-    <div class="gx-settings gw-setbody"><section class="ps-group"><h3>규칙</h3><div class="ps-rows">
-      <div class="ps-row"><div class="ps-label"><b>사용</b><small>끄면 어느 지침에도 붙지 않아요. 글은 남아요.</small></div><div class="ps-ctl">${switchHtml({ action: "ed-rule-on", value: r.id, on: r.on })}</div></div>
-      <div class="ps-row"><div class="ps-label"><b>제목</b><small>규칙 글 위에 작은 제목으로 들어가요.</small></div><div class="ps-ctl"><input class="gw-rule-title" data-input="ed-rule-title" data-key="${esc16(r.id)}" value="${esc16(r.title)}" placeholder="예: 대사 길이" autocomplete="off" maxlength="${RULE_TITLE_MAX}"></div></div>
-      <div class="ps-row"><div class="ps-label"><b>붙일 곳</b><small>본편 = RP 지침 끝 · 이동·임무 = COMMON 절 · 괴담넷 = 게시판 절 · 괴담톡·필드 = COMMON 절 · 위키 = 작성 안내 절</small></div><div class="ps-ctl"><div class="dir-chips">${chips3}</div></div></div>
-      <div class="ps-row"><div class="ps-label"><b>본문</b><small>모델에게 그대로 가요. 지침 언어(영어)와 맞추면 더 잘 따라요.</small></div>
-        <textarea data-input="ed-rule-text" data-key="${esc16(r.id)}" rows="6" placeholder="규칙 글" maxlength="${RULE_TEXT_MAX}">${esc16(r.text)}</textarea></div>
-    </div></section></div>
-  </div>`;
-  }
-  function ruleInput(name, key2, value) {
-    if (name !== "ed-rule-title" && name !== "ed-rule-text") return false;
-    const next = getUserRules().map((r) => r.id === key2 ? { ...r, [name === "ed-rule-title" ? "title" : "text"]: value } : r);
-    saveSoon(next);
-    return true;
-  }
-  async function ruleAction(action, value) {
-    if (!action.startsWith("ed-rule-")) return false;
-    const rules3 = getUserRules();
-    switch (action) {
-      case "ed-rule-new": {
-        if (rules3.length >= RULE_MAX) {
-          ruleUi.info = `규칙은 ${RULE_MAX}개까지예요. 안 쓰는 규칙을 지우고 다시 추가해 주세요.`;
-          return true;
-        }
-        const r = { id: uid(), title: "", text: "", to: ["RP"], on: true };
-        await saveRules([...rules3, r]);
-        ruleUi.info = "";
-        return `rule:${r.id}`;
-      }
-      case "ed-rule-on":
-        await saveRules(rules3.map((r) => r.id === value ? { ...r, on: !r.on } : r));
-        return true;
-      case "ed-rule-to": {
-        const [id, t] = (value ?? "").split(
+      ${rules3.length ? `<section class="ps-group"><h3>지금 있는 규칙 <small>${rules3.length}개</small></h3><div class="ps-rows">${rules3.map((x) => `<div class="ps-row"><div class="ps-label"><b>${esc16(x.title || "(제목 없음)")}</b><small>${x.to.map((t) => RULE_TARGET_LABEL[t]).join(" · ") || "붙일 곳 없음"} · ${x.on ? "켬" : "끔"}</small></div><div class="ps-ctl"><button class="gx-mini" data-action="ed-node" data-value="rule:${esc16(x.id)}">열기</button></div></div>`).join("

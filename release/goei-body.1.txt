@@ -1,4 +1,4 @@
-// goei-body 0.18.1
+// goei-body 0.18.2
 "use strict";
 (() => {
   var __create = Object.create;
@@ -1165,12 +1165,12 @@ ${tpl.replace(/\[\[INPUT\]\]/g, () => extra)}`;
       return a === b || a.includes(b) || b.includes(a);
     });
   }
-  function uniqueRegion(region) {
+  function uniqueRegion(region2) {
     let match = null;
     for (const [code2, list4] of Object.entries(SIGUN)) {
       for (let i = 0; i < list4.length; i++) {
         const loc = `${code2}-${i}`;
-        if (loc === SEALED_LOC || !regionMatch(region, locName(loc))) continue;
+        if (loc === SEALED_LOC || !regionMatch(region2, locName(loc))) continue;
         if (match) return null;
         match = loc;
       }
@@ -1715,9 +1715,22 @@ ${body5.slice(at).replace(/^\s+/, "")}
     for (const [viewer, m] of Object.entries(obj2(raw))) if (Object.keys(strMap(m)).length) out[viewer] = strMap(m);
     return out;
   }
+  var DEFAULT_PHONE_TABS = {
+    order_by_faction: { B00: ["T02", "T01"] },
+    tabs: [
+      { id: "T01", name: "관리", visible_for: ["A00"], name_by_faction: { B00: "가짜" } },
+      { id: "T02", name: "가짜", visible_for: ["B00"], name_by_faction: { B00: "관리" } },
+      { id: "T03", name: "백일", visible_for: ["C00"] },
+      { id: "T04", name: "중립", visible_for: ["A00", "B00", "C00", "D00", "E00"] },
+      { id: "T05", name: "기타", visible_for: ["A00", "B00", "C00", "D00", "E00"] },
+      { id: "X01", name: "괴이", visible_for: ["A00", "B00", "C00", "D00", "E00"] }
+    ]
+  };
   function phoneTabsSection(lore) {
     const saved = readDirectoryData(lore)?.["괴담톡 탭"];
-    const d = saved && typeof saved === "object" ? obj2(saved) : obj2(book(lore, "Phone tabs"));
+    const fromBook = obj2(book(lore, "Phone tabs"));
+    const picked = saved && typeof saved === "object" ? obj2(saved) : fromBook;
+    const d = Array.isArray(picked.tabs) && picked.tabs.length ? picked : obj2(DEFAULT_PHONE_TABS);
     const tabs2 = (Array.isArray(d.tabs) ? d.tabs : []).map(obj2).map((t) => {
       const tab2 = { id: s2(t.id), name: s2(t.name), visible_for: list2(t.visible_for) };
       const by = strMap(t.name_by_faction);
@@ -2719,27 +2732,4 @@ ${body5.slice(at).replace(/^\s+/, "")}
     injured: "부상",
     wounded: "부상",
     hurt: "부상",
-    dead: "사망",
-    kia: "사망",
-    deceased: "사망",
-    killed: "사망",
-    missing: "실종",
-    mia: "실종",
-    lost: "실종",
-    quarantine: "격리",
-    quarantined: "격리",
-    isolated: "격리",
-    contaminated: "격리",
-    "off duty": "비번",
-    offduty: "비번",
-    "on leave": "비번",
-    leave: "비번",
-    resting: "비번"
-  };
-  var AN_LABELS = ["슬롯", "지역", "발생지점", "위치", "이름", "괴이명", "괴이", "명칭", "배치", "작전현황", "작전", "상태", "위협등급", "등급"];
-  function stripLabel(v) {
-    let s5 = (v ?? "").trim();
-    for (const lb of AN_LABELS) {
-      const m = new RegExp(`^${lb}\\s*[:：]\\s*`).exec(s5);
-      if (m) {
-        s5 = s5.slice(m[0].l
+    de

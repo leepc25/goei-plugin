@@ -1,4 +1,45 @@
-"|");
+")}</div></section>` : ""}
+    </div>`;
+    }
+    const chips3 = RULE_TARGETS.map((t) => `<button class="gx-chip${r.to.includes(t) ? " on" : ""}" data-action="ed-rule-to" data-value="${esc16(`${r.id}|${t}`)}" aria-pressed="${r.to.includes(t)}">${RULE_TARGET_LABEL[t]}</button>`).join("");
+    const del = ruleUi.confirmDel === r.id ? `<button class="gx-mini danger" data-action="ed-rule-del-yes" data-value="${esc16(r.id)}">정말 지우기</button><button class="gx-mini" data-action="ed-rule-del-no">취소</button>` : `<button class="gx-mini danger" data-action="ed-rule-del" data-value="${esc16(r.id)}">${ICONS.trash}지우기</button>`;
+    return `<div class="gw-page gw-set"><header class="gw-head"><h2>${esc16(r.title.trim() || "(제목 없음)")}<small>추가 규칙 · 이 기기 공통</small><span class="gw-state${r.on ? "" : " off"}">${r.on ? "켬" : "끔"}</span></h2>
+      <div class="gw-head-act"><span class="gw-tokens">${tokenizerName() ? "" : "약 "}${tokens(r.text).toLocaleString()}토큰</span>${del}</div>
+      <p class="gx-muted">${r.to.length ? `${r.to.map((t) => RULE_TARGET_LABEL[t]).join(" · ")} 지침 끝에 붙어요.` : "붙일 곳을 고르면 그 지침 끝에 붙어요."} 바꾸면 바로 저장돼요.</p>${ruleUi.info ? `<p class="gx-hint">${esc16(ruleUi.info)}</p>` : ""}</header>
+    <div class="gx-settings gw-setbody"><section class="ps-group"><h3>규칙</h3><div class="ps-rows">
+      <div class="ps-row"><div class="ps-label"><b>사용</b><small>끄면 어느 지침에도 붙지 않아요. 글은 남아요.</small></div><div class="ps-ctl">${switchHtml({ action: "ed-rule-on", value: r.id, on: r.on })}</div></div>
+      <div class="ps-row"><div class="ps-label"><b>제목</b><small>규칙 글 위에 작은 제목으로 들어가요.</small></div><div class="ps-ctl"><input class="gw-rule-title" data-input="ed-rule-title" data-key="${esc16(r.id)}" value="${esc16(r.title)}" placeholder="예: 대사 길이" autocomplete="off" maxlength="${RULE_TITLE_MAX}"></div></div>
+      <div class="ps-row"><div class="ps-label"><b>붙일 곳</b><small>본편 = RP 지침 끝 · 이동·임무 = COMMON 절 · 괴담넷 = 게시판 절 · 괴담톡·필드 = COMMON 절 · 위키 = 작성 안내 절</small></div><div class="ps-ctl"><div class="dir-chips">${chips3}</div></div></div>
+      <div class="ps-row"><div class="ps-label"><b>본문</b><small>모델에게 그대로 가요. 지침 언어(영어)와 맞추면 더 잘 따라요.</small></div>
+        <textarea data-input="ed-rule-text" data-key="${esc16(r.id)}" rows="6" placeholder="규칙 글" maxlength="${RULE_TEXT_MAX}">${esc16(r.text)}</textarea></div>
+    </div></section></div>
+  </div>`;
+  }
+  function ruleInput(name, key2, value) {
+    if (name !== "ed-rule-title" && name !== "ed-rule-text") return false;
+    const next = getUserRules().map((r) => r.id === key2 ? { ...r, [name === "ed-rule-title" ? "title" : "text"]: value } : r);
+    saveSoon(next);
+    return true;
+  }
+  async function ruleAction(action, value) {
+    if (!action.startsWith("ed-rule-")) return false;
+    const rules3 = getUserRules();
+    switch (action) {
+      case "ed-rule-new": {
+        if (rules3.length >= RULE_MAX) {
+          ruleUi.info = `규칙은 ${RULE_MAX}개까지예요. 안 쓰는 규칙을 지우고 다시 추가해 주세요.`;
+          return true;
+        }
+        const r = { id: uid(), title: "", text: "", to: ["RP"], on: true };
+        await saveRules([...rules3, r]);
+        ruleUi.info = "";
+        return `rule:${r.id}`;
+      }
+      case "ed-rule-on":
+        await saveRules(rules3.map((r) => r.id === value ? { ...r, on: !r.on } : r));
+        return true;
+      case "ed-rule-to": {
+        const [id, t] = (value ?? "").split("|");
         if (!RULE_TARGETS.includes(t)) return true;
         await saveRules(rules3.map((r) => r.id === id ? { ...r, to: r.to.includes(t) ? r.to.filter((x) => x !== t) : [...r.to, t] } : r));
         return true;
@@ -4018,19 +4059,4 @@ ${rules3}`;
     "",
     "Clue difficulty: obvious 0, visible with attention 1, subtle 2, hidden 3. No access is not a high number; it means the path does not exist. When the ability meets or exceeds the difficulty, the person can perceive the clue. Exactly one step below: the person senses only that something is off, without a specific cause. Lower: the clue does not reach them. Without a path, perception fails regardless of ability. Never claim an exact judgment for a condition without evidence, never dress up a result with an outdated impairment, and never invent a clue or suppress someone's perception merely to make observers differ.",
     "",
-    "Certainty of interpretation, for the wording of `knowledge` entries: **known** (direct perception or credible evidence; distinguish that a source spoke from the truth of what it said), **inferred_strong** (independently perceived clues point the same way; write as the person's interpretation, which may still be wrong), **inferred_weak** (sparse evidence or several explanations; write only as speculation, impression or question), **unaware**, **false_belief** (what the person wrongly believes and why). Limited point of view narrates only what the viewpoint person senses; an omniscient narration still does not give the persons knowledge.",
-    "<<END:perception_ext>>",
-    "<<SECTION:taste>>",
-    "## 12. Taste band (first impression) — Risupot affinity.taste_band",
-    "",
-    "Each person may hold a taste band −3…+3 toward the user's character: how far the user's appearance, manner and conduct match this person's own tastes. It is a separate axis from accumulated affinity, from the relationship type and from duty; protagonist status creates no attraction, and being outside this person's romantic scope still allows nonromantic respect or comradeship. Never derive the band from the affinity total, and never use the band to create affinity.",
-    "- `taste_now` in `people` is the current band or null. When it is null and this person actually interacts with the user in the confirmed span, derive it ONCE from the person's established tastes, values and the visible appearance or manner shown, or from neutral ordinary choices; use explicit settings and depicted reactions first, then a provisional evidence-grounded assessment. Do not invent preferences. If nothing supports a judgment, return nothing.",
-    "- An existing band moves only after a catalyst: observing a new taste or aversion, actual revelation of a concealed layer, conduct that incurs a cost, display of an ability the person values, directly experienced cruelty, humiliation or deceit, or an explicit changing time skip. An increase moves at most one band per event (also when grounded only in reputation actually transmitted); a decrease may cross several bands. Time passing alone does not restore the band. A single exception does not rewrite a profile.",
-    "- Bands: −3 strong aversion (ends or avoids contact) · −2 clear dislike (friction, distance, less voluntary kindness) · −1 slightly grating (responds only as needed) · 0 no particular pull or aversion · +1 weakly drawn (more attention, remembers, keeps talking) · +2 core tastes clearly match (asks first, spends time and effort) · +3 several core tastes strongly match (priorities of attention may shift).",
-    "- When several persons show a strong preference for the same target, confirm each person's specific taste evidence; never shape a desired distribution. Return `taste` items only for a derivation or an actual change, with the new absolute band, `m`, a verbatim `quote` and a short Korean `reason`.",
-    "<<END:taste>>",
-    "<<SECTION:openness>>",
-    "## 13. Openness (shown to the user as 음란도) — Risupot openness.score",
-    "",
-    "An accumulated value 0…300 for an adult person, tracking how openly that person responds in intimate contexts. `openness_now` in `people` is `{value, stage}` or null. Preserve an existing value, including zero; never reinitialize.",
-    "- **Baseline (once, `op: init`)**: when `openness_now` is null, inspect only what the record and span actually give: core traits and values, intimacy style, emotion expression and defense, explicit sexual experience or attitude, explicit contraception conditions, initiative versus receptivity in intimate contexts, boundaries and trust prerequisites, novelty or risk attitude specifically in intimacy, shame/guilt/taboo inhibition, and verified actual behavior over fantasy or words. Unknown contributes nothing. Marriage, sociability, affection, initiative or generic impulsivi
+    "Certainty of interpretation, for the wording of `knowledge` entries: **known** (direct perception or credible evidence; distinguish that a source spoke from the truth of what it said), **inferr

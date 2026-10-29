@@ -1,4 +1,4 @@
-// goei-game 0.18.1
+// goei-game 0.18.2
 "use strict";
 (() => {
   // src/game/action/engine/view.ts
@@ -37726,7 +37726,7 @@ ${t.secret}` : "",
     }
   }
   var mod = {
-    version: "0.18.1",
+    version: "0.18.2",
     mount: (box2, bridge) => mountPlay(box2, bridge)
   };
   globalThis.__goeiGame = mod;

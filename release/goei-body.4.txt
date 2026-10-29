@@ -1,4 +1,33 @@
-(e.name));
+nction pickLoreRisu(entries2, messages, depth) {
+    const squash5 = (s5) => s5.toLowerCase().replace(/\s+/g, "");
+    const window2 = messages.slice(-Math.max(1, depth)).map((m) => ({ m, flat: squash5(m.data) }));
+    const out = [];
+    for (const entry3 of entries2) {
+      const reasons = [];
+      for (const k of entry3.rawKeys) {
+        const key2 = squash5(k);
+        const at = key2 ? window2.find((w) => w.flat.includes(key2)) : void 0;
+        if (at) reasons.push({ why: at.m.role === "user" ? "user" : "char", key: k, snippet: k });
+      }
+      if (reasons.length) out.push({ entry: entry3, score: 0, reasons });
+    }
+    return sortPicks(out);
+  }
+  function slotTexts(picks, env3) {
+    const out = { org: [], site: [], anomaly: [], agent: [] };
+    for (const p of picks) {
+      const text4 = stripDecorators(evaluate(p.entry.content, env3)).trim();
+      if (text4) out[p.entry.kind].push(text4);
+    }
+    return Object.fromEntries(LORE_KINDS.map((k) => [k, out[k].join("\n\n")]));
+  }
+  function loreMessages(chat, input2, raw = false) {
+    const msgs4 = (chat.message ?? []).map((m) => ({ role: m.role === "user" ? "user" : "char", data: raw ? str4(m.data) : messageText(str4(m.data)) }));
+    if (input2 !== void 0) msgs4.push({ role: "user", data: raw ? input2 : messageText(input2) });
+    return msgs4.filter((m) => m.data);
+  }
+  function computeLore(lore, chat, o) {
+    const entries2 = managedEntries(lore).filter((e) => !o.exclude?.includes(e.name));
     if (!entries2.length) return null;
     const msgs4 = loreMessages(chat, o.input, o.mode === "risu");
     const picks = o.mode === "risu" ? pickLoreRisu(entries2, msgs4, o.depth) : pickLore(entries2, msgs4, loreState(chat), o, msgs4.at(-1)?.role === "user");
@@ -3829,37 +3858,4 @@ Next Paragraph Text
       const saved = await updateChat(t.charIndex, t.chatIndex, (latest) => {
         const list4 = latest.message ?? [];
         const i = t.messageIndex;
-        if (i !== list4.length - 1 || list4[i]?.role !== "char" || list4[i].data !== job.original) return null;
-        const message = list4.slice();
-        message[i] = { ...list4[i], data: next };
-        return { ...latest, message, scriptstate: { ...latest.scriptstate ?? {}, [ASSET_NOTE]: "" } };
-      });
-      if (!saved) console.log("[goei] 이미지 태그: 그새 응답이 바뀌어 저장하지 않았어요.");
-    } catch (error) {
-      const why = error instanceof AssetError ? error.message : `보조 모델 호출 실패: ${error instanceof Error ? error.message : String(error)}`;
-      console.log(`[goei] 이미지 태그 보충 실패: ${why}`);
-      await note(why.slice(0, 300));
-    } finally {
-      running = false;
-    }
-  }
-
-  // src/core/watch.ts
-  var WatchState = class {
-    charIndex = -2;
-    active = false;
-    isLite = false;
-    /** 지금 캐릭터가 괴이봇 Lite인지 (채팅 화면 여부와 무관) */
-    get lite() {
-      return this.charIndex >= 0 && this.isLite;
-    }
-    needsCharacterCheck(s5) {
-      return s5.charIndex !== this.charIndex;
-    }
-    /** 이 캐릭터를 다시 판정하게 한다 (설치로 로어북이 바뀌었을 때: 같은 캐릭터라 그냥 두면 「괴이 카드 아님」이 남는다) */
-    forget() {
-      this.charIndex = -2;
-    }
-    /**
-     * lite: 이번 캐릭터가 괴이봇 Lite인지 (needsCharacterCheck가 false면 생략, 이전 값 유지).
-     * intro: 괴이봇 Lite 채팅 화면에 새로 들어
+        if (i !== list4.length - 

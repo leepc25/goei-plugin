@@ -1,4 +1,31 @@
-g(v[ST.supportOn]) ?? d.supportOn
+ (v === "main" || v === "메인") return "main";
+    if (v === "aux" || v === "보조") return "aux";
+    return null;
+  }
+  function basicDefaults(lore) {
+    const b = readSettingsBook(lore).basic;
+    const book2 = {
+      anomalyOn: flag(b["상황판"] ?? b["통합관제"]) ?? BASIC_DEFAULTS.anomalyOn,
+      assetOn: flag(b["에셋 출력"]) ?? BASIC_DEFAULTS.assetOn,
+      assetModel: model(b["에셋 모델"]) ?? BASIC_DEFAULTS.assetModel,
+      assetPlayer: flag(b["주인공 에셋"]) ?? BASIC_DEFAULTS.assetPlayer,
+      assetLimit: int2(b["캐릭터당 이미지 수"], 1, 4) ?? BASIC_DEFAULTS.assetLimit,
+      agentLimit: int2(b["요원 표시 인원"], 0, AGENT_MAX) ?? BASIC_DEFAULTS.agentLimit,
+      supportOn: flag(b["지원 투입"]) ?? BASIC_DEFAULTS.supportOn
+    };
+    return { ...book2, ...prefs.basic };
+  }
+  function basicSettings(lore, ss) {
+    const d = basicDefaults(lore);
+    const v = ss ?? {};
+    return {
+      anomalyOn: v.$st_anomaly_on === void 0 ? d.anomalyOn : v.$st_anomaly_on === "1",
+      assetOn: flag(v[ST.assetOn]) ?? d.assetOn,
+      assetModel: model(v[ST.assetModel]) ?? d.assetModel,
+      assetPlayer: flag(v[ST.assetPlayer]) ?? d.assetPlayer,
+      assetLimit: int2(v[ST.assetLimit], 1, 4) ?? d.assetLimit,
+      agentLimit: int2(v[ST.agentLimit], 0, AGENT_MAX) ?? d.agentLimit,
+      supportOn: flag(v[ST.supportOn]) ?? d.supportOn
     };
   }
   function basicVars(s5) {
@@ -58,14 +85,14 @@ g(v[ST.supportOn]) ?? d.supportOn
   };
   function readWallet(vars, defaultStart = 0) {
     const raw = vars?.[WALLET_VAR];
-    const empty = { start: defaultStart, log: [] };
-    if (typeof raw !== "string" || !raw.trim()) return empty;
+    const empty2 = { start: defaultStart, log: [] };
+    if (typeof raw !== "string" || !raw.trim()) return empty2;
     try {
       const o = JSON.parse(raw);
-      if (!o || typeof o !== "object") return empty;
+      if (!o || typeof o !== "object") return empty2;
       return { start: Number.isSafeInteger(o.start) ? o.start : defaultStart, log: Array.isArray(o.log) ? o.log.filter(isEntry2).slice(-400) : [] };
     } catch {
-      return empty;
+      return empty2;
     }
   }
   var walletVars = (w) => ({ [WALLET_VAR]: JSON.stringify(w) });
@@ -2177,7 +2204,10 @@ ${themeVars("[x-goei-fab]")}
       });
     };
     const moveTarget = typeof doc2?.addEventListener === "function" ? doc2 : host2;
-    const bind = async () => {
+    let binding = Promise.resolve();
+    const bind = () => binding = binding.catch(() => {
+    }).then(bindNow);
+    const bindNow = async () => {
       await unbind();
       for (const [target, type, fn2] of [
         [host2, "pointerdown", onDown],
@@ -4216,33 +4246,4 @@ ${content}` };
     return `[Locked appendix: 「${e.name}」] Hidden information about ${e.appendix.parent} that no character knows yet. Unlock it when this happens in the story: ${e.appendix.when.unlock}
 Do not invent, reveal, or hint at the hidden information before it is unlocked. In the one reply where the condition is clearly met, write [🔓|${e.name}] on its own line at the very end.`;
   }
-  function pickLoreRisu(entries2, messages, depth) {
-    const squash5 = (s5) => s5.toLowerCase().replace(/\s+/g, "");
-    const window2 = messages.slice(-Math.max(1, depth)).map((m) => ({ m, flat: squash5(m.data) }));
-    const out = [];
-    for (const entry3 of entries2) {
-      const reasons = [];
-      for (const k of entry3.rawKeys) {
-        const key2 = squash5(k);
-        const at = key2 ? window2.find((w) => w.flat.includes(key2)) : void 0;
-        if (at) reasons.push({ why: at.m.role === "user" ? "user" : "char", key: k, snippet: k });
-      }
-      if (reasons.length) out.push({ entry: entry3, score: 0, reasons });
-    }
-    return sortPicks(out);
-  }
-  function slotTexts(picks, env3) {
-    const out = { org: [], site: [], anomaly: [], agent: [] };
-    for (const p of picks) {
-      const text4 = stripDecorators(evaluate(p.entry.content, env3)).trim();
-      if (text4) out[p.entry.kind].push(text4);
-    }
-    return Object.fromEntries(LORE_KINDS.map((k) => [k, out[k].join("\n\n")]));
-  }
-  function loreMessages(chat, input2, raw = false) {
-    const msgs4 = (chat.message ?? []).map((m) => ({ role: m.role === "user" ? "user" : "char", data: raw ? str4(m.data) : messageText(str4(m.data)) }));
-    if (input2 !== void 0) msgs4.push({ role: "user", data: raw ? input2 : messageText(input2) });
-    return msgs4.filter((m) => m.data);
-  }
-  function computeLore(lore, chat, o) {
-    const entries2 = managedEntries(lore).filter((e) => !o.exclude?.includes
+  fu

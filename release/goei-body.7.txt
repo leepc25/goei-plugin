@@ -1,4 +1,19 @@
-ty alone never establish a high baseline. Allowed values: 0 (conservative, guarded, or no evidence), 90 (shy curiosity or plausibly receptive; the maximum supported by personality alone), 150 (explicit sexual interest, open attitude or experience), 210 (clearly proactive or adventurous experience or preference), 270 (explicitly highly indulgent or unrestrained evidence). A label like married is never enough. Without explicit background support, leave the value absent during ordinary scenes; a qualifying confirmed intimacy trigger in the span (intentional handholding, embrace, intimate pressing, kiss, caress, exposure, sexual proposition, or stronger consensual adult contact) may create it as `init 0` plus a separate `event`. Ordinary conversation, work proximity, accidental touch or non-intimate contact creates nothing.",
+ed_strong** (independently perceived clues point the same way; write as the person's interpretation, which may still be wrong), **inferred_weak** (sparse evidence or several explanations; write only as speculation, impression or question), **unaware**, **false_belief** (what the person wrongly believes and why). Limited point of view narrates only what the viewpoint person senses; an omniscient narration still does not give the persons knowledge.",
+    "<<END:perception_ext>>",
+    "<<SECTION:taste>>",
+    "## 12. Taste band (first impression) — Risupot affinity.taste_band",
+    "",
+    "Each person may hold a taste band −3…+3 toward the user's character: how far the user's appearance, manner and conduct match this person's own tastes. It is a separate axis from accumulated affinity, from the relationship type and from duty; protagonist status creates no attraction, and being outside this person's romantic scope still allows nonromantic respect or comradeship. Never derive the band from the affinity total, and never use the band to create affinity.",
+    "- `taste_now` in `people` is the current band or null. When it is null and this person actually interacts with the user in the confirmed span, derive it ONCE from the person's established tastes, values and the visible appearance or manner shown, or from neutral ordinary choices; use explicit settings and depicted reactions first, then a provisional evidence-grounded assessment. Do not invent preferences. If nothing supports a judgment, return nothing.",
+    "- An existing band moves only after a catalyst: observing a new taste or aversion, actual revelation of a concealed layer, conduct that incurs a cost, display of an ability the person values, directly experienced cruelty, humiliation or deceit, or an explicit changing time skip. An increase moves at most one band per event (also when grounded only in reputation actually transmitted); a decrease may cross several bands. Time passing alone does not restore the band. A single exception does not rewrite a profile.",
+    "- Bands: −3 strong aversion (ends or avoids contact) · −2 clear dislike (friction, distance, less voluntary kindness) · −1 slightly grating (responds only as needed) · 0 no particular pull or aversion · +1 weakly drawn (more attention, remembers, keeps talking) · +2 core tastes clearly match (asks first, spends time and effort) · +3 several core tastes strongly match (priorities of attention may shift).",
+    "- When several persons show a strong preference for the same target, confirm each person's specific taste evidence; never shape a desired distribution. Return `taste` items only for a derivation or an actual change, with the new absolute band, `m`, a verbatim `quote` and a short Korean `reason`.",
+    "<<END:taste>>",
+    "<<SECTION:openness>>",
+    "## 13. Openness (shown to the user as 음란도) — Risupot openness.score",
+    "",
+    "An accumulated value 0…300 for an adult person, tracking how openly that person responds in intimate contexts. `openness_now` in `people` is `{value, stage}` or null. Preserve an existing value, including zero; never reinitialize.",
+    "- **Baseline (once, `op: init`)**: when `openness_now` is null, inspect only what the record and span actually give: core traits and values, intimacy style, emotion expression and defense, explicit sexual experience or attitude, explicit contraception conditions, initiative versus receptivity in intimate contexts, boundaries and trust prerequisites, novelty or risk attitude specifically in intimacy, shame/guilt/taboo inhibition, and verified actual behavior over fantasy or words. Unknown contributes nothing. Marriage, sociability, affection, initiative or generic impulsivity alone never establish a high baseline. Allowed values: 0 (conservative, guarded, or no evidence), 90 (shy curiosity or plausibly receptive; the maximum supported by personality alone), 150 (explicit sexual interest, open attitude or experience), 210 (clearly proactive or adventurous experience or preference), 270 (explicitly highly indulgent or unrestrained evidence). A label like married is never enough. Without explicit background support, leave the value absent during ordinary scenes; a qualifying confirmed intimacy trigger in the span (intentional handholding, embrace, intimate pressing, kiss, caress, exposure, sexual proposition, or stronger consensual adult contact) may create it as `init 0` plus a separate `event`. Ordinary conversation, work proximity, accidental touch or non-intimate contact creates nothing.",
     "- **New actual reactions (`op: event`, `delta`)**: +1 a small voluntary new reaction actually shown during relevant light contact, gaze or conversation · +3 a meaningful new reaction to mutually accepted relevant contact or atmosphere, including recognizing one's own welcoming response · +5 a new positive relevant experience the person actually and voluntarily accepted or initiated · +10 a rare and important personal milestone in a consensual situation between adults · −2 withdrawing from embarrassment or newly regaining composure · −4 closing off after uncomfortable contact, interruption or a broken mood · −5 a reaction clearly blocked by disgust, fear or shame. Increased affinity, nonsexual kindness, appearance, another person's reaction, routine repetition, ordinary recurring marital relations, alcohol and reduced resistance are not rewards. Never count coercion, an ignored refusal or an impaired ability to choose as a positive event. Never count baseline evidence again as an event, and never add the same event again because it was redescribed or rerolled.",
     "- Stages and contraception attitude are computed by the program from the value (0–60 Chaste: must use contraception · –120 Shy: hesitant but still asks · –180 Open: non-use acceptable on a 'safe day' as a belief · –240 Awakened: pays little attention · –300 Indulgent: prefers non-use). You never compute the total or the stage; return only `init` values and `event` deltas with `m`, a verbatim `quote` and a Korean `reason`. Up to 3 events per person per response.",
     "<<END:openness>>",
@@ -614,10 +629,8 @@ ty alone never establish a high baseline. Allowed values: 0 (conservative, guard
     const store = peopleStore(ctx2.chat);
     const allUnread = unreadIndexes(ctx2.chat, store);
     let unread = allUnread;
-    if (!o.scope?.indexes) {
-      const lastRead = Math.max(-1, ...ctx2.chat.message.map((m, i) => store.read[messageKey(m, i)] !== void 0 ? i : -1));
-      unread = lastRead < 0 ? allUnread.slice(-1) : allUnread.filter((i) => i > lastRead);
-    } else unread = o.scope.indexes.filter((i) => ctx2.chat.message[i]?.role === "char");
+    if (!o.scope?.indexes) unread = splitUnread(ctx2.chat, store).newer;
+    else unread = o.scope.indexes.filter((i) => ctx2.chat.message[i]?.role === "char");
     setStatus({ unread: allUnread.length });
     if (!unread.length) return result;
     const sheet = sheetOf(ctx2);
@@ -2296,58 +2309,4 @@ Return the JSON object.` }
   // src/core/visitPrompt.ts
   var VISIT_BOOK = "Visit";
   var VisitError = class extends Error {
-  };
-  var LANGUAGE3 = "Reply in the dominant language of the actual conversation; default to Korean when no conversation is available.";
-  var ROOM2 = { office: "사무실", lounge: "휴게실", infirmary: "의무실", quarters: "숙소" };
-  var canInterject = (src) => {
-    const p = policySections(src.char.globalLore, VISIT_BOOK);
-    return p.INTERJECT !== void 0 && p.OUTPUT_GROUP !== void 0;
-  };
-  function rules2(src, limit, group6) {
-    const p = policySections(src.char.globalLore, VISIT_BOOK);
-    const need = group6 ? ["COMMON", "REPLY", "INTERJECT", "OUTPUT_GROUP"] : ["COMMON", "REPLY", "OUTPUT_REPLY"];
-    const missing = need.filter((k) => p[k] === void 0);
-    if (missing.length) throw new VisitError(Object.keys(p).length ? `Visit 로어북의 ${missing.join(", ")} 항목이 없어요.` : "카드에 본부 대화 지침(Visit 로어북)이 없어요. 설정 → 업데이트로 카드를 업데이트해 주세요.");
-    const text4 = need.map((k) => p[k].replace(/__LIMIT_LINE__/g, String(limit)).replace(/<!--[\s\S]*?-->/g, "").trim());
-    return [...text4, genSettings(src.chat.scriptstate).language ?? LANGUAGE3].join("\n\n");
-  }
-  function visitContextRules(src) {
-    return policySections(src.char.globalLore, VISIT_BOOK).MAIN_CONTEXT?.trim() || null;
-  }
-  function visitPrompt(src, input2, names4 = {}) {
-    const ss = src.chat.scriptstate;
-    applyAdvanced(ss);
-    const limit = advNum(ss, "hq", "line_chars");
-    const n2 = trimTurns(advNum(ss, "hq", "turns"));
-    const turns2 = n2 ? recentTurns(src.chat, n2) : [];
-    const recentStory = [];
-    turns2.forEach((t2, i) => {
-      if (t2.user) recentStory.push({ role: "user", text: t2.user, turn: i + 1 });
-      for (const c of t2.char) recentStory.push({ role: "char", text: c, turn: i + 1 });
-    });
-    const t = refToggles(ss, "hq");
-    const by = advOn(ss, "hq", "interject") && canInterject(src) ? (input2.bystanders ?? []).filter((b) => b.name !== input2.agent.name) : [];
-    const talk = [...input2.conversation.map((l) => l.text), input2.said].join("\n");
-    const rows2 = collectRefs(src, {
-      scope: "phone",
-      text: `${talk}
-${recentStory.map((m) => m.text).join("\n")}`,
-      description: t.description,
-      authors: t.authors,
-      persona: t.persona,
-      active: t.active,
-      related: t.related && !trimRelated(),
-      secondary: t.secondary && !trimSecondary()
-    });
-    const universe = { characterDescription: "", authorsNote: "", activeLoreBooks: [] };
-    let protagonist = "";
-    for (const r of rows2) {
-      if (r.kind === "base" && r.sources.includes("봇 설명")) universe.characterDescription = r.content;
-      else if (r.kind === "base" && r.sources.includes("작가 노트")) universe.authorsNote = r.content;
-      else if (r.kind === "base" && r.sources.includes(PERSONA_SOURCE)) protagonist = r.content;
-      else if (r.content !== input2.agent.lore && !by.some((b) => b.lore === r.content) && !r.sources.some((x) => input2.skipBooks?.includes(x))) universe.activeLoreBooks.push({ source: r.sources.join(" / "), content: r.content, kind: r.kind });
-    }
-    const body5 = {
-      agent: { name: input2.agent.name, ...input2.agent.rank ? { rank: input2.agent.rank } : {}, lore: input2.agent.lore, status: input2.agent.state, situation: input2.agent.situation, where: ROOM2[input2.agent.room] ?? input2.agent.room },
-      ...by.length ? { bystanders: by.map((b) => ({ name: b.name, ...b.rank ? { rank: b.rank } : {}, lore: b.lore, status: b.state, situation: b.situation })) } : {},
-      protagonist: { name: input2.visitor
+ 

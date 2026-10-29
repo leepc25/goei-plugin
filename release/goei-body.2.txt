@@ -1,4 +1,27 @@
-ength).trim();
+ad: "사망",
+    kia: "사망",
+    deceased: "사망",
+    killed: "사망",
+    missing: "실종",
+    mia: "실종",
+    lost: "실종",
+    quarantine: "격리",
+    quarantined: "격리",
+    isolated: "격리",
+    contaminated: "격리",
+    "off duty": "비번",
+    offduty: "비번",
+    "on leave": "비번",
+    leave: "비번",
+    resting: "비번"
+  };
+  var AN_LABELS = ["슬롯", "지역", "발생지점", "위치", "이름", "괴이명", "괴이", "명칭", "배치", "작전현황", "작전", "상태", "위협등급", "등급"];
+  function stripLabel(v) {
+    let s5 = (v ?? "").trim();
+    for (const lb of AN_LABELS) {
+      const m = new RegExp(`^${lb}\\s*[:：]\\s*`).exec(s5);
+      if (m) {
+        s5 = s5.slice(m[0].length).trim();
         break;
       }
     }
@@ -34,10 +57,10 @@ ength).trim();
   function scanAnomalies(text4) {
     return fields(text4, "AN").flatMap((f) => {
       const slot = /^\d+$/.test(f[0] ?? "") && f.length >= 6 ? 1 : 0;
-      const region = f[slot] ?? "";
+      const region2 = f[slot] ?? "";
       const r = f.slice(slot + 1);
-      if (r.length < 4 || !region) return [];
-      return [{ region, name: stripLabel(r[0]), state: normAnState(r[1]), grade: normGrade(r[2]), deploy: stripLabel(r[3]), situation: stripLabel(r.slice(4).join(" ")) }];
+      if (r.length < 4 || !region2) return [];
+      return [{ region: region2, name: stripLabel(r[0]), state: normAnState(r[1]), grade: normGrade(r[2]), deploy: stripLabel(r[3]), situation: stripLabel(r.slice(4).join(" ")) }];
     });
   }
   function scanSites(text4, kind, states) {
@@ -45,9 +68,9 @@ ength).trim();
       const bare = (v) => stripLabel(v).replace(/\s*[(（][^)）]*[)）]\s*/g, "").trim();
       const i = f.findIndex((v, k) => k >= 2 && states.includes(bare(v)));
       if (i < 0) return [];
-      let region = f[0] ?? "";
-      if (/^\d+$/.test(region) && i >= 3) region = f[1] ?? "";
-      return [{ region, name: stripLabel(f[i - 1]), state: bare(f[i]), rest: f.slice(i + 1).map(stripLabel) }];
+      let region2 = f[0] ?? "";
+      if (/^\d+$/.test(region2) && i >= 3) region2 = f[1] ?? "";
+      return [{ region: region2, name: stripLabel(f[i - 1]), state: bare(f[i]), rest: f.slice(i + 1).map(stripLabel) }];
     });
   }
   var DEPLOY_ONLY = /^(?:없음|none|-|[A-Z]\d{3}(?:\s*[,/·]\s*[A-Z]\d{3})*)$/i;
@@ -371,14 +394,14 @@ ength).trim();
       if (!before.includes(p.id)) w.promoted.push(`${p.id}(${p.name})`);
     }
   }
-  function matchAn(w, region, name) {
+  function matchAn(w, region2, name) {
     let best;
     let score2 = 0;
     let tied = false;
-    const r = region.trim().replace(/\s+/g, "");
+    const r = region2.trim().replace(/\s+/g, "");
     for (const e of w.an) {
       const ln = locName(e.loc);
-      if (!regionMatch(region, ln)) continue;
+      if (!regionMatch(region2, ln)) continue;
       let points = r === ln.replace(/\s+/g, "") ? 10 : 1;
       if (name && (name === e.name || name === e.presetName)) points += 100;
       if (points > score2) {
@@ -389,8 +412,8 @@ ength).trim();
     }
     return tied ? void 0 : best;
   }
-  function firstRegion(region) {
-    for (const loc of POOL) if (regionMatch(region, locName(loc))) return loc;
+  function firstRegion(region2) {
+    for (const loc of POOL) if (regionMatch(region2, locName(loc))) return loc;
     return null;
   }
   function applyAnomalies(w, c, s5, faction, text4) {
@@ -4076,6 +4099,13 @@ ${c}`)]).join("\n\n");
     });
     return out;
   }
+  function splitUnread(chat, store) {
+    const all = unreadIndexes(chat, store);
+    const list4 = msgs(chat);
+    const lastRead = Math.max(-1, ...list4.map((m, i) => store.read[messageKey(m, i)] !== void 0 ? i : -1));
+    const newer = lastRead < 0 ? all.slice(-1) : all.filter((i) => i > lastRead);
+    return { newer, older: all.filter((i) => !newer.includes(i)) };
+  }
   function markRead(store, chat, indexes) {
     const list4 = msgs(chat);
     for (const i of indexes) {
@@ -4509,7 +4539,8 @@ ${recent > 0 ? `{{#when {{greater_equal::{{chat_index}}::{{? {{lastmessageid}}-$
     const imgFoldOn = o.imgFoldOn === false ? false : void 0;
     const show = imgRecent(o.imgShow);
     const send2 = imgRecent(o.imgSend);
-    const marks2 = (Array.isArray(o.marks) ? o.marks : DEFAULT_MARKS).filter((m) => !!m && typeof m === "object" && typeof m.name === "string" && !!m.s && typeof m.s.tab === "string").slice(0, MARK_MAX).map((m) => ({ s: m.s, name: m.name.slice(0, 80) }));
+    const savedMarks = (Array.isArray(o.marks) ? o.marks : []).filter((m) => !!m && typeof m === "object" && typeof m.name === "string" && !!m.s && typeof m.s.tab === "string").slice(0, MARK_MAX).map((m) => ({ s: m.s, name: m.name.slice(0, 80) }));
+    const marks2 = o.marksSeeded === true ? savedMarks : [...savedMarks, ...DEFAULT_MARKS.filter((d) => !savedMarks.some((m) => JSON.stringify(m.s) === JSON.stringify(d.s)))].slice(0, MARK_MAX);
     const strList = (v, max, len) => Array.isArray(v) ? v.filter((x) => typeof x === "string" && !!x.trim()).map((x) => x.trim().slice(0, len)).slice(0, max) : [];
     const imgPrompt = typeof o.imgPrompt === "string" && o.imgPrompt.trim() ? o.imgPrompt.slice(0, 6e3) : void 0;
     const imgNamesOff = strList(o.imgNamesOff, 200, 40);
@@ -4534,7 +4565,7 @@ ${recent > 0 ? `{{#when {{greater_equal::{{chat_index}}::{{? {{lastmessageid}}-$
     const relationsSym = o.relationsSym === false ? false : void 0;
     const frame = o.frame === "none" || o.frame === "tactical" ? o.frame : void 0;
     const walletStart = int2(o.walletStart, 0, 1e12);
-    prefs = { basic, world: world2, ...walletStart !== null ? { walletStart } : {}, ...frame ? { frame } : {}, ...editorWidth !== null ? { editorWidth } : {}, ...Object.keys(guides).length ? { guides } : {}, ...rules3.length ? { rules: rules3 } : {}, ...relationsSym === false ? { relationsSym } : {}, ...theme ? { theme } : {}, ...imgPrompt ? { imgPrompt } : {}, ...imgNamesOff.length ? { imgNamesOff } : {}, ...imgNamesExtra.length ? { imgNamesExtra } : {}, ...imgKeywords.length ? { imgKeywords } : {}, ...Object.keys(vars).length ? { vars } : {}, ...nav ? { nav } : {}, ...wikiSide ? { wikiSide } : {}, ...agents ? { agents } : {}, ...dim !== null ? { dim } : {}, ...status2 ? { status: status2 } : {}, ...size !== null ? { imgSize: size } : {}, ...fold3 !== null ? { imgFold: fold3 } : {}, ...imgFoldOn === false ? { imgFoldOn } : {}, ...show !== null ? { imgShow: show } : {}, ...send2 !== null ? { imgSend: send2 } : {}, ...marks2.length ? { marks: marks2 } : {} };
+    prefs = { basic, world: world2, ...walletStart !== null ? { walletStart } : {}, ...frame ? { frame } : {}, ...editorWidth !== null ? { editorWidth } : {}, ...Object.keys(guides).length ? { guides } : {}, ...rules3.length ? { rules: rules3 } : {}, ...relationsSym === false ? { relationsSym } : {}, ...theme ? { theme } : {}, ...imgPrompt ? { imgPrompt } : {}, ...imgNamesOff.length ? { imgNamesOff } : {}, ...imgNamesExtra.length ? { imgNamesExtra } : {}, ...imgKeywords.length ? { imgKeywords } : {}, ...Object.keys(vars).length ? { vars } : {}, ...nav ? { nav } : {}, ...wikiSide ? { wikiSide } : {}, ...agents ? { agents } : {}, ...dim !== null ? { dim } : {}, ...status2 ? { status: status2 } : {}, ...size !== null ? { imgSize: size } : {}, ...fold3 !== null ? { imgFold: fold3 } : {}, ...imgFoldOn === false ? { imgFoldOn } : {}, ...show !== null ? { imgShow: show } : {}, ...send2 !== null ? { imgSend: send2 } : {}, ...marks2.length ? { marks: marks2 } : {}, marksSeeded: true };
     return prefs;
   }
   function readSettingsBook(lore) {
@@ -4572,31 +4603,4 @@ ${recent > 0 ? `{{#when {{greater_equal::{{chat_index}}::{{? {{lastmessageid}}-$
     return null;
   }
   function model(v) {
-    if (v === "main" || v === "메인") return "main";
-    if (v === "aux" || v === "보조") return "aux";
-    return null;
-  }
-  function basicDefaults(lore) {
-    const b = readSettingsBook(lore).basic;
-    const book2 = {
-      anomalyOn: flag(b["상황판"] ?? b["통합관제"]) ?? BASIC_DEFAULTS.anomalyOn,
-      assetOn: flag(b["에셋 출력"]) ?? BASIC_DEFAULTS.assetOn,
-      assetModel: model(b["에셋 모델"]) ?? BASIC_DEFAULTS.assetModel,
-      assetPlayer: flag(b["주인공 에셋"]) ?? BASIC_DEFAULTS.assetPlayer,
-      assetLimit: int2(b["캐릭터당 이미지 수"], 1, 4) ?? BASIC_DEFAULTS.assetLimit,
-      agentLimit: int2(b["요원 표시 인원"], 0, AGENT_MAX) ?? BASIC_DEFAULTS.agentLimit,
-      supportOn: flag(b["지원 투입"]) ?? BASIC_DEFAULTS.supportOn
-    };
-    return { ...book2, ...prefs.basic };
-  }
-  function basicSettings(lore, ss) {
-    const d = basicDefaults(lore);
-    const v = ss ?? {};
-    return {
-      anomalyOn: v.$st_anomaly_on === void 0 ? d.anomalyOn : v.$st_anomaly_on === "1",
-      assetOn: flag(v[ST.assetOn]) ?? d.assetOn,
-      assetModel: model(v[ST.assetModel]) ?? d.assetModel,
-      assetPlayer: flag(v[ST.assetPlayer]) ?? d.assetPlayer,
-      assetLimit: int2(v[ST.assetLimit], 1, 4) ?? d.assetLimit,
-      agentLimit: int2(v[ST.agentLimit], 0, AGENT_MAX) ?? d.agentLimit,
-      supportOn: fla
+    if

@@ -1,4 +1,374 @@
-ld3.target, key2) ? " sel" : "";
+e) void viewport.phoneFull(false);
+    viewport?.fill(false);
+    notice = "";
+    setHead();
+    void home();
+  }
+  function setHead() {
+    const head3 = layer?.querySelector(".gx-head");
+    if (!head3) return;
+    const inGame = view !== "home";
+    layer?.classList.toggle("gx-playing", inGame);
+    head3.innerHTML = `<div class="gx-brand gx-tabhead"><span class="gx-tabicon">${ICONS.game}</span><div><b>필드</b></div></div>
+    <div class="gx-head-act">${inGame ? `<button class="gx-x" data-g="home" aria-label="시작 화면">${ICONS.back}</button>` : ""}
+    <button class="gx-x" data-action="game-close" aria-label="게임 닫기">${ICONS.close}</button></div>`;
+  }
+  async function onClick(e) {
+    const t = e.target.closest("[data-g]");
+    if (!t || !layer || t.disabled) return;
+    const at = Number(t.dataset.at);
+    const find = async () => (await pendingReports()).find((p) => p.at === at);
+    try {
+      switch (t.dataset.g) {
+        case "get":
+          return void await getFiles();
+        case "file":
+          return layer.querySelector("[data-g-file]")?.click();
+        case "play":
+          notice = "";
+          return void await play(0);
+        case "home":
+          return toHome();
+        case "full":
+          if (document.fullscreenElement) await viewport?.exit();
+          else if (view === "home" && viewport?.full) await viewport.exit();
+          else await viewport?.enter();
+          if (view !== "home") viewport?.fill(true);
+          return setHead();
+        case "post": {
+          const p = await find();
+          if (!p) return;
+          busy3 = "채팅에 놓는 중";
+          void home();
+          await postReport(p);
+          busy3 = "";
+          return say("보고서를 채팅에 놓았어요. 보내려면 채팅창의 전송 버튼을, 그만두려면 메시지의 취소를 눌러 주세요.");
+        }
+        case "record": {
+          const p = await find();
+          if (!p) return;
+          await recordReport(p);
+          return say(`이 채팅 로어북 「${RECORD_COMMENT}」에 남겼어요. 요청마다 들어가니 필요 없으면 지워 주세요.`);
+        }
+        case "unrecord":
+          if (!confirm(`「${RECORD_COMMENT}」 로어북을 지울까요?`)) return;
+          await clearRecord();
+          return say("기록 로어북을 지웠어요.");
+        case "drop":
+          await dropReport(at);
+          return void home();
+      }
+    } catch (err) {
+      busy3 = "";
+      say(err instanceof Error ? err.message : String(err));
+    }
+  }
+  var gameOpen = () => !!layer;
+  var hiddenSubs2 = /* @__PURE__ */ new Set();
+  var hidden = false;
+  function hideGame() {
+    if (!layer || hidden) return;
+    hidden = true;
+    layer.remove();
+    hiddenSubs2.forEach((f) => f(true));
+  }
+  var onExit = null;
+  function openGame(panel, exit) {
+    if (layer || !panel) return;
+    onExit = exit ?? null;
+    const t0 = performance.now();
+    layer = document.createElement("div");
+    layer.className = "gx-game";
+    layer.innerHTML = `<div class="gx-game-in"><header class="gx-head"></header><div class="gx-game-box"></div></div>`;
+    panel.append(layer);
+    viewport = makeViewport(layer, { inFrame: true });
+    offUpright = uprightInput(layer, () => !!viewport?.rotated);
+    view = "home";
+    notice = "";
+    setHead();
+    layer.addEventListener("click", (e) => void onClick(e));
+    layer.addEventListener("change", (e) => {
+      const input2 = e.target;
+      if (!input2.matches("[data-g-file]") || !input2.files?.length) return;
+      const list4 = input2.files;
+      void putFiles(list4).finally(() => input2.value = "");
+    });
+    offReports = onReports(() => void home());
+    void home().then(() => gameStats.openMs = Math.round(performance.now() - t0));
+  }
+  function closeGame() {
+    stop();
+    phoneChrome(false);
+    offReports?.();
+    offReports = null;
+    offUpright?.();
+    offUpright = null;
+    viewport?.dispose();
+    viewport = null;
+    layer?.remove();
+    layer = null;
+    onExit = null;
+    hiddenSubs2.clear();
+    hidden = false;
+    view = "home";
+    busy3 = "";
+  }
+  function reattachGame(panel) {
+    if (!layer || !panel || layer.parentElement === panel && !hidden) return;
+    panel.append(layer);
+    if (hidden) {
+      hidden = false;
+      hiddenSubs2.forEach((f) => f(false));
+    }
+  }
+
+  // src/ui/cctvfx.ts
+  var BASE = { tear: 0.12, lost: 0.03, shade: 0.04, text: 0.05, breath: 0.04 };
+  var LAST2 = { tear: 260, lost: 1500, shade: 1400, text: 750, breath: 4200 };
+  var BACK_MS = 1300;
+  var BACKS = ["stand", "flee", "near", "peek", "lens"];
+  var AN_ONLY = ["shade", "text", "breath"];
+  var GAP = { tear: 4e3, lost: 2e4, shade: 2e4, text: 1e4, breath: 15e3 };
+  var FIRST = ["shade", "shade", "text", "text", "tear", "lost"];
+  var visible = /* @__PURE__ */ new Set();
+  var lastAt = /* @__PURE__ */ new Map();
+  var GRADE = { s: 1.8, a: 1.35, b: 1, c: 0.6, d: 0.35 };
+  var BLOCKS = "█▓▒░#?¿§";
+  var JAMO = "ㄱㄲㄴㄷㄸㄹㅁㅂㅃㅅㅆㅇㅈㅉㅊㅋㅌㅍㅎㅏㅑㅓㅕㅗㅛㅜㅠㅡㅣ";
+  var timer3 = null;
+  var any = (set2) => set2[Math.floor(Math.random() * set2.length)];
+  function garble(ch) {
+    if (/\s/.test(ch) || Math.random() > 0.45) return ch;
+    if (/[가-힣]/.test(ch)) return Math.random() < 0.5 ? any(JAMO) : String.fromCharCode(44032 + Math.floor(Math.random() * 11172));
+    return any(BLOCKS);
+  }
+  function textGlitch(view3) {
+    const nodes = [];
+    for (const box2 of view3.querySelectorAll(".gx-oposd, .gx-opcap")) {
+      const walk = document.createTreeWalker(box2, NodeFilter.SHOW_TEXT);
+      for (let n2 = walk.nextNode(); n2; n2 = walk.nextNode()) if (n2.nodeValue?.trim()) nodes.push(n2);
+    }
+    const real = nodes.map((n2) => n2.nodeValue ?? "");
+    const shake = () => nodes.forEach((n2, i) => n2.nodeValue = Array.from(real[i]).map(garble).join(""));
+    shake();
+    const steps = [130, 280, 470].map((ms) => setTimeout(shake, ms));
+    setTimeout(() => {
+      steps.forEach(clearTimeout);
+      nodes.forEach((n2, i) => n2.nodeValue = real[i]);
+    }, LAST2.text - 10);
+  }
+  function fireFx(view3, fx) {
+    const cls = `fx-${fx}`;
+    if (view3.classList.contains(cls)) return;
+    if (fx === "text") textGlitch(view3);
+    view3.classList.add(cls);
+    setTimeout(() => {
+      view3.classList.remove(cls);
+      if (fx === "lost" && view3.isConnected) {
+        view3.dataset.back = BACKS[Math.floor(Math.random() * BACKS.length)];
+        view3.classList.add("fx-back");
+        setTimeout(() => view3.classList.remove("fx-back"), BACK_MS);
+      }
+    }, LAST2[fx]);
+  }
+  function tick2(root3) {
+    const now = /* @__PURE__ */ new Set();
+    for (const view3 of root3.querySelectorAll(".gx-opview.feed:not(.ended):not(.nosig)")) {
+      const an = view3.classList.contains("k-an");
+      const key2 = view3.dataset.fxkey ?? "";
+      now.add(key2);
+      if (key2 && !visible.has(key2)) {
+        const fx = an ? FIRST[Math.floor(Math.random() * FIRST.length)] : "tear";
+        lastAt.set(fx, Date.now());
+        setTimeout(() => view3.isConnected && fireFx(view3, fx), Math.random() * 1500);
+        continue;
+      }
+      const scale = an ? GRADE[view3.dataset.grade ?? ""] ?? 1 : 0.4;
+      for (const fx of Object.keys(BASE)) {
+        if (!an && AN_ONLY.includes(fx)) continue;
+        if (Date.now() - (lastAt.get(fx) ?? 0) < GAP[fx] || Math.random() >= BASE[fx] * scale) continue;
+        lastAt.set(fx, Date.now());
+        fireFx(view3, fx);
+      }
+    }
+    visible = now;
+  }
+  function startCctvFx(root3) {
+    if (timer3 || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    timer3 = setInterval(() => tick2(root3), 1e3);
+    tick2(root3);
+  }
+  function stopCctvFx() {
+    if (timer3) clearInterval(timer3);
+    timer3 = null;
+    visible = /* @__PURE__ */ new Set();
+  }
+
+  // src/host/send.ts
+  var QUICK_FAIL_MS = 700;
+  async function sendNow() {
+    let sent;
+    try {
+      sent = Promise.resolve(risuai.sendChat("")).then(
+        (r) => r !== false,
+        (e) => {
+          console.log(`[goei] 자동 전송 실패: ${e instanceof Error ? e.message : String(e)}`);
+          return false;
+        }
+      );
+    } catch {
+      return false;
+    }
+    return Promise.race([sent, new Promise((r) => setTimeout(() => r(true), QUICK_FAIL_MS))]);
+  }
+  var SEND_FALLBACK = "채팅에 요청을 놓았어요. 자동 전송이 막혀 있어서(플러그인 모델 사용 등) 채팅창의 전송 버튼을 한 번 눌러 주세요.";
+  var noticeClass = (text4) => text4 === SEND_FALLBACK ? "gx-err info" : "gx-err";
+
+  // src/ui/field.ts
+  var field3 = {
+    region: "01",
+    filter: "all",
+    place: null,
+    target: null,
+    team: [],
+    support: 0,
+    mkind: "an",
+    mname: null,
+    mpick: "an",
+    mopen: "",
+    note: "",
+    step: "goal",
+    query: "",
+    mapq: "",
+    confirmEnd: null
+  };
+  var mapUrls = {};
+  var esc31 = (s5) => String(s5 ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+  var KIND_LABEL5 = { an: "괴이", in: "사건", ms: "특수" };
+  var MISSION_LABEL = { an: "괴이", ms: "특수", lm: "거점" };
+  function resetField(all = false) {
+    field3.target = null;
+    field3.team = [];
+    field3.support = 0;
+    field3.mname = null;
+    field3.note = "";
+    field3.step = "goal";
+    field3.confirmEnd = null;
+    field3.place = null;
+    if (all) {
+      field3.region = "01";
+      field3.filter = "all";
+      field3.query = "";
+      field3.mkind = "an";
+    }
+  }
+  function ctxOf(ctx2, chat) {
+    const lore = ctx2.char.globalLore;
+    const catalog = parseCatalog(lore);
+    const bases = draftBases();
+    return {
+      catalog: bases ? { ...catalog, landmarks: landmarksOf(bases) } : catalog,
+      world: readWorld(chat),
+      faction: String(chat.scriptstate?.["$st_faction"] ?? ""),
+      on: worldOn(chat),
+      settings: worldSettings(lore, chat.scriptstate),
+      supportOn: basicSettings(lore, chat.scriptstate).supportOn,
+      char: ctx2.char
+    };
+  }
+  function readCtx(ctx2) {
+    try {
+      return ctxOf(ctx2, ctx2.chat);
+    } catch (error) {
+      return error instanceof Error ? error.message : String(error);
+    }
+  }
+  function sidoOf(loc) {
+    return loc.split("-")[0];
+  }
+  function placeKey(ev, c) {
+    if (ev.kind === "in") {
+      const lm = c.landmarks.find((l) => l.name === ev.name && (l.gu ? landmarkLoc(l.sido, l.gu) === ev.loc : ev.loc.startsWith(`${l.sido}-`)));
+      if (lm) return `fac:${lm.name}`;
+    }
+    return ev.loc;
+  }
+  function placeTarget(key2) {
+    return key2.startsWith("fac:") ? { type: "facility", name: key2.slice(4) } : { type: "place", loc: key2 };
+  }
+  function targetName(t) {
+    if (t.type === "event") return t.name;
+    if (t.type === "facility") return t.name;
+    return locName(t.loc);
+  }
+  var isPC = () => !matchMedia("(max-width: 760px)").matches;
+  function sameTarget(a, key2) {
+    if (!a) return false;
+    if (a.type === "event") return a.key === key2;
+    return (a.type === "facility" ? `fac:${a.name}` : a.loc) === key2;
+  }
+  function mapImage(ctx2, code2, env3) {
+    const hit3 = mapUrls[code2];
+    if (hit3 === void 0) {
+      mapUrls[code2] = "loading";
+      void assetUrl(ctx2.char, `map${code2}`).then((url) => {
+        mapUrls[code2] = url;
+        env3.render();
+      });
+      return null;
+    }
+    return hit3 === "loading" ? null : hit3;
+  }
+  var boardMapUrl = (ctx2, env3) => mapImage(ctx2, "01", env3);
+  function pin(action, value, label2, x, y, cls, count2 = 0) {
+    return `<button class="gx-pin ${cls}" style="left:${x}%;top:${y}%" data-action="${action}" data-value="${esc31(value)}" aria-label="${esc31(label2)}">
+    <span class="gx-dot"></span><span class="gx-pname">${esc31(label2)}${count2 ? `<b>${count2}</b>` : ""}</span></button>`;
+  }
+  function hotClass(list4) {
+    if (!list4.length) return "";
+    const kinds = new Set(list4.map((e) => e.kind));
+    return ` hot hot-${kinds.size === 1 ? [...kinds][0] : "all"}`;
+  }
+  var narrow2 = () => matchMedia("(max-width: 760px)").matches;
+  function mapBar(x) {
+    const code2 = field3.region;
+    const options = ["01", ...MAP_CODES].map((c) => `<option value="${c}"${c === code2 ? " selected" : ""}>${c === "01" ? "전국" : esc31(regionName(c))}</option>`).join("");
+    const bar = `<div class="gx-mapbar">
+      <select class="gx-select" data-change="map-region" aria-label="지역">${options}</select>
+      <div class="gx-mapfind"><input class="gx-search" type="search" placeholder="장소 검색" value="${esc31(field3.mapq)}" data-input="map-query" aria-label="장소 검색" autocomplete="off">
+        <div class="gx-mapsug">${mapSuggest(x.catalog)}</div></div>
+      ${modeSwap("mission")}
+    </div>`;
+    return bar;
+  }
+  function mapCanvas(ctx2, x, events, env3) {
+    const code2 = field3.region;
+    const url = mapImage(ctx2, code2, env3);
+    const byPlace = /* @__PURE__ */ new Map();
+    for (const e of events) {
+      const k = placeKey(e, x.catalog);
+      byPlace.set(k, [...byPlace.get(k) ?? [], e]);
+    }
+    let pins = "";
+    if (code2 === "01") {
+      for (const [nn, label2, px, py] of NATION_PINS) {
+        const here = events.filter((e) => sidoOf(e.loc) === nn);
+        pins += pin("map-region", nn, label2, px, py, `nation${hotClass(here)}`, here.length);
+      }
+    } else {
+      (SIGUN[code2] ?? []).forEach((gu, i) => {
+        const xy = REGION_PINS[code2]?.[i];
+        const loc = `${code2}-${i}`;
+        if (!xy) return;
+        const here = byPlace.get(loc) ?? [];
+        const sel = field3.place === loc || sameTarget(field3.target, loc) ? " sel" : "";
+        pins += pin("map-place", loc, gu, xy[0], xy[1], `${loc === SEALED_LOC ? "sealed" : ""}${hotClass(here)}${sel}`, here.length > 1 ? here.length : 0);
+      });
+      for (const lm of x.catalog.landmarks) {
+        if (lm.sido !== code2) continue;
+        const key2 = `fac:${lm.name}`;
+        const here = byPlace.get(key2) ?? [];
+        const sel = field3.place === key2 || sameTarget(field3.target, key2) ? " sel" : "";
         pins += pin("map-place", key2, lm.label || lm.name, lm.x, lm.y, `fac${hotClass(here)}${sel}`);
       }
     }
@@ -82,9 +452,9 @@ ld3.target, key2) ? " sel" : "";
     const place2 = field3.place ? placeCard(field3.place, x.catalog, sameTarget(field3.target, field3.place)) : "";
     const cancel = cancelChip("map-unplace", !!(field3.place || field3.target));
     const gone = field3.place ? "" : endedShown(x.world).filter((e) => field3.filter === "all" || e.kind === field3.filter).map((e) => endedCard(e, (n2, k) => artCtx ? evArt(artCtx, n2, k) : void 0)).join("");
-    const empty = !x.on ? "상황판이 꺼져 있어 발생한 상황이 없어요. 지도에서 장소를 골라 이동할 수 있어요." : field3.place || field3.filter !== "all" ? "조건에 맞는 상황이 없어요." : "지금 발생한 상황이 없어요. 지도에서 장소를 골라 이동할 수 있어요.";
+    const empty2 = !x.on ? "상황판이 꺼져 있어 발생한 상황이 없어요. 지도에서 장소를 골라 이동할 수 있어요." : field3.place || field3.filter !== "all" ? "조건에 맞는 상황이 없어요." : "지금 발생한 상황이 없어요. 지도에서 장소를 골라 이동할 수 있어요.";
     return `<div class="gx-chips gx-sitbar">${chips3}${cancel}</div>
-    ${shown2.length || place2 || gone ? `<ul class="gx-evcs">${place2}${shown2.map((e) => eventRow(e, x, agents)).join("")}${gone}</ul>` : `<p class="gx-none">${empty}</p>`}`;
+    ${shown2.length || place2 || gone ? `<ul class="gx-evcs">${place2}${shown2.map((e) => eventRow(e, x, agents)).join("")}${gone}</ul>` : `<p class="gx-none">${empty2}</p>`}`;
   }
   function cancelChip(action, on3) {
     return `<button class="gx-chip gx-unplace" data-action="${action}" ${on3 ? 'title="선택 풀기"' : "disabled"}>취소</button>`;
@@ -142,7 +512,7 @@ ld3.target, key2) ? " sel" : "";
     return withMap ? drawerBox(mapBar(x), "gx-mapdrawer") : "";
   }
   function modeSwap(to) {
-    return `<button class="gx-mswap desk" data-action="tab" data-value="${to}" aria-label="${to === "map" ? "임무로 전환" : "커스텀 임무로 전환"}">${ICONS.swap}<span>${to === "map" ? "임무" : "커스텀 임무"}</span></button>`;
+    return `<button class="gx-mswap desk" data-action="tab" data-value="${to}" aria-label="${to === "map" ? "임무로 전환" : "커스텀으로 전환"}">${ICONS.swap}<span>${to === "map" ? "임무" : "커스텀"}</span></button>`;
   }
   function stepBar(goal, swap) {
     const used = field3.team.length + field3.support + 1;
@@ -214,7 +584,7 @@ ld3.target, key2) ? " sel" : "";
         return `<li class="gx-ev gx-mx${sel ? " sel" : ""}${wikiBtn ? " has-wiki" : ""}"><button class="gx-mx-art k-${kind}${art.pic ? "" : " none"}" data-action="mission-open" data-value="${val}" aria-expanded="false"${bg}>
         ${status2 ? `<span class="gx-evart-top">${status2}</span>` : ""}<span class="gx-evart-cap">${cap}</span></button>${wikiBtn}</li>`;
       }
-      const aim = sel ? aimMark(true, "mission-unpick", "") : aimMark(false, "mission-pick", val);
+      const aim = sel ? aimMark(true, "mission-unpick", "", val) : aimMark(false, "mission-pick", val);
       return `<li class="gx-ev gx-mx open${sel ? " sel" : ""}"><div class="gx-mx-art k-${kind}${art.pic ? "" : " none"}" data-action="mission-open" data-value="${val}"${bg}>
       ${aim}<span class="gx-evart-top">${status2}<span class="gx-evart-act"><button class="gx-evbtn" data-action="mission-open" data-value="${val}" aria-label="접기" title="접기">${ICONS.up}</button>${wikiBtn}</span></span>
       <span class="gx-evart-cap">${capOpen("")}${art.desc ? `<span class="gx-evc-desc">${esc31(art.desc)}</span>` : ""}</span></div></li>`;
@@ -643,26 +1013,21 @@ ${note.trim()}` : card2;
     const todayRows = rows2.filter((r) => real(r) && today && r.date === today);
     const todayNet = todayRows.reduce((n2, r) => n2 + r.e.amount, 0);
     const balance = rows2.length ? rows2[rows2.length - 1].after : start4;
-    const chip3 = (v, label2) => `<button class="gx-wt-chip${walletUi.filter === v ? " on" : ""}" data-action="wallet-filter" data-value="${v}" aria-pressed="${walletUi.filter === v}">${label2}</button>`;
+    const chip3 = (v, label2) => `<button class="gx-chip${walletUi.filter === v ? " on" : ""}" data-action="wallet-filter" data-value="${v}" aria-pressed="${walletUi.filter === v}">${label2}</button>`;
     const editable = walletEditable(ctx2.chat.scriptstate);
     const edit = editable && walletUi.edit ? `<div class="gx-wt-edit"><input type="text" name="wt-adj" inputmode="numeric" placeholder="예: 1,200,000 또는 120만" aria-label="잔고를 이 값으로" data-enter="wallet-adj"><button class="gx-mini" data-action="wallet-adj" data-take="wt-adj">저장</button><button class="gx-mini" data-action="wallet-edit">취소</button></div>` : "";
     return `<main class="gx-body gx-wallettab">
-    <section class="gx-wt-tiles">
-      <div class="gx-wt-tile bal">
-        <small>잔고</small>
-        <div class="gx-wt-balrow"><b>${esc32(formatWon(balance))}</b>${editable ? `<button class="gx-wt-pen" data-action="wallet-edit" aria-label="잔고 고치기" title="잔고 고치기">${ICONS.pen}</button>` : ""}</div>
-        ${edit}
-        <span class="gx-wt-sub">시작 ${esc32(formatWon(start4))} · 거래 ${rows2.length}건</span>
+    <section class="gx-mon gx-wt-tiles">
+      <div class="gx-mon-osd"><span><span class="gx-mon-tag live"><i></i>LEDGER</span><span class="gx-mon-title">가계부</span></span>${today ? `<span>${esc32(today)}</span>` : ""}</div>
+      <div class="gx-mon-cells">
+        <div class="gx-mon-cell gx-wt-tile bal"><small>BALANCE · 잔고</small><div class="gx-wt-balrow"><b class="mint">${esc32(formatWon(balance))}</b>${editable ? `<button class="gx-wt-pen" data-action="wallet-edit" aria-label="잔고 고치기" title="잔고 고치기">${ICONS.pen}</button>` : ""}</div>${edit}<span>시작 ${esc32(formatWon(start4))} · 거래 ${rows2.length}건</span></div>
+        <div class="gx-mon-cell gx-wt-tile"><small>INCOME · 수입</small><b class="mint">+${esc32(income.toLocaleString("en-US"))}</b><span>${inN}건</span></div>
+        <div class="gx-mon-cell gx-wt-tile"><small>SPEND · 지출</small><b class="red">${spend ? `−${esc32(Math.abs(spend).toLocaleString("en-US"))}` : "0"}</b><span>${outN}건</span></div>
+        <div class="gx-mon-cell gx-wt-tile"><small>TODAY${today ? ` · ${esc32(shortDay(today))}` : ""}</small><b class="${todayNet < 0 ? "red" : todayNet > 0 ? "mint" : ""}">${esc32(formatDelta(todayNet) || "0")}</b><span>${todayRows.length}건</span></div>
       </div>
-      <div class="gx-wt-tile"><small>수입</small><b class="in">+${esc32(income.toLocaleString("en-US"))}</b><span class="gx-wt-sub">${inN}건</span></div>
-      <div class="gx-wt-tile"><small>지출</small><b class="out">−${esc32(spend.toLocaleString("en-US"))}</b><span class="gx-wt-sub">${outN}건</span></div>
-      <div class="gx-wt-tile"><small>오늘${today ? ` · ${esc32(shortDay(today))}` : ""}</small><b class="${todayNet < 0 ? "out" : todayNet > 0 ? "in" : ""}">${esc32(formatDelta(todayNet) || "0")}</b><span class="gx-wt-sub">${todayRows.length}건</span></div>
     </section>
     ${walletUi.notice ? `<div class="gx-err" role="alert">${esc32(walletUi.notice)}</div>` : ""}
-    <div class="gx-wt-tools">
-      <div class="gx-wt-chips">${chip3("all", "전체")}${chip3("in", "수입")}${chip3("out", "지출")}</div>
-      <input class="gx-wt-q" type="search" data-input="wallet-q" value="${esc32(walletUi.q)}" placeholder="찾기: 메모·근거" aria-label="거래 찾기">
-    </div>
+    <div class="gx-rec-tools">${chip3("all", "전체")}${chip3("in", "수입")}${chip3("out", "지출")}<input class="gx-wt-q" type="search" data-input="wallet-q" value="${esc32(walletUi.q)}" placeholder="찾기: 메모·근거" aria-label="거래 찾기"></div>
     <div class="gx-wt-list">${walletList(ctx2)}</div>
   </main>`;
   }
@@ -2858,5 +3223,5 @@ ${texts.anomaly}`;
   }
 
   // src/body-entry.ts
-  globalThis.__goeiBody = { version: "0.18.1", start: start3 };
+  globalThis.__goeiBody = { version: "0.18.2", start: start3 };
 })();
