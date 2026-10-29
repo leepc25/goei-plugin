@@ -2877,7 +2877,7 @@ if (fixture.globalLore.some(packed)) {
   const idOrder = await page.$$eval('.gx-nav-brand .gx-id > *', (l) => l.map((e) => e.className.split(' ')[0]));
   assert.ok(idOrder.indexOf('gx-id-photo') < idOrder.indexOf('gx-id-who') && idOrder.indexOf('gx-id-who') < idOrder.indexOf('gx-op-st'), idOrder.join(','));
   assert.ok((await page.textContent('.gx-nav-brand .gx-id-who small')).includes('관리국'), '소속');
-  { const b = await page.locator('.gx-nav-brand .gx-id-who b').boundingBox(), sm = await page.locator('.gx-nav-brand .gx-id-who small').boundingBox(); assert.ok(b && sm && sm.x > b.x + b.width - 1 && Math.abs((sm.y + sm.height) - (b.y + b.height)) < 8, `이름·소속 한 줄 ${JSON.stringify([b, sm])}`); }
+  { /* 이 시험 채팅은 페르소나 이름이 비어 이름 칸이 0폭일 수 있다 */ const b = await page.locator('.gx-nav-brand .gx-id-who b').boundingBox(), sm = await page.locator('.gx-nav-brand .gx-id-who small').boundingBox(); assert.ok(sm && (!b || sm.x > b.x + b.width - 1) && (!b || Math.abs((sm.y + sm.height) - (b.y + b.height)) < 8), `이름·소속 한 줄 ${JSON.stringify([b, sm])}`); }
   assert.deepEqual(await page.$$eval('.gx-nav-brand .gx-op-st > .gx-op-ln', (l) => l.map((e) => e.querySelector('i')?.textContent)), ['잔고', '위치']);
   assert.ok((await page.textContent('.gx-nav-brand .gx-op-meta')).includes('02:47'), '시각 줄');
   // 잔고 줄 → 가계부 화면 (메뉴 없이도)
