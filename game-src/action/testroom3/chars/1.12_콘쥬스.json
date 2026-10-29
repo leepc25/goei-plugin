@@ -442,7 +442,7 @@
         },
         {
          "t": "v",
-         "vfx": "x3-c-ground-shockwave",
+         "vfx": "x3-c-dust-cloud-large",
          "at": "spot",
          "dx": 0,
          "scale": 0.45,
@@ -451,7 +451,8 @@
          "hit": {
           "dmg": 270,
           "kind": "launch"
-         }
+         },
+         "r": 184.0
         },
         {
          "t": "v",

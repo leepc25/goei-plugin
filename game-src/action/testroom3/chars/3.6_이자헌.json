@@ -860,10 +860,10 @@
       },
       {
        "t": "v",
-       "vfx": "x3-c-air-ring",
+       "vfx": "x3-c-hit-spark-heavy",
        "at": "hand",
        "dx": 30,
-       "scale": 1.6
+       "scale": 2.08
       },
       {
        "t": "later",

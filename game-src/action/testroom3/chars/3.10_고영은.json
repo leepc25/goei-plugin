@@ -681,11 +681,11 @@
      "fx": [
       {
        "t": "v",
-       "vfx": "x3-c-ground-shockwave",
+       "vfx": "x3-c-dust-cloud-large",
        "at": "self",
        "w": 1.2,
        "under": true,
-       "r": 460,
+       "r": 460.0,
        "depth": 220,
        "boom": 2,
        "hit": {
@@ -695,7 +695,8 @@
         "vs": 1.5,
         "stop": 0.14,
         "shake": 10
-       }
+       },
+       "scale": 1.0
       }
      ]
     },
@@ -705,11 +706,11 @@
      "fx": [
       {
        "t": "v",
-       "vfx": "x3-c-ground-shockwave",
+       "vfx": "x3-c-dust-cloud-large",
        "at": "self",
        "w": 1.2,
        "under": true,
-       "r": 460,
+       "r": 460.0,
        "depth": 220,
        "boom": 2,
        "hit": {
@@ -719,7 +720,8 @@
         "vs": 1.5,
         "stop": 0.14,
         "shake": 16
-       }
+       },
+       "scale": 1.0
       },
       {
        "t": "shake",

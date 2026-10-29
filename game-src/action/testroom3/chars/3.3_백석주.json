@@ -548,12 +548,12 @@
      "fx": [
       {
        "t": "v",
-       "vfx": "x3-c-air-ring",
+       "vfx": "x3-c-hit-spark-heavy",
        "at": "front",
        "dx": 110,
        "dy": -70,
-       "scale": 1.4,
-       "r": 80,
+       "scale": 1.82,
+       "r": 61.5,
        "hit": {
         "dmg": 195,
         "kind": "stun",
@@ -789,11 +789,11 @@
        "fx": [
         {
          "t": "v",
-         "vfx": "x3-c-air-ring",
+         "vfx": "x3-c-hit-spark-heavy",
          "at": "hand",
          "dx": 40,
-         "scale": 4,
-         "r": 260,
+         "scale": 5.2,
+         "r": 200.0,
          "boom": 2,
          "hit": {
           "dmg": 294,

@@ -465,7 +465,7 @@
      "fx": [
       {
        "t": "v",
-       "vfx": "x3-c-ground-shockwave",
+       "vfx": "x3-c-dust-cloud-large",
        "at": "front",
        "dx": 90,
        "scale": 0.5,

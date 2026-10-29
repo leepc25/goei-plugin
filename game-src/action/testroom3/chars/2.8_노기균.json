@@ -840,7 +840,7 @@
      "fx": [
       {
        "t": "v",
-       "vfx": "x3-c-ground-shockwave",
+       "vfx": "x3-c-dust-cloud-large",
        "at": "self",
        "scale": 0.93,
        "tint": "#ffffff",
@@ -853,11 +853,11 @@
       },
       {
        "t": "v",
-       "vfx": "x3-c-air-ring",
+       "vfx": "x3-c-hit-spark-heavy",
        "at": "body",
        "dx": 20,
        "dy": -70,
-       "scale": 1.6,
+       "scale": 2.08,
        "tint": "#ffffff"
       },
       {

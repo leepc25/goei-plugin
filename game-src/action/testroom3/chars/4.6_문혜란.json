@@ -647,7 +647,7 @@
       },
       {
        "t": "v",
-       "vfx": "x3-c-ground-shockwave",
+       "vfx": "x3-c-dust-cloud-large",
        "at": "front",
        "dx": 330,
        "scale": 2.4,
@@ -658,7 +658,8 @@
         "kind": "launch",
         "stop": 0.22,
         "shake": 18
-       }
+       },
+       "r": 184.0
       },
       {
        "t": "shake",

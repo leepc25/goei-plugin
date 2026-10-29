@@ -578,11 +578,12 @@
       },
       {
        "t": "v",
-       "vfx": "x3-c-ground-shockwave",
+       "vfx": "x3-c-dust-cloud-large",
        "at": "screen",
        "w": 1.05,
        "tint": "#6EC6FF",
-       "under": true
+       "under": true,
+       "scale": 1.0
       },
       {
        "t": "v",

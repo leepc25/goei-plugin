@@ -621,11 +621,11 @@
      "fx": [
       {
        "t": "v",
-       "vfx": "x3-c-air-ring",
+       "vfx": "x3-c-hit-spark-heavy",
        "at": "body",
        "dx": -10,
        "dy": -80,
-       "scale": 1.4,
+       "scale": 1.82,
        "tint": "#ffffff"
       }
      ]
@@ -1091,10 +1091,10 @@
      "fx": [
       {
        "t": "v",
-       "vfx": "x3-c-air-ring",
+       "vfx": "x3-c-hit-spark-heavy",
        "at": "body",
        "dy": -120,
-       "scale": 2,
+       "scale": 2.6,
        "tint": "#ffffff"
       },
       {
@@ -1158,10 +1158,10 @@
      "fx": [
       {
        "t": "v",
-       "vfx": "x3-c-air-ring",
+       "vfx": "x3-c-hit-spark-heavy",
        "at": "body",
        "dy": -100,
-       "scale": 1.6,
+       "scale": 2.08,
        "tint": "#ffffff"
       },
       {

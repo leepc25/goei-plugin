@@ -542,11 +542,11 @@
        "fx": [
         {
          "t": "v",
-         "vfx": "x3-c-air-ring",
+         "vfx": "x3-c-hit-spark-heavy",
          "at": "hand",
          "dx": 30,
-         "scale": 1.5,
-         "r": 90,
+         "scale": 1.95,
+         "r": 69.2,
          "hit": {
           "dmg": 270,
           "kind": "heavy",

@@ -758,10 +758,10 @@
         },
         {
          "t": "v",
-         "vfx": "x3-c-air-ring",
+         "vfx": "x3-c-hit-spark-heavy",
          "at": "target",
          "dy": -10,
-         "scale": 0.9,
+         "scale": 1.17,
          "tint": "#ffe066"
         }
        ]
@@ -781,10 +781,10 @@
         },
         {
          "t": "v",
-         "vfx": "x3-c-air-ring",
+         "vfx": "x3-c-hit-spark-heavy",
          "at": "target",
          "dy": -10,
-         "scale": 0.9,
+         "scale": 1.17,
          "tint": "#ffe066"
         }
        ]
@@ -804,10 +804,10 @@
         },
         {
          "t": "v",
-         "vfx": "x3-c-air-ring",
+         "vfx": "x3-c-hit-spark-heavy",
          "at": "target",
          "dy": -10,
-         "scale": 0.9,
+         "scale": 1.17,
          "tint": "#ffe066"
         }
        ]
@@ -827,10 +827,10 @@
         },
         {
          "t": "v",
-         "vfx": "x3-c-air-ring",
+         "vfx": "x3-c-hit-spark-heavy",
          "at": "target",
          "dy": -10,
-         "scale": 0.9,
+         "scale": 1.17,
          "tint": "#ffe066"
         }
        ]
@@ -852,10 +852,10 @@
         },
         {
          "t": "v",
-         "vfx": "x3-c-air-ring",
+         "vfx": "x3-c-hit-spark-heavy",
          "at": "target",
          "dy": -10,
-         "scale": 0.9,
+         "scale": 1.17,
          "tint": "#ffe066"
         }
        ],

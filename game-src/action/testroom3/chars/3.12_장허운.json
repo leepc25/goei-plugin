@@ -498,7 +498,7 @@
       },
       {
        "t": "v",
-       "vfx": "x3-c-ground-shockwave",
+       "vfx": "x3-c-dust-cloud-large",
        "at": "front",
        "dx": 90,
        "scale": 0.45,
@@ -679,12 +679,13 @@
       },
       {
        "t": "v",
-       "vfx": "x3-c-ground-shockwave",
+       "vfx": "x3-c-dust-cloud-large",
        "at": "screen",
        "w": 1.05,
        "tint": "#8a6440",
        "under": true,
-       "boom": 3
+       "boom": 3,
+       "scale": 1.0
       }
      ]
     },

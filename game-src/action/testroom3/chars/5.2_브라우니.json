@@ -405,12 +405,12 @@
      "fx": [
       {
        "t": "v",
-       "vfx": "x3-c-air-ring",
+       "vfx": "x3-c-hit-spark-heavy",
        "at": "hand",
        "dx": 50,
-       "scale": 2.4,
+       "scale": 3.12,
        "tint": "#fff6c0",
-       "r": 110,
+       "r": 84.6,
        "hit": {
         "dmg": 112,
         "kind": "light"
@@ -424,12 +424,12 @@
      "fx": [
       {
        "t": "v",
-       "vfx": "x3-c-air-ring",
+       "vfx": "x3-c-hit-spark-heavy",
        "at": "hand",
        "dx": 50,
-       "scale": 2.8,
+       "scale": 3.64,
        "tint": "#fff6c0",
-       "r": 110,
+       "r": 84.6,
        "hit": {
         "dmg": 158,
         "kind": "heavy"
@@ -587,7 +587,7 @@
      "fx": [
       {
        "t": "v",
-       "vfx": "x3-c-ground-shockwave",
+       "vfx": "x3-c-dust-cloud-large",
        "at": "screen",
        "w": 1.05,
        "tint": "#fff6c0",
@@ -595,14 +595,16 @@
         "dmg": 76,
         "kind": "launch",
         "stop": 0.12
-       }
+       },
+       "scale": 1.0,
+       "r": 184.0
       },
       {
        "t": "v",
-       "vfx": "x3-c-air-ring",
+       "vfx": "x3-c-hit-spark-heavy",
        "at": "screen",
        "dy": -200,
-       "scale": 5,
+       "scale": 6.5,
        "tint": "#fff6c0"
       },
       {
@@ -617,7 +619,7 @@
      "fx": [
       {
        "t": "v",
-       "vfx": "x3-c-ground-shockwave",
+       "vfx": "x3-c-dust-cloud-large",
        "at": "screen",
        "w": 1.05,
        "tint": "#fff6c0",
@@ -625,14 +627,16 @@
         "dmg": 76,
         "kind": "launch",
         "stop": 0.12
-       }
+       },
+       "scale": 1.0,
+       "r": 184.0
       },
       {
        "t": "v",
-       "vfx": "x3-c-air-ring",
+       "vfx": "x3-c-hit-spark-heavy",
        "at": "screen",
        "dy": -200,
-       "scale": 5,
+       "scale": 6.5,
        "tint": "#fff6c0"
       },
       {
@@ -647,7 +651,7 @@
      "fx": [
       {
        "t": "v",
-       "vfx": "x3-c-ground-shockwave",
+       "vfx": "x3-c-dust-cloud-large",
        "at": "screen",
        "w": 1.05,
        "tint": "#fff6c0",
@@ -655,14 +659,16 @@
         "dmg": 76,
         "kind": "launch",
         "stop": 0.12
-       }
+       },
+       "scale": 1.0,
+       "r": 184.0
       },
       {
        "t": "v",
-       "vfx": "x3-c-air-ring",
+       "vfx": "x3-c-hit-spark-heavy",
        "at": "screen",
        "dy": -200,
-       "scale": 5,
+       "scale": 6.5,
        "tint": "#fff6c0"
       },
       {

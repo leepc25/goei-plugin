@@ -674,15 +674,7 @@
          "t": "screen",
          "spots": 4,
          "every": 0.12,
-         "each": [
-          {
-           "t": "ring",
-           "r": 60,
-           "time": 1.6,
-           "color": "#ff3a2a",
-           "w": 4
-          }
-         ]
+         "each": []
         }
        ]
       }

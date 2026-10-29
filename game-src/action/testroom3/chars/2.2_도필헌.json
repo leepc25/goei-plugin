@@ -587,12 +587,12 @@
        "fx": [
         {
          "t": "v",
-         "vfx": "x3-c-air-ring",
+         "vfx": "x3-c-hit-spark-heavy",
          "at": "front",
          "dx": 117,
-         "scale": 1.4,
+         "scale": 1.82,
          "tint": "#C9A046",
-         "r": 70,
+         "r": 53.8,
          "hit": {
           "dmg": 48,
           "kind": "heavy"

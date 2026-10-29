@@ -502,15 +502,15 @@
      "fx": [
       {
        "t": "v",
-       "vfx": "x3-c-air-ring",
+       "vfx": "x3-c-hit-spark-heavy",
        "at": "hand",
        "dx": 20,
-       "scale": 1.8,
+       "scale": 2.34,
        "tint": "#7d80d0"
       },
       {
        "t": "v",
-       "vfx": "x3-c-ground-shockwave",
+       "vfx": "x3-c-dust-cloud-large",
        "at": "front",
        "dx": 90,
        "scale": 0.35,
