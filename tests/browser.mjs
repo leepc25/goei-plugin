@@ -2901,9 +2901,15 @@ if (fixture.globalLore.some(packed)) {
     window.__cardSaves = [];
     // 가짜 setChatToIndex 는 저장마다 __calls.setChat 에 push 한다 — 그 push 를 가로채 그 순간의 display 결과를 적는다
     const arr = window.__calls.setChat;
-    arr.push = function (...a) { const r = Array.prototype.push.apply(this, a); window.__cardSaves.push(window.__calls.handlers.display(endReply).includes('data-goei-card="report"')); return r; };
+    arr.push = function (...a) {
+      const r = Array.prototype.push.apply(this, a);
+      const i = window.__cardSaves.push(null) - 1; // display 처리기가 비동기여도 저장 순서 자리를 지킨다
+      Promise.resolve().then(() => window.__calls.handlers.display(endReply)).then((h) => { window.__cardSaves[i] = String(h).includes('data-goei-card="report"'); }, (e) => { window.__cardSaves[i] = `오류: ${e && e.message ? e.message : e}`; });
+      return r;
+    };
   }, endReply);
   await fire(endReply);
+  await page.waitForFunction(() => window.__cardSaves.length > 0 && window.__cardSaves.every((v) => v !== null), null, { timeout: 5000 });
   const cardSaves = await page.evaluate(() => { const v = window.__cardSaves; delete window.__cardSaves; delete window.__calls.setChat.push; return v; });
   assert.ok(cardSaves.length >= 2 && cardSaves[0] === false && cardSaves.includes(true) && cardSaves.at(-1) === true, `종료 저장(아직 카드 없음) → 열쇠 표 채움 → 그대로 한 번 더 저장(카드 있음): ${JSON.stringify(cardSaves)}`);
   const ss = await page.evaluate(() => window.__chat.scriptstate);
