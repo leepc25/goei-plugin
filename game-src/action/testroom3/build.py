@@ -545,9 +545,9 @@ def chair_auto(cfg):
         print("의자 맞춤 실패", cfg["key"], e); return {}
 
 
-def build_char(cfg, force=False):
+def analyze(cfg, force=False):
+    """그림 처리(줄마다 시트·장별 수치). 서명이 같으면 .cache 를 씀. → (A, 다시 만들었나)"""
     key = cfg["key"]
-    js = OUT / "chars" / f"c{key.split('_')[0]}.js"   # 파일 이름은 ASCII만(Artifact 서버에서 한글 경로가 안 열림)
     cache = HERE / ".cache" / f"{key}.json"
     cache.parent.mkdir(exist_ok=True)
     sig = signature(cfg)
@@ -583,6 +583,11 @@ def build_char(cfg, force=False):
         cache.write_text(json.dumps({"sig": sig, "A": A}, ensure_ascii=False))
     for lid, an in cfg["anims"].items():   # 이름은 설정 것을 씀
         if lid in A: A[lid]["name"] = an.get("name", lid)
+    return A, rebuilt
+
+
+def payload_of(cfg, A):
+    """방·게임이 읽는 인물 설정 = chars/<키>.json + 그림에서 잰 것"""
     payload = {k: v for k, v in cfg.items() if k not in ("anims",)}
     payload["reachY"] = reach_y(cfg, ("14", "7", "23"))   # 점프 공격: 가장 앞으로 나간 손발의 높이(장마다) → 맞는 높이(10-28 「점프 공격 타점이 안 맞음」)
     payload["turn19"] = turn_after_down(cfg)   # 쓰러진 뒤 잇는 줄인데 머리 방향이 반대로 그려진 줄(10-28 이기석 기기: 머리·발이 뿅 바뀜) → 방에서 몸 방향을 돌려 이음
@@ -590,8 +595,15 @@ def build_char(cfg, force=False):
     payload["seam"], payload["ret"] = seam_map(A)   # 동작 끝 → 대기 이음새(10-29)
     payload["cycle"] = cycle_map(A)   # 걷기·뛰기 반복 구간(10-29)
     payload["chairAuto"] = chair_auto(cfg)   # 의자 자동 맞춤(chairfit.py). 손으로 맞춘 값은 설정 chars/<키>.json 의 "chair"가 이김
+    return payload
+
+
+def build_char(cfg, force=False):
+    key = cfg["key"]
+    js = OUT / "chars" / f"c{key.split('_')[0]}.js"   # 파일 이름은 ASCII만(Artifact 서버에서 한글 경로가 안 열림)
+    A, rebuilt = analyze(cfg, force)
     js.write_text("(window.__C=window.__C||{})[" + json.dumps(key, ensure_ascii=False) + "]=" +
-                  json.dumps({"cfg": payload, "A": A}, ensure_ascii=False, separators=(",", ":")) + ";\n", encoding="utf-8")
+                  json.dumps({"cfg": payload_of(cfg, A), "A": A}, ensure_ascii=False, separators=(",", ":")) + ";\n", encoding="utf-8")
     return js.stat().st_size, rebuilt
 
 
@@ -755,6 +767,31 @@ def load_vfx():
     return VFX
 
 
+def wanted(ch, npc):
+    """테스트룸(요원/NPC)에 넣는 인물인가"""
+    if npc:
+        if not ch["key"].startswith("6."): return False
+    elif ch["key"].startswith("6.") or (ch["key"] != EILEEN_KEY and not ch["state"].startswith("뽑음") and not ch["state"].startswith("완료")): return False
+    if ch["key"] != EILEEN_KEY and not (M3 / ch["key"]).exists(): return False
+    return True
+
+
+def load_cfg(ch, reset=()):
+    """인물 설정 = 자동값(표·그림) ⊕ chars/<키>.json ⊕ chairs/<키>.json. 줄이 없으면 None"""
+    auto = auto_cfg(ch)
+    if not auto["anims"]: return None
+    p = CHARS / f"{ch['key']}.json"
+    if not p.exists() or ch["key"] in reset:
+        p.write_text(dump_cfg(auto), encoding="utf-8")
+        cfg = auto
+    else:
+        cfg = deep_merge(auto, json.loads(p.read_text(encoding="utf-8")))
+    cp = HERE / "chairs" / f"{ch['key']}.json"   # 의자 손 맞춤(qa/fit_chair.py)
+    if cp.exists(): cfg["chair"] = json.loads(cp.read_text(encoding="utf-8"))
+    for lid in cfg.get("drop") or []: cfg["anims"].pop(lid, None)   # 인물마다 테스트룸에서 뺄 줄(파일은 그대로) — 곽성주 155 고기 굽기(사용자 10-28)
+    return cfg
+
+
 def main():
     global OUT
     args = sys.argv[1:]
@@ -766,22 +803,9 @@ def main():
     CHARS.mkdir(exist_ok=True); (OUT / "chars").mkdir(parents=True, exist_ok=True)
     index = []
     for ch in roster():
-        if npc:
-            if not ch["key"].startswith("6."): continue
-        elif ch["key"].startswith("6.") or (ch["key"] != EILEEN_KEY and not ch["state"].startswith("뽑음") and not ch["state"].startswith("완료")): continue
-        if ch["key"] != EILEEN_KEY and not (M3 / ch["key"]).exists(): continue
-        auto = auto_cfg(ch)
-        if not auto["anims"]: continue
-        p = CHARS / f"{ch['key']}.json"
-        if not p.exists() or ch["key"] in reset:
-            p.write_text(dump_cfg(auto), encoding="utf-8")
-            cfg = auto
-        else:
-            cfg = deep_merge(auto, json.loads(p.read_text(encoding="utf-8")))
-        cp = HERE / "chairs" / f"{ch['key']}.json"   # 의자 손 맞춤(qa/fit_chair.py)
-        if cp.exists(): cfg["chair"] = json.loads(cp.read_text(encoding="utf-8"))
-        for lid in cfg.get("drop") or []: cfg["anims"].pop(lid, None)   # 인물마다 테스트룸에서 뺄 줄(파일은 그대로) — 곽성주 155 고기 굽기(사용자 10-28)
-            # 사람이 지운 줄은 지운 채로, 새로 생긴 줄은 자동값으로
+        if not wanted(ch, npc): continue
+        cfg = load_cfg(ch, reset)
+        if cfg is None: continue
         if only is not None and ch["key"] not in only:
             js = OUT / "chars" / f"c{ch['key'].split('_')[0]}.js"
             if not js.exists(): continue
