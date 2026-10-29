@@ -468,7 +468,7 @@
       "speed": 1700,
       "time": 0.42,
       "hit": {
-       "dmg": 125,
+       "dmg": 151,
        "kind": "stun",
        "n": 4,
        "mid": "light",
@@ -588,7 +588,7 @@
        "w": 1.05,
        "dy": -80,
        "hit": {
-        "dmg": 84,
+        "dmg": 62,
         "kind": "stun"
        }
       },
@@ -624,7 +624,7 @@
          "at": "target",
          "scale": 0.7,
          "hit": {
-          "dmg": 114,
+          "dmg": 84,
           "kind": "light",
           "n": 2,
           "every": 0.1
@@ -664,7 +664,7 @@
        "life": 1.0,
        "pierce": true,
        "hit": {
-        "dmg": 318,
+        "dmg": 234,
         "kind": "blow",
         "n": 3,
         "mid": "heavy",

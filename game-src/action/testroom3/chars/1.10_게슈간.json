@@ -447,7 +447,7 @@
        {
         "t": "hit",
         "hit": {
-         "dmg": 300,
+         "dmg": 150,
          "kind": "blow",
          "stop": 0.12,
          "shake": 10
