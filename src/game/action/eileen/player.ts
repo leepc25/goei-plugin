@@ -11,6 +11,7 @@ import type { Body, Hit, HitResult, React, WBox, WorldView } from '../engine/con
 import type { Pad, Btn } from '../engine/input';
 import type { FrameInfo } from '../engine/art';
 import { createEileenCore } from './core';
+import type { AutoPilot, AutoSelf } from './autoPilot';
 
 /** 테스트룸 동작 이름 ↔ 엔진 버튼 */
 /** 에일린 그림 배율 (사용자 2026-10-25: 문에 비해 작다 → 처음 맞춰 본 크기로). 걷는 띠 가운데쯤(y500)에서 약 270px, 맨 뒤 260px · 맨 앞 305px */
@@ -203,7 +204,11 @@ export class EileenPlayer extends Player {
     for (const b of ['block', 'charge'] as Btn[]) if (p.released.has(b)) this.core.onRelease(b);
   }
 
+  /** 자동전투 (모바일 AUTO·O 키): 엔진 모듈이 붙인다. 켜져 있으면 사람 입력에 두뇌 입력을 섞는다 */
+  auto: AutoPilot | null = null;
+
   tick(world: WorldView, p: Pad) {
+    if (this.auto?.on && !this.seat) p = this.auto.apply(this as unknown as AutoSelf, world, p);
     this.world = world;
     const w = world as WorldView & { underlays: ((c: CanvasRenderingContext2D, camX: number) => void)[]; camX: number };
     if (!w.underlays.includes(this.underFn)) w.underlays.push(this.underFn);

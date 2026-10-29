@@ -47,6 +47,8 @@ import { hasVisitAgent, hasVisitClip, visitAgentFaceCanvas } from '../art/visitA
 import { drawTestMan, hasTestPeople, testPlayerFace, testPlayerTop } from '../art/testPeople';
 import { eileenHooks } from '../eileen/player';
 import { AiEileen } from '../eileen/aiFighter';
+import { AutoPilot } from '../eileen/autoPilot';
+import { CODE } from '../ui/keys';
 import { Squad, DIFF, type Difficulty } from '../../combat/brain';
 import { FieldFx, parseFxList } from '../fx/fieldFx';
 import { SUPER_TEXT } from '../fx/superText';
@@ -529,10 +531,12 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
     rescued: () => hq.state().rescued,
     photo: (k) => (bridge as { photo?: (n: string) => string | undefined } | undefined)?.photo?.(k) || (demoPhotos as Record<string, string>)[k],
     sfx: (n) => audio.play(n as never),
-    onOpen: (on) => shell.touch.setVisible(!on && shell.mode === 'play'),
+    // 대화창이 열리면 터치판은 숨지 않고 대사창 모드 (frame 이 한 곳에서 정한다)
+    onOpen: () => {},
   });
   (globalThis as { __goeiNpc?: unknown }).__goeiNpc = npc; // 시험용
   (globalThis as { __goeiStage?: unknown }).__goeiStage = shell.stage; // 시험용
+  Object.assign(globalThis as object, { __goeiTouch: shell.touch, __goeiInput: shell.input }); // 시험용 (모바일 조작)
   // 필드 요원: 지금 그림(몸 약 97도트)을 화면 약 255px로 (PixelLab 256 캔버스 몸 약 170도트 ×1.5 크기를 미리 보기). 원근은 view.persp
   setPixelScale(bridge?.visit ? 2.625 : 2.75);
   (globalThis as { __goeiSetPixel?: (p: number) => void }).__goeiSetPixel = setPixelScale; // 시험용
@@ -546,7 +550,26 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
   });
   // 출동 지도 (Z·Tab·M, 터치 「지도」): 열린 동안 게임이 멈춘다. 구석 미니맵은 늘
   let mapOpen = false;
-  let touchHiddenByHq = false;
+  // 자동전투 (모바일 AUTO·O 키, 세션 한정): 주인공 에일린의 입력을 대련 두뇌가 대신 만든다. 스틱을 만지면 직접 조작이 먼저
+  const pilot = new AutoPilot();
+  pilot.manual = () => {
+    const a = shell.input.axis();
+    return a.x !== 0 || a.y !== 0;
+  };
+  (globalThis as { __goeiAuto?: unknown }).__goeiAuto = pilot; // 시험용
+  const offAutoKey = shell.input.on((code, down) => {
+    if (!down || code !== CODE.auto) return;
+    // 싸움 없는 곳에서는 못 켠다 (버튼은 흐림). 켜 둔 것은 언제든 끈다
+    if (!pilot.on && !AutoPilot.fight(world)) return;
+    pilot.on = !pilot.on;
+    shell.touch.setAuto(pilot.on);
+  });
+  // 방문 대화(아래 한 줄 입력)의 터치 대사창 모드: 선택 = 입력칸 열기(키패드), 취소 = 닫기
+  const offTalkKey = shell.input.on((code, down, src) => {
+    if (!down || src !== 'touch' || !visit?.isOpen() || shell.menu.isOpen) return;
+    if (code === 'Escape') visit.close();
+    else if (code === 'Enter') shell.stage.ui.querySelector<HTMLInputElement>('.gt-in')?.focus({ preventScroll: true });
+  });
   let guardA = 0; // 방어 게이지 불투명도
   const offMapKey = shell.input.on((code, down) => {
     if (!down) return;
@@ -922,12 +945,15 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
     },
     onPlay: () => shell.play(),
     frame: (dt) => {
-      // 본부 메뉴 창(임무 창구 등)·엘리베이터 층 단추가 떠 있으면 터치 조작을 숨긴다: 폰에서 왼쪽 스틱 영역이 창 위에 겹쳐 단추를 못 눌렀다 (NPC 대화창과 같은 규칙)
-      const hqUp = !!game?.inHub && (!!hq.isOpen?.() || !floorBox.hidden);
-      if (hqUp !== touchHiddenByHq) {
-        touchHiddenByHq = hqUp;
-        shell.touch.setVisible(!hqUp && shell.mode === 'play' && !shell.menu.isOpen && !npc.isOpen());
-      }
+      // 터치판 모드를 한 곳에서 정한다 (모바일 조작 설계 2026-10-28): 본부 창(임무 창구 등)·승강기 층 단추·NPC 대화창·방문 대화·메뉴가 뜨면
+      // 「대사창 모드」(선택·취소 + 스틱 ↑↓, 선택지 글자 직접 누르기도 됨). 영상이 도는 동안만 숨긴다
+      const dialogUp = (!!game?.inHub && (!!hq.isOpen?.() || !floorBox.hidden)) || npc.isOpen() || !!visit?.isOpen() || shell.menu.isOpen;
+      shell.touch.setMode(dialogUp ? 'dialog' : 'play');
+      shell.touch.setVisible(!story.isVideoPlaying() && (shell.mode === 'play' || shell.menu.isOpen));
+      // 못 씀(흐림·자리 유지): 에일린 전투 몸이 아니면 전투 버튼, 싸움이 없으면 AUTO
+      const fighter = !!(world?.player as { core?: unknown } | undefined)?.core;
+      for (const id of ['light', 'heavy', 'dodge', 'block', 'unique', 'ult'] as const) shell.touch.setOff(id, !fighter);
+      shell.touch.setOff('auto', !pilot.on && !AutoPilot.fight(world));
       ffx.opt = { shake: shell.settings.shake, flash: shell.settings.flash, numbers: shell.settings.numbers };
       ffx.update(shell.paused ? 0 : dt);
       { const o = ffx.camera(); shell.canvas.style.translate = o.x || o.y ? `${o.x}px ${o.y}px` : ''; }
@@ -1020,9 +1046,7 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
         else if (m) drawMiniMap(ctx, m, w.player.x, t, U);
       } else mapOpen = false;
       syncNavigationButton(shell.canvas, hs.navigation);
-      shell.touch.setItems(hs.items);
       shell.touch.setGauge(w.player.gauge / 100);
-      shell.touch.hint('reload', w.player.ammo <= 2 && w.player.reserve > 0);
       shell.fx.drawTransition(ctx);
     },
     onScene: (name) => {
@@ -1048,6 +1072,7 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
       }
       cancelStoryForScene();
       world = w;
+      if (w.player instanceof EileenPlayer) w.player.auto = pilot;
       runAgent = run.agent as AgentId;
       // 첫 출동: 도트 영상 first_entry, 끝나면 로프 안내 자막 한 줄 (영상을 못 틀면 자막만)
       if (run.stageId !== 'hq' && (run as Launch).launch && !story.flags.told_rope) {
@@ -1111,6 +1136,9 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
       const g = globalThis as { __goeiStory?: unknown; __goeiStoryStart?: unknown; __goeiNpc?: unknown; __goeiStage?: unknown };
       // 시험용 손잡이도 놓는다: 남겨 두면 닫은 게임 하나(캔버스·엔진)가 다음에 열 때까지 그대로 남는다 (2026-10-28 QC)
       if (g.__goeiStage === shell.stage) delete g.__goeiStage;
+      const gt = globalThis as { __goeiTouch?: unknown; __goeiInput?: unknown };
+      if (gt.__goeiTouch === shell.touch) delete gt.__goeiTouch;
+      if (gt.__goeiInput === shell.input) delete gt.__goeiInput;
       eileenHooks.sfx = noSfx; // 모듈 수준 함수로: 여기서 새 화살표를 만들면 그 함수가 이 장면(shell)을 다시 붙잡는다
       const fx = globalThis as { __goeiFieldFx?: unknown };
       if (fx.__goeiFieldFx === ffx) delete fx.__goeiFieldFx;
@@ -1121,6 +1149,9 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
       game = null;
       window.removeEventListener('keydown', storyKeys, true);
       offMapKey();
+      offAutoKey();
+      offTalkKey();
+      if ((globalThis as { __goeiAuto?: unknown }).__goeiAuto === pilot) delete (globalThis as { __goeiAuto?: unknown }).__goeiAuto;
       window.removeEventListener('keydown', titleInput, true);
       window.removeEventListener('pointerdown', titleInput, true);
       if (openingT) clearTimeout(openingT);
