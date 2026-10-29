@@ -36,7 +36,7 @@ try {
  for(const mobile of [false,true]) {
   const ctx=await browser.newContext({viewport:mobile?{width:390,height:844}:{width:1280,height:950},isMobile:mobile,hasTouch:mobile});
   const page=await ctx.newPage();page.on('pageerror',e=>errors.push(String(e)));
-  await page.setContent('<!doctype html><html><body></body></html>');
+  await page.setContent('<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"></head><body></body></html>'); // 폰(isMobile) 틀이 980px 배치로 돌지 않게 viewport 메타
   await page.addScriptTag({content:bundle.outputFiles[0].text});await page.evaluate(()=>window.setup());
   await page.click('[data-rest="day"]');
   assert.deepEqual(await page.evaluate(()=>({day:hq.state.day,budget:hq.state.currencies.budget,injury:hq.state.agents.jyaldi.injured,fatigue:hq.state.agents.jyaldi.fatigue,runs:hq.state.runs})),{day:2,budget:0,injury:0,fatigue:0,runs:0});

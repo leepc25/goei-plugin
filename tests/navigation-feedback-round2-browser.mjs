@@ -23,7 +23,7 @@ window.fixture=(compact=false)=>{
  c.fillText=original;
 };
 `}});
-const fixtureHtml=`<!doctype html><meta charset="utf-8"><style>body{margin:0;background:#000}canvas{width:100%;max-height:100vh;object-fit:contain}</style><canvas width="1280" height="720"></canvas><script type="module">${fixture.outputFiles[0].text}</script>`;
+const fixtureHtml=`<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><style>body{margin:0;background:#000}canvas{width:100%;max-height:100vh;object-fit:contain}</style><canvas width="1280" height="720"></canvas><script type="module">${fixture.outputFiles[0].text}</script>`;
 const server=createServer((req,res)=>{res.setHeader('Content-Type','text/html');res.end(req.url.startsWith('/fixture')?fixtureHtml:game)});
 await new Promise(r=>server.listen(0,'127.0.0.1',r));const url=`http://127.0.0.1:${server.address().port}`;
 const browser=await chromium.launch({executablePath:process.env.CHROMIUM_PATH || undefined,headless:true,args:['--no-sandbox']});
