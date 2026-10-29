@@ -353,3 +353,16 @@
   .gw .ps-ctl > input, .gw .ps-ctl > select, .gw .dir-in > input, .gw .dir-in > select, .gw .st-range { width: 100%; }
   .gw .dir-in:has(> .dir-photo) > span:first-child, .gw .dir-in > .dir-photo, .gw .dir-in:has(> .dir-photo) > small, .gw .dir-in:has(> .dir-photo) > .dir-ext { grid-column: 1; }
 }
+
+/* 이미지 지침 페이지 (ui/imgprompt.ts): 묶음마다 카드, 입력칸·단추·목록에 여백 (2026-10-29 사용자: 입력칸이 바깥 테두리에 붙고 단추·목록이 다닥다닥) */
+.gw .gw-imgp > article { display: flex; flex-direction: column; gap: 18px; }
+.gw .gw-imgp .ps-group { margin: 0; padding: 16px 18px 18px; border: 1px solid var(--line); border-radius: 10px; background: var(--panel); }
+.gw .gw-imgp .ps-group > h3 { margin: 0 0 4px; }
+.gw .gw-imgp .ps-group > .ps-note { margin: 0 0 12px; }
+.gw .gw-imgp textarea.gx-search, .gw .gw-imgp input.gx-search { width: 100%; box-sizing: border-box; margin: 0; }
+.gw .gw-imgp .gx-row-btns { margin-top: 12px; gap: 10px; justify-content: flex-end; }
+.gw .gw-imgp .ip-names { gap: 10px; }
+.gw .gw-imgp .ip-name { padding: 10px 12px; }
+.gw .gw-imgp .ip-extra { margin-top: 12px; gap: 10px; }
+.gw .gw-imgp .ip-preview { margin-top: 14px; padding: 14px 16px; }
+.gw .gw-imgp .gx-err, .gw .gw-imgp .gx-hint { margin: 0; }

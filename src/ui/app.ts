@@ -1500,14 +1500,13 @@ function tabs(): string {
   const unreadPhone = view.kind === 'started' && phoneUnread(view.ctx);
   const cur: Tab = tab === 'mission' ? 'map' : tab;
   const item = (id: Tab, label: string, icon: string, cls = '', badge = '') =>
-    `<button class="gx-nb${cls ? ` ${cls}` : ''}${(cls === 'mob' ? cur === id : tab === id) ? ' on' : ''}" data-action="${cls === 'mob' ? 'tab' : 'nav-tab'}" data-value="${id}" aria-current="${tab === id ? 'page' : 'false'}">${icon}<span>${label}</span>${badge}</button>`;
+    `<button class="gx-nb${cls ? ` ${cls}` : ''}${cur === id ? ' on' : ''}" data-action="${cls === 'mob' ? 'tab' : 'nav-tab'}" data-value="${id}" aria-current="${tab === id ? 'page' : 'false'}">${icon}<span>${label}</span>${badge}</button>`;
   const ctx = view.kind === 'started' ? view.ctx : null;
   return `<nav class="gx-nav" aria-label="주요 화면">
     ${ctx ? brand(ctx) : ''}
     ${item('board', '상황판', ICONS.board)}
     ${item('map', '임무', ICONS.map, 'desk')}
     ${item('map', '임무', ICONS.map, 'mob')}
-    ${item('mission', '커스텀', ICONS.mission, 'desk')}
     ${item('phone', '괴담톡', ICONS.phone, '', unreadPhone ? '<span class="gx-nbadge dot" aria-label="새 메시지"></span>' : '')}
     ${GNET_ON ? item('gnet', gnetLabel(ctx?.chat.scriptstate), ICONS.gnet) : ''}
     ${item('wiki', '위키', ICONS.wiki)}
@@ -1544,7 +1543,12 @@ function idCard(ctx: ChatContext): string {
   const st = lastStatusFields((ctx.chat.message ?? []).filter((m) => m.role === 'char').slice(-6).map((m) => m.data));
   const time = (w ? clock(w.minute) : '') || [st?.date, st?.time].filter(Boolean).join(' ');
   const weather = [st?.weather, st?.temp].filter(Boolean).join(' ');
-  // 2026-10-29 정리 (시안 Main.dc.html): 사진 → 「이름 + 소속 칩」 → 잔고 줄(누르면 가계부 ›) → 「위치  시각 · 날씨」 → 「목표」
+  // 소속 사진 패널: 맨 위 소속 이름 한 줄, 가로줄 아래 위치·목표 한 줄씩, 맨 아래 왼쪽 날짜·시각 / 오른쪽 날씨·온도 (원본 v0.16.22 구조 그대로.
+  // 2026-10-29 사용자: 이름과 소속만 한 줄에, 나머지는 손대지 않는다)
+  const line = (label: string, value: string) => (value ? `<span class="gx-op-ln"><i>${label}</i><em>${esc(value)}</em></span>` : '');
+  const meta = time || weather ? `<span class="gx-op-meta"><span>${esc(time)}</span><span>${esc(weather)}</span></span>` : '';
+  // 첫 응답 전: 상황판 칸 배치는 그대로 두고, 비어 있는 이 자리에만 안내 (v0.16.31)
+  const status = line('위치', st?.place ?? '') + line('목표', st?.target ?? '') + meta || (w && w.minute === null ? '<span class="gx-op-wait">첫 응답 뒤에 위치·시각이 채워져요.</span>' : '');
   const u = userInfo();
   // 캐릭터로 플레이: 신분증도 그 요원 사진·이름·직급
   const pa = playerAgent(ctx.char.globalLore, ctx.chat.scriptstate);
@@ -1554,15 +1558,10 @@ function idCard(ctx: ChatContext): string {
   const photo = photoUrl
     ? `<span class="gx-id-photo"><img src="${esc(photoUrl)}" alt=""></span>`
     : `<span class="gx-id-photo none">${ICONS.idcard}</span>`;
-  const chips = `<span class="gx-badge own gx-id-fac">${esc(f ? selfName(ctx, f.code, f.name) : '소속 없음')}</span>${pa?.rank ? `<span class="gx-badge gx-id-fac">${esc(pa.rank)}</span>` : ''}`;
-  const line = (label: string, value: string, extra = '') => (value || extra ? `<span class="gx-id-row"><i>${label}</i><em>${esc(value)}</em>${extra}</span>` : '');
-  const meta = time || weather ? `<small>${esc([time.replace(/^\d{4}\./, ''), weather].filter(Boolean).join(' · '))}</small>` : '';
-  // 첫 응답 전: 상황판 칸 배치는 그대로 두고, 비어 있는 이 자리에만 안내 (v0.16.31)
-  const status = line('위치', st?.place ?? '', meta) + line('목표', st?.target ?? '') || (w && w.minute === null ? '<span class="gx-op-wait">첫 응답 뒤에 위치·시각이 채워져요.</span>' : '');
   return `<div class="gx-id">${img ? `<span class="gx-id-bg" style="background-image:url('${esc(img)}')"></span>` : ''}
       ${photo}
-      <span class="gx-id-who"><b>${esc(name)}</b>${chips}</span>
-      ${status || walletChip(ctx) ? `<span class="gx-op-st gx-id-rows">${walletChip(ctx)}${status}</span>` : ''}
+      <span class="gx-id-who"><b>${esc(name)}</b><small>${esc([f ? selfName(ctx, f.code, f.name) : '소속 없음', pa?.rank ?? ''].filter(Boolean).join(' · '))}</small></span>
+      ${status || walletChip(ctx) ? `<span class="gx-op-st">${walletChip(ctx)}${status}</span>` : ''}
     </div>`;
 }
 
@@ -1570,7 +1569,7 @@ function idCard(ctx: ChatContext): string {
 function walletChip(ctx: ChatContext): string {
   if (colConfig(ctx.chat.scriptstate).wallet === 'off') return '';
   const w = readWallet(ctx.chat.scriptstate, getPrefs().walletStart ?? WALLET_START_DEFAULT);
-  return `<button class="gx-id-row gx-id-wallet gx-wallet" data-action="tab" data-value="wallet" aria-label="잔고·가계부" title="가계부"><i>잔고</i><em>${esc(formatWon(walletBalance(w, aliveAnchors(ctx.chat))))}</em><span class="gx-id-go" aria-hidden="true">›</span></button>`;
+  return `<button class="gx-op-ln gx-wallet" data-action="tab" data-value="wallet" aria-label="잔고·가계부" title="가계부"><i>잔고</i><em>${esc(formatWon(walletBalance(w, aliveAnchors(ctx.chat))))}</em></button>`;
 }
 
 /** 내 소속은 내 시점의 이름으로 (가짜 관리국을 고르면 나에게는 그냥 관리국). 명부에서 이름을 바꿨으면 그 이름 */

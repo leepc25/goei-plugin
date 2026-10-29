@@ -395,8 +395,15 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
 .gx-sidecol .gx-sec { padding: 0; }
 .gx-mapbar { display: flex; gap: 8px; align-items: center; }
 /* 임무 탭 (v0.16.21): 지역 고르기 옆에 장소 검색. 결과는 아래로 펼쳐지는 작은 목록 */
-.gx-mapbar > .gx-select { flex: 0 0 200px; min-width: 0; }
+.gx-mapbar > .gx-select { flex: 0 0 150px; min-width: 0; }
 .gx-mapfind { position: relative; flex: 1; min-width: 0; }
+/* 임무 ↔ 커스텀 전환 (PC, ui/field.ts modeSwap): 지역·검색 줄과 커스텀 필터 줄의 오른쪽 끝. 눈에 띄게 (2026-10-29 사용자) */
+.gx-mswap { display: inline-flex; align-items: center; gap: 6px; flex: none; margin-left: auto; min-height: 36px; padding: 0 14px 0 12px; border: 1px solid var(--signal); border-radius: 999px; background: color-mix(in srgb, var(--signal) 14%, var(--panel)); color: var(--signal); font: inherit; font-size: 13px; font-weight: 700; letter-spacing: .02em; cursor: pointer; box-shadow: 0 0 0 3px color-mix(in srgb, var(--signal) 10%, transparent); }
+.gx-mswap:hover { background: color-mix(in srgb, var(--signal) 24%, var(--panel)); }
+.gx-mswap svg { width: 16px; height: 16px; }
+.gx-mfilter .gx-mswap { margin-left: auto; }
+@media (max-width: 760px) { .gx-mswap { display: none; } }
+
 .gx-mapfind .gx-search { width: 100%; font-size: 13px; }
 .gx-mapsug { position: absolute; top: calc(100% + 4px); left: 0; right: 0; z-index: 30; display: flex; flex-direction: column; max-height: 320px; overflow-y: auto; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); box-shadow: var(--shadow); }
 .gx-mapsug:empty { display: none; }
@@ -2975,20 +2982,8 @@ button.mk-go:hover { color: var(--signal); }
 .gx-upright input { flex: 1; min-width: 0; font: 16px/1.4 inherit; padding: 8px 10px; color: #fff; background: #2b2620; border: 2px solid #6e6350; border-radius: 6px; outline: none; }
 .gx-upright button { font: 15px inherit; padding: 0 12px; color: #ffe27a; background: #3d3428; border: 2px solid #c9a74a; border-radius: 6px; }
 
-/* ── 사원증 정리 (2026-10-29, 시안 Main.dc.html): 사진 → 이름 + 소속 칩 → 잔고 줄(› 가계부) → 위치 (시각 · 날씨) → 목표 ── */
-.gx-id-who { flex-direction: row; flex-wrap: wrap; align-items: center; justify-content: center; gap: 6px 8px; }
-.gx-id-who .gx-id-fac { font-size: 11.5px; padding: 4px 9px; }
-.gx-id-who .gx-badge.own { color: var(--signal); background: var(--accent-bg); box-shadow: inset 0 0 0 1px var(--accent-line); }
-.gx-id .gx-id-rows { gap: 0; padding-top: 4px; }
-.gx-id-row { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 8px; min-width: 0; width: 100%; padding: 7px 0; border-bottom: 1px solid color-mix(in srgb, var(--line) 60%, transparent); font-size: 12.5px; line-height: 1.4; text-align: left; }
-.gx-id-row:last-child { border-bottom: 0; }
-.gx-id-row i { flex: none; width: 28px; font-style: normal; font-size: 10.5px; font-weight: 700; letter-spacing: .06em; color: var(--dim); }
-.gx-id-row em { flex: 1 1 72px; min-width: 0; font-style: normal; font-weight: 600; color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.gx-id-row small { flex: 0 1 auto; margin-left: auto; max-width: 100%; font-size: 11px; color: var(--sub); font-variant-numeric: tabular-nums; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.gx-id-wallet { cursor: pointer; }
-.gx-id-wallet em { font-variant-numeric: tabular-nums; }
-.gx-id-wallet .gx-id-go { flex: none; color: var(--dim); font-size: 15px; line-height: 1; }
-.gx-id-wallet:hover em, .gx-id-wallet:hover .gx-id-go { color: var(--signal); }
+/* 사원증: 이름과 소속을 한 줄에 (2026-10-29 사용자). 나머지는 원본 구조 */
+.gx-id-who { flex-direction: row; flex-wrap: wrap; align-items: baseline; justify-content: center; gap: 2px 8px; }
 
 /* ── 상황판: 종료 줄 보고서 지름길·「기록에서 전부 보기」·종료 알림 ── */
 .gx-oprpt { flex: none; display: grid; place-items: center; width: 32px; height: 32px; padding: 0; border: 1px solid var(--line); border-radius: 9px; background: var(--panel2); color: var(--signal); cursor: pointer; }

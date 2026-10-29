@@ -222,7 +222,7 @@ function featurePage(ctx: ChatContext, page: NonNullable<typeof settingsUi.page>
 }
 
 /** 설정 묶음 하나 (편집 창의 「설정」 페이지가 묶음별로 가져다 쓴다, 2026-10-27) */
-export type SettingsSection = 'screen' | 'image' | 'board' | 'adv' | 'update';
+export type SettingsSection = 'screen' | 'image' | 'board' | 'status' | 'adv' | 'update';
 export function settingsSection(ctx: ChatContext, scope: SettingsScope, canChat: boolean, section: SettingsSection): string {
   return settingsTab(ctx, scope, canChat, section);
 }
@@ -284,7 +284,6 @@ export function settingsTab(ctx: ChatContext, scope: SettingsScope = 'chat', can
     screen: `${group('화면', [
       // 테마는 채팅마다 ($st_fixed_theme, 원본 ensureDefaults) — 시작 뒤엔 이 채팅, 시작 전엔 새 채팅 기본값 (2026-10-28 QC: 「이 기기」 배지가 붙어 있었지만 실제로는 채팅에 저장됐다)
       field('테마', seg('set-theme', theme, [['light', '라이트'], ['dark', '다크'], ['paper', '페이퍼']], busy), `채팅 화면의 캐릭터 이미지 배경과 상태창(「테마」를 골랐을 때) 배색이에요. ${scope === 'chat' ? '이 채팅에 저장돼요. 새 채팅의 기본값은 시작 화면의 설정에서 정해요.' : '새 채팅이 시작할 때 쓸 배색이에요.'}`, scope === 'chat' ? 'chat' : 'defaults'),
-      field('상태창', seg('set-status', getPrefs().status ?? 'auto', [['auto', '테마'], ['dark', '다크'], ['light', '라이트'], ['paper', '페이퍼'], ['off', '미표시']], busy), '채팅 속 상태창의 배색이에요. 「테마」는 위 테마를 따라가요. 미표시를 고르면 상자만 숨기고, 모델은 상태 태그를 계속 써요.', 'device'),
       field('메뉴 위치', seg('set-nav', getPrefs().nav ?? 'left', [['left', '왼쪽'], ['right', '오른쪽']], busy), 'PC 창에서 메뉴 목록을 놓을 쪽이에요.', 'device'),
       field('위키 목록 위치', seg('set-wiki-side', getPrefs().wikiSide ?? 'left', [['left', '왼쪽'], ['right', '오른쪽']], busy), 'PC 창에서 위키의 세로바와 숨은 목록 서랍을 놓을 쪽이에요. 모바일은 늘 오른쪽 아래 「목록」 책갈피예요.', 'device'),
       field('요원 칸', seg('set-agents', getPrefs().agents ?? 'wall', [['wall', '모니터'], ['list', '목록']], busy), '상황판 요원 칸 모양이에요.', 'device'),
@@ -312,8 +311,6 @@ export function settingsTab(ctx: ChatContext, scope: SettingsScope = 'chat', can
       field('지원 투입', seg('set-support', s.supportOn ? '1' : '0', [['1', 'ON'], ['0', 'OFF']], busy), '편성에서 등록 요원 외의 일반 지원 인원을 더할 수 있어요.'),
       field('인물 기록', seg('set-people', peopleOn ? '1' : '0', [['1', 'ON'], ['0', 'OFF']], busy), scope === 'chat' ? '응답마다 보조 모델이 한 번 읽어 인물의 상태·관계·호감을 기록하고, 본편 요청이 그 기록을 읽어요. 세부는 「기능별 설정 → 인물 기록」에서.' : '새 채팅을 인물 기록을 켠 채로 시작할지 정해요.'),
     ].join(''))}
-    ${group(`상태창 칸 <small>${usedCols(colCfg).length}칸 사용</small>`, `${statusColsTable(colCfg, busy)}${colCfg.wallet !== 'off' ? field('시작 잔고', wonInput(walletStart, busy, startLocked), scope === 'chat' ? `이 채팅 장부의 시작 잔고예요. 지금 잔고 ${esc(formatWon(walletNow))}. 거래 내역은 가계부 탭에서.${startLocked ? ' 이야기가 시작돼서 잠겼어요(아래 「잔고 직접 수정」을 켜면 바꿀 수 있어요).' : ''}` : '새 채팅 장부의 시작 잔고예요. 거래는 인물 기록 갱신기가 본문에서 금액이 적힌 것만 뽑아 더하고 빼요.') : ''}${colCfg.wallet !== 'off' ? field('잔고 직접 수정', seg('set-wallet-edit', walletEdit ? '1' : '0', [['1', 'ON'], ['0', 'OFF']], busy), '켜면 가계부에서 잔고를 고치고 거래를 지울 수 있고, 진행 중인 채팅의 시작 잔고도 바꿀 수 있어요. 이야기 밖에서 바뀐 잔고는 모델이 이유를 몰라 대화가 길어질수록 앞뒤가 꼬이기 쉬워서 기본은 꺼 둬요.') : ''}`,
-      `응답 끝의 상태 태그 <code>[▣|…]</code>에 들어가는 칸이에요. 「안 씀」으로 하면 태그에서 그 칸이 빠지고(모델에 모양을 알려 줘요), 「숨김」은 태그에는 두고 채팅 속 상태창 상자에서만 가려요.${scope === 'chat' ? ' 바꾼 구성은 이 채팅에 바로 적용되고 바뀐 시점이 기록돼요.' : ' 새 채팅의 기본 구성이에요.'}`)}
     <section class="ps-group"><h3>괴이 발생</h3><p class="ps-note">응답을 처리할 때마다 판정해요. 상한을 0으로 하면 그 종류는 자동으로 생기지 않아요.</p>
       <div class="ps-cards">
         ${worldKind(world, 'preset', '프리셋 괴이', busy)}${worldKind(world, 'random', '랜덤 괴이', busy)}
@@ -323,6 +320,13 @@ export function settingsTab(ctx: ChatContext, scope: SettingsScope = 'chat', can
           <p class="ps-note">직접 고르거나 RP 중에 새로 등장한 것을 상한과 따로 기록할 수 있는 개수예요.</p></div>
       </div>
     </section>`,
+    // 상태창: 배색(이 기기)과 칸 구성(이 채팅). 2026-10-29 사용자: 상황판 페이지에 섞여 있던 것을 따로 뺌
+    status: `${group('상태창', [
+      field('상태창', seg('set-status', getPrefs().status ?? 'auto', [['auto', '테마'], ['dark', '다크'], ['light', '라이트'], ['paper', '페이퍼'], ['off', '미표시']], busy), '채팅 속 상태창의 배색이에요. 「테마」는 위 테마를 따라가요. 미표시를 고르면 상자만 숨기고, 모델은 상태 태그를 계속 써요.', 'device'),
+    ].join(''))}
+    ${group(`상태창 칸 <small>${usedCols(colCfg).length}칸 사용</small>`, `${statusColsTable(colCfg, busy)}${colCfg.wallet !== 'off' ? field('시작 잔고', wonInput(walletStart, busy, startLocked), scope === 'chat' ? `이 채팅 장부의 시작 잔고예요. 지금 잔고 ${esc(formatWon(walletNow))}. 거래 내역은 가계부 탭에서.${startLocked ? ' 이야기가 시작돼서 잠겼어요(아래 「잔고 직접 수정」을 켜면 바꿀 수 있어요).' : ''}` : '새 채팅 장부의 시작 잔고예요. 거래는 인물 기록 갱신기가 본문에서 금액이 적힌 것만 뽑아 더하고 빼요.') : ''}${colCfg.wallet !== 'off' ? field('잔고 직접 수정', seg('set-wallet-edit', walletEdit ? '1' : '0', [['1', 'ON'], ['0', 'OFF']], busy), '켜면 가계부에서 잔고를 고치고 거래를 지울 수 있고, 진행 중인 채팅의 시작 잔고도 바꿀 수 있어요. 이야기 밖에서 바뀐 잔고는 모델이 이유를 몰라 대화가 길어질수록 앞뒤가 꼬이기 쉬워서 기본은 꺼 둬요.') : ''}`,
+      `응답 끝의 상태 태그 <code>[▣|…]</code>에 들어가는 칸이에요. 「안 씀」으로 하면 태그에서 그 칸이 빠지고(모델에 모양을 알려 줘요), 「숨김」은 태그에는 두고 채팅 속 상태창 상자에서만 가려요.${scope === 'chat' ? ' 바꾼 구성은 이 채팅에 바로 적용되고 바뀐 시점이 기록돼요.' : ' 새 채팅의 기본 구성이에요.'}`)}
+`,
     adv: `${advSections('gen', scope === 'chat' ? ctx.chat.scriptstate : getPrefs().vars, scope === 'chat' && canChat ? { 1: loreCheckBox(ctx) } : {})}`,
     update: `${updateGroup(ctx)}`,
   };

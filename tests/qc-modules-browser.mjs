@@ -1205,7 +1205,7 @@ if (want('WL1')) {
   };
   const { page, errors } = await boot(fixture, chat);
   await open(page);
-  await page.click('.gx-nav-brand .gx-id-wallet');
+  await page.click('.gx-nav-brand .gx-wallet');
   await page.waitForSelector('.gx-wallettab');
   assert.ok((await page.textContent('.gx-wt-tile.bal b')).includes('155,000'));
   assert.equal(await page.locator('.gx-wt-pen').count(), 0, '수정 끔: ✎ 없음');

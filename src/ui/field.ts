@@ -205,6 +205,7 @@ function mapBar(x: Ctx): string {
       <select class="gx-select" data-change="map-region" aria-label="지역">${options}</select>
       <div class="gx-mapfind"><input class="gx-search" type="search" placeholder="장소 검색" value="${esc(field.mapq)}" data-input="map-query" aria-label="장소 검색" autocomplete="off">
         <div class="gx-mapsug">${mapSuggest(x.catalog)}</div></div>
+      ${modeSwap('mission')}
     </div>`;
   return bar;
 }
@@ -427,6 +428,11 @@ function fieldDrawer(x: Ctx, withMap: boolean): string {
 
 /** 모바일 단계 바: ① 목표 → ② 편성 (CSS로 모바일에서만 보이고, 고른 단계만 보인다).
  *  swap: 오른쪽 끝 임무↔커스텀 전환 (v0.16.18: 위에 따로 있던 전환 줄은 자리만 차지했다) */
+/** PC: 임무 ↔ 커스텀 전환 단추 (2026-10-29 사용자: 왼쪽 메뉴의 「커스텀」을 없애고 임무 창 안에서 전환. 지역·검색 줄 오른쪽 끝, 눈에 띄게). 폰은 단계 줄의 전환 단추를 쓴다 */
+function modeSwap(to: 'map' | 'mission'): string {
+  return `<button class="gx-mswap desk" data-action="tab" data-value="${to}" aria-label="${to === 'map' ? '임무로 전환' : '커스텀 임무로 전환'}">${ICONS.swap}<span>${to === 'map' ? '임무' : '커스텀 임무'}</span></button>`;
+}
+
 function stepBar(goal: string | null, swap?: 'map' | 'mission'): string {
   const used = field.team.length + field.support + 1;
   const b = (k: 'goal' | 'team', n: string, label: string, sub: string) =>
@@ -553,7 +559,7 @@ export function missionTab(ctx: ChatContext, opening: boolean, notice: string, b
     ${stepBar(field.mname, opening ? undefined : 'map')}
     <div class="gx-mapcol">
       ${intro}
-      <div class="gx-mfilter">${segs}<input class="gx-search" type="search" placeholder="검색" value="${esc(field.query)}" data-input="mission-query" aria-label="검색">${cancelChip('mission-unpick', !!field.mname)}</div>
+      <div class="gx-mfilter">${segs}<input class="gx-search" type="search" placeholder="검색" value="${esc(field.query)}" data-input="mission-query" aria-label="검색">${cancelChip('mission-unpick', !!field.mname)}${opening ? '' : modeSwap('map')}</div>
       <div class="gx-mbox">${missionList(ctx, opening)}</div>
     </div>
     <div class="gx-sidecol">

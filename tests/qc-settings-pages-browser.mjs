@@ -10,7 +10,7 @@ const which = process.argv[3] ?? 'all';
 const vps = which === 'all' ? Object.keys(VIEWPORTS) : [which];
 const browser = await launch();
 
-const PAGES = ['screen', 'image', 'board', 'gnet', 'phone', 'wiki', 'visit', 'people', 'journal', 'adv', 'update'];
+const PAGES = ['screen', 'image', 'board', 'status', 'gnet', 'phone', 'wiki', 'visit', 'people', 'journal', 'adv', 'update'];
 /** 기능 페이지: 값은 늘 이 채팅 변수 (범위 전환 없음) */
 const FEATURE = new Set(['gnet', 'phone', 'wiki', 'visit', 'people', 'journal']);
 /** 누르면 저장이 아니라 다른 일을 하는 단추 (확인창·네트워크·화면 이동·LLM 호출) — 전수 클릭에서 뺀다 */

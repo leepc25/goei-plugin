@@ -1026,7 +1026,6 @@ export function phoneTab(ctx: ChatContext, env: PhoneEnv): string {
     tool('ph-group', ICONS.group, '단톡 만들기', busy ? 'disabled' : '', '단톡'),
     tool('ph-add', ICONS.addUser, '연락처 추가', '', '추가'),
     tool('ph-call', ICONS.call, '전화 걸기', 'data-value=""', '전화'),
-    tool('ph-settings', ICONS.settings, '괴담톡 설정', phone.view === 'settings' ? 'aria-pressed="true"' : '', '설정'),
   ].join('');
   return `<main class="gx-body ph ph-app ${detail ? 'is-detail' : 'is-list'}">
     <section class="ph-side" aria-label="괴담톡 목록">

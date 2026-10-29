@@ -28,10 +28,10 @@ import { worldOn } from '../../core/world';
 import { ppValue } from '../../core/people/settings';
 
 /** 설정 페이지 (2026-10-27: 모든 설정은 이 창 하나로. 지침은 그 기능 페이지 아래에) */
-export type SetPage = 'screen' | 'image' | 'board' | 'gnet' | 'phone' | 'wiki' | 'visit' | 'people' | 'journal' | 'adv' | 'update';
+export type SetPage = 'screen' | 'image' | 'board' | 'status' | 'gnet' | 'phone' | 'wiki' | 'visit' | 'people' | 'journal' | 'adv' | 'update';
 export type GuideNode = `guide:${GuideName | 'Image'}`;
 export type EditorNode = WorldKind | 'base' | 'relations' | `set:${SetPage}` | 'install' | GuideNode | ManageNode | `rule:${string}`;
-const SET_PAGES: SetPage[] = ['screen', 'image', 'board', 'gnet', 'phone', 'wiki', 'visit', 'people', 'journal', 'adv', 'update'];
+const SET_PAGES: SetPage[] = ['screen', 'image', 'board', 'status', 'gnet', 'phone', 'wiki', 'visit', 'people', 'journal', 'adv', 'update'];
 export const isSetNode = (n: string): n is `set:${SetPage}` => n.startsWith('set:') && SET_PAGES.includes(n.slice(4) as SetPage);
 export const isGuideNode = (n: string): n is GuideNode => n.startsWith('guide:');
 /* 상단 탭 (2026-10-27 리수폿식): 설정(기능) · 세계 · 지침 · 관리. 왼쪽 목록은 탭마다 다르다 */
@@ -281,15 +281,15 @@ function touched(): void {
 
 export const isKind = (n: string): n is WorldKind => ['agent', 'org', 'anomaly', 'site', 'appendix'].includes(n);
 
-const SET_LABEL: Record<SetPage, string> = { screen: '화면', image: '캐릭터 이미지', board: '상황판', gnet: '괴담넷', phone: '괴담톡', wiki: '위키', visit: '필드', people: '인물 기록', journal: '기록', adv: '고급', update: '업데이트' };
-const SET_ICON: Record<SetPage, string> = { screen: ICONS.settings, image: ICONS.cctv, board: ICONS.grid, gnet: ICONS.gnet, phone: ICONS.phone, wiki: ICONS.wiki, visit: ICONS.game, people: ICONS.group, journal: ICONS.records, adv: ICONS.pen, update: ICONS.refresh };
+const SET_LABEL: Record<SetPage, string> = { screen: '화면', image: '캐릭터 이미지', board: '상황판', status: '상태창', gnet: '괴담넷', phone: '괴담톡', wiki: '위키', visit: '필드', people: '인물 기록', journal: '기록', adv: '고급', update: '업데이트' };
+const SET_ICON: Record<SetPage, string> = { screen: ICONS.settings, image: ICONS.cctv, board: ICONS.grid, status: ICONS.list, gnet: ICONS.gnet, phone: ICONS.phone, wiki: ICONS.wiki, visit: ICONS.game, people: ICONS.group, journal: ICONS.records, adv: ICONS.pen, update: ICONS.refresh };
 type TreeItem = [EditorNode, string, string, string?];
 const setItem = (p: SetPage): TreeItem => [`set:${p}`, SET_LABEL[p], SET_ICON[p]];
 const guideItem = (g: GuideName | 'Image'): TreeItem => [`guide:${g}`, g === 'Image' ? '이미지' : GUIDE_LABEL[g], ICONS.book];
 /** 탭마다 왼쪽 목록 (제목 + 항목). 설정 탭 항목에는 켬/끔 배지, 세계 탭에는 개수 */
 function treeOf(tab: Tab): { title: string; items: TreeItem[] }[] {
   switch (tab) {
-    case 'set': return [{ title: '기능', items: (['screen', 'image', 'board', 'gnet', 'phone', 'wiki', 'visit', 'people', 'journal', 'adv'] as SetPage[]).map(setItem) }];
+    case 'set': return [{ title: '기능', items: (['screen', 'image', 'board', 'status', 'gnet', 'phone', 'wiki', 'visit', 'people', 'journal', 'adv'] as SetPage[]).map(setItem) }];
     case 'world': return [{ title: '세계', items: [['agent', '요원', ICONS.person], ['org', '조직', ICONS.org], ['anomaly', '괴이', ICONS.spook], ['site', '파밍', ICONS.star], ['appendix', '부록', ICONS.book], ['base', '거점', ICONS.pin], ['relations', '세력 관계', ICONS.grid]] }];
     case 'guide': return [
       { title: '추가 규칙', items: ruleTreeItems().map(([id, label, badge]) => [id as EditorNode, label, id === 'rule:new' ? ICONS.plus : ICONS.pen, badge] as TreeItem) },
@@ -347,6 +347,7 @@ function settingsPage(ctx: ChatContext, page: SetPage): string {
     case 'screen': body = sec('screen'); break;
     case 'image': body = sec('image') + `<section class="ps-group"><h3>이미지 지침</h3><div class="ps-rows">${imgPromptPane(ctx)}</div></section>`; break;
     case 'board': body = sec('board'); break;
+    case 'status': body = sec('status'); break;
     case 'gnet': body = feat('gnet'); break;
     case 'phone': body = feat('phone'); break;
     case 'wiki': body = feat('wiki'); break;
@@ -417,7 +418,7 @@ function tree(ctx: ChatContext | null): string {
 function guideNodePage(ctx: ChatContext, n: GuideNode): string {
   const g = n.slice(6) as GuideName | 'Image';
   const crumb = `지침 / ${g === 'RP' || g === 'Directive' || g === 'Tag' ? '기본 지침' : '기능별 지침'}`;
-  if (g === 'Image') return `<div class="gw-page gw-set"><header class="gw-head"><h2>이미지 지침</h2><p class="gx-muted">카드 로어북 대신 플러그인이 만드는 이미지 태그 지침이에요. 지침 틀, 출력 대상 캐릭터(명부에서 자동), 표정 세트를 여기서 관리해요.</p></header><div class="gx-settings gw-setbody"><section class="ps-group"><div class="ps-rows">${imgPromptPane(ctx)}</div></section></div></div>`;
+  if (g === 'Image') return `<div class="gw-page gw-set"><header class="gw-head"><h2>이미지 지침</h2><p class="gx-muted">카드 로어북 대신 플러그인이 만드는 이미지 태그 지침이에요. 지침 틀, 출력 대상 캐릭터(명부에서 자동), 표정 세트를 여기서 관리해요.</p></header><div class="gx-settings gw-setbody gw-imgp">${imgPromptPane(ctx)}</div></div>`;
   return guidePage(g, crumb);
 }
 

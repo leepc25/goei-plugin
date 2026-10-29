@@ -178,8 +178,8 @@ async function leaveField(page) {
   await page.click('[data-action="ed-tab"][data-value="world"]');
   assert.ok(await page.$('[data-action="ed-node"][data-value="agent"]'), '시작 전에도 세계 편집 트리');
   await page.click('[data-action="ed-tab"][data-value="set"]');
-  await page.click('[data-action="ed-node"][data-value="set:board"]');
-  // 2026-10-27 설정 창 재작성: 상태창 칸 표는 접힘(summary) 없이 「상태창 칸」 묶음 안에, 괴이 발생도 접힘 없이 묶음
+  await page.click('[data-action="ed-node"][data-value="set:status"]');
+  // 2026-10-29: 상태창 칸·배색은 「상태창」 페이지. 상태창 칸 표는 접힘(summary) 없이 「상태창 칸」 묶음 안에, 괴이 발생도 접힘 없이 묶음
   await page.waitForSelector('.st-cols .st-col-row');
   // 4단계: 상태창 칸 표 (새 채팅 기본값) — 잠긴 칸은 끌 수 없고, 끈 칸은 표시 조작이 잠긴다
   assert.equal(await page.locator('.st-col-row').count(), 10, '상태창 칸 10개');
@@ -582,11 +582,11 @@ if (fixture.globalLore.some((e) => String(e.comment).startsWith('📚Lore slot')
     await page.setViewportSize({ width: 1600, height: Number(process.env.VH || 1200) });
     await page.evaluate(() => { document.querySelector('.gx-body').scrollTop = 0; });
     await page.screenshot({ path: `${shots}/9-board-wide.png` });
-    await page.click('.gx-nav .gx-nb:not(.mob)[data-value="mission"]');
+    await page.click('.gx-mswap[data-value="mission"]');
     await pickCustom(page);
     await page.waitForTimeout(200);
     await page.screenshot({ path: `${shots}/9-mission-wide.png` });
-    for (const t of ['board', 'map', 'mission', 'phone', 'wiki', 'settings']) {
+    for (const t of ['board', 'map', 'phone', 'wiki', 'settings']) {
       await page.click(`.gx-nav .gx-nb:not(.mob)[data-value="${t}"]`); await page.waitForTimeout(150);
       await page.screenshot({ path: `${shots}/9-tab-${t}.png` });
     }
@@ -740,6 +740,7 @@ if (fixture.globalLore.some((e) => String(e.comment).startsWith('📚Lore slot')
       await page.waitForSelector('.gx-nb.on[data-value="wiki"], .nw-doc, .nw-write', { timeout: 15000 });
       // 설정 「상태창」: 페이퍼 → 그린 상자도 바로 바뀜, 미표시 → 숨김
       await page.click('.gx-nav .gx-nb.desk[data-action="ed-open"]');
+      await edGo(page, 'set:status');
       await page.click('[data-action="set-status"][data-value="paper"]');
       await page.waitForFunction(() => JSON.parse(window.__store['p:goei:prefs'] || '{}').status === 'paper');
       assert.equal(await page.evaluate(() => getComputedStyle(document.querySelector('#msg .x-risu-gst')).backgroundColor), 'rgb(250, 245, 233)');
@@ -1022,13 +1023,13 @@ async function startedWithReply(page, { phoneAuto = false } = {}) {
   // 진행 중 채팅: 커스텀 임무 탭에서 미스틱 사이트 요청
   await page.evaluate(() => { window.__chat.message.push({ role: 'char', data: '응답' }); const g = document.querySelector('.gx'); if (g) g.style.display = 'none'; });
   await open(page);
-  await page.click('.gx-nav .gx-nb:not(.mob)[data-value="mission"]');
+  await page.click('.gx-mswap[data-value="mission"]');
   await page.click('[data-action="mission-kind"][data-value="ms"]');
   await pickCustom(page);
   const site = (await page.textContent('.gx-goal b')).trim();
   // 다른 탭에 다녀와도 고른 목표 유지
   await page.click('.gx-nav .gx-nb:not(.mob)[data-value="wiki"]');
-  await page.click('.gx-nav .gx-nb:not(.mob)[data-value="mission"]');
+  await page.click('.gx-mswap[data-value="mission"]');
   assert.equal((await page.textContent('.gx-goal b')).trim(), site, '탭 이동 뒤에도 목표 유지');
   if (shots) await page.screenshot({ path: `${shots}/12-mission-tab.png` });
   await page.click('[data-action="mission-send"]');
@@ -1039,7 +1040,7 @@ async function startedWithReply(page, { phoneAuto = false } = {}) {
   // 요청 취소
   await open(page);
   // 이미 커스텀 탭이면 다시 누르지 않는다 (한 번 더 누르면 상황판으로 간다)
-  if (!(await page.$('.gx-nav .gx-nb:not(.mob).on[data-value="mission"]'))) await page.click('.gx-nav .gx-nb:not(.mob)[data-value="mission"]');
+  if (!(await page.$('.gx-mission'))) await page.click('.gx-mswap[data-value="mission"]');
   await page.click('[data-action="mission-cancel"][data-value="ms"]');
   await page.waitForFunction(() => !JSON.parse(window.__chat.scriptstate.$goei_world).pending.ms);
   // 목록의 「위키」: 위키 탭의 그 제목으로
@@ -1757,7 +1758,7 @@ if (fixture.globalLore.some(packed)) {
   await page.click('.gw [data-action="set-support"][data-value="0"]');
   await page.waitForFunction(() => window.__chat.scriptstate.$st_support_on === '0');
   await edClose(page);
-  await page.click('.gx-nav .gx-nb:not(.mob)[data-value="mission"]');
+  await page.click('.gx-mswap[data-value="mission"]');
   await page.waitForSelector('.gx-mbox');
   await pickCustom(page, '.gx-mbox li.gx-mx');
   await page.waitForSelector('.gx-team');
@@ -2854,14 +2855,15 @@ if (fixture.globalLore.some(packed)) {
   // 왼쪽 메뉴: 「기록」 있음, 「가계부」 없음 (메뉴 수 그대로)
   assert.equal(await page.locator('.gx-nav > .gx-nb.desk[data-value="records"]').count(), 1, '메뉴에 기록');
   assert.equal(await page.locator('.gx-nav > .gx-nb[data-value="wallet"]').count(), 0, '메뉴에 가계부 없음');
-  // 사원증: 사진 → 이름+소속 칩 → (잔고 → 위치) 줄
+  // 사원증: 원본 구조(사진 → 이름·소속 한 줄 → 잔고·위치·시각 줄). 2026-10-29 사용자: 이름과 소속만 한 줄, 나머지는 손대지 않음
   const idOrder = await page.$$eval('.gx-nav-brand .gx-id > *', (l) => l.map((e) => e.className.split(' ')[0]));
   assert.ok(idOrder.indexOf('gx-id-photo') < idOrder.indexOf('gx-id-who') && idOrder.indexOf('gx-id-who') < idOrder.indexOf('gx-op-st'), idOrder.join(','));
-  assert.ok((await page.textContent('.gx-nav-brand .gx-id-who .gx-id-fac')).includes('관리국'), '소속 칩');
-  assert.deepEqual(await page.$$eval('.gx-nav-brand .gx-id-rows > *', (l) => l.map((e) => e.querySelector('i')?.textContent)), ['잔고', '위치']);
-  assert.ok((await page.textContent('.gx-nav-brand .gx-id-row:has(i:text("위치"))')).includes('02:47'), '위치 줄에 시각');
+  assert.ok((await page.textContent('.gx-nav-brand .gx-id-who small')).includes('관리국'), '소속');
+  assert.equal(await page.$eval('.gx-nav-brand .gx-id-who', (e) => getComputedStyle(e).flexDirection), 'row', '이름·소속 한 줄');
+  assert.deepEqual(await page.$$eval('.gx-nav-brand .gx-op-st > .gx-op-ln', (l) => l.map((e) => e.querySelector('i')?.textContent)), ['잔고', '위치']);
+  assert.ok((await page.textContent('.gx-nav-brand .gx-op-meta')).includes('02:47'), '시각 줄');
   // 잔고 줄 → 가계부 화면 (메뉴 없이도)
-  await page.click('.gx-nav-brand .gx-id-wallet');
+  await page.click('.gx-nav-brand .gx-wallet');
   await page.waitForSelector('.gx-wallettab');
   assert.equal(await tabNow(), 'wallet');
   // 기록 탭: 하위 탭 넷, 같은 너비, 빈 일지, 「오늘 일지 이미지로」 없음
@@ -3136,8 +3138,8 @@ if (fixture.globalLore.some(packed)) {
   assert.ok(Math.max(...tabW) - Math.min(...tabW) <= 1, `폰 하위 탭 같은 너비 (${tabW.join(',')})`);
   // 폰 머리 사원증 창의 잔고 줄 → 가계부
   await page.click('.gx-idbtn');
-  await page.waitForSelector('.gx-idpop .gx-id-wallet');
-  await page.click('.gx-idpop .gx-id-wallet');
+  await page.waitForSelector('.gx-idpop .gx-wallet');
+  await page.click('.gx-idpop .gx-wallet');
   await page.waitForSelector('.gx-wallettab');
   assert.deepEqual(errors, []);
   await page.close();

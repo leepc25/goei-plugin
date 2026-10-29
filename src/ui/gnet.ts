@@ -668,7 +668,6 @@ export function gnetTab(ctx: ChatContext, env?: GnetEnv): string {
     tool('gn-write', ICONS.pen, '글쓰기', gnet.compose?.kind === 'post' ? 'aria-pressed="true"' : '', '글쓰기'),
     tool('gn-newdm', ICONS.mail, '새 쪽지', gnet.compose?.kind === 'newdm' ? 'aria-pressed="true"' : '', '쪽지'),
     tool('gn-nick', ICONS.idcard, '닉네임 바꾸기', gnet.editNick ? 'aria-pressed="true"' : '', '닉네임'),
-    tool('gn-settings', ICONS.settings, `${gnetLabel(ctx.chat.scriptstate)} 설정`, gnet.settings ? 'aria-pressed="true"' : '', '설정'),
   ].join('');
   const subBtn = (id: 'board' | 'dm', label: string, extra = '') =>
     `<button class="ph-sub${gnet.sub === id ? ' on' : ''}" data-action="gn-sub" data-value="${id}" aria-pressed="${gnet.sub === id}">${label}${extra}</button>`;

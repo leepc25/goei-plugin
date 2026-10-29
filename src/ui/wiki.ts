@@ -465,7 +465,6 @@ function rail(): string {
   const label = open ? '목록 접기' : '목록 펼치기';
   return `<nav class="nw-rail" aria-label="위키 메뉴">
     ${tool('wiki-home', ICONS.wiki, '위키 메인', wiki.view === 'home' ? 'aria-pressed="true"' : '')}
-    ${tool('wiki-settings', ICONS.settings, '위키 설정', wiki.view === 'settings' ? 'aria-pressed="true"' : '')}
     <button class="nw-grab" type="button" data-action="wiki-list" aria-expanded="${open}" aria-label="${label}" title="${label}"><span class="nw-grab-ico${open ? '' : ' flip'}">${ICONS.back}</span></button>
   </nav>`;
 }
@@ -679,7 +678,6 @@ export function wikiTab(ctx: ChatContext): string {
       tool('wiki-home', ICONS.wiki, '위키 메인', wiki.view === 'home' ? 'aria-pressed="true"' : '', '메인'),
       tool('wiki-find', ICONS.search, '위키 검색', '', '검색'),
       tool('wiki-list', ICONS.list, open ? '목록 접기' : '목록 펼치기', `aria-pressed="${open}"`, '목록'),
-      tool('wiki-settings', ICONS.settings, '위키 설정', wiki.view === 'settings' ? 'aria-pressed="true"' : '', '설정'),
     ].join(''))}
     ${note}
   </main>`;
