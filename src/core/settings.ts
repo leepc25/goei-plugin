@@ -1,5 +1,6 @@
 // 기본 설정과 괴이 생성 수치. 우선순위: 이 채팅의 변수($st_*, $wg_*) > 플러그인 저장소의 기본값(설정 창)
 // > 옛 카드의 Settings 로어북(있으면) > 내장 기본값. 채팅 변수 키는 원본 ensureDefaults·WG.get과 같다.
+import { GUIDE_NAMES, isGuideName, setGuideOverride, RULE_TARGETS, setUserRules, type RuleTarget, type UserRule } from './guides';
 import type { LoreEntry, ScriptState } from './types';
 import { DEFAULT_SETTINGS, type WorldSettings } from './world/engine';
 import { imgFold, imgRecent, imgSize } from './imgtag';
@@ -97,6 +98,8 @@ export interface Prefs {
   vars?: Record<string, string>;
   /** 창 모양 (이 기기·모든 채팅 공통): 메뉴 위치, 창 바깥 어둡기(%) */
   nav?: 'left' | 'right';
+  /** 위키 목록 서랍 쪽 (PC, 이 기기 공통, 2026-10-27 사용자). 없으면 왼쪽. 모바일은 늘 오른쪽 책갈피 */
+  wikiSide?: 'right';
   /** 상황판 요원 칸 모양 (이 기기 공통): 모니터 벽(기본) 또는 목록 */
   agents?: 'wall' | 'list';
   dim?: number;
@@ -105,11 +108,28 @@ export interface Prefs {
   /** 채팅 속 캐릭터 이미지 칸 크기·접힌 높이 (%, 이 기기 공통, 없으면 원본 카드와 같은 100%·68%) */
   imgSize?: number;
   imgFold?: number;
+  /** 이미지를 접을지 (기본 켬). 끄면 늘 펼친 채 (사용자 2026-10-27) */
+  imgFoldOn?: boolean;
   /** 이미지를 띄울 최근 메시지 수·요청에 이미지 태그를 남길 최근 메시지 수 (0이면 전부, 없으면 6) */
   imgShow?: number;
   imgSend?: number;
   /** 즐겨찾기 (이 기기·모든 채팅 공통, 최대 MARK_MAX): 창 안 화면 상태와 이름 */
   marks?: Mark[];
+  /** 이미지 태그 지침 (core/imgprompt.ts): 틀, 끈 이름, 임의 추가 이름, 표정 세트. 없으면 기본 */
+  imgPrompt?: string;
+  imgNamesOff?: string[];
+  imgNamesExtra?: string[];
+  imgKeywords?: string[];
+  /** 세계 편집 창 폭 (브라우저 폭의 %, 50~100. 없으면 90) */
+  editorWidth?: number;
+  /** 고친 지침 (core/guides.ts GuideName → 글). 없으면 기본 */
+  guides?: Record<string, string>;
+  /** 내가 추가한 규칙 (core/guides.ts UserRule). 지침 끝에 붙는다 */
+  rules?: UserRule[];
+  /** 세력 관계 격자: 한 칸을 바꾸면 반대 칸도 (기본 켬) */
+  relationsSym?: boolean;
+  /** 새 채팅의 시작 잔고 (원). 없으면 0 */
+  walletStart?: number;
 }
 
 /** 즐겨찾기 하나: s는 app.ts가 앞뒤 이동 기록에 쓰는 화면 상태 그대로, name은 저장할 때 붙인 이름 */
@@ -126,7 +146,7 @@ export const DIM_STEPS = [0, 25, 50, 75, 100];
 let prefs: Prefs = { basic: {}, world: {} };
 
 /** 기능 설정으로 기본값에 담을 수 있는 채팅 변수 (상태·기록 변수는 빼고 설정만) */
-export const PREF_VAR = /^(\$ph_(model|auto|status|related|context|incoming|incoming_chance|group_invites|group_invite_chance|announcements|announcement_gap|announcement_history|announcement_page_size|all_contacts|anomaly_contacts|storage_(auto|limit)_(dm|group|notice))|\$lb_cfg_lb-gn\.[a-z_]+|\$gn_storage_(auto|limit)_dm|\$nw_(mode|model|length|refresh_previous|writing_request|context)|\$ph_context_(messages|announcements)|\$(ph|nw)_adv_[a-z_]+|\$gen_[a-z_]+)$/;
+export const PREF_VAR = /^(\$ph_(model|auto|status|related|context|incoming|incoming_chance|group_invites|group_invite_chance|announcements|announcement_gap|announcement_history|announcement_page_size|all_contacts|anomaly_contacts|storage_(auto|limit)_(dm|group|notice))|\$lb_cfg_lb-gn\.[a-z_]+|\$gn_storage_(auto|limit)_dm|\$nw_(mode|model|length|refresh_previous|writing_request|context)|\$ph_context_(messages|announcements)|\$(ph|nw)_adv_[a-z_]+|\$hq_(adv_[a-z_]+|ui)|\$gen_[a-z_]+|\$pp_[a-z_]+|\$st_col_[a-z]+|\$st_wallet_edit)$/;
 
 export function getPrefs(): Prefs {
   return prefs;
@@ -158,18 +178,43 @@ export function setPrefs(raw: unknown): Prefs {
     for (const [k, v] of Object.entries(o.vars as Record<string, unknown>)) if (PREF_VAR.test(k) && typeof v === 'string') vars[k] = v;
   }
   const nav = o.nav === 'right' ? 'right' : undefined;
+  const wikiSide = o.wikiSide === 'right' ? 'right' : undefined;
   const agents = o.agents === 'list' ? 'list' : undefined;
   const dim = int(o.dim, 0, 100);
   const status = o.status === 'off' || o.status === 'light' || o.status === 'dark' || o.status === 'paper' ? o.status : undefined;
   const size = imgSize(o.imgSize);
   const fold = imgFold(o.imgFold);
+  const imgFoldOn = o.imgFoldOn === false ? false : undefined;
   const show = imgRecent(o.imgShow);
   const send = imgRecent(o.imgSend);
   const marks: Mark[] = (Array.isArray(o.marks) ? o.marks : [])
     .filter((m): m is Mark => !!m && typeof m === 'object' && typeof (m as Mark).name === 'string' && !!(m as Mark).s && typeof (m as Mark).s.tab === 'string')
     .slice(0, MARK_MAX)
     .map((m) => ({ s: m.s, name: m.name.slice(0, 80) }));
-  prefs = { basic, world, ...(theme ? { theme } : {}), ...(Object.keys(vars).length ? { vars } : {}), ...(nav ? { nav } : {}), ...(agents ? { agents } : {}), ...(dim !== null ? { dim } : {}), ...(status ? { status } : {}), ...(size !== null ? { imgSize: size } : {}), ...(fold !== null ? { imgFold: fold } : {}), ...(show !== null ? { imgShow: show } : {}), ...(send !== null ? { imgSend: send } : {}), ...(marks.length ? { marks } : {}) };
+  const strList = (v: unknown, max: number, len: number) => (Array.isArray(v) ? v.filter((x): x is string => typeof x === 'string' && !!x.trim()).map((x) => x.trim().slice(0, len)).slice(0, max) : []);
+  const imgPrompt = typeof o.imgPrompt === 'string' && o.imgPrompt.trim() ? o.imgPrompt.slice(0, 6000) : undefined;
+  const imgNamesOff = strList(o.imgNamesOff, 200, 40);
+  const imgNamesExtra = strList(o.imgNamesExtra, 60, 40);
+  const imgKeywords = strList(o.imgKeywords, 60, 24);
+  const editorWidth = int(o.editorWidth, 50, 100);
+  const guides: Record<string, string> = {};
+  if (o.guides && typeof o.guides === 'object') {
+    for (const [k, v] of Object.entries(o.guides as Record<string, unknown>)) if (isGuideName(k) && typeof v === 'string' && v.trim()) guides[k] = v.slice(0, 120000);
+  }
+  for (const k of GUIDE_NAMES) setGuideOverride(k, guides[k]);
+  const rules: UserRule[] = [];
+  if (Array.isArray(o.rules)) {
+    for (const r of o.rules as Record<string, unknown>[]) {
+      if (!r || typeof r !== 'object' || typeof r.id !== 'string') continue;
+      const to = (Array.isArray(r.to) ? r.to : []).filter((t): t is RuleTarget => (RULE_TARGETS as string[]).includes(String(t)));
+      rules.push({ id: r.id.slice(0, 40), title: String(r.title ?? '').slice(0, 80), text: String(r.text ?? '').slice(0, 20000), to, on: r.on !== false });
+      if (rules.length >= 100) break;
+    }
+  }
+  setUserRules(rules);
+  const relationsSym = o.relationsSym === false ? false : undefined;
+  const walletStart = int(o.walletStart, 0, 1_000_000_000_000);
+  prefs = { basic, world, ...(walletStart !== null ? { walletStart } : {}), ...(editorWidth !== null ? { editorWidth } : {}), ...(Object.keys(guides).length ? { guides } : {}), ...(rules.length ? { rules } : {}), ...(relationsSym === false ? { relationsSym } : {}), ...(theme ? { theme } : {}), ...(imgPrompt ? { imgPrompt } : {}), ...(imgNamesOff.length ? { imgNamesOff } : {}), ...(imgNamesExtra.length ? { imgNamesExtra } : {}), ...(imgKeywords.length ? { imgKeywords } : {}), ...(Object.keys(vars).length ? { vars } : {}), ...(nav ? { nav } : {}), ...(wikiSide ? { wikiSide } : {}), ...(agents ? { agents } : {}), ...(dim !== null ? { dim } : {}), ...(status ? { status } : {}), ...(size !== null ? { imgSize: size } : {}), ...(fold !== null ? { imgFold: fold } : {}), ...(imgFoldOn === false ? { imgFoldOn } : {}), ...(show !== null ? { imgShow: show } : {}), ...(send !== null ? { imgSend: send } : {}), ...(marks.length ? { marks } : {}) };
   return prefs;
 }
 

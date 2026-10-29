@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {
   SCENARIOS, parseSeedManifest, buildSeed, applySeedLifetime, planStart, applyStart, readManifest,
   chatPhase, currentChoice, processRequest, StartError, MANIFEST_COMMENT, userTurns, unwrapScenes,
-  parseDirective, destination, sceneDirective, validTeam, sceneRecord, readScene, stripSceneCard, renderSceneCards, DirectiveError,
+  parseDirective, setGuideOverride, destination, sceneDirective, validTeam, sceneRecord, readScene, stripSceneCard, renderSceneCards, DirectiveError,
 } from '../dist-test/core.mjs';
 
 const lore = [
@@ -69,7 +69,9 @@ test('request processing follows user turn count', () => {
 });
 
 test('directive: lore sections, party clause and scene record round trip', () => {
-  const d = parseDirective([{ comment: 'Directive', content: DIRECTIVE }]);
+  // 지시문은 플러그인 내장 지침(core/guides.ts). 시험 글은 덮어쓰기로 올리고 끝에 되돌린다
+  setGuideOverride('Directive', DIRECTIVE);
+  const d = parseDirective([]);
   assert.equal(destination(d, '소라 랜드'), '소라 랜드');
   assert.equal(destination(d, '소라 랜드', '서울 종로구'), '서울 종로구 소라 랜드');
   const solo = sceneDirective(d, 'X', [], 0, false);
@@ -83,8 +85,11 @@ test('directive: lore sections, party clause and scene record round trip', () =>
   assert.deepEqual(readScene(rec), { target: '소라 랜드', party: '나, 쟈알디' });
   assert.equal(stripSceneCard(rec), 'BODY\nLINE');
   assert.equal(renderSceneCards(`앞\n${rec}\n뒤`, (s) => `[${s.target}|${s.party}]`), '앞\n[소라 랜드|나, 쟈알디]\n뒤');
-  assert.throws(() => parseDirective([]), DirectiveError);
-  assert.throws(() => parseDirective([{ comment: 'Directive', content: DIRECTIVE.replace('===OPENING===', '===OPEN===') }]), /OPENING/);
+  setGuideOverride('Directive', DIRECTIVE.replace('===OPENING===', '===OPEN==='));
+  assert.throws(() => parseDirective([]), /OPENING/);
+  setGuideOverride('Directive', '');
+  assert.ok(parseDirective([]).sections.COMMON.length > 20, '기본 내장 지침');
+  assert.ok(DirectiveError);
 });
 
 test('scene records are unwrapped for the model and merged with the text typed after them', () => {

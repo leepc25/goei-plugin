@@ -9,11 +9,12 @@ import { Menu, choiceScreen, esc, type MenuItem, type Screen } from './menu';
 import { DEFAULT_SETTINGS, localStore, parseSettings, type SettingsStore, type UiSettings } from './settings';
 import { mountStage, type Stage } from './stage';
 import { TouchPad } from './touch';
+import { charSize } from '../charSize';
 
 export { Fx, Hud, InputHub, Menu, PadReader, TouchPad, choiceScreen };
 export type { FxEvent, TransitionKind } from './fx';
-export type { HudState, HudItem, MapState } from './hud';
-export { drawHud, drawMap, label, plate, font, FONT, setHudItemIcon, drawHudItemIcon, statusHtml } from './hud';
+export type { HudState, HudItem } from './hud';
+export { drawHud, label, plate, font, FONT, setHudItemIcon, drawHudItemIcon, statusHtml } from './hud';
 export type { UiSettings } from './settings';
 export { W, H, mountStage } from './stage';
 export { drawTitleBg, drawGoSign } from './title';
@@ -41,8 +42,10 @@ export interface ShellOptions {
   toLocal?: (clientX: number, clientY: number, el: HTMLElement) => { x: number; y: number };
   /** 일시정지 메뉴 위쪽 한 줄 요약 */
   pauseInfo?: () => string;
+  /** 필드 가방 (일시정지 메뉴 「가방」, 필드에 있을 때만) */
+  bag?: { available(): boolean; open(): void };
   /** 필드(봇 보조): 일시정지는 계속·설정·조작법·나가기만, 설정에서 전체 화면·NPC 대화 칸을 뺀다 (2026-10-23 사용자) */
-  field?: { onExit: () => void };
+  field?: { onExit: () => void; fullscreen?: { enter(kind: 'browser' | 'panel'): Promise<void>; exit(): Promise<void>; mode(): 'browser' | 'panel' | null } };
 }
 
 export interface Shell {
@@ -106,6 +109,7 @@ export function mountGameShell(box: HTMLElement, o: ShellOptions = {}): Shell {
     stage.setCrt(settings.crt);
     stage.setBright(settings.bright);
     stage.setPixel(settings.pixel);
+    charSize.k = settings.charSize;
     fx.opt = { shake: settings.shake, flash: settings.flash, numbers: settings.numbers };
     pad.setRumble(settings.vibrate);
     touch.refresh();
@@ -142,7 +146,7 @@ export function mountGameShell(box: HTMLElement, o: ShellOptions = {}): Shell {
       .map((a) => {
         const kb = a === 'left' ? '<kbd>←</kbd><kbd>→</kbd><kbd>↑</kbd><kbd>↓</kbd>' : `<kbd>${esc(KEY_NAME[a])}</kbd>`;
         const pd = PAD_NAME[CODE[a]] ?? '';
-        const tc = a === 'left' ? '왼쪽 스틱' : a === 'menu' ? '☰' : a === 'auto' || a === 'hitbox' ? '메뉴' : a.startsWith('item') ? '아래 칸' : a === 'evade' ? '회피 (스틱 끝 = 달리기)' : '버튼';
+        const tc = a === 'left' ? '왼쪽 스틱' : a === 'menu' ? '☰' : a === 'auto' ? '메뉴' : a.startsWith('item') ? '아래 칸' : a === 'evade' ? '회피 (스틱 끝 = 달리기)' : '버튼';
         return `<tr><td>${esc(a === 'left' ? '이동 (좌우 + 안쪽·앞쪽)' : LABEL[a])}</td><td>${kb}</td><td>${esc(pd)}</td><td>${esc(tc)}</td></tr>`;
       })
       .join('');
@@ -153,13 +157,23 @@ export function mountGameShell(box: HTMLElement, o: ShellOptions = {}): Shell {
     const pct = (v: number) => `${Math.round(v * 100)}%`;
     return [
       { type: 'head', label: '화면' },
-      { type: 'toggle', label: 'CRT 필터 (주사선·모서리)', get: () => s.crt, set: (v) => (s.crt = v) },
+      { type: 'choice', label: 'CRT 모니터', options: [['off', '끄기'], ['screen', '화면 효과'], ['curved', '곡면까지']], get: () => s.crt, set: (v) => (s.crt = v as UiSettings['crt']) },
       { type: 'slider', label: '화면 흔들림', get: () => s.shake, set: (v) => (s.shake = v), min: 0, max: 1, step: 0.25, fmt: pct },
       { type: 'toggle', label: '피격 섬광', get: () => s.flash, set: (v) => (s.flash = v) },
       { type: 'toggle', label: '피해 숫자', get: () => s.numbers, set: (v) => (s.numbers = v) },
       { type: 'slider', label: '밝기', get: () => s.bright, set: (v) => (s.bright = v), min: 0.7, max: 1.4, step: 0.05, fmt: pct },
       { type: 'toggle', label: '도트 선명하게', get: () => s.pixel, set: (v) => (s.pixel = v) },
+      { type: 'slider', label: '화면 확대', get: () => s.charSize, set: (v) => (s.charSize = v), min: 1, max: 2.5, step: 0.05, fmt: pct },
       ...(o.field ? [] : [{ type: 'button' as const, label: '전체 화면', sub: '폰은 가로로 고정', act: () => void stage.fullscreen() }]),
+      // 필드(리스): 전체 화면 두 가지 (2026-10-25 사용자) — 브라우저 전체 · 상황창 안 전체(왼쪽 메뉴·오른쪽 신분증 칸까지)
+      ...(o.field?.fullscreen ? [{
+        type: 'choice' as const, label: '전체 화면', options: [['off', '끄기'], ['panel', '상황창 안'], ['browser', '브라우저']] as [string, string][],
+        get: () => o.field!.fullscreen!.mode() ?? 'off',
+        set: (v: string) => {
+          const f = o.field!.fullscreen!;
+          void (v === 'off' ? f.exit() : f.enter(v as 'browser' | 'panel')).then(() => { if (menu.isOpen) menu.replace(settingsScreen()); });
+        },
+      }] : []),
       { type: 'head', label: '소리' },
       { type: 'slider', label: '전체', get: () => s.master, set: (v) => (s.master = v), min: 0, max: 1, step: 0.1, fmt: pct },
       { type: 'slider', label: '음악', get: () => s.music, set: (v) => (s.music = v), min: 0, max: 1, step: 0.1, fmt: pct },
@@ -177,6 +191,10 @@ export function mountGameShell(box: HTMLElement, o: ShellOptions = {}): Shell {
         { type: 'choice' as const, label: 'NPC 대화 모델', options: [['main', '주 모델'], ['aux', '보조 모델']] as [string, string][], get: () => s.talkModel, set: (v: string) => (s.talkModel = v as UiSettings['talkModel']) },
         { type: 'toggle' as const, label: '본편 최근 채팅 같이 보내기', get: () => s.talkRecent, set: (v: boolean) => (s.talkRecent = v) },
       ]),
+      { type: 'head', label: '필드 시간' },
+      ...([['tScene', '장면 넘어가기', 60], ['tRegion', '지역 이동', 180], ['tTalk', '대화 한 번', 60], ['tFight', '싸움 (장면당 한 번)', 60], ['tWaitShort', '시간 보내기 · 짧게', 240], ['tWaitLong', '시간 보내기 · 길게', 480]] as const).map(([k, label, max]) => ({
+        type: 'slider' as const, label, get: () => s[k], set: (v: number) => (s[k] = Math.round(v)), min: 0, max, step: 5, fmt: (v: number) => (v ? `${Math.round(v)}분` : '안 감'),
+      })),
       { type: 'html', html: `<p style="font-size:14px;color:#9aa6ab">게임패드: ${esc(pad.connected ? pad.connected.slice(0, 48) : '연결 안 됨 (버튼을 하나 누르면 잡힙니다)')}</p>` },
       { type: 'button', label: '기본값으로', act: () => ((settings = { ...DEFAULT_SETTINGS }), apply(), saveSettings(), menu.replace(settingsScreen())) },
     ];
@@ -226,7 +244,7 @@ export function mountGameShell(box: HTMLElement, o: ShellOptions = {}): Shell {
       menu.open({
         id: 'title',
         look: 'title',
-        title: o.title ?? '차원 승강기',
+        title: o.title ?? '괴이 ː ANOMALY',
         sub: o.sub ?? 'ANOMALY SIMULATION · 관리국 액션',
         noBack: true,
         // 필드: 저장 이어하기가 없다 (본편 상황판이 곧 저장). 입장 판정은 onNew가 한다
@@ -255,6 +273,7 @@ export function mountGameShell(box: HTMLElement, o: ShellOptions = {}): Shell {
         sub: o.pauseInfo?.() ?? '',
         items: o.field ? [
           { type: 'button', label: '계속', sub: key('Esc'), act: () => menu.closeAll() },
+          ...(o.bag?.available() ? [{ type: 'button' as const, label: '가방', act: () => (menu.closeAll(), o.bag!.open()) }] : []),
           { type: 'button', label: '설정', act: () => shell.openSettings() },
           { type: 'button', label: '조작법', act: () => shell.openControls() },
           ...(o.onTitle ? [{ type: 'button' as const, label: '타이틀로', act: () => (menu.closeAll(), o.onTitle!()) }] : []),
@@ -262,6 +281,7 @@ export function mountGameShell(box: HTMLElement, o: ShellOptions = {}): Shell {
         ] : [
           ...(hud.last ? [{ type: 'html' as const, html: statusHtml(hud.last) }] : []),
           { type: 'button', label: '계속', sub: key('Esc'), act: () => menu.closeAll() },
+          ...(o.bag?.available() ? [{ type: 'button' as const, label: '가방', act: () => (menu.closeAll(), o.bag!.open()) }] : []),
           { type: 'button', label: '설정', act: () => shell.openSettings() },
           { type: 'button', label: '조작법', act: () => shell.openControls() },
           { type: 'button', label: '자동 전환', sub: key('X'), act: () => (menu.closeAll(), tap('KeyX')) },

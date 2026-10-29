@@ -1,0 +1,4 @@
+Side-scrolling game background, interior of a clean, well-kept modern Korean government office building corridor. Camera looks straight at the back wall (front view, slightly from above). The wall-floor line is a straight horizontal line at 60% of the image height; below it is the walkable floor.
+The left end of the corridor is closed by a side wall seen in perspective: the back corner is a vertical line at about 17% of the image width, and the side wall's floor line runs from the bottom of that corner diagonally down to the bottom-left corner of the image.
+Plain painted walls with a baseboard and a thin ceiling edge at the top. No doors, no windows, no furniture, no objects. Smooth seamless floor without tile lines. No stains, no dirt. No people, no text.
+Same pixel art style as the style image.

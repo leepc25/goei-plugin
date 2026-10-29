@@ -5,6 +5,8 @@ import { factionList } from '../core/factions';
 import { setOpeningHint } from '../host/openinghint';
 import { NavHistory } from '../core/navhist';
 import { applyStart, chatPhase, currentChoice, planStart, readManifest, StartError } from '../core/start';
+import { isGoeiLore } from '../core/install';
+import { refreshInstall } from './editor/install';
 import type { FactionCode, LangCode, LoreEntry, Manifest } from '../core/types';
 import {
   activeEvents, type Catalog, endedShown, codesToNames, factionNames, lastStatusFields, locName, parseCatalog, readWorld, rosterFor, startWorldVars, agentLocked, readDirectory, type WorldState, worldOn,
@@ -14,6 +16,7 @@ import { prepareBaseDocs } from '../core/wiki';
 import { facePic, loadModuleAssets, mainPic } from '../host/assets';
 import { playableAgents, playerAgent } from '../core/player';
 import { savePrefs } from '../host/prefs';
+import { editorOnSettings, editorOpen, openEditor, render as editorRender, type EditorNode } from './editor/index';
 import { agentPanel, agentPopup, agUi, bindAgentTips, type AgentItem } from './agents';
 import css from './style.css';
 import { GHOST_ICON, ICONS } from './icons';
@@ -32,7 +35,7 @@ import { gnet, gnetOpenCheck, gnetTab, handleGnet, resetGnet, type GnetEnv } fro
 import { addPhoto, attachInput, hydratePhotos, zoomPhoto } from './attach';
 import { ATTACH_MAX } from '../core/attach';
 import { readPhone, roomLabel } from '../core/phone';
-import { findPost, readGnet } from '../core/gnet';
+import { findPost, gnetLabel, readGnet } from '../core/gnet';
 import { savePhoto } from '../host/photo';
 import { readPersona, readUser, userInfo } from '../host/user';
 import { applyAdvanced } from '../core/advanced';
@@ -47,8 +50,15 @@ import { noticeClass, sendNow } from '../host/send';
 import { markUnsent } from '../host/unsent';
 import { startRecord } from '../core/dispatch';
 import { handleSettings, resetSettings, settingsTab, settingsUi, type SettingsEnv } from './settings';
+import { bindPeopleHold, bindPeopleStatus, handlePeople, hasPersonRecord, peopleInput, type PeopleEnv } from './people';
+import { handleImgPrompt, imgInput } from './imgprompt';
 import { cropValue, setCrop, directoryExtList, directoryInput, directoryPhotoList, directoryList, dirUi, handleDirectory, resetDirectory } from './directory';
 import { basicDefaults, basicVars, DIM_DEFAULT, getPrefs, worldDefaults, worldSettings, worldVarsOf, type Mark } from '../core/settings';
+import { colConfig } from '../core/world/statuscols';
+import { adjustWallet, walletEditable, aliveAnchors, formatWon, parseWon, readWallet, removeWalletEntry, walletBalance, walletVars, WALLET_START_DEFAULT } from '../core/wallet';
+import { walletHeadButton, walletList, walletOn, walletTab, walletUi as walletTabUi } from './wallet';
+
+/** ID카드 잔고 칩 → 장부 창 (열림·입력 알림) */
 
 interface Draft {
   faction?: FactionCode;
@@ -63,7 +73,7 @@ interface Draft {
 type View =
   | { kind: 'loading' }
   | { kind: 'error'; message: string }
-  | { kind: 'not-lite'; name: string }
+  | { kind: 'not-lite'; name: string; goei?: boolean }
   | { kind: 'started'; ctx: ChatContext }
   /** 커스텀 임무로 시작을 골랐고 첫 지시문을 아직 안 보냄 */
   | { kind: 'opening'; ctx: ChatContext }
@@ -83,8 +93,8 @@ let busy = false;
 let notice = '';
 /** 괴담넷 탭 (완성 전까지 숨김) */
 const GNET_ON = true;
-type Tab = 'board' | 'map' | 'mission' | 'gnet' | 'phone' | 'wiki' | 'field' | 'settings';
-const TABS: Tab[] = ['board', 'map', 'mission', ...(GNET_ON ? (['gnet'] as Tab[]) : []), 'phone', 'wiki', 'field', 'settings'];
+type Tab = 'board' | 'map' | 'mission' | 'gnet' | 'phone' | 'wiki' | 'field' | 'wallet' | 'settings';
+const TABS: Tab[] = ['board', 'map', 'mission', ...(GNET_ON ? (['gnet'] as Tab[]) : []), 'phone', 'wiki', 'field', 'wallet'];
 let tab: Tab = 'board';
 /** 커스텀 임무 시작 화면에서 "다시 고르기"를 눌렀을 때 */
 let repick = false;
@@ -112,6 +122,7 @@ const wikiEnv: WikiEnv = {
 
 const gnetEnv: GnetEnv = wikiEnv;
 const settingsEnv: SettingsEnv = { render: () => render(), refresh: () => refresh() };
+const peopleEnv: PeopleEnv = settingsEnv;
 
 /** 창이 떠 있는지 (괴담톡이 받은 말풍선을 바로 읽음 처리할지) */
 let shown = false;
@@ -131,7 +142,12 @@ const esc = (s: unknown) =>
 function ensureRoot(): HTMLElement {
   if (root) return root;
   // 이미지가 도착하면: 시작 화면은 그 카드만, 나머지 화면은 다시 그린다
-  setImageRedraw(() => (view.kind === 'picker' ? renderPicker() : render()));
+  // 사진이 다 읽히면 패널과, 떠 있으면 세계 편집 창도 다시 그린다 (2026-10-27: 편집 창의 괴이·요원 사진이 안 뜨던 문제 — 창은 패널과 따로 그린다)
+  setImageRedraw(() => {
+    if (view.kind === 'picker') renderPicker();
+    else render();
+    if (editorOpen()) editorRender();
+  });
   const style = document.createElement('style');
   style.textContent = css;
   document.head.appendChild(style);
@@ -184,7 +200,10 @@ function ensureRoot(): HTMLElement {
     const el = t.closest<HTMLElement>('[data-action]');
     if (!el || el.hasAttribute('disabled')) return;
     // data-take: 같은 창의 입력칸 값을 넘긴다 (form 제출은 플러그인 iframe에서 막혀 있음)
-    const take = el.dataset.take ? root?.querySelector<HTMLInputElement>(`[name="${el.dataset.take}"]`)?.value : undefined;
+    // 이름을 쉼표로 여럿 주면 값들을 JSON 배열로 (가계부 거래 추가: 금액·메모)
+    const names = el.dataset.take?.split(',') ?? [];
+    const val = (n: string) => root?.querySelector<HTMLInputElement>(`[name="${n}"]`)?.value ?? '';
+    const take = !names.length ? undefined : names.length > 1 ? JSON.stringify(names.map(val)) : root?.querySelector<HTMLInputElement>(`[name="${names[0]}"]`)?.value;
     void handle(el.dataset.action!, take ?? el.dataset.value);
   });
   // 명부 얼굴 틀: 대표 사진을 누르거나 끌면 그 자리가 틀 가운데 (틀이 사진 밖으로 나가지 않게)
@@ -314,98 +333,16 @@ function ensureRoot(): HTMLElement {
     const input = form.querySelector('input');
     if (form.dataset.submit) void handle(form.dataset.submit, input?.value ?? '');
   });
-  root.addEventListener('change', (ev) => {
-    const el = ev.target as HTMLSelectElement;
-    if (el?.dataset?.change) void handle(el.dataset.change, el.dataset.key ? `${el.dataset.key}=${el.value}` : el.value);
-  });
+  root.addEventListener('change', (ev) => panelChange(ev.target as HTMLSelectElement));
   // 검색어는 목록만 다시 그린다 (입력창 포커스 유지)
-  root.addEventListener('input', (ev) => {
-    const el = ev.target as HTMLInputElement;
-    if (el?.dataset?.input === 'dim' && root) {
-      paintVeil(root, Number(el.value));
-      const out = el.parentElement?.querySelector('output');
-      if (out) out.textContent = `${el.value}%`;
-      return;
-    }
-    if (el?.dataset?.input === 'pct' || el?.dataset?.input === 'count') {
-      const out = el.parentElement?.querySelector('output');
-      if (out) out.textContent = `${el.value}${el.dataset.input === 'pct' ? '%' : '개'}`;
-      return;
-    }
-    if (el?.dataset?.input === 'wiki-query' && view.kind === 'started') {
-      wiki.query = el.value;
-      const box = root?.querySelector('.nw .ph-content');
-      if (box) box.innerHTML = wikiList(view.ctx);
-      return;
-    }
-    if (el?.dataset?.input === 'wiki-home-query' && view.kind === 'started') {
-      wiki.homeQuery = el.value;
-      const box = root?.querySelector('.nw-hero-res');
-      if (box) box.innerHTML = wikiHomeResults(view.ctx);
-      return;
-    }
-    if (el?.dataset?.input && wikiInput(el.dataset.input, el.value)) return;
-    if (el?.dataset?.input === 'gn-draft') return void (gnet.draft = el.value);
-    if (el?.dataset?.input === 'gn-to') return void (gnet.to = el.value);
-    if (el?.dataset?.input === 'gn-att') return void attachInput(gnet.attach, el.dataset.key, el.value);
-    if (el?.dataset?.input === 'ph-query' && view.kind === 'started') {
-      const box = root?.querySelector('.ph-content');
-      if (box) box.innerHTML = phoneContent(view.ctx, el.value);
-      return;
-    }
-    if (el?.dataset?.input === 'ph-pick-q' && view.kind === 'started') {
-      phoneInput('ph-pick-q', el.value);
-      const box = root?.querySelector('.ph-pick');
-      if (box) box.innerHTML = phonePickList(view.ctx);
-      return;
-    }
-    if (el?.dataset?.input === 'dir-q' && (view.kind === 'started' || view.kind === 'picker')) {
-      dirUi.q = el.value;
-      const box = root?.querySelector('.dir-list');
-      if (box) box.innerHTML = directoryList(view.ctx);
-      return;
-    }
-    if (el?.dataset?.input === 'dir-crop-size') {
-      const key = el.dataset.key ?? '';
-      const [x, y] = cropValue(key);
-      setCrop(key, [x, y, Number(el.value)]);
-      const frame = root?.querySelector<HTMLElement>('[data-crop] .dir-crop-frame');
-      if (frame) frame.style.width = `${el.value}%`;
-      return;
-    }
-    if (el?.dataset?.input === 'dir-photo-q' && (view.kind === 'started' || view.kind === 'picker')) {
-      dirUi.pickQ = el.value;
-      const box = root?.querySelector('.dir-pics');
-      if (box) box.innerHTML = directoryPhotoList(view.ctx);
-      return;
-    }
-    if (el?.dataset?.input === 'dir-ext-q' && (view.kind === 'started' || view.kind === 'picker')) {
-      dirUi.addQ = el.value;
-      const box = root?.querySelector('.dir-ext-list');
-      if (box) box.innerHTML = directoryExtList(view.ctx);
-      return;
-    }
-    if (el?.dataset?.input === 'dir') return void directoryInput(el.dataset.key ?? '', el.value, root?.querySelector('.dir-bar') ?? null);
-    if (el?.dataset?.input && phoneInput(el.dataset.input, el.value, el.dataset.key)) return;
-    if (el?.dataset?.input === 'field-note') return void (field.note = el.value);
-    if (el?.dataset?.input === 'map-query' && view.kind === 'started') {
-      const box = root?.querySelector('.gx-mapsug');
-      if (box) box.innerHTML = mapSuggestFor(view.ctx, el.value);
-      return;
-    }
-    if (el?.dataset?.input === 'start-note') {
-      const had = !!(draft.situation ?? '').trim();
-      draft.situation = el.value;
-      // 비었다/채워졌다가 바뀔 때만 출발 버튼을 다시 그린다 (입력 중인 칸은 그대로)
-      if (had !== !!el.value.trim()) root?.querySelector<HTMLButtonElement>('.gx-foot .gx-start')?.toggleAttribute('disabled', !el.value.trim() || busy);
-      return;
-    }
-    if (el?.dataset?.input !== 'mission-query') return;
-    field.query = el.value;
-    const box = root?.querySelector('.gx-mbox');
-    if (box && (view.kind === 'started' || view.kind === 'opening')) box.innerHTML = missionList(view.ctx, view.kind === 'opening');
-  });
+  // 검색어는 목록만 다시 그린다 (입력창 포커스 유지). 편집 창의 설정 페이지도 같은 처리기를 쓴다 (panelInput)
+  root.addEventListener('input', (ev) => panelInput(ev.target as HTMLInputElement));
   bindAgentTips(root);
+  // 인물 기록: 갱신 중·끝남 알림으로 다시 그리기 (입력 중이면 건너뜀), 호감 막대 길게 누르기
+  bindPeopleStatus(() => {
+    if (shown && view.kind === 'started') render();
+  });
+  bindPeopleHold(root);
   document.addEventListener('keydown', (ev) => {
     if (ev.key !== 'Escape') return;
     // 필드에서 Esc는 게임 일시정지 메뉴 (창을 닫지 않는다, 2026-10-23 사용자)
@@ -418,6 +355,112 @@ function ensureRoot(): HTMLElement {
     void close();
   });
   return root;
+}
+
+/** 패널의 change 이벤트 (편집 창의 설정 페이지에서도 같은 함수를 부른다) */
+function panelChange(el: HTMLSelectElement): void {
+  if (el?.dataset?.change) void handle(el.dataset.change, el.dataset.key ? `${el.dataset.key}=${el.value}` : el.value);
+}
+
+/** 패널의 input 이벤트 (편집 창의 설정 페이지에서도 같은 함수를 부른다) */
+function panelInput(el: HTMLInputElement): void {
+  if (el?.dataset?.input === 'dim' && root) {
+    paintVeil(root, Number(el.value));
+    const out = el.parentElement?.querySelector('output');
+    if (out) out.textContent = `${el.value}%`;
+    return;
+  }
+  if (el?.dataset?.input === 'pp-cap') {
+    const out = el.parentElement?.querySelector('output');
+    if (out) out.textContent = Number(el.value) === 0 ? '한도 없음' : `±${el.value}`;
+    return;
+  }
+  if (el?.dataset?.input === 'pct' || el?.dataset?.input === 'count') {
+    const out = el.parentElement?.querySelector('output');
+    if (out) out.textContent = `${el.value}${el.dataset.input === 'pct' ? '%' : '개'}`;
+    return;
+  }
+  if (el?.dataset?.input === 'wallet-q' && view.kind === 'started') {
+    // 가계부 찾기: 목록만 다시 그린다 (입력칸 포커스 유지)
+    walletTabUi.q = el.value;
+    const box = root?.querySelector('.gx-wt-list');
+    if (box) box.innerHTML = walletList(view.ctx);
+    return;
+  }
+  if (el?.dataset?.input === 'wiki-query' && view.kind === 'started') {
+    wiki.query = el.value;
+    const box = root?.querySelector('.nw .ph-content');
+    if (box) box.innerHTML = wikiList(view.ctx);
+    return;
+  }
+  if (el?.dataset?.input === 'wiki-home-query' && view.kind === 'started') {
+    wiki.homeQuery = el.value;
+    const box = root?.querySelector('.nw-hero-res');
+    if (box) box.innerHTML = wikiHomeResults(view.ctx);
+    return;
+  }
+  if (el?.dataset?.input && wikiInput(el.dataset.input, el.value)) return;
+  if (el?.dataset?.input && peopleInput(el.dataset.input, el.value)) return;
+  if (el?.dataset?.input && imgInput(el.dataset.input, el.value)) return;
+  if (el?.dataset?.input === 'gn-draft') return void (gnet.draft = el.value);
+  if (el?.dataset?.input === 'gn-to') return void (gnet.to = el.value);
+  if (el?.dataset?.input === 'gn-att') return void attachInput(gnet.attach, el.dataset.key, el.value);
+  if (el?.dataset?.input === 'ph-query' && view.kind === 'started') {
+    const box = root?.querySelector('.ph-content');
+    if (box) box.innerHTML = phoneContent(view.ctx, el.value);
+    return;
+  }
+  if (el?.dataset?.input === 'ph-pick-q' && view.kind === 'started') {
+    phoneInput('ph-pick-q', el.value);
+    const box = root?.querySelector('.ph-pick');
+    if (box) box.innerHTML = phonePickList(view.ctx);
+    return;
+  }
+  if (el?.dataset?.input === 'dir-q' && (view.kind === 'started' || view.kind === 'picker')) {
+    dirUi.q = el.value;
+    const box = root?.querySelector('.dir-list');
+    if (box) box.innerHTML = directoryList(view.ctx);
+    return;
+  }
+  if (el?.dataset?.input === 'dir-crop-size') {
+    const key = el.dataset.key ?? '';
+    const [x, y] = cropValue(key);
+    setCrop(key, [x, y, Number(el.value)]);
+    const frame = root?.querySelector<HTMLElement>('[data-crop] .dir-crop-frame');
+    if (frame) frame.style.width = `${el.value}%`;
+    return;
+  }
+  if (el?.dataset?.input === 'dir-photo-q' && (view.kind === 'started' || view.kind === 'picker')) {
+    dirUi.pickQ = el.value;
+    const box = root?.querySelector('.dir-pics');
+    if (box) box.innerHTML = directoryPhotoList(view.ctx);
+    return;
+  }
+  if (el?.dataset?.input === 'dir-ext-q' && (view.kind === 'started' || view.kind === 'picker')) {
+    dirUi.addQ = el.value;
+    const box = root?.querySelector('.dir-ext-list');
+    if (box) box.innerHTML = directoryExtList(view.ctx);
+    return;
+  }
+  if (el?.dataset?.input === 'dir') return void directoryInput(el.dataset.key ?? '', el.value, root?.querySelector('.dir-bar') ?? null);
+  if (el?.dataset?.input && phoneInput(el.dataset.input, el.value, el.dataset.key)) return;
+  if (el?.dataset?.input === 'field-note') return void (field.note = el.value);
+  if (el?.dataset?.input === 'map-query' && view.kind === 'started') {
+    const box = root?.querySelector('.gx-mapsug');
+    if (box) box.innerHTML = mapSuggestFor(view.ctx, el.value);
+    return;
+  }
+  if (el?.dataset?.input === 'start-note') {
+    const had = !!(draft.situation ?? '').trim();
+    draft.situation = el.value;
+    // 비었다/채워졌다가 바뀔 때만 출발 버튼을 다시 그린다 (입력 중인 칸은 그대로)
+    if (had !== !!el.value.trim()) root?.querySelector<HTMLButtonElement>('.gx-foot .gx-start')?.toggleAttribute('disabled', !el.value.trim() || busy);
+    return;
+  }
+  if (el?.dataset?.input !== 'mission-query') return;
+  field.query = el.value;
+  const box = root?.querySelector('.gx-mbox');
+  if (box && (view.kind === 'started' || view.kind === 'opening')) box.innerHTML = missionList(view.ctx, view.kind === 'opening');
 }
 
 /** 고른 사진을 줄여 저장하고 작성 중인 첨부에 넣는다 (괴담넷 gn · 괴담톡 ph) */
@@ -453,7 +496,7 @@ export async function openApp(opts: { quietIfNotLite?: boolean } = {}): Promise<
   ensureRoot();
   if (opts.quietIfNotLite) {
     const ctx = await loadContext().catch(() => null);
-    if (!ctx || !readManifest(ctx.char.globalLore)) return;
+    if (!ctx || !isGoeiLore(ctx.char.globalLore)) return;
   }
   view = { kind: 'loading' };
   notice = '';
@@ -474,6 +517,32 @@ export async function openApp(opts: { quietIfNotLite?: boolean } = {}): Promise<
 }
 
 /** 채팅 속 상태창의 위키 이름을 눌렀을 때: 창을 그 위키 문서로 연다 */
+/** 설치 · 점검 (설계안 9절): 괴이 카드가 아닌 봇에서도 연다. 편집 창이 채팅 정보를 직접 읽는다 */
+let installCtx: ChatContext | null = null;
+export async function openInstall(): Promise<void> {
+  // 플러그인 칸(iframe)이 안 떠 있으면 패널부터 띄운다: 편집 창도 같은 칸 안에 그려져서, 안 띄우면 눌러도 아무것도 안 보인다 (2026-10-27 깡통봇)
+  if (!shown) await openApp();
+  installCtx = await loadContext().catch(() => null);
+  if (!installCtx) {
+    ensureRoot();
+    view = { kind: 'error', message: '선택된 채팅이 없어요. 설치할 봇의 채팅을 연 뒤 다시 눌러 주세요.' };
+    render();
+    shown = true;
+    await showWindow();
+    return;
+  }
+  const host = {
+    ctx: () => installCtx,
+    refresh: async () => {
+      installCtx = (await loadContext().catch(() => null)) ?? installCtx;
+      if (shown) await refresh();
+    },
+    theme: () => root?.dataset.theme ?? getPrefs().theme ?? 'dark',
+  };
+  await refreshInstall(installCtx);
+  openEditor(host, 'install');
+}
+
 export async function openWiki(title: string): Promise<void> {
   await openApp({ quietIfNotLite: true });
   if (view.kind === 'started') await handle('wiki-goto', title);
@@ -508,7 +577,7 @@ async function refresh(): Promise<void> {
       const cur = currentChoice(ctx.chat);
       const facs = factionList(ctx.char.globalLore);
       const presetStaged = phase === 'staged' && !!cur.faction && !!cur.fm && findScenario(cur.faction, cur.fm, facs)?.kind === 'preset';
-      if (!manifest) view = { kind: 'not-lite', name: String(ctx.char.name ?? '') };
+      if (!manifest) view = { kind: 'not-lite', name: String(ctx.char.name ?? ''), goei: isGoeiLore(ctx.char.globalLore) };
       else if (phase === 'started') view = { kind: 'started', ctx };
       else if (presetStaged && !repick) view = { kind: 'opening', ctx };
       else {
@@ -559,14 +628,52 @@ async function handle(action: string, value?: string): Promise<void> {
     await handleAdvanced(action, value, view.ctx, { render, refresh }, view.kind === 'started' ? 'chat' : 'defaults');
     return;
   }
-  if (view.kind === 'started' && action.startsWith('wiki-') && (await handleWiki(action, value, view.ctx, wikiEnv))) return;
-  if (view.kind === 'started' && action.startsWith('gn-') && (await handleGnet(action, value, view.ctx, gnetEnv))) return;
-  if (view.kind === 'started' && action.startsWith('ph-') && (await handlePhone(action, value, view.ctx, phoneEnv))) return;
+  // 시작 전(시작 패널 → 설정)에도 기능별 설정 페이지가 열려 있으면 그 기능의 단추를 받는다 (2026-10-26 사용자). chat 객체·scriptstate 는 있다
+  const featCtx = view.kind === 'started' || (view.kind === 'picker' && pickerPrefs && settingsUi.page) ? view.ctx : null;
+  if (action === 'wiki-back' && view.kind === 'started' && !wiki.history.some((h) => h.view !== 'home') && navHist.can(-1)) {
+    // 위키 안에서 옮겨 다닌 길이 없으면 뒤로가기는 무조건 이전 화면 (다른 탭·사원증 창 포함, 사용자 2026-10-26)
+    const run = navStep(-1);
+    return run ? run() : render();
+  }
+  if (featCtx && action.startsWith('wiki-') && (await handleWiki(action, value, featCtx, wikiEnv))) return;
+  if (featCtx && action.startsWith('pp-') && (await handlePeople(action, value, featCtx, peopleEnv))) return;
+  if (action.startsWith('ip-') && (await handleImgPrompt(action, value, { render }))) return;
+  if (featCtx && action.startsWith('gn-') && (await handleGnet(action, value, featCtx, gnetEnv))) return;
+  if (featCtx && action.startsWith('ph-') && (await handlePhone(action, value, featCtx, phoneEnv))) return;
+  if (action === 'ed-open') {
+    // 설정·세계 편집 창 (별도 창 하나, 2026-10-27: 모든 설정은 이 창). 시작 전(시작 패널)에도 열 수 있다: ctx 가 있으면
+    if (!(view.kind === 'started' || view.kind === 'picker' || view.kind === 'opening')) return;
+    if (view.kind === 'picker') pickerPrefs = true; // 시작 전: 설정 단추가 기본값 범위로 가게
+    settingsUi.scope = view.kind === 'started' ? (settingsUi.scope === 'defaults' ? 'defaults' : 'chat') : 'defaults';
+    openEditor({
+      ctx: () => (view.kind === 'started' || view.kind === 'picker' || view.kind === 'opening' ? view.ctx : null),
+      refresh: () => refresh(),
+      theme: () => root?.dataset.theme ?? 'dark',
+      handle: (a, v) => handle(a, v),
+      input: panelInput,
+      change: panelChange,
+      canChat: () => view.kind === 'started',
+    }, (value as EditorNode) || undefined);
+    return;
+  }
+  if (action === 'install-open') {
+    await openInstall();
+    return;
+  }
+  if (action === 'set-editor-width') {
+    await savePrefs((p) => ({ ...p, editorWidth: Math.max(50, Math.min(100, Number(value) || 90)) }));
+    return render();
+  }
+  // 어디서 「설정」을 누르든 설정 창 하나 (2026-10-27 사용자): 괴담넷·괴담톡·위키 판의 설정 단추는 그 기능 페이지로
+  const FEAT_SET: Record<string, string> = { 'gn-settings': 'set:gnet', 'ph-settings': 'set:phone', 'wiki-settings': 'set:wiki' };
+  if (FEAT_SET[action]) return handle('ed-open', FEAT_SET[action]);
   if (action === 'prefs-open' || action === 'prefs-close') {
-    pickerPrefs = action === 'prefs-open';
+    // 시작 전 「새 채팅 기본 설정」: 설정 창을 연다 (패널 안 설정 탭은 없앴다)
     resetSettings();
     resetDirectory();
     settingsUi.scope = 'defaults';
+    if (action === 'prefs-open') return handle('ed-open', 'set:screen');
+    pickerPrefs = false;
     return render();
   }
   if ((view.kind === 'started' || (view.kind === 'picker' && pickerPrefs)) && action.startsWith('dir-')) {
@@ -574,7 +681,7 @@ async function handle(action: string, value?: string): Promise<void> {
     await handleDirectory(action, value, view.ctx, settingsEnv);
     return;
   }
-  if (view.kind === 'picker' && pickerPrefs && action.startsWith('set-')) {
+  if (view.kind === 'picker' && pickerPrefs && (action.startsWith('set-') || action.startsWith('visit-'))) {
     if (settingsUi.busy) return;
     await handleSettings(action, value, view.ctx, settingsEnv, settingsUi.scope === 'chat' ? 'defaults' : settingsUi.scope);
     if (action === 'set-theme' && view.kind === 'picker' && view.staged) await stagedTheme(view.ctx, value);
@@ -586,12 +693,8 @@ async function handle(action: string, value?: string): Promise<void> {
     return;
   }
   if (action === 'upd-go') {
-    // 설정 → 업데이트로 (시작 전 화면은 기본 설정 화면에 같은 칸이 있다)
-    if (view.kind === 'started') (tab = 'settings'), (settingsUi.scope = 'chat');
-    else if (view.kind === 'picker') pickerPrefs = true;
-    render();
-    root?.querySelector('.upd-ver')?.closest('.ps-group')?.scrollIntoView({ block: 'start' });
-    return;
+    // 설정 창의 업데이트 페이지로
+    return handle('ed-open', 'set:update');
   }
   if (action.startsWith('upd-') && (view.kind === 'started' || view.kind === 'picker') && (await handleUpdate(action, view.ctx, settingsEnv))) return;
   // 상황판(CCTV·일지·상세 창)에서 「선택」: 목표로 고르고 바로 임무 지도로, 그 자리를 고른 채로 (2026-10-21 사용자)
@@ -654,8 +757,11 @@ async function handle(action: string, value?: string): Promise<void> {
       if (value === tab && value !== 'board' && !matchMedia('(max-width: 760px)').matches) value = 'board';
     // falls through
     case 'tab':
+      if (value === 'settings') return handle('ed-open', 'set:screen');
       tab = TABS.includes(value as Tab) ? (value as Tab) : 'board';
       notice = '';
+      // 위키 탭: 인물 기록 화면(인물·목록·문서·세력)에 있었으면 위키 홈으로 (사원증 「기록」으로 들어온 뒤 위키를 못 여는 문제, 2026-10-26 사용자)
+      if (tab === 'wiki' && ['people', 'person', 'docs', 'faction'].includes(wiki.view)) resetWiki();
       // 지도·커스텀 임무에서 고른 목표·편성은 다른 탭에 다녀와도 그대로 둔다
       field.confirmEnd = null;
       resetSettings();
@@ -692,10 +798,9 @@ async function handle(action: string, value?: string): Promise<void> {
       await removeMarkAt(Number(value));
       return render();
     case 'feature-set':
-      // 메인 설정 「기능별 설정」: 그 기능 탭으로 넘어가지 않고 설정창 안에서 그 기능 설정을 연다 (2026-10-23 사용자)
-      if (view.kind !== 'started') return;
-      if (value === 'phone' || value === 'wiki' || value === 'visit' || (value === 'gnet' && GNET_ON)) settingsUi.page = value;
-      return render();
+      // 기능 설정은 설정 창의 그 페이지로 (2026-10-27)
+      if (value === 'phone' || value === 'wiki' || value === 'visit' || value === 'people' || value === 'image' || (value === 'gnet' && GNET_ON)) return handle('ed-open', `set:${value}`);
+      return;
     case 'ops-sel':
       // 관제실 상황판: 일지 줄·지도 표시 → 왼쪽 큰 보기가 그 상황으로. 보던 화면(CCTV·위성)은 그대로 (2026-10-21 사용자). 모바일은 큰 보기로 올라간다
       opsUi.sel = value ?? '';
@@ -719,8 +824,50 @@ async function handle(action: string, value?: string): Promise<void> {
     case 'id-card': {
       // 모바일: 머리의 ID카드 버튼 → 왼쪽 패널과 같은 카드를 작은 창으로
       if (view.kind !== 'started') return;
-      showIdCard(idCard(view.ctx));
+      showIdCard(idCard(view.ctx), (a, v) => void handle(a, v));
       return;
+    }
+    case 'wallet-pop':
+      // 옛 잔고 칩 → 가계부 탭
+      return handle('tab', 'wallet');
+    case 'wallet-filter':
+      walletTabUi.filter = value === 'in' || value === 'out' ? value : 'all';
+      return render();
+    case 'wallet-open':
+      walletTabUi.open = walletTabUi.open === value ? null : value ?? null;
+      return render();
+    case 'wallet-edit':
+      // 잔고 칸 ✎: 그 자리에 잔고 고치기 칸 (잔고 직접 수정이 켜져 있을 때만)
+      if (view.kind !== 'started' || !walletEditable(view.ctx.chat.scriptstate)) return;
+      walletTabUi.edit = !walletTabUi.edit;
+      walletTabUi.notice = '';
+      render();
+      if (walletTabUi.edit) root?.querySelector<HTMLInputElement>('[name="wt-adj"]')?.focus();
+      return;
+    case 'wallet-del': {
+      if (view.kind !== 'started' || !value || !walletEditable(view.ctx.chat.scriptstate)) return;
+      const ctx = view.ctx;
+      await updateChat(ctx.charIndex, ctx.chatIndex, (chat) => {
+        const w = readWallet(chat.scriptstate, getPrefs().walletStart ?? WALLET_START_DEFAULT);
+        return { ...chat, scriptstate: { ...(chat.scriptstate ?? {}), ...walletVars(removeWalletEntry(w, value ?? '')) } };
+      });
+      return refresh();
+    }
+    case 'wallet-adj': {
+      if (view.kind !== 'started' || !walletEditable(view.ctx.chat.scriptstate)) return;
+      const n = parseWon(value ?? '');
+      if (n === null) {
+        walletTabUi.notice = '금액을 읽을 수 없어요. 숫자 또는 「120만」처럼 적어 주세요.';
+        return render();
+      }
+      const ctx = view.ctx;
+      await updateChat(ctx.charIndex, ctx.chatIndex, (chat) => {
+        const w = readWallet(chat.scriptstate, getPrefs().walletStart ?? WALLET_START_DEFAULT);
+        return { ...chat, scriptstate: { ...(chat.scriptstate ?? {}), ...walletVars(adjustWallet(w, aliveAnchors(chat), n)) } };
+      });
+      walletTabUi.notice = '';
+      walletTabUi.edit = false;
+      return refresh();
     }
     case 'agents-view':
       // 상황판 요원 칸 제목줄의 모니터·목록 아이콘 (설정 「요원 칸」과 같은 기기 공통 값)
@@ -749,6 +896,16 @@ async function handle(action: string, value?: string): Promise<void> {
       phone.view = phone.view === 'room' ? 'room' : 'list';
       resetField();
       await handleWiki('wiki-write', value, view.ctx, wikiEnv);
+      return;
+    case 'people-goto':
+      // 사원증 창의 「기록」: 위키 탭의 인물 상세로
+      if (view.kind !== 'started' || !value || !hasPersonRecord(view.ctx, value)) return;
+      tab = 'wiki';
+      resetWiki();
+      gnet.compose = null;
+      phone.view = phone.view === 'room' ? 'room' : 'list';
+      resetField();
+      await handleWiki('wiki-person', value, view.ctx, wikiEnv);
       return;
     case 'repick':
       repick = true;
@@ -838,7 +995,7 @@ async function turnWorldOn(): Promise<void> {
 }
 
 const TAB_TITLE: Record<Tab, string> = {
-  board: '상황판', map: '임무', mission: '커스텀', gnet: '괴담넷', phone: '괴담톡', wiki: '위키', field: '필드', settings: '설정',
+  board: '상황판', map: '임무', mission: '커스텀', gnet: '괴담넷', phone: '괴담톡', wiki: '위키', field: '필드', wallet: '가계부', settings: '설정',
 };
 
 function header(sub: string, extra = ''): string {
@@ -854,11 +1011,12 @@ const gameShown = (): boolean => true;
 /** 진행 중 화면의 머리: 지금 탭 이름 (위협도는 기준이 헷갈리기만 해서 아예 뺐다, 사용자 결정) */
 function startedHeader(ctx: ChatContext): string {
   return `<header class="gx-head">
-    <div class="gx-brand gx-tabhead"><span class="gx-hmark"><span class="gx-logo">${GHOST_ICON}</span><span class="gx-mark-txt"><b aria-label="${BRAND.name}">${brandHtml('var(--text)', 'var(--signal)')}</b></span></span><span class="gx-hsep" aria-hidden="true">›</span><span class="gx-tabicon">${tab === 'field' ? ICONS.game : ICONS[tab]}</span><div><b>${TAB_TITLE[tab]}</b></div></div>
+    <div class="gx-brand gx-tabhead"><span class="gx-hmark"><span class="gx-logo">${GHOST_ICON}</span><span class="gx-mark-txt"><b aria-label="${BRAND.name}">${brandHtml('var(--text)', 'var(--signal)')}</b></span></span><span class="gx-hsep" aria-hidden="true">›</span><span class="gx-tabicon">${tab === 'field' ? ICONS.game : ICONS[tab]}</span><div><b>${tab === 'gnet' ? gnetLabel(ctx.chat.scriptstate) : TAB_TITLE[tab]}</b></div></div>
     <div class="gx-head-act">
+      ${walletHeadButton(ctx, tab === 'wallet')}
       ${gameShown() ? `<button class="gx-x gx-fieldbtn${tab === 'field' ? ' on' : ''}" data-action="tab" data-value="field" aria-label="필드" title="필드">${ICONS.game}</button>` : ''}
       <button class="gx-x gx-idbtn" data-action="id-card" aria-label="내 ID카드">${userInfo().photo ? `<img src="${esc(userInfo().photo!)}" alt="">` : ICONS.idcard}</button>
-      <button class="gx-x${tab === 'settings' ? ' on' : ''}" data-action="tab" data-value="settings" aria-label="설정">${ICONS.settings}${hasUpdate(ctx) ? '<span class="gx-xdot" aria-label="새 버전"></span>' : ''}</button>
+      <button class="gx-x" data-action="ed-open" data-value="set:screen" aria-label="설정">${ICONS.settings}${hasUpdate(ctx) ? '<span class="gx-xdot" aria-label="새 버전"></span>' : ''}</button>
       <button class="gx-x" data-action="close" aria-label="닫기">${ICONS.close}</button></div>
   </header>`;
 }
@@ -892,15 +1050,23 @@ function renderPicker(): void {
 }
 
 const INNER_SCROLL = '.gx-acards, .gx-sidecol, .gx-mbox, .gx-sits, .gx-bd-col > .gx-evcs, .nw-groups';
+/** 설정 기능 페이지(인물 기록 설정 등)·위키 문서 칸(인물 상세·기록 문서): .gx-body 가 아니라 이 칸이 실제로 스크롤된다.
+ *  같은 페이지(pageKey)를 다시 그릴 때만 자리를 지킨다 (다른 문서로 넘어가면 맨 위부터) */
+const PAGE_SCROLL = '.st-featpage .ph-form-body, .nw-pane .nw-doc';
+const pageKey = () => `${tab}|${settingsUi.page}|${wiki.view}|${wiki.title}`;
 
 function render(): void {
   if (!root) return;
+  // 설정 창의 설정 페이지는 패널 상태를 그대로 보여 주므로 패널을 다시 그릴 때 같이 그린다 (2026-10-27)
+  if (editorOpen() && editorOnSettings()) queueMicrotask(() => editorRender());
   const nav = view.kind === 'started';
   // 다시 그려도 읽던 자리를 지킨다
   const scroller = root.querySelector('.gx-body');
   const keep = scroller && root.dataset.tab === tab ? scroller.scrollTop : 0;
   // 안쪽 스크롤 칸(편성 요원 목록·사이드 칸 등)도 같은 탭이면 자리를 지킨다
   const inner = root.dataset.tab === tab ? [...root.querySelectorAll<HTMLElement>(INNER_SCROLL)].map((el) => el.scrollTop) : [];
+  // 설정 기능 페이지·위키 문서 칸: 진단 행 펼치기·📌·취소처럼 전체를 다시 그려도 그 칸의 자리를 지킨다 (맨 위로 튀던 문제, 2026-10-26)
+  const pageKeep = root.dataset.pk === pageKey() ? [...root.querySelectorAll<HTMLElement>(PAGE_SCROLL)].map((el) => el.scrollTop) : [];
   // 괴담톡 대화: 맨 아래를 보고 있었으면(또는 방을 새로 열면) 다시 그린 뒤에도 맨 아래로
   const log = root.querySelector<HTMLElement>('.ph-log');
   const logRoom = root.dataset.room ?? '';
@@ -920,6 +1086,7 @@ function render(): void {
   // 창 모양 (설정 → 화면): 메뉴 위치, 창 바깥 어둡기
   const pf = getPrefs();
   root.dataset.nav = pf.nav ?? 'left';
+  root.dataset.wikiSide = pf.wikiSide ?? 'left';
   // --dim은 글자색 변수라 겹치면 안 된다. 테마별 막 색에 투명도만 바꿔 바로 칠함
   paintVeil(root, pf.dim ?? DIM_DEFAULT);
   // 시작 전(고르기·첫 장면) 화면은 PC에서 설정 화면 폭만큼만 (너무 넓으면 가운데만 차고 양옆이 빈다)
@@ -941,6 +1108,8 @@ function render(): void {
   const next = root.querySelector('.gx-body');
   if (next && keep) next.scrollTop = keep;
   if (inner.length) root.querySelectorAll<HTMLElement>(INNER_SCROLL).forEach((el, i) => inner[i] && (el.scrollTop = inner[i]));
+  root.dataset.pk = pageKey();
+  if (pageKeep.length) root.querySelectorAll<HTMLElement>(PAGE_SCROLL).forEach((el, i) => pageKeep[i] && (el.scrollTop = pageKeep[i]));
   const nlog = root.querySelector<HTMLElement>('.ph-log');
   root.dataset.room = phone.room ?? '';
   if (nlog) {
@@ -982,6 +1151,8 @@ interface NavState {
   g?: { sub: string; open: number | null; dm: string | null; s: boolean; c: unknown };
   f?: 'goal' | 'team';
   d?: string;
+  /** 상황판 사원증 창 (열려 있으면 요원 이름) */
+  a?: string;
 }
 const navHist = new NavHistory<NavState>();
 
@@ -993,6 +1164,7 @@ function navState(): NavState {
   if (tab === 'gnet') s.g = { sub: gnet.sub, open: gnet.open, dm: gnet.openDm, s: gnet.settings, c: gnet.compose?.kind === 'post' || gnet.compose?.kind === 'newdm' ? gnet.compose : null };
   if (tab === 'map' || tab === 'mission') s.f = field.step;
   if (tab === 'settings') s.d = dirUi.open;
+  if (tab === 'board' && agUi.pop) s.a = agUi.pop;
   return s;
 }
 
@@ -1011,15 +1183,15 @@ const PH_SUB: Record<string, string> = { contacts: '연락처', chats: '대화',
 function markOf(raw: NavState): Mark {
   const s = markState(raw);
   const ctx = view.kind === 'started' ? view.ctx : null;
-  let name = TAB_TITLE[s.tab];
-  if (s.w) name = s.w.view === 'doc' || s.w.view === 'compose' ? s.w.title || '위키' : s.w.view === 'settings' ? '위키 설정' : s.w.view === 'new' ? '위키 새 문서' : '위키 메인';
+  let name = s.tab === 'gnet' ? gnetLabel(ctx?.chat.scriptstate) : TAB_TITLE[s.tab];
+  if (s.w) name = s.w.view === 'doc' || s.w.view === 'compose' ? s.w.title || '위키' : s.w.view === 'settings' ? '위키 설정' : s.w.view === 'new' ? '위키 새 문서' : s.w.view === 'people' ? '이 채팅의 인물' : s.w.view === 'person' ? `${s.w.title} 기록` : s.w.view === 'docs' ? '기록 문서' : s.w.view === 'faction' ? `세력 ${s.w.title}` : '위키 메인';
   if (s.p) {
     const r = s.p.view === 'room' && s.p.room && ctx ? readPhone(ctx.chat).rooms[s.p.room] : undefined;
     name = r ? roomLabel(r) : s.p.view === 'settings' ? '괴담톡 설정' : `괴담톡 ${PH_SUB[s.p.sub] ?? ''}`.trim();
   }
   if (s.g) {
     const post = s.g.open !== null && ctx ? findPost(readGnet(ctx.chat), s.g.open) : undefined;
-    name = s.g.s ? '괴담넷 설정' : post ? post.title || '괴담넷 글' : s.g.dm ? `${s.g.dm} 쪽지` : s.g.sub === 'dm' ? '괴담넷 쪽지' : '괴담넷';
+    name = s.g.s ? `${gnetLabel(ctx?.chat.scriptstate)} 설정` : post ? post.title || `${gnetLabel(ctx?.chat.scriptstate)} 글` : s.g.dm ? `${s.g.dm} 쪽지` : s.g.sub === 'dm' ? '괴담넷 쪽지' : '괴담넷';
   }
   if (s.f === 'team') name = `${name} 편성`;
   if (s.tab === 'settings' && s.d) name = '명부';
@@ -1051,6 +1223,7 @@ function applyNav(s: NavState): void {
   if (s.p) Object.assign(phone, { sub: s.p.sub, tab: s.p.tab, view: s.p.view, room: s.p.room, openNotice: s.p.n });
   if (s.g) Object.assign(gnet, { sub: s.g.sub, open: s.g.open, openDm: s.g.dm, settings: s.g.s, compose: s.g.c });
   if (s.d !== undefined) dirUi.open = s.d;
+  agUi.pop = s.a ?? '';
   // 편성 단계는 목표를 골라야 갈 수 있으니 버튼과 같은 길로 (못 가면 목표 단계에 머문다)
   if (s.f && s.f !== field.step) return void handle('field-step', s.f);
   render();
@@ -1117,6 +1290,8 @@ function startedBody(ctx: ChatContext): string {
       return gnetTab(ctx, gnetEnv);
     case 'phone':
       return phoneTab(ctx, phoneEnv);
+    case 'wallet':
+      return walletTab(ctx);
     case 'field':
       // 게임은 그린 뒤 이 자리에 붙인다 (afterRender → syncField)
       return '<main class="gx-body gx-fieldhost"></main>';
@@ -1140,17 +1315,16 @@ function body(): string {
       return `${header('오류')}<div class="gx-empty">${esc(view.message)}</div>`;
     case 'not-lite':
       return `${header('연결 안 됨')}<div class="gx-empty">
-        <p><b>${esc(view.name || '이 캐릭터')}</b>는 ${BRAND.name} 카드가 아니에요.</p>
-        <p>플러그인은 ${BRAND.name} 전용 카드(${CARD_FILE})에서만 동작해요. 원본 괴이봇 카드는 기존 Lua로 그대로 돌아가요.</p>
+        <p><b>${esc(view.name || '이 캐릭터')}</b>는 ${view.goei ? `${BRAND.name} 카드지만 Plugin manifest 가 없어요.` : `${BRAND.name} 카드가 아니에요.`}</p>
+        <p>${view.goei ? '설치 · 점검에서 매니페스트와 인사말을 다시 심으면 시작 화면이 열려요.' : `이 봇에 ${BRAND.name}를 설치하면(설정 폴더·명부·인사말·사진·아이콘을 심어요) 여기서 바로 쓸 수 있어요. 기존 로어북·인사말·에셋은 그대로 둬요.`}</p>
+        <button class="gx-start" data-action="install-open">${view.goei ? '설치 · 점검 열기' : `이 봇에 ${BRAND.name} 설치`}</button>
       </div>`;
     case 'started':
       evSeenReset();
-      return `${tabs()}${startedHeader(view.ctx)}<div class="gx-content">${tab === 'settings' ? '' : updateBanner(view.ctx)}${notice && tab !== 'map' && tab !== 'mission' ? `<div class="${noticeClass(notice)} gx-notice" role="alert">${esc(notice)}</div>` : ''}${startedBody(view.ctx)}</div>${evPopup(boardClock(view.ctx))}${tab === 'board' ? agentPopup() : ''}${markPop(markOf(navState()), recentMarks())}`;
+      return `${tabs()}${startedHeader(view.ctx)}<div class="gx-content">${tab === 'settings' ? '' : updateBanner(view.ctx)}${notice && tab !== 'map' && tab !== 'mission' ? `<div class="${noticeClass(notice)} gx-notice" role="alert">${esc(notice)}</div>` : ''}${startedBody(view.ctx)}</div>${evPopup(boardClock(view.ctx))}${tab === 'board' ? agentPopup((n) => view.kind === 'started' && hasPersonRecord(view.ctx, n)) : ''}${markPop(markOf(navState()), recentMarks())}`;
     case 'opening':
       return `${header('커스텀 임무 · 첫 장면 고르기', '<button class="gx-x" data-action="repick" aria-label="시작 설정 다시 고르기">' + ICONS.back + '</button>')}<div class="gx-content">${missionTab(view.ctx, true, notice, busy)}</div>`;
     case 'picker':
-      if (pickerPrefs)
-        return `${header('새 채팅 기본 설정', `<button class="gx-x" data-action="prefs-close" aria-label="시작 화면으로">${ICONS.back}</button>`)}<div class="gx-content">${settingsTab(view.ctx, settingsUi.scope === 'chat' ? 'defaults' : settingsUi.scope, false)}</div>`;
       return `${header(view.staged ? '첫 전송 전까지 다시 고를 수 있어요' : '새 작전 준비', `<button class="gx-x" data-action="prefs-open" aria-label="설정">${ICONS.settings}${hasUpdate(view.ctx) ? '<span class="gx-xdot" aria-label="새 버전"></span>' : ''}</button>`)}<div class="gx-content">${updateBanner(view.ctx)}${picker()}</div>`;
   }
 }
@@ -1231,10 +1405,11 @@ function tabs(): string {
     ${item('map', '임무', ICONS.map, 'mob')}
     ${item('mission', '커스텀', ICONS.mission, 'desk')}
     ${item('phone', '괴담톡', ICONS.phone, '', unreadPhone ? '<span class="gx-nbadge dot" aria-label="새 메시지"></span>' : '')}
-    ${GNET_ON ? item('gnet', '괴담넷', ICONS.gnet) : ''}
+    ${GNET_ON ? item('gnet', gnetLabel(ctx?.chat.scriptstate), ICONS.gnet) : ''}
     ${item('wiki', '위키', ICONS.wiki)}
     ${gameShown() ? item('field', '필드', ICONS.game, 'desk') : ''}
-    ${item('settings', '설정', ICONS.settings, 'desk', ctx && hasUpdate(ctx) ? '<span class="gx-nbadge dot" aria-label="새 버전"></span>' : '')}
+    ${ctx && walletOn(ctx) ? item('wallet', '가계부', ICONS.wallet, 'desk') : ''}
+    <button class="gx-nb desk" data-action="ed-open" data-value="set:screen">${ICONS.settings}<span>설정</span>${ctx && hasUpdate(ctx) ? '<span class="gx-nbadge dot" aria-label="새 버전"></span>' : ''}</button>
     <span class="gx-nav-gap"></span>
     ${ctx ? navHistBar(markOf(navState())) : ''}
     ${mbarHtml([
@@ -1242,7 +1417,7 @@ function tabs(): string {
       item('map', '임무', ICONS.map, 'mob'),
       item('board', '상황판', ICONS.board, 'home'),
       item('phone', '괴담톡', ICONS.phone, '', unreadPhone ? '<span class="gx-nbadge dot" aria-label="새 메시지"></span>' : ''),
-      ...(GNET_ON ? [item('gnet', '괴담넷', ICONS.gnet)] : []),
+      ...(GNET_ON ? [item('gnet', gnetLabel(ctx?.chat.scriptstate), ICONS.gnet)] : []),
     ])}
   </nav>`;
 }
@@ -1282,8 +1457,15 @@ function idCard(ctx: ChatContext): string {
   return `<div class="gx-id">${img ? `<span class="gx-id-bg" style="background-image:url('${esc(img)}')"></span>` : ''}
       ${photo}
       <span class="gx-id-who"><b>${esc(name)}</b><small>${esc([f ? selfName(ctx, f.code, f.name) : '소속 없음', pa?.rank ?? ''].filter(Boolean).join(' · '))}</small></span>
-      ${status ? `<span class="gx-op-st">${status}</span>` : ''}
+      ${status || walletChip(ctx) ? `<span class="gx-op-st">${walletChip(ctx)}${status}</span>` : ''}
     </div>`;
+}
+
+/** 잔고 칩 (상태창 잔고 칸을 쓸 때): 장부 잔고. 누르면 장부 창 */
+function walletChip(ctx: ChatContext): string {
+  if (colConfig(ctx.chat.scriptstate).wallet === 'off') return '';
+  const w = readWallet(ctx.chat.scriptstate, getPrefs().walletStart ?? WALLET_START_DEFAULT);
+  return `<button class="gx-op-ln gx-wallet" data-action="tab" data-value="wallet" aria-label="잔고·가계부" title="가계부"><i>잔고</i><em>${esc(formatWon(walletBalance(w, aliveAnchors(ctx.chat))))}</em></button>`;
 }
 
 /** 내 소속은 내 시점의 이름으로 (가짜 관리국을 고르면 나에게는 그냥 관리국). 명부에서 이름을 바꿨으면 그 이름 */

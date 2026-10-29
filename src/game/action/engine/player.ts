@@ -29,6 +29,9 @@ export interface AnimRef {
   origin: number;
 }
 
+/** 월드가 플레이어를 만드는 곳 (에일린이 있으면 main.ts가 에일린 플레이어로 바꾼다) */
+export const playerFactory: { make: (clips: Record<string, FrameInfo[]>) => Player } = { make: (clips) => new Player(clips) };
+
 export class Player extends Fighter {
   readonly team = 'player' as const;
   readonly kind = 'player';
@@ -113,7 +116,7 @@ export class Player extends Fighter {
   wantItem = 0;
   wantSuper = false;
 
-  constructor(private clips: Record<string, FrameInfo[]>) {
+  constructor(protected clips: Record<string, FrameInfo[]>) {
     super();
     this.friction = 0.72;
   }
@@ -195,6 +198,11 @@ export class Player extends Fighter {
       }
     }
     return { hit: hit.map(h => progressionHit(h, this.progression, h.attackId === al?.id || isBlastMove(this.moveKey) ? 'ability' : 'melee')), hurt };
+  }
+
+  /** 클립 장 수 (그림 바꿔 그리기용) */
+  clipLen(clip: string): number {
+    return this.clips[clip]?.length || 1;
   }
 
   /** 지금 보여 줄 클립·장 */

@@ -2,6 +2,7 @@
 // 직접 입력·커스텀 임무와 달리 놓을 유저 메시지가 없으니 자동 전송도, 유저 메시지도 만들지 않는다.
 // display는 어느 글인지 알려 주지 않아서, 고른 첫 장면 원문에서 한 줄을 떼어 두고 그 줄이 든 글에만 붙인다.
 // 첫 메시지를 보내면 Risu가 첫 장면을 다시 그리지 않을 수 있어서, 숨김은 본 화면 CSS(overlay.ts OPENING_CSS)가 맡는다.
+import { getChar } from './risu';
 import { factionList } from '../core/factions';
 import { findScenario } from '../core/scenarios';
 import { chatPhase, currentChoice } from '../core/start';
@@ -44,7 +45,7 @@ export function wantsOpeningHint(text: string): boolean {
 export async function refreshOpeningHint(charIndex: number, chatIndex: number): Promise<void> {
   if (charIndex < 0 || chatIndex < 0) return void (marker = '');
   const chat = (await risuai.getChatFromIndex(charIndex, chatIndex)) as Chat | null;
-  const char = (await risuai.getCharacterFromIndex(charIndex)) as { globalLore?: LoreEntry[]; alternateGreetings?: string[] } | null;
+  const char = await getChar<{ globalLore?: LoreEntry[]; alternateGreetings?: string[] }>(charIndex);
   const fm = Number(chat?.fmIndex);
   setOpeningHint(chat && openingStaged(chat, char?.globalLore) && Number.isInteger(fm) && fm >= 0 ? (char?.alternateGreetings?.[fm] ?? null) : null);
 }

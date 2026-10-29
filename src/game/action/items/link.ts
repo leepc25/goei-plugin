@@ -9,7 +9,7 @@ import { usesAmmo, type ItemRun } from './inventory';
 
 /** 적 모듈 Drop.item 그대로 */
 export interface EnemyDrop {
-  item: 'cash' | 'heal' | 'shard' | 'relic' | 'ammo' | 'dream' | 'key' | 'upgrade';
+  item: 'heal' | 'ammo';
   n: number;
 }
 /** 적이 들고 있던 임시 무기 (부록 F.2). 적 모듈 종류 이름 기준 */
@@ -20,9 +20,7 @@ export const ENEMY_WEAPONS: Record<string, { p: number; pool: string[] }> = {
   fb_shield: { p: 0.2, pool: ['pipe'] },
   dd_member: { p: 0.1, pool: ['kitchenknife'] },
 };
-const COMMON_RELICS = ['scrap', 'oddcoin', 'tooth', 'photo'];
-
-/** 적 모듈 드랍 → 바닥. 탄을 안 쓰는 요원에게 탄은 현금으로 바뀐다. 'upgrade'는 엔진·본부 몫이라 건너뛴다. */
+/** 적 모듈 드랍 → 바닥. 탄을 안 쓰는 요원에게는 탄이 안 떨어진다. */
 export function spawnEnemyDrops(field: Field, run: ItemRun, drops: EnemyDrop[], x: number, y: number, kind = ''): ItemEvent[] {
   const ev: ItemEvent[] = [];
   const put = (k: Parameters<typeof spawnPickup>[1], ref?: string, amount = 1) => {
@@ -32,35 +30,11 @@ export function spawnEnemyDrops(field: Field, run: ItemRun, drops: EnemyDrop[], 
   for (const d of drops) {
     if (!Number.isSafeInteger(d.n) || d.n <= 0) continue;
     switch (d.item) {
-      case 'cash': {
-        // 큰 값은 몇 덩이로
-        const parts = Math.min(4, Math.max(1, Math.ceil(d.n / 10)));
-        let left = d.n;
-        for (let i = 0; i < parts; i++) {
-          const k = i === parts - 1 ? left : Math.ceil(d.n / parts);
-          left -= k;
-          if (k > 0) put('cash', undefined, k);
-        }
-        break;
-      }
-      case 'shard':
-        for (let i = 0; i < d.n; i++) put('shard');
-        break;
       case 'heal':
         for (let i = 0; i < d.n; i++) put('heal');
         break;
       case 'ammo':
         if (usesAmmo(run)) for (let i = 0; i < d.n; i++) put('ammo');
-        else put('cash', undefined, 4 * d.n);
-        break;
-      case 'relic':
-        for (let i = 0; i < d.n; i++) put('relic', COMMON_RELICS[Math.floor(rand(field) * COMMON_RELICS.length)]);
-        break;
-      case 'dream':
-        for (let i = 0; i < d.n; i++) put('relic', 'dreamcatcher');
-        break;
-      case 'key':
-        for (let i = 0; i < d.n; i++) put('relic', 'rustkey');
         break;
     }
   }

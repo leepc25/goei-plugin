@@ -1,0 +1,6 @@
+Detailed 16-bit pixel art side-scrolling game background. Interior of a brand-new, modern Korean government agency office building corridor, bright and clean.
+Camera looks straight at the back wall (front view, slightly from above). Vertical layout from top: a thin plain light-gray ceiling strip (top 6% of the image), then the back wall, then at exactly 60% of the image height from the top a straight horizontal line where the wall meets the floor, then the floor filling the bottom 40% of the image.
+The left end of the corridor is closed by a side wall seen in gentle perspective: the back corner is a vertical line at about 22% of the image width, and the side wall's floor line runs from the bottom of that corner diagonally down to the bottom-left corner of the image; its top edge runs from the top of the corner up-left to the top edge.
+Back wall and side wall: one continuous plain painted surface in light warm gray / off-white, no panels, no seams, no grid lines, with a slim dark-gray baseboard at the bottom.
+Floor: one uniform matte light-gray color with only fine even pixel noise texture, the same brightness everywhere (no light spots, no shading gradient, no stains, no lines), and a thin soft shadow line where it meets the wall.
+Completely empty: no doors, no windows, no light fixtures, no furniture, no objects. No wood, no darkness. No people, no text.

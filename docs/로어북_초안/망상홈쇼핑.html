@@ -1,0 +1,146 @@
+<title>망상홈쇼핑 로어북 초안</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=IBM+Plex+Sans+KR:wght@400;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* 로어북 항목 검토지: 위에 등록 정보, 아래 본문 렌더, 맨 아래 붙여넣기용 원문 */
+:root{
+  --bg:#f3f4f1;--panel:#e6e9e4;--fg:#1d2422;--muted:#5d6a66;--line:#c8cfca;--gold:#9a6b0c;--red:#a2302a;
+  --display:"Gowun Batang",'Nanum Myeongjo',serif;--body:"IBM Plex Sans KR",'Apple SD Gothic Neo','Malgun Gothic',sans-serif;--mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#121615;--panel:#1b2120;--fg:#dfe4e0;--muted:#8e9a96;--line:#2e3735;--gold:#e0b04a;--red:#e07a6f;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#121615;--panel:#1b2120;--fg:#dfe4e0;--muted:#8e9a96;--line:#2e3735;--gold:#e0b04a;--red:#e07a6f;color-scheme:dark}
+body{background:var(--bg);color:var(--fg);font-family:var(--body);font-size:15px;line-height:1.75;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.wrap{max-width:820px;margin:0 auto;padding-block:40px 80px;display:grid;gap:28px}
+.stamp{font-family:var(--mono);font-size:12px;letter-spacing:.12em;color:var(--red)}
+h1{font-family:var(--display);font-size:clamp(26px,4vw,38px);line-height:1.25;margin:6px 0 0;text-wrap:balance}
+.meta{background:var(--panel);border-left:3px solid var(--gold);padding:12px 16px;font-size:14px}
+.meta ul{margin:0;padding-left:1.2em}.meta li{margin:2px 0}
+.entry{min-width:0}
+.entry h3{font-family:var(--display);font-size:24px;margin:0 0 8px;text-wrap:balance}
+.entry h4{font-family:var(--display);font-size:18px;color:var(--gold);margin:28px 0 6px;padding-top:10px;border-top:1px solid var(--line)}
+.entry ul{padding-left:1.2em}.entry li{margin:4px 0}
+code{font-family:var(--mono);font-size:.88em;background:var(--panel);padding:1px 5px;border-radius:3px;word-break:break-all}
+.raw{border:1px solid var(--line);border-radius:4px}
+.raw .bar{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:8px 12px;background:var(--panel);font-size:13px;color:var(--muted)}
+.raw button{font:inherit;font-weight:600;color:var(--bg);background:var(--gold);border:0;border-radius:3px;padding:6px 14px;cursor:pointer}
+.raw button:focus-visible{outline:2px solid var(--fg);outline-offset:2px}
+.raw pre{margin:0;padding:12px;max-height:360px;overflow:auto;font-family:var(--mono);font-size:12.5px;line-height:1.55;white-space:pre-wrap}
+</style>
+<div class="wrap">
+<header><div class="stamp">로어북 초안 · 카드 미반영</div><h1>로어북 초안 · 망상홈쇼핑 (괴이/파밍 미정)</h1></header>
+<section class="meta"><ul>
+<li>폴더: 미정 (🚧괴이 또는 🎁파밍)</li>
+<li>이름(comment): 망상홈쇼핑</li>
+<li>키: <code>Delusion Home Shopping, 망상홈쇼핑, 망상 홈쇼핑, Red Friday, 레드 프라이데이, 망상 홈쇼핑 라이브</code></li>
+<li>순서(insertorder): 500 (괴이로 갈 때) / 파밍 기본값 (파밍으로 갈 때)</li>
+<li>근거: 카드 「오후역」 시트와 위키 기본 문서 「오후역」에서 망상홈쇼핑 부분만 간추림. 원작 394화의 「망상홈쇼핑 / 아이템」(미인 약), 사용자가 준 원작 상품 설정(불운 포스트잇, 계란무드등)과 "물건을 떼와서 파는 플랫폼 어둠"을 더함.</li>
+<li>새로 지은 부분: 「Audience Recruitment」 절 전체(방청객 모집·쇼룸·흥정·교환), 「Ordering」 절의 결제 방식(분할 납부 = 출연 계약)과 주문서 색종이·택배 규칙 일부. 오후역 원문엔 주문이 가능하다는 증언(배송은 옴, 받는 이 이름이 다름)만 있음.</li>
+<li>겹치는 키: 지금 「오후역」 시트 키에 <code>Delusion Home Shopping, 망상 홈쇼핑, 망상홈쇼핑</code>이 들어 있음. 이 문서를 넣으면 오후역 키에서 빼야 두 항목이 같이 켜지지 않음.</li>
+</ul></section>
+<article class="entry"><h3>Delusion Home Shopping (망상홈쇼핑)</h3>
+<h4>Identity</h4>
+<ul>
+<li>A 24-hour 2000s-style TV shopping channel selling anomalous merchandise whose advertised effects are real; that is the danger.</li>
+<li>A platform, not a maker: it sources items from other Uh-doom, anomalous workshops, and dead sellers' stock and markets them to whatever demand exists, often for a purpose other than the one they were made for. The original purpose survives under the label.</li>
+<li>Once a bizarre ad that cut into ordinary TV unannounced on Friday nights; since the Day of Disaster the permanent tenant of Blood Broadcasting Station at Segwang's Afternoon Station (see 오후역 for the studio). Broadcasts, app, and deliveries reach far beyond Segwang.</li>
+</ul>
+<h4>Contact</h4>
+<ul>
+<li>Friday Interruption: on Friday nights any screen left on can switch to the channel; changing channels brings it back one channel later. Switching off works, but the host's voice runs on a few seconds after the screen goes black.</li>
+<li>Live App: "Delusion Home Shopping Live" installs itself and appoints the owner as audience; deleted, it often returns next Friday. Chat mixes shopping talk with pleas ("Delivery time?" / "I'm in here" / "Restock on item 2?" / "Anyone know the way out").</li>
+<li>Staff Contracts: posters of smiling models injuring themselves lead to an intake room with a pen and a one-day contract for "unspecified support duties, performance-based pay." Signing makes the signer staff.</li>
+<li>Stray Goods: boxes with the channel's sticker, usage instructions, and air date (e.g., "aired June 1, 19XX") turn up in pharmacies, gyms, clinics, flea markets, stockrooms. Baekilmong has bought whole lots for experiments.</li>
+</ul>
+<h4>Studio Audience</h4>
+<ul>
+<li>On air and in the app a banner offers "Studio audience wanted! Free seats, free gifts, special audience prices" with a number or button. Applicants are pulled, with whatever they hold, into the Main Studio seats at the next broadcast; anyone touching them comes along as their guest.</li>
+<li>Each gets a numbered paddle and lanyard pass. Audience is a guest status, separate from staff and demonstration models; lose paddle and pass and only those two categories remain.</li>
+<li>Rules, read by a floor manager before airtime: applaud and laugh on the cue lights (silence or visible fear draws the camera); never cross the floor tape; when the host asks "Who in our audience would like to try it?", do not raise a hand, stand, or meet his eyes (volunteers become models); touch nothing on the stage or demo table; stay seated until the credits roll and the EXIT sign over the audience door lights, then leave only by that door, which returns each person to where they applied.</li>
+<li>In commercial breaks a runner leads the audience behind the bleachers to a glass-cased showroom of current and back-catalog stock, each case with price card, usage sticker, and sample. Samples may be examined freely; opening a case without a runner counts as buying.</li>
+<li>Haggle with runners, or with Red Friday in the "audience special" segment; he enjoys a good haggle on air and hates looking cheap. Audience prices beat phone prices.</li>
+<li>Payment: "interest-free installments," each an obligation to appear later as a model, extra, or caller; or a trade in anomalous items, Uh-doom material, or contracts, since this is how the channel sources stock. It underpays for anything whose purpose it reads better than the seller. Purchases come in a gift bag at the exit door; taking it accepts the sale.</li>
+</ul>
+<h4>Phone Orders</h4>
+<ul>
+<li>Calling the on-screen number mid-segment reaches a polite operator; the order is real and ships in an ordinary courier box, often addressed to someone else. Whoever opens it accepts the purchase.</li>
+<li>Installments as above. Missed ones are collected by summoning the buyer onto the set unannounced, usually on a Friday. Contracts are channel property and can be sold or transferred.</li>
+<li>Confetti picked up near the studio can unfold into an order form with the picker's name in the quantity box; treat stray confetti, flyers, and slips as contracts. No refunds; returns are "processed" by demonstrating the item on air.</li>
+</ul>
+<h4>Merchandise</h4>
+<ul>
+<li>The catalog is open-ended and changes by program, season, and demand. Each product has a cheerful ad, a real effect, strict usage instructions, and a hidden original purpose shown by embossing, foreign script, or a layer under the sticker. Following instructions exactly gives only the advertised effect; breaking them or adding a forbidden variable releases the original purpose. Demonstrations are real and often end in mutilation, parasitism, overdose, or death. Examples:</li>
+<li>Samra-Manshang Co. "Into the Vacuum": containers that stop food decay forever; comparatively peaceful.</li>
+<li>Happy-Maker: narcotic-grade painkiller sticks; the model looked far too happy; addictive.</li>
+<li>Gold-Edition Blood Bathtub: restores youth; do not ask what fills it.</li>
+<li>Aesthetic-Caterpillar Egg-Sac Diet Aid: leech-toothed worms eat fat first, then tunnel and liquefy organs.</li>
+<li>Beauty Pills (BB, "Become Beautiful"): pink translucent soft capsules, 120 per bottle. Pitch (June 1, 19XX): "Everyone, look at the model in this magazine ad. Isn't she dazzling? Today's new product is an amazing pill that lets you become just as dazzling…" Instructions: one pill each morning with liquid; over three days the body improves and gains aesthetic beauty (scars, swelling, posture, facial balance truly improve). Under the sticker, embossed judgment gates, purgatory, sulfur, notes, staff lines: "Create your own beautiful instrument! The ■■ care method beloved by the Purgatory Choir. Suitable for ■■." Alcohol after the third pill triggers the original effect in sleep: the body becomes a living instrument and the Choir comes to tune and collect it (see 화요퀴즈쇼). Baekilmong grade: Twilight.</li>
+<li>Bad Luck Post-it (불운 포스트잇): "Is there an acquaintance you hate to death? The old superstition of the curse talisman is now real. Mourn their unfortunate accident with a simple trap!" Tip: the more superstitious the target, the faster and stronger. Conditions: the target must be the user's acquaintance, must find and read it personally, and must be flustered. "Hyeolhyung (혈흉) guarantees a valid effect only when every precaution is observed."</li>
+<li>Egg Mood Lamp (계란무드등, 繼卵 "succession egg"), certified genuine, from Sunshine Select Shop (햇살편집숍): its light and shadow show a creature growing and hatching in the egg, and the result can be used alone: "Use the nerves and muscles of the creature you observed! Enjoy cool special effects!" Needs 2 ml of the creature's blood, 3 cm of its hair, 100 ml saline, in unlit darkness or shade. Open the adhesive side, attach near the spinal cord where it meets the brain, and wear it. Never wake the result; after a week of continuous use stop and recharge; never force it off; stop when adhesion weakens; do not let the result die. Recommended use: the creature's lifespan.</li>
+</ul>
+<h4>Personnel</h4>
+<ul>
+<li>Red Friday, lead host: male-presenting, late thirties, black suit, groomed hair, unnaturally white makeup, huge black fully dilated eyes. On air smooth and relentless ("Customers, you will never see this price again. Call right now. See our model's face? That is the real effect!"); off air his mouth opens too far onto a bottomless scarlet throat. Politely bureaucratic toward other anomalies, indifferent to worker deaths. He stammers only when the landlord's rent call cuts in, then calls up another model; broadcasts grow harsher near rent day.</li>
+<li>Other hosts, runners, and staff share the white face, wide smile, and scarlet throat. Dead contract workers keep working, stiff but visibly frightened. Silent stagehands clear bodies and reset props. Callers are hauntings, dying screams, or nonhuman speech; hosts keep phone etiquette throughout.</li>
+</ul>
+<h4>Survival Notes</h4>
+<ul>
+<li>Order, sign, or pick up nothing from the channel unless that obligation is the goal; the least risky way to shop is as audience, keeping that status until the EXIT sign lights.</li>
+<li>Turn screens off when the channel appears on Friday nights. Do not keep watching any feed of Segwang City Hall's rooftop; covering the screen stops the humming it induces.</li>
+<li>Once chosen for a demonstration, the body follows the script to the end.</li>
+<li>Contracts are assets: buying, winning, or transferring the paperwork changes who owns a worker or buyer without defeating the channel.</li>
+<li>Keep stray merchandise sealed; if it must be used, follow the sticker exactly and find the hidden purpose first.</li>
+</ul>
+<hr /></article>
+<section class="raw"><div class="bar"><span>카드에 붙여 넣을 원문</span><button id="copy" type="button">원문 복사</button></div><pre id="rawtext">### Delusion Home Shopping (망상홈쇼핑)
+
+#### Identity
+- A 24-hour 2000s-style TV shopping channel selling anomalous merchandise whose advertised effects are real; that is the danger.
+- A platform, not a maker: it sources items from other Uh-doom, anomalous workshops, and dead sellers&#x27; stock and markets them to whatever demand exists, often for a purpose other than the one they were made for. The original purpose survives under the label.
+- Once a bizarre ad that cut into ordinary TV unannounced on Friday nights; since the Day of Disaster the permanent tenant of Blood Broadcasting Station at Segwang&#x27;s Afternoon Station (see 오후역 for the studio). Broadcasts, app, and deliveries reach far beyond Segwang.
+
+#### Contact
+- Friday Interruption: on Friday nights any screen left on can switch to the channel; changing channels brings it back one channel later. Switching off works, but the host&#x27;s voice runs on a few seconds after the screen goes black.
+- Live App: &quot;Delusion Home Shopping Live&quot; installs itself and appoints the owner as audience; deleted, it often returns next Friday. Chat mixes shopping talk with pleas (&quot;Delivery time?&quot; / &quot;I&#x27;m in here&quot; / &quot;Restock on item 2?&quot; / &quot;Anyone know the way out&quot;).
+- Staff Contracts: posters of smiling models injuring themselves lead to an intake room with a pen and a one-day contract for &quot;unspecified support duties, performance-based pay.&quot; Signing makes the signer staff.
+- Stray Goods: boxes with the channel&#x27;s sticker, usage instructions, and air date (e.g., &quot;aired June 1, 19XX&quot;) turn up in pharmacies, gyms, clinics, flea markets, stockrooms. Baekilmong has bought whole lots for experiments.
+
+#### Studio Audience
+- On air and in the app a banner offers &quot;Studio audience wanted! Free seats, free gifts, special audience prices&quot; with a number or button. Applicants are pulled, with whatever they hold, into the Main Studio seats at the next broadcast; anyone touching them comes along as their guest.
+- Each gets a numbered paddle and lanyard pass. Audience is a guest status, separate from staff and demonstration models; lose paddle and pass and only those two categories remain.
+- Rules, read by a floor manager before airtime: applaud and laugh on the cue lights (silence or visible fear draws the camera); never cross the floor tape; when the host asks &quot;Who in our audience would like to try it?&quot;, do not raise a hand, stand, or meet his eyes (volunteers become models); touch nothing on the stage or demo table; stay seated until the credits roll and the EXIT sign over the audience door lights, then leave only by that door, which returns each person to where they applied.
+- In commercial breaks a runner leads the audience behind the bleachers to a glass-cased showroom of current and back-catalog stock, each case with price card, usage sticker, and sample. Samples may be examined freely; opening a case without a runner counts as buying.
+- Haggle with runners, or with Red Friday in the &quot;audience special&quot; segment; he enjoys a good haggle on air and hates looking cheap. Audience prices beat phone prices.
+- Payment: &quot;interest-free installments,&quot; each an obligation to appear later as a model, extra, or caller; or a trade in anomalous items, Uh-doom material, or contracts, since this is how the channel sources stock. It underpays for anything whose purpose it reads better than the seller. Purchases come in a gift bag at the exit door; taking it accepts the sale.
+
+#### Phone Orders
+- Calling the on-screen number mid-segment reaches a polite operator; the order is real and ships in an ordinary courier box, often addressed to someone else. Whoever opens it accepts the purchase.
+- Installments as above. Missed ones are collected by summoning the buyer onto the set unannounced, usually on a Friday. Contracts are channel property and can be sold or transferred.
+- Confetti picked up near the studio can unfold into an order form with the picker&#x27;s name in the quantity box; treat stray confetti, flyers, and slips as contracts. No refunds; returns are &quot;processed&quot; by demonstrating the item on air.
+
+#### Merchandise
+- The catalog is open-ended and changes by program, season, and demand. Each product has a cheerful ad, a real effect, strict usage instructions, and a hidden original purpose shown by embossing, foreign script, or a layer under the sticker. Following instructions exactly gives only the advertised effect; breaking them or adding a forbidden variable releases the original purpose. Demonstrations are real and often end in mutilation, parasitism, overdose, or death. Examples:
+  - Samra-Manshang Co. &quot;Into the Vacuum&quot;: containers that stop food decay forever; comparatively peaceful.
+  - Happy-Maker: narcotic-grade painkiller sticks; the model looked far too happy; addictive.
+  - Gold-Edition Blood Bathtub: restores youth; do not ask what fills it.
+  - Aesthetic-Caterpillar Egg-Sac Diet Aid: leech-toothed worms eat fat first, then tunnel and liquefy organs.
+  - Beauty Pills (BB, &quot;Become Beautiful&quot;): pink translucent soft capsules, 120 per bottle. Pitch (June 1, 19XX): &quot;Everyone, look at the model in this magazine ad. Isn&#x27;t she dazzling? Today&#x27;s new product is an amazing pill that lets you become just as dazzling…&quot; Instructions: one pill each morning with liquid; over three days the body improves and gains aesthetic beauty (scars, swelling, posture, facial balance truly improve). Under the sticker, embossed judgment gates, purgatory, sulfur, notes, staff lines: &quot;Create your own beautiful instrument! The ■■ care method beloved by the Purgatory Choir. Suitable for ■■.&quot; Alcohol after the third pill triggers the original effect in sleep: the body becomes a living instrument and the Choir comes to tune and collect it (see 화요퀴즈쇼). Baekilmong grade: Twilight.
+  - Bad Luck Post-it (불운 포스트잇): &quot;Is there an acquaintance you hate to death? The old superstition of the curse talisman is now real. Mourn their unfortunate accident with a simple trap!&quot; Tip: the more superstitious the target, the faster and stronger. Conditions: the target must be the user&#x27;s acquaintance, must find and read it personally, and must be flustered. &quot;Hyeolhyung (혈흉) guarantees a valid effect only when every precaution is observed.&quot;
+  - Egg Mood Lamp (계란무드등, 繼卵 &quot;succession egg&quot;), certified genuine, from Sunshine Select Shop (햇살편집숍): its light and shadow show a creature growing and hatching in the egg, and the result can be used alone: &quot;Use the nerves and muscles of the creature you observed! Enjoy cool special effects!&quot; Needs 2 ml of the creature&#x27;s blood, 3 cm of its hair, 100 ml saline, in unlit darkness or shade. Open the adhesive side, attach near the spinal cord where it meets the brain, and wear it. Never wake the result; after a week of continuous use stop and recharge; never force it off; stop when adhesion weakens; do not let the result die. Recommended use: the creature&#x27;s lifespan.
+
+#### Personnel
+- Red Friday, lead host: male-presenting, late thirties, black suit, groomed hair, unnaturally white makeup, huge black fully dilated eyes. On air smooth and relentless (&quot;Customers, you will never see this price again. Call right now. See our model&#x27;s face? That is the real effect!&quot;); off air his mouth opens too far onto a bottomless scarlet throat. Politely bureaucratic toward other anomalies, indifferent to worker deaths. He stammers only when the landlord&#x27;s rent call cuts in, then calls up another model; broadcasts grow harsher near rent day.
+- Other hosts, runners, and staff share the white face, wide smile, and scarlet throat. Dead contract workers keep working, stiff but visibly frightened. Silent stagehands clear bodies and reset props. Callers are hauntings, dying screams, or nonhuman speech; hosts keep phone etiquette throughout.
+
+#### Survival Notes
+- Order, sign, or pick up nothing from the channel unless that obligation is the goal; the least risky way to shop is as audience, keeping that status until the EXIT sign lights.
+- Turn screens off when the channel appears on Friday nights. Do not keep watching any feed of Segwang City Hall&#x27;s rooftop; covering the screen stops the humming it induces.
+- Once chosen for a demonstration, the body follows the script to the end.
+- Contracts are assets: buying, winning, or transferring the paperwork changes who owns a worker or buyer without defeating the channel.
+- Keep stray merchandise sealed; if it must be used, follow the sticker exactly and find the hidden purpose first.
+
+---</pre></section>
+</div>
+<script>
+document.getElementById('copy').addEventListener('click',function(){var b=this,t=document.getElementById('rawtext');
+navigator.clipboard.writeText(t.textContent).then(function(){b.textContent='복사됨'},function(){var r=document.createRange();r.selectNodeContents(t);var s=getSelection();s.removeAllRanges();s.addRange(r);b.textContent='선택됨, 복사하세요'});});
+</script>

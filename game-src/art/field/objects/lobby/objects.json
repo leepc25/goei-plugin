@@ -1,0 +1,26 @@
+{
+ "scene": "lobby",
+ "background": "game-src/art/field/hq/lobby.webp",
+ "objects": {
+  "desk": {
+   "file": "desk.webp",
+   "x": 494,
+   "y": 205,
+   "w": 644,
+   "h": 262,
+   "sortY": 463,
+   "solid": {
+    "x0": 494,
+    "x1": 1137,
+    "y0": 420,
+    "y1": 466
+   },
+   "behind": {
+    "x0": 560,
+    "x1": 1060,
+    "footY": 432
+   },
+   "note": "배경의 데스크는 그대로 두고 위에 덧그린다. 데스크 뒤(behind)에 선 NPC를 데스크보다 먼저 그리면 뒤에 선다. 의자는 배경에 남김."
+  }
+ }
+}

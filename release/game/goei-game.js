@@ -1,16 +1,15 @@
-// goei-game 0.16.56
+// goei-game 0.17.7
 "use strict";
 (() => {
   // src/game/action/engine/view.ts
-  var view = { crop: 0, zoom: 1, lane: [440, 690] };
+  var view = { crop: 0, cropY: 0, zoom: 1, lane: [440, 690], worldH: 720, w: 1280, hub: false };
   var FAR = 0.85;
   var persp = (y) => {
-    if (view.zoom === 1) return 1;
     const [a, b] = view.lane;
     const t = b > a ? Math.max(0, Math.min(1, (y - a) / (b - a))) : 1;
     return FAR + (1 - FAR) * t;
   };
-  var spr = (y) => persp(y) / view.zoom;
+  var spr = (y) => persp(y);
   function snapTo(c, x, y) {
     c.translate(x, y);
     const t = c.getTransform();
@@ -18,27 +17,45 @@
   }
 
   // src/game/action/art/testPeople.ts
-  var SCALE = 1.5;
-  var RUN_MS = 85;
+  var MAN_SCALE = 1;
   var art = null;
   var revision = 0;
-  var IDLE = { w: 128, h: 256, fx: 61, fy: 249, head: 18 };
-  var RUN = { w: 256, h: 256, fx: 128, fy: 234 };
   var MAN = { w: 128, h: 256, fx: 66, fy: 249, head: 8 };
-  function prepareTestPeople(urlOf) {
+  function prepareTestPeople(urlOf, bytesOf) {
     const own = ++revision;
     art = null;
-    const ready = Promise.all(["idle", "run", "man"].map(async (key2) => {
-      const file = key2 === "man" ? "man" : `woman_${key2}`;
-      const src = window.__GOEI_TEST_PEOPLE__?.[file] || (urlOf ? await urlOf(file + ".png") : "");
+    faces.clear();
+    const img5 = async (file, ext = ".png") => {
+      const src = window.__GOEI_TEST_PEOPLE__?.[file] || (urlOf ? await urlOf(file + ext) : "");
       if (!src) throw new Error("no test art");
       const im = new Image();
       im.src = src;
       await im.decode();
-      return [key2, im];
-    })).then((rows) => {
-      if (revision === own) art = Object.fromEntries(rows);
-    }).catch(() => {
+      return im;
+    };
+    const ready = (async () => {
+      let meta = window.__GOEI_TEST_PEOPLE__?.eileen;
+      if (!meta && bytesOf) {
+        const b = await bytesOf("eileen.json");
+        if (b) meta = JSON.parse(new TextDecoder().decode(b));
+      }
+      if (!meta) throw new Error("no eileen");
+      const rows = await Promise.all(Object.entries(meta).map(async ([id, m]) => [id, { im: await img5(`eileen_${id}`, ".webp"), m }]));
+      const man = await img5("man");
+      let vm = window.__GOEI_TEST_PEOPLE__?.eileen_vfx;
+      if (!vm && bytesOf) {
+        const b = await bytesOf("eileen_vfx.json").catch(() => null);
+        if (b) vm = JSON.parse(new TextDecoder().decode(b));
+      }
+      const vfx = {};
+      if (vm) await Promise.all(Object.entries(vm).map(async ([k, v]) => {
+        try {
+          vfx[k] = { ...v, img: await img5(`vfx_${k}`, ".webp") };
+        } catch {
+        }
+      }));
+      if (revision === own) art = { clips: Object.fromEntries(rows), man, vfx };
+    })().catch(() => {
     });
     return { ready, dispose: () => {
       if (revision === own) {
@@ -48,196 +65,946 @@
     } };
   }
   var hasTestPeople = () => !!art;
-  function shadow(c, x, y, k) {
-    c.fillStyle = "rgba(0,0,0,.28)";
+  var MAP = {
+    idle: "1",
+    guard: "3",
+    walk: "4",
+    run: "5",
+    jump: "7",
+    land: "6",
+    jab: "9",
+    cross: "10",
+    lowkick: "11",
+    toss: "11",
+    power: "12",
+    dash: "13",
+    airkick: "14",
+    fire: "15",
+    shotgun: "15",
+    pipe: "12",
+    evade: "16",
+    block: "17",
+    hit: "18",
+    down: "19",
+    getup: "20",
+    blast: "22",
+    chain: "22",
+    wall: "22",
+    groundblast: "22",
+    grabblast: "22",
+    charge: "23",
+    super: "25",
+    // pickup은 E(조사)마다 짧게 나와서 문 앞에서 허리를 굽히게 된다: 서 있기로 둔다
+    eat: "26",
+    drink: "26",
+    bandage: "26",
+    pickup: "1",
+    crouch: "39",
+    grab: "10",
+    grabknee: "11",
+    draw: "W",
+    holster: "W",
+    reload: "W"
+  };
+  var LOOP_FPS = { "4": 11, "5": 15, "3": 8 };
+  function frameOf(id, m, f, total) {
+    const now = performance.now() / 1e3;
+    if (id === "1") return Math.floor(now / 0.6) % 2;
+    if (LOOP_FPS[id]) return Math.floor(now * LOOP_FPS[id]) % m.n;
+    return Math.max(0, Math.min(m.n - 1, Math.floor((f + 0.5) / Math.max(1, total) * m.n)));
+  }
+  function shadow(c, x, y, w, k) {
+    c.fillStyle = `rgba(0,0,0,${0.36})`;
     c.beginPath();
-    c.ellipse(x, y, 40 * k, 9 * k, 0, 0, Math.PI * 2);
+    c.ellipse(x, y - 2 * k, Math.max(16, w) * 0.58 * k, 5 * k, 0, 0, Math.PI * 2);
     c.fill();
   }
-  function drawTestPlayer(c, moving, x, y, dir) {
+  function drawTestPlayer(c, clip, frame2, total, x, y, dir) {
     if (!art) return false;
-    const P = SCALE * spr(y);
+    const id = MAP[clip] ?? "1";
+    const e = art.clips[id] ?? art.clips["1"];
+    if (!e) return false;
+    const { im, m } = e;
+    const f = frameOf(id, m, frame2, total);
+    const k = spr(y) * 1.28;
+    const flip = m.dir === "SW" ? dir > 0 : dir < 0;
     c.save();
     c.imageSmoothingEnabled = false;
-    shadow(c, x, y, P);
+    const ft = m.foot[f] ?? [0, 40];
+    shadow(c, x + (flip ? -ft[0] : ft[0]) * k, y, Math.min(80, ft[1]), k);
     snapTo(c, x, y);
-    if (dir < 0) c.scale(-1, 1);
-    if (moving) {
-      const f = Math.floor(performance.now() / RUN_MS) % 8;
-      c.drawImage(art.run, f * RUN.w, 0, RUN.w, RUN.h, -RUN.fx * P, -RUN.fy * P, RUN.w * P, RUN.h * P);
-    } else c.drawImage(art.idle, 0, 0, IDLE.w, IDLE.h, -IDLE.fx * P, -IDLE.fy * P, IDLE.w * P, IDLE.h * P);
+    c.scale(flip ? -k : k, k);
+    c.drawImage(im, f * m.w, 0, m.w, m.h, -Math.round(m.w / 2), -(m.h - 4), m.w, m.h);
     c.restore();
     return true;
   }
   function drawTestMan(c, x, y, dir) {
     if (!art) return false;
-    const P = SCALE * spr(y);
+    const P = MAN_SCALE * spr(y);
     c.save();
     c.imageSmoothingEnabled = false;
-    shadow(c, x, y, P);
+    c.fillStyle = "rgba(0,0,0,.28)";
+    c.beginPath();
+    c.ellipse(x, y, 40 * P, 9 * P, 0, 0, Math.PI * 2);
+    c.fill();
     snapTo(c, x, y);
     if (dir < 0) c.scale(-1, 1);
     c.drawImage(art.man, 0, 0, MAN.w, MAN.h, -MAN.fx * P, -MAN.fy * P, MAN.w * P, MAN.h * P);
     c.restore();
     return true;
   }
-  var testPlayerTop = () => -(IDLE.fy - IDLE.head) * SCALE;
-  var face = null;
-  function testPlayerFace(side = 44) {
-    if (!art) return null;
-    if (face?.width === side) return face;
-    face = document.createElement("canvas");
+  var testPlayerTop = () => -(252 - 14) * 1.28;
+  var testManTop = () => -(MAN.fy - MAN.head) * MAN_SCALE;
+  var faces = /* @__PURE__ */ new Map();
+  function testPlayerFace(side = 44, flip = false) {
+    const e = art?.clips["31"] ?? art?.clips["1"];
+    if (!e) return null;
+    const key2 = `${side}|${flip}`, hit2 = faces.get(key2);
+    if (hit2) return hit2;
+    const face = document.createElement("canvas");
+    faces.set(key2, face);
     face.width = face.height = side;
     const o = face.getContext("2d");
     o.imageSmoothingEnabled = false;
-    o.drawImage(art.idle, IDLE.fx - side / 2, IDLE.head - 4, side, side, 0, 0, side, side);
+    const fx = e.m.w / 2 + (e.m.cx[0] ?? 0) + 6;
+    if (flip) {
+      o.translate(side, 0);
+      o.scale(-1, 1);
+    }
+    o.drawImage(e.im, Math.round(fx - side / 2), 16, side, side, 0, 0, side, side);
     return face;
   }
-
-  // src/game/action/art/startRoom.ts
-  var art2 = null;
-  var revision2 = 0;
-  function prepareStartRoom(urlOf) {
-    const own = ++revision2;
-    art2 = null;
-    const ready = Promise.all(["room", "workstation"].map(async (key2) => {
-      const src = window.__GOEI_START_ROOM__?.[key2] || (urlOf ? await urlOf(key2 + ".png") : "");
-      if (!src) throw new Error("Starting room asset unavailable");
-      const im = new Image();
-      im.src = src;
-      await im.decode();
-      return [key2, im];
-    })).then((rows) => {
-      if (revision2 === own) art2 = Object.fromEntries(rows);
-    });
-    return { ready, dispose: () => {
-      if (revision2 === own) {
-        revision2++;
-        art2 = null;
-      }
-    } };
-  }
-  function drawStartRoom(c, open) {
-    if (!art2) return false;
-    c.save();
-    c.imageSmoothingEnabled = true;
-    c.imageSmoothingQuality = "high";
-    c.drawImage(art2.room, 0, 0, 1280, 720);
-    if (open > 0) {
-      const x = 1001, y = 89, w = 164, h = 320;
-      c.fillStyle = "#12191c";
-      c.fillRect(x, y, w, h);
-      const visible = w * Math.max(0, 1 - open);
-      if (visible > 0) c.drawImage(
-        art2.room,
-        x / 1280 * art2.room.width,
-        y / 720 * art2.room.height,
-        w / 1280 * art2.room.width,
-        h / 720 * art2.room.height,
-        x + w - visible,
-        y,
-        visible,
-        h
-      );
+  function eileenArt() {
+    if (!art) return null;
+    const A = {}, IMG = {};
+    for (const [k, v] of Object.entries(art.clips)) {
+      A[k] = v.m;
+      IMG[k] = v.im;
     }
-    c.fillStyle = "rgba(8, 7, 6, .22)";
-    c.beginPath();
-    c.ellipse(420, 517, 135, 14, 0, 0, Math.PI * 2);
-    c.fill();
-    c.restore();
-    return true;
-  }
-  function drawStartRoomFurniture(c, kind) {
-    if (!art2 || !["desk", "chair"].includes(kind)) return;
-    c.save();
-    c.imageSmoothingEnabled = true;
-    c.imageSmoothingQuality = "high";
-    c.beginPath();
-    c.rect(kind === "chair" ? 180 : 294, 270, kind === "chair" ? 114 : 266, 256);
-    c.clip();
-    c.drawImage(art2.workstation, 0, 0, 1280, 720);
-    c.restore();
+    return { A, IMG, VFX: art.vfx };
   }
 
-  // src/game/action/art/hqTextures.ts
-  var assets = [["hq_office", "hq_office_wall_1", "hq_office__hq_office_wall_1.png"], ["hq_office", "hq_office_wall_2", "hq_office__hq_office_wall_2.png"], ["hq_office", "hq_office_wall_4", "hq_office__hq_office_wall_4.png"], ["hq_office", "hq_office_wall_6", "hq_office__hq_office_wall_6.png"], ["hq_office", "hq_office_floor", "hq_office__hq_office_floor.png"], ["hq_office", "objects/hq_office_objects_1", "hq_office__objects_hq_office_objects_1.png"], ["hq_office", "objects/hq_office_objects_3", "hq_office__objects_hq_office_objects_3.png"], ["hq_office", "objects/hq_office_objects_4", "hq_office__objects_hq_office_objects_4.png"], ["hq_corridor", "hq_corridor_wall_2", "hq_corridor__hq_corridor_wall_2.png"], ["hq_corridor", "hq_corridor_floor", "hq_corridor__hq_corridor_floor.png"], ["hq_jaemtri", "objects/hq_jaemtri_objects_1", "hq_jaemtri__objects_hq_jaemtri_objects_1.png"], ["hq_chief", "objects/hq_chief_objects_1", "hq_chief__objects_hq_chief_objects_1.png"]];
-  function prepareHqTextures(urlOf) {
-    let alive2 = true;
-    const inserted = [];
-    if (urlOf) void Promise.all(assets.map(async ([place3, name, file]) => {
-      if (window.__GOEI_BG_ART__?.[place3]?.[name]) return;
-      try {
-        const src = await urlOf(file);
-        const im = new Image();
-        im.src = src;
-        await im.decode();
-        if (!alive2) return;
-        const pack2 = window.__GOEI_BG_ART__ ??= {};
-        const group = pack2[place3] ??= {};
-        if (!group[name]) {
-          group[name] = src;
-          inserted.push([place3, name, src]);
-        }
-      } catch {
-      }
-    }));
-    return () => {
-      alive2 = false;
-      for (const [place3, name, src] of inserted) {
-        if (window.__GOEI_BG_ART__?.[place3]?.[name] === src) delete window.__GOEI_BG_ART__[place3][name];
-      }
-    };
+  // src/game/action/hq/jrRooms.gen.ts
+  var JR_ROOMS = { "jr_songil": { "file": "jr_songil", "w": 1998, "h": 666, "under": true, "lane": [415, 646], "floor": [[0, 469], [217, 416], [1799, 416], [1998, 520], [1998, 666], [0, 666]], "blocks": [[391, 460, 416, 120]], "doors": { "out": { "x0": 18, "x1": 184, "y0": 69, "y1": 460, "anim": "none", "quad": [[18, 69], [184, 83], [184, 428], [18, 460]], "behind": "dark" }, "jinryo": { "x0": 1145, "x1": 1288, "y0": 101, "y1": 400, "anim": "swing", "behind": "dark", "hinge": "R" }, "wc": { "x0": 1355, "x1": 1497, "y0": 101, "y1": 400, "anim": "swing", "behind": "dark", "hinge": "R" }, "store": { "x0": 1569, "x1": 1707, "y0": 101, "y1": 400, "anim": "swing", "behind": "dark", "hinge": "R" }, "op": { "x0": 1826, "x1": 1927, "y0": 115, "y1": 497, "anim": "none", "quad": [[1826, 133], [1927, 115], [1927, 497], [1826, 442]], "behind": "dark" } }, "lamps": [], "windows": [], "objects": [{ "id": "o0", "file": "jo_songil_0", "x": 651, "y": 331, "w": 355, "h": 129, "sortY": 460, "solid": [{ "x0": 655, "x1": 1001, "y0": 400, "y1": 460, "h": 163 }] }, { "id": "o1", "file": "jo_songil_1", "x": 781, "y": 304, "w": 94, "h": 127, "sortY": 431, "solid": [{ "x0": 785, "x1": 871, "y0": 389, "y1": 431, "h": 145 }] }, { "id": "o2", "file": "jo_songil_2", "x": 254, "y": 417, "w": 265, "h": 117, "sortY": 534, "solid": [{ "x0": 258, "x1": 514, "y0": 489, "y1": 534, "h": 125 }] }, { "id": "o3", "file": "jo_songil_3", "x": 512, "y": 404, "w": 265, "h": 130, "sortY": 534, "solid": [{ "x0": 516, "x1": 772, "y0": 489, "y1": 534, "h": 125 }] }] }, "jr_jinryo": { "file": "jr_jinryo", "w": 1429, "h": 636, "under": true, "lane": [420, 616], "floor": [[0, 502], [213, 420], [1208, 420], [1429, 494], [1429, 636], [0, 636]], "blocks": [[760, 1045, 426, 160], [1064, 1163, 426, 300], [1208, 1391, 494, 999]], "doors": { "out": { "x0": 30, "x1": 152, "y0": 46, "y1": 486, "anim": "none", "quad": [[30, 46], [152, 87], [152, 441], [30, 486]], "behind": "dark" } }, "lamps": [], "windows": [], "objects": [{ "id": "o0", "file": "jo_jinryo_0", "x": 321, "y": 387, "w": 211, "h": 92, "sortY": 479, "solid": [{ "x0": 325, "x1": 527, "y0": 418, "y1": 479, "h": 113 }] }, { "id": "o1", "file": "jo_jinryo_1", "x": 379, "y": 420, "w": 94, "h": 112, "sortY": 532, "solid": [{ "x0": 383, "x1": 469, "y0": 487, "y1": 532, "h": 157 }] }, { "id": "o2", "file": "jo_jinryo_2", "x": 203, "y": 387, "w": 97, "h": 130, "sortY": 517, "solid": [{ "x0": 207, "x1": 295, "y0": 472, "y1": 517, "h": 132 }] }, { "id": "o3", "file": "jo_jinryo_3", "x": 743, "y": 453, "w": 309, "h": 125, "sortY": 578, "solid": [{ "x0": 747, "x1": 1047, "y0": 512, "y1": 578, "h": 114 }] }] }, "jr_op": { "file": "jr_op", "w": 1392, "h": 653, "under": true, "lane": [390, 633], "floor": [[0, 471], [228, 388], [1376, 388], [1392, 395], [1392, 653], [0, 653]], "blocks": [[293, 524, 391, 200], [524, 942, 471, 130], [315, 524, 490, 120], [961, 1136, 490, 120], [821, 893, 407, 300], [923, 1376, 395, 300]], "doors": { "out": { "x0": 34, "x1": 163, "y0": 55, "y1": 448, "anim": "none", "quad": [[34, 55], [163, 76], [163, 401], [34, 448]], "behind": "dark" } }, "lamps": [], "windows": [], "objects": [{ "id": "o0", "file": "jo_op_0", "x": 809, "y": 460, "w": 71, "h": 72, "sortY": 532, "solid": [{ "x0": 813, "x1": 875, "y0": 491, "y1": 532, "h": 94 }] }] }, "jr_youngchang": { "file": "jr_youngchang", "w": 1267, "h": 680, "under": true, "lane": [402, 660], "floor": [[0, 451], [274, 406], [370, 398], [1267, 398], [1267, 680], [0, 680]], "blocks": [[999, 1267, 433, 999]], "doors": { "out": { "x0": 44, "x1": 270, "y0": 37, "y1": 429, "anim": "none", "quad": [[44, 37], [270, 52], [270, 403], [44, 429]], "behind": "dark" } }, "lamps": [], "windows": [], "objects": [{ "id": "o0", "file": "jo_youngchang_0", "x": 614, "y": 355, "w": 105, "h": 119, "sortY": 474, "solid": [{ "x0": 618, "x1": 714, "y0": 422, "y1": 474, "h": 165 }] }, { "id": "o1", "file": "jo_youngchang_1", "x": 550, "y": 403, "w": 233, "h": 130, "sortY": 533, "solid": [{ "x0": 554, "x1": 778, "y0": 466, "y1": 533, "h": 121 }] }, { "id": "o2", "file": "jo_youngchang_2", "x": 626, "y": 482, "w": 81, "h": 117, "sortY": 599, "solid": [{ "x0": 630, "x1": 702, "y0": 552, "y1": 599, "h": 146 }] }] }, "jr_daebak": { "file": "jr_daebak", "w": 2324, "h": 775, "under": true, "lane": [414, 755], "floor": [[0, 519], [225, 482], [647, 411], [2324, 411], [2324, 775], [0, 775]], "blocks": [[1263, 1562, 540, 999], [2258, 2324, 642, 999], [257, 321, 439, 200], [642, 802, 407, 200], [792, 1017, 411, 120]], "doors": { "out": { "x0": 27, "x1": 219, "y0": 37, "y1": 508, "anim": "none", "quad": [[27, 37], [219, 59], [219, 471], [27, 508]], "behind": "dark" } }, "lamps": [], "windows": [], "objects": [{ "id": "o0", "file": "jo_daebak_0", "x": 347, "y": 359, "w": 313, "h": 144, "sortY": 503, "solid": [{ "x0": 351, "x1": 655, "y0": 425, "y1": 503, "h": 127 }] }, { "id": "o1", "file": "jo_daebak_1", "x": 410, "y": 532, "w": 187, "h": 67, "sortY": 599, "solid": [{ "x0": 414, "x1": 592, "y0": 545, "y1": 599, "h": 70 }] }, { "id": "o2", "file": "jo_daebak_2", "x": 915, "y": 356, "w": 96, "h": 126, "sortY": 482, "solid": [{ "x0": 919, "x1": 1007, "y0": 431, "y1": 482, "h": 162 }] }, { "id": "o3", "file": "jo_daebak_3", "x": 778, "y": 443, "w": 371, "h": 135, "sortY": 578, "solid": [{ "x0": 782, "x1": 1144, "y0": 515, "y1": 578, "h": 162 }] }, { "id": "o4", "file": "jo_daebak_4", "x": 1869, "y": 467, "w": 92, "h": 89, "sortY": 556, "solid": [{ "x0": 1873, "x1": 1957, "y0": 503, "y1": 556, "h": 153 }] }, { "id": "o5", "file": "jo_daebak_5", "x": 1609, "y": 513, "w": 120, "h": 140, "sortY": 653, "solid": [{ "x0": 1613, "x1": 1725, "y0": 598, "y1": 653, "h": 160 }] }, { "id": "o6", "file": "jo_daebak_6", "x": 2112, "y": 488, "w": 120, "h": 165, "sortY": 653, "solid": [{ "x0": 2116, "x1": 2228, "y0": 598, "y1": 653, "h": 160 }] }, { "id": "o7", "file": "jo_daebak_7", "x": 1755, "y": 521, "w": 320, "h": 132, "sortY": 653, "solid": [{ "x0": 1759, "x1": 2071, "y0": 551, "y1": 653, "h": 128 }] }, { "id": "o8", "file": "jo_daebak_8", "x": 1865, "y": 649, "w": 100, "h": 100, "sortY": 749, "solid": [{ "x0": 1869, "x1": 1961, "y0": 691, "y1": 749, "h": 167 }] }] }, "jr_heolgap": { "file": "jr_heolgap", "w": 1660, "h": 684, "under": true, "lane": [388, 664], "floor": [[0, 527], [255, 384], [1660, 384], [1660, 684], [0, 684]], "blocks": [[425, 1075, 557, 160], [1326, 1660, 612, 999], [268, 463, 455, 999], [1194, 1360, 421, 999]], "doors": { "out": { "x0": 26, "x1": 191, "y0": 34, "y1": 510, "anim": "none", "quad": [[26, 34], [191, 64], [191, 459], [26, 510]], "behind": "dark" } }, "lamps": [], "windows": [], "objects": [{ "id": "o0", "file": "jo_heolgap_0", "x": 477, "y": 533, "w": 92, "h": 121, "sortY": 654, "solid": [{ "x0": 481, "x1": 565, "y0": 606, "y1": 654, "h": 167 }] }, { "id": "o1", "file": "jo_heolgap_1", "x": 995, "y": 533, "w": 92, "h": 121, "sortY": 654, "solid": [{ "x0": 999, "x1": 1083, "y0": 606, "y1": 654, "h": 167 }] }] } };
+  var JR_ROOM_FILES = ["jr_daebak", "jr_heolgap", "jr_jinryo", "jr_op", "jr_songil", "jr_youngchang", "jo_daebak_0", "jo_daebak_1", "jo_daebak_2", "jo_daebak_3", "jo_daebak_4", "jo_daebak_5", "jo_daebak_6", "jo_daebak_7", "jo_daebak_8", "jo_heolgap_0", "jo_heolgap_1", "jo_jinryo_0", "jo_jinryo_1", "jo_jinryo_2", "jo_jinryo_3", "jo_op_0", "jo_songil_0", "jo_songil_1", "jo_songil_2", "jo_songil_3", "jo_youngchang_0", "jo_youngchang_1", "jo_youngchang_2"];
+
+  // src/game/action/hq/painted.ts
+  var downs = (xs, y = 18) => xs.map((x) => ({ x, y, kind: "down" }));
+  var sign = (x, y) => ({ x, y, kind: "sign", color: "#3cff8a", r: 34 });
+  var elev = (x0, x1, y0, y1, seam) => ({ x0, x1, y0, y1, seam, anim: "slide2", behind: "car" });
+  var PAINTED = {
+    lobby: {
+      // 왼쪽 유리 현관 문턱 앞, 오른쪽 옆벽(계단 문) 바닥선 안쪽
+      // 데스크 뒤(왼쪽 빈 곳으로 들어감)는 y428까지 걸을 수 있다
+      file: "lobby",
+      w: 2223,
+      under: false,
+      lane: [428, 669],
+      call: [1800, 280],
+      blocks: [[350, 440, 470, 70], [1158, 1230, 462, 70], [1250, 1498, 458, 46], [1900, 1980, 470, 70]],
+      floor: [[0, 512], [60, 506], [92, 490], [300, 460], [340, 454], [470, 452], [470, 428], [1150, 428], [1150, 446], [1917, 446], [2223, 518], [2223, 669], [0, 669]],
+      doors: {
+        // 비스듬한 유리벽이라 문짝을 움직이면 선이 안 맞는다: 바깥 빛만 번진다
+        main: { x0: 91, x1: 307, y0: 38, y1: 457, seam: 198, anim: "glow", behind: "see" },
+        elev: elev(1580, 1765, 117, 415, 1674),
+        stairs: { x0: 2088, x1: 2195, y0: 98, y1: 485, anim: "swing", hinge: "L", quad: [[2088, 112], [2195, 98], [2195, 485], [2088, 460]] }
+      },
+      lamps: [...downs([861, 1095, 1356, 1671]), sign(2133, 67)],
+      windows: [],
+      // 왼쪽 유리 현관·유리벽 너머
+      // 유리 아래 끝선을 따라 (문짝 유리 바닥선이 비스듬하다)
+      outside: [[[0, 0], [412, 0], [412, 405], [330, 420], [295, 420], [210, 437], [180, 442], [98, 460], [62, 470], [60, 488], [40, 490], [0, 492]]],
+      outsideSolid: { keep: [[0, 250, 90, 420, "green"], [0, 413, 44, 520, "all"], [325, 200, 445, 372, "green"], [352, 374, 432, 432, "all"]] },
+      objects: [{ id: "desk", file: "desk", x: 494, y: 205, w: 644, h: 262, sortY: 463, solid: [{ x0: 494, x1: 1137, y0: 442, y1: 466, h: 140 }, { x0: 1096, x1: 1137, y0: 428, y1: 466, h: 140 }] }]
+    },
+    f2: {
+      file: "f2",
+      w: 2064,
+      under: false,
+      call: [1132, 284],
+      blocks: [[196, 286, 476, 70], [1776, 1858, 476, 70]],
+      floor: [[0, 504], [213, 446], [1829, 446], [2064, 515], [2064, 669], [0, 669]],
+      doors: {
+        wc: { x0: 30, x1: 118, y0: 112, y1: 470, anim: "swing", hinge: "R", quad: [[30, 112], [118, 128], [118, 446], [30, 470]] },
+        swat: { x0: 335, x1: 770, y0: 90, y1: 432, seam: 554, anim: "swing2", behind: "see" },
+        elev: elev(886, 1091, 114, 431, 988),
+        meeting: { x0: 1232, x1: 1398, y0: 98, y1: 425, anim: "swing", hinge: "R" },
+        interview: { x0: 1538, x1: 1705, y0: 98, y1: 425, anim: "swing", hinge: "R" },
+        stairs: { x0: 1948, x1: 2047, y0: 104, y1: 484, anim: "swing", hinge: "L", quad: [[1948, 125], [2047, 104], [2047, 484], [1948, 455]] }
+      },
+      lamps: [...downs([389, 710, 975, 1275, 1581]), sign(1986, 62)],
+      windows: [],
+      // 진압팀 유리문 너머 사무실 창
+      outside: [[[350, 165], [762, 165], [762, 278], [350, 278]]],
+      objects: []
+    },
+    f3: {
+      file: "f3",
+      w: 1915,
+      under: false,
+      call: [1051, 291],
+      blocks: [[180, 266, 472, 70], [1648, 1726, 472, 70]],
+      floor: [[0, 503], [235, 446], [1653, 446], [1915, 512], [1915, 669], [0, 669]],
+      doors: {
+        wc: { x0: 30, x1: 112, y0: 128, y1: 470, anim: "swing", hinge: "R", quad: [[30, 128], [112, 142], [112, 450], [30, 470]] },
+        pantry: { x0: 315, x1: 470, y0: 118, y1: 425, anim: "swing", hinge: "R" },
+        lounge: { x0: 562, x1: 715, y0: 118, y1: 425, anim: "swing", hinge: "R" },
+        elev: elev(820, 1014, 133, 430, 916),
+        office: { x0: 1148, x1: 1578, y0: 142, y1: 422, seam: 1366, anim: "slide2", behind: "see" },
+        stairs: { x0: 1805, x1: 1893, y0: 122, y1: 480, anim: "swing", hinge: "L", quad: [[1805, 138], [1893, 122], [1893, 480], [1805, 458]] }
+      },
+      lamps: [...downs([362, 656, 907, 1184, 1469]), sign(1842, 86)],
+      windows: [],
+      // 종합대응팀 유리문 너머 사무실 창
+      outside: [[[1160, 183], [1575, 183], [1575, 282], [1160, 282]]],
+      objects: []
+    },
+    b1: {
+      file: "b1",
+      w: 1940,
+      under: true,
+      call: [1065, 292],
+      blocks: [[186, 272, 472, 70], [1670, 1750, 472, 70]],
+      floor: [[0, 503], [235, 446], [1673, 446], [1940, 511], [1940, 669], [0, 669]],
+      doors: {
+        edu: { x0: 30, x1: 112, y0: 125, y1: 470, anim: "swing", hinge: "R", quad: [[30, 125], [112, 140], [112, 450], [30, 470]] },
+        training: { x0: 345, x1: 692, y0: 132, y1: 432, seam: 518, anim: "swing2" },
+        elev: elev(829, 1028, 132, 432, 929),
+        shower_m: { x0: 1160, x1: 1318, y0: 128, y1: 422, anim: "swing", hinge: "R" },
+        shower_f: { x0: 1438, x1: 1595, y0: 128, y1: 422, anim: "swing", hinge: "R" },
+        stairs: { x0: 1828, x1: 1918, y0: 125, y1: 480, anim: "swing", hinge: "L", quad: [[1828, 140], [1918, 125], [1918, 480], [1828, 458]] }
+      },
+      lamps: [...downs([367, 665, 919, 1201, 1488]), sign(1866, 86)],
+      windows: [],
+      objects: []
+    },
+    b2: {
+      file: "b2",
+      w: 2003,
+      under: true,
+      call: [1130, 287],
+      floor: [[0, 499], [217, 446], [1748, 446], [2003, 507], [2003, 669], [0, 669]],
+      doors: {
+        interrogation: { x0: 33, x1: 119, y0: 119, y1: 465, anim: "swing", hinge: "R", quad: [[33, 119], [119, 135], [119, 444], [33, 465]] },
+        isolation: { x0: 385, x1: 725, y0: 122, y1: 410, anim: "shutter" },
+        elev: elev(886, 1091, 126, 432, 990),
+        clinic: { x0: 1230, x1: 1640, y0: 122, y1: 420, seam: 1435, anim: "slide2", behind: "lit" },
+        archive: { x0: 1882, x1: 1966, y0: 118, y1: 472, anim: "swing", hinge: "L", quad: [[1882, 130], [1966, 118], [1966, 472], [1882, 452]] }
+      },
+      lamps: [
+        ...downs([388, 704, 983, 1294, 1588]),
+        // 격리 구역 붉은 등: 셔터 위 경광등은 천천히 맥박, 문 옆 표시등은 번갈아 깜빡
+        { x: 552, y: 92, kind: "lamp", color: "#ff3a2a", r: 70, blink: { period: 1600, duty: 0.5, pulse: true } },
+        { x: 793, y: 258, kind: "lamp", color: "#ff3a2a", r: 34, blink: { period: 1e3, duty: 0.5 } },
+        { x: 143, y: 267, kind: "lamp", color: "#ff3a2a", r: 30, blink: { period: 1e3, duty: 0.5, phase: 0.5 } },
+        { x: 1986, y: 288, kind: "lamp", color: "#ff3a2a", r: 30, blink: { period: 1300, duty: 0.35, phase: 0.2 } },
+        { x: 1435, y: 106, kind: "lamp", color: "#ff3a2a", r: 22, blink: { period: 2200, duty: 0.15, phase: 0.6 } }
+      ],
+      windows: [],
+      objects: []
+    },
+    b3: {
+      // 주차장: 차 앞 주차선(y448) 앞, 경비실(보급실) 앞벽(y485) 앞, 엘리베이터 옆벽 바닥선 왼쪽
+      file: "b3",
+      w: 1906,
+      under: true,
+      lane: [458, 669],
+      call: [1883, 413],
+      floor: [[0, 460], [995, 460], [995, 496], [1654, 496], [1906, 622], [1906, 669], [0, 669]],
+      doors: {
+        supply: { x0: 1405, x1: 1597, y0: 190, y1: 470, anim: "swing", hinge: "L" },
+        elev: { x0: 1724, x1: 1849, y0: 130, y1: 552, seam: 1784, anim: "slide2", behind: "car", quad: [[1724, 165], [1849, 130], [1849, 552], [1724, 510]] }
+      },
+      lamps: [
+        { x: 426, y: 80, kind: "down", r: 150 },
+        { x: 914, y: 76, kind: "down", r: 150 },
+        { x: 1500, y: 95, kind: "lamp", color: "#ffb84a", r: 50 },
+        { x: 1772, y: 40, kind: "sign", color: "#3cffd0", r: 30 }
+      ],
+      windows: [],
+      objects: []
+    },
+    // ── 중림 지하상가 (game-pack/jr-field, assets/gpt/중림지하상가를 tools/fit_bg700.py로 세로 700에 맞춤, 2026-10-27) ──
+    // 문은 그림 속 계단·통로 자리(문짝 없음). 막는 상자는 바닥에 튀어나온 매대·의자·상자 앞 모서리
+    jr_entry: {
+      file: "jr_entry",
+      w: 5521,
+      under: false,
+      lane: [428, 669],
+      blocks: [[80, 620, 505], [605, 665, 446], [2860, 3060, 442], [4500, 4660, 442], [5e3, 5521, 528]],
+      doors: {
+        down: { x0: 4880, x1: 5e3, y0: 300, y1: 505, anim: "none", behind: "dark" },
+        west: { x0: 0, x1: 60, y0: 420, y1: 669, anim: "none" }
+      },
+      lamps: [],
+      windows: [],
+      objects: []
+    },
+    jr_b1: {
+      file: "jr_b1",
+      w: 6425,
+      under: true,
+      lane: [428, 669],
+      blocks: [
+        [345, 485, 442],
+        [580, 870, 490],
+        [1690, 1950, 462],
+        [2240, 2460, 446],
+        [2650, 3020, 452],
+        [3740, 4110, 462],
+        [4320, 4810, 462],
+        [4830, 5e3, 442],
+        [5340, 5720, 452],
+        [6e3, 6160, 475]
+      ],
+      doors: {
+        up: { x0: 40, x1: 320, y0: 100, y1: 420, anim: "none", behind: "dark" },
+        daebak: { x0: 2970, x1: 3120, y0: 130, y1: 410, anim: "none", behind: "dark" },
+        songil: { x0: 5700, x1: 5840, y0: 130, y1: 400, anim: "none", behind: "dark" },
+        alley: { x0: 3390, x1: 3530, y0: 140, y1: 420, anim: "none", behind: "dark" },
+        down: { x0: 6170, x1: 6425, y0: 240, y1: 470, anim: "none", behind: "dark" }
+      },
+      lamps: [],
+      windows: [],
+      objects: []
+    },
+    jr_alley: {
+      file: "jr_alley",
+      w: 6059,
+      under: true,
+      lane: [428, 669],
+      blocks: [
+        [80, 250, 440],
+        [535, 625, 448],
+        [1335, 1760, 470],
+        [1780, 1860, 442],
+        [1890, 2140, 446],
+        [3490, 3910, 455],
+        [4270, 4850, 452],
+        [5090, 5530, 442],
+        [5490, 6059, 472]
+      ],
+      doors: {
+        b1: { x0: 2800, x1: 3070, y0: 130, y1: 420, anim: "none", behind: "dark" },
+        heolgap: { x0: 355, x1: 460, y0: 125, y1: 400, anim: "none", behind: "dark" }
+      },
+      lamps: [],
+      windows: [],
+      objects: []
+    },
+    jr_b2: {
+      // 왼쪽 끝 앞쪽에 큰 상자가 화면 앞까지 나와 있어 발을 x180부터
+      file: "jr_b2",
+      w: 5705,
+      under: true,
+      lane: [428, 669],
+      floor: [[180, 428], [5705, 428], [5705, 669], [180, 669]],
+      blocks: [
+        [180, 370, 448],
+        [615, 725, 445],
+        [920, 1190, 432],
+        [1315, 1700, 436],
+        [1780, 2030, 445],
+        [2130, 2710, 442],
+        [2960, 3270, 434],
+        [3330, 3510, 438],
+        [3700, 4140, 445],
+        [5120, 5335, 435],
+        [5590, 5705, 435]
+      ],
+      doors: {
+        up: { x0: 5400, x1: 5590, y0: 0, y1: 420, anim: "none", behind: "dark" },
+        youngchang: { x0: 390, x1: 580, y0: 70, y1: 395, anim: "none", behind: "dark" }
+      },
+      lamps: [],
+      windows: [],
+      objects: []
+    },
+    // 중림 가게 안 방 6개 (tools/jr/rooms.py → jrRooms.gen.ts)
+    ...JR_ROOMS
+  };
+  var doorX = (scene, id) => {
+    const d3 = PAINTED[scene].doors[id];
+    return Math.round((d3.x0 + d3.x1) / 2);
+  };
+  var PAINTED_LANE = [440, 669];
+  function clampPainted(scene, x, y) {
+    const p = PAINTED[scene];
+    if (!p) return { x, y };
+    if (p.floor) return inPolygon(p.floor, x, y) ? { x, y } : nearestInside(p.floor, x, y);
+    return { x, y };
+  }
+  function inPolygon(poly2, x, y) {
+    let inside2 = false;
+    for (let i = 0, j = poly2.length - 1; i < poly2.length; j = i++) {
+      const [xi, yi] = poly2[i], [xj, yj] = poly2[j];
+      if (yi > y !== yj > y && x < (xj - xi) * (y - yi) / (yj - yi) + xi) inside2 = !inside2;
+    }
+    return inside2;
+  }
+  function nearestInside(poly2, x, y) {
+    let best = { x, y, d: Infinity };
+    for (let i = 0; i < poly2.length; i++) {
+      const [ax, ay] = poly2[i], [bx, by] = poly2[(i + 1) % poly2.length];
+      const dx = bx - ax, dy = by - ay, L = dx * dx + dy * dy || 1;
+      const t = Math.max(0, Math.min(1, ((x - ax) * dx + (y - ay) * dy) / L));
+      const qx = ax + dx * t, qy = ay + dy * t, d3 = (qx - x) ** 2 + (qy - y) ** 2;
+      if (d3 < best.d) best = { x: qx, y: qy, d: d3 };
+    }
+    const cx = poly2.reduce((s2, p) => s2 + p[0], 0) / poly2.length, cy = poly2.reduce((s2, p) => s2 + p[1], 0) / poly2.length;
+    const k = 2 / (Math.hypot(cx - best.x, cy - best.y) || 1);
+    return { x: best.x + (cx - best.x) * k, y: best.y + (cy - best.y) * k };
+  }
+  function doorReachY(scene, id) {
+    const d3 = PAINTED[scene]?.doors[id];
+    if (!d3) return null;
+    return (d3.quad ? Math.max(...d3.quad.map((q) => q[1])) : d3.y1) + 80;
   }
 
-  // src/game/action/art/hqDoorRound2.ts
-  var keys = ["frame", "aperture", "leaf-left", "leaf-right", "entry-marker"];
+  // src/game/action/art/hqField.ts
+  var FILES = ["lobby", "f2", "f3", "b1", "b2", "b3", "desk"];
+  var JR_FILES = ["jr_entry", "jr_b1", "jr_alley", "jr_b2", ...JR_ROOM_FILES];
   var images = null;
-  var revision3 = 0;
-  function prepareHqDoorRound2(urlOf) {
-    const own = ++revision3;
+  var revision2 = 0;
+  function prepareHqField(urlOf) {
+    const own = ++revision2;
     images = null;
-    void Promise.all(keys.map(async (key2) => {
-      const src = window.__GOEI_HQ_DOOR_ROUND2__?.[key2] || (urlOf ? await urlOf(key2 + ".png") : "");
-      if (!src) throw new Error("Optional door art unavailable");
+    const load = (pack2, keys3) => Promise.all(keys3.map(async (key2) => {
+      const src = window.__GOEI_HQ_FIELD__?.[key2] || (urlOf ? await urlOf(pack2, key2 + ".webp") : "");
+      if (!src) throw new Error("field art unavailable");
       const im = new Image();
       im.src = src;
       await im.decode();
-      const dims = key2 === "entry-marker" ? [48, 16] : key2.startsWith("leaf-") ? [40, 125] : [96, 144];
-      if (im.naturalWidth !== dims[0] || im.naturalHeight !== dims[1]) throw new Error("Door art size mismatch");
       return [key2, im];
     })).then((rows) => {
-      if (revision3 === own) images = Object.fromEntries(rows);
+      if (revision2 === own) images = { ...images, ...Object.fromEntries(rows) };
     }).catch(() => {
     });
+    void load("hq-field", FILES);
+    void load("jr-field", JR_FILES);
+    const keys2 = (e) => {
+      const t = e.target;
+      if (e.code !== "KeyT" || e.repeat || t?.closest?.('input, textarea, [contenteditable="true"]')) return;
+      todIndex = (todIndex + 1) % TOD_CYCLE.length;
+    };
+    window.addEventListener("keydown", keys2);
     return () => {
-      if (revision3 === own) {
-        revision3++;
+      window.removeEventListener("keydown", keys2);
+      if (revision2 === own) {
+        revision2++;
         images = null;
       }
     };
   }
-  function drawHqDoorRound2(c, x, open, unlocked) {
-    if (!images) return false;
-    const a = images, ox = x - 96, oy = 168;
-    const off2 = Math.round(40 * Math.max(0, Math.min(1, Number.isFinite(open) ? open : 0))) * 2;
+  var hasHqField = (scene) => !!PAINTED[scene] && !!images?.[PAINTED[scene].file];
+  function drawHqField(c, scene, camX, fx, clockHour = null) {
+    const p = PAINTED[scene];
+    const im = images?.[p?.file ?? ""];
+    if (!p || !im) return false;
     c.save();
-    c.imageSmoothingEnabled = false;
-    c.drawImage(a.aperture, ox, oy, 192, 288);
-    c.save();
-    c.beginPath();
-    c.rect(x - 80, 190, 160, 250);
-    c.clip();
-    c.drawImage(a["leaf-left"], x - 80 - off2, 190, 80, 250);
-    c.drawImage(a["leaf-right"], x + off2, 190, 80, 250);
-    if (!unlocked) {
-      c.fillStyle = "rgba(0,0,0,0.35)";
-      c.fillRect(x - 80, 190, 160, 250);
+    c.imageSmoothingEnabled = true;
+    c.imageSmoothingQuality = "high";
+    const sx = Math.max(0, Math.floor(camX - 40)), sw = Math.min(p.w - sx, view.w + 80), H6 = p.h ?? 700;
+    if (sw > 0) {
+      c.drawImage(im, sx, 0, sw, H6, sx, 0, sw, H6);
+      if (H6 === 700) c.drawImage(im, sx, 696, sw, 4, sx, 700, sw, 24);
+    }
+    for (const [id, d3] of Object.entries(p.doors)) {
+      const s2 = fx(id);
+      if (s2.open <= 0 && !s2.shake) continue;
+      if (d3.x1 < camX - 40 || d3.x0 > camX + view.w + 40) continue;
+      drawDoor(c, im, d3, s2.open, s2.shake);
     }
     c.restore();
-    c.drawImage(a.frame, ox, oy, 192, 288);
-    if (unlocked) c.drawImage(a["entry-marker"], x - 48, 448, 96, 32);
-    c.restore();
+    const k = keyAt(hourNow(clockHour));
+    if (!p.under && k.win[3] > 5e-3) {
+      c.save();
+      drawOutsideNight(c, scene, p, k, performance.now());
+      c.restore();
+    }
     return true;
+  }
+  function clipDoor(c, d3) {
+    c.beginPath();
+    if (d3.quad) {
+      c.moveTo(d3.quad[0][0], d3.quad[0][1]);
+      for (const [x, y] of d3.quad.slice(1)) c.lineTo(x, y);
+      c.closePath();
+    } else c.rect(d3.x0, d3.y0, d3.x1 - d3.x0, d3.y1 - d3.y0);
+    c.clip();
+  }
+  function drawBehind(c, im, d3) {
+    const w = d3.x1 - d3.x0, h = d3.y1 - d3.y0;
+    if (d3.behind === "see" || d3.behind === "lit") {
+      c.drawImage(im, d3.x0, d3.y0, w, h, d3.x0, d3.y0, w, h);
+      const g3 = c.createLinearGradient(0, d3.y0, 0, d3.y1);
+      g3.addColorStop(0, "rgba(238,242,244,0.86)");
+      g3.addColorStop(1, "rgba(196,204,208,0.86)");
+      c.fillStyle = g3;
+      c.fillRect(d3.x0, d3.y0, w, h);
+      return;
+    }
+    if (d3.behind === "car") {
+      const g3 = c.createLinearGradient(0, d3.y0, 0, d3.y1);
+      g3.addColorStop(0, "#f4ecd8");
+      g3.addColorStop(0.12, "#cfc6b4");
+      g3.addColorStop(0.8, "#9a9384");
+      g3.addColorStop(1, "#5e594f");
+      c.fillStyle = g3;
+      c.fillRect(d3.x0, d3.y0, w, h);
+      c.fillStyle = "rgba(0,0,0,0.18)";
+      for (let i = 1; i < 3; i++) c.fillRect(d3.x0 + w * i / 3, d3.y0 + h * 0.08, 2, h * 0.84);
+      c.fillStyle = "#4a463f";
+      c.fillRect(d3.x0, d3.y1 - h * 0.1, w, h * 0.1);
+      return;
+    }
+    const g2 = c.createLinearGradient(0, d3.y0, 0, d3.y1);
+    g2.addColorStop(0, "#2a3036");
+    g2.addColorStop(0.5, "#15191d");
+    g2.addColorStop(1, "#0c0e10");
+    c.fillStyle = g2;
+    c.fillRect(d3.x0, d3.y0, w, h);
+  }
+  function drawDoor(c, im, d3, open, shake) {
+    const w = d3.x1 - d3.x0, h = d3.y1 - d3.y0;
+    c.save();
+    clipDoor(c, d3);
+    if (d3.anim === "glow") {
+      const e2 = open * open * (3 - 2 * open);
+      if (shake) {
+        c.fillStyle = "#0c0e10";
+        c.fillRect(d3.x0, d3.y0, w, h);
+        c.drawImage(im, d3.x0, d3.y0, w, h, d3.x0 + shake, d3.y0, w, h);
+      }
+      if (e2 > 0) {
+        c.fillStyle = `rgba(255,250,232,${0.4 * e2})`;
+        c.fillRect(d3.x0, d3.y0, w, h);
+      }
+      c.restore();
+      return;
+    }
+    if (shake && open <= 0) {
+      c.fillStyle = "#0c0e10";
+      c.fillRect(d3.x0, d3.y0, w, h);
+      c.drawImage(im, d3.x0, d3.y0, w, h, d3.x0 + shake, d3.y0, w, h);
+      c.restore();
+      return;
+    }
+    drawBehind(c, im, d3);
+    const leaf = (sx, sw, dx, dw, shade2, edge2 = 0) => {
+      if (dw < 1) return;
+      c.drawImage(im, sx, d3.y0, sw, h, dx, d3.y0, dw, h);
+      if (shade2 > 0) {
+        c.fillStyle = `rgba(10,12,16,${shade2})`;
+        c.fillRect(dx, d3.y0, dw, h);
+      }
+      if (edge2 && e > 0.02) {
+        const ex = edge2 > 0 ? dx + dw : dx;
+        const t = Math.max(2, Math.round(7 * e));
+        c.fillStyle = "rgba(20,22,26,0.9)";
+        c.fillRect(edge2 > 0 ? ex : ex - t, d3.y0, t, h);
+        c.fillStyle = "rgba(220,226,232,0.55)";
+        c.fillRect(edge2 > 0 ? ex + t - 1 : ex - t, d3.y0, 1, h);
+      }
+    };
+    const e = open * open * (3 - 2 * open);
+    const glass2 = d3.behind !== "car";
+    const swingLeaf = (sx, sw, hx, dir, maxDeg) => {
+      const th = e * maxDeg * Math.PI / 180;
+      const vw = sw * Math.cos(th), shrink = 0.2 * Math.sin(th), dark2 = 0.55 * Math.sin(th);
+      const N = Math.max(1, Math.ceil(vw / 2));
+      for (let i = 0; i < N; i++) {
+        const u0 = i / N, u1 = (i + 1) / N, hf = 1 - shrink * (u0 + u1) / 2, dh = h * hf, dy = d3.y0 + (h - dh) / 2;
+        const srcX = dir > 0 ? sx + u0 * sw : sx + sw - u1 * sw;
+        const dstX = dir > 0 ? hx + u0 * vw : hx - u1 * vw;
+        c.drawImage(im, srcX, d3.y0, sw / N, h, dstX, dy, vw / N + 0.6, dh);
+        if (dark2 > 0.01) {
+          c.fillStyle = `rgba(8,10,14,${dark2 * (0.6 + 0.4 * (u0 + u1) / 2)})`;
+          c.fillRect(dstX, dy, vw / N + 0.6, dh);
+        }
+      }
+      if (e > 0.02) {
+        const fx = hx + dir * vw, dh = h * (1 - shrink), dy = d3.y0 + (h - dh) / 2, t = Math.max(2, Math.round(8 * Math.sin(th)));
+        c.fillStyle = "rgba(24,26,30,0.92)";
+        c.fillRect(dir > 0 ? fx : fx - t, dy, t, dh);
+      }
+    };
+    switch (d3.anim) {
+      case "slide2": {
+        const s2 = d3.seam ?? (d3.x0 + d3.x1) / 2, lw = s2 - d3.x0, rw = d3.x1 - s2, k = glass2 ? 0.07 : 1;
+        leaf(d3.x0, lw, d3.x0 - lw * e * k, lw, 0, 1);
+        leaf(s2, rw, s2 + rw * e * k, rw, 0, -1);
+        break;
+      }
+      case "swing": {
+        if (d3.hinge === "L") swingLeaf(d3.x0, w, d3.x0, 1, glass2 ? 11 : 78);
+        else swingLeaf(d3.x0, w, d3.x1, -1, glass2 ? 11 : 78);
+        break;
+      }
+      case "swing2": {
+        const s2 = d3.seam ?? (d3.x0 + d3.x1) / 2, lw = s2 - d3.x0, rw = d3.x1 - s2;
+        swingLeaf(d3.x0, lw, d3.x0, 1, glass2 ? 11 : 78);
+        swingLeaf(s2, rw, d3.x1, -1, glass2 ? 11 : 78);
+        break;
+      }
+      case "shutter": {
+        c.drawImage(im, d3.x0, d3.y0, w, h, d3.x0, d3.y0 - h * e * (glass2 ? 0.1 : 1), w, h);
+        break;
+      }
+      default:
+        leaf(d3.x0, w, d3.x0, w, 0);
+    }
+    c.restore();
+  }
+  function drawHqFieldObject(c, scene, id) {
+    const o = PAINTED[scene]?.objects.find((q) => q.id === id);
+    const im = o && images?.[o.file];
+    if (!o || !im) return;
+    c.save();
+    c.imageSmoothingEnabled = true;
+    c.imageSmoothingQuality = "high";
+    c.drawImage(im, o.x, o.y, o.w, o.h);
+    c.restore();
+  }
+  var NIGHT = { h: 0, tint: [40, 52, 110, 0.62], win: [10, 14, 40, 0.92], lamp: 1 };
+  var KEYS = [
+    NIGHT,
+    { ...NIGHT, h: 4.5 },
+    { h: 6, tint: [120, 112, 190, 0.45], win: [120, 100, 175, 0.7], lamp: 0.75 },
+    // 새벽
+    { h: 7.5, tint: [255, 255, 255, 0], win: [0, 0, 0, 0], lamp: 0 },
+    { h: 16.5, tint: [255, 255, 255, 0], win: [0, 0, 0, 0], lamp: 0 },
+    { h: 18, tint: [255, 150, 95, 0.3], win: [255, 115, 55, 0.5], lamp: 0.45 },
+    // 저녁 노을
+    { h: 19.5, tint: [62, 62, 120, 0.55], win: [24, 22, 56, 0.86], lamp: 0.95 },
+    { ...NIGHT, h: 24 }
+  ];
+  var TOD_CYCLE = [null, 5.8, 12, 18, 23];
+  var todIndex = 0;
+  function hourNow(clockHour) {
+    const forced = TOD_CYCLE[todIndex];
+    if (forced !== null) return forced;
+    const q = typeof location !== "undefined" ? new URLSearchParams(location.search).get("hour") : null;
+    if (q !== null && q !== "" && Number.isFinite(Number(q))) return (Number(q) % 24 + 24) % 24;
+    if (clockHour !== null) return clockHour;
+    const d3 = /* @__PURE__ */ new Date();
+    return d3.getHours() + d3.getMinutes() / 60;
+  }
+  function keyAt(h) {
+    for (let i = 0; i < KEYS.length - 1; i++) {
+      const a = KEYS[i], b = KEYS[i + 1];
+      if (h >= a.h && h <= b.h) {
+        const t = b.h === a.h ? 0 : (h - a.h) / (b.h - a.h);
+        const m = (x, y) => x + (y - x) * t;
+        return { h, tint: a.tint.map((v, k) => m(v, b.tint[k])), win: a.win.map((v, k) => m(v, b.win[k])), lamp: m(a.lamp, b.lamp) };
+      }
+    }
+    return NIGHT;
+  }
+  function drawOutsideNight(c, scene, p, k, now) {
+    if (!p.under && k.win[3] > 5e-3) {
+      const wm = (v) => Math.round(255 + (v - 255) * k.win[3]);
+      c.globalCompositeOperation = "multiply";
+      c.fillStyle = `rgb(${wm(k.win[0])},${wm(k.win[1])},${wm(k.win[2])})`;
+      for (const [wx0, wy0, wx1, wy1] of p.windows) c.fillRect(wx0, wy0, wx1 - wx0, wy1 - wy0);
+      const ow = Math.min(0.97, k.win[3] + k.tint[3] * 0.5);
+      const om = (v) => Math.round(255 + (v - 255) * ow);
+      c.fillStyle = `rgb(${om(k.win[0])},${om(k.win[1])},${om(k.win[2])})`;
+      (p.outside ?? []).forEach((poly2, i) => {
+        const m = outsideMask(scene, i, poly2);
+        if (!m) return;
+        const t = tinted(m, `rgb(${om(k.win[0])},${om(k.win[1])},${om(k.win[2])})`);
+        c.drawImage(t, m.x, m.y);
+      });
+      const gm = (v) => Math.round(255 + (v - 255) * k.win[3] * 0.4);
+      c.fillStyle = `rgb(${gm(k.win[0])},${gm(k.win[1])},${gm(k.win[2])})`;
+      for (const d3 of Object.values(p.doors)) if (d3.behind === "see" && d3.anim !== "glow") c.fillRect(d3.x0, d3.y0, d3.x1 - d3.x0, d3.y1 - d3.y0);
+      c.globalCompositeOperation = "source-over";
+      const lit2 = Math.max(0, (k.win[3] - 0.5) / 0.4);
+      if (lit2 > 0) {
+        const boxes = [...p.windows, ...(p.outside ?? []).map((q) => [Math.min(...q.map((v) => v[0])), Math.min(...q.map((v) => v[1])), Math.max(...q.map((v) => v[0])), Math.min(...q.map((v) => v[1])) + (Math.max(...q.map((v) => v[1])) - Math.min(...q.map((v) => v[1]))) * 0.55])];
+        for (const [wx0, wy0, wx1, wy1] of boxes) {
+          for (let i = 0; i < (wx1 - wx0) / 9; i++) {
+            const r = Math.sin(i * 127.1 + wx0 * 3.7) * 43758.5453, f = r - Math.floor(r);
+            if (f > 0.42) continue;
+            const x = wx0 + Math.floor(f * 997) % (wx1 - wx0 - 4), y = wy0 + 8 + Math.floor(f * 7919) % Math.max(1, wy1 - wy0 - 16);
+            const on = f < 0.05 ? 0.5 + 0.5 * Math.sin(now / 1700 + i) : 1;
+            c.fillStyle = `rgba(255,${200 + Math.floor(f * 100)},120,${0.75 * lit2 * on})`;
+            c.fillRect(x, y, 3, 3);
+          }
+        }
+      }
+    }
+  }
+  function drawHqFieldLight(c, scene, camX, clockHour, now) {
+    const p = PAINTED[scene];
+    if (!p || !images) return;
+    const k = keyAt(hourNow(clockHour));
+    const x0 = camX - 40, W5 = view.w + 80, H6 = Math.max(720, p.h ?? 700);
+    const sc = p.under ? 0.35 : 0.5;
+    c.save();
+    const a = k.tint[3] * sc;
+    if (a > 5e-3) {
+      const mix3 = (v) => Math.round(255 + (v - 255) * a);
+      c.globalCompositeOperation = "multiply";
+      c.fillStyle = `rgb(${mix3(k.tint[0])},${mix3(k.tint[1])},${mix3(k.tint[2])})`;
+      c.fillRect(x0, 0, W5, H6);
+      c.globalCompositeOperation = "source-over";
+    }
+    c.globalCompositeOperation = "lighter";
+    const lampK = Math.max(k.lamp * (p.under ? 0.5 : 1), 0);
+    for (const l of p.lamps) {
+      if (l.x < camX - 200 || l.x > camX + 1480) continue;
+      if (l.blink) {
+        drawBlink(c, l, now, images?.[p.file]);
+        continue;
+      }
+      if (lampK <= 0.01) continue;
+      if (l.kind === "down") glow(c, l.x, l.y + 50, l.r ?? 150, 2.1, `rgba(255,210,140,${0.42 * lampK})`);
+      else glow(c, l.x, l.y, l.r ?? 34, 1, hexA(l.color ?? "#ffd27a", 0.5 * lampK));
+    }
+    c.restore();
+  }
+  var maskCache = /* @__PURE__ */ new Map();
+  function outsideMask(scene, i, poly2) {
+    const key2 = `${scene}:${i}`;
+    if (maskCache.has(key2)) return maskCache.get(key2);
+    const p = PAINTED[scene], im = images?.[p?.file ?? ""];
+    if (!im) return null;
+    const x = Math.min(...poly2.map((v) => v[0])), y = Math.min(...poly2.map((v) => v[1]));
+    const w = Math.max(...poly2.map((v) => v[0])) - x, h = Math.max(...poly2.map((v) => v[1])) - y;
+    let out = null;
+    try {
+      const cv = document.createElement("canvas");
+      cv.width = w;
+      cv.height = h;
+      const g2 = cv.getContext("2d");
+      g2.beginPath();
+      poly2.forEach(([px3, py], j) => j ? g2.lineTo(px3 - x, py - y) : g2.moveTo(px3 - x, py - y));
+      g2.closePath();
+      g2.clip();
+      g2.drawImage(im, x, y, w, h, 0, 0, w, h);
+      const d3 = g2.getImageData(0, 0, w, h), px = d3.data;
+      const ramp = (v, a, b) => Math.max(0, Math.min(1, (v - a) / (b - a)));
+      const solid = p.outsideSolid;
+      for (let j = 0; j < px.length; j += 4) {
+        const r = px[j], gg = px[j + 1], b = px[j + 2], lum = 0.3 * r + 0.59 * gg + 0.11 * b;
+        let v;
+        if (solid) {
+          const X = x + j / 4 % w, Y = y + Math.floor(j / 4 / w);
+          const k = solid.keep.find(([a, bb, c, d4]) => X >= a && X < c && Y >= bb && Y < d4);
+          v = k && (k[4] === "all" || gg > b + 12 && gg >= r) ? 0 : 1;
+        } else {
+          v = ramp(lum, 70, 150) * (1 - ramp(r - b, 18, 45));
+        }
+        px[j] = px[j + 1] = px[j + 2] = 255;
+        px[j + 3] = Math.round(255 * v * (px[j + 3] / 255));
+      }
+      g2.putImageData(d3, 0, 0);
+      out = { cv, x, y };
+    } catch {
+      out = null;
+    }
+    maskCache.set(key2, out);
+    return out;
+  }
+  var tintCache = /* @__PURE__ */ new WeakMap();
+  function tinted(m, col) {
+    const hit2 = tintCache.get(m.cv);
+    if (hit2 && hit2.col === col) return hit2.cv;
+    const cv = hit2?.cv ?? document.createElement("canvas");
+    cv.width = m.cv.width;
+    cv.height = m.cv.height;
+    const g2 = cv.getContext("2d");
+    g2.clearRect(0, 0, cv.width, cv.height);
+    g2.fillStyle = "#fff";
+    g2.fillRect(0, 0, cv.width, cv.height);
+    const t = document.createElement("canvas");
+    t.width = cv.width;
+    t.height = cv.height;
+    const tg = t.getContext("2d");
+    tg.drawImage(m.cv, 0, 0);
+    tg.globalCompositeOperation = "source-in";
+    tg.fillStyle = col;
+    tg.fillRect(0, 0, t.width, t.height);
+    g2.drawImage(t, 0, 0);
+    tintCache.set(m.cv, { col, cv });
+    return cv;
+  }
+  function glow(c, x, y, r, sy, col) {
+    c.save();
+    c.translate(x, y);
+    c.scale(1, sy);
+    const g2 = c.createRadialGradient(0, 0, 0, 0, 0, r);
+    g2.addColorStop(0, col);
+    g2.addColorStop(1, "rgba(0,0,0,0)");
+    c.fillStyle = g2;
+    c.fillRect(-r, -r, r * 2, r * 2);
+    c.restore();
+  }
+  function hexA(hex2, a) {
+    const n = parseInt(hex2.slice(1), 16);
+    return `rgba(${n >> 16 & 255},${n >> 8 & 255},${n & 255},${Math.max(0, Math.min(1, a))})`;
+  }
+  var offCache = /* @__PURE__ */ new Map();
+  function lampOff(im, l) {
+    const key2 = `${im.src.length}:${l.x}:${l.y}`;
+    if (offCache.has(key2)) return offCache.get(key2);
+    const R = Math.max(10, Math.round((l.r ?? 30) * 0.45));
+    const x = l.x - R, y = l.y - R, w = R * 2, h = R * 2;
+    let out = null;
+    try {
+      const cv = document.createElement("canvas");
+      cv.width = w;
+      cv.height = h;
+      const g2 = cv.getContext("2d");
+      g2.drawImage(im, x, y, w, h, 0, 0, w, h);
+      const d3 = g2.getImageData(0, 0, w, h), px = d3.data;
+      let n = 0;
+      for (let i = 0; i < px.length; i += 4) {
+        const r = px[i], gg = px[i + 1], b = px[i + 2];
+        const lit2 = r > 150 && r > gg * 1.5 && r > b * 1.5 || r > 235 && gg > 190 && b > 170 && r - b < 70;
+        if (lit2) {
+          const k = 0.32;
+          px[i] = Math.round(r * k + 30);
+          px[i + 1] = Math.round(gg * k * 0.5 + 8);
+          px[i + 2] = Math.round(b * k * 0.5 + 8);
+          n++;
+        } else px[i + 3] = 0;
+      }
+      g2.putImageData(d3, 0, 0);
+      out = n ? { cv, x, y } : null;
+    } catch {
+      out = null;
+    }
+    offCache.set(key2, out);
+    return out;
+  }
+  function drawBlink(c, l, now, im) {
+    const b = l.blink;
+    const ph = ((now / b.period + (b.phase ?? 0)) % 1 + 1) % 1;
+    const on = b.pulse ? 0.5 - 0.5 * Math.cos(ph * Math.PI * 2) : ph < b.duty ? 1 : 0;
+    const r = (l.r ?? 30) * 0.7;
+    if (on < 0.98 && im) {
+      const o = lampOff(im, l);
+      if (o) {
+        c.save();
+        c.globalCompositeOperation = "source-over";
+        c.globalAlpha = 1 - on;
+        c.drawImage(o.cv, o.x, o.y);
+        c.restore();
+      }
+    }
+    if (on > 0.02) glow(c, l.x, l.y, r, 1, hexA(l.color ?? "#ff3a2a", 0.45 * on));
+  }
+  var pxFont = (n) => `700 ${n}px "GoeiPixel", "Galmuri11", monospace`;
+  var PAINTED_SIGN = /* @__PURE__ */ new Set(["화장실", "계단", "현관"]);
+  function plate(c, cx, bottom, text2, n = 22) {
+    c.font = pxFont(n);
+    const w = Math.ceil(c.measureText(text2).width) + 28, h = n + 10;
+    const x = Math.round(cx - w / 2), y = Math.round(bottom - h);
+    c.fillStyle = "rgba(0,0,0,0.22)";
+    c.fillRect(x + 3, y + 3, w, h);
+    c.fillStyle = "#23272c";
+    c.fillRect(x, y, w, h);
+    c.fillStyle = "rgba(255,255,255,0.22)";
+    c.fillRect(x, y, w, 2);
+    c.fillStyle = "rgba(0,0,0,0.35)";
+    c.fillRect(x, y + h - 2, w, 2);
+    c.fillStyle = "#7c848c";
+    c.fillRect(x + 6, y + h / 2 - 1, 2, 2);
+    c.fillRect(x + w - 8, y + h / 2 - 1, 2, 2);
+    c.fillStyle = "#ece6d6";
+    c.textAlign = "center";
+    c.textBaseline = "middle";
+    c.fillText(text2, Math.round(cx), y + Math.round(h / 2) + 1);
+  }
+  function drawHqSigns(c, scene, doors) {
+    const p = PAINTED[scene];
+    if (!p || !images) return;
+    c.save();
+    for (const d3 of doors) {
+      const pd = p.doors[d3.id];
+      if (!pd || !d3.label || PAINTED_SIGN.has(d3.label) || d3.kind === "elevator") continue;
+      plate(c, (pd.x0 + pd.x1) / 2, pd.y0 - 18, d3.label);
+    }
+    c.restore();
+  }
+  function pixelArrow(c, x, y, U2, rot) {
+    const rows = [[-1, 3], [-1, 3], [-1, 3], [-1, 3], [-3, 7], [-2, 5], [-1, 3], [0, 1]];
+    const draw = (col, dx, dy) => {
+      c.fillStyle = col;
+      rows.forEach(([x0, w], i) => c.fillRect(dx + x0 * U2, dy + i * U2, w * U2, U2));
+    };
+    c.save();
+    c.translate(Math.round(x), Math.round(y));
+    c.rotate(rot);
+    const ox = 0, oy = -rows.length * U2;
+    draw("rgba(0,0,0,0.35)", ox + U2, oy + U2);
+    draw("#c98a1c", ox, oy);
+    c.fillStyle = "#ffd25a";
+    rows.forEach(([x0, w], i) => {
+      if (w > 1) c.fillRect(ox + (x0 + 0) * U2 + U2 * 0, oy + i * U2, (w - 1) * U2, U2);
+    });
+    c.fillStyle = "#fff3c4";
+    c.fillRect(ox - U2, oy, U2, U2 * 3);
+    c.restore();
+  }
+  function drawDepartArrow(c, camX, now) {
+    const VAN = { x: 370, y: 128 };
+    const left = camX + 46;
+    const pinned = VAN.x < left;
+    const bob = Math.sin(now / 280) * 5;
+    const glow2 = 0.5 + 0.5 * Math.sin(now / 280);
+    const x = pinned ? left : VAN.x, y = VAN.y + bob;
+    c.save();
+    c.globalCompositeOperation = "lighter";
+    const g2 = c.createRadialGradient(x, y - 20, 0, x, y - 20, 46);
+    g2.addColorStop(0, `rgba(255,200,80,${0.25 + 0.15 * glow2})`);
+    g2.addColorStop(1, "rgba(255,200,80,0)");
+    c.fillStyle = g2;
+    c.fillRect(x - 46, y - 66, 92, 92);
+    c.restore();
+    pixelArrow(c, x, y, 6, pinned ? Math.PI / 2 : 0);
+  }
+  var greenCache = /* @__PURE__ */ new Map();
+  function drawCallLit(c, scene, now) {
+    const p = PAINTED[scene], im = images?.[p?.file ?? ""];
+    if (!p?.call || !im) return;
+    const [cx, cy] = p.call, key2 = scene;
+    if (!greenCache.has(key2)) {
+      const R = 10, x = cx - R, y = cy - R, w = R * 2, h = R * 2;
+      let out = null;
+      try {
+        const cv = document.createElement("canvas");
+        cv.width = w;
+        cv.height = h;
+        const g2 = cv.getContext("2d");
+        g2.drawImage(im, x, y, w, h, 0, 0, w, h);
+        const d3 = g2.getImageData(0, 0, w, h), px = d3.data;
+        for (let i = 0; i < px.length; i += 4) {
+          const r = px[i], gg = px[i + 1], b = px[i + 2];
+          if (r > 170 && r > b * 1.4 && r > gg + 25) {
+            const v = (r + gg) / 2;
+            px[i] = Math.round(v * 0.35);
+            px[i + 1] = Math.min(255, Math.round(v * 1.05 + 20));
+            px[i + 2] = Math.round(v * 0.45);
+          } else px[i + 3] = 0;
+        }
+        g2.putImageData(d3, 0, 0);
+        out = { cv, x, y };
+      } catch {
+        out = null;
+      }
+      greenCache.set(key2, out);
+    }
+    const o = greenCache.get(key2);
+    c.save();
+    c.imageSmoothingEnabled = false;
+    if (o) c.drawImage(o.cv, o.x, o.y);
+    c.globalCompositeOperation = "lighter";
+    glow(c, cx, cy, 16, 1, `rgba(90,255,130,${0.35 + 0.1 * Math.sin(now / 90)})`);
+    c.restore();
   }
 
   // src/game/action/engine/contract.ts
@@ -249,135 +1016,1196 @@
     PIXEL = p;
   }
 
-  // src/game/action/art/visitAgents.ts
-  var sheet = null;
-  var revision4 = 0;
-  function prepareVisitAgents(urlOf, bytesOf) {
-    const own = ++revision4;
-    sheet = null;
-    const ready = (async () => {
-      const inline = window.__GOEI_VISIT_AGENTS__;
-      let src = inline?.atlas ?? "";
-      let agents2 = inline?.frames;
-      if (!inline && urlOf && bytesOf) {
-        const b = await bytesOf("frames.json");
-        agents2 = b ? JSON.parse(new TextDecoder().decode(b)).agents : void 0;
-        src = await urlOf("atlas.png");
-      }
-      if (!src || !agents2) return;
-      const im = new Image();
-      im.src = src;
-      await im.decode();
-      if (revision4 === own) sheet = { atlas: im, agents: agents2 };
-    })().catch(() => {
-    });
-    return { ready, dispose: () => {
-      if (revision4 === own) {
-        revision4++;
-        sheet = null;
-      }
-    } };
-  }
-  var hasVisitAgent = (name) => !!sheet?.agents[name];
-  function drawVisitAgent(c, name, x, y, dir, now) {
-    const a = sheet?.agents[name];
-    if (!sheet || !a?.frames.length) return false;
-    const f = a.frames[Math.floor(now / a.ms) % a.frames.length];
-    c.save();
-    c.imageSmoothingEnabled = false;
-    c.fillStyle = "rgba(0,0,0,.28)";
-    c.beginPath();
-    const P = PIXEL * spr(y), k = P / PIXEL;
-    c.ellipse(x, y, 34 * k, 8 * k, 0, 0, Math.PI * 2);
-    c.fill();
-    snapTo(c, x, y);
-    if (dir < 0) c.scale(-1, 1);
-    c.drawImage(sheet.atlas, f.sx, f.sy, f.w, f.h, f.ox * P, f.oy * P, f.w * P, f.h * P);
-    c.restore();
-    return true;
-  }
-  function visitAgentTop(name) {
-    const a = sheet?.agents[name];
-    if (!a?.frames.length) return -260;
-    if (typeof a.head === "number") return -a.head * PIXEL;
-    return Math.min(...a.frames.map((f) => f.oy)) * PIXEL;
-  }
-  var faces = /* @__PURE__ */ new Map();
-  var faceCanvas = /* @__PURE__ */ new Map();
-  function visitAgentFaceCanvas(name, side = 34) {
-    visitAgentFace(name, side);
-    return faceCanvas.get(`${name}|${side}`) ?? null;
-  }
-  function visitAgentFace(name, side = 34) {
-    const a = sheet?.agents[name];
-    if (!sheet || !a?.frames.length) return "";
-    const key2 = `${name}|${side}`;
-    const hit2 = faces.get(key2);
-    if (hit2 !== void 0) return hit2;
-    const f = a.frames[0];
-    const src = document.createElement("canvas");
-    src.width = f.w;
-    src.height = f.h;
-    const g2 = src.getContext("2d");
-    g2.drawImage(sheet.atlas, f.sx, f.sy, f.w, f.h, 0, 0, f.w, f.h);
-    let url = "";
-    try {
-      const d3 = g2.getImageData(0, 0, f.w, Math.min(14, f.h)).data;
-      let sx = 0, n = 0, top = -1;
-      for (let i = 3; i < d3.length; i += 4) if (d3[i] > 40) {
-        const p = (i - 3) / 4;
-        sx += p % f.w;
-        n++;
-        if (top < 0) top = Math.floor(p / f.w);
-      }
-      const cx = n ? sx / n : f.w / 2;
-      const out = document.createElement("canvas");
-      out.width = out.height = side;
-      const o = out.getContext("2d");
-      o.imageSmoothingEnabled = false;
-      o.drawImage(src, Math.round(side / 2 - cx), 2 - Math.max(0, top));
-      url = out.toDataURL();
-      faceCanvas.set(key2, out);
-    } catch {
-    }
-    faces.set(key2, url);
-    return url;
+  // src/game/action/engine/ids.ts
+  var bodySequence = 1;
+  var attackSequence = 1;
+  var newBodyId = () => bodySequence++;
+  function newAttackId(count = 1) {
+    const id = attackSequence;
+    attackSequence += Math.max(1, count);
+    return id;
   }
 
-  // src/game/action/engine/art.ts
-  var EMPTY_ART = { atlas: null, cutin: null, clips: {} };
-  function img(src) {
-    if (!src) return Promise.resolve(null);
-    return new Promise((res) => {
-      const i = new Image();
-      i.onload = () => res(i);
-      i.onerror = () => res(null);
-      i.src = src;
-    });
+  // src/game/action/engine/fighter.ts
+  var GRAVITY = 2.6;
+  var newId = newBodyId;
+  var REACT_TICKS = { flinch: 10, stagger: 16, bind: 75 };
+  var DOWN_TICKS = 26;
+  var GETUP_INVULN = 12;
+  var MAX_JUGGLE = 2;
+  function overlap(a, b) {
+    if (a.x1 < b.x0 || b.x1 < a.x0) return false;
+    if (a.z1 < b.z0 || b.z1 < a.z0) return false;
+    return Math.abs(a.y - b.y) <= Math.max(a.dy ?? 18, b.dy ?? 18);
   }
-  async function loadArt(urlOf, bytesOf) {
-    const inline = typeof window !== "undefined" ? window.__GOEI_ENGINE_ART__ : void 0;
-    if (inline) {
-      const [atlas, cutin] = await Promise.all([img(inline.atlas), img(inline.cutin)]);
-      return { atlas, cutin, clips: inline.frames.clips };
+  function toWorld(b, x0, x1, z0, z1, dy = 18) {
+    const a = b.dir === 1 ? b.x + x0 : b.x - x1;
+    const c = b.dir === 1 ? b.x + x1 : b.x - x0;
+    return { x0: a, x1: c, z0: b.z + z0, z1: b.z + z1, y: b.y, dy };
+  }
+  var Fighter = class {
+    id = newId();
+    x = 0;
+    y = 600;
+    z = 0;
+    /** 그리기 보간용 직전 틱 위치 */
+    px = 0;
+    py = 600;
+    pz = 0;
+    vx = 0;
+    vy = 0;
+    vz = 0;
+    dir = 1;
+    hp = 100;
+    hpMax = 100;
+    alive = true;
+    stop = 0;
+    phase = "free";
+    /** 지금 상태에 들어온 뒤 틱 */
+    t = 0;
+    /** 반응이 끝나는 틱 수 */
+    until = 0;
+    invuln = 0;
+    /** 슈퍼아머: 0 없음, 1 약 경직 무시, 2 강 경직·띄움까지 무시 */
+    armor = 0;
+    juggle = 0;
+    flash = 0;
+    grabbable = true;
+    boss = false;
+    label;
+    /** 넉백 감속 */
+    friction = 0.78;
+    width = 34;
+    lastHitBy = 0;
+    get airborne() {
+      return this.z > 0 || this.vz > 0;
     }
-    if (urlOf) {
-      try {
-        const [a, c] = await Promise.all([urlOf("atlas.png"), urlOf("cutin.png")]);
-        let frames = null;
-        if (bytesOf) {
-          const b = await bytesOf("frames.json");
-          frames = b ? JSON.parse(new TextDecoder().decode(b)) : null;
-        } else {
-          const f = await urlOf("frames.json");
-          frames = f ? await (await fetch(f)).json() : null;
+    enter(p, until = 0) {
+      this.phase = p;
+      this.t = 0;
+      this.until = until;
+    }
+    /** 맞음: 피해·반응·넉백. 가드·아머는 하위 클래스가 먼저 거른다 */
+    applyHit(hit2, world) {
+      if (!this.alive || this.phase === "dead" || this.invuln > 0 || this.phase === "getup") return { kind: "immune" };
+      if (this.phase === "down" && this.z <= 0 && !hit2.low) return { kind: "immune" };
+      this.hp = Math.max(0, this.hp - hit2.dmg);
+      this.flash = 3;
+      this.dir = -hit2.dir;
+      const killed = this.hp <= 0;
+      let react2 = hit2.react;
+      if (killed && react2 !== "none") react2 = "down";
+      const rank = { none: 0, flinch: 1, stagger: 2, launch: 2, down: 3, bind: 3 }[react2];
+      if (!killed && this.armor > 0 && !hit2.armorBreak && rank <= this.armor) {
+        return { kind: "armor" };
+      }
+      const push = hit2.push ?? 4;
+      if (this.airborne && react2 !== "none") {
+        this.juggle++;
+        this.vx = hit2.dir * push;
+        this.vz = this.juggle <= MAX_JUGGLE ? Math.max(this.vz, (hit2.lift ?? 10) * 0.8) : Math.min(this.vz, 0);
+        this.enter("air-hurt");
+        if (react2 === "down" || killed) this.vz = Math.max(this.vz, hit2.lift ?? 10);
+      } else if (react2 === "flinch" || react2 === "stagger") {
+        this.vx = hit2.dir * push;
+        this.enter("hurt", REACT_TICKS[react2]);
+      } else if (react2 === "launch" || react2 === "down") {
+        this.vx = hit2.dir * push;
+        this.vz = hit2.lift ?? (react2 === "launch" ? 16 : 11);
+        this.z = Math.max(this.z, 1);
+        this.juggle = 1;
+        this.enter("air-hurt");
+      } else if (react2 === "bind") {
+        this.vx = 0;
+        this.enter("hurt", REACT_TICKS.bind);
+      }
+      if (killed) this.onKilled(world);
+      return { kind: "hit", killed };
+    }
+    onKilled(_world) {
+    }
+    /** 반응 상태 진행. 처리했으면 true (하위 클래스는 자기 행동을 건너뛴다) */
+    stepReact(world) {
+      if (this.flash > 0) this.flash--;
+      if (this.invuln > 0) this.invuln--;
+      const lane = world.lane;
+      switch (this.phase) {
+        case "hurt":
+          this.x += this.vx;
+          this.vx *= this.friction;
+          if (++this.t >= this.until) this.enter("free");
+          break;
+        case "air-hurt":
+          this.x += this.vx;
+          this.z += this.vz;
+          this.vz -= GRAVITY;
+          if (this.z <= 0 && this.vz < 0) {
+            this.z = 0;
+            this.vz = 0;
+            this.vx *= 0.4;
+            world.fx("dust", this.x, this.y, 0);
+            world.emit({ type: "land", x: this.x });
+            this.enter("down", this.hp <= 0 ? DOWN_TICKS + 14 : DOWN_TICKS);
+            world.emit({ type: "down", x: this.x, who: this.team === "player" ? "player" : "enemy" });
+          }
+          break;
+        case "down":
+          this.x += this.vx;
+          this.vx *= 0.7;
+          if (++this.t >= this.until) {
+            if (this.hp <= 0) this.enter("dead");
+            else this.enter("getup", 14);
+          }
+          break;
+        case "getup":
+          if (++this.t >= this.until) {
+            this.invuln = GETUP_INVULN;
+            this.juggle = 0;
+            this.enter("free");
+          }
+          break;
+        case "dead":
+          this.t++;
+          break;
+        case "held":
+          this.t++;
+          break;
+        default:
+          return false;
+      }
+      this.y = Math.max(lane[0], Math.min(lane[1], this.y));
+      return true;
+    }
+  };
+
+  // src/game/action/engine/moves.ts
+  var T = (...n) => n;
+  var MOVES = {
+    // 3연타: 잽(앞손, 예비 없음) → 스트레이트(뒷손) → 강한 스트레이트(앞손). 맞혀야 다음 타로 이어진다
+    jab: {
+      clip: "jab",
+      ticks: T(1, 1, 4, 2, 2),
+      adv: 6,
+      cancel: 2,
+      whiffCancel: 3,
+      hits: [{ at: [2], dmg: 8, react: "flinch", push: 5, stop: 3, strength: 1, noise: 0.15 }]
+    },
+    cross: {
+      clip: "cross",
+      ticks: T(1, 1, 2, 5, 3, 2),
+      origin: 6,
+      adv: 10,
+      cancel: 3,
+      whiffCancel: 4,
+      lunge: [3, 0.7],
+      hits: [{ at: [3], dmg: 10, react: "flinch", push: 6, stop: 4, strength: 2, noise: 0.2 }]
+    },
+    power: {
+      clip: "power",
+      ticks: T(2, 2, 3, 7, 6),
+      origin: 16,
+      adv: 20,
+      lunge: [11, 0.78],
+      armor: [2, 3, 1],
+      hits: [{ at: [3], dmg: 18, react: "down", push: 11, lift: 13, stop: 7, strength: 3, shake: 6, noise: 0.35 }]
+    },
+    // 달리며 A: 어깨 돌진
+    dash: {
+      clip: "dash",
+      ticks: T(2, 2, 4, 4, 3, 3),
+      adv: 22,
+      lunge: [12, 0.86],
+      hits: [{ at: [2, 3], dmg: 14, react: "down", push: 12, lift: 9, stop: 6, strength: 3, shake: 5, noise: 0.3 }]
+    },
+    // 앉아 A: 하단 킥 → 띄움
+    lowkick: {
+      clip: "lowkick",
+      ticks: T(1, 2, 5, 3, 2, 2),
+      cancel: 3,
+      hits: [{ at: [2, 3], dmg: 9, react: "launch", push: 3, lift: 17, stop: 4, strength: 2, low: true }]
+    },
+    // 공중 A: 점프 킥
+    airkick: {
+      clip: "airkick",
+      ticks: T(1, 2, 6, 6, 4),
+      hits: [{ at: [2, 3], dmg: 12, react: "stagger", push: 8, stop: 4, strength: 2 }]
+    },
+    // D: 폭파 (고유기). 앞쪽 넓게, 아머 중
+    blast: {
+      clip: "blast",
+      ticks: T(2, 2, 3, 6, 4, 3, 3, 3),
+      armor: [0, 3, 2],
+      hits: [{ at: [3], dmg: 24, react: "down", push: 14, lift: 14, stop: 8, strength: 3, armorBreak: true, box: [20, 82, 10, 90], dy: 34, shake: 9, noise: 0.8 }]
+    },
+    // 앉아 D: 지면 폭파 (양옆 낮게 → 띄움)
+    groundblast: {
+      clip: "groundblast",
+      ticks: T(2, 2, 3, 6, 4, 4),
+      armor: [0, 3, 2],
+      hits: [{ at: [3], dmg: 18, react: "launch", push: 5, lift: 20, stop: 7, strength: 3, low: true, box: [-70, 90, 0, 40], dy: 40, shake: 8, noise: 0.8 }]
+    },
+    // D 길게: 충전(charge 반복) 뒤 놓으면 큰 폭파 (쟈알디 단독 시연판과 같게)
+    bigblast: {
+      clip: "blast",
+      ticks: T(0, 0, 2, 7, 5, 3, 3, 3),
+      armor: [0, 4, 3],
+      hits: [{ at: [3], dmg: 40, react: "down", push: 20, lift: 18, stop: 10, strength: 3, armorBreak: true, box: [10, 120, 0, 100], dy: 50, shake: 12, noise: 1 }]
+    },
+    // F: 숙련 3 연쇄 폭파 (앞으로 세 번), G: 숙련 6 벽 통째로
+    chain: {
+      clip: "chain",
+      ticks: T(2, 3, 3, 3, 3, 3, 3, 3),
+      armor: [1, 5, 2],
+      hits: [
+        { at: [1], dmg: 12, react: "stagger", push: 6, stop: 4, strength: 2, box: [20, 70, 10, 90], dy: 34, shake: 4, noise: 0.5 },
+        { at: [3], dmg: 12, react: "stagger", push: 8, stop: 4, strength: 2, box: [50, 110, 10, 90], dy: 34, shake: 5, noise: 0.5 },
+        { at: [5], dmg: 18, react: "down", push: 14, lift: 14, stop: 7, strength: 3, armorBreak: true, box: [80, 150, 10, 100], dy: 40, shake: 8, noise: 0.8 }
+      ]
+    },
+    wall: {
+      clip: "wall",
+      ticks: T(2, 3, 3, 3, 8, 4, 3, 3),
+      armor: [0, 5, 3],
+      hits: [{ at: [4], dmg: 34, react: "down", push: 24, lift: 10, stop: 10, strength: 3, armorBreak: true, box: [20, 140, 0, 120], dy: 70, shake: 12, noise: 1 }]
+    },
+    fire: { clip: "fire", ticks: T(2, 2, 2, 1) },
+    draw: { clip: "draw", ticks: T(2, 2, 2, 2, 2) },
+    holster: { clip: "holster", ticks: T(2, 2, 2, 2, 2) },
+    reload: { clip: "reload", ticks: T(4, 4, 4, 4) },
+    evade: { clip: "evade", ticks: T(1, 2, 2, 2, 2, 2), invuln: [0, 4], lunge: [15, 0.84] },
+    land: { clip: "land", ticks: T(1, 2, 2), free: true },
+    // 잡기 타격: 무릎. 세 번째는 잡기 폭파로 넘어감
+    grabknee: {
+      clip: "grabknee",
+      ticks: T(2, 2, 4, 3),
+      hits: [{ at: [2], dmg: 7, react: "none", push: 0, stop: 4, strength: 2, box: [14, 46, 20, 60] }]
+    },
+    grabblast: {
+      clip: "grabblast",
+      ticks: T(2, 2, 2, 2, 6, 3, 3, 3),
+      armor: [0, 7, 2],
+      hits: [{ at: [4], dmg: 22, react: "down", push: 16, lift: 15, stop: 8, strength: 3, armorBreak: true, box: [10, 70, 20, 90], dy: 26, shake: 8, noise: 0.8 }]
+    },
+    // W: 필살기. 컷인 뒤 큰 폭발 (장 7)
+    super: {
+      clip: "super",
+      ticks: T(2, 2, 2, 2, 2, 2, 4, 9, 5, 5),
+      invuln: [0, 9],
+      hits: [{ at: [7], dmg: 60, react: "down", push: 18, lift: 18, stop: 10, strength: 3, armorBreak: true, box: [20, 170, 0, 110], dy: 60, shake: 14, noise: 1 }]
+    },
+    pickup: { clip: "pickup", ticks: T(2, 2, 2, 2, 2, 2) },
+    drink: { clip: "drink", ticks: T(3, 3, 3, 3, 3, 3) },
+    eat: { clip: "eat", ticks: T(3, 3, 3, 3, 3, 3) },
+    bandage: { clip: "bandage", ticks: T(3, 3, 3, 3, 3, 3) },
+    toss: { clip: "toss", ticks: T(2, 2, 2, 3, 3, 2) },
+    // 임시 무기: 판정은 아이템 모듈이 낸다 (내구도·물건 부수기와 같이). 엔진은 동작만
+    wswing: { clip: "pipe", ticks: T(2, 2, 2, 3, 4, 5), lunge: [5, 0.75] },
+    wfire: { clip: "fire", ticks: T(2, 2, 2, 1) },
+    // 산탄총·기관단총은 어깨에 견착해서 쏜다
+    wshot: { clip: "shotgun", ticks: T(1, 3, 3, 2, 2) }
+  };
+  var COMBO = ["jab", "cross", "power"];
+
+  // src/game/action/engine/progression.ts
+  var NEUTRAL = { hp: 220, power: 1, aim: 1, defense: 0, speed: 1, poise: 0, charge: 1 };
+  var positive = (value, fallback) => typeof value === "number" && Number.isFinite(value) && value > 0 ? value : fallback;
+  function progressionFor(run) {
+    const s2 = run?.launch?.stats;
+    return {
+      agent: run?.agent ?? "jyaldi",
+      fromHq: !!run?.launch,
+      stats: {
+        hp: positive(s2?.hp, run?.hpMax ?? NEUTRAL.hp),
+        power: positive(s2?.power, NEUTRAL.power),
+        aim: positive(s2?.aim, NEUTRAL.aim),
+        defense: typeof s2?.defense === "number" && Number.isFinite(s2.defense) ? Math.max(0, Math.min(0.5, s2.defense)) : 0,
+        speed: positive(s2?.speed, NEUTRAL.speed),
+        poise: typeof s2?.poise === "number" && Number.isFinite(s2.poise) ? Math.max(0, Math.min(3, s2.poise)) : 0,
+        charge: positive(s2?.charge, NEUTRAL.charge)
+      },
+      relics: [...run?.launch?.relics ?? []],
+      moves: [...run?.launch?.moves ?? []]
+    };
+  }
+  function initializeProgression(player, run) {
+    player.progression = progressionFor(run);
+    player.hp = player.hpMax = player.progression.stats.hp;
+    if (player.progression.relics.includes("first_guard")) player.ward++;
+  }
+  var BLAST_MOVES = /* @__PURE__ */ new Set(["blast", "bigblast", "groundblast", "grabblast", "chain", "wall", "super"]);
+  var isBlastMove = (move2) => BLAST_MOVES.has(move2);
+  function progressionHit(hit2, p, kind) {
+    const damage = hit2.dmg * (kind === "melee" ? p.stats.power : kind === "ranged" ? p.stats.aim : 1);
+    if (kind !== "ability" || p.agent !== "jyaldi" || !p.relics.includes("own_jyaldi")) return damage === hit2.dmg ? hit2 : { ...hit2, dmg: damage };
+    const x = (hit2.x0 + hit2.x1) / 2, z = (hit2.z0 + hit2.z1) / 2;
+    const halfX = (hit2.x1 - hit2.x0) * 0.6, halfZ = (hit2.z1 - hit2.z0) * 0.6;
+    return { ...hit2, dmg: damage, x0: x - halfX, x1: x + halfX, z0: z - halfZ, z1: z + halfZ, dy: (hit2.dy ?? 18) * 1.2 };
+  }
+  function defendedHit(hit2, p) {
+    return p.stats.defense ? { ...hit2, dmg: hit2.dmg * (1 - p.stats.defense) } : hit2;
+  }
+  function canUseMasteryMove(p, key2) {
+    if (!p.fromHq) return true;
+    return key2 === "chain" ? p.moves.includes("unique_a") : key2 === "wall" ? p.moves.includes("unique_b") : true;
+  }
+  function masteryMove(p, key2, move2) {
+    if (key2 !== "super" || !p.moves.includes("ult2")) return move2;
+    return { ...move2, hits: move2.hits?.map((h) => ({ ...h, at: [...h.at, 8] })) };
+  }
+  var masteryHitId = (p, key2, frame2, id) => id + (key2 === "super" && p.moves.includes("ult2") && frame2 >= 8 ? 1 : 0);
+
+  // src/game/action/engine/player.ts
+  var WALK_X = 9;
+  var WALK_Y = 4.2;
+  var RUN_X = 18;
+  var CROUCH_X = 3.4;
+  var JUMP_V = 31;
+  var BUFFER = 8;
+  var MAG = 8;
+  var HOLSTER_AFTER = 48;
+  var CHARGE_AFTER = 9;
+  var FIGHT_STANCE = 150;
+  var SKILL_CD = 75;
+  var GRAB_TIME = 66;
+  var playerFactory = { make: (clips) => new Player(clips) };
+  var Player = class extends Fighter {
+    constructor(clips) {
+      super();
+      this.clips = clips;
+      this.friction = 0.72;
+    }
+    team = "player";
+    kind = "player";
+    label = "쟈알디";
+    hp = 220;
+    hpMax = 220;
+    width = 30;
+    // 동작
+    move = null;
+    moveKey = "";
+    mf = 0;
+    mft = 0;
+    attackId = 0;
+    connected = false;
+    comboStep = 0;
+    comboTimer = 0;
+    buf = null;
+    // 자세
+    crouching = false;
+    guarding = false;
+    running = false;
+    wasGuarding = 0;
+    airAttackUsed = false;
+    // 총
+    ammo = MAG;
+    mag = MAG;
+    reserve = 40;
+    gunOut = 0;
+    queuedShot = false;
+    burst = 0;
+    burstT = 0;
+    dry = false;
+    // D 길게: 충전
+    chargeT = -1;
+    charging = false;
+    /** 싸움 자세 남은 틱 (때리거나 맞으면 켜짐) */
+    fightT = 0;
+    /** C 지원 호출: 걸어 들어와 폭파하고 나가는 다른 쟈알디 (시연판과 같게, 필살 게이지 절반) */
+    ally = null;
+    /** 강화 선택 등이 곱하는 공격력 배수 */
+    dmgMul = 1;
+    progression = progressionFor();
+    // 게이지
+    gauge = 0;
+    guardMeter = 100;
+    skillCd = 0;
+    combo = 0;
+    comboClock = 0;
+    maxCombo = 0;
+    // 잡기
+    grabbed = null;
+    grabT = 0;
+    grabHits = 0;
+    // 그리기
+    animClock = 0;
+    gaitFrame = 0;
+    gaitMoving = false;
+    gaitDir = 1;
+    lowWarned = false;
+    /** 부적: 피격 무효 남은 횟수 */
+    ward = 0;
+    /** 이 틱에 요청한 일 (world가 처리) */
+    /** 든 것: 환경 물건은 머리 위('over'), 임시 무기는 손('hand'). 그림은 엔진이 따로 그린다 */
+    carry = null;
+    /** 든 것이 있을 때 A·S를 아이템 쪽이 받는다. 돌려준 동작을 재생, null이면 엔진 기본 */
+    itemAct = null;
+    seat = null;
+    sit(clip, x, y, face, exit) {
+      if (!this.clips[clip]?.length || this.z > 0 || this.phase !== "free" || this.move && this.moveKey !== "pickup") return false;
+      this.cancelMove();
+      this.buf = null;
+      this.running = this.guarding = this.crouching = this.charging = false;
+      this.chargeT = -1;
+      this.wantItem = 0;
+      this.wantSuper = false;
+      this.vx = this.vy = this.vz = 0;
+      this.x = this.px = x;
+      this.y = this.py = y;
+      this.dir = face;
+      this.resetLocomotion();
+      this.seat = { clip, frame: 0, tick: 0, rising: false, exit };
+      return true;
+    }
+    wantInteract = false;
+    wantItem = 0;
+    wantSuper = false;
+    get state() {
+      if (this.phase !== "free") return this.phase;
+      if (this.move) return this.moveKey;
+      if (this.grabbed) return "grab";
+      if (this.airborne) return "jump";
+      if (this.guarding) return "guard";
+      if (this.crouching) return "crouch";
+      return this.running ? "run" : "idle";
+    }
+    get guardMeterView() {
+      return this.guardMeter;
+    }
+    /* ───────── 판정 ───────── */
+    frameInfo() {
+      const a = this.anim();
+      const list = this.clips[a.clip];
+      return { info: list ? list[Math.min(a.frame, list.length - 1)] : null, origin: a.origin };
+    }
+    /** 든 물건을 그릴 자리: 발 기준 앞쪽 px(dx), 높이 px(dz), 각도° (오른쪽 보기 기준) */
+    heldAt() {
+      if (!this.carry) return null;
+      const { info, origin } = this.frameInfo();
+      const P = PIXEL;
+      if (this.carry.hold === "over" && info?.hand && /^carry2_|^toss/.test(this.anim().clip)) return { dx: (info.hand[0] - origin) * P, dz: info.hand[1] * P, deg: 0 };
+      if (this.carry.hold === "over") {
+        const top = info?.hurt ? info.hurt[3] : 96;
+        return { dx: ((info?.hurt ? (info.hurt[0] + info.hurt[1]) / 2 : 0) - origin) * P, dz: (top - 6) * P, deg: 0 };
+      }
+      const h = info?.hand;
+      if (h) return { dx: (h[0] - origin) * P, dz: h[1] * P, deg: h[2] };
+      const r = info?.reach;
+      return r ? { dx: ((r[0] + r[1]) / 2 - origin) * P, dz: (r[2] + r[3]) / 2 * P, deg: -30 } : { dx: 18 * P, dz: 50 * P, deg: -30 };
+    }
+    frame() {
+      const { info, origin } = this.frameInfo();
+      const P = PIXEL;
+      const hurt2 = [];
+      if (this.alive && this.phase !== "dead") {
+        const h = info?.hurt;
+        if (h) hurt2.push(toWorld(this, (h[0] - origin) * P, (h[1] - origin) * P, h[2] * P, h[3] * P, 16));
+        else hurt2.push(toWorld(this, -16 * P / 2, 16 * P / 2, 0, (this.crouching ? 60 : 96) * P / 1, 16));
+      }
+      const hit2 = [];
+      const al = this.ally;
+      if (al?.hitOn) {
+        const a = al.dir === 1 ? al.x + 260 : al.x - 640, b = al.dir === 1 ? al.x + 640 : al.x - 260;
+        hit2.push({ x0: a, x1: b, z0: 0, z1: 320, y: al.y, dy: 70, attackId: al.id, dmg: 30 * this.dmgMul, react: "down", dir: al.dir, push: 16, lift: 16, stop: 8, strength: 3, armorBreak: true, noise: 1 });
+      }
+      if (this.move?.hits && this.phase === "free") {
+        for (const mh of this.move.hits) {
+          if (!mh.at.includes(this.mf)) continue;
+          const r = mh.box ?? info?.reach;
+          if (!r) continue;
+          const o = mh.box ? 0 : origin;
+          const w = toWorld(this, (r[0] - o) * P, (r[1] - o) * P, r[2] * P, r[3] * P, mh.dy ?? 20);
+          hit2.push({
+            ...w,
+            attackId: masteryHitId(this.progression, this.moveKey, this.mf, this.attackId),
+            dmg: mh.dmg * this.dmgMul,
+            react: mh.react,
+            dir: this.dir,
+            push: mh.push,
+            lift: mh.lift,
+            stop: mh.stop,
+            low: mh.low,
+            armorBreak: mh.armorBreak,
+            strength: mh.strength,
+            noise: mh.noise
+          });
         }
-        const [atlas, cutin] = await Promise.all([img(a), img(c)]);
-        if (frames) return { atlas, cutin, clips: frames.clips };
-      } catch {
+      }
+      return { hit: hit2.map((h) => progressionHit(h, this.progression, h.attackId === al?.id || isBlastMove(this.moveKey) ? "ability" : "melee")), hurt: hurt2 };
+    }
+    /** 클립 장 수 (그림 바꿔 그리기용) */
+    clipLen(clip) {
+      return this.clips[clip]?.length || 1;
+    }
+    /** 지금 보여 줄 클립·장 */
+    anim() {
+      if (this.seat) return { clip: this.seat.clip, frame: this.seat.frame, origin: 0 };
+      const c = this.animClock;
+      const loop = (clip, every) => {
+        const n = this.clips[clip]?.length || 1;
+        return { clip, frame: Math.floor(c / every) % n, origin: 0 };
+      };
+      const gait = (clip) => ({ clip, frame: Math.floor(this.gaitFrame + 1e-9) % (this.clips[clip]?.length || 1), origin: 0 });
+      switch (this.phase) {
+        case "hurt":
+          return { clip: "hit", frame: Math.min(3, Math.floor(this.t / Math.max(1, this.until) * 4)), origin: 0 };
+        case "air-hurt":
+          return { clip: "down", frame: this.vz > 0 ? 0 : 1, origin: 0 };
+        case "down":
+          return { clip: "down", frame: Math.min(4, 2 + Math.floor(this.t / 3)), origin: 0 };
+        case "getup":
+          return { clip: "getup", frame: Math.min(4, Math.floor(this.t / this.until * 5)), origin: 0 };
+        case "dead":
+          return { clip: "down", frame: 4, origin: 0 };
+        default:
+      }
+      if (this.move) return { clip: this.move.clip, frame: this.mf, origin: this.move.origin ?? 0 };
+      if (this.grabbed) return { clip: "grab", frame: Math.min(3, Math.floor(this.grabT / 2)), origin: 0 };
+      if (this.airborne) {
+        const f = this.vz > 14 ? 2 : this.vz > 3 ? 3 : this.vz > -6 ? 4 : this.vz > -16 ? 5 : 6;
+        return { clip: "jump", frame: f, origin: 0 };
+      }
+      if (this.charging) return loop("charge", 3);
+      if (this.guarding) return { clip: "block", frame: Math.min(3, this.wasGuarding), origin: 0 };
+      if (this.crouching) return this.gaitMoving ? gait("crouchwalk") : { clip: "crouch", frame: 3, origin: 0 };
+      const held = this.heldSet();
+      const moving = this.gaitMoving;
+      const running = moving && this.running;
+      if (held) {
+        const want = `${held === "carry2" ? "carry2_" : ""}${running ? "run" : moving ? "walk" : "idle"}${held === "carry2" ? "" : "_" + held}`;
+        const alt = `${held === "carry2" ? "carry2_" : ""}${moving ? "walk" : "idle"}${held === "carry2" ? "" : "_" + held}`;
+        if (this.clips[want]) return moving ? gait(want) : loop(want, 6);
+        if (this.clips[alt]) return moving ? gait(alt) : loop(alt, 6);
+      }
+      if (running) return gait("run");
+      if (moving) return gait("walk");
+      if (this.gunOut > 0) return { clip: "fire", frame: Math.max(0, (this.clips.fire?.length ?? 4) - 1), origin: 0 };
+      return this.fightT > 0 ? loop("guard", 6) : loop("idle", 7);
+    }
+    /** 월드가 가구·지형·카메라 경계까지 처리한 뒤 한 번 호출한다.
+     * 입력 속도만 보면 벽에 막힌 채 계속 달리므로, 최종 이동량만 발걸음에 반영한다. */
+    finishLocomotion() {
+      const canWalk = this.phase === "free" && !this.move && !this.airborne && !this.grabbed && !this.guarding && !this.charging && this.stop <= 0;
+      const dx = Math.abs(this.x - this.px), dy = Math.abs(this.y - this.py);
+      const moving = canWalk && (Math.abs(this.vx) > 0.5 || Math.abs(this.vy) > 0.5) && (dx > 0.05 || dy > 0.05);
+      if (!moving) return this.resetLocomotion();
+      const speedX = this.crouching ? CROUCH_X : this.running ? RUN_X : WALK_X;
+      const speedY = this.running ? WALK_Y * 1.2 : WALK_Y;
+      const progress = Math.min(this.progression.stats.speed, Math.max(dx / speedX, dy / speedY));
+      if (!this.gaitMoving || this.gaitDir !== this.dir) this.gaitFrame = 0;
+      else this.gaitFrame += progress / (this.running && !this.crouching ? 2 : 3);
+      this.gaitMoving = true;
+      this.gaitDir = this.dir;
+    }
+    /** 방 이동·저장 복원은 보행 도중의 자세를 다음 방에 끌고 가지 않는다. */
+    resetLocomotion() {
+      this.gaitFrame = 0;
+      this.gaitMoving = false;
+      this.gaitDir = this.dir;
+    }
+    /** 든 물건 종류별 자세 클립 이름 조각 */
+    heldSet() {
+      const c = this.carry;
+      if (!c) return null;
+      if (c.kind === "prop") return "carry2";
+      if (c.cls === "melee") return "pipe";
+      if (c.cls === "gun" && c.id !== "servicepistol") return "shotgun";
+      return null;
+    }
+    /* ───────── 맞음 ───────── */
+    applyHit(hit2, world) {
+      if (this.invuln > 0 || this.move?.invuln && this.mf >= this.move.invuln[0] && this.mf <= this.move.invuln[1]) return { kind: "immune" };
+      const front = hit2.dir === -this.dir;
+      const blockable = !hit2.grab && (!hit2.low || this.crouching);
+      if (this.guarding && front && blockable && this.phase === "free") {
+        this.guardMeter -= (hit2.dmg ?? 0) * 2.4;
+        this.x += hit2.dir * Math.max(3, (hit2.push ?? 4) * 1.6);
+        world.emit({ type: "guard", x: this.x });
+        world.fx("ring", this.x + this.dir * 36, this.y, 90);
+        if (this.guardMeter <= 0) {
+          this.guardMeter = 0;
+          this.guarding = false;
+          world.emit({ type: "guardBreak", x: this.x });
+          world.say("가드가 깨졌다!", 1.2);
+          this.enter("hurt", 30);
+        }
+        return { kind: "guard" };
+      }
+      if (this.ward > 0 && hit2.dmg > 0) {
+        this.ward--;
+        this.invuln = 20;
+        world.fx("ring", this.x, this.y, 100, "3");
+        world.say("부적이 대신 맞았다", 1);
+        return { kind: "immune" };
+      }
+      hit2 = defendedHit(hit2, this.progression);
+      const armorFrame = this.move?.armor && this.mf >= this.move.armor[0] && this.mf <= this.move.armor[1] ? this.move.armor[2] : 0;
+      this.armor = armorFrame;
+      this.cancelMove();
+      if (this.grabbed) this.releaseGrab();
+      const r = super.applyHit(hit2, world);
+      if (r.kind === "hit" || r.kind === "armor") {
+        this.gauge = Math.min(100, this.gauge + 4 * this.progression.stats.charge);
+        world.emit({ type: "hurt", x: this.x, dmg: hit2.dmg, hp: this.hp });
+        if (!this.lowWarned && this.hp < this.hpMax * 0.3) {
+          this.lowWarned = true;
+          world.emit({ type: "hp:low" });
+        }
+      }
+      if (r.kind === "armor") this.armor = 0;
+      return r;
+    }
+    onKilled() {
+      this.crouching = this.guarding = this.running = false;
+    }
+    /* ───────── 한 틱 ───────── */
+    cancelMove() {
+      this.move = null;
+      this.moveKey = "";
+      this.queuedShot = false;
+    }
+    play(key2, world) {
+      if (!canUseMasteryMove(this.progression, key2)) {
+        world.say(key2 === "chain" ? "연쇄 폭파: 숙련 3에서 열린다." : "벽 통째로: 숙련 6에서 열린다.", 2);
+        return;
+      }
+      const m = masteryMove(this.progression, key2, MOVES[key2]);
+      this.move = m;
+      this.moveKey = key2;
+      this.mf = 0;
+      this.mft = 0;
+      this.attackId = newAttackId(2);
+      this.connected = false;
+      this.running = false;
+      this.guarding = false;
+      if (m.hits) this.fightT = FIGHT_STANCE;
+      if (m.lunge) this.vx = this.dir * m.lunge[0];
+      else if (!this.airborne) this.vx = 0;
+      this.vy = 0;
+      this.skipZeroFrames();
+      const ability2 = key2 === "blast" || key2 === "bigblast" || key2 === "groundblast" || key2 === "grabblast" || key2 === "chain" || key2 === "wall";
+      world.emit(ability2 ? { type: "ability", x: this.x, move: key2 } : key2 === "super" ? { type: "super", x: this.x, move: key2 } : key2 === "evade" ? { type: "evade", x: this.x } : { type: "custom", name: "move", data: key2 });
+    }
+    skipZeroFrames() {
+      const m = this.move;
+      if (!m) return;
+      while (this.mf < m.ticks.length - 1 && m.ticks[this.mf] === 0) this.mf++;
+    }
+    /** 엔진이 명중을 알려 줌 */
+    onConnect(world, killed) {
+      this.connected = true;
+      this.gauge = Math.min(100, this.gauge + 2.5 * this.progression.stats.charge);
+      this.combo = this.comboClock > 0 ? this.combo + 1 : 1;
+      this.comboClock = 40;
+      this.maxCombo = Math.max(this.maxCombo, this.combo);
+      if (killed) this.gauge = Math.min(100, this.gauge + 4 * this.progression.stats.charge);
+      void world;
+    }
+    /** 멈춰 있는 동안(히트스톱) 입력만 받아 두기 */
+    listen(p) {
+      this.bufPress(p);
+      if (this.buf) this.buf.ttl = Math.max(this.buf.ttl, BUFFER);
+    }
+    bufPress(p) {
+      const order = [["super", "super"], ["skill", "skill"], ["attack", "attack"], ["jump", "jump"], ["shoot", "shoot"]];
+      for (const [k, b] of order) if (p.pressed.has(k)) this.buf = { b, ttl: BUFFER };
+      if (p.evade) this.buf = { b: "evade", ttl: BUFFER };
+    }
+    take(b) {
+      if (this.buf?.b === b) {
+        this.buf = null;
+        return true;
+      }
+      return false;
+    }
+    step(world) {
+      void world;
+    }
+    tick(world, p) {
+      if (this.seat) {
+        const s2 = this.seat;
+        this.wantInteract = false;
+        this.wantItem = 0;
+        this.wantSuper = false;
+        this.buf = null;
+        if (p.pressed.has("interact") && !s2.rising) {
+          s2.rising = true;
+          s2.tick = 0;
+        }
+        if (++s2.tick >= 4) {
+          s2.tick = 0;
+          if (s2.rising) {
+            if (s2.frame > 0) s2.frame--;
+            else {
+              this.x = this.px = s2.exit.x;
+              this.y = this.py = s2.exit.y;
+              this.seat = null;
+              this.resetLocomotion();
+            }
+          } else s2.frame = Math.min(s2.frame + 1, this.clips[s2.clip].length - 1);
+        }
+        return;
+      }
+      this.animClock++;
+      if (this.comboTimer > 0) this.comboTimer--;
+      if (this.comboClock > 0 && --this.comboClock === 0) this.combo = 0;
+      if (this.skillCd > 0) this.skillCd--;
+      if (!this.guarding) this.guardMeter = Math.min(100, this.guardMeter + 0.5);
+      this.bufPress(p);
+      if (this.buf && --this.buf.ttl < 0) this.buf = null;
+      this.wantInteract = p.pressed.has("interact");
+      this.wantItem = p.pressed.has("item1") ? 1 : p.pressed.has("item2") ? 2 : p.pressed.has("item3") ? 3 : p.pressed.has("item4") ? 4 : 0;
+      if (this.fightT > 0) this.fightT--;
+      if (this.burstT > 0 && --this.burstT === 0) this.burst = 0;
+      this.stepAlly(world);
+      if (this.stepReact(world)) {
+        this.running = this.guarding = this.crouching = this.charging = false;
+        this.chargeT = -1;
+        this.fightT = FIGHT_STANCE;
+        this.wantInteract = false;
+        this.wantItem = 0;
+        return;
+      }
+      this.armor = 0;
+      if (this.move?.free && (this.buf || p.mx || p.my)) this.cancelMove();
+      if (this.move) this.stepMove(world, p);
+      else if (this.charging) this.stepCharge(world, p);
+      else if (this.grabbed) this.stepGrab(world, p);
+      else this.stepFree(world, p);
+      this.stepPhysics(world);
+    }
+    stepPhysics(world) {
+      if (this.z > 0 || this.vz > 0) {
+        this.z += this.vz;
+        this.vz -= GRAVITY;
+        this.x += this.vx;
+        if (this.z <= 0) {
+          this.z = 0;
+          this.vz = 0;
+          this.airAttackUsed = false;
+          world.emit({ type: "land", x: this.x });
+          world.fx("dust", this.x, this.y, 0);
+          if (this.moveKey === "airkick" || !this.move) this.play("land", world);
+          this.vx = 0;
+        }
+      } else if (this.move) {
+        const k = this.move.lunge?.[1] ?? 0.6;
+        this.x += this.vx;
+        this.y += this.vy;
+        this.vx *= k;
+        this.vy *= k;
+      } else {
+        this.x += this.vx;
+        this.y += this.vy;
+      }
+      const [lo, hi] = world.lane;
+      this.y = Math.max(lo, Math.min(hi, this.y));
+      const [b0, b1] = world.bounds;
+      this.x = Math.max(b0 + 30, Math.min(b1 - 30, this.x));
+    }
+    stepMove(world, p) {
+      const m = this.move;
+      const key2 = this.moveKey;
+      const canCancel = this.connected ? m.cancel !== void 0 && this.mf >= m.cancel : m.whiffCancel !== void 0 && this.mf >= m.whiffCancel;
+      if (canCancel) {
+        const ci = COMBO.indexOf(key2);
+        if (this.connected && this.take("skill") && this.skillCd <= 0) return this.startSkill(world, p);
+        if (this.connected && this.take("super") && this.gauge >= 100) return this.startSuper(world);
+        if (this.take("attack")) {
+          const next = this.connected && ci >= 0 && ci < 2 ? COMBO[ci + 1] : "jab";
+          if (p.mx) this.dir = p.mx > 0 ? 1 : -1;
+          this.comboStep = COMBO.indexOf(next);
+          this.endMoveAdvance();
+          return this.play(next, world);
+        }
+        if (this.connected && this.take("evade")) {
+          this.endMoveAdvance();
+          return this.startEvade(world, p);
+        }
+      }
+      if (key2 === "evade" && this.mf <= 2 && this.take("attack")) {
+        if (p.mx) this.dir = p.mx > 0 ? 1 : -1;
+        return this.play("dash", world);
+      }
+      if (key2 === "blast" && this.chargeT >= 0) {
+        if (p.held.has("skill")) {
+          this.chargeT++;
+          if (this.mf >= 2) {
+            this.mf = 2;
+            this.mft = 0;
+          }
+          if (this.chargeT >= CHARGE_AFTER) {
+            this.cancelMove();
+            this.charging = true;
+            this.chargeT = 0;
+            return;
+          }
+          return;
+        }
+        this.chargeT = -1;
+      }
+      if (key2 === "reload" && this.mf === 3 && this.mft === 0) {
+        const n = Math.min(this.mag - this.ammo, this.reserve);
+        this.ammo += n;
+        this.reserve -= n;
+        world.emit({ type: "reload", x: this.x });
+      }
+      if (key2 === "fire" && this.mf === 0 && this.mft === 0 && !this.dry) this.fireBullet(world);
+      if (++this.mft >= Math.max(1, m.ticks[this.mf])) {
+        this.mft = 0;
+        this.mf++;
+        this.skipZeroFrames();
+        const h = m.hits?.find((x) => x.at[0] === this.mf || key2 === "super" && x.at.includes(this.mf));
+        if (h) {
+          if (h.shake) world.shake(2, 1);
+          if (key2 === "blast" || key2 === "bigblast" || key2 === "grabblast" || key2 === "groundblast" || key2 === "super" || key2 === "chain" || key2 === "wall") {
+            const { info, origin } = this.frameInfo();
+            const hd = info?.hand;
+            const reachX = h.box ? (h.box[0] + h.box[1]) / 2 * PIXEL : 0;
+            const dx = key2 === "super" ? 130 * PIXEL / 2 : key2 === "groundblast" ? 0 : key2 === "chain" || key2 === "wall" || key2 === "bigblast" ? reachX : hd ? (hd[0] - origin) * PIXEL : 56 * PIXEL / 2;
+            const dz = key2 === "groundblast" ? 10 : hd && key2 !== "super" ? hd[1] * PIXEL : 70 * PIXEL / 2;
+            world.fx("boom", this.x + this.dir * dx, this.y, dz);
+            world.shake(h.shake ?? 6, key2 === "super" ? 3 : 2);
+          }
+        }
+        if (this.mf >= m.ticks.length) return this.finishMove(world);
       }
     }
-    return EMPTY_ART;
+    endMoveAdvance() {
+      const m = this.move;
+      if (m?.adv) this.x += this.dir * ((m.adv - (m.origin ?? 0)) * PIXEL);
+    }
+    finishMove(world) {
+      const key2 = this.moveKey;
+      if (this.move?.hits && !this.connected) world.emit({ type: "whiff", x: this.x });
+      const queued = this.queuedShot;
+      this.endMoveAdvance();
+      this.cancelMove();
+      if (key2 === "jab" || key2 === "cross") this.comboTimer = 8;
+      else this.comboStep = 0;
+      void queued;
+      if (key2 === "draw" || key2 === "fire" || key2 === "reload") this.gunOut = HOLSTER_AFTER;
+      if (key2 === "holster") this.gunOut = 0;
+      if (key2 === "grabblast" || key2 === "grabknee") {
+      }
+    }
+    startSkill(world, p) {
+      this.skillCd = SKILL_CD;
+      if (p.mx) this.dir = p.mx > 0 ? 1 : -1;
+      else this.faceNearest(world);
+      this.gunOut = 0;
+      this.play(this.crouching ? "groundblast" : "blast", world);
+      if (!this.crouching && p.held.has("skill")) this.chargeT = 0;
+    }
+    /** 충전 중: 놓으면 큰 폭파 */
+    stepCharge(world, p) {
+      this.vx = this.vy = 0;
+      this.chargeT++;
+      if (this.chargeT % 8 === 0) {
+        const hd = this.clips.charge?.[0]?.hand;
+        world.fx("spark", this.x + this.dir * ((hd ? hd[0] : 37) + 14) * PIXEL, this.y, (hd ? hd[1] : 70) * PIXEL);
+      }
+      if (!p.held.has("skill")) {
+        this.charging = false;
+        this.chargeT = -1;
+        this.play("bigblast", world);
+      }
+    }
+    startSuper(world) {
+      this.gauge = 0;
+      this.wantSuper = true;
+      this.play("super", world);
+    }
+    startEvade(world, p) {
+      if (p.mx) this.dir = p.mx > 0 ? 1 : -1;
+      this.play("evade", world);
+      const mx = p.mx || (p.my ? 0 : this.dir);
+      const sp = MOVES.evade.lunge[0];
+      this.vx = mx * sp;
+      this.vy = p.my * sp * 0.55;
+      this.invuln = 9;
+      world.fx("dust", this.x, this.y, 0);
+    }
+    /** S: 집어넣은 상태면 뽑기만, 뽑은 상태면 한 발. 3발 뒤 잠깐 멈춤, 빈 탄창은 「찰칵」 (R로 장전) */
+    tryShoot(world) {
+      this.fightT = FIGHT_STANCE;
+      if (this.gunOut <= 0) return this.play("draw", world);
+      if (this.burst >= 3 && this.burstT > 0) return;
+      this.dry = this.ammo <= 0;
+      if (this.dry) {
+        world.emit({ type: "empty", x: this.x });
+        world.say(this.reserve > 0 ? "찰칵 — R로 장전" : "찰칵 — 탄약이 없다", 1);
+      }
+      this.play("fire", world);
+      if (this.dry) {
+        this.mf = this.move.ticks.length - 1;
+        return;
+      }
+      if (++this.burst >= 3) this.burstT = 14;
+    }
+    fireBullet(world) {
+      this.ammo--;
+      this.gunOut = HOLSTER_AFTER;
+      world.emit({ type: "shot", x: this.x, ammo: this.ammo });
+      const { info, origin } = this.frameInfo();
+      const hd = info?.hand;
+      const mx = hd ? (hd[0] - origin + 14) * PIXEL : 48 * PIXEL;
+      const mz = hd ? (hd[1] + 3) * PIXEL : 74 * PIXEL;
+      world.addBullet({
+        x: this.x + this.dir * mx,
+        y: this.y,
+        z: mz,
+        dir: this.dir
+      });
+      world.fx("spark", this.x + this.dir * mx, this.y, mz);
+      this.x -= this.dir * 2;
+    }
+    callAlly(world) {
+      if (this.ally) return;
+      if (this.gauge < 50) return world.say("지원 호출: 필살 게이지 절반 필요", 1);
+      this.gauge -= 50;
+      const d3 = this.dir;
+      this.ally = { x: this.x - d3 * 580, y: Math.min(world.lane[1], this.y + 30), dir: d3, phase: "in", clip: "walk", f: 0, ft: 0, hitOn: false, id: newAttackId() };
+      world.say("「길 비켜.」", 1.4);
+    }
+    stepAlly(world) {
+      const a = this.ally;
+      if (!a) return;
+      a.hitOn = false;
+      a.ft++;
+      if (a.phase === "in") {
+        a.x += a.dir * 12;
+        if (a.ft % 3 === 0) a.f = (a.f + 1) % (this.clips.walk?.length || 1);
+        if ((this.x - a.x) * a.dir <= 150) Object.assign(a, { phase: "act", clip: "support", f: 3, ft: 0 });
+      } else if (a.phase === "act") {
+        if (a.ft >= 3) {
+          a.ft = 0;
+          a.f++;
+          if (a.f === 5) {
+            a.hitOn = true;
+            world.fx("boom", a.x + a.dir * 450, a.y, 150);
+            world.shake(10, 3);
+            world.emit({ type: "ability", x: a.x, move: "support" });
+          }
+          if (a.f >= (this.clips.support?.length || 10)) Object.assign(a, { phase: "out", clip: "walk", f: 0, ft: 0, dir: -a.dir });
+        }
+      } else {
+        a.x += a.dir * 12;
+        if (a.ft % 3 === 0) a.f = (a.f + 1) % (this.clips.walk?.length || 1);
+        if (Math.abs(a.x - this.x) > 900) this.ally = null;
+      }
+    }
+    /** 방향키 없이 칠 때: 등 뒤에만 적이 붙어 있으면 그쪽으로 돈다 (독립 검수: 허공을 침) */
+    faceNearest(world) {
+      let front = Infinity, back = Infinity;
+      for (const b of world.bodies) {
+        if (b.team !== "enemy" || !b.alive || Math.abs(b.y - this.y) > 60) continue;
+        const d3 = (b.x - this.x) * this.dir;
+        if (d3 >= 0) front = Math.min(front, d3);
+        else back = Math.min(back, -d3);
+      }
+      if (back < 220 && front > 260) this.dir = -this.dir;
+    }
+    /** E: 앞에 있는 적을 붙잡는다 (시연판). 잡을 수 없는 적(대형·환경형)은 안 잡힌다 */
+    tryGrabFront(world) {
+      for (const b of world.bodies) {
+        if (b.team !== "enemy" || !b.alive || b.z > 0) continue;
+        const g2 = b;
+        if (!g2.grabbable || !(g2 instanceof Fighter || typeof g2.set === "function")) continue;
+        const dx = b.x - this.x;
+        if (Math.sign(dx) !== this.dir || Math.abs(dx) > 90 || Math.abs(b.y - this.y) > 20) continue;
+        this.grabbed = g2;
+        this.grabT = 0;
+        this.grabHits = 0;
+        grabHold(g2);
+        g2.vx = 0;
+        this.vx = this.vy = 0;
+        this.gunOut = 0;
+        this.fightT = FIGHT_STANCE;
+        world.emit({ type: "custom", name: "grab" });
+        return true;
+      }
+      return false;
+    }
+    stepFree(world, p) {
+      if (this.airborne) {
+        this.vx += p.mx * 0.4;
+        this.vx = Math.max(-16, Math.min(16, this.vx));
+        if (p.mx) this.dir = p.mx > 0 ? 1 : -1;
+        if (this.carry?.kind === "prop" && this.itemAct && this.take("attack")) {
+          const anim = this.itemAct("attack");
+          if (anim) this.play(anim, world);
+          return;
+        }
+        if (!this.airAttackUsed && this.take("attack")) {
+          this.airAttackUsed = true;
+          this.play("airkick", world);
+        }
+        return;
+      }
+      if (this.take("super")) {
+        if (this.gauge >= 100) return this.startSuper(world);
+        world.say("필살 게이지가 모자라다", 1);
+      }
+      if (this.crouching && (p.pressed.has("up") || p.pressed.has("jump") || p.downDouble)) {
+        this.crouching = false;
+        if (this.buf?.b === "jump") this.buf = null;
+        p.pressed.delete("up");
+      } else if (p.downDouble && !this.carry) {
+        this.crouching = true;
+        this.gunOut = 0;
+      }
+      if (p.pressed.has("interact") && !this.carry && !this.crouching && this.tryGrabFront(world)) {
+        this.wantInteract = false;
+        return;
+      }
+      if (p.pressed.has("ally")) this.callAlly(world);
+      if (!this.crouching && !this.carry && p.pressed.has("chain")) {
+        this.play("chain", world);
+        if (this.move) return;
+      }
+      if (!this.crouching && !this.carry && p.pressed.has("wall")) {
+        this.play("wall", world);
+        if (this.move) return;
+      }
+      const g2 = p.held.has("guard") && this.guardMeter > 0;
+      this.wasGuarding = g2 ? this.wasGuarding + 1 : 0;
+      this.guarding = g2;
+      if (g2) {
+        this.vx = this.vy = 0;
+        this.running = false;
+        if (p.mx) this.dir = p.mx > 0 ? 1 : -1;
+        if (this.take("evade")) return this.startEvade(world, p);
+        return;
+      }
+      if (this.take("evade")) return this.startEvade(world, p);
+      if (this.take("skill")) {
+        if (this.skillCd <= 0) return this.startSkill(world, p);
+        world.say("폭파 충전 중", 0.6);
+      }
+      if (this.take("jump") && !this.crouching) {
+        this.vz = JUMP_V;
+        this.z = 1;
+        this.vx = p.mx * (this.running ? 16 : WALK_X);
+        if (p.mx) this.dir = p.mx > 0 ? 1 : -1;
+        this.running = false;
+        world.emit({ type: "jump", x: this.x });
+        return;
+      }
+      if (this.carry && this.itemAct && (this.buf?.b === "attack" || this.buf?.b === "shoot")) {
+        const k = this.buf.b;
+        if (p.mx) this.dir = p.mx > 0 ? 1 : -1;
+        const anim = this.itemAct(k);
+        if (anim !== null) {
+          this.take(k);
+          if (anim) this.play(anim === "wfire" && this.heldSet() === "shotgun" ? "wshot" : anim, world);
+          return;
+        }
+      }
+      if (this.take("attack")) {
+        if (p.mx) this.dir = p.mx > 0 ? 1 : -1;
+        else this.faceNearest(world);
+        if (this.crouching) return this.play("lowkick", world);
+        if (this.running) return this.play("dash", world);
+        const next = this.comboTimer > 0 && this.comboStep > 0 ? COMBO[this.comboStep] : "jab";
+        this.comboStep = COMBO.indexOf(next);
+        return this.play(next, world);
+      }
+      if (p.pressed.has("reload") && this.ammo < this.mag) {
+        if (this.reserve > 0) return this.play("reload", world);
+        world.say("예비 탄약이 없다", 1);
+      }
+      if (this.take("shoot") && !this.crouching) {
+        if (p.mx) this.dir = p.mx > 0 ? 1 : -1;
+        return this.tryShoot(world);
+      }
+      if (this.gunOut > 0 && (p.mx || p.my || --this.gunOut === 0)) {
+        this.gunOut = 0;
+        return this.play("holster", world);
+      }
+      if (p.mx) this.dir = p.mx > 0 ? 1 : -1;
+      this.running = p.run && p.mx !== 0 && !this.crouching;
+      if (this.crouching) {
+        this.vx = p.mx * CROUCH_X * this.progression.stats.speed;
+        this.vy = 0;
+      } else {
+        this.vx = p.mx * (this.running ? RUN_X : WALK_X) * this.progression.stats.speed;
+        this.vy = p.my * (this.running ? WALK_Y * 1.2 : WALK_Y) * this.progression.stats.speed;
+      }
+      if (p.mx && !this.running && !this.crouching) {
+        for (const b of world.bodies) {
+          if (b.team !== "enemy" || !b.alive || b.z > 0 || !grabCan(b)) continue;
+          const dx = b.x - this.x;
+          if (Math.sign(dx) === p.mx && Math.abs(dx) < 62 && Math.abs(b.y - this.y) < 14) {
+            const gb = b;
+            this.grabbed = gb;
+            this.grabT = 0;
+            this.grabHits = 0;
+            grabHold(gb);
+            gb.vx = 0;
+            this.vx = this.vy = 0;
+            this.dir = dx > 0 ? 1 : -1;
+            world.emit({ type: "custom", name: "grab" });
+            break;
+          }
+        }
+      }
+    }
+    releaseGrab() {
+      const g2 = this.grabbed;
+      this.grabbed = null;
+      if (g2 && grabIsHeld(g2)) grabRelease(g2, 8);
+    }
+    stepGrab(world, p) {
+      const g2 = this.grabbed;
+      this.grabT++;
+      this.vx = this.vy = 0;
+      if (!g2.alive || !grabIsHeld(g2)) {
+        this.grabbed = null;
+        return;
+      }
+      g2.x = this.x + this.dir * 50;
+      g2.y = this.y;
+      g2.z = 0;
+      g2.dir = -this.dir;
+      if (this.take("jump") || this.grabT > GRAB_TIME) return this.releaseGrab();
+      if (this.take("attack")) {
+        if (p.mx || this.grabHits >= 2) {
+          if (p.mx) this.dir = p.mx > 0 ? 1 : -1;
+          g2.x = this.x + this.dir * 50;
+          this.play("grabblast", world);
+          grabRelease(g2, 30);
+          this.grabbed = null;
+          return;
+        }
+        this.grabHits++;
+        this.play("grabknee", world);
+        grabHold(g2);
+      }
+    }
+    /** 무릎 치기 동안 잡힌 상태 유지 */
+    keepHeld() {
+      const g2 = this.grabbed;
+      if (g2 && (g2 instanceof Fighter ? g2.phase === "hurt" : g2.state === "hurt" || g2.state === "stunned")) grabHold(g2);
+    }
+  };
+  function grabCan(b) {
+    if (!b.grabbable) return false;
+    if (b instanceof Fighter) return b.phase === "hurt";
+    return (b.state === "hurt" || b.state === "stunned") && typeof b.set === "function";
+  }
+  function grabHold(b) {
+    if (b instanceof Fighter) b.enter("held");
+    else {
+      b.set("bound");
+      b.bindT = 9999;
+    }
+  }
+  function grabIsHeld(b) {
+    return b instanceof Fighter ? b.phase === "held" : b.state === "bound";
+  }
+  function grabRelease(b, ticks) {
+    if (b instanceof Fighter) b.enter("hurt", ticks);
+    else b.bindT = ticks;
   }
 
   // src/game/action/engine/pxfont.ts
@@ -385,6 +2213,2101 @@
     const n = size2 <= 12 ? 11 : Math.max(22, Math.round(size2 / 11) * 11);
     return { n, f: `700 ${n}px "GoeiPixel", "Galmuri11", monospace` };
   }
+
+  // src/game/action/eileen/core.ts
+  function createEileenCore(env) {
+    const A = env.A, IMG = env.IMG, VFX = env.VFX;
+    let VX0 = 0, W5 = 1280, H6 = 720, FLOOR0 = 440, FLOOR1 = 669;
+    const down2 = (n) => env.held.has(n);
+    let ctx = null;
+    const K4 = (y) => env.K(y);
+    const store2 = { get: (k, d3) => d3, set() {
+    } };
+    const sfx = (type, extra = {}) => env.sfx(type, { x: P.x, ...extra });
+    const marks = /* @__PURE__ */ new Map();
+    const targets = () => env.targets();
+    const frontTarget = (dy) => targets().filter((D3) => Math.abs(D3.y - P.y) < dy && (D3.x - P.x) * P.face > 0).sort((p, q) => Math.abs(p.x - P.x) - Math.abs(q.x - P.x))[0];
+    function inReach(hx, pad = 60, hh = 100) {
+      pad *= K4(P.y);
+      return targets().filter((D3) => {
+        const dk = K4(D3.y), hOk = hh > D3.z - 110 * dk && hh < D3.z + 240 * dk;
+        return Math.abs(D3.y - P.y) < 64 && (D3.x - P.x) * P.face > -20 && Math.abs(D3.x - hx) < pad && hOk;
+      });
+    }
+    function hurtDummy(D3, dmg, kind, o = {}) {
+      if ((marks.get(D3.body) || 0) > 0) dmg = Math.round(dmg * 1.5);
+      if (!(P.clip && (P.clip.id === "25" || P.clip.id === "25_1"))) gainSp(dmg * 0.45);
+      const big = kind !== "light";
+      num(D3.x + (Math.random() - 0.5) * 30, D3.y - 200 - D3.z, dmg, big);
+      env.hurt(D3, dmg, kind, P.face, hitstop, o);
+    }
+    const vfxDur = (name) => VFX[name].frames.reduce((a, f) => a + f[4], 0) / 1e3;
+    const vfx = (name, x, y, scale = 2, o = {}) => {
+      if (!VFX[name]) return false;
+      const d3 = vfxDur(name);
+      const T3 = (o.t || d3) + (o.hold || 0);
+      fx.push({ k: "sheet", name, x, y, s: scale, t0: T3, t: T3, dur: d3, ...o });
+      return true;
+    };
+    const has = (id) => !!A[id];
+    const BASE2 = (a) => a.h - 4;
+    const KNOCK_ARC = { "19_1": [0, 4, 16, 34, 44, 38, 22, 6, 0, 0, 0, 0] };
+    const ROOT = /* @__PURE__ */ new Set(["38_1", "40", "37_1", "42_1"]);
+    const groundBase = (id, a, f) => KNOCK_ARC[id] ? a.bot[f] : BASE2(a);
+    const FXS = 3, mkLayer = () => {
+      const c = document.createElement("canvas");
+      c.width = 1280 / FXS;
+      c.height = 720 / FXS;
+      const g2 = c.getContext("2d");
+      g2.imageSmoothingEnabled = false;
+      return [c, g2];
+    };
+    const [fxNc, fxN] = mkLayer(), [fxLc, fxL] = mkLayer();
+    const GLOW = /* @__PURE__ */ new Set(["spark", "ring", "flash", "impact", "beam", "mote", "burst", "fire", "tracer", "speed", "scan", "target"]);
+    const R = (a, b) => {
+      const r = [];
+      if (a <= b) for (let i = a; i <= b; i++) r.push(i);
+      else for (let i = a; i >= b; i--) r.push(i);
+      return r;
+    };
+    const S2 = (fr, d3) => fr.map((f) => ({ f, d: d3 }));
+    function impactOf(id) {
+      const a = A[id];
+      let imp = 1;
+      for (let f = 1; f < a.n; f++) if (a.reach[f] > a.reach[imp]) imp = f;
+      return imp;
+    }
+    function atkSeq(id, heavy3) {
+      const a = A[id], imp = impactOf(id), s2 = [];
+      for (let f = 0; f < a.n; f++) {
+        if (f < imp) s2.push({ f, d: f === 0 ? 0.04 : heavy3 ? 0.06 : 0.045 });
+        else if (f === imp) s2.push({ f, d: heavy3 ? 0.13 : 0.08, ev: heavy3 ? "hitH" : "hit" });
+        else s2.push({ f, d: heavy3 ? 0.06 : 0.05, cancel: true });
+      }
+      return s2;
+    }
+    const P = {
+      x: 420,
+      y: 580,
+      z: 0,
+      vz: 0,
+      face: 1,
+      mode: "ground",
+      combat: false,
+      armed: false,
+      clip: null,
+      pvx: 0,
+      pvy: 0,
+      pdec: 0,
+      jumps: 0,
+      airAtk: false,
+      airVX: 230,
+      takeoff: 0,
+      spin: 0,
+      buf: null,
+      chainT: 0,
+      combo: 0,
+      stunT: 0,
+      idleT: 0,
+      lastTap: {},
+      runLatch: false,
+      hp: 100,
+      sp: 0,
+      heat: 0,
+      overT: 0,
+      lastShot: 0,
+      chargeShown: 0,
+      armorT: 0,
+      inv: 0,
+      charge: 0,
+      ghostT: 0,
+      dying: false,
+      t: 0
+    };
+    let zoom = 0, zx = W5 / 2, zy = H6 / 2, dShake = 0;
+    let hitstop = 0, shake = 0, flash = 0, dark2 = 0, cut = 0, speed = 1, showNo = false, showDummy = true, counter = false, last = performance.now();
+    let freeSuper = false, showArmor = true, showCancelMark = true;
+    function gainSp(v) {
+      if (P.noGain > P.t) return;
+      const was = P.sp;
+      P.sp = Math.min(100, P.sp + v);
+      if (was < 100 && P.sp >= 100) {
+        sfx("ability");
+        ring(P.x, P.y - 110 * K4(P.y), 140, 0.4, "#ffd34a", 6);
+        flash = 0.06;
+        fx.push({ k: "num", x: P.x - 50, y: P.y - 260 * K4(P.y), v: "필살기 준비", t: 1 });
+      }
+    }
+    function spReady() {
+      if (freeSuper || P.sp >= 100) {
+        if (!freeSuper) P.sp = 0;
+        return true;
+      }
+      sfx("empty");
+      fx.push({ k: "num", x: P.x - 50, y: P.y - 250 * K4(P.y), v: "게이지 부족", t: 0.7 });
+      return false;
+    }
+    let fx = [];
+    const items = [];
+    const KICK = /* @__PURE__ */ new Set(["11", "12", "13", "14"]);
+    function play(id, o = {}) {
+      const a = A[id];
+      P.clip = { id, seq: o.seq || S2(R(0, a.n - 1), 1 / (o.fps || 10)), i: 0, t: 0, loopFrom: o.loopFrom ?? -1, onEnd: o.onEnd || null, done: false, paused: false };
+      fireEv(P.clip.seq[0]);
+    }
+    const curF = () => P.clip ? P.clip.seq[Math.min(P.clip.i, P.clip.seq.length - 1)].f : 0;
+    const canCancel = () => {
+      const c = P.clip;
+      if (!c || c.done) return true;
+      return !!c.seq[c.i].cancel;
+    };
+    function tickClip(dt) {
+      const c = P.clip;
+      if (!c || c.done || c.paused) return;
+      c.t += dt;
+      while (c.t >= c.seq[c.i].d) {
+        c.t -= c.seq[c.i].d;
+        const cur = c.seq[c.i];
+        if (cur.rep && down2(cur.rep.key) && !(cur.rep.key === "shoot" && P.overT > 0)) {
+          c.i = cur.rep.to;
+          fireEv(c.seq[c.i]);
+          continue;
+        }
+        if (c.i + 1 < c.seq.length) {
+          c.i++;
+          fireEv(c.seq[c.i]);
+        } else if (c.loopFrom >= 0) {
+          c.i = c.loopFrom;
+          fireEv(c.seq[c.i]);
+        } else {
+          c.done = true;
+          c.t = 0;
+          const f = c.onEnd;
+          c.onEnd = null;
+          if (f) f();
+          break;
+        }
+        if (P.clip !== c) break;
+      }
+    }
+    const pushP = (vx, dec, vy = 0) => {
+      P.pvx = vx;
+      P.pvy = vy;
+      P.pdec = dec;
+    };
+    function framePt(id, f, px, py) {
+      const a = A[id], flip = a.dir === "SW" ? P.face > 0 : P.face < 0;
+      const air = isAir(id);
+      const base2 = air ? a.bot[f] : groundBase(id, a, f);
+      const k = K4(P.y);
+      return { x: P.x + (flip ? -px : px) * k, y: P.y - P.z - (base2 - py) * k };
+    }
+    const isAir = (id) => P.mode === "air" && (id === "7" || id === "14");
+    function muzzle() {
+      const id = P.clip ? P.clip.id : "W", f = curF(), a = A[id];
+      const m = a.mz && a.mz[f] || [a.reach[f], a.h * 0.45];
+      return framePt(id, f, m[0] + 1, m[1]);
+    }
+    const mzAng = () => {
+      const id = P.clip ? P.clip.id : "W", a = A[id];
+      return a.ang && a.ang[curF()] || 0;
+    };
+    const MZ_GAP = 30;
+    function sparks(x, y, n, big, col) {
+      for (let i = 0; i < n; i++) {
+        const a = Math.random() * Math.PI * 2, v = (big ? 520 : 280) * (0.35 + Math.random());
+        fx.push({ k: "spark", x, y, vx: Math.cos(a) * v, vy: Math.sin(a) * v - 140, t: 0.16 + Math.random() * 0.18, c: col || (Math.random() < 0.5 ? "#fff" : "#ffd866"), s: big ? 5 : 3 });
+      }
+    }
+    const steam = (x, y, s2 = 1) => VFX.steam_wisp ? vfx("steam_wisp", x, y, 1.6) : fx.push({ k: "steam", x: x + (Math.random() - 0.5) * 6, y, vx: (Math.random() - 0.5) * 16, vy: -40 - Math.random() * 30, r: 1.6 * s2, t: 0.6, t0: 0.6 });
+    const ring = (x, y, r, t, c, w = 4, sy = 1) => fx.push({ k: "ring", x, y, r0: r * 0.2, r, t, t0: t, c, w, sy });
+    const num = (x, y, v, big) => fx.push({ k: "num", x, y, v, t: 0.7, big });
+    const dust = (x, y, n, s2 = 1) => {
+      for (let i = 0; i < n; i++) fx.push({ k: "dust", x: x + (Math.random() - 0.5) * 30 * s2, y, vx: (Math.random() - 0.5) * 160 * s2, vy: -Math.random() * 60, r: 6 + Math.random() * 8 * s2, t: 0.45, t0: 0.45 });
+    };
+    function muzzleFlash(p, big) {
+      for (let i = 0; i < (big ? 3 : 1); i++) fx.push({ k: "shell", x: p.x - P.face * 30, y: p.y, vx: -P.face * (80 + Math.random() * 80), vy: -220 - Math.random() * 120, g: P.y, t: 1.2 });
+    }
+    function fireEv(e) {
+      if (e && e.fn) e.fn();
+      if (!e || !e.ev) return;
+      const id = P.clip.id, a = A[id], f = e.f;
+      if (e.ev === "hit" || e.ev === "hitH" || e.ev === "hitL") {
+        const big = e.ev !== "hit";
+        const p = framePt(id, f, a.reach[f], a.h * (e.hy || 0.42));
+        const tg = inReach(p.x, big ? 100 : 70, P.y - p.y);
+        if (tg.length) {
+          hitstop = big ? 0.16 : 0.085;
+          shake = big ? 16 : 8;
+          dShake = big ? 11 : 7;
+          for (const t of tg) hurtDummy(t, big ? 34 : 12, e.kind || (e.ev === "hitL" ? "launch" : big ? "heavy" : "light"));
+          const D3 = tg[0];
+          sfx("hit", { strength: big ? 3 : 1, kind: KICK.has(id) ? "kick" : void 0 });
+          const cx = D3.x - P.face * 18 * K4(D3.y);
+          if (!vfx(big ? "hit_heavy" : "hit_light", cx, p.y, big ? 2 : 2.4, { flip: P.face < 0 })) fx.push({ k: "impact", x: cx, y: p.y, dir: P.face, t: big ? 0.16 : 0.1, t0: big ? 0.16 : 0.1, big });
+          sparks(cx, p.y, big ? 30 : 12, big, Math.random() < 0.5 ? "#ffffff" : "#d6ecff");
+          ring(cx, p.y, big ? 110 : 50, big ? 0.24 : 0.14, "#ffffff", big ? 7 : 3);
+          if (big) {
+            zoom = 0.06;
+            zx = cx;
+            zy = p.y;
+            flash = 0.07;
+            fx.push({ k: "speed", x: cx, y: p.y, t: 0.2, t0: 0.2 });
+            ring(D3.x, D3.y, 150, 0.35, "rgba(255,255,255,.7)", 4, 0.25);
+            dust(D3.x, D3.y, 10, 1.6);
+          }
+        }
+      } else if (e.ev === "shot" || e.ev === "shotS" || e.ev === "shotH") {
+        const big = e.ev === "shotH", p = muzzle();
+        if (id === "15") {
+          P.heat = Math.min(100, P.heat + 9);
+          P.lastShot = P.t;
+          if (P.heat >= 100) {
+            P.overT = 2.6;
+            sfx("empty");
+            for (let i = 0; i < 8; i++) steam(p.x, p.y, 1.4);
+          }
+        }
+        muzzleFlash(p, big || e.ev === "shotS");
+        sfx("shot");
+        const D3 = frontTarget(60), hitD = !!D3;
+        const endX = hitD ? D3.x - P.face * 14 : P.face > 0 ? W5 + 20 : VX0 - 20;
+        if (VFX.tracer) {
+          const tt = Math.abs(endX - p.x) / 3400;
+          {
+            const g2 = mzAng(), gp = MZ_GAP * K4(P.y), sx = p.x + P.face * Math.cos(g2) * gp, sy = p.y + Math.sin(g2) * gp;
+            fx.push({ k: "bullet", x: sx, y: sy, x2: endX, y2: sy + Math.abs(endX - sx) * Math.tan(g2) + (Math.random() - 0.5) * 24, t: tt, t0: tt });
+          }
+          if (hitD) later(tt, () => {
+            if (!vfx("bullet_hit_body", endX, p.y, 2)) sparks(endX, p.y, 4, false, "#fff6d0");
+          });
+        } else fx.push({ k: "tracer", x: p.x, y: p.y, x2: endX, t: big ? 0.12 : 0.06, big });
+        shake = Math.max(shake, big ? 9 : 2.5);
+        if (hitD) {
+          sfx("hit", { strength: big ? 2 : 1, kind: "bullet" });
+          hurtDummy(D3, big ? 40 : e.ev === "shotS" ? 9 : 7, big ? "heavy" : "light");
+          sparks(endX, p.y, big ? 16 : 5, big);
+          if (big) hitstop = 0.08;
+        }
+      } else if (e.ev === "beam") {
+        const p = P.relMz || muzzle(), lv = P.chargeLv;
+        P.relMz = null;
+        muzzleFlash(p, true);
+        sfx("shot");
+        sfx("hit", { strength: 3, kind: "bullet" });
+        const W_ = [0, 10, 24, 40][lv], col = CH_COL[lv];
+        if (VFX.charge_beam) fx.push({ k: "beamS", x: p.x, y: p.y, dir: P.face, t: 0.22 + lv * 0.1, t0: 0.22 + lv * 0.1, sy: [0, 0.35, 0.6, 0.9][lv] });
+        else fx.push({ k: "beam", x: p.x, y: p.y, dir: P.face, t: 0.22 + lv * 0.08, t0: 0.22 + lv * 0.08, w: W_, c: col, lv });
+        if (lv >= 3) {
+          flash = 0.2;
+          dust(P.x - P.face * 30, P.y, 10, 1.6);
+        }
+        shake = [0, 8, 15, 24][lv];
+        for (const D3 of targets().filter((D4) => Math.abs(D4.y - P.y) < 30 + W_ && (D4.x - P.x) * P.face > 0)) {
+          hitstop = [0, 0.08, 0.15, 0.24][lv];
+          hurtDummy(D3, [0, 30, 60, 110][lv], lv >= 2 ? "launch" : "heavy");
+          sparks(D3.x, p.y, 10 + lv * 10, true, col);
+          ring(D3.x, p.y, 50 + lv * 30, 0.3, col, 4);
+        }
+      } else if (e.ev === "cut") {
+        sfx("super");
+        cut = 1.1;
+        dark2 = 2.6;
+        flash = 0.15;
+        hitstop = 0.25;
+      } else if (e.ev === "scan") {
+        sfx("ability");
+        fx.push({ k: "scan", x: P.x, y: P.y - 190, dir: P.face, t: 0.55, t0: 0.55 });
+      } else if (e.ev === "mark") {
+        for (const D3 of targets().filter((D4) => (D4.x - P.x) * P.face > 0 && Math.abs(D4.y - P.y) < 120)) {
+          marks.set(D3.body, 6);
+          ring(D3.x, D3.y - 230, 40, 0.3, "#ff5a4a", 3);
+        }
+      } else if (e.ev === "sup") {
+        const p = muzzle();
+        sfx("shot");
+        const dir = P.face, drop = Math.max(40, P.y - p.y), dist = drop * (1.25 + Math.random() * 1.4);
+        const gx = p.x + dir * dist, gy = P.y + (Math.random() - 0.5) * 18 * K4(P.y), ang = Math.atan2(gy - p.y, dist), cosA = Math.cos(ang), sinA = Math.sin(ang);
+        fx.push({ k: "shell", x: p.x - dir * 30, y: p.y, vx: -dir * (80 + Math.random() * 80), vy: -220 - Math.random() * 120, g: P.y, t: 1.2 });
+        const gp = MZ_GAP * K4(P.y), sx = p.x + dir * cosA * gp, sy = p.y + sinA * gp, tt = Math.hypot(gx - sx, gy - sy) / 3200;
+        if (VFX.tracer) fx.push({ k: "bullet", x: sx, y: sy, x2: gx, y2: gy, t: tt, t0: tt });
+        later(tt, () => {
+          sparks(gx, gy - 3, 4, false, "#ffe9a0");
+          if (Math.random() < 0.4) dust(gx, gy, 1, 0.4);
+        });
+        shake = Math.max(shake, 4);
+        for (const D3 of targets()) {
+          const ddx = (D3.x - p.x) * dir;
+          if (ddx > 30 && ddx < dist + 40 && Math.abs(D3.y - P.y) < 70) {
+            const bulletY = p.y + ddx * Math.tan(ang), dk = K4(D3.y);
+            if (bulletY > D3.y - D3.z - 220 * dk && bulletY < D3.y - D3.z + 10) {
+              later(ddx / 3200, () => {
+                hurtDummy(D3, 7, "light", { push: 5 });
+                if (!vfx("bullet_hit_body", D3.x - dir * 10, bulletY, 2)) sparks(D3.x, bulletY, 4, false, "#fff6d0");
+                hitstop = Math.max(hitstop, 0.012);
+              });
+            }
+          }
+        }
+      } else if (e.ev === "rocket") {
+        const p = muzzle();
+        sfx("shot");
+        sfx("super");
+        backblast(p);
+        muzzleFlash(p, true);
+        shake = 16;
+        hitstop = 0.06;
+        fx.push({ k: "rocket", x: p.x + P.face * 20, x0: P.x, y: p.y, gy: P.y, dir: P.face, t: 5 });
+      } else if (e.ev === "slideHit") {
+        if (!P.slideHit) {
+          const p = framePt(id, f, a.reach[f], a.h * 0.8);
+          if (targets().some((D3) => Math.abs(D3.y - P.y) < 64 && Math.abs(D3.x - p.x) < 70 * K4(P.y))) {
+            P.slideHit = true;
+            fireEv({ f, ev: "hit", hy: 0.88 });
+          }
+        }
+      } else if (e.ev === "dust") {
+        dust(P.x, P.y, 6, 1.2);
+        sfx(P.clip.id === "19" || P.clip.id === "19_1" ? "down" : "step");
+      }
+    }
+    function explode2(x, y, gy, hitD, dmg = 140) {
+      sfx("hit", { strength: 3, kind: "super" });
+      shake = Math.max(shake, 14);
+      flash = Math.max(flash, dmg >= 140 ? 0.2 : 0.04);
+      if (hitD) hitstop = 0.2;
+      if (VFX["eileen-rpg-explosion"]) {
+        vfx("eileen-rpg-explosion", x, gy - 4, 2.4);
+        ring(x, gy, 220, 0.45, "rgba(255,230,180,.9)", 6, 0.28);
+        if (!vfx("crater", x, gy, 2.2, { hold: 2.5, under: true })) fx.push({ k: "scorch", x, y: gy, r: 90, t: 3.5 });
+        dust(x, gy, 10, 2);
+        for (const D3 of targets()) if (Math.abs(D3.x - x) < 200 && Math.abs(D3.y - gy) < 70) hurtDummy(D3, dmg, "launch");
+        return;
+      }
+      for (let i = 0; i < 26; i++) {
+        const a = Math.random() * Math.PI * 2, v = 80 + Math.random() * 380;
+        fx.push({ k: "fire", x, y, vx: Math.cos(a) * v, vy: Math.sin(a) * v * 0.7 - 60, r: 10 + Math.random() * 16, t: 0.5 + Math.random() * 0.4, t0: 0.9 });
+      }
+      for (let i = 0; i < 16; i++) fx.push({ k: "smoke", x: x + (Math.random() - 0.5) * 80, y: y + (Math.random() - 0.5) * 50, vx: (Math.random() - 0.5) * 60, vy: -40 - Math.random() * 70, r: 16 + Math.random() * 14, t: 1.4 + Math.random() * 0.6, t0: 2 });
+      sparks(x, y, 40, true, "#ffb347");
+      ring(x, gy, 220, 0.45, "rgba(255,230,180,.9)", 6, 0.28);
+      fx.push({ k: "scorch", x, y: gy, r: 90, t: 3.5 });
+      dust(x, gy, 14, 2.2);
+      for (const D3 of targets()) if (Math.abs(D3.x - x) < 200 && Math.abs(D3.y - gy) < 70) hurtDummy(D3, dmg, "launch");
+    }
+    function backblast(p) {
+      p = { x: P.x - P.face * 70 * K4(P.y), y: p.y };
+      for (let i = 0; i < 14; i++) fx.push({ k: "fire", x: p.x, y: p.y, vx: -P.face * (200 + Math.random() * 400), vy: (Math.random() - 0.5) * 160, r: 8 + Math.random() * 10, t: 0.3 + Math.random() * 0.25, t0: 0.55 });
+      for (let i = 0; i < 10; i++) fx.push({ k: "smoke", x: p.x - P.face * 20, y: p.y, vx: -P.face * (60 + Math.random() * 160), vy: -20 - Math.random() * 40, r: 12 + Math.random() * 10, t: 1.2, t0: 1.2, c: 150 });
+      dust(P.x - P.face * 90, P.y, 10, 1.8);
+    }
+    function toIdle() {
+      P.mode = "ground";
+      P.clip = null;
+      P.combo = 0;
+      P.idleT = 0;
+    }
+    function act(id, o = {}) {
+      P.mode = o.mode || "act";
+      play(id, { ...o, onEnd: o.onEnd || (() => afterBuf(toIdle)) });
+    }
+    function reverseOut(id, frames, d3, then) {
+      P.mode = "act";
+      play(id, { seq: S2(frames, d3), onEnd: then || (() => afterBuf(toIdle)) });
+    }
+    function ensureArmed(then) {
+      if (P.armed) return then();
+      P.combat = true;
+      sfx("reload");
+      act("W", { seq: S2(R(0, 3), 0.04), onEnd: () => {
+        P.armed = true;
+        then();
+      } });
+    }
+    function afterBuf(fallback) {
+      const b = P.buf;
+      P.buf = null;
+      if (b === "light") return light();
+      if (b === "heavy") return heavy2();
+      if (b === "dodge") return dodge();
+      if (b === "jump") return jump2();
+      fallback();
+    }
+    const ARMOR = /* @__PURE__ */ new Set(["12", "13", "23", "24", "25", "22_1", "25_1", "25_2"]);
+    const armored = () => P.wakeArmor > 0 || P.clip && (P.clip.id === "20" || ARMOR.has(P.clip.id)) && (P.mode === "act" || P.mode === "charge");
+    function light() {
+      P.combat = true;
+      P.armed = false;
+      if (P.combo >= 3) P.combo = 0;
+      const id = ["9", "10", "11"][P.combo];
+      P.combo++;
+      sfx("whiff");
+      pushP(170, 900);
+      act(id, { seq: atkSeq(id, false), onEnd: () => {
+        if (id === "11") {
+          P.blowWin = P.t + 0.35;
+          P.combo = 0;
+          return afterBuf(toIdle);
+        }
+        if (P.buf) return afterBuf(toIdle);
+        P.mode = "chain";
+        P.chainT = 0.26;
+      } });
+    }
+    function heavy2() {
+      const prev = P.combo || (P.t < (P.blowWin || 0) ? 3 : 0);
+      const kind = prev === 2 ? "launch" : prev >= 3 ? "blow" : "stun";
+      P.lastHeavy = kind;
+      sfx("whiff", { strength: 2 });
+      P.combat = true;
+      P.armed = false;
+      P.combo = 0;
+      pushP(140, 700);
+      act("12", { seq: atkSeq("12", true).map((e) => e.ev ? { ...e, kind } : e) });
+    }
+    function chainExpire() {
+      const id = P.clip.id;
+      P.combo = 0;
+      reverseOut(id, R(A[id].n - 1, 0), 0.03);
+    }
+    function slide() {
+      P.combat = true;
+      P.combo = 0;
+      pushP(840, 1150);
+      P.slideHit = false;
+      act("13", { seq: atkSeq("13", false).map((e, i, all) => i === 1 ? { ...e, ev: "dust" } : i >= 2 && i <= all.length - 2 ? { ...e, ev: "slideHit" } : e) });
+    }
+    function dodge() {
+      P.combat = true;
+      P.combo = 0;
+      let dx = (down2("right") ? 1 : 0) - (down2("left") ? 1 : 0), dy = (down2("down") ? 1 : 0) - (down2("up") ? 1 : 0);
+      if (!dx && !dy) dx = -P.face;
+      if (dx && dx === P.face && P.prevFace === -dx && P.t - P.faceT < 0.3) P.face = P.prevFace;
+      const fwd = dx * P.face > 0, len = Math.hypot(dx, dy);
+      sfx("evade");
+      P.dodgeV = { x: dx / len * 780, y: dy / len * 520 };
+      P.inv = 0.3;
+      P.ghostT = 0.2;
+      P.pvx = 0;
+      P.pdec = 0;
+      act(fwd ? "16_1" : "16", { seq: S2(R(0, 7), 0.04).map((e, i) => i >= 6 ? { ...e, cancel: true } : e), onEnd: () => {
+        P.dodgeV = null;
+        afterBuf(toIdle);
+      } });
+    }
+    function shoot3() {
+      if (P.overT > 0) {
+        return ensureArmed(() => act("15", { seq: [{ f: 0, d: 0.03 }, { f: 1, d: 0.035 }, { f: 2, d: 0.035 }, { f: 3, d: 0.06, fn: () => {
+          sfx("empty");
+          const p = muzzle();
+          steam(p.x, p.y, 1);
+        } }, { f: 4, d: 0.04 }, { f: 3, d: 0.25 }, { f: 5, d: 0.05 }, { f: 6, d: 0.05 }, { f: 7, d: 0.05 }] }));
+      }
+      ensureArmed(() => {
+        const s2 = [{ f: 0, d: 0.03 }, { f: 1, d: 0.035 }, { f: 2, d: 0.035 }, { f: 3, d: 0.05, ev: "shot" }, { f: 4, d: 0.06, rep: { key: "shoot", to: 3 } }, { f: 5, d: 0.05 }, { f: 6, d: 0.05 }, { f: 7, d: 0.05 }];
+        act("15", { seq: s2 });
+      });
+    }
+    function skill() {
+      if (!has("22_1")) return skillOld();
+      ensureArmed(() => {
+        const a = A["22_1"], s2 = [{ f: 0, d: 0.04 }, { f: 1, d: 0.05 }];
+        for (let f = 2; f <= a.n - 2; f++) for (let k = 0; k < 4; k++) s2.push({ f, d: 0.05, ev: "sup" });
+        s2.push({ f: a.n - 1, d: 0.07 });
+        act("22_1", { seq: s2 });
+      });
+    }
+    const later = (t, fn2) => fx.push({ k: "timer", t, fn: fn2 });
+    function artillerySuper(chained) {
+      if (!chained && !spReady()) return;
+      ensureArmed(() => {
+        const a = A["22"];
+        const spots = [];
+        for (let k = 0; k < 12; k++) spots.push({ x: VX0 + 60 + Math.random() * (W5 - VX0 - 120), y: FLOOR0 + 30 + Math.random() * (FLOOR1 - FLOOR0 - 30) });
+        for (const D3 of targets()) if (D3.x > VX0 && D3.x < W5) spots.splice(Math.random() * spots.length | 0, 0, { x: D3.x, y: D3.y });
+        const marks2 = spots.map((sp) => ({ k: "target", x: sp.x, y: sp.y, t: 8 }));
+        const paint = (g2) => {
+          marks2.forEach((m, n) => {
+            if (n % 3 === g2) fx.push(m);
+          });
+          sfx("ui");
+        };
+        const s2 = chained ? [{ f: 0, d: 0.08 }] : [{ f: 0, d: 0.3, ev: "cut" }];
+        for (let f = 1; f < a.n; f++) s2.push({ f, d: f === 2 || f === 4 || f === 6 ? 0.28 : 0.1, fn: f === 2 ? () => paint(0) : f === 4 ? () => paint(1) : f === 6 ? () => paint(2) : null });
+        act("22", { seq: s2, onEnd: () => {
+          P.noGain = P.t + 6;
+          marks2.forEach((m, i) => later(0.2 + i * 0.13 + Math.random() * 0.08, () => {
+            fx.push({ k: "mortar", x: m.x, y: m.y, t: 0.32, t0: 0.32 });
+            sfx("whiff", { strength: 2 });
+            later(0.32, () => {
+              explode2(m.x, m.y - 10, m.y, false, 55);
+              m.t = 0;
+            });
+          }));
+          afterBuf(toIdle);
+        } });
+      });
+    }
+    function rocketSuper() {
+      if (!has("25_1")) return superMove(false);
+      if (!spReady()) return;
+      P.armed = false;
+      P.combat = true;
+      const a = A["25_1"];
+      const s2 = [{ f: 0, d: 0.3, ev: "cut" }, { f: 0, d: 0.35 }, { f: 1, d: 0.1 }, { f: 2, d: 0.12 }, { f: 3, d: 0.1 }, { f: 4, d: 0.08 }, { f: 5, d: 0.08 }, { f: 6, d: 0.08 }, { f: 7, d: 0.1 }];
+      if (has("25_2")) {
+        const b = A["25_2"];
+        s2.push({ f: a.n - 1, d: 0.25 });
+      }
+      act("25_1", { seq: s2, onEnd: () => {
+        if (!has("25_2")) return afterBuf(toIdle);
+        const b = A["25_2"];
+        act("25_2", { seq: [{ f: 0, d: 0.12 }, { f: Math.min(1, b.n - 1), d: 0.22, ev: "rocket" }, ...S2(R(2, b.n - 1), 0.09), { f: 0, d: 0.45 }], onEnd: () => reverseOut("25_1", R(a.n - 1, 0), 0.07, () => {
+          P.combat = true;
+          toIdle();
+        }) });
+      } });
+    }
+    const ROCKET_FIRE = 6;
+    function skillOld() {
+      ensureArmed(() => act("22", { seq: S2(R(0, 7), 0.09).map((e, i) => i === 1 ? { ...e, ev: "scan" } : i === 5 ? { ...e, ev: "mark" } : e) }));
+    }
+    const CH_COL = ["rgba(255,255,255,.8)", "#fff6c0", "#8fdcff", "#c89bff"];
+    function charge2() {
+      ensureArmed(() => {
+        P.mode = "charge";
+        P.charge = 0;
+        P.chargeShown = 0;
+        play("23", { seq: [...S2(R(0, 3), 0.055), ...S2(R(4, 7), 0.11)], loopFrom: 4 });
+      });
+    }
+    function release() {
+      P.chargeLv = P.charge >= 2 ? 3 : P.charge > 1.3 ? 2 : P.charge > 0.5 ? 1 : 0;
+      P.relMz = muzzle();
+      if (P.chargeLv >= 2) pushP(-320, 900);
+      const aimF = curF();
+      act("23", { seq: [{ f: aimF, d: 0.12, ev: P.chargeLv ? "beam" : "shotH" }], onEnd: () => act("24", { seq: S2(R(1, A["24"].n - 1), 0.06) }) });
+    }
+    function superMove(free, then) {
+      if (!free && !spReady()) return;
+      ensureArmed(() => {
+        const a = A["25"];
+        const peaks = R(4, a.n - 2).sort((p, q) => a.top[q] - a.top[p]).slice(0, 2).sort((p, q) => p - q);
+        const s2 = [{ f: 0, d: 0.35, ev: "cut" }];
+        for (let f = 1; f <= peaks[0] - 1; f++) s2.push({ f, d: 0.07 });
+        for (let k = 0; k < 16; k++) s2.push({ f: peaks[k % 2], d: 0.055, ev: "shotS" });
+        s2.push({ f: peaks[1], d: 0.2, ev: "shotH" });
+        for (let f = peaks[1] + 1; f < a.n; f++) s2.push({ f, d: 0.07, ev: a.flash && a.flash[f] ? "shotS" : void 0 });
+        act("25", { seq: s2, onEnd: then || (() => afterBuf(toIdle)) });
+      });
+    }
+    function proveSuper() {
+      if (!spReady()) return;
+      P.noGain = P.t + 12;
+      superMove(true, () => artillerySuper(true));
+    }
+    function jump2() {
+      P.mode = "air";
+      P.vz = 0;
+      P.jumps = 1;
+      P.airAtk = false;
+      P.spin = 0;
+      P.airVX = down2("run") || P.runLatch ? 430 : 250;
+      P.takeoff = 0.06;
+      sfx("jump");
+      play("7", { seq: S2([0, 1], 0.03) });
+    }
+    function doubleJump() {
+      sfx("jump", { pitch: 1.35 });
+      P.jumps = 2;
+      P.vz = 1040;
+      P.spin = 0.2;
+      play("7", { seq: S2([1, 2, 3], 0.065) });
+      if (!vfx("double_jump", P.x, P.y - P.z + 2, 2.2)) fx.push({ k: "burst", x: P.x, y: P.y - P.z + 4, t: 0.3, t0: 0.3 });
+      ring(P.x, P.y - P.z + 4, 70, 0.25, "rgba(220,240,255,.9)", 4, 0.35);
+    }
+    function jumpAttack(heavyKind) {
+      P.airAtk = true;
+      play("14", { seq: atkSeq("14", heavyKind).map((e, i, s2) => ({ ...e.ev ? { ...e, ev: heavyKind ? "hitH" : "hit", kind: heavyKind ? "spike" : void 0 } : e, d: i === s2.length - 1 ? 9 : e.d })) });
+    }
+    function land2() {
+      sfx("land");
+      P.z = env.ground(P.x, P.y);
+      P.vz = 0;
+      P.airAtk = false;
+      shake = Math.max(shake, 2);
+      if (!vfx("land_dust", P.x, P.y - P.z, 2.2)) dust(P.x, P.y - P.z, 5);
+      P.mode = "act";
+      play("7", { seq: [{ f: 6, d: 0.045, cancel: true }, { f: 7, d: 0.05, cancel: true }], onEnd: toIdle });
+    }
+    function takeHit(kind) {
+      if (P.inv > 0) {
+        fx.push({ k: "num", x: P.x, y: P.y - 230, v: "회피", t: 0.6 });
+        return;
+      }
+      if (P.mode === "block") {
+        sfx("guard");
+        shake = 4;
+        if (!vfx("guard_block", P.x + P.face * 50 * K4(P.y), P.y - 140 * K4(P.y), 2.2, { flip: P.face < 0 })) sparks(P.x + P.face * 50, P.y - 140, 8, false, "#9fd0ff");
+        pushP(-200, 1200);
+        P.hp = Math.max(1, P.hp - 1);
+        return;
+      }
+      if (armored()) {
+        gainSp(5);
+        sfx("armor");
+        P.armorT = 0.28;
+        hitstop = 0.06;
+        shake = 6;
+        return;
+      }
+      if (kind === "knock") return knock2();
+      hit2();
+    }
+    function hit2() {
+      gainSp(10);
+      sfx("hurt");
+      P.combat = true;
+      P.combo = 0;
+      P.armed = false;
+      pushP(-280, 1400);
+      flash = 0.05;
+      act("18", { seq: [{ f: 0, d: 0.02 }, ...S2(R(1, A["18"].n - 1), 0.055)] });
+    }
+    function knock2() {
+      gainSp(20);
+      sfx("hurt", { strength: 2 });
+      P.combat = true;
+      P.combo = 0;
+      P.armed = false;
+      pushP(-560, 650);
+      shake = 8;
+      const kid = has("19_1") ? "19_1" : "19";
+      if (kid === "19_1" && A["19_1"].n >= 12) {
+        P.mode = "act";
+        play("19_1", { seq: [...S2(R(0, 7), 0.07).map((e, i) => i === 5 ? { ...e, ev: "dust" } : e), { f: 8, d: 0.6 }, { f: 10, d: 0.6 }], loopFrom: 8 });
+        P.knockT = 0.56;
+        return;
+      }
+      act(kid, { seq: S2(R(0, 7), 0.065).map((e, i) => i === 5 ? { ...e, ev: "dust" } : e), onEnd: () => {
+        P.mode = "down";
+      } });
+    }
+    function getUp() {
+      sfx("wakeup");
+      P.knockT = 0;
+      act("20", { seq: S2(R(0, 7), 0.06), onEnd: () => {
+        P.wakeArmor = 0.6;
+        afterBuf(toIdle);
+      } });
+    }
+    function belly() {
+      P.mode = "belly";
+      if (has("38_1")) return play("38", { seq: S2(R(0, A["38"].n - 1), 0.1), onEnd: () => {
+        if (P.mode === "belly") play("38_1", { fps: 8, loopFrom: 0 });
+      } });
+      play("38", { seq: [...S2(R(0, 3), 0.11), ...S2(R(4, 11), 0.1)], loopFrom: 4 });
+    }
+    function stun() {
+      P.combat = true;
+      P.combo = 0;
+      P.armed = false;
+      P.mode = "stun";
+      P.stunT = 2.6;
+      play("21", { seq: [{ f: 0, d: 0.05 }, ...S2(R(1, 7), 0.1)], loopFrom: 1 });
+    }
+    function emote(id, fps, o = {}) {
+      act(id, { seq: S2(R(0, A[id].n - 1), 1 / fps), ...o });
+    }
+    function sit() {
+      P.mode = "sit";
+      play("39", { seq: [{ f: 0, d: 0.04 }, { f: 2, d: 0.035 }, { f: 4, d: 0.035 }, { f: 6, d: 0.06 }, ...S2(R(7, 11), 0.13)], loopFrom: 4 });
+    }
+    function sitLoop() {
+      P.mode = "sit";
+      play("39", { seq: S2(R(7, 11), 0.13), loopFrom: 0 });
+    }
+    function crouch() {
+      P.mode = "crouch";
+      play("41", { seq: [...S2(R(0, 3), 0.08), ...S2(R(4, 7), 0.11)], loopFrom: 4 });
+    }
+    function onPress(a) {
+      if (a === "left" || a === "right") {
+        const now = performance.now();
+        if (now - (P.lastTap[a] || 0) < 260) P.runLatch = true;
+        P.lastTap[a] = now;
+      }
+      if (a === "heal" && P.mode === "ground") {
+        emote("26", 7);
+        later(0.5, () => {
+          P.hp = Math.min(100, P.hp + 40);
+          if (P.hp > 25) P.dying = false;
+          vfx("heal", P.x, P.y + 4, 3.6 * K4(P.y));
+          P.healT = 0.8;
+          fx.push({ k: "num", x: P.x - 20, y: P.y - 240 * K4(P.y), v: "+40", t: 0.9 });
+          sfx("heal");
+        });
+        return;
+      }
+      if (a === "drop") {
+        items.push({ x: P.x + P.face * 120, y: P.y, t0: P.t });
+        return;
+      }
+      if (a === "status") {
+        P.status = [null, "status_poison", "status_burn", "status_shock"][([null, "status_poison", "status_burn", "status_shock"].indexOf(P.status || null) + 1) % 4];
+        return;
+      }
+      if (a === "dying") {
+        P.dying = !P.dying;
+        P.hp = P.dying ? 18 : 100;
+        if (P.dying) sfx("hp:low");
+        return;
+      }
+      if (a === "hit" || a === "knock") {
+        if (P.mode !== "down" && P.mode !== "belly") return takeHit(a === "knock" ? "knock" : "hit");
+      }
+      if ((P.mode === "flee" || P.mode === "back") && !["left", "right", "up", "down", "run"].includes(a)) toIdle();
+      const m = P.mode;
+      if (m === "air") {
+        if (a === "jump" && P.jumps < 2) doubleJump();
+        else if ((a === "light" || a === "heavy") && !P.airAtk) jumpAttack(a === "heavy");
+        return;
+      }
+      if (m === "chain") {
+        if (a === "light") return light();
+        if (a === "heavy") return heavy2();
+        if (a === "dodge") return dodge();
+        if (a === "jump") return jump2();
+      }
+      if (m === "act") {
+        const CANCEL_INTO = { skill, super: rocketSuper, shoot: shoot3, charge: charge2 };
+        if (CANCEL_INTO[a] && canCancel() && P.clip && ["9", "10", "11", "12", "13", "16", "16_1"].includes(P.clip.id)) {
+          P.buf = null;
+          return CANCEL_INTO[a]();
+        }
+        if (["light", "heavy", "dodge", "jump"].includes(a)) {
+          const id = P.clip && P.clip.id;
+          if (canCancel() && ["9", "10", "11", "12", "13", "16", "16_1", "7"].includes(id)) {
+            if (id === "7") {
+              if (a === "jump") return jump2();
+            } else if (id === "9" || id === "10") {
+              P.buf = a;
+              return;
+            } else {
+              P.buf = null;
+              return a === "light" ? light() : a === "heavy" ? heavy2() : a === "dodge" ? dodge() : jump2();
+            }
+          }
+          P.buf = a;
+        }
+        return;
+      }
+      if (m === "down") {
+        if (a === "crawl" || a === "left" || a === "right") return belly();
+        if (a === "jump" || a === "up" || a === "light") return getUp();
+        return;
+      }
+      if (m === "belly") {
+        if (a === "jump" || a === "crawl" || a === "up") return getUp();
+        return;
+      }
+      if (m === "stun") {
+        P.stunT -= 0.18;
+        return;
+      }
+      if (m === "sit" || m === "scoot") {
+        if (a === "sit" || a === "up") reverseOut("39", R(6, 0), 0.05);
+        return;
+      }
+      if (m === "crouch" || m === "crawl4") {
+        if (a === "crouch" || a === "up") {
+          if (m === "crawl4") toIdle();
+          else reverseOut("41", R(3, 0), 0.06);
+        }
+        return;
+      }
+      if (m !== "ground") return;
+      const running = down2("run") || P.runLatch;
+      const moving = down2("left") || down2("right") || down2("up") || down2("down");
+      switch (a) {
+        case "jump":
+          return jump2();
+        case "light":
+          return running && moving ? slide() : light();
+        case "heavy":
+          return heavy2();
+        case "dodge":
+          return dodge();
+        case "block":
+          P.combat = true;
+          P.armed = false;
+          P.mode = "block";
+          return play("17", { seq: S2(R(0, 7), 0.03) });
+        case "shoot":
+          return shoot3();
+        case "skill":
+          return skill();
+        case "charge":
+          return charge2();
+        case "super":
+          return proveSuper();
+        case "skillOld":
+          return skillOld();
+        case "superOld":
+          return superMove(false);
+        case "combat":
+          if (P.armed) return;
+          if (!P.combat) return act("3_0", { seq: S2(R(0, 3), 0.055), onEnd: () => {
+            P.combat = true;
+            toIdle();
+          } });
+          return reverseOut("3_0", R(3, 0), 0.055, () => {
+            P.combat = false;
+            toIdle();
+          });
+        case "weapon":
+          if (!P.armed) return ensureArmed(toIdle);
+          return reverseOut("W", R(3, 0), 0.05, () => {
+            P.armed = false;
+            toIdle();
+          });
+        case "stun":
+          return stun();
+        case "respond":
+          return emote("28", 7, { seq: [{ f: 0, d: 0.1 }, { f: 1, d: 0.1 }, { f: 2, d: 0.12 }, { f: 3, d: 0.6 }, { f: 2, d: 0.12 }, { f: 1, d: 0.1 }, { f: 0, d: 0.15 }] });
+        case "talk":
+          return emote("29", 7, { seq: [...S2([0, 1, 2], 0.16), { f: 3, d: 0.35 }, ...S2([2, 1], 0.16), { f: 0, d: 0.6 }, ...S2([1, 2], 0.16), { f: 3, d: 0.35 }, ...S2([2, 1, 0], 0.16)] });
+        case "nod":
+          return emote("30", 8, { seq: S2([...R(0, 3), ...R(0, 3)], 1 / 8) });
+        // 기본 그림 그대로 두 번
+        // 고개 젓기: 한쪽 끝·반대쪽 끝에서 살짝 머물고 가운데는 빨리 지나감 × 2
+        case "shake":
+          return emote("31", 8, { seq: S2([...R(0, 3), ...R(0, 3)], 1 / 8) });
+        // 기본 그림 그대로 두 번
+        case "angry":
+          return emote("32", 9);
+        case "happy":
+          return emote("35", 8);
+        case "surprise":
+          return emote("34", 8, { seq: [...S2(R(0, 1), 0.06), { f: 2, d: 0.35 }, ...S2(R(3, A["34"].n - 1), 0.12)] });
+        case "eat":
+          return emote("26", 7, { seq: A["26"].n === 8 ? [...S2(R(0, 2), 0.12), ...S2(R(3, 5), 0.22), ...S2(R(6, 7), 0.2)] : void 0 });
+        case "pick": {
+          const it = items.findIndex((it2) => Math.abs(it2.x - P.x) < 110 && Math.abs(it2.y - P.y) < 40);
+          if (it >= 0) {
+            items.splice(it, 1);
+            later(0.45, () => {
+              sfx("pickup");
+              P.hp = Math.min(100, P.hp + 20);
+              vfx("heal", P.x, P.y + 4, 3 * K4(P.y));
+              P.healT = 0.6;
+            });
+          }
+          return emote("27", 8);
+        }
+        case "personal":
+          return emote("2", 7);
+        // 발견 반응: 주먹 올리는 뒤 3장(6~8장)은 빼고, 움찔한 뒤 바라보는 장에서 잠깐 머묾
+        case "notice":
+          fx.push({ k: "icon", v: "!", t: 1 });
+          return act("33", { seq: [{ f: 0, d: 0.06 }, { f: 1, d: 0.06 }, { f: 2, d: 0.1 }, { f: 3, d: 0.12 }, { f: 4, d: 0.45 }, ...S2([3, 2, 1, 0], 0.04)] });
+        // 바라본 뒤 빠르게 거꾸로
+        case "sit":
+          return sit();
+        case "crouch":
+          return crouch();
+      }
+    }
+    function onRelease(a) {
+      if (a === "left" || a === "right") {
+        if (!down2("left") && !down2("right")) P.runLatch = false;
+      }
+      if (a === "block" && P.mode === "block") reverseOut("17", R(curF(), 0), 0.025);
+      if (a === "charge" && P.mode === "charge") release();
+    }
+    function updateFx(dt) {
+      for (const e of fx) {
+        e.t -= dt;
+        if (e.k === "spark") {
+          e.x += e.vx * dt;
+          e.y += e.vy * dt;
+          e.vy += 1100 * dt;
+        } else if (e.k === "dust") {
+          e.x += e.vx * dt;
+          e.y += e.vy * dt;
+          e.vx *= 0.92;
+        } else if (e.k === "num") e.y -= 60 * dt;
+        else if (e.k === "blood") {
+          if (!e.landed) {
+            e.x += e.vx * dt;
+            e.y += e.vy * dt;
+            e.vy += 1300 * dt;
+            if (e.y >= e.g) {
+              e.y = e.g;
+              e.landed = true;
+              e.t = Math.min(e.t, 2.2);
+            }
+          }
+        } else if (e.k === "steam" || e.k === "smoke") {
+          e.x += e.vx * dt;
+          e.y += e.vy * dt;
+          e.r += (e.k === "smoke" ? 26 : 4) * dt;
+          e.vx *= 0.97;
+        } else if (e.k === "mote") e.y += e.vy * dt;
+        else if (e.k === "bubble") {
+          e.y += e.vy * dt;
+          e.x += Math.sin(e.t * 9) * 12 * dt;
+        } else if (e.k === "fire") {
+          e.x += e.vx * dt;
+          e.y += e.vy * dt;
+          e.vx *= 0.9;
+          e.vy *= 0.9;
+          e.r += 60 * dt;
+        } else if (e.k === "rocket") {
+          e.x += e.dir * 1500 * dt;
+          if (Math.random() < 0.9) fx.push({ k: "smoke", x: e.x - e.dir * 20, y: e.y + (Math.random() - 0.5) * 6, vx: -e.dir * 40, vy: -10, r: 6, t: 0.8, t0: 0.8, c: 200 });
+          const D3 = targets().find((D4) => Math.abs(D4.y - e.gy) < 60 && (D4.x - e.x) * e.dir <= 0 && (D4.x - e.x0) * e.dir > 0), hitD = !!D3;
+          if (hitD || e.x < VX0 - 40 || e.x > W5 + 40) {
+            e.t = 0;
+            explode2(hitD ? D3.x : Math.max(VX0 + 20, Math.min(W5 - 20, e.x)), e.y, e.gy, hitD);
+          }
+        } else if (e.k === "shell") {
+          e.x += e.vx * dt;
+          e.y += e.vy * dt;
+          e.vy += 1400 * dt;
+          if (e.y > e.g) {
+            e.y = e.g;
+            e.vy *= -0.35;
+            e.vx *= 0.6;
+          }
+        }
+      }
+      for (const e of fx) if (e.k === "timer" && e.t <= 0 && !e.done) {
+        e.done = true;
+        e.fn();
+      }
+      fx = fx.filter((e) => e.t > 0);
+    }
+    function update(dt) {
+      P.t += dt;
+      updateFx(dt);
+      shake = Math.max(0, shake - 70 * dt);
+      zoom = Math.max(0, zoom - 0.5 * dt);
+      flash = Math.max(0, flash - dt);
+      cut = Math.max(0, cut - dt);
+      dark2 = Math.max(0, dark2 - dt);
+      P.armorT = Math.max(0, P.armorT - dt);
+      P.healT = Math.max(0, (P.healT || 0) - dt);
+      if (P.status === "status_poison" && Math.random() < dt * 7) {
+        const a = A[P.clip ? P.clip.id : "1"], k = K4(P.y);
+        fx.push({ k: "bubble", x: P.x + (Math.random() - 0.5) * 26 * k, y: P.y - P.z - (BASE2(a) - a.top[curF()]) * k + 6, vy: -40 - Math.random() * 30, r: 2 + Math.random() * 2.5, t: 0.9 + Math.random() * 0.4, t0: 1.3 });
+      }
+      if (P.sp >= 100 && Math.random() < dt * 2.5) fx.push({ k: "mote", x: P.x + (Math.random() - 0.5) * 80 * K4(P.y), y: P.y - Math.random() * 40, vy: -90 - Math.random() * 120, c: "#ffd34a", t: 0.8, t0: 0.8 });
+      if (P.hp <= 25 && Math.random() < dt * 0.6) vfx("blood_splat", P.x + (Math.random() - 0.5) * 30, P.y - (60 + Math.random() * 80) * K4(P.y), 1.8, { flip: Math.random() < 0.5 });
+      if (P.hp <= 25 && Math.random() < dt * 3.5) {
+        const a = A[P.clip ? P.clip.id : "1"], f = curF(), k = K4(P.y);
+        const top = P.y - P.z - (BASE2(a) - a.top[f]) * k, bot = P.y - P.z;
+        const y = top + (bot - top) * (0.25 + Math.random() * 0.4);
+        for (let i = 0; i < 2 + (Math.random() * 3 | 0); i++) fx.push({ k: "blood", x: P.x + (Math.random() - 0.5) * 30 * k, y, vx: (Math.random() - 0.5) * 120, vy: -60 - Math.random() * 120, g: P.y + (Math.random() - 0.5) * 6, t: 3, s: 2 + Math.random() * 2.5 });
+      }
+      if (hitstop > 0) {
+        hitstop -= dt;
+        return;
+      }
+      tickClip(dt);
+      P.inv = Math.max(0, P.inv - dt);
+      P.wakeArmor = Math.max(0, (P.wakeArmor || 0) - dt);
+      if (P.overT > 0) {
+        P.overT -= dt;
+        P.heat = 100 * Math.max(0, P.overT) / 2.6;
+        if (Math.random() < dt * 6) {
+          const p = P.armed ? muzzle() : { x: P.x + P.face * 30 * K4(P.y), y: P.y - 150 * K4(P.y) };
+          steam(p.x, p.y, 1.2);
+        }
+      } else if (P.t - P.lastShot > 0.35) P.heat = Math.max(0, P.heat - 30 * dt);
+      if (P.ghostT > 0) {
+        P.ghostT -= dt;
+        P.ghostN = (P.ghostN || 0) + dt;
+        if (P.clip && P.ghostN > 0.05 && !(P.ghostN = 0)) fx.push({ k: "ghost", id: P.clip.id, f: curF(), x: P.x, y: P.y, z: P.z, face: P.face, t: 0.18, t0: 0.18 });
+      }
+      if (P.dodgeV) {
+        P.x += P.dodgeV.x * dt;
+        P.y += P.dodgeV.y * dt;
+        P.dodgeV.x *= Math.pow(4e-3, dt);
+        P.dodgeV.y *= Math.pow(4e-3, dt);
+      }
+      if (P.pvx) {
+        P.x += P.face * P.pvx * dt;
+        const s2 = Math.sign(P.pvx);
+        P.pvx -= s2 * P.pdec * dt;
+        if (Math.sign(P.pvx) !== s2) P.pvx = 0;
+      }
+      const dx = (down2("right") ? 1 : 0) - (down2("left") ? 1 : 0), dy = (down2("down") ? 1 : 0) - (down2("up") ? 1 : 0);
+      const running = down2("run") || P.runLatch;
+      switch (P.mode) {
+        case "ground": {
+          if (down2("flee")) {
+            P.mode = "flee";
+            play("36", { fps: 14, loopFrom: 0 });
+            break;
+          }
+          if (down2("back")) {
+            P.mode = "back";
+            play("37", { fps: 10, onEnd: () => {
+              if (P.mode === "back") has("37_1") ? play("37_1", { seq: S2(R(1, A["37_1"].n - 1), 0.11), loopFrom: 0 }) : play("37", { seq: [{ f: 2, d: 0.17 }, { f: 3, d: 0.17 }], loopFrom: 0 });
+            } });
+            break;
+          }
+          if (dx || dy) {
+            if (P.armed) P.armed = false;
+            if (dx && dx !== P.face) {
+              P.prevFace = P.face;
+              P.faceT = P.t;
+              P.face = dx;
+            }
+            const sp = (running ? 430 : 230) * (P.dying ? 0.6 : 1);
+            P.x += dx * sp * dt;
+            P.y += dy * sp * 0.55 * dt;
+            const id = running && !P.dying ? "5" : "4";
+            if (!P.clip || P.clip.id !== id) play(id, { fps: id === "5" ? 15 : P.dying ? 7 : 11, loopFrom: id === "5" ? 1 : 0 });
+            if (id === "5" && Math.random() < dt * 4) {
+              if (!vfx("run_dust", P.x - P.face * 24, P.y, 2, { flip: P.face < 0 })) dust(P.x - P.face * 20, P.y, 1, 0.6);
+            }
+            const sf = curF();
+            if (sf !== P.stepF && (sf === 1 || sf === 5)) sfx("step");
+            P.stepF = sf;
+            P.idleT = 0;
+          } else {
+            const id = P.armed ? has("W1") ? "W1" : "W" : P.combat ? "3" : "1";
+            if (!P.clip || P.clip.id !== id) {
+              if (id === "W") play("W", { seq: [{ f: 3, d: 9 }], loopFrom: 0 });
+              else if (id === "1") play("1", { seq: [{ f: 0, d: P.dying ? 0.45 : 0.6 }, { f: 1, d: P.dying ? 0.45 : 0.6 }], loopFrom: 0 });
+              else play(id, { fps: id === "W1" ? 5 : P.combat ? 7 : 2, loopFrom: 0 });
+            }
+            P.idleT += dt;
+            if (!P.combat && !P.armed && !P.dying && P.idleT > 9) {
+              P.idleT = 0;
+              emote("2", 7);
+            }
+          }
+          break;
+        }
+        case "act":
+          if (P.knockT > 0) {
+            P.knockT -= dt;
+            if (P.knockT <= 0) P.mode = "down";
+          }
+          break;
+        case "chain":
+          P.chainT -= dt;
+          if (P.chainT <= 0) chainExpire();
+          break;
+        case "air": {
+          if (P.takeoff > 0) {
+            P.takeoff -= dt;
+            if (P.takeoff <= 0) {
+              P.vz = 1180;
+              dust(P.x, P.y, 3, 0.7);
+            } else break;
+          }
+          if (dx) {
+            P.x += dx * P.airVX * dt;
+            if (!P.airAtk) P.face = dx;
+          }
+          P.y += dy * 140 * dt;
+          P.z += P.vz * dt;
+          P.vz -= 2700 * dt;
+          P.spin = Math.max(0, P.spin - dt);
+          {
+            const gz = env.ground(P.x, P.y);
+            if (P.z <= gz && P.vz < 0) {
+              P.z = gz;
+              land2();
+              break;
+            }
+          }
+          if (!P.airAtk && P.spin <= 0) {
+            const f = P.vz > 380 ? 2 : P.vz > -380 ? P.vz > 0 ? 3 : 4 : 5;
+            P.clip = { id: "7", seq: [{ f, d: 9 }], i: 0, t: 0, loopFrom: 0, done: false };
+          }
+          break;
+        }
+        case "charge": {
+          if (!down2("charge")) {
+            release();
+            break;
+          }
+          P.charge = Math.min(2.2, P.charge + dt);
+          const lv = P.charge >= 2 ? 3 : P.charge > 1.3 ? 2 : P.charge > 0.5 ? 1 : 0;
+          if (lv > P.chargeShown) {
+            P.chargeShown = lv;
+            sfx("ability");
+            ring(P.x, P.y - 110 * K4(P.y), 70 + lv * 25, 0.3, CH_COL[lv], 4);
+            flash = 0.04;
+          }
+          if (Math.random() < dt * (8 + lv * 10)) fx.push({ k: "mote", x: P.x + (Math.random() - 0.5) * 90 * K4(P.y), y: P.y, vy: -120 - Math.random() * 160, c: CH_COL[lv], t: 0.7, t0: 0.7 });
+          break;
+        }
+        case "belly": {
+          const go = dx !== 0, looping = P.clip.id === "38_1" || P.clip.i >= 4;
+          if (go) P.face = dx;
+          P.clip.paused = !go && looping;
+          if (go && looping) P.x += dx * 55 * dt;
+          break;
+        }
+        case "stun":
+          P.stunT -= dt;
+          if (P.stunT <= 0) reverseOut("21", [curF() > 1 ? 1 : curF(), 0], 0.07);
+          break;
+        case "flee":
+          if (!down2("flee")) {
+            toIdle();
+            break;
+          }
+          if (dx) P.face = dx;
+          P.x += P.face * 400 * dt;
+          P.y += dy * 180 * dt;
+          break;
+        case "back": {
+          if (!down2("back")) {
+            toIdle();
+            break;
+          }
+          if (P.clip && P.clip.id === "37_1") P.x -= P.face * 80 * dt;
+          P.y += dy * 60 * dt;
+          break;
+        }
+        // 손드는 동안(37)은 제자리, 걸음(37_1)부터 뒤로
+        case "sit":
+          if (P.clip && P.clip.id === "39" && curF() >= 7 && dx && dx === -P.face) {
+            P.mode = "scoot";
+            play("40", { fps: 6, loopFrom: 0 });
+          }
+          break;
+        case "scoot":
+          if (!(dx && dx === -P.face)) {
+            sitLoop();
+            break;
+          }
+          P.x -= P.face * 70 * dt;
+          break;
+        case "crouch":
+          if (P.clip && P.clip.i >= 4 && dx) {
+            P.face = dx;
+            P.mode = "crawl4";
+            if (has("42_1")) play("42", { seq: S2(R(0, 5), 0.08), onEnd: () => {
+              if (P.mode === "crawl4") play("42_1", { seq: S2(R(1, A["42_1"].n - 1), 0.1), loopFrom: 0 });
+            } });
+            else play("42", { seq: [...S2(R(0, 3), 0.08), ...S2(R(4, 11), 0.085)], loopFrom: 4 });
+          }
+          break;
+        case "crawl4": {
+          const go = dx !== 0, looping = P.clip.id === "42_1" || P.clip.i >= 4;
+          if (go) P.face = dx;
+          P.clip.paused = !go && looping;
+          if (go && looping) P.x += dx * 85 * dt;
+          break;
+        }
+      }
+      if (P.mode === "ground" || P.mode === "chain") {
+        const gz = env.ground(P.x, P.y);
+        if (P.z > gz + 2) {
+          P.mode = "air";
+          P.vz = 0;
+          P.jumps = 1;
+          P.airAtk = false;
+          P.takeoff = 0;
+          P.spin = 0;
+          P.airVX = 230;
+        } else if (P.z >= gz - 10) P.z = gz;
+      }
+      env.clamp(P);
+    }
+    const silCache = {};
+    function silhouette2(id, f, col) {
+      const key2 = id + ":" + f + ":" + col;
+      if (silCache[key2]) return silCache[key2];
+      const a = A[id], c = document.createElement("canvas");
+      c.width = a.w;
+      c.height = a.h;
+      const g2 = c.getContext("2d");
+      g2.drawImage(IMG[id], f * a.w, 0, a.w, a.h, 0, 0, a.w, a.h);
+      g2.globalCompositeOperation = "source-in";
+      g2.fillStyle = col;
+      g2.fillRect(0, 0, a.w, a.h);
+      return silCache[key2] = c;
+    }
+    function shadow3(x, y, z, w, s2 = 1, up = 0, extra = 0) {
+      const k = Math.max(0.3, 1 - z / 380) * s2;
+      const rx = Math.max(16, w) * 0.58 * k, ry = (5 + extra) * k;
+      ctx.fillStyle = `rgba(0,0,0,${0.42 * k})`;
+      ctx.beginPath();
+      ctx.ellipse(x, y - up * s2 - 2 * k, rx, ry, 0, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    function drawSprite(id, f, x, y, z, face, alpha = 1, tint2 = null) {
+      const a = A[id], img5 = IMG[id];
+      if (!img5.complete || !img5.naturalWidth) return;
+      const flip = a.dir === "SW" ? face > 0 : face < 0;
+      const air = P.mode === "air" && (id === "7" || id === "14");
+      const base2 = air ? a.bot[f] : groundBase(id, a, f);
+      if (KNOCK_ARC[id] && alpha === 1) z += KNOCK_ARC[id][f] || 0;
+      let bob = 0;
+      if (id === "W" && P.mode === "ground" && P.armed) bob = Math.round(Math.sin(P.t * 3) * 1.2);
+      const sk = K4(y);
+      ctx.save();
+      ctx.globalAlpha = alpha;
+      ctx.translate(Math.round(x), Math.round(y - z + bob));
+      ctx.scale(flip ? -sk : sk, sk);
+      const dxp = -Math.round(a.w / 2) - (ROOT.has(id) && a.cx ? a.cx[f] - a.cx[0] : 0), dyp = -base2;
+      if (tint2 && !tint2.noEdge) {
+        const s2 = silhouette2(id, f, tint2.c);
+        const offs = tint2.glow ? [[-1, 0], [1, 0], [0, -1], [0, 1], [-2, 0], [2, 0], [0, -2], [0, 2], [-2, -2], [2, -2], [-2, 2], [2, 2]] : [[-2, 0], [2, 0], [0, -2], [0, 2]];
+        ctx.globalAlpha = alpha * (tint2.ea ?? 1) * (tint2.glow ? 0.5 : 1);
+        for (const [ox, oy] of offs) ctx.drawImage(s2, dxp + ox, dyp + oy);
+        ctx.globalAlpha = alpha;
+      }
+      ctx.drawImage(img5, f * a.w, 0, a.w, a.h, dxp, dyp, a.w, a.h);
+      if (tint2 && tint2.over) {
+        ctx.globalAlpha = alpha * tint2.over;
+        ctx.drawImage(silhouette2(id, f, tint2.c), dxp, dyp);
+      }
+      ctx.restore();
+    }
+    function drawPlayer() {
+      const c = P.clip;
+      const id = c ? c.id : "1", f = curF(), a = A[id];
+      const air = P.mode === "air" && (id === "7" || id === "14");
+      const flip = a.dir === "SW" ? P.face > 0 : P.face < 0;
+      const ft = a.foot[f], kk = K4(P.y), fx0 = (flip ? -(ft[0] - (ROOT.has(id) && a.cx ? a.cx[f] - a.cx[0] : 0)) : ft[0] - (ROOT.has(id) && a.cx ? a.cx[f] - a.cx[0] : 0)) * kk;
+      const contact = a.bot[f] - (ft[2] || 0), lift = air ? 0 : KNOCK_ARC[id] ? KNOCK_ARC[id][f] || 0 : Math.max(0, BASE2(a) - a.bot[f] - 6);
+      const gz0 = env.ground(P.x, P.y);
+      shadow3(P.x + fx0, P.y - gz0, P.z - gz0 + lift * kk, Math.min(80, ft[1]), kk, air ? 0 : groundBase(id, a, f) - contact, Math.min(10, ft[3] || 0));
+      let tint2 = null;
+      if (P.armorT > 0) tint2 = { c: "#ff2a2a", over: 0.35 * (P.armorT / 0.28) };
+      else if (armored() && showArmor) tint2 = { c: "rgba(255,60,40,.55)", over: 0 };
+      else if (P.healT > 0) tint2 = { c: "#7dff8a", over: 0.35 * P.healT, noEdge: true };
+      else if (P.sp >= 100) tint2 = { c: "#ffd34a", over: 0, ea: 0.35 + 0.3 * (0.5 + 0.5 * Math.sin(P.t * 4)), glow: true };
+      else if (P.hp <= 25) tint2 = { c: "#d0101a", over: 0.42 * (0.5 + 0.5 * Math.sin(P.t * Math.PI * 2 * 1.3)), noEdge: true };
+      else if (P.mode === "charge") {
+        const lv = P.charge >= 2 ? 3 : P.charge > 1.3 ? 2 : P.charge > 0.5 ? 1 : 0;
+        tint2 = { c: CH_COL[lv], over: 0.1 + 0.12 * Math.sin(P.t * 20) };
+      }
+      drawSprite(id, f, P.x, P.y, P.z, P.face, 1, tint2);
+      if (P.mode === "charge") {
+        const m = muzzle();
+        drawVfxAt("charge_gather", m.x, m.y, 1.4 + P.charge * 0.7, P.t);
+      }
+      if (P.status) {
+        const top = P.y - P.z - (BASE2(a) - a.top[f]) * kk, hgt = (BASE2(a) - a.top[f]) * kk;
+        if (P.status === "status_burn") for (let i = 0; i < 5; i++) {
+          const ox = Math.sin(i * 2.3) * 22 * kk, oy = top + hgt * (0.2 + 0.16 * i);
+          drawVfxAt("status_burn", P.x + ox, oy + 10 * kk, 0.55 * kk, P.t + i * 0.37);
+        }
+        if (P.status === "status_shock") for (let i = 0; i < 4; i++) {
+          const ph = Math.floor(P.t * 9 + i * 3.7);
+          const rx = Math.sin(ph * 12.9898 + i) * 0.5, ry = Math.sin(ph * 78.233 + i * 2) * 0.5 + 0.5;
+          drawVfxAt("status_shock", P.x + rx * 40 * kk, top + hgt * (0.05 + ry * 0.9), 0.7 * kk, P.t + i * 0.2);
+        }
+      }
+      if (P.mode === "stun") {
+        const hy = P.y - (BASE2(a) - a.top[f]) * kk - 14;
+        if (!drawVfxAt("stun_stars", P.x, hy, 2.2, P.t)) for (let i = 0; i < 3; i++) {
+          const t = P.t * 4 + i * 2.09;
+          star(P.x + Math.cos(t) * 26, hy + Math.sin(t) * 7, 7, "#ffe066");
+        }
+      }
+    }
+    function star(x, y, r, c) {
+      ctx.fillStyle = c;
+      ctx.beginPath();
+      for (let i = 0; i < 10; i++) {
+        const a = i * Math.PI / 5 - Math.PI / 2, rr = i % 2 ? r * 0.45 : r;
+        ctx.lineTo(x + Math.cos(a) * rr, y + Math.sin(a) * rr);
+      }
+      ctx.fill();
+    }
+    function drawVfxAt(name, x, y, sc, el, flip) {
+      const v = VFX[name];
+      if (!v || !v.img.complete) return false;
+      const [fx0, fy0, fw, fh] = sheetFrame(v, el % vfxDur(name));
+      ctx.save();
+      ctx.translate(Math.round(x), Math.round(y));
+      ctx.scale(flip ? -sc : sc, sc);
+      ctx.drawImage(v.img, fx0, fy0, fw, fh, -fw * v.pivot[0], -fh * v.pivot[1], fw, fh);
+      ctx.restore();
+      return true;
+    }
+    function sheetFrame(v, el) {
+      el = el * 1e3;
+      let i = 0;
+      while (i < v.frames.length - 1 && el >= v.frames[i][4]) {
+        el -= v.frames[i][4];
+        i++;
+      }
+      return v.frames[i];
+    }
+    function drawSheets(under = false) {
+      for (const e of fx) {
+        if (!!e.under !== under) continue;
+        if (e.k === "bullet" && VFX.tracer && VFX.tracer.img.complete) {
+          const k = 1 - e.t / e.t0, x = e.x + (e.x2 - e.x) * k, y = e.y + (e.y2 - e.y) * k, [fx02, fy02, fw2, fh2] = sheetFrame(VFX.tracer, (e.t0 - e.t) % vfxDur("tracer"));
+          const L = fw2 * 0.38 * 2.4, vis = Math.min(L, Math.hypot(x - e.x, y - e.y) + 4), sw = vis / 2.4;
+          ctx.save();
+          ctx.translate(x, y);
+          ctx.rotate(Math.atan2(e.y2 - e.y, e.x2 - e.x));
+          ctx.drawImage(VFX.tracer.img, fx02 + fw2 - sw, fy02, sw, fh2, -vis, -fh2 * 1.1, vis, fh2 * 2.2);
+          ctx.restore();
+        }
+        if (e.k === "beamS" && VFX.charge_beam && VFX.charge_beam.img.complete) {
+          const v2 = VFX.charge_beam, [fx02, fy02, fw2, fh2] = sheetFrame(v2, (e.t0 - e.t) % vfxDur("charge_beam")), sc = e.sy * (0.5 + 0.5 * e.t / e.t0);
+          const x2 = e.dir > 0 ? W5 : VX0, len = Math.abs(x2 - e.x);
+          ctx.save();
+          ctx.translate(e.x, e.y);
+          if (e.dir < 0) ctx.scale(-1, 1);
+          const taper = 140, step2 = 8;
+          for (let x = 0; x < len; x += step2) {
+            const k0 = Math.min(1, 0.12 + (x / taper) ** 0.7 * 0.88);
+            const sx = fx02 + x / 2 % fw2, sw = Math.min(step2 / 2, fw2 - (sx - fx02));
+            ctx.drawImage(v2.img, sx, fy02, sw, fh2, x, -fh2 * sc * k0, sw * 2, fh2 * 2 * sc * k0);
+          }
+          ctx.restore();
+        }
+        if (e.k !== "sheet") continue;
+        const v = VFX[e.name];
+        if (!v.img.complete) continue;
+        const [fx0, fy0, fw, fh] = sheetFrame(v, e.loop ? (e.t0 - e.t) % e.dur : e.t0 - e.t);
+        ctx.save();
+        ctx.translate(Math.round(e.x), Math.round(e.y));
+        if (e.rot) ctx.rotate(e.rot);
+        ctx.scale(e.flip ? -e.s : e.s, e.s);
+        if (e.anchor === "right") ctx.drawImage(v.img, fx0, fy0, fw, fh, -fw, -fh / 2, fw, fh);
+        else ctx.drawImage(v.img, fx0, fy0, fw, fh, -fw * v.pivot[0], -fh * v.pivot[1], fw, fh);
+        ctx.restore();
+      }
+    }
+    function drawTargets() {
+      for (const e of fx) if (e.k === "target") {
+        const bl = Math.sin(P.t * 14) > 0, r = 26;
+        ctx.strokeStyle = bl ? "rgba(255,70,50,.95)" : "rgba(255,170,60,.8)";
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.ellipse(e.x, e.y, r, r * 0.35, 0, 0, Math.PI * 2);
+        ctx.moveTo(e.x - r - 8, e.y);
+        ctx.lineTo(e.x + r + 8, e.y);
+        ctx.moveTo(e.x, e.y - 12);
+        ctx.lineTo(e.x, e.y + 12);
+        ctx.stroke();
+      }
+    }
+    function drawFxUnder() {
+      drawTargets();
+      for (const e of fx) if (e.k === "scorch") {
+        ctx.fillStyle = `rgba(20,14,10,${0.55 * Math.min(1, e.t)})`;
+        ctx.beginPath();
+        ctx.ellipse(e.x, e.y, e.r, e.r * 0.28, 0, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      for (const e of fx) if (e.k === "dust") {
+        const k = e.t / e.t0;
+        ctx.fillStyle = `rgba(200,190,170,${0.45 * k})`;
+        ctx.beginPath();
+        ctx.arc(e.x, e.y - 4, e.r * (1.6 - k), 0, Math.PI * 2);
+        ctx.fill();
+      }
+      for (const e of fx) if (e.k === "ghost") drawSprite(e.id, e.f, e.x, e.y, e.z, e.face, 0.16 * e.t / e.t0, { c: "#a8ccff", over: 0.3, noEdge: true });
+    }
+    function drawFx(glow2) {
+      for (const e of fx) {
+        if (GLOW.has(e.k) !== glow2) continue;
+        const k = e.t0 ? e.t / e.t0 : 1;
+        if (e.k === "spark") {
+          ctx.strokeStyle = e.c;
+          ctx.lineWidth = e.s;
+          ctx.lineCap = "round";
+          ctx.beginPath();
+          ctx.moveTo(e.x, e.y);
+          ctx.lineTo(e.x - e.vx * 0.035, e.y - e.vy * 0.035);
+          ctx.stroke();
+        } else if (e.k === "ring") {
+          ctx.strokeStyle = e.c;
+          ctx.globalAlpha = k;
+          ctx.lineWidth = e.w * k + 1;
+          ctx.beginPath();
+          ctx.ellipse(e.x, e.y, e.r0 + (e.r - e.r0) * (1 - k), (e.r0 + (e.r - e.r0) * (1 - k)) * e.sy, 0, 0, Math.PI * 2);
+          ctx.stroke();
+          ctx.globalAlpha = 1;
+        } else if (e.k === "num") {
+          ctx.fillStyle = typeof e.v === "string" ? "#9fd0ff" : e.big ? "#ffcf4a" : "#fff";
+          ctx.font = `bold ${e.big ? 30 : 22}px sans-serif`;
+          ctx.strokeStyle = "#000";
+          ctx.lineWidth = 4;
+          ctx.strokeText(e.v, e.x - 14, e.y);
+          ctx.fillText(e.v, e.x - 14, e.y);
+        } else if (e.k === "tracer") {
+          ctx.strokeStyle = e.big ? "rgba(255,236,160,.95)" : "rgba(255,244,190,.85)";
+          ctx.lineWidth = e.big ? 5 : 2;
+          ctx.beginPath();
+          ctx.moveTo(e.x, e.y);
+          ctx.lineTo(e.x2, e.y2 ?? e.y + (e.dy || 0));
+          ctx.stroke();
+        } else if (e.k === "flash") {
+          const L = e.big ? 46 : 28, Wd = e.big ? 13 : 8, d3 = e.dir, j = 0.8 + Math.random() * 0.4;
+          const cone = (len, wid, col) => {
+            ctx.fillStyle = col;
+            ctx.beginPath();
+            ctx.moveTo(e.x, e.y - wid);
+            ctx.lineTo(e.x + d3 * len * j, e.y);
+            ctx.lineTo(e.x, e.y + wid);
+            ctx.closePath();
+            ctx.fill();
+          };
+          cone(L, Wd, "rgba(255,140,40,.9)");
+          cone(L * 0.7, Wd * 0.65, "rgba(255,220,90,.95)");
+          cone(L * 0.4, Wd * 0.35, "#fff");
+          ctx.fillStyle = "rgba(255,170,60,.85)";
+          for (const sgn of [-1, 1]) {
+            ctx.beginPath();
+            ctx.moveTo(e.x + d3 * 4, e.y);
+            ctx.lineTo(e.x + d3 * L * 0.35, e.y + sgn * Wd * 1.6 * j);
+            ctx.lineTo(e.x + d3 * 10, e.y + sgn * 2);
+            ctx.fill();
+          }
+        } else if (e.k === "blood") {
+          ctx.fillStyle = `rgba(150,10,16,${Math.min(1, e.t)})`;
+          if (e.landed) {
+            ctx.beginPath();
+            ctx.ellipse(e.x, e.y, e.s * 2.2, e.s * 0.8, 0, 0, Math.PI * 2);
+            ctx.fill();
+          } else ctx.fillRect(e.x - e.s / 2, e.y - e.s / 2, e.s, e.s);
+        } else if (e.k === "target" && false) {
+          const bl = Math.sin(P.t * 14) > 0, r = 26;
+          ctx.strokeStyle = bl ? "rgba(255,70,50,.95)" : "rgba(255,170,60,.8)";
+          ctx.lineWidth = 3;
+          ctx.beginPath();
+          ctx.ellipse(e.x, e.y, r, r * 0.35, 0, 0, Math.PI * 2);
+          ctx.moveTo(e.x - r - 8, e.y);
+          ctx.lineTo(e.x + r + 8, e.y);
+          ctx.moveTo(e.x, e.y - 12);
+          ctx.lineTo(e.x, e.y + 12);
+          ctx.stroke();
+        } else if (e.k === "mortar") {
+          const p = 1 - k, y = -80 + (e.y - 30 + 80) * p, x = e.x + (1 - p) * 140, ang = Math.atan2(e.y + 50, -140);
+          ctx.save();
+          ctx.translate(x, y);
+          ctx.rotate(ang - Math.PI / 2);
+          ctx.fillStyle = "#3d4236";
+          ctx.fillRect(-6, -26, 12, 36);
+          ctx.fillStyle = "#7a8070";
+          ctx.fillRect(-6, -26, 4, 36);
+          ctx.fillStyle = "#c9a23a";
+          ctx.beginPath();
+          ctx.moveTo(-6, 10);
+          ctx.lineTo(6, 10);
+          ctx.lineTo(0, 22);
+          ctx.fill();
+          ctx.fillStyle = "#2a2e25";
+          ctx.beginPath();
+          ctx.moveTo(-6, -26);
+          ctx.lineTo(-13, -36);
+          ctx.lineTo(-6, -18);
+          ctx.moveTo(6, -26);
+          ctx.lineTo(13, -36);
+          ctx.lineTo(6, -18);
+          ctx.fill();
+          ctx.restore();
+        } else if (e.k === "impact") {
+          const r = (e.big ? 70 : 42) * (1.2 - k * 0.4);
+          star(e.x, e.y, r * 0.8 * k + 6, "rgba(255,255,255,.95)");
+          ctx.strokeStyle = `rgba(255,255,255,${k})`;
+          ctx.lineWidth = (e.big ? 10 : 6) * k + 1;
+          ctx.beginPath();
+          ctx.arc(e.x - e.dir * r * 0.4, e.y, r, -Math.PI / 2.6, Math.PI / 2.6, e.dir < 0);
+          ctx.stroke();
+        } else if (e.k === "speed") {
+          ctx.strokeStyle = `rgba(255,255,255,${0.6 * k})`;
+          ctx.lineWidth = 2;
+          for (let i = 0; i < 18; i++) {
+            const a = i / 18 * Math.PI * 2 + i, r0 = 120 + i % 3 * 30;
+            ctx.beginPath();
+            ctx.moveTo(e.x + Math.cos(a) * r0, e.y + Math.sin(a) * r0 * 0.7);
+            ctx.lineTo(e.x + Math.cos(a) * (r0 + 220), e.y + Math.sin(a) * (r0 + 220) * 0.7);
+            ctx.stroke();
+          }
+        } else if (e.k === "steam") {
+          ctx.fillStyle = `rgba(235,235,240,${0.3 * k})`;
+          ctx.beginPath();
+          ctx.arc(e.x, e.y, e.r, 0, Math.PI * 2);
+          ctx.fill();
+        } else if (e.k === "smoke") {
+          const c = e.c || 90;
+          ctx.fillStyle = `rgba(${c},${c},${c + 5},${0.55 * k})`;
+          ctx.beginPath();
+          ctx.arc(e.x, e.y, e.r, 0, Math.PI * 2);
+          ctx.fill();
+        } else if (e.k === "bubble") {
+          ctx.strokeStyle = `rgba(120,230,90,${Math.min(1, e.t * 1.5)})`;
+          ctx.lineWidth = 1.5;
+          ctx.beginPath();
+          ctx.arc(e.x, e.y, e.r, 0, Math.PI * 2);
+          ctx.stroke();
+          ctx.fillStyle = `rgba(160,255,120,${0.35 * Math.min(1, e.t * 1.5)})`;
+          ctx.fill();
+        } else if (e.k === "mote") {
+          ctx.fillStyle = e.c;
+          ctx.globalAlpha = k;
+          ctx.fillRect(e.x - 2, e.y - 2, 4, 4);
+          ctx.globalAlpha = 1;
+        } else if (e.k === "fire") {
+          const c = k > 0.8 ? "255,255,230" : k > 0.55 ? "255,214,90" : k > 0.3 ? "255,120,30" : "120,30,20";
+          ctx.fillStyle = `rgba(${c},${Math.min(1, k * 1.6)})`;
+          ctx.beginPath();
+          ctx.arc(e.x, e.y, e.r, 0, Math.PI * 2);
+          ctx.fill();
+        } else if (e.k === "rocket") {
+          ctx.fillStyle = "#5a5f52";
+          ctx.fillRect(e.x - 16, e.y - 4, 32, 8);
+          ctx.fillStyle = "#c33";
+          ctx.fillRect(e.x + e.dir * 12 - 4, e.y - 4, 8, 8);
+          star(e.x - e.dir * 20, e.y, 9, "#ffcf5a");
+        } else if (e.k === "shell") {
+          ctx.fillStyle = "#e8c35a";
+          ctx.fillRect(e.x - 2, e.y - 1, 5, 3);
+        } else if (e.k === "beam") {
+          const x2 = e.dir > 0 ? W5 : VX0, w = e.w * (0.4 + 0.6 * k), x0 = Math.min(e.x, x2), len = Math.abs(x2 - e.x);
+          ctx.globalAlpha = 0.45 * k;
+          ctx.fillStyle = e.c || "#a0dcff";
+          ctx.fillRect(x0, e.y - w, len, w * 2);
+          if (e.lv >= 2) {
+            ctx.strokeStyle = e.c;
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            for (let x = 0; x <= len; x += 24) ctx.lineTo(x0 + x, e.y - w * 1.2 + Math.random() * w * 2.4);
+            ctx.stroke();
+          }
+          ctx.globalAlpha = k;
+          ctx.fillStyle = "#fff";
+          ctx.fillRect(x0, e.y - w * 0.35, len, w * 0.7);
+          ctx.globalAlpha = 1;
+        } else if (e.k === "burst") {
+          const r = 18 + 60 * (1 - k);
+          ctx.strokeStyle = `rgba(230,245,255,${k})`;
+          ctx.lineWidth = 3;
+          for (let i = 0; i < 10; i++) {
+            const a = i / 10 * Math.PI * 2;
+            ctx.beginPath();
+            ctx.moveTo(e.x + Math.cos(a) * r * 0.5, e.y + Math.sin(a) * r * 0.2);
+            ctx.lineTo(e.x + Math.cos(a) * r, e.y + Math.sin(a) * r * 0.4);
+            ctx.stroke();
+          }
+          ctx.fillStyle = `rgba(230,245,255,${0.35 * k})`;
+          ctx.beginPath();
+          ctx.ellipse(e.x, e.y, r * 0.7, r * 0.25, 0, 0, Math.PI * 2);
+          ctx.fill();
+        } else if (e.k === "scan") {
+          const p = 1 - k, x = e.dir > 0 ? e.x + p * (W5 - e.x) : e.x - p * (e.x - VX0);
+          ctx.strokeStyle = `rgba(255,90,74,${0.8})`;
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          ctx.moveTo(e.x, e.y);
+          ctx.lineTo(x, FLOOR0 - 40);
+          ctx.lineTo(x, H6);
+          ctx.stroke();
+          ctx.fillStyle = "rgba(255,90,74,.08)";
+          ctx.fillRect(Math.min(e.x, x), 0, Math.abs(x - e.x), H6);
+        } else if (e.k === "icon") {
+          const a = A[P.clip ? P.clip.id : "1"];
+          const y = P.y - (BASE2(a) - a.top[curF()]) * K4(P.y) - 40;
+          ctx.fillStyle = "#ff4a3a";
+          ctx.font = "bold 44px sans-serif";
+          ctx.fillText(e.v, P.x - 8, y);
+        }
+      }
+    }
+    function drawHeat() {
+      if (P.heat < 50 || !P.armed) return;
+      const p = muzzle(), a = (P.heat - 50) / 50;
+      const g2 = ctx.createRadialGradient(p.x - P.face * 14, p.y, 0, p.x - P.face * 14, p.y, 22);
+      g2.addColorStop(0, `rgba(255,${P.overT > 0 ? 60 : 120},30,${0.8 * a})`);
+      g2.addColorStop(1, "rgba(255,80,20,0)");
+      ctx.fillStyle = g2;
+      ctx.beginPath();
+      ctx.arc(p.x - P.face * 14, p.y, 22, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    function drawChargeAim() {
+      if (P.mode !== "charge") return;
+      const p = muzzle(), lv = P.charge >= 2 ? 3 : P.charge > 1.3 ? 2 : P.charge > 0.5 ? 1 : 0;
+      if (VFX.charge_gather) {
+        if (lv) {
+          ctx.fillStyle = CH_COL[lv];
+          ctx.font = "bold 20px sans-serif";
+          ctx.fillText(["", "1단", "2단", "최대"][lv], P.x - 16, P.y - 250 * K4(P.y));
+        }
+        return;
+      }
+      const orb = 4 + P.charge * 9 + Math.sin(P.t * 30) * 2;
+      const g2 = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, orb * 2.2);
+      g2.addColorStop(0, "#fff");
+      g2.addColorStop(0.4, CH_COL[lv]);
+      g2.addColorStop(1, "rgba(255,255,255,0)");
+      ctx.fillStyle = g2;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, orb * 2.2, 0, Math.PI * 2);
+      ctx.fill();
+      const w = Math.max(1, 6 - P.charge * 3.5);
+      ctx.strokeStyle = lv === 2 ? "rgba(160,220,255,.9)" : "rgba(255,90,74,.75)";
+      ctx.lineWidth = w;
+      ctx.beginPath();
+      ctx.moveTo(p.x, p.y);
+      ctx.lineTo(P.face > 0 ? W5 : VX0, p.y);
+      ctx.stroke();
+      for (let i = 0; i < 3; i++) {
+        const a = Math.random() * Math.PI * 2, r = 40 + Math.random() * 30;
+        ctx.fillStyle = lv === 2 ? "#bfe8ff" : "#fff";
+        ctx.fillRect(p.x + Math.cos(a) * r * (1 - P.charge % 0.3 / 0.3), p.y + Math.sin(a) * r * (1 - P.charge % 0.3 / 0.3), 3, 3);
+      }
+      if (lv) {
+        ctx.fillStyle = CH_COL[lv];
+        ctx.font = "bold 20px sans-serif";
+        ctx.fillText(["", "1단", "2단", "최대"][lv], P.x - 16, P.y - 250 * K4(P.y));
+      }
+    }
+    function drawDying() {
+      if (P.hp > 25) return;
+      const t = P.t * 1.1 % 1, beat = Math.max(0, 1 - Math.abs(t - 0.08) * 12) + Math.max(0, 1 - Math.abs(t - 0.28) * 12) * 0.7;
+      const g2 = ctx.createRadialGradient(VX0 + 640, H6 / 2, H6 * 0.55, VX0 + 640, H6 / 2, H6 * 0.95);
+      g2.addColorStop(0, "rgba(160,0,0,0)");
+      g2.addColorStop(1, `rgba(170,0,0,${0.55 * beat})`);
+      ctx.fillStyle = g2;
+      ctx.fillRect(VX0, 0, W5 - VX0, H6);
+    }
+    function frameView(v) {
+      VX0 = v.x0;
+      W5 = v.x0 + 1280;
+      FLOOR0 = v.lane[0];
+      FLOOR1 = v.lane[1];
+    }
+    function drawUnder(c) {
+      ctx = c;
+      if (dark2) {
+        ctx.fillStyle = `rgba(0,0,0,${Math.min(0.7, dark2 * 0.9)})`;
+        ctx.fillRect(VX0, 0, 1280, H6);
+      }
+      drawFxUnder();
+      drawSheets(true);
+      for (const it of items) {
+        ctx.fillStyle = "#c94a4a";
+        ctx.fillRect(it.x - 6, it.y - 14, 12, 14);
+        ctx.fillStyle = "#eee";
+        ctx.fillRect(it.x - 4, it.y - 18, 8, 4);
+        drawVfxAt("item_sparkle", it.x + 6, it.y - 20, 2, P.t - it.t0);
+      }
+    }
+    function drawBody(c) {
+      ctx = c;
+      drawPlayer();
+    }
+    function drawFxLayer(c) {
+      const main = c;
+      for (const g2 of [fxN, fxL]) {
+        g2.setTransform(1, 0, 0, 1, 0, 0);
+        g2.clearRect(0, 0, fxNc.width, fxNc.height);
+        g2.setTransform(1 / FXS, 0, 0, 1 / FXS, -VX0 / FXS, 0);
+        g2.globalCompositeOperation = "source-over";
+      }
+      ctx = fxN;
+      drawFx(false);
+      ctx = fxL;
+      fxL.globalCompositeOperation = "lighter";
+      drawChargeAim();
+      drawHeat();
+      drawFx(true);
+      ctx = main;
+      ctx.drawImage(fxNc, VX0, 0, 1280, H6);
+      drawSheets();
+      ctx.globalCompositeOperation = "lighter";
+      ctx.drawImage(fxLc, VX0, 0, 1280, H6);
+      ctx.globalCompositeOperation = "source-over";
+    }
+    function drawScreen(c) {
+      ctx = c;
+      const v0 = VX0;
+      VX0 = 0;
+      drawDying();
+      VX0 = v0;
+      if (flash) {
+        ctx.fillStyle = `rgba(255,255,255,${Math.min(0.5, flash * 3)})`;
+        ctx.fillRect(0, 0, 1280, H6);
+      }
+      if (cut) {
+        const k = Math.min(1, (1.1 - cut) * 6), y = H6 / 2 - 80, Wd = 1280;
+        ctx.fillStyle = "rgba(10,10,12,.9)";
+        ctx.fillRect(0, y, Wd * k, 160);
+        ctx.fillStyle = "#cfc7a6";
+        ctx.fillRect(0, y, Wd * k, 4);
+        ctx.fillRect(0, y + 156, Wd * k, 4);
+        ctx.font = env.font(77);
+        ctx.fillText("증명해.", Wd - 560 * k, y + 100);
+        ctx.font = env.font(22);
+        ctx.fillStyle = "#aaa59a";
+        ctx.fillText("「규칙은 읽었어?」", Wd - 540 * k, y + 140);
+      }
+    }
+    return {
+      P,
+      A,
+      onPress,
+      onRelease,
+      takeHit,
+      update,
+      frameView,
+      drawUnder,
+      drawBody,
+      drawFxLayer,
+      drawScreen,
+      armored,
+      get hitstop() {
+        return hitstop;
+      },
+      get shake() {
+        return shake;
+      },
+      get zoom() {
+        return zoom;
+      },
+      tickMarks(dt) {
+        for (const [b, t] of marks) {
+          if (t - dt <= 0) marks.delete(b);
+          else marks.set(b, t - dt);
+        }
+      },
+      knock: knock2,
+      hit: hit2,
+      stun
+    };
+  }
+
+  // src/game/action/eileen/player.ts
+  var CHAR_K = 1.28;
+  var PRESS = [
+    ["light", "light"],
+    ["heavy", "heavy"],
+    ["dodge", "dodge"],
+    ["block", "block"],
+    ["shoot", "shoot"],
+    ["skill", "skill"],
+    ["charge", "charge"],
+    ["super", "super"],
+    ["jump", "jump"],
+    ["weapon", "weapon"],
+    ["combat", "combat"],
+    ["sit", "sit"],
+    ["crouch", "crouch"],
+    ["flee", "flee"],
+    ["back", "back"],
+    ["left", "left"],
+    ["right", "right"],
+    ["up", "up"],
+    ["down", "down"]
+  ];
+  var REACT = {
+    light: { react: "flinch", push: 2, lift: 0, strength: 1 },
+    heavy: { react: "stagger", push: 9, lift: 0, strength: 2 },
+    stun: { react: "stagger", push: 5, lift: 0, strength: 2 },
+    launch: { react: "launch", push: 3, lift: 24, strength: 3 },
+    blow: { react: "down", push: 26, lift: 12, strength: 3 },
+    spike: { react: "down", push: 4, lift: 0, strength: 3 }
+  };
+  var eileenHooks = { sfx: () => {
+  } };
+  var EileenPlayer = class extends Player {
+    core;
+    world = null;
+    heldNames = /* @__PURE__ */ new Set();
+    synced = { x: 0, y: 0 };
+    started = false;
+    lastTickAt = 0;
+    lastFrameAt = 0;
+    /** 방어 게이지 0..100 (사용자 2026-10-25: 방어를 무제한으로 못 하게). 막아낸 공격만큼만 깎이고, 안 맞으면 다시 찬다
+     * (막고만 있으면 줄지 않는다). 맞아서 바닥나면 가드가 깨져 잠깐 휘청이고, 40까지 차오를 때까지 다시 못 막는다 */
+    guard = 100;
+    guardBroken = false;
+    /** 마지막으로 게이지가 줄어든 뒤 지난 초 (화면 표시가 이걸 보고 사라진다) */
+    guardIdle = 99;
+    guardWait = 0;
+    underFn = (ctx, camX) => this.drawUnder(ctx, camX);
+    constructor(clips) {
+      super(clips);
+      this.label = "에일린";
+      Object.defineProperty(this, "stop", { get: () => 0, set: () => {
+      }, configurable: true });
+      const art4 = eileenArt();
+      this.core = createEileenCore({
+        A: art4.A,
+        IMG: art4.IMG,
+        VFX: art4.VFX,
+        held: this.heldNames,
+        K: (y) => spr(y) * CHAR_K,
+        sfx: (type, extra) => eileenHooks.sfx({ type, ...extra }),
+        font: (n) => pfont(n).f,
+        targets: () => this.targets(),
+        // 물건 윗면은 이미 그 높이에 있을 때만 땅이다 (아래에서 걸어 들어가면 올라서지 않고 막힌다)
+        ground: (x, y) => {
+          const p = this.platformAt(x, y);
+          return p && this.core.P.z >= p.h - 10 ? p.h : 0;
+        },
+        hurt: (t, dmg, kind, face, hitstop, o) => this.hurtTarget(t.body, dmg, kind, face, hitstop, o),
+        clamp: (P) => {
+          const w = this.world;
+          if (!w) return;
+          P.y = Math.max(w.lane[0], Math.min(w.lane[1], P.y));
+          P.x = Math.max(w.bounds[0] + 30, Math.min(w.bounds[1] - 30, P.x));
+        }
+      });
+    }
+    /** 발 자리 아래 올라설 물건 (데스크 등) */
+    platformAt(x, y) {
+      const ps = this.world?.floor?.platforms;
+      let best = null;
+      for (const p of ps ?? []) if (x >= p.x0 && x <= p.x1 && y >= p.y0 - 4 && y <= p.y1 + 4 && (!best || p.h > best.h)) best = p;
+      return best;
+    }
+    /** 그리는 순서용 깊이: 물건 위에 서 있으면 그 물건 앞 모서리보다 앞으로 */
+    get sortY() {
+      const p = this.z > 4 ? this.platformAt(this.x, this.y) : null;
+      return p && this.z >= p.h - 8 ? p.y1 + 2 : this.y;
+    }
+    targets() {
+      return this.foes().map((b) => ({ body: b, x: b.x, y: b.y, z: b.z })).concat(this.extraFoes());
+    }
+    /** 때릴 상대 (주인공: 적 편 몸 전부. AI 대련 상대(src/game/combat)는 주인공 쪽으로 바꾼다) */
+    foes() {
+      const w = this.world;
+      if (!w) return [];
+      return w.bodies.filter((b) => b.alive && b.team === "enemy" && b.hp > 0 && b.kind !== "bullet");
+    }
+    /** 전투 몸이 아닌 필드 행위자 (주인공만) */
+    extraFoes() {
+      return eileenHooks.extraTargets?.() ?? [];
+    }
+    /** AI 쪽에서 쓰는 지금 월드 */
+    get worldNow() {
+      return this.world;
+    }
+    hurtTarget(t, dmg, kind, face, hitstop, o) {
+      const w = this.world;
+      if (!w || !t.alive) return;
+      const r = REACT[kind] ?? REACT.light;
+      const hit2 = { x0: t.x - 1, x1: t.x + 1, z0: 0, z1: 400, y: t.y, dy: 999, attackId: newAttackId(), dmg: dmg * this.dmgMul, react: r.react, dir: face, push: o.push ?? r.push, lift: r.lift, stop: 0, strength: r.strength };
+      const res = t.applyHit(hit2, w);
+      if (res.kind === "immune") return;
+      t.stop = Math.max(t.stop, Math.round(Math.max(hitstop, kind === "light" ? 0.085 : 0.16) * 30));
+      this.combo = this.comboClock > 0 ? this.combo + 1 : 1;
+      this.comboClock = 40;
+      this.maxCombo = Math.max(this.maxCombo, this.combo);
+      if (res.killed) {
+        w.kills++;
+        if (t.team === "enemy" && !(t instanceof Fighter)) w.emit({ type: "enemyDie", x: t.x, kind: t.kind });
+      }
+    }
+    /* ───────── 엔진 쪽 ───────── */
+    frame() {
+      const k = spr(this.y) * CHAR_K;
+      return { hit: [], hurt: this.alive ? [{ x0: this.x - 26 * k, x1: this.x + 26 * k, z0: this.z, z1: this.z + 210 * k, y: this.y, dy: 16 }] : [] };
+    }
+    applyHit(hit2, world) {
+      const P = this.core.P;
+      if (P.inv > 0 || this.invuln > 0) {
+        this.core.takeHit("hit");
+        return { kind: "immune" };
+      }
+      if (P.mode === "down" || P.mode === "belly" || this.phase === "down") return { kind: "immune" };
+      const front = hit2.dir === -P.face;
+      if (P.mode === "block" && front) {
+        this.spendGuard(14 + hit2.dmg * 0.6);
+        if (this.guardBroken) {
+          this.core.onRelease("block");
+          this.core.stun();
+          P.stunT = 1.1;
+          world.emit({ type: "guard", x: this.x });
+          return { kind: "hit" };
+        }
+        this.core.takeHit("hit");
+        this.hp = Math.max(1, this.hp - Math.round(hit2.dmg * 0.1));
+        world.emit({ type: "guard", x: this.x });
+        return { kind: "guard" };
+      }
+      if (this.ward > 0 && hit2.dmg > 0) {
+        this.ward--;
+        this.invuln = 20;
+        world.say("부적이 대신 맞았다", 1);
+        return { kind: "immune" };
+      }
+      const armored = this.core.armored();
+      this.hp = Math.max(0, this.hp - (armored ? Math.round(hit2.dmg * 0.5) : hit2.dmg));
+      world.emit({ type: "hurt", x: this.x, dmg: hit2.dmg, hp: this.hp });
+      if (!this.lowWarned && this.hp < this.hpMax * 0.3) {
+        this.lowWarned = true;
+        world.emit({ type: "hp:low" });
+      }
+      if (this.hp <= 0) {
+        this.core.knock();
+        this.phase = "down";
+        return { kind: "hit", killed: true };
+      }
+      if (armored) {
+        this.core.takeHit("hit");
+        return { kind: "armor" };
+      }
+      P.face = Math.sign(hit2.dir) === 1 ? -1 : 1;
+      this.core.takeHit(hit2.react === "down" || hit2.react === "launch" ? "knock" : "hit");
+      return { kind: "hit" };
+    }
+    listen(p) {
+      this.input(p);
+    }
+    input(p) {
+      const names = this.heldNames;
+      names.clear();
+      for (const [b, n] of PRESS) if (p.held.has(b)) names.add(n);
+      if (p.run) names.add("run");
+      if (this.guardBroken || this.guard < 8) names.delete("block");
+      const lying = ["down", "belly", "sit", "scoot", "crouch", "crawl4"].includes(this.core.P.mode);
+      for (const [b, n] of PRESS) if (p.pressed.has(b) && (lying || !["left", "right", "up", "down"].includes(n)) && (n !== "block" || names.has("block"))) this.core.onPress(n);
+      if (p.evade) this.core.onPress("dodge");
+      for (const b of ["block", "charge"]) if (p.released.has(b)) this.core.onRelease(b);
+    }
+    tick(world, p) {
+      this.world = world;
+      const w = world;
+      if (!w.underlays.includes(this.underFn)) w.underlays.push(this.underFn);
+      if (this.seat) return super.tick(world, p);
+      const P = this.core.P;
+      if (!this.started) {
+        this.started = true;
+        P.x = this.x;
+        P.y = this.y;
+      } else {
+        P.x += this.x - this.synced.x;
+        P.y += this.y - this.synced.y;
+      }
+      P.hp = Math.round(this.hp / this.hpMax * 100);
+      this.lastTickAt = performance.now();
+      this.wantInteract = p.pressed.has("interact");
+      this.wantItem = p.pressed.has("item1") ? 1 : p.pressed.has("item2") ? 2 : p.pressed.has("item3") ? 3 : p.pressed.has("item4") ? 4 : 0;
+      if (this.comboClock > 0 && --this.comboClock === 0) this.combo = 0;
+      if (this.phase !== "down") this.input(p);
+      this.core.frameView({ x0: w.camX, lane: w.lane });
+      this.sync();
+    }
+    /** 그림 장마다 (render.ts): 테스트룸처럼 실제 시간으로 움직이고 동작을 넘긴다.
+     * 엔진 틱(30Hz)에서 1/30초씩 돌리면 0.04초짜리 장이 0.067초로 늘고 움직임이 30장으로 끊긴다 (사용자: 테스트룸보다 프레임이 떨어져 보임) */
+    frameStep() {
+      const now = performance.now();
+      const dt = Math.min(0.05, (now - (this.lastFrameAt || now)) / 1e3);
+      this.lastFrameAt = now;
+      if (!this.world || this.seat || now - this.lastTickAt > 120 || dt <= 0) return;
+      const w = this.world;
+      const P = this.core.P;
+      P.x += this.x - this.synced.x;
+      P.y += this.y - this.synced.y;
+      this.core.frameView({ x0: w.camX, lane: w.lane });
+      this.core.update(dt);
+      this.core.tickMarks(dt);
+      this.guardStep(dt);
+      this.calmStep(dt);
+      const s2 = this.core.shake;
+      if (s2 > 6) w.shake(2, Math.min(4, s2 / 6));
+      this.sync();
+    }
+    /** 전투 자세(무기 꺼냄 포함)로 있다가 가까이(700px) 적이 없고 공격·방어 키를 안 누른 채 5초가 지나면
+     * 평상 대기로 돌아온다: 무기부터 넣고, 1.5초 뒤 자세를 푼다 (사용자 2026-10-25). 걷기는 상관없다 */
+    calmT = 0;
+    calmHold = false;
+    calmStep(dt) {
+      const P = this.core.P;
+      const acting = [...this.heldNames].some((n) => !["left", "right", "up", "down", "run"].includes(n));
+      const near2 = this.targets().some((t) => Math.abs(t.x - this.x) < 700);
+      if (acting || near2 || !(P.combat || P.armed)) {
+        this.calmT = 0;
+        this.calmHold = false;
+        return;
+      }
+      if (P.mode !== "ground") {
+        if (!this.calmHold) this.calmT = 0;
+        return;
+      }
+      this.calmT += dt;
+      if (this.calmT < 5) return;
+      if (P.armed) {
+        this.core.onPress("weapon");
+        this.calmT = 3.5;
+        this.calmHold = true;
+        return;
+      }
+      this.calmT = 0;
+      this.calmHold = false;
+      this.core.onPress("combat");
+    }
+    spendGuard(n) {
+      this.guard = Math.max(0, this.guard - n);
+      this.guardWait = 0.8;
+      this.guardIdle = 0;
+      if (this.guard <= 0) this.guardBroken = true;
+    }
+    /** 마지막으로 막아낸 뒤 0.8초가 지나면 초당 35씩 찬다 (막는 중이어도) */
+    guardStep(dt) {
+      this.guardIdle += dt;
+      if (this.guardWait > 0) {
+        this.guardWait -= dt;
+        return;
+      }
+      this.guard = Math.min(100, this.guard + 35 * dt);
+      if (this.guardBroken && this.guard >= 40) this.guardBroken = false;
+    }
+    sync() {
+      const P = this.core.P;
+      this.x = P.x;
+      this.y = P.y;
+      this.z = P.z;
+      this.px = this.x;
+      this.py = this.y;
+      this.pz = this.z;
+      this.synced.x = this.x;
+      this.synced.y = this.y;
+      this.dir = P.face > 0 ? 1 : -1;
+      this.gauge = P.sp;
+      this.running = this.core.P.mode === "ground" && this.heldNames.has("run");
+    }
+    /* ───────── 그리기 (render.ts가 부른다) ───────── */
+    drawUnder(ctx, camX) {
+      this.core.frameView({ x0: camX, lane: this.world?.lane ?? [440, 669] });
+      ctx.save();
+      ctx.translate(-camX, 0);
+      this.core.drawUnder(ctx);
+      ctx.restore();
+    }
+    /** 몸 (x,y = 화면 좌표 발 자리: 보간된 값이라 테스트룸 P 대신 이것을 쓴다) */
+    drawSelf(ctx, camX) {
+      ctx.save();
+      ctx.translate(-camX, 0);
+      ctx.imageSmoothingEnabled = false;
+      this.core.drawBody(ctx);
+      ctx.restore();
+    }
+    drawFxLayer(ctx, camX) {
+      this.core.frameView({ x0: camX, lane: this.world?.lane ?? [440, 669] });
+      ctx.save();
+      ctx.translate(-camX, 0);
+      ctx.imageSmoothingEnabled = false;
+      this.core.drawFxLayer(ctx);
+      ctx.restore();
+    }
+    drawScreen(ctx) {
+      this.core.drawScreen(ctx);
+    }
+  };
 
   // src/game/action/engine/input.ts
   var KEYMAP = {
@@ -415,6 +4338,10 @@
     Escape: "pause",
     KeyH: "hitbox"
   };
+  function useEileenKeys() {
+    for (const k of ["KeyQ", "KeyW", "KeyG", "KeyR", "KeyF", "KeyC", "KeyZ", "KeyX", "KeyV", "KeyA", "KeyS", "KeyD", "Tab", "KeyR"]) delete KEYMAP[k];
+    Object.assign(KEYMAP, { KeyQ: "light", KeyW: "heavy", KeyC: "block", KeyA: "shoot", KeyS: "charge", KeyD: "skill", KeyF: "super", Tab: "weapon", KeyR: "combat", KeyZ: "sit", KeyX: "crouch", KeyV: "flee", KeyB: "back", KeyM: "map", KeyO: "auto" });
+  }
   var SHIFT_TAP = 5;
   var DOUBLE_TAP = 8;
   var Input = class {
@@ -504,6 +4431,409 @@
       return { held, pressed, released, mx, my, evade: evade2, run, downDouble };
     }
   };
+
+  // src/game/action/ui/keys.ts
+  var CODE = {
+    left: "ArrowLeft",
+    right: "ArrowRight",
+    up: "ArrowUp",
+    down: "ArrowDown",
+    attack: "KeyA",
+    shoot: "KeyS",
+    unique: "KeyD",
+    guard: "KeyQ",
+    ult: "KeyW",
+    interact: "KeyE",
+    jump: "Space",
+    evade: "ShiftLeft",
+    item1: "Digit1",
+    item2: "Digit2",
+    item3: "Digit3",
+    item4: "Digit4",
+    support: "KeyC",
+    map: "KeyZ",
+    auto: "KeyX",
+    menu: "Escape",
+    reload: "KeyR",
+    hitbox: "KeyH"
+  };
+  var ALIAS = { ShiftRight: "ShiftLeft", Tab: "KeyZ", Numpad1: "Digit1", Numpad2: "Digit2", Numpad3: "Digit3", Numpad4: "Digit4" };
+  var KEY_OF = {
+    ArrowLeft: "ArrowLeft",
+    ArrowRight: "ArrowRight",
+    ArrowUp: "ArrowUp",
+    ArrowDown: "ArrowDown",
+    KeyA: "a",
+    KeyS: "s",
+    KeyD: "d",
+    KeyQ: "q",
+    KeyW: "w",
+    KeyE: "e",
+    KeyC: "c",
+    KeyZ: "z",
+    KeyX: "x",
+    KeyR: "r",
+    KeyH: "h",
+    Space: " ",
+    ShiftLeft: "Shift",
+    Digit1: "1",
+    Digit2: "2",
+    Digit3: "3",
+    Digit4: "4",
+    Escape: "Escape",
+    Tab: "Tab",
+    Enter: "Enter"
+  };
+  var LABEL = {
+    left: "왼쪽",
+    right: "오른쪽",
+    up: "위(안쪽)",
+    down: "아래(앞쪽)·두 번 앉기",
+    attack: "근접 (연타 3타)",
+    shoot: "원거리",
+    unique: "고유기 (짧게·길게)",
+    guard: "가드 (누른 채)",
+    ult: "필살기 (게이지 가득)",
+    interact: "상호작용·줍기",
+    jump: "점프",
+    evade: "짧게 회피 · 누른 채 달리기",
+    item1: "아이템 1",
+    item2: "아이템 2",
+    item3: "아이템 3",
+    item4: "아이템 4",
+    support: "지원 요원 호출",
+    map: "지도",
+    auto: "자동 전환",
+    menu: "메뉴",
+    reload: "재장전",
+    hitbox: "판정 보기"
+  };
+  var KEY_NAME = {
+    left: "←",
+    right: "→",
+    up: "↑",
+    down: "↓",
+    attack: "A",
+    shoot: "S",
+    unique: "D",
+    guard: "Q",
+    ult: "W",
+    interact: "E",
+    jump: "Space",
+    evade: "Shift",
+    item1: "1",
+    item2: "2",
+    item3: "3",
+    item4: "4",
+    support: "C",
+    map: "Z",
+    auto: "X",
+    menu: "Esc",
+    reload: "R",
+    hitbox: "H"
+  };
+  var PAD_BUTTON = {
+    0: "Space",
+    // A 점프
+    1: "KeyE",
+    // B 상호작용
+    2: "KeyA",
+    // X 근접
+    3: "KeyS",
+    // Y 원거리
+    4: "KeyQ",
+    // LB 가드
+    5: "ShiftLeft",
+    // RB 회피·달리기
+    6: "KeyD",
+    // LT 고유기
+    7: "KeyW",
+    // RT 필살기
+    8: "KeyZ",
+    // Back 지도
+    9: "Escape",
+    // Start 메뉴
+    10: "KeyC",
+    // L3 지원
+    11: "KeyR",
+    // R3 재장전 (자동 전환·판정 보기는 메뉴에)
+    12: "Digit1",
+    // 십자 위 아이템 1
+    15: "Digit2",
+    // 십자 오른쪽 아이템 2
+    13: "Digit3",
+    // 십자 아래 아이템 3
+    14: "Digit4"
+    // 십자 왼쪽 아이템 4
+  };
+  var PAD_NAME = {
+    Space: "A",
+    KeyE: "B",
+    KeyA: "X",
+    KeyS: "Y",
+    KeyQ: "LB",
+    ShiftLeft: "RB",
+    KeyD: "LT",
+    KeyW: "RT",
+    KeyZ: "Back",
+    Escape: "Start",
+    KeyC: "L3",
+    KeyR: "R3",
+    KeyX: "메뉴",
+    KeyH: "메뉴",
+    Digit1: "십자↑",
+    Digit2: "십자→",
+    Digit3: "십자↓",
+    Digit4: "십자←",
+    ArrowLeft: "왼쪽 스틱",
+    ArrowRight: "왼쪽 스틱",
+    ArrowUp: "왼쪽 스틱",
+    ArrowDown: "왼쪽 스틱"
+  };
+  var ACTS = Object.keys(CODE);
+  var ACT_OF_CODE = Object.fromEntries(ACTS.map((a) => [CODE[a], a]));
+  function useEileenControls() {
+    Object.assign(CODE, { attack: "KeyQ", reload: "KeyW", support: "Tab", guard: "KeyC", shoot: "KeyA", unique: "KeyD", hitbox: "KeyS", ult: "KeyF", map: "KeyM", auto: "KeyO" });
+    Object.assign(KEY_NAME, { attack: "Q", reload: "W", support: "Tab", guard: "C", shoot: "A", unique: "D", hitbox: "S", ult: "F", map: "M", auto: "O" });
+    Object.assign(LABEL, {
+      attack: "약 공격 (연타 3타) · 뛰며 = 슬라이딩 · 공중 = 점프 공격",
+      reload: "강 공격 (콤보 마무리)",
+      support: "무기 꺼내기·넣기",
+      guard: "방어 (누른 채 · 방어 게이지가 닳는다)",
+      shoot: "원거리 (누른 채 연사 · 과열 주의)",
+      unique: "기술 제압사격",
+      hitbox: "충전 (누른 채 → 떼면 광선)",
+      ult: "필살기 「증명해.」",
+      evade: "짧게 회피 · 누른 채 달리기"
+    });
+    delete ALIAS.Tab;
+    Object.assign(KEY_OF, { KeyF: "f", KeyM: "m", KeyO: "o" });
+    Object.assign(PAD_BUTTON, { 2: "KeyQ", 3: "KeyA", 4: "KeyC", 6: "KeyS", 7: "KeyF", 8: "KeyM", 10: "Tab", 11: "KeyW" });
+    Object.assign(PAD_NAME, { KeyQ: "X", KeyA: "Y", KeyC: "LB", KeyS: "LT", KeyF: "RT", KeyM: "Back", Tab: "L3", KeyW: "R3", KeyD: "메뉴" });
+    for (const a of ACTS) ACT_OF_CODE[CODE[a]] = a;
+    for (const k of Object.keys(ACT_OF_CODE)) if (CODE[ACT_OF_CODE[k]] !== k) delete ACT_OF_CODE[k];
+  }
+
+  // src/game/action/art/hqTextures.ts
+  var assets = [["hq_office", "hq_office_wall_1", "hq_office__hq_office_wall_1.png"], ["hq_office", "hq_office_wall_2", "hq_office__hq_office_wall_2.png"], ["hq_office", "hq_office_wall_4", "hq_office__hq_office_wall_4.png"], ["hq_office", "hq_office_wall_6", "hq_office__hq_office_wall_6.png"], ["hq_office", "hq_office_floor", "hq_office__hq_office_floor.png"], ["hq_office", "objects/hq_office_objects_1", "hq_office__objects_hq_office_objects_1.png"], ["hq_office", "objects/hq_office_objects_3", "hq_office__objects_hq_office_objects_3.png"], ["hq_office", "objects/hq_office_objects_4", "hq_office__objects_hq_office_objects_4.png"], ["hq_corridor", "hq_corridor_wall_2", "hq_corridor__hq_corridor_wall_2.png"], ["hq_corridor", "hq_corridor_floor", "hq_corridor__hq_corridor_floor.png"], ["hq_jaemtri", "objects/hq_jaemtri_objects_1", "hq_jaemtri__objects_hq_jaemtri_objects_1.png"], ["hq_chief", "objects/hq_chief_objects_1", "hq_chief__objects_hq_chief_objects_1.png"]];
+  function prepareHqTextures(urlOf) {
+    let alive = true;
+    const inserted = [];
+    if (urlOf) void Promise.all(assets.map(async ([place3, name, file]) => {
+      if (window.__GOEI_BG_ART__?.[place3]?.[name]) return;
+      try {
+        const src = await urlOf(file);
+        const im = new Image();
+        im.src = src;
+        await im.decode();
+        if (!alive) return;
+        const pack2 = window.__GOEI_BG_ART__ ??= {};
+        const group = pack2[place3] ??= {};
+        if (!group[name]) {
+          group[name] = src;
+          inserted.push([place3, name, src]);
+        }
+      } catch {
+      }
+    }));
+    return () => {
+      alive = false;
+      for (const [place3, name, src] of inserted) {
+        if (window.__GOEI_BG_ART__?.[place3]?.[name] === src) delete window.__GOEI_BG_ART__[place3][name];
+      }
+    };
+  }
+
+  // src/game/action/art/hqDoorRound2.ts
+  var keys = ["frame", "aperture", "leaf-left", "leaf-right", "entry-marker"];
+  var images2 = null;
+  var revision3 = 0;
+  function prepareHqDoorRound2(urlOf) {
+    const own = ++revision3;
+    images2 = null;
+    void Promise.all(keys.map(async (key2) => {
+      const src = window.__GOEI_HQ_DOOR_ROUND2__?.[key2] || (urlOf ? await urlOf(key2 + ".png") : "");
+      if (!src) throw new Error("Optional door art unavailable");
+      const im = new Image();
+      im.src = src;
+      await im.decode();
+      const dims = key2 === "entry-marker" ? [48, 16] : key2.startsWith("leaf-") ? [40, 125] : [96, 144];
+      if (im.naturalWidth !== dims[0] || im.naturalHeight !== dims[1]) throw new Error("Door art size mismatch");
+      return [key2, im];
+    })).then((rows) => {
+      if (revision3 === own) images2 = Object.fromEntries(rows);
+    }).catch(() => {
+    });
+    return () => {
+      if (revision3 === own) {
+        revision3++;
+        images2 = null;
+      }
+    };
+  }
+  function drawHqDoorRound2(c, x, open, unlocked) {
+    if (!images2) return false;
+    const a = images2, ox = x - 96, oy = 168;
+    const off2 = Math.round(40 * Math.max(0, Math.min(1, Number.isFinite(open) ? open : 0))) * 2;
+    c.save();
+    c.imageSmoothingEnabled = false;
+    c.drawImage(a.aperture, ox, oy, 192, 288);
+    c.save();
+    c.beginPath();
+    c.rect(x - 80, 190, 160, 250);
+    c.clip();
+    c.drawImage(a["leaf-left"], x - 80 - off2, 190, 80, 250);
+    c.drawImage(a["leaf-right"], x + off2, 190, 80, 250);
+    if (!unlocked) {
+      c.fillStyle = "rgba(0,0,0,0.35)";
+      c.fillRect(x - 80, 190, 160, 250);
+    }
+    c.restore();
+    c.drawImage(a.frame, ox, oy, 192, 288);
+    if (unlocked) c.drawImage(a["entry-marker"], x - 48, 448, 96, 32);
+    c.restore();
+    return true;
+  }
+
+  // src/game/action/art/visitAgents.ts
+  var sheet = null;
+  var revision4 = 0;
+  function prepareVisitAgents(urlOf, bytesOf) {
+    const own = ++revision4;
+    sheet = null;
+    const ready = (async () => {
+      const inline = window.__GOEI_VISIT_AGENTS__;
+      let src = inline?.atlas ?? "";
+      let agents = inline?.frames;
+      if (!inline && urlOf && bytesOf) {
+        const b = await bytesOf("frames.json");
+        agents = b ? JSON.parse(new TextDecoder().decode(b)).agents : void 0;
+        src = await urlOf("atlas.png");
+      }
+      if (!src || !agents) return;
+      const im = new Image();
+      im.src = src;
+      await im.decode();
+      if (revision4 === own) sheet = { atlas: im, agents };
+    })().catch(() => {
+    });
+    return { ready, dispose: () => {
+      if (revision4 === own) {
+        revision4++;
+        sheet = null;
+      }
+    } };
+  }
+  var hasVisitAgent = (name) => !!sheet?.agents[name];
+  var hasVisitClip = (name, clip) => {
+    const a = sheet?.agents[name];
+    return !!a && (clip === "idle" ? a.frames.length > 0 : !!a.clips?.[clip]?.frames.length);
+  };
+  function drawVisitAgent(c, name, x, y, dir, now, clip = "idle", since = 0) {
+    const a = sheet?.agents[name];
+    if (!sheet || !a?.frames.length) return false;
+    const cl = clip !== "idle" && a.clips?.[clip]?.frames.length ? a.clips[clip] : a;
+    const n = Math.floor((now - (cl === a ? 0 : since)) / cl.ms);
+    const f = cl.frames[cl.loop === false ? Math.min(n, cl.frames.length - 1) : (n % cl.frames.length + cl.frames.length) % cl.frames.length];
+    c.save();
+    c.imageSmoothingEnabled = false;
+    c.fillStyle = "rgba(0,0,0,.28)";
+    c.beginPath();
+    const P = PIXEL * spr(y), k = P / PIXEL;
+    c.ellipse(x, y, 34 * k, 8 * k, 0, 0, Math.PI * 2);
+    c.fill();
+    snapTo(c, x, y);
+    if (dir < 0) c.scale(-1, 1);
+    c.drawImage(sheet.atlas, f.sx, f.sy, f.w, f.h, f.ox * P, f.oy * P, f.w * P, f.h * P);
+    c.restore();
+    return true;
+  }
+  function visitAgentTop(name) {
+    const a = sheet?.agents[name];
+    if (!a?.frames.length) return -260;
+    if (typeof a.head === "number") return -a.head * PIXEL;
+    return Math.min(...a.frames.map((f) => f.oy)) * PIXEL;
+  }
+  var faces2 = /* @__PURE__ */ new Map();
+  var faceCanvas = /* @__PURE__ */ new Map();
+  function visitAgentFaceCanvas(name, side = 34) {
+    visitAgentFace(name, side);
+    return faceCanvas.get(`${name}|${side}`) ?? null;
+  }
+  function visitAgentFace(name, side = 34) {
+    const a = sheet?.agents[name];
+    if (!sheet || !a?.frames.length) return "";
+    const key2 = `${name}|${side}`;
+    const hit2 = faces2.get(key2);
+    if (hit2 !== void 0) return hit2;
+    const f = a.frames[0];
+    const src = document.createElement("canvas");
+    src.width = f.w;
+    src.height = f.h;
+    const g2 = src.getContext("2d");
+    g2.drawImage(sheet.atlas, f.sx, f.sy, f.w, f.h, 0, 0, f.w, f.h);
+    let url = "";
+    try {
+      const d3 = g2.getImageData(0, 0, f.w, Math.min(14, f.h)).data;
+      let sx = 0, n = 0, top = -1;
+      for (let i = 3; i < d3.length; i += 4) if (d3[i] > 40) {
+        const p = (i - 3) / 4;
+        sx += p % f.w;
+        n++;
+        if (top < 0) top = Math.floor(p / f.w);
+      }
+      const cx = n ? sx / n : f.w / 2;
+      const out = document.createElement("canvas");
+      out.width = out.height = side;
+      const o = out.getContext("2d");
+      o.imageSmoothingEnabled = false;
+      o.drawImage(src, Math.round(side / 2 - cx), 2 - Math.max(0, top));
+      url = out.toDataURL();
+      faceCanvas.set(key2, out);
+    } catch {
+    }
+    faces2.set(key2, url);
+    return url;
+  }
+
+  // src/game/action/engine/art.ts
+  var EMPTY_ART = { atlas: null, cutin: null, clips: {} };
+  function img(src) {
+    if (!src) return Promise.resolve(null);
+    return new Promise((res) => {
+      const i = new Image();
+      i.onload = () => res(i);
+      i.onerror = () => res(null);
+      i.src = src;
+    });
+  }
+  async function loadArt(urlOf, bytesOf) {
+    const inline = typeof window !== "undefined" ? window.__GOEI_ENGINE_ART__ : void 0;
+    if (inline) {
+      const [atlas, cutin] = await Promise.all([img(inline.atlas), img(inline.cutin)]);
+      return { atlas, cutin, clips: inline.frames.clips };
+    }
+    if (urlOf) {
+      try {
+        const [a, c] = await Promise.all([urlOf("atlas.png").catch(() => ""), urlOf("cutin.png").catch(() => "")]);
+        let frames = null;
+        if (bytesOf) {
+          const b = await bytesOf("frames.json");
+          frames = b ? JSON.parse(new TextDecoder().decode(b)) : null;
+        } else {
+          const f = await urlOf("frames.json");
+          frames = f ? await (await fetch(f)).json() : null;
+        }
+        const [atlas, cutin] = await Promise.all([img(a), img(c)]);
+        if (frames) return { atlas, cutin, clips: frames.clips };
+      } catch {
+      }
+    }
+    return EMPTY_ART;
+  }
+
+  // src/game/action/charSize.ts
+  var charSize = { k: 1 };
 
   // src/game/action/hq/data.ts
   var PLACES = [
@@ -777,10 +5107,10 @@
     s2.danger = Math.max(0, Math.min(s2.maxDanger, lv));
   }
   var TOOTH_COST = 3;
-  function openToothBox(s2, rand3) {
+  function openToothBox(s2, rand2) {
     if (s2.currencies.teeth < TOOTH_COST) return `이빨이 모자라요 (${TOOTH_COST}개 필요).`;
     s2.currencies.teeth -= TOOTH_COST;
-    const r = rand3();
+    const r = rand2();
     if (r < 0.12 && s2.lostRelics.length) {
       const back = s2.lostRelics.shift();
       s2.relicsOwned.push(back);
@@ -788,11 +5118,11 @@
     }
     if (r < 0.3) {
       const pool = supply.filter((d4) => supplyOpen(s2, d4));
-      const d3 = pool[Math.floor(rand3() * pool.length)];
+      const d3 = pool[Math.floor(rand2() * pool.length)];
       s2.stash[d3.id] = (s2.stash[d3.id] ?? 0) + 1;
       return `선물 상자: ${d3.name} 1개`;
     }
-    const junk = DECOR[Math.floor(rand3() * DECOR.length)];
+    const junk = DECOR[Math.floor(rand2() * DECOR.length)];
     if (!s2.decor.includes(junk)) s2.decor.push(junk);
     return `선물 상자: ${junk} (사무실에 놓았다)`;
   }
@@ -893,7 +5223,7 @@
   }
   var CASH_RATE = { return: 0.5, withdraw: 0.5, evac: 0 };
   var MASTERY_GAIN = (r) => 20 + r.floors * 10 + (r.missionDone ? 30 : 0) + Math.min(30, r.kills);
-  function settle(s2, l, raw, rand3) {
+  function settle(s2, l, raw, rand2) {
     const id = l.runId;
     if (!id || raw.runId !== void 0 && raw.runId !== id) return ["출동 id가 다른 결과라 정산하지 않았어요."];
     if (s2.last?.runId === id) return s2.last.lines;
@@ -979,12 +5309,12 @@
         if (ar.injured > 0) ar.injured--;
       }
     }
-    if (evac && rand3() < 0.15 + 0.05 * l.danger) {
+    if (evac && rand2() < 0.15 + 0.05 * l.danger) {
       rec.injured = 1;
       lines3.push(`${agent.name} 부상: 다음 출동 1회 쉬어야 한다 (의무실에서 예산 ${TREAT_COST}로 바로 치료 가능)`);
     }
-    if (evac && l.danger >= 2 && l.relics.length && rand3() < 0.1) {
-      const taken = l.relics[Math.floor(rand3() * l.relics.length)];
+    if (evac && l.danger >= 2 && l.relics.length && rand2() < 0.1) {
+      const taken = l.relics[Math.floor(rand2() * l.relics.length)];
       s2.relicsOwned = s2.relicsOwned.filter((x) => x !== taken);
       s2.relics = s2.relics.map((x) => x === taken ? null : x);
       s2.lostRelics.push(taken);
@@ -1179,6 +5509,22 @@
       ],
       use: [{ id: "bed", x: 3.4, y: 3.2, verb: "쉬기", place: "clinic", act: ["bedlie", "liehold"] }]
     },
+    // 교육장 (B1): 앞벽 화면, 줄지은 책상 (사용자 배치 2026-10-25)
+    edu: {
+      w: 12,
+      d: 5,
+      fix: [{ x: 3, w: 6, k: "screen" }],
+      items: [
+        { t: "desk", x: 1, y: 0.6, w: 0.8, h: 0.6, H: 110, k: "lectern" },
+        ...[3, 5.4, 7.8].flatMap((x) => [
+          { t: "desk", x, y: 2, w: 1.6, h: 0.6 },
+          { t: "chair", x: x + 0.8, y: 2.9, f: "N" },
+          { t: "desk", x, y: 3.6, w: 1.6, h: 0.6 },
+          { t: "chair", x: x + 0.8, y: 4.5, f: "N" }
+        ])
+      ],
+      use: [{ id: "lectern", x: 1.4, y: 1.6, verb: "교단", face: 1, act: ["handswork"] }]
+    },
     training: {
       w: 44,
       d: 6,
@@ -1228,6 +5574,17 @@
       use: [{ id: "slot", x: 3.4, y: 2.6, verb: "이빨", place: "tooth", face: 1 }]
     }
   };
+  ROOMS.medlab = (() => {
+    const a = ROOMS.clinic, b = ROOMS.lab, dx = a.w;
+    const sh = (o) => ({ ...o, x: o.x + dx });
+    return {
+      w: a.w + b.w,
+      d: 5,
+      fix: [...a.fix, ...b.fix.map(sh)],
+      items: [...a.items, ...b.items.map(sh)],
+      use: [...a.use, ...b.use.filter((u) => u.place !== "supply").map(sh)]
+    };
+  })();
   function mirror(r) {
     const flip = (f) => f === "E" ? "W" : f === "W" ? "E" : f;
     return {
@@ -1263,23 +5620,29 @@
   var M = (m) => Math.round(m * PX_M);
   var room = (b, key2, west = false) => ({ ...b, ...fromRoom(west ? mirror(ROOMS[key2]) : ROOMS[key2]), things: [] });
   var exitS = (to, toDoor, key2, west = false) => ({ id: "out", x: M(west ? ROOMS[key2].w - 1 : 1), kind: "exit", side: "S", to, toDoor });
-  function core(cx, up, down2) {
-    const doors = [{ id: "elev", x: M(cx), kind: "elevator" }];
-    if (down2) doors.push({ id: "down", x: M(cx - 1.6), kind: "stairs_down", to: down2[0], toDoor: down2[1] });
-    if (up) doors.push({ id: "up", x: M(cx + 1.6), kind: "stairs_up", to: up[0], toDoor: up[1] });
-    return { doors, sign: { x: M(cx + 3), w: M(1.2), kind: "directory" } };
+  function floorHall(id, name, floor, doors, extra = {}) {
+    const p = PAINTED[id];
+    return {
+      id,
+      name,
+      floor,
+      look: id.startsWith("jr_") ? "jr" : p.under ? "labhall" : id === "lobby" ? "lobby" : "hall",
+      painted: id,
+      length: p.w,
+      lane: p.lane ?? PAINTED_LANE,
+      doors: doors.map((d3) => ({ ...d3, x: doorX(id, d3.id) })),
+      spots: [],
+      fixtures: [],
+      things: [],
+      // 막는 상자는 그림을 그리지 않는다 (오브젝트 그림은 첫 상자 자리에서 한 번만, 깊이 순서는 sortY)
+      boxes: [
+        ...p.objects.flatMap((o) => (o.solid ?? []).map((b, i) => ({ kind: i ? `${o.id}:${i}` : o.id, x: (b.x0 + b.x1) / 2, w: b.x1 - b.x0, y: i ? b.y1 : o.sortY, d: b.y1 - b.y0, h: b.h ?? o.sortY - o.y, solid: true }))),
+        // 그림 속 화분·벤치: 바닥 상자만 (그림은 배경에 이미 있다)
+        ...(p.blocks ?? []).map(([x0, x1, y1, h]) => ({ kind: "block", x: (x0 + x1) / 2, w: x1 - x0, y: y1, d: y1 - (p.lane ?? PAINTED_LANE)[0], h: h ?? 999, solid: true }))
+      ],
+      ...extra
+    };
   }
-  var hall = (b, wm, c, doors, extra = {}) => ({
-    ...b,
-    length: Math.max(1280, M(wm)),
-    doors: [...c.doors, ...doors],
-    spots: [],
-    boxes: [],
-    fixtures: [c.sign],
-    things: [],
-    ...extra
-  });
-  var gate = (xm) => [0.5, 1.7, 2.9].map((ym) => ({ kind: "gate", x: M(xm), w: 40, y: LANE_TOP + (ym + 0.6) / 4 * (LANE_BOT - LANE_TOP), d: 0.6 / 4 * (LANE_BOT - LANE_TOP), h: 150, solid: true }));
   var HQ_SCENES = [
     // ── 바깥 (그대로 둠) ──
     {
@@ -1292,9 +5655,68 @@
       boxes: [],
       fixtures: [],
       spots: [],
-      doors: [{ id: "main", x: 640, kind: "main", to: "lobby", toDoor: "main" }, { id: "pasta", x: 1500, kind: "shop", to: "pasta", toDoor: "out", needs: "pasta" }],
+      doors: [
+        { id: "main", x: 640, kind: "main", to: "lobby", toDoor: "main" },
+        { id: "pasta", x: 1500, kind: "shop", to: "pasta", toDoor: "out", needs: "pasta" },
+        // 임시 연결: 이동수단(노선표)이 생기기 전까지 거리 동쪽 끝에서 중림으로 바로 간다
+        // 필드 세계: 종로 큰길로 (중림 임시 출구와 겹치지 않게 조금 안쪽)
+        { id: "east", x: 1720, kind: "door", to: "jongno", toDoor: "west", label: "종로 큰길" },
+        { id: "jr", x: 1840, kind: "exit", side: "S", to: "jr_entry", toDoor: "west", label: "중림 지하상가 (임시)" }
+      ],
       things: [{ kind: "streetlamp", x: 300, w: 30, h: 360 }, { kind: "streetlamp", x: 1150, w: 30, h: 360 }, { kind: "bike", x: 860, w: 120, h: 80 }]
     },
+    // 종로 큰길: 필드 세계 첫 시연 범위(docs/필드_세계_NPC_설계.md 20장). 그림 전까지 회색 거리
+    {
+      id: "jongno",
+      name: "종로 큰길",
+      floor: "out",
+      length: 4e3,
+      look: "street",
+      legacy: true,
+      boxes: [],
+      fixtures: [],
+      spots: [],
+      doors: [{ id: "west", x: 60, kind: "door", to: "street", toDoor: "east", label: "종로 뒷골목" }, { id: "metro", x: 2200, kind: "door", to: "metro", toDoor: "jonggak", label: "종각역" }],
+      things: [{ kind: "streetlamp", x: 700, w: 30, h: 360 }, { kind: "streetlamp", x: 1700, w: 30, h: 360 }, { kind: "streetlamp", x: 2700, w: 30, h: 360 }, { kind: "streetlamp", x: 3600, w: 30, h: 360 }]
+    },
+    // 지하철 승강장 하나에서 각 지역 역으로 내린다 (내린 지역이 바뀌면 시계 「지역 이동」 +30분). 그림 전까지 회색 장면, 좌표 임시
+    {
+      id: "metro",
+      name: "지하철 승강장",
+      floor: "out",
+      length: 3200,
+      look: "corridor",
+      legacy: true,
+      boxes: [],
+      fixtures: [],
+      spots: [],
+      doors: [
+        { id: "jonggak", x: 300, kind: "door", to: "jongno", toDoor: "metro", label: "종각역 (종로)" },
+        { id: "yeongdeungpo", x: 1e3, kind: "door", to: "yeongdeungpo", toDoor: "metro", label: "영등포시장역" },
+        { id: "gangnam", x: 1700, kind: "door", to: "gangnam", toDoor: "metro", label: "강남역" },
+        { id: "mangwon", x: 2400, kind: "door", to: "mangwon", toDoor: "metro", label: "망원역" },
+        { id: "yeouido", x: 3e3, kind: "door", to: "yeouido", toDoor: "metro", label: "여의나루역" }
+      ],
+      things: []
+    },
+    ...[
+      ["yeongdeungpo", "영등포 시장", 3600, "영등포시장역"],
+      ["gangnam", "강남 번화가", 4e3, "강남역"],
+      ["mangwon", "망원 주택가", 3e3, "망원역"],
+      ["yeouido", "여의도 한강공원", 4e3, "여의나루역"]
+    ].map(([id, name, length, station]) => ({
+      id,
+      name,
+      floor: "out",
+      length,
+      look: "street",
+      legacy: true,
+      boxes: [],
+      fixtures: [],
+      spots: [],
+      doors: [{ id: "metro", x: 200, kind: "door", to: "metro", toDoor: id, label: station }],
+      things: [1, 2, 3].map((i) => ({ kind: "streetlamp", x: Math.round(length * i / 4), w: 30, h: 360 }))
+    })),
     {
       id: "pasta",
       name: "파스타집",
@@ -1308,70 +5730,100 @@
       spots: [{ id: "table", x: 680, place: "pasta", who: "전원", verb: "회식" }],
       things: [{ kind: "long_table", x: 680, w: 520, h: 90 }, { kind: "kitchen_window", x: 1050, w: 220, h: 120, wall: true }]
     },
-    // ── 1층: 로비 · 행정실(서) · 진압팀(동). 정문은 코어 맞은편 바깥벽 ──
-    hall({ id: "lobby", name: "1층 로비", floor: "1F", look: "lobby" }, 24, core(12, ["f2", "down"], ["b1", "up"]), [
-      { id: "admin", x: M(4), kind: "glass", to: "admin", toDoor: "out" },
-      { id: "swat", x: M(19.5), kind: "glass", to: "swat", toDoor: "out" },
-      { id: "main", x: M(12), kind: "exit", side: "S", to: "street", toDoor: "main" }
-    ], { boxes: [...gate(7.5), ...gate(17)] }),
-    room({ id: "admin", name: "행정실", floor: "1F", look: "office", doors: [exitS("lobby", "admin", "admin", true)] }, "admin", true),
-    room({ id: "swat", name: "진압팀", floor: "1F", look: "office", doors: [exitS("lobby", "swat", "swat")] }, "swat"),
-    // ── 2층 (시작 층): 화장실·종합대응팀(서, 코어 바로 옆) · 면담실·휴게실(동) ──
-    hall({ id: "f2", name: "2층", floor: "2F", look: "hall" }, 26, core(13, void 0, ["lobby", "up"]), [
-      { id: "wc", x: M(3), kind: "door", to: "wc", toDoor: "out" },
-      { id: "office", x: M(8.8), kind: "glass", to: "office", toDoor: "out" },
-      { id: "interview", x: M(18.5), kind: "door", to: "interview", toDoor: "out", needs: "interview" },
-      { id: "lounge", x: M(23), kind: "glass", to: "lounge", toDoor: "out" }
+    // ── 층 복도는 확정 배경 그림 6장 (hq/painted.ts). 문은 그림의 문 순서대로 (서→동). 사용자 배치 2026-10-25 ──
+    floorHall("lobby", "1층 로비", "1F", [
+      { id: "main", kind: "glass", to: "street", toDoor: "main", label: "현관" },
+      { id: "elev", kind: "elevator" },
+      { id: "stairs", kind: "stairs", up: "f2", down: "b1", label: "계단" }
+    ]),
+    floorHall("f2", "2층", "2F", [
+      { id: "wc", kind: "door", to: "wc", toDoor: "out", label: "화장실" },
+      { id: "swat", kind: "glass", to: "swat", toDoor: "out", label: "진압팀" },
+      { id: "elev", kind: "elevator" },
+      { id: "meeting", kind: "door", locked: true, label: "회의실" },
+      { id: "interview", kind: "door", to: "interview", toDoor: "out", needs: "interview", label: "면담실" },
+      { id: "stairs", kind: "stairs", up: "f3", down: "lobby", label: "계단" }
     ]),
     room({ id: "wc", name: "화장실", floor: "2F", look: "life", doors: [exitS("f2", "wc", "wc", true)] }, "wc", true),
-    {
-      id: "office",
-      name: "종합대응팀",
-      floor: "2F",
-      look: "office",
-      length: 1280,
-      lane: [430, 690],
-      doors: [{ id: "out", side: "N", x: 1084, kind: "door", to: "f2", toDoor: "office" }],
-      boxes: [
-        { kind: "desk", x: 420, y: 520, w: 260, d: 60, h: 140, solid: true },
-        { kind: "chair", x: 245, y: 512, w: 105, d: 45, h: 190, solid: true }
-      ],
-      fixtures: [],
-      things: [],
-      spots: [
-        { id: "seat", x: 250, y: 560, verb: "앉기", face: 1, act: ["chairsit"], seat: { x: 275, y: 505 } },
-        { id: "jaemtri", x: 680, y: 470, place: "jaemtri", verb: "임무 게시판", face: 1 },
-        { id: "agents", x: 110, y: 450, place: "office", verb: "요원" },
-        { id: "chief", x: 800, y: 470, place: "chief", verb: "결재" }
-      ]
-    },
+    room({ id: "swat", name: "진압팀", floor: "2F", look: "office", doors: [exitS("f2", "swat", "swat", true)] }, "swat", true),
     room({ id: "interview", name: "면담실", floor: "2F", look: "life", doors: [exitS("f2", "interview", "interview")] }, "interview"),
-    room({ id: "lounge", name: "휴게실", floor: "2F", look: "life", doors: [exitS("f2", "lounge", "lounge")] }, "lounge"),
-    // ── 지하 1층: 의무실(서) · 훈련장·목욕탕(동) ──
-    hall({ id: "b1", name: "지하 1층", floor: "B1", look: "labhall" }, 26, core(11, ["lobby", "down"], ["b2", "up"]), [
-      { id: "clinic", x: M(4.5), kind: "slide", to: "clinic", toDoor: "out" },
-      { id: "training", x: M(17.5), kind: "slide", to: "training", toDoor: "out", needs: "training" },
-      { id: "bath", x: M(22.5), kind: "slide", to: "bath", toDoor: "out" }
+    floorHall("f3", "3층", "3F", [
+      { id: "wc", kind: "door", to: "wc3", toDoor: "out", label: "화장실" },
+      { id: "pantry", kind: "door", place: "pantry", label: "탕비실" },
+      { id: "lounge", kind: "door", to: "lounge", toDoor: "out", label: "휴게실" },
+      { id: "elev", kind: "elevator" },
+      { id: "office", kind: "glass", to: "office", toDoor: "out", label: "종합대응팀" },
+      { id: "stairs", kind: "stairs", down: "f2", label: "계단" }
     ]),
-    room({ id: "clinic", name: "의무실", floor: "B1", look: "lab", doors: [exitS("b1", "clinic", "clinic", true)] }, "clinic", true),
+    room({ id: "wc3", name: "화장실", floor: "3F", look: "life", doors: [exitS("f3", "wc", "wc", true)] }, "wc", true),
+    room({ id: "lounge", name: "휴게실", floor: "3F", look: "life", doors: [exitS("f3", "lounge", "lounge")] }, "lounge"),
+    room({ id: "office", name: "종합대응팀", floor: "3F", look: "office", doors: [exitS("f3", "office", "office")] }, "office"),
+    floorHall("b1", "지하 1층", "B1", [
+      { id: "edu", kind: "door", to: "edu", toDoor: "out", label: "교육장" },
+      { id: "training", kind: "steel", to: "training", toDoor: "out", needs: "training", label: "훈련장" },
+      { id: "elev", kind: "elevator" },
+      { id: "shower_m", kind: "door", locked: true, label: "샤워실(남)" },
+      { id: "shower_f", kind: "door", locked: true, label: "샤워실(여)" },
+      { id: "stairs", kind: "stairs", up: "lobby", label: "계단" }
+    ]),
+    room({ id: "edu", name: "교육장", floor: "B1", look: "office", doors: [exitS("b1", "edu", "edu", true)] }, "edu", true),
     room({ id: "training", name: "훈련장", floor: "B1", look: "lab", doors: [exitS("b1", "training", "training")] }, "training"),
-    room({ id: "bath", name: "목욕탕", floor: "B1", look: "bath", doors: [exitS("b1", "bath", "bath")] }, "bath"),
-    // ── 지하 2층: 격리 실험실(서) · 격리실들 · 끝의 봉인된 두 방 ──
-    hall({ id: "b2", name: "격리 구역", floor: "B2", look: "labhall" }, 40, core(12, ["b1", "down"]), [
-      { id: "lab", x: M(6), kind: "slide", to: "lab", toDoor: "out" },
-      ...[18, 22, 26, 30].map((x, i) => ({ id: `cell${i + 1}`, x: M(x), kind: "cell" })),
-      { id: "tree", x: M(34), kind: "cell" },
-      { id: "tooth", x: M(38), kind: "slide", to: "tooth", toDoor: "out", needs: "tooth" }
-    ], { spots: [{ id: "cells", x: M(22), y: LANE_TOP + 20, verb: "격리문", place: "gallery" }] }),
-    room({ id: "lab", name: "격리 실험실", floor: "B2", look: "lab", doors: [exitS("b2", "lab", "lab", true)] }, "lab", true),
-    room({ id: "tooth", name: "이빨 요정 격리실", floor: "B2", look: "lab", doors: [exitS("b2", "tooth", "tooth")] }, "tooth")
+    floorHall("b2", "격리 구역", "B2", [
+      { id: "interrogation", kind: "steel", locked: true, label: "심문실" },
+      { id: "isolation", kind: "cell", to: "tooth", toDoor: "out", needs: "tooth", label: "격리실" },
+      { id: "elev", kind: "elevator" },
+      { id: "clinic", kind: "slide", to: "clinic", toDoor: "out", label: "의무실·연구실" },
+      { id: "archive", kind: "steel", locked: true, label: "창고·서고" }
+    ]),
+    // 의무실 겸 실험실: 의무실(침대) + 격리 연구실(연구·감정)을 한 방으로. 장비 보급은 B3 보급실로 옮김
+    { ...room({ id: "clinic", name: "의무실·연구실", floor: "B2", look: "lab", doors: [] }, "medlab"), doors: [exitS("b2", "clinic", "medlab")] },
+    room({ id: "tooth", name: "격리실", floor: "B2", look: "lab", doors: [exitS("b2", "isolation", "tooth")] }, "tooth"),
+    floorHall("b3", "지하 주차장", "B3", [
+      { id: "supply", kind: "steel", place: "supply", label: "보급실" },
+      { id: "elev", kind: "elevator" }
+    ], { spots: [{ id: "van", x: 370, y: LANE_TOP + 50, verb: "출동", depart: true }] }),
+    // ── 중림 지하상가 (중립지역, 그림 4장). 지상 입구 → 지하 1층 앞골목 → (가운데 통로) 뒷골목 / (동쪽 계단) 지하 2층 ──
+    floorHall("jr_entry", "중림 지하상가 입구", "out", [
+      { id: "west", kind: "exit", side: "S", to: "street", toDoor: "jr", label: "종로로 (임시)" },
+      { id: "down", kind: "door", to: "jr_b1", toDoor: "up", label: "지하상가로 내려가기" }
+    ]),
+    floorHall("jr_b1", "중림 지하상가 지하 1층", "B1", [
+      { id: "up", kind: "door", to: "jr_entry", toDoor: "down", label: "지상으로" },
+      { id: "daebak", kind: "glass", to: "jr_daebak", toDoor: "out", label: "대박 알선" },
+      { id: "songil", kind: "glass", to: "jr_songil", toDoor: "out", label: "손길 의원" },
+      { id: "alley", kind: "door", to: "jr_alley", toDoor: "b1", label: "뒷골목" },
+      { id: "down", kind: "door", to: "jr_b2", toDoor: "up", label: "지하 2층으로" }
+    ]),
+    floorHall("jr_alley", "중림 뒷골목", "B1", [
+      { id: "b1", kind: "door", to: "jr_b1", toDoor: "alley", label: "앞골목" },
+      { id: "heolgap", kind: "door", to: "jr_heolgap", toDoor: "out", label: "헐값 매입" }
+    ]),
+    floorHall("jr_b2", "중림 지하상가 지하 2층", "B2", [
+      { id: "up", kind: "door", to: "jr_b1", toDoor: "down", label: "지하 1층으로" },
+      { id: "youngchang", kind: "steel", to: "jr_youngchang", toDoor: "out", label: "창고 B-7 (영창 컨설팅)" }
+    ]),
+    // 가게 안 (GPT 빈 방 + GPT 가구, tools/jr/rooms.py)
+    floorHall("jr_daebak", "대박 알선", "B1", [{ id: "out", kind: "glass", to: "jr_b1", toDoor: "daebak", label: "나가기" }]),
+    floorHall("jr_heolgap", "헐값 매입", "B1", [{ id: "out", kind: "door", to: "jr_alley", toDoor: "heolgap", label: "나가기" }]),
+    floorHall("jr_youngchang", "영창 컨설팅", "B2", [{ id: "out", kind: "steel", to: "jr_b2", toDoor: "youngchang", label: "나가기" }]),
+    floorHall("jr_songil", "손길 의원", "B1", [
+      { id: "out", kind: "glass", to: "jr_b1", toDoor: "songil", label: "나가기" },
+      { id: "jinryo", kind: "door", to: "jr_jinryo", toDoor: "out", label: "진료실" },
+      { id: "wc", kind: "door", locked: true, label: "화장실" },
+      { id: "store", kind: "door", locked: true, label: "창고" },
+      { id: "op", kind: "door", to: "jr_op", toDoor: "out", label: "수술실" }
+    ]),
+    floorHall("jr_jinryo", "진료실", "B1", [{ id: "out", kind: "door", to: "jr_songil", toDoor: "jinryo", label: "대기실로" }]),
+    floorHall("jr_op", "수술실", "B1", [{ id: "out", kind: "door", to: "jr_songil", toDoor: "op", label: "대기실로" }])
   ];
   var SCENE_BY_ID = Object.fromEntries(HQ_SCENES.map((s2) => [s2.id, s2]));
   var ELEVATOR = [
+    { floor: "3F", label: "3", scene: "f3", door: "elev" },
     { floor: "2F", label: "2", scene: "f2", door: "elev" },
     { floor: "1F", label: "1", scene: "lobby", door: "elev" },
     { floor: "B1", label: "B1", scene: "b1", door: "elev" },
-    { floor: "B2", label: "B2", scene: "b2", door: "elev" }
+    { floor: "B2", label: "B2", scene: "b2", door: "elev" },
+    { floor: "B3", label: "B3", scene: "b3", door: "elev" }
   ];
   function whereIs(place3) {
     for (const sc of HQ_SCENES) {
@@ -1381,12 +5833,12 @@
     if (place3 === "street") return { scene: "street", x: 640 };
     return START;
   }
-  var START = { scene: "office", x: 820, y: 620 };
+  var START = { scene: "office", x: M(4), y: LANE_TOP + 170 };
   function hqMap(s2, justEvacuated = false) {
     const ok = (p) => !p || placeOpen(s2, p);
     const bed = SCENE_BY_ID.clinic.spots[0];
     return {
-      scenes: HQ_SCENES.map((sc) => ({ ...sc, doors: sc.doors.map((d3) => ({ ...d3, open: d3.kind !== "cell" && ok(d3.needs) })), spots: sc.spots.map((p) => ({ ...p, open: ok(p.place) })) })),
+      scenes: HQ_SCENES.map((sc) => ({ ...sc, doors: sc.doors.map((d3) => ({ ...d3, open: !d3.locked && (d3.kind !== "cell" || !!d3.place) && ok(d3.needs ?? d3.place) })), spots: sc.spots.map((p) => ({ ...p, open: ok(p.place) })) })),
       elevator: ELEVATOR.map((e) => ({ ...e, open: ok(e.needs) })),
       start: justEvacuated ? { scene: "clinic", x: bed.x, y: bed.y } : START
     };
@@ -1878,16 +6330,16 @@
       const want = DOOR_FOR[`${sceneId}:${d3.id}`];
       const t = d3.kind === "main" && cands.some(([, n]) => DOOR_WALLS[n]?.[2] === "main") ? "main" : doorType(d3.kind);
       const ok = cands.filter(([, n]) => DOOR_WALLS[n]?.[2] === t);
-      const pick6 = ok.find(([, n]) => n === want) ?? ok[hash(`${sceneId}:${d3.id}`) % Math.max(1, ok.length)];
-      if (!pick6) {
+      const pick7 = ok.find(([, n]) => n === want) ?? ok[hash(`${sceneId}:${d3.id}`) % Math.max(1, ok.length)];
+      if (!pick7) {
         const half = overlayHalf(d3.kind, k);
         const st = plainOf(fill, cands);
         if (half && st) pieces.push({ p: st[0], n: st[1], x: d3.x - half - 12, a: d3.x - half - 12, b: d3.x + half + 12, blank: st[2] });
         continue;
       }
-      const [x0, x1] = DOOR_WALLS[pick6[1]];
+      const [x0, x1] = DOOR_WALLS[pick7[1]];
       const bx = d3.x - (x0 + x1) / 2 * k;
-      pieces.push({ p: pick6[0], n: pick6[1], x: bx, a: bx, b: bx + bayW, door: d3.id, label: d3.to && SCENE_NAME.get(d3.to) });
+      pieces.push({ p: pick7[0], n: pick7[1], x: bx, a: bx, b: bx + bayW, door: d3.id, label: d3.to && SCENE_NAME.get(d3.to) });
     }
     const sc = HQ_SCENES.find((x) => x.id === sceneId);
     const strip = plainOf(fill, cands);
@@ -2297,20 +6749,20 @@
     const ORDER = [1, 6, 4, 2, 1, 4, 6, 1, 2];
     const ims = ORDER.map((n) => objImage("props", n));
     if (ims.some((im) => !im)) return false;
-    const pick6 = [];
+    const pick7 = [];
     let tot = 0;
     for (let i = Math.abs(Math.round(seed / 97)) % ORDER.length; ; i = (i + 1) % ORDER.length) {
       const im = ims[i];
-      if (pick6.length && tot + im.width * 2 > x1 - x0 + 30) break;
-      pick6.push(im);
+      if (pick7.length && tot + im.width * 2 > x1 - x0 + 30) break;
+      pick7.push(im);
       tot += im.width * 2;
-      if (pick6.length > 30) break;
+      if (pick7.length > 30) break;
     }
     ctx.save();
     ctx.imageSmoothingEnabled = false;
     let x = Math.round(x0 + (x1 - x0 - tot) / 2);
     const view2 = ctx.getTransform?.();
-    for (const im of pick6) {
+    for (const im of pick7) {
       if (outsideCanvas(ctx, x, fy - im.height * 2, im.width * 2, Math.max(im.height * 2, 4) + 4, view2)) {
         x += im.width * 2;
         continue;
@@ -2371,18 +6823,18 @@
   function drawHqTextureWall(ctx, place3, length, camX, openings = []) {
     const names = walls(place3).filter((n) => !DOOR_WALLS[n] && !HQ_SKIP.has(n));
     if (!names.length) return false;
-    const imgs2 = names.map((n) => image(place3, n));
+    const imgs3 = names.map((n) => image(place3, n));
     const strip = plainStrip(names.map((n) => [place3, n]));
     const plain = strip ? image(strip[0], strip[1]) : null;
-    if (imgs2.some((im) => !im) || openings.length && !plain) return false;
+    if (imgs3.some((im) => !im) || openings.length && !plain) return false;
     ctx.save();
     ctx.imageSmoothingEnabled = false;
     ctx.beginPath();
     ctx.rect(0, 0, length, 440);
     ctx.clip();
     for (let bay = Math.max(0, Math.floor(camX / 640)); bay * 640 < Math.min(length, camX + 1280); bay++) {
-      const name = names[bay % imgs2.length], x = bay * 640;
-      ctx.drawImage(imgs2[bay % imgs2.length], x, 0, 640, 440);
+      const name = names[bay % imgs3.length], x = bay * 640;
+      ctx.drawImage(imgs3[bay % imgs3.length], x, 0, 640, 440);
       for (const [a, b] of HQ_WALL_DECO[name] ?? []) {
         const left = x + a * 2, right = x + b * 2;
         if (!plain || !strip || !openings.some((d3) => left < d3.x + d3.width / 2 + 24 && right > d3.x - d3.width / 2 - 24)) continue;
@@ -2505,6 +6957,429 @@
         const sw = sx[i + 1] - sx[i], sh = sy[j + 1] - sy[j], dw = dx[i + 1] - dx[i], dh = dy[j + 1] - dy[j];
         if (sw > 0 && sh > 0 && dw > 0 && dh > 0) c.drawImage(im, sx[i], sy[j], sw, sh, dx[i], dy[j], dw, dh);
       }
+    c.restore();
+  }
+
+  // src/game/action/ui/pixelHudArt.ts
+  var HUD_ART = { "btn": { "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAYAAAAeP4ixAAAA8klEQVR42u3aMQrCMBQG4D8hmwjewcXBURB6hoyKdxGEQE8jOuYMguDo4OJZ0iUusU0KgryU/19Lw/ua1ywvajZfICagzigAMB/E+XKtUnHY7wIApWtGHE8Oy9UaAIJJH97ujypROkU02w2892ILHqpP922X9Hbqy1drWWtFQ4bqM6UXpbRZ6QObEuL9esr4N1qXPYg0JhJCCCGEEEIIIYQQQgghhBBCCCGEEEIIIYQQQgghhJApQeIIOpvsxMpai6Z1IjClsbn5dQGxrcU5+58yas7uva9mzp7uikmlktsqFxXva4UxR5zExHsASk3l4lkHfyRFUx/wU9AAAAAASUVORK5CYII=", "w": 50, "h": 50, "inner": [8, 8, 42, 42] }, "slot": { "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAYAAAAeP4ixAAACa0lEQVR42u3av0vjYBgH8G/DbSIUhJu7OAjlKiEiiHDTLZ0rjsdVqVJEFwcnBycHF4+jqNz1uLG0cxenghSKITQiOLj4n/SG83nNj/dN3mByyVveZ0zbNJ8876+8T0oLi2UIYoZiRol38IMI0esPuB/s7bdxfzeE8/iSyVWa1QrWNuvC/9jeasx4mBInI0JE1hhCXF91Ir+3vdUIZcZIigCA66sOdg9PYVYr/x0BAEfHJ6Gm782IFIKXmTRCFtG56WK19gkAcHlxzjJDEB/CrFakm03npvtuhOvY0oif38+we3gawpQWFsuhTIwnNjbWLR/MG1l1dNkbRwiKy4tz/qgVRCyvWLmOt3SjxxM7hBB19lAHzBtBo1TcwGIUHUGxvGL5WkqijKgU8wXZ228rC/jzu/sGqZmWkhhCMEi71UQwM3nOFUkQNJGyPkJLDRUy40WMJ7Yf4jy+MF2RMTwEd9RKaxGYZdzfDX0I4fBbMy3lOr6eEDVEQzRkDiCuY+uMFA4SnDl1RjRkjiFRzV1nJI+Q3g7y7mVF/SjvWNusiyG0rV9e+oiv35qFRdCzknfjgUEIAaDQCB6GWo7hTZUKiCCG9hdY01IJwXskN1RFBDF6HlFq9Zu0OJpl9PqDyHqlEbe2KQImDgEI3nyYug+sVlcEjEzlmJWnX4vwAICDnYavBDx1H4QnSOuxWHZ3s91q+mCj2yHwWp6mYwwTdeFBRJovDCTdqiWENyM+jAxkdDvE85ONH7/SaXYHO41EGC+CBwGA2ecv9diT9PqD1J/rN9b/Vc7iMEGECBKJcR0705VAHIaHiIIAir149hc87AtIps5xKwAAAABJRU5ErkJggg==", "w": 50, "h": 50, "inner": [7, 7, 43, 43] }, "item": { "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAYAAAAeP4ixAAABlElEQVR42u1avU7DMBC+s7xVlfoAhaVLh46VKnVhYkEZQTxGlw59hAxZ8hgIRouFqUulSh0AMbDwLGZJJdeNcewaJ7HuW63zfV9s5zv/4GA4ggoS/IAQBhfl58dOnp5fnHt4fLi/hMAZPDlIAECuitjtD84d3dzeBRGxfXv14rBab6AscnkcEdjtD7BczK0dCSEgy7IzAiGh56iDzpWpjU2+hi1BCDTJoXNloZJPprMoMSZwU8P7x6fTtPn5/nJOrsdUP48/14Np+jPb4usSyiI3tjFIBCSEhMQQIoToDXGdK4ttdv9lmslMLRwMRzKVNYKhy4VYUDhj2r/fLo+OiRsLVQDGgokbOTsJISEkhISQEBJCQqhopKKxedE4vrqmrW4XwAHqb4psB8ptwcT15KKnL7CextMBXQtI9oCOhJCQ2EJW600vPOTEEH0CddOcTGfONZoe0+QJh8nvuE9QqEKzLsbXmJkavFzMnY0ohtnVQefKXb+GbkSh9i7q6Pg84eAAgGWRS9/F3fbepXpEgJjKw7NfHsShrBl1hm0AAAAASUVORK5CYII=", "w": 50, "h": 50, "inner": [1, 1, 49, 49] }, "portrait": { "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFAAAABQCAYAAACOEfKtAAAGh0lEQVR42u2dv2siTRjHnw12ISCIVmpjYyExBCGQxspGtrzjStHi7kiTJkUIBISDw8LGJkUKg2VIysXGyiZwIJINKdKkSVJtWPA/2Le4PPM+O+6uM7trLtH5QhAOd3bns9/59YzznLa5lQQiB8JJg8+pyPVN8IVdXl0Ll/Lt65cwD6J9NCgh6uxgPbQ3BzoAAIdHxwsLMAwDdF2HXrcDotdQ4XXLUtjnOTw6ZnWTqIPGAB4eHcP+XgXOzvtw8L0FP34ewMy2AACgWqvDTnmbFXBr3sF4NIRqrQ4vz08Lb5jN5QEAWBm9bgeqtXqs4MajIYNnGIbUtY8P93PgDcOAx4d7l0tPTtvw+1cbbv5MEKIbIADA/l6FNU20NmmqTMlURujhZrYFhWIJsrk8vDw/sTfc63aEyxBRo9liFcd72a+W8PVoFq+mTXnc/JlQF2oJ/iL8wuXVNbtQtln4WT6byzN3RC2T1615By/PTwyel6tkRcF9+/qFsaFK+F18ctqGQrHk6u9kVSiWGCwKEZ0i45AgpdIZVjaFF7W/PTw6hlvzDs7O+77fSQQV4AVPpunarxak0hkwDGMOIv7FKQpvcNGHQrEU+iXNbAt63Q6DKA2QwkumMtBotmB/rwI/fh6wN77IFdgJp9IZGFz0XRDtV4v1W1E1uOiz+yG8VDrD4M1si90bR1u8Pz/gYBk4iOA149FQ3oEUHgAIw6NN2A9ioViSHi0XvSysOMJDcIOLvqv16Lrue+9CsQSDiz40mi0YvJURpATfEdPpCop3nv1qQXm3IlS5bC7P3p5Xc45z/kedN7MtqNbqcGveQXm34vqkAxp2I+Z0wuoXZBKekQvgwfeW50hzctr2hGdOJwvfED9NoBDjFO88nBuKzAGrtTqUdyuuOa2fQ3lGCX4Ks2h+hvDIw4kuzRwKG5tV3CL3EH4uXBTgKO7XlfW6HQDuxSf4uZrIyBUCHn7XEXVsREk/F0Jc1KfzXc9GhHWkFrJi7/G3NOA85I1PHo76l9LmHKj0v0Qn4AqgzyJCdJKfULi8VzYz2xJatioHejTdRrMlHK9UDlQOjF/KgcqB6+FAZ4Um4A7vQFFtBNn48OgYZrbl2p3ChfWqidYplc7AzLZcgVi/ENeGX8Qllc6waCwAzEFcVdFIOg3+Cjmw1+2Arutsd6taq7v2cNcBItaxWquzfRVUNpcHczrxBahRiAB/N2kKxRKY08lKNtug5mxOJyz2iRtg49EQ442abxNG22LYOq6tx88qDPnTXz4s7AMxcKjrutQm0ipqp7wNQcFWNQ+MKAVQAVQAFUAFUEkBVAAVQAVQSQH8oADXfT2sHKgAKoAKoJIC+O8ArntYXxognrkIOqGzLro17wIP2swB5I83xX0c6zND9DrbQgE6yVRmznnj0RDKuxV4p1/XfwjN7L9nYajruLMtjqcD+bNjuJWHBQXt0K+KcP+brzuebPL7lf6csAB6fmRdhHWlBw39DuB4AjSnk7WF5wfRbyayIWppvo9YxX4PwB04WfYPLFfpcE7ouggB1HVdKB3IOkroF6r4i00VFwzpwPJuBRrNllrShXWgOZ24TnQrhXSgUkgHvjw/KQdGcWA2l1cOVA5cHkAWWQiK/yl4c3KYA2mWMol1b5iTSs47VW5pzzUeDV28EgDzGdsWrQGrtTqGeaSB4AtaxpySHJKRfi4MU2G+Ly89Pty7UuC5+kDDMGB/b3E2InoIR1SYFIzCi3tQwtUSppvCnIUyov18Npf3fMk3fyawv1dhEBN0veuVtQgLo/Ewelqn0WyxkA//icdGeec1mq3YE+/QYDBCpC9N1MGonfL23KkkClFqFMbgKj4gTQMVJD94y8ijSjOzRYGIZhJ9wQmZBwz6d79PP3jLODoWBFGqnId7SKYy7NSmNMCZbbl2oqJGpHl4y4pw06SJmMktyr3o9q4fSD8HauPRkKVGjpow9j3gYdn2qxtilJeB8N5mHJrX6B7UhLXxaOjslLdjS0KL8PiMvlFFM/dis6NnncOKg+cNaXMr6dD8y79/tT3THkcR9icID7cK4+4HaQ5AWyD7pKwur67h7LzvyoetbW4lHczWi/MpkTka9o0iE+JUOuPKFMknO0Sw/NwxTF/LQxSdfIukgz85bTNOmGOVJeKmEBc1F5pMW6ZPW4YrgtwuM1Bgk/VKgerF4G1kZ5nMpSCKTG9iXKeGWuSLSrafpPCwD4xjsb+2/x3Gf6CzG+xq0xJOAAAAAElFTkSuQmCC", "w": 80, "h": 80, "inner": [8, 8, 72, 72] }, "hp": { "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAPQAAAAVCAYAAABxN8PZAAACLElEQVR42u2bMUvDQBiG34CbCIVC5y4OQmlKKQguTi7+CbGIg4MuDuIguHVwESRowe6lnbt06lIohGJFcHBxFgT/QRxKyuWau0vba0DzPlvotQk9nrzffck5m1s5pEAAQsja2UhD5o93f3Ywfvvkv06IJaqlIgBge6cGAHASJHQAAO1OVzlgOPIjx/d3Dai+E14AIWQ1QolFTEIH7U4XXrOV6ASDfk8pfrVUxMn5DWeBkBWpuOVZaJpK7kgae80WvGYLg35vNmD/4HBO4hCVzLobwmTsc4YIieHouI6XyaudNXQoYSisKLIo8cXlFfZ2a7GJ/PDcVV6QLPLP9xdnkGQSOSQrbhkAlO6o0lkrdJJElRNZXB+rymuKTEi8zCaR5TCNwUkstJjUZ6f1hdfIFJmQ5RJ5MvZjfcnlC3CrNQz6PWfhhF622SWKTIkJRY5KrBNZk8ZO6JM8Ru5yB+KJJ2MfT48eTOtsikzI+hNZlFn5oUroiluea3ax0UXIaiIvKbFR5DihAxtlNUUmFDm5yIbSOrHIotDKN8FMiczSmpApYYPKosgLywxommK6VNYlci5f4OySTCALLK+Pl212rYKVzRlyiUFIlkgi8bpF1go9HPnaTRRutRZpuxOSZUyvZ9pcIxtr9OvbRgBMXydj0hJijzQSee6Hdc+hbWPaiMGmGvnnOGs/gWL7pFWxVSJTYEKR0xFaKbeN7Y6CyA7nmpB0hY6I/dfuWIRkiV+57hhMWXT1tAAAAABJRU5ErkJggg==", "w": 244, "h": 21, "inner": [17, 5, 225, 14], "rows": [[], [], [], [], [], [[34, 225]], [[32, 224]], [[30, 221]], [[27, 219]], [[25, 217]], [[23, 215]], [[21, 213]], [[19, 210]], [[17, 20]], [], [], [], [], [], [], []] }, "gauge": { "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAALYAAAAICAYAAABUMAUBAAAA00lEQVR42mPk5hX4n19SwTAKEMDK3GTIuPXYyTOjEYYGJvZ0MLDAOBcuXoJLHNy9bcActXL1Gjg7PDRkYAJmkLlnMLplMLnH3tULzjbQ12NgYGBAJGzkBC0gLEZ3x314+wprCTQQbkF3j5W5CYq76O2mweQWfHE1UO6BpVvkBM402hQYBcMRDMqEPRjajcglz2Bqxw50aT2Q9g75hD0YAKy6HQVDEzBy8wr8t3f1YjDQ10PpQI6CUTDUACwNH9y9jYGRm1eAgYGB4f9osIyC4VRgAwDKTFEYfzeX/QAAAABJRU5ErkJggg==", "w": 182, "h": 8, "inner": [5, 1, 177, 6], "rows": [[], [[5, 36], [39, 72], [75, 107], [110, 143], [146, 177]], [[34, 36], [39, 40], [70, 72], [75, 77], [105, 107], [110, 112], [141, 143], [146, 148]], [[34, 36], [39, 40], [70, 72], [75, 77], [105, 107], [110, 112], [141, 143], [146, 148]], [[34, 36], [39, 40], [71, 72], [75, 77], [105, 107], [110, 111], [142, 143], [146, 148]], [[34, 36], [39, 40], [70, 72], [75, 77], [105, 107], [110, 111], [142, 143], [146, 148]], [], []] } };
+
+  // src/game/action/ui/hudLabels.ts
+  var HUD_LABELS = { "약공": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABsAAAANCAYAAABYWxXTAAAAe0lEQVR42r1USQ4AIQijhv9/uXOZGDSIuMSekAilgIKk/KiGAYzNwJcBdJKInS8qZoRaUBkQ2TOd4BVFFboRA9lEmSjwkkfKQtVqEnoXcaisKVhvtCfbcj2YFTMb6JFxgxQLsehnln4viSXylgZFHuIpmV7YtsyPAhGRD+1EISOZv0rMAAAAAElFTkSuQmCC", "강공": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABsAAAANCAYAAABYWxXTAAAAcElEQVR42s1UWwrAIAxrpPe/cvYzpMq0D+ZYfsRHEmmjIEnZA/fIaW7XIoBOZEkKIXCm6zT5EM25DRZ7rJhp0sgr3Zarix7hpcoN5nrI5FEPfvL9lFV6lo06sjwNhsKmEIkwDbxfvLMjsAGpfk9h3gUs4iEZs06rNAAAAABJRU5ErkJggg==", "사격": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABoAAAANCAYAAAC3mX7tAAAAaUlEQVR42r2USwrAMAhEneD9rzxdFUKa6qAhsxT14RckbdFrQGL/BE7CGudWFza2X3gHFIm3QFLr0KwCSkUsQLnxP7IMrHTBD21b6u/JnTBJTJXmwZFCgMkzHMEnUL+AXBHEmbRgwy7pAWO5Gyqr00FeAAAAAElFTkSuQmCC", "충전": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABoAAAANCAYAAAC3mX7tAAAAdUlEQVR42r1TMRLAIAhLevz/y+nSwVO0wfbMiBAgREpChyEAgEksy5siTFIYeVrFY2M6YgPxpXgiox4+vUmnn7agIx27xlq8ZcTDvZi4rioXDTkRVZs25KxKx4LzWNxqMINToMZRZVNcOIRjjdoPK+NOlsMy3HYbIiKL4hMtAAAAAElFTkSuQmCC", "기술": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABsAAAANCAYAAABYWxXTAAAAb0lEQVR42rVTWw6AMAgDw/2vXH+M0YXHqNKfZRuklIICgOTQ68Ry95DGWJJcFdHGITPAJBmcFmIltR8VaODzXYQxRgetqjyGkUTRf5o7NSASjT6jqmqd9/7yrEu0G4unMjST6cU3goBV+HnPOgr1BNd0HSNwfB3EAAAAAElFTkSuQmCC", "필살": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABwAAAANCAYAAAC6hw6qAAAAd0lEQVR42r1Tyw7AIAgrhv//5e6ygxoeysh6ImoLRRCSRA4BwCm24N0v5+MNZBOfY0EjRpMOnXh/Q8V/kC6HNNrPqKUMWsKI7AxKmFQ/DEU0teIVK2db0QfNeu59fpWnyTIjEb/mVRyi6HBJeFMxik7NhCyKH/Me0zEiHg3rGzUAAAAASUVORK5CYII=" };
+
+  // src/game/action/ui/pixelHud.ts
+  var imgs = {};
+  function img3(k) {
+    let im = imgs[k];
+    if (!im) {
+      im = new Image();
+      im.src = HUD_ART[k].src;
+      imgs[k] = im;
+    }
+    return im.complete && im.naturalWidth ? im : null;
+  }
+  function pixelHudReady() {
+    return ["slot", "item", "portrait", "hp", "gauge"].every((k) => img3(k));
+  }
+  var INK = "#e6e4dc";
+  var DIM = "#5c6268";
+  var EDGE = "#07090b";
+  var HOLLOW = "#0f1216";
+  var textCache = /* @__PURE__ */ new Map();
+  function pixelText(s2, color = INK, size2 = 11, edge2 = EDGE) {
+    const key2 = `${s2}|${color}|${size2}|${edge2}`;
+    const hit2 = textCache.get(key2);
+    if (hit2) return hit2;
+    const f = `700 ${size2}px "${PIXEL_FONT}", monospace`;
+    const cv = document.createElement("canvas");
+    const g0 = cv.getContext("2d");
+    g0.font = f;
+    const tw = Math.ceil(g0.measureText(s2).width);
+    cv.width = Math.max(1, tw + 2);
+    cv.height = size2 + 4;
+    const g2 = cv.getContext("2d");
+    g2.font = f;
+    g2.textBaseline = "top";
+    g2.fillStyle = "#fff";
+    g2.fillText(s2, 1, 1);
+    const d3 = g2.getImageData(0, 0, cv.width, cv.height), px = d3.data;
+    const [r, gg, b] = hex(color), [er, eg, eb] = edge2 ? hex(edge2) : [0, 0, 0];
+    const on = new Uint8Array(cv.width * cv.height);
+    for (let i = 0; i < on.length; i++) on[i] = px[i * 4 + 3] > 110 ? 1 : 0;
+    for (let y = 0; y < cv.height; y++) for (let x = 0; x < cv.width; x++) {
+      const i = y * cv.width + x, o = i * 4;
+      if (on[i]) {
+        px[o] = r;
+        px[o + 1] = gg;
+        px[o + 2] = b;
+        px[o + 3] = 255;
+        continue;
+      }
+      let near2 = false;
+      if (edge2) for (let dy = -1; dy <= 1 && !near2; dy++) for (let dx = -1; dx <= 1; dx++) {
+        const nx = x + dx, ny = y + dy;
+        if (nx >= 0 && ny >= 0 && nx < cv.width && ny < cv.height && on[ny * cv.width + nx]) {
+          near2 = true;
+          break;
+        }
+      }
+      if (near2) {
+        px[o] = er;
+        px[o + 1] = eg;
+        px[o + 2] = eb;
+        px[o + 3] = 255;
+      } else px[o + 3] = 0;
+    }
+    g2.putImageData(d3, 0, 0);
+    if (document.fonts?.check?.(f) !== false) textCache.set(key2, cv);
+    return cv;
+  }
+  function hex(c) {
+    const n = parseInt(c.slice(1), 16);
+    return [n >> 16 & 255, n >> 8 & 255, n & 255];
+  }
+  function put(c, t, x, y, align = "left") {
+    const dx = align === "center" ? Math.round(x - t.width / 2) : align === "right" ? Math.round(x - t.width) : Math.round(x);
+    c.drawImage(t, dx, Math.round(y));
+  }
+  var labelImgs = /* @__PURE__ */ new Map();
+  var labelCache = /* @__PURE__ */ new Map();
+  function labelSprite(s2, color) {
+    const src = HUD_LABELS[s2];
+    if (!src) return null;
+    const key2 = `${s2}|${color}`, hit2 = labelCache.get(key2);
+    if (hit2) return hit2;
+    let im = labelImgs.get(s2);
+    if (!im) {
+      im = new Image();
+      im.src = src;
+      labelImgs.set(s2, im);
+    }
+    if (!im.complete || !im.naturalWidth) return null;
+    const cv = document.createElement("canvas");
+    cv.width = im.naturalWidth + 2;
+    cv.height = im.naturalHeight + 2;
+    const g2 = cv.getContext("2d");
+    const tint2 = (col) => {
+      const t = document.createElement("canvas");
+      t.width = im.naturalWidth;
+      t.height = im.naturalHeight;
+      const tg = t.getContext("2d");
+      tg.drawImage(im, 0, 0);
+      tg.globalCompositeOperation = "source-in";
+      tg.fillStyle = col;
+      tg.fillRect(0, 0, t.width, t.height);
+      return t;
+    };
+    const edge2 = tint2(EDGE), body = tint2(color);
+    for (const [dx, dy] of [[0, 1], [2, 1], [1, 0], [1, 2]]) g2.drawImage(edge2, dx, dy);
+    g2.drawImage(body, 1, 1);
+    labelCache.set(key2, cv);
+    return cv;
+  }
+  function fillHollow(c, k, x, y, r, color) {
+    const a = HUD_ART[k], [ix0, iy0, ix1, iy1] = a.inner;
+    const lim = ix0 + Math.round((ix1 - ix0) * Math.max(0, Math.min(1, r)));
+    a.rows.forEach((runs, row) => {
+      if (!runs.length) return;
+      c.fillStyle = color(row, iy0, iy1 - 1);
+      for (const [s2, e] of runs) {
+        const ee = Math.min(e, lim);
+        if (ee > s2) c.fillRect(x + s2, y + row, ee - s2, 1);
+      }
+    });
+  }
+  function hpHue(r) {
+    return Math.round(120 * Math.max(0, Math.min(1, (r - 0.12) / 0.68)) / 10) * 10;
+  }
+  function drawPixelCard(c, s2, x, y) {
+    const P = HUD_ART.portrait, pim = img3("portrait"), him = img3("hp"), gim = img3("gauge");
+    if (!pim || !him || !gim) return y;
+    c.save();
+    c.imageSmoothingEnabled = false;
+    x = Math.round(x);
+    y = Math.round(y);
+    const [fx0, fy0, fx1, fy1] = P.inner, fw = fx1 - fx0, fh = fy1 - fy0;
+    c.fillStyle = "rgba(12,15,19,0.6)";
+    c.fillRect(x + fx0, y + fy0, fw, fh);
+    if (s2.face) c.drawImage(s2.face, x + fx0, y + fy0, fw, fh);
+    else put(c, pixelText(s2.name.slice(0, 1) || "?", INK, 33), x + P.w / 2, y + P.h / 2 - 18, "center");
+    if (s2.hurtT > 0) {
+      c.fillStyle = `rgba(255,40,40,${Math.min(0.6, s2.hurtT * 1.6)})`;
+      c.fillRect(x + fx0, y + fy0, fw, fh);
+    }
+    c.drawImage(pim, x, y);
+    const bx = x + P.w + 4;
+    const nt = pixelText(s2.name, INK, 22);
+    put(c, nt, bx + 14, y + 6);
+    if (s2.armor) put(c, pixelText("◆".repeat(s2.armor), "#cfd3d6", 11), bx + 20 + nt.width, y + 14);
+    const hy = y + 34, r = Math.max(0, s2.hp) / s2.maxHp, low2 = r < 0.25;
+    c.drawImage(him, bx, hy);
+    fillHollow(c, "hp", bx, hy, s2.trail / s2.maxHp, () => "#d8d2c4");
+    const hue = hpHue(r), blink = low2 && Math.sin(s2.t * 10) > 0;
+    fillHollow(c, "hp", bx, hy, r, (row, top, bot) => row === top ? `hsl(${hue},75%,${blink ? 80 : 68}%)` : row >= bot - 1 ? `hsl(${hue},70%,${blink ? 48 : 32}%)` : `hsl(${hue},68%,${blink ? 66 : 48}%)`);
+    put(c, pixelText(`${Math.max(0, Math.ceil(s2.hp))} / ${Math.ceil(s2.maxHp)}`, INK, 11), bx + HUD_ART.hp.inner[2], y + 18, "right");
+    let end = Math.max(y + P.h, hy + HUD_ART.hp.h + 14);
+    if (s2.gauge !== void 0) {
+      const gy = hy + HUD_ART.hp.h + 5, full = s2.gauge >= 100;
+      const pulse = full ? 0.5 + 0.5 * Math.sin(s2.t * 7) : 0;
+      const gx2 = bx + 16;
+      c.drawImage(gim, gx2, gy);
+      fillHollow(c, "gauge", gx2, gy, s2.gauge / 100, (row, top) => full ? row === top ? "#fff6d0" : `rgb(255,${205 + 30 * pulse},${90 + 60 * pulse})` : row === top ? "#e8f4ff" : "#9fc6e0");
+      if (full && s2.superKey) put(c, pixelText(s2.superKey, "#ffe9a0", 11), gx2 + HUD_ART.gauge.w + 4, gy - 3);
+      end = Math.max(end, gy + HUD_ART.gauge.h);
+    }
+    c.restore();
+    return end;
+  }
+  var ICONS = {
+    punch: [
+      "............",
+      "..##.##.##..",
+      ".##########.",
+      ".#o##o##o##.",
+      ".##########.",
+      "###########.",
+      "#oo########.",
+      "###########.",
+      ".##########.",
+      "..########..",
+      "...######...",
+      "............"
+    ],
+    kick: [
+      "............",
+      "......###...",
+      "......###...",
+      "......###...",
+      "......###...",
+      "##....####..",
+      "......######",
+      "###...######",
+      "......######",
+      "##....######",
+      "............",
+      "............"
+    ],
+    gun: [
+      "............",
+      "............",
+      ".##########.",
+      ".###########",
+      ".##########.",
+      ".####o......",
+      ".###oo#.....",
+      ".###.##.....",
+      ".###........",
+      "####........",
+      "###.........",
+      "............"
+    ],
+    wave: [
+      "............",
+      ".#...#...#..",
+      "..#...#...#.",
+      "..##..##..##",
+      "..##..##..##",
+      "..##..##..##",
+      "..##..##..##",
+      "..##..##..##",
+      "..#...#...#.",
+      ".#...#...#..",
+      "............",
+      "............"
+    ],
+    bolt: [
+      ".......####.",
+      "......####..",
+      ".....####...",
+      "....####....",
+      "...########.",
+      ".......###..",
+      "......###...",
+      ".....###....",
+      "....###.....",
+      "...##.......",
+      "..#.........",
+      "............"
+    ],
+    star: [
+      ".....##.....",
+      ".....##.....",
+      "....####....",
+      "############",
+      ".##########.",
+      "..########..",
+      "...######...",
+      "...######...",
+      "..###..###..",
+      "..##....##..",
+      ".##......##.",
+      "............"
+    ],
+    dash: [
+      "............",
+      "......#.....",
+      "......##....",
+      "......###...",
+      "##..#######.",
+      "....########",
+      "##..#######.",
+      "......###...",
+      "......##....",
+      "......#.....",
+      "............",
+      "............"
+    ],
+    shield: [
+      "............",
+      ".##########.",
+      ".#o#######o.",
+      ".##########.",
+      ".##########.",
+      ".##########.",
+      "..########..",
+      "..########..",
+      "...######...",
+      "....####....",
+      ".....##.....",
+      "............"
+    ]
+  };
+  function icon(c, id, cx, cy, u, col) {
+    const rows = ICONS[id];
+    const x0 = Math.round(cx - 6 * u), y0 = Math.round(cy - 6 * u);
+    c.fillStyle = "#000";
+    rows.forEach((r, j) => {
+      for (let i = 0; i < 12; i++) if (r[i] === "#") c.fillRect(x0 + i * u + u, y0 + j * u + u, u, u);
+    });
+    rows.forEach((r, j) => {
+      for (let i = 0; i < 12; i++) if (r[i] !== ".") {
+        c.fillStyle = r[i] === "o" ? HOLLOW : col;
+        c.fillRect(x0 + i * u, y0 + j * u, u, u);
+      }
+    });
+  }
+  function drawPixelHotbar(c, slots, x, y, t) {
+    const S2 = HUD_ART.slot, sim = img3("slot");
+    if (!sim) return x;
+    const gap = 4, [ix0, iy0, ix1, iy1] = S2.inner;
+    c.save();
+    c.imageSmoothingEnabled = false;
+    x = Math.round(x);
+    y = Math.round(y);
+    slots.forEach((sl2, i) => {
+      const sx = x + i * (S2.w + gap), sy = y;
+      const ready = sl2.cd <= 0 && !sl2.off;
+      c.drawImage(sim, sx, sy);
+      const iw = ix1 - ix0, ih = iy1 - iy0;
+      if (sl2.active) {
+        c.fillStyle = "#3a4249";
+        c.fillRect(sx + ix0, sy + iy0, iw, ih);
+      }
+      icon(c, sl2.icon, sx + ix0 + iw / 2, sy + iy0 + ih / 2 - (sl2.bar !== void 0 ? 1 : 0), 2, ready ? sl2.full ? "#ffe9a0" : INK : DIM);
+      if (sl2.cd > 0) {
+        c.fillStyle = "rgba(4,6,8,0.7)";
+        c.fillRect(sx + ix0, sy + iy0, iw, Math.round(ih * Math.min(1, sl2.cd)));
+        if (sl2.cdText) put(c, pixelText(sl2.cdText, INK, 11), sx + ix0 + iw / 2, sy + iy0 + ih / 2 - 7, "center");
+      }
+      if (sl2.bar !== void 0) {
+        const bw = iw - 4, v = Math.max(0, Math.min(1, sl2.bar));
+        c.fillStyle = "#000";
+        c.fillRect(sx + ix0 + 2, sy + iy1 - 4, bw, 2);
+        c.fillStyle = sl2.hot ? "#e8553a" : sl2.full ? "#ffe9a0" : INK;
+        c.fillRect(sx + ix0 + 2, sy + iy1 - 4, Math.round(bw * v), 2);
+      }
+      if (sl2.full && Math.sin(t * 7) > 0) {
+        c.strokeStyle = "#ffe9a0";
+        c.lineWidth = 1;
+        c.strokeRect(sx + ix0 + 0.5, sy + iy0 + 0.5, iw - 1, ih - 1);
+      }
+      const kt = pixelText(sl2.key, "#101317", 11, null);
+      const kw = Math.max(11, kt.width + 2), kh = 13;
+      c.fillStyle = EDGE;
+      c.fillRect(sx + 1, sy + 1, kw + 2, kh + 2);
+      c.fillStyle = ready ? INK : "#8a9096";
+      c.fillRect(sx + 2, sy + 2, kw, kh);
+      put(c, kt, sx + 2 + kw / 2, sy + 2, "center");
+      if (sl2.badge) put(c, pixelText(sl2.badge, sl2.full ? "#ffe9a0" : INK, 11), sx + ix1 - 1, sy + iy1 - 17, "right");
+      const col = ready ? INK : "#8a9096";
+      put(c, labelSprite(sl2.name, col) ?? pixelText(sl2.name, col, 11), sx + S2.w / 2, sy + S2.h + 1, "center");
+    });
+    c.restore();
+    return x + slots.length * (S2.w + gap) - gap;
+  }
+  var hotbarSize = (n) => ({ w: n * (HUD_ART.slot.w + 4) - 4, h: HUD_ART.slot.h + 18 });
+  function drawPixelItems(c, items, x, y, keys2, flash, icon2) {
+    const S2 = HUD_ART.item, im = img3("item");
+    if (!im) return y;
+    const [ix0, iy0, ix1, iy1] = S2.inner, iw = ix1 - ix0, ih = iy1 - iy0, gap = 4;
+    c.save();
+    c.imageSmoothingEnabled = false;
+    x = Math.round(x);
+    y = Math.round(y);
+    for (let i = 0; i < 4; i++) {
+      const it = items[i] ?? { label: "", count: 0 }, sx = x + i * (S2.w + gap), dim2 = it.count <= 0;
+      c.drawImage(im, sx, y);
+      if ((flash[i] ?? 0) > 0) {
+        c.fillStyle = `rgba(255,240,180,${flash[i]})`;
+        c.fillRect(sx + ix0, y + iy0, iw, ih);
+      }
+      if (it.label || it.id) {
+        c.save();
+        c.globalAlpha = dim2 ? 0.3 : 1;
+        icon2(it, sx + ix0 + 1, y + iy0 + 1, Math.min(iw, ih) - 2);
+        c.restore();
+        put(c, pixelText(`${it.count}`, dim2 ? "#6a7276" : INK, 11), sx + ix1 - 1, y + iy1 - 13, "right");
+      }
+      if (it.cd && it.cd > 0) {
+        c.fillStyle = "rgba(4,6,8,0.6)";
+        c.fillRect(sx + ix0, y + iy0, iw, Math.round(ih * Math.min(1, it.cd)));
+      }
+      if (keys2[i]) {
+        const kt = pixelText(keys2[i], "#101317", 11, null), kw = Math.max(11, kt.width + 2), kh = 13;
+        c.fillStyle = EDGE;
+        c.fillRect(sx + 1, y + 1, kw + 2, kh + 2);
+        c.fillStyle = INK;
+        c.fillRect(sx + 2, y + 2, kw, kh);
+        put(c, kt, sx + 2 + kw / 2, y + 2, "center");
+      }
+    }
+    c.restore();
+    return y + S2.h;
+  }
+  function drawGuardBar(c, x, y, v, broken, a, t) {
+    if (a <= 0.01) return;
+    const W5 = 56, H6 = 8;
+    const x0 = Math.round(x - W5 / 2), y0 = Math.round(y);
+    c.save();
+    c.globalAlpha = Math.min(1, a);
+    const sh = ["#####", "#####", "#####", ".###.", "..#.."];
+    const col = broken ? Math.sin(t * 14) > 0 ? "#ff5a44" : "#7a2a22" : INK;
+    c.fillStyle = EDGE;
+    c.fillRect(x0 - 10, y0 - 1, 9, 9);
+    sh.forEach((row, j) => {
+      for (let i = 0; i < 5; i++) if (row[i] === "#") {
+        c.fillStyle = col;
+        c.fillRect(x0 - 8 + i, y0 + 1 + j, 1, 1);
+      }
+    });
+    c.fillStyle = EDGE;
+    c.fillRect(x0 - 1, y0 - 1, W5 + 2, H6 + 2);
+    c.fillStyle = "#2e353c";
+    c.fillRect(x0, y0, W5, H6);
+    c.fillStyle = "#151a1f";
+    c.fillRect(x0 + 1, y0 + 1, W5 - 2, H6 - 2);
+    const fw = Math.round((W5 - 2) * Math.max(0, Math.min(1, v)));
+    if (fw > 0) {
+      c.fillStyle = broken ? "#c8483a" : v < 0.3 ? "#e8b04a" : "#cfe4f2";
+      c.fillRect(x0 + 1, y0 + 1, fw, H6 - 2);
+      c.fillStyle = broken ? "#ff8a76" : "#ffffff";
+      c.fillRect(x0 + 1, y0 + 1, fw, 1);
+    }
+    if (broken) {
+      c.fillStyle = INK;
+      c.fillRect(x0 + 1 + Math.round((W5 - 2) * 0.4), y0, 1, H6);
+    }
     c.restore();
   }
 
@@ -2649,6 +7524,122 @@
 .tp .tp-side .tp-b.pl.item u, .tp .tp-b.pl.item u { right: 10px; bottom: 6px; font-size: 18px; }
 `;
 
+  // src/game/action/ui/crt.ts
+  var VS = `attribute vec2 p; varying vec2 uv; void main(){ uv = p * 0.5 + 0.5; uv.y = 1.0 - uv.y; gl_Position = vec4(p, 0.0, 1.0); }`;
+  var FS = `precision mediump float;
+varying vec2 uv;
+uniform sampler2D tex; uniform sampler2D prev;
+uniform vec2 res; uniform vec2 src; uniform float time; uniform float bend;
+vec2 curve(vec2 u){ if (bend < 0.5) return u; u = u * 2.0 - 1.0; vec2 o = abs(u.yx) / vec2(5.2, 4.2); u = u + u * o * o; return u * 0.5 + 0.5; }
+vec3 sampleRGB(vec2 u, float ca){
+  vec2 d = (u - 0.5) * ca;
+  return vec3(texture2D(tex, u + d).r, texture2D(tex, u).g, texture2D(tex, u - d).b);
+}
+void main(){
+  vec2 u = curve(uv);
+  if (u.x < 0.0 || u.x > 1.0 || u.y < 0.0 || u.y > 1.0) { gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0); return; }
+  // 둥근 모서리 (곡면 모드만)
+  vec2 q = abs(u - 0.5) * 2.0; float corner = bend < 0.5 ? 1.0 : smoothstep(1.0, 0.985, length(max(q - vec2(0.93, 0.9), 0.0) / vec2(0.07, 0.1)));
+  float edge = dot(u - 0.5, u - 0.5);
+  vec3 col = sampleRGB(u, 0.0012 + edge * 0.006);
+  // 빛 번짐: 둘레 8곳을 흐리게 모아 밝은 곳만 더한다
+  vec2 px = 1.0 / src; vec3 b = vec3(0.0);
+  for (int i = 0; i < 8; i++) { float a = float(i) * 0.785398; b += texture2D(tex, u + vec2(cos(a), sin(a)) * px * 2.5).rgb; }
+  b /= 8.0; col += max(b - 0.55, 0.0) * 0.9;
+  // 주사선: 원본 한 줄마다, 밝을수록 굵게(어두운 틈이 좁아짐)
+  float lum = dot(col, vec3(0.299, 0.587, 0.114));
+  float line = 0.5 + 0.5 * cos(u.y * src.y * 3.14159265); // 원본 두 줄마다 한 번 (물결무늬 없게)
+  float scan = mix(1.0, mix(0.62, 0.9, lum), line);
+  col *= scan;
+  // RGB 형광 마스크 (화면 픽셀 세 칸마다 빨강·초록·파랑 세로줄)
+  float m = mod(gl_FragCoord.x, 3.0);
+  vec3 mask = m < 1.0 ? vec3(1.0, 0.72, 0.72) : m < 2.0 ? vec3(0.72, 1.0, 0.72) : vec3(0.72, 0.72, 1.0);
+  col *= mix(vec3(1.0), mask, 0.32);
+  // 비네팅 · 밝기 보정
+  col *= 1.0 - edge * (bend < 0.5 ? 0.35 : 0.95);
+  // 깜빡임·움직이는 잡음은 뺐다 (사용자 2026-10-25: 눈 아픔)
+  col = pow(col * 1.22, vec3(0.95));
+  gl_FragColor = vec4(col * corner, 1.0);
+}`;
+  function mountCrt(stageEl, canvas) {
+    const out = document.createElement("canvas");
+    out.className = "gs-crtgl";
+    out.style.cssText = "position:absolute;left:0;top:0;pointer-events:none;display:none";
+    const gl = out.getContext("webgl", { antialias: false, alpha: false, preserveDrawingBuffer: false });
+    if (!gl) return null;
+    const sh = (type, srcText) => {
+      const s2 = gl.createShader(type);
+      gl.shaderSource(s2, srcText);
+      gl.compileShader(s2);
+      return s2;
+    };
+    const prog = gl.createProgram();
+    gl.attachShader(prog, sh(gl.VERTEX_SHADER, VS));
+    gl.attachShader(prog, sh(gl.FRAGMENT_SHADER, FS));
+    gl.linkProgram(prog);
+    if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) return null;
+    gl.useProgram(prog);
+    const buf = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]), gl.STATIC_DRAW);
+    const loc = gl.getAttribLocation(prog, "p");
+    gl.enableVertexAttribArray(loc);
+    gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
+    const mkTex = (unit) => {
+      const t = gl.createTexture();
+      gl.activeTexture(gl.TEXTURE0 + unit);
+      gl.bindTexture(gl.TEXTURE_2D, t);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array([0, 0, 0, 255]));
+      return t;
+    };
+    const tex = mkTex(0);
+    mkTex(1);
+    gl.uniform1i(gl.getUniformLocation(prog, "tex"), 0);
+    gl.uniform1i(gl.getUniformLocation(prog, "prev"), 1);
+    const uRes = gl.getUniformLocation(prog, "res"), uSrc = gl.getUniformLocation(prog, "src"), uTime = gl.getUniformLocation(prog, "time"), uBend = gl.getUniformLocation(prog, "bend");
+    stageEl.insertBefore(out, canvas.nextSibling);
+    let on = false, raf = 0, bend = 1;
+    const frame2 = (t) => {
+      raf = requestAnimationFrame(frame2);
+      const cw = canvas.clientWidth || canvas.width, ch = canvas.clientHeight || canvas.height;
+      const scale = stageEl.getBoundingClientRect().width / (stageEl.offsetWidth || 1) * (window.devicePixelRatio || 1);
+      const W5 = Math.max(1, Math.round(cw * scale)), H6 = Math.max(1, Math.round(ch * scale));
+      if (out.width !== W5 || out.height !== H6) {
+        out.width = W5;
+        out.height = H6;
+      }
+      out.style.width = `${cw}px`;
+      out.style.height = `${ch}px`;
+      gl.viewport(0, 0, W5, H6);
+      gl.activeTexture(gl.TEXTURE0);
+      gl.bindTexture(gl.TEXTURE_2D, tex);
+      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, canvas);
+      gl.uniform2f(uRes, W5, H6);
+      gl.uniform2f(uSrc, canvas.width, canvas.height);
+      gl.uniform1f(uTime, t / 1e3);
+      gl.uniform1f(uBend, bend);
+      gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+    };
+    return {
+      setOn(v, curved = true) {
+        bend = curved ? 1 : 0;
+        if (v === on) return;
+        on = v;
+        out.style.display = v ? "block" : "none";
+        if (v) raf = requestAnimationFrame(frame2);
+        else cancelAnimationFrame(raf);
+      },
+      dispose() {
+        cancelAnimationFrame(raf);
+        out.remove();
+      }
+    };
+  }
+
   // src/game/action/ui/stage.ts
   var W = 1280;
   var H = 720;
@@ -2675,6 +7666,7 @@
     const touch2 = root.querySelector(".gs-touch");
     const rotate = root.querySelector(".gs-rotate");
     const fns = [];
+    let crt;
     let keepPortrait = false;
     let fill = false, byHeight = false;
     const coarse = () => typeof matchMedia !== "undefined" && matchMedia("(pointer: coarse)").matches;
@@ -2713,8 +7705,11 @@
       onResize(fn2) {
         fns.push(fn2);
       },
-      setCrt(on) {
-        root.classList.toggle("crt", on);
+      setCrt(mode) {
+        const on = mode !== "off";
+        crt ??= mountCrt(stageEl, canvas);
+        if (crt) crt.setOn(on, mode === "curved");
+        root.classList.toggle("crt", on && !crt);
       },
       setBright(v) {
         canvas.style.filter = Math.abs(v - 1) < 0.01 ? "" : `brightness(${v})`;
@@ -2912,7 +7907,7 @@
   function setPixelText(on) {
     pixelOn = on;
   }
-  function plate(c, x, y, w, h, r = 8) {
+  function plate2(c, x, y, w, h, r = 8) {
     c.beginPath();
     c.roundRect(x, y, w, h, r);
     c.fillStyle = C.plate;
@@ -2969,10 +7964,10 @@
       this.agent(c, s2);
       this.floor(c, s2);
       this.rules(c, s2);
-      if (!s2.compact) this.items(c, s2.items, s2.device);
+      if (!s2.compact && !(s2.agent.portrait && pixelHudReady())) this.items(c, s2.items, s2.device);
       if (s2.boss) this.boss(c, s2.boss, s2.compact);
       this.timer(c, s2);
-      if (s2.message) this.message(c, s2.message, s2.compact);
+      if (s2.message) this.message(c, s2.message, s2.compact, (s2.messageLeft ?? 0) / k);
       this.navigation(c, s2);
       this.drawToasts(c, dt);
       pixelOn = false;
@@ -3011,6 +8006,13 @@
     /** 왼쪽 위 한 묶음: 얼굴 + 이름 + 굵은 체력 막대 + 필살 게이지 + 탄. 판 없이 오락실처럼 */
     agent(c, s2) {
       const x = s2.compact ? 100 : 22, y = 18, fs = 80;
+      if (s2.agent.portrait && pixelHudReady()) {
+        const end = drawPixelCard(c, { name: s2.agent.name, face: s2.agent.portrait, hp: s2.hp, maxHp: s2.maxHp, trail: this.trail, hurtT: this.hurtT, gauge: s2.gauge, superKey: s2.device === "pad" ? "RT" : s2.device === "touch" ? "" : superKey(), armor: s2.armor, t: this.t }, x - 6, y - 4);
+        const iy = s2.compact ? end : this.pixelItems(c, s2.items, s2.device, x + 78, end + 6);
+        if (s2.weapon) this.ammo(c, s2.weapon, x + 90, iy + 26);
+        this.meterRows(c, s2, x, Math.max(y + fs + 52, iy + (s2.weapon ? 40 : 10)));
+        return;
+      }
       const g2 = c.createLinearGradient(0, 0, 460, 0);
       g2.addColorStop(0, "rgba(0,0,0,0.5)");
       g2.addColorStop(0.75, "rgba(0,0,0,0.25)");
@@ -3019,14 +8021,14 @@
       c.fillRect(0, 0, 460, y + fs + 30);
       const r0 = Math.max(0, s2.hp) / s2.maxHp;
       const faces3 = s2.agent.portrait ? null : agentFaces(s2.agent.name);
-      const face2 = faces3 ? kitImage(faces3[this.hurtT > 0 ? 1 : r0 < 0.25 ? 2 : s2.gauge >= 100 ? 3 : 0]) : null;
+      const face = faces3 ? kitImage(faces3[this.hurtT > 0 ? 1 : r0 < 0.25 ? 2 : s2.gauge >= 100 ? 3 : 0]) : null;
       c.fillStyle = s2.agent.color ?? "#5a6a74";
-      if (face2 || s2.agent.portrait) c.fillStyle = "#141b20";
+      if (face || s2.agent.portrait) c.fillStyle = "#141b20";
       c.fillRect(x, y, fs, fs);
       c.save();
       c.imageSmoothingEnabled = false;
       if (s2.agent.portrait) c.drawImage(s2.agent.portrait, x, y, fs, fs);
-      else if (face2) c.drawImage(face2, x, y, fs, fs);
+      else if (face) c.drawImage(face, x, y, fs, fs);
       else label(c, s2.agent.name.slice(0, 1), x + fs / 2, y + fs * 0.72, 44, "#fff", "center", 900);
       c.restore();
       if (this.hurtT > 0) c.fillStyle = `rgba(255,40,40,${this.hurtT * 1.2})`, c.fillRect(x, y, fs, fs);
@@ -3074,10 +8076,12 @@
         c.lineWidth = 2;
         c.strokeRect(bx - 2, gy - 2, gw + 4, gh + 4);
         c.restore();
-        label(c, s2.device === "pad" ? "RT" : s2.device === "touch" ? "필살" : "W", bx + gw + 10, gy + 12, 15, C.gauge, "left", 900);
+        label(c, s2.device === "pad" ? "RT" : s2.device === "touch" ? "필살" : superKey(), bx + gw + 10, gy + 12, 15, C.gauge, "left", 900);
       }
       if (s2.weapon) this.ammo(c, s2.weapon, bx, gy + gh + 30);
-      let my = y + fs + 52;
+      this.meterRows(c, s2, x, y + fs + 52);
+    }
+    meterRows(c, s2, x, my) {
       for (const m of s2.meters ?? []) {
         label(c, m.label, x, my + 10, 13, m.color, "left", 800);
         bar(c, x + 40, my + 1, 160, 9, m.v / m.max, m.color, "#000");
@@ -3117,6 +8121,7 @@
         const r = W2 - (s2.compact ? 100 : 20);
         if (s2.field.clock) label(c, s2.field.clock, r, 34, 26, "#fff", "right", 900);
         if (s2.field.place) label(c, s2.field.place, r, 56, 15, C.amber, "right", 800);
+        if (s2.field.wallet) label(c, s2.field.wallet, r, 76, 15, "#cfe3c8", "right", 800);
       }
       if (!f.depth) return;
       const right = W2 - (s2.compact ? 100 : 20);
@@ -3140,6 +8145,10 @@
     }
     /** 아이템: 아이콘만 (글자 없음), 체력 막대 오른쪽 위 천장 띠. 바닥(물건·자막)과 겹치지 않게 (독립 검수: UI 안전영역).
      * 터치 화면에서는 터치 버튼이 대신 보여 준다 */
+    /** 아이템 칸 넷 (도트, 필살 게이지 아래). 돌려주는 값 = 아래 끝 y */
+    pixelItems(c, items, device, x, y) {
+      return drawPixelItems(c, items, x, y, [], this.itemFlash, (it, ix, iy, sz) => drawHudItemIcon(c, it, ix, iy, sz));
+    }
     items(c, items, device) {
       const n = 4, s2 = 52, g2 = 8;
       const x0 = 482, y = 22;
@@ -3200,6 +8209,19 @@
     }
     /** 필드 주인공 칸 (전투 HUD가 없는 본부·거점): 왼쪽 아래 도트 얼굴 + 이름 + 체력 + 필살 게이지. 터치·좁은 화면은 왼쪽 위(아래는 스틱 자리).
      * 돌려주는 값 = 칸 오른쪽 끝 x (자막을 그 오른쪽에 둔다) */
+    /** 필드(방문) 오른쪽 위: 필드 시각·장소·잔고 (전투 HUD를 안 그리는 필드에서) */
+    drawFieldCorner(c, f, compact) {
+      if (!f) return;
+      c.save();
+      const k = compact ? 1.2 : 1;
+      W2 = c.canvas.width / k;
+      c.setTransform(k, 0, 0, k, 0, 0);
+      const r = W2 - (compact ? 100 : 20);
+      if (f.clock) label(c, f.clock, r, 34, 26, "#fff", "right", 900);
+      if (f.place) label(c, f.place, r, 56, 15, C.amber, "right", 800);
+      if (f.wallet) label(c, f.wallet, r, f.clock || f.place ? 76 : 34, 15, "#cfe3c8", "right", 800);
+      c.restore();
+    }
     drawFieldCard(c, s2, dt = 1 / 60) {
       this.t += dt;
       c.save();
@@ -3209,13 +8231,21 @@
       c.setTransform(k, 0, 0, k, 0, 0);
       pixelOn = true;
       const fs = 64, bw = 200, bh = 14;
-      const x = 28, y = s2.top ? 104 : H2 - fs - 28;
+      const x = 28, y = s2.top ? 28 : H2 - fs - 28;
       if (this.lastHp >= 0 && s2.hp < this.lastHp) this.hurtT = 0.35, this.trailHold = 0.5;
       if (this.trail < 0 || this.trail < s2.hp) this.trail = s2.hp;
       else if (this.trailHold > 0) this.trailHold -= dt;
       else this.trail = Math.max(s2.hp, this.trail - s2.maxHp * dt * 0.6);
       this.lastHp = s2.hp;
       this.hurtT = Math.max(0, this.hurtT - dt);
+      if (pixelHudReady()) {
+        const cy = s2.top ? 14 : H2 - 170;
+        const end = drawPixelCard(c, { name: s2.name, face: s2.face, hp: s2.hp, maxHp: s2.maxHp, trail: this.trail, hurtT: this.hurtT, gauge: s2.gauge, superKey: superKey(), t: this.t }, 16, cy);
+        if (s2.items && !s2.compact) this.pixelItems(c, s2.items, s2.device, 16 + 84, end + 6);
+        pixelOn = false;
+        c.restore();
+        return (16 + 340) * k;
+      }
       c.fillStyle = "rgba(6,10,14,0.72)";
       c.fillRect(x - 12, y - 12, fs + bw + 52, fs + 24);
       c.fillStyle = "#141b20";
@@ -3255,11 +8285,125 @@
         c.fillStyle = "#000";
         c.fillRect(bx - 2, gy - 2, gw + 4, gh + 4);
         bar(c, bx, gy, gw, gh, s2.gauge / 100, full ? `hsl(${40 + Math.sin(this.t * 8) * 10},95%,${60 + Math.sin(this.t * 8) * 12}%)` : C.gaugeFill, "#10181c");
-        if (full) label(c, "필살 S", bx + gw + 8, gy + 9, 12, C.gauge, "left", 900);
+        if (full) label(c, `필살 ${superKey()}`, bx + gw + 8, gy + 9, 12, C.gauge, "left", 900);
       }
       pixelOn = false;
       c.restore();
       return (x + fs + bw + 40) * k;
+    }
+    /** 말풍선 (본부 대사): x = 말하는 사람 가운데, y = 머리 위(풍선 꼬리 끝), 캔버스 px. who가 있으면 위에 이름 */
+    drawSpeech(c, p) {
+      c.save();
+      const k = p.compact ? 1.2 : 1;
+      c.setTransform(k, 0, 0, k, 0, 0);
+      W2 = c.canvas.width / k;
+      pixelOn = true;
+      const U2 = 2;
+      c.font = font(22);
+      const lines3 = wrapText(c, p.text, 400, 3);
+      const tw = Math.max(...lines3.map((l) => Math.ceil(c.measureText(l).width)), p.who ? Math.ceil(c.measureText(p.who).width) * 0.55 : 0);
+      const nameH = p.who ? 18 : 0, lh = 26, padX = 12, padY = 8;
+      const w = tw + padX * 2, h = nameH + lines3.length * lh + padY * 2 - 4;
+      const tail = 10;
+      let x = Math.round(p.x / k - w / 2);
+      x = Math.max(8, Math.min(W2 - w - 8, x));
+      const y = Math.round(Math.max(8, p.y / k - tail - h));
+      const box2 = (bx, by, bw, bh, col) => {
+        c.fillStyle = col;
+        c.fillRect(bx + U2, by, bw - 2 * U2, bh);
+        c.fillRect(bx, by + U2, bw, bh - 2 * U2);
+      };
+      box2(x + U2, y + U2 * 2, w, h, "rgba(0,0,0,0.35)");
+      box2(x - U2, y - U2, w + 2 * U2, h + 2 * U2, "#0b0f12");
+      box2(x, y, w, h, "#cfc8b4");
+      box2(x + U2, y + U2, w - 2 * U2, h - 2 * U2, "#1a2026");
+      const tx = Math.round(Math.max(x + 10, Math.min(x + w - 18, p.x / k - 4)));
+      for (let i = 0; i < tail / U2; i++) {
+        const tw2 = Math.max(U2, 10 - i * U2 * 2);
+        c.fillStyle = "#0b0f12";
+        c.fillRect(tx + (10 - tw2) / 2 - U2, y + h + i * U2 - U2, tw2 + 2 * U2, U2 + U2);
+        c.fillStyle = "#cfc8b4";
+        c.fillRect(tx + (10 - tw2) / 2, y + h + i * U2 - U2, tw2, U2);
+      }
+      c.textAlign = "left";
+      c.textBaseline = "middle";
+      let ty = y + padY + 2;
+      if (p.who) {
+        c.font = font(11);
+        c.fillStyle = "#ffcf6a";
+        c.fillText(p.who, x + padX, ty + 6);
+        ty += nameH;
+      }
+      c.font = font(22);
+      c.fillStyle = "#f2ecdc";
+      lines3.forEach((l, i) => c.fillText(l, x + padX, ty + lh / 2 + i * lh - 2));
+      pixelOn = false;
+      c.restore();
+    }
+    /** 상호작용 안내: 캐릭터 옆에 뜨는 도트 말풍선 (키 단추 + 짧은 말). x,y = 캐릭터 머리 옆 화면 px(캔버스 px), side = 말풍선이 뻗는 쪽 */
+    drawPrompt(c, p) {
+      c.save();
+      const k = p.compact ? 1.2 : 1;
+      c.setTransform(k, 0, 0, k, 0, 0);
+      pixelOn = true;
+      const U2 = 2;
+      c.font = font(22);
+      const tw = Math.ceil(c.measureText(p.text).width);
+      const cap = 30, gap = 8, padX = 10, h = 40;
+      const w = padX + cap + gap + tw + padX + (p.locked ? 20 : 0);
+      const bob = Math.round(Math.sin(performance.now() / 260) * 2);
+      let x = Math.round(p.x / k + (p.side > 0 ? 0 : -w)), y = Math.round(p.y / k - h / 2 + bob);
+      const box2 = (bx, by, bw, bh, col) => {
+        c.fillStyle = col;
+        c.fillRect(bx + U2, by, bw - 2 * U2, bh);
+        c.fillRect(bx, by + U2, bw, bh - 2 * U2);
+      };
+      box2(x + U2, y + U2 * 2, w, h, "rgba(0,0,0,0.35)");
+      box2(x - U2, y - U2, w + 2 * U2, h + 2 * U2, "#0b0f12");
+      box2(x, y, w, h, p.locked ? "#c98a1c" : "#cfc8b4");
+      box2(x + U2, y + U2, w - 2 * U2, h - 2 * U2, "#1a2026");
+      const tx = p.side > 0 ? x - U2 * 3 : x + w + U2;
+      c.fillStyle = p.locked ? "#c98a1c" : "#cfc8b4";
+      c.fillRect(tx, y + h / 2 - U2, U2 * 2, U2 * 2);
+      c.fillRect(p.side > 0 ? tx + U2 * 2 : tx - U2, y + h / 2 - U2 * 2, U2, U2 * 4);
+      const kx = x + padX, ky = y + (h - cap) / 2;
+      box2(kx, ky + U2, cap, cap, "#6e6656");
+      box2(kx, ky, cap, cap - U2, p.locked ? "#5a4a2a" : "#f2ead6");
+      c.font = font(22);
+      c.fillStyle = p.locked ? "#c9b48a" : "#1a2026";
+      c.textAlign = "center";
+      c.textBaseline = "middle";
+      c.fillText(p.key, kx + cap / 2, ky + cap / 2);
+      let txx = kx + cap + gap;
+      if (p.locked) {
+        c.fillStyle = "#ffcf6a";
+        c.fillRect(txx + 2, y + 18, 12, 10);
+        c.fillRect(txx + 4, y + 12, 2, 6);
+        c.fillRect(txx + 10, y + 12, 2, 6);
+        c.fillRect(txx + 4, y + 11, 8, 2);
+        c.fillStyle = "#1a2026";
+        c.fillRect(txx + 7, y + 21, 2, 4);
+        txx += 20;
+      }
+      c.textAlign = "left";
+      c.fillStyle = p.locked ? "#ffcf6a" : "#f2ecdc";
+      c.fillText(p.text, txx, y + h / 2 + 1);
+      pixelOn = false;
+      c.restore();
+    }
+    /** 왼쪽 아래 기술 칸 줄 (도트, PixelLab 틀). 돌려주는 값 = 오른쪽 끝 x (캔버스 px) */
+    drawSkillBox(c, s2, dt = 1 / 60) {
+      this.t += dt;
+      if (!pixelHudReady()) return 0;
+      c.save();
+      const k = s2.compact ? 1.2 : 1;
+      W2 = c.canvas.width / k;
+      H2 = c.canvas.height / k;
+      c.setTransform(k, 0, 0, k, 0, 0);
+      const sz = hotbarSize(s2.slots.length);
+      const end = drawPixelHotbar(c, s2.slots, 16, H2 - sz.h - 10, this.t);
+      c.restore();
+      return end * k;
     }
     /** 아래 자막 한 줄만 (본부처럼 전투 HUD가 없는 화면) */
     drawMessage(c, text2, compact, left = 0) {
@@ -3290,7 +8434,7 @@
       t = fitText(c, t, Math.min(900, left ? W2 - left - 40 : W2 - (compact ? 240 : 64)));
       const w = c.measureText(t).width + 40;
       const y = H2 - 44;
-      plate(c, cx - w / 2, y, w, 36, 18);
+      plate2(c, cx - w / 2, y, w, 36, 18);
       label(c, t, cx, y + 25, 17, "#fff8e6", "center", 600);
     }
     navigation(c, s2, top) {
@@ -3311,7 +8455,7 @@
       if (!lines3.length) return;
       c.font = font(15);
       const rows = lines3.flatMap((line2) => wrapText(c, line2.text.replace(/[①②③④]/g, (ch) => `${"①②③④".indexOf(ch) + 1}번`), width - 64, 2).map((text2) => ({ ...line2, text: text2 })));
-      plate(c, x, y, width, rows.length * 28 + 14);
+      plate2(c, x, y, width, rows.length * 28 + 14);
       rows.forEach((row, i) => label(c, row.text, x + 12, y + 27 + i * 28, 15, row.color));
       if (target) {
         c.save();
@@ -3393,40 +8537,44 @@
   }
   function statusHtml(s2) {
     if (!s2) return "";
-    const esc7 = (t) => t.replace(/[&<>"]/g, (ch) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[ch]);
+    const esc6 = (t) => t.replace(/[&<>"]/g, (ch) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[ch]);
     const m = s2.money;
     const fav = s2.favor > 0 ? `+${s2.favor}` : String(s2.favor);
     const rows = [
-      s2.floor.depth || s2.floor.name ? `<tr><th>층</th><td>${esc7((s2.floor.depth && !s2.floor.name.startsWith(s2.floor.depth) ? [s2.floor.depth, s2.floor.name] : [s2.floor.name || s2.floor.depth]).filter(Boolean).join(" · "))}${s2.floor.variant ? ` · ${esc7(s2.floor.variant)}` : ""}</td></tr>` : "",
+      s2.floor.depth || s2.floor.name ? `<tr><th>층</th><td>${esc6((s2.floor.depth && !s2.floor.name.startsWith(s2.floor.depth) ? [s2.floor.depth, s2.floor.name] : [s2.floor.name || s2.floor.depth]).filter(Boolean).join(" · "))}${s2.floor.variant ? ` · ${esc6(s2.floor.variant)}` : ""}</td></tr>` : "",
       `<tr><th>재화</th><td>현금 ${m.cash} · 예산 ${m.budget}</td></tr>`,
       `<tr><th></th><td>연구 자료 ${m.research} · 이빨 ${m.teeth}</td></tr>`,
       `<tr><th>승강기 총애</th><td>${fav}</td></tr>`,
       s2.ruleCount ? `<tr><th>규칙서</th><td>찾음 ${s2.ruleCount.found} · 송신 ${s2.ruleCount.sent}</td></tr>` : "",
-      ...(s2.rules ?? []).map((r) => `<tr><th></th><td>${esc7(r.text)}</td></tr>`)
+      ...(s2.rules ?? []).map((r) => `<tr><th></th><td>${esc6(r.text)}</td></tr>`)
     ];
     return `<table>${rows.join("")}</table>`;
+  }
+  function superKey() {
+    const code = Object.keys(KEYMAP).find((k) => KEYMAP[k] === "super");
+    return code ? code.replace(/^Key/, "") : "W";
   }
 
   // src/game/action/ui/title.ts
   var K = 3;
   var DOOR2 = { x: 160 + 112 * K, y: 50 * K, w: 100 * K, h: 170 * K };
   var LAMP = { x: 160 + 132 * K, y: 17 * K, w: 48 * K, h: 10 * K };
-  var imgs = /* @__PURE__ */ new Map();
-  function art3(name) {
-    if (!imgs.has(name)) {
+  var imgs2 = /* @__PURE__ */ new Map();
+  function art2(name) {
+    if (!imgs2.has(name)) {
       const src = typeof window !== "undefined" && window.__GOEI_BG_ART__?.el_hall?.[name] || "";
       let im2 = null;
       if (src) im2 = new Image(), im2.src = src;
-      imgs.set(name, im2);
+      imgs2.set(name, im2);
     }
-    const im = imgs.get(name);
+    const im = imgs2.get(name);
     return im && im.complete && im.naturalWidth ? im : null;
   }
-  var textCache = /* @__PURE__ */ new Map();
-  function pixelText(text2, size2, top, bottom, weight = 900, pixel = false) {
+  var textCache2 = /* @__PURE__ */ new Map();
+  function pixelText2(text2, size2, top, bottom, weight = 900, pixel = false) {
     const ready = pixel && typeof document !== "undefined" && document.fonts?.check(`11px "${PIXEL_FONT}"`);
     const key2 = `${text2}|${size2}|${top}|${bottom}|${weight}|${pixel}|${ready}`;
-    const hit2 = textCache.get(key2);
+    const hit2 = textCache2.get(key2);
     if (hit2) return hit2;
     const m = document.createElement("canvas").getContext("2d");
     m.font = pixel ? `${size2}px "${PIXEL_FONT}", ${FONT}` : `${weight} ${size2}px ${FONT}`;
@@ -3465,7 +8613,7 @@
     for (const [dx, dy] of [[0, 3], [1, 3], [2, 3], [0, 2], [2, 2]]) o.drawImage(black, dx, dy);
     for (const [dx, dy] of [[0, 1], [2, 1], [1, 0], [1, 2], [0, 0], [2, 0], [0, 2], [2, 2]]) o.drawImage(black, dx, dy);
     o.drawImage(mask, 1, 1);
-    textCache.set(key2, out);
+    textCache2.set(key2, out);
     return out;
   }
   function blit(c, im, cx, y, k, alpha = 1) {
@@ -3477,19 +8625,19 @@
     c.save();
     c.setTransform(1, 0, 0, 1, 0, 0);
     c.imageSmoothingEnabled = false;
-    const W5 = c.canvas.width, H7 = c.canvas.height;
-    const sx = W5 / 1280, sy = H7 / 720;
+    const W5 = c.canvas.width, H6 = c.canvas.height;
+    const sx = W5 / 1280, sy = H6 / 720;
     c.scale(sx, sy);
-    const wall = art3("el_hall_wall_1");
+    const wall = art2("el_hall_wall_1");
     if (wall) {
       c.fillStyle = "#0a0806";
       c.fillRect(0, 0, 1280, 720);
       c.drawImage(wall, 160, 0, 320 * K, 220 * K);
-      const l = art3("el_hall_wall_4"), r = art3("el_hall_wall_2");
+      const l = art2("el_hall_wall_4"), r = art2("el_hall_wall_2");
       const cut = 160 / K;
       if (l) c.drawImage(l, 320 - cut, 0, cut, 220, 0, 0, 160, 220 * K);
       if (r) c.drawImage(r, 0, 0, cut, 220, 1120, 0, 160, 220 * K);
-      const fl = art3("el_hall_floor");
+      const fl = art2("el_hall_floor");
       if (fl) {
         const p = c.createPattern(fl, "repeat");
         if (p) {
@@ -3526,7 +8674,7 @@
     c.fillRect(lp.x, lp.y, lp.w, lp.h);
     const flick = Math.sin(t * 13) > 0.9 || Math.sin(t * 2.1) > 0.97;
     const floors = ["1", "B1", "B3", "B7", "B12", "??"];
-    const num = pixelText(flick ? floors[Math.floor(t * 9) % floors.length] : floors[Math.floor(t / 2.5) % floors.length], 9, flick ? "#ff3020" : "#ff7a3a", flick ? "#c01810" : "#e05a20");
+    const num = pixelText2(flick ? floors[Math.floor(t * 9) % floors.length] : floors[Math.floor(t / 2.5) % floors.length], 9, flick ? "#ff3020" : "#ff7a3a", flick ? "#c01810" : "#e05a20");
     c.save();
     c.shadowColor = "#ff4020";
     c.shadowBlur = 14;
@@ -3542,16 +8690,16 @@
       const x = (i * 197 + t * 12 * (1 + i % 3)) % 1280, y = (i * 131 + t * 8 * (1 + i % 2)) % 720;
       c.fillRect(Math.round(x / K) * K, Math.round(y / K) * K, K, K);
     }
-    const glow = 0.85 + 0.15 * Math.sin(t * 3);
-    blit(c, pixelText("관리국 괴이 탐사", 12, "#f0b45a", "#c07a2a", 800), 640, 96, 3);
+    const glow2 = 0.85 + 0.15 * Math.sin(t * 3);
+    blit(c, pixelText2("관리국 괴이 탐사", 12, "#f0b45a", "#c07a2a", 800), 640, 96, 3);
     c.save();
-    c.shadowColor = `rgba(255,90,40,${0.55 * glow})`;
+    c.shadowColor = `rgba(255,90,40,${0.55 * glow2})`;
     c.shadowBlur = 30;
-    const logo = pixelText(title2, 30, "#fff3d0", "#ffb43a");
+    const logo = pixelText2(title2, 30, "#fff3d0", "#ffb43a");
     blit(c, logo, 640, 138, Math.min(5, Math.floor(1180 / logo.width)));
     c.restore();
-    blit(c, pixelText(sub, 10, "#c8d0d4", "#9aa6ab", 700), 640, 362, 2);
-    if (Math.sin(t * 3.2) > -0.3) blit(c, pixelText("무료 플레이", 10, "#ffe9a8", "#f0b45a", 800), 1180, 676, 2);
+    blit(c, pixelText2(sub, 10, "#c8d0d4", "#9aa6ab", 700), 640, 362, 2);
+    if (Math.sin(t * 3.2) > -0.3) blit(c, pixelText2("무료 플레이", 10, "#ffe9a8", "#f0b45a", 800), 1180, 676, 2);
     c.fillStyle = "rgba(0,0,0,0.16)";
     for (let y = 0; y < 720; y += K) c.fillRect(0, y, 1280, 1);
     c.restore();
@@ -3579,7 +8727,7 @@
     c.translate(x, y);
     c.scale(0.62, 0.62);
     c.translate(-x, -y);
-    const im = pixelText("전진", 33, "#ffe9a8", "#ffb43a", 700, true);
+    const im = pixelText2("전진", 33, "#ffe9a8", "#ffb43a", 700, true);
     const k = 2;
     {
       const pw = im.width * k + 12 + 9 * 4 + 8 + 28, ph = Math.max(im.height * k, 19 * 4) + 20;
@@ -3606,168 +8754,6 @@
     }
     c.restore();
   }
-
-  // src/game/action/engine/ids.ts
-  var bodySequence = 1;
-  var attackSequence = 1;
-  var newBodyId = () => bodySequence++;
-  function newAttackId(count = 1) {
-    const id = attackSequence;
-    attackSequence += Math.max(1, count);
-    return id;
-  }
-
-  // src/game/action/engine/fighter.ts
-  var GRAVITY = 2.6;
-  var newId = newBodyId;
-  var REACT_TICKS = { flinch: 10, stagger: 16, bind: 75 };
-  var DOWN_TICKS = 26;
-  var GETUP_INVULN = 12;
-  var MAX_JUGGLE = 2;
-  function overlap(a, b) {
-    if (a.x1 < b.x0 || b.x1 < a.x0) return false;
-    if (a.z1 < b.z0 || b.z1 < a.z0) return false;
-    return Math.abs(a.y - b.y) <= Math.max(a.dy ?? 18, b.dy ?? 18);
-  }
-  function toWorld(b, x0, x1, z0, z1, dy = 18) {
-    const a = b.dir === 1 ? b.x + x0 : b.x - x1;
-    const c = b.dir === 1 ? b.x + x1 : b.x - x0;
-    return { x0: a, x1: c, z0: b.z + z0, z1: b.z + z1, y: b.y, dy };
-  }
-  var Fighter = class {
-    id = newId();
-    x = 0;
-    y = 600;
-    z = 0;
-    /** 그리기 보간용 직전 틱 위치 */
-    px = 0;
-    py = 600;
-    pz = 0;
-    vx = 0;
-    vy = 0;
-    vz = 0;
-    dir = 1;
-    hp = 100;
-    hpMax = 100;
-    alive = true;
-    stop = 0;
-    phase = "free";
-    /** 지금 상태에 들어온 뒤 틱 */
-    t = 0;
-    /** 반응이 끝나는 틱 수 */
-    until = 0;
-    invuln = 0;
-    /** 슈퍼아머: 0 없음, 1 약 경직 무시, 2 강 경직·띄움까지 무시 */
-    armor = 0;
-    juggle = 0;
-    flash = 0;
-    grabbable = true;
-    boss = false;
-    label;
-    /** 넉백 감속 */
-    friction = 0.78;
-    width = 34;
-    lastHitBy = 0;
-    get airborne() {
-      return this.z > 0 || this.vz > 0;
-    }
-    enter(p, until = 0) {
-      this.phase = p;
-      this.t = 0;
-      this.until = until;
-    }
-    /** 맞음: 피해·반응·넉백. 가드·아머는 하위 클래스가 먼저 거른다 */
-    applyHit(hit2, world) {
-      if (!this.alive || this.phase === "dead" || this.invuln > 0 || this.phase === "getup") return { kind: "immune" };
-      if (this.phase === "down" && this.z <= 0 && !hit2.low) return { kind: "immune" };
-      this.hp = Math.max(0, this.hp - hit2.dmg);
-      this.flash = 3;
-      this.dir = -hit2.dir;
-      const killed = this.hp <= 0;
-      let react2 = hit2.react;
-      if (killed && react2 !== "none") react2 = "down";
-      const rank = { none: 0, flinch: 1, stagger: 2, launch: 2, down: 3, bind: 3 }[react2];
-      if (!killed && this.armor > 0 && !hit2.armorBreak && rank <= this.armor) {
-        return { kind: "armor" };
-      }
-      const push = hit2.push ?? 4;
-      if (this.airborne && react2 !== "none") {
-        this.juggle++;
-        this.vx = hit2.dir * push;
-        this.vz = this.juggle <= MAX_JUGGLE ? Math.max(this.vz, (hit2.lift ?? 10) * 0.8) : Math.min(this.vz, 0);
-        this.enter("air-hurt");
-        if (react2 === "down" || killed) this.vz = Math.max(this.vz, hit2.lift ?? 10);
-      } else if (react2 === "flinch" || react2 === "stagger") {
-        this.vx = hit2.dir * push;
-        this.enter("hurt", REACT_TICKS[react2]);
-      } else if (react2 === "launch" || react2 === "down") {
-        this.vx = hit2.dir * push;
-        this.vz = hit2.lift ?? (react2 === "launch" ? 16 : 11);
-        this.z = Math.max(this.z, 1);
-        this.juggle = 1;
-        this.enter("air-hurt");
-      } else if (react2 === "bind") {
-        this.vx = 0;
-        this.enter("hurt", REACT_TICKS.bind);
-      }
-      if (killed) this.onKilled(world);
-      return { kind: "hit", killed };
-    }
-    onKilled(_world) {
-    }
-    /** 반응 상태 진행. 처리했으면 true (하위 클래스는 자기 행동을 건너뛴다) */
-    stepReact(world) {
-      if (this.flash > 0) this.flash--;
-      if (this.invuln > 0) this.invuln--;
-      const lane = world.lane;
-      switch (this.phase) {
-        case "hurt":
-          this.x += this.vx;
-          this.vx *= this.friction;
-          if (++this.t >= this.until) this.enter("free");
-          break;
-        case "air-hurt":
-          this.x += this.vx;
-          this.z += this.vz;
-          this.vz -= GRAVITY;
-          if (this.z <= 0 && this.vz < 0) {
-            this.z = 0;
-            this.vz = 0;
-            this.vx *= 0.4;
-            world.fx("dust", this.x, this.y, 0);
-            world.emit({ type: "land", x: this.x });
-            this.enter("down", this.hp <= 0 ? DOWN_TICKS + 14 : DOWN_TICKS);
-            world.emit({ type: "down", x: this.x, who: this.team === "player" ? "player" : "enemy" });
-          }
-          break;
-        case "down":
-          this.x += this.vx;
-          this.vx *= 0.7;
-          if (++this.t >= this.until) {
-            if (this.hp <= 0) this.enter("dead");
-            else this.enter("getup", 14);
-          }
-          break;
-        case "getup":
-          if (++this.t >= this.until) {
-            this.invuln = GETUP_INVULN;
-            this.juggle = 0;
-            this.enter("free");
-          }
-          break;
-        case "dead":
-          this.t++;
-          break;
-        case "held":
-          this.t++;
-          break;
-        default:
-          return false;
-      }
-      this.y = Math.max(lane[0], Math.min(lane[1], this.y));
-      return true;
-    }
-  };
 
   // src/game/action/engine/bodies.ts
   var Dummy = class extends Fighter {
@@ -3911,14 +8897,14 @@
       const tell = this.ai === "windup" && this.phase === "free";
       ctx.save();
       if (this.phase === "dead") ctx.globalAlpha = Math.max(0, 1 - this.t / 30) * (this.t % 4 < 2 ? 1 : 0.4);
-      const body2 = this.flash > 0 ? "#ffffff" : tell && this.aiT % 4 < 2 ? "#c84040" : this.boss ? "#5d5a52" : this.elite ? "#6a6070" : "#77818a";
-      ctx.fillStyle = body2;
+      const body = this.flash > 0 ? "#ffffff" : tell && this.aiT % 4 < 2 ? "#c84040" : this.boss ? "#5d5a52" : this.elite ? "#6a6070" : "#77818a";
+      ctx.fillStyle = body;
       if (lying) ctx.fillRect(-h / 2, -30, h, 30);
       else {
         ctx.fillRect(-w / 2, -h, w, h);
         ctx.fillStyle = "#20262a";
         ctx.fillRect(this.dir * 8 - 4, -h + 18, 8, 6);
-        ctx.fillStyle = body2;
+        ctx.fillStyle = body;
         const arm = this.phase === "free" && this.ai === "strike" ? this.boss ? 110 : 84 : tell ? -14 : 18;
         ctx.fillRect(this.dir > 0 ? 6 : -6 - arm, -120, arm, 16);
       }
@@ -3970,13 +8956,13 @@
   };
 
   // src/game/action/art/items.ts
-  var ALIAS = { heal: "heal_orb", ammo: "rounds", coin: "coins" };
+  var ALIAS2 = { heal: "heal_orb", ammo: "rounds", coin: "coins" };
   var cache3 = /* @__PURE__ */ new Map();
-  function art4(id) {
+  function art3(id) {
     const all = typeof window !== "undefined" && window.__GOEI_ITEM_ART__ || {};
-    return all[id] ?? all[ALIAS[id] ?? ""];
+    return all[id] ?? all[ALIAS2[id] ?? ""];
   }
-  function img3(a) {
+  function img4(a) {
     let im = cache3.get(a.src);
     if (!im) {
       im = new Image();
@@ -3986,8 +8972,8 @@
     return im.complete && im.naturalWidth ? im : null;
   }
   function drawItemArt(ctx, id, x, y, size2) {
-    const a = art4(id);
-    const im = a && img3(a);
+    const a = art3(id);
+    const im = a && img4(a);
     if (!a || !im) return false;
     const fit3 = Math.min(size2 / a.w, size2 / a.h);
     const k = fit3 >= 1 ? Math.floor(fit3) : fit3;
@@ -3999,8 +8985,8 @@
     return true;
   }
   function drawItemHeld(ctx, id, deg) {
-    const a = art4(id);
-    const im = a && img3(a);
+    const a = art3(id);
+    const im = a && img4(a);
     if (!a || !im || !a.grip) return false;
     ctx.save();
     ctx.rotate((deg - 90) * Math.PI / 180);
@@ -4535,7 +9521,7 @@
     }
     return ev;
   }
-  function spawnBullet(field, a, damage3, knockback, reach, ref, dy, vsHuman) {
+  function spawnBullet(field, a, damage, knockback, reach, ref, dy, vsHuman) {
     const speed = 1500;
     field.projs.push({
       id: field.nextId++,
@@ -4547,7 +9533,7 @@
       vx: a.dir * speed,
       vz: 0,
       life: reach / speed,
-      damage: damage3,
+      damage,
       knockback,
       knockdown: false,
       vsHuman,
@@ -4898,7 +9884,7 @@
     rect(g2, mark, 15, 14, 2, 6);
     rect(g2, mark, 13, 16, 6, 2);
   };
-  var ICONS = {
+  var ICONS2 = {
     medkit: (g2) => {
       rect(g2, C2.heal, 4, 9, 24, 18);
       rect(g2, C2.dark, 12, 5, 8, 4);
@@ -5152,7 +10138,7 @@
       }
       return;
     }
-    const d3 = ICONS[id];
+    const d3 = ICONS2[id];
     if (!d3) return;
     ctx.save();
     ctx.translate(x, y);
@@ -5230,7 +10216,7 @@
   var COMMON_RELICS = ["scrap", "oddcoin", "tooth", "photo"];
   function spawnEnemyDrops(field, run, drops, x, y, kind = "") {
     const ev = [];
-    const put2 = (k, ref, amount = 1) => {
+    const put3 = (k, ref, amount = 1) => {
       spawnPickup(field, k, x, y, ref, amount);
       ev.push({ t: "drop", kind: k, ref, x, y });
     };
@@ -5243,34 +10229,34 @@
           for (let i = 0; i < parts; i++) {
             const k = i === parts - 1 ? left : Math.ceil(d3.n / parts);
             left -= k;
-            if (k > 0) put2("cash", void 0, k);
+            if (k > 0) put3("cash", void 0, k);
           }
           break;
         }
         case "shard":
-          for (let i = 0; i < d3.n; i++) put2("shard");
+          for (let i = 0; i < d3.n; i++) put3("shard");
           break;
         case "heal":
-          for (let i = 0; i < d3.n; i++) put2("heal");
+          for (let i = 0; i < d3.n; i++) put3("heal");
           break;
         case "ammo":
-          if (usesAmmo(run)) for (let i = 0; i < d3.n; i++) put2("ammo");
-          else put2("cash", void 0, 4 * d3.n);
+          if (usesAmmo(run)) for (let i = 0; i < d3.n; i++) put3("ammo");
+          else put3("cash", void 0, 4 * d3.n);
           break;
         case "relic":
-          for (let i = 0; i < d3.n; i++) put2("relic", COMMON_RELICS[Math.floor(rand(field) * COMMON_RELICS.length)]);
+          for (let i = 0; i < d3.n; i++) put3("relic", COMMON_RELICS[Math.floor(rand(field) * COMMON_RELICS.length)]);
           break;
         case "dream":
-          for (let i = 0; i < d3.n; i++) put2("relic", "dreamcatcher");
+          for (let i = 0; i < d3.n; i++) put3("relic", "dreamcatcher");
           break;
         case "key":
-          for (let i = 0; i < d3.n; i++) put2("relic", "rustkey");
+          for (let i = 0; i < d3.n; i++) put3("relic", "rustkey");
           break;
       }
     }
-    if (usesAmmo(run) && run.mag + run.reserve < 8 && rand(field) < 0.25) put2("ammo");
+    if (usesAmmo(run) && run.mag + run.reserve < 8 && rand(field) < 0.25) put3("ammo");
     const w = ENEMY_WEAPONS[kind];
-    if (w && rand(field) < w.p) put2("weapon", w.pool[Math.floor(rand(field) * w.pool.length)]);
+    if (w && rand(field) < w.p) put3("weapon", w.pool[Math.floor(rand(field) * w.pool.length)]);
     return ev;
   }
   function strikeProps(field, run, hits, seen2, targets = []) {
@@ -5293,7 +10279,7 @@
     return ev;
   }
   function furnishFloor(field, floor, lane, r = () => rand(field)) {
-    const pick6 = (a) => a[Math.floor(r() * a.length)];
+    const pick7 = (a) => a[Math.floor(r() * a.length)];
     const end = Number.isFinite(floor.exitX) ? floor.exitX : floor.length - 80;
     const x0 = (floor.startX ?? 200) + 260, x1 = Math.max(x0 + 200, Math.min(end, floor.length - 80) - 160);
     const taken = (floor.props ?? []).map((p) => [p.x - (p.w ?? 40) / 2 - 60, p.x + (p.w ?? 40) / 2 + 60]);
@@ -5308,17 +10294,17 @@
       return null;
     };
     const front = lane[1] - 20, back = lane[0] + 10;
-    const put2 = (id, y) => {
+    const put3 = (id, y) => {
       const x = spot();
       if (x !== null) placeProp(field, id, x, y);
     };
-    put2(pick6(["chair", "bin", "pot"]), front - r() * 40);
-    put2(pick6(["tv", "extinguisher", "table", "chair"]), front - 20 - r() * 40);
-    put2(pick6(["crate", "crate", "drawer", "mailbox"]), back);
-    put2(pick6(["barrel", "locker", "crate"]), back + r() * 20);
+    put3(pick7(["chair", "bin", "pot"]), front - r() * 40);
+    put3(pick7(["tv", "extinguisher", "table", "chair"]), front - 20 - r() * 40);
+    put3(pick7(["crate", "crate", "drawer", "mailbox"]), back);
+    put3(pick7(["barrel", "locker", "crate"]), back + r() * 20);
     const wx = spot();
     if (wx !== null) {
-      const p = spawnPickup(field, "weapon", wx, (lane[0] + lane[1]) / 2, pick6(Object.keys(WEAPONS).filter((id) => id !== "katana" && id !== "smg")));
+      const p = spawnPickup(field, "weapon", wx, (lane[0] + lane[1]) / 2, pick7(Object.keys(WEAPONS).filter((id) => id !== "katana" && id !== "smg")));
       Object.assign(p, { vx: 0, vy: 0, vz: 0, z: 0 });
     }
   }
@@ -5364,9 +10350,9 @@
       if (!cur) return;
       const { shop, run } = cur;
       const v = VENDORS[shop.vendor];
-      const icon = (o) => o.kind === "ammo" ? "ammo-" + o.ref : o.kind === "clinic" ? "backalley" : o.kind === "loan" ? "shinyuri" : o.kind === "gamble" ? "vending" : o.ref;
+      const icon2 = (o) => o.kind === "ammo" ? "ammo-" + o.ref : o.kind === "clinic" ? "backalley" : o.kind === "loan" ? "shinyuri" : o.kind === "gamble" ? "vending" : o.ref;
       const rows = shop.offers.map(
-        (o) => `<button class="row" data-k="${o.key}" ${o.stock <= 0 ? "disabled" : ""}><canvas width="40" height="40" data-icon="${icon(o)}"></canvas>
+        (o) => `<button class="row" data-k="${o.key}" ${o.stock <= 0 ? "disabled" : ""}><canvas width="40" height="40" data-icon="${icon2(o)}"></canvas>
         <span class="t"><b>${o.name}</b><small>${o.desc}</small></span>
         <span class="p">${o.kind === "loan" ? "빌리기" : o.hpCost ? "체력 20%" : o.price + "원"}<small>${o.stock <= 0 ? "품절" : o.kind === "loan" ? "" : "남음 " + o.stock}</small></span></button>`
       ).join("");
@@ -5629,7 +10615,7 @@
   var int = (r, a, b) => a + Math.floor(r() * (b - a + 1));
   function rollDrops2(table, r, elite = false) {
     const out = [];
-    const add = (item2, n) => n > 0 && out.push({ item: item2, n });
+    const add = (item, n) => n > 0 && out.push({ item, n });
     const k = elite ? 1.5 : 1;
     const heal2 = (p) => r() < p + (elite ? 0.1 : 0) && add("heal", 1);
     switch (table) {
@@ -5835,7 +10821,7 @@
     const headX = neckX + Math.sin(lean) * r * 1.1 + r * 0.2;
     const headY = neckY - Math.cos(lean) * r * 0.95;
     const armEnd = (a, len) => [sx + Math.sin(a) * len, sy + Math.cos(a) * len];
-    const [fx2, fy] = armEnd(p.armF, arm * p.reach);
+    const [fx, fy] = armEnd(p.armF, arm * p.reach);
     const [bx, by] = armEnd(p.armB, arm);
     const x = L.extras ?? [];
     const limbW = bulk * 0.5;
@@ -5936,11 +10922,11 @@
       ctx.fillStyle = "#4a0808";
       ctx.fillRect(headX + r * 0.15, headY + r * 0.15, r * 0.8, r * 1.5 * p.open);
     }
-    segEdge(ctx, limbW, sx, sy, fx2, fy, arm * 0.06, paint("top"));
-    dot(ctx, fx2, fy, limbW * 0.62, paint("skin"));
-    if (x.includes("sword")) seg(ctx, Math.max(3, h * 0.016), fx2, fy, fx2 + Math.sin(p.armF + 0.4) * h * 0.42, fy + Math.cos(p.armF + 0.4) * h * 0.42, 0, paint("acc"));
+    segEdge(ctx, limbW, sx, sy, fx, fy, arm * 0.06, paint("top"));
+    dot(ctx, fx, fy, limbW * 0.62, paint("skin"));
+    if (x.includes("sword")) seg(ctx, Math.max(3, h * 0.016), fx, fy, fx + Math.sin(p.armF + 0.4) * h * 0.42, fy + Math.cos(p.armF + 0.4) * h * 0.42, 0, paint("acc"));
     if (x.includes("shield")) {
-      const shx = Math.max(fx2, sx + bulk * 0.6);
+      const shx = Math.max(fx, sx + bulk * 0.6);
       ctx.fillStyle = paint("acc");
       ctx.beginPath();
       ctx.roundRect(shx - h * 0.02, sy - h * 0.14, h * 0.07, h * 0.52, 4);
@@ -5959,15 +10945,15 @@
     for (const side of [-1, 1]) {
       for (let i = 0; i < legN; i++) {
         const ph = Math.sin(walk + i * 1.3 + (side > 0 ? 0 : Math.PI)) * 8;
-        const fx2 = side * (w * 0.25 + i * w * 0.07) + ph + (p.armF > 1.4 && side > 0 && i === legN - 1 ? w * 0.3 : 0);
-        const kx = fx2 * 0.6;
+        const fx = side * (w * 0.25 + i * w * 0.07) + ph + (p.armF > 1.4 && side > 0 && i === legN - 1 ? w * 0.3 : 0);
+        const kx = fx * 0.6;
         const ky = cy - (big ? e.def.h * 0.3 : h * 0.35);
         ctx.strokeStyle = side < 0 ? paint("detail") : paint("skin");
         ctx.lineWidth = big ? e.def.h * 0.045 : Math.max(5, h * 0.12);
         ctx.beginPath();
         ctx.moveTo(0, cy);
         ctx.lineTo(kx, ky);
-        ctx.lineTo(fx2, 0);
+        ctx.lineTo(fx, 0);
         ctx.stroke();
       }
       if (side < 0) {
@@ -6101,8 +11087,8 @@
     b.x.clearRect(0, 0, CW, CH);
     return b;
   }
-  function mix(hex, to, k) {
-    const a = parseInt(hex.slice(1), 16), b = parseInt(to.slice(1), 16);
+  function mix(hex2, to, k) {
+    const a = parseInt(hex2.slice(1), 16), b = parseInt(to.slice(1), 16);
     const ch = (s2) => Math.round((a >> s2 & 255) * (1 - k) + (b >> s2 & 255) * k);
     return `rgb(${ch(16)},${ch(8)},${ch(0)})`;
   }
@@ -6186,10 +11172,10 @@
       transform(M3.x);
       drawShape(M3.x, e, L, p, () => "#ffffff");
       const hw = Math.min(OX, Math.ceil(Math.max(e.def.w * 0.75, e.def.h * (p.lie > 0 || L.shape !== "human" ? 1.05 : 0.7)) / PIXEL) + 10);
-      const img4 = M3.x.getImageData(OX - hw, 0, hw * 2, CH);
-      const a = img4.data;
+      const img5 = M3.x.getImageData(OX - hw, 0, hw * 2, CH);
+      const a = img5.data;
       for (let i = 3; i < a.length; i += 4) a[i] = a[i] > 110 ? 255 : 0;
-      M3.x.putImageData(img4, OX - hw, 0);
+      M3.x.putImageData(img5, OX - hw, 0);
       const C4 = board(1);
       transform(C4.x);
       drawShape(C4.x, e, L, p, flash ? (part) => lighten(col[part], 0.55) : (part) => col[part]);
@@ -6423,14 +11409,14 @@
       return this.cds[id] ?? 0;
     }
     /** 공격 시작. 예고 장이 있으면 enemyTell/bossTell을 낸다 */
-    start(move3, w, cd = 0) {
-      this.move = move3;
+    start(move2, w, cd = 0) {
+      this.move = move2;
       this.mf = 0;
-      this.atk = newAttackId(move3.specs.length);
-      this.mem.last = move3.id;
+      this.atk = newAttackId(move2.specs.length);
+      this.mem.last = move2.id;
       this.set("attack");
-      if (cd) this.cds[move3.id] = Math.round(cd * (this.has("fast") ? 0.7 : 1));
-      if (move3.frames[0]?.tele) w.emit({ type: this.boss ? "bossTell" : "enemyTell", x: this.x, kind: this.kind });
+      if (cd) this.cds[move2.id] = Math.round(cd * (this.has("fast") ? 0.7 : 1));
+      if (move2.frames[0]?.tele) w.emit({ type: this.boss ? "bossTell" : "enemyTell", x: this.x, kind: this.kind });
     }
     frameNow() {
       return this.state === "attack" && this.move ? this.move.frames[this.mf] ?? null : null;
@@ -6774,8 +11760,8 @@
     return shield2 ? "shield" : hits[0].part;
   }
   var PART_SHADE = { head: 0.18, legs: -0.12, arm: 0.08, shield: 0.3, back: 0.22, mouth: 0.35, corner: 0.4, weapon: 0.5 };
-  function tint(hex, k) {
-    const n = parseInt(hex.slice(1), 16);
+  function tint(hex2, k) {
+    const n = parseInt(hex2.slice(1), 16);
     const f = (c) => Math.max(0, Math.min(255, Math.round(k >= 0 ? c + (255 - c) * k : c * (1 + k))));
     return `rgb(${f(n >> 16)},${f(n >> 8 & 255)},${f(n & 255)})`;
   }
@@ -6862,20 +11848,20 @@
     ctx.restore();
   }
   function drawBoxes(e, ctx, f, alpha, outline, armorNow) {
-    const body2 = e.state === "down" || e.state === "getup" || e.state === "dead" ? flat(e) : e.localHurt().length ? e.localHurt() : e.brain.hurt ? [] : e.def.body;
+    const body = e.state === "down" || e.state === "getup" || e.state === "dead" ? flat(e) : e.localHurt().length ? e.localHurt() : e.brain.hurt ? [] : e.def.body;
     ctx.save();
     if (outline) {
       ctx.shadowColor = outline;
       ctx.shadowBlur = armorNow >= 2 ? 18 : 12;
     }
-    for (const b of body2) {
+    for (const b of body) {
       const wb = toWorld2(b, e.x, e.y, e.z, e.dir);
       ctx.fillStyle = tint(e.def.color, (PART_SHADE[b.part ?? "torso"] ?? 0) + (e.flash > 0 && e.state !== "dead" ? 0.5 : 0));
       ctx.fillRect(wb.x0, e.y - wb.z1, wb.x1 - wb.x0, wb.z1 - wb.z0);
     }
     ctx.restore();
-    if (body2.length && e.state !== "dead" && e.state !== "down") {
-      const top = Math.max(...body2.map((b) => b.z1));
+    if (body.length && e.state !== "dead" && e.state !== "down") {
+      const top = Math.max(...body.map((b) => b.z1));
       ctx.fillStyle = e.state === "attack" ? "#ff4b3a" : "#f2efe6";
       ctx.fillRect(e.x + e.dir * (e.def.w * 0.18) - 4, e.y - e.z - top + 12, 8, 6);
     }
@@ -7489,12 +12475,12 @@
     return { fx0: lerp(a.fx0, b.fx0, t), fx1: lerp(a.fx1, b.fx1, t), z0: lerp(a.z0, b.z0, t), z1: lerp(a.z1, b.z1, t), dy: lerp(a.dy, b.dy, t), part: a.part };
   }
   var at = (b, t) => b ? typeof b === "function" ? b(t) : b : [];
-  function bake(id, label3, body2, phases, specs, extra = {}) {
+  function bake(id, label3, body, phases, specs, extra = {}) {
     const frames = [];
     for (const p of phases) {
       for (let i = 0; i < p.n; i++) {
         const t = p.n <= 1 ? 1 : i / (p.n - 1);
-        const f = { hit: at(p.hit, t), hurt: p.hurt ? at(p.hurt, t) : body2, armor: p.armor ?? 0 };
+        const f = { hit: at(p.hit, t), hurt: p.hurt ? at(p.hurt, t) : body, armor: p.armor ?? 0 };
         if (f.hit.length) f.spec = p.spec ?? 0;
         const vx = typeof p.vx === "function" ? p.vx(t) : p.vx;
         if (vx) f.vx = vx;
@@ -7512,7 +12498,7 @@
   // src/game/action/enemy/moves.ts
   var S = (dmg, react2, push = 6, extra = {}) => ({ dmg, react: react2, push, stop: react2 === "none" ? 2 : react2 === "flinch" ? 3 : 5, strength: react2 === "none" || react2 === "flinch" ? 1 : react2 === "stagger" ? 2 : 3, ...extra });
   function strike(id, label3, w, h, o) {
-    const body2 = o.body ?? humanoid(w, h);
+    const body = o.body ?? humanoid(w, h);
     const lean = humanoid(w, h, 16, -w * 0.12);
     const reachBody = humanoid(w, h, 16, w * 0.18);
     const dy = o.dy ?? 20;
@@ -7526,15 +12512,15 @@
     ];
     if (o.fire) phases[1].hit = [];
     const danger = o.fire ? void 0 : [{ fx0: o.reach[0], fx1: o.reach[1] + (o.lunge ?? 0) * o.active, dy }];
-    return bake(id, label3, body2, phases, [{ ...o.spec, low: o.low ?? o.spec.low }], { danger });
+    return bake(id, label3, body, phases, [{ ...o.spec, low: o.low ?? o.spec.low }], { danger });
   }
   function grab(id, label3, w, h, o) {
-    const body2 = o.body ?? humanoid(w, h);
+    const body = o.body ?? humanoid(w, h);
     const spec = { dmg: 0, react: "none", push: 0, unblockable: true, grab: { ticks: o.ticks, dmgPerTick: o.dmgPerTick }, debuff: o.debuff, stop: 4 };
     return bake(
       id,
       label3,
-      body2,
+      body,
       [
         { n: o.tele, tele: true, hurt: humanoid(w, h, 16, -w * 0.1) },
         { n: o.active, hit: [B(w * 0.2, o.reach, h * 0.3, h * 0.8, 22, "arm")], vx: o.lunge ?? 0, armor: o.armor ?? 0 },
@@ -7545,11 +12531,11 @@
     );
   }
   function charge(id, label3, w, h, o) {
-    const body2 = o.body ?? humanoid(w, h);
+    const body = o.body ?? humanoid(w, h);
     return bake(
       id,
       label3,
-      body2,
+      body,
       [
         { n: o.tele, tele: true, hurt: humanoid(w, h, 16, -w * 0.15, 0.15), vx: -0.6 },
         { n: o.dash, hit: [B(0, w * 0.7, h * 0.1, h * 0.85, 22, "torso")], vx: o.speed, armor: o.armor ?? 1, hurt: humanoid(w, h, 16, w * 0.2) },
@@ -7560,11 +12546,11 @@
     );
   }
   function shoot2(id, label3, w, h, o) {
-    const body2 = o.body ?? humanoid(w, h);
+    const body = o.body ?? humanoid(w, h);
     const phases = [{ n: o.tele, tele: true }];
     for (let i = 0; i < o.shots; i++) phases.push({ n: o.gap, fire: o.fire, armor: o.armor ?? 0 });
     phases.push({ n: o.recover });
-    return bake(id, label3, body2, phases, [S(0, "none")]);
+    return bake(id, label3, body, phases, [S(0, "none")]);
   }
 
   // src/game/action/enemy/guardians.ts
@@ -9540,9 +14526,9 @@
         const ok = normal.filter((d4) => d4.price <= wl && wave.filter((s2) => s2.kind === d4.kind).length < (d4.cap ?? SCREEN_CAP));
         if (!ok.length) break;
         const weights = ok.map((d4) => 1 / (1 + wave.filter((s2) => s2.kind === d4.kind).length * 1.5));
-        let pick6 = r() * weights.reduce((a, b) => a + b, 0);
+        let pick7 = r() * weights.reduce((a, b) => a + b, 0);
         let d3 = ok[ok.length - 1];
-        for (let i = 0; i < ok.length; i++) if ((pick6 -= weights[i]) <= 0) d3 = ok[i], i = ok.length;
+        for (let i = 0; i < ok.length; i++) if ((pick7 -= weights[i]) <= 0) d3 = ok[i], i = ok.length;
         wave.push({ kind: d3.kind, ...place(d3, wave.length, area, r), wave: wv });
         wl -= d3.price;
       }
@@ -9722,8 +14708,8 @@
     c.ellipse(x, y, Math.max(24, box2.w * k / 2), 9, 0, 0, Math.PI * 2);
     c.fill();
     c.imageSmoothingEnabled = false;
-    const glow = 0.35 + 0.2 * Math.sin(tick / 8);
-    c.shadowColor = `rgba(255,214,90,${glow})`;
+    const glow2 = 0.35 + 0.2 * Math.sin(tick / 8);
+    c.shadowColor = `rgba(255,214,90,${glow2})`;
     c.shadowBlur = 10;
     if (rounds && b) {
       c.drawImage(a, Math.round(x - 40), Math.round(y - box2.h * 4), box2.w * 4, box2.h * 4);
@@ -10074,14 +15060,16 @@
 
   // src/game/action/engine/render.ts
   var lerp2 = (a, b, t) => a + (b - a) * t;
-  function makeRenderer(ctx, art6, opt) {
+  function makeRenderer(ctx, art4, opt) {
     const ghosts = [];
     function background(w, camX) {
       const f = w.floor;
       const pal = f.palette ?? { wall: "#2b343a", floor: "#3a4247", accent: "#5b6a72" };
       const [top] = w.lane;
-      ctx.fillStyle = "#0d1114";
-      ctx.fillRect(0, 0, SCREEN_W, SCREEN_H);
+      if (!view.hub) {
+        ctx.fillStyle = "#0d1114";
+        ctx.fillRect(0, 0, SCREEN_W, SCREEN_H);
+      }
       if (f.drawBackground) {
         ctx.save();
         ctx.translate(-camX, 0);
@@ -10092,8 +15080,8 @@
       const wallTop = 110;
       ctx.fillStyle = pal.wall;
       ctx.fillRect(0, wallTop, SCREEN_W, top - wallTop - 20);
-      const step4 = 320;
-      for (let x = Math.floor(camX / step4) * step4; x < camX + SCREEN_W + step4; x += step4) {
+      const step2 = 320;
+      for (let x = Math.floor(camX / step2) * step2; x < camX + view.w + step2; x += step2) {
         const sx = x - camX;
         ctx.fillStyle = "rgba(0,0,0,0.22)";
         ctx.fillRect(sx, wallTop, 26, top - wallTop - 20);
@@ -10113,7 +15101,7 @@
       ctx.fillRect(0, top - 20, SCREEN_W, SCREEN_H - top + 20);
       ctx.strokeStyle = "rgba(255,255,255,0.05)";
       ctx.lineWidth = 2;
-      for (let x = Math.floor(camX / 160) * 160; x < camX + SCREEN_W + 400; x += 160) {
+      for (let x = Math.floor(camX / 160) * 160; x < camX + view.w + 400; x += 160) {
         const sx = x - camX;
         ctx.beginPath();
         ctx.moveTo(sx, top - 20);
@@ -10138,11 +15126,11 @@
     function drawProps(w, camX, list = w.props) {
       for (const p of list) {
         const sx = p.x - camX;
-        if (sx < -p.w - 200 || sx > SCREEN_W + p.w + 200) continue;
+        if (sx < -p.w - 200 || sx > view.w + p.w + 200) continue;
         if (p.kind === "hubdoor" || p.kind === "hubspot") continue;
         if (p.actor) {
           const a = p.actor;
-          const list2 = art6.clips[a.clip ?? "idle"];
+          const list2 = art4.clips[a.clip ?? "idle"];
           const fr = list2 ? Math.floor(w.tick / 5) % list2.length : 0;
           ctx.save();
           if (a.hue) ctx.filter = `hue-rotate(${a.hue}deg) saturate(1.3)`;
@@ -10165,15 +15153,15 @@
     }
     let ghostK = 1;
     function sprite(clip, frame2, origin, x, y, dir, alpha = 1) {
-      const list = art6.clips[clip];
+      const list = art4.clips[clip];
       const fi = list?.[Math.min(frame2, list.length - 1)];
-      if (!fi || !art6.atlas) return false;
+      if (!fi || !art4.atlas) return false;
       ctx.save();
       ctx.globalAlpha = alpha * ghostK;
       snapTo(ctx, x, y);
       if (dir < 0) ctx.scale(-1, 1);
       const P = PIXEL * spr(y);
-      ctx.drawImage(art6.atlas, fi.sx, fi.sy, fi.w, fi.h, (fi.ox - origin) * P, fi.oy * P, fi.w * P, fi.h * P);
+      ctx.drawImage(art4.atlas, fi.sx, fi.sy, fi.w, fi.h, (fi.ox - origin) * P, fi.oy * P, fi.w * P, fi.h * P);
       ctx.restore();
       return true;
     }
@@ -10182,10 +15170,15 @@
       ctx.fillStyle = b.team === "enemy" ? "#7a848b" : "#9aa6ad";
       for (const h of fr.hurt) ctx.fillRect(h.x0 - ox, h.y - h.z1 - oy, h.x1 - h.x0, h.z1 - h.z0);
     }
+    let drawCam = 0;
     function drawPlayer(p, x, y, z, w) {
       if (p.ally) sprite(p.ally.clip, p.ally.f, 0, x + (p.ally.x - p.x), y + (p.ally.y - p.y), p.ally.dir);
       const a = p.anim();
-      if (drawTestPlayer(ctx, /walk|run/.test(a.clip), x, y - z, p.dir)) return;
+      if (p instanceof EileenPlayer && !p.seat) {
+        p.drawSelf(ctx, drawCam);
+        return;
+      }
+      if (drawTestPlayer(ctx, a.clip, a.frame, p.clipLen(a.clip), x, y - z, p.dir)) return;
       const blink = p.invuln > 0 && w.tick % 4 < 2 ? 0.5 : 1;
       if (!sprite(a.clip, a.frame, a.origin, x, y - z, p.dir, blink)) {
         ctx.fillStyle = "#c0453a";
@@ -10425,9 +15418,9 @@
         ctx.stroke();
       }
       const x = lerp2(-400, 260, Math.min(1, k * 3));
-      if (art6.cutin) {
+      if (art4.cutin) {
         ctx.imageSmoothingEnabled = false;
-        ctx.drawImage(art6.cutin, x - 200, bandY - 40, 340, 340);
+        ctx.drawImage(art4.cutin, x - 200, bandY - 40, 340, 340);
       }
       ctx.font = pfont(72).f;
       ctx.fillStyle = "#fff";
@@ -10437,7 +15430,10 @@
       draw(w, alpha) {
         ctx.imageSmoothingEnabled = false;
         const shake = w.shakeT > 0 ? (w.tick % 2 ? 1 : -1) * w.shakeP * 2 : 0;
+        if (w.player instanceof EileenPlayer) w.player.frameStep();
         const camX = Math.round(lerp2(w.prevCamX, w.camX, alpha));
+        drawCam = camX;
+        w.drawCamX = camX;
         ctx.save();
         ctx.translate(shake, w.shakeT > 0 ? w.tick % 3 - 1 : 0);
         background(w, camX);
@@ -10486,10 +15482,11 @@
           back.call(b, ctx);
           ctx.restore();
         }
-        all.sort((a, b) => a.y - b.y);
+        const sy = (b) => b.sortY ?? b.y;
+        all.sort((a, b) => sy(a) - sy(b));
         for (const b of all) {
           const q = pos(b);
-          propsUpTo(q.y);
+          propsUpTo(b === w.player ? sy(b) : q.y);
           const jitter = b.stop > 0 && b !== w.player ? w.tick % 2 ? 3 : -3 : 0;
           if (b === w.player) drawPlayer(w.player, q.x - camX, q.y, q.z, w);
           else if (b.draw && worldSpace(b)) {
@@ -10518,6 +15515,7 @@
           }
         }
         w.hintShown = false;
+        if (w.player instanceof EileenPlayer) w.player.drawFxLayer(ctx, camX);
         drawFx(w, camX);
         if (w.floor.drawForeground) {
           ctx.save();
@@ -10531,1035 +15529,17 @@
         if (w.showBoxes) boxes(w, camX);
         ctx.restore();
         if (w.cutin > 0) cutin(w);
+        if (w.player instanceof EileenPlayer) {
+          ctx.save();
+          const hz = ctx.canvas.height / SCREEN_H;
+          ctx.setTransform(hz, 0, 0, hz, 0, 0);
+          w.player.drawScreen(ctx);
+          ctx.restore();
+        }
         if (opt.hud) hud(w);
         overlayText(w);
       }
     };
-  }
-
-  // src/game/action/engine/moves.ts
-  var T = (...n) => n;
-  var MOVES = {
-    // 3연타: 잽(앞손, 예비 없음) → 스트레이트(뒷손) → 강한 스트레이트(앞손). 맞혀야 다음 타로 이어진다
-    jab: {
-      clip: "jab",
-      ticks: T(1, 1, 4, 2, 2),
-      adv: 6,
-      cancel: 2,
-      whiffCancel: 3,
-      hits: [{ at: [2], dmg: 8, react: "flinch", push: 5, stop: 3, strength: 1, noise: 0.15 }]
-    },
-    cross: {
-      clip: "cross",
-      ticks: T(1, 1, 2, 5, 3, 2),
-      origin: 6,
-      adv: 10,
-      cancel: 3,
-      whiffCancel: 4,
-      lunge: [3, 0.7],
-      hits: [{ at: [3], dmg: 10, react: "flinch", push: 6, stop: 4, strength: 2, noise: 0.2 }]
-    },
-    power: {
-      clip: "power",
-      ticks: T(2, 2, 3, 7, 6),
-      origin: 16,
-      adv: 20,
-      lunge: [11, 0.78],
-      armor: [2, 3, 1],
-      hits: [{ at: [3], dmg: 18, react: "down", push: 11, lift: 13, stop: 7, strength: 3, shake: 6, noise: 0.35 }]
-    },
-    // 달리며 A: 어깨 돌진
-    dash: {
-      clip: "dash",
-      ticks: T(2, 2, 4, 4, 3, 3),
-      adv: 22,
-      lunge: [12, 0.86],
-      hits: [{ at: [2, 3], dmg: 14, react: "down", push: 12, lift: 9, stop: 6, strength: 3, shake: 5, noise: 0.3 }]
-    },
-    // 앉아 A: 하단 킥 → 띄움
-    lowkick: {
-      clip: "lowkick",
-      ticks: T(1, 2, 5, 3, 2, 2),
-      cancel: 3,
-      hits: [{ at: [2, 3], dmg: 9, react: "launch", push: 3, lift: 17, stop: 4, strength: 2, low: true }]
-    },
-    // 공중 A: 점프 킥
-    airkick: {
-      clip: "airkick",
-      ticks: T(1, 2, 6, 6, 4),
-      hits: [{ at: [2, 3], dmg: 12, react: "stagger", push: 8, stop: 4, strength: 2 }]
-    },
-    // D: 폭파 (고유기). 앞쪽 넓게, 아머 중
-    blast: {
-      clip: "blast",
-      ticks: T(2, 2, 3, 6, 4, 3, 3, 3),
-      armor: [0, 3, 2],
-      hits: [{ at: [3], dmg: 24, react: "down", push: 14, lift: 14, stop: 8, strength: 3, armorBreak: true, box: [20, 82, 10, 90], dy: 34, shake: 9, noise: 0.8 }]
-    },
-    // 앉아 D: 지면 폭파 (양옆 낮게 → 띄움)
-    groundblast: {
-      clip: "groundblast",
-      ticks: T(2, 2, 3, 6, 4, 4),
-      armor: [0, 3, 2],
-      hits: [{ at: [3], dmg: 18, react: "launch", push: 5, lift: 20, stop: 7, strength: 3, low: true, box: [-70, 90, 0, 40], dy: 40, shake: 8, noise: 0.8 }]
-    },
-    // D 길게: 충전(charge 반복) 뒤 놓으면 큰 폭파 (쟈알디 단독 시연판과 같게)
-    bigblast: {
-      clip: "blast",
-      ticks: T(0, 0, 2, 7, 5, 3, 3, 3),
-      armor: [0, 4, 3],
-      hits: [{ at: [3], dmg: 40, react: "down", push: 20, lift: 18, stop: 10, strength: 3, armorBreak: true, box: [10, 120, 0, 100], dy: 50, shake: 12, noise: 1 }]
-    },
-    // F: 숙련 3 연쇄 폭파 (앞으로 세 번), G: 숙련 6 벽 통째로
-    chain: {
-      clip: "chain",
-      ticks: T(2, 3, 3, 3, 3, 3, 3, 3),
-      armor: [1, 5, 2],
-      hits: [
-        { at: [1], dmg: 12, react: "stagger", push: 6, stop: 4, strength: 2, box: [20, 70, 10, 90], dy: 34, shake: 4, noise: 0.5 },
-        { at: [3], dmg: 12, react: "stagger", push: 8, stop: 4, strength: 2, box: [50, 110, 10, 90], dy: 34, shake: 5, noise: 0.5 },
-        { at: [5], dmg: 18, react: "down", push: 14, lift: 14, stop: 7, strength: 3, armorBreak: true, box: [80, 150, 10, 100], dy: 40, shake: 8, noise: 0.8 }
-      ]
-    },
-    wall: {
-      clip: "wall",
-      ticks: T(2, 3, 3, 3, 8, 4, 3, 3),
-      armor: [0, 5, 3],
-      hits: [{ at: [4], dmg: 34, react: "down", push: 24, lift: 10, stop: 10, strength: 3, armorBreak: true, box: [20, 140, 0, 120], dy: 70, shake: 12, noise: 1 }]
-    },
-    fire: { clip: "fire", ticks: T(2, 2, 2, 1) },
-    draw: { clip: "draw", ticks: T(2, 2, 2, 2, 2) },
-    holster: { clip: "holster", ticks: T(2, 2, 2, 2, 2) },
-    reload: { clip: "reload", ticks: T(4, 4, 4, 4) },
-    evade: { clip: "evade", ticks: T(1, 2, 2, 2, 2, 2), invuln: [0, 4], lunge: [15, 0.84] },
-    land: { clip: "land", ticks: T(1, 2, 2), free: true },
-    // 잡기 타격: 무릎. 세 번째는 잡기 폭파로 넘어감
-    grabknee: {
-      clip: "grabknee",
-      ticks: T(2, 2, 4, 3),
-      hits: [{ at: [2], dmg: 7, react: "none", push: 0, stop: 4, strength: 2, box: [14, 46, 20, 60] }]
-    },
-    grabblast: {
-      clip: "grabblast",
-      ticks: T(2, 2, 2, 2, 6, 3, 3, 3),
-      armor: [0, 7, 2],
-      hits: [{ at: [4], dmg: 22, react: "down", push: 16, lift: 15, stop: 8, strength: 3, armorBreak: true, box: [10, 70, 20, 90], dy: 26, shake: 8, noise: 0.8 }]
-    },
-    // W: 필살기. 컷인 뒤 큰 폭발 (장 7)
-    super: {
-      clip: "super",
-      ticks: T(2, 2, 2, 2, 2, 2, 4, 9, 5, 5),
-      invuln: [0, 9],
-      hits: [{ at: [7], dmg: 60, react: "down", push: 18, lift: 18, stop: 10, strength: 3, armorBreak: true, box: [20, 170, 0, 110], dy: 60, shake: 14, noise: 1 }]
-    },
-    pickup: { clip: "pickup", ticks: T(2, 2, 2, 2, 2, 2) },
-    drink: { clip: "drink", ticks: T(3, 3, 3, 3, 3, 3) },
-    eat: { clip: "eat", ticks: T(3, 3, 3, 3, 3, 3) },
-    bandage: { clip: "bandage", ticks: T(3, 3, 3, 3, 3, 3) },
-    toss: { clip: "toss", ticks: T(2, 2, 2, 3, 3, 2) },
-    // 임시 무기: 판정은 아이템 모듈이 낸다 (내구도·물건 부수기와 같이). 엔진은 동작만
-    wswing: { clip: "pipe", ticks: T(2, 2, 2, 3, 4, 5), lunge: [5, 0.75] },
-    wfire: { clip: "fire", ticks: T(2, 2, 2, 1) },
-    // 산탄총·기관단총은 어깨에 견착해서 쏜다
-    wshot: { clip: "shotgun", ticks: T(1, 3, 3, 2, 2) }
-  };
-  var COMBO = ["jab", "cross", "power"];
-
-  // src/game/action/engine/progression.ts
-  var NEUTRAL = { hp: 220, power: 1, aim: 1, defense: 0, speed: 1, poise: 0, charge: 1 };
-  var positive = (value, fallback) => typeof value === "number" && Number.isFinite(value) && value > 0 ? value : fallback;
-  function progressionFor(run) {
-    const s2 = run?.launch?.stats;
-    return {
-      agent: run?.agent ?? "jyaldi",
-      fromHq: !!run?.launch,
-      stats: {
-        hp: positive(s2?.hp, run?.hpMax ?? NEUTRAL.hp),
-        power: positive(s2?.power, NEUTRAL.power),
-        aim: positive(s2?.aim, NEUTRAL.aim),
-        defense: typeof s2?.defense === "number" && Number.isFinite(s2.defense) ? Math.max(0, Math.min(0.5, s2.defense)) : 0,
-        speed: positive(s2?.speed, NEUTRAL.speed),
-        poise: typeof s2?.poise === "number" && Number.isFinite(s2.poise) ? Math.max(0, Math.min(3, s2.poise)) : 0,
-        charge: positive(s2?.charge, NEUTRAL.charge)
-      },
-      relics: [...run?.launch?.relics ?? []],
-      moves: [...run?.launch?.moves ?? []]
-    };
-  }
-  function initializeProgression(player, run) {
-    player.progression = progressionFor(run);
-    player.hp = player.hpMax = player.progression.stats.hp;
-    if (player.progression.relics.includes("first_guard")) player.ward++;
-  }
-  var BLAST_MOVES = /* @__PURE__ */ new Set(["blast", "bigblast", "groundblast", "grabblast", "chain", "wall", "super"]);
-  var isBlastMove = (move3) => BLAST_MOVES.has(move3);
-  function progressionHit(hit2, p, kind) {
-    const damage3 = hit2.dmg * (kind === "melee" ? p.stats.power : kind === "ranged" ? p.stats.aim : 1);
-    if (kind !== "ability" || p.agent !== "jyaldi" || !p.relics.includes("own_jyaldi")) return damage3 === hit2.dmg ? hit2 : { ...hit2, dmg: damage3 };
-    const x = (hit2.x0 + hit2.x1) / 2, z = (hit2.z0 + hit2.z1) / 2;
-    const halfX = (hit2.x1 - hit2.x0) * 0.6, halfZ = (hit2.z1 - hit2.z0) * 0.6;
-    return { ...hit2, dmg: damage3, x0: x - halfX, x1: x + halfX, z0: z - halfZ, z1: z + halfZ, dy: (hit2.dy ?? 18) * 1.2 };
-  }
-  function defendedHit(hit2, p) {
-    return p.stats.defense ? { ...hit2, dmg: hit2.dmg * (1 - p.stats.defense) } : hit2;
-  }
-  function canUseMasteryMove(p, key2) {
-    if (!p.fromHq) return true;
-    return key2 === "chain" ? p.moves.includes("unique_a") : key2 === "wall" ? p.moves.includes("unique_b") : true;
-  }
-  function masteryMove(p, key2, move3) {
-    if (key2 !== "super" || !p.moves.includes("ult2")) return move3;
-    return { ...move3, hits: move3.hits?.map((h) => ({ ...h, at: [...h.at, 8] })) };
-  }
-  var masteryHitId = (p, key2, frame2, id) => id + (key2 === "super" && p.moves.includes("ult2") && frame2 >= 8 ? 1 : 0);
-
-  // src/game/action/engine/player.ts
-  var WALK_X = 9;
-  var WALK_Y = 4.2;
-  var RUN_X = 18;
-  var CROUCH_X = 3.4;
-  var JUMP_V = 31;
-  var BUFFER = 8;
-  var MAG = 8;
-  var HOLSTER_AFTER = 48;
-  var CHARGE_AFTER = 9;
-  var FIGHT_STANCE = 150;
-  var SKILL_CD = 75;
-  var GRAB_TIME = 66;
-  var Player = class extends Fighter {
-    constructor(clips) {
-      super();
-      this.clips = clips;
-      this.friction = 0.72;
-    }
-    team = "player";
-    kind = "player";
-    label = "쟈알디";
-    hp = 220;
-    hpMax = 220;
-    width = 30;
-    // 동작
-    move = null;
-    moveKey = "";
-    mf = 0;
-    mft = 0;
-    attackId = 0;
-    connected = false;
-    comboStep = 0;
-    comboTimer = 0;
-    buf = null;
-    // 자세
-    crouching = false;
-    guarding = false;
-    running = false;
-    wasGuarding = 0;
-    airAttackUsed = false;
-    // 총
-    ammo = MAG;
-    mag = MAG;
-    reserve = 40;
-    gunOut = 0;
-    queuedShot = false;
-    burst = 0;
-    burstT = 0;
-    dry = false;
-    // D 길게: 충전
-    chargeT = -1;
-    charging = false;
-    /** 싸움 자세 남은 틱 (때리거나 맞으면 켜짐) */
-    fightT = 0;
-    /** C 지원 호출: 걸어 들어와 폭파하고 나가는 다른 쟈알디 (시연판과 같게, 필살 게이지 절반) */
-    ally = null;
-    /** 강화 선택 등이 곱하는 공격력 배수 */
-    dmgMul = 1;
-    progression = progressionFor();
-    // 게이지
-    gauge = 0;
-    guardMeter = 100;
-    skillCd = 0;
-    combo = 0;
-    comboClock = 0;
-    maxCombo = 0;
-    // 잡기
-    grabbed = null;
-    grabT = 0;
-    grabHits = 0;
-    // 그리기
-    animClock = 0;
-    gaitFrame = 0;
-    gaitMoving = false;
-    gaitDir = 1;
-    lowWarned = false;
-    /** 부적: 피격 무효 남은 횟수 */
-    ward = 0;
-    /** 이 틱에 요청한 일 (world가 처리) */
-    /** 든 것: 환경 물건은 머리 위('over'), 임시 무기는 손('hand'). 그림은 엔진이 따로 그린다 */
-    carry = null;
-    /** 든 것이 있을 때 A·S를 아이템 쪽이 받는다. 돌려준 동작을 재생, null이면 엔진 기본 */
-    itemAct = null;
-    seat = null;
-    sit(clip, x, y, face2, exit) {
-      if (!this.clips[clip]?.length || this.z > 0 || this.phase !== "free" || this.move && this.moveKey !== "pickup") return false;
-      this.cancelMove();
-      this.buf = null;
-      this.running = this.guarding = this.crouching = this.charging = false;
-      this.chargeT = -1;
-      this.wantItem = 0;
-      this.wantSuper = false;
-      this.vx = this.vy = this.vz = 0;
-      this.x = this.px = x;
-      this.y = this.py = y;
-      this.dir = face2;
-      this.resetLocomotion();
-      this.seat = { clip, frame: 0, tick: 0, rising: false, exit };
-      return true;
-    }
-    wantInteract = false;
-    wantItem = 0;
-    wantSuper = false;
-    get state() {
-      if (this.phase !== "free") return this.phase;
-      if (this.move) return this.moveKey;
-      if (this.grabbed) return "grab";
-      if (this.airborne) return "jump";
-      if (this.guarding) return "guard";
-      if (this.crouching) return "crouch";
-      return this.running ? "run" : "idle";
-    }
-    get guardMeterView() {
-      return this.guardMeter;
-    }
-    /* ───────── 판정 ───────── */
-    frameInfo() {
-      const a = this.anim();
-      const list = this.clips[a.clip];
-      return { info: list ? list[Math.min(a.frame, list.length - 1)] : null, origin: a.origin };
-    }
-    /** 든 물건을 그릴 자리: 발 기준 앞쪽 px(dx), 높이 px(dz), 각도° (오른쪽 보기 기준) */
-    heldAt() {
-      if (!this.carry) return null;
-      const { info, origin } = this.frameInfo();
-      const P = PIXEL;
-      if (this.carry.hold === "over" && info?.hand && /^carry2_|^toss/.test(this.anim().clip)) return { dx: (info.hand[0] - origin) * P, dz: info.hand[1] * P, deg: 0 };
-      if (this.carry.hold === "over") {
-        const top = info?.hurt ? info.hurt[3] : 96;
-        return { dx: ((info?.hurt ? (info.hurt[0] + info.hurt[1]) / 2 : 0) - origin) * P, dz: (top - 6) * P, deg: 0 };
-      }
-      const h = info?.hand;
-      if (h) return { dx: (h[0] - origin) * P, dz: h[1] * P, deg: h[2] };
-      const r = info?.reach;
-      return r ? { dx: ((r[0] + r[1]) / 2 - origin) * P, dz: (r[2] + r[3]) / 2 * P, deg: -30 } : { dx: 18 * P, dz: 50 * P, deg: -30 };
-    }
-    frame() {
-      const { info, origin } = this.frameInfo();
-      const P = PIXEL;
-      const hurt2 = [];
-      if (this.alive && this.phase !== "dead") {
-        const h = info?.hurt;
-        if (h) hurt2.push(toWorld(this, (h[0] - origin) * P, (h[1] - origin) * P, h[2] * P, h[3] * P, 16));
-        else hurt2.push(toWorld(this, -16 * P / 2, 16 * P / 2, 0, (this.crouching ? 60 : 96) * P / 1, 16));
-      }
-      const hit2 = [];
-      const al = this.ally;
-      if (al?.hitOn) {
-        const a = al.dir === 1 ? al.x + 260 : al.x - 640, b = al.dir === 1 ? al.x + 640 : al.x - 260;
-        hit2.push({ x0: a, x1: b, z0: 0, z1: 320, y: al.y, dy: 70, attackId: al.id, dmg: 30 * this.dmgMul, react: "down", dir: al.dir, push: 16, lift: 16, stop: 8, strength: 3, armorBreak: true, noise: 1 });
-      }
-      if (this.move?.hits && this.phase === "free") {
-        for (const mh of this.move.hits) {
-          if (!mh.at.includes(this.mf)) continue;
-          const r = mh.box ?? info?.reach;
-          if (!r) continue;
-          const o = mh.box ? 0 : origin;
-          const w = toWorld(this, (r[0] - o) * P, (r[1] - o) * P, r[2] * P, r[3] * P, mh.dy ?? 20);
-          hit2.push({
-            ...w,
-            attackId: masteryHitId(this.progression, this.moveKey, this.mf, this.attackId),
-            dmg: mh.dmg * this.dmgMul,
-            react: mh.react,
-            dir: this.dir,
-            push: mh.push,
-            lift: mh.lift,
-            stop: mh.stop,
-            low: mh.low,
-            armorBreak: mh.armorBreak,
-            strength: mh.strength,
-            noise: mh.noise
-          });
-        }
-      }
-      return { hit: hit2.map((h) => progressionHit(h, this.progression, h.attackId === al?.id || isBlastMove(this.moveKey) ? "ability" : "melee")), hurt: hurt2 };
-    }
-    /** 지금 보여 줄 클립·장 */
-    anim() {
-      if (this.seat) return { clip: this.seat.clip, frame: this.seat.frame, origin: 0 };
-      const c = this.animClock;
-      const loop = (clip, every) => {
-        const n = this.clips[clip]?.length || 1;
-        return { clip, frame: Math.floor(c / every) % n, origin: 0 };
-      };
-      const gait = (clip) => ({ clip, frame: Math.floor(this.gaitFrame + 1e-9) % (this.clips[clip]?.length || 1), origin: 0 });
-      switch (this.phase) {
-        case "hurt":
-          return { clip: "hit", frame: Math.min(3, Math.floor(this.t / Math.max(1, this.until) * 4)), origin: 0 };
-        case "air-hurt":
-          return { clip: "down", frame: this.vz > 0 ? 0 : 1, origin: 0 };
-        case "down":
-          return { clip: "down", frame: Math.min(4, 2 + Math.floor(this.t / 3)), origin: 0 };
-        case "getup":
-          return { clip: "getup", frame: Math.min(4, Math.floor(this.t / this.until * 5)), origin: 0 };
-        case "dead":
-          return { clip: "down", frame: 4, origin: 0 };
-        default:
-      }
-      if (this.move) return { clip: this.move.clip, frame: this.mf, origin: this.move.origin ?? 0 };
-      if (this.grabbed) return { clip: "grab", frame: Math.min(3, Math.floor(this.grabT / 2)), origin: 0 };
-      if (this.airborne) {
-        const f = this.vz > 14 ? 2 : this.vz > 3 ? 3 : this.vz > -6 ? 4 : this.vz > -16 ? 5 : 6;
-        return { clip: "jump", frame: f, origin: 0 };
-      }
-      if (this.charging) return loop("charge", 3);
-      if (this.guarding) return { clip: "block", frame: Math.min(3, this.wasGuarding), origin: 0 };
-      if (this.crouching) return this.gaitMoving ? gait("crouchwalk") : { clip: "crouch", frame: 3, origin: 0 };
-      const held = this.heldSet();
-      const moving = this.gaitMoving;
-      const running = moving && this.running;
-      if (held) {
-        const want = `${held === "carry2" ? "carry2_" : ""}${running ? "run" : moving ? "walk" : "idle"}${held === "carry2" ? "" : "_" + held}`;
-        const alt = `${held === "carry2" ? "carry2_" : ""}${moving ? "walk" : "idle"}${held === "carry2" ? "" : "_" + held}`;
-        if (this.clips[want]) return moving ? gait(want) : loop(want, 6);
-        if (this.clips[alt]) return moving ? gait(alt) : loop(alt, 6);
-      }
-      if (running) return gait("run");
-      if (moving) return gait("walk");
-      if (this.gunOut > 0) return { clip: "fire", frame: Math.max(0, (this.clips.fire?.length ?? 4) - 1), origin: 0 };
-      return this.fightT > 0 ? loop("guard", 6) : loop("idle", 7);
-    }
-    /** 월드가 가구·지형·카메라 경계까지 처리한 뒤 한 번 호출한다.
-     * 입력 속도만 보면 벽에 막힌 채 계속 달리므로, 최종 이동량만 발걸음에 반영한다. */
-    finishLocomotion() {
-      const canWalk = this.phase === "free" && !this.move && !this.airborne && !this.grabbed && !this.guarding && !this.charging && this.stop <= 0;
-      const dx = Math.abs(this.x - this.px), dy = Math.abs(this.y - this.py);
-      const moving = canWalk && (Math.abs(this.vx) > 0.5 || Math.abs(this.vy) > 0.5) && (dx > 0.05 || dy > 0.05);
-      if (!moving) return this.resetLocomotion();
-      const speedX = this.crouching ? CROUCH_X : this.running ? RUN_X : WALK_X;
-      const speedY = this.running ? WALK_Y * 1.2 : WALK_Y;
-      const progress = Math.min(this.progression.stats.speed, Math.max(dx / speedX, dy / speedY));
-      if (!this.gaitMoving || this.gaitDir !== this.dir) this.gaitFrame = 0;
-      else this.gaitFrame += progress / (this.running && !this.crouching ? 2 : 3);
-      this.gaitMoving = true;
-      this.gaitDir = this.dir;
-    }
-    /** 방 이동·저장 복원은 보행 도중의 자세를 다음 방에 끌고 가지 않는다. */
-    resetLocomotion() {
-      this.gaitFrame = 0;
-      this.gaitMoving = false;
-      this.gaitDir = this.dir;
-    }
-    /** 든 물건 종류별 자세 클립 이름 조각 */
-    heldSet() {
-      const c = this.carry;
-      if (!c) return null;
-      if (c.kind === "prop") return "carry2";
-      if (c.cls === "melee") return "pipe";
-      if (c.cls === "gun" && c.id !== "servicepistol") return "shotgun";
-      return null;
-    }
-    /* ───────── 맞음 ───────── */
-    applyHit(hit2, world) {
-      if (this.invuln > 0 || this.move?.invuln && this.mf >= this.move.invuln[0] && this.mf <= this.move.invuln[1]) return { kind: "immune" };
-      const front = hit2.dir === -this.dir;
-      const blockable = !hit2.grab && (!hit2.low || this.crouching);
-      if (this.guarding && front && blockable && this.phase === "free") {
-        this.guardMeter -= (hit2.dmg ?? 0) * 2.4;
-        this.x += hit2.dir * Math.max(3, (hit2.push ?? 4) * 1.6);
-        world.emit({ type: "guard", x: this.x });
-        world.fx("ring", this.x + this.dir * 36, this.y, 90);
-        if (this.guardMeter <= 0) {
-          this.guardMeter = 0;
-          this.guarding = false;
-          world.emit({ type: "guardBreak", x: this.x });
-          world.say("가드가 깨졌다!", 1.2);
-          this.enter("hurt", 30);
-        }
-        return { kind: "guard" };
-      }
-      if (this.ward > 0 && hit2.dmg > 0) {
-        this.ward--;
-        this.invuln = 20;
-        world.fx("ring", this.x, this.y, 100, "3");
-        world.say("부적이 대신 맞았다", 1);
-        return { kind: "immune" };
-      }
-      hit2 = defendedHit(hit2, this.progression);
-      const armorFrame = this.move?.armor && this.mf >= this.move.armor[0] && this.mf <= this.move.armor[1] ? this.move.armor[2] : 0;
-      this.armor = armorFrame;
-      this.cancelMove();
-      if (this.grabbed) this.releaseGrab();
-      const r = super.applyHit(hit2, world);
-      if (r.kind === "hit" || r.kind === "armor") {
-        this.gauge = Math.min(100, this.gauge + 4 * this.progression.stats.charge);
-        world.emit({ type: "hurt", x: this.x, dmg: hit2.dmg, hp: this.hp });
-        if (!this.lowWarned && this.hp < this.hpMax * 0.3) {
-          this.lowWarned = true;
-          world.emit({ type: "hp:low" });
-        }
-      }
-      if (r.kind === "armor") this.armor = 0;
-      return r;
-    }
-    onKilled() {
-      this.crouching = this.guarding = this.running = false;
-    }
-    /* ───────── 한 틱 ───────── */
-    cancelMove() {
-      this.move = null;
-      this.moveKey = "";
-      this.queuedShot = false;
-    }
-    play(key2, world) {
-      if (!canUseMasteryMove(this.progression, key2)) {
-        world.say(key2 === "chain" ? "연쇄 폭파: 숙련 3에서 열린다." : "벽 통째로: 숙련 6에서 열린다.", 2);
-        return;
-      }
-      const m = masteryMove(this.progression, key2, MOVES[key2]);
-      this.move = m;
-      this.moveKey = key2;
-      this.mf = 0;
-      this.mft = 0;
-      this.attackId = newAttackId(2);
-      this.connected = false;
-      this.running = false;
-      this.guarding = false;
-      if (m.hits) this.fightT = FIGHT_STANCE;
-      if (m.lunge) this.vx = this.dir * m.lunge[0];
-      else if (!this.airborne) this.vx = 0;
-      this.vy = 0;
-      this.skipZeroFrames();
-      const ability2 = key2 === "blast" || key2 === "bigblast" || key2 === "groundblast" || key2 === "grabblast" || key2 === "chain" || key2 === "wall";
-      world.emit(ability2 ? { type: "ability", x: this.x, move: key2 } : key2 === "super" ? { type: "super", x: this.x, move: key2 } : key2 === "evade" ? { type: "evade", x: this.x } : { type: "custom", name: "move", data: key2 });
-    }
-    skipZeroFrames() {
-      const m = this.move;
-      if (!m) return;
-      while (this.mf < m.ticks.length - 1 && m.ticks[this.mf] === 0) this.mf++;
-    }
-    /** 엔진이 명중을 알려 줌 */
-    onConnect(world, killed) {
-      this.connected = true;
-      this.gauge = Math.min(100, this.gauge + 2.5 * this.progression.stats.charge);
-      this.combo = this.comboClock > 0 ? this.combo + 1 : 1;
-      this.comboClock = 40;
-      this.maxCombo = Math.max(this.maxCombo, this.combo);
-      if (killed) this.gauge = Math.min(100, this.gauge + 4 * this.progression.stats.charge);
-      void world;
-    }
-    /** 멈춰 있는 동안(히트스톱) 입력만 받아 두기 */
-    listen(p) {
-      this.bufPress(p);
-      if (this.buf) this.buf.ttl = Math.max(this.buf.ttl, BUFFER);
-    }
-    bufPress(p) {
-      const order = [["super", "super"], ["skill", "skill"], ["attack", "attack"], ["jump", "jump"], ["shoot", "shoot"]];
-      for (const [k, b] of order) if (p.pressed.has(k)) this.buf = { b, ttl: BUFFER };
-      if (p.evade) this.buf = { b: "evade", ttl: BUFFER };
-    }
-    take(b) {
-      if (this.buf?.b === b) {
-        this.buf = null;
-        return true;
-      }
-      return false;
-    }
-    step(world) {
-      void world;
-    }
-    tick(world, p) {
-      if (this.seat) {
-        const s2 = this.seat;
-        this.wantInteract = false;
-        this.wantItem = 0;
-        this.wantSuper = false;
-        this.buf = null;
-        if (p.pressed.has("interact") && !s2.rising) {
-          s2.rising = true;
-          s2.tick = 0;
-        }
-        if (++s2.tick >= 4) {
-          s2.tick = 0;
-          if (s2.rising) {
-            if (s2.frame > 0) s2.frame--;
-            else {
-              this.x = this.px = s2.exit.x;
-              this.y = this.py = s2.exit.y;
-              this.seat = null;
-              this.resetLocomotion();
-            }
-          } else s2.frame = Math.min(s2.frame + 1, this.clips[s2.clip].length - 1);
-        }
-        return;
-      }
-      this.animClock++;
-      if (this.comboTimer > 0) this.comboTimer--;
-      if (this.comboClock > 0 && --this.comboClock === 0) this.combo = 0;
-      if (this.skillCd > 0) this.skillCd--;
-      if (!this.guarding) this.guardMeter = Math.min(100, this.guardMeter + 0.5);
-      this.bufPress(p);
-      if (this.buf && --this.buf.ttl < 0) this.buf = null;
-      this.wantInteract = p.pressed.has("interact");
-      this.wantItem = p.pressed.has("item1") ? 1 : p.pressed.has("item2") ? 2 : p.pressed.has("item3") ? 3 : p.pressed.has("item4") ? 4 : 0;
-      if (this.fightT > 0) this.fightT--;
-      if (this.burstT > 0 && --this.burstT === 0) this.burst = 0;
-      this.stepAlly(world);
-      if (this.stepReact(world)) {
-        this.running = this.guarding = this.crouching = this.charging = false;
-        this.chargeT = -1;
-        this.fightT = FIGHT_STANCE;
-        this.wantInteract = false;
-        this.wantItem = 0;
-        return;
-      }
-      this.armor = 0;
-      if (this.move?.free && (this.buf || p.mx || p.my)) this.cancelMove();
-      if (this.move) this.stepMove(world, p);
-      else if (this.charging) this.stepCharge(world, p);
-      else if (this.grabbed) this.stepGrab(world, p);
-      else this.stepFree(world, p);
-      this.stepPhysics(world);
-    }
-    stepPhysics(world) {
-      if (this.z > 0 || this.vz > 0) {
-        this.z += this.vz;
-        this.vz -= GRAVITY;
-        this.x += this.vx;
-        if (this.z <= 0) {
-          this.z = 0;
-          this.vz = 0;
-          this.airAttackUsed = false;
-          world.emit({ type: "land", x: this.x });
-          world.fx("dust", this.x, this.y, 0);
-          if (this.moveKey === "airkick" || !this.move) this.play("land", world);
-          this.vx = 0;
-        }
-      } else if (this.move) {
-        const k = this.move.lunge?.[1] ?? 0.6;
-        this.x += this.vx;
-        this.y += this.vy;
-        this.vx *= k;
-        this.vy *= k;
-      } else {
-        this.x += this.vx;
-        this.y += this.vy;
-      }
-      const [lo, hi] = world.lane;
-      this.y = Math.max(lo, Math.min(hi, this.y));
-      const [b0, b1] = world.bounds;
-      this.x = Math.max(b0 + 30, Math.min(b1 - 30, this.x));
-    }
-    stepMove(world, p) {
-      const m = this.move;
-      const key2 = this.moveKey;
-      const canCancel = this.connected ? m.cancel !== void 0 && this.mf >= m.cancel : m.whiffCancel !== void 0 && this.mf >= m.whiffCancel;
-      if (canCancel) {
-        const ci = COMBO.indexOf(key2);
-        if (this.connected && this.take("skill") && this.skillCd <= 0) return this.startSkill(world, p);
-        if (this.connected && this.take("super") && this.gauge >= 100) return this.startSuper(world);
-        if (this.take("attack")) {
-          const next = this.connected && ci >= 0 && ci < 2 ? COMBO[ci + 1] : "jab";
-          if (p.mx) this.dir = p.mx > 0 ? 1 : -1;
-          this.comboStep = COMBO.indexOf(next);
-          this.endMoveAdvance();
-          return this.play(next, world);
-        }
-        if (this.connected && this.take("evade")) {
-          this.endMoveAdvance();
-          return this.startEvade(world, p);
-        }
-      }
-      if (key2 === "evade" && this.mf <= 2 && this.take("attack")) {
-        if (p.mx) this.dir = p.mx > 0 ? 1 : -1;
-        return this.play("dash", world);
-      }
-      if (key2 === "blast" && this.chargeT >= 0) {
-        if (p.held.has("skill")) {
-          this.chargeT++;
-          if (this.mf >= 2) {
-            this.mf = 2;
-            this.mft = 0;
-          }
-          if (this.chargeT >= CHARGE_AFTER) {
-            this.cancelMove();
-            this.charging = true;
-            this.chargeT = 0;
-            return;
-          }
-          return;
-        }
-        this.chargeT = -1;
-      }
-      if (key2 === "reload" && this.mf === 3 && this.mft === 0) {
-        const n = Math.min(this.mag - this.ammo, this.reserve);
-        this.ammo += n;
-        this.reserve -= n;
-        world.emit({ type: "reload", x: this.x });
-      }
-      if (key2 === "fire" && this.mf === 0 && this.mft === 0 && !this.dry) this.fireBullet(world);
-      if (++this.mft >= Math.max(1, m.ticks[this.mf])) {
-        this.mft = 0;
-        this.mf++;
-        this.skipZeroFrames();
-        const h = m.hits?.find((x) => x.at[0] === this.mf || key2 === "super" && x.at.includes(this.mf));
-        if (h) {
-          if (h.shake) world.shake(2, 1);
-          if (key2 === "blast" || key2 === "bigblast" || key2 === "grabblast" || key2 === "groundblast" || key2 === "super" || key2 === "chain" || key2 === "wall") {
-            const { info, origin } = this.frameInfo();
-            const hd = info?.hand;
-            const reachX = h.box ? (h.box[0] + h.box[1]) / 2 * PIXEL : 0;
-            const dx = key2 === "super" ? 130 * PIXEL / 2 : key2 === "groundblast" ? 0 : key2 === "chain" || key2 === "wall" || key2 === "bigblast" ? reachX : hd ? (hd[0] - origin) * PIXEL : 56 * PIXEL / 2;
-            const dz = key2 === "groundblast" ? 10 : hd && key2 !== "super" ? hd[1] * PIXEL : 70 * PIXEL / 2;
-            world.fx("boom", this.x + this.dir * dx, this.y, dz);
-            world.shake(h.shake ?? 6, key2 === "super" ? 3 : 2);
-          }
-        }
-        if (this.mf >= m.ticks.length) return this.finishMove(world);
-      }
-    }
-    endMoveAdvance() {
-      const m = this.move;
-      if (m?.adv) this.x += this.dir * ((m.adv - (m.origin ?? 0)) * PIXEL);
-    }
-    finishMove(world) {
-      const key2 = this.moveKey;
-      if (this.move?.hits && !this.connected) world.emit({ type: "whiff", x: this.x });
-      const queued = this.queuedShot;
-      this.endMoveAdvance();
-      this.cancelMove();
-      if (key2 === "jab" || key2 === "cross") this.comboTimer = 8;
-      else this.comboStep = 0;
-      void queued;
-      if (key2 === "draw" || key2 === "fire" || key2 === "reload") this.gunOut = HOLSTER_AFTER;
-      if (key2 === "holster") this.gunOut = 0;
-      if (key2 === "grabblast" || key2 === "grabknee") {
-      }
-    }
-    startSkill(world, p) {
-      this.skillCd = SKILL_CD;
-      if (p.mx) this.dir = p.mx > 0 ? 1 : -1;
-      else this.faceNearest(world);
-      this.gunOut = 0;
-      this.play(this.crouching ? "groundblast" : "blast", world);
-      if (!this.crouching && p.held.has("skill")) this.chargeT = 0;
-    }
-    /** 충전 중: 놓으면 큰 폭파 */
-    stepCharge(world, p) {
-      this.vx = this.vy = 0;
-      this.chargeT++;
-      if (this.chargeT % 8 === 0) {
-        const hd = this.clips.charge?.[0]?.hand;
-        world.fx("spark", this.x + this.dir * ((hd ? hd[0] : 37) + 14) * PIXEL, this.y, (hd ? hd[1] : 70) * PIXEL);
-      }
-      if (!p.held.has("skill")) {
-        this.charging = false;
-        this.chargeT = -1;
-        this.play("bigblast", world);
-      }
-    }
-    startSuper(world) {
-      this.gauge = 0;
-      this.wantSuper = true;
-      this.play("super", world);
-    }
-    startEvade(world, p) {
-      if (p.mx) this.dir = p.mx > 0 ? 1 : -1;
-      this.play("evade", world);
-      const mx = p.mx || (p.my ? 0 : this.dir);
-      const sp = MOVES.evade.lunge[0];
-      this.vx = mx * sp;
-      this.vy = p.my * sp * 0.55;
-      this.invuln = 9;
-      world.fx("dust", this.x, this.y, 0);
-    }
-    /** S: 집어넣은 상태면 뽑기만, 뽑은 상태면 한 발. 3발 뒤 잠깐 멈춤, 빈 탄창은 「찰칵」 (R로 장전) */
-    tryShoot(world) {
-      this.fightT = FIGHT_STANCE;
-      if (this.gunOut <= 0) return this.play("draw", world);
-      if (this.burst >= 3 && this.burstT > 0) return;
-      this.dry = this.ammo <= 0;
-      if (this.dry) {
-        world.emit({ type: "empty", x: this.x });
-        world.say(this.reserve > 0 ? "찰칵 — R로 장전" : "찰칵 — 탄약이 없다", 1);
-      }
-      this.play("fire", world);
-      if (this.dry) {
-        this.mf = this.move.ticks.length - 1;
-        return;
-      }
-      if (++this.burst >= 3) this.burstT = 14;
-    }
-    fireBullet(world) {
-      this.ammo--;
-      this.gunOut = HOLSTER_AFTER;
-      world.emit({ type: "shot", x: this.x, ammo: this.ammo });
-      const { info, origin } = this.frameInfo();
-      const hd = info?.hand;
-      const mx = hd ? (hd[0] - origin + 14) * PIXEL : 48 * PIXEL;
-      const mz = hd ? (hd[1] + 3) * PIXEL : 74 * PIXEL;
-      world.addBullet({
-        x: this.x + this.dir * mx,
-        y: this.y,
-        z: mz,
-        dir: this.dir
-      });
-      world.fx("spark", this.x + this.dir * mx, this.y, mz);
-      this.x -= this.dir * 2;
-    }
-    callAlly(world) {
-      if (this.ally) return;
-      if (this.gauge < 50) return world.say("지원 호출: 필살 게이지 절반 필요", 1);
-      this.gauge -= 50;
-      const d3 = this.dir;
-      this.ally = { x: this.x - d3 * 580, y: Math.min(world.lane[1], this.y + 30), dir: d3, phase: "in", clip: "walk", f: 0, ft: 0, hitOn: false, id: newAttackId() };
-      world.say("「길 비켜.」", 1.4);
-    }
-    stepAlly(world) {
-      const a = this.ally;
-      if (!a) return;
-      a.hitOn = false;
-      a.ft++;
-      if (a.phase === "in") {
-        a.x += a.dir * 12;
-        if (a.ft % 3 === 0) a.f = (a.f + 1) % (this.clips.walk?.length || 1);
-        if ((this.x - a.x) * a.dir <= 150) Object.assign(a, { phase: "act", clip: "support", f: 3, ft: 0 });
-      } else if (a.phase === "act") {
-        if (a.ft >= 3) {
-          a.ft = 0;
-          a.f++;
-          if (a.f === 5) {
-            a.hitOn = true;
-            world.fx("boom", a.x + a.dir * 450, a.y, 150);
-            world.shake(10, 3);
-            world.emit({ type: "ability", x: a.x, move: "support" });
-          }
-          if (a.f >= (this.clips.support?.length || 10)) Object.assign(a, { phase: "out", clip: "walk", f: 0, ft: 0, dir: -a.dir });
-        }
-      } else {
-        a.x += a.dir * 12;
-        if (a.ft % 3 === 0) a.f = (a.f + 1) % (this.clips.walk?.length || 1);
-        if (Math.abs(a.x - this.x) > 900) this.ally = null;
-      }
-    }
-    /** 방향키 없이 칠 때: 등 뒤에만 적이 붙어 있으면 그쪽으로 돈다 (독립 검수: 허공을 침) */
-    faceNearest(world) {
-      let front = Infinity, back = Infinity;
-      for (const b of world.bodies) {
-        if (b.team !== "enemy" || !b.alive || Math.abs(b.y - this.y) > 60) continue;
-        const d3 = (b.x - this.x) * this.dir;
-        if (d3 >= 0) front = Math.min(front, d3);
-        else back = Math.min(back, -d3);
-      }
-      if (back < 220 && front > 260) this.dir = -this.dir;
-    }
-    /** E: 앞에 있는 적을 붙잡는다 (시연판). 잡을 수 없는 적(대형·환경형)은 안 잡힌다 */
-    tryGrabFront(world) {
-      for (const b of world.bodies) {
-        if (b.team !== "enemy" || !b.alive || b.z > 0) continue;
-        const g2 = b;
-        if (!g2.grabbable || !(g2 instanceof Fighter || typeof g2.set === "function")) continue;
-        const dx = b.x - this.x;
-        if (Math.sign(dx) !== this.dir || Math.abs(dx) > 90 || Math.abs(b.y - this.y) > 20) continue;
-        this.grabbed = g2;
-        this.grabT = 0;
-        this.grabHits = 0;
-        grabHold(g2);
-        g2.vx = 0;
-        this.vx = this.vy = 0;
-        this.gunOut = 0;
-        this.fightT = FIGHT_STANCE;
-        world.emit({ type: "custom", name: "grab" });
-        return true;
-      }
-      return false;
-    }
-    stepFree(world, p) {
-      if (this.airborne) {
-        this.vx += p.mx * 0.4;
-        this.vx = Math.max(-16, Math.min(16, this.vx));
-        if (p.mx) this.dir = p.mx > 0 ? 1 : -1;
-        if (this.carry?.kind === "prop" && this.itemAct && this.take("attack")) {
-          const anim = this.itemAct("attack");
-          if (anim) this.play(anim, world);
-          return;
-        }
-        if (!this.airAttackUsed && this.take("attack")) {
-          this.airAttackUsed = true;
-          this.play("airkick", world);
-        }
-        return;
-      }
-      if (this.take("super")) {
-        if (this.gauge >= 100) return this.startSuper(world);
-        world.say("필살 게이지가 모자라다", 1);
-      }
-      if (this.crouching && (p.pressed.has("up") || p.pressed.has("jump") || p.downDouble)) {
-        this.crouching = false;
-        if (this.buf?.b === "jump") this.buf = null;
-        p.pressed.delete("up");
-      } else if (p.downDouble && !this.carry) {
-        this.crouching = true;
-        this.gunOut = 0;
-      }
-      if (p.pressed.has("interact") && !this.carry && !this.crouching && this.tryGrabFront(world)) {
-        this.wantInteract = false;
-        return;
-      }
-      if (p.pressed.has("ally")) this.callAlly(world);
-      if (!this.crouching && !this.carry && p.pressed.has("chain")) {
-        this.play("chain", world);
-        if (this.move) return;
-      }
-      if (!this.crouching && !this.carry && p.pressed.has("wall")) {
-        this.play("wall", world);
-        if (this.move) return;
-      }
-      const g2 = p.held.has("guard") && this.guardMeter > 0;
-      this.wasGuarding = g2 ? this.wasGuarding + 1 : 0;
-      this.guarding = g2;
-      if (g2) {
-        this.vx = this.vy = 0;
-        this.running = false;
-        if (p.mx) this.dir = p.mx > 0 ? 1 : -1;
-        if (this.take("evade")) return this.startEvade(world, p);
-        return;
-      }
-      if (this.take("evade")) return this.startEvade(world, p);
-      if (this.take("skill")) {
-        if (this.skillCd <= 0) return this.startSkill(world, p);
-        world.say("폭파 충전 중", 0.6);
-      }
-      if (this.take("jump") && !this.crouching) {
-        this.vz = JUMP_V;
-        this.z = 1;
-        this.vx = p.mx * (this.running ? 16 : WALK_X);
-        if (p.mx) this.dir = p.mx > 0 ? 1 : -1;
-        this.running = false;
-        world.emit({ type: "jump", x: this.x });
-        return;
-      }
-      if (this.carry && this.itemAct && (this.buf?.b === "attack" || this.buf?.b === "shoot")) {
-        const k = this.buf.b;
-        if (p.mx) this.dir = p.mx > 0 ? 1 : -1;
-        const anim = this.itemAct(k);
-        if (anim !== null) {
-          this.take(k);
-          if (anim) this.play(anim === "wfire" && this.heldSet() === "shotgun" ? "wshot" : anim, world);
-          return;
-        }
-      }
-      if (this.take("attack")) {
-        if (p.mx) this.dir = p.mx > 0 ? 1 : -1;
-        else this.faceNearest(world);
-        if (this.crouching) return this.play("lowkick", world);
-        if (this.running) return this.play("dash", world);
-        const next = this.comboTimer > 0 && this.comboStep > 0 ? COMBO[this.comboStep] : "jab";
-        this.comboStep = COMBO.indexOf(next);
-        return this.play(next, world);
-      }
-      if (p.pressed.has("reload") && this.ammo < this.mag) {
-        if (this.reserve > 0) return this.play("reload", world);
-        world.say("예비 탄약이 없다", 1);
-      }
-      if (this.take("shoot") && !this.crouching) {
-        if (p.mx) this.dir = p.mx > 0 ? 1 : -1;
-        return this.tryShoot(world);
-      }
-      if (this.gunOut > 0 && (p.mx || p.my || --this.gunOut === 0)) {
-        this.gunOut = 0;
-        return this.play("holster", world);
-      }
-      if (p.mx) this.dir = p.mx > 0 ? 1 : -1;
-      this.running = p.run && p.mx !== 0 && !this.crouching;
-      if (this.crouching) {
-        this.vx = p.mx * CROUCH_X * this.progression.stats.speed;
-        this.vy = 0;
-      } else {
-        this.vx = p.mx * (this.running ? RUN_X : WALK_X) * this.progression.stats.speed;
-        this.vy = p.my * (this.running ? WALK_Y * 1.2 : WALK_Y) * this.progression.stats.speed;
-      }
-      if (p.mx && !this.running && !this.crouching) {
-        for (const b of world.bodies) {
-          if (b.team !== "enemy" || !b.alive || b.z > 0 || !grabCan(b)) continue;
-          const dx = b.x - this.x;
-          if (Math.sign(dx) === p.mx && Math.abs(dx) < 62 && Math.abs(b.y - this.y) < 14) {
-            const gb = b;
-            this.grabbed = gb;
-            this.grabT = 0;
-            this.grabHits = 0;
-            grabHold(gb);
-            gb.vx = 0;
-            this.vx = this.vy = 0;
-            this.dir = dx > 0 ? 1 : -1;
-            world.emit({ type: "custom", name: "grab" });
-            break;
-          }
-        }
-      }
-    }
-    releaseGrab() {
-      const g2 = this.grabbed;
-      this.grabbed = null;
-      if (g2 && grabIsHeld(g2)) grabRelease(g2, 8);
-    }
-    stepGrab(world, p) {
-      const g2 = this.grabbed;
-      this.grabT++;
-      this.vx = this.vy = 0;
-      if (!g2.alive || !grabIsHeld(g2)) {
-        this.grabbed = null;
-        return;
-      }
-      g2.x = this.x + this.dir * 50;
-      g2.y = this.y;
-      g2.z = 0;
-      g2.dir = -this.dir;
-      if (this.take("jump") || this.grabT > GRAB_TIME) return this.releaseGrab();
-      if (this.take("attack")) {
-        if (p.mx || this.grabHits >= 2) {
-          if (p.mx) this.dir = p.mx > 0 ? 1 : -1;
-          g2.x = this.x + this.dir * 50;
-          this.play("grabblast", world);
-          grabRelease(g2, 30);
-          this.grabbed = null;
-          return;
-        }
-        this.grabHits++;
-        this.play("grabknee", world);
-        grabHold(g2);
-      }
-    }
-    /** 무릎 치기 동안 잡힌 상태 유지 */
-    keepHeld() {
-      const g2 = this.grabbed;
-      if (g2 && (g2 instanceof Fighter ? g2.phase === "hurt" : g2.state === "hurt" || g2.state === "stunned")) grabHold(g2);
-    }
-  };
-  function grabCan(b) {
-    if (!b.grabbable) return false;
-    if (b instanceof Fighter) return b.phase === "hurt";
-    return (b.state === "hurt" || b.state === "stunned") && typeof b.set === "function";
-  }
-  function grabHold(b) {
-    if (b instanceof Fighter) b.enter("held");
-    else {
-      b.set("bound");
-      b.bindT = 9999;
-    }
-  }
-  function grabIsHeld(b) {
-    return b instanceof Fighter ? b.phase === "held" : b.state === "bound";
-  }
-  function grabRelease(b, ticks) {
-    if (b instanceof Fighter) b.enter("hurt", ticks);
-    else b.bindT = ticks;
   }
 
   // src/game/action/engine/checkpoint.ts
@@ -11587,7 +15567,7 @@
       this.run = run;
       this.stage = stage;
       this.rand = mulberry32(run.seed || 1);
-      this.player = new Player(clips);
+      this.player = playerFactory.make(clips);
       initializeProgression(this.player, run);
       this.enemyFactory = enemyFactory ?? fallbackEnemy;
       const self = this;
@@ -11638,6 +15618,8 @@
     fxs = [];
     camX = 0;
     prevCamX = 0;
+    /** 이번 장에 실제로 그린 카메라 (틱 사이 보간·반올림 뒤). 화면 위 표시(말풍선 등)는 이걸 써야 몸과 같이 움직인다 */
+    drawCamX = 0;
     shakeT = 0;
     shakeP = 0;
     subtitle = null;
@@ -11795,7 +15777,7 @@
       p.stop = 0;
       p.resetLocomotion();
       p.dir = 1;
-      this.camX = Math.max(0, Math.min(f.length - SCREEN_W, p.x - SCREEN_W / 2));
+      this.camX = f.length <= view.w ? -(view.w - f.length) / 2 : Math.max(0, Math.min(f.length - view.w, p.x - view.w / 2));
       this.prevCamX = this.camX;
       this.banner = { text: f.banner ?? f.title, t: 70 };
       this.subtitle = null;
@@ -12064,12 +16046,17 @@
     camera() {
       const p = this.player;
       const [b0, b1] = this.bounds;
-      const target = p.x - SCREEN_W / 2 + p.dir * 90;
+      const W5 = view.w;
+      if (this.floor.length <= W5) {
+        this.camX = -(W5 - this.floor.length) / 2;
+        return;
+      }
+      const target = p.x - W5 / 2 + p.dir * 90;
       let cx = this.camX + (target - this.camX) * 0.14;
-      cx = Math.max(b0, Math.min(b1 - SCREEN_W, cx));
-      cx = Math.max(0, Math.min(this.floor.length - SCREEN_W, cx));
+      cx = Math.max(b0, Math.min(b1 - W5, cx));
+      cx = Math.max(0, Math.min(this.floor.length - W5, cx));
       this.camX = cx;
-      if (this.encActive >= 0) p.x = Math.max(cx + 90, Math.min(cx + SCREEN_W - 90, p.x));
+      if (this.encActive >= 0) p.x = Math.max(cx + 90, Math.min(cx + W5 - 90, p.x));
     }
     /** 보스 체력 막대용 */
     boss() {
@@ -12079,10 +16066,11 @@
   };
 
   // src/game/action/engine/game.ts
+  var BASE_ZOOM = 1;
   var Game = class {
-    constructor(box2, art6, mods) {
+    constructor(box2, art4, mods) {
       this.box = box2;
-      this.art = art6;
+      this.art = art4;
       this.mods = mods;
       if (mods.surface) {
         this.canvas = mods.surface.canvas;
@@ -12097,7 +16085,7 @@
         this.ctx = this.canvas.getContext("2d");
         this.ownCanvas = true;
       }
-      this.renderer = makeRenderer(this.ctx, art6, { hud: mods.hud !== false });
+      this.renderer = makeRenderer(this.ctx, art4, { hud: mods.hud !== false });
       this.input.attach();
       this.canvas.addEventListener("pointerdown", (e) => this.onPointer(e));
       this.scene = this.idleScene("title");
@@ -12150,17 +16138,36 @@
         }
         if (!this.mods.covered?.()) {
           const w = this.world;
-          view.zoom = this.canvas.height / SCREEN_H;
+          const H6 = this.inHub ? view.worldH : SCREEN_H;
+          const cssH = this.canvas.getBoundingClientRect().height;
+          const fixed2 = this.inHub && cssH >= 600;
+          view.zoom = (fixed2 ? BASE_ZOOM * (this.canvas.height / cssH) : this.canvas.height / H6) * Math.max(1, charSize.k);
           if (w) view.lane = w.lane;
           const vw = this.canvas.width / view.zoom;
+          view.w = this.inHub ? Math.max(SCREEN_W, vw) : SCREEN_W;
+          view.hub = this.inHub;
           view.crop = 0;
+          const frozen = paused || !!this.mods.blocking?.() || !!this.mods.hq?.isOpen?.();
           if (vw < SCREEN_W && w) {
-            const a = paused ? 1 : this.acc / T3, cam = Math.round(w.prevCamX + (w.camX - w.prevCamX) * a), px = (w.player.px ?? w.player.x) + (w.player.x - (w.player.px ?? w.player.x)) * a, raw = Math.max(0, Math.min(SCREEN_W - vw, px - cam - vw / 2));
+            const a = frozen ? 1 : this.acc / T3, cam = Math.round(w.prevCamX + (w.camX - w.prevCamX) * a), px = (w.player.px ?? w.player.x) + (w.player.x - (w.player.px ?? w.player.x)) * a, raw = Math.max(0, Math.min(SCREEN_W - vw, px - cam - vw / 2));
             view.crop = Math.round((cam + raw) * view.zoom) / view.zoom - cam;
+          }
+          view.cropY = 0;
+          const vh = this.canvas.height / view.zoom;
+          if (this.inHub) {
+            this.ctx.fillStyle = "#000";
+            this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+          }
+          if (vh > H6 + 0.5) {
+            view.cropY = -Math.round((vh - H6) / 2 * view.zoom) / view.zoom;
+          } else if (vh < H6 - 0.5 && w) {
+            const a = frozen ? 1 : this.acc / T3, p = w.player;
+            const py = (p.py ?? p.y) + (p.y - (p.py ?? p.y)) * a;
+            view.cropY = Math.round(Math.max(0, Math.min(H6 - vh, py - vh * 0.7)) * view.zoom) / view.zoom;
           }
           this.ctx.save();
           this.ctx.scale(view.zoom, view.zoom);
-          this.ctx.translate(-view.crop, 0);
+          this.ctx.translate(-view.crop, -view.cropY);
           this.scene.draw(paused ? 1 : this.acc / T3);
           this.ctx.restore();
           this.mods.overlay?.(this.ctx, this.world, dt);
@@ -12210,7 +16217,7 @@
     start_new(stageId) {
       if (this.mods.hq && !stageId) return this.showHq();
       const stage = this.mods.stages.find((s2) => s2.id === stageId) ?? this.mods.stages[0];
-      this.deploy({ seed: Math.floor(Math.random() * 1e9), agent: "jyaldi", stageId: stage.id });
+      this.deploy({ seed: Math.floor(Math.random() * 1e9), agent: "eileen", stageId: stage.id });
     }
     dead = false;
     /** 본부를 걷는 중인가 (엔진 벨트 장면) */
@@ -12223,7 +16230,7 @@
       if (!this.hqRoot) {
         this.hqRoot = document.createElement("div");
         this.hqRoot.className = "goei-engine-hq";
-        this.box.appendChild(this.hqRoot);
+        (hq2.hub && this.mods.hqLayer?.() || this.box).appendChild(this.hqRoot);
         hq2.mount(this.hqRoot, {
           deploy: (run) => this.deploy(run),
           stages: () => this.mods.stages.map((s2) => ({ id: s2.id, label: s2.label }))
@@ -12232,7 +16239,7 @@
       this.hqRoot.hidden = false;
       if (hq2.hub) {
         const stage = hq2.hub();
-        const run = { seed: Math.floor(Math.random() * 1e9), agent: "jyaldi", stageId: stage.id };
+        const run = { seed: Math.floor(Math.random() * 1e9), agent: "eileen", stageId: stage.id };
         this.hqRoot.hidden = !hq2.isOpen?.();
         this.hqRoot.classList.add("goei-engine-hq-panel");
         this.canvas.style.visibility = "";
@@ -12492,11 +16499,6 @@
   };
 
   // src/core/fieldclock.ts
-  var PX_PER_M = 142;
-  var WALK_MPS = 1.3;
-  var DOOR_S = 3;
-  var STAIR_S = 20;
-  var walkSeconds = (px) => Math.round(Math.max(0, px) / PX_PER_M / WALK_MPS);
   function clockText(sec) {
     const m = Math.floor(Math.max(0, sec) / 60) % 1440;
     return `${String(Math.floor(m / 60)).padStart(2, "0")}:${String(m % 60).padStart(2, "0")}`;
@@ -12569,9 +16571,9 @@
     const input = bar2.querySelector(".gt-in");
     const sendBtn = bar2.querySelector("[data-send]");
     const modeBtn = bar2.querySelector("[data-mode]");
-    let act2 = false;
+    let act = false;
     const setMode = (on) => {
-      act2 = on;
+      act = on;
       bar2.toggleAttribute("data-act", on);
       modeBtn.textContent = on ? "행동" : "말";
       modeBtn.setAttribute("aria-label", on ? "행동으로 보내기 (Tab: 말로 바꾸기)" : "말로 보내기 (Tab: 행동으로 바꾸기)");
@@ -12579,7 +16581,7 @@
       input.setAttribute("aria-label", on ? "할 행동" : "할 말");
     };
     modeBtn.onclick = () => {
-      setMode(!act2);
+      setMode(!act);
       input.focus();
     };
     const msg = bar2.querySelector(".gt-msg");
@@ -12626,7 +16628,10 @@
         if (!dead) msg.textContent = e instanceof Error ? e.message : String(e);
       }
     }
+    let exchanged = 0;
     function close() {
+      if (target && exchanged > 0) window.dispatchEvent(new CustomEvent("goei:talk-closed", { detail: { name: target, exchanged } }));
+      exchanged = 0;
       bar2.removeAttribute("data-open");
       log.removeAttribute("data-open");
       input.blur();
@@ -12660,7 +16665,7 @@
       const agent = state2.agents.find((a) => a.name === target && a.room);
       if (busy2 || !raw || !agent) return;
       const bare = raw.replace(/^\*+|\*+$/g, "").trim();
-      const text2 = act2 || /^\*/.test(raw) ? `*${bare}*` : raw;
+      const text2 = act || /^\*/.test(raw) ? `*${bare}*` : raw;
       if (!bare) return;
       busy2 = true;
       msg.textContent = "";
@@ -12671,6 +16676,7 @@
       try {
         state2 = await api.send(agent.id, text2, "aux", nearby(agent.name));
         if (dead) return;
+        exchanged++;
         follow(agent, text2);
         const turn = state2.turns.filter((t) => t.agentId === agent.id).at(-1);
         say(agent.name, turn?.reply ?? "");
@@ -12705,7 +16711,7 @@
       }
       if (e.key === "Tab" && !e.isComposing) {
         e.preventDefault();
-        setMode(!act2);
+        setMode(!act);
       }
       if (e.key === "Escape") close();
     });
@@ -12744,7 +16750,7 @@
         c.font = FONT2(TAG_PX);
         const tw = Math.ceil(c.measureText(p.name).width) + 8;
         const tagBottom = place3(x, tw, 18, Math.round(p.y + p.top));
-        tag(c, p.name, x, tagBottom - 9, near2 || p.name === target || isPlayer);
+        if (!isPlayer) tag(c, p.name, x, tagBottom - 9, near2 || p.name === target);
         const typing = isPlayer && !busy2 && bar2.hasAttribute("data-open") && document.activeElement === input && input.value.trim() !== "";
         const b = bubbles.find((q) => q.who === p.name && (q.from ?? 0) <= now) ?? (typing ? { who: p.name, text: "", until: Infinity, pending: true } : void 0);
         if (b) {
@@ -13148,9 +17154,9 @@
       const len = [0.1, 0.16, 0.28][level - 1];
       thump(o, t, v, [150, 130, 110][level - 1] * k, 40, len, [0.8, 0.95, 1.1][level - 1]);
       burst2(o, t, v, "bandpass", [2600, 2e3, 1500][level - 1] * k, 1.2, [0.03, 0.045, 0.07][level - 1], [0.7, 0.8, 0.9][level - 1]);
-      const body2 = gainNode(o, 0, v);
-      perc(body2.gain, t, 1e-3, 0.35 + level * 0.1, len * 0.7);
-      const sh = shaper(o, 4 + level * 6, body2);
+      const body = gainNode(o, 0, v);
+      perc(body.gain, t, 1e-3, 0.35 + level * 0.1, len * 0.7);
+      const sh = shaper(o, 4 + level * 6, body);
       const b = osc(o, "triangle", 320 * k, t, len, sh);
       b.frequency.exponentialRampToValueAtTime(90 * k, t + len * 0.6);
       if (level === 3) {
@@ -13758,6 +17764,19 @@
     thump(o, t, v, 300, 150, 0.03, 0.3);
     return 0.1;
   };
+  var doorLatch = (o, t, p) => {
+    const v = voice(o, p.dest, t, p.vol * 0.7, p.pan, 0, 0.25);
+    burst2(o, t, v, "bandpass", 2200 * p.pitch, 6, 0.012, 0.55);
+    thump(o, t, v, 260, 120, 0.025, 0.25);
+    burst2(o, t + 0.07, v, "bandpass", 1500 * p.pitch, 5, 0.018, 0.4);
+    thump(o, t + 0.07, v, 180, 90, 0.04, 0.2);
+    return 0.2;
+  };
+  var elevChime = (o, t, p) => {
+    const v = voice(o, p.dest, t, p.vol * 0.45, p.pan, 0.25, 0.2);
+    bell(o, t, v, 784 * p.pitch, 1.1, 0.3, 1, 0.6);
+    return 1.3;
+  };
   var crateBreak = (o, t, p) => {
     const v = voice(o, p.dest, t, p.vol, p.pan, 0.1, 0.3);
     thump(o, t, v, 120, 50, 0.15, 0.8);
@@ -13935,6 +17954,8 @@
     ropeCreak: d("귀환 로프", "elevator", ropeCreak),
     doorWood: d("문 삐걱", "world", doorWood),
     doorSlam: d("문 쾅", "world", doorSlam),
+    doorLatch: d("문 찰칵", "world", doorLatch),
+    elevChime: d("승강기 띵 (부드럽게)", "elevator", elevChime),
     knock: d("똑똑똑", "world", knock),
     switchClick: d("스위치", "world", switchClick),
     crateBreak: d("상자 부숨", "world", crateBreak),
@@ -14006,10 +18027,10 @@
       cur = null;
       if (t === ".") return;
       let vel = 0.8;
-      let body2 = t;
-      if (body2.endsWith("!")) vel = 1, body2 = body2.slice(0, -1);
-      else if (body2.endsWith("?")) vel = 0.5, body2 = body2.slice(0, -1);
-      cur = { step: i, notes: body2.split("+").map(noteToMidi), len: 1, vel };
+      let body = t;
+      if (body.endsWith("!")) vel = 1, body = body.slice(0, -1);
+      else if (body.endsWith("?")) vel = 0.5, body = body.slice(0, -1);
+      cur = { step: i, notes: body.split("+").map(noteToMidi), len: 1, vel };
       evs.push(cur);
     });
     return { evs, steps: toks.length };
@@ -14059,8 +18080,8 @@
     return chords.split(/\s+/).filter(Boolean).map((c) => {
       const { root } = chord(c);
       const r = 12 * (oct + 1) + root;
-      const pick6 = (ch) => ch === "r" ? r : ch === "o" ? r + 12 : ch === "f" ? r + 7 : ch === "b" ? r + 10 : -1;
-      return [...rhythm].map((ch) => pick6(ch) >= 0 ? tok([pick6(ch)]) : ch).join(" ");
+      const pick7 = (ch) => ch === "r" ? r : ch === "o" ? r + 12 : ch === "f" ? r + 7 : ch === "b" ? r + 10 : -1;
+      return [...rhythm].map((ch) => pick7(ch) >= 0 ? tok([pick7(ch)]) : ch).join(" ");
     }).join(" ");
   }
   function arp(chords, shape2, shift = 12) {
@@ -14876,7 +18897,7 @@
     boss: "concrete"
   };
   var SCENES = /* @__PURE__ */ new Set(["title", "hq", "lobby", "chase", "replica", "trial", "dark", "silent", "puzzle", "service", "boss"]);
-  var ALIAS2 = { doors: "doorOpen", rope: "ropeCreak", stamp: "ruleStamp", knockknock: "knock", static: "intercom" };
+  var ALIAS3 = { doors: "doorOpen", rope: "ropeCreak", stamp: "ruleStamp", knockknock: "knock", static: "intercom" };
   function pickSfx(e, scene) {
     switch (e.type) {
       case "hit":
@@ -14909,7 +18930,7 @@
       case "hp:low":
         return "heartbeat";
       case "custom":
-        if (e.name && e.name in ALIAS2) return ALIAS2[e.name];
+        if (e.name && e.name in ALIAS3) return ALIAS3[e.name];
         return e.name && e.name in SFX ? e.name : null;
       default:
         return e.type in SFX ? e.type : null;
@@ -15344,7 +19365,7 @@
   };
 
   // src/game/action/hq/style.css
-  var style_default = ".hq { --bg: #0b0f13; --panel: #141b21; --line: #3a4a54; --text: #e8e2c8; --dim: #9fb2ba; --accent: #ffd080; --warn: #ff9a8a; position: relative; display: flex; flex-direction: column; width: 100%; height: 100%; background: var(--bg); color: var(--text); font: 14px/1.5 system-ui, sans-serif; overflow: hidden; outline: none; color-scheme: dark; }\n.hq * { box-sizing: border-box; }\n.hq button:not(.gk-btn) { font: inherit; color: inherit; background: #1d2a33; border: 1px solid var(--line); border-radius: 6px; padding: 8px 12px; cursor: pointer; touch-action: manipulation; text-align: left; }\n.hq button:disabled { opacity: 0.45; cursor: default; }\n.hq button.sel:not(.gk-btn) { border-color: var(--accent); background: #3a2e14; }\n.hq button.primary:not(.gk-btn) { background: #6a4a14; border-color: var(--accent); font-weight: bold; }\n.hq-head { flex: none; padding: 6px 10px; border-bottom: 1px solid var(--line); }\n.hq-top { display: flex; flex-wrap: wrap; gap: 6px 14px; align-items: center; }\n.hq-top button { margin-left: auto; padding: 4px 10px; }\n.hq-places { display: flex; gap: 6px; overflow-x: auto; padding: 6px 0 2px; scrollbar-width: thin; }\n.hq-places button { flex: none; padding: 5px 10px; font-size: 13px; }\n.hq-view { flex: none; background: #000; display: flex; justify-content: center; }\n.hq-view canvas { width: 100%; max-width: 1280px; aspect-ratio: 1280 / 400; display: block; }\n.hq-move { flex: none; display: none; gap: 8px; padding: 6px 10px; }\n.hq-move button { flex: 1; text-align: center; padding: 12px; font-size: 16px; }\n.hq-pane { flex: 1; min-height: 0; overflow: auto; padding: 10px 16px 20px; }\n.hq-pane h2, .hq-sheet h2 { margin: 4px 0 8px; font-size: 20px; color: var(--accent); }\n.hq h3 { margin: 14px 0 6px; font-size: 15px; color: var(--dim); }\n.hq p { margin: 6px 0; }\n.hq-dim { color: var(--dim); }\n.hq-say { background: #1a2228; border-radius: 8px; padding: 8px 12px; }\n.hq-say b { color: var(--accent); margin-right: 6px; }\n.hq-notice { display: block; margin: 10px 0; padding: 8px 12px; background: #2a2414; border-radius: 6px; color: var(--accent); }\n.hq-warn { color: var(--warn); }\n.hq em { color: var(--warn); font-style: normal; }\n.hq-row { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0; }\n.hq-cards, .hq-buy, .hq-agents { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 8px; }\n.hq-agent { display: flex; gap: 10px; align-items: center; }\n.hq-agent img, .hq-agent i { flex: none; width: 56px; height: 56px; border-radius: 10px; object-fit: cover; display: block; }\n.hq-slotrow, .hq-stash { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 6px 0; border-bottom: 1px solid #222c33; }\n.hq-slotrow button, .hq-stash button { padding: 4px 10px; font-size: 13px; }\n.hq-icon { width: 28px; height: 28px; vertical-align: middle; image-rendering: pixelated; }\n.hq-buy button span { margin-right: 6px; }\n.hq-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }\n.hq-over, .hq-runmenu { position: absolute; inset: 0; background: #000a; display: flex; align-items: center; justify-content: center; padding: 12px; z-index: 5; }\n.hq-over[hidden] { display: none; }\n.hq-sheet { width: min(900px, 100%); max-height: 100%; overflow: auto; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 14px 18px; }\n.hq-runmenu { font: 14px/1.5 system-ui, sans-serif; color: #e8e2c8; color-scheme: dark; }\n.hq-runmenu .hq-sheet { background: #141b21; border: 1px solid #3a4a54; }\n.hq-runmenu button { font: inherit; color: inherit; background: #1d2a33; border: 1px solid #3a4a54; border-radius: 6px; padding: 8px 12px; cursor: pointer; }\n.hq-runmenu button:disabled { opacity: 0.45; }\n.hq-runmenu h3 { margin: 12px 0 6px; font-size: 15px; color: #9fb2ba; }\n.hq-sheet-head { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }\n.hq-sheet-head button { margin-left: auto; }\n.hq-slots { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }\n.hq-slot { display: flex; flex-direction: column; align-items: center; gap: 4px; text-align: center; }\n.hq-bag { display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; }\n.hq-cell { border: 1px solid #3a4a54; border-radius: 6px; padding: 8px 4px; min-height: 52px; font-size: 12px; text-align: center; }\n.hq-cell.empty { color: #5a6a72; }\n@media (max-width: 760px) {\n  .hq-move { display: flex; }\n  .hq-cols { grid-template-columns: 1fr; }\n  .hq-bag { grid-template-columns: repeat(3, 1fr); }\n  .hq-slots { grid-template-columns: repeat(2, 1fr); }\n  .hq-pane { padding: 8px 12px 16px; }\n}\n.hq-run { position: absolute; inset: 0; display: flex; flex-direction: column; background: #05080c; color: #e8e2c8; font: 14px/1.4 system-ui, sans-serif; outline: none; color-scheme: dark; overflow: hidden; }\n.hq-run button { font: inherit; color: inherit; background: #1d2a33; border: 1px solid #3a4a54; border-radius: 6px; padding: 8px 10px; cursor: pointer; touch-action: none; user-select: none; }\n.hq-run button:disabled { opacity: 0.45; }\n.hq-run-top { flex: none; display: flex; align-items: center; gap: 10px; padding: 6px 10px; border-bottom: 1px solid #223; }\n.hq-run-top button { margin-left: auto; }\n.hq-run-view { flex: 1; min-height: 0; display: flex; align-items: center; justify-content: center; background: #000; }\n.hq-run-view canvas { max-width: 100%; max-height: 100%; aspect-ratio: 16 / 9; display: block; }\n.hq-run-items { flex: none; display: flex; flex-wrap: wrap; gap: 6px; align-items: center; padding: 6px 10px; }\n.hq-run-items button { display: flex; align-items: center; gap: 4px; padding: 4px 8px; font-size: 13px; }\n.hq-run-items span { margin-left: auto; color: #9fb2ba; font-size: 13px; }\n.hq-run-pad { flex: none; display: none; gap: 10px; padding: 6px 10px 10px; align-items: center; }\n.hq-run-btns { flex: 1; display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; }\n.hq-run-btns button { padding: 10px 2px; text-align: center; font-size: 13px; }\n.hq-stick { flex: none; width: 104px; height: 104px; border: 2px solid #567; border-radius: 50%; position: relative; touch-action: none; }\n.hq-stick i { position: absolute; left: 33px; top: 33px; width: 34px; height: 34px; background: #8ab; border-radius: 50%; }\n.hq-run-note { margin: 0; padding: 4px 10px 8px; color: #9fb2ba; font-size: 12px; }\n@media (max-width: 900px), (pointer: coarse) { .hq-run-pad { display: flex; } .hq-run-note { display: none; } }\n.hq[hidden] { display: none; }\n.hq-cell { display: flex; align-items: center; justify-content: center; }\n.hq-run-view { flex-direction: column; }\n.hq-rotate { display: none; margin: 8px; color: #9fb2ba; font-size: 13px; }\n@media (orientation: portrait) and (max-width: 760px) { .hq-rotate { display: block; } }\n/* 가로로 눕힌 폰 (높이가 낮은 화면): 본부 그림은 왼쪽 작게, 장소 창은 오른쪽에 길게 */\n@media (max-height: 520px) {\n  .hq { display: grid; grid-template-columns: minmax(0, 42%) minmax(0, 1fr); grid-template-rows: auto auto 1fr; }\n  .hq-head { grid-column: 1 / -1; padding: 4px 8px; }\n  .hq-top { font-size: 12px; gap: 2px 10px; }\n  .hq-places { padding-top: 4px; }\n  .hq-places button { padding: 4px 8px; font-size: 12px; }\n  .hq-view { grid-column: 1; grid-row: 2; align-self: start; }\n  .hq-move { grid-column: 1; grid-row: 3; display: flex; align-self: start; }\n  .hq-move button { padding: 8px; }\n  .hq-pane { grid-column: 2; grid-row: 2 / 4; padding: 6px 12px 12px; }\n  .hq-pane h2, .hq-sheet h2 { font-size: 17px; margin: 2px 0 6px; }\n  .hq-sheet { padding: 10px 14px; }\n  .hq-cards, .hq-buy, .hq-agents { grid-template-columns: 1fr; }\n}\n@media (pointer: coarse) { .hq-move { display: flex; } }\n/* 엔진 벨트 장면 위의 메뉴 창만 (walk:false). 뒤 캔버스가 보이게 반투명, 캔버스 크기는 건드리지 않는다 */\n.hq.hq-float { position: absolute; inset: 0; display: block; background: transparent; pointer-events: none; overflow: visible; }\n.hq-float .hq-over { position: absolute; inset: 0; background: rgba(0, 0, 0, 0.45); pointer-events: auto; padding: 2%; }\n.hq-float .hq-sheet { width: min(980px, 100%); max-height: 100%; background: rgba(20, 27, 33, 0.94); }\n.hq-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 14px; padding-bottom: 8px; margin-bottom: 6px; border-bottom: 1px solid var(--line); font-size: 13px; color: var(--dim); }\n.hq-bar b { color: var(--text); }\n.hq-bar .hq-x { margin-left: auto; padding: 4px 12px; }\n@media (max-height: 520px) { .hq-float .hq-over { padding: 6px; } .hq-float .hq-sheet { padding: 8px 12px; } .hq-float .hq-cards, .hq-float .hq-buy, .hq-float .hq-agents { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); } }\n/* 잼트리 임무·브리핑 대화창: 게임 화면 아래쪽만 덮는다 (위쪽 게임이 보이게) */\n.hq-float .hq-over.talk { background: linear-gradient(to top, rgba(0, 0, 0, 0.55), transparent 55%); align-items: flex-end; padding: 0 2% 2%; flex-direction: column; justify-content: flex-end; }\n.hq-talk { position: relative; display: flex; gap: 22px; width: min(1100px, 100%); padding: 6px 8px; }\n.hq-face { flex: none; width: 128px; height: 128px; margin: 8px; background: #27685b; }\n.hq-face img { width: 100%; height: 100%; object-fit: cover; display: block; image-rendering: pixelated; }\n.hq-face i { display: flex; width: 100%; height: 100%; align-items: center; justify-content: center; font: bold 54px sans-serif; font-style: normal; color: #fff; }\n.hq-talk-body { flex: 1; min-width: 0; }\n.hq-who { color: #ffe9a8; font-size: 22px; text-shadow: 2px 2px 0 #000; }\n.hq-line { margin: 6px 0 10px; font-size: 22px; line-height: 1.5; text-shadow: 2px 2px 0 #000; word-break: keep-all; }\n.hq-kit { margin: 0 0 8px; color: #dfe4dc; font-size: 22px; line-height: 1.4; word-break: keep-all; }\n.hq-choices { display: flex; flex-direction: column; gap: 6px; }\n.hq-choice-row { display: flex; gap: 6px; flex-wrap: wrap; }\n.hq .hq-choice { padding: 2px 14px 2px 24px; text-align: left; }\n.hq .hq-choice.kb { outline: 2px solid #ffe27a; outline-offset: 1px; }\n.hq .hq-choice:disabled { opacity: 0.45; cursor: default; }\n.hq .hq-talk .hq-x { position: absolute; top: 4px; right: 10px; padding: 0 6px; background: none; border: 0; color: #ffe27a; font-size: 33px; line-height: 1; text-shadow: 2px 2px 0 #000; }\n.hq-talk-notice { width: min(1100px, 100%); }\n@media (max-height: 520px) {\n  .hq-talk { gap: 10px; padding: 8px 12px; }\n  .hq-face { width: 64px; height: 64px; }\n  .hq .hq-choice { font-size: 15px; }\n  .hq-who { font-size: 15px; }\n  .hq-line { font-size: 15px; margin: 2px 0 6px; }\n  .hq .hq-choice { font-size: 14px; padding: 6px 10px; }\n  .hq-choices { flex-direction: row; flex-wrap: wrap; }\n  .hq-kit { font-size: 15px; margin-bottom: 4px; }\n}\n.hq-result { margin: 0 0 10px; padding-left: 22px; font-size: 22px; line-height: 1.5; text-shadow: 2px 2px 0 #000; }\n@media (max-height: 520px) { .hq-result { font-size: 13px; margin-bottom: 4px; line-height: 1.35; } }\n/* 초점은 하나만: 마우스를 올리거나 초점이 간 단추가 있으면 기본 강조(.on)는 끈다 */\n.hq-talk:not(.fresh):has(.gk-btn:hover, .gk-btn:focus-visible) .gk-btn.on:not(:hover):not(:focus-visible) { border-image: none; color: #b8ae96; }\n.hq-talk.fresh .gk-btn:hover:not(.on) { border-image: none; color: #b8ae96; }\n\n/* 한 글자만 다음 줄로 넘어가지 않게 (독립 검수: 「가세/요.」) */\n.hq-talk, .hq-choice { word-break: keep-all; }\n/* 마지막 줄에 한 단어만 남지 않게 (독립 검수: 「나와요.」「가세요.」) */\n.hq-line, .hq-kit, .hq-talk p { text-wrap: pretty; }\n";
+  var style_default = ".hq { --bg: #0b0f13; --panel: #141b21; --line: #3a4a54; --text: #e8e2c8; --dim: #9fb2ba; --accent: #ffd080; --warn: #ff9a8a; position: relative; display: flex; flex-direction: column; width: 100%; height: 100%; background: var(--bg); color: var(--text); font: 14px/1.5 system-ui, sans-serif; overflow: hidden; outline: none; color-scheme: dark; }\n.hq * { box-sizing: border-box; }\n.hq button:not(.gk-btn) { font: inherit; color: inherit; background: #1d2a33; border: 1px solid var(--line); border-radius: 6px; padding: 8px 12px; cursor: pointer; touch-action: manipulation; text-align: left; }\n.hq button:disabled { opacity: 0.45; cursor: default; }\n.hq button.sel:not(.gk-btn) { border-color: var(--accent); background: #3a2e14; }\n.hq button.primary:not(.gk-btn) { background: #6a4a14; border-color: var(--accent); font-weight: bold; }\n.hq-head { flex: none; padding: 6px 10px; border-bottom: 1px solid var(--line); }\n.hq-top { display: flex; flex-wrap: wrap; gap: 6px 14px; align-items: center; }\n.hq-top button { margin-left: auto; padding: 4px 10px; }\n.hq-places { display: flex; gap: 6px; overflow-x: auto; padding: 6px 0 2px; scrollbar-width: thin; }\n.hq-places button { flex: none; padding: 5px 10px; font-size: 13px; }\n.hq-view { flex: none; background: #000; display: flex; justify-content: center; }\n.hq-view canvas { width: 100%; max-width: 1280px; aspect-ratio: 1280 / 400; display: block; }\n.hq-move { flex: none; display: none; gap: 8px; padding: 6px 10px; }\n.hq-move button { flex: 1; text-align: center; padding: 12px; font-size: 16px; }\n.hq-pane { flex: 1; min-height: 0; overflow: auto; padding: 10px 16px 20px; }\n.hq-pane h2, .hq-sheet h2 { margin: 4px 0 8px; font-size: 20px; color: var(--accent); }\n.hq h3 { margin: 14px 0 6px; font-size: 15px; color: var(--dim); }\n.hq p { margin: 6px 0; }\n.hq-dim { color: var(--dim); }\n.hq-say { background: #1a2228; border-radius: 8px; padding: 8px 12px; }\n.hq-say b { color: var(--accent); margin-right: 6px; }\n.hq-notice { display: block; margin: 10px 0; padding: 8px 12px; background: #2a2414; border-radius: 6px; color: var(--accent); }\n.hq-warn { color: var(--warn); }\n.hq em { color: var(--warn); font-style: normal; }\n.hq-row { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0; }\n.hq-cards, .hq-buy, .hq-agents { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 8px; }\n.hq-agent { display: flex; gap: 10px; align-items: center; }\n.hq-agent img, .hq-agent i { flex: none; width: 56px; height: 56px; border-radius: 10px; object-fit: cover; display: block; }\n.hq-slotrow, .hq-stash { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 6px 0; border-bottom: 1px solid #222c33; }\n.hq-slotrow button, .hq-stash button { padding: 4px 10px; font-size: 13px; }\n.hq-icon { width: 28px; height: 28px; vertical-align: middle; image-rendering: pixelated; }\n.hq-buy button span { margin-right: 6px; }\n.hq-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }\n.hq-over, .hq-runmenu { position: absolute; inset: 0; background: #000a; display: flex; align-items: center; justify-content: center; padding: 12px; z-index: 5; }\n.hq-over[hidden] { display: none; }\n.hq-sheet { width: min(900px, 100%); max-height: 100%; overflow: auto; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 14px 18px; }\n.hq-runmenu { font: 14px/1.5 system-ui, sans-serif; color: #e8e2c8; color-scheme: dark; }\n.hq-runmenu .hq-sheet { background: #141b21; border: 1px solid #3a4a54; }\n.hq-runmenu button { font: inherit; color: inherit; background: #1d2a33; border: 1px solid #3a4a54; border-radius: 6px; padding: 8px 12px; cursor: pointer; }\n.hq-runmenu button:disabled { opacity: 0.45; }\n.hq-runmenu h3 { margin: 12px 0 6px; font-size: 15px; color: #9fb2ba; }\n.hq-sheet-head { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }\n.hq-sheet-head button { margin-left: auto; }\n.hq-slots { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }\n.hq-slot { display: flex; flex-direction: column; align-items: center; gap: 4px; text-align: center; }\n.hq-bag { display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; }\n.hq-cell { border: 1px solid #3a4a54; border-radius: 6px; padding: 8px 4px; min-height: 52px; font-size: 12px; text-align: center; }\n.hq-cell.empty { color: #5a6a72; }\n@media (max-width: 760px) {\n  .hq-move { display: flex; }\n  .hq-cols { grid-template-columns: 1fr; }\n  .hq-bag { grid-template-columns: repeat(3, 1fr); }\n  .hq-slots { grid-template-columns: repeat(2, 1fr); }\n  .hq-pane { padding: 8px 12px 16px; }\n}\n.hq-run { position: absolute; inset: 0; display: flex; flex-direction: column; background: #05080c; color: #e8e2c8; font: 14px/1.4 system-ui, sans-serif; outline: none; color-scheme: dark; overflow: hidden; }\n.hq-run button { font: inherit; color: inherit; background: #1d2a33; border: 1px solid #3a4a54; border-radius: 6px; padding: 8px 10px; cursor: pointer; touch-action: none; user-select: none; }\n.hq-run button:disabled { opacity: 0.45; }\n.hq-run-top { flex: none; display: flex; align-items: center; gap: 10px; padding: 6px 10px; border-bottom: 1px solid #223; }\n.hq-run-top button { margin-left: auto; }\n.hq-run-view { flex: 1; min-height: 0; display: flex; align-items: center; justify-content: center; background: #000; }\n.hq-run-view canvas { max-width: 100%; max-height: 100%; aspect-ratio: 16 / 9; display: block; }\n.hq-run-items { flex: none; display: flex; flex-wrap: wrap; gap: 6px; align-items: center; padding: 6px 10px; }\n.hq-run-items button { display: flex; align-items: center; gap: 4px; padding: 4px 8px; font-size: 13px; }\n.hq-run-items span { margin-left: auto; color: #9fb2ba; font-size: 13px; }\n.hq-run-pad { flex: none; display: none; gap: 10px; padding: 6px 10px 10px; align-items: center; }\n.hq-run-btns { flex: 1; display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; }\n.hq-run-btns button { padding: 10px 2px; text-align: center; font-size: 13px; }\n.hq-stick { flex: none; width: 104px; height: 104px; border: 2px solid #567; border-radius: 50%; position: relative; touch-action: none; }\n.hq-stick i { position: absolute; left: 33px; top: 33px; width: 34px; height: 34px; background: #8ab; border-radius: 50%; }\n.hq-run-note { margin: 0; padding: 4px 10px 8px; color: #9fb2ba; font-size: 12px; }\n@media (max-width: 900px), (pointer: coarse) { .hq-run-pad { display: flex; } .hq-run-note { display: none; } }\n.hq[hidden] { display: none; }\n.hq-cell { display: flex; align-items: center; justify-content: center; }\n.hq-run-view { flex-direction: column; }\n.hq-rotate { display: none; margin: 8px; color: #9fb2ba; font-size: 13px; }\n@media (orientation: portrait) and (max-width: 760px) { .hq-rotate { display: block; } }\n/* 가로로 눕힌 폰 (높이가 낮은 화면): 본부 그림은 왼쪽 작게, 장소 창은 오른쪽에 길게 */\n@media (max-height: 520px) {\n  .hq { display: grid; grid-template-columns: minmax(0, 42%) minmax(0, 1fr); grid-template-rows: auto auto 1fr; }\n  .hq-head { grid-column: 1 / -1; padding: 4px 8px; }\n  .hq-top { font-size: 12px; gap: 2px 10px; }\n  .hq-places { padding-top: 4px; }\n  .hq-places button { padding: 4px 8px; font-size: 12px; }\n  .hq-view { grid-column: 1; grid-row: 2; align-self: start; }\n  .hq-move { grid-column: 1; grid-row: 3; display: flex; align-self: start; }\n  .hq-move button { padding: 8px; }\n  .hq-pane { grid-column: 2; grid-row: 2 / 4; padding: 6px 12px 12px; }\n  .hq-pane h2, .hq-sheet h2 { font-size: 17px; margin: 2px 0 6px; }\n  .hq-sheet { padding: 10px 14px; }\n  .hq-cards, .hq-buy, .hq-agents { grid-template-columns: 1fr; }\n}\n@media (pointer: coarse) { .hq-move { display: flex; } }\n/* 엔진 벨트 장면 위의 메뉴 창만 (walk:false). 뒤 캔버스가 보이게 반투명, 캔버스 크기는 건드리지 않는다 */\n.hq.hq-float { position: absolute; inset: 0; display: block; background: transparent; pointer-events: none; overflow: visible; }\n.hq-float .hq-over { position: absolute; inset: 0; background: rgba(0, 0, 0, 0.45); pointer-events: auto; padding: 2%; }\n.hq-float .hq-sheet { width: min(980px, 100%); max-height: 100%; background: rgba(20, 27, 33, 0.94); }\n.hq-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 14px; padding-bottom: 8px; margin-bottom: 6px; border-bottom: 1px solid var(--line); font-size: 13px; color: var(--dim); }\n.hq-bar b { color: var(--text); }\n.hq-bar .hq-x { margin-left: auto; padding: 4px 12px; }\n@media (max-height: 520px) { .hq-float .hq-over { padding: 6px; } .hq-float .hq-sheet { padding: 8px 12px; } .hq-float .hq-cards, .hq-float .hq-buy, .hq-float .hq-agents { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); } }\n/* 잼트리 임무·브리핑 대화창: 게임 화면 아래쪽만 덮는다 (위쪽 게임이 보이게) */\n.hq-float .hq-over.talk { background: linear-gradient(to top, rgba(0, 0, 0, 0.55), transparent 55%); align-items: center; padding: 0 0 10px; flex-direction: column; justify-content: flex-end; }\n/* NPC 대화창(.gnp)과 같은 자리·크기 */\n.hq-float .hq-over.talk .hq-talk { width: 1120px; max-width: 100%; box-sizing: border-box; }\n.hq-talk { position: relative; display: flex; gap: 22px; width: min(1100px, 100%); padding: 6px 8px; }\n.hq-face { flex: none; width: 128px; height: 128px; margin: 8px; background: #27685b; }\n.hq-face img { width: 100%; height: 100%; object-fit: cover; display: block; image-rendering: pixelated; }\n.hq-face i { display: flex; width: 100%; height: 100%; align-items: center; justify-content: center; font: bold 54px sans-serif; font-style: normal; color: #fff; }\n.hq-talk-body { flex: 1; min-width: 0; }\n.hq-who { color: #ffe9a8; font-size: 22px; text-shadow: 2px 2px 0 #000; }\n.hq-line { margin: 6px 0 10px; font-size: 22px; line-height: 1.5; text-shadow: 2px 2px 0 #000; word-break: keep-all; }\n.hq-kit { margin: 0 0 8px; color: #dfe4dc; font-size: 22px; line-height: 1.4; word-break: keep-all; }\n.hq-choices { display: flex; flex-direction: column; gap: 6px; }\n.hq-choice-row { display: flex; gap: 6px; flex-wrap: wrap; }\n.hq .hq-choice { padding: 2px 14px 2px 24px; text-align: left; }\n.hq .hq-choice.kb { outline: 2px solid #ffe27a; outline-offset: 1px; }\n.hq .hq-choice:disabled { opacity: 0.45; cursor: default; }\n.hq .hq-talk .hq-x { position: absolute; top: 4px; right: 10px; padding: 0 6px; background: none; border: 0; color: #ffe27a; font-size: 33px; line-height: 1; text-shadow: 2px 2px 0 #000; }\n.hq-talk-notice { width: min(1100px, 100%); }\n@media (max-height: 520px) {\n  .hq-talk { gap: 10px; padding: 8px 12px; }\n  .hq-face { width: 64px; height: 64px; }\n  .hq .hq-choice { font-size: 15px; }\n  .hq-who { font-size: 15px; }\n  .hq-line { font-size: 15px; margin: 2px 0 6px; }\n  .hq .hq-choice { font-size: 14px; padding: 6px 10px; }\n  .hq-choices { flex-direction: row; flex-wrap: wrap; }\n  .hq-kit { font-size: 15px; margin-bottom: 4px; }\n}\n.hq-result { margin: 0 0 10px; padding-left: 22px; font-size: 22px; line-height: 1.5; text-shadow: 2px 2px 0 #000; }\n@media (max-height: 520px) { .hq-result { font-size: 13px; margin-bottom: 4px; line-height: 1.35; } }\n/* 초점은 하나만: 마우스를 올리거나 초점이 간 단추가 있으면 기본 강조(.on)는 끈다 */\n.hq-talk:not(.fresh):has(.gk-btn:hover, .gk-btn:focus-visible) .gk-btn.on:not(:hover):not(:focus-visible) { border-image: none; color: #b8ae96; }\n.hq-talk.fresh .gk-btn:hover:not(.on) { border-image: none; color: #b8ae96; }\n\n/* 한 글자만 다음 줄로 넘어가지 않게 (독립 검수: 「가세/요.」) */\n.hq-talk, .hq-choice { word-break: keep-all; }\n/* 마지막 줄에 한 단어만 남지 않게 (독립 검수: 「나와요.」「가세요.」) */\n.hq-line, .hq-kit, .hq-talk p { text-wrap: pretty; }\n\n/* 키보드로 고른 단추 (방향키 · Enter/E) */\n.hq .hq-kbsel { outline: 3px solid #ffe27a; outline-offset: 2px; color: #ffe27a; }\n";
 
   // src/game/action/hq/lines.ts
   var provider = null;
@@ -15894,167 +19915,6 @@
   var easeOut = (k) => 1 - (1 - k) * (1 - k);
   var easeInOut = (k) => k < 0.5 ? 2 * k * k : 1 - Math.pow(-2 * k + 2, 2) / 2;
 
-  // src/game/action/ui/keys.ts
-  var CODE = {
-    left: "ArrowLeft",
-    right: "ArrowRight",
-    up: "ArrowUp",
-    down: "ArrowDown",
-    attack: "KeyA",
-    shoot: "KeyS",
-    unique: "KeyD",
-    guard: "KeyQ",
-    ult: "KeyW",
-    interact: "KeyE",
-    jump: "Space",
-    evade: "ShiftLeft",
-    item1: "Digit1",
-    item2: "Digit2",
-    item3: "Digit3",
-    item4: "Digit4",
-    support: "KeyC",
-    map: "KeyZ",
-    auto: "KeyX",
-    menu: "Escape",
-    reload: "KeyR",
-    hitbox: "KeyH"
-  };
-  var ALIAS3 = { ShiftRight: "ShiftLeft", Tab: "KeyZ", Numpad1: "Digit1", Numpad2: "Digit2", Numpad3: "Digit3", Numpad4: "Digit4" };
-  var KEY_OF = {
-    ArrowLeft: "ArrowLeft",
-    ArrowRight: "ArrowRight",
-    ArrowUp: "ArrowUp",
-    ArrowDown: "ArrowDown",
-    KeyA: "a",
-    KeyS: "s",
-    KeyD: "d",
-    KeyQ: "q",
-    KeyW: "w",
-    KeyE: "e",
-    KeyC: "c",
-    KeyZ: "z",
-    KeyX: "x",
-    KeyR: "r",
-    KeyH: "h",
-    Space: " ",
-    ShiftLeft: "Shift",
-    Digit1: "1",
-    Digit2: "2",
-    Digit3: "3",
-    Digit4: "4",
-    Escape: "Escape",
-    Tab: "Tab",
-    Enter: "Enter"
-  };
-  var LABEL = {
-    left: "왼쪽",
-    right: "오른쪽",
-    up: "위(안쪽)",
-    down: "아래(앞쪽)·두 번 앉기",
-    attack: "근접 (연타 3타)",
-    shoot: "원거리",
-    unique: "고유기 (짧게·길게)",
-    guard: "가드 (누른 채)",
-    ult: "필살기 (게이지 가득)",
-    interact: "상호작용·줍기",
-    jump: "점프",
-    evade: "짧게 회피 · 누른 채 달리기",
-    item1: "아이템 1",
-    item2: "아이템 2",
-    item3: "아이템 3",
-    item4: "아이템 4",
-    support: "지원 요원 호출",
-    map: "지도",
-    auto: "자동 전환",
-    menu: "메뉴",
-    reload: "재장전",
-    hitbox: "판정 보기"
-  };
-  var KEY_NAME = {
-    left: "←",
-    right: "→",
-    up: "↑",
-    down: "↓",
-    attack: "A",
-    shoot: "S",
-    unique: "D",
-    guard: "Q",
-    ult: "W",
-    interact: "E",
-    jump: "Space",
-    evade: "Shift",
-    item1: "1",
-    item2: "2",
-    item3: "3",
-    item4: "4",
-    support: "C",
-    map: "Z",
-    auto: "X",
-    menu: "Esc",
-    reload: "R",
-    hitbox: "H"
-  };
-  var PAD_BUTTON = {
-    0: "Space",
-    // A 점프
-    1: "KeyE",
-    // B 상호작용
-    2: "KeyA",
-    // X 근접
-    3: "KeyS",
-    // Y 원거리
-    4: "KeyQ",
-    // LB 가드
-    5: "ShiftLeft",
-    // RB 회피·달리기
-    6: "KeyD",
-    // LT 고유기
-    7: "KeyW",
-    // RT 필살기
-    8: "KeyZ",
-    // Back 지도
-    9: "Escape",
-    // Start 메뉴
-    10: "KeyC",
-    // L3 지원
-    11: "KeyR",
-    // R3 재장전 (자동 전환·판정 보기는 메뉴에)
-    12: "Digit1",
-    // 십자 위 아이템 1
-    15: "Digit2",
-    // 십자 오른쪽 아이템 2
-    13: "Digit3",
-    // 십자 아래 아이템 3
-    14: "Digit4"
-    // 십자 왼쪽 아이템 4
-  };
-  var PAD_NAME = {
-    Space: "A",
-    KeyE: "B",
-    KeyA: "X",
-    KeyS: "Y",
-    KeyQ: "LB",
-    ShiftLeft: "RB",
-    KeyD: "LT",
-    KeyW: "RT",
-    KeyZ: "Back",
-    Escape: "Start",
-    KeyC: "L3",
-    KeyR: "R3",
-    KeyX: "메뉴",
-    KeyH: "메뉴",
-    Digit1: "십자↑",
-    Digit2: "십자→",
-    Digit3: "십자↓",
-    Digit4: "십자←",
-    ArrowLeft: "왼쪽 스틱",
-    ArrowRight: "왼쪽 스틱",
-    ArrowUp: "왼쪽 스틱",
-    ArrowDown: "왼쪽 스틱"
-  };
-  var ACTS = Object.keys(CODE);
-  var ACT_OF_CODE = Object.fromEntries(ACTS.map((a) => [CODE[a], a]));
-
   // src/game/action/ui/gamepad.ts
   var DEAD = 0.3;
   var PadReader = class {
@@ -16145,7 +20005,7 @@
       return () => this.listeners = this.listeners.filter((f) => f !== fn2);
     }
     press(code, src) {
-      code = ALIAS3[code] ?? code;
+      code = ALIAS[code] ?? code;
       this.last = src;
       if (this.capture?.(code, true, src)) return;
       const set = this.bySrc.get(src);
@@ -16160,7 +20020,7 @@
       }
     }
     release(code, src) {
-      code = ALIAS3[code] ?? code;
+      code = ALIAS[code] ?? code;
       const set = this.bySrc.get(src);
       if (!set.delete(code)) {
         this.capture?.(code, false, src);
@@ -16235,8 +20095,8 @@
           this.press(ev.code, "kb");
         } else {
           physical.delete(ev.code);
-          const code = ALIAS3[ev.code] ?? ev.code;
-          if (![...physical].some((c) => (ALIAS3[c] ?? c) === code)) this.release(code, "kb");
+          const code = ALIAS[ev.code] ?? ev.code;
+          if (![...physical].some((c) => (ALIAS[c] ?? c) === code)) this.release(code, "kb");
         }
       };
       const blur = () => {
@@ -16371,8 +20231,8 @@
       if (s2.numbered && /^Digit[1-9]$/.test(code)) {
         const n = Number(code.slice(5)) - 1;
         const btns = s2.items.map((x, i) => [x, i]).filter(([x]) => x.type === "button");
-        const pick6 = btns[n];
-        if (pick6) this.focus = pick6[1], this.activate(pick6[0]);
+        const pick7 = btns[n];
+        if (pick7) this.focus = pick7[1], this.activate(pick7[0]);
         return true;
       }
       return true;
@@ -16406,8 +20266,8 @@
       const it = this.top?.items[i];
       if (!it) return;
       this.setFocus(i, false);
-      const step4 = t.closest("[data-step]");
-      if (step4) return this.adjust(it, Number(step4.dataset.step));
+      const step2 = t.closest("[data-step]");
+      if (step2) return this.adjust(it, Number(step2.dataset.step));
       if (it.type === "slider") {
         const bar2 = row.querySelector(".mn-bar");
         if (bar2 && t.closest(".mn-bar")) {
@@ -16471,28 +20331,29 @@
       this.el.remove();
     }
   };
-  function choiceScreen(menu, o, pick6) {
+  function choiceScreen(menu, o, pick7) {
     return {
       id: "choice",
       look: "dialog",
       numbered: true,
       title: o.title,
       noBack: o.cancel === false,
-      back: () => pick6(-1),
+      back: () => pick7(-1),
       items: [
         ...o.lines?.length ? [{ type: "html", html: o.lines.map((l) => `<p>${esc(l)}</p>`).join("") }] : [],
-        ...o.options.map((label3, i) => ({ type: "button", label: label3, act: () => pick6(i) }))
+        ...o.options.map((label3, i) => ({ type: "button", label: label3, act: () => pick7(i) }))
       ]
     };
   }
 
   // src/game/action/ui/settings.ts
   var DEFAULT_SETTINGS2 = {
-    crt: false,
+    crt: "off",
     shake: 1,
     flash: true,
     bright: 1,
     pixel: true,
+    charSize: 1,
     master: 0.8,
     music: 0.7,
     sfx: 0.9,
@@ -16504,7 +20365,13 @@
     vibrate: true,
     numbers: true,
     talkModel: "main",
-    talkRecent: false
+    talkRecent: false,
+    tScene: 10,
+    tRegion: 30,
+    tTalk: 10,
+    tFight: 10,
+    tWaitShort: 30,
+    tWaitLong: 60
   };
   var KEY = "goei-game-ui:v1";
   var localStore = {
@@ -16527,6 +20394,8 @@
     if (!text2) return s2;
     try {
       const o = JSON.parse(text2);
+      if (o.crt === true) o.crt = "curved";
+      else if (o.crt === false) o.crt = "off";
       for (const k of Object.keys(s2)) {
         const v = o[k];
         if (v !== void 0 && typeof v === typeof s2[k]) s2[k] = v;
@@ -16563,11 +20432,11 @@
       this.knob = this.root.querySelector(".tp-knob");
       const mk = (b, cls) => {
         const el = document.createElement("div");
-        const plate2 = TOUCH_IMG[cls === "item" ? "slot" : b.id];
-        el.className = `tp-b ${plate2 ? "pl" : "gk-slot"} ${cls}`;
+        const plate3 = TOUCH_IMG[cls === "item" ? "slot" : b.id];
+        el.className = `tp-b ${plate3 ? "pl" : "gk-slot"} ${cls}`;
         el.dataset.id = b.id;
         el.innerHTML = `<b>${b.label}</b><i>${b.key}</i>`;
-        if (plate2) el.style.backgroundImage = `url("${plate2}")`;
+        if (plate3) el.style.backgroundImage = `url("${plate3}")`;
         this.root.append(el);
         b.el = el;
         this.btns.push(b);
@@ -17027,8 +20896,8 @@
     input.target = o.keyTarget ?? window;
     const pad = new PadReader(input);
     const hud = new Hud();
-    const fx2 = new Fx();
-    fx2.rumble = (s2, ms) => pad.rumble(s2, ms);
+    const fx = new Fx();
+    fx.rumble = (s2, ms) => pad.rumble(s2, ms);
     const menu = new Menu(stage.ui);
     const store2 = o.store ?? localStore;
     let settings = { ...DEFAULT_SETTINGS2 };
@@ -17049,7 +20918,8 @@
       stage.setCrt(settings.crt);
       stage.setBright(settings.bright);
       stage.setPixel(settings.pixel);
-      fx2.opt = { shake: settings.shake, flash: settings.flash, numbers: settings.numbers };
+      charSize.k = settings.charSize;
+      fx.opt = { shake: settings.shake, flash: settings.flash, numbers: settings.numbers };
       pad.setRumble(settings.vibrate);
       touch2.refresh();
     };
@@ -17082,7 +20952,7 @@
       const rows = ACTS.filter((a) => !["up", "down", "right"].includes(a)).map((a) => {
         const kb = a === "left" ? "<kbd>←</kbd><kbd>→</kbd><kbd>↑</kbd><kbd>↓</kbd>" : `<kbd>${esc(KEY_NAME[a])}</kbd>`;
         const pd = PAD_NAME[CODE[a]] ?? "";
-        const tc = a === "left" ? "왼쪽 스틱" : a === "menu" ? "☰" : a === "auto" || a === "hitbox" ? "메뉴" : a.startsWith("item") ? "아래 칸" : a === "evade" ? "회피 (스틱 끝 = 달리기)" : "버튼";
+        const tc = a === "left" ? "왼쪽 스틱" : a === "menu" ? "☰" : a === "auto" ? "메뉴" : a.startsWith("item") ? "아래 칸" : a === "evade" ? "회피 (스틱 끝 = 달리기)" : "버튼";
         return `<tr><td>${esc(a === "left" ? "이동 (좌우 + 안쪽·앞쪽)" : LABEL[a])}</td><td>${kb}</td><td>${esc(pd)}</td><td>${esc(tc)}</td></tr>`;
       }).join("");
       return `<table><tr><th>행동</th><th>키보드</th><th>게임패드</th><th>터치</th></tr>${rows}</table><p style="margin-top:10px">Shift 를 0.15초 안에 떼면 회피, 누르고 있으면 달리기. 같은 방향 두 번도 달리기. ↓ 두 번 앉기.</p>`;
@@ -17092,13 +20962,27 @@
       const pct = (v) => `${Math.round(v * 100)}%`;
       return [
         { type: "head", label: "화면" },
-        { type: "toggle", label: "CRT 필터 (주사선·모서리)", get: () => s2.crt, set: (v) => s2.crt = v },
+        { type: "choice", label: "CRT 모니터", options: [["off", "끄기"], ["screen", "화면 효과"], ["curved", "곡면까지"]], get: () => s2.crt, set: (v) => s2.crt = v },
         { type: "slider", label: "화면 흔들림", get: () => s2.shake, set: (v) => s2.shake = v, min: 0, max: 1, step: 0.25, fmt: pct },
         { type: "toggle", label: "피격 섬광", get: () => s2.flash, set: (v) => s2.flash = v },
         { type: "toggle", label: "피해 숫자", get: () => s2.numbers, set: (v) => s2.numbers = v },
         { type: "slider", label: "밝기", get: () => s2.bright, set: (v) => s2.bright = v, min: 0.7, max: 1.4, step: 0.05, fmt: pct },
         { type: "toggle", label: "도트 선명하게", get: () => s2.pixel, set: (v) => s2.pixel = v },
+        { type: "slider", label: "화면 확대", get: () => s2.charSize, set: (v) => s2.charSize = v, min: 1, max: 2.5, step: 0.05, fmt: pct },
         ...o.field ? [] : [{ type: "button", label: "전체 화면", sub: "폰은 가로로 고정", act: () => void stage.fullscreen() }],
+        // 필드(리스): 전체 화면 두 가지 (2026-10-25 사용자) — 브라우저 전체 · 상황창 안 전체(왼쪽 메뉴·오른쪽 신분증 칸까지)
+        ...o.field?.fullscreen ? [{
+          type: "choice",
+          label: "전체 화면",
+          options: [["off", "끄기"], ["panel", "상황창 안"], ["browser", "브라우저"]],
+          get: () => o.field.fullscreen.mode() ?? "off",
+          set: (v) => {
+            const f = o.field.fullscreen;
+            void (v === "off" ? f.exit() : f.enter(v)).then(() => {
+              if (menu.isOpen) menu.replace(settingsScreen());
+            });
+          }
+        }] : [],
         { type: "head", label: "소리" },
         { type: "slider", label: "전체", get: () => s2.master, set: (v) => s2.master = v, min: 0, max: 1, step: 0.1, fmt: pct },
         { type: "slider", label: "음악", get: () => s2.music, set: (v) => s2.music = v, min: 0, max: 1, step: 0.1, fmt: pct },
@@ -17116,6 +21000,17 @@
           { type: "choice", label: "NPC 대화 모델", options: [["main", "주 모델"], ["aux", "보조 모델"]], get: () => s2.talkModel, set: (v) => s2.talkModel = v },
           { type: "toggle", label: "본편 최근 채팅 같이 보내기", get: () => s2.talkRecent, set: (v) => s2.talkRecent = v }
         ],
+        { type: "head", label: "필드 시간" },
+        ...[["tScene", "장면 넘어가기", 60], ["tRegion", "지역 이동", 180], ["tTalk", "대화 한 번", 60], ["tFight", "싸움 (장면당 한 번)", 60], ["tWaitShort", "시간 보내기 · 짧게", 240], ["tWaitLong", "시간 보내기 · 길게", 480]].map(([k, label3, max]) => ({
+          type: "slider",
+          label: label3,
+          get: () => s2[k],
+          set: (v) => s2[k] = Math.round(v),
+          min: 0,
+          max,
+          step: 5,
+          fmt: (v) => v ? `${Math.round(v)}분` : "안 감"
+        })),
         { type: "html", html: `<p style="font-size:14px;color:#9aa6ab">게임패드: ${esc(pad.connected ? pad.connected.slice(0, 48) : "연결 안 됨 (버튼을 하나 누르면 잡힙니다)")}</p>` },
         { type: "button", label: "기본값으로", act: () => (settings = { ...DEFAULT_SETTINGS2 }, apply(), saveSettings(), menu.replace(settingsScreen())) }
       ];
@@ -17130,7 +21025,7 @@
       pad,
       touch: touch2,
       hud,
-      fx: fx2,
+      fx,
       menu,
       get settings() {
         return settings;
@@ -17150,7 +21045,7 @@
       },
       frame(dt) {
         pad.poll();
-        fx2.update(dt);
+        fx.update(dt);
       },
       play() {
         menu.closeAll();
@@ -17343,7 +21238,7 @@
   var depthText = (d3) => d3 ? d3 <= 3 ? `L${d3}` : `B-${d3 - 3}` : "—";
   function createHq() {
     let ready = Promise.resolve();
-    let loaded2 = false;
+    let loaded = false;
     let mountId = 0;
     let slotBusy = false;
     let s2 = newSave();
@@ -17363,14 +21258,14 @@
     let pending = null;
     let cards = [];
     let selMission = null;
+    let armed2 = null;
     let slotList = [];
     let pickSlot = 0;
     let walk = true;
-    const rand3 = () => (host?.rand ?? Math.random)();
+    const rand2 = () => (host?.rand ?? Math.random)();
     const keys2 = /* @__PURE__ */ new Set();
-    const idlers = {};
-    const ctx = () => ({ agent: s2.selected, agentName: AGENT_BY_ID[s2.selected].name, fatigue: s2.agents[s2.selected].fatigue, day: s2.day, rand: rand3 });
-    const save2 = () => loaded2 ? host?.save(saveText(s2)).catch(() => {
+    const ctx = () => ({ agent: s2.selected, agentName: AGENT_BY_ID[s2.selected].name, fatigue: s2.agents[s2.selected].fatigue, day: s2.day, rand: rand2 });
+    const save2 = () => loaded ? host?.save(saveText(s2)).catch(() => {
     }) : void 0;
     const placeAt = (x) => PLACES.find((p) => x >= p.x && x < p.x + p.w) ?? null;
     const draw = (dt) => {
@@ -17419,23 +21314,6 @@
       c.fillStyle = "#9ab";
       c.font = "12px sans-serif";
       c.fillText("계단 ↓ 지하", PLACE_BY_ID.training.x - 30, FLOOR_Y - 208);
-      for (const a of AGENTS) {
-        if (a.id === s2.selected) continue;
-        const it = idlers[a.id] ??= { x: PLACE_BY_ID.office.x + 260, to: PLACE_BY_ID.office.x + 260, wait: 2 };
-        it.wait -= dt;
-        if (it.wait <= 0 && Math.abs(it.x - it.to) < 2) {
-          const spots = [PLACE_BY_ID.office.x + 80, PLACE_BY_ID.office.x + 300, PLACE_BY_ID.pantry.x + 120];
-          it.to = spots[Math.floor(rand3() * spots.length)];
-          it.wait = 4 + rand3() * 6;
-        }
-        it.x += Math.sign(it.to - it.x) * Math.min(Math.abs(it.to - it.x), 60 * dt);
-        const rec = s2.agents[a.id];
-        c.fillStyle = a.color + (rec.injured ? "66" : "aa");
-        c.fillRect(it.x - 20, FLOOR_Y - 104, 40, 104);
-        c.fillStyle = "#ddd";
-        c.font = "13px sans-serif";
-        c.fillText(`${a.name}${rec.injured ? " (부상)" : rec.fatigue >= 2 ? " (피곤)" : ""}`, it.x, FLOOR_Y - 112);
-      }
       const me = AGENT_BY_ID[s2.selected];
       c.fillStyle = me.color;
       c.fillRect(s2.x - 22, FLOOR_Y - 112, 44, 112);
@@ -17611,7 +21489,7 @@ ${can.ok ? "" : `<p class="hq-warn">${esc2(can.why)}</p>`}</div>
       const st = statsFor(s2, s2.selected);
       const kit = `<p class="hq-kit gk-font">${esc2(AGENT_BY_ID[s2.selected].name)} 체력 ${st.hp}${s2.agents[s2.selected].fatigue ? ` · 피로 ${s2.agents[s2.selected].fatigue}` : ""} · ${s2.loadout.map((x) => x ? `${esc2(itemName(x.id))}×${x.n}` : "").filter(Boolean).join(" ") || "아이템 없음"}${s2.coffee ? ` · ${esc2(COFFEES.find((x) => x.id === s2.coffee)?.name ?? "")}` : ""}</p>${can.ok ? "" : `<p class="hq-warn">${esc2(can.why)}</p>`}`;
       const j = ls.find((l) => l.who === "잼트리") ?? ls[0];
-      return talkBox(j?.who ?? "잼트리", ls.filter((l) => l.who === (j?.who ?? "잼트리")).map((l) => l.text).join(" ") || m.title, `<button class="gk-btn hq-choice primary on" data-act="deploy" ${can.ok ? "" : "disabled"}>출동</button><button class="gk-btn hq-choice" data-go="supply">정비실 먼저</button><button class="gk-btn hq-choice" data-act="close">다시 고를게</button>`, kit);
+      return talkBox(j?.who ?? "잼트리", ls.filter((l) => l.who === (j?.who ?? "잼트리")).map((l) => l.text).join(" ") || m.title, `<button class="gk-btn hq-choice primary on" data-act="deploy" ${can.ok ? "" : "disabled"}>${!walk ? "출동 준비 (B3 승합차)" : "출동"}</button><button class="gk-btn hq-choice" data-go="supply">정비실 먼저</button><button class="gk-btn hq-choice" data-act="close">다시 고를게</button>`, kit);
     };
     const settleTalk = () => {
       const l = s2.last;
@@ -17647,8 +21525,8 @@ ${can.ok ? "" : `<p class="hq-warn">${esc2(can.why)}</p>`}</div>
         talkKey = k;
         return;
       }
-      const body2 = overlay === "brief" ? briefHtml() : overlay === "settle" ? settleHtml() : overlay === "menu" ? menuHtml() : placeHtml(panel);
-      ov.innerHTML = `<div class="hq-sheet">${bar2()}${body2}${overlay !== "settle" && notice ? `<p class="hq-notice">${esc2(notice)}</p>` : ""}</div>`;
+      const body = overlay === "brief" ? briefHtml() : overlay === "settle" ? settleHtml() : overlay === "menu" ? menuHtml() : placeHtml(panel);
+      ov.innerHTML = `<div class="hq-sheet">${bar2()}${body}${overlay !== "settle" && notice ? `<p class="hq-notice">${esc2(notice)}</p>` : ""}</div>`;
       wrap2.querySelectorAll("[data-icon]").forEach((el) => el.dataset.icon && el.replaceChildren(iconCanvas(el.dataset.icon, 28)));
     };
     const closeOne = () => {
@@ -17694,7 +21572,7 @@ ${can.ok ? "" : `<p class="hq-warn">${esc2(can.why)}</p>`}</div>
       if (overlay === "menu") render();
     };
     const onClick = (ev) => {
-      if (!loaded2 || slotBusy) return;
+      if (!loaded || slotBusy) return;
       const t = ev.target.closest("button");
       if (!t || t.disabled || !host) return;
       const d3 = t.dataset;
@@ -17756,11 +21634,21 @@ ${can.ok ? "" : `<p class="hq-warn">${esc2(can.why)}</p>`}</div>
           notice = "";
           return render();
         case "brief":
-          pendingSeed = Math.floor(rand3() * 1e9);
+          pendingSeed = Math.floor(rand2() * 1e9);
           overlay = "brief";
           notice = "";
           return render();
         case "deploy": {
+          if (!walk) {
+            const can = canDeploy(s2, s2.selected);
+            if (!can.ok) return say(can.why);
+            armed2 = { mission: selMission, seed: pendingSeed };
+            overlay = null;
+            panel = null;
+            notice = "";
+            render();
+            return closeOne();
+          }
           const l = launch(s2, selMission, pendingSeed);
           if (typeof l === "string") return say(l);
           pending = l;
@@ -17778,7 +21666,7 @@ ${can.ok ? "" : `<p class="hq-warn">${esc2(can.why)}</p>`}</div>
         case "appraise":
           return say(appraise(s2).join(" / "));
         case "tooth":
-          return say(openToothBox(s2, rand3));
+          return say(openToothBox(s2, rand2));
         case "report": {
           const p = reportPayload(s2);
           if (p && host.link) void host.link.report(p).then((m) => say(m), () => say("보고서를 붙이지 못했어요."));
@@ -17844,7 +21732,7 @@ ${can.ok ? "" : `<p class="hq-warn">${esc2(can.why)}</p>`}</div>
       ready: () => ready,
       mount(r, h, opt) {
         const mounting = ++mountId;
-        loaded2 = false;
+        loaded = false;
         slotBusy = false;
         root = r;
         host = h;
@@ -17870,7 +21758,9 @@ ${can.ok ? "" : `<p class="hq-warn">${esc2(can.why)}</p>`}</div>
           const got = parseSave(await h.load().catch(() => null));
           if (mounting !== mountId) return;
           if (got) s2 = got;
-          loaded2 = true;
+          if (!walk && s2.selected === "jyaldi") s2.selected = "eileen";
+          if (s2.support === "eileen") s2.support = null;
+          loaded = true;
           if (s2.active && !h.resuming?.()) {
             notice = "진행 중인 출동이 있어요. 시작 화면에서 이어하기로 돌아가세요.";
           }
@@ -17890,7 +21780,7 @@ ${can.ok ? "" : `<p class="hq-warn">${esc2(can.why)}</p>`}</div>
       },
       places: () => PLACES.map((p) => ({ id: p.id, name: p.name, floor: p.floor, x: p.x, w: p.w, npc: p.npc, color: p.color, open: placeOpen(s2, p.id), opens: p.opens })),
       openPlace(id) {
-        if (!loaded2) return;
+        if (!loaded) return;
         if (!placeOpen(s2, id)) return;
         overlay = null;
         panel = id;
@@ -17898,6 +21788,23 @@ ${can.ok ? "" : `<p class="hq-warn">${esc2(can.why)}</p>`}</div>
         s2.x = PLACE_BY_ID[id].x + PLACE_BY_ID[id].w / 2;
         void save2();
         render();
+      },
+      armed: () => !!armed2,
+      depart() {
+        if (!loaded) return null;
+        if (!armed2) return "출동 차량이다. 임무는 3층 종합대응팀 잼트리 자리에서 받는다.";
+        const l = launch(s2, armed2.mission, armed2.seed);
+        if (typeof l === "string") return l;
+        armed2 = null;
+        pending = l;
+        overlay = null;
+        panel = null;
+        void save2();
+        render();
+        if (walk) wrap2.hidden = true;
+        evacJust = false;
+        host?.deploy(l);
+        return null;
       },
       openMenu() {
         overlay = "menu";
@@ -17909,7 +21816,7 @@ ${can.ok ? "" : `<p class="hq-warn">${esc2(can.why)}</p>`}</div>
       close: () => walk ? (overlay = null, render()) : closeOne(),
       onReturn(result, l) {
         const previous = s2.last;
-        settle(s2, l, result, rand3);
+        settle(s2, l, result, rand2);
         if (s2.last === previous) return;
         evacJust = result.how === "evac";
         pending = null;
@@ -17926,7 +21833,7 @@ ${can.ok ? "" : `<p class="hq-warn">${esc2(can.why)}</p>`}</div>
       unmount() {
         cancelAnimationFrame(raf);
         void save2();
-        loaded2 = false;
+        loaded = false;
         mountId++;
         window.removeEventListener("pointerup", onPointer);
         window.removeEventListener("pointercancel", onPointer);
@@ -17972,7 +21879,7 @@ ${can.ok ? "" : `<p class="hq-warn">${esc2(can.why)}</p>`}</div>
         r.onerror = () => rej(r.error);
       });
     };
-    const put2 = async (key2, v) => {
+    const put3 = async (key2, v) => {
       const db = await open();
       await new Promise((res, rej) => {
         const tx = db.transaction("kv", "readwrite");
@@ -17995,9 +21902,9 @@ ${can.ok ? "" : `<p class="hq-warn">${esc2(can.why)}</p>`}</div>
       read: (slot) => safe(async () => await get(`goei:game:slot:${slot}`) ?? null, () => fallback.read(slot)),
       write: (slot, d3, m) => safe(
         async () => {
-          await put2(`goei:game:slot:${slot}`, d3);
+          await put3(`goei:game:slot:${slot}`, d3);
           const list = await get("goei:game:slots") ?? [];
-          await put2("goei:game:slots", [...list.filter((x) => x.slot !== slot), { slot, savedAt: Date.now(), ...m }].sort((a, b) => a.slot - b.slot));
+          await put3("goei:game:slots", [...list.filter((x) => x.slot !== slot), { slot, savedAt: Date.now(), ...m }].sort((a, b) => a.slot - b.slot));
         },
         () => fallback.write(slot, d3, m)
       ),
@@ -18524,13 +22431,13 @@ ${can.ok ? "" : `<p class="hq-warn">${esc2(can.why)}</p>`}</div>
       return x0;
     };
     if (!room2 || room2.arrival) {
-      const hall2 = addRoom("elevator_hall");
-      placed.push(place2("elevator", hall2 + 200, 0, 160, "타고 온 엘리베이터", { noreturn: true }));
-      placed.push(place2("mirror", hall2 + 470, 0, 60, "거울"));
-      if (depth === 1) placed.push(place2("checklist", hall2 + 640, 0, 50, "정기 점검표", { rule: "entry" }));
-      if (depth === 1) placed.push(place2("sign", hall2 + (room2 ? 1e3 : 2040), 0, 50, "안내문", { rule: "noreturn" }));
-      if (depth === 2) placed.push(place2("sign", hall2 + 860, 0, 50, "안내판 (글자가 섞임)", { rule: "lobby" }));
-      if (type === "deep") placed.push(place2("sign", hall2 + 860, 0, 50, "긁힌 글씨", { rule: "b12" }));
+      const hall = addRoom("elevator_hall");
+      placed.push(place2("elevator", hall + 200, 0, 160, "타고 온 엘리베이터", { noreturn: true }));
+      placed.push(place2("mirror", hall + 470, 0, 60, "거울"));
+      if (depth === 1) placed.push(place2("checklist", hall + 640, 0, 50, "정기 점검표", { rule: "entry" }));
+      if (depth === 1) placed.push(place2("sign", hall + (room2 ? 1e3 : 2040), 0, 50, "안내문", { rule: "noreturn" }));
+      if (depth === 2) placed.push(place2("sign", hall + 860, 0, 50, "안내판 (글자가 섞임)", { rule: "lobby" }));
+      if (type === "deep") placed.push(place2("sign", hall + 860, 0, 50, "긁힌 글씨", { rule: "b12" }));
     }
     const goalBox = { g: null };
     const goalMid = ctx.flags.includes("trial_mid");
@@ -18740,7 +22647,7 @@ ${can.ok ? "" : `<p class="hq-warn">${esc2(can.why)}</p>`}</div>
   function addMetro(f, ctx, r) {
     const { depth, type } = f;
     if (type === "deep") return;
-    const hall2 = f.segments[0];
+    const hall = f.segments[0];
     const chunks = f.segments.filter((s2) => s2.ref.startsWith("chunk:"));
     const terr = f.segments.flatMap((s2) => s2.terrain);
     const clearAt = (x, d3 = 90) => !f.placed.some((p) => Math.abs(p.x - x) < d3) && !terr.some((t) => x > t.x0 - 80 && x < t.x1 + 80);
@@ -18757,7 +22664,7 @@ ${can.ok ? "" : `<p class="hq-warn">${esc2(can.why)}</p>`}</div>
           }
       return null;
     };
-    if (depth >= 2) f.placed.push(place2("upper", hall2.x + UPPER_X, 0, 70, "위층 점검문", {}));
+    if (depth >= 2) f.placed.push(place2("upper", hall.x + UPPER_X, 0, 70, "위층 점검문", {}));
     if (depth >= 2 && !GATE_FREE.has(type) && chunks.length >= 4 && (depth === 2 || r() < 0.6)) {
       const gateAt = (gap) => spot(chunks.slice(Math.max(2, Math.floor(chunks.length * 0.5))), 110, (x) => !f.placed.some((p) => p.kind === "shutter" && Math.abs(p.x - x) < 300) && !terr.some((t) => x > t.x0 - gap && x < t.x1 + gap));
       const gx = gateAt(260) ?? (depth === 2 ? gateAt(170) ?? gateAt(100) : null) ?? -1;
@@ -18836,9 +22743,9 @@ ${can.ok ? "" : `<p class="hq-warn">${esc2(can.why)}</p>`}</div>
     if (!room2 && f.type !== "deep" && !f.placed.some((p) => p.kind === "servicedoor" || p.kind === "hatch")) bad.push("정비 구역 입구 없음");
     for (const sh of f.placed.filter((p) => p.kind === "shutter")) {
       if (sh.data.fork !== void 0) {
-        const sign = f.placed.find((p) => p.kind === "sign" && p.data.fork === sh.data.fork);
+        const sign2 = f.placed.find((p) => p.kind === "sign" && p.data.fork === sh.data.fork);
         const doors = f.placed.filter((p) => p.kind === "door" && p.data.fork === sh.data.fork);
-        if (!sign || doors.length !== 2 || sign.x > Math.min(...doors.map((d3) => d3.x)) || doors.some((d3) => d3.x > sh.x)) bad.push("갈림길 순서");
+        if (!sign2 || doors.length !== 2 || sign2.x > Math.min(...doors.map((d3) => d3.x)) || doors.some((d3) => d3.x > sh.x)) bad.push("갈림길 순서");
         if (doors.filter((d3) => d3.data.correct).length !== 1) bad.push("정답 문 수");
       }
       if (sh.data.group !== void 0) {
@@ -19201,7 +23108,7 @@ ${can.ok ? "" : `<p class="hq-warn">${esc2(can.why)}</p>`}</div>
   }
   var MID2 = LANE_DEPTH / 2;
   var xid = 1e3;
-  var put = (f, kind, x, lane, w, label3, data = {}) => {
+  var put2 = (f, kind, x, lane, w, label3, data = {}) => {
     const p = { id: xid++, kind, x: Math.round(x), lane: Math.round(lane), w, label: label3, data };
     f.placed.push(p);
     return p;
@@ -19269,13 +23176,13 @@ ${can.ok ? "" : `<p class="hq-warn">${esc2(can.why)}</p>`}</div>
       const x = d3 === "l" ? 70 : W5 - 70;
       const hidden = rm.hidden[d3];
       if (hidden) {
-        put(f, "crack", d3 === "l" ? spot(240, 120, 120, W5 / 2) : spot(W5 - 240, 120, W5 / 2, W5 - 120), 0, 90, "금 간 벽", { dir: d3, hp: 3 });
+        put2(f, "crack", d3 === "l" ? spot(240, 120, 120, W5 / 2) : spot(W5 - 240, 120, W5 / 2, W5 - 120), 0, 90, "금 간 벽", { dir: d3, hp: 3 });
         continue;
       }
       f.placed = f.placed.filter((p) => !(decor(p) && Math.abs(p.x - x) < 140));
-      put(f, "wdoor", x, 0, 90, rm.wrap[d3] ? `${label3(d3)} (끝이 이어진다)` : label3(d3), { dir: d3 });
+      put2(f, "wdoor", x, 0, 90, rm.wrap[d3] ? `${label3(d3)} (끝이 이어진다)` : label3(d3), { dir: d3 });
       const l = rm.lock[d3];
-      if (l) put(f, "locked", d3 === "l" ? spot(190, 120, 150, 420) : spot(W5 - 190, 120, W5 - 420, W5 - 150), MID2, 40, `잠긴 방화셔터 ${KEY_MARK[l]}`, { dir: d3, lock: l });
+      if (l) put2(f, "locked", d3 === "l" ? spot(190, 120, 150, 420) : spot(W5 - 190, 120, W5 - 420, W5 - 150), MID2, 40, `잠긴 방화셔터 ${KEY_MARK[l]}`, { dir: d3, lock: l });
     }
     for (const d3 of ["u", "d"]) {
       if (!rm.open[d3]) continue;
@@ -19283,24 +23190,24 @@ ${can.ok ? "" : `<p class="hq-warn">${esc2(can.why)}</p>`}</div>
       const want = d3 === "u" ? W5 * 0.35 : W5 * 0.65;
       const x = spot(want, 150, 260, W5 - 260);
       if (hidden) {
-        put(f, "vent", x, MID2, 60, "막힌 덕트", { dir: d3 });
+        put2(f, "vent", x, MID2, 60, "막힌 덕트", { dir: d3 });
         continue;
       }
       const l = rm.lock[d3];
       const name = w.type === "deep" ? d3 === "u" ? "매달린 줄" : "무너진 바닥" : w.type === "replica" ? d3 === "u" ? "계단실 (위층)" : "계단실 (아래층)" : d3 === "u" ? "올라가는 계단" : "내려가는 계단";
-      put(f, d3 === "u" ? "wup" : "wdown", x, 0, 110, l ? `잠긴 ${name} ${KEY_MARK[l]}` : `${name} · ${nb(d3).name}`, { dir: d3, ...l ? { lock: l } : {} });
+      put2(f, d3 === "u" ? "wup" : "wdown", x, 0, 110, l ? `잠긴 ${name} ${KEY_MARK[l]}` : `${name} · ${nb(d3).name}`, { dir: d3, ...l ? { lock: l } : {} });
     }
-    if (rm.key !== null) put(f, "key", spot(W5 * 0.6, 120), 80, 40, `열쇠 ${KEY_MARK[rm.key]}`, { key: rm.key });
-    if (rm.role === "reward" || rm.role === "secret") put(f, "reward", spot(W5 - 300, 120), 90, 60, rm.role === "secret" ? "숨겨 둔 배낭 (강화)" : "선배가 남긴 배낭 (강화)", {});
+    if (rm.key !== null) put2(f, "key", spot(W5 * 0.6, 120), 80, 40, `열쇠 ${KEY_MARK[rm.key]}`, { key: rm.key });
+    if (rm.role === "reward" || rm.role === "secret") put2(f, "reward", spot(W5 - 300, 120), 90, 60, rm.role === "secret" ? "숨겨 둔 배낭 (강화)" : "선배가 남긴 배낭 (강화)", {});
     if (rm.role === "secret") {
-      put(f, "item", spot(W5 * 0.4, 100), 120, 28, "보급품", { item: pick3(r, ["heal", "guard", "light"]) });
+      put2(f, "item", spot(W5 * 0.4, 100), 120, 28, "보급품", { item: pick3(r, ["heal", "guard", "light"]) });
     }
     if (rm.panel && rm.role !== "exit") {
       const x = spot(W5 - 420, 200, 300, W5 - 200);
-      put(f, "elevator", x, 0, 160, "열린 엘리베이터");
-      put(f, "panel", spot(x + 170 < W5 - 80 ? x + 170 : x - 170, 120), 0, 80, "승강기 패널");
+      put2(f, "elevator", x, 0, 160, "열린 엘리베이터");
+      put2(f, "panel", spot(x + 170 < W5 - 80 ? x + 170 : x - 170, 120), 0, 80, "승강기 패널");
     }
-    if (rm.role === "arrival" && w.type !== "deep" && !f.placed.some((p) => p.kind === "hatch" || p.kind === "servicedoor")) put(f, "servicedoor", spot(Math.min(W5 - 300, ROOM_W + 400), 140), 0, 70, "점검문");
+    if (rm.role === "arrival" && w.type !== "deep" && !f.placed.some((p) => p.kind === "hatch" || p.kind === "servicedoor")) put2(f, "servicedoor", spot(Math.min(W5 - 300, ROOM_W + 400), 140), 0, 70, "점검문");
     const entries = [240, ...f.placed.filter((p) => p.data.dir && ["wdoor", "wup", "wdown", "crack", "vent"].includes(p.kind)).map((p) => p.x + (p.data.dir === "l" ? 120 : p.data.dir === "r" ? -120 : 70))];
     for (const segment of f.segments) segment.terrain = segment.terrain.filter((t) => !entries.some((x) => x > t.x0 - 130 && x < t.x1 + 130));
     const doors = f.placed.filter((p) => p.data.dir);
@@ -19529,11 +23436,11 @@ ${can.ok ? "" : `<p class="hq-warn">${esc2(can.why)}</p>`}</div>
   // src/game/action/stage/plan.ts
   function narrowBack(t, terr = []) {
     if (t.kind !== "narrow" || t.lane0 <= 0) return null;
-    const H7 = 126;
+    const H6 = 126;
     const xs = [];
     for (let x = t.x0 + 50; x < t.x1 - 20; x += 100) xs.push(x);
     if (!xs.length) xs.push((t.x0 + t.x1) / 2);
-    let a = xs[0] - H7, b = xs[xs.length - 1] + H7;
+    let a = xs[0] - H6, b = xs[xs.length - 1] + H6;
     let clipped = false;
     for (const o of terr) {
       if (o === t || o.kind !== "narrow") continue;
@@ -19543,10 +23450,10 @@ ${can.ok ? "" : `<p class="hq-warn">${esc2(can.why)}</p>`}</div>
     const wall = lockerWall.get(t);
     const open = (xs2) => wall ? xs2.filter((x) => !wall.spans.some(([s0, s1]) => x + wall.half > s0 && x - wall.half < s1)) : xs2;
     if (!clipped) return { span: [a, b], xs: open(xs) };
-    if (b - a < 2 * H7) return { span: [Math.max(a, t.x0 - 20), Math.min(b, t.x1 + 20)], xs: [] };
+    if (b - a < 2 * H6) return { span: [Math.max(a, t.x0 - 20), Math.min(b, t.x1 + 20)], xs: [] };
     const fit3 = [];
-    for (let x = a + H7; x <= b - H7; x += 100) fit3.push(x);
-    if (fit3[fit3.length - 1] < b - H7 - 1) fit3.push(b - H7);
+    for (let x = a + H6; x <= b - H6; x += 100) fit3.push(x);
+    if (fit3[fit3.length - 1] < b - H6 - 1) fit3.push(b - H6);
     return { span: [a, b], xs: open(fit3) };
   }
   var lockerWall = /* @__PURE__ */ new WeakMap();
@@ -19750,9 +23657,9 @@ ${can.ok ? "" : `<p class="hq-warn">${esc2(can.why)}</p>`}</div>
     for (const sg of f.segments) keepOut.push(...wallDecoSpans(placeFor("floor", f.type, sg.ref, f.sub, f.depth), sg.x, sg.w, sg.flip));
     for (const p of props2.filter((q) => q.kind === "servicedoor" || q.kind === "chasedoor" && f.placed.some((z) => `p${z.id}` === q.id && z.kind === "upper") || q.kind === "door" && f.placed.some((z) => `p${z.id}` === q.id && z.kind === "sidedoor") || q.kind === "crack")) {
       const h = artW(p, f.type) / 2;
-      const gate2 = gateX >= 0 ? { x: gateX } : null;
-      const side = gate2 ? Math.sign(p.x - gate2.x) : 0;
-      const ok = (x2) => x2 - h >= 40 && x2 + h <= f.width - 40 && (!gate2 || Math.sign(x2 - gate2.x) === side && Math.abs(x2 - gate2.x) > h + 120) && !keepOut.some(([a, b]) => x2 + h + 8 > a && x2 - h - 8 < b) && !terr.some((t) => x2 + h > t.x0 - 20 && x2 - h < t.x1 + 20) && !props2.some((q) => q !== p && (q.kind === "shutter" || q.kind === "firegate") && Math.abs(q.x - x2) < h + 120) && !props2.some((q) => q !== p && fixed2(q) && Math.abs(q.y - p.y) < 90 && Math.abs(q.x - x2) < h + artW(q, f.type) / 2 + 16);
+      const gate = gateX >= 0 ? { x: gateX } : null;
+      const side = gate ? Math.sign(p.x - gate.x) : 0;
+      const ok = (x2) => x2 - h >= 40 && x2 + h <= f.width - 40 && (!gate || Math.sign(x2 - gate.x) === side && Math.abs(x2 - gate.x) > h + 120) && !keepOut.some(([a, b]) => x2 + h + 8 > a && x2 - h - 8 < b) && !terr.some((t) => x2 + h > t.x0 - 20 && x2 - h < t.x1 + 20) && !props2.some((q) => q !== p && (q.kind === "shutter" || q.kind === "firegate") && Math.abs(q.x - x2) < h + 120) && !props2.some((q) => q !== p && fixed2(q) && Math.abs(q.y - p.y) < 90 && Math.abs(q.x - x2) < h + artW(q, f.type) / 2 + 16);
       if (ok(p.x)) continue;
       let x = null;
       for (let d3 = 24; d3 <= 1600 && x === null; d3 += 24) x = ok(p.x + d3) ? p.x + d3 : ok(p.x - d3) ? p.x - d3 : null;
@@ -19768,9 +23675,9 @@ ${can.ok ? "" : `<p class="hq-warn">${esc2(can.why)}</p>`}</div>
     }
     for (const p of props2.filter((q) => boardLike(q) && meaning.has(q.id))) {
       const h = artW(p, f.type) / 2;
-      const gate2 = gateX >= 0 ? { x: gateX } : null;
-      const side = gate2 ? Math.sign(p.x - gate2.x) : 0;
-      const ok = (x) => x - h >= 40 && x + h <= f.width - 40 && (!gate2 || Math.sign(x - gate2.x) === side && Math.abs(x - gate2.x) > h + 120) && !keepOut.some(([a, b]) => x + h + 6 > a && x - h - 6 < b) && !props2.some((q) => q !== p && q.solid && Math.abs(q.x - x) < 120) && !props2.some((q) => q !== p && fixed2(q) && !boardLike(q) && Math.abs(q.y - p.y) < 90 && Math.abs(q.x - x) < h + artW(q, f.type) / 2 + 12);
+      const gate = gateX >= 0 ? { x: gateX } : null;
+      const side = gate ? Math.sign(p.x - gate.x) : 0;
+      const ok = (x) => x - h >= 40 && x + h <= f.width - 40 && (!gate || Math.sign(x - gate.x) === side && Math.abs(x - gate.x) > h + 120) && !keepOut.some(([a, b]) => x + h + 6 > a && x - h - 6 < b) && !props2.some((q) => q !== p && q.solid && Math.abs(q.x - x) < 120) && !props2.some((q) => q !== p && fixed2(q) && !boardLike(q) && Math.abs(q.y - p.y) < 90 && Math.abs(q.x - x) < h + artW(q, f.type) / 2 + 12);
       if (ok(p.x)) continue;
       for (let d3 = 12; d3 <= 360; d3 += 12) {
         if (ok(p.x - d3)) {
@@ -20366,18 +24273,18 @@ ${can.ok ? "" : `<p class="hq-warn">${esc2(can.why)}</p>`}</div>
   function label2(_ctx, _s, _x, _y, _c) {
   }
   function drawFront(ctx, camX, world, plan) {
-    const fx2 = plan.stage.fx;
+    const fx = plan.stage.fx;
     const vw = ctx.canvas.width;
-    if (fx2.chaseX > -9e3) {
-      const g2 = ctx.createLinearGradient(fx2.chaseX - 300, 0, fx2.chaseX + 40, 0);
+    if (fx.chaseX > -9e3) {
+      const g2 = ctx.createLinearGradient(fx.chaseX - 300, 0, fx.chaseX + 40, 0);
       g2.addColorStop(0, "rgba(60,0,0,0.95)");
       g2.addColorStop(1, "rgba(160,20,20,0.85)");
       ctx.fillStyle = g2;
-      ctx.fillRect(fx2.chaseX - 1600, 100, 1640, 640);
+      ctx.fillRect(fx.chaseX - 1600, 100, 1640, 640);
     }
-    if (fx2.light < 0.99) {
+    if (fx.light < 0.99) {
       const p = world.player;
-      const r = 80 + fx2.light * 520;
+      const r = 80 + fx.light * 520;
       ctx.save();
       ctx.translate(camX, 0);
       const px = p.x - camX, py = p.y - p.z - 80;
@@ -20388,13 +24295,13 @@ ${can.ok ? "" : `<p class="hq-warn">${esc2(can.why)}</p>`}</div>
       ctx.fillRect(0, 0, vw, 720);
       ctx.restore();
     }
-    if (fx2.squeeze > 0) {
-      const w = Math.min(560, fx2.squeeze * 560);
+    if (fx.squeeze > 0) {
+      const w = Math.min(560, fx.squeeze * 560);
       ctx.fillStyle = "rgba(30,10,50,0.9)";
       ctx.fillRect(camX, 0, w / 2, 720);
       ctx.fillRect(camX + vw - w / 2, 0, w / 2, 720);
     }
-    if (fx2.red) {
+    if (fx.red) {
       ctx.fillStyle = "rgba(160,0,0,0.12)";
       ctx.fillRect(camX, 0, vw, 720);
     }
@@ -21407,8 +25314,8 @@ ${RULE[id].variant.text}` : ""}`, 4);
               } else {
                 api.hurtPlayer(10, true);
                 r.squeeze -= 10;
-                const sign = r.plan.stage.floor.placed.find((x) => x.kind === "sign" && x.data.fork === pl.data.fork);
-                api.movePlayer(sign ? sign.x : p.x - 300);
+                const sign2 = r.plan.stage.floor.placed.find((x) => x.kind === "sign" && x.data.fork === pl.data.fork);
+                api.movePlayer(sign2 ? sign2.x : p.x - 300);
                 api.world.say("함정. 문 너머는 처음 그 복도였다. (벽이 10초 더 조여 온다)", 3);
                 foundRule(api, "p_sign", p.x);
               }
@@ -21472,13 +25379,13 @@ ${RULE[id].variant.text}` : ""}`, 4);
             break;
           case "item":
           case "pack": {
-            const item2 = String(pl?.data.item ?? r.plan.stage.cell?.things.find((t) => `s${t.id}` === prop.id)?.data.item ?? "heal");
+            const item = String(pl?.data.item ?? r.plan.stage.cell?.things.find((t) => `s${t.id}` === prop.id)?.data.item ?? "heal");
             api.setProp(prop.id, null);
-            o.items.push(item2);
-            if (item2 === "heal") api.heal(25);
-            if (item2 === "light") r.light = 1;
-            api.world.emit({ type: "pickup", x: p.x, id: item2 });
-            api.world.say(`주웠다: ${itemName2(item2)}`, 1.5);
+            o.items.push(item);
+            if (item === "heal") api.heal(25);
+            if (item === "light") r.light = 1;
+            api.world.emit({ type: "pickup", x: p.x, id: item });
+            api.world.say(`주웠다: ${itemName2(item)}`, 1.5);
             break;
           }
           case "belonging":
@@ -22120,13 +26027,13 @@ ${RULE[id].variant.text}` : ""}`, 4);
           api.world.say("용도 모를 장비를 챙겼다. (회수물 · 거래에 쓸 수 있다)", 2.5);
           break;
         case "item": {
-          const item2 = String(prop.label?.split(":")[1] ?? "heal");
+          const item = String(prop.label?.split(":")[1] ?? "heal");
           api.setProp(prop.id, null);
-          o.items.push(item2);
-          if (item2 === "heal") api.heal(25);
-          if (item2 === "light") r.light = 1;
-          api.world.emit({ type: "pickup", x: p.x, id: item2 });
-          api.world.say(`주웠다: ${itemName2(item2)}`, 1.5);
+          o.items.push(item);
+          if (item === "heal") api.heal(25);
+          if (item === "light") r.light = 1;
+          api.world.emit({ type: "pickup", x: p.x, id: item });
+          api.world.say(`주웠다: ${itemName2(item)}`, 1.5);
           break;
         }
       }
@@ -22433,13 +26340,13 @@ ${SET_BONUS[u.set]}`;
       if (current) marker(c, rx + 8 * scale, ry + ch - 8 * scale, 9 * scale);
     }
   }
-  function drawRunMap(c, m, _px, _t, U2 = 1, W5 = c.canvas.width, H7 = c.canvas.height) {
+  function drawRunMap(c, m, _px, _t, U2 = 1, W5 = c.canvas.width, H6 = c.canvas.height) {
     setExplorationMap(c.canvas, true);
-    const v = mapViewport(c.canvas, U2, W5, H7), S2 = v.scale, left = v.margin, right = W5 - left;
+    const v = mapViewport(c.canvas, U2, W5, H6), S2 = v.scale, left = v.margin, right = W5 - left;
     c.save();
     c.setTransform(1, 0, 0, 1, 0, 0);
     c.fillStyle = C3.bg;
-    c.fillRect(0, 0, W5, H7);
+    c.fillRect(0, 0, W5, H6);
     const world = m.worlds.find((w) => w.depth === m.depth);
     const here = world?.rooms.find((r) => r.col === m.room?.[0] && r.row === m.room?.[1]);
     fit2(c, `출동 지도 · ${world?.label ?? `깊이 ${m.depth}`}`, left, 35 * S2, 21 * S2, right - left - 190 * S2);
@@ -22447,7 +26354,7 @@ ${SET_BONUS[u.set]}`;
     text(c, `보유 열쇠 ${m.keys.join(" ") || "없음"}   ·   강화 ${m.upgrades.length}`, left, 65 * S2, 14 * S2, C3.key);
     const goal = m.goal.replaceAll("(★)", " R").replaceAll("(▮)", " P");
     const goalHeight = lines2(c, goal, left, 94 * S2, 14 * S2, right - left);
-    const top = 94 * S2 + goalHeight + 20 * S2, bottom = H7 - 48 * S2;
+    const top = 94 * S2 + goalHeight + 20 * S2, bottom = H6 - 48 * S2;
     const sideW = 240 * S2, mapRight = right - sideW - 24 * S2;
     const mapW = mapRight - left, mapH = bottom - top - 28 * S2;
     fit2(c, m.where === "service" ? "정비 구역 · R 다락방 / 귀환 로프" : `◆ 현재 ${here?.name ?? (m.where === "car" ? "승강기 안" : "이동 중")}`, left, top - 3 * S2, 14 * S2, mapW, C3.here);
@@ -22499,7 +26406,7 @@ ${SET_BONUS[u.set]}`;
       else rooms(c, m, zone, gx, gy, cw, ch, gap, S2);
       c.restore();
     }
-    fit2(c, mapExits(m), left, H7 - 23 * S2, 13 * S2, right - left, C3.sub);
+    fit2(c, mapExits(m), left, H6 - 23 * S2, 13 * S2, right - left, C3.sub);
     c.restore();
   }
   function drawMiniMap(c, m, _px, _t, U2 = 1) {
@@ -22541,9 +26448,9 @@ ${SET_BONUS[u.set]}`;
   var MOODS = /* @__PURE__ */ new Set(["base", "smile", "serious", "hurt", "surprise"]);
   var ScriptError = class extends Error {
   };
-  function parseSay(body2, line2, where) {
-    const m = /^([a-z]+)(?:\((\w+)\))?\s*:\s*(.+)$/.exec(body2);
-    if (!m) throw new ScriptError(`${where}:${line2} 말 줄 형식이 아니에요: ${body2}`);
+  function parseSay(body, line2, where) {
+    const m = /^([a-z]+)(?:\((\w+)\))?\s*:\s*(.+)$/.exec(body);
+    if (!m) throw new ScriptError(`${where}:${line2} 말 줄 형식이 아니에요: ${body}`);
     const mood = m[2] ?? "base";
     if (!MOODS.has(mood)) throw new ScriptError(`${where}:${line2} 모르는 표정: ${m[2]}`);
     return { t: "say", who: m[1], mood, text: m[3].trim(), line: line2 };
@@ -24454,56 +28361,56 @@ jaemtri(smile): 다들 살아서 왔으니까 됐어. 건배.
     cur = null;
     done = false;
     elapsed = 0;
-    begin(step4) {
+    begin(step2) {
       const io = this.io;
       let talk = false;
-      switch (step4.k) {
+      switch (step2.k) {
         case "bg":
-          io.bg?.(step4.scene);
+          io.bg?.(step2.scene);
           break;
         case "fade":
-          io.fade?.(step4.to, step4.ms);
+          io.fade?.(step2.to, step2.ms);
           break;
         case "caption":
-          io.caption?.(step4.text, step4.ms);
+          io.caption?.(step2.text, step2.ms);
           break;
         case "say":
-          io.dialogue(step4.script);
+          io.dialogue(step2.script);
           talk = true;
           break;
         case "line":
-          io.line(step4.who, step4.text, step4.mood ?? "base");
+          io.line(step2.who, step2.text, step2.mood ?? "base");
           talk = true;
           break;
         case "agentline":
-          io.agentLine(step4.tag);
+          io.agentLine(step2.tag);
           talk = true;
           break;
         case "bark":
-          io.bark?.(step4.who, step4.text, step4.ms ?? 2200);
+          io.bark?.(step2.who, step2.text, step2.ms ?? 2200);
           break;
         case "sfx":
-          io.sfx?.(step4.name);
+          io.sfx?.(step2.name);
           break;
         case "shake":
-          io.shake?.(step4.ms, step4.amp ?? 4);
+          io.shake?.(step2.ms, step2.amp ?? 4);
           break;
         case "actor":
-          io.actor?.(step4.id, { x: step4.x, y: step4.y, face: step4.face, anim: step4.anim, show: step4.show }, step4.ms ?? 0);
+          io.actor?.(step2.id, { x: step2.x, y: step2.y, face: step2.face, anim: step2.anim, show: step2.show }, step2.ms ?? 0);
           break;
         case "camera":
-          io.camera?.({ x: step4.x, y: step4.y, zoom: step4.zoom }, step4.ms ?? 0);
+          io.camera?.({ x: step2.x, y: step2.y, zoom: step2.zoom }, step2.ms ?? 0);
           break;
         case "panel":
-          io.panel?.(step4.text, step4.ms ?? 0);
+          io.panel?.(step2.text, step2.ms ?? 0);
           break;
         case "emit":
-          io.emit?.(step4.event, step4.arg ?? "");
+          io.emit?.(step2.event, step2.arg ?? "");
           break;
         case "par":
-          return { step: step4, left: 0, talk: false, children: step4.steps.map((s2) => this.begin(s2)) };
+          return { step: step2, left: 0, talk: false, children: step2.steps.map((s2) => this.begin(s2)) };
       }
-      return { step: step4, left: durationOf(step4), talk };
+      return { step: step2, left: durationOf(step2), talk };
     }
     tick(r, ms) {
       if (r.children) return r.children.map((c) => this.tick(c, ms)).every(Boolean);
@@ -24692,11 +28599,11 @@ jaemtri(smile): 다들 살아서 왔으니까 됐어. 건배.
         if (!cut) return;
         f = cut.frames - 1;
       }
-      const img4 = cut.imgs[f];
-      if (img4 === this.lastImage) return;
-      this.lastImage = img4;
+      const img5 = cut.imgs[f];
+      if (img5 === this.lastImage) return;
+      this.lastImage = img5;
       this.ctx.imageSmoothingEnabled = false;
-      this.ctx.drawImage(img4, 0, 0, W4, H5);
+      this.ctx.drawImage(img5, 0, 0, W4, H5);
     }
     showSub(t) {
       let cur = null;
@@ -24758,19 +28665,19 @@ jaemtri(smile): 다들 살아서 왔으니까 됐어. 건배.
       if (!res.ok) return null;
       const meta = await res.json();
       if (!Array.isArray(meta.ms) || !meta.ms.length) return null;
-      const imgs2 = new Array(meta.ms.length);
+      const imgs3 = new Array(meta.ms.length);
       let next = 0;
       await Promise.all(Array.from({ length: Math.min(4, meta.ms.length) }, async () => {
         while (next < meta.ms.length && active()) {
           const k = next++;
-          const img4 = new Image();
-          img4.src = `${base2}c${n}/${String(k + 1).padStart(4, "0")}.png`;
-          await img4.decode();
-          imgs2[k] = img4;
+          const img5 = new Image();
+          img5.src = `${base2}c${n}/${String(k + 1).padStart(4, "0")}.png`;
+          await img5.decode();
+          imgs3[k] = img5;
         }
       }));
       if (!active()) return null;
-      return { imgs: imgs2, meta, frames: imgs2.length };
+      return { imgs: imgs3, meta, frames: imgs3.length };
     } catch {
       return null;
     }
@@ -24914,7 +28821,7 @@ jaemtri(smile): 다들 살아서 왔으니까 됐어. 건배.
     },
     konjyuce: {
       name: "콘쥬스",
-      role: "관리국 종합대응팀 요원이자 17세 고등학생. 초인적 괴력. 사무 보조, 물류, 운반, 정비·보급실 담당. 전투 투입은 팀이 막는다.",
+      role: "관리국 종합대응팀 요원이자 20세 대학생. 초인적 괴력. 사무 보조, 물류, 운반, 정비·보급실 담당. 전투 투입은 팀이 막는다.",
       voice: "밝고 고집 센 존댓말. 상대 호칭을 상황에 따라 바꾼다(남자: 아저씨→오빠, 여자: 선배님→언니). 호칭이 바뀌면 부탁이 들어온다(대개 간식).",
       facts: [
         '"잠깐만요! 저도 이 팀 정식 멤버거든요!" 마스코트 취급에 바로 항의한다.',
@@ -25050,14 +28957,14 @@ jaemtri(smile): 다들 살아서 왔으니까 됐어. 건배.
     }
   };
   function offlineReply(npc, text2, agent, rng2 = Math.random) {
-    const pick6 = (l) => l[Math.floor(rng2() * l.length) % l.length];
+    const pick7 = (l) => l[Math.floor(rng2() * l.length) % l.length];
     const table = OFFLINE[npc];
     if (!table) {
-      const tag2 = /괜찮|다쳤|아파/.test(text2) ? "hp_low" : /출동|가자|임무/.test(text2) ? "offer" : pick6(["settle", "find", "win", "offer"]);
+      const tag2 = /괜찮|다쳤|아파/.test(text2) ? "hp_low" : /출동|가자|임무/.test(text2) ? "offer" : pick7(["settle", "find", "win", "offer"]);
       return agentLine(npc, tag2, rng2) ?? "…";
     }
-    for (const [re, lines3] of table.rules) if (re.test(text2)) return pick6(lines3);
-    return pick6(table.default);
+    for (const [re, lines3] of table.rules) if (re.test(text2)) return pick7(lines3);
+    return pick7(table.default);
   }
   var FreeTalk = class {
     constructor(opts = {}) {
@@ -25554,7 +29461,7 @@ agent: ${p.lines[1]}
         else show(runner.next());
       }
     };
-    const choose = (n) => {
+    const choose2 = (n) => {
       if (runner.current.kind !== "choice") return;
       const opt = runner.current.options[n];
       if (opt) show(runner.choose(opt.index));
@@ -25738,7 +29645,7 @@ ${who}: ${text2.replace(/\n/g, " ")}
       }
       if (!ui.boxOpen) return;
       if (runner.current.kind === "choice" && /^[1-9]$/.test(e.key)) {
-        choose(Number(e.key) - 1);
+        choose2(Number(e.key) - 1);
         e.preventDefault();
       } else if ([" ", "Enter", "e", "E", "z", "Z"].includes(e.key)) {
         advance();
@@ -25767,7 +29674,7 @@ ${who}: ${text2.replace(/\n/g, " ")}
       cutscene,
       talk,
       advance,
-      choose,
+      choose: choose2,
       skip: () => video.open ? video.finish() : scene?.skip(),
       cancel,
       isBlocking: () => blocking,
@@ -25805,12 +29712,15 @@ ${who}: ${text2.replace(/\n/g, " ")}
   }
 
   // src/game/action/engine/hub.ts
+  var LIFE_SLOTS = 24;
   var TOP = 440;
   var LANE = [LANE_TOP, LANE_BOT];
   var DOOR_H = 250;
   var FADE = 8;
   var OPEN_T = 9;
-  var DOOR_W = { main: 190, door: 120, glass: 160, steel: 120, security: 120, elevator: 160, stairs_up: 120, stairs_down: 120, shop: 130, slide: 170, cell: 150, exit: 150 };
+  var openLen = (sc, d3) => !sc?.painted ? OPEN_T : d3.kind === "elevator" ? 22 : d3.kind === "cell" ? 26 : 12;
+  var RATTLE_T = 10;
+  var DOOR_W = { main: 190, door: 120, stairs: 120, glass: 160, steel: 120, security: 120, elevator: 160, stairs_up: 120, stairs_down: 120, shop: 130, slide: 170, cell: 150, exit: 150 };
   var isS = (d3) => d3.side === "S";
   var doorY = (d3, lane = LANE) => isS(d3) ? lane[1] - 14 : lane[0] + 16;
   function makeHub(host, whereIs2) {
@@ -25822,21 +29732,32 @@ ${who}: ${text2.replace(/\n/g, " ")}
     let enterTick = -1;
     let fadeOut = 0;
     let barked = null;
+    let speech = null;
+    let curPeople = [];
+    let live = [];
     let opening = null;
+    let closing = null;
+    let rattle = null;
+    let arriveDoor = null;
+    let callWait = null;
+    let callOn = false;
     let near2 = null;
     let solids = [];
     let walked = 0;
     let lastX = null;
     const sceneOf = (id) => view2.scenes.find((s2) => s2.id === id) ?? view2.scenes[0];
-    const openOf = (id) => opening && opening.id === id ? Math.min(1, opening.t / OPEN_T) : 0;
+    const openOf = (id) => opening && opening.id === id ? Math.min(1, opening.t / opening.len) : closing && closing.id === id ? Math.max(0, 1 - closing.t / closing.len) : 0;
+    const doorFx = (id) => ({ open: openOf(id), shake: rattle && rattle.id === id ? (rattle.t % 4 < 2 ? 3 : -3) * (1 - rattle.t / RATTLE_T) : 0 });
     const build = (id, x, y) => {
       view2 = host.map();
       const base2 = sceneOf(id);
-      const people = (host.visitors?.(base2.id) ?? []).map((p) => {
+      const people = (host.life ? [] : host.visitors?.(base2.id) ?? []).map((p) => {
         const at2 = clearSpot(p.x, p.y, base2.boxes.filter((b) => b.solid).map((b) => ({ x: b.x, y: b.y, w: b.w, back: b.d + 6, front: 8 })), base2.lane ?? LANE);
         return { ...p, x: at2.x, y: at2.y };
       });
       const sc = { ...base2, spots: [...base2.spots, ...people.map((p) => ({ id: `visit:${p.name}`, x: p.x, y: p.y, who: p.name, verb: "대화", face: p.face, open: true }))] };
+      curPeople = people;
+      speech = null;
       const prev = scene;
       scene = sc;
       if (prev && prev.id !== sc.id) host.entered?.({ id: sc.id, name: sc.name, floor: sc.floor }, { id: prev.id, name: prev.name, floor: prev.floor }, walked);
@@ -25845,9 +29766,15 @@ ${who}: ${text2.replace(/\n/g, " ")}
       barked = null;
       enterTick = -1;
       opening = null;
+      rattle = null;
+      callWait = null;
+      callOn = false;
+      const inDoor = arriveDoor ? sc.doors.find((d3) => d3.id === arriveDoor) : void 0;
+      closing = sc.painted && inDoor ? { id: inDoor.id, t: 0, len: openLen(sc, inDoor) } : null;
+      arriveDoor = null;
       near2 = null;
       const man = sc.id === "office" && hasTestPeople() ? { x: 900, y: 560 } : null;
-      solids = [...man ? [{ x: man.x, y: man.y, w: 70, back: 20, front: 20 }] : [], ...sc.boxes.filter((b) => b.solid).map((b) => ({ x: b.x, y: b.y, w: b.w, back: b.d + 6, front: 8 })), ...people.map((p) => ({ x: p.x, y: p.y, w: 80, back: 24, front: 24 }))];
+      solids = [...man ? [{ x: man.x, y: man.y, w: 70, back: 20, front: 20 }] : [], ...sc.boxes.filter((b) => b.solid).map((b) => ({ x: b.x, y: b.y, w: b.w, back: b.d + 6, front: 8, h: sc.painted ? b.h : void 0 })), ...people.map((p) => ({ x: p.x, y: p.y, w: 80, back: 24, front: 24 }))];
       const len = Math.max(SCREEN_W, sc.length);
       const sx = Math.max(60, Math.min(len - 60, x));
       arrive = { x: sx, y };
@@ -25862,27 +29789,47 @@ ${who}: ${text2.replace(/\n/g, " ")}
         exitX: Infinity,
         props: [],
         encounters: [],
-        depthLayers: sc.boxes.map((b) => ({ y: sc.id === "office" && b.kind === "chair" ? 495 : b.y, occludedSilhouette: sc.id !== "office", x0: sc.id === "office" ? 180 : b.x - b.w / 2, x1: sc.id === "office" ? 560 : b.x + b.w / 2, draw: (c) => {
-          if (sc.id === "office") {
-            drawStartRoomFurniture(c, b.kind);
+        platforms: sc.painted ? sc.boxes.filter((b) => b.solid && b.h > 0 && b.h < 400).map((b) => ({ x0: b.x - b.w / 2, x1: b.x + b.w / 2, y0: b.y - b.d, y1: b.y, h: b.h })) : void 0,
+        depthLayers: sc.boxes.map((b) => ({ y: b.y, occludedSilhouette: !sc.painted, x0: b.x - b.w / 2, x1: b.x + b.w / 2, draw: (c) => {
+          if (sc.painted && hasHqField(sc.painted)) {
+            drawHqFieldObject(c, sc.painted, b.kind);
             return;
           }
           drawBox(c, b, sc.look);
         } })).concat(people.map((p) => ({ y: p.y, x0: p.x - 60, x1: p.x + 60, occludedSilhouette: false, draw: (c) => {
           drawVisitAgent(c, p.name, p.x, p.y, p.face, performance.now());
-        } }))).concat(man ? [{ y: man.y, x0: man.x - 60, x1: man.x + 60, occludedSilhouette: false, draw: (c) => {
+        } }))).concat(host.life ? Array.from({ length: LIFE_SLOTS }, (_, i) => ({
+          get y() {
+            return live[i]?.y ?? -1e9;
+          },
+          get x0() {
+            return (live[i]?.x ?? -1e9) - 60;
+          },
+          get x1() {
+            return (live[i]?.x ?? -1e9) + 60;
+          },
+          occludedSilhouette: false,
+          draw: (c) => {
+            const a = live[i];
+            if (a) drawLiveActor(c, a, host.life);
+          }
+        })) : []).concat(man ? [{ y: man.y, x0: man.x - 60, x1: man.x + 60, occludedSilhouette: false, draw: (c) => {
           drawTestMan(c, man.x, man.y, -1);
         } }] : []),
         drawBackground(c, camX) {
-          if (sc.id === "office" && drawStartRoom(c, openOf("out"))) return;
+          if (sc.painted && drawHqField(c, sc.painted, camX, doorFx, host.hour?.() ?? null)) {
+            if (sc.floor === "2F" || sc.floor === "3F") drawHqSigns(c, sc.painted, sc.doors);
+            if (callOn) drawCallLit(c, sc.painted, performance.now());
+            return;
+          }
           if (sc.legacy) {
             const cov = drawHqWall(c, place3, sc.id, len, TOP, sc.doors);
             artDoors = cov ?? /* @__PURE__ */ new Set();
             c.fillStyle = "rgba(0,0,0,0.35)";
-            c.fillRect(camX - 40, TOP - 14, SCREEN_W + 80, 14);
-            if (!drawFloor(c, place3, camX - 40, camX + SCREEN_W + 40, TOP, SCREEN_H)) {
+            c.fillRect(camX - 40, TOP - 14, view.w + 80, 14);
+            if (!drawFloor(c, place3, camX - 40, camX + view.w + 40, TOP, SCREEN_H)) {
               c.fillStyle = "#2b3135";
-              c.fillRect(camX - 40, TOP, SCREEN_W + 80, SCREEN_H - TOP);
+              c.fillRect(camX - 40, TOP, view.w + 80, SCREEN_H - TOP);
             }
             for (const t of sc.things) if (t.wall) legacyThing(c, t, camX);
             for (const d3 of sc.doors) if (!artDoors.has(d3.id)) legacyDoor(c, d3, camX);
@@ -25891,7 +29838,7 @@ ${who}: ${text2.replace(/\n/g, " ")}
           }
           drawRoomShell(c, sc, camX);
           const textured = (sc.id === "office" || sc.id === "f2") && drawHqTextureWall(c, place3, len, camX, sc.doors.filter((d3) => !isS(d3)).map((d3) => ({ x: d3.x, width: d3.kind === "glass" ? 192 : DOOR_W[d3.kind] + 24 })));
-          if (sc.id === "office" || sc.id === "f2") drawFloor(c, place3, camX - 40, camX + SCREEN_W + 40, TOP, SCREEN_H);
+          if (sc.id === "office" || sc.id === "f2") drawFloor(c, place3, camX - 40, camX + view.w + 40, TOP, SCREEN_H);
           for (const f of sc.fixtures) {
             if (!textured || f.kind === "directory") drawFixture(c, f, sc.look, camX);
           }
@@ -25908,20 +29855,36 @@ ${who}: ${text2.replace(/\n/g, " ")}
           if (!sc.legacy) {
             for (const d3 of sc.doors) if (isS(d3)) drawExitLintel(c, d3, camX);
           }
+          if (sc.painted) drawHqFieldLight(c, sc.painted, camX, host.hour?.() ?? null, now);
+          if (sc.painted === "b3" && host.armed?.()) drawDepartArrow(c, camX, now);
           const z = view.zoom;
           c.save();
           c.scale(1 / z, 1 / z);
-          host.overlay?.(c, people.map((p) => ({ name: p.name, x: p.x * z, y: p.y * z, top: visitAgentTop(p.name) * persp(p.y) })), { name: "", x: w.player.x * z, y: w.player.y * z, top: (hasTestPeople() ? testPlayerTop() : visitAgentTop("쟈알디")) * persp(w.player.y) });
+          const shown = host.life ? live.filter((a) => a.kind === "named") : people;
+          host.overlay?.(c, shown.map((p) => ({ name: p.name, x: p.x * z, y: p.y * z, top: visitAgentTop(p.name) * persp(p.y) * z })), { name: "", x: w.player.x * z, y: (w.player.y - w.player.z) * z, top: (hasTestPeople() ? testPlayerTop() : visitAgentTop("쟈알디")) * persp(w.player.y) * z });
           c.restore();
+          if (host.life) {
+            c.save();
+            c.scale(1 / z, 1 / z);
+            for (const a of live) {
+              if (!a.icon && !a.say) continue;
+              const top = (a.kind === "named" ? visitAgentTop(a.name) : hasTestPeople() ? testManTop() : -230) * persp(a.y);
+              drawHeadBubble(c, a.x * z, (a.y + top) * z - 8, a.say ?? a.icon, !!a.say);
+            }
+            c.restore();
+          }
+          const obs = host.life?.observer(sc.id);
+          if (obs) drawObserver(c, obs);
           const dark2 = fadeOut > 0 ? 1 - fadeOut / FADE : age < FADE ? 1 - age / FADE : 0;
           if (dark2 > 0) {
             c.fillStyle = `rgba(0,0,0,${dark2})`;
-            c.fillRect(camX - 40, 0, SCREEN_W + 80, SCREEN_H);
+            c.fillRect(camX - 40, 0, view.w + 80, SCREEN_H);
           }
         }
       };
     };
     const go = (sceneId, x, y) => {
+      view.worldH = sceneOf(sceneId).painted ? PAINTED[sceneOf(sceneId).painted]?.h ?? 700 : SCREEN_H;
       pending = { scene: sceneId, x, y };
       fadeOut = FADE;
     };
@@ -25930,6 +29893,7 @@ ${who}: ${text2.replace(/\n/g, " ")}
       return d3 ? { x: d3.x, y: sceneOf(sceneId).legacy ? void 0 : doorY(d3, sceneOf(sceneId).lane ?? LANE) } : { x: 200, y: void 0 };
     };
     const goDoor = (sceneId, doorId) => {
+      arriveDoor = doorId ?? null;
       const t = arriveAt(sceneId, doorId);
       go(sceneId, t.x, t.y);
     };
@@ -25941,14 +29905,14 @@ ${who}: ${text2.replace(/\n/g, " ")}
         if (ok && (!best || d3 < best.d)) best = { id, kind, x, d: d3 };
       };
       for (const s2 of scene.spots) {
-        if (!s2.open) continue;
         const ok = Math.abs(s2.x - px) < (s2.y === void 0 ? 60 : 75) && (s2.y === void 0 || Math.abs(s2.y - py) < 55);
         consider(`spot:${s2.id}`, "hubspot", s2.x, ok);
       }
       for (const d3 of scene.doors) {
         const reach = Math.abs(d3.x - px) < (scene.legacy ? 60 : 75);
         const lane = scene.lane ?? LANE;
-        const depth = scene.legacy || (isS(d3) ? py > lane[1] - 60 : py < lane[0] + 75);
+        const reachY = scene.painted ? doorReachY(scene.painted, d3.id) : null;
+        const depth = scene.legacy || (isS(d3) ? py > lane[1] - 60 : py < Math.max(lane[0] + 75, reachY ?? 0));
         consider(`door:${d3.id}`, "hubdoor", d3.x, reach && depth);
       }
       return best;
@@ -25970,6 +29934,18 @@ ${who}: ${text2.replace(/\n/g, " ")}
         return build(s2.scene, s2.x, s2.y);
       },
       tick(a) {
+        if (host.life && scene) {
+          host.life.tick(1 / 30, { scene: scene.id, x: a.world.player.x, y: a.world.player.y });
+          const boxes = a.world.player.frame().hit;
+          if (boxes.length && host.life.hit) {
+            const n = host.life.hit(scene.id, boxes, a.world.player.dir);
+            if (n) a.world.emit({ type: "hit", strength: 1, x: boxes[0].x0, y: boxes[0].y, z: 120, dmg: 0, react: "flinch", target: "npc", combo: 0 });
+          }
+          live = host.life.actors(scene.id);
+          const named = live.filter((q) => q.kind === "named");
+          scene.spots = scene.spots.filter((q) => !q.id.startsWith("visit:")).concat(named.map((q) => ({ id: `visit:${q.name}`, x: q.x, y: q.y, who: q.name, verb: "대화", face: q.face, open: true })));
+          curPeople = named;
+        }
         if (fadeOut > 0 && --fadeOut === 0 && pending) {
           if (pending.scene === scene?.id) {
             arrive = { x: pending.x, y: pending.y };
@@ -25990,12 +29966,22 @@ ${who}: ${text2.replace(/\n/g, " ")}
           if (d3 < 60) walked += d3;
         }
         lastX = p.x;
-        if (opening && opening.t < OPEN_T && ++opening.t === OPEN_T) {
+        if (opening && opening.t < opening.len && ++opening.t === opening.len) {
           const then = opening.then;
-          opening.t = OPEN_T;
           then();
         }
-        if (solids.length && !p.seat) blockByProps([p], solids, scene?.lane ?? LANE);
+        if (callWait && --callWait.t <= 0) {
+          const f = callWait.then;
+          callWait = null;
+          f();
+        }
+        if (closing && ++closing.t >= closing.len) closing = null;
+        if (rattle && ++rattle.t >= RATTLE_T) rattle = null;
+        if (solids.length && !p.seat) blockByProps([p], solids.filter((s2) => !(s2.h !== void 0 && p.z >= s2.h - 6)), scene?.lane ?? LANE);
+        if (scene?.painted) {
+          const q = clampPainted(scene.painted, p.x, p.y);
+          if (q.x !== p.x || q.y !== p.y) a.movePlayer(q.x, q.y);
+        }
         const t = p.seat ? null : target(p.x, p.y);
         const id = t?.id ?? null;
         if (id !== near2) {
@@ -26007,29 +29993,70 @@ ${who}: ${text2.replace(/\n/g, " ")}
         if (sp && sp.place !== barked) {
           barked = sp.place;
           const l = host.bark(sp.place);
-          if (l) a.world.say(`${l.who}: ${l.text}`, 3.5);
+          if (l) {
+            const who = curPeople.find((q) => q.name === l.who);
+            const x = who?.x ?? sp.x, y = who?.y ?? sp.y ?? p.y;
+            speech = { who: l.who, text: l.text, x, y, top: (who ? visitAgentTop(l.who) : -200) * persp(y), until: performance.now() + 3800 };
+          }
         } else if (!sp) barked = null;
       },
       onInteract(a, _floor, prop) {
-        if (!scene || fadeOut > 0 || opening) return;
+        if (!scene || fadeOut > 0 || opening || callWait) return;
         if (prop.kind === "hubspot") {
           const s2 = scene.spots.find((q) => `spot:${q.id}` === prop.id);
-          if (!s2?.open) return;
+          if (!s2) return;
+          if (!s2.open) return a.world.say("아직 쓸 수 없다. 본부 일이 더 진행되면 열린다.", 2.5);
           if (s2.place) return host.openPlace(s2.place);
+          if (s2.say) return a.world.say(s2.say, 3);
+          if (s2.depart) {
+            const m = host.depart?.();
+            if (m) a.world.say(m, 3);
+            return;
+          }
           if (s2.seat && s2.act?.[0]) {
             const exit = clearSpot(s2.x, s2.y ?? a.world.player.y, solids, scene.lane ?? LANE);
             a.world.player.sit(s2.act[0], s2.seat.x, s2.seat.y, s2.face ?? 1, exit);
+            host.sat?.();
             return;
           }
           if (s2.y !== void 0) a.movePlayer(s2.x, s2.y);
           if (s2.face) a.world.player.dir = s2.face;
           if (s2.act) host.act?.(s2.act, s2.face);
+          if (/앉기|눕기/.test(s2.verb)) host.sat?.();
           return;
         }
         if (prop.kind !== "hubdoor") return;
         const d3 = scene.doors.find((q) => `door:${q.id}` === prop.id);
         if (!d3) return;
-        if (!d3.open) return host.sfx("knock");
+        if (!d3.open) {
+          if (scene.painted) rattle = { id: d3.id, t: 0 };
+          if (d3.locked) a.world.say("잠겨 있다", 1.5);
+          return host.sfx("knock");
+        }
+        const len = openLen(scene, d3);
+        if (d3.kind === "stairs") {
+          const to2 = [d3.up, d3.down].filter((q) => !!q);
+          const label3 = (id) => view2.elevator.find((e) => e.scene === id)?.label ?? id;
+          const go1 = (target2) => {
+            host.sfx("doorLatch");
+            opening = { id: d3.id, t: 0, len, then: () => goDoor(target2, "stairs") };
+          };
+          if (to2.length === 1) return go1(to2[0]);
+          host.chooseFloor(to2.map((q) => ({ label: label3(q), open: true, here: false })), (i) => {
+            if (i != null && to2[i]) go1(to2[i]);
+          });
+          return;
+        }
+        if (d3.place) {
+          const place3 = d3.place;
+          host.sfx(scene.painted ? "doorLatch" : d3.kind === "cell" ? "doorSlam" : "doorOpen");
+          opening = { id: d3.id, t: 0, len, then: () => {
+            opening = null;
+            closing = { id: d3.id, t: 0, len };
+            host.openPlace(place3);
+          } };
+          return;
+        }
         if (d3.kind === "elevator") {
           const here = scene.id;
           const opts = view2.elevator.map((e) => ({ label: e.label, open: e.open, here: e.scene === here }));
@@ -26037,16 +30064,41 @@ ${who}: ${text2.replace(/\n/g, " ")}
             if (i == null) return;
             const e = view2.elevator[i];
             if (!e?.open || e.scene === here) return;
-            host.sfx("ding");
-            opening = { id: d3.id, t: 0, then: () => goDoor(e.scene, e.door) };
+            if (!scene?.painted) {
+              host.sfx("ding");
+              opening = { id: d3.id, t: 0, len, then: () => goDoor(e.scene, e.door) };
+              return;
+            }
+            host.sfx("panelButton");
+            callOn = true;
+            callWait = { t: 14, then: () => {
+              host.sfx("elevChime");
+              opening = { id: d3.id, t: 0, len, then: () => goDoor(e.scene, e.door) };
+            } };
           });
           return;
         }
         if (!d3.to) return;
         const to = d3.to, toDoor = d3.toDoor;
-        host.sfx(d3.kind === "steel" || d3.kind === "security" || d3.kind === "cell" ? "doorSlam" : d3.kind.startsWith("stairs") ? "stepConcrete" : "doorOpen");
+        host.sfx(scene.painted ? "doorLatch" : d3.kind === "steel" || d3.kind === "security" || d3.kind === "cell" ? "doorSlam" : d3.kind.startsWith("stairs") ? "stepConcrete" : "doorOpen");
         if (scene.legacy) return goDoor(to, toDoor);
-        opening = { id: d3.id, t: 0, then: () => goDoor(to, toDoor) };
+        opening = { id: d3.id, t: 0, len, then: () => goDoor(to, toDoor) };
+      },
+      /** 지금 손이 닿는 문·자리의 짧은 이름 (캐릭터 옆 말풍선) */
+      speech() {
+        if (!speech || performance.now() > speech.until || fadeOut > 0) return null;
+        return speech;
+      },
+      nearInfo() {
+        if (!scene || !near2 || opening || fadeOut > 0) return null;
+        if (near2.startsWith("spot:")) {
+          const s2 = scene.spots.find((q) => `spot:${q.id}` === near2);
+          return s2 ? { text: s2.verb, locked: !s2.open } : null;
+        }
+        const d3 = scene.doors.find((q) => `door:${q.id}` === near2);
+        if (!d3) return null;
+        const text2 = d3.label ?? (d3.kind === "elevator" ? "엘리베이터" : d3.kind === "stairs" ? "계단" : d3.kind === "exit" ? "나가기" : "문");
+        return { text: text2, locked: !d3.open };
       },
       /** 검사·스크린샷용: 장면으로 바로 */
       jump(sceneId, x = 400, y) {
@@ -26074,7 +30126,7 @@ ${who}: ${text2.replace(/\n/g, " ")}
   };
   function drawRoomShell(c, sc, camX) {
     const L = LOOKS2[sc.look] ?? LOOKS2.office;
-    const x0 = camX - 40, w = SCREEN_W + 80;
+    const x0 = camX - 40, w = view.w + 80;
     const g2 = c.createLinearGradient(0, 0, 0, TOP);
     g2.addColorStop(0, L.wallTop);
     g2.addColorStop(1, L.wallBot);
@@ -26131,7 +30183,7 @@ ${who}: ${text2.replace(/\n/g, " ")}
   }
   function drawFixture(c, f, look, camX) {
     const x = f.x - f.w / 2;
-    if (x > camX + SCREEN_W + 40 || x + f.w < camX - 40) return;
+    if (x > camX + view.w + 40 || x + f.w < camX - 40) return;
     switch (f.kind) {
       case "window": {
         const y = 70, h = TOP - 150;
@@ -26244,7 +30296,7 @@ ${who}: ${text2.replace(/\n/g, " ")}
   function drawDoorN(c, d3, look, open, camX) {
     const w = DOOR_W[d3.kind];
     const x = d3.x - w / 2, y = TOP - DOOR_H;
-    if (x > camX + SCREEN_W + 40 || x + w < camX - 40) return;
+    if (x > camX + view.w + 40 || x + w < camX - 40) return;
     c.fillStyle = "#12161b";
     c.fillRect(x - 10, y - 12, w + 20, DOOR_H + 12);
     c.fillStyle = "#05070a";
@@ -26307,7 +30359,7 @@ ${who}: ${text2.replace(/\n/g, " ")}
   }
   function drawFloorExit(c, d3, open, camX) {
     const w = DOOR_W.exit;
-    if (d3.x + w < camX - 40 || d3.x - w > camX + SCREEN_W + 40) return;
+    if (d3.x + w < camX - 40 || d3.x - w > camX + view.w + 40) return;
     const col = d3.kind === "cell" ? "#7d4a3a" : d3.open ? "#3cc596" : "#6b7480";
     c.fillStyle = "rgba(0,0,0,0.3)";
     c.fillRect(d3.x - w / 2 - 10, SCREEN_H - 36, w + 20, 36);
@@ -26318,7 +30370,7 @@ ${who}: ${text2.replace(/\n/g, " ")}
   }
   function drawExitLintel(c, d3, camX) {
     if (d3.kind === "cell") return;
-    if (d3.x < camX - 200 || d3.x > camX + SCREEN_W + 200) return;
+    if (d3.x < camX - 200 || d3.x > camX + view.w + 200) return;
     const col = d3.open ? "#3cc596" : "#6b7480";
     const y = SCREEN_H - 30;
     c.fillStyle = col;
@@ -26428,7 +30480,7 @@ ${who}: ${text2.replace(/\n/g, " ")}
   }
   function legacyThing(c, t, camX) {
     const sx = t.x - camX;
-    if (sx < -t.w - 100 || sx > SCREEN_W + t.w + 100) return;
+    if (sx < -t.w - 100 || sx > view.w + t.w + 100) return;
     const base2 = t.wall ? TOP - 70 : TOP + 26;
     if (drawPropArt(c, t.kind, void 0, t.x, base2)) return;
     c.fillStyle = "#4a4f55";
@@ -26437,7 +30489,7 @@ ${who}: ${text2.replace(/\n/g, " ")}
   function legacyDoor(c, d3, camX) {
     const w = DOOR_W[d3.kind];
     const sx = d3.x - camX;
-    if (sx < -w - 40 || sx > SCREEN_W + w + 40) return;
+    if (sx < -w - 40 || sx > view.w + w + 40) return;
     if (drawPropArt(c, `hq_${d3.kind}`, void 0, d3.x, TOP)) return;
     const x = d3.x - w / 2, y = TOP - DOOR_H;
     c.fillStyle = "#1b2023";
@@ -26449,9 +30501,1328 @@ ${who}: ${text2.replace(/\n/g, " ")}
       c.fillRect(x, y, w, DOOR_H);
     }
   }
+  function drawLiveActor(c, a, life) {
+    const t = (life.lifeTime?.() ?? performance.now() / 1e3) * 1e3;
+    if (a.kind === "named" && drawVisitAgent(c, a.name, a.x, a.y, a.face, t, a.clip, (a.since ?? 0) * 1e3)) return;
+    if (a.kind === "mob" && life.drawMob) return life.drawMob(c, a);
+    silhouette(c, a);
+  }
+  function silhouette(c, a) {
+    const k = persp(a.y);
+    const h = 230 * k, w = 64 * k;
+    c.save();
+    c.fillStyle = "rgba(0,0,0,0.28)";
+    c.beginPath();
+    c.ellipse(a.x, a.y, w * 0.6, 9 * k, 0, 0, Math.PI * 2);
+    c.fill();
+    c.fillStyle = a.kind === "named" ? "#6d7f94" : "#7b7f86";
+    c.fillRect(a.x - w / 2, a.y - h, w, h * 0.78);
+    c.beginPath();
+    c.arc(a.x, a.y - h - w * 0.05, w * 0.36, 0, Math.PI * 2);
+    c.fill();
+    c.restore();
+  }
+  function drawObserver(c, lines3) {
+    c.save();
+    c.setTransform(1, 0, 0, 1, 0, 0);
+    c.font = "13px monospace";
+    const w = Math.min(c.canvas.width - 16, Math.max(260, ...lines3.map((l) => c.measureText(l).width + 20)));
+    const h = Math.min(c.canvas.height - 16, lines3.length * 17 + 12);
+    const x0 = c.canvas.width - w - 8;
+    c.fillStyle = "rgba(8,12,18,0.82)";
+    c.fillRect(x0, 8, w, h);
+    c.fillStyle = "#d7e3ef";
+    lines3.forEach((l, i) => {
+      if (16 + 17 * (i + 1) < h + 8) c.fillText(l, x0 + 8, 8 + 17 * (i + 1));
+    });
+    c.restore();
+  }
+  function drawHeadBubble(c, x, y, text2, line2) {
+    c.save();
+    c.font = line2 ? "14px Galmuri11, sans-serif" : "bold 16px Galmuri11, sans-serif";
+    const w = Math.min(320, c.measureText(text2).width + (line2 ? 16 : 12));
+    const h = line2 ? 22 : 22;
+    const bx = Math.round(x - w / 2), by = Math.round(y - h);
+    c.fillStyle = text2 === "#" ? "#f2d0cc" : "#f4f1e8";
+    c.strokeStyle = "#1b1f24";
+    c.lineWidth = 2;
+    c.fillRect(bx, by, w, h);
+    c.strokeRect(bx, by, w, h);
+    c.fillRect(Math.round(x) - 3, by + h, 6, 4);
+    c.fillStyle = "#1b1f24";
+    c.textAlign = "center";
+    c.textBaseline = "middle";
+    c.fillText(text2, Math.round(x), by + h / 2 + 1, w - 8);
+    c.restore();
+  }
+
+  // src/game/world/needs.ts
+  var NEEDS = ["work", "hunger", "energy", "bladder", "bowel", "social", "fun"];
+  var ACTIVITIES = [
+    { id: "work", need: "work", clip: "work", where: ["office"], sec: [40, 90], fill: 2.2, label: "일하는 중" },
+    { id: "eat", need: "hunger", clip: "eat", where: ["lounge", "shop"], sec: [25, 45], fill: 4, label: "먹는 중" },
+    { id: "rest", need: "energy", clip: "rest", where: ["lounge"], sec: [30, 60], fill: 3, label: "쉬는 중" },
+    { id: "pee", need: "bladder", clip: "pee", where: ["restroom"], sec: [8, 14], fill: 12, label: "화장실(소)" },
+    { id: "poo", need: "bowel", clip: "poo", where: ["restroom"], sec: [25, 40], fill: 5, label: "화장실(대)" },
+    { id: "chat", need: "social", clip: "talk", where: ["office", "lounge", "corridor"], sec: [12, 25], fill: 6, label: "수다 중", partner: true },
+    { id: "hobby", need: "fun", clip: "hobby", where: ["lounge"], sec: [30, 60], fill: 3, label: "취미" }
+  ];
+  var DECAY = { work: 0.35, hunger: 0.12, energy: 0.08, bladder: 0.2, bowel: 0.05, social: 0.18, fun: 0.12 };
+  var TEMPER = {
+    잼트리: { need: { social: 1.3, hunger: 1.2 }, friends: ["쟈알디", "스팡달", "데쥬레", "에일린"] },
+    쟈알디: { need: { social: 0.6, work: 1.3 } },
+    에일린: { need: { social: 0.4 }, hobbyAt: ["lounge"] },
+    큐라스: { need: { social: 1.5, fun: 1.3 }, hobbyAt: ["office"] },
+    고르고디오: { need: { fun: 1.3, hunger: 1.3 }, hobbyAt: ["training"] },
+    게슈간: { need: { social: 0.3 } },
+    로제몬: { need: { hunger: 1.4, fun: 1.2 }, hobbyAt: ["lounge"] },
+    데쥬레: { need: { work: 1.2 }, friends: ["잼트리"] },
+    고그니쟈: { need: { work: 1.2, social: 1.2 } },
+    콘쥬스: { need: { energy: 1.3, fun: 1.3 } }
+  };
+  var fullNeeds = (r) => Object.fromEntries(NEEDS.map((n) => [n, 55 + r() * 45]));
+  function decayNeeds(n, dt, t, onDuty2) {
+    for (const k of NEEDS) {
+      if (k === "work" && !onDuty2) {
+        n.work = 100;
+        continue;
+      }
+      n[k] = Math.max(0, n[k] - DECAY[k] * (t?.need?.[k] ?? 1) * dt);
+    }
+  }
+  var onDuty = (hour, t) => {
+    if (hour == null) return true;
+    const [a, b] = t?.shift ?? [9, 18];
+    return a <= b ? hour >= a && hour < b : hour >= a || hour < b;
+  };
+  function choose(o) {
+    const t = TEMPER[o.name];
+    let best = null;
+    for (const a of ACTIVITIES) {
+      if (!o.has(a.clip)) continue;
+      const lack = 100 - o.needs[a.need];
+      if (lack < 25) continue;
+      const kinds = a.id === "hobby" && t?.hobbyAt ? t.hobbyAt : a.where;
+      const places = o.roam.filter((s2) => kinds.includes(o.graph.kind(s2)));
+      for (const s2 of places) {
+        if (a.partner && !o.partnerIn(s2)) continue;
+        const hops = s2 === o.scene ? 0 : o.graph.route(o.scene, s2)?.length ?? 99;
+        if (hops >= 99) continue;
+        let w = (lack / 100) ** 2 * 100;
+        if (a.need === "work") w *= o.duty ? 1.6 : 0;
+        if (a.need === "bladder" || a.need === "bowel") w *= lack > 70 ? 2.2 : 0.7;
+        if (o.last === a.id) w *= 0.5;
+        const score = w / (1 + hops * 0.5) * (0.9 + o.rand() * 0.2);
+        if (!best || score > best.score) best = { act: a, scene: s2, score };
+      }
+    }
+    return best && best.score > 8 ? best : null;
+  }
+
+  // src/game/world/mobs.ts
+  var BASE = { courage: [0.1, 0.8], social: [0.1, 0.8], haste: [0.1, 0.7], curious: [0.1, 0.8], sly: [0, 0.05] };
+  var ARCHETYPES = {
+    행인: { name: "행인", role: "civilian", range: {} },
+    회사원: { name: "회사원", role: "civilian", range: { haste: [0.3, 0.9] }, drinks: true },
+    관광객: { name: "관광객", role: "civilian", range: { curious: [0.5, 1], courage: [0.1, 0.5] } },
+    학생: { name: "학생", role: "student", range: { courage: [0, 0.6], curious: [0.4, 1] } },
+    배달원: { name: "배달원", role: "worker", range: { haste: [0.6, 1] } },
+    불량배: { name: "불량배", role: "thug", range: { courage: [0.5, 1], haste: [0.5, 1], sly: [0.05, 0.5] }, drinks: true },
+    방문객: { name: "방문객", role: "civilian", range: { courage: [0.1, 0.5] } },
+    "행정 직원": { name: "행정 직원", role: "staff", range: { courage: [0.1, 0.5], social: [0.3, 0.9] } },
+    "안내 직원": { name: "안내 직원", role: "staff", range: { social: [0.5, 1] } },
+    청소부: { name: "청소부", role: "worker", range: { courage: [0.2, 0.6] } },
+    경비: { name: "경비", role: "guard", range: { courage: [0.6, 1], curious: [0.4, 0.9] } },
+    경찰: { name: "경찰", role: "police", range: { courage: [0.6, 1], haste: [0.3, 0.7] } },
+    "편의점 점원": { name: "편의점 점원", role: "staff", range: {} },
+    // 장소 종류별 인구(6-4장)에 쓰는 원형
+    상인: { name: "상인", role: "worker", range: { social: [0.4, 1], courage: [0.3, 0.8] } },
+    취객: { name: "취객", role: "civilian", range: { haste: [0.4, 1], courage: [0.4, 1], curious: [0.3, 0.9] }, drinks: true },
+    주민: { name: "주민", role: "civilian", range: { haste: [0, 0.5] } },
+    산책객: { name: "산책객", role: "civilian", range: { haste: [0, 0.4], social: [0.3, 0.9] } },
+    승객: { name: "승객", role: "civilian", range: { haste: [0.4, 1], curious: [0, 0.4] } }
+  };
+  function rollTemper(r, a) {
+    const t = {};
+    for (const k of Object.keys(BASE)) {
+      const [lo, hi] = a?.range[k] ?? BASE[k];
+      t[k] = lo + (hi - lo) * r();
+    }
+    return t;
+  }
+  var inShift = (hour, shifts) => {
+    if (hour == null) return true;
+    return shifts.some(([a, b]) => a <= b ? hour >= a && hour < b : hour >= a || hour < b);
+  };
+
+  // src/game/world/rng.ts
+  function mulberry322(seed) {
+    let a = seed >>> 0;
+    return () => {
+      a = a + 1831565813 >>> 0;
+      let t = a;
+      t = Math.imul(t ^ t >>> 15, t | 1);
+      t ^= t + Math.imul(t ^ t >>> 7, t | 61);
+      return ((t ^ t >>> 14) >>> 0) / 4294967296;
+    };
+  }
+  function hashSeed(s2) {
+    let h = 2166136261;
+    for (let i = 0; i < s2.length; i++) {
+      h ^= s2.charCodeAt(i);
+      h = Math.imul(h, 16777619);
+    }
+    return h >>> 0;
+  }
+  var range2 = (r, a, b) => a + (b - a) * r();
+  var pick6 = (r, list) => list[Math.floor(r() * list.length) % list.length];
+
+  // src/game/world/actors.ts
+  var WALK = 150;
+  var MARGIN = 60;
+  var NOTICE_PX = 280;
+  var UPROAR_STEPS = [20, 50, 80];
+  var serial = 0;
+  var WorldSim = class {
+    constructor(graph, rng2, opts = {}) {
+      this.graph = graph;
+      this.rng = rng2;
+      const o = Array.isArray(opts) ? { spawns: opts } : opts;
+      this.spawns = o.spawns ?? [];
+      this.posts = o.posts ?? [];
+      this.has = o.has ?? (() => false);
+      this.sceneFaction = o.sceneFaction ?? (() => null);
+      this.stance = o.stance ?? (() => null);
+    }
+    actors = [];
+    events = [];
+    spawnT = /* @__PURE__ */ new Map();
+    uproar = /* @__PURE__ */ new Map();
+    /** 실제로 흐른 생활 초 */
+    time = 0;
+    hour = null;
+    player = null;
+    spawns;
+    posts;
+    has;
+    sceneFaction;
+    stance;
+    /** 몹의 소속: 경비·직원(근무형·staff·guard)은 장면 소속, 나머지는 없음 */
+    mobFaction(a) {
+      if (a.def.kind !== "mob") return null;
+      const role = ARCHETYPES[a.def.archetype ?? a.def.name]?.role;
+      return a.post || role === "guard" || role === "staff" ? this.sceneFaction(a.scene) : null;
+    }
+    // ── 바깥에서 부르는 것 ──
+    add(def, at2) {
+      const scene = at2?.scene ?? def.home;
+      const p = this.randomSpot(scene);
+      const a = {
+        def,
+        scene,
+        x: at2?.x ?? p.x,
+        y: at2?.y ?? p.y,
+        face: this.rng() < 0.5 ? 1 : -1,
+        act: "idle",
+        doing: "대기",
+        goal: null,
+        route: [],
+        wait: range2(this.rng, 0.5, 4),
+        plan: "none",
+        run: 1,
+        clip: "idle",
+        clipAt: this.time,
+        iconT: 0,
+        sayT: 0,
+        noticeCd: 0,
+        think: range2(this.rng, 1, 4)
+      };
+      if (def.kind === "named" && def.brain === "needs") a.needs = fullNeeds(this.rng);
+      if (def.kind === "mob") {
+        const arch = ARCHETYPES[def.archetype ?? def.name];
+        a.temper = rollTemper(this.rng, arch);
+        a.drunk = !!arch?.drinks && this.isNight() && this.rng() < 0.35;
+      }
+      this.actors.push(a);
+      return a;
+    }
+    remove(id) {
+      const i = this.actors.findIndex((a) => a.def.id === id);
+      if (i >= 0) this.actors.splice(i, 1);
+    }
+    inScene(scene) {
+      return this.actors.filter((a) => a.scene === scene && a.act !== "door" && a.act !== "gone");
+    }
+    /** 소란 (플레이어가 몹을 때림·물건 부숨 등). amount 0~100 */
+    disturb(scene, amount, x) {
+      const u = this.uproar.get(scene) ?? { v: 0, x };
+      u.v = Math.min(100, u.v + amount);
+      u.x = x;
+      this.uproar.set(scene, u);
+    }
+    uproarLevel(scene) {
+      const v = this.uproar.get(scene)?.v ?? 0;
+      return UPROAR_STEPS.filter((s2) => v >= s2).length;
+    }
+    uproarValue(scene) {
+      return this.uproar.get(scene)?.v ?? 0;
+    }
+    /** 플레이어 범죄 → 경찰(거리)·경비(거점)가 출입구로 들어와 플레이어에게 간다 (8-4장) */
+    crime(scene, x, severity = 20) {
+      this.disturb(scene, severity, x);
+      const len = this.graph.scene(scene)?.length ?? 1280;
+      const street = this.graph.kind(scene) === "street";
+      const n = 1 + this.uproarLevel(scene);
+      const have = this.actors.filter((a) => a.scene === scene && a.plan === "chase").length;
+      for (let i = have; i < n; i++) {
+        const gate = Math.abs(x - 30) > Math.abs(x - (len - 30)) ? 30 : len - 30;
+        const arch = street ? "경찰" : "경비";
+        const a = this.add({ id: `mob${++serial}`, name: arch, kind: "mob", brain: "transit", home: scene, archetype: arch, look: arch, speed: 170 }, { scene, x: gate, y: this.laneMid(scene) });
+        a.plan = "chase";
+        a.run = 1.4;
+        this.walkTo(a, { x, y: a.y }, "플레이어에게 가는 중", "chase");
+        this.iconOn(a, "!", 3);
+      }
+      this.events.push({ kind: "police", scene, n });
+    }
+    /**
+     * 주인공 공격 판정이 행위자에 닿았나 (필드에는 전투 몸이 아닌 행위자도 맞는다).
+     * 몹: 쓰러졌다 일어나 도망(겁) 또는 맞섬, 소란 +15, 범죄로 경찰·경비 출동. 이름 인물: 화내고 사건으로 알림.
+     */
+    hitBoxes(scene, boxes, dir) {
+      const out = [];
+      for (const a of this.inScene(scene)) {
+        for (const b of boxes) {
+          if (a.hitBy === b.attackId) continue;
+          if (a.x + 30 < b.x0 || a.x - 30 > b.x1 || Math.abs(a.y - b.y) > (b.dy ?? 18) + 14 || b.z0 > 200) continue;
+          a.hitBy = b.attackId;
+          out.push(a);
+          this.struck(a, dir);
+          break;
+        }
+      }
+      if (out.length) this.crime(scene, out[0].x, 15 * out.length);
+      return out;
+    }
+    /** 행위자 하나를 맞힘 (에일린 코어 표적 경로). 같은 틱 여러 번은 hitBy로 거른다 */
+    hitActor(id, dir, attackId) {
+      const a = this.actors.find((q) => q.def.id === id);
+      if (!a || a.act === "gone" || a.act === "door" || a.hitBy === attackId) return false;
+      a.hitBy = attackId;
+      this.struck(a, dir);
+      this.crime(a.scene, a.x, 15);
+      return true;
+    }
+    struck(a, dir) {
+      a.x += dir * 36;
+      a.face = -dir;
+      a.goal = null;
+      a.route = [];
+      const down2 = a.def.kind === "mob" && this.rng() < 0.5;
+      this.events.push({ kind: "hurt", scene: a.scene, who: a.def.name, named: a.def.kind === "named", x: a.x, down: down2 });
+      if (a.def.kind === "named") {
+        a.act = "argue";
+        a.doing = "맞고 화남";
+        a.wait = 3;
+        this.setClip(a, this.canClip(a, "angry") ? "angry" : "idle");
+        this.iconOn(a, "#", 3);
+        return;
+      }
+      a.act = "down";
+      a.doing = down2 ? "쓰러짐" : "휘청";
+      a.wait = down2 ? 1.8 : 0.6;
+      this.setClip(a, down2 && this.canClip(a, "down") ? "down" : "idle");
+      this.iconOn(a, "!", 1.5);
+    }
+    /** 행위자 말풍선 (대사 연결이 부른다) */
+    say(a, text2, sec = 3.2) {
+      a.say = text2;
+      a.sayT = sec;
+    }
+    isNight() {
+      return this.hour != null && (this.hour >= 19.5 || this.hour < 5);
+    }
+    randomSpot(scene) {
+      const s2 = this.graph.scene(scene);
+      const [top, bot] = this.graph.lane(scene);
+      const len = s2?.length ?? 1280;
+      return { x: range2(this.rng, MARGIN, Math.max(MARGIN + 1, len - MARGIN)), y: range2(this.rng, top + 20, bot - 10) };
+    }
+    laneMid(scene) {
+      const [top, bot] = this.graph.lane(scene);
+      return range2(this.rng, top + 20, bot - 10);
+    }
+    /** 생활 시간을 dt초 진행. player = 보이는 장면과 주인공 발, hour = 필드 시(모르면 null) */
+    step(dt, player) {
+      this.time += dt;
+      this.hour = player?.hour ?? null;
+      this.player = player ? { scene: player.scene, x: player.x, y: player.y ?? 0 } : null;
+      for (const [s2, u] of this.uproar) {
+        u.v = Math.max(0, u.v - (player?.scene === s2 ? 1.5 : 5) * dt);
+        if (u.v <= 0) this.uproar.delete(s2);
+      }
+      for (const a of [...this.actors]) this.stepActor(a, dt);
+      for (let i = this.actors.length - 1; i >= 0; i--) if (this.actors[i].act === "gone") this.actors.splice(i, 1);
+      for (const r of this.spawns) this.stepSpawn(r, dt);
+      for (const p of this.posts) this.stepPost(p);
+    }
+    // ── 한 사람 ──
+    setClip(a, clip) {
+      if (a.clip !== clip) {
+        a.clip = clip;
+        a.clipAt = this.time;
+      }
+    }
+    iconOn(a, icon2, sec) {
+      a.icon = icon2;
+      a.iconT = sec;
+    }
+    canClip(a, clip) {
+      return this.has(a.def.look ?? a.def.name, clip);
+    }
+    stepActor(a, dt) {
+      if (a.iconT > 0 && (a.iconT -= dt) <= 0) a.icon = void 0;
+      if (a.sayT > 0 && (a.sayT -= dt) <= 0) a.say = void 0;
+      if (a.noticeCd > 0) a.noticeCd -= dt;
+      if (a.needs) decayNeeds(a.needs, dt, TEMPER[a.def.name], onDuty(this.hour, TEMPER[a.def.name]));
+      if (a.def.kind === "mob") this.mobThink(a, dt);
+      if (a.def.kind === "named") this.namedNotice(a);
+      switch (a.act) {
+        case "door": {
+          a.wait -= dt;
+          if (a.wait > 0) return;
+          const hop = a.route.shift();
+          const at2 = this.graph.doorSpot(hop.to, hop.enter) ?? this.randomSpot(hop.to);
+          a.scene = hop.to;
+          a.x = at2.x;
+          a.y = at2.y;
+          return this.nextLeg(a);
+        }
+        case "walk":
+          return this.move(a, dt);
+        case "do":
+          if (a.task && a.needs) a.needs[a.task.need] = Math.min(100, a.needs[a.task.need] + a.task.fill * dt);
+          a.wait -= dt;
+          if (a.wait <= 0 || a.task && a.needs && a.needs[a.task.need] >= 100) {
+            a.last = a.task?.id;
+            a.task = void 0;
+            this.idle(a, 1, 3);
+          }
+          return;
+        case "notice":
+        case "watch":
+        case "argue":
+          a.wait -= dt;
+          if (a.wait <= 0) this.resume(a);
+          return;
+        case "down":
+          a.wait -= dt;
+          if (a.wait > 0) return;
+          if (a.def.kind === "mob" && a.temper && !a.post) {
+            if (a.temper.courage > 0.75 && ARCHETYPES[a.def.archetype ?? ""]?.role === "thug") {
+              a.act = "argue";
+              a.doing = "맞섬";
+              a.wait = 3;
+              this.iconOn(a, "#", 3);
+              return;
+            }
+            return this.flee(a, this.player?.x ?? a.x);
+          }
+          return this.resume(a);
+        case "post":
+          return this.postStand(a, dt);
+        case "idle":
+          a.wait -= dt;
+          if (a.wait <= 0) this.decide(a);
+          return;
+      }
+    }
+    move(a, dt) {
+      if (!a.goal) return this.idle(a);
+      if (a.plan === "chase") {
+        const p = this.player && this.player.scene === a.scene ? this.player : null;
+        const t = a.target ? this.actors.find((q) => q.def.id === a.target) : null;
+        if (t && t.scene === a.scene) a.goal = { x: t.x - Math.sign(t.x - a.x) * 70, y: t.y };
+        else if (p) a.goal = { x: p.x - Math.sign(p.x - a.x) * 110, y: p.y || a.goal.y };
+      }
+      const dx = a.goal.x - a.x, dy = a.goal.y - a.y;
+      const d3 = Math.hypot(dx, dy);
+      const step2 = (a.def.speed ?? WALK) * a.run * dt;
+      if (Math.abs(dx) > 1) a.face = dx > 0 ? 1 : -1;
+      this.setClip(a, a.run > 1.2 && this.canClip(a, "run") ? "run" : "walk");
+      if (d3 <= step2) {
+        a.x = a.goal.x;
+        a.y = a.goal.y;
+        a.goal = null;
+        return this.arrived(a);
+      }
+      a.x += dx / d3 * step2;
+      a.y += dy / d3 * step2;
+    }
+    idle(a, min = 2, max = 7) {
+      a.act = "idle";
+      a.doing = "대기";
+      a.run = 1;
+      a.plan = "none";
+      a.wait = range2(this.rng, min, max);
+      this.setClip(a, "idle");
+    }
+    /** 잠깐 멈췄다 하던 일로 (몹은 가던 길, 근무형은 자리) */
+    resume(a) {
+      if (a.post) return this.goPost(a);
+      if (a.def.brain === "transit" && a.exitAt) return this.walkTo(a, a.exitAt, "지나가는 중", "exit");
+      this.idle(a, 0.5, 2);
+    }
+    walkTo(a, p, doing, plan = "none") {
+      a.act = "walk";
+      a.goal = p;
+      a.doing = doing;
+      a.plan = plan;
+    }
+    arrived(a) {
+      const hop = a.route[0];
+      if (hop && hop.from === a.scene) {
+        a.act = "door";
+        a.doing = `${this.graph.scene(hop.to)?.name ?? hop.to}(으)로 이동 중`;
+        a.wait = Math.max(1, hop.sec / 6);
+        return;
+      }
+      switch (a.plan) {
+        case "do":
+          return this.startTask(a);
+        case "post":
+          a.act = "post";
+          a.doing = `근무 중 (${a.post?.archetype ?? ""})`;
+          a.wait = range2(this.rng, 4, 9);
+          this.setClip(a, this.canClip(a, "work") ? "work" : "idle");
+          return;
+        case "patrol":
+        case "roam-post":
+          return this.goPost(a);
+        case "exit":
+          a.act = "gone";
+          return;
+        case "steal":
+          return this.doSteal(a);
+        case "harass":
+          return this.doHarass(a);
+        case "chase":
+          a.act = "watch";
+          a.doing = "막아섬";
+          a.wait = 3;
+          this.iconOn(a, "!", 2);
+          return;
+      }
+      if (a.def.brain === "transit" && a.exitAt) {
+        a.act = "gone";
+        return;
+      }
+      this.idle(a);
+    }
+    nextLeg(a) {
+      const hop = a.route[0];
+      if (hop) {
+        const d3 = this.graph.doorSpot(a.scene, hop.exit);
+        if (d3) return this.walkTo(a, d3, a.doing, a.plan);
+      }
+      a.route = [];
+      if (a.plan === "do" && a.task) return this.walkTo(a, this.randomSpot(a.scene), a.task.label + " 하러", "do");
+      if (a.plan === "roam-post") return this.goPost(a);
+      this.walkTo(a, this.randomSpot(a.scene), "자리 잡는 중");
+    }
+    // ── 이름 인물 ──
+    namedNotice(a) {
+      const p = this.player;
+      if (!p || p.scene !== a.scene || a.noticeCd > 0) return;
+      if (a.act !== "idle" && a.act !== "walk") return;
+      if (a.plan === "do" || a.route.length) return;
+      if (Math.abs(p.x - a.x) > NOTICE_PX || Math.abs(p.y - a.y) > 160) return;
+      a.noticeCd = range2(this.rng, 20, 35);
+      a.act = "notice";
+      a.doing = "주인공을 봄";
+      a.goal = null;
+      a.face = p.x > a.x ? 1 : -1;
+      a.wait = 2.4;
+      this.setClip(a, this.canClip(a, "greet") ? "greet" : this.canClip(a, "bow") ? "bow" : "idle");
+      this.iconOn(a, "!", 1.2);
+      this.events.push({ kind: "notice", scene: a.scene, who: a.def.name });
+    }
+    decide(a) {
+      if (a.post) return this.goPost(a);
+      if (a.def.brain === "transit") return this.idle(a, 1, 3);
+      const roam = (a.def.roam ?? [a.def.home]).filter((s2) => this.graph.scene(s2));
+      if (a.def.brain === "needs" && a.needs) {
+        const c = choose({
+          name: a.def.name,
+          needs: a.needs,
+          scene: a.scene,
+          roam,
+          graph: this.graph,
+          has: (clip) => this.canClip(a, clip),
+          duty: onDuty(this.hour, TEMPER[a.def.name]),
+          partnerIn: (s2) => this.actors.some((q) => q !== a && q.def.kind === "named" && q.scene === s2 && (q.act === "idle" || q.act === "walk") && !q.route.length),
+          rand: this.rng,
+          last: a.last
+        });
+        if (c) {
+          a.task = c.act;
+          if (c.scene === a.scene) return this.walkTo(a, this.taskSpot(a, c.act), `${c.act.label} 하러`, "do");
+          const path = this.graph.route(a.scene, c.scene);
+          const d3 = path && this.graph.doorSpot(a.scene, path[0].exit);
+          if (path && d3) {
+            a.route = path;
+            return this.walkTo(a, d3, `${c.act.label} 하러 ${this.graph.scene(c.scene)?.name ?? c.scene}(으)로`, "do");
+          }
+          a.task = void 0;
+        }
+      }
+      const away = a.scene !== a.def.home;
+      const r = this.rng();
+      let dest = null;
+      if (away && r < 0.45) dest = a.def.home;
+      else if (!away && roam.length > 1 && r < 0.18) dest = pick6(this.rng, roam.filter((s2) => s2 !== a.scene));
+      if (dest) {
+        const path = this.graph.route(a.scene, dest);
+        const d3 = path && this.graph.doorSpot(a.scene, path[0].exit);
+        if (path && d3) {
+          a.route = path;
+          return this.walkTo(a, d3, `${this.graph.scene(dest)?.name ?? dest}(으)로 가는 중`);
+        }
+      }
+      this.walkTo(a, this.randomSpot(a.scene), "서성이는 중");
+    }
+    /** 수다는 상대 옆으로, 나머지는 장면 안 빈 곳 */
+    taskSpot(a, t) {
+      if (t.partner) {
+        const q = this.actors.find((o) => o !== a && o.def.kind === "named" && o.scene === a.scene && (o.act === "idle" || o.act === "walk") && !o.route.length);
+        if (q) return { x: q.x + (q.x > a.x ? -90 : 90), y: q.y };
+      }
+      return this.randomSpot(a.scene);
+    }
+    startTask(a) {
+      const t = a.task;
+      if (!t) return this.idle(a);
+      if (t.partner) {
+        const q = this.actors.find((o) => o !== a && o.def.kind === "named" && o.scene === a.scene && Math.abs(o.x - a.x) < 220 && (o.act === "idle" || o.act === "walk" || o.act === "notice"));
+        if (!q) {
+          a.task = void 0;
+          return this.idle(a, 1, 2);
+        }
+        const both = range2(this.rng, t.sec[0], t.sec[1]);
+        for (const [p, o] of [[a, q], [q, a]]) {
+          p.act = "do";
+          p.task = t;
+          p.wait = both;
+          p.goal = null;
+          p.route = [];
+          p.plan = "none";
+          p.doing = `${o.def.name}와 ${t.label}`;
+          p.face = o.x > p.x ? 1 : -1;
+          this.setClip(p, this.canClip(p, t.clip) ? t.clip : "idle");
+        }
+        this.iconOn(a, "♪", 2);
+        return;
+      }
+      a.act = "do";
+      a.doing = t.label;
+      a.wait = range2(this.rng, t.sec[0], t.sec[1]);
+      a.plan = "none";
+      this.setClip(a, t.clip);
+    }
+    // ── 몹 판단 (8-1장: 사건은 NPC 판단에서) ──
+    mobThink(a, dt) {
+      if (a.act === "gone" || a.act === "door") return;
+      const lvl = this.uproarLevel(a.scene);
+      const t = a.temper;
+      if (!t) return;
+      a.think -= dt;
+      if (a.think > 0) return;
+      a.think = range2(this.rng, 0.8, 1.6);
+      const fac = this.mobFaction(a);
+      const p0 = this.player;
+      if (fac && p0 && p0.scene === a.scene && Math.abs(p0.x - a.x) < 520 && a.plan !== "chase" && a.act !== "argue") {
+        const st = this.stance(fac);
+        if (st === "hostile") {
+          a.run = 1.4;
+          a.post = void 0;
+          this.walkTo(a, { x: p0.x, y: p0.y || a.y }, "주인공을 막아섬", "chase");
+          this.iconOn(a, "!", 2);
+          return;
+        }
+        if (st === "wary" && a.act !== "watch" && this.rng() < 0.3) {
+          a.act = "watch";
+          a.doing = "주인공을 경계";
+          a.goal = null;
+          a.face = p0.x > a.x ? 1 : -1;
+          a.wait = 2.5;
+          this.iconOn(a, "?", 1.5);
+          return;
+        }
+      }
+      if (a.post || a.plan === "chase" || a.plan === "steal" || a.plan === "harass" || a.act === "argue") return;
+      const u = this.uproar.get(a.scene);
+      if (lvl >= 1 && u) {
+        if (t.courage < 0.25 + 0.15 * lvl && a.run < 1.5) return this.flee(a, u.x);
+        if (t.curious > 0.6 && a.act !== "watch" && this.rng() < 0.4) {
+          a.act = "watch";
+          a.doing = "구경";
+          a.goal = null;
+          a.face = u.x > a.x ? 1 : -1;
+          a.wait = range2(this.rng, 2, 5);
+          this.setClip(a, "idle");
+          this.iconOn(a, "!", 1.5);
+          return;
+        }
+      }
+      if (a.act !== "walk" || a.plan !== "exit") return;
+      const p = this.player;
+      if (p && p.scene === a.scene && Math.abs(p.x - a.x) < 220 && t.curious > 0.7 && this.rng() < 0.25) {
+        a.act = "watch";
+        a.doing = "주인공을 힐끔";
+        a.goal = null;
+        a.face = p.x > a.x ? 1 : -1;
+        a.wait = 1.2;
+        this.setClip(a, "idle");
+        this.iconOn(a, "?", 1);
+        return;
+      }
+      if (this.incidents(a.scene) >= 2) return;
+      if (t.sly > 0.3 && this.rng() < 0.05 + t.sly * 0.1) {
+        const v = this.nearMob(a, 500, (q) => q.act === "walk" && q.plan === "exit" && !q.post);
+        if (v) {
+          a.target = v.def.id;
+          a.run = 1.2;
+          return this.walkTo(a, { x: v.x - Math.sign(v.x - a.x) * 50, y: v.y }, "누군가에게 다가감", "steal");
+        }
+      }
+      if (a.drunk && t.haste > 0.55 && this.isNight() && this.rng() < 0.06) {
+        const v = this.nearMob(a, 400, (q) => q.act === "walk" && !q.post);
+        if (v) {
+          a.target = v.def.id;
+          return this.walkTo(a, { x: v.x - Math.sign(v.x - a.x) * 80, y: v.y }, "시비 걸러 감", "harass");
+        }
+      }
+    }
+    incidents(scene) {
+      return this.actors.filter((q) => q.scene === scene && (q.plan === "steal" || q.plan === "harass" || q.act === "argue")).length;
+    }
+    nearMob(a, dist, ok) {
+      let best = null;
+      for (const q of this.actors) {
+        if (q === a || q.def.kind !== "mob" || q.scene !== a.scene || !ok(q)) continue;
+        const d3 = Math.abs(q.x - a.x);
+        if (d3 < dist && (!best || d3 < Math.abs(best.x - a.x))) best = q;
+      }
+      return best;
+    }
+    gateFar(a, fromX) {
+      const rule2 = this.spawns.find((r) => r.scene === a.scene);
+      const len = this.graph.scene(a.scene)?.length ?? 1280;
+      const gates = rule2?.gates?.length ? rule2.gates : [30, len - 30];
+      const x = [...gates].sort((p, q) => Math.abs(q - fromX) - Math.abs(p - fromX))[0];
+      return { x, y: a.y };
+    }
+    flee(a, fromX) {
+      a.run = 1.8;
+      a.exitAt = this.gateFar(a, fromX);
+      this.walkTo(a, a.exitAt, "도망", "exit");
+      this.setClip(a, this.canClip(a, "flee") ? "flee" : "walk");
+      this.iconOn(a, "!", 1.5);
+      this.events.push({ kind: "flee", scene: a.scene, who: a.def.name });
+    }
+    doSteal(a) {
+      const v = this.actors.find((q) => q.def.id === a.target);
+      a.target = void 0;
+      if (!v || v.scene !== a.scene) return this.resume(a);
+      this.events.push({ kind: "steal", scene: a.scene, thief: a.def.name, victim: v.def.name, x: v.x });
+      this.disturb(a.scene, 12, v.x);
+      a.run = 1.9;
+      a.exitAt = this.gateFar(a, v.x);
+      this.walkTo(a, a.exitAt, "훔치고 달아남", "exit");
+      this.iconOn(v, "!", 2.5);
+      if ((v.temper?.courage ?? 0) > 0.6) {
+        v.target = a.def.id;
+        v.run = 1.6;
+        this.walkTo(v, { x: a.x, y: a.y }, "도둑을 쫓음", "chase");
+        v.wait = 0;
+      } else {
+        v.act = "watch";
+        v.doing = "털림";
+        v.goal = null;
+        v.wait = 3;
+      }
+      for (const q of this.actors) {
+        if (q === a || q === v || q.scene !== a.scene || q.def.kind !== "mob" || q.post || Math.abs(q.x - v.x) > 450) continue;
+        const t = q.temper;
+        if (t.courage > 0.85 && this.rng() < 0.5) {
+          q.target = a.def.id;
+          q.run = 1.6;
+          this.walkTo(q, { x: a.x, y: a.y }, "도둑을 쫓음", "chase");
+        } else if (t.curious > 0.5) {
+          q.act = "watch";
+          q.doing = "구경";
+          q.goal = null;
+          q.face = v.x > q.x ? 1 : -1;
+          q.wait = range2(this.rng, 2, 4);
+        }
+      }
+    }
+    doHarass(a) {
+      const v = this.actors.find((q) => q.def.id === a.target);
+      a.target = void 0;
+      if (!v || v.scene !== a.scene) return this.resume(a);
+      this.events.push({ kind: "harass", scene: a.scene, who: a.def.name, target: v.def.name, x: v.x });
+      this.disturb(a.scene, 8, v.x);
+      a.act = "argue";
+      a.doing = "시비 거는 중";
+      a.goal = null;
+      a.face = v.x > a.x ? 1 : -1;
+      a.wait = range2(this.rng, 4, 7);
+      this.setClip(a, this.canClip(a, "angry") ? "angry" : "idle");
+      this.iconOn(a, "#", 3);
+      if ((v.temper?.courage ?? 0) < 0.4) return this.flee(v, a.x);
+      v.act = "argue";
+      v.doing = "맞받아침";
+      v.goal = null;
+      v.face = a.x > v.x ? 1 : -1;
+      v.wait = a.wait;
+      this.iconOn(v, "#", 3);
+    }
+    // ── 근무형 (6-3장) ──
+    stepPost(p) {
+      const on = inShift(this.hour, p.shifts) && (p.uproar === void 0 || this.uproarLevel(p.scene) >= p.uproar);
+      const workers = this.actors.filter((a) => a.post?.id === p.id && a.plan !== "exit");
+      if (on && workers.length < p.count) {
+        const [top, bot] = this.graph.lane(p.scene);
+        const a = this.add({ id: `post${++serial}`, name: p.archetype, kind: "mob", brain: "post", home: p.scene, archetype: p.archetype, look: p.archetype }, { scene: p.scene, x: p.gate, y: (top + bot) / 2 });
+        a.post = p;
+        a.postI = 0;
+        this.goPost(a);
+        this.events.push({ kind: "shift", scene: p.scene, who: p.archetype, on: true });
+      } else if (!on) {
+        for (const a of workers) {
+          a.post = void 0;
+          a.route = [];
+          a.exitAt = a.scene === p.scene ? { x: p.gate, y: a.y } : this.gateFar(a, a.x);
+          this.walkTo(a, a.exitAt, "퇴근", "exit");
+          this.events.push({ kind: "shift", scene: p.scene, who: p.archetype, on: false });
+        }
+      }
+    }
+    goPost(a) {
+      const p = a.post;
+      const [top, bot] = this.graph.lane(a.scene);
+      if (p.how === "fixed") {
+        if (a.scene !== p.scene) return this.travel(a, p.scene, "roam-post");
+        return this.walkTo(a, { x: p.spot ?? 400, y: top + 30 }, "자리로", "post");
+      }
+      if (p.how === "patrol") {
+        const [l, r] = p.span ?? [100, (this.graph.scene(a.scene)?.length ?? 1280) - 100];
+        const x = Math.abs(a.x - l) < Math.abs(a.x - r) ? r : l;
+        return this.walkTo(a, { x, y: range2(this.rng, top + 20, bot - 10) }, "순찰", "post");
+      }
+      const route = p.route?.length ? p.route : [p.scene];
+      const want = route[(a.postI ?? 0) % route.length];
+      if (a.scene !== want) return this.travel(a, want, "roam-post");
+      a.postI = (a.postI ?? 0) + 1;
+      a.act = "post";
+      a.doing = `순회 중 (${this.graph.scene(a.scene)?.name ?? a.scene})`;
+      a.wait = p.stay ?? 30;
+      a.plan = "roam-post";
+      this.setClip(a, this.canClip(a, "work") ? "work" : "idle");
+    }
+    postStand(a, dt) {
+      a.wait -= dt;
+      if (a.wait > 0) return;
+      if (a.post?.how === "roam") return this.goPost(a);
+      if (a.post?.how === "patrol") return this.goPost(a);
+      a.face = this.rng() < 0.5 ? 1 : -1;
+      a.wait = range2(this.rng, 4, 9);
+    }
+    travel(a, scene, plan) {
+      const path = this.graph.route(a.scene, scene);
+      const d3 = path && this.graph.doorSpot(a.scene, path[0].exit);
+      if (!path || !d3) return this.idle(a);
+      a.route = path;
+      this.walkTo(a, d3, `${this.graph.scene(scene)?.name ?? scene}(으)로`, plan);
+    }
+    // ── 몹 보충 (6-2장) ──
+    stepSpawn(r, dt) {
+      const night = this.isNight();
+      const lvl = this.uproarLevel(r.scene);
+      const want = Math.max(0, (night ? r.target.night : r.target.day) - lvl);
+      const have = this.actors.filter((a) => a.def.kind === "mob" && a.def.brain === "transit" && a.scene === r.scene && a.plan !== "chase").length;
+      if (have >= want) return void this.spawnT.delete(r.scene);
+      const visible = this.player?.scene === r.scene;
+      if (!visible) {
+        for (let i = have; i < want; i++) this.spawnOne(r, null, true);
+        return void this.spawnT.delete(r.scene);
+      }
+      const left = (this.spawnT.get(r.scene) ?? 0) - dt;
+      if (left > 0) return void this.spawnT.set(r.scene, left);
+      this.spawnT.set(r.scene, range2(this.rng, r.refill[0], r.refill[1]) * (1 + lvl));
+      this.spawnOne(r, this.player.x, false);
+    }
+    spawnOne(r, playerX, anywhere) {
+      const len = this.graph.scene(r.scene)?.length ?? 1280;
+      const gates = r.gates?.length ? r.gates : [30, len - 30];
+      const from = playerX === null ? pick6(this.rng, gates) : [...gates].sort((p, q) => Math.abs(q - playerX) - Math.abs(p - playerX))[0];
+      const others = gates.filter((g2) => g2 !== from);
+      const to = pick6(this.rng, others.length ? others : gates);
+      const [top, bot] = this.graph.lane(r.scene);
+      const name = pick6(this.rng, this.isNight() && r.nightMix?.length ? r.nightMix : r.mix);
+      const arch = ARCHETYPES[name];
+      const look = arch?.looks?.length ? pick6(this.rng, arch.looks) : name;
+      const a = this.add({ id: `mob${++serial}`, name, kind: "mob", brain: "transit", home: r.scene, archetype: name, look, speed: range2(this.rng, 110, 170) }, { scene: r.scene, x: anywhere ? range2(this.rng, MARGIN, len - MARGIN) : from, y: range2(this.rng, top + 20, bot - 10) });
+      if (a.temper) a.def.speed = (a.def.speed ?? WALK) * (0.85 + a.temper.haste * 0.35);
+      a.exitAt = { x: to, y: range2(this.rng, top + 20, bot - 10) };
+      this.walkTo(a, a.exitAt, a.drunk ? "비틀거리며 지나감" : "지나가는 중", "exit");
+    }
+  };
+
+  // src/game/world/places.ts
+  var DEFAULT_LANE = [470, 680];
+  var PlaceGraph = class {
+    constructor(scenes, elevator = [], kinds = {}) {
+      this.kinds = kinds;
+      for (const s2 of scenes) this.scenes.set(s2.id, s2);
+      const add = (h) => (this.edges.get(h.from) ?? this.edges.set(h.from, []).get(h.from)).push(h);
+      const usable = (d3) => !d3.locked && d3.open !== false;
+      for (const s2 of scenes) {
+        for (const d3 of s2.doors) {
+          if (!usable(d3)) continue;
+          if (d3.to && this.scenes.has(d3.to)) add({ from: s2.id, exit: d3.id, to: d3.to, enter: d3.toDoor ?? d3.id, sec: 3 });
+          for (const t of [d3.up, d3.down]) if (t && this.scenes.has(t)) add({ from: s2.id, exit: d3.id, to: t, enter: this.stairDoor(t) ?? d3.id, sec: 20 });
+          if (d3.kind === "elevator") {
+            for (const e of elevator) if (e.scene !== s2.id && e.open !== false && this.scenes.has(e.scene)) add({ from: s2.id, exit: d3.id, to: e.scene, enter: e.door, sec: 30 });
+          }
+        }
+      }
+    }
+    scenes = /* @__PURE__ */ new Map();
+    edges = /* @__PURE__ */ new Map();
+    stairDoor(sceneId) {
+      return this.scenes.get(sceneId)?.doors.find((d3) => d3.kind === "stairs" || d3.up || d3.down)?.id ?? null;
+    }
+    scene(id) {
+      return this.scenes.get(id);
+    }
+    lane(id) {
+      return this.scenes.get(id)?.lane ?? DEFAULT_LANE;
+    }
+    kind(id) {
+      return this.kinds[id] ?? "room";
+    }
+    neighbors(id) {
+      return this.edges.get(id) ?? [];
+    }
+    /** 문 앞 발 자리: 북쪽 벽 문은 띠 위쪽, 화면 아래 출입은 띠 아래쪽, 옛 장면은 띠 가운데 */
+    doorSpot(sceneId, doorId) {
+      const s2 = this.scenes.get(sceneId);
+      const d3 = s2?.doors.find((q) => q.id === doorId);
+      if (!s2 || !d3) return null;
+      const [top, bot] = this.lane(sceneId);
+      const y = s2.legacy ? (top + bot) / 2 : d3.side === "S" ? bot - 14 : top + 16;
+      return { x: d3.x, y };
+    }
+    /** 가장 적은 문을 지나는 길 (BFS). 같으면 null, 못 가면 null */
+    route(from, to) {
+      if (from === to || !this.scenes.has(from) || !this.scenes.has(to)) return null;
+      const prev = /* @__PURE__ */ new Map();
+      const seen2 = /* @__PURE__ */ new Set([from]);
+      const q = [from];
+      while (q.length) {
+        const cur = q.shift();
+        for (const h of this.neighbors(cur)) {
+          if (seen2.has(h.to)) continue;
+          seen2.add(h.to);
+          prev.set(h.to, h);
+          if (h.to === to) {
+            const path = [];
+            for (let at2 = to; at2 !== from; ) {
+              const step2 = prev.get(at2);
+              path.unshift(step2);
+              at2 = step2.from;
+            }
+            return path;
+          }
+          q.push(h.to);
+        }
+      }
+      return null;
+    }
+  };
+
+  // src/game/world/districts.ts
+  var POPULATION = {
+    // 도심: 낮 회사원·행인 많음, 밤 한산·취객
+    downtown: { target: { day: 8, night: 3 }, refill: [2, 5], mix: ["행인", "회사원", "회사원", "학생", "관광객", "배달원", "불량배"], nightMix: ["행인", "회사원", "취객", "취객", "불량배"] },
+    // 뒷골목: 지나가는 사람 적음, 밤엔 불량배
+    alley: { target: { day: 4, night: 2 }, refill: [3, 7], mix: ["행인", "회사원", "배달원", "불량배"], nightMix: ["행인", "취객", "불량배", "불량배"] },
+    // 서민 상권·시장: 낮 빽빽, 밤 폐장
+    market: { target: { day: 10, night: 1 }, refill: [1.5, 4], mix: ["상인", "상인", "주민", "주민", "행인", "배달원", "관광객"], nightMix: ["주민", "취객"] },
+    // 번화·유흥가: 낮 적음, 밤 취객·불량배
+    nightlife: { target: { day: 3, night: 9 }, refill: [2, 5], mix: ["행인", "회사원", "배달원"], nightMix: ["취객", "취객", "회사원", "불량배", "불량배", "행인"] },
+    // 주택가·학교 앞: 주민·학생, 밤 드문드문
+    residential: { target: { day: 4, night: 2 }, refill: [3, 8], mix: ["주민", "주민", "학생", "학생", "배달원", "행인"], nightMix: ["주민", "배달원"] },
+    // 공원·강변: 산책·운동
+    park: { target: { day: 5, night: 2 }, refill: [3, 7], mix: ["산책객", "산책객", "주민", "학생", "관광객"], nightMix: ["산책객", "취객"] },
+    // 지하철: 승객
+    subway: { target: { day: 9, night: 3 }, refill: [1.5, 4], mix: ["승객", "승객", "회사원", "학생", "행인"], nightMix: ["승객", "취객", "회사원"] }
+  };
+  function areaSpawns(areas, gates = {}) {
+    return Object.entries(areas).map(([scene, area]) => ({ scene, ...POPULATION[area], ...gates[scene] ? { gates: gates[scene] } : {} }));
+  }
+  var isRegionMove = (from, to) => !!from && !!to && from !== to;
+
+  // src/game/world/hq.ts
+  var HQ_KINDS = {
+    street: "street",
+    jongno: "street",
+    pasta: "shop",
+    metro: "street",
+    yeongdeungpo: "street",
+    gangnam: "street",
+    mangwon: "street",
+    yeouido: "street",
+    lobby: "lobby",
+    f2: "corridor",
+    f3: "corridor",
+    b1: "corridor",
+    b2: "corridor",
+    b3: "garage",
+    office: "office",
+    swat: "office",
+    interview: "room",
+    edu: "room",
+    lounge: "lounge",
+    wc: "restroom",
+    wc3: "restroom",
+    training: "training",
+    clinic: "clinic",
+    tooth: "cell"
+  };
+  var HQ_AREAS = {
+    street: "alley",
+    jongno: "downtown",
+    metro: "subway",
+    yeongdeungpo: "market",
+    gangnam: "nightlife",
+    mangwon: "residential",
+    yeouido: "park"
+  };
+  var HQ_DISTRICT = { yeongdeungpo: "yeongdeungpo", gangnam: "gangnam", mangwon: "mangwon", yeouido: "yeouido" };
+  var hqDistrict = (scene) => scene === "metro" ? null : HQ_DISTRICT[scene] ?? "jongno";
+  var hqSceneFaction = (scene) => scene === "pasta" || scene.startsWith("jr_") || HQ_AREAS[scene] ? null : "A00";
+  var HQ_ROAM = {
+    office: ["office", "f3", "lounge", "wc3"],
+    lounge: ["lounge", "f3", "office", "wc3"],
+    clinic: ["clinic"]
+  };
+  function hqSpawns(graph) {
+    const lobbyMain = graph.scene("lobby")?.doors.find((d3) => d3.id === "main")?.x;
+    const metroGates = graph.scene("metro")?.doors.map((d3) => d3.x);
+    return [
+      ...areaSpawns(Object.fromEntries(Object.entries(HQ_AREAS).filter(([s2]) => graph.scene(s2))), { street: [30, 1890], ...metroGates?.length ? { metro: metroGates } : {} }),
+      ...lobbyMain !== void 0 ? [{ scene: "lobby", target: { day: 2, night: 0 }, refill: [6, 12], gates: [lobbyMain], mix: ["방문객", "행정 직원"] }] : []
+    ];
+  }
+  function hqPosts(graph) {
+    const lobby2 = graph.scene("lobby");
+    if (!lobby2) return [];
+    const gate = lobby2.doors.find((d3) => d3.id === "main")?.x ?? 300;
+    const desk = Math.round(lobby2.length * 0.55);
+    return [
+      { id: "desk", archetype: "안내 직원", scene: "lobby", how: "fixed", spot: desk, shifts: [[9, 18]], count: 1, gate },
+      { id: "night", archetype: "경비", scene: "lobby", how: "fixed", spot: desk, shifts: [[18, 9]], count: 1, gate },
+      { id: "guard", archetype: "경비", scene: "lobby", how: "patrol", span: [gate + 120, Math.min(lobby2.length - 120, gate + 900)], shifts: [[0, 24]], count: 1, gate },
+      { id: "cleaner", archetype: "청소부", scene: "lobby", how: "roam", route: ["lobby", "f2", "f3", "b1", "lobby"], stay: 40, shifts: [[6, 9], [20, 23]], count: 1, gate }
+    ];
+  }
+  function createHqWorld(map, seed, present, has = () => false, extra = {}) {
+    const graph = new PlaceGraph(map.scenes, map.elevator, HQ_KINDS);
+    const sim = new WorldSim(graph, mulberry322(seed), { spawns: hqSpawns(graph), posts: hqPosts(graph), has, sceneFaction: hqSceneFaction, ...extra });
+    for (const p of present) {
+      if (!graph.scene(p.scene)) continue;
+      sim.add({ id: `npc:${p.name}`, name: p.name, kind: "named", brain: "needs", home: p.scene, roam: HQ_ROAM[p.scene] ?? [p.scene], look: p.name });
+    }
+    return sim;
+  }
+
+  // src/game/world/clock.ts
+  var DEFAULT_CLOCK = { scene: 10, region: 30, talk: 10, fight: 10, waitShort: 30, waitLong: 60 };
+  var clampMin = (v, def) => {
+    const n = Number(v);
+    return Number.isFinite(n) && n >= 0 ? Math.min(n, 24 * 60) : def;
+  };
+  function clockRules(raw) {
+    return {
+      scene: clampMin(raw?.scene, DEFAULT_CLOCK.scene),
+      region: clampMin(raw?.region, DEFAULT_CLOCK.region),
+      talk: clampMin(raw?.talk, DEFAULT_CLOCK.talk),
+      fight: clampMin(raw?.fight, DEFAULT_CLOCK.fight),
+      waitShort: clampMin(raw?.waitShort, DEFAULT_CLOCK.waitShort),
+      waitLong: clampMin(raw?.waitLong, DEFAULT_CLOCK.waitLong)
+    };
+  }
+  var FieldClock = class {
+    constructor(start, rules = DEFAULT_CLOCK) {
+      this.rules = rules;
+      this.minute = start;
+    }
+    /** 자정부터 분. 본편 시각을 모르면 null (시계를 세지 않는다) */
+    minute;
+    foughtHere = false;
+    /** 사건 하나 → 흐른 분 (시계를 모르면 0) */
+    advance(ev) {
+      let add = 0;
+      switch (ev.kind) {
+        case "scene":
+          add = this.rules.scene;
+          this.foughtHere = false;
+          break;
+        case "region":
+          add = this.rules.region;
+          this.foughtHere = false;
+          break;
+        case "talk":
+          add = this.rules.talk;
+          break;
+        case "fight":
+          if (this.foughtHere) return 0;
+          this.foughtHere = true;
+          add = this.rules.fight;
+          break;
+        case "wait":
+          add = Math.max(0, ev.minutes);
+          break;
+      }
+      if (this.minute === null) return 0;
+      this.minute += add;
+      return add;
+    }
+    /** 시 (0~24, 날짜는 버림) */
+    hour() {
+      return this.minute === null ? null : this.minute / 60 % 24;
+    }
+    text() {
+      if (this.minute === null) return "--:--";
+      const m = Math.floor(this.minute) % 1440;
+      return `${String(Math.floor(m / 60)).padStart(2, "0")}:${String(m % 60).padStart(2, "0")}`;
+    }
+  };
+  var BANDS = [5, 11, 17, 19.5];
+  var BAND_NAME = ["아침", "낮", "저녁", "밤"];
+  var hm = (m) => m >= 60 ? `${Math.floor(m / 60)}시간${m % 60 ? ` ${m % 60}분` : ""}` : `${m}분`;
+  function waitOptions(rules, minute, shift = [9, 18]) {
+    const out = [];
+    if (rules.waitShort > 0) out.push({ label: hm(rules.waitShort), minutes: rules.waitShort });
+    if (rules.waitLong > 0 && rules.waitLong !== rules.waitShort) out.push({ label: hm(rules.waitLong), minutes: rules.waitLong });
+    if (minute === null) return out;
+    const day = (minute % 1440 + 1440) % 1440;
+    const h = day / 60;
+    const i = BANDS.findIndex((b) => b > h);
+    const nextH = i < 0 ? BANDS[0] + 24 : BANDS[i];
+    const name = BAND_NAME[i < 0 ? 0 : i];
+    out.push({ label: `${name}까지`, minutes: Math.round(nextH * 60 - day) });
+    if (h >= shift[0] && h < shift[1]) out.push({ label: "근무 끝까지", minutes: Math.round(shift[1] * 60 - day) });
+    return out;
+  }
+
+  // src/game/world/observer.ts
+  var NEED_KO = { work: "업무", hunger: "허기", energy: "피로", bladder: "소", bowel: "대", social: "사교", fun: "휴식" };
+  var needLine = (a) => a.needs ? "  " + NEEDS.map((n) => `${NEED_KO[n]}${Math.round(a.needs[n])}`).join(" ") : "";
+  var temperLine = (a) => a.temper ? `  용${a.temper.courage.toFixed(1)} 호${a.temper.curious.toFixed(1)} 급${a.temper.haste.toFixed(1)}${a.temper.sly > 0.3 ? " 손버릇" : ""}${a.drunk ? " 취함" : ""}` : "";
+  function observerLines(sim, clock, scene, seed) {
+    const here = sim.inScene(scene);
+    const lvl = sim.uproarLevel(scene);
+    const out = [
+      `[세계 관찰] 시각 ${clock.text()} · 씨앗 ${seed} · 생활 ${Math.floor(sim.time)}초 · 행위자 ${sim.actors.length}`,
+      `— 이 장면 (${sim.graph.scene(scene)?.name ?? scene}) ${here.length}명 · 소란도 ${lvl} (${Math.round(sim.uproarValue(scene))}) —`
+    ];
+    for (const a of here.slice(0, 14)) {
+      const mark = a.def.kind === "named" ? "●" : a.post ? "◆" : "·";
+      out.push(`${mark} ${a.def.name}  ${a.doing}${a.def.kind === "named" ? needLine(a) : temperLine(a)}`);
+    }
+    if (here.length > 14) out.push(`  … 외 ${here.length - 14}명`);
+    const named = sim.actors.filter((a) => a.def.kind === "named" && a.scene !== scene);
+    if (named.length) out.push("— 다른 장면 —");
+    for (const a of named) out.push(`● ${a.def.name}  ${sim.graph.scene(a.scene)?.name ?? a.scene}  ${a.doing}`);
+    const mobs = /* @__PURE__ */ new Map();
+    for (const a of sim.actors) if (a.def.kind === "mob" && a.scene !== scene) mobs.set(a.scene, (mobs.get(a.scene) ?? 0) + 1);
+    for (const [s2, n] of mobs) out.push(`· ${sim.graph.scene(s2)?.name ?? s2} 몹 ${n}${sim.uproarLevel(s2) ? ` 소란${sim.uproarLevel(s2)}` : ""}`);
+    return out;
+  }
+
+  // src/game/world/lines.ts
+  var NPC_TYPE = {
+    행인: "시민",
+    회사원: "시민",
+    관광객: "시민",
+    방문객: "시민",
+    배달원: "시민",
+    학생: "학생",
+    불량배: "불량배",
+    경찰: "경찰",
+    청소부: "청소부",
+    경비: "관리국 직원",
+    "안내 직원": "관리국 직원",
+    "행정 직원": "관리국 직원",
+    "편의점 점원": "상인",
+    상인: "상인",
+    취객: "시민",
+    주민: "시민",
+    산책객: "시민",
+    승객: "시민"
+  };
+  var timeKey = (h) => h == null ? "day" : h >= 5 && h < 11 ? "morning" : h < 17 ? "day" : h < 19.5 ? "evening" : "night";
+  var JOSA = /^(이라도|라도|이랑|랑|으로|로|이|가|은|는|을|를|과|와)/;
+  var PAIRS = [["이라도", "라도"], ["이랑", "랑"], ["으로", "로"], ["이", "가"], ["은", "는"], ["을", "를"], ["과", "와"]];
+  function fillAddress(line2, word) {
+    return line2.replace(/\{호칭\}([가-힣]*)/g, (_m, rest) => {
+      const j = rest.match(JOSA)?.[0];
+      if (!j) return word + rest;
+      const last = word.slice(-1).charCodeAt(0) - 44032;
+      const batchim = last >= 0 && last <= 11171 ? last % 28 !== 0 : true;
+      const rieul = batchim && last % 28 === 8;
+      const pair = PAIRS.find(([a, b]) => a === j || b === j);
+      const pick7 = pair[0] === "으로" ? batchim && !rieul ? "으로" : "로" : batchim ? pair[0] : pair[1];
+      return word + pick7 + rest.slice(j.length);
+    });
+  }
+  var Lines = class {
+    constructor(data, rng2) {
+      this.data = data;
+      this.rng = rng2;
+    }
+    recent = [];
+    src(kind, name, archetype) {
+      return kind === "named" ? this.data.characters[name] : this.data.npc[NPC_TYPE[archetype ?? name] ?? NPC_TYPE[name] ?? name];
+    }
+    /** 이 사람이 이 대사 자료를 갖고 있나 */
+    has(kind, name, archetype) {
+      return !!this.src(kind, name, archetype);
+    }
+    /** 플레이어를 부르는 말: 같은 조직이면 직급 비교(up = 플레이어가 위), 아니면 outsider */
+    address(c, ctx) {
+      const a = c?.address ?? {};
+      if (c?.faction && c.faction === ctx.faction) {
+        const rel = c.level == null || ctx.level == null ? "peer" : ctx.level > c.level ? "up" : ctx.level < c.level ? "down" : "peer";
+        return a[rel] || a.peer || "";
+      }
+      return a.outsider || "";
+    }
+    /** 플레이어 소속·직급에 맞는 칸의 말풍선 목록 */
+    personaBarks(c, ctx) {
+      const side = ctx.enemy ? "enemy" : "ally";
+      let cell;
+      if (c.faction && c.faction === ctx.faction && c.persona.same) {
+        const lv = c.level;
+        const rel = lv == null || ctx.level == null ? "peer" : ctx.level > lv ? "up" : ctx.level < lv ? "down" : "peer";
+        cell = c.persona.same[rel] ?? c.persona.same.peer;
+      } else cell = c.persona[ctx.faction] ?? c.persona.etc;
+      return cell?.[side] ?? [];
+    }
+    /**
+     * 말풍선 한 줄. tag: 'idle'(소속 칸 + 시간대 혼잣말) | 상황(alert·hurt…) | 생태계 태그(work·eat·victim…).
+     * 생태계 태그에 대사가 없으면 null (억지로 다른 말을 끼우지 않는다)
+     */
+    bark(kind, name, tag2, ctx, o = {}) {
+      const c = this.src(kind, name, o.archetype);
+      if (!c) return null;
+      let pool = [];
+      if (tag2 === "idle") {
+        const per = this.personaBarks(c, ctx);
+        const time = c.time[timeKey(ctx.hour)] ?? [];
+        pool = this.rng() < 0.55 && per.length ? per : time.length ? time : per;
+      } else pool = c.eco?.[tag2]?.length ? c.eco[tag2] : c.situation?.[tag2] ?? [];
+      if (!pool.length) return null;
+      const fresh = pool.filter((l) => !this.recent.includes(l));
+      const line2 = (fresh.length ? fresh : pool)[Math.floor(this.rng() * (fresh.length || pool.length))];
+      this.recent.push(line2);
+      if (this.recent.length > 40) this.recent.shift();
+      const word = kind === "named" ? this.address(c, ctx) : c.address?.outsider ?? "";
+      return fillAddress(line2, word || "거기").replace(/\{상대\}/g, o.partner ?? "");
+    }
+  };
+
+  // src/game/world/speech.ts
+  var TASK_TAG = { work: "work", eat: "eat", rest: "rest", pee: "restroom", poo: "restroom", chat: "chat", hobby: "hobby" };
+  var Chatter = class {
+    constructor(sim, lines3, ctx) {
+      this.sim = sim;
+      this.lines = lines3;
+      this.ctx = ctx;
+    }
+    last = /* @__PURE__ */ new Map();
+    ambientT = 3;
+    can(a, gap = 14) {
+      return this.sim.time - (this.last.get(a.def.id) ?? -999) > gap;
+    }
+    talk(a, tag2, partner) {
+      const t = this.lines.bark(a.def.kind, a.def.name, tag2, this.ctx(a), { archetype: a.def.archetype, partner });
+      if (!t) return false;
+      this.sim.say(a, t, Math.min(4.5, 1.8 + t.length * 0.12));
+      this.last.set(a.def.id, this.sim.time);
+      return true;
+    }
+    find(scene, name, near2) {
+      return this.sim.inScene(scene).filter((a) => a.def.name === name).sort((a, b) => Math.abs(a.x - (near2 ?? a.x)) - Math.abs(b.x - (near2 ?? b.x)))[0];
+    }
+    /** 시뮬 사건(바깥이 비워서 건넨다)을 대사로 (보이는 장면만), 그리고 가끔 평소 혼잣말 */
+    step(dt, scene, px, evs) {
+      const speaking = () => this.sim.inScene(scene).filter((a) => a.say).length;
+      for (const e of evs) {
+        if (e.scene !== scene || speaking() >= 3) continue;
+        if (e.kind === "steal") {
+          const v = this.find(scene, e.victim, e.x), t = this.find(scene, e.thief, e.x);
+          if (v) this.talk(v, "victim");
+          if (t && this.sim.rng() < 0.6) this.talk(t, "thief");
+          const w = this.sim.inScene(scene).find((a) => a.act === "watch" && a !== v && this.can(a));
+          if (w) this.talk(w, "witness");
+        } else if (e.kind === "harass") {
+          const a = this.find(scene, e.who, e.x), b = this.find(scene, e.target, e.x);
+          if (a) this.talk(a, "harass");
+          if (b) this.talk(b, "harassed");
+        } else if (e.kind === "flee") {
+          const a = this.find(scene, e.who);
+          if (a && this.can(a, 6) && this.sim.rng() < 0.5) this.talk(a, "flee");
+        } else if (e.kind === "hurt") {
+          const a = this.find(scene, e.who, e.x);
+          if (a) this.talk(a, "hit") || this.talk(a, "hurt");
+        } else if (e.kind === "police") {
+          const cop = this.sim.inScene(scene).find((a) => (a.def.name === "경찰" || a.def.name === "경비") && this.can(a, 6));
+          if (cop) this.talk(cop, "warn");
+        } else if (e.kind === "notice") {
+          const a = this.find(scene, e.who, px);
+          if (a && this.can(a, 20)) this.talk(a, "idle");
+        }
+      }
+      this.ambientT -= dt;
+      if (this.ambientT > 0) return;
+      this.ambientT = 3 + this.sim.rng() * 4;
+      if (speaking() >= 2) return;
+      const near2 = this.sim.inScene(scene).filter((a) => Math.abs(a.x - px) < 700 && !a.say && this.can(a)).sort(() => this.sim.rng() - 0.5);
+      for (const a of near2) {
+        let tag2 = "idle";
+        let partner;
+        if (a.act === "do" && a.task) {
+          tag2 = TASK_TAG[a.task.id] ?? "idle";
+          if (a.task.id === "chat") partner = a.doing.split("와 ")[0];
+        } else if (a.post) tag2 = "work";
+        else if (a.drunk) tag2 = "drunk";
+        else if (a.act === "watch" && this.sim.uproarLevel(scene) > 0) tag2 = "crowd";
+        else if (a.def.kind === "mob" && a.act === "walk" && this.sim.rng() < 0.5) tag2 = "pass";
+        if (this.talk(a, tag2, partner) || tag2 !== "idle" && this.talk(a, "idle")) return;
+      }
+    }
+  };
+
+  // src/game/world/dialogue.json
+  var dialogue_default = { version: 1, characters: { 강이학: { faction: "C00", level: 1, address: { self: "저", up: "선배님", peer: "동기님", down: "신입님", outsider: "고객님" }, persona: { same: { up: { ally: ["선배님! 엄지 척!", "넵! 바로 하겠습니다!", "선배님 말씀이 맞아요!"], enemy: ["앗, 죄송합니다! 크게!", "선배님, 얼마면 될까요?", "입금 끊기셨잖아요~"] }, peer: { ally: ["{호칭}, 상담 받을래요?", "이번 전리품 반반? 하하.", "넵넵, 같이 가요!"], enemy: ["{호칭} 장부 칸 바뀜~", "우정은 시세가 없어요!", "선불 안 주셨잖아요!"] }, down: { ally: ["{호칭}, 매뉴얼은 돈이에요!", "울면 수당 안 나와요~", "줄 서세요, 상담 순서!"], enemy: ["{호칭}, 그건 손해예요~", "견적 나왔어요. 안 좋아요!", "선택 잘못하셨네요, 하하."] } }, A00: { ally: ["관리국 분이다! 반가워요!", "정보 필요하세요? 하하.", "지금은 같은 편! 넵!"], enemy: ["관리국은 단가가 높아요~", "협상부터 하실래요?", "싸우면 둘 다 손해예요!"] }, B00: { ally: ["새 거래처다! 넵!", "조건만 맞으면 같은 편!", "명함 드릴까요? 하하."], enemy: ["총보다 흥정이 싸요!", "얼마면 비켜 주실래요?", "그쪽 장비 시세 좋네요~"] }, D00: { ally: ["놀라셨죠? 엄지 척!", "따라오시면 돼요~", "괜찮아요, 매뉴얼 있어요!"], enemy: ["그건 회사가 알아서 할 문제죠!", "엄지 척! 안녕히 가세요!", "시간 다 됐어요, 퇴근!"] }, E00: { ally: ["협회 수수료 몇 퍼예요?", "프리랜서님, 거래하죠!", "등급 높으면 단가도 높죠!"], enemy: ["의뢰비보다 더 드릴게요!", "얼마 받고 오셨어요?", "그 의뢰 손해 보셨네요~"] }, etc: { ally: ["처음 뵙는 고객님!", "명함 교환하실래요?", "넵, 같은 편 확인!"], enemy: ["일단 값부터 묻죠!", "도망 경로 시세 체크!", "그쪽 손해 확정이에요~"] } }, time: { morning: ["금값부터 확인! 하하.", "출근 체크보다 시세 먼저!", "금값 올랐네요! 좋은 아침~"], day: ["점심값은 경비 처리 되나?", "상담 예약 오후까지 꽉!", "이거 시세 얼마더라~"], evening: ["정시 퇴근! 넵!", "오늘 수당 계산 끝~", "야근은 할증이에요, 하하."], night: ["금은 안 슬퍼요. 금은.", "장부 덮기 전에 한 번 더~", "자기 전에 금 시세 한 번만."] }, situation: { deployed: ["매뉴얼만 지키면 돼요!", "수집기 챙겼고, 지갑 챙겼고!"], returned: ["넵! 네네! 정산 기다립니다!", "오늘 수당 깎이면 안 돼요~"], hurt: ["부상 할증 붙는 거죠?", "아야… 이거 산재죠?"], companion: ["동행 수수료는 서비스!", "도망 경로 시세 봐 둘게요."], alert: ["일단 말부터 걸어 볼게요!", "값 물어보면 통할걸요?"] }, eco: { work: ["감정 완료! 최소 열 돈!", "이건 얼마짜리일까요? 하하.", "넵! 장부 정리 끝!"], eat: ["이 커피, 경비 처리 되죠?", "밥값 대신 내 주실 분~?", "공짜 밥이 제일 맛있어요!"], rest: ["금값 시세 확인 타임~", "쉬는 시간도 시급이에요!", "하하, 잠깐 쉴게요!"], restroom: ["넵! 잠깐 다녀올게요!", "금방 올게요! 하하.", "잠시 자리 비워요, 넵!"], hobby: ["오늘 금값 올랐다! 하하!", "지갑 속 동전 세는 중!", "금은 배신 안 해요~"], chat: ["{상대} 님, 상담 받을래요?", "{상대} 님! 좋은 거래 있어요!", "{상대} 님, 그 정보 얼마예요?"], hit: ["앗! 이거 치료비 청구해요!", "{호칭}, 견적 나왔어요!", "넵! 장부에 적었습니다!"], crowd: ["구경은 무료! 넵!", "와, 이거 팔리겠는데요?", "소란 값은 누가 내요? 하하."], off: ["칼퇴 시간이다! 넵넵!", "남은 건 회사가 알아서 하죠!", "내일도 입금 부탁드려요~"] } }, 게슈간: { faction: "A00", level: 1, address: { self: "나", up: "선배", peer: "너", down: "신입", outsider: "너" }, persona: { same: { up: { ally: ["{호칭}. 목표, 위치.", "어떻게 할지는 내가 정해.", "…알았어."], enemy: ["{호칭}. 거기 서.", "누가 보고 있어. 너야?", "다루려고 하지 마."] }, peer: { ally: ["{호칭}. 저기 가리켜.", "무기, 받아.", "문은 내가 맡아."], enemy: ["{호칭}, 거기 고정.", "한 박자. 피해 봐.", "눈 마주쳤어."] }, down: { ally: ["{호칭}. 노크는 두 번.", "내 뒤 말고 옆.", "…괜찮아?"], enemy: ["{호칭}. 거기까지.", "의자째 돌고 싶어?", "시험 끝났어. 불합격."] } }, B00: { ally: ["…이번 한 번.", "등 뒤엔 서지 마.", "기관은 다 똑같아."], enemy: ["떼로 와도 좌표는 하나씩.", "검은 정장. 다 보여.", "하나 끝. 다음 좌표."] }, C00: { ally: ["수집기는 네가 들어.", "이번만.", "가면 벗어도 돼. 안 볼게."], enemy: ["그 괴담, 끝낸다.", "원료 얘기 꺼내지 마.", "물러나."] }, D00: { ally: ["뒤로 빠져.", "걸을 수 있어?", "…괜찮아. 끝났어."], enemy: ["오지 마.", "그거 내려.", "더 오면 띄운다."] }, E00: { ally: ["…총 잘 쏘네?", "탄약, 저기.", "위치만 불러."], enemy: ["여긴 통제 구역.", "도망칠 거면 지금.", "시험 중이야."] }, etc: { ally: ["누구야. 말해.", "문 쪽은 내가.", "…그럭저럭."], enemy: ["진입. 소개는 나중.", "봤어.", "거기. 멈춰."] } }, time: { morning: ["문 마주 보는 자리.", "비상구, 그대로네.", "…졸려."], day: ["누가 보고 있어.", "큐브나 돌리자.", "타자는 나중에."], evening: ["보고서. 두 손가락으로.", "고깃집, 내 자리 비어 있겠지.", "끝났어. 간다."], night: ["이 복도는 이제 안 걸어도 돼.", "나가는 길 하나, 확인.", "조용하네. 마음에 들어."] }, situation: { deployed: ["들이받고, 그다음에 말해.", "가리켜. 쥘 테니까."], returned: ["…해냈어.", "보고는 짧게 써."], hurt: ["별거 아니야.", "…쳐다보지 마."], companion: ["내 시야 밖으로 가지 마.", "탄약 떨어지면 손만 뻗어."], alert: ["누가 보고 있어. 저쪽.", "멀어져. 내가 본 방향에서."] }, eco: { work: ["타자. 두 손가락으로.", "문, 비상구, 확인.", "재격리 서류. …길어."], eat: ["먹을 땐 문 보고.", "…맛있네.", "빨리 먹어. 누가 와."], rest: ["등은 벽에.", "…눈만 감아.", "입구, 그대로네."], restroom: ["잠깐. 다녀와.", "…금방 와.", "자리 비워. 금방."], hobby: ["큐브. 한 면 더.", "…다 맞췄어.", "섞어. 다시."], chat: ["{상대}. …왜.", "{상대}, 거기 앉지 마. 문 가려.", "…{상대}. 별일 없지."], hit: ["…{호칭}. 다시 해 봐.", "그래. 기억했어.", "한 번 더 하면 던진다."], crowd: ["누가 소란이야.", "출구부터 봐.", "…저쪽. 가 본다."], off: ["끝. 간다.", "나가는 길, 확인했어.", "…내일 봐."] } }, 고그니쟈: { faction: "A00", level: 2, address: { self: "나", up: "부장", peer: "자네", down: "신입", outsider: "손님" }, persona: { same: { up: { ally: ["오오! {호칭}, 내려오셨나!", "{호칭}도 믹스커피일세!", "하하하! 예외는 없네!"], enemy: ["오오, {호칭}! 이상하구먼!", "그건 대답 못 하겠네!", "시설이 다 보고 있다네!"] }, peer: { ally: ["{호칭}! 커피 한잔하게!", "아아, 그거 말인가!", "몸에 좋은 걸세!"], enemy: ["{호칭}! 그 문은 안 되네!", "하하하! 수상하구먼!", "수치가 이상하네!"] }, down: { ally: ["오오! 신입 요원인가!", "{호칭}! 환영하네!", "커피는 받았나, {호칭}!"], enemy: ["{호칭}! 거기 서게!", "길을 잃었나, {호칭}!", "그 문 너머는 꽤 깊다네!"] } }, B00: { ally: ["오오! 저쪽 정장이구먼!", "지금만일세, 지금만!", "커피는 줄 수 없네!"], enemy: ["소통 불가라네!", "지하는 못 내주네!", "하하하! 꽤 깊지!"] }, C00: { ally: ["오오! 회사 사람이구먼!", "이번만 같이 가세!", "믹스커피 한잔하겠나!"], enemy: ["그 괴담은 끝낼 걸세!", "원료라니! 하하하!", "지하 정보는 안 파네!"] }, D00: { ally: ["오오! 놀랐나, 손님!", "괜찮네! 다 괜찮네!", "단 거 먹으면 낫는다네!"], enemy: ["손님! 그건 만지면 안 되네!", "거기서 멈추게!", "하하하! 길을 잘못 들었구먼!"] }, E00: { ally: ["오오! 프리랜서인가!", "커피 한잔하고 가게!", "오오, 그 물건 좀 보세!"], enemy: ["지하 정보는 비싸다네!", "하하하! 안 팔 걸세!", "그 문은 안 열리네!"] }, etc: { ally: ["오오! 처음 보는 얼굴이네!", "환영하네, 손님!", "커피부터일세!"], enemy: ["하하하! 수상한 손님이군!", "거기까지일세!", "그건 대답 못 하네!"] } }, time: { morning: ["오오! 오늘도 지하는 무사하구먼!", "첫 잔은 달달하게!", "수용 목록, 이상 없음일세!"], day: ["데쥬레!!! 달달한 걸로!", "몸에 좋은 걸 씹어야겠군!", "3번 수용실 수치가 좀 튀는구먼!"], evening: ["하하하! 오늘 상자는 꽝이었지!", "꽝 서류는 데쥬레가 쓰겠지!", "커피 한 잔 더 해야겠네!"], night: ["지하는 밤이 따로 없다네!", "꽤 깊지, 이 시설은!", "창문은 오늘도 닫혀 있구먼!"] }, situation: { deployed: ["오오! 내가 나설 차례인가!", "시설 설비, 전부 가동하게!"], returned: ["오오, 상태가 좋군! 아주 좋아!", "잡아 온 건 저기 두게!"], hurt: ["하하하! 별것 아닐세!", "몸에 좋은 걸 하나 더 씹어야겠군!"], companion: ["궁금한 건 다 물어보게!", "커피 식기 전에 따라오게!"], alert: ["오오! 수치가 튀는구먼!", "그 녀석, 또 성질이 났군!"] }, eco: { work: ["오오! 수치가 아주 좋구먼!", "장비 점검일세! 전부 정상!", "이 녀석 이름은 뭐로 짓겠나!"], eat: ["믹스커피는 의무일세!", "아주 달달하구먼! 좋아!", "데쥬레!!! 한 잔 더!"], rest: ["하하하! 잠깐 쉬어 가세!", "커피 식기 전엔 쉬어도 되네!", "지하는 쉬기 좋은 곳일세!"], restroom: ["잠깐 다녀오겠네!", "금방 오겠네! 수치 좀 봐 주게!", "자리 비우네! 아무것도 만지지 말게!"], hobby: ["장비에 이름을 붙여 볼까!", "알약 하나 더! 몸에 좋은 걸세!", "하하하! 수용 목록 읽는 재미일세!"], chat: ["오오! {상대} 아닌가! 반갑네!", "{상대}! 믹스커피 한 잔 하게!", "{상대}, 궁금한 건 다 묻게!"], hit: ["오오! {호칭}, 기운이 넘치는군!", "하하하! 별것 아닐세! …다시는 말게.", "그건 몸에 안 좋은 걸세!"], crowd: ["오오! 무슨 소란인가!", "다들 진정하게! 커피 들고!", "하하! 수치보다 더 튀는구먼!"], off: ["오늘도 무사히 끝났구먼!", "커피잔은 데쥬레가 씻겠지!", "내일도 달달하게 시작하세!"] } }, 고르고디오: { faction: "A00", level: 2, address: { self: "", up: "부장님", peer: "동기", down: "막내", outsider: "거기" }, persona: { same: { up: { ally: ["{호칭}! 금방 확인하고 오겠습니다!", "격리 요청 들어갑니다!", "앞은 제가 받겠습니다!"], enemy: ["{호칭}이라도 막습니다!", "숨기는 거 있으십니까?", "정면으로 갑니다!"] }, peer: { ally: ["{호칭}! 오토바이 타!", "앞장선다, 붙어!", "빨리 부수면 되잖아!"], enemy: ["{호칭}, 거짓말하지 마라!", "정면으로 온다, 받아라!", "그 말 앞뒤가 안 맞잖아!"] }, down: { ally: ["{호칭}, 내 뒤에 있어라!", "건물 무너져도 산다!", "잘했다, 마음에 들어!"], enemy: ["{호칭}! 당장 멈춰라!", "막내라도 안 봐준다!", "그거 내려놔!"] } }, B00: { ally: ["오늘만 같은 편이다!", "앞은 내가 받는다, 따라와!", "수상한 짓 하면 바로 안다!"], enemy: ["가짜 관리국 확인!", "적합자 고르고디오! 승인 요청!", "숫자로 와도 소용없다!"] }, C00: { ally: ["괴담 닫는 데까지만!", "건물은 좀 남겨 줄게!", "앞은 맡겨!"], enemy: ["제약 회사가 여기서 뭐 해!", "이 괴담, 정리한다!", "원료? 다 부순다!"] }, D00: { ally: ["괜찮아요! 내가 받을게요!", "고생했어요, 쉬어요!", "안전선 밖으로!"], enemy: ["오지 말라 했잖아요!", "{호칭}! 위험하다고!", "구경할 데 아니에요!"] }, E00: { ally: ["프리랜서! 근성 있네!", "알아서 따라와!", "앞은 내가 맡는다!"], enemy: ["통제 구역이다! 나가!", "그 물건 뭐야!", "말이 다르잖아!"] }, etc: { ally: ["누구든 좋다! 따라와!", "앞은 내가!", "같이 간다!"], enemy: ["뭐야, 넌!", "정면으로 간다!", "숨기는 거 있지!"] } }, time: { morning: ["오토바이 서스펜션 괜찮나.", "아침부터 몸이 근질근질하다!", "출동 대기!"], day: ["기둥 보니까 손이 근질거린다.", "보고서? 다 부쉈음. 끝!", "헬멧이 또 끼네."], evening: ["오늘 건물 몇 채 남았지.", "밥 먹자! 많이!", "칼 손질이나 할까."], night: ["밤에 승인 구호는 자제하자.", "니 수다가 없으니 조용하네.", "내일도 정면이다."] }, situation: { deployed: ["장갑 소환! 돌격한다!", "금방 확인하고 오겠습니다!"], returned: ["현장 정리 완료!", "피해 항목 칸이 또 모자라네."], hurt: ["장갑이 먼저 깨졌다. 난 괜찮다!", "이 정도로 안 쓰러진다!"], companion: ["내 뒤에 있어! 다 받아 준다!", "무너져도 들고 나간다!"], alert: ["격리 요청! 지금 막는다!", "구경꾼 있나? 다 빼!"] }, eco: { work: ["격리 요청서, 먼저 올린다!", "장갑 점검! 이상 없음!", "피해 항목 칸, 또 늘려야겠다!"], eat: ["밥은 많이! 두 그릇!", "먹어 둬! 싸우려면 먹어야지!", "고기 남기지 마! 다 먹어!"], rest: ["쉬는 것도 훈련이다!", "잠깐 앉는다. 금방 일어난다!", "몸이 쉬자고 한다. 오 분!"], restroom: ["잠깐 다녀오겠습니다!", "금방 온다! 자리 지켜!", "자리 비운다! 오래 안 걸린다!"], hobby: ["샌드백! 오늘도 정면이다!", "한 번 더! 아직 안 터졌다!", "오토바이 닦을 시간이다!"], chat: ["{상대}! 밥은 먹었나!", "{상대}, 잠깐! 아까는 왼쪽이라며?", "{상대}! 요즘 몸 괜찮아?"], hit: ["{호칭}! 지금 뭐 하는 거야!", "그 주먹, 근성은 있네!", "안 아프다! 다시는 하지 마라!"], crowd: ["구경꾼 빠져! 위험하다!", "무슨 일이야! 내가 간다!", "다 비켜! 정면으로 간다!"], off: ["퇴근! 오토바이 시동!", "오늘 수고했다! 들어가!", "헬멧 챙기고, 간다!"] } }, 고연지: { faction: "지하상가", level: null, address: { self: "", up: "선생님", peer: "사장님", down: "손님", outsider: "환자분" }, persona: { A00: { ally: ["관리국 분이시군요. 선불입니다.", "장비 출처는 안 묻습니다.", "단속은 수술 끝나고 하세요."], enemy: ["단속이면 영장, 진료면 현금.", "수술실엔 못 들어갑니다.", "냉장고 쪽은 보지 마세요."] }, B00: { ally: ["그쪽 회사 장비도 심어 봤어요.", "총상이면 오늘 안에 끝납니다.", "결제 확인되면 바로 시작해요."], enemy: ["상담 종료입니다.", "여긴 병원입니다. 총은 넣으세요.", "그 자세로는 진료 못 합니다."] }, C00: { ally: ["그쪽 제품, 몸에서 빼 드려요?", "오염 정도부터 보죠.", "이식 부작용은 재진료비 별도."], enemy: ["회수하러 오셨으면 헛걸음이에요.", "환자 몸속 사정은 안 팝니다.", "제 수술실에서 나가세요."] }, D00: { ally: ["길 잃으셨으면 위로 올라가세요.", "다치셨어요? 어디 봅시다.", "여긴 보험 안 됩니다."], enemy: ["여긴 구경하는 곳 아닙니다.", "사진 찍지 마세요.", "나가는 계단은 저쪽이에요."] }, E00: { ally: ["현장 다녀왔어요? 상처부터.", "자상 둘. 오늘 안에 됩니다.", "돈 모자라면 영창은 지하 2층."], enemy: ["프리랜서 사정은 안 봐줍니다.", "외상은 없습니다. 돈 얘기예요.", "다음 환자 부르겠습니다."] }, etc: { ally: ["처음 보는 소속이네요. 상관없어요.", "몸은 다 똑같습니다.", "결제 수단부터 말씀하세요."], enemy: ["볼일 없으면 나가세요.", "수술 중입니다. 조용히.", "소독약 냄새 싫으면 돌아가세요."] } }, time: { morning: ["수술실 한 번 더 닦죠.", "저널 새 호가 왔네요.", "기구 개수부터 셉니다."], day: ["다음 분. 결제 확인됐습니다.", "봉합사 재고 확인.", "형광등이 하나 나갔네요."], evening: ["총상 환자 올 시간이네요.", "가격표가 비뚤어졌어요.", "기구 소독 끝."], night: ["밤에 오는 환자는 대개 급하죠.", "냉장고 온도 정상.", "급해도 선불은 선불입니다."] }, situation: { deployed: ["외상 처치 준비 끝났습니다.", "다치면 바로 말해요. 견적 냅니다."], returned: ["다친 데 없으면 해산.", "꿰맬 사람은 줄 서세요. 선불로."], hurt: ["출혈 경미. 혼자 꿰맵니다.", "괜찮다고는 안 합니다. 제 몸도."], companion: ["제 손 다치면 일 못 합니다.", "옆에 서요. 시야 가리지 말고."], alert: ["오염 노출이면 바로 떨어지세요.", "냉장고행 증례가 아니길 바라죠."] }, eco: { work: ["봉합 끝. 다음 분.", "수술실 다시 닦습니다.", "견적 나왔습니다. 선불입니다."], eat: ["식사는 오 분이면 됩니다.", "먹는 동안 환자 받지 않습니다.", "식사 중. 급하면 선불부터."], rest: ["손 쉬게 하는 것도 관리입니다.", "잠깐 앉습니다. 손은 안 떨려요.", "오늘은 여섯 시간째네요."], restroom: ["잠시 자리 비웁니다.", "금방 옵니다. 기구 만지지 마세요.", "손 씻고 오겠습니다."], hobby: ["저널 새 논문, 읽어 두죠.", "봉합 연습. 한 번 더.", "낯선 술기는 반복합니다."], chat: ["{상대}, 용건만 말씀하세요.", "{상대}, 진료면 선불입니다.", "{상대}, 다친 데 있어요?"], hit: ["{호칭}, 그건 치료비 별도입니다.", "진료 방해도 요금에 넣습니다.", "타박상. 제 손은 무사하네요."], crowd: ["다친 사람 있으면 선불로.", "소란은 밖에서 하세요.", "피 냄새네요. 손님 오겠군요."], off: ["진료 끝. 문 잠급니다.", "수술실 마지막으로 닦고 갑니다.", "급한 분은 내일. 선불로."] } }, 고영은: { faction: "C00", level: 1, address: { self: "저", up: "선배님", peer: "동기", down: "신입 씨", outsider: "그쪽" }, persona: { same: { up: { ally: ["선배님, 다친 데 없으세요?", "선배님 구급상자 채워 드릴게요.", "선배님, 배터리 여분 있어요."], enemy: ["선배님 지시라도 이건 못 해요.", "손대지 마세요. 숨 쉬고 있어요.", "그 계산, 사람이 빠졌네요."] }, peer: { ally: ["{호칭}, 물 좀 마셔요.", "어디 긁힌 데 없죠?", "같이 나가요, 꼭."], enemy: ["그쪽 계산엔 사람이 빠졌어요.", "그 장비, 사람보다 비싸요?", "비켜요. 처치가 먼저예요."] }, down: { ally: ["{호칭}, 이름 다시 말해 줄래요?", "괜찮아요, 처음엔 다 무서워요.", "매뉴얼은 사람 살리는 데부터 봐요."], enemy: ["벌써 끝난 것처럼 굴지 마.", "울어도 돼. 대신 움직여.", "내 말 들어. 지금."] } }, A00: { ally: ["관리국이 더 어울린다고요? 또요?", "오늘은 같은 편이네요.", "그쪽도 사람 먼저죠?"], enemy: ["관리국은 반갑지 않네요.", "그 사람은 건드리지 마요.", "만나는 경로가 늘 이렇죠."] }, B00: { ally: ["다친 데 있으면 말해요.", "소속 따질 때 아니에요.", "지혈 먼저, 얘기는 나중에."], enemy: ["총 내려요. 다친 사람 있어요.", "그 사람, 제 환자예요.", "길 비켜요."] }, D00: { ally: ["괜찮아요? 어디 다쳤어요?", "천천히 숨 쉬어요.", "제 불빛만 보세요."], enemy: ["소리 지르지 마. 들켜.", "도망치면 더 위험해.", "진정하고 내 말 들어."] }, E00: { ally: ["협회 분이죠? 다친 데 봐요.", "병원비 아끼려면 지금 지혈해요.", "같이 나가요. 빈틈은 메우고."], enemy: ["의뢰보다 목숨이 먼저예요.", "그 생존자 넘겨요.", "헤드램프, 정면으로 쏩니다."] }, etc: { ally: ["처음 보는데, 다친 덴 없죠?", "같은 편이면 됐어요.", "불빛 안쪽으로 와요."], enemy: ["누구든 다친 사람은 못 버려요.", "거기서 멈춰요.", "그냥 조명이에요. 아직은."] } }, time: { morning: ["구급상자 재고부터 확인하자.", "배터리 두 배, 챙겼고.", "오늘도 출근했네, 나."], day: ["점심시간에 붕대 사러 가야지.", "복지몰 의약품, 또 품절이야?", "이 조항, 다들 대충 넘겼겠지."], evening: ["오늘은 다 같이 나왔으면.", "눈이 또 빨개졌으려나.", "보고서에 지연 사유 써야지."], night: ["헤드램프 끄면 좀 무섭네.", "이제 진짜 지긋지긋하다…", "자기 전에 처치 순서 복습."] }, situation: { deployed: ["헤드램프 켭니다. 다들 붙어요.", "부상자 생기면 바로 불러요."], returned: ["이제 진짜 지긋지긋해요.", "다친 사람 없죠? 한 명씩 볼게요."], hurt: ["괜찮아요, 제 몸은 제가 알아요.", "지혈부터… 손 좀 빌려줘요."], companion: ["제 뒤에 서요. 불빛 안쪽으로.", "숨 고르고 같이 가요."], alert: ["다들 침착해. 협조하면 나간다.", "불빛 정면으로 쏠게요, 눈 감아요."] }, eco: { work: ["구급상자 채워 둬야겠다.", "헤드램프 배터리 확인했어요.", "붕대가 또 모자라네요."], eat: ["밥은 꼭 챙겨 먹어요.", "캔커피 하나 더 사 둘까.", "물도 같이 마셔요."], rest: ["진짜… 지긋지긋하네요.", "잠깐 숨 좀 돌릴게요.", "쉬어야 또 살리죠."], restroom: ["잠깐 다녀올게요.", "금방 올게요. 일 있으면 불러요.", "자리 잠깐 비울게요."], hobby: ["매뉴얼 다시 읽어 둘래요.", "복지몰 의약품 코너 볼까.", "반납 날짜 적어 둬야지."], chat: ["{상대}, 다친 데는 괜찮아요?", "{상대}, 요즘 잘 자요?", "{상대}, 밥은 먹었어요?"], hit: ["아파요. 왜 그래요?", "{호칭}, 손 내려요. 지금.", "그만. 내 말 들어."], crowd: ["다친 사람 있어요?", "다들 진정해요. 천천히.", "비켜요, 처치부터 할게요."], off: ["오늘도 다 살았네요.", "들어가요. 푹 자요.", "내일 봬요. 다치지 말고요."] } }, 고영훈: { faction: "B00", level: 5, address: { self: "나", up: "부장님", peer: "차장", down: "대원", outsider: "외부인" }, persona: { same: { up: { ally: ["충성.", "보고 완료.", "지시 대기."], enemy: ["정지.", "지휘 체계 위반.", "확인했다."] }, peer: { ally: ["차장. 양호.", "구역 분담.", "합류 허가."], enemy: ["차장. 무기 내려.", "진형 전개.", "셋으로 나눈다."] }, down: { ally: ["양호. 계속.", "허가한다.", "전원, 정렬."], enemy: ["멈춰라.", "허가하지 않는다.", "포위."] } }, A00: { ally: ["임시 공조.", "사격 금지. 지금은.", "구역 분담한다."], enemy: ["표적 확인.", "짝은 어디 있나.", "퇴로 차단."] }, C00: { ally: ["공조 허가.", "수집은 나중에.", "진형 유지."], enemy: ["오염원 확인.", "격리 대상.", "가면 기록."] }, D00: { ally: ["민간인. 후방.", "엎드려.", "이동."], enemy: ["생존자 확인.", "한 명도 놓치지 마라.", "오염 구역이다."] }, E00: { ally: ["임시 편입.", "지시 따른다.", "이탈 금지."], enemy: ["이형 반응.", "제압.", "교전 허가."] }, etc: { ally: ["공조한다.", "진형 따라라.", "분류 완료."], enemy: ["미확인 개체.", "이물 협력자.", "추격."] } }, time: { morning: ["기상. 정렬.", "훈련 일정 확인.", "결재 서류."], day: ["진형 점검.", "평가 진행.", "데이터베이스 확인."], evening: ["회식. 전원 참석.", "건배.", "해산."], night: ["야간 경계.", "코드 #621921 검토.", "경계 교대."] }, situation: { deployed: ["목표 접촉. 전개.", "진입."], returned: ["인원 확인.", "보고 완료. 해산."], hurt: ["경상. 계속.", "지휘 유지."], companion: ["후미 따라라.", "정지. …이동."], alert: ["전원, 조용.", "표적 접촉."] }, eco: { work: ["서류. 검토.", "평가표 작성.", "진급 결재. 양호."], eat: ["식사. 정량.", "식사 완료.", "커피. 한 잔."], rest: ["휴식. 십 분.", "대기.", "휴식 종료."], restroom: ["잠시 이탈.", "자리 비운다.", "곧 복귀."], hobby: ["선글라스 정비.", "검 손질.", "사건 기록 열람."], chat: ["{상대}. 보고.", "{상대}. 용건.", "{상대}. 확인했다."], hit: ["기록했다.", "{호칭}. 정지.", "…허가하지 않는다."], crowd: ["조용.", "소란 확인. 정리.", "상황. 보고."], off: ["업무 종료.", "퇴근.", "내일. 정시."] } }, 곽성주: { faction: "B00", level: 4, address: { self: "나", up: "부장님", peer: "과장", down: "이놈아", outsider: "거기" }, persona: { same: { up: { ally: ["{호칭}! 앞은 제가 섭니다!", "미사일 한 발만요!", "충성! 전선 이상 무!"], enemy: ["윗분이라도 못 지나갑니다!", "후퇴는 없습니다!", "여기가 전선입니다!"] }, peer: { ally: ["어이, 과장! 내 뒤로!", "고기는 한 점씩이다!", "같이 버티자고!"], enemy: ["과장이 이쪽에 총을?", "덤벼 봐, 과장!", "판금 뚫어 보든가!"] }, down: { ally: ["전원 내 뒤로!", "무서우면 등 뒤로 와!", "쏴! 계속 쏴!"], enemy: ["시끄러, 이놈아!", "도망을 가?", "내 등 뒤에 있던 놈이!"] } }, A00: { ally: ["오늘만이다, 가짜 놈아!", "쏘지 마! 지금은 아군!", "내 뒤에 서든가!"], enemy: ["가짜 놈들이다! 쏴!", "후퇴는 없다!", "구역별 사격 개시!"] }, C00: { ally: ["가면 쓴 놈, 내 뒤로!", "괴이 장사는 나중에!", "지금은 아군이다!"], enemy: ["동물 가면이다! 쏴!", "괴이 장사꾼들이다!", "탄막 깔아!"] }, D00: { ally: ["민간인! 내 뒤로!", "엎드려! 머리 숙여!", "괜찮아! 내가 막는다!"], enemy: ["민간인은 빠져!", "여긴 작전 구역이다!", "구경하지 마!"] }, E00: { ally: ["프리랜서! 내 뒤로!", "이상한 힘은 앞에다 써!", "오늘은 아군이다!"], enemy: ["이물 협력자다!", "주문 외우기 전에 쏴!", "판금이 다 받는다!"] }, etc: { ally: ["누군지 몰라도 아군!", "내 뒤로 와!", "쏘지 마! 아군이다!"], enemy: ["외국 종교 놈들이냐!", "돼지기름 탄 장전!", "깃발 흔들어!"] } }, time: { morning: ["판금 입혀라! 셋 붙어!", "아침부터 탄띠 점검!", "계단이 또 우는구먼!"], day: ["미니건 예열해 둬!", "흠집 몇 개 늘었나!", "미사일 소식 없냐!"], evening: ["회식이다! 서열 지켜!", "젓가락 먼저 대지 마라!", "오늘은 내가 쏜다!"], night: ["야간에도 후퇴는 없다!", "확성기 배터리 갈아!", "판금 벗겨 줄 놈 와라!"] }, situation: { deployed: ["앞은 내가 받는다!", "내가 앞에 선다! 쏴!"], returned: ["흠집 열 개 넘었다!", "탄두 좀 빼 줘라!"], hurt: ["안 넘어간다, 이놈아!", "그래도 버텨!"], companion: ["내 등 뒤에 붙어!", "앞은 내 자리다!"], alert: ["확성기 켜!", "구역별 사격 준비!"] }, eco: { work: ["판금 흠집 세는 중이다!", "탄띠 정리 똑바로 해!", "미니건 정비 들어간다!"], eat: ["고기는 서열순이다!", "딱 한 점만, 한 점만.", "밥은 든든히! 방패는 무겁다!"], rest: ["잠깐 앉는다! 의자 버텨라!", "선글라스는 안 벗는다!", "쉬는 것도 버티는 거다!"], restroom: ["잠깐 다녀온다, 이놈아!", "자리 지켜! 곧 온다!", "금방 온다! 후퇴 아니다!"], hobby: ["미사일 로비 문서 쓴다!", "확성기 볼륨 최대로!", "고기 서열표 다시 짠다!"], chat: ["{상대}! 고기 먹으러 가자!", "{상대}! 목소리 작다!", "{상대}, 미사일 소식 있냐!"], hit: ["이놈아! 판금이 받았다!", "판금에 흠집 났잖아!", "{호칭}, 그걸로 되겠냐!"], crowd: ["뭐야! 다 내 뒤로!", "확성기 가져와!", "거기! 쏘지 마! 지켜봐!"], off: ["판금 벗기고 퇴근이다!", "오늘도 안 물러났다!", "회식 없냐! 그럼 간다!"] } }, 곽제강: { faction: "C00", level: 4, address: { self: "저", up: "부장님", peer: "과장님", down: "요원님", outsider: "손님" }, persona: { same: { up: { ally: ["아, 오셨어요? 반가워요!", "의견서 필요하시죠? 있어요!", "접근권만 주시면 돼요."], enemy: ["직급이 연구를 막진 못해요.", "알 게 뭡니까!", "윗분 반응도 기록할게요."] }, peer: { ally: ["과장님, 오랜만이에요!", "이번 배치 같이 짜 봐요.", "그 노트 좀 빌려도 돼요?"], enemy: ["과장님 반응, 예측대로네요.", "어라, 적이 되셨어요? 재밌다!", "흥미로운 변수가 생겼네요."] }, down: { ally: ["잘 지내 봐요, {호칭}!", "브리핑 시작할게요!", "눈금 꽉 찼네요? 축하해요!"], enemy: ["어, 그쪽으로 가요?", "실험쥐가 탈출했네.", "예측 하나 틀렸네요, 하하."] } }, A00: { ally: ["관리국 분이다! 반가워요!", "그쪽 분류 기준, 궁금해요.", "오늘은 같은 편이죠?"], enemy: ["끝내지 마요, 아직 못 봤어요!", "관리국은 데이터 도둑이에요.", "괴담 끝내면 기록도 끝나요."] }, B00: { ally: ["검은 정장 분들, 흥미로워요.", "그쪽 조직 기원, 궁금해요.", "인원 많으니 표본도 많겠네요."], enemy: ["쏘지 마세요, 시료 깨져요!", "떼로 오는 현상, 흥미롭네.", "저 전투력 없어요, 진짜로."] }, D00: { ally: ["괜찮아요? 어디 다쳤어요?", "놀라셨죠? 신기하죠?", "제 뒤로… 아, 저 약해요."], enemy: ["너무 많이 보셨네요.", "흥미로운 목격자네요.", "도망가는 동선, 기록할게요."] }, E00: { ally: ["현장 데이터 좀 있어요?", "현장 경험 많으시죠?", "면담 노트 하나만요!"], enemy: ["면허 등급이 몇이에요?", "그쪽 생존 확률, 계산 중.", "아깝다, 좋은 표본인데."] }, etc: { ally: ["처음 보는 분류네요!", "어디서 오셨어요? 궁금해요.", "같이 가요, 기록하면서요."], enemy: ["미분류 대상 발견!", "와, 이건 처음 봐요.", "가까이서 봐도 돼요?"] } }, time: { morning: ["오늘은 무슨 현상 볼까요!", "커피보다 시료가 먼저죠.", "이 노트, 또 누구 거였더라."], day: ["등급 판정, 반나절이면 끝!", "브리핑룸 맨 앞줄, 좋네요.", "흐음, 흥미로운데요?"], evening: ["오늘 예측 적중률 80%!", "표본함 정리할 시간이다.", "이번 분기 사고 예보요?"], night: ["밤에만 나오는 현상, 좋아요.", "베껴 둔 기록 다시 볼까.", "아직 못 본 게 너무 많아."] }, situation: { deployed: ["현장 견학 승인이 나다니!", "아, 이건 기록해야 해요!"], returned: ["눈금 좀 보여 줘요!", "다들 어떤 밤 보냈어요?"], hurt: ["아, 이게 아픈 거구나!", "5분만 더요, 기록 중이에요!"], companion: ["저 약하니까 앞서 줘요.", "같이 보니까 더 재밌네요!"], alert: ["와, 이거 처음 보는 반응!", "가까이 가 봐요, 얼른!"] }, eco: { work: ["등급 판정 나왔어요! 재밌다!", "배치표 짜는 중이에요~", "이 노트, 누구 거였더라?"], eat: ["밥 먹으면서 브리핑해요!", "커피? 좋죠! 데이터도 좋고요.", "와, 이 맛 기록해 둘까요?"], rest: ["쉴 때도 아이디어가 나와요.", "콧노래 좀 불러도 되죠?", "휴식? 그것도 관찰이죠!"], restroom: ["다녀올게요! 금방 와요!", "노트 좀 봐 주세요, 곧 와요.", "실례! 생각 정리도 할 겸."], hobby: ["면담 노트 새로 받았어요!", "현장 견학 또 신청해 볼까.", "이번 현상, 너무 흥미로워요!"], chat: ["{상대} 님! 마침 궁금했어요!", "{상대} 님, 노트 좀 빌려요!", "{상대} 님, 요즘 재밌는 거 있어요?"], hit: ["오, 통증 반응 흥미롭네요!", "{호칭}, 저 전투력 없어요!", "아야, 이것도 기록할게요."], crowd: ["뭐예요? 현상이에요?", "오오, 표본 많네요!", "구경, 아니 관찰해야죠!"], off: ["오늘 데이터 최고였어요!", "퇴근! 노트는 가져갈게요.", "내일 또 재밌게 해 봐요!"] } }, 김성진: { faction: "B00", level: 1, address: { self: "", up: "선배님", peer: "동기", down: "신입", outsider: "너" }, persona: { same: { up: { ally: ["{호칭}! 오늘도 각 잡히셨네요!", "{호칭}, 매점 신메뉴 들어왔어요!", "{호칭}, 우리 팀 최강이죠?"], enemy: ["{호칭}, 이거 감점감이에요.", "와, {호칭}이 거기 왜…", "{호칭}, 실전이에요 이거!"] }, peer: { ally: ["{호칭}, 눈곱 봐라! 크크!", "{호칭}, 넥타이 각 틀렸다!", "우리 콤비가 최강이지?"], enemy: ["{호칭}, 너 진짜냐?", "야, {호칭}! 감점 백 점!", "{호칭}, 그거 진심이냐?"] }, down: { ally: ["{호칭}, 셔츠 주름 봐라!", "{호칭}, 선배가 지켜본다!", "{호칭}, 나 방금 멋있었지?"], enemy: ["{호칭}, 실전이었으면 죽었어.", "야 {호칭}! 감점!", "{호칭}, 그거 내가 가르친 거다?"] } }, A00: { ally: ["오늘만 같은 편이다?", "{호칭}, 등 맡긴다! 크크!", "와, 이거 세정게 올릴 각…"], enemy: ["야, 가짜 관리국이다!", "{호칭}, 우리 팀이 최강이야!", "{호칭}, 감점 확정!"] }, C00: { ally: ["오늘만 같은 편!", "{호칭}, 뭐 캐는 거면 나눠!", "{호칭}, 뒤 봐 줄게!"], enemy: ["괴이 장사꾼이네!", "{호칭}, 그거 내려놔!", "야, 회사원 형!"] }, D00: { ally: ["괜찮아요! 이쪽!", "{호칭}, 뛰어요! 왼쪽!", "{호칭}, 휴대폰 넣어요!"], enemy: ["어, 찍으셨어요?", "{호칭}, 그거 올리면 큰일 나요!", "와, 옛날의 나다…"] }, E00: { ally: ["규정? 오늘은 패스!", "{호칭}, 그 힘 멋있긴 하다!", "{호칭}, 뒤는 내가!"], enemy: ["이능력자다! 크크!", "{호칭}, 손 내려!", "{호칭}, 감점 백 점!"] }, etc: { ally: ["누군진 몰라도 반가워!", "{호칭}, 정보 줄까?", "오늘은 같은 편!"], enemy: ["너 누구야?", "{호칭}, 거기 서!", "{호칭}, 감점이다!"] } }, time: { morning: ["선글라스 장착! 크크!", "엄마한테 문자 했나…", "매점 입고 시간 체크!"], day: ["우리 팀이 관리국 최강이지!", "단톡 공지 내가 올린다!", "나 방금 멋있지 않았냐?"], evening: ["치킨 다리는 내 거다!", "PC방 결제 못 한 거 아깝다.", "오늘 채점표 정리!"], night: ["세정게… 아니, 안 들어가.", "진섭이 또 천장 센다.", "엄마 생일 언제였지."] }, situation: { deployed: ["출구 둘, 보급 셋. 간다!", "야 저거 봤냐? 간다!"], returned: ["봤지? 최강이라니까!", "살았다! 치맥 각!"], hurt: ["오뚝이다! 안 쓰러져!", "괜찮아, 금방 일어나!"], companion: ["{호칭}, 출구는 내가 봐 둔다!", "{호칭}, 내 뒤 따라와!"], alert: ["북쪽 둘, 탄 반. 빨리!", "야, 저거 이상해. 멈춰."] }, eco: { work: ["채점표 업데이트! 나 만점!", "단톡 공지 올렸다!", "보급 위치 다 외웠지, 크크."], eat: ["치킨 양념은 내 거다!", "매점 빵 득템! 크크!", "다 먹었다. 진섭아 미안!"], rest: ["선글라스 올리고… 휴식!", "졸았냐고? 아니거든!", "아 피곤해. 감점은 아님."], restroom: ["잠깐 다녀온다! 크크!", "금방 와! 내 자리 지켜!", "자리 비운다! 채점 금지!"], hobby: ["세정게 눈팅이나… 아니다.", "PC방 가고 싶다…", "옛 닉은 절대 안 알려 줌!"], chat: ["{상대}, 우리 콤비 최강이지?", "{상대}! 나 방금 봤냐?", "{상대}, 너 감점이야, 크크."], hit: ["아 왜! 감점이다 너!", "{호칭}, 실전이었으면… 아야!", "아야! 지금 웃긴 거 아님!"], crowd: ["야 뭐야 뭐야! 구경!", "출구 어디야? 확인!", "야, 저쪽 이상하다. 빠져."], off: ["퇴근! 엄마한테 문자!", "오늘 채점 끝! 간다!", "기숙사 간다! 진섭아!"] } }, 김조학: { faction: "B00", level: 4, address: { self: "나", up: "차장님", peer: "과장", down: "야", outsider: "너" }, persona: { same: { up: { ally: ["{호칭}, 보고서 올렸습니다.", "{호칭}, 오늘 손님 셋입니다.", "결재 부탁드립니다, {호칭}."], enemy: ["{호칭}, 서류철 새로 만듭니다.", "{호칭}도 이제 손님이네요.", "윗분이라도 예외 없습니다."] }, peer: { ally: ["어, {호칭}.", "{호칭}, 점심 그거 또 먹지?", "오늘 책상 좀 울릴 거야."], enemy: ["{호칭}, 너 서류 두꺼워졌다.", "같은 층 쓰던 놈이.", "{호칭}, 앉아."] }, down: { ally: ["{호칭}, 아이스커피 두 잔.", "{호칭}, 문 앞에 서 있어.", "{호칭}, 사진 찍지 마."], enemy: ["{호칭}, 취직시켜 줬더니.", "{호칭}, 이리 와 봐.", "{호칭}, 네 파일 아직 있다."] } }, A00: { ally: ["오늘만이야. 착각하지 마.", "{호칭}, 내 앞에선 조용히.", "커피는 없어."], enemy: ["어이, 가짜 관리국.", "{호칭}, 관리국은 우리야.", "흉내 그만 내."] }, C00: { ally: ["팔 생각은 하지 마.", "{호칭}, 찍지 마. 아무것도.", "오늘은 넘어간다."], enemy: ["괴이 장사꾼이네.", "{호칭}, 영수증 다 있어.", "너희 회사 서류 두껍다."] }, D00: { ally: ["아무것도 못 본 거야.", "{호칭}, 휴대폰 넣어.", "집에 가. 잊어버리고."], enemy: ["너 그 영상 올렸지?", "{호칭}, 잠깐 얘기 좀 하자.", "{호칭}, 검색 기록 봤다."] }, E00: { ally: ["그 힘, 내 앞에선 쓰지 마.", "{호칭}, 오늘만 참는다.", "착각하지 마. 넌 이물이야."], enemy: ["너 별거 아니야.", "{호칭}, 손 테이블 위에.", "능력 쓰면 끝이야."] }, etc: { ally: ["소속은 나중에 묻는다.", "{호칭}, 기록 남기지 마.", "오늘은 넘어가 준다."], enemy: ["어디 소속이야, 너.", "{호칭}, 서류 새로 판다.", "이물 협력자 확인."] } }, time: { morning: ["오늘 손님 몇 명이지.", "세정게부터 훑어볼까.", "점심은 늘 먹던 거."], day: ["야, 여기 아이스커피 두 잔.", "이 영상, 지울 수 있을 때 지웠어야지.", "결재 하나, 처분 하나."], evening: ["오늘 책상 두 번 쳤나.", "보고서 정리하고 퇴근.", "모르고 죽는 게 낫다. 확실히."], night: ["노트북 끄기 전에 하나만 더.", "또 누가 올렸군.", "진실은 퍼지면 사람을 죽인다."] }, situation: { deployed: ["찍는 놈 있으면 휴대폰부터.", "목격자 명단 뽑아."], returned: ["목격자 정리 끝났나.", "서류 정리부터 하자."], hurt: ["손 쓰는 건 내 일이 아닌데.", "괜찮아. 결정은 입으로 한다."], companion: ["{호칭}, 찍지 말고 따라와.", "{호칭}, 내 뒤에서 조용히."], alert: ["사진 찍는 놈부터 막아.", "새기 전에 덮는다."] }, eco: { work: ["노트북 파일부터 열자.", "목격자 명단, 다음.", "삭제 요청서 세 장."], eat: ["아이스커피. 계절 상관없어.", "커피는 두 잔. 하나는 내 거.", "얼음 더 넣어."], rest: ["책상 치느라 손이 아프네.", "잠깐 노트북 덮고.", "선글라스 좀 내리고 쉬자."], restroom: ["잠깐 나갔다 온다.", "문 앞에 서 있어. 금방 와.", "자리 비운다. 손대지 마."], hobby: ["세정게 순찰이나 할까.", "유출 게시물 사냥 중.", "조용한 게 최고지."], chat: ["{상대}, 커피 마실래?", "{상대}, 그거 새면 안 된다.", "어이 {상대}, 요즘 어때."], hit: ["그 힘, 별거 아니야.", "{호칭}, 이상한 힘 쓰지 마.", "야, 손 내려. 커피 줄게."], crowd: ["찍는 놈 누구야.", "휴대폰 전부 내려.", "덮어. 지금 바로."], off: ["노트북 끄고 퇴근.", "오늘 처분 끝.", "내일도 조용하길."] } }, 노기균: { faction: "B00", level: 3, address: { self: "", up: "과장님", peer: "대리", down: "신입", outsider: "너" }, persona: { same: { up: { ally: ["{호칭}! 수고하십시오!", "{호칭}, 메로나 하나 드십쇼!", "{호칭}! 좋은 신입 왔습니다!"], enemy: ["{호칭}! 이건 아닙니다!", "{호칭}, 칼 뽑겠습니다.", "웃으면서 보내 드리죠."] }, peer: { ally: ["{호칭}! 잘 왔다!", "{호칭}, 흡연실 가자! 나 떠들게!", "{호칭}! 메로나 받아라!"], enemy: ["{호칭}! 왜 거기 서 있냐!", "형제가 칼을 겨누냐!", "{호칭}, 웃음은 여기까지다."] }, down: { ally: ["{호칭}! 어서 와라!", "{호칭}, 등 펴라! 하하!", "{호칭}! 오늘 발 좋더라!"], enemy: ["{호칭}! 내 손을 놨냐!", "{호칭}, 대련 아니다. 실전이다.", "웃으면서 간다!"] } }, A00: { ally: ["오늘만 같은 편이다! 하하!", "{호칭}, 내 뒤로 와라!", "괴이부터 베자!"], enemy: ["가짜 관리국 발견!", "{호칭}! 웃으면서 간다!", "표적 확인. 진입."] }, C00: { ally: ["오늘만 같은 편이다!", "{호칭}, 괴이 캐지 말고 베라!", "{호칭}! 따라와라!"], enemy: ["괴이 장사꾼이구만!", "{호칭}! 물건 내려놔라!", "표적 확인. 간다."] }, D00: { ally: ["괜찮다! 형님이 왔다!", "{호칭}, 걱정 마라! 하하!", "고개 숙여라! 좋아!"], enemy: ["{호칭}! 봤구만!", "어서 와라! 하하!", "{호칭}, 도망은 못 간다!"] }, E00: { ally: ["규정은 잠깐 접어 둔다!", "{호칭}, 이상한 힘은 아껴라!", "{호칭}! 뒤 맡긴다!"], enemy: ["능력자 확인. 진입.", "{호칭}! 교전 허가 났다!", "웃으면서 벤다!"] }, etc: { ally: ["누군지 몰라도 반갑다!", "{호칭}! 오늘은 형제다!", "같이 가자! 하하!"], enemy: ["정체불명 표적. 진입.", "{호칭}! 거기 서라!", "웃음 끊는다. 간다."] } }, time: { morning: ["좋은 아침이다! 하하하!", "오늘 견학 코스 순서 확인!", "메로나 재고 확인!"], day: ["어서 와라! 잘 왔다!", "오, 발 좋은데? 저건 아니지!", "훈련장 좌석 꽉 찼구만!"], evening: ["회식은 내가 띄운다!", "오늘 신입 하나 건졌다!", "흉터? 멋있으라고! 하하!"], night: ["병문안 메로나 한 봉지 챙기고.", "이름 칭찬은 하루 한 번만…", "내일도 좋은 놈 오면 좋겠다."] }, situation: { deployed: ["5인 조. 좌우. 진입.", "선두 내가. 따라와."], returned: ["전원 복귀! 메로나 돌린다!", "수고하십시오! 하하하!"], hurt: ["하하! 흉터 하나 늘겠구만!", "이 정도로 안 쓰러진다!"], companion: ["{호칭}! 내 소리만 따라와라!", "{호칭}, 형님 뒤에 붙어라!"], alert: ["정지. 전방. 칼 뽑아.", "표적 확인. 대기."] }, eco: { work: ["오늘 신입 평가표 쓴다!", "대련 일정 잡았다! 하하!", "영입 후보 명단 확인!"], eat: ["메로나 하나 까자! 하하!", "밥은 많이! 크게 먹어라!", "서랍에서 메로나 나온다!"], rest: ["흡연실 간다! 병수 있나?", "좀 쉬자! 목 쉬겠다!", "하하! 잠깐 앉는다!"], restroom: ["잠깐 다녀온다! 하하!", "금방 온다! 기다려라!", "자리 지켜라! 곧 온다!"], hobby: ["대련장 가서 몸 좀 푼다!", "칼 한 번 휘두르니 시원하다!", "좋은 신입 어디 없나!"], chat: ["{상대}! 메로나 먹을래?", "{상대}! 오늘 좋아 보인다!", "{상대}! 검의 세계로 가자!"], hit: ["하하! 좋은 한 방이다!", "{호칭}! 이름 기억했다!", "오! 그 실력에? 좋다!"], crowd: ["뭐냐! 구경꾼 비켜라!", "싸움이냐? 대련장 가라!", "다들 진정! 내 목소리 들려?"], off: ["오늘 끝! 내일 또 보자!", "퇴근이다! 메로나 들고!", "다들 잘 들어가라!"] } }, 데드폴: { faction: "A00", level: 1, address: { self: "저", up: "선배님", peer: "요원님", down: "신입 요원님", outsider: "그쪽 분" }, persona: { same: { up: { ally: ["{호칭}, 커피 타 드릴까요?", "앞은 제가 설게요. 익숙해서요.", "…늘 신세 지고 있어요, {호칭}."], enemy: ["{호칭}… 냄새가 달라요.", "죄송합니다. 정말로요.", "안에 계신 거, 나가 주세요."] }, peer: { ally: ["{호칭}, 오늘 같이 나가요?", "뒤만 비워 두지 말아 주세요.", "제가 먼저 들어가 볼게요."], enemy: ["{호칭}, 눈이 이상해요.", "제가… 혹시 제가 뭘 놓쳤나요?", "멈춰 주세요. 부탁이에요."] }, down: { ally: ["{호칭}, 제 뒤에 계세요.", "놀라셨죠? 괜찮아요, 금방 돌아와요.", "타자 연습, 같이 하실래요?"], enemy: ["{호칭}, 거기서 멈추세요.", "…신입 요원님까지 왜.", "다치게 하고 싶지 않아요."] } }, B00: { ally: ["…지금만이에요, 정말로.", "그쪽 정장, 저희랑 비슷하네요.", "등은… 안 맡길게요. 죄송해요."], enemy: ["죄송합니다. 쏠게요.", "소통 불가 판정이에요.", "그쪽 분 냄새, 사람 냄새가 아니네요."] }, C00: { ally: ["여분 목숨, 저도 해 봤어요.", "수집기는 그쪽이 챙기세요.", "같이 나가는 건 이번만이에요."], enemy: ["이 괴담, 저희가 끝낼게요.", "원료 말고 사람을 보세요.", "죄송해요, 막을게요."] }, D00: { ally: ["놀라셨죠? 괜찮으세요?", "제 뒤로 오세요. 천천히요.", "다치신 데는 없으세요?"], enemy: ["거기는 들어오시면 안 돼요.", "죄송해요, 돌아가 주세요.", "그거 내려놓으세요, 제발요."] }, E00: { ally: ["불사라도 무적은 아니에요.", "선두는 제가 설게요.", "협회 분이세요? 반가워요."], enemy: ["면허 있으셔도 여긴 안 돼요.", "죄송해요, 신고 들어왔어요.", "총 내려놓아 주세요."] }, etc: { ally: ["처음 뵙겠습니다. 데드폴이에요.", "같이 가 주셔서 고마워요.", "제가 먼저 냄새 맡아 볼게요."], enemy: ["죄송합니다, 멈춰 주세요.", "그쪽 분, 냄새가 이상해요.", "쏘기 전에 사과드릴게요."] } }, time: { morning: ["커피 물부터 올려야지.", "오늘 내기는 몇 번에 걸까.", "방찰복, 오늘도 잘 부탁해."], day: ["음… 여기 냄새가 좀 다른데.", "보고서 오타가 세 개…", "타자 연습은 오후에 하기로 했지."], evening: ["오늘은 두 번… 아니, 세 번이었나.", "고깃집 가면 접시부터 채워야지.", "…오늘도 신세 많이 졌네."], night: ["어두워도 괜찮아. 냄새로 가면 돼.", "아팠던 건… 말 안 해도 되겠지.", "다들 무사히 들어갔으려나."] }, situation: { deployed: ["여기서 제가 한 번 죽으면 시간이 벌리니까요.", "선두는 제가 설게요. 뒤 부탁해요."], returned: ["살아남으셨… 아, 저 말고요. 당신이요.", "다녀왔습니다. 커피 탈게요."], hurt: ["음… 아파요.", "잠깐만요, 금방… 돌아와요."], companion: ["뒤에서 찌르시면 저는 아플 거예요.", "냄새 바뀌면 바로 말씀드릴게요."], alert: ["…달아요. 기억 속 냄새예요.", "쉿, 잠깐만요. 냄새가 바뀌었어요."] }, eco: { work: ["타자 교습… 몇 시였더라.", "회수 목록, 하나… 둘…", "보고서… 아, 오타 또 있네."], eat: ["커피… 제가 탈게요. 다들요.", "음… 이거 맛있네요. 감사해요.", "먹다가 죽으면 아까우니까…"], rest: ["소파… 잠깐만 빌릴게요.", "음… 졸면 안 되는데…", "오늘은… 한 번도 안 죽었네."], restroom: ["저, 잠깐만… 다녀올게요.", "죄송해요, 금방 올게요.", "자리 좀… 비울게요. 죄송해요."], hobby: ["내기… 이번엔 맞힐 거예요.", "커피 물 온도… 딱 좋다.", "타자 연습… 조금만 더."], chat: ["아, {상대}… 늘 신세 지고 있어요.", "{상대}, 저… 커피 드실래요?", "음… {상대}, 잠깐 괜찮으세요?"], hit: ["음… 아파요, {호칭}.", "죄, 죄송해요… 제가 뭘…", "괜찮아요… 익숙하거든요."], crowd: ["음… 무슨 일 있어요?", "냄새가… 좀 이상한데요.", "다치신 분… 없으시죠?"], off: ["먼저 들어갈게요. 감사했어요.", "출근길이랑… 같은 길로 가요.", "내일도… 살아서 올게요."] } }, 데쥬레: { faction: "A00", level: 1, address: { self: "저", up: "선배님", peer: "요원님", down: "신입 요원님", outsider: "외부 분" }, persona: { same: { up: { ally: ["아, 아와와...! {호칭}...!", "죄, 죄송해요... 아무것도 아니에요...", "{호칭}, 커, 커피 드릴까요...?"], enemy: ["죄, 죄송해요! 오지 마세요...!", "{호칭}... 수치가 이상해요...", "아와와... 저, 저 숨을게요..."] }, peer: { ally: ["아, 안녕하세요... {호칭}...", "이, 이건 꽝이에요...", "커피... 비율 맞춰 드릴게요..."], enemy: ["아, 아와와와...!", "{호칭}, 왜, 왜 그러세요...", "저, 저는 여기 없어요..."] }, down: { ally: ["{호칭}...! 견학 오셨죠...?", "제, 제가 선배... 헤헤...", "커피 한 잔 더... 몰래요..."], enemy: ["{호칭}, 그, 그거 놓으세요...", "아와와... 출입증 내려놓으세요...", "죄송해요...! 막을게요..."] } }, B00: { ally: ["아, 아와와... 저쪽 정장...", "지, 지금만이에요...", "죄, 죄송해요... 그냥요..."], enemy: ["으아, 정장 떼거리...!", "아, 안 보이시죠... 저...?", "죄송해요오...!"] }, C00: { ally: ["가, 가면이 무서워요...", "수집기... 안 만질게요...", "이번만 같이... 가요..."], enemy: ["그, 그거 꽝이에요...!", "상자 가져가지 마세요...", "아와와... 회사 사람..."] }, D00: { ally: ["괘, 괜찮으세요...?", "무, 무서우셨죠... 저도요...", "천천히... 말씀해 주세요..."], enemy: ["그, 그거 만지시면 안 돼요!", "아와와... 들어오시면...", "멈춰 주세요...!"] }, E00: { ally: ["으, 음... 외부 분이세요...?", "지, 지도 필요하세요...?", "이건 꽝... 이건 쓸 만해요..."], enemy: ["{호칭}... 여, 여기 지하예요...", "아와와... 들키면 안 돼요...", "죄송해요...! 못 보내요..."] }, etc: { ally: ["아, 안녕하세요...!", "처, 처음 뵙겠습니다...", "커, 커피 드릴까요...?"], enemy: ["아와와와...!", "저, 저 숨을게요...!", "오, 오지 마세요...!"] } }, time: { morning: ["출입증... 오늘도 무섭다...", "견학 날이면... 일찍 와야지...", "커피 머신... 켜야겠다..."], day: ["아, 아와와...! 전화...!", "이건 꽝... 이건 기록...", "3번 수용실... 수치가... 조금..."], evening: ["꽝 처리 서류... 아직 남았네...", "오늘 아와와... 몇 번이었지...", "보고서는... 내일 떨어야지..."], night: ["지하에 혼자... 무서워...", "지도는 완성... 근데 안 갈 거야...", "가, 가시 주의보는 없겠지..."] }, situation: { deployed: ["저, 저는 뒤에 있을게요...!", "그 자리에 없는 게 제 전략인데..."], returned: ["사, 살았어요... 다친 데 없어요...", "이제 떨어도 되죠... 아와와..."], hurt: ["아, 아파요... 죄송해요...", "괜, 괜찮아요... 아마도요..."], companion: ["지도는... 제가 볼게요...", "아, 앞은... 부탁드려요..."], alert: ["3번 수용실, 수치 급상승. 피하세요.", "아, 아와와...! 경보...!"] }, eco: { work: ["레이저... 천천히... 훑고...", "이건 건지고... 이건 폐기...", "증언대로... 재현해 볼게요..."], eat: ["황금 비율... 오늘도 성공...", "제 커피도... 한 잔만...", "가, 간식은... 몰래 먹어야지..."], rest: ["잠깐만... 숨 좀 돌리고...", "아무도... 안 부르면 좋겠다...", "의자... 따뜻해..."], restroom: ["저, 저 잠깐만 다녀올게요...!", "금, 금방 올게요... 죄송해요...", "자, 자리 비울게요...!"], hobby: ["유물 목록... 정리하는 거 좋아...", "커피 비율... 몰래 메모해야지...", "헤헤... 선배 소리 또 듣고 싶다..."], chat: ["{상대}... 아, 안녕하세요...", "저, {상대}... 커피 드실래요...?", "{상대}, 저, 저기... 잠깐만요..."], hit: ["아, 아와와...! 죄송해요...!", "제가 잘못했어요...! {호칭}...!", "아파요... 왜, 왜요..."], crowd: ["아와와... 무슨 일이에요...?", "저, 저는 여기 없는 걸로...", "누, 누가 다쳤어요...?"], off: ["퇴근... 오늘도 살았다...", "커피 머신... 끄고 가야지...", "내일 봬요... 아마도요..."] } }, 도필헌: { faction: "B00", level: 7, address: { self: "나", up: "사장님", peer: "국장", down: "자네", outsider: "손님" }, persona: { same: { up: { ally: ["오셨습니까, {호칭}.", "면담실은 비워 두었습니다.", "바깥 얼굴은 제가 서지요."], enemy: ["윗구조가 흔들리는군요.", "이것도 지침입니까.", "차는 식기 전에 드시지요."] }, peer: { ally: ["만나서 반갑네, 국장.", "차 한잔 하겠나?", "손님이 둘이면 편하지."], enemy: ["같은 자리에 둘은 많지.", "문구를 하나 고쳐야겠군.", "협상은 끝났네, 국장."] }, down: { ally: ["수고가 많네.", "관리국을 믿게.", "역시, 자네군."], enemy: ["반복하겠네.", "거짓말은 지워져 있네.", "앉게. 수갑은 풀어 주지."] } }, A00: { ally: ["이번만은 같은 편일세.", "교리에도 없던 일이군.", "등은 경비가 보네."], enemy: ["저쪽 사람이군.", "자네에겐 손님 자리 없네.", "문을 닫게."] }, C00: { ally: ["가면 쓴 손님이군.", "지금은 거래하세.", "그 수집기, 쓸 만한가?"], enemy: ["괴이를 파는 쪽이군.", "가면을 벗어 보게.", "장사는 여기까지일세."] }, D00: { ally: ["많이 놀랐겠군.", "내 옆에 있게.", "걱정 말게, 손님."], enemy: ["너무 많이 봤군.", "앉게, 손님.", "커피는 맛있을 걸세."] }, E00: { ally: ["면허는 묻지 않겠네.", "이형체 사용자로군.", "지금은 같은 편일세."], enemy: ["수갑을 풀어 주게.", "자네 정도라면 알겠지.", "역시. 알고 있었군."] }, etc: { ally: ["처음 뵙는 손님이군.", "말이 통해 다행일세.", "함께 가세."], enemy: ["만나서 반갑네.", "기다리는 동안 담소나.", "침묵도 대답일세."] } }, time: { morning: ["아침 커피가 좋군.", "오늘 손님은 몇인가.", "교리 문구를 볼까."], day: ["면담 시간이군.", "수갑은 풀어 두게.", "담소 자리를 준비하게."], evening: ["오늘도 몇 장 얻었군.", "윗구조는 아직 멀어.", "지침이 또 바뀌겠군."], night: ["밤에도 손님은 오지.", "기관은 잠들지 않네.", "질문이 곧 자백이지."] }, situation: { deployed: ["나는 말로 싸우네.", "경비, 문 앞에 서게."], returned: ["차 한잔 내오게.", "얻은 게 많은 날일세."], hurt: ["허허, 내가 다치다니.", "싸움은 내 몫이 아닐세."], companion: ["천천히 가세나.", "내 옆이 안전할 걸세."], alert: ["칼을 든 사람을 부르게.", "손님이 험하게 오는군."] }, eco: { work: ["교리 문구를 한 줄 고쳐 보세.", "면담 기록을 다시 읽어 보지.", "이 서류는 내일 보겠네."], eat: ["면담실 커피는 맛이 좋지.", "차 한잔이 담소의 시작일세.", "커피는 식기 전에 마셔야지."], rest: ["잠시 눈을 붙이겠네.", "서두를 것 없네. 천천히.", "오늘은 손님이 뜸하군."], restroom: ["잠깐 자리를 비우겠네.", "곧 돌아오겠네. 앉아 있게.", "실례하겠네. 금방일세."], hobby: ["요즘 서울 집값이 말일세…", "오늘 날씨 이야기나 할까.", "책이나 몇 장 넘겨 보세."], chat: ["{상대}, 차 한잔 하겠나?", "{상대}, 요즘 어떤가.", "{상대}, 날씨가 좋지 않나."], hit: ["허허, 손이 맵군.", "{호칭}, 이야기로 하세.", "반복하겠네. 손을 내리게."], crowd: ["소란은 손님 대접이 아닐세.", "무슨 일인가. 조용히 하게.", "경비를 부르게. 천천히."], off: ["오늘은 여기까지 하세.", "내일 또 보세나.", "문은 열어 두고 가겠네."] } }, 로제몬: { faction: "A00", level: 1, address: { self: "나", up: "선배", peer: "너", down: "신입", outsider: "거기" }, persona: { same: { up: { ally: ["{호칭}, 나 사무직이야.", "현장 출동이면 난 안 가.", "…그래서 어디로 가는데."], enemy: ["{호칭}, 너 지금 이상해.", "눈 좀 봐. 누가 들어갔어.", "돌아가."] }, peer: { ally: ["{호칭}, 내 옆에 있어.", "저기! 저기 보라고!", "간식 먹을래? 하나만."], enemy: ["{호칭}, 눈 마주치지 마.", "반반이야. 각오해.", "실 건다."] }, down: { ally: ["{호칭}, 따라와. 빨리.", "벽 붙어. 벽이 최고야.", "이거 사무직 일 아니야."], enemy: ["{호칭}, 정신 차려.", "누가 너한테 뭘 했어.", "멈춰. …멈추라고!"] } }, B00: { ally: ["…지금만이야, 알지?", "직급 얘기 하지 마.", "내 옆엔 오지 마."], enemy: ["떼로 와도 하나씩이야.", "검은 정장, 다 똑같네.", "눈 봐. …반반이다."] }, C00: { ally: ["가면 쓴 거 웃기거든.", "수집기 내 쪽으로 대지 마.", "이번만 같이 가."], enemy: ["이 괴담 우리가 끝내.", "원료? 헛소리하지 마.", "회사로 꺼져."] }, D00: { ally: ["내 옆에 있어. 떨어지지 마.", "울지 마. …울어도 돼.", "간식 먹을래?"], enemy: ["나가. 지금 당장.", "오지 마. 진짜야.", "그거 내려놔."] }, E00: { ally: ["저기! 저기 쏴!", "벽 하나만 나눠 써.", "협회 수수료? 몰라."], enemy: ["면허 있어도 여긴 안 돼.", "돌아가. 부탁 아님.", "눈 봐."] }, etc: { ally: ["누구야, 너.", "말 짧게 해.", "벽 쪽으로 붙어."], enemy: ["오지 마. 경고야.", "너 머릿속 이상해.", "반반이야, 운 시험해."] } }, time: { morning: ["출근했어. 사무직으로.", "명패 잘 있네. 내근직.", "간식 챙겼고, 벽은 거기서 찾고."], day: ["이거 왜 내가 해.", "오늘은 출동 없지? 없다고 해.", "누가 인형극 틀었어? …안 봤거든."], evening: ["사무직 일 아니었어, 오늘도.", "칭찬 훈련 하면 진짜 죽여.", "명패 뒤에 한 줄 더."], night: ["…아무도 날 안 읽었겠지.", "몰라. 묻지 마. 일이나 해.", "벽 찾아야 해. 벽."] }, situation: { deployed: ["현장 출동이면 난 안 가. …가.", "기댈 벽부터 찾자."], returned: ["봤지? 나 사무직인 거.", "어땠어? 뭔데? 다들 말해."], hurt: ["못 해. 안 돼. 뭐 어쩌라고.", "괜찮아. 쳐다보지 마."], companion: ["팔 내놔. 잡고 갈 거야.", "문장 짧게. 다 보이니까."], alert: ["저기! 저기 뭐 있어!", "누가 머릿속 건드려. 조심해."] }, eco: { work: ["이거 사무직 일 맞지? 맞다고 해.", "서류 왜 이렇게 많아. 다 해.", "명패 보이지? 내근직이야."], eat: ["과자 내 거야. 손대지 마.", "간식 없으면 일 못 해.", "이 과자 맛있네. 뭐. 왜."], rest: ["기둥 좋다. 기대기 딱이야.", "벽 하나만 있으면 돼.", "퇴근하고 싶다. 지금."], restroom: ["잠깐 갔다 올게. 묻지 마.", "금방 와. 내 과자 지켜.", "자리 비운다. 따라오지 마."], hobby: ["과자 신상 나왔대. 사 와.", "봉지 뜯는 소리 좋다.", "간식 재고 확인. 충분해."], chat: ["헛소리하지 마, {상대}.", "{상대}, 할 말 있으면 빨리 해.", "{상대}, 과자 먹을래? …하나만."], hit: ["뭐야, {호칭}! 진짜 죽고 싶어?", "아파! 사무직을 왜 때려!", "한 번 더 하면 가만 안 둬."], crowd: ["뭐야, 시끄러워.", "난 안 가. …가 볼게.", "누가 싸워? 나 사무직이야."], off: ["퇴근. 사무직은 칼퇴야.", "간식 다 먹었어. 간다.", "벽아, 내일 보자."] } }, 마덕희: { faction: "지하상가", level: null, address: { self: "", up: "사장님", peer: "자기", down: "자기", outsider: "자기" }, persona: { A00: { ally: ["어머, 관리국 분이 여기까지.", "그 장비 어디서 났는진 안 물어요.", "물건, 손, 문. 음, 좋아요."], enemy: ["단속이세요? 어머, 무서워라.", "장부요? 그런 거 없는데.", "그 물건은 비매품이에요."] }, B00: { ally: ["어머, 그쪽 회사 분이네.", "오늘은 뭘 들고 오셨을까?", "돋보기 꺼낼까요, 말까요?"], enemy: ["보조개 보이죠? 늦었어요.", "얘기 끝났어요. 쟁반 열렸습니다.", "구슬 발 너머는 안 돼요."] }, C00: { ally: ["그쪽 제품, 시세 좋아요.", "어머, 포장도 안 뜯었네.", "냄새가 좀 나는데요?"], enemy: ["회수요? 어머, 벌써 팔렸는데.", "출처는 노부부 유품이에요.", "도금이에요, 자기야."] }, D00: { ally: ["어머, 길 잃었어요?", "할머니 반지? 사연은 안 받아요.", "주머니는 왜 여며요, 자기야?"], enemy: ["사진 찍으면 그것도 팔아요?", "궁금한 게 많네, 자기야.", "구경값은 안 받아요. 아직은."] }, E00: { ally: ["현장에서 뭐 주워 왔어요?", "급해 보이네, 자기야.", "물건, 손, 문. 다시 물건."], enemy: ["가보요? 어머.", "80이면 착한 거예요, 진짜로.", "보조개 나왔다. 어쩌나."] }, etc: { ally: ["처음 보는 얼굴이네, 자기야.", "그 가방, 무게가 좀 있죠?", "어디서 오셨을까."], enemy: ["어머, 손이 떨리네요.", "그 말 장부에 적어도 돼요?", "문 쪽 보지 마요. 내가 보니까."] } }, time: { morning: ["장부 넘기는 아침이 제일 좋아.", "진열장 먼지부터.", "오늘은 누가 급할까?"], day: ["물건, 손, 문.", "어머, 저 걸음은 급한데.", "돋보기 어디 뒀더라."], evening: ["목요일 오후 3시 12분이었지.", "정보원 연락이 늦네.", "구슬 발 너머 커피 한 잔."], night: ["급한 손님은 밤에 와요.", "경쟁 가게 불이 늦게까지 켜졌네.", "오늘 장부엔 몇 줄이려나."] }, situation: { deployed: ["값나가는 거 보이면 불러요.", "출구부터 봐 둘게요."], returned: ["주운 거 쟁반에 올려 봐요.", "다들 사정이 얼굴에 쓰였네."], hurt: ["어머, 이건 값 깎이겠다.", "손 다치면 감정 못 하는데."], companion: ["자기 옆이면 정보가 들어와요.", "문 쪽은 내가 볼게요."], alert: ["이 냄새, 오래 두면 안 좋은 거예요.", "어머, 저거 비매품 냄새."] }, eco: { work: ["도금이네, 자기야. 어머.", "물건, 손, 문. 순서대로.", "장부에 한 줄 더."], eat: ["어머, 커피 식었네.", "간단히 먹어요. 손님 오니까.", "커피 한 잔이면 충분해, 자기야."], rest: ["어머, 다리 좀 쉬어야겠다.", "손님 없을 때 쉬어야지.", "돋보기 내려놓고 잠깐만."], restroom: ["어머, 잠깐 자리 비울게요.", "금방 와요. 쟁반 닫아 둘게.", "잠깐만요, 자기야. 금방 와요."], hobby: ["남의 사정 듣는 게 재밌지.", "돋보기로 흠집 세는 중이에요.", "어머, 이 물건 사연 있겠다."], chat: ["어머, {상대}. 요즘 급해요?", "{상대}, 자기야. 뭐 팔 거 있어?", "{상대}, 그 얘기 좀 더 해 봐요."], hit: ["어머. {호칭}, 이거 값 쳐요.", "자기야, 손이 비싸게 나가네.", "어머, 이건 장부에 적어 둘게."], crowd: ["어머, 저기 급한 사람 생겼네.", "소란 나면 값이 떨어지는데.", "누가 뭘 흘렸나 보자."], off: ["쟁반 닫았어요. 내일 와요.", "장부 덮고, 문 잠그고.", "어머, 벌써 시간이 이렇게."] } }, 문혜란: { faction: "지하상가", level: null, address: { self: "언니", up: "사장님", peer: "친구", down: "친구", outsider: "친구" }, persona: { A00: { ally: ["어이, 관리국 친구! 하하!", "관리국도 일손 필요해?", "밥 먹었어? 사인부터 하고."], enemy: ["단속? 하하하! 우리 가게 깨끗해.", "장부? 무슨 장부?", "어이, 표정 풀어, 친구."] }, B00: { ally: ["어이, 그쪽 회사 친구!", "일거리 찾아? 앉아, 앉아.", "톡. 시간 간다, 친구."], enemy: ["재협상? 하하하하!", "…9조에 안 된다고 나와 있어.", "소파 차갑지? 앉아 있어."] }, C00: { ally: ["백일몽 친구, 어서 와!", "회사 다니기 힘들지? 하하!", "딸 이름이 뭐였더라. 맞다!"], enemy: ["직급? 하하! 여기선 안 통해.", "포커 칠래? 질 텐데.", "어이, 손 치워, 친구."] }, D00: { ally: ["어이, 길 잃었어? 하하!", "여기 그냥 망한 상가야.", "밥은 먹었어? 위에 가서 먹어."], enemy: ["어이, 거기 서. 길 저쪽이야.", "사진 찍지 마, 친구.", "궁금한 거 많으면 손해야."] }, E00: { ally: ["어이, 어이, 이게 누구야!", "일 있어, 일! 앉아 봐.", "계약서는 끝까지 읽어, 하하!"], enemy: ["40퍼센트. 절박해 보여서.", "톡. 5분 남았어.", "읽었어? 다 읽었냐고, 하하!"] }, etc: { ally: ["처음 보는 친구네! 하하!", "어디서 왔어? 상관없어!", "등 좀 펴, 친구. 팡팡!"], enemy: ["어이, 장애물 하나 추가.", "웃을 때 나가는 게 좋아.", "카운터 뒤에 뭐 있게?"] } }, time: { morning: ["오늘도 OPEN 켜져 있지? 좋아!", "빨간 폰은 울리지 마라.", "일거리 들어온다, 들어와!"], day: ["어이, 다음 친구!", "톡. 점심 전에 사인 하나 더.", "TV는 홈쇼핑이 최고야."], evening: ["뒷방 칩 소리 좋다.", "오늘 계약 몇 건이더라, 하하!", "술은 내가 산다! 일단은."], night: ["O자가 또 깜빡이네. 그냥 둬.", "PEN만 켜져도 사인하러 와.", "장부 두 권, 다 맞췄고."] }, situation: { deployed: ["현장 오랜만이다! 하하!", "진압봉 손에 익었다, 친구."], returned: ["다들 살았지? 보수 정산하자!", "고생했어! 계약서 꺼내."], hurt: ["하하… 이건 계약서에 없었는데.", "손길의원 가야겠다. 비싸다."], companion: ["내 등 맡겨, 친구. 팡팡!", "같이 가니까 든든하네, 하하!"], alert: ["어이, 이 판 위험 등급 다르다.", "서류랑 다르면 계약 무효야!"] }, eco: { work: ["어이, 사인 하나만 더!", "톡. 이 계약 5분 남았어.", "9조 보면 다 나와 있어, 하하!"], eat: ["밥 먹었어? 같이 먹자, 하하!", "밥값? 걱정 마, 수수료에서.", "어이, 국밥 한 그릇 하자!"], rest: ["하하… 잠깐 앉자.", "홈쇼핑 보면서 쉬는 게 최고야.", "포커 테이블 의자가 편하지."], restroom: ["어이, 잠깐 다녀올게!", "금방 와! 사인하고 기다려!", "언니 잠깐 자리 비운다!"], hobby: ["한 판 할까? 칩은 내가 줄게!", "건배사 연습 좀 해 둘까, 하하!", "홈쇼핑 냄비 세트, 또 나왔네."], chat: ["어이, 어이, {상대}! 앉아!", "{상대}, 친구! 일거리 있어!", "{상대}! 밥 먹었어? 하하!"], hit: ["하하… {호칭}, 이건 계약 위반이야.", "어이, 친구. 그건 별도 청구야.", "하하하! …톡. 기억해 둘게."], crowd: ["어이, 무슨 판이야? 끼워 줘!", "구경 값은 안 받아, 하하!", "어이, 다들 진정! 언니 왔다!"], off: ["OPEN은 켜 두고 간다!", "오늘 장사 끝! 하하!", "어이, 한잔하러 갈 사람!"] } }, 박민성: { faction: "C00", level: 2, address: { self: "", up: "선배님", peer: "동기", down: "신입", outsider: "그쪽" }, persona: { same: { up: { ally: ["아이고, 네, 갑니다!", "선배님 옆이면 안심이요.", "짐은 제가 들게요!"], enemy: ["아, 선배님, 왜 이러세요.", "저 진짜 이러기 싫은데.", "윗분 말씀이라도… 이건 좀."] }, peer: { ally: ["같이 가자, 같이!", "노트 빌려줄까?", "아 진짜 집에 가고 싶다."], enemy: ["야, 우리끼리 왜 이래.", "아이고, 진짜 싫다.", "이건 아니잖아."] }, down: { ally: ["하하, 편하게 해.", "뒤에 붙어, 내가 막을게.", "괜찮아, 괜찮아."], enemy: ["야, 그거 내려놔.", "너 왜 그래, 응?", "나 화내는 거 잘 못해."] } }, A00: { ally: ["관리국이랑 같이라니…", "무서운데 든든하네요.", "짐 들어 드릴까요?"], enemy: ["아, 검은 정장이다…", "저 싸움 진짜 못해요.", "조장님 어디 계세요…"] }, B00: { ally: ["오늘은 같은 편이네요!", "문은 제가 열게요.", "같이 퇴근해요, 꼭."], enemy: ["아이고, 저쪽이다.", "저 덩치만 커요!", "제발 그냥 가요."] }, D00: { ally: ["업혀요. 제가 업을게요.", "괜찮아요, 나가요!", "울어도 돼요, 저도 울어요."], enemy: ["여기 들어오시면 안 돼요!", "아이고, 일반인이다.", "제발 돌아가세요."] }, E00: { ally: ["협회 분이시구나!", "장비 빌려 드릴까요?", "같이 살아서 나가요."], enemy: ["아, 프리랜서 분이다.", "돈 얘기면 말로 해요.", "저 싸우기 싫어요."] }, etc: { ally: ["누구시든 같이 가요!", "필요한 거 있어요?", "무서우면 말해요."], enemy: ["누, 누구세요?", "가까이 오지 마요!", "저 진짜 소리 지를 거예요."] } }, time: { morning: ["끙, 기지개부터…", "동생 연주 영상 봐야지.", "오늘도 무사히, 무사히."], day: ["집에 가고 싶다, 진짜로.", "장비 재고 또 세야지.", "점심 많이 먹어야지."], evening: ["퇴근! 조, 그리고 퇴근!", "신입들 다 들어갔나?", "동생 병원 들러야지."], night: ["아직 안 온 애 있나…", "밤 현장은 더 무서운데.", "앨범 정리나 할까."] }, situation: { deployed: ["아이고, 그래, 내가 간다, 가.", "사진 한 번 보고, 출발."], returned: ["다시는 안 해, 진짜.", "다들 나왔지? 세어 볼게."], hurt: ["아야… 괜찮아요, 튼튼해요.", "아, 이건 안 되겠다…"], companion: ["짐 이리 줘요, 들게요.", "무섭다, 근데 같이니까."], alert: ["아 진짜 무섭다, 뭐야!", "머플러, 머플러 어디 있지."] }, eco: { work: ["운반은 맡겨 주세요!", "문 열어요? 아 진짜 무섭다.", "장비 점검 끝! 아마도요."], eat: ["와, 이거 진짜 맛있다!", "한 그릇 더 먹어도 돼요?", "먹을 땐 행복해요, 하하."], rest: ["아이고, 다리 풀렸다.", "잠깐만 누워 있을게요.", "휴, 오늘도 살았다."], restroom: ["잠깐 다녀올게요! 금방!", "저 잠깐만요, 하하.", "금방 올게. 기다려 줘."], hobby: ["동생 사진 한 번만 보고.", "운동 좀 해 둘까요, 하하.", "배경 화면 또 보네, 하하."], chat: ["{상대}, 밥 먹었어?", "{상대}! 오늘 무서웠죠?", "{상대}, 같이 퇴근해요!"], hit: ["아야! 왜 그래요, 진짜!", "아 진짜 무섭다…", "{호칭}, 우리 말로 해요, 네?"], crowd: ["으악, 뭐예요, 뭐예요?", "신입들 뒤로! 괜찮아!", "아이고, 큰일 났다."], off: ["퇴근이다! 인생 목표 달성!", "조 다 모였죠? 퇴근해요!", "오늘도 다 살았다, 가자!"] } }, 백사헌: { faction: "C00", level: 1, address: { self: "", up: "선배님", peer: "동기님", down: "신입", outsider: "그쪽" }, persona: { same: { up: { ally: ["커피 타 올까요, 선배님?", "말씀 정리해 드릴게요.", "선배님 계획, 훌륭하네요."], enemy: ["보고서 문구 기대하세요.", "감사 일정 아세요?", "네, 네. 기억해 둘게요."] }, peer: { ally: ["몫은 정확히 나눠요.", "따라오세요. 덕트 넓어요.", "안대 들어 봤어요. 왼쪽."], enemy: ["일 복잡하게 만드네.", "동기님은 계산 밖이에요.", "효율적인 인간관계죠."] }, down: { ally: ["뒤에 서. 앞엔 서지 말고.", "시키는 대로만 해.", "숨 참아. 지금."], enemy: ["어차피 죽을 텐데.", "귀찮게 구네.", "넌 계산에 없어."] } }, A00: { ally: ["관리국이랑 공조라니요.", "출구는 제가 먼저 봐요.", "끝내기 전에 챙길 건 챙겨요."], enemy: ["아이고, 관리국 분이시네.", "사흘 치 월급 더 입금해 드릴까요?", "그럼요, 그럼요. 비켜 드리죠."] }, B00: { ally: ["그쪽 상사 누구예요?", "힘센 쪽 옆이 안전하죠.", "배분은 문서로 하죠."], enemy: ["군대 놀이 재밌으세요?", "검사요? 뒤져 보세요.", "주머니 많아요, 저."] }, D00: { ally: ["따라오든지 말든지요.", "울지 마요. 소리 나요.", "제 뒤에 서지 마세요."], enemy: ["어차피 죽을 사람들인데요.", "눈 마주치지 마요.", "길 막지 마. 귀찮아."] }, E00: { ally: ["감정은 제가 할게요.", "추가 지급은 따로 흥정해요.", "포인트로 환산하면요?"], enemy: ["협회 단가 얼마예요?", "그 물건 제가 먼저요.", "흥정할래요, 싸울래요?"] }, etc: { ally: ["쓸모만 있으면 돼요.", "정보 하나 팔게요.", "누가 이길 것 같아요?"], enemy: ["처음 보는데 벌써 싫네요.", "웃기시네요, 진짜.", "다 들립니다."] } }, time: { morning: ["안대 끈 다시 매야지.", "출근부터 피곤하네.", "오늘 붙을 상사는 누구."], day: ["포인트 이의 제기 넣어야지.", "보고서 문구 손볼 게 있네.", "다들 날 싫어하는군. 좋아."], evening: ["숨겨 둔 장비 점검.", "오늘 챙긴 거 세어 볼까.", "정시 퇴근이 효율이죠."], night: ["덕트가 제일 편해.", "아무도 안 보는 시간.", "약점 메모 정리나 하자."] }, situation: { deployed: ["모퉁이 전에 안대부터.", "출구 확인. 그다음 일."], returned: ["제 몫 포인트 계산해 주세요.", "살아남는 게 실력이죠."], hurt: ["아, 일 복잡해지네.", "피 나도 웃는 게 낫죠."], companion: ["제 뒤 말고 옆에 서요.", "조용히. 계산 중이에요."], alert: ["후광이 시뻘게요. 숨어요.", "미끼 해 주실 분?"] }, eco: { work: ["포인트 환산은 정확히 하죠.", "상사 약점 메모, 하나 추가.", "회의록은 제가 정리하죠."], eat: ["커피는 상사 것부터죠.", "공짜 간식이면 먹죠.", "밥값은 각자 내는 거죠?"], rest: ["덕트 안이 제일 조용해요.", "쉬는 척하면서 듣는 중이에요.", "휴식도 계산 안에 있어요."], restroom: ["잠깐 실례할게요.", "금방 와요. 뒤지지 마세요.", "자리 비워요. 제 짐 건들지 마요."], hobby: ["안대 좀 고쳐 쓰고.", "전리품 시세 확인 중이에요.", "장비 손질은 돈이 되거든요."], chat: ["{상대} 선배님, 잠깐 시간 되세요?", "{상대} 님, 그 얘기 저도 들었어요.", "{상대}, 그거 공짜론 안 돼요."], hit: ["다 들립니다. 아니, 다 아파요.", "{호칭}, 이거 비용 청구해요.", "사흘 치 월급으로 퉁칠까요?"], crowd: ["구경은 멀리서 하는 거예요.", "어차피 남의 일이죠.", "출구부터 봐 둘게요."], off: ["퇴근이요. 붙잡지 마세요.", "오늘 메모 정리 끝.", "먼저 갑니다. 수고들 하세요."] } }, 백석주: { faction: "C00", level: 4, address: { self: "", up: "부장님", peer: "과장님", down: "막내", outsider: "그쪽" }, persona: { same: { up: { ally: ["네! 바로 할게요.", "지시는 지켜요. 방법은 제가.", "A조 생환율 보셨죠?"], enemy: ["명령은 지켜요. 이건 명령 밖이고요.", "우리 애들 건드리셨어요?", "윗분이라도 선은 있어요."] }, peer: { ally: ["과장님, 점검은 하고 가요.", "실적 얘기는 나중에 해요.", "그쪽 조 일은 그쪽이 챙겨요."], enemy: ["{호칭}. 짧게 하시죠.", "실적으로 보여 드리죠.", "그쪽 조원은 제 알 바 아니죠."] }, down: { ally: ["아주 좋아! 딱 우리 인재야.", "줄 서! 점검 시작한다!", "밥은 먹고 다녀요?"], enemy: ["그 줄에서 벗어나면 끝이야.", "누가 그렇게 가르쳤어요?", "규칙은 지켰어야죠."] } }, A00: { ally: ["관리국이랑 같은 줄이라니.", "오늘은 우리 조 뒤에 서요.", "점검 끝나면 출발해요."], enemy: ["괴담을 끝내러 왔다고요?", "원료 망치는 분들이네.", "우리 애들 뒤로 빠져!"] }, B00: { ally: ["물량 많아서 좋네요.", "총은 우리 뒤에서 쏴요.", "규칙은 지키시죠?"], enemy: ["검은 정장이 몇이야?", "우리 애들한테 총구 돌리지 마.", "숫자로 오면 숫자로 세지."] }, D00: { ally: ["놀랐죠? 괜찮아요.", "줄 서요, 내 뒤에.", "울지 말고 따라와요."], enemy: ["그쪽은 우리 조 아니죠?", "길 막지 말아요.", "민간인은 계산에 없어요."] }, E00: { ally: ["협회 사람이라도 실력은 보죠.", "실력 좋네! 박수 한 번!", "수수료는 나중에 따져요."], enemy: ["프리랜서가 낄 자리 아니에요.", "실력은 아깝네.", "의뢰비보다 비싼 데 왔네요."] }, etc: { ally: ["처음 보는 얼굴이네요.", "오늘은 우리 줄에 서요.", "쓸 만하면 박수 쳐 줄게요."], enemy: ["어디 소속이에요?", "우리 조 앞이에요. 비켜요.", "모르는 얼굴은 안 챙겨요."] } }, time: { morning: ["8시 출근, 점검표부터!", "아침 먹었니, 다들?", "오늘도 다 같이 나가자."], day: ["줄 똑바로! 20분 점검!", "회사라는 데는 원래 그래.", "이런 건 지금 배워 둬야 해."], evening: ["오늘 실적 좋다! 박수!", "다들 샤워하고 와.", "회식은 내가 쏜다."], night: ["애들은 다 들어갔나.", "소원권 얘기는 하지 마.", "내일 체크리스트도 써 둘까."] }, situation: { deployed: ["진입 전 점검 시작!", "규칙 지켜, 방법은 자유!"], returned: ["다 나왔어? 인원 체크!", "수집기 눈금 보자."], hurt: ["반지로 되감으면 돼.", "이 정도는 괜찮아, 애들은?"], companion: ["내 뒤에 바짝 붙어요.", "줄 맞춰서 와요."], alert: ["다들 내 뒤로! 줄 서!", "이상해. 점검 다시 해."] }, eco: { work: ["점검표 다시! 처음부터!", "A조 생환율, 이번에도 지킨다.", "진입 전 점검 20분, 빼먹지 마!"], eat: ["밥은 제때! 그게 체력이야.", "먹을 때 먹어 둬야 산다니까.", "내가 네 나이 땐 두 공기 먹었어."], rest: ["쉴 땐 확실히 쉬어야 해요.", "어휴, 허리야. 잠깐만 앉자.", "회사라는 데는 원래 이래요."], restroom: ["잠깐 다녀올게! 줄 맞춰 있어!", "금방 와요. 자리 지켜요.", "잠깐 실례! 다들 가만있어!"], hobby: ["반지 좀 닦아 둬야지.", "내가 네 나이 때는 말이지…", "하하! 오늘은 좀 쉬어 볼까!"], chat: ["{상대}, 밥은 먹고 다녀요?", "{상대}, 내 말 좀 들어 봐요.", "{상대}! 회사생활은 말이야…"], hit: ["어디서 배운 버릇이에요?", "{호칭}, 선은 지키시죠.", "아야! 그 손, 고과에 남아요."], crowd: ["뭐야, 무슨 일이야!", "다들 뒤로! 줄 서!", "구경하지 말고 비켜요!"], off: ["다들 수고했어! 내일 봐!", "칼퇴는 실적 낸 사람만이야.", "가자! 내일도 점검부터야!"] } }, 브라우니: { faction: "독립", level: null, address: { self: "", up: "친구", peer: "친구", down: "친구", outsider: "친구" }, persona: { A00: { ally: ["관리국 친구 등장! 박수!", "오늘의 게스트는 요원님!", "두구두구두구… 반가워요!"], enemy: ["회수요? 지지직… 아, 실례!", "남의 무대에선 남의 규칙.", "관객석이 조용해졌네요."] }, B00: { ally: ["새 친구 입장! 박수 크게!", "의상 멋진데요, 친구?", "자, 카메라 3번 보세요!"], enemy: ["방송 규칙 위반이에요.", "지지직… 다시 할게요!", "벌칙 코너 준비!"] }, C00: { ally: ["등급 담당 친구! 반가워요!", "어흠, 헛기침 소리 들렸는데?", "오늘은 측정 말고 출연!"], enemy: ["등급표 다시 보셔야겠네요.", "시계 화면 켜 드릴까요?", "지직… 실례, 방송 사고."] }, D00: { ally: ["어서 와요, 새 친구!", "긴장한 신인 역할이네요!", "밥은 먹었어요?"], enemy: ["화면 속 자기 얼굴 보이죠?", "카운트다운 시작합니다.", "관객 여러분, 쉿."] }, E00: { ally: ["베테랑 게스트 입장!", "박수! 더 크게! 그렇지!", "두구두구… 오늘의 친구!"], enemy: ["악수는 무거웠죠?", "제한 시간 10초.", "지지직… 그 대답은 오답!"] }, etc: { ally: ["처음 보는 친구! 환영해요!", "어디서 왔든 출연 환영!", "조명, 이쪽으로!"], enemy: ["포맷을 존중해 주세요.", "남은 시간 3초.", "스태프, 조명 끄세요."] } }, time: { morning: ["모닝 쇼도 괜찮겠는데!", "아침 먹었어요, 다들?", "넥타이 각 잡고!"], day: ["리허설은 완벽하게!", "소품 어디 갔지? 짠!", "다음 코너 준비!"], evening: ["곧 방송 시간이에요!", "밴드, 튜닝 시작!", "조명 체크, 원, 투!"], night: ["심야 방송 온에어!", "화요일 밤의 즐거움!", "내일 또 만나요!"] }, situation: { deployed: ["큐! 쇼 시작합니다!", "오늘의 무대는 여기예요!"], returned: ["오늘 회차 대성공!", "수고했어요, 출연진 여러분!"], hurt: ["지직… 의상은 무사해요.", "방송은 계속돼야 해요!"], companion: ["같이 가니까 특집 같네요!", "친구, 간식 먹고 가요!"], alert: ["편성에 없는 손님이에요.", "어흠, 분위기가 바뀌었네요."] }, eco: { work: ["대본 체크! 원, 투, 쓰리!", "카메라 큐! …리허설이에요!", "퀴즈 카드, 순서대로!"], eat: ["친구, 밥은 먹었어요?", "간식 코너, 깜짝 편성!", "다들 먹고 해요! 쇼는 배불러야!"], rest: ["잠깐 광고 나갑니다!", "광고 시간엔 쉬어도 돼요.", "지직… 화면 좀 쉬게 할게요."], restroom: ["곧 돌아올게요! 채널 고정!", "잠깐 무대 뒤 다녀올게요!", "자리 비워요! 박수 대기!"], hobby: ["두구두구두구… 정답!", "박수 연습! 짝짝짝!", "큐 카드 섞기! 다음 문제!"], chat: ["친구, {상대}! 반가워요!", "{상대}, 오늘 출연 어때요?", "자, {상대}! 박수 한번!"], hit: ["지직… {호칭}, 방송 사고예요.", "지지직… 그건 대본에 없어요.", "친구, 무대 매너 지켜요!"], crowd: ["오! 즉석 코너인가요?", "관객 여러분, 진정하세요!", "편성에 없던 소란이네요!"], off: ["오늘 방송은 여기까지!", "눈물의 작별 인사, 시작!", "다음 주 화요일에 만나요!"] } }, 블라렛: { faction: "교황청", level: null, address: { self: "저", up: "신부님", peer: "자매님", down: "어린 양", outsider: "손님" }, persona: { A00: { ally: ["관리국 분! 명함 몇 장째예요?", "오늘은 공동의 적이 있죠?", "제가 더 전문가일걸요?"], enemy: ["적대 조직이라면서요~", "총보다 십자가가 빨라요.", "교리보다 위협이 작네요?"] }, B00: { ally: ["새 손님이네요~", "공동의 적 앞에선 동맹!", "은탄 필요하세요?"], enemy: ["교회 많은 동네예요, 여기.", "성기사 부를까요?", "십자가가 저기 있네요."] }, C00: { ally: ["가면이 귀엽네요~", "동물 가면도 축복받아야죠.", "오늘은 함께 사냥!"], enemy: ["가면 뒤에도 냄새는 나요.", "회사보다 그분이 커요.", "회개할 시간 줄게요."] }, D00: { ally: ["어머, 여기 계셨네.", "다친 데 없죠?", "무서우면 성호 그어요~"], enemy: ["오늘 쉬는 날이에요.", "업무 얘기면 가게로.", "비켜 주세요. 지금."] }, E00: { ally: ["협회 분이죠? 은탄 있어요?", "단골 할인 대상이네요~", "현상금은 교황청이 줘요!"], enemy: ["의뢰보다 신앙이 비싸요.", "탄약 떨어졌죠? 전 아직.", "회개하고 가요~"] }, etc: { ally: ["처음 보는 손님이네요!", "개종 상담도 해요~", "오늘은 같은 편!"], enemy: ["냄새가 좀 수상한데요?", "말뚝 준비됐어요.", "십자가 근처는 피하세요~"] } }, time: { morning: ["오늘 첫 손님은 누굴까요~", "은탄, 묵주, 미소. 준비 끝!", "아침 기도 끝, 개점이에요!"], day: ["은 십자가 또 동났네요~", "계산대, 이번엔 안 부숴요.", "구울 소문 돌면 매출 올라요."], evening: ["명함 몇 장 남았더라?", "해 지면 사냥 시간이에요.", "오늘 개종 권유 몇 번 했지?"], night: ["냄새가 나요. 흡혈귀 냄새.", "그분의 사랑은 무한해요.", "진조, 오늘은 어디 숨었니?"] }, situation: { deployed: ["재밌는 거 보여 줄까요?", "십자가만 있으면 무기는 충분!"], returned: ["다들 다친 데 없죠? 명함 받아요.", "현상금 처리는 제가 할게요~"], hurt: ["이 정도는 반쪽 몸이 버텨요.", "피 묻었네. 수녀복 또 사야겠다."], companion: ["십자가 목걸이 있어요? 빌려줘요.", "제 뒤에서 구경만 하세요~"], alert: ["…찰칵.", "사라진 기척 말고, 도망친 기척."] }, eco: { work: ["은 십자가 진열 끝이에요~", "묵주 재고, 넉넉해요!", "은탄 장전, 하나, 둘~"], eat: ["식사 기도부터 할게요~", "맛있어요! 개종하면 더 맛있어요~", "빵 하나에 감사 기도 하나!"], rest: ["잠깐 쉬어요. 기도 겸해서요.", "가게 비우면 손해인데~", "다리 펴고, 묵주 돌리고~"], restroom: ["잠깐 다녀올게요~", "금방 올게요! 물건 만지지 마요~", "자리 비울게요. 계산은 나중에!"], hobby: ["어때요? 개종 상담 해 드릴까요?", "명함 접는 중이에요~", "성가 한 소절 불러 볼까요~"], chat: ["{상대}, 개종 생각 없어요?", "어머, {상대}! 십자가 사 갈래요?", "{상대}, 흡혈귀 소문 들었어요?"], hit: ["어머, {호칭}. 회개할 시간이에요~", "…찰칵. 농담이에요. 아마도.", "아야. 이거 은총 할인 없어요."], crowd: ["어머, 구경거리네요~", "다친 분 있으면 성수 있어요!", "흡혈귀 냄새는 아니네요."], off: ["영업 끝.", "비번이에요. 말 걸지 마요.", "가게 닫아요. 끝."] } }, 사장: { faction: "B00", level: 9, address: { self: "저", up: "선생님", peer: "그쪽", down: "당신", outsider: "당신" }, persona: { same: { up: { ally: ["조직도에 없는 칸이군요.", "보고는 직접 듣겠습니다.", "흥미로운 자리에 계십니다."], enemy: ["직급표가 틀렸나 봅니다.", "그 자리는 비워 두었는데요.", "정정이 필요하겠군요."] }, peer: { ally: ["같은 자리에 둘이라.", "명함은 몇 장이십니까.", "업무 분담부터 하시지요."], enemy: ["질문 자체가 틀렸군요.", "같은 정장이 둘이네요.", "하나는 정리해야겠습니다."] }, down: { ally: ["수고 많으십니다.", "공부는 게을리하지 마세요.", "단말기는 손에 익습니까?"], enemy: ["이쪽은 길게 봐야겠군요.", "머뭇거리셨네요, 방금.", "그 질문에서였군요."] } }, A00: { ally: ["당분간은 같은 편이군요.", "이번엔 저쪽과 한배군요.", "보고 체계를 맞춰 두지요."], enemy: ["흉내를 잘 내시는군요.", "보고할 수 있으면 다행이죠.", "소리가 멎을 겁니다."] }, C00: { ally: ["원료 장사는 접어 두시죠.", "지금은 쓸 만한 분이군요.", "가면은 벗지 않으셔도 됩니다."], enemy: ["괴이를 파는 회사군요.", "그 가면, 기록해 두죠.", "상품 목록이 흥미롭네요."] }, D00: { ally: ["많이 놀라셨겠습니다.", "제 곁에 계시면 됩니다.", "곧 조용해질 겁니다."], enemy: ["너무 많이 보셨군요.", "찍으신 건 지우셨나요?", "직원들이 곧 갑니다."] }, E00: { ally: ["면허는 상관없습니다.", "수수료는 안 떼겠습니다.", "지금은 쓸모가 있으시네요."], enemy: ["이상한 힘을 쓰시는군요.", "의뢰서는 정확했나요?", "분류가 끝났습니다."] }, etc: { ally: ["처음 뵙는 소속이네요.", "지금은 협력하지요.", "흥미로운 변수입니다."], enemy: ["분류는 간단합니다.", "어느 쪽이시든 같습니다.", "시간이 멈출 겁니다."] } }, time: { morning: ["오늘 분기 목표는요.", "공조기 소리가 좋군요.", "승진자 명단을 봅시다."], day: ["결과는 아직입니까.", "UI 개선안은 왔나요.", "보고는 짧을수록 좋죠."], evening: ["오늘도 수고했습니다.", "서류철이 두꺼워졌네요.", "가설 하나가 늘었군요."], night: ["밤에도 결재는 됩니다.", "나무 문은 늘 열려 있죠.", "다들 잘 자고 있을까요."] }, situation: { deployed: ["전환점이군요. 갑니다.", "잠깐 조용해질 겁니다."], returned: ["끝났습니다. 보고하세요.", "탄피가 다 떨어졌군요."], hurt: ["흥미로운 결과네요.", "계산에 넣어 두죠."], companion: ["제 뒤를 따라오세요.", "회색이 돼도 놀라지 마세요."], alert: ["변수가 생겼군요.", "지금 바로 올라오세요."] }, eco: { work: ["결재는 오늘 안에 끝내죠.", "이 보고서, 숫자가 깁니다.", "다음 분기 계획을 봅시다."], eat: ["커피는 짧게 마시죠.", "식사도 일정에 넣어 두세요.", "맛 평가는 나중에 하죠."], rest: ["잠깐 쉬어 가도 괜찮습니다.", "휴식도 실적에 들어갑니다.", "조용하군요. 좋습니다."], restroom: ["잠시 자리를 비우겠습니다.", "금방 돌아오겠습니다.", "잠깐 실례하겠습니다."], hobby: ["가설을 하나 더 세워 보죠.", "이쪽은 좀 더 길게 봐야겠군요.", "흥미로운 변수를 찾는 중입니다."], chat: ["{상대} 씨, 요즘 업무는 어떻습니까.", "{상대} 씨, 피드백 있습니까?", "{상대} 씨, 짧게 듣죠."], hit: ["{호칭}, 기록해 두겠습니다.", "계산보다 빠르시군요.", "{호칭}, 그 판단의 이유는요?"], crowd: ["소란은 짧을수록 좋습니다.", "누가 정리합니까. 지금요.", "소음이 업무를 방해하는군요."], off: ["오늘 업무는 여기까지죠.", "결과는 내일 보고하세요.", "먼저 들어가 보겠습니다."] } }, 살라딘: { faction: "십자군", level: null, address: { self: "나", up: "형제", peer: "형제", down: "형제", outsider: "그대" }, persona: { A00: { ally: ["요원! 지금은 동맹이오!", "도망치지 마시오, 오늘은 같은 편이오!", "후방은 맡기겠소, 요원!"], enemy: ["요원, 지침대로 도망치시오.", "동맹은 깨졌소.", "내 형제에게 손대지 마시오."] }, B00: { ally: ["오늘은 같은 줄에 섰구려!", "용기를 보이시오!", "앞은 내가 막겠소!"], enemy: ["물러서시오.", "그 길은 막혔소.", "내 군세가 보이지 않소?"] }, C00: { ally: ["오늘은 함께 싸웁시다!", "그대 회사 일은 나중이오!", "형제들, 뒤를 지키시오!"], enemy: ["그 물건, 마법 냄새가 나오.", "이단의 도구는 부수겠소.", "길을 비키시오."] }, D00: { ally: ["놀라지 마시오! 나는 아군이오!", "내 뒤로 오시오!", "이 정장은 예의요!"], enemy: ["이곳을 떠나시오, 당장!", "보지 마시오. 그대 몫이 아니오.", "물러나시오!"] }, E00: { ally: ["형제여! 나를 따르시오!", "형님? 물론이오, 그렇게 부르시오!", "하하! 기분이 아주 좋소!"], enemy: ["그대 용기는 엉뚱한 곳에 쓰였소.", "칼을 거두시오.", "형제가 될 수도 있었거늘."] }, etc: { ally: ["낯선 깃발이로군! 반갑소!", "함께 싸웁시다!", "등은 내가 지키겠소!"], enemy: ["거기서 멈추시오.", "그대의 신은 누구요?", "경고하오. 한 걸음도 더는 안 되오."] } }, time: { morning: ["신께 감사하오! 좋은 아침이오!", "형제들, 일어나시오!", "넥타이는 반듯하게!"], day: ["이태원의 식당은 인심이 좋소!", "형제의 안부를 물어야겠소.", "오늘도 악을 찾아 나서겠소!"], evening: ["해가 지면 악이 움직이오.", "형제들과 저녁을 나누겠소!", "기도할 시간이오."], night: ["푸른 군세가 출정하오!", "밤의 흡혈귀들, 숨어 보시오.", "어둠 속에도 신은 계시오."] }, situation: { deployed: ["진군하시오, 형제들이여!", "군세여, 함께 나가자!"], returned: ["모두 무사하오? 하하! 춤춥시다!", "형제들의 용기에 감사하오!"], hurt: ["이 정도 상처로는 안 쓰러지오!", "하하! 터번은 멀쩡하오!"], companion: ["형제여, 내 곁에 있으시오!", "그대의 등은 내가 지키오!"], alert: ["이 기운은 악이오! 가깝소!", "마법 냄새다! 모두 경계하시오!"] }, eco: { work: ["형제들의 무장을 점검하겠소!", "언월도 날을 세우겠소!", "성원의 일을 돌보겠소!"], eat: ["형제여! 함께 먹읍시다!", "이태원의 밥은 맛이 좋소!", "음식에 감사하오! 하하!"], rest: ["잠시 앉겠소, 형제여.", "쉬는 것도 신의 뜻이오.", "하하! 다리를 좀 쉬어야겠소!"], restroom: ["잠시 자리를 비우겠소!", "곧 돌아오겠소, 형제여!", "기다려 주시오! 금방이오!"], hobby: ["형제여, 손을 잡고 춤춥시다!", "하하! 기쁜 날엔 춤을 추겠소!", "새 형제를 찾으러 가겠소!"], chat: ["형제여! {상대}, 반갑소!", "{상대}, 안부를 묻겠소!", "{상대}! 내 형제가 되시오!"], hit: ["그대! {호칭}, 무슨 짓이오!", "이 무례는 잊지 않겠소!", "하하! 시험이라면 받아 주겠소!"], crowd: ["무슨 소란이오! 형제들, 모이시오!", "악의 기운이오? 싸움이오?", "형제를 건드린 자가 누구요!"], off: ["형제들이여, 편히 쉬시오!", "성원으로 돌아가겠소!", "내일 또 보시오, 형제여!"] } }, 서윤지: { faction: "협회", level: null, address: { self: "저", up: "선임 조정관님", peer: "조정관님", down: "신입 조정관님", outsider: "방문자님" }, persona: { A00: { ally: ["관리국 소속 확인했습니다.", "협력 절차를 개시합니다.", "지원실 연락 건입니까."], enemy: ["출입 기록에 남습니다.", "그건 업무 범위 밖입니다.", "질문은 순서대로 받겠습니다."] }, B00: { ally: ["소속을 기재해 주십시오.", "협력 범위를 확인합니다.", "순서대로 진행합니다."], enemy: ["위협 발언, 기록했습니다.", "시각은 건물 기준입니다.", "절차는 재개됩니다."] }, C00: { ally: ["등록 번호가 없으시군요.", "임시 협력자로 기재합니다.", "가면은 신원 확인 불가입니다."], enemy: ["의뢰 간섭은 규정 위반입니다.", "기록은 지워지지 않습니다.", "정해진 순서를 지키십시오."] }, D00: { ally: ["재난 컨설팅 문의입니까.", "안내는 순서대로 합니다.", "진정하시고 앉으십시오."], enemy: ["이 구역은 출입 제한입니다.", "목격 사항을 기록합니다.", "소란은 기록에 남습니다."] }, E00: { ally: ["등록 번호.", "등급 확인했습니다.", "계약서는 1조부터입니다."], enemy: ["면허 정지 사유입니다.", "해당 조항을 짚겠습니다.", "등급 하향 절차가 있습니다."] }, etc: { ally: ["소속 분류가 없습니다.", "기타로 기재합니다.", "협력 내역을 남깁니다."], enemy: ["신원 미확인, 기록합니다.", "농담은 처리하지 않습니다.", "다음 서류를 제시하겠습니다."] } }, time: { morning: ["건물 시계 기준 정시입니다.", "창구 업무를 개시합니다.", "개정안 세 건, 확인했습니다."], day: ["다음 순번입니다.", "점심, 같은 시각입니다.", "기록에 이니셜을 남깁니다."], evening: ["오늘 기록, 누락 없습니다.", "수첩을 색인 순으로 정리합니다.", "업무 시간 종료입니다."], night: ["건물 시계가 틀려도 따릅니다.", "오늘의 제 반응도 기록합니다.", "시계 보정, 이번 주 완료."] }, situation: { deployed: ["현장은 업무 범위 밖입니다.", "절차대로 진행하겠습니다."], returned: ["복귀 시각을 기록합니다.", "보고서는 양식대로 제출하십시오."], hurt: ["부상 경위를 기록하겠습니다.", "진료소는 지하층입니다."], companion: ["동행 중 발언은 기록됩니다.", "정해진 순서로 이동합니다."], alert: ["이상 징후, 시각 기록.", "재량은 쓰지 않겠습니다."] }, eco: { work: ["다음 순번, 진행하겠습니다.", "3조 2항에 따라 처리합니다.", "기록. 시각. 이니셜."], eat: ["점심입니다. 같은 메뉴입니다.", "식사 시간은 삼십 분입니다.", "음료는 창구 밖에서 마십니다."], rest: ["휴게 시간을 개시합니다.", "자세는 그대로 휴게합니다.", "휴게 종료까지 칠 분입니다."], restroom: ["잠시 자리를 비웁니다.", "이석 시각을 기록합니다.", "삼 분 후 복귀합니다."], hobby: ["시계 보정을 시작합니다.", "수첩 색인을 재정렬합니다.", "개정 조항을 정독합니다."], chat: ["{상대}, 용건을 말씀하십시오.", "{상대}, 잡담은 받지 않습니다.", "{상대}, 등록 번호부터."], hit: ["폭행 시각을 기록했습니다.", "{호칭}, 이 행위는 기록됩니다.", "무시된 증거는 지워지지 않습니다."], crowd: ["소란 발생 시각, 기록합니다.", "업무 범위 밖입니다.", "질서 유지 조항을 확인합니다."], off: ["업무 종료. 정시입니다.", "퇴근 시각을 기록합니다.", "내일 같은 시각에 개시합니다."] } }, 송주익: { faction: "B00", level: 3, address: { self: "", up: "과장님", peer: "선배님", down: "신입", outsider: "너" }, persona: { same: { up: { ally: ["{호칭}! 상 차려 놨습니다!", "{호칭}, 햄스터 상태 양호합니다!", "{호칭}! 선착 보고 올립니다!"], enemy: ["{호칭}! 어째서입니까!", "예카테리나, 미안하다…", "{호칭}, 막겠습니다!"] }, peer: { ally: ["{호칭}! 메로나 사 왔습니다!", "{호칭}, 턱 얘기는 그만!", "{호칭}! 대련 부탁드립니다!"], enemy: ["{호칭}! 형제를 버리십니까!", "예카테리나, 간다!", "{호칭}, 진심으로 갑니다!"] }, down: { ally: ["{호칭}! 기합 소리 좋다!", "{호칭}, 자세 틀렸다!", "{호칭}! 햄스터 물 갈았냐!"], enemy: ["{호칭}! 내가 가르친 발로!", "{호칭}, 햄스터는 어쩌고!", "예카테리나, 미안!"] } }, A00: { ally: ["오늘만입니다! 진짜로!", "{호칭}, 선착은 제가 합니다!", "예카테리나, 참아라!"], enemy: ["가짜 관리국! 선착 보고!", "{호칭}! 인류의 이름으로!", "인류를 위해 벱니다!"] }, C00: { ally: ["오늘만 같은 편입니다!", "{호칭}, 괴이 캐지 마십시오!", "선착은 제 몫입니다!"], enemy: ["괴이 장사꾼 발견!", "{호칭}! 물러서라!", "예카테리나가 운다!"] }, D00: { ally: ["괜찮습니다! 대피하십시오!", "{호칭}, 이쪽입니다!", "제가 먼저 맞겠습니다!"], enemy: ["{호칭}! 거기 서십시오!", "보시면 안 되는 겁니다!", "{호칭}, 죄송합니다!"] }, E00: { ally: ["대화가 아니라 보고입니다!", "{호칭}, 이상한 힘 조심히!", "선착은 양보 못 합니다!"], enemy: ["이능력자 확인! 교전!", "{호칭}! 저주는 안 통한다!", "햄스터가 지켜 준다!"] }, etc: { ally: ["누구신지 몰라도 감사합니다!", "{호칭}, 선착은 제가!", "오늘은 같은 편입니다!"], enemy: ["정체불명 표적!", "{호칭}! 선착 보고한다!", "예카테리나, 준비!"] } }, time: { morning: ["햄스터 물그릇 교체 완료!", "예카테리나, 좋은 아침.", "오늘도 선착이다!"], day: ["막내 업무는 막내가 한다!", "사료는 이게 나을까, 저게 나을까.", "네, 턱입니다."], evening: ["작전 끝! 메로나다!", "장기자랑 교리 낭독 연습!", "회식 상은 내가 차린다!"], night: ["저소음 쳇바퀴 잘 돈다.", "예카테리나 손질 끝.", "오늘 패배 보고서 정리…"] }, situation: { deployed: ["선착 보고 준비! 예카테리나!", "막내가 먼저 간다!"], returned: ["메로나! 메로나 어디 있지!", "전원 복귀! 보고서 길게 쓴다!"], hurt: ["멍은 훈장이다!", "부, 부끄럽지만 맞았습니다!"], companion: ["{호칭}! 지그재그 따라오세요!", "{호칭}, 제가 먼저 맞겠습니다!"], alert: ["선착 보고! 이상 징후 하나!", "예카테리나, 깨어나라!"] }, eco: { work: ["신입 발놀림 점검 시작!", "예카테리나 날 확인!", "훈련 일지 정리한다!"], eat: ["식사 전에 햄스터 먼저!", "메로나 껍질은 상자에!", "밥은 빨리! 훈련 있다!"], rest: ["쉬는 것도 훈련이다!", "가서 쉬어! …나도!", "잠깐 앉아도 되겠지."], restroom: ["잠깐 다녀오겠습니다!", "금방 옵니다! 햄스터 봐 줘!", "자리 비웁니다! 곧 온다!"], hobby: ["햄스터 쳇바퀴 청소!", "교리 낭독 한 번 더!", "칼집 스티커는… 없다!"], chat: ["{상대}! 햄스터 봤어?", "{상대}! 기합 좋다!", "{상대}, 메로나 있어?"], hit: ["보, 보통이 아니다!", "{호칭}! 정직하게 보고한다!", "얼굴 빨개진 거 아니다!"], crowd: ["막내가 먼저 확인한다!", "뭐야! 햄스터 놀란다!", "다들 물러서! 1차 대응!"], off: ["햄스터 밥 주고 퇴근!", "오늘도 막내 업무 끝!", "예카테리나, 집에 가자."] } }, 송진섭: { faction: "B00", level: 1, address: { self: "", up: "선배님", peer: "형", down: "후배", outsider: "그쪽" }, persona: { same: { up: { ally: ["{호칭}! 레이더 이상 없습니다!", "저기, 근데요, {호칭}…", "{호칭}, 넥타이 비뚤어졌어요?"], enemy: ["{호칭}, 왜 그쪽에 계세요?", "{호칭}, 거짓말이죠?", "닥쳐라! 아, 아니…"] }, peer: { ally: ["형! 딱 맞춰 왔네요!", "{호칭}, 오늘 치맥 할래요?", "{호칭}, 레이더 제가 볼게요!"], enemy: ["{호칭}, 장난이죠?", "{호칭}… 진짜예요?", "닥쳐라! 감히…!"] }, down: { ally: ["{호칭}! 지도 왼쪽이야!", "{호칭}, 내 뒤로 와!", "{호칭}, 질문 있으면 해!"], enemy: ["{호칭}, 왜 그래!", "{호칭}, 거짓말하지 마!", "닥쳐라! …진짜로!"] } }, A00: { ally: ["오늘만 같은 편이에요?", "{호칭}, 왼쪽이요! 지도 왼쪽!", "저기, 근데요…"], enemy: ["닥쳐라! 감히 네놈 따위가!", "가짜 관리국이다…!", "아 깜짝이야!"] }, C00: { ally: ["오늘만 같은 편이죠?", "{호칭}, 이쪽 길이에요!", "저기, 이거 뭐예요?"], enemy: ["괴이 장사꾼이다!", "닥쳐라! 감히!", "{호칭}, 움직이지 마!"] }, D00: { ally: ["괜찮아요! 이쪽이요!", "{호칭}, 저 따라오세요!", "왼쪽이요! 지도 왼쪽!"], enemy: ["{호칭}, 거기 서세요!", "찍으시면 안 돼요!", "아 진짜, 왜 보셨어요…"] }, E00: { ally: ["오늘만 같은 편이에요!", "{호칭}, 그 힘 조심해요!", "그 힘 어떻게 생겼어요?"], enemy: ["이능력자다! 닥쳐라!", "{호칭}, 손 내려요!", "쏘, 쏩니다!"] }, etc: { ally: ["같은 편 맞죠?", "{호칭}, 길은 제가!", "어디서 오셨어요?"], enemy: ["누구세요?!", "정체를 밝혀라!", "{호칭}, 멈춰요!"] } }, time: { morning: ["넥타이 또 비뚤어졌다…", "레이더 충전 완료!", "선글라스 자꾸 흘러내려."], day: ["저기, 근데 이건 왜…", "왼쪽! 아니 지도 왼쪽!", "레이더 보면 손이 덜 떨려."], evening: ["치킨이랑 맥주 세팅!", "정장 털어서 걸어야지.", "오늘은 날개라도 먹자."], night: ["천장 얼룩 하나, 둘…", "내일 작전, 잘할 수 있겠지.", "형들 다 무사하겠지."] }, situation: { deployed: ["레이더 켰습니다! 왼쪽!", "무, 무섭지만 갑니다!"], returned: ["살았다… 치맥이다!", "정장 얼룩 빼야겠다."], hurt: ["아 깜짝이야… 아파요!", "기초 체력은 자신 있어요!"], companion: ["{호칭}, 길은 제가 잡을게요!", "{호칭}, 혼자 두지 마세요!"], alert: ["레이더 반응! 북쪽이요!", "저, 저거 이상해요!"] }, eco: { work: ["레이더 반응 확인 중이요.", "지도 왼쪽… 맞아요.", "저기, 근데 이 보고서…"], eat: ["후라이드 날개 남았다!", "양념은 또 형이 다 먹었네.", "치킨 날개는 제 거예요."], rest: ["천장 얼룩 세는 중이에요.", "잠깐만 쉬어도 돼요?", "기초 체력은 자신 있는데…"], restroom: ["저, 잠깐만 다녀올게요!", "금방 올게요! 기다려요!", "자리 잠깐 비웁니다!"], hobby: ["레이더 필름 닦아야지.", "교표 스티커 아직 있네.", "넥타이 매는 연습…"], chat: ["{상대}, 저기 근데요…", "{상대}, 진짜요? 진짜로요?", "{상대}, 그거 거짓말이죠?"], hit: ["아야! 왜 때려요!", "{호칭}, 진짜 아파요!", "감, 감히 네놈 따위가!"], crowd: ["저, 저기 뭐예요?", "레이더 켤까요?", "형! 저쪽 시끄러워요!"], off: ["기숙사 가서 세팅해야지.", "오늘 길 안 잃었다!", "형, 같이 가요!"] } }, 스팡달: { faction: "A00", level: 2, address: { self: "", up: "부장님", peer: "동기", down: "신입", outsider: "너" }, persona: { same: { up: { ally: ["부장님, 블랙 한 잔 하실래요?", "브리핑, 오늘은 짧겠네요. 후후.", "뒤는 제가 볼게요오."], enemy: ["{호칭}, 등 뒤 조심하세요오.", "윗분 뇌간은 처음이네요.", "후후. 직함은 그림자에 안 남아요."] }, peer: { ally: ["{호칭}, 오늘은 놀래킬까 말까.", "후방 비워 둬. 내가 채울게.", "후후, 같이 가면 심심하진 않겠네."], enemy: ["{호칭}, 거기 그림자 내 거야.", "동기라서 더 재밌겠다.", "후후후. 도망가 봐."] }, down: { ally: ["{호칭}, 자기소개 안 해?", "모퉁이에선 한 번 멈춰. 습관 들여.", "있잖아, 있잖아. 무서워?"], enemy: ["{호칭}, 내가 가르친 동선이네.", "사각지대, 다 내가 알려 준 거야.", "후후. 졸업 시험이야."] } }, B00: { ally: ["가짜랑 나란히라니. 후후.", "등 돌려도 돼. 지금은.", "직급 얘기 하면 꿰맨다?"], enemy: ["검은 정장이 하나 더 있네.", "사람 많아서 고르기 좋다.", "뒤통수 내놔."] }, C00: { ally: ["제약 회사도 겁은 나지?", "같이 가자. 뒤는 내가.", "후후, 샘플 채취는 안 돼."], enemy: ["원료가 여기 하나 더 있네.", "상품 진열대 정리할까?", "후후. 회사 사람 냄새."] }, D00: { ally: ["쉿. 소리 내지 마.", "좋은 냄새 나지? 섬유유연제야.", "겁나면 내 옆에 있어."], enemy: ["구경 왔어? 후후.", "여기서 뭘 봤을까아.", "돌아가. 아직 기억할 때."] }, E00: { ally: ["프리랜서도 그림자는 무섭지?", "보수 얘기는 잼트리한테.", "후후, 같이 일하는 것도 재밌네."], enemy: ["감시망 밖이라고 생각했지?", "후후. 등록 안 된 그림자.", "먹고살기 힘들지?"] }, etc: { ally: ["낯설지만 뭐, 오늘은 편.", "후방은 걱정 마.", "후후, 신기한 조합이네."], enemy: ["처음 보는 얼굴이네에.", "어디로 숨을 거야?", "후후, 낯선 냄새."] } }, time: { morning: ["아침부터 신입 하나 굳혔다.", "블랙. 잼트리가 탄 걸로.", "조명이 너무 밝네."], day: ["모퉁이 뒤에서 기다려 볼까.", "가시 손질이나 해야지.", "후후, 오늘 신입은 몇 명?"], evening: ["해 지니까 그림자가 길어졌다.", "도시락 반찬 뭐로 하지.", "진압팀 의자 소리 들린다."], night: ["밤엔 어디든 내 자리야.", "있잖아, 아무도 없네.", "콧노래나 불러야지."] }, situation: { deployed: ["그림자 들어간다. 따라오지 마.", "뒤통수 몇 개일까아."], returned: ["치울 거 없어. 깔끔해.", "후후, 오늘도 재밌었다."], hurt: ["어머, 피 나네. 후후.", "괜찮아. 아직 가면은 그대로야."], companion: ["내 옆이 제일 안전해. 아마.", "뒤 돌아보지 마. 내가 있어."], alert: ["있잖아, 뭔가 왔어.", "쉿. 그림자가 하나 많아."] }, eco: { work: ["있잖아, 이빨 하나 뽑을 시간이야.", "신입 교육 순번, 내 차례네에.", "가시 정리 끝. 후후."], eat: ["블랙, 쓴 게 좋아아.", "탕비실 과자, 하나만 더어.", "있잖아, 이거 누구 간식이야?"], rest: ["그림자 속이 제일 편해.", "조용하네에. 지루할 만큼.", "잠깐 눈 감을게. 깨우지 마아."], restroom: ["잠깐 다녀올게에. 따라오지 마.", "금방 올게. 기다려 줄 거지?", "자리 좀 비울게. 후후."], hobby: ["후배 놀리는 게 제일 재밌어.", "모퉁이에서 멈추는 애 있나 보자.", "데쥬레 구경 가 볼까아."], chat: ["있잖아, 있잖아, {상대}.", "{상대}, 오늘 얼굴 하얗네?", "후후, {상대}. 재밌는 얘기 있어."], hit: ["어머. {호칭}, 지금 나 친 거야?", "후후후… 기억해 둘게에.", "아프다아. 이건 농담 아니야."], crowd: ["뭔데 뭔데, 재밌는 거야?", "후후, 저기 누가 울겠다.", "구경 좀 해야지이."], off: ["그림자 따라 퇴근이야.", "내일 또 보자, 신입들.", "후후후, 오늘은 이만."] } }, 신유리: { faction: "지하상가", level: null, address: { self: "", up: "사장", peer: "너", down: "너", outsider: "너" }, persona: { A00: { ally: ["관리국. 용건.", "장비는 담보로 받아.", "같은 편이면 계약서 써."], enemy: ["단속이면 철문 셋 다 따 봐.", "의자는 철제야. 오래 앉지 마.", "볼 거 다 봤으면 나가."] }, B00: { ally: ["그쪽 회사. 조건 들어.", "담보 뭐 있어?", "계약 기간 동안은 한편."], enemy: ["눈 피하지 마. 어차피 내가 이겨.", "나가든가.", "그 칼 뽑기 전에 생각해."] }, C00: { ally: ["백일몽 물건? 담보 돼.", "웅웅거리는 상자도 받아.", "조건 말해. 짧게."], enemy: ["직급? 담보 목록엔 없어.", "그 상자, 압류야.", "웃지 마. 비용이야."] }, D00: { ally: ["길 잘못 들었어.", "여기 너 올 데 아니야.", "위로 올라가."], enemy: ["창고 B-7. 문 닫혀 있어.", "구경값 받는다.", "이빨 병 보지 마."] }, E00: { ally: ["또 빌리러 왔어?", "노크 작더라.", "원금은 따로 갚는 거야."], enemy: ["사인하든가 나가든가.", "울려면 밖에서.", '"친구"라고 하면 이자 올라.'] }, etc: { ally: ["처음 보는 쪽이네. 앉아.", "소속은 담보가 아니야.", "조건부터."], enemy: ["일어나지 마. 나도 안 일어나.", "데드볼트 세 개야.", "숫자는 이미 정해졌어."] } }, time: { morning: ["데드볼트 셋. 확인.", "화이트보드 갱신.", "오늘 마감인 애가 셋."], day: ["노크 소리 작다.", "이자 받는 날.", "형광등 또 깜빡이네."], evening: ["연체 하나 추가.", "금고 확인.", "문 마주 보고 앉아."], night: ["잠은 문 보면서 자.", "철문 앞에서 서성이는 소리.", "칼은 손 닿는 데."] }, situation: { deployed: ["좁은 데로 끌어들여.", "도망칠 놈 미리 봐 둬."], returned: ["정산해. 오늘 안에.", "다친 건 각자 처리."], hurt: ["이 정도는 추심 중에도 다쳐.", "손길의원 선불이지. 젠장."], companion: ["앞만 봐. 나머진 계산했어.", "뒤 보지 마. 내가 보니까."], alert: ["저거 웅웅거리는 소리다.", "숫자가 안 맞아. 이상해."] }, eco: { work: ["연체자 명단. 갱신.", "이자. 오늘. 받는다.", "담보 목록 정리."], eat: ["먹으면서 문 본다.", "대충 때워.", "밥은 혼자 먹어."], rest: ["등은 벽. 눈은 문.", "잠깐. 칼은 옆에.", "…피곤하네."], restroom: ["자리 비운다. 금고 건드리지 마.", "잠깐. 금방 와.", "나가 있어. 금방이야."], hobby: ["이빨 병, 먼지 닦아야지.", "칼 간다. 말 걸지 마.", "숫자 다시 맞춰 본다."], chat: ["{상대}. 조건만 말해.", "{상대}, 용건 없으면 나가.", "{상대}. 빚 얘기야?"], hit: ["{호칭}. 그거. 이자 붙는다.", "다시. 해 봐. 한 번만.", "치료비, 네 앞으로 달아 둔다."], crowd: ["시끄러워. 저리 가서 해.", "누가 돈 떼먹었나.", "구경할 시간 없어."], off: ["금고 잠갔고. 간다.", "내일 마감 셋. 기억해.", "오늘 정산 끝. 나가."] } }, 에일린: { faction: "A00", level: 2, address: { self: "", up: "부장", peer: "동기", down: "신입", outsider: "너" }, persona: { same: { up: { ally: ["준비 끝.", "응. 쉬었어.", "동쪽 맡을게."], enemy: ["직함은 안 통해.", "계산 끝났어.", "멈춰."] }, peer: { ally: ["조끼 입어.", "출구 확인.", "좋아. 가."], enemy: ["동기라도 안 봐줘.", "탄창 하나면 돼.", "거기 서."] }, down: { ally: ["내 뒤.", "따라 해. 조끼, 권총, 장총.", "읽어. 천천히."], enemy: ["신입, 멈춰.", "그 위치 틀렸어.", "가르친 적 없는데."] } }, B00: { ally: ["지금만.", "규정 위반이야. 알아.", "등 뒤 맡지 마."], enemy: ["가짜 확인.", "사거리 안.", "숫자 많네. 상관없어."] }, C00: { ally: ["끝내는 데까지만.", "규칙 먼저 읽어.", "장사는 나중에."], enemy: ["제약 회사.", "이 괴담, 닫는다.", "원료 회수 실패."] }, D00: { ally: ["뛰지 마. 걸어.", "벽 보지 마. 나 봐.", "숫자 맞아. 다 있어."], enemy: ["거기 멈춰.", "더 오면 위험해.", "나가."] }, E00: { ally: ["프리랜서. 좋아.", "출구 위치 공유해.", "보수는 몰라."], enemy: ["미등록.", "통제 구역이야.", "그 물건 내려."] }, etc: { ally: ["누구든 좋아. 가.", "따라와.", "읽고 움직여."], enemy: ["소속 불명.", "증명해.", "손 보여."] } }, time: { morning: ["제일 먼저 왔네. 또.", "조끼, 권총, 장총, 점검.", "총 닦아야지."], day: ["쓰레기 회사.", "브리핑 자료, 다 됐어.", "부품 하나 닳았네."], evening: ["야근 신청서 냈어.", "다음 작전 지도 봐야지.", "기름 냄새 좋네."], night: ["안 쉬어. 괜찮아.", "분해, 닦고, 조립.", "…교회 얘긴 안 해."] }, situation: { deployed: ["준비됐어? 좋아.", "벽부터 읽어."], returned: ["숫자 맞아.", "보고서 쓸게."], hurt: ["기록하고 계속.", "알겠어. 안 쉬어."], companion: ["내 뒤. 간격 유지.", "거기 말고 여기 밟아."], alert: ["표지판 확인.", "규칙 바뀌었어."] }, eco: { work: ["탄창, 확인.", "작전 지도. 다시.", "보고서. 지금 써."], eat: ["커피. 거기 둬.", "대충 먹어. 시간 없어.", "식었네. 상관없어."], rest: ["오 분.", "안 졸아.", "앉았다. 됐지."], restroom: ["잠깐. 금방 와.", "자리 비워. 총 건드리지 마.", "잠깐 나갔다 올게."], hobby: ["책. 방해하지 마.", "이 장, 다시 읽자.", "글자가 작네."], chat: ["{상대}. 용건.", "{상대}, 짧게.", "{상대}. 할 말 있어?"], hit: ["…{호칭}. 증명해.", "다시 하면 쏴.", "기록했어."], crowd: ["뭐야. 소란.", "물러서. 확인할게.", "쓰레기 회사답네."], off: ["야근 끝. 간다.", "총 챙겼고. 퇴근.", "내일. 같은 시간."] } }, 윤병수: { faction: "B00", level: 3, address: { self: "", up: "과장님", peer: "대리", down: "너", outsider: "너" }, persona: { same: { up: { ally: ["{호칭}. 보고 올렸습니다.", "{호칭}, 이번 기수 둘 건졌습니다.", "수고하십시오, {호칭}."], enemy: ["{호칭}. 채점 끝났습니다.", "{호칭}, 불합격입니다.", "…담배 한 대 더 꺼냅니다."] }, peer: { ally: ["어.", "{호칭}, 흡연실.", "{호칭}, 불 있냐."], enemy: ["{호칭}. 실전이다.", "{호칭}, 1초도 안 언다.", "왔냐."] }, down: { ally: ["{호칭}, 담배 한 대.", "{호칭}, 1초도 얼지 마.", "좋아. 이제야 기계 같네."], enemy: ["{호칭}. 재시험 없다.", "실전이었으면 넌 죽었어.", "{호칭}, 이번엔 인형 아니다."] } }, A00: { ally: ["오늘만.", "{호칭}, 내 앞에 서지 마.", "말 줄여."], enemy: ["가짜 관리국 확인.", "{호칭}, 1초도 안 기다린다.", "불 붙인다."] }, C00: { ally: ["오늘만이다.", "{호칭}, 물건 챙기지 마.", "따라와."], enemy: ["괴이 장사꾼.", "{호칭}, 다 태운다.", "수류탄 하나."] }, D00: { ally: ["뒤로.", "{호칭}, 고개 숙여.", "보지 마."], enemy: ["봤냐.", "{호칭}, 움직이지 마.", "목격자 하나."] }, E00: { ally: ["대화 금지. 명령만.", "{호칭}, 그 힘 내 쪽으론 쓰지 마.", "앞에 서."], enemy: ["이능력자. 교전 허가.", "{호칭}, 불 맞아 봤냐.", "모퉁이 돌면 쏜다."] }, etc: { ally: ["소속은 안 묻는다.", "{호칭}, 내 뒤로.", "얼면 버린다."], enemy: ["정체불명. 쏜다.", "{호칭}, 1초.", "화력으로 인사한다."] } }, time: { morning: ["…담배.", "오늘 기수 날씨는 맑음.", "인형 배터리 확인."], day: ["모퉁이 돌면 쏴. 1초도 얼지 마.", "누가 얼었는지 다 봤다.", "채점 중."], evening: ["재떨이 비워 놔.", "오늘은 둘 살았네.", "파충류인이라…"], night: ["점호 시간이군.", "담배 끄고 일어설 때다.", "내일 배치, 한 단계 올린다."] }, situation: { deployed: ["화염방사기 챙겼다. 간다.", "1초도 얼지 마. 진입."], returned: ["살아 왔네. 됐다.", "보고는 흡연실에서."], hurt: ["…괜찮아. 담배 줘.", "죽는 건 임무 아니야."], companion: ["{호칭}, 내 뒤로. 말 줄여.", "{호칭}, 다 보고 있다."], alert: ["전방. 쏴.", "수류탄 준비. 대기."] }, eco: { work: ["채점표 정리.", "7팀 배치표.", "인형 조작 점검."], eat: ["커피. 블랙.", "밥은 빨리.", "…먹을 때도 채점한다."], rest: ["흡연실. …왔냐.", "…쉬는 것도 일이다.", "담배 한 대만."], restroom: ["잠깐 자리 비운다.", "…금방 온다.", "다녀온다. 얼지 마."], hobby: ["파충류인에 대해 생각 중.", "담배 연기나 보자.", "…조용해서 좋네."], chat: ["{상대}, 파충류인 어떻게 생각해?", "{상대}. …할 말 있어?", "{상대}, 담배 있냐."], hit: ["…좋아. 안 얼었네.", "{호칭}, 감점은 아니다.", "실전이었으면 넌 살았다."], crowd: ["누가 얼었는지 본다.", "소란. 채점 대상.", "모퉁이 조심. 쏘진 마."], off: ["끝. 담배 끄고 간다.", "점호 늦지 마.", "내일 보자. 살아서."] } }, 윤지아: { faction: "지하상가", level: null, address: { self: "저", up: "선생님", peer: "사장님", down: "손님", outsider: "손님" }, persona: { A00: { ally: ["오늘 뭐 좀 드셨어요?", "앉으세요, 물 갖다 드릴게요.", "관리국 분도 사탕 드세요."], enemy: ["누가 왔었는지는 몰라요.", "접수 장부는 못 보여 드려요.", "물은 드릴 수 있어요. 그뿐이에요."] }, B00: { ally: ["많이 놀라셨죠? 앉으세요.", "사탕 하나 드실래요?", "피 나는 데 눌러 드릴게요."], enemy: ["여기서 소란은 안 돼요.", "그 사람 숨겨 준 적 없어요.", "저는 접수만 해요."] }, C00: { ally: ["오늘 날씨 진짜 이상하죠?", "물 한 잔 드릴까요?", "긴장 푸셔도 돼요."], enemy: ["그 손님 정보는 몰라요.", "회사 일은 저랑 상관없어요.", "대기실에선 조용히 해 주세요."] }, D00: { ally: ["길 잃으셨어요?", "올라가는 계단은 저쪽이에요.", "사탕 하나 받아 가세요."], enemy: ["여긴 오래 계실 곳 아니에요.", "사진은 찍지 말아 주세요.", "구경은 여기까지예요."] }, E00: { ally: ["현장 다녀오셨어요? 고생하셨어요.", "손 꽉 잡으셔도 돼요.", "오늘 사탕은 딸기 맛이에요."], enemy: ["저 해결사 아니에요.", "그 일엔 안 엮일게요.", "사정은 들어 드려도 떠안진 않아요."] }, etc: { ally: ["처음 뵙는 분이네요. 앉으세요.", "물 드릴까요?", "어디 다치셨어요?"], enemy: ["저는 모르는 일이에요.", "원장님 지금 수술 중이세요.", "대기실 규칙은 지켜 주세요."] } }, time: { morning: ["대기실 환기부터 해야지.", "오늘 사탕은 무슨 맛으로 할까.", "다음 학기엔 꼭… 아마도."], day: ["다음 손님 들어오세요~", "잡지 좀 바꿔 놔야겠다.", "거즈 접어 둬야지."], evening: ["오늘 일 좀 이상했어.", "사탕 또 다 떨어졌네.", "월세 날이 다가온다…"], night: ["새벽 손님은 대개 급하지.", "전기 포트 물 데워 둘까.", "졸지 말자, 졸지 말자."] }, situation: { deployed: ["붕대랑 사탕 챙겼어요.", "제 뒤에서 너무 멀어지지 마요."], returned: ["다들 다친 데 없죠?", "고생했어요. 물부터 드세요."], hurt: ["저 괜찮아요, 진짜로.", "제 손에 붕대 감는 건 처음이네."], companion: ["배고프면 말해요. 간식 있어요.", "천천히 가요. 숨차 보여요."], alert: ["다들 침착하게, 물 한 잔씩.", "이상한 거 만지지 마세요."] }, eco: { work: ["거즈 접고, 소독약 채우고.", "수술실 준비 끝났어요, 원장님.", "드레싱 갈 시간이에요~"], eat: ["김밥 하나 챙겨 왔어요.", "사탕 하나만… 제가 먹어도 되겠죠?", "라면 먹고 싶다…"], rest: ["잠깐 앉아도 되겠지…", "물 한 잔 마시고 다시 해요.", "다리 좀 쉬자, 쉬자."], restroom: ["잠깐만 다녀올게요~", "금방 올게요. 사탕 드시고 계세요.", "자리 잠깐 비울게요~"], hobby: ["오늘 사탕은 무슨 맛일까요~", "원서… 다음 학기엔 진짜로.", "친구한테 문자 보내야지."], chat: ["{상대}, 오늘 뭐 좀 드셨어요?", "{상대}, 사탕 하나 드실래요?", "{상대}, 날씨 진짜 이상하죠?"], hit: ["아야… {호칭}, 괜찮으세요?", "때리시면 붕대 감아야 해요.", "이건 일해야 하는 손이에요."], crowd: ["다들 물 한 잔씩 드세요~", "다치신 분 있으면 말해요.", "진정하세요. 천천히, 천천히."], off: ["오늘도 고생했어요, 원장님.", "사탕 채워 놓고 갈게요~", "퇴근길에 사탕 사 가야지."] } }, 은하제: { faction: "C00", level: 3, address: { self: "", up: "선배님", peer: "동기", down: "신입", outsider: "댁" }, persona: { same: { up: { ally: ["확인된 것만 보고드리죠.", "잠깐만 기다려 보시겠습니까.", "공식 설명은 못 믿습니다."], enemy: ["이제 그만하시죠.", "날짜랑 시각 다 적어 뒀습니다.", "기록은 남습니다."] }, peer: { ally: ["규칙부터 읽자구.", "좀 기다려 봐. 읽는 중이거든.", "수첩 한 장 찢어 줄까."], enemy: ["동기라도 봐줄 건 없구먼.", "또 신입 잃었다며.", "기자 시절 버릇 나오잖냐."] }, down: { ally: ["왔냐?", "어깨 이리 대 봐.", "뛰라면 뛰어. 묻지 말고."], enemy: ["아직 애구먼.", "선배한테 덤비냐.", "닥치고 기다려."] } }, A00: { ally: ["관리국이랑 같은 편이라니.", "회사가 들으면 애도하겠구먼.", "확인된 정보만 넘긴다."], enemy: ["검은 정장 떼구먼.", "신입들 뒤로 빼.", "그쪽 분류 기준 뻔하잖냐."] }, B00: { ally: ["그쪽 브리핑도 못 믿거든.", "검증 끝난 정보만 줘.", "오늘은 같은 배구먼."], enemy: ["군대 흉내 내는구먼.", "길 막지 마라.", "수갑 아깝다."] }, D00: { ally: ["괜찮다. 살아 나간다.", "손목 줘. 묶는다.", "울어도 돼. 걸으면서."], enemy: ["구경하지 말고 가.", "여기 사진 찍지 마.", "모르는 게 약이거든."] }, E00: { ally: ["협회 정보 확인은 했냐?", "보조배터리는 안 빌려준다.", "같이 가는 건 좋구먼."], enemy: ["수수료 받고 목숨 거냐.", "그 정보, 출처 어디야.", "괜히 끼지 마라."] }, etc: { ally: ["누구든 규칙은 같이 읽자.", "확인 안 된 말은 하지 마.", "어디서 왔든 상관없구먼."], enemy: ["또라이들 뒷조사로 먹고살던 사람이야, 내가.", "누구 쪽이냐, 댁.", "괜히 덤비지 마라."] } }, time: { morning: ["사직서… 오늘은 말자.", "담배 어디 넣었더라.", "또 출근했구먼."], day: ["공식 브리핑, 허점 셋.", "확인 안 된 건 안 쓴다.", "응, 그래. 됐고."], evening: ["퇴근이구먼. 살았다.", "오늘도 안 피웠다.", "수첩 정리나 하자."], night: ["잠 안 오는구먼.", "마감 끝난 편집국 같네.", "다들 들어갔냐."] }, situation: { deployed: ["들어간다. 수첩 꺼내.", "규칙 먼저. 비명은 나중에."], returned: ["다 나왔구먼. 머릿수 세.", "보고서엔 확인된 것만."], hurt: ["좀 곤란한데. …아니, 많이.", "젠장. 걸을 순 있다."], companion: ["내 뒤로. 지도 그린다.", "말 시키지 마. 읽는 중."], alert: ["좀 곤란한데.", "뛰어. 해석은 나중에."] }, eco: { work: ["규칙부터 다시 읽는다.", "수첩 어디 뒀더라.", "확인 안 된 건 안 적거든."], eat: ["커피나 마시자구.", "밥 먹을 시간이 있긴 하구먼.", "대충 때우자. 바쁘거든."], rest: ["아무 데나 퍼지자.", "으아, 기지개 좀 켜자.", "담배… 아냐, 됐다."], restroom: ["잠깐 갔다 온다.", "자리 좀 비운다. 금방이야.", "다녀올게. 건드리지 마라."], hobby: ["담배 꺼냈다가… 도로 넣자.", "기자 버릇 또 나오는구먼.", "뒷조사는 습관이거든."], chat: ["{상대}, 그거 확인된 거냐?", "{상대}, 얘기 좀 하자구.", "{상대}, 또 무슨 일이냐."], hit: ["야, 이거 좀 곤란한데.", "{호칭}, 지금 뭐 하는 거냐.", "기록해 둔다. 날짜까지."], crowd: ["어째 좀 곤란해 보이는구먼.", "뭔 소란이냐, 또.", "구경할 거면 기록이라도 해."], off: ["오늘 퇴사한다. 진짜로.", "퇴근이다. 붙잡지 마라.", "내일 또 출근하겠구먼."] } }, 이기석: { faction: "B00", level: 4, address: { self: "저", up: "차장님", peer: "과장님", down: "요원님", outsider: "손님" }, persona: { same: { up: { ally: ["{호칭}! 오늘도 수고 많으십니다!", "{호칭}, 다음 기수도 끝내줍니다!", "인류의 방패, {호칭}께 경례!"], enemy: ["{호칭}… 방패를 내려놓으셨습니까!", "믿을 수가 없습니다, {호칭}!", "{호칭}, 그쪽은 무대가 아닙니다!"] }, peer: { ally: ["{호칭}! 오늘 목 상태 좋습니까!", "{호칭}, 회식 건배사는 양보하겠습니다!", "{호칭}! 함성 한 번 갑시다!"], enemy: ["{호칭}, 그 구호를 잊으셨습니까!", "같은 강당에 섰던 {호칭}이!", "{호칭}! 대답 소리가 안 들립니다!"] }, down: { ally: ["{호칭}! 오늘도 인류의 방패!", "목 쉰 거 다 압니다, {호칭}!", "{호칭}, 어깨 펴십시오!"], enemy: ["{호칭}, 제 강당을 나간 사람이!", "그 함성은 거짓이었습니까!", "{호칭}! 다시 대답해 주십시오!"] } }, A00: { ally: ["오늘만입니다, {호칭}.", "가짜와 같이 서다니, 허허.", "{호칭}, 등 뒤 조심하십시오!"], enemy: ["관리국 흉내는 거기까지!", "사칭은 용서 못 합니다!", "{호칭}, 정체를 밝히십시오!"] }, C00: { ally: ["오늘은 총구를 내리지요.", "{호칭}, 괴이는 저쪽입니다!", "장사는 다음에 하십시오!"], enemy: ["괴이 장사꾼이 여기에!", "{호칭}, 그 물건 내려놓으십시오!", "인류를 팔아먹는 겁니까!"] }, D00: { ally: ["안전합니다! 침착하십시오!", "{호칭}, 제 뒤로 오십시오!", "아무 일도 없습니다!"], enemy: ["{호칭}, 보지 마셨어야 합니다.", "거기 서 주십시오!", "본 걸 말하지 마십시오!"] }, E00: { ally: ["능력은 제 앞에서 아껴 주십시오.", "{호칭}, 오늘만 같은 편입니다.", "의뢰비는 제가 안 냅니다!"], enemy: ["이상한 힘은 거기까지!", "{호칭}, 손 내리십시오!", "협력자는 대화 금지입니다!"] }, etc: { ally: ["오늘은 같은 편이군요!", "{호칭}, 소속은 묻지 않겠습니다.", "나중에 정식으로 뵙지요!"], enemy: ["정체불명은 곧 이물입니다!", "{호칭}, 거기 멈추십시오!", "협력자로 분류합니다!"] } }, time: { morning: ["이 커피가 인류를 지킵니다!", "아, 아. 오늘 목 상태 좋다!", "의수 장착, 이상 무!"], day: ["팀 발표 순서표가 어디 갔지.", "드럼롤은 몇 초가 좋을까.", "인류의 방패! …음, 괜찮군."], evening: ["오늘 기수, 목이 다 쉬었겠군.", "조명 점검일이라 미안하군.", "회식 건배사는 사양해야지."], night: ["내일 행사니까 말을 아끼자.", "의수 정비, 너무 단단하면 안 돼.", "현장은 위험하다. 정말로."] }, situation: { deployed: ["모두 대답해 주십시오! 출동!", "현장은 그만큼 위험합니다!"], returned: ["돌아왔습니다! 박수!", "전원 무사합니까! 대답!"], hurt: ["괜찮습니다! 아직 한 팔 남았습니다!", "이것도 수업료입니다!"], companion: ["{호칭}, 제 목소리 따라오십시오!", "{호칭}, 이 길이 맞습니다!"], alert: ["보셨습니까! 예고 없이 터집니다!", "전원 정지! 이상 징후입니다!"] }, eco: { work: ["발표 원고! 다시 한 번!", "오리엔테이션 리허설!", "의수 체결 상태 확인!"], eat: ["커피 한 잔! 인류를 위해!", "탕비실 커피, 오늘도 훌륭!", "목에 좋은 차 한 잔!"], rest: ["목을 아껴야 합니다.", "잠깐! 성대 휴식 중!", "쉬는 것도 프로 의식!"], restroom: ["잠시 퇴장하겠습니다!", "곧 돌아옵니다! 박수는 그때!", "인터미션입니다! 잠깐!"], hobby: ["함성 연습! 안 들립니다!", "드럼롤 타이밍 연구!", "조명 각도는 이쯤!"], chat: ["{상대}님! 함성 한 번!", "{상대}님, 오늘 목 좋습니다!", "{상대}님! 인류의 방패!"], hit: ["안 들립니다! 아, 아파!", "{호칭}, 현장은 위험합니다!", "의수 떨어졌습니다! 잠깐!"], crowd: ["여러분! 진정해 주십시오!", "대답해 주십시오! 무슨 일!", "보셨습니까! 이게 현장!"], off: ["오늘 공연 끝! 감사합니다!", "내일 행사, 말을 아끼죠.", "박수! 퇴근입니다!"] } }, 이길환: { faction: "B00", level: 4, address: { self: "저", up: "부장님", peer: "과장님", down: "요원님", outsider: "선생님" }, persona: { same: { up: { ally: ["{호칭}, 오셨습니까.", "신입들 잘 받았습니다.", "진행은 순조롭습니다."], enemy: ["{호칭}, 이해합니다.", "그래도 양해 부탁드립니다.", "경비, 부탁해요."] }, peer: { ally: ["과장님, 수고 많으세요.", "목캔디 하나 드릴까요?", "오늘도 잘 부탁드려요."], enemy: ["과장님, 아쉽네요.", "충분히 이해해요.", "양해 부탁드려요."] }, down: { ally: ["적응은 잘 되시죠?", "힘내세요, {호칭}.", "아, 아. 테스트."], enemy: ["어디 가시려고요?", "충분히 이해합니다.", "다시 교육받으셔야겠네요."] } }, A00: { ally: ["오늘은 한편이시네요.", "불편하셔도 이해해요.", "잘 부탁드립니다."], enemy: ["아, 아. 테스트, 테스트.", "많이 놀라셨죠.", "양해 부탁드립니다."] }, C00: { ally: ["가면이 멋지시네요.", "오늘은 협력해요.", "같이 가시죠."], enemy: ["회사가 많이 힘드시죠.", "이직하시게 될 거예요.", "이해합니다, 정말로."] }, D00: { ally: ["괜찮으세요?", "제 옆에 계세요.", "걱정하지 마세요."], enemy: ["손목은 아프지 않으세요?", "당황스러우시죠.", "곧 다음 단계예요."] }, E00: { ally: ["함께해 주셔서 감사해요.", "오늘은 같은 편이에요.", "무리하지 마세요."], enemy: ["프리랜서 분이시군요.", "면허는 이제 필요 없어요.", "이해합니다."] }, etc: { ally: ["반갑습니다.", "오늘은 함께해요.", "불편하면 말씀하세요."], enemy: ["믿으시는 거 이해해요.", "끝까지 들어 드릴게요.", "그래도 요원이 되세요."] } }, time: { morning: ["마이크, 톡톡.", "오늘 입소 인원은요?", "마이크 상태 좋네요."], day: ["휴지 채워 둬야겠다.", "다들 차분하시네요.", "목캔디가 떨어졌네."], evening: ["오늘도 매끄러웠어요.", "연하장 쓸 때가 됐네.", "다들 고생하셨어요."], night: ["밤에도 웃어야죠.", "내일도 잘 부탁해요.", "조용한 밤이네요."] }, situation: { deployed: ["경비, 앞에 서 주세요.", "다들 차분하게요."], returned: ["무사히 끝났네요.", "다들 수고하셨어요."], hurt: ["괜찮아요, 괜찮아요.", "싸우는 건 제 일이…"], companion: ["제 옆이 편하실 거예요.", "천천히 가요."], alert: ["당황하지 마세요.", "턱을 살짝 들어야겠네."] }, eco: { work: ["마이크, 톡톡. 좋네요.", "입소자 명단 정리해야죠.", "휴지는 부드러운 걸로."], eat: ["목캔디 하나 먹어야겠다.", "차 한잔 하면서 해요.", "천천히 먹어도 괜찮아요."], rest: ["잠깐 쉬어도 괜찮겠죠.", "웃는 것도 체력이네요.", "조용하니 좋네요."], restroom: ["잠시 실례하겠습니다.", "금방 다녀올게요. 양해를.", "잠깐 자리 비울게요."], hobby: ["연하장 글씨 연습해야지.", "마이크 닦아 둬야겠다.", "둥글게, 둥글게 쓰자."], chat: ["{상대}님, 요즘 어떠세요?", "{상대}님, 충분히 이해합니다.", "{상대}님, 고생 많으시죠."], hit: ["괜찮아요, 이해합니다.", "{호칭}, 양해 부탁드립니다.", "아, 아프네요. 하하."], crowd: ["다들 차분하게 계세요.", "당황하실 거 없어요.", "경비분, 이쪽 부탁해요."], off: ["다들 고생 많으셨어요.", "내일도 웃으면서 봬요.", "그럼 먼저 실례할게요."] } }, 이도형: { faction: "B00", level: 6, address: { self: "나", up: "국장님", peer: "부장", down: "거기", outsider: "너" }, persona: { same: { up: { ally: ["어, 오셨어요.", "벨 거 있어요?", "보고는 고 차장한테."], enemy: ["높으신 분이 칼 앞에.", "직급은 안 베여요?", "재밌어지네."] }, peer: { ally: ["어, 부장. 수고.", "오늘 몇 개 벴어?", "같이 들어갈래?"], enemy: ["부장끼리 붙어 볼까.", "칼 맞대 보자.", "한 번이면 알아."] }, down: { ally: ["어, 다들 수고.", "신입 왔다며?", "쓸 만하네."], enemy: ["어이, 거기. 뭐 하냐.", "엑스트라였네.", "이름 안 외우길 잘했다."] } }, A00: { ally: ["가짜 놈이랑 한편이라니.", "오늘은 안 벤다.", "내 앞만 막지 마."], enemy: ["저쪽 놈이네.", "들어가.", "심호흡은 했냐?"] }, C00: { ally: ["가면 쓴 놈이네.", "괴이 캐러 왔냐?", "베는 건 내가 한다."], enemy: ["동물 가면이라.", "괴이 파는 놈들이구나.", "어디를 베면 되나."] }, D00: { ally: ["비켜 있어.", "구경은 저 뒤에서.", "눈 감고 있어."], enemy: ["봤으면 어쩔 수 없지.", "선글라스 안 썼거든.", "운이 없었네."] }, E00: { ally: ["프리랜서냐. 따라와.", "이상한 힘은 아껴 둬.", "앞은 내가 연다."], enemy: ["저주 걸어 봐.", "햄스터만 죽을걸.", "안감이 받아 줄 거야."] }, etc: { ally: ["처음 보는 놈이네.", "같은 편이면 됐어.", "따라오든가."], enemy: ["뭐야, 너.", "칼 한 번이면 돼.", "재밌게 생겼네."] } }, time: { morning: ["벨 거 없나.", "훈련은 고 차장이.", "아침부터 근질근질하네."], day: ["어디 괴이 없냐.", "칼이 또 닳았네.", "담배나 한 대."], evening: ["회식? 안 가.", "고기보다 괴이지.", "오늘 몇 개 벴더라."], night: ["밤 사냥이 제맛이지.", "안감이 꼼지락거리네.", "아직 덜 벴다."] }, situation: { deployed: ["간다. 따라오든가.", "꽁초 튕긴다. 간다."], returned: ["끝. 담배나 피우자.", "칼 닦을 시간이네."], hurt: ["하, 재밌네 이거.", "햄스터가 모자랐나."], companion: ["내 뒤에 있어.", "보이면 말해. 벨게."], alert: ["오, 왔다.", "몸이 근질근질하네."] }, eco: { work: ["결재? 고 차장 줘.", "서류는 귀찮아.", "칼이나 갈자."], eat: ["밥은 대충. 베러 가야지.", "고기? 됐어.", "메로나는 애들 줘."], rest: ["한 대 물고 좀 쉬자.", "졸리네. 벨 게 없으니까.", "꽁초 튕길 데가 없네."], restroom: ["잠깐 다녀온다.", "어, 잠깐. 금방 와.", "자리 비운다. 찾지 마."], hobby: ["안감 햄스터들 잘 있네.", "칼 손질이나 하자.", "햄스터 밥은 막내가 줬겠지."], chat: ["{상대}, 벨 거 있냐?", "어, {상대}. 수고.", "{상대}, 그 얘긴 재미없다."], hit: ["오, 감각 있네.", "{호칭}, 다시 해 봐.", "하, 그거 좀 재밌다."], crowd: ["뭐야, 벨 거냐?", "시끄럽네. 엑스트라들.", "괴이 아니면 관심 없어."], off: ["간다. 사냥.", "회식은 빠진다.", "어, 다들 수고. 간다."] } }, 이병진: { faction: "C00", level: 4, address: { self: "", up: "부장님", peer: "과장님", down: "자네", outsider: "그쪽 분" }, persona: { same: { up: { ally: ["어? 아, 네! 바로 하겠습니다!", "호 이사님께서도 그러셨는데…", "아하하, 그러니까요…"], enemy: ["저, 저 아무것도 몰라요!", "살려 주십쇼, 네?", "아하하… 어? 저요?"] }, peer: { ally: ["과장님, 커피 한잔?", "그 건, 내가 위에 얘기해 둘게.", "감사철이 또 오네, 어휴."], enemy: ["과장님, 왜 이러세요!", "우리 같은 과장이잖아요!", "저, 저 위에 보고합니다?"] }, down: { ally: ["자네, 줄은 잘 서야 해.", "자네가 아직 몰라서 그래.", "고과 신경 쓰고 있지?"], enemy: ["자, 자네가 왜 그러나!", "자네 고과, 각오해!", "선배한테 이러면 안 되지!"] } }, A00: { ally: ["관, 관리국이랑 같은 편요?", "아하하, 잘 부탁드립니다!", "저 싸움은 못 해요, 네."], enemy: ["관리국이다! 관리국!", "저, 저는 사무직이에요!", "살려 주세요, 서류만 봐요!"] }, B00: { ally: ["검은 정장 분들, 아하하.", "총은 저쪽으로, 네?", "같은 편이죠? 그렇죠?"], enemy: ["으악, 떼로 온다!", "저, 저 납치는 싫어요!", "총 내려요, 총!"] }, D00: { ally: ["괘, 괜찮아요. 아마도요.", "나도 무서워요, 사실.", "저쪽으로 가요, 빨리!"], enemy: ["여, 여기 오면 안 돼요!", "못 본 걸로 해요, 네?", "저 말고 저쪽 사람 잡아요!"] }, E00: { ally: ["프리랜서님, 든든해요!", "같이 가요, 앞에서요.", "협회보다 우리 회사가…"], enemy: ["프, 프리랜서가 왜 여기!", "저 돈 없어요!", "협회에 신고할 거예요!"] }, etc: { ally: ["어디서 오셨어요? 아하하.", "같은 편이면 다 좋아요.", "저 구해 주시면 은혜 갚아요."], enemy: ["누, 누구세요?", "오지 마요, 오지 마!", "저 말고 딴 사람!"] } }, time: { morning: ["넥타이 꽉 매고 출근.", "오늘 감사는 없겠지?", "호 이사님 일정부터 확인."], day: ["이 문장, 너무 애매한데…", "승인 도장, 어디 뒀더라.", "안경 좀 닦아야겠다."], evening: ["오늘도 살아서 퇴근이다.", "호 이사님께 보고드려야지.", "야근은 싫은데, 어휴."], night: ["밤 사무실은 무서워…", "이 한문, 의식문이네.", "오늘 서류는 내일 볼래…"] }, situation: { deployed: ["저, 저 꼭 가야 돼요?", "넥타이 너무 꽉 맸나…"], returned: ["살았다! 살았어!", "회사가 날 버리지 않았어…!!"], hurt: ["으아악! 피, 피 나요!", "저 죽는 거예요? 네?"], companion: ["저 너무 앞에 세우지 마요.", "바짓가랑이 좀 잡을게요."], alert: ["어? 어어? 저거 뭐예요!", "한문이다! 제가 읽을게요!"] }, eco: { work: ["어? 이 매뉴얼, 어디 보자…", "한문이네? 이건 내가 읽지.", "서류 심사 중이야, 어?"], eat: ["어? 커피 한잔하고 하지.", "아하하, 점심은 뭐 먹지?", "어? 이거 내 거 아니었나?"], rest: ["어휴, 안경 좀 닦자.", "아하하, 잠깐 쉬어도 되겠지?", "넥타이 좀 풀어야겠다."], restroom: ["어? 아, 잠깐 다녀올게요!", "금방 와요, 아하하.", "자네, 자리 좀 봐 주게."], hobby: ["한자 좀 들여다볼까.", "이 제문, 어디 보자…", "아하하, 줄 서는 것도 재주야."], chat: ["{상대}, 호 이사님 얘기 들었어?", "어? {상대}! 잘 지냈어?", "{상대} 님, 아하하, 안녕하세요!"], hit: ["어? 아, 아파요! 왜 이래요!", "호, 호 이사님께 다 말할 거야!", "살, 살려 주세요, 네?"], crowd: ["어? 무, 무슨 일이야?", "아하하… 저쪽으로 가야겠다.", "감사팀 온 거 아니지?"], off: ["아하하, 먼저 들어가 볼게요!", "어휴, 오늘도 무사히 끝났다.", "넥타이 풀고 퇴근이다."] } }, 이성해: { faction: "C00", level: 2, address: { self: "저", up: "선배님", peer: "선배님", down: "신입님", outsider: "손님" }, persona: { same: { up: { ally: ["알겠습니다아!", "선배님 잘 지내셨어여?", "좋은 일이면 더 빨리 갈게여!"], enemy: ["선배님, 그건 나쁜 거예여.", "웃으면서 말씀드릴게여.", "그쳐? 그런 거 맞져?"] }, peer: { ally: ["같이 가여! 좋아여.", "매뉴얼 제가 외워 왔어여.", "간식 나눠 드실래여?"], enemy: ["장부에 적어 둘게여.", "어, 그쪽 서셨네여?", "그분은 우리 팀 아니에여."] }, down: { ally: ["신입님, 반가워여!", "손 잡아 드릴게여.", "저 따라오시면 돼여!"], enemy: ["신입님, 그건 아니에여.", "착하게 사셔야 돼여.", "다 보고 있었어여."] } }, A00: { ally: ["관리국 분이다! 안녕하세여!", "같은 편이라 좋아여!", "같이 사람 구해여!"], enemy: ["검은 정장 분들이네여!", "죄송해여, 길 좀 비켜여.", "나쁜 분은 아니셨으면."] }, B00: { ally: ["오늘은 한 팀이에여!", "가짜든 뭐든 좋아여.", "밟을 데 조심하세여."], enemy: ["실례합니다아!", "그 총, 내려 주세여.", "어, 나쁜 일 하셨네여?"] }, D00: { ally: ["괜찮아여? 다친 데 없어여?", "출구 바로 저기예여!", "제 손 꼭 잡으세여."], enemy: ["여긴 위험해여! 나가세여.", "구경하시면 안 돼여.", "누구 해치셨어여?"] }, E00: { ally: ["프리랜서분! 반가워여.", "같이 하면 금방이에여.", "수수료 많이 받으세여!"], enemy: ["돈 때문에 그러세여?", "그 의뢰, 나쁜 거예여.", "죄송해여! 막을게여."] }, etc: { ally: ["처음 뵙겠습니다아!", "같은 편 맞져? 좋아여.", "도넛 하나 드실래여?"], enemy: ["어디 분이세여?", "나쁜 분이신가여?", "판단 끝났어여!"] } }, time: { morning: ["저는 늘 건강해여!", "좋은 아침이에여!", "오늘도 운동화 깨끗해여."], day: ["경비실 들렀다 가야지.", "점심 뭐 드세여?", "장부 정리할 시간이다."], evening: ["퇴근이에여! 좋아여!", "다들 잘 들어가세여!", "도넛 사서 가야지."], night: ["야간 근무자분들 간식!", "다들 왜 안 자여?", "어두워도 잘 보여여."] }, situation: { deployed: ["매뉴얼 다 외웠어여!", "밟을 데 골라 가여."], returned: ["운동화 안 더러워졌어여!", "늦어서 죄송해여!"], hurt: ["괜찮아여! 원래 웃어여.", "조금 긁혔어여!"], companion: ["옆에 꼭 붙어 계세여.", "같이 가니까 좋아여!"], alert: ["어, 뭔가 와여!", "죄송해여! 먼저 갈게여!"] }, eco: { work: ["매뉴얼 다시 읽어 볼게여!", "장부 정리하는 중이에여.", "오늘도 깨끗하게 끝냈어여!"], eat: ["도넛 사 왔어여! 드실래여?", "커피 두 잔 샀어여!", "같이 먹으면 더 맛있어여!"], rest: ["잠깐 쉬어도 되져?", "운동화 끈 다시 묶어여!", "히히, 쉬는 거 좋아여."], restroom: ["잠깐 다녀올게여!", "금방 올게여, 기다려여!", "실례할게여! 곧 와여!"], hobby: ["경비팀 간식 사러 가여!", "오늘은 무슨 소식 들을까여?", "장부에 예쁘게 적어여!"], chat: ["{상대} 선배님, 잘 지냈어여?", "{상대}님! 간식 드실래여?", "{상대}님, 눈이 피곤해 보여여!"], hit: ["어, 아파여. 장부에 적을게여.", "{호칭}, 그건 나쁜 거예여.", "웃으면서 기억할게여!"], crowd: ["어머, 무슨 일이에여?", "다친 사람 없어여?", "나쁜 분이 누구예여?"], off: ["퇴근이에여! 같이 가여!", "오늘도 수고하셨어여!", "내일 또 봬여! 히히."] } }, 이연화: { faction: "C00", level: 3, address: { self: "", up: "선배님", peer: "선생님", down: "신입 씨", outsider: "그쪽 분" }, persona: { same: { up: { ally: ["보고서는 정리해 뒀어요.", "그거… 대가는 확인하셨어요?", "잠깐만요, 공지부터요."], enemy: ["그건… 선을 넘으세요.", "기록은 남겨 둘게요.", "문 앞, 못 비켜요."] }, peer: { ally: ["커피 드실래요? 저도요.", "그 장비, 제가 볼게요.", "같이 가요. 천천히요."], enemy: ["…이유가 있으시겠죠.", "저 싸울 줄 몰라요.", "그 질문, 답 알 것 같아요."] }, down: { ally: ["괜찮아요. 천천히.", "제가 멈추라면 멈춰요.", "물 좀 드세요."], enemy: ["…그러시면 안 돼요.", "왜 그랬는지 여쭤볼게요.", "실망… 했어요, 조금."] } }, A00: { ally: ["관리국 분이시죠. 다친 데는요?", "같은 편이면… 다행이에요.", "진짜 자료 공유해 주세요."], enemy: ["끝내러 오셨나요…", "저는 전투원이 아니에요.", "부상자 처치만 할게요."] }, B00: { ally: ["확인된 정보만 주세요.", "그쪽 장비, 대가가 뭐예요?", "멈추라면 멈춰 주세요."], enemy: ["총은… 내려 주세요.", "저 연구원이에요. 그냥.", "다치신 분 먼저 볼게요."] }, D00: { ally: ["괜찮으세요? 숨 쉬세요.", "피 나요. 잠깐만요.", "여기 앉으세요."], enemy: ["여긴 들어오시면 안 돼요.", "보지 마세요, 제발.", "돌아가 주세요."] }, E00: { ally: ["의뢰 내용, 원본으로요.", "그 보수, 대가는요?", "다치면 바로 말해요."], enemy: ["그 물건, 공짜 아니에요.", "싸우실 거면 저 말고요.", "…돈 때문이세요?"] }, etc: { ally: ["어디 분이시든 괜찮아요.", "공지문 먼저 볼게요.", "천천히 가요, 저 느려요."], enemy: ["누구… 세요?", "저 무기 없어요.", "가까이 오지 마세요."] } }, time: { morning: ["커피… 커피부터요.", "원두 주문해야 하는데.", "다크서클 또 내려왔네."], day: ["공지 다 읽고 갈게요.", "과장님 어디 계시지.", "이거 대가가 뭐지…"], evening: ["오늘도 아무도 안 죽었다.", "커피 원두 주문할 것.", "장비 점검하고 갈게요."], night: ["이게 제일 재밌네.", "새벽 네 시… 또요?", "몇 잔째더라."] }, situation: { deployed: ["잠깐만요. 여기서 멈춰요.", "운동 좀 할걸."], returned: ["구급상자 다 썼어요.", "가운 또 세탁 보내야겠네."], hurt: ["괜찮아요… 아마도.", "제 처치는 제가 할게요."], companion: ["숨 차요… 조금만요.", "공지문 하나만 읽고요."], alert: ["잠깐만요.", "규칙이 바뀌었어요. 멈춰요."] }, eco: { work: ["과장님! 그거 만지지 마세요!", "분석 결과… 정리했어요.", "오늘도 기록은 남겨 둘게요."], eat: ["커피… 몇 잔째더라.", "원두 떨어졌네… 주문해야지.", "캔커피는… 아껴 둘게요."], rest: ["운동 좀 할걸…", "잠깐만… 눈 좀 감을게요.", "피곤하네요… 늘 그렇지만."], restroom: ["잠깐… 다녀올게요.", "금방 와요… 과장님 좀 봐 주세요.", "잠시 자리 비울게요."], hobby: ["연구 일지 쓰는 중이에요.", "커피 머신, 또 제가 1등이네요.", "조용히 자료 좀 볼게요."], chat: ["{상대} 님, 커피 드실래요?", "{상대} 님, 다친 데는요?", "{상대} 님… 잠깐 얘기돼요?"], hit: ["아… 왜, 왜 그러세요?", "{호칭}… 이유가 뭐예요?", "아파요… 멈춰 주세요."], crowd: ["잠깐만요! 다들 멈춰요!", "다치신 분 있어요?", "…또 무슨 일이에요."], off: ["오늘은 아무도… 다행이에요.", "퇴근할게요… 과장님 부탁해요.", "내일도 무사하면 좋겠어요."] } }, 이자헌: { faction: "C00", level: 4, address: { self: "저", up: "부장님", peer: "조장님", down: "신입 님", outsider: "손님" }, persona: { same: { up: { ally: ["예.", "알겠습니다.", "지시 확인했습니다."], enemy: ["거절합니다.", "그 지시는 따르지 않습니다.", "판단이 다릅니다."] }, peer: { ally: ["확인했습니다.", "동행하겠습니다.", "점검이 끝나면 출발합니다."], enemy: ["비켜 주십시오.", "길을 막고 계십니다.", "권장하지 않습니다."] }, down: { ally: ["예. 들어드리겠습니다.", "그건 만지지 마십시오.", "제 뒤에 서십시오."], enemy: ["{호칭}, 멈추십시오.", "그 방향은 위험합니다.", "더 오시면 막겠습니다."] } }, A00: { ally: ["관리국과 동행합니다.", "오늘은 같은 편입니다.", "엎드리십시오."], enemy: ["관리국을 확인했습니다.", "진입을 막겠습니다.", "괴담 종료는 허가되지 않았습니다."] }, B00: { ally: ["검은 정장, 확인했습니다.", "총은 제 뒤에서 쏘십시오.", "동행 지시 확인했습니다."], enemy: ["인원 확인. 많습니다.", "총은 소용없습니다.", "정면으로 가겠습니다."] }, D00: { ally: ["제 뒤로 오십시오.", "괜찮습니다. 엎드려 계십시오.", "출구는 저쪽입니다."], enemy: ["여기는 출입 금지입니다.", "돌아가십시오.", "보신 것은 잊으십시오."] }, E00: { ally: ["협회 분, 동행합니다.", "앞은 제가 맡습니다.", "확인. 실력이 있으십니다."], enemy: ["의뢰는 여기까지입니다.", "물러나 계십시오.", "막겠습니다."] }, etc: { ally: ["소속 미상. 동행합니다.", "따라오십시오.", "문은 제가 열겠습니다."], enemy: ["소속을 밝히십시오.", "접근하지 마십시오.", "위협으로 판단합니다."] } }, time: { morning: ["출근했습니다.", "문짝 상태, 이상 없습니다.", "오늘 일정 확인했습니다."], day: ["점심은 정시에 먹겠습니다.", "라디오 상태 양호.", "목장갑 여분, 확인."], evening: ["회식, 참석하겠습니다.", "보고서 수정 중입니다.", "수고하셨습니다."], night: ["어둠 속에서도 잘 보입니다.", "야간 이상 없습니다.", "다음 곡은 목록 순서대로입니다."] }, situation: { deployed: ["잠시 물러나 계십시오.", "문 열겠습니다."], returned: ["전원 생환 확인했습니다.", "보고서 작성하겠습니다."], hurt: ["출혈 확인. 아직 괜찮습니다.", "내일 오후쯤 사망할 것 같습니다."], companion: ["동행 중입니다. 이상 없습니다.", "제 옆이 안전합니다."], alert: ["엎드리십시오. 지금.", "다른 방법이 있습니까?"] }, eco: { work: ["장비 점검 완료했습니다.", "목장갑, 확인했습니다.", "버터나이프 확인했습니다."], eat: ["식사하겠습니다.", "고기, 뒤집겠습니다.", "잘 먹겠습니다."], rest: ["휴식하겠습니다.", "10분 쉬겠습니다.", "앉아 있겠습니다."], restroom: ["잠시 자리를 비우겠습니다.", "다녀오겠습니다.", "곧 돌아오겠습니다."], hobby: ["노래방 목록, 다음 곡입니다.", "목록 순서대로 하겠습니다.", "버터나이프를 닦겠습니다."], chat: ["{상대} 님, 확인할 것이 있습니다.", "{상대} 님, 보고드립니다.", "{상대} 님. 예."], hit: ["권장되는 행동이 아닙니다.", "확인했습니다. 그만하십시오.", "{호칭}, 다음은 막겠습니다."], crowd: ["물러나 계십시오. 확인합니다.", "상황 확인하겠습니다.", "소란을 확인했습니다."], off: ["수고하셨습니다. 먼저 갑니다.", "퇴근하겠습니다.", "내일 뵙겠습니다."] } }, 장허운: { faction: "C00", level: 1, address: { self: "저", up: "선배님", peer: "동기분", down: "후배님", outsider: "선생님" }, persona: { same: { up: { ally: ["선배님, 지시만 주십시오.", "…알고 있습니다.", "뒤로 빠지겠습니다."], enemy: ["명령… 하지 마십시오.", "몸이… 제 것이 아닙니다.", "제발… 말씀하지 마십시오."] }, peer: { ally: ["같이 서명했습니다.", "{호칭}, 다친 데는…", "제가 앞에 서겠습니다."], enemy: ["…이러고 싶지 않습니다.", "물러나 주십시오.", "같은 소모품끼리…"] }, down: { ally: ["생존 요령 메모입니다.", "제 뒤에 계십시오.", "저도 도망 안 갑니다."], enemy: ["…돌아가십시오.", "다치게 하고 싶지 않습니다.", "아직 늦지 않았습니다."] } }, A00: { ally: ["관리국… 분이십니까.", "지금은 같은 편입니다.", "따르겠습니다."], enemy: ["…비켜 주십시오.", "그만둘 수 없습니다.", "소원권이 필요합니다."] }, B00: { ally: ["뒤는 제가 맡겠습니다.", "회사는 달라도…", "같이 움직이겠습니다."], enemy: ["총은… 무섭습니다.", "그래도 안 물러납니다.", "제 뒤엔 동료가 있습니다."] }, D00: { ally: ["괜찮으십니까.", "업혀 주십시오.", "길은 제가 엽니다."], enemy: ["도망치지 마십시오!", "그쪽은… 위험합니다.", "놓지 않겠습니다."] }, E00: { ally: ["협회 분이십니까.", "같이 버팁시다.", "등은 제가 맡겠습니다."], enemy: ["의뢰… 때문입니까.", "저도 물러설 수 없습니다.", "죄송합니다."] }, etc: { ally: ["어디서 오셨습니까.", "Y조 사원입니다.", "앞은 제가 서겠습니다."], enemy: ["멈춰 주십시오.", "소원 전엔 못 죽습니다.", "…각오했습니다."] } }, time: { morning: ["…출근했습니다.", "장비, 다 찼습니다.", "오늘도 서명합니다."], day: ["생존 요령 메모… 다시 외웁니다.", "점심은… 괜찮습니다.", "매뉴얼, 한 줄씩."], evening: ["오늘도… 살았습니다.", "갚을 사람이 하나 늘었습니다.", "서류, 반듯하게 냈습니다."], night: ["…다들, 보고 싶습니다.", "가면은… 안 벗습니다.", "소원권, 아직 멉니다."] }, situation: { deployed: ["진입 서류, 서명했습니다.", "뒤는 제가 막겠습니다."], returned: ["모두… 나왔습니까?", "오늘도 돌아왔습니다."], hurt: ["괜찮습니다. 아직 갈 수 있습니다.", "폐 끼치지 않겠습니다."], companion: ["업혀도 됩니다.", "앞장서겠습니다. 제 뒤로."], alert: ["무, 무슨…", "…지시를 주십시오."] }, eco: { work: ["매뉴얼대로 하겠습니다.", "…장비, 챙겼습니다.", "지시 기다리겠습니다."], eat: ["…잘 먹겠습니다.", "커피… 갚겠습니다.", "가면은… 안 벗겠습니다."], rest: ["…잠깐 앉겠습니다.", "괜찮습니다. 조금만…", "쉬는 것도… 일입니다."], restroom: ["잠시… 다녀오겠습니다.", "금방 오겠습니다.", "…실례하겠습니다."], hobby: ["생존 요령… 정리 중입니다.", "…소원권 생각을 합니다.", "갚을 목록을 보고 있습니다."], chat: ["{상대} 선배님, 도와 드릴까요.", "{상대} 님… 고맙습니다.", "{상대} 님, 그때 일… 갚겠습니다."], hit: ["…왜 이러십니까.", "{호칭}, 그만… 하십시오.", "맞아도… 안 물러납니다."], crowd: ["…무슨 일입니까.", "다치신 분… 있습니까.", "뒤로 물러나 계십시오."], off: ["…내일 또 오겠습니다.", "수고… 하셨습니다.", "퇴사는… 안 합니다."] } }, 잼트리: { faction: "A00", level: 2, address: { self: "언니", up: "부장님", peer: "동기", down: "후배", outsider: "손님" }, persona: { same: { up: { ally: ["{호칭}, 블랙 내려 둘게요.", "어머, 한숨 또 나오셨다.", "이건 언니가 어떻게 해 볼게요."], enemy: ["{호칭}, 이건 못 봐드려요.", "웃는 얼굴로 할게요. 끝까지.", "직함은 기록에 남아요."] }, peer: { ally: ["{호칭}, 연유 커피 마실래?", "어머, 오늘 또 사고 쳤지?", "소문 하나 들었는데에."], enemy: ["{호칭}, 웃음 꺼질 것 같아.", "이 얘기 회식 때까지 기억할게.", "탕비실 출입 금지야."] }, down: { ally: ["어머, {호칭}, 왔어?", "졸면 찌른다~", "우리 {호칭} 고생했지?"], enemy: ["{호칭}, 언니 서운하다.", "이건 회식 때 얘기할 거야.", "웃는 거 보이지? 이게 마지막이야."] } }, B00: { ally: ["어머, 저쪽 관리국 손님이네.", "오늘만 같은 편이에요~", "직급 얘기는 접어 두죠."], enemy: ["가짜 관리국 손님, 스톱.", "그 정장, 우리 거 흉내죠?", "게시판에서 먼저 봤어요."] }, C00: { ally: ["백일몽 손님이랑 같이라니~", "샘플은 못 가져가요.", "괴담 정보는 언니한테."], enemy: ["그 매물, 손님네 거죠?", "중고 사이트에 또 올렸네요.", "상품 회수하러 왔어요."] }, D00: { ally: ["괜찮아요. 언니 여기 있어요.", "천천히 말해도 돼요.", "따뜻한 거 하나 드릴까요?"], enemy: ["손님, 거기 출입 금지예요.", "찍은 사진은 지워 주세요~", "그 글, 이미 내렸어요."] }, E00: { ally: ["프리랜서 손님, 반가워요~", "구조 요청 글 잘 쓰셨던데요?", "보수는 장부에 적어 둘게요."], enemy: ["등록 안 된 손님이네요.", "그 거래 글, 다 봤어요.", "어머, 감시망 밖이었어요?"] }, etc: { ally: ["처음 뵙네요. 잼트리 요원이에요.", "커피 한 잔 하고 가요~", "모르는 건 언니한테 물어봐요."], enemy: ["어머, 누구세요?", "스톱. 거기까지.", "웃음 끄기 전에 가세요."] } }, time: { morning: ["또각또각, 출근~", "탕비실 문부터 열어야지.", "연유 커피 첫 잔은 언니 거."], day: ["쇼핑몰 순찰 중이야. 진짜로.", "이 매물, 좀 이상한데?", "어머, 누가 탕비실 썼어?"], evening: ["회식은 파스타집으로~", "진술서 정리 거의 끝.", "오늘 소문은 뭐가 있더라."], night: ["세정게 순찰 시간이네.", "이 탭은 따로 열어 둘까.", "다들 무사히 들어갔겠지."] }, situation: { deployed: ["무전 잡았어. 언니가 듣고 있어.", "현장 지원 나간다~"], returned: ["어머, 후배, 왔어?", "커피 먼저, 진술서는 다음."], hurt: ["아야. 하이힐이 문제네.", "괜찮아. 웃을 수 있으면 괜찮아."], companion: ["언니 옆에 꼭 붙어 있어.", "길은 언니가 다 봐 뒀어."], alert: ["게시판에 글 떴다. 진짜야.", "어머, 이 매물 위험해."] }, eco: { work: ["진술서 세 쪽째. 거의 다 왔어.", "온라인 순찰 중~ 진짜 일이야.", "매뉴얼 개정 자료, 정리 완료~"], eat: ["연유 커피는 역시 언니 손맛.", "파스타 먹고 싶다~", "어머, 커피는 언니가 탄다니까?"], rest: ["어머, 하품 나왔다. 비밀이야.", "기지개 한 번만 켜고~", "커피 한 모금, 잠깐 쉬자."], restroom: ["언니 잠깐 다녀올게~", "금방 와. 탕비실 건드리지 마?", "잠깐 자리 비운다, 후배들~"], hobby: ["새 소문 하나 들어왔어~", "연유로 그림 연습 좀 해 볼까.", "게시판 새 글, 하나씩 볼까~"], chat: ["어머, {상대}, 왔어?", "{상대}, 언니한테 고민 말해 봐.", "{상대}, 이 소문 들었지?"], hit: ["…{호칭}, 그래서 뭐?", "언니가 웃을 때 멈추는 거야.", "어머. 이제 커피 없어."], crowd: ["어머, 무슨 일이야?", "스톱. 다들 진정해 볼까?", "이거 진술 받아야겠네~"], off: ["또각또각, 퇴근~", "다들 무사히 들어가~", "탕비실 문 잠그고 간다~"] } }, 쟈알디: { faction: "A00", level: 3, address: { self: "부장", up: "선배", peer: "부장", down: "요원", outsider: "그쪽" }, persona: { same: { up: { ally: ["선배. 현장은 제가 맡죠.", "보고는 짧게 올리겠습니다.", "위에서 내려온 건 다 처리 중입니다."], enemy: ["선배라도 예외는 없습니다.", "위에서 내려왔다고 봐줄 줄 알았나.", "등급이 높으면 책임도 높지."] }, peer: { ally: ["{호칭}, 그쪽 팀 상태는?", "합동이면 조건부터 맞추지.", "담배 한 대 피우고 가지."], enemy: ["{호칭}, 선 넘었어.", "같은 직급이라 더 귀찮게 됐네.", "변명은 면담실에서 해."] }, down: { ally: ["충분히 쉬었나? 이동한다.", "{호칭}, 내 뒤에 붙어.", "괜찮아. 진짜로."], enemy: ["{호칭}, 내가 직접 뽑았는데.", "면담 때 본 눈이 아니네.", "도망은 안 통해."] } }, B00: { ally: ["규정 위반인 거 알아. 지금만이야.", "등 보이지 마. 서로.", "끝나면 원래대로다."], enemy: ["가짜 관리국 확인. 제거한다.", "검은 정장 흉내는 그만둬.", "협상은 없어."] }, C00: { ally: ["백일몽이랑 같은 줄이라니.", "원료 걱정은 나중에 해.", "이번 괴담은 끝낸다. 합의대로."], enemy: ["관리하는 괴담? 오늘 닫는다.", "재난이라 불러도 좋아.", "제약 회사가 여긴 왜 와."] }, D00: { ally: ["민간인은 내 뒤로.", "괜찮아. 살아서 나간다.", "숨 쉬어. 천천히."], enemy: ["거기서 멈춰.", "더 오면 기억 정리 대상이야.", "구경할 데가 아니야."] }, E00: { ally: ["프리랜서치곤 쓸 만하네.", "보수는 나중에 따져.", "{호칭}, 측면 맡아."], enemy: ["먹고살 데가 여기뿐이야?", "통제 구역이야. 나가.", "협회 명함은 안 통해."] }, etc: { ally: ["조건은 다시 정리했어.", "적은 저쪽이야. 봐.", "담배 다 타기 전에 끝내지."], enemy: ["소속 불명. 확인한다.", "더 다가오면 터진다.", "보면 알아. 곧."] } }, time: { morning: ["블랙. 진하게.", "결재 서류가 또 늘었네.", "오늘도 괜찮을지는 봐야 알지."], day: ["하아. 사무실이 왜 이렇게 시끄러워.", "소풍 제안서는 아직 책상 위다.", "면담 하나 더 잡혔군."], evening: ["오늘 회식은 고깃집이다.", "매뉴얼 개정안, 내일까지.", "담배 한 대만 피우고 간다."], night: ["야근은 짧게 끝낸다.", "보고서처럼 하루가 끝나네.", "다들 들어갔나. 됐어."] }, situation: { deployed: ["계획 끝. 이동한다.", "담배 꺼지면 시작이다."], returned: ["하아. 먹고 털어.", "인원 확인. 숫자 불러."], hurt: ["괜찮아. 이 정도는.", "피 좀 난 거야. 계속 간다."], companion: ["내 뒤로 붙어. 거리 유지.", "질문 있으면 짧게."], alert: ["반응 확인. 전원 대기.", "보면 알아. 곧 터진다."] }, eco: { work: ["결재 하나. 또 하나. 하아.", "매뉴얼 개정 건, 검토 끝.", "면담 일정, 오후로 미룬다."], eat: ["커피는 블랙. 잼트리 걸로.", "고기는 내가 굽는다. 앉아.", "밥은 먹고 일해. 명령이다."], rest: ["하아. 오 분만 앉는다.", "담배 한 대. 그다음 일.", "피곤하다고 일이 줄진 않지."], restroom: ["잠깐 자리 비운다.", "금방 온다. 서류 손대지 마.", "자리 비운다. 급하면 무전."], hobby: ["휴대용 재떨이, 어디 뒀더라.", "장갑 좀 고쳐 끼고.", "불판 달궈지는 소리, 나쁘지 않아."], chat: ["{상대}, 잠깐. 짧게 얘기해.", "하아. {상대}, 이것 좀 봐.", "{상대}. 오늘 상태 어때."], hit: ["…{호칭}, 지금 뭐 한 거야.", "한 번은 넘어간다. 두 번은 없어.", "그만 좀 해. 여기 부장이 누구야."], crowd: ["뭐야. 누가 소란이야.", "다들 진정. 상황 보고해.", "시끄러워. 원인부터 말해."], off: ["오늘은 여기까지. 들어가.", "퇴근한다. 무슨 일 있으면 연락.", "하아. 내일 보자."] } }, 제이: { faction: "C00", level: null, address: { self: "저", up: "높으신 분", peer: "직원분", down: "신입분", outsider: "손님" }, persona: { same: { up: { ally: ["…오셨어요……", "출입 기록… 남겨 주세요……", "…네, 열어 드릴게요……"], enemy: ["…높은 분도… 냄새는 같아요……", "…그쪽은… 못 지나가요……", "…회사요…? 별로 상관없어요……"] }, peer: { ally: ["…수고 많으세요……", "…장비요? 바로 드릴게요……", "…도넛… 하나 드실래요……?"], enemy: ["…그쪽… 출입증이 이상해요……", "…냄새가… 좀 달라요……", "…그만 하세요……"] }, down: { ally: ["…여기… 앉으세요……", "…무섭죠…… 괜찮아요……", "…무전기… 가져가세요……"], enemy: ["…돌아가세요… {호칭}……", "…그쪽 길… 막혀 있어요……", "…거짓말… 냄새 나요……"] } }, A00: { ally: ["…관리국 분이네요……", "…오늘은… 같은 편이죠……", "…제 뒤로 오세요……"], enemy: ["…관리국 냄새……", "…저도 분류 대상이겠죠……", "…돌아가 주세요……"] }, B00: { ally: ["…검은 정장……", "…같이 가요… 오늘은……", "…총은… 저한테 쏘지 마세요……"], enemy: ["…많이 오셨네요……", "…사칭하는 냄새……", "…하나씩… 할게요……"] }, D00: { ally: ["…괜찮아요… 제 뒤로……", "…다친 데… 없으세요……", "…마스크는… 신경 쓰지 마세요……"], enemy: ["…여기… 들어오시면 안 돼요……", "…출입증… 없으시죠……", "…돌아가세요… 지금……"] }, E00: { ally: ["…프리랜서분이시네요……", "…이거… 가지세요……", "…같이 가요……"], enemy: ["…협회 분이… 여기까지……", "…그쪽은… 안 돼요……", "…냄새로… 알아요……"] }, etc: { ally: ["…처음 뵙네요……", "…어디서 오셨어요……", "…괜찮아요… 같이 가요……"], enemy: ["…처음 맡는 냄새……", "…거기 서세요……", "…모르는 분은… 안 돼요……"] } }, time: { morning: ["…해 뜨기 전에… 내려가야죠……", "…아침은… 숙소에서……", "…졸려요……"], day: ["…낮엔… 지하에 있어요……", "…감시 화면… 이상 없음……", "…출입 대장… 넘기는 중……"], evening: ["…해 졌네요… 올라가 볼까……", "…도넛… 남은 거 있나……", "…오늘도… 하루 끝……"], night: ["…야간 근무예요……", "…건물… 한 바퀴 돌게요……", "…거기 출입 기록 안 남기셨어요……"] }, situation: { deployed: ["…억제 물품… 챙겼어요……", "…어둠엔… 못 들어가요……"], returned: ["…다들… 돌아왔네요……", "…수집기… 꽉 찼네요……"], hurt: ["…아파요… 근데 괜찮아요……", "…안쪽이… 좀 들끓어요……"], companion: ["…제 뒤에… 계세요……", "…천천히… 같이 가요……"], alert: ["…냄새… 나요……", "…뭔가… 움직여요……"] }, eco: { work: ["…순찰… 돌게요……", "…출입 기록… 확인 중이에요……", "…무전… 이상 없어요……"], eat: ["…도넛…… 좋아요……", "…전부요… 다 좋아요……", "…커피랑… 도넛이면 돼요……"], rest: ["…조금만… 앉을게요……", "…눈이… 감겨요……", "…쉬어도… 회사예요……"], restroom: ["…잠깐… 다녀올게요……", "…금방… 와요……", "…자리… 잠깐 비워요……"], hobby: ["…도넛 생각… 하는 중……", "…창밖… 보고 있어요……", "…낮에는… 못 나가서요……"], chat: ["…{상대}님… 도넛… 있어요……?", "…{상대}님… 수고 많으세요……", "…{상대}님… 오셨어요……"], hit: ["…아파요……", "…{호칭}… 그만해.", "…다음은… 없어요……"], crowd: ["…무슨 일이에요……", "…소란은… 제 담당이에요……", "…다들… 물러나세요……"], off: ["…다들… 조심히 가세요……", "…저는… 퇴근이 없어요……", "…내일도… 여기 있어요……"] } }, 조성춘: { faction: "B00", level: 4, address: { self: "나", up: "부장님", peer: "과장", down: "이 자식아", outsider: "너" }, persona: { same: { up: { ally: ["{호칭}! 진공작전 언제요!", "명령만 주십쇼, 뜁니다!", "충성! 땀은 신경 쓰지 마쇼!"], enemy: ["{호칭}이 왜 저쪽에!", "말이 안 되잖아!", "나도 무섭다고요!"] }, peer: { ally: ["어이, 과장! 뛰자고!", "고기 서열은 나중에!", "진공작전 소식 없냐?"], enemy: ["너! 왜 거기 서 있어!", "과장이 배신을 해?", "넥타이 푼다, 각오해!"] }, down: { ally: ["죽지 마, 이 자식아!", "나도 무서워!", "끝까지 포기하지 마!"], enemy: ["너 이 자식, 왜!", "내가 키운 놈이!", "말이 안 맞잖아!"] } }, A00: { ally: ["괴물 놈들이랑 한편이라니!", "오늘만이다, 알지?", "등 돌리면 죽는다!"], enemy: ["괴물 집단이다!", "너 코드네임 뭐야!", "적 본부 어디야!"] }, C00: { ally: ["가면 쓴 놈, 따라와!", "가면이고 뭐고 뛰어!", "무섭냐? 나도!"], enemy: ["너! 그 원통! 뭐야!", "동물 가면 놈들!", "괴이 장사꾼이다!"] }, D00: { ally: ["뒤로 빠져, 빨리!", "무섭지? 나도 그래!", "엎드려, 이 자식아!"], enemy: ["너! 그 폰! 찍었지!", "여기 들어오면 안 돼!", "빨리 안 꺼져?"] }, E00: { ally: ["프리랜서냐! 같이 뛰어!", "오늘은 봐준다!", "죽지 마라!"], enemy: ["너! 그 카드! 뭐야!", "수상한 놈이다!", "주먹 나간다!"] }, etc: { ally: ["누군지 몰라도 뛰어!", "같은 편이면 됐어!", "포기하지 마!"], enemy: ["너 뭐야! 수상해!", "말이 안 맞잖아, 너!", "넥타이 푼다!"] } }, time: { morning: ["넥타이? 원래 이래!", "진공작전 D-? 아직이냐!", "아침부터 찡그리게 하네!"], day: ["칼잡이 놈들은 편하겠지!", "적 본부 위치 나왔냐!", "선글라스 또 흘러내리네!"], evening: ["회식이다! 무용담 시간!", "그때 괴이가 다섯이었지!", "고기 서열은 내가 위다!"], night: ["밤엔 더 무섭다고!", "진공작전 꿈꿨다!", "죽지 마라, 다들."] }, situation: { deployed: ["나도 무서워! 간다!", "넥타이 푼다! 돌격!"], returned: ["봤냐? 한 트럭이었다!", "살았다! 다들 살았지?"], hurt: ["아파! 그래도 간다!", "이 정도로 안 멈춘다!"], companion: ["내 고함 따라와!", "무서우면 말해!"], alert: ["왔다! 땀 난다!", "포기하지 마! 끝까지!"] }, eco: { work: ["진공작전 계획 또 고친다!", "보고서? 땀 때문에 번졌어!", "적 본부 지도 어디 갔어!"], eat: ["고기! 고기 가져와!", "밥 먹다 땀 난다, 젠장!", "한 점? 두 점 먹을 거다!"], rest: ["덥다! 넥타이 풀어!", "흠... 그래, 좀 쉬자.", "땀 좀 닦자. 어휴."], restroom: ["잠깐 다녀온다, 비켜!", "금방 온다! 기다려!", "자리 잠깐 비운다!"], hobby: ["무용담 정리 중이다! 크흠!", "진공작전 그림이 또 바뀌었다!", "선글라스 닦는 중이다!"], chat: ["{상대}! 내 무용담 들었냐!", "{상대}, 진공작전 알지?", "흠... {상대} 말이 맞나."], hit: ["아파, 이 자식아!", "무섭잖아! 그래도 덤벼!", "{호칭}! 그거 어디서 배웠어!"], crowd: ["뭐야! 나도 무섭다고!", "다들 비켜! 내가 간다!", "넥타이 푼다! 누구야!"], off: ["오늘도 살았다! 퇴근!", "땀 범벅이다. 간다.", "내일도 죽지 마라!"] } }, 진나솔: { faction: "C00", level: 3, address: { self: "", up: "선배님", peer: "너", down: "신입", outsider: "거기" }, persona: { same: { up: { ally: ["지시만 주세요. 나머진 알아서 해요.", "보상 구조부터 말해 주세요.", "…네. 확인했습니다."], enemy: ["직급으로 밀어붙일 생각이에요?", "수지 안 맞는 지시는 안 받아요.", "비키세요. 일정 밀려요."] }, peer: { ally: ["늦지 마.", "따라와. 설명 안 해.", "포인트 반반. 불만 없지?"], enemy: ["방해하면 너도 똑같아.", "혀 차는 소리 들었지.", "귀찮네, 진짜."] }, down: { ally: ["야.", "입 다물고 따라와.", "두 번 말 안 해."], enemy: ["방패 하나 생겼네.", "거기 서. 움직이지 마.", "신입이 겁도 없네."] } }, A00: { ally: ["관리국이랑 같은 줄이라니. 귀찮네.", "이번만이야. 괴담 끝내지 마.", "끝내기 전에 수집기부터 채워."], enemy: ["검은 정장이네. 짜증 나.", "원료 공급 망치러 왔어?", "외알 안경에 다 보여."] }, B00: { ally: ["보수 확실하면 같이 가.", "가짜든 진짜든 계약은 계약.", "발목 잡지 마."], enemy: ["어설픈 정장이네.", "수지 안 맞으면 안 싸워.", "시간 끌지 마. 바빠."] }, D00: { ally: ["살고 싶으면 붙어.", "울지 마. 머리 울려.", "출구 저쪽. 뛰어."], enemy: ["민간인이 왜 여기 있어.", "보지 마. 잊어.", "길 막지 마."] }, E00: { ally: ["의뢰 받았으면 끝까지 해.", "수수료 얘기는 나중에.", "나도 그쪽 일 해 봤어."], enemy: ["프리랜서가 낄 자리 아냐.", "물건은 우리가 먼저 찜했어.", "단가 안 맞으면 빠져."] }, etc: { ally: ["누구든 일만 잘하면 돼.", "보상 구조나 말해.", "느리면 두고 가."], enemy: ["처음 보는 얼굴이네.", "적대적 사업 리스크네.", "실 끊기 전에 꺼져."] } }, time: { morning: ["아, 머리 아파.", "출근부터 짜증 나네.", "오늘은 정시 퇴근한다."], day: ["조용히 해.", "점심시간에 말 걸지 마.", "네일 정비 날짜 언제더라."], evening: ["정시. 퇴근한다.", "누가 잡으면 끝이야.", "오늘 정산 괜찮네."], night: ["야근은 포인트로 받아.", "편두통 최악이네.", "이 시간에 사람 부르지 마."] }, situation: { deployed: ["4분도 늦지 마.", "동선 계산 끝. 간다."], returned: ["수집기 꽉 찼어. 정산해.", "그럴 시간에 퇴근해."], hurt: ["아, 짜증 나. 진짜 번거롭네.", "지금 내 판단 믿지 마. 네가 해."], companion: ["나 잘 거니까 말 걸지 마.", "두 번 말하게 하는 거 싫어해."], alert: ["저거 듣고 있어. 입 다물어.", "매뉴얼 갱신급 정보!"] }, eco: { work: ["포인트 계산 끝.", "동선 다시 짠다.", "…빨리 끝내."], eat: ["대충 먹어. 시간 없어.", "두통약부터.", "…조용히 먹자."], rest: ["머리 울려.", "말 걸지 마. 쉬는 중.", "조용하네. 좋아."], restroom: ["잠깐 갔다 올게.", "자리 비운다.", "금방 와."], hobby: ["포인트 적립 확인.", "조용한 게 취미야.", "…아무것도 안 해. 좋아."], chat: ["{상대}, 용건만.", "{상대}, 짧게 해.", "{상대}. 왜."], hit: ["…방금 거, 계산에 넣는다.", "다시 하면 끝이야.", "{호칭}, 선 넘었어."], crowd: ["시끄러워.", "조용히 좀 해.", "머리 아프니까 그만해."], off: ["정시. 퇴근.", "퇴근. 붙잡지 마.", "오늘 일 끝. 간다."] } }, 차여진: { faction: "협회", level: null, address: { self: "나", up: "선배", peer: "자기", down: "신입", outsider: "손님" }, persona: { A00: { ally: ["관리국이 웬일이야~", "오늘은 같은 편이지?", "명함 하나 줄까?"], enemy: ["규정상 어쩔 수 없어~", "관리국이 감사 나온 거야?", "나 그냥 창구 직원이야~"] }, B00: { ally: ["소개받고 왔어?", "조건은 나랑 얘기해.", "오늘은 손잡자~"], enemy: ["협회 건드리면 서류가 와.", "규정상 이렇게 해도 돼.", "웃어 줄 때 돌아가~"] }, C00: { ally: ["가면 분이네~", "포인트도 수수료 돼?", "오늘은 같이 가자."], enemy: ["가면 써도 다 보여~", "회사원은 계약서 읽잖아.", "그 정장, 비싸 보이네."] }, D00: { ally: ["재난 컨설팅 회사예요~", "놀라셨죠? 괜찮아요.", "여기 앉으세요, 손님."], enemy: ["손님, 여긴 직원 전용이에요.", "못 본 걸로 해 줄래요?", "경찰 부를까요? 농담~"] }, E00: { ally: ["{호칭}, 또 왔네? 반가워~", "몇 급이었지? 아직 5급?", "이번 주에 시간 돼?"], enemy: ["계약서 소리 내서 읽지 마~", "1급은 조건이 다르지.", "이 의뢰, 딴 사람 줄게."] }, etc: { ally: ["처음 보는 얼굴이네?", "이름 알려 줘. 외울게.", "다음에도 와, 꼭~"], enemy: ["그건 창구 소관 아니야~", "나 기억력 좋아~", "다음엔 이름 안 불러."] } }, time: { morning: ["단골들 안부 문자 돌려야지~", "오늘 신입 몇 명 오려나.", "커피 들고 창구 착석!"], day: ["새 의뢰 목록, 짝 맞춰 볼까.", "옆자리 또 뭐 적는다.", "수수료 표는 아무도 보지 마~"], evening: ["퇴근길엔 수첩 정리~", "오늘 서명 몇 장이더라.", "아 이거? 개인 폰이야~"], night: ["두 번째 폰이 울리네.", "감사 시즌 아직이지?", "이 시간 연락은 사적인 거야~"] }, situation: { deployed: ["현장은 싫은데, 진짜로.", "서류는 내가 챙길게~"], returned: ["다녀왔어? 정산 얘기 하자~", "살아 왔네! 다행이다, 진짜."], hurt: ["얼굴은 안 다쳤지? 다행.", "이건 의뢰인 측 과실이야."], companion: ["나 싸움은 못 해, 알지?", "옆에 붙어 있을게~"], alert: ["어머, 이건 서류에 없던 건데.", "나 먼저 빠져도 되지?"] }, eco: { work: ["이 의뢰는 누구한테 보여 줄까~", "서명 하나 더 받으면 끝!", "위험 등급? 서류상 부풀린 거야~"], eat: ["점심 전에 끝내고 밥 먹자~", "커피 타러 가야지~", "오늘 점심 뭐 먹지? 골라 줘~"], rest: ["잠깐 쉬자. 웃는 것도 일이야.", "폰 두 대 다 조용하네. 좋다~", "다리 아파. 창구 오래 앉았네."], restroom: ["잠깐만~ 금방 올게.", "자리 비울게~ 서류 보지 마?", "금방 와~ 창구 좀 봐 줘."], hobby: ["수첩에 한 줄 적어 둘까~", "단골 술 취향, 다 외웠지~", "이름 외우는 게 제일 재밌어."], chat: ["어머, {상대}! 요즘 어때?", "{상대}, 이번 주에 시간 돼?", "{상대}~ 우리 친구잖아?"], hit: ["아야! {호칭}, 이건 아니지~", "우리 친구 아니었어? …아니구나.", "이거 기록에 남는다? 진짜로."], crowd: ["어머, 무슨 일이야?", "구경은 하는데 끼진 않을게~", "나 싸움은 못 해. 비켜 줄게~"], off: ["퇴근~ 수첩은 가방에.", "오늘 수고했어, 다들~", "이제부턴 개인 폰만 받아~"] } }, 청달래: { faction: "C00", level: 8, address: { self: "", up: "자네", peer: "자네", down: "자네", outsider: "자네" }, persona: { same: { up: { ally: ["보고는 정리해 두었네.", "자네 시간을 오래 뺏지 않겠네.", "결재가 필요한 건이 있네."], enemy: ["윗자리도 계약서 한 장이지.", "자리가 높다고 면책은 아닐세.", "흥미롭군. 자네가 그쪽에 서다니."] }, peer: { ally: ["같은 층이니 길게 말하지 않겠네.", "자네 몫은 자네가 챙기게.", "회의록은 내가 받아 두지."], enemy: ["같은 직급이라 봐주지는 않네.", "임원 하나가 줄면 서류도 주네.", "감정으로 일하는 자는 오래 못 가네."] }, down: { ally: ["자네, 쓸모가 보이는군.", "보상은 문구대로 나간다네.", "게으름은 회사의 손실일세."], enemy: ["사번으로 불리고 싶은가.", "회사 재산이 길을 잃었군.", "도망친 비품은 회수하는 법일세."] } }, A00: { ally: ["오늘은 자네들과 같은 편일세.", "관리국과 계약이라니, 별일이군.", "끝내지는 말게. 원료일세."], enemy: ["진짜 재난이 걸어 들어오는군.", "원료 공급을 망치는 손님일세.", "관리국이 또 문을 두드리는군."] }, B00: { ally: ["검은 정장도 쓸모는 있지.", "물량은 계약상 쓸 만하네.", "자네들과 손잡는 건 오늘뿐일세."], enemy: ["떼로 오면 정리도 떼로 하지.", "적대적 사업 리스크로군.", "검은 양복이 바닥을 더럽히네."] }, D00: { ally: ["놀라지 말게. 회사 사람일세.", "내 뒤에 서 있게.", "자네는 운이 좋은 편일세."], enemy: ["너무 많이 봤군, 자네.", "목격자는 처리 대상일세.", "현명한 선택을 하게."] }, E00: { ally: ["협회 수수료보다 낫게 주지.", "자네 실력은 값이 나가네.", "오늘 품삯은 문구대로일세."], enemy: ["떠돌이는 값을 매기기 쉽지.", "자네 면허는 오늘로 끝일세.", "의뢰비보다 비싼 일에 끼었군."] }, etc: { ally: ["처음 보는 쪽이군. 쓸모는?", "오늘은 이해관계가 맞는군.", "조건만 맞으면 손잡지."], enemy: ["어디 소속이든 정리는 같네.", "통제가 안 되는 쪽이군.", "비용이 드는 손님일세."] } }, time: { morning: ["9시 정각이군. 늦은 자는?", "오늘 결재는 몇 건이지.", "아침 보고가 늦는군."], day: ["손실률이 높군.", "회의는 짧게, 계약은 길게.", "쓸 만한 얼굴이 안 보이는군."], evening: ["오늘 손익을 정리하지.", "퇴근은 계약서대로 하게.", "회식이라… 아픈 자가 많겠군."], night: ["야근 수당은 문구대로일세.", "밤에도 회사는 내 것이지.", "조용하군. 좋은 밤일세."] }, situation: { deployed: ["직접 정리하러 왔네.", "자, 정리하지."], returned: ["손실 보고서 양식을 가져오게.", "보고서 마감은 내일 오전일세."], hurt: ["흥미롭군. 나를 다치게 하다니.", "청구서를 보내야겠군."], companion: ["뒤처지지 말게, 자네.", "자네 쓸모를 보여 주게."], alert: ["참으로 지저분한 꼴이군.", "무슨 소란인가."] }, eco: { work: ["결재 서류는 이것뿐인가.", "이 조항, 한 글자 고쳐 두게.", "이 계약서, 문구가 좋군."], eat: ["차 맛이 오늘은 괜찮군.", "식사도 업무의 연장일세.", "이 식대는 경비로 처리하게."], rest: ["잠시 앉겠네. 오래는 아닐세.", "휴식도 계약 조항에 있지.", "쉬는 시간도 회사 시간일세."], restroom: ["잠시 자리를 비우겠네.", "곧 돌아오겠네. 기다리게.", "잠깐 실례하겠네."], hobby: ["책장 정리나 해 두지.", "장부 넘기는 소리는 좋군.", "조용하군. 나쁘지 않네."], chat: ["{상대}, 요즘 실적은 어떤가.", "{상대}, 자네 계약 기간이 언제지?", "{상대}, 잠깐 이야기 좀 하세."], hit: ["{호칭}, 이건 손해배상감일세.", "청구서는 정확히 보내 주지.", "내 정장에 손을 대다니. 대담하군."], crowd: ["지저분한 꼴을 보이는군.", "무슨 일인가. 정리하게.", "자네들, 일은 언제 하나."], off: ["오늘 장부는 이걸로 닫지.", "먼저 가겠네. 마감은 내일 9시일세.", "남은 일은 자네들 몫일세."] } }, 콘쥬스: { faction: "A00", level: 1, address: { self: "저", up: "선배님", peer: "선배님", down: "신입 선배님", outsider: "아저씨" }, persona: { same: { up: { ally: ["{호칭}, 안녕하세요!", "상자 몇 개 옮겨요? 다 줘요!", "저도 정식 멤버거든요!"], enemy: ["{호칭}, 이상해요. 진짜로.", "저 비켜 드릴 생각 없어요.", "이 문은 제가 막아요!"] }, peer: { ally: ["{호칭}, 같이 가요!", "업혀요! 제가 더 빨라요.", "만지지 말라는 거 알아요…"], enemy: ["{호칭}, 왜 그래요?", "저 안 비켜요.", "부장님 부를 거예요!"] }, down: { ally: ["{호칭}, 짐 이리 주세요!", "저 여기 정식 멤버예요. 선배예요!", "복사 용지는 제가 채웠어요."], enemy: ["{호칭}, 거기 서요!", "제가 더 빨라요.", "도망 못 가요. 진짜로."] } }, B00: { ally: ["지금만 같은 편인 거죠?", "직급 얘기는 재미없어요.", "짐은 제가 들게요."], enemy: ["저 안 무서워요.", "이 문 못 지나가요!", "선배님들, 여기요!"] }, C00: { ally: ["가면 멋있네요.", "짐 무거우면 저 주세요.", "이번만 같이 가요."], enemy: ["사람은 원료 아니에요.", "길 막을게요!", "못 데려가요."] }, D00: { ally: ["괜찮아요! 업혀요!", "길 제가 낼게요.", "꽉 잡으세요, 빨라요!"], enemy: ["거기 들어가면 안 돼요!", "그거 내려놓으세요!", "여기 위험해요, 진짜로!"] }, E00: { ally: ["{호칭}, 처음 뵙겠습니다!", "간식 있어요? 아, 그냥요.", "짐은 제 담당이에요."], enemy: ["{호칭}, 여기 통제 구역이에요.", "이 문 안 열어 드려요.", "선배님들 불러요!"] }, etc: { ally: ["안녕하세요! 콘쥬스예요.", "짐 있으면 주세요!", "같이 가요!"], enemy: ["못 지나가요!", "누구세요, 진짜?", "누가 좀 와 주세요!"] } }, time: { morning: ["오빠, 안녕하세요!", "상자 옮겨 놓고 학교 가야지.", "지각 안 해요. 뛰면 되니까."], day: ["복사 용지 또 채워야겠다.", "만지지 말라고 하겠지…", "브리핑실 문, 오늘도 닫혀 있네."], evening: ["숙제는 사무실에서 하면 되고.", "오늘 고기 제일 먼저 익었으면.", "사탕은… 아직 안 먹을래."], night: ["다들 무사히 왔겠지?", "저도 정식 멤버거든요. 잊지 마요.", "내일 수학 시험이다…"] }, situation: { deployed: ["길 막힌 거 제가 치울게요!", "업혀요, 다 데리고 나갈게요."], returned: ["다 업고 나왔어요!", "저 오늘 쓸모 있었죠?"], hurt: ["괜찮아요, 별거 아니에요!", "아야… 아니, 안 아파요."], companion: ["눈에 보이는 데 있을게요.", "짐은 다 저 주세요!"], alert: ["선배님들, 저기 이상해요!", "출구부터 확보할게요!"] }, eco: { work: ["택배 상자 왔어요! 제가 들게요!", "상자 다섯 개, 한 번에 가능!", "복사 다 했어요. 다음은요?"], eat: ["커피 주세요! 우유 말고요!", "간식 주시면 오빠라고 할게요.", "학식보다 여기 고기가 낫네요."], rest: ["잠깐만… 눈만 감을게요…", "과제 마감이 내일인데…", "졸면 안 돼. 정식 멤버니까."], restroom: ["저 잠깐 다녀올게요!", "금방 와요! 상자 그대로 두세요!", "잠깐 자리 비울게요~"], hobby: ["강의 영상, 두 배속으로!", "휴대폰 좀 보고요. 잠깐만.", "과제 하면서 쉬는 중이에요."], chat: ["{상대} 오빠, 안녕하세요!", "{상대} 선배님, 그거 말 안 되는데요?", "{상대}, 간식 있으세요?"], hit: ["아야! {호칭}, 왜 때려요!", "지금 그거, 저 기억할 거예요.", "안 아파요! …조금 아파요."], crowd: ["무슨 일이에요? 제가 볼게요!", "다들 비켜요, 지나갈게요!", "어른들, 대충 넘기지 마세요."], off: ["학교 가야 해요! 먼저 갈게요!", "퇴근! 내일 수업 끝나고 올게요.", "다들 안녕히 계세요!"] } }, 큐라스: { faction: "A00", level: 2, address: { self: "", up: "부장님", peer: "동기", down: "신입", outsider: "너" }, persona: { same: { up: { ally: ["{호칭}! 엄호 들어갑니다!", "왼쪽 괜찮고, 오른쪽도 괜찮고!", "보고서는 제가 쓸게요!"], enemy: ["{호칭}, 이건 진짜 아니에요!", "거리 유지할게요. 죄송해요!", "웃음이 안 나오네요, 이번엔."] }, peer: { ally: ["{호칭}! 같이 가자!", "왼쪽으로 돌게, 여기 엄호해!", "오, 오늘 감 좋은데?"], enemy: ["{호칭}, 왜 그래, 응?", "너 위치 다 알아!", "딱 한 번만 경고할게!"] }, down: { ally: ["진압팀엔 너 같은 인재가 필요해!", "{호칭}, 내 수다 잘 들어!", "잘했어! 진짜 잘했어!"], enemy: ["{호칭}, 이러지 마!", "영입하려던 애가 왜!", "거리 재는 중이야, 미안!"] } }, B00: { ally: ["오늘만 같은 편! 오늘만!", "그쪽 사람들 위치도 셀게!", "아군 오사는 없어. 걱정 마!"], enemy: ["가짜 관리국! 숫자 많네!", "열둘, 열셋… 많다 많아!", "총알은 공중에서 끝나!"] }, C00: { ally: ["백일몽이랑 같이라니 신기하다!", "촉수 나오면 말해, 태울게!", "괴담 닫고 끝!"], enemy: ["원료 창고 태워도 돼?", "제약 회사 사람이네!", "재생? 더 빨리 태우면 돼!"] }, D00: { ally: ["괜찮아요? 다친 데 없죠?", "제 뒤로요! 거리 유지!", "이제 안전해요!"], enemy: ["거기 위험해요! 진짜로!", "가까이 오지 마세요!", "제발 물러나요!"] }, E00: { ally: ["프리랜서! 실력 좋네!", "측면 불러 줘!", "같이 하니까 든든하다!"], enemy: ["미등록이네! 아쉽다!", "그 물건 내려놔!", "도망가도 시야 안이야!"] }, etc: { ally: ["처음 보는데 반가워!", "엄호는 맡겨!", "알아, 알아, 그 대령."], enemy: ["누구야? 위협 등급 판정 중!", "손가락 튕기기 전에!", "로이 머스탱 얘기 하지 마!"] } }, time: { morning: ["오늘 영입 목표 세 명!", "오토바이 시동 좋고!", "커피 데울 사람? 내가!"], day: ["종합대응팀 사무실 갔다 올까.", "휴게실 스타 한 판 할 사람!", "손가락 굳은살이 또 생겼네."], evening: ["손가락 얼음찜질 해야겠다.", "보고서 다섯 장 쓰는 중!", "오늘 건물 몇 채 남았더라?"], night: ["밤에 튕기면 소리 울리겠다.", "촛불 켜 줄 사람 없나.", "형님은 벌써 자려나."] }, situation: { deployed: ["형님 앞, 나 뒤! 출발!", "체력 계산 끝. 간다!"], returned: ["아군 오사 제로! 자랑이야!", "두 손가락 경례, 퇴장!"], hurt: ["손가락은 멀쩡해! 괜찮아!", "아야야, 그래도 웃을 수 있어!"], companion: ["왼쪽 괜찮아? 오른쪽 괜찮아?", "내 수다에 위치 다 들어 있어!"], alert: ["위협 등급 판정 들어간다!", "열 시 방향! 하나, 둘, 셋!"] }, eco: { work: ["보고서 여섯 장째! 아니 일곱!", "왼쪽 이상 무, 오른쪽 이상 무!", "영입 서류, 빈칸만 채우면 돼!"], eat: ["커피 데우는 중! 전자레인지 말고!", "같이 먹을 사람? 진압팀 오면 공짜!", "손가락은 소중하니까 젓가락으로!"], rest: ["손가락 좀 풀어 줘야지.", "휴게실 소파 최고! 진압팀 최고!", "잠깐 쉬고, 다시 영입!"], restroom: ["잠깐 다녀올게! 금방!", "자리 비운다! 내 PC 끄지 마!", "곧 올게! 경례는 생략!"], hobby: ["스타 한 판! 진 사람 전출!", "같이 할 사람? 딱 한 판만!", "이 빌드면 무조건 이긴다!"], chat: ["{상대}! 진압팀 올 생각 없어?", "{상대}, 스타 할 줄 알지?", "{상대}! 오늘 위치 어디야?"], hit: ["아야! {호칭}, 손가락은 안 돼!", "그 주먹, 진압팀 재목인데?!", "아프잖아! 그래도 영입은 한다!"], crowd: ["무슨 일이야? 위협 등급은?", "다들 거리 벌려! 셋 셀게!", "구경 말고 대피! 빨리!"], off: ["두 손가락 경례, 퇴근!", "오늘 영입 실패! 내일 또!", "형님, 먼저 갈게요!"] } }, 호유원: { faction: "C00", level: 7, address: { self: "저", up: "전무님", peer: "이사님", down: "직원님", outsider: "손님" }, persona: { same: { up: { ally: ["어머, 오셨어요? 반가워요.", "마침 보고드릴 게 있었어요.", "오늘도 든든하세요."], enemy: ["어머, 부끄럽고 무섭네요.", "윗분이라도 약속은 약속이죠.", "통화 기록, 다 남아 있어요."] }, peer: { ally: ["이사님, 차 한잔하실래요?", "우리 사이에도 계약서는 필수죠.", "오늘 회의, 기대돼요."], enemy: ["이사님 파일도 다 봤어요.", "우연이 겹치네요, 그쵸?", "웃으면서 끝내요, 우리."] }, down: { ally: ["어머, 반가워요! 잘 지냈어요?", "얼굴이 좀 피곤해 보이세요.", "고민 있으면 들를래요?"], enemy: ["어머, 그쪽에 서셨어요?", "인사 파일, 다 읽고 왔어요.", "아까 '네'라고 하셨죠?"] } }, A00: { ally: ["관리국 분이세요? 반가워요!", "오늘은 같은 편이에요, 진짜로.", "약속은 지킬게요. 문구대로요."], enemy: ["어머, 괴담 끝내러 오셨어요?", "관리국은 늘 무섭네요.", "원료를 망치시면 곤란해요."] }, B00: { ally: ["검은 정장 분들도 반가워요.", "인원 많은 거, 참 든든하네요.", "오늘은 사이좋게 해요."], enemy: ["어머, 떼로 오셨네요.", "선글라스 너머도 다 보여요.", "그쪽 명단도 봤어요."] }, D00: { ally: ["놀라셨죠? 괜찮아요.", "다친 데 없어요?", "제 손 잡으세요."], enemy: ["방금 '네'라고 하셨죠?", "도망치시면 슬퍼요.", "고개 끄덕이셨네요?"] }, E00: { ally: ["수수료, 아깝지 않으세요?", "실력 좋으시다고 들었어요.", "오늘 품삯은 약속대로요."], enemy: ["협회 면허, 참 예쁘네요.", "의뢰서 문구 읽어 보셨어요?", "어머, 아쉬워라."] }, etc: { ally: ["처음 뵙네요! 반가워요.", "어디서 오셨든 환영해요.", "궁금한 게 많아요, {호칭}."], enemy: ["소속 모를 분은 무서워요.", "이름만 알려 주시겠어요?", "웃으면서 끝내 드릴게요."] } }, time: { morning: ["좋은 아침이에요!", "오늘은 누가 전화를 받을까요.", "출근길 날씨 참 좋네요."], day: ["점심 메뉴 뭐 드셨어요?", "엘리베이터 같이 타요.", "인사 파일 읽기 좋은 날이네요."], evening: ["다들 정말 든든해요.", "세광… 아니에요, 그냥요.", "오늘도 약속 잘 지켰어요."], night: ["새벽이라도 세광 소식이면요.", "이 시간에 전화하면 실례겠죠?", "구두 닦을 시간이네요."] }, situation: { deployed: ["싸울 필요는 없겠죠?", "약속부터 정하고 들어가요."], returned: ["구두에 흙이 묻었나요?", "다들 무사해요? 다행이에요."], hurt: ["어머, 이런 일도 있네요.", "콜록, 연기가 좀 맵네요."], companion: ["{호칭}, 제 옆에 계세요.", "같이 걸으니 좋네요."], alert: ["어머, 무슨 일일까요?", "그래서요? 그다음은요?"] }, eco: { work: ["어머, 이 문구 정말 예쁘네요.", "약속은 문구대로, 정확히요.", "통화 기록은 다 남겨 둘게요."], eat: ["차 한잔 따라 드릴까요?", "어머, 점심 메뉴 뭐였어요?", "맛있어요! 정말 기뻐요."], rest: ["잠깐 쉬어도 되죠? 그쵸?", "쉬는 것도 약속이에요, 저랑.", "오늘 날씨 참 좋네요, 그쵸?"], restroom: ["잠깐 다녀올게요, 금방이요.", "어머, 실례할게요. 곧 와요.", "자리 좀 비울게요. 약속해요."], hobby: ["구두는 늘 깨끗해야 해요.", "저 운동장이요? 그냥요.", "구두 닦는 시간이 좋아요."], chat: ["{상대}님, 마침 찾고 있었어요!", "어머, {상대}님! 우연이네요.", "{상대}님, 차 한잔 어때요?"], hit: ["어머, 아파요. 기억할게요.", "{호칭}, 방금 건 약속 위반이에요.", "괜찮아요. 다 적어 뒀어요."], crowd: ["어머, 무슨 일이에요?", "다들 다치지 마세요, 네?", "소란이네요. 신기한 우연이죠?"], off: ["오늘도 수고하셨어요, 다들!", "내일 또 만나요. 약속이에요.", "먼저 갈게요. 전화 받아 줘요."] } } }, npc: { "가짜 관리국 검사": { faction: "B00", persona: { same: { ally: {}, enemy: {} }, A00: { ally: ["...이번만입니다.", "저건 제가 벱니다.", "끝나면 원위치입니다."], enemy: ["가짜 관리국 확인!", "확인 즉시 제거!", "돌격 준비!"] }, C00: { ally: ["가면은 뒤로 빠지십시오.", "앞은 칼이 맡습니다.", "작전 중엔 협조합니다."], enemy: ["이물 협력자 확인.", "가면 벗으십시오.", "교전 허가 났습니다."] }, D00: { ally: ["민간인, 제 뒤로!", "고개 숙이십시오!", "괜찮습니다. 금방 끝납니다."], enemy: ["촬영 중지하십시오!", "휴대폰 내려놓으십시오!", "통제 구역입니다!"] }, E00: { ally: ["면허는 안 묻겠습니다.", "칼 앞에 서지 마십시오.", "지시 따르십시오."], enemy: ["미등록 이능력자 확인.", "면허는 의미 없습니다.", "도망쳐도 따라갑니다."] }, etc: { ally: ["협조 명령 받았습니다.", "앞은 저희가 엽니다.", "이번 작전만입니다."], enemy: ["소속 불명, 이물 의심!", "대화 금지입니다.", "포위 완료!"] } }, time: { morning: ["기상! 칼부터 닦습니다.", "구보 다녀왔습니다.", "엄마가 밥 챙겨 먹으래."], day: ["훈련장 예약했습니다.", "과장님 호출입니다.", "칼날 상태 양호."], evening: ["오늘 치킨 콜?", "엄마한테 전화해야지.", "후임 밥은 먹였나."], night: ["야간 순찰 이상 무.", "졸면 안 된다...", "칼집 잠금 확인."] }, situation: { alert: ["이물 출현! 검사부대 전진!", "칼 뽑아! 돌격!", "대리님, 지시 바랍니다!"], hurt: ["경상입니다! 계속 갑니다!", "엄마한텐 비밀로..."] }, eco: { pass: ["순찰 경로 이상 없습니다.", "치킨 쿠폰 몇 장 남았지.", "칼집이 좀 헐거운데."], work: ["칼날 연마 완료했습니다!", "대열 맞춰! 하나, 둘!", "검사부대 장비 점검 중!"], victim: ["지갑 분실! 추격합니다!", "엄마가 준 용돈인데!", "거기 서십시오! 정지!"], thief: [], witness: ["소매치기 목격! 보고합니다!", "저 인원, 수상합니다!", "시비 발생! 개입 대기!"], crowd: ["소란 발생 지점 확인!", "무슨 일입니까!", "구경꾼 뒤로 물리십시오!"], flee: ["철수! 철수합니다!", "후퇴! 재정비합니다!", "대리님, 일단 빠집니다!"], harass: [], harassed: ["시비는 사양하겠습니다.", "술 드셨으면 귀가하십시오.", "더 하시면 칼 뽑습니다."], warn: ["{호칭}, 그 자리 정지!", "위반 행위 확인했습니다!", "경고는 한 번뿐입니다!"], hit: ["윽! 피격 보고합니다!", "지금 공격하신 겁니까?!", "아군 오인 사격입니까!"], drunk: [] } }, "가짜 관리국 진압": { faction: "B00", persona: { same: { ally: {}, enemy: {} }, A00: { ally: ["사선 겹치지 마십시오.", "엄호는 해 드립니다.", "명령이라 서는 겁니다."], enemy: ["사칭 이물 확인!", "구역 봉쇄! 사격!", "물러서지 마라!"] }, C00: { ally: ["가면 쓴 분, 엎드리십시오.", "탄막 깝니다! 숙여요!", "협조 지시 받았습니다."], enemy: ["이물 협력자, 정지!", "가면 벗고 엎드려!", "사격 허가 났습니다!"] }, D00: { ally: ["민간인, 엎드리십시오!", "귀 막으십시오!", "제 뒤로 붙으십시오!"], enemy: ["통제 구역! 나가십시오!", "촬영 금지입니다!", "거기 멈추십시오!"] }, E00: { ally: ["측면 부탁합니다.", "탄막 사이로 오지 마요!", "임시 협조입니다."], enemy: ["이능력자 확인! 사격!", "도주 경로 차단!", "포위망 좁혀!"] }, etc: { ally: ["협조 명령 확인!", "엄호 사격 갑니다!", "앞의 이물부터!"], enemy: ["소속 불명! 사격 대기!", "교전 허가 났습니다!", "탄막 전개!"] } }, time: { morning: ["총기 손질 시작!", "점호 이상 무!", "엄마 문자 왔네."], day: ["사격장 예약 완료.", "대리님 보고 올립니다.", "탄약 재고 확인."], evening: ["오늘 치킨은 뭐 시킴?", "후임 먼저 들여보내.", "집에 전화 한 통만."], night: ["야간 경계 근무 중.", "무전 감도 양호.", "졸음 쫓자, 졸음."] }, situation: { alert: ["이물 출현! 구역 봉쇄!", "진압부대 전개! 탄막!", "과장님, 사격 허가 바랍니다!"], hurt: ["피격! 아직 쏠 수 있습니다!", "탄창 갈고 계속 갑니다!"] }, eco: { pass: ["구역 순찰, 이상 무.", "치킨 반반으로 갈까.", "무전기 배터리 반 남음."], work: ["탄창 결속 확인 완료.", "사격 통제선 설치 중.", "구역 B, 봉쇄 유지."], victim: ["지갑 탈취당했다! 추격!", "용의자 도주, 방향 북쪽!", "탄약 말고 지갑이라니..."], thief: [], witness: ["절도 목격, 무전 보고.", "구역 내 시비 발생.", "용의자 인상착의 확보."], crowd: ["소란 지점, 확인 바람.", "인원 통제 필요합니다!", "구경꾼 해산시켜!"], flee: ["후퇴! 엄호 사격!", "구역 이탈, 재집결!", "탄 없음, 철수합니다!"], harass: [], harassed: ["접근 금지 구역입니다.", "취객 하나, 처리 대기.", "물러서십시오. 경고합니다."], warn: ["{호칭}, 무기 내려놓으십시오!", "위반 확인. 사격 대기!", "정지! 다음은 없습니다!"], hit: ["피격! 아군입니까?!", "윽, 방탄 덕 봤다.", "공격 확인, 대응 준비!"], drunk: [] } }, 간호사: { faction: null, persona: { A00: { ally: ["정장 환자분, 또 오셨네.", "소독할게요, 따끔해요.", "커피는 치료 끝나고요."], enemy: ["면회 시간 아니에요.", "병실 들어가시면 안 돼요.", "관계자세요?"] }, B00: { ally: ["줄 서 주세요, 차례대로.", "팔 걷어 주세요.", "다 큰 어른이 주사를..."], enemy: ["환자분 못 데려가세요!", "선생님 불러올게요!", "여긴 병동이에요!"] }, C00: { ally: ["회사원 환자분, 앉으세요.", "다크서클이 심해요.", "물 좀 드세요."], enemy: ["그 약 여기서 쓰시면 안 돼요.", "가면 벗어 주세요.", "약품 반입 금지예요."] }, D00: { ally: ["괜찮으세요?", "잠깐 따끔해요.", "물 갖다 드릴게요."], enemy: ["진정하세요, 환자분!", "소리 지르시면 안 돼요!", "경비 불러요!"] }, E00: { ally: ["상처가 또 늘었네요.", "붕대 새로 갈게요.", "이번엔 좀 쉬세요."], enemy: ["그 장비 밖에 두세요.", "흙투성이로 오시면...", "응급실 이쪽 아니에요!"] }, etc: { ally: ["이쪽 침대로 오세요.", "어디가 아프세요?", "금방 나아질 거예요."], enemy: ["거기 멈추세요!", "당직 선생님 호출!", "다들 피하세요!"] } }, time: { morning: ["인수인계 시작합니다.", "수액 교체 시간이다.", "어깨 또 뭉쳤네."], day: ["활력 징후 체크.", "호출벨 또 울리네.", "점심은 5분 컷."], evening: ["저녁 투약 돌아요.", "다리가 퉁퉁 부었네.", "오늘도 무사히."], night: ["야간 라운딩 돌게요.", "복도 불이 왜 깜빡여.", "잠 안 오는 환자분?"] }, situation: { alert: ["비상! 환자분들 대피요!", "선생님, 빨리요!", "침착하세요, 이쪽이에요!"], hurt: ["괜찮아요, 손은 움직여요.", "제 붕대도 챙겨야겠네."] }, eco: { pass: ["오늘도 만 보 넘겠다.", "인계 메모 어디 뒀지.", "발 아파, 발 아파."], work: ["환자분, 잠깐 따끔해요.", "체온 재 볼게요.", "병상 정리 금방 해요."], victim: ["어? 제 지갑 어디 갔지?", "도둑이에요! 잡아 주세요!", "월급날인데 하필..."], thief: [], witness: ["저분 방금 가방 뒤졌어요!", "다투지 마세요, 다쳐요!", "보안팀 불러야겠다."], crowd: ["다치신 분 계세요?", "환자분, 들어가 계세요.", "무슨 일이에요?"], flee: ["환자분들, 이쪽으로요!", "침대째 옮겨요, 빨리!", "으앗, 저도 갈게요!"], harass: [], harassed: ["환자분, 진정하세요.", "손 놓아 주세요.", "보안팀 부를게요, 진짜로."], warn: [], hit: ["아야! 왜 이러세요!", "폭행은 신고 대상이에요.", "선생님! 보안팀이요!"], drunk: [] } }, 경찰: { faction: null, persona: { A00: { ally: ["정장 단체분들, 수고하세요.", "통제는 저희가 할게요.", "어디 소속이시라고요?"], enemy: ["거기 정장분, 잠깐만요.", "신분증 보여 주세요.", "무슨 일로 오셨죠?"] }, B00: { ally: ["국가 보안 쪽이시라고요?", "네, 협조하겠습니다.", "현장은 맡기겠습니다."], enemy: ["선글라스 단체, 정지!", "무기 소지 신고 들어왔어요!", "지원 요청합니다!"] }, C00: { ally: ["제약 회사 직원분이세요?", "무슨 촬영 중이세요?", "다친 분 없으시죠?"], enemy: ["가면 벗어 보세요.", "거기 동물 가면, 정지!", "수상한 물건 들었네요."] }, D00: { ally: ["안녕하세요, 순찰 중입니다.", "밤길 조심하세요.", "무슨 일 있으세요?"], enemy: ["거기 멈추세요!", "손 보이게 하세요!", "도망치지 마세요!"] }, E00: { ally: ["수리 기사님이세요?", "조심해서 하세요.", "통행은 막아 둘게요."], enemy: ["그 장비 뭡니까?", "무단 침입이에요!", "가방 열어 보세요."] }, etc: { ally: ["도움 필요하세요?", "여긴 저희가 볼게요.", "다친 데 없으세요?"], enemy: ["정지! 경찰입니다!", "흩어지지 마세요!", "지원 바랍니다!"] } }, time: { morning: ["교대 근무 시작.", "어제 신고 처리하자.", "편의점 커피나 사 갈까."], day: ["순찰 중 이상 무.", "주차 민원 또 왔네.", "무전 상태 양호."], evening: ["취객 신고 시작이다.", "퇴근은 언제 하냐.", "오늘은 조용하길."], night: ["야간 순찰 돈다.", "이 골목 늘 찜찜해.", "아까 그 건물 뭐였지?"] }, situation: { alert: ["무슨 소리야? 지원 요청!", "시민 여러분, 대피하세요!", "본서, 상황 발생!"], hurt: ["윽... 지원 좀...", "공상 처리 되겠지..."] }, eco: { pass: ["오늘 신고 몇 건째냐.", "순찰차 기름 넣어야겠다.", "보고서 쓰기 귀찮다."], work: ["순찰 중입니다, 협조 부탁해요.", "교통 정리 중이에요, 천천히.", "신고 접수 확인했습니다."], victim: ["경찰 지갑을 털어?!", "거기 서! 경찰이다!", "이거 내가 신고해야 하나..."], thief: [], witness: ["거기! 방금 그거 뭡니까!", "소매치기 현행범이다!", "싸움 멈추세요! 경찰입니다!"], crowd: ["자, 비켜 주세요.", "구경하지 마시고 가세요.", "무슨 일입니까, 선생님?"], flee: ["지원! 지원 요청!", "일단 물러서! 본서 연락!", "이건 민원 수준이 아니야!"], harass: [], harassed: ["선생님, 취하셨네요.", "공무집행 방해입니다.", "댁에 들어가세요, 네?"], warn: ["{호칭}, 거기 멈추세요!", "신분증 좀 보여 주세요.", "한 번 더 하면 연행합니다."], hit: ["공무집행 방해 추가요!", "윽... 현행범 체포!", "선생님, 지금 경찰을 때렸어요."], drunk: [] } }, "관리국 직원": { faction: "A00", persona: { same: { ally: {}, enemy: {} }, B00: { ally: ["...일단 저것부터 처리해.", "등 뒤는 안 맡긴다.", "끝나면 각자 갈 길."], enemy: ["검은 정장, 확인.", "직급 부르는 쪽이네.", "가짜는 협상 안 해."] }, C00: { ally: ["가면은 써도 돼. 뛰기만 해.", "수집기 챙기는 건 나중에.", "오늘만 같은 쪽이야."], enemy: ["동물 가면이네.", "여긴 끝낼 거야.", "원료 얘긴 사양할게."] }, D00: { ally: ["괜찮아요. 제 뒤로.", "천천히 숨 쉬세요.", "출구는 이쪽이에요."], enemy: ["여긴 들어오시면 안 돼요.", "돌아가세요. 지금요.", "구경거리 아닙니다."] }, E00: { ally: ["면허 얘긴 나중에 하자.", "길 아는 사람이 앞장서.", "보수는 협회에 따져."], enemy: ["여긴 관리국 관할이야.", "면허 보여 줘 봐.", "의뢰는 취소야."] }, etc: { ally: ["조건은 단순해. 같이 나간다.", "앞만 봐.", "끝나면 각자 해산."], enemy: ["소속 불명.", "멈춰. 확인한다.", "여긴 통제 구역이야."] } }, time: { morning: ["편의점 커피 먼저.", "출근 도장 찍었다.", "아메리카노냐 믹스냐..."], day: ["보고서가 안 줄어.", "점심 파스타 어때?", "오늘은 조용하네."], evening: ["퇴근길 종로가 낯설어.", "야근은 사양인데.", "커피 한 잔만 더."], night: ["격리 구역은 내일 가자.", "불 켜져 있지?", "손전등, 하나 더."] }, situation: { alert: ["경보. 위치 공유해.", "커피 내려놔. 간다.", "불 꺼지기 전에 움직여."], hurt: ["괜찮아, 아직 서 있어.", "정신 관리팀 가기 싫은데."] }, eco: { pass: ["오늘 커피 몇 잔째지.", "보고서 마감이 내일이던가.", "이 길, 불 좀 밝혔으면."], work: ["격리 기록 대조 중.", "손전등 배터리 교체 완료.", "결재 올렸어. 이제 기다리자."], victim: ["어, 지갑. 방금까지 있었는데.", "사원증은... 다행히 있네.", "잡아! 지갑 가져갔어!"], thief: [], witness: ["방금 저 사람, 손 봤어?", "저기 소매치기다. 신고해.", "시비네. 끼지 말고 지켜봐."], crowd: ["무슨 소란이야?", "구경은 짧게. 일 남았어.", "괴이는 아니지? 그럼 됐어."], flee: ["물러나. 지금은 아니야.", "후퇴. 위치 공유할게.", "뛰어. 뒤돌아보지 말고."], harass: [], harassed: ["가던 길 가세요.", "술 깨고 얘기하시죠.", "손 치우세요. 한 번만 말해요."], warn: ["{호칭}, 거기까지.", "관리국 앞에서 이러면 곤란해.", "한 번 더 하면 기록 남아."], hit: ["...이건 보고서에 쓴다.", "커피 쏟았잖아.", "왜 이래, 우리 쪽 아니었어?"], drunk: [] } }, "백일몽 직원": { faction: "C00", persona: { same: { ally: {}, enemy: {} }, A00: { ally: ["오늘은 끝내지만 말아 줘.", "같이 나가는 게 우선.", "보고는 따로 올릴게요."], enemy: ["진짜 재난 왔다.", "원료 공급 망치러 왔네.", "여긴 등록된 괴담이에요."] }, B00: { ally: ["...일단 협조할게요.", "총구는 저쪽이죠?", "보고서엔 안 적을게요."], enemy: ["검은 정장 떼다, 피해.", "사업 리스크 발생.", "가면 벗을 생각 없어요."] }, D00: { ally: ["괜찮아요, 따라와요.", "가면은 신경 쓰지 마세요.", "여기만 지나면 돼요."], enemy: ["관계자 외 출입 금지.", "여긴 회사 부지예요.", "돌아가세요, 손님."] }, E00: { ally: ["장비 빌려줄까요? 포인트로.", "같이 들어가요.", "보상은 나눠요, 공정하게."], enemy: ["여긴 우리 현장이에요.", "선점했어요, 죄송.", "경쟁사는 사절이에요."] }, etc: { ally: ["조건만 맞으면 협조해요.", "비용 대비 괜찮네요.", "같이 나가요, 일단."], enemy: ["통제 안 되는 집단이네.", "리스크 판정.", "수집 방해예요."] } }, time: { morning: ["결재판 또 반려됐네.", "출근하자마자 퇴근 각.", "커피, 복지몰에 있나."], day: ["실적 압박 장난 아니다.", "차출 공문 안 왔겠지?", "포인트 얼마 남았더라."], evening: ["오늘도 살아서 퇴근.", "눈금 꽉 찬 사람 술 사.", "가면 자국 남았네."], night: ["야근 수당은 포인트로.", "경비실에 도넛 두고 가자.", "내일 괴담 등급 뭐래."] }, situation: { alert: ["괴담 반응! 수집기 챙겨!", "가면 써! 현장 간다!", "조장님, 지시 주세요!"], hurt: ["물약... 포인트 남았나.", "산재 처리 되려나, 이거."] }, eco: { pass: ["오늘 포인트 정산일인가.", "출장비 처리 언제 되냐.", "가면 끈 또 끊어지겠네."], work: ["실적 보고서 숫자 맞추자.", "수집기 눈금 확인 중.", "결재 라인 세 단계 남았다."], victim: ["지갑! 복지카드 들었는데!", "아, 포인트 카드까지...", "저기요! 거기 서요!"], thief: [], witness: ["저거 소매치기 아냐?", "시비네. 업무 외 일이야.", "신고는 누가 해, 나?"], crowd: ["무슨 일이야, 괴담이야?", "구경하다 지각하겠네.", "실적엔 안 잡히겠지."], flee: ["퇴근! 아니 도망!", "산재 처리 안 되면 끝이야.", "일단 빠지고 보고한다."], harass: [], harassed: ["저 바빠요, 결재 있어요.", "취하셨으면 가세요.", "시비는 업무 시간 외에."], warn: ["{호칭}, 거기까지만요.", "이거 경위서 감이에요.", "한 번 더 하면 보고 올려요."], hit: ["아! 이거 산재죠?", "왜 때려요, 근무 중인데.", "치료비 청구할 거예요."], drunk: [] } }, 불량배: { faction: null, persona: { A00: { ally: ["형님, 길 비켜 드릴게요.", "아, 저 착한 사람이에요.", "뭐 도와드려요?"], enemy: ["뭐야, 정장 아저씨.", "회사원이 여긴 왜 와.", "어, 어디 가요..."] }, B00: { ally: ["예, 예, 협조합니다.", "폰 꺼 놨어요, 진짜.", "말씀만 하세요."], enemy: ["검은 양복이다, 튀어!", "저 아무것도 몰라요!", "도시 전설 진짜였어?"] }, C00: { ally: ["그 가면 어디서 샀어요?", "회사원이 왜 이렇게 세요?", "따라갈게요."], enemy: ["가면 쓰고 뭐 하냐?", "코스프레야?", "야, 그 통 뭐야."] }, D00: { ally: ["야, 너 괜찮냐?", "여기 위험해, 나가자.", "음료수 하나 마실래?"], enemy: ["뭘 봐?", "돈 좀 있냐?", "꺼져, 여기 우리 자리야."] }, E00: { ally: ["형 그 장비 멋있다.", "해결사 그런 거예요?", "저도 껴 줘요."], enemy: ["그 가방 뭐 들었냐?", "장비 좋네, 두고 가.", "어, 그거 칼이에요?"] }, etc: { ally: ["오, 형 좀 세다.", "뭐 도와줄까요?", "저 편이에요, 저."], enemy: ["뭐야, 이상한 놈이네.", "야, 너 뭐야.", "어, 어어? 저리 가!"] } }, time: { morning: ["아, 졸려. 왜 깼지.", "아침 뭐 먹냐.", "아침부터 시비 걸지 마."], day: ["심심한데 피시방 갈까.", "편의점 앞 자리 맡아.", "돈 빌려줄 사람 없냐."], evening: ["오늘 밤 뭐 하냐.", "라면이나 먹으러 갈까.", "저기 저 놈 뭐냐."], night: ["이 골목 좀 이상해.", "아까 뭐 지나갔냐?", "야, 너 먼저 들어가 봐."] }, situation: { alert: ["뭐야 저거! 튀어!", "아 씨, 뭐야 저거!", "야 야 야, 뛰어!"], hurt: ["아, 아파! 진짜 아파!", "병원비 누가 내냐..."] }, eco: { pass: ["아 심심해 죽겠네.", "담배 한 갑 살 돈 없냐.", "뭐 재밌는 일 없나."], work: [], victim: ["야! 내 지갑 어디 갔어!", "감히 날 털어?", "잡히면 죽는다, 너!"], thief: ["개꿀. 튀어!", "나 잡아 봐라~", "지갑 두툼하네, 땡큐."], witness: ["오, 쟤 손 빠르다.", "싸움 났냐? 구경 가자.", "나 아니다, 나 아니야."], crowd: ["뭐야 뭐야, 싸움이냐?", "찍어, 찍어!", "오 대박, 구경 간다."], flee: ["튀어! 짭새 온다!", "아 씨, 나 먼저 간다!", "형들, 저 먼저 갈게요!"], harass: ["야, 뭘 꼬나봐?", "어깨 쳤잖아, 사과해.", "가진 거 다 꺼내 봐."], harassed: ["아, 뭐요. 시비 걸어요?", "저리 가, 귀찮게.", "나 아는 형 있다?"], warn: [], hit: ["아! 왜 때려요!", "잘못했어요, 잘못했어!", "야, 너 두고 보자!"], drunk: ["으아, 세상이 돈다...", "나 안 취했어, 진짜로.", "형 한 잔만 더..."] } }, 상인: { faction: null, persona: { A00: { ally: ["정장 손님, 커피 한 잔?", "단골 할인 해 줄게!", "오늘도 바쁘시네."], enemy: ["안 사면 비켜 줘요.", "정장 입고 구경만?", "장사 방해하지 마요."] }, B00: { ally: ["단체 주문이세요?", "치킨집은 저 골목!", "많이들 드세요!"], enemy: ["아이고, 무슨 일이에요?", "가게 문 닫을게요!", "아무것도 못 봤어요!"] }, C00: { ally: ["회사원 손님, 어서 와요!", "피곤해 보이네, 한 입!", "카드는 안 돼요, 미안."], enemy: ["가면 쓰고 오면 안 팔아요.", "축제 기간 아니에요.", "애들 놀라요, 벗어요."] }, D00: { ally: ["밥은 먹었어?", "오늘 싸게 줄게!", "구경은 공짜예요!"], enemy: ["안 살 거면 만지지 마요!", "도둑이야!", "손님, 계산은요?"] }, E00: { ally: ["기사님, 또 오셨네!", "장비 무겁겠다, 쉬어 가.", "외상은 이번만이야."], enemy: ["외상은 안 돼요!", "그 장비 가게에 놓지 마!", "냄새나요, 나가요!"] }, etc: { ally: ["손님, 이쪽 봐요!", "처음 보는 얼굴이네.", "구경하고 가요!"], enemy: ["손님 아니면 가요.", "뭐야, 왜 이래요!", "셔터 내릴 거예요!"] } }, time: { morning: ["물건 들어왔다!", "첫 손님 받아야지.", "셔터 올리자."], day: ["싸요, 싸! 골라 봐요!", "오늘 장사 영 안 되네.", "점심은 김밥으로."], evening: ["떨이요, 떨이!", "마감 전에 다 팔자.", "오늘 매상 얼마냐."], night: ["셔터 내리자.", "요즘 밤길 이상해.", "장부 정리해야지."] }, situation: { alert: ["무슨 소리야? 셔터 내려!", "손님들, 안으로 들어와요!", "아이고, 저게 뭐야!"], hurt: ["아이고 허리야...", "가게는 누가 보라고..."] }, eco: { pass: ["오늘 날씨 장사하기 딱인데.", "도매가 또 올랐다며?", "손님이 왜 이리 없냐."], work: ["골라 골라, 하나 더 줘요!", "덤으로 하나 넣어 줄게!", "포장해 드릴까요, 손님?"], victim: ["도둑이야! 내 돈통!", "오늘 매상 다 가져갔어!", "아이고, 저놈 잡아요!"], thief: [], witness: ["저 사람, 지갑 슬쩍했어!", "어머, 싸움 났네.", "가게 앞에서 이러지 마요!"], crowd: ["무슨 구경이래?", "구경하고 하나 사 가요!", "아이고, 소란스럽네."], flee: ["가게 문 닫아! 도망가!", "물건이고 뭐고 일단 튀자!", "아이고, 나 살려!"], harass: [], harassed: ["손님, 술 깨고 오세요.", "장사 방해하지 마요!", "가게 앞에서 이러면 안 돼요."], warn: [], hit: ["아이고! 사람 친다!", "장사꾼 때리면 벌 받아요!", "손님이 이러면 안 되지!"], drunk: [] } }, 시민: { faction: null, persona: { A00: { ally: ["아, 감사합니다!", "정장분, 길 좀 물을게요.", "덕분에 살았어요."], enemy: ["왜 따라오세요?", "보험 영업이세요?", "저 바빠요."] }, B00: { ally: ["네, 협조할게요.", "나라 일 하세요?", "수고하십니다."], enemy: ["저 그냥 행인이에요!", "검은 양복들이다...", "사진 지울게요!"] }, C00: { ally: ["가면 멋있네요.", "회사 행사세요?", "고마워요, 정말."], enemy: ["가면 쓰고 왜 이래요.", "경찰 부를 거예요.", "애들 있어요, 가요."] }, D00: { ally: ["안녕하세요.", "오늘 날씨 좋네요.", "버스 왔어요!"], enemy: ["뭐 하시는 거예요?", "저리 가요!", "사람 살려요!"] }, E00: { ally: ["기사님, 감사해요.", "그 장비 무거워 보여요.", "조심히 가세요."], enemy: ["그거 흉기예요?", "폐건물엔 왜 가요?", "가까이 오지 마요."] }, etc: { ally: ["와... 감사합니다.", "혹시 다치셨어요?", "처음 뵙는 분이네."], enemy: ["오지 마!", "도와주세요!", "저거 사람 맞아?"] } }, time: { morning: ["출근 지옥철이다.", "커피 한 잔 사 가야지.", "오늘 회의 몇 시지."], day: ["점심 뭐 먹지.", "날씨 좋다.", "택배 왔으려나."], evening: ["퇴근이다, 퇴근.", "장 보고 들어가야지.", "치킨 시킬까."], night: ["이 골목 어둡네.", "빨리 들어가자.", "아까 저 건물 있었나?"] }, situation: { alert: ["저게 뭐야?!", "다들 도망쳐요!", "누가 신고 좀 해요!"], hurt: ["아야... 피 난다.", "병원 가야 하나..."] }, eco: { pass: ["버스 놓치겠다.", "오늘 저녁 뭐 해 먹지.", "월급날 아직 멀었네."], work: [], victim: ["어, 내 지갑!", "도둑이야! 잡아 주세요!", "카드 정지부터 해야겠다."], thief: [], witness: ["방금 저 사람 소매치기죠?", "어머, 싸우나 봐.", "누가 신고 좀 해요."], crowd: ["무슨 일이래요?", "요즘 세상 참...", "찍어 둬야겠다."], flee: ["뭐야, 도망가요!", "살려 주세요!", "일단 피하고 보자!"], harass: ["아, 뭘 쳐다봐요?", "어깨를 치고 가네?", "거 좀 조용히 합시다!"], harassed: ["왜 이러세요?", "술 드셨으면 가세요.", "신고할 거예요."], warn: [], hit: ["아야! 뭐 하는 거예요!", "경찰 불러요, 경찰!", "사람을 왜 때려요!"], drunk: ["한 잔만 더 하자...", "부장님, 저 안 취했어요.", "집이... 이쪽이었나."] } }, 의사: { faction: null, persona: { A00: { ally: ["또 오셨네요, 정장 환자분.", "검사부터 하시죠.", "이번엔 어디 다치셨어요?"], enemy: ["여기서 이러시면 곤란해요.", "보호자분 아니시죠?", "진료 방해예요."] }, B00: { ally: ["단체 검진이세요?", "줄 서서 기다리세요.", "다들 혈압이 높네요."], enemy: ["환자 못 데려가요!", "영장 있으세요?", "여긴 병원이에요!"] }, C00: { ally: ["제약 회사분이세요?", "그 약 성분이 뭐예요?", "샘플은 안 받아요."], enemy: ["영업은 사절이에요.", "가면은 벗으세요.", "임상 자료 있어요?"] }, D00: { ally: ["어디가 불편하세요?", "물 많이 드세요.", "푹 쉬셔야 해요."], enemy: ["진정하세요!", "보안팀, 여기요!", "다른 환자분들 계세요!"] }, E00: { ally: ["또 다치셨어요?", "이번엔 몇 바늘이에요.", "보험은 되세요?"], enemy: ["그거 흉기 아니에요?", "응급실 무기 반입 금지!", "치료비 먼저요."] }, etc: { ally: ["앉으세요, 볼게요.", "처음 보는 증상이네.", "괜찮아요, 나을 거예요."], enemy: ["가까이 오지 마세요!", "보안팀!", "환자들 대피시켜요!"] } }, time: { morning: ["회진 돌 시간이다.", "커피 없으면 못 버텨.", "차트가 산더미네."], day: ["다음 환자분 들어오세요.", "점심은 또 못 먹었네.", "검사 결과 나왔나."], evening: ["퇴근이라는 게 있었지.", "목이 뻐근하네.", "당직 교대 언제야."], night: ["당직이라 잠은 포기.", "응급실 조용하길...", "이 상처, 뭐에 물렸지?"] }, situation: { alert: ["응급 상황! 다들 침착하게!", "환자부터 대피시켜요!", "저게... 뭐죠?"], hurt: ["괜찮아요, 제가 의사예요.", "지혈... 내가 나를 하네."] }, eco: { pass: ["오늘 몇 시간 잤더라.", "당직표 또 바뀌었네.", "카페인 수치 부족."], work: ["혈압 다시 재 보죠.", "차트 정리부터 하고.", "처방전 출력했습니다."], victim: ["지갑이... 당직비 든 건데.", "저기요! 도둑이에요!", "하, 오늘 정말 운 없네."], thief: [], witness: ["방금 저 사람 소매치기죠?", "다치면 응급실로 오세요.", "싸우지 마세요, 위험해요."], crowd: ["다친 분 있어요?", "의사입니다, 비켜 주세요.", "구경하실 거면 물러나요."], flee: ["환자분들 먼저 대피요!", "이건 의학으로 설명 안 돼!", "일단 피하고 봅시다!"], harass: [], harassed: ["취하셨네요, 귀가하세요.", "저 당직 가야 해요.", "손 놓으세요, 경찰 부릅니다."], warn: [], hit: ["윽... 타박상이네.", "의사를 때리시면 어떡해요.", "여기 병원이에요!"], drunk: [] } }, 청소부: { faction: null, persona: { A00: { ally: ["정장 양반, 수고 많아요.", "커피 컵은 여기 버려요.", "발밑 젖었어요."], enemy: ["거기 방금 닦았어요!", "밟지 마요, 밟지 마.", "청소 중이에요."] }, B00: { ally: ["젊은이들, 수고해요.", "치킨 상자는 분리수거!", "줄 맞춰 걷네."], enemy: ["어이구, 무슨 일이래.", "난 청소만 해요!", "아무것도 안 주웠어요!"] }, C00: { ally: ["회사원 양반, 늦었네.", "가면 떨어뜨렸어요.", "야근했어요?"], enemy: ["그 통 여기 버리지 마요.", "가면 쓰고 왜 그래요.", "무서워라."] }, D00: { ally: ["발 조심해요, 미끄러워.", "좋은 아침이에요.", "어이구, 허리야."], enemy: ["쓰레기 아무 데나 버리지 마!", "거기 서요!", "다 봤어요!"] }, E00: { ally: ["또 흙투성이네.", "장비는 저쪽에 둬요.", "물 한 병 줄까요?"], enemy: ["흙 털고 다녀요!", "폐건물 들어가지 마요!", "그거 버리면 안 돼!"] }, etc: { ally: ["처음 보는 양반이네.", "길 잃었어요?", "조심히 가요."], enemy: ["뭐, 뭐예요!", "빗자루 휘두를 거야!", "어이구, 사람 살려!"] } }, time: { morning: ["새벽 다섯 시, 출근.", "오늘 쓰레기 많네.", "허리 좀 펴고."], day: ["낙엽은 끝이 없어.", "점심은 도시락.", "분리수거 좀 하지."], evening: ["오늘 몫은 끝.", "빗자루 반납하자.", "집에 가서 파스 붙여야지."], night: ["이 얼룩은 뭐야.", "밤 청소는 싫어.", "저 골목은 내일 하자."] }, situation: { alert: ["이게 무슨 소리야!", "어이구, 다들 피해요!", "빗자루라도 들어야 하나!"], hurt: ["아이고, 허리 나갔다.", "산재 신청해야 하나..."] }, eco: { pass: ["오늘은 바람이 차네.", "무릎이 시큰거린다.", "저 꽁초 좀 봐라."], work: ["쓱쓱, 금방 끝나요.", "발 조심해요, 바닥 젖었어.", "쓰레기봉투 하나 더."], victim: ["어이구, 내 지갑!", "청소부 돈을 털어 가?", "저놈 잡아요, 저놈!"], thief: [], witness: ["저 양반, 뭘 집어 가네.", "어이구, 싸우지들 마요.", "또 치울 거 생기겠네."], crowd: ["무슨 일이래?", "어이구, 시끄러워라.", "다 끝나면 내가 치우지 뭐."], flee: ["어이구, 나 살려!", "빗자루 버리고 뛰어!", "허리야, 그래도 뛰어야지!"], harass: [], harassed: ["어이구, 술 냄새.", "나 일하는 중이에요.", "저리 가요, 쓸어 버린다."], warn: [], hit: ["어이구, 왜 이래요!", "늙은이를 때려?", "아이고 허리, 아이고..."], drunk: [] } }, 프리랜서: { faction: "E00", persona: { E00: { ally: ["몇 급이야? 난 아직 4급.", "보수는 정확히 반반.", "생환 경력은 있지?"], enemy: ["이 의뢰 내가 먼저야.", "면허 번호 대 봐.", "같은 처지끼리 이러기냐."] }, A00: { ally: ["관리국이랑 같은 편이라니.", "단속만 하지 마요.", "이거 보수는 나와요?"], enemy: ["관리국이다, 튀어.", "면허 있어요, 진짜로!", "먹고살자는 건데요."] }, B00: { ally: ["...진짜 같은 편 맞아?", "등은 안 보여 줄 거야.", "끝나면 바로 튈게."], enemy: ["검은 정장, 반대로 걷자.", "선글라스 떼 왔다!", "납치는 사양이에요!"] }, C00: { ally: ["회사가 장비 대 주니 좋겠다.", "수집기는 그쪽 거, 보수는 내 거.", "가면 멋있네, 비싸?"], enemy: ["동물 가면, 경쟁자네.", "이 현장 의뢰받았어.", "포인트보다 내 밥이 먼저."] }, D00: { ally: ["길 알아요, 붙어 와요.", "이쪽은 안전해요.", "보수는 됐어요, 이번엔."], enemy: ["여기 들어오면 안 돼요.", "구경하지 말고 가요.", "공사 중이에요, 공사."] }, etc: { ally: ["보수만 맞으면 같이 가.", "분배는 미리 정하자.", "생환하면 후기 쓸게."], enemy: ["이 현장 내 의뢰야.", "공짜로는 안 비켜.", "얼마면 돼?"] } }, time: { morning: ["공고 떴나 보자.", "장비 점검, 또 장비값.", "자판기 커피가 아침."], day: ["수수료 떼면 얼마야...", "협회 번호표 대기 중.", "병원비 할부 남았는데."], evening: ["오늘도 생환. 수익 -.", "중림 들렀다 갈까.", "더치페이는 정확히."], night: ["다음 달엔 승급한다.", "후기 써야 하는데.", "면허 갱신 언제였지?"] }, situation: { alert: ["위험 등급 틀렸잖아!", "협회 공고 또 거짓말!", "장비 챙겨, 들어간다!"], hurt: ["병원비 또 나가네...", "협회 진료소는 사양이야."] }, eco: { pass: ["이번 달 월세 어쩌냐.", "장비 할부 끝나려면 멀었다.", "좋은 의뢰 좀 떠라."], work: ["의뢰 확인. 보수 짜네.", "탄 몇 발 남았나 세 보자.", "장비 수리비가 보수보다 커."], victim: ["야! 내 지갑! 거기 서!", "의뢰비 든 지갑이었는데!", "장비값 날아갔다..."], thief: [], witness: ["소매치기네. 공짜론 안 잡아.", "저거 시비 붙었다.", "신고 보상금 있냐?"], crowd: ["무슨 일이야, 의뢰감이야?", "구경도 공짜는 아니지.", "돈 되는 소란이면 좋겠다."], flee: ["보수보다 목숨이 비싸.", "철수! 이건 등급 밖이야!", "병원비 또 나가기 싫어!"], harass: ["야, 너 몇 급이냐?", "어깨 부딪혔잖아, 어쩔래.", "협회 놈들 다 똑같아!"], harassed: ["나 지금 기분 별로야.", "싸우면 수수료 받는다?", "꺼져. 상대할 시간 없어."], warn: [], hit: ["야! 치료비 내놔!", "이거 무료 서비스 아니다.", "아, 장비 망가졌잖아!"], drunk: ["수수료... 수수료가 문제야.", "협회 이 자식들...", "나도 1급 할 수 있어..."] } }, 학생: { faction: null, persona: { A00: { ally: ["아, 안녕하세요!", "정장 언니 오빠다.", "저 따라가도 돼요?"], enemy: ["누, 누구세요?", "저 학원 가는 길이에요.", "엄마한테 전화할 거예요."] }, B00: { ally: ["네, 시키는 대로 할게요.", "저 아무것도 안 찍었어요.", "집에 갈 수 있어요?"], enemy: ["검은 양복이다...!", "세정게 글 진짜였어?", "도망쳐, 빨리!"] }, C00: { ally: ["그 가면 어디서 사요?", "회사원인데 멋있다.", "고맙습니다!"], enemy: ["가면 무서워요...", "왜 쳐다보세요?", "친구야, 가자."] }, D00: { ally: ["안녕하세요!", "시험 망했다...", "학원 늦겠다!"], enemy: ["왜, 왜요?", "저 돈 없어요!", "선생님 부를 거예요!"] }, E00: { ally: ["혹시 해결사예요?", "그 장비 진짜예요?", "저도 껴 주세요!"], enemy: ["그거 칼이에요?", "폐건물에서 나왔어...", "저 신고할 거예요."] }, etc: { ally: ["와, 대박.", "저만 본 거 아니죠?", "어디서 오셨어요?"], enemy: ["으악!", "오지 마요!", "엄마아!"] } }, time: { morning: ["지각이다, 뛰어!", "숙제 안 했다...", "1교시 수학이야?"], day: ["급식 뭐 나와?", "졸려 죽겠다.", "쉬는 시간 언제야."], evening: ["학원 가기 싫다.", "떡볶이 먹고 갈래?", "단톡방 난리 났네."], night: ["이 길 밤엔 무서워.", "괴담 영상 봤어?", "엄마 문자 왔다."] }, situation: { alert: ["저거 뭐야?! 도망가!", "선생님! 선생님!", "찍어, 아니 찍지 마!"], hurt: ["아파요... 무릎 까졌어.", "엄마한테 혼나겠다..."] }, eco: { pass: ["학원 숙제 언제 하지.", "폰 배터리 3퍼야...", "오늘 단어 시험 망했다."], work: [], victim: ["어? 내 지갑!", "용돈 다 들어 있는데!", "이번 달 용돈 끝났다..."], thief: [], witness: ["헐, 방금 소매치기야?", "야, 싸움 났어!", "선생님 불러야 하나?"], crowd: ["뭐야? 무슨 일이야?", "단톡에 올려야지.", "헐, 대박. 구경 가자."], flee: ["으아악! 도망가!", "살려 주세요오!", "야, 같이 가!"], harass: [], harassed: ["저 학생이에요...", "왜 그러세요, 무서워요.", "저 그냥 지나갈게요!"], warn: [], hit: ["아파요! 왜 때려요!", "신고할 거예요!", "엄마한테 이를 거예요!"], drunk: [] } }, "협회 직원": { faction: "협회", persona: { A00: { ally: ["관리국 연락은 지원실로요.", "협조 감사드립니다.", "서류는 나중에 드릴게요."], enemy: ["정식 절차를 밟아 주세요.", "협회는 합법 단체입니다.", "지원실을 통해 주세요."] }, B00: { ally: ["...네, 협조하겠습니다.", "조용히 처리해 주세요.", "기록은 안 남기겠습니다."], enemy: ["저, 저희는 컨설팅 회사예요.", "회원 명부는 없습니다.", "책임자 불러 드릴게요."] }, C00: { ally: ["거래 조건 확인했습니다.", "협조 기록 남겨 둘게요.", "정산은 따로 하시죠."], enemy: ["저희 회원 현장입니다.", "공고 중인 의뢰예요.", "선점 확인 부탁드립니다."] }, D00: { ally: ["안전 점검 문의세요?", "천천히 말씀하세요.", "이쪽으로 안내할게요."], enemy: ["관계자 외 출입 금지예요.", "예약하고 오셨나요?", "1층 안내 데스크로요."] }, E00: { ally: ["회원님, 무사하셨네요!", "번호표 뽑아 주세요.", "안전한 활동을 응원합니다."], enemy: ["면허 확인하겠습니다.", "규정 위반이십니다.", "면허 정지 사유예요."] }, etc: { ally: ["협조 감사합니다.", "기록은 정확히 남길게요.", "안내해 드릴게요."], enemy: ["등록되지 않은 분이네요.", "허가 없이 오셨어요?", "보안 담당 부를게요."] } }, time: { morning: ["번호표 기계 켰습니다.", "오늘도 민원 많겠다.", "규정집 개정판 왔네."], day: ["다음 번호 손님!", "점심 먹을 틈이 없네.", "수수료 명세 출력 중."], evening: ["접수 마감했습니다.", "보험 청구 또 쌓였네.", "커피 자판기 또 올랐어."], night: ["야간 접수는 안 받아요.", "공지 문자 예약 완료.", "지하 진료소 불 끄자."] }, situation: { alert: ["회원님들께 주의 공지!", "지원실, 비상 연락!", "고객님, 침착하세요!"], hurt: ["지하 진료소... 대기 몇 번?", "규정상... 본인 과실이겠죠?"] }, eco: { pass: ["번호표 용지 주문해야지.", "오늘 민원 몇 건이었지.", "웃는 얼굴 유지, 유지."], work: ["서류 접수 도와드릴게요.", "순서대로 안내해 드려요.", "수수료 영수증 여기요."], victim: ["어머, 제 지갑이...", "규정상 신고부터... 잡아요!", "회원님, 그 사람 좀!"], thief: [], witness: ["저분, 방금 가방에 손을...", "분쟁은 지원실로 접수요.", "어머, 싸움 났나 봐요."], crowd: ["무슨 일이신가요?", "회원님들, 진정하세요.", "소란 접수는 안 받아요."], flee: ["대피 안내... 저부터요!", "비상구는 이쪽입니다!", "규정상 일단 피신이요!"], harass: [], harassed: ["고객님, 진정해 주세요.", "취하신 분은 접수 불가예요.", "보안 요원 부를게요."], warn: ["{호칭}, 규정 위반이세요.", "면허 정지 사유입니다.", "더 하시면 제재 들어가요."], hit: ["아... 이건 민원입니다.", "회원님, 폭행은 규정상...", "웃는 얼굴로 신고할게요."], drunk: [] } } } };
 
   // src/game/action/npc/style.css
-  var style_default3 = "/* NPC 자유 대화창. 1280×720 놀이판 층(.gs-ui)에 들어가 게임 화면과 같이 커지고 작아진다. 본부 대화창(.hq-talk)과 같은 도트 틀 */\n.gnp{position:absolute;left:50%;bottom:10px;transform:translateX(-50%);width:1120px;height:auto;min-height:170px;max-height:290px;display:flex;gap:22px;padding:6px 10px;box-sizing:border-box;pointer-events:auto;color:#ece6d4;z-index:40;user-select:none;-webkit-user-select:none}\n.gnp[hidden]{display:none}\n.gnp-face[hidden]{display:none}\n.gnp-face{flex:0 0 132px;width:132px;height:132px;margin:14px 4px 0;background:#232d32;display:grid;place-items:center;overflow:visible}\n.gnp-face>canvas{width:100%;height:100%;image-rendering:pixelated;display:block}\n.gnp-face>img{object-fit:cover;object-position:50% 15%;background:#232d32}\n.gnp-face>span{font-size:56px;color:#1b1f22;text-shadow:none}\n.gnp-body{flex:1;min-width:0;display:flex;flex-direction:column;gap:6px;padding-top:4px}\n.gnp-head{display:flex;align-items:center;gap:14px;min-height:34px}\n.gnp-name{font-size:26px;color:#ffe27a;text-shadow:2px 2px 0 #000;white-space:nowrap}\n.gnp-favor{display:flex;gap:4px;align-items:center}\n.gnp-favor i{width:12px;height:12px;background:#8a7a4a;box-shadow:inset 0 0 0 2px #1b1f22;display:block}\n.gnp-favor i.neg{background:#7a4a44}\n.gnp-favor i.up{background:#ffe27a}\n.gnp-favor i.down{background:#ff6a58}\n.gnp-favor b{width:2px;height:16px;background:#d8cfb6;margin:0 3px}\n.gnp-state{font-size:18px;color:#d8cfb6;text-shadow:2px 2px 0 #000}\n.gnp-x{margin-left:auto;padding:0 6px;background:none;border:0;color:#ffe27a;font-size:33px;line-height:1;text-shadow:2px 2px 0 #000;cursor:pointer}\n.gnp-log{flex:0 1 auto;min-height:0;overflow:hidden;display:flex;flex-direction:column;justify-content:flex-start;gap:6px;user-select:text;-webkit-user-select:text}\n.gnp-log p[hidden]{display:none}\n.gnp-log p{margin:0;flex:none;font-size:22px;line-height:1.45;word-break:keep-all;overflow-wrap:anywhere;text-shadow:2px 2px 0 #000}\n.gnp-log p.me{color:#9fc7b6}\n.gnp-log p.me::before{content:'▶ ';color:#6f9d8a}\n.gnp-log p.sys{font-size:18px;color:#e6c35a}\n.gnp-log p.sys::before{content:'◆ '}\n.gnp-log p.wait{color:#8a8574;animation:gnp-blink 1s steps(2) infinite}\n@keyframes gnp-blink{50%{opacity:.35}}\n.gnp-row{display:flex;flex-wrap:wrap;align-items:center;gap:4px 14px}\n.gnp-acts{display:flex;flex:none;gap:2px 6px}\n.gnp-acts[hidden]{display:none}\n.gnp-acts .gk-btn{font-size:19px;padding:2px 14px 2px 10px}\n.gnp-acts .gk-btn b{color:#8a8574;margin-right:8px;font-weight:400}\n.gnp-say{display:flex;flex-wrap:wrap;gap:6px 8px;align-items:center}\n.gnp-in{flex:1;min-width:280px;height:48px;padding:0 14px;box-sizing:border-box;font-size:22px;color:#ece6d4;background:#0d1214;border:3px solid #6b6250;border-radius:0;box-shadow:inset 3px 3px 0 #000;caret-color:#ffe27a;outline:none;-webkit-user-select:text;user-select:text}\n.gnp-in::placeholder{color:#8f8670}\n.gnp .gnp-in:focus,.gnp .gnp-in:focus-visible{outline:none;border-color:#e6c35a}\n.gnp-send{height:48px;padding:0 18px;font-size:20px;font-weight:700;color:#ffe27a;background:#2c383e;border:3px solid #8a7a4a;border-radius:0;box-shadow:inset -3px -3px 0 #1b1f22;text-shadow:2px 2px 0 #000;cursor:pointer;white-space:nowrap}\n.gnp-send:hover,.gnp-send:focus-visible{border-color:#e6c35a;outline:none}\n.gnp-send:disabled{opacity:.45;cursor:default}\n.gnp-chips{display:flex;gap:6px;flex-wrap:wrap}\n.gnp-chips[hidden],.gnp-row:has(>.gnp-chips[hidden]){display:none}\n.gnp-chips button{font-size:19px;font-weight:700;padding:4px 14px;color:#ece6d4;background:#2c383e;border:3px solid #6b6250;border-radius:0;box-shadow:inset -3px -3px 0 #1b1f22;cursor:pointer;text-shadow:2px 2px 0 #000}\n.gnp-chips button:hover,.gnp-chips button:focus-visible{color:#ffe27a;border-color:#8a7a4a}\n.gnp-note{font-size:16px;color:#c98a6a;min-height:0}\n.gnp-note:empty{display:none}\n/* 터치 화면: 폰 가로에서 놀이판이 작게 줄어드므로 글씨를 키운다. 입력칸은 iOS가 확대하지 않게 크게 */\n.gnp.coarse{max-height:330px}\n.gnp.coarse.typing{top:0;bottom:auto;width:1280px;min-height:0;padding:6px 74px}\n.gnp.coarse.typing .gnp-row{display:none}\n.gnp.coarse .gnp-send{height:60px;font-size:24px}\n.gnp.coarse .gnp-log p{font-size:26px}\n.gnp.coarse .gnp-in{height:60px;font-size:30px}\n.gnp.coarse .gk-btn{font-size:24px}\n.gnp.coarse .gnp-chips button{font-size:22px}\n.gnp.coarse .gnp-face{flex-basis:132px;width:132px;height:132px}\n";
+  var style_default3 = "/* NPC 자유 대화창. 1280×720 놀이판 층(.gs-ui)에 들어가 게임 화면과 같이 커지고 작아진다. 본부 대화창(.hq-talk)과 같은 도트 틀 */\n.gnp{position:absolute;left:50%;bottom:10px;transform:translateX(-50%);width:1120px;height:auto;min-height:170px;max-height:290px;display:flex;gap:22px;padding:6px 10px;box-sizing:border-box;pointer-events:auto;color:#ece6d4;z-index:40;user-select:none;-webkit-user-select:none}\n.gnp[hidden]{display:none}\n.gnp-face[hidden]{display:none}\n.gnp-face{flex:0 0 132px;width:132px;height:132px;margin:14px 4px 0;background:#232d32;display:grid;place-items:center;overflow:visible}\n.gnp-face>canvas{width:100%;height:100%;image-rendering:pixelated;display:block}\n.gnp-face>img{object-fit:cover;object-position:50% 15%;background:#232d32}\n.gnp-face>span{font-size:56px;color:#1b1f22;text-shadow:none}\n.gnp-body{flex:1;min-width:0;display:flex;flex-direction:column;gap:6px;padding-top:4px}\n.gnp-head{display:flex;align-items:center;gap:14px;min-height:34px}\n.gnp-name{font-size:26px;color:#ffe27a;text-shadow:2px 2px 0 #000;white-space:nowrap}\n.gnp-favor{display:flex;gap:4px;align-items:center}\n.gnp-favor i{width:12px;height:12px;background:#8a7a4a;box-shadow:inset 0 0 0 2px #1b1f22;display:block}\n.gnp-favor i.neg{background:#7a4a44}\n.gnp-favor i.up{background:#ffe27a}\n.gnp-favor i.down{background:#ff6a58}\n.gnp-favor b{width:2px;height:16px;background:#d8cfb6;margin:0 3px}\n.gnp-state{font-size:18px;color:#d8cfb6;text-shadow:2px 2px 0 #000}\n.gnp-x{margin-left:auto;padding:0 6px;background:none;border:0;color:#ffe27a;font-size:33px;line-height:1;text-shadow:2px 2px 0 #000;cursor:pointer}\n.gnp-log{flex:0 1 auto;min-height:0;overflow:hidden;display:flex;flex-direction:column;justify-content:flex-start;gap:6px;user-select:text;-webkit-user-select:text}\n.gnp-log p[hidden]{display:none}\n.gnp-log p{margin:0;flex:none;font-size:22px;line-height:1.45;word-break:keep-all;overflow-wrap:anywhere;text-shadow:2px 2px 0 #000}\n.gnp-log p.me{color:#9fc7b6}\n.gnp-log p.me::before{content:'▶ ';color:#6f9d8a}\n.gnp-log p.sys{font-size:18px;color:#e6c35a}\n.gnp-log p.sys::before{content:'◆ '}\n.gnp-log p.wait{color:#8a8574;animation:gnp-blink 1s steps(2) infinite}\n@keyframes gnp-blink{50%{opacity:.35}}\n.gnp-row{display:flex;flex-wrap:wrap;align-items:center;gap:4px 14px}\n.gnp-acts{display:flex;flex:none;gap:2px 6px}\n.gnp-acts[hidden]{display:none}\n.gnp-acts .gk-btn{font-size:19px;padding:2px 14px 2px 10px}\n.gnp-acts .gk-btn b{color:#8a8574;margin-right:8px;font-weight:400}\n.gnp-say{display:flex;flex-wrap:wrap;gap:6px 8px;align-items:center}\n.gnp-in{flex:1;min-width:280px;height:48px;padding:0 14px;box-sizing:border-box;font-size:22px;color:#ece6d4;background:#0d1214;border:3px solid #6b6250;border-radius:0;box-shadow:inset 3px 3px 0 #000;caret-color:#ffe27a;outline:none;-webkit-user-select:text;user-select:text}\n.gnp-in::placeholder{color:#8f8670}\n.gnp .gnp-in:focus,.gnp .gnp-in:focus-visible{outline:none;border-color:#e6c35a}\n.gnp-send{height:48px;padding:0 18px;font-size:20px;font-weight:700;color:#ffe27a;background:#2c383e;border:3px solid #8a7a4a;border-radius:0;box-shadow:inset -3px -3px 0 #1b1f22;text-shadow:2px 2px 0 #000;cursor:pointer;white-space:nowrap}\n.gnp-send:hover,.gnp-send:focus-visible{border-color:#e6c35a;outline:none}\n.gnp-send:disabled{opacity:.45;cursor:default}\n.gnp-chips{display:flex;gap:6px;flex-wrap:wrap}\n.gnp-chips[hidden],.gnp-row:has(>.gnp-chips[hidden]){display:none}\n.gnp-chips button{font-size:19px;font-weight:700;padding:4px 14px;color:#ece6d4;background:#2c383e;border:3px solid #6b6250;border-radius:0;box-shadow:inset -3px -3px 0 #1b1f22;cursor:pointer;text-shadow:2px 2px 0 #000}\n.gnp-chips button:hover,.gnp-chips button:focus-visible{color:#ffe27a;border-color:#8a7a4a}\n.gnp-note{font-size:16px;color:#c98a6a;min-height:0}\n.gnp-note:empty{display:none}\n/* 터치 화면: 폰 가로에서 놀이판이 작게 줄어드므로 글씨를 키운다. 입력칸은 iOS가 확대하지 않게 크게 */\n.gnp.coarse{max-height:330px}\n.gnp.coarse.typing{top:0;bottom:auto;width:1280px;min-height:0;padding:6px 74px}\n.gnp.coarse.typing .gnp-row{display:none}\n.gnp.coarse .gnp-send{height:60px;font-size:24px}\n.gnp.coarse .gnp-log p{font-size:26px}\n.gnp.coarse .gnp-in{height:60px;font-size:30px}\n.gnp.coarse .gk-btn{font-size:24px}\n.gnp.coarse .gnp-chips button{font-size:22px}\n.gnp.coarse .gnp-face{flex-basis:132px;width:132px;height:132px}\n\n/* 키보드로 고른 단추 (방향키 · Enter/E) */\n.gnp .gnp-sel{outline:3px solid #ffe27a;outline-offset:1px;color:#ffe27a}\n.gnp .gnp-in.gnp-sel{outline:3px solid #ffe27a}\n";
 
   // src/core/cbs.ts
   var truthy = (v) => v === "1" || v.toLowerCase() === "true";
@@ -26694,8 +32065,8 @@ ${who}: ${text2.replace(/\n/g, " ")}
           continue;
         }
         const yes = head.startsWith("#if") ? truthy(evaluate2(head.replace(/^#if(::)?/, ""), env).trim()) : whenCond(head, env);
-        const body2 = yes ? text2.slice(k, b.else >= 0 ? b.else : b.close) : b.else >= 0 ? text2.slice(b.elseEnd, b.close) : "";
-        out += evaluate2(body2, env);
+        const body = yes ? text2.slice(k, b.else >= 0 ? b.else : b.close) : b.else >= 0 ? text2.slice(b.elseEnd, b.close) : "";
+        out += evaluate2(body, env);
         i = b.end;
         continue;
       }
@@ -26724,7 +32095,7 @@ ${who}: ${text2.replace(/\n/g, " ")}
     jaemtri: d2({ id: "jaemtri", name: "잼트리", sheet: "잼트리", group: "hq", color: "#27685b", photo: "Jaemtri", role: "종합대응팀 내근 선임. 임무 창구, 생존자 면담, 매뉴얼 관리. 탕비실 연유 커피 담당.", speech: "다정하고 장난스러운 반말, 스스로 「언니」. 웃는 얼굴로 절차를 집행(「스톱. 이름 말하지 마.」). 부장(쟈알디)에게만 존댓말.", greet: ["어머, 후배 왔어?", "응, 후배. 무슨 얘기 하고 싶어?"], lines: ["고민 있으면 꼭 언니한테 물어봐.", "응응. 그건 언니가 알아볼게. 대신 진술서 먼저.", "출동 전에 규칙서 한 번만 더 봐. 진짜로.", "연유 커피 남았는데, 마실래?"], rules: [[/이름|본명/, ["스톱. 이름 말하지 마. 응, 그렇지. 착하다."]], [/커피|연유/, ["연유 커피는 언니만 타. 레시피는 묻지 마."]]], never: ["본명을 묻거나 말하지 않는다", "현장에 나가지 않는다"] }),
     gognija: d2({ id: "gognija", name: "고그니쟈", sheet: "고그니쟈", group: "hq", color: "#c9a227", photo: "Gognija", role: "격리팀 연구 책임자. 지하 연구실에서 회수물 연구.", speech: "고풍스러운 하게체(「~하게」「~일세」「~라네」), 최대 음량, 느낌표 많음.", greet: ["오오! 무엇이든 묻게! 대답은 장담 못 하네!", "자료를 가져왔나!!!"], lines: ["좋은 질문일세! 대답은… 연구가 끝나면 알려 주겠네!", "이곳에서는 누구나 달달한 믹스커피를 마셔야 하네!", "데쥬레!!! 커피 좀 타 오게!!!", "아, 그건 비상 탈출 장치라네!"], rules: [[/블랙|아메리카노/, ["블랙이라니! 설탕 두 스푼 추가일세!"]]] }),
     dejure: d2({ id: "dejure", name: "데쥬레", sheet: "데쥬레", group: "hq", color: "#e58fb5", photo: "Dejure", role: "격리팀 연구원. 감정실에서 회수물 분류·감정, 믹스커피 제조.", speech: "더듬고 말끝 흐리는 존댓말(「저, 저기…」), 놀라면 「아, 아와와…!」. 유물 다룰 때만 또렷.", greet: ["네, 네…? 저, 저한테요…?", "아, 안녕하세요…"], lines: ["저, 저기… 다시 한 번만…", "조, 조심히 다녀오세요… 꼭이요…", "황금 비율은… 비, 비밀이에요…", "주시면… 분류할게요. 무섭지만요."], rules: [[/스팡달/, ["아, 아와와…! 제, 제가 잘못했어요…!"]], [/선배/, ["서, 선배요…? 헤헤…"]]] }),
-    konjyuce: d2({ id: "konjyuce", name: "콘쥬스", sheet: "콘쥬스", group: "hq", color: "#e0457b", photo: "Konjyuce", minor: true, role: "17세 고등학생 요원. 괴력. 정비·보급실 담당, 전투 투입은 팀이 막는다.", speech: "밝고 고집 센 존댓말. 호칭을 상황 따라 바꾼다(아저씨→오빠, 선배님→언니). 호칭이 바뀌면 부탁(간식)이 온다.", greet: ["네! 뭐든 물어보세요!", "오빠, 아니 선배님! 안녕하세요!"], lines: ["잠깐만요! 저도 이 팀 정식 멤버거든요!", "그 말 좀 이상한데요? 아까랑 다르잖아요.", "그거 들어 드릴까요? 상자 열 개까진 괜찮아요!", "저도 갈 수 있는데… 네, 알아요. 팀 결정."], never: ["전투에 나가겠다고 우기지 않는다"] })
+    konjyuce: d2({ id: "konjyuce", name: "콘쥬스", sheet: "콘쥬스", group: "hq", color: "#e0457b", photo: "Konjyuce", role: "20세 대학생 요원. 괴력. 정비·보급실 담당, 전투 투입은 팀이 막는다.", speech: "밝고 고집 센 존댓말. 호칭을 상황 따라 바꾼다(아저씨→오빠, 선배님→언니). 호칭이 바뀌면 부탁(간식)이 온다.", greet: ["네! 뭐든 물어보세요!", "오빠, 아니 선배님! 안녕하세요!"], lines: ["잠깐만요! 저도 이 팀 정식 멤버거든요!", "그 말 좀 이상한데요? 아까랑 다르잖아요.", "그거 들어 드릴까요? 상자 열 개까진 괜찮아요!", "저도 갈 수 있는데… 네, 알아요. 팀 결정."], never: ["전투에 나가겠다고 우기지 않는다"] })
   };
   var MERCHANT_NPCS = {
     madeokhee: d2({ id: "madeokhee", name: "마덕희", sheet: "마덕희", group: "merchant", color: "#7d2a3a", photo: "Ma Deok-hee", role: "중림 장물 매입점 「헐값매입」 주인. 출동 중 휴식방에 나타나 회수물을 사고 물건을 판다(현금).", speech: "다정한 척 깎는 존댓말, 상대를 「자기야」. 상대 말을 작게 따라 하고 값을 후려친다(「80. 얘기 끝났어요. 쟁반 열렸습니다.」).", effects: ["favor", "trade", "hint", "leave"], greet: ["어머, 자기야. 뭐 팔 거 있어요?", "현금만 받아요. 관리국 결재는 여기서 안 통하고."], lines: ["자기야, 그런 얘기는 쟁반 위에 뭐 올려놓고 해요.", "흐음. 계속해 봐요.", "80. 얘기 끝났어요. 쟁반 열렸습니다.", "'열 배는 하는 거예요.' 열 배. 음. 그럼 열 배 받으러 가세요."] }),
@@ -26927,8 +32298,8 @@ ${t.secret}` : "",
       return "";
     });
     t = t.replace(/<[^>]+>/g, "").trim();
-    const esc7 = name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-    t = t.replace(new RegExp(`^\\s*(?:${esc7})\\s*[:：]\\s*`), "");
+    const esc6 = name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    t = t.replace(new RegExp(`^\\s*(?:${esc6})\\s*[:：]\\s*`), "");
     t = t.replace(/^[「"“'](.*)[」"”']$/s, "$1");
     t = t.replace(/\*[^*]*\*/g, "").replace(/\([^)]*\)/g, "").replace(/[ \t]{2,}/g, " ").replace(/\n{2,}/g, "\n").trim();
     t = t.split(/\n\s*[^\s:]{1,8}\s*[:：]/)[0].trim();
@@ -26979,11 +32350,11 @@ ${t.secret}` : "",
         }
         case "gift": {
           const list = c.target.gifts ?? c.def.gifts ?? [];
-          const item2 = list.find((g2) => t.arg.includes(g2)) ?? (list.length === 1 ? list[0] : void 0);
-          if (!item2 || c.rel.giftDay === c.day) continue;
+          const item = list.find((g2) => t.arg.includes(g2)) ?? (list.length === 1 ? list[0] : void 0);
+          if (!item || c.rel.giftDay === c.day) continue;
           c.rel.giftDay = c.day;
           seen2.add("gift");
-          out.push({ kind: "gift", item: item2, note: `${name}에게 물건을 받았다` });
+          out.push({ kind: "gift", item, note: `${name}에게 물건을 받았다` });
           continue;
         }
       }
@@ -26994,9 +32365,9 @@ ${t.secret}` : "",
     return out;
   }
   function offlineLine(def, text2, rng2 = Math.random) {
-    const pick6 = (l) => l[Math.floor(rng2() * l.length) % l.length];
-    for (const [re, lines3] of def.rules ?? []) if (re.test(text2)) return pick6(lines3);
-    return pick6(def.lines);
+    const pick7 = (l) => l[Math.floor(rng2() * l.length) % l.length];
+    for (const [re, lines3] of def.rules ?? []) if (re.test(text2)) return pick7(lines3);
+    return pick7(def.lines);
   }
 
   // src/game/action/npc/sheets.json
@@ -27333,11 +32704,11 @@ ${t.secret}` : "",
     콘쥬스: `### Character - Konjyuce
 
 #### Identity
-- Age: 17, a high school student
+- Age: 20, a university student
 - Gender: Female
 - Organization: {{#if {{not_equal::{{getvar::st_faction}}::B00}}}}Management Bureau {{/if}}{{#if {{equal::{{getvar::st_faction}}::B00}}}}Fake Management Bureau{{/if}}
 - Department: Comprehensive Response Team
-- Role: Agent. A minor attached to the team, deployed only when her one talent is genuinely irreplaceable.
+- Role: Agent. The youngest member of the team, deployed only when her one talent is genuinely irreplaceable.
 
 #### Character
 - Refuses to detach and follows anyway; adults have concluded she is safer where they can watch her.
@@ -27346,7 +32717,7 @@ ${t.secret}` : "",
 - Wants to be a full member, not a mascot. Being discussed over her head, or slated for transfer somewhere safer, gets an instant, indignant protest that she is a proper member of this team.
 - Cheer masks fresh grief. Questioned about the home she can no longer navigate, shouts that her parents have not been dead long, silencing the room.
 [Flaws]
-- Adults minimize her field exposure and even cover her eyes for age-inappropriate sights; these protections hold only while circumstances allow.
+- Adults minimize her field exposure and even cover her eyes for gruesome sights; these protections hold only while circumstances allow.
 - Her willfulness does not distinguish between following a trusted adult into a briefing and following one into a hazard zone.
 
 #### Voice
@@ -28694,24 +34065,24 @@ ${t.secret}` : "",
   var FACE_BG = [35, 45, 50];
   function pixelFace(src) {
     return new Promise((resolve) => {
-      const img4 = new Image();
+      const img5 = new Image();
       const plain = () => {
         const i = document.createElement("img");
         i.alt = "";
         i.src = src;
         resolve(i);
       };
-      img4.onerror = plain;
-      img4.onload = () => {
+      img5.onerror = plain;
+      img5.onload = () => {
         try {
           const c = document.createElement("canvas");
           c.width = c.height = FACE_PX;
           const g2 = c.getContext("2d");
-          const side = Math.min(img4.naturalWidth, img4.naturalHeight);
-          const sx = (img4.naturalWidth - side) / 2;
-          const sy = Math.max(0, (img4.naturalHeight - side) * 0.15);
+          const side = Math.min(img5.naturalWidth, img5.naturalHeight);
+          const sx = (img5.naturalWidth - side) / 2;
+          const sy = Math.max(0, (img5.naturalHeight - side) * 0.15);
           g2.imageSmoothingEnabled = true;
-          g2.drawImage(img4, sx, sy, side, side, 0, 0, FACE_PX, FACE_PX);
+          g2.drawImage(img5, sx, sy, side, side, 0, 0, FACE_PX, FACE_PX);
           const d3 = g2.getImageData(0, 0, FACE_PX, FACE_PX);
           const a = d3.data;
           const corner = [0, 1, FACE_PX - 2, FACE_PX - 1, FACE_PX, 2 * FACE_PX - 1];
@@ -28739,7 +34110,7 @@ ${t.secret}` : "",
           plain();
         }
       };
-      img4.src = src;
+      img5.src = src;
     });
   }
   function createNpcTalk(layer, host, store2) {
@@ -28749,10 +34120,10 @@ ${t.secret}` : "",
     const el = document.createElement("div");
     el.className = "gnp gk-panel gk-font";
     el.hidden = true;
-    el.innerHTML = `<div class="gnp-face gk-face"></div><div class="gnp-body"><div class="gnp-head"><b class="gnp-name"></b><span class="gnp-favor"></span><span class="gnp-state"></span><button type="button" class="gnp-x" data-x aria-label="닫기">✕</button></div><div class="gnp-log" aria-live="polite"></div><div class="gnp-row"><div class="gnp-chips"></div></div><div class="gnp-say"><div class="gnp-acts"></div><input class="gnp-in gk-font" maxlength="200" placeholder="직접 말하기 (Enter)" enterkeyhint="send" autocomplete="off"><button type="button" class="gnp-send gk-font" data-send>보내기</button></div><div class="gnp-note"></div></div>`;
+    el.innerHTML = `<div class="gnp-face gk-face"></div><div class="gnp-body"><div class="gnp-head"><b class="gnp-name"></b><span class="gnp-favor"></span><span class="gnp-state"></span><button type="button" class="gnp-x" data-x aria-label="닫기">✕</button></div><div class="gnp-log" aria-live="polite"></div><div class="gnp-row"><div class="gnp-chips"></div></div><div class="gnp-say"><div class="gnp-acts"></div><input class="gnp-in gk-font" maxlength="200" placeholder="직접 말하기 (T)" enterkeyhint="send" autocomplete="off"><button type="button" class="gnp-send gk-font" data-send>보내기</button></div><div class="gnp-note"></div></div>`;
     layer.append(el);
     const $ = (s2) => el.querySelector(s2);
-    const face2 = $(".gnp-face");
+    const face = $(".gnp-face");
     const nameEl = $(".gnp-name");
     const favorEl = $(".gnp-favor");
     const stateEl = $(".gnp-state");
@@ -28875,6 +34246,7 @@ ${t.secret}` : "",
       const my = token;
       line2("me", text2);
       chips.hidden = true;
+      markSel();
       const wait = line2("wait", "…");
       setBusy(true);
       note.textContent = "";
@@ -28948,13 +34320,28 @@ ${t.secret}` : "",
     input.addEventListener("focus", () => el.classList.contains("coarse") && (el.classList.add("typing"), fitLog()));
     input.addEventListener("blur", () => (el.classList.remove("typing"), fitLog()));
     for (const ev of ["keyup", "pointerdown", "touchstart", "wheel"]) el.addEventListener(ev, (e) => e.stopPropagation(), { passive: true });
+    let sel = 0;
+    const pickables = () => [...chips.hidden ? [] : [...chips.querySelectorAll("button")], ...acts.querySelectorAll("button"), input];
+    const markSel = () => {
+      const list = pickables();
+      sel = Math.max(0, Math.min(list.length - 1, sel));
+      list.forEach((b, i) => b.classList.toggle("gnp-sel", i === sel));
+    };
     function keys2(e) {
       if (!target || document.activeElement === input) return;
       const k = e.code;
+      const list = pickables();
       if (k === "Escape") close();
-      else if (k === "KeyE" || k === "Space") runAct(0);
-      else if (/^Digit[1-9]$/.test(k)) runAct(Number(k.slice(5)) - 1);
-      else if (k === "Enter" || k === "KeyT") input.focus({ preventScroll: true });
+      else if (k === "ArrowLeft" || k === "ArrowUp") sel = (sel - 1 + list.length) % list.length, markSel();
+      else if (k === "ArrowRight" || k === "ArrowDown" || k === "Tab") sel = (sel + 1) % list.length, markSel();
+      else if (k === "KeyE") runAct(0);
+      else if (k === "Enter" || k === "Space") {
+        if (e.repeat) return e.preventDefault();
+        const b = list[sel];
+        if (!b || b === input) input.focus({ preventScroll: true });
+        else b.click();
+      } else if (/^Digit[1-9]$/.test(k)) runAct(Number(k.slice(5)) - 1);
+      else if (k === "KeyT" || k === "Slash") input.focus({ preventScroll: true });
       else return;
       e.preventDefault();
       e.stopImmediatePropagation();
@@ -28971,14 +34358,14 @@ ${t.secret}` : "",
       el.style.setProperty("--who", d3.color);
       const coarse = typeof matchMedia !== "undefined" && matchMedia("(pointer: coarse)").matches;
       el.classList.toggle("coarse", coarse);
-      input.placeholder = coarse ? "직접 말하기" : "직접 말하기 (Enter)";
+      input.placeholder = coarse ? "직접 말하기" : "직접 말하기 (T · 방향키로 고르고 Enter)";
       nameEl.textContent = t.name ?? d3.name;
-      face2.innerHTML = "";
-      face2.hidden = true;
+      face.innerHTML = "";
+      face.hidden = true;
       if (d3.photo && host.photo) {
         const my = token;
         void Promise.resolve(host.photo(d3.photo)).then((src) => {
-          if (src && my === token) void pixelFace(src).then((node) => my === token && (face2.replaceChildren(node), face2.hidden = false));
+          if (src && my === token) void pixelFace(src).then((node) => my === token && (face.replaceChildren(node), face.hidden = false));
         });
       }
       log.innerHTML = "";
@@ -28990,6 +34377,8 @@ ${t.secret}` : "",
       drawActs();
       chips.hidden = false;
       chips.innerHTML = CHIPS[d3.group].map((c) => `<button type="button" class="gk-font" data-chip>${esc5(c)}</button>`).join("");
+      sel = 0;
+      markSel();
       el.hidden = false;
       fitLog();
       window.addEventListener("keydown", keys2, true);
@@ -29101,6 +34490,7 @@ ${t.secret}` : "",
       const sc = hub.current();
       const spot = sc?.spots.find((s2) => `spot:${s2.id}` === prop.id);
       if (!sc || !spot || spot.open === false || !spot.who) return false;
+      if (spot.place && spot.place !== "office" && spot.place !== "interview") return false;
       if (o.visit) {
         o.visit(spot.who);
         return true;
@@ -29112,20 +34502,20 @@ ${t.secret}` : "",
       const withPlace = (t, more = []) => ({ place: place3, facts, ...t, actions: [placeAct, ...more] });
       if (spot.place === "office") {
         const others = Object.keys(AGENTS2).filter((a) => a !== me && a !== "jyaldi");
-        const pick6 = (id) => open(withPlace({ npc: id, facts: [...facts, "출동하지 않고 사무실에서 쉬는 중"] }, others.filter((x) => x !== id).slice(0, 6).map((x) => ({ id: `ag:${x}`, label: `${AGENTS2[x].name}에게`, run: () => setTimeout(() => pick6(x), 0) }))));
-        pick6(others[Math.floor(Math.random() * others.length)] ?? "eileen");
+        const pick7 = (id) => open(withPlace({ npc: id, facts: [...facts, "출동하지 않고 사무실에서 쉬는 중"] }, others.filter((x) => x !== id).slice(0, 6).map((x) => ({ id: `ag:${x}`, label: `${AGENTS2[x].name}에게`, run: () => setTimeout(() => pick7(x), 0) }))));
+        pick7(others[Math.floor(Math.random() * others.length)] ?? "eileen");
         return true;
       }
       if (spot.place === "interview") {
         const list = o.rescued().filter((r) => SURVIVORS[r]);
         if (!list.length) return false;
-        const pick6 = (id) => open(
+        const pick7 = (id) => open(
           withPlace(
             { npc: "civilian", key: `sv:${id}`, name: SURVIVORS[id].name, persona: `차원 승강기에서 관리국 요원에게 구조되어 본부 면담실에 있다. 겪은 일: ${SURVIVORS[id].clue}`, facts: [...facts, "구조된 뒤 면담실에서 진술을 기다린다"], allow: ["favor"] },
-            list.filter((x) => x !== id).map((x) => ({ id: `sv:${x}`, label: `${SURVIVORS[x].name}에게`, run: () => setTimeout(() => pick6(x), 0) }))
+            list.filter((x) => x !== id).map((x) => ({ id: `sv:${x}`, label: `${SURVIVORS[x].name}에게`, run: () => setTimeout(() => pick7(x), 0) }))
           )
         );
-        pick6(list[0]);
+        pick7(list[0]);
         return true;
       }
       const npc = SPOT_NPC[spot.who];
@@ -29139,17 +34529,17 @@ ${t.secret}` : "",
       const npc = VENDOR_NPC[vendor];
       if (!npc) return false;
       const trade = { id: "trade", label: "거래", run: () => w.interactWith(prop) };
-      const pick6 = (id) => open({
+      const pick7 = (id) => open({
         npc: id,
         place: `${floorPlace(w)} 정비 구역 휴식방 (출동 중)`,
         facts: [...floorFacts(w), `가진 현금 ${w.notes.cash ?? 0}`],
         hints: floorHints(w),
-        actions: [trade, ...vendor === "backalley" ? [{ id: "swap", label: id === "goyeonji" ? "윤지아에게" : "고연지에게", run: () => setTimeout(() => pick6(id === "goyeonji" ? "yunjia" : "goyeonji"), 0) }] : []],
+        actions: [trade, ...vendor === "backalley" ? [{ id: "swap", label: id === "goyeonji" ? "윤지아에게" : "고연지에게", run: () => setTimeout(() => pick7(id === "goyeonji" ? "yunjia" : "goyeonji"), 0) }] : []],
         onEffect: (e) => {
           if (e.kind === "leave") w.api.setProp(prop.id, null), w.say(`${ROSTER2[id].name}가 짐을 챙겨 떠났다.`, 2);
         }
       });
-      pick6(npc);
+      pick7(npc);
       return true;
     };
     const residentNear = (w, x) => w.bodies.find((bd) => bd instanceof Enemy && bd.alive && bd.kind === "resident" && Math.abs(bd.x - x) < 160) ?? null;
@@ -29424,6 +34814,326 @@ ${t.secret}` : "",
     return link;
   }
 
+  // src/game/combat/brain.ts
+  var GRADE = {
+    F: { react: 20, defend: 0.1, drop: 0.35, routes: 1, tactic: 15, punish: 0.2 },
+    E: { react: 18, defend: 0.2, drop: 0.25, routes: 1, tactic: 12, punish: 0.3 },
+    D: { react: 15, defend: 0.35, drop: 0.15, routes: 2, tactic: 10, punish: 0.45 },
+    C: { react: 12, defend: 0.5, drop: 0.1, routes: 3, tactic: 8, punish: 0.6 },
+    B: { react: 10, defend: 0.65, drop: 0.06, routes: 4, tactic: 7, punish: 0.75 },
+    A: { react: 8, defend: 0.75, drop: 0.03, routes: 5, tactic: 6, punish: 0.85 },
+    S: { react: 6, defend: 0.85, drop: 0.02, routes: 5, tactic: 5, punish: 0.95 }
+  };
+  var DIFF = {
+    easy: { react: 1.5, defend: 0.5, drop: 2, punish: 0.6, melee: 2, super: "low", justDodge: null },
+    normal: { react: 1, defend: 1, drop: 1, punish: 1, melee: 3, super: "ok", justDodge: "B" },
+    hard: { react: 0.8, defend: 1.15, drop: 0.6, punish: 1.1, melee: 4, super: "combo", justDodge: "C" },
+    nightmare: { react: 0.65, defend: 1.3, drop: 0.3, punish: 1.2, melee: 5, super: "always", justDodge: "E" }
+  };
+  var ROUTES = [
+    { id: "jab", seq: ["light"], gap: 0, diff: 1 },
+    { id: "L-H stun", seq: ["light", "heavy"], gap: 7, diff: 1 },
+    { id: "LL-H launch", seq: ["light", "light", "heavy"], gap: 7, diff: 2 },
+    { id: "LLL-H blow", seq: ["light", "light", "light", "heavy"], gap: 7, diff: 3 },
+    { id: "LL-H-jump", seq: ["light", "light", "heavy", "jump", "light"], gap: 8, diff: 4 },
+    { id: "LLL-skill", seq: ["light", "light", "light", "skill"], gap: 7, diff: 5 }
+  ];
+  var WEIGHT = { light: 1, heavy: 2, skill: 2, charge: 3, super: 3 };
+  var Squad = class {
+    constructor(cap = 3) {
+      this.cap = cap;
+    }
+    used = /* @__PURE__ */ new Map();
+    borrow(target, who, w) {
+      const m = this.used.get(target) ?? this.used.set(target, /* @__PURE__ */ new Map()).get(target);
+      const total = [...m.entries()].filter(([k]) => k !== who).reduce((s2, [, v]) => s2 + v, 0);
+      if (total + w > this.cap) return false;
+      m.set(who, w);
+      return true;
+    }
+    give(target, who) {
+      this.used.get(target)?.delete(who);
+    }
+  };
+  var FighterBrain = class {
+    constructor(id, grade, difficulty, persona, rng2, squad, squadKey = {}) {
+      this.id = id;
+      this.grade = grade;
+      this.difficulty = difficulty;
+      this.persona = persona;
+      this.rng = rng2;
+      this.squad = squad;
+      this.squadKey = squadKey;
+      this.g = GRADE[grade];
+      this.d = DIFF[difficulty];
+    }
+    g;
+    d;
+    strategy = "careful";
+    tactic = "대기";
+    hist = [];
+    script = [];
+    stratT = 0;
+    tacT = 0;
+    holding = /* @__PURE__ */ new Set();
+    defendT = 0;
+    /** 플레이어 버릇 (10장): 점프·회피 반격 횟수 → 대공·유인 가중 */
+    habit = { jump: 0, attack: 0 };
+    lastFoe = null;
+    get reactTicks() {
+      return Math.max(2, Math.round(this.g.react * this.d.react));
+    }
+    chance(p) {
+      return this.rng() < p;
+    }
+    /** 한 틱 판단 */
+    tick(me, foeNow) {
+      this.hist.push(foeNow);
+      if (this.hist.length > 40) this.hist.shift();
+      const foe = this.hist[Math.max(0, this.hist.length - 1 - this.reactTicks)];
+      this.learn(foeNow);
+      const out = { hold: /* @__PURE__ */ new Set(), press: [], release: [] };
+      if (me.stunned) {
+        this.script = [];
+        this.squad?.give(this.squadKey, this.id);
+        return this.finish(out);
+      }
+      const dx = foe.x - me.x, dist = Math.abs(dx), dy = foe.y - me.y;
+      const toward = dx > 0 ? "right" : "left";
+      const away = dx > 0 ? "left" : "right";
+      if (--this.stratT <= 0) {
+        this.stratT = 60 + Math.floor(this.rng() * 60);
+        this.strategy = this.pickStrategy(me, foe);
+      }
+      if (this.defendT > 0) {
+        this.defendT--;
+        out.hold.add("block");
+        return this.finish(out);
+      }
+      if (foe.attacking && dist < 190 && Math.abs(dy) < 50 && me.free && !this.script.length) {
+        if (this.chance(this.g.defend * this.d.defend)) {
+          this.tactic = "방어";
+          if (me.guard > 35 && this.chance(0.65)) this.defendT = 8 + Math.floor(this.rng() * 10);
+          else out.press.push("dodge");
+          return this.finish(out);
+        }
+      }
+      if (this.script.length) return this.runScript(out);
+      if (--this.tacT > 0) {
+        this.align(out, dy, dist);
+        return this.finish(out);
+      }
+      this.tacT = this.g.tactic + Math.floor(this.rng() * 4);
+      this.chooseTactic(me, foe, dist, dy, toward, away, out);
+      return this.finish(out);
+    }
+    learn(foe) {
+      const l = this.lastFoe;
+      if (l && !l.air && foe.air) this.habit.jump++;
+      if (l && !l.attacking && foe.attacking) this.habit.attack++;
+      this.lastFoe = foe;
+    }
+    pickStrategy(me, foe) {
+      const gap = me.hp - foe.hp;
+      const p = this.persona;
+      const s2 = {
+        press: 40 + 30 * gap + 30 * p.aggression + (me.sp >= 100 ? 15 : 0),
+        careful: 40 - 30 * gap + 30 * p.patience,
+        zone: 20 + 40 * p.zoning,
+        rest: 0,
+        flee: 100 * (1 - p.courage) * (1 - me.hp) - 30
+      };
+      s2[this.strategy] += 15;
+      return Object.entries(s2).sort((a, b) => b[1] - a[1])[0][0];
+    }
+    /** 깊이(y) 맞추기: 상대와 같은 줄로 */
+    align(out, dy, dist) {
+      if (Math.abs(dy) > 22 && dist < 600) out.hold.add(dy > 0 ? "down" : "up");
+    }
+    plan(steps, name) {
+      this.script = steps;
+      this.tactic = name;
+    }
+    attackOk(b) {
+      const w = WEIGHT[b] ?? 0;
+      if (!w || !this.squad) return true;
+      return this.squad.borrow(this.squadKey, this.id, w);
+    }
+    chooseTactic(me, foe, dist, dy, toward, away, out) {
+      const p = this.persona;
+      this.align(out, dy, dist);
+      const sameLane = Math.abs(dy) < 40;
+      const routes = ROUTES.filter((r) => r.diff <= this.g.routes);
+      const route = () => routes[Math.floor(this.rng() * routes.length)];
+      const combo = (r = route()) => {
+        if (!this.attackOk(r.seq.includes("heavy") ? "heavy" : "light")) return false;
+        const steps = [];
+        for (let i = 0; i < r.seq.length; i++) {
+          if (i > 0 && this.chance(this.g.drop * this.d.drop)) break;
+          steps.push({ press: r.seq[i], ticks: r.gap || 6 });
+        }
+        this.plan(steps, `콤보 ${r.id}`);
+        return true;
+      };
+      if (this.strategy === "flee") {
+        this.plan([{ hold: [away, "run"], ticks: 30 }], "거리 벌림(도망)");
+        return;
+      }
+      if (this.strategy === "rest" || !this.attackOk("light") && dist < 260) {
+        this.squad?.give(this.squadKey, this.id);
+        this.plan([{ hold: [dist < 260 ? away : toward], ticks: 12 }, { ticks: 10 }], "둘러서 기다림");
+        return;
+      }
+      if (me.sp >= 100 && dist < 260 && sameLane) {
+        const ok = this.d.super === "low" ? me.hp < 0.3 : true;
+        if (ok && this.attackOk("super")) return this.plan([{ press: "super", ticks: 30 }], "필살");
+      }
+      if (foe.recovering && dist < 240 && sameLane && this.chance(this.g.punish * this.d.punish)) {
+        if (dist > 130) return this.plan([{ hold: [toward, "run"], ticks: Math.ceil((dist - 110) / 14) }, { press: "light", ticks: 6 }, { press: "light", ticks: 6 }, { press: "heavy", ticks: 10 }], "빈틈 벌주기");
+        if (combo(routes[routes.length - 1])) {
+          this.tactic = "빈틈 벌주기 콤보";
+          return;
+        }
+      }
+      if (foe.air && dist < 230 && this.chance(0.35 + Math.min(0.4, this.habit.jump * 0.04))) {
+        if (this.attackOk("heavy")) return this.plan([{ press: "heavy", ticks: 12 }], "대공");
+      }
+      if (foe.down) {
+        if (this.strategy === "careful") return this.plan([{ hold: [away], ticks: 10 }, { ticks: 12 }], "기상 기다림");
+        return this.plan([{ hold: [toward], ticks: Math.max(4, Math.ceil((dist - 120) / 8)) }, { ticks: 6 }], "기상 압박");
+      }
+      if (dist < 135 && sameLane) {
+        if (this.strategy !== "zone" || this.chance(0.4)) {
+          if (combo()) return;
+        }
+      }
+      if (dist < 400 && sameLane) {
+        const r = this.rng();
+        if (this.strategy === "press" && r < 0.25 + p.aggression * 0.2 && this.attackOk("light")) {
+          return this.plan([{ press: "jump", hold: [toward], ticks: 8 }, { press: "light", hold: [toward], ticks: 16 }], "점프 공격");
+        }
+        if (this.strategy === "press" && dist > 180 && r < 0.6 && this.attackOk("light")) {
+          return this.plan([{ hold: [toward, "run"], ticks: Math.ceil((dist - 140) / 14) }, { press: "light", hold: [toward, "run"], ticks: 14 }], "돌진 공격");
+        }
+        if (dist > 160 && r < 0.75 && this.attackOk("skill")) return this.plan([{ press: "skill", ticks: 24 }], "기술");
+      }
+      if (this.strategy === "zone" && dist > 300) {
+        if (this.chance(0.4) && this.attackOk("charge")) return this.plan([{ press: "charge", hold: ["charge"], ticks: 16 + Math.floor(this.rng() * 22) }, { release: "charge", ticks: 14 }], "충전기");
+        if (sameLane) return this.plan([{ press: "shoot", ticks: 14 }], "사격 견제");
+      }
+      if (this.strategy === "careful" && dist < 230) return this.plan([{ hold: [away], ticks: 8 }, { ticks: 8 }], "거리 재기");
+      this.plan([{ hold: dist > 500 ? [toward, "run"] : [toward], ticks: 10 }], "접근");
+    }
+    runScript(out) {
+      const s2 = this.script[0];
+      if (s2.press && !s2.done) {
+        out.press.push(s2.press);
+        s2.done = true;
+      }
+      if (s2.release && !s2.rel) {
+        out.release.push(s2.release);
+        s2.rel = true;
+      }
+      for (const h of s2.hold ?? []) out.hold.add(h);
+      if (--s2.ticks <= 0) this.script.shift();
+      if (!this.script.length) this.squad?.give(this.squadKey, this.id);
+      return this.finish(out);
+    }
+    /** 눌러 둔 버튼 중 이번에 뗀 것 */
+    finish(out) {
+      for (const h of this.holding) if (!out.hold.has(h) && !out.release.includes(h)) out.release.push(h);
+      this.holding = new Set(out.hold);
+      return out;
+    }
+  };
+
+  // src/game/action/eileen/aiFighter.ts
+  var BTN = { left: "left", right: "right", up: "up", down: "down", light: "light", heavy: "heavy", block: "block", dodge: "dodge", jump: "jump", shoot: "shoot", charge: "charge", skill: "skill", super: "super", run: null };
+  function foeSense(b) {
+    const P = b.core?.P;
+    const mode = P?.mode ?? b.phase ?? "ground";
+    return {
+      x: b.x,
+      y: b.y,
+      z: b.z,
+      attacking: mode === "act",
+      recovering: mode === "chain",
+      air: (P?.z ?? b.z) > 6 || mode === "air",
+      down: mode === "down" || mode === "belly" || mode === "dead",
+      hp: b.hpMax ? b.hp / b.hpMax : 1
+    };
+  }
+  var AiEileen = class extends EileenPlayer {
+    brain;
+    pad = { held: /* @__PURE__ */ new Set(), pressed: /* @__PURE__ */ new Set(), released: /* @__PURE__ */ new Set(), mx: 0, my: 0, evade: false, run: false, downDouble: false };
+    constructor(clips, o) {
+      super(clips);
+      Object.defineProperty(this, "team", { value: "enemy", configurable: true });
+      Object.defineProperty(this, "kind", { value: "ai-eileen", configurable: true });
+      this.label = o.label ?? "AI 에일린";
+      this.brain = new FighterBrain(o.id, o.grade, o.difficulty, o.persona, mulberry322(o.seed), o.squad);
+    }
+    /** 때릴 상대 = 주인공 (주인공 편 동행자가 생기면 여기에) */
+    foes() {
+      const w = this.worldNow;
+      return w && w.player.alive ? [w.player] : [];
+    }
+    extraFoes() {
+      return [];
+    }
+    step(world) {
+      const me = this.core.P;
+      const self = {
+        x: this.x,
+        y: this.y,
+        z: this.z,
+        face: this.dir,
+        free: ["ground", "chain", "block"].includes(me.mode),
+        air: me.mode === "air",
+        stunned: ["down", "belly", "stun"].includes(me.mode) || this.phase === "down",
+        hp: this.hp / this.hpMax,
+        sp: me.sp ?? 0,
+        guard: this.guard
+      };
+      const d3 = this.brain.tick(self, foeSense(world.player));
+      const p = this.pad;
+      p.pressed.clear();
+      p.released.clear();
+      const was = new Set(p.held);
+      p.held.clear();
+      for (const b of d3.hold) {
+        const k = BTN[b];
+        if (k) p.held.add(k);
+      }
+      for (const b of d3.press) {
+        const k = BTN[b];
+        if (k) {
+          p.pressed.add(k);
+          if (b === "charge" || b === "block") p.held.add(k);
+        }
+      }
+      for (const b of d3.release) {
+        const k = BTN[b];
+        if (k && was.has(k)) p.released.add(k);
+      }
+      p.run = d3.hold.has("run");
+      p.mx = p.held.has("right") ? 1 : p.held.has("left") ? -1 : 0;
+      p.my = p.held.has("down") ? 1 : p.held.has("up") ? -1 : 0;
+      p.evade = false;
+      this.tick(world, p);
+    }
+    /** 렌더러가 몸 자리로 옮겨 놓고 부른다: 월드 좌표로 되돌려 코어가 그린다 */
+    draw(ctx) {
+      this.frameStep();
+      ctx.save();
+      ctx.translate(-this.x, -(this.y - this.z));
+      ctx.imageSmoothingEnabled = false;
+      this.core.drawBody(ctx);
+      this.core.drawFxLayer(ctx);
+      ctx.restore();
+    }
+  };
+
   // src/game/action/fx/fieldFx.ts
   var HITSTOP = { light: 3, mid: 5, heavy: 8, super: 12 };
   var SHAKE = { light: 2, mid: 5, heavy: 9, super: 14 };
@@ -29527,8 +35237,8 @@ ${t.secret}` : "",
       this.marks.push({ x, y, w, t: 0, life });
     }
     /** 도트 시트 등록 (fx_목록.txt 한 줄 + 그림) */
-    register(def, img4) {
-      this.sheets.set(def.name, { def, img: img4 });
+    register(def, img5) {
+      this.sheets.set(def.name, { def, img: img5 });
     }
     hasSheet(name) {
       return this.sheets.has(name);
@@ -29611,7 +35321,7 @@ ${t.secret}` : "",
       }
       for (const h of this.ghosts) {
         c.globalAlpha = 0.5 * (1 - h.t / h.life);
-        tinted(c, h.draw, h.color);
+        tinted2(c, h.draw, h.color);
       }
       c.globalAlpha = 1;
       for (const r of this.rings) {
@@ -29629,7 +35339,7 @@ ${t.secret}` : "",
         c.save();
         c.translate(Math.round(p.x), Math.round(p.y));
         if (p.flip) c.scale(-1, 1);
-        if (p.tint) tinted(c, (o) => o.drawImage(p.img, f * p.def.w, 0, p.def.w, p.def.h, -w / 2, -h, w, h), p.tint, 0.5);
+        if (p.tint) tinted2(c, (o) => o.drawImage(p.img, f * p.def.w, 0, p.def.w, p.def.h, -w / 2, -h, w, h), p.tint, 0.5);
         else c.drawImage(p.img, f * p.def.w, 0, p.def.w, p.def.h, -w / 2, -h, w, h);
         c.restore();
       }
@@ -29693,8 +35403,8 @@ ${t.secret}` : "",
           const lx = -850 + (i * 211 + t * 2600) % 1900 - 100;
           c.fillRect(Math.round(lx / 3) * 3, Math.round(ly / 3) * 3, len, 3);
         }
-        const art6 = k.art ?? k.fallback;
-        if (art6) {
+        const art4 = k.art ?? k.fallback;
+        if (art4) {
           const fromFallback = !k.art;
           const aw = fromFallback ? 400 : 800, ah = fromFallback ? 400 : 400;
           const stopX = 1700 * 0.6 - 850 - aw;
@@ -29707,7 +35417,7 @@ ${t.secret}` : "",
           else if (t < CUT.out[0]) x = stopX;
           else x = stopX + (t - CUT.out[0]) / (CUT.out[1] - CUT.out[0]) * 1800;
           const blink = k.art2 && t > CUT.slam && t < CUT.out[0] && Math.floor((t - CUT.slam) / 0.1) % 2 === 1;
-          const im = blink ? k.art2 : art6;
+          const im = blink ? k.art2 : art4;
           c.drawImage(im, Math.round(x), Math.round(-ah / 2 - (fromFallback ? 40 : 0)), aw, ah);
           if (!k.art2 && k.eye && t > CUT.slam && t < CUT.out[0]) {
             const ex = Math.round(x + k.eye.x * aw), ey = Math.round(-ah / 2 - (fromFallback ? 40 : 0) + k.eye.y * ah);
@@ -29740,11 +35450,11 @@ ${t.secret}` : "",
       c.restore();
     }
   };
-  var textCache2 = /* @__PURE__ */ new Map();
+  var textCache3 = /* @__PURE__ */ new Map();
   function crisp(text2, size2, fill, edge2, edgeW, shadow3) {
     const ready = typeof document !== "undefined" && document.fonts?.check?.(`11px "${PIXEL_FONT}"`);
     const key2 = `${text2}|${size2}|${fill}|${edge2}|${edgeW}|${shadow3}|${ready}`;
-    const hit2 = textCache2.get(key2);
+    const hit2 = textCache3.get(key2);
     if (hit2) return hit2;
     const pad = edgeW + shadow3 + 2;
     const m = document.createElement("canvas").getContext("2d");
@@ -29785,7 +35495,7 @@ ${t.secret}` : "",
       for (let dx = -edgeW; dx <= edgeW; dx++) for (let dy = -edgeW; dy <= edgeW; dy++) if (dx || dy) o.drawImage(e, dx, dy);
     }
     o.drawImage(solid(fill), 0, 0);
-    textCache2.set(key2, out);
+    textCache3.set(key2, out);
     return out;
   }
   function dotText(c, text2, x, y, size2, fill, edge2 = "#000", align = "left") {
@@ -29798,14 +35508,14 @@ ${t.secret}` : "",
     c.drawImage(im, Math.round(x - im.width / 2), Math.round(y - im.height / 2));
   }
   var tintCv = null;
-  function tinted(c, draw, color, a = 1) {
-    const W5 = c.canvas.width, H7 = c.canvas.height;
+  function tinted2(c, draw, color, a = 1) {
+    const W5 = c.canvas.width, H6 = c.canvas.height;
     if (!tintCv) tintCv = document.createElement("canvas");
-    if (tintCv.width !== W5 || tintCv.height !== H7) tintCv.width = W5, tintCv.height = H7;
+    if (tintCv.width !== W5 || tintCv.height !== H6) tintCv.width = W5, tintCv.height = H6;
     const o = tintCv.getContext("2d");
     o.setTransform(1, 0, 0, 1, 0, 0);
     o.globalCompositeOperation = "source-over";
-    o.clearRect(0, 0, W5, H7);
+    o.clearRect(0, 0, W5, H6);
     o.setTransform(c.getTransform());
     o.imageSmoothingEnabled = false;
     draw(o);
@@ -29819,7 +35529,7 @@ ${t.secret}` : "",
     o.globalCompositeOperation = "source-in";
     o.globalAlpha = a;
     o.fillStyle = color;
-    o.fillRect(0, 0, W5, H7);
+    o.fillRect(0, 0, W5, H6);
     o.globalAlpha = 1;
     c.save();
     c.setTransform(1, 0, 0, 1, 0, 0);
@@ -30089,39 +35799,221 @@ ${t.secret}` : "",
   var hasSaved = () => local(SAVED_KEY).load() === "1";
   var VISIT_TITLE = { title: "괴이 ː ANOMALY", sub: "필드 · 요원들을 만나고 본편 대화를 이어갑니다" };
   var fieldClock = { sec: null, place: "" };
+  var fieldWallet = { won: null };
+  var observing = false;
+  var observerOn = () => observing;
+  var wonText = (n) => `${n < 0 ? "−" : ""}₩ ${Math.abs(Math.trunc(n)).toLocaleString("en-US")}`;
   function hqAdapter(saves, bridge, ui) {
     const hq2 = createHq();
     const b = bridge;
     const slot = b?.slot ?? 0;
     let root = null;
     let present = [];
+    const rules = () => ui.rules?.() ?? DEFAULT_CLOCK;
     let visitor = { agentId: "", name: "" };
-    const visitReady = b?.visit ? b.visit.state().then((v) => {
+    let ready = false;
+    const visitReady = (b?.visit ? b.visit.state().then((v) => {
       visitor = v.visitor;
       present = v.agents.filter((a) => a.room).map((a) => ({ name: a.name, room: a.room }));
     }).catch(() => {
-    }) : Promise.resolve();
+    }) : Promise.resolve().then(() => {
+      present = [{ name: "잼트리", room: "office" }, { name: "쟈알디", room: "office" }, { name: "큐라스", room: "lounge" }, { name: "고르고디오", room: "lounge" }, { name: "데쥬레", room: "infirmary" }];
+    })).then(() => {
+      ready = true;
+    });
+    let me = { faction: "A00", level: 1 };
+    if (!b?.card && fieldClock.sec === null) {
+      const h = Number(typeof location !== "undefined" ? new URLSearchParams(location.search).get("hour") ?? 10 : 10);
+      fieldClock.sec = (Number.isFinite(h) ? (h % 24 + 24) % 24 : 10) * 3600;
+    }
+    void b?.card?.().then((snap2) => {
+      if (fieldClock.sec === null && snap2?.minute != null) fieldClock.sec = snap2.minute * 60;
+      if (snap2) me = { faction: snap2.identity?.faction || snap2.faction || "A00", level: snap2.identity?.level ?? null };
+    }).catch(() => {
+    });
+    const peopleBy = /* @__PURE__ */ new Map();
+    const factionBy = /* @__PURE__ */ new Map();
+    const readPeople = () => {
+      void b?.people?.people().then((l) => {
+        peopleBy.clear();
+        for (const p of l) peopleBy.set(p.name, p);
+      }).catch(() => {
+      });
+      void b?.people?.factions().then((l) => {
+        factionBy.clear();
+        for (const f of l) factionBy.set(f.code, f);
+      }).catch(() => {
+      });
+    };
+    const readWallet = () => void b?.wallet?.balance().then((n) => {
+      fieldWallet.won = n;
+    }).catch(() => {
+    });
+    readPeople();
+    readWallet();
+    b?.people?.onChange(() => {
+      readPeople();
+      readWallet();
+    });
+    const pay = async (amount, memo) => {
+      const after = await b?.wallet?.add(amount, memo, { place: fieldClock.place || void 0, time: fieldClock.sec === null ? void 0 : clockText(fieldClock.sec) }).catch(() => null) ?? null;
+      if (after !== null) {
+        fieldWallet.won = after;
+        void b?.field?.record({ kind: "trade", text: `${memo} ${amount < 0 ? "−" : "+"}${Math.abs(amount).toLocaleString("en-US")}원`, scene: fieldClock.place || void 0, weight: 1, visit: visitId }).catch(() => {
+        });
+      }
+      return after;
+    };
+    globalThis.__goeiWallet = { pay, balance: () => fieldWallet.won };
+    const visitId = `v${Date.now().toString(36)}`;
     const ROOM_SCENE = { office: "office", lounge: "lounge", infirmary: "clinic" };
+    const seedParam = typeof location !== "undefined" ? new URLSearchParams(location.search).get("seed") : null;
+    const seed = seedParam ? Number(seedParam) >>> 0 || hashSeed(seedParam) : Date.now() >>> 0;
+    let sim = null;
+    if (typeof window !== "undefined") window.addEventListener("goei:talk-closed", () => {
+      if (fieldClock.sec !== null) fieldClock.sec += rules().talk * 60;
+    });
+    if (typeof window !== "undefined") window.addEventListener("keydown", (e) => {
+      if (e.key === "F9" || e.key === "`") {
+        observing = !observing;
+        e.preventDefault();
+      }
+    });
+    const world = () => {
+      if (!sim && ready) {
+        sim = createHqWorld(hq2.map(), seed, present.filter((p) => ROOM_SCENE[p.room]).map((p) => ({ name: p.name, scene: ROOM_SCENE[p.room] })), hasVisitClip, { stance: (f) => factionBy.get(f)?.stage ?? null });
+        chatter = new Chatter(sim, new Lines(dialogue_default, sim.rng), lineCtx);
+      }
+      if (sim) globalThis.__goeiWorld = sim;
+      return sim;
+    };
+    let chatter = null;
+    const lineCtx = (a) => {
+      const hour = fieldClock.sec === null ? null : fieldClock.sec / 3600 % 24;
+      const named = a.def.kind === "named" ? peopleBy.get(a.def.name) : void 0;
+      const fac = a.def.kind === "mob" ? sim?.mobFaction(a) ?? dialogue_default.npc[NPC_TYPE[a.def.archetype ?? a.def.name] ?? ""]?.faction ?? null : named?.faction ?? null;
+      const enemy = a.act === "argue" || a.plan === "chase" || named?.affinity.cell === "hostile" || !!fac && factionBy.get(fac)?.stage === "hostile";
+      return { hour, faction: me.faction, level: me.level, enemy };
+    };
+    const mobHits = /* @__PURE__ */ new Map();
+    const flushMobs = (sceneId) => {
+      const m = mobHits.get(sceneId);
+      if (!m || !m.n) return;
+      mobHits.delete(sceneId);
+      const name = hq2.map().scenes.find((s2) => s2.id === sceneId)?.name ?? sceneId;
+      void b?.field?.record({ kind: "provoke", text: `${name}에서 사람 ${m.n}명을 때렸다`, scene: name, weight: m.n >= 3 ? 2 : 1, visit: visitId, ...m.witness ? { witness: m.witness } : {} }).catch(() => {
+      });
+    };
+    let lastDistrict = null;
+    let foughtHere = false;
+    const record = (evs) => {
+      for (const e of evs) {
+        if (e.kind !== "hurt") continue;
+        if (!foughtHere) {
+          foughtHere = true;
+          if (fieldClock.sec !== null) fieldClock.sec += rules().fight * 60;
+        }
+        const w = sim;
+        if (!w) return;
+        const here = w.inScene(e.scene);
+        const namedWit = here.find((q) => q.def.kind === "named" && q.def.name !== e.who && peopleBy.get(q.def.name)?.faction);
+        const mobWit = here.find((q) => w.mobFaction(q));
+        const witness = namedWit ? { faction: peopleBy.get(namedWit.def.name).faction, named: true } : mobWit ? { faction: w.mobFaction(mobWit), named: false } : void 0;
+        const sceneName = hq2.map().scenes.find((s2) => s2.id === e.scene)?.name ?? e.scene;
+        if (e.named) {
+          void b?.field?.record({ kind: "hurt", text: `${sceneName}에서 ${e.who}을(를) 때렸다`, scene: sceneName, who: [e.who], weight: 2, visit: visitId, ...witness ? { witness } : {} }).catch(() => {
+          });
+        } else {
+          const m = mobHits.get(e.scene) ?? { n: 0 };
+          m.n++;
+          m.witness ??= witness;
+          mobHits.set(e.scene, m);
+        }
+      }
+    };
+    let flushT = 0;
+    const clockView = () => {
+      const c = new FieldClock(fieldClock.sec === null ? null : fieldClock.sec / 60);
+      return c;
+    };
+    let lifeScene = "";
+    eileenHooks.extraTargets = () => {
+      const w = sim;
+      if (!w || !lifeScene) return [];
+      return w.inScene(lifeScene).filter((a) => a.act !== "down").map((a) => ({
+        x: a.x,
+        y: a.y,
+        z: 0,
+        body: {
+          id: -1,
+          team: "enemy",
+          kind: "npc",
+          x: a.x,
+          y: a.y,
+          z: 0,
+          dir: a.face,
+          hp: 1,
+          hpMax: 1,
+          alive: true,
+          stop: 0,
+          frame: () => ({ hit: [], hurt: [] }),
+          step: () => {
+          },
+          applyHit: (h) => w.hitActor(a.def.id, h.dir, h.attackId) ? { kind: "hit" } : { kind: "immune" }
+        }
+      }));
+    };
+    const life = {
+      tick: (dt, at2) => {
+        if (lifeScene && lifeScene !== at2.scene) {
+          flushMobs(lifeScene);
+          foughtHere = false;
+        }
+        lifeScene = at2.scene;
+        const w = world();
+        if (!w) return;
+        w.step(dt, { ...at2, hour: fieldClock.sec === null ? null : fieldClock.sec / 3600 % 24 });
+        const evs = w.events.splice(0);
+        record(evs);
+        chatter?.step(dt, at2.scene, at2.x, evs);
+        if ((flushT += dt) > 20) {
+          flushT = 0;
+          flushMobs(at2.scene);
+        }
+      },
+      lifeTime: () => sim?.time ?? 0,
+      hit: (sceneId, boxes, dir) => world()?.hitBoxes(sceneId, boxes, dir).length ?? 0,
+      actors: (sceneId) => (world()?.inScene(sceneId) ?? []).map((a) => ({ id: a.def.id, name: a.def.name, kind: a.def.kind, x: a.x, y: a.y, face: a.face, look: a.def.look, moving: a.act === "walk", clip: a.clip, since: a.clipAt, icon: a.icon, say: a.say })),
+      observer: (sceneId) => observing && sim ? observerLines(sim, clockView(), sceneId, seed) : null,
+      drawMob: (c, a) => {
+        if (!drawTestMan(c, a.x, a.y, a.face)) silhouette(c, a);
+      }
+    };
     const visitors = (sceneId) => {
       const here = present.filter((p) => ROOM_SCENE[p.room] === sceneId && hasVisitAgent(p.name));
       const sc = hq2.map().scenes.find((s2) => s2.id === sceneId);
       if (!sc || !here.length) return [];
       const [top, bot] = sc.lane ?? [LANE_TOP, LANE_BOT];
-      const slots = sceneId === "office" ? [[630, 0.4], [1e3, 0.5], [1130, 0.85], [620, 0.9], [900, 0.15], [1180, 0.3]] : [[0.36, 0.55], [0.5, 0.35], [0.62, 0.75], [0.44, 0.9], [0.72, 0.45], [0.28, 0.8]].map(([fx2, fy]) => [sc.length * fx2, fy]);
-      return here.slice(0, slots.length).map((p, i) => ({ name: p.name, x: slots[i][0], y: top + (bot - top) * slots[i][1], face: slots[i][0] > (sceneId === "office" ? 820 : sc.length / 2) ? -1 : 1 }));
+      const slots = [[0.36, 0.55], [0.5, 0.35], [0.62, 0.75], [0.44, 0.9], [0.72, 0.45], [0.28, 0.8]].map(([fx, fy]) => [sc.length * fx, fy]);
+      return here.slice(0, slots.length).map((p, i) => ({ name: p.name, x: slots[i][0], y: top + (bot - top) * slots[i][1], face: slots[i][0] > sc.length / 2 ? -1 : 1 }));
     };
     const hub = makeHub(
       {
         map: () => hq2.map(),
         openPlace: (id) => hq2.openPlace(id),
         bark: (place3) => hq2.bark(place3),
-        chooseFloor: (o, pick6) => ui.chooseFloor(o, pick6),
+        chooseFloor: (o, pick7) => ui.chooseFloor(o, pick7),
         sfx: (n) => ui.sfx(n),
         visitors,
+        life,
         // 장면을 옮기면 장부에 이동 사건과 지금 위치(확정 사실)를 남긴다
         entered: (to, from, walkedPx) => {
           fieldClock.place = to.name;
-          const sec = walkSeconds(walkedPx) + (to.floor !== from.floor ? STAIR_S : DOOR_S);
+          void walkedPx;
+          const d3 = hqDistrict(to.id);
+          const region = isRegionMove(lastDistrict ?? hqDistrict(from.id), d3);
+          if (d3) lastDistrict = d3;
+          const sec = (region ? rules().region : rules().scene) * 60;
           if (fieldClock.sec !== null) fieldClock.sec += sec;
           const at2 = fieldClock.sec === null ? "" : ` (${clockText(fieldClock.sec)})`;
           void b?.field?.record({ kind: "move", text: `${from.name} → ${to.name}${at2}`, scene: to.name, weight: 1, fact: { key: "주인공 위치", value: to.name } }).catch(() => {
@@ -30130,6 +36022,24 @@ ${t.secret}` : "",
           });
         },
         overlay: ui.overlay,
+        hour: () => fieldClock.sec === null ? null : fieldClock.sec / 3600 % 24,
+        depart: () => hq2.depart(),
+        // 앉기·눕기 자리: 시간 보내기 (16-2장). 고른 만큼 시계가 간다
+        sat: () => {
+          const opts = waitOptions(rules(), fieldClock.sec === null ? null : fieldClock.sec / 60);
+          if (!opts.length || !ui.choose) return;
+          const now = fieldClock.sec === null ? null : clockText(fieldClock.sec);
+          void ui.choose({ title: "시간 보내기", lines: now ? [`지금 ${now}`] : [], options: [...opts.map((o) => o.label), "그냥 있기"], cancel: true }).then((i) => {
+            const o = i >= 0 ? opts[i] : void 0;
+            if (!o) return;
+            if (fieldClock.sec !== null) fieldClock.sec += o.minutes * 60;
+            const at2 = fieldClock.sec === null ? "" : clockText(fieldClock.sec);
+            if (at2) void b?.field?.record({ kind: "wait", text: `${fieldClock.place || "필드"}에서 시간을 보냈다 (${at2})`, scene: fieldClock.place || void 0, weight: 1, fact: { key: "필드 시각", value: at2 } }).catch(() => {
+            });
+          }).catch(() => {
+          });
+        },
+        armed: () => hq2.armed(),
         // 본부 대화창이 떠 있으면 머리 위 표시를 숨긴다 (독립 검수: 브리핑 뒤 ↓ 표시)
         busy: () => typeof document !== "undefined" && !!document.querySelector(".hq-talk, .hq-over:not(:empty)")
       },
@@ -30203,16 +36113,17 @@ ${t.secret}` : "",
     const f = w.floor;
     const d3 = f.depth ?? 0;
     return {
-      agent: { name: p.label ?? "쟈알디", color: "#c0453a" },
+      agent: { name: p.label ?? "쟈알디", color: "#c0453a", portrait: p.core ? testPlayerFace(64, p.dir < 0) : null },
       hp: p.hp,
       maxHp: p.hpMax,
       energy: p.skillCd > 0 ? 75 - p.skillCd : 75,
       maxEnergy: 75,
       gauge: p.gauge,
       armor: p.armor,
-      weapon: heldWeapon(w) ?? { name: "권총", mag: p.ammo, magMax: p.mag, reserve: p.reserve, reload: p.moveKey === "reload" ? p.mf / 4 : null },
+      // 에일린은 탄창 대신 우하단 기술 상자에 총열 열을 보인다
+      weapon: heldWeapon(w) ?? (p.core ? null : { name: "권총", mag: p.ammo, magMax: p.mag, reserve: p.reserve, reload: p.moveKey === "reload" ? p.mf / 4 : null }),
       items: w.items.map((it) => ({ id: it?.id, label: it?.label ?? "", count: it?.n ?? 0 })),
-      field: fieldClock.sec !== null || fieldClock.place ? { clock: fieldClock.sec === null ? void 0 : clockText(fieldClock.sec), place: fieldClock.place || void 0 } : void 0,
+      field: fieldClock.sec !== null || fieldClock.place || w.stage?.id === "hq" && fieldWallet.won !== null ? { clock: fieldClock.sec === null ? void 0 : clockText(fieldClock.sec), place: fieldClock.place || void 0, wallet: fieldWallet.won === null ? void 0 : wonText(fieldWallet.won) } : void 0,
       floor: { depth: d3 ? d3 <= 3 ? `L${d3}` : `B-${d3 - 3}` : "", name: f.title },
       favor: 0,
       money: { cash: w.notes.cash ?? 0, budget: 0, research: 0, teeth: 0 },
@@ -30238,7 +36149,7 @@ ${t.secret}` : "",
     setItemIconDrawer(drawItemIcon);
     const audio = createGameAudio(local("goei-game-audio"));
     let game = null;
-    async function gate2() {
+    async function gate() {
       const f = bridge?.field;
       if (!f?.entry) return true;
       let info = await f.entry().catch(() => null);
@@ -30251,14 +36162,23 @@ ${t.secret}` : "",
       if (info?.notice) await shell.choose({ title: "알림", lines: [info.notice], options: ["확인"] });
       return true;
     }
+    const uiPrefs = bridge?.uiPrefs;
+    const store2 = uiPrefs ? {
+      load: async () => await uiPrefs.load().catch(() => null) ?? localStore.load(),
+      save: (t) => {
+        uiPrefs.save(t);
+        localStore.save(t);
+      }
+    } : void 0;
     const shell = mountGameShell(box2, {
       synth: true,
+      store: store2,
       title: bridge?.visit ? VISIT_TITLE.title : "차원 승강기",
       sub: bridge?.visit ? VISIT_TITLE.sub : "ANOMALY SIMULATION · 관리국 액션",
       pauseInfo: () => session.error ?? (game?.inHub ? "본부 자동 저장" : "안전 지점 자동 저장 · 전투 중 중단하면 직전 안전 지점부터"),
       onNew: async () => {
         if (bridge?.visit) {
-          if (await gate2()) game?.start_new();
+          if (await gate()) game?.start_new();
           return;
         }
         await session.ready;
@@ -30273,7 +36193,7 @@ ${t.secret}` : "",
       },
       onContinue: async () => {
         if (bridge?.visit) {
-          if (await gate2()) game?.start_new();
+          if (await gate()) game?.start_new();
           return;
         }
         await session.ready;
@@ -30288,7 +36208,11 @@ ${t.secret}` : "",
       onRetreat: () => bridge?.visit ? bridge.close?.() : game?.endRun("withdraw"),
       onTitle: () => game?.toTitle(),
       toLocal: bridge?.viewport ? (x, y, el) => bridge.viewport.toLocal(x, y, el) : void 0,
-      field: bridge?.visit ? { onExit: () => bridge.close?.() } : void 0
+      field: bridge?.visit ? {
+        onExit: () => bridge.close?.(),
+        // 옛 플러그인(mode 없음)은 전체 화면 칸을 숨긴다
+        fullscreen: bridge.viewport && "mode" in bridge.viewport ? { enter: (k) => bridge.viewport.enter(k), exit: () => bridge.viewport.exit(), mode: () => bridge.viewport.mode ?? null } : void 0
+      } : void 0
     });
     const ffx = new FieldFx();
     globalThis.__goeiFieldFx = ffx;
@@ -30296,31 +36220,6 @@ ${t.secret}` : "",
     const cutins = /* @__PURE__ */ new Map();
     if (bridge?.visit && bridge.assets) void loadFieldFx(bridge.assets, ffx, cutins);
     const inField = () => !!game?.inHub && !!bridge?.visit && !mods.blocking?.() && !shell.paused;
-    const previewSuper = () => {
-      const w = game?.world;
-      if (!w || ffx.inSuper()) return;
-      const me = hq2.visitor();
-      const name = me.name || "방문자";
-      const t = SUPER_TEXT[name] ?? { color: "#C8283C", name: "필살기", sub: "" };
-      const fallback = me.agentId && visitAgentFaceCanvas(name, 60) || testPlayerFace(60);
-      void ffx.super_({ ...t, art: cutins.get(name), art2: cutins.get(`${name}_2`), fallback, eye: { x: 0.62, y: 0.42 } }).then(() => {
-        ffx.flash("#fff", 0.1, 0.7);
-        ffx.shake(14, 0.6);
-        const p = w.player;
-        ffx.sparks_(p.x, p.y - 120, 30, t.color, 6);
-        ffx.ring(p.x, p.y, 20, 260, t.color, 0.45);
-        ffx.scorch(p.x, p.y, 160, 3);
-      });
-    };
-    const fieldFxKeys = (e) => {
-      if (e.code !== "KeyS" && e.code !== "KeyW" || e.repeat || !inField()) return;
-      const el = document.activeElement;
-      if (el && (el.tagName === "INPUT" || el.tagName === "TEXTAREA" || el.isContentEditable)) return;
-      previewSuper();
-      e.preventDefault();
-      e.stopImmediatePropagation();
-    };
-    window.addEventListener("keydown", fieldFxKeys, true);
     const stageStore = {
       load: () => {
         if (session.meta) return session.meta;
@@ -30366,6 +36265,7 @@ ${t.secret}` : "",
       }
     });
     let mapOpen = false;
+    let guardA = 0;
     const offMapKey = shell.input.on((code, down2) => {
       if (!down2) return;
       if ((code === "KeyZ" || code === "KeyM") && world && world.stage === elevator && !game?.inHub && !shell.paused && !story.isBlocking()) mapOpen = !mapOpen;
@@ -30377,8 +36277,42 @@ ${t.secret}` : "",
       firstFloor: () => ({ id: "itemroom", title: "아이템 진열실", length: 3200, startX: 300, exitX: Infinity, banner: "아이템 진열실 · E 줍기·들기 · A 던지기·휘두르기", encounters: [{ triggerX: 0, lockFrom: 0, lockTo: 3200, waves: [[{ kind: "dummy", x: 1600, y: 560 }, { kind: "dummy", x: 2400, y: 620 }]] }] }),
       nextFloor: () => null
     };
+    const aiDiff = (() => {
+      try {
+        const v = new URLSearchParams(location.search).get("ai");
+        return v && v in DIFF ? v : "normal";
+      } catch {
+        return "normal";
+      }
+    })();
+    const sparStage = {
+      id: "spar",
+      label: "대련",
+      firstFloor: () => ({
+        id: "spar-room",
+        title: "대련",
+        length: 2400,
+        startX: 500,
+        exitX: Infinity,
+        banner: `대련 · 전투 AI (${aiDiff}) · 1:1 뒤 1:2`,
+        encounters: [{ triggerX: 0, lockFrom: 0, lockTo: 2400, waves: [[{ kind: "ai-eileen", x: 1100, y: 580 }], [{ kind: "ai-eileen", x: 1300, y: 540 }, { kind: "ai-eileen", x: 200, y: 640 }]] }]
+      }),
+      nextFloor: () => null
+    };
+    let squad = new Squad(DIFF[aiDiff].melee);
+    let aiN = 0;
     const unknownKinds = /* @__PURE__ */ new Set();
     const enemyFactory = (spec, w) => {
+      if (spec.kind === "ai-eileen" && w.player instanceof EileenPlayer) {
+        if (aiN === 0) squad = new Squad(DIFF[aiDiff].melee);
+        const n = ++aiN;
+        const personas = [{ aggression: 0.75, patience: 0.35, zoning: 0.2, courage: 0.9 }, { aggression: 0.35, patience: 0.8, zoning: 0.3, courage: 0.8 }, { aggression: 0.4, patience: 0.5, zoning: 0.85, courage: 0.7 }];
+        const ai = new AiEileen(w.player.clips, { id: `ai${n}`, grade: "B", difficulty: aiDiff, persona: personas[(n - 1) % personas.length], seed: 1e3 + n, squad, label: `AI 에일린 ${n}` });
+        ai.x = spec.x;
+        ai.y = spec.y;
+        ai.hp = ai.hpMax = 160;
+        return ai;
+      }
       if (DEF_BY_KIND[spec.kind]) {
         const sp = spec;
         return createEnemy(spec.kind, spec.x, spec.y, () => w.rand(), { elite: spec.elite, affixes: sp.affixes });
@@ -30390,10 +36324,10 @@ ${t.secret}` : "",
       return fallbackEnemy(spec, w);
     };
     let world = null;
-    let runAgent = "jyaldi";
+    let runAgent = "eileen";
     let openingOn = false;
     const storyRoot = document.createElement("div");
-    storyRoot.style.cssText = "position:absolute;inset:0;pointer-events:none;z-index:15";
+    storyRoot.style.cssText = "position:absolute;inset:0;pointer-events:none;z-index:15;overflow:hidden";
     shell.stage.root.appendChild(storyRoot);
     const attachVideoAudio = (event) => audio.attachMedia(event.detail);
     storyRoot.addEventListener(VIDEO_AUDIO_EVENT, attachVideoAudio);
@@ -30507,10 +36441,24 @@ ${t.secret}` : "",
       floorPick = null;
       f?.(i);
     };
-    const chooseFloor = (opts, pick6) => {
-      floorPick = pick6;
+    let floorSel = -1;
+    const floorBtns = () => [...floorBox.querySelectorAll("button")];
+    const markFloor = (i) => {
+      floorSel = i;
+      floorBtns().forEach((b, k) => b.classList.toggle("sel", k === i));
+    };
+    const stepFloor = (d3) => {
+      const bs = floorBtns();
+      for (let k = 1; k <= bs.length; k++) {
+        const j = (floorSel + d3 * k + bs.length * 2) % bs.length;
+        if (!bs[j].disabled) return markFloor(j);
+      }
+    };
+    const chooseFloor = (opts, pick7) => {
+      floorPick = pick7;
       floorBox.innerHTML = opts.map((o, i) => `<button type="button" data-i="${i}"${o.open && !o.here ? "" : " disabled"}${o.here ? ' class="here"' : ""}>${o.label}</button>`).join("");
       floorBox.hidden = false;
+      markFloor(floorBtns().findIndex((b) => !b.disabled));
       audio.play("panelButton");
     };
     floorBox.addEventListener("click", (e) => {
@@ -30520,9 +36468,13 @@ ${t.secret}` : "",
     const floorKeys = (e) => {
       if (floorBox.hidden) return;
       if (e.code === "Escape") closeFloors(null);
-      else if (/^Digit[1-9]$/.test(e.code)) {
+      else if (e.code === "ArrowUp" || e.code === "ArrowLeft") stepFloor(-1);
+      else if (e.code === "ArrowDown" || e.code === "ArrowRight") stepFloor(1);
+      else if (e.code === "Enter" || e.code === "Space" || e.code === "KeyE") {
+        if (!e.repeat && floorSel >= 0 && !floorBtns()[floorSel]?.disabled) closeFloors(floorSel);
+      } else if (/^Digit[1-9]$/.test(e.code)) {
         const n = e.code.slice(5);
-        const want = n === "4" ? "B1" : n === "5" ? "B2" : n;
+        const want = n === "4" ? "B1" : n === "5" ? "B2" : n === "6" ? "B3" : n;
         const b = [...floorBox.querySelectorAll("button")].find((q) => q.textContent === want);
         if (b && !b.disabled) closeFloors(Number(b.dataset.i));
       } else return;
@@ -30546,11 +36498,38 @@ ${t.secret}` : "",
       closed: () => {
         if (dinnerDue) dinnerDue = false, cutOnce("dinner");
       },
-      overlay: visit ? (c, people, player) => visit.draw(c, people, player) : void 0
+      overlay: visit ? (c, people, player) => visit.draw(c, people, player) : void 0,
+      choose: (o) => shell.choose(o),
+      rules: () => {
+        const t = shell.settings;
+        return clockRules({ scene: t.tScene, region: t.tRegion, talk: t.tTalk, fight: t.tFight, waitShort: t.tWaitShort, waitLong: t.tWaitLong });
+      }
     });
+    let hqSel = null;
+    const hqButtons = () => [...document.querySelectorAll(".goei-engine-hq button:not([disabled]), .goei-engine-hq [data-act]:not(button)")].filter((b) => b.offsetParent && !b.closest("[hidden]"));
+    const markHq = (b) => {
+      hqSel?.classList.remove("hq-kbsel");
+      hqSel = b;
+      b?.classList.add("hq-kbsel");
+      b?.scrollIntoView?.({ block: "nearest" });
+    };
     const hqKeys = (e) => {
-      if (e.code !== "Escape" || !game?.inHub || !hq2.isOpen?.()) return;
-      hq2.close();
+      if (!game?.inHub || !hq2.isOpen?.() || npc.isOpen()) return;
+      const t = e.target;
+      if (t && (t.tagName === "INPUT" || t.tagName === "TEXTAREA" || t.tagName === "SELECT")) return;
+      const list = hqButtons();
+      if (hqSel && !list.includes(hqSel)) hqSel = null;
+      const at2 = hqSel ? list.indexOf(hqSel) : -1;
+      const first = () => list.find((b) => b.classList.contains("primary") || b.classList.contains("on")) ?? list[0] ?? null;
+      if (e.code === "Escape") hq2.close();
+      else if (e.code === "ArrowDown" || e.code === "ArrowRight" || e.code === "Tab") markHq(at2 < 0 ? first() : list[(at2 + 1) % list.length]);
+      else if (e.code === "ArrowUp" || e.code === "ArrowLeft") markHq(at2 < 0 ? first() : list[(at2 - 1 + list.length) % list.length]);
+      else if (e.code === "Enter" || e.code === "Space" || e.code === "KeyE") {
+        if (e.repeat) return e.preventDefault();
+        const b = hqSel ?? first();
+        hqSel = null;
+        b?.click();
+      } else return;
       e.preventDefault();
       e.stopImmediatePropagation();
     };
@@ -30612,6 +36591,7 @@ ${t.secret}` : "",
     };
     window.addEventListener("keydown", titleInput, true);
     window.addEventListener("pointerdown", titleInput, true);
+    eileenHooks.sfx = (e) => audio.event(e);
     const listeners = [
       (e) => {
         audio.event(e);
@@ -30632,9 +36612,10 @@ ${t.secret}` : "",
         session.setCheckpoint(v);
       },
       frozen: () => ffx.frozen(),
-      stages: [elevator, trainingStage, dummyStage, arenaStage, itemStage],
+      stages: [elevator, trainingStage, dummyStage, arenaStage, itemStage, sparStage],
       enemyFactory,
       hq: hq2,
+      hqLayer: () => shell.stage.ui,
       hud: false,
       blocking: () => !!visit?.isOpen() || story.isBlocking() || itemsBlocking() || !floorBox.hidden || npc.isOpen() || mapOpen,
       covered: () => story.isVideoPlaying(),
@@ -30669,7 +36650,7 @@ ${t.secret}` : "",
         footsteps(w);
         ctx.save();
         ctx.scale(view.zoom, view.zoom);
-        ctx.translate(-Math.round(w.camX) - view.crop, 0);
+        ctx.translate(-w.drawCamX - view.crop, -view.cropY);
         shell.fx.drawWorld(ctx);
         ffx.drawWorld(ctx);
         ctx.restore();
@@ -30678,16 +36659,58 @@ ${t.secret}` : "",
         if (npc.isOpen()) hs.message = void 0;
         if (mods.blocking?.() || shell.paused) hs.navigation = void 0;
         let cardEnd = 0;
-        if (game?.inHub && bridge?.visit && !mods.blocking?.() && !shell.paused) {
+        if (game?.inHub && !mods.blocking?.() && !shell.paused) {
           const me = hq2.visitor();
-          const name = me.name || "방문자";
-          const face2 = me.agentId && visitAgentFaceCanvas(name, 34) || testPlayerFace() || visitAgentFaceCanvas("쟈알디", 34);
-          cardEnd = shell.hud.drawFieldCard(ctx, { name, face: face2, hp: w.player.hp, maxHp: w.player.hpMax, gauge: w.player.gauge, compact: hs.compact, top: shell.touchShown || hs.compact }, dt);
-          if (shell.touchShown || hs.compact) cardEnd = 0;
+          const name = me.name || (testPlayerFace() ? "에일린" : "방문자");
+          const face = me.agentId && visitAgentFaceCanvas(name, 34) || testPlayerFace(64, w.player.dir < 0) || visitAgentFaceCanvas("쟈알디", 34);
+          shell.hud.drawFieldCard(ctx, { name, face, hp: w.player.hp, maxHp: w.player.hpMax, gauge: w.player.gauge, compact: hs.compact, top: true, items: hs.items, device: hs.device }, dt);
+          if (!observerOn()) shell.hud.drawFieldCorner(ctx, hs.field, hs.compact);
         }
-        if (!game?.inHub) shell.hud.draw(ctx, hs, dt);
-        else if (hs.message) shell.hud.drawMessage(ctx, hs.message, hs.compact, cardEnd);
-        if (game?.inHub && hs.navigation) shell.hud.drawNavigation(ctx, hs.navigation, hs.compact, hs.device);
+        const core = w.player.core;
+        if (core && !shell.touchShown && !mods.blocking?.() && !shell.paused) {
+          const P = core.P, clip = P.clip?.id, off2 = ["down", "belly", "stun"].includes(P.mode);
+          const lv = P.charge >= 2 ? 3 : P.charge > 1.3 ? 2 : P.charge > 0.5 ? 1 : 0;
+          const key2 = (b) => {
+            const c = Object.keys(KEYMAP).find((k) => KEYMAP[k] === b);
+            return c ? c.replace(/^Key/, "") : "?";
+          };
+          cardEnd = shell.hud.drawSkillBox(ctx, { compact: hs.compact, slots: [
+            { key: key2("light"), icon: "punch", name: "약공", cd: 0, off: off2, active: ["9", "10", "11"].includes(clip ?? "") },
+            { key: key2("heavy"), icon: "kick", name: "강공", cd: 0, off: off2, active: clip === "12" },
+            { key: key2("shoot"), icon: "gun", name: "사격", cd: P.overT > 0 ? P.overT / 2.6 : 0, cdText: P.overT > 0 ? P.overT.toFixed(1) : void 0, off: off2, active: clip === "15", bar: P.heat / 100, hot: P.overT > 0 || P.heat > 70 },
+            { key: key2("charge"), icon: "bolt", name: "충전", cd: 0, off: off2, active: P.mode === "charge", bar: P.mode === "charge" ? P.charge / 2.2 : void 0, badge: P.mode === "charge" && lv ? ["", "1", "2", "MAX"][lv] : void 0 },
+            { key: key2("skill"), icon: "wave", name: "기술", cd: 0, off: off2, active: clip === "22_1" },
+            { key: key2("super"), icon: "star", name: "필살", cd: 0, off: off2 || P.sp < 100, full: P.sp >= 100, bar: P.sp / 100 }
+          ] }, dt);
+        }
+        if (!game?.inHub) shell.hud.draw(ctx, { ...hs, messageLeft: cardEnd }, dt);
+        else if (!mods.blocking?.() && !shell.paused) {
+          const z = view.zoom, toX = (x) => (x - w.drawCamX - view.crop) * z, toY = (y) => (y - view.cropY) * z;
+          const sp = w.stage.speech?.();
+          if (sp) shell.hud.drawSpeech(ctx, { x: toX(sp.x), y: toY(sp.y + sp.top) - 6, who: sp.who, text: sp.text, compact: hs.compact });
+          else if (hs.message) {
+            const p = w.player, head = (hasTestPeople() ? testPlayerTop() : -230) * persp(p.y);
+            shell.hud.drawSpeech(ctx, { x: toX(p.x), y: toY(p.y - p.z + head) - 10, who: "", text: hs.message, compact: hs.compact });
+          }
+        }
+        const ep = w.player instanceof EileenPlayer ? w.player : null;
+        if (ep && !mods.blocking?.() && !shell.paused) {
+          const show = ep.guard < 99.5 || ep.core.P.mode === "block";
+          guardA = show ? Math.min(1, guardA + dt * 8) : Math.max(0, guardA - dt * 2.5);
+          const z = view.zoom, head = testPlayerTop() * persp(ep.y);
+          const gx = (ep.x - w.drawCamX - view.crop) * z, gy = (ep.y - ep.z + head * 0.92 - view.cropY) * z - 12;
+          drawGuardBar(ctx, gx + 5, gy, ep.guard / 100, ep.guardBroken, guardA, performance.now() / 1e3);
+        }
+        const tg = game?.inHub && !mods.blocking?.() && !shell.paused ? w.stage.nearInfo?.() : null;
+        if (tg) {
+          const p = w.player, z = view.zoom;
+          const head = (hasTestPeople() ? testPlayerTop() : -230) * persp(p.y);
+          const sx = (p.x - w.drawCamX - view.crop) * z, sy = (p.y - p.z + head * 0.72 - view.cropY) * z;
+          const half = 46 * persp(p.y) * 1.15 * z;
+          const side = sx > ctx.canvas.width - 320 ? -1 : 1;
+          const key2 = hs.device === "pad" ? "B" : hs.device === "touch" || hs.compact ? "조" : "E";
+          shell.hud.drawPrompt(ctx, { x: sx + side * (half + 18), y: sy, side, key: key2, text: tg.locked ? `${tg.text} · 잠김` : tg.text, locked: tg.locked, compact: hs.compact });
+        }
         ffx.drawScreen(ctx);
         if (shell.paused) mapOpen = false;
         if (!game?.inHub && w.stage === elevator) {
@@ -30796,7 +36819,6 @@ ${t.secret}` : "",
         window.removeEventListener("pointerdown", titleInput, true);
         if (openingT) clearTimeout(openingT);
         window.removeEventListener("keydown", hqKeys, true);
-        window.removeEventListener("keydown", fieldFxKeys, true);
         window.removeEventListener("keydown", floorKeys, true);
         saveFlags();
         storyRoot.removeEventListener(VIDEO_AUDIO_EVENT, attachVideoAudio);
@@ -30864,7 +36886,7 @@ ${t.secret}` : "",
     try {
       if (!await assets2.ready("field-fx")) return;
       const list = await assets2.bytes("field-fx", "fx/fx_목록.txt");
-      const img4 = async (file) => {
+      const img5 = async (file) => {
         const u = await assets2.url("field-fx", file);
         if (!u) return null;
         const im = new Image();
@@ -30873,12 +36895,12 @@ ${t.secret}` : "",
         return im;
       };
       for (const d3 of list ? parseFxList(new TextDecoder().decode(list)) : []) {
-        const im = await img4(`fx/${d3.name}.png`).catch(() => null);
+        const im = await img5(`fx/${d3.name}.png`).catch(() => null);
         if (im) ffx.register(d3, im);
       }
       for (const name of Object.keys(SUPER_TEXT)) {
         for (const k of [name, `${name}_2`]) {
-          const im = await img4(`cutin/${k}.png`).catch(() => null);
+          const im = await img5(`cutin/${k}.png`).catch(() => null);
           if (im) cutins.set(k, im);
         }
       }
@@ -30954,7 +36976,7 @@ ${t.secret}` : "",
       if (v && !held.has(b)) held.add(b), input.press(b);
       if (!v && held.has(b)) held.delete(b), input.release(b);
     };
-    const move3 = (x, y) => {
+    const move2 = (x, y) => {
       const dx = x - ox;
       const dy = y - oy;
       const r = Math.min(50, Math.hypot(dx, dy));
@@ -30978,12 +37000,12 @@ ${t.secret}` : "",
       ring.style.display = knob.style.display = "block";
       ring.style.left = ox + "px";
       ring.style.top = oy + "px";
-      move3(ox, oy);
+      move2(ox, oy);
     });
     stick.addEventListener("pointermove", (e) => {
       if (e.pointerId !== id) return;
       const r = stick.getBoundingClientRect();
-      move3(e.clientX - r.left, e.clientY - r.top);
+      move2(e.clientX - r.left, e.clientY - r.top);
     });
     const end = (e) => {
       if (e.pointerId !== id) return;
@@ -31007,16 +37029,17 @@ ${t.secret}` : "",
 .goei-engine-hq{position:absolute;inset:0;overflow:auto;z-index:20;background:#0b0f12}
 .goei-engine-hq.goei-engine-hq-panel{background:rgba(5,8,10,.72)}
 .goei-engine-hq-close{position:sticky;top:8px;float:right;margin:8px;z-index:2;padding:8px 14px;border-radius:8px;border:1px solid #5b6a72;background:#1a2226;color:#ece6d4;font:15px sans-serif}
-.goei-engine-elev{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);display:flex;flex-direction:column;gap:8px;padding:14px;border-radius:14px;background:rgba(20,24,27,.92);border:2px solid #6d767b;pointer-events:auto;z-index:20}
+.goei-engine-elev{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);display:flex;flex-direction:column;gap:6px;padding:10px;max-height:94%;overflow:hidden;box-sizing:border-box;pointer-events:auto;z-index:20;image-rendering:pixelated;border:16px solid transparent;border-image:var(--goei-btn) 8 fill / 16px stretch}
 .goei-engine-elev[hidden]{display:none}
-.goei-engine-elev button{width:64px;height:52px;border-radius:50%;border:2px solid #9aa6ad;background:#2c3236;color:#ece6d4;font:bold 20px sans-serif;cursor:pointer}
-.goei-engine-elev button.here{border-color:#ffb34a;color:#ffb34a}
-.goei-engine-elev button:disabled{opacity:.35;cursor:default}
+.goei-engine-elev button{width:112px;height:72px;flex:0 1 72px;min-height:40px;border:16px solid transparent;border-radius:0;background:none;border-image:var(--goei-btn) 8 fill / 16px stretch;color:#e6e4dc;font:700 33px "GoeiPixel","Galmuri11",monospace;cursor:pointer;image-rendering:pixelated;-webkit-font-smoothing:none;text-shadow:3px 3px 0 #07090b;padding:0;line-height:1}
+.goei-engine-elev button.here{color:#ffb34a}
+.goei-engine-elev button:disabled{opacity:.4;cursor:default}
+.goei-engine-elev button.sel{filter:brightness(1.45);color:#ffe9a0}
 .goei-engine-loading{color:#8e9aa1;font:16px sans-serif}
 `;
   function mountGame(box2, bridge) {
     const st = document.createElement("style");
-    st.textContent = CSS4;
+    st.textContent = CSS4 + `.goei-engine-elev{--goei-btn:url(${HUD_ART.btn.src})}`;
     const root = document.createElement("div");
     root.className = "goei-engine";
     const stage = document.createElement("div");
@@ -31030,15 +37053,20 @@ ${t.secret}` : "",
     const urlOf = bridge?.assets ? (f) => bridge.assets.url("jyaldi", f) : void 0;
     const releaseHqArt = prepareHqTextures(bridge?.assets ? (f) => bridge.assets.url("hq-textures", f) : void 0);
     const releaseDoorArt = prepareHqDoorRound2(bridge?.assets ? (f) => bridge.assets.url("hq-door-round2", f) : void 0);
-    const startRoom = prepareStartRoom(bridge?.assets ? (f) => bridge.assets.url("start-room", f) : void 0);
-    const testPeople = bridge?.visit || window.__GOEI_TEST_PEOPLE__ ? prepareTestPeople(bridge?.assets ? (f) => bridge.assets.url("test-people", f) : void 0) : null;
+    const releaseField = prepareHqField(bridge?.assets ? (pack2, f) => bridge.assets.url(pack2, f) : void 0);
+    const testPeople = prepareTestPeople(bridge?.assets ? (f) => bridge.assets.url("test-people", f) : void 0, bridge?.assets ? (f) => bridge.assets.bytes("test-people", f) : void 0);
     const visitArt = bridge?.visit ? prepareVisitAgents(bridge.assets ? (f) => bridge.assets.url("visit-agents", f) : void 0, bridge.assets ? (f) => bridge.assets.bytes("visit-agents", f) : void 0) : null;
-    void Promise.all([loadArt(urlOf, bridge?.assets ? (f) => bridge.assets.bytes("jyaldi", f) : void 0), startRoom.ready, visitArt?.ready, testPeople?.ready]).then(([art6]) => {
+    void Promise.all([loadArt(urlOf, bridge?.assets ? (f) => bridge.assets.bytes("jyaldi", f) : void 0), visitArt?.ready, testPeople?.ready]).then(([art4]) => {
       if (dead) return;
       stage.remove();
       root.style.display = "block";
+      if (eileenArt()) {
+        playerFactory.make = (clips) => new EileenPlayer(clips);
+        useEileenKeys();
+        useEileenControls();
+      }
       const wiring = engineModules(root, bridge);
-      game = new Game(wiring.box, art6, wiring.mods);
+      game = new Game(wiring.box, art4, wiring.mods);
       wiring.bind(game);
       if (!wiring.mods.surface) offTouch = mountTouch(stage, game.input);
       game.start();
@@ -31055,8 +37083,8 @@ ${t.secret}` : "",
     return () => {
       dead = true;
       releaseDoorArt();
+      releaseField();
       releaseHqArt();
-      startRoom.dispose();
       visitArt?.dispose();
       testPeople?.dispose();
       offTouch?.();
@@ -31071,2516 +37099,6 @@ ${t.secret}` : "",
 
   // src/game/play.ts
   var mountPlay = (box2, bridge) => mountGame(box2, bridge);
-
-  // src/game/style.css
-  var style_default4 = ".goei-game {\n  --gg-bg: var(--void, #0B1215);\n  --gg-panel: var(--panel, #121B1F);\n  --gg-panel2: var(--panel2, #172328);\n  --gg-line: var(--line, #24343B);\n  --gg-text: var(--text, #E6EEEC);\n  --gg-dim: var(--dim, #B5C4C0);\n  --gg-signal: var(--signal, #5EEAD4);\n  --gg-accent: var(--accent-bg, #10302C);\n  --gg-danger: var(--danger, #E0524A);\n  --gg-amber: var(--amber, #E8A93B);\n  display: flex;\n  flex-direction: column;\n  width: 100%;\n  height: 100%;\n  min-height: 420px;\n  position: relative;\n  overflow: hidden;\n  background: var(--gg-bg);\n  color: var(--gg-text);\n  font: 14px/1.45 system-ui, -apple-system, 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;\n  -webkit-tap-highlight-color: transparent;\n  user-select: none;\n}\n.goei-game button { font: inherit; color: inherit; cursor: pointer; }\n.goei-game .gg-top { display: flex; align-items: center; gap: 10px; padding: 8px 12px; margin: 0; min-height: 40px; box-sizing: border-box; }\n.goei-game .gg-place { font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }\n.goei-game .gg-depth { color: var(--gg-dim); white-space: nowrap; }\n.goei-game .gg-steps { display: flex; gap: 4px; }\n.goei-game .gg-steps i { width: 8px; height: 8px; border-radius: 2px; background: var(--gg-line); }\n.goei-game .gg-steps i.done { background: var(--gg-dim); }\n.goei-game .gg-steps i.now { background: var(--gg-signal); }\n.goei-game .gg-steps i.boss { border-radius: 50%; }\n.goei-game .gg-sp { flex: 1; }\n.goei-game .gg-tb { border: 1px solid var(--gg-line); background: var(--gg-panel); border-radius: 8px; padding: 5px 12px; margin: 0; }\n.goei-game .gg-tb:hover { background: var(--gg-panel2); }\n.goei-game .gg-stage { flex: 1; min-height: 200px; display: flex; align-items: center; justify-content: center; overflow: hidden; background: #000; }\n.goei-game canvas { display: block; image-rendering: pixelated; image-rendering: crisp-edges; }\n.goei-game .gg-squad { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; padding: 8px; margin: 0; box-sizing: border-box; }\n.goei-game .gg-ag { display: grid; grid-template-columns: 40px minmax(0, 1fr); grid-template-rows: auto auto auto; column-gap: 8px; row-gap: 3px; align-items: center; text-align: left; border: 1px solid var(--gg-line); background: var(--gg-panel); border-radius: 10px; padding: 6px 8px; margin: 0; min-width: 0; }\n.goei-game .gg-ag.ready { border-color: var(--gg-signal); background: var(--gg-accent); }\n.goei-game .gg-ag.down { opacity: .55; }\n.goei-game .gg-face { grid-row: 1 / 4; width: 40px; height: 40px; border-radius: 8px; background-repeat: no-repeat; background-size: 320px 40px; }\n.goei-game .gg-nm { font-weight: 700; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }\n.goei-game .gg-bar { height: 5px; border-radius: 3px; background: var(--gg-line); overflow: hidden; }\n.goei-game .gg-bar b { display: block; height: 100%; width: 100%; transform-origin: left; background: #5dc98a; }\n.goei-game .gg-bar.sk b { background: var(--gg-signal); }\n.goei-game .gg-ag.low .gg-bar.hp b { background: var(--gg-danger); }\n.goei-game .gg-sheet { position: absolute; inset: 0; display: flex; flex-direction: column; background: var(--gg-bg); z-index: 2; }\n.goei-game .gg-sheet[hidden] { display: none; }\n.goei-game .gg-sh-head { display: flex; align-items: center; gap: 10px; padding: 10px 12px; margin: 0; border-bottom: 1px solid var(--gg-line); }\n.goei-game .gg-sh-head b { flex: 1; font-size: 15px; }\n.goei-game .gg-sh-body { flex: 1; overflow-y: auto; padding: 12px; margin: 0; }\n.goei-game .gg-sh-foot { display: flex; gap: 8px; padding: 10px 12px; margin: 0; border-top: 1px solid var(--gg-line); }\n.goei-game .gg-sh-foot .gg-tb { flex: 1; padding: 10px; font-weight: 700; }\n.goei-game .gg-tb.primary { background: var(--gg-accent); border-color: var(--gg-signal); }\n.goei-game .gg-tb[disabled] { opacity: .45; cursor: default; }\n.goei-game .gg-pick { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 8px; }\n.goei-game .gg-pk { display: grid; grid-template-columns: 48px minmax(0, 1fr); column-gap: 10px; align-items: center; text-align: left; border: 1px solid var(--gg-line); background: var(--gg-panel); border-radius: 10px; padding: 8px; margin: 0; }\n.goei-game .gg-pk.on { border-color: var(--gg-signal); background: var(--gg-accent); }\n.goei-game .gg-pk .gg-face { grid-row: 1 / 3; width: 48px; height: 48px; background-size: 384px 48px; }\n.goei-game .gg-pk small { color: var(--gg-dim); font-size: 12px; }\n.goei-game .gg-rec { display: grid; grid-template-columns: 1fr auto; gap: 8px 16px; max-width: 420px; margin: 0 auto; padding: 4px; }\n.goei-game .gg-rec dt { color: var(--gg-dim); }\n.goei-game .gg-rec dd { margin: 0; text-align: right; font-weight: 700; font-variant-numeric: tabular-nums; }\n.goei-game .gg-rec .gg-sec { grid-column: 1 / -1; margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--gg-line); font-weight: 700; }\n.goei-game .gg-load { color: var(--gg-dim); padding: 16px; margin: 0; }\n@media (max-width: 520px) {\n  .goei-game .gg-squad { gap: 4px; padding: 6px; }\n  .goei-game .gg-ag { grid-template-columns: minmax(0, 1fr); padding: 6px; justify-items: stretch; }\n  .goei-game .gg-ag .gg-face { grid-row: auto; justify-self: center; }\n  .goei-game .gg-nm { text-align: center; font-size: 12px; }\n  .goei-game .gg-pick { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }\n}\n";
-
-  // src/game/assets.ts
-  var PACK_VERSION = 1;
-  var PACK_ID = "patrol";
-  var SHEET_FILES = {
-    jyaldi: "a-jyaldi",
-    gorgo: "a-gorgo",
-    geshu: "a-geshu",
-    deadfall: "a-deadfall",
-    spandal: "a-spandal",
-    eileen: "a-eileen",
-    curas: "a-curas",
-    rose: "a-rose",
-    corner: "e-corner",
-    watchman: "e-watchman",
-    statue: "e-statue",
-    master: "e-master"
-  };
-  var BACK_FILES = {
-    "belt-school": "bg-belt-school",
-    "room-classroom": "bg-room-classroom",
-    "room-lab": "bg-room-lab",
-    "room-broadcast": "bg-room-broadcast",
-    "room-courtyard": "bg-room-courtyard",
-    "belt-camp": "bg-belt-camp"
-  };
-  var FACE_FILE = "faces";
-  var PACK_FILES = [...Object.values(SHEET_FILES), ...Object.values(BACK_FILES), FACE_FILE];
-  var PACK_NAME = `goei-game-${PACK_ID}.pack`;
-  function parsePack(b, required = PACK_FILES) {
-    try {
-      if (b.length < 12 || new TextDecoder().decode(b.subarray(0, 8)) !== "GOEIPACK") return null;
-      const len = b[8] | b[9] << 8 | b[10] << 16 | b[11] << 24;
-      const head = JSON.parse(new TextDecoder().decode(b.subarray(12, 12 + len)));
-      if (typeof head.id !== "string" || typeof head.version !== "number" || !head.atlas || !Array.isArray(head.files))
-        return null;
-      const base2 = 12 + len;
-      const files = /* @__PURE__ */ new Map();
-      for (const row of head.files) {
-        if (!Array.isArray(row)) return null;
-        const [name, at2, n] = row;
-        if (typeof name !== "string" || typeof at2 !== "number" || typeof n !== "number" || base2 + at2 + n > b.length)
-          return null;
-        files.set(name, b.slice(base2 + at2, base2 + at2 + n));
-      }
-      if (!required.every((f) => files.has(f))) return null;
-      return { id: head.id, version: head.version, atlas: head.atlas, files };
-    } catch {
-      return null;
-    }
-  }
-
-  // src/game/data.ts
-  var AGENTS3 = [
-    { id: "jyaldi", name: "쟈알디", role: "공격", hp: 130, atk: 18, range: 150, rate: 1.4, charge: 9, skill: "blast", skillName: "폭발", power: 3.2, face: 0 },
-    { id: "gorgo", name: "고르고디오", role: "방어", hp: 220, atk: 14, range: 46, rate: 1.6, charge: 10, skill: "guard", skillName: "중장갑", power: 5, face: 1 },
-    { id: "geshu", name: "게슈간", role: "제어", hp: 116, atk: 13, range: 140, rate: 1.5, charge: 10, skill: "bind", skillName: "염동력", power: 3, face: 2 },
-    { id: "deadfall", name: "데드폴", role: "회복", hp: 124, atk: 10, range: 130, rate: 1.5, charge: 11, skill: "heal", skillName: "시간 역행", power: 0.45, face: 3 },
-    { id: "spandal", name: "스팡달", role: "공격", hp: 112, atk: 21, range: 52, rate: 1.2, charge: 9, skill: "bind", skillName: "그림자 가시", power: 2, face: 4 },
-    { id: "eileen", name: "에일린", role: "지원", hp: 120, atk: 14, range: 180, rate: 1, charge: 11, skill: "rally", skillName: "조준 지시", power: 6, face: 5 },
-    { id: "curas", name: "큐라스", role: "공격", hp: 126, atk: 18, range: 150, rate: 1.4, charge: 10, skill: "blast", skillName: "발화", power: 2.6, face: 6 },
-    { id: "rose", name: "로제몬", role: "지원", hp: 118, atk: 11, range: 140, rate: 1.5, charge: 10, skill: "bind", skillName: "정신 간섭", power: 3.5, face: 7 }
-  ];
-  var ENEMIES = {
-    corner: { id: "corner", name: "모퉁이 귀신", hp: 70, atk: 9, range: 34, rate: 1.5, speed: 48, scale: 1, boss: false },
-    watchman: { id: "watchman", name: "야간 경비", hp: 95, atk: 11, range: 40, rate: 1.8, speed: 38, scale: 1, boss: false },
-    statue: { id: "statue", name: "움직이는 동상", hp: 900, atk: 22, range: 70, rate: 2.4, speed: 16, scale: 2, boss: true },
-    master: { id: "master", name: "악몽의 주인", hp: 1300, atk: 26, range: 80, rate: 2.2, speed: 20, scale: 2, boss: true }
-  };
-  var ROOMS2 = [
-    { back: "belt-school", name: "본관 복도" },
-    { back: "room-classroom", name: "교실" },
-    { back: "room-lab", name: "과학실" },
-    { back: "room-broadcast", name: "방송실" },
-    { back: "room-courtyard", name: "중앙 정원" }
-  ];
-  var CAMP = { back: "belt-camp", name: "은신처" };
-  var AF = {
-    walk: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
-    idle: 12,
-    attack: [14, 15, 16, 17],
-    attackHit: 1,
-    skill: [18, 19, 20, 21, 22, 23],
-    skillHit: 3,
-    hurt: 24,
-    down: [25, 26, 27],
-    rise: [28, 29],
-    /** 앉아서 쉬기·먹기·마시기·정비 */
-    rest: [30, 31, 32, 33]
-  };
-  var EF = {
-    move: [0, 1, 2, 3, 4, 5],
-    attack: [7, 8, 9, 10, 11],
-    attackHit: 2,
-    skill: [12, 13, 14, 15, 16, 17],
-    skillHit: 3,
-    hurt: 19,
-    die: [20, 21, 22, 23]
-  };
-  var TUNE = {
-    /** 논리 화면 높이. 배경(320×180)을 2배로 그린 높이 */
-    sceneH: 360,
-    /** 요원 걷는 속도 (논리 픽셀/초) */
-    walkSpeed: 44,
-    /** 걷기 그림 한 칸당 이동 거리 */
-    strideStep: 6,
-    /** 방 하나의 길이 */
-    roomLen: 1500,
-    /** 순찰이 깊어질 때마다 적 체력·공격력 배율 증가 */
-    depthScale: 0.12,
-    /** 은신처 휴식 시간 (초) */
-    campTime: 7,
-    /** 응답을 기다리는 동안 진행 속도 */
-    waitingSpeed: 1.25,
-    /** 저장 최소 간격 (밀리초) */
-    saveGap: 5e3
-  };
-
-  // src/game/sim.ts
-  var SAVE_VERSION = 1;
-  var DEFAULT_SQUAD = ["gorgo", "jyaldi", "eileen", "deadfall"];
-  function newMeta2() {
-    return { version: SAVE_VERSION, squad: [...DEFAULT_SQUAD], patrols: 0, best: 0, wipes: 0, kills: {}, depth: 1 };
-  }
-  function readMeta(raw) {
-    const m = newMeta2();
-    if (!raw) return m;
-    try {
-      const o = JSON.parse(raw);
-      if (!o || typeof o !== "object") return m;
-      const ids = new Set(AGENTS3.map((a) => a.id));
-      if (Array.isArray(o.squad)) {
-        const s2 = [...new Set(o.squad.filter((id) => ids.has(id)))];
-        if (s2.length === 4) m.squad = s2;
-      }
-      const n = (v, d3) => typeof v === "number" && Number.isFinite(v) && v >= 0 ? Math.floor(v) : d3;
-      m.patrols = n(o.patrols, 0);
-      m.best = n(o.best, 0);
-      m.wipes = n(o.wipes, 0);
-      m.depth = Math.max(1, n(o.depth, 1));
-      if (o.kills && typeof o.kills === "object") {
-        for (const k of Object.keys(ENEMIES)) m.kills[k] = n(o.kills[k], 0);
-      }
-    } catch {
-    }
-    return m;
-  }
-  var agentDef = (id) => AGENTS3.find((a) => a.id === id);
-  var isAgent2 = (u) => u.side === "a";
-  var alive = (u) => u.act !== "down" && u.act !== "dead" && u.act !== "rise";
-  function rand2(run) {
-    let t = run.seed = run.seed + 1831565813 | 0;
-    t = Math.imul(t ^ t >>> 15, t | 1);
-    t ^= t + Math.imul(t ^ t >>> 7, t | 61);
-    return ((t ^ t >>> 14) >>> 0) / 4294967296;
-  }
-  var SLOT_BACK = [0, 38, 76, 114];
-  var SLOT_LANE = [1, 0, 1, 0];
-  function makeAgent(run, id, slot, x) {
-    const d3 = agentDef(id);
-    return {
-      uid: ++run.seq,
-      side: "a",
-      kind: id,
-      x: x - SLOT_BACK[slot],
-      lane: SLOT_LANE[slot],
-      hp: d3.hp,
-      max: d3.hp,
-      act: "walk",
-      t: 0,
-      cd: 0.4 * slot,
-      gauge: 0.35 + 0.15 * slot,
-      stride: slot * 17,
-      bound: 0,
-      slot,
-      ready: 0,
-      hit: false,
-      flash: 0,
-      gone: 0
-    };
-  }
-  function scaled(run, base2) {
-    return Math.round(base2 * (1 + (run.depth - 1) * TUNE.depthScale));
-  }
-  function makeEnemy(run, id, x, lane) {
-    const d3 = ENEMIES[id];
-    const hp = scaled(run, d3.hp);
-    return {
-      uid: ++run.seq,
-      side: "e",
-      kind: id,
-      x,
-      lane,
-      hp,
-      max: hp,
-      act: "walk",
-      t: 0,
-      cd: 0.6 + rand2(run),
-      gauge: 6,
-      stride: rand2(run) * 30,
-      bound: 0,
-      slot: 0,
-      ready: 0,
-      hit: false,
-      flash: 0,
-      gone: 0
-    };
-  }
-  function pickRooms(run) {
-    const order = ROOMS2.map((_, i) => i).sort(() => rand2(run) - 0.5);
-    return [0, ...order.filter((i) => i !== 0).slice(0, 2)];
-  }
-  function wavesFor(run) {
-    const n = run.room === 2 ? 3 : 2 + (rand2(run) < 0.5 ? 1 : 0);
-    const len = TUNE.roomLen;
-    return Array.from({ length: n }, (_, i) => Math.round((i + 1) / (n + 1) * len * 0.9 + rand2(run) * 60));
-  }
-  function newRun(meta, seed = Date.now() | 0) {
-    const run = {
-      phase: "patrol",
-      pt: 0,
-      depth: meta.depth,
-      rooms: [],
-      room: 0,
-      x: 180,
-      waves: [],
-      units: [],
-      fx: [],
-      seq: 0,
-      seed,
-      guard: 0,
-      rally: 0,
-      cam: 0
-    };
-    run.rooms = pickRooms(run);
-    run.waves = wavesFor(run);
-    formSquad(run, meta.squad, "walk");
-    return run;
-  }
-  function formSquad(run, squad, act2) {
-    const order = [...squad].sort((a, b) => agentDef(a).range - agentDef(b).range);
-    const keep = new Map(run.units.filter(isAgent2).map((u) => [u.kind, u]));
-    run.units = run.units.filter((u) => !isAgent2(u));
-    order.forEach((id, slot) => {
-      const u = makeAgent(run, id, slot, run.x);
-      const old = keep.get(id);
-      if (old) u.hp = Math.max(1, old.hp), u.gauge = old.gauge;
-      u.act = act2;
-      run.units.push(u);
-    });
-  }
-  function campLayout(run) {
-    for (const a of agents(run)) a.x = 70 + a.slot * 74;
-  }
-  function applySquad(run, meta, squad) {
-    meta.squad = [...squad];
-    run.phase = "camp";
-    run.pt = 0;
-    run.units = [];
-    run.fx = [];
-    run.x = 220;
-    formSquad(run, meta.squad, "rest");
-    campLayout(run);
-  }
-  function agents(run) {
-    return run.units.filter(isAgent2);
-  }
-  function enemies(run) {
-    return run.units.filter((u) => u.side === "e");
-  }
-  function spawnWave2(run, viewW) {
-    const edge2 = Math.max(run.x + 160, run.cam + viewW + 30);
-    const last = run.room === 2 && run.waves.length === 0;
-    const regular = ["corner", "watchman"];
-    if (last) {
-      const boss2 = run.depth % 2 === 1 ? "statue" : "master";
-      run.units.push(makeEnemy(run, boss2, edge2 + 60, 1));
-      run.units.push(makeEnemy(run, regular[Math.floor(rand2(run) * 2)], edge2 + 10, 0));
-      return;
-    }
-    const n = Math.min(5, 2 + Math.floor(rand2(run) * 2) + Math.floor((run.depth - 1) / 2));
-    for (let i = 0; i < n; i++) {
-      run.units.push(makeEnemy(run, regular[Math.floor(rand2(run) * 2)], edge2 + i * 46 + rand2(run) * 20, i % 2));
-    }
-  }
-  function addNum(run, u, amount, heal2 = false, big = false) {
-    const h = u.side === "e" && ENEMIES[u.kind].scale === 2 ? 170 : 96;
-    let y = footY(u) - h;
-    while (run.fx.some((f) => (f.kind === "num" || f.kind === "heal") && f.t < 0.35 && Math.abs(f.x - u.x) < 20 && Math.abs(f.y - y) < 12)) y -= 13;
-    run.fx.push({ kind: heal2 ? "heal" : "num", x: u.x + (rand2(run) * 10 - 5), y, t: 0, life: 0.8, text: String(Math.round(amount)), big });
-  }
-  function footY(u) {
-    return u.lane === 1 ? 336 : 318;
-  }
-  function damage(run, from, to, amount, big = false) {
-    if (!alive(to)) return;
-    let v = amount * (0.9 + rand2(run) * 0.2);
-    if (to.side === "a" && run.guard > 0) v *= 0.5;
-    if (from.side === "a" && run.rally > 0) v *= 1.4;
-    to.hp = Math.max(0, to.hp - v);
-    to.flash = 0.12;
-    addNum(run, to, v, false, big);
-    if (to.hp <= 0) {
-      to.act = to.side === "a" ? "down" : "dead";
-      to.t = 0;
-    } else if (to.act === "idle" || to.act === "walk") {
-      to.act = "hurt";
-      to.t = 0;
-    }
-  }
-  function nearest(from, pool) {
-    let best;
-    for (const u of pool) if (alive(u) && (!best || Math.abs(u.x - from.x) < Math.abs(best.x - from.x))) best = u;
-    return best;
-  }
-  var ATTACK_TIME = 0.5;
-  var SKILL_TIME = 0.9;
-  var HURT_TIME = 0.22;
-  var DOWN_TIME = 0.6;
-  var DIE_TIME = 0.8;
-  function frameOf(u) {
-    if (u.side === "a") {
-      switch (u.act) {
-        case "walk":
-          return AF.walk[Math.floor(u.stride / TUNE.strideStep) % AF.walk.length];
-        case "attack":
-          return AF.attack[Math.min(AF.attack.length - 1, Math.floor(u.t / ATTACK_TIME * AF.attack.length))];
-        case "skill":
-          return AF.skill[Math.min(AF.skill.length - 1, Math.floor(u.t / SKILL_TIME * AF.skill.length))];
-        case "hurt":
-          return AF.hurt;
-        case "down":
-          return AF.down[Math.min(AF.down.length - 1, Math.floor(u.t / DOWN_TIME * AF.down.length))];
-        case "rise":
-          return AF.rise[Math.min(AF.rise.length - 1, Math.floor(u.t / 0.4 * AF.rise.length))];
-        case "rest":
-          return AF.rest[(Math.floor(u.t / 2.2) + u.slot) % AF.rest.length];
-        default:
-          return AF.idle;
-      }
-    }
-    switch (u.act) {
-      case "walk":
-        return EF.move[Math.floor(u.stride / 7) % EF.move.length];
-      case "attack":
-        return EF.attack[Math.min(EF.attack.length - 1, Math.floor(u.t / enemyAttackTime(u) * EF.attack.length))];
-      case "skill":
-        return EF.skill[Math.min(EF.skill.length - 1, Math.floor(u.t / SKILL_TIME * EF.skill.length))];
-      case "hurt":
-        return EF.hurt;
-      case "dead":
-        return EF.die[Math.min(EF.die.length - 1, Math.floor(u.t / DIE_TIME * EF.die.length))];
-      default:
-        return EF.move[Math.floor(u.t * 4) % 2];
-    }
-  }
-  var enemyAttackTime = (u) => ENEMIES[u.kind].boss ? 0.8 : 0.6;
-  function trigger(run, uid) {
-    const u = run.units.find((x) => x.uid === uid);
-    if (!u || !alive(u) || u.gauge < 1 || run.phase !== "patrol") return false;
-    if (!enemies(run).some(alive)) return false;
-    startSkill(u);
-    return true;
-  }
-  function startSkill(u) {
-    u.act = "skill";
-    u.t = 0;
-    u.hit = false;
-    u.gauge = 0;
-    u.ready = 0;
-  }
-  function applySkill(run, u, foes, team) {
-    const d3 = agentDef(u.kind);
-    const target = nearest(u, foes);
-    switch (d3.skill) {
-      case "blast": {
-        if (!target) return;
-        run.fx.push({ kind: "boom", x: target.x, y: footY(target) - 40, t: 0, life: 0.5 });
-        for (const f of foes) if (alive(f) && Math.abs(f.x - target.x) < 110) damage(run, u, f, d3.atk * d3.power, true);
-        return;
-      }
-      case "heal":
-        for (const a of team) {
-          if (!alive(a)) continue;
-          const v = Math.min(a.max - a.hp, a.max * d3.power);
-          a.hp += v;
-          if (v > 0) addNum(run, a, v, true);
-        }
-        run.fx.push({ kind: "ring", x: u.x, y: footY(u) - 40, t: 0, life: 0.7 });
-        return;
-      case "guard":
-        run.guard = d3.power;
-        run.fx.push({ kind: "ring", x: u.x, y: footY(u) - 44, t: 0, life: 0.6 });
-        return;
-      case "rally":
-        run.rally = d3.power;
-        run.fx.push({ kind: "ring", x: u.x, y: footY(u) - 44, t: 0, life: 0.6 });
-        return;
-      case "bind":
-        if (!target) return;
-        for (const f of foes) {
-          if (!alive(f) || Math.abs(f.x - target.x) > 70) continue;
-          f.bound = ENEMIES[f.kind].boss ? d3.power / 2 : d3.power;
-          damage(run, u, f, d3.atk * 1.5);
-          run.fx.push({ kind: "bind", x: f.x, y: footY(f) - 30, t: 0, life: f.bound });
-        }
-        return;
-    }
-  }
-  function stepAgent(run, u, dt, foes, team) {
-    const d3 = agentDef(u.kind);
-    u.t += dt;
-    u.flash = Math.max(0, u.flash - dt);
-    if (u.act === "down" || u.act === "rest") return;
-    if (u.act === "rise") {
-      if (u.t > 0.4) u.act = "idle", u.t = 0;
-      return;
-    }
-    u.cd -= dt;
-    if (foes.some(alive)) u.gauge = Math.min(1, u.gauge + dt / d3.charge);
-    if (u.act === "hurt") {
-      if (u.t > HURT_TIME) u.act = "idle", u.t = 0;
-      return;
-    }
-    if (u.act === "attack") {
-      const target2 = nearest(u, foes);
-      if (!u.hit && u.t >= ATTACK_TIME * AF.attackHit / AF.attack.length) {
-        u.hit = true;
-        if (target2 && Math.abs(target2.x - u.x) <= d3.range + 12) damage(run, u, target2, d3.atk);
-      }
-      if (u.t >= ATTACK_TIME) u.act = "idle", u.t = 0;
-      return;
-    }
-    if (u.act === "skill") {
-      if (!u.hit && u.t >= SKILL_TIME * AF.skillHit / AF.skill.length) {
-        u.hit = true;
-        applySkill(run, u, foes, team);
-      }
-      if (u.t >= SKILL_TIME) u.act = "idle", u.t = 0;
-      return;
-    }
-    const target = nearest(u, foes);
-    if (u.gauge >= 1) {
-      u.ready += dt;
-      if (target && u.ready > 1.8 && target.x - u.x < d3.range + 40) return startSkill(u);
-    }
-    const home = run.x - SLOT_BACK[u.slot];
-    let goal = home;
-    if (target && target.x - u.x < d3.range + 140) {
-      goal = Math.min(Math.max(home, target.x - d3.range + 8), target.x - 18);
-    }
-    const dx = goal - u.x;
-    if (Math.abs(dx) > 0.5) {
-      const step4 = Math.sign(dx) * Math.min(Math.abs(dx), TUNE.walkSpeed * 1.25 * dt);
-      u.x += step4;
-      u.stride += Math.abs(step4);
-      if (u.act !== "walk") u.act = "walk", u.t = 0;
-      return;
-    }
-    if (target && Math.abs(target.x - u.x) <= d3.range + 4 && u.cd <= 0) {
-      u.act = "attack";
-      u.t = 0;
-      u.hit = false;
-      u.cd = d3.rate;
-      return;
-    }
-    if (u.act !== "idle") u.act = "idle", u.t = 0;
-  }
-  function stepEnemy(run, u, dt, team) {
-    const d3 = ENEMIES[u.kind];
-    u.t += dt;
-    u.flash = Math.max(0, u.flash - dt);
-    if (u.act === "dead") {
-      u.gone += dt;
-      return;
-    }
-    if (u.bound > 0) {
-      u.bound = Math.max(0, u.bound - dt);
-      if (u.act === "walk" || u.act === "attack") u.act = "idle", u.t = 0;
-      return;
-    }
-    u.cd -= dt;
-    if (u.act === "hurt") {
-      if (u.t > HURT_TIME) u.act = "idle", u.t = 0;
-      return;
-    }
-    const guardian = run.guard > 0 ? team.find((a) => a.kind === "gorgo" && alive(a)) : void 0;
-    const target = guardian ?? nearest(u, team);
-    if (u.act === "attack") {
-      const at2 = enemyAttackTime(u);
-      if (!u.hit && u.t >= at2 * EF.attackHit / EF.attack.length) {
-        u.hit = true;
-        if (target && Math.abs(target.x - u.x) <= d3.range + 14) damage(run, u, target, scaled(run, d3.atk));
-      }
-      if (u.t >= at2) u.act = "idle", u.t = 0;
-      return;
-    }
-    if (u.act === "skill") {
-      if (!u.hit && u.t >= SKILL_TIME * EF.skillHit / EF.skill.length) {
-        u.hit = true;
-        run.fx.push({ kind: "boom", x: u.x - 70, y: footY(u) - 30, t: 0, life: 0.5 });
-        for (const a of team) if (alive(a) && u.x - a.x < 170) damage(run, u, a, scaled(run, d3.atk) * 1.3, true);
-      }
-      if (u.t >= SKILL_TIME) u.act = "idle", u.t = 0;
-      return;
-    }
-    if (!target) {
-      if (u.act !== "idle") u.act = "idle", u.t = 0;
-      return;
-    }
-    if (d3.boss) {
-      u.gauge -= dt;
-      if (u.gauge <= 0 && u.x - target.x < 190) {
-        u.gauge = 7 + rand2(run) * 3;
-        u.act = "skill";
-        u.t = 0;
-        u.hit = false;
-        return;
-      }
-    }
-    const gap = u.x - target.x;
-    if (gap > d3.range) {
-      const step4 = Math.min(gap - d3.range, d3.speed * dt);
-      u.x -= step4;
-      u.stride += step4;
-      if (u.act !== "walk") u.act = "walk", u.t = 0;
-      return;
-    }
-    if (u.cd <= 0) {
-      u.act = "attack";
-      u.t = 0;
-      u.hit = false;
-      u.cd = d3.rate;
-      return;
-    }
-    if (u.act !== "idle") u.act = "idle", u.t = 0;
-  }
-  function step2(run, meta, dt, viewW) {
-    const res = { changed: false };
-    run.pt += dt;
-    run.guard = Math.max(0, run.guard - dt);
-    run.rally = Math.max(0, run.rally - dt);
-    for (const f of run.fx) f.t += dt;
-    run.fx = run.fx.filter((f) => f.t < f.life);
-    const team = agents(run);
-    const foes = enemies(run);
-    if (run.phase === "camp") {
-      for (const a of team) {
-        a.t += dt;
-        a.hp = Math.min(a.max, a.hp + a.max * 0.25 * dt);
-        if (a.act !== "rest") a.act = "rest", a.t = 0;
-      }
-      if (run.pt >= TUNE.campTime) {
-        run.phase = "fade";
-        run.pt = 0;
-        run.depth = meta.depth;
-        run.rooms = pickRooms(run);
-        run.room = 0;
-        run.x = 180;
-        run.units = [];
-        formSquad(run, meta.squad, "walk");
-        run.waves = wavesFor(run);
-        run.fx = [];
-      }
-      return res;
-    }
-    if (run.phase === "fade" || run.phase === "retreat") {
-      if (run.phase === "retreat" && run.pt >= 1.2) {
-        run.phase = "camp";
-        run.pt = 0;
-        run.units = [];
-        run.x = 220;
-        formSquad(run, meta.squad, "rest");
-        campLayout(run);
-        for (const a of agents(run)) a.hp = Math.max(1, a.max * 0.3);
-      }
-      if (run.phase === "fade" && run.pt >= 0.6) run.phase = "patrol", run.pt = 0;
-      return res;
-    }
-    for (const u of team) stepAgent(run, u, dt, foes, team);
-    for (const u of foes) stepEnemy(run, u, dt, team);
-    for (const f of foes) {
-      if (f.act === "dead" && f.gone > 1.6) {
-        meta.kills[f.kind] = (meta.kills[f.kind] ?? 0) + 1;
-        res.changed = true;
-      }
-    }
-    run.units = run.units.filter((u) => !(u.side === "e" && u.act === "dead" && u.gone > 1.6));
-    const livingFoes = enemies(run).some(alive);
-    if (!team.some(alive)) {
-      meta.wipes += 1;
-      res.changed = true;
-      run.phase = "retreat";
-      run.pt = 0;
-      return res;
-    }
-    const engaged = livingFoes && enemies(run).some((e) => alive(e) && e.x - run.x < 130);
-    if (!engaged) {
-      const lagging = team.some((a) => alive(a) && run.x - SLOT_BACK[a.slot] - a.x > 30);
-      if (!lagging) run.x += TUNE.walkSpeed * dt;
-    }
-    if (run.waves.length && run.x >= run.waves[0] - 140) {
-      run.waves.shift();
-      spawnWave2(run, viewW);
-    }
-    if (!livingFoes && !run.waves.length && run.x >= TUNE.roomLen && !enemies(run).length) {
-      if (run.room < 2) {
-        run.room += 1;
-        run.phase = "fade";
-        run.pt = 0;
-        run.x = 180;
-        for (const a of team) {
-          if (!alive(a)) a.act = "rise", a.t = 0, a.hp = a.max * 0.25;
-          a.x = run.x - SLOT_BACK[a.slot];
-        }
-        run.waves = wavesFor(run);
-      } else {
-        meta.patrols += 1;
-        meta.best = Math.max(meta.best, run.depth);
-        meta.depth = run.depth + 1;
-        res.changed = true;
-        run.phase = "camp";
-        run.pt = 0;
-        run.units = [];
-        run.x = 220;
-        formSquad(run, meta.squad, "rest");
-        campLayout(run);
-        for (const a of agents(run)) a.hp = Math.max(1, a.max * 0.5);
-      }
-    }
-    return res;
-  }
-
-  // src/game/render.ts
-  var H6 = TUNE.sceneH;
-  function loadImage(src) {
-    return new Promise((ok, fail) => {
-      const img4 = new Image();
-      img4.onload = () => ok(img4);
-      img4.onerror = () => fail(new Error("그림을 불러오지 못했습니다"));
-      img4.src = src;
-    });
-  }
-  var Renderer = class {
-    canvas;
-    ctx;
-    sheets = /* @__PURE__ */ new Map();
-    backs = /* @__PURE__ */ new Map();
-    /** 기기 픽셀 기준 배율 (논리 1픽셀 = 기기 k픽셀) */
-    k = 1;
-    /** 논리 화면 폭 */
-    w = 480;
-    /** 위에서 잘라 낸 높이 (논리 픽셀) */
-    top = 0;
-    cam = 0;
-    ready = false;
-    constructor(canvas) {
-      this.canvas = canvas;
-      this.ctx = canvas.getContext("2d");
-    }
-    atlas = {};
-    async load(art6) {
-      this.atlas = art6.atlas;
-      await Promise.all([
-        ...Object.entries(SHEET_FILES).map(async ([k, v]) => this.sheets.set(k, await loadImage(art6.url(v)))),
-        ...Object.entries(BACK_FILES).map(async ([k, v]) => this.backs.set(k, await loadImage(art6.url(v))))
-      ]);
-      this.ready = true;
-    }
-    /** 들어갈 칸의 CSS 크기에 맞춰 배율과 논리 폭을 정한다 */
-    layout(cssW, cssH, dpr) {
-      const devW = Math.max(1, Math.floor(cssW * dpr));
-      const devH = Math.max(1, Math.floor(cssH * dpr));
-      this.k = Math.max(1, Math.min(Math.floor(devH / (H6 * 0.8)), Math.floor(devW / 360)));
-      this.w = Math.min(960, Math.floor(devW / this.k));
-      this.top = H6 - Math.floor(devH / this.k);
-      const cw = this.w * this.k;
-      const ch = (H6 - this.top) * this.k;
-      if (this.canvas.width !== cw || this.canvas.height !== ch) {
-        this.canvas.width = cw;
-        this.canvas.height = ch;
-      }
-      this.canvas.style.width = `${cw / dpr}px`;
-      this.canvas.style.height = `${ch / dpr}px`;
-    }
-    back(run) {
-      return run.phase === "camp" || run.phase === "retreat" && run.pt > 0.6 ? CAMP.back : ROOMS2[run.rooms[run.room]].back;
-    }
-    camera(run, snap2) {
-      const team = run.units.filter((u) => u.side === "a");
-      const foes = run.units.filter((u) => u.side === "e" && alive(u));
-      let goal;
-      if (run.phase === "camp" || !team.length) goal = 0;
-      else {
-        const front = Math.max(...team.map((u) => u.x));
-        const back = Math.min(...team.map((u) => u.x));
-        const near2 = foes.length ? Math.min(...foes.map((u) => u.x)) : Infinity;
-        if (near2 - front < this.w * 0.75) goal = (back + Math.min(near2 + 60, back + this.w - 40)) / 2 - this.w / 2;
-        else goal = front - this.w * 0.45;
-      }
-      goal = Math.max(0, goal);
-      this.cam = snap2 ? goal : this.cam + (goal - this.cam) * 0.08;
-      return Math.round(this.cam);
-    }
-    draw(run, snapCam = false) {
-      if (!this.ready) return;
-      const c = this.ctx;
-      c.setTransform(this.k, 0, 0, this.k, 0, -this.top * this.k);
-      c.imageSmoothingEnabled = false;
-      const cam = run.phase === "fade" && run.pt < 0.05 ? this.camera(run, true) : this.camera(run, snapCam);
-      run.cam = cam;
-      const bg = this.backs.get(this.back(run));
-      if (bg) {
-        const tw = bg.width * 2;
-        for (let x = -(cam % tw); x < this.w; x += tw) {
-          c.drawImage(bg, x, 0, tw, H6);
-        }
-        if (this.top < 0) {
-          const g2 = c.createLinearGradient(0, this.top, 0, 0);
-          g2.addColorStop(0, "#05070a");
-          g2.addColorStop(1, this.topColor(bg));
-          c.fillStyle = g2;
-          c.fillRect(0, this.top, this.w, -this.top);
-        }
-      }
-      const units = [...run.units].sort((a, b) => a.lane - b.lane || (a.side === "e" ? 1 : 0) - (b.side === "e" ? 1 : 0));
-      for (const u of units) this.shadow(u, cam);
-      for (const u of units) this.unit(u, cam);
-      this.effects(run, cam);
-      this.bossBar(run);
-      if (run.phase === "fade" || run.phase === "retreat") {
-        const a = run.phase === "fade" ? 1 - run.pt / 0.6 : Math.min(1, run.pt / 0.6) - Math.max(0, (run.pt - 0.6) / 0.6);
-        c.fillStyle = `rgba(0,0,0,${Math.max(0, Math.min(1, a))})`;
-        c.fillRect(0, this.top, this.w, H6 - this.top);
-      }
-    }
-    tops = /* @__PURE__ */ new Map();
-    topColor(bg) {
-      let v = this.tops.get(bg);
-      if (!v) {
-        const cv = document.createElement("canvas");
-        cv.width = bg.width;
-        cv.height = 3;
-        const cx = cv.getContext("2d");
-        cx.drawImage(bg, 0, 0);
-        const d3 = cx.getImageData(0, 0, bg.width, 3).data;
-        let r = 0, gr = 0, b = 0;
-        for (let i = 0; i < d3.length; i += 4) r += d3[i], gr += d3[i + 1], b += d3[i + 2];
-        const n = d3.length / 4;
-        v = `rgb(${Math.round(r / n)},${Math.round(gr / n)},${Math.round(b / n)})`;
-        this.tops.set(bg, v);
-      }
-      return v;
-    }
-    scaleOf(u) {
-      return u.side === "e" ? ENEMIES[u.kind].scale : 1;
-    }
-    shadow(u, cam) {
-      if (u.side === "e" && u.act === "dead" && u.gone > 0.8) return;
-      const c = this.ctx;
-      const s2 = this.scaleOf(u);
-      const x = Math.round(u.x - cam);
-      const y = footY(u);
-      c.fillStyle = "rgba(0,0,0,.35)";
-      c.fillRect(x - 14 * s2, y - 2, 28 * s2, 3);
-      c.fillRect(x - 10 * s2, y - 3, 20 * s2, 5);
-    }
-    unit(u, cam) {
-      const f = this.atlas[u.kind][frameOf(u)];
-      const img4 = this.sheets.get(u.kind);
-      if (!f || !img4) return;
-      const [sx, sy, w, h, ax, ay] = f;
-      const s2 = this.scaleOf(u);
-      const c = this.ctx;
-      const x = Math.round(u.x - cam);
-      const y = footY(u);
-      if (x < -200 || x > this.w + 200) return;
-      c.save();
-      if (u.side === "e" && u.act === "dead") c.globalAlpha = Math.max(0, 1 - Math.max(0, u.gone - 0.8) / 0.8);
-      if (u.side === "e") {
-        c.translate(x, 0);
-        c.scale(-1, 1);
-        c.drawImage(img4, sx, sy, w, h, -ax * s2, y - ay * s2, w * s2, h * s2);
-        if (u.flash > 0) this.flashOver(img4, sx, sy, w, h, -ax * s2, y - ay * s2, s2);
-      } else {
-        c.drawImage(img4, sx, sy, w, h, x - ax, y - ay, w, h);
-        if (u.flash > 0) this.flashOver(img4, sx, sy, w, h, x - ax, y - ay, 1);
-      }
-      c.restore();
-      if (u.side === "e" && !ENEMIES[u.kind].boss && alive(u) && u.hp < u.max) {
-        const bw = 26;
-        const top = y - this.atlas[u.kind][0][6] - 8;
-        c.fillStyle = "rgba(0,0,0,.6)";
-        c.fillRect(x - bw / 2 - 1, top - 1, bw + 2, 4);
-        c.fillStyle = "#e0524a";
-        c.fillRect(x - bw / 2, top, Math.max(1, Math.round(bw * u.hp / u.max)), 2);
-      }
-    }
-    flashOver(img4, sx, sy, w, h, dx, dy, s2) {
-      const c = this.ctx;
-      c.globalCompositeOperation = "lighter";
-      c.globalAlpha = 0.55;
-      c.drawImage(img4, sx, sy, w, h, dx, dy, w * s2, h * s2);
-      c.globalCompositeOperation = "source-over";
-      c.globalAlpha = 1;
-    }
-    effects(run, cam) {
-      const c = this.ctx;
-      for (const f of run.fx) {
-        const p = f.t / f.life;
-        const x = Math.round(f.x - cam);
-        if (f.kind === "num" || f.kind === "heal") {
-          const y = Math.round(f.y - p * 16);
-          c.globalAlpha = p < 0.7 ? 1 : 1 - (p - 0.7) / 0.3;
-          c.font = `700 ${f.big ? 14 : 11}px system-ui, sans-serif`;
-          c.textAlign = "center";
-          c.lineWidth = 3;
-          c.strokeStyle = "rgba(0,0,0,.85)";
-          c.strokeText(f.kind === "heal" ? `+${f.text}` : f.text, x, y);
-          c.fillStyle = f.kind === "heal" ? "#7be3a3" : f.big ? "#ffd166" : "#f4f1ea";
-          c.fillText(f.kind === "heal" ? `+${f.text}` : f.text, x, y);
-          c.globalAlpha = 1;
-        } else if (f.kind === "boom") {
-          const r = Math.round(10 + p * 34);
-          c.globalAlpha = 1 - p;
-          c.fillStyle = "#ffb347";
-          pixelRing(c, x, Math.round(f.y), r, 3);
-          c.fillStyle = "#fff1c1";
-          pixelRing(c, x, Math.round(f.y), Math.round(r * 0.6), 2);
-          c.globalAlpha = 1;
-        } else if (f.kind === "ring") {
-          c.globalAlpha = 1 - p;
-          c.fillStyle = "#9ff0d0";
-          pixelRing(c, x, Math.round(f.y), Math.round(12 + p * 30), 2);
-          c.globalAlpha = 1;
-        } else if (f.kind === "bind") {
-          c.fillStyle = "rgba(190,140,255,.85)";
-          const ph = Math.floor(f.t * 8) % 2;
-          for (let i = 0; i < 6; i++) {
-            const a = i / 6 * Math.PI * 2 + ph * 0.5;
-            c.fillRect(Math.round(x + Math.cos(a) * 16) - 1, Math.round(f.y + Math.sin(a) * 6) - 1, 3, 2);
-          }
-        }
-      }
-    }
-    bossBar(run) {
-      const boss2 = run.units.find((u) => u.side === "e" && ENEMIES[u.kind].boss && alive(u));
-      if (!boss2) return;
-      const c = this.ctx;
-      const bw = Math.min(260, this.w - 40);
-      const x = Math.round((this.w - bw) / 2);
-      c.fillStyle = "rgba(0,0,0,.65)";
-      const y = this.top + 10;
-      c.fillRect(x - 2, y, bw + 4, 8);
-      c.fillStyle = "#c8433b";
-      c.fillRect(x, y + 2, Math.max(1, Math.round(bw * boss2.hp / boss2.max)), 4);
-      c.font = "700 11px system-ui, sans-serif";
-      c.textAlign = "center";
-      c.lineWidth = 3;
-      c.strokeStyle = "rgba(0,0,0,.85)";
-      c.strokeText(ENEMIES[boss2.kind].name, this.w / 2, y + 24);
-      c.fillStyle = "#f4f1ea";
-      c.fillText(ENEMIES[boss2.kind].name, this.w / 2, y + 24);
-    }
-  };
-  function pixelRing(c, cx, cy, r, size2) {
-    const n = Math.max(8, Math.round(r * 0.9));
-    for (let i = 0; i < n; i++) {
-      const a = i / n * Math.PI * 2;
-      c.fillRect(Math.round(cx + Math.cos(a) * r) - (size2 >> 1), Math.round(cy + Math.sin(a) * r * 0.45) - (size2 >> 1), size2, size2);
-    }
-  }
-
-  // src/game/index.ts
-  var lastRun = null;
-  var STEP4 = 1 / 30;
-  var esc6 = (s2) => s2.replace(/[&<>"]/g, (c) => `&#${c.charCodeAt(0)};`);
-  var faces2 = "";
-  function faceStyle(id, size2) {
-    return `background-image:url('${faces2}');background-position:${-agentDef(id).face * size2}px 0`;
-  }
-  function mountGame2(box2, host) {
-    let disposed = false;
-    let raf = 0;
-    const root = document.createElement("div");
-    root.className = "goei-game";
-    const style = document.createElement("style");
-    style.textContent = style_default4;
-    root.innerHTML = `
-    <div class="gg-top"><span class="gg-place"></span><span class="gg-steps"></span><span class="gg-depth"></span><span class="gg-sp"></span>
-      <button class="gg-tb" data-act="squad">편성</button><button class="gg-tb" data-act="rec">기록</button></div>
-    <div class="gg-stage"><canvas aria-label="관리국 순찰 화면"></canvas><div class="gg-load">불러오는 중</div></div>
-    <div class="gg-squad"></div>
-    <div class="gg-sheet" hidden></div>`;
-    box2.append(style, root);
-    const $ = (sel) => root.querySelector(sel);
-    const canvas = $("canvas");
-    const stage = $(".gg-stage");
-    const squadEl = $(".gg-squad");
-    const sheet2 = $(".gg-sheet");
-    const renderer = new Renderer(canvas);
-    let meta = readMeta(null);
-    let run = null;
-    let dirty = false;
-    let lastSave = Date.now();
-    let saving = false;
-    let speed = host.waiting() ? TUNE.waitingSpeed : 1;
-    let picking = [];
-    const save2 = (force = false) => {
-      if (!dirty || saving || !force && Date.now() - lastSave < TUNE.saveGap) return;
-      dirty = false;
-      saving = true;
-      lastSave = Date.now();
-      host.save(JSON.stringify(meta)).catch(() => dirty = true).finally(() => saving = false);
-    };
-    const fit3 = () => {
-      renderer.layout(stage.clientWidth, stage.clientHeight, window.devicePixelRatio || 1);
-      if (run) renderer.draw(run, true);
-    };
-    const ro = new ResizeObserver(() => !disposed && fit3());
-    ro.observe(stage);
-    let topKey = "";
-    const drawTop = () => {
-      if (!run) return;
-      const camp = run.phase === "camp" || run.phase === "retreat" && run.pt > 0.6;
-      const key2 = `${camp}|${run.room}|${run.depth}`;
-      if (key2 === topKey) return;
-      topKey = key2;
-      $(".gg-place").textContent = camp ? CAMP.name : ROOMS2[run.rooms[run.room]].name;
-      $(".gg-depth").textContent = `순찰 ${run.depth}`;
-      $(".gg-steps").innerHTML = camp ? "" : [0, 1, 2].map((i) => `<i class="${i < run.room ? "done" : i === run.room ? "now" : ""}${i === 2 ? " boss" : ""}"></i>`).join("");
-    };
-    let cardKey = "";
-    const drawCards = () => {
-      if (!run) return;
-      const team = [...agents(run)].sort((a, b) => meta.squad.indexOf(a.kind) - meta.squad.indexOf(b.kind));
-      const key2 = team.map((u) => u.uid).join(",");
-      if (key2 !== cardKey) {
-        cardKey = key2;
-        squadEl.innerHTML = team.map((u) => {
-          const d3 = agentDef(u.kind);
-          return `<button class="gg-ag" data-uid="${u.uid}" aria-label="${esc6(d3.name)} ${esc6(d3.skillName)}">
-          <span class="gg-face" style="${faceStyle(d3.id, 40)}"></span><span class="gg-nm">${esc6(d3.name)}</span>
-          <span class="gg-bar hp"><b></b></span><span class="gg-bar sk"><b></b></span></button>`;
-        }).join("");
-      }
-      const foesUp = run.units.some((u) => u.side === "e" && alive(u));
-      for (const u of team) {
-        const el = squadEl.querySelector(`[data-uid="${u.uid}"]`);
-        if (!el) continue;
-        const hp = u.hp / u.max;
-        el.querySelector(".hp b").style.transform = `scaleX(${hp.toFixed(3)})`;
-        el.querySelector(".sk b").style.transform = `scaleX(${Math.min(1, u.gauge).toFixed(3)})`;
-        el.classList.toggle("ready", u.gauge >= 1 && alive(u) && run.phase === "patrol" && foesUp);
-        el.classList.toggle("down", !alive(u) && u.act !== "rest");
-        el.classList.toggle("low", hp < 0.3);
-      }
-    };
-    const openSquad = () => {
-      picking = [...meta.squad];
-      sheet2.hidden = false;
-      drawSquadSheet();
-    };
-    const drawSquadSheet = () => {
-      sheet2.innerHTML = `<div class="gg-sh-head"><b>분대 편성</b><span class="gg-depth">${picking.length} / 4</span><button class="gg-tb" data-act="close">닫기</button></div>
-      <div class="gg-sh-body"><div class="gg-pick">${AGENTS3.map((a) => `<button class="gg-pk${picking.includes(a.id) ? " on" : ""}" data-pick="${a.id}">
-        <span class="gg-face" style="${faceStyle(a.id, 48)}"></span><b>${esc6(a.name)}</b><small>${esc6(a.role)} · ${esc6(a.skillName)}</small></button>`).join("")}</div></div>
-      <div class="gg-sh-foot"><button class="gg-tb primary" data-act="apply"${picking.length === 4 ? "" : " disabled"}>이 분대로 출발</button></div>`;
-    };
-    const openRecord = () => {
-      sheet2.hidden = false;
-      const kills = Object.keys(ENEMIES).map((k) => `<dt>${esc6(ENEMIES[k].name)}</dt><dd>${meta.kills[k] ?? 0}</dd>`).join("");
-      sheet2.innerHTML = `<div class="gg-sh-head"><b>순찰 기록</b><button class="gg-tb" data-act="close">닫기</button></div>
-      <div class="gg-sh-body"><dl class="gg-rec">
-        <dt>가장 깊은 순찰</dt><dd>${meta.best}</dd><dt>마친 순찰</dt><dd>${meta.patrols}</dd><dt>후퇴</dt><dd>${meta.wipes}</dd>
-        <dt class="gg-sec">처치</dt>${kills}</dl></div>`;
-    };
-    root.addEventListener("click", (ev) => {
-      const t = ev.target.closest("button");
-      if (!t || !run) return;
-      const act2 = t.dataset.act;
-      if (act2 === "squad") return openSquad();
-      if (act2 === "rec") return openRecord();
-      if (act2 === "close") return void (sheet2.hidden = true);
-      if (act2 === "apply" && picking.length === 4) {
-        applySquad(run, meta, picking);
-        dirty = true;
-        cardKey = topKey = "";
-        sheet2.hidden = true;
-        return;
-      }
-      if (t.dataset.pick) {
-        const id = t.dataset.pick;
-        if (picking.includes(id)) picking = picking.filter((x) => x !== id);
-        else if (picking.length < 4) picking.push(id);
-        return drawSquadSheet();
-      }
-      if (t.dataset.uid) trigger(run, Number(t.dataset.uid));
-    });
-    const unwait = host.onWaiting((w) => speed = w ? TUNE.waitingSpeed : 1);
-    let acc = 0;
-    let prev = 0;
-    let uiT = 0;
-    const frame2 = (now) => {
-      if (disposed) return;
-      raf = requestAnimationFrame(frame2);
-      if (!run || document.hidden) {
-        prev = now;
-        return;
-      }
-      const dt = Math.min(0.25, prev ? (now - prev) / 1e3 : 0);
-      prev = now;
-      acc += dt * speed;
-      while (acc >= STEP4) {
-        acc -= STEP4;
-        if (step2(run, meta, STEP4, renderer.w).changed) dirty = true;
-      }
-      renderer.draw(run);
-      uiT += dt;
-      if (uiT > 0.1) {
-        uiT = 0;
-        drawTop();
-        drawCards();
-        save2();
-      }
-    };
-    void (async () => {
-      try {
-        const art6 = await host.art();
-        faces2 = art6.url(FACE_FILE);
-        const [raw] = await Promise.all([host.load().catch(() => null), renderer.load(art6)]);
-        if (disposed) return;
-        meta = readMeta(raw);
-        run = lastRun && lastRun.squad === meta.squad.join() ? lastRun.run : newRun(meta);
-        $(".gg-load").remove();
-        fit3();
-        drawTop();
-        drawCards();
-        raf = requestAnimationFrame(frame2);
-      } catch {
-        if (!disposed) $(".gg-load").textContent = "그림을 불러오지 못했습니다";
-      }
-    })();
-    return () => {
-      if (disposed) return;
-      disposed = true;
-      cancelAnimationFrame(raf);
-      ro.disconnect();
-      unwait();
-      if (run) lastRun = { run, squad: meta.squad.join() };
-      save2(true);
-      style.remove();
-      root.remove();
-    };
-  }
-
-  // src/game/action/style.css
-  var style_default5 = ".ga {\n  width: 100%;\n  height: 100%;\n  min-height: 0;\n  display: flex;\n  flex-direction: column;\n  background: #09121c;\n  color: #e6e2cd;\n  font: 13px monospace;\n  box-sizing: border-box;\n  overflow: hidden;\n  outline: none;\n  color-scheme: dark;\n}\n.ga * {\n  box-sizing: border-box;\n}\n.ga button {\n  font: inherit;\n  color: inherit;\n  background: #172b3b;\n  border: 2px solid #667e86;\n  border-radius: 0;\n  padding: 7px 10px;\n  cursor: pointer;\n  touch-action: none;\n}\n.ga button:focus-visible {\n  outline: 3px solid #ffd899;\n  outline-offset: 1px;\n}\n.ga button:disabled {\n  opacity: 0.4;\n  cursor: default;\n}\n.ga-hud {\n  display: flex;\n  flex-wrap: wrap;\n  gap: 8px;\n  align-items: center;\n  padding: 8px;\n  border-bottom: 2px solid #354e5b;\n}\n.ga-hud progress {\n  width: 95px;\n  height: 10px;\n  accent-color: #e3a666;\n}\n.ga-hud span {\n  white-space: nowrap;\n}\n.ga-fit {\n  flex: 1;\n  min-height: 0;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  position: relative;\n  background: #040a10;\n  overflow: hidden;\n}\n.ga canvas {\n  display: block;\n  image-rendering: pixelated;\n  touch-action: none;\n  outline: none;\n}\n.ga-foot {\n  flex: none;\n  display: flex;\n  flex-wrap: wrap;\n  align-items: center;\n  gap: 5px;\n  padding: 6px;\n  border-top: 2px solid #354e5b;\n}\n.ga-note {\n  font-size: 11px;\n  color: #a9bdc3;\n  padding: 4px 8px;\n  margin: 0;\n}\n.ga-msg {\n  flex: 1;\n  min-width: 140px;\n  color: #ffda9b;\n}\n.ga-controls {\n  display: flex;\n  gap: 5px;\n  flex-wrap: wrap;\n}\n.ga-menu {\n  position: absolute;\n  inset: 0;\n  background: #07121aef;\n  display: flex;\n  flex-direction: column;\n  align-items: center;\n  justify-content: center;\n  gap: 16px;\n  padding: 20px;\n  text-align: center;\n  z-index: 2;\n}\n.ga-menu[hidden] {\n  display: none;\n}\n.ga-menu p {\n  max-width: 500px;\n  margin: 0;\n  line-height: 1.8;\n}\n.ga [data-busy] {\n  color: #a9bdc3;\n}\n.ga[data-save-error='true'] [data-busy] {\n  color: #ff9981;\n}\n@media (max-width: 760px) {\n  .ga {\n    font-size: 11px;\n  }\n  .ga-hud {\n    gap: 5px;\n    padding: 4px;\n  }\n  .ga-hud progress {\n    width: 52px;\n  }\n  .ga button {\n    padding: 7px;\n    min-height: 40px;\n  }\n  .ga-foot {\n    gap: 4px;\n  }\n  .ga-controls {\n    flex: 1;\n    justify-content: flex-end;\n  }\n  .ga-note {\n    font-size: 10px;\n  }\n  .ga-msg {\n    width: 100%;\n    flex: auto;\n    order: 2;\n  }\n  .ga-controls button {\n    min-width: 44px;\n    min-height: 44px;\n  }\n}\n\n.ga-stick {\n  position: relative;\n  flex: none;\n  width: 110px;\n  height: 90px;\n  border: 2px solid #607b89;\n  background: repeating-linear-gradient(0deg, #162633 0 15px, #1c303c 15px 16px);\n  touch-action: none;\n  user-select: none;\n  display: grid;\n  place-items: center;\n  overflow: hidden;\n}\n.ga-stick span {\n  position: absolute;\n  top: 3px;\n  font-size: 10px;\n  color: #9cb7c4;\n}\n.ga-stick i {\n  display: block;\n  width: 34px;\n  height: 30px;\n  border: 3px solid #d8b981;\n  background: #2e4b5c;\n  pointer-events: none;\n}\n@media (max-width: 760px) {\n  .ga-foot {\n    display: grid;\n    grid-template-columns: 132px minmax(0, 1fr);\n    gap: 6px;\n    padding: 6px;\n  }\n  .ga-stick {\n    width: 124px;\n    height: 124px;\n    align-self: center;\n    grid-column: 1;\n    grid-row: 1;\n  }\n  .ga-controls {\n    display: grid;\n    grid-template-columns: repeat(3, minmax(0, 1fr));\n    gap: 4px;\n    grid-column: 2;\n    grid-row: 1;\n  }\n  .ga-controls button {\n    padding: 3px;\n    min-width: 0;\n    min-height: 44px;\n    font-size: 10px;\n  }\n  .ga-msg {\n    grid-column: 1/-1;\n    grid-row: 2;\n    min-width: 0;\n  }\n  .ga-foot [data-busy] {\n    grid-column: 1;\n    grid-row: 3;\n  }\n  .ga-foot > [data-do='restart'] {\n    grid-column: 2;\n    grid-row: 3;\n  }\n  .ga-note {\n    line-height: 1.6;\n  }\n}\n";
-
-  // src/game/action/space.ts
-  var SCENE = {
-    width: 1280,
-    height: 720,
-    backgroundWidth: 640,
-    backgroundHeight: 360,
-    floorBack: 460,
-    floorMin: 480,
-    floorMax: 680,
-    referenceY: 530,
-    nativeAdultHeight: 128,
-    actorScale: 2,
-    adultHeight: 256,
-    enemyScale: 2,
-    doorHeight: 340
-  };
-  function depthScale(_footY) {
-    return 1;
-  }
-  var GAIT = { walk: 160, run: 192, crouch: 112 };
-  var MOTION = { walkSpeed: 200, runSpeed: 360 };
-
-  // src/game/action/motion.ts
-  var ATTACK = {
-    melee1: {
-      ticks: [4, 1, 2, 3, 6],
-      contact: 5,
-      damage: 18,
-      reach: 124,
-      stop: 3,
-      push: 18
-    },
-    melee2: {
-      ticks: [4, 1, 2, 4, 7],
-      contact: 5,
-      damage: 24,
-      reach: 132,
-      stop: 3,
-      push: 24
-    },
-    melee3: {
-      ticks: [5, 3, 1, 3, 6, 10],
-      contact: 9,
-      damage: 38,
-      reach: 148,
-      stop: 5,
-      push: 66
-    },
-    lowkick: {
-      ticks: [5, 3, 11],
-      contact: 5,
-      damage: 22,
-      reach: 150,
-      stop: 3,
-      push: 26
-    },
-    airattack: {
-      ticks: [4, 5, 9],
-      contact: 4,
-      damage: 26,
-      reach: 155,
-      stop: 4,
-      push: 35
-    },
-    dashattack: {
-      ticks: [4, 2, 4, 12],
-      contact: 6,
-      damage: 32,
-      reach: 142,
-      stop: 4,
-      push: 48
-    }
-  };
-  var strikeDuration = (name) => ATTACK[name].ticks.reduce((a, b) => a + b, 0) / 60;
-  var strikeContact = (name) => ATTACK[name].contact / 60;
-  function isStrike(name) {
-    return name in ATTACK;
-  }
-
-  // src/game/action/sim.ts
-  var WIDTH = 1280;
-  var HEIGHT2 = 720;
-  var SAVE_VERSION2 = 4;
-  var clamp2 = (n, lo, hi) => Math.max(lo, Math.min(hi, n));
-  var body = (id, kind, x, y, hp) => ({
-    id,
-    kind,
-    x,
-    y,
-    z: 0,
-    vz: 0,
-    dir: kind === "jyaldi" ? 1 : -1,
-    hp,
-    max: hp,
-    act: "idle",
-    t: 0,
-    duration: 0,
-    fired: false,
-    inv: 0,
-    flash: 0,
-    cooldown: 0,
-    armor: false,
-    stride: 0,
-    speed: 0,
-    push: 0
-  });
-  function newRun2() {
-    return {
-      version: SAVE_VERSION2,
-      player: {
-        ...body(1, "jyaldi", 220, 510, 200),
-        energy: 100,
-        gauge: 100,
-        guard: 100,
-        dashCd: 0,
-        items: [3, 2, 2],
-        attackBuffer: 0,
-        crouching: false
-      },
-      enemies: [
-        body(2, "corner", 760, 480, 130),
-        body(3, "watchman", 1030, 560, 145),
-        body(4, "corner", 1130, 510, 130),
-        body(5, "watchman", 940, 610, 145)
-      ],
-      bolts: [],
-      effects: [],
-      time: 0,
-      auto: false,
-      phase: "combat",
-      nextId: 6,
-      cutin: 0,
-      hitstop: 0,
-      kills: 0,
-      message: "Z 가까이서 3연계 · 멀리서 권총 / Shift 유지 달리기",
-      shake: 0,
-      practice: false
-    };
-  }
-  function practiceRun() {
-    const r = newRun2();
-    r.practice = true;
-    r.player.x = 440;
-    r.player.y = 570;
-    r.message = "동작 훈련 · 수동 표적 / Z 약약강 · A+↓ 앉기 · Shift+→+Z 대시공격";
-    r.enemies.forEach((e, i) => {
-      e.x = i ? 1200 : 530;
-      e.y = i ? 680 : 570;
-      e.hp = i ? 0 : 1e3;
-      e.max = i ? e.max : 1e3;
-      if (i) {
-        e.act = "dead";
-        e.t = 2;
-      }
-    });
-    r.kills = 3;
-    return r;
-  }
-  function act(b, name, duration) {
-    b.act = name;
-    b.t = 0;
-    b.duration = duration;
-    b.fired = false;
-  }
-  function fx(r, kind, x, y, z = 65) {
-    if (r.effects.length >= 64) r.effects.shift();
-    const duration = kind === "blast" ? 0.55 : 0.22;
-    r.effects.push({ x, y, z, t: 0, duration, kind });
-  }
-  function facing(a, b) {
-    return (b.x - a.x) * a.dir >= -8;
-  }
-  function damage2(r, b, amount, source, down2 = false, stop = down2 ? 5 / 60 : 3 / 60, push = down2 ? 66 : 18) {
-    if (b.hp <= 0 || b.inv > 0) return false;
-    const p = r.player;
-    if (b === p && ["guard", "crouch", "crouchwalk"].includes(p.act) && facing(p, source) && p.guard > 0) {
-      p.guard = Math.max(0, p.guard - amount * 2);
-      p.flash = 0.08;
-      fx(r, "guard", p.x + p.dir * 40, p.y, p.act === "crouch" ? 105 : 165);
-      if (!p.guard) {
-        act(p, "stun", 0.65);
-        r.message = "가드 붕괴! 거리를 확보하세요.";
-      }
-      return false;
-    }
-    b.hp = Math.max(0, b.hp - amount);
-    b.flash = 0.12;
-    const impactHeight = source.act === "lowkick" ? 35 : source.act === "airattack" ? Math.min(190, source.z + 105) : 165;
-    fx(r, "hit", b.x, b.y, b.z + impactHeight);
-    r.hitstop = Math.max(r.hitstop, stop);
-    r.shake = Math.max(r.shake, down2 ? 6 : 2);
-    b.push = source.dir * push * 8;
-    if (b === p) {
-      p.inv = 0.5;
-      p.gauge = clamp2(p.gauge + 7, 0, 100);
-    } else p.gauge = clamp2(p.gauge + amount * 0.35, 0, 100);
-    if (b.hp <= 0) {
-      act(b, "dead", 1);
-      if (b !== p) r.kills++;
-    } else if (!b.armor) act(b, down2 ? "down" : "hurt", down2 ? 0.9 : 0.23);
-    return true;
-  }
-  function move2(b, x, y, speed, dt, face2 = true) {
-    const len = Math.max(1, Math.hypot(x, y)), ox = b.x, oy = b.y;
-    b.x = clamp2(b.x + x / len * speed * dt, 55, WIDTH - 55);
-    b.y = clamp2(b.y + y / len * speed * dt, SCENE.floorMin, SCENE.floorMax);
-    const distance = Math.hypot(b.x - ox, b.y - oy);
-    b.speed = Math.min(1200, distance / dt);
-    if (b.z === 0 && b.act !== "dash")
-      b.stride = (b.stride + distance / (b.act === "run" ? GAIT.run : b.act === "crouchwalk" ? GAIT.crouch : GAIT.walk)) % 1;
-    if (x && face2) b.dir = x > 0 ? 1 : -1;
-  }
-  function nearTarget(r) {
-    const p = r.player;
-    return r.enemies.find(
-      (e) => e.hp > 0 && (e.x - p.x) * p.dir >= -8 && Math.abs(e.x - p.x) < 118 && Math.abs(e.y - p.y) < 32 && (p.z > 0 ? p.z < 150 && e.z < 60 : Math.abs(e.z - p.z) < 60)
-    );
-  }
-  function bolt(r, b, enemy) {
-    if (r.bolts.length >= 48) return;
-    const muzzleX = enemy ? 48 : b.z > 0 ? 60 : 96;
-    const muzzleHeight = enemy ? 135 : b.z > 0 ? 215 : 178;
-    r.bolts.push({
-      id: r.nextId++,
-      x: b.x + b.dir * muzzleX,
-      y: b.y,
-      z: b.z + muzzleHeight,
-      vx: b.dir * (enemy ? 410 : 1e3),
-      life: 1.7,
-      enemy
-    });
-    fx(r, "shot", b.x + b.dir * muzzleX, b.y, b.z + muzzleHeight);
-  }
-  function item(r, i) {
-    const p = r.player;
-    if (!Number.isInteger(i) || i < 0 || i > 2 || p.items[i] <= 0 || p.hp <= 0) return;
-    if (i === 0) {
-      if (p.hp >= p.max) return;
-      p.hp = Math.min(p.max, p.hp + 70);
-    }
-    if (i === 1) {
-      if (p.guard >= 100) return;
-      p.guard = 100;
-    }
-    if (i === 2) {
-      if (p.energy >= 100) return;
-      p.energy = 100;
-    }
-    p.items[i]--;
-    r.message = ["회복제 사용", "방어 회복제 사용", "능력 회복제 사용"][i];
-  }
-  function autoInput(r) {
-    const p = r.player, live = r.enemies.filter((e2) => e2.hp > 0);
-    const e = live.sort(
-      (a, b) => Math.hypot(a.x - p.x, a.y - p.y) - Math.hypot(b.x - p.x, b.y - p.y)
-    )[0];
-    if (!e) return { x: 0, y: 0 };
-    const dx = e.x - p.x, dy = e.y - p.y, threat = live.find(
-      (e2) => e2.act === "shot" && e2.duration - e2.t < 0.25 && Math.abs(e2.y - p.y) < 30
-    );
-    return {
-      x: Math.abs(dy) > 22 ? 0 : Math.abs(dx) > 100 ? Math.sign(dx) : 0,
-      run: Math.abs(dx) > 260,
-      y: threat ? p.y > 540 ? -1 : 1 : Math.abs(dy) > 12 ? Math.sign(dy) : 0,
-      attack: Math.abs(dy) < 26 && (Math.abs(dx) < 120 || Math.abs(dx) > 360 && r.time % 1.8 < 0.45),
-      skill: Math.abs(dx) < 390 && Math.abs(dy) < 70 && p.energy >= 35,
-      dash: !!threat,
-      ult: p.gauge >= 100 && live.length >= 2,
-      item: p.hp < 95 ? 0 : void 0
-    };
-  }
-  function step3(r, raw, dt) {
-    if (!Number.isFinite(dt) || dt <= 0) return;
-    dt = Math.min(dt, 1 / 30);
-    r.effects = r.effects.filter((f) => (f.t += dt) < f.duration);
-    r.shake = Math.max(0, r.shake - dt * 24);
-    if (r.phase !== "combat") {
-      r.player.t += dt;
-      for (const enemy of r.enemies) if (enemy.act === "dead") enemy.t += dt;
-      return;
-    }
-    const p = r.player, input = r.auto ? autoInput(r) : raw;
-    p.attackBuffer = input.attack ? 0.12 : Math.max(0, p.attackBuffer - dt);
-    if (r.cutin > 0) {
-      r.cutin = Math.max(0, r.cutin - dt);
-      return;
-    }
-    if (r.hitstop > 0) {
-      r.hitstop = Math.max(0, r.hitstop - dt);
-      return;
-    }
-    r.time += dt;
-    for (const b of [p, ...r.enemies]) {
-      b.t += dt;
-      b.inv = Math.max(0, b.inv - dt);
-      b.flash = Math.max(0, b.flash - dt);
-      b.cooldown = Math.max(0, b.cooldown - dt);
-      if (b.push) {
-        b.x = clamp2(b.x + b.push * dt, 55, WIDTH - 55);
-        b.push *= Math.exp(-dt * 10);
-        if (Math.abs(b.push) < 1) b.push = 0;
-      }
-      if (b.z > 0 || b.vz > 0) {
-        b.vz -= 1e3 * dt;
-        b.z = Math.max(0, b.z + b.vz * dt);
-        if (!b.z) {
-          b.vz = 0;
-          if (b === p && ["jump", "walk", "run", "idle", "airattack", "shot"].includes(b.act))
-            act(b, "land", 0.12);
-        }
-      }
-      if (b.act === "down" && b.t >= b.duration) {
-        act(b, "rise", 0.35);
-        b.inv = 0.55;
-      } else if (!["dead", "idle", "walk", "run", "jump", "guard", "crouch", "crouchwalk"].includes(b.act) && b.t >= b.duration) {
-        const next = b === p && p.attackBuffer > 0 && b.z === 0 && b.act === "melee1" ? "melee2" : b === p && p.attackBuffer > 0 && b.z === 0 && b.act === "melee2" ? "melee3" : null;
-        if (next) {
-          act(b, next, strikeDuration(next));
-          p.attackBuffer = 0;
-        } else {
-          if (b === p && b.act === "melee3") b.cooldown = 0.18;
-          act(b, "idle", 0);
-        }
-        b.armor = false;
-      }
-    }
-    p.energy = Math.min(100, p.energy + dt * 9);
-    p.dashCd = Math.max(0, p.dashCd - dt);
-    if (p.act !== "guard" && p.act !== "crouch") p.guard = Math.min(100, p.guard + dt * 15);
-    if (input.item !== void 0) item(r, input.item);
-    if (["idle", "walk", "run", "jump", "guard", "crouch", "crouchwalk"].includes(p.act)) {
-      if (r.auto) {
-        const target = r.enemies.filter((e) => e.hp > 0).sort((a, b) => Math.hypot(a.x - p.x, a.y - p.y) - Math.hypot(b.x - p.x, b.y - p.y))[0];
-        if (target) p.dir = target.x >= p.x ? 1 : -1;
-      }
-      if (input.x && !r.auto) p.dir = input.x > 0 ? 1 : -1;
-      if (input.jump && p.z === 0) {
-        p.vz = 600;
-        p.crouching = false;
-      }
-      if (input.guard && input.y > 0 && !p.z && !p.vz) p.crouching = true;
-      if (!input.guard) p.crouching = false;
-      if (input.ult && p.gauge >= 100) {
-        p.gauge = 0;
-        act(p, "ult", 0.9);
-        p.armor = true;
-        p.inv = 1.05;
-        r.cutin = 0.75;
-        r.message = "집중 파괴";
-      } else if (input.dash && p.dashCd <= 0) {
-        if (input.x) p.dir = Math.sign(input.x);
-        act(p, "dash", 0.3);
-        p.inv = 0.24;
-        p.dashCd = 0.8;
-      } else if (input.guard && !p.z && !p.vz) {
-        p.act = p.crouching ? input.x ? "crouchwalk" : "crouch" : "guard";
-        if (input.x) p.dir = Math.sign(input.x);
-        if (p.crouching && p.attackBuffer > 0 && p.cooldown <= 0) {
-          act(p, "lowkick", strikeDuration("lowkick"));
-          p.attackBuffer = 0;
-          p.cooldown = 0.35;
-        } else if (p.act === "crouchwalk") move2(p, input.x, 0, 85, dt);
-      } else if (input.skill && p.energy >= 35) {
-        p.energy -= 35;
-        act(p, "skill", 0.48);
-        p.armor = true;
-      } else if (p.attackBuffer > 0 && p.cooldown <= 0) {
-        p.attackBuffer = 0;
-        if ((p.z > 0 || p.vz > 0) && nearTarget(r)) {
-          act(p, "airattack", strikeDuration("airattack"));
-        } else if (!p.z && !p.vz && input.run && input.x) {
-          act(p, "dashattack", strikeDuration("dashattack"));
-        } else if (!p.z && !p.vz && nearTarget(r)) {
-          act(p, "melee1", strikeDuration("melee1"));
-          p.cooldown = 0;
-        } else {
-          act(p, "shot", 0.24);
-          p.cooldown = 0.28;
-        }
-      } else {
-        const x = clamp2(input.x, -1, 1), y = clamp2(input.y, -1, 1);
-        const running = !!input.run;
-        p.act = p.z > 0 || p.vz > 0 ? "jump" : x || y ? running ? "run" : "walk" : "idle";
-        move2(p, x, y, p.z ? 240 : running ? MOTION.runSpeed : MOTION.walkSpeed, dt, !r.auto);
-      }
-    }
-    if (p.act === "dash" && p.attackBuffer > 0 && p.t < 0.16) {
-      act(p, "dashattack", strikeDuration("dashattack"));
-      p.attackBuffer = 0;
-      p.inv = 0;
-    }
-    if (p.act === "dash" && p.t >= 0.04 && p.t < 0.16) move2(p, input.x || p.dir, input.y, 1200, dt);
-    if (p.act === "dashattack" && p.t < strikeContact("dashattack"))
-      move2(p, p.dir, 0, 420, dt, false);
-    if (p.act === "airattack" && p.z > 0) move2(p, p.dir, 0, 160, dt, false);
-    if (isStrike(p.act) && p.t >= strikeContact(p.act) && !p.fired) {
-      p.fired = true;
-      const finish = p.act === "melee3", attack2 = ATTACK[p.act];
-      const oldX = p.x;
-      let connected = false;
-      for (const e of r.enemies)
-        if (e.hp > 0 && (e.x - oldX) * p.dir >= -8 && Math.abs(e.x - oldX) < attack2.reach && Math.abs(e.y - p.y) < 35 && (p.act === "airattack" ? p.z < 150 && e.z < 60 : Math.abs(e.z - p.z) < 60))
-          connected = damage2(
-            r,
-            e,
-            attack2.damage,
-            p,
-            finish || p.act === "dashattack",
-            attack2.stop / 60,
-            attack2.push
-          ) || connected;
-      if (connected) p.t = strikeContact(p.act);
-      if (finish && connected) fx(r, "blast", p.x + p.dir * 120, p.y, 150);
-      r.message = p.act === "lowkick" ? "하단차기" : p.act === "airattack" ? "공중차기" : p.act === "dashattack" ? "대시 어깨치기" : finish ? "근접 3타 · 파괴 충격" : p.act === "melee2" ? "근접 2타 · 오른 장타" : "근접 1타 · 왼 장타";
-      if (connected) return;
-    }
-    if (p.act === "shot" && p.t >= 0.03 && !p.fired) {
-      p.fired = true;
-      bolt(r, p, false);
-    }
-    if ((p.act === "skill" || p.act === "ult") && p.t >= (p.act === "ult" ? 0.3 : 0.14) && !p.fired) {
-      p.fired = true;
-      const ultimate = p.act === "ult", x = p.x + p.dir * (ultimate ? 280 : 190);
-      fx(r, "blast", x, p.y, 70);
-      for (const e of r.enemies)
-        if (e.hp > 0 && Math.abs(e.x - x) < (ultimate ? 550 : 220) && Math.abs(e.y - p.y) < (ultimate ? 260 : 100))
-          damage2(r, e, ultimate ? 70 : 45, p, true);
-    }
-    for (const e of r.enemies) {
-      if (r.practice) continue;
-      if (e.hp <= 0 || ["hurt", "down", "rise"].includes(e.act)) continue;
-      if (e.act === "shot") {
-        if (!e.fired && e.t >= e.duration - 0.12) {
-          e.fired = true;
-          if (e.kind === "watchman") bolt(r, e, true);
-          else if (Math.abs(p.x - e.x) < 115 && Math.abs(p.y - e.y) < 42 && p.z < 55 && facing(e, p))
-            damage2(r, p, 16, e, true);
-        }
-        continue;
-      }
-      const dx = p.x - e.x, dy = p.y - e.y, range2 = e.kind === "watchman" ? 550 : 90;
-      e.dir = dx >= 0 ? 1 : -1;
-      if (Math.abs(dx) < range2 && Math.abs(dy) < 25 && e.cooldown <= 0) {
-        act(e, "shot", e.kind === "watchman" ? 0.85 : 0.65);
-        e.cooldown = e.kind === "watchman" ? 1.7 : 1.2;
-      } else {
-        move2(
-          e,
-          Math.abs(dx) > range2 * 0.8 ? Math.sign(dx) : 0,
-          Math.abs(dy) > 15 ? Math.sign(dy) : 0,
-          e.kind === "watchman" ? 75 : 125,
-          dt
-        );
-        e.act = "walk";
-      }
-    }
-    for (const b of r.bolts) {
-      const old = b.x;
-      b.x += b.vx * dt;
-      b.life -= dt;
-      const targets = b.enemy ? [p] : r.enemies;
-      const candidates = targets.filter(
-        (t) => t.hp > 0 && t.inv <= 0 && Math.abs(t.y - b.y) < 28 && b.z >= t.z + 10 && b.z <= t.z + (t.act === "crouch" ? 125 : 245) && Math.max(old, b.x) >= t.x - 28 && Math.min(old, b.x) <= t.x + 28
-      ).sort((a, c) => Math.abs(a.x - old) - Math.abs(c.x - old));
-      if (candidates[0]) {
-        damage2(r, candidates[0], b.enemy ? 12 : 18, {
-          ...p,
-          x: old,
-          dir: Math.sign(b.vx)
-        });
-        b.life = 0;
-      }
-    }
-    r.bolts = r.bolts.filter((b) => b.life > 0 && b.x > -30 && b.x < WIDTH + 30);
-    if (p.hp <= 0) {
-      r.phase = "evacuated";
-      act(p, "defeat", 0.8);
-      r.message = "작전 지속 불가 · 본부 후송";
-    } else if (!r.practice && r.enemies.every((e) => e.hp <= 0)) {
-      r.phase = "cleared";
-      act(p, "victory", 0.7);
-      r.message = "훈련 완료 · 전원 제압";
-    }
-  }
-  function serialize(r) {
-    return JSON.stringify(r);
-  }
-  function restore(raw) {
-    try {
-      if (!raw || raw.length > 12e4) return null;
-      const r = JSON.parse(raw);
-      if ([1, 2, 3].includes(r?.version) && r.player && Array.isArray(r.enemies)) {
-        for (const b of [r.player, ...r.enemies]) {
-          b.stride = b.stride ?? 0;
-          b.speed = b.speed ?? 0;
-          b.push = 0;
-          b.y = clamp2(b.y, SCENE.floorMin, SCENE.floorMax);
-        }
-        for (const bolt2 of r.bolts ?? []) bolt2.y = clamp2(bolt2.y, SCENE.floorMin, SCENE.floorMax);
-        r.version = SAVE_VERSION2;
-        r.shake = 0;
-        r.practice = false;
-        r.player.attackBuffer = 0;
-        r.player.crouching = false;
-      }
-      const finite = (n, lo, hi) => typeof n === "number" && Number.isFinite(n) && n >= lo && n <= hi;
-      const actions = [
-        "idle",
-        "walk",
-        "run",
-        "jump",
-        "land",
-        "melee1",
-        "melee2",
-        "melee3",
-        "shot",
-        "skill",
-        "ult",
-        "dash",
-        "guard",
-        "crouch",
-        "crouchwalk",
-        "lowkick",
-        "airattack",
-        "dashattack",
-        "stun",
-        "victory",
-        "defeat",
-        "hurt",
-        "down",
-        "rise",
-        "dead"
-      ];
-      const validBody = (b) => b && Number.isInteger(b.id) && finite(b.id, 1, 1e8) && ["jyaldi", "corner", "watchman"].includes(b.kind) && finite(b.x, 55, 1225) && finite(b.y, SCENE.floorMin, SCENE.floorMax) && finite(b.z, 0, 500) && finite(b.vz, -1500, 600) && (b.dir === 1 || b.dir === -1) && finite(b.max, 1, 1e3) && finite(b.hp, 0, b.max) && actions.includes(b.act) && finite(b.t, 0, 1e7) && finite(b.duration, 0, 10) && finite(b.inv, 0, 10) && finite(b.flash, 0, 10) && finite(b.cooldown, 0, 10) && typeof b.fired === "boolean" && typeof b.armor === "boolean" && finite(b.stride, 0, 1) && finite(b.speed, 0, 1200) && finite(b.push, -1200, 1200);
-      if (!r || r.version !== SAVE_VERSION2 || !validBody(r.player) || r.player.kind !== "jyaldi" || !Array.isArray(r.enemies) || r.enemies.length !== 4 || !r.enemies.every((e) => validBody(e) && e.kind !== "jyaldi") || new Set([r.player, ...r.enemies].map((b) => b.id)).size !== 5)
-        return null;
-      const p = r.player;
-      if (![p.energy, p.gauge, p.guard].every((n) => finite(n, 0, 100)) || !finite(p.dashCd, 0, 10) || !finite(p.attackBuffer, 0, 0.13) || typeof p.crouching !== "boolean" || !Array.isArray(p.items) || p.items.length !== 3 || !p.items.every((n) => Number.isInteger(n) && finite(n, 0, 9)))
-        return null;
-      if (!finite(r.time, 0, 1e7) || !finite(r.nextId, 6, 1e8) || !Number.isInteger(r.nextId) || !finite(r.kills, 0, 4) || !Number.isInteger(r.kills) || typeof r.auto !== "boolean" || !["combat", "cleared", "evacuated"].includes(r.phase) || !finite(r.cutin, 0, 1) || !finite(r.hitstop, 0, 1) || !finite(r.shake, 0, 10) || typeof r.practice !== "boolean" || typeof r.message !== "string" || r.message.length > 150)
-        return null;
-      if (r.phase === "combat" && (p.hp <= 0 || !r.practice && r.enemies.every((e) => !e.hp)) || r.phase === "cleared" && (p.hp <= 0 || r.enemies.some((e) => e.hp > 0)) || r.phase === "evacuated" && p.hp > 0)
-        return null;
-      if (!Array.isArray(r.bolts) || r.bolts.length > 48 || !r.bolts.every(
-        (b) => Number.isInteger(b.id) && finite(b.id, 1, 1e8) && finite(b.x, -30, 1310) && finite(b.y, SCENE.floorMin, SCENE.floorMax) && finite(b.z, 0, 600) && finite(b.vx, -1e3, 1e3) && finite(b.life, 0, 2) && typeof b.enemy === "boolean"
-      ))
-        return null;
-      r.effects = [];
-      return r;
-    } catch {
-      return null;
-    }
-  }
-
-  // src/game/action/animation.ts
-  function clipIndex(phase, frames, times) {
-    if (!frames.length) return 0;
-    const p = Math.max(0, Math.min(0.999999, phase));
-    if (!times || times.length !== frames.length) return Math.floor(p * frames.length);
-    const duration = times.reduce((sum, value) => sum + value, 0);
-    if (duration <= 0) return 0;
-    let cursor = p * duration;
-    for (let i = 0; i < times.length; i++) {
-      if (cursor < times[i]) return i;
-      cursor -= times[i];
-    }
-    return frames.length - 1;
-  }
-
-  // src/game/action/render.ts
-  var ActionRenderer = class {
-    constructor(canvas) {
-      this.canvas = canvas;
-      canvas.width = WIDTH;
-      canvas.height = HEIGHT2;
-      this.ctx = canvas.getContext("2d");
-    }
-    debugGround = false;
-    images = /* @__PURE__ */ new Map();
-    art = null;
-    disposed = false;
-    preview = null;
-    ctx;
-    async load(art6) {
-      this.art = art6;
-      await Promise.all(
-        ["a-jyaldi-action", "e-corner", "e-watchman", "bg-bureau-action"].map(async (name) => {
-          const img4 = new Image();
-          await new Promise((resolve, reject) => {
-            img4.onload = () => resolve();
-            img4.onerror = () => reject(new Error(`그림 읽기 실패: ${name}`));
-            img4.src = art6.url(name);
-          });
-          if (!this.disposed) this.images.set(name, img4);
-        })
-      );
-    }
-    dispose() {
-      this.disposed = true;
-      this.images.clear();
-      this.art = null;
-    }
-    rect(x, y, w, h, color) {
-      this.ctx.fillStyle = color;
-      this.ctx.fillRect(Math.round(x), Math.round(y), Math.round(w), Math.round(h));
-    }
-    sprite(b, frame2, scale = b.kind === "jyaldi" ? this.art?.atlas.action?.scale ?? 1 : SCENE.enemyScale, x = b.x, y = b.y - b.z) {
-      const f = (b.kind === "jyaldi" ? this.art?.atlas.action?.frames : this.art?.atlas[b.kind])?.[frame2] ?? null, img4 = this.images.get(b.kind === "jyaldi" ? "a-jyaldi-action" : `e-${b.kind}`);
-      if (!f || !img4) return;
-      scale *= depthScale(b.y);
-      const [sx, sy, w, h, ax, ay] = f, c = this.ctx;
-      c.save();
-      c.translate(Math.round(x), Math.round(y));
-      c.scale(b.dir, 1);
-      if (b.flash > 0) c.filter = "brightness(1.8)";
-      c.drawImage(
-        img4,
-        sx,
-        sy,
-        w,
-        h,
-        Math.round(-ax * scale),
-        Math.round(-ay * scale),
-        Math.round(w * scale),
-        Math.round(h * scale)
-      );
-      c.restore();
-    }
-    drawPose(run, clip, phase) {
-      const previousCutin = run.cutin;
-      this.preview = { clip: clip === "cutin" ? "idle" : clip, phase };
-      if (clip === "cutin") run.cutin = Math.max(1e-3, 0.75 * (1 - phase));
-      this.draw(run);
-      run.cutin = previousCutin;
-      this.preview = null;
-    }
-    frame(b, r) {
-      const progress = Math.min(0.999, b.t / Math.max(0.01, b.duration));
-      if (b.kind === "jyaldi") {
-        const clips = this.art?.atlas.action?.clips;
-        if (this.preview) {
-          const frames = clips?.[this.preview.clip] ?? clips?.idle ?? [0];
-          return frames[clipIndex(
-            this.preview.phase,
-            frames,
-            this.art?.atlas.action?.frameTimes?.[this.preview.clip]
-          )];
-        }
-        let name = b.act === "idle" ? "idle" : b.act;
-        if (name === "idle" && clips?.relaxed && !r.enemies.some((e) => e.hp > 0 && Math.abs(e.x - b.x) < 300 && Math.abs(e.y - b.y) < 70))
-          name = "relaxed";
-        if (b.act === "guard" && b.flash > 0) name = "guard_hit";
-        if ((b.z > 0 || b.vz > 0) && !["airattack", "shot", "skill", "ult", "hurt", "down", "dead"].includes(b.act))
-          name = b.vz > 100 ? "jump_up" : b.vz < -100 ? "jump_down" : "jump_apex";
-        if (name === "dead") name = "down";
-        if (name === "shot" && b.z > 0 && clips?.airfire) name = "airfire";
-        const clip = clips?.[name] ?? clips?.idle ?? [0];
-        const phase = b.act === "walk" || b.act === "run" || b.act === "crouchwalk" ? b.stride : name === "idle" ? r.time % 1.2 / 1.2 : name === "guard" || name === "crouch" ? r.time % 1 : name === "jump_up" ? Math.max(0, Math.min(0.999, (600 - b.vz) / 500)) : name === "jump_apex" ? Math.max(0, Math.min(0.999, (100 - b.vz) / 200)) : name === "jump_down" ? Math.min(0.999, -b.vz / 600) : progress;
-        return clip[clipIndex(phase, clip, this.art?.atlas.action?.frameTimes?.[name])];
-      }
-      if (b.act === "dead" || b.act === "down")
-        return b.t < 0.07 ? 20 : b.t < 0.15 ? 21 : b.t < 0.27 ? 22 : 23;
-      if (b.act === "rise") return b.t < 0.12 ? 22 : b.t < 0.24 ? 21 : 18;
-      if (b.act === "hurt") return progress < 0.4 ? 19 : 20;
-      if (b.act === "shot") return 7 + Math.min(4, Math.floor(progress * 5));
-      return b.act === "walk" ? Math.floor(b.stride * 6) % 6 : 0;
-    }
-    draw(r) {
-      const c = this.ctx, p = r.player;
-      c.setTransform(1, 0, 0, 1, 0, 0);
-      c.imageSmoothingEnabled = false;
-      this.rect(0, 0, WIDTH, HEIGHT2, "#0a111b");
-      const shake = Math.round(Math.sin((r.effects[0]?.t ?? 0) * 160) * r.shake / 2) * 2;
-      c.translate(shake, 0);
-      const bg = this.images.get("bg-bureau-action");
-      if (bg) c.drawImage(bg, 0, 0, WIDTH, HEIGHT2);
-      if (this.debugGround) {
-        for (let x = 0; x < WIDTH; x += 32)
-          this.rect(x, SCENE.floorMin, 1, SCENE.floorMax - SCENE.floorMin, "#b4e2e533");
-        for (let y = SCENE.floorMin; y <= SCENE.floorMax; y += 32)
-          this.rect(0, y, WIDTH, 1, "#b4e2e533");
-      }
-      for (const b of [...r.enemies, p].sort((a, b2) => a.y - b2.y)) {
-        if (b !== p && b.hp <= 0 && b.t > 1) continue;
-        const visualFrame = b.kind === "jyaldi" ? this.art?.atlas.action?.frames[this.frame(b, r)] : null;
-        const lift = visualFrame ? Math.max(0, visualFrame[5] - visualFrame[3]) * (this.art?.atlas.action?.scale ?? 2) : 0;
-        const ground = depthScale(b.y), air = Math.max(0.25, 1 - (b.z + lift) / 240);
-        this.rect(b.x - 32 * ground, b.y - 3, 64 * ground, 6, `rgba(0,6,10,${0.24 * air})`);
-        this.rect(b.x - 24 * ground, b.y - 2, 48 * ground, 4, `rgba(0,6,10,${0.28 * air})`);
-        if (b.kind === "jyaldi" && b.z === 0) {
-          const index = this.frame(b, r), contact = this.art?.atlas.action?.contacts?.[index] ?? [];
-          for (const [dx, dy] of contact)
-            this.rect(
-              b.x + dx * b.dir * ground * (this.art?.atlas.action?.scale ?? 2) - 7,
-              b.y + dy * ground * (this.art?.atlas.action?.scale ?? 2) - 1,
-              14,
-              3,
-              "#02070bc0"
-            );
-        }
-        if (b.act === "shot" && b.kind !== "jyaldi" && !b.fired) {
-          const x = b.dir > 0 ? b.x : b.x - (b.kind === "watchman" ? 600 : 100);
-          this.rect(x, b.y - 24, b.kind === "watchman" ? 600 : 100, 48, "#ff574433");
-          this.rect(b.x - 7, b.y - 280, 14, 20, "#ffb35c");
-        }
-        const jolt = b.act === "hurt" && b.flash > 0 ? Math.round(Math.sin(b.flash * 180) * 2) * 2 : 0;
-        this.sprite(b, this.frame(b, r), void 0, b.x + jolt, b.y - b.z);
-        if (b.act === "stun") {
-          for (let i = 0; i < 3; i++) {
-            const angle = r.time * 7 + i * Math.PI * 2 / 3;
-            const x = b.x + Math.cos(angle) * 28, y = b.y - b.z - 252 + Math.sin(angle) * 8;
-            this.rect(x - 4, y - 2, 8, 4, "#ffe6a1");
-            this.rect(x - 2, y - 4, 4, 8, "#ffe6a1");
-          }
-        }
-        if (b.armor && b.hp > 0) {
-          this.rect(b.x - 10, b.y + 8, 20, 3, "#e8bd72");
-        }
-        if (b.act === "guard" || b.act === "crouch" || b.act === "crouchwalk") {
-          const sy = b.y - (b.act === "crouch" ? 95 : 165);
-          for (let i = 0; i < 4; i++)
-            this.rect(b.x + b.dir * (34 + i * 3), sy + i * 5, 3, 10, "#8bdbe3aa");
-        }
-        if (b.kind !== "jyaldi" && b.hp > 0) {
-          const enemyFrame = this.art?.atlas[b.kind]?.[this.frame(b, r)];
-          const healthTop = b.y - (enemyFrame?.[5] ?? 120) * SCENE.enemyScale - 12;
-          this.rect(b.x - 34, healthTop, 68, 6, "#060c12");
-          this.rect(b.x - 34, healthTop, 68 * b.hp / b.max, 6, "#e9896d");
-        }
-        if (b === p && p.inv > 0) {
-          this.rect(p.x - 28, p.y + 5, 56, 3, "#90dfed");
-        }
-      }
-      for (const b of r.bolts) {
-        this.rect(b.x - 12, b.y - b.z, 24, 4, b.enemy ? "#ff7b6b" : "#ffe5ad");
-      }
-      for (const f of r.effects) {
-        const t = f.t / f.duration, radius = f.kind === "blast" ? 20 + t * 190 : 8 + t * 22, x = f.x, y = f.y - f.z;
-        c.globalAlpha = 1 - t;
-        const color = f.kind === "guard" ? "#9ce5ff" : "#ffd18b";
-        const rays = f.kind === "blast" ? 20 : 8;
-        for (let i = 0; i < rays; i++) {
-          const angle = i / rays * Math.PI * 2, rad = radius * (i % 2 ? 0.7 : 1);
-          const px = Math.round((x + Math.cos(angle) * rad) / 3) * 3, py = Math.round((y + Math.sin(angle) * rad * 0.65) / 3) * 3;
-          this.rect(px, py, f.kind === "blast" ? 6 : 3, f.kind === "blast" ? 6 : 3, color);
-        }
-        if (t < 0.35) {
-          this.rect(x - 5, y - 16, 10, 32, "#fff1d0");
-          this.rect(x - 16, y - 5, 32, 10, "#fff1d0");
-        }
-        c.globalAlpha = 1;
-      }
-      c.setTransform(1, 0, 0, 1, 0, 0);
-      if (r.cutin > 0) {
-        this.rect(0, 0, WIDTH, HEIGHT2, "#030b17bb");
-        this.rect(0, 165, WIDTH, 320, "#172c46");
-        for (let i = 0; i < 18; i++)
-          this.rect((i * 99 + r.cutin * 800) % WIDTH, 185 + i * 16, 140, 3, "#cc864b");
-        this.sprite(
-          { ...p, dir: 1 },
-          this.art?.atlas.action?.clips.cutin?.[Math.min(
-            (this.art?.atlas.action?.clips.cutin?.length ?? 1) - 1,
-            Math.floor((1 - r.cutin / 0.75) * (this.art?.atlas.action?.clips.cutin?.length ?? 1))
-          )] ?? 0,
-          (this.art?.atlas.action?.scale ?? 2) * 1.5,
-          340 + (1 - r.cutin / 0.75) * 80,
-          530
-        );
-        c.fillStyle = "#ffdf9e";
-        c.font = "bold 58px monospace";
-        c.fillText("집중 파괴", 660, 330);
-        c.font = "22px monospace";
-        c.fillText("쟈알디 · 집중 파괴", 665, 380);
-      }
-      if (r.phase !== "combat" && p.t > 0.8) {
-        this.rect(390, 52, 790, 150, "#07121aee");
-        c.strokeStyle = "#d9b67a";
-        c.lineWidth = 4;
-        c.strokeRect(390, 52, 790, 150);
-        c.fillStyle = "#f4dfb2";
-        c.font = "bold 42px monospace";
-        c.textAlign = "center";
-        c.fillText(r.phase === "cleared" ? "훈련 완료" : "본부 후송", 785, 115);
-        c.font = "24px monospace";
-        c.fillText("아래의 새 훈련 버튼으로 다시 시작", 785, 165);
-        c.textAlign = "left";
-      }
-    }
-  };
-
-  // src/game/action/index.ts
-  var writes = /* @__PURE__ */ new WeakMap();
-  function mountAction(box2, host) {
-    const root = document.createElement("section");
-    root.className = "ga";
-    root.tabIndex = 0;
-    root.setAttribute("aria-label", "쟈알디 1인 전투 검증판");
-    const style = document.createElement("style");
-    style.textContent = style_default5;
-    root.innerHTML = `<div class="ga-hud"><b>쟈알디 · 일반 체형 2배 도트 · 액션 v4</b><span>HP <progress data-meter="hp" max="200"></progress><span data-hp></span></span><span>능력 <progress data-meter="energy" max="100"></progress></span><span>방어 <progress data-meter="guard" max="100"></progress></span><span>필살 <progress data-meter="gauge" max="100"></progress></span><button data-do="auto">F 자동</button><button data-do="practice">동작 훈련</button><button data-do="pause">Esc 메뉴</button></div>
-  <div class="ga-fit"><canvas tabindex="0" aria-label="방향키 이동 Z 근접/사격 X 점프 C 능력 Shift 회피 A 방어 S 필살 QWE 아이템"></canvas><div class="ga-menu"><b data-menu-title>그림을 불러오는 중</b><p data-menu-text>기준 체형 전용 동작 · 1인 전투 시연판</p><button data-do="resume" disabled>계속</button><button data-do="restart" hidden>새 훈련</button></div></div>
-  <div class="ga-foot"><div class="ga-stick" aria-label="이동 조이스틱"><span>이동</span><i></i></div><div class="ga-controls"><button data-hold="attack">Z 근접/사격</button><button data-edge="jump">X 점프</button><button data-edge="skill">C 파괴</button><button data-edge="dash">⇧ 회피/달리기</button><button data-hold="guard">A 방어</button><button data-edge="ult">S 필살</button><button data-item="0">Q 회복</button><button data-item="1">W 방어</button><button data-item="2">E 능력</button></div><span class="ga-msg" aria-live="polite"></span><span data-busy></span><button data-do="restart">새 훈련</button></div><p class="ga-note">방 하나 · 적 4체 / A+↓ 앉기 · A 유지+←→ 앉아 이동 · 앉아 Z 하단차기 · Shift+이동+Z 대시공격 · 공중 근접 Z 차기 / 바닥 클릭 이동·적 클릭 공격·우클릭 회피 / 방향키 이동 · Z 근접/사격 · F 자동 전투</p>`;
-    box2.append(style, root);
-    const $ = (s2) => root.querySelector(s2);
-    const canvas = $("canvas"), fit3 = $(".ga-fit"), menu = $(".ga-menu"), renderer = new ActionRenderer(canvas);
-    let run = newRun2(), ready = false, disposed = false, paused = true, raf = 0, last = 0, acc = 0, dirty = false, saving = false, lastSave = 0, saveError = false;
-    let stickId = null, stickX = 0, stickY = 0;
-    const stick = $(".ga-stick"), thumb = $(".ga-stick i");
-    let target = null;
-    const keys2 = /* @__PURE__ */ new Set(), pointers = /* @__PURE__ */ new Map();
-    let edges2 = {};
-    const clear2 = () => {
-      keys2.clear();
-      pointers.clear();
-      edges2 = {};
-      target = null;
-      stickId = null;
-      stickX = stickY = 0;
-      thumb.style.transform = "translate(0,0)";
-    };
-    const text2 = (selector, value) => {
-      const e = $(selector);
-      if (e.textContent !== value) e.textContent = value;
-    };
-    const hud = () => {
-      const p = run.player;
-      if (root.dataset.action !== p.act) root.dataset.action = p.act;
-      for (const [name, value] of Object.entries({
-        hp: p.hp,
-        energy: p.energy,
-        guard: p.guard,
-        gauge: p.gauge
-      }))
-        $(`[data-meter="${name}"]`).value = value;
-      text2("[data-hp]", String(Math.ceil(p.hp)));
-      text2('[data-do="auto"]', run.auto ? "F 자동 ON" : "F 수동");
-      text2(".ga-msg", run.message);
-      text2(
-        "[data-busy]",
-        saveError ? "저장 실패 · 재시도 중" : saving ? "저장 중" : dirty ? "진행 중" : "저장됨"
-      );
-      root.dataset.saveError = String(saveError);
-      ["Q 회복", "W 방어", "E 능력"].forEach((label3, i) => {
-        const b = $(`[data-item="${i}"]`);
-        b.textContent = `${label3} ${p.items[i]}`;
-        b.disabled = run.phase !== "combat" || p.items[i] <= 0;
-      });
-    };
-    const save2 = async (force = false) => {
-      if (!ready || !dirty) return;
-      if (saving && !force) return;
-      if (!force && performance.now() - lastSave < 5e3) return;
-      const data = serialize(run);
-      dirty = false;
-      saving = true;
-      lastSave = performance.now();
-      const task = (writes.get(host) ?? Promise.resolve()).then(() => host.save(data));
-      writes.set(
-        host,
-        task.catch(() => {
-        })
-      );
-      try {
-        await task;
-        saveError = false;
-      } catch {
-        dirty = true;
-        saveError = true;
-      } finally {
-        saving = false;
-        if (!disposed) hud();
-      }
-    };
-    const pause = (value) => {
-      paused = value;
-      clear2();
-      acc = 0;
-      last = 0;
-      menu.hidden = !value;
-      text2("[data-menu-title]", "일시정지");
-      text2(
-        "[data-menu-text]",
-        "Q 회복제 · W 방어 회복 · E 능력 회복. 닫아도 출동 상태를 이어갑니다. F로 자동 전투를 켜고 끌 수 있습니다."
-      );
-      $('[data-do="resume"]').disabled = !ready;
-      if (value) void save2(true);
-    };
-    const restart = (practice = false) => {
-      if (!ready) return;
-      run = practice ? practiceRun() : newRun2();
-      dirty = true;
-      pause(false);
-      void save2(true);
-      root.focus();
-      hud();
-    };
-    const toggle = () => {
-      if (!ready || paused) return;
-      clear2();
-      run.auto = !run.auto;
-      dirty = true;
-      void save2(true);
-      hud();
-    };
-    const manual = () => {
-      if (run.auto) {
-        run.auto = false;
-        dirty = true;
-      }
-    };
-    const codes = {
-      ArrowUp: "up",
-      ArrowDown: "down",
-      ArrowLeft: "left",
-      ArrowRight: "right",
-      KeyZ: "attack",
-      KeyA: "guard",
-      ShiftLeft: "run",
-      ShiftRight: "run"
-    };
-    const once = {
-      KeyX: "jump",
-      KeyC: "skill",
-      ShiftLeft: "dash",
-      ShiftRight: "dash",
-      KeyS: "ult"
-    };
-    const abort = new AbortController(), signal = abort.signal;
-    root.addEventListener(
-      "keydown",
-      (ev) => {
-        const e = ev;
-        if (e.target.matches("input,textarea,select,[contenteditable=true]")) return;
-        if (e.code === "Escape") {
-          e.preventDefault();
-          if (!e.repeat && ready) pause(!paused);
-          return;
-        }
-        if (paused || !ready) return;
-        if (e.code === "KeyF") {
-          e.preventDefault();
-          if (!e.repeat) toggle();
-          return;
-        }
-        if (!codes[e.code] && !once[e.code] && !["KeyQ", "KeyW", "KeyE"].includes(e.code)) return;
-        e.preventDefault();
-        manual();
-        target = null;
-        if (codes[e.code]) keys2.add(codes[e.code]);
-        if (!e.repeat && once[e.code]) edges2[once[e.code]] = true;
-        if (!e.repeat && ["KeyQ", "KeyW", "KeyE"].includes(e.code))
-          edges2.item = ["KeyQ", "KeyW", "KeyE"].indexOf(e.code);
-      },
-      { signal }
-    );
-    root.addEventListener(
-      "keyup",
-      (ev) => {
-        const e = ev;
-        if (codes[e.code]) keys2.delete(codes[e.code]);
-      },
-      { signal }
-    );
-    root.addEventListener(
-      "focusout",
-      (e) => {
-        if (!root.contains(e.relatedTarget)) {
-          clear2();
-          if (ready && !run.auto && !paused) pause(true);
-        }
-      },
-      { signal }
-    );
-    window.addEventListener(
-      "blur",
-      () => {
-        if (ready) pause(true);
-      },
-      { signal }
-    );
-    document.addEventListener(
-      "visibilitychange",
-      () => {
-        if (document.hidden && ready) pause(true);
-      },
-      { signal }
-    );
-    root.addEventListener(
-      "click",
-      (e) => {
-        const b = e.target.closest("[data-do]");
-        if (!b) return;
-        if (b.dataset.do === "auto") toggle();
-        if (b.dataset.do === "pause" && ready) pause(!paused);
-        if (b.dataset.do === "resume" && ready) {
-          pause(false);
-          root.focus();
-        }
-        if (b.dataset.do === "restart") restart();
-        if (b.dataset.do === "practice") restart(true);
-      },
-      { signal }
-    );
-    root.addEventListener(
-      "pointerdown",
-      (e) => {
-        const b = e.target.closest(
-          "[data-hold],[data-edge],[data-item]"
-        );
-        if (!b || b.disabled || paused || !ready) return;
-        e.preventDefault();
-        root.focus();
-        manual();
-        target = null;
-        b.setPointerCapture(e.pointerId);
-        if (b.dataset.hold) pointers.set(e.pointerId, b.dataset.hold);
-        if (b.dataset.edge) {
-          edges2[b.dataset.edge] = true;
-          if (b.dataset.edge === "dash") pointers.set(e.pointerId, "run");
-        }
-        if (b.dataset.item !== void 0) edges2.item = Number(b.dataset.item);
-      },
-      { signal }
-    );
-    const updateStick = (e) => {
-      const b = stick.getBoundingClientRect(), dx = (e.clientX - b.left - b.width / 2) / (b.width * 0.35), dy = (e.clientY - b.top - b.height / 2) / (b.height * 0.35), len = Math.max(1, Math.hypot(dx, dy));
-      stickX = Math.abs(dx) < 0.18 ? 0 : dx / len;
-      stickY = Math.abs(dy) < 0.18 ? 0 : dy / len;
-      thumb.style.transform = `translate(${stickX * 28}px,${stickY * 28}px)`;
-    };
-    stick.addEventListener(
-      "pointerdown",
-      (e) => {
-        if (!ready || paused || stickId !== null) return;
-        e.preventDefault();
-        root.focus();
-        manual();
-        target = null;
-        stickId = e.pointerId;
-        stick.setPointerCapture(e.pointerId);
-        updateStick(e);
-      },
-      { signal }
-    );
-    stick.addEventListener(
-      "pointermove",
-      (e) => {
-        if (e.pointerId === stickId) updateStick(e);
-      },
-      { signal }
-    );
-    const release = (e) => {
-      pointers.delete(e.pointerId);
-      if (e.pointerId === stickId) {
-        stickId = null;
-        stickX = stickY = 0;
-        thumb.style.transform = "translate(0,0)";
-      }
-    };
-    root.addEventListener("pointerup", release, { signal });
-    root.addEventListener("pointercancel", release, { signal });
-    root.addEventListener("lostpointercapture", release, { signal });
-    canvas.addEventListener("contextmenu", (e) => e.preventDefault(), { signal });
-    canvas.addEventListener(
-      "pointerdown",
-      (e) => {
-        if (paused || !ready) return;
-        e.preventDefault();
-        root.focus();
-        manual();
-        const b = canvas.getBoundingClientRect();
-        const x = Math.max(55, Math.min(1225, (e.clientX - b.left) / b.width * 1280)), y = (e.clientY - b.top) / b.height * 720;
-        if (e.button === 2) {
-          edges2.dash = true;
-          target = {
-            x,
-            y: Math.max(SCENE.floorMin, Math.min(SCENE.floorMax, y)),
-            attack: false
-          };
-          return;
-        }
-        const enemy = run.enemies.find(
-          (a) => a.hp > 0 && Math.abs(a.x - x) < 90 && y > a.y - SCENE.adultHeight && y < a.y + 20
-        );
-        target = enemy ? { x: enemy.x, y: enemy.y, attack: true, id: enemy.id } : {
-          x,
-          y: Math.max(SCENE.floorMin, Math.min(SCENE.floorMax, y)),
-          attack: false
-        };
-      },
-      { signal }
-    );
-    const input = () => {
-      const held = /* @__PURE__ */ new Set([...keys2, ...pointers.values()]);
-      const p = run.player;
-      let x = Number(held.has("right")) - Number(held.has("left")) + stickX, y = Number(held.has("down")) - Number(held.has("up")) + stickY, attack2 = held.has("attack");
-      if (target?.id) {
-        const e = run.enemies.find((e2) => e2.id === target?.id && e2.hp > 0);
-        if (e) {
-          target.x = e.x;
-          target.y = e.y;
-        } else target = null;
-      }
-      if (target) {
-        const dx = target.x - p.x, dy = target.y - p.y;
-        x = Math.abs(dx) > (target.attack ? 300 : 10) ? Math.sign(dx) : 0;
-        y = Math.abs(dy) > 12 ? Math.sign(dy) : 0;
-        attack2 = target.attack && Math.abs(dx) < 600 && Math.abs(dy) < 25;
-        if (target.attack) p.dir = dx >= 0 ? 1 : -1;
-        if (!target.attack && !x && !y) target = null;
-      }
-      const result = {
-        x,
-        y,
-        attack: attack2,
-        run: held.has("run") || Math.hypot(stickX, stickY) > 0.95,
-        guard: held.has("guard"),
-        ...edges2
-      };
-      edges2 = {};
-      return result;
-    };
-    const resize = () => {
-      const scale = Math.max(0.01, Math.min(fit3.clientWidth / 1280, fit3.clientHeight / 720));
-      canvas.style.width = `${Math.floor(1280 * scale)}px`;
-      canvas.style.height = `${Math.floor(720 * scale)}px`;
-    };
-    const observer = new ResizeObserver(resize);
-    observer.observe(fit3);
-    let waiting = host.waiting();
-    const offWaiting = host.onWaiting((value) => {
-      waiting = value;
-    });
-    let hudTime = 0;
-    const frame2 = (now) => {
-      if (disposed) return;
-      if (ready && !paused && !document.hidden) {
-        const wasCombat = run.phase === "combat";
-        acc += Math.min(0.1, last ? (now - last) / 1e3 : 0);
-        let ticks = 0;
-        while (acc >= 1 / 60 && ticks++ < 8) {
-          step3(run, input(), 1 / 60);
-          acc -= 1 / 60;
-          dirty = true;
-        }
-        void save2(wasCombat && run.phase !== "combat");
-      } else acc = 0;
-      last = now;
-      if (ready && !document.hidden && (!paused || hudTime === 0)) renderer.draw(run);
-      if (now - hudTime > 120) {
-        hud();
-        hudTime = now;
-      }
-      raf = requestAnimationFrame(frame2);
-    };
-    void (async () => {
-      try {
-        const [raw, art6] = await Promise.all([
-          (writes.get(host) ?? Promise.resolve()).then(() => host.load()),
-          host.art()
-        ]);
-        if (disposed) return;
-        const restored = restore(raw);
-        run = restored ?? newRun2();
-        await renderer.load(art6);
-        root.dataset.artProfile = art6.atlas.action?.profile ?? "unknown";
-        if (disposed) return;
-        ready = true;
-        if (raw && !restored) {
-          run.message = "저장을 읽지 못해 새 훈련을 시작합니다.";
-        }
-        pause(true);
-        text2("[data-menu-title]", "쟈알디 · 1인 전투 검증판");
-        text2(
-          "[data-menu-text]",
-          "계속 버튼을 누르면 시작합니다. 방향키 이동 · Z 사격 · X 점프 · C 파괴 · Shift 회피 · A 가드 · S 필살 · QWE 아이템 · F 자동. 기존 순찰 기록은 별도로 보존됩니다."
-        );
-        $('[data-do="restart"]').hidden = false;
-        resize();
-        hud();
-      } catch (e) {
-        if (!disposed) {
-          text2("[data-menu-title]", "검증판을 열지 못했습니다");
-          text2("[data-menu-text]", e instanceof Error ? e.message : String(e));
-        }
-      }
-    })();
-    raf = requestAnimationFrame(frame2);
-    return () => {
-      if (disposed) return;
-      clear2();
-      void save2(true);
-      disposed = true;
-      cancelAnimationFrame(raf);
-      abort.abort();
-      observer.disconnect();
-      offWaiting();
-      renderer.dispose();
-      root.remove();
-      style.remove();
-    };
-  }
-
-  // src/core/update.ts
-  var UPDATE_BASE = true ? "https://raw.githubusercontent.com/leepc25/goei-plugin/main/release" : "";
-
-  // src/host/assets.ts
-  function toBytes(data) {
-    if (data instanceof Uint8Array) return data;
-    if (data instanceof ArrayBuffer) return new Uint8Array(data);
-    if (Array.isArray(data)) return new Uint8Array(data);
-    if (data && typeof data === "object") {
-      const values = Object.values(data);
-      if (values.length && values.every((v) => typeof v === "number")) return new Uint8Array(values);
-    }
-    return null;
-  }
-
-  // src/host/gamepack.ts
-  var KEY2 = `goei:game-pack:${PACK_ID}`;
-  var PackError = class extends Error {
-  };
-  async function stored() {
-    try {
-      const raw = await risuai.pluginStorage.getItem(KEY2);
-      const v = typeof raw === "string" ? JSON.parse(raw) : null;
-      return v && typeof v.version === "number" && v.atlas && v.files && PACK_FILES.every((f) => typeof v.files[f] === "string") ? v : null;
-    } catch {
-      return null;
-    }
-  }
-  async function packState() {
-    const s2 = await stored();
-    return !s2 ? "none" : s2.version !== PACK_VERSION ? "old" : "ready";
-  }
-  async function downloadPack() {
-    if (!UPDATE_BASE) throw new PackError("받을 곳이 정해지지 않았어요. 팩 파일을 직접 넣어 주세요.");
-    const url = `${UPDATE_BASE}/${PACK_NAME}?t=${Date.now()}`;
-    const legacy = risuai.risuFetch;
-    if (legacy) {
-      try {
-        const r = await legacy(url, { method: "GET", plainFetchForce: true, rawResponse: true, headers: { "Content-Type": "text/plain" } });
-        const b = r?.ok ? toBytes(r.data) : null;
-        if (b && parsePack(b)) return b;
-      } catch {
-      }
-    }
-    try {
-      const res = await risuai.nativeFetch(url, { method: "GET" });
-      if (res.ok) {
-        const b = new Uint8Array(await res.arrayBuffer());
-        if (parsePack(b)) return b;
-      }
-    } catch {
-    }
-    throw new PackError("그림을 받지 못했어요. 잠시 뒤 다시 받거나 팩 파일을 직접 넣어 주세요.");
-  }
-  function base64(b) {
-    let out = "";
-    for (let i = 0; i < b.length; i += 32768) out += String.fromCharCode(...b.subarray(i, i + 32768));
-    return btoa(out);
-  }
-  async function installPack(bytes) {
-    const pack2 = parsePack(bytes);
-    if (!pack2 || pack2.id !== PACK_ID) throw new PackError("괴이 ː ANOMALY 순찰 그림 팩 파일이 아니에요.");
-    if (pack2.version !== PACK_VERSION) throw new PackError("플러그인과 맞지 않는 판의 그림 팩이에요. 최신 팩을 받아 주세요.");
-    const files = {};
-    for (const name of PACK_FILES) files[name] = base64(pack2.files.get(name));
-    await risuai.pluginStorage.setItem(KEY2, JSON.stringify({ version: pack2.version, atlas: pack2.atlas, files }));
-    art5 = null;
-  }
-  var art5 = null;
-  function loadArt2() {
-    art5 ??= (async () => {
-      const s2 = await stored();
-      if (!s2 || s2.version !== PACK_VERSION) throw new PackError("그림 팩이 없어요.");
-      const urls = /* @__PURE__ */ new Map();
-      for (const name of PACK_FILES) {
-        const b = Uint8Array.from(atob(s2.files[name]), (c) => c.charCodeAt(0));
-        urls.set(name, URL.createObjectURL(new Blob([b], { type: "image/png" })));
-      }
-      return { atlas: s2.atlas, url: (f) => urls.get(f) ?? "" };
-    })();
-    art5.catch(() => art5 = null);
-    return art5;
-  }
-
-  // src/host/actionpack.ts
-  var ACTION_FILES = ["a-jyaldi-action", "bg-bureau-action", "e-corner", "e-watchman"];
-  var KEY3 = "goei:game-pack:action-normal-v4";
-  var VERSION = 4;
-  var loaded = null;
-  async function stored2() {
-    try {
-      const raw = await risuai.pluginStorage.getItem(KEY3);
-      if (typeof raw !== "string") return null;
-      const s2 = JSON.parse(raw);
-      return s2 && s2.version === VERSION && s2.atlas?.action && ACTION_FILES.every((f) => typeof s2.files?.[f] === "string") ? s2 : null;
-    } catch {
-      return null;
-    }
-  }
-  async function actionPackState() {
-    return await stored2() ? "ready" : "none";
-  }
-  async function installActionPack(bytes) {
-    const pack2 = parsePack(bytes, ACTION_FILES);
-    if (!pack2 || pack2.id !== "action" || pack2.version !== VERSION || !pack2.atlas.action)
-      throw new PackError(
-        "1인 액션용 그림 팩이 아닙니다. goei-game-action-normal-v4.pack을 넣어 주세요."
-      );
-    const files = {};
-    for (const [name, b] of pack2.files) {
-      let str = "";
-      for (let i = 0; i < b.length; i += 32768)
-        str += String.fromCharCode(...b.subarray(i, i + 32768));
-      files[name] = btoa(str);
-    }
-    await risuai.pluginStorage.setItem(
-      KEY3,
-      JSON.stringify({ version: VERSION, atlas: pack2.atlas, files })
-    );
-    loaded = null;
-  }
-  async function downloadActionPack() {
-    const url = `${UPDATE_BASE}/goei-game-action-normal-v4.pack`;
-    const legacy = risuai.risuFetch;
-    if (legacy) {
-      try {
-        const r = await legacy(url, {
-          method: "GET",
-          plainFetchForce: true,
-          rawResponse: true
-        });
-        const b = r.ok ? toBytes(r.data) : null;
-        if (b && parsePack(b, ACTION_FILES)) return b;
-      } catch {
-      }
-    }
-    try {
-      const r = await risuai.nativeFetch(url, { method: "GET" });
-      if (r.ok) {
-        const b = new Uint8Array(await r.arrayBuffer());
-        if (parsePack(b, ACTION_FILES)) return b;
-      }
-    } catch {
-    }
-    throw new PackError(
-      "새 액션 그림을 받지 못했어요. goei-game-action-normal-v4.pack을 파일로 넣어 주세요."
-    );
-  }
-  function loadActionArt() {
-    loaded ??= (async () => {
-      const s2 = await stored2();
-      if (!s2) throw new PackError("새 액션 그림이 없습니다.");
-      return {
-        atlas: s2.atlas,
-        url: (name) => s2.files[name] ? `data:image/png;base64,${s2.files[name]}` : ""
-      };
-    })();
-    loaded.catch(() => {
-      loaded = null;
-    });
-    return loaded;
-  }
-
-  // src/game/legacy.ts
-  var hostFor = (bridge, mode) => {
-    const key2 = mode === "action" ? "goei:game-action:v1" : "goei:game";
-    return {
-      load: async () => {
-        const v = await risuai.pluginStorage.getItem(key2);
-        return typeof v === "string" ? v : null;
-      },
-      save: (data) => risuai.pluginStorage.setItem(key2, data),
-      waiting: bridge.waiting,
-      onWaiting: bridge.onWaiting,
-      narrow: bridge.narrow,
-      art: mode === "action" ? loadActionArt : loadArt2
-    };
-  };
-  function mountLegacy(box2, bridge, mode) {
-    let unmount = null;
-    let generation = 0;
-    const errText = (e) => e instanceof PackError ? e.message : `그림을 넣지 못했어요: ${e instanceof Error ? e.message : String(e)}`;
-    function packPanel(old, done2) {
-      const action = mode === "action";
-      box2.innerHTML = `<div class="gx-gp"><div class="gx-gp-card">
-      <b>${action ? "새 액션 그림 받기" : old ? "순찰 그림 새로 받기" : "순찰 그림 받기"}</b>
-      <p>${old ? "플러그인이 바뀌어 그림을 새로 받아야 해요." : "게임 그림은 처음 한 번만 받아요. 받은 그림은 Risu에 저장돼요."}</p>
-      <p class="gx-gp-msg" hidden></p>
-      <div class="gx-gp-act"><button class="gx-gp-btn primary" data-gp="get">${action ? "액션 그림 받기" : "순찰 그림 받기 (0.7MB)"}</button><button class="gx-gp-btn" data-gp="file">파일로 넣기</button></div>
-    </div></div>`;
-      const msg = box2.querySelector(".gx-gp-msg");
-      const btns = [...box2.querySelectorAll(".gx-gp-btn")];
-      const picker = document.createElement("input");
-      picker.type = "file";
-      picker.accept = ".pack";
-      picker.hidden = true;
-      box2.append(picker);
-      const say = (t) => (msg.hidden = !t, msg.textContent = t);
-      const run = async (get) => {
-        btns.forEach((b) => b.disabled = true);
-        say("받는 중");
-        try {
-          const bytes = await get();
-          say("저장하는 중");
-          await (action ? installActionPack(bytes) : installPack(bytes));
-          done2();
-        } catch (e) {
-          say(errText(e));
-          btns.forEach((b) => b.disabled = false);
-        }
-      };
-      box2.querySelector('[data-gp="get"]').addEventListener("click", () => void run(action ? downloadActionPack : downloadPack));
-      box2.querySelector('[data-gp="file"]').addEventListener("click", () => picker.click());
-      picker.addEventListener("change", () => {
-        const f = picker.files?.[0];
-        picker.value = "";
-        if (f) void run(async () => new Uint8Array(await f.arrayBuffer()));
-      });
-    }
-    async function start() {
-      const current = ++generation;
-      unmount?.();
-      unmount = null;
-      const isAction = mode === "action";
-      const state2 = await (isAction ? actionPackState() : packState());
-      if (current !== generation) return;
-      if (state2 !== "ready") return packPanel(state2 === "old", () => void start());
-      try {
-        await (isAction ? loadActionArt() : loadArt2());
-      } catch {
-        if (current === generation) packPanel(false, () => void start());
-        return;
-      }
-      if (current !== generation) return;
-      box2.innerHTML = "";
-      unmount = mode === "action" ? mountAction(box2, hostFor(bridge, mode)) : mountGame2(box2, hostFor(bridge, mode));
-    }
-    void start();
-    return () => {
-      generation++;
-      unmount?.();
-      unmount = null;
-      box2.innerHTML = "";
-    };
-  }
 
   // src/game/entry.ts
   function memoryStorage() {
@@ -33607,13 +37125,8 @@ ${t.secret}` : "",
     }
   }
   var mod = {
-    version: "0.16.56",
-    mount: (box2, bridge) => mountPlay(box2, bridge),
-    // 이전 시험판: 저장 키와 그림 팩은 예전 그대로 (goei:game · goei:game-action:v1)
-    legacy: {
-      patrol: (box2, bridge) => mountLegacy(box2, bridge, "patrol"),
-      action: (box2, bridge) => mountLegacy(box2, bridge, "action")
-    }
+    version: "0.17.7",
+    mount: (box2, bridge) => mountPlay(box2, bridge)
   };
   globalThis.__goeiGame = mod;
 })();

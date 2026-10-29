@@ -45,7 +45,7 @@ test('판정: 거래는 거래 버튼이 있을 때만, 적대면 동행·거래
 
 test('판정: 단서는 주어진 목록에서 번호로만, 같은 만남에서 두 번 안 준다', () => {
   const hints = [{ id: 'r1', text: '인사하면 산다' }, { id: 'r2', text: '문은 셋째' }];
-  const c = ctx('elevator', { hints });
+  const c = ctx('jyaldi', { hints });
   assert.equal(B.decide([{ kind: 'hint', arg: '2' }], c)[0].hint.id, 'r2');
   assert.equal(B.decide([{ kind: 'hint', arg: '2' }], c).length, 0, '이미 준 단서');
   assert.equal(B.decide([{ kind: 'hint', arg: '9' }], c).length, 0, '없는 번호');
@@ -57,23 +57,25 @@ test('판정: 선물은 하루 한 번, 허락된 물건만', () => {
   assert.equal(B.decide([{ kind: 'gift', arg: 'medkit' }], c).length, 0, '같은 날 두 번 안 됨');
 });
 
-test('판정: 동행은 호감 +1부터 (민간인·승객은 0부터), 동행 불가 자리는 무시', () => {
+test('판정: 동행은 호감 +1부터, 동행 불가 자리는 무시', () => {
   assert.equal(B.decide([{ kind: 'join', arg: '' }], ctx('leejaheon', { canJoin: true }, 0)).length, 0);
   assert.equal(B.decide([{ kind: 'join', arg: '' }], ctx('leejaheon', { canJoin: true }, 1))[0].kind, 'join');
-  assert.equal(B.decide([{ kind: 'join', arg: '' }], ctx('passenger', { canJoin: true }, 0))[0].kind, 'join');
   assert.equal(B.decide([{ kind: 'join', arg: '' }], ctx('leejaheon', {}, 3)).length, 0);
 });
 
-test('프롬프트: 시트·상황·태그 안내가 들어가고 미성년자 안전 줄이 붙는다', () => {
+test('프롬프트: 시트·상황·태그 안내가 들어가고, minor 인물에만 미성년자 안전 줄이 붙는다', () => {
   const agent = { id: 'jyaldi', name: '쟈알디', title: '부장', voice: '짧고 건조하게' };
+  // 콘쥬스는 2026-10-26부터 20세 (minor 아님)
   const m = B.buildPrompt({ def: B.npcDef('konjyuce'), target: { npc: 'konjyuce', place: '본부 2층', facts: ['본부 3일차'] }, sheet: 'SHEET', agent, rel: rel(1), meta: { events: ['괴이 「X」'] }, text: '안녕' });
   const s = m[0].content;
   assert.match(s, /SHEET/);
   assert.match(s, /본부 2층/);
-  assert.match(s, /미성년자/);
+  assert.doesNotMatch(s, /미성년자/);
   assert.match(s, /괴이 「X」/);
+  const minor = B.buildPrompt({ def: { ...B.npcDef('konjyuce'), minor: true }, target: { npc: 'konjyuce', place: '본부' }, agent, rel: rel(1), text: '안녕' })[0].content;
+  assert.match(minor, /미성년자/);
   assert.equal(m.at(-1).content, '안녕');
-  const h = B.buildPrompt({ def: B.npcDef('elevator'), target: { npc: 'elevator', place: '승강기', hints: [{ id: 'a', text: '첫 단서' }], allow: ['hint'] }, agent, rel: rel(), text: '?' })[0].content;
+  const h = B.buildPrompt({ def: B.npcDef('jyaldi'), target: { npc: 'jyaldi', place: '본부', hints: [{ id: 'a', text: '첫 단서' }], allow: ['hint'] }, agent, rel: rel(), text: '?' })[0].content;
   assert.match(h, /1\) 첫 단서/);
   assert.doesNotMatch(h, /\[\[호감/, '허락 안 된 태그는 안내하지 않는다');
 });

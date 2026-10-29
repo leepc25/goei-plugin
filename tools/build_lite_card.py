@@ -217,6 +217,53 @@ def build_openings(first_mes, scenarios):
 SETTINGS_BOOKS = ('Settings', '통합설정')
 
 
+EXTRA_LORE = ROOT / 'card' / 'extra-lore'
+APPENDIX_FOLDER_KEY = '\uf000folder:3b7e9d10-goei-0000-0000-appendix0001'
+APPENDIX_FOLDER_NAME = '📎부록'
+
+
+def read_extra_lore():
+    """card/extra-lore/*.txt: 원본 카드에 없는 로어북 (머리 줄 folder·name·key·order·appendix, --- 아래 본문)"""
+    out = []
+    for f in sorted(EXTRA_LORE.glob('*.txt')):
+        head, body = f.read_text(encoding='utf-8').split('\n---\n', 1)
+        meta = dict(line.split(': ', 1) if ': ' in line else (line.rstrip(':'), '') for line in head.splitlines() if line.strip())
+        out.append({**meta, 'content': body})
+    return out
+
+
+def add_extra_lore(entries):
+    """원작 3부 등 새 로어북을 폴더에 넣는다. 같은 폴더에 같은 이름이 있으면 바꾼다. 📎부록 폴더가 없으면 만든다"""
+    extra = read_extra_lore()
+    if not extra:
+        return entries
+    if not any(e.get('mode') == 'folder' and _folder_word(e.get('comment')) == '부록' for e in entries):
+        entries.append({'key': APPENDIX_FOLDER_KEY, 'comment': APPENDIX_FOLDER_NAME, 'content': '', 'mode': 'folder', 'insertorder': 100,
+                        'alwaysActive': False, 'secondkey': '', 'selective': False, 'bookVersion': 2})
+    folders = {e.get('comment'): e['key'] for e in entries if e.get('mode') == 'folder'}
+    for x in extra:
+        key = folders.get(x['folder'])
+        if not key:
+            raise SystemExit(f'새 로어북 넣기 실패: {x["folder"]} 폴더가 없어요 ({x["name"]})')
+        entries = [e for e in entries if not (e.get('folder') == key and e.get('comment') == x['name'])]
+        entries.append({'key': x.get('key', ''), 'secondkey': '', 'comment': x['name'], 'content': x['content'], 'mode': 'normal',
+                        'insertorder': int(x.get('order') or 0), 'alwaysActive': False, 'selective': False, 'useRegex': False,
+                        'folder': key, 'bookVersion': 2})
+    return entries
+
+
+def add_appendix_data(entries):
+    """새 로어북 머리의 부록 조건(appendix)을 명부(Directory) 「부록」에 적는다 (migrate_directory 뒤)"""
+    want = {x['name']: json.loads(x['appendix']) for x in read_extra_lore() if x.get('appendix')}
+    if not want:
+        return entries
+    d = next(e for e in entries if e.get('comment') == 'Directory')
+    data = json.loads(d['content'])
+    data['부록'] = {**data.get('부록', {}), **want}
+    d['content'] = json.dumps(data, ensure_ascii=False, indent=1)
+    return entries
+
+
 def migrate_directory(entries):
     """괴이·미스틱 사이트·요원·거점·세력 호칭·괴담톡 탭·첫 턴 로어북을 명부(Directory)로 옮긴다 (플러그인과 같은 코드를 node로 실행, 먼저 npm run build)"""
     with tempfile.TemporaryDirectory() as tmp:
@@ -235,26 +282,71 @@ WIKI_PACK_HEAD = 'GOEIWIKI1:'  # core/wiki.ts WIKI_PACK_HEAD와 같게
 
 
 def add_wiki_base(entries):
-    """card/wiki-base.json(scripts/wiki-import.mjs가 모은 위키 기본 문서)을 「📖위키」 폴더의 항목 하나로 넣는다.
-    문서가 많아(2MB 넘음) 카드가 무거워지지 않게 {제목: 본문} JSON을 gzip+base64로 줄인다. 플러그인이 창을 열 때 한 번 푼다(core/wiki.ts prepareBaseDocs).
-    키 없는 비활성 항목이라 모델 프롬프트에는 들어가지 않는다"""
-    path = ROOT / 'card' / 'wiki-base.json'
-    if not path.exists():
-        return entries
-    docs = json.loads(path.read_text(encoding='utf-8'))
-    entries = [e for e in entries if e.get('folder') != WIKI_FOLDER_KEY and e.get('key') != WIKI_FOLDER_KEY]
+    """「📖위키」 폴더(사용자 문서 자리)만 카드에 둔다. 기본 문서 묶음은 2026-10-27부터 카드 밖(release/wiki-base.N.txt)에서 플러그인이 받아
+    저장소(pluginStorage)에 둔다 (core/wiki.ts prepareBaseDocs · host/install.ts). 옛 카드의 「📖위키 기본 문서」 항목은 뺀다"""
+    entries = [e for e in entries if e.get('folder') != WIKI_FOLDER_KEY and e.get('key') != WIKI_FOLDER_KEY and e.get('comment') != WIKI_PACK_COMMENT]
     entries.append({'key': WIKI_FOLDER_KEY, 'comment': WIKI_FOLDER_NAME, 'content': '', 'mode': 'folder', 'insertorder': 100,
                     'alwaysActive': False, 'secondkey': '', 'selective': False, 'bookVersion': 2})
-    raw = json.dumps(docs, ensure_ascii=False, separators=(',', ':')).encode('utf-8')
-    packed = WIKI_PACK_HEAD + base64.b64encode(gzip.compress(raw, compresslevel=9, mtime=0)).decode('ascii')
-    entries.append({'key': '', 'secondkey': '', 'comment': WIKI_PACK_COMMENT, 'content': packed, 'mode': 'normal', 'insertorder': 0,
-                    'alwaysActive': False, 'selective': False, 'useRegex': False, 'folder': WIKI_FOLDER_KEY, 'bookVersion': 2})
     return entries
+
+
+WIKI_PACK_FILE = 'wiki-base.json'
+
+
+def wiki_pack():
+    """card/wiki-base.json(scripts/wiki-import.mjs가 모은 위키 기본 문서) → {제목: 본문} JSON 을 gzip+base64 로 줄인 글 한 덩어리.
+    플러그인이 받아 저장소에 두고 창을 열 때 한 번 푼다 (core/wiki.ts prepareBaseDocs). 없으면 None"""
+    path = ROOT / 'card' / 'wiki-base.json'
+    if not path.exists():
+        return None
+    docs = json.loads(path.read_text(encoding='utf-8'))
+    raw = json.dumps(docs, ensure_ascii=False, separators=(',', ':')).encode('utf-8')
+    return WIKI_PACK_HEAD + base64.b64encode(gzip.compress(raw, compresslevel=9, mtime=0)).decode('ascii')
+
+
+def write_parts(folder, stem, text, extra=None):
+    """글 한 덩어리를 200KB 조각(stem.N.txt)으로 나눠 쓰고 목록(stem.json)을 둔다 (Risu 웹 프록시는 1MB 넘는 파일을 못 받는다). 지난 조각은 지운다"""
+    folder = Path(folder)
+    for old in folder.glob(f'{stem}.*.txt'):
+        old.unlink()
+    parts, buf, size = [], [], 0
+    for ch in text:
+        n = len(ch.encode('utf-8'))
+        if size + n > UPDATE_PART_BYTES:
+            parts.append(''.join(buf))
+            buf, size = [], 0
+        buf.append(ch)
+        size += n
+    if buf:
+        parts.append(''.join(buf))
+    names = []
+    for i, part in enumerate(parts, 1):
+        name = f'{stem}.{i}.txt'
+        (folder / name).write_text(part, encoding='utf-8')
+        names.append(name)
+    index = {'parts': names, 'length': len(text.encode('utf-16-le')) // 2, 'digest': hashlib.sha1(text.encode('utf-8')).hexdigest()[:12], **(extra or {})}
+    (folder / f'{stem}.json').write_text(json.dumps(index, ensure_ascii=False), encoding='utf-8')
+    return index
+
+
+INSTALL_DIR = ROOT / 'src' / 'data' / 'install'
+
+
+def write_install_data(greetings, greeting_index, pictures, lore, icon):
+    """깡통봇 설치용 플러그인 데이터 (core/install.ts 가 내장): 인사말 57개와 키→번호, 카드 사진 목록, 기본 명부(Directory), 아이콘 지문"""
+    INSTALL_DIR.mkdir(parents=True, exist_ok=True)
+    directory = json.loads(next(e for e in lore if e.get('comment') == 'Directory')['content'])
+    dump = lambda name, obj: (INSTALL_DIR / name).write_text(json.dumps(obj, ensure_ascii=False, separators=(',', ':')), encoding='utf-8')
+    dump('greetings.json', {'index': greeting_index, 'texts': greetings})
+    dump('pictures.json', pictures)
+    dump('directory.json', directory)
+    dump('icon.json', {'file': 'icon.png', 'digest': hashlib.sha1(icon).hexdigest()[:12], 'bytes': len(icon)} if icon else {})
+    return directory
 
 
 # 본편 로어북 고르기 (플러그인 core/lore.ts). 네 폴더 항목은 @@dont_activate로 Risu가 켜지 않고,
 # 플러그인이 고른 글을 자리 항목 4개가 채팅 변수로 읽는다. 키 정리: docs/호출키_검토_1019.md
-MANAGED_FOLDERS = {'세력': 'org', '조직': 'org', '파밍': 'site', '괴이': 'anomaly', '요원': 'agent'}
+MANAGED_FOLDERS = {'세력': 'org', '조직': 'org', '파밍': 'site', '괴이': 'anomaly', '요원': 'agent', '부록': 'appendix'}
 LORE_SLOTS = [  # core/lore.ts SLOTS와 같게
     ('📚Lore slot · Faction', 'goei_lore_org', 200),
     ('📚Lore slot · Mystic', 'goei_lore_site', 400),
@@ -324,6 +416,8 @@ KEY_EDITS = {
     '우주 쇼핑몰': (['우주쇼핑'], []),
     '친절한 씨앗 키트': (['씨앗 키트', 'Seed Kit'], ['친절한 씨앗 키트']),
     '이빨 요정': (['Tooth Fairy', '이빨나무', '이빨요정', '치아 나무', '치아나무', '치아 요정', '치아요정'], []),
+    # 망상홈쇼핑은 따로 🎁파밍 항목이 됐다 (2026-10-26). 오후역은 역·건물주(혈액 방송국) 키만
+    '오후역': (['Delusion Home Shopping', '망상 홈쇼핑', '망상홈쇼핑'], []),
 }
 
 
@@ -368,20 +462,23 @@ def lore_activation(entries):
         if not e.get('content', '').lstrip().startswith(DONT_ACTIVATE):
             e['content'] = DONT_ACTIVATE + '\n' + e.get('content', '')
         prints[name] = sorted({before, key_print(e['key'])})
-    if edits:
+    if edits and any(kinds.values()):
         raise SystemExit(f'키 정리 실패: 로어북을 찾지 못했어요 {sorted(edits)}')
-    settings = next(e for e in entries if e.get('mode') == 'folder' and e.get('comment') == SETTINGS_FOLDER_NAME)
+    # 자리 항목(📚Lore slot)은 더 넣지 않는다 (2026-10-27): 플러그인이 요청에 직접 끼운다 (core/lore.ts insertLoreBlock)
     names = {c for c, _, _ in LORE_SLOTS}
     entries = [e for e in entries if e.get('comment') not in names]
-    for comment, var, order in LORE_SLOTS:
-        entries.append({'key': '', 'secondkey': '', 'comment': comment, 'content': '{{getvar::' + var + '}}', 'mode': 'normal',
-                        'insertorder': order, 'alwaysActive': True, 'selective': False, 'useRegex': False,
-                        'folder': settings['key'], 'bookVersion': 2})
     return entries, prints
 
 
 # 원본 지침 문장 고치기 (주석 이름, 옛 문장, 새 문장). 옛 문장이 없으면 빌드를 멈춘다
 LORE_PATCHES = [
+    # 괴담넷 성격 전환 (2026-10-26 사용자): 설정 lb_cfg_lb-gn.style = gal 괴담갤(일반) / net 괴담넷(업계, 기본) / wpf 세정게. 큰 틀은 그대로, 소개·기본 말투·기본 주제만 분기. 문안은 card/gnet-style.json
+    *[('GNet', v['old'], v['new']) for v in json.loads((ROOT / 'card' / 'gnet-style.json').read_text(encoding='utf-8')).values()],
+    # 콘쥬스 20세 대학생 (2026-10-26 사용자 지시). 위키·게임 시트·대사도 같이 바꿈
+    ('콘쥬스', '- Age: 17, a high school student', '- Age: 20, a university student'),
+    ('콘쥬스', 'Agent. A minor attached to the team, deployed only when', 'Agent. The youngest member of the team, deployed only when'),
+    ('콘쥬스', 'cover her eyes for age-inappropriate sights', 'cover her eyes for gruesome sights'),
+    ('콘쥬스', "A teenager's frame that gives no warning", 'A small frame that gives no warning'),
     # 상태창에 동행·투입 칸 (2026-10-23 사용자 승인: 필드가 동행 인물과 괴이 안/밖을 알 수 있게). 플러그인 v0.16.54부터 읽는다. 옛 6칸도 읽힌다
     ('🏷️Tag', '[▣|YYYY.MM.DD|HH:MM AM/PM|weather|temperature|location|anomaly]\n',
      '[▣|YYYY.MM.DD|HH:MM AM/PM|weather|temperature|location|anomaly|companions|deployed]\n'),
@@ -392,6 +489,14 @@ LORE_PATCHES = [
      "- The status line of the previous scene is provided in a `[Previous status]` block just before the latest user input. Continue from it: advance the time and update the other fields. Older responses do not carry their status lines.\n"
      "- Example (no current anomaly):\n[▣|2025.01.01|02:47 AM|☀️|4°C|서울 종로구 거리|없음|없음|없음]\n"
      "- Example (inside an anomaly with two companions):\n[▣|2025.01.01|10:15 PM|🌫️|9°C|명일 아파트 3층 복도|명일 아파트|쟈알디,에일린|투입]"),
+    # 상태창에 신분 칸 (2026-10-26 사용자 결정: 인물 기록이 유저 직급을 알게). 플러그인은 8칸·9칸 모두 읽고, 옛 플러그인은 9칸을 추측 경로로 읽어 신분만 버린다
+    ('🏷️Tag', '[▣|YYYY.MM.DD|HH:MM AM/PM|weather|temperature|location|anomaly|companions|deployed]\n',
+     '[▣|YYYY.MM.DD|HH:MM AM/PM|weather|temperature|location|anomaly|companions|deployed|identity]\n'),
+    ('🏷️Tag', "- The status line of the previous scene is provided in a `[Previous status]` block",
+     "- Identity = {{user}}'s current organization and rank in Korean as `조직/직급` (e.g. `관리국/신입`, `가짜 관리국/대리`, `백일몽/사원`, `프리랜서/5급`, `민간인/-`). Copy it unchanged every turn unless the story actually changes it (promotion, transfer, defection).\n"
+     "- The status line of the previous scene is provided in a `[Previous status]` block"),
+    ('🏷️Tag', "[▣|2025.01.01|02:47 AM|☀️|4°C|서울 종로구 거리|없음|없음|없음]", "[▣|2025.01.01|02:47 AM|☀️|4°C|서울 종로구 거리|없음|없음|없음|관리국/신입]"),
+    ('🏷️Tag', "[▣|2025.01.01|10:15 PM|🌫️|9°C|명일 아파트 3층 복도|명일 아파트|쟈알디,에일린|투입]", "[▣|2025.01.01|10:15 PM|🌫️|9°C|명일 아파트 3층 복도|명일 아파트|쟈알디,에일린|투입|관리국/요원]"),
     # 배치 칸 띄어쓰기 통일 (2026-10-21 점검)
     ('🏷️Tag', '- 배치 : Agent code(s) | External faction name | 없음\n', '- 배치: Agent code(s) | External faction name | 없음\n'),
     # 요원 상태 값만 한국어로 쓰게: 괄호 영어 풀이를 따로 줄로 (모델이 「휴게 (On-duty break)」를 그대로 베끼지 않게)
@@ -416,6 +521,14 @@ LORE_PATCHES = [
      'For conversational pacing only, use type="pause", sender="-", content=a brief pause without external events.',
      'For a time gap only, use type="pause", sender="-", content=a short elapsed-time marker in Korean such as "잠시 후" or "10분 후" (at most 12 characters). '
      'A pause never narrates: no names, actions, emotions, sounds or scene description. Put such things in the NPC\'s own message text or omit them.'),
+    # 미인 약(망상홈쇼핑)으로 불려 나오는 연옥합창단 퍼레이드 (2026-10-26, 원작 395~398화)
+    ('화요퀴즈쇼', 'leaving a persistent risk of future invitations or recruitment.\n',
+     'leaving a persistent risk of future invitations or recruitment.\n\n'
+     '#### Outside Summoning: Purgatory Choir Parade\n'
+     '- The Purgatory Choir can also be drawn out of the studio by people turned into living instruments (for example by Delusion Home Shopping\'s Beauty Pills taken with alcohol). It opens silver arch passages in walls, reliefs of judgment gates, purgatory, sulfur, notes, and staff lines; choristers wear oversized old suits under dead animal heads (a rat with yarn-stitched eyes, a rotting rooster, a fly-covered ox, a balding sheep, a dog).\n'
+     '- It tunes and selects instruments, announces "The performance will begin shortly. Please enter through the open doors and take your seats," and opens every door as a welcome to the audience, turning the whole building into a venue. It takes over local speakers.\n'
+     '- If the instruments do not take their seats, it switches to a Parade that visits every area with signs of life. An Intermission introduces a "distinguished guest" and gives a short window to act.\n'
+     '- Direct listening collapses thought; a completed harmony feels pleasant, which is the luring stage. Earplugs shrivel into treble-clef lumps. Known countermeasures: hide out of sight, break speakers, close doors, use the intermission, wake entranced allies by force, and keep alcohol away from pill-takers. Victims are found headless or with altered skeletons, hands pressed together as if clapping.\n'),
 ]
 
 # 캐릭터 설명 오타 (옛 문장, 새 문장). 옛 문장이 없으면 빌드를 멈춘다
@@ -431,6 +544,29 @@ def patch_desc(text):
             raise SystemExit(f'설명 패치 대상 없음: {old[:40]}')
         text = text.replace(old, new, 1)
     return text
+
+
+# 첫 메시지(시작 장면)의 표정 태그 중 지금 표정 세트(assets/portraits 27종)에 없는 것 → 가장 가까운 표정 (2026-10-26 사용자 지시)
+EMOTION_FIX = {
+    'acting coy': 'shy', 'admiring': 'lovestruck', 'depressed': 'sad', 'determined': 'serious', 'disgusted': 'contemptuous',
+    'enraged': 'angry', 'evil smiling': 'smug', 'forced smiling': 'nervous', 'happy smile': 'happy', 'indifferent': 'bored',
+    'joyful': 'excited', 'neutral': 'default', 'scared screaming': 'scared', 'seductive smile': 'smirk', 'sniggering': 'laughing',
+    'suspicious': 'thinking', 'tormented': 'exhausted', 'worried': 'nervous',
+}
+EMOTIONS = set('default angry annoyed bored confused contemptuous crying curious dumbfounded embarrassed excited exhausted happy laughing '
+               'lovestruck lustful nervous proud sad scared serious shy smile smirk smug surprised thinking'.split())
+
+
+def fix_emotion_tags(text):
+    """<img=이름_표정> 의 표정을 지금 세트로. 세트에도 표(EMOTION_FIX)에도 없으면 빌드를 멈춘다"""
+    def one(m):
+        name, kw = m.group(1), m.group(2).strip()
+        if kw in EMOTIONS:
+            return m.group(0)
+        if kw not in EMOTION_FIX:
+            raise SystemExit(f'표정 세트에 없는 태그: <img={name}_{kw}>')
+        return f'<img={name}_{EMOTION_FIX[kw]}>'
+    return re.sub(r'<img=([^>_]+)_([^>]+)>', one, text)
 
 
 def patch_lore(entries):
@@ -495,6 +631,27 @@ def to_ccv3(e):
 def drop_settings(entries):
     """설정값은 플러그인 창·저장소로 옮겼으므로 Settings 로어북은 Lite 카드에 넣지 않는다"""
     return [e for e in entries if e.get('comment') not in SETTINGS_BOOKS]
+
+
+# 플러그인이 들고 가는 로어북 (docs/설계안_세계편집.md, 2026-10-27 사용자 결정): 지침·상시 지침·자리 항목·시드 통로·세계 폴더 전부.
+# 명부(Directory)로 옮기는 일(migrate_directory·add_appendix_data)은 이 함수 전에 끝나야 한다 (폴더 항목을 보고 명부 행을 만든다)
+PLUGIN_BOOKS = ('GNet', 'Phone', 'Wiki', 'Directive', 'Visit', 'LB Backend', '🏷️Tag', '📜Faction', '🙂Roster', '📕Start Lore', 'Asset', 'Image tag')
+PLUGIN_FOLDERS = ('세계', '세력', '조직', '요원', '괴이', '파밍', '부록')
+
+
+def drop_plugin_lore(entries):
+    """플러그인에 내장한 지침·세계 로어북과 그 폴더를 카드에서 뺀다. 남는 것: ⚙️설정(Directory·매니페스트)·📖위키 폴더"""
+    folders = {e['key'] for e in entries if e.get('mode') == 'folder' and _folder_word(e.get('comment')) in PLUGIN_FOLDERS}
+    out = []
+    for e in entries:
+        if e.get('mode') == 'folder' and e.get('key') in folders:
+            continue
+        if e.get('folder') in folders:
+            continue
+        if e.get('comment') in PLUGIN_BOOKS or str(e.get('comment', '')).startswith('📚Lore slot'):
+            continue
+        out.append(e)
+    return out
 
 
 UPDATE_FILE = 'card-update.json'
@@ -592,14 +749,16 @@ def add_wiki_assets(data, others):
     return added
 
 
-# 이미지 태그 로어북 2개 (사용자 2026-10-22, 예전 에셋 모듈에서 옮김): Asset = 메인 모델 출력 지침(언제나 켬), Image tag = 보조 모델 자료(core/asset.ts)
+# 이미지 태그 로어북 원문 보관 (사용자 2026-10-22, 예전 에셋 모듈에서 옮김). v0.16.66부터 카드에는 넣지 않는다: Asset(메인 모델 지침)은 설정으로 조립(core/imgprompt.ts), Image tag(보조 모델 자료)는 명부에서 조립(core/asset.ts imageDataFrom)
 IMAGE_LORE = ROOT / 'card' / 'image-lore.json'
 
 
 def add_image_lore(lore):
-    """이미지 태그 로어북을 ⚙️설정 폴더에 넣는다. 같은 이름이 카드에 있으면 바꾼다"""
-    books = json.loads(IMAGE_LORE.read_text(encoding='utf-8'))['data']
-    names = {b['comment'] for b in books}
+    """이미지 태그 로어북을 ⚙️설정 폴더에 넣는다. 같은 이름이 카드에 있으면 바꾼다.
+    「Asset」(메인 모델 지침)은 v0.16.64부터 플러그인이 설정으로 조립해 요청에 끼우므로 카드에 넣지 않고, 있던 것도 뺀다 (core/imgprompt.ts)"""
+    # v0.16.66: 「Image tag」(보조 모델 자료)도 명부(한글 이름·영문명·별칭)+설정으로 조립하므로 카드에서 뺀다 (사용자 2026-10-27). 둘 다 있던 것도 지운다
+    books = [b for b in json.loads(IMAGE_LORE.read_text(encoding='utf-8'))['data'] if b['comment'] not in ('Asset', 'Image tag')]
+    names = {b['comment'] for b in books} | {'Asset', 'Image tag'}
     settings = next(e for e in lore if e.get('mode') == 'folder' and e.get('comment') == SETTINGS_FOLDER_NAME)
     return [e for e in lore if e.get('comment') not in names] + [{**b, 'folder': settings['key']} for b in books]
 
@@ -676,7 +835,7 @@ def main(src, dst):
     lore = (module or {}).get('lorebook') or (data.get('character_book') or {}).get('entries') or []
     regex = (module or {}).get('regex') or risu.get('customScripts') or []
 
-    greetings, greeting_index = build_openings(data['first_mes'], scenarios)
+    greetings, greeting_index = build_openings(fix_emotion_tags(data['first_mes']), scenarios)
     pkg = json.loads((ROOT / 'package.json').read_text(encoding='utf-8'))
     version = pkg['version']
     min_plugin = pkg.get('goei', {}).get('minPlugin', version)
@@ -695,9 +854,15 @@ def main(src, dst):
     data['character_version'] = version
     data['description'] = patch_desc(data.get('description', ''))
     lore = [e for e in lore if e.get('comment') not in (MANIFEST_COMMENT, OLD_MANIFEST)]
-    lore = add_visit_guide(add_image_lore(add_wiki_base(migrate_directory(tidy_guides(patch_lore(drop_settings(lore)))))))
-    lore, manifest['keys'] = lore_activation(lore)
+    # 지침·세계 로어북은 플러그인 내장(2026-10-27): 명부로 옮기는 일까지 끝낸 뒤 카드에서 뺀다. 카드에 남는 글 로어북은 Directory·매니페스트·위키 기본 문서
+    lore = drop_plugin_lore(add_wiki_base(add_appendix_data(migrate_directory(add_extra_lore(patch_lore(drop_settings(lore)))))))
+    lore, _prints = lore_activation(lore)
     settings = next(e for e in lore if e.get('mode') == 'folder' and e.get('comment') == SETTINGS_FOLDER_NAME)
+    # 폴더 key: 플러그인이 이름 대신 key 로 폴더를 찾고(이름을 바꿔도 됨), 점검이 없어진 것을 안다 (2026-10-27 설계안 9절)
+    manifest['keys'] = {'settings': settings['key'], 'wiki': WIKI_FOLDER_KEY}
+    pack = wiki_pack()
+    if pack:
+        manifest['wiki'] = {'digest': hashlib.sha1(pack.encode('utf-8')).hexdigest()[:12], 'length': len(pack.encode('utf-16-le')) // 2}
     lore.append({
         'key': MANIFEST_KEY, 'secondkey': '', 'insertorder': 0, 'comment': MANIFEST_COMMENT,
         'content': json.dumps(manifest, ensure_ascii=False), 'mode': 'normal', 'alwaysActive': False,
@@ -711,8 +876,10 @@ def main(src, dst):
     data['name'] = CARD_NAME
     data['first_mes'] = LANDING
     data['alternate_greetings'] = greetings
-    data['creator_notes'] = creator_notes(data.get('creator_notes'))
-    risu['backgroundHTML'] = status_css(risu.get('backgroundHTML'))
+    # 2026-10-27 사용자: 제작 노트는 비우고, RP 지침(description)은 플러그인이 요청에 끼우고(core/guides.ts RP), 옛 상태창 CSS 는 쓰는 곳이 없어 비운다
+    data['creator_notes'] = ''
+    data['description'] = ''
+    risu['backgroundHTML'] = ''
     risu['lowLevelAccess'] = False
     risu['virtualscript'] = ''
     risu.pop('triggerscript', None)
@@ -738,11 +905,19 @@ def main(src, dst):
     payload = update_payload(data, risu, lite_module, version, min_plugin)
     parts = write_update(Path(dst).parent, payload)
     pic_files = write_pictures(Path(dst).parent, pictures, data, others)
+    # 위키 기본 문서 묶음 · 아이콘: release 에서 플러그인이 받는다 (깡통봇 설치, 카드에 없는 기본 문서)
+    wiki_parts = write_parts(Path(dst).parent, 'wiki-base', pack, {'version': version})['parts'] if pack else []
+    icon_asset = next((a for a in data.get('assets', []) if a.get('type') == 'icon'), None)
+    icon = others.get(str(icon_asset.get('uri', '')).replace('embeded://', '')) if icon_asset else None
+    if icon:
+        (Path(dst).parent / 'icon.png').write_bytes(icon)
+    write_install_data(greetings, greeting_index, pictures, lore, icon)
     # 창이 열릴 때 받는 작은 버전 정보 (플러그인·카드를 같은 버전으로 함께 낸다)
     Path(dst).with_name('version.json').write_text(json.dumps(
         {'card': version, 'plugin': version, 'minPlugin': payload['minPlugin']}), encoding='utf-8')
     print(json.dumps({
         'output': str(dst), 'update': UPDATE_FILE, 'parts': parts, 'greetings': len(greetings), 'lore': len(lore), 'regex': len(kept_regex), 'wikiAssets': wiki_assets, 'maps': maps, 'pictures': pic_files,
+        'wikiParts': len(wiki_parts), 'icon': bool(icon),
         'backgroundHTML': len(risu['backgroundHTML']), 'first_mes': len(LANDING),
     }, ensure_ascii=False))
 

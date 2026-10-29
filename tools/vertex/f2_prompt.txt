@@ -1,0 +1,31 @@
+Use the attached image ONLY as the art-style reference: copy its pixel-art rendering exactly (chunky crisp pixels, dark outlines around every object, flat simple shading, clean color blocks, no blur, no soft gradients, no photographic texture). Do NOT copy its room, furniture, night lighting or wall colors.
+
+Draw ONE continuous side-view (front view, camera looking slightly down) background of a long, quiet, modern Korean government office building corridor, 2nd floor, daytime. Very wide panorama. The image width represents 26 meters of corridor, west (left) to east (right). Only the north wall (the back wall facing the camera) is visible; there are no windows anywhere.
+
+Vertical layout (as fractions of image height): the top ~6% is a thin ceiling edge strip with just a slim top molding, a few small downlight fixtures and two small CCTV domes (no wide ceiling band). From ~6% down to 60% is the back wall. At exactly 60% height there is ONE perfectly straight horizontal line where the wall meets the floor, across the entire width. Below that, 60%–100%, is the floor the player walks on.
+
+Wall: the simplest possible wall, one flat light-gray/off-white painted surface with a thin baseboard. No pillars, no vertical panels, no seams, no decoration, no light spots. Floor: smooth matte light-gray vinyl/polished tile, NO grid lines, NO tile lines, NO carpet; depth shown only by brightness (slightly darker near the wall, lighter toward the front) and a thin dark contact band where wall meets floor. No reflections. Lights are drawn as fixtures only, switched-off look: no glow, no light halos.
+
+Objects along the back wall, left to right, positions given as percent of the image width (all doors stand on the wall/floor line, door height ≈ 43% of image height):
+- 0%: west end wall corner.
+- 3–6.5%: a single dark charcoal-gray steel fire door to the stairwell (small narrow wire-glass window, gray door closer arm on top), a small green running-man exit sign above it, a small square blank floor-number plate beside it. No stairs are visible anywhere.
+- 9%: blank direction signboard on the wall (colored stripe and arrow/pictogram only).
+- 11.5%: large potted plant.
+- 15–18.5%: restroom door with a blank sign plate above it and a small male/female pictogram plate beside it.
+- 22%: water dispenser and a recycling bin.
+- 26%: red fire extinguisher cabinet.
+- 29–36%: wide double glass door (frosted band) of the main office, blank sign plate with a teal stripe above it, one small wall lamp.
+- 38.5%: bulletin board.
+- 42–60%: elevator hall: a slightly recessed area with a darker stone-like floor inlay in front; inside it a blank floor-plan board on the left wall part, then TWO identical brushed stainless-steel elevator doors side by side with a small gap (each with a small dark blank floor-indicator window above), a small call-button panel to the right of the elevators, and a large potted plant at the right end of the hall.
+- 62%: blank direction signboard.
+- 65.5%: simple bench against the wall.
+- 69–72.5%: single interview-room door with a blank sign plate above and a small blank status plate beside it.
+- 76%: wall clock (no numbers). 79%: a framed picture (abstract, no text).
+- 84%: red fire extinguisher cabinet.
+- 86.5–93.5%: wide double glass door of the lounge, blank sign plate with a teal stripe above.
+- 95%: small potted plant.
+- 97–100%: the east end: a dark charcoal steel emergency-exit fire door with a green running-man exit sign above, then the east end wall.
+
+Keep the floor area in front of doors and elevators empty. Leave ~3px gaps between separate objects. Everything at a consistent human scale (a door is about 0.9 m wide, 2.1 m tall).
+
+Forbidden: people or shadows of people, any letters, numbers, readable logos or text, stairs, perspective lines converging to a vanishing point, floor grid, carpet, dirt, stains, rust, broken lights, antique or detective-office style, dark navy walls, glowing light effects.

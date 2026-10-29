@@ -2,7 +2,6 @@ import { AMMO_PICKUP, DROP_TABLES, ITEMS, PICKUP, PROPS, SIGNATURES, WEAPONS, ty
 import {
   addAmmo,
   addItem,
-  addRelic,
   equip,
   fireSignature,
   pickupHealAmount,
@@ -113,7 +112,7 @@ export interface FieldInput {
 }
 export type ItemEvent =
   | { t: 'pickup'; kind: PickupKind; ref?: string; amount: number; x: number; y: number }
-  | { t: 'full'; kind: 'item' | 'relic' | 'ammo'; ref?: string }
+  | { t: 'full'; kind: 'item' | 'ammo'; ref?: string }
   | { t: 'use'; slot: number; id: string; effect: ReturnType<typeof useItem> extends infer R ? (R extends { effect: infer E } ? E : never) : never }
   | { t: 'equip'; weapon: string; dropped?: string }
   | { t: 'swing'; weapon: string; left: number }
@@ -152,7 +151,7 @@ export function placeProp(field: Field, prop: string, x: number, y: number): Pro
 /** 바닥에 하나 떨어뜨린다. 작은 포물선으로 튄다. */
 export function spawnPickup(field: Field, kind: PickupKind, x: number, y: number, ref?: string, amount = 1, uses?: number): Pickup {
   const a = rand(field) * Math.PI * 2,
-    s = (40 + rand(field) * 70) * (kind === 'weapon' || kind === 'relic' ? 0.6 : 1);
+    s = (40 + rand(field) * 70) * (kind === 'weapon' ? 0.6 : 1);
   const p: Pickup = {
     id: field.nextId++,
     type: 'pickup',
@@ -172,7 +171,7 @@ export function spawnPickup(field: Field, kind: PickupKind, x: number, y: number
   return p;
 }
 
-/** 드랍 표를 굴린다. 탄을 안 쓰는 요원은 탄 대신 현금, 탄이 바닥나면 탄 확률을 올린다(막힘 방지). */
+/** 드랍 표를 굴린다. 탄을 안 쓰는 요원에게는 탄이 안 떨어진다. 탄이 바닥나면 탄 확률을 올린다(막힘 방지). */
 export function rollDrops(field: Field, run: ItemRun, table: string, x: number, y: number): ItemEvent[] {
   const rows = DROP_TABLES[table];
   const out: ItemEvent[] = [];
@@ -181,27 +180,10 @@ export function rollDrops(field: Field, run: ItemRun, table: string, x: number, 
     let p = r.p;
     if (r.kind === 'ammo' && usesAmmo(run) && run.mag + run.reserve < 8) p = Math.min(1, p + 0.25);
     if (rand(field) >= p) continue;
-    let kind = r.kind,
-      ref: string | undefined,
-      amount = 1;
-    if (kind === 'ammo' && !usesAmmo(run)) {
-      kind = 'cash';
-      amount = between(field, 3, 6);
-    } else if (kind === 'cash') {
-      amount = between(field, r.min ?? 1, r.max ?? r.min ?? 1);
-      amount = Math.round(amount * (1 + field.depth * 0.05));
-    } else if (kind === 'shard') amount = between(field, r.min ?? 1, r.max ?? 1);
-    else if (r.pool) ref = pick(field, r.pool);
-    if (kind === 'shard' || (kind === 'cash' && amount > 10)) {
-      // 큰 값은 몇 개로 나눠 흩뿌린다(줍는 맛)
-      const n = kind === 'shard' ? amount : Math.min(4, Math.ceil(amount / 10));
-      let left = amount;
-      for (let i = 0; i < n; i++) {
-        const k = i === n - 1 ? left : Math.ceil(amount / n);
-        left -= k;
-        spawnPickup(field, kind, x, y, ref, k);
-      }
-    } else spawnPickup(field, kind, x, y, ref, amount);
+    const kind = r.kind;
+    if (kind === 'ammo' && !usesAmmo(run)) continue;
+    const ref = r.pool ? pick(field, r.pool) : undefined;
+    spawnPickup(field, kind, x, y, ref, 1);
     out.push({ t: 'drop', kind, ref, x, y });
   }
   return out;
@@ -393,7 +375,7 @@ export function interact(field: Field, run: ItemRun, actor: Actor): ItemEvent[] 
   for (const e of field.ents) {
     const d = near(e, actor);
     if (d >= bd) continue;
-    if (e.type === 'pickup' && (e.kind === 'weapon' || e.kind === 'item' || e.kind === 'relic') && e.z < 8) {
+    if (e.type === 'pickup' && (e.kind === 'weapon' || e.kind === 'item') && e.z < 8) {
       best = e;
       bd = d;
     } else if (e.type === 'prop' && PROPS[e.prop].use !== 'break' && !run.held) {
@@ -414,12 +396,6 @@ function take(field: Field, run: ItemRun, p: Pickup, manual: boolean, ctx?: UseC
   const at = { x: p.x, y: p.y };
   let amount = p.amount;
   switch (p.kind) {
-    case 'cash':
-      run.cash += p.amount;
-      break;
-    case 'shard':
-      run.shards += p.amount;
-      break;
     case 'heal':
       if (ctx) {
         if (ctx.hp >= ctx.max) return [];
@@ -440,11 +416,6 @@ function take(field: Field, run: ItemRun, p: Pickup, manual: boolean, ctx?: UseC
     case 'item':
       amount = addItem(run, p.ref!, p.amount);
       if (!amount) return manual ? [{ t: 'full', kind: 'item', ref: p.ref }] : [];
-      break;
-    case 'relic':
-      amount = 0;
-      while (amount < p.amount && addRelic(run, p.ref!)) amount++;
-      if (!amount) return manual ? [{ t: 'full', kind: 'relic', ref: p.ref }] : [];
       break;
     case 'weapon': {
       const prev = equip(run, p.ref!, p.uses);
@@ -499,13 +470,13 @@ export function stepField(
     }
     if (e.age < 0.35 || actor.z > 40) continue;
     // 작은 자동 흡수: 현금·파편·회복 조각·탄 / 아이템·회수물은 밟으면
-    const auto = e.kind === 'cash' || e.kind === 'shard' || e.kind === 'heal' || e.kind === 'ammo';
+    const auto = e.kind === 'heal' || e.kind === 'ammo';
     const d = near(e, actor);
     if (auto && d < PICKUP.magnet) {
       e.x += (actor.x - e.x) * Math.min(1, dt * 14);
       e.y += (actor.y - e.y) * Math.min(1, dt * 14);
     }
-    if ((auto && d < PICKUP.touch) || ((e.kind === 'item' || e.kind === 'relic') && d < PICKUP.touch)) ev.push(...take(field, run, e, false, ctx));
+    if ((auto && d < PICKUP.touch) || (e.kind === 'item' && d < PICKUP.touch)) ev.push(...take(field, run, e, false, ctx));
   }
   // 입력
   if (input.interact) ev.push(...interact(field, run, actor));

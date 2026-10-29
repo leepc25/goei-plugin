@@ -1,7 +1,7 @@
 import { build } from 'esbuild';
 import { readFileSync, writeFileSync, mkdirSync, readdirSync, unlinkSync, existsSync } from 'node:fs';
 import { createHash } from 'node:crypto';
-import { buildGamePack, buildPack } from './game-pack.mjs';
+import { buildGamePack } from './game-pack.mjs';
 import { rmSync } from 'node:fs';
 
 const pkg = JSON.parse(readFileSync(new URL('../package.json', import.meta.url)));
@@ -10,7 +10,7 @@ if (process.env.GOEI_BUILD_VERSION) pkg.version = process.env.GOEI_BUILD_VERSION
 const updateBase = String(process.env.GOEI_UPDATE_BASE ?? pkg.goei?.updateBase ?? '').replace(/\/+$/, '');
 const header = [
   '//@name goei-plugin',
-  '//@display-name 괴이: ANOMALY',
+  `//@display-name 괴이: ANOMALY v${pkg.version}`,
   '//@api 3.0',
   `//@version ${pkg.version}`,
   ...(updateBase ? [`//@update-url ${updateBase}/goei-plugin.js`] : []),
@@ -30,7 +30,7 @@ const common = {
   charset: 'utf8',
   minify: false,
   legalComments: 'none',
-  loader: { '.css': 'text' },
+  loader: { '.css': 'text', '.txt': 'text' },
   write: false,
 };
 
@@ -118,83 +118,22 @@ await build({
   format: 'esm',
   target: 'es2022',
   charset: 'utf8',
+  loader: { '.txt': 'text' },
   outfile: 'dist-test/core.mjs',
 });
 
-// 관찰형 게임 시험 페이지용 (tests/game/demo.html)
-await build({
-  entryPoints: ['src/game/demo.ts'],
-  bundle: true,
-  format: 'esm',
-  target: 'es2022',
-  charset: 'utf8',
-  loader: { '.css': 'text' },
-  outfile: 'dist-test/game-demo.js',
-});
-await build({
-  entryPoints: ['src/game/sim.ts'],
-  bundle: true,
-  format: 'esm',
-  target: 'es2022',
-  charset: 'utf8',
-  outfile: 'dist-test/game-sim.mjs',
-});
-
-// 1인 액션 검증판과 순수 전투 로직 시험용.
-await build({
-  ...common,
-  entryPoints: ['src/game/action/demo.ts'],
-  format: 'esm',
-  write: true,
-  outfile: 'dist-test/action-demo.js',
-});
-await build({
-  entryPoints: ['src/game/action/sim.ts'],
-  bundle: true,
-  format: 'esm',
-  target: 'es2022',
-  outfile: 'dist-test/action-sim.mjs',
-});
-
-await build({
-  ...common,
-  entryPoints: ['src/ui/game.ts'],
-  format: 'esm',
-  write: true,
-  outfile: 'dist-test/action-ui.js',
-});
-
-// 회색 상자 시험판 (그림 없음): 시험 페이지용 번들, 순수 시뮬레이션, 단일 HTML.
-await build({ ...common, entryPoints: ['src/game/action/graybox/demo.ts'], format: 'esm', write: true, outfile: 'dist-test/graybox-demo.js' });
-await build({ entryPoints: ['src/game/action/graybox/sim.ts'], bundle: true, format: 'esm', target: 'es2022', outfile: 'dist-test/graybox-sim.mjs' });
-{
-  const code = readFileSync('dist-test/graybox-demo.js', 'utf8').replace(/<\/script/gi, '<\\/script');
-  const html = `<!doctype html><html lang="ko"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>회색 상자 시험판 · 차원 승강기</title><style>body{margin:0;background:#02070c;display:flex;justify-content:center}#box{position:relative;max-width:100vw;height:100dvh}</style><div id="box"></div><script type="module">${code}</script></html>`;
-  writeFileSync('dist/goei-graybox.html', html);
-  mkdirSync('release/demo', { recursive: true });
-  writeFileSync('release/demo/goei-graybox.html', html);
-}
 
 // 게임 엔진 시연판 (전투·조작·장면 관리). 쟈알디 그림 묶음(game-pack/jyaldi)을 내장한 단일 HTML.
 await build({ ...common, entryPoints: ['src/game/action/engine/demo.ts'], format: 'esm', minify: true, write: true, outfile: 'dist-test/engine-demo.js' });
 {
   const art = {
-    atlas: `data:image/png;base64,${readFileSync('game-pack/jyaldi/atlas.png').toString('base64')}`,
-    cutin: `data:image/png;base64,${readFileSync('game-pack/jyaldi/cutin.png').toString('base64')}`,
+    // 쟈알디 그림(atlas·cutin)은 2026-10-25 사용자 지시로 뺐다. 동작 판정표(frames.json)만 남는다
+    atlas: '',
+    cutin: '',
     frames: JSON.parse(readFileSync('game-pack/jyaldi/frames.json', 'utf8')),
   };
-  // 배경 그림 (tools/bg_pixelize.py → game-src/art/bg/dot/<장소>/*.png). 없으면 단색 대역.
+  // 옛 배경 도트(game-src/art/bg/dot)는 2026-10-25 사용자 지시로 뺐다: 그림이 없는 장소는 단색 대역
   const bg = {};
-  const bgDir = 'game-src/art/bg/dot';
-  for (const place of existsSync(bgDir) ? readdirSync(bgDir) : []) {
-    for (const sub of ['', 'objects/']) {
-      const dir = `${bgDir}/${place}/${sub}`;
-      if (!existsSync(dir)) continue;
-      for (const f of readdirSync(dir).filter((f) => f.endsWith('.png'))) {
-        (bg[place] ??= {})[sub + f.slice(0, -4)] = `data:image/png;base64,${readFileSync(dir + f).toString('base64')}`;
-      }
-    }
-  }
   // 아이템·무기 그림 (tools/items_pixelize.py → game-src/art/items/dot + items.json)
   const items = {};
   if (existsSync('game-src/art/items/items.json')) {
@@ -203,20 +142,22 @@ await build({ ...common, entryPoints: ['src/game/action/engine/demo.ts'], format
       if (existsSync(f)) items[id] = { src: `data:image/png;base64,${readFileSync(f).toString('base64')}`, w: e.w, h: e.h, grip: e.grip, foot: e.foot };
     }
   }
-  const startRoom = {};
-  for (const key of ['room', 'workstation']) {
-    startRoom[key] = `data:image/png;base64,${readFileSync(`game-pack/start-room/${key}.png`).toString('base64')}`;
-  }
   const testPeople = {};
-  for (const key of ['woman_idle', 'woman_run', 'man']) {
-    testPeople[key] = `data:image/png;base64,${readFileSync(`game-pack/test-people/${key}.png`).toString('base64')}`;
+  for (const f of readdirSync('game-pack/test-people').filter((f) => /\.(png|webp)$/.test(f) && !f.startsWith('woman_'))) {
+    testPeople[f.replace(/\.(png|webp)$/, '')] = `data:image/${f.endsWith('.webp') ? 'webp' : 'png'};base64,${readFileSync(`game-pack/test-people/${f}`).toString('base64')}`;
   }
+  testPeople.eileen = JSON.parse(readFileSync('game-pack/test-people/eileen.json', 'utf8'));
+  testPeople.eileen_vfx = JSON.parse(readFileSync('game-pack/test-people/eileen_vfx.json', 'utf8'));
   const hqDoor = {};
   for (const key of ['frame', 'aperture', 'leaf-left', 'leaf-right', 'entry-marker']) {
     hqDoor[key] = `data:image/png;base64,${readFileSync(`game-pack/hq-door-round2/${key}.png`).toString('base64')}`;
   }
+  const hqField = {};
+  for (const pack of ['hq-field', 'jr-field']) for (const f of readdirSync(`game-pack/${pack}`).filter((f) => f.endsWith('.webp'))) {
+    hqField[f.slice(0, -5)] = `data:image/webp;base64,${readFileSync(`game-pack/${pack}/${f}`).toString('base64')}`;
+  }
   const code = readFileSync('dist-test/engine-demo.js', 'utf8').replace(/<\/script/gi, '<\\/script');
-  const html = `<!doctype html><html lang="ko"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"><title>관리국 액션 · 전투 시연</title><style>html,body{margin:0;height:100%;background:#000;overflow:hidden}#box{position:fixed;inset:0}</style><div id="box"></div><script>window.__GOEI_ENGINE_ART__=${JSON.stringify(art)};window.__GOEI_BG_ART__=${JSON.stringify(bg)};window.__GOEI_ITEM_ART__=${JSON.stringify(items)};window.__GOEI_HQ_DOOR_ROUND2__=${JSON.stringify(hqDoor)};window.__GOEI_START_ROOM__=${JSON.stringify(startRoom)};window.__GOEI_TEST_PEOPLE__=${JSON.stringify(testPeople)}</script><script type="module">${code}</script></html>`;
+  const html = `<!doctype html><html lang="ko"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"><title>관리국 액션 · 전투 시연</title><style>html,body{margin:0;height:100%;background:#000;overflow:hidden}#box{position:fixed;inset:0}</style><div id="box"></div><script>window.__GOEI_ENGINE_ART__=${JSON.stringify(art)};window.__GOEI_BG_ART__=${JSON.stringify(bg)};window.__GOEI_ITEM_ART__=${JSON.stringify(items)};window.__GOEI_HQ_DOOR_ROUND2__=${JSON.stringify(hqDoor)};window.__GOEI_HQ_FIELD__=${JSON.stringify(hqField)};window.__GOEI_TEST_PEOPLE__=${JSON.stringify(testPeople)}</script><script type="module">${code}</script></html>`;
   writeFileSync('dist/goei-action-game.html', html);
   mkdirSync('release/demo', { recursive: true });
   writeFileSync('release/demo/goei-action-game.html', html);
@@ -225,7 +166,7 @@ await build({ ...common, entryPoints: ['src/game/action/engine/demo.ts'], format
 {
   const out = await build({ ...common, entryPoints: ['src/game/action/audio/demo.ts'], format: 'esm', minify: true });
   const code = out.outputFiles[0].text.replace(/<\/script/gi, '<\\/script');
-  const html = `<!doctype html><html lang="ko"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>소리 시험실 · 차원 승강기</title><body><script type="module">${code}</script></body></html>`;
+  const html = `<!doctype html><html lang="ko"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>소리 시험실</title><body><script type="module">${code}</script></body></html>`;
   writeFileSync('dist/goei-sound.html', html);
   mkdirSync('release/demo', { recursive: true });
   writeFileSync('release/demo/goei-sound.html', html);
@@ -234,75 +175,30 @@ await build({ ...common, entryPoints: ['src/game/action/engine/demo.ts'], format
 }
 await build({ entryPoints: ['src/game/action/audio/music.ts', 'src/game/action/audio/songs.ts', 'src/game/action/audio/index.ts'], bundle: true, format: 'esm', target: 'es2022', outdir: 'dist-test/audio' });
 
-await build({
-  ...common,
-  entryPoints: ['src/game/action/motion-demo.ts'],
-  format: 'esm',
-  write: true,
-  outfile: 'dist-test/motion-demo.js',
-});
-
-// 새 액션 그림 팩은 구형 순찰 팩과 분리한다.
-const actionPack = buildPack('game-pack/action', 'action', 4, [
-  'a-jyaldi-action',
-  'bg-bureau-action',
-  'e-corner',
-  'e-watchman',
-]);
-writeFileSync('dist/goei-game-action.pack', actionPack);
-mkdirSync('dist-test', { recursive: true });
-writeFileSync('dist-test/goei-game-action.pack', actionPack);
-const actionReviewed = JSON.parse(readFileSync('game-src/action/layout.json', 'utf8')).releaseReady === true;
-if (actionReviewed) writeFileSync('release/goei-game-action-normal-v4.pack', actionPack);
-
-// 설치 없이 여는 단일 HTML 검증판. 필요한 새 액션 그림만 포함한다.
-const actionArt = {
-  atlas: JSON.parse(readFileSync('game-pack/action/atlas.json', 'utf8')),
-  files: Object.fromEntries(
-    ['a-jyaldi-action', 'e-corner', 'e-watchman', 'bg-bureau-action'].map((name) => [
-      name,
-      `data:image/png;base64,${readFileSync(`game-pack/action/${name}.png`).toString('base64')}`,
-    ]),
-  ),
-};
-const actionCode = readFileSync('dist-test/action-demo.js', 'utf8').replace(/<\/script/gi, '<\\/script');
-writeFileSync(
-  'dist/goei-action-demo.html',
-  `<!doctype html><html lang="ko"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>관리국 1인 전투 검증판</title><style>body{margin:0;background:#02070c;display:flex;justify-content:center}#box{position:relative;max-width:100vw;height:100dvh}</style><div id="box"></div><script>window.__GOEI_ACTION_ART__=${JSON.stringify(actionArt)}</script><script type="module">${actionCode}</script></html>`,
-);
-
-const motionCode = readFileSync('dist-test/motion-demo.js', 'utf8').replace(/<\/script/gi, '<\\/script');
-writeFileSync(
-  'dist/goei-jyaldi-motions.html',
-  `<!doctype html><html lang="ko"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>쟈알디 동작 확인</title><body><script>window.__GOEI_ACTION_ART__=${JSON.stringify(actionArt)}</script><script type="module">${motionCode}</script></body></html>`,
-);
-
-// 검토한 그림만 공유용 시연판으로 승격한다. 진행 중 자료는 dist에만 둔다.
-if (actionReviewed) {
-  mkdirSync('release/demo', { recursive: true });
-  const playable = readFileSync('dist/goei-action-demo.html');
-  writeFileSync('release/demo/goei-action-demo.html', playable);
-  const actionProfile = actionArt.atlas.action?.profile;
-  writeFileSync(
-    actionProfile?.startsWith('normal-')
-      ? 'release/demo/goei-jyaldi-normal.html'
-      : 'release/demo/goei-jyaldi-slender.html',
-    playable,
-  );
-  if (actionProfile === 'normal-v4') writeFileSync('release/demo/goei-jyaldi-action-v4.html', playable);
-  writeFileSync('release/demo/goei-jyaldi-motions.html', readFileSync('dist/goei-jyaldi-motions.html'));
+// 토크나이저 순위표 (o200k_base, js-tiktoken MIT): 플러그인이 설치·점검에서 받아 저장소에 둔다 (core/tokenizer.ts). 200KB 조각 + 목록
+{
+  const ranks = (await import('js-tiktoken/ranks/o200k_base')).default;
+  const text = JSON.stringify({ pat_str: ranks.pat_str, special_tokens: ranks.special_tokens, bpe_ranks: ranks.bpe_ranks });
+  for (const f of readdirSync('dist')) if (/^tok-o200k\.\d+\.txt$/.test(f)) unlinkSync(`dist/${f}`);
+  const PART = 200_000;
+  const parts = [];
+  let buf = '';
+  let bytes = 0;
+  for (const ch of text) {
+    const n = Buffer.byteLength(ch);
+    if (bytes + n > PART) (parts.push(buf), (buf = ''), (bytes = 0));
+    buf += ch;
+    bytes += n;
+  }
+  if (buf) parts.push(buf);
+  const names = parts.map((p, i) => {
+    const name = `tok-o200k.${i + 1}.txt`;
+    writeFileSync(`dist/${name}`, p);
+    return name;
+  });
+  writeFileSync('dist/tok-o200k.json', JSON.stringify({ name: 'o200k_base', parts: names, length: text.length, digest: createHash('sha1').update(text).digest('hex').slice(0, 12) }));
+  console.log({ tokenizer: 'o200k_base', parts: names.length, chars: text.length });
 }
-
-// 게임 그림 팩: 플러그인과 따로, 원하는 사람만 게임 창에서 받는다 (release/ 폴더에서 바로 받거나 파일로 넣기).
-// 그림이 그대로면 바이트도 같아서 매번 써도 바뀐 것으로 잡히지 않는다
-const PACK_VERSION = Number(/PACK_VERSION = (\d+)/.exec(readFileSync('src/game/assets.ts', 'utf8'))[1]);
-const pack = buildPack('game-pack/patrol', 'patrol', PACK_VERSION);
-writeFileSync('dist/goei-game-patrol.pack', pack);
-mkdirSync('release', { recursive: true });
-writeFileSync('release/goei-game-patrol.pack', pack);
-mkdirSync('dist-test', { recursive: true });
-writeFileSync('dist-test/goei-game-patrol.pack', pack);
-
 const info = {
   version: pkg.version,
   bytes: Buffer.byteLength(code),

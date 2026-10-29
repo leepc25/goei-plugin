@@ -1,5 +1,5 @@
 {
- "version": "0.16.56",
+ "version": "0.17.7",
  "code": {
   "parts": [
    "goei-game.1.txt",
@@ -11,10 +11,12 @@
    "goei-game.7.txt",
    "goei-game.8.txt",
    "goei-game.9.txt",
-   "goei-game.10.txt"
+   "goei-game.10.txt",
+   "goei-game.11.txt",
+   "goei-game.12.txt"
   ],
-  "length": 1888758,
-  "bytes": 1981309
+  "length": 2181521,
+  "bytes": 2382027
  },
  "packs": [
   {
@@ -23,6 +25,17 @@
    "bytes": 11232,
    "parts": [
     "hq-door-round2.1.bin"
+   ],
+   "required": true
+  },
+  {
+   "id": "hq-field",
+   "hash": "00e6d4b059be50e4",
+   "bytes": 1277071,
+   "parts": [
+    "hq-field.1.bin",
+    "hq-field.2.bin",
+    "hq-field.3.bin"
    ],
    "required": true
   },
@@ -36,34 +49,37 @@
    "required": false
   },
   {
-   "id": "jyaldi",
-   "hash": "f9ddba2dce4f4bc4",
-   "bytes": 1283015,
+   "id": "jr-field",
+   "hash": "4af7242a4da57a0b",
+   "bytes": 3164926,
    "parts": [
-    "jyaldi.1.bin",
-    "jyaldi.2.bin",
-    "jyaldi.3.bin"
+    "jr-field.1.bin",
+    "jr-field.2.bin",
+    "jr-field.3.bin",
+    "jr-field.4.bin",
+    "jr-field.5.bin",
+    "jr-field.6.bin",
+    "jr-field.7.bin"
    ],
    "required": true
   },
   {
-   "id": "start-room",
-   "hash": "ac1c5cd3def14d50",
-   "bytes": 2001478,
+   "id": "jyaldi",
+   "hash": "3f5eef56dba8ab22",
+   "bytes": 46050,
    "parts": [
-    "start-room.1.bin",
-    "start-room.2.bin",
-    "start-room.3.bin",
-    "start-room.4.bin"
+    "jyaldi.1.bin"
    ],
    "required": true
   },
   {
    "id": "test-people",
-   "hash": "dfd590d8f3d61152",
-   "bytes": 97595,
+   "hash": "c677942e2c209bcc",
+   "bytes": 1228145,
    "parts": [
-    "test-people.1.bin"
+    "test-people.1.bin",
+    "test-people.2.bin",
+    "test-people.3.bin"
    ],
    "required": true
   },

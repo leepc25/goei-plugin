@@ -147,7 +147,7 @@ export class Enemy implements Body {
     this.z = def.hover ?? 0;
     this.hp = this.hpMax = def.hp;
     this.grabbable = def.grabbable;
-    this.boss = def.faction === 'guardian';
+    this.boss = false;
     this.armorBase = def.armor;
     this.brain = brain;
     const r = opts.rand ?? (() => 0.5);
@@ -378,7 +378,7 @@ export class Enemy implements Body {
       this.x += this.vx;
       this.vx *= 0.82;
       // 벽 충돌: 강하게 밀려 벽에 닿으면 추가 피해 + 다운 (E.1)
-      if ((this.x < bx0 + 20 || this.x > bx1 - 20) && Math.abs(this.vx) > 7 && !this.mem.wallHit && this.def.faction !== 'guardian') {
+      if ((this.x < bx0 + 20 || this.x > bx1 - 20) && Math.abs(this.vx) > 7 && !this.mem.wallHit) {
         this.mem.wallHit = true;
         this.hp -= Math.round(this.hpMax * 0.06);
         this.vx = -this.vx * 0.3;

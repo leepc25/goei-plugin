@@ -1,56 +1,95 @@
-// 필드 시험용 사람 그림 (game-pack/test-people, 사용자가 PixelLab에서 만든 Test woman·Test man 128×256).
-// 주인공 = 여자: 서 있으면 남동(south-east) 그림, 움직이면 남동 달리기 8장(걷기도 달리기로). 왼쪽은 좌우 뒤집기.
-// 남자 = 사무실에 서 있기만 한다(동쪽 그림, 4방향 캐릭터라 대각선이 없다).
-// 크기: 원본 1도트 = 맨 앞 화면 1.5px, 원근은 다른 요원과 같다.
+// 필드 시험용 사람 그림 (game-pack/test-people).
+// 주인공 = 에일린 테스트룸 완성본(2026-10-25 사용자 지시): 테스트룸이 정리한 시트·기준점(eileen.json)을 그대로 쓰고,
+// 재생도 테스트룸 규칙대로(평상 대기는 앞 두 장만 0.6초씩, 걷기 11장/초, 뛰기 15장/초, 발밑 = 그림 높이 - 4, 그림자는 발 범위).
+// 엔진 동작 이름(idle·walk·jab…)은 테스트룸 동작 번호로 바꿔 그린다. 왼쪽은 좌우 뒤집기.
+// 남자 = 사무실에 서 있기만 한다(Test man, 동쪽 그림).
+// 크기: 원본 1도트 = 월드 1.15px × 원근 (맨 뒤 줄 키 1.65m = 235px). 배경과 같이 커진다.
 import { snapTo, spr } from '../engine/view';
 
-const SCALE = 1.5;
-const RUN_MS = 85;
-type Art = { idle: HTMLImageElement; run: HTMLImageElement; man: HTMLImageElement };
+const MAN_SCALE = 1;
+type Meta = { name: string; dir: string; n: number; w: number; h: number; bot: number[]; foot: number[][]; cx: number[] };
+type Vfx = { frames: number[][]; pivot: number[]; img: HTMLImageElement };
+type Art = { clips: Record<string, { im: HTMLImageElement; m: Meta }>; man: HTMLImageElement; vfx: Record<string, Vfx> };
 let art: Art | null = null;
 let revision = 0;
-declare global { interface Window { __GOEI_TEST_PEOPLE__?: Record<string, string> } }
+declare global { interface Window { __GOEI_TEST_PEOPLE__?: Record<string, string> & { eileen?: Record<string, Meta>; eileen_vfx?: Record<string, Omit<Vfx, 'img'>> } } }
 
-/** 그림별 발 기준점(원본 px): 서 있기 128×256 캔버스, 달리기 256×256 캔버스 */
-const IDLE = { w: 128, h: 256, fx: 61, fy: 249, head: 18 };
-const RUN = { w: 256, h: 256, fx: 128, fy: 234 };
 const MAN = { w: 128, h: 256, fx: 66, fy: 249, head: 8 };
 
-export function prepareTestPeople(urlOf?: (file: string) => Promise<string>) {
+export function prepareTestPeople(urlOf?: (file: string) => Promise<string>, bytesOf?: (file: string) => Promise<Uint8Array | null>) {
   const own = ++revision;
   art = null;
-  const ready = Promise.all((['idle', 'run', 'man'] as const).map(async (key) => {
-    const file = key === 'man' ? 'man' : `woman_${key}`;
-    const src = window.__GOEI_TEST_PEOPLE__?.[file] || (urlOf ? await urlOf(file + '.png') : '');
+  faces.clear();
+  const img = async (file: string, ext = '.png') => {
+    const src = window.__GOEI_TEST_PEOPLE__?.[file] || (urlOf ? await urlOf(file + ext) : '');
     if (!src) throw new Error('no test art');
     const im = new Image(); im.src = src; await im.decode();
-    return [key, im] as const;
-  })).then((rows) => { if (revision === own) art = Object.fromEntries(rows) as Art; }).catch(() => { /* 없으면 원래 쟈알디 그림 */ });
+    return im;
+  };
+  const ready = (async () => {
+    let meta = window.__GOEI_TEST_PEOPLE__?.eileen as Record<string, Meta> | undefined;
+    if (!meta && bytesOf) {
+      const b = await bytesOf('eileen.json');
+      if (b) meta = JSON.parse(new TextDecoder().decode(b));
+    }
+    if (!meta) throw new Error('no eileen');
+    const rows = await Promise.all(Object.entries(meta).map(async ([id, m]) => [id, { im: await img(`eileen_${id}`, '.webp'), m }] as const));
+    const man = await img('man');
+    // 테스트룸 PixelLab 이펙트 그림 (없어도 된다: 그림 없는 이펙트는 코드 그림으로)
+    let vm = window.__GOEI_TEST_PEOPLE__?.eileen_vfx as Record<string, Omit<Vfx, 'img'>> | undefined;
+    if (!vm && bytesOf) { const b = await bytesOf('eileen_vfx.json').catch(() => null); if (b) vm = JSON.parse(new TextDecoder().decode(b)); }
+    const vfx: Record<string, Vfx> = {};
+    if (vm) await Promise.all(Object.entries(vm).map(async ([k, v]) => { try { vfx[k] = { ...v, img: await img(`vfx_${k}`, '.webp') }; } catch { /* 이 그림만 없음 */ } }));
+    if (revision === own) art = { clips: Object.fromEntries(rows), man, vfx };
+  })().catch(() => { /* 없으면 원래 쟈알디 그림 */ });
   return { ready, dispose: () => { if (revision === own) { revision++; art = null; } } };
 }
 
 export const hasTestPeople = () => !!art;
 
-function shadow(c: CanvasRenderingContext2D, x: number, y: number, k: number) {
-  c.fillStyle = 'rgba(0,0,0,.28)';
+/** 엔진 동작 → 테스트룸 동작 번호. loop = 시간으로 도는 동작 (장/초), 나머지는 엔진 진행률로 장을 고른다 */
+const MAP: Record<string, string> = {
+  idle: '1', guard: '3', walk: '4', run: '5', jump: '7', land: '6',
+  jab: '9', cross: '10', lowkick: '11', toss: '11', power: '12', dash: '13', airkick: '14',
+  fire: '15', shotgun: '15', pipe: '12', evade: '16', block: '17', hit: '18', down: '19', getup: '20',
+  blast: '22', chain: '22', wall: '22', groundblast: '22', grabblast: '22', charge: '23', super: '25',
+  // pickup은 E(조사)마다 짧게 나와서 문 앞에서 허리를 굽히게 된다: 서 있기로 둔다
+  eat: '26', drink: '26', bandage: '26', pickup: '1', crouch: '39', grab: '10', grabknee: '11',
+  draw: 'W', holster: 'W', reload: 'W',
+};
+const LOOP_FPS: Record<string, number> = { '4': 11, '5': 15, '3': 8 };
+
+function frameOf(id: string, m: Meta, f: number, total: number): number {
+  const now = performance.now() / 1000;
+  if (id === '1') return Math.floor(now / 0.6) % 2; // 평상 대기: 앞 두 장만 (마지막 장은 가슴이 너무 올라감, 사용자)
+  if (LOOP_FPS[id]) return Math.floor(now * LOOP_FPS[id]) % m.n;
+  return Math.max(0, Math.min(m.n - 1, Math.floor(((f + 0.5) / Math.max(1, total)) * m.n)));
+}
+
+function shadow(c: CanvasRenderingContext2D, x: number, y: number, w: number, k: number) {
+  c.fillStyle = `rgba(0,0,0,${0.36})`;
   c.beginPath();
-  c.ellipse(x, y, 40 * k, 9 * k, 0, 0, Math.PI * 2);
+  c.ellipse(x, y - 2 * k, Math.max(16, w) * 0.58 * k, 5 * k, 0, 0, Math.PI * 2);
   c.fill();
 }
 
-/** 주인공(여자). moving이면 달리기. x,y = 발 가운데(월드), dir 1 = 오른쪽 */
-export function drawTestPlayer(c: CanvasRenderingContext2D, moving: boolean, x: number, y: number, dir: 1 | -1): boolean {
+/** 주인공(에일린). clip·frame·total = 엔진 동작과 그 장(진행률). x,y = 발 가운데(월드), dir 1 = 오른쪽 */
+export function drawTestPlayer(c: CanvasRenderingContext2D, clip: string, frame: number, total: number, x: number, y: number, dir: 1 | -1): boolean {
   if (!art) return false;
-  const P = SCALE * spr(y);
+  const id = MAP[clip] ?? '1';
+  const e = art.clips[id] ?? art.clips['1'];
+  if (!e) return false;
+  const { im, m } = e;
+  const f = frameOf(id, m, frame, total);
+  const k = spr(y) * 1.28; // 맨 뒤 줄 키 1.65m = 235px (eileen/player.ts CHAR_K와 같게)
+  const flip = m.dir === 'SW' ? dir > 0 : dir < 0;
   c.save();
   c.imageSmoothingEnabled = false;
-  shadow(c, x, y, P);
+  const ft = m.foot[f] ?? [0, 40];
+  shadow(c, x + (flip ? -ft[0] : ft[0]) * k, y, Math.min(80, ft[1]), k);
   snapTo(c, x, y);
-  if (dir < 0) c.scale(-1, 1);
-  if (moving) {
-    const f = Math.floor(performance.now() / RUN_MS) % 8;
-    c.drawImage(art.run, f * RUN.w, 0, RUN.w, RUN.h, -RUN.fx * P, -RUN.fy * P, RUN.w * P, RUN.h * P);
-  } else c.drawImage(art.idle, 0, 0, IDLE.w, IDLE.h, -IDLE.fx * P, -IDLE.fy * P, IDLE.w * P, IDLE.h * P);
+  c.scale(flip ? -k : k, k);
+  c.drawImage(im, f * m.w, 0, m.w, m.h, -Math.round(m.w / 2), -(m.h - 4), m.w, m.h);
   c.restore();
   return true;
 }
@@ -58,10 +97,11 @@ export function drawTestPlayer(c: CanvasRenderingContext2D, moving: boolean, x: 
 /** 서 있는 남자. dir 1 = 오른쪽 보기(원본) */
 export function drawTestMan(c: CanvasRenderingContext2D, x: number, y: number, dir: 1 | -1): boolean {
   if (!art) return false;
-  const P = SCALE * spr(y);
+  const P = MAN_SCALE * spr(y);
   c.save();
   c.imageSmoothingEnabled = false;
-  shadow(c, x, y, P);
+  c.fillStyle = 'rgba(0,0,0,.28)';
+  c.beginPath(); c.ellipse(x, y, 40 * P, 9 * P, 0, 0, Math.PI * 2); c.fill();
   snapTo(c, x, y);
   if (dir < 0) c.scale(-1, 1);
   c.drawImage(art.man, 0, 0, MAN.w, MAN.h, -MAN.fx * P, -MAN.fy * P, MAN.w * P, MAN.h * P);
@@ -70,18 +110,32 @@ export function drawTestMan(c: CanvasRenderingContext2D, x: number, y: number, d
 }
 
 /** 발 기준 머리 꼭대기 (화면 px, 음수, 원근 미포함 — 부르는 쪽이 persp를 곱한다) */
-export const testPlayerTop = () => -(IDLE.fy - IDLE.head) * SCALE;
-export const testManTop = () => -(MAN.fy - MAN.head) * SCALE;
+export const testPlayerTop = () => -(252 - 14) * 1.28;
+export const testManTop = () => -(MAN.fy - MAN.head) * MAN_SCALE;
 
-/** 주인공(여자) 얼굴 칸: 서 있는 그림의 머리·어깨 side×side (원본 1도트 = 1px) */
-let face: HTMLCanvasElement | null = null;
-export function testPlayerFace(side = 44): HTMLCanvasElement | null {
-  if (!art) return null;
-  if (face?.width === side) return face;
-  face = document.createElement('canvas');
+/** 주인공 얼굴 칸 (네임텍): 얼굴이 잘 보이는 남동쪽 그림(고개 젓기 첫 장, 없으면 평상 대기). flip = 남서(왼쪽 보기)면 좌우 반전 (사용자 2026-10-25) */
+const faces = new Map<string, HTMLCanvasElement>();
+export function testPlayerFace(side = 44, flip = false): HTMLCanvasElement | null {
+  const e = art?.clips['31'] ?? art?.clips['1'];
+  if (!e) return null;
+  const key = `${side}|${flip}`, hit = faces.get(key);
+  if (hit) return hit;
+  const face = document.createElement('canvas');
+  faces.set(key, face);
   face.width = face.height = side;
   const o = face.getContext('2d')!;
   o.imageSmoothingEnabled = false;
-  o.drawImage(art.idle, IDLE.fx - side / 2, IDLE.head - 4, side, side, 0, 0, side, side);
+  // 얼굴 가운데 = 몸 중심에서 오른쪽 6도트, 머리 꼭대기(14)에서 조금 아래부터
+  const fx = e.m.w / 2 + (e.m.cx[0] ?? 0) + 6;
+  if (flip) { o.translate(side, 0); o.scale(-1, 1); }
+  o.drawImage(e.im, Math.round(fx - side / 2), 16, side, side, 0, 0, side, side);
   return face;
+}
+
+/** 에일린 테스트룸 전투(eileen/core.ts)가 쓰는 그림: 동작 기준점(A)·시트(IMG)·이펙트(VFX) */
+export function eileenArt(): { A: Record<string, Meta & Record<string, unknown>>; IMG: Record<string, HTMLImageElement>; VFX: Record<string, Vfx> } | null {
+  if (!art) return null;
+  const A: Record<string, Meta> = {}, IMG: Record<string, HTMLImageElement> = {};
+  for (const [k, v] of Object.entries(art.clips)) { A[k] = v.m; IMG[k] = v.im; }
+  return { A, IMG, VFX: art.vfx };
 }

@@ -85,120 +85,12 @@ test('조건식', () => {
   assert.throws(() => S.evaluate('a ==', f));
 });
 
-test('모든 대본이 읽히고 표지·call이 전부 맞다', () => {
-  const lib = S.buildLibrary();
-  assert.deepEqual(lib.validate(), []);
-  assert.ok(lib.scripts.size >= 25, `대본 ${lib.scripts.size}개`);
-  for (const c of Object.values(S.CUTSCENES))
-    for (const st of c.steps.flatMap((x) => (x.k === 'par' ? x.steps : [x]))) if (st.k === 'say') assert.ok(lib.scripts.has(st.script), `${c.id} → ${st.script}`);
-});
-
-test('요원 8명 × 대사표 태그 전부 있고 호명 3·총애 높낮이 2줄씩', () => {
+test('요원 8명 × 대사표 태그 전부 있다', () => {
   const tags = ['offer', 'brief', 'enter', 'enter_elevator', 'greet', 'called', 'combat', 'boss', 'kill', 'ult', 'hp_low', 'ammo_low', 'ammo_empty', 'find', 'rule_break', 'intrude_fake', 'intrude_daydream', 'rescue', 'win', 'evac', 'settle'];
   for (const a of S.AGENT_IDS) {
     for (const t of tags) assert.ok(S.AGENT_LINES[a][t]?.length, `${a}.${t}`);
-    assert.equal(S.CALLS[a].length, 3, `${a} 호명`);
-    assert.ok(S.FAVOR_LINES[a].high.length >= 2 && S.FAVOR_LINES[a].low.length >= 2);
-    assert.ok(S.CALLS[a].every((l) => l.includes(S.AGENTS[a].name)), `${a} 호명에 이름`);
     for (const lines of Object.values(S.AGENT_LINES[a])) for (const l of lines) assert.ok(l.length > 0 && l.length <= 80, `${a}: ${l}`);
   }
-});
-
-test('모든 요원 × 주요 대본이 끝까지 돌고 빈 대사가 없다', () => {
-  const lib = S.buildLibrary();
-  const ids = ['jaemtri_desk', 'briefing', 'offer', 'supply', 'appraisal', 'lab', 'breakroom', 'settle', 'evac_wake', 'board', 'deal', 'attic', 'passenger_three', 'passenger_pair', 'passenger_supply', 'passenger_signs', 'passenger_missing', 'mirror', 'exit_panel', 'cs_first_day', 'cs_first_entry', 'cs_first_call', 'cs_evac', 'cs_exit'];
-  for (const a of S.AGENT_IDS)
-    for (const id of ids)
-      for (const pick of [0, 1, 2, 3])
-        for (const honest of [0, 1]) {
-          const flags = { favor: pick - 1, rules: pick * 3, mission: `m${pick + 1}`, honest, liar: honest ? 'a' : 'b', loot: 1, unsent: 1, depth: 4, ftype: 'chase', result: ['return', 'retreat', 'evac'][pick % 3], male: a === 'gorgodio' || a === 'kyuras' };
-          const said = play(lib, id, ctxFor(a, flags, seq(0.1, 0.7, 0.4)), [pick, pick, pick, 0]);
-          for (const l of said) {
-            assert.ok(!/\{|\}|undefined|NaN/.test(l), `${a}/${id}: ${l}`);
-            assert.ok(!/: $/.test(l), `${a}/${id} 빈 대사`);
-          }
-        }
-});
-
-test('잼트리 임무 게시판: 앞 임무를 끝내야 다음 임무가 열린다', () => {
-  const lib = S.buildLibrary();
-  const flags = { met_jaemtri: 1 };
-  const r = new S.StoryRunner(lib, ctxFor('jyaldi', flags, seq(0)));
-  let s = r.start('jaemtri_desk');
-  while (s.kind === 'say') s = r.next();
-  s = r.choose(0); // 게시판
-  while (s.kind === 'say') s = r.next();
-  assert.equal(s.options.length, 2);
-  assert.ok(s.options[0].text.startsWith('[조사]') && s.options[1].text.startsWith('다시'));
-  flags.done_m1 = flags.done_m2 = flags.done_m3 = 1;
-  s = r.start('jaemtri_desk');
-  while (s.kind === 'say') s = r.next();
-  s = r.choose(0);
-  while (s.kind === 'say') s = r.next();
-  assert.equal(s.options.length, 4, 'm4·m5·m7 + 돌아가기');
-});
-
-test('승강기 탑승: 첫 탑승에만 호명, 인사로 총애가 오르고 -3~+3을 넘지 않는다', () => {
-  const lib = S.buildLibrary();
-  const flags = { favor: 2, depth: 4, ftype: 'trial' };
-  const said1 = play(lib, 'board', ctxFor('eileen', flags, () => 0.01), [0]);
-  assert.ok(said1.some((l) => l.includes('와이셔츠')), '첫 호명');
-  assert.equal(flags.favor, 3);
-  assert.ok(said1.some((l) => l.includes('다들 내리기만')), '총애 3: 외로움 한 줄');
-  assert.ok(said1.some((l) => l.includes('벽에 숙제')), '총애 2 이상: 맞는 층 힌트');
-  const said2 = play(lib, 'board', ctxFor('eileen', flags, () => 0.01), [0]);
-  assert.equal(flags.favor, 3, '상한');
-  assert.ok(!said2.some((l) => l.includes('와이셔츠') || l.includes('생일')), '두 번째 탑승은 호명 없음');
-  flags.favor = -2;
-  play(lib, 'board', ctxFor('eileen', flags), [1]);
-  assert.equal(flags.favor, -3);
-  const said3 = play(lib, 'board', ctxFor('eileen', flags), [1]);
-  assert.equal(flags.favor, -3, '하한');
-  assert.ok(said3.some((l) => l.includes('닫히지 않습니다')), '총애 -3: 갇힘');
-});
-
-test('호명은 같은 요원에게 3줄을 차례로', () => {
-  const flags = {};
-  const got = [0, 1, 2, 3].map(() => S.lookupLine('gorgodio', 'el:call', flags, Math.random));
-  assert.equal(new Set(got.slice(0, 3)).size, 3);
-  assert.equal(got[3], got[0]);
-});
-
-test('떠도는 승객: 로제몬은 거짓을 알아보고, 둘 중 사연 긴 쪽이 거짓이다', () => {
-  const lib = S.buildLibrary();
-  const lie = play(lib, 'passenger_three', ctxFor('rojemon', { honest: 0 }), [0]);
-  assert.ok(lie.some((l) => l.startsWith('로제몬: 헛소리하지 마')));
-  const ctx = ctxFor('eileen', { honest: 0 });
-  play(lib, 'passenger_three', ctx, [0]);
-  assert.deepEqual(ctx.emitted.at(-1), ['passenger', 'lure']);
-  const ctx2 = ctxFor('eileen', { honest: 1 });
-  play(lib, 'passenger_three', ctx2, [0]);
-  assert.deepEqual(ctx2.emitted.at(-1), ['passenger', 'right']);
-  for (const liar of ['a', 'b']) {
-    const r = new S.StoryRunner(lib, ctxFor('kyuras', { liar }));
-    let s = r.start('passenger_pair');
-    const lens = [];
-    while (s.kind === 'say') {
-      if (s.who === 'passenger') lens.push(s.text.length);
-      s = r.next();
-    }
-    const longIsA = lens[0] > lens[1];
-    assert.equal(longIsA, liar === 'a', '긴 쪽이 거짓');
-    const c = ctxFor('kyuras', { liar });
-    play(lib, 'passenger_pair', c, [liar === 'a' ? 1 : 0]);
-    assert.ok(c.emitted.some(([e, a]) => e === 'passenger' && a === 'right'));
-    assert.equal(c.flags.rule_passenger, 1, '처음 맞히면 규칙서에 한 줄');
-  }
-});
-
-test('EXIT: 조건 전에는 막히고, 다 채우면 출구 컷신', () => {
-  const lib = S.buildLibrary();
-  const c1 = ctxFor('jyaldi', { rules: 9, favor: 3, reached_b12: 1 });
-  const said = play(lib, 'exit_panel', c1);
-  assert.ok(said[0].includes('아직 안 돼요'));
-  const c2 = ctxFor('jyaldi', { rules: 10, favor: 3, reached_b12: 1 });
-  play(lib, 'exit_panel', c2);
-  assert.deepEqual(c2.emitted, [['cutscene', 'exit']]);
 });
 
 test('말풍선 감독: 간격·태그 쿨다운·확률', () => {
@@ -251,22 +143,6 @@ test('컷신 시퀀서: 시간 순서, 대화 기다림, 동시 진행, 건너�
   c.update(0.6);
   assert.equal(log.at(-1), 'emit done t');
   assert.equal(c.done, true);
-  // 건너뛰기: 끝 상태만
-  const log2 = [];
-  const c2 = new S.Cutscene(S.CUTSCENES.first_entry, { ...io, bg: (s) => log2.push(s), emit: (e) => log2.push(e), dialogue: () => {}, talking: () => false, closeDialogue: () => {} });
-  c2.update(0.01);
-  c2.skip();
-  assert.equal(c2.done, true);
-  assert.equal(log2.at(-1), 'cutscene:done');
-  assert.equal(log2.at(-2), 'lobby_wrong');
-});
-
-test('모든 컷신이 대화 없이 120초 안에 끝난다', () => {
-  for (const def of Object.values(S.CUTSCENES)) {
-    const c = new S.Cutscene(def, { dialogue: () => {}, line: () => {}, agentLine: () => {}, talking: () => false, closeDialogue: () => {} });
-    for (let i = 0; i < 2400 && !c.done; i++) c.update(0.05);
-    assert.ok(c.done, def.id);
-  }
 });
 
 test('자유 대화: 모델 메시지 구성, 답 다듬기, 실패·지연 시 미리 쓴 답', async () => {

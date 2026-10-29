@@ -32,53 +32,46 @@ try {
   await hold(page, 'ArrowRight', 500);
   const s1 = await st(page);
   assert.ok(s1.x > s0.x + 60, `걷기 ${s0.x}→${s1.x}`);
-  // 허수아비 쪽으로 가서 3연타
+  // 주인공 = 에일린 테스트룸 전투 (2026-10-25 사용자 지시). 키도 테스트룸: Z 약 · X 강 · A 원거리 · S 기술 · D 충전 · C 회피 · V 막기 · Space 점프
+  const ei = (page) => page.evaluate(() => { const p = window.__goeiEngine.world.player; return { cls: !!p.core, mode: p.core?.P.mode, clip: p.core?.P.clip?.id ?? null, z: p.z, heat: p.core?.P.heat ?? 0, combo: p.maxCombo, hp: window.__goeiEngine.world.bodies.filter((b) => b.team === 'enemy').reduce((s, b) => s + b.hp, 0) }; });
+  assert.ok((await ei(page)).cls, '주인공이 에일린');
+  // 허수아비 쪽으로 가서 약 3연타 + 강
   await page.keyboard.down('ArrowRight');
   await page.waitForFunction(() => window.__goeiEngine.world.player.x > 600, null, { timeout: 5000 });
   await page.keyboard.up('ArrowRight');
-  for (let i = 0; i < 12; i++) { await page.keyboard.press('KeyA'); await page.waitForTimeout(110); }
+  const hp0 = (await ei(page)).hp;
+  const seen = new Set();
+  // 앞 동작이 끝나 이어 칠 수 있을 때(약 → 「이어 치기」 자세, 약3 → 서기) 다음 키를 누른다
+  const ready = () => page.waitForFunction(() => { const P = window.__goeiEngine.world.player.core.P; return P.mode === 'chain' || P.mode === 'ground'; }, null, { timeout: 3000 });
+  for (const k of ['KeyQ', 'KeyQ', 'KeyQ', 'KeyW']) { await ready(); await hold(page, k, 40); for (let i = 0; i < 3; i++) { await page.waitForTimeout(40); const c = (await ei(page)).clip; if (c) seen.add(c); } }
   await S(page, 'pc-combo');
-  const s2 = await st(page);
-  assert.ok(s2.combo >= 2, `콤보 ${s2.combo}`);
-  // 판정 보기
-  await page.keyboard.press('KeyH');
-  await page.keyboard.press('KeyA');
-  await page.waitForTimeout(120);
-  await S(page, 'pc-hitbox');
-  await page.keyboard.press('KeyH');
-  await page.waitForTimeout(900);
-  // 사격: 첫 S는 뽑기만, 다음 S가 한 발 (쟈알디 시연판과 같게)
-  await page.keyboard.press('KeyS');
-  await page.waitForTimeout(500);
-  assert.equal((await st(page)).ammo, 8, '뽑기만 해서는 탄이 그대로');
-  await page.keyboard.press('KeyS');
-  await page.waitForTimeout(400);
-  const s3 = await st(page);
-  assert.ok(s3.ammo < 8, '사격 후 탄 감소');
-  const muzzle = await page.evaluate(() => Math.max(0, ...window.__goeiEngine.world.bodies.filter((b) => b.kind === 'bullet').map((b) => b.z)));
-  assert.ok(muzzle === 0 || muzzle > 150, `총알이 손 높이에서 나감 (z ${muzzle})`);
-  await page.waitForTimeout(1900);
-  // 점프·회피·앉기
-  await page.keyboard.press('Space');
-  await page.waitForTimeout(150);
-  const s4 = await st(page);
-  assert.ok(s4.z > 0, '점프');
+  assert.ok(['9', '10', '11', '12'].every((c) => seen.has(c)), `약1·약2·약3·강 동작 (${[...seen]})`);
+  assert.ok((await ei(page)).hp < hp0, '허수아비가 맞음');
   await page.waitForTimeout(700);
-  await page.keyboard.down('ArrowLeft'); await page.keyboard.press('ShiftLeft'); await page.keyboard.up('ArrowLeft');
-  await page.waitForTimeout(50);
-  const s5 = await st(page);
-  assert.equal(s5.state, 'evade');
+  // 원거리: 누르고 있으면 연사, 총열 열이 오른다
+  await hold(page, 'KeyA', 500);
+  assert.ok((await ei(page)).heat > 0, '원거리 사격 (총열 열)');
+  await page.waitForTimeout(700);
+  // 점프
+  await page.keyboard.press('Space');
+  await page.waitForTimeout(250);
+  assert.ok((await st(page)).z > 0, '점프');
+  await page.waitForTimeout(900);
+  // 회피(Shift 짧게)·방어(C)·기술(D)·충전(S)
+  await page.keyboard.down('ShiftLeft'); await page.waitForTimeout(60); await page.keyboard.up('ShiftLeft'); await page.waitForTimeout(80);
+  assert.ok(['16', '16_1'].includes((await ei(page)).clip), '회피');
   await page.waitForTimeout(500);
-  await page.keyboard.press('ArrowDown'); await page.waitForTimeout(70); await page.keyboard.down('ArrowDown'); await page.waitForTimeout(200);
-  assert.equal((await st(page)).state, 'crouch');
-  await page.keyboard.press('KeyA'); await page.waitForTimeout(80);
-  assert.equal((await st(page)).state, 'lowkick');
-  await page.keyboard.up('ArrowDown');
-  await page.waitForTimeout(300);
-  // 폭파
-  await page.keyboard.press('KeyD'); await page.waitForTimeout(250);
+  await page.keyboard.down('KeyC'); await page.waitForTimeout(150);
+  assert.equal((await ei(page)).mode, 'block', '막기');
+  await page.keyboard.up('KeyC'); await page.waitForTimeout(400);
+  await page.keyboard.press('KeyD'); await page.waitForTimeout(450);
+  assert.equal((await ei(page)).clip, '22_1', '고유기술 제압사격');
+  await page.waitForTimeout(1500);
+  await page.keyboard.down('KeyS'); await page.waitForTimeout(700);
+  assert.equal((await ei(page)).mode, 'charge', '충전');
+  await page.keyboard.up('KeyS'); await page.waitForTimeout(250);
   await S(page, 'pc-blast');
-  // 메뉴 → 타이틀로 → 새로 시작(본부) → 잼트리 → 임무 → 출동
+  // 메뉴 → 타이틀로 → 새로 시작(본부 걷기). 옛 임무 창구·출동은 2026-10-28에 지웠다
   await page.waitForTimeout(600);
   await page.keyboard.press('Escape');
   await page.waitForTimeout(200);
@@ -91,40 +84,8 @@ try {
   await page.waitForFunction(() => window.__goeiEngine.inHub && window.__goeiEngine.world);
   await page.waitForTimeout(300);
   await S(page, 'pc-hq');
-  await page.evaluate(() => { const w = window.__goeiEngine.world; const d = w.props.find((q) => q.id === 'spot:jaemtri'); w.player.x = d.x; });
-  await page.waitForTimeout(100);
-  await page.keyboard.press('KeyE');
-  // 자리 주인과 대화창이 먼저 열린다 (NPC 자유 대화). E 한 번 더 = 원래 창구
-  await page.waitForSelector('.gnp:not([hidden])');
-  await page.keyboard.press('KeyE');
-  await page.waitForSelector('[data-mission]', { state: 'visible' });
-  await S(page, 'pc-hq-panel');
-  await page.click('[data-mission]');
-  await page.click('[data-act=brief]');
-  await page.waitForSelector('[data-act=deploy]');
-  await page.click('[data-act=deploy]');
-  await page.waitForFunction(() => window.__goeiEngine.world);
-  await page.waitForTimeout(300);
-  // 자동 진행: 오른쪽으로 걸으며 계속 때림 (훈련장 끝까지)
-  const t0 = Date.now();
-  let last;
-  await page.keyboard.down('ArrowRight');
-  while (Date.now() - t0 < 60000) {
-    last = await st(page);
-    if (!last || last.ended || last.hp <= 0) break;
-    await page.keyboard.press('KeyA');
-    await page.waitForTimeout(90);
-    if (Math.random() < 0.15) { await page.keyboard.press('KeyD'); }
-  }
-  await page.keyboard.up('ArrowRight');
-  await S(page, 'pc-late');
-  console.log('진행', last);
-  await page.waitForTimeout(800);
-  await S(page, 'pc-end');
-  if (last && last.ended) {
-    await page.waitForTimeout(1500);
-    await S(page, 'pc-settle');
-  }
+  // 옛 임무 창구 자리(잼트리 책상)는 닫혀 있다
+  assert.equal(await page.evaluate(() => window.__goeiEngine.world.stage.current().spots.find((q) => q.id === 'jaemtri')?.open), false, '임무 창구 자리 닫힘');
   // 모바일 가로
   const m = await browser.newPage({ viewport: { width: 844, height: 390 }, hasTouch: true, isMobile: true });
   m.on('pageerror', (e) => errors.push(String(e)));

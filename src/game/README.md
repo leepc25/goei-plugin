@@ -1,13 +1,10 @@
-# 관찰형 게임 「관리국 순찰」
+# 게임 코드 (필드)
 
-응답을 기다리는 동안 관리국 분대 네 명이 학교를 순찰하며 괴이와 싸우는 모습을 지켜보는 게임.
-플러그인 창에서 `mountGame(box, host)`로 붙이고, 돌려받은 함수로 정리한다 (`index.ts`의 `GameHost`).
+플러그인 본체와 따로 받는 게임 코드 팩이다 (빌드: `dist/game/goei-game.js`).
 
-- 흐름: 방 세 곳(첫 방은 본관 복도) → 세 번째 방 끝에 우두머리(홀수 순찰 동상, 짝수 순찰 악몽의 주인) → 은신처 휴식 → 다음 순찰(적이 12%씩 세짐). 전멸하면 은신처로 후퇴해 같은 순찰을 다시.
-- 조작: 편성(8명 중 4명, 바꾸면 은신처에서 다시 출발), 기록, 분대 카드 탭(기술이 다 찼을 때 바로 발동, 안 누르면 잠시 뒤 알아서).
-- 저장: `{ version: 1, squad, patrols, best, wipes, kills, depth }`를 바뀐 게 있을 때 5초 이상 간격으로 `host.save`. 순찰 도중 상태는 같은 페이지에서 다시 열 때만 이어진다.
-- 시간: 1/30초 고정 간격 계산, 화면은 requestAnimationFrame. 문서가 숨겨지면 멈춘다. 닫아 둔 동안의 진행은 없다. 응답을 기다리는 동안은 1.25배 빠르게.
-- 조정: 수치는 `data.ts`의 `AGENTS`·`ENEMIES`·`TUNE`.
-- 그림: GPT가 만든 시트(`game-src/`)를 `python3 tools/game_assets.py`로 프레임별로 잘라 `game-pack/patrol/`에 담는다. 크기는 바꾸지 않고, 화면은 기기 픽셀 기준 정수 배율로만 키운다.
-- 그림 팩: 플러그인에 넣지 않는다. 빌드가 `release/goei-game-patrol.pack` 한 파일로 묶고(`scripts/game-pack.mjs`), 게임 창이 처음 열릴 때 받거나 파일로 넣어 pluginStorage에 둔다(`src/host/gamepack.ts`). 팩 모양이 바뀌면 `assets.ts`의 `PACK_VERSION`을 올린다.
-- 시험: `npm run build` 뒤 `tests/game/demo.html`을 로컬 서버로 연다 (`?w=390&h=700`으로 창 크기). 계산은 `tests/game.test.mjs`.
+- `entry.ts`: 코드 팩 진입점. `globalThis.__goeiGame = { version, mount }`를 남긴다.
+- `play.ts`: `mountPlay(box, bridge)` → 통합 엔진(`action/main.ts`의 `mountGame`).
+- `bridge.ts`: 게임 ↔ 플러그인 다리 타입. 플러그인 쪽 구현은 `src/host/game/`.
+- `action/`: 엔진·본부·적·이야기·화면 등 게임 본체.
+
+옛 「이전 시험판」(관리국 순찰 · 1인 전투 검증판)은 2026-10-26에 지웠다.

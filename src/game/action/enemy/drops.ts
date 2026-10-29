@@ -22,48 +22,32 @@ export function fireDropHook(c: DropContext) {
 
 const int = (r: () => number, a: number, b: number) => a + Math.floor(r() * (b - a + 1));
 
-/** 11.2 드랍 표. 정예는 현금·파편 1.5배, 회복 조각 확률 +10%p */
+/** 처치 드랍 표. 회복 조각·탄만 (옛 출동 현금·이상 파편·회수물·강화 선택은 2026-10-28에 지웠다). 정예는 회복 조각 확률 +10%p */
 export function rollDrops(table: DropTable, r: () => number, elite = false): Drop[] {
   const out: Drop[] = [];
   const add = (item: Drop['item'], n: number) => n > 0 && out.push({ item, n });
-  const k = elite ? 1.5 : 1;
   const heal = (p: number) => r() < p + (elite ? 0.1 : 0) && add('heal', 1);
   switch (table) {
     case 'none':
       return out;
     case 'common':
-      add('cash', Math.round(int(r, 1, 3) * k));
       heal(0.15);
-      add('shard', Math.round(int(r, 1, 2) * k));
-      if (r() < 0.02) add('relic', 1);
       break;
     case 'bureau':
-      add('cash', Math.round(int(r, 3, 6) * k));
       heal(0.1);
-      add('shard', Math.round(1 * k));
-      if (r() < 0.05) add(r() < 0.5 ? 'ammo' : 'relic', 1);
+      if (r() < 0.05) add('ammo', 1);
       break;
     case 'daydream':
-      add('cash', Math.round(int(r, 6, 10) * k));
       heal(0.1);
-      add('shard', Math.round(1 * k));
-      if (r() < 0.03) add('dream', 1);
       break;
     case 'mid':
-      add('cash', int(r, 12, 20));
       add('heal', 1);
-      add('shard', 5);
-      add('relic', 1);
       break;
     case 'guardian':
-      add('cash', int(r, 40, 60));
       add('heal', 2);
-      add('shard', 10);
-      add('relic', 1);
-      add('upgrade', 1);
       break;
   }
   return out;
 }
 
-export const DROP_LABEL: Record<Drop['item'], string> = { cash: '현금', heal: '회복 조각', shard: '이상 파편', relic: '회수물', ammo: '탄약', dream: '꿈결 수집기', key: '열쇠', upgrade: '강화 선택' };
+export const DROP_LABEL: Record<Drop['item'], string> = { heal: '회복 조각', ammo: '탄약' };

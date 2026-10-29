@@ -4,7 +4,9 @@
 export type Btn =
   | 'left' | 'right' | 'up' | 'down'
   | 'attack' | 'shoot' | 'skill' | 'guard' | 'super' | 'interact' | 'jump' | 'shift' | 'reload'
-  | 'chain' | 'wall' | 'ally' | 'item1' | 'item2' | 'item3' | 'item4' | 'map' | 'auto' | 'pause' | 'hitbox';
+  | 'chain' | 'wall' | 'ally' | 'item1' | 'item2' | 'item3' | 'item4' | 'map' | 'auto' | 'pause' | 'hitbox'
+  // 에일린(테스트룸 조작)
+  | 'light' | 'heavy' | 'dodge' | 'block' | 'charge' | 'weapon' | 'combat' | 'sit' | 'crouch' | 'flee' | 'back';
 
 export const KEYMAP: Record<string, Btn> = {
   ArrowLeft: 'left', ArrowRight: 'right', ArrowUp: 'up', ArrowDown: 'down',
@@ -14,6 +16,13 @@ export const KEYMAP: Record<string, Btn> = {
   Digit1: 'item1', Digit2: 'item2', Digit3: 'item3', Digit4: 'item4',
   KeyZ: 'map', Tab: 'map', KeyX: 'auto', Escape: 'pause', KeyH: 'hitbox',
 };
+
+/** 에일린 테스트룸 키 배치 (사용자 2026-10-25: 테스트룸 전투 그대로).
+ * 사용자 2026-10-25 다시 정함: Q 약 · W 강 · C 방어 · A 원거리 · S 충전 · D 기술 · F 필살기 · Tab 무기 꺼내기/넣기 · R 전투 자세 · Z 주저앉기 · X 웅크리기 · V 도망(누른 채) · B 뒷걸음질(누른 채, Ctrl은 Ctrl+W 탭 닫기와 겹쳐서 뺐다) · Space 점프 · Shift 짧게 회피·길게 달리기 · E 조사 · 1~4 아이템 · M 지도 · Esc 메뉴 */
+export function useEileenKeys() {
+  for (const k of ['KeyQ', 'KeyW', 'KeyG', 'KeyR', 'KeyF', 'KeyC', 'KeyZ', 'KeyX', 'KeyV', 'KeyA', 'KeyS', 'KeyD', 'Tab', 'KeyR']) delete KEYMAP[k];
+  Object.assign(KEYMAP, { KeyQ: 'light', KeyW: 'heavy', KeyC: 'block', KeyA: 'shoot', KeyS: 'charge', KeyD: 'skill', KeyF: 'super', Tab: 'weapon', KeyR: 'combat', KeyZ: 'sit', KeyX: 'crouch', KeyV: 'flee', KeyB: 'back', KeyM: 'map', KeyO: 'auto' } as Record<string, Btn>);
+}
 
 /** Shift를 이 틱 수 안에 떼면 회피, 넘게 누르면 달리기 (0.15초) */
 export const SHIFT_TAP = 5;

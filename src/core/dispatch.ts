@@ -2,6 +2,7 @@
 // 지시문 문장은 카드의 Directive 로어북에서 읽고, 채팅에는 SCENE_CARD로 감싼 유저 메시지 하나로 남긴다.
 // 화면에는 카드(목표·투입)만 보이고, 모델 요청에서는 감싼 표식만 지운 본문이 간다.
 import type { LoreEntry } from './types';
+import { guidePrompt } from './guides';
 
 export class DirectiveError extends Error {}
 
@@ -26,9 +27,10 @@ export interface Directive {
 
 const REQUIRED = ['COMMON', 'OPENING', 'CONTINUATION', 'CONTEXT'];
 
-export function parseDirective(lore: LoreEntry[] | undefined): Directive {
-  const raw = (lore ?? []).find((e) => e.comment === 'Directive')?.content;
-  if (typeof raw !== 'string' || !raw.trim()) throw new DirectiveError('Directive 로어북을 읽지 못했어요.');
+export function parseDirective(_lore?: LoreEntry[] | undefined): Directive {
+  // 지시문 문장은 플러그인 내장 지침 (core/guides.ts Directive). 카드 로어북은 읽지 않는다 (2026-10-27)
+  const raw = guidePrompt('Directive');
+  if (typeof raw !== 'string' || !raw.trim()) throw new DirectiveError('Directive 지침을 읽지 못했어요.');
   const sections: Record<string, string> = {};
   const heads = [...raw.matchAll(/===([A-Z][A-Z0-9_]*)===/g)];
   heads.forEach((h, i) => {

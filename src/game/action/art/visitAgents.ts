@@ -4,7 +4,10 @@ import { PIXEL } from '../engine/contract';
 import { snapTo, spr } from '../engine/view';
 
 type Frame = { sx: number; sy: number; w: number; h: number; ox: number; oy: number };
-type Sheet = { atlas: HTMLImageElement; agents: Record<string, { ms: number; frames: Frame[] }> };
+type Clip = { ms: number; frames: Frame[]; loop?: boolean };
+/** 요원 하나: ms·frames = 대기(idle). clips = 이름 붙은 동작 (docs/필드_클립_이름_약속.md). 없으면 대기만 */
+type Agent = Clip & { head?: number; clips?: Record<string, Clip> };
+type Sheet = { atlas: HTMLImageElement; agents: Record<string, Agent> };
 let sheet: Sheet | null = null;
 let revision = 0;
 declare global { interface Window { __GOEI_VISIT_AGENTS__?: { atlas: string; frames: Sheet['agents'] } } }
@@ -32,12 +35,25 @@ export function prepareVisitAgents(urlOf?: (file: string) => Promise<string>, by
 }
 
 export const hasVisitAgent = (name: string) => !!sheet?.agents[name];
+/** 그 요원에게 그 클립이 있나 ('idle'은 그림만 있으면 참). 필드 세계는 클립이 있는 행동만 켠다 */
+export const hasVisitClip = (name: string, clip: string) => {
+  const a = sheet?.agents[name];
+  return !!a && (clip === 'idle' ? a.frames.length > 0 : !!a.clips?.[clip]?.frames.length);
+};
+/** 그 요원이 가진 클립 이름 전부 (idle 포함) */
+export const visitClips = (name: string): string[] => {
+  const a = sheet?.agents[name];
+  return a ? ['idle', ...Object.keys(a.clips ?? {})] : [];
+};
 
 /** x,y = 발 가운데. dir 1 = 오른쪽 보기(원본 방향) */
-export function drawVisitAgent(c: CanvasRenderingContext2D, name: string, x: number, y: number, dir: 1 | -1, now: number): boolean {
+export function drawVisitAgent(c: CanvasRenderingContext2D, name: string, x: number, y: number, dir: 1 | -1, now: number, clip = 'idle', since = 0): boolean {
   const a = sheet?.agents[name];
   if (!sheet || !a?.frames.length) return false;
-  const f = a.frames[Math.floor(now / a.ms) % a.frames.length];
+  // 이름 붙은 클립이 있으면 그것 (since부터 센다, loop:false면 마지막 장에서 멈춤), 없으면 대기
+  const cl: Clip = (clip !== 'idle' && a.clips?.[clip]?.frames.length ? a.clips[clip] : a);
+  const n = Math.floor((now - (cl === a ? 0 : since)) / cl.ms);
+  const f = cl.frames[cl.loop === false ? Math.min(n, cl.frames.length - 1) : ((n % cl.frames.length) + cl.frames.length) % cl.frames.length];
   c.save();
   c.imageSmoothingEnabled = false;
   c.fillStyle = 'rgba(0,0,0,.28)';

@@ -1,5 +1,6 @@
-// 아이템 모듈(items/) 연결: 1~4 소모품, 처치 드랍·자동 줍기(현금·파편·회복·탄·아이템·회수물), 섬광·연막 투척, 탄약 맞추기.
+// 아이템 모듈(items/) 연결: 1~4 소모품, 처치 드랍·자동 줍기(회복·탄·아이템), 섬광·연막 투척, 탄약 맞추기.
 // 환경 물건 들기(E)·던지기(A), 임시 무기 줍기(E)·휘두르기(A)·쏘기(S). 든 것은 캐릭터 그림과 따로 손 고정점에 그린다.
+import type { StatusSet } from '../../combat/status';
 import { drawItemHeld } from '../art/items';
 import {
   ITEMS,
@@ -10,7 +11,6 @@ import {
   createField,
   createItemRun,
   addItem,
-  addRelic,
   itemHit,
   pickupHealAmount,
   slowAt,
@@ -19,12 +19,6 @@ import {
   spawnEnemyDrops,
   strikeProps,
   furnishFloor,
-  openShop,
-  createShopPanel,
-  VENDORS,
-  type ShopPanel,
-  type Shop,
-  type VendorId,
   type EnemyDrop,
   stepField,
   toGameEvents,
@@ -122,14 +116,6 @@ function drawPropSized(c: CanvasRenderingContext2D, id: string, x: number, y: nu
   return true;
 }
 
-// 중림 상인 거래 창 (무대 위에 겹침). 열려 있으면 전투를 멈춘다: modules.ts의 blocking에서 itemsBlocking()
-let shopPanel: ShopPanel | null = null;
-export const itemsBlocking = () => !!shopPanel?.isOpen();
-export function mountItemsOverlay(root: HTMLElement) {
-  shopPanel?.dispose();
-  shopPanel = createShopPanel(root);
-  return () => (shopPanel?.dispose(), (shopPanel = null));
-}
 
 export function linkItems(w: World, run: RunConfigCore & { launch?: { items?: ({ id: string; n: number } | null)[] } }) {
   const loadout = run.launch?.items ?? [{ id: 'medkit', n: 2 }, { id: 'flash', n: 2 }, { id: 'adrenaline', n: 1 }, null];
@@ -141,21 +127,7 @@ export function linkItems(w: World, run: RunConfigCore & { launch?: { items?: ({
   p.reserve = ir.reserve;
   let lastReserve = ir.reserve;
   (w as unknown as { itemRun: ItemRun }).itemRun = ir;
-  w.recovery = {
-    has: id => ir.bag.some(b => b?.id === id),
-    add: id => addRelic(ir, id),
-    take: id => {
-      const i = ir.bag.findIndex(b => b?.id === id);
-      if (i < 0) return false;
-      ir.bag[i] = null;
-      return true;
-    },
-  };
   const recordInventory = () => {
-    w.notes.cash = ir.cash;
-    w.notes.shards = ir.shards;
-    w.notes.debt = ir.debt;
-    w.notes.bag = ir.bag.map(b => b ? { ...b } : null);
     w.notes.itemsLeft = ir.loadout.map(s => s ? { ...s } : null);
   };
   (w as unknown as { itemField: () => Field }).itemField = () => field;
@@ -168,7 +140,9 @@ export function linkItems(w: World, run: RunConfigCore & { launch?: { items?: ({
     w.bodies
       .filter((b) => b.team === 'enemy' && b.alive && b.hp > 0)
       .map((b) => ({ id: b.id, x: b.x, y: b.y, z: b.z, w: 56, h: 170, human: true }));
-  const ctx = () => ({ hp: p.hp, max: p.hpMax, gauge: p.gauge / 100, energy: p.skillCd > 0 ? 0 : 1, energyMax: 1 });
+  // 상태 효과(에일린 status)도 넘긴다: 효과 없을 때 해제 아이템을 소비하지 않게
+  const st = () => (p as unknown as { status?: StatusSet }).status;
+  const ctx = () => ({ hp: p.hp, max: p.hpMax, gauge: p.gauge / 100, energy: p.skillCd > 0 ? 0 : 1, energyMax: 1, bleed: !!st()?.has('bleed'), taint: st()?.stacks('taint') ?? 0, headache: !!st()?.has('headache'), mind: !!(st()?.has('fear') || st()?.has('confuse')) });
 
   const apply = (evs: ItemEvent[]) => {
     for (const e of evs) {
@@ -206,9 +180,22 @@ export function linkItems(w: World, run: RunConfigCore & { launch?: { items?: ({
       } else if (e.t === 'use') {
         const f = e.effect;
         if (f.type === 'heal') p.hp = Math.min(p.hpMax, p.hp + p.hpMax * f.ratio);
-        else if (f.type === 'cure') p.hp = Math.min(p.hpMax, p.hp + p.hpMax * (f.heal ?? 0));
+        else if (f.type === 'cure') {
+          p.hp = Math.min(p.hpMax, p.hp + p.hpMax * (f.heal ?? 0));
+          const s = st();
+          if (s) {
+            if (f.status === 'mind') { s.cure('fear'); s.cure('confuse'); }
+            else if (f.status === 'any') s.clear();
+            else s.cure(f.status);
+          }
+        }
         else if (f.type === 'gauge') p.gauge = Math.min(100, p.gauge + f.amount * 100);
-        else if (f.type === 'energy') p.skillCd = 0;
+        else if (f.type === 'energy') {
+          p.skillCd = 0;
+          // 에일린(테스트룸 코어): 능력 자원 = 총열 열. 열을 식히고 과열을 푼다
+          const core = (p as unknown as { core?: { P: { heat: number; overT: number } } }).core;
+          if (core) { core.P.heat = Math.max(0, core.P.heat - f.amount); core.P.overT = 0; }
+        }
         else if (f.type === 'ward') p.ward += f.hits;
       } else if (e.t === 'pickup' && e.kind === 'heal') {
         p.hp = Math.min(p.hpMax, p.hp + pickupHealAmount(p.hpMax, e.amount));
@@ -315,29 +302,6 @@ export function linkItems(w: World, run: RunConfigCore & { launch?: { items?: ({
     }
   });
 
-  // 중림 상인: 층 모듈의 merchant 소품 앞 E
-  let shopSeed = run.seed ^ 0x5151;
-  const shops = new Map<string, Shop>();
-  w.interactHooks.push((prop) => {
-    if (prop?.kind !== 'merchant' || !shopPanel || shopPanel.isOpen()) return;
-    const ids = Object.keys(VENDORS) as VendorId[];
-    const vendor = ids.find((v) => prop.label?.includes(VENDORS[v].name)) ?? 'madeokhee';
-    const shopKey = JSON.stringify([w.floor.id, prop.id, vendor]);
-    let shop = shops.get(shopKey);
-    if (!shop) {
-      shop = openShop(vendor, ir, w.floor?.depth ?? 1, shopSeed + (w.floors | 0) * 131);
-      shops.set(shopKey, shop);
-    }
-    lastReserve = ir.reserve = p.reserve;
-    shopPanel.open(shop, ir, (r) => {
-      if (r.heal) p.hp = Math.min(p.hpMax, p.hp + p.hpMax * r.heal);
-      if (r.hpCost) p.hp = Math.max(1, p.hp - p.hpMax * r.hpCost);
-      apply([]);
-      syncCarry();
-      w.emit({ type: 'pickup', x: p.x, id: 'shop' });
-    }, () => w.say(VENDORS[vendor].bye, 2), () => ({ hp: p.hp, max: p.hpMax }));
-  });
-
   const hitSeen = new Set<string>();
   const overlapT = new WeakMap<object, number>();
   const lastX = new WeakMap<object, number>();
@@ -377,16 +341,15 @@ export function linkItems(w: World, run: RunConfigCore & { launch?: { items?: ({
     configurable: true,
   });
   w.itemState = {
-    snapshot: () => ({ inventory: ir, fields: [...fields], current: w.floor.id, lastReserve, shopSeed, shops: [...shops] }),
+    snapshot: () => ({ inventory: ir, fields: [...fields], current: w.floor.id, lastReserve }),
     restore(value) {
-      const s = value as { inventory: ItemRun; fields: [string, Field][]; current: string; lastReserve: number; shopSeed: number; shops?: [string, Shop][] };
+      const s = value as { inventory: ItemRun; fields: [string, Field][]; current: string; lastReserve: number };
       if (!s?.inventory || !Array.isArray(s.fields)) throw new Error('손상된 아이템 저장');
       Object.assign(ir, s.inventory);
       fields.clear(); for (const [k, v] of s.fields) fields.set(k, v);
       field = fields.get(s.current)!;
       if (!field) throw new Error('방 아이템 저장 누락');
-      lastReserve = s.lastReserve; shopSeed = s.shopSeed;
-      shops.clear(); for (const [k, v] of s.shops ?? []) shops.set(k, v);
+      lastReserve = s.lastReserve;
       syncSlots(); syncCarry();
     },
   };
@@ -413,6 +376,18 @@ export function linkItems(w: World, run: RunConfigCore & { launch?: { items?: ({
       // 적 모듈의 기존 40% 둔화 상태를 연막 영역과 연결한다.
       for (const b of w.bodies)
         if (b instanceof Enemy && b.alive && b.hp > 0 && slowAt(field, b.x, b.y) < 1) b.slow = Math.max(b.slow, 2);
+      // 소금 원: 괴이(사람이 아닌 적)는 원 안에 들어오지 못한다. 안에 있으면 원 가장자리로 밀어낸다 (사람 적 bureau·daydream은 그대로)
+      for (const z of field.zones) {
+        if (z.kind !== 'salt') continue;
+        for (const b of w.bodies) {
+          if (!(b instanceof Enemy) || !b.alive || b.hp <= 0 || b.def.faction === 'bureau' || b.def.faction === 'daydream') continue;
+          const dx = b.x - z.x, dy2 = (b.y - z.y) * 2;
+          if (Math.hypot(dx, dy2) >= z.r) continue;
+          const edge = Math.sqrt(Math.max(0, z.r * z.r - dy2 * dy2)) + 2;
+          b.x = z.x + (dx >= 0 ? 1 : -1) * edge;
+          b.vx = 0;
+        }
+      }
       // 바닥 물건 뚫고 지나가기 금지: 요원·적 모두 (검수 15-2)
       const ents = field.ents.filter((e) => e.type === 'prop' && PROPS[e.prop]);
       const solids = ents.map((e) => itemSolid(e as { x: number; y: number; prop: string }));

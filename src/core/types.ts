@@ -60,6 +60,10 @@ export interface Manifest {
   assets?: string;
   /** 카드 사진 [이름, 지문, 확장자, 바이트]. 창의 업데이트가 지문이 바뀐 것만 받아 바꾼다 (host/picpack.ts) */
   pictures?: [string, string, string, number][];
+  /** 폴더 key (settings·wiki): 이름 대신 key 로 찾는다 (core/install.ts findFolder) */
+  keys?: Record<string, string>;
+  /** 위키 기본 문서 묶음 지문·길이 (release/wiki-base) */
+  wiki?: { digest?: string; length?: number };
 }
 
 export interface StartChoice {

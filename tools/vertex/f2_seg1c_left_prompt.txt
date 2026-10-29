@@ -1,0 +1,4 @@
+This image is part of a wide pixel-art game background. The right part is already finished; the white area on the left is empty.
+Fill in the white area by extending the scene to the left, seamlessly: keep the right part exactly as it is, same pixel art style, colors, textures and scale.
+In the new area, complete the left side wall that is cut off: show the whole side wall plane including its top corner where it meets the ceiling and its bottom line where it meets the floor, and its front vertical edge, fully inside the image. Beyond that front edge, finish the image with the cut-through thickness of the wall and a plain dark area (the outside of the building section), like the edge of a stage set. Nothing is cut off.
+No stairs, no people, no text, letters or numbers.

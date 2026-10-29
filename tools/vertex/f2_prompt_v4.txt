@@ -1,0 +1,9 @@
+Two reference images are attached.
+IMAGE 1 (dark office room) = ART STYLE ONLY: copy its detailed 16-bit pixel art exactly — visible square pixels, dark outlines, rich pixel shading with several tone steps, textured surfaces. Do NOT copy its wooden floor, its night lighting, its dark walls or its furniture.
+IMAGE 2 (bright corridor) = LAYOUT AND COLORS: copy its bright daytime colors (light gray walls, smooth light gray floor), its closed angled side walls with doors at both ends, its elevator flush with the back wall, and its objects placed on the floor. Ignore and do NOT draw the percentage number labels in image 2.
+
+Draw one very long continuous pixel-art corridor of a modern Korean office building, wall-to-floor line straight and horizontal at 60% of the image height, plenty of floor below. Left to right:
+west angled side wall with a dark gray steel stairwell door and green exit sign — restroom door — wide glass double door to an office — two stainless elevators side by side, flush on the back wall, open floor in front — interview room door — wide glass double door to a lounge — east angled side wall with a dark gray steel emergency exit door and green exit sign.
+Between them: a water dispenser, fire extinguisher cabinets, a bulletin board, a wall clock, a framed picture, and some objects standing out on the floor (potted plants, a bench, a small side table).
+
+No text, no letters, no numbers, no people, no stairs, no blur.

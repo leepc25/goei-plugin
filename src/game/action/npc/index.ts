@@ -54,15 +54,11 @@ const esc = (s: string) => s.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&l
 const CHIPS: Record<NpcDef['group'], string[]> = {
   agent: ['요즘 어때?', '같이 갈래?', '조언 좀 해 줘'],
   hq: ['안녕하세요', '요즘 무슨 일 있어요?', '조언 좀 해 주세요'],
-  merchant: ['뭐 팔아요?', '좀 깎아 주세요', '이 층 얘기 좀'],
+  merchant: ['뭐 팔아요?', '좀 깎아 주세요', '요즘 소식 좀'],
   daydream: ['우린 싸울 생각 없어', '나눠 갖자', '여기서 꺼져'],
   fake: ['정체가 뭐야', '비켜', '거래하자'],
   faction: ['무슨 일로 왔어요?', '같이 싸울래요?', '정보 좀 줘요'],
   entity: ['안녕하세요', '여기서 나가게 해 주세요', '거래할래요?'],
-  elevator: ['안녕하세요', '다음 층은 어디예요?', '외롭지 않아요?'],
-  civilian: ['괜찮아요?', '저랑 같이 가요', '여기서 뭘 봤어요?'],
-  passenger: ['당신은 누구죠?', '어느 쪽 문이에요?', '도와줄 수 있어요?'],
-  resident: ['안녕하세요', '여기 사세요?', '실례했습니다'],
 };
 
 const FACE_PX = 44; // 얼굴 칸 132px = 3배 (도트 격자가 딱 맞게)
@@ -130,7 +126,7 @@ export function createNpcTalk(layer: HTMLElement, host: NpcHost, store?: Relatio
   const el = document.createElement('div');
   el.className = 'gnp gk-panel gk-font';
   el.hidden = true;
-  el.innerHTML = `<div class="gnp-face gk-face"></div><div class="gnp-body"><div class="gnp-head"><b class="gnp-name"></b><span class="gnp-favor"></span><span class="gnp-state"></span><button type="button" class="gnp-x" data-x aria-label="닫기">✕</button></div><div class="gnp-log" aria-live="polite"></div><div class="gnp-row"><div class="gnp-chips"></div></div><div class="gnp-say"><div class="gnp-acts"></div><input class="gnp-in gk-font" maxlength="200" placeholder="직접 말하기 (Enter)" enterkeyhint="send" autocomplete="off"><button type="button" class="gnp-send gk-font" data-send>보내기</button></div><div class="gnp-note"></div></div>`;
+  el.innerHTML = `<div class="gnp-face gk-face"></div><div class="gnp-body"><div class="gnp-head"><b class="gnp-name"></b><span class="gnp-favor"></span><span class="gnp-state"></span><button type="button" class="gnp-x" data-x aria-label="닫기">✕</button></div><div class="gnp-log" aria-live="polite"></div><div class="gnp-row"><div class="gnp-chips"></div></div><div class="gnp-say"><div class="gnp-acts"></div><input class="gnp-in gk-font" maxlength="200" placeholder="직접 말하기 (T)" enterkeyhint="send" autocomplete="off"><button type="button" class="gnp-send gk-font" data-send>보내기</button></div><div class="gnp-note"></div></div>`;
   layer.append(el);
   const $ = <T extends HTMLElement>(s: string) => el.querySelector<T>(s)!;
   const face = $('.gnp-face');
@@ -271,6 +267,7 @@ export function createNpcTalk(layer: HTMLElement, host: NpcHost, store?: Relatio
     const my = token;
     line('me', text);
     chips.hidden = true; // 말 꺼내기 예시는 처음에만
+    markSel();
     const wait = line('wait', '…');
     setBusy(true);
     note.textContent = '';
@@ -350,13 +347,29 @@ export function createNpcTalk(layer: HTMLElement, host: NpcHost, store?: Relatio
   for (const ev of ['keyup', 'pointerdown', 'touchstart', 'wheel'] as const) el.addEventListener(ev, (e) => e.stopPropagation(), { passive: true });
 
   /** 창이 열린 동안 키: E·Space 첫 버튼, 1~9 버튼, Enter·T 입력칸, Esc 닫기. 게임으로는 안 넘긴다 */
+  /** 키보드로 고르는 단추 (사용자 2026-10-25: 키보드가 안 먹는다) — 말 꺼내기 예시 + 행동 + 입력칸 */
+  let sel = 0;
+  const pickables = (): HTMLElement[] => [...(chips.hidden ? [] : [...chips.querySelectorAll<HTMLElement>('button')]), ...acts.querySelectorAll<HTMLElement>('button'), input];
+  const markSel = () => {
+    const list = pickables();
+    sel = Math.max(0, Math.min(list.length - 1, sel));
+    list.forEach((b, i) => b.classList.toggle('gnp-sel', i === sel));
+  };
   function keys(e: KeyboardEvent) {
     if (!target || document.activeElement === input) return;
     const k = e.code;
+    const list = pickables();
     if (k === 'Escape') close();
-    else if (k === 'KeyE' || k === 'Space') runAct(0);
-    else if (/^Digit[1-9]$/.test(k)) runAct(Number(k.slice(5)) - 1);
-    else if (k === 'Enter' || k === 'KeyT') input.focus({ preventScroll: true });
+    else if (k === 'ArrowLeft' || k === 'ArrowUp') (sel = (sel - 1 + list.length) % list.length), markSel();
+    else if (k === 'ArrowRight' || k === 'ArrowDown' || k === 'Tab') (sel = (sel + 1) % list.length), markSel();
+    else if (k === 'KeyE') runAct(0); // 단추에 적힌 대로 E = 첫 행동
+    else if (k === 'Enter' || k === 'Space') {
+      if (e.repeat) return e.preventDefault();
+      const b = list[sel];
+      if (!b || b === input) input.focus({ preventScroll: true });
+      else b.click();
+    } else if (/^Digit[1-9]$/.test(k)) runAct(Number(k.slice(5)) - 1);
+    else if (k === 'KeyT' || k === 'Slash') input.focus({ preventScroll: true });
     else return;
     e.preventDefault();
     e.stopImmediatePropagation();
@@ -374,7 +387,7 @@ export function createNpcTalk(layer: HTMLElement, host: NpcHost, store?: Relatio
     el.style.setProperty('--who', d.color);
     const coarse = typeof matchMedia !== 'undefined' && matchMedia('(pointer: coarse)').matches;
     el.classList.toggle('coarse', coarse);
-    input.placeholder = coarse ? '직접 말하기' : '직접 말하기 (Enter)';
+    input.placeholder = coarse ? '직접 말하기' : '직접 말하기 (T · 방향키로 고르고 Enter)';
     nameEl.textContent = t.name ?? d.name;
     // 얼굴 그림이 있는 사람만 얼굴 칸 (없으면 글자 상자 대신 칸을 접는다)
     face.innerHTML = '';
@@ -394,6 +407,8 @@ export function createNpcTalk(layer: HTMLElement, host: NpcHost, store?: Relatio
     drawActs();
     chips.hidden = false;
     chips.innerHTML = CHIPS[d.group].map((c) => `<button type="button" class="gk-font" data-chip>${esc(c)}</button>`).join('');
+    sel = 0;
+    markSel();
     el.hidden = false;
     fitLog();
     window.addEventListener('keydown', keys, true);

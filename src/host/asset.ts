@@ -1,8 +1,9 @@
 // 응답이 끝난 뒤 보조 모델로 이미지 태그를 보충한다 (원본 onOutput → imgTagFireCore).
-// 에셋 모듈의 Image tag 로어북은 모듈에 있을 수 있어서 getCurrentLorebookEntries로 읽는다.
-import { ASSET_NOTE, AssetError, finishAsset, planAsset, readImageData, withUser } from '../core/asset';
+// 자료(캐릭터·별칭·표정)는 명부 + 설정(이미지 지침)으로 조립한다. 로어북 「Image tag」는 더 쓰지 않는다.
+import { ASSET_NOTE, AssetError, finishAsset, imageDataFrom, planAsset, withUser } from '../core/asset';
 import { playerAgent } from '../core/player';
-import { basicSettings } from '../core/settings';
+import { imgCharacters, imgPromptConfig } from '../core/imgprompt';
+import { basicSettings, getPrefs } from '../core/settings';
 import type { Chat, LoreEntry } from '../core/types';
 import { runModel } from './llm';
 import { updateChat } from './risu';
@@ -30,16 +31,13 @@ export async function supplementAssets(t: AssetTarget): Promise<void> {
   const note = (text: string) =>
     updateChat(t.charIndex, t.chatIndex, (c) => (c.scriptstate?.[ASSET_NOTE] === text ? null : { ...c, scriptstate: { ...(c.scriptstate ?? {}), [ASSET_NOTE]: text } })).catch(() => null);
   try {
-    let entries: LoreEntry[];
-    try {
-      entries = ((await risuai.getCurrentLorebookEntries()) ?? []) as LoreEntry[];
-    } catch {
-      entries = t.lore ?? [];
-    }
     // 메인모델과 같은 구조: 「주인공 이미지」 ON이면 {{user}} 금지를 빼고, 캐릭터로 플레이하지 않으면 페르소나를 명단에. OFF면 주인공 요원을 명단에서 뺀다
     const agent = playerAgent(t.lore, t.chat.scriptstate);
-    const base = readImageData(entries);
-    const data = s.assetPlayer ? withUser(base, agent ? undefined : userInfo().name) : base;
+    // 명부 + 설정(이미지 지침)의 대상 목록·표정 세트로 자료를 조립한다 (메인 모델 지침과 같은 목록)
+    const cfg = imgPromptConfig(getPrefs());
+    const picked = imgCharacters(t.lore, cfg, { assetPlayer: s.assetPlayer, playerEnglish: agent?.english || undefined, userName: userInfo().name });
+    const tuned = imageDataFrom(t.lore, picked, cfg.keywords);
+    const data = s.assetPlayer ? withUser(tuned, agent ? undefined : userInfo().name) : tuned;
     const exclude = agent && !s.assetPlayer ? [agent.english, data.aliases.get(agent.name.toLowerCase())].filter((v): v is string => typeof v === 'string' && !!v) : [];
     const job = planAsset(msg.data, data, s.assetLimit, exclude);
     if (!job) return;

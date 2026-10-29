@@ -6,19 +6,22 @@ const { renderImgTags, imgCss, hasImgTag, imgTagsKnown, stripOldImgTags } = imgt
 const have = new Set(['Jyaldi_default', 'Jyaldi_smile', 'Eileen_default']);
 const pick = (n) => [...have].find((h) => h.toLowerCase() === n.toLowerCase()) ?? null;
 
-test('imgtag: picks the expression, falls back to _default, drops unknown characters', () => {
+test('imgtag: picks the expression, drops unknown expressions and unknown characters (no default fallback)', () => {
   const out = renderImgTags('앞 문단.<img=jyaldi_smile>\n뒤 문단 <img="Jyaldi_angry"> <img=Nobody_sad>끝', pick);
   assert.ok(out.includes("url('{{raw::Jyaldi_smile}}')"), '대소문자 맞춤');
-  assert.ok(out.includes("url('{{raw::Jyaldi_default}}')"), '없는 표정은 default');
+  assert.ok(!out.includes('Jyaldi_default') && !out.includes('Jyaldi_angry'), '없는 표정은 칸 없음 (기본 그림으로 바꾸지 않음)');
   assert.ok(!out.includes('Nobody'), '없는 캐릭터는 칸 없음');
+  assert.ok(out.includes('뒤 문단') && out.includes('끝'), '글은 그대로');
   assert.ok(!hasImgTag(out));
   assert.match(out, /앞 문단\.\n\n\{\{#when \{\{greater_equal::\{\{chat_index\}\}::\{\{\? \{\{lastmessageid\}\}-5\}\}\}\}\}\}<div class="gim" style="[^"]*max-width:32em/, '태그 앞뒤 줄바꿈 + 최근 메시지 조건 + 기본 모양');
   assert.ok(out.includes('</div>{{/when}}'));
 });
 
-test('imgtag: without an asset list the tag name is trusted; unsafe names are dropped', () => {
-  assert.ok(renderImgTags('<img=Eileen_cry>').includes('{{raw::Eileen_cry}}'));
-  assert.ok(!renderImgTags("<img=a_b}}{{x>").includes('{{raw'));
+test('imgtag: without an asset list only expressions in the set are trusted; unsafe names are dropped', () => {
+  assert.ok(renderImgTags('<img=Eileen_sad>').includes('{{raw::Eileen_sad}}'));
+  assert.ok(!renderImgTags('<img=Eileen_cry>').includes('{{raw'), '세트 밖 표정은 칸 없음');
+  assert.ok(!renderImgTags('<img=Spangdal_seductive smile>').includes('{{raw'));
+  assert.ok(!renderImgTags("<img=a_b}}{{x>").includes('{{x'), '위험한 글자는 들어가지 않음 (세트 밖이라 default 로)');
 });
 
 test('imgtag: css follows size %, fold % and hidden', () => {
@@ -40,8 +43,8 @@ test('imgtag: prefs keep valid percentages only', () => {
 });
 
 test('imgtag: known check guards other bots before the Lite check', () => {
-  assert.equal(imgTagsKnown('<img=Jyaldi_cry>', pick), true, '표정이 없어도 default가 있으면');
-  assert.equal(imgTagsKnown('<img=Jyaldi_smile> <img=Stranger_smile>', pick), false);
+  assert.equal(imgTagsKnown('<img=Jyaldi_cry>', pick), false, '없는 표정뿐이면 모르는 메시지');
+  assert.equal(imgTagsKnown('<img=Jyaldi_smile> <img=Stranger_smile>', pick), true, '하나라도 알면 우리 메시지 (모르는 태그는 그릴 때 빠짐)');
   assert.equal(imgTagsKnown('<img=Jyaldi_smile>', undefined), false, '에셋 목록을 못 읽었으면 판정 전엔 안 건드림');
 });
 

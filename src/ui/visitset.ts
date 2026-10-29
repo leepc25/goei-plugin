@@ -10,16 +10,18 @@ import { playerAgent } from '../core/player';
 import { lastExchange } from '../host/game/visit';
 import { updateChat, type ChatContext } from '../host/risu';
 import { userInfo } from '../host/user';
+import { gameUiSections, setGameUi } from './visitgame';
+import { defaultsAction } from './defaults';
 
 const esc = (s: unknown) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]!);
 const pre = (s: string) => `<pre class="ps-pre" style="white-space:pre-wrap;word-break:break-word;max-height:320px;overflow:auto;margin:6px 0 0;padding:10px;border:1px solid var(--gx-line,#5554);border-radius:8px;font-size:12px;line-height:1.5">${esc(s)}</pre>`;
 const fold = (key: string, title: string, body: string) => `<details class="ps-adv-sub" data-keep="${key}"${keepOpen(key)}><summary>${esc(title)}</summary>${body}</details>`;
 
-export const visitUi = { confirmClear: false };
+export const visitUi = { confirmClear: false, notice: '' };
 
 export function visitSettings(ctx: ChatContext | null, state: Record<string, unknown> | undefined): string {
   const head = `<section class="ps-group"><p class="ps-note">필드에서 만난 사람과 나눈 말은 다음 본편 요청 때 그 자리(대화한 때의 마지막 답 바로 뒤)에 막간으로 들어가요. 지침은 카드의 「Visit」 로어북에 있어요.</p></section>`;
-  if (!ctx) return head + advSections('hq', state);
+  if (!ctx) return head + gameUiSections(state) + advSections('hq', state);
   const chat = ctx.chat;
   const me = playerAgent(ctx.char.globalLore, chat.scriptstate);
   const visitor = me?.name || userInfo().name || '주인공';
@@ -48,7 +50,7 @@ export function visitSettings(ctx: ChatContext | null, state: Record<string, unk
     ${fold('hq-last', '마지막 대화 요청', lastBody)}
     ${fold('hq-guide', '지침 전문 (카드 「Visit」 로어북)', guide ? pre(guide) : '<p class="ps-note">카드에 Visit 로어북이 없어요. 설정 → 업데이트로 카드를 업데이트해 주세요.</p>')}
   </section>`;
-  return head + advSections('hq', state) + view;
+  return head + gameUiSections(state) + advSections('hq', state) + view;
 }
 
 function prettyJson(s: string): string {
@@ -59,7 +61,21 @@ function prettyJson(s: string): string {
   }
 }
 
-export async function handleVisitSettings(action: string, ctx: ChatContext, render: () => void, refresh: () => Promise<void>): Promise<boolean> {
+export async function handleVisitSettings(action: string, ctx: ChatContext, render: () => void, refresh: () => Promise<void>, value = ''): Promise<boolean> {
+  if (action === 'visit-ui') {
+    if (await setGameUi(ctx, value)) await refresh();
+    return true;
+  }
+  if (action.startsWith('visit-def-')) {
+    try {
+      const msg = await defaultsAction('visit', action, value, ctx, refresh);
+      visitUi.notice = msg ?? '';
+    } catch (error) {
+      visitUi.notice = `기본값을 처리하지 못했어요: ${error instanceof Error ? error.message : String(error)}`;
+    }
+    render();
+    return true;
+  }
   if (action === 'visit-orphans' || action === 'visit-orphans-no') {
     visitUi.confirmClear = action === 'visit-orphans';
     render();

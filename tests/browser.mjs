@@ -135,17 +135,37 @@ async function pickCustom(page, row = '.gx-mlist li.gx-mx') {
   if (shots) await page.screenshot({ path: `${shots}/1-empty.png` });
   // 시작 전 설정: 새 채팅 기본값 (플러그인 저장소)
   await page.click('[data-action="prefs-open"]');
-  await page.waitForSelector('.gx-settings');
-  assert.equal(await page.$('[data-action="set-scope"][data-value="chat"]'), null, '시작 전에는 「이 채팅」 없음');
-  assert.ok(await page.$('[data-action="set-scope"][data-value="card"]'), '시작 전에도 카드 명부');
+  // 2026-10-27: 설정은 창 하나 (시작 전엔 새 채팅 기본값만)
+  await page.waitForSelector('.gw .gw-set');
+  assert.equal(await page.$('.gw-set [data-action="set-scope"][data-value="chat"]'), null, '시작 전에는 「이 채팅」 없음');
+  assert.ok(await page.$('[data-action="ed-node"][data-value="agent"]'), '시작 전에도 세계 편집 트리');
+  await page.click('[data-action="ed-node"][data-value="set:board"]');
+  await page.waitForSelector('.st-colsbox summary');
+  // 4단계: 상태창 칸 표 (새 채팅 기본값) — 잠긴 칸은 끌 수 없고, 끈 칸은 표시 조작이 잠긴다
+  if (await page.$('.st-colsbox summary')) {
+  await page.click('.st-colsbox summary');
+  assert.equal(await page.locator('.st-col-row').count(), 10, '상태창 칸 10개');
+  assert.equal(await page.isDisabled('[data-action="set-col"][data-value="date:use:0"]'), true, '날짜는 사용을 끌 수 없음');
+  await page.click('[data-action="set-col"][data-value="weather:use:0"]');
+  await page.waitForSelector('.st-col-row.off');
+  assert.equal(await page.isDisabled('[data-action="set-col"][data-value="weather:show:1"]'), true, '안 쓰는 칸은 표시 조작 잠김');
+  assert.ok((await page.textContent('.st-colsbox summary')).includes('9칸 사용'));
+  await page.click('[data-action="set-col"][data-value="weather:use:1"]');
+  await page.waitForFunction(() => document.querySelector('.st-colsbox summary')?.textContent?.includes('10칸 사용'));
+  await page.fill('.st-won', '120만');
+  await page.dispatchEvent('.st-won', 'change');
+  await page.waitForFunction(() => document.querySelector('.st-won')?.value === '1,200,000');
+  }
   assert.equal(await page.evaluate(() => document.querySelector('.st-world').open), false, '괴이 발생은 접혀 있음');
   await page.click('.st-world > summary');
   await page.click('[data-action="set-world"][data-value="incident_cap:+"]');
   await page.waitForFunction(() => JSON.parse(window.__store['p:goei:prefs'] || '{}').world?.incident_cap === 2);
+  await page.click('[data-action="ed-node"][data-value="set:screen"]');
+  await page.waitForSelector('.gw-set [data-action="set-theme"]');
   await page.click('[data-action="set-theme"][data-value="dark"]');
   await page.waitForFunction(() => JSON.parse(window.__store['p:goei:prefs'] || '{}').theme === 'dark');
   if (shots) await page.screenshot({ path: `${shots}/1-prefs.png` });
-  await page.click('[data-action="prefs-close"]');
+  await page.click('.gw [data-action="ed-close"]');
   await page.waitForSelector('.gx-fac');
   await page.click('.gx-fac[data-value="C00"]');
   await page.click('.gx-seg[data-value="en"]');
@@ -233,7 +253,7 @@ async function pickCustom(page, row = '.gx-mlist li.gx-mx') {
   const card = await page.evaluate((t) => window.__calls.handlers.display(t), saved.message[0].data);
   assert.ok(card.includes('data-goei-card="start"') && card.includes('첫 상황') && card.includes('냉장고 안에서') && !card.includes('%%'), card);
   const sent = await page.evaluate((t) => window.__calls.replacers[0]([{ role: 'user', content: t }], 'model'), saved.message[0].data);
-  assert.equal(sent.at(-1).content, '새벽 편의점, 냉장고 안에서 노크 소리');
+  assert.equal(sent.filter((m) => m.role === 'user').at(-1).content, '새벽 편의점, 냉장고 안에서 노크 소리', '요청의 사용자 글은 적은 글만 (이미지 지침 시스템 메시지는 플러그인이 뒤에 붙인다)');
   await page.waitForFunction(() => window.__calls.send?.length === 1 && window.__calls.hide >= 1);
   console.log('PASS 직접 입력 → 빈 인사말 + 적은 상황을 바로 전송');
   await page.close();
@@ -257,7 +277,7 @@ async function pickCustom(page, row = '.gx-mlist li.gx-mx') {
   assert.ok(html.includes('data-goei-card="start"') && html.includes('data-goei-cancel') && html.includes('전송 대기') && !html.includes('%%'), html);
   // 요청에는 표식이 가지 않는다
   const req = await page.evaluate(() => window.__calls.replacers[0]([{ role: 'user', content: window.__chat.message[0].data }], 'model'));
-  assert.equal(req.at(-1).content, '시작');
+  assert.equal(req.filter((m) => m.role === 'user').at(-1).content, '시작');
   await page.evaluate((h) => { const d = document.createElement('div'); d.id = 'msg'; d.innerHTML = h; document.querySelector('.default-chat-screen').appendChild(d); }, html);
   // 요청 대기 표시를 끈다 (위 replacers 호출이 켠 것)
   await page.evaluate(async () => { const c = window.__chat; await window.__calls.listeners[0]({ char: JSON.parse(JSON.stringify(window.__char)), chat: JSON.parse(JSON.stringify({ ...c, message: [] })), characterIndex: 0, chatIndex: 0, messageIndex: -1 }); });
@@ -310,9 +330,12 @@ async function pickCustom(page, row = '.gx-mlist li.gx-mx') {
   await page.waitForTimeout(300);
   assert.equal(await page.evaluate(() => window.__calls.show.length), 0);
   assert.equal(await page.$('.gx-panel'), null);
-  assert.equal(await page.evaluate(() => window.__button), undefined, '채팅 메뉴 항목 없음');
+  // 5단계(2026-10-27): 다른 봇에는 햄버거 메뉴의 「설치·점검」 단추 하나만 (본체는 꺼내지 않음)
+  const btn = await page.evaluate(() => window.__button);
+  assert.equal(btn?.arg?.id, 'goei-plugin-install', '설치·점검 단추만');
+  assert.equal(btn?.arg?.location, 'hamburger');
   assert.deepEqual(errors, []);
-  console.log('PASS 다른 봇 → 아무것도 표시하지 않음');
+  console.log('PASS 다른 봇 → 설치 단추 말고는 아무것도 표시하지 않음');
   await page.close();
 }
 
@@ -1705,7 +1728,17 @@ if (fixture.globalLore.some(packed)) {
   await page.click('[data-action="set-scope"][data-value="card"]');
   await page.waitForSelector('.dir');
   const kinds = await page.textContent('.dir-kinds');
-  assert.ok(/괴이\s*62/.test(kinds) && /요원\s*55/.test(kinds) && /조직\s*16/.test(kinds), kinds);
+  assert.ok(/괴이\s*63/.test(kinds) && /요원\s*55/.test(kinds) && /조직\s*17/.test(kinds) && /부록\s*4/.test(kinds), kinds);
+  // 부록: 본 항목별로 묶이고, 펼치면 본 항목·조건·해금 (해금은 이 채팅에 바로 적는다)
+  await page.click('[data-action="dir-kind"][data-value="appendix"]');
+  await page.waitForSelector('.dir-kinds [data-value="appendix"].on');
+  assert.equal(await page.$$eval('.dir-list .dir-row', (rows) => rows.length), 4);
+  assert.ok(!(await page.textContent('.dir-list')).includes('본 항목 없음'), '모두 본 항목을 찾음');
+  await page.click('[data-action="dir-open"][data-value="남해지사 · 숨은 진실"]');
+  await page.waitForSelector('[data-key="app:unlock|남해지사 · 숨은 진실"]');
+  assert.match(await page.textContent('.dir-panel'), /본 항목과 같은 세력 자리/);
+  if (shots) await page.screenshot({ path: `${shots}/17-directory-appendix.png` });
+  await page.click('[data-action="dir-kind"][data-value="anomaly"]');
   assert.equal(await page.getAttribute('.dir-bar [data-value="save"]', 'disabled'), '', '고친 게 없으면 저장 못 함');
   // 괴이: 명일 아파트를 발생 후보에서 빼기
   // 통합 검색: 탭과 상관없이 다섯 탭을 묶어 보여 주고, 고르면 그 탭으로 가서 펼친다
@@ -2189,7 +2222,7 @@ if (fixture.globalLore.some(packed)) {
 }
 
 // 게임 창 (ui/game.ts): 머리 게임 버튼 → 시작 화면. 게임 파일(코드 팩)이 없으면 받기, 받은 뒤 저장 칸에서 시작.
-// 정산 결과는 쌓아 두고 버튼을 눌러야만 채팅(전송 대기)과 기록 로어북에 쓴다. 이전 시험판(순찰)도 그대로 열린다.
+// 정산 결과는 쌓아 두고 버튼을 눌러야만 채팅(전송 대기)과 기록 로어북에 쓴다.
 {
   const { page, errors } = await boot(fixture, { message: [], scriptstate: {} });
   await startedWithReply(page);
@@ -2269,22 +2302,9 @@ if (fixture.globalLore.some(packed)) {
   await page.waitForSelector('.gx-game.gx-full.gx-rot');
   await page.setViewportSize({ width: 1100, height: 900 });
   await page.waitForSelector('.gx-game.gx-full:not(.gx-rot)');
-  // 이전 시험판: 순찰은 예전처럼 그림 팩 받기
-  await page.click('[data-g="home"]');
-  await page.click('details[data-keep="game-legacy"] > summary');
-  await page.click('[data-g="legacy"][data-mode="patrol"]');
-  await page.waitForSelector('.gx-gp');
-  const pack = readFileSync(new URL('../dist/goei-game-patrol.pack', import.meta.url)).toString('base64');
-  await page.evaluate((b64) => {
-    const bytes = Uint8Array.from(atob(b64), (c) => c.charCodeAt(0));
-    window.__fetch = (u) => (u.includes('goei-game-patrol.pack') ? bytes : null);
-  }, pack);
-  await page.click('[data-gp="get"]');
-  await page.waitForSelector('.goei-game canvas');
-  assert.equal(await page.evaluate(() => Object.keys(JSON.parse(window.__store['p:goei:game-pack:patrol']).files).length), 19, '그림 19장 저장');
   await page.click('[data-action="game-close"]');
   assert.deepEqual(errors, []);
-  console.log('PASS 게임 창: 파일 받기 실패 안내 → 받기(코드·쟈알디 팩) → 통합 엔진 시작 → 결과는 버튼으로만 채팅·로어북 → 다시 열면 이어하기 → 돌려 보기 → 이전 순찰');
+  console.log('PASS 게임 창: 파일 받기 실패 안내 → 받기(코드·쟈알디 팩) → 통합 엔진 시작 → 결과는 버튼으로만 채팅·로어북 → 다시 열면 이어하기 → 돌려 보기');
   await page.close();
 }
 

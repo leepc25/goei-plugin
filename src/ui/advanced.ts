@@ -22,9 +22,18 @@ function control(f: AdvFeature, item: AdvItem, cur: string): string {
       .map(([v, label]) => `<button class="gx-seg${cur === v ? ' on' : ''}" data-action="adv-set" data-value="${id}=${v}" aria-pressed="${cur === v}">${esc(label)}</button>`)
       .join('')}</div>`;
   }
-  // 0이 「공통」「제한 없음」 같은 뜻이면 칸을 비우고 그 말을 흐리게 보여 준다
-  const zero = cur === '0' && item.zero;
-  return `<span class="adv-num"><input class="gx-search" type="number" inputmode="numeric" min="${item.min ?? 0}" max="${item.max ?? ''}" step="1" data-change="adv-set" data-key="${id}" value="${zero ? '' : esc(cur)}"${item.zero ? ` placeholder="${esc(item.zero)}"` : ''} aria-label="${esc(item.label)}"><span>${esc(item.unit ?? '')}</span></span>`;
+  // 숫자: −/+ 단추(사용자 2026-10-27, 상황판 인원 칸과 같은 모양) + 가운데 숫자는 직접 쳐도 된다.
+  // 한 번에 움직이는 폭: 토큰 상한처럼 큰 수(상한 1만 이상)는 500, 나머지는 1. 0이 「공통」「제한 없음」 같은 뜻이면 숫자 대신 그 말
+  const min = item.min ?? 0;
+  const max = item.max ?? Number.MAX_SAFE_INTEGER;
+  const step = max >= 10000 ? 500 : 1;
+  const n = Math.min(max, Math.max(min, Number(cur) || 0));
+  const zero = n === 0 && item.zero;
+  const down = Math.max(min, n - step);
+  const up = Math.min(max, n + step);
+  return `<div class="st-step adv-step"><button class="gx-step" data-action="adv-set" data-value="${id}=${down}" ${n <= min ? 'disabled' : ''} aria-label="${esc(item.label)} 줄이기">−</button>
+    <input class="adv-val" type="number" inputmode="numeric" min="${min}" max="${item.max ?? ''}" step="${step}" data-change="adv-set" data-key="${id}" value="${zero ? '' : n}"${item.zero ? ` placeholder="${esc(item.zero)}"` : ''} aria-label="${esc(item.label)}">${item.unit ? `<span>${esc(item.unit)}</span>` : ''}
+    <button class="gx-step" data-action="adv-set" data-value="${id}=${up}" ${n >= max ? 'disabled' : ''} aria-label="${esc(item.label)} 늘리기">+</button></div>`;
 }
 
 function row(f: AdvFeature, item: AdvItem, state: State): string {

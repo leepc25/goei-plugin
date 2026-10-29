@@ -1,0 +1,10 @@
+16-bit pixel art game background, in the style of high-quality modern pixel art games (like a detailed SNES-era / modern indie pixel art side-scroller). Hard-edged square pixels clearly visible, limited palette, crisp 1-pixel dark outlines around every object, cel-style shading with 3–4 flat tone steps per surface, small dithering patterns for texture, no anti-aliasing, no blur, no gradients, no painterly brush strokes, no vector look.
+
+Scene: one very long continuous side-view corridor of a modern, clean Korean office building, bright daytime. Camera looks at the back wall straight on, slightly from above. The line where the back wall meets the floor is perfectly straight and horizontal at 60% of the image height; the lower 40% is a wide smooth light-gray floor (no tile grid). Back wall: plain light-gray paint with a thin baseboard; a thin ceiling edge with small downlights at the top.
+
+Both ends are closed: at the far left an angled west side wall with a dark gray steel stairwell fire door and a green exit sign above it; at the far right an angled east side wall with a dark gray steel emergency exit door with push bar and a green exit sign.
+
+Along the back wall from left to right: restroom door with a small pictogram plate, water dispenser, red fire extinguisher cabinet, wide glass double door to an office, bulletin board, two stainless-steel elevators side by side flush with the wall (open floor in front, darker floor inlay), interview room door, wall clock, framed picture, red fire extinguisher cabinet, wide glass double door to a lounge.
+On the floor, away from the wall: a few large potted plants, a bench, a small round side table — with clear walking space.
+
+No text, no letters, no numbers, no people, no stairs.

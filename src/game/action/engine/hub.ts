@@ -4,17 +4,18 @@
 // 문은 열리는 그림이 나온 뒤 잠깐 암전, 엘리베이터는 층 단추, 자리 앞 E는 본부 메뉴 창 또는 그 자리 동작.
 // 집기는 바닥 위 상자(앞면 + 윗면)로 몸과 깊이 순서로 섞여 그려지고, 몸은 상자를 뚫고 지나가지 못한다.
 // 방 그림(GPT 전체 그림 + 앞 레이어)이 오기 전까지는 같은 자리·크기의 색 상자로 그린다.
-// 화면에 방 이름·층·잠김 이유 같은 글씨를 쓰지 않는다.
+// 화면 글씨: 그림 층의 지상 표찰(2·3층)·잠긴 문 「잠겨 있다」만 (사용자 2026-10-25). 그 밖의 방 이름·층·잠김 이유는 쓰지 않는다.
 import type { Player } from './player';
 import type { FloorPlan, StageApi, StageModule, WorldView } from './contract';
 import { SCREEN_H, SCREEN_W } from './contract';
 import { HQ_PLACE, drawFloor, drawHqWall, drawPropArt, drawHqTextureWall } from '../art/bg';
-import { drawStartRoom, drawStartRoomFurniture } from '../art/startRoom';
 import { drawHqDoorRound2 } from '../art/hqDoorRound2';
+import { drawCallLit, drawHqField, drawHqFieldLight, drawHqFieldObject, drawHqSigns, hasHqField } from '../art/hqField';
 import { drawVisitAgent, visitAgentTop } from '../art/visitAgents';
 import { drawTestMan, hasTestPeople, testManTop, testPlayerTop } from '../art/testPeople';
 import { persp, view as fieldView } from './view';
 import { blockByProps, clearSpot, type BlockProp } from './propBlock';
+import { PAINTED, clampPainted, doorReachY } from '../hq/painted';
 import { LANE_BOT, LANE_TOP, type HqBox, type HqDoor, type HqMapView, type HqScene, type HqSpot } from '../hq/map';
 
 type Door = HqDoor & { open: boolean };
@@ -38,17 +39,46 @@ export interface HubHost {
   visitors?(sceneId: string): { name: string; x: number; y: number; face: 1 | -1 }[];
   /** 장면 맨 위에 그리기 (월드 좌표): 이름표·말풍선. people = 이 방 요원, player = 주인공 발 */
   overlay?(c: CanvasRenderingContext2D, people: { name: string; x: number; y: number; top: number }[], player: { name: string; x: number; y: number; top: number }): void;
+  /** 필드 시각 (시, 0~24). 없으면 시간대 조명은 기기 시계 */
+  hour?(): number | null;
+  /** 앉기·눕기 자리에 앉았다 (시간 보내기 고르기) */
+  sat?(): void;
+  /** 필드 가게 자리: 거래 창을 연다. 못 열면(문 닫음 등) 자막 한 줄 */
+  shop?(id: string): string | null;
+  /** 필드 세계 (src/game/world): 있으면 visitors 대신 움직이는 행위자를 그린다 */
+  life?: HubLife;
 }
+
+/** 보이는 장면의 행위자 하나 (월드 좌표, 발 기준) */
+export interface LiveActor { id: string; name: string; kind: 'named' | 'mob'; x: number; y: number; face: 1 | -1; look?: string; moving: boolean; clip?: string; since?: number; icon?: string; say?: string }
+export interface HubLife {
+  /** 생활 시간 진행 (실시간 초). at = 보이는 장면과 주인공 발 */
+  tick(dt: number, at: { scene: string; x: number; y?: number }): void;
+  actors(sceneId: string): LiveActor[];
+  /** 관찰 창이 켜져 있으면 글 줄, 꺼져 있으면 null */
+  observer(sceneId: string): string[] | null;
+  /** 몹 그림. 없으면 회색 실루엣 */
+  drawMob?(c: CanvasRenderingContext2D, a: LiveActor): void;
+  /** 생활 시각(초): 클립 재생 기준 */
+  lifeTime?(): number;
+  /** 주인공 공격 판정 → 맞은 행위자 수 */
+  hit?(sceneId: string, boxes: { x0: number; x1: number; y: number; dy?: number; z0: number; z1: number; attackId: number }[], dir: 1 | -1): number;
+}
+/** 행위자 깊이 층 자리 수 (한 화면 상한보다 넉넉히) */
+const LIFE_SLOTS = 24;
 
 const TOP = 440;
 const LANE: [number, number] = [LANE_TOP, LANE_BOT];
 const DOOR_H = 250;
 const FADE = 8;
-/** 문 열리는 그림 길이(틱) */
+/** 문 열리는 그림 길이(틱). 그림 장면은 문마다 다르다 (엘리베이터·셔터는 천천히) */
 const OPEN_T = 9;
-const DOOR_W: Record<Door['kind'], number> = { main: 190, door: 120, glass: 160, steel: 120, security: 120, elevator: 160, stairs_up: 120, stairs_down: 120, shop: 130, slide: 170, cell: 150, exit: 150 };
+const openLen = (sc: Scene | null, d: HqDoor) => (!sc?.painted ? OPEN_T : d.kind === 'elevator' ? 22 : d.kind === 'cell' ? 26 : 12);
+/** 잠긴 문 덜컹 길이(틱) */
+const RATTLE_T = 10;
+const DOOR_W: Record<Door['kind'], number> = { main: 190, door: 120, stairs: 120, glass: 160, steel: 120, security: 120, elevator: 160, stairs_up: 120, stairs_down: 120, shop: 130, slide: 170, cell: 150, exit: 150 };
 
-export type Hub = StageModule & { goto(place: string): void; jump(sceneId: string, x?: number, y?: number): void; sceneIds(): string[]; current(): HqScene | null };
+export type Hub = StageModule & { nearInfo(): { text: string; locked: boolean } | null; speech(): { who: string; text: string; x: number; y: number; top: number } | null; goto(place: string): void; jump(sceneId: string, x?: number, y?: number): void; sceneIds(): string[]; current(): HqScene | null };
 
 const isS = (d: HqDoor) => d.side === 'S';
 const doorY = (d: HqDoor, lane: [number, number] = LANE) => (isS(d) ? lane[1] - 14 : lane[0] + 16);
@@ -62,25 +92,41 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
   let enterTick = -1;
   let fadeOut = 0;
   let barked: string | null = null;
-  let opening: { id: string; t: number; then: () => void } | null = null;
+  /** 자리 주인 목소리 한 줄: 아래 자막 대신 그 사람 머리 위 말풍선 (사용자 2026-10-25) */
+  let speech: { who: string; text: string; x: number; y: number; top: number; until: number } | null = null;
+  let curPeople: { name: string; x: number; y: number }[] = [];
+  /** 보이는 장면의 행위자 (host.life) */
+  let live: LiveActor[] = [];
+  let opening: { id: string; t: number; len: number; then: () => void } | null = null;
+  /** 들어온 문이 뒤에서 닫히는 것·메뉴 문이 다시 닫히는 것 */
+  let closing: { id: string; t: number; len: number } | null = null;
+  let rattle: { id: string; t: number } | null = null;
+  let arriveDoor: string | null = null;
+  /** 엘리베이터 층을 고른 뒤: 호출 단추가 초록으로 바뀌고 잠깐 뒤 문이 열린다 */
+  let callWait: { t: number; then: () => void } | null = null;
+  let callOn = false;
   let near: string | null = null;
-  let solids: BlockProp[] = [];
+  let solids: (BlockProp & { h?: number })[] = [];
   /** 이 장면에서 걸은 거리 (px). 필드 시계가 쓴다 */
   let walked = 0;
   let lastX: number | null = null;
 
   const sceneOf = (id: string): Scene => view!.scenes.find((s) => s.id === id) ?? view!.scenes[0];
-  const openOf = (id: string) => (opening && opening.id === id ? Math.min(1, opening.t / OPEN_T) : 0);
+  const openOf = (id: string) =>
+    opening && opening.id === id ? Math.min(1, opening.t / opening.len) : closing && closing.id === id ? Math.max(0, 1 - closing.t / closing.len) : 0;
+  const doorFx = (id: string) => ({ open: openOf(id), shake: rattle && rattle.id === id ? (rattle.t % 4 < 2 ? 3 : -3) * (1 - rattle.t / RATTLE_T) : 0 });
 
   const build = (id: string, x: number, y?: number): FloorPlan => {
     view = host.map();
     const base = sceneOf(id);
     // 방문 요원은 그 방의 자리(대화 상대)로 붙인다: E → 대화창 (npcLink hubTalk → visit)
-    const people = (host.visitors?.(base.id) ?? []).map((p) => {
+    const people = (host.life ? [] : host.visitors?.(base.id) ?? []).map((p) => {
       const at = clearSpot(p.x, p.y, base.boxes.filter((b) => b.solid).map((b) => ({ x: b.x, y: b.y, w: b.w, back: b.d + 6, front: 8 })), base.lane ?? LANE);
       return { ...p, x: at.x, y: at.y };
     });
     const sc: Scene = { ...base, spots: [...base.spots, ...people.map((p) => ({ id: `visit:${p.name}`, x: p.x, y: p.y, who: p.name, verb: '대화', face: p.face, open: true }))] };
+    curPeople = people;
+    speech = null;
     const prev = scene;
     scene = sc;
     if (prev && prev.id !== sc.id) host.entered?.({ id: sc.id, name: sc.name, floor: sc.floor }, { id: prev.id, name: prev.name, floor: prev.floor }, walked);
@@ -89,10 +135,17 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
     barked = null;
     enterTick = -1;
     opening = null;
+    rattle = null;
+    callWait = null;
+    callOn = false;
+    // 들어온 문은 열린 채로 시작해 뒤에서 닫힌다 (그림 장면)
+    const inDoor = arriveDoor ? sc.doors.find((d) => d.id === arriveDoor) : undefined;
+    closing = sc.painted && inDoor ? { id: inDoor.id, t: 0, len: openLen(sc, inDoor) } : null;
+    arriveDoor = null;
     near = null;
     // 필드 시험: 사무실에 서 있는 남자 (임시)
     const man = sc.id === 'office' && hasTestPeople() ? { x: 900, y: 560 } : null;
-    solids = [...(man ? [{ x: man.x, y: man.y, w: 70, back: 20, front: 20 }] : []), ...sc.boxes.filter((b) => b.solid).map((b) => ({ x: b.x, y: b.y, w: b.w, back: b.d + 6, front: 8 })), ...people.map((p) => ({ x: p.x, y: p.y, w: 80, back: 24, front: 24 }))];
+    solids = [...(man ? [{ x: man.x, y: man.y, w: 70, back: 20, front: 20 }] : []), ...sc.boxes.filter((b) => b.solid).map((b) => ({ x: b.x, y: b.y, w: b.w, back: b.d + 6, front: 8, h: sc.painted ? b.h : undefined })), ...people.map((p) => ({ x: p.x, y: p.y, w: 80, back: 24, front: 24 }))];
     const len = Math.max(SCREEN_W, sc.length);
     const sx = Math.max(60, Math.min(len - 60, x));
     arrive = { x: sx, y };
@@ -107,21 +160,35 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
       exitX: Infinity,
       props: [],
       encounters: [],
-      depthLayers: sc.boxes.map((b) => ({ y: sc.id === 'office' && b.kind === 'chair' ? 495 : b.y, occludedSilhouette: sc.id !== 'office', x0: sc.id === 'office' ? 180 : b.x - b.w / 2, x1: sc.id === 'office' ? 560 : b.x + b.w / 2, draw: (c: CanvasRenderingContext2D) => {
-        if (sc.id === 'office') { drawStartRoomFurniture(c, b.kind); return; }
+      platforms: sc.painted ? sc.boxes.filter((b) => b.solid && b.h > 0 && b.h < 400).map((b) => ({ x0: b.x - b.w / 2, x1: b.x + b.w / 2, y0: b.y - b.d, y1: b.y, h: b.h })) : undefined,
+      depthLayers: sc.boxes.map((b) => ({ y: b.y, occludedSilhouette: !sc.painted, x0: b.x - b.w / 2, x1: b.x + b.w / 2, draw: (c: CanvasRenderingContext2D) => {
+        if (sc.painted && hasHqField(sc.painted)) { drawHqFieldObject(c, sc.painted, b.kind); return; }
         drawBox(c, b, sc.look);
       } })).concat(people.map((p) => ({ y: p.y, x0: p.x - 60, x1: p.x + 60, occludedSilhouette: false, draw: (c: CanvasRenderingContext2D) => { drawVisitAgent(c, p.name, p.x, p.y, p.face, performance.now()); } })))
+        // 움직이는 행위자: 자리 수만큼 층을 두고 매 프레임 지금 목록의 i번째를 읽는다 (깊이 정렬은 y 게터로)
+        .concat(host.life ? Array.from({ length: LIFE_SLOTS }, (_, i) => ({
+          get y() { return live[i]?.y ?? -1e9; },
+          get x0() { return (live[i]?.x ?? -1e9) - 60; },
+          get x1() { return (live[i]?.x ?? -1e9) + 60; },
+          occludedSilhouette: false,
+          draw: (c: CanvasRenderingContext2D) => { const a = live[i]; if (a) drawLiveActor(c, a, host.life!); },
+        })) : [])
         .concat(man ? [{ y: man.y, x0: man.x - 60, x1: man.x + 60, occludedSilhouette: false, draw: (c: CanvasRenderingContext2D) => { drawTestMan(c, man.x, man.y, -1); } }] : []),
       drawBackground(c: CanvasRenderingContext2D, camX: number) {
-        if (sc.id === 'office' && drawStartRoom(c, openOf('out'))) return;
+        if (sc.painted && drawHqField(c, sc.painted, camX, doorFx, host.hour?.() ?? null)) {
+          // 표찰은 지상 사무 층(2·3층)만 (사용자 2026-10-25)
+          if (sc.floor === '2F' || sc.floor === '3F') drawHqSigns(c, sc.painted, sc.doors);
+          if (callOn) drawCallLit(c, sc.painted, performance.now());
+          return;
+        }
         if (sc.legacy) {
           const cov = drawHqWall(c, place, sc.id, len, TOP, sc.doors);
           artDoors = cov ?? new Set();
           c.fillStyle = 'rgba(0,0,0,0.35)';
-          c.fillRect(camX - 40, TOP - 14, SCREEN_W + 80, 14);
-          if (!drawFloor(c, place, camX - 40, camX + SCREEN_W + 40, TOP, SCREEN_H)) {
+          c.fillRect(camX - 40, TOP - 14, fieldView.w + 80, 14);
+          if (!drawFloor(c, place, camX - 40, camX + fieldView.w + 40, TOP, SCREEN_H)) {
             c.fillStyle = '#2b3135';
-            c.fillRect(camX - 40, TOP, SCREEN_W + 80, SCREEN_H - TOP);
+            c.fillRect(camX - 40, TOP, fieldView.w + 80, SCREEN_H - TOP);
           }
           for (const t of sc.things) if (t.wall) legacyThing(c, t, camX);
           for (const d of sc.doors) if (!artDoors.has(d.id)) legacyDoor(c, d, camX);
@@ -130,7 +197,7 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
         }
         drawRoomShell(c, sc, camX);
         const textured = (sc.id === 'office' || sc.id === 'f2') && drawHqTextureWall(c, place, len, camX, sc.doors.filter(d => !isS(d)).map(d => ({ x: d.x, width: d.kind === 'glass' ? 192 : DOOR_W[d.kind] + 24 })));
-        if (sc.id === 'office' || sc.id === 'f2') drawFloor(c, place, camX - 40, camX + SCREEN_W + 40, TOP, SCREEN_H);
+        if (sc.id === 'office' || sc.id === 'f2') drawFloor(c, place, camX - 40, camX + fieldView.w + 40, TOP, SCREEN_H);
         for (const f of sc.fixtures) {
           // Windows/boards are already painted in the wall tiles; keep functional signage.
           if (!textured || f.kind === 'directory') drawFixture(c, f, sc.look, camX);
@@ -147,24 +214,43 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
         if (enterTick < 0) enterTick = now;
         const age = (now - enterTick) / (1000 / 30);
         if (!sc.legacy) for (const d of sc.doors) if (isS(d)) drawExitLintel(c, d, camX);
+        if (sc.painted) drawHqFieldLight(c, sc.painted, camX, host.hour?.() ?? null, now);
+        // 엘리베이터 앞 방향 안내(drawHqGuide)는 사용자 지시로 끔 (2026-10-25)
         // 주인공 그림은 쟈알디 그림이라 머리 높이도 쟈알디 기준
         // 말풍선·이름표는 화면 px 그대로 (필드 zoom을 되돌려 글자 도트가 고르게). top은 원근까지 곱한 화면 px
         const z = fieldView.zoom;
         c.save();
         c.scale(1 / z, 1 / z);
-        host.overlay?.(c, people.map((p) => ({ name: p.name, x: p.x * z, y: p.y * z, top: visitAgentTop(p.name) * persp(p.y) })), { name: '', x: w.player.x * z, y: w.player.y * z, top: (hasTestPeople() ? testPlayerTop() : visitAgentTop('쟈알디')) * persp(w.player.y) });
+        // 사람 그림은 월드 배율로 그려지므로(배경과 같이 커짐) 머리 높이도 z를 곱한다
+        const shown = host.life ? live.filter((a) => a.kind === 'named') : people;
+        host.overlay?.(c, shown.map((p) => ({ name: p.name, x: p.x * z, y: p.y * z, top: visitAgentTop(p.name) * persp(p.y) * z })), { name: '', x: w.player.x * z, y: (w.player.y - w.player.z) * z, top: (hasTestPeople() ? testPlayerTop() : visitAgentTop('쟈알디')) * persp(w.player.y) * z });
         c.restore();
+        // 행위자 머리 위 아이콘·말풍선 (화면 px)
+        if (host.life) {
+          c.save();
+          c.scale(1 / z, 1 / z);
+          for (const a of live) {
+            if (!a.icon && !a.say) continue;
+            const top = (a.kind === 'named' ? visitAgentTop(a.name) : hasTestPeople() ? testManTop() : -230) * persp(a.y);
+            drawHeadBubble(c, a.x * z, (a.y + top) * z - 8, a.say ?? a.icon!, !!a.say);
+          }
+          c.restore();
+        }
+        // 세계 관찰 창 (개발 도구): 화면 왼쪽 위, 화면 px 그대로
+        const obs = host.life?.observer(sc.id);
+        if (obs) drawObserver(c, obs);
         // 출입 표식과 잠금 이유는 render.ts / HUD가 같은 조사 대상으로 표시한다.
         const dark = fadeOut > 0 ? 1 - fadeOut / FADE : age < FADE ? 1 - age / FADE : 0;
         if (dark > 0) {
           c.fillStyle = `rgba(0,0,0,${dark})`;
-          c.fillRect(camX - 40, 0, SCREEN_W + 80, SCREEN_H); // 이 그림판은 이미 -camX 만큼 옮겨져 있다
+          c.fillRect(camX - 40, 0, fieldView.w + 80, SCREEN_H); // 이 그림판은 이미 -camX 만큼 옮겨져 있다
         }
       },
     };
   };
 
   const go = (sceneId: string, x: number, y?: number) => {
+    fieldView.worldH = sceneOf(sceneId).painted ? PAINTED[sceneOf(sceneId).painted!]?.h ?? 700 : SCREEN_H;
     pending = { scene: sceneId, x, y };
     fadeOut = FADE;
   };
@@ -173,6 +259,7 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
     return d ? { x: d.x, y: sceneOf(sceneId).legacy ? undefined : doorY(d, sceneOf(sceneId).lane ?? LANE) } : { x: 200, y: undefined };
   };
   const goDoor = (sceneId: string, doorId?: string) => {
+    arriveDoor = doorId ?? null;
     const t = arriveAt(sceneId, doorId);
     go(sceneId, t.x, t.y);
   };
@@ -186,15 +273,16 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
       if (ok && (!best || d < best.d)) best = { id, kind, x, d };
     };
     // 자리 먼저: 같은 거리면 자리(격리문 앞 전시 등)가 이긴다
+    // 아직 안 열린 자리도 다가가면 「잠김」으로 보인다 (전수검사: 연구·감정·면담 자리가 아무 안내 없이 비어 보였다)
     for (const s of scene.spots) {
-      if (!s.open) continue;
       const ok = Math.abs(s.x - px) < (s.y === undefined ? 60 : 75) && (s.y === undefined || Math.abs(s.y - py) < 55);
       consider(`spot:${s.id}`, 'hubspot', s.x, ok);
     }
     for (const d of scene.doors) {
       const reach = Math.abs(d.x - px) < (scene.legacy ? 60 : 75);
       const lane = scene.lane ?? LANE;
-      const depth = scene.legacy || (isS(d) ? py > lane[1] - 60 : py < lane[0] + 75);
+      const reachY = scene.painted ? doorReachY(scene.painted, d.id) : null;
+      const depth = scene.legacy || (isS(d) ? py > lane[1] - 60 : py < Math.max(lane[0] + 75, reachY ?? 0));
       consider(`door:${d.id}`, 'hubdoor', d.x, reach && depth);
     }
     return best;
@@ -217,6 +305,20 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
       return build(s.scene, s.x, s.y);
     },
     tick(a: StageApi) {
+      if (host.life && scene) {
+        host.life.tick(1 / 30, { scene: scene.id, x: a.world.player.x, y: a.world.player.y });
+        // 주인공 공격이 행위자에게 닿았나 (필드 행위자는 전투 몸이 아니라 따로 본다)
+        const boxes = a.world.player.frame().hit;
+        if (boxes.length && host.life.hit) {
+          const n = host.life.hit(scene.id, boxes, a.world.player.dir);
+          if (n) a.world.emit({ type: 'hit', strength: 1, x: boxes[0].x0, y: boxes[0].y, z: 120, dmg: 0, react: 'flinch', target: 'npc', combo: 0 });
+        }
+        live = host.life.actors(scene.id);
+        // 이름 인물 대화 자리(visit:이름)를 지금 서 있는 곳으로 옮긴다 (E → npcLink 대화)
+        const named = live.filter((q) => q.kind === 'named');
+        scene.spots = scene.spots.filter((q) => !q.id.startsWith('visit:')).concat(named.map((q) => ({ id: `visit:${q.name}`, x: q.x, y: q.y, who: q.name, verb: '대화', face: q.face, open: true })));
+        curPeople = named;
+      }
       if (fadeOut > 0 && --fadeOut === 0 && pending) {
         if (pending.scene === scene?.id) {
           arrive = { x: pending.x, y: pending.y };
@@ -235,12 +337,20 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
       }
       if (lastX !== null) { const d = Math.abs(p.x - lastX); if (d < 60) walked += d; }
       lastX = p.x;
-      if (opening && opening.t < OPEN_T && ++opening.t === OPEN_T) {
+      if (opening && opening.t < opening.len && ++opening.t === opening.len) {
         const then = opening.then;
-        opening.t = OPEN_T;
         then();
       }
-      if (solids.length && !(p as Player).seat) blockByProps([p as never], solids, scene?.lane ?? LANE);
+      if (callWait && --callWait.t <= 0) { const f = callWait.then; callWait = null; f(); }
+      if (closing && ++closing.t >= closing.len) closing = null;
+      if (rattle && ++rattle.t >= RATTLE_T) rattle = null;
+      // 물건보다 높이 떠 있으면(점프·올라선 몸) 막지 않는다
+      if (solids.length && !(p as Player).seat) blockByProps([p as never], solids.filter((s) => !(s.h !== undefined && p.z >= s.h - 6)), scene?.lane ?? LANE);
+      if (scene?.painted) {
+        // 그림 층: 양 끝 옆벽·튀어나온 벽 바깥으로 못 간다
+        const q = clampPainted(scene.painted, p.x, p.y);
+        if (q.x !== p.x || q.y !== p.y) a.movePlayer(q.x, q.y);
+      }
       // E가 닿는 것 하나만 엔진 소품으로 (엔진은 x 거리만 보므로 깊이는 여기서 고른다)
       const t = (p as Player).seat ? null : target(p.x, p.y);
       const id = t?.id ?? null;
@@ -254,30 +364,71 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
       if (sp && sp.place !== barked) {
         barked = sp.place!;
         const l = host.bark(sp.place!);
-        if (l) a.world.say(`${l.who}: ${l.text}`, 3.5);
+        if (l) {
+          // 말하는 사람이 이 방에 서 있으면 그 머리 위, 아니면 그 자리 위
+          const who = curPeople.find((q) => q.name === l.who);
+          const x = who?.x ?? sp.x, y = who?.y ?? sp.y ?? p.y;
+          speech = { who: l.who, text: l.text, x, y, top: (who ? visitAgentTop(l.who) : -200) * persp(y), until: performance.now() + 3800 };
+        }
       } else if (!sp) barked = null;
     },
     onInteract(a, _floor, prop) {
-      if (!scene || fadeOut > 0 || opening) return;
+      if (!scene || fadeOut > 0 || opening || callWait) return;
       if (prop.kind === 'hubspot') {
         const s = scene.spots.find((q) => `spot:${q.id}` === prop.id);
-        if (!s?.open) return;
+        if (!s) return;
+        if (!s.open) return a.world.say('아직 쓸 수 없다. 본부 일이 더 진행되면 열린다.', 2.5);
+        if (s.shop) {
+          const m = host.shop?.(s.shop);
+          if (m) a.world.say(m, 2.5);
+          return;
+        }
         if (s.place) return host.openPlace(s.place);
+        if (s.say) return a.world.say(s.say, 3);
         if (s.seat && s.act?.[0]) {
           const exit = clearSpot(s.x, s.y ?? a.world.player.y, solids, scene.lane ?? LANE);
           (a.world.player as Player).sit(s.act[0], s.seat.x, s.seat.y, s.face ?? 1, exit);
+          host.sat?.();
           return;
         }
         // 자리 동작: 그 자리에 서서 보는 쪽을 맞춘다 (생활 클립 재생은 host.act)
         if (s.y !== undefined) a.movePlayer(s.x, s.y);
         if (s.face) (a.world.player as { dir: 1 | -1 }).dir = s.face;
         if (s.act) host.act?.(s.act, s.face);
+        // 앉기·눕기 자리 = 시간 보내기 (docs/필드_세계_NPC_설계.md 16-2)
+        if (/앉기|눕기/.test(s.verb)) host.sat?.();
         return;
       }
       if (prop.kind !== 'hubdoor') return;
       const d = scene.doors.find((q) => `door:${q.id}` === prop.id);
       if (!d) return;
-      if (!d.open) return host.sfx('knock');
+      if (!d.open) {
+        if (scene.painted) rattle = { id: d.id, t: 0 };
+        if (d.locked) a.world.say('잠겨 있다', 1.5);
+        return host.sfx('knock');
+      }
+      const len = openLen(scene, d);
+      if (d.kind === 'stairs') {
+        // 계단: 위층·아래층 중 고른다 (그 층의 계단 문으로 나온다)
+        const to = [d.up, d.down].filter((q): q is NonNullable<typeof q> => !!q);
+        const label = (id: string) => view!.elevator.find((e) => e.scene === id)?.label ?? id;
+        const go1 = (target: string) => {
+          host.sfx('doorLatch');
+          opening = { id: d.id, t: 0, len, then: () => goDoor(target, 'stairs') };
+        };
+        if (to.length === 1) return go1(to[0]);
+        host.chooseFloor(to.map((q) => ({ label: label(q), open: true, here: false })), (i) => {
+          if (i != null && to[i]) go1(to[i]);
+        });
+        return;
+      }
+      if (d.place) {
+        // 방 그림이 없는 장소: 문이 열리면 메뉴 창, 문은 다시 닫힌다
+        const place = d.place;
+        host.sfx(scene.painted ? 'doorLatch' : d.kind === 'cell' ? 'doorSlam' : 'doorOpen');
+        opening = { id: d.id, t: 0, len, then: () => { opening = null; closing = { id: d.id, t: 0, len }; host.openPlace(place); } };
+        return;
+      }
       if (d.kind === 'elevator') {
         const here = scene.id;
         const opts = view!.elevator.map((e) => ({ label: e.label, open: e.open, here: e.scene === here }));
@@ -285,17 +436,40 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
           if (i == null) return;
           const e = view!.elevator[i];
           if (!e?.open || e.scene === here) return;
-          host.sfx('ding');
-          opening = { id: d.id, t: 0, then: () => goDoor(e.scene, e.door) };
+          if (!scene?.painted) {
+            host.sfx('ding');
+            opening = { id: d.id, t: 0, len, then: () => goDoor(e.scene, e.door) };
+            return;
+          }
+          // 단추가 초록으로 바뀌며 딸깍 → 잠깐 뒤 띵 하고 문이 열린다
+          host.sfx('panelButton');
+          callOn = true;
+          callWait = { t: 14, then: () => { host.sfx('elevChime'); opening = { id: d.id, t: 0, len, then: () => goDoor(e.scene, e.door) }; } };
         });
         return;
       }
       if (!d.to) return;
       const to = d.to,
         toDoor = d.toDoor;
-      host.sfx(d.kind === 'steel' || d.kind === 'security' || d.kind === 'cell' ? 'doorSlam' : d.kind.startsWith('stairs') ? 'stepConcrete' : 'doorOpen');
+      host.sfx(scene.painted ? 'doorLatch' : d.kind === 'steel' || d.kind === 'security' || d.kind === 'cell' ? 'doorSlam' : d.kind.startsWith('stairs') ? 'stepConcrete' : 'doorOpen');
       if (scene.legacy) return goDoor(to, toDoor);
-      opening = { id: d.id, t: 0, then: () => goDoor(to, toDoor) };
+      opening = { id: d.id, t: 0, len, then: () => goDoor(to, toDoor) };
+    },
+    /** 지금 손이 닿는 문·자리의 짧은 이름 (캐릭터 옆 말풍선) */
+    speech() {
+      if (!speech || performance.now() > speech.until || fadeOut > 0) return null;
+      return speech;
+    },
+    nearInfo() {
+      if (!scene || !near || opening || fadeOut > 0) return null;
+      if (near.startsWith('spot:')) {
+        const s = scene.spots.find((q) => `spot:${q.id}` === near);
+        return s ? { text: s.verb, locked: !s.open } : null;
+      }
+      const d = scene.doors.find((q) => `door:${q.id}` === near);
+      if (!d) return null;
+      const text = d.label ?? (d.kind === 'elevator' ? '엘리베이터' : d.kind === 'stairs' ? '계단' : d.kind === 'exit' ? '나가기' : '문');
+      return { text, locked: !d.open };
     },
     /** 검사·스크린샷용: 장면으로 바로 */
     jump(sceneId: string, x = 400, y?: number) {
@@ -329,7 +503,7 @@ const LOOKS: Record<string, Look> = {
 function drawRoomShell(c: CanvasRenderingContext2D, sc: Scene, camX: number) {
   const L = LOOKS[sc.look] ?? LOOKS.office;
   const x0 = camX - 40,
-    w = SCREEN_W + 80;
+    w = fieldView.w + 80;
   const g = c.createLinearGradient(0, 0, 0, TOP);
   g.addColorStop(0, L.wallTop);
   g.addColorStop(1, L.wallBot);
@@ -390,7 +564,7 @@ function drawRoomShell(c: CanvasRenderingContext2D, sc: Scene, camX: number) {
 
 function drawFixture(c: CanvasRenderingContext2D, f: Scene['fixtures'][number], look: string, camX: number) {
   const x = f.x - f.w / 2;
-  if (x > camX + SCREEN_W + 40 || x + f.w < camX - 40) return;
+  if (x > camX + fieldView.w + 40 || x + f.w < camX - 40) return;
   switch (f.kind) {
     case 'window': {
       // 통창: 장막 안의 텅 빈 종로 밤
@@ -513,7 +687,7 @@ function drawDoorN(c: CanvasRenderingContext2D, d: Door, look: string, open: num
   const w = DOOR_W[d.kind];
   const x = d.x - w / 2,
     y = TOP - DOOR_H;
-  if (x > camX + SCREEN_W + 40 || x + w < camX - 40) return;
+  if (x > camX + fieldView.w + 40 || x + w < camX - 40) return;
   c.fillStyle = '#12161b';
   c.fillRect(x - 10, y - 12, w + 20, DOOR_H + 12);
   c.fillStyle = '#05070a';
@@ -579,7 +753,7 @@ function drawDoorN(c: CanvasRenderingContext2D, d: Door, look: string, open: num
 /** 화면 아래 출입: 바닥 끝에 빛 띠 + 아래로 가는 화살표 (사용자: 문 자리에 나가는 표시) */
 function drawFloorExit(c: CanvasRenderingContext2D, d: Door, open: number, camX: number) {
   const w = DOOR_W.exit;
-  if (d.x + w < camX - 40 || d.x - w > camX + SCREEN_W + 40) return;
+  if (d.x + w < camX - 40 || d.x - w > camX + fieldView.w + 40) return;
   const col = d.kind === 'cell' ? '#7d4a3a' : d.open ? '#3cc596' : '#6b7480';
   c.fillStyle = 'rgba(0,0,0,0.3)';
   c.fillRect(d.x - w / 2 - 10, SCREEN_H - 36, w + 20, 36);
@@ -590,7 +764,7 @@ function drawFloorExit(c: CanvasRenderingContext2D, d: Door, open: number, camX:
 }
 function drawExitLintel(c: CanvasRenderingContext2D, d: Door, camX: number) {
   if (d.kind === 'cell') return;
-  if (d.x < camX - 200 || d.x > camX + SCREEN_W + 200) return;
+  if (d.x < camX - 200 || d.x > camX + fieldView.w + 200) return;
   const col = d.open ? '#3cc596' : '#6b7480';
   const y = SCREEN_H - 30;
   c.fillStyle = col;
@@ -688,7 +862,7 @@ function drawChair(c: CanvasRenderingContext2D, b: HqBox) {
 
 function legacyThing(c: CanvasRenderingContext2D, t: HqScene['things'][number], camX: number) {
   const sx = t.x - camX;
-  if (sx < -t.w - 100 || sx > SCREEN_W + t.w + 100) return;
+  if (sx < -t.w - 100 || sx > fieldView.w + t.w + 100) return;
   const base = t.wall ? TOP - 70 : TOP + 26;
   if (drawPropArt(c, t.kind, undefined, t.x, base)) return;
   c.fillStyle = '#4a4f55';
@@ -698,7 +872,7 @@ function legacyThing(c: CanvasRenderingContext2D, t: HqScene['things'][number], 
 function legacyDoor(c: CanvasRenderingContext2D, d: Door, camX: number) {
   const w = DOOR_W[d.kind];
   const sx = d.x - camX;
-  if (sx < -w - 40 || sx > SCREEN_W + w + 40) return;
+  if (sx < -w - 40 || sx > fieldView.w + w + 40) return;
   if (drawPropArt(c, `hq_${d.kind}`, undefined, d.x, TOP)) return;
   const x = d.x - w / 2,
     y = TOP - DOOR_H;
@@ -710,4 +884,61 @@ function legacyDoor(c: CanvasRenderingContext2D, d: Door, camX: number) {
     c.fillStyle = 'rgba(0,0,0,0.35)';
     c.fillRect(x, y, w, DOOR_H);
   }
+}
+
+/** 행위자 그리기: 이름 인물은 방문 요원 그림(없으면 실루엣), 몹은 host가 주는 그림(없으면 실루엣) */
+function drawLiveActor(c: CanvasRenderingContext2D, a: LiveActor, life: HubLife): void {
+  const t = (life.lifeTime?.() ?? performance.now() / 1000) * 1000;
+  if (a.kind === 'named' && drawVisitAgent(c, a.name, a.x, a.y, a.face, t, a.clip, (a.since ?? 0) * 1000)) return;
+  if (a.kind === 'mob' && life.drawMob) return life.drawMob(c, a);
+  silhouette(c, a);
+}
+/** 그림이 없을 때 대역: 바닥 그림자 + 회색 몸 (검수 전 표시) */
+export function silhouette(c: CanvasRenderingContext2D, a: { x: number; y: number; kind: 'named' | 'mob' }): void {
+  const k = persp(a.y);
+  const h = 230 * k, w = 64 * k;
+  c.save();
+  c.fillStyle = 'rgba(0,0,0,0.28)';
+  c.beginPath();
+  c.ellipse(a.x, a.y, w * 0.6, 9 * k, 0, 0, Math.PI * 2);
+  c.fill();
+  c.fillStyle = a.kind === 'named' ? '#6d7f94' : '#7b7f86';
+  c.fillRect(a.x - w / 2, a.y - h, w, h * 0.78);
+  c.beginPath();
+  c.arc(a.x, a.y - h - w * 0.05, w * 0.36, 0, Math.PI * 2);
+  c.fill();
+  c.restore();
+}
+function drawObserver(c: CanvasRenderingContext2D, lines: string[]): void {
+  c.save();
+  c.setTransform(1, 0, 0, 1, 0, 0);
+  c.font = '13px monospace';
+  const w = Math.min(c.canvas.width - 16, Math.max(260, ...lines.map((l) => c.measureText(l).width + 20)));
+  const h = Math.min(c.canvas.height - 16, lines.length * 17 + 12);
+  // 오른쪽 위 (왼쪽 위는 HUD 초상화·체력)
+  const x0 = c.canvas.width - w - 8;
+  c.fillStyle = 'rgba(8,12,18,0.82)';
+  c.fillRect(x0, 8, w, h);
+  c.fillStyle = '#d7e3ef';
+  lines.forEach((l, i) => { if (16 + 17 * (i + 1) < h + 8) c.fillText(l, x0 + 8, 8 + 17 * (i + 1)); });
+  c.restore();
+}
+/** 머리 위 작은 말풍선: 아이콘 한 글자(! ? ♪ … #) 또는 대사 한 줄 */
+function drawHeadBubble(c: CanvasRenderingContext2D, x: number, y: number, text: string, line: boolean): void {
+  c.save();
+  c.font = line ? '14px Galmuri11, sans-serif' : 'bold 16px Galmuri11, sans-serif';
+  const w = Math.min(320, c.measureText(text).width + (line ? 16 : 12));
+  const h = line ? 22 : 22;
+  const bx = Math.round(x - w / 2), by = Math.round(y - h);
+  c.fillStyle = text === '#' ? '#f2d0cc' : '#f4f1e8';
+  c.strokeStyle = '#1b1f24';
+  c.lineWidth = 2;
+  c.fillRect(bx, by, w, h);
+  c.strokeRect(bx, by, w, h);
+  c.fillRect(Math.round(x) - 3, by + h, 6, 4);
+  c.fillStyle = '#1b1f24';
+  c.textAlign = 'center';
+  c.textBaseline = 'middle';
+  c.fillText(text, Math.round(x), by + h / 2 + 1, w - 8);
+  c.restore();
 }

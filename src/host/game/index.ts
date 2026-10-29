@@ -1,4 +1,5 @@
 // 플러그인 쪽 게임 다리: 저장 칸·자산 팩·본편 스냅숏·결과 받기·화면을 하나로 묶어 게임 코드에 넘긴다.
+import { createUiPrefs } from './uiprefs';
 import type { GameBridge, SlotId } from '../../game/bridge';
 import { isWaiting, onWaiting } from '../waiting';
 import { cardPhoto, readCard, takeReport } from './card';
@@ -7,13 +8,20 @@ import { gameSaves } from './saves';
 import { gameTalk } from './talk';
 import { createVisit } from './visit';
 import { createField } from './field';
+import { createPeople } from './people';
+import { createWallet } from './wallet';
+import { createFieldState } from './fieldstate';
 import type { ViewportCtl } from './viewport';
 
 export function makeBridge(viewport: ViewportCtl, slot: SlotId, close: () => void, onHidden?: GameBridge['onHidden']): GameBridge {
   return {
     api: 1,
+    uiPrefs: createUiPrefs(),
     visit: createVisit(),
     field: createField(),
+    people: createPeople(),
+    wallet: createWallet(),
+    fieldState: createFieldState(),
     slot,
     saves: gameSaves,
     assets: gameAssets,

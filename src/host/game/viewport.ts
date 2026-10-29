@@ -15,6 +15,10 @@ const phone = () => Math.min(innerWidth, innerHeight) <= 560 || matchMedia('(poi
 
 export function makeViewport(layer: HTMLElement, opt: { inFrame?: boolean } = {}): ViewportCtl {
   let full = false;
+  /** 사용자가 고른 전체화면 (필드 설정): 브라우저 · 상황창 안 */
+  let mode: 'browser' | 'panel' | null = null;
+  /** 브라우저 전체화면이 막혀(리스 플러그인 창은 iframe에 fullscreen 허용이 없다) 창 전체를 덮는 중 */
+  let winFill = false;
   let rotated = false;
   /** 사용자가 돌려 보기를 원하는가 (전체화면을 누르면 켜진다) */
   let wantRotate = false;
@@ -26,6 +30,8 @@ export function makeViewport(layer: HTMLElement, opt: { inFrame?: boolean } = {}
     const rot = !opt.inFrame && wantRotate && full && portrait() && phone();
     if (rot !== rotated) rotated = rot;
     layer.classList.toggle('gx-full', full);
+    layer.classList.toggle('gx-panelfull', mode === 'panel');
+    layer.classList.toggle('gx-winfull', mode === 'browser' && winFill);
     layer.classList.toggle('gx-rot', rotated);
     emit();
   };
@@ -33,8 +39,9 @@ export function makeViewport(layer: HTMLElement, opt: { inFrame?: boolean } = {}
   const onResize = () => apply();
   const onFs = () => {
     // 브라우저 전체화면에서 사용자가 뒤로 가기·Esc로 나오면 창 안 전체화면도 푼다
-    if (!document.fullscreenElement && full && layer.dataset.nativeFs === '1') {
-      full = false;
+    if (!document.fullscreenElement && layer.dataset.nativeFs === '1') {
+      if (mode === 'browser') mode = null;
+      full = opt.inFrame ? full : false;
       wantRotate = false;
       delete layer.dataset.nativeFs;
       apply();
@@ -52,13 +59,26 @@ export function makeViewport(layer: HTMLElement, opt: { inFrame?: boolean } = {}
     get rotated() {
       return rotated;
     },
-    async enter() {
+    get mode() {
+      return mode;
+    },
+    async enter(kind = 'browser') {
       full = true;
       wantRotate = true;
+      if (kind === 'panel') {
+        if (document.fullscreenElement) await document.exitFullscreen().catch(() => {});
+        delete layer.dataset.nativeFs;
+        mode = 'panel';
+        return apply();
+      }
+      // 브라우저 전체화면이 막히면(리스 창 iframe은 허용이 없다) 브라우저 창 전체를 덮는다 (상황창 틀·여백까지)
+      mode = 'browser';
+      winFill = true;
       try {
         if (layer.requestFullscreen && document.fullscreenEnabled) {
           await layer.requestFullscreen({ navigationUI: 'hide' });
           layer.dataset.nativeFs = '1';
+          winFill = false;
           try {
             await (screen.orientation as unknown as { lock(o: string): Promise<void> }).lock('landscape');
           } catch {
@@ -77,7 +97,10 @@ export function makeViewport(layer: HTMLElement, opt: { inFrame?: boolean } = {}
       apply();
     },
     async exit() {
-      full = false;
+      // 필드 게임 중(창 틀 안)에는 틀 채우기는 그대로 두고 전체화면만 푼다
+      full = opt.inFrame && mode !== null ? full : false;
+      mode = null;
+      winFill = false;
       wantRotate = false;
       if (document.fullscreenElement) {
         try {

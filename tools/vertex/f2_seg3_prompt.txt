@@ -1,0 +1,6 @@
+This image is part of a wide pixel-art game background. The left part is already finished; the white area on the right is empty.
+Fill in the white area by continuing the same corridor to the right, seamlessly: keep the left part exactly as it is, and continue the same wall, the same baseboard and the same wall-floor line at exactly the same height, the same floor tiles, the same ceiling strip, the same pixel art style, colors and scale.
+
+In the new area draw, with open space between them (not crowded): a wooden interview-room door with a blank sign plate, a wall clock without numbers, a bench standing out on the floor, a wide glass double door to a lounge (sofas visible inside, no people), and at the far right end a closed angled side wall with a gray steel emergency exit door with a push bar and a green exit sign above it.
+Same side-scrolling front view: wall parallel to the image, floor-wall line horizontal, no vanishing point.
+No people, no text, letters or numbers anywhere. Matte floor, no reflections.

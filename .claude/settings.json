@@ -3,16 +3,13 @@
     "allow": [
       "Bash(git push origin HEAD:main)",
       "Bash(git push origin main)",
-      "Bash(git push -u origin main)",
-      "Bash(python3 game-src/action/eileen/motion_v3/cleanup_old.py*)",
-      "Bash(cd /home/user/goei-plugin && python3 game-src/action/eileen/motion_v3/cleanup_old.py*)"
+      "Bash(git push -u origin main)"
     ]
   },
   "autoMode": {
     "allow": [
       "$defaults",
-      "이 저장소(leepc25/goei-plugin)의 main 브랜치에 git push 하는 것은 사용자가 허용했다. 릴리스 규칙은 CLAUDE.md를 따른다.",
-      "PixelLab(api.pixellab.ai) 캐릭터의 버린 동작 판을 지우는 것(DELETE /characters/*/animations/*)은 사용자가 허용했다(2026-10-24). 다시 뽑을 때 이전 판을 지우는 gen.py와 cleanup_old.py가 그 일을 한다."
+      "이 저장소(leepc25/goei-plugin)의 main 브랜치에 git push 하는 것은 사용자가 허용했다. 릴리스 규칙은 CLAUDE.md를 따른다."
     ]
   }
 }

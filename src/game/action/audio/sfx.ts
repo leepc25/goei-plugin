@@ -795,6 +795,21 @@ const switchClick: Recipe = (o, t, p) => {
   thump(o, t, v, 300, 150, 0.03, 0.3);
   return 0.1;
 };
+/** 문 손잡이 찰칵: 걸쇠가 빠지는 짧은 두 번 딸깍 (본부 문, 2026-10-25 사용자: 지이익 대신 찰칵) */
+const doorLatch: Recipe = (o, t, p) => {
+  const v = voice(o, p.dest, t, p.vol * 0.7, p.pan, 0, 0.25);
+  burst(o, t, v, 'bandpass', 2200 * p.pitch, 6, 0.012, 0.55);
+  thump(o, t, v, 260, 120, 0.025, 0.25);
+  burst(o, t + 0.07, v, 'bandpass', 1500 * p.pitch, 5, 0.018, 0.4);
+  thump(o, t + 0.07, v, 180, 90, 0.04, 0.2);
+  return 0.2;
+};
+/** 엘리베이터 도착 부드러운 띵 (사용자: 너무 쨍함 → 낮고 짧게, 작게) */
+const elevChime: Recipe = (o, t, p) => {
+  const v = voice(o, p.dest, t, p.vol * 0.45, p.pan, 0.25, 0.2);
+  bell(o, t, v, 784 * p.pitch, 1.1, 0.3, 1.0, 0.6);
+  return 1.3;
+};
 const crateBreak: Recipe = (o, t, p) => {
   const v = voice(o, p.dest, t, p.vol, p.pan, 0.1, 0.3);
   thump(o, t, v, 120, 50, 0.15, 0.8);
@@ -993,6 +1008,8 @@ export const SFX = {
   ropeCreak: d('귀환 로프', 'elevator', ropeCreak),
   doorWood: d('문 삐걱', 'world', doorWood),
   doorSlam: d('문 쾅', 'world', doorSlam),
+  doorLatch: d('문 찰칵', 'world', doorLatch),
+  elevChime: d('승강기 띵 (부드럽게)', 'elevator', elevChime),
   knock: d('똑똑똑', 'world', knock),
   switchClick: d('스위치', 'world', switchClick),
   crateBreak: d('상자 부숨', 'world', crateBreak),

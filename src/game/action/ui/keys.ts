@@ -78,3 +78,20 @@ export const PAD_NAME: Record<string, string> = {
 
 export const ACTS = Object.keys(CODE) as Act[];
 export const ACT_OF_CODE: Record<string, Act> = Object.fromEntries(ACTS.map((a) => [CODE[a], a]));
+
+/** 에일린 테스트룸 조작으로 바꾼다 (engine/input.ts useEileenKeys와 같은 배치). 터치·패드·조작법 화면이 이 표를 쓴다.
+ * 행동 이름은 그대로 두고 뜻만 바꾼다: attack=약 · reload=강 · support=무기 꺼내기 · guard=방어 · shoot=원거리 · unique=기술 · hitbox=충전 · ult=필살기 */
+export function useEileenControls() {
+  Object.assign(CODE, { attack: 'KeyQ', reload: 'KeyW', support: 'Tab', guard: 'KeyC', shoot: 'KeyA', unique: 'KeyD', hitbox: 'KeyS', ult: 'KeyF', map: 'KeyM', auto: 'KeyO' });
+  Object.assign(KEY_NAME, { attack: 'Q', reload: 'W', support: 'Tab', guard: 'C', shoot: 'A', unique: 'D', hitbox: 'S', ult: 'F', map: 'M', auto: 'O' });
+  Object.assign(LABEL, {
+    attack: '약 공격 (연타 3타) · 뛰며 = 슬라이딩 · 공중 = 점프 공격', reload: '강 공격 (콤보 마무리)', support: '무기 꺼내기·넣기', guard: '방어 (누른 채 · 방어 게이지가 닳는다)',
+    shoot: '원거리 (누른 채 연사 · 과열 주의)', unique: '기술 제압사격', hitbox: '충전 (누른 채 → 떼면 광선)', ult: '필살기 「증명해.」', evade: '짧게 회피 · 누른 채 달리기',
+  });
+  delete ALIAS.Tab; // Tab = 무기
+  Object.assign(KEY_OF, { KeyF: 'f', KeyM: 'm', KeyO: 'o' });
+  Object.assign(PAD_BUTTON, { 2: 'KeyQ', 3: 'KeyA', 4: 'KeyC', 6: 'KeyS', 7: 'KeyF', 8: 'KeyM', 10: 'Tab', 11: 'KeyW' });
+  Object.assign(PAD_NAME, { KeyQ: 'X', KeyA: 'Y', KeyC: 'LB', KeyS: 'LT', KeyF: 'RT', KeyM: 'Back', Tab: 'L3', KeyW: 'R3', KeyD: '메뉴' });
+  for (const a of ACTS) ACT_OF_CODE[CODE[a]] = a;
+  for (const k of Object.keys(ACT_OF_CODE)) if (CODE[ACT_OF_CODE[k]] !== k) delete ACT_OF_CODE[k];
+}

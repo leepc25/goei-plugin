@@ -2,8 +2,10 @@
 // 고친 값은 카드 로어북 「Directory」에 저장되어 카드와 함께 공유되고, 이 카드의 모든 채팅에 바로 적용된다.
 import {
   agentGroup, assignOrg, directoryData, moveAgent, type Directory, factionDisplayNames, orgAffiliation, orgOf, type OrgRow, phoneTabs, readDirectory, type AgentRow,
-  type BaseRow, type PlaceRow, withDirectory, agentGender, loreGender,
+  type BaseRow, type PlaceRow, withDirectory, agentGender, loreGender, type AppendixRow,
 } from '../core/world/directory';
+import { tokens } from '../core/gnet';
+import { readUnlocked, unlockedValue, UNLOCK_VAR } from '../core/lore';
 import { MAP_CODES, placeWhere, regionName, SIDO_NAME, SIGUN } from '../core/world/geo';
 import { assetNames, assetUrl, DEFAULT_CROP, facePic, mainPic, parseCrop, personCrop, splitPic, type PicSource } from '../host/assets';
 import { LEGACY_DATA } from '../core/lorebooks';
@@ -18,7 +20,9 @@ export interface DirectoryEnv {
   refresh: () => Promise<void>;
 }
 
-type Kind = 'anomaly' | 'site' | 'agent' | 'org' | 'base';
+type Kind = 'anomaly' | 'site' | 'agent' | 'org' | 'base' | 'appendix';
+const KINDS: Kind[] = ['anomaly', 'site', 'agent', 'org', 'base', 'appendix'];
+const isKind = (v: string): v is Kind => (KINDS as string[]).includes(v);
 
 export const dirUi = {
   kind: 'anomaly' as Kind,
@@ -54,6 +58,10 @@ const esc = (s: unknown) =>
 
 const snapshot = (d: Directory) => JSON.stringify(directoryData(d));
 
+export function directoryDraft(ctx: ChatContext): Directory {
+  return draftOf(ctx);
+}
+
 function draftOf(ctx: ChatContext): Directory {
   const lore = ctx.char.globalLore ?? [];
   if (!dirUi.draft || (dirUi.from !== lore && !dirty())) {
@@ -72,6 +80,7 @@ function draftOf(ctx: ChatContext): Directory {
     add(d.sites, fresh.sites, (r) => r.lore);
     add(d.agents, fresh.agents, (r) => r.lore);
     add(d.orgs, fresh.orgs, (r) => r.name);
+    add(d.appendices, fresh.appendices, (r) => r.lore);
     dirUi.from = lore;
   }
   return dirUi.draft;
@@ -158,7 +167,7 @@ export function directoryExtList(ctx: ChatContext): string {
   const own = dirUi.kind === 'anomaly' ? '괴이' : '파밍';
   const q = dirUi.addQ.trim().toLowerCase();
   const list = [...loreSources(ctx.char.globalLore)]
-    .filter(([name, src]) => src && !have.has(name) && !/설정/.test(src) && src.replace(/[^\p{L}\p{N}]/gu, '') !== own && (!q || name.toLowerCase().includes(q) || src.toLowerCase().includes(q)))
+    .filter(([name, src]) => src && !have.has(name) && !/설정|부록/.test(src) && src.replace(/[^\p{L}\p{N}]/gu, '') !== own && (!q || name.toLowerCase().includes(q) || src.toLowerCase().includes(q)))
     .slice(0, 60);
   if (!list.length) return '<p class="gx-muted dir-empty">고를 수 있는 로어북이 없어요.</p>';
   return list
@@ -275,7 +284,7 @@ export function directoryPhotoList(ctx: ChatContext): string {
     .join('') + more;
 }
 
-function placePanel(p: PlaceRow, ctx: ChatContext): string {
+export function placePanel(p: PlaceRow, ctx: ChatContext): string {
   const k = (f: string) => `${f}|${p.lore}`;
   return `<div class="dir-panel">
     <div class="dir-line"><span>무작위 발생 후보</span><div class="gx-segs gx-segs-sm">
@@ -291,7 +300,7 @@ function placePanel(p: PlaceRow, ctx: ChatContext): string {
   </div>`;
 }
 
-function agentPanel(a: AgentRow, ctx: ChatContext, d: Directory): string {
+export function agentPanel(a: AgentRow, ctx: ChatContext, d: Directory): string {
   const lore = ctx.char.globalLore ?? [];
   const names = namesOf(d, lore);
   const tabs = tabsOf(d, lore);
@@ -360,7 +369,7 @@ function builtinBlock(code: string, d: Directory): string {
     <div class="dir-line"><span>첫 장면에 함께 넣을 로어북</span></div><div class="dir-grid">${scenes}</div>`;
 }
 
-function orgPanel(o: OrgRow, ctx: ChatContext, d: Directory): string {
+export function orgPanel(o: OrgRow, ctx: ChatContext, d: Directory): string {
   const lore = ctx.char.globalLore ?? [];
   const names = namesOf(d, lore);
   const tabs = tabsOf(d, lore);
@@ -499,6 +508,75 @@ function agentRow(a: AgentRow, ctx: ChatContext, d: Directory, names: Record<str
 }
 
 
+// ── 부록 ──
+// 📎부록 폴더 항목. 본 항목(이름 앞부분으로 짐작, 고칠 수 있음)과 켜지는 조건을 정한다. 해금은 채팅마다
+
+const FOLDER_LABEL: Record<string, string> = { 세력: '세력', 조직: '세력', 파밍: '특수', 괴이: '괴이', 요원: '요원' };
+
+/** 본 항목이 들어 있는 폴더의 자리 이름 (못 찾으면 '') */
+function parentSlot(r: AppendixRow, ctx: ChatContext): string {
+  const src = loreSources(ctx.char.globalLore).get(r.parent) ?? '';
+  return r.parent ? FOLDER_LABEL[src.split(' · ')[0].replace(/[^\p{L}\p{N}]/gu, '')] ?? '' : '';
+}
+
+const unlockedHere = (ctx: ChatContext) => new Set(readUnlocked(ctx.chat.scriptstate));
+
+function appendixWhen(r: AppendixRow): string {
+  return [r.keys ? '키' : '', r.withParent ? '본 항목과 같이' : '', r.target ? '목표' : '', r.places.length ? `위치 ${r.places.length}` : '', r.agents.length ? `요원 ${r.agents.length}` : '']
+    .filter(Boolean).join(' · ') || '켜질 조건 없음';
+}
+
+function appendixRow(r: AppendixRow, ctx: ChatContext, d: Directory): string {
+  const open = dirUi.open === r.lore;
+  const slot = parentSlot(r, ctx);
+  const lock = r.unlock ? (unlockedHere(ctx).has(r.lore) ? '<span class="gx-badge live">해금됨</span>' : '<span class="gx-badge wait">잠김</span>') : '';
+  return `<div class="dir-row${open ? ' open' : ''}">
+    <button class="dir-head" data-action="dir-open" data-value="${esc(r.lore)}" aria-expanded="${open}">
+      <span class="dir-name"><b>${esc(r.lore)}</b><small>${esc(appendixWhen(r))}</small></span>
+      ${slot ? '' : '<span class="gx-badge hot">본 항목 없음</span>'}${lock}
+    </button>${open ? appendixPanel(r, ctx, d) : ''}</div>`;
+}
+
+export function appendixPanel(r: AppendixRow, ctx: ChatContext, d: Directory): string {
+  const k = (f: string) => `app:${f}|${r.lore}`;
+  const e = (ctx.char.globalLore ?? []).find((x) => x.mode !== 'folder' && String(x.comment ?? '') === r.lore);
+  const keys = String(e?.key ?? '').split(',').map((t) => t.trim()).filter(Boolean);
+  const slot = parentSlot(r, ctx);
+  const toggle = (f: string, label: string, on: boolean) => chip('dir-app-toggle', `${f}|${r.lore}`, label, on);
+  const bases = d.bases.map((b) => b.name).filter((n) => !r.places.includes(n));
+  const unlocked = unlockedHere(ctx).has(r.lore);
+  return `<div class="dir-panel">
+    ${input(k('parent'), r.parent, '본 항목', r.guess ? `이름 앞부분으로 찾은 본 항목: ${esc(r.guess)}` : '본 항목 로어북 이름을 그대로 적어요')}
+    <p class="${slot ? 'gx-muted' : 'gx-hint'}">${slot ? `본 항목과 같은 ${slot} 자리, 본 항목 바로 뒤에 들어가요.` : '본 항목을 찾지 못했어요. 세력 자리에 들어가요.'}</p>
+    <div class="dir-line"><span>켜지는 조건</span><div class="dir-chips">
+      ${toggle('keys', '키가 걸리면', r.keys)}${toggle('withParent', '본 항목과 같이', r.withParent)}${toggle('target', '상태창 목표가 본 항목이면', r.target)}
+    </div></div>
+    <p class="gx-muted">키: ${keys.length ? esc(keys.join(', ')) : '없음'} · 키는 로어북에서 고쳐요.</p>
+    ${input(k('places'), r.places.join(', '), '위치', '상태창 위치 칸에 이 말이 들어 있으면 켜요. 쉼표로 나눠 적어요')}
+    ${bases.length ? `<div class="dir-line"><span>거점에서 넣기</span><div class="dir-chips">${bases.slice(0, 24).map((n) => chip('dir-app-place', `${n}|${r.lore}`, `＋ ${n}`, false)).join('')}</div></div>` : ''}
+    ${input(k('agents'), r.agents.join(', '), '동행·투입 요원', '이 요원이 동행하거나 작전에 투입 중이면 켜요. 쉼표로 나눠 적어요')}
+    <div class="dir-line"><span>끄는 조건</span><div class="dir-chips">${toggle('needParent', '본 항목이 꺼져 있으면 끄기', r.needParent)}</div></div>
+    ${area(k('unlock'), r.unlock, '해금 조건', '비우면 해금 없이 켜져요. 적으면 해금 전에는 어떤 조건으로도 켜지지 않고, 본 항목이 켜졌을 때 모델에게 이 조건만 알려요. 조건이 맞으면 모델이 해금 표시를 남겨요')}
+    ${r.unlock ? `<div class="dir-line"><span>이 채팅</span><div class="dir-chips">${chip('dir-app-unlock', r.lore, unlocked ? '해금됨 · 누르면 다시 잠금' : '잠김 · 누르면 해금', unlocked)}</div></div>` : ''}
+    <p class="gx-muted">로어북: ${esc(r.lore)} · 약 ${tokens(String(e?.content ?? '')).toLocaleString()}토큰</p>
+  </div>`;
+}
+
+function appendixList(ctx: ChatContext, d: Directory, q: string): string {
+  const rows = d.appendices.filter((r) => !q || [r.lore, r.parent, ...r.places, ...r.agents].some((t) => t.toLowerCase().includes(q)));
+  if (!rows.length) {
+    return q ? '<p class="gx-muted dir-empty">맞는 부록이 없어요.</p>'
+      : '<p class="gx-muted dir-empty">부록이 없어요. 로어북에 <code>📎부록</code> 폴더를 만들고 「본 항목 이름 · 설명」으로 항목을 넣으면 여기 들어와요.</p>';
+  }
+  const lost = rows.filter((r) => !parentSlot(r, ctx));
+  const parents = [...new Set(rows.filter((r) => parentSlot(r, ctx)).map((r) => r.parent))];
+  return `${lost.length ? `<h3 class="dir-group warn">본 항목 없음<small>${lost.length}</small></h3>${lost.map((r) => appendixRow(r, ctx, d)).join('')}` : ''}
+    ${parents.map((p) => {
+      const list = rows.filter((r) => r.parent === p && parentSlot(r, ctx));
+      return `<h3 class="dir-group">${esc(p)}<small>${list.length}</small></h3>${list.map((r) => appendixRow(r, ctx, d)).join('')}`;
+    }).join('')}`;
+}
+
 /** 통합 검색: 검색어가 있으면 다섯 탭을 한꺼번에 찾아 탭별로 묶고, 고르면 그 탭으로 가서 연다 */
 function searchAll(ctx: ChatContext, d: Directory, q: string, names: Record<string, string>): string {
   const jump = (kind: Kind, html: string) => html.replace(/data-action="dir-open" data-value="([^"]*)" aria-expanded="[^"]*"/, (_m, key: string) => `data-action="dir-jump" data-value="${kind}|${key}"`);
@@ -508,6 +586,7 @@ function searchAll(ctx: ChatContext, d: Directory, q: string, names: Record<stri
     ['agent', '요원', d.agents.filter((r) => matches(r, q)).map((r) => jump('agent', agentRow(r, ctx, d, names)))],
     ['org', '조직', d.orgs.filter((o) => [o.name, o.spec.english].some((t) => t && t.toLowerCase().includes(q))).map((o) => jump('org', orgRow(o, ctx, d, names)))],
     ['base', '거점', d.bases.filter((b) => [b.name, b.label, b.english, b.org, b.gu, ...b.aliases].some((t) => t && t.toLowerCase().includes(q))).map((b) => jump('base', baseRow(b, ctx, d)))],
+    ['appendix', '부록', d.appendices.filter((r) => [r.lore, r.parent].some((t) => t.toLowerCase().includes(q))).map((r) => jump('appendix', appendixRow(r, ctx, d)))],
   ];
   const hit = groups.filter(([, , rows]) => rows.length);
   if (!hit.length) return '<p class="gx-muted dir-empty">맞는 항목이 없어요.</p>';
@@ -520,6 +599,7 @@ export function directoryList(ctx: ChatContext): string {
   const names = namesOf(d, ctx.char.globalLore);
   if (q) return searchAll(ctx, d, q, names);
   if (dirUi.kind === 'base') return baseList(ctx, d, q);
+  if (dirUi.kind === 'appendix') return appendixList(ctx, d, q);
   if (dirUi.kind === 'org') {
     const rows = d.orgs.filter((o) => !q || o.name.toLowerCase().includes(q));
     return `${rows.map((o) => orgRow(o, ctx, d, names)).join('') || '<p class="gx-muted dir-empty">맞는 조직이 없어요.</p>'}`;
@@ -559,7 +639,7 @@ export const directoryDoneClear = (text: string): void => {
 
 
 export const directorySearch = (): string =>
-  `<input class="dir-search" type="search" data-input="dir-q" value="${esc(dirUi.q)}" placeholder="명부 전체 검색 (괴이·특수·요원·조직·거점)" aria-label="명부 전체 검색" autocomplete="off">`;
+  `<input class="dir-search" type="search" data-input="dir-q" value="${esc(dirUi.q)}" placeholder="명부 전체 검색 (괴이·특수·요원·조직·거점·부록)" aria-label="명부 전체 검색" autocomplete="off">`;
 
 /** 설정 위쪽 줄의 「덮어쓰기」「불러오기」 (설정·명부 공통, 누르면 확인) */
 export const barButtons = (off: boolean): string =>
@@ -577,6 +657,7 @@ export function directoryView(ctx: ChatContext): string {
     ['agent', '요원', d.agents.length],
     ['org', '조직', d.orgs.length],
     ['base', '거점', d.bases.length],
+    ['appendix', '부록', d.appendices.length],
   ];
   // 탭이 맨 위 (모바일은 고정), 사용법은 그 아래 접어 둔다
   return `<div class="dir">
@@ -595,6 +676,7 @@ export function directoryView(ctx: ChatContext): string {
         <li>로어북 폴더 <code>🚧괴이</code> <code>🎁파밍</code> <code>🙂요원</code>에 넣은 항목이 각각 괴이·특수·요원 탭에 자동으로 들어와요.</li>
         <li>새 요원은 「요원」 탭에서 소속 조직을 골라 주세요.</li>
         <li>거점은 지도에 찍히는 장소예요. 「거점」 탭에서 추가하고 지도를 눌러 위치를 정해요.</li>
+        <li>긴 로어북의 세부는 <code>📎부록</code> 폴더에 「본 항목 이름 · 설명」으로 따로 넣어요. 본 항목과 같은 자리에 들어가고, 켜지는 조건(키·위치·동행·해금)은 「부록」 탭에서 정해요.</li>
         <li>고친 값은 위의 「덮어쓰기」를 눌러야 카드에 남아요. 이 카드의 모든 채팅에 바로 적용되고, 카드를 공유하면 같이 가요.</li>
       </ul>
       ${d.folders ? '' : '<p class="gx-hint">이 카드에는 명부 폴더가 없어서 옛 목록(World catalog·Agent roster)을 보여 줘요.</p>'}
@@ -606,7 +688,7 @@ export function directoryView(ctx: ChatContext): string {
 }
 
 // 명부 위 한 줄 도구: 검색 · 추가 · 사용법 (요원은 로어북 폴더에서 들어오므로 추가 없음)
-const ADD_LABEL: Record<Kind, string> = { anomaly: '후보 추가', site: '후보 추가', agent: '', org: '조직 추가', base: '거점 추가' };
+const ADD_LABEL: Record<Kind, string> = { anomaly: '후보 추가', site: '후보 추가', agent: '', org: '조직 추가', base: '거점 추가', appendix: '' };
 
 /** 「추가」를 눌렀을 때만 펼치는 칸 */
 function addPanel(ctx: ChatContext): string {
@@ -654,6 +736,19 @@ export function directoryInput(key: string, value: string, bar: Element | null):
       if (names.length) d.seeds[rest] = names;
       else delete d.seeds[rest];
     }
+    dirUi.done = '';
+    if (bar) bar.innerHTML = directoryBar();
+    return;
+  }
+  if (key.startsWith('app:')) {
+    const at = key.indexOf('|');
+    const field = key.slice(4, at);
+    const r = d.appendices.find((x) => x.lore === key.slice(at + 1));
+    if (!r) return;
+    if (field === 'parent') r.parent = value.trim();
+    else if (field === 'places' || field === 'agents') r[field] = splitList(value);
+    else if (field === 'unlock') r.unlock = value.trim();
+    else return;
     dirUi.done = '';
     if (bar) bar.innerHTML = directoryBar();
     return;
@@ -716,7 +811,7 @@ export async function handleDirectory(action: string, value: string | undefined,
   const baseOf = (name: string) => d.bases.find((b) => b.name === name);
   switch (action) {
     case 'dir-kind':
-      if (v === 'anomaly' || v === 'site' || v === 'agent' || v === 'org' || v === 'base') {
+      if (isKind(v)) {
         dirUi.kind = v;
         dirUi.open = '';
         dirUi.q = '';
@@ -736,7 +831,7 @@ export async function handleDirectory(action: string, value: string | undefined,
       // 통합 검색 결과: 그 탭으로 가서 펼친다
       const cut = v.indexOf('|');
       const kind = v.slice(0, cut);
-      if (kind === 'anomaly' || kind === 'site' || kind === 'agent' || kind === 'org' || kind === 'base') {
+      if (isKind(kind)) {
         Object.assign(dirUi, { kind, open: v.slice(cut + 1), q: '', adding: false });
         dirUi.scrollTo = v.slice(cut + 1);
       }
@@ -755,6 +850,40 @@ export async function handleDirectory(action: string, value: string | undefined,
       }
       dirUi.done = '';
       break;
+    }
+    case 'dir-app-toggle': {
+      const at = v.indexOf('|');
+      const field = v.slice(0, at);
+      const r = d.appendices.find((x) => x.lore === v.slice(at + 1));
+      if (!r || (field !== 'keys' && field !== 'withParent' && field !== 'needParent' && field !== 'target')) break;
+      r[field] = !r[field];
+      dirUi.done = '';
+      break;
+    }
+    case 'dir-app-place': {
+      const at = v.lastIndexOf('|');
+      const r = d.appendices.find((x) => x.lore === v.slice(at + 1));
+      const name = v.slice(0, at);
+      if (!r || !name || r.places.includes(name)) break;
+      r.places = [...r.places, name];
+      dirUi.done = '';
+      break;
+    }
+    case 'dir-app-unlock': {
+      // 해금은 채팅마다라 명부가 아니라 지금 채팅에 바로 적는다
+      if (!d.appendices.some((x) => x.lore === v)) break;
+      try {
+        await updateChat(ctx.charIndex, ctx.chatIndex, (chat) => {
+          const cur = readUnlocked(chat.scriptstate);
+          const next = cur.includes(v) ? cur.filter((x) => x !== v) : [...cur, v];
+          return { ...chat, scriptstate: { ...(chat.scriptstate ?? {}), [UNLOCK_VAR]: unlockedValue(next) } };
+        });
+        dirUi.done = '이 채팅의 해금 상태를 바꿨어요';
+      } catch (error) {
+        dirUi.notice = `해금 상태를 바꾸지 못했어요: ${error instanceof Error ? error.message : String(error)}`;
+      }
+      await env.refresh();
+      return true;
     }
     case 'dir-org-pick': {
       const at = v.indexOf('|');

@@ -1,8 +1,10 @@
 // 게임 HUD: 1280×720 캔버스 위에 그린다. 엔진은 HudState 만 채운다.
+import { KEYMAP } from '../engine/input';
 // 오락실식: 왼쪽 위 한 묶음(얼굴·체력·필살·탄), 오른쪽 위 구석 층 글자, 왼쪽 아래 아이템 아이콘, 아래 대사.
-// 재화·총애·규칙서 목록은 화면에 늘 띄우지 않는다: 바뀔 때 잠깐 알림, 전체는 일시정지 메뉴(statusHtml).
+// 지금 장소는 일시정지 메뉴(statusHtml). 옛 승강기 총애·출동 재화·규칙서 표시는 2026-10-28에 지웠다.
 // 터치 버튼이 보이면 compact: 아이템은 터치 버튼이 대신 보여 준다.
 import { agentFaces, kitImage, kitPiece, kitSlice, nine, PIXEL_FONT } from './kit';
+import { drawPixelCard, drawPixelHotbar, drawPixelItems, hotbarSize, pixelHudReady, type PixelSlot } from './pixelHud';
 import { ITEM_IMG } from './kit.gen';
 import { H as H0, W as W0 } from './stage';
 import { setExplorationMap } from './mapLayout';
@@ -24,6 +26,8 @@ export interface HudItem {
   cd?: number;
 }
 export interface HudState {
+  /** 아래 자막을 이 x(캔버스 px) 오른쪽에 (왼쪽 아래 기술 칸 줄) */
+  messageLeft?: number;
   agent: { name: string; color?: string; portrait?: CanvasImageSource | null };
   hp: number;
   maxHp: number;
@@ -38,12 +42,7 @@ export interface HudState {
   items: HudItem[];
   floor: { depth: string; name: string; variant?: string };
   /** 필드: 시각과 장소 이름 (우상단 작게) */
-  field?: { clock?: string; place?: string };
-  rules?: { text: string; fresh?: boolean }[];
-  ruleCount?: { found: number; sent: number };
-  /** 승강기 총애 -3~+3 */
-  favor: number;
-  money: { cash: number; budget: number; research: number; teeth: number };
+  field?: { clock?: string; place?: string; wallet?: string };
   boss?: { name: string; hp: number; max: number } | null;
   /** 구형 조사 안내. 좌표는 호환을 위해 받고 고정 안내 영역에 표시한다. */
   prompt?: { text: string; key: string; x: number; y: number } | null;
@@ -135,6 +134,21 @@ export function setPixelText(on: boolean) {
   pixelOn = on;
 }
 
+/** 상태 효과 칩 (필드 주인공 칸: 전투 HUD는 meterRows가 같은 모양으로 그린다) */
+export function statusChips(c: CanvasRenderingContext2D, list: { label: string; good: boolean }[], x: number, y: number) {
+  let cx = x;
+  for (const st of list) {
+    c.font = font(13, 800);
+    const w = c.measureText(st.label).width + 14;
+    c.beginPath();
+    c.roundRect(cx, y, w, 22, 11);
+    c.fillStyle = st.good ? 'rgba(60,140,90,0.9)' : 'rgba(150,50,50,0.9)';
+    c.fill();
+    label(c, st.label, cx + 7, y + 16, 13, '#fff', 'left', 800);
+    cx += w + 6;
+  }
+}
+
 export function plate(c: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, r = 8) {
   c.beginPath();
   c.roundRect(x, y, w, h, r);
@@ -158,11 +172,7 @@ export class Hud {
   private hurtT = 0;
   private toasts: Toast[] = [];
   private t = 0;
-  private lastFavor: number | null = null;
-  private favorPulse = 0;
   private lastFloor = '';
-  private lastMoney: Record<string, number> = {};
-  private moneyPulse: Record<string, number> = {};
   private itemFlash = [0, 0, 0, 0];
   /** 마지막으로 그린 상태 (일시정지 메뉴가 재화·총애·규칙을 보여 줄 때 쓴다) */
   last: HudState | null = null;
@@ -175,8 +185,6 @@ export class Hud {
   reset() {
     this.trail = -1;
     this.lastHp = -1;
-    this.lastFavor = null;
-    this.lastMoney = {};
     this.lastItems = [];
   }
 
@@ -194,11 +202,10 @@ export class Hud {
     pixelOn = true;
     this.agent(c, s);
     this.floor(c, s);
-    this.rules(c, s);
-    if (!s.compact) this.items(c, s.items, s.device);
+    if (!s.compact && !(s.agent.portrait && pixelHudReady())) this.items(c, s.items, s.device); // 도트 칸이면 초상화 칸 아래에 그렸다
     if (s.boss) this.boss(c, s.boss, s.compact);
     this.timer(c, s);
-    if (s.message) this.message(c, s.message, s.compact);
+    if (s.message) this.message(c, s.message, s.compact, (s.messageLeft ?? 0) / k);
     this.navigation(c, s);
     this.drawToasts(c, dt);
     pixelOn = false;
@@ -213,20 +220,6 @@ export class Hud {
     else if (this.trailHold > 0) this.trailHold -= dt;
     else this.trail = Math.max(s.hp, this.trail - s.maxHp * dt * 0.6);
     this.hurtT = Math.max(0, this.hurtT - dt);
-    if (this.lastFavor !== null && s.favor !== this.lastFavor) {
-      this.favorPulse = 1.2;
-      this.toast(`총애 ${s.favor > this.lastFavor ? '+' : ''}${s.favor - this.lastFavor}`, s.favor > this.lastFavor ? C.favorUp : C.favorDown);
-    }
-    this.lastFavor = s.favor;
-    this.favorPulse = Math.max(0, this.favorPulse - dt);
-    const names: Record<string, string> = { cash: '현금', budget: '예산', research: '연구 자료', teeth: '이빨' };
-    for (const k of Object.keys(names)) {
-      const v = s.money[k as keyof HudState['money']];
-      const old = this.lastMoney[k];
-      if (old !== undefined && v > old) (this.moneyPulse[k] = 0.8), this.toast(`${names[k]} +${v - old}`, '#e8e0b0');
-      this.lastMoney[k] = v;
-      this.moneyPulse[k] = Math.max(0, (this.moneyPulse[k] ?? 0) - dt);
-    }
     s.items.forEach((it, i) => {
       if (this.lastItems[i] !== undefined && it.count !== this.lastItems[i]) this.itemFlash[i] = 0.5;
       this.lastItems[i] = it.count;
@@ -241,6 +234,13 @@ export class Hud {
     const x = s.compact ? 100 : 22,
       y = 18,
       fs = 80;
+    if (s.agent.portrait && pixelHudReady()) {
+      const end = drawPixelCard(c, { name: s.agent.name, face: s.agent.portrait, hp: s.hp, maxHp: s.maxHp, trail: this.trail, hurtT: this.hurtT, gauge: s.gauge, superKey: s.device === 'pad' ? 'RT' : s.device === 'touch' ? '' : superKey(), armor: s.armor, t: this.t }, x - 6, y - 4);
+      const iy = s.compact ? end : this.pixelItems(c, s.items, s.device, x + 78, end + 6);
+      if (s.weapon) this.ammo(c, s.weapon, x + 90, iy + 26);
+      this.meterRows(c, s, x, Math.max(y + fs + 52, iy + (s.weapon ? 40 : 10)));
+      return;
+    }
     // 뒤를 살짝 어둡게 (밝은 배경에서도 읽히게)
     const g = c.createLinearGradient(0, 0, 460, 0);
     g.addColorStop(0, 'rgba(0,0,0,0.5)');
@@ -313,12 +313,15 @@ export class Hud {
       c.lineWidth = 2;
       c.strokeRect(bx - 2, gy - 2, gw + 4, gh + 4);
       c.restore();
-      label(c, s.device === 'pad' ? 'RT' : s.device === 'touch' ? '필살' : 'W', bx + gw + 10, gy + 12, 15, C.gauge, 'left', 900);
+      label(c, s.device === 'pad' ? 'RT' : s.device === 'touch' ? '필살' : superKey(), bx + gw + 10, gy + 12, 15, C.gauge, 'left', 900);
     }
     // 탄: 총알 그림 + 큰 숫자
     if (s.weapon) this.ammo(c, s.weapon, bx, gy + gh + 30);
+    this.meterRows(c, s, x, y + fs + 52);
+  }
+
+  private meterRows(c: CanvasRenderingContext2D, s: HudState, x: number, my: number) {
     // 가드 같은 상황 막대는 묶음 아래
-    let my = y + fs + 52; // 탄약 줄(126) 아래에서 시작
     for (const m of s.meters ?? []) {
       label(c, m.label, x, my + 10, 13, m.color, 'left', 800);
       bar(c, x + 40, my + 1, 160, 9, m.v / m.max, m.color, '#000');
@@ -361,6 +364,7 @@ export class Hud {
       const r = W - (s.compact ? 100 : 20);
       if (s.field.clock) label(c, s.field.clock, r, 34, 26, '#fff', 'right', 900);
       if (s.field.place) label(c, s.field.place, r, 56, 15, C.amber, 'right', 800);
+      if (s.field.wallet) label(c, s.field.wallet, r, 76, 15, '#cfe3c8', 'right', 800);
     }
     if (!f.depth) return;
     const right = W - (s.compact ? 100 : 20);
@@ -368,24 +372,13 @@ export class Hud {
     if (f.variant) label(c, f.variant, right, 68, 15, C.amber, 'right', 800);
   }
 
-  /** 규칙서: 새로 찾은 규칙이 있을 때만 오른쪽 위에 잠깐. 전체 목록은 일시정지 메뉴 */
-  private rules(c: CanvasRenderingContext2D, s: HudState) {
-    const fresh = (s.rules ?? []).filter((r) => r.fresh);
-    if (!fresh.length) return;
-    let y = s.floor.variant ? 96 : 76;
-    if (s.boss && s.compact) y += 34;
-    for (const r of fresh.slice(-3)) {
-      let t = r.text;
-      c.font = font(15, 800);
-      while (c.measureText(t).width > 380 && t.length > 4) t = t.slice(0, -2);
-      if (t !== r.text) t += '…';
-      label(c, `규칙 · ${t}`, W - 20, y + 16, 15, Math.sin(this.t * 9) > 0 ? '#fff6a0' : C.rule, 'right', 800);
-      y += 24;
-    }
-  }
-
   /** 아이템: 아이콘만 (글자 없음), 체력 막대 오른쪽 위 천장 띠. 바닥(물건·자막)과 겹치지 않게 (독립 검수: UI 안전영역).
    * 터치 화면에서는 터치 버튼이 대신 보여 준다 */
+  /** 아이템 칸 넷 (도트, 필살 게이지 아래). 돌려주는 값 = 아래 끝 y */
+  private pixelItems(c: CanvasRenderingContext2D, items: HudItem[], device: string | undefined, x: number, y: number): number {
+    return drawPixelItems(c, items, x, y, [], this.itemFlash, (it, ix, iy, sz) => drawHudItemIcon(c, it, ix, iy, sz));
+  }
+
   private items(c: CanvasRenderingContext2D, items: HudItem[], device?: string) {
     const n = 4,
       s = 52,
@@ -456,7 +449,21 @@ export class Hud {
 
   /** 필드 주인공 칸 (전투 HUD가 없는 본부·거점): 왼쪽 아래 도트 얼굴 + 이름 + 체력 + 필살 게이지. 터치·좁은 화면은 왼쪽 위(아래는 스틱 자리).
    * 돌려주는 값 = 칸 오른쪽 끝 x (자막을 그 오른쪽에 둔다) */
-  drawFieldCard(c: CanvasRenderingContext2D, s: { name: string; face?: CanvasImageSource | null; hp: number; maxHp: number; gauge?: number; sub?: string; compact?: boolean; top?: boolean }, dt = 1 / 60): number {
+  /** 필드(방문) 오른쪽 위: 필드 시각·장소·잔고 (전투 HUD를 안 그리는 필드에서) */
+  drawFieldCorner(c: CanvasRenderingContext2D, f: HudState['field'], compact?: boolean) {
+    if (!f) return;
+    c.save();
+    const k = compact ? 1.2 : 1;
+    W = c.canvas.width / k;
+    c.setTransform(k, 0, 0, k, 0, 0);
+    const r = W - (compact ? 100 : 20);
+    if (f.clock) label(c, f.clock, r, 34, 26, '#fff', 'right', 900);
+    if (f.place) label(c, f.place, r, 56, 15, C.amber, 'right', 800);
+    if (f.wallet) label(c, f.wallet, r, f.clock || f.place ? 76 : 34, 15, '#cfe3c8', 'right', 800);
+    c.restore();
+  }
+
+  drawFieldCard(c: CanvasRenderingContext2D, s: { name: string; face?: CanvasImageSource | null; hp: number; maxHp: number; gauge?: number; sub?: string; compact?: boolean; top?: boolean; items?: HudItem[]; device?: string; status?: { label: string; good: boolean }[] }, dt = 1 / 60): number {
     this.t += dt;
     c.save();
     const k = s.compact ? 1.2 : 1;
@@ -465,7 +472,7 @@ export class Hud {
     c.setTransform(k, 0, 0, k, 0, 0);
     pixelOn = true;
     const fs = 64, bw = 200, bh = 14;
-    const x = 28, y = s.top ? 104 : H - fs - 28;
+    const x = 28, y = s.top ? 28 : H - fs - 28;
     // 체력이 줄면 얼굴이 붉게 번쩍, 붉은 띠가 늦게 따라온다 (전투 HUD와 같은 느낌)
     if (this.lastHp >= 0 && s.hp < this.lastHp) (this.hurtT = 0.35), (this.trailHold = 0.5);
     if (this.trail < 0 || this.trail < s.hp) this.trail = s.hp;
@@ -473,6 +480,15 @@ export class Hud {
     else this.trail = Math.max(s.hp, this.trail - s.maxHp * dt * 0.6);
     this.lastHp = s.hp;
     this.hurtT = Math.max(0, this.hurtT - dt);
+    if (pixelHudReady()) {
+      const cy = s.top ? 14 : H - 170;
+      const end = drawPixelCard(c, { name: s.name, face: s.face, hp: s.hp, maxHp: s.maxHp, trail: this.trail, hurtT: this.hurtT, gauge: s.gauge, superKey: superKey(), t: this.t }, 16, cy);
+      const iy = s.items && !s.compact ? this.pixelItems(c, s.items, s.device, 16 + 84, end + 6) : end;
+      if (s.status?.length) statusChips(c, s.status, 16 + 84, iy + 8);
+      pixelOn = false;
+      c.restore();
+      return (16 + 340) * k;
+    }
     // 칸 뒤 어두운 판
     c.fillStyle = 'rgba(6,10,14,0.72)';
     c.fillRect(x - 12, y - 12, fs + bw + 52, fs + 24);
@@ -513,11 +529,126 @@ export class Hud {
       c.fillStyle = '#000';
       c.fillRect(bx - 2, gy - 2, gw + 4, gh + 4);
       bar(c, bx, gy, gw, gh, s.gauge / 100, full ? `hsl(${40 + Math.sin(this.t * 8) * 10},95%,${60 + Math.sin(this.t * 8) * 12}%)` : C.gaugeFill, '#10181c');
-      if (full) label(c, '필살 S', bx + gw + 8, gy + 9, 12, C.gauge, 'left', 900);
+      if (full) label(c, `필살 ${superKey()}`, bx + gw + 8, gy + 9, 12, C.gauge, 'left', 900);
     }
     pixelOn = false;
     c.restore();
     return (x + fs + bw + 40) * k;
+  }
+
+  /** 말풍선 (본부 대사): x = 말하는 사람 가운데, y = 머리 위(풍선 꼬리 끝), 캔버스 px. who가 있으면 위에 이름 */
+  drawSpeech(c: CanvasRenderingContext2D, p: { x: number; y: number; who: string; text: string; compact?: boolean }) {
+    c.save();
+    const k = p.compact ? 1.2 : 1;
+    c.setTransform(k, 0, 0, k, 0, 0);
+    W = c.canvas.width / k;
+    pixelOn = true;
+    const U = 2;
+    c.font = font(22);
+    const lines = wrapText(c, p.text, 400, 3);
+    const tw = Math.max(...lines.map((l) => Math.ceil(c.measureText(l).width)), p.who ? Math.ceil(c.measureText(p.who).width) * 0.55 : 0);
+    const nameH = p.who ? 18 : 0, lh = 26, padX = 12, padY = 8;
+    const w = tw + padX * 2, h = nameH + lines.length * lh + padY * 2 - 4;
+    const tail = 10;
+    let x = Math.round(p.x / k - w / 2);
+    x = Math.max(8, Math.min(W - w - 8, x));
+    const y = Math.round(Math.max(8, p.y / k - tail - h));
+    const box = (bx: number, by: number, bw: number, bh: number, col: string) => {
+      c.fillStyle = col;
+      c.fillRect(bx + U, by, bw - 2 * U, bh);
+      c.fillRect(bx, by + U, bw, bh - 2 * U);
+    };
+    box(x + U, y + U * 2, w, h, 'rgba(0,0,0,0.35)');
+    box(x - U, y - U, w + 2 * U, h + 2 * U, '#0b0f12');
+    box(x, y, w, h, '#cfc8b4');
+    box(x + U, y + U, w - 2 * U, h - 2 * U, '#1a2026');
+    // 꼬리: 말하는 사람 쪽 (계단 모양)
+    const tx = Math.round(Math.max(x + 10, Math.min(x + w - 18, p.x / k - 4)));
+    for (let i = 0; i < tail / U; i++) {
+      const tw2 = Math.max(U, 10 - i * U * 2);
+      c.fillStyle = '#0b0f12'; c.fillRect(tx + (10 - tw2) / 2 - U, y + h + i * U - U, tw2 + 2 * U, U + U);
+      c.fillStyle = '#cfc8b4'; c.fillRect(tx + (10 - tw2) / 2, y + h + i * U - U, tw2, U);
+    }
+    c.textAlign = 'left'; c.textBaseline = 'middle';
+    let ty = y + padY + 2;
+    if (p.who) {
+      c.font = font(11);
+      c.fillStyle = '#ffcf6a';
+      c.fillText(p.who, x + padX, ty + 6);
+      ty += nameH;
+    }
+    c.font = font(22);
+    c.fillStyle = '#f2ecdc';
+    lines.forEach((l, i) => c.fillText(l, x + padX, ty + lh / 2 + i * lh - 2));
+    pixelOn = false;
+    c.restore();
+  }
+
+  /** 상호작용 안내: 캐릭터 옆에 뜨는 도트 말풍선 (키 단추 + 짧은 말). x,y = 캐릭터 머리 옆 화면 px(캔버스 px), side = 말풍선이 뻗는 쪽 */
+  drawPrompt(c: CanvasRenderingContext2D, p: { x: number; y: number; side: 1 | -1; key: string; text: string; locked?: boolean; compact?: boolean }) {
+    c.save();
+    const k = p.compact ? 1.2 : 1;
+    c.setTransform(k, 0, 0, k, 0, 0);
+    pixelOn = true;
+    const U = 2; // 도트 한 칸
+    c.font = font(22);
+    const tw = Math.ceil(c.measureText(p.text).width);
+    const cap = 30, gap = 8, padX = 10, h = 40;
+    const w = padX + cap + gap + tw + padX + (p.locked ? 20 : 0);
+    const bob = Math.round(Math.sin(performance.now() / 260) * 2);
+    let x = Math.round(p.x / k + (p.side > 0 ? 0 : -w)), y = Math.round(p.y / k - h / 2 + bob);
+    // 계단 모서리 판 (도트): 바깥 어두운 테 → 밝은 테 → 안
+    const box = (bx: number, by: number, bw: number, bh: number, col: string) => {
+      c.fillStyle = col;
+      c.fillRect(bx + U, by, bw - 2 * U, bh);
+      c.fillRect(bx, by + U, bw, bh - 2 * U);
+    };
+    box(x + U, y + U * 2, w, h, 'rgba(0,0,0,0.35)'); // 그림자
+    box(x - U, y - U, w + 2 * U, h + 2 * U, '#0b0f12');
+    box(x, y, w, h, p.locked ? '#c98a1c' : '#cfc8b4');
+    box(x + U, y + U, w - 2 * U, h - 2 * U, '#1a2026');
+    // 꼬리: 캐릭터 쪽으로
+    const tx = p.side > 0 ? x - U * 3 : x + w + U;
+    c.fillStyle = p.locked ? '#c98a1c' : '#cfc8b4';
+    c.fillRect(tx, y + h / 2 - U, U * 2, U * 2);
+    c.fillRect(p.side > 0 ? tx + U * 2 : tx - U, y + h / 2 - U * 2, U, U * 4);
+    // 키 단추
+    const kx = x + padX, ky = y + (h - cap) / 2;
+    box(kx, ky + U, cap, cap, '#6e6656');
+    box(kx, ky, cap, cap - U, p.locked ? '#5a4a2a' : '#f2ead6');
+    c.font = font(22);
+    c.fillStyle = p.locked ? '#c9b48a' : '#1a2026';
+    c.textAlign = 'center'; c.textBaseline = 'middle';
+    c.fillText(p.key, kx + cap / 2, ky + cap / 2);
+    // 말 (잠김이면 자물쇠)
+    let txx = kx + cap + gap;
+    if (p.locked) {
+      c.fillStyle = '#ffcf6a';
+      c.fillRect(txx + 2, y + 18, 12, 10);
+      c.fillRect(txx + 4, y + 12, 2, 6); c.fillRect(txx + 10, y + 12, 2, 6); c.fillRect(txx + 4, y + 11, 8, 2);
+      c.fillStyle = '#1a2026'; c.fillRect(txx + 7, y + 21, 2, 4);
+      txx += 20;
+    }
+    c.textAlign = 'left';
+    c.fillStyle = p.locked ? '#ffcf6a' : '#f2ecdc';
+    c.fillText(p.text, txx, y + h / 2 + 1);
+    pixelOn = false;
+    c.restore();
+  }
+
+  /** 왼쪽 아래 기술 칸 줄 (도트, PixelLab 틀). 돌려주는 값 = 오른쪽 끝 x (캔버스 px) */
+  drawSkillBox(c: CanvasRenderingContext2D, s: SkillBoxState, dt = 1 / 60): number {
+    this.t += dt;
+    if (!pixelHudReady()) return 0;
+    c.save();
+    const k = s.compact ? 1.2 : 1;
+    W = c.canvas.width / k;
+    H = c.canvas.height / k;
+    c.setTransform(k, 0, 0, k, 0, 0);
+    const sz = hotbarSize(s.slots.length);
+    const end = drawPixelHotbar(c, s.slots, 16, H - sz.h - 10, this.t);
+    c.restore();
+    return end * k;
   }
 
   /** 아래 자막 한 줄만 (본부처럼 전투 HUD가 없는 화면) */
@@ -674,65 +805,23 @@ export function drawHudItemIcon(c: CanvasRenderingContext2D, it: { id?: string; 
   c.restore();
 }
 
-/** 일시정지 메뉴에 넣을 지금 상태 (재화·총애·층·규칙서). 화면에 늘 띄우지 않는 것들 */
+/** 일시정지 메뉴에 넣을 지금 상태 (장소) */
 export function statusHtml(s: HudState | null): string {
   if (!s) return '';
   const esc = (t: string) => t.replace(/[&<>"]/g, (ch) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[ch]!);
-  const m = s.money;
-  const fav = s.favor > 0 ? `+${s.favor}` : String(s.favor);
   const rows = [
     s.floor.depth || s.floor.name ? `<tr><th>층</th><td>${esc((s.floor.depth && !s.floor.name.startsWith(s.floor.depth) ? [s.floor.depth, s.floor.name] : [s.floor.name || s.floor.depth]).filter(Boolean).join(' · '))}${s.floor.variant ? ` · ${esc(s.floor.variant)}` : ''}</td></tr>` : '',
-    `<tr><th>재화</th><td>현금 ${m.cash} · 예산 ${m.budget}</td></tr>`,
-    `<tr><th></th><td>연구 자료 ${m.research} · 이빨 ${m.teeth}</td></tr>`,
-    `<tr><th>승강기 총애</th><td>${fav}</td></tr>`,
-    s.ruleCount ? `<tr><th>규칙서</th><td>찾음 ${s.ruleCount.found} · 송신 ${s.ruleCount.sent}</td></tr>` : '',
-    ...(s.rules ?? []).map((r) => `<tr><th></th><td>${esc(r.text)}</td></tr>`),
   ];
   return `<table>${rows.join('')}</table>`;
 }
 
-/** 지도 (Z): 가 본 층 목록 + 지금 층 띠 */
-export interface MapState {
-  floors: { label: string; current: boolean }[];
-  strip: { w: number; color: string; tag?: string }[];
-  /** 지금 위치 0~1 */
-  at: number;
+export interface SkillBoxState {
+  compact?: boolean;
+  slots: PixelSlot[];
 }
-export function drawMap(c: CanvasRenderingContext2D, m: MapState) {
-  W = c.canvas.width;
-  H = c.canvas.height;
-  c.save();
-  c.setTransform(1, 0, 0, 1, 0, 0);
-  c.fillStyle = 'rgba(3,6,9,0.82)';
-  c.fillRect(0, 0, W, H);
-  label(c, '지도', 80, 90, 28, '#fff', 'left', 800);
-  label(c, 'Z · Esc 닫기', W - 80, 90, 14, '#9aa6ab', 'right');
-  // 층 기록 (세로)
-  plate(c, 80, 120, 260, 520, 12);
-  label(c, '내려온 층', 100, 152, 15, '#9aa6ab');
-  m.floors.slice(-18).forEach((f, i) => label(c, `${f.current ? '▶ ' : '  '}${f.label}`, 100, 182 + i * 25, 15, f.current ? '#f2c94c' : '#d8d0bc', 'left', f.current ? 800 : 600));
-  // 지금 층 (가로 띠)
-  const x = 380,
-    y = 300,
-    w = 820;
-  plate(c, x - 20, y - 70, w + 40, 190, 12);
-  label(c, '이번 층', x, y - 38, 15, '#9aa6ab');
-  const total = m.strip.reduce((a, s) => a + s.w, 0) || 1;
-  let px = x;
-  for (const s of m.strip) {
-    const sw = (s.w / total) * w;
-    c.fillStyle = s.color;
-    c.fillRect(px, y, Math.max(1, sw - 2), 40);
-    if (s.tag) label(c, s.tag, px + sw / 2, y + 66, 12, '#d8d0bc', 'center');
-    px += sw;
-  }
-  const ax = x + m.at * w;
-  c.fillStyle = '#f2c94c';
-  c.beginPath();
-  c.moveTo(ax, y - 4);
-  c.lineTo(ax - 8, y - 18);
-  c.lineTo(ax + 8, y - 18);
-  c.closePath();
-  c.fill();
-  c.restore();
+
+/** 필살기 키 이름: 지금 키 배치(에일린이면 F)에서 찾는다 */
+function superKey(): string {
+  const code = Object.keys(KEYMAP).find((k) => KEYMAP[k] === 'super');
+  return code ? code.replace(/^Key/, '') : 'W';
 }

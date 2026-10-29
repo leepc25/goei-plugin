@@ -46,7 +46,8 @@ export async function loadArt(urlOf?: (file: string) => Promise<string>, bytesOf
   }
   if (urlOf) {
     try {
-      const [a, c] = await Promise.all([urlOf('atlas.png'), urlOf('cutin.png')]);
+      // 그림(atlas·cutin)은 없어도 된다: 판정표(frames.json)만 있으면 엔진이 돈다
+      const [a, c] = await Promise.all([urlOf('atlas.png').catch(() => ''), urlOf('cutin.png').catch(() => '')]);
       let frames = null;
       if (bytesOf) {
         const b = await bytesOf('frames.json');

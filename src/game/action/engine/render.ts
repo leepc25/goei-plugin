@@ -3,7 +3,7 @@ import { pfont } from './pxfont';
 import { drawPropArt } from '../art/bg';
 import { drawGoSign } from '../ui/title';
 import { PIXEL, SCREEN_H, SCREEN_W, type Body, type WBox } from './contract';
-import { snapTo, spr } from './view';
+import { snapTo, spr, view } from './view';
 import type { Art } from './art';
 import { Bullet } from './bodies';
 import { Fighter } from './fighter';
@@ -11,6 +11,7 @@ import type { Player } from './player';
 import type { World } from './world';
 import { drawSupply } from './itemsLink';
 import { drawTestPlayer } from '../art/testPeople';
+import { EileenPlayer } from '../eileen/player';
 
 const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
 
@@ -25,8 +26,11 @@ export function makeRenderer(ctx: CanvasRenderingContext2D, art: Art, opt: { hud
     const f = w.floor;
     const pal = f.palette ?? { wall: '#2b343a', floor: '#3a4247', accent: '#5b6a72' };
     const [top] = w.lane;
-    ctx.fillStyle = '#0d1114';
-    ctx.fillRect(0, 0, SCREEN_W, SCREEN_H);
+    // 필드는 엔진(game.ts)이 이미 화면 전체를 검게 칠했다: 장면 밖에 1280×720 회색 판이 남지 않게
+    if (!view.hub) {
+      ctx.fillStyle = '#0d1114';
+      ctx.fillRect(0, 0, SCREEN_W, SCREEN_H);
+    }
     if (f.drawBackground) {
       ctx.save();
       ctx.translate(-camX, 0);
@@ -39,7 +43,7 @@ export function makeRenderer(ctx: CanvasRenderingContext2D, art: Art, opt: { hud
     ctx.fillRect(0, wallTop, SCREEN_W, top - wallTop - 20);
     // 벽 판넬·기둥 (시차 없이 바닥과 같이 흐름)
     const step = 320;
-    for (let x = Math.floor(camX / step) * step; x < camX + SCREEN_W + step; x += step) {
+    for (let x = Math.floor(camX / step) * step; x < camX + view.w + step; x += step) {
       const sx = x - camX;
       ctx.fillStyle = 'rgba(0,0,0,0.22)';
       ctx.fillRect(sx, wallTop, 26, top - wallTop - 20);
@@ -61,7 +65,7 @@ export function makeRenderer(ctx: CanvasRenderingContext2D, art: Art, opt: { hud
     ctx.fillRect(0, top - 20, SCREEN_W, SCREEN_H - top + 20);
     ctx.strokeStyle = 'rgba(255,255,255,0.05)';
     ctx.lineWidth = 2;
-    for (let x = Math.floor(camX / 160) * 160; x < camX + SCREEN_W + 400; x += 160) {
+    for (let x = Math.floor(camX / 160) * 160; x < camX + view.w + 400; x += 160) {
       const sx = x - camX;
       ctx.beginPath();
       ctx.moveTo(sx, top - 20);
@@ -88,7 +92,7 @@ export function makeRenderer(ctx: CanvasRenderingContext2D, art: Art, opt: { hud
   function drawProps(w: World, camX: number, list: readonly World['props'][number][] = w.props) {
     for (const p of list) {
       const sx = p.x - camX;
-      if (sx < -p.w - 200 || sx > SCREEN_W + p.w + 200) continue;
+      if (sx < -p.w - 200 || sx > view.w + p.w + 200) continue;
       if (p.kind === 'hubdoor' || p.kind === 'hubspot') continue; // 본부 문·자리는 본부 장면(hub.ts)이 그린다
       if (p.actor) {
         // 사람 대역: 플레이어 클립을 색만 바꿔서
@@ -139,11 +143,14 @@ export function makeRenderer(ctx: CanvasRenderingContext2D, art: Art, opt: { hud
     for (const h of fr.hurt) ctx.fillRect(h.x0 - ox, h.y - h.z1 - oy, h.x1 - h.x0, h.z1 - h.z0);
   }
 
+  /** 이번 그림의 카메라 x (에일린은 자기 좌표로 그려서 같은 카메라를 써야 한다) */
+  let drawCam = 0;
   function drawPlayer(p: Player, x: number, y: number, z: number, w: World) {
     if (p.ally) sprite(p.ally.clip, p.ally.f, 0, x + (p.ally.x - p.x), y + (p.ally.y - p.y), p.ally.dir);
     const a = p.anim();
     // 필드 시험 캐릭터가 있으면 그 그림 (서기 / 움직이면 달리기)
-    if (drawTestPlayer(ctx, /walk|run/.test(a.clip), x, y - z, p.dir)) return;
+    if (p instanceof EileenPlayer && !p.seat) { p.drawSelf(ctx, drawCam); return; }
+    if (drawTestPlayer(ctx, a.clip, a.frame, p.clipLen(a.clip), x, y - z, p.dir)) return;
     const blink = p.invuln > 0 && w.tick % 4 < 2 ? 0.5 : 1;
     if (!sprite(a.clip, a.frame, a.origin, x, y - z, p.dir, blink)) {
       ctx.fillStyle = '#c0453a';
@@ -411,7 +418,11 @@ export function makeRenderer(ctx: CanvasRenderingContext2D, art: Art, opt: { hud
     draw(w: World, alpha: number) {
       ctx.imageSmoothingEnabled = false;
       const shake = w.shakeT > 0 ? (w.tick % 2 ? 1 : -1) * w.shakeP * 2 : 0;
+      // 에일린은 그림 장마다 실제 시간으로 움직인다 (테스트룸과 같게)
+      if (w.player instanceof EileenPlayer) w.player.frameStep();
       const camX = Math.round(lerp(w.prevCamX, w.camX, alpha));
+      drawCam = camX;
+      w.drawCamX = camX;
       ctx.save();
       ctx.translate(shake, w.shakeT > 0 ? (w.tick % 3) - 1 : 0);
       background(w, camX);
@@ -466,10 +477,12 @@ export function makeRenderer(ctx: CanvasRenderingContext2D, art: Art, opt: { hud
         back.call(b, ctx);
         ctx.restore();
       }
-      all.sort((a, b) => a.y - b.y);
+      // 깊이 순서: 몸이 따로 정한 깊이(물건 위에 선 에일린)가 있으면 그것
+      const sy = (b: Body) => (b as { sortY?: number }).sortY ?? b.y;
+      all.sort((a, b) => sy(a) - sy(b));
       for (const b of all) {
         const q = pos(b);
-        propsUpTo(q.y);
+        propsUpTo(b === w.player ? sy(b) : q.y);
         const jitter = b.stop > 0 && b !== w.player ? (w.tick % 2 ? 3 : -3) : 0;
         if (b === w.player) drawPlayer(w.player, q.x - camX, q.y, q.z, w);
         else if (b.draw && worldSpace(b)) {
@@ -501,6 +514,7 @@ export function makeRenderer(ctx: CanvasRenderingContext2D, art: Art, opt: { hud
       // 실제 조사 대상의 표식. 전투 중에도 잠김 이유는 HUD에서 읽을 수 있다.
       // 표식은 HUD 안내 띠 안에서 그린다. 머리 위 표식과 안내 띠가 겹치지 않게 한다.
       w.hintShown = false;
+      if (w.player instanceof EileenPlayer) w.player.drawFxLayer(ctx, camX);
       drawFx(w, camX);
       if (w.floor.drawForeground) {
         ctx.save();
@@ -514,6 +528,14 @@ export function makeRenderer(ctx: CanvasRenderingContext2D, art: Art, opt: { hud
       if (w.showBoxes) boxes(w, camX);
       ctx.restore();
       if (w.cutin > 0) cutin(w);
+      if (w.player instanceof EileenPlayer) {
+        // 컷인·번쩍임·쓰러짐은 화면 기준 (화면 확대·세로 따라가기와 무관)
+        ctx.save();
+        const hz = ctx.canvas.height / SCREEN_H;
+        ctx.setTransform(hz, 0, 0, hz, 0, 0);
+        w.player.drawScreen(ctx);
+        ctx.restore();
+      }
       if (opt.hud) hud(w);
       overlayText(w);
     },

@@ -1,6 +1,7 @@
 // 「괴담톡」 탭: 연락처·대화방·공지·전화. 원본 괴담톡(폰)과 같은 저장 형식과 규칙.
 // 생성은 보내기·방 새로고침·단톡 만들기·초대·새 메시지 확인을 눌렀을 때, 그리고 (설정이 켜져 있으면) 채팅 응답이 끝날 때마다 한 번.
 // 생성은 창을 닫아도 계속되고 끝나면 원래 채팅에 저장한다.
+import { onOffSwitch } from './controls';
 import { composeBody, describe, previewText, type UserKind } from '../core/attach';
 import { keepOpen } from './panels';
 import { attachAction, attachBody, attachEditor, attachInput, emptyAttachment, type Attachments } from './attach';
@@ -903,6 +904,8 @@ const AUTO_HINT: Record<string, string> = {
 };
 
 function seg(key: string, cur: string, items: [string, string][]): string {
+  const sw = onOffSwitch(items, cur, 'ph-cfg', (v) => `${key}=${v}`);
+  if (sw) return sw;
   return `<div class="gx-segs gx-segs-sm">${items
     .map(([v, label]) => `<button class="gx-seg${cur === v ? ' on' : ''}" data-action="ph-cfg" data-value="${key}=${v}" aria-pressed="${cur === v}">${label}</button>`)
     .join('')}</div>`;
@@ -915,7 +918,7 @@ const group = (title: string, rows: string) => `<section class="ps-group"><h3>${
 
 function settingsView(ctx: ChatContext): string {
   const v = (k: string) => phoneValue(ctx.chat.scriptstate, k);
-  const onoff = (k: string) => seg(k, v(k) === '1' ? '1' : '0', [['1', '켜기'], ['0', '끄기']]);
+  const onoff = (k: string) => seg(k, v(k) === '1' ? '1' : '0', [['1', 'ON'], ['0', 'OFF']]);
   const pct = (k: string) => `<span class="ph-inline"><input class="gx-search ph-pct" type="number" min="0" max="100" data-change="ph-num" data-key="${k}" value="${esc(v(k))}" aria-label="확률"><span>%</span></span>`;
   const num = (k: string, cur: number, lo: number, hi: number, unit: string) => `<span class="ph-inline"><input class="gx-search ph-pct" type="number" min="${lo}" max="${hi}" data-change="ph-num" data-key="${k}" value="${cur}" aria-label="${k}"><span>${unit}</span></span>`;
   const notices = noticeSettings(ctx.chat.scriptstate);
@@ -925,7 +928,7 @@ function settingsView(ctx: ChatContext): string {
   };
   const keep = (k: 'dm' | 'group' | 'notice', label: string) => {
     const st = phoneStorage(ctx.chat.scriptstate, k);
-    return row(label, `<span class="ph-inline">${seg(`storage_auto_${k}`, st.auto ? '1' : '0', [['1', '켜기'], ['0', '끄기']])}${st.auto ? num(`storage_limit_${k}`, st.limit, 1, STORAGE_MAX, '개') : ''}</span>`, '최근 기록만 남기고, 지운 대화는 흐름 요약으로 남겨요');
+    return row(label, `<span class="ph-inline">${seg(`storage_auto_${k}`, st.auto ? '1' : '0', [['1', 'ON'], ['0', 'OFF']])}${st.auto ? num(`storage_limit_${k}`, st.limit, 1, STORAGE_MAX, '개') : ''}</span>`, '최근 기록만 남기고, 지운 대화는 흐름 요약으로 남겨요');
   };
   return `<div class="ph-form">${paneHead('괴담톡 설정', '', `<span class="ph-act">${defaultsButtons('ph')}</span>`)}${defaultsConfirm('ph')}
     <div class="ph-form-body ps">

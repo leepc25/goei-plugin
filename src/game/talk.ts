@@ -120,7 +120,11 @@ export function mountTalk(root: HTMLElement, api: GameVisit, field?: GameField) 
       if (!dead) msg.textContent = e instanceof Error ? e.message : String(e);
     }
   }
+  /** 이번 대화창에서 모델과 주고받은 횟수 (닫을 때 1번 이상이면 시계 +대화 분, 필드 세계 16-2) */
+  let exchanged = 0;
   function close() {
+    if (target && exchanged > 0) window.dispatchEvent(new CustomEvent('goei:talk-closed', { detail: { name: target, exchanged } }));
+    exchanged = 0;
     bar.removeAttribute('data-open');
     log.removeAttribute('data-open');
     input.blur();
@@ -161,6 +165,7 @@ export function mountTalk(root: HTMLElement, api: GameVisit, field?: GameField) 
     try {
       state = await api.send(agent.id, text, 'aux', nearby(agent.name));
       if (dead) return;
+      exchanged++;
       follow(agent, text);
       const turn = state.turns.filter((t) => t.agentId === agent.id).at(-1);
       say(agent.name, turn?.reply ?? '');
@@ -233,7 +238,8 @@ export function mountTalk(root: HTMLElement, api: GameVisit, field?: GameField) 
       c.font = FONT(TAG_PX);
       const tw = Math.ceil(c.measureText(p.name).width) + 8;
       const tagBottom = place(x, tw, 18, Math.round(p.y + p.top));
-      tag(c, p.name, x, tagBottom - 9, near || p.name === target || isPlayer);
+      // 지금 조작하는 주인공은 이름표를 달지 않는다 (사용자 2026-10-25). 자리만 잡아 말풍선을 머리 위에 띄운다
+      if (!isPlayer) tag(c, p.name, x, tagBottom - 9, near || p.name === target);
       // 내가 입력하는 동안 내 머리 위에 움직이는 점 (말을 보내면 그 말로 바뀐다)
       const typing = isPlayer && !busy && bar.hasAttribute('data-open') && document.activeElement === input && input.value.trim() !== '';
       const b = bubbles.find((q) => q.who === p.name && (q.from ?? 0) <= now) ?? (typing ? { who: p.name, text: '', until: Infinity, pending: true } : undefined);
