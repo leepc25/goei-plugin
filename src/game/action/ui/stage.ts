@@ -158,7 +158,8 @@ export function mountStage(box: HTMLElement): Stage {
     const fieldFill = byHeight && !portrait && bh >= 600;
     const k = fieldFill ? Math.max(1, Math.floor(dpr)) / dpr : 1;
     const vh = fieldFill ? Math.round(bh / k) : H;
-    const vw = fieldFill ? Math.round(bw / k) : fill && !portrait && bw / bh > W / H ? Math.min(1800, Math.round((H * bw) / bh)) : byHeight && !portrait && bw / bh < W / H ? Math.max(640, Math.round((H * bw) / bh)) : W;
+    // 필드가 16:9 보다 긴 낮은 화면(가로 폰)이면 캔버스를 옆으로 넓혀 좌우 검은 띠 없이 꽉 채운다 (모바일 조작 설계: 가로 전체화면으로 꽉 차게)
+    const vw = fieldFill ? Math.round(bw / k) : (fill || byHeight) && !portrait && bw / bh > W / H ? Math.min(byHeight ? 2000 : 1800, Math.round((H * bw) / bh)) : byHeight && !portrait && bw / bh < W / H ? Math.max(640, Math.round((H * bw) / bh)) : W;
     if (vw !== s.vw || canvas.width !== vw || canvas.height !== vh) {
       s.vw = vw;
       canvas.width = vw;

@@ -110,7 +110,8 @@ export function mountTalk(root: HTMLElement, api: GameVisit, field?: GameField) 
     to.textContent = `${name}에게`;
     bar.setAttribute('data-open', '');
     refresh();
-    input.focus();
+    // 터치 기기는 바로 키패드를 띄우지 않는다: 터치판 대사창 모드의 「선택」(또는 입력칸 누르기)으로 연다 (모바일 조작 설계 2026-10-28)
+    if (typeof matchMedia === 'undefined' || !matchMedia('(pointer: coarse)').matches) input.focus();
     try {
       state = await api.state();
       if (dead) return;

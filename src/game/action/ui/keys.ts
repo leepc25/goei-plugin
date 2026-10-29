@@ -76,6 +76,9 @@ export const PAD_NAME: Record<string, string> = {
   Digit1: '십자↑', Digit2: '십자→', Digit3: '십자↓', Digit4: '십자←', ArrowLeft: '왼쪽 스틱', ArrowRight: '왼쪽 스틱', ArrowUp: '왼쪽 스틱', ArrowDown: '왼쪽 스틱',
 };
 
+/** 터치 「고유」를 길게 누르면 누른 채로 두는 충전 키 (에일린 조작 S). 없으면 길게 = 고유 키를 누른 채 */
+export const TOUCH_CHARGE: { code: string | null } = { code: null };
+
 export const ACTS = Object.keys(CODE) as Act[];
 export const ACT_OF_CODE: Record<string, Act> = Object.fromEntries(ACTS.map((a) => [CODE[a], a]));
 
@@ -89,6 +92,7 @@ export function useEileenControls() {
     shoot: '원거리 (누른 채 연사 · 과열 주의)', unique: '기술 제압사격', hitbox: '충전 (누른 채 → 떼면 광선)', ult: '필살기 「증명해.」', evade: '짧게 회피 · 누른 채 달리기',
   });
   delete ALIAS.Tab; // Tab = 무기
+  TOUCH_CHARGE.code = 'KeyS';
   Object.assign(KEY_OF, { KeyF: 'f', KeyM: 'm', KeyO: 'o' });
   Object.assign(PAD_BUTTON, { 2: 'KeyQ', 3: 'KeyA', 4: 'KeyC', 6: 'KeyS', 7: 'KeyF', 8: 'KeyM', 10: 'Tab', 11: 'KeyW' });
   Object.assign(PAD_NAME, { KeyQ: 'X', KeyA: 'Y', KeyC: 'LB', KeyS: 'LT', KeyF: 'RT', KeyM: 'Back', Tab: 'L3', KeyW: 'R3', KeyD: '메뉴' });
