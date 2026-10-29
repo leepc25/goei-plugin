@@ -9,7 +9,7 @@
     "group: plugin = 플러그인 창(가짜 risuai), game = 게임(필드 틀·시연판), legacy = 옛 round2 시험(소스를 esbuild 로 바로 묶고 자체 http 서버)."
   ],
   "tests": [
-    { "name": "browser", "file": "tests/browser.mjs", "group": "plugin", "args": ["fixture", "shots"], "timeoutMin": 30, "frame": "자체 hostScript(가짜 risuai 원본)", "note": "패널 전체 31절. 17c·17d 는 묶음 위키 카드에서만" },
+    { "name": "browser", "file": "tests/browser.mjs", "group": "plugin", "args": ["fixture"], "timeoutMin": 30, "frame": "자체 hostScript(가짜 risuai 원본)", "note": "패널 전체 31절. 17c·17d 는 묶음 위키 카드에서만. 사진 인자는 안 넘김: 9절의 사진 전용 경로가 옛 설정 탭(.gx-nb[data-value=settings])을 눌러 시간 초과(QC 도 사진 없이 돌렸음)" },
     { "name": "install", "file": "tests/install-browser.mjs", "group": "plugin", "args": ["fixture"], "timeoutMin": 10, "frame": "browser.mjs hostScript 사본", "note": "시작 화면 → 저장" },
     { "name": "editor", "file": "tests/editor-browser.mjs", "group": "plugin", "args": ["fixture"], "timeoutMin": 10, "frame": "자체 boot(가짜 risuai, 편집 창 전용)", "note": "세계 편집 → 기록 고치기 → 저장" },
     { "name": "wallet", "file": "tests/wallet-browser.mjs", "group": "plugin", "args": ["fixture"], "timeoutMin": 10, "frame": "browser.mjs hostScript 사본", "note": "가계부 탭 PC·폰" },
