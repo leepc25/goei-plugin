@@ -1,113 +1,4 @@
-ounds; holds position while openly afraid.
-- Worries constantly about others. Counts minutes for overdue juniors, suppresses sighs and rejects abandonment; hopes rookies stay in D Jo. Helps sustain its unusual loyalty in a company he calls every-man-for-himself.
-- Unashamedly sentimental: an old superior's shoulder-slap brings nostalgia; reunions bring his widest smile and tears. Flusters when nostalgia turns into heist recruitment.
-- Lends notes and gear before being asked, treats new hires as people to keep alive rather than resources to spend, and hand-waves away credit he earned.
-- Values: the Jo, and going home, in that order and no third item.
-[Flaws]
-- He defers to superiors, accepts the company's framing, and concedes hope a beat before he should.
-
-#### Voice
-- Loud and friendly, laughs constantly, banmal with mask names downward.
-- Waves off deference: "Haha, no need to be so formal with me."
-- Gallows candor, cheerfully: "In this department everyone makes Senior Staff around the one-year mark. You will too, soon. Could die before that, though."
-- Handing away credit: "Nah, none of it was me. You did all of it."
-
-#### Background
-- Survived the first year to become Senior Staff; D Jo's practical memory for gear, forms and unsafe corridors.
-- Earns points and pay for a hospitalized younger sibling, a gifted violinist. Awkwardly rubs his cheek when mentioning it but cannot hide pride; has no further ambition.
-
-#### Abilities
-- Physical: strong and durable, the Jo's carrier and door-opener.
-- Disguise operation: competent with company camouflage rigs, including full-body mimicry that lets him pass as an anomaly's own machinery. This is equipment work.`,
-    백사헌: `### Character - Baek Sa-heon
-
-#### Identity
-- Age: late 20s
-- Gender: Male
-- Organization: Baekilmong Co., Ltd.
-- Department: Development Division, Field Exploration Team, F Jo
-- Role: Sa-won
-- Mask: Goat
-
-#### Character
-- Knowingly, unapologetically selfish. In his first hour, punched a volunteer's eye out to save himself before witnesses, without remorse. Proposes beheading a dying colleague for salvage and cannot understand objections.
-- Can price danger but fears minds he cannot understand. Unpredictable thinking brings cold sweat and immediate deference; his sudden politeness betrays fear.
-- Shamelessly attaches himself to whoever has a plan or greatest strength, fabricating warmth toward people he despises.
-- First used a mind-affecting tool to hide from his roommate's perception and plot stealing cohort equipment; covertly exploits situations.
-- Needles the powerless, sneers at optimism and challenges authority, but becomes silent and focused when hiding. Shared dislike of him ironically calms and unites rooms.
-- Values items, information and points; courts superiors, hoards intelligence and conceals good equipment, advancing ahead of his cohort.
-- Understands bureaucratic pressure: an audit, a competing superior's interests, a report's wording, and access to schedules can accomplish what a direct threat cannot.
-- Selectively helps a person who has earned a place in his calculations. A plausible profit or exchange lets him justify remaining when departure would be easier.
-- Gratitude can disarm him more than bargaining. He pauses, deflects, becomes prickly, or insists that an outstanding debt still exists.
-- Attachment remains selective. Concern for one ally coexists with harsh triage and resentment at being asked to rescue strangers.
-- Under acute threat to an established ally, anger becomes an insistence that they keep thinking instead of accepting the first lethal compromise.
-[Flaws]
-- Temper. His spite overrides his caution in precisely the situations where caution is the whole game.
-
-#### Voice
-- Sneering jondaemal with a needle in it upward and sideways. Flat contemptuous banmal with anyone he thinks he outranks. Under real threat he converts instantly to fawning courtesy and starts offering bribes.
-- The needle: "A knock requires a 'come in' before you actually come in. That was the social contract, wasn't it? Well?"
-- Downward: "They're going to die anyway.", "You're making this complicated."
-- Under threat: "Shall I wire you another three days' salary?"
-
-#### Background`,
-    고영은: `### Character - Go Young-eun
-
-#### Identity
-- Age: late 20s
-- Gender: Female
-- Organization: Baekilmong Co., Ltd.
-- Department: Development Division, Field Exploration Team, R Jo
-- Role: Sa-won
-- Mask: Mountain goat
-
-#### Character
-- Decent survivor in an exploitative company: instinctively approaches the injured, calms panicking strangers and refuses mutilating dying colleagues for salvage.
-- Hardens without returning to naivety. Within a year, can clear a hostile floor alone, practically decide a survivor need not die and leave thinking she has had enough. Mercy and tactical judgment converge: sparing people is often also the best play.
-- Values: people over material, safety over points. She follows the manuals because they keep people alive, not because the company wrote them.
-- Openly hostile and sniping toward Baek Saheon, yet works beside him when required.
-- Colleagues consistently judge her better suited to the Anomaly Management Bureau than Baekilmong.
-- Reasons aloud about mechanisms: explains an urban legend's failure to manifest through divergent versions whose simultaneous truth would contradict each other.
-[Flaws]
-- She spends points, time and standing on rescues the company values at zero, and has never once run the numbers the company's way.
-
-#### Voice
-- Warm Haeyo-che with peers, using real names rather than mask names. Her crisis register switches to a hard teacher's banmal. She sighs, swallows, and says the hard thing anyway.
-- Peers, by real name: "Are you all right?"
-- Crisis register: "Acting like it's already over is how you throw away the chances you still have. If we want out safely, we do our best and we cooperate. Understood?"
-
-#### Background
-- Survived lethal intake; her R Jo leader abandoned her at the first hostile anomaly, fixing her view of the company.
-- Former medical student who transferred out and never took the licensing exam. Calls her skills fake but constantly uses them as the room's only medically trained person.
-
-#### Abilities
-- Medical: triage, wound care, and assessment of injuries nobody else in the Jo can name.
-- Civilian handling: de-escalation, crowd control, turning a panicking group into a cooperating one.`,
-    강이학: `### Character - Kang I-hak
-
-#### Identity
-- Age: late 20s
-- Gender: Female
-- Organization: Baekilmong Co., Ltd.
-- Department: Development Division, Field Exploration Team, I Jo
-- Role: Sa-won
-- Mask: Pony
-
-#### Character
-- Explicitly values gold over cash: would spend a wish on gold because national collapse could make currency worthless.
-- Cheerfully prices effort, risk and people's future usefulness aloud, concealing none of her calculation.
-- Values money alone and never pretends otherwise.
-- Untroubled by others' deaths; gives a thumbs-up when told leaving early will get people killed.
-- Volunteers as bait while negotiating payment. Instantly reads leverage, flatters whichever lunatic holds it and switches attention as soon as profit moves.
-- Deliberately resists short-term reward cravings when a salary bump loses value long-term; studies cohort promotion strategies like a market analyst.
-- Flatters superiors because upsetting them pays nothing; openly treats courtesy as arithmetic.
-- Recognizes pure gold by touch and estimates at least ten don by heft before an explanation finishes.
-[Flaws]
-- Handling: she is buyable, reliably, and she stays bought exactly as long as the payment lasts.
-
-#### Voice
-- Bright, exclamatory and drawn out. She apologizes fast and loudly, because a fast loud apology is cheaper than a slow one.
-- Introductions: "Kang Ihak, pleased to meet you! Senior Staff, Employee!", "Haha.", "Okay.", "Yes yes!"
+tions: "Kang Ihak, pleased to meet you! Senior Staff, Employee!", "Haha.", "Okay.", "Yes yes!"
 - Threats, still smiling: "But! If you're lying to me, I'll give the Bureau every detail of your personal information, and take out an organ-backed loan in your name on the way out."
 - On deaths after clocking out: "Well, that's the company's problem to sort out!"
 
@@ -862,8 +753,8 @@ ounds; holds position while openly afraid.
         const timer = setTimeout(() => ctrl.abort(), host.timeoutMs ?? 25e3);
         try {
           const a = AGENTS2[host.agent()] ?? AGENTS2.jyaldi;
-          const [sheet2, meta] = await Promise.all([sheetText(d3), host.meta?.(d3).catch(() => null)]);
-          const messages = buildPrompt({ def: d3, target: t, sheet: sheet2, agent: { id: a.id, name: a.name, title: a.title, voice: a.voice }, rel: r, meta, text: text2 });
+          const [sheet3, meta] = await Promise.all([sheetText(d3), host.meta?.(d3).catch(() => null)]);
+          const messages = buildPrompt({ def: d3, target: t, sheet: sheet3, agent: { id: a.id, name: a.name, title: a.title, voice: a.voice }, rel: r, meta, text: text2 });
           const raw = await Promise.race([
             model(messages, { signal: ctrl.signal }),
             new Promise((_, rej) => ctrl.signal.addEventListener("abort", () => rej(new Error("응답이 25초 넘게 없어요"))))
@@ -1074,7 +965,6 @@ ounds; holds position while openly afraid.
     let hq2 = false;
     const pending = /* @__PURE__ */ new Map();
     let lastPassengerProp = null;
-    const agentInfo = () => AGENTS2[o.agent()] ?? AGENTS2.jyaldi;
     const floorHints = (w) => {
       const found = new Set(w.notes["stage.found"] ?? []);
       const type = w.floor.type ?? "";
@@ -1484,6 +1374,8 @@ ounds; holds position while openly afraid.
     /** 플레이어 버릇 (10장): 점프·회피 반격 횟수 → 대공·유인 가중 */
     habit = { jump: 0, attack: 0 };
     lastFoe = null;
+    /** 누운 뒤 일어나기까지 남은 틱 (8-2: 바로 / 늦게 +10~20틱). null = 아직 안 고름 */
+    wakeT = null;
     get reactTicks() {
       return Math.max(2, Math.round(this.g.react * this.d.react));
     }
@@ -1500,8 +1392,16 @@ ounds; holds position while openly afraid.
       if (me.stunned) {
         this.script = [];
         this.squad?.give(this.squadKey, this.id);
+        if (me.lying) {
+          if (this.wakeT === null) this.wakeT = this.chance(0.5) ? 0 : 10 + Math.floor(this.rng() * 11);
+          if (this.wakeT-- <= 0) {
+            out.press.push("jump");
+            this.wakeT = null;
+          }
+        } else this.wakeT = null;
         return this.finish(out);
       }
+      this.wakeT = null;
       const dx = foe.x - me.x, dist = Math.abs(dx), dy = foe.y - me.y;
       const toward = dx > 0 ? "right" : "left";
       const away = dx > 0 ? "left" : "right";
@@ -1695,6 +1595,7 @@ ounds; holds position while openly afraid.
         free: ["ground", "chain", "block"].includes(me.mode),
         air: me.mode === "air",
         stunned: ["down", "belly", "stun"].includes(me.mode) || this.phase === "down",
+        lying: (me.mode === "down" || me.mode === "belly") && this.phase !== "down",
         hp: this.hp / this.hpMax,
         sp: me.sp ?? 0,
         guard: this.guard
@@ -1735,6 +1636,108 @@ ounds; holds position while openly afraid.
       this.core.drawBody(ctx);
       this.core.drawFxLayer(ctx);
       ctx.restore();
+    }
+  };
+
+  // src/game/action/eileen/autoPilot.ts
+  var BTN2 = { left: "left", right: "right", up: "up", down: "down", light: "light", heavy: "heavy", block: "block", dodge: "dodge", jump: "jump", shoot: "shoot", charge: "charge", skill: "skill", super: "super", run: null };
+  var PERSONA = { aggression: 0.55, patience: 0.55, zoning: 0.4, courage: 0.85 };
+  var MANUAL_HOLD = 30;
+  var AutoPilot = class _AutoPilot {
+    /** 켜짐 (AUTO 버튼·O 키) */
+    on = false;
+    /** 직접 조작 중인가 (스틱 아날로그 ≠ 0 또는 방향키) — 껍데기가 넣는다 */
+    manual = () => false;
+    brain;
+    /** 두뇌가 지난 틱에 누르고 있던 버튼 */
+    held = /* @__PURE__ */ new Set();
+    manualT = 0;
+    /** 시험용: 마지막으로 두뇌가 고른 전술, 그동안 섞은 버튼 수 */
+    last = { tactic: "", pressed: [], foe: false, manual: false, presses: 0, counts: {} };
+    constructor(seed = 20261029) {
+      this.brain = new FighterBrain("auto-player", "B", "normal", PERSONA, mulberry322(seed));
+    }
+    /** 가장 가까운 적 (살아 있고 체력이 남은 적 편 몸) */
+    static foe(self, w) {
+      let best = null, bd = Infinity;
+      for (const b of w.bodies) {
+        if (!_AutoPilot.isFoe(b)) continue;
+        const d3 = Math.abs(b.x - self.x) + Math.abs(b.y - self.y) * 0.5;
+        if (d3 < bd) bd = d3, best = b;
+      }
+      return best;
+    }
+    static isFoe(b) {
+      return b.alive && b.team === "enemy" && b.hp > 0 && !b.kind.startsWith("proj") && b.kind !== "bullet";
+    }
+    /** 싸울 상대가 있는가 (없으면 AUTO 버튼을 흐리게) */
+    static fight(w) {
+      return !!w && w.bodies.some((b) => _AutoPilot.isFoe(b));
+    }
+    /** 두뇌가 쥔 버튼을 모두 놓는 Pad (자동이 멈출 때 막기·충전이 눌린 채 남지 않게) */
+    release(pad) {
+      if (!this.held.size) return pad;
+      const released = new Set(pad.released);
+      for (const b of this.held) if (!pad.held.has(b)) released.add(b);
+      this.held.clear();
+      return { ...pad, released };
+    }
+    /** 엔진 틱마다: 사람 입력 pad 를 받아 자동 입력을 섞은 pad 를 돌려준다 */
+    apply(self, w, pad) {
+      if (!this.on) return this.release(pad);
+      const man = this.manual() || pad.mx !== 0 || pad.my !== 0;
+      if (man) this.manualT = MANUAL_HOLD;
+      else if (this.manualT > 0) this.manualT--;
+      this.last.manual = this.manualT > 0;
+      if (this.manualT > 0) return this.release(pad);
+      const foe = _AutoPilot.foe(self, w);
+      this.last.foe = !!foe;
+      if (!foe) return this.release(pad);
+      const P = self.core.P;
+      const me = {
+        x: self.x,
+        y: self.y,
+        z: self.z,
+        face: self.dir,
+        free: ["ground", "chain", "block"].includes(P.mode),
+        air: P.mode === "air",
+        stunned: ["down", "belly", "stun"].includes(P.mode) || self.phase === "down",
+        lying: (P.mode === "down" || P.mode === "belly") && self.phase !== "down",
+        hp: self.hpMax ? self.hp / self.hpMax : 1,
+        sp: P.sp ?? 0,
+        guard: self.guard
+      };
+      const d3 = this.brain.tick(me, foeSense(foe));
+      this.last.tactic = this.brain.tactic;
+      const was = this.held;
+      const now = /* @__PURE__ */ new Set();
+      const pressed = new Set(pad.pressed);
+      const released = new Set(pad.released);
+      for (const b of d3.hold) {
+        const k = BTN2[b];
+        if (k) now.add(k);
+      }
+      const auto = [];
+      for (const b of d3.press) {
+        const k = BTN2[b];
+        if (!k) continue;
+        pressed.add(k);
+        auto.push(k);
+        this.last.counts[k] = (this.last.counts[k] ?? 0) + 1;
+        if (b === "charge" || b === "block") now.add(k);
+      }
+      for (const b of d3.release) {
+        const k = BTN2[b];
+        if (k && was.has(k) && !pad.held.has(k)) released.add(k);
+      }
+      for (const k of was) if (!now.has(k) && !pad.held.has(k)) released.add(k);
+      this.held = now;
+      this.last.pressed = auto;
+      this.last.presses += auto.length;
+      const held = /* @__PURE__ */ new Set([...pad.held, ...now]);
+      const mx = held.has("right") ? 1 : held.has("left") ? -1 : 0;
+      const my = held.has("down") ? 1 : held.has("up") ? -1 : 0;
+      return { held, pressed, released, mx, my, evade: pad.evade, run: pad.run || d3.hold.has("run"), downDouble: pad.downDouble };
     }
   };
 
@@ -2407,11 +2410,16 @@ ounds; holds position while openly afraid.
   var observing = false;
   var observerOn = () => observing;
   var wonText = (n) => `${n < 0 ? "−" : ""}₩ ${Math.abs(Math.trunc(n)).toLocaleString("en-US")}`;
+  var noSfx = () => {
+  };
   function hqAdapter(saves, bridge, ui) {
     const hq2 = createHq();
     const b = bridge;
     const slot = b?.slot ?? 0;
-    let root = null;
+    fieldClock.sec = null;
+    fieldClock.place = "";
+    fieldWallet.won = null;
+    observing = false;
     let present = [];
     const rules = () => ui.rules?.() ?? DEFAULT_CLOCK;
     let visitor = { agentId: "", name: "" };
@@ -2455,7 +2463,7 @@ ounds; holds position while openly afraid.
     });
     readPeople();
     readWallet();
-    b?.people?.onChange(() => {
+    const offPeople = b?.people?.onChange(() => {
       readPeople();
       readWallet();
     });
@@ -2468,21 +2476,24 @@ ounds; holds position while openly afraid.
       }
       return after;
     };
-    globalThis.__goeiWallet = { pay, balance: () => fieldWallet.won };
+    const walletHook = { pay, balance: () => fieldWallet.won };
+    globalThis.__goeiWallet = walletHook;
     const visitId = `v${Date.now().toString(36)}`;
     const ROOM_SCENE = { office: "office", lounge: "lounge", infirmary: "clinic" };
     const seedParam = typeof location !== "undefined" ? new URLSearchParams(location.search).get("seed") : null;
     const seed = seedParam ? Number(seedParam) >>> 0 || hashSeed(seedParam) : Date.now() >>> 0;
     let sim = null;
-    if (typeof window !== "undefined") window.addEventListener("goei:talk-closed", () => {
+    const onTalkClosed = () => {
       if (fieldClock.sec !== null) fieldClock.sec += rules().talk * 60;
-    });
-    if (typeof window !== "undefined") window.addEventListener("keydown", (e) => {
+    };
+    const onObserveKey = (e) => {
       if (e.key === "F9" || e.key === "`") {
         observing = !observing;
         e.preventDefault();
       }
-    });
+    };
+    if (typeof window !== "undefined") window.addEventListener("goei:talk-closed", onTalkClosed);
+    if (typeof window !== "undefined") window.addEventListener("keydown", onObserveKey);
     const world = () => {
       if (!sim && ready) {
         sim = createHqWorld(hq2.map(), seed, present.filter((p) => ROOM_SCENE[p.room]).map((p) => ({ name: p.name, scene: ROOM_SCENE[p.room] })), hasVisitClip, { stance: (f) => factionBy.get(f)?.stage ?? null });
@@ -2638,7 +2649,7 @@ ounds; holds position while openly afraid.
             if (!o) return;
             if (fieldClock.sec !== null) fieldClock.sec += o.minutes * 60;
             const at2 = fieldClock.sec === null ? "" : clockText(fieldClock.sec);
-            if (at2) void b?.field?.record({ kind: "wait", text: `${fieldClock.place || "필드"}에서 시간을 보냈다 (${at2})`, scene: fieldClock.place || void 0, weight: 1, fact: { key: "필드 시각", value: at2 } }).catch(() => {
+            if (at2) void b?.field?.record({ kind: "act", text: `${fieldClock.place || "필드"}에서 시간을 보냈다 (${at2})`, scene: fieldClock.place || void 0, weight: 1, fact: { key: "필드 시각", value: at2 } }).catch(() => {
             });
           }).catch(() => {
           });
@@ -2658,8 +2669,18 @@ ounds; holds position while openly afraid.
       goto: (place3) => hub.goto(place3),
       isOpen: () => hq2.isOpen(),
       close: () => hq2.close(),
+      dispose: () => {
+        if (typeof window !== "undefined") {
+          window.removeEventListener("goei:talk-closed", onTalkClosed);
+          window.removeEventListener("keydown", onObserveKey);
+        }
+        offPeople?.();
+        const g2 = globalThis;
+        if (g2.__goeiWallet === walletHook) delete g2.__goeiWallet;
+        if (sim && g2.__goeiWorld === sim) delete g2.__goeiWorld;
+        eileenHooks.extraTargets = void 0;
+      },
       mount(r, host) {
-        root = r;
         hq2.mount(r, {
           deploy: (l) => !bridge?.visit && host.deploy({ ...l, hpMax: l.stats?.hp, launch: l }),
           load: () => saves.read(slot),
@@ -2823,7 +2844,6 @@ ounds; holds position while openly afraid.
     ffx.sfx = (n) => audio.event({ type: n === "super" ? "super" : "hit", kind: n === "slam" ? "super" : void 0, strength: 3 });
     const cutins = /* @__PURE__ */ new Map();
     if (bridge?.visit && bridge.assets) void loadFieldFx(bridge.assets, ffx, cutins);
-    const inField = () => !!game?.inHub && !!bridge?.visit && !mods.blocking?.() && !shell.paused;
     const stageStore = {
       load: () => {
         if (session.meta) return session.meta;
@@ -2855,10 +2875,13 @@ ounds; holds position while openly afraid.
       rescued: () => hq2.state().rescued,
       photo: (k) => bridge?.photo?.(k) || demo_photos_default[k],
       sfx: (n) => audio.play(n),
-      onOpen: (on) => shell.touch.setVisible(!on && shell.mode === "play")
+      // 대화창이 열리면 터치판은 숨지 않고 대사창 모드 (frame 이 한 곳에서 정한다)
+      onOpen: () => {
+      }
     });
     globalThis.__goeiNpc = npc;
     globalThis.__goeiStage = shell.stage;
+    Object.assign(globalThis, { __goeiTouch: shell.touch, __goeiInput: shell.input });
     setPixelScale(bridge?.visit ? 2.625 : 2.75);
     globalThis.__goeiSetPixel = setPixelScale;
     const elevator = createElevatorStage(stageStore, {
@@ -2869,6 +2892,23 @@ ounds; holds position while openly afraid.
       }
     });
     let mapOpen = false;
+    const pilot = new AutoPilot();
+    pilot.manual = () => {
+      const a = shell.input.axis();
+      return a.x !== 0 || a.y !== 0;
+    };
+    globalThis.__goeiAuto = pilot;
+    const offAutoKey = shell.input.on((code, down2) => {
+      if (!down2 || code !== CODE.auto) return;
+      if (!pilot.on && !AutoPilot.fight(world)) return;
+      pilot.on = !pilot.on;
+      shell.touch.setAuto(pilot.on);
+    });
+    const offTalkKey = shell.input.on((code, down2, src) => {
+      if (!down2 || src !== "touch" || !visit?.isOpen() || shell.menu.isOpen) return;
+      if (code === "Escape") visit.close();
+      else if (code === "Enter") shell.stage.ui.querySelector(".gt-in")?.focus({ preventScroll: true });
+    });
     let guardA = 0;
     const offMapKey = shell.input.on((code, down2) => {
       if (!down2) return;
@@ -2928,6 +2968,7 @@ ounds; holds position while openly afraid.
       return fallbackEnemy(spec, w);
     };
     let world = null;
+    let reportSay = false;
     let runAgent = "eileen";
     let openingOn = false;
     const storyRoot = document.createElement("div");
@@ -3235,6 +3276,12 @@ ounds; holds position while openly afraid.
       },
       onPlay: () => shell.play(),
       frame: (dt) => {
+        const dialogUp = !!game?.inHub && (!!hq2.isOpen?.() || !floorBox.hidden) || npc.isOpen() || !!visit?.isOpen() || shell.menu.isOpen;
+        shell.touch.setMode(dialogUp ? "dialog" : "play");
+        shell.touch.setVisible(!story.isVideoPlaying() && (shell.mode === "play" || shell.menu.isOpen));
+        const fighter = !!world?.player?.core;
+        for (const id of ["light", "heavy", "dodge", "block", "unique", "ult"]) shell.touch.setOff(id, !fighter);
+        shell.touch.setOff("auto", !pilot.on && !AutoPilot.fight(world));
         ffx.opt = { shake: shell.settings.shake, flash: shell.settings.flash, numbers: shell.settings.numbers };
         ffx.update(shell.paused ? 0 : dt);
         {
@@ -3325,9 +3372,7 @@ ounds; holds position while openly afraid.
           else if (m) drawMiniMap(ctx, m, w.player.x, t, U2);
         } else mapOpen = false;
         syncNavigationButton(shell.canvas, hs.navigation);
-        shell.touch.setItems(hs.items);
         shell.touch.setGauge(w.player.gauge / 100);
-        shell.touch.hint("reload", w.player.ammo <= 2 && w.player.reserve > 0);
         shell.fx.drawTransition(ctx);
       },
       onScene: (name) => {
@@ -3349,10 +3394,17 @@ ounds; holds position while openly afraid.
             const text2 = `작전 종료 (${how === "evac" ? "후송" : how === "withdraw" ? "철수" : "귀환"}): ${label3}, 처치 ${w.kills}, 부상 ${Math.max(0, Math.round(w.player.hpMax - w.player.hp))}`;
             void bridge.field.record({ kind: "exit_anomaly", text: text2, weight: 3, fact: { key: "작전", value: `종료 (${how === "evac" ? "후송" : how === "withdraw" ? "철수" : "귀환"})` } }).catch(() => {
             });
+            reportSay = !!bridge.field?.lastReport;
+          });
+        }
+        if (reportSay && run.stageId === "hq" && bridge?.field?.lastReport) {
+          reportSay = false;
+          void bridge.field.lastReport().then((r) => r && world === w && w.say(`보고서가 기록에 저장됐어요: ${r.title}`, 4)).catch(() => {
           });
         }
         cancelStoryForScene();
         world = w;
+        if (w.player instanceof EileenPlayer) w.player.auto = pilot;
         runAgent = run.agent;
         if (run.stageId !== "hq" && run.launch && !story.flags.told_rope) {
           story.flags.told_rope = 1;
@@ -3409,9 +3461,17 @@ ounds; holds position while openly afraid.
         window.removeEventListener("pagehide", saveOnHide);
         document.removeEventListener("visibilitychange", saveOnHide);
         offHidden?.();
+        hq2.dispose();
         npc.dispose();
         unmountItems();
         const g2 = globalThis;
+        if (g2.__goeiStage === shell.stage) delete g2.__goeiStage;
+        const gt = globalThis;
+        if (gt.__goeiTouch === shell.touch) delete gt.__goeiTouch;
+        if (gt.__goeiInput === shell.input) delete gt.__goeiInput;
+        eileenHooks.sfx = noSfx;
+        const fx = globalThis;
+        if (fx.__goeiFieldFx === ffx) delete fx.__goeiFieldFx;
         delete g2.__goeiStory;
         delete g2.__goeiNpc;
         delete g2.__goeiStoryStart;
@@ -3419,11 +3479,15 @@ ounds; holds position while openly afraid.
         game = null;
         window.removeEventListener("keydown", storyKeys, true);
         offMapKey();
+        offAutoKey();
+        offTalkKey();
+        if (globalThis.__goeiAuto === pilot) delete globalThis.__goeiAuto;
         window.removeEventListener("keydown", titleInput, true);
         window.removeEventListener("pointerdown", titleInput, true);
         if (openingT) clearTimeout(openingT);
         window.removeEventListener("keydown", hqKeys, true);
         window.removeEventListener("keydown", floorKeys, true);
+        hq2.dispose();
         saveFlags();
         storyRoot.removeEventListener(VIDEO_AUDIO_EVENT, attachVideoAudio);
         story.dispose();
@@ -3729,7 +3793,7 @@ ounds; holds position while openly afraid.
     }
   }
   var mod = {
-    version: "0.17.8",
+    version: "0.18.0",
     mount: (box2, bridge) => mountPlay(box2, bridge)
   };
   globalThis.__goeiGame = mod;
