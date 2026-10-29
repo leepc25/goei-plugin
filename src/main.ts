@@ -113,10 +113,23 @@ function ensure(prompt = false): Promise<Body | null> {
 }
 
 async function onBeforeRequest<M>(messages: M[], type: string): Promise<M[]> {
-  if (body) return body.beforeRequest(messages as never, type) as Promise<M[]>;
-  if (type !== 'model' || !Array.isArray(messages) || !messages.some((m) => ours((m as { content?: unknown })?.content))) return messages;
-  const b = await ensure();
-  return b ? (b.beforeRequest(messages as never, type) as Promise<M[]>) : messages;
+  let b = body;
+  if (!b) {
+    if (type !== 'model' || !Array.isArray(messages) || !messages.some((m) => ours((m as { content?: unknown })?.content))) return messages;
+    b = await ensure();
+    if (!b) return messages;
+  }
+  try {
+    return (await b.beforeRequest(messages as never, type)) as M[];
+  } catch (error) {
+    // 본체가 통째로 던져도 요청은 막지 않는다: 본체의 sanitize 로 플러그인 표식만 지워 보내고(없으면 원문), 까닭은 로그로 (QC 개선 나3)
+    console.log(`[goei] 요청 처리기 실패(표식만 지우고 보냄): ${error instanceof Error ? error.message : String(error)}`);
+    try {
+      return typeof b.sanitize === 'function' ? (b.sanitize(messages as never) as M[]) : messages;
+    } catch {
+      return messages;
+    }
+  }
 }
 
 async function onOutput(arg: Parameters<Body['output']>[0]): Promise<void> {

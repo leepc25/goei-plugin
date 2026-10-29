@@ -39,6 +39,11 @@ const files = {};
   files['version.json'] = read('release/version.json');
 }
 const bodyIndex = JSON.parse(files['goei-body.json']);
+/** src/loader/body.ts bodyHash 와 같은 식 (sha256 만 어긋난 목록을 만들 때) */
+const fnv = (text) => { let h = 0x811c9dc5; for (let i = 0; i < text.length; i++) h = Math.imul(h ^ text.charCodeAt(i), 0x01000193) >>> 0; return h.toString(16).padStart(8, '0'); };
+/** 글자 하나를 바꾼 조각(길이 같음)과, 그 깨진 본체에 맞춘 hash 를 가진 목록 (sha256 은 원본 그대로 → sha256 확인만 걸린다) */
+const corruptPart = (name) => files[name].slice(0, 100) + '#' + files[name].slice(101);
+const corruptedBodyHash = (name) => fnv(bodyIndex.parts.map((n) => (n === name ? corruptPart(name) : files[n])).join(''));
 
 const otherBot = { name: '다른 봇', alternateGreetings: ['안녕'], globalLore: [{ comment: '내 로어', content: '글', key: 'x', mode: 'normal' }], additionalAssets: [] };
 const emptyBot = { name: '깡통봇', alternateGreetings: ['안녕'], globalLore: [], additionalAssets: [], image: 'assets/old-icon.png' };
@@ -146,6 +151,7 @@ let scene = 0;
 const skip = () => ++scene < from;
 
 /** Risu src/ts/plugins/apiV3/factory.ts 와 같은 격리: sandbox iframe + nonce CSP. 플러그인은 srcdoc 안에서 바로 돈다 */
+/** opts.insecure: 바깥 문서를 about:blank 로 (sandbox srcdoc 이 보안 컨텍스트가 아니라 crypto.subtle 이 없는 환경 흉내) */
 async function boot(chars, charIndex, chat, opts = {}) {
   const page = await browser.newPage({ viewport: { width: 1100, height: 900 } });
   const errors = [];
@@ -158,7 +164,8 @@ async function boot(chars, charIndex, chat, opts = {}) {
   const html = `<!DOCTYPE html><html><head><meta charset="utf-8"><meta http-equiv="Content-Security-Policy" content="${csp}" id="csp-meta"></head>`
     + `<body style="margin:0;height:100vh"><div class="default-chat-screen" style="height:100%;background:#f3f3f3"></div>`
     + `<script nonce="${nonce}">document.querySelector('meta#csp-meta')?.remove();\n${inner}</script></body></html>`;
-  await page.goto(outerUrl);
+  if (opts.insecure) await page.setContent(outer);
+  else await page.goto(outerUrl);
   await page.evaluate(({ html, csp }) => {
     const f = document.querySelector('iframe');
     f.sandbox.add('allow-scripts');
@@ -252,12 +259,20 @@ if (!skip()) {
   // 길이 불일치 (조각이 잘림)
   await frame.evaluate(() => { window.__fetchHook = (n) => (n === 'goei-body.2.txt' ? window.__files[n].slice(0, -10) : undefined); });
   assert.match(await retry(), /끝까지 받지 못했어요/, '길이 불일치');
-  // 지문 불일치 (길이는 같은데 글자가 바뀐 조각)
+  // 지문 불일치 (길이는 같은데 글자가 바뀐 조각). 플러그인 칸은 보안 컨텍스트라 sha256 으로 잡는다
+  assert.ok(await frame.evaluate(() => window.isSecureContext && !!crypto.subtle), '플러그인 칸이 보안 컨텍스트');
   await frame.evaluate(() => { window.__fetchHook = (n) => (n === 'goei-body.5.txt' ? window.__files[n].slice(0, 100) + '#' + window.__files[n].slice(101) : undefined); });
-  assert.match(await retry(), /깨져 있어요/, '지문 불일치');
+  assert.match(await retry(), /깨져 있어요\(sha256\)/, '지문 불일치 → sha256 에서 걸림');
   assert.equal(await frame.evaluate(() => window.__store['p:goei:body'] ?? null), null);
-  // 성공
-  await frame.evaluate(() => { window.__fetchHook = null; });
+  // sha256 불일치만 (개선 나2): 목록의 hash 를 깨진 본체에 맞춰 두어 hash 로는 못 잡는 경우도 sha256 이 잡는다
+  await frame.evaluate(({ hash }) => { window.__fetchHook = (n) => (n === 'goei-body.json' ? JSON.stringify({ ...JSON.parse(window.__files[n]), hash }) : n === 'goei-body.5.txt' ? window.__files[n].slice(0, 100) + '#' + window.__files[n].slice(101) : undefined); }, { hash: corruptedBodyHash('goei-body.5.txt') });
+  assert.match(await retry(), /깨져 있어요\(sha256\)/, 'sha256 불일치 → 다시 받기');
+  assert.equal(await frame.evaluate(() => window.__store['p:goei:body'] ?? null), null, '깨진 본체는 저장 안 함');
+  // sha256 이 없는 목록(hash 만, 0.17.9 개발 중 모양)이면 hash 로 잡는다
+  await frame.evaluate(() => { window.__fetchHook = (n) => (n === 'goei-body.json' ? JSON.stringify({ ...JSON.parse(window.__files[n]), sha256: undefined }) : n === 'goei-body.5.txt' ? window.__files[n].slice(0, 100) + '#' + window.__files[n].slice(101) : undefined); });
+  assert.match(await retry(), /깨져 있어요\(hash\)/, 'sha256 없는 목록은 hash 로');
+  // 성공: 옛 release 목록(hash·sha256 둘 다 없음)도 길이·판만 보고 그대로 통과 (호환)
+  await frame.evaluate(() => { window.__fetchHook = (n) => (n === 'goei-body.json' ? JSON.stringify({ ...JSON.parse(window.__files[n]), hash: undefined, sha256: undefined }) : undefined); });
   await frame.click('[data-gl="get"]');
   await waitFab(frame);
   assert.equal(await frame.locator('.gl-card').count(), 0, '받으면 창이 닫힘');
@@ -265,7 +280,30 @@ if (!skip()) {
   await frame.click('[x-goei-fab] button');
   await frame.waitForSelector('.gx-fac');
   await closeOf(page, errors);
-  ok('시작기 받기 실패: 받기 창 · 1분 억제 · 조각 404 · 판 불일치 · 길이 불일치 · 지문 불일치 · 다시 받기 성공');
+  ok('시작기 받기 실패: 받기 창 · 1분 억제 · 조각 404 · 판 불일치 · 길이 불일치 · 지문 불일치(sha256·sha256만·hash) · 옛 목록 호환 · 다시 받기 성공');
+}
+
+// ── 2-1) 보안 컨텍스트가 아닌 환경(about:blank 안 sandbox srcdoc, crypto.subtle 없음): sha256 을 못 내니 hash 로 확인하고, 맞으면 받는다
+if (!skip()) {
+  const { page, frame, errors } = await boot([fixture], 0, emptyChat(), { insecure: true });
+  await frame.waitForSelector('.gl-card', { timeout: 8000 });
+  assert.equal(await frame.evaluate(() => !window.isSecureContext && !(globalThis.crypto && crypto.subtle)), true, 'crypto.subtle 이 없는 환경');
+  const retry = async () => {
+    await frame.evaluate(() => { document.querySelector('.gl-msg').textContent = ''; });
+    await frame.click('[data-gl="get"]');
+    await frame.waitForFunction(() => { const m = document.querySelector('.gl-msg'); return m && !m.hidden && m.textContent && m.textContent !== '받는 중'; }, null, { timeout: 15000 });
+    return panelMsg(frame);
+  };
+  await serve(frame, bodyFiles);
+  await frame.evaluate(() => { window.__fetchHook = (n) => (n === 'goei-body.5.txt' ? window.__files[n].slice(0, 100) + '#' + window.__files[n].slice(101) : undefined); });
+  assert.match(await retry(), /깨져 있어요\(hash\)/, 'sha256 을 못 내면 hash 경로로 떨어져 잡는다');
+  assert.equal(await frame.evaluate(() => window.__store['p:goei:body'] ?? null), null);
+  await frame.evaluate(() => { window.__fetchHook = null; });
+  await frame.click('[data-gl="get"]');
+  await waitFab(frame);
+  assert.equal(await frame.evaluate(() => window.__store['p:goei:body'].length), bodyCode.length, 'hash 가 맞으면 받아서 실행');
+  await closeOf(page, errors);
+  ok('보안 컨텍스트 아님: sha256 대신 hash 로 확인 (불일치 잡음 · 일치 통과)');
 }
 
 // ── 3) 파일로 넣기: 다른 판 · 깨진 파일(실행 안 됨: 창 유지·저장 안 함) · 맞는 판. 닫기
