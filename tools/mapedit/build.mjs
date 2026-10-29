@@ -24,7 +24,8 @@ const props = readdirSync(dir).filter((f) => /^(jo_|jc_).*\.webp$/.test(f) && LA
 // 기본 캐릭터: 에일린 서기 첫 장(128×256)을 잘라 PNG로 (sharp 없이: 원본 webp를 그대로 쓰고 에디터가 첫 장만 자른다)
 // 테스트룸 8방향 의자(PixelLab, 1배 = 에일린과 같은 점 크기)
 const DIRS = [['south', '남'], ['south-east', '남동'], ['east', '동'], ['north-east', '북동'], ['north', '북'], ['north-west', '북서'], ['west', '서'], ['south-west', '남서']];
-const chairs = [['c01', 'C01 사무의자'], ['c02', 'C02 기댄 사무의자']].map(([set, label]) => ({ set, label,
+// anchor = 바닥 가운데(원본 200칸의 100,171)를 8방향 합집합으로 자른 그림 안 좌표
+const chairs = [['c01', 'C01 사무의자', [50, 135]], ['c02', 'C02 기댄 사무의자', [63, 134]]].map(([set, label, anchor]) => ({ set, label, anchor,
   dirs: DIRS.map(([d, k]) => ({ d, k, url: 'data:image/png;base64,' + readFileSync(`game-src/art/objects/chairs/${set}_${d}.png`).toString('base64') })) }));
 const charUrl = 'data:image/png;base64,' + readFileSync('tools/mapedit/eileen_stand.png').toString('base64');
 const html = readFileSync('tools/mapedit/index.html', 'utf8')

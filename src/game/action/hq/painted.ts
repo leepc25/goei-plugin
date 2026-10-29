@@ -55,9 +55,14 @@ export interface PaintedScene {
   /** 바깥 풍경을 색으로 고르지 않고 다각형 전체를 고르게 덮는다 (유리 현관처럼 바깥이 통째로 보이는 곳). keep = 앞에 놓인 화분 등은 빼기: 'green'이면 잎(초록) 픽셀만, 'all'이면 상자 전부 */
   outsideSolid?: { keep: [number, number, number, number, 'green' | 'all'][] };
   objects: PaintedObject[];
+  /** 못 지나가는 바닥 다각형(맵 에디터 막힘, 윗면 높이 400 이상). 발이 안에 들어가면 가장 가까운 바깥으로 밀어낸다 */
+  holes?: [number, number][][];
+  /** 사람 앞줄 도트 배율(월드 px / 도트). 세로 890 화면 기준 앞 1.5배를 장면 세로에 맞춘 값(1.5 × h / 890). 없으면 CHAR_K */
+  dotK?: number;
 }
 
 import { JR_ROOMS } from './jrRooms.gen';
+import { MAPEDIT_SCENES } from './mapedit.gen';
 import { JR_CUTS } from './jrCuts.gen';
 
 const downs = (xs: number[], y = 18): PaintedLamp[] => xs.map((x) => ({ x, y, kind: 'down' as const }));
@@ -232,6 +237,11 @@ export const PAINTED: Record<string, PaintedScene> = {
 
 // 중림 장면에서 오린 소품(가림용): tools/jr/cuts.py
 for (const [k, cs] of Object.entries(JR_CUTS)) if (PAINTED[k] && k !== 'jr_heolgap') PAINTED[k].objects = [...PAINTED[k].objects, ...cs];
+// 맵 에디터로 만든 장면(tools/mapedit/import.py → mapedit.gen.ts)이 있으면 그것으로 바꾼다. 출입구·조명을 안 찍었으면 원래 것을 쓴다
+for (const [k, m] of Object.entries(MAPEDIT_SCENES)) {
+  const base = PAINTED[k];
+  PAINTED[k] = { ...base, ...m, doors: Object.keys(m.doors).length || !base ? m.doors : base.doors, lamps: m.lamps.length || !base ? m.lamps : base.lamps } as PaintedScene;
+}
 
 /** 문 가운데 x */
 export const doorX = (scene: string, id: string) => {
@@ -243,11 +253,19 @@ export const doorX = (scene: string, id: string) => {
 export const PAINTED_LANE: [number, number] = [440, 669];
 
 /** 옆벽·튀어나온 벽 바깥으로 나간 발을 바닥 안으로 되돌린다 */
-export function clampPainted(scene: string, x: number, y: number): { x: number; y: number } {
+export function clampPainted(scene: string, x: number, y: number, z = 0): { x: number; y: number } {
   const p = PAINTED[scene];
   if (!p) return { x, y };
-  if (p.floor) return inPolygon(p.floor, x, y) ? { x, y } : nearestInside(p.floor, x, y);
-  return { x, y };
+  let q = p.floor && !inPolygon(p.floor, x, y) ? nearestInside(p.floor, x, y) : { x, y };
+  for (const h of p.holes ?? []) if (inPolygon(h, q.x, q.y)) q = nearestOutside(h, q.x, q.y, p.floor);
+  // 맵 에디터 발판(윗면 높이 있는 네모): 그 높이보다 낮게 있으면 벽처럼 정확히 막는다 (위에 올라서 있거나 뛰어넘는 중이면 통과)
+  if (p.holes) for (const o of p.objects) for (const b of o.solid ?? []) {
+    if (b.h === undefined || z >= b.h - 6) continue;
+    const r: [number, number][] = [[b.x0, b.y0], [b.x1, b.y0], [b.x1, b.y1], [b.x0, b.y1]];
+    if (inPolygon(r, q.x, q.y)) q = nearestOutside(r, q.x, q.y, p.floor);
+  }
+  if (p.floor && !inPolygon(p.floor, q.x, q.y)) q = nearestInside(p.floor, q.x, q.y);
+  return q;
 }
 
 function inPolygon(poly: [number, number][], x: number, y: number): boolean {
@@ -272,6 +290,21 @@ function nearestInside(poly: [number, number][], x: number, y: number): { x: num
   const cx = poly.reduce((s, p) => s + p[0], 0) / poly.length, cy = poly.reduce((s, p) => s + p[1], 0) / poly.length;
   const k = 2 / (Math.hypot(cx - best.x, cy - best.y) || 1);
   return { x: best.x + (cx - best.x) * k, y: best.y + (cy - best.y) * k };
+}
+
+/** 막힘 다각형 안의 발을 가장 가까운 변 바깥으로 (변의 법선 쪽 중 다각형 밖이고 바닥 안인 쪽으로 2px) */
+function nearestOutside(poly: [number, number][], x: number, y: number, floor?: [number, number][]): { x: number; y: number } {
+  const cands: { x: number; y: number; d: number }[] = [];
+  for (let i = 0; i < poly.length; i++) {
+    const [ax, ay] = poly[i], [bx, by] = poly[(i + 1) % poly.length];
+    const dx = bx - ax, dy = by - ay, L = dx * dx + dy * dy || 1, n = Math.sqrt(L);
+    const t = Math.max(0, Math.min(1, ((x - ax) * dx + (y - ay) * dy) / L));
+    const qx = ax + dx * t, qy = ay + dy * t, d = (qx - x) ** 2 + (qy - y) ** 2;
+    for (const sgn of [1, -1]) cands.push({ x: qx - (dy / n) * 2 * sgn, y: qy + (dx / n) * 2 * sgn, d });
+  }
+  cands.sort((a, b) => a.d - b.d);
+  const ok = cands.find((c) => !inPolygon(poly, c.x, c.y) && (!floor || inPolygon(floor, c.x, c.y)));
+  return ok ?? cands.find((c) => !inPolygon(poly, c.x, c.y)) ?? { x, y };
 }
 
 /** 문 앞에서 E가 닿는 깊이 한계(발 y): 문 그림 아래 끝 + 75 (옆벽 문은 사다리꼴 아래 끝) */

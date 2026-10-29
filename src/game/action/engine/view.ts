@@ -4,8 +4,12 @@
 // 사람 그림은 zoom을 되돌려 도트 1칸이 늘 PIXEL 화면 px이 되게 하고, 원근(뒤로 갈수록 작게)을 곱한다.
 /** worldH: 장면 세로(월드 px). 관리국 그림 배경은 700, 나머지는 720. 필드(PC) 확대는 장면과 상관없이 고정(game.ts BASE_ZOOM), 폰은 이 높이를 창에 꽉 맞춘다 */
 /** w: 화면에 보이는 월드 폭. 기본 1280, 필드 무확대에서 창이 넓으면 그만큼 넓다 (카메라·그리는 범위가 이걸 따른다) */
-export const view = { crop: 0, cropY: 0, zoom: 1, lane: [440, 690] as [number, number], worldH: 720, w: 1280, hub: false };
+export const view = { crop: 0, cropY: 0, zoom: 1, lane: [440, 690] as [number, number], worldH: 720, w: 1280, hub: false,
+  /** 사람 그림 배율에 더 곱할 값. 장면에 dotK(앞줄 도트 배율)가 있으면 dotK / CHAR_K, 아니면 1 (hub.ts가 장면에 들어갈 때 정한다) */
+  charMul: 1 };
 
+/** 에일린 그림 배율 (사용자 2026-10-25: 문에 비해 작다 → 처음 맞춰 본 크기로). 걷는 띠 가운데쯤(y500)에서 약 270px, 맨 뒤 260px · 맨 앞 305px. 장면 dotK가 있으면 view.charMul로 바꾼다 */
+export const CHAR_K = 1.28;
 /** 필드 원근: 줄 맨 뒤 0.85배 ~ 맨 앞 1배 */
 export const FAR = 0.85;
 export const persp = (y: number) => {
@@ -14,7 +18,7 @@ export const persp = (y: number) => {
   return FAR + (1 - FAR) * t;
 };
 /** 발 y에 선 사람 그림의 배율 (월드 좌표 기준). 배경과 같이 커지고 작아진다 (사용자 2026-10-25: 캐릭터만 작아지면 안 됨) */
-export const spr = (y: number) => persp(y);
+export const spr = (y: number) => persp(y) * view.charMul;
 /** 사람 그림 원점을 (x, y)로 옮기되 화면 픽셀 정수에 붙인다 (필드는 월드를 zoom배로 그려서 월드 정수 좌표가 화면 소수 px이 된다) */
 export function snapTo(c: CanvasRenderingContext2D, x: number, y: number) {
   c.translate(x, y);

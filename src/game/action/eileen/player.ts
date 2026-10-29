@@ -4,7 +4,7 @@
 import { Player } from '../engine/player';
 import { Fighter } from '../engine/fighter';
 import { newAttackId } from '../engine/ids';
-import { spr } from '../engine/view';
+import { CHAR_K, spr } from '../engine/view';
 import { pfont } from '../engine/pxfont';
 import { eileenArt } from '../art/testPeople';
 import type { Body, Hit, HitResult, React, WBox, WorldView } from '../engine/contract';
@@ -14,8 +14,7 @@ import { createEileenCore } from './core';
 import { drawEileen3D } from './three3d';
 
 /** 테스트룸 동작 이름 ↔ 엔진 버튼 */
-/** 에일린 그림 배율 (사용자 2026-10-25: 문에 비해 작다 → 처음 맞춰 본 크기로). 걷는 띠 가운데쯤(y500)에서 약 270px, 맨 뒤 260px · 맨 앞 305px */
-export const CHAR_K = 1.28;
+export { CHAR_K };
 /** 테스트룸 동작 이름 ↔ 엔진 버튼 */
 const PRESS: [Btn, string][] = [
   ['light', 'light'], ['heavy', 'heavy'], ['dodge', 'dodge'], ['block', 'block'], ['shoot', 'shoot'],
@@ -72,7 +71,8 @@ export class EileenPlayer extends Player {
       draw3d: drawEileen3D,
       targets: () => this.targets(),
       // 물건 윗면은 이미 그 높이에 있을 때만 땅이다 (아래에서 걸어 들어가면 올라서지 않고 막힌다)
-      ground: (x: number, y: number) => { const p = this.platformAt(x, y); return p && this.core.P.z >= p.h - 10 ? p.h : 0; },
+      // 내려앉기 허용 30px: 떨어지는 속도(30Hz 한 틱에 20px 넘게)로 윗면을 지나쳐 버리지 않게
+      ground: (x: number, y: number) => { const p = this.platformAt(x, y); return p && this.core.P.z >= p.h - 30 ? p.h : 0; },
       hurt: (t: { body: Body }, dmg: number, kind: string, face: 1 | -1, hitstop: number, o: { push?: number }) => this.hurtTarget(t.body, dmg, kind, face, hitstop, o),
       clamp: (P: { x: number; y: number }) => {
         const w = this.world;

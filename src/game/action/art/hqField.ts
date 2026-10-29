@@ -5,9 +5,10 @@ import { PAINTED, type PaintedDoor, type PaintedScene } from '../hq/painted';
 import { view } from '../engine/view';
 import { JR_ROOM_FILES } from '../hq/jrRooms.gen';
 import { JR_CUT_FILES } from '../hq/jrCuts.gen';
+import { MAPEDIT_FILES } from '../hq/mapedit.gen';
 
 const FILES = ['lobby', 'f2', 'f3', 'b1', 'b2', 'b3', 'desk'];
-const JR_FILES = ['jr_entry', 'jr_b1', 'jr_alley', 'jr_b2', 'jr_heolgap2', ...JR_ROOM_FILES, ...JR_CUT_FILES];
+const JR_FILES = ['jr_entry', 'jr_b1', 'jr_alley', 'jr_b2', 'jr_heolgap2', ...JR_ROOM_FILES, ...JR_CUT_FILES, ...MAPEDIT_FILES];
 let images: Record<string, HTMLImageElement> | null = null;
 let revision = 0;
 declare global { interface Window { __GOEI_HQ_FIELD__?: Record<string, string> } }

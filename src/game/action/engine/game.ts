@@ -153,6 +153,7 @@ export class Game {
         const vw = this.canvas.width / view.zoom;
         view.w = this.inHub ? Math.max(SCREEN_W, vw) : SCREEN_W;
         view.hub = this.inHub;
+        if (!this.inHub) view.charMul = 1;   // 전투 장면은 기본 사람 배율
         // 화면 밀기는 그림과 같은 보간 위치로 (틱 위치로 하면 걸을 때 화면이 30Hz로 툭툭 따라가 캐릭터가 떨린다).
         // 렌더러는 camX를 정수로 반올림하므로, 둘을 합한 이동이 화면 px 정수가 되게 crop을 맞춘다
         view.crop = 0;

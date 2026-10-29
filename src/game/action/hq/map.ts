@@ -7,6 +7,7 @@ import type { HqSave } from './state';
 import { placeOpen } from './logic';
 import { ROOMS, mirror, type Room, type RoomFix } from './rooms';
 import { PAINTED, PAINTED_LANE, doorX } from './painted';
+import { MAPEDIT_SPOTS } from './mapedit.gen';
 import { JR_ROOM_SPOTS } from './jrRooms.gen';
 
 export type SceneId =
@@ -269,7 +270,7 @@ export const HQ_SCENES: HqScene[] = [
   ]),
   // 가게 안 (GPT 빈 방 + GPT 가구, tools/jr/rooms.py)
   floorHall('jr_daebak', '대박 알선', 'B1', [{ id: 'out', kind: 'glass', to: 'jr_b1', toDoor: 'daebak', label: '나가기' }], { spots: JR_ROOM_SPOTS.jr_daebak }),
-  floorHall('jr_heolgap', '헐값 매입', 'B1', [{ id: 'out', kind: 'exit', side: 'S', to: 'jr_alley', toDoor: 'heolgap', label: '나가기' }], { spots: JR_ROOM_SPOTS.jr_heolgap }),
+  floorHall('jr_heolgap', '헐값 매입', 'B1', [{ id: 'out', kind: 'exit', side: 'S', to: 'jr_alley', toDoor: 'heolgap', label: '나가기' }], { spots: MAPEDIT_SPOTS.jr_heolgap ?? JR_ROOM_SPOTS.jr_heolgap }),
   floorHall('jr_youngchang', '영창 컨설팅', 'B2', [{ id: 'out', kind: 'steel', to: 'jr_b2', toDoor: 'youngchang', label: '나가기' }], { spots: JR_ROOM_SPOTS.jr_youngchang }),
   floorHall('jr_songil', '손길 의원', 'B1', [
     { id: 'out', kind: 'glass', to: 'jr_b1', toDoor: 'songil', label: '나가기' },

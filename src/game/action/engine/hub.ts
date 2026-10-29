@@ -13,7 +13,7 @@ import { drawHqDoorRound2 } from '../art/hqDoorRound2';
 import { drawCallLit, drawDepartArrow, drawHqField, drawHqFieldLight, drawHqFieldObject, drawHqSigns, hasHqField } from '../art/hqField';
 import { drawVisitAgent, visitAgentTop } from '../art/visitAgents';
 import { drawTestMan, hasTestPeople, testManTop, testPlayerTop } from '../art/testPeople';
-import { persp, view as fieldView } from './view';
+import { CHAR_K, persp, spr, view as fieldView } from './view';
 import { blockByProps, clearSpot, type BlockProp } from './propBlock';
 import { PAINTED, clampPainted, doorReachY } from '../hq/painted';
 import { LANE_BOT, LANE_TOP, type HqBox, type HqDoor, type HqMapView, type HqScene, type HqSpot } from '../hq/map';
@@ -148,6 +148,8 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
     // 필드 시험: 사무실에 서 있는 남자 (임시)
     const man = sc.id === 'office' && hasTestPeople() ? { x: 900, y: 560 } : null;
     solids = [...(man ? [{ x: man.x, y: man.y, w: 70, back: 20, front: 20 }] : []), ...sc.boxes.filter((b) => b.solid).map((b) => ({ x: b.x, y: b.y, w: b.w, back: b.d + 6, front: 8, h: sc.painted ? b.h : undefined })), ...people.map((p) => ({ x: p.x, y: p.y, w: 80, back: 24, front: 24 }))];
+    // 사람 배율: 장면 그림이 정한 앞줄 도트 배율(세로 890 기준 앞 1.5배를 장면 세로에 맞춘 값)이 있으면 그걸로
+    fieldView.charMul = sc.painted && PAINTED[sc.painted]?.dotK ? PAINTED[sc.painted].dotK! / CHAR_K : 1;
     const len = Math.max(SCREEN_W, sc.length);
     const sx = Math.max(60, Math.min(len - 60, x));
     arrive = { x: sx, y };
@@ -227,7 +229,7 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
         c.scale(1 / z, 1 / z);
         // 사람 그림은 월드 배율로 그려지므로(배경과 같이 커짐) 머리 높이도 z를 곱한다
         const shown = host.life ? live.filter((a) => a.kind === 'named') : people;
-        host.overlay?.(c, shown.map((p) => ({ name: p.name, x: p.x * z, y: p.y * z, top: visitAgentTop(p.name) * persp(p.y) * z })), { name: '', x: w.player.x * z, y: (w.player.y - w.player.z) * z, top: (hasTestPeople() ? testPlayerTop() : visitAgentTop('쟈알디')) * persp(w.player.y) * z });
+        host.overlay?.(c, shown.map((p) => ({ name: p.name, x: p.x * z, y: p.y * z, top: visitAgentTop(p.name) * spr(p.y) * z })), { name: '', x: w.player.x * z, y: (w.player.y - w.player.z) * z, top: (hasTestPeople() ? testPlayerTop() : visitAgentTop('쟈알디')) * spr(w.player.y) * z });
         c.restore();
         // 행위자 머리 위 아이콘·말풍선 (화면 px)
         if (host.life) {
@@ -235,7 +237,7 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
           c.scale(1 / z, 1 / z);
           for (const a of live) {
             if (!a.icon && !a.say) continue;
-            const top = (a.kind === 'named' ? visitAgentTop(a.name) : hasTestPeople() ? testManTop() : -230) * persp(a.y);
+            const top = (a.kind === 'named' ? visitAgentTop(a.name) : hasTestPeople() ? testManTop() : -230) * spr(a.y);
             drawHeadBubble(c, a.x * z, (a.y + top) * z - 8, a.say ?? a.icon!, !!a.say);
           }
           c.restore();
@@ -352,7 +354,7 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
       if (solids.length && !(p as Player).seat) blockByProps([p as never], solids.filter((s) => !(s.h !== undefined && p.z >= s.h - 6)), scene?.lane ?? LANE);
       if (scene?.painted) {
         // 그림 층: 양 끝 옆벽·튀어나온 벽 바깥으로 못 간다
-        const q = clampPainted(scene.painted, p.x, p.y);
+        const q = clampPainted(scene.painted, p.x, p.y, p.z);
         if (q.x !== p.x || q.y !== p.y) a.movePlayer(q.x, q.y);
       }
       // E가 닿는 것 하나만 엔진 소품으로 (엔진은 x 거리만 보므로 깊이는 여기서 고른다)
@@ -372,7 +374,7 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
           // 말하는 사람이 이 방에 서 있으면 그 머리 위, 아니면 그 자리 위
           const who = curPeople.find((q) => q.name === l.who);
           const x = who?.x ?? sp.x, y = who?.y ?? sp.y ?? p.y;
-          speech = { who: l.who, text: l.text, x, y, top: (who ? visitAgentTop(l.who) : -200) * persp(y), until: performance.now() + 3800 };
+          speech = { who: l.who, text: l.text, x, y, top: (who ? visitAgentTop(l.who) : -200) * spr(y), until: performance.now() + 3800 };
         }
       } else if (!sp) barked = null;
     },
@@ -899,7 +901,7 @@ function drawLiveActor(c: CanvasRenderingContext2D, a: LiveActor, life: HubLife)
 }
 /** 그림이 없을 때 대역: 바닥 그림자 + 회색 몸 (검수 전 표시) */
 export function silhouette(c: CanvasRenderingContext2D, a: { x: number; y: number; kind: 'named' | 'mob' }): void {
-  const k = persp(a.y);
+  const k = spr(a.y);
   const h = 230 * k, w = 64 * k;
   c.save();
   c.fillStyle = 'rgba(0,0,0,0.28)';
