@@ -11,7 +11,7 @@ import { drawGuardBar } from '../ui/pixelHud';
 import { EileenPlayer } from '../eileen/player';
 import { Room3Player, room3Hooks } from '../room3/player';
 import { AiRoom3 } from '../room3/ai';
-import { charArt, charFace, charTop, drawCharClip, hasCharClip, loadChar } from '../art/charPacks';
+import { charArt, charFace, charTop, drawCharClip, hasCharClip, hasCharPacks, loadChar } from '../art/charPacks';
 import { setPixelScale } from './contract';
 import { mountTalk } from '../../talk';
 import { createGameAudio } from '../audio';
@@ -260,7 +260,8 @@ function hqAdapter(bridge: Partial<GameBridge> | undefined, ui: { chooseFloor: H
     hit: (sceneId, boxes, dir) => world()?.hitBoxes(sceneId, boxes, dir).length ?? 0,
     actors: (sceneId) => (world()?.inScene(sceneId) ?? []).map((a) => ({ id: a.def.id, name: a.def.name, kind: a.def.kind, x: a.x, y: a.y, face: a.face, look: a.def.look, moving: a.act === 'walk', clip: a.clip, since: a.clipAt, icon: a.icon, say: a.say })),
     observer: (sceneId) => (observing && sim ? observerLines(sim, clockView(), sceneId, seed) : null),
-    drawMob: (c, a) => { if (!drawTestMan(c, a.x, a.y, a.face)) silhouette(c, a); },
+    // 몹: 인물 팩(look = NPC 원형 이름, 받아 둔 것) → 인물 팩이 아예 없을 때만 옛 Test man → 실루엣
+    drawMob: (c, a) => { if (a.look && drawCharClip(c, a.look, a.x, a.y, a.face, performance.now(), a.clip, (a.since ?? 0) * 1000)) return; if (hasCharPacks() || !drawTestMan(c, a.x, a.y, a.face)) silhouette(c, a); },
   };
   const visitors = (sceneId: string) => {
     const here = present.filter((p) => ROOM_SCENE[p.room] === sceneId && (hasVisitAgent(p.name) || !!charArt(p.name)));
