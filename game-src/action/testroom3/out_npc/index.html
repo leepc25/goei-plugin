@@ -322,7 +322,7 @@ function posOf(s, c) {
   if (s.at === 'front') return { x: P.x + f * (s.dx ?? 150) * k, gy: P.y, hy: P.y - (s.h ?? 110) * k, k };
   const m = c.o || muzzle(); return { x: m.x + f * (s.dx || 0) * k, gy: P.y, hy: m.y + (s.dy || 0) * k, k };
 }
-const near = (x, gy, rx, ry = 70) => showDummy && Math.abs(D.x - x) < rx && Math.abs(D.y - gy) < ry;
+const near = (x, gy, rx, ry = 90) => showDummy && Math.abs(D.x - x) < rx && Math.abs(D.y - gy) < ry;   // 줄 차이 70 → 90(10-29 밤 사용자: 판정이 너무 엄격)
 // 맞았을 때만: 멈춤·흔들림·타격 그림
 function strike(h, y) {
   if (!h) return;
@@ -449,7 +449,7 @@ const FX = {
   },
   // 앞 범위 타격(그림 없는 판정 상자)
   // melee 사거리는 평타(170)만큼은 닿게(10-29: 140 같은 짧은 사거리는 평타 거리의 상대를 못 맞혔음)
-  melee(s, c) { const r = Math.max(s.range || 170, 175) * K(P.y), x = P.x + P.face * r * 0.6; if (near(x, P.y, r * 0.6 + 30, s.depth || 64) && (D.x - P.x) * P.face > -20) strike(s.hit); },
+  melee(s, c) { const r = Math.max(s.range || 170, 175) * K(P.y), x = P.x + P.face * r * 0.6; if (near(x, P.y, r * 0.6 + 40, s.depth || 90) && (D.x - P.x) * P.face > -20) strike(s.hit); },   // 깊이 64 → 90, 앞 여유 +10(10-29 밤)
   // 바닥 가시: 검은 바늘 n개가 솟음
   spikes(s, c) {
     const p = posOf({ at: 'front', ...s }, c), n = s.n || 5, sp = (s.spread || 70) * p.k;
@@ -569,7 +569,7 @@ const FX = {
     later(tt, () => { sparks(gx, gy - 3, 4, false, '#ffe9a0'); if (Math.random() < 0.4) dust(gx, gy, 1, 0.4); });
     shake = Math.max(shake, 1.5);
     const ddx = (D.x - p.x) * dir;
-    if (showDummy && ddx > 30 && ddx < dist + 40 && Math.abs(D.y - P.y) < 70) {
+    if (showDummy && ddx > 30 && ddx < dist + 40 && Math.abs(D.y - P.y) < 90) {   // 줄 차이 70 → 90(10-29 밤)
       const bulletY = p.y + ddx * Math.tan(ang), dk = K(D.y);
       if (bulletY > D.y - D.z - 220 * dk && bulletY < D.y - D.z + 10) later(ddx / 3200, () => { hurtDummy(s.dmg || 7, 'light'); D.vx += dir * 140; D.stag = Math.max(D.stag, 0.45); vfx('bullet_hit_body', D.x - dir * 10, bulletY, 2); hitstop = Math.max(hitstop, 0.012); shake = Math.max(shake, 3); });
     }
