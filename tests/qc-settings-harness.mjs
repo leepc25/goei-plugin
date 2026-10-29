@@ -31,7 +31,7 @@ const worldPack = distWorldPack();
 const served = distPackFiles('goei-data-install');
 
 /** 가짜 risuai (tests/browser.mjs hostScript 와 같음 + 리스너 세기) */
-export function hostScript(char, chat, { rootDom = true, noBody = false } = {}) {
+export function hostScript(char, chat, { rootDom = true, noBody = false, store = {} } = {}) {
   return `
     window.__calls = { setChat: [], show: [], hide: 0, replacers: [], listeners: [], handlers: {}, setChar: 0 };
     // document 전체 리스너 수 (창 열기/닫기 누수 측정): 플러그인이 붙인 것만 센다
@@ -62,7 +62,8 @@ export function hostScript(char, chat, { rootDom = true, noBody = false } = {}) 
       hasClass: async (c) => el.classList.contains(c),
       textContent: async () => el.textContent,
     });
-    window.__store = {};
+    // store: 미리 넣어 둘 저장소 항목 (새로 고침 뒤 기기 설정이 유지되는지 볼 때: { 'p:goei:prefs': … })
+    window.__store = ${JSON.stringify(store)};
     if (!${noBody}) window.__store['p:goei:body'] = ${JSON.stringify(bodyCode)};
     if (!${noBody}) window.__store['p:goei:data-world'] = ${JSON.stringify(worldPack)};
     window.__files = ${JSON.stringify(served)};

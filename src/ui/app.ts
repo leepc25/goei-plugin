@@ -19,6 +19,7 @@ import { savePrefs } from '../host/prefs';
 import { editorOnSettings, editorOpen, openEditor, render as editorRender, type EditorNode } from './editor/index';
 import { agentPanel, agentPopup, agUi, bindAgentTips, type AgentItem } from './agents';
 import css from './style.css';
+import { frameHtml, frameState } from './frame';
 import { GHOST_ICON, ICONS } from './icons';
 import { labelSwitches } from './controls';
 import { bindMbar, mbarHtml } from './mbar';
@@ -296,6 +297,14 @@ function ensureRoot(): HTMLElement {
   if (!widthWatch) {
     widthWatch = true;
     matchMedia('(max-width: 760px)').addEventListener?.('change', () => root && render());
+    // 창 둘레 기기 틀: 뷰포트 폭·필드 전체화면이 바뀌어 그릴지 말지가 달라질 때만 다시 그린다 (ui/frame.ts)
+    const frameWatch = () => {
+      if (!root || root.style.display === 'none') return;
+      const fr = frameState(getPrefs().frame, view.kind === 'started');
+      if (root.dataset.frame !== fr.kind || (root.dataset.frameHidden === '1') !== fr.hidden) render();
+    };
+    window.addEventListener('resize', frameWatch);
+    document.addEventListener('fullscreenchange', frameWatch);
   }
   root.addEventListener('paste', (ev) => {
     const prefix = photoTarget(ev.target);
@@ -1108,8 +1117,14 @@ function render(): void {
   root.dataset.wikiSide = pf.wikiSide ?? 'left';
   // --dim은 글자색 변수라 겹치면 안 된다. 테마별 막 색에 투명도만 바꿔 바로 칠함
   paintVeil(root, pf.dim ?? DIM_DEFAULT);
+  // 창 둘레 기기 틀 (설정 → 화면 「외부 프레임」, PC만, ui/frame.ts). 창 크기는 그대로, 틀만 바깥으로. 좁으면 틀만 숨긴다
+  const fr = frameState(pf.frame, nav);
+  root.dataset.frame = fr.kind;
+  if (fr.hidden) root.dataset.frameHidden = '1';
+  else delete root.dataset.frameHidden;
   // 시작 전(고르기·첫 장면) 화면은 PC에서 설정 화면 폭만큼만 (너무 넓으면 가운데만 차고 양옆이 빈다)
-  root.innerHTML = `<div class="gx-panel${nav ? ' has-nav' : ' pre'}">${body()}</div>`;
+  const panel = `<div class="gx-panel${nav ? ' has-nav' : ' pre'}">${body()}</div>`;
+  root.innerHTML = fr.kind === 'none' ? panel : frameHtml(fr.kind, !nav, panel);
   // 명부 통합 검색에서 고른 줄로 (위쪽 고정 줄에 가리지 않게 가운데로)
   if (dirUi.scrollTo) {
     dirUi.scrollTo = '';
