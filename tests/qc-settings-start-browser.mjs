@@ -164,8 +164,8 @@ for (const vp of vps) {
   assert.ok((await page.textContent('.gx-head small')).includes('다시 고를 수 있어요'));
   // 시작 전(staged) 설정 창: 「이 채팅」 없음, 테마를 바꾸면 이 채팅에도 적힌다
   await openEditor(page, 'set:screen');
-  assert.equal(await page.$('.gw-set [data-action="set-scope"][data-value="chat"]'), null, '시작 전에는 「이 채팅」 범위 없음');
-  assert.ok((await page.textContent('.gw-where')).includes('시작 전'));
+  assert.equal(await page.$('.gw-set [data-action="set-bar"]'), null, '시작 전에는 기본값으로 저장·불러오기 없음 (기본값을 바로 고침)');
+  assert.ok(await page.$('.gw-brand svg'), '머리는 유령 아이콘 + 설정');
   await page.evaluate(() => document.querySelector('.gw-set [data-action="set-theme"][data-value="light"]').click());
   await page.waitForFunction(() => window.__chat.scriptstate.$st_fixed_theme === 'light' && JSON.parse(window.__store['p:goei:prefs']).theme === 'light');
   assert.equal(await page.evaluate(() => document.querySelector('.gx').dataset.theme), 'light', '창 배색도 바로');
@@ -181,14 +181,14 @@ for (const vp of vps) {
   // 기본값 되돌리기 (다음 뷰포트에 영향 없게 새 페이지를 쓰지만 저장소도 비운다)
   await page.evaluate(() => { delete window.__store['p:goei:prefs']; });
 
-  // 시작 뒤 설정 창: 범위 「이 채팅」 기본, 「새 채팅 기본값」 전환
+  // 시작 뒤 설정 창: 범위 칩 없이 늘 이 채팅, 머리에 「기본값으로 저장」「기본값 불러오기」 (2026-10-29)
   await closeWin(page);
   await setChat(page, { message: [{ role: 'user', data: 'hi' }, { role: 'char', data: '본문' }], scriptstate: { ...again.scriptstate } });
   await openWin(page);
   await page.waitForSelector('.gx-tabhead');
   await openEditor(page, 'set:board');
-  assert.ok(await page.$('.gw-set [data-action="set-scope"][data-value="chat"].on'), '시작 뒤 기본 범위는 이 채팅');
-  assert.ok((await page.textContent('.gw-where')).includes('현재 채팅'));
+  assert.equal(await page.$('.gw-set [data-action="set-scope"]'), null, '범위 칩 없음');
+  assert.equal(await page.locator('.gw-set [data-action="set-bar"]').count(), 2, '시작 뒤 기본값으로 저장·불러오기');
   await closeEditor(page);
   await closeWin(page);
 

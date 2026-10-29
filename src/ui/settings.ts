@@ -44,7 +44,7 @@ export function resetSettings(): void {
 
 import { updateGroup } from './update';
 import { handleVisitSettings, visitSettings, visitUi } from './visitset';
-import { defaultsButtons, defaultsConfirm, MAIN_PREFIXES } from './defaults';
+import { ALL_PREFIXES, defaultsButtons, defaultsConfirm } from './defaults';
 import { PP, ppValue } from '../core/people/settings';
 import { phoneSettingsPane } from './phone';
 import { gnetSettingsPane } from './gnet';
@@ -167,8 +167,8 @@ function worldKind(w: WorldSettings, k: 'preset' | 'random' | 'incident' | 'myst
 // 명부에서는 카드 로어북을 저장하고 불러온다. 누르면 확인을 한 번 더 받는다.
 const CONFIRM: Record<'chat' | 'card', Record<'save' | 'load', [string, string]>> = {
   chat: {
-    save: ['지금 설정으로 새 채팅 기본값을 덮어쓸까요?', '덮어쓰기'],
-    load: ['저장해 둔 기본값을 지금 채팅에 불러올까요? 상황판 켜기·끄기는 그대로 둬요.', '불러오기'],
+    save: ['이 채팅의 설정 전부(캐릭터 이미지·상황판·괴담넷·괴담톡·위키·필드·인물 기록·고급)를 새 채팅 기본값으로 저장할까요? 앞으로 새로 시작하는 채팅이 이 값으로 시작해요.', '저장'],
+    load: ['저장해 둔 새 채팅 기본값 전부를 이 채팅에 불러올까요? 상황판 켜기·끄기는 그대로 둬요.', '불러오기'],
   },
   card: {
     save: ['고친 명부로 카드에 저장된 명부를 덮어쓸까요? 이 카드의 모든 채팅에 적용돼요.', '덮어쓰기'],
@@ -193,9 +193,13 @@ function scopeBar(scope: SettingsScope, canChat: boolean): string {
   return `<div class="st-scopebar">${tabs}${btns}</div>${confirm}`;
 }
 
-/** 편집 창 설정 페이지(캐릭터 이미지·상황판·고급) 머리의 「덮어쓰기」「불러오기」 (가3, 2026-10-29: 10-27 개편 때 빠진 단추 복구).
- *  덮어쓰기 = 지금 채팅의 화면·상황판·괴이 발생·이미지·고급·인물 기록 설정을 새 채팅 기본값으로, 불러오기 = 그 반대. 처리는 set-bar / set-bar-yes / set-bar-no 그대로 */
-export const mainDefaultsButtons = (): string => `<span class="ps-defaults">${barButtons(settingsUi.busy)}</span>`;
+/** 설정 창 모든 채팅 설정 페이지 머리의 「기본값으로 저장」「기본값 불러오기」 (가3 → 2026-10-29 사용자 1번 결정: 범위 칩 없음, 값은 늘 이 채팅,
+ *  저장 = 이 채팅의 설정 전부(이미지·상황판·괴이 발생·테마·기능 페이지 변수·고급)를 한 번에 새 채팅 기본값으로, 불러오기 = 그 반대 한 번에).
+ *  처리는 set-bar / set-bar-yes / set-bar-no */
+export const mainDefaultsButtons = (): string => {
+  const off = settingsUi.busy ? 'disabled' : '';
+  return `<span class="ps-defaults"><button class="st-act save" data-action="set-bar" data-value="save" ${off}>${ICONS.pen}기본값으로 저장</button><button class="st-act" data-action="set-bar" data-value="load" ${off}>${ICONS.refresh}기본값 불러오기</button></span>`;
+};
 export function mainDefaultsConfirm(): string {
   const c = settingsUi.confirm ? CONFIRM.chat[settingsUi.confirm] : null;
   if (!c) return '';
@@ -415,17 +419,17 @@ export async function handleSettings(action: string, value: string | undefined, 
     const what = settingsUi.confirm;
     settingsUi.confirm = '';
     if (what === 'save') {
-      // 지금 채팅의 화면·상황판·괴이 발생·캐릭터 이미지 설정을 새 채팅 기본값으로
+      // 이 채팅의 설정 전부(캐릭터 이미지·상황판·괴이 발생·테마 + 기능 페이지·고급 변수)를 새 채팅 기본값으로 (2026-10-29: 한 번에)
       const cur = current(ctx, 'chat');
       await saveDefaults(env, (p) => ({ ...p, basic: { ...cur.basic }, world: { ...cur.world }, theme: cur.theme }));
-      if (!settingsUi.notice) await saveVarDefaults(MAIN_PREFIXES, ctx.chat.scriptstate).catch((error) => (settingsUi.notice = `기본값을 저장하지 못했어요: ${error instanceof Error ? error.message : String(error)}`));
+      if (!settingsUi.notice) await saveVarDefaults(ALL_PREFIXES, ctx.chat.scriptstate).catch((error) => (settingsUi.notice = `기본값을 저장하지 못했어요: ${error instanceof Error ? error.message : String(error)}`));
       if (!settingsUi.notice) settingsUi.info = '지금 설정을 새 채팅 기본값으로 저장했어요.';
       env.render();
     } else if (what === 'load') {
       // 새 채팅 기본값을 지금 채팅에. 상황판 켜기·끄기는 상태를 비우거나 새로 만들기 때문에 그대로 둔다
       const d = current(ctx, 'defaults');
       await save(ctx, env, (chat) => {
-        const vars: ScriptState = { ...basicVars(d.basic), [THEME_KEY]: d.theme, ...loadVarDefaults(MAIN_PREFIXES, chat.scriptstate) };
+        const vars: ScriptState = { ...basicVars(d.basic), [THEME_KEY]: d.theme, ...loadVarDefaults(ALL_PREFIXES, chat.scriptstate) };
         for (const f of WORLD_SPEC) vars[wgKey(f.key)] = String(d.world[f.key]);
         if (worldOn(chat)) {
           const ss = { ...(chat.scriptstate ?? {}), ...vars };

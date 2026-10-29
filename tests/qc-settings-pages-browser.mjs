@@ -191,34 +191,36 @@ for (const vp of vps) {
     await closeEditor(page, true);
     await page.close();
   }
-  // ── 시작 뒤: 이 채팅 / 새 채팅 기본값 ──
+  // ── 시작 뒤: 늘 이 채팅 (범위 칩 없음, 2026-10-29) ──
   {
     const started = { message: [{ role: 'user', data: 'hi' }, { role: 'char', data: '본문\n[▣|2025.01.01|02:47 AM|☀️|4°C|관리국 본부|목표]' }], scriptstate: { $st_faction: 'A00', $st_lang: 'ko', $st_fm: '2', $st_fixed_theme: 'dark' } };
     const { page, errors } = await boot(browser, fx, started, vp);
     await openWin(page);
     await page.waitForSelector('.gx-tabhead');
     await openEditor(page, 'set:board');
-    for (const mode of ['chat', 'defaults']) {
+    for (const mode of ['chat']) {
       for (const p of PAGES) {
         await goNode(page, `set:${p}`);
         await page.waitForSelector('.gw .gw-setbody');
         if (p === 'update') continue;
-        const seg = await page.$(`.gw [data-action="set-scope"][data-value="${mode}"]`);
-        if (seg) {
-          await page.evaluate((m) => document.querySelector(`.gw [data-action="set-scope"][data-value="${m}"]`).click(), mode);
-          await page.waitForFunction((m) => document.querySelector(`.gw [data-action="set-scope"][data-value="${m}"]`)?.classList.contains('on'), mode);
-        } else if (!FEATURE.has(p) && p !== 'screen') assert.fail(`${vp} ${p}: 범위 전환 없음`);
+        assert.equal(await page.$('.gw [data-action="set-scope"]'), null, `${vp} ${p}: 범위 칩 없음`);
+        assert.equal(await page.locator('.gw .gw-head [data-action="set-bar"]').count(), p === 'screen' ? 0 : 2, `${vp} ${p}: 머리의 기본값으로 저장·불러오기`);
         total += await sweepPage(page, p, mode, log);
         const a = await auditDom(page, '.gw');
         assert.deepEqual(a.missing, [], `${vp} ${p}/${mode}: 글자·aria-label 없는 단추`);
         if (vp !== 'pc') assert.deepEqual(a.overflow, [], `${vp} ${p}/${mode}: 가로 넘침`);
       }
     }
-    // 범위 전환 시 값이 뒤섞이지 않는다: 요원 표시 인원을 이 채팅 3, 기본값 7 로 두고 번갈아 본다
+    // 기본값으로 저장·불러오기: 요원 표시 인원을 3으로 두고 저장 → 기본값 3, 7로 바꾼 뒤 불러오기 → 3 (이 채팅 값만 바뀜)
     await goNode(page, 'set:board');
-    const setAgent = async (mode, n) => {
-      await page.evaluate((m) => document.querySelector(`.gw [data-action="set-scope"][data-value="${m}"]`).click(), mode);
-      await page.waitForFunction((m) => document.querySelector(`.gw [data-action="set-scope"][data-value="${m}"]`)?.classList.contains('on'), mode);
+    const bar = async (what) => {
+      await page.evaluate((w) => document.querySelector(`.gw .gw-head [data-action="set-bar"][data-value="${w}"]`).click(), what);
+      await page.waitForSelector(`.gw .st-barconfirm [data-action="set-bar-yes"][data-value="${what}"]`);
+      await page.evaluate((w) => document.querySelector(`.gw .st-barconfirm [data-action="set-bar-yes"][data-value="${w}"]`).click(), what);
+      await page.waitForFunction(() => !document.querySelector('.gw .st-barconfirm'));
+      await settle(page);
+    };
+    const setAgent = async (_mode, n) => {
       for (let i = 0; i < 30; i++) {
         const cur = Number((await page.textContent('.gw [data-action="set-agent"] + b, .gw .st-step:has([data-action="set-agent"]) b')).replace(/\D/g, ''));
         if (cur === n) break;
@@ -228,12 +230,14 @@ for (const vp of vps) {
     };
     const shownAgent = () => page.evaluate(() => Number(document.querySelector('.gw .st-step:has([data-action="set-agent"]) b').textContent.replace(/\D/g, '')));
     await setAgent('chat', 3);
-    await setAgent('defaults', 7);
-    assert.equal(await shownAgent(), 7);
-    assert.equal((await prefsOf(page)).basic.agentLimit, 7, '기본값 7');
-    assert.equal((await chatOf(page)).scriptstate.$st_agent_limit, '3', '이 채팅 3');
-    await setAgent('chat', 3);
-    assert.equal(await shownAgent(), 3, '이 채팅으로 돌아오면 3');
+    await bar('save');
+    assert.equal((await prefsOf(page)).basic.agentLimit, 3, '기본값으로 저장 → 기본값 3');
+    await setAgent('chat', 7);
+    assert.equal((await chatOf(page)).scriptstate.$st_agent_limit, '7', '이 채팅 7');
+    assert.equal((await prefsOf(page)).basic.agentLimit, 3, '이 채팅을 바꿔도 기본값은 3');
+    await bar('load');
+    assert.equal(await shownAgent(), 3, '기본값 불러오기 → 이 채팅 3');
+    assert.equal((await chatOf(page)).scriptstate.$st_agent_limit, '3');
     // 스테퍼 경계: 0 에서 − 잠김, 20 에서 + 잠김
     await setAgent('chat', 0);
     assert.equal(await page.isDisabled('.gw [data-action="set-agent"][data-value="n:-"]'), true, '0명에서 − 잠김');
@@ -263,8 +267,6 @@ for (const vp of vps) {
       assert.ok(await page.$(worldBtn('preset_ttl', '+')), '자동 종료 ON → 유지 시간 줄');
     }
     // 시작 잔고: 한글 단위·잘못된 값·음수·소수·빈 칸·너무 긴 수
-    await page.evaluate(() => document.querySelector('.gw [data-action="set-scope"][data-value="chat"]').click());
-    await settle(page);
     const won = '.gw .st-won';
     if (await page.$(won)) {
       const chatWon = async () => JSON.parse((await chatOf(page)).scriptstate.$st_wallet ?? '{}');
@@ -321,13 +323,15 @@ for (const vp of vps) {
       if (W > 760) assert.ok(Math.abs(width - (W * Number(w)) / 100) < 4, `창 폭 ${w}% → ${width}`);
       else assert.ok(Math.abs(width - W) < 2, `폰은 늘 전체 폭 (${w}% → ${width})`);
     }
+    // 위의 「기본값으로 저장」이 테마도 기본값에 넣었으니(한 번에 전부), 여기서는 「테마 줄은 기본값을 안 건드린다」만 본다
+    const theme0 = (await prefsOf(page)).theme;
     for (const t of ['light', 'paper', 'dark']) {
       await page.evaluate((t) => document.querySelector(`.gw [data-action="set-theme"][data-value="${t}"]`).click(), t);
       await settle(page);
       assert.equal((await chatOf(page)).scriptstate.$st_fixed_theme, t, `테마 ${t}: 이 채팅에`);
       assert.equal(await page.evaluate(() => document.querySelector('.gx').dataset.theme), t, `테마 ${t}: 창 배색`);
       assert.equal(await page.evaluate(() => document.querySelector('.gw').dataset.theme), t, `테마 ${t}: 편집 창 배색`);
-      assert.equal((await prefsOf(page)).theme, undefined, `테마 ${t}: 시작 뒤엔 기본값을 건드리지 않음`);
+      assert.equal((await prefsOf(page)).theme, theme0, `테마 ${t}: 시작 뒤엔 기본값을 건드리지 않음`);
     }
     for (const side of ['right', 'left']) {
       await page.evaluate((s) => document.querySelector(`.gw [data-action="set-nav"][data-value="${s}"]`).click(), side);
@@ -354,12 +358,10 @@ for (const vp of vps) {
     // 다시 열었을 때 같은 값 (상황판·이미지 페이지, 이 채팅 범위)
     for (const p of ['board', 'image']) {
       await goNode(page, `set:${p}`);
-      await page.evaluate(() => document.querySelector('.gw [data-action="set-scope"][data-value="chat"]').click());
       await settle(page);
       const s1 = await pageSig(page);
       await closeEditor(page);
       await openEditor(page, `set:${p}`);
-      await page.evaluate(() => document.querySelector('.gw [data-action="set-scope"][data-value="chat"]').click());
       await settle(page);
       assert.equal(await pageSig(page), s1, `${p}: 다시 열어도 같은 값`);
     }

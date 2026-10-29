@@ -11,7 +11,7 @@ import { updateCharacterLore, type ChatContext } from '../../host/risu';
 import { savePrefs } from '../../host/prefs';
 import { cropValue, directoryDraft, directoryExtList, directoryInput, directoryPhotoList, directoryView, dirUi, dirty as dirDirty, handleDirectory, resetDirectory, setCrop } from '../directory';
 import { handleImgPrompt, imgInput, imgPromptPane } from '../imgprompt';
-import { ICONS } from '../icons';
+import { GHOST_ICON, ICONS } from '../icons';
 import { labelSwitches } from '../controls';
 import { rememberPanel } from '../panels';
 import editorCss from './style.css';
@@ -315,8 +315,9 @@ function featureState(ctx: ChatContext | null): Partial<Record<EditorNode, boole
 
 /* 기능 페이지 머리 (2026-10-27 리수폿식): 설명 한 줄 · 켬/끔 배지 · 「기본」 예시 · 끄면 빠지는 것 */
 const FEATURE_INFO: Partial<Record<SetPage, { desc: string; example: string; off?: string }>> = {
-  board: { desc: '응답마다 괴이·사건·특수 발생을 판정하고 지도와 요원 상태를 갱신해요. 상태 태그는 응답 끝에 붙어요.', example: '응답 끝의 상태 태그 「[▣|2025.05.10 17:38|맑음 19℃|서울 서대문구 기독교 상점 내부|…]」가 상황판·지도·요원 칸으로 풀려요.', off: '끄면 괴이가 자동으로 생기지 않고 상황판이 비어요. 커스텀 임무는 계속 쓸 수 있어요.' },
-  image: { desc: '본문에 등장한 캐릭터의 등록 이미지를 태그로 적어 채팅 속에 띄워요. 이미지와 태그 목록은 봇 카드에 있어요.', example: '응답 속 「쟈알디 · 미소」 태그 → 채팅에 그 표정 이미지가 접힌 채로 뜨고, 누르면 펼쳐져요.', off: '끄면 이미지 태그를 적지 않고 이미지 지침도 요청에 넣지 않아요.' },
+  // 2026-10-29 사용자: 응답 태그 형식 같은 안쪽 사정은 예시로 보이지 않는다 (상황판·이미지는 설명만)
+  board: { desc: '응답마다 괴이·사건·특수 발생을 판정하고 상황판·지도·요원 상태를 갱신해요.', example: '', off: '끄면 괴이가 자동으로 생기지 않고 상황판이 비어요. 커스텀 임무는 계속 쓸 수 있어요.' },
+  image: { desc: '본문에 등장한 캐릭터의 등록 이미지를 채팅 속에 띄워요. 이미지 목록은 봇 카드에 있어요.', example: '', off: '끄면 캐릭터 이미지를 띄우지 않고 이미지 지침도 요청에 넣지 않아요.' },
   gnet: { desc: '괴담넷 게시판 글·댓글·쪽지를 보조 모델이 만들어요. 아래 값은 이 채팅에 저장돼요.', example: '「[목격담] 중림 지하상가 3번 출구에서 또 봤음 · 댓글 7」 — 게시판 글 한 줄. 장면과 관련된 글은 본편 요청에 참고로 붙어요.', off: '끄면 게시판 생성과 채팅 반영을 멈춰요. 저장된 글과 쪽지는 남아요.' },
   phone: { desc: '괴담톡 연락처와 문자방의 답장·선톡·단톡방 초대를 보조 모델이 만들어요. 아래 값은 이 채팅에 저장돼요.', example: '「스팡달: 부장님 지금 어디세요? 본부 4층 비었어요」 — 장면과 관련된 대화는 본편 요청에 참고로 붙어요.' },
   wiki: { desc: '위키 문서를 생성·갱신해요. 채팅에 나온 문서는 본편 요청에 참고로 붙일 수 있어요.', example: '「미술관」 문서: 소재 · 접근 · 규칙 · 목격 기록 — 분량·작성 모드대로 써요.' },
@@ -327,10 +328,10 @@ const FEATURE_INFO: Partial<Record<SetPage, { desc: string; example: string; off
 /** 설정 페이지: 패널 설정의 묶음을 그대로 (지침은 지침 탭) */
 function settingsPage(ctx: ChatContext, page: SetPage): string {
   const canChat = host?.canChat?.() ?? true;
-  const scope = canChat ? (settingsUi.scope === 'defaults' ? 'defaults' : 'chat') : 'defaults';
-  const scopeSeg = canChat
-    ? `<div class="gx-segs gx-segs-sm gw-scope"><button class="gx-seg${scope === 'chat' ? ' on' : ''}" data-action="set-scope" data-value="chat" aria-pressed="${scope === 'chat'}">이 채팅</button><button class="gx-seg${scope === 'defaults' ? ' on' : ''}" data-action="set-scope" data-value="defaults" aria-pressed="${scope === 'defaults'}">새 채팅 기본값</button></div>`
-    : '<span class="gw-tokens">새 채팅 기본값 (시작 전)</span>';
+  // 범위 칩(이 채팅 / 새 채팅 기본값)은 없다 (2026-10-29 사용자 결정, v0.16.23 설계로 복귀): 값은 늘 이 채팅, 시작 전에는 새 채팅 기본값을 바로 고친다.
+  // 머리의 「기본값으로 저장」「기본값 불러오기」가 설정 전부를 한 번에 옮긴다
+  const scope: 'chat' | 'defaults' = canChat ? 'chat' : 'defaults';
+  if (canChat) settingsUi.scope = 'chat';
   const title = page === 'gnet' ? gnetLabel(ctx.chat.scriptstate) : SET_LABEL[page];
   const sec = (s: SettingsSection) => settingsSection(ctx, scope, canChat, s);
   let body = '';
@@ -353,18 +354,20 @@ function settingsPage(ctx: ChatContext, page: SetPage): string {
     case 'update': body = sec('update'); break;
   }
   // 머리는 모든 페이지가 같다: 제목 왼쪽, 오른쪽에 범위(이 채팅/새 채팅 기본값) 또는 그 기능의 단추(덮어쓰기·불러오기). 시작 전이면 같은 글귀
-  const showScope = ['image', 'board', 'adv'].includes(page);
-  // 범위 칩 옆 「덮어쓰기」「불러오기」 (가3, 2026-10-29 사용자 「반영해줘」): 시작 뒤 이 채팅 범위에서만. 시작 전엔 기본값을 바로 고치니 없음
-  const defBtns = showScope && canChat && scope === 'chat' ? mainDefaultsButtons() : '';
-  const right = page === 'screen' ? '<span class="gw-tokens">이 기기 공통</span>' : showScope ? `${scopeSeg}${defBtns}` : `${canChat ? '' : '<span class="gw-tokens">새 채팅 기본값 (시작 전)</span>'}${act}`;
-  const crumb = page === 'update' ? '관리' : page === 'screen' ? '설정 / 이 기기 공통' : `설정 / ${canChat ? (scope === 'chat' ? '이 채팅' : '새 채팅 기본값') : '새 채팅 기본값 · 시작 전'}`;
+  // 채팅 설정 페이지는 모두 같은 머리: 시작 뒤 「기본값으로 저장」「기본값 불러오기」(설정 전부 한 번에), 시작 전 「새 채팅 기본값 (시작 전)」.
+  // 기능 페이지가 자기 머리에 두던 칸별 단추(ps-defaults)는 창 안에서는 빼고 그 밖의 단추만 남긴다
+  const chatPage = page !== 'screen' && page !== 'update';
+  const defBtns = chatPage && canChat ? mainDefaultsButtons() : '';
+  act = act.replace(/<span class="ps-defaults">[\s\S]*?<\/span>/, '').trim();
+  const right = page === 'screen' ? '<span class="gw-tokens">이 기기 공통</span>' : chatPage ? `${canChat ? '' : '<span class="gw-tokens">새 채팅 기본값 (시작 전)</span>'}${defBtns}${act}` : act;
+  const crumb = page === 'update' ? '관리' : page === 'screen' ? '설정 / 이 기기 공통' : `설정 / ${canChat ? '이 채팅' : '새 채팅 기본값 · 시작 전'}`;
   const info = FEATURE_INFO[page];
   const on = featureState(ctx)[`set:${page}`];
   const badge = on === undefined ? '' : `<span class="gw-state${on ? '' : ' off'}">${on ? '켬' : '끔'}</span>`;
   // 기능 판 안의 머리 설명은 여기 설명과 겹치니 뺀다 (인물 기록 소개, 필드 안내)
   if (info) body = body.replace(/<p class="ps-note">본편 응답이 끝날 때마다[\s\S]*?<\/p>/, '').replace(/<section class="ps-group"><p class="ps-note">필드에서 만난 사람과[\s\S]*?<\/section>/, '');
   const lead = info
-    ? `<p class="gx-muted">${esc(info.desc)} <span class="gw-eg">예) ${esc(info.example)}</span>${on === false && info.off ? ` <span class="gw-off-note">${esc(info.off)}</span>` : ''}</p></header>`
+    ? `<p class="gx-muted">${esc(info.desc)}${info.example ? ` <span class="gw-eg">예) ${esc(info.example)}</span>` : ''}${on === false && info.off ? ` <span class="gw-off-note">${esc(info.off)}</span>` : ''}</p></header>`
     : '</header>';
   return `<div class="gw-page gw-set"><header class="gw-head"><h2>${esc(title)}${badge}</h2>${right ? `<div class="gw-head-act">${right}</div>` : ''}${lead}
     ${defBtns ? mainDefaultsConfirm() : ''}
@@ -465,13 +468,13 @@ export function render(): void {
   const canChat = host.canChat?.() ?? true;
   const tabs = TABS.map(([id, label, icon]) => `<button class="gw-tab${tab === id ? ' on' : ''}" role="tab" aria-selected="${tab === id}" data-action="ed-tab" data-value="${id}">${icon}<span>${label}</span></button>`).join('');
   const dirty = anyDirty();
-  const where = ctx ? `${esc(String(ctx.char.name ?? ''))} · ${canChat ? '현재 채팅' : '시작 전'}` : '';
+  // 머리는 유령 아이콘 + 「설정」만 (2026-10-29 사용자: 봇 이름·현재 채팅·「바꾸면 바로 저장」 글귀는 지저분함)
   root.innerHTML = `<div class="gw-win${edUi.drawer ? ' drawer' : ''}">
     <header class="gw-top">
       <button class="gx-x gw-menu" data-action="ed-drawer" aria-label="메뉴">${ICONS.list}</button>
-      <b>설정</b><small class="gw-where">${where}</small>
+      <span class="gw-brand">${GHOST_ICON}</span><b>설정</b>
       ${edUi.notice ? `<span class="gw-notice err">${esc(edUi.notice)}</span>` : edUi.info ? `<span class="gw-notice">${esc(edUi.info)}</span>` : ''}
-      <div class="gw-top-right">${tab === 'world' || dirty ? saveBar() : `<span class="gw-save-note">${tab === 'set' ? '바꾸면 바로 저장' : tab === 'guide' ? '지침 저장을 눌러야 남아요' : ''}</span>`}<button class="gx-x" data-action="ed-close" aria-label="닫기">${ICONS.close}</button></div>
+      <div class="gw-top-right">${tab === 'world' || dirty ? saveBar() : ''}<button class="gx-x" data-action="ed-close" aria-label="닫기">${ICONS.close}</button></div>
     </header>
     <nav class="gw-tree"><div class="gw-tabs" role="tablist">${tabs}</div>${tree(ctx)}</nav>
     <main class="gw-body">${ctx ? body(ctx) : '<p class="gx-err">채팅 정보를 읽지 못했어요. 창을 닫고 다시 열어 주세요.</p>'}</main>

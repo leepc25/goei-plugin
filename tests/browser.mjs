@@ -147,11 +147,6 @@ async function edClose(page) {
   await page.click('.gw .gw-top [data-action="ed-close"]');
   await page.waitForFunction(() => document.querySelector('.gw')?.hidden === true);
 }
-// 설정 창 페이지 머리의 범위 칩 (이 채팅 / 새 채팅 기본값: 캐릭터 이미지·상황판·고급 페이지)
-async function edScope(page, scope) {
-  await page.click(`.gw [data-action="set-scope"][data-value="${scope}"]`);
-  await page.waitForSelector(`.gw [data-action="set-scope"][data-value="${scope}"].on`);
-}
 const stepShown = (page, action, key) => page.evaluate(([a, k]) => document.querySelector(`.gw [data-action="${a}"][data-value="${k}:+"]`)?.closest('.st-step')?.querySelector('b')?.textContent ?? '', [action, key]);
 
 // 필드(게임)에서 나오기: 필드 탭 안에서는 게임 머리(닫기·시작 화면 단추)를 숨기고(style.css .gx-fieldhost .gx-game .gx-head) 게임 안 「필드 나가기」
@@ -883,6 +878,8 @@ async function startedWithReply(page, { phoneAuto = false } = {}) {
   await page.waitForSelector('.gx-canvas');
   await page.selectOption('.gx-select', '02');
   await page.click('.gx-pin[data-value="02-0"]');
+  // 핀을 누른 뒤 목표 글이 다시 그려질 때까지 (2026-10-29: 느린 컨테이너에서 「미정」을 먼저 읽는 경쟁)
+  await page.waitForFunction(() => document.querySelector('.gx-goal b')?.textContent.trim() !== '미정');
   const goal = (await page.textContent('.gx-goal b')).trim();
   assert.ok(goal.startsWith('서울특별시'), goal);
   await page.click('[data-action="depart"]');
@@ -1668,39 +1665,59 @@ if (fixture.globalLore.some(packed)) {
   await page.waitForFunction(() => window.__chat.scriptstate.$wg_preset_cap === '3');
   await page.click('.gw [data-action="set-world"][data-value="incident_p:-"]');
   await page.waitForFunction(() => window.__chat.scriptstate.$wg_incident_p === '40');
-  // 새 채팅 기본값: 2026-10-27 개편으로 페이지 머리의 범위 칩 「이 채팅 / 새 채팅 기본값」으로 기본값을 바로 고친다
-  // (src/ui/editor/index.ts settingsPage scopeSeg). 2026-10-29(가3): 그때 빠진 「덮어쓰기」「불러오기」(set-bar)를 범위 칩 옆에 되살렸다 —
-  // 이 채팅 범위에서만 보이고, 시작 전·기본값 범위에는 없다
-  assert.ok(await page.$('.gw [data-action="set-scope"][data-value="defaults"]'), '새 채팅 기본값 범위 칩');
-  assert.equal(await page.locator('.gw [data-action="set-bar"]').count(), 2, '이 채팅 범위: 덮어쓰기·불러오기 단추');
-  await edScope(page, 'defaults');
-  assert.equal(await page.locator('.gw [data-action="set-bar"]').count(), 0, '기본값 범위에는 덮어쓰기·불러오기 없음 (바로 고침)');
-  assert.equal(await stepShown(page, 'set-world', 'preset_cap'), '2개', '기본값 범위는 카드 기본값을 보여 줌 (이 채팅 값 3과 안 섞임)');
-  await page.click('.gw [data-action="set-world"][data-value="preset_cap:+"]');
-  await page.waitForFunction(() => JSON.parse(window.__store['p:goei:prefs'] || '{}').world?.preset_cap === 3);
-  assert.equal(await page.evaluate(() => window.__chat.scriptstate.$wg_preset_cap), '3');
-  // 테마: 화면 페이지는 범위 칩이 없고 시작 뒤엔 늘 이 채팅에 저장된다(settings.ts 테마 줄 주석, 2026-10-28 QC B3).
-  // 새 채팅 테마 기본값은 시작 화면의 설정에서 정하므로(1절) 여기서 바꾼 paper 는 기본값에 들어가지 않는다
-  assert.equal(JSON.parse(await page.evaluate(() => window.__store['p:goei:prefs'])).theme, undefined, '시작 뒤 테마는 기본값을 건드리지 않음');
-  await edScope(page, 'chat');
-  // 덮어쓰기: 확인 줄 → 지금 채팅 값(incident_p 40)이 새 채팅 기본값으로
+  // 새 채팅 기본값 (2026-10-29 사용자 1번 결정, v0.16.23 설계로 복귀): 범위 칩 없음, 값은 늘 이 채팅. 머리의 「기본값으로 저장」이
+  // 이 채팅의 설정 전부(이미지·상황판·괴이 발생·테마·기능 페이지 변수·고급)를 한 번에 새 채팅 기본값으로, 「기본값 불러오기」가 한 번에 되돌린다
+  // (src/ui/settings.ts mainDefaultsButtons · set-bar-yes, defaults.ts ALL_PREFIXES)
+  assert.equal(await page.$('.gw [data-action="set-scope"]'), null, '범위 칩 없음');
+  assert.equal(await page.locator('.gw [data-action="set-bar"]').count(), 2, '기본값으로 저장·기본값 불러오기 단추');
+  // 취소하면 아무것도 안 바뀐다
   await page.click('.gw [data-action="set-bar"][data-value="save"]');
   await page.waitForSelector('.gw .st-barconfirm [data-action="set-bar-yes"][data-value="save"]');
   await page.click('.gw [data-action="set-bar-no"]');
   await page.waitForFunction(() => !document.querySelector('.gw .st-barconfirm'));
   assert.notEqual(JSON.parse(await page.evaluate(() => window.__store['p:goei:prefs'] || '{}')).world?.incident_p, 40, '취소하면 기본값 그대로');
+  // 저장: 괴이 발생(이 채팅 preset_cap 3·incident_p 40)·테마(paper)·기능 페이지 변수($pp_on 끔·$ph_auto 창을 열 때)가 한 번에 기본값으로.
+  // 변수는 플러그인이 보는 채팅(ctx)에 들어가야 하니 화면으로 바꾼다 (window.__chat 을 직접 고치면 ctx 는 모른다)
+  await page.click('.gw [data-action="set-people"][data-value="0"]');
+  await page.waitForFunction(() => window.__chat.scriptstate.$pp_on === '0');
+  await edGo(page, 'set:phone');
+  await page.click('.gw [data-action="ph-cfg"][data-value="auto=open"]');
+  await page.waitForFunction(() => window.__chat.scriptstate.$ph_auto === 'open');
+  await edGo(page, 'set:board');
   await page.click('.gw [data-action="set-bar"][data-value="save"]');
   await page.click('.gw .st-barconfirm [data-action="set-bar-yes"][data-value="save"]');
   await page.waitForFunction(() => JSON.parse(window.__store['p:goei:prefs'] || '{}').world?.incident_p === 40);
   await page.waitForFunction(() => !document.querySelector('.gw .st-barconfirm'));
-  assert.equal(await page.evaluate(() => window.__chat.scriptstate.$wg_incident_p), '40', '덮어쓰기는 이 채팅 값을 건드리지 않음');
-  // 불러오기: 이 채팅 값을 30으로 바꾼 뒤 기본값(40)을 불러오면 되돌아온다
+  {
+    const prefs = JSON.parse(await page.evaluate(() => window.__store['p:goei:prefs']));
+    assert.equal(prefs.world.preset_cap, 3, '괴이 발생 상한이 기본값으로');
+    assert.equal(prefs.theme, 'paper', '테마도 기본값으로');
+    assert.equal(prefs.vars?.$ph_auto, 'open', '괴담톡 변수도 한 번에');
+    assert.equal(prefs.vars?.$pp_on, '0', '인물 기록 변수도 한 번에');
+  }
+  assert.equal(await page.evaluate(() => window.__chat.scriptstate.$wg_incident_p), '40', '저장은 이 채팅 값을 건드리지 않음');
+  // 불러오기: 이 채팅 값을 바꾼 뒤(incident_p 30·인물 기록 켬·괴담톡 수동) 기본값을 불러오면 전부 되돌아온다
   await page.click('.gw [data-action="set-world"][data-value="incident_p:-"]');
   await page.waitForFunction(() => window.__chat.scriptstate.$wg_incident_p === '30');
+  await page.click('.gw [data-action="set-people"][data-value="1"]');
+  await page.waitForFunction(() => window.__chat.scriptstate.$pp_on === '1');
+  await edGo(page, 'set:phone');
+  await page.click('.gw [data-action="ph-cfg"][data-value="auto=0"]');
+  await page.waitForFunction(() => window.__chat.scriptstate.$ph_auto === '0');
+  // 기능 페이지(괴담톡) 머리에도 같은 단추, 칸별 단추는 없음
+  assert.equal(await page.locator('.gw .gw-head [data-action="set-bar"]').count(), 2, '기능 페이지도 같은 단추');
+  assert.equal(await page.locator('.gw [data-action="ph-def-ask"]').count(), 0, '칸별 덮어쓰기 없음');
   await page.click('.gw [data-action="set-bar"][data-value="load"]');
   await page.click('.gw .st-barconfirm [data-action="set-bar-yes"][data-value="load"]');
-  await page.waitForFunction(() => window.__chat.scriptstate.$wg_incident_p === '40');
+  await page.waitForFunction(() => window.__chat.scriptstate.$wg_incident_p === '40' && window.__chat.scriptstate.$pp_on === '0' && window.__chat.scriptstate.$ph_auto === 'open');
+  await page.waitForFunction(() => document.querySelector('.gw [data-action="ph-cfg"][data-value="auto=open"]')?.getAttribute('aria-pressed') === 'true');
+  // 뒤 절을 위해 원래대로 (인물 기록 켬·괴담톡 수동)
+  await page.click('.gw [data-action="ph-cfg"][data-value="auto=0"]');
+  await page.waitForFunction(() => window.__chat.scriptstate.$ph_auto === '0');
+  await edGo(page, 'set:board');
   await page.waitForFunction(() => document.querySelector('.gw [data-action="set-world"][data-value="incident_p:-"]')?.closest('.st-step')?.textContent.includes('40'));
+  await page.click('.gw [data-action="set-people"][data-value="1"]');
+  await page.waitForFunction(() => window.__chat.scriptstate.$pp_on === '1');
   // 요원 표시 인원: 줄이면 상황판 요원 수와 요원 보고가 함께 바뀐다
   await page.click('.gw [data-action="set-agent"][data-value="n:-"]');
   await page.waitForFunction(() => window.__chat.scriptstate.$st_agent_limit === '11');
