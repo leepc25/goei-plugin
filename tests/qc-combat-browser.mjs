@@ -53,7 +53,17 @@ for (const diff of ['easy', 'normal', 'hard', 'nightmare']) {
     // 앞서 AI 에 맞아 넘어져 있으면 첫 키가 일어나기에 쓰인다(마무리가 한 칸씩 밀림): 서서 자유로울 때까지
     await ground();
     await page.waitForTimeout(300);
-    for (const k of seq) { await page.keyboard.press(k); await page.waitForTimeout(330); }
+    // 약공격은 다음 입력을 하나만 기억한다(core.ts P.buf): 고정 간격으로 누르면 느린 기계에서 세 번째 약이 강에 덮여 「띄우기」가 나온다.
+    // 그래서 약은 그 연타 동작(9·10·11)이 시작된 것을 보고 다음 키를 누른다 (사람은 동작을 보고 치므로 같은 조건)
+    let n = 0;
+    for (const k of seq) {
+      await page.keyboard.press(k);
+      if (k === 'KeyQ') {
+        const id = ['9', '10', '11'][n++];
+        await page.waitForFunction((id) => window.__goeiEngine.world.player.core.P.clip?.id === id, id, { timeout: 3000 }).catch(() => {});
+        await page.waitForTimeout(120);
+      } else await page.waitForTimeout(330);
+    }
     await page.waitForTimeout(900);
     const r = await page.evaluate(() => { const w = window.__goeiEngine.world; const e = w.bodies.find((b) => b.team === 'enemy' && b.alive); return { lastHeavy: w.player.core.P.lastHeavy, dmg: e.hpMax - e.hp, max: window.__max, clips: [...window.__clips] }; });
     kinds[name] = r.lastHeavy;
