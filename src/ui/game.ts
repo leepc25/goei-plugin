@@ -104,10 +104,6 @@ function linkHtml(card: CardSnapshot | null, reports: PendingReport[], record: n
   ].join(''));
 }
 
-function statsHtml(): string {
-  const s = gameStats;
-  return row('측정', `게임 코드 ${kb(codeStats.bytes || 0)} · 꺼내기 ${codeStats.readMs}ms · 실행 ${codeStats.runMs}ms${codeStats.fromNet ? ' (방금 받음)' : ''} · 붙이기 ${s.mountMs}ms · 받은 양 ${kb(fetchStats.bytes)}/${fetchStats.requests}번 · 그림 주소 ${liveUrls()}개${s.heapOpen ? ` · 힙 ${kb(s.heapOpen)} → ${kb(heap())}` : ''}`);
-}
 
 async function home(): Promise<void> {
   const box = layer?.querySelector<HTMLElement>('.gx-game-box');
@@ -126,7 +122,6 @@ async function home(): Promise<void> {
   const open = new Set([...box.querySelectorAll<HTMLDetailsElement>('details[data-keep]')].filter((d) => d.open).map((d) => d.dataset.keep));
   box.innerHTML = `<div class="gx-gl gx-settings">
     ${filesHtml(f)}${startHtml(slots, last, !needFiles(f))}${linkHtml(card, reports, record)}
-    <details class="ps-adv gx-gl-dev" data-keep="game-dev"><summary class="ps-adv-sum"><b>시험용</b></summary><div class="ps-rows">${statsHtml()}</div></details>
     <input type="file" accept=".js,.pack" multiple hidden data-g-file></div>`;
   box.querySelectorAll<HTMLDetailsElement>('details[data-keep]').forEach((d) => (d.open = open.has(d.dataset.keep)));
 }

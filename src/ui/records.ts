@@ -16,6 +16,7 @@ import { formatDelta, formatWon } from '../core/wallet';
 import { locName, parseCatalog, readWorld, worldOn } from '../core/world';
 import { updateChat, type ChatContext } from '../host/risu';
 import { onOffSwitch } from './controls';
+import { drawerHtml } from './drawer';
 import { defaultsAction, defaultsButtons, defaultsConfirm } from './defaults';
 import { ICONS } from './icons';
 import { avatar, stLabel } from './images';
@@ -127,12 +128,17 @@ function nowMinute(ctx: ChatContext, rows: JournalRow[]): number | null {
 const SUBS: [RecSub, string][] = [['journal', '일지'], ['reports', '보고서'], ['people', '인물'], ['factions', '세력']];
 
 export function recordsTab(ctx: ChatContext): string {
-  const tabs = `<div class="gx-segs gx-rec-tabs" role="tablist">${SUBS.map(([v, l]) => `<button role="tab" class="gx-seg${rec.sub === v ? ' on' : ''}" data-action="rec-sub" data-value="${v}" aria-selected="${rec.sub === v}" aria-pressed="${rec.sub === v}">${l}</button>`).join('')}</div>`;
+  const tabs = `<div class="ph-tabs gx-rec-tabs" role="tablist">${SUBS.map(([v, l]) => `<button role="tab" class="ph-tab${rec.sub === v ? ' on' : ''}" data-action="rec-sub" data-value="${v}" aria-selected="${rec.sub === v}" aria-pressed="${rec.sub === v}">${l}</button>`).join('')}</div>`;
   const notice = rec.notice ? `<div class="gx-err" role="alert">${esc(rec.notice)}</div>` : '';
   const note = toast('rec', rec.info, (t) => {
     if (rec.info === t) rec.info = '';
   });
-  return `<main class="gx-body gx-records">${tabs}${notice}${pane(ctx)}${note}</main>${pngModal()}`;
+  // 폰: 하위 탭 넷은 위가 아니라 숨은 서랍(괴담톡·괴담넷처럼)에 (2026-10-29 사용자). PC 는 위 탭 줄
+  const SUB_ICON: Record<RecSub, string> = { journal: ICONS.list, reports: ICONS.records, people: ICONS.group, factions: ICONS.org };
+  const drawer = matchMedia('(max-width: 760px)').matches
+    ? drawerHtml(SUBS.map(([v, l]) => `<button class="ph-tool" data-action="rec-sub" data-value="${v}" aria-label="${l}" title="${l}" aria-pressed="${rec.sub === v}">${SUB_ICON[v]}<span class="ph-tool-l">${l}</span></button>`).join(''), '', 'gx-rdrawer')
+    : '';
+  return `<main class="gx-body gx-records">${tabs}${notice}${pane(ctx)}${note}</main>${pngModal()}${drawer}`;
 }
 
 /** 「이미지로 저장」 미리보기 창: 내려받기는 이미 시작됐고, download 를 무시하는 곳(iOS)은 그림을 길게 눌러 저장 */
@@ -206,7 +212,7 @@ function journalPane(ctx: ChatContext): string {
     ${tile('백그라운드', rows.length - mineN, '요원 단독 처리')}
     ${tile(`오늘${now !== null ? ` · ${ymd(now)}` : ''}`, todayRows.length, avg !== null ? `평균 소요 ${durText(avg)}` : todayRows.length ? '소요 미상' : '없음')}
   </section>`;
-  const chips = FILTERS.map(([v, l]) => `<button class="gx-wt-chip${rec.filter === v ? ' on' : ''}" data-action="rec-filter" data-value="${v}" aria-pressed="${rec.filter === v}">${l}</button>`).join('');
+  const chips = FILTERS.map(([v, l]) => `<button class="gx-chip${rec.filter === v ? ' on' : ''}" data-action="rec-filter" data-value="${v}" aria-pressed="${rec.filter === v}">${l}</button>`).join('');
   return `${tiles}
     <p class="gx-rec-lead">종료된 괴이·사건·특수 전부 · 영구 보관 · 가계부는 사원증의 잔고에서</p>
     <div class="gx-wt-tools"><div class="gx-wt-chips">${chips}</div><input class="gx-wt-q" type="search" data-input="rec-q" value="${esc(rec.q)}" placeholder="찾기: 이름·장소·요원" aria-label="일지 찾기"></div>
@@ -259,7 +265,7 @@ const walletSum = (r: Report) => {
 function reportsPane(ctx: ChatContext): string {
   const all = readReports(ctx.chat).items;
   const shown = all.filter((r) => (rec.rfilter === 'mine' ? r.mine : !r.mine)).reverse();
-  const chips = RFILTERS.map(([v, l]) => `<button class="gx-wt-chip${rec.rfilter === v ? ' on' : ''}" data-action="rec-rfilter" data-value="${v}" aria-pressed="${rec.rfilter === v}">${l}</button>`).join('');
+  const chips = RFILTERS.map(([v, l]) => `<button class="gx-chip${rec.rfilter === v ? ' on' : ''}" data-action="rec-rfilter" data-value="${v}" aria-pressed="${rec.rfilter === v}">${l}</button>`).join('');
   const cards = shown.map((r) => {
     const h = r.head;
     const meta = [ymd(h.at) ? `${ymd(h.at)} ${hhmm(h.at)}` : '시각 없음', h.place || locName(h.loc) || h.loc, durText(h.duration)].filter(Boolean).join(' · ');

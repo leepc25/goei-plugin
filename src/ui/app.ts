@@ -1395,10 +1395,11 @@ function startedBody(ctx: ChatContext): string {
     case 'wallet':
       return walletTab(ctx);
     case 'records':
+      // 폰: 기록 탭의 서랍엔 하위 탭 넷(ui/records.ts), 필드 탭은 상황판처럼 즐겨찾기 서랍 (2026-10-29 사용자)
       return recordsTab(ctx);
     case 'field':
       // 게임은 그린 뒤 이 자리에 붙인다 (afterRender → syncField). 출동이 막 끝났으면 그 위에 보고서 시트 (ui/records fieldSheet)
-      return `<main class="gx-body gx-fieldhost">${fieldSheet(ctx)}</main>`;
+      return `<main class="gx-body gx-fieldhost">${fieldSheet(ctx)}</main>${boardDrawer()}`;
     case 'settings':
     {
       // 설정은 상황판 위에서 여는 화면이라 상황판 서랍(즐겨찾기)도 그대로 둔다 (2026-10-20 사용자: 설정을 열면 서랍이 가려진 것처럼 보임).

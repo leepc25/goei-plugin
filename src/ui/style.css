@@ -224,7 +224,16 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
 .gx-head:has(.gx-tabhead)::after { content: ''; position: absolute; left: 0; right: 0; bottom: -1px; height: 2px; background: linear-gradient(90deg, transparent, var(--signal) 14%, color-mix(in srgb, var(--signal) 70%, transparent) 80%, transparent); }
 .gx-tabicon { display: grid; place-items: center; width: 38px; height: 38px; flex: none; border-radius: 12px; background: var(--accent-bg); border: 1px solid var(--accent-line); color: var(--signal); }
 .gx-tabicon svg { width: 20px; height: 20px; }
-.gx-tabhead b { letter-spacing: .02em; }
+.gx-tabhead b { letter-spacing: .02em; white-space: nowrap; }
+/* 폰 머리: 단추가 많아(잔고·필드·기록·사원증·설정·닫기) 제목이 잘리던 것 — 탭 아이콘은 빼고 단추를 조금 작게 (2026-10-29) */
+@media (max-width: 760px) {
+  .gx-tabhead { min-width: 0; }
+  .gx-tabhead > div { min-width: 0; }
+  .gx-tabhead .gx-tabicon { display: none; }
+  .gx-head-act { gap: 4px; }
+  .gx-head-act > .gx-x { width: 34px; height: 34px; }
+  .gx-head-act .gx-hwallet { height: 32px; padding: 0 8px; font-size: 12.5px; }
+}
 .gx-nav-gap { flex: 1; }
 .gx-nb {
   position: relative; display: flex; align-items: center; gap: 12px;
@@ -3014,13 +3023,17 @@ button.mk-go:hover { color: var(--signal); }
 /* ── 기록 탭 (일지 · 보고서 · 인물 · 세력) ── */
 .gx-records { display: flex; flex-direction: column; gap: 14px; }
 .gx-records section { padding: 0; }
-.gx-rec-tabs { display: flex; width: 100%; }
-.gx-rec-tabs .gx-seg { flex: 1 1 0; min-width: 0; padding: 0 6px; }
+/* 하위 탭 줄: 괴담톡 탭과 같은 알약(.ph-tabs), 넷이 같은 너비. 폰에서는 숨기고 서랍(.gx-rdrawer)에 */
+.gx-rec-tabs { display: flex; width: 100%; padding: 0; overflow: visible; }
+.gx-rec-tabs .ph-tab { flex: 1 1 0; min-width: 0; min-height: 34px; padding: 0 6px; justify-content: center; text-align: center; }
+.gx-rdrawer .ph-tools { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+@media (max-width: 760px) { .gx-rec-tabs { display: none; } }
 .gx-rec-lead { margin: -4px 4px 0; font-size: 13px; color: var(--dim); }
 .gx-records .in { color: var(--signal); }
 .gx-records .out { color: var(--danger); }
 .gx-records .gx-wt-tile { position: relative; display: flex; flex-direction: column; gap: 4px; min-width: 0; padding: 14px 16px; border: 1px solid var(--line); border-radius: 16px; background: var(--panel); }
-.gx-records .gx-wt-tile.bal { background: linear-gradient(135deg, color-mix(in srgb, var(--signal) 18%, var(--panel)), var(--panel) 75%); border-color: color-mix(in srgb, var(--signal) 40%, var(--line)); }
+.gx-records .gx-wt-tile.bal { border-color: var(--accent-line); }
+.gx-records .gx-wt-tile.bal > b { color: var(--signal); }
 .gx-jr-tiles { grid-template-columns: 1.3fr 1fr 1fr 1fr; }
 .gx-rec-pane { border: 1px solid var(--line); border-radius: 16px; background: var(--panel); overflow: hidden; }
 .gx-rec-pane .ph-room-head { background: var(--panel); }
