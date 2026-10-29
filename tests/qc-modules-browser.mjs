@@ -9,6 +9,23 @@ import { dirname, resolve } from 'node:path';
 import assert from 'node:assert/strict';
 import { gzipSync } from 'node:zlib';
 
+// 설정 창의 괴담넷 페이지 열기/닫기 (2026-10-29: 판 안 설정 단추 없음)
+async function featSet(page, node) {
+  const open = await page.evaluate(() => { const g = document.querySelector('.gw'); return !!(g && !g.hidden); });
+  if (open) {
+    await page.evaluate(() => document.querySelector('.gw .gw-top [data-action="ed-close"]').click());
+    await page.waitForFunction(() => document.querySelector('.gw')?.hidden === true);
+    return;
+  }
+  await page.click('.gx-nav .gx-nb.desk[data-action="ed-open"]');
+  await page.waitForFunction(() => { const g = document.querySelector('.gw'); return g && !g.hidden && g.querySelector('.gw-win'); });
+  await page.evaluate(() => document.querySelector('.gw [data-action="ed-tab"][data-value="set"]')?.click());
+  await page.waitForFunction((n) => !!document.querySelector(`.gw [data-action="ed-node"][data-value="${n}"]`), node);
+  await page.evaluate((n) => document.querySelector(`.gw [data-action="ed-node"][data-value="${n}"]`).click(), node);
+  await page.waitForFunction((n) => document.querySelector('.gw .gw-tree-item.on')?.dataset.value === n, node);
+}
+
+
 const require = createRequire(execSync('npm root -g').toString().trim() + '/');
 const { chromium } = require('playwright');
 const fixture = JSON.parse(readFileSync(process.argv[2], 'utf8'));
@@ -261,7 +278,7 @@ if (want('G2')) {
   await page.waitForFunction(() => (window.__chat.scriptstate.$gn_nick ?? '').startsWith('닉<img'));
   assert.equal(await page.evaluate(() => window.__xss), undefined, '닉네임도 글자로');
   assert.ok((await page.textContent('.gn-mynick')).includes('<img src=x'));
-  await page.click('[data-action="gn-settings"]');
+  await featSet(page, 'set:gnet');
   await page.fill('[data-change="gn-text"][data-key="subject"]', `주제 "${evil}`);
   await page.dispatchEvent('[data-change="gn-text"][data-key="subject"]', 'change');
   await page.waitForFunction(() => (window.__chat.scriptstate['$lb_cfg_lb-gn.subject'] ?? '').startsWith('주제'));
@@ -306,17 +323,17 @@ if (want('G3')) {
   // 쪽지함: 상대 3명, 각 20통 (기본 상한 40 안) → 자동 정리 상한을 5로 내리면 저장 때 5통만
   await page.click('[data-action="gn-sub"][data-value="dm"]');
   assert.equal(await page.locator('.gn-dmrow').count(), 3);
-  await page.click('[data-action="gn-settings"]');
+  await featSet(page, 'set:gnet');
   await page.fill('[data-change="gn-keep"]', '5');
   await page.dispatchEvent('[data-change="gn-keep"]', 'change');
   await page.waitForFunction(() => window.__chat.scriptstate.$gn_storage_limit_dm === '5');
   // 상한은 다음 저장(writeGnet) 때 적용된다: 쪽지를 하나 읽으면 저장된다
-  await page.click('[data-action="gn-settings"]');
+  await featSet(page, 'set:gnet');
   await page.click('.gn-dmrow[data-value="상대0"]');
   await page.waitForFunction(() => (window.__chat.scriptstate.$gn_raw.match(/^D\|상대0\|/gm) ?? []).length === 5, null, { timeout: 4000 });
   assert.equal((await page.evaluate(() => window.__chat.scriptstate.$gn_raw.match(/^D\|상대1\|/gm).length)), 5, '다른 상대도 5통');
   // 자동 정리를 끄면 상한을 넘겨도 지우지 않는다
-  await page.click('[data-action="gn-settings"]');
+  await featSet(page, 'set:gnet');
   await page.click('[data-action="gn-cfg"][data-value="storage=0"]');
   await page.waitForFunction(() => window.__chat.scriptstate.$gn_storage_auto_dm === '0');
   assert.equal(await page.locator('[data-change="gn-keep"]').count(), 0, '끄면 상한 칸이 사라진다');
@@ -330,7 +347,7 @@ if (want('G3')) {
   await page.click('[data-action="gn-cfg"][data-value="style=wpf"]');
   await page.waitForFunction(() => window.__chat.scriptstate['$lb_cfg_lb-gn.style'] === 'wpf');
   assert.ok((await page.textContent('.ph-form .ph-room-title')).includes('세정게'), '성격을 바꾸면 창 이름도');
-  await page.click('[data-action="gn-settings"]');
+  await featSet(page, 'set:gnet');
   await page.click('[data-action="gn-sub"][data-value="board"]');
   await llm(page, [ok(JSON.stringify({ posts: [post(900)], alternativePosts: [post(901, { title: '대안' })] }))]);
   await page.click('[data-action="gn-refresh"]');
@@ -537,7 +554,7 @@ if (want('P1')) {
   assert.equal(await llmCount(page), 6, '검사 실패는 형식 오류라 한 번 더 묻는다');
   assert.ok((await page.textContent('.ph')).includes('허용되지 않은 대화방') || (await page.textContent('.ph')).includes('공지'));
   // 1-d. 선톡 확률 0 + 초대 끄기 → 후보 없음: 모델을 부르지 않고 안내
-  await page.click('[data-action="ph-settings"]');
+  await featSet(page, 'set:phone');
   await page.fill('[data-change="ph-num"][data-key="incoming_chance"]', '0');
   await page.dispatchEvent('[data-change="ph-num"][data-key="incoming_chance"]', 'change');
   await page.waitForFunction(() => window.__chat.scriptstate.$ph_incoming_chance === '0');
@@ -545,14 +562,14 @@ if (want('P1')) {
   await page.waitForFunction(() => window.__chat.scriptstate.$ph_group_invites === '0');
   await page.click('[data-action="ph-cfg"][data-value="announcements=0"]');
   await page.waitForFunction(() => window.__chat.scriptstate.$ph_announcements === '0');
-  await page.click('[data-action="ph-settings"]');
+  await featSet(page, 'set:phone');
   const n = await llmCount(page);
   await page.click('[data-action="ph-refresh"]');
   await wait(400);
   assert.equal(await llmCount(page), n, '확률 0·초대 끔·공지 끔이면 모델을 안 부른다');
   assert.ok((await page.textContent('.ph')).includes('건너뛰었어요'));
   // 1-e. 확률 100 + 대기 턴 중이면 선톡은 빼고 공지만 (공지 켬)
-  await page.click('[data-action="ph-settings"]');
+  await featSet(page, 'set:phone');
   await page.fill('[data-change="ph-num"][data-key="incoming_chance"]', '250');
   await page.dispatchEvent('[data-change="ph-num"][data-key="incoming_chance"]', 'change');
   await page.waitForFunction(() => window.__chat.scriptstate.$ph_incoming_chance === '100', null, { timeout: 3000 });
@@ -560,7 +577,7 @@ if (want('P1')) {
   await page.waitForFunction(() => window.__chat.scriptstate.$ph_announcements === '1');
   // 대기 표시는 「선톡을 받은 때의 이야기 턴 수」: 지금 턴으로 적으면 아직 쉬는 중
   await page.evaluate(() => { window.__chat.scriptstate.$cooldown_received_incoming = String(window.__chat.message.filter((m) => m.role === 'char' && String(m.data ?? '').trim() && !String(m.data).includes('%%')).length); });
-  await page.click('[data-action="ph-settings"]');
+  await featSet(page, 'set:phone');
   // 창은 열 때 채팅을 다시 읽는다: 밖에서 바꾼 대기 표시가 보이게 닫았다 연다
   await page.click('[data-action="close"]');
   await open(page);
@@ -618,13 +635,13 @@ if (want('P2')) {
   assert.equal(s1.rooms.dm_c_50303031.messages.length, 2000, '자동 정리 끔이면 그대로');
   // 보관 상한 켜고 3 → 저장 때 3개만 남고 흐름 요약(baseline)과 정리 수
   await page.click('[data-action="ph-back"]');
-  await page.click('[data-action="ph-settings"]');
+  await featSet(page, 'set:phone');
   await page.click('[data-action="ph-cfg"][data-value="storage_auto_dm=1"]');
   await page.waitForFunction(() => window.__chat.scriptstate.$ph_storage_auto_dm === '1');
   await page.fill('[data-change="ph-num"][data-key="storage_limit_dm"]', '3');
   await page.dispatchEvent('[data-change="ph-num"][data-key="storage_limit_dm"]', 'change');
   await page.waitForFunction(() => window.__chat.scriptstate.$ph_storage_limit_dm === '3');
-  await page.click('[data-action="ph-settings"]');
+  await featSet(page, 'set:phone');
   await page.click('[data-action="ph-sub"][data-value="chats"]');
   await page.click('.ph-chats [data-action="ph-room"][data-value="dm_c_50303031"]');
   await page.waitForFunction(() => JSON.parse(window.__chat.scriptstate.$ph_state).rooms.dm_c_50303031.messages.length === 3, null, { timeout: 5000 });
@@ -661,10 +678,10 @@ if (want('P2')) {
   await page.click('[data-action="ph-notice-filter"][data-value="all"]');
   await page.click('[data-action="ph-notice-faction"][data-value="B00"]'); // 다시 누르면 세력 칩 해제
   assert.equal(await page.locator('.ph-notice').count(), 30);
-  await page.click('[data-action="ph-settings"]');
+  await featSet(page, 'set:phone');
   await page.click('[data-action="ph-cfg"][data-value="announcement_page_size=50"]');
   await page.waitForFunction(() => window.__chat.scriptstate.$ph_announcement_page_size === '50');
-  await page.click('[data-action="ph-settings"]');
+  await featSet(page, 'set:phone');
   await page.click('[data-action="ph-sub"][data-value="notices"]');
   assert.equal(await page.locator('.ph-notice').count(), 45, '페이지 50이면 한 쪽');
   const nid = await page.getAttribute('.ph-notice .ph-ndel', 'data-value');
@@ -672,14 +689,14 @@ if (want('P2')) {
   await page.click(`.ph-notice [data-action="ph-notice-del"][data-value="${nid}"]`);
   await page.waitForFunction((n) => JSON.parse(window.__chat.scriptstate.$ph_bulletins).items.length === n, 44);
   // 공지 보관 상한: 10 → 저장 때 10개만
-  await page.click('[data-action="ph-settings"]');
+  await featSet(page, 'set:phone');
   // (공지 자동 정리는 처음에 꺼 둠: 기본 상한 20이면 「모두 읽음」 저장 때 이미 20개로 줄어든다)
   await page.click('[data-action="ph-cfg"][data-value="storage_auto_notice=1"]');
   await page.waitForFunction(() => window.__chat.scriptstate.$ph_storage_auto_notice === '1');
   await page.fill('[data-change="ph-num"][data-key="storage_limit_notice"]', '10');
   await page.dispatchEvent('[data-change="ph-num"][data-key="storage_limit_notice"]', 'change');
   await page.waitForFunction(() => window.__chat.scriptstate.$ph_storage_limit_notice === '10');
-  await page.click('[data-action="ph-settings"]');
+  await featSet(page, 'set:phone');
   await page.click('[data-action="ph-sub"][data-value="notices"]');
   await page.click('.ph-notice .ph-ndel');
   await page.click('.ph-notice .gx-mini.danger');

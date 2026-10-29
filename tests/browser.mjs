@@ -148,6 +148,14 @@ async function edOpen(page, node, { pre = false } = {}) {
   await page.waitForFunction(() => { const g = document.querySelector('.gw'); return g && !g.hidden && g.querySelector('.gw-win'); });
   if (node) await edGo(page, node);
 }
+// 2026-10-29 사용자: 각 메뉴의 설정 단추를 없앴다(설정은 메인 설정 창만). 옛 「판 안 설정 켜고 끄기」 자리는 설정 창의 그 기능 페이지를 열고 닫는 것으로
+async function featSet(page, node) {
+  const open = await page.evaluate(() => { const g = document.querySelector('.gw'); return !!(g && !g.hidden); });
+  if (open) {
+    await page.evaluate(() => document.querySelector('.gw .gw-top [data-action="ed-close"]').click());
+    await page.waitForFunction(() => document.querySelector('.gw')?.hidden === true);
+  } else await edOpen(page, node);
+}
 async function edClose(page) {
   await page.click('.gw .gw-top [data-action="ed-close"]');
   await page.waitForFunction(() => document.querySelector('.gw')?.hidden === true);
@@ -1210,8 +1218,7 @@ if (fixture.globalLore.some(packed)) {
   assert.ok(prev.endsWith('\n목격담 추가'), '다시 쓰기 지침');
   // 목록, 설정, 작성 지침, 삭제
   // 설정은 따로 (괴담톡·괴담넷처럼), 「기본값으로 저장」은 플러그인 저장소에
-  await page.click('[data-action="wiki-settings"]');
-  await page.waitForSelector('.nw-setpane');
+  await featSet(page, 'set:wiki');
   await page.click('[data-action="wiki-length"][data-value="short"]');
   await page.waitForFunction(() => window.__chat.scriptstate.$nw_length === 'short');
   await page.fill('.nw-reqbox', '목격담 위주로');
@@ -1231,7 +1238,7 @@ if (fixture.globalLore.some(packed)) {
   await page.click('[data-action="wiki-def-yes"]');
   await page.waitForFunction(() => window.__chat.scriptstate.$nw_length === 'short');
   assert.equal(await page.locator('.ps-defconfirm').count(), 0);
-  await page.click('[data-action="wiki-settings"]');
+  await featSet(page, 'set:wiki');
   // 위키 메인: 최근 문서 카드, 아직 없는 링크는 작성이 필요한 문서로
   await page.click('.nw-rail [data-action="wiki-home"]');
   await page.waitForSelector('.nw-home .nw-card');
@@ -1452,13 +1459,13 @@ if (fixture.globalLore.some(packed)) {
   assert.equal(tight.length, 1, '총 상한 안에 못 들면 빼기');
   await page.evaluate(() => { delete window.__chat.scriptstate.$gen_ctx_total; });
   // 설정: 본편 반영 빼기
-  await page.click('[data-action="gn-settings"]');
+  await featSet(page, 'set:gnet');
   await page.click('[data-action="gn-cfg"][data-value="context=1"]');
   await page.waitForFunction(() => window.__chat.scriptstate['$lb_cfg_lb-gn.context'] === '1');
   const off = await page.evaluate(async () => window.__core(await window.__calls.replacers[0]([{ role: 'user', content: 'u' }], 'model')));
   assert.equal(off.length, 1);
   // 내 글 삭제 (두 번 눌러야)
-  await page.click('[data-action="gn-settings"]');
+  await featSet(page, 'set:gnet');
   await page.click('[data-action="gn-sub"][data-value="board"]');
   await page.waitForSelector('[data-action="gn-del-post"]');
   await page.click('[data-action="gn-del-post"]');
@@ -1975,7 +1982,7 @@ if (fixture.globalLore.some(packed)) {
   assert.equal(await page.locator('.gn-post .at-files .at-card-link a.at-go').count(), 1, '링크는 문서 목록, 주소면 누를 수 있음');
   if (shots) await page.screenshot({ path: `${shots}/18-gnet-attach.png` });
   // 괴담넷 끄기 → 탭은 안내만, 본편 반영 멈춤 → 켜면 고른 모델로
-  await page.click('[data-action="gn-settings"]');
+  await featSet(page, 'set:gnet');
   await page.click('[data-action="gn-cfg"][data-value="mode=1"]');
   await page.waitForFunction(() => window.__chat.scriptstate['$lb_cfg_lb-gn.mode'] === '1');
   await page.click('[data-action="gn-cfg"][data-value="power=0"]');
@@ -2030,7 +2037,7 @@ if (fixture.globalLore.some(packed)) {
   // 목록 미리보기와 보관 설정
   await page.click('[data-action="ph-back"]');
   await page.click('[data-action="ph-sub"][data-value="chats"]');
-  await page.click('[data-action="ph-settings"]');
+  await featSet(page, 'set:phone');
   await page.click('[data-action="ph-cfg"][data-value="storage_auto_group=0"]');
   await page.waitForFunction(() => window.__chat.scriptstate.$ph_storage_auto_group === '0');
   // 공지 페이지 넘기기·모두 읽음 (공지 45개를 넣고, 페이지 크기 설정 저장이 화면을 새로 읽는다)
