@@ -116,6 +116,8 @@ export interface Prefs {
   imgSend?: number;
   /** 즐겨찾기 (이 기기·모든 채팅 공통, 최대 MARK_MAX): 창 안 화면 상태와 이름 */
   marks?: Mark[];
+  /** 기본 즐겨찾기(DEFAULT_MARKS)를 이 기기에 한 번 채웠나. 채운 뒤에는 지워도 다시 넣지 않는다 (2026-10-29 사용자) */
+  marksSeeded?: boolean;
   /** 이미지 태그 지침 (core/imgprompt.ts): 틀, 끈 이름, 임의 추가 이름, 표정 세트. 없으면 기본 */
   imgPrompt?: string;
   imgNamesOff?: string[];
@@ -197,10 +199,14 @@ export function setPrefs(raw: unknown): Prefs {
   const imgFoldOn = o.imgFoldOn === false ? false : undefined;
   const show = imgRecent(o.imgShow);
   const send = imgRecent(o.imgSend);
-  const marks: Mark[] = (Array.isArray(o.marks) ? o.marks : DEFAULT_MARKS)
+  const savedMarks: Mark[] = (Array.isArray(o.marks) ? o.marks : [])
     .filter((m): m is Mark => !!m && typeof m === 'object' && typeof (m as Mark).name === 'string' && !!(m as Mark).s && typeof (m as Mark).s.tab === 'string')
     .slice(0, MARK_MAX)
     .map((m) => ({ s: m.s, name: m.name.slice(0, 80) }));
+  // 기본 즐겨찾기는 기기마다 한 번만: 이미 있는 것은 두고 빠진 기본 항목만 빈칸에 붙인다. 한 번 채운 뒤(marksSeeded)엔 손대지 않는다
+  const marks: Mark[] = o.marksSeeded === true
+    ? savedMarks
+    : [...savedMarks, ...DEFAULT_MARKS.filter((d) => !savedMarks.some((m) => JSON.stringify(m.s) === JSON.stringify(d.s)))].slice(0, MARK_MAX);
   const strList = (v: unknown, max: number, len: number) => (Array.isArray(v) ? v.filter((x): x is string => typeof x === 'string' && !!x.trim()).map((x) => x.trim().slice(0, len)).slice(0, max) : []);
   const imgPrompt = typeof o.imgPrompt === 'string' && o.imgPrompt.trim() ? o.imgPrompt.slice(0, 6000) : undefined;
   const imgNamesOff = strList(o.imgNamesOff, 200, 40);
@@ -225,7 +231,7 @@ export function setPrefs(raw: unknown): Prefs {
   const relationsSym = o.relationsSym === false ? false : undefined;
   const frame = o.frame === 'none' || o.frame === 'tactical' ? o.frame : undefined;
   const walletStart = int(o.walletStart, 0, 1_000_000_000_000);
-  prefs = { basic, world, ...(walletStart !== null ? { walletStart } : {}), ...(frame ? { frame } : {}), ...(editorWidth !== null ? { editorWidth } : {}), ...(Object.keys(guides).length ? { guides } : {}), ...(rules.length ? { rules } : {}), ...(relationsSym === false ? { relationsSym } : {}), ...(theme ? { theme } : {}), ...(imgPrompt ? { imgPrompt } : {}), ...(imgNamesOff.length ? { imgNamesOff } : {}), ...(imgNamesExtra.length ? { imgNamesExtra } : {}), ...(imgKeywords.length ? { imgKeywords } : {}), ...(Object.keys(vars).length ? { vars } : {}), ...(nav ? { nav } : {}), ...(wikiSide ? { wikiSide } : {}), ...(agents ? { agents } : {}), ...(dim !== null ? { dim } : {}), ...(status ? { status } : {}), ...(size !== null ? { imgSize: size } : {}), ...(fold !== null ? { imgFold: fold } : {}), ...(imgFoldOn === false ? { imgFoldOn } : {}), ...(show !== null ? { imgShow: show } : {}), ...(send !== null ? { imgSend: send } : {}), ...(marks.length ? { marks } : {}) };
+  prefs = { basic, world, ...(walletStart !== null ? { walletStart } : {}), ...(frame ? { frame } : {}), ...(editorWidth !== null ? { editorWidth } : {}), ...(Object.keys(guides).length ? { guides } : {}), ...(rules.length ? { rules } : {}), ...(relationsSym === false ? { relationsSym } : {}), ...(theme ? { theme } : {}), ...(imgPrompt ? { imgPrompt } : {}), ...(imgNamesOff.length ? { imgNamesOff } : {}), ...(imgNamesExtra.length ? { imgNamesExtra } : {}), ...(imgKeywords.length ? { imgKeywords } : {}), ...(Object.keys(vars).length ? { vars } : {}), ...(nav ? { nav } : {}), ...(wikiSide ? { wikiSide } : {}), ...(agents ? { agents } : {}), ...(dim !== null ? { dim } : {}), ...(status ? { status } : {}), ...(size !== null ? { imgSize: size } : {}), ...(fold !== null ? { imgFold: fold } : {}), ...(imgFoldOn === false ? { imgFoldOn } : {}), ...(show !== null ? { imgShow: show } : {}), ...(send !== null ? { imgSend: send } : {}), ...(marks.length ? { marks } : {}), marksSeeded: true };
   return prefs;
 }
 

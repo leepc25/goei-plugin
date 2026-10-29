@@ -407,8 +407,8 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
 .gx-mapbar > .gx-select { flex: 0 0 150px; min-width: 0; }
 .gx-mapfind { position: relative; flex: 1; min-width: 0; }
 /* 임무 ↔ 커스텀 전환 (PC, ui/field.ts modeSwap): 지역·검색 줄과 커스텀 필터 줄의 오른쪽 끝. 눈에 띄게 (2026-10-29 사용자) */
-.gx-mswap { display: inline-flex; align-items: center; gap: 6px; flex: none; margin-left: auto; min-height: 36px; padding: 0 14px 0 12px; border: 1px solid var(--signal); border-radius: 999px; background: color-mix(in srgb, var(--signal) 14%, var(--panel)); color: var(--signal); font: inherit; font-size: 13px; font-weight: 700; letter-spacing: .02em; cursor: pointer; box-shadow: 0 0 0 3px color-mix(in srgb, var(--signal) 10%, transparent); }
-.gx-mswap:hover { background: color-mix(in srgb, var(--signal) 24%, var(--panel)); }
+.gx-mswap { display: inline-flex; align-items: center; gap: 6px; flex: none; margin-left: auto; height: 36px; padding: 0 14px 0 12px; border: 1px solid var(--accent-line); border-radius: 8px; background: var(--accent-bg); color: var(--signal); font: inherit; font-size: 13px; font-weight: 700; cursor: pointer; box-shadow: none; }
+.gx-mswap:hover { border-color: var(--signal); }
 .gx-mswap svg { width: 16px; height: 16px; }
 .gx-mfilter .gx-mswap { margin-left: auto; }
 @media (max-width: 760px) { .gx-mswap { display: none; } }

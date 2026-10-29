@@ -430,7 +430,7 @@ function fieldDrawer(x: Ctx, withMap: boolean): string {
  *  swap: 오른쪽 끝 임무↔커스텀 전환 (v0.16.18: 위에 따로 있던 전환 줄은 자리만 차지했다) */
 /** PC: 임무 ↔ 커스텀 전환 단추 (2026-10-29 사용자: 왼쪽 메뉴의 「커스텀」을 없애고 임무 창 안에서 전환. 지역·검색 줄 오른쪽 끝, 눈에 띄게). 폰은 단계 줄의 전환 단추를 쓴다 */
 function modeSwap(to: 'map' | 'mission'): string {
-  return `<button class="gx-mswap desk" data-action="tab" data-value="${to}" aria-label="${to === 'map' ? '임무로 전환' : '커스텀 임무로 전환'}">${ICONS.swap}<span>${to === 'map' ? '임무' : '커스텀 임무'}</span></button>`;
+  return `<button class="gx-mswap desk" data-action="tab" data-value="${to}" aria-label="${to === 'map' ? '임무로 전환' : '커스텀으로 전환'}">${ICONS.swap}<span>${to === 'map' ? '임무' : '커스텀'}</span></button>`;
 }
 
 function stepBar(goal: string | null, swap?: 'map' | 'mission'): string {
