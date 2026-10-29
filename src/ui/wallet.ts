@@ -144,10 +144,10 @@ export function walletTab(ctx: ChatContext): string {
       <div class="gx-wt-tile"><small>오늘${today ? ` · ${esc(shortDay(today))}` : ''}</small><b class="${todayNet < 0 ? 'out' : todayNet > 0 ? 'in' : ''}">${esc(formatDelta(todayNet) || '0')}</b><span class="gx-wt-sub">${todayRows.length}건</span></div>
     </section>
     ${walletUi.notice ? `<div class="gx-err" role="alert">${esc(walletUi.notice)}</div>` : ''}
-    <div class="gx-wt-tools">
-      <div class="gx-wt-chips">${chip('all', '전체')}${chip('in', '수입')}${chip('out', '지출')}</div>
-      <input class="gx-wt-q" type="search" data-input="wallet-q" value="${esc(walletUi.q)}" placeholder="찾기: 메모·근거" aria-label="거래 찾기">
-    </div>
-    <div class="gx-wt-list">${walletList(ctx)}</div>
+    <section class="gx-card">
+      <header class="gx-card-head"><b>거래 내역</b><div class="gx-card-tools"><div class="gx-wt-chips">${chip('all', '전체')}${chip('in', '수입')}${chip('out', '지출')}</div>
+      <input class="gx-wt-q" type="search" data-input="wallet-q" value="${esc(walletUi.q)}" placeholder="찾기: 메모·근거" aria-label="거래 찾기"></div></header>
+      <div class="gx-card-body gx-wt-list">${walletList(ctx)}</div>
+    </section>
   </main>`;
 }

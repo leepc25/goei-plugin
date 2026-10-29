@@ -3061,7 +3061,7 @@ button.mk-go:hover { color: var(--signal); }
 .gx-records { display: flex; flex-direction: column; gap: 14px; }
 .gx-records section { padding: 0; }
 /* 하위 탭 줄: 괴담톡 탭과 같은 알약(.ph-tabs), 넷이 같은 너비. 폰에서는 숨기고 서랍(.gx-rdrawer)에 */
-.gx-rec-tabs { display: flex; width: 100%; padding: 0; overflow: visible; }
+.gx-rec-tabs { width: 100%; }
 .gx-rec-tabs .ph-tab { flex: 1 1 0; min-width: 0; min-height: 34px; padding: 0 6px; justify-content: center; text-align: center; }
 .gx-rdrawer .ph-tools { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 @media (max-width: 760px) { .gx-rec-tabs { display: none; } }
@@ -3224,4 +3224,24 @@ button.gx-jr-row:hover { background: color-mix(in srgb, var(--text) 4%, transpar
   .gx-wallettab .gx-wt-tile:nth-child(odd), .gx-records .gx-wt-tile:nth-child(odd) { border-left: 0; }
   .gx-wallettab .gx-wt-tile:nth-child(-n+2), .gx-records .gx-wt-tile:nth-child(-n+2) { border-top: 0; }
   .gx-wallettab .gx-wt-tile.bal { grid-column: auto; }
+}
+
+/* 기록·가계부 칸 구분 (2026-10-29 사용자): 내용 묶음마다 머리 있는 카드. 머리 = 제목·설명 왼쪽, 거르기·찾기 오른쪽.
+   카드 모양은 인물·세력 카드(.gx-rec-pane)·설정 카드와 같은 테두리·둥글기 */
+.gx-card { border: 1px solid var(--line); border-radius: 12px; background: var(--panel); overflow: hidden; }
+.gx-card-head { display: flex; align-items: center; flex-wrap: wrap; gap: 6px 12px; padding: 12px 16px; border-bottom: 1px solid var(--line); }
+.gx-card-head > b { font-size: 15px; font-weight: 800; color: var(--text); }
+.gx-card-head > small { font-size: 12.5px; color: var(--dim); }
+.gx-card-tools { display: flex; align-items: center; gap: 8px; margin-left: auto; flex-wrap: wrap; }
+.gx-card-tools .gx-wt-q { width: 220px; flex: none; }
+.gx-card-body { padding: 12px 16px 16px; }
+.gx-card-body .gx-jr-day ul, .gx-card-body .gx-wt-day ul { border-radius: 10px; }
+.gx-rec-pane { border-radius: 12px; }
+/* 하위 탭: 괴담톡·괴담넷과 같은 밑줄 탭 (넷이 같은 너비) */
+.gx-rec-tabs.ph-subs { grid-template-columns: repeat(4, 1fr); }
+@media (max-width: 760px) {
+  .gx-card-head { padding: 10px 12px; }
+  .gx-card-tools { margin-left: 0; width: 100%; }
+  .gx-card-tools .gx-wt-q { width: auto; flex: 1; }
+  .gx-card-body { padding: 10px 12px 12px; }
 }

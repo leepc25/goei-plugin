@@ -128,7 +128,7 @@ function nowMinute(ctx: ChatContext, rows: JournalRow[]): number | null {
 const SUBS: [RecSub, string][] = [['journal', '일지'], ['reports', '보고서'], ['people', '인물'], ['factions', '세력']];
 
 export function recordsTab(ctx: ChatContext): string {
-  const tabs = `<div class="ph-tabs gx-rec-tabs" role="tablist">${SUBS.map(([v, l]) => `<button role="tab" class="ph-tab${rec.sub === v ? ' on' : ''}" data-action="rec-sub" data-value="${v}" aria-selected="${rec.sub === v}" aria-pressed="${rec.sub === v}">${l}</button>`).join('')}</div>`;
+  const tabs = `<div class="ph-subs gx-rec-tabs" role="tablist">${SUBS.map(([v, l]) => `<button role="tab" class="ph-sub${rec.sub === v ? ' on' : ''}" data-action="rec-sub" data-value="${v}" aria-selected="${rec.sub === v}" aria-pressed="${rec.sub === v}">${l}</button>`).join('')}</div>`;
   const notice = rec.notice ? `<div class="gx-err" role="alert">${esc(rec.notice)}</div>` : '';
   const note = toast('rec', rec.info, (t) => {
     if (rec.info === t) rec.info = '';
@@ -214,9 +214,10 @@ function journalPane(ctx: ChatContext): string {
   </section>`;
   const chips = FILTERS.map(([v, l]) => `<button class="gx-chip${rec.filter === v ? ' on' : ''}" data-action="rec-filter" data-value="${v}" aria-pressed="${rec.filter === v}">${l}</button>`).join('');
   return `${tiles}
-    <p class="gx-rec-lead">종료된 괴이·사건·특수 전부 · 영구 보관 · 가계부는 사원증의 잔고에서</p>
-    <div class="gx-wt-tools"><div class="gx-wt-chips">${chips}</div><input class="gx-wt-q" type="search" data-input="rec-q" value="${esc(rec.q)}" placeholder="찾기: 이름·장소·요원" aria-label="일지 찾기"></div>
-    <div class="gx-jr-list">${journalList(ctx)}</div>`;
+    <section class="gx-card">
+      <header class="gx-card-head"><b>관리국 일지</b><small>종료된 괴이·사건·특수 전부 · 영구 보관</small><div class="gx-card-tools"><div class="gx-wt-chips">${chips}</div><input class="gx-wt-q" type="search" data-input="rec-q" value="${esc(rec.q)}" placeholder="찾기: 이름·장소·요원" aria-label="일지 찾기"></div></header>
+      <div class="gx-card-body gx-jr-list">${journalList(ctx)}</div>
+    </section>`;
 }
 
 /** 일지 목록만 (찾기 칸을 칠 때 이 부분만 다시 그린다) */
@@ -279,9 +280,10 @@ function reportsPane(ctx: ChatContext): string {
     </button>`;
   }).join('');
   const empty = all.length ? '맞는 보고서가 없어요.' : '아직 보고서가 없어요. 상황이 종료되면 그 순간의 기록이 보고서로 남아요.';
-  return `<p class="gx-rec-lead">${rec.rfilter === 'mine' ? '내가 출동한 사건의 보고서' : rec.rfilter === 'bg' ? '요원이 처리한 사건의 간이 보고서' : '보고서 전부'} · 종료 시점 그대로 보관</p>
-    <div class="gx-wt-tools"><div class="gx-wt-chips">${chips}</div></div>
-    ${cards ? `<div class="gx-rcards">${cards}</div>` : `<p class="gx-wt-empty">${empty}</p>`}`;
+  return `<section class="gx-card">
+      <header class="gx-card-head"><b>사건 보고서</b><small>${rec.rfilter === 'mine' ? '내가 출동한 사건' : '요원이 처리한 사건(간이)'} · 종료 시점 그대로 보관</small><div class="gx-card-tools"><div class="gx-wt-chips">${chips}</div></div></header>
+      <div class="gx-card-body">${cards ? `<div class="gx-rcards">${cards}</div>` : `<p class="gx-wt-empty">${empty}</p>`}</div>
+    </section>`;
 }
 
 // ── 보고서 페이지 ──
