@@ -1,6 +1,18 @@
 // QC(정적 감사) 성능·자원 측정: 본체 시작 시간, display 처리기 1000건, 1초 감시 루프의 risuai 호출 수(가만히 10초),
-// 창 열고 닫기 100번·채팅 전환 100번 뒤 heap·DOM 노드·<style> 수·설정 저장 횟수. 측정값을 출력하고 누수·재주입만 실패로 본다.
+// 창 열고 닫기 100번·채팅 전환 100번 뒤 heap·DOM 노드·<style> 수·설정 저장 횟수. 측정값을 출력하고 아래 LIMIT 상한을 넘으면 실패.
 // 사용법: node tests/qc-static-perf-browser.mjs <fixture.json>
+//
+// 상한(개선 제안 나7, docs/qc/09_개선_나_567.md): 이 컨테이너(CPU 4개를 나눠 쓰는 느린 기계)에서 3번 돌린 측정값의 3~5배, 튀는 값은 더 넉넉히.
+//  측정 3회: bootMs 81~207 · fabVisibleMs 195~394(06 보고서 409) · display1000Ms 32~72(06 보고서 48) · 열고 닫기 100번 8.6~9.9초 ·
+//  heap +0.5MB · 노드 521→521 · 리스너 80→80 · style 3→3 · 가만히 10초 API 30회. 노드·리스너·style 은 「늘지 않음」을 본다.
+const LIMIT = {
+  bootMs: 1500,          // 시작기 주입 → 본체 start() 끝. 측정 81~207 (튀는 값)
+  fabVisibleMs: 2000,    // 플로팅 버튼 보임. 측정 195~409
+  display1000Ms: 500,    // display 처리기 1000건. 측정 32~72 (예전 2~4초 → 48ms 로 고친 것의 회귀 감시)
+  openClose100Ms: 45_000, // 창 열고 닫기 100번 (Playwright 기다리기 포함). 측정 8.6~9.9초
+  idleApi10s: 90,        // 가만히 10초 동안 risuai 호출 합계. 측정 30 (초당 3번)
+  heapGrowMB: 5,         // 열고 닫기·채팅 전환 100번 뒤 heap 증가. 측정 +0.5 / +0.1
+};
 import { readFileSync } from 'node:fs';
 import assert from 'node:assert/strict';
 import { launch, boot, open } from './qc-static-harness.mjs';
@@ -100,10 +112,20 @@ const metrics = async () => {
 
 console.log(JSON.stringify(out, null, 2));
 assert.deepEqual(errors, []);
-assert.ok(out.openClose100.after.styles <= out.openClose100.before.styles, 'CSS 재주입 없음');
-assert.ok(out.openClose100.after.heapMB - out.openClose100.before.heapMB < 10, '열고 닫기 100번에 heap 10MB 미만 증가');
-assert.ok(out.openClose100.after.listeners - out.openClose100.before.listeners < 50, '열고 닫기 100번에 리스너가 쌓이지 않음');
-assert.ok(out.chatSwitch100.after.heapMB - out.chatSwitch100.before.heapMB < 10, '채팅 전환 100번에 heap 10MB 미만 증가');
-assert.equal(out.openClose100.prefsSaves, 0, '열고 닫기만으로 설정을 저장하지 않음');
+// 시간 상한 (느린 기계 기준으로 넉넉히 — 넘으면 성능 회귀)
+assert.ok(out.bootMs >= 0 && out.bootMs < LIMIT.bootMs, `본체 시작 ${out.bootMs}ms < ${LIMIT.bootMs}ms`);
+assert.ok(out.fabVisibleMs < LIMIT.fabVisibleMs, `플로팅 버튼 보임 ${out.fabVisibleMs}ms < ${LIMIT.fabVisibleMs}ms`);
+assert.ok(out.display1000Ms < LIMIT.display1000Ms, `display 1000건 ${out.display1000Ms}ms < ${LIMIT.display1000Ms}ms`);
+assert.ok(out.openClose100.ms < LIMIT.openClose100Ms, `열고 닫기 100번 ${out.openClose100.ms}ms < ${LIMIT.openClose100Ms}ms`);
+const idleCalls = Object.values(out.idleApi10s).reduce((a, b) => a + b, 0);
+assert.ok(idleCalls <= LIMIT.idleApi10s, `가만히 10초 risuai 호출 ${idleCalls}회 ≤ ${LIMIT.idleApi10s}회`);
+// 자원: 열고 닫기 100번·채팅 전환 100번에 노드·리스너·<style> 이 늘지 않고 heap 은 조금만
+for (const [label, m] of [['열고 닫기 100번', out.openClose100], ['채팅 전환 100번', out.chatSwitch100]]) {
+  assert.ok(m.after.styles <= m.before.styles, `${label}: CSS 재주입 없음 (${m.before.styles} → ${m.after.styles})`);
+  assert.ok(m.after.nodes <= m.before.nodes, `${label}: DOM 노드가 늘지 않음 (${m.before.nodes} → ${m.after.nodes})`);
+  assert.ok(m.after.listeners <= m.before.listeners, `${label}: 리스너가 늘지 않음 (${m.before.listeners} → ${m.after.listeners})`);
+  assert.ok(m.after.heapMB - m.before.heapMB < LIMIT.heapGrowMB, `${label}: heap ${m.before.heapMB} → ${m.after.heapMB}MB, 증가 ${LIMIT.heapGrowMB}MB 미만`);
+  assert.equal(m.prefsSaves, 0, `${label}: 설정을 저장하지 않음`);
+}
 console.log('PASS 성능·자원 측정');
 await browser.close();
