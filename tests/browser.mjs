@@ -2888,8 +2888,8 @@ if (fixture.globalLore.some(packed)) {
   // 기록 탭: 하위 탭 넷, 같은 너비, 빈 일지, 「오늘 일지 이미지로」 없음
   await page.click('.gx-nav .gx-nb:not(.mob)[data-value="records"]');
   await page.waitForSelector('.gx-records');
-  assert.deepEqual(await page.$$eval('.gx-rec-tabs .gx-seg', (l) => l.map((b) => b.textContent)), ['일지', '보고서', '인물', '세력']);
-  const widths = await page.$$eval('.gx-rec-tabs .gx-seg', (l) => l.map((b) => b.getBoundingClientRect().width));
+  assert.deepEqual(await page.$$eval('.gx-rec-tabs .ph-sub', (l) => l.map((b) => b.textContent)), ['일지', '보고서', '인물', '세력']);
+  const widths = await page.$$eval('.gx-rec-tabs .ph-sub', (l) => l.map((b) => b.getBoundingClientRect().width));
   assert.ok(Math.max(...widths) - Math.min(...widths) <= 1, `하위 탭 같은 너비 (${widths.join(',')})`);
   assert.ok((await page.textContent('.gx-records')).includes('아직 종료된 상황이 없어요'));
   assert.equal(await page.locator('.gx-records button:has-text("이미지로")').count(), 0, '「오늘 일지 이미지로」 단추 없음');
@@ -3155,7 +3155,7 @@ if (fixture.globalLore.some(packed)) {
   await page.click('[data-action="rec-sub"][data-value="journal"]');
   await page.waitForSelector('.gx-jr-row');
   await noOverflow('폰 일지');
-  const tabW = await page.$$eval('.gx-rec-tabs .gx-seg', (l) => l.map((b) => b.getBoundingClientRect().width));
+  const tabW = await page.$$eval('.gx-rec-tabs .ph-sub', (l) => l.map((b) => b.getBoundingClientRect().width));
   assert.ok(Math.max(...tabW) - Math.min(...tabW) <= 1, `폰 하위 탭 같은 너비 (${tabW.join(',')})`);
   // 폰 머리 사원증 창의 잔고 줄 → 가계부
   await page.click('.gx-idbtn');
