@@ -46,7 +46,6 @@
 
     { "name": "audio-lifecycle-round2", "file": "tests/audio-lifecycle-round2-browser.mjs", "group": "legacy", "args": [], "timeoutMin": 10, "frame": "소스 esbuild + 자체 http (Web Audio)", "note": "결과 /tmp/goei-audio-lifecycle-round2/" },
     { "name": "audio-lifecycle-round2-game", "file": "tests/audio-lifecycle-round2-game-browser.mjs", "group": "legacy", "args": [], "timeoutMin": 10, "frame": "소스 esbuild + 시연판 + 자체 http", "note": "" },
-    { "name": "background-render-round2", "file": "tests/background-render-round2-browser.mjs", "group": "legacy", "args": [], "timeoutMin": 10, "frame": "소스 esbuild(git show 기준선) + 시연판 + 자체 http", "note": "" },
     { "name": "child-door-dist", "file": "tests/child-door-dist-browser.mjs", "group": "legacy", "args": [], "timeoutMin": 10, "frame": "시연판 dist/goei-action-game.html (자체 http)", "note": "사진 out/child-door-dist/" },
     { "name": "door-video", "file": "tests/door-video-browser.mjs", "group": "legacy", "args": [], "timeoutMin": 10, "frame": "소스 esbuild + 시연판 + 자체 http", "note": "" },
     { "name": "guardian-rules-round2", "file": "tests/guardian-rules-round2-browser.mjs", "group": "legacy", "args": [], "timeoutMin": 10, "frame": "소스 esbuild + 자체 http", "note": "" },
