@@ -2056,6 +2056,7 @@ if (fixture.globalLore.some(packed)) {
   });
   await page.click('[data-action="ph-cfg"][data-value="announcement_page_size=30"]');
   await page.waitForFunction(() => window.__chat.scriptstate.$ph_announcement_page_size === '30');
+  await edClose(page);
   await page.click('[data-action="ph-sub"][data-value="notices"]');
   await page.waitForSelector('.ph-pager');
   assert.equal(await page.locator('.ph-notice').count(), 30);
