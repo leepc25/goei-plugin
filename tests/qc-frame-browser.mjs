@@ -68,8 +68,8 @@ let prefsSaved;
   assert.ok(s.inFrame);
   assert.equal(s.panelW, tabletW, '전술도 창 폭 그대로');
   assert.ok(s.panelH >= 600, `전술 틀일 때 창 높이 ${s.panelH} ≥ 600`);
-  assert.equal(await page.evaluate(() => getComputedStyle(document.querySelector('.gx')).padding), '6px', '전술은 범퍼 돌출분만큼 바깥 여백 6px');
-  // 창 테두리는 틀 안에서 지운다(검은 띠와 창 사이 회색 선 방지). 범퍼 바닥(-6px)은 1000px 높이에서 잘리지 않는다
+  assert.equal(await page.evaluate(() => getComputedStyle(document.querySelector('.gx')).padding), '8px', '전술은 범퍼 돌출분만큼 바깥 여백 8px');
+  // 창 테두리는 틀 안에서 지운다(검은 띠와 창 사이 회색 선 방지). 범퍼 바닥(-8px)은 1000px 높이에서 잘리지 않는다
   const edge = await page.evaluate(() => ({ border: getComputedStyle(document.querySelector('.gx-frame > .gx-panel')).borderTopColor, bumpTop: document.querySelector('.gxf-bump.tl.base').getBoundingClientRect().top, bumpBottom: document.querySelector('.gxf-bump.bl.base').getBoundingClientRect().bottom }));
   assert.equal(edge.border, 'rgba(0, 0, 0, 0)', '틀 안 창 테두리는 투명');
   assert.ok(edge.bumpTop >= 0 && edge.bumpBottom <= 1000, `범퍼가 화면 안에 (${edge.bumpTop}~${edge.bumpBottom})`);
