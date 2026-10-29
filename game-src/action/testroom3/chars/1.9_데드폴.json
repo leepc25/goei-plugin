@@ -513,6 +513,12 @@
       ]
      }
     ]
+   },
+   "hitVfx": {
+    "2": "x3-1.9-S2-scent-shot"
+   },
+   "hitScale": {
+    "2": 0.75
    }
   },
   "super": {

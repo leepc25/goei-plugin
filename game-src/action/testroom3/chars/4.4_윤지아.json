@@ -628,6 +628,12 @@
       "tint": "#e8c4a8"
      }
     ]
+   },
+   "hitVfx": {
+    "2": "x3-4.4-S2-weather-burst"
+   },
+   "hitScale": {
+    "2": 0.73
    }
   },
   "super": {

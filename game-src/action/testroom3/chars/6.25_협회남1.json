@@ -255,7 +255,9 @@
       }
      ]
     }
-   ]
+   ],
+   "hitVfx": "x3-npc-tear-off",
+   "hitScale": 0.65
   },
   "charge": {
    "name": "정조준",

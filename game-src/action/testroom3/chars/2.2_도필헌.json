@@ -510,6 +510,12 @@
       ]
      }
     ]
+   },
+   "hitVfx": {
+    "2": "x3-2.2-S2-appraisal-crush"
+   },
+   "hitScale": {
+    "2": 0.6
    }
   },
   "super": {

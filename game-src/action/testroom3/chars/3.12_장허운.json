@@ -650,6 +650,12 @@
       ]
      }
     ]
+   },
+   "hitVfx": {
+    "2": "x3-3.12-S2-pillar-slam"
+   },
+   "hitScale": {
+    "2": 0.65
    }
   },
   "super": {

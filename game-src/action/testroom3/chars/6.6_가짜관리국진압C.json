@@ -273,7 +273,9 @@
      "fps": 22,
      "rev": true
     }
-   ]
+   ],
+   "hitVfx": "x3-npc-riot-butt",
+   "hitScale": 0.62
   },
   "charge": {
    "name": "구역 탄막",

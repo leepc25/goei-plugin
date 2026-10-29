@@ -8,7 +8,7 @@ a, b = (int(sys.argv[1]) if len(sys.argv) > 1 else 0), (int(sys.argv[2]) if len(
 for e in P[a:b]:
     key = e["key"]; name = e["name"]
     d = json.loads((M3.parent / "testroom3" / "chars" / f"{key}.json").read_text(encoding="utf-8")); west = d.get("dir") == "W"
-    sprite = sorted((M3 / key / "1").glob("[0-9][0-9].png"))[0]
+    sprite = (sorted((M3 / key / "1").glob("[0-9][0-9].png")) or sorted((M3 / key / "101").glob("[0-9][0-9].png")) or sorted((M3.parent / "eileen" / "base").glob("*.png")))[0]   # 에일린은 1줄이 없어 101(앉기)·eileen/base 로
     if (M3.parent / "testroom3" / "vfx" / f"{name}.png").exists(): print(name, "있음, 건너뜀"); continue
     print(time.strftime("%H:%M:%S"), "생성", name, flush=True)
     r = subprocess.run([sys.executable, str(M3 / "vfx2.py"), name, e["desc"], str(sprite), "W" if west else "E", e["mode"], key], capture_output=True, text=True)

@@ -672,6 +672,12 @@
       }
      }
     ]
+   },
+   "hitVfx": {
+    "2": "x3-3.7-S2-chain-bind"
+   },
+   "hitScale": {
+    "2": 0.59
    }
   },
   "super": {

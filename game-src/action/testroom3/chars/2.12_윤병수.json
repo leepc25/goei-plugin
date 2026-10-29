@@ -863,6 +863,12 @@
       ]
      }
     ]
+   },
+   "hitVfx": {
+    "2": "x3-2.12-S2-grenade-blast"
+   },
+   "hitScale": {
+    "2": 0.68
    }
   },
   "super": {

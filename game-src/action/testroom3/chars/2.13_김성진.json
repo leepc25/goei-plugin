@@ -697,6 +697,12 @@
       ]
      }
     ]
+   },
+   "hitVfx": {
+    "2": "x3-2.13-S2-scrap-crash"
+   },
+   "hitScale": {
+    "2": 0.66
    }
   },
   "super": {

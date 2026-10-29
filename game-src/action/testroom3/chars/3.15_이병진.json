@@ -691,6 +691,12 @@
       ]
      }
     ]
+   },
+   "hitVfx": {
+    "2": "x3-3.15-S2-express-stamp"
+   },
+   "hitScale": {
+    "2": 0.73
    }
   },
   "super": {

@@ -563,6 +563,12 @@
       ]
      }
     ]
+   },
+   "hitVfx": {
+    "2": "x3-1.12-S2-thread-rush"
+   },
+   "hitScale": {
+    "2": 0.67
    }
   },
   "super": {

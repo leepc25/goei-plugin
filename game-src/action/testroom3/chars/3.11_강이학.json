@@ -852,6 +852,12 @@
       "color": "#F2C230"
      }
     ]
+   },
+   "hitVfx": {
+    "2": "x3-3.11-S2-deal-seal"
+   },
+   "hitScale": {
+    "2": 0.64
    }
   },
   "super": {
