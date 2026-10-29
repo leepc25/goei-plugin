@@ -1934,5 +1934,109 @@
   "kind": "own",
   "mode": "center",
   "desc": "A breakthrough charge finisher: a thick wall of grey concrete slabs shatters outward from the center in big square chunks with cobalt blue booster flames blasting through the gap, dust and debris streaming sideways. Huge: about four character heights wide. 10 frames. Colors: cobalt blue, grey concrete, white, dark dust. A standalone effect, not attached to any hand or character. Size reference only: the given character. Pixel art effect, transparent background, crisp hard-edged pixels, no blur, no background scenery. Draw only the effect: no people, no character body or hands, no creatures, monsters, animals, faces, letters or numbers. Absolutely no circles, no concentric rings, no round shockwaves, no halo."
+ },
+ {
+  "name": "x3-1.10-F-gravity-crush",
+  "key": "1.10_게슈간",
+  "row": "전용(10-29)",
+  "kind": "own",
+  "mode": "bottom",
+  "desc": "A gravity-crush finisher on the floor: a wide rectangular slab of pale ice-blue force slams down from above, the floor splits into long straight cracks of light-blue glow and shards of ground are flung upward along the whole width. Huge: about four character heights wide, low. 10 frames. Colors: ice blue, pale cyan, white, dark cracks. A standalone effect, not attached to any hand or character. Size reference only: the given character. Pixel art effect, transparent background, crisp hard-edged pixels, no blur, no background scenery. Draw only the effect: no people, no character body or hands, no creatures, monsters, animals, faces, letters or numbers. Absolutely no circles, no concentric rings, no round shockwaves, no halo."
+ },
+ {
+  "name": "x3-2.4-F-spotlight-burst",
+  "key": "2.4_이기석",
+  "row": "전용(10-29)",
+  "kind": "own",
+  "mode": "center",
+  "desc": "A team-announcement finisher: a burst of golden spotlight beams radiating outward in straight rays from one point like a stage reveal, with confetti strips and gold sparkles raining down across the whole width. Huge: about four character heights wide. 10 frames. Colors: gold, warm yellow, white, confetti red and blue. A standalone effect, not attached to any hand or character. Size reference only: the given character. Pixel art effect, transparent background, crisp hard-edged pixels, no blur, no background scenery. Draw only the effect: no people, no character body or hands, no creatures, monsters, animals, faces, letters or numbers. Absolutely no circles, no concentric rings, no round shockwaves, no halo."
+ },
+ {
+  "name": "x3-2.5-F-video-slam",
+  "key": "2.5_김조학",
+  "row": "전용(10-29)",
+  "kind": "own",
+  "mode": "center",
+  "desc": "A finisher slam: a tall vertical column of slate-blue light drops with a heavy flat impact, followed by jagged slate-blue cracks and sheets of grey glass-like shards bursting outward sideways. Large: about three character heights wide. 10 frames. Colors: slate blue, grey, white flash, dark cracks. A standalone effect, not attached to any hand or character. Size reference only: the given character. Pixel art effect, transparent background, crisp hard-edged pixels, no blur, no background scenery. Draw only the effect: no people, no character body or hands, no creatures, monsters, animals, faces, letters or numbers. Absolutely no circles, no concentric rings, no round shockwaves, no halo."
+ },
+ {
+  "name": "x3-2.10-F-bullet-wall",
+  "key": "2.10_곽성주",
+  "row": "전용(10-29)",
+  "kind": "own",
+  "mode": "center",
+  "desc": "A no-retreat finisher: a dense wall of grey-white muzzle flashes and horizontal bullet streaks firing forward across the whole width, dirt spurts kicking up along the ground and smoke drifting. Huge: about four character heights wide. 10 frames. Colors: steel grey, white flash, yellow sparks, brown dirt. A standalone effect, not attached to any hand or character. Size reference only: the given character. Pixel art effect, transparent background, crisp hard-edged pixels, no blur, no background scenery. Draw only the effect: no people, no character body or hands, no creatures, monsters, animals, faces, letters or numbers. Absolutely no circles, no concentric rings, no round shockwaves, no halo."
+ },
+ {
+  "name": "x3-2.12-F-firestorm",
+  "key": "2.12_윤병수",
+  "row": "전용(10-29)",
+  "kind": "own",
+  "mode": "bottom",
+  "desc": "A finisher firestorm on the ground: a long low wall of orange flame racing forward across the whole width with black smoke rolling up, embers and burning fragments flying, the floor scorched black. Huge: about four character heights wide. 10 frames. Colors: orange, yellow, dark red, black smoke. A standalone effect, not attached to any hand or character. Size reference only: the given character. Pixel art effect, transparent background, crisp hard-edged pixels, no blur, no background scenery. Draw only the effect: no people, no character body or hands, no creatures, monsters, animals, faces, letters or numbers. Absolutely no circles, no concentric rings, no round shockwaves, no halo."
+ },
+ {
+  "name": "x3-2.14-F-sniper-grid",
+  "key": "2.14_송진섭",
+  "row": "전용(10-29)",
+  "kind": "own",
+  "mode": "center",
+  "desc": "A spotter finisher: thin sky-blue targeting lines sweep across the whole width forming a grid of crosshair marks, then each mark explodes into a sharp cyan-white star burst in quick succession with white spark rays. Huge: about four character heights wide. 10 frames. Colors: sky blue, cyan, white. A standalone effect, not attached to any hand or character. Size reference only: the given character. Pixel art effect, transparent background, crisp hard-edged pixels, no blur, no background scenery. Draw only the effect: no people, no character body or hands, no creatures, monsters, animals, faces, letters or numbers. Absolutely no circles, no concentric rings, no round shockwaves, no halo."
+ },
+ {
+  "name": "x3-1.9-F-time-shatter",
+  "key": "1.9_데드폴",
+  "row": "전용(10-29)",
+  "kind": "own",
+  "mode": "center",
+  "desc": "A time-rewind finisher: a huge sheet of indigo glass-like time surface cracks in jagged straight lines and shatters into long shards that fly outward, with pale clock-hand shaped splinters and blue sparks. Huge: about four character heights wide. 10 frames. Colors: indigo, slate blue, pale cyan, white. A standalone effect, not attached to any hand or character. Size reference only: the given character. Pixel art effect, transparent background, crisp hard-edged pixels, no blur, no background scenery. Draw only the effect: no people, no character body or hands, no creatures, monsters, animals, faces, letters or numbers. Absolutely no circles, no concentric rings, no round shockwaves, no halo."
+ },
+ {
+  "name": "x3-2.3-F-sound-blast",
+  "key": "2.3_이길환",
+  "row": "전용(10-29)",
+  "kind": "own",
+  "mode": "center",
+  "desc": "A sound-blast finisher: thick apricot-orange sound bars (straight vertical bars of varying height like an equalizer) burst outward in a wide horizontal fan with white shock lines and orange sparks. Huge: about four character heights wide. 10 frames. Colors: apricot orange, warm yellow, white. A standalone effect, not attached to any hand or character. Size reference only: the given character. Pixel art effect, transparent background, crisp hard-edged pixels, no blur, no background scenery. Draw only the effect: no people, no character body or hands, no creatures, monsters, animals, faces, letters or numbers. Absolutely no circles, no concentric rings, no round shockwaves, no halo."
+ },
+ {
+  "name": "x3-3.3-F-rewind-shards",
+  "key": "3.3_백석주",
+  "row": "전용(10-29)",
+  "kind": "own",
+  "mode": "center",
+  "desc": "A rewind finisher: streams of jade-green glowing shards and torn paper-like fragments rush inward from both sides along straight lines and collide at the center in a sharp emerald flash with white spark rays. Huge: about four character heights wide. 10 frames. Colors: jade green, emerald, white. A standalone effect, not attached to any hand or character. Size reference only: the given character. Pixel art effect, transparent background, crisp hard-edged pixels, no blur, no background scenery. Draw only the effect: no people, no character body or hands, no creatures, monsters, animals, faces, letters or numbers. Absolutely no circles, no concentric rings, no round shockwaves, no halo."
+ },
+ {
+  "name": "x3-4.2-F-red-pen-strike",
+  "key": "4.2_서윤지",
+  "row": "전용(10-29)",
+  "kind": "own",
+  "mode": "center",
+  "desc": "A proofreading finisher: a giant sage-green and red pen stroke slashes diagonally across the whole width like a correction mark, leaving a thick jagged red line that bursts into paper scraps and green sparks. Huge: about four character heights wide. 10 frames. Colors: sage green, red, white, cream paper. A standalone effect, not attached to any hand or character. Size reference only: the given character. Pixel art effect, transparent background, crisp hard-edged pixels, no blur, no background scenery. Draw only the effect: no people, no character body or hands, no creatures, monsters, animals, faces, letters or numbers. Absolutely no circles, no concentric rings, no round shockwaves, no halo."
+ },
+ {
+  "name": "x3-4.5-F-brass-hammer",
+  "key": "4.5_마덕희",
+  "row": "전용(10-29)",
+  "kind": "own",
+  "mode": "bottom",
+  "desc": "A finisher hammer blow on the floor: a huge brass impact flash in the shape of a jagged star with long straight cracks of molten brass light splitting the ground across the whole width, square brass fragments and gold sparks flung upward. Huge: about four character heights wide, low. 10 frames. Colors: brass, gold, wine red, dark bronze. A standalone effect, not attached to any hand or character. Size reference only: the given character. Pixel art effect, transparent background, crisp hard-edged pixels, no blur, no background scenery. Draw only the effect: no people, no character body or hands, no creatures, monsters, animals, faces, letters or numbers. Absolutely no circles, no concentric rings, no round shockwaves, no halo."
+ },
+ {
+  "name": "x3-5.1-F-blood-rain",
+  "key": "5.1_세크리엠",
+  "row": "전용(10-29)",
+  "kind": "own",
+  "mode": "center",
+  "desc": "A finisher of blood: dozens of thin crimson blades of blood rain down diagonally across the whole width and burst into red splashes along a line, dark red mist drifting. Huge: about four character heights wide. 10 frames. Colors: crimson, dark red, black-red mist, white glints. A standalone effect, not attached to any hand or character. Size reference only: the given character. Pixel art effect, transparent background, crisp hard-edged pixels, no blur, no background scenery. Draw only the effect: no people, no character body or hands, no creatures, monsters, animals, faces, letters or numbers. Absolutely no circles, no concentric rings, no round shockwaves, no halo."
+ },
+ {
+  "name": "x3-5.2-F-quiz-flash",
+  "key": "5.2_브라우니",
+  "row": "전용(10-29)",
+  "kind": "own",
+  "mode": "center",
+  "desc": "A quiz-show finisher: giant mint-green stage lights flash in straight beams from the top corners across the whole width, then a shower of white and mint confetti strips and star-shaped sparkles bursts outward. Huge: about four character heights wide. 10 frames. Colors: mint green, light teal, white, gold. A standalone effect, not attached to any hand or character. Size reference only: the given character. Pixel art effect, transparent background, crisp hard-edged pixels, no blur, no background scenery. Draw only the effect: no people, no character body or hands, no creatures, monsters, animals, faces, letters or numbers. Absolutely no circles, no concentric rings, no round shockwaves, no halo."
  }
 ]

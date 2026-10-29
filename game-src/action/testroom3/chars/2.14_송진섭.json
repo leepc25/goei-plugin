@@ -661,6 +661,13 @@
      "fx": [
       {
        "t": "v",
+       "vfx": "x3-2.14-F-sniper-grid",
+       "at": "screen",
+       "w": 1.05,
+       "dy": -90
+      },
+      {
+       "t": "v",
        "vfx": "x3-2.14-S2-radar-sweep",
        "at": "self",
        "scale": 2.2,

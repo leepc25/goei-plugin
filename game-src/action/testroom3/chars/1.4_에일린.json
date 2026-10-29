@@ -496,6 +496,13 @@
        "d": 0.055,
        "fx": [
         {
+         "t": "v",
+         "vfx": "x3-1.4-F-tracer-storm",
+         "at": "screen",
+         "w": 1.05,
+         "dy": -90
+        },
+        {
          "t": "proj",
          "kind": "bullet",
          "hit": {

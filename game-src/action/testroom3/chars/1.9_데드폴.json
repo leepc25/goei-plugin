@@ -565,9 +565,9 @@
        "fx": [
         {
          "t": "v",
-         "vfx": "x3-1.9-F-clock-ring-huge",
+         "vfx": "x3-1.9-F-time-shatter",
          "at": "body",
-         "scale": 1.7
+         "scale": 1.0
         }
        ]
       }

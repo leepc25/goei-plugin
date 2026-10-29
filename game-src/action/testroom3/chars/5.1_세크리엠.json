@@ -583,14 +583,16 @@
      "fx": [
       {
        "t": "v",
-       "vfx": "x3-5.1-F-red-wave",
+       "vfx": "x3-5.1-F-blood-rain",
        "at": "screen",
        "w": 1.05,
        "dy": -80,
        "hit": {
         "dmg": 62,
         "kind": "stun"
-       }
+       },
+       "scale": 1.0,
+       "r": 409.6
       },
       {
        "t": "flash",

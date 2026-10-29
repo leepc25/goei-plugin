@@ -883,6 +883,13 @@
      "hold": 0.3,
      "fx": [
       {
+       "t": "v",
+       "vfx": "x3-2.12-F-firestorm",
+       "at": "screen",
+       "w": 1.05,
+       "under": true
+      },
+      {
        "t": "summon",
        "icon": "decoy",
        "anim": "15",

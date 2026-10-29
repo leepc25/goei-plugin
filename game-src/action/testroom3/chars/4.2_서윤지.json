@@ -798,10 +798,10 @@
         },
         {
          "t": "v",
-         "vfx": "x3-4.2-F-square-shock-ring",
+         "vfx": "x3-4.2-F-red-pen-strike",
          "at": "self",
          "dx": 60,
-         "scale": 2.3,
+         "scale": 1.0,
          "under": true,
          "boom": 3,
          "hit": {
@@ -812,7 +812,8 @@
           "vfx": "x3-c-hit-spark-heavy",
           "vs": 1.1,
           "tint": "#c8e0c6"
-         }
+         },
+         "r": 515.2
         }
        ]
       }

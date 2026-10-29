@@ -517,6 +517,13 @@
      "f": 3,
      "fx": [
       {
+       "t": "v",
+       "vfx": "x3-1.10-F-gravity-crush",
+       "at": "screen",
+       "w": 1.05,
+       "under": true
+      },
+      {
        "t": "screen",
        "spots": 5,
        "every": 0.06,

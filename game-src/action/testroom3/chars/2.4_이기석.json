@@ -548,6 +548,13 @@
      "fx": [
       {
        "t": "v",
+       "vfx": "x3-2.4-F-spotlight-burst",
+       "at": "screen",
+       "w": 1.05,
+       "dy": -90
+      },
+      {
+       "t": "v",
        "vfx": "x3-c-hit-spark-heavy",
        "at": "body",
        "dy": -80,

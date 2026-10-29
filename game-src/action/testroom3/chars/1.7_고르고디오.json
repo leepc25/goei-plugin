@@ -603,6 +603,13 @@
        "hold": 0.3,
        "fx": [
         {
+         "t": "v",
+         "vfx": "x3-1.7-F-wall-breach",
+         "at": "screen",
+         "w": 1.05,
+         "dy": -90
+        },
+        {
          "t": "flash",
          "v": 0.06
         },

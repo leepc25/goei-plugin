@@ -724,7 +724,7 @@
         },
         {
          "t": "v",
-         "vfx": "x3-4.5-F-brass-ring",
+         "vfx": "x3-4.5-F-brass-hammer",
          "at": "front",
          "dx": 90,
          "w": 0.95,
@@ -734,8 +734,9 @@
           "dmg": 107,
           "kind": "launch"
          },
-         "r": 300,
-         "depth": 120
+         "r": 300.0,
+         "depth": 120,
+         "scale": 1.0
         },
         {
          "t": "shake",

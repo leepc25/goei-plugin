@@ -544,9 +544,9 @@
      "fx": [
       {
        "t": "v",
-       "vfx": "x3-2.3-F-howl-rings",
+       "vfx": "x3-2.3-F-sound-blast",
        "at": "body",
-       "scale": 1.4,
+       "scale": 1.0,
        "boom": 2,
        "hit": {
         "dmg": 293,
@@ -556,7 +556,8 @@
         "every": 0.2,
         "stop": 0.16,
         "shake": 14
-       }
+       },
+       "r": 573.4
       }
      ]
     },

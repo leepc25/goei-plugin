@@ -700,7 +700,7 @@
        "fx": [
         {
          "t": "v",
-         "vfx": "x3-3.3-F-rewind-ring",
+         "vfx": "x3-3.3-F-rewind-shards",
          "at": "front",
          "dx": 320,
          "under": true,
@@ -711,7 +711,9 @@
           "noVfx": true,
           "stop": 0.05,
           "shake": 4
-         }
+         },
+         "scale": 1.0,
+         "r": 368.0
         }
        ]
       },

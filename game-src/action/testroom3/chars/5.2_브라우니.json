@@ -571,6 +571,13 @@
      "fx": [
       {
        "t": "v",
+       "vfx": "x3-5.2-F-quiz-flash",
+       "at": "screen",
+       "w": 1.05,
+       "dy": -90
+      },
+      {
+       "t": "v",
        "vfx": "x3-5.2-F-studio",
        "at": "screen",
        "w": 1.05,
