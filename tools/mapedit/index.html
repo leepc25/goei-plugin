@@ -68,6 +68,10 @@
     <button id="bOpen">불러오기</button>
     <button id="bSave">내보내기 .zip</button>
     <button id="bNew" class="danger">새로</button>
+    <span class="sep"></span>
+    <button id="bZ1">확대 1.00 <kbd>1</kbd></button>
+    <button id="bZFit">전체 보기 <kbd>0</kbd></button>
+    <span id="zoomV" class="muted"></span>
     <span id="msg"></span>
   </div>
   <div id="stage">
@@ -93,6 +97,9 @@
     <div class="row"><label>캐릭터</label><input type="number" id="charScale" step="0.25" min="0.25" value="1"><span class="muted">배 (1 = 배경과 같은 점 크기)</span><button id="bChar">그림 바꾸기</button></div>
     <h4>조작</h4>
     <div class="help">
+      <b>보기</b>: 기본 확대 1.00(배경은 자동 2배, 에일린 실제 크기) · 1 = 확대 1.00 · 0 = 전체 보기.<br>
+      <b>가림(C)</b>: 그린 다각형 안의 <b>배경 그림</b>을 캐릭터 위에 다시 칠한다. 캐릭터 발이 주황 깊이선보다 <b>위(안쪽)</b>면 그 부분이 캐릭터를 덮어 「뒤로 지나가는」 모습이 된다. 카운터·진열장처럼 배경에 그려진 물건 둘레를 딴다.<br>
+      <b>자동 가림(A)</b>: 물건 둘레로 상자를 끌면, 상자 테두리 색(벽·바닥)과 다른 점만 골라 가림을 만든다. 허용치·붓으로 다듬는다.<br>
       <b>선택(V)</b>: 클릭으로 고르기 · 끌어서 옮기기 · 빈 곳 끌기 = 화면 이동 · 휠 = 확대/축소.<br>
       <b>다각형 고치기</b>: 고른 다각형의 <b>흰 점</b> 끌기 · 변 가운데 <b>＋</b> 끌기 = 점 추가 · 점 <b>오른쪽 클릭</b> = 점 삭제 · 안쪽 끌기 = 통째 이동.<br>
       <b>다각형 그리기(F·B·C)</b>: 클릭으로 점 · <b>첫 점(노랑) 다시 클릭</b> 또는 Enter·더블클릭·오른쪽 클릭 = 닫기 · Backspace = 점 빼기 · Esc = 취소. 닫으면 선택 모드로.<br>
@@ -169,7 +176,7 @@ async function setBg(name, url) {
   S.images[name] = { img, url }; S.bg = img; S.bgName = name;
   S.w = img.width * S.bgScale; S.h = img.height * S.bgScale; setBgInfo();
   if (!S.items.some((i) => i.kind === 'floor')) S.items.push({ id: uid('f'), kind: 'floor', name: '바닥', poly: [[0, Math.round(S.h * 0.6)], [S.w, Math.round(S.h * 0.6)], [S.w, S.h], [0, S.h]] });
-  ensureChar(); fitView(); commit(); say('배경을 열었습니다 (확대 ' + S.bgScale + '배)');
+  ensureChar(); homeView(); commit(); say('배경을 열었습니다 (확대 ' + S.bgScale + '배)');
 }
 function viewCenter() { return [(cv.width / 2 - S.px) / S.zoom, (cv.height / 2 - S.py) / S.zoom]; }
 async function addPng(name, url, scale) {
@@ -189,6 +196,8 @@ async function trimImg(img) {
   if (x1 < 0) return c;
   const o = document.createElement('canvas'); o.width = x1 - x0 + 1; o.height = y1 - y0 + 1; o.getContext('2d').drawImage(c, -x0, -y0); return o;
 }
+$('bZ1').onclick = () => homeView();
+$('bZFit').onclick = () => fitView();
 $('bBg').onclick = () => $('fBg').click();
 $('bAddPng').onclick = () => $('fPng').click();
 $('bChar').onclick = () => $('fChar').click();
@@ -199,7 +208,7 @@ $('bgScale').onchange = (e) => {
   const k = +e.target.value / S.bgScale; S.bgScale = +e.target.value;
   if (S.bg) { S.w = S.bg.width * S.bgScale; S.h = S.bg.height * S.bgScale; setBgInfo(); }
   for (const it of S.items) scaleItem(it, k);
-  fitView(); commit();
+  homeView(); commit();
 };
 $('charScale').onchange = (e) => { S.charScale = +e.target.value || 1; save(); draw(); };
 function scaleItem(it, k) {
@@ -214,9 +223,27 @@ function scaleItem(it, k) {
 }
 
 /* 저장소 소품 선반 */
+const CHAIR_RE = /^(c0[12])_([a-z-]+)\.png$/;
+// 테스트룸 8방향 의자: 「1배」 = 에일린 서기와 같은 점 크기 → 캐릭터와 같은 배율로 놓는다
+function chairDir(set, d) { return EMBED.chairs?.find((c) => c.set === set)?.dirs.find((x) => x.d === d); }
+async function setChairDir(it, d) {
+  const m = CHAIR_RE.exec(it.file); if (!m) return; const x = chairDir(m[1], d); if (!x) return;
+  const name = `${m[1]}_${d}.png`; if (!S.images[name]) S.images[name] = { img: await loadImg(x.url), url: x.url };
+  it.file = name; it.name = it.name.replace(/_[a-z-]+$/, '_' + d); commit();
+}
 function buildShelf() {
   const sh = $('shelf'); sh.innerHTML = '';
-  if (!EMBED.props.length) { sh.innerHTML = '<span class="muted">이 판에는 저장소 소품이 안 들어 있습니다</span>'; return; }
+  for (const c of EMBED.chairs || []) {
+    const t = document.createElement('div'); t.style.gridColumn = '1 / -1'; t.className = 'muted'; t.textContent = c.label + ' · 테스트룸 8방향 (놓은 뒤 오른쪽 「방향」에서 바꿈)'; sh.appendChild(t);
+    for (const x of c.dirs) {
+      const d = document.createElement('div'); d.className = 'p'; d.title = `${c.set}_${x.d}`;
+      d.innerHTML = `<img src="${x.url}"><div></div>`; d.querySelector('div').textContent = x.k;
+      d.onclick = () => addPng(`${c.set}_${x.d}.png`, x.url, S.bgScale * S.charScale);
+      sh.appendChild(d);
+    }
+  }
+  if (EMBED.props.length) { const t = document.createElement('div'); t.style.gridColumn = '1 / -1'; t.className = 'muted'; t.textContent = '중림 필드 소품'; sh.appendChild(t); }
+  if (!EMBED.props.length && !EMBED.chairs?.length) { sh.innerHTML = '<span class="muted">이 판에는 저장소 소품이 안 들어 있습니다</span>'; return; }
   for (const p of EMBED.props) {
     const d = document.createElement('div'); d.className = 'p'; d.title = p.file;
     d.innerHTML = `<img src="${p.url}"><div></div>`; d.querySelector('div').textContent = p.label;
@@ -279,6 +306,8 @@ function drawSeat(it, sel) {
 /* ───────── 그리기 ───────── */
 function sizeCanvas() { const r = $('stage').getBoundingClientRect(); cv.width = Math.max(1, r.width); cv.height = Math.max(1, r.height); }
 function fitView() { sizeCanvas(); S.zoom = Math.min((cv.width - 40) / S.w, (cv.height - 40) / S.h); S.px = (cv.width - S.w * S.zoom) / 2; S.py = (cv.height - S.h * S.zoom) / 2; draw(); }
+// 기본 보기: 확대 1.00(배경 2배를 그대로 1:1로), 캐릭터가 화면 가운데
+function homeView() { sizeCanvas(); S.zoom = 1; const c = charItem || { x: S.w / 2, y: S.h * 0.8 }; S.px = Math.round(cv.width / 2 - c.x); S.py = Math.round(cv.height / 2 - (c.y - charSize()[1] / 2)); draw(); }
 addEventListener('resize', () => { sizeCanvas(); draw(); });
 const toW = (cx, cy) => { const r = cv.getBoundingClientRect(); return [(cx - r.left - S.px) / S.zoom, (cy - r.top - S.py) / S.zoom]; };
 function pathPoly(pts) { ctx.beginPath(); pts.forEach(([x, y], i) => (i ? ctx.lineTo(x, y) : ctx.moveTo(x, y))); ctx.closePath(); }
@@ -301,6 +330,7 @@ function drawChar(it) {
 const sortYOf = (it) => (it.kind === 'char' ? it.y : it.sortY);
 function draw() {
   ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.fillStyle = '#000'; ctx.fillRect(0, 0, cv.width, cv.height);
+  { const zv = $('zoomV'); if (zv) zv.textContent = '확대 ' + S.zoom.toFixed(2); }
   ctx.setTransform(S.zoom, 0, 0, S.zoom, S.px, S.py); ctx.imageSmoothingEnabled = false;
   if (S.bg) ctx.drawImage(S.bg, 0, 0, S.w, S.h);
   else { ctx.fillStyle = '#1b1e23'; ctx.fillRect(0, 0, S.w, S.h); ctx.fillStyle = '#7a838e'; ctx.font = '30px sans-serif'; ctx.textAlign = 'center'; ctx.fillText('「배경 열기」 또는 그림을 여기로 끌어 놓기', S.w / 2, S.h / 2); ctx.textAlign = 'start'; }
@@ -492,6 +522,8 @@ addEventListener('keydown', (e) => {
     return;
   }
   if (k === 'Escape') { if (S.brush) { S.brush = null; showProps(); draw(); } else if (S.tool !== 'select') setTool('select'); else { S.sel = null; refresh(); } return; }
+  if (!e.ctrlKey && !e.metaKey && !e.altKey && k === '1') { homeView(); return; }
+  if (!e.ctrlKey && !e.metaKey && !e.altKey && k === '0') { fitView(); return; }
   if (!e.ctrlKey && !e.metaKey && !e.altKey) { const t = { v: 'select', f: 'floor', b: 'block', c: 'cover', a: 'auto', s: 'seat', e: 'exit', l: 'lamp' }[k.toLowerCase()]; if (t) { setTool(t); return; } }
   const it = S.sel; if (!it) return;
   if (k === 'Delete' || k === 'Backspace') { e.preventDefault(); removeItem(it); return; }
@@ -534,6 +566,7 @@ function showProps() {
   const txt = (lab, key) => `<div class="row"><label>${lab}</label><input type="text" data-k="${key}" value="${String(it[key] ?? '').replace(/"/g, '&quot;')}"></div>`;
   let h = `<div class="row"><label>종류</label><b>${KIND[it.kind]}</b></div>` + (it.kind === 'char' ? '' : txt('이름', 'name'));
   if (it.kind === 'obj') h += num('x', 'x') + num('y', 'y') + num('폭', 'w') + num('높이', 'h') + num('회전°', 'rot', 15) + `<div class="row"><label>뒤집기</label><input type="checkbox" data-k="flip" ${it.flip ? 'checked' : ''}></div>` + num('깊이선 y', 'sortY')
+    + (CHAIR_RE.test(it.file) ? `<div class="row"><label>방향</label><select id="pDir">${(chairDir(CHAIR_RE.exec(it.file)[1], 'south') ? EMBED.chairs.find((c) => c.set === CHAIR_RE.exec(it.file)[1]).dirs : []).map((x) => `<option value="${x.d}" ${CHAIR_RE.exec(it.file)[2] === x.d ? 'selected' : ''}>${x.k}</option>`).join('')}</select></div>` : '')
     + `<div class="row"><button id="pFoot">발밑 막힘 만들기</button><button id="pSeat">이 소품에 앉는 자리</button></div>`;
   if (it.kind === 'cover') { h += num('깊이선 y', 'sortY'); h += it.mask ? `<div class="row"><label>허용치</label><input type="range" id="pTol" min="5" max="160" value="${it.tol ?? 40}"><span id="pTolV">${it.tol ?? 40}</span><button id="pRedo">다시 따기</button></div><div class="row"><button id="bAdd" class="${S.brush === 'add' ? 'on' : ''}">붓: 더하기</button><button id="bErase" class="${S.brush === 'erase' ? 'on' : ''}">붓: 지우기</button><label style="min-width:auto">굵기</label><input type="number" id="bR" min="1" max="80" value="${S.brushR}"></div>` : `<div class="muted">점 ${it.poly.length}개</div>`; }
   if (it.kind === 'block') h += num('윗면 높이', 'h') + `<div class="muted">999 = 못 넘음 · 낮게 주면 점프로 올라섬 · 점 ${it.poly.length}개</div>`;
@@ -551,6 +584,7 @@ function showProps() {
     it[k] = v; if (it.mask) it._cv = null; commit();
   };
   const del = $('pDel'); if (del) del.onclick = () => removeItem(it);
+  const pd = $('pDir'); if (pd) pd.onchange = () => setChairDir(it, pd.value);
   const ft = $('pFoot'); if (ft) ft.onclick = () => { const y1 = it.sortY, y0 = y1 - Math.max(12, Math.round(it.h * 0.2)); const b = { id: uid('b'), kind: 'block', name: it.name + ' 막힘', poly: [[it.x, y0], [it.x + it.w, y0], [it.x + it.w, y1], [it.x, y1]], h: 999 }; S.items.push(b); S.sel = b; commit(); say('발밑 막힘(빨강)을 만들었습니다. 점을 끌어 다듬으세요'); };
   const st = $('pSeat'); if (st) st.onclick = () => { const s = makeSeat(it.x + it.w / 2, it.y + it.h * 0.55); s.name = it.name + ' 자리'; S.items.push(s); S.sel = s; commit(); say('앉는 자리를 만들었습니다. 청록 점(엉덩이)·노란 점(발)을 끌어 맞추세요'); };
   const tl = $('pTol');
@@ -648,7 +682,7 @@ $('fOpen').onchange = async (e) => {
     else if (o.cover) S.items.push({ id: o.id, kind: 'cover', name: o.name || '가림', poly: o.cover[0], sortY: o.sortY });
     else { const file = Object.keys(S.images).find((n) => n.replace(/\.[^.]+$/, '') === o.file) || o.file + '.png'; S.items.push({ id: o.id, kind: 'obj', name: o.name || o.file, file, x: o.x, y: o.y, w: o.w, h: o.h, rot: o.rot || 0, flip: !!o.flip, sortY: o.sortY }); }
   }
-  ensureChar(); S.sel = null; fitView(); commit(); say('불러왔습니다');
+  ensureChar(); S.sel = null; homeView(); commit(); say('불러왔습니다');
 };
 const stage = $('stage');
 stage.addEventListener('dragover', (e) => { e.preventDefault(); $('drop').style.display = 'flex'; });
@@ -664,7 +698,7 @@ stage.addEventListener('drop', async (e) => {
   const had = await restore();
   if (!S.charImg && EMBED.char) { S.charImg = await loadImg(EMBED.char); }
   ensureChar(); if (committed === null) committed = ser();
-  fitView(); refresh();
+  homeView(); refresh();
   say(had ? '이전 작업을 불러왔습니다' : '「배경 열기」로 시작하세요 (배경은 자동 2배)');
 })();
 </script>
