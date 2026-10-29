@@ -719,7 +719,7 @@ export interface BodyHandlers {
 
 /**
  * 본체 시작: 세계 자료를 넣고(저장소 → 없으면 받아 저장, QC 개선 나1), 설정을 읽고 플로팅 버튼·채팅 감시를 켠다.
- * Risu에 거는 처리기는 시작기(main.ts)가 대신 걸고 여기로 넘긴다. 세계 자료를 받지 못하면 여기서 던져 처리기·화면 없이 시작기의 받기 창에 까닭이 보인다
+ * Risu에 거는 처리기는 시작기(main.ts)가 대신 걸고 여기로 넘긴다. 세계 자료를 받지 못하면 받기 창(host/datapanel.ts)을 띄우고 던진다 — 처리기·화면은 켜지 않는다
  */
 export async function start(): Promise<BodyHandlers> {
   try {
