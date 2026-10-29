@@ -70,6 +70,14 @@ for (const diff of ['easy', 'normal', 'hard', 'nightmare']) {
     hsMax = Math.max(hsMax, r.max.hs); shMax = Math.max(shMax, r.max.sh); dmgTotal += r.dmg;
   }
   assert.deepEqual(kinds, { stun: 'stun', launch: 'launch', blow: 'blow' }, `강공격 마무리 3종 ${JSON.stringify(kinds)}`);
+  // 빠른 연타 (2026-10-29 사용자: 선입력 2칸): 약·약·약·강을 120ms 간격으로 눌러도 세 번째 약이 안 사라지고 날리기
+  await page.evaluate(() => { const w = window.__goeiEngine.world; const p = w.player; p.core.P.lastHeavy = null; const e = w.bodies.find((b) => b.team === 'enemy' && b.alive); e.hp = e.hpMax; p.x = e.x - 110; p.y = e.y; p.dir = 1; if (p.core) p.core.P.face = 1; });
+  await ground();
+  await page.waitForTimeout(300);
+  for (const k of ['KeyQ', 'KeyQ', 'KeyQ', 'KeyW']) { await page.keyboard.press(k); await page.waitForTimeout(120); }
+  await page.waitForFunction(() => window.__goeiEngine.world.player.core.P.lastHeavy !== null, null, { timeout: 4000 }).catch(() => {});
+  const fast = await page.evaluate(() => window.__goeiEngine.world.player.core.P.lastHeavy);
+  assert.equal(fast, 'blow', `빠른 연타 약3+강 = 날리기 (${fast})`);
   assert.ok(hsMax > 0, `히트스톱 ${hsMax}`);
   assert.ok(shMax > 6, `흔들림 ${shMax}`);
   assert.ok(dmgTotal > 0, `상대 피해 ${dmgTotal}`);
