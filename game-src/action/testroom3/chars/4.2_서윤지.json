@@ -799,10 +799,8 @@
         {
          "t": "v",
          "vfx": "x3-4.2-F-red-pen-strike",
-         "at": "self",
-         "dx": 60,
+         "at": "screen",
          "scale": 1.0,
-         "under": true,
          "boom": 3,
          "hit": {
           "dmg": 263,
@@ -813,7 +811,8 @@
           "vs": 1.1,
           "tint": "#c8e0c6"
          },
-         "r": 515.2
+         "w": 1.05,
+         "dy": -90
         }
        ]
       }
