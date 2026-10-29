@@ -59,8 +59,9 @@
     <div class="row"><button id="bWalk">걷기 시험 켜기</button><span class="hint">방향키로 이동, 가림·막힘 확인</span></div>
     <h4>도움말</h4>
     <div class="hint">
-      선택: 클릭·끌기(이동). 모서리 끌기: 크기. R: 회전 +15°, F: 좌우 뒤집기, [ ]: 앞뒤 순서, Delete: 삭제.<br>
-      다각형: 클릭으로 점, 더블클릭·Enter로 끝. 점 끌기로 수정, 점 위 Alt+클릭 삭제.<br>
+      선택: 클릭·끌기(이동). 모서리 끌기: 크기. R: 회전 +15°, F: 좌우 뒤집기, [ ]: 앞뒤 순서, Delete: 삭제, <b>Ctrl+Z: 되돌리기</b>, Esc: 그리기 취소, 그리는 중 Backspace: 마지막 점 빼기.<br>
+      다각형: 클릭으로 점, <b>누른 채 끌면 자유곡선</b>, 더블클릭·Enter로 끝. 점 끌기로 수정, 점 위 Alt+클릭 삭제, 선 위 클릭으로 점 추가.<br>
+      자동 가림(색): 상자를 끌면 테두리 색(벽·바닥)과 다른 픽셀만 픽셀 단위로 따서 가림이 됨. 허용치·붓(더하기/지우기)으로 다듬기.<br>
       깊이선(sortY): 소품의 주황선을 위아래로 끌기. 사람 발이 이 선보다 위면 소품 뒤에 그려짐.<br>
       가림: 배경을 오리지 않고 다각형 안을 사람 위에 다시 그림. 깊이선은 가림에도 있음.
     </div>
@@ -72,6 +73,7 @@
       <button data-tool="select" class="tool on">선택</button>
       <button data-tool="floor" class="tool">바닥 다각형</button>
       <button data-tool="cover" class="tool">가림 다각형</button>
+      <button data-tool="autocover" class="tool">자동 가림(색)</button>
       <button data-tool="solid" class="tool">막힘 상자</button>
       <button data-tool="exit" class="tool">출입구</button>
       <button data-tool="lamp" class="tool">조명</button>
@@ -94,6 +96,7 @@ const S = {
   items: [],   // {id, kind:'obj'|'cover'|'solid'|'exit'|'lamp'|'seat', ...}
   sel: null, tool: 'select', zoom: 0.6, panX: 20, panY: 20,
   drawing: null, // 진행 중 다각형 점들
+  brush: null, brushR: 6, mouse: null,
   walk: false, char: null, charScale: 2, p: { x: 300, y: 500 },
   images: {},    // name → {img, dataUrl}
 };
@@ -143,7 +146,7 @@ function insidePoly(poly, x, y) { let inside = false; for (let i = 0, j = poly.l
 function centroid(poly) { let x = 0, y = 0; for (const p of poly) { x += p[0]; y += p[1]; } return [x / poly.length, y / poly.length]; }
 function itemBox(it) {
   if (it.kind === 'obj') return { x0: it.x, y0: it.y, x1: it.x + it.w, y1: it.y + it.h };
-  if (it.kind === 'cover') { const xs = it.poly.map((p) => p[0]), ys = it.poly.map((p) => p[1]); return { x0: Math.min(...xs), y0: Math.min(...ys), x1: Math.max(...xs), y1: Math.max(...ys) }; }
+  if (it.kind === 'cover') { if (it.mask) return { x0: it.mx, y0: it.my, x1: it.mx + it.mw, y1: it.my + it.mh }; const xs = it.poly.map((p) => p[0]), ys = it.poly.map((p) => p[1]); return { x0: Math.min(...xs), y0: Math.min(...ys), x1: Math.max(...xs), y1: Math.max(...ys) }; }
   if (it.kind === 'solid') return { x0: it.x0, y0: it.y0, x1: it.x1, y1: it.y1 };
   if (it.kind === 'exit') return { x0: it.x - 60, y0: it.y - 20, x1: it.x + 60, y1: it.y + 10 };
   return { x0: it.x - 14, y0: it.y - 14, x1: it.x + 14, y1: it.y + 14 };
@@ -159,8 +162,44 @@ function drawObj(c, it, alpha = 1) {
 }
 function drawCover(c, it) {
   if (!S.bg) return;
+  if (it.mask) {
+    // 마스크 가림: 배경의 그 영역을 마스크(흰 = 가림)로 잘라 한 번 더 그린다
+    if (!it._cv) rebuildMaskCanvas(it);
+    c.save(); c.imageSmoothingEnabled = false; c.drawImage(it._cv, it.mx, it.my, it.mw, it.mh); c.restore();
+    return;
+  }
   c.save(); c.beginPath(); it.poly.forEach(([x, y], i) => (i ? c.lineTo(x, y) : c.moveTo(x, y))); c.closePath(); c.clip();
   c.imageSmoothingEnabled = false; c.drawImage(S.bg, 0, 0, S.w, S.h); c.restore();
+}
+function rebuildMaskCanvas(it) {
+  const o = document.createElement('canvas'); o.width = it.mw; o.height = it.mh; const g = o.getContext('2d');
+  g.imageSmoothingEnabled = false; g.drawImage(S.bg, it.mx / S.bgScale, it.my / S.bgScale, it.mw / S.bgScale, it.mh / S.bgScale, 0, 0, it.mw, it.mh);
+  const id = g.getImageData(0, 0, it.mw, it.mh), d = id.data, m = it.mask;   // mask: Uint8Array(mw*mh) 0/1 (월드 px 단위)
+  for (let i = 0; i < m.length; i++) if (!m[i]) d[i * 4 + 3] = 0;
+  g.putImageData(id, 0, 0); it._cv = o;
+}
+function maskToDataUrl(it) { const o = document.createElement('canvas'); o.width = it.mw; o.height = it.mh; const g = o.getContext('2d'); const id = g.createImageData(it.mw, it.mh); for (let i = 0; i < it.mask.length; i++) { const v = it.mask[i] ? 255 : 0; id.data[i * 4] = v; id.data[i * 4 + 1] = v; id.data[i * 4 + 2] = v; id.data[i * 4 + 3] = 255; } g.putImageData(id, 0, 0); return o.toDataURL('image/png'); }
+function maskFromDataUrl(it, url) { return new Promise((res) => { const im = new Image(); im.onload = () => { const o = document.createElement('canvas'); o.width = it.mw; o.height = it.mh; const g = o.getContext('2d'); g.drawImage(im, 0, 0); const d = g.getImageData(0, 0, it.mw, it.mh).data; it.mask = new Uint8Array(it.mw * it.mh); for (let i = 0; i < it.mask.length; i++) it.mask[i] = d[i * 4] > 127 ? 1 : 0; it._cv = null; res(); }; im.src = url; }); }
+/** 상자 안에서 테두리 색과 다른 픽셀만 (허용치 tol). 작은 점은 지운다 */
+function autoMask(it) {
+  const o = document.createElement('canvas'); o.width = it.mw; o.height = it.mh; const g = o.getContext('2d');
+  g.imageSmoothingEnabled = false; g.drawImage(S.bg, it.mx / S.bgScale, it.my / S.bgScale, it.mw / S.bgScale, it.mh / S.bgScale, 0, 0, it.mw, it.mh);
+  const d = g.getImageData(0, 0, it.mw, it.mh).data, W = it.mw, H = it.mh;
+  // 바탕색 후보: 테두리 픽셀을 색 묶음으로 (16단계로 양자화해 자주 나오는 것 위주)
+  const cnt = new Map(), key = (i) => `${d[i] >> 4},${d[i + 1] >> 4},${d[i + 2] >> 4}`;
+  const border = [];
+  for (let x = 0; x < W; x++) { border.push(x * 4, ((H - 1) * W + x) * 4); }
+  for (let y = 0; y < H; y++) { border.push(y * W * 4, (y * W + W - 1) * 4); }
+  for (const i of border) cnt.set(key(i), (cnt.get(key(i)) || 0) + 1);
+  const bgs = [...cnt.entries()].sort((a, b) => b[1] - a[1]).slice(0, 6).map(([k]) => k.split(',').map((v) => v * 16 + 8));
+  const tol = it.tol ?? 40, m = new Uint8Array(W * H);
+  for (let i = 0; i < W * H; i++) { const r = d[i * 4], gg = d[i * 4 + 1], b = d[i * 4 + 2]; let near = false; for (const [br, bg, bb] of bgs) if (Math.abs(r - br) + Math.abs(gg - bg) + Math.abs(b - bb) < tol) { near = true; break; } m[i] = near ? 0 : 1; }
+  // 작은 점 지우기: 3×3 열기
+  const e = new Uint8Array(W * H);
+  for (let y = 1; y < H - 1; y++) for (let x = 1; x < W - 1; x++) { let ok = 1; for (let dy = -1; dy <= 1 && ok; dy++) for (let dx = -1; dx <= 1; dx++) if (!m[(y + dy) * W + x + dx]) { ok = 0; break; } e[y * W + x] = ok; }
+  const r2 = new Uint8Array(W * H);
+  for (let y = 1; y < H - 1; y++) for (let x = 1; x < W - 1; x++) { let any = 0; for (let dy = -1; dy <= 1 && !any; dy++) for (let dx = -1; dx <= 1; dx++) if (e[(y + dy) * W + x + dx]) { any = 1; break; } r2[y * W + x] = any; }
+  it.mask = r2; it._cv = null;
 }
 function drawChar(c) {
   const h = (S.char ? S.char.height : 115) * S.charScale, w = (S.char ? S.char.width : 50) * S.charScale;
@@ -182,7 +221,11 @@ function draw() {
   if ($('showFloor').checked && S.floor.length) { ctx.strokeStyle = '#3cff8a'; ctx.lineWidth = lw; ctx.setLineDash([8 / S.zoom, 6 / S.zoom]); poly(ctx, S.floor); ctx.stroke(); ctx.setLineDash([]); ctx.fillStyle = 'rgba(60,255,138,.08)'; ctx.fill(); }
   for (const it of S.items) {
     const sel = it === S.sel;
-    if (it.kind === 'cover' && $('showCover').checked) { ctx.strokeStyle = sel ? '#fff' : '#b388ff'; ctx.lineWidth = lw; poly(ctx, it.poly); ctx.stroke(); ctx.fillStyle = 'rgba(179,136,255,.12)'; ctx.fill(); }
+    if (it.kind === 'cover' && $('showCover').checked) {
+      ctx.strokeStyle = sel ? '#fff' : '#b388ff'; ctx.lineWidth = lw;
+      if (it.mask) { ctx.setLineDash([6 / S.zoom, 4 / S.zoom]); ctx.strokeRect(it.mx, it.my, it.mw, it.mh); ctx.setLineDash([]); if (sel) { if (!it._cv) rebuildMaskCanvas(it); ctx.save(); ctx.globalAlpha = 0.35; ctx.fillStyle = '#b388ff'; ctx.globalCompositeOperation = 'source-over'; const o = document.createElement('canvas'); o.width = it.mw; o.height = it.mh; const g = o.getContext('2d'); g.drawImage(it._cv, 0, 0); g.globalCompositeOperation = 'source-in'; g.fillStyle = '#b388ff'; g.fillRect(0, 0, it.mw, it.mh); ctx.drawImage(o, it.mx, it.my); ctx.restore(); } }
+      else { poly(ctx, it.poly); ctx.stroke(); ctx.fillStyle = 'rgba(179,136,255,.12)'; ctx.fill(); }
+    }
     if (it.kind === 'solid' && $('showSolid').checked) { ctx.strokeStyle = sel ? '#fff' : '#ff5252'; ctx.lineWidth = lw; ctx.strokeRect(it.x0, it.y0, it.x1 - it.x0, it.y1 - it.y0); ctx.fillStyle = 'rgba(255,82,82,.15)'; ctx.fillRect(it.x0, it.y0, it.x1 - it.x0, it.y1 - it.y0); }
     if (it.kind === 'obj') {
       if (it.solid && $('showSolid').checked) { ctx.strokeStyle = '#ff5252'; ctx.lineWidth = lw; ctx.strokeRect(it.solid.x0, it.solid.y0, it.solid.x1 - it.solid.x0, it.solid.y1 - it.solid.y0); }
@@ -195,7 +238,8 @@ function draw() {
   }
   if (S.drawing) { ctx.strokeStyle = '#fff'; ctx.lineWidth = lw; ctx.beginPath(); S.drawing.forEach(([x, y], i) => (i ? ctx.lineTo(x, y) : ctx.moveTo(x, y))); ctx.stroke(); for (const [x, y] of S.drawing) ctx.fillRect(x - 3 / S.zoom, y - 3 / S.zoom, 6 / S.zoom, 6 / S.zoom); }
   if (S.tool === 'floor' && S.floor.length && !S.drawing) { ctx.fillStyle = '#3cff8a'; for (const [x, y] of S.floor) ctx.fillRect(x - 4 / S.zoom, y - 4 / S.zoom, 8 / S.zoom, 8 / S.zoom); }
-  if (S.sel?.kind === 'cover') { ctx.fillStyle = '#fff'; for (const [x, y] of S.sel.poly) ctx.fillRect(x - 3 / S.zoom, y - 3 / S.zoom, 6 / S.zoom, 6 / S.zoom); }
+  if (S.sel?.kind === 'cover' && S.sel.poly) { ctx.fillStyle = '#fff'; for (const [x, y] of S.sel.poly) ctx.fillRect(x - 3 / S.zoom, y - 3 / S.zoom, 6 / S.zoom, 6 / S.zoom); }
+  if (S.brush && S.sel?.mask && S.mouse) { ctx.strokeStyle = S.brush === 'add' ? '#fff' : '#ff5252'; ctx.lineWidth = lw; ctx.beginPath(); ctx.arc(S.mouse[0], S.mouse[1], S.brushR, 0, Math.PI * 2); ctx.stroke(); }
 }
 function poly(c, pts) { c.beginPath(); pts.forEach(([x, y], i) => (i ? c.lineTo(x, y) : c.moveTo(x, y))); c.closePath(); }
 function handles(it) { return [[it.x, it.y], [it.x + it.w, it.y], [it.x, it.y + it.h], [it.x + it.w, it.y + it.h]]; }
@@ -206,12 +250,17 @@ cv.addEventListener('mousedown', (e) => {
   const [x, y] = toWorld(e.clientX, e.clientY);
   if (e.button === 1 || e.shiftKey && S.tool === 'select') { drag = { kind: 'pan', sx: e.clientX, sy: e.clientY, px: S.panX, py: S.panY }; return; }
   const T = S.tool;
+  if (S.brush && S.sel?.mask) { drag = { kind: 'brush' }; paintMask(x, y); return; }
+  if (T === 'autocover') { drag = { kind: 'auto', x0: x, y0: y, it: { id: uid('c'), kind: 'cover', mx: Math.round(x), my: Math.round(y), mw: 1, mh: 1, mask: null, tol: 40, sortY: Math.round(y), name: '가림(자동)' } }; return; }
   if (T === 'floor' || T === 'cover') {
-    // 기존 점 끌기 (floor 또는 선택한 cover)
-    const pts = T === 'floor' ? S.floor : S.sel?.kind === 'cover' ? S.sel.poly : null;
-    if (pts && !S.drawing) { const i = nearPoint(pts, x, y); if (i >= 0) { if (e.altKey) { if (pts.length > 3) pts.splice(i, 1); draw(); persist(); return; } drag = { kind: 'pt', pts, i }; return; } }
+    // 기존 점 끌기 (floor 또는 선택한 cover), 선 위 클릭이면 점 추가
+    const pts = T === 'floor' ? S.floor : S.sel?.kind === 'cover' && S.sel.poly ? S.sel.poly : null;
+    if (pts && !S.drawing) {
+      const i = nearPoint(pts, x, y); if (i >= 0) { if (e.altKey) { if (pts.length > 3) pts.splice(i, 1); draw(); persist(); return; } drag = { kind: 'pt', pts, i }; return; }
+      const j = nearEdge(pts, x, y); if (j >= 0) { pts.splice(j + 1, 0, [Math.round(x), Math.round(y)]); drag = { kind: 'pt', pts, i: j + 1 }; draw(); return; }
+    }
     if (!S.drawing) S.drawing = [];
-    S.drawing.push([Math.round(x), Math.round(y)]); draw(); return;
+    S.drawing.push([Math.round(x), Math.round(y)]); drag = { kind: 'free' }; draw(); return;
   }
   if (T === 'solid') { drag = { kind: 'rect', x0: x, y0: y, it: { id: uid('b'), kind: 'solid', x0: x, y0: y, x1: x, y1: y, h: 999, name: '막힘' } }; S.items.push(drag.it); S.sel = drag.it; return; }
   if (T === 'exit') { const it = { id: uid('x'), kind: 'exit', x: Math.round(x), y: Math.round(y), to: '', name: '출입구' }; S.items.push(it); S.sel = it; setTool('select'); refreshList(); draw(); persist(); return; }
@@ -221,7 +270,7 @@ cv.addEventListener('mousedown', (e) => {
   if (S.sel?.kind === 'obj') { const hs = handles(S.sel); for (let i = 0; i < 4; i++) if (Math.hypot(hs[i][0] - x, hs[i][1] - y) < 8 / S.zoom) { drag = { kind: 'size', i, it: S.sel, ax: hs[3 - i][0], ay: hs[3 - i][1], ar: S.sel.w / S.sel.h }; return; } }
   if (S.sel && (S.sel.kind === 'obj' || S.sel.kind === 'cover') && Math.abs(y - S.sel.sortY) < 6 / S.zoom) { const b = itemBox(S.sel); if (x > b.x0 - 10 && x < b.x1 + 10) { drag = { kind: 'sort', it: S.sel }; return; } }
   if (S.sel?.kind === 'cover') { const i = nearPoint(S.sel.poly, x, y); if (i >= 0) { drag = { kind: 'pt', pts: S.sel.poly, i }; return; } }
-  const hit = [...S.items].reverse().find((it) => { const b = itemBox(it); return x >= b.x0 && x <= b.x1 && y >= b.y0 && y <= b.y1 && (it.kind !== 'cover' || insidePoly(it.poly, x, y)); });
+  const hit = [...S.items].reverse().find((it) => { const b = itemBox(it); return x >= b.x0 && x <= b.x1 && y >= b.y0 && y <= b.y1 && (it.kind !== 'cover' || (it.mask ? !!it.mask[Math.floor(y - it.my) * it.mw + Math.floor(x - it.mx)] : insidePoly(it.poly, x, y))); });
   S.sel = hit || null; refreshList(); showProps();
   if (hit) drag = { kind: 'move', it: hit, sx: x, sy: y, snap: JSON.parse(JSON.stringify(hit)) };
   draw();
@@ -230,6 +279,9 @@ addEventListener('mousemove', (e) => {
   if (!drag) return;
   const [x, y] = toWorld(e.clientX, e.clientY);
   if (drag.kind === 'pan') { S.panX = drag.px + e.clientX - drag.sx; S.panY = drag.py + e.clientY - drag.sy; draw(); return; }
+  if (drag.kind === 'free') { const L = S.drawing[S.drawing.length - 1]; if (Math.hypot(L[0] - x, L[1] - y) >= 3 / S.zoom) { S.drawing.push([Math.round(x), Math.round(y)]); draw(); } return; }
+  if (drag.kind === 'brush') { paintMask(x, y); return; }
+  if (drag.kind === 'auto') { const it = drag.it; it.mx = Math.round(Math.min(drag.x0, x)); it.my = Math.round(Math.min(drag.y0, y)); it.mw = Math.max(1, Math.round(Math.abs(x - drag.x0))); it.mh = Math.max(1, Math.round(Math.abs(y - drag.y0))); draw(); ctx.save(); ctx.setTransform(S.zoom, 0, 0, S.zoom, S.panX, S.panY); ctx.strokeStyle = '#b388ff'; ctx.lineWidth = 2 / S.zoom; ctx.strokeRect(it.mx, it.my, it.mw, it.mh); ctx.restore(); return; }
   if (drag.kind === 'pt') { drag.pts[drag.i] = [Math.round(x), Math.round(y)]; draw(); return; }
   if (drag.kind === 'rect') { const it = drag.it; it.x0 = Math.round(Math.min(drag.x0, x)); it.x1 = Math.round(Math.max(drag.x0, x)); it.y0 = Math.round(Math.min(drag.y0, y)); it.y1 = Math.round(Math.max(drag.y0, y)); draw(); return; }
   if (drag.kind === 'sort') { drag.it.sortY = Math.round(y); draw(); showProps(); return; }
@@ -237,13 +289,30 @@ addEventListener('mousemove', (e) => {
   if (drag.kind === 'move') {
     const dx = Math.round(x - drag.sx), dy = Math.round(y - drag.sy), it = drag.it, s = drag.snap;
     if (it.kind === 'obj') { it.x = s.x + dx; it.y = s.y + dy; it.sortY = s.sortY + dy; if (s.solid) it.solid = { x0: s.solid.x0 + dx, x1: s.solid.x1 + dx, y0: s.solid.y0 + dy, y1: s.solid.y1 + dy, h: s.solid.h }; }
-    else if (it.kind === 'cover') { it.poly = s.poly.map(([px, py]) => [px + dx, py + dy]); it.sortY = s.sortY + dy; }
+    else if (it.kind === 'cover') { if (it.mask) { it.mx = s.mx + dx; it.my = s.my + dy; it._cv = null; } else it.poly = s.poly.map(([px, py]) => [px + dx, py + dy]); it.sortY = s.sortY + dy; }
     else if (it.kind === 'solid') { it.x0 = s.x0 + dx; it.x1 = s.x1 + dx; it.y0 = s.y0 + dy; it.y1 = s.y1 + dy; }
     else { it.x = s.x + dx; it.y = s.y + dy; }
     draw(); showProps();
   }
 });
-addEventListener('mouseup', () => { if (drag) { if (drag.kind === 'rect') { setTool('select'); refreshList(); } drag = null; persist(); showProps(); } });
+addEventListener('mouseup', () => {
+  if (!drag) return;
+  if (drag.kind === 'rect') { setTool('select'); refreshList(); }
+  if (drag.kind === 'free') { drag = null; if (S.drawing && S.drawing.length > 12) { /* 끌어 그린 자유곡선은 바로 끝낸다 */ finishPoly(); } return; }
+  if (drag.kind === 'auto') { const it = drag.it; if (it.mw > 4 && it.mh > 4) { autoMask(it); it.sortY = it.my + it.mh; S.items.push(it); S.sel = it; setTool('select'); refreshList(); } drag = null; draw(); persist(); showProps(); return; }
+  if (drag.kind === 'brush') { drag = null; S.sel._cv = null; draw(); persist(); return; }
+  drag = null; persist(); showProps();
+});
+cv.addEventListener('mousemove', (e) => { S.mouse = toWorld(e.clientX, e.clientY); if (S.brush) draw(); });
+function paintMask(x, y) {
+  const it = S.sel, r = S.brushR, v = S.brush === 'add' ? 1 : 0;
+  for (let yy = Math.max(0, Math.floor(y - r - it.my)); yy < Math.min(it.mh, y + r - it.my); yy++) for (let xx = Math.max(0, Math.floor(x - r - it.mx)); xx < Math.min(it.mw, x + r - it.mx); xx++) if (Math.hypot(xx + it.mx - x, yy + it.my - y) <= r) it.mask[yy * it.mw + xx] = v;
+  it._cv = null; draw();
+}
+function nearEdge(pts, x, y) {
+  for (let i = 0; i < pts.length; i++) { const a = pts[i], b = pts[(i + 1) % pts.length]; const L = Math.hypot(b[0] - a[0], b[1] - a[1]); if (!L) continue; const t = Math.max(0, Math.min(1, ((x - a[0]) * (b[0] - a[0]) + (y - a[1]) * (b[1] - a[1])) / (L * L))); if (Math.hypot(a[0] + t * (b[0] - a[0]) - x, a[1] + t * (b[1] - a[1]) - y) < 6 / S.zoom) return i; }
+  return -1;
+}
 cv.addEventListener('dblclick', () => finishPoly());
 cv.addEventListener('wheel', (e) => { e.preventDefault(); const [wx, wy] = toWorld(e.clientX, e.clientY); const z = Math.max(0.25, Math.min(3, S.zoom * (e.deltaY < 0 ? 1.1 : 0.9))); S.panX -= wx * (z - S.zoom); S.panY -= wy * (z - S.zoom); S.zoom = z; $('zoom').value = z; $('zoomV').textContent = z.toFixed(2); draw(); }, { passive: false });
 function nearPoint(pts, x, y) { for (let i = 0; i < pts.length; i++) if (Math.hypot(pts[i][0] - x, pts[i][1] - y) < 7 / S.zoom) return i; return -1; }
@@ -256,8 +325,10 @@ function finishPoly() {
 function setTool(t) { S.tool = t; for (const q of document.querySelectorAll('.tool')) q.classList.toggle('on', q.dataset.tool === t); }
 addEventListener('keydown', (e) => {
   if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT') return;
+  if ((e.ctrlKey || e.metaKey) && (e.key === 'z' || e.key === 'Z')) { e.preventDefault(); if (UNDO.length) { const j = UNDO.pop(); lastSnap = j; restoreSnap(j).then(() => { try { localStorage.setItem('goei-mapedit-tmp', '1'); } catch (_) {} persistQuiet(); }); status('되돌림'); } return; }
   if (e.key === 'Enter') { finishPoly(); return; }
-  if (e.key === 'Escape') { S.drawing = null; draw(); return; }
+  if (e.key === 'Escape') { S.drawing = null; S.brush = null; draw(); showProps(); return; }
+  if (S.drawing && (e.key === 'Backspace' || e.key === 'Delete')) { S.drawing.pop(); if (!S.drawing.length) S.drawing = null; draw(); return; }
   if (S.walk && e.key.startsWith('Arrow')) {
     e.preventDefault(); const st = e.shiftKey ? 24 : 8; const nx = S.p.x + (e.key === 'ArrowLeft' ? -st : e.key === 'ArrowRight' ? st : 0), ny = S.p.y + (e.key === 'ArrowUp' ? -st : e.key === 'ArrowDown' ? st : 0);
     if (walkable(nx, ny)) S.p = { x: nx, y: ny }; else if (walkable(nx, S.p.y)) S.p.x = nx; else if (walkable(S.p.x, ny)) S.p.y = ny;
@@ -297,7 +368,8 @@ function showProps() {
     h += `<div class="row"><button id="pSolid">${it.solid ? '막힘 상자 지우기' : '막힘 상자 만들기(아래 띠)'}</button></div>`;
     if (it.solid) h += `<div class="row">막힘 x0 <input data-s="x0" type="number" value="${it.solid.x0}"> x1 <input data-s="x1" type="number" value="${it.solid.x1}"></div><div class="row">y0 <input data-s="y0" type="number" value="${it.solid.y0}"> y1 <input data-s="y1" type="number" value="${it.solid.y1}"></div><div class="row">윗면 높이 <input data-s="h" type="number" value="${it.solid.h ?? 999}"> <span class="hint">999 = 못 넘음</span></div>`;
   }
-  if (it.kind === 'cover') h += f('깊이선 y', 'sortY') + `<div class="hint">점 ${it.poly.length}개. 가림 도구에서 점 끌기·Alt+클릭 삭제</div>`;
+  if (it.kind === 'cover' && it.mask) h += f('깊이선 y', 'sortY') + `<div class="row">허용치 <input type="range" id="pTol" min="5" max="150" value="${it.tol ?? 40}"> <span id="pTolV">${it.tol ?? 40}</span> <button id="pRedo">다시 따기</button></div><div class="row">붓 <button id="bAdd" class="${S.brush === 'add' ? 'on' : ''}">더하기</button><button id="bErase" class="${S.brush === 'erase' ? 'on' : ''}">지우기</button> 굵기 <input type="number" id="bR" value="${S.brushR}" min="1" max="60"></div><div class="hint">상자 안 픽셀 중 테두리 색(벽·바닥)과 다른 것만 가림. 붓으로 더하거나 지우기</div>`;
+  else if (it.kind === 'cover') h += f('깊이선 y', 'sortY') + `<div class="hint">점 ${it.poly.length}개. 가림 도구에서 점 끌기·Alt+클릭 삭제·선 위 클릭 추가</div>`;
   if (it.kind === 'solid') h += f('x0', 'x0') + f('x1', 'x1') + f('y0', 'y0') + f('y1', 'y1') + f('윗면 높이', 'h');
   if (it.kind === 'exit') h += f('x', 'x') + f('y', 'y') + f('가는 곳(장면 id)', 'to', 'text') + f('도착 문 id', 'toDoor', 'text') + f('표시 이름', 'label', 'text');
   if (it.kind === 'lamp') h += f('x', 'x') + f('y', 'y') + f('반지름', 'r') + `<div class="row">종류 <select data-k="lk"><option ${it.lk === 'lamp' ? 'selected' : ''}>lamp</option><option ${it.lk === 'down' ? 'selected' : ''}>down</option><option ${it.lk === 'sign' ? 'selected' : ''}>sign</option></select></div>` + f('색', 'color', 'text');
@@ -306,6 +378,8 @@ function showProps() {
   P.innerHTML = h;
   for (const inp of P.querySelectorAll('input[data-k],select[data-k]')) inp.onchange = () => { const k = inp.dataset.k; it[k] = inp.type === 'checkbox' ? inp.checked : inp.type === 'number' ? +inp.value : inp.value; draw(); persist(); refreshList(); };
   for (const inp of P.querySelectorAll('input[data-s]')) inp.onchange = () => { it.solid[inp.dataset.s] = +inp.value; draw(); persist(); };
+  const tl = $('pTol'); if (tl) { tl.oninput = () => { $('pTolV').textContent = tl.value; }; $('pRedo').onclick = () => { it.tol = +tl.value; autoMask(it); draw(); persist(); }; $('bAdd').onclick = () => { S.brush = S.brush === 'add' ? null : 'add'; showProps(); draw(); }; $('bErase').onclick = () => { S.brush = S.brush === 'erase' ? null : 'erase'; showProps(); draw(); }; $('bR').onchange = () => { S.brushR = +$('bR').value; }; }
+  else S.brush = null;
   const ps = $('pSolid'); if (ps) ps.onclick = () => { it.solid = it.solid ? null : { x0: it.x, x1: it.x + it.w, y0: it.sortY - Math.round(it.h * 0.25), y1: it.sortY, h: 999 }; draw(); persist(); showProps(); };
   $('pDel').onclick = () => { S.items = S.items.filter((q) => q !== it); S.sel = null; refreshList(); draw(); persist(); };
 }
@@ -322,22 +396,33 @@ function toJSON() {
     windows: [],
     objects: S.items.filter((i) => i.kind === 'obj' || i.kind === 'cover').map((i) => i.kind === 'obj'
       ? { id: i.id, name: i.name, file: i.file.replace(/\.[^.]+$/, ''), x: i.x, y: i.y, w: i.w, h: i.h, rot: i.rot || 0, flip: !!i.flip, sortY: i.sortY, solid: i.solid ? [i.solid] : undefined }
+      : i.mask ? { id: i.id, name: i.name, file: '', x: i.mx, y: i.my, w: i.mw, h: i.mh, sortY: i.sortY, coverMask: maskToDataUrl(i), tol: i.tol }
       : { id: i.id, name: i.name, file: '', x: 0, y: 0, w: 0, h: 0, sortY: i.sortY, cover: [i.poly] }),
   };
   return scene;
 }
+const UNDO = []; let lastSnap = null;
+function snapshot() { return JSON.stringify({ items: S.items.map((i) => i.mask ? { ...i, mask: undefined, _cv: undefined, maskUrl: maskToDataUrl(i) } : i), floor: S.floor }); }
+async function restoreSnap(j) {
+  const d = JSON.parse(j); S.items = d.items; S.floor = d.floor; S.sel = null; S.drawing = null;
+  for (const it of S.items) if (it.maskUrl) { await maskFromDataUrl(it, it.maskUrl); delete it.maskUrl; }
+  refreshList(); draw();
+}
+function persistQuiet() { try { localStorage.setItem('goei-mapedit', JSON.stringify({ scene: toJSON(), items: S.items.map((i) => i.mask ? { ...i, mask: undefined, _cv: undefined, maskUrl: maskToDataUrl(i) } : i), floor: S.floor, bgName: S.bgName, bgScale: S.bgScale, images: Object.fromEntries(Object.entries(S.images).map(([k, v]) => [k, v.dataUrl])) })); } catch (e) {} }
 function persist() {
-  try { localStorage.setItem('goei-mapedit', JSON.stringify({ scene: toJSON(), items: S.items, floor: S.floor, bgName: S.bgName, bgScale: S.bgScale, images: Object.fromEntries(Object.entries(S.images).map(([k, v]) => [k, v.dataUrl])) })); } catch (e) { status('브라우저 저장 실패(용량)'); }
+  try { const now = snapshot(); if (lastSnap !== null && lastSnap !== now) { UNDO.push(lastSnap); if (UNDO.length > 60) UNDO.shift(); } lastSnap = now; } catch (e) {}
+  try { localStorage.setItem('goei-mapedit', JSON.stringify({ scene: toJSON(), items: S.items.map((i) => i.mask ? { ...i, mask: undefined, _cv: undefined, maskUrl: maskToDataUrl(i) } : i), floor: S.floor, bgName: S.bgName, bgScale: S.bgScale, images: Object.fromEntries(Object.entries(S.images).map(([k, v]) => [k, v.dataUrl])) })); } catch (e) { status('브라우저 저장 실패(용량)'); }
 }
 async function restore() {
   const raw = localStorage.getItem('goei-mapedit'); if (!raw) return;
   try {
     const d = JSON.parse(raw);
     for (const [k, url] of Object.entries(d.images || {})) await new Promise((res) => { const img = new Image(); img.onload = () => { S.images[k] = { img, dataUrl: url }; res(); }; img.onerror = res; img.src = url; });
-    S.items = d.items || []; S.floor = d.floor || []; S.bgName = d.bgName || ''; S.bgScale = d.bgScale || 2; $('bgScale').value = S.bgScale;
+    S.items = d.items || []; S.floor = d.floor || [];
+    for (const it of S.items) if (it.maskUrl) { await maskFromDataUrl(it, it.maskUrl); delete it.maskUrl; } S.bgName = d.bgName || ''; S.bgScale = d.bgScale || 2; $('bgScale').value = S.bgScale;
     if (S.images[S.bgName]) { S.bg = S.images[S.bgName].img; S.w = S.bg.width * S.bgScale; S.h = S.bg.height * S.bgScale; $('bgSize').textContent = `${S.bg.width}×${S.bg.height} → 월드 ${S.w}×${S.h}`; }
     if (S.images.__char) S.char = S.images.__char.img;
-    refreshList(); status('브라우저에 저장된 맵을 불러왔습니다');
+    refreshList(); lastSnap = snapshot(); status('브라우저에 저장된 맵을 불러왔습니다');
   } catch (e) { console.warn(e); }
 }
 // 저장 전용 ZIP (압축 없음)
@@ -371,7 +456,7 @@ function loadScene(d) {
   for (const [id, dr] of Object.entries(d.doors || {})) S.items.push({ id, kind: 'exit', x: dr.x, y: dr.y, to: dr.to, toDoor: dr.toDoor, label: dr.label, name: '출입구' });
   for (const l of d.lamps || []) S.items.push({ id: uid('l'), kind: 'lamp', x: l.x, y: l.y, r: l.r || 200, lk: l.kind, color: l.color, name: '조명' });
   for (const s of d.spots || []) S.items.push({ id: s.id, kind: 'seat', x: s.x, y: s.y, verb: s.verb, face: s.face, sx: s.seat?.x, sy: s.seat?.y, name: '앉는 자리' });
-  for (const o of d.objects || []) S.items.push(o.cover ? { id: o.id, kind: 'cover', poly: o.cover[0], sortY: o.sortY, name: o.name || '가림' } : { id: o.id, kind: 'obj', file: Object.keys(S.images).find((k) => k.replace(/\.[^.]+$/, '') === o.file) || o.file + '.png', x: o.x, y: o.y, w: o.w, h: o.h, rot: o.rot || 0, flip: !!o.flip, sortY: o.sortY, solid: o.solid?.[0] || null, name: o.name || o.file });
+  for (const o of d.objects || []) if (o.coverMask) { const it = { id: o.id, kind: 'cover', mx: o.x, my: o.y, mw: o.w, mh: o.h, mask: null, tol: o.tol, sortY: o.sortY, name: o.name || '가림(자동)' }; S.items.push(it); maskFromDataUrl(it, o.coverMask).then(draw); } else S.items.push(o.cover ? { id: o.id, kind: 'cover', poly: o.cover[0], sortY: o.sortY, name: o.name || '가림' } : { id: o.id, kind: 'obj', file: Object.keys(S.images).find((k) => k.replace(/\.[^.]+$/, '') === o.file) || o.file + '.png', x: o.x, y: o.y, w: o.w, h: o.h, rot: o.rot || 0, flip: !!o.flip, sortY: o.sortY, solid: o.solid?.[0] || null, name: o.name || o.file });
   refreshList(); draw(); persist(); status('map.json 불러옴. 그림은 왼쪽/오른쪽에서 같은 이름으로 다시 고르면 붙습니다');
 }
 restore().then(fit);
