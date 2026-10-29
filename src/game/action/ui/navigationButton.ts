@@ -15,11 +15,13 @@ export function syncNavigationButton(canvas: HTMLCanvasElement, navigation?: Nav
   button.classList.toggle('hint', active);
   const label = button.querySelector<HTMLElement>('b');
   if (!label) return;
+  // 버튼 그림을 가리지 않게 버튼 아래 한 줄 (참고 모바일 게임처럼 버튼 자체는 아이콘만). 잠김일 때만 글자를 띄운다
   label.textContent = text;
   Object.assign(label.style, {
-    display: 'block', position: 'absolute', inset: 'auto 2px 2px',
-    background: 'rgba(7,11,15,.9)', color: locked ? '#f0b45a' : '#fff8e6',
-    font: '700 12px sans-serif', lineHeight: '15px', textAlign: 'center',
+    display: locked ? 'block' : 'none', position: 'absolute', left: '50%', top: '100%', transform: 'translate(-50%, 2px)',
+    padding: '0 6px', borderRadius: '6px', whiteSpace: 'nowrap',
+    background: 'rgba(7,11,15,.85)', color: '#f0b45a',
+    font: '700 11px sans-serif', lineHeight: '16px', textAlign: 'center',
     pointerEvents: 'none', textShadow: 'none',
   });
 }

@@ -4,7 +4,7 @@
 // 모든 버튼은 키보드와 같은 키 코드를 InputHub 에 누르고 뗀다. 손가락을 떼지 않고 옆 버튼으로 미끄러지면 그 버튼이 눌린다.
 // 터치는 게임 층 루트(.gs)에서 받는다: 버튼·스틱·대사창 선택지·입력칸·메뉴 항목 말고는 아무 영향도 없게 preventDefault 만 한다.
 import { CODE, TOUCH_CHARGE } from './keys';
-import { BTN_CELL, BTN_CELLS, BTN_INNER, BTN_SHEET, BTN_SHEET_H, BTN_SHEET_W } from './mobileButtons.gen';
+import { clearArtCache, onSheetReady, renderButton, renderKnob, renderStickBase, type FrameKind } from './touchArt';
 import type { InputHub } from './input';
 import type { UiSettings } from './settings';
 
@@ -57,40 +57,6 @@ const CHARGE_MS = 300;
  *  대사창 판의 빈 곳(대사 글자)은 넘기지 않는다: 스틱이 그 위에서도 시작된다 */
 const EXEMPT = 'button, input, textarea, select, a[href], label, [contenteditable="true"], [role="button"], [data-act], [data-mission], [data-go], [data-chip], .mn-row, .mn-list, .gt-log';
 
-/** 빈 틀(아이콘을 지운 약공격 칸): 자동·메뉴·선택·취소 바탕. 한 번만 만든다 */
-let frameUrl: string | null = null;
-let framePending: Promise<string | null> | null = null;
-function emptyFrame(): Promise<string | null> {
-  if (frameUrl) return Promise.resolve(frameUrl);
-  if (framePending) return framePending;
-  framePending = new Promise((res) => {
-    if (typeof Image === 'undefined' || typeof document === 'undefined') return res(null);
-    const img = new Image();
-    img.onload = () => {
-      try {
-        const cv = document.createElement('canvas');
-        cv.width = cv.height = BTN_CELL;
-        const g = cv.getContext('2d');
-        if (!g) return res(null);
-        g.imageSmoothingEnabled = false;
-        const [sx, sy] = BTN_CELLS[0];
-        g.drawImage(img, sx, sy, BTN_CELL, BTN_CELL, 0, 0, BTN_CELL, BTN_CELL);
-        g.fillStyle = BTN_INNER.color;
-        g.beginPath();
-        g.ellipse(BTN_CELL / 2, BTN_CELL / 2, BTN_INNER.rx, BTN_INNER.ry, 0, 0, Math.PI * 2);
-        g.fill();
-        frameUrl = cv.toDataURL('image/png');
-        res(frameUrl);
-      } catch {
-        res(null);
-      }
-    };
-    img.onerror = () => res(null);
-    img.src = BTN_SHEET;
-  });
-  return framePending;
-}
-
 /** 화면 가장자리 안전 여백(노치·홈 바). env() 를 한 번 재서 쓴다 */
 function safeInsets(host: HTMLElement): { t: number; r: number; b: number; l: number } {
   const probe = document.createElement('div');
@@ -142,6 +108,7 @@ export class TouchPad {
   private autoOn = false;
   private baseX = 0;
   private baseY = 0;
+  private lastDpr = 0;
   constructor(
     private layer: HTMLElement,
     private hub: InputHub,
@@ -154,19 +121,21 @@ export class TouchPad {
     this.root.innerHTML = `<div class="tp-zone"></div><div class="tp-base"><div class="tp-knob"></div></div>`;
     this.zone = this.root.querySelector('.tp-zone')!;
     this.base = this.root.querySelector('.tp-base')!;
-    this.knob = this.root.querySelector('.tp-knob')!;
     for (const d of DEF) {
       const el = document.createElement('div');
       el.className = `tp-b ${d.cell === null ? 'tp-frame' : 'tp-icon'}`;
       el.dataset.id = d.id;
       el.setAttribute('aria-label', d.text || '메뉴');
       // 그림 버튼: 글자는 숨긴 이름표 (조사는 navigationButton.ts 가 「잠김」을 덧쓴다)
-      el.innerHTML = `<b>${d.text}</b><i class="tp-cd"></i>${d.id === 'ult' ? '<i class="tp-ring"></i>' : ''}${d.id === 'menu' ? '<i class="tp-bars"></i>' : ''}`;
-      if (d.cell !== null) el.style.backgroundImage = `url("${BTN_SHEET}")`;
+      // 틀·아이콘은 코드가 기기 픽셀로 그린다 (touchArt.ts). 글자는 숨긴 이름표 (조사는 navigationButton.ts 가 「잠김」을 덧쓴다)
+      el.innerHTML = `<canvas class="tp-cv"></canvas><b>${d.text}</b><i class="tp-cd"></i>${d.id === 'ult' ? '<i class="tp-ring"></i>' : ''}`;
       this.root.append(el);
       this.btns.push({ ...d, el, cx: 0, cy: 0, r: 0 });
     }
-    void emptyFrame().then((u) => u && this.root.style.setProperty('--tp-frame', `url("${u}")`));
+    this.base.innerHTML = '<canvas class="tp-cv"></canvas><div class="tp-knob"><canvas class="tp-cv"></canvas></div>';
+    this.knob = this.base.querySelector('.tp-knob')!;
+    // 아이콘 시트가 읽히면 한 번 다시 그린다
+    onSheetReady(() => this.paintAll());
     layer.append(this.root);
     const opt = { passive: false } as AddEventListenerOptions;
     const s = this.surface;
@@ -236,6 +205,8 @@ export class TouchPad {
     const ins = this.rotated() ? { t: sa.r, r: sa.b, b: sa.l, l: sa.t } : sa;
     const portrait = bh > bw * 1.05;
     const u = (this.u = Math.max(44, Math.min(86, Math.min(bw, bh) * 0.16)) * s.touchSize);
+    const dprNow = typeof devicePixelRatio === 'number' ? devicePixelRatio : 1;
+    if (dprNow !== this.lastDpr) (this.lastDpr = dprNow), clearArtCache();
     this.root.style.setProperty('--tp-u', `${u}px`);
     this.root.style.setProperty('--tp-a', String(s.touchAlpha));
     const flip = (x: number) => (s.lefty ? bw - x : x);
@@ -253,12 +224,7 @@ export class TouchPad {
       el.style.width = el.style.height = `${r * 2}px`;
       el.style.left = `${cx - r}px`;
       el.style.top = `${cy - r}px`;
-      if (b.cell !== null) {
-        const k = (r * 2) / BTN_CELL;
-        const [sx, sy] = BTN_CELLS[b.cell];
-        el.style.backgroundSize = `${BTN_SHEET_W * k}px ${BTN_SHEET_H * k}px`;
-        el.style.backgroundPosition = `${-sx * k}px ${-sy * k}px`;
-      }
+      this.paint(b);
     };
     // 아래 가운데: 자동 + 메뉴 (홈 바 제스처와 겹치지 않게 아래 끝에서 안전 여백 + 12px). 세로 화면(돌리지 못한 경우)은 위 가운데
     const autoR = 0.4 * u,
@@ -280,6 +246,7 @@ export class TouchPad {
     Object.assign(this.zone.style, { left: `${this.zr.x}px`, top: `${zt}px`, width: `${zw}px`, height: `${bh - zt}px` });
     this.sr = u * 1.05;
     this.root.style.setProperty('--tp-r', `${this.sr}px`);
+    this.paintStick();
     this.restX = ins.l + 24 + this.sr * 1.1;
     this.restY = ins.b + 24 + this.sr * 1.1;
     this.root.classList.toggle('tp-dialog', this.mode === 'dialog');
@@ -358,6 +325,42 @@ export class TouchPad {
   private active() {
     return this.shown && !this.imeUp;
   }
+  /** 버튼 종류 → 틀 모양 */
+  private kindOf(b: Btn): FrameKind {
+    if (b.id === 'light' || b.id === 'ok') return 'main';
+    if (b.id === 'ult') return 'ult';
+    if (b.id === 'block' || b.id === 'dodge') return 'guard';
+    if (b.id === 'auto') return 'auto';
+    if (b.id === 'menu') return 'menu';
+    return 'skill';
+  }
+  /** 버튼 한 장을 지금 크기·상태로 그린다 (touchArt.ts 캐시) */
+  private paint(b: Btn) {
+    const cv = b.el.querySelector<HTMLCanvasElement>(':scope > .tp-cv');
+    if (!cv || !b.r) return;
+    const size = Math.round(b.r * 2);
+    const art = renderButton({ size, kind: this.kindOf(b), cell: b.cell, text: b.id === 'auto' ? '자동\n전투' : b.text, on: b.id === 'auto' && this.autoOn });
+    if (cv.width !== art.width || cv.height !== art.height) (cv.width = art.width), (cv.height = art.height);
+    const g = cv.getContext('2d');
+    if (!g) return;
+    g.clearRect(0, 0, cv.width, cv.height);
+    g.drawImage(art, 0, 0);
+  }
+  private paintAll() {
+    for (const b of this.btns) this.paint(b);
+    this.paintStick();
+  }
+  private paintStick() {
+    const base = this.base.querySelector<HTMLCanvasElement>(':scope > .tp-cv');
+    const knob = this.knob.querySelector<HTMLCanvasElement>('.tp-cv');
+    if (!base || !knob || !this.sr) return;
+    const b = renderStickBase(Math.round(this.sr * 2));
+    const k = renderKnob(Math.round(this.sr * 0.8));
+    for (const [cv, art] of [[base, b], [knob, k]] as const) {
+      if (cv.width !== art.width || cv.height !== art.height) (cv.width = art.width), (cv.height = art.height);
+      cv.getContext('2d')?.drawImage(art, 0, 0);
+    }
+  }
   /** 옛 호환: 아이템 칸은 모바일에서 뺐다 */
   setItems(_items: { count: number; label: string; id?: string }[]) {}
   /** 필살 게이지 0~1: 금색 테두리 게이지, 가득 차면 빛남 */
@@ -393,6 +396,8 @@ export class TouchPad {
     if (this.autoOn === on) return;
     this.autoOn = on;
     this.root.classList.toggle('tp-auto-on', on);
+    const a = this.btns.find((x) => x.id === 'auto');
+    if (a) this.paint(a);
   }
   /** 버튼 강조 (조사할 것이 있을 때 등) */
   hint(id: string, on: boolean) {

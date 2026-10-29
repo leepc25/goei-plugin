@@ -11,13 +11,13 @@ try { ({ chromium } = require('playwright')); } catch { ({ chromium } = createRe
 
 const DIST = resolve(new URL('../dist/game', import.meta.url).pathname);
 
-/** 선택: touch = 폰 흉내(hasTouch·isMobile), card = bridge.card() 가 줄 본편 스냅숏(시각 minute 등), uiPrefs = $hq_ui 설정 JSON 글, people = 인물 기록·세력 평판 (factions 배열), query = 주소 ?seed=…&hour=… */
-export async function openField({ width = 1873, height = 1082, panel = true, card = null, uiPrefs = null, people = null, query = '', touch = false } = {}) {
+/** 선택: touch = 폰 흉내(hasTouch·isMobile), dsf = 기기 픽셀 배율(폰 사진은 3), card = bridge.card() 가 줄 본편 스냅숏(시각 minute 등), uiPrefs = $hq_ui 설정 JSON 글, people = 인물 기록·세력 평판 (factions 배열), query = 주소 ?seed=…&hour=… */
+export async function openField({ width = 1873, height = 1082, panel = true, card = null, uiPrefs = null, people = null, query = '', touch = false, dsf = 1 } = {}) {
   const code = readFileSync(`${DIST}/goei-game.js`, 'utf8');
   const packs = {};
   for (const f of readdirSync(DIST)) if (f.endsWith('.pack')) packs[f.replace(/\.pack$/, '')] = readFileSync(`${DIST}/${f}`).toString('base64');
   const b = await chromium.launch();
-  const page = await b.newPage({ viewport: { width, height }, ...(touch ? { hasTouch: true, isMobile: true } : {}) });
+  const page = await b.newPage({ viewport: { width, height }, deviceScaleFactor: dsf, ...(touch ? { hasTouch: true, isMobile: true } : {}) });
   const errors = [];
   page.on('pageerror', (e) => errors.push(e.message));
   page.on('console', (m) => m.type() === 'error' && errors.push(m.text()));
