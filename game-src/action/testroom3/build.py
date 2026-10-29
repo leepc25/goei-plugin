@@ -797,7 +797,9 @@ def main():
     html = room.replace("/*__INDEX__*/null", json.dumps(index, ensure_ascii=False)).replace("/*__AUDIO__*/", audio)
     chair = {k: "data:image/png;base64," + base64.b64encode((ROOT / "game-src/action/objects/C01_사무의자_1배" / f"{k}.png").read_bytes()).decode() for k in ("south", "south-east", "south-west", "east", "north", "north-east", "north-west")}   # 의자 앉기용(판정 전)
     chair.update({"C02:" + k: "data:image/png;base64," + base64.b64encode((ROOT / "game-src/action/objects/C02_기댄사무의자_1배_2차" / f"{k}.png").read_bytes()).decode() for k in ("south", "south-east", "south-west", "east", "west")})   # 등받이 기운 의자(기대 쉬기 73, 사용자 10-28)
-    (OUT / "vfx.js").write_text("window.__VFX=" + json.dumps(load_vfx(), separators=(",", ":")) + ";\nwindow.__CHAIR=" + json.dumps(chair) + ";\n", encoding="utf-8")   # 이펙트 그림은 따로(첫 화면 파일을 작게)
+    V = load_vfx(); ks = sorted(V); half = len(ks) // 2   # 16MB 게시 제한(10-29 밤) → 두 파일로
+    (OUT / "vfx.js").write_text("window.__VFX=" + json.dumps({k: V[k] for k in ks[:half]}, separators=(",", ":")) + ";\nwindow.__CHAIR=" + json.dumps(chair) + ";\n", encoding="utf-8")
+    (OUT / "vfx2.js").write_text("Object.assign(window.__VFX," + json.dumps({k: V[k] for k in ks[half:]}, separators=(",", ":")) + ");\n", encoding="utf-8")   # 이펙트 그림은 따로(첫 화면 파일을 작게)
     if npc: html = html.replace("<title>요원 통합 테스트룸</title>", "<title>NPC 테스트룸</title>", 1).replace("<h1>요원 통합 테스트룸 ", "<h1>NPC 테스트룸 ", 1)
     (OUT / "index.html").write_text(html, encoding="utf-8")
     print(OUT / "index.html", (OUT / "index.html").stat().st_size // 1024, "KB ·", len(index), "명")
