@@ -28,10 +28,10 @@ import { worldOn } from '../../core/world';
 import { ppValue } from '../../core/people/settings';
 
 /** 설정 페이지 (2026-10-27: 모든 설정은 이 창 하나로. 지침은 그 기능 페이지 아래에) */
-export type SetPage = 'screen' | 'image' | 'board' | 'gnet' | 'phone' | 'wiki' | 'visit' | 'people' | 'adv' | 'update';
+export type SetPage = 'screen' | 'image' | 'board' | 'gnet' | 'phone' | 'wiki' | 'visit' | 'people' | 'journal' | 'adv' | 'update';
 export type GuideNode = `guide:${GuideName | 'Image'}`;
 export type EditorNode = WorldKind | 'base' | 'relations' | `set:${SetPage}` | 'install' | GuideNode | ManageNode | `rule:${string}`;
-const SET_PAGES: SetPage[] = ['screen', 'image', 'board', 'gnet', 'phone', 'wiki', 'visit', 'people', 'adv', 'update'];
+const SET_PAGES: SetPage[] = ['screen', 'image', 'board', 'gnet', 'phone', 'wiki', 'visit', 'people', 'journal', 'adv', 'update'];
 export const isSetNode = (n: string): n is `set:${SetPage}` => n.startsWith('set:') && SET_PAGES.includes(n.slice(4) as SetPage);
 export const isGuideNode = (n: string): n is GuideNode => n.startsWith('guide:');
 /* 상단 탭 (2026-10-27 리수폿식): 설정(기능) · 세계 · 지침 · 관리. 왼쪽 목록은 탭마다 다르다 */
@@ -111,7 +111,7 @@ export function openEditor(h: EditorHost, node?: EditorNode): void {
 function syncSettingsPage(): void {
   const n = edUi.node;
   const page = isSetNode(n) ? n.slice(4) : '';
-  settingsUi.page = page === 'gnet' || page === 'phone' || page === 'wiki' || page === 'visit' || page === 'people' ? page : '';
+  settingsUi.page = page === 'gnet' || page === 'phone' || page === 'wiki' || page === 'visit' || page === 'people' || page === 'journal' ? page : '';
 }
 
 export function closeEditor(): void {
@@ -281,15 +281,15 @@ function touched(): void {
 
 export const isKind = (n: string): n is WorldKind => ['agent', 'org', 'anomaly', 'site', 'appendix'].includes(n);
 
-const SET_LABEL: Record<SetPage, string> = { screen: '화면', image: '캐릭터 이미지', board: '상황판', gnet: '괴담넷', phone: '괴담톡', wiki: '위키', visit: '필드', people: '인물 기록', adv: '고급', update: '업데이트' };
-const SET_ICON: Record<SetPage, string> = { screen: ICONS.settings, image: ICONS.cctv, board: ICONS.grid, gnet: ICONS.gnet, phone: ICONS.phone, wiki: ICONS.wiki, visit: ICONS.game, people: ICONS.group, adv: ICONS.pen, update: ICONS.refresh };
+const SET_LABEL: Record<SetPage, string> = { screen: '화면', image: '캐릭터 이미지', board: '상황판', gnet: '괴담넷', phone: '괴담톡', wiki: '위키', visit: '필드', people: '인물 기록', journal: '기록', adv: '고급', update: '업데이트' };
+const SET_ICON: Record<SetPage, string> = { screen: ICONS.settings, image: ICONS.cctv, board: ICONS.grid, gnet: ICONS.gnet, phone: ICONS.phone, wiki: ICONS.wiki, visit: ICONS.game, people: ICONS.group, journal: ICONS.records, adv: ICONS.pen, update: ICONS.refresh };
 type TreeItem = [EditorNode, string, string, string?];
 const setItem = (p: SetPage): TreeItem => [`set:${p}`, SET_LABEL[p], SET_ICON[p]];
 const guideItem = (g: GuideName | 'Image'): TreeItem => [`guide:${g}`, g === 'Image' ? '이미지' : GUIDE_LABEL[g], ICONS.book];
 /** 탭마다 왼쪽 목록 (제목 + 항목). 설정 탭 항목에는 켬/끔 배지, 세계 탭에는 개수 */
 function treeOf(tab: Tab): { title: string; items: TreeItem[] }[] {
   switch (tab) {
-    case 'set': return [{ title: '기능', items: (['screen', 'image', 'board', 'gnet', 'phone', 'wiki', 'visit', 'people', 'adv'] as SetPage[]).map(setItem) }];
+    case 'set': return [{ title: '기능', items: (['screen', 'image', 'board', 'gnet', 'phone', 'wiki', 'visit', 'people', 'journal', 'adv'] as SetPage[]).map(setItem) }];
     case 'world': return [{ title: '세계', items: [['agent', '요원', ICONS.person], ['org', '조직', ICONS.org], ['anomaly', '괴이', ICONS.spook], ['site', '파밍', ICONS.star], ['appendix', '부록', ICONS.book], ['base', '거점', ICONS.pin], ['relations', '세력 관계', ICONS.grid]] }];
     case 'guide': return [
       { title: '추가 규칙', items: ruleTreeItems().map(([id, label, badge]) => [id as EditorNode, label, id === 'rule:new' ? ICONS.plus : ICONS.pen, badge] as TreeItem) },
@@ -323,6 +323,8 @@ const FEATURE_INFO: Partial<Record<SetPage, { desc: string; example: string; off
   wiki: { desc: '위키 문서를 생성·갱신해요. 채팅에 나온 문서는 본편 요청에 참고로 붙일 수 있어요.', example: '「미술관」 문서: 소재 · 접근 · 규칙 · 목격 기록 — 분량·작성 모드대로 써요.' },
   visit: { desc: '본부 방문(필드)에서 만난 사람과 나눈 말이 다음 본편 요청에 막간으로 들어가요. 게임 화면·소리·조작도 여기서.', example: '「막간: 로비에서 큐라스와 — 어젯밤 순찰 얘기」 — 대화한 자리(마지막 답 바로 뒤)에 끼워져요.' },
   people: { desc: '본편 응답이 끝날 때마다 보조 모델이 한 번 읽어 인물별 기록(기본정보·성격·현재 상태·인간관계·호감·호칭)을 쌓고, 다음 본편 요청과 필드가 그 기록을 읽어요.', example: '「쟈알디 · 호감 +8 → 신뢰 — 함께 임무를 치른 뒤」 — 기록이 이야기에 따라 바뀌어요.', off: '끄면 응답을 읽지 않고, 본편에도 기록을 넣지 않아요.' },
+  // 기록(일지·보고서)은 모델을 부르지 않아 켬/끔 배지가 없다 (featureState 에 넣지 않음)
+  journal: { desc: '상황이 종료될 때마다 일지 한 줄과 그 순간의 보고서를 상황판·인물 기록·가계부에서 만들어요(모델 호출 없음). 채팅에 카드를 띄울지, 일지를 본편 요청에 넣을지, 소감 자동, 상한을 여기서.', example: '「RPT-0510-03 · 거울 속 사람 · 내가 출동 · 1시간 24분」 — 왼쪽 메뉴 「기록」에 쌓여요.' },
 };
 
 /** 설정 페이지: 패널 설정의 묶음을 그대로 (지침은 지침 탭) */
@@ -336,7 +338,7 @@ function settingsPage(ctx: ChatContext, page: SetPage): string {
   const sec = (s: SettingsSection) => settingsSection(ctx, scope, canChat, s);
   let body = '';
   let act = '';
-  const feat = (p: 'gnet' | 'phone' | 'wiki' | 'visit' | 'people') => {
+  const feat = (p: 'gnet' | 'phone' | 'wiki' | 'visit' | 'people' | 'journal') => {
     const r = featurePane(ctx, p, canChat);
     act = r.act;
     return r.body;
@@ -350,6 +352,7 @@ function settingsPage(ctx: ChatContext, page: SetPage): string {
     case 'wiki': body = feat('wiki'); break;
     case 'visit': body = feat('visit'); break;
     case 'people': body = feat('people'); break;
+    case 'journal': body = feat('journal'); break;
     case 'adv': body = sec('adv'); break;
     case 'update': body = sec('update'); break;
   }

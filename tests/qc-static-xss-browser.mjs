@@ -229,11 +229,16 @@ async function seen(page, where) {
   await page.fill('[data-input="wiki-home-query"]', '시험 문서');
   await page.press('[data-input="wiki-home-query"]', 'Enter');
   await page.waitForSelector('.nw-doc', { timeout: 5000 }); await audit(page, errors, '위키 문서'); await seen(page, '위키 문서'); total++;
-  if (await page.$('[data-action="wiki-people"]')) { await page.click('[data-action="wiki-people"]'); await page.waitForTimeout(200); await audit(page, errors, '인물 기록 목록'); await seen(page, '인물 기록'); total++;
-    const who = await page.$('[data-action="pp-open"], .pp-row [data-action]');
+  // 기록 탭 (2026-10-29): 일지·보고서·인물·세력 — 인물 기록 목록·상세는 여기
+  await tab('records'); await audit(page, errors, '기록 일지'); total++;
+  await page.click('[data-action="rec-sub"][data-value="reports"]'); await page.waitForTimeout(150); await audit(page, errors, '기록 보고서'); total++;
+  await page.click('[data-action="rec-sub"][data-value="people"]'); await page.waitForTimeout(200); await audit(page, errors, '인물 기록 목록'); await seen(page, '인물 기록'); total++;
+  {
+    const who = await page.$('[data-action="rec-person"]');
     if (who) { await who.click(); await page.waitForTimeout(200); await audit(page, errors, '인물 기록 상세'); total++; }
   }
-  await tab('wallet'); await audit(page, errors, '가계부'); await seen(page, '가계부'); total++;
+  await page.click('[data-action="rec-sub"][data-value="factions"]'); await page.waitForTimeout(150); await audit(page, errors, '기록 세력'); total++;
+  await page.click('.gx-nav-brand .gx-id-wallet'); await page.waitForFunction(() => document.querySelector('.gx')?.dataset.tab === 'wallet'); await audit(page, errors, '가계부'); await seen(page, '가계부'); total++;
   await tab('field'); await audit(page, errors, '필드'); total++;
   // 설정 창: 인물 기록·괴담넷·괴담톡 설정 페이지와 세계 편집 트리 (명부 이름 등)
   await page.click('.gx-nav .gx-nb.desk[data-action="ed-open"]');

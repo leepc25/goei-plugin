@@ -40,6 +40,10 @@ export interface EvCard {
   locCode?: string;
   /** 막 끝난 상황 (다음 응답까지 흐리게) */
   ended?: boolean;
+  /** 종료된 상황의 보고서 id (기록 메뉴, 2026-10-29). 있으면 줄 끝·큰 보기에 보고서 지름길 */
+  rpt?: string;
+  /** 내가 출동한 상황 (보고서 배지) */
+  mine?: boolean;
 }
 
 /** 배치·방문자 이름 칩: 요원은 사진+이름, 그 밖의 이름은 이름표 */
@@ -196,7 +200,7 @@ function opsRow(c: OpsCard, on: boolean): string {
   const thumb = c.art?.pic ? `<img src="${esc(c.art.pic)}" alt="" loading="lazy">` : `<span class="gx-oprow-ico">${MARK[c.kind]}</span>`;
   return `<li class="gx-oprow k-${c.kind}${on ? ' sel' : ''}${c.ended ? ' ended' : ''}" data-action="ops-sel" data-value="${esc(c.id)}" aria-current="${on}">
     <span class="gx-oprow-pic">${thumb}</span>
-    <span class="gx-oprow-t"><b>${gradeMark(c)}<span>${esc(c.name)}</span>${c.selected ? '<span class="gx-badge gx-goaltag">목표</span>' : ''}</b><small><span>${c.loc}</span>${statusNote(c)}</small></span>${depMark(c)}</li>`;
+    <span class="gx-oprow-t"><b>${gradeMark(c)}<span>${esc(c.name)}</span>${c.selected ? '<span class="gx-badge gx-goaltag">목표</span>' : ''}${c.ended && c.mine ? '<span class="gx-badge live gx-minetag">내가 출동</span>' : ''}</b><small><span>${c.loc}</span>${statusNote(c)}</small></span>${c.ended && c.rpt ? `<button class="gx-oprpt" data-action="rec-open" data-value="${esc(c.rpt)}" title="보고서" aria-label="${esc(c.name)} 보고서">${ICONS.records}</button>` : depMark(c)}</li>`;
 }
 
 const camNo = (loc: string) => String((Array.from(loc).reduce((h, ch) => (h * 31 + ch.charCodeAt(0)) % 97, 7) % 89) + 10).padStart(2, '0');
@@ -227,7 +231,8 @@ function osd(sig: string, cam: string, clock: string): string {
 function evBtns(c: EvCard): string {
   const key = c.key ? esc(c.key) : '';
   const name = esc(c.name);
-  return `${c.name === '이름 미확인' ? '' : `<button class="gx-evbtn" data-action="wiki-goto" data-value="${name}" title="위키" aria-label="${name} 위키">${ICONS.wiki}</button>`}
+  return `${c.rpt ? `<button class="gx-evbtn" data-action="rec-open" data-value="${esc(c.rpt)}" title="보고서" aria-label="${name} 보고서">${ICONS.records}</button>` : ''}
+    ${c.name === '이름 미확인' ? '' : `<button class="gx-evbtn" data-action="wiki-goto" data-value="${name}" title="위키" aria-label="${name} 위키">${ICONS.wiki}</button>`}
     ${c.key ? `<button class="gx-evbtn end${c.confirmEnd ? ' danger' : ''}" data-action="end-event" data-value="${key}" title="${c.confirmEnd ? '한 번 더 누르면 종료' : '상황 종료'}" aria-label="${name} ${c.confirmEnd ? '정말 종료' : '상황 종료'}">${ICONS.trash}</button>` : ''}`;
 }
 
@@ -267,7 +272,7 @@ function feedView(c: EvCard, clock: string, cls = ''): string {
   const fxkey = ` data-fxkey="${esc(`${cls ? 'pop' : 'board'}:${c.key ?? c.name}`)}"`;
   return `<div class="gx-opview feed k-${c.kind}${c.ended ? ' ended' : ''}${cls}"${grade}${fxkey}>${pic}${tear}${STATIC}${c.ended ? '' : FX}
     <div class="gx-opbar">${osd(`<span class="rec"><i></i>${c.ended ? 'END' : 'REC'}</span>`, cam, clock)}<span class="gx-evart-act">${btns}</span></div>
-    <div class="gx-opcap"><span class="gx-evart-l1">${gradeMark(c)}<b>${name}</b>${c.key && !c.ended ? targetMark(!!c.selected, 'pick-event', c.key) : ''}</span>${whoLine(c.chips)}<span class="gx-evart-l2"><small>${c.loc}</small>${statusNote(c)}</span>${c.extra ?? ''}${desc}</div>
+    <div class="gx-opcap"><span class="gx-evart-l1">${gradeMark(c)}<b>${name}</b>${c.key && !c.ended ? targetMark(!!c.selected, 'pick-event', c.key) : ''}${c.ended && c.mine ? '<span class="gx-badge live gx-minetag">내가 출동</span>' : ''}</span>${whoLine(c.chips)}<span class="gx-evart-l2"><small>${c.loc}</small>${statusNote(c)}</span>${c.extra ?? ''}${desc}</div>
   </div>`;
 }
 
@@ -304,5 +309,7 @@ export function opsBoard(cards: OpsCard[], o: { mapUrl: string | null; clock: st
   const sel = cards.find((c) => c.id === opsUi.sel);
   const view = opsUi.mode === 'map' ? opsMap(cards, opsUi.sel, o.mapUrl, o.clock) : opsFeed(sel, o.clock, o.empty);
   const rows = cards.map((c) => opsRow(c, c.id === opsUi.sel)).join('');
-  return `<div class="gx-ops">${view}<section class="gx-oplog"><h2>${headSeg('ops-mode', opsUi.mode, [['feed', 'CCTV', ICONS.cctv], ['map', '위성 지도', ICONS.pin]])}<span class="gx-opcnt">${o.counts}</span></h2>${rows ? `<ul>${rows}</ul>` : `<p class="gx-none">${esc(o.empty)}</p>`}</section></div>`;
+  // 목록 바닥 (2026-10-29 기록 메뉴): 종료 줄은 다음 응답에 빠지고, 전부는 기록 › 일지에
+  const foot = '<footer class="gx-oplog-foot"><small>종료 줄은 다음 응답에 빠져요.</small><button data-action="rec-journal">기록에서 전부 보기 ›</button></footer>';
+  return `<div class="gx-ops">${view}<section class="gx-oplog"><h2>${headSeg('ops-mode', opsUi.mode, [['feed', 'CCTV', ICONS.cctv], ['map', '위성 지도', ICONS.pin]])}<span class="gx-opcnt">${o.counts}</span></h2>${rows ? `<ul>${rows}</ul>` : `<p class="gx-none">${esc(o.empty)}</p>`}${foot}</section></div>`;
 }

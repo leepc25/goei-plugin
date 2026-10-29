@@ -1205,7 +1205,7 @@ if (want('WL1')) {
   };
   const { page, errors } = await boot(fixture, chat);
   await open(page);
-  await nav(page, 'wallet');
+  await page.click('.gx-nav-brand .gx-id-wallet');
   await page.waitForSelector('.gx-wallettab');
   assert.ok((await page.textContent('.gx-wt-tile.bal b')).includes('155,000'));
   assert.equal(await page.locator('.gx-wt-pen').count(), 0, '수정 끔: ✎ 없음');
@@ -1358,16 +1358,22 @@ if (want('PP2')) {
   await page.waitForFunction((n) => (window.__calls.llm ?? []).length === n + 1, n0, { timeout: 8000 });
   await page.waitForFunction(() => (window.__chat.goeiPeopleV1?.log ?? []).length >= 4, null, { timeout: 8000 });
   await open(page);
+  // 2026-10-29: 인물 기록 화면은 위키가 아니라 왼쪽 메뉴 「기록」 › 인물 (위키 홈에 타일 없음)
   await nav(page, 'wiki');
   await page.waitForSelector('.nw-home');
-  assert.ok((await page.textContent('.nw-tile.k-pp')).includes('1명'));
-  await page.click('.nw-tile.k-pp');
+  assert.equal(await page.locator('.nw-tile.k-pp').count(), 0, '위키 홈에 인물 타일 없음');
+  await nav(page, 'records');
+  await page.click('[data-action="rec-sub"][data-value="people"]');
   await page.waitForSelector('.pp-pane');
   assert.ok((await page.textContent('.pp-pane')).includes('쟈알디'));
-  // 세력 평판 절: 기본 5 + 기록. 메시지당 상한 10 → 큰도움 5 + 헌신 10 = 15 → 10 으로 잘림(호감), 세력도 ±10
+  assert.ok((await page.textContent('.pp-pane .ph-room-title')).includes('1명'));
+  // 세력 평판: 기록 탭 › 세력 (기본 5 + 기록). 메시지당 상한 10 → 큰도움 5 + 헌신 10 = 15 → 10 으로 잘림(호감), 세력도 ±10
+  await page.click('[data-action="rec-sub"][data-value="factions"]');
+  await page.waitForSelector('.pp-sec:has-text("세력 평판")');
   const facRow = await page.textContent('.pp-sec:has-text("세력 평판")');
   assert.ok(facRow.includes('관리국') && facRow.includes('백일몽'));
-  await page.click('[data-action="wiki-person"][data-value="쟈알디"]');
+  await page.click('[data-action="rec-sub"][data-value="people"]');
+  await page.click('[data-action="rec-person"][data-value="쟈알디"]');
   await page.waitForSelector('.pp-aff');
   await page.click('[data-action="pp-num-toggle"]');
   const affText = await page.textContent('.pp-aff-num');
@@ -1403,10 +1409,10 @@ if (want('PP2')) {
   await page.check('[data-change="pp-addr-pin"]');
   await page.click('[data-action="pp-addr-save"]');
   await page.waitForFunction(() => window.__chat.goeiPeopleV1.people['쟈알디'].address.pin === true && window.__chat.goeiPeopleV1.people['쟈알디'].address.toUser === '요원님');
-  // 세력 평판 상세: 값 −100~100, 구간, 고정
-  await page.click('[data-action="wiki-back"]');
+  // 세력 평판 상세: 값 −100~100, 구간, 고정 (기록 탭 › 세력)
+  await page.click('[data-action="rec-sub"][data-value="factions"]');
   await page.waitForSelector('.pp-sec:has-text("세력 평판")');
-  await page.click('[data-action="wiki-faction"][data-value="C00"]');
+  await page.click('[data-action="rec-faction"][data-value="C00"]');
   await page.waitForSelector('.pp-cells');
   const fv = await page.textContent('.pp-aff-num');
   assert.ok(fv.includes('범위 -100~100'));
@@ -1425,19 +1431,19 @@ if (want('PP2')) {
   assert.ok((await page.textContent('.pp-aff-top b')).includes('적대'), '기본 경계: −80 = 적대');
   await page.evaluate(() => { window.__chat.scriptstate.$pp_faction_bounds = '61,21,-90,-95'; });
   await reopen(page);
-  if (!(await page.locator('.pp-cells').count())) await page.click('[data-action="wiki-faction"][data-value="C00"]');
+  if (!(await page.locator('.pp-cells').count())) { await page.click('[data-action="rec-sub"][data-value="factions"]'); await page.click('[data-action="rec-faction"][data-value="C00"]'); }
   await page.waitForSelector('.pp-cells');
   assert.ok((await page.textContent('.pp-aff-top b')).includes('중립'), '중립 하한 −90: −80 = 중립');
-  // 문서
-  await page.click('[data-action="wiki-back"]');
-  await page.click('[data-action="wiki-docs"]');
+  // 문서 (기록 탭 › 인물 › 기록 문서)
+  await page.click('[data-action="rec-sub"][data-value="people"]');
+  await page.click('[data-action="rec-docs"]');
   await page.waitForSelector('.pp-pane');
   assert.ok((await page.textContent('.pp-pane')).includes('관람차 사건'));
   // 되감기: 근거 메시지 본문을 고치면 항목·계기가 빠지고(회색), 화면은 「메시지가 사라져 빠짐」
   await page.evaluate(() => { const m = window.__chat.message.at(-1); m.data = '전혀 다른 글.'; });
   await reopen(page);
-  if (!(await page.locator('[data-action="wiki-person"][data-value="쟈알디"]').count())) await page.click('[data-action="wiki-back"]');
-  await page.click('[data-action="wiki-person"][data-value="쟈알디"]');
+  if (!(await page.locator('[data-action="rec-person"][data-value="쟈알디"]').count())) await page.click('[data-action="rec-sub"][data-value="people"]');
+  await page.click('[data-action="rec-person"][data-value="쟈알디"]');
   await page.waitForSelector('.pp-aff');
   assert.ok((await page.textContent('.pp-pane')).includes('메시지가 사라져 빠짐'));
   const reqAfter = await page.evaluate(() => window.__calls.replacers[0]([{ role: 'user', content: '쟈알디' }], 'model'));
@@ -1445,7 +1451,7 @@ if (want('PP2')) {
   assert.ok(blk && !blk.content.includes('부상 (왼팔)'), '빠진 항목은 본편에 안 들어감');
   assert.ok(blk.content.includes("'요원님'"), '고정한 호칭은 남음');
   assert.deepEqual(errors, []);
-  console.log('PASS 인물 기록: 위키 연동·근거·고정·취소·호감/호칭 직접 수정·세력 평판 값/구간/고정·문서·되감기');
+  console.log('PASS 인물 기록: 기록 탭 연동·근거·고정·취소·호감/호칭 직접 수정·세력 평판 값/구간/고정·문서·되감기');
   await page.close();
 }
 

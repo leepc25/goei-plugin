@@ -1,0 +1,481 @@
+// 왼쪽 메뉴 「기록」 (2026-10-29 사용자 결정, docs/설계안_기록_보고서.md 5장): 가계부 자리에 들어가고, 하위 탭 [일지 | 보고서 | 인물 | 세력].
+// 일지·보고서는 core/journal 이 종료 순간 잘라 둔 스냅숏(채팅 변수 $goei_journal·$goei_reports)을 그대로 그린다 — 모델 호출 없음.
+// 인물·개인 기록·기록 문서·세력 화면은 위키에서 옮겨 왔다 (ui/people.ts 의 화면 함수 그대로, 동작 이름만 rec-*).
+// 설정 「기록」 묶음(journalSettingsPane)도 여기: 채팅에 보고서 표시 · 일지를 본편 요청에 · 소감 자동 · 일지 상한 · 보고서 상한 ($jr_*).
+import {
+  JOURNAL_KIND_LABEL, JR, JR_CTX_MAX, JR_CTX_ON_DEFAULT, JR_JOURNAL_CAP, JR_REPORT_CAP, journalClock, journalSettings, jrValue, pinReport, readJournal, readReports, reportVars,
+  type JournalKind, type JournalRow, type Report,
+} from '../core/journal';
+import type { RecordsNav } from '../core/navhist';
+import { messageKey } from '../core/people/store';
+import type { Chat } from '../core/types';
+import { formatDelta, formatWon } from '../core/wallet';
+import { locName, parseCatalog, readWorld, worldOn } from '../core/world';
+import { updateChat, type ChatContext } from '../host/risu';
+import { onOffSwitch } from './controls';
+import { defaultsAction, defaultsButtons, defaultsConfirm } from './defaults';
+import { ICONS } from './icons';
+import { avatar, stLabel } from './images';
+import { factionListView, factionView, peopleDocsView, peopleListView, personView, resetPeopleUi } from './people';
+import { toast } from './toast';
+
+const esc = (s: unknown) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]!);
+
+export type RecSub = RecordsNav['sub'];
+export type RecView = RecordsNav['view'];
+export type JournalFilter = 'all' | 'mine' | 'bg' | 'an' | 'in';
+export type ReportFilter = 'mine' | 'bg' | 'all';
+
+export interface RecordsEnv {
+  render(): void;
+  refresh(): Promise<void>;
+}
+
+/** 기록 탭 상태 (채팅이 바뀌면 resetRecords). dismissed = 이 세션에서 닫은 종료 알림의 보고서 id (채팅 변수에 쓰지 않는다) */
+export const rec = {
+  sub: 'journal' as RecSub,
+  view: 'list' as RecView,
+  id: '',
+  filter: 'all' as JournalFilter,
+  q: '',
+  rfilter: 'mine' as ReportFilter,
+  notice: '',
+  info: '',
+  busy: false,
+  dismissed: '',
+};
+
+export function resetRecords(): void {
+  Object.assign(rec, { sub: 'journal', view: 'list', id: '', filter: 'all', q: '', rfilter: 'mine', notice: '', info: '', busy: false, dismissed: '' });
+}
+
+/** 앞뒤 이동·즐겨찾기에 적는 위치 */
+export const recordsNav = (): RecordsNav => ({ sub: rec.sub, view: rec.view, id: rec.id });
+export function applyRecordsNav(r: RecordsNav): void {
+  Object.assign(rec, { sub: r.sub, view: r.view, id: r.id, notice: '' });
+}
+
+/** 즐겨찾기 이름 */
+export function recordsMarkName(r: RecordsNav, chat: Chat | null): string {
+  if (r.view === 'report') return `보고서 ${(chat && readReports(chat).items.find((x) => x.id === r.id)?.no) || ''}`.trim();
+  if (r.view === 'person') return `${r.id} 기록`;
+  if (r.view === 'docs') return '기록 문서';
+  if (r.view === 'faction') return `세력 ${r.id}`;
+  return r.sub === 'journal' ? '일지' : r.sub === 'reports' ? '보고서' : r.sub === 'people' ? '이 채팅의 인물' : '세력';
+}
+
+// ── 시각·글 도우미 ──
+
+const two = (n: number) => String(n).padStart(2, '0');
+const WEEK = '일월화수목금토';
+/** 세계 분 → 「YYYY.MM.DD (요일)」 (UTC 기준, app.ts clock() 과 같은 변환) */
+function dayOf(at: number | null): string {
+  if (at === null) return '';
+  const d = new Date(at * 60000);
+  return `${d.getUTCFullYear()}.${two(d.getUTCMonth() + 1)}.${two(d.getUTCDate())} (${WEEK[d.getUTCDay()]})`;
+}
+const hhmm = (at: number | null) => (at === null ? '--:--' : journalClock(at).slice(6));
+const ymd = (at: number | null) => (at === null ? '' : journalClock(at).slice(0, 5));
+/** 소요 분 → 「1h 24m」·「38m」 */
+export function durText(min: number | null): string {
+  if (min === null || !Number.isFinite(min)) return '';
+  const h = Math.floor(min / 60);
+  const m = min % 60;
+  return h ? `${h}h ${two(m)}m` : `${m}m`;
+}
+const longDur = (min: number | null) => (min === null ? '' : `${Math.floor(min / 60) ? `${Math.floor(min / 60)}시간 ` : ''}${min % 60}분`);
+
+function gmark(kind: JournalKind, grade?: string): string {
+  const g = kind === 'an' && grade && /^[A-Za-z]+$/.test(grade) ? grade : '';
+  const cls = kind === 'fd' ? 'ms' : kind;
+  const mark = kind === 'an' ? '?' : kind === 'in' ? ICONS.siren : kind === 'ms' ? ICONS.spook : ICONS.game;
+  return `<i class="gx-gmark ${cls}${g ? ` g-${g.toLowerCase()}` : ''}" title="${JOURNAL_KIND_LABEL[kind]}${g ? ` ${esc(g)}등급` : ''}">${g ? esc(g) : mark}</i>`;
+}
+const whoText = (r: { mine: boolean; agents: { name: string }[] }) => [...(r.mine ? ['나'] : []), ...r.agents.map((a) => a.name)].filter(Boolean).join(' · ');
+const mineBadge = (r: { mine: boolean; kind: JournalKind }) => (r.kind === 'fd' ? '<span class="gx-badge live">필드 출동</span>' : r.mine ? '<span class="gx-badge live">내가 출동</span>' : '<span class="gx-badge">요원 처리</span>');
+
+/** 세계 시각 (상황판) — 없으면 가장 최근 일지 줄의 시각 */
+function nowMinute(ctx: ChatContext, rows: JournalRow[]): number | null {
+  const w = worldOn(ctx.chat) ? readWorld(ctx.chat) : null;
+  if (w && w.minute !== null) return w.minute;
+  for (let i = rows.length - 1; i >= 0; i--) if (rows[i].at !== null) return rows[i].at;
+  return null;
+}
+
+// ── 화면 ──
+
+const SUBS: [RecSub, string][] = [['journal', '일지'], ['reports', '보고서'], ['people', '인물'], ['factions', '세력']];
+
+export function recordsTab(ctx: ChatContext): string {
+  const tabs = `<div class="gx-segs gx-rec-tabs" role="tablist">${SUBS.map(([v, l]) => `<button role="tab" class="gx-seg${rec.sub === v ? ' on' : ''}" data-action="rec-sub" data-value="${v}" aria-selected="${rec.sub === v}" aria-pressed="${rec.sub === v}">${l}</button>`).join('')}</div>`;
+  const notice = rec.notice ? `<div class="gx-err" role="alert">${esc(rec.notice)}</div>` : '';
+  const note = toast('rec', rec.info, (t) => {
+    if (rec.info === t) rec.info = '';
+  });
+  return `<main class="gx-body gx-records">${tabs}${notice}${pane(ctx)}${note}</main>`;
+}
+
+function pane(ctx: ChatContext): string {
+  if (rec.view === 'report') return reportPage(ctx, rec.id);
+  if (rec.view === 'person') return `<div class="gx-rec-pane">${personView(ctx, rec.id)}</div>`;
+  if (rec.view === 'docs') return `<div class="gx-rec-pane">${peopleDocsView(ctx)}</div>`;
+  if (rec.view === 'faction') return `<div class="gx-rec-pane">${factionView(ctx, rec.id)}</div>`;
+  switch (rec.sub) {
+    case 'reports': return reportsPane(ctx);
+    case 'people': return `<div class="gx-rec-pane">${peopleListView(ctx)}</div>`;
+    case 'factions': return `<div class="gx-rec-pane">${factionListView(ctx)}</div>`;
+    default: return journalPane(ctx);
+  }
+}
+
+// ── 일지 ──
+
+const FILTERS: [JournalFilter, string][] = [['all', '전체'], ['mine', '내가 출동'], ['bg', '백그라운드'], ['an', '괴이'], ['in', '사건']];
+
+function journalPane(ctx: ChatContext): string {
+  const rows = readJournal(ctx.chat).rows;
+  const reports = readReports(ctx.chat).items;
+  const now = nowMinute(ctx, rows);
+  const month = now === null ? '' : journalClock(now).slice(0, 2);
+  const monthRows = now === null ? rows : rows.filter((r) => r.at !== null && ymd(r.at).slice(0, 2) === month && new Date(r.at * 60000).getUTCFullYear() === new Date(now * 60000).getUTCFullYear());
+  const todayKey = now === null ? '' : dayOf(now);
+  const todayRows = todayKey ? rows.filter((r) => dayOf(r.at) === todayKey) : [];
+  const mineN = rows.filter((r) => r.mine).length;
+  const kinds = (list: JournalRow[]) => [['an', '괴이'], ['in', '사건'], ['ms', '특수'], ['fd', '필드']].map(([k, l]) => [l, list.filter((r) => r.kind === k).length] as const).filter(([, n]) => n).map(([l, n]) => `${l} ${n}`).join(' · ');
+  const durs = todayRows.map((r) => (r.at !== null && r.since !== null ? Math.max(0, r.at - r.since) : null)).filter((d): d is number => d !== null);
+  const avg = durs.length ? Math.round(durs.reduce((a, b) => a + b, 0) / durs.length) : null;
+  const tile = (label: string, n: number, sub: string, cls = '') => `<div class="gx-wt-tile gx-jr-tile${cls ? ` ${cls}` : ''}"><small>${label}</small><b>${n}</b><span class="gx-wt-sub">${esc(sub)}</span></div>`;
+  const tiles = `<section class="gx-wt-tiles gx-jr-tiles">
+    ${tile(now === null ? '종료 전체' : '이번 달 종료', monthRows.length, kinds(monthRows) || '아직 없음', 'bal')}
+    ${tile('내가 출동', mineN, `보고서 ${reports.filter((r) => r.mine).length}건`)}
+    ${tile('백그라운드', rows.length - mineN, '요원 단독 처리')}
+    ${tile(`오늘${now !== null ? ` · ${ymd(now)}` : ''}`, todayRows.length, avg !== null ? `평균 소요 ${durText(avg)}` : todayRows.length ? '소요 미상' : '없음')}
+  </section>`;
+  const chips = FILTERS.map(([v, l]) => `<button class="gx-wt-chip${rec.filter === v ? ' on' : ''}" data-action="rec-filter" data-value="${v}" aria-pressed="${rec.filter === v}">${l}</button>`).join('');
+  return `${tiles}
+    <p class="gx-rec-lead">종료된 괴이·사건·특수 전부 · 영구 보관 · 가계부는 사원증의 잔고에서</p>
+    <div class="gx-wt-tools"><div class="gx-wt-chips">${chips}</div><input class="gx-wt-q" type="search" data-input="rec-q" value="${esc(rec.q)}" placeholder="찾기: 이름·장소·요원" aria-label="일지 찾기"></div>
+    <div class="gx-jr-list">${journalList(ctx)}</div>`;
+}
+
+/** 일지 목록만 (찾기 칸을 칠 때 이 부분만 다시 그린다) */
+export function journalList(ctx: ChatContext): string {
+  const rows = readJournal(ctx.chat).rows;
+  const q = rec.q.trim().toLowerCase();
+  const pass = (r: JournalRow) => (rec.filter === 'mine' ? r.mine : rec.filter === 'bg' ? !r.mine : rec.filter === 'an' ? r.kind === 'an' : rec.filter === 'in' ? r.kind === 'in' : true)
+    && (!q || `${r.name} ${locName(r.loc)} ${r.agents.map((a) => a.name).join(' ')} ${r.result}`.toLowerCase().includes(q));
+  const shown = rows.filter(pass).reverse();
+  if (!shown.length) return `<p class="gx-wt-empty">${rows.length ? '맞는 줄이 없어요.' : '아직 종료된 상황이 없어요. 괴이·사건·특수가 종료되면 여기에 한 줄씩 쌓여요.'}</p>`;
+  // 날짜별 묶음 (최근 날짜부터). 시각을 모르는 줄은 「시각 없음」 묶음 맨 아래
+  const groups: { day: string; rows: JournalRow[] }[] = [];
+  for (const r of shown) {
+    const day = dayOf(r.at);
+    const g = groups[groups.length - 1];
+    if (g && g.day === day) g.rows.push(r);
+    else groups.push({ day, rows: [r] });
+  }
+  groups.sort((a, b) => (a.day === '' ? 1 : b.day === '' ? -1 : 0));
+  const cnt = (list: JournalRow[]) => [['an', '괴이'], ['in', '사건'], ['ms', '특수'], ['fd', '필드']].map(([k, l]) => [l, list.filter((r) => r.kind === k).length] as const).filter(([, n]) => n).map(([l, n]) => `${l} ${n}`).concat(list.some((r) => r.mine) ? [`내가 출동 ${list.filter((r) => r.mine).length}`] : []).join(' · ');
+  return groups.map((g) => `<section class="gx-jr-day"><h3><span>${esc(g.day || '시각 없음')}</span><em>${esc(cnt(g.rows))}</em></h3><ul>${g.rows.map(journalRow).join('')}</ul></section>`).join('');
+}
+
+function journalRow(r: JournalRow): string {
+  const dur = r.at !== null && r.since !== null ? durText(Math.max(0, r.at - r.since)) : '';
+  const tag = r.rpt ? `<span class="gx-jr-go">${ICONS.records}<span>보고서</span></span>` : `<span class="gx-jr-bg">${r.mine ? '내가 출동' : '백그라운드'}</span>`;
+  const inner = `<span class="gx-jr-time">${esc(hhmm(r.at))}</span>${gmark(r.kind, r.grade)}
+    <span class="gx-jr-main"><b>${esc(r.name)}</b><small>${JOURNAL_KIND_LABEL[r.kind]} · ${esc(locName(r.loc) || r.loc)}</small></span>
+    <span class="gx-jr-who">${esc(whoText(r) || '투입 없음')}</span>
+    <span class="gx-jr-res">${esc([r.result, dur].filter(Boolean).join(' · '))}</span>${tag}`;
+  const cls = `gx-jr-row${r.mine ? ' mine' : ''}`;
+  return `<li>${r.rpt ? `<button class="${cls}" data-action="rec-open" data-value="${esc(r.rpt)}" aria-label="${esc(r.name)} 보고서">${inner}</button>` : `<div class="${cls}">${inner}</div>`}</li>`;
+}
+
+// ── 보고서 목록 ──
+
+const RFILTERS: [ReportFilter, string][] = [['mine', '내가 출동'], ['bg', '요원 처리'], ['all', '전체']];
+
+const peopleSum = (r: Report) => (r.people?.length ? `<span class="gx-rcard-aff">호감 ${r.people.map((p) => `<i class="${p.delta < 0 ? 'neg' : 'pos'}">${p.delta > 0 ? '+' : p.delta < 0 ? '−' : ''}${Math.abs(p.delta)}</i>`).join(' ')}</span>` : '');
+const walletSum = (r: Report) => {
+  const n = (r.wallet ?? []).reduce((a, t) => a + t.amount, 0);
+  return n ? `<span class="gx-rcard-won ${n < 0 ? 'out' : 'in'}">${esc(formatDelta(n).replace(/^([+−-])/, '$1₩'))}</span>` : '';
+};
+
+function reportsPane(ctx: ChatContext): string {
+  const all = readReports(ctx.chat).items;
+  const shown = all.filter((r) => (rec.rfilter === 'mine' ? r.mine : rec.rfilter === 'bg' ? !r.mine : true)).reverse();
+  const chips = RFILTERS.map(([v, l]) => `<button class="gx-wt-chip${rec.rfilter === v ? ' on' : ''}" data-action="rec-rfilter" data-value="${v}" aria-pressed="${rec.rfilter === v}">${l}</button>`).join('');
+  const cards = shown.map((r) => {
+    const h = r.head;
+    const meta = [ymd(h.at) ? `${ymd(h.at)} ${hhmm(h.at)}` : '시각 없음', h.place || locName(h.loc) || h.loc, durText(h.duration)].filter(Boolean).join(' · ');
+    const who = [whoText(r), r.result].filter(Boolean).join(' · ');
+    return `<button class="gx-rcard${r.mine ? ' mine' : ''}" data-action="rec-open" data-value="${esc(r.id)}">
+      <span class="gx-rcard-top"><span class="gx-rcard-no">${esc(r.no)}</span>${mineBadge(r)}${r.pin ? `<i class="gx-rcard-pin" title="고정">${ICONS.pin}</i>` : ''}</span>
+      <span class="gx-rcard-t">${gmark(r.kind, h.grade)}<b>${esc(h.name)}</b></span>
+      <span class="gx-rcard-meta">${esc(meta)}</span>
+      <span class="gx-rcard-who">${esc(who)}</span>
+      ${r.people?.length || (r.wallet?.length) ? `<span class="gx-rcard-sum">${peopleSum(r)}${walletSum(r)}</span>` : ''}
+    </button>`;
+  }).join('');
+  const empty = all.length ? '맞는 보고서가 없어요.' : '아직 보고서가 없어요. 상황이 종료되면 그 순간의 기록이 보고서로 남아요.';
+  return `<p class="gx-rec-lead">${rec.rfilter === 'mine' ? '내가 출동한 사건의 보고서' : rec.rfilter === 'bg' ? '요원이 처리한 사건의 간이 보고서' : '보고서 전부'} · 종료 시점 그대로 보관</p>
+    <div class="gx-wt-tools"><div class="gx-wt-chips">${chips}</div></div>
+    ${cards ? `<div class="gx-rcards">${cards}</div>` : `<p class="gx-wt-empty">${empty}</p>`}`;
+}
+
+// ── 보고서 페이지 ──
+
+function reportPage(ctx: ChatContext, id: string): string {
+  const r = readReports(ctx.chat).items.find((x) => x.id === id);
+  const back = `<button class="ph-tool ph-back" data-action="rec-back" aria-label="뒤로">${ICONS.back}</button>`;
+  if (!r) return `<section class="gx-rpt"><header class="gx-rpt-head">${back}<b>보고서</b></header><p class="gx-wt-empty">이 보고서는 상한에 밀려 지워졌거나 되감겨서 없어요.</p></section>`;
+  const h = r.head;
+  const kindLine = `${JOURNAL_KIND_LABEL[r.kind]} · 종료${r.cause === 'manual' ? ' (직접 종료)' : r.cause === 'ttl' ? ' (시간 경과)' : ''}`;
+  const place = [h.place, locName(h.loc) || h.loc].filter((x, i, a) => x && a.indexOf(x) === i).join(' · ');
+  const times = [['발생', h.born], ['투입', h.since], ['종료', h.at]].filter(([, m]) => m !== null && m !== undefined).map(([l, m]) => `<span><i>${l}</i><b>${esc(`${ymd(m as number)} ${hhmm(m as number)}`)}</b></span>`).join('');
+  const dur = h.duration !== null ? `<span><i>소요</i><b>${esc(longDur(h.duration))}</b></span>` : '';
+  const trail = r.trail.length
+    ? `<ol class="gx-rpt-trail">${r.trail.map((t, i) => `<li><span class="gx-rpt-t">${esc(hhmm(t.m))}</span><span>${esc(t.text)}${i === 0 ? ' <em class="gx-rpt-first">발생</em>' : ''}</span></li>`).join('')}</ol>`
+    : '<p class="ps-note">상황판 기록이 없어요.</p>';
+  let byName = new Map<string, { english?: string }>();
+  try {
+    byName = new Map(parseCatalog(ctx.char.globalLore).people.map((p) => [p.name, { english: p.english }]));
+  } catch {
+    /* 목록 로어북이 없는 카드 */
+  }
+  const agents = r.agents.length
+    ? `<ul class="gx-rpt-agents">${r.agents.map((a) => `<li>${avatar(ctx.char, byName.get(a.name)?.english, a.name, 'sm')}<span><b>${esc(a.name)}</b><small>${esc([a.st ? stLabel(a.st) : '상태 미상', a.situation].filter(Boolean).join(' · '))}</small></span></li>`).join('')}</ul>`
+    : '<p class="ps-note">투입 기록이 없어요.</p>';
+  const debrief = r.debrief
+    ? `<blockquote class="gx-rpt-debrief"><b>${esc(r.debrief.who)} 소감</b><p>${esc(r.debrief.text)}</p><small>${r.debrief.src === 'manual' ? '직접 요청' : r.debrief.src === 'backfill' ? '지난 응답 읽기' : '종료 턴 갱신기'} · ${esc(r.debrief.at.slice(0, 10))}</small></blockquote>`
+    : '<p class="ps-note">소감 없음</p>';
+  const people = r.full
+    ? `<section class="gx-rpt-sec"><h3>인물 기록 변화 <small>(종료 시점)</small></h3>${r.people?.length
+      ? `<ul class="gx-rpt-people">${r.people.map((p) => `<li><b>${esc(p.who)}</b>${p.quote ? `<q>${esc(p.quote)}</q>` : ''}<em class="${p.delta < 0 ? 'neg' : 'pos'}">${p.delta > 0 ? '+' : p.delta < 0 ? '−' : ''}${Math.abs(p.delta)}${p.stage ? ` → ${esc(p.stage)}` : ''}</em></li>`).join('')}</ul>`
+      : '<p class="ps-note">이 사건 동안 호감이 움직인 인물이 없어요.</p>'}</section>`
+    : '';
+  const wallet = r.full
+    ? `<section class="gx-rpt-sec"><h3>가계부 <small>(이 사건 동안)</small></h3>${r.wallet?.length
+      ? `<ul class="gx-rpt-wallet">${r.wallet.map((t) => `<li><span>${esc(t.memo || '(메모 없음)')}</span><b class="${t.amount < 0 ? 'out' : 'in'}">${esc(formatDelta(t.amount).replace(/^([+−-])/, '$1₩ '))}</b></li>`).join('')}${r.balance !== undefined ? `<li class="bal"><span>종료 시점 잔고</span><b>${esc(formatWon(r.balance))}</b></li>` : ''}</ul>`
+      : `<p class="ps-note">이 사건 동안 거래가 없어요.${r.balance !== undefined ? ` 종료 시점 잔고 ${esc(formatWon(r.balance))}` : ''}</p>`}</section>`
+    : '';
+  // 「이미지로 저장」·「소감 쓰기」 자리: 그리기·보조 모델 호출은 다음 묶음에서 붙는다 (단추 자리만, 잠금)
+  const acts = `<button class="gx-mini" data-action="rec-png" data-value="${esc(r.id)}" disabled title="준비 중">${ICONS.cctv}이미지로 저장</button>
+    <button class="gx-mini" data-action="rec-debrief" data-value="${esc(r.id)}" disabled title="준비 중">${ICONS.pen}소감 쓰기 <small>보조 모델 1회</small></button>
+    <button class="gx-mini${r.pin ? ' on' : ''}" data-action="rec-pin" data-value="${esc(r.id)}" aria-pressed="${!!r.pin}" title="${r.pin ? '고정 풀기' : '고정: 상한에 밀려 지워지지 않아요'}" ${rec.busy ? 'disabled' : ''}>${ICONS.pin}${r.pin ? '고정됨' : '고정'}</button>`;
+  return `<section class="gx-rpt">
+    <header class="gx-rpt-head">${back}<b>보고서</b><span class="gx-rcard-no">${esc(r.no)}</span><span class="gx-rpt-acts">${acts}</span></header>
+    <div class="gx-rpt-top">${gmark(r.kind, h.grade)}<div class="gx-rpt-title"><b>${esc(h.name)}</b><span>${esc(kindLine)}</span>${mineBadge(r)}${h.cleared ? '<span class="gx-badge live">클리어</span>' : ''}</div>
+      ${place ? `<p class="gx-rpt-place">${esc(place)}</p>` : ''}
+      <div class="gx-rpt-times">${times}${dur}</div></div>
+    <section class="gx-rpt-sec"><h3>경과 <small>(상황판 기록)</small></h3>${trail}</section>
+    <section class="gx-rpt-sec"><h3>투입 요원</h3>${agents}</section>
+    <section class="gx-rpt-sec"><h3>결과</h3><p class="gx-rpt-result">${esc(r.result)}</p></section>
+    <section class="gx-rpt-sec"><h3>소감</h3>${debrief}</section>
+    ${people}${wallet}
+    <p class="gx-rpt-foot">이 보고서는 상황판·인물 기록·가계부에서 자동으로 만들어졌어요.</p>
+  </section>`;
+}
+
+// ── 상황판 연결 ──
+
+/** 종료 줄 → 보고서 지름길 (같은 종류·장소의 최신 일지 줄. 이름이 같은 줄이 있으면 그것) */
+export function endedReport(chat: Chat, kind: JournalKind, name: string, loc: string): { rpt?: string; mine: boolean } | null {
+  const rows = readJournal(chat).rows;
+  let loose: JournalRow | null = null;
+  for (let i = rows.length - 1; i >= 0; i--) {
+    const r = rows[i];
+    if (r.kind !== kind || r.loc !== loc) continue;
+    if (r.name === name) return { rpt: r.rpt, mine: r.mine };
+    loose ??= r;
+  }
+  return loose ? { rpt: loose.rpt, mine: loose.mine } : null;
+}
+
+/** 종료 알림 (상황판 맨 위 한 줄): 마지막 응답에서 내가 출동한 사건이 종료돼 보고서가 생겼으면. 닫으면 이 세션에서는 다시 안 뜬다 */
+export function closeNotice(chat: Chat): string {
+  const list = Array.isArray(chat.message) ? chat.message : [];
+  let last = -1;
+  for (let i = list.length - 1; i >= 0; i--) if (list[i].role === 'char') { last = i; break; }
+  if (last < 0) return '';
+  const key = messageKey(list[last], last);
+  const rows = readJournal(chat).rows;
+  const hit = [...rows].reverse().find((r) => r.mine && r.rpt && (r.anchor === key || r.idx >= last));
+  if (!hit || !hit.rpt || rec.dismissed === hit.rpt) return '';
+  return `<div class="gx-notice gx-recnote" role="status"><span>${ICONS.records}보고서가 기록에 저장됐어요 · <b>${esc(hit.name)}</b></span><button class="gx-mini" data-action="rec-open" data-value="${esc(hit.rpt)}">보기</button><button class="gx-recnote-x" data-action="rec-note-x" data-value="${esc(hit.rpt)}" aria-label="알림 닫기">${ICONS.close}</button></div>`;
+}
+
+// ── 조작 ──
+
+/** 처리했으면 true. rec-back 을 최상위(목록)에서 눌렀을 때만 false → app.ts 가 이전 화면으로 */
+export async function handleRecords(action: string, value: string | undefined, ctx: ChatContext, env: RecordsEnv): Promise<boolean> {
+  const v = value ?? '';
+  if (action.startsWith('jr-')) return handleJournalSettings(action, v, ctx, env);
+  switch (action) {
+    case 'rec-sub':
+      if (!SUBS.some(([s]) => s === v)) return true;
+      rec.sub = v as RecSub;
+      rec.view = 'list';
+      rec.id = '';
+      rec.notice = '';
+      resetPeopleUi();
+      break;
+    case 'rec-journal':
+      Object.assign(rec, { sub: 'journal', view: 'list', id: '', notice: '' });
+      break;
+    case 'rec-filter':
+      if (FILTERS.some(([f]) => f === v)) rec.filter = v as JournalFilter;
+      break;
+    case 'rec-rfilter':
+      if (RFILTERS.some(([f]) => f === v)) rec.rfilter = v as ReportFilter;
+      break;
+    case 'rec-open':
+      if (!readReports(ctx.chat).items.some((r) => r.id === v)) {
+        rec.notice = '이 보고서는 상한에 밀려 지워졌거나 되감겨서 없어요.';
+        break;
+      }
+      Object.assign(rec, { sub: 'reports', view: 'report', id: v, notice: '' });
+      break;
+    case 'rec-people':
+      Object.assign(rec, { sub: 'people', view: 'list', id: '', notice: '' });
+      resetPeopleUi();
+      break;
+    case 'rec-person':
+      if (!v) return true;
+      Object.assign(rec, { sub: 'people', view: 'person', id: v, notice: '' });
+      resetPeopleUi();
+      break;
+    case 'rec-docs':
+      Object.assign(rec, { sub: 'people', view: 'docs', id: '', notice: '' });
+      resetPeopleUi();
+      break;
+    case 'rec-faction':
+      if (!v) return true;
+      Object.assign(rec, { sub: 'factions', view: 'faction', id: v, notice: '' });
+      resetPeopleUi();
+      break;
+    case 'rec-back':
+      if (rec.view === 'list') return false;
+      rec.notice = '';
+      if (rec.view === 'report') Object.assign(rec, { sub: 'reports', view: 'list', id: '' });
+      else if (rec.view === 'faction') Object.assign(rec, { sub: 'factions', view: 'list', id: '' });
+      else Object.assign(rec, { sub: 'people', view: 'list', id: '' });
+      resetPeopleUi();
+      break;
+    case 'rec-note-x':
+      rec.dismissed = v;
+      break;
+    case 'rec-pin': {
+      if (rec.busy || !v) return true;
+      const on = !readReports(ctx.chat).items.find((r) => r.id === v)?.pin;
+      rec.busy = true;
+      try {
+        await updateChat(ctx.charIndex, ctx.chatIndex, (chat) => ({ ...chat, scriptstate: { ...(chat.scriptstate ?? {}), ...reportVars(pinReport(readReports(chat), v, on)) } }));
+        rec.info = on ? '고정했어요. 상한에 밀려 지워지지 않아요.' : '고정을 풀었어요.';
+      } catch (error) {
+        rec.notice = error instanceof Error ? error.message : String(error);
+      }
+      rec.busy = false;
+      await env.refresh();
+      return true;
+    }
+    case 'rec-png':
+    case 'rec-debrief':
+      // 다음 묶음에서 붙는다 (단추는 잠겨 있다)
+      return true;
+    default:
+      return false;
+  }
+  env.render();
+  return true;
+}
+
+/** 입력칸 (다시 그리지 않음). 처리했으면 true — 찾기 칸은 app.ts 가 목록만 다시 그린다 */
+export function recordsInput(name: string, value: string): boolean {
+  if (name === 'rec-q') return void (rec.q = value), true;
+  return false;
+}
+
+// ── 설정 「기록」 묶음 ──
+
+const CHAT_CARD: [string, string][] = [['off', '안 띄움'], ['mine', '내가 출동한 사건만'], ['all', '전부']];
+const row = (label: string, control: string, help = '') => `<div class="ps-row"><div class="ps-label"><b>${label}</b>${help ? `<small>${help}</small>` : ''}</div><div class="ps-ctl">${control}</div></div>`;
+function seg(key: string, cur: string, items: [string, string][]): string {
+  const sw = onOffSwitch(items, cur, 'jr-set', (v) => `${key}=${v}`);
+  if (sw) return sw;
+  return `<div class="gx-segs gx-segs-sm">${items.map(([v, label]) => `<button class="gx-seg${cur === v ? ' on' : ''}" data-action="jr-set" data-value="${esc(`${key}=${v}`)}" aria-pressed="${cur === v}">${label}</button>`).join('')}</div>`;
+}
+function stepper(key: string, shown: string, canDown: boolean, canUp: boolean, label: string): string {
+  return `<div class="st-step"><button class="gx-step" data-action="jr-step" data-value="${key}:-" ${!canDown || rec.busy ? 'disabled' : ''} aria-label="${esc(label)} 줄이기">−</button>
+    <b>${esc(shown)}</b><button class="gx-step" data-action="jr-step" data-value="${key}:+" ${!canUp || rec.busy ? 'disabled' : ''} aria-label="${esc(label)} 늘리기">+</button></div>`;
+}
+
+export function journalSettingsPane(ctx: ChatContext, canChat = true): string {
+  const s = journalSettings(ctx.chat.scriptstate);
+  const ctxOn = s.ctx > 0;
+  const rows = [
+    row('채팅에 보고서 표시', seg('chat_card', s.chatCard, CHAT_CARD), '사건이 종료된 응답 아래에 보고서 카드를 띄워요. 보여 주기만 하고 본문·요청에는 들어가지 않아요. 끄면 이미 뜬 카드도 사라져요.'),
+    row('일지를 본편 요청에 참고로 넣기', `${seg('ctx', ctxOn ? '1' : '0', [['1', 'ON'], ['0', 'OFF']])}${ctxOn ? stepper('ctx', `최근 ${s.ctx}건`, s.ctx > 1, s.ctx < JR_CTX_MAX, '일지 건수') : ''}`, `끄면 모델은 일지를 모르고, 켜면 최근 N건을 한 줄씩 요청에만 끼워요 (채팅 메시지엔 안 넣음). 한 줄 ≈ 60자. 1~${JR_CTX_MAX}건.`),
+    row('소감 자동', seg('debrief_auto', s.debriefAuto ? '1' : '0', [['1', 'ON'], ['0', 'OFF']]), '인물 기록 갱신기가 켜져 있을 때 그 호출에 「담당 요원 소감」 칸을 얹어요. 따로 부르지 않아요. 갱신기가 꺼져 있으면 보고서는 「소감 없음」.'),
+    row('일지 상한', stepper('journal_cap', `${s.journalCap.toLocaleString('en-US')}줄`, s.journalCap > JR_JOURNAL_CAP.min, s.journalCap < JR_JOURNAL_CAP.max, '일지 상한'), `넘치면 오래된 줄부터 지워요 (${JR_JOURNAL_CAP.min.toLocaleString('en-US')}~${JR_JOURNAL_CAP.max.toLocaleString('en-US')}). 채팅 저장 크기에 더해져요.`),
+    row('보고서 상한', stepper('report_cap', `${s.reportCap}건`, s.reportCap > JR_REPORT_CAP.min, s.reportCap < JR_REPORT_CAP.max, '보고서 상한'), `넘치면 오래된 보고서부터 지워요 (${JR_REPORT_CAP.min}~${JR_REPORT_CAP.max}). 고정한 보고서는 상한에 들지 않아요.`),
+  ].join('');
+  return `<div class="ph-form jr-set">
+    <header class="ph-room-head"><button class="ph-tool ph-back" data-action="set-feat-back" aria-label="설정으로">${ICONS.back}</button><div class="ph-room-title"><b>기록 설정</b><small>${canChat ? '이 채팅' : '이 채팅 · 시작 전'}</small></div><span class="ph-act">${defaultsButtons('jr')}</span></header>${defaultsConfirm('jr')}
+    ${rec.notice ? `<div class="gx-err" role="alert">${esc(rec.notice)}</div>` : ''}
+    <div class="ph-form-body ps">
+      <section class="ps-group"><h3>기록</h3><div class="ps-rows">${rows}</div></section>
+    </div>
+    ${toast('rec', rec.info, (t) => {
+      if (rec.info === t) rec.info = '';
+    })}
+  </div>`;
+}
+
+async function setVars(ctx: ChatContext, env: RecordsEnv, vars: Record<string, string>): Promise<void> {
+  rec.busy = true;
+  rec.notice = '';
+  try {
+    await updateChat(ctx.charIndex, ctx.chatIndex, (chat) => ({ ...chat, scriptstate: { ...(chat.scriptstate ?? {}), ...vars } }));
+  } catch (error) {
+    rec.notice = error instanceof Error ? error.message : String(error);
+  }
+  rec.busy = false;
+  await env.refresh();
+}
+
+async function handleJournalSettings(action: string, v: string, ctx: ChatContext, env: RecordsEnv): Promise<boolean> {
+  const def = await defaultsAction('jr', action, v, ctx, env.refresh);
+  if (def !== null) {
+    if (def) rec.info = def;
+    env.render();
+    return true;
+  }
+  if (action === 'jr-set') {
+    const i = v.indexOf('=');
+    if (i < 0) return true;
+    const key = v.slice(0, i);
+    let val = v.slice(i + 1);
+    if (key === 'chat_card') val = val === 'off' || val === 'all' ? val : 'mine';
+    else if (key === 'ctx') val = val === '0' ? '0' : String(Math.max(1, Math.min(JR_CTX_MAX, Number(val) || JR_CTX_ON_DEFAULT)));
+    else if (key === 'debrief_auto') val = val === '0' ? '0' : '1';
+    else return true;
+    // 켤 때 N 은 기본 10 (설계 5-11절)
+    if (key === 'ctx' && val !== '0' && v.slice(i + 1) === '1') val = String(JR_CTX_ON_DEFAULT);
+    await setVars(ctx, env, { [JR(key)]: val });
+    return true;
+  }
+  if (action === 'jr-step') {
+    const [key, op] = v.split(':');
+    const s = journalSettings(ctx.chat.scriptstate);
+    const dir = op === '+' ? 1 : -1;
+    let next: number;
+    if (key === 'ctx') next = Math.max(1, Math.min(JR_CTX_MAX, s.ctx + dir));
+    else if (key === 'journal_cap') next = Math.max(JR_JOURNAL_CAP.min, Math.min(JR_JOURNAL_CAP.max, s.journalCap + dir * JR_JOURNAL_CAP.step));
+    else if (key === 'report_cap') next = Math.max(JR_REPORT_CAP.min, Math.min(JR_REPORT_CAP.max, s.reportCap + dir * JR_REPORT_CAP.step));
+    else return true;
+    if (String(next) === jrValue(ctx.chat.scriptstate, key)) return true;
+    await setVars(ctx, env, { [JR(key)]: String(next) });
+    return true;
+  }
+  return false;
+}

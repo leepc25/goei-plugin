@@ -3,7 +3,7 @@ import { anchorOf } from '../core/visit';
 import { showWindow } from '../host/container';
 import { factionList } from '../core/factions';
 import { setOpeningHint } from '../host/openinghint';
-import { NavHistory } from '../core/navhist';
+import { legacyWikiNav, NavHistory, type RecordsNav } from '../core/navhist';
 import { applyStart, chatPhase, currentChoice, planStart, readManifest, StartError } from '../core/start';
 import { isGoeiLore } from '../core/install';
 import { refreshInstall } from './editor/install';
@@ -58,6 +58,7 @@ import { basicDefaults, basicVars, DIM_DEFAULT, getPrefs, worldDefaults, worldSe
 import { colConfig } from '../core/world/statuscols';
 import { adjustWallet, walletEditable, aliveAnchors, formatWon, parseWon, readWallet, removeWalletEntry, walletBalance, walletVars, WALLET_START_DEFAULT } from '../core/wallet';
 import { walletHeadButton, walletList, walletOn, walletTab, walletUi as walletTabUi } from './wallet';
+import { applyRecordsNav, closeNotice, endedReport, handleRecords, journalList, rec, recordsInput, recordsMarkName, recordsNav, recordsTab, resetRecords, type RecordsEnv } from './records';
 
 /** ID카드 잔고 칩 → 장부 창 (열림·입력 알림) */
 
@@ -94,8 +95,9 @@ let busy = false;
 let notice = '';
 /** 괴담넷 탭 (완성 전까지 숨김) */
 const GNET_ON = true;
-type Tab = 'board' | 'map' | 'mission' | 'gnet' | 'phone' | 'wiki' | 'field' | 'wallet' | 'settings';
-const TABS: Tab[] = ['board', 'map', 'mission', ...(GNET_ON ? (['gnet'] as Tab[]) : []), 'phone', 'wiki', 'field', 'wallet'];
+/** records = 「기록」(일지·보고서·인물·세력, 2026-10-29 가계부 메뉴 자리). wallet 은 메뉴에서 빠졌지만 사원증 잔고 줄·폰 머리 칩이 연다 */
+type Tab = 'board' | 'map' | 'mission' | 'gnet' | 'phone' | 'wiki' | 'field' | 'records' | 'wallet' | 'settings';
+const TABS: Tab[] = ['board', 'map', 'mission', ...(GNET_ON ? (['gnet'] as Tab[]) : []), 'phone', 'wiki', 'field', 'records', 'wallet'];
 let tab: Tab = 'board';
 /** 커스텀 임무 시작 화면에서 "다시 고르기"를 눌렀을 때 */
 let repick = false;
@@ -124,6 +126,7 @@ const wikiEnv: WikiEnv = {
 const gnetEnv: GnetEnv = wikiEnv;
 const settingsEnv: SettingsEnv = { render: () => render(), refresh: () => refresh() };
 const peopleEnv: PeopleEnv = settingsEnv;
+const recordsEnv: RecordsEnv = settingsEnv;
 
 /** 창이 떠 있는지 (괴담톡이 받은 말풍선을 바로 읽음 처리할지) */
 let shown = false;
@@ -391,6 +394,13 @@ function panelInput(el: HTMLInputElement): void {
     if (box) box.innerHTML = walletList(view.ctx);
     return;
   }
+  if (el?.dataset?.input === 'rec-q' && view.kind === 'started') {
+    // 기록 › 일지 찾기: 목록만 다시 그린다 (입력칸 포커스 유지)
+    recordsInput('rec-q', el.value);
+    const box = root?.querySelector('.gx-jr-list');
+    if (box) box.innerHTML = journalList(view.ctx);
+    return;
+  }
   if (el?.dataset?.input === 'wiki-query' && view.kind === 'started') {
     wiki.query = el.value;
     const box = root?.querySelector('.nw .ph-content');
@@ -571,6 +581,7 @@ async function refresh(): Promise<void> {
         navHist.clear();
         resetField(true);
         resetWiki();
+        resetRecords();
         resetGnet();
         resetPhone();
         resetSettings();
@@ -651,6 +662,23 @@ async function handle(action: string, value?: string): Promise<void> {
   }
   if (featCtx && action.startsWith('wiki-') && (await handleWiki(action, value, featCtx, wikiEnv))) return;
   if (featCtx && action.startsWith('pp-') && (await handlePeople(action, value, featCtx, peopleEnv))) return;
+  // 기록 메뉴(일지·보고서·인물·세력)와 설정 「기록」 묶음. 상황판 종료 줄·알림의 보고서 지름길(rec-open)·「기록에서 전부 보기」(rec-journal)는 기록 탭으로 넘어간다
+  if (featCtx && (action.startsWith('rec-') || action.startsWith('jr-'))) {
+    if (action === 'rec-back' && !(await handleRecords(action, value, featCtx, recordsEnv))) {
+      // 하위 탭 뿌리에서 뒤로 = 이전 화면 (위키의 뒤로와 같은 규칙)
+      const go = navStep(-1);
+      return go ? go() : render();
+    }
+    const switching = (action === 'rec-open' || action === 'rec-journal' || action === 'rec-person' || action === 'rec-people') && tab !== 'records';
+    if (switching) {
+      tab = 'records';
+      notice = '';
+      field.confirmEnd = null;
+      resetSettings();
+    }
+    if (action !== 'rec-back' && !(await handleRecords(action, value, featCtx, recordsEnv)) && switching) render();
+    return;
+  }
   if (action.startsWith('ip-') && (await handleImgPrompt(action, value, { render }))) return;
   if (featCtx && action.startsWith('gn-') && (await handleGnet(action, value, featCtx, gnetEnv))) return;
   if (featCtx && action.startsWith('ph-') && (await handlePhone(action, value, featCtx, phoneEnv))) return;
@@ -777,8 +805,6 @@ async function handle(action: string, value?: string): Promise<void> {
       if (value === 'settings') return handle('ed-open', 'set:screen');
       tab = TABS.includes(value as Tab) ? (value as Tab) : 'board';
       notice = '';
-      // 위키 탭: 인물 기록 화면(인물·목록·문서·세력)에 있었으면 위키 홈으로 (사원증 「기록」으로 들어온 뒤 위키를 못 여는 문제, 2026-10-26 사용자)
-      if (tab === 'wiki' && ['people', 'person', 'docs', 'faction'].includes(wiki.view)) resetWiki();
       // 지도·커스텀 임무에서 고른 목표·편성은 다른 탭에 다녀와도 그대로 둔다
       field.confirmEnd = null;
       resetSettings();
@@ -915,14 +941,13 @@ async function handle(action: string, value?: string): Promise<void> {
       await handleWiki('wiki-write', value, view.ctx, wikiEnv);
       return;
     case 'people-goto':
-      // 사원증 창의 「기록」: 위키 탭의 인물 상세로
+      // 사원증 창의 「기록」: 기록 탭 › 인물 › 그 사람 (2026-10-29: 위키에서 기록 메뉴로 옮김)
       if (view.kind !== 'started' || !value || !hasPersonRecord(view.ctx, value)) return;
-      tab = 'wiki';
-      resetWiki();
+      tab = 'records';
       gnet.compose = null;
       phone.view = phone.view === 'room' ? 'room' : 'list';
       resetField();
-      await handleWiki('wiki-person', value, view.ctx, wikiEnv);
+      await handleRecords('rec-person', value, view.ctx, recordsEnv);
       return;
     case 'repick':
       repick = true;
@@ -1015,7 +1040,7 @@ async function turnWorldOn(): Promise<void> {
 }
 
 const TAB_TITLE: Record<Tab, string> = {
-  board: '상황판', map: '임무', mission: '커스텀', gnet: '괴담넷', phone: '괴담톡', wiki: '위키', field: '필드', wallet: '가계부', settings: '설정',
+  board: '상황판', map: '임무', mission: '커스텀', gnet: '괴담넷', phone: '괴담톡', wiki: '위키', field: '필드', records: '기록', wallet: '가계부', settings: '설정',
 };
 
 function header(sub: string, extra = ''): string {
@@ -1073,7 +1098,7 @@ const INNER_SCROLL = '.gx-acards, .gx-sidecol, .gx-mbox, .gx-sits, .gx-bd-col > 
 /** 설정 기능 페이지(인물 기록 설정 등)·위키 문서 칸(인물 상세·기록 문서): .gx-body 가 아니라 이 칸이 실제로 스크롤된다.
  *  같은 페이지(pageKey)를 다시 그릴 때만 자리를 지킨다 (다른 문서로 넘어가면 맨 위부터) */
 const PAGE_SCROLL = '.st-featpage .ph-form-body, .nw-pane .nw-doc';
-const pageKey = () => `${tab}|${settingsUi.page}|${wiki.view}|${wiki.title}`;
+const pageKey = () => `${tab}|${settingsUi.page}|${wiki.view}|${wiki.title}|${rec.sub}|${rec.view}|${rec.id}`;
 
 function render(): void {
   if (!root) return;
@@ -1168,6 +1193,8 @@ function boardDrawer(): string {
 interface NavState {
   tab: Tab;
   w?: { view: string; title: string; list: boolean };
+  /** 기록 탭: 하위 탭·화면·대상 */
+  r?: RecordsNav;
   p?: { sub: string; tab: string; view: string; room: string | null; n: number | null };
   g?: { sub: string; open: number | null; dm: string | null; s: boolean; c: unknown };
   f?: 'goal' | 'team';
@@ -1180,6 +1207,7 @@ const navHist = new NavHistory<NavState>();
 function navState(): NavState {
   const s: NavState = { tab };
   if (tab === 'wiki') s.w = { view: wiki.view, title: wiki.title, list: wiki.listOpen };
+  if (tab === 'records') s.r = recordsNav();
   if (tab === 'phone') s.p = { sub: phone.sub, tab: phone.tab, view: phone.view, room: phone.room, n: phone.openNotice };
   // 괴담넷 글쓰기·새 쪽지 화면만 기록 (댓글 답글 칸은 화면 이동이 아니다)
   if (tab === 'gnet') s.g = { sub: gnet.sub, open: gnet.open, dm: gnet.openDm, s: gnet.settings, c: gnet.compose?.kind === 'post' || gnet.compose?.kind === 'newdm' ? gnet.compose : null };
@@ -1205,7 +1233,8 @@ function markOf(raw: NavState): Mark {
   const s = markState(raw);
   const ctx = view.kind === 'started' ? view.ctx : null;
   let name = s.tab === 'gnet' ? gnetLabel(ctx?.chat.scriptstate) : TAB_TITLE[s.tab];
-  if (s.w) name = s.w.view === 'doc' || s.w.view === 'compose' ? s.w.title || '위키' : s.w.view === 'settings' ? '위키 설정' : s.w.view === 'new' ? '위키 새 문서' : s.w.view === 'people' ? '이 채팅의 인물' : s.w.view === 'person' ? `${s.w.title} 기록` : s.w.view === 'docs' ? '기록 문서' : s.w.view === 'faction' ? `세력 ${s.w.title}` : '위키 메인';
+  if (s.w) name = s.w.view === 'doc' || s.w.view === 'compose' ? s.w.title || '위키' : s.w.view === 'settings' ? '위키 설정' : s.w.view === 'new' ? '위키 새 문서' : '위키 메인';
+  if (s.r) name = recordsMarkName(s.r, ctx?.chat ?? null);
   if (s.p) {
     const r = s.p.view === 'room' && s.p.room && ctx ? readPhone(ctx.chat).rooms[s.p.room] : undefined;
     name = r ? roomLabel(r) : s.p.view === 'settings' ? '괴담톡 설정' : `괴담톡 ${PH_SUB[s.p.sub] ?? ''}`.trim();
@@ -1231,6 +1260,13 @@ function recentMarks(): Mark[] {
 /** 다른 채팅에서 넣은 즐겨찾기: 이 채팅에 없는 괴담톡 방은 목록으로 */
 function openable(ctx: ChatContext, s: NavState): NavState {
   const o: NavState = JSON.parse(JSON.stringify(s));
+  // 옛 즐겨찾기: 위키 안 인물·개인 기록·기록 문서·세력 화면은 기록 탭으로 (2026-10-29)
+  const legacy = o.tab === 'wiki' && o.w ? legacyWikiNav(o.w.view, o.w.title) : null;
+  if (legacy) {
+    o.tab = 'records';
+    o.r = legacy;
+    delete o.w;
+  }
   if (!TABS.includes(o.tab)) o.tab = 'board';
   if (o.p?.room && !readPhone(ctx.chat).rooms[o.p.room]) Object.assign(o.p, { view: 'list', room: null });
   return o;
@@ -1241,6 +1277,7 @@ function applyNav(s: NavState): void {
   notice = '';
   field.confirmEnd = null;
   if (s.w) Object.assign(wiki, { view: s.w.view, title: s.w.title, listOpen: s.w.list });
+  if (s.r) applyRecordsNav(s.r);
   if (s.p) Object.assign(phone, { sub: s.p.sub, tab: s.p.tab, view: s.p.view, room: s.p.room, openNotice: s.p.n });
   if (s.g) Object.assign(gnet, { sub: s.g.sub, open: s.g.open, openDm: s.g.dm, settings: s.g.s, compose: s.g.c });
   if (s.d !== undefined) dirUi.open = s.d;
@@ -1313,6 +1350,8 @@ function startedBody(ctx: ChatContext): string {
       return phoneTab(ctx, phoneEnv);
     case 'wallet':
       return walletTab(ctx);
+    case 'records':
+      return recordsTab(ctx);
     case 'field':
       // 게임은 그린 뒤 이 자리에 붙인다 (afterRender → syncField)
       return '<main class="gx-body gx-fieldhost"></main>';
@@ -1429,7 +1468,7 @@ function tabs(): string {
     ${GNET_ON ? item('gnet', gnetLabel(ctx?.chat.scriptstate), ICONS.gnet) : ''}
     ${item('wiki', '위키', ICONS.wiki)}
     ${gameShown() ? item('field', '필드', ICONS.game, 'desk') : ''}
-    ${ctx && walletOn(ctx) ? item('wallet', '가계부', ICONS.wallet, 'desk') : ''}
+    ${item('records', '기록', ICONS.records, 'desk')}
     <button class="gx-nb desk" data-action="ed-open" data-value="set:screen">${ICONS.settings}<span>설정</span>${ctx && hasUpdate(ctx) ? '<span class="gx-nbadge dot" aria-label="새 버전"></span>' : ''}</button>
     <span class="gx-nav-gap"></span>
     ${ctx ? navHistBar(markOf(navState())) : ''}
@@ -1461,11 +1500,7 @@ function idCard(ctx: ChatContext): string {
   const st = lastStatusFields((ctx.chat.message ?? []).filter((m) => m.role === 'char').slice(-6).map((m) => m.data));
   const time = (w ? clock(w.minute) : '') || [st?.date, st?.time].filter(Boolean).join(' ');
   const weather = [st?.weather, st?.temp].filter(Boolean).join(' ');
-  // 소속 사진 패널: 맨 위 소속 이름 한 줄, 가로줄 아래 위치·목표 한 줄씩, 맨 아래 왼쪽 날짜·시각 / 오른쪽 날씨·온도
-  const line = (label: string, value: string) => (value ? `<span class="gx-op-ln"><i>${label}</i><em>${esc(value)}</em></span>` : '');
-  const meta = time || weather ? `<span class="gx-op-meta"><span>${esc(time)}</span><span>${esc(weather)}</span></span>` : '';
-  // 첫 응답 전: 상황판 칸 배치는 그대로 두고, 비어 있는 이 자리에만 안내 (v0.16.31)
-  const status = line('위치', st?.place ?? '') + line('목표', st?.target ?? '') + meta || (w && w.minute === null ? '<span class="gx-op-wait">첫 응답 뒤에 위치·시각이 채워져요.</span>' : '');
+  // 2026-10-29 정리 (시안 Main.dc.html): 사진 → 「이름 + 소속 칩」 → 잔고 줄(누르면 가계부 ›) → 「위치  시각 · 날씨」 → 「목표」
   const u = userInfo();
   // 캐릭터로 플레이: 신분증도 그 요원 사진·이름·직급
   const pa = playerAgent(ctx.char.globalLore, ctx.chat.scriptstate);
@@ -1475,18 +1510,23 @@ function idCard(ctx: ChatContext): string {
   const photo = photoUrl
     ? `<span class="gx-id-photo"><img src="${esc(photoUrl)}" alt=""></span>`
     : `<span class="gx-id-photo none">${ICONS.idcard}</span>`;
+  const chips = `<span class="gx-badge own gx-id-fac">${esc(f ? selfName(ctx, f.code, f.name) : '소속 없음')}</span>${pa?.rank ? `<span class="gx-badge gx-id-fac">${esc(pa.rank)}</span>` : ''}`;
+  const line = (label: string, value: string, extra = '') => (value || extra ? `<span class="gx-id-row"><i>${label}</i><em>${esc(value)}</em>${extra}</span>` : '');
+  const meta = time || weather ? `<small>${esc([time.replace(/^\d{4}\./, ''), weather].filter(Boolean).join(' · '))}</small>` : '';
+  // 첫 응답 전: 상황판 칸 배치는 그대로 두고, 비어 있는 이 자리에만 안내 (v0.16.31)
+  const status = line('위치', st?.place ?? '', meta) + line('목표', st?.target ?? '') || (w && w.minute === null ? '<span class="gx-op-wait">첫 응답 뒤에 위치·시각이 채워져요.</span>' : '');
   return `<div class="gx-id">${img ? `<span class="gx-id-bg" style="background-image:url('${esc(img)}')"></span>` : ''}
       ${photo}
-      <span class="gx-id-who"><b>${esc(name)}</b><small>${esc([f ? selfName(ctx, f.code, f.name) : '소속 없음', pa?.rank ?? ''].filter(Boolean).join(' · '))}</small></span>
-      ${status || walletChip(ctx) ? `<span class="gx-op-st">${walletChip(ctx)}${status}</span>` : ''}
+      <span class="gx-id-who"><b>${esc(name)}</b>${chips}</span>
+      ${status || walletChip(ctx) ? `<span class="gx-op-st gx-id-rows">${walletChip(ctx)}${status}</span>` : ''}
     </div>`;
 }
 
-/** 잔고 칩 (상태창 잔고 칸을 쓸 때): 장부 잔고. 누르면 장부 창 */
+/** 사원증 잔고 줄 (상태창 잔고 칸을 쓸 때): 장부 잔고. 누르면 가계부 화면 (2026-10-29: 가계부가 왼쪽 메뉴에서 빠져 이 줄이 PC 의 입구) */
 function walletChip(ctx: ChatContext): string {
   if (colConfig(ctx.chat.scriptstate).wallet === 'off') return '';
   const w = readWallet(ctx.chat.scriptstate, getPrefs().walletStart ?? WALLET_START_DEFAULT);
-  return `<button class="gx-op-ln gx-wallet" data-action="tab" data-value="wallet" aria-label="잔고·가계부" title="가계부"><i>잔고</i><em>${esc(formatWon(walletBalance(w, aliveAnchors(ctx.chat))))}</em></button>`;
+  return `<button class="gx-id-row gx-id-wallet gx-wallet" data-action="tab" data-value="wallet" aria-label="잔고·가계부" title="가계부"><i>잔고</i><em>${esc(formatWon(walletBalance(w, aliveAnchors(ctx.chat))))}</em><span class="gx-id-go" aria-hidden="true">›</span></button>`;
 }
 
 /** 내 소속은 내 시점의 이름으로 (가짜 관리국을 고르면 나에게는 그냥 관리국). 명부에서 이름을 바꿨으면 그 이름 */
@@ -1546,7 +1586,9 @@ function board(ctx: ChatContext): string {
   // 막 끝난 상황은 이름 막기와 같은 동안 일지 맨 아래에 흐리게 (2026-10-20 사용자)
   for (const e of endedShown(w)) {
     const name = e.name || '이름 미확인';
-    cards.push({ kind: e.kind, name, grade: e.grade, loc: esc(locName(e.loc)), badge: '<span class="gx-badge end">종료</span>', ended: true, id: `end:${e.kind}:${e.name}:${e.loc}`, locCode: e.loc, art: evArt(ctx, name, e.kind) });
+    // 종료 줄 → 보고서 지름길 (기록 메뉴, 2026-10-29): 같은 종류·이름·장소의 일지 줄이 가리키는 보고서
+    const rp = endedReport(ctx.chat, e.kind, e.name, e.loc);
+    cards.push({ kind: e.kind, name, grade: e.grade, loc: esc(locName(e.loc)), badge: '<span class="gx-badge end">종료</span>', ended: true, id: `end:${e.kind}:${e.name}:${e.loc}`, locCode: e.loc, art: evArt(ctx, name, e.kind), ...(rp?.rpt ? { rpt: rp.rpt } : {}), ...(rp?.mine ? { mine: true } : {}) });
   }
   // 요원 칸 (2026-10-20 사용자): 모니터 벽 또는 근무 현황 목록. 편성 기준으로 밝기를 나눈다
   // 괴이와 사건(2026-10-21 배치 칸 추가)에서 찾는다
@@ -1574,6 +1616,7 @@ function board(ctx: ChatContext): string {
   const counts = cnt('an', '괴이', live(w.an)) + cnt('in', '사건', live(w.inc)) + cnt('ms', '특수', live(w.ms));
   const clock = boardClock(ctx);
   return `<main class="gx-body gx-board">
+    ${closeNotice(ctx.chat)}
     ${opsBoard(cards, { mapUrl: boardMapUrl(ctx, env), clock, counts, empty: '지금 발생한 상황이 없어요.' })}
     ${agentPanel(agents, getPrefs().agents ?? 'wall', { total: roster.length, org: findFaction(faction, factionList(ctx.char.globalLore))?.affiliation ?? '', extra: promo, empty: limit === 0 ? '설정에서 요원 표시 인원을 0명으로 해 두었어요.' : '이 소속에는 요원 명단이 없어요.' })}
   </main>${boardDrawer()}`;

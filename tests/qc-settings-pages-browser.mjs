@@ -1,4 +1,4 @@
-// QC 03 · 설정 창 모든 페이지(set:screen,image,board,gnet,phone,wiki,visit,people,adv,update)의 모든 조작을 실제로 눌러
+// QC 03 · 설정 창 모든 페이지(set:screen,image,board,gnet,phone,wiki,visit,people,journal,adv,update)의 모든 조작을 실제로 눌러
 // 값이 기기 설정(prefs) 또는 채팅 변수(setChatToIndex)에 맞게 저장되는지, 범위(이 채팅/새 채팅 기본값/시작 전)가 섞이지 않는지,
 // 경계값·잘못된 입력, 다시 열었을 때 같은 값이 보이는지를 본다. 세 뷰포트.
 // 사용법: node tests/qc-settings-pages-browser.mjs <fixture.json> [pc|phone|land|all]
@@ -10,11 +10,11 @@ const which = process.argv[3] ?? 'all';
 const vps = which === 'all' ? Object.keys(VIEWPORTS) : [which];
 const browser = await launch();
 
-const PAGES = ['screen', 'image', 'board', 'gnet', 'phone', 'wiki', 'visit', 'people', 'adv', 'update'];
+const PAGES = ['screen', 'image', 'board', 'gnet', 'phone', 'wiki', 'visit', 'people', 'journal', 'adv', 'update'];
 /** 기능 페이지: 값은 늘 이 채팅 변수 (범위 전환 없음) */
-const FEATURE = new Set(['gnet', 'phone', 'wiki', 'visit', 'people']);
+const FEATURE = new Set(['gnet', 'phone', 'wiki', 'visit', 'people', 'journal']);
 /** 누르면 저장이 아니라 다른 일을 하는 단추 (확인창·네트워크·화면 이동·LLM 호출) — 전수 클릭에서 뺀다 */
-const SKIP_ACTION = /^(set-scope|set-bar|set-feat-back|ed-|upd-|visit-orphans|visit-def|gn-def|ph-def|wiki-def|pp-def|pp-update|pp-backfill|pp-reread|pp-diag|pp-tidy|pp-register|pp-ignore|pp-pin|pp-jump|wiki-|adv-reset-all|adv-reset-yes|adv-reset-no|man-|ip-|dir-|mk-|nav-|tab|close)/;
+const SKIP_ACTION = /^(set-scope|set-bar|set-feat-back|ed-|upd-|visit-orphans|visit-def|gn-def|ph-def|wiki-def|pp-def|jr-def|rec-|pp-update|pp-backfill|pp-reread|pp-diag|pp-tidy|pp-register|pp-ignore|pp-pin|pp-jump|wiki-|adv-reset-all|adv-reset-yes|adv-reset-no|man-|ip-|dir-|mk-|nav-|tab|close)/;
 const CHANGE_SKIP = /^(ed-|dir-|ip-|pp-diag-all|pp-backfill-turns|pp-reread-turns)/;
 
 /** 저장 상태 스냅샷 */

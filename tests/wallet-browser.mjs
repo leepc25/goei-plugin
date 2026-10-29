@@ -1,4 +1,4 @@
-// 가계부 탭 (src/ui/wallet.ts): PC 왼쪽 메뉴, 모바일 머리 잔고 단추·ID카드 잔고 칩으로 들어가 내역·합계·추가·수정·지우기
+// 가계부 탭 (src/ui/wallet.ts): PC 는 사원증 잔고 줄(2026-10-29: 왼쪽 메뉴 자리는 「기록」), 모바일 머리 잔고 단추·ID카드 잔고 줄로 들어가 내역·합계·추가·수정·지우기
 // 사용법: node tests/wallet-browser.mjs <fixture.json> [screenshot-dir]   (fixture: tests/make_fixture.py)
 // 호스트 흉내(hostScript·boot·open)는 tests/browser.mjs 와 같다.
 import { createRequire } from 'node:module';
@@ -130,12 +130,14 @@ const chat = () => ({
 const walletOf = (page) => page.evaluate(() => JSON.parse(window.__chat.scriptstate.$st_wallet));
 const rows = (page) => page.locator('.gx-wt-row').count();
 
-// PC: 왼쪽 메뉴 「가계부」
+// PC: 사원증 잔고 줄 (왼쪽 메뉴에 「가계부」 없음 — 그 자리는 「기록」)
 {
   const { page, errors } = await boot(fixture, chat(), { width: 1280, height: 860 });
   await open(page);
   await page.waitForSelector('.gx-nav');
-  await page.click('.gx-nav > .gx-nb[data-value="wallet"]');
+  assert.equal(await page.locator('.gx-nav > .gx-nb[data-value="wallet"]').count(), 0, '가계부는 메뉴에 없다');
+  assert.equal(await page.locator('.gx-nav > .gx-nb[data-value="records"]').count(), 1, '그 자리에 기록');
+  await page.click('.gx-nav-brand .gx-id-wallet');
   await page.waitForSelector('.gx-wallettab');
   assert.match(await page.textContent('.gx-wt-balrow b'), /153,800/, '잔고 = 시작 + 살아 있는 거래 (지운 메시지 거래 빠짐)');
   assert.match(await page.textContent('.gx-wt-tile.bal'), /시작 ₩ 140,000 · 거래 3건/);
@@ -212,7 +214,7 @@ const rows = (page) => page.locator('.gx-wt-row').count();
   const { page, errors } = await boot(fixture, c, { width: 1280, height: 860 });
   await open(page);
   await page.waitForSelector('.gx-nav');
-  await page.click('.gx-nav > .gx-nb[data-value="wallet"]');
+  await page.click('.gx-nav-brand .gx-id-wallet');
   await page.waitForSelector('.gx-wallettab');
   assert.equal(await page.locator('.gx-wt-pen').count(), 0, '꺼져 있으면 ✎ 없음');
   assert.equal(await page.locator('.gx-wt-del').count(), 0, '꺼져 있으면 ✕ 없음');
@@ -235,7 +237,7 @@ const rows = (page) => page.locator('.gx-wt-row').count();
   const { page } = await boot(fixture, c, { width: 1280, height: 860 });
   await open(page);
   await page.waitForSelector('.gx-nav');
-  assert.equal(await page.locator('.gx-nav > .gx-nb[data-value="wallet"]').count(), 0);
+  assert.equal(await page.locator('.gx-nav-brand .gx-id-wallet').count(), 0, '잔고 칸을 끄면 사원증 잔고 줄 없음');
   assert.equal(await page.locator('.gx-hwallet').count(), 0);
   await page.close();
 }
