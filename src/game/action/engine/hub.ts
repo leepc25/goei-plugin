@@ -11,7 +11,8 @@ import { SCREEN_H, SCREEN_W } from './contract';
 import { HQ_PLACE, drawFloor, drawHqWall, drawPropArt, drawHqTextureWall } from '../art/bg';
 import { drawHqDoorRound2 } from '../art/hqDoorRound2';
 import { drawCallLit, drawHqField, drawHqFieldLight, drawHqFieldObject, drawHqSigns, hasHqField } from '../art/hqField';
-import { drawVisitAgent, visitAgentTop } from '../art/visitAgents';
+import { drawVisitAgent, visitAgentTop, hasVisitAgent } from '../art/visitAgents';
+import { charTop, drawCharClip, charArt } from '../art/charPacks';
 import { drawTestMan, hasTestPeople, testManTop, testPlayerTop } from '../art/testPeople';
 import { persp, view as fieldView } from './view';
 import { blockByProps, clearSpot, type BlockProp } from './propBlock';
@@ -164,7 +165,7 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
       depthLayers: sc.boxes.map((b) => ({ y: b.y, occludedSilhouette: !sc.painted, x0: b.x - b.w / 2, x1: b.x + b.w / 2, draw: (c: CanvasRenderingContext2D) => {
         if (sc.painted && hasHqField(sc.painted)) { drawHqFieldObject(c, sc.painted, b.kind); return; }
         drawBox(c, b, sc.look);
-      } })).concat(people.map((p) => ({ y: p.y, x0: p.x - 60, x1: p.x + 60, occludedSilhouette: false, draw: (c: CanvasRenderingContext2D) => { drawVisitAgent(c, p.name, p.x, p.y, p.face, performance.now()); } })))
+      } })).concat(people.map((p) => ({ y: p.y, x0: p.x - 60, x1: p.x + 60, occludedSilhouette: false, draw: (c: CanvasRenderingContext2D) => { drawVisitAgent(c, p.name, p.x, p.y, p.face, performance.now()) || drawCharClip(c, p.name, p.x, p.y, p.face, performance.now()); } })))
         // 움직이는 행위자: 자리 수만큼 층을 두고 매 프레임 지금 목록의 i번째를 읽는다 (깊이 정렬은 y 게터로)
         .concat(host.life ? Array.from({ length: LIFE_SLOTS }, (_, i) => ({
           get y() { return live[i]?.y ?? -1e9; },
@@ -223,7 +224,7 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
         c.scale(1 / z, 1 / z);
         // 사람 그림은 월드 배율로 그려지므로(배경과 같이 커짐) 머리 높이도 z를 곱한다
         const shown = host.life ? live.filter((a) => a.kind === 'named') : people;
-        host.overlay?.(c, shown.map((p) => ({ name: p.name, x: p.x * z, y: p.y * z, top: visitAgentTop(p.name) * persp(p.y) * z })), { name: '', x: w.player.x * z, y: (w.player.y - w.player.z) * z, top: (hasTestPeople() ? testPlayerTop() : visitAgentTop('쟈알디')) * persp(w.player.y) * z });
+        host.overlay?.(c, shown.map((p) => ({ name: p.name, x: p.x * z, y: p.y * z, top: namedTop(p.name) * persp(p.y) * z })), { name: '', x: w.player.x * z, y: (w.player.y - w.player.z) * z, top: ((w.player as { art?: { key: string } }).art ? charTop((w.player as { art?: { key: string } }).art!.key) : hasTestPeople() ? testPlayerTop() : visitAgentTop('쟈알디')) * persp(w.player.y) * z });
         c.restore();
         // 행위자 머리 위 아이콘·말풍선 (화면 px)
         if (host.life) {
@@ -231,7 +232,7 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
           c.scale(1 / z, 1 / z);
           for (const a of live) {
             if (!a.icon && !a.say) continue;
-            const top = (a.kind === 'named' ? visitAgentTop(a.name) : hasTestPeople() ? testManTop() : -230) * persp(a.y);
+            const top = (a.kind === 'named' ? namedTop(a.name) : hasTestPeople() ? testManTop() : -230) * persp(a.y);
             drawHeadBubble(c, a.x * z, (a.y + top) * z - 8, a.say ?? a.icon!, !!a.say);
           }
           c.restore();
@@ -886,10 +887,13 @@ function legacyDoor(c: CanvasRenderingContext2D, d: Door, camX: number) {
   }
 }
 
-/** 행위자 그리기: 이름 인물은 방문 요원 그림(없으면 실루엣), 몹은 host가 주는 그림(없으면 실루엣) */
+/** 이름 인물 머리 꼭대기: 방문 요원 그림이 있으면 그것, 아니면 인물 팩(테스트룸 그림) */
+const namedTop = (name: string) => (hasVisitAgent(name) || !charArt(name) ? visitAgentTop(name) : charTop(name));
+/** 행위자 그리기: 이름 인물은 방문 요원 그림 → 인물 팩(통합 테스트룸 생활 클립, 10-29) → 실루엣, 몹은 host가 주는 그림(없으면 실루엣) */
 function drawLiveActor(c: CanvasRenderingContext2D, a: LiveActor, life: HubLife): void {
   const t = (life.lifeTime?.() ?? performance.now() / 1000) * 1000;
   if (a.kind === 'named' && drawVisitAgent(c, a.name, a.x, a.y, a.face, t, a.clip, (a.since ?? 0) * 1000)) return;
+  if (a.kind === 'named' && drawCharClip(c, a.name, a.x, a.y, a.face, t, a.clip, (a.since ?? 0) * 1000)) return;
   if (a.kind === 'mob' && life.drawMob) return life.drawMob(c, a);
   silhouette(c, a);
 }

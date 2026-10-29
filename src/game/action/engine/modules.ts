@@ -9,6 +9,9 @@ import { persp, view } from './view';
 import { KEYMAP } from './input';
 import { drawGuardBar } from '../ui/pixelHud';
 import { EileenPlayer } from '../eileen/player';
+import { Room3Player, room3Hooks } from '../room3/player';
+import { AiRoom3 } from '../room3/ai';
+import { charArt, charFace, charTop, drawCharClip, hasCharClip, loadChar } from '../art/charPacks';
 import { setPixelScale } from './contract';
 import { mountTalk } from '../../talk';
 import { createGameAudio } from '../audio';
@@ -98,7 +101,9 @@ function hqAdapter(bridge: Partial<GameBridge> | undefined, ui: { chooseFloor: H
   const visitReady = (b?.visit
     ? b.visit.state().then((v) => { visitor = v.visitor; present = v.agents.filter((a) => a.room).map((a) => ({ name: a.name, room: a.room! })); }).catch(() => {})
     // 시연판(본편 연결 없음): 생태계를 볼 수 있게 요원 몇 명을 세운다
-    : Promise.resolve().then(() => { present = [{ name: '잼트리', room: 'office' }, { name: '쟈알디', room: 'office' }, { name: '큐라스', room: 'lounge' }, { name: '고르고디오', room: 'lounge' }, { name: '데쥬레', room: 'infirmary' }]; })).then(() => { ready = true; });
+    : Promise.resolve().then(() => { present = [{ name: '잼트리', room: 'office' }, { name: '쟈알디', room: 'office' }, { name: '큐라스', room: 'lounge' }, { name: '고르고디오', room: 'lounge' }, { name: '데쥬레', room: 'infirmary' }]; }))
+    // 본부에 있는 요원의 인물 팩(생활 클립·전투)을 받아 둔다 (없는 인물은 방문 요원 그림·실루엣)
+    .then(() => Promise.all(present.map((p) => loadChar(p.name)))).then(() => { ready = true; });
   // 필드 시각은 본편 상태줄 시각에서 시작한다 (docs/필드_세계_NPC_설계.md 16-3). 유저 소속·신분도 같이
   let me: { faction: string; level: number | null } = { faction: 'A00', level: 1 };
   // 시연판(본편 없음): 시계를 10시에서 시작 (?hour=숫자 로 바꿈) — 근무·시간대·시간 보내기를 볼 수 있게
@@ -151,7 +156,7 @@ function hqAdapter(bridge: Partial<GameBridge> | undefined, ui: { chooseFloor: H
   if (typeof window !== 'undefined') window.addEventListener('keydown', (e) => { if (e.key === 'F9' || e.key === '`') { observing = !observing; e.preventDefault(); } });
   const world = () => {
     if (!sim && ready) {
-      sim = createHqWorld(map, seed, present.filter((p) => ROOM_SCENE[p.room]).map((p) => ({ name: p.name, scene: ROOM_SCENE[p.room] })), hasVisitClip, { stance: (f) => factionBy.get(f)?.stage ?? null });
+      sim = createHqWorld(map, seed, present.filter((p) => ROOM_SCENE[p.room]).map((p) => ({ name: p.name, scene: ROOM_SCENE[p.room] })), (n, c) => hasVisitClip(n, c) || hasCharClip(n, c), { stance: (f) => factionBy.get(f)?.stage ?? null });
       chatter = new Chatter(sim, new Lines(dialogueData as unknown as DialogueData, sim.rng), lineCtx);
     }
     // 개발 도구·브라우저 시험: 세계를 들여다본다 (관찰 창과 같은 정보)
@@ -214,7 +219,7 @@ function hqAdapter(bridge: Partial<GameBridge> | undefined, ui: { chooseFloor: H
   const clockView = () => { const c = new FieldClock(fieldClock.sec === null ? null : fieldClock.sec / 60); return c; };
   // 필드 행위자를 에일린 공격 표적으로 (전투 몸이 아니므로 가짜 몸을 건넨다. 보이는 장면만)
   let lifeScene = '';
-  eileenHooks.extraTargets = () => {
+  eileenHooks.extraTargets = room3Hooks.extraTargets = () => {
     const w = sim;
     if (!w || !lifeScene) return [];
     return w.inScene(lifeScene).filter((a) => a.act !== 'down').map((a) => ({
@@ -258,7 +263,7 @@ function hqAdapter(bridge: Partial<GameBridge> | undefined, ui: { chooseFloor: H
     drawMob: (c, a) => { if (!drawTestMan(c, a.x, a.y, a.face)) silhouette(c, a); },
   };
   const visitors = (sceneId: string) => {
-    const here = present.filter((p) => ROOM_SCENE[p.room] === sceneId && hasVisitAgent(p.name));
+    const here = present.filter((p) => ROOM_SCENE[p.room] === sceneId && (hasVisitAgent(p.name) || !!charArt(p.name)));
     const sc = map.scenes.find((s) => s.id === sceneId);
     if (!sc || !here.length) return [];
     const [top, bot] = sc.lane ?? [LANE_TOP, LANE_BOT];
@@ -323,12 +328,17 @@ function hqAdapter(bridge: Partial<GameBridge> | undefined, ui: { chooseFloor: H
   };
 }
 
+/** 주인공 머리 꼭대기 (발 기준 화면 px, 음수, 원근 미포함) */
+function heroTop(p: World['player']): number {
+  return p instanceof Room3Player ? charTop(p.art.key) : hasTestPeople() ? testPlayerTop() : -230;
+}
+
 function hudState(w: World, shell: Shell): HudState {
   const p = w.player;
   const boss = w.boss();
   const f = w.floor;
   return {
-    agent: { name: p.label ?? '쟈알디', color: '#c0453a', portrait: (p as { core?: unknown }).core ? testPlayerFace(64, p.dir < 0) : null },
+    agent: { name: p.label ?? '쟈알디', color: p instanceof Room3Player ? p.art.cfg.color : '#c0453a', portrait: p instanceof Room3Player ? charFace(p.art.key, 64, p.dir < 0) : (p as { core?: unknown }).core ? testPlayerFace(64, p.dir < 0) : null },
     hp: p.hp,
     maxHp: p.hpMax,
     energy: p.skillCd > 0 ? 75 - p.skillCd : 75,
@@ -461,6 +471,19 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
   let aiN = 0;
   const unknownKinds = new Set<string>();
   const enemyFactory: EnemyFactory = (spec, w) => {
+    // 통합 테스트룸 인물 AI: 'ai-char' = 주인공과 같은 인물, 'ai-char:<이름>' = 그 인물 팩(받아 둔 것만). 대련('ai-eileen')도 주인공이 인물 팩이면 그 인물로
+    if ((spec.kind === 'ai-char' || spec.kind.startsWith('ai-char:') || spec.kind === 'ai-eileen') && w.player instanceof Room3Player) {
+      const who = spec.kind.startsWith('ai-char:') ? spec.kind.slice(8) : '';
+      const art = who ? charArt(who) : w.player.art;
+      if (!art) { void loadChar(who); return fallbackEnemy(spec, w); }
+      if (aiN === 0) squad = new Squad(DIFF[aiDiff].melee);
+      const n = ++aiN;
+      const personas = [{ aggression: 0.75, patience: 0.35, zoning: 0.2, courage: 0.9 }, { aggression: 0.35, patience: 0.8, zoning: 0.3, courage: 0.8 }, { aggression: 0.4, patience: 0.5, zoning: 0.85, courage: 0.7 }];
+      const ai = new AiRoom3((w.player as unknown as { clips: ConstructorParameters<typeof AiRoom3>[0] }).clips, art, { id: `ai${n}`, grade: 'B', difficulty: aiDiff, persona: personas[(n - 1) % personas.length], seed: 1000 + n, squad, label: `AI ${art.cfg.name} ${n}` });
+      ai.x = spec.x; ai.y = spec.y;
+      ai.hp = ai.hpMax = 160;
+      return ai as never;
+    }
     if (spec.kind === 'ai-eileen' && w.player instanceof EileenPlayer) {
       if (aiN === 0) squad = new Squad(DIFF[aiDiff].melee);
       const n = ++aiN;
@@ -683,7 +706,7 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
     storyRoot.style.visibility = shell.paused ? 'hidden' : '';
   };
   // 에일린 테스트룸 전투의 소리는 화면 효과 없이 소리만
-  eileenHooks.sfx = (e) => audio.event(e as never);
+  eileenHooks.sfx = room3Hooks.sfx = (e) => audio.event(e as never);
   const listeners: ((e: GameEvent) => void)[] = [
     (e) => {
       audio.event(e as never);
@@ -740,8 +763,8 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
       let cardEnd = 0;
       if (game?.inHub && !mods.blocking?.() && !shell.paused) {
         const me = hq.visitor();
-        const name = me.name || (testPlayerFace() ? '에일린' : '방문자');
-        const face = (me.agentId && visitAgentFaceCanvas(name, 34)) || testPlayerFace(64, w.player.dir < 0) || visitAgentFaceCanvas('쟈알디', 34);
+        const name = me.name || (w.player instanceof Room3Player ? w.player.label : testPlayerFace() ? '에일린' : '방문자');
+        const face = (w.player instanceof Room3Player && charFace(w.player.art.key, 64, w.player.dir < 0)) || (me.agentId && visitAgentFaceCanvas(name, 34)) || testPlayerFace(64, w.player.dir < 0) || visitAgentFaceCanvas('쟈알디', 34);
         // 좌상단 초상화 상자 (사용자 2026-10-25: 위 목표 띠 대신)
         shell.hud.drawFieldCard(ctx, { name, face, hp: w.player.hp, maxHp: w.player.hpMax, gauge: w.player.gauge, compact: hs.compact, top: true, items: hs.items, device: hs.device, status: hs.status }, dt);
         // 오른쪽 위 필드 시각·장소·잔고 (관찰 창이 켜져 있으면 그 자리라 숨김)
@@ -769,16 +792,16 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
         const sp = (w.stage as { speech?: () => { who: string; text: string; x: number; y: number; top: number } | null }).speech?.();
         if (sp) shell.hud.drawSpeech(ctx, { x: toX(sp.x), y: toY(sp.y + sp.top) - 6, who: sp.who, text: sp.text, compact: hs.compact });
         else if (hs.message) {
-          const p = w.player, head = (hasTestPeople() ? testPlayerTop() : -230) * persp(p.y);
+          const p = w.player, head = heroTop(p) * persp(p.y);
           shell.hud.drawSpeech(ctx, { x: toX(p.x), y: toY(p.y - p.z + head) - 10, who: '', text: hs.message, compact: hs.compact });
         }
       }
       // 방어 게이지: 캐릭터 머리 위, 막는 중·회복 중에만 (가득 차면 천천히 사라진다)
-      const ep = w.player instanceof EileenPlayer ? w.player : null;
+      const ep = w.player instanceof EileenPlayer || w.player instanceof Room3Player ? w.player : null;
       if (ep && !mods.blocking?.() && !shell.paused) {
         const show = ep.guard < 99.5 || ep.core.P.mode === 'block';
         guardA = show ? Math.min(1, guardA + dt * 8) : Math.max(0, guardA - dt * 2.5);
-        const z = view.zoom, head = testPlayerTop() * persp(ep.y);
+        const z = view.zoom, head = heroTop(ep) * persp(ep.y);
         const gx = (ep.x - w.drawCamX - view.crop) * z, gy = (ep.y - ep.z + head * 0.92 - view.cropY) * z - 12;
         drawGuardBar(ctx, gx + 5, gy, ep.guard / 100, ep.guardBroken, guardA, performance.now() / 1000);
       }
@@ -786,7 +809,7 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
       const tg = game?.inHub && !mods.blocking?.() && !shell.paused ? (w.stage as { nearInfo?: () => { text: string; locked: boolean } | null }).nearInfo?.() : null;
       if (tg) {
         const p = w.player, z = view.zoom;
-        const head = (hasTestPeople() ? testPlayerTop() : -230) * persp(p.y);
+        const head = heroTop(p) * persp(p.y);
         const sx = (p.x - w.drawCamX - view.crop) * z, sy = (p.y - p.z + head * 0.72 - view.cropY) * z;
         const half = 46 * persp(p.y) * 1.15 * z;
         const side: 1 | -1 = sx > ctx.canvas.width - 320 ? -1 : 1;

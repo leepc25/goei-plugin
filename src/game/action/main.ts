@@ -4,6 +4,8 @@ import { prepareTestPeople } from './art/testPeople';
 import { prepareHqField } from './art/hqField';
 import { eileenArt } from './art/testPeople';
 import { EileenPlayer } from './eileen/player';
+import { Room3Player } from './room3/player';
+import { prepareCharPacks, loadChar } from './art/charPacks';
 import { playerFactory } from './engine/player';
 import { useEileenKeys } from './engine/input';
 import { useEileenControls } from './ui/keys';
@@ -54,13 +56,20 @@ export function mountGame(box: HTMLElement, bridge?: Partial<GameBridge>): () =>
   // 필드 시험: 사용자 PixelLab 시험 캐릭터 (임시)
   // 주인공 그림(에일린 테스트룸 완성본): 늘 받는다 (쟈알디 그림은 뺐다, 2026-10-25)
   const testPeople = prepareTestPeople(bridge?.assets ? f => bridge.assets!.url('test-people', f) : undefined, bridge?.assets ? f => bridge.assets!.bytes('test-people', f) : undefined);
+  // 통합 테스트룸 인물 팩(10-29): 공용 이펙트·의자·명단을 받고, 주인공(방문 요원, 없으면 에일린) 팩을 받는다. 없으면 에일린 시험판으로
+  const charPacks = prepareCharPacks(bridge?.assets);
+  const heroArt = charPacks.ready.then(async () => {
+    const who = await bridge?.visit?.state().then((v) => v.visitor.name).catch(() => '') ?? '';
+    return (who && (await loadChar(who))) || loadChar('에일린');
+  }).catch(() => null);
   const visitArt = bridge?.visit ? prepareVisitAgents(bridge.assets ? f => bridge.assets!.url('visit-agents', f) : undefined, bridge.assets ? f => bridge.assets!.bytes('visit-agents', f) : undefined) : null;
-  void Promise.all([loadArt(urlOf, bridge?.assets ? f => bridge.assets!.bytes('jyaldi', f) : undefined), visitArt?.ready, testPeople?.ready]).then(([art]) => {
+  void Promise.all([loadArt(urlOf, bridge?.assets ? f => bridge.assets!.bytes('jyaldi', f) : undefined), visitArt?.ready, testPeople?.ready, heroArt]).then(([art, , , hero]) => {
     if (dead) return;
     stage.remove();
     root.style.display = 'block';
     // 에일린 테스트룸 전투: 그림이 있으면 플레이어와 키 배치를 에일린으로
-    if (eileenArt()) { playerFactory.make = (clips) => new EileenPlayer(clips); useEileenKeys(); useEileenControls(); }
+    if (hero) { playerFactory.make = (clips) => new Room3Player(clips, hero); useEileenKeys(); useEileenControls(); }
+    else if (eileenArt()) { playerFactory.make = (clips) => new EileenPlayer(clips); useEileenKeys(); useEileenControls(); }
     const wiring = engineModules(root, bridge);
     game = new Game(wiring.box, art, wiring.mods);
     wiring.bind(game);
@@ -81,6 +90,7 @@ export function mountGame(box: HTMLElement, bridge?: Partial<GameBridge>): () =>
     releaseHqArt();
     visitArt?.dispose();
     testPeople?.dispose();
+    charPacks.dispose();
     offTouch?.();
     game?.destroy();
     const g = globalThis as { __goeiEngine?: Game };

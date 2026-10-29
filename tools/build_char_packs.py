@@ -62,17 +62,25 @@ def write_fx():
     return len(meta)
 
 
+def one(item):
+    ch, cfg = item
+    size, n = write_char(cfg)
+    print(f"{cfg['key']:<14} 줄 {n:>3} · {size / 1024 / 1024:.2f} MB", flush=True)
+    return dict(key=cfg["key"], name=cfg["name"], num=ch["num"], pack=pack_id(cfg["key"]), color=cfg.get("color"), dir=cfg["dir"], armed=cfg.get("armed"), npc=cfg["key"].startswith("6."), kb=size // 1024)
+
+
 def main():
-    roster = []
-    total = 0
+    from multiprocessing import Pool
+    items = []
     for ch in build.roster():
         if not (build.wanted(ch, False) or build.wanted(ch, True)): continue
         if only is not None and ch["key"] not in only: continue
         cfg = build.load_cfg(ch)
         if cfg is None: continue
-        size, n = write_char(cfg); total += size
-        roster.append(dict(key=cfg["key"], name=cfg["name"], num=ch["num"], pack=pack_id(cfg["key"]), color=cfg.get("color"), dir=cfg["dir"], armed=cfg.get("armed"), npc=cfg["key"].startswith("6."), kb=size // 1024))
-        print(f"{cfg['key']:<14} 줄 {n:>3} · {size / 1024 / 1024:.2f} MB", flush=True)
+        items.append((ch, cfg))
+    with Pool(4) as pool:   # 10-29: 한 줄로 돌리면 한 명 4분(126명 8시간) → 4코어 병렬
+        roster = pool.map(one, items, chunksize=1)
+    total = sum(r["kb"] * 1024 for r in roster)
     if only is None:
         nfx = write_fx()
         (PACKS / "action-fx" / "roster.json").write_text(json.dumps(roster, ensure_ascii=False, indent=0), encoding="utf-8")

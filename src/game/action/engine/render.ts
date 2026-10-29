@@ -12,6 +12,9 @@ import type { World } from './world';
 import { drawSupply } from './itemsLink';
 import { drawTestPlayer } from '../art/testPeople';
 import { EileenPlayer } from '../eileen/player';
+import { Room3Player } from '../room3/player';
+/** 테스트룸 코어로 움직이는 플레이어 (에일린 시험판·통합 테스트룸 인물): 스스로 그리고 장마다 실제 시간으로 움직인다 */
+const corePlayer = (p: unknown): p is EileenPlayer | Room3Player => p instanceof EileenPlayer || p instanceof Room3Player;
 
 const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
 
@@ -149,7 +152,7 @@ export function makeRenderer(ctx: CanvasRenderingContext2D, art: Art, opt: { hud
     if (p.ally) sprite(p.ally.clip, p.ally.f, 0, x + (p.ally.x - p.x), y + (p.ally.y - p.y), p.ally.dir);
     const a = p.anim();
     // 필드 시험 캐릭터가 있으면 그 그림 (서기 / 움직이면 달리기)
-    if (p instanceof EileenPlayer && !p.seat) { p.drawSelf(ctx, drawCam); return; }
+    if (corePlayer(p) && !p.seat) { p.drawSelf(ctx, drawCam); return; }
     if (drawTestPlayer(ctx, a.clip, a.frame, p.clipLen(a.clip), x, y - z, p.dir)) return;
     const blink = p.invuln > 0 && w.tick % 4 < 2 ? 0.5 : 1;
     if (!sprite(a.clip, a.frame, a.origin, x, y - z, p.dir, blink)) {
@@ -419,7 +422,7 @@ export function makeRenderer(ctx: CanvasRenderingContext2D, art: Art, opt: { hud
       ctx.imageSmoothingEnabled = false;
       const shake = w.shakeT > 0 ? (w.tick % 2 ? 1 : -1) * w.shakeP * 2 : 0;
       // 에일린은 그림 장마다 실제 시간으로 움직인다 (테스트룸과 같게)
-      if (w.player instanceof EileenPlayer) w.player.frameStep();
+      if (corePlayer(w.player)) w.player.frameStep();
       const camX = Math.round(lerp(w.prevCamX, w.camX, alpha));
       drawCam = camX;
       w.drawCamX = camX;
@@ -514,7 +517,7 @@ export function makeRenderer(ctx: CanvasRenderingContext2D, art: Art, opt: { hud
       // 실제 조사 대상의 표식. 전투 중에도 잠김 이유는 HUD에서 읽을 수 있다.
       // 표식은 HUD 안내 띠 안에서 그린다. 머리 위 표식과 안내 띠가 겹치지 않게 한다.
       w.hintShown = false;
-      if (w.player instanceof EileenPlayer) w.player.drawFxLayer(ctx, camX);
+      if (corePlayer(w.player)) w.player.drawFxLayer(ctx, camX);
       drawFx(w, camX);
       if (w.floor.drawForeground) {
         ctx.save();
@@ -528,7 +531,7 @@ export function makeRenderer(ctx: CanvasRenderingContext2D, art: Art, opt: { hud
       if (w.showBoxes) boxes(w, camX);
       ctx.restore();
       if (w.cutin > 0) cutin(w);
-      if (w.player instanceof EileenPlayer) {
+      if (corePlayer(w.player)) {
         // 컷인·번쩍임·쓰러짐은 화면 기준 (화면 확대·세로 따라가기와 무관)
         ctx.save();
         const hz = ctx.canvas.height / SCREEN_H;
