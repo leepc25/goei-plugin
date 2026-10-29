@@ -52,7 +52,9 @@ export function mountGame(box: HTMLElement, bridge?: Partial<GameBridge>): () =>
   // 통합 테스트룸 인물 팩(10-29): 공용 이펙트·의자·명단을 받고, 주인공(방문 요원, 없으면 에일린) 팩을 받는다. 옛 에일린 라이브판 팩·코드는 _old/에일린_라이브판_2026-10-29 에 보관(사용자 10-29)
   const charPacks = prepareCharPacks(bridge?.assets);
   const heroArt = charPacks.ready.then(async () => {
-    const who = await bridge?.visit?.state().then((v) => v.visitor.name).catch(() => '') ?? '';
+    // 주인공: 방문 요원 → 주소 ?char=이름 (시연판·시험장) → 에일린
+    const asked = (() => { try { return new URLSearchParams(location.search).get('char') ?? ''; } catch { return ''; } })();
+    const who = (await bridge?.visit?.state().then((v) => v.visitor.name).catch(() => '')) || asked;
     return (who && (await loadChar(who))) || loadChar('에일린');
   }).catch(() => null);
   void Promise.all([loadArt(urlOf, bridge?.assets ? f => bridge.assets!.bytes('jyaldi', f) : undefined), heroArt]).then(([art, hero]) => {

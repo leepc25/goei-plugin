@@ -155,6 +155,10 @@ await build({ ...common, entryPoints: ['src/game/action/engine/demo.ts'], format
   writeFileSync('dist/goei-action-game.html', html);
   mkdirSync('release/demo', { recursive: true });
   writeFileSync('release/demo/goei-action-game.html', html);
+  // 인물 시험장 (옛 통합 테스트룸 대신, src/game/action/fighter/testroom.ts): 게임 그대로 + 옆 판. 인물 팩은 game-pack/ 에서 받는다 (저장소 맨 위에서 정적 서버로 열기)
+  const tr = await build({ ...common, entryPoints: ['src/game/action/fighter/testroom.ts'], format: 'esm', minify: true, write: false });
+  const trCode = tr.outputFiles[0].text.replace(/<\/script/gi, '<\\/script');
+  writeFileSync('dist/goei-testroom.html', `<!doctype html><html lang="ko"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>인물 시험장</title><body><script>window.__GOEI_ENGINE_ART__=${JSON.stringify(art)};window.__GOEI_BG_ART__=${JSON.stringify(bg)};window.__GOEI_ITEM_ART__=${JSON.stringify(items)}</script><script type="module">${trCode}</script></body></html>`);
 }
 // 소리 시험실 (효과음·음악·환경음 전부 코드 합성): 단일 HTML. 순수 로직은 시험용으로 따로 묶는다.
 {

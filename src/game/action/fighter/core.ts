@@ -1463,5 +1463,7 @@ function drawCut() {
     P, A, CH, onPress, onRelease, takeHit, update, frameView, drawUnder, drawBody, drawFxLayer, drawScreen, armored,
     get hitstop() { return hitstop; }, get shake() { return shake; }, get zoom() { return zoom; }, get target() { return T; },
     knock, hit, stun, die, sitAt, rise, seatAct, runScene, playLife, lifeIds, emote, act, toIdle, has, nOf, SCENES,
+    /** 시험장 전용 스위치: 필살 게이지 무시 */
+    get freeSuper() { return freeSuper; }, set freeSuper(v: boolean) { freeSuper = v; },
   };
 }

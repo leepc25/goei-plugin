@@ -1,3 +1,10 @@
+> **2026-10-29 바뀜 (이 절이 아래보다 우선)**: 테스트룸 페이지(room.html)는 은퇴했다(`_old/테스트룸_변환기_2026-10-29/room.html`).
+> 전투·이펙트·판정 엔진의 원본은 게임 코드 `src/game/action/fighter/core.ts`이고, 시험장은 그 게임을 그대로 띄우는 `dist/goei-testroom.html`이다.
+> - 만들기·열기: `npm run build` → 저장소 맨 위에서 `python3 -m http.server 8765` → `http://localhost:8765/dist/goei-testroom.html?char=이름`
+> - 무대: `?start=stage=dummy`(허수아비, 기본) · `stage=spar&ai=easy|normal|hard|nightmare`(AI 대련) · `stage=training`. 옆 판에 인물 고르기·장면·생활 줄·동작 하나씩·필살 게이지 무시.
+> - 인물 설정(`chars/<키>.json`)·그림 측정(`build.py`)은 그대로 여기서 하고, 인물 팩은 `python3 tools/build_char_packs.py --only 키 --all`로 다시 만든다.
+> - 아직 옛 페이지에 묶인 도구: `qa/tools/dmg.cjs`·`dmg1.cjs`·`reach.cjs`·`review_all.cjs`·`trace.cjs`(out/index.html 안을 들여다봄). 밸런스를 다시 잴 때 새 시험장으로 옮겨야 한다. `qa/check_skills.py`는 게임 엔진을 읽게 고침.
+
 # 통합 테스트룸 (인물을 바꿔 가며 시연)
 
 에일린 테스트룸을 일반화한 판. 화면 위 목록이나 `[` `]` 키로 인물을 바꾸면 조작·콤보·회피·막기·피격·점프·생활 동작이 그 인물 그림으로 바뀌고, 고유기술·충전·필살기도 그 인물 설정대로 돈다.

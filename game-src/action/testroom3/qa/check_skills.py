@@ -10,9 +10,10 @@ sys.path.insert(0, str(HERE))
 sys.argv = sys.argv[:1] + [a for a in sys.argv[1:]]
 import build  # noqa: E402
 
-room = (HERE / "room.html").read_text(encoding="utf-8")
+# 부품 목록은 게임 엔진(src/game/action/fighter/core.ts, 2026-10-29부터 원본)에서 읽는다
+room = (HERE.parents[2] / "src/game/action/fighter/core.ts").read_text(encoding="utf-8")
 blk = room.split("const FX = {", 1)[1].split("\nfunction runFx", 1)[0]
-PARTS = set(re.findall(r"^  (\w+)\((?:s|s, c)\)", blk, re.M))
+PARTS = set(re.findall(r"^  (\w+)\(s\??(?:: \w+)?(?:, c\??(?:: \w+)?)?\)", blk, re.M))
 VFXN = {p.stem for d in (build.EIL / "vfx", HERE / "vfx") for p in d.glob("*.json") if p.with_suffix(".png").exists()}
 KINDS = {"light", "heavy", "launch", "blow", "down", "stun", "spike", "pull", "turn"}
 

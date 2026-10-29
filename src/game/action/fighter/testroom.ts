@@ -1,0 +1,150 @@
+// 인물 시험장 (2026-10-29): 옛 통합 테스트룸(room.html)을 대신한다. 엔진을 따로 두지 않고 게임을 그대로 띄운 뒤
+// 옆 판에서 인물·무대를 고르고, 동작·생활 줄·장면을 단추로 틀어 본다. 전투·이펙트·판정·피해는 게임 코드(fighter/core.ts) 그대로라
+// 여기서 본 것이 본 게임에서 나오는 것과 같다.
+// 열기: npm run build → 저장소 맨 위에서 `python3 -m http.server 8765` → http://localhost:8765/dist/goei-testroom.html
+//   ?char=이름(기본 에일린) · ?start=stage=dummy|spar|training 또는 hq · &ai=easy|normal|hard|nightmare · ?packs=팩 주소(기본 ../game-pack/)
+import { mountGame } from '../main';
+import { FighterPlayer } from './player';
+import type { GameAssets } from '../../bridge';
+
+type Row = { key: string; name: string; num: string; npc: boolean };
+
+const q = new URLSearchParams(location.search);
+if (!q.get('start')) {
+  q.set('start', 'stage=dummy');
+  history.replaceState(null, '', `${location.pathname}?${q}`);
+}
+const base = new URL(q.get('packs') ?? '../game-pack/', location.href).href.replace(/\/?$/, '/');
+const at = (pack: string, f: string) => `${base}${pack}/${f}`;
+const assets: GameAssets = {
+  ready: async (pack) => (await fetch(at(pack, 'pack.json')).catch(() => null))?.ok ?? false,
+  url: async (pack, f) => at(pack, f),
+  bytes: async (pack, f) => { const r = await fetch(at(pack, f)).catch(() => null); return r?.ok ? new Uint8Array(await r.arrayBuffer()) : null; },
+  atlas: async () => null,
+  list: async () => [],
+};
+
+const css = `
+html,body{margin:0;height:100%;background:#111;color:#ddd;font:13px/1.45 system-ui,sans-serif;overflow:hidden}
+#side{position:fixed;left:0;top:0;bottom:0;width:340px;overflow:auto;padding:10px 12px;box-sizing:border-box;background:#181a1d;border-right:1px solid #2a2d31}
+#box{position:fixed;left:340px;right:0;top:0;bottom:0}
+h1{font-size:15px;margin:0 0 6px} h2{font-size:13px;margin:12px 0 6px;color:#e8c27a}
+.m{color:#8b9097;font-size:12px} .row{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+button,select{background:#262a2f;color:#ddd;border:1px solid #3a3f45;border-radius:6px;padding:4px 8px;font:inherit;cursor:pointer}
+button:hover{background:#30353b} select{max-width:200px}
+.grid{display:flex;flex-wrap:wrap;gap:4px} .grid button{padding:2px 6px;font-size:12px}
+label{display:flex;gap:6px;align-items:center}
+@media (max-width:760px){#side{width:100%;bottom:auto;height:42%;border-right:0;border-bottom:1px solid #2a2d31}#box{left:0;top:42%}}
+`;
+document.head.insertAdjacentHTML('beforeend', `<style>${css}</style>`);
+document.body.innerHTML = '<div id="side"></div><div id="box"></div>';
+const side = document.getElementById('side')!;
+const box = document.getElementById('box')!;
+
+const el = <K extends keyof HTMLElementTagNameMap>(tag: K, attrs: Record<string, string> = {}, text = '') => {
+  const n = document.createElement(tag);
+  for (const [k, v] of Object.entries(attrs)) n.setAttribute(k, v);
+  if (text) n.textContent = text;
+  return n;
+};
+/** 단추: 누른 뒤 포커스를 게임으로 돌려 키 입력이 단추에 먹히지 않게 */
+const btn = (label: string, fn: () => void, title = '') => {
+  const b = el('button', title ? { title } : {}, label);
+  b.onclick = () => { fn(); b.blur(); (box.querySelector('canvas') as HTMLCanvasElement | null)?.focus(); };
+  return b;
+};
+const go = (patch: Record<string, string | null>) => {
+  for (const [k, v] of Object.entries(patch)) (v === null ? q.delete(k) : q.set(k, v));
+  location.search = q.toString();
+};
+
+// ── 위: 인물·무대 (게임과 상관없이 바로 그림) ──
+const head = el('div');
+head.append(el('h1', {}, '인물 시험장'), el('div', { class: 'm' }, '검수용 · 게임 코드 그대로 · 화면을 한 번 누른 뒤 키로 조종'));
+const pickRow = el('div', { class: 'row' });
+const sel = el('select', { 'aria-label': '인물 고르기' });
+pickRow.append(btn('◀', () => step(-1), '이전 인물'), sel, btn('▶', () => step(1), '다음 인물'));
+head.append(el('h2', {}, '인물'), pickRow);
+let roster: Row[] = [];
+const cur = q.get('char') ?? '에일린';
+const step = (d: number) => {
+  if (!roster.length) return;
+  const i = roster.findIndex((r) => r.name === cur);
+  go({ char: roster[(i + d + roster.length) % roster.length].name });
+};
+sel.onchange = () => go({ char: sel.value });
+void fetch(at('action-fx', 'roster.json')).then((r) => r.json()).then((rows: Row[]) => {
+  roster = rows;
+  for (const [label, npc] of [['요원', false], ['NPC', true]] as const) {
+    const g = el('optgroup', { label });
+    for (const r of rows.filter((x) => !!x.npc === npc)) { const o = el('option', { value: r.name }, `${r.num} ${r.name}`); if (r.name === cur) o.selected = true; g.append(o); }
+    sel.append(g);
+  }
+}).catch(() => { sel.append(el('option', {}, '명단을 못 읽음 (팩 주소 확인)')); });
+
+const stageRow = el('div', { class: 'row' });
+const start = q.get('start') ?? '';
+const ai = q.get('ai') ?? 'normal';
+stageRow.append(
+  btn(`${start === 'stage=dummy' ? '● ' : ''}허수아비`, () => go({ start: 'stage=dummy', ai: null })),
+  btn(`${start === 'stage=spar' ? '● ' : ''}AI 대련`, () => go({ start: 'stage=spar', ai })),
+  btn(`${start === 'stage=training' ? '● ' : ''}훈련장`, () => go({ start: 'stage=training', ai: null })),
+);
+const aiSel = el('select', { 'aria-label': 'AI 난이도' });
+for (const d of ['easy', 'normal', 'hard', 'nightmare']) { const o = el('option', { value: d }, `AI ${d}`); if (d === ai) o.selected = true; aiSel.append(o); }
+aiSel.onchange = () => go({ start: 'stage=spar', ai: aiSel.value });
+stageRow.append(aiSel);
+head.append(el('h2', {}, '무대'), stageRow);
+side.append(head);
+
+// ── 아래: 지금 인물의 엔진에 붙는 단추 (게임이 뜬 뒤 채운다) ──
+const live = el('div');
+live.append(el('div', { class: 'm' }, '게임을 불러오는 중…'));
+side.append(live);
+
+function fill(p: FighterPlayer) {
+  live.innerHTML = '';
+  const c = p.core;
+  const cfg = p.art.cfg as Record<string, any>; // eslint-disable-line @typescript-eslint/no-explicit-any
+  const sk = (cfg.skills ?? {}) as Record<string, { name?: string }>;
+  const bal = (cfg.bal ?? {}) as { role?: string; gun?: string; speed?: string; cd?: Record<string, number> };
+  const info = el('div', { class: 'm' });
+  info.innerHTML = [
+    `<b style="color:${cfg.color ?? '#ddd'}">${cfg.name}</b> · ${cfg.key}`,
+    `고유기(D) ${sk.skill?.name ?? '—'} · 충전(S) ${sk.charge?.name ?? '—'} · 필살(F) ${sk.super?.name ?? '—'}${sk.skill2 ? ` · 기술2 ${sk.skill2.name}` : ''}`,
+    `역할 ${bal.role ?? '—'} · 손 ${bal.speed ?? '—'} · 총 ${bal.gun ?? '—'} · 쿨 ${Object.entries(bal.cd ?? {}).map(([k, v]) => `${k} ${v}초`).join(' · ') || '—'}`,
+  ].join('<br>');
+  live.append(el('h2', {}, '이 인물'), info);
+
+  const free = el('input', { type: 'checkbox' }) as HTMLInputElement;
+  free.checked = c.freeSuper;
+  free.onchange = () => { c.freeSuper = free.checked; };
+  const lab = el('label');
+  lab.append(free, document.createTextNode('필살 게이지 무시'));
+  live.append(el('h2', {}, '스위치'), lab);
+
+  for (const [title, list] of c.SCENES as [string, [string, () => void][]][]) {
+    const g = el('div', { class: 'grid' });
+    for (const [label, fn] of list) g.append(btn(label, fn));
+    live.append(el('h2', {}, `장면 · ${title}`), g);
+  }
+
+  const lifeG = el('div', { class: 'grid' });
+  for (const id of c.lifeIds()) lifeG.append(btn(id, () => c.playLife(id)));
+  live.append(el('h2', {}, '생활·직무 줄'), el('div', { class: 'm' }, '누르면 그 줄을 틂 · 방향키로 끊음'), lifeG);
+
+  const ids = Object.keys(c.A).sort((a, b) => parseFloat(a.replace('_', '.')) - parseFloat(b.replace('_', '.')) || a.localeCompare(b));
+  const allG = el('div', { class: 'grid' });
+  for (const id of ids) allG.append(btn(`${id}`, () => c.act(id), `${c.nOf(id)}장`));
+  live.append(el('h2', {}, `동작 하나씩 (${ids.length}줄)`), allG);
+
+  live.append(el('h2', {}, '조작'), el('div', { class: 'm' }, '방향키 이동(두 번 빠르게 = 달리기) · Space 점프 · Q 약공 · W 강공 · C 막기·회피 · A 사격 · S 충전(누르고 떼기) · D 고유기 · F 필살 · Tab 무기 · R 전투 자세 · Z 앉기 · X 웅크림 · V 도망 · B 뒷걸음 · Esc 메뉴'));
+}
+
+mountGame(box, { assets });
+let shown: FighterPlayer | null = null;
+setInterval(() => {
+  const w = (globalThis as { __goeiEngine?: { world: { player: unknown } | null } }).__goeiEngine?.world;
+  const p = w?.player;
+  if (p instanceof FighterPlayer && p !== shown) { shown = p; fill(p); }
+}, 300);

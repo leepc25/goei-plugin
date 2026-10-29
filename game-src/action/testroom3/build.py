@@ -816,6 +816,11 @@ def main():
         print(f"{'만듦' if rebuilt else '그대로'} {cfg['key']:<14} 줄 {len(cfg['anims']):>2} · {size / 1024 / 1024:.2f} MB")
     for old in (OUT / "chars").glob("*.js"):   # 목록에서 빠진 인물 파일 정리
         if old.stem not in {"c" + c["key"].split("_")[0] for c in index}: old.unlink()
+    # 옛 테스트룸 페이지(room.html)는 2026-10-29 은퇴: 엔진 원본은 게임(src/game/action/fighter/core.ts), 시험장은 dist/goei-testroom.html(npm run build).
+    # 이 빌더는 인물 설정·그림 측정(인물 팩 변환기 tools/build_char_packs.py 가 부름)만 맡는다. 옛 페이지는 _old/테스트룸_변환기_2026-10-29/room.html
+    if not (HERE / "room.html").exists():
+        print("옛 테스트룸 페이지는 은퇴했어요 → npm run build 뒤 dist/goei-testroom.html (저장소 맨 위에서 정적 서버로)")
+        return
     room = (HERE / "room.html").read_text(encoding="utf-8")
     audio = (EIL / "testroom" / "audio.js").read_text(encoding="utf-8")
     html = room.replace("/*__INDEX__*/null", json.dumps(index, ensure_ascii=False)).replace("/*__AUDIO__*/", audio)
