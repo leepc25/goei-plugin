@@ -2813,6 +2813,8 @@ if (fixture.globalLore.some(packed)) {
   assert.equal(await page.locator('.gx-nh[data-action="nav-back"]').isDisabled(), false, '뒤로 갈 곳이 있으면 켜짐');
   await page.click('.gx-nh.mk-star');
   await page.waitForSelector('.mk-pop');
+  // 기본 즐겨찾기(필드·가계부·기록·설정, 2026-10-29 사용자)를 비우고 시작
+  while (await page.$('.mk-pop [data-action="mk-del"]')) await page.click('.mk-pop [data-action="mk-del"] >> nth=0');
   assert.ok((await page.textContent('.mk-pop')).includes('위키 메인'), '최근 본 화면');
   await page.click('.mk-pop [data-action="mk-add"]');
   await page.click('.mk-pop [data-action="mk-here"]');
@@ -3051,6 +3053,8 @@ if (fixture.globalLore.some(packed)) {
   // 즐겨찾기: 보고서 페이지를 넣고 다른 탭에서 돌아온다
   await page.click('.gx-nh.mk-star');
   await page.waitForSelector('.mk-pop');
+  // 기본 즐겨찾기(필드·가계부·기록·설정, 2026-10-29 사용자)를 비우고 시작
+  while (await page.$('.mk-pop [data-action="mk-del"]')) await page.click('.mk-pop [data-action="mk-del"] >> nth=0');
   await page.click('.mk-pop [data-action="mk-here"]');
   const saved = JSON.parse(await page.evaluate(() => window.__store['p:goei:prefs'])).marks;
   const mi = saved.findIndex((m) => m.s.tab === 'records' && m.s.r?.view === 'report' && m.s.r?.id === rpt.id);
