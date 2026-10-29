@@ -95,7 +95,7 @@ export async function boot(browser, char, chat, { viewport = { width: 1100, heig
   await page.exposeFunction('__readAsset', (p) => {
     try { return fixtureDir ? readFileSync(new URL(p, `file://${fixtureDir}/`)).toString('base64') : null; } catch { return null; }
   });
-  await page.setContent('<!doctype html><html><head><meta charset="utf-8"></head><body style="margin:0;height:100vh"><div class="default-chat-screen" style="height:100%;background:#f3f3f3"><button id="other" style="margin:40px">다른 버튼</button></div></body></html>');
+  await page.setContent('<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"></head><body style="margin:0;height:100vh"><div class="default-chat-screen" style="height:100%;background:#f3f3f3"><button id="other" style="margin:40px">다른 버튼</button></div></body></html>');
   await page.addScriptTag({ content: "document.addEventListener('submit', (e) => { e.preventDefault(); e.stopImmediatePropagation(); }, true);" });
   await page.addScriptTag({ content: hostScript(char, chat, { rootDom, noBody, prefs }) });
   await page.addScriptTag({ content: `(async () => { ${plugin}\n })().catch(e => { window.__bootError = String(e); });` });

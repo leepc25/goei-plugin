@@ -44,7 +44,7 @@ async function touch(cdp, type, points) {
 /** 플러그인 창을 띄우고 필드 시작 화면까지 */
 async function bootPhone(browser, w, h, noFs = false) {
   const { page, errors } = await boot(browser, fx, { message: [], scriptstate: {} }, { viewport: { width: w, height: h }, touch: true, fixtureDir });
-  await page.evaluate(() => { const m = document.createElement('meta'); m.name = 'viewport'; m.content = 'width=device-width,initial-scale=1'; document.head.append(m); });
+  // viewport 메타는 qc-host boot 의 문서에 들어 있다 (나6)
   // 아이폰처럼 전체화면이 막힌 경우: 창 전체 덮기 + 회전으로 가야 한다
   if (noFs) await page.evaluate(() => { Element.prototype.requestFullscreen = function () { return Promise.reject(new Error('전체화면 막힘')); }; });
   await startChat(page);
