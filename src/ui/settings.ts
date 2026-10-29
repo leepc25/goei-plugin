@@ -197,7 +197,7 @@ function scopeBar(scope: SettingsScope, canChat: boolean): string {
  *  처리는 set-bar / set-bar-yes / set-bar-no */
 export const mainDefaultsButtons = (): string => {
   const off = settingsUi.busy ? 'disabled' : '';
-  return `<span class="ps-defaults"><button class="st-act save" data-action="set-bar" data-value="save" ${off}>${ICONS.pen}기본값으로 저장</button><button class="st-act" data-action="set-bar" data-value="load" ${off}>${ICONS.refresh}기본값 불러오기</button></span>`;
+  return `<span class="ps-defaults"><button class="st-act save" data-action="set-bar" data-value="save" title="기본값으로 저장" aria-label="기본값으로 저장" ${off}>${ICONS.pen}<span>기본값으로 저장</span></button><button class="st-act" data-action="set-bar" data-value="load" title="기본값 불러오기" aria-label="기본값 불러오기" ${off}>${ICONS.refresh}<span>기본값 불러오기</span></button></span>`;
 };
 export function mainDefaultsConfirm(): string {
   const c = settingsUi.confirm ? CONFIRM.chat[settingsUi.confirm] : null;
