@@ -85,7 +85,9 @@ const FALLS = new Set(['18_3', '44', '75', '76', '77']);   // 서서 시작해 �
 const lowF = (a, f) => (a.bot[f] - a.top[f]) < 0.55 * (a.bot[0] - a.top[0]);
 function lieLine(a) { if (a._lie != null) return a._lie; const v = a.bot.map((b, f) => f).filter(f => lowF(a, f)).map(f => (a.mbot || a.bot)[f]).sort((x, y) => x - y); return (a._lie = v.length ? v[v.length >> 1] + 3 : null); }
 // 누운 장은 장마다 자기 몸통 아랫선을 바닥에(그림마다 높이가 달라 한 줄로 맞추면 위아래로 튐 — 10-28 데드폴)
-const groundBase = (id, a, f) => arcOf(id) ? a.bot[f] : FALLS.has(id) ? (lowF(a, f) && a.mbot ? a.mbot[f] + 3 : Math.min(BASE(a), a.bot[f] + 2)) : (LIE.has(id) || (id === '19' && f >= lieFrom(a))) ? (FLAT.has(id) && a.mbot ? a.mbot[f] + 3 : a.bot[f] + 2) : BASE(a);   // 누운 장: 몸통 아래 선을 바닥에(늘어진 손발은 바닥 앞쪽으로 내려감)
+// 앉기·앉은 줄: 장마다 그 장의 가장 낮은 점(발)을 땅에(10-29 밤 사용자: PixelLab이 앉은 장을 캔버스 위쪽에 그린 줄은 서 있던 바닥 기준이라 사람·의자가 통째로 떠 보임 — 데쥬레 후면 41px, 이연화 후면 등)
+const SEAT_IDS = new Set(['60', '61', '96', '62', '63', '64', '65', '66', '67', '68', '69', '70', '71', '72', '73', '97', '98', '99', '105', '106', '148', '149', '167']);
+const groundBase = (id, a, f) => arcOf(id) ? a.bot[f] : SEAT_IDS.has(id) ? Math.min(BASE(a), a.bot[f]) : FALLS.has(id) ? (lowF(a, f) && a.mbot ? a.mbot[f] + 3 : Math.min(BASE(a), a.bot[f] + 2)) : (LIE.has(id) || (id === '19' && f >= lieFrom(a))) ? (FLAT.has(id) && a.mbot ? a.mbot[f] + 3 : a.bot[f] + 2) : BASE(a);   // 누운 장: 몸통 아래 선을 바닥에(늘어진 손발은 바닥 앞쪽으로 내려감)
 const cv = document.getElementById('cv'); let ctx = cv.getContext('2d'); ctx.imageSmoothingEnabled = false;
 const FXS = 3, mkLayer = () => { const c = document.createElement('canvas'); c.width = 1280 / FXS; c.height = 720 / FXS; const g = c.getContext('2d'); g.imageSmoothingEnabled = false; return [c, g]; };
 const [fxNc, fxN] = mkLayer(), [fxLc, fxL] = mkLayer();

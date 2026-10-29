@@ -21,7 +21,7 @@ def cell(im, p, front_layer, label, Z=2, TW=220, TH=280):
     base = TH - 10
     if im is not None:
         c = Image.open(fc.chair_png(p["img"])).convert("RGBA")
-        ox, oy = TW // 2 - im.size[0] // 2, base - (im.size[1] - 4)
+        ox, oy = TW // 2 - im.size[0] // 2, base - (p.get("sb") if p.get("sb") is not None else im.size[1] - 4)   # 방 BASE 와 같은 기준선(10-29 밤)
         cx, cy = round(TW / 2 + p["dx"] - 100), round(base + p["dy"] - 171)
         if not front_layer: T.alpha_composite(c, (cx, cy)); T.alpha_composite(im, (ox, oy))
         else: T.alpha_composite(im, (ox, oy)); T.alpha_composite(c, (cx, cy))
@@ -49,6 +49,8 @@ for key in keys:
     try: cfg, _ = fc.load(key)
     except Exception as e: print("못 읽음", key, e); continue
     ims, vals = fc.values(cfg); chair = cfg.get("chair") or {}
+    for v, l, _ in fc.VIEWS:
+        if vals.get(v) is not None: vals[v] = {**vals[v], "sb": fc.line_base(cfg, l)}
     if VIEW == "dirs":   # 방향 고르기: 정면 S·SE·SW + 후면 NW·N·NE, 후보마다 그 의자 좌석 가운데를 몸 가운데에
         import chairfit2
         for v, cands in (("front", ("south", "south-east", "south-west")), ("back", ("north-west", "north", "north-east"))):

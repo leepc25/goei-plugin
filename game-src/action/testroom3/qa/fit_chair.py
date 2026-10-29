@@ -39,6 +39,14 @@ def last(cfg, lid):
     return im.transpose(Image.FLIP_LEFT_RIGHT) if an.get("mirror") else im
 
 
+def line_base(cfg, lid):
+    """방이 그 줄의 끝 장을 땅에 붙이는 기준선 = 그 장의 가장 낮은 점(앉은 줄은 room groundBase 가 장마다 bot, 최대 H-4). 의자 dy 는 이 선 기준(10-29 밤)"""
+    im = last(cfg, lid)
+    if im is None: return None
+    bb = im.getbbox(); H = im.size[1]
+    return min(H - 4, (bb[3] - 1) if bb else H - 4)
+
+
 def values(cfg):
     ims = {v: last(cfg, l) for v, l, _ in VIEWS}
     auto = chairfit.fit(ims["side"], ims["front"], ims["back"])

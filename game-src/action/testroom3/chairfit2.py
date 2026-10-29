@@ -49,19 +49,20 @@ def side_hipback(im, seat_y):
     return max(band) if band else None
 
 
-def fit(side_im, front_im, back_im, imgs, prev=None):
+def fit(side_im, front_im, back_im, imgs, prev=None, bases=None):
     """imgs = {front: south|south-east|south-west, side: east, back: north|north-east|north-west}. prev = 전 판 값(정면 dy 만 이어 씀)"""
-    out = {}
+    out = {}; bases = bases or {}
+    B = lambda v, H: bases.get(v) if bases.get(v) is not None else H - 4   # 방 BASE(줄의 가장 낮은 점, 최대 H-4)
     if side_im is not None and (r := side_measure(side_im)):
         seat_h, knee, floor = r; W, H = side_im.size
         # 10-29 밤(사용자: 등받이에서 떨어져 좌석 앞에 걸터앉음): 엉덩이 뒤 끝을 등받이 앞(x=87)에 붙임. 엉덩이 띠(좌석 위 2~14px)의 왼쪽 끝 중 가장 안쪽 값(늘어진 머리·코트는 더 왼쪽이라 걸러짐). 허벅지 길이가 이상하면 무릎 규칙으로
         hb = side_hipback(side_im, floor - seat_h)
         if hb is not None and 40 <= knee - hb <= 110: dx = hb - W / 2 - (BACKREST_FRONT_EAST - 100)
         else: dx = (knee - KNEE_AHEAD) - W / 2 - (SEAT_FRONT_EAST - 100)
-        out["side"] = {"dx": round(dx, 1), "dy": round(floor - (H - 4) + max(0, min(10, SEAT_H - seat_h)), 1), "s": 1.0, "img": "east"}
+        out["side"] = {"dx": round(dx, 1), "dy": round(floor - B("side", H) + max(0, min(10, SEAT_H - seat_h)), 1), "s": 1.0, "img": "east"}
     for key, im, dy0 in (("front", front_im, -12), ("back", back_im, 12)):   # 정면: 의자가 뒤라 바닥선 위(-12; 10-29 밤 -20에서 내림 — 발 아래 의자 바닥이 떠 보임), 후면: 앞이라 아래(+12). 인물마다 다르게 하지 않음
         if im is None: continue
         cx, floor = hip_center(im); W, H = im.size
         img = imgs.get(key) or ("south" if key == "front" else "north")
-        out[key] = {"dx": round(cx - W / 2 - (SEAT_CX[img] - 100), 1), "dy": round(floor - (H - 4) + dy0, 1), "s": 1.0, "img": img}
+        out[key] = {"dx": round(cx - W / 2 - (SEAT_CX[img] - 100), 1), "dy": round(floor - B(key, H) + dy0, 1), "s": 1.0, "img": img}
     return out

@@ -20,7 +20,10 @@ for key in keys:
     old = json.loads(cp.read_text(encoding="utf-8")) if cp.exists() else {}
     imgs = {v: (old.get(v) or {}).get("img") for v in ("front", "side", "back")}; imgs.update(imgs_arg)
     ims = {v: fc.last(cfg, l) for v, l, _ in fc.VIEWS}
-    new = chairfit2.fit(ims["side"], ims["front"], ims["back"], imgs, old)
+    bases = {v: fc.line_base(cfg, l) for v, l, _ in fc.VIEWS}
+    new = chairfit2.fit(ims["side"], ims["front"], ims["back"], imgs, old, bases)
+    for v in list(new):   # 눈으로 손본 값(hand)은 dx 만 유지, dy 는 새 기준선으로
+        if (old.get(v) or {}).get("hand"): new[v]["dx"] = old[v]["dx"]; new[v]["hand"] = old[v]["hand"]
     old.update(new)
     cp.write_text(json.dumps(old, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
     print(key, {v: (new[v]["dx"], new[v]["dy"], new[v]["img"]) for v in new})
