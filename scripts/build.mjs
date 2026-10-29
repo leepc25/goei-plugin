@@ -3,6 +3,7 @@ import { readFileSync, writeFileSync, mkdirSync, readdirSync, unlinkSync, exists
 import { createHash } from 'node:crypto';
 import { buildGamePack } from './game-pack.mjs';
 import { rmSync } from 'node:fs';
+import { INSTALL_PACK_NAME, WORLD_PACK_NAME, installPackText, packOf, worldPackText } from './data-pack.mjs';
 
 const pkg = JSON.parse(readFileSync(new URL('../package.json', import.meta.url)));
 if (process.env.GOEI_BUILD_VERSION) pkg.version = process.env.GOEI_BUILD_VERSION;
@@ -19,9 +20,22 @@ const header = [
 ].join('\n');
 
 mkdirSync('dist', { recursive: true });
+
+// 자료 팩 (QC 개선 나1, scripts/data-pack.mjs): 세계 자료·설치 자료는 본체에 번들하지 않고 goei-data-<이름>.json + .N.txt 로 따로 받는다.
+// 지문(hash·sha256·length)을 본체에 박아(define) 본체가 자기와 맞는 자료만 쓴다. 조각은 본체와 같은 200KB 이하
+const dataPacks = [packOf(WORLD_PACK_NAME, worldPackText(), pkg.version), packOf(INSTALL_PACK_NAME, installPackText(), pkg.version)];
+for (const f of readdirSync('dist')) if (/^goei-data-[a-z]+\.(\d+\.txt|json)$/.test(f)) unlinkSync(`dist/${f}`);
+for (const p of dataPacks) {
+  p.parts.forEach((part, i) => writeFileSync(`dist/${p.partNames[i]}`, part));
+  writeFileSync(`dist/${p.name}.json`, JSON.stringify(p.index) + '\n');
+}
+const [worldPack, installPack] = dataPacks;
+
 const define = {
   __UPDATE_BASE__: JSON.stringify(updateBase),
   __PLUGIN_VERSION__: JSON.stringify(pkg.version),
+  __WORLD_PACK__: JSON.stringify(JSON.stringify(worldPack.expect)),
+  __INSTALL_PACK__: JSON.stringify(JSON.stringify(installPack.expect)),
 };
 const common = {
   define,
@@ -118,7 +132,7 @@ writeFileSync(
   JSON.stringify({ version: pkg.version, code: { parts: gameParts, length: gameCode.length, bytes: Buffer.byteLength(gameCode) }, packs: gamePacks }, null, 1) + '\n',
 );
 
-// 테스트용: 순수 로직만 묶은 모듈
+// 테스트용: 순수 로직만 묶은 모듈. 세계·설치 자료는 본체처럼 묶음에 없으므로 입구(core.mjs)가 tests/data-init.mjs 로 파일에서 읽어 넣은 뒤 내보낸다
 await build({
   define,
   entryPoints: ['src/core/index.ts'],
@@ -127,8 +141,19 @@ await build({
   target: 'es2022',
   charset: 'utf8',
   loader: { '.txt': 'text' },
-  outfile: 'dist-test/core.mjs',
+  outfile: 'dist-test/core.bundle.mjs',
 });
+writeFileSync(
+  'dist-test/core.mjs',
+  [
+    '// 시험용 입구 (scripts/build.mjs 가 만든다): 본체가 자료 팩으로 받는 세계·설치 자료를 파일에서 넣고(tests/data-init.mjs) core 를 그대로 내보낸다',
+    "import * as core from './core.bundle.mjs';",
+    "import { initTestData } from '../tests/data-init.mjs';",
+    'initTestData(core);',
+    "export * from './core.bundle.mjs';",
+    '',
+  ].join('\n'),
+);
 
 // 시험용: 원본 카드의 module.json (tests/realcard.mjs 가 찾는다. 「실제 카드」 시험 15개가 이걸 읽는다). python3 가 없으면 그 시험들은 건너뛴다
 if (existsSync('card/원본_봇카드.jpeg')) {
@@ -221,6 +246,7 @@ const info = {
   bytes: Buffer.byteLength(code),
   bodyBytes: Buffer.byteLength(bodyCode),
   bodyParts: partNames.length,
+  dataPacks: dataPacks.map((p) => `${p.name} ${Buffer.byteLength(p.text)} (${p.parts.length}조각, hash ${p.expect.hash})`),
   gameBytes: Buffer.byteLength(gameCode),
   gameParts: gameParts.length,
   gamePacks: gamePacks.map((p) => `${p.id} ${p.bytes}`),

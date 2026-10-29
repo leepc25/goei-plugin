@@ -3,6 +3,7 @@
 // - 세 뷰포트(PC 1100×900 · 폰 세로 390×844 · 폰 가로 844×390, hasTouch) 를 이름으로 고른다
 // 사용: import { boot, openWin, VIEWPORTS, ... } from './qc-settings-harness.mjs'
 import { createRequire } from 'node:module';
+import { distPackFiles, distWorldPack } from './data-init.mjs';
 import { execSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
@@ -24,6 +25,10 @@ export function loadFixture(path) {
 
 const plugin = readFileSync(new URL('../dist/goei-plugin.js', import.meta.url), 'utf8');
 const bodyCode = readFileSync(new URL('../dist/goei-body.js', import.meta.url), 'utf8');
+/** 세계 자료 팩 (개선 나1): 본체처럼 가짜 저장소에 미리 둔다 (저장소에 자료가 있는 보통 경우). 받기 시험은 noBody 쪽에서 */
+const worldPack = distWorldPack();
+/** 받기 흉내 기본값: 설치·점검 페이지가 받는 설치 자료 팩 (개선 나1). 시험이 window.__fetch 를 바꾸면 그쪽이 우선 */
+const served = distPackFiles('goei-data-install');
 
 /** 가짜 risuai (tests/browser.mjs hostScript 와 같음 + 리스너 세기) */
 export function hostScript(char, chat, { rootDom = true, noBody = false } = {}) {
@@ -59,6 +64,9 @@ export function hostScript(char, chat, { rootDom = true, noBody = false } = {}) 
     });
     window.__store = {};
     if (!${noBody}) window.__store['p:goei:body'] = ${JSON.stringify(bodyCode)};
+    if (!${noBody}) window.__store['p:goei:data-world'] = ${JSON.stringify(worldPack)};
+    window.__files = ${JSON.stringify(served)};
+    window.__fetch = (u) => window.__files[String(u).split('?')[0].split('/').pop()] ?? null;
     window.__rootDoc = ${rootDom} ? { querySelector: async (q) => wrap(document.querySelector(q)), querySelectorAll: async (q) => { const a = [...document.querySelectorAll(q)].map(wrap); return { length: async () => a.length, at: async (i) => a[i] }; }, createElement: async (t) => wrap(document.createElement(t)) } : null;
     window.__char = ${JSON.stringify(char)};
     window.__liteChar = window.__char;

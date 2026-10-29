@@ -443,7 +443,7 @@ function body(ctx: ChatContext): string {
   // 설치 · 점검: 이 캐릭터를 아직 점검하지 않았으면 점검하고 다시 그린다 (어느 길로 열어도)
   if (instUi.forChar !== ctx.charIndex && !instUi.pending) {
     instUi.pending = true;
-    void refreshInstall(ctx).finally(() => {
+    void refreshInstall(ctx, render).finally(() => {
       instUi.pending = false;
       render();
     });

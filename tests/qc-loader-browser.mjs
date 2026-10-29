@@ -8,6 +8,7 @@ import { readFileSync, existsSync } from 'node:fs';
 import { createHash } from 'node:crypto';
 import { createServer } from 'node:http';
 import assert from 'node:assert/strict';
+import { distPackFiles, distWorldPack } from './data-init.mjs';
 
 const require = createRequire(execSync('npm root -g').toString().trim() + '/');
 const { chromium } = require('playwright');
@@ -18,6 +19,11 @@ const pkg = JSON.parse(read('package.json'));
 const VERSION = pkg.version;
 const plugin = read('dist/goei-plugin.js');
 const bodyCode = read('dist/goei-body.js');
+/** 옛 시작기: 사용자 기기에 이미 깔린 release/goei-plugin.js (본체 조각만 받는다). 새 본체는 세계 자료를 스스로 받아야 이 시작기로도 돈다 (개선 나1).
+ *  판 글자만 지금 판으로 맞춘다 (시작기는 자기 판의 본체만 받고 실행하므로) */
+const oldLoader = (() => { const t = read('release/goei-plugin.js'); const v = /^\/\/@version (\S+)/m.exec(t)?.[1]; return v && v !== VERSION ? t.split(v).join(VERSION) : t; })();
+/** 세계 자료 팩 글 (본체에 박힌 지문과 같은 것). 본체가 있으면 가짜 저장소에 미리 둔다 (저장소에 자료가 있는 보통 경우) */
+const worldPack = distWorldPack();
 const manifest = JSON.parse(fixture.globalLore.find((e) => e.comment === 'Plugin manifest').content);
 
 // release 폴더 모양의 파일 묶음 (이름 → 글 또는 {b64})
@@ -37,8 +43,12 @@ const files = {};
   files['card-update.json'] = JSON.stringify(upd);
   for (const n of upd.parts) files[n] = read(`release/${n}`);
   files['version.json'] = read('release/version.json');
+  // 자료 팩 (개선 나1): 세계 자료는 본체가 뜰 때, 설치 자료는 설치·점검 화면이 받는다
+  Object.assign(files, distPackFiles('goei-data-world'), distPackFiles('goei-data-install'));
 }
 const bodyIndex = JSON.parse(files['goei-body.json']);
+const worldIndex = JSON.parse(files['goei-data-world.json']);
+const installIndex = JSON.parse(files['goei-data-install.json']);
 /** src/loader/body.ts bodyHash 와 같은 식 (sha256 만 어긋난 목록을 만들 때) */
 const fnv = (text) => { let h = 0x811c9dc5; for (let i = 0; i < text.length; i++) h = Math.imul(h ^ text.charCodeAt(i), 0x01000193) >>> 0; return h.toString(16).padStart(8, '0'); };
 /** 글자 하나를 바꾼 조각(길이 같음)과, 그 깨진 본체에 맞춘 hash 를 가진 목록 (sha256 은 원본 그대로 → sha256 확인만 걸린다) */
@@ -51,7 +61,8 @@ const emptyChat = () => ({ message: [], scriptstate: {} });
 
 /** serve: 처음부터 받기 흉내에 둘 파일 이름 (시작기가 뜨자마자 받으므로 boot 뒤에 넣으면 늦다). storeFail: setItem 이 실패할 키(정규식 글) */
 /** eventsOn: SafeElement.addEventListener 가 걸리는 곳. 'element' = 2026-10 Risu(요소 자신), 'document' = 옛 Risu(문서 전체) */
-function hostScript(chars, charIndex, chat, { rootDom = true, body = null, store = {}, risuFetch = false, serve = [], storeFail = '', eventsOn = 'element' } = {}) {
+/** data: body 를 미리 둘 때 세계 자료 팩도 같이 둔다(기본). false 면 본체는 있고 자료는 없는 저장소 (본체가 자료만 받는 경우) */
+function hostScript(chars, charIndex, chat, { rootDom = true, body = null, store = {}, risuFetch = false, serve = [], storeFail = '', eventsOn = 'element', data = true } = {}) {
   const served = Object.fromEntries(serve.map((n) => [n, files[n]]));
   return `
     window.__calls = { setChat: [], show: [], hide: 0, replacers: [], listeners: [], handlers: {}, removed: [], idx: 0, fetch: [], risuFetch: [] };
@@ -80,6 +91,7 @@ function hostScript(chars, charIndex, chat, { rootDom = true, body = null, store
     });
     window.__store = ${JSON.stringify(store)};
     ${body ? `window.__store['p:goei:body'] = ${JSON.stringify(body)};` : ''}
+    ${body && data ? `window.__store['p:goei:data-world'] = ${JSON.stringify(worldPack)};` : ''}
     // SafeDocument: 리스너는 늘 문서(Document)에 걸린다 (Risu v3.svelte.ts SafeDocument 생성자)
     window.__rootDoc = ${rootDom} ? { ...wrap(document.documentElement), querySelector: async (q) => wrap(document.querySelector(q)), querySelectorAll: async (q) => [...document.querySelectorAll(q)].map(wrap), createElement: async (t) => wrap(document.createElement(t)), addEventListener: async (type, fn) => attach(document, type, fn) } : null;
     window.__chars = ${JSON.stringify(chars)};
@@ -151,7 +163,7 @@ let scene = 0;
 const skip = () => ++scene < from;
 
 /** Risu src/ts/plugins/apiV3/factory.ts 와 같은 격리: sandbox iframe + nonce CSP. 플러그인은 srcdoc 안에서 바로 돈다 */
-/** opts.insecure: 바깥 문서를 about:blank 로 (sandbox srcdoc 이 보안 컨텍스트가 아니라 crypto.subtle 이 없는 환경 흉내) */
+/** opts.insecure: 바깥 문서를 about:blank 로 (sandbox srcdoc 이 보안 컨텍스트가 아니라 crypto.subtle 이 없는 환경 흉내). opts.loader: 시작기 글 (기본 dist, 'old' 면 release 의 옛 시작기) */
 async function boot(chars, charIndex, chat, opts = {}) {
   const page = await browser.newPage({ viewport: { width: 1100, height: 900 } });
   const errors = [];
@@ -160,7 +172,8 @@ async function boot(chars, charIndex, chat, opts = {}) {
   page.on('console', (m) => logs.push(m.text()));
   const nonce = 'n' + Math.random().toString(36).slice(2);
   const csp = `connect-src 'none'; script-src 'nonce-${nonce}' 'wasm-unsafe-eval'; frame-src 'none'; object-src 'none'; style-src * 'unsafe-inline'; default-src 'none'; img-src * data: blob:; font-src * data: blob:; media-src * data: blob:; base-uri 'none';`;
-  const inner = (hostScript(chars, charIndex, chat, opts) + `\n(async () => { ${plugin}\n })().catch(e => { window.__bootError = String(e); });`).replace(/<\/script/gi, '<\\/script');
+  const loader = opts.loader === 'old' ? oldLoader : plugin;
+  const inner = (hostScript(chars, charIndex, chat, opts) + `\n(async () => { ${loader}\n })().catch(e => { window.__bootError = String(e); });`).replace(/<\/script/gi, '<\\/script');
   const html = `<!DOCTYPE html><html><head><meta charset="utf-8"><meta http-equiv="Content-Security-Policy" content="${csp}" id="csp-meta"></head>`
     + `<body style="margin:0;height:100vh"><div class="default-chat-screen" style="height:100%;background:#f3f3f3"></div>`
     + `<script nonce="${nonce}">document.querySelector('meta#csp-meta')?.remove();\n${inner}</script></body></html>`;
@@ -194,6 +207,11 @@ const waitFab = (frame, display = 'block', timeout = 8000) => frame.waitForFunct
 const panelMsg = (frame) => frame.evaluate(() => document.querySelector('.gl-msg')?.textContent ?? null);
 const fetched = (frame) => frame.evaluate(() => window.__calls.fetch.map((u) => u.split('?')[0].split('/').pop()));
 const bodyFiles = ['goei-body.json', ...bodyIndex.parts];
+const worldFiles = ['goei-data-world.json', ...worldIndex.parts];
+const installFiles = ['goei-data-install.json', ...installIndex.parts];
+/** 본체가 처음 뜨는 데 필요한 것: 본체 조각 + 세계 자료 팩 (본체가 뜨면서 받는다) */
+const startFiles = [...bodyFiles, ...worldFiles];
+const storedWorld = (frame) => frame.evaluate(() => window.__store['p:goei:data-world'] ?? null);
 const ok = (t) => console.log(`PASS ${t}`);
 const closeOf = async (page, errors, allow = []) => {
   const bad = errors.filter((e) => !allow.some((a) => e.includes(a)));
@@ -204,12 +222,13 @@ const closeOf = async (page, errors, allow = []) => {
 // ── 1) 받기 성공: 본체 없음 → 괴이 카드를 보면 조각으로 받아 저장·실행, 받기 창 없이 플로팅 버튼. 받은 뒤 그려진 채팅은 다시 저장(redrawAfterLoad)
 if (!skip()) {
   const chat = { message: [{ role: 'char', data: '안녕 <img=Jyaldi_default>' }], scriptstate: {} };
-  const { page, frame, errors } = await boot([fixture], 0, chat, { serve: bodyFiles });
+  const { page, frame, errors } = await boot([fixture], 0, chat, { serve: startFiles });
   await waitFab(frame);
   assert.equal(await frame.locator('.gl-card').count(), 0, '받기 창 없음');
-  assert.deepEqual(await fetched(frame), bodyFiles, '목록 + 조각 17개를 한 번씩');
+  assert.deepEqual(await fetched(frame), startFiles, '본체 목록 + 조각, 이어서 세계 자료 목록 + 조각을 한 번씩 (본체가 뜨면서 자료를 받는다)');
   assert.match(await frame.evaluate(() => window.__store['p:goei:body'].slice(0, 30)), /^\/\/ goei-body /, '본체 저장');
   assert.equal(await frame.evaluate(() => window.__store['p:goei:body'].length), bodyCode.length);
+  assert.equal((await storedWorld(frame))?.length ?? 0, worldPack.length, '세계 자료 팩 저장 (goei:data-world)');
   await frame.waitForFunction(() => window.__calls.setChat.length >= 1, null, { timeout: 5000 });
   assert.equal(await frame.evaluate(() => window.__calls.setChat.length), 1, '이미지 태그가 있는 괴이 채팅을 한 번 다시 저장');
   assert.match(await frame.evaluate(() => window.__calls.handlers.display('<div data-goei="landing">ANOMALY SIMULATION</div>')), /landing/, '시작 카드 표시는 본체가');
@@ -219,7 +238,7 @@ if (!skip()) {
   const b = await frame.evaluate(() => window.__calls.idx);
   assert.ok(b - a >= 2 && b - a <= 4, `감시 1초 간격 (${b - a}번)`);
   await closeOf(page, errors);
-  ok('시작기 받기 성공: 조각 17개 → 저장 → 실행 → 플로팅 버튼, 채팅 다시 그리기');
+  ok('시작기 받기 성공: 본체 조각 → 저장 → 실행 → 세계 자료 팩 받아 저장 → 플로팅 버튼, 채팅 다시 그리기');
 }
 
 // ── 2) 받기 실패(404) → 받기 창. 1분 재시도 억제. 다시 받기: 조각 하나 깨짐 · 판 불일치 · 길이 불일치 · 지문 불일치 · 성공
@@ -249,11 +268,11 @@ if (!skip()) {
     return panelMsg(frame);
   };
   // 조각 하나 깨짐(404)
-  await serve(frame, bodyFiles.filter((n) => n !== 'goei-body.3.txt'));
+  await serve(frame, startFiles.filter((n) => n !== 'goei-body.3.txt'));
   assert.match(await retry(), /받지 못했어요 \(404\)/, '조각 404');
   assert.equal(await frame.evaluate(() => window.__store['p:goei:body'] ?? null), null, '깨진 본체는 저장 안 함');
   // 판 불일치 (아직 안 올라온 판)
-  await serve(frame, bodyFiles);
+  await serve(frame, startFiles);
   await frame.evaluate(() => { window.__fetchHook = (n) => (n === 'goei-body.json' ? JSON.stringify({ ...JSON.parse(window.__files[n]), version: '0.0.1' }) : undefined); });
   assert.match(await retry(), /아직 이 판의 본체가/, '판 불일치');
   // 길이 불일치 (조각이 잘림)
@@ -294,7 +313,7 @@ if (!skip()) {
     await frame.waitForFunction(() => { const m = document.querySelector('.gl-msg'); return m && !m.hidden && m.textContent && m.textContent !== '받는 중'; }, null, { timeout: 15000 });
     return panelMsg(frame);
   };
-  await serve(frame, bodyFiles);
+  await serve(frame, startFiles);
   await frame.evaluate(() => { window.__fetchHook = (n) => (n === 'goei-body.5.txt' ? window.__files[n].slice(0, 100) + '#' + window.__files[n].slice(101) : undefined); });
   assert.match(await retry(), /깨져 있어요\(hash\)/, 'sha256 을 못 내면 hash 경로로 떨어져 잡는다');
   assert.equal(await frame.evaluate(() => window.__store['p:goei:body'] ?? null), null);
@@ -333,7 +352,8 @@ if (!skip()) {
   await sleep(1300);
   await frame.evaluate(() => { window.__charIndex = 0; });
   await frame.waitForSelector('.gl-card', { timeout: 5000 });
-  // 맞는 판의 파일 → 실행 → 창 닫힘 → 버튼
+  // 맞는 판의 파일 → 실행(세계 자료 팩은 본체가 받는다) → 창 닫힘 → 버튼
+  await serve(frame, worldFiles);
   await put('goei-body.js', bodyCode);
   await waitFab(frame);
   assert.equal(await frame.locator('.gl-card').count(), 0);
@@ -349,7 +369,7 @@ if (!skip()) {
   assert.match(await panelMsg(frame), /본체를 시작하지 못했어요/);
   assert.equal(await frame.evaluate(() => window.__store['p:goei:body'] ?? null), null, '깨진 저장 본체는 지움 (다음엔 다시 받게)');
   assert.deepEqual(await fetched(frame), [], '저장 본체가 있었으니 받지는 않았음');
-  await serve(frame, bodyFiles);
+  await serve(frame, startFiles);
   await frame.click('[data-gl="get"]');
   await waitFab(frame);
   await closeOf(page, errors, ['Unexpected', 'SyntaxError']);
@@ -358,19 +378,21 @@ if (!skip()) {
 
 // ── 5) 저장 실패(QuotaExceeded): 받은 본체로 이번에는 그냥 돈다. 다음에 다시 받는다
 if (!skip()) {
-  const { page, frame, errors, logs } = await boot([fixture], 0, emptyChat(), { serve: bodyFiles, storeFail: '^goei:body$' });
+  const { page, frame, errors, logs } = await boot([fixture], 0, emptyChat(), { serve: startFiles, storeFail: '^goei:(body|data-world)$' });
   await waitFab(frame);
   assert.equal(await frame.evaluate(() => window.__store['p:goei:body'] ?? null), null, '저장은 안 됨');
   assert.ok(logs.some((l) => l.includes('본체를 저장하지 못했어요')), '저장 실패를 적음');
+  assert.equal(await storedWorld(frame), null, '세계 자료도 저장 안 됨');
+  assert.ok(logs.some((l) => l.includes('세계 자료를 저장하지 못했어요')), '세계 자료 저장 실패도 적음 (받은 자료로 이번에는 돈다)');
   assert.equal(await frame.locator('.gl-card').count(), 0, '받기 창은 안 뜸');
   await closeOf(page, errors);
-  ok('pluginStorage 저장 실패(용량 초과)에도 본체는 뜸');
+  ok('pluginStorage 저장 실패(용량 초과)에도 본체는 뜸 (세계 자료 저장 실패도 같은 정책)');
 }
 
 // ── 6) 다른 봇: 아무것도 하지 않음(요청·표시·버튼). 괴이 카드로 바꾸면 본체, 다시 다른 봇이면 버튼 숨김, 돌아오면 접속 효과
 if (!skip()) {
   const { page, frame, errors } = await boot([otherBot, fixture], 0, emptyChat());
-  await serve(frame, bodyFiles);
+  await serve(frame, startFiles);
   await sleep(2500);
   assert.deepEqual(await fetched(frame), [], '다른 봇에서는 받지 않음');
   assert.equal(await frame.locator('.gl-card').count(), 0);
@@ -384,7 +406,7 @@ if (!skip()) {
   // 괴이 카드로 전환 → 받아서 본체 → 버튼
   await frame.evaluate(() => { window.__charIndex = 1; });
   await waitFab(frame);
-  assert.deepEqual(await fetched(frame), bodyFiles);
+  assert.deepEqual(await fetched(frame), startFiles);
   assert.equal(await frame.evaluate(() => document.querySelector('[x-goei-fab]').getAttribute('x-goei-intro')), 'true', '접속 효과');
   // 다른 봇으로 → 버튼 숨김, 표시는 그대로
   await frame.evaluate(() => { window.__charIndex = 0; });
@@ -438,9 +460,9 @@ if (!skip()) {
 
 // ── 9) 옛 길(risuFetch)이 있는 Risu: 본 화면에서 직접 받고 nativeFetch 는 쓰지 않는다
 if (!skip()) {
-  const { page, frame, errors } = await boot([fixture], 0, emptyChat(), { risuFetch: true, serve: bodyFiles });
+  const { page, frame, errors } = await boot([fixture], 0, emptyChat(), { risuFetch: true, serve: startFiles });
   await waitFab(frame);
-  assert.equal((await frame.evaluate(() => window.__calls.risuFetch.length)), bodyFiles.length);
+  assert.equal((await frame.evaluate(() => window.__calls.risuFetch.length)), startFiles.length, '본체 조각과 세계 자료 조각 모두 risuFetch 로');
   assert.deepEqual(await fetched(frame), [], 'nativeFetch 안 씀');
   await closeOf(page, errors);
   ok('risuFetch 가 있으면 그 길로 받음');
@@ -584,7 +606,7 @@ if (!skip()) {
 if (!skip()) {
   const tokText = JSON.parse(files['tok-o200k.json']).parts.map((n) => files[n]).join('');
   const wikiText = JSON.parse(files['wiki-base.json']).parts.map((n) => files[n]).join('');
-  const { page, frame, errors } = await boot([fixture], 0, emptyChat(), { body: bodyCode, store: { 'p:goei:tok-o200k': tokText, 'p:goei:wikibase': wikiText } });
+  const { page, frame, errors } = await boot([fixture], 0, emptyChat(), { body: bodyCode, store: { 'p:goei:tok-o200k': tokText, 'p:goei:wikibase': wikiText }, serve: installFiles });
   await waitFab(frame);
   await frame.evaluate(() => window.__buttons['goei-plugin-install'].cb());
   await frame.waitForSelector('.gw-install', { timeout: 10000 });
@@ -592,10 +614,10 @@ if (!skip()) {
   assert.match(await frame.textContent('.gw-install'), /모두 갖춰져 있어요/, '위키·토크나이저가 있으면 빠진 것 없음 (아이콘만 다름)');
   await frame.click('[data-action="ed-node"][data-value="manage:diag"]');
   assert.match(await frame.textContent('.gw'), /o200k_base/, '다시 읽은 토크나이저');
-  assert.ok(!(await fetched(frame)).some((n) => /tok-o200k|wiki-base|goei-body/.test(n)), '토크나이저·위키·본체는 받지 않음 (창을 열면 version.json 만 확인)');
+  assert.ok(!(await fetched(frame)).some((n) => /tok-o200k|wiki-base|goei-body|goei-data-world/.test(n)), '토크나이저·위키·본체·세계 자료는 받지 않음 (창을 열면 version.json 과 설치 자료 팩만)');
   // 깨진 저장값: 어림값으로
   await page.close();
-  const bad = await boot([fixture], 0, emptyChat(), { body: bodyCode, store: { 'p:goei:tok-o200k': '{"pat_str":1}'.padEnd(2000, ' '), 'p:goei:wikibase': 'NOTAPACK' } });
+  const bad = await boot([fixture], 0, emptyChat(), { body: bodyCode, store: { 'p:goei:tok-o200k': '{"pat_str":1}'.padEnd(2000, ' '), 'p:goei:wikibase': 'NOTAPACK' }, serve: installFiles });
   await waitFab(bad.frame);
   await bad.frame.evaluate(() => window.__buttons['goei-plugin-install'].cb());
   await bad.frame.waitForSelector('.gw-install', { timeout: 10000 });
@@ -631,7 +653,7 @@ if (!skip()) {
   dir.content = dir.content.replace('"schema"', '"내가 고친 값": 1, "schema"');
   oldCard.additionalAssets.push(['MyOwn', 'assets/mine.webp', 'webp']);
   const chat = { message: [{ role: 'user', data: 'hi' }], scriptstate: { $st_faction: 'A00', $st_lang: 'ko', $st_fm: '1' } };
-  const { page, frame, errors } = await boot([oldCard], 0, chat, { body: bodyCode });
+  const { page, frame, errors } = await boot([oldCard], 0, chat, { body: bodyCode, serve: installFiles });
   await frame.evaluate(({ parts, partsHigh, bytes, version }) => {
     window.__picBytes = bytes;
     window.__delay = 0;
@@ -771,6 +793,125 @@ for (const eventsOn of skip() ? [] : ['element', 'document']) {
   assert.equal(await frame.evaluate(() => document.querySelector('.gx')?.style.display), 'none', '버튼 밖을 눌러도 창 안 열림');
   await closeOf(page, errors);
   ok(`플로팅 버튼 끌기·누르기 (리스너 ${eventsOn})`);
+}
+
+// ── 16) 자료 팩(개선 나1): 옛 시작기(release/goei-plugin.js)와 새 시작기 둘 다에서 새 본체가 세계 자료를 스스로 받아 저장하고 뜬다 → 창 열림.
+//        시작기는 본체 조각만 받고, 본체가 start() 안에서 goei-data-world.json + 조각을 받아 pluginStorage(goei:data-world)에 둔다
+for (const loader of skip() ? [] : ['old', 'new']) {
+  const chat = emptyChat();
+  const { page, frame, errors } = await boot([fixture], 0, chat, { serve: startFiles, loader });
+  await waitFab(frame);
+  assert.equal(await frame.locator('.gl-card').count(), 0, '받기 창 없음');
+  const got = await fetched(frame);
+  assert.deepEqual(got.slice(0, bodyFiles.length), bodyFiles, `${loader}: 시작기는 본체 조각만 받음`);
+  assert.deepEqual(got.slice(bodyFiles.length), worldFiles, `${loader}: 그 다음 본체가 세계 자료 목록 + 조각 ${worldIndex.parts.length}개를 한 번씩`);
+  assert.equal((await storedWorld(frame))?.length ?? 0, worldPack.length, '세계 자료 팩 저장');
+  assert.equal(await storedWorld(frame), worldPack, '저장한 글이 dist 의 팩과 같음');
+  // 처리기 등록·화면은 자료가 들어온 뒤: 요청 손질이 세계 자료(세력 관계·명부)를 읽어도 던지지 않는다
+  await frame.click('[x-goei-fab] button');
+  await frame.waitForSelector('.gx-fac', { timeout: 8000 });
+  assert.match(await frame.evaluate(() => window.__calls.handlers.display('<div data-goei="landing">ANOMALY SIMULATION</div>')), /landing/, '시작 카드 표시는 본체가');
+  // 새로고침 흉내: 본체·자료가 저장소에 있으면 아무것도 받지 않고 뜬다 (저장소에서 읽음 — 저장소 의존 없음)
+  const store = await frame.evaluate(() => ({ 'p:goei:body': window.__store['p:goei:body'], 'p:goei:data-world': window.__store['p:goei:data-world'] }));
+  await closeOf(page, errors);
+  const again = await boot([fixture], 0, chat, { store, loader });
+  await waitFab(again.frame);
+  assert.deepEqual(await fetched(again.frame), [], `${loader}: 저장소에 본체·자료가 있으면 받기 없음`);
+  await again.frame.click('[x-goei-fab] button');
+  await again.frame.waitForSelector('.gx-fac', { timeout: 8000 });
+  await closeOf(again.page, again.errors);
+  ok(`자료 팩: ${loader === 'old' ? '옛 시작기' : '새 시작기'} + 새 본체 → 세계 자료 받아 저장 → 창 열림 → 다시 뜰 때 받기 없음`);
+}
+
+// ── 17) 자료 팩 받기 실패: 조각 404 → 본체가 띄우는 받기 창(까닭 · 다시 받기 · 닫기, 파일 넣기 없음). 옛 시작기는 시작 실패에 아무 창도 안 띄우므로
+//        본체가 띄운다(host/datapanel.ts). 1분 재시도 억제(표시마다 다시 받지 않음) · 깨진 조각(sha256) · 목록 판 불일치 · 성공 →
+//        옛 시작기: 채팅 다시 저장(Risu 가 다시 그리면 display → 시작기가 본체를 다시 띄움) / 새 시작기: 고리(__goeiRelaunch)로 바로 띄움, 창은 하나만
+for (const loader of skip() ? [] : ['old', 'new']) {
+  const chat = { message: [{ role: 'user', data: 'hi' }], scriptstate: {} };
+  const { page, frame, errors, logs } = await boot([fixture], 0, chat, { serve: startFiles.filter((n) => n !== 'goei-data-world.2.txt'), loader });
+  await frame.waitForSelector('.gl-card', { timeout: 15000 });
+  assert.equal(await frame.locator('.gl-card').count(), 1, `${loader}: 받기 창은 하나 (새 시작기도 자기 창을 겹쳐 띄우지 않음)`);
+  assert.equal(await frame.locator('[data-gl="file"]').count(), 0, '본체의 자료 받기 창에는 파일 넣기가 없음');
+  const first = await panelMsg(frame);
+  assert.match(first, /^세계 자료\(goei-data-world\)를 받지 못했어요: goei-data-world\.2\.txt을 받지 못했어요 \(404\)\./, first);
+  assert.match(await frame.textContent('.gl-card'), /다시 받아 주세요/, '안내 글');
+  assert.deepEqual(await frame.evaluate(() => window.__calls.show), ['fullscreen'], '창을 띄움');
+  assert.equal(await fab(frame), 'none', '자료 없이는 버튼도 처리기 화면도 없음');
+  assert.equal(await storedWorld(frame), null, '못 받은 자료는 저장 안 함');
+  assert.match(await frame.evaluate(() => window.__store['p:goei:body']?.slice(0, 30) ?? ''), /^\/\/ goei-body /, '본체는 저장됨 (본체는 멀쩡)');
+  assert.ok(logs.some((l) => l.includes('본체를 시작하지 못했어요') && l.includes('세계 자료')), '시작기 로그에 까닭');
+  // 1분 억제: 메시지 표시로 시작기가 본체를 다시 시작해도(옛 시작기는 표시마다) 자료를 다시 받으려 하지 않는다. 창은 그대로 하나
+  const n0 = (await fetched(frame)).filter((n) => n === 'goei-data-world.json').length;
+  await frame.evaluate(() => window.__calls.handlers.display('<div data-goei="landing">x</div>'));
+  await sleep(700);
+  assert.equal((await fetched(frame)).filter((n) => n === 'goei-data-world.json').length, n0, `${loader}: 1분 안에는 다시 받지 않음`);
+  assert.equal(await frame.locator('.gl-card').count(), 1, '창은 하나');
+  const retry = async () => {
+    await frame.evaluate(() => { document.querySelector('.gl-msg').textContent = ''; });
+    await frame.click('[data-gl="get"]');
+    await frame.waitForFunction(() => { const m = document.querySelector('.gl-msg'); return (m && !m.hidden && m.textContent && m.textContent !== '받는 중') || !document.querySelector('.gl-card'); }, null, { timeout: 30000 });
+    return panelMsg(frame);
+  };
+  // 깨진 조각(길이 같음): 보안 컨텍스트라 sha256 에서 걸린다
+  await serve(frame, startFiles);
+  await frame.evaluate(() => { window.__fetchHook = (n) => (n === 'goei-data-world.1.txt' ? window.__files[n].slice(0, 100) + '#' + window.__files[n].slice(101) : undefined); });
+  assert.match(await retry(), /세계 자료가 깨져 있어요\(sha256\)/, '깨진 조각');
+  assert.equal(await storedWorld(frame), null);
+  assert.equal(await frame.evaluate(() => [...document.querySelectorAll('.gl-act button')].every((b) => !b.disabled)), true, '단추 다시 살아남');
+  // 목록의 지문이 본체와 다름 (release 에 다른 판의 팩만 있을 때): 조각은 받지 않는다
+  await frame.evaluate(() => { window.__fetchHook = (n) => (n === 'goei-data-world.json' ? JSON.stringify({ ...JSON.parse(window.__files[n]), hash: 'deadbeef' }) : undefined); });
+  const p1 = (await fetched(frame)).filter((n) => n === 'goei-data-world.1.txt').length;
+  assert.match(await retry(), /아직 이 판의 세계 자료가 올라오지 않았어요/, '판 불일치');
+  assert.equal((await fetched(frame)).filter((n) => n === 'goei-data-world.1.txt').length, p1, '목록에서 멈춤');
+  // 성공 → 창 닫힘 → 저장
+  await frame.evaluate(() => { window.__fetchHook = null; });
+  await frame.click('[data-gl="get"]');
+  await frame.waitForFunction(() => !document.querySelector('.gl-card'), null, { timeout: 30000 });
+  assert.equal((await storedWorld(frame))?.length ?? 0, worldPack.length, '세계 자료 저장');
+  if (loader === 'new') {
+    // 새 시작기: 고리로 바로 다시 띄운다 (1분 억제와 무관)
+    await waitFab(frame, 'block', 15000);
+    assert.equal(await frame.evaluate(() => window.__calls.setChat.length), 0, '채팅 다시 저장은 안 함');
+  } else {
+    // 옛 시작기: 채팅을 그대로 다시 저장해 Risu 가 다시 그리게 한다. (가짜 Risu 는 다시 그리지 않으니) 표시 처리기를 불러 흉내 → 시작기가 본체를 띄움
+    await frame.waitForFunction(() => window.__calls.setChat.length === 1, null, { timeout: 5000 });
+    assert.deepEqual(await frame.evaluate(() => window.__calls.setChat[0].message), chat.message, '채팅은 그대로 다시 저장');
+    assert.equal(await fab(frame), 'none');
+    await frame.evaluate(() => window.__calls.handlers.display('<div data-goei="landing">x</div>'));
+    await waitFab(frame, 'block', 15000);
+  }
+  await frame.click('[x-goei-fab] button');
+  await frame.waitForFunction(() => { const g = document.querySelector('.gx'); return g && g.style.display !== 'none' && g.querySelector('[data-action="ed-open"]'); }, null, { timeout: 8000 });
+  await closeOf(page, errors);
+  ok(`자료 팩 받기 실패(${loader === 'old' ? '옛' : '새'} 시작기): 본체의 받기 창 · 1분 억제 · 깨진 조각(sha256) · 판 불일치 · 다시 받기 성공 → ${loader === 'old' ? '채팅 다시 저장 → 표시 → ' : '고리로 '}본체 뜸`);
+}
+
+// ── 18) 저장소의 자료가 이 판과 다르면(판 불일치·깨짐) 다시 받고, 맞으면 받지 않는다. 자료만 없는 저장소(본체는 있음)도 자료만 받는다
+if (!skip()) {
+  // (a) 판이 다른 팩(짧은 글) → 다시 받아 덮어씀
+  const { page, frame, errors, logs } = await boot([fixture], 0, emptyChat(), { body: bodyCode, data: false, store: { 'p:goei:data-world': '{"schema":1,"kind":"world"}' }, serve: worldFiles, loader: 'old' });
+  await waitFab(frame);
+  assert.deepEqual(await fetched(frame), worldFiles, '본체는 저장소에서, 세계 자료만 다시 받음');
+  assert.equal(await storedWorld(frame), worldPack, '새 팩으로 덮어씀');
+  assert.ok(logs.some((l) => l.includes('저장된 세계 자료가 이 판과 달라 다시 받아요')), '까닭을 적음');
+  await closeOf(page, errors);
+  // (b) 길이는 같은데 글자가 다른 팩(깨짐) → 지문이 달라 다시 받음
+  const broken = worldPack.slice(0, 500) + (worldPack[500] === 'a' ? 'b' : 'a') + worldPack.slice(501);
+  const b = await boot([fixture], 0, emptyChat(), { body: bodyCode, data: false, store: { 'p:goei:data-world': broken }, serve: worldFiles, loader: 'old' });
+  await waitFab(b.frame);
+  assert.deepEqual(await fetched(b.frame), worldFiles, '지문이 다르면 다시 받음');
+  assert.equal(await storedWorld(b.frame), worldPack);
+  await closeOf(b.page, b.errors);
+  // (c) 자료만 없는 저장소 → 자료만 받음. (d) 둘 다 있으면 아무것도 안 받음 (16 에서도 봄)
+  const c = await boot([fixture], 0, emptyChat(), { body: bodyCode, data: false, serve: worldFiles, loader: 'old' });
+  await waitFab(c.frame);
+  assert.deepEqual(await fetched(c.frame), worldFiles, '자료만 받음');
+  await closeOf(c.page, c.errors);
+  const d = await boot([fixture], 0, emptyChat(), { body: bodyCode, loader: 'old' });
+  await waitFab(d.frame);
+  assert.deepEqual(await fetched(d.frame), [], '맞는 자료가 있으면 받기 없음');
+  await closeOf(d.page, d.errors);
+  ok('저장소 자료 판 불일치·깨짐 → 다시 받음 · 자료만 없으면 자료만 · 맞으면 받기 없음');
 }
 
 await browser.close();

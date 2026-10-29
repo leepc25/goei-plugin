@@ -1,10 +1,8 @@
 // 깡통봇 설치·점검 (docs/설계안_세계편집.md 9절). 아무 봇에나 플러그인을 설치할 수 있게 카드에 있어야 할 것을 플러그인이 심는다:
 // ⚙️설정 폴더(Directory·Plugin manifest), 📖위키 폴더, 인사말 57개(매니페스트 키→번호), 카드 사진 1,751장(release/pic), 아이콘, 위키 기본 문서 묶음.
 // 여기는 순수 계산(검사·로어북 만들기)만. 받기·저장은 host/install.ts.
-import greetingsRaw from '../data/install/greetings.json';
-import picturesRaw from '../data/install/pictures.json';
-import directoryRaw from '../data/install/directory.json';
-import iconRaw from '../data/install/icon.json';
+// 설치 자료(인사말·카드 사진 목록·기본 명부·아이콘 정보)는 본체에 번들하지 않는다 (QC 개선 나1): 설치·점검 화면을 열 때 자료 팩
+// (goei-data-install, core/datapack.ts applyInstallPack → setInstallData) 을 받아 넣는다. 저장소에는 두지 않는다 (docs/qc/09_개선_나_1.md).
 import { DIRECTORY_COMMENT, MANIFEST_COMMENT, directoryEntries, manifestEntry } from './lorebooks';
 import { readManifest } from './start';
 import { PLUGIN_VERSION } from './update';
@@ -12,10 +10,32 @@ import { readDirectoryData } from './world/directory';
 import { pictures as manifestPictures, type Picture } from './pictures';
 import type { LoreEntry, Manifest } from './types';
 
-export const INSTALL_GREETINGS = greetingsRaw as { index: Record<string, number>; texts: string[] };
-export const INSTALL_PICTURES = picturesRaw as Picture[];
-export const DEFAULT_DIRECTORY = directoryRaw as Record<string, unknown>;
-export const INSTALL_ICON = iconRaw as { file?: string; digest?: string; bytes?: number };
+/** 설치 자료 (자료 팩 goei-data-install 의 내용) */
+export interface InstallData {
+  /** 인사말: 매니페스트 키 → texts 번호, 글 */
+  greetings: { index: Record<string, number>; texts: string[] };
+  /** 카드 사진 [이름, 지문, 확장자, 크기] */
+  pictures: Picture[];
+  /** 기본 명부(Directory) */
+  directory: Record<string, unknown>;
+  /** 아이콘: release/icon.png 파일 이름·지문·크기 */
+  icon: { file?: string; digest?: string; bytes?: number };
+}
+
+let data: InstallData | null = null;
+export function setInstallData(d: InstallData): void {
+  if (!d.greetings || typeof d.greetings.index !== 'object' || !Array.isArray(d.greetings.texts)) throw new Error('설치 자료 형식이 달라요 (greetings).');
+  if (!Array.isArray(d.pictures)) throw new Error('설치 자료 형식이 달라요 (pictures).');
+  if (!d.directory || typeof d.directory !== 'object') throw new Error('설치 자료 형식이 달라요 (directory).');
+  if (!d.icon || typeof d.icon !== 'object') throw new Error('설치 자료 형식이 달라요 (icon).');
+  data = d;
+}
+export const installDataReady = (): boolean => data !== null;
+/** 설치 자료. 아직 받지 않았으면 던진다 (host/install.ts 가 설치·점검 전에 ensureInstallData 로 받는다) */
+export function installData(): InstallData {
+  if (!data) throw new Error('설치 자료(goei-data-install)를 아직 받지 않았어요. 설치·점검 화면을 다시 열어 주세요.');
+  return data;
+}
 
 export const SETTINGS_FOLDER_NAME = '⚙️설정';
 export const WIKI_FOLDER_NAME = '📖위키';
@@ -85,14 +105,15 @@ export function installCheck(i: CheckInput): InstallState {
   const m = readManifest(lore);
   const greetings = Array.isArray(i.alternateGreetings) ? (i.alternateGreetings as unknown[]) : [];
   const idx = m?.greetings ?? {};
-  const missing = Object.keys(INSTALL_GREETINGS.index).filter((k) => {
+  const inst = installData();
+  const missing = Object.keys(inst.greetings.index).filter((k) => {
     const n = idx[k];
     if (!Number.isInteger(n) || n < 0 || n >= greetings.length) return true;
-    const want = INSTALL_GREETINGS.texts[INSTALL_GREETINGS.index[k]] ?? '';
+    const want = inst.greetings.texts[inst.greetings.index[k]] ?? '';
     return want ? typeof greetings[n] !== 'string' || !(greetings[n] as string).trim() : false;
   });
   const have = new Set(((Array.isArray(i.assets) ? i.assets : []) as unknown[]).filter(isRow).map((r) => r[0]));
-  const want = manifestPictures(m).length ? manifestPictures(m) : INSTALL_PICTURES;
+  const want = manifestPictures(m).length ? manifestPictures(m) : inst.pictures;
   const missingPics = want.filter((p) => !have.has(p[0]));
   let directory = false;
   try {
@@ -106,7 +127,7 @@ export function installCheck(i: CheckInput): InstallState {
     directory,
     settingsFolder: !!findFolder(lore, 'settings'),
     wikiFolder: !!findFolder(lore, 'wiki'),
-    greetings: { ok: !missing.length, missing, total: Object.keys(INSTALL_GREETINGS.index).length },
+    greetings: { ok: !missing.length, missing, total: Object.keys(inst.greetings.index).length },
     pictures: { missing: missingPics, bytes: missingPics.reduce((n, p) => n + (Number(p[3]) || 0), 0), total: want.length },
     icon: i.iconOurs,
     wikiPack: i.wikiPack,
@@ -127,8 +148,9 @@ export function plantGreetings(existing: unknown): { greetings: string[]; index:
   out.forEach((g, n) => {
     if (!at.has(g)) at.set(g, n);
   });
-  for (const [key, n] of Object.entries(INSTALL_GREETINGS.index)) {
-    const text = INSTALL_GREETINGS.texts[n] ?? '';
+  const inst = installData();
+  for (const [key, n] of Object.entries(inst.greetings.index)) {
+    const text = inst.greetings.texts[n] ?? '';
     let hit = at.get(text);
     if (hit === undefined) {
       hit = out.length;
@@ -149,7 +171,7 @@ export function buildManifest(o: { greetings: Record<string, number>; settingsKe
     plugin: 'goei-plugin',
     version: prev.version ?? PLUGIN_VERSION,
     greetings: o.greetings,
-    pictures: manifestPictures(prev as Manifest).length ? manifestPictures(prev as Manifest) : INSTALL_PICTURES,
+    pictures: manifestPictures(prev as Manifest).length ? manifestPictures(prev as Manifest) : installData().pictures,
     keys: { ...(prev.keys ?? {}), settings: o.settingsKey, wiki: o.wikiKey },
   };
 }
@@ -174,7 +196,7 @@ export function installLore(lore: LoreEntry[] | undefined, greetings: Record<str
   const dir = directoryEntries(out).filter((e) => typeof e.content === 'string' && e.content.trim());
   if (!dir.length) {
     const stale = out.findIndex((e) => e.comment === DIRECTORY_COMMENT);
-    const fresh = entry(DIRECTORY_COMMENT, JSON.stringify(DEFAULT_DIRECTORY), settingsKey);
+    const fresh = entry(DIRECTORY_COMMENT, JSON.stringify(installData().directory), settingsKey);
     if (stale >= 0) out[stale] = fresh;
     else out.push(fresh);
   } else {

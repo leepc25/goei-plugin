@@ -48,6 +48,31 @@ test('본체 조각: 이어 붙이면 goei-body.js, 판·길이·지문이 맞�
   assert.notEqual(createHash('sha256').update(broken, 'utf8').digest('hex'), index.sha256);
 });
 
+// 자료 팩 (개선 나1, docs/qc/09_개선_나_1.md): 세계·설치 자료는 본체에 없고 goei-data-<이름>.json + .N.txt 로. 본체에 박힌 지문 = 팩의 지문
+test('자료 팩 조각: 이어 붙이면 팩 글, 지문이 본체에 박혀 있고, 본체에는 자료가 없다', { skip: !existsSync(new URL('dist/goei-data-world.json', root)) }, async () => {
+  const { worldPackText, installPackText, textHash } = await import('../scripts/data-pack.mjs');
+  const body = read('dist/goei-body.js');
+  for (const [name, text, probe] of [['goei-data-world', worldPackText(), 'Sora Land Amusement Park'], ['goei-data-install', installPackText(), '"texts":[']]) {
+    const index = roundTrip('dist', name + '.json', text);
+    assert.equal(index.name, name);
+    assert.equal(index.version, pkg.version);
+    assert.equal(index.hash, textHash(text), `${name}: 목록의 hash = 팩 글 FNV-1a`);
+    assert.equal(index.sha256, createHash('sha256').update(text, 'utf8').digest('hex'), `${name}: sha256`);
+    assert.deepEqual(Object.keys(index).sort(), ['hash', 'length', 'name', 'parts', 'sha256', 'version']);
+    // 본체에 박힌 지문 (core/datapack.ts 의 __WORLD_PACK__·__INSTALL_PACK__ define)
+    // esbuild 가 define 글을 작은따옴표 문자열로 낸다: '{"hash":"…","sha256":"…","length":N}'
+    assert.ok(body.includes(`"hash":"${index.hash}","sha256":"${index.sha256}","length":${index.length}`), `${name}: 본체에 같은 지문(hash·sha256·length)이 박혀 있음`);
+    assert.ok(text.includes(probe) && !body.includes(probe), `${name}: 자료 본문은 팩에만 있고 본체에는 없음`);
+  }
+  const w = JSON.parse(worldPackText());
+  assert.deepEqual([w.schema, w.kind], [1, 'world']);
+  assert.deepEqual([Object.keys(w.agent).length, Object.keys(w.org).length, Object.keys(w.anomaly).length, Object.keys(w.site).length, Object.keys(w.appendix).length, Object.keys(w.relations.pairs).length], [55, 17, 63, 11, 4, 78]);
+  const i = JSON.parse(installPackText());
+  assert.deepEqual([i.schema, i.kind, i.greetings.texts.length, i.icon.file], [1, 'install', 57, 'icon.png']);
+  // 본체 크기: 자료를 뺀 뒤 (개선 나1 전 3.42MB · 18조각)
+  assert.ok(Buffer.byteLength(body) < 2_300_000, `본체 ${Buffer.byteLength(body)} 바이트 < 2.3MB`);
+});
+
 test('게임 코드 조각: 이어 붙이면 goei-game.js', { skip: !existsSync(new URL('dist/game/goei-game.js', root)) }, () => {
   const code = read('dist/game/goei-game.js');
   const index = JSON.parse(read('dist/game/index.json'));

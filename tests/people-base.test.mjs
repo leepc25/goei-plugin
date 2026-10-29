@@ -1,14 +1,14 @@
 // 미리 만든 자료: 호칭 표 시드 (유저 신분에 따른 상급·동급·하급·외부인 호칭)
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { build } from 'esbuild';
+import { buildWithData } from './data-init.mjs';
 import { mkdtemp } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { pathToFileURL } from 'node:url';
 
 const dir = await mkdtemp(join(tmpdir(), 'goei-people-base-'));
-await build({
+await buildWithData({
   entryPoints: ['src/core/people/base.ts', 'src/core/people/identity.ts'],
   outdir: dir, outbase: 'src', bundle: true, platform: 'node', format: 'esm', outExtension: { '.js': '.mjs' }, logLevel: 'silent',
 });

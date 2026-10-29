@@ -1,5 +1,6 @@
 // 본체 받기·실행. 본체(goei-body.js)는 「// goei-body 판」 줄로 시작하고, 실행하면 globalThis.__goeiBody를 남긴다.
 import type { BodyHandlers } from '../body';
+import { sha256Text, textHash } from '../core/texthash';
 
 export type Body = BodyHandlers;
 export const BODY_KEY = 'goei:body';
@@ -13,12 +14,8 @@ export function bodyVersion(code: string): string | null {
   return /^\/\/ goei-body (\S+)/.exec(code)?.[1] ?? null;
 }
 
-/** 본체 글 지문 (scripts/build.mjs textHash 와 같게): UTF-16 단위의 FNV-1a 32비트. 길이만 보면 글자가 바뀐 조각을 못 잡는다 */
-export function bodyHash(code: string): string {
-  let h = 0x811c9dc5;
-  for (let i = 0; i < code.length; i++) h = Math.imul(h ^ code.charCodeAt(i), 0x01000193) >>> 0;
-  return h.toString(16).padStart(8, '0');
-}
+/** 본체 글 지문 (scripts/build.mjs textHash 와 같게): UTF-16 단위의 FNV-1a 32비트 (core/texthash.ts). 길이만 보면 글자가 바뀐 조각을 못 잡는다 */
+export const bodyHash = (code: string): string => textHash(code);
 
 /**
  * 본체 코드를 실행한다. Risu 플러그인 칸은 nonce가 붙은 스크립트만 실행하므로(eval·blob 막힘)
@@ -92,14 +89,5 @@ export async function fetchBody(version: string): Promise<string> {
   return code;
 }
 
-/** 본체 전체의 sha256 (UTF-8 바이트, 소문자 hex). crypto.subtle 이 없거나(보안 컨텍스트 아님) 실패하면 null → 부르는 쪽이 hash 로 */
-export async function sha256(code: string): Promise<string | null> {
-  try {
-    const subtle = globalThis.crypto?.subtle;
-    if (!subtle) return null;
-    const d = await subtle.digest('SHA-256', new TextEncoder().encode(code));
-    return [...new Uint8Array(d)].map((b) => b.toString(16).padStart(2, '0')).join('');
-  } catch {
-    return null;
-  }
-}
+/** 본체 전체의 sha256 (UTF-8 바이트, 소문자 hex, core/texthash.ts). crypto.subtle 이 없거나(보안 컨텍스트 아님) 실패하면 null → 부르는 쪽이 hash 로 */
+export const sha256 = (code: string): Promise<string | null> => sha256Text(code);

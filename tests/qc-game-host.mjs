@@ -2,6 +2,7 @@
 // 플러그인 창 → 필드 탭(게임)까지 간다. 게임 파일(코드·팩)은 dist/game/ 을 window.__fetch 로 준다.
 // 사용: import { boot, openPanel, gameFiles, serveGame, startedChat } from './qc-game-host.mjs'
 import { createRequire } from 'node:module';
+import { distWorldPack } from './data-init.mjs';
 import { execSync } from 'node:child_process';
 import { readFileSync, readdirSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
@@ -13,6 +14,8 @@ export const { chromium } = require('playwright');
 export const DIST = new URL('../dist/', import.meta.url);
 export const plugin = readFileSync(process.env.PLUGIN || new URL('goei-plugin.js', DIST), 'utf8');
 export const bodyCode = readFileSync(new URL('goei-body.js', DIST), 'utf8');
+/** 세계 자료 팩 (개선 나1): 본체처럼 가짜 저장소에 미리 둔다 (저장소에 자료가 있는 보통 경우). 받기 시험은 noBody 쪽에서 */
+export const worldPack = distWorldPack();
 export const VERSION = /\/\/ goei-body (\S+)/.exec(bodyCode)?.[1] ?? JSON.parse(readFileSync(new URL('../package.json', import.meta.url), 'utf8')).version;
 
 export function loadFixture(path) {
@@ -45,6 +48,7 @@ export function hostScript(char, chat, { rootDom = true, noBody = false } = {}) 
     });
     window.__store = {};
     if (!${noBody}) window.__store['p:goei:body'] = ${JSON.stringify(bodyCode)};
+    if (!${noBody}) window.__store['p:goei:data-world'] = ${JSON.stringify(worldPack)};
     window.__rootDoc = ${rootDom} ? { querySelector: async (q) => wrap(document.querySelector(q)), querySelectorAll: async (q) => [...document.querySelectorAll(q)].map(wrap), createElement: async (t) => wrap(document.createElement(t)) } : null;
     window.__char = ${JSON.stringify(char)};
     window.__liteChar = window.__char;

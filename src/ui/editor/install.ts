@@ -25,15 +25,25 @@ export const instUi = {
   info: '',
 };
 
-export async function refreshInstall(ctx: ChatContext): Promise<void> {
+/** 점검. 설치 자료(goei-data-install)가 아직 없으면 먼저 받는다 — 진행 글은 instUi.progress 로 화면에 (render 가 있으면 다시 그린다) */
+export async function refreshInstall(ctx: ChatContext, render?: () => void): Promise<void> {
   try {
-    const r = await checkInstall(ctx.charIndex);
+    const r = await checkInstall(ctx.charIndex, (t) => {
+      instUi.progress = t;
+      render?.();
+    });
     if (instUi.forChar !== ctx.charIndex) instUi.setName = !r.state.goei;
     instUi.state = r.state;
     instUi.iconPrev = r.iconPrev;
     instUi.forChar = ctx.charIndex;
   } catch (error) {
+    // 설치 자료를 못 받았거나(네트워크) 캐릭터를 못 읽음: 화면에 까닭과 「다시 점검」. 이 캐릭터는 점검한 것으로 치워야
+    // 페이지가 다시 그려질 때마다 점검(받기 실패)을 되풀이하지 않는다 — 다시 점검은 단추(ed-inst-recheck)로만
+    instUi.state = null;
+    instUi.forChar = ctx.charIndex;
     instUi.notice = `점검하지 못했어요: ${error instanceof Error ? error.message : String(error)}`;
+  } finally {
+    instUi.progress = '';
   }
 }
 
@@ -58,7 +68,10 @@ export function installPage(ctx: ChatContext): string {
   const s = instUi.state;
   const busy = !!instUi.busy;
   if (!s || instUi.forChar !== ctx.charIndex) {
-    return `<div class="gw-page"><header class="gw-head"><h2>설치 · 점검</h2></header><p class="gx-muted">점검하는 중…</p></div>`;
+    // 점검 전: 설치 자료 받는 진행 글, 또는 실패 까닭 + 다시 점검 (설치 자료 받기 실패는 여기로 온다)
+    const failed = !instUi.pending && instUi.notice;
+    return `<div class="gw-page gw-install-pre"><header class="gw-head"><h2>설치 · 점검</h2>${failed ? `<div class="gw-head-act"><button class="gx-mini primary" data-action="ed-inst-recheck">다시 점검</button></div>` : ''}</header>
+      ${failed ? `<div class="gx-err" role="alert">${esc(instUi.notice)}</div>` : `<p class="gx-muted">${esc(instUi.progress || '점검하는 중…')}</p>`}</div>`;
   }
   const missing = installSummary(s);
   const allDone = s.goei && !missing.length && s.icon && s.tokenizer;
@@ -96,6 +109,14 @@ export async function installAction(action: string, ctx: ChatContext, env: Env):
   if (instUi.busy) return true;
   if (action === 'ed-inst-name') {
     instUi.setName = !instUi.setName;
+    env.render();
+    return true;
+  }
+  if (action === 'ed-inst-recheck') {
+    // 다시 점검: 이 캐릭터를 아직 점검하지 않은 상태로 돌리면 페이지가 다시 그려질 때 점검(설치 자료 받기 포함)을 다시 한다 (editor/index.ts)
+    instUi.forChar = -1;
+    instUi.state = null;
+    instUi.notice = '';
     env.render();
     return true;
   }

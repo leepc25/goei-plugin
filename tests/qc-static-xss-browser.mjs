@@ -3,6 +3,7 @@
 // 사용법: node tests/qc-static-xss-browser.mjs <fixture.json>
 // 틀은 tests/browser.mjs 의 hostScript 를 복사·축약한 것 (가짜 risuai).
 import { createRequire } from 'node:module';
+import { distWorldPack } from './data-init.mjs';
 import { execSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import assert from 'node:assert/strict';
@@ -13,6 +14,8 @@ const { chromium } = require('playwright');
 const fixture = JSON.parse(readFileSync(process.argv[2], 'utf8'));
 const plugin = readFileSync(new URL('../dist/goei-plugin.js', import.meta.url), 'utf8');
 const bodyCode = readFileSync(new URL('../dist/goei-body.js', import.meta.url), 'utf8');
+/** 세계 자료 팩 (개선 나1): 본체처럼 가짜 저장소에 미리 둔다 (저장소에 자료가 있는 보통 경우). 받기 시험은 noBody 쪽에서 */
+const worldPack = distWorldPack();
 
 function hostScript(char, chat) {
   return `
@@ -37,7 +40,7 @@ function hostScript(char, chat) {
       hasClass: async (c) => el.classList.contains(c),
       textContent: async () => el.textContent,
     });
-    window.__store = { 'p:goei:body': ${JSON.stringify(bodyCode)} };
+    window.__store = { 'p:goei:body': ${JSON.stringify(bodyCode)}, 'p:goei:data-world': ${JSON.stringify(worldPack)} };
     window.__rootDoc = { querySelector: async (q) => wrap(document.querySelector(q)), querySelectorAll: async (q) => { const a = [...document.querySelectorAll(q)].map(wrap); return Object.assign(a, { length: async () => a.length, at: async (i) => a[i] }); }, createElement: async (t) => wrap(document.createElement(t)) };
     window.__char = ${JSON.stringify(char)};
     window.__chat = ${JSON.stringify(chat)};

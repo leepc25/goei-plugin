@@ -43,6 +43,8 @@ import { getPrefs } from './core/settings';
 import { openApp, openInstall, openWiki } from './ui/app';
 import { isGoeiLore } from './core/install';
 import { loadStoredTokenizer, loadStoredWikiPack } from './host/install';
+import { loadWorldData } from './host/datapack';
+import { showWorldDataPanel } from './host/datapanel';
 import { setInstalledHook } from './host/hooks';
 import { GHOST_ICON } from './ui/icons';
 import { landingHtml as renderLanding } from './ui/landing';
@@ -715,8 +717,18 @@ export interface BodyHandlers {
   unload: () => Promise<void>;
 }
 
-/** 본체 시작: 설정을 읽고 플로팅 버튼·채팅 감시를 켠다. Risu에 거는 처리기는 시작기(main.ts)가 대신 걸고 여기로 넘긴다 */
+/**
+ * 본체 시작: 세계 자료를 넣고(저장소 → 없으면 받아 저장, QC 개선 나1), 설정을 읽고 플로팅 버튼·채팅 감시를 켠다.
+ * Risu에 거는 처리기는 시작기(main.ts)가 대신 걸고 여기로 넘긴다. 세계 자료를 받지 못하면 여기서 던져 처리기·화면 없이 시작기의 받기 창에 까닭이 보인다
+ */
 export async function start(): Promise<BodyHandlers> {
+  try {
+    await loadWorldData();
+  } catch (error) {
+    // 받기 창(까닭·다시 받기)은 본체가 띄운다 — 옛 시작기는 시작 실패에 아무 창도 띄우지 않으므로 (host/datapanel.ts)
+    showWorldDataPanel(reason(error));
+    throw error;
+  }
   await loadPrefs();
   await loadStoredWikiPack();
   await loadStoredTokenizer();

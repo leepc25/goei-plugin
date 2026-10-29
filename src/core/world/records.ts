@@ -1,11 +1,7 @@
 // 세계 데이터 기록: 플러그인 기본 세계(src/data/world/*.json) + 카드 명부의 덧쓰기(DirectoryData.세계).
 // 「기본 세계 + 덧쓰기」(사용자 2026-10-27): 카드에 같은 기록이 있으면 카드가 이기고, 카드에만 있으면 추가, deleted 면 기본 기록을 뺀다.
-import agentsJson from '../../data/world/agents.json';
-import orgsJson from '../../data/world/orgs.json';
-import anomaliesJson from '../../data/world/anomalies.json';
-import sitesJson from '../../data/world/sites.json';
-import appendicesJson from '../../data/world/appendices.json';
-import relationsJson from '../../data/world/relations.json';
+// 기본 세계는 본체에 번들하지 않는다 (QC 개선 나1): 부팅 때 자료 팩(goei-data-world, core/datapack.ts·host/datapack.ts)을 풀어
+// setWorldData() 로 한 번 넣는다. 아래 export 는 그대로 동기이며, 자료가 들어오기 전에 불리면 분명한 오류를 던진다 (조용히 빈 결과 금지).
 import { FIELDS, type WorldKind, ANOMALY_NOTE } from './schema';
 
 /** 기록별 추가 칸. kind=line 은 요원 Identity·Appearance 절의 「- 이름: 값」 한 줄(sec 절, at 칸 뒤·'' 이면 절 맨 앞), block 은 절 하나(맨 뒤) */
@@ -62,20 +58,36 @@ export interface Relations {
   common: string;
 }
 
-interface Pack {
-  schema: number;
-  kind: WorldKind;
-  records: Record<string, WorldRecord>;
+/** 기본 세계 자료 (자료 팩 goei-data-world 의 내용). 종류별 이름 → 기록, 세력 관계 기본값 */
+export interface WorldData {
+  agent: Record<string, WorldRecord>;
+  org: Record<string, WorldRecord>;
+  anomaly: Record<string, WorldRecord>;
+  site: Record<string, WorldRecord>;
+  appendix: Record<string, WorldRecord>;
+  relations: Relations;
 }
 
-const DEFAULTS: Record<WorldKind, Record<string, WorldRecord>> = {
-  agent: (agentsJson as Pack).records,
-  org: (orgsJson as Pack).records,
-  anomaly: (anomaliesJson as Pack).records,
-  site: (sitesJson as Pack).records,
-  appendix: (appendicesJson as Pack).records,
-};
-const DEFAULT_RELATIONS: Relations = { pairs: (relationsJson as { pairs: Record<string, RelationCell> }).pairs, common: (relationsJson as { common: string }).common };
+let data: WorldData | null = null;
+
+/** 부팅 때 한 번 (host/datapack.ts loadWorldData → core/datapack.ts applyWorldPack). 시험은 tests/data-init.mjs 가 파일에서 읽어 넣는다 */
+export function setWorldData(d: WorldData): void {
+  for (const k of ['agent', 'org', 'anomaly', 'site', 'appendix'] as const) {
+    if (!d[k] || typeof d[k] !== 'object' || Array.isArray(d[k])) throw new Error(`세계 자료 형식이 달라요 (${k}).`);
+  }
+  if (!d.relations || typeof d.relations.pairs !== 'object' || typeof d.relations.common !== 'string') throw new Error('세계 자료 형식이 달라요 (relations).');
+  data = d;
+}
+/** 세계 자료가 들어왔나 (본체 부팅 순서 확인용) */
+export const worldDataReady = (): boolean => data !== null;
+
+/** 자료가 아직 없으면 던진다: 본체는 start() 에서 loadWorldData() 를 끝낸 뒤에만 처리기를 걸므로 실제로는 부팅 순서가 깨진 것 */
+function world(): WorldData {
+  if (!data) throw new Error('세계 자료(goei-data-world)가 아직 없어요. 본체 부팅이 자료 받기를 끝내기 전에 세계 기록을 읽었어요.');
+  return data;
+}
+const DEFAULTS = (kind: WorldKind): Record<string, WorldRecord> => world()[kind];
+const DEFAULT_RELATIONS = (): Relations => world().relations;
 
 /** 카드 명부에 저장되는 덧쓰기. 기록은 부분(fields 일부만)이어도 된다 */
 export interface WorldOverrides {
@@ -145,7 +157,7 @@ export function mergeRecord(base: WorldRecord | undefined, over: Partial<WorldRe
 
 /** 종류별 전체 기록 (기본 순서, 카드에만 있는 것은 뒤에). 이름 → 기록 */
 export function worldRecords(kind: WorldKind, overrides?: WorldOverrides): Map<string, WorldRecord> {
-  const base = DEFAULTS[kind];
+  const base = DEFAULTS(kind);
   const over = (overrides?.[kind] ?? {}) as Record<string, Partial<WorldRecord>>;
   const out = new Map<string, WorldRecord>();
   for (const [name, rec] of Object.entries(base)) {
@@ -163,12 +175,12 @@ export function worldRecords(kind: WorldKind, overrides?: WorldOverrides): Map<s
 export const worldRecord = (kind: WorldKind, name: string, overrides?: WorldOverrides): WorldRecord | null => worldRecords(kind, overrides).get(name) ?? null;
 
 export function worldRelations(overrides?: WorldOverrides): Relations {
-  const pairs: Record<string, RelationCell> = { ...DEFAULT_RELATIONS.pairs };
+  const pairs: Record<string, RelationCell> = { ...DEFAULT_RELATIONS().pairs };
   for (const [k, v] of Object.entries(overrides?.relations?.pairs ?? {})) {
     if (v === null) delete pairs[k];
     else if (v && RELATION_STAGES.includes(v.stage)) pairs[k] = { stage: v.stage, ...(v.memo ? { memo: v.memo } : {}) };
   }
-  return { pairs, common: overrides?.relations?.common ?? DEFAULT_RELATIONS.common };
+  return { pairs, common: overrides?.relations?.common ?? DEFAULT_RELATIONS().common };
 }
 
 /** 세력 관계도에서 뺀 조직 이름들 */
@@ -188,27 +200,28 @@ export function filterRelations(rel: Relations, excluded: Set<string>): Relation
 }
 
 /** 기본 세계에 그 이름의 기록이 있는지 (카드 덧쓰기와 구분해 보여 줄 때) */
-export const isDefaultRecord = (kind: WorldKind, name: string): boolean => name in DEFAULTS[kind];
+export const isDefaultRecord = (kind: WorldKind, name: string): boolean => name in DEFAULTS(kind);
 /** 기본 세계의 기록 (덧쓰기 전) */
-export const defaultRecord = (kind: WorldKind, name: string): WorldRecord | undefined => DEFAULTS[kind][name];
+export const defaultRecord = (kind: WorldKind, name: string): WorldRecord | undefined => DEFAULTS(kind)[name];
 
 // ── 지금 보고 있는 카드의 세계 (가상 로어북을 만들 때 기록해 둔다. 인물 기록의 세력 시작값 등이 읽는다) ──
 /** 기본 세력 코드 → 기본 세계의 조직 이름 (명부를 읽기 전·시험에서도 격자를 코드로 찾을 수 있게) */
 export const BUILTIN_ORG_CODES: Record<string, string> = { A00: '관리국', B00: '가짜 관리국', C00: '백일몽', D00: '민간인', E00: '프리랜서' };
-let active: { relations: Relations; orgCodes: Record<string, string>; anomalyNote: string } = { relations: DEFAULT_RELATIONS, orgCodes: { ...BUILTIN_ORG_CODES }, anomalyNote: ANOMALY_NOTE };
+/** 아직 카드를 읽기 전(setActiveWorld 전)에는 기본 세계의 관계·기본 코드·기본 머리말 */
+let active: { relations: Relations; orgCodes: Record<string, string>; anomalyNote: string } | null = null;
 export function setActiveWorld(relations: Relations, orgCodes: Record<string, string>, anomalyNote: string = ANOMALY_NOTE): void {
   active = { relations, orgCodes: { ...BUILTIN_ORG_CODES, ...orgCodes }, anomalyNote };
 }
-export const activeRelations = (): Relations => active.relations;
+export const activeRelations = (): Relations => active?.relations ?? DEFAULT_RELATIONS();
 /** 지금 카드의 괴이 공통 머리말 (body.ts 가 괴이 묶음 앞에 한 번 넣는다) */
-export const activeAnomalyNote = (): string => active.anomalyNote;
+export const activeAnomalyNote = (): string => active?.anomalyNote ?? ANOMALY_NOTE;
 /** 조직 코드(A00)나 이름 → 격자의 조직 이름 */
-export const activeOrgName = (codeOrName: string): string => active.orgCodes[codeOrName] ?? codeOrName;
+export const activeOrgName = (codeOrName: string): string => (active?.orgCodes ?? BUILTIN_ORG_CODES)[codeOrName] ?? codeOrName;
 
 /** 단계 → 평판 시작값 (단계 경계의 가운데: 적대 -80 · 경계 -40 · 중립 0 · 호의 40 · 우호 80) */
 export const STAGE_VALUE: Record<RelationStage, number> = { hostile: -80, wary: -40, neutral: 0, favorable: 40, friendly: 80 };
 /** 보는 쪽 → 대상의 시작 단계 (격자). 없으면 중립 */
-export function relationStage(viewer: string, target: string, rel: Relations = active.relations): RelationStage {
+export function relationStage(viewer: string, target: string, rel: Relations = activeRelations()): RelationStage {
   return rel.pairs[`${activeOrgName(viewer)}>${activeOrgName(target)}`]?.stage ?? 'neutral';
 }
 

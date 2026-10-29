@@ -2,6 +2,7 @@
 // 가짜 risuai API로 시작 화면 → 저장까지 확인한다.
 // 사용법: node tests/browser.mjs <fixture.json> [screenshot-dir]
 import { createRequire } from 'node:module';
+import { distPackFiles, distWorldPack } from './data-init.mjs';
 import { execSync } from 'node:child_process';
 import { readFileSync, readdirSync, mkdirSync, writeFileSync } from 'node:fs';
 import { createHash } from 'node:crypto';
@@ -19,6 +20,8 @@ const manifest = JSON.parse(fixture.globalLore.find((e) => e.comment === 'Plugin
 
 // 본체는 시작기가 pluginStorage에서 꺼낸다. 따로 시험하는 곳(noBody) 말고는 미리 넣어 둔다
 const bodyCode = readFileSync(new URL('../dist/goei-body.js', import.meta.url), 'utf8');
+/** 세계 자료 팩 (개선 나1): 본체처럼 가짜 저장소에 미리 둔다 (저장소에 자료가 있는 보통 경우). 받기 시험은 noBody 쪽에서 */
+const worldPack = distWorldPack();
 function hostScript(char, chat, { rootDom = true, noBody = false } = {}) {
   return `
     window.__calls = { setChat: [], show: [], hide: 0, replacers: [], listeners: [], handlers: {} };
@@ -44,6 +47,7 @@ function hostScript(char, chat, { rootDom = true, noBody = false } = {}) {
     });
     window.__store = {};
     if (!${noBody}) window.__store['p:goei:body'] = ${JSON.stringify(bodyCode)};
+    if (!${noBody}) window.__store['p:goei:data-world'] = ${JSON.stringify(worldPack)};
     window.__rootDoc = ${rootDom} ? { ...wrap(document.documentElement), querySelector: async (q) => wrap(document.querySelector(q)), querySelectorAll: async (q) => [...document.querySelectorAll(q)].map(wrap), createElement: async (t) => wrap(document.createElement(t)) } : null;
     window.__char = ${JSON.stringify(char)};
     window.__liteChar = window.__char;
@@ -131,6 +135,8 @@ async function pickCustom(page, row = '.gx-mlist li.gx-mx') {
   const { page, errors } = await boot({ name: '깡통봇', alternateGreetings: ['안녕'], globalLore: [], additionalAssets: [] }, { message: [], scriptstate: {} });
   const logs = [];
   page.on('console', (m) => logs.push(m.text()));
+  // 설치 자료 팩(개선 나1): 설치·점검 화면이 열릴 때 받는다. 받기 흉내에 dist 의 goei-data-install.* 만 둔다 (사진·아이콘 등은 404 그대로)
+  await page.evaluate((files) => { window.__fetch = (u) => files[u.split('?')[0].split('/').pop()] ?? null; }, distPackFiles('goei-data-install'));
   await page.waitForFunction(() => window.__button);
   const btn = await page.evaluate(() => window.__button.arg);
   console.log('button', JSON.stringify(btn));
@@ -140,6 +146,8 @@ async function pickCustom(page, row = '.gx-mlist li.gx-mx') {
   console.log('gx', await page.evaluate(() => { const g = document.querySelector('.gx'); return g ? `${g.style.display || 'shown'} ${g.querySelector('.gx-empty')?.textContent?.slice(0, 80)}` : 'none'; }));
   console.log('gw', await page.evaluate(() => { const g = document.querySelector('.gw'); return g ? `hidden=${g.hidden} install=${!!g.querySelector('.gw-install')} text=${g.textContent?.slice(0, 120)}` : 'none'; }));
   assert.ok(await page.$('.gw-install'), '설치 창');
+  await page.waitForSelector('[data-action="ed-inst-all"]', { timeout: 10000 });
+  assert.ok((await page.evaluate(() => window.__calls.fetch.map((u) => u.split('?')[0].split('/').pop()))).includes('goei-data-install.json'), '설치 자료 팩을 받아 점검');
   // 로어북·인사말 심기 → 괴이 카드가 됨 → 창을 닫으면 플로팅 버튼이 생겨야 (감시가 다시 판정)
   await page.click('[data-action="ed-inst-all"]');
   await page.waitForFunction(() => document.querySelector('.gw-install')?.textContent?.includes('끝났어요'), null, { timeout: 60000 });

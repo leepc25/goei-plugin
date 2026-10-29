@@ -1,14 +1,15 @@
 // 세력 평판 (docs/설계안_세력평판.md): 시작값·재계산·구간·갱신기 검사·필드 목격 경로·본편 주입·지침
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { build } from 'esbuild';
+import { buildWithData } from './data-init.mjs';
 import { mkdtemp } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { pathToFileURL } from 'node:url';
 
 const dir = await mkdtemp(join(tmpdir(), 'goei-people-fac-'));
-await build({
+// 세계 자료(세력 관계 기본값)는 본체처럼 팩으로 넣는다 (tests/data-init.mjs)
+await buildWithData({
   entryPoints: ['src/core/people/updater.ts', 'src/core/people/store.ts', 'src/core/people/types.ts', 'src/core/people/settings.ts', 'src/core/people/affinity.ts', 'src/core/people/faction.ts', 'src/core/people/field.ts', 'src/core/people/request.ts', 'src/core/people/prompt/index.ts', 'src/core/people/identity.ts'],
   outdir: dir, outbase: 'src', bundle: true, platform: 'node', format: 'esm', outExtension: { '.js': '.mjs' }, logLevel: 'silent',
 });

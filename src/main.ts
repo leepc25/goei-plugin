@@ -23,6 +23,12 @@ let failedAt = 0;
 let startError = '';
 /** 본체 코드 자체가 실행되지 않았나 (깨진 글·판 불일치). 본체는 돌았는데 시작 중에 실패한 것과 구분해, 깨진 코드만 저장소에서 지운다 */
 let codeBroken = false;
+/** 본체와 주고받는 고리 (개선 나1, host/datapanel.ts): 본체가 세계 자료 받기 창을 띄웠으면(__goeiBodyPanel) 시작기 창은 띄우지 않고,
+ *  그 창에서 다시 받기에 성공하면 본체가 __goeiRelaunch 로 다시 띄워 달라고 한다 (옛 시작기에는 이 고리가 없어 본체가 채팅을 다시 그리게 한다) */
+const link = globalThis as { __goeiBodyPanel?: boolean; __goeiRelaunch?: () => void };
+link.__goeiRelaunch = () => {
+  if (!body && !stopped) void ensure(true);
+};
 
 /** 저장해 둔 본체를 읽고, 없거나 판이 다르면 받는다. 받지 못하면 받기 창을 띄우고 null */
 async function load(prompt: boolean): Promise<Body | null> {
@@ -50,7 +56,7 @@ async function load(prompt: boolean): Promise<Body | null> {
     failedAt = Date.now();
     // 저장해 둔 본체가 깨져 있으면(판은 맞는데 실행이 안 됨) 지워서 다음에 다시 받게 한다. 그냥 두면 플러그인 판이 바뀔 때까지 영영 안 뜬다
     if (fromStore && codeBroken) await risuai.pluginStorage.removeItem(BODY_KEY).catch(() => {});
-    if (prompt) showPanel(VERSION, install, `본체를 시작하지 못했어요: ${startError}`);
+    if (prompt && !link.__goeiBodyPanel) showPanel(VERSION, install, `본체를 시작하지 못했어요: ${startError}`);
   }
   return b;
 }
@@ -207,6 +213,7 @@ watch();
 
 await hook('종료', () => risuai.onUnload(async () => {
   stopped = true;
+  delete link.__goeiRelaunch;
   await body?.unload().catch(() => {});
   // 하나가 실패해도 나머지는 뗀다
   await risuai.removeRisuReplacer('beforeRequest', onBeforeRequest).catch(() => {});

@@ -1,9 +1,15 @@
 // 깡통봇 설치·점검 (설계안 9절): 괴이 카드 판정, 인사말 심기, 로어북 심기(없는 것만·key 로 폴더 찾기), 점검
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { isGoeiLore, installLore, plantGreetings, installCheck, findFolder, installSummary, INSTALL_GREETINGS, INSTALL_PICTURES, DEFAULT_DIRECTORY, readManifest, readDirectoryData, WIKI_FOLDER_KEY } from '../dist-test/core.mjs';
+import { isGoeiLore, installLore, plantGreetings, installCheck, findFolder, installSummary, installData, readManifest, readDirectoryData, WIKI_FOLDER_KEY } from '../dist-test/core.mjs';
 
-test('내장 설치 데이터: 인사말 57 키, 사진 목록, 기본 명부', () => {
+// 설치 자료는 본체에 없고 자료 팩(goei-data-install)으로 받는다 (개선 나1). 시험은 dist-test/core.mjs 가 tests/data-init.mjs 로 파일에서 넣어 준다
+const INSTALL_GREETINGS = installData().greetings;
+const INSTALL_PICTURES = installData().pictures;
+const DEFAULT_DIRECTORY = installData().directory;
+
+test('설치 자료(팩): 인사말 57 키, 사진 목록, 기본 명부, 아이콘 정보', () => {
+  assert.equal(installData().icon.file, 'icon.png');
   assert.equal(Object.keys(INSTALL_GREETINGS.index).length, 66, '키(세력×언어×시나리오) 66개');
   assert.equal(INSTALL_GREETINGS.texts.length, 57);
   assert.ok(INSTALL_PICTURES.length > 1700);

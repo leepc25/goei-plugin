@@ -1,6 +1,7 @@
 // 출시 전 QC 공용 가짜 Risu (tests/browser.mjs 의 hostScript 를 복사해 읽기 횟수 세기·예외 주입을 더한 것).
 // 다른 qc-*-browser.mjs 가 import 해서 쓴다. 사용법: import { launch, boot, startChat, hostScript } from './qc-host.mjs'
 import { createRequire } from 'node:module';
+import { distWorldPack } from './data-init.mjs';
 import { execSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import assert from 'node:assert/strict';
@@ -10,6 +11,8 @@ export const { chromium } = require('playwright');
 
 export const plugin = readFileSync(process.env.PLUGIN || new URL('../dist/goei-plugin.js', import.meta.url), 'utf8');
 export const bodyCode = readFileSync(new URL('../dist/goei-body.js', import.meta.url), 'utf8');
+/** 세계 자료 팩 (개선 나1): 본체처럼 가짜 저장소에 미리 둔다 (저장소에 자료가 있는 보통 경우). 받기 시험은 noBody 쪽에서 */
+export const worldPack = distWorldPack();
 
 /** 가짜 risuai. window.__counts 에 getChatFromIndex·getCharacterFromIndex 호출 수를 센다 */
 export function hostScript(char, chat, { rootDom = true, noBody = false, prefs = null } = {}) {
@@ -37,6 +40,7 @@ export function hostScript(char, chat, { rootDom = true, noBody = false, prefs =
     });
     window.__store = {};
     if (!${noBody}) window.__store['p:goei:body'] = ${JSON.stringify(bodyCode)};
+    if (!${noBody}) window.__store['p:goei:data-world'] = ${JSON.stringify(worldPack)};
     if (${JSON.stringify(prefs)}) window.__store['p:goei:prefs'] = ${JSON.stringify(JSON.stringify(prefs))};
     window.__rootDoc = ${rootDom} ? { ...wrap(document.documentElement), querySelector: async (q) => wrap(document.querySelector(q)), querySelectorAll: async (q) => [...document.querySelectorAll(q)].map(wrap), createElement: async (t) => wrap(document.createElement(t)) } : null;
     window.__char = ${JSON.stringify(char)};

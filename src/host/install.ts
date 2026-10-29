@@ -1,60 +1,19 @@
 // 깡통봇 설치·점검의 받기·저장 (core/install.ts 가 계산, 여기서 Risu 에 쓴다).
 // 로어북·인사말은 캐릭터에, 사진은 에셋 저장소(release/pic), 아이콘은 release/icon.png 를 받아 메인 아이콘으로,
 // 위키 기본 문서 묶음은 release/wiki-base.N.txt 를 받아 플러그인 저장소에 둔다.
-import { installCheck, installLore, INSTALL_ICON, plantGreetings, type InstallState } from '../core/install';
+// 설치 자료(인사말·사진 목록·기본 명부·아이콘 정보)는 점검 전에 자료 팩(goei-data-install)으로 받는다 (host/datapack.ts ensureInstallData, QC 개선 나1).
+import { installCheck, installData, installLore, plantGreetings, type InstallState } from '../core/install';
 import { UPDATE_BASE } from '../core/update';
 import { setStoredWikiPack, storedWikiPack, WIKI_PACK_HEAD } from '../core/wiki';
 import { clearTokenizer, setTokenizerRanks, tokenizerName } from '../core/tokenizer';
 import type { LoreEntry } from '../core/types';
 import { digest, fetchPictures } from './picpack';
-import { toBytes } from './assets';
+import { ensureInstallData, getBytes, getText, type Progress } from './datapack';
 import { forgetImages } from '../ui/images';
 
 const WIKI_KEY = 'goei:wikibase';
 const TOK_KEY = 'goei:tok-o200k';
 const ICON_KEY = 'goei:icon';
-
-type RisuFetch = (url: string, arg: Record<string, unknown>) => Promise<{ ok: boolean; data: unknown; status: number }>;
-
-/** 받기 하나에 기다리는 시간. 응답이 영영 안 오면 설치 화면이 「받는 중」으로 굳지 않게 (QC 2026-10-28; ui/update.ts 와 같은 값) */
-const TIMEOUT_MS = 40_000;
-function timeout<T>(p: Promise<T>, name: string): Promise<T> {
-  let t: ReturnType<typeof setTimeout> | undefined;
-  return Promise.race([p, new Promise<never>((_, rej) => (t = setTimeout(() => rej(new Error(`${name}을 ${TIMEOUT_MS / 1000}초 안에 받지 못했어요.`)), TIMEOUT_MS)))]).finally(() => clearTimeout(t));
-}
-
-async function getText(name: string): Promise<string> {
-  const url = `${UPDATE_BASE}/${name}?t=${Date.now()}`;
-  const legacy = (risuai as unknown as { risuFetch?: RisuFetch }).risuFetch;
-  if (legacy) {
-    try {
-      const r = await timeout(legacy(url, { method: 'GET', plainFetchForce: true, rawResponse: true, headers: { 'Content-Type': 'text/plain' } }), name);
-      if (r?.ok && r.data instanceof Uint8Array) return new TextDecoder().decode(r.data);
-    } catch {
-      // 아래에서 다시
-    }
-  }
-  const res = await timeout(risuai.nativeFetch(url, { method: 'GET' }), name);
-  if (!res.ok) throw new Error(`${name}을 받지 못했어요 (${res.status}).`);
-  return String((await timeout(res.text(), name)) ?? '');
-}
-
-async function getBytes(name: string): Promise<Uint8Array> {
-  const url = `${UPDATE_BASE}/${name}?t=${Date.now()}`;
-  const legacy = (risuai as unknown as { risuFetch?: RisuFetch }).risuFetch;
-  if (legacy) {
-    try {
-      const r = await timeout(legacy(url, { method: 'GET', plainFetchForce: true, rawResponse: true, headers: { 'Content-Type': 'text/plain' } }), name);
-      const b = r?.ok ? toBytes(r.data) : null;
-      if (b?.length) return b;
-    } catch {
-      // 아래에서 다시
-    }
-  }
-  const res = await timeout(risuai.nativeFetch(url, { method: 'GET' }), name);
-  if (!res.ok) throw new Error(`${name}을 받지 못했어요 (${res.status}).`);
-  return new Uint8Array(await timeout(res.arrayBuffer(), name));
-}
 
 /** 저장소의 위키 묶음을 읽어 core/wiki 에 알린다 (본체 시작 때 한 번) */
 export async function loadStoredWikiPack(): Promise<void> {
@@ -83,8 +42,9 @@ async function iconNotes(): Promise<Record<string, IconNote>> {
 
 const charId = (char: Record<string, unknown>) => String(char.chaId ?? char.name ?? '');
 
-/** 지금 캐릭터의 설치 상태 */
-export async function checkInstall(charIndex: number): Promise<{ state: InstallState; iconPrev: string }> {
+/** 지금 캐릭터의 설치 상태. 설치 자료가 아직 없으면 먼저 받는다 (진행 글은 progress 로) */
+export async function checkInstall(charIndex: number, progress?: Progress): Promise<{ state: InstallState; iconPrev: string }> {
+  await ensureInstallData(progress);
   const char = ((await risuai.getCharacterFromIndex(charIndex)) ?? {}) as Record<string, unknown>;
   const notes = await iconNotes();
   const note = notes[charId(char)];
@@ -102,7 +62,7 @@ export async function checkInstall(charIndex: number): Promise<{ state: InstallS
 }
 
 export type InstallStep = 'lore' | 'pictures' | 'icon' | 'wiki';
-export type Progress = (text: string) => void;
+export type { Progress };
 
 /** 로어북·인사말 심기 (없는 것만). 캐릭터를 저장한다 */
 export async function installLoreAndGreetings(charIndex: number, o: { name?: string } = {}): Promise<void> {
@@ -150,15 +110,16 @@ export async function installPictures(charIndex: number, progress: Progress): Pr
 
 /** 아이콘: release/icon.png 를 받아 저장하고 메인 아이콘으로. 설치 전 아이콘은 기록해 둔다 (「이전 아이콘으로」) */
 export async function installIcon(charIndex: number, progress: Progress): Promise<void> {
-  if (!INSTALL_ICON.file) throw new Error('이 판에는 아이콘 정보가 없어요.');
+  const icon = installData().icon;
+  if (!icon.file) throw new Error('이 판에는 아이콘 정보가 없어요.');
   const char = (await risuai.getCharacterFromIndex(charIndex)) as Record<string, unknown> | null;
   if (!char) throw new Error('캐릭터를 찾을 수 없어요.');
   progress('아이콘 받는 중…');
-  const bytes = await getBytes(INSTALL_ICON.file);
-  if (INSTALL_ICON.bytes && bytes.length !== INSTALL_ICON.bytes) throw new Error('아이콘을 끝까지 받지 못했어요.');
+  const bytes = await getBytes(icon.file);
+  if (icon.bytes && bytes.length !== icon.bytes) throw new Error('아이콘을 끝까지 받지 못했어요.');
   // 지문(icon.json digest)도 본다: 길이만 같은 엉뚱한 파일을 메인 아이콘으로 쓰지 않게 (지문을 못 내는 환경이면 길이만)
-  const d = INSTALL_ICON.digest ? await digest(bytes) : null;
-  if (d && d !== INSTALL_ICON.digest) throw new Error('받은 아이콘이 이 판의 아이콘과 달라요.');
+  const d = icon.digest ? await digest(bytes) : null;
+  if (d && d !== icon.digest) throw new Error('받은 아이콘이 이 판의 아이콘과 달라요.');
   const path = await risuai.saveAsset(bytes);
   if (typeof path !== 'string' || !path) throw new Error('아이콘을 저장하지 못했어요.');
   const notes = await iconNotes();

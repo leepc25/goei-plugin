@@ -1,12 +1,13 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { build } from 'esbuild';
+import { buildWithData } from './data-init.mjs';
 import { mkdtemp, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { pathToFileURL } from 'node:url';
 const dir = await mkdtemp(join(tmpdir(), 'goei-visit-'));
-await build({ entryPoints: ['src/core/visit.ts', 'src/core/visitPrompt.ts', 'src/core/interlude.ts', 'src/host/game/visit.ts'], outdir: dir, outbase: 'src', bundle: true, platform: 'node', format: 'esm', outExtension: { '.js': '.mjs' }, define: { __PLUGIN_VERSION__: '"test"', __UPDATE_BASE__: '""' }, logLevel: 'silent' });
+await buildWithData({ entryPoints: ['src/core/visit.ts', 'src/core/visitPrompt.ts', 'src/core/interlude.ts', 'src/host/game/visit.ts'], outdir: dir, outbase: 'src', bundle: true, platform: 'node', format: 'esm', outExtension: { '.js': '.mjs' }, define: { __PLUGIN_VERSION__: '"test"', __UPDATE_BASE__: '""' }, logLevel: 'silent' });
 const { visitRoom, visitRecord, withVisitTurn, VISIT_LORE } = await import(pathToFileURL(join(dir, 'core/visit.mjs')));
 const { createVisit } = await import(pathToFileURL(join(dir, 'host/game/visit.mjs')));
 const { parseVisitLine, parseVisitGroup, clipLine } = await import(pathToFileURL(join(dir, 'core/visitPrompt.mjs')));

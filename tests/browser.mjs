@@ -2,6 +2,7 @@
 // 가짜 risuai API로 시작 화면 → 저장까지 확인한다.
 // 사용법: node tests/browser.mjs <fixture.json> [screenshot-dir]
 import { createRequire } from 'node:module';
+import { distPackFiles, distWorldPack } from './data-init.mjs';
 import { execSync } from 'node:child_process';
 import { readFileSync, readdirSync, mkdirSync, writeFileSync } from 'node:fs';
 import { createHash } from 'node:crypto';
@@ -19,6 +20,8 @@ const manifest = JSON.parse(fixture.globalLore.find((e) => e.comment === 'Plugin
 
 // 본체는 시작기가 pluginStorage에서 꺼낸다. 따로 시험하는 곳(noBody) 말고는 미리 넣어 둔다
 const bodyCode = readFileSync(new URL('../dist/goei-body.js', import.meta.url), 'utf8');
+/** 세계 자료 팩 (개선 나1): 본체처럼 가짜 저장소에 미리 둔다 (저장소에 자료가 있는 보통 경우). 받기 시험은 noBody 쪽에서 */
+const worldPack = distWorldPack();
 function hostScript(char, chat, { rootDom = true, noBody = false } = {}) {
   return `
     window.__calls = { setChat: [], show: [], hide: 0, replacers: [], listeners: [], handlers: {} };
@@ -44,6 +47,7 @@ function hostScript(char, chat, { rootDom = true, noBody = false } = {}) {
     });
     window.__store = {};
     if (!${noBody}) window.__store['p:goei:body'] = ${JSON.stringify(bodyCode)};
+    if (!${noBody}) window.__store['p:goei:data-world'] = ${JSON.stringify(worldPack)};
     window.__rootDoc = ${rootDom} ? { ...wrap(document.documentElement), querySelector: async (q) => wrap(document.querySelector(q)), querySelectorAll: async (q) => [...document.querySelectorAll(q)].map(wrap), createElement: async (t) => wrap(document.createElement(t)) } : null;
     window.__char = ${JSON.stringify(char)};
     window.__liteChar = window.__char;
@@ -2310,8 +2314,10 @@ if (fixture.globalLore.some(packed)) {
     await page.screenshot({ path: `${shots}/loader-panel-m.png` });
     await page.setViewportSize({ width: 1100, height: 900 });
   }
+  // 본체 조각 + 세계 자료 팩(개선 나1): 시작기는 본체만 받고, 본체가 뜨면서 세계 자료를 스스로 받아 저장한다
   const files = Object.fromEntries(['goei-body.json', ...JSON.parse(readFileSync(new URL('../dist/goei-body.json', import.meta.url), 'utf8')).parts]
     .map((n) => [n, readFileSync(new URL(`../dist/${n}`, import.meta.url), 'utf8')]));
+  Object.assign(files, distPackFiles('goei-data-world'));
   await frame.evaluate((files) => {
     window.__fetch = (u) => { const name = u.split('?')[0].split('/').pop(); return files[name] ?? null; };
   }, files);
@@ -2319,6 +2325,8 @@ if (fixture.globalLore.some(packed)) {
   await frame.waitForFunction(() => document.querySelector('[x-goei-fab]')?.style.display === 'block', null, { timeout: 8000 });
   assert.equal(await frame.locator('.gl-card').count(), 0, '받으면 창이 닫힘');
   assert.match(await frame.evaluate(() => window.__store['p:goei:body'].slice(0, 40)), /^\/\/ goei-body /);
+  assert.equal(await frame.evaluate(() => window.__store['p:goei:data-world']?.length ?? 0), worldPack.length, '본체가 세계 자료 팩을 받아 저장');
+  assert.ok((await frame.evaluate(() => window.__calls.fetch.map((u) => u.split('?')[0].split('/').pop()))).includes('goei-data-world.json'), '세계 자료 목록을 받음');
   await frame.click('[x-goei-fab] button');
   await frame.waitForSelector('.gx-fac');
   // 시작 카드 표시도 본체가 맡는다
