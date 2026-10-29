@@ -51,9 +51,21 @@ export function hqPosts(graph: PlaceGraph): Post[] {
     { id: 'night', archetype: '경비', scene: 'lobby', how: 'fixed', spot: desk, shifts: [[18, 9]], count: 1, gate },
     { id: 'guard', archetype: '경비', scene: 'lobby', how: 'patrol', span: [gate + 120, Math.min(lobby.length - 120, gate + 900)], shifts: [[0, 24]], count: 1, gate },
     { id: 'cleaner', archetype: '청소부', scene: 'lobby', how: 'roam', route: ['lobby', 'f2', 'f3', 'b1', 'lobby'], stay: 40, shifts: [[6, 9], [20, 23]], count: 1, gate },
+    // 의무실·연구실(B2): 의사·간호사 주간 근무 (문은 방 아래 출입이라 gate = 출입 x)
+    ...clinicPosts(graph),
     // 필드 가게 주인 (src/game/world/fieldShop.ts SHOPS: 편의점 24시간, 시장 노점 06~19시). 가게 자리 x는 hq/map.ts spots와 같게
     ...(graph.scene('jongno') ? [{ id: 'cvs-clerk', archetype: '편의점 점원', scene: 'jongno', how: 'fixed', spot: 1300, shifts: [[0, 24]], count: 1, gate: 2200 } as Post] : []),
     ...(graph.scene('yeongdeungpo') ? [{ id: 'market-seller', archetype: '상인', scene: 'yeongdeungpo', how: 'fixed', spot: 1500, shifts: [[6, 19]], count: 1, gate: 200 } as Post] : []),
+  ];
+}
+
+function clinicPosts(graph: PlaceGraph): Post[] {
+  const c = graph.scene('clinic');
+  if (!c) return [];
+  const gate = c.doors.find((d) => d.id === 'out')?.x ?? 100;
+  return [
+    { id: 'doctor', archetype: '의사', scene: 'clinic', how: 'fixed', spot: Math.round(c.length * 0.7), shifts: [[9, 18]], count: 1, gate },
+    { id: 'nurse', archetype: '간호사', scene: 'clinic', how: 'patrol', span: [Math.round(c.length * 0.15), Math.round(c.length * 0.6)], shifts: [[9, 18]], count: 1, gate },
   ];
 }
 

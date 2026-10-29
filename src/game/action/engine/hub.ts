@@ -11,7 +11,7 @@ import { SCREEN_H, SCREEN_W } from './contract';
 import { HQ_PLACE, drawFloor, drawHqWall, drawPropArt, drawHqTextureWall } from '../art/bg';
 import { drawHqDoorRound2 } from '../art/hqDoorRound2';
 import { drawCallLit, drawHqField, drawHqFieldLight, drawHqFieldObject, drawHqSigns, hasHqField } from '../art/hqField';
-import { charTop, drawCharClip, charArt } from '../art/charPacks';
+import { charTop, drawCharClip, charArt, charFx, CHAR_K } from '../art/charPacks';
 import { persp, view as fieldView } from './view';
 import { blockByProps, clearSpot, type BlockProp } from './propBlock';
 import { PAINTED, clampPainted, doorReachY } from '../hq/painted';
@@ -62,6 +62,8 @@ export interface HubLife {
   lifeTime?(): number;
   /** 주인공 공격 판정 → 맞은 행위자 수 */
   hit?(sceneId: string, boxes: { x0: number; x1: number; y: number; dy?: number; z0: number; z1: number; attackId: number }[], dir: 1 | -1): number;
+  /** 매 틱: 주인공을 막아선 행위자를 전투 AI 몸으로 세우고(ai-char), 쓰러진 몸을 행위자로 되돌린다 */
+  combat?(api: StageApi, sceneId: string): void;
 }
 /** 행위자 깊이 층 자리 수 (한 화면 상한보다 넉넉히) */
 const LIFE_SLOTS = 24;
@@ -106,6 +108,8 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
   let callOn = false;
   let near: string | null = null;
   let solids: (BlockProp & { h?: number })[] = [];
+  /** 주인공이 앉아 있는 방 의자 (코어가 인물 팩 의자를 그리는 동안 방 의자 그림은 숨긴다) */
+  let sitChair: HqBox | null = null;
   /** 이 장면에서 걸은 거리 (px). 필드 시계가 쓴다 */
   let walked = 0;
   let lastX: number | null = null;
@@ -160,6 +164,7 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
       platforms: sc.painted ? sc.boxes.filter((b) => b.solid && b.h > 0 && b.h < 400).map((b) => ({ x0: b.x - b.w / 2, x1: b.x + b.w / 2, y0: b.y - b.d, y1: b.y, h: b.h })) : undefined,
       depthLayers: sc.boxes.map((b) => ({ y: b.y, occludedSilhouette: !sc.painted, x0: b.x - b.w / 2, x1: b.x + b.w / 2, draw: (c: CanvasRenderingContext2D) => {
         if (sc.painted && hasHqField(sc.painted)) { drawHqFieldObject(c, sc.painted, b.kind); return; }
+        if (b === sitChair) return;
         drawBox(c, b, sc.look);
       } })).concat(people.map((p) => ({ y: p.y, x0: p.x - 60, x1: p.x + 60, occludedSilhouette: false, draw: (c: CanvasRenderingContext2D) => { drawCharClip(c, p.name, p.x, p.y, p.face, performance.now()); } })))
         // 움직이는 행위자: 자리 수만큼 층을 두고 매 프레임 지금 목록의 i번째를 읽는다 (깊이 정렬은 y 게터로)
@@ -301,6 +306,7 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
       return build(s.scene, s.x, s.y);
     },
     tick(a: StageApi) {
+      if (sitChair && !(a.world.player as Player).seat && !(a.world.player as { sitting?: boolean }).sitting) sitChair = null;
       if (host.life && scene) {
         host.life.tick(1 / 30, { scene: scene.id, x: a.world.player.x, y: a.world.player.y });
         // 주인공 공격이 행위자에게 닿았나 (필드 행위자는 전투 몸이 아니라 따로 본다)
@@ -309,6 +315,7 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
           const n = host.life.hit(scene.id, boxes, a.world.player.dir);
           if (n) a.world.emit({ type: 'hit', strength: 1, x: boxes[0].x0, y: boxes[0].y, z: 120, dmg: 0, react: 'flinch', target: 'npc', combo: 0 });
         }
+        host.life.combat?.(a, scene.id);
         live = host.life.actors(scene.id);
         // 이름 인물 대화 자리(visit:이름)를 지금 서 있는 곳으로 옮긴다 (E → npcLink 대화)
         const named = live.filter((q) => q.kind === 'named');
@@ -383,7 +390,7 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
         if (s.say) return a.world.say(s.say, 3);
         if (s.seat && s.act?.[0]) {
           const exit = clearSpot(s.x, s.y ?? a.world.player.y, solids, scene.lane ?? LANE);
-          (a.world.player as Player).sit(s.act[0], s.seat.x, s.seat.y, s.face ?? 1, exit);
+          if ((a.world.player as Player).sit(s.act[0], s.seat.x, s.seat.y, s.face ?? 1, exit) && s.chair !== undefined) sitChair = scene.boxes[s.chair] ?? null;
           host.sat?.();
           return;
         }
@@ -836,7 +843,20 @@ function drawBox(c: CanvasRenderingContext2D, b: HqBox, look: string) {
 }
 
 /** 옆에서 본 의자: 앉은 사람이 보는 쪽 반대편에 등받이 */
+/** 의자: 인물 팩 공용 의자 그림(action-fx chair-<방향>, 테스트룸 C01·원점 (100,171))이 있으면 그걸로, 없으면 옛 코드 의자 */
 function drawChair(c: CanvasRenderingContext2D, b: HqBox) {
+  const CH = charFx()?.CHAIR;
+  const im = CH?.[b.face === 'N' ? 'north' : b.face === 'W' ? 'west' : 'east'];
+  if (im?.complete && im.naturalWidth) {
+    const k = persp(b.y) * CHAR_K;
+    c.save();
+    c.translate(Math.round(b.x), Math.round(b.y));
+    c.scale(k, k);
+    c.imageSmoothingEnabled = false;
+    c.drawImage(im, -100, -171);
+    c.restore();
+    return;
+  }
   const seatY = b.y - 82;
   const col = b.kind === 'armchair' ? '#8a5b4a' : '#2d3640';
   c.fillStyle = col;

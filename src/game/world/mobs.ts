@@ -41,26 +41,38 @@ export const DROPS = new Set(['불량배', '취객']);
 
 const BASE: Record<keyof Temperament, [number, number]> = { courage: [0.1, 0.8], social: [0.1, 0.8], haste: [0.1, 0.7], curious: [0.1, 0.8], sly: [0, 0.05] };
 
+// 몹 71명 그림(인물 팩 roster.json, npc:true)을 원형마다 나눠 쓴다 (2026-10-29 NPC 배치). 가짜관리국·백일몽·협회·프리랜서 그림은 자리(장소·원형)가 정해지면 넣는다
+const 시민 = ['시민남1', '시민남2', '시민남3', '시민남4', '시민남5', '시민남6', '시민남7', '시민남8', '시민남9', '시민여1', '시민여2', '시민여3', '시민여4', '시민여5', '시민여6', '시민여7', '시민여8', '시민여9'];
+const 학생 = ['학생남1', '학생남2', '학생여1', '학생여2'];
+const 불량배 = ['불량배남1', '불량배남2', '불량배남3', '불량배여1', '불량배여2', '불량배여3'];
+const 관리국 = ['관리국남A', '관리국남B', '관리국여A', '관리국여B'];
+const 경찰 = ['경찰남1', '경찰남2', '경찰여1', '경찰여2'];
+const 상인 = ['상인남1', '상인남2', '상인남3', '상인남4', '상인여1', '상인여2', '상인여3'];
+const 청소부 = ['청소부남1', '청소부여1'];
 export const ARCHETYPES: Record<string, Archetype> = {
-  행인: { name: '행인', role: 'civilian', range: {} },
-  회사원: { name: '회사원', role: 'civilian', range: { haste: [0.3, 0.9] }, drinks: true },
-  관광객: { name: '관광객', role: 'civilian', range: { curious: [0.5, 1], courage: [0.1, 0.5] } },
-  학생: { name: '학생', role: 'student', range: { courage: [0, 0.6], curious: [0.4, 1] } },
-  배달원: { name: '배달원', role: 'worker', range: { haste: [0.6, 1] } },
-  불량배: { name: '불량배', role: 'thug', range: { courage: [0.5, 1], haste: [0.5, 1], sly: [0.05, 0.5] }, drinks: true },
-  방문객: { name: '방문객', role: 'civilian', range: { courage: [0.1, 0.5] } },
-  '행정 직원': { name: '행정 직원', role: 'staff', range: { courage: [0.1, 0.5], social: [0.3, 0.9] } },
-  '안내 직원': { name: '안내 직원', role: 'staff', range: { social: [0.5, 1] } },
-  청소부: { name: '청소부', role: 'worker', range: { courage: [0.2, 0.6] } },
-  경비: { name: '경비', role: 'guard', range: { courage: [0.6, 1], curious: [0.4, 0.9] } },
-  경찰: { name: '경찰', role: 'police', range: { courage: [0.6, 1], haste: [0.3, 0.7] } },
-  '편의점 점원': { name: '편의점 점원', role: 'staff', range: {} },
+  행인: { name: '행인', role: 'civilian', range: {}, looks: 시민 },
+  회사원: { name: '회사원', role: 'civilian', range: { haste: [0.3, 0.9] }, drinks: true, looks: 시민 },
+  관광객: { name: '관광객', role: 'civilian', range: { curious: [0.5, 1], courage: [0.1, 0.5] }, looks: 시민 },
+  학생: { name: '학생', role: 'student', range: { courage: [0, 0.6], curious: [0.4, 1] }, looks: 학생 },
+  배달원: { name: '배달원', role: 'worker', range: { haste: [0.6, 1] }, looks: 시민 },
+  불량배: { name: '불량배', role: 'thug', range: { courage: [0.5, 1], haste: [0.5, 1], sly: [0.05, 0.5] }, drinks: true, looks: 불량배 },
+  방문객: { name: '방문객', role: 'civilian', range: { courage: [0.1, 0.5] }, looks: 시민 },
+  '행정 직원': { name: '행정 직원', role: 'staff', range: { courage: [0.1, 0.5], social: [0.3, 0.9] }, looks: 관리국 },
+  '안내 직원': { name: '안내 직원', role: 'staff', range: { social: [0.5, 1] }, looks: 관리국 },
+  청소부: { name: '청소부', role: 'worker', range: { courage: [0.2, 0.6] }, looks: 청소부 },
+  // 경비 그림은 따로 없어 관리국 직원 그림으로
+  경비: { name: '경비', role: 'guard', range: { courage: [0.6, 1], curious: [0.4, 0.9] }, looks: 관리국 },
+  경찰: { name: '경찰', role: 'police', range: { courage: [0.6, 1], haste: [0.3, 0.7] }, looks: 경찰 },
+  '편의점 점원': { name: '편의점 점원', role: 'staff', range: {}, looks: 상인 },
+  // 의무실 근무형 (본부 B2 의무실·연구실)
+  의사: { name: '의사', role: 'staff', range: { courage: [0.2, 0.6], social: [0.3, 0.8] }, looks: ['의사1'] },
+  간호사: { name: '간호사', role: 'staff', range: { social: [0.5, 1] }, looks: ['간호사1'] },
   // 장소 종류별 인구(6-4장)에 쓰는 원형
-  상인: { name: '상인', role: 'worker', range: { social: [0.4, 1], courage: [0.3, 0.8] } },
-  취객: { name: '취객', role: 'civilian', range: { haste: [0.4, 1], courage: [0.4, 1], curious: [0.3, 0.9] }, drinks: true },
-  주민: { name: '주민', role: 'civilian', range: { haste: [0, 0.5] } },
-  산책객: { name: '산책객', role: 'civilian', range: { haste: [0, 0.4], social: [0.3, 0.9] } },
-  승객: { name: '승객', role: 'civilian', range: { haste: [0.4, 1], curious: [0, 0.4] } },
+  상인: { name: '상인', role: 'worker', range: { social: [0.4, 1], courage: [0.3, 0.8] }, looks: 상인 },
+  취객: { name: '취객', role: 'civilian', range: { haste: [0.4, 1], courage: [0.4, 1], curious: [0.3, 0.9] }, drinks: true, looks: 시민 },
+  주민: { name: '주민', role: 'civilian', range: { haste: [0, 0.5] }, looks: 시민 },
+  산책객: { name: '산책객', role: 'civilian', range: { haste: [0, 0.4], social: [0.3, 0.9] }, looks: 시민 },
+  승객: { name: '승객', role: 'civilian', range: { haste: [0.4, 1], curious: [0, 0.4] }, looks: 시민 },
 };
 
 export function rollTemper(r: Rng, a: Archetype | undefined): Temperament {

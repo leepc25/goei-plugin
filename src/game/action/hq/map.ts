@@ -3,7 +3,7 @@
 // 방 안 배치는 hq/rooms.ts(위에서 본 m 좌표)에서 화면 px로 바꾼다. 집기는 막는 상자다.
 // 출입: 복도 북쪽 벽 문(N)으로 들어간 방은 방 아래(S)로 들어오고 나간다. 복도 아래 문(S)으로 들어간 방은 방 북쪽 벽 문으로.
 import type { PlaceId } from './data';
-import { ROOMS, mirror, type Room, type RoomFix } from './rooms';
+import { ROOMS, mirror, type Room, type RoomFix, type RoomItem } from './rooms';
 import { PAINTED, PAINTED_LANE, doorX } from './painted';
 
 export type SceneId =
@@ -53,6 +53,8 @@ export interface HqSpot {
   say?: string;
   /** 필드 가게 (src/game/world/fieldShop.ts SHOPS id): E로 거래 창 */
   shop?: string;
+  /** 의자 자리: 그 장면 boxes의 의자 번호 (앉아 있는 동안 방 의자 그림은 숨기고 인물 팩 의자를 그린다) */
+  chair?: number;
 }
 /** 바닥 위 상자 (집기). x = 가운데, y = 앞 모서리(바닥에 닿는 선), d = 뒤로 깊이, h = 높이. 모두 화면 px */
 export interface HqBox {
@@ -102,21 +104,24 @@ export const LANE_TOP = 420;
 export const LANE_BOT = 669;
 const HEIGHT: Record<string, number> = { desk: 106, big: 121, wall: 283, glass: 190 };
 
+/** 회색 방(그림 없는 방)은 의자만 둔다 (사용자 2026-10-29: 「가구 같은 거 넣지 말고 회색 룸에 의자들만 놔둬. 이미지 뽑고 나면 교체」).
+ * rooms.ts 의 책상·침대·벽 집기·벽 붙박이는 그림이 올 때까지 그리지도 막지도 않는다. 의자마다 앉기 자리 하나(E → 인물 팩 앉기, 코어 sitAt) */
 function fromRoom(r: Room) {
   const yOf = (m: number) => LANE_TOP + (m / r.d) * (LANE_BOT - LANE_TOP);
-  const boxes: HqBox[] = r.items.map((it) => {
-    if (it.t === 'chair') {
-      const y = yOf(it.y);
-      return { kind: it.soft ? 'armchair' : 'chair', x: it.x * PX_M, w: it.soft ? 70 : 54, y: y + 10, d: 20, h: it.soft ? 120 : 150, solid: false, face: it.f };
-    }
-    const y = yOf(it.y + it.h);
-    return { kind: it.k ?? it.t, x: (it.x + it.w / 2) * PX_M, w: Math.max(14, it.w * PX_M), y, d: Math.max(8, y - yOf(it.y)), h: it.H ?? HEIGHT[it.t], solid: true };
+  const chairs = r.items.filter((it): it is Extract<RoomItem, { t: 'chair' }> => it.t === 'chair');
+  const boxes: HqBox[] = chairs.map((it) => {
+    const y = yOf(it.y);
+    return { kind: it.soft ? 'armchair' : 'chair', x: it.x * PX_M, w: it.soft ? 70 : 54, y: y + 10, d: 20, h: it.soft ? 120 : 150, solid: false, face: it.f };
   });
+  // 의자 자리: 앉은 사람이 보는 쪽(E/W = 옆 앉기, N = 후면 앉기). 발 자리 = 의자 바닥 선
+  const spots: HqSpot[] = boxes.map((b, i): HqSpot => ({
+    id: `chair${i}`, x: b.x, y: b.y, verb: '앉기', face: b.face === 'W' ? -1 : 1, seat: { x: b.x, y: b.y }, act: [b.face === 'N' ? 'sit_back' : 'sit_side'], chair: i,
+  }));
   return {
     length: Math.max(1280, r.w * PX_M),
     boxes,
-    fixtures: r.fix.map((f) => ({ x: (f.x + f.w / 2) * PX_M, w: f.w * PX_M, kind: f.k })),
-    spots: r.use.map((u): HqSpot => ({ ...u, x: u.x * PX_M, y: yOf(u.y) })),
+    fixtures: [],
+    spots,
   };
 }
 

@@ -75,6 +75,8 @@ export interface Actor {
   pocket?: number;
   /** 그중 훔친 돈 */
   stolen?: number;
+  /** 전투 AI 몸(ai-char)으로 싸우는 중: 시뮬이 움직이지도 그리지도 않는다 (engine/modules.ts life.combat) */
+  fighting?: boolean;
 }
 
 /** 엔진 공격 판정 상자 (contract Hit의 모양만) */
@@ -179,7 +181,38 @@ export class WorldSim {
     if (i >= 0) this.actors.splice(i, 1);
   }
   inScene(scene: string): Actor[] {
-    return this.actors.filter((a) => a.scene === scene && a.act !== 'door' && a.act !== 'gone');
+    return this.actors.filter((a) => a.scene === scene && a.act !== 'door' && a.act !== 'gone' && !a.fighting);
+  }
+  /** 전투 AI로 넘길 행위자: 주인공을 막아선 몹(적대 세력·경찰·시비 뒤 맞섬) */
+  challengers(scene: string): Actor[] {
+    return this.inScene(scene).filter((a) => a.def.kind === 'mob' && ((a.plan === 'chase' && !a.target && a.act === 'watch') || (a.act === 'argue' && a.doing === '맞섬')));
+  }
+  /** 전투 AI 몸으로 넘김 (돌아올 때까지 시뮬에서 뺌) */
+  toFight(id: string): Actor | null {
+    const a = this.actors.find((q) => q.def.id === id);
+    if (!a || a.fighting) return null;
+    a.fighting = true;
+    a.goal = null;
+    a.route = [];
+    return a;
+  }
+  /** 전투에서 돌아옴. down = 쓰러뜨림(기절 → 깨면 떠남), 아니면 싸움이 끊긴 것(주인공이 장면을 떠남 등) */
+  fromFight(id: string, x: number, y: number, down: boolean): void {
+    const a = this.actors.find((q) => q.def.id === id);
+    if (!a || !a.fighting) return;
+    a.fighting = false;
+    a.x = x;
+    a.y = y;
+    a.plan = 'none';
+    if (down) {
+      a.hp = 0;
+      this.struck(a, a.face);
+      this.crime(a.scene, a.x, 15);
+      return;
+    }
+    a.act = 'idle';
+    a.wait = 0.5;
+    this.setClip(a, 'idle');
   }
   /** 소란 (플레이어가 몹을 때림·물건 부숨 등). amount 0~100 */
   disturb(scene: string, amount: number, x: number): void {
@@ -301,7 +334,7 @@ export class WorldSim {
       u.v = Math.max(0, u.v - (player?.scene === s ? 1.5 : 5) * dt);
       if (u.v <= 0) this.uproar.delete(s);
     }
-    for (const a of [...this.actors]) this.stepActor(a, dt);
+    for (const a of [...this.actors]) if (!a.fighting) this.stepActor(a, dt);
     for (let i = this.actors.length - 1; i >= 0; i--) if (this.actors[i].act === 'gone') this.actors.splice(i, 1);
     for (const r of this.spawns) this.stepSpawn(r, dt);
     for (const p of this.posts) this.stepPost(p);

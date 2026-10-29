@@ -225,6 +225,8 @@ export class Room3Player extends Player {
 
   /** 본부 의자 자리(hub.ts seat): 엔진 앉기 클립 대신 테스트룸 앉기(코어 sitAt, 의자 그림·맞춤 chairs/<키>.json 그대로). 조사 키로 일어나 exit 자리로 */
   private coreSeat: { exit: { x: number; y: number } } | null = null;
+  /** 코어 의자에 앉아 있나 (hub.ts: 방 의자 그림 숨김) */
+  get sitting(): boolean { return !!this.coreSeat; }
   sit(clip: string, x: number, y: number, face: 1 | -1, exit: { x: number; y: number }): boolean {
     const P = this.core.P as unknown as { x: number; y: number; z: number; vx: number; face: 1 | -1; mode: string; seat: unknown };
     const can = ['60', '96', '61'].some((id) => this.core.has(id));

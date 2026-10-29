@@ -241,7 +241,7 @@ function hqAdapter(bridge: Partial<GameBridge> | undefined, ui: { chooseFloor: H
   const life: HubLife = {
     tick: (dt, at) => {
       lastAt = { x: at.x, y: (at as { y?: number }).y ?? 0 };
-      if (lifeScene && lifeScene !== at.scene) { flushMobs(lifeScene); foughtHere = false; }
+      if (lifeScene && lifeScene !== at.scene) { flushMobs(lifeScene); foughtHere = false; endFights(false); }
       lifeScene = at.scene;
       const w = world();
       if (!w) return;
@@ -255,9 +255,48 @@ function hqAdapter(bridge: Partial<GameBridge> | undefined, ui: { chooseFloor: H
     hit: (sceneId, boxes, dir) => world()?.hitBoxes(sceneId, boxes, dir).length ?? 0,
     actors: (sceneId) => (world()?.inScene(sceneId) ?? []).map((a) => ({ id: a.def.id, name: a.def.name, kind: a.def.kind, x: a.x, y: a.y, face: a.face, look: a.def.look, moving: a.act === 'walk', clip: a.clip, since: a.clipAt, icon: a.icon, say: a.say })),
     observer: (sceneId) => (observing && sim ? observerLines(sim, clockView(), sceneId, seed) : null),
-    // 몹: 인물 팩(look = NPC 원형 이름, 받아 둔 것) → 실루엣
-    drawMob: (c, a) => { if (!(a.look && drawCharClip(c, a.look, a.x, a.y, a.face, performance.now(), a.clip, (a.since ?? 0) * 1000))) silhouette(c, a); },
+    // 몹: 인물 팩(look = 몹 그림 이름, src/game/world/mobs.ts looks) → 받는 동안·없으면 실루엣. 처음 보이는 그림은 그때 받는다
+    drawMob: (c, a) => {
+      if (a.look && !charArt(a.look)) void loadChar(a.look);
+      if (!(a.look && drawCharClip(c, a.look, a.x, a.y, a.face, performance.now(), a.clip, (a.since ?? 0) * 1000))) silhouette(c, a);
+    },
+    combat: (api, sceneId) => combatStep(api, sceneId),
   };
+  // ── 필드 전투 AI (2026-10-29 AI 세팅): 주인공을 막아선 몹(적대 세력·경찰 출동·시비 뒤 맞섬)은 그 그림의 인물 팩으로 전투 AI 몸(ai-char:<그림>)을 세워 싸운다.
+  // 몸이 쓰러지면 1.5초 뒤 행위자로 되돌려 기절(깨면 떠남)·장부 기록. 주인공이 장면을 떠나면 싸움은 끊기고 행위자는 그 자리에 선다
+  const fights = new Map<string, { body: Body & { hp: number; hpMax: number; alive: boolean; label: string }; t: number; scene: string }>();
+  const endFights = (down: boolean) => {
+    const w = sim;
+    for (const [id, f] of fights) { f.body.alive = false; w?.fromFight(id, f.body.x, f.body.y, down); }
+    fights.clear();
+  };
+  function combatStep(api: { spawn(s: { kind: string; x: number; y: number }): void; world: { bodies: readonly Body[] } }, sceneId: string) {
+    const w = sim;
+    if (!w) return;
+    // 엔진 spawn은 몸을 돌려주지 않는다 → 생긴 뒤 목록 끝의 몸
+    const spawn = (spec: { kind: string; x: number; y: number }): Body | undefined => { const n = api.world.bodies.length; api.spawn(spec); return api.world.bodies.length > n ? api.world.bodies[api.world.bodies.length - 1] : undefined; };
+    for (const [id, f] of fights) {
+      if (f.scene !== sceneId || !f.body.alive || !api.world.bodies.includes(f.body)) { f.body.alive = false; w.fromFight(id, f.body.x, f.body.y, false); fights.delete(id); continue; }
+      if (f.body.hp > 0) continue;
+      if ((f.t += 1 / 30) < 1.5) continue;
+      f.body.alive = false;
+      w.fromFight(id, f.body.x, f.body.y, true);
+      fights.delete(id);
+    }
+    for (const a of w.challengers(sceneId)) {
+      const look = a.def.look ?? a.def.name;
+      if (!charArt(look)) { void loadChar(look); continue; }
+      const b = spawn({ kind: `ai-char:${look}`, x: a.x, y: a.y });
+      if (!b) continue;
+      if (!(b instanceof AiRoom3)) { b.alive = false; continue; }
+      if (!w.toFight(a.def.id)) { b.alive = false; continue; }
+      // 몸 = 몹 등급 체력 (docs/게임_성장_경제_설계.md 2-3). 이름표는 원형 이름
+      b.hp = b.hpMax = Math.max(1, a.hpMax ?? b.hpMax);
+      b.label = a.def.name;
+      (b as unknown as { dir: 1 | -1 }).dir = a.face;
+      fights.set(a.def.id, { body: b as typeof b & { hp: number; hpMax: number; alive: boolean; label: string }, t: 0, scene: sceneId });
+    }
+  }
   const visitors = (sceneId: string) => {
     const here = present.filter((p) => ROOM_SCENE[p.room] === sceneId && !!charArt(p.name));
     const sc = map.scenes.find((s) => s.id === sceneId);
