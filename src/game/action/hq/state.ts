@@ -1,7 +1,7 @@
 // 본부 저장 데이터 모양 (본부 스레드 소유). 저장소(pluginStorage 슬롯)는 리스 탑재 스레드의 bridge.saves가 들고,
 // 본문은 이 모양의 JSON 문자열이다. 모양이 바뀌면 HQ_SCHEMA 숫자를 올리고 migrate()에 옮기는 줄을 더한다.
 import type { AgentId, BagSlot, RunResult, Slot } from './contract';
-import { OLD_ITEM_IDS, type PlaceId } from './data';
+import { OLD_ITEM_IDS } from './data';
 
 export const HQ_SCHEMA = 'goei-hq/1';
 

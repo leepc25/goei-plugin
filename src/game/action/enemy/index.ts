@@ -14,7 +14,7 @@ import { Enemy, type Affix } from './enemy';
 import { GUARDIANS, GUARDIAN_BRAINS } from './guardians';
 import { setSpawner } from './registry';
 import { scaleAll } from './scale';
-import { ROSTER, ROSTER_BY_KIND, type EnemyDef } from './roster';
+import { ROSTER, type EnemyDef } from './roster';
 import type { Body, Hit, HitResult, RuleSignal, WorldView } from './types';
 
 export { Enemy } from './enemy';

@@ -25,7 +25,6 @@ import { bindEnemyInteractions } from './enemyInteractions';
 import { createElevatorStage } from '../stage';
 import { drawMiniMap, drawRunMap } from '../stage/runmap';
 import { CUTSCENES, VIDEOS, hqLines, mountStory, stageHooks, type AgentId, type StoryApi } from '../story';
-import type { SpeakerId } from '../story/types';
 import { itemsBlocking, linkItems, mountItemsOverlay } from './itemsLink';
 import { makeHub, silhouette, type HubHost, type HubLife } from './hub';
 import { createHqWorld, hqDistrict } from '../../world/hq';
@@ -106,7 +105,6 @@ function hqAdapter(saves: SaveSlots, bridge: Partial<GameBridge> | undefined, ui
   fieldWallet.won = null;
   observing = false;
   // 본부 걷기는 엔진 벨트 장면(engine/hub.ts): 건물 지도는 본부 모듈 map(), 엔진은 장면 옮기기·그리기. 메뉴 창(DOM)만 본부 모듈이 띄운다
-  let root: HTMLElement | null = null;
   // 본부 방문: 상태 태그로 정한 방(사무실·휴게실·의무실)에 요원을 세운다. 들어가기 전에 한 번 읽는다
   let present: { name: string; room: string }[] = [];
   // 필드 시계 규칙 (설정 → 필드 시간, 채팅별). 바꾸면 다음 행동부터
@@ -327,7 +325,6 @@ function hqAdapter(saves: SaveSlots, bridge: Partial<GameBridge> | undefined, ui
       eileenHooks.extraTargets = undefined;
     },
     mount(r, host) {
-      root = r;
       hq.mount(r, {
         deploy: (l) => !bridge?.visit && host.deploy({ ...l, hpMax: l.stats?.hp, launch: l } as Launch),
         load: () => saves.read(slot as never),
@@ -498,7 +495,6 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
   ffx.sfx = (n) => audio.event({ type: n === 'super' ? 'super' : 'hit', kind: n === 'slam' ? 'super' : undefined, strength: 3 } as never);
   const cutins = new Map<string, HTMLImageElement>();
   if (bridge?.visit && bridge.assets) void loadFieldFx(bridge.assets, ffx, cutins);
-  const inField = () => !!game?.inHub && !!bridge?.visit && !mods.blocking?.() && !shell.paused;
   const stageStore = {
     load: () => {
       if (session.meta) return session.meta as never;

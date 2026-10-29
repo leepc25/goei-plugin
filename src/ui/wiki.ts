@@ -2,7 +2,7 @@
 // 생성은 창을 닫아도 계속되고, 끝나면 원래 채팅의 로어북에 저장한다.
 import { onOffSwitch } from './controls';
 import { factionNames, parseCatalog } from '../core/world/catalog';
-import { buildRegistry, searchRegistry, type Registry } from '../core/world/registry';
+import { buildRegistry, type Registry } from '../core/world/registry';
 import { hasBook, type RefSource } from '../core/refs';
 import {
   type WikiDoc, acceptArticle, baseDocs, canonicalTitle, deleteDoc, findDoc, listDocs, renderArticle, saveDoc, validTitle, wikiPrompt, wikiSettings, WikiError,
@@ -14,7 +14,6 @@ import { fitPrompt } from '../core/budget';
 import { advancedBox } from './advanced';
 import { personaText } from '../host/user';
 import { playerSource } from '../core/player';
-import { saveVarDefaults } from '../host/prefs';
 import { GHOST_ICON, ICONS } from './icons';
 import { defaultsAction, defaultsButtons, defaultsConfirm } from './defaults';
 import { toast } from './toast';

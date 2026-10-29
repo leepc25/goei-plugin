@@ -5,7 +5,7 @@
 //   audio.duck(1.5);                                 // 필살기 컷인
 // AudioContext는 처음 소리를 낼 때 만든다. 다른 봇에서는 아무것도 하지 않는다.
 import { type AudioSettings, type Bus, type Out, BUSES, DEFAULT_SETTINGS, buildGraph, cleanSettings, sliderGain, AudioScope, busOut, oneShot } from './engine';
-import { SFX, SFX_IDS, SURFACE_SFX, type SfxId, type Surface } from './sfx';
+import { SFX, SURFACE_SFX, type SfxId, type Surface } from './sfx';
 import { Player, compileSong, type Compiled } from './music';
 import { SONGS, type SongId } from './songs';
 import { startAmbience, type Scene } from './ambience';

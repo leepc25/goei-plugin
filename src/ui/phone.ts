@@ -3,7 +3,6 @@
 // 생성은 창을 닫아도 계속되고 끝나면 원래 채팅에 저장한다.
 import { onOffSwitch } from './controls';
 import { composeBody, describe, previewText, type UserKind } from '../core/attach';
-import { keepOpen } from './panels';
 import { attachAction, attachBody, attachEditor, attachInput, emptyAttachment, type Attachments } from './attach';
 import {
   applyEvents, bulletinUnread, callRecord, commitAnnouncements, commitInvitations, contactDetails, cooldownMark, directory, LIMITS, listedRooms,
@@ -30,7 +29,6 @@ import { advancedBox } from './advanced';
 import { fitPrompt } from '../core/budget';
 import { personaText } from '../host/user';
 import { playerSource } from '../core/player';
-import { saveVarDefaults } from '../host/prefs';
 import { updateChat, type ChatContext } from '../host/risu';
 
 type Sub = 'contacts' | 'chats' | 'notices';

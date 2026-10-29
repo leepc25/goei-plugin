@@ -10,7 +10,6 @@ const block = (x0: number, x1: number, h = 44): Terrain => ({ kind: 'block', x0,
 const low = (x0: number, x1: number): Terrain => ({ kind: 'low', x0, x1 });
 const narrow = (x0: number, x1: number, lane0: number, lane1: number): Terrain => ({ kind: 'narrow', x0, x1, lane0, lane1 });
 const glass = (x0: number, x1: number): Terrain => ({ kind: 'glass', x0, x1 });
-const red = (x0: number, x1: number, lane0: number, lane1: number): Terrain => ({ kind: 'redfloor', x0, x1, lane0, lane1 });
 
 const T = (id: string, set: ChunkTemplate['set'], label: string, terrain: Terrain[], slots: Slot[], extra: Partial<ChunkTemplate> = {}): ChunkTemplate => ({ id, set, label, terrain, slots, ...extra });
 

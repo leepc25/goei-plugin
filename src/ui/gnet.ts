@@ -24,7 +24,6 @@ import { fitPrompt } from '../core/budget';
 import { advancedBox } from './advanced';
 import { personaText } from '../host/user';
 import { playerSource } from '../core/player';
-import { saveVarDefaults } from '../host/prefs';
 import { defaultsAction, defaultsButtons, defaultsConfirm } from './defaults';
 import { updateChat, type ChatContext } from '../host/risu';
 

@@ -8,7 +8,7 @@ import type { Chat } from '../core/types';
 import { basicSettings, worldSettings } from '../core/settings';
 import {
   activeEvents, agentLocked, endedShown, factionNames, cancelMission, type Catalog, endEvent, type EventKind, locName, MAP_CODES,
-  type MissionKind, NATION_PINS, parseCatalog, readWorld, REGION_PINS, regionName, requestMission, rosterFor, SEALED_LOC, SIDO_NAME,
+  type MissionKind, NATION_PINS, parseCatalog, readWorld, REGION_PINS, regionName, requestMission, rosterFor, SEALED_LOC,
   SIGUN, type WorldEvent, worldOn, worldVars, type WorldSettings, type WorldState, codesToNames, landmarkLoc, landmarksOf, placeWhere, prevWorldVars,
 } from '../core/world';
 import { assetUrl } from '../host/assets';
@@ -141,14 +141,6 @@ function placeKey(ev: WorldEvent, c: Catalog): string {
     if (lm) return `fac:${lm.name}`;
   }
   return ev.loc;
-}
-
-function placeName(key: string, c: Catalog): string {
-  if (key.startsWith('fac:')) {
-    const lm = c.landmarks.find((l) => l.name === key.slice(4));
-    return lm ? `${lm.name} · ${lm.gu || SIDO_NAME[lm.sido] || ''}` : key.slice(4);
-  }
-  return locName(key);
 }
 
 function placeTarget(key: string): Target {

@@ -3,8 +3,8 @@
 import { directoryData, withDirectory, readDirectoryData, type Directory } from '../../core/world/directory';
 import { overrideCount } from '../../core/world/draft';
 import type { WorldOverrides } from '../../core/world/records';
-import { WORLD_KIND_LABEL, type WorldKind } from '../../core/world/schema';
-import { GUIDE_LABEL, GUIDE_NAMES, type GuideName } from '../../core/guides';
+import type { WorldKind } from '../../core/world/schema';
+import { GUIDE_LABEL, type GuideName } from '../../core/guides';
 import { LEGACY_DATA } from '../../core/lorebooks';
 import { getPrefs } from '../../core/settings';
 import { updateCharacterLore, type ChatContext } from '../../host/risu';
@@ -360,7 +360,6 @@ function settingsPage(ctx: ChatContext, page: SetPage): string {
   const defBtns = chatPage && canChat ? mainDefaultsButtons() : '';
   act = act.replace(/<span class="ps-defaults">[\s\S]*?<\/span>/, '').trim();
   const right = page === 'screen' ? '<span class="gw-tokens">이 기기 공통</span>' : chatPage ? `${canChat ? '' : '<span class="gw-tokens">새 채팅 기본값 (시작 전)</span>'}${defBtns}${act}` : act;
-  const crumb = page === 'update' ? '관리' : page === 'screen' ? '설정 / 이 기기 공통' : `설정 / ${canChat ? '이 채팅' : '새 채팅 기본값 · 시작 전'}`;
   const info = FEATURE_INFO[page];
   const on = featureState(ctx)[`set:${page}`];
   const badge = on === undefined ? '' : `<span class="gw-state${on ? '' : ' off'}">${on ? '켬' : '끔'}</span>`;
@@ -465,7 +464,6 @@ export function render(): void {
     : '';
   const tab = tabOf(edUi.node);
   edUi.last[tab] = edUi.node;
-  const canChat = host.canChat?.() ?? true;
   const tabs = TABS.map(([id, label, icon]) => `<button class="gw-tab${tab === id ? ' on' : ''}" role="tab" aria-selected="${tab === id}" data-action="ed-tab" data-value="${id}">${icon}<span>${label}</span></button>`).join('');
   const dirty = anyDirty();
   // 머리는 유령 아이콘 + 「설정」만 (2026-10-29 사용자: 봇 이름·현재 채팅·「바꾸면 바로 저장」 글귀는 지저분함)

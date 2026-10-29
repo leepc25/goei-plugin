@@ -77,15 +77,6 @@ function parseJson(raw: string, book: string): unknown {
   }
 }
 
-const str = (v: unknown) => (typeof v === 'string' ? v.trim() : '');
-const strList = (v: unknown) => (Array.isArray(v) ? v.map(str).filter(Boolean) : []);
-
-function worldRows(data: Record<string, unknown>, group: string, landmark: boolean): unknown[][] {
-  const rows = data[group];
-  if (!Array.isArray(rows)) throw new CatalogError(`World catalog / ${group}: 배열이 필요합니다.`);
-  return rows.filter((r): r is unknown[] => Array.isArray(r) && r.length === (landmark ? 10 : 5) && r[0] === true);
-}
-
 /** 지도에 그릴 거점 (보이기 켠 것, 지역이 맞는 것만) */
 export function landmarksOf(bases: BaseRow[]): Landmark[] {
   return bases

@@ -6,7 +6,7 @@ import {
 } from '../core/world/directory';
 import { tokens } from '../core/gnet';
 import { readUnlocked, unlockedValue, UNLOCK_VAR } from '../core/lore';
-import { MAP_CODES, placeWhere, regionName, SIDO_NAME, SIGUN } from '../core/world/geo';
+import { MAP_CODES, placeWhere, regionName, SIGUN } from '../core/world/geo';
 import { assetNames, assetUrl, DEFAULT_CROP, facePic, mainPic, parseCrop, personCrop, splitPic, type PicSource } from '../host/assets';
 import { LEGACY_DATA } from '../core/lorebooks';
 import { SCENARIOS } from '../core/scenarios';

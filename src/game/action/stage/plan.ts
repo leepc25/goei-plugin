@@ -5,7 +5,7 @@ import { depthLabel } from './data/floortypes';
 import { CHUNK_W, ROOM_W, Y_BOTTOM, Y_TOP, laneY, type Floor, type FloorSegment, type Palette, type ServiceCell, type ServiceZone, type SideRoom, type Terrain } from './types';
 import type { ElevatorButton } from './elevator';
 import { FLOOR_TYPES } from './data/floortypes';
-import { drawFloor, drawLedge, drawLowRow, setFloorTone, drawPipeBundle, floorHasGrid, isHighSign, floorPattern, drawWallCell, placeFor, seamPillar, wallSolidSpans } from '../art/bg';
+import { drawFloor, drawLowRow, setFloorTone, drawPipeBundle, floorHasGrid, isHighSign, floorPattern, drawWallCell, placeFor, seamPillar, wallSolidSpans } from '../art/bg';
 
 /** FloorPlan에 붙여 두는 스테이지 정보 (엔진은 몰라도 된다) */
 export interface StagePlan extends FloorPlan {
@@ -659,10 +659,6 @@ function drawMetro(ctx: CanvasRenderingContext2D, plan: StagePlan, vx0: number, 
       }
     }
   }
-}
-
-function roomName(ref: string): string {
-  return ({ 'room:elevator_hall': '엘리베이터 홀', 'room:guardian_room': '수호자 방', 'room:trial_goal': '시험 목표 방', 'room:attic': '다락방', 'room:exit_hall': '출구 홀', 'room:car': '승강기 안' } as Record<string, string>)[ref] ?? ref;
 }
 
 /** 공사 차단대 줄: 길 폭을 같은 너비 차단대 n개로 나눈다 (끝에 기둥 하나짜리 조각이 남지 않게, 검수 14-2).

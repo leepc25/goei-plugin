@@ -87,7 +87,6 @@ export class TouchPad {
   private timers = new Set<number>();
   /** 고유: 누른 시각·충전 시작 타이머·충전 중 */
   private uniq = { timer: 0, charging: false, down: false };
-  private u = 64;
   private sr = 64;
   private restX = 0;
   private restY = 0;
@@ -204,7 +203,7 @@ export class TouchPad {
     const sa = typeof getComputedStyle === 'undefined' ? { t: 0, r: 0, b: 0, l: 0 } : safeInsets(this.layer);
     const ins = this.rotated() ? { t: sa.r, r: sa.b, b: sa.l, l: sa.t } : sa;
     const portrait = bh > bw * 1.05;
-    const u = (this.u = Math.max(44, Math.min(86, Math.min(bw, bh) * 0.16)) * s.touchSize);
+    const u = Math.max(44, Math.min(86, Math.min(bw, bh) * 0.16)) * s.touchSize;
     const dprNow = typeof devicePixelRatio === 'number' ? devicePixelRatio : 1;
     if (dprNow !== this.lastDpr) (this.lastDpr = dprNow), clearArtCache();
     this.root.style.setProperty('--tp-u', `${u}px`);

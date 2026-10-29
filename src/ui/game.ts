@@ -2,7 +2,7 @@
 // 덮개는 창 그리기(innerHTML)와 따로 들고 있다가 그린 뒤 다시 붙인다.
 // 처음 화면은 시작 화면: 게임 파일 받기 → 저장 칸 고르기 → 본편 연동(읽은 것·넘겨받은 결과 쓰기).
 // 게임 코드는 본체에 들지 않고 코드 팩으로 받는다(host/game/code.ts). 쓰는 것은 사용자가 버튼을 누를 때만이다.
-import { SLOT_IDS, type CardSnapshot, type SlotId, type SlotInfo } from '../game/bridge';
+import type { CardSnapshot, SlotId, SlotInfo } from '../game/bridge';
 import { RECORD_COMMENT } from '../core/gamelink';
 import { codeState, codeStats, installGameCode, loadGameCode } from '../host/game/code';
 import { fetchStats, forgetIndex, gameIndex, type GameIndex } from '../host/game/fetch';
@@ -40,7 +40,6 @@ const when = (t: number) => {
   const d = new Date(t);
   return `${d.getMonth() + 1}/${d.getDate()} ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
 };
-const SLOT_NAME = (n: SlotId) => (n === 0 ? '자동 저장' : `${n}번 칸`);
 
 interface Files {
   index: GameIndex | null;

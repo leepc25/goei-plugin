@@ -72,7 +72,8 @@ export function withWorldLore(lore: LoreEntry[] | undefined): LoreEntry[] {
   const hit = cache.get(base);
   if (hit) return hit;
   const overrides = worldOverrides(base);
-  const dir0 = readDirectory(base);
+  // 결과는 안 쓴다: 카드 로어북 기준 명부를 먼저 한 번 읽어 readDirectory 의 캐시를 데워 둔다(아래 folderKey 들이 같은 배열로 다시 읽음)
+  void readDirectory(base);
   const out = [...base];
   const existing = new Set(base.filter((e) => e.mode !== 'folder').map((e) => s(e.comment)));
   // 1) 가상 항목이 폴더에 있어야 명부가 요원·괴이·파밍으로 알아보므로, 먼저 빈 본문의 항목을 만들어 명부를 다시 읽는다

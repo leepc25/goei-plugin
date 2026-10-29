@@ -26,7 +26,6 @@ import { autoRefreshGnet } from './ui/gnet';
 import { Joint } from './host/joint';
 import { prefetchFactions } from './ui/images';
 import { SEED_CLOSE, SEED_OPEN, seedBody } from './core/seed';
-import { readManifest } from './core/start';
 import type { Chat, LoreEntry } from './core/types';
 import { cleanOutput, hasWorldTags, parseCatalog, processOutput, readDirectory } from './core/world';
 import { basicSettings, missingBasicVars, worldSettings } from './core/settings';

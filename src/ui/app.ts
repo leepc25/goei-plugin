@@ -9,7 +9,7 @@ import { isGoeiLore } from '../core/install';
 import { refreshInstall } from './editor/install';
 import type { FactionCode, LangCode, LoreEntry, Manifest } from '../core/types';
 import {
-  activeEvents, type Catalog, endedShown, codesToNames, factionNames, lastStatusFields, locName, parseCatalog, readWorld, rosterFor, startWorldVars, agentLocked, readDirectory, type WorldState, worldOn,
+  activeEvents, type Catalog, endedShown, codesToNames, factionNames, lastStatusFields, locName, parseCatalog, readWorld, rosterFor, startWorldVars, agentLocked, readDirectory, worldOn,
 } from '../core/world';
 import { loadContext, updateChat, type ChatContext } from '../host/risu';
 import { prepareBaseDocs } from '../core/wiki';
@@ -23,15 +23,15 @@ import { GHOST_ICON, ICONS } from './icons';
 import { labelSwitches } from './controls';
 import { bindMbar, mbarHtml } from './mbar';
 import { bindDrawer, closeDrawer, drawerHtml } from './drawer';
-import { addMark, isMarked, markCandidates, markPop, marks, markSlots, markUi, navHistBar, removeMarkAt } from './marks';
+import { addMark, markCandidates, markPop, marks, markSlots, markUi, navHistBar, removeMarkAt } from './marks';
 import { bindSwipeBack } from './swipeback';
-import { agentInner, avatar, factionPic, imageUrl, picAvatar, setImageRedraw, showIdCard, stLabel } from './images';
+import { avatar, factionPic, imageUrl, picAvatar, setImageRedraw, showIdCard, stLabel } from './images';
 import { bindMapZoom } from './mapzoom';
 import { closeGame, gameOpen, hideGame, openGame, reattachGame } from './game';
-import { BRAND, CARD_FILE, brandHtml } from './brand';
+import { BRAND, brandHtml } from './brand';
 import { checkLatest, handleUpdate, hasUpdate, updateBanner } from './update';
 import { setCurrentTheme, themeName } from './theme';
-import { bindFootnotes, bindWikiSide, handleWiki, openWikiSettings, resetWiki, wiki, wikiHomeResults, wikiInput, wikiList, wikiTab, type WikiEnv } from './wiki';
+import { bindFootnotes, bindWikiSide, handleWiki, resetWiki, wiki, wikiHomeResults, wikiInput, wikiList, wikiTab, type WikiEnv } from './wiki';
 import { gnet, gnetOpenCheck, gnetTab, handleGnet, resetGnet, type GnetEnv } from './gnet';
 import { addPhoto, attachInput, hydratePhotos, zoomPhoto } from './attach';
 import { ATTACH_MAX } from '../core/attach';
@@ -770,10 +770,9 @@ async function handle(action: string, value?: string): Promise<void> {
     case 'start':
       return start();
     case 'nav-tab':
-      // PC 왼쪽 메뉴: 이미 보고 있는 탭을 한 번 더 누르면 상황판으로 (2026-10-21 사용자, 모바일은 그대로)
-      if (value === tab && value !== 'board' && !matchMedia('(max-width: 760px)').matches) value = 'board';
-    // falls through
     case 'tab':
+      // PC 왼쪽 메뉴(nav-tab): 이미 보고 있는 탭을 한 번 더 누르면 상황판으로 (2026-10-21 사용자, 모바일 아래 줄(tab)은 그대로)
+      if (action === 'nav-tab' && value === tab && value !== 'board' && !matchMedia('(max-width: 760px)').matches) value = 'board';
       if (value === 'settings') return handle('ed-open', 'set:screen');
       tab = TABS.includes(value as Tab) ? (value as Tab) : 'board';
       notice = '';

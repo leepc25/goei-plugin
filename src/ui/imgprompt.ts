@@ -5,7 +5,6 @@ import { savePrefs } from '../host/prefs';
 import { getPrefs, basicSettings } from '../core/settings';
 import { IMG_KEYWORDS_DEFAULT, IMG_PROMPT_DEFAULT, IMG_TEMPLATE_MAX, buildImgPrompt, imgCandidates, imgCharacters, imgPromptConfig } from '../core/imgprompt';
 import { playerAgent } from '../core/player';
-import { ICONS } from './icons';
 import { userInfo } from '../host/user';
 
 const esc = (s: unknown) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]!);

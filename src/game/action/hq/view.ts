@@ -222,7 +222,6 @@ export function createHq(): HqModule {
     const rec = s.agents[id];
     const lv = masteryLevel(rec.xp);
     const nx = masteryNext(rec.xp);
-    const can = canDeploy(s, id);
     const ros = rosterFor(card, id);
     const photo = ros?.photo && /^(data:|https?:|blob:)/.test(ros.photo) ? `<img src="${esc(ros.photo)}" alt="">` : `<i style="background:${a.color}"></i>`;
     const sel = mode === 'pick' ? s.selected === id : s.support === id;

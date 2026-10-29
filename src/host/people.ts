@@ -7,7 +7,7 @@ import { buildDirector, directorBlock, parseDirector, type DirectorNote } from '
 import { loadContext, updateChat, type ChatContext } from './risu';
 import { isWaiting, onWaiting } from './waiting';
 import { peopleStore, withPeople, unreadIndexes, messageKey, messageHash as messageHashOf, liveness } from '../core/people/store';
-import { applyUpdate, assemblePrompt, buildUpdate, clearStoryRecords, enabledSections, mentionIndexes, parseUpdate, planBatches, recordChars, type ApplyReport, type UpdateInput } from '../core/people/updater';
+import { applyUpdate, assemblePrompt, buildUpdate, clearStoryRecords, enabledSections, mentionIndexes, parseUpdate, planBatches, recordChars, type ApplyReport } from '../core/people/updater';
 import { applyConsolidate, buildConsolidate, parseConsolidate, type ConsolidateReport } from '../core/people/consolidate';
 import { peopleSettings, type PeopleSettings } from '../core/people/settings';
 import { seedPerson } from '../core/people/seed';

@@ -1485,8 +1485,6 @@ export function createElevatorStage(store: StageStore, hooks: StageHooks = {}): 
   };
 
   const resolveChoice = (api: StageApi, prop: PropSpec, ch: { hook: SpawnHook; choice: PassengerChoice | 'deal' | 'upgrade'; deal?: 'reveal' | 'skip' | 'supply'; up?: string }) => {
-    const o = out!;
-    const p = api.world.player;
     if (ch.choice === 'deal') {
       clearChoices(api, 'deal:');
       return applyDeal(api, ch.deal!);
@@ -1601,11 +1599,6 @@ export function createElevatorStage(store: StageStore, hooks: StageHooks = {}): 
 
   // ── 메트로배니아·로그라이트 (기본기획서 6.2·8.2·15장)
   const quietK = () => (out?.upgrades.includes('quiet') ? 0.5 : 1);
-  const upperId = (d: number) => {
-    const f = nodes.get(`floor:${d}`)?.plan.stage.floor;
-    const u = f?.placed.find((q) => q.kind === 'upper');
-    return u ? `p${u.id}` : null;
-  };
   let rushT = 0;
 
   /** 매 틱: 지도에 가 본 범위, 강화 타격 배율 */

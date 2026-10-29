@@ -20,9 +20,7 @@ import { barButtons, directoryBar, directoryDone, directoryDoneClear, directoryS
 import { drawerBox } from './drawer';
 import { toast } from './toast';
 import { ICONS } from './icons';
-import { gnetLabel } from '../core/gnet';
 import { imgPromptPane } from './imgprompt';
-import { keepOpen } from './panels';
 
 export interface SettingsEnv {
   render: () => void;

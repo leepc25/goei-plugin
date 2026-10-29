@@ -1,6 +1,6 @@
 // 회색 상자 렌더러: 상자·글자·선만. 그림 없음. 크기 비교(128·96·80)는 요원 상자 높이로 보인다.
 import { TYPE_COLOR, TYPE_LABEL, depthLabel } from './data';
-import { LANE_MAX, LANE_MIN, type Floor } from './gen';
+import { LANE_MIN, type Floor } from './gen';
 import { elevatorOptions, agentDef, wallAhead, H, W, type Run, type Ent } from './sim';
 import { RULE_BY_ID, UPGRADES } from './data';
 

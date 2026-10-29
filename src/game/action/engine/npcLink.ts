@@ -135,8 +135,6 @@ export function linkNpcTalk(o: NpcLinkOpts): NpcLink {
   let lastPassengerProp: PropSpec | null = null;
   type PassengerMeet = { kind: PassengerKind; honest: boolean; long: boolean; fork: boolean; agent: string; depth: number };
 
-  const agentInfo = () => AGENTS[o.agent()] ?? AGENTS.jyaldi;
-
   /** 이 층의 진짜 단서: 아직 못 찾은 이 층·공통 규칙 줄 */
   const floorHints = (w: World): TalkHint[] => {
     const found = new Set((w.notes['stage.found'] as string[] | undefined) ?? []);
