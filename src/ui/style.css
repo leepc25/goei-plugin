@@ -1316,7 +1316,7 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
 .gx-idbtn img { width: 100%; height: 100%; object-fit: cover; }
 .gx-idpop-card { position: relative; width: 300px; max-width: 100%; max-height: calc(100% - 8px); overflow-y: auto; }
 .gx-idpop-card .gx-id { padding: 24px 18px 18px; }
-.gx-idpop-card .gx-id-photo { width: 190px; height: 190px; border-radius: 24px; }
+.gx-idpop-card .gx-id-photo { width: 240px; height: 240px; border-radius: 24px; }
 .gx-idpop-card .gx-agpop-x { z-index: 1; }
 @media (max-width: 760px) { .gx-idbtn { display: grid; } }
 .gx-op-st { display: flex; flex-direction: column; gap: 3px; margin-top: 8px; padding-top: 8px; border-top: 1px solid color-mix(in srgb, var(--line) 80%, transparent); }
@@ -2545,8 +2545,10 @@ button.mk-go:hover { color: var(--signal); }
 }
 /* 카드 가운데 선택 과녁 (evcard.ts aimMark, 2026-10-29): 조준선 — 천천히 도는 바깥 눈금 원, 숨 쉬듯 맥동하는 안 원, 네 방향 팔, 가운데 점.
    누르면 붉게 잠긴다: 눈금 원이 빨리 돌며 조여들고 모서리 괄호가 나타나고 점이 붉게 빛난다 */
-.gx-aim { position: absolute; left: 50%; top: 50%; z-index: 3; display: flex; flex-direction: column; align-items: center; gap: 4px; width: 190px; height: 190px; padding: 0; border: 0; background: none; color: rgba(255, 255, 255, .75); opacity: 1; transform: translate(-50%, -50%); cursor: pointer; filter: drop-shadow(0 1px 2px rgba(0, 0, 0, .8)); transition: color .18s ease, opacity .18s ease; }
-.gx-aim svg { width: 140px; height: 140px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; overflow: visible; opacity: .72; transition: opacity .18s ease; }
+.gx-aim { position: absolute; left: 50%; top: 50%; z-index: 3; display: flex; flex-direction: column; align-items: center; gap: 4px; width: 240px; height: 240px; padding: 0; border: 0; background: none; color: rgba(255, 255, 255, .75); opacity: 1; transform: translate(-50%, -50%); cursor: pointer; filter: drop-shadow(0 1px 2px rgba(0, 0, 0, .8)); transition: color .18s ease, opacity .18s ease; }
+/* 안 골랐을 땐 크게(210px) 떠 있다가, 고르면 140px 로 조여들며 붉게 잠기고, 해제하면 터지듯 다시 커진다 */
+.gx-aim svg { width: 210px; height: 210px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; overflow: visible; opacity: .72; animation: gx-aim-release .5s cubic-bezier(.2, 1.2, .3, 1); }
+.gx-aim:not(.on) .burst { fill: rgba(255, 255, 255, .45); animation: gx-aim-burst .55s ease-out; }
 .gx-aim:hover svg, .gx-aim.on svg { opacity: 1; }
 .gx-aim .burst { stroke: none; fill: none; opacity: 0; }
 .gx-aim .halo { stroke: none; fill: transparent; }
@@ -2560,7 +2562,7 @@ button.mk-go:hover { color: var(--signal); }
 .gx-aim:hover { color: #fff; }
 .gx-aim:active svg { transform: scale(.94); }
 .gx-aim.on { color: #ff6b5f; opacity: 1; filter: drop-shadow(0 0 3px rgba(0, 0, 0, .9)) drop-shadow(0 0 10px rgba(255, 59, 48, .75)) drop-shadow(0 6px 10px rgba(0, 0, 0, .6)); }
-.gx-aim.on svg { stroke-width: 3; animation: gx-aim-impact .55s cubic-bezier(.15, 1.1, .3, 1); }
+.gx-aim.on svg { width: 140px; height: 140px; stroke-width: 3; animation: gx-aim-impact .55s cubic-bezier(.15, 1.1, .3, 1); }
 .gx-aim.on .burst { fill: rgba(255, 80, 60, .5); animation: gx-aim-burst .6s ease-out; }
 .gx-aim.on .halo { fill: radial-gradient(circle, rgba(255, 59, 48, .35), transparent 70%); fill: rgba(255, 59, 48, .22); filter: blur(4px); }
 .gx-aim.on .rot { animation-duration: 4s; }
@@ -2572,11 +2574,12 @@ button.mk-go:hover { color: var(--signal); }
 @keyframes gx-aim-spin { to { transform: rotate(360deg); } }
 @keyframes gx-aim-breathe { 0%, 100% { transform: scale(1); opacity: .75; } 50% { transform: scale(1.07); opacity: 1; } }
 @keyframes gx-aim-lock { from { transform: scale(2); transform-origin: 50% 50%; opacity: 0; } 70% { transform: scale(.92); opacity: 1; } to { transform: scale(1); opacity: 1; } }
-@keyframes gx-aim-impact { 0% { transform: scale(1.9); opacity: .2; } 60% { transform: scale(.9); opacity: 1; } 100% { transform: scale(1); } }
+@keyframes gx-aim-impact { 0% { transform: scale(1.5); opacity: .5; } 55% { transform: scale(.86); opacity: 1; } 100% { transform: scale(1); } }
+@keyframes gx-aim-release { 0% { transform: scale(.66); opacity: 1; } 60% { transform: scale(1.08); } 100% { transform: scale(1); opacity: .72; } }
 @keyframes gx-aim-burst { 0% { r: 10; opacity: .9; } 100% { r: 60; opacity: 0; } }
 @keyframes gx-aim-brk { from { transform: scale(1.4); transform-origin: 50% 50%; opacity: 0; } to { transform: scale(1); opacity: 1; } }
 @keyframes gx-aim-blink { 0%, 100% { opacity: 1; } 50% { opacity: .45; } }
-@media (prefers-reduced-motion: reduce) { .gx-aim .rot, .gx-aim .ring, .gx-aim.on svg, .gx-aim.on .burst, .gx-aim.on .orb, .gx-aim.on .brk, .gx-aim.on .dot { animation: none; } }
+@media (prefers-reduced-motion: reduce) { .gx-aim .rot, .gx-aim .ring, .gx-aim svg, .gx-aim .burst, .gx-aim.on .burst, .gx-aim.on .orb, .gx-aim.on .brk, .gx-aim.on .dot { animation: none; } }
 /* 목표 표식 (2026-10-21 사용자: 제목 바로 오른쪽, 이질감 없이). 상태 딱지처럼 고정폭 글자·각진 테두리.
    안 고름: 흐린 점선 「목표 지정」 / 고름: 민트 「목표」. 제목은 한 줄, 길면 말줄임 (표식은 줄지 않는다) */
 .gx-tgt { flex: none; display: inline-flex; align-items: center; gap: 3px; height: 20px; margin: 0 0 0 2px; padding: 0 2px; border: 0; border-radius: 3px; background: none; color: rgba(255, 255, 255, .55); font: 700 11px/1 var(--mono); letter-spacing: .04em; text-shadow: 0 1px 2px rgba(0, 0, 0, .8); cursor: pointer; transition: color .15s; }
