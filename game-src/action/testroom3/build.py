@@ -587,7 +587,7 @@ def build_char(cfg, force=False):
     payload["reachY"] = reach_y(cfg, ("14", "7", "23"))   # 점프 공격: 가장 앞으로 나간 손발의 높이(장마다) → 맞는 높이(10-28 「점프 공격 타점이 안 맞음」)
     payload["turn19"] = turn_after_down(cfg)   # 쓰러진 뒤 잇는 줄인데 머리 방향이 반대로 그려진 줄(10-28 이기석 기기: 머리·발이 뿅 바뀜) → 방에서 몸 방향을 돌려 이음
     payload["lie19"] = settled_loop(A.get("19"))   # 누운 반복 장(10-29)
-    payload["seam"] = seam_map(A)   # 동작 끝 → 대기 이음새(10-29)
+    payload["seam"], payload["ret"] = seam_map(A)   # 동작 끝 → 대기 이음새(10-29)
     payload["cycle"] = cycle_map(A)   # 걷기·뛰기 반복 구간(10-29)
     payload["chairAuto"] = chair_auto(cfg)   # 의자 자동 맞춤(chairfit.py). 손으로 맞춘 값은 설정 chars/<키>.json 의 "chair"가 이김
     js.write_text("(window.__C=window.__C||{})[" + json.dumps(key, ensure_ascii=False) + "]=" +
@@ -628,16 +628,25 @@ def seam_map(A):
     firsts = {}
     for st in ("3", "1"):
         if st in A: firsts[st] = place(A[st], masks(A[st])[0], 0)
-    if not firsts: return {}
-    out = {}
+    if not firsts: return {}, {}
+    out, ret = {}, {}
     for lid in ("9", "10", "11", "12", "13", "16", "16_1", "17", "18", "18_1", "20", "22", "24", "25", "26", "27", "28", "29", "30", "31", "32", "33", "34", "35"):
         a = A.get(lid)
         if not a or a["n"] < 2: continue
-        last = place(a, masks(a)[-1], a["n"] - 1); best = 1.0
-        for st, f0 in firsts.items():
-            u = (last | f0).sum(); d = (last ^ f0).sum() / u if u else 0; best = min(best, d)
-        out[lid] = round(float(best), 2)
-    return out
+        ms = masks(a)
+        def diff(f):
+            m = place(a, ms[f], f); r = 1.0
+            for f0 in firsts.values():
+                u = (m | f0).sum(); r = min(r, (m ^ f0).sum() / u if u else 0)
+            return float(r)
+        best = diff(a["n"] - 1); out[lid] = round(best, 2)
+        if best >= 0.35 and a["n"] >= 4 and lid != "20":
+            # 되돌림 장(10-29 사용자: 대기로 갈 때 뚝 튐): 끝에서 거꾸로 가며 대기와 가장 닮은 장까지, 고르게 최대 4장
+            ds = [(diff(f), f) for f in range(a["n"] - 2, -1, -1)]
+            tgt = min(ds)[1]; path = list(range(a["n"] - 2, tgt - 1, -1))
+            if len(path) > 4: path = [path[round(i * (len(path) - 1) / 3)] for i in range(4)]
+            ret[lid] = path
+    return out, ret
 
 
 def cycle_map(A):
