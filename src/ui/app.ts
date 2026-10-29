@@ -570,6 +570,7 @@ export async function openInstall(): Promise<void> {
     input: panelInput,
     change: panelChange,
     canChat: () => view.kind === 'started',
+    mobileNav: mobileNavHtml,
   };
   await refreshInstall(installCtx);
   openEditor(host, 'install');
@@ -726,6 +727,7 @@ async function handle(action: string, value?: string): Promise<void> {
       input: panelInput,
       change: panelChange,
       canChat: () => view.kind === 'started',
+      mobileNav: mobileNavHtml,
     }, (value as EditorNode) || undefined);
     return;
   }
@@ -1518,14 +1520,30 @@ function tabs(): string {
     <button class="gx-nb desk" data-action="ed-open" data-value="set:screen">${ICONS.settings}<span>설정</span>${ctx && hasUpdate(ctx) ? '<span class="gx-nbadge dot" aria-label="새 버전"></span>' : ''}</button>
     <span class="gx-nav-gap"></span>
     ${ctx ? navHistBar(markOf(navState())) : ''}
-    ${mbarHtml([
-      item('wiki', '위키', ICONS.wiki),
-      item('map', '임무', ICONS.map, 'mob'),
-      item('board', '상황판', ICONS.board, 'home'),
-      item('phone', '괴담톡', ICONS.phone, '', unreadPhone ? '<span class="gx-nbadge dot" aria-label="새 메시지"></span>' : ''),
-      ...(GNET_ON ? [item('gnet', gnetLabel(ctx?.chat.scriptstate), ICONS.gnet)] : []),
-    ])}
+    ${mobileBar(item, unreadPhone, ctx)}
   </nav>`;
+}
+
+type NavItem = (id: Tab, label: string, icon: string, cls?: string, badge?: string) => string;
+/** 폰 하단 바 (위키·임무·상황판·괴담톡·괴담넷). 설정 창(editor)도 폰에서 같은 바를 그린다 */
+function mobileBar(item: NavItem, unreadPhone: boolean, ctx: ChatContext | null): string {
+  return mbarHtml([
+    item('wiki', '위키', ICONS.wiki),
+    item('map', '임무', ICONS.map, 'mob'),
+    item('board', '상황판', ICONS.board, 'home'),
+    item('phone', '괴담톡', ICONS.phone, '', unreadPhone ? '<span class="gx-nbadge dot" aria-label="새 메시지"></span>' : ''),
+    ...(GNET_ON ? [item('gnet', gnetLabel(ctx?.chat.scriptstate), ICONS.gnet)] : []),
+  ]);
+}
+
+/** 설정 창(폰)에 주는 하단 바: 본 창과 같은 항목, 지금 탭 표시 */
+function mobileNavHtml(): string {
+  const ctx = view.kind === 'started' ? view.ctx : null;
+  const unreadPhone = view.kind === 'started' && phoneUnread(view.ctx);
+  const cur: Tab = tab === 'mission' ? 'map' : tab;
+  const item: NavItem = (id, label, icon, cls = '', badge = '') =>
+    `<button class="gx-nb${cls ? ` ${cls}` : ''}${cur === id ? ' on' : ''}" data-action="tab" data-value="${id}">${icon}<span>${esc(label)}</span>${badge}</button>`;
+  return `<nav class="gx-nav gw-nav">${mobileBar(item, unreadPhone, ctx)}</nav>`;
 }
 
 /** 왼쪽 위: 표지 + 세로 ID카드 */

@@ -13,6 +13,8 @@ import { cropValue, directoryDraft, directoryExtList, directoryInput, directoryP
 import { handleImgPrompt, imgInput, imgPromptPane } from '../imgprompt';
 import { GHOST_ICON, ICONS } from '../icons';
 import { labelSwitches } from '../controls';
+import { bindDrawer, drawerHtml } from '../drawer';
+import { bindMbar } from '../mbar';
 import { rememberPanel } from '../panels';
 import editorCss from './style.css';
 import { recordCount, recordList, recordPage, recordAction, recordInput, recUi } from './record';
@@ -52,6 +54,8 @@ export interface EditorHost {
   change?: (el: HTMLSelectElement) => void;
   /** 채팅이 시작됐나 (설정의 「이 채팅」 범위를 쓸 수 있나) */
   canChat?: () => boolean;
+  /** 폰: 본 창과 같은 하단 바(<nav class="gx-nav">…) — 설정도 본 창의 한 화면처럼 보이게 (2026-10-29 사용자) */
+  mobileNav?: () => string;
 }
 
 export const edUi = {
@@ -483,18 +487,36 @@ export function render(): void {
     : '';
   const caret = focusSel && typeof act!.selectionStart === 'number' ? [act!.selectionStart, act!.selectionEnd ?? act!.selectionStart] : null;
   lastDrawn = edUi.node;
-  root.innerHTML = `<div class="gw-win${edUi.drawer ? ' drawer' : ''}">
-    <header class="gw-top">
+  // 폰(2026-10-29 사용자): 설정도 본 창의 한 화면처럼 — 머리는 본 창과 같은 모양(제목 「설정」만), 아래에 숨은 서랍(기능·세계·지침·점검)과 본 창의 하단 바
+  const phone = matchMedia('(max-width: 760px)').matches;
+  const noticeHtml = edUi.notice ? `<span class="gw-notice err">${esc(edUi.notice)}</span>` : edUi.info ? `<span class="gw-notice">${esc(edUi.info)}</span>` : '';
+  const right = `${tab === 'set' && (host?.canChat?.() ?? true) ? mainDefaultsButtons() : ''}${tab === 'world' || dirty ? saveBar() : ''}<button class="gx-x" data-action="ed-close" aria-label="닫기">${ICONS.close}</button>`;
+  const top = phone
+    ? `<header class="gw-top gx-head gw-phead">
+      <button class="gx-x gw-menu" data-action="ed-drawer" aria-label="메뉴">${ICONS.list}</button>
+      <div class="gx-brand gx-tabhead"><div><b>설정</b></div></div>${noticeHtml}
+      <div class="gx-head-act gw-top-right">${right}</div>
+    </header>`
+    : `<header class="gw-top">
       <button class="gx-x gw-menu" data-action="ed-drawer" aria-label="메뉴">${ICONS.list}</button>
       <span class="gw-brand">${GHOST_ICON}</span><b>설정</b>
-      ${edUi.notice ? `<span class="gw-notice err">${esc(edUi.notice)}</span>` : edUi.info ? `<span class="gw-notice">${esc(edUi.info)}</span>` : ''}
-      <div class="gw-top-right">${tab === 'set' && (host?.canChat?.() ?? true) ? mainDefaultsButtons() : ''}${tab === 'world' || dirty ? saveBar() : ''}<button class="gx-x" data-action="ed-close" aria-label="닫기">${ICONS.close}</button></div>
-    </header>
+      ${noticeHtml}
+      <div class="gw-top-right">${right}</div>
+    </header>`;
+  const tabTools = TABS.map(([id, label, icon]) => `<button class="ph-tool" data-action="ed-tab" data-value="${id}" aria-pressed="${tab === id}" aria-label="${label}" title="${label}">${icon}<span class="ph-tool-l">${label}</span></button>`).join('');
+  const foot = phone ? `${drawerHtml(tabTools, '', 'gw-tabdrawer')}${host.mobileNav?.() ?? ''}` : '';
+  root.innerHTML = `<div class="gw-win${edUi.drawer ? ' drawer' : ''}${phone ? ' phone' : ''}">
+    ${top}
     <nav class="gw-tree"><div class="gw-tabs" role="tablist">${tabs}</div>${tree(ctx)}</nav>
     <main class="gw-body">${ctx ? body(ctx) : '<p class="gx-err">채팅 정보를 읽지 못했어요. 창을 닫고 다시 열어 주세요.</p>'}</main>
+    ${foot}
     ${confirm}
   </div>`;
   labelSwitches(root);
+  if (phone) {
+    bindDrawer(root);
+    bindMbar(root, () => void run('ed-close'));
+  }
   if (keep.length) KEEP.forEach((q, i) => { const el = root!.querySelector<HTMLElement>(q); if (el && keep[i]) el.scrollTop = keep[i]; });
   if (focusSel) {
     const el = [...root.querySelectorAll<HTMLInputElement>(focusSel)].find((x) => x.offsetParent);
@@ -624,6 +646,12 @@ export async function handle(action: string, value?: string): Promise<void> {
   if (isKind(edUi.node) && (await recordAction(action, value, ctx, edUi.node))) render();
   // 그 밖의 동작(설정 단추·기능 설정)은 패널과 같은 처리기로. 패널이 다시 그려질 때 설정 페이지도 같이 그린다 (app.ts render)
   else if (host?.handle && !action.startsWith('ed-')) {
+    // 폰 하단 바의 탭 단추: 설정을 닫고 본 창의 그 화면으로
+    if ((action === 'tab' || action === 'nav-tab') && matchMedia('(max-width: 760px)').matches) {
+      closeEditor();
+      await host.handle(action, value);
+      return;
+    }
     await host.handle(action, value);
     render();
   }
