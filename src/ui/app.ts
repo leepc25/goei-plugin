@@ -555,13 +555,21 @@ export async function openInstall(): Promise<void> {
     await showWindow();
     return;
   }
+  // 설치 창에서 기능·화면 설정 페이지로 옮겨 가도 단추가 먹게 보통 설정 창과 같은 처리기를 단다
+  // (2026-10-29 사용자: 깡통봇 설치 뒤 그 창에서는 슬라이더만 되고 단추가 전부 안 눌렸다 — handle 이 없어 조작이 버려졌다)
+  if (view.kind === 'picker') pickerPrefs = true;
   const host = {
-    ctx: () => installCtx,
+    ctx: () => (view.kind === 'started' || view.kind === 'picker' || view.kind === 'opening' ? view.ctx : installCtx),
     refresh: async () => {
       installCtx = (await loadContext().catch(() => null)) ?? installCtx;
       if (shown) await refresh();
+      if (view.kind === 'picker') pickerPrefs = true;
     },
     theme: () => root?.dataset.theme ?? getPrefs().theme ?? 'dark',
+    handle: (a: string, v?: string) => handle(a, v),
+    input: panelInput,
+    change: panelChange,
+    canChat: () => view.kind === 'started',
   };
   await refreshInstall(installCtx);
   openEditor(host, 'install');
