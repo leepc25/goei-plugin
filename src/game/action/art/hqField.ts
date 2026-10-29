@@ -7,7 +7,7 @@ import { JR_ROOM_FILES } from '../hq/jrRooms.gen';
 import { JR_CUT_FILES } from '../hq/jrCuts.gen';
 
 const FILES = ['lobby', 'f2', 'f3', 'b1', 'b2', 'b3', 'desk'];
-const JR_FILES = ['jr_entry', 'jr_b1', 'jr_alley', 'jr_b2', ...JR_ROOM_FILES, ...JR_CUT_FILES];
+const JR_FILES = ['jr_entry', 'jr_b1', 'jr_alley', 'jr_b2', 'jr_heolgap2', ...JR_ROOM_FILES, ...JR_CUT_FILES];
 let images: Record<string, HTMLImageElement> | null = null;
 let revision = 0;
 declare global { interface Window { __GOEI_HQ_FIELD__?: Record<string, string> } }
@@ -183,9 +183,23 @@ function drawDoor(c: CanvasRenderingContext2D, im: HTMLImageElement, d: PaintedD
 
 /** 오린 오브젝트 (깊이 순서 층에서 부른다) */
 export function drawHqFieldObject(c: CanvasRenderingContext2D, scene: string, id: string): void {
-  const o = PAINTED[scene]?.objects.find((q) => q.id === id);
-  const im = o && images?.[o.file];
-  if (!o || !im) return;
+  const p = PAINTED[scene];
+  const o = p?.objects.find((q) => q.id === id);
+  if (!o) return;
+  if (o.cover) {
+    // 오리지 않은 가림: 배경 그림의 다각형 영역을 그대로 한 번 더 (사람이 뒤에 서면 가려진다)
+    const bg = images?.[p.file];
+    if (!bg) return;
+    c.save(); c.imageSmoothingEnabled = true; c.imageSmoothingQuality = 'high';
+    c.beginPath();
+    for (const poly of o.cover) { poly.forEach(([x, y], i) => (i ? c.lineTo(x, y) : c.moveTo(x, y))); c.closePath(); }
+    c.clip();
+    c.drawImage(bg, o.x, o.y, o.w, o.h, o.x, o.y, o.w, o.h);
+    c.restore();
+    return;
+  }
+  const im = images?.[o.file];
+  if (!im) return;
   c.save(); c.imageSmoothingEnabled = true; c.imageSmoothingQuality = 'high';
   c.drawImage(im, o.x, o.y, o.w, o.h);
   c.restore();

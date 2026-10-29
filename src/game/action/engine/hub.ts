@@ -208,14 +208,14 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
           if (sc.id === 'f2' && d.id === 'office' && d.kind === 'glass' && drawHqDoorRound2(c, d.x, openOf(d.id), d.open)) continue;
           drawDoorN(c, d, sc.look, openOf(d.id), camX);
         }
-        for (const d of sc.doors) if (isS(d)) drawFloorExit(c, d, openOf(d.id), camX);
+        for (const d of sc.doors) if (isS(d)) drawFloorExit(c, d, openOf(d.id), camX, sc.painted ? PAINTED[sc.painted].h ?? 700 : SCREEN_H);
       },
       drawForeground(c: CanvasRenderingContext2D, camX: number, w: WorldView) {
         // 시계는 실제 시간(틱 단위로 환산): 메뉴·정산 창이 열려 월드가 멈춰도 들어오는 암전은 끝난다
         const now = performance.now();
         if (enterTick < 0) enterTick = now;
         const age = (now - enterTick) / (1000 / 30);
-        if (!sc.legacy) for (const d of sc.doors) if (isS(d)) drawExitLintel(c, d, camX);
+        if (!sc.legacy) for (const d of sc.doors) if (isS(d)) drawExitLintel(c, d, camX, sc.painted ? PAINTED[sc.painted].h ?? 700 : SCREEN_H);
         if (sc.painted) drawHqFieldLight(c, sc.painted, camX, host.hour?.() ?? null, now);
         // 엘리베이터 앞 방향 안내(drawHqGuide)는 사용자 지시로 끔 (2026-10-25)
         // 출동 준비가 됐으면 B3 승합차 위 화살표
@@ -755,7 +755,7 @@ function drawDoorN(c: CanvasRenderingContext2D, d: Door, look: string, open: num
 }
 
 /** 화면 아래 출입: 바닥 끝에 빛 띠 + 아래로 가는 화살표 (사용자: 문 자리에 나가는 표시) */
-function drawFloorExit(c: CanvasRenderingContext2D, d: Door, open: number, camX: number) {
+function drawFloorExit(c: CanvasRenderingContext2D, d: Door, open: number, camX: number, SCREEN_H = 720) {
   const w = DOOR_W.exit;
   if (d.x + w < camX - 40 || d.x - w > camX + fieldView.w + 40) return;
   const col = d.kind === 'cell' ? '#7d4a3a' : d.open ? '#3cc596' : '#6b7480';
@@ -766,7 +766,7 @@ function drawFloorExit(c: CanvasRenderingContext2D, d: Door, open: number, camX:
   c.fillRect(d.x - w / 2, SCREEN_H - 14, w, 8);
   c.globalAlpha = 1;
 }
-function drawExitLintel(c: CanvasRenderingContext2D, d: Door, camX: number) {
+function drawExitLintel(c: CanvasRenderingContext2D, d: Door, camX: number, SCREEN_H = 720) {
   if (d.kind === 'cell') return;
   if (d.x < camX - 200 || d.x > camX + fieldView.w + 200) return;
   const col = d.open ? '#3cc596' : '#6b7480';

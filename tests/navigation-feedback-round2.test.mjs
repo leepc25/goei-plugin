@@ -85,7 +85,7 @@ test('본부 실제 문: 잠긴 시설은 이유 표시, 열린 출구는 E로 �
  const map=M.hqMap(M.newSave());let closed=0,opened=0;
  for(const scene of map.scenes) for(const door of scene.doors) {
   if(door.open&&!door.to) continue;
-  const y=door.side==='S'?M.LANE_BOT-14:M.LANE_TOP+16;
+  const y=door.side==='S'?(scene.lane?.[1]??M.LANE_BOT)-14:(scene.lane?.[0]??M.LANE_TOP)+16;
   const stage=M.makeHub({map:()=>({...map,start:{scene:scene.id,x:door.x,y}}),openPlace(){},bark:()=>null,chooseFloor(){},sfx(){}},()=>({scene:scene.id,x:door.x,y}));
   const w=new M.World({seed:1,agent:'jyaldi',stageId:'hq'},{},stage);w.enterFloor(stage.firstFloor(w.run));w.step(pad);
   const target=M.navigationFeedback(w).target;assert.ok(target,`${scene.id}:${door.id}`);

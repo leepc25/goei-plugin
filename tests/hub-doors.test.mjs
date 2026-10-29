@@ -7,7 +7,7 @@ const pad = {mx:0,my:0,run:false,evade:false,downDouble:false,held:new Set(),pre
 test('본부: 열린 문 앞에서 E 한 번 → 문 열기 → 암전 → 연결된 방 (이동 예약 반복 없음)', () => {
  const map=M.hqMap(M.newSave());let checked=0;
  for(const scene of map.scenes) for(const door of scene.doors.filter(d=>d.open && d.to)) {
-  const y=door.side==='S'?M.LANE_BOT-14:M.LANE_TOP+16;
+  const y=door.side==='S'?(scene.lane?.[1]??M.LANE_BOT)-14:(scene.lane?.[0]??M.LANE_TOP)+16;
   const host={map:()=>({...map,start:{scene:scene.id,x:door.x,y}}),openPlace(){},bark:()=>null,chooseFloor(){},sfx(){}};
   const stage=M.makeHub(host,()=>({scene:scene.id,x:door.x,y}));
   const w=new M.World({agent:'jyaldi',seed:1,stageId:'hq'},{},stage);

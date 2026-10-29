@@ -58,7 +58,7 @@ let ready: {
 let failed = false;
 export const has3D = () => !!ready;
 /** 시험용 끄고 켜기 (F8) */
-export const eileen3D = { on: true };
+export const eileen3D = { on: false };
 
 export async function prepareEileen3D(bytes: Uint8Array | null): Promise<void> {
   if (ready || failed || !bytes) return;
