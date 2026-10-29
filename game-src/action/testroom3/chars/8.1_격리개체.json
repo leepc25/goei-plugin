@@ -1,0 +1,21 @@
+{
+  "key": "8.1_격리개체",
+  "name": "격리개체",
+  "dir": "E",
+  "color": "#cfc7a6",
+  "armed": false,
+  "anims": {
+    "1": {"folder": "1", "mirror": false, "name": "뛰쳐나오기"},
+    "2": {"folder": "2", "mirror": false, "name": "짓밟으며 달리기"},
+    "SH_D": {"folder": "샤워2_D", "src": "test", "mirror": false, "name": "샤워 물 맞으며 쉬기"},
+    "SH_E": {"folder": "샤워2_E", "src": "test", "mirror": false, "name": "샤워 몸 씻기"}
+  },
+  "picks": {"combat": 4, "weapon": 4, "apex": 4, "run": 2, "crawl4": 6},
+  "loops": {},
+  "hit": {},
+  "gun": [],
+  "kick": [],
+  "ranged": {"proj": {"t": "proj", "kind": "orb", "hit": {"dmg": 7, "kind": "light"}}, "heat": false},
+  "skills": {},
+  "_note": "자동 생성. 값을 고치면 build가 그대로 씀. 다시 자동으로: build.py --reset 8.1_격리개체"
+}

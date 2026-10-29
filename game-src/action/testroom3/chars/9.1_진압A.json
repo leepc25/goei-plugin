@@ -1,0 +1,21 @@
+{
+  "key": "9.1_진압A",
+  "name": "진압A",
+  "dir": "E",
+  "color": "#cfc7a6",
+  "armed": false,
+  "anims": {
+    "SH_A": {"folder": "샤워2_A", "src": "test", "mirror": false, "name": "샤워 옷 벗기"},
+    "SH_B": {"folder": "샤워2_B", "src": "test", "mirror": false, "name": "샤워 맨몸 걷기"},
+    "SH_D": {"folder": "샤워2_D", "src": "test", "mirror": false, "name": "샤워 물 맞으며 쉬기"},
+    "SH_E": {"folder": "샤워2_E", "src": "test", "mirror": false, "name": "샤워 몸 씻기"}
+  },
+  "picks": {"combat": 4, "weapon": 4, "apex": 4, "run": 2, "crawl4": 6},
+  "loops": {},
+  "hit": {},
+  "gun": [],
+  "kick": [],
+  "ranged": {"proj": {"t": "proj", "kind": "orb", "hit": {"dmg": 7, "kind": "light"}}, "heat": false},
+  "skills": {},
+  "_note": "자동 생성. 값을 고치면 build가 그대로 씀. 다시 자동으로: build.py --reset 9.1_진압A"
+}
