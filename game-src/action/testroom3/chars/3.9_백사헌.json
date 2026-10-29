@@ -667,6 +667,12 @@
       ]
      }
     ]
+   },
+   "hitVfx": {
+    "2": "x3-3.9-S2-reverse-slit"
+   },
+   "hitScale": {
+    "2": 0.53
    }
   },
   "super": {

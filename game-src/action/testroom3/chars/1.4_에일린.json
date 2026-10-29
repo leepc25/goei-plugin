@@ -380,7 +380,9 @@
       }
      ]
     }
-   ]
+   ],
+   "hitVfx": "x3-1.4-D-suppress-fan",
+   "hitScale": 0.59
   },
   "skill2": {
    "name": "판독",
@@ -469,6 +471,12 @@
       "v": 0.2
      }
     ]
+   },
+   "hitVfx": {
+    "2": "x3-1.4-S2-held-shot"
+   },
+   "hitScale": {
+    "2": 0.69
    }
   },
   "super": {
