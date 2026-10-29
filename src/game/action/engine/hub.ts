@@ -11,9 +11,7 @@ import { SCREEN_H, SCREEN_W } from './contract';
 import { HQ_PLACE, drawFloor, drawHqWall, drawPropArt, drawHqTextureWall } from '../art/bg';
 import { drawHqDoorRound2 } from '../art/hqDoorRound2';
 import { drawCallLit, drawHqField, drawHqFieldLight, drawHqFieldObject, drawHqSigns, hasHqField } from '../art/hqField';
-import { drawVisitAgent, visitAgentTop } from '../art/visitAgents';
-import { charTop, drawCharClip, charArt, hasCharPacks } from '../art/charPacks';
-import { drawTestMan, hasTestPeople, testManTop, testPlayerTop } from '../art/testPeople';
+import { charTop, drawCharClip, charArt } from '../art/charPacks';
 import { persp, view as fieldView } from './view';
 import { blockByProps, clearSpot, type BlockProp } from './propBlock';
 import { PAINTED, clampPainted, doorReachY } from '../hq/painted';
@@ -144,10 +142,7 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
     closing = sc.painted && inDoor ? { id: inDoor.id, t: 0, len: openLen(sc, inDoor) } : null;
     arriveDoor = null;
     near = null;
-    // 필드 시험: 사무실에 서 있는 남자 (임시)
-    // 옛 시험 그림(Test man)은 인물 팩이 없을 때만 (사용자 10-29: 옛 에일린·쟈알디 그림이 왜 보이냐)
-    const man = sc.id === 'office' && hasTestPeople() && !hasCharPacks() ? { x: 900, y: 560 } : null;
-    solids = [...(man ? [{ x: man.x, y: man.y, w: 70, back: 20, front: 20 }] : []), ...sc.boxes.filter((b) => b.solid).map((b) => ({ x: b.x, y: b.y, w: b.w, back: b.d + 6, front: 8, h: sc.painted ? b.h : undefined })), ...people.map((p) => ({ x: p.x, y: p.y, w: 80, back: 24, front: 24 }))];
+    solids = [...sc.boxes.filter((b) => b.solid).map((b) => ({ x: b.x, y: b.y, w: b.w, back: b.d + 6, front: 8, h: sc.painted ? b.h : undefined })), ...people.map((p) => ({ x: p.x, y: p.y, w: 80, back: 24, front: 24 }))];
     const len = Math.max(SCREEN_W, sc.length);
     const sx = Math.max(60, Math.min(len - 60, x));
     arrive = { x: sx, y };
@@ -166,7 +161,7 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
       depthLayers: sc.boxes.map((b) => ({ y: b.y, occludedSilhouette: !sc.painted, x0: b.x - b.w / 2, x1: b.x + b.w / 2, draw: (c: CanvasRenderingContext2D) => {
         if (sc.painted && hasHqField(sc.painted)) { drawHqFieldObject(c, sc.painted, b.kind); return; }
         drawBox(c, b, sc.look);
-      } })).concat(people.map((p) => ({ y: p.y, x0: p.x - 60, x1: p.x + 60, occludedSilhouette: false, draw: (c: CanvasRenderingContext2D) => { drawCharClip(c, p.name, p.x, p.y, p.face, performance.now()) || drawVisitAgent(c, p.name, p.x, p.y, p.face, performance.now()); } })))
+      } })).concat(people.map((p) => ({ y: p.y, x0: p.x - 60, x1: p.x + 60, occludedSilhouette: false, draw: (c: CanvasRenderingContext2D) => { drawCharClip(c, p.name, p.x, p.y, p.face, performance.now()); } })))
         // 움직이는 행위자: 자리 수만큼 층을 두고 매 프레임 지금 목록의 i번째를 읽는다 (깊이 정렬은 y 게터로)
         .concat(host.life ? Array.from({ length: LIFE_SLOTS }, (_, i) => ({
           get y() { return live[i]?.y ?? -1e9; },
@@ -174,8 +169,7 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
           get x1() { return (live[i]?.x ?? -1e9) + 60; },
           occludedSilhouette: false,
           draw: (c: CanvasRenderingContext2D) => { const a = live[i]; if (a) drawLiveActor(c, a, host.life!); },
-        })) : [])
-        .concat(man ? [{ y: man.y, x0: man.x - 60, x1: man.x + 60, occludedSilhouette: false, draw: (c: CanvasRenderingContext2D) => { drawTestMan(c, man.x, man.y, -1); } }] : []),
+        })) : []),
       drawBackground(c: CanvasRenderingContext2D, camX: number) {
         if (sc.painted && drawHqField(c, sc.painted, camX, doorFx, host.hour?.() ?? null)) {
           // 표찰은 지상 사무 층(2·3층)만 (사용자 2026-10-25)
@@ -225,7 +219,7 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
         c.scale(1 / z, 1 / z);
         // 사람 그림은 월드 배율로 그려지므로(배경과 같이 커짐) 머리 높이도 z를 곱한다
         const shown = host.life ? live.filter((a) => a.kind === 'named') : people;
-        host.overlay?.(c, shown.map((p) => ({ name: p.name, x: p.x * z, y: p.y * z, top: namedTop(p.name) * persp(p.y) * z })), { name: '', x: w.player.x * z, y: (w.player.y - w.player.z) * z, top: ((w.player as { art?: { key: string } }).art ? charTop((w.player as { art?: { key: string } }).art!.key) : hasTestPeople() ? testPlayerTop() : visitAgentTop('쟈알디')) * persp(w.player.y) * z });
+        host.overlay?.(c, shown.map((p) => ({ name: p.name, x: p.x * z, y: p.y * z, top: namedTop(p.name) * persp(p.y) * z })), { name: '', x: w.player.x * z, y: (w.player.y - w.player.z) * z, top: ((w.player as { art?: { key: string } }).art ? charTop((w.player as { art?: { key: string } }).art!.key) : -230) * persp(w.player.y) * z });
         c.restore();
         // 행위자 머리 위 아이콘·말풍선 (화면 px)
         if (host.life) {
@@ -233,7 +227,7 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
           c.scale(1 / z, 1 / z);
           for (const a of live) {
             if (!a.icon && !a.say) continue;
-            const top = (a.kind === 'named' ? namedTop(a.name) : a.look && charArt(a.look) ? charTop(a.look) : hasTestPeople() && !hasCharPacks() ? testManTop() : -230) * persp(a.y);
+            const top = (a.kind === 'named' ? namedTop(a.name) : a.look && charArt(a.look) ? charTop(a.look) : -230) * persp(a.y);
             drawHeadBubble(c, a.x * z, (a.y + top) * z - 8, a.say ?? a.icon!, !!a.say);
           }
           c.restore();
@@ -370,7 +364,7 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
           // 말하는 사람이 이 방에 서 있으면 그 머리 위, 아니면 그 자리 위
           const who = curPeople.find((q) => q.name === l.who);
           const x = who?.x ?? sp.x, y = who?.y ?? sp.y ?? p.y;
-          speech = { who: l.who, text: l.text, x, y, top: (who ? visitAgentTop(l.who) : -200) * persp(y), until: performance.now() + 3800 };
+          speech = { who: l.who, text: l.text, x, y, top: (who ? namedTop(l.who) : -200) * persp(y), until: performance.now() + 3800 };
         }
       } else if (!sp) barked = null;
     },
@@ -888,13 +882,12 @@ function legacyDoor(c: CanvasRenderingContext2D, d: Door, camX: number) {
   }
 }
 
-/** 이름 인물 머리 꼭대기: 방문 요원 그림이 있으면 그것, 아니면 인물 팩(테스트룸 그림) */
-const namedTop = (name: string) => (charArt(name) ? charTop(name) : visitAgentTop(name));
-/** 행위자 그리기: 이름 인물은 인물 팩(통합 테스트룸 생활 클립, 10-29) → 옛 방문 요원 그림 → 실루엣, 몹은 host가 주는 그림(없으면 실루엣) */
+/** 이름 인물 머리 꼭대기: 인물 팩(테스트룸 그림) 값, 없으면 실루엣 높이 */
+const namedTop = (name: string) => (charArt(name) ? charTop(name) : -230);
+/** 행위자 그리기: 이름 인물은 인물 팩(통합 테스트룸 생활 클립, 10-29) → 실루엣, 몹은 host가 주는 그림(없으면 실루엣) */
 function drawLiveActor(c: CanvasRenderingContext2D, a: LiveActor, life: HubLife): void {
   const t = (life.lifeTime?.() ?? performance.now() / 1000) * 1000;
   if (a.kind === 'named' && drawCharClip(c, a.name, a.x, a.y, a.face, t, a.clip, (a.since ?? 0) * 1000)) return;
-  if (a.kind === 'named' && drawVisitAgent(c, a.name, a.x, a.y, a.face, t, a.clip, (a.since ?? 0) * 1000)) return;
   if (a.kind === 'mob' && life.drawMob) return life.drawMob(c, a);
   silhouette(c, a);
 }

@@ -142,12 +142,6 @@ await build({ ...common, entryPoints: ['src/game/action/engine/demo.ts'], format
       if (existsSync(f)) items[id] = { src: `data:image/png;base64,${readFileSync(f).toString('base64')}`, w: e.w, h: e.h, grip: e.grip, foot: e.foot };
     }
   }
-  const testPeople = {};
-  for (const f of readdirSync('game-pack/test-people').filter((f) => /\.(png|webp)$/.test(f) && !f.startsWith('woman_'))) {
-    testPeople[f.replace(/\.(png|webp)$/, '')] = `data:image/${f.endsWith('.webp') ? 'webp' : 'png'};base64,${readFileSync(`game-pack/test-people/${f}`).toString('base64')}`;
-  }
-  testPeople.eileen = JSON.parse(readFileSync('game-pack/test-people/eileen.json', 'utf8'));
-  testPeople.eileen_vfx = JSON.parse(readFileSync('game-pack/test-people/eileen_vfx.json', 'utf8'));
   const hqDoor = {};
   for (const key of ['frame', 'aperture', 'leaf-left', 'leaf-right', 'entry-marker']) {
     hqDoor[key] = `data:image/png;base64,${readFileSync(`game-pack/hq-door-round2/${key}.png`).toString('base64')}`;
@@ -157,7 +151,7 @@ await build({ ...common, entryPoints: ['src/game/action/engine/demo.ts'], format
     hqField[f.slice(0, -5)] = `data:image/webp;base64,${readFileSync(`game-pack/${pack}/${f}`).toString('base64')}`;
   }
   const code = readFileSync('dist-test/engine-demo.js', 'utf8').replace(/<\/script/gi, '<\\/script');
-  const html = `<!doctype html><html lang="ko"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"><title>관리국 액션 · 전투 시연</title><style>html,body{margin:0;height:100%;background:#000;overflow:hidden}#box{position:fixed;inset:0}</style><div id="box"></div><script>window.__GOEI_ENGINE_ART__=${JSON.stringify(art)};window.__GOEI_BG_ART__=${JSON.stringify(bg)};window.__GOEI_ITEM_ART__=${JSON.stringify(items)};window.__GOEI_HQ_DOOR_ROUND2__=${JSON.stringify(hqDoor)};window.__GOEI_HQ_FIELD__=${JSON.stringify(hqField)};window.__GOEI_TEST_PEOPLE__=${JSON.stringify(testPeople)}</script><script type="module">${code}</script></html>`;
+  const html = `<!doctype html><html lang="ko"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"><title>관리국 액션 · 전투 시연</title><style>html,body{margin:0;height:100%;background:#000;overflow:hidden}#box{position:fixed;inset:0}</style><div id="box"></div><script>window.__GOEI_ENGINE_ART__=${JSON.stringify(art)};window.__GOEI_BG_ART__=${JSON.stringify(bg)};window.__GOEI_ITEM_ART__=${JSON.stringify(items)};window.__GOEI_HQ_DOOR_ROUND2__=${JSON.stringify(hqDoor)};window.__GOEI_HQ_FIELD__=${JSON.stringify(hqField)}</script><script type="module">${code}</script></html>`;
   writeFileSync('dist/goei-action-game.html', html);
   mkdirSync('release/demo', { recursive: true });
   writeFileSync('release/demo/goei-action-game.html', html);

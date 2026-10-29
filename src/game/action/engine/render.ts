@@ -10,11 +10,9 @@ import { Fighter } from './fighter';
 import type { Player } from './player';
 import type { World } from './world';
 import { drawSupply } from './itemsLink';
-import { drawTestPlayer } from '../art/testPeople';
-import { EileenPlayer } from '../eileen/player';
 import { Room3Player } from '../room3/player';
-/** 테스트룸 코어로 움직이는 플레이어 (에일린 시험판·통합 테스트룸 인물): 스스로 그리고 장마다 실제 시간으로 움직인다 */
-const corePlayer = (p: unknown): p is EileenPlayer | Room3Player => p instanceof EileenPlayer || p instanceof Room3Player;
+/** 테스트룸 코어로 움직이는 플레이어 (통합 테스트룸 인물): 스스로 그리고 장마다 실제 시간으로 움직인다 */
+const corePlayer = (p: unknown): p is Room3Player => p instanceof Room3Player;
 
 const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
 
@@ -153,7 +151,6 @@ export function makeRenderer(ctx: CanvasRenderingContext2D, art: Art, opt: { hud
     const a = p.anim();
     // 필드 시험 캐릭터가 있으면 그 그림 (서기 / 움직이면 달리기)
     if (corePlayer(p) && !p.seat) { p.drawSelf(ctx, drawCam); return; }
-    if (drawTestPlayer(ctx, a.clip, a.frame, p.clipLen(a.clip), x, y - z, p.dir)) return;
     const blink = p.invuln > 0 && w.tick % 4 < 2 ? 0.5 : 1;
     if (!sprite(a.clip, a.frame, a.origin, x, y - z, p.dir, blink)) {
       ctx.fillStyle = '#c0453a';
