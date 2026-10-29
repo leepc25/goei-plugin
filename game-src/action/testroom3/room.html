@@ -260,7 +260,7 @@ const dust = (x, y, n, s = 1) => { for (let i = 0; i < n; i++) fx.push({ k: 'dus
 // 총 쏠 때 불꽃은 그림에 그려진 것만 씀 — 코드는 탄피만
 function muzzleFlash(p, big) { if (!(CH.gun || []).length) return; for (let i = 0; i < (big ? 3 : 1); i++) fx.push({ k: 'shell', x: p.x - P.face * 30, y: p.y, vx: -P.face * (80 + Math.random() * 80), vy: -220 - Math.random() * 120, g: P.y, t: 1.2 }); }
 
-function inReach(hx, pad = 60, hh = 100, wide = false) { pad *= K(P.y); const dk = K(D.y), hOk = wide ? P.z < D.z + 215 * dk && hh > D.z - 120 * dk : hh > D.z - 110 * dk && hh < D.z + 240 * dk; /* 공중공격: 발이 허수아비 머리(190)보다 낮게 내려왔을 때만(10-28 허공에서 맞던 것) */ return showDummy && Math.abs(D.y - P.y) < (wide ? 100 : 64) && (D.x - P.x) * P.face > (wide ? -60 : -20) && Math.abs(D.x - hx) < pad && hOk; }
+function inReach(hx, pad = 60, hh = 100, wide = false) { pad *= K(P.y); const dk = K(D.y), hOk = wide ? P.z < D.z + 215 * dk && hh > D.z - 120 * dk : hh > D.z - 110 * dk && hh < D.z + 240 * dk; /* 공중공격: 발이 허수아비 머리(190)보다 낮게 내려왔을 때만(10-28 허공에서 맞던 것) */ return showDummy && Math.abs(D.y - P.y) < (wide ? 100 : 80) && (D.x - P.x) * P.face > (wide ? -60 : -20) && Math.abs(D.x - hx) < pad && hOk; }
 function hurtDummy(dmg, kind) {
   if (D.mark > 0) dmg = Math.round(dmg * 1.5);
   D.hp = Math.max(0, D.hp - dmg); D.hits++; if (!P.inSuper) gainSp(dmg * 0.45); D.hitT = 1.0; D.flash = 0.09;
@@ -289,7 +289,7 @@ function fireEv(e) {
     const big = e.ev !== 'hit';
     const ry = id === '14' && CH.reachY && CH.reachY['14'] && CH.reachY['14'][f], p = framePt(id, f, a.reach[f], ry != null && ry !== false ? ry : a.h * (e.hy || 0.42));   // 점프 공격은 앞으로 뻗은 손발 높이에서
     const wide = id === '14';   // 공중공격은 판정을 넓게(사용자 2026-10-25): 앞뒤 160·위아래·깊이 넓게
-    if (inReach(p.x, wide ? 160 : big ? 100 : 70, P.y - p.y, wide)) {
+    if (inReach(p.x, wide ? 160 : big ? 115 : 90, P.y - p.y, wide)) {   // 10-29 밤 사용자: 판정이 엄격 → 앞 여유 70/100 → 90/115, 줄 차이 64 → 80
       hitstop = big ? 0.16 : 0.085; shake = big ? 16 : 8; dShake = big ? 11 : 7; P.connected = true;
       hurtDummy(atkDmg(id, big), e.kind || (big ? 'heavy' : 'light'));
       sfx('hit', { strength: big ? 3 : 1, kind: (CH.kick || []).includes(id) ? 'kick' : undefined });

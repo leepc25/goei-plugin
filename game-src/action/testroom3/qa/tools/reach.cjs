@@ -4,8 +4,8 @@
 const { chromium } = require('playwright'); const path = require('path'); const fs = require('fs');
 const [,, html, outp, par, only] = process.argv;
 const sleep = ms => new Promise(r => setTimeout(r, ms));
-const XS = [120, 180, 240, 300, 360, 440], YS = [0, 40, 80];
-const PARTS = { light: ['KeyQ', 60, 1300], heavy: ['KeyW', 60, 1600], skill: ['KeyD', 60, 3200], c2: ['KeyS', 1450, 3500], super: ['KeyF', 60, 5500] };
+const XS = [150, 200, 250, 300], YS = [0, 70];
+const PARTS = { light: ['KeyQ', 60, 900], heavy: ['KeyW', 60, 1100], skill: ['KeyD', 60, 2600] };
 (async () => {
   const b = await chromium.launch();
   const p0 = await b.newPage(); await p0.goto('file://' + path.resolve(html)); await p0.waitForFunction(() => window.__room && window.__room.CK);
