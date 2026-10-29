@@ -1,28 +1,20 @@
 # GPT 요청문 · 헐값매입 (PixelLab image-to-pixelart 변환 시험용, 2026-10-29)
 
-용도: GPT가 그린 큰 그림 한 장을 PixelLab `image-to-pixelart-pro`(또는 pro-flash, 6회)에 넣어 도트로 바꾸는 시험. 「GPT 안 쓴다」 결정은 유지하되, 변환 경로가 쓸 만한지만 본다.
-
-- 크기: **1536×1024** (GPT 가로 최대). 비율 3:2.
-- 시점·구도는 요원 그림(PixelLab low top-down ≈ 20°)에 맞춘다. 바닥이 아래 45%.
-- 문 없음(출입은 화면 아래 어둠에서). 글자·사람 없음. 가장자리는 어둠으로 묻히게.
-
----
-
-붙여 넣을 요청문:
+용도: GPT가 그린 큰 그림 한 장을 PixelLab 도트 변환에 넣어 보는 시험. 1차 결과(`game-src/art/pixellab-test-20261028/gpt_heolgap_1536x1024.webp`)는 쓸 만했으나 시계가 2개, 물건이 비슷비슷함. 아래는 그걸 고친 2차 요청문.
 
 ```
 Game background illustration, 1536x1024, landscape.
 
-SCENE: a cramped, dim pawn shop ("cheap buy-up" shop) inside a run-down 1990s Seoul underground shopping arcade, late at night. It must read as ONE continuous room, not a box: the side walls and the near floor edge dissolve into darkness; only what the lamps reach is visible.
+SCENE: a cramped, dim pawn shop inside a run-down 1990s Seoul underground shopping arcade, late at night.
 
-CAMERA: beat 'em up view. The camera is about 20 degrees above the floor looking slightly down, straight at the back wall, no vanishing point, no converging lines. The back wall is low in the frame: its baseboard sits at about 55% of the image height, so the lower 45% of the image is open floor the characters walk on. Furniture against the back wall stands on that baseboard line. Nothing is cut off awkwardly at the left or right edges; let them fade to shadow instead.
+CAMERA: beat 'em up view. The camera is slightly above the floor looking a little down, straight at the back wall, no vanishing point, no converging lines. The back wall is low in the frame so that most of the lower part of the image is open floor the characters walk on. Furniture against the back wall stands on the baseboard line.
 
-CONTENTS (all of these, filling the room densely, nothing empty):
-- Back wall: dark burgundy paint with water stains and peeling patches, a thin dark wooden baseboard. Two round wall clocks. A folding screen (byobu) with a faded painting standing in one corner.
-- Three or four tall glass display cabinets with brass frames, lit from inside, packed with: gold rings and necklaces on black velvet busts, old wristwatches, small brass figurines and an incense burner, chipped celadon shards, and several strange unlabeled curios (a sealed jar with something dark inside, a cracked porcelain doll, a tarnished mask, an odd metal device).
-- Dominating the middle of the room: a heavy old dark wooden appraisal desk, long and wide, front face toward the camera, with a brass balance scale, a magnifying glass on a stand, white appraisal gloves, a seal box, a document tray and a low shaded desk lamp on top. An old wooden armchair behind it (owner) and a plain wooden chair in front of it (customer), the two facing each other across the desk.
-- To one side of the back wall: a dark doorway to a back room covered by a hanging curtain of red-brown wooden beads. No other doors anywhere.
-- A small iron safe on the floor, a few stacked old books, a low wooden cabinet with document trays.
+CONTENTS — every object must look clearly different from the others; do not repeat the same cabinet, the same vase, the same statue:
+- Back wall: dark burgundy paint with water stains and peeling patches, a thin dark wooden baseboard. ONE round wall clock. One faded ink-painting scroll. A folding screen standing in one corner.
+- Display cabinets, each a different design: (a) a tall narrow brass-and-glass jewellery case with gold rings, necklaces and bracelets on black velvet; (b) a wide wooden-framed glass case with old wristwatches and pocket watches laid in rows; (c) a dark lacquered cabinet with metal crafts: a bronze incense burner, a brass lion, a cracked bronze bell, celadon shards on a tray; (d) a dusty glass case of strange unlabeled curios: a sealed jar with something dark inside, a cracked porcelain doll, a tarnished mask, an odd clockwork device, a small bone.
+- Dominating the middle: a heavy old dark wooden appraisal desk, long and wide, front face toward the camera, with a brass balance scale, a magnifying glass on a stand, white appraisal gloves, a seal box, a document tray and a shaded desk lamp. An old wooden armchair behind it (owner), a plain wooden chair in front (customer), facing each other across the desk.
+- To one side of the back wall: a dark doorway to a back room covered by a hanging curtain of red-brown wooden beads.
+- A small iron safe on the floor, a short stack of old books, a low wooden cabinet with document trays.
 - Floor: old dark hardwood planks, scuffed and dull, with warm pools of lamp light and deep shadows under the furniture.
 
 LIGHT: low and warm — the desk lamp and the lit cabinets are the main light; the rest falls into brown-black shadow. Dark, slightly desaturated palette with warm gold highlights.
