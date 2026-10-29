@@ -58,8 +58,14 @@ function control(it: Item, s: UiSettings): string {
   const seg = (v: string, label: string, on: boolean) => `<button class="gx-seg${on ? ' on' : ''}" data-action="visit-ui" data-value="${it.key}=${v}" aria-pressed="${on}">${esc(label)}</button>`;
   if (it.type === 'pick') return `<div class="gx-segs gx-segs-sm">${it.opts.map(([v, l]) => seg(v, l, cur === v)).join('')}</div>`;
   if (it.type === 'on') return switchHtml({ action: 'visit-ui', value: `${it.key}=${cur === true ? '0' : '1'}`, on: cur === true, label: it.label });
-  if (it.type === 'min') return `<span class="adv-num"><input class="gx-search" type="number" inputmode="numeric" min="${it.min}" max="${it.max}" step="${it.step}" data-change="visit-ui" data-key="${it.key}" value="${Math.round(Number(cur))}" aria-label="${esc(it.label)}"><span>분</span></span>`;
-  return `<span class="adv-num"><input class="gx-search" type="number" inputmode="numeric" min="${Math.round(it.min * 100)}" max="${Math.round(it.max * 100)}" step="${Math.round(it.step * 100)}" data-change="visit-ui" data-key="${it.key}" value="${Math.round(Number(cur) * 100)}" aria-label="${esc(it.label)}"><span>%</span></span>`;
+  // 숫자 칸은 요원 표시 인원과 같은 「− 값 +」 (2026-10-29 사용자: type=number 의 작은 화살표는 누르기 어렵다). 값은 visit-ui key=숫자 로 그대로 간다
+  const step = (shown: string, lo: number, hi: number, down: number, up: number) =>
+    `<div class="st-step"><button class="gx-step" data-action="visit-ui" data-value="${it.key}=${down}" ${lo <= 0 ? 'disabled' : ''} aria-label="${esc(it.label)} 줄이기">−</button>
+    <b>${esc(shown)}</b><button class="gx-step" data-action="visit-ui" data-value="${it.key}=${up}" ${hi <= 0 ? 'disabled' : ''} aria-label="${esc(it.label)} 늘리기">+</button></div>`;
+  const n = Number(cur);
+  if (it.type === 'min') return step(`${Math.round(n)}분`, n - it.min, it.max - n, Math.max(it.min, Math.round(n - it.step)), Math.min(it.max, Math.round(n + it.step)));
+  const pc = Math.round(n * 100), st = Math.round(it.step * 100), lo = Math.round(it.min * 100), hi = Math.round(it.max * 100);
+  return step(`${pc}%`, pc - lo, hi - pc, Math.max(lo, pc - st), Math.min(hi, pc + st));
 }
 
 export function gameUiSections(state: Record<string, unknown> | undefined): string {
