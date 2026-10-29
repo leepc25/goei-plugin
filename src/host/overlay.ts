@@ -146,6 +146,15 @@ export interface Fab {
 
 const POS_KEY = 'goei-plugin:fab-pos';
 
+/** 폰 필드(가로 전체화면) 중에는 유령 버튼을 숨긴다 (모바일 조작 설계 2026-10-28). 게임 창(ui/game.ts)이 부른다 */
+let fieldHidden = false;
+const hiddenSubs = new Set<(hidden: boolean) => void>();
+export function setFabHidden(on: boolean): void {
+  if (fieldHidden === on) return;
+  fieldHidden = on;
+  hiddenSubs.forEach((f) => f(on));
+}
+
 interface DragState {
   x: number;
   y: number;
@@ -333,6 +342,11 @@ export async function createFab(onOpen: () => void): Promise<Fab> {
     }
   };
   await bind();
+  const onHidden = (h: boolean) => {
+    if (h) drag = null;
+    void host.setStyle('display', visible && !h ? 'block' : 'none').catch(() => {});
+  };
+  hiddenSubs.add(onHidden);
 
   return {
     async setVisible(next, intro = false) {
@@ -357,7 +371,7 @@ export async function createFab(onOpen: () => void): Promise<Fab> {
         await host.setAttribute('x-goei-intro', 'true');
         introTimer = setTimeout(endIntro, INTRO_MS + 400);
       }
-      await host.setStyle('display', next ? 'block' : 'none');
+      await host.setStyle('display', next && !fieldHidden ? 'block' : 'none');
     },
     endIntro,
     async setTheme(theme) {
@@ -368,6 +382,7 @@ export async function createFab(onOpen: () => void): Promise<Fab> {
       return !!(await doc.querySelector('.default-chat-screen'));
     },
     async remove() {
+      hiddenSubs.delete(onHidden);
       visible = false;
       drag = null;
       pending = null;

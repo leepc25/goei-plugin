@@ -10,7 +10,9 @@ import { downloadGamePack, installGamePack, liveUrls, packStateOf, releaseAll } 
 import { gameSaves } from '../host/game/saves';
 import { clearRecord, dropReport, onReports, pendingReports, postReport, readCard, recordReport, type PendingReport } from '../host/game/card';
 import { makeBridge } from '../host/game';
-import { makeViewport, type ViewportCtl } from '../host/game/viewport';
+import { makeViewport, phone, type ViewportCtl } from '../host/game/viewport';
+import { setFabHidden } from '../host/overlay';
+import { uprightInput } from './uprightInput';
 import { loadContext } from '../host/risu';
 import { ICONS } from './icons';
 
@@ -24,6 +26,7 @@ let generation = 0;
 let busy = '';
 let notice = '';
 let offReports: (() => void) | null = null;
+let offUpright: (() => void) | null = null;
 
 /** 측정 (시작 화면 아래 「측정」에 보인다, 시험이 읽는다) */
 export const gameStats = { openMs: 0, codeMs: 0, mountMs: 0, heapOpen: 0, heapAfter: 0 };
@@ -173,10 +176,29 @@ async function putFiles(list: FileList): Promise<void> {
   }
 }
 
+/** 폰 필드 (모바일 조작 설계 2026-10-28): 창 머리·아래 메뉴·신분증 칸(창의 왼쪽 메뉴 줄)·유령 버튼을 숨긴다. 나가면 되돌린다 */
+let chromeHidden: HTMLElement | null = null;
+function phoneChrome(on: boolean): void {
+  if (on && layer) {
+    chromeHidden = layer.closest<HTMLElement>('.gx') ?? null;
+    chromeHidden?.classList.add('gx-fieldfull');
+    layer.classList.add('gx-phone');
+  } else {
+    chromeHidden?.classList.remove('gx-fieldfull');
+    chromeHidden = null;
+    layer?.classList.remove('gx-phone');
+  }
+  setFabHidden(on);
+}
+
 async function play(slot: SlotId): Promise<void> {
   const box = layer?.querySelector<HTMLElement>('.gx-game-box');
   if (!box || !viewport) return;
   const me = ++generation;
+  // 폰이면 무조건 가로 전체화면: 전체화면 요청은 「들어가기」 손짓 안에서 바로 (게임 코드를 꺼내기 전에)
+  const onPhone = phone();
+  const going = onPhone ? viewport.phoneFull(true) : null;
+  if (onPhone) phoneChrome(true);
   const t0 = performance.now();
   gameStats.heapOpen = heap();
   busy = '게임을 여는 중';
@@ -186,7 +208,8 @@ async function play(slot: SlotId): Promise<void> {
     if (me !== generation || !layer) return;
     view = 'play';
     // 게임은 창 전체를 쓴다(통합 규격 3장: 캔버스가 창 면적 80% 이상, 폰 가로는 높이 100%, 폰 세로는 돌려 꽉 채움)
-    viewport.fill(true);
+    if (going) await going;
+    else viewport.fill(true);
     setHead();
     box.innerHTML = '';
     const bridge = makeBridge(viewport, slot, () => (onExit ? onExit() : closeGame()), (cb) => {
@@ -201,6 +224,8 @@ async function play(slot: SlotId): Promise<void> {
   } catch (e) {
     busy = '';
     view = 'home';
+    phoneChrome(false);
+    if (viewport.phone) await viewport.phoneFull(false);
     viewport.fill(false);
     setHead();
     say(`게임을 열지 못했어요: ${e instanceof Error ? e.message : String(e)}`);
@@ -218,6 +243,8 @@ function stop(): void {
 function toHome(): void {
   stop();
   view = 'home';
+  phoneChrome(false);
+  if (viewport?.phone) void viewport.phoneFull(false);
   viewport?.fill(false);
   notice = '';
   setHead();
@@ -311,6 +338,8 @@ export function openGame(panel: Element | null, exit?: () => void): void {
   layer.innerHTML = `<div class="gx-game-in"><header class="gx-head"></header><div class="gx-game-box"></div></div>`;
   panel.append(layer);
   viewport = makeViewport(layer, { inFrame: true });
+  // 아이폰(돌려 보이는 중): 입력칸을 바로 세워 키패드 위에
+  offUpright = uprightInput(layer, () => !!viewport?.rotated);
   view = 'home';
   notice = '';
   setHead();
@@ -327,8 +356,11 @@ export function openGame(panel: Element | null, exit?: () => void): void {
 
 export function closeGame(): void {
   stop();
+  phoneChrome(false);
   offReports?.();
   offReports = null;
+  offUpright?.();
+  offUpright = null;
   viewport?.dispose();
   viewport = null;
   layer?.remove();

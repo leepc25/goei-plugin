@@ -2896,3 +2896,15 @@ button.mk-go:hover { color: var(--signal); }
   .gx-wt-row:hover .gx-wt-del { visibility: hidden; }
   .gx-wt-row.open .gx-wt-del { visibility: visible; }
 }
+
+/* 폰 필드 (모바일 조작 설계 2026-10-28): 게임이 창 전체를 덮고(gx-winfull 또는 브라우저 전체화면), 창 머리·왼쪽 메뉴 줄(신분증)·아래 메뉴 줄은 숨긴다.
+   터치 차단: 두 손가락 확대·길게 누르기 메뉴·글자 선택·당겨서 뒤로·가장자리 쓸기를 층 루트에서 막는다 */
+.gx.gx-fieldfull .gx-panel > .gx-head, .gx.gx-fieldfull .gx-panel > .gx-nav, .gx.gx-fieldfull .gx-mbar { visibility: hidden; }
+.gx.gx-fieldfull { overscroll-behavior: none; }
+.gx-game.gx-phone { touch-action: none; overscroll-behavior: none; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; -webkit-tap-highlight-color: transparent; }
+.gx-game.gx-phone .gx-head { display: none; }
+.gx-game.gx-phone:fullscreen { background: #000; }
+/* 돌려 보이는 게임 안 입력칸을 바로 세운 임시 상자 (ui/uprightInput.ts): 키패드 바로 위 */
+.gx-upright { position: fixed; left: 0; right: 0; bottom: 0; z-index: 10001; display: flex; gap: 6px; padding: 8px 10px calc(8px + env(safe-area-inset-bottom)); background: #14110d; border-top: 3px solid #c9a74a; }
+.gx-upright input { flex: 1; min-width: 0; font: 16px/1.4 inherit; padding: 8px 10px; color: #fff; background: #2b2620; border: 2px solid #6e6350; border-radius: 6px; outline: none; }
+.gx-upright button { font: 15px inherit; padding: 0 12px; color: #ffe27a; background: #3d3428; border: 2px solid #c9a74a; border-radius: 6px; }
