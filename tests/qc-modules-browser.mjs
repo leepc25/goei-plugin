@@ -905,19 +905,19 @@ if (want('W1')) {
   await page.waitForSelector('.nw-compose');
   assert.ok((await page.textContent('.nw-compose')).includes('같은 이름의 로어북이 있어요'));
   // 설정: 원본 충실·짧게·보조·이전 문서 참고 OFF·채팅 반영 ON·공용 지침
-  await page.click('[data-action="wiki-settings"]');
-  await page.click('[data-action="wiki-mode"][data-value="faithful"]');
+  await featSet(page, 'set:wiki');
+  await page.click('.gw [data-action="wiki-mode"][data-value="faithful"]');
   await page.waitForFunction(() => window.__chat.scriptstate.$nw_mode === 'faithful');
-  await page.click('[data-action="wiki-length"][data-value="short"]');
+  await page.click('.gw [data-action="wiki-length"][data-value="short"]');
   await page.waitForFunction(() => window.__chat.scriptstate.$nw_length === 'short');
-  await page.click('[data-action="wiki-model"][data-value="aux"]');
+  await page.click('.gw [data-action="wiki-model"][data-value="aux"]');
   await page.waitForFunction(() => window.__chat.scriptstate.$nw_model === 'aux');
-  await page.click('[data-action="wiki-context"][data-value="1"]');
+  await page.click('.gw [data-action="wiki-context"][data-value="1"]');
   await page.waitForFunction(() => window.__chat.scriptstate.$nw_context === '1');
-  await page.fill('[data-change="wiki-request"]', '존댓말로 쓸 것');
-  await page.dispatchEvent('[data-change="wiki-request"]', 'change');
+  await page.fill('.gw [data-change="wiki-request"]', '존댓말로 쓸 것');
+  await page.dispatchEvent('.gw [data-change="wiki-request"]', 'change');
   await page.waitForFunction(() => window.__chat.scriptstate.$nw_writing_request === '존댓말로 쓸 것');
-  await page.click('[data-action="wiki-settings"]');
+  await featSet(page, 'set:wiki');
   await page.click('.nw-grab');
   await page.fill('.nw .ph-search', '소라 랜드');
   await page.press('.nw .ph-search', 'Enter');
@@ -939,12 +939,12 @@ if (want('W1')) {
   assert.ok(call.messages[1].content.includes('[최근 챗로그]'));
   assert.ok(!call.messages[1].content.includes('[이전 위키'), '처음 쓸 땐 이전 문서 없음');
   // 성공: 확장 모드로 바꾸고 생성 → 저장 → 문서 화면 (XSS 포함)
-  await page.click('[data-action="wiki-settings"]');
-  await page.click('[data-action="wiki-mode"][data-value="expand"]');
+  await featSet(page, 'set:wiki');
+  await page.click('.gw [data-action="wiki-mode"][data-value="expand"]');
   await page.waitForFunction(() => window.__chat.scriptstate.$nw_mode === 'expand');
-  await page.click('[data-action="wiki-length"][data-value="detailed"]');
+  await page.click('.gw [data-action="wiki-length"][data-value="detailed"]');
   await page.waitForFunction(() => window.__chat.scriptstate.$nw_length === 'detailed');
-  await page.click('[data-action="wiki-settings"]');
+  await featSet(page, 'set:wiki');
   await page.click('.nw-grab');
   await page.fill('.nw .ph-search', '소라 랜드');
   await page.press('.nw .ph-search', 'Enter');
