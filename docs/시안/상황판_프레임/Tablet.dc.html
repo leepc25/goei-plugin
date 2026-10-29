@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<title>일반 태블릿 프레임</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+body{margin:0;font-family:'IBM Plex Sans KR','Noto Sans KR',system-ui,sans-serif;color:#E9F0EE}
+a{color:#5EEAD4}a:hover{color:#8FF3E4}
+</style>
+</helmet>
+<div style="width: 1400px; height: 1100px; box-sizing: border-box; background: linear-gradient(180deg, #16181d 0%, #121418 100%); display: grid; place-items: center; position: relative; overflow: hidden;">
+  <!-- 뒤 배경 = Risu 채팅 화면(어두운 테마)이 덮개로 가려진 모습 -->
+  <div style="position: absolute; left: 0; right: 0; top: 0; height: 56px; border-bottom: 1px solid rgba(255,255,255,.05); background: rgba(255,255,255,.02);"></div>
+  <div style="position: absolute; left: 120px; top: 110px; width: 460px; height: 92px; border-radius: 14px; background: rgba(255,255,255,.035);"></div>
+  <div style="position: absolute; right: 120px; top: 230px; width: 380px; height: 64px; border-radius: 14px; background: rgba(255,255,255,.03);"></div>
+  <div style="position: absolute; left: 120px; top: 330px; width: 520px; height: 120px; border-radius: 14px; background: rgba(255,255,255,.035);"></div>
+  <div style="position: absolute; left: 0; right: 0; bottom: 0; height: 72px; border-top: 1px solid rgba(255,255,255,.05); background: rgba(255,255,255,.02);"></div>
+  <div style="position: absolute; inset: 0; background: rgba(3,7,9,.62);"></div>
+
+  <!-- 기기 본체: 창(1088×886) + 베젤 38px = 1164×962. 창 크기는 그대로, 프레임만 바깥으로 -->
+  <div style="position: relative; width: 1122px; height: 922px; border-radius: 40px; background: linear-gradient(148deg, #4a5057 0%, #2a2f35 28%, #15181c 60%, #262b31 100%); box-shadow: 0 70px 120px -40px rgba(0,0,0,.85), 0 0 0 1px rgba(255,255,255,.06), inset 0 1px 0 rgba(255,255,255,.14), inset 0 -1px 0 rgba(0,0,0,.6);">
+    <!-- 알루미늄 테두리 하이라이트 -->
+    <div style="position: absolute; inset: 3px; border-radius: 37px; box-shadow: inset 0 0 0 1px rgba(255,255,255,.07), inset 0 0 18px rgba(0,0,0,.6); pointer-events: none;"></div>
+    <!-- 검은 유리 베젤 -->
+    <div style="position: absolute; inset: 8px; border-radius: 32px; background: radial-gradient(120% 90% at 50% 0%, #121517 0%, #07090b 55%, #000 100%); box-shadow: inset 0 0 0 1px rgba(255,255,255,.035);"></div>
+    <!-- 전면 카메라 + 조도 센서 (위 가운데) -->
+    <div style="position: absolute; left: 50%; top: 13px; transform: translateX(-50%); display: flex; align-items: center; gap: 10px;">
+      <span style="width: 4px; height: 4px; border-radius: 50%; background: #1c2226; box-shadow: inset 0 0 0 1px #0a0d0f;"></span>
+      <span style="width: 9px; height: 9px; border-radius: 50%; background: radial-gradient(circle at 40% 35%, #3a4f5c 0%, #0d1317 55%, #000 100%); box-shadow: 0 0 0 1.5px #0c0f11, 0 0 0 2.5px rgba(255,255,255,.05);"></span>
+    </div>
+    <!-- 화면: 창 그대로 -->
+    <img src="/_blob/0609c7c20887227cbe5bcca89a72a7d6" alt="괴이 상황판 창 (실제 화면)" width="1070" height="870" style="position: absolute; left: 26px; top: 26px; width: 1070px; height: 870px; border-radius: 20px; display: block; box-shadow: 0 0 0 3px #000, 0 0 0 4px rgba(255,255,255,.03);">
+    <!-- 유리 반사 (화면 위 아주 옅게) -->
+    <div style="position: absolute; left: 26px; top: 26px; width: 1070px; height: 870px; border-radius: 20px; background: linear-gradient(115deg, rgba(255,255,255,.045) 0%, rgba(255,255,255,0) 28%); pointer-events: none;"></div>
+    <!-- 측면 버튼: 전원(오른쪽 위), 볼륨(오른쪽) -->
+    <div style="position: absolute; right: -4px; top: 86px; width: 4px; height: 54px; border-radius: 0 3px 3px 0; background: linear-gradient(180deg, #4b5159, #22272c); box-shadow: inset -1px 0 0 rgba(255,255,255,.12);"></div>
+    <div style="position: absolute; right: -4px; top: 170px; width: 4px; height: 92px; border-radius: 0 3px 3px 0; background: linear-gradient(180deg, #4b5159, #22272c); box-shadow: inset -1px 0 0 rgba(255,255,255,.12);"></div>
+    <!-- 스피커 구멍 (아래 테두리 좌우) -->
+    <div style="position: absolute; left: 300px; bottom: 2px; width: 110px; height: 3px; background: repeating-linear-gradient(90deg, rgba(0,0,0,.9) 0 3px, transparent 3px 7px); opacity: .7;"></div>
+    <div style="position: absolute; right: 300px; bottom: 2px; width: 110px; height: 3px; background: repeating-linear-gradient(90deg, rgba(0,0,0,.9) 0 3px, transparent 3px 7px); opacity: .7;"></div>
+  </div>
+
+  <div style="position: absolute; left: 24px; bottom: 20px; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 12px; letter-spacing: .12em; color: rgba(233,240,238,.55);">TABLET · BEZEL 26 · WINDOW 1070 × 870 (UNCHANGED)</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1400,"height":1100}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

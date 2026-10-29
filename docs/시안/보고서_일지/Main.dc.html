@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<title>상황판 · 종료 사건의 보고서와 일지 전환</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap">
+<style>
+body{margin:0;font-family:'IBM Plex Sans KR','Noto Sans KR',system-ui,sans-serif;color:#E9F0EE}
+a{color:#5EEAD4}a:hover{color:#8FF3E4}
+</style>
+</helmet>
+<div style="width: 1100px; height: 900px; box-sizing: border-box; background: #0E1416; padding: 12px; display: flex;">
+<div style="flex: 1 1 auto; min-width: 0; display: grid; grid-template-rows: 56px minmax(0, 1fr); background: #1A2226; border: 1px solid #37464D; border-radius: 20px; overflow: hidden;">
+  <header style="display: flex; align-items: center; gap: 12px; padding: 0 12px 0 16px; border-bottom: 1px solid #3F8879;">
+    <div style="width: 36px; height: 36px; border-radius: 10px; background: #1D403A; display: grid; place-items: center;"><svg width="22" height="22" viewBox="0 0 24 24" fill="#5EEAD4" aria-hidden="true"><path d="M12 2.5c-3.7 0-6 2.7-6 6.3V20l2.2-1.6L10.4 20l1.6-1.6L13.6 20l2.2-1.6L18 20V8.8c0-3.6-2.3-6.3-6-6.3Zm-2.2 7.6a1.1 1.1 0 1 1 0-2.2 1.1 1.1 0 0 1 0 2.2Zm4.4 0a1.1 1.1 0 1 1 0-2.2 1.1 1.1 0 0 1 0 2.2Z"/></svg></div>
+    <b style="font-size: 17px; font-weight: 700;">괴이 <span style="color:#5EEAD4;font-weight:300;margin:0 .3em">ː</span><span style="color:#5EEAD4">ANOMALY</span></b>
+    <span style="color: #97A9A5;">›</span>
+    <b style="font-size: 17px;">상황판</b>
+    <div style="margin-left: auto; display: flex; gap: 8px; align-items: center;">
+      <button type="button" aria-label="설정" style="width: 34px; height: 34px; border-radius: 10px; border: 1px solid #37464D; background: #232D32; color: #BECBC8; display: grid; place-items: center; cursor: pointer;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="17" r="2"/></svg></button>
+      <button type="button" aria-label="닫기" style="width: 34px; height: 34px; border-radius: 10px; border: 1px solid #37464D; background: #232D32; color: #BECBC8; display: grid; place-items: center; cursor: pointer;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+    </div>
+  </header>
+  <div style="display: grid; grid-template-columns: 236px minmax(0, 1fr); min-height: 0;">
+    <nav style="padding: 16px 14px; border-right: 1px solid #37464D; display: flex; flex-direction: column; gap: 4px; overflow: hidden;">
+      <!-- 사원증: 세로 카드 그대로. 이름·소속 한 줄, 잔고는 누르면 가계부, 위치·목표 한 줄씩 -->
+      <div style="border-radius: 16px; background: linear-gradient(180deg, #243238 0%, #1C262B 100%); border: 1px solid #37464D; margin-bottom: 12px; padding: 14px 12px 12px; display: flex; flex-direction: column; align-items: center; gap: 8px;">
+        <div style="width: 96px; height: 96px; border-radius: 14px; background: #2C383E; border: 1px solid #46565D; display: grid; place-items: center; color: #97A9A5;"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="5" y="3" width="14" height="18" rx="2"/><circle cx="12" cy="10" r="2.5"/><path d="M8 17c1-2 7-2 8 0"/></svg></div>
+        <div style="display: flex; align-items: center; gap: 8px;"><b style="font-size: 16px;">나</b><span style="font-size: 11px; padding: 2px 8px; border-radius: 999px; background: #1D403A; color: #5EEAD4;">관리국</span></div>
+        <button type="button" aria-label="가계부 열기" style="width: 100%; height: 36px; margin-top: 2px; padding: 0 10px 0 12px; border-radius: 10px; border: 1px solid #37464D; background: #1A2226; color: #E9F0EE; display: flex; align-items: center; justify-content: space-between; font: inherit; cursor: pointer;"><span style="font-size: 11px; color: #97A9A5;">잔고</span><span style="display: inline-flex; align-items: center; gap: 6px;"><b style="font-family:'JetBrains Mono',monospace;font-size:15px">₩ 207,500</b><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#97A9A5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></span></button>
+        <div style="width: 100%; display: flex; flex-direction: column; gap: 3px; font-size: 12px; color: #BECBC8;">
+          <div style="display: flex; justify-content: space-between;"><span><span style="color:#97A9A5;font-size:11px;margin-right:6px">위치</span><span style="font-family:'JetBrains Mono',monospace">05.10 19:02</span></span><span style="color:#97A9A5;font-size:11px">맑음 17°C</span></div>
+          <div style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"><span style="color:#97A9A5;font-size:11px;margin-right:6px">목표</span>관리국 본부</div>
+        </div>
+      </div>
+      <div style="height: 48px; border-radius: 12px; background: #1D403A; color: #5EEAD4; display: flex; align-items: center; padding: 0 16px; font-weight: 600; gap: 10px;">상황판</div>
+      <div style="height: 48px; display: flex; align-items: center; padding: 0 16px; color: #BECBC8;">임무</div>
+      <div style="height: 48px; display: flex; align-items: center; padding: 0 16px; color: #BECBC8;">커스텀</div>
+      <div style="height: 48px; display: flex; align-items: center; padding: 0 16px; color: #BECBC8;">괴담톡</div>
+      <div style="height: 48px; display: flex; align-items: center; padding: 0 16px; color: #BECBC8;">괴담넷</div>
+      <div style="height: 48px; display: flex; align-items: center; padding: 0 16px; color: #BECBC8;">위키</div>
+      <div style="height: 48px; display: flex; align-items: center; padding: 0 16px; color: #BECBC8;">필드</div>
+      <div style="height: 48px; display: flex; align-items: center; padding: 0 16px; color: #BECBC8; gap: 8px;">기록 <span style="font-size: 10px; padding: 1px 6px; border-radius: 999px; border: 1px dashed #F5B544; color: #F5B544; font-weight: 600;">새 메뉴 · 가계부 자리</span></div>
+      <div style="height: 48px; display: flex; align-items: center; padding: 0 16px; color: #BECBC8;">설정</div>
+    </nav>
+    <main style="padding: 20px; overflow: hidden; display: grid; grid-template-rows: 440px minmax(0, 1fr); gap: 16px; min-width: 0;">
+      <div style="display: grid; grid-template-columns: minmax(0, 1fr) 348px; gap: 14px; min-height: 0;">
+        <!-- CCTV: 고른 사건(종료된 것)을 보여 준다 -->
+        <div style="position: relative; border-radius: 16px; border: 1px solid #37464D; background: #141B1E; overflow: hidden; display: flex; flex-direction: column; justify-content: space-between;">
+          <div style="position: absolute; inset: 0; background: radial-gradient(ellipse at 40% 30%, #27353B 0%, #121A1D 60%, #0C1114 100%); opacity: .95;"></div>
+          <div style="position: absolute; inset: 0; background: repeating-linear-gradient(0deg, rgba(255,255,255,.025) 0 1px, transparent 1px 3px);"></div>
+          <div style="position: relative; display: flex; justify-content: space-between; padding: 14px 16px;">
+            <div style="font-family:'JetBrains Mono',monospace; font-size: 11px; letter-spacing: .14em; color: #BECBC8; line-height: 1.6;"><span style="color:#FF7A6B">● REC</span>&nbsp; CAM-12 · 서울특별시 중구<br>2025.05.10 07:02 PM · 재생</div>
+            <div style="display: flex; gap: 6px;">
+              <span style="width: 30px; height: 30px; border-radius: 8px; background: rgba(26,34,38,.9); border: 1px solid #37464D; display: grid; place-items: center; color: #BECBC8;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h4"/></svg></span>
+              <span style="width: 30px; height: 30px; border-radius: 8px; background: rgba(26,34,38,.9); border: 1px solid #37464D; display: grid; place-items: center; color: #BECBC8;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 7h16M9 7V5h6v2M7 7l1 13h8l1-13"/></svg></span>
+            </div>
+          </div>
+          <div style="position: relative; padding: 16px 18px 18px; background: linear-gradient(180deg, rgba(10,14,16,0) 0%, rgba(10,14,16,.85) 40%); display: flex; flex-direction: column; gap: 8px;">
+            <div style="display: flex; align-items: center; gap: 10px;">
+              <span style="width: 30px; height: 30px; border-radius: 8px; background: #2C383E; color: #BECBC8; display: grid; place-items: center; font-family:'JetBrains Mono',monospace; font-weight: 700;">B</span>
+              <b style="font-size: 22px;">거울 속 사람</b>
+              <span style="font-size: 12px; padding: 5px 9px; border-radius: 999px; background: #2C383E; color: #BECBC8; box-shadow: inset 0 0 0 1px #46565D; font-weight: 600;">종료</span>
+              <span style="font-size: 12px; padding: 5px 9px; border-radius: 999px; background: #45381C; color: #F5B544; font-weight: 600;">내가 출동</span>
+            </div>
+            <div style="font-size: 14px; color: #BECBC8;">투입 <span style="color:#5EEAD4;font-weight:600">에일린 · 큐라스</span></div>
+            <div style="font-size: 13px; color: #97A9A5;">중림 지하상가 · 17:38 발생 → 19:02 종료 · 1시간 24분</div>
+            <div style="display: flex; align-items: flex-end; justify-content: space-between; gap: 12px;">
+              <div style="font-size: 15px; font-weight: 600;">격리 완료. 현장 봉쇄 해제.</div>
+              <button type="button" style="flex: none; height: 36px; padding: 0 14px; border-radius: 10px; border: 1px solid #3F8879; background: #1D403A; color: #5EEAD4; font: inherit; font-size: 13px; font-weight: 700; display: inline-flex; align-items: center; gap: 6px; cursor: pointer;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M5 4h11l3 3v13H5z"/><path d="M8 10h8M8 14h8M8 18h5"/></svg>보고서</button>
+            </div>
+          </div>
+        </div>
+        <!-- 오른쪽: 상황 목록 (CCTV / 지도 / 일지 전환) -->
+        <div style="border-radius: 16px; border: 1px solid #37464D; background: #232D32; display: flex; flex-direction: column; overflow: hidden;">
+          <div style="display: flex; align-items: center; gap: 8px; padding: 10px 12px; border-bottom: 1px solid #37464D;">
+            <div style="display: inline-flex; gap: 2px; padding: 2px; border-radius: 10px; background: #1A2226; border: 1px solid #37464D;">
+              <span style="width: 32px; height: 28px; border-radius: 8px; background: #1D403A; color: #5EEAD4; display: grid; place-items: center;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="5" width="18" height="12" rx="2"/><path d="M8 21h8"/></svg></span>
+              <span style="width: 32px; height: 28px; border-radius: 8px; color: #BECBC8; display: grid; place-items: center;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 21s-6-5.3-6-10a6 6 0 0 1 12 0c0 4.7-6 10-6 10Z"/><circle cx="12" cy="11" r="2"/></svg></span>
+            </div>
+            <span style="margin-left: auto; font-size: 12px; color: #97A9A5;">괴이 <b style="color:#FF7A6B;font-family:'JetBrains Mono',monospace">1</b> &nbsp;|&nbsp; 사건 <b style="color:#F5B544;font-family:'JetBrains Mono',monospace">0</b> &nbsp;|&nbsp; 특수 <b style="color:#7DB8F5;font-family:'JetBrains Mono',monospace">0</b></span>
+          </div>
+          <div style="padding: 10px; display: flex; flex-direction: column; gap: 8px; overflow: hidden;">
+            <div style="display: flex; gap: 10px; align-items: center; padding: 8px; border-radius: 12px; border: 1px solid #37464D; background: #1A2226;">
+              <div style="width: 52px; height: 44px; border-radius: 8px; background: linear-gradient(135deg, #4A2A27, #1A2226); flex: none;"></div>
+              <div style="flex: 1 1 auto; min-width: 0;">
+                <div style="display: flex; align-items: center; gap: 6px;"><span style="font-size: 11px; padding: 2px 6px; border-radius: 6px; background: #4A2A27; color: #FF7A6B; font-family:'JetBrains Mono',monospace; font-weight: 700;">A</span><b style="font-size: 14px;">붉은 복도</b></div>
+                <div style="font-size: 12px; color: #97A9A5; margin-top: 2px;">서울특별시 용산구 · 2시간 전 발생</div>
+              </div>
+              <span style="color: #BECBC8;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c1-4 5-6 8-6s7 2 8 6"/></svg></span>
+            </div>
+            <div style="font-size: 11px; color: #97A9A5; letter-spacing: .06em; padding: 6px 4px 0;">종료 · 최근</div>
+            <div style="display: flex; gap: 10px; align-items: center; padding: 8px; border-radius: 12px; border: 1px solid #3F8879; background: #1A2226;">
+              <div style="width: 52px; height: 44px; border-radius: 8px; background: linear-gradient(135deg, #2C383E, #141B1E); flex: none;"></div>
+              <div style="flex: 1 1 auto; min-width: 0;">
+                <div style="display: flex; align-items: center; gap: 6px;"><span style="font-size: 11px; padding: 2px 6px; border-radius: 6px; background: #2C383E; color: #BECBC8; font-family:'JetBrains Mono',monospace; font-weight: 700;">B</span><b style="font-size: 14px;">거울 속 사람</b><span style="font-size: 10px; padding: 2px 6px; border-radius: 999px; background: #45381C; color: #F5B544; font-weight: 700;">내가 출동</span></div>
+                <div style="font-size: 12px; color: #97A9A5; margin-top: 2px;">중림 지하상가 · 19:02 종료</div>
+              </div>
+              <button type="button" aria-label="보고서" style="width: 32px; height: 32px; border-radius: 8px; border: 1px solid #3F8879; background: #1D403A; color: #5EEAD4; display: grid; place-items: center; cursor: pointer;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 4h11l3 3v13H5z"/><path d="M8 10h8M8 14h8M8 18h5"/></svg></button>
+            </div>
+            <div style="display: flex; gap: 10px; align-items: center; padding: 8px; border-radius: 12px; border: 1px solid #37464D; background: #1A2226; opacity: .8;">
+              <div style="width: 52px; height: 44px; border-radius: 8px; background: linear-gradient(135deg, #2C383E, #141B1E); flex: none;"></div>
+              <div style="flex: 1 1 auto; min-width: 0;">
+                <div style="display: flex; align-items: center; gap: 6px;"><span style="font-size: 11px; padding: 2px 6px; border-radius: 6px; background: #2C383E; color: #BECBC8; font-family:'JetBrains Mono',monospace; font-weight: 700;">C</span><b style="font-size: 14px;">소리 없는 개</b></div>
+                <div style="font-size: 12px; color: #97A9A5; margin-top: 2px;">마포 상암 · 10:40 종료 · 고르고디오 · 큐라스</div>
+              </div>
+              <span style="font-size: 11px; color: #97A9A5;">일지</span>
+            </div>
+            <div style="margin-top: auto; display: flex; align-items: center; justify-content: space-between; padding: 4px;"><span style="font-size: 11px; color: #97A9A5;">종료 줄은 하루 지나면 빠져요.</span><a href="Journal.dc.html" style="font-size: 12px; font-weight: 600; text-decoration: none;">기록에서 전부 보기 ›</a></div>
+          </div>
+        </div>
+      </div>
+      <!-- 아래: 요원 격자 -->
+      <div style="border-radius: 16px; border: 1px solid #37464D; background: #232D32; display: flex; flex-direction: column; overflow: hidden; min-height: 0;">
+        <div style="display: flex; align-items: center; padding: 8px 12px; border-bottom: 1px solid #37464D; gap: 8px;">
+          <div style="display: inline-flex; gap: 2px; padding: 2px; border-radius: 10px; background: #1A2226; border: 1px solid #37464D;"><span style="width: 32px; height: 28px; border-radius: 8px; background: #1D403A; color: #5EEAD4; display: grid; place-items: center;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="13" width="7" height="7" rx="1.5"/><rect x="13" y="13" width="7" height="7" rx="1.5"/></svg></span><span style="width: 32px; height: 28px; border-radius: 8px; color: #BECBC8; display: grid; place-items: center;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></span></div>
+          <span style="margin-left: auto; font-size: 12px; color: #97A9A5;">작전 <b style="color:#FF7A6B;font-family:'JetBrains Mono',monospace">1</b> /12</span>
+        </div>
+        <div style="padding: 10px; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10px; overflow: hidden;">
+          <div style="height: 136px; border-radius: 12px; border: 1px solid #37464D; background: linear-gradient(180deg, #2F3A40 0%, #1C262B 100%); padding: 8px 10px; display: flex; flex-direction: column; justify-content: space-between;"><div style="display: flex; justify-content: space-between; font-family:'JetBrains Mono',monospace; font-size: 11px; color: #97A9A5;"><span>CH-01</span><span style="padding: 2px 6px; border-radius: 4px; background: #2C383E; color: #BECBC8;">미정</span></div><div><b style="font-size: 14px;">쟈알디</b><div style="font-size: 11px; color: #BECBC8;">대기 중</div></div></div>
+          <div style="height: 136px; border-radius: 12px; border: 1px solid #37464D; background: linear-gradient(180deg, #2F3A40 0%, #1C262B 100%); padding: 8px 10px; display: flex; flex-direction: column; justify-content: space-between;"><div style="display: flex; justify-content: space-between; font-family:'JetBrains Mono',monospace; font-size: 11px; color: #97A9A5;"><span>CH-02</span><span style="padding: 2px 6px; border-radius: 4px; background: #2C383E; color: #BECBC8;">미정</span></div><div><b style="font-size: 14px;">스팡달</b><div style="font-size: 11px; color: #BECBC8;">대기 중</div></div></div>
+          <div style="height: 136px; border-radius: 12px; border: 1px solid #37464D; background: linear-gradient(180deg, #2F3A40 0%, #1C262B 100%); padding: 8px 10px; display: flex; flex-direction: column; justify-content: space-between;"><div style="display: flex; justify-content: space-between; font-family:'JetBrains Mono',monospace; font-size: 11px; color: #97A9A5;"><span>CH-03</span><span style="padding: 2px 6px; border-radius: 4px; background: #2C383E; color: #BECBC8;">미정</span></div><div><b style="font-size: 14px;">잼트리</b><div style="font-size: 11px; color: #BECBC8;">대기 중</div></div></div>
+          <div style="height: 136px; border-radius: 12px; border: 1px solid #37464D; background: linear-gradient(180deg, #2F3A40 0%, #1C262B 100%); padding: 8px 10px; display: flex; flex-direction: column; justify-content: space-between;"><div style="display: flex; justify-content: space-between; font-family:'JetBrains Mono',monospace; font-size: 11px; color: #97A9A5;"><span>CH-04</span><span style="padding: 2px 6px; border-radius: 4px; background: #2C383E; color: #BECBC8;">휴게</span></div><div><b style="font-size: 14px;">에일린</b><div style="font-size: 11px; color: #BECBC8;">사무실</div></div></div>
+          <div style="height: 136px; border-radius: 12px; border: 1px solid #37464D; background: linear-gradient(180deg, #2F3A40 0%, #1C262B 100%); padding: 8px 10px; display: flex; flex-direction: column; justify-content: space-between;"><div style="display: flex; justify-content: space-between; font-family:'JetBrains Mono',monospace; font-size: 11px; color: #97A9A5;"><span>CH-05</span><span style="padding: 2px 6px; border-radius: 4px; background: #4A2A27; color: #FF7A6B;">작전</span></div><div><b style="font-size: 14px;">고르고디오</b><div style="font-size: 11px; color: #BECBC8;">붉은 복도</div></div></div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1100,"height":900}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>
