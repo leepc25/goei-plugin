@@ -164,8 +164,9 @@ for (const vp of vps) {
   assert.ok((await page.textContent('.gx-head small')).includes('다시 고를 수 있어요'));
   // 시작 전(staged) 설정 창: 「이 채팅」 없음, 테마를 바꾸면 이 채팅에도 적힌다
   await openEditor(page, 'set:screen');
-  assert.equal(await page.$('.gw-set [data-action="set-bar"]'), null, '시작 전에는 기본값으로 저장·불러오기 없음 (기본값을 바로 고침)');
-  assert.ok(await page.$('.gw-brand svg'), '머리는 유령 아이콘 + 설정');
+  assert.equal(await page.$('.gw [data-action="set-bar"]'), null, '시작 전에는 기본값으로 저장·불러오기 없음 (기본값을 바로 고침)');
+  // 폰(760px 이하)은 본 창과 같은 상단바에 제목 「설정」만 (2026-10-29 사용자)
+  if (VIEWPORTS[vp].width > 760) assert.ok(await page.$('.gw-brand svg'), '머리는 유령 아이콘 + 설정');
   await page.evaluate(() => document.querySelector('.gw-set [data-action="set-theme"][data-value="light"]').click());
   await page.waitForFunction(() => window.__chat.scriptstate.$st_fixed_theme === 'light' && JSON.parse(window.__store['p:goei:prefs']).theme === 'light');
   assert.equal(await page.evaluate(() => document.querySelector('.gx').dataset.theme), 'light', '창 배색도 바로');
@@ -188,7 +189,7 @@ for (const vp of vps) {
   await page.waitForSelector('.gx-tabhead');
   await openEditor(page, 'set:board');
   assert.equal(await page.$('.gw-set [data-action="set-scope"]'), null, '범위 칩 없음');
-  assert.equal(await page.locator('.gw-set [data-action="set-bar"]').count(), 2, '시작 뒤 기본값으로 저장·불러오기');
+  assert.equal(await page.locator('.gw [data-action="set-bar"]').count(), 2, '시작 뒤 기본값으로 저장·불러오기');
   await closeEditor(page);
   await closeWin(page);
 

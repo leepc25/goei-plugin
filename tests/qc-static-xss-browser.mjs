@@ -212,7 +212,8 @@ async function seen(page, where) {
   await audit(page, errors, '상황판'); await seen(page, '상황판');
   const tab = async (id) => { await page.click(`.gx-nav [data-action="nav-tab"][data-value="${id}"]`); await page.waitForFunction((id) => document.querySelector('.gx')?.dataset.tab === id, id); };
   await tab('map'); await audit(page, errors, '지도'); total++;
-  await tab('mission'); await audit(page, errors, '임무'); total++;
+  // 커스텀 임무는 따로 메뉴가 없고 임무 화면의 전환 단추로 (2026-10-29 사용자)
+  await page.click('.gx-mswap[data-value="mission"]'); await page.waitForFunction(() => document.querySelector('.gx')?.dataset.tab === 'mission'); await audit(page, errors, '커스텀 임무'); total++;
   await tab('gnet'); await audit(page, errors, '괴담넷 목록'); total++;
   await page.click('[data-action="gn-open"]'); await page.waitForSelector('.gn-c'); await audit(page, errors, '괴담넷 글·댓글'); await seen(page, '괴담넷 글'); total++;
   if (await page.$('[data-action="gn-dm"], [data-action="gn-dms"]')) { await page.click('[data-action="gn-dm"], [data-action="gn-dms"]'); await audit(page, errors, '괴담넷 쪽지'); total++; }

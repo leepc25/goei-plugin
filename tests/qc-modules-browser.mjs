@@ -346,8 +346,8 @@ if (want('G3')) {
   await page.waitForFunction(() => window.__chat.scriptstate['$lb_cfg_lb-gn.privacy'] === '4');
   await page.click('[data-action="gn-cfg"][data-value="style=wpf"]');
   await page.waitForFunction(() => window.__chat.scriptstate['$lb_cfg_lb-gn.style'] === 'wpf');
-  assert.ok((await page.textContent('.ph-form .ph-room-title')).includes('세정게'), '성격을 바꾸면 창 이름도');
   await featSet(page, 'set:gnet');
+  assert.ok((await page.textContent('.gx-panel')).includes('세정게'), '성격을 바꾸면 창 이름도');
   await page.click('[data-action="gn-sub"][data-value="board"]');
   await llm(page, [ok(JSON.stringify({ posts: [post(900)], alternativePosts: [post(901, { title: '대안' })] }))]);
   await page.click('[data-action="gn-refresh"]');

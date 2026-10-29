@@ -121,30 +121,30 @@ const box = (page, sel) => page.locator(sel).first().boundingBox();
   await page.click('.gx-nav > .gx-nb[data-value="wiki"]');
   await page.waitForSelector('.nw-rail');
   let rail = await box(page, '.nw-rail'), main = await box(page, '.nw-main');
-  assert.ok(rail.x < main.x, '기본은 왼쪽');
-  // 설정 → 화면 → 위키 목록 위치: 오른쪽
+  assert.ok(rail.x > main.x, '기본은 오른쪽 (2026-10-29 사용자)');
+  // 설정 → 화면 → 위키 목록 위치: 왼쪽
   await page.click('[data-action="ed-open"][data-value="set:screen"] >> nth=0');
   await page.waitForSelector('[data-action="set-wiki-side"]');
-  await page.click('[data-action="set-wiki-side"][data-value="right"]');
-  await page.waitForFunction(() => document.querySelector('.gx')?.dataset.wikiSide === 'right');
+  await page.click('[data-action="set-wiki-side"][data-value="left"]');
+  await page.waitForFunction(() => document.querySelector('.gx')?.dataset.wikiSide === 'left');
   await page.click('.gw [data-action="ed-close"]');
   await page.waitForFunction(() => !document.querySelector('.gw') || getComputedStyle(document.querySelector('.gw')).display === 'none');
   await page.waitForTimeout(300);
   rail = await box(page, '.nw-rail'); main = await box(page, '.nw-main');
-  assert.ok(rail.x > main.x, '오른쪽으로 옮김');
+  assert.ok(rail.x < main.x, '왼쪽으로 옮김');
   await page.click('.nw-grab');
   await page.waitForSelector('.list-open');
   await page.waitForTimeout(400);
   const panel = await box(page, '.nw-panel');
-  assert.ok(Math.abs(panel.x + panel.width - rail.x) < 4, '서랍이 세로바 왼쪽에 붙어 열림');
-  if (shots) await page.screenshot({ path: `${shots}/wiki-right.png` });
+  assert.ok(Math.abs(panel.x - (rail.x + rail.width)) < 4, '서랍이 세로바 오른쪽에 붙어 열림');
+  if (shots) await page.screenshot({ path: `${shots}/wiki-left.png` });
   assert.deepEqual(errors, []);
   await page.close();
 }
-// 모바일은 그대로 오른쪽 책갈피
+// 모바일 책갈피도 PC 설정을 따른다 (기본 오른쪽)
 {
   const { page } = await boot(fixture, chat(), { width: 390, height: 844 });
-  await page.evaluate(() => { window.__store['p:goei:prefs'] = JSON.stringify({ ...(JSON.parse(window.__store['p:goei:prefs'] || '{}')), wikiSide: 'right' }); });
+  await page.evaluate(() => { window.__store['p:goei:prefs'] = JSON.stringify({ ...(JSON.parse(window.__store['p:goei:prefs'] || '{}')) }); });
   await open(page);
   await page.locator('[data-value="wiki"]:visible').first().click();
   await page.waitForSelector('.nw-edge');
