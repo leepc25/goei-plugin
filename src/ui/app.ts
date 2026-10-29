@@ -1164,7 +1164,7 @@ function render(): void {
   // 창 모양 (설정 → 화면): 메뉴 위치, 창 바깥 어둡기
   const pf = getPrefs();
   root.dataset.nav = pf.nav ?? 'left';
-  root.dataset.wikiSide = pf.wikiSide ?? 'left';
+  root.dataset.wikiSide = pf.wikiSide ?? 'right';
   // --dim은 글자색 변수라 겹치면 안 된다. 테마별 막 색에 투명도만 바꿔 바로 칠함
   paintVeil(root, pf.dim ?? DIM_DEFAULT);
   // 창 둘레 기기 틀 (설정 → 화면 「외부 프레임」, PC만, ui/frame.ts). 창 크기는 그대로, 틀만 바깥으로. 좁으면 틀만 숨긴다

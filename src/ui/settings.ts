@@ -285,7 +285,7 @@ export function settingsTab(ctx: ChatContext, scope: SettingsScope = 'chat', can
       // 테마는 채팅마다 ($st_fixed_theme, 원본 ensureDefaults) — 시작 뒤엔 이 채팅, 시작 전엔 새 채팅 기본값 (2026-10-28 QC: 「이 기기」 배지가 붙어 있었지만 실제로는 채팅에 저장됐다)
       field('테마', seg('set-theme', theme, [['light', '라이트'], ['dark', '다크'], ['paper', '페이퍼']], busy), `채팅 화면의 캐릭터 이미지 배경과 상태창(「테마」를 골랐을 때) 배색이에요. ${scope === 'chat' ? '이 채팅에 저장돼요. 새 채팅의 기본값은 시작 화면의 설정에서 정해요.' : '새 채팅이 시작할 때 쓸 배색이에요.'}`, scope === 'chat' ? 'chat' : 'defaults'),
       field('메뉴 위치', seg('set-nav', getPrefs().nav ?? 'left', [['left', '왼쪽'], ['right', '오른쪽']], busy), 'PC 창에서 메뉴 목록을 놓을 쪽이에요.', 'device'),
-      field('위키 목록 위치', seg('set-wiki-side', getPrefs().wikiSide ?? 'left', [['left', '왼쪽'], ['right', '오른쪽']], busy), 'PC 창에서 위키의 세로바와 숨은 목록 서랍을 놓을 쪽이에요. 모바일은 늘 오른쪽 아래 「목록」 책갈피예요.', 'device'),
+      field('위키 목록 위치', seg('set-wiki-side', getPrefs().wikiSide ?? 'right', [['left', '왼쪽'], ['right', '오른쪽']], busy), '위키의 세로바와 숨은 목록 서랍을 놓을 쪽이에요. 폰의 「목록」 책갈피도 같은 쪽으로 가요.', 'device'),
       field('요원 칸', seg('set-agents', getPrefs().agents ?? 'wall', [['wall', '모니터'], ['list', '목록']], busy), '상황판 요원 칸 모양이에요.', 'device'),
       field('창 바깥 불투명도', dimSlider(getPrefs().dim ?? DIM_DEFAULT, busy), '창 뒤 채팅 화면을 가리는 정도예요. 0%면 그대로 보이고 100%면 다 가려요.', 'device'),
       // 창 둘레 기기 틀 (2026-10-29 사용자, ui/frame.ts). 좁아서 숨긴 상태는 app.ts 가 .gx 에 data-frame-hidden 으로 적는다
@@ -477,7 +477,7 @@ export async function handleSettings(action: string, value: string | undefined, 
     return true;
   }
   if (action === 'set-wiki-side') {
-    if (v === 'left' || v === 'right') await saveDefaults(env, (p) => ({ ...p, wikiSide: v === 'right' ? 'right' : undefined }));
+    if (v === 'left' || v === 'right') await saveDefaults(env, (p) => ({ ...p, wikiSide: v }));
     return true;
   }
   if (action === 'set-frame') {

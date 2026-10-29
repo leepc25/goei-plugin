@@ -1784,6 +1784,11 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
   /* 모바일 목록은 오른쪽에서 열린다 (손잡이가 오른쪽) */
   .nw-panel { left: auto; right: 0; transform: translateX(100%); max-width: calc(100% - 40px); border-right: 0; border-left: 1px solid var(--panel2); box-shadow: -10px 0 28px rgba(0, 0, 0, .32); }
   .list-open .nw-scrim { inset: 0; }
+  /* 설정 「위키 목록 위치」가 왼쪽이면 폰 책갈피·목록도 왼쪽에서 (2026-10-29 사용자: 폰도 설정을 따라간다) */
+  .gx[data-wiki-side="left"] .nw-edge { right: auto; left: 0; padding: 0 2px 0 0; border-right: 1px solid var(--line2); border-left: 0; border-radius: 0 14px 14px 0; box-shadow: 3px 4px 14px -6px rgba(0, 0, 0, .5); }
+  .gx[data-wiki-side="left"] .nw-edge svg { transform: scaleX(-1); }
+  .gx[data-wiki-side="left"] .nw-panel { right: auto; left: 0; transform: translateX(-100%); border-left: 0; border-right: 1px solid var(--panel2); box-shadow: 10px 0 28px rgba(0, 0, 0, .32); }
+  .gx[data-wiki-side="left"] .list-open .nw-panel { transform: none; }
   .nw-main .ph-room-head.nw-noback { padding-left: 12px; }
   .nw-home { padding: 14px 14px 22px; gap: 18px; }
   .nw-home .nw-hero { padding: 16px; }

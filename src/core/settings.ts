@@ -99,7 +99,8 @@ export interface Prefs {
   /** 창 모양 (이 기기·모든 채팅 공통): 메뉴 위치, 창 바깥 어둡기(%) */
   nav?: 'left' | 'right';
   /** 위키 목록 서랍 쪽 (PC, 이 기기 공통, 2026-10-27 사용자). 없으면 왼쪽. 모바일은 늘 오른쪽 책갈피 */
-  wikiSide?: 'right';
+  /** 위키 목록·세로바 쪽 (기본 오른쪽, 2026-10-29 사용자). 폰의 「목록」 책갈피도 따라간다 */
+  wikiSide?: 'left' | 'right';
   /** 상황판 요원 칸 모양 (이 기기 공통): 모니터 벽(기본) 또는 목록 */
   agents?: 'wall' | 'list';
   dim?: number;
@@ -180,7 +181,7 @@ export function setPrefs(raw: unknown): Prefs {
     for (const [k, v] of Object.entries(o.vars as Record<string, unknown>)) if (PREF_VAR.test(k) && typeof v === 'string') vars[k] = v;
   }
   const nav = o.nav === 'right' ? 'right' : undefined;
-  const wikiSide = o.wikiSide === 'right' ? 'right' : undefined;
+  const wikiSide = o.wikiSide === 'left' ? 'left' : o.wikiSide === 'right' ? 'right' : undefined;
   const agents = o.agents === 'list' ? 'list' : undefined;
   const dim = int(o.dim, 0, 100);
   const status = o.status === 'off' || o.status === 'light' || o.status === 'dark' || o.status === 'paper' ? o.status : undefined;

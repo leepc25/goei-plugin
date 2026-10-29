@@ -807,12 +807,12 @@ export function bindWikiSide(root: HTMLElement, act: (value: string) => void): v
     const dx = (e.changedTouches[0]?.clientX ?? t0.x) - t0.x;
     const dy = (e.changedTouches[0]?.clientY ?? t0.y) - t0.y;
     t0 = null;
-    // PC는 설정한 쪽(기본 왼쪽)에서, 모바일은 오른쪽에서 열리므로 접는 방향도 그쪽으로
-    const fromLeft = wide() && root.closest<HTMLElement>('[data-wiki-side]')?.dataset.wikiSide !== 'right';
+    // 설정한 쪽(기본 오른쪽)에서 열리므로 접는 방향도 그쪽으로 (PC·폰 같음, 2026-10-29)
+    const fromLeft = root.closest<HTMLElement>('[data-wiki-side]')?.dataset.wikiSide === 'left';
     const out = fromLeft ? dx < -36 : dx > 36;
     if (out && Math.abs(dx) > Math.abs(dy) * 1.5 && wiki.listOpen) act('close');
   }, { passive: true });
-  // 모바일 책갈피를 왼쪽으로 끌어도 열린다
+  // 모바일 책갈피를 안쪽으로 끌어도 열린다 (오른쪽 책갈피는 왼쪽으로, 왼쪽 책갈피는 오른쪽으로)
   const edge = root.querySelector<HTMLElement>('.nw-edge');
   let e0: number | null = null;
   edge?.addEventListener('touchstart', (e) => (e0 = e.touches[0]?.clientX ?? null), { passive: true });
@@ -820,7 +820,8 @@ export function bindWikiSide(root: HTMLElement, act: (value: string) => void): v
     if (e0 === null) return;
     const dx = (e.changedTouches[0]?.clientX ?? e0) - e0;
     e0 = null;
-    if (dx < -24 && !wiki.listOpen) act('open');
+    const leftSide = root.closest<HTMLElement>('[data-wiki-side]')?.dataset.wikiSide === 'left';
+    if ((leftSide ? dx > 24 : dx < -24) && !wiki.listOpen) act('open');
   }, { passive: true });
 }
 
