@@ -34,24 +34,20 @@ try {
     await page.evaluate(() => window.__goeiEngine.deploy({ seed: 4242, agent: 'jyaldi', stageId: 'elevator' }));
     await page.waitForTimeout(350);
     await page.screenshot({ path: `${shots}/${name}-minimap.png` });
-    const toggle = async () => {
-      if (!touch) return page.keyboard.press('KeyM'); // 에일린 키 배치: 지도 = M (Tab은 지원 요원)
-      // TouchPad hit-tests coordinates on its root; the visual buttons have pointer-events:none.
-      const box = await page.locator('[data-id="map"]').boundingBox();
-      await page.touchscreen.tap(box.x + box.width / 2, box.y + box.height / 2);
-    };
+    // 모바일 조작 설계(2026-10-28): 터치 「지도」 단추는 모바일에서 뺐다(PC 키 M 은 그대로). 지도는 키로 연다
+    const toggle = async () => page.keyboard.press('KeyM'); // 에일린 키 배치: 지도 = M (Tab은 지원 요원)
     await toggle(); await page.waitForTimeout(150);
     if (touch) {
-      assert.equal(await page.locator('[data-id="attack"]').isVisible(), false, 'map hides combat controls');
-      assert.equal(await page.locator('.tp-zone').isVisible(), false, 'map hides joystick');
-      assert.equal(await page.locator('[data-id="map"]').isVisible(), true, 'map close control remains');
+      assert.equal(await page.locator('[data-id="light"]').isVisible(), false, 'map hides combat controls');
+      assert.equal(await page.locator('.tp-base').isVisible(), false, 'map hides joystick');
+      assert.equal(await page.locator('[data-id="menu"]').isVisible(), true, 'map menu control remains');
     }
     const tick = await page.evaluate(() => window.__goeiEngine.world.tick);
     await page.waitForTimeout(180);
     assert.equal(await page.evaluate(() => window.__goeiEngine.world.tick), tick, `${name}: map pauses simulation`);
     await page.screenshot({ path: `${shots}/${name}-map.png` });
     await toggle(); await page.waitForTimeout(180);
-    if (touch) assert.equal(await page.locator('[data-id="attack"]').isVisible(), true, 'closing map restores controls');
+    if (touch) assert.equal(await page.locator('[data-id="light"]').isVisible(), true, 'closing map restores controls');
     assert.ok(await page.evaluate(() => window.__goeiEngine.world.tick) > tick, `${name}: map closes and resumes`);
     // Real service entrance: position at the actual prop, then send the gameplay interaction key.
     await page.evaluate(() => {

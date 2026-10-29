@@ -127,7 +127,7 @@ try {
     await page.screenshot({ path: `${shots}/m-play.png` });
     const cdp = await ctx.newCDPSession(page);
     const a = await page.evaluate(() => {
-      const r = document.querySelector('.tp-b[data-id=attack]').getBoundingClientRect();
+      const r = document.querySelector('.tp-b[data-id=light]').getBoundingClientRect();
       return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
     });
     const x0 = await page.evaluate(() => window.__ui.run.player.x);

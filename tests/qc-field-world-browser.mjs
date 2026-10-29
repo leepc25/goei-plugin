@@ -288,7 +288,10 @@ for (const vp of [{ width: 1100, height: 900, panel: true, touch: false }, { wid
   await page.waitForSelector('[data-mission]', { state: 'visible', timeout: 5000 }).then((h) => h.dispose());
   await page.waitForTimeout(300);
   if (vp.touch) {
-    assert.equal(await tpShown(), false, '임무 창이 뜨면 터치 조작을 숨긴다');
+    // 모바일 조작 설계 (2026-10-28): 창이 뜨면 터치판은 숨지 않고 대사창 모드 — 선택·취소 두 버튼만 (옛 규칙: 전부 숨김)
+    const ids = await page.evaluate(() => [...document.querySelectorAll('.tp-b')].filter((b) => getComputedStyle(b).display !== 'none').map((b) => b.dataset.id).sort());
+    assert.ok(await tpShown(), '임무 창이 뜨면 터치판은 대사창 모드');
+    assert.deepEqual(ids, ['cancel', 'ok'], `대사창 모드 버튼 ${ids}`);
     const btn = page.locator('[data-mission]').first();
     const box = await btn.boundingBox();
     const top = await page.evaluate(([x, y]) => { const el = document.elementFromPoint(x, y); return el?.closest('[data-mission]') ? 'mission' : el?.className ?? ''; }, [box.x + box.width / 2, box.y + box.height / 2]);
