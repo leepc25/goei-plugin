@@ -359,10 +359,10 @@ function settingsPage(ctx: ChatContext, page: SetPage): string {
   // 머리는 모든 페이지가 같다: 제목 왼쪽, 오른쪽에 범위(이 채팅/새 채팅 기본값) 또는 그 기능의 단추(덮어쓰기·불러오기). 시작 전이면 같은 글귀
   // 채팅 설정 페이지는 모두 같은 머리: 시작 뒤 「기본값으로 저장」「기본값 불러오기」(설정 전부 한 번에), 시작 전 「새 채팅 기본값 (시작 전)」.
   // 기능 페이지가 자기 머리에 두던 칸별 단추(ps-defaults)는 창 안에서는 빼고 그 밖의 단추만 남긴다
+  // 「기본값으로 저장」「기본값 불러오기」는 설정 전부를 한 번에 다루므로 페이지마다 두지 않고 창 머리(render)에 한 번만 둔다 (2026-10-29 사용자). 확인 띠는 어느 페이지에서든 그 자리에
   const chatPage = page !== 'screen' && page !== 'update';
-  const defBtns = chatPage && canChat ? mainDefaultsButtons() : '';
   act = act.replace(/<span class="ps-defaults">[\s\S]*?<\/span>/, '').trim();
-  const right = page === 'screen' ? '<span class="gw-tokens">이 기기 공통</span>' : chatPage ? `${canChat ? '' : '<span class="gw-tokens">새 채팅 기본값 (시작 전)</span>'}${defBtns}${act}` : act;
+  const right = chatPage && !canChat ? `<span class="gw-tokens">새 채팅 기본값 (시작 전)</span>${act}` : act;
   const info = FEATURE_INFO[page];
   const on = featureState(ctx)[`set:${page}`];
   const badge = on === undefined ? '' : `<span class="gw-state${on ? '' : ' off'}">${on ? '켬' : '끔'}</span>`;
@@ -372,7 +372,7 @@ function settingsPage(ctx: ChatContext, page: SetPage): string {
     ? `<p class="gx-muted">${esc(info.desc)}${info.example ? ` <span class="gw-eg">예) ${esc(info.example)}</span>` : ''}${on === false && info.off ? ` <span class="gw-off-note">${esc(info.off)}</span>` : ''}</p></header>`
     : '</header>';
   return `<div class="gw-page gw-set"><header class="gw-head"><h2>${esc(title)}${badge}</h2>${right ? `<div class="gw-head-act">${right}</div>` : ''}${lead}
-    ${defBtns ? mainDefaultsConfirm() : ''}
+    ${canChat ? mainDefaultsConfirm() : ''}
     ${settingsNotices()}
     <div class="gx-settings gw-setbody">${body}</div></div>`;
 }
@@ -475,7 +475,7 @@ export function render(): void {
       <button class="gx-x gw-menu" data-action="ed-drawer" aria-label="메뉴">${ICONS.list}</button>
       <span class="gw-brand">${GHOST_ICON}</span><b>설정</b>
       ${edUi.notice ? `<span class="gw-notice err">${esc(edUi.notice)}</span>` : edUi.info ? `<span class="gw-notice">${esc(edUi.info)}</span>` : ''}
-      <div class="gw-top-right">${tab === 'world' || dirty ? saveBar() : ''}<button class="gx-x" data-action="ed-close" aria-label="닫기">${ICONS.close}</button></div>
+      <div class="gw-top-right">${tab === 'set' && (host?.canChat?.() ?? true) ? mainDefaultsButtons() : ''}${tab === 'world' || dirty ? saveBar() : ''}<button class="gx-x" data-action="ed-close" aria-label="닫기">${ICONS.close}</button></div>
     </header>
     <nav class="gw-tree"><div class="gw-tabs" role="tablist">${tabs}</div>${tree(ctx)}</nav>
     <main class="gw-body">${ctx ? body(ctx) : '<p class="gx-err">채팅 정보를 읽지 못했어요. 창을 닫고 다시 열어 주세요.</p>'}</main>

@@ -1724,7 +1724,7 @@ if (fixture.globalLore.some(packed)) {
   await page.click('.gw [data-action="ph-cfg"][data-value="auto=0"]');
   await page.waitForFunction(() => window.__chat.scriptstate.$ph_auto === '0');
   // 기능 페이지(괴담톡) 머리에도 같은 단추, 칸별 단추는 없음
-  assert.equal(await page.locator('.gw .gw-head [data-action="set-bar"]').count(), 2, '기능 페이지도 같은 단추');
+  assert.equal(await page.locator('.gw .gw-top [data-action="set-bar"]').count(), 2, '기능 페이지도 같은 단추');
   assert.equal(await page.locator('.gw [data-action="ph-def-ask"]').count(), 0, '칸별 덮어쓰기 없음');
   await page.click('.gw [data-action="set-bar"][data-value="load"]');
   await page.click('.gw .st-barconfirm [data-action="set-bar-yes"][data-value="load"]');
@@ -3070,7 +3070,7 @@ if (fixture.globalLore.some(packed)) {
   await page.waitForSelector('.gw .gw-setbody');
   const st = await page.textContent('.gw .gw-setbody');
   for (const t of ['채팅에 보고서 표시', '안 띄움', '내가 출동한 사건만', '전부', '소감 자동', '일지 상한', '보고서 상한']) assert.ok(st.includes(t), `기록 설정: ${t}`);
-  assert.equal(await page.locator('.gw .gw-head [data-action="set-bar"]').count(), 2, '머리의 기본값으로 저장·불러오기');
+  assert.equal(await page.locator('.gw .gw-top [data-action="set-bar"]').count(), 2, '머리의 기본값으로 저장·불러오기');
   // 채팅에 보고서 표시 3단계: 끄면 이미 그려진 카드도 사라지고(열쇠 표 비움 + 채팅 그대로 다시 저장), 「전부」면 요원 처리 보고서도, 「내가 출동한 사건만」이면 그것만
   const saves0 = await page.evaluate(() => window.__calls.setChat.length);
   await page.click('.gw [data-action="jr-set"][data-value="chat_card=off"]');
@@ -3096,7 +3096,7 @@ if (fixture.globalLore.some(packed)) {
   await page.click('.gw [data-action="jr-step"][data-value="report_cap:+"]');
   await page.waitForFunction(() => window.__chat.scriptstate.$jr_report_cap === '110');
   // 기본값으로 저장 → $jr_* 가 기기 기본값(prefs.vars)에 들어간다
-  await page.click('.gw .gw-head [data-action="set-bar"][data-value="save"]');
+  await page.click('.gw .gw-top [data-action="set-bar"][data-value="save"]');
   await page.click('.gw .st-barconfirm [data-action="set-bar-yes"][data-value="save"]');
   await page.waitForFunction(() => JSON.parse(window.__store['p:goei:prefs'] ?? '{}').vars?.$jr_chat_card === 'off');
   assert.equal(JSON.parse(await page.evaluate(() => window.__store['p:goei:prefs'])).vars.$jr_report_cap, '110', '보고서 상한도 기본값에');

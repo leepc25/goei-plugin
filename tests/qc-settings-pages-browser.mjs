@@ -204,7 +204,7 @@ for (const vp of vps) {
         await page.waitForSelector('.gw .gw-setbody');
         if (p === 'update') continue;
         assert.equal(await page.$('.gw [data-action="set-scope"]'), null, `${vp} ${p}: 범위 칩 없음`);
-        assert.equal(await page.locator('.gw .gw-head [data-action="set-bar"]').count(), p === 'screen' ? 0 : 2, `${vp} ${p}: 머리의 기본값으로 저장·불러오기`);
+        assert.equal(await page.locator('.gw .gw-top [data-action="set-bar"]').count(), 2, `${vp} ${p}: 창 머리의 기본값으로 저장·불러오기 (모든 페이지 같음)`);
         total += await sweepPage(page, p, mode, log);
         const a = await auditDom(page, '.gw');
         assert.deepEqual(a.missing, [], `${vp} ${p}/${mode}: 글자·aria-label 없는 단추`);
@@ -214,7 +214,7 @@ for (const vp of vps) {
     // 기본값으로 저장·불러오기: 요원 표시 인원을 3으로 두고 저장 → 기본값 3, 7로 바꾼 뒤 불러오기 → 3 (이 채팅 값만 바뀜)
     await goNode(page, 'set:board');
     const bar = async (what) => {
-      await page.evaluate((w) => document.querySelector(`.gw .gw-head [data-action="set-bar"][data-value="${w}"]`).click(), what);
+      await page.evaluate((w) => document.querySelector(`.gw .gw-top [data-action="set-bar"][data-value="${w}"]`).click(), what);
       await page.waitForSelector(`.gw .st-barconfirm [data-action="set-bar-yes"][data-value="${what}"]`);
       await page.evaluate((w) => document.querySelector(`.gw .st-barconfirm [data-action="set-bar-yes"][data-value="${w}"]`).click(), what);
       await page.waitForFunction(() => !document.querySelector('.gw .st-barconfirm'));
