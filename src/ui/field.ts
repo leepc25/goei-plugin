@@ -11,6 +11,7 @@ import {
   type MissionKind, NATION_PINS, parseCatalog, readWorld, REGION_PINS, regionName, requestMission, rosterFor, SEALED_LOC, SIDO_NAME,
   SIGUN, type WorldEvent, worldOn, worldVars, type WorldSettings, type WorldState, codesToNames, landmarkLoc, landmarksOf, placeWhere, prevWorldVars,
 } from '../core/world';
+import { buildClosures, journalSettings, recordVars } from '../core/journal';
 import { assetUrl } from '../host/assets';
 import { updateChat, type CharacterSnapshot, type ChatContext } from '../host/risu';
 import { noticeClass, sendNow } from '../host/send';
@@ -697,7 +698,14 @@ async function saveWorld(ctx: ChatContext, env: FieldEnv, change: (w: WorldState
       const err = change(w, x);
       if (err) throw new Error(err);
       const prev = prevWorldVars(latest.scriptstate, (p) => change(p, x));
-      return { ...latest, scriptstate: { ...(latest.scriptstate ?? {}), ...worldVars(w, x.catalog, x.settings, x.faction), ...prev } };
+      const next: Chat = { ...latest, scriptstate: { ...(latest.scriptstate ?? {}), ...worldVars(w, x.catalog, x.settings, x.faction), ...prev } };
+      // 손으로 끝낸 상황도 일지·보고서에 (core/journal). 종료 번호는 지금 마지막 메시지
+      if (w.closed?.length) {
+        const index = Math.max(0, (latest.message ?? []).length - 1);
+        const built = buildClosures({ chat: next, index, world: w, closed: w.closed, catalog: x.catalog, faction: x.faction, settings: journalSettings(latest.scriptstate) });
+        if (built.rows.length) next.scriptstate = { ...next.scriptstate, ...recordVars(built.journal, built.reports) };
+      }
+      return next;
     });
     env.setBusy(false);
     await env.refresh();

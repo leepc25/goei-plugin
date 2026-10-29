@@ -38,3 +38,4 @@ export * from './texthash';
 export * from './tokenizer';
 export * from './wallet';
 export * from './field';
+export * from './journal';

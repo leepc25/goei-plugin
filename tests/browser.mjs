@@ -925,6 +925,20 @@ async function startedWithReply(page, { phoneAuto = false } = {}) {
   await page.click(endBtn);
   await page.waitForFunction((name) => !JSON.parse(window.__chat.scriptstate.$goei_world).an.some((e) => e.name === name), preset.name);
   assert.ok(!(await page.evaluate(() => window.__chat.scriptstate.$an_report)).includes(`${preset.name}|활성`));
+  // 손으로 끝낸 상황도 일지 한 줄 + 보고서 (core/journal, 채팅 변수 $goei_journal·$goei_reports).
+  // 이 괴이로 가는 출동 카드는 위에서 장소 카드로 바꿔 끼워졌고 상태창 목표도 아니었으니 「내가 출동」 근거가 없다 → 간이 보고서
+  {
+    const ss = await page.evaluate(() => window.__chat.scriptstate);
+    const row = JSON.parse(ss.$goei_journal).rows.find((r) => r.name === preset.name);
+    assert.ok(row, '일지 줄');
+    assert.equal(row.cause, 'manual');
+    assert.equal(row.kind, 'an');
+    assert.equal(row.mine, false, '출동 근거 없음');
+    assert.deepEqual(row.agents.map((a) => a.id), ['P001']);
+    const rpt = JSON.parse(ss.$goei_reports).items.find((r) => r.id === row.rpt);
+    assert.ok(rpt && rpt.full === false && !rpt.people, '간이 보고서');
+    assert.ok(!ss.$goei_world.includes('"closed"'), '세계 저장값에 closed 없음');
+  }
   assert.deepEqual(errors, []);
   console.log('PASS 지도: 상황·장소 선택, 편성, 출발 카드, 요청 합치기, 상황 종료');
   await page.close();

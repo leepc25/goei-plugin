@@ -58,6 +58,7 @@ import { withFieldFacts, withInterludes } from './core/interlude';
 import { fieldRecord } from './core/field';
 import { buildImgPrompt, imgCharacters, imgPromptConfig, stripImgLore } from './core/imgprompt';
 import { withStatusBlock, type StatusShape } from './core/statusctx';
+import { withJournal } from './core/journal';
 import { colConfig, fillStatusSection, usedCols } from './core/world/statuscols';
 import { activeAnomalyNote } from './core/world/records';
 import { aliveAnchors, readWallet, walletBalance, WALLET_START_DEFAULT } from './core/wallet';
@@ -138,6 +139,8 @@ async function onBeforeRequest<M extends PromptMessage>(messages: M[], type: str
         messages = step('로어', () => fixLore(messages, c), messages);
         messages = await stepAsync('주인공', () => withPlayer(messages, c), messages);
         messages = step('막간', () => withVisit(messages, c), messages);
+        // 일지 참고 (core/journal): 설정 「최근 N건」이 켜져 있을 때만 한 블록. 기본 끔
+        messages = step('일지', () => withJournal(messages, c.chat), messages);
         messages = step('명부 다듬기', () => trimRoster(messages), messages);
         const mctx = step('참고 기록', () => moduleContext(sceneText(messages), c), [] as string[]);
         if (mctx.length) {
