@@ -7,7 +7,7 @@ import { tokens } from '../core/gnet';
 import { factionList } from '../core/factions';
 import { updateChat, type ChatContext } from '../host/risu';
 import { backfillPeople, chatId, clearDiag, consolidatePerson, loadDiag, rereadPerson, onPeopleStatus, peopleStatus, requestPeopleUpdate, sheetOf, type DiagRun } from '../host/people';
-import { anchorOf, changeId, entryStates, isAlive, liveChanges, liveEntries, liveness, messageKey, peopleStore, plain, putChange, unreadIndexes, withPeople, type EntryState, type Liveness } from '../core/people/store';
+import { anchorOf, changeId, entryStates, isAlive, liveChanges, liveEntries, liveness, messageKey, peopleStore, plain, putChange, splitUnread, withPeople, type EntryState, type Liveness } from '../core/people/store';
 import { addressOf, affinityView, opennessOf, tasteOf } from '../core/people/affinity';
 import { factionNow, knownFactionCodes, userFactionOf } from '../core/people/faction';
 import { FEATURES, PP, PP_DEFAULTS, peopleSettings, ppValue, type Feature } from '../core/people/settings';
@@ -302,15 +302,18 @@ function prettyJson(s: string): string {
 
 /** 지금 갱신 단추 + 상태 줄. canChat=false(시작 전)면 단추를 막고 한 줄 안내 */
 function updateBar(ctx: ChatContext, canChat = true): string {
+  // 2026-10-29 사용자: 숫자는 안 읽은 응답 전부를 세는데 「지금 갱신」은 마지막으로 읽은 응답 뒤만 읽어 헷갈렸다 →
+  // 「지금 갱신」 옆엔 그 단추가 읽는 새 응답 수, 「지난 응답 읽기」 옆엔 그 앞의 안 읽은 응답 수. 단추는 각자 숫자 바로 옆
   const st = peopleStatus();
   const store = peopleStore(ctx.chat);
-  const unread = st.busy ? st.unread : unreadIndexes(ctx.chat, store).length;
-  const label = !canChat ? '채팅을 시작한 뒤에 갱신할 수 있어요' : st.busy ? st.label || '갱신 중…' : unread ? `안 읽은 응답 ${unread}개` : '모두 읽었어요';
+  const { newer, older } = splitUnread(ctx.chat, store);
   const dis = st.busy || peopleUi.busy || !canChat ? 'disabled' : '';
-  const back = unread
-    ? `<span class="pp-backfill"><select class="gx-select" data-change="pp-backfill-turns" aria-label="읽을 범위">${[['10', '최근 10개'], ['30', '최근 30개'], ['0', '전부']].map(([v, l]) => `<option value="${v}" ${peopleUi.backfillTurns === v ? 'selected' : ''}>${l}</option>`).join('')}</select><button class="gx-mini" data-action="pp-backfill" title="기능을 중간에 켰거나 끄고 지나간 구간의 응답을 읽어요. 보조 호출이 묶음마다 1회" ${dis}>지난 응답 읽기</button></span>`
+  const label = !canChat ? '채팅을 시작한 뒤에 갱신할 수 있어요' : st.busy ? st.label || '갱신 중…' : newer.length ? `새 응답 ${newer.length}개` : '새 응답 없음';
+  const now = `<span class="pp-upgrp"><span class="pp-upst${st.busy ? ' busy' : ''}">${st.busy ? '<i class="pp-spin"></i>' : ''}${esc(label)}</span><button class="gx-mini ps-save" data-action="pp-update" title="마지막으로 읽은 응답 뒤의 새 응답을 지금 읽어요" ${dis || (newer.length ? '' : 'disabled')}>${ICONS.refresh}새 응답 읽기</button></span>`;
+  const back = older.length && canChat
+    ? `<span class="pp-upgrp pp-backfill"><span class="pp-upst">지난 응답 ${older.length}개 안 읽음</span><select class="gx-select" data-change="pp-backfill-turns" aria-label="읽을 범위">${[['10', '최근 10개'], ['30', '최근 30개'], ['0', '전부']].map(([v, l]) => `<option value="${v}" ${peopleUi.backfillTurns === v ? 'selected' : ''}>${l}</option>`).join('')}</select><button class="gx-mini" data-action="pp-backfill" title="기능을 중간에 켰거나 끄고 지나간 구간의 응답을 읽어요. 보조 호출이 묶음마다 1회" ${dis}>지난 응답 읽기</button></span>`
     : '';
-  return `<div class="pp-upbar"><span class="pp-upst${st.busy ? ' busy' : ''}">${st.busy ? '<i class="pp-spin"></i>' : ''}${esc(label)}</span><button class="gx-mini ps-save" data-action="pp-update" title="마지막으로 읽은 응답 뒤의 안 읽은 응답을 지금 읽어요" ${dis}>${ICONS.refresh}지금 갱신</button>${back}</div>`;
+  return `<div class="pp-upbar">${now}${back}</div>`;
 }
 
 /** 추가 지침 한 칸: 이름 · 입력칸 · 바로 밑 설명 · 저장 */
@@ -327,7 +330,7 @@ export function peopleSettingsPane(ctx: ChatContext, canChat = true): string {
   const intro = `<p class="ps-note">본편 응답이 끝날 때마다 <b>보조 모델이 그 응답을 한 번 읽어</b> 인물별 기록(기본정보·성격·현재 상태·인간관계·호감·호칭…)을 쌓고, 다음 본편 요청과 필드(대사·신분)가 그 기록을 읽어요. 로어북 시트는 시작값이고, 이 기록이 이야기에 따라 바뀌어요. 비용: 응답당 보조 모델 호출 1회(갱신 모델을 메인으로 두면 메인 1회).</p>`;
   const main = [
     row('인물 기록', onoff('on'), '끄면 응답을 읽지 않고, 본편에도 기록을 넣지 않아요. 메인 설정 「상황판 → 인물 기록」과 같은 값이에요.'),
-    row('갱신 시점', seg('when', s.when, [['turn', '매 턴'], ['manual', '수동']]), '수동이면 인물 화면의 「지금 갱신」을 눌렀을 때만 읽어요.'),
+    row('갱신 시점', seg('when', s.when, [['turn', '매 턴'], ['manual', '수동']]), '수동이면 인물 화면의 「새 응답 읽기」를 눌렀을 때만 읽어요.'),
     row('갱신 모델', seg('model', s.model, [['aux', '보조'], ['main', '메인']])),
     row('지침', seg('prompt', s.prompt, [['detailed', '자세히'], ['compact', '간결']]), '자세히 = 리수폿 원문 규칙+설명. 간결 = 같은 규칙·설명 축약, 토큰 약 1/3.'),
     row('기록 언어', seg('lang', s.lang, [['ko', '한국어'], ['en', '영어']]), '기록 본문(항목·이유·메모)을 쓰는 언어. 이름·인용·호칭은 늘 원문. 영어는 같은 내용이면 토큰이 절반쯤이고, 위키 화면에도 영어로 보여요.'),

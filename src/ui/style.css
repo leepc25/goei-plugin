@@ -2890,7 +2890,8 @@ button.mk-go:hover { color: var(--signal); }
 .pp-range input[type=range] { width: 180px; max-width: 60vw; }
 .pp-range output { min-width: 64px; font-variant-numeric: tabular-nums; }
 
-.pp-backfill { display: inline-flex; align-items: center; gap: 6px; margin-left: 6px; }
+.pp-upgrp { display: inline-flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.pp-backfill { margin-left: auto; }
 .pp-backfill .gx-select, .pp-reread-sel { min-height: 28px; font-size: 12.5px; }
 .pp-reread-sel { margin-left: 6px; }
 
@@ -3205,4 +3206,22 @@ button.gx-jr-row:hover { background: color-mix(in srgb, var(--text) 4%, transpar
 @media (max-width: 760px) {
   .gx-fieldsheet { left: 8px; right: 8px; bottom: 8px; padding: 12px; }
   .gx-fs-title { font-size: 15px; }
+}
+
+/* 가계부·기록 공통 (2026-10-29 사용자: 다른 화면과 따로 놀았다) — 숫자 넷은 설정 카드처럼 한 장의 카드에 칸을 나눠, 그라데이션·큰 둥근 상자 없이.
+   거르기는 다른 화면과 같은 칩(.gx-chip), 찾기는 같은 입력칸 모양 */
+.gx-wt-tiles { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); overflow: hidden; }
+.gx-wallettab .gx-wt-tile, .gx-records .gx-wt-tile { gap: 3px; padding: 12px 16px; border: 0; border-left: 1px solid var(--line); border-radius: 0; background: none; }
+.gx-wallettab .gx-wt-tile:first-child, .gx-records .gx-wt-tile:first-child { border-left: 0; }
+.gx-wallettab .gx-wt-tile.bal, .gx-records .gx-wt-tile.bal { background: none; border-color: var(--line); }
+.gx-wt-tile > b { font-size: 20px; font-weight: 800; }
+.gx-wt-balrow b { font-size: 20px; }
+.gx-wallettab .gx-wt-tile.bal > .gx-wt-balrow b, .gx-records .gx-wt-tile.bal > b { color: var(--signal); }
+.gx-wt-q { height: 36px; border-radius: 10px; background: var(--panel2); }
+@media (max-width: 760px) {
+  .gx-wt-tiles { grid-template-columns: 1fr 1fr; }
+  .gx-wallettab .gx-wt-tile, .gx-records .gx-wt-tile { border-left: 1px solid var(--line); border-top: 1px solid var(--line); padding: 10px 12px; }
+  .gx-wallettab .gx-wt-tile:nth-child(odd), .gx-records .gx-wt-tile:nth-child(odd) { border-left: 0; }
+  .gx-wallettab .gx-wt-tile:nth-child(-n+2), .gx-records .gx-wt-tile:nth-child(-n+2) { border-top: 0; }
+  .gx-wallettab .gx-wt-tile.bal { grid-column: auto; }
 }

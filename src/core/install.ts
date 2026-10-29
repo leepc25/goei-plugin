@@ -72,6 +72,8 @@ export interface InstallState {
   goei: boolean;
   manifest: boolean;
   directory: boolean;
+  /** 명부가 있긴 한데 깨졌거나(읽을 수 없음) 기본 명부의 칸이 빠졌나 — 「빠진 것 전부 채우기」가 빠진 칸만 채운다 (2026-10-29) */
+  directoryGaps: number;
   settingsFolder: boolean;
   wikiFolder: boolean;
   /** 인사말: 매니페스트 키마다 추가 인사말에 글이 있나. missing = 심어야 할 키 */
@@ -116,8 +118,10 @@ export function installCheck(i: CheckInput): InstallState {
   const want = manifestPictures(m).length ? manifestPictures(m) : inst.pictures;
   const missingPics = want.filter((p) => !have.has(p[0]));
   let directory = false;
+  let directoryGaps = 0;
   try {
     directory = !!readDirectoryData(lore);
+    directoryGaps = directoryGapCount(lore ?? []);
   } catch {
     directory = false;
   }
@@ -125,6 +129,7 @@ export function installCheck(i: CheckInput): InstallState {
     goei: !!m || directory,
     manifest: !!m,
     directory,
+    directoryGaps,
     settingsFolder: !!findFolder(lore, 'settings'),
     wikiFolder: !!findFolder(lore, 'wiki'),
     greetings: { ok: !missing.length, missing, total: Object.keys(inst.greetings.index).length },
@@ -181,6 +186,55 @@ const entry = (comment: string, content: string, folder: string, extra: Partial<
 const folderEntry = (comment: string, key: string): LoreEntry =>
   ({ key, comment, content: '', mode: 'folder', insertorder: 100, alwaysActive: false, secondkey: '', selective: false, bookVersion: 2 }) as LoreEntry;
 
+const isObj = (v: unknown): v is Record<string, unknown> => !!v && typeof v === 'object' && !Array.isArray(v);
+const empty = (v: unknown) => v === undefined || v === null || v === '' || (Array.isArray(v) && !v.length) || (isObj(v) && !Object.keys(v).length);
+
+/**
+ * 있는 명부에 기본 명부의 빠진 칸만 채운다 (2026-10-29 사용자: 깡통봇 명부가 비어 거점 0·소속 없음·영문명 잘림·괴담톡 탭 없음).
+ * 고친 값은 그대로 두고, 없는 큰 칸·없는 항목·항목 안의 빈 칸만 기본 값으로. 바뀐 칸 수와 결과를 돌려준다
+ */
+export function fillDirectory(cur: Record<string, unknown>, def: Record<string, unknown>): { data: Record<string, unknown>; gaps: number } {
+  const out: Record<string, unknown> = { ...cur };
+  let gaps = 0;
+  for (const [k, dv] of Object.entries(def)) {
+    if (k === '_help') continue;
+    const cv = out[k];
+    if (empty(cv)) {
+      if (!empty(dv)) (out[k] = dv), gaps++;
+      continue;
+    }
+    // 괴담톡 탭은 통째로 (탭 줄이 비면 괴담톡이 안 나온다)
+    if (k === '괴담톡 탭') {
+      if (isObj(cv) && empty(cv.tabs) && isObj(dv) && !empty(dv.tabs)) (out[k] = dv), gaps++;
+      continue;
+    }
+    if (!isObj(cv) || !isObj(dv)) continue;
+    const sec: Record<string, unknown> = { ...cv };
+    for (const [name, de] of Object.entries(dv)) {
+      const ce = sec[name];
+      if (ce === undefined) {
+        sec[name] = de;
+        gaps++;
+      } else if (isObj(ce) && isObj(de)) {
+        const row: Record<string, unknown> = { ...ce };
+        for (const [f, fv] of Object.entries(de)) if (empty(row[f]) && !empty(fv)) (row[f] = fv), gaps++;
+        sec[name] = row;
+      }
+    }
+    out[k] = sec;
+  }
+  return { data: out, gaps };
+}
+
+/** 명부 상태: 깨졌으면(읽을 수 없음) -1, 빠진 칸 수(0 이면 온전) */
+function directoryGapCount(lore: LoreEntry[]): number {
+  const parts = directoryEntries(lore).filter((e) => typeof e.content === 'string' && e.content.trim());
+  if (!parts.length) return 0;
+  const cur = readDirectoryData(lore) as unknown as Record<string, unknown> | null;
+  if (!cur) return -1;
+  return data ? fillDirectory(cur, installData().directory).gaps : 0;
+}
+
 /**
  * 로어북 심기: 없는 것만 만든다 (⚙️설정 폴더 → Directory(기본 명부) → 📖위키 폴더 → Plugin manifest). 있는 항목은 그대로.
  * 매니페스트는 늘 다시 써서 폴더 key·인사말 번호를 맞춘다
@@ -194,13 +248,23 @@ export function installLore(lore: LoreEntry[] | undefined, greetings: Record<str
   }
   const settingsKey = str(settings.key);
   const dir = directoryEntries(out).filter((e) => typeof e.content === 'string' && e.content.trim());
-  if (!dir.length) {
+  const cur = dir.length ? (readDirectoryData(out) as unknown as Record<string, unknown> | null) : null;
+  if (!dir.length || !cur) {
+    // 없거나 깨진 명부: 깨진 것은 이름을 바꿔 남기고(지우지 않는다) 기본 명부를 새로 둔다
+    for (const e of dir) e.comment = `${String(e.comment)} (읽을 수 없어 보관)`;
     const stale = out.findIndex((e) => e.comment === DIRECTORY_COMMENT);
     const fresh = entry(DIRECTORY_COMMENT, JSON.stringify(installData().directory), settingsKey);
     if (stale >= 0) out[stale] = fresh;
     else out.push(fresh);
   } else {
     for (const e of dir) if (!e.folder) e.folder = settingsKey;
+    // 있는 명부: 빠진 칸만 기본 값으로 채운다 (고친 값은 그대로)
+    const filled = fillDirectory(cur, installData().directory);
+    if (filled.gaps) {
+      const first = out.indexOf(dir[0]);
+      out[first] = { ...dir[0], comment: DIRECTORY_COMMENT, content: JSON.stringify(filled.data) };
+      for (let i = out.length - 1; i >= 0; i--) if (i !== first && dir.includes(out[i])) out.splice(i, 1);
+    }
   }
   let wiki = findFolder(out, 'wiki');
   if (!wiki) {
@@ -222,7 +286,8 @@ export function installLore(lore: LoreEntry[] | undefined, greetings: Record<str
 export function installSummary(s: InstallState): string[] {
   const out: string[] = [];
   if (!s.settingsFolder) out.push('⚙️설정 폴더 없음');
-  if (!s.directory) out.push('명부(Directory) 없음');
+  if (!s.directory) out.push(s.directoryGaps < 0 ? '명부(Directory)를 읽을 수 없음' : '명부(Directory) 없음');
+  else if (s.directoryGaps > 0) out.push(`명부에 빠진 칸 ${s.directoryGaps}개`);
   if (!s.manifest) out.push('Plugin manifest 없음');
   if (!s.wikiFolder) out.push('📖위키 폴더 없음');
   if (!s.greetings.ok) out.push(`인사말 ${s.greetings.missing.length}/${s.greetings.total}개 없음`);

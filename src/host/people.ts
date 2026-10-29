@@ -6,7 +6,7 @@ import { generate, runModel, LlmError, type LlmMessage } from './llm';
 import { buildDirector, directorBlock, parseDirector, type DirectorNote } from '../core/people/director';
 import { loadContext, updateChat, type ChatContext } from './risu';
 import { isWaiting, onWaiting } from './waiting';
-import { peopleStore, withPeople, unreadIndexes, messageKey, messageHash as messageHashOf, liveness } from '../core/people/store';
+import { peopleStore, withPeople, splitUnread, unreadIndexes, messageKey, messageHash as messageHashOf, liveness } from '../core/people/store';
 import { applyUpdate, assemblePrompt, buildUpdate, clearStoryRecords, enabledSections, mentionIndexes, parseUpdate, planBatches, recordChars, type ApplyReport } from '../core/people/updater';
 import { applyConsolidate, buildConsolidate, parseConsolidate, type ConsolidateReport } from '../core/people/consolidate';
 import { peopleSettings, type PeopleSettings } from '../core/people/settings';
@@ -217,10 +217,8 @@ async function runOnce(reason: string, o: { manual?: boolean; scope?: RunScope }
   // 읽은 적이 없으면(기능을 중간에 켬) 마지막 응답 하나만 — 지난 응답은 「지난 응답 읽기」로 사용자가 고른다
   const allUnread = unreadIndexes(ctx.chat, store);
   let unread = allUnread;
-  if (!o.scope?.indexes) {
-    const lastRead = Math.max(-1, ...ctx.chat.message.map((m, i) => (store.read[messageKey(m, i)] !== undefined ? i : -1)));
-    unread = lastRead < 0 ? allUnread.slice(-1) : allUnread.filter((i) => i > lastRead);
-  } else unread = o.scope.indexes.filter((i) => ctx.chat.message[i]?.role === 'char');
+  if (!o.scope?.indexes) unread = splitUnread(ctx.chat, store).newer;
+  else unread = o.scope.indexes.filter((i) => ctx.chat.message[i]?.role === 'char');
   setStatus({ unread: allUnread.length });
   if (!unread.length) return result;
   const sheet = sheetOf(ctx);

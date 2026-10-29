@@ -126,7 +126,7 @@ export function walletTab(ctx: ChatContext): string {
   const todayRows = rows.filter((r) => real(r) && today && r.date === today);
   const todayNet = todayRows.reduce((n, r) => n + r.e.amount, 0);
   const balance = rows.length ? rows[rows.length - 1].after : start;
-  const chip = (v: typeof walletUi.filter, label: string) => `<button class="gx-wt-chip${walletUi.filter === v ? ' on' : ''}" data-action="wallet-filter" data-value="${v}" aria-pressed="${walletUi.filter === v}">${label}</button>`;
+  const chip = (v: typeof walletUi.filter, label: string) => `<button class="gx-chip${walletUi.filter === v ? ' on' : ''}" data-action="wallet-filter" data-value="${v}" aria-pressed="${walletUi.filter === v}">${label}</button>`;
   const editable = walletEditable(ctx.chat.scriptstate);
   const edit = editable && walletUi.edit
     ? `<div class="gx-wt-edit"><input type="text" name="wt-adj" inputmode="numeric" placeholder="예: 1,200,000 또는 120만" aria-label="잔고를 이 값으로" data-enter="wallet-adj"><button class="gx-mini" data-action="wallet-adj" data-take="wt-adj">저장</button><button class="gx-mini" data-action="wallet-edit">취소</button></div>`
@@ -140,7 +140,7 @@ export function walletTab(ctx: ChatContext): string {
         <span class="gx-wt-sub">시작 ${esc(formatWon(start))} · 거래 ${rows.length}건</span>
       </div>
       <div class="gx-wt-tile"><small>수입</small><b class="in">+${esc(income.toLocaleString('en-US'))}</b><span class="gx-wt-sub">${inN}건</span></div>
-      <div class="gx-wt-tile"><small>지출</small><b class="out">−${esc(spend.toLocaleString('en-US'))}</b><span class="gx-wt-sub">${outN}건</span></div>
+      <div class="gx-wt-tile"><small>지출</small><b class="out">${spend ? `−${esc(Math.abs(spend).toLocaleString('en-US'))}` : '0'}</b><span class="gx-wt-sub">${outN}건</span></div>
       <div class="gx-wt-tile"><small>오늘${today ? ` · ${esc(shortDay(today))}` : ''}</small><b class="${todayNet < 0 ? 'out' : todayNet > 0 ? 'in' : ''}">${esc(formatDelta(todayNet) || '0')}</b><span class="gx-wt-sub">${todayRows.length}건</span></div>
     </section>
     ${walletUi.notice ? `<div class="gx-err" role="alert">${esc(walletUi.notice)}</div>` : ''}

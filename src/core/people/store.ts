@@ -187,6 +187,15 @@ export function unreadIndexes(chat: Chat, store: PeopleStore): number[] {
   return out;
 }
 
+/** 안 읽은 응답을 「지금 갱신」이 읽을 새 것(마지막으로 읽은 응답 뒤, 읽은 적이 없으면 마지막 하나)과 「지난 응답 읽기」 몫(그 앞)으로 나눈다 */
+export function splitUnread(chat: Chat, store: PeopleStore): { newer: number[]; older: number[] } {
+  const all = unreadIndexes(chat, store);
+  const list = msgs(chat);
+  const lastRead = Math.max(-1, ...list.map((m, i) => (store.read[messageKey(m, i)] !== undefined ? i : -1)));
+  const newer = lastRead < 0 ? all.slice(-1) : all.filter((i) => i > lastRead);
+  return { newer, older: all.filter((i) => !newer.includes(i)) };
+}
+
 export function markRead(store: PeopleStore, chat: Chat, indexes: number[]): void {
   const list = msgs(chat);
   for (const i of indexes) {
