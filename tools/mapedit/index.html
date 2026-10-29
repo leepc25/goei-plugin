@@ -5,496 +5,668 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>괴이봇 맵 에디터</title>
 <style>
-  :root { --bg:#14161a; --panel:#1f2329; --line:#333842; --text:#e6e8eb; --dim:#9aa3ad; --acc:#4fc3f7; --warn:#ff8a65; }
-  html,body { margin:0; height:100%; background:var(--bg); color:var(--text); font:13px/1.4 system-ui,sans-serif; overflow:hidden; }
-  #app { display:grid; grid-template-columns:260px 1fr 300px; grid-template-rows:40px 1fr; height:100%; }
-  #top { grid-column:1/4; display:flex; gap:8px; align-items:center; padding:0 10px; background:var(--panel); border-bottom:1px solid var(--line); }
-  #top b { margin-right:8px; }
-  #left,#right { background:var(--panel); overflow:auto; padding:8px; border-right:1px solid var(--line); }
-  #right { border-right:0; border-left:1px solid var(--line); }
+  :root { --bg:#121418; --panel:#1c2026; --panel2:#252a32; --line:#333a44; --text:#e8eaed; --dim:#98a1ac; --acc:#4fc3f7; }
+  * { box-sizing:border-box; }
+  html,body { margin:0; height:100%; background:var(--bg); color:var(--text); font:13px/1.45 system-ui,"Apple SD Gothic Neo","Malgun Gothic",sans-serif; overflow:hidden; user-select:none; }
+  #app { display:grid; grid-template-columns:1fr 300px; grid-template-rows:auto 1fr; height:100%; }
+  #bar { grid-column:1/3; display:flex; gap:6px; align-items:center; padding:6px 10px; background:var(--panel); border-bottom:1px solid var(--line); flex-wrap:wrap; }
+  #bar .sep { width:1px; height:24px; background:var(--line); margin:0 4px; }
+  button { background:var(--panel2); color:var(--text); border:1px solid var(--line); border-radius:6px; padding:5px 9px; font:inherit; cursor:pointer; white-space:nowrap; }
+  button:hover { border-color:#56616f; }
+  button.on { background:var(--acc); color:#001018; border-color:var(--acc); }
+  button kbd { font:11px monospace; color:var(--dim); margin-left:4px; }
+  button.on kbd { color:#003040; }
+  button.danger { border-color:#6b2a2a; color:#ffb3b3; }
   #stage { position:relative; overflow:hidden; background:#000; }
-  canvas { display:block; image-rendering:pixelated; }
-  button,select,input[type=file] { background:#2a2f37; color:var(--text); border:1px solid var(--line); border-radius:6px; padding:4px 8px; font:inherit; cursor:pointer; }
-  button.on { background:var(--acc); color:#000; }
-  button.warn { border-color:var(--warn); }
-  input[type=number],input[type=text] { width:70px; background:#0f1115; color:var(--text); border:1px solid var(--line); border-radius:4px; padding:2px 4px; font:inherit; }
-  input[type=range] { width:120px; vertical-align:middle; }
-  h4 { margin:10px 0 4px; font-size:12px; color:var(--dim); text-transform:uppercase; letter-spacing:.04em; }
-  .row { display:flex; gap:6px; align-items:center; margin:3px 0; flex-wrap:wrap; }
-  .list { border:1px solid var(--line); border-radius:6px; max-height:260px; overflow:auto; }
-  .item { padding:4px 6px; cursor:pointer; border-bottom:1px solid var(--line); display:flex; justify-content:space-between; }
-  .item.sel { background:#2d3a46; }
+  #cv { position:absolute; inset:0; width:100%; height:100%; }
+  #hint { position:absolute; left:10px; bottom:10px; background:rgba(0,0,0,.75); color:#dfe6ee; padding:6px 10px; border-radius:6px; font-size:12px; pointer-events:none; max-width:75%; }
+  #side { background:var(--panel); border-left:1px solid var(--line); overflow:auto; padding:10px; }
+  h4 { margin:14px 0 6px; font-size:11px; color:var(--dim); letter-spacing:.06em; }
+  h4:first-child { margin-top:0; }
+  .row { display:flex; gap:6px; align-items:center; margin:4px 0; flex-wrap:wrap; }
+  .row label { color:var(--dim); min-width:62px; }
+  input[type=number], input[type=text], select { background:#0e1013; color:var(--text); border:1px solid var(--line); border-radius:4px; padding:3px 5px; font:inherit; }
+  input[type=number] { width:76px; }
+  input[type=text] { width:160px; }
+  .list { border:1px solid var(--line); border-radius:6px; max-height:240px; overflow:auto; }
+  .item { display:flex; gap:6px; align-items:center; padding:4px 6px; border-bottom:1px solid var(--line); cursor:pointer; }
+  .item:last-child { border-bottom:0; }
+  .item.sel { background:#24384a; }
+  .item .dot { width:10px; height:10px; border-radius:2px; flex:none; }
+  .item .nm { flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
   .item .k { color:var(--dim); font-size:11px; }
-  .hint { color:var(--dim); font-size:12px; }
-  #status { margin-left:auto; color:var(--dim); }
-  label.chk { display:inline-flex; gap:4px; align-items:center; }
+  .chk { display:inline-flex; gap:4px; align-items:center; color:var(--dim); margin-right:8px; }
+  .muted { color:var(--dim); font-size:12px; }
+  .help { color:var(--dim); font-size:12px; line-height:1.65; }
+  .help b { color:var(--text); font-weight:600; }
+  #shelf { display:grid; grid-template-columns:repeat(3,1fr); gap:6px; max-height:300px; overflow:auto; border:1px solid var(--line); border-radius:6px; padding:6px; }
+  #shelf .p { background:#0e1013; border:1px solid var(--line); border-radius:6px; padding:4px; cursor:pointer; text-align:center; font-size:11px; color:var(--dim); }
+  #shelf .p:hover { border-color:var(--acc); color:var(--text); }
+  #shelf .p img { width:100%; height:54px; object-fit:contain; image-rendering:pixelated; display:block; }
+  #drop { position:absolute; inset:0; display:none; align-items:center; justify-content:center; background:rgba(79,195,247,.15); border:3px dashed var(--acc); color:var(--acc); font-size:20px; pointer-events:none; }
+  #msg { margin-left:auto; color:var(--dim); }
 </style>
 </head>
 <body>
 <div id="app">
-  <div id="top">
-    <b>괴이봇 맵 에디터</b>
-    <button id="bNew">새 맵</button>
-    <button id="bOpen">불러오기(.json)</button>
-    <button id="bSave">내보내기(.zip)</button>
-    <span class="hint">배경·소품은 패널에서 추가. 저장은 브라우저에도 자동.</span>
-    <span id="status"></span>
+  <div id="bar">
+    <button id="bBg">배경 열기</button>
+    <button id="bAddPng">소품 PNG 열기</button>
+    <span class="sep"></span>
+    <button data-tool="select" class="tool on">선택 <kbd>V</kbd></button>
+    <button data-tool="floor" class="tool">바닥 <kbd>F</kbd></button>
+    <button data-tool="block" class="tool">막힘 <kbd>B</kbd></button>
+    <button data-tool="cover" class="tool">가림 <kbd>C</kbd></button>
+    <button data-tool="auto" class="tool">자동 가림 <kbd>A</kbd></button>
+    <button data-tool="seat" class="tool">앉는 자리 <kbd>S</kbd></button>
+    <button data-tool="exit" class="tool">출입구 <kbd>E</kbd></button>
+    <button data-tool="lamp" class="tool">조명 <kbd>L</kbd></button>
+    <span class="sep"></span>
+    <button id="bUndo">되돌리기 <kbd>Ctrl+Z</kbd></button>
+    <button id="bRedo">다시 <kbd>Ctrl+Y</kbd></button>
+    <span class="sep"></span>
+    <button id="bOpen">불러오기</button>
+    <button id="bSave">내보내기 .zip</button>
+    <button id="bNew" class="danger">새로</button>
+    <span id="msg"></span>
   </div>
-  <div id="left">
-    <h4>배경</h4>
-    <div class="row"><input type="file" id="fBg" accept="image/*"></div>
-    <div class="row">배율 <select id="bgScale"><option>1</option><option selected>2</option><option>3</option><option>4</option></select> <span class="hint">그림 1px → 월드 px</span></div>
-    <div class="row">크기 <span id="bgSize" class="hint">-</span></div>
-    <h4>보기</h4>
-    <div class="row">확대 <input type="range" id="zoom" min="0.25" max="3" step="0.05" value="0.6"><span id="zoomV">0.6</span></div>
-    <div class="row">
-      <label class="chk"><input type="checkbox" id="showFloor" checked>바닥</label>
-      <label class="chk"><input type="checkbox" id="showSolid" checked>막힘</label>
-      <label class="chk"><input type="checkbox" id="showCover" checked>가림</label>
-      <label class="chk"><input type="checkbox" id="showSort" checked>깊이선</label>
-    </div>
-    <h4>걷기 시험</h4>
-    <div class="row"><input type="file" id="fChar" accept="image/*"><span class="hint">서 있는 캐릭터 PNG(발이 아래 끝)</span></div>
-    <div class="row">키 배율 <input type="number" id="charScale" value="2" step="0.5" min="0.5"></div>
-    <div class="row"><button id="bWalk">걷기 시험 켜기</button><span class="hint">방향키로 이동, 가림·막힘 확인</span></div>
-    <h4>도움말</h4>
-    <div class="hint">
-      선택: 클릭·끌기(이동). 모서리 끌기: 크기. R: 회전 +15°, F: 좌우 뒤집기, [ ]: 앞뒤 순서, Delete: 삭제, <b>Ctrl+Z: 되돌리기</b>, Esc: 그리기 취소, 그리는 중 Backspace: 마지막 점 빼기.<br>
-      다각형(바닥·가림·막힘): 클릭으로 점, <b>누른 채 끌면 자유곡선</b>, 더블클릭·Enter로 끝. 선택 도구에서도 선택한 다각형의 <b>점 끌기·선 위 클릭으로 점 추가·점 위 Alt+클릭 삭제</b>, 안쪽 끌기로 통째 이동. 아무것도 선택 안 됐을 땐 바닥 점을 바로 고침.<br>
-      자동 가림(색): 상자를 끌면 테두리 색(벽·바닥)과 다른 픽셀만 픽셀 단위로 따서 가림이 됨. 허용치·붓(더하기/지우기)으로 다듬기.<br>
-      깊이선(sortY): 소품의 주황선을 위아래로 끌기. 사람 발이 이 선보다 위면 소품 뒤에 그려짐.<br>
-      가림: 배경을 오리지 않고 다각형 안을 사람 위에 다시 그림. 깊이선은 가림에도 있음.
-    </div>
+  <div id="stage">
+    <canvas id="cv"></canvas>
+    <div id="hint"></div>
+    <div id="drop">여기에 놓기: 배경이 없으면 배경, 있으면 소품</div>
   </div>
-  <div id="stage"><canvas id="cv"></canvas></div>
-  <div id="right">
-    <h4>층</h4>
-    <div class="row">
-      <button data-tool="select" class="tool on">선택</button>
-      <button data-tool="floor" class="tool">바닥 다각형</button>
-      <button data-tool="cover" class="tool">가림 다각형</button>
-      <button data-tool="autocover" class="tool">자동 가림(색)</button>
-      <button data-tool="solid" class="tool">막힘 다각형</button>
-      <button data-tool="exit" class="tool">출입구</button>
-      <button data-tool="lamp" class="tool">조명</button>
-      <button data-tool="seat" class="tool">앉는 자리</button>
-    </div>
-    <h4>소품 추가</h4>
-    <div class="row"><input type="file" id="fObj" accept="image/*" multiple><span class="hint">투명 PNG, 여러 장</span></div>
-    <div class="row">저장소 소품 <select id="repoObj"><option value="">고르기…</option></select><button id="bRepoObj">넣기</button></div>
-    <div class="hint">게임에 이미 쓰는 소품(중림 가게 가구·오린 소품). 배율 1 = 게임 크기 그대로. 인터넷에서 열었을 때만 됩니다.</div>
-    <h4>목록</h4>
-    <div class="list" id="list"></div>
+  <div id="side">
     <h4>선택한 것</h4>
-    <div id="props" class="hint">없음</div>
+    <div id="props" class="muted">없음</div>
+    <h4>저장소 소품 (클릭하면 화면 가운데에 놓임)</h4>
+    <div id="shelf"></div>
+    <h4>목록</h4>
+    <div class="row">
+      <span class="chk"><input type="checkbox" id="vFloor" checked>바닥</span>
+      <span class="chk"><input type="checkbox" id="vBlock" checked>막힘</span>
+      <span class="chk"><input type="checkbox" id="vCover" checked>가림</span>
+      <span class="chk"><input type="checkbox" id="vSort" checked>깊이선</span>
+    </div>
+    <div class="list" id="list"></div>
+    <h4>배경·캐릭터</h4>
+    <div class="row"><label>배경 확대</label><select id="bgScale"><option value="1">1배</option><option value="2" selected>2배</option><option value="3">3배</option><option value="4">4배</option></select><span class="muted" id="bgInfo"></span></div>
+    <div class="row"><label>캐릭터</label><input type="number" id="charScale" step="0.25" min="0.25" value="1"><span class="muted">배 (1 = 배경과 같은 점 크기)</span><button id="bChar">그림 바꾸기</button></div>
+    <h4>조작</h4>
+    <div class="help">
+      <b>선택(V)</b>: 클릭으로 고르기 · 끌어서 옮기기 · 빈 곳 끌기 = 화면 이동 · 휠 = 확대/축소.<br>
+      <b>다각형 고치기</b>: 고른 다각형의 <b>흰 점</b> 끌기 · 변 가운데 <b>＋</b> 끌기 = 점 추가 · 점 <b>오른쪽 클릭</b> = 점 삭제 · 안쪽 끌기 = 통째 이동.<br>
+      <b>다각형 그리기(F·B·C)</b>: 클릭으로 점 · <b>첫 점(노랑) 다시 클릭</b> 또는 Enter·더블클릭·오른쪽 클릭 = 닫기 · Backspace = 점 빼기 · Esc = 취소. 닫으면 선택 모드로.<br>
+      <b>소품</b>: 모서리 끌기 = 크기 · R 회전 · H 좌우 뒤집기 · 주황 손잡이 끌기 = <b>깊이선</b>(캐릭터 발이 이 선보다 위면 소품에 가려짐).<br>
+      <b>앉는 자리(S)</b>: 의자 <b>좌석 위, 엉덩이가 닿는 곳</b>을 클릭. 앉은 모습이 미리 보임. 소품을 고르고 「이 소품에 앉는 자리」도 됨.<br>
+      <b>캐릭터</b>: 끌어서 놓거나, 고른 뒤 방향키로 걷기(바닥·막힘 적용, Shift = 빠르게).<br>
+      <b>자동 가림(A)</b>: 가릴 물건을 덮는 상자를 끌면 벽·바닥 색과 다른 픽셀만 가림이 됨. 오른쪽에서 붓으로 더하기·지우기.<br>
+      Delete 삭제 · Ctrl+Z / Ctrl+Y · 방향키 1px 이동(Shift 10px).
+    </div>
   </div>
 </div>
+<input type="file" id="fBg" accept="image/*" hidden>
+<input type="file" id="fPng" accept="image/*" multiple hidden>
+<input type="file" id="fChar" accept="image/*" hidden>
+<input type="file" id="fOpen" accept=".zip,.json" hidden>
 <script>
 'use strict';
-// ───────── 상태 ─────────
-const S = {
-  bg: null, bgName: '', bgScale: 2, w: 0, h: 0,
-  floor: [], lane: null,
-  items: [],   // {id, kind:'obj'|'cover'|'solid'|'exit'|'lamp'|'seat', ...}
-  sel: null, tool: 'select', zoom: 0.6, panX: 20, panY: 20,
-  drawing: null, // 진행 중 다각형 점들
-  brush: null, brushR: 6, mouse: null,
-  walk: false, char: null, charScale: 2, p: { x: 300, y: 500 },
-  images: {},    // name → {img, dataUrl}
-};
-const cv = document.getElementById('cv'), ctx = cv.getContext('2d');
+/* 빌드할 때 저장소 소품·기본 캐릭터가 여기에 들어간다 (tools/mapedit/build.mjs) */
+const EMBED = window.__MAPEDIT_EMBED__ || { props: [], char: null };
+
+/* ───────── 상태 ───────── */
 const $ = (id) => document.getElementById(id);
-const uid = (p) => p + '_' + Math.random().toString(36).slice(2, 7);
-const status = (t) => { $('status').textContent = t; };
+const cv = $('cv'), ctx = cv.getContext('2d');
+const COLORS = { floor: '#3ddc84', block: '#ff5a5a', cover: '#b48cff', obj: '#4fc3f7', exit: '#3ddc84', seat: '#4dd0e1', lamp: '#ffd54f', char: '#ffffff' };
+const KIND = { floor: '바닥', block: '막힘', cover: '가림', obj: '소품', exit: '출입구', seat: '앉는 자리', lamp: '조명', char: '캐릭터' };
+const S = {
+  bg: null, bgName: '', bgScale: 2, w: 1280, h: 720,
+  items: [], sel: null, tool: 'select', draw: null,
+  zoom: 0.6, px: 20, py: 20, images: {},
+  charImg: null, charScale: 1, brush: null, brushR: 8, mouse: [0, 0], space: false,
+};
+const uid = (p) => p + Math.random().toString(36).slice(2, 8);
+const say = (t) => { $('msg').textContent = t; };
+let charItem = null;
 
-// ───────── 파일 ─────────
-function readImage(file) {
-  return new Promise((res) => { const r = new FileReader(); r.onload = () => { const img = new Image(); img.onload = () => res({ img, dataUrl: r.result, name: file.name }); img.src = r.result; }; r.readAsDataURL(file); });
-}
-$('fBg').onchange = async (e) => {
-  const f = e.target.files[0]; if (!f) return;
-  const { img, dataUrl, name } = await readImage(f);
-  S.bg = img; S.bgName = name; S.images[name] = { img, dataUrl };
-  S.w = img.width * S.bgScale; S.h = img.height * S.bgScale;
-  if (!S.floor.length) { S.floor = [[0, Math.round(S.h * 0.6)], [S.w, Math.round(S.h * 0.6)], [S.w, S.h], [0, S.h]]; }
-  $('bgSize').textContent = `${img.width}×${img.height} → 월드 ${S.w}×${S.h}`;
-  draw(); persist();
-};
-$('bgScale').onchange = (e) => { S.bgScale = +e.target.value; if (S.bg) { S.w = S.bg.width * S.bgScale; S.h = S.bg.height * S.bgScale; $('bgSize').textContent = `${S.bg.width}×${S.bg.height} → 월드 ${S.w}×${S.h}`; } draw(); persist(); };
-$('fObj').onchange = async (e) => {
-  for (const f of e.target.files) {
-    const { img, dataUrl, name } = await readImage(f);
-    S.images[name] = { img, dataUrl };
-    const sc = S.bgScale;
-    const it = { id: uid('o'), kind: 'obj', file: name, x: Math.round(S.w / 2 - img.width * sc / 2), y: Math.round(S.h / 2 - img.height * sc), w: img.width * sc, h: img.height * sc, rot: 0, flip: false, solid: null, name: name.replace(/\.[^.]+$/, '') };
-    it.sortY = it.y + it.h;
-    S.items.push(it); S.sel = it;
-  }
-  e.target.value = ''; refreshList(); draw(); persist();
-};
-// 저장소 소품: githack 등 인터넷에서 열면 저장소 경로에서 바로 가져온다
-const REPO_OBJS = ['jo_daebak_0','jo_daebak_1','jo_daebak_2','jo_daebak_3','jo_daebak_4','jo_daebak_5','jo_daebak_6','jo_daebak_7','jo_daebak_8','jo_heolgap_0','jo_heolgap_1','jo_jinryo_0','jo_jinryo_1','jo_jinryo_2','jo_jinryo_3','jo_op_0','jo_songil_0','jo_songil_1','jo_songil_2','jo_songil_3','jo_youngchang_0','jo_youngchang_1','jo_youngchang_2','jc_jr_b1_chair','jc_jr_b1_stool_1','jc_jr_b1_stool_2','jc_jr_b1_stool_b','jc_jr_b1_stool_r','jc_jr_b1_bench_1','jc_jr_b1_bench_2','jc_jr_b1_table','jc_jr_b1_cart','jc_jr_b1_crates','jc_jr_b1_can','jc_jr_alley_stool','jc_jr_alley_stool_b','jc_jr_alley_stool_r','jc_jr_alley_table','jc_jr_alley_cart','jc_jr_alley_cases','jc_jr_alley_box','jc_jr_alley_bin','jc_jr_b2_chair','jc_jr_b2_desk','jc_jr_b2_wheelchair','jc_jr_b2_cart','jc_jr_b2_gurney','jc_jr_b2_locker','jc_jr_b2_chest','jc_jr_b2_pile','jc_jr_heolgap_desk','jc_jr_op_table','jc_jr_op_cart_l','jc_jr_op_cart_r','jc_jr_op_iv','jc_jr_entry_bin','jc_jr_entry_busstop'];
-const REPO_NAME = { jo_daebak: '대박알선', jo_heolgap: '헐값매입 의자', jo_jinryo: '진료실', jo_op: '수술실', jo_songil: '손길의원', jo_youngchang: '영창', jc_jr: '중림(오림)' };
-{ const sel = $('repoObj'); for (const n of REPO_OBJS) { const o = document.createElement('option'); o.value = n; const k = Object.keys(REPO_NAME).find((p) => n.startsWith(p)); o.textContent = (k ? REPO_NAME[k] + ' · ' : '') + n; sel.appendChild(o); } }
-$('bRepoObj').onclick = async () => {
-  const n = $('repoObj').value; if (!n) return;
-  const base = new URL('../../game-pack/jr-field/', location.href).href;
-  try {
-    const r = await fetch(base + n + '.webp'); if (!r.ok) throw new Error(r.status);
-    const blob = await r.blob(); const { img, dataUrl } = await readImage(new File([blob], n + '.webp'));
-    S.images[n + '.webp'] = { img, dataUrl };
-    const it = { id: uid('o'), kind: 'obj', file: n + '.webp', x: Math.round(S.w / 2 - img.width / 2), y: Math.round(S.h / 2 - img.height), w: img.width, h: img.height, rot: 0, flip: false, solid: null, name: n };
-    it.sortY = it.y + it.h; S.items.push(it); S.sel = it; refreshList(); draw(); persist();
-  } catch (e) { status('저장소 소품을 못 가져왔습니다(인터넷에서 연 게 아니거나 경로 없음): ' + e.message); }
-};
-$('fChar').onchange = async (e) => { const f = e.target.files[0]; if (!f) return; const r = await readImage(f); S.char = r.img; S.images['__char'] = r; draw(); };
-$('charScale').onchange = (e) => { S.charScale = +e.target.value; draw(); };
-$('zoom').oninput = (e) => { S.zoom = +e.target.value; $('zoomV').textContent = S.zoom.toFixed(2); draw(); };
-for (const b of document.querySelectorAll('.tool')) b.onclick = () => { S.tool = b.dataset.tool; S.drawing = null; for (const q of document.querySelectorAll('.tool')) q.classList.toggle('on', q === b); draw(); };
-for (const id of ['showFloor', 'showSolid', 'showCover', 'showSort']) $(id).onchange = draw;
-$('bWalk').onclick = () => { S.walk = !S.walk; $('bWalk').classList.toggle('on', S.walk); $('bWalk').textContent = S.walk ? '걷기 시험 끄기' : '걷기 시험 켜기'; if (S.walk && !insidePoly(S.floor, S.p.x, S.p.y)) { const c = centroid(S.floor); S.p = { x: c[0], y: c[1] }; } draw(); };
-$('bNew').onclick = () => { if (!confirm('지금 맵을 지우고 새로 시작할까요?')) return; Object.assign(S, { bg: null, bgName: '', w: 0, h: 0, floor: [], items: [], sel: null, images: {} }); localStorage.removeItem('goei-mapedit'); refreshList(); draw(); };
-
-// ───────── 좌표 ─────────
-function fit() { const st = $('stage'); cv.width = st.clientWidth; cv.height = st.clientHeight; draw(); }
-addEventListener('resize', fit);
-const toWorld = (ex, ey) => { const r = cv.getBoundingClientRect(); return [(ex - r.left - S.panX) / S.zoom, (ey - r.top - S.panY) / S.zoom]; };
-function insidePoly(poly, x, y) { let inside = false; for (let i = 0, j = poly.length - 1; i < poly.length; j = i++) { const [xi, yi] = poly[i], [xj, yj] = poly[j]; if ((yi > y) !== (yj > y) && x < ((xj - xi) * (y - yi)) / (yj - yi) + xi) inside = !inside; } return inside; }
-function centroid(poly) { let x = 0, y = 0; for (const p of poly) { x += p[0]; y += p[1]; } return [x / poly.length, y / poly.length]; }
+/* ───────── 기하 ───────── */
+const inPoly = (poly, x, y) => { let c = false; for (let i = 0, j = poly.length - 1; i < poly.length; j = i++) { const [xi, yi] = poly[i], [xj, yj] = poly[j]; if ((yi > y) !== (yj > y) && x < ((xj - xi) * (y - yi)) / (yj - yi) + xi) c = !c; } return c; };
+const bboxOf = (pts) => { let x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9; for (const [x, y] of pts) { x0 = Math.min(x0, x); y0 = Math.min(y0, y); x1 = Math.max(x1, x); y1 = Math.max(y1, y); } return { x0, y0, x1, y1 }; };
+const hitR = () => 8 / S.zoom;
+const near = (a, x, y, r = hitR()) => Math.hypot(a[0] - x, a[1] - y) <= r;
+// 캐릭터 그림 1px = 배경 그림 1px (둘 다 같은 점 크기의 도트). 배경 확대를 따라간다. charScale은 그 위 보정
+function charSize() { const k = S.bgScale * S.charScale, im = S.charImg; return im ? [im.width * k, im.height * k] : [60 * k, 234 * k]; }
 function itemBox(it) {
-  if (it.kind === 'obj') return { x0: it.x, y0: it.y, x1: it.x + it.w, y1: it.y + it.h };
-  if (it.kind === 'cover') { if (it.mask) return { x0: it.mx, y0: it.my, x1: it.mx + it.mw, y1: it.my + it.mh }; const xs = it.poly.map((p) => p[0]), ys = it.poly.map((p) => p[1]); return { x0: Math.min(...xs), y0: Math.min(...ys), x1: Math.max(...xs), y1: Math.max(...ys) }; }
-  if (it.kind === 'solid') { const xs = it.poly.map((p) => p[0]), ys = it.poly.map((p) => p[1]); return { x0: Math.min(...xs), y0: Math.min(...ys), x1: Math.max(...xs), y1: Math.max(...ys) }; }
-  if (it.kind === 'exit') return { x0: it.x - 60, y0: it.y - 20, x1: it.x + 60, y1: it.y + 10 };
-  return { x0: it.x - 14, y0: it.y - 14, x1: it.x + 14, y1: it.y + 14 };
+  if (it.poly) return bboxOf(it.poly);
+  if ((it.kind === 'cover' && it.mask) || it.kind === 'obj') return { x0: it.x, y0: it.y, x1: it.x + it.w, y1: it.y + it.h };
+  if (it.kind === 'char') { const [w, h] = charSize(); return { x0: it.x - w / 2, y0: it.y - h, x1: it.x + w / 2, y1: it.y }; }
+  if (it.kind === 'seat') return { x0: it.x - 30, y0: it.hipY - 30, x1: it.x + 30, y1: it.y + 10 };
+  return { x0: it.x - 16, y0: it.y - 16, x1: it.x + 16, y1: it.y + 16 };
 }
 
-// ───────── 그리기 ─────────
-function drawObj(c, it, alpha = 1) {
-  const im = S.images[it.file]?.img; if (!im) return;
-  c.save(); c.globalAlpha = alpha; c.imageSmoothingEnabled = false;
-  const cx = it.x + it.w / 2, cy = it.y + it.h / 2;
-  c.translate(cx, cy); c.rotate((it.rot || 0) * Math.PI / 180); if (it.flip) c.scale(-1, 1);
-  c.drawImage(im, -it.w / 2, -it.h / 2, it.w, it.h); c.restore();
+/* ───────── 되돌리기·저장 ───────── */
+const UNDO = [], REDO = [];
+let committed = null;
+function ser() { return JSON.stringify(S.items.map((i) => (i.kind === 'cover' && i.mask ? { ...i, mask: null, _cv: null, maskUrl: maskUrl(i) } : { ...i, _cv: undefined }))); }
+async function deser(j) {
+  const arr = JSON.parse(j);
+  for (const it of arr) if (it.maskUrl) { await loadMask(it, it.maskUrl); delete it.maskUrl; }
+  const selId = S.sel?.id; S.items = arr; charItem = S.items.find((i) => i.kind === 'char') || null; S.sel = S.items.find((i) => i.id === selId) || null;
 }
-function drawCover(c, it) {
-  if (!S.bg) return;
-  if (it.mask) {
-    // 마스크 가림: 배경의 그 영역을 마스크(흰 = 가림)로 잘라 한 번 더 그린다
-    if (!it._cv) rebuildMaskCanvas(it);
-    c.save(); c.imageSmoothingEnabled = false; c.drawImage(it._cv, it.mx, it.my, it.mw, it.mh); c.restore();
-    return;
+function commit() {
+  const now = ser();
+  if (committed !== null && now !== committed) { UNDO.push(committed); if (UNDO.length > 150) UNDO.shift(); REDO.length = 0; }
+  committed = now; save(); refresh();
+}
+async function undo() { if (!UNDO.length) return say('되돌릴 것이 없습니다'); REDO.push(committed); committed = UNDO.pop(); await deser(committed); save(); refresh(); say('되돌림'); }
+async function redo() { if (!REDO.length) return say('다시 할 것이 없습니다'); UNDO.push(committed); committed = REDO.pop(); await deser(committed); save(); refresh(); say('다시 함'); }
+
+/* ───────── 그림 ───────── */
+const readFile = (file) => new Promise((res) => { const r = new FileReader(); r.onload = () => res(r.result); r.readAsDataURL(file); });
+const loadImg = (url) => new Promise((res, rej) => { const im = new Image(); im.onload = () => res(im); im.onerror = rej; im.src = url; });
+function setBgInfo() { $('bgInfo').textContent = S.bg ? `${S.bg.width}×${S.bg.height} → ${S.w}×${S.h}` : ''; }
+async function setBg(name, url) {
+  const img = await loadImg(url);
+  S.images[name] = { img, url }; S.bg = img; S.bgName = name;
+  S.w = img.width * S.bgScale; S.h = img.height * S.bgScale; setBgInfo();
+  if (!S.items.some((i) => i.kind === 'floor')) S.items.push({ id: uid('f'), kind: 'floor', name: '바닥', poly: [[0, Math.round(S.h * 0.6)], [S.w, Math.round(S.h * 0.6)], [S.w, S.h], [0, S.h]] });
+  ensureChar(); fitView(); commit(); say('배경을 열었습니다 (확대 ' + S.bgScale + '배)');
+}
+function viewCenter() { return [(cv.width / 2 - S.px) / S.zoom, (cv.height / 2 - S.py) / S.zoom]; }
+async function addPng(name, url, scale) {
+  const img = await loadImg(url); S.images[name] = { img, url };
+  const sc = scale ?? S.bgScale, w = Math.round(img.width * sc), h = Math.round(img.height * sc), [cx, cy] = viewCenter();
+  const it = { id: uid('o'), kind: 'obj', name: name.replace(/\.[^.]+$/, ''), file: name, x: Math.round(cx - w / 2), y: Math.round(cy - h / 2), w, h, rot: 0, flip: false };
+  it.sortY = it.y + it.h; S.items.push(it); S.sel = it; setTool('select'); commit();
+}
+function ensureChar() {
+  charItem = S.items.find((i) => i.kind === 'char');
+  if (!charItem) { charItem = { id: 'char', kind: 'char', name: '캐릭터', x: Math.round(S.w * 0.5), y: Math.round(S.h * 0.88) }; S.items.push(charItem); }
+}
+async function trimImg(img) {
+  const c = document.createElement('canvas'); c.width = img.width; c.height = img.height; const g = c.getContext('2d'); g.drawImage(img, 0, 0);
+  const d = g.getImageData(0, 0, c.width, c.height).data; let x0 = c.width, y0 = c.height, x1 = -1, y1 = -1;
+  for (let y = 0; y < c.height; y++) for (let x = 0; x < c.width; x++) if (d[(y * c.width + x) * 4 + 3] > 10) { if (x < x0) x0 = x; if (y < y0) y0 = y; if (x > x1) x1 = x; if (y > y1) y1 = y; }
+  if (x1 < 0) return c;
+  const o = document.createElement('canvas'); o.width = x1 - x0 + 1; o.height = y1 - y0 + 1; o.getContext('2d').drawImage(c, -x0, -y0); return o;
+}
+$('bBg').onclick = () => $('fBg').click();
+$('bAddPng').onclick = () => $('fPng').click();
+$('bChar').onclick = () => $('fChar').click();
+$('fBg').onchange = async (e) => { const f = e.target.files[0]; e.target.value = ''; if (f) await setBg(f.name, await readFile(f)); };
+$('fPng').onchange = async (e) => { const fs = [...e.target.files]; e.target.value = ''; for (const f of fs) await addPng(f.name, await readFile(f)); };
+$('fChar').onchange = async (e) => { const f = e.target.files[0]; e.target.value = ''; if (!f) return; S.charImg = await trimImg(await loadImg(await readFile(f))); S.charUrl = S.charImg.toDataURL(); save(); draw(); };
+$('bgScale').onchange = (e) => {
+  const k = +e.target.value / S.bgScale; S.bgScale = +e.target.value;
+  if (S.bg) { S.w = S.bg.width * S.bgScale; S.h = S.bg.height * S.bgScale; setBgInfo(); }
+  for (const it of S.items) scaleItem(it, k);
+  fitView(); commit();
+};
+$('charScale').onchange = (e) => { S.charScale = +e.target.value || 1; save(); draw(); };
+function scaleItem(it, k) {
+  const r = (v) => Math.round(v * k);
+  if (it.poly) it.poly = it.poly.map(([x, y]) => [r(x), r(y)]);
+  if ('x' in it) { it.x = r(it.x); it.y = r(it.y); }
+  if ('hipY' in it) it.hipY = r(it.hipY);
+  if (it.kind === 'cover' && it.mask) { const ow = it.w, oh = it.h; it.w = r(ow); it.h = r(oh); rescaleMask(it, ow, oh); }
+  else if ('w' in it) { it.w = r(it.w); it.h = r(it.h); }
+  if ('sortY' in it) it.sortY = r(it.sortY);
+  if ('r' in it) it.r = r(it.r);
+}
+
+/* 저장소 소품 선반 */
+function buildShelf() {
+  const sh = $('shelf'); sh.innerHTML = '';
+  if (!EMBED.props.length) { sh.innerHTML = '<span class="muted">이 판에는 저장소 소품이 안 들어 있습니다</span>'; return; }
+  for (const p of EMBED.props) {
+    const d = document.createElement('div'); d.className = 'p'; d.title = p.file;
+    d.innerHTML = `<img src="${p.url}"><div></div>`; d.querySelector('div').textContent = p.label;
+    // 저장소 소품은 게임 장면(사람 키 235px) 크기로 저장돼 있다: 여기 캐릭터 키에 맞춰 키운다
+    d.onclick = () => addPng(p.file + '.webp', p.url, charSize()[1] / 235);
+    sh.appendChild(d);
   }
-  c.save(); c.beginPath(); it.poly.forEach(([x, y], i) => (i ? c.lineTo(x, y) : c.moveTo(x, y))); c.closePath(); c.clip();
-  c.imageSmoothingEnabled = false; c.drawImage(S.bg, 0, 0, S.w, S.h); c.restore();
 }
-function rebuildMaskCanvas(it) {
-  const o = document.createElement('canvas'); o.width = it.mw; o.height = it.mh; const g = o.getContext('2d');
-  g.imageSmoothingEnabled = false; g.drawImage(S.bg, it.mx / S.bgScale, it.my / S.bgScale, it.mw / S.bgScale, it.mh / S.bgScale, 0, 0, it.mw, it.mh);
-  const id = g.getImageData(0, 0, it.mw, it.mh), d = id.data, m = it.mask;   // mask: Uint8Array(mw*mh) 0/1 (월드 px 단위)
-  for (let i = 0; i < m.length; i++) if (!m[i]) d[i * 4 + 3] = 0;
-  g.putImageData(id, 0, 0); it._cv = o;
+
+/* ───────── 자동 가림 ───────── */
+function bgCrop(x, y, w, h) {
+  const o = document.createElement('canvas'); o.width = w; o.height = h; const g = o.getContext('2d'); g.imageSmoothingEnabled = false;
+  g.drawImage(S.bg, x / S.bgScale, y / S.bgScale, w / S.bgScale, h / S.bgScale, 0, 0, w, h); return o;
 }
-function maskToDataUrl(it) { const o = document.createElement('canvas'); o.width = it.mw; o.height = it.mh; const g = o.getContext('2d'); const id = g.createImageData(it.mw, it.mh); for (let i = 0; i < it.mask.length; i++) { const v = it.mask[i] ? 255 : 0; id.data[i * 4] = v; id.data[i * 4 + 1] = v; id.data[i * 4 + 2] = v; id.data[i * 4 + 3] = 255; } g.putImageData(id, 0, 0); return o.toDataURL('image/png'); }
-function maskFromDataUrl(it, url) { return new Promise((res) => { const im = new Image(); im.onload = () => { const o = document.createElement('canvas'); o.width = it.mw; o.height = it.mh; const g = o.getContext('2d'); g.drawImage(im, 0, 0); const d = g.getImageData(0, 0, it.mw, it.mh).data; it.mask = new Uint8Array(it.mw * it.mh); for (let i = 0; i < it.mask.length; i++) it.mask[i] = d[i * 4] > 127 ? 1 : 0; it._cv = null; res(); }; im.src = url; }); }
-/** 상자 안에서 테두리 색과 다른 픽셀만 (허용치 tol). 작은 점은 지운다 */
 function autoMask(it) {
-  const o = document.createElement('canvas'); o.width = it.mw; o.height = it.mh; const g = o.getContext('2d');
-  g.imageSmoothingEnabled = false; g.drawImage(S.bg, it.mx / S.bgScale, it.my / S.bgScale, it.mw / S.bgScale, it.mh / S.bgScale, 0, 0, it.mw, it.mh);
-  const d = g.getImageData(0, 0, it.mw, it.mh).data, W = it.mw, H = it.mh;
-  // 바탕색 후보: 테두리 픽셀을 색 묶음으로 (16단계로 양자화해 자주 나오는 것 위주)
-  const cnt = new Map(), key = (i) => `${d[i] >> 4},${d[i + 1] >> 4},${d[i + 2] >> 4}`;
-  const border = [];
-  for (let x = 0; x < W; x++) { border.push(x * 4, ((H - 1) * W + x) * 4); }
-  for (let y = 0; y < H; y++) { border.push(y * W * 4, (y * W + W - 1) * 4); }
-  for (const i of border) cnt.set(key(i), (cnt.get(key(i)) || 0) + 1);
-  const bgs = [...cnt.entries()].sort((a, b) => b[1] - a[1]).slice(0, 6).map(([k]) => k.split(',').map((v) => v * 16 + 8));
+  const W = it.w, H = it.h, d = bgCrop(it.x, it.y, W, H).getContext('2d').getImageData(0, 0, W, H).data;
+  const cnt = new Map(), key = (i) => ((d[i] >> 4) << 8) | ((d[i + 1] >> 4) << 4) | (d[i + 2] >> 4);
+  const push = (x, y) => { const i = (y * W + x) * 4; cnt.set(key(i), (cnt.get(key(i)) || 0) + 1); };
+  for (let x = 0; x < W; x++) { push(x, 0); push(x, H - 1); } for (let y = 0; y < H; y++) { push(0, y); push(W - 1, y); }
+  const bgs = [...cnt.entries()].sort((a, b) => b[1] - a[1]).slice(0, 6).map(([k]) => [((k >> 8) & 15) * 16 + 8, ((k >> 4) & 15) * 16 + 8, (k & 15) * 16 + 8]);
   const tol = it.tol ?? 40, m = new Uint8Array(W * H);
-  for (let i = 0; i < W * H; i++) { const r = d[i * 4], gg = d[i * 4 + 1], b = d[i * 4 + 2]; let near = false; for (const [br, bg, bb] of bgs) if (Math.abs(r - br) + Math.abs(gg - bg) + Math.abs(b - bb) < tol) { near = true; break; } m[i] = near ? 0 : 1; }
-  // 작은 점 지우기: 3×3 열기
-  const e = new Uint8Array(W * H);
-  for (let y = 1; y < H - 1; y++) for (let x = 1; x < W - 1; x++) { let ok = 1; for (let dy = -1; dy <= 1 && ok; dy++) for (let dx = -1; dx <= 1; dx++) if (!m[(y + dy) * W + x + dx]) { ok = 0; break; } e[y * W + x] = ok; }
-  const r2 = new Uint8Array(W * H);
-  for (let y = 1; y < H - 1; y++) for (let x = 1; x < W - 1; x++) { let any = 0; for (let dy = -1; dy <= 1 && !any; dy++) for (let dx = -1; dx <= 1; dx++) if (e[(y + dy) * W + x + dx]) { any = 1; break; } r2[y * W + x] = any; }
-  it.mask = r2; it._cv = null;
+  for (let i = 0; i < W * H; i++) { const r = d[i * 4], g = d[i * 4 + 1], b = d[i * 4 + 2]; m[i] = bgs.some(([R, G, B]) => Math.abs(r - R) + Math.abs(g - G) + Math.abs(b - B) < tol) ? 0 : 1; }
+  const ero = new Uint8Array(W * H), out = new Uint8Array(W * H);
+  for (let y = 1; y < H - 1; y++) for (let x = 1; x < W - 1; x++) { let ok = 1; for (let dy = -1; dy <= 1 && ok; dy++) for (let dx = -1; dx <= 1; dx++) if (!m[(y + dy) * W + x + dx]) { ok = 0; break; } ero[y * W + x] = ok; }
+  for (let y = 1; y < H - 1; y++) for (let x = 1; x < W - 1; x++) { let a = 0; for (let dy = -1; dy <= 1 && !a; dy++) for (let dx = -1; dx <= 1; dx++) if (ero[(y + dy) * W + x + dx]) { a = 1; break; } out[y * W + x] = a; }
+  it.mask = out; it._cv = null;
 }
-function drawChar(c) {
-  const h = (S.char ? S.char.height : 115) * S.charScale, w = (S.char ? S.char.width : 50) * S.charScale;
-  c.save(); c.imageSmoothingEnabled = false;
-  if (S.char) c.drawImage(S.char, S.p.x - w / 2, S.p.y - h, w, h); else { c.fillStyle = 'rgba(80,200,255,.8)'; c.fillRect(S.p.x - w / 2, S.p.y - h, w, h); }
-  c.fillStyle = '#4fc3f7'; c.fillRect(S.p.x - 3, S.p.y - 3, 6, 6); c.restore();
+function maskCanvas(it) {
+  if (it._cv) return it._cv;
+  const o = bgCrop(it.x, it.y, it.w, it.h), g = o.getContext('2d'), id = g.getImageData(0, 0, it.w, it.h);
+  for (let i = 0; i < it.mask.length; i++) if (!it.mask[i]) id.data[i * 4 + 3] = 0;
+  g.putImageData(id, 0, 0); it._cv = o; return o;
 }
+function maskUrl(it) { const o = document.createElement('canvas'); o.width = it.w; o.height = it.h; const g = o.getContext('2d'), id = g.createImageData(it.w, it.h); for (let i = 0; i < it.mask.length; i++) { const v = it.mask[i] ? 255 : 0; id.data[i * 4] = v; id.data[i * 4 + 1] = v; id.data[i * 4 + 2] = v; id.data[i * 4 + 3] = 255; } g.putImageData(id, 0, 0); return o.toDataURL(); }
+async function loadMask(it, url) { const im = await loadImg(url); const o = document.createElement('canvas'); o.width = it.w; o.height = it.h; const g = o.getContext('2d'); g.imageSmoothingEnabled = false; g.drawImage(im, 0, 0, it.w, it.h); const d = g.getImageData(0, 0, it.w, it.h).data; it.mask = new Uint8Array(it.w * it.h); for (let i = 0; i < it.mask.length; i++) it.mask[i] = d[i * 4] > 127 ? 1 : 0; it._cv = null; }
+function rescaleMask(it, ow, oh) { const old = it.mask, m = new Uint8Array(it.w * it.h); for (let y = 0; y < it.h; y++) for (let x = 0; x < it.w; x++) m[y * it.w + x] = old[Math.min(oh - 1, Math.floor(y * oh / it.h)) * ow + Math.min(ow - 1, Math.floor(x * ow / it.w))] || 0; it.mask = m; it._cv = null; }
+function paint(x, y) {
+  const it = S.sel, r = S.brushR, v = S.brush === 'add' ? 1 : 0;
+  for (let yy = Math.max(0, Math.floor(y - r - it.y)); yy < Math.min(it.h, Math.ceil(y + r - it.y)); yy++)
+    for (let xx = Math.max(0, Math.floor(x - r - it.x)); xx < Math.min(it.w, Math.ceil(x + r - it.x)); xx++)
+      if ((xx + it.x - x) ** 2 + (yy + it.y - y) ** 2 <= r * r) it.mask[yy * it.w + xx] = v;
+  it._cv = null;
+}
+
+/* ───────── 앉는 자리 ───────── */
+// 게임 기준: 앉으면 캐릭터 발(그림 기준점)이 (x, y)에 놓인다. 엉덩이 높이 hipY에서 발까지는 캐릭터 키의 약 28%.
+const LEG = 0.28;
+function makeSeat(hx, hy) { const [, h] = charSize(); return { id: uid('s'), kind: 'seat', name: '앉는 자리', x: Math.round(hx), hipY: Math.round(hy), y: Math.round(hy + h * LEG), face: 1, verb: '앉기' }; }
+function drawSeat(it, sel) {
+  const [w, h] = charSize(), col = sel ? '#fff' : COLORS.seat;
+  // 앉은 모습 실루엣: 엉덩이 → 무릎(앞으로) → 발, 몸통은 엉덩이 위로
+  const f = it.face || 1, hip = [it.x, it.hipY], knee = [it.x + f * w * 0.45, it.hipY], foot = [it.x + f * w * 0.45, it.y], head = [it.x - f * w * 0.05, it.hipY - h * 0.62];
+  ctx.save(); ctx.globalAlpha = 0.35; ctx.strokeStyle = col; ctx.lineCap = 'round'; ctx.lineWidth = w * 0.22;
+  ctx.beginPath(); ctx.moveTo(...head); ctx.lineTo(...hip); ctx.lineTo(...knee); ctx.lineTo(...foot); ctx.stroke();
+  ctx.fillStyle = col; ctx.beginPath(); ctx.arc(head[0], head[1] - w * 0.15, w * 0.2, 0, 7); ctx.fill(); ctx.restore();
+  dotH(it.x, it.hipY, col); dotH(it.x, it.y, '#ffeb3b');
+  label(it.x + 10, it.hipY - 8, (it.verb || '앉기') + ' · 엉덩이');
+}
+
+/* ───────── 그리기 ───────── */
+function sizeCanvas() { const r = $('stage').getBoundingClientRect(); cv.width = Math.max(1, r.width); cv.height = Math.max(1, r.height); }
+function fitView() { sizeCanvas(); S.zoom = Math.min((cv.width - 40) / S.w, (cv.height - 40) / S.h); S.px = (cv.width - S.w * S.zoom) / 2; S.py = (cv.height - S.h * S.zoom) / 2; draw(); }
+addEventListener('resize', () => { sizeCanvas(); draw(); });
+const toW = (cx, cy) => { const r = cv.getBoundingClientRect(); return [(cx - r.left - S.px) / S.zoom, (cy - r.top - S.py) / S.zoom]; };
+function pathPoly(pts) { ctx.beginPath(); pts.forEach(([x, y], i) => (i ? ctx.lineTo(x, y) : ctx.moveTo(x, y))); ctx.closePath(); }
+function drawObj(it) {
+  const im = S.images[it.file]?.img; if (!im) { ctx.fillStyle = 'rgba(79,195,247,.3)'; ctx.fillRect(it.x, it.y, it.w, it.h); return; }
+  ctx.save(); ctx.translate(it.x + it.w / 2, it.y + it.h / 2); ctx.rotate((it.rot || 0) * Math.PI / 180); if (it.flip) ctx.scale(-1, 1);
+  ctx.drawImage(im, -it.w / 2, -it.h / 2, it.w, it.h); ctx.restore();
+}
+function drawCover(it) {
+  if (!S.bg) return;
+  if (it.mask) { ctx.drawImage(maskCanvas(it), it.x, it.y); return; }
+  ctx.save(); pathPoly(it.poly); ctx.clip(); ctx.drawImage(S.bg, 0, 0, S.w, S.h); ctx.restore();
+}
+function drawChar(it) {
+  const [w, h] = charSize();
+  ctx.fillStyle = 'rgba(0,0,0,.35)'; ctx.beginPath(); ctx.ellipse(it.x, it.y, w * 0.4, Math.max(4, w * 0.08), 0, 0, 7); ctx.fill();
+  if (S.charImg) ctx.drawImage(S.charImg, it.x - w / 2, it.y - h, w, h);
+  else { ctx.fillStyle = 'rgba(225,225,235,.9)'; ctx.beginPath(); ctx.arc(it.x, it.y - h * 0.92, w * 0.28, 0, 7); ctx.fill(); ctx.fillRect(it.x - w * 0.35, it.y - h * 0.82, w * 0.7, h * 0.82); }
+}
+const sortYOf = (it) => (it.kind === 'char' ? it.y : it.sortY);
 function draw() {
   ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.fillStyle = '#000'; ctx.fillRect(0, 0, cv.width, cv.height);
-  ctx.setTransform(S.zoom, 0, 0, S.zoom, S.panX, S.panY);
-  if (S.bg) { ctx.imageSmoothingEnabled = false; ctx.drawImage(S.bg, 0, 0, S.w, S.h); }
-  else { ctx.fillStyle = '#222'; ctx.fillRect(0, 0, 1280, 720); ctx.fillStyle = '#777'; ctx.font = '28px sans-serif'; ctx.fillText('왼쪽에서 배경을 불러오세요', 380, 360); }
-  // 깊이 순서로: 소품·가림·(시험 캐릭터)
-  const layers = S.items.filter((i) => i.kind === 'obj' || i.kind === 'cover').map((i) => ({ y: i.sortY, it: i }));
-  if (S.walk) layers.push({ y: S.p.y, it: null });
-  layers.sort((a, b) => a.y - b.y);
-  for (const L of layers) { if (!L.it) drawChar(ctx); else if (L.it.kind === 'obj') drawObj(ctx, L.it); else drawCover(ctx, L.it); }
-  const lw = 2 / S.zoom;
-  if ($('showFloor').checked && S.floor.length) { ctx.strokeStyle = '#3cff8a'; ctx.lineWidth = lw; ctx.setLineDash([8 / S.zoom, 6 / S.zoom]); poly(ctx, S.floor); ctx.stroke(); ctx.setLineDash([]); ctx.fillStyle = 'rgba(60,255,138,.08)'; ctx.fill(); }
+  ctx.setTransform(S.zoom, 0, 0, S.zoom, S.px, S.py); ctx.imageSmoothingEnabled = false;
+  if (S.bg) ctx.drawImage(S.bg, 0, 0, S.w, S.h);
+  else { ctx.fillStyle = '#1b1e23'; ctx.fillRect(0, 0, S.w, S.h); ctx.fillStyle = '#7a838e'; ctx.font = '30px sans-serif'; ctx.textAlign = 'center'; ctx.fillText('「배경 열기」 또는 그림을 여기로 끌어 놓기', S.w / 2, S.h / 2); ctx.textAlign = 'start'; }
+  const lw = 1.5 / S.zoom, sel = S.sel;
   for (const it of S.items) {
-    const sel = it === S.sel;
-    if (it.kind === 'cover' && $('showCover').checked) {
-      ctx.strokeStyle = sel ? '#fff' : '#b388ff'; ctx.lineWidth = lw;
-      if (it.mask) { ctx.setLineDash([6 / S.zoom, 4 / S.zoom]); ctx.strokeRect(it.mx, it.my, it.mw, it.mh); ctx.setLineDash([]); if (sel) { if (!it._cv) rebuildMaskCanvas(it); ctx.save(); ctx.globalAlpha = 0.35; ctx.fillStyle = '#b388ff'; ctx.globalCompositeOperation = 'source-over'; const o = document.createElement('canvas'); o.width = it.mw; o.height = it.mh; const g = o.getContext('2d'); g.drawImage(it._cv, 0, 0); g.globalCompositeOperation = 'source-in'; g.fillStyle = '#b388ff'; g.fillRect(0, 0, it.mw, it.mh); ctx.drawImage(o, it.mx, it.my); ctx.restore(); } }
-      else { poly(ctx, it.poly); ctx.stroke(); ctx.fillStyle = 'rgba(179,136,255,.12)'; ctx.fill(); }
-    }
-    if (it.kind === 'solid' && $('showSolid').checked) { ctx.strokeStyle = sel ? '#fff' : '#ff5252'; ctx.lineWidth = lw; poly(ctx, it.poly); ctx.stroke(); ctx.fillStyle = 'rgba(255,82,82,.15)'; ctx.fill(); }
-    if (it.kind === 'obj') {
-      if (it.solid && $('showSolid').checked) { ctx.strokeStyle = '#ff5252'; ctx.lineWidth = lw; ctx.strokeRect(it.solid.x0, it.solid.y0, it.solid.x1 - it.solid.x0, it.solid.y1 - it.solid.y0); }
-      if (sel) { ctx.strokeStyle = '#fff'; ctx.lineWidth = lw; ctx.strokeRect(it.x, it.y, it.w, it.h); ctx.fillStyle = '#fff'; for (const [hx, hy] of handles(it)) ctx.fillRect(hx - 5 / S.zoom, hy - 5 / S.zoom, 10 / S.zoom, 10 / S.zoom); }
-    }
-    if ((it.kind === 'obj' || it.kind === 'cover') && $('showSort').checked) { const b = itemBox(it); ctx.strokeStyle = sel ? '#ffd740' : 'rgba(255,167,38,.8)'; ctx.lineWidth = lw; ctx.beginPath(); ctx.moveTo(b.x0 - 10, it.sortY); ctx.lineTo(b.x1 + 10, it.sortY); ctx.stroke(); }
-    if (it.kind === 'exit') { ctx.fillStyle = sel ? '#fff' : '#3cc596'; ctx.beginPath(); ctx.moveTo(it.x - 40, it.y); ctx.lineTo(it.x + 40, it.y); ctx.lineTo(it.x, it.y + 16); ctx.closePath(); ctx.fill(); ctx.font = `${14 / S.zoom}px sans-serif`; ctx.fillText(`출입구 ${it.to || ''}`, it.x - 40, it.y - 6); }
-    if (it.kind === 'lamp') { ctx.strokeStyle = sel ? '#fff' : '#ffeb3b'; ctx.lineWidth = lw; ctx.beginPath(); ctx.arc(it.x, it.y, 12, 0, Math.PI * 2); ctx.stroke(); ctx.beginPath(); ctx.arc(it.x, it.y, it.r || 200, 0, Math.PI * 2); ctx.setLineDash([4 / S.zoom, 4 / S.zoom]); ctx.stroke(); ctx.setLineDash([]); }
-    if (it.kind === 'seat') { ctx.fillStyle = sel ? '#fff' : '#80cbc4'; ctx.fillRect(it.x - 8, it.y - 8, 16, 16); ctx.font = `${14 / S.zoom}px sans-serif`; ctx.fillText(it.verb || '앉기', it.x + 10, it.y + 4); }
+    const on = it === sel;
+    if (it.kind === 'floor' && $('vFloor').checked) { pathPoly(it.poly); ctx.fillStyle = 'rgba(61,220,132,.10)'; ctx.fill(); ctx.strokeStyle = on ? '#fff' : COLORS.floor; ctx.lineWidth = lw * (on ? 2 : 1.2); ctx.setLineDash([10 / S.zoom, 6 / S.zoom]); ctx.stroke(); ctx.setLineDash([]); }
+    if (it.kind === 'block' && $('vBlock').checked) { pathPoly(it.poly); ctx.fillStyle = 'rgba(255,90,90,.25)'; ctx.fill(); ctx.strokeStyle = on ? '#fff' : COLORS.block; ctx.lineWidth = lw * (on ? 2 : 1.2); ctx.stroke(); }
   }
-  if (S.drawing) { ctx.strokeStyle = '#fff'; ctx.lineWidth = lw; ctx.beginPath(); S.drawing.forEach(([x, y], i) => (i ? ctx.lineTo(x, y) : ctx.moveTo(x, y))); ctx.stroke(); for (const [x, y] of S.drawing) ctx.fillRect(x - 3 / S.zoom, y - 3 / S.zoom, 6 / S.zoom, 6 / S.zoom); }
-  if ((S.tool === 'floor' || (S.tool === 'select' && !S.sel)) && S.floor.length && !S.drawing && $('showFloor').checked) { ctx.fillStyle = '#3cff8a'; for (const [x, y] of S.floor) ctx.fillRect(x - 4 / S.zoom, y - 4 / S.zoom, 8 / S.zoom, 8 / S.zoom); }
-  if (S.sel?.poly) { ctx.fillStyle = '#fff'; for (const [x, y] of S.sel.poly) ctx.fillRect(x - 4 / S.zoom, y - 4 / S.zoom, 8 / S.zoom, 8 / S.zoom); }
-  if (S.brush && S.sel?.mask && S.mouse) { ctx.strokeStyle = S.brush === 'add' ? '#fff' : '#ff5252'; ctx.lineWidth = lw; ctx.beginPath(); ctx.arc(S.mouse[0], S.mouse[1], S.brushR, 0, Math.PI * 2); ctx.stroke(); }
+  for (const it of S.items.filter((i) => i.kind === 'obj' || i.kind === 'cover' || i.kind === 'char').sort((a, b) => sortYOf(a) - sortYOf(b))) {
+    if (it.kind === 'obj') drawObj(it); else if (it.kind === 'cover') drawCover(it); else drawChar(it);
+  }
+  for (const it of S.items) {
+    const on = it === sel;
+    if (it.kind === 'cover' && $('vCover').checked) {
+      ctx.strokeStyle = on ? '#fff' : COLORS.cover; ctx.lineWidth = lw * (on ? 2 : 1.2);
+      if (it.mask) { ctx.setLineDash([6 / S.zoom, 4 / S.zoom]); ctx.strokeRect(it.x, it.y, it.w, it.h); ctx.setLineDash([]); if (on) { const o = document.createElement('canvas'); o.width = it.w; o.height = it.h; const g = o.getContext('2d'); g.drawImage(maskCanvas(it), 0, 0); g.globalCompositeOperation = 'source-in'; g.fillStyle = COLORS.cover; g.fillRect(0, 0, it.w, it.h); ctx.save(); ctx.globalAlpha = 0.5; ctx.drawImage(o, it.x, it.y); ctx.restore(); } }
+      else { pathPoly(it.poly); ctx.fillStyle = 'rgba(180,140,255,.22)'; ctx.fill(); ctx.stroke(); }
+    }
+    if (it.kind === 'obj' && on) { ctx.strokeStyle = '#fff'; ctx.lineWidth = lw; ctx.strokeRect(it.x, it.y, it.w, it.h); }
+    if ((it.kind === 'obj' || it.kind === 'cover') && (on || $('vSort').checked)) {
+      const b = itemBox(it); ctx.strokeStyle = on ? '#ffab40' : 'rgba(255,171,64,.65)'; ctx.lineWidth = lw * (on ? 2 : 1);
+      ctx.beginPath(); ctx.moveTo(b.x0, it.sortY); ctx.lineTo(b.x1, it.sortY); ctx.stroke();
+      if (on) { const g = sortGrip(it); ctx.fillStyle = '#ffab40'; ctx.fillRect(g[0] - 9 / S.zoom, g[1] - 6 / S.zoom, 18 / S.zoom, 12 / S.zoom); label(g[0] + 12 / S.zoom, g[1] + 4 / S.zoom, '깊이선'); }
+    }
+    if (it.kind === 'seat') drawSeat(it, on);
+    if (it.kind === 'exit') { ctx.fillStyle = on ? '#fff' : COLORS.exit; ctx.beginPath(); ctx.moveTo(it.x - 40, it.y - 8); ctx.lineTo(it.x + 40, it.y - 8); ctx.lineTo(it.x, it.y + 12); ctx.closePath(); ctx.fill(); label(it.x - 40, it.y - 14, '출입구' + (it.to ? ' → ' + it.to : '')); }
+    if (it.kind === 'lamp') { ctx.strokeStyle = on ? '#fff' : COLORS.lamp; ctx.lineWidth = lw * 1.5; ctx.beginPath(); ctx.arc(it.x, it.y, 10, 0, 7); ctx.stroke(); ctx.setLineDash([5 / S.zoom, 5 / S.zoom]); ctx.beginPath(); ctx.arc(it.x, it.y, it.r, 0, 7); ctx.stroke(); ctx.setLineDash([]); }
+    if (it.kind === 'char' && on) { const b = itemBox(it); ctx.strokeStyle = '#fff'; ctx.lineWidth = lw; ctx.setLineDash([4 / S.zoom, 4 / S.zoom]); ctx.strokeRect(b.x0, b.y0, b.x1 - b.x0, b.y1 - b.y0); ctx.setLineDash([]); }
+  }
+  if (sel?.poly) { for (const p of midpoints(sel.poly)) plusH(...p); for (const p of sel.poly) dotH(p[0], p[1], '#fff'); }
+  if (sel?.kind === 'obj') for (const p of corners(sel)) dotH(p[0], p[1], '#fff');
+  if (S.draw) {
+    const col = COLORS[S.tool] || '#fff';
+    ctx.strokeStyle = col; ctx.lineWidth = 2 * lw; ctx.beginPath(); S.draw.forEach(([x, y], i) => (i ? ctx.lineTo(x, y) : ctx.moveTo(x, y))); ctx.lineTo(...S.mouse); ctx.stroke();
+    if (S.draw.length >= 2) { ctx.save(); ctx.globalAlpha = 0.15; ctx.fillStyle = col; pathPoly([...S.draw, S.mouse]); ctx.fill(); ctx.restore(); }
+    S.draw.forEach((p, i) => dotH(p[0], p[1], i === 0 ? '#ffeb3b' : col));
+    if (S.draw.length >= 3 && near(S.draw[0], ...S.mouse)) { ctx.strokeStyle = '#ffeb3b'; ctx.lineWidth = 2 * lw; ctx.beginPath(); ctx.arc(S.draw[0][0], S.draw[0][1], 13 / S.zoom, 0, 7); ctx.stroke(); }
+  }
+  if (dragS?.kind === 'auto') { const b = dragS.box; ctx.strokeStyle = COLORS.cover; ctx.lineWidth = 2 * lw; ctx.setLineDash([6 / S.zoom, 4 / S.zoom]); ctx.strokeRect(b.x, b.y, b.w, b.h); ctx.setLineDash([]); }
+  if (S.brush && sel?.mask) { ctx.strokeStyle = S.brush === 'add' ? '#fff' : '#ff5a5a'; ctx.lineWidth = lw; ctx.beginPath(); ctx.arc(S.mouse[0], S.mouse[1], S.brushR, 0, 7); ctx.stroke(); }
+  if (S.tool === 'seat') drawSeat({ x: S.mouse[0], hipY: S.mouse[1], y: S.mouse[1] + charSize()[1] * LEG, face: 1 }, false);
+  hintText();
 }
-function poly(c, pts) { c.beginPath(); pts.forEach(([x, y], i) => (i ? c.lineTo(x, y) : c.moveTo(x, y))); c.closePath(); }
-function handles(it) { return [[it.x, it.y], [it.x + it.w, it.y], [it.x, it.y + it.h], [it.x + it.w, it.y + it.h]]; }
+function label(x, y, t) { ctx.save(); ctx.font = `${13 / S.zoom}px sans-serif`; const w = ctx.measureText(t).width; ctx.fillStyle = 'rgba(0,0,0,.65)'; ctx.fillRect(x - 3 / S.zoom, y - 13 / S.zoom, w + 6 / S.zoom, 17 / S.zoom); ctx.fillStyle = '#fff'; ctx.fillText(t, x, y); ctx.restore(); }
+function dotH(x, y, c) { const r = 5 / S.zoom, b = 1.5 / S.zoom; ctx.fillStyle = '#000'; ctx.fillRect(x - r - b, y - r - b, 2 * (r + b), 2 * (r + b)); ctx.fillStyle = c; ctx.fillRect(x - r, y - r, 2 * r, 2 * r); }
+function plusH(x, y) { const r = 6 / S.zoom; ctx.fillStyle = 'rgba(0,0,0,.7)'; ctx.beginPath(); ctx.arc(x, y, r, 0, 7); ctx.fill(); ctx.strokeStyle = '#fff'; ctx.lineWidth = 1.5 / S.zoom; ctx.beginPath(); ctx.moveTo(x - r * 0.6, y); ctx.lineTo(x + r * 0.6, y); ctx.moveTo(x, y - r * 0.6); ctx.lineTo(x, y + r * 0.6); ctx.stroke(); }
+const midpoints = (p) => p.map((a, i) => { const b = p[(i + 1) % p.length]; return [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2]; });
+const corners = (it) => [[it.x, it.y], [it.x + it.w, it.y], [it.x + it.w, it.y + it.h], [it.x, it.y + it.h]];
+const sortGrip = (it) => [itemBox(it).x1 + 14 / S.zoom, it.sortY];
+function hintText() {
+  const T = { select: '선택: 클릭으로 고르기 · 끌어 옮기기 · 빈 곳 끌기 = 화면 이동 · 휠 = 확대',
+    floor: '바닥 그리기: 클릭으로 점 · 첫 점(노랑) 클릭/Enter/오른쪽 클릭 = 닫기 · Backspace = 점 빼기 · Esc = 취소 (바닥은 하나, 새로 그리면 바뀜)',
+    block: '막힘 그리기: 못 지나가는 곳 둘레를 클릭 · 첫 점 클릭/Enter = 닫기 · Esc = 취소',
+    cover: '가림 그리기: 캐릭터를 가릴 물건 윤곽을 따라 클릭 · 첫 점 클릭/Enter = 닫기 · Esc = 취소',
+    auto: '자동 가림: 가릴 물건을 덮는 상자를 끌기', exit: '출입구: 캐릭터가 나가는 바닥 자리 클릭',
+    seat: '앉는 자리: 의자 좌석 위, 엉덩이가 닿는 곳을 클릭 (미리보기가 따라다님)', lamp: '조명: 등 자리 클릭 (밤에 빛 웅덩이)' };
+  let t = T[S.tool] || '';
+  if (S.tool === 'select' && S.sel?.poly) t = '다각형: 흰 점 끌기 · ＋ 끌기 = 점 추가 · 점 오른쪽 클릭 = 점 삭제 · 안쪽 끌기 = 이동 · Delete = 통째 삭제';
+  if (S.tool === 'select' && S.sel?.kind === 'char') t = '캐릭터: 끌어서 놓기 · 방향키 = 걷기(바닥·막힘 적용) · Shift = 빠르게';
+  if (S.tool === 'select' && S.sel?.kind === 'obj') t = '소품: 끌어 옮기기 · 모서리 = 크기 · 주황 손잡이 = 깊이선 · R 회전 · H 뒤집기 · Delete 삭제';
+  if (S.brush) t = `붓(${S.brush === 'add' ? '더하기' : '지우기'}): 끌어서 칠하기 · Esc = 붓 끄기`;
+  $('hint').textContent = t;
+}
 
-// ───────── 입력 ─────────
-let drag = null;
+/* ───────── 입력 ───────── */
+let dragS = null;
+function setTool(t) {
+  S.draw = null; S.tool = t; S.brush = null;
+  for (const b of document.querySelectorAll('.tool')) b.classList.toggle('on', b.dataset.tool === t);
+  cv.style.cursor = t === 'select' ? 'default' : 'crosshair'; showProps(); draw();
+}
+for (const b of document.querySelectorAll('.tool')) b.onclick = () => setTool(b.dataset.tool);
+function finishPoly() {
+  if (!S.draw) return;
+  if (S.draw.length < 3) { say('점이 3개 이상이어야 닫힙니다'); return; }
+  const kind = S.tool, poly = S.draw; S.draw = null;
+  let it;
+  if (kind === 'floor') { S.items = S.items.filter((i) => i.kind !== 'floor'); it = { id: uid('f'), kind: 'floor', name: '바닥', poly }; }
+  else if (kind === 'block') it = { id: uid('b'), kind: 'block', name: '막힘', poly, h: 999 };
+  else it = { id: uid('c'), kind: 'cover', name: '가림', poly, sortY: Math.max(...poly.map((p) => p[1])) };
+  S.items.push(it); S.sel = it; setTool('select'); commit();
+}
+function hitItem(x, y) {
+  for (const it of [...S.items].reverse()) if (it.kind === 'seat' && (near([it.x, it.hipY], x, y, 14 / S.zoom) || near([it.x, it.y], x, y, 14 / S.zoom))) return it;
+  for (const it of [...S.items].reverse()) if ((it.kind === 'exit' || it.kind === 'lamp') && Math.abs(it.x - x) < 40 && Math.abs(it.y - y) < 18) return it;
+  for (const it of S.items.filter((i) => i.kind === 'obj' || i.kind === 'cover' || i.kind === 'char').sort((a, b) => sortYOf(b) - sortYOf(a))) {
+    const b = itemBox(it); if (x < b.x0 || x > b.x1 || y < b.y0 || y > b.y1) continue;
+    if (it.kind === 'cover') { if (it.mask ? it.mask[Math.floor(y - it.y) * it.w + Math.floor(x - it.x)] : inPoly(it.poly, x, y)) return it; continue; }
+    if (it.kind === 'obj' && !opaqueAt(it, x, y)) continue;
+    return it;
+  }
+  for (const it of [...S.items].reverse()) if (it.kind === 'block' && inPoly(it.poly, x, y)) return it;
+  for (const it of [...S.items].reverse()) if (it.kind === 'floor' && inPoly(it.poly, x, y)) return it;
+  return null;
+}
+const alphaCache = new Map();
+function opaqueAt(it, x, y) {
+  const im = S.images[it.file]?.img; if (!im) return true;
+  let a = alphaCache.get(it.file);
+  if (!a) { const c = document.createElement('canvas'); c.width = im.width; c.height = im.height; const g = c.getContext('2d'); g.drawImage(im, 0, 0); a = { d: g.getImageData(0, 0, im.width, im.height).data, w: im.width, h: im.height }; alphaCache.set(it.file, a); }
+  let u = (x - it.x) / it.w; const v = (y - it.y) / it.h; if (it.flip) u = 1 - u;
+  const px = Math.floor(u * a.w), py = Math.floor(v * a.h); if (px < 0 || py < 0 || px >= a.w || py >= a.h) return false;
+  return a.d[(py * a.w + px) * 4 + 3] > 20;
+}
+cv.addEventListener('contextmenu', (e) => e.preventDefault());
 cv.addEventListener('mousedown', (e) => {
-  const [x, y] = toWorld(e.clientX, e.clientY);
-  if (e.button === 1 || e.shiftKey && S.tool === 'select') { drag = { kind: 'pan', sx: e.clientX, sy: e.clientY, px: S.panX, py: S.panY }; return; }
+  const [x, y] = toW(e.clientX, e.clientY), R = Math.round; S.mouse = [x, y];
+  if (e.button === 1 || S.space) { dragS = { kind: 'pan', cx: e.clientX, cy: e.clientY, px: S.px, py: S.py }; return; }
   const T = S.tool;
-  if (S.brush && S.sel?.mask) { drag = { kind: 'brush' }; paintMask(x, y); return; }
-  if (T === 'autocover') { drag = { kind: 'auto', x0: x, y0: y, it: { id: uid('c'), kind: 'cover', mx: Math.round(x), my: Math.round(y), mw: 1, mh: 1, mask: null, tol: 40, sortY: Math.round(y), name: '가림(자동)' } }; return; }
-  if (T === 'floor' || T === 'cover') {
-    // 기존 점 끌기 (floor 또는 선택한 cover), 선 위 클릭이면 점 추가
-    const pts = T === 'floor' ? S.floor : S.sel?.kind === 'cover' && S.sel.poly ? S.sel.poly : null;
-    if (pts && !S.drawing) {
-      const i = nearPoint(pts, x, y); if (i >= 0) { if (e.altKey) { if (pts.length > 3) pts.splice(i, 1); draw(); persist(); return; } drag = { kind: 'pt', pts, i }; return; }
-      const j = nearEdge(pts, x, y); if (j >= 0) { pts.splice(j + 1, 0, [Math.round(x), Math.round(y)]); drag = { kind: 'pt', pts, i: j + 1 }; draw(); return; }
-    }
-    if (!S.drawing) S.drawing = [];
-    S.drawing.push([Math.round(x), Math.round(y)]); drag = { kind: 'free' }; draw(); return;
+  if (T === 'floor' || T === 'block' || T === 'cover') {
+    if (e.button === 2) { finishPoly(); return; }
+    if (S.draw && S.draw.length >= 3 && near(S.draw[0], x, y)) { finishPoly(); return; }
+    (S.draw ||= []).push([R(x), R(y)]); draw(); return;
   }
-  if (T === 'solid') {
-    if (!S.drawing && S.sel?.kind === 'solid') { const i = nearPoint(S.sel.poly, x, y); if (i >= 0) { if (e.altKey) { if (S.sel.poly.length > 3) S.sel.poly.splice(i, 1); draw(); persist(); return; } drag = { kind: 'pt', pts: S.sel.poly, i }; return; } const j = nearEdge(S.sel.poly, x, y); if (j >= 0) { S.sel.poly.splice(j + 1, 0, [Math.round(x), Math.round(y)]); drag = { kind: 'pt', pts: S.sel.poly, i: j + 1 }; draw(); return; } }
-    if (!S.drawing) S.drawing = [];
-    S.drawing.push([Math.round(x), Math.round(y)]); drag = { kind: 'free' }; draw(); return;
+  if (e.button === 2) { if (T !== 'select') setTool('select'); else if (S.sel?.poly) { const i = S.sel.poly.findIndex((p) => near(p, x, y)); if (i >= 0) { if (S.sel.poly.length > 3) { S.sel.poly.splice(i, 1); commit(); } else say('점은 3개보다 적을 수 없습니다'); } } return; }
+  if (T === 'auto') { if (!S.bg) return say('배경을 먼저 여세요'); dragS = { kind: 'auto', x0: x, y0: y, box: { x: R(x), y: R(y), w: 0, h: 0 } }; return; }
+  if (T === 'seat') { const it = makeSeat(x, y); S.items.push(it); S.sel = it; setTool('select'); commit(); return; }
+  if (T === 'exit' || T === 'lamp') {
+    const it = T === 'exit' ? { id: uid('x'), kind: 'exit', name: '출입구', x: R(x), y: R(y), to: '', toDoor: '' } : { id: uid('l'), kind: 'lamp', name: '조명', x: R(x), y: R(y), r: 200, lk: 'lamp' };
+    S.items.push(it); S.sel = it; setTool('select'); commit(); return;
   }
-  if (T === 'exit') { const it = { id: uid('x'), kind: 'exit', x: Math.round(x), y: Math.round(y), to: '', name: '출입구' }; S.items.push(it); S.sel = it; setTool('select'); refreshList(); draw(); persist(); return; }
-  if (T === 'lamp') { const it = { id: uid('l'), kind: 'lamp', x: Math.round(x), y: Math.round(y), r: 200, lk: 'lamp', name: '조명' }; S.items.push(it); S.sel = it; setTool('select'); refreshList(); draw(); persist(); return; }
-  if (T === 'seat') { const it = { id: uid('s'), kind: 'seat', x: Math.round(x), y: Math.round(y), verb: '앉기', face: 1, name: '앉는 자리' }; S.items.push(it); S.sel = it; setTool('select'); refreshList(); draw(); persist(); return; }
-  // select
-  if (S.sel?.kind === 'obj') { const hs = handles(S.sel); for (let i = 0; i < 4; i++) if (Math.hypot(hs[i][0] - x, hs[i][1] - y) < 8 / S.zoom) { drag = { kind: 'size', i, it: S.sel, ax: hs[3 - i][0], ay: hs[3 - i][1], ar: S.sel.w / S.sel.h }; return; } }
-  if (S.sel && (S.sel.kind === 'obj' || S.sel.kind === 'cover') && Math.abs(y - S.sel.sortY) < 6 / S.zoom) { const b = itemBox(S.sel); if (x > b.x0 - 10 && x < b.x1 + 10) { drag = { kind: 'sort', it: S.sel }; return; } }
-  // 선택한 다각형(가림·막힘)의 점 끌기 / Alt+클릭 삭제 / 선 위 클릭으로 점 추가
-  if (S.sel?.poly) {
-    const pts = S.sel.poly; const i = nearPoint(pts, x, y);
-    if (i >= 0) { if (e.altKey) { if (pts.length > 3) pts.splice(i, 1); draw(); persist(); return; } drag = { kind: 'pt', pts, i }; return; }
-    const j = nearEdge(pts, x, y); if (j >= 0) { pts.splice(j + 1, 0, [Math.round(x), Math.round(y)]); drag = { kind: 'pt', pts, i: j + 1 }; draw(); return; }
+  // 선택 도구
+  const sel = S.sel;
+  if (S.brush && sel?.mask) { dragS = { kind: 'brush' }; paint(x, y); draw(); return; }
+  if (sel?.poly) {
+    const i = sel.poly.findIndex((p) => near(p, x, y));
+    if (i >= 0) { if (e.altKey) { if (sel.poly.length > 3) { sel.poly.splice(i, 1); commit(); } return; } dragS = { kind: 'pt', i, moved: false }; return; }
+    const m = midpoints(sel.poly).findIndex((p) => near(p, x, y));
+    if (m >= 0) { sel.poly.splice(m + 1, 0, [R(x), R(y)]); dragS = { kind: 'pt', i: m + 1, moved: true }; draw(); return; }
   }
-  // 아무것도 선택 안 됐으면 바닥 다각형 점도 바로 고친다
-  if (!S.sel && S.floor.length) {
-    const i = nearPoint(S.floor, x, y);
-    if (i >= 0) { if (e.altKey) { if (S.floor.length > 3) S.floor.splice(i, 1); draw(); persist(); return; } drag = { kind: 'pt', pts: S.floor, i }; return; }
-    const j = nearEdge(S.floor, x, y); if (j >= 0) { S.floor.splice(j + 1, 0, [Math.round(x), Math.round(y)]); drag = { kind: 'pt', pts: S.floor, i: j + 1 }; draw(); return; }
-  }
-  const hit = [...S.items].reverse().find((it) => { const b = itemBox(it); return x >= b.x0 && x <= b.x1 && y >= b.y0 && y <= b.y1 && (it.kind !== 'solid' || insidePoly(it.poly, x, y)) && (it.kind !== 'cover' || (it.mask ? !!it.mask[Math.floor(y - it.my) * it.mw + Math.floor(x - it.mx)] : insidePoly(it.poly, x, y))); });
-  S.sel = hit || null; refreshList(); showProps();
-  if (hit) drag = { kind: 'move', it: hit, sx: x, sy: y, snap: JSON.parse(JSON.stringify(hit)) };
-  draw();
+  if (sel?.kind === 'obj') { const c = corners(sel).findIndex((p) => near(p, x, y)); if (c >= 0) { dragS = { kind: 'size', opp: corners(sel)[(c + 2) % 4], ar: sel.w / sel.h }; return; } }
+  if (sel && 'sortY' in sel && near(sortGrip(sel), x, y, hitR() * 1.4)) { dragS = { kind: 'sort' }; return; }
+  if (sel?.kind === 'seat' && near([sel.x, sel.y], x, y, 14 / S.zoom)) { dragS = { kind: 'seatfoot' }; return; }
+  const hit = hitItem(x, y);
+  if (hit) { S.sel = hit; refreshList(); showProps(); dragS = { kind: 'move', x0: x, y0: y, snap: JSON.parse(JSON.stringify({ ...hit, mask: null, _cv: null })), moved: false }; draw(); return; }
+  S.sel = null; refreshList(); showProps(); dragS = { kind: 'pan', cx: e.clientX, cy: e.clientY, px: S.px, py: S.py }; draw();
 });
 addEventListener('mousemove', (e) => {
-  if (!drag) return;
-  const [x, y] = toWorld(e.clientX, e.clientY);
-  if (drag.kind === 'pan') { S.panX = drag.px + e.clientX - drag.sx; S.panY = drag.py + e.clientY - drag.sy; draw(); return; }
-  if (drag.kind === 'free') { const L = S.drawing[S.drawing.length - 1]; if (Math.hypot(L[0] - x, L[1] - y) >= 3 / S.zoom) { S.drawing.push([Math.round(x), Math.round(y)]); draw(); } return; }
-  if (drag.kind === 'brush') { paintMask(x, y); return; }
-  if (drag.kind === 'auto') { const it = drag.it; it.mx = Math.round(Math.min(drag.x0, x)); it.my = Math.round(Math.min(drag.y0, y)); it.mw = Math.max(1, Math.round(Math.abs(x - drag.x0))); it.mh = Math.max(1, Math.round(Math.abs(y - drag.y0))); draw(); ctx.save(); ctx.setTransform(S.zoom, 0, 0, S.zoom, S.panX, S.panY); ctx.strokeStyle = '#b388ff'; ctx.lineWidth = 2 / S.zoom; ctx.strokeRect(it.mx, it.my, it.mw, it.mh); ctx.restore(); return; }
-  if (drag.kind === 'pt') { drag.pts[drag.i] = [Math.round(x), Math.round(y)]; draw(); return; }
-  if (drag.kind === 'rect') { const it = drag.it; it.x0 = Math.round(Math.min(drag.x0, x)); it.x1 = Math.round(Math.max(drag.x0, x)); it.y0 = Math.round(Math.min(drag.y0, y)); it.y1 = Math.round(Math.max(drag.y0, y)); draw(); return; }
-  if (drag.kind === 'sort') { drag.it.sortY = Math.round(y); draw(); showProps(); return; }
-  if (drag.kind === 'size') { const it = drag.it; let w = Math.abs(x - drag.ax), h = w / drag.ar; if (e.shiftKey) h = Math.abs(y - drag.ay); it.w = Math.max(4, Math.round(w)); it.h = Math.max(4, Math.round(h)); it.x = Math.round(Math.min(x, drag.ax) === x ? drag.ax - it.w : drag.ax); it.y = Math.round(Math.min(y, drag.ay) === y ? drag.ay - it.h : drag.ay); draw(); showProps(); return; }
-  if (drag.kind === 'move') {
-    const dx = Math.round(x - drag.sx), dy = Math.round(y - drag.sy), it = drag.it, s = drag.snap;
-    if (it.kind === 'obj') { it.x = s.x + dx; it.y = s.y + dy; it.sortY = s.sortY + dy; if (s.solid) it.solid = { x0: s.solid.x0 + dx, x1: s.solid.x1 + dx, y0: s.solid.y0 + dy, y1: s.solid.y1 + dy, h: s.solid.h }; }
-    else if (it.kind === 'cover') { if (it.mask) { it.mx = s.mx + dx; it.my = s.my + dy; it._cv = null; } else it.poly = s.poly.map(([px, py]) => [px + dx, py + dy]); it.sortY = s.sortY + dy; }
-    else if (it.kind === 'solid') { it.poly = s.poly.map(([px, py]) => [px + dx, py + dy]); }
-    else { it.x = s.x + dx; it.y = s.y + dy; }
-    draw(); showProps();
+  const [x, y] = toW(e.clientX, e.clientY), R = Math.round; S.mouse = [x, y];
+  if (!dragS) { if (S.draw || S.brush || S.tool === 'seat') draw(); return; }
+  const sel = S.sel;
+  switch (dragS.kind) {
+    case 'pan': S.px = dragS.px + e.clientX - dragS.cx; S.py = dragS.py + e.clientY - dragS.cy; break;
+    case 'pt': sel.poly[dragS.i] = [R(x), R(y)]; dragS.moved = true; break;
+    case 'brush': paint(x, y); break;
+    case 'sort': sel.sortY = R(y); showProps(); break;
+    case 'seatfoot': sel.y = Math.max(sel.hipY + 4, R(y)); showProps(); break;
+    case 'auto': { const b = dragS.box; b.x = R(Math.min(dragS.x0, x)); b.y = R(Math.min(dragS.y0, y)); b.w = R(Math.abs(x - dragS.x0)); b.h = R(Math.abs(y - dragS.y0)); break; }
+    case 'size': { const o = dragS.opp, w = Math.max(4, Math.abs(x - o[0])), h = e.shiftKey ? Math.max(4, Math.abs(y - o[1])) : w / dragS.ar; const dy = (sel.sortY ?? 0) - (sel.y + sel.h); sel.w = R(w); sel.h = R(h); sel.x = R(x < o[0] ? o[0] - w : o[0]); sel.y = R(y < o[1] ? o[1] - h : o[1]); sel.sortY = sel.y + sel.h + dy; showProps(); break; }
+    case 'move': {
+      const dx = R(x - dragS.x0), dy = R(y - dragS.y0), s = dragS.snap; if (dx || dy) dragS.moved = true;
+      if (sel.poly) sel.poly = s.poly.map(([a, b]) => [a + dx, b + dy]);
+      if ('x' in s) { sel.x = s.x + dx; sel.y = s.y + dy; if (sel.mask) sel._cv = null; }
+      if ('hipY' in s) sel.hipY = s.hipY + dy;
+      if ('sortY' in s) sel.sortY = s.sortY + dy;
+      if (sel.kind !== 'char') showProps();
+      break;
+    }
   }
+  draw();
 });
 addEventListener('mouseup', () => {
-  if (!drag) return;
-  if (drag.kind === 'rect') { setTool('select'); refreshList(); }
-  if (drag.kind === 'free') { drag = null; if (S.drawing && S.drawing.length > 12) { /* 끌어 그린 자유곡선은 바로 끝낸다 */ finishPoly(); } return; }
-  if (drag.kind === 'auto') { const it = drag.it; if (it.mw > 4 && it.mh > 4) { autoMask(it); it.sortY = it.my + it.mh; S.items.push(it); S.sel = it; setTool('select'); refreshList(); } drag = null; draw(); persist(); showProps(); return; }
-  if (drag.kind === 'brush') { drag = null; S.sel._cv = null; draw(); persist(); return; }
-  drag = null; persist(); showProps();
+  if (!dragS) return;
+  const d = dragS; dragS = null;
+  if (d.kind === 'auto') {
+    const b = d.box;
+    if (b.w > 4 && b.h > 4) { const it = { id: uid('c'), kind: 'cover', name: '가림(자동)', x: b.x, y: b.y, w: b.w, h: b.h, tol: 40, sortY: b.y + b.h, mask: null }; autoMask(it); S.items.push(it); S.sel = it; setTool('select'); commit(); }
+    else draw();
+    return;
+  }
+  if (d.kind === 'pan') return;
+  if ((d.kind === 'move' || d.kind === 'pt') && !d.moved) return;
+  if (d.kind === 'move' && S.sel?.kind === 'char') { save(); showProps(); return; }
+  commit();
 });
-cv.addEventListener('mousemove', (e) => { S.mouse = toWorld(e.clientX, e.clientY); if (S.brush) draw(); });
-function paintMask(x, y) {
-  const it = S.sel, r = S.brushR, v = S.brush === 'add' ? 1 : 0;
-  for (let yy = Math.max(0, Math.floor(y - r - it.my)); yy < Math.min(it.mh, y + r - it.my); yy++) for (let xx = Math.max(0, Math.floor(x - r - it.mx)); xx < Math.min(it.mw, x + r - it.mx); xx++) if (Math.hypot(xx + it.mx - x, yy + it.my - y) <= r) it.mask[yy * it.mw + xx] = v;
-  it._cv = null; draw();
-}
-function nearEdge(pts, x, y) {
-  for (let i = 0; i < pts.length; i++) { const a = pts[i], b = pts[(i + 1) % pts.length]; const L = Math.hypot(b[0] - a[0], b[1] - a[1]); if (!L) continue; const t = Math.max(0, Math.min(1, ((x - a[0]) * (b[0] - a[0]) + (y - a[1]) * (b[1] - a[1])) / (L * L))); if (Math.hypot(a[0] + t * (b[0] - a[0]) - x, a[1] + t * (b[1] - a[1]) - y) < 6 / S.zoom) return i; }
-  return -1;
-}
-cv.addEventListener('dblclick', () => finishPoly());
-cv.addEventListener('wheel', (e) => { e.preventDefault(); const [wx, wy] = toWorld(e.clientX, e.clientY); const z = Math.max(0.25, Math.min(3, S.zoom * (e.deltaY < 0 ? 1.1 : 0.9))); S.panX -= wx * (z - S.zoom); S.panY -= wy * (z - S.zoom); S.zoom = z; $('zoom').value = z; $('zoomV').textContent = z.toFixed(2); draw(); }, { passive: false });
-function nearPoint(pts, x, y) { for (let i = 0; i < pts.length; i++) if (Math.hypot(pts[i][0] - x, pts[i][1] - y) < 7 / S.zoom) return i; return -1; }
-function finishPoly() {
-  if (!S.drawing || S.drawing.length < 3) { S.drawing = null; draw(); return; }
-  if (S.tool === 'floor') S.floor = S.drawing;
-  else if (S.tool === 'solid') { const it = { id: uid('b'), kind: 'solid', poly: S.drawing, h: 999, name: '막힘' }; S.items.push(it); S.sel = it; setTool('select'); }
-  else { const ys = S.drawing.map((p) => p[1]); const it = { id: uid('c'), kind: 'cover', poly: S.drawing, sortY: Math.max(...ys), name: '가림' }; S.items.push(it); S.sel = it; setTool('select'); }
-  S.drawing = null; refreshList(); draw(); persist();
-}
-function setTool(t) { S.tool = t; for (const q of document.querySelectorAll('.tool')) q.classList.toggle('on', q.dataset.tool === t); }
+cv.addEventListener('dblclick', () => { if (S.draw) { S.draw.pop(); finishPoly(); } });
+cv.addEventListener('wheel', (e) => { e.preventDefault(); const [wx, wy] = toW(e.clientX, e.clientY); const z = Math.max(0.1, Math.min(10, S.zoom * (e.deltaY < 0 ? 1.12 : 1 / 1.12))); S.px -= wx * (z - S.zoom); S.py -= wy * (z - S.zoom); S.zoom = z; draw(); }, { passive: false });
 addEventListener('keydown', (e) => {
-  if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT') return;
-  if ((e.ctrlKey || e.metaKey) && (e.key === 'z' || e.key === 'Z')) { e.preventDefault(); if (UNDO.length) { const j = UNDO.pop(); lastSnap = j; restoreSnap(j).then(() => { try { localStorage.setItem('goei-mapedit-tmp', '1'); } catch (_) {} persistQuiet(); }); status('되돌림'); } return; }
-  if (e.key === 'Enter') { finishPoly(); return; }
-  if (e.key === 'Escape') { S.drawing = null; S.brush = null; draw(); showProps(); return; }
-  if (S.drawing && (e.key === 'Backspace' || e.key === 'Delete')) { S.drawing.pop(); if (!S.drawing.length) S.drawing = null; draw(); return; }
-  if (S.walk && e.key.startsWith('Arrow')) {
-    e.preventDefault(); const st = e.shiftKey ? 24 : 8; const nx = S.p.x + (e.key === 'ArrowLeft' ? -st : e.key === 'ArrowRight' ? st : 0), ny = S.p.y + (e.key === 'ArrowUp' ? -st : e.key === 'ArrowDown' ? st : 0);
-    if (walkable(nx, ny)) S.p = { x: nx, y: ny }; else if (walkable(nx, S.p.y)) S.p.x = nx; else if (walkable(S.p.x, ny)) S.p.y = ny;
-    draw(); return;
+  if (/INPUT|SELECT|TEXTAREA/.test(e.target.tagName)) return;
+  const k = e.key;
+  if ((e.ctrlKey || e.metaKey) && (k === 'z' || k === 'Z')) { e.preventDefault(); e.shiftKey ? redo() : undo(); return; }
+  if ((e.ctrlKey || e.metaKey) && (k === 'y' || k === 'Y')) { e.preventDefault(); redo(); return; }
+  if (k === ' ') { S.space = true; e.preventDefault(); return; }
+  if (S.draw) {
+    if (k === 'Enter') { finishPoly(); return; }
+    if (k === 'Escape') { S.draw = null; draw(); return; }
+    if (k === 'Backspace' || k === 'Delete') { e.preventDefault(); S.draw.pop(); if (!S.draw.length) S.draw = null; draw(); }
+    return;
   }
+  if (k === 'Escape') { if (S.brush) { S.brush = null; showProps(); draw(); } else if (S.tool !== 'select') setTool('select'); else { S.sel = null; refresh(); } return; }
+  if (!e.ctrlKey && !e.metaKey && !e.altKey) { const t = { v: 'select', f: 'floor', b: 'block', c: 'cover', a: 'auto', s: 'seat', e: 'exit', l: 'lamp' }[k.toLowerCase()]; if (t) { setTool(t); return; } }
   const it = S.sel; if (!it) return;
-  if (e.key === 'Delete' || e.key === 'Backspace') { S.items = S.items.filter((q) => q !== it); S.sel = null; refreshList(); draw(); persist(); }
-  if (it.kind === 'obj') {
-    if (e.key === 'r' || e.key === 'R') { it.rot = ((it.rot || 0) + (e.shiftKey ? -15 : 15)) % 360; }
-    if (e.key === 'f' || e.key === 'F') it.flip = !it.flip;
+  if (k === 'Delete' || k === 'Backspace') { e.preventDefault(); removeItem(it); return; }
+  if (k.startsWith('Arrow')) {
+    e.preventDefault();
+    const dx = k === 'ArrowLeft' ? -1 : k === 'ArrowRight' ? 1 : 0, dy = k === 'ArrowUp' ? -1 : k === 'ArrowDown' ? 1 : 0;
+    if (it.kind === 'char') { const st = e.shiftKey ? 24 : 8; walk(dx * st, dy * st); draw(); return; }
+    const st = e.shiftKey ? 10 : 1; moveItem(it, dx * st, dy * st); commit(); return;
   }
-  if (e.key === '[' || e.key === ']') { const i = S.items.indexOf(it); const j = e.key === '[' ? i - 1 : i + 1; if (j >= 0 && j < S.items.length) { S.items.splice(i, 1); S.items.splice(j, 0, it); } refreshList(); }
-  draw(); showProps(); persist();
+  if (it.kind === 'obj' && (k === 'r' || k === 'R')) { it.rot = ((it.rot || 0) + (e.shiftKey ? -15 : 15) + 360) % 360; commit(); return; }
+  if (it.kind === 'obj' && (k === 'h' || k === 'H')) { it.flip = !it.flip; commit(); return; }
+  if (it.kind === 'seat' && (k === 'h' || k === 'H')) { it.face = -(it.face || 1); commit(); }
 });
+addEventListener('keyup', (e) => { if (e.key === ' ') S.space = false; });
+function moveItem(it, dx, dy) { if (it.poly) it.poly = it.poly.map(([a, b]) => [a + dx, b + dy]); if ('x' in it) { it.x += dx; it.y += dy; if (it.mask) it._cv = null; } if ('hipY' in it) it.hipY += dy; if ('sortY' in it) it.sortY += dy; }
+function removeItem(it) { if (it.kind === 'char') return say('캐릭터는 시험용이라 지울 수 없습니다'); S.items = S.items.filter((q) => q !== it); S.sel = null; commit(); say(KIND[it.kind] + ' 삭제 (Ctrl+Z로 되돌리기)'); }
 function walkable(x, y) {
-  if (!insidePoly(S.floor, x, y)) return false;
-  for (const it of S.items) {
-    if (it.kind === 'solid' && insidePoly(it.poly, x, y)) return false;
-    const b = it.kind === 'obj' && it.solid ? it.solid : null;
-    if (b && x >= b.x0 - 14 && x <= b.x1 + 14 && y >= b.y0 && y <= b.y1) return false;
-  }
-  return true;
+  const floor = S.items.find((i) => i.kind === 'floor'); if (floor && !inPoly(floor.poly, x, y)) return false;
+  return !S.items.some((it) => it.kind === 'block' && inPoly(it.poly, x, y));
 }
+function walk(dx, dy) { const c = charItem, nx = c.x + dx, ny = c.y + dy; if (walkable(nx, ny)) { c.x = nx; c.y = ny; } else if (walkable(nx, c.y)) c.x = nx; else if (walkable(c.x, ny)) c.y = ny; else say('막혀서 못 감'); save(); showProps(); }
 
-// ───────── 목록·속성 ─────────
-const KN = { obj: '소품', cover: '가림', solid: '막힘', exit: '출입구', lamp: '조명', seat: '앉는 자리' };
+/* ───────── 오른쪽 패널 ───────── */
+function refresh() { refreshList(); showProps(); draw(); }
 function refreshList() {
   const L = $('list'); L.innerHTML = '';
-  S.items.forEach((it) => { const d = document.createElement('div'); d.className = 'item' + (it === S.sel ? ' sel' : ''); d.innerHTML = `<span>${it.name || it.id}</span><span class="k">${KN[it.kind]}</span>`; d.onclick = () => { S.sel = it; refreshList(); showProps(); draw(); }; L.appendChild(d); });
-  showProps();
+  const order = ['char', 'floor', 'block', 'cover', 'obj', 'seat', 'exit', 'lamp'];
+  for (const it of [...S.items].sort((a, b) => order.indexOf(a.kind) - order.indexOf(b.kind))) {
+    const d = document.createElement('div'); d.className = 'item' + (it === S.sel ? ' sel' : '');
+    d.innerHTML = `<span class="dot" style="background:${COLORS[it.kind]}"></span><span class="nm"></span><span class="k">${KIND[it.kind]}</span>`;
+    d.querySelector('.nm').textContent = it.name || it.id;
+    d.onclick = () => { setTool('select'); S.sel = it; refresh(); };
+    L.appendChild(d);
+  }
 }
 function showProps() {
-  const it = S.sel, P = $('props'); if (!it) { P.textContent = '없음'; return; }
-  const f = (label, key, type = 'number', step = 1) => `<div class="row">${label} <input data-k="${key}" type="${type}" step="${step}" value="${it[key] ?? ''}"></div>`;
-  let h = `<div class="row">이름 <input data-k="name" type="text" value="${it.name || ''}"></div>`;
-  if (it.kind === 'obj') {
-    h += f('x', 'x') + f('y', 'y') + f('폭', 'w') + f('높이', 'h') + f('회전°', 'rot') + `<div class="row"><label class="chk"><input data-k="flip" type="checkbox" ${it.flip ? 'checked' : ''}>좌우 뒤집기</label></div>` + f('깊이선 y', 'sortY');
-    h += `<div class="row"><button id="pSolid">${it.solid ? '막힘 상자 지우기' : '막힘 상자 만들기(아래 띠)'}</button></div>`;
-    if (it.solid) h += `<div class="row">막힘 x0 <input data-s="x0" type="number" value="${it.solid.x0}"> x1 <input data-s="x1" type="number" value="${it.solid.x1}"></div><div class="row">y0 <input data-s="y0" type="number" value="${it.solid.y0}"> y1 <input data-s="y1" type="number" value="${it.solid.y1}"></div><div class="row">윗면 높이 <input data-s="h" type="number" value="${it.solid.h ?? 999}"> <span class="hint">999 = 못 넘음</span></div>`;
-  }
-  if (it.kind === 'cover' && it.mask) h += f('깊이선 y', 'sortY') + `<div class="row">허용치 <input type="range" id="pTol" min="5" max="150" value="${it.tol ?? 40}"> <span id="pTolV">${it.tol ?? 40}</span> <button id="pRedo">다시 따기</button></div><div class="row">붓 <button id="bAdd" class="${S.brush === 'add' ? 'on' : ''}">더하기</button><button id="bErase" class="${S.brush === 'erase' ? 'on' : ''}">지우기</button> 굵기 <input type="number" id="bR" value="${S.brushR}" min="1" max="60"></div><div class="hint">상자 안 픽셀 중 테두리 색(벽·바닥)과 다른 것만 가림. 붓으로 더하거나 지우기</div>`;
-  else if (it.kind === 'cover') h += f('깊이선 y', 'sortY') + `<div class="hint">점 ${it.poly.length}개. 가림 도구에서 점 끌기·Alt+클릭 삭제·선 위 클릭 추가</div>`;
-  if (it.kind === 'solid') h += f('윗면 높이', 'h') + `<div class="hint">점 ${it.poly.length}개. 점 끌기·Alt+클릭 삭제·선 위 클릭 추가 (999 = 못 넘음, 낮으면 뛰어 올라섬)</div>`;
-  if (it.kind === 'exit') h += f('x', 'x') + f('y', 'y') + f('가는 곳(장면 id)', 'to', 'text') + f('도착 문 id', 'toDoor', 'text') + f('표시 이름', 'label', 'text');
-  if (it.kind === 'lamp') h += f('x', 'x') + f('y', 'y') + f('반지름', 'r') + `<div class="row">종류 <select data-k="lk"><option ${it.lk === 'lamp' ? 'selected' : ''}>lamp</option><option ${it.lk === 'down' ? 'selected' : ''}>down</option><option ${it.lk === 'sign' ? 'selected' : ''}>sign</option></select></div>` + f('색', 'color', 'text');
-  if (it.kind === 'seat') h += f('x', 'x') + f('y', 'y') + f('동사', 'verb', 'text') + f('앉은 자리 x', 'sx') + f('앉은 자리 y', 'sy') + f('방향(1/-1)', 'face');
-  h += `<div class="row"><button id="pDel" class="warn">삭제</button></div>`;
+  const P = $('props'), it = S.sel;
+  if (!it) { P.innerHTML = '<span class="muted">없음 — 그림 위를 클릭하거나 목록에서 고르세요</span>'; return; }
+  const num = (lab, key, step = 1) => `<div class="row"><label>${lab}</label><input type="number" data-k="${key}" step="${step}" value="${it[key] ?? ''}"></div>`;
+  const txt = (lab, key) => `<div class="row"><label>${lab}</label><input type="text" data-k="${key}" value="${String(it[key] ?? '').replace(/"/g, '&quot;')}"></div>`;
+  let h = `<div class="row"><label>종류</label><b>${KIND[it.kind]}</b></div>` + (it.kind === 'char' ? '' : txt('이름', 'name'));
+  if (it.kind === 'obj') h += num('x', 'x') + num('y', 'y') + num('폭', 'w') + num('높이', 'h') + num('회전°', 'rot', 15) + `<div class="row"><label>뒤집기</label><input type="checkbox" data-k="flip" ${it.flip ? 'checked' : ''}></div>` + num('깊이선 y', 'sortY')
+    + `<div class="row"><button id="pFoot">발밑 막힘 만들기</button><button id="pSeat">이 소품에 앉는 자리</button></div>`;
+  if (it.kind === 'cover') { h += num('깊이선 y', 'sortY'); h += it.mask ? `<div class="row"><label>허용치</label><input type="range" id="pTol" min="5" max="160" value="${it.tol ?? 40}"><span id="pTolV">${it.tol ?? 40}</span><button id="pRedo">다시 따기</button></div><div class="row"><button id="bAdd" class="${S.brush === 'add' ? 'on' : ''}">붓: 더하기</button><button id="bErase" class="${S.brush === 'erase' ? 'on' : ''}">붓: 지우기</button><label style="min-width:auto">굵기</label><input type="number" id="bR" min="1" max="80" value="${S.brushR}"></div>` : `<div class="muted">점 ${it.poly.length}개</div>`; }
+  if (it.kind === 'block') h += num('윗면 높이', 'h') + `<div class="muted">999 = 못 넘음 · 낮게 주면 점프로 올라섬 · 점 ${it.poly.length}개</div>`;
+  if (it.kind === 'floor') h += `<div class="muted">점 ${it.poly.length}개 · 바닥은 하나뿐, 바닥(F)으로 새로 그리면 바뀜</div>`;
+  if (it.kind === 'seat') h += num('x', 'x') + num('엉덩이 y', 'hipY') + num('발 y', 'y') + `<div class="row"><label>방향</label><select data-k="face"><option value="1" ${it.face !== -1 ? 'selected' : ''}>오른쪽 보기</option><option value="-1" ${it.face === -1 ? 'selected' : ''}>왼쪽 보기</option></select></div>` + txt('동사', 'verb') + `<div class="muted">엉덩이 = 좌석에 닿는 곳(청록 점), 발 = 앉았을 때 발이 놓이는 바닥(노란 점, 끌어서 조정). 게임은 E로 앉으면 캐릭터 발을 노란 점에 둡니다. H = 방향 바꾸기</div>`;
+  if (it.kind === 'exit') h += num('x', 'x') + num('y', 'y') + txt('가는 곳', 'to') + txt('도착 문', 'toDoor') + txt('표시 이름', 'label');
+  if (it.kind === 'lamp') h += num('x', 'x') + num('y', 'y') + num('빛 반지름', 'r', 10) + `<div class="row"><label>종류</label><select data-k="lk">${[['lamp', '스탠드'], ['down', '천장등'], ['sign', '간판']].map(([v, n]) => `<option value="${v}" ${it.lk === v ? 'selected' : ''}>${n}</option>`).join('')}</select></div>` + txt('색', 'color') + '<div class="muted">밤에 장면이 어두워질 때 이 자리에 빛 웅덩이가 생김. 안 찍으면 그냥 고르게 어두워짐</div>';
+  if (it.kind === 'char') h += num('x', 'x') + num('y', 'y') + '<div class="muted">발 위치. 방향키로 걷기(바닥 밖·막힘 안으로는 못 감)</div>';
+  if (it.kind !== 'char') h += `<div class="row" style="margin-top:8px"><button id="pDel" class="danger">삭제 (Delete)</button></div>`;
   P.innerHTML = h;
-  for (const inp of P.querySelectorAll('input[data-k],select[data-k]')) inp.onchange = () => { const k = inp.dataset.k; it[k] = inp.type === 'checkbox' ? inp.checked : inp.type === 'number' ? +inp.value : inp.value; draw(); persist(); refreshList(); };
-  for (const inp of P.querySelectorAll('input[data-s]')) inp.onchange = () => { it.solid[inp.dataset.s] = +inp.value; draw(); persist(); };
-  const tl = $('pTol'); if (tl) { tl.oninput = () => { $('pTolV').textContent = tl.value; }; $('pRedo').onclick = () => { it.tol = +tl.value; autoMask(it); draw(); persist(); }; $('bAdd').onclick = () => { S.brush = S.brush === 'add' ? null : 'add'; showProps(); draw(); }; $('bErase').onclick = () => { S.brush = S.brush === 'erase' ? null : 'erase'; showProps(); draw(); }; $('bR').onchange = () => { S.brushR = +$('bR').value; }; }
-  else S.brush = null;
-  const ps = $('pSolid'); if (ps) ps.onclick = () => { it.solid = it.solid ? null : { x0: it.x, x1: it.x + it.w, y0: it.sortY - Math.round(it.h * 0.25), y1: it.sortY, h: 999 }; draw(); persist(); showProps(); };
-  $('pDel').onclick = () => { S.items = S.items.filter((q) => q !== it); S.sel = null; refreshList(); draw(); persist(); };
-}
-
-// ───────── 저장·불러오기 ─────────
-function toJSON() {
-  const floorTop = S.floor.length ? Math.min(...S.floor.map((p) => p[1])) : 0, floorBot = S.floor.length ? Math.max(...S.floor.map((p) => p[1])) : S.h;
-  const scene = {
-    file: S.bgName.replace(/\.[^.]+$/, ''), bgScale: S.bgScale, w: S.w, h: S.h, under: true, lane: [floorTop, floorBot - 12], floor: S.floor,
-    blocks: S.items.filter((i) => i.kind === 'solid').map((i) => ({ poly: i.poly, h: i.h ?? 999 })),
-    doors: Object.fromEntries(S.items.filter((i) => i.kind === 'exit').map((i, n) => [i.id, { kind: 'exit', side: 'S', x: i.x, y: i.y, to: i.to || '', toDoor: i.toDoor || '', label: i.label || '' }])),
-    lamps: S.items.filter((i) => i.kind === 'lamp').map((i) => ({ x: i.x, y: i.y, kind: i.lk || 'lamp', r: i.r, color: i.color || undefined })),
-    spots: S.items.filter((i) => i.kind === 'seat').map((i) => ({ id: i.id, x: i.x, y: i.y, verb: i.verb || '앉기', face: i.face ?? 1, seat: { x: i.sx ?? i.x, y: i.sy ?? i.y - 20 } })),
-    windows: [],
-    objects: S.items.filter((i) => i.kind === 'obj' || i.kind === 'cover').map((i) => i.kind === 'obj'
-      ? { id: i.id, name: i.name, file: i.file.replace(/\.[^.]+$/, ''), x: i.x, y: i.y, w: i.w, h: i.h, rot: i.rot || 0, flip: !!i.flip, sortY: i.sortY, solid: i.solid ? [i.solid] : undefined }
-      : i.mask ? { id: i.id, name: i.name, file: '', x: i.mx, y: i.my, w: i.mw, h: i.mh, sortY: i.sortY, coverMask: maskToDataUrl(i), tol: i.tol }
-      : { id: i.id, name: i.name, file: '', x: 0, y: 0, w: 0, h: 0, sortY: i.sortY, cover: [i.poly] }),
+  for (const el of P.querySelectorAll('[data-k]')) el.onchange = () => {
+    const k = el.dataset.k; let v = el.type === 'checkbox' ? el.checked : el.type === 'number' ? +el.value : el.value; if (k === 'face') v = +v;
+    if (it.kind === 'obj' && k === 'y') it.sortY += v - it.y;
+    if (it.kind === 'seat' && k === 'hipY') it.y += v - it.hipY;
+    it[k] = v; if (it.mask) it._cv = null; commit();
   };
-  return scene;
+  const del = $('pDel'); if (del) del.onclick = () => removeItem(it);
+  const ft = $('pFoot'); if (ft) ft.onclick = () => { const y1 = it.sortY, y0 = y1 - Math.max(12, Math.round(it.h * 0.2)); const b = { id: uid('b'), kind: 'block', name: it.name + ' 막힘', poly: [[it.x, y0], [it.x + it.w, y0], [it.x + it.w, y1], [it.x, y1]], h: 999 }; S.items.push(b); S.sel = b; commit(); say('발밑 막힘(빨강)을 만들었습니다. 점을 끌어 다듬으세요'); };
+  const st = $('pSeat'); if (st) st.onclick = () => { const s = makeSeat(it.x + it.w / 2, it.y + it.h * 0.55); s.name = it.name + ' 자리'; S.items.push(s); S.sel = s; commit(); say('앉는 자리를 만들었습니다. 청록 점(엉덩이)·노란 점(발)을 끌어 맞추세요'); };
+  const tl = $('pTol');
+  if (tl) {
+    tl.oninput = () => { $('pTolV').textContent = tl.value; };
+    $('pRedo').onclick = () => { it.tol = +tl.value; autoMask(it); commit(); };
+    $('bAdd').onclick = () => { S.brush = S.brush === 'add' ? null : 'add'; showProps(); draw(); };
+    $('bErase').onclick = () => { S.brush = S.brush === 'erase' ? null : 'erase'; showProps(); draw(); };
+    $('bR').onchange = () => { S.brushR = +$('bR').value || 8; };
+  }
 }
-const UNDO = []; let lastSnap = null;
-function snapshot() { return JSON.stringify({ items: S.items.map((i) => i.mask ? { ...i, mask: undefined, _cv: undefined, maskUrl: maskToDataUrl(i) } : i), floor: S.floor }); }
-async function restoreSnap(j) {
-  const d = JSON.parse(j); S.items = d.items; S.floor = d.floor; S.sel = null; S.drawing = null;
-  for (const it of S.items) if (it.maskUrl) { await maskFromDataUrl(it, it.maskUrl); delete it.maskUrl; }
-  refreshList(); draw();
+for (const id of ['vFloor', 'vBlock', 'vCover', 'vSort']) $(id).onchange = draw;
+$('bUndo').onclick = undo; $('bRedo').onclick = redo;
+
+/* ───────── 저장·내보내기 ───────── */
+function exportScene() {
+  const floor = S.items.find((i) => i.kind === 'floor'), ys = floor ? floor.poly.map((p) => p[1]) : [0, S.h];
+  return {
+    file: S.bgName.replace(/\.[^.]+$/, ''), bgScale: S.bgScale, w: S.w, h: S.h, under: true,
+    lane: [Math.min(...ys), Math.max(...ys) - 12], floor: floor ? floor.poly : null,
+    blocks: S.items.filter((i) => i.kind === 'block').map((i) => ({ poly: i.poly, h: i.h ?? 999 })),
+    doors: Object.fromEntries(S.items.filter((i) => i.kind === 'exit').map((i) => [i.id, { kind: 'exit', side: 'S', x: i.x, y: i.y, to: i.to || '', toDoor: i.toDoor || '', label: i.label || '' }])),
+    lamps: S.items.filter((i) => i.kind === 'lamp').map((i) => ({ x: i.x, y: i.y, kind: i.lk || 'lamp', r: i.r, color: i.color || undefined })),
+    // 게임 자리: (x, y) = E를 누르는 곳(앉은 발보다 조금 앞), seat = 앉으면 발이 가는 곳
+    spots: S.items.filter((i) => i.kind === 'seat').map((i) => ({ id: i.id, x: i.x, y: i.y + 20, verb: i.verb || '앉기', face: i.face ?? 1, act: ['chairsit', 'seatthink'], seat: { x: i.x, y: i.y }, hipY: i.hipY })),
+    objects: S.items.filter((i) => i.kind === 'obj' || i.kind === 'cover').map((i) => i.kind === 'obj'
+      ? { id: i.id, name: i.name, file: i.file.replace(/\.[^.]+$/, ''), x: i.x, y: i.y, w: i.w, h: i.h, rot: i.rot || 0, flip: !!i.flip, sortY: i.sortY }
+      : i.mask ? { id: i.id, name: i.name, file: '', x: i.x, y: i.y, w: i.w, h: i.h, sortY: i.sortY, coverMask: maskUrl(i) }
+      : { id: i.id, name: i.name, file: '', sortY: i.sortY, cover: [i.poly] }),
+  };
 }
-function persistQuiet() { try { localStorage.setItem('goei-mapedit', JSON.stringify({ scene: toJSON(), items: S.items.map((i) => i.mask ? { ...i, mask: undefined, _cv: undefined, maskUrl: maskToDataUrl(i) } : i), floor: S.floor, bgName: S.bgName, bgScale: S.bgScale, images: Object.fromEntries(Object.entries(S.images).map(([k, v]) => [k, v.dataUrl])) })); } catch (e) {} }
-function persist() {
-  try { const now = snapshot(); if (lastSnap !== null && lastSnap !== now) { UNDO.push(lastSnap); if (UNDO.length > 60) UNDO.shift(); } lastSnap = now; } catch (e) {}
-  try { localStorage.setItem('goei-mapedit', JSON.stringify({ scene: toJSON(), items: S.items.map((i) => i.mask ? { ...i, mask: undefined, _cv: undefined, maskUrl: maskToDataUrl(i) } : i), floor: S.floor, bgName: S.bgName, bgScale: S.bgScale, images: Object.fromEntries(Object.entries(S.images).map(([k, v]) => [k, v.dataUrl])) })); } catch (e) { status('브라우저 저장 실패(용량)'); }
+function save() {
+  try {
+    const imgs = {}; for (const [k, v] of Object.entries(S.images)) imgs[k] = v.url;
+    localStorage.setItem('goei-mapedit3', JSON.stringify({ items: ser(), bgName: S.bgName, bgScale: S.bgScale, charScale: S.charScale, imgs, char: S.charUrl || null }));
+  } catch (e) { say('브라우저 저장 공간이 모자랍니다. 내보내기(.zip)로 저장하세요'); }
 }
 async function restore() {
-  const raw = localStorage.getItem('goei-mapedit'); if (!raw) return;
+  const raw = localStorage.getItem('goei-mapedit3'); if (!raw) return false;
   try {
     const d = JSON.parse(raw);
-    for (const [k, url] of Object.entries(d.images || {})) await new Promise((res) => { const img = new Image(); img.onload = () => { S.images[k] = { img, dataUrl: url }; res(); }; img.onerror = res; img.src = url; });
-    S.items = d.items || []; S.floor = d.floor || [];
-    for (const it of S.items) if (it.maskUrl) { await maskFromDataUrl(it, it.maskUrl); delete it.maskUrl; }
-    for (const it of S.items) if (it.kind === 'solid' && !it.poly) it.poly = [[it.x0, it.y0], [it.x1, it.y0], [it.x1, it.y1], [it.x0, it.y1]]; S.bgName = d.bgName || ''; S.bgScale = d.bgScale || 2; $('bgScale').value = S.bgScale;
-    if (S.images[S.bgName]) { S.bg = S.images[S.bgName].img; S.w = S.bg.width * S.bgScale; S.h = S.bg.height * S.bgScale; $('bgSize').textContent = `${S.bg.width}×${S.bg.height} → 월드 ${S.w}×${S.h}`; }
-    if (S.images.__char) S.char = S.images.__char.img;
-    refreshList(); lastSnap = snapshot(); status('브라우저에 저장된 맵을 불러왔습니다');
-  } catch (e) { console.warn(e); }
+    for (const [k, url] of Object.entries(d.imgs || {})) S.images[k] = { img: await loadImg(url), url };
+    S.bgScale = d.bgScale || 2; $('bgScale').value = S.bgScale; S.charScale = d.charScale || 1; $('charScale').value = S.charScale;
+    if (d.char) { S.charImg = await loadImg(d.char); S.charUrl = d.char; }
+    if (d.bgName && S.images[d.bgName]) { S.bg = S.images[d.bgName].img; S.bgName = d.bgName; S.w = S.bg.width * S.bgScale; S.h = S.bg.height * S.bgScale; setBgInfo(); }
+    await deser(d.items); committed = ser(); return true;
+  } catch (e) { console.warn(e); return false; }
 }
-// 저장 전용 ZIP (압축 없음)
-function crc32(buf) { let c, crc = 0xffffffff; for (let n = 0; n < buf.length; n++) { c = (crc ^ buf[n]) & 0xff; for (let k = 0; k < 8; k++) c = c & 1 ? 0xedb88320 ^ (c >>> 1) : c >>> 1; crc = (crc >>> 8) ^ c; } return (crc ^ 0xffffffff) >>> 0; }
-function zip(files) {
-  const enc = new TextEncoder(), parts = [], central = []; let off = 0;
+$('bNew').onclick = () => { if (!confirm('지금 맵을 지우고 새로 시작할까요?')) return; localStorage.removeItem('goei-mapedit3'); location.reload(); };
+function crc32(b) { let c, r = -1; for (let n = 0; n < b.length; n++) { c = (r ^ b[n]) & 255; for (let k = 0; k < 8; k++) c = c & 1 ? 0xedb88320 ^ (c >>> 1) : c >>> 1; r = (r >>> 8) ^ c; } return (r ^ -1) >>> 0; }
+function makeZip(files) {
+  const enc = new TextEncoder(), parts = [], cen = []; let off = 0;
   for (const [name, data] of files) {
     const n = enc.encode(name), crc = crc32(data), h = new DataView(new ArrayBuffer(30));
-    h.setUint32(0, 0x04034b50, true); h.setUint16(4, 20, true); h.setUint16(8, 0, true); h.setUint32(14, crc, true); h.setUint32(18, data.length, true); h.setUint32(22, data.length, true); h.setUint16(26, n.length, true);
+    h.setUint32(0, 0x04034b50, true); h.setUint16(4, 20, true); h.setUint16(6, 0x0800, true); h.setUint32(14, crc, true); h.setUint32(18, data.length, true); h.setUint32(22, data.length, true); h.setUint16(26, n.length, true);
     parts.push(new Uint8Array(h.buffer), n, data);
-    const c = new DataView(new ArrayBuffer(46));
-    c.setUint32(0, 0x02014b50, true); c.setUint16(4, 20, true); c.setUint16(6, 20, true); c.setUint32(16, crc, true); c.setUint32(20, data.length, true); c.setUint32(24, data.length, true); c.setUint16(28, n.length, true); c.setUint32(42, off, true);
-    central.push(new Uint8Array(c.buffer), n); off += 30 + n.length + data.length;
+    const c = new DataView(new ArrayBuffer(46)); c.setUint32(0, 0x02014b50, true); c.setUint16(4, 20, true); c.setUint16(6, 20, true); c.setUint16(8, 0x0800, true); c.setUint32(16, crc, true); c.setUint32(20, data.length, true); c.setUint32(24, data.length, true); c.setUint16(28, n.length, true); c.setUint32(42, off, true);
+    cen.push(new Uint8Array(c.buffer), n); off += 30 + n.length + data.length;
   }
-  const cstart = off, csize = central.reduce((a, b) => a + b.length, 0), e = new DataView(new ArrayBuffer(22));
-  e.setUint32(0, 0x06054b50, true); e.setUint16(8, files.length, true); e.setUint16(10, files.length, true); e.setUint32(12, csize, true); e.setUint32(16, cstart, true);
-  return new Blob([...parts, ...central, new Uint8Array(e.buffer)], { type: 'application/zip' });
+  const size = cen.reduce((a, b) => a + b.length, 0), e = new DataView(new ArrayBuffer(22));
+  e.setUint32(0, 0x06054b50, true); e.setUint16(8, files.length, true); e.setUint16(10, files.length, true); e.setUint32(12, size, true); e.setUint32(16, off, true);
+  return new Blob([...parts, ...cen, new Uint8Array(e.buffer)], { type: 'application/zip' });
 }
-const b64bytes = (url) => Uint8Array.from(atob(url.split(',')[1]), (c) => c.charCodeAt(0));
+function readZip(buf) {
+  const v = new DataView(buf), out = {}, dec = new TextDecoder(); let p = 0;
+  while (p + 30 <= buf.byteLength && v.getUint32(p, true) === 0x04034b50) { const size = v.getUint32(p + 18, true), nl = v.getUint16(p + 26, true), xl = v.getUint16(p + 28, true); out[dec.decode(new Uint8Array(buf, p + 30, nl))] = new Uint8Array(buf, p + 30 + nl + xl, size); p += 30 + nl + xl + size; }
+  return out;
+}
+const bytesOfUrl = (url) => Uint8Array.from(atob(url.split(',')[1]), (c) => c.charCodeAt(0));
 $('bSave').onclick = () => {
-  if (!S.bg) { alert('배경이 없습니다'); return; }
-  const scene = toJSON(), files = [['map.json', new TextEncoder().encode(JSON.stringify(scene, null, 1))]];
-  const used = new Set([S.bgName, ...S.items.filter((i) => i.kind === 'obj').map((i) => i.file)]);
-  for (const k of used) if (S.images[k]) files.push([k, b64bytes(S.images[k].dataUrl)]);
-  const a = document.createElement('a'); a.href = URL.createObjectURL(zip(files)); a.download = (scene.file || 'map') + '.zip'; a.click(); status('zip 내보냄: map.json + 그림 ' + (files.length - 1) + '장');
+  if (!S.bg) return say('배경이 없습니다');
+  const scene = exportScene(), files = [['map.json', new TextEncoder().encode(JSON.stringify(scene, null, 1))]];
+  for (const k of new Set([S.bgName, ...S.items.filter((i) => i.kind === 'obj').map((i) => i.file)])) if (S.images[k]) files.push([k, bytesOfUrl(S.images[k].url)]);
+  const a = document.createElement('a'); a.href = URL.createObjectURL(makeZip(files)); a.download = (scene.file || 'map') + '.zip'; a.click();
+  say(`내보냄: map.json + 그림 ${files.length - 1}장`);
 };
-$('bOpen').onclick = () => { const i = document.createElement('input'); i.type = 'file'; i.accept = '.json'; i.onchange = async () => { const d = JSON.parse(await i.files[0].text()); loadScene(d); }; i.click(); };
-function loadScene(d) {
-  S.floor = d.floor || []; S.bgScale = d.bgScale || 2; S.bgName = d.file ? d.file + '.png' : S.bgName; S.items = [];
-  for (const b of d.blocks || []) S.items.push({ id: uid('b'), kind: 'solid', poly: b.poly || [[b.x0, b.y0], [b.x1, b.y0], [b.x1, b.y1], [b.x0, b.y1]], h: b.h ?? 999, name: '막힘' });
-  for (const [id, dr] of Object.entries(d.doors || {})) S.items.push({ id, kind: 'exit', x: dr.x, y: dr.y, to: dr.to, toDoor: dr.toDoor, label: dr.label, name: '출입구' });
-  for (const l of d.lamps || []) S.items.push({ id: uid('l'), kind: 'lamp', x: l.x, y: l.y, r: l.r || 200, lk: l.kind, color: l.color, name: '조명' });
-  for (const s of d.spots || []) S.items.push({ id: s.id, kind: 'seat', x: s.x, y: s.y, verb: s.verb, face: s.face, sx: s.seat?.x, sy: s.seat?.y, name: '앉는 자리' });
-  for (const o of d.objects || []) if (o.coverMask) { const it = { id: o.id, kind: 'cover', mx: o.x, my: o.y, mw: o.w, mh: o.h, mask: null, tol: o.tol, sortY: o.sortY, name: o.name || '가림(자동)' }; S.items.push(it); maskFromDataUrl(it, o.coverMask).then(draw); } else S.items.push(o.cover ? { id: o.id, kind: 'cover', poly: o.cover[0], sortY: o.sortY, name: o.name || '가림' } : { id: o.id, kind: 'obj', file: Object.keys(S.images).find((k) => k.replace(/\.[^.]+$/, '') === o.file) || o.file + '.png', x: o.x, y: o.y, w: o.w, h: o.h, rot: o.rot || 0, flip: !!o.flip, sortY: o.sortY, solid: o.solid?.[0] || null, name: o.name || o.file });
-  refreshList(); draw(); persist(); status('map.json 불러옴. 그림은 왼쪽/오른쪽에서 같은 이름으로 다시 고르면 붙습니다');
-}
-restore().then(fit);
+$('bOpen').onclick = () => $('fOpen').click();
+$('fOpen').onchange = async (e) => {
+  const f = e.target.files[0]; e.target.value = ''; if (!f) return;
+  let scene, files = {};
+  if (f.name.endsWith('.zip')) { files = readZip(await f.arrayBuffer()); scene = JSON.parse(new TextDecoder().decode(files['map.json'])); } else scene = JSON.parse(await f.text());
+  const mime = (n) => (n.endsWith('.png') ? 'image/png' : n.endsWith('.webp') ? 'image/webp' : 'image/jpeg');
+  for (const n of Object.keys(files)) if (n !== 'map.json') { const url = await readFile(new Blob([files[n]], { type: mime(n) })); S.images[n] = { img: await loadImg(url), url }; }
+  S.bgScale = scene.bgScale || 2; $('bgScale').value = S.bgScale;
+  const bgName = Object.keys(S.images).find((n) => n.replace(/\.[^.]+$/, '') === scene.file);
+  if (bgName) { S.bg = S.images[bgName].img; S.bgName = bgName; S.w = S.bg.width * S.bgScale; S.h = S.bg.height * S.bgScale; setBgInfo(); }
+  S.items = [];
+  if (scene.floor) S.items.push({ id: uid('f'), kind: 'floor', name: '바닥', poly: scene.floor });
+  for (const b of scene.blocks || []) S.items.push({ id: uid('b'), kind: 'block', name: '막힘', poly: b.poly, h: b.h ?? 999 });
+  for (const [id, d] of Object.entries(scene.doors || {})) S.items.push({ id, kind: 'exit', name: d.label || '출입구', x: d.x, y: d.y, to: d.to, toDoor: d.toDoor, label: d.label });
+  for (const l of scene.lamps || []) S.items.push({ id: uid('l'), kind: 'lamp', name: '조명', x: l.x, y: l.y, r: l.r, lk: l.kind, color: l.color });
+  for (const s of scene.spots || []) S.items.push({ id: s.id, kind: 'seat', name: '앉는 자리', x: s.seat?.x ?? s.x, y: s.seat?.y ?? s.y, hipY: s.hipY ?? (s.seat?.y ?? s.y) - 60, verb: s.verb, face: s.face });
+  for (const o of scene.objects || []) {
+    if (o.coverMask) { const it = { id: o.id, kind: 'cover', name: o.name || '가림', x: o.x, y: o.y, w: o.w, h: o.h, sortY: o.sortY, mask: null }; await loadMask(it, o.coverMask); S.items.push(it); }
+    else if (o.cover) S.items.push({ id: o.id, kind: 'cover', name: o.name || '가림', poly: o.cover[0], sortY: o.sortY });
+    else { const file = Object.keys(S.images).find((n) => n.replace(/\.[^.]+$/, '') === o.file) || o.file + '.png'; S.items.push({ id: o.id, kind: 'obj', name: o.name || o.file, file, x: o.x, y: o.y, w: o.w, h: o.h, rot: o.rot || 0, flip: !!o.flip, sortY: o.sortY }); }
+  }
+  ensureChar(); S.sel = null; fitView(); commit(); say('불러왔습니다');
+};
+const stage = $('stage');
+stage.addEventListener('dragover', (e) => { e.preventDefault(); $('drop').style.display = 'flex'; });
+stage.addEventListener('dragleave', () => { $('drop').style.display = 'none'; });
+stage.addEventListener('drop', async (e) => {
+  e.preventDefault(); $('drop').style.display = 'none';
+  for (const f of [...e.dataTransfer.files].filter((f) => f.type.startsWith('image/'))) { const url = await readFile(f); if (!S.bg) await setBg(f.name, url); else await addPng(f.name, url); }
+});
+
+/* ───────── 시작 ───────── */
+(async () => {
+  sizeCanvas(); buildShelf();
+  const had = await restore();
+  if (!S.charImg && EMBED.char) { S.charImg = await loadImg(EMBED.char); }
+  ensureChar(); if (committed === null) committed = ser();
+  fitView(); refresh();
+  say(had ? '이전 작업을 불러왔습니다' : '「배경 열기」로 시작하세요 (배경은 자동 2배)');
+})();
 </script>
 </body>
 </html>
