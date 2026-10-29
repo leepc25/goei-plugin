@@ -253,7 +253,11 @@ function hqAdapter(bridge: Partial<GameBridge> | undefined, ui: { chooseFloor: H
     },
     lifeTime: () => sim?.time ?? 0,
     hit: (sceneId, boxes, dir) => world()?.hitBoxes(sceneId, boxes, dir).length ?? 0,
-    actors: (sceneId) => (world()?.inScene(sceneId) ?? []).map((a) => ({ id: a.def.id, name: a.def.name, kind: a.def.kind, x: a.x, y: a.y, face: a.face, look: a.def.look, moving: a.act === 'walk', clip: a.clip, since: a.clipAt, icon: a.icon, say: a.say })),
+    actors: (sceneId) => (world()?.inScene(sceneId) ?? []).map((a) => {
+      const st = a.seat ? world()?.graph.scene(sceneId)?.seats?.[a.seat.i] : undefined;
+      return { id: a.def.id, name: a.def.name, kind: a.def.kind, x: a.x, y: a.y, face: a.face, look: a.def.look, moving: a.act === 'walk', clip: a.clip, since: a.clipAt, icon: a.icon, say: a.say,
+        ...(a.seat && st ? { seat: { box: st.box, dir: a.seat.dir, kind: a.seat.kind, x: a.seat.x, y: a.seat.y } } : {}) };
+    }),
     observer: (sceneId) => (observing && sim ? observerLines(sim, clockView(), sceneId, seed) : null),
     // 몹: 인물 팩(look = 몹 그림 이름, src/game/world/mobs.ts looks) → 받는 동안·없으면 실루엣. 처음 보이는 그림은 그때 받는다
     drawMob: (c, a) => {

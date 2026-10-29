@@ -12,6 +12,7 @@ import type { Body, Hit, HitResult, React, WBox, WorldView } from '../engine/con
 import type { Pad, Btn } from '../engine/input';
 import type { FrameInfo } from '../engine/art';
 import { createFighterCore } from './core';
+import { seatBody } from './seats';
 import { StatusSet } from '../../combat/status';
 
 /** 테스트룸 동작 이름 ↔ 엔진 버튼 */
@@ -234,6 +235,11 @@ export class FighterPlayer extends Player {
     P.x = x; P.y = y; P.z = 0; P.vx = 0; P.face = face;
     this.core.sitAt(clip.includes('side') ? 'side' : clip.includes('back') ? 'back' : 'front');
     if (!P.seat) return super.sit(clip, x, y, face, exit);
+    // 지도 의자는 (x, y) 그 자리에 둔다: 사람 발을 이 인물 의자 맞춤값(chairs/<키>.json)만큼 옮긴다 (fighter/seats.ts)
+    const seat = P.seat as { dir: string; cx?: number; cy?: number };
+    seat.cx = x; seat.cy = y;
+    const body = seatBody(x, y, face, this.core.chairFit(seat.dir), spr(y) * CHAR_K);
+    P.x = body.x; P.y = body.y;
     this.coreSeat = { exit };
     this.sync();
     return true;

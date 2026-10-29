@@ -3,6 +3,7 @@
 // 게임과 맞닿는 곳: 표적 = env.targets()의 실제 적(T = 지금 가장 가까운 앞 상대 + 범위 검사에 든 상대 전부), 화면 = 보이는 화면(VX0~W)·게임 바닥, 키 = env.held, 소리 = env.sfx, 체력 = 게임.
 // env: { A, IMG, CH, VFX, CHAIR, held:Set, K(y), sfx(type, extra), font(n), targets():[{body,x,y,z}], hurt(T, dmg, kind, face, hitstop, o), clamp(P), ground(x,y), mod?:{speed(),sp()}, heal?(v) }
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { SEATS as SEAT_TABLE, SEAT_LOOP as SEAT_LOOP_IDS, SEAT_IDS as SEAT_ID_SET, seatFit } from './seats';
 /** 인물 설정(char.json cfg)·줄 측정값(A)·이펙트 정의·기술 부품은 JSON 자료라 모양이 인물·기술마다 다르다 → 자료 쪽은 느슨한 형(Json)으로 둔다 */
 type Json = any;
 /** 부품 실행 맥락 ({ o, pt, basic, … }) */
@@ -71,7 +72,7 @@ const FALLS = new Set(['18_3', '44', '75', '76', '77']);   // 서서 시작해 �
 const lowF = (a?: Json, f?: Json) => (a.bot[f] - a.top[f]) < 0.55 * (a.bot[0] - a.top[0]);
 // 누운 장은 장마다 자기 몸통 아랫선을 바닥에(그림마다 높이가 달라 한 줄로 맞추면 위아래로 튐 — 10-28 데드폴)
 // 앉기·앉은 줄: 장마다 그 장의 가장 낮은 점(발)을 땅에(10-29 밤 사용자: PixelLab이 앉은 장을 캔버스 위쪽에 그린 줄은 서 있던 바닥 기준이라 사람·의자가 통째로 떠 보임 — 데쥬레 후면 41px, 이연화 후면 등)
-const SEAT_IDS = new Set(['60', '61', '96', '62', '63', '64', '65', '66', '67', '68', '69', '70', '71', '72', '73', '97', '98', '99', '105', '106', '148', '149', '167']);
+const SEAT_IDS = SEAT_ID_SET;
 const groundBase = (id?: Json, a?: Json, f?: Json) => arcOf(id) ? a.bot[f] : SEAT_IDS.has(id) ? Math.min(BASE(a), a.bot[f]) : FALLS.has(id) ? (lowF(a, f) && a.mbot ? a.mbot[f] + 3 : Math.min(BASE(a), a.bot[f] + 2)) : (LIE.has(id) || (id === '19' && f >= lieFrom(a))) ? (FLAT.has(id) && a.mbot ? a.mbot[f] + 3 : a.bot[f] + 2) : BASE(a);   // 누운 장: 몸통 아래 선을 바닥에(늘어진 손발은 바닥 앞쪽으로 내려감)
 const FXS = 3, mkLayer = () => { const c = document.createElement('canvas'); c.width = 1280 / FXS; c.height = 720 / FXS; const g = c.getContext('2d')!; g.imageSmoothingEnabled = false; return [c, g] as [HTMLCanvasElement, CanvasRenderingContext2D]; };
 const [fxNc, fxN] = mkLayer(), [fxLc, fxL] = mkLayer();
@@ -791,15 +792,15 @@ const crLp = () => LP('41') || R(Math.min(4, nOf('41') - 1), nOf('41') - 1);
 function crouch() { if (!has('41')) return; P.mode = 'crouch'; const lp = crLp(); play('41', { seq: [...S(R(0, lp[0] - 1), 0.08), ...S(lp, 0.11)], loopFrom: lp[0] }); }
 
 // ── 의자 앉기(3판 정면 60 · 옆 96 · 후면 61) — 라이브 seat: 4틱(0.133초)마다 한 장, E로 거꾸로 일어남 ──
-const SEATS: Json[] = [{ dir: 'front', sit: '60', img: 'south', acts: { talk: '62', eat: '64', drink: '65', type: '63', doze: '66', lean: '73', nod: '68', craft: '106', phone: '148', book: '149', paper: '167', call: '67' } },
-               { dir: 'side', sit: '96', img: 'east', acts: { talk: '97', eat: '98', drink: '99', type: '105' } },
-               { dir: 'back', sit: '61', img: 'north', acts: { talk: '70', eat: '71', drink: '71', type: '69', look: '72' } }];
-const SEAT_LOOP = new Set(['63', '64', '66', '73', '98', '105', '69', '71', '106', '148', '149', '167']);   // 「반복, 첫 장 유지」 줄
+const SEATS: Json[] = SEAT_TABLE;   // 앉기 방향 표: fighter/seats.ts (필드 그림과 같이 씀)
+const SEAT_LOOP = SEAT_LOOP_IDS;   // 「반복, 첫 장 유지」 줄
 const SEAT_F = 0.133;
 // 의자 맞춤 {dx(앞쪽 +), dy(아래 +), s}: 설정 chars/<키>.json "chair" > 이 브라우저에서 미세 조정한 값 > 빌드 자동값(chairfit.py)
-const chairEdit = (): Record<string, Json> => ({});
+/** 의자 맞추기(시험장 「의자 맞추기」 칸): 방향별 { dx, dy, s } 고친 값. 비어 있으면 설정값(chairs/<키>.json → CH.chair) 그대로 */
+const chairEdits: Record<string, Json> = {};
+const chairEdit = (): Record<string, Json> => chairEdits;
 let seatIdx = -1, showChair = true;
-function chairFit(dir?: Json, line?: Json) { const d = { dx: 0, dy: 0, s: 1 }, base = { ...d, ...((CH.chairAuto || {})[dir] || {}), ...((CH.chair || {})[dir] || {}), ...(chairEdit()[dir] || {}) }; return line && ((CH.chair || {})[line] || chairEdit()[line]) ? { ...base, ...((CH.chair || {})[line] || {}), ...(chairEdit()[line] || {}) } : base; }   // 줄마다(기대 쉬기 73 등 자세가 크게 바뀌는 줄) 따로 맞춘 값이 있으면 그것
+function chairFit(dir?: Json, line?: Json) { return seatFit(CH, dir, line, chairEdit()); }   // 줄마다(기대 쉬기 73 등) 따로 맞춘 값이 있으면 그것 (fighter/seats.ts)
 function seatIdle() { const s = P.seat; P.mode = 'seat'; const n = nOf(s.sit); play(s.sit, { seq: [{ f: n - 1, d: 9 }], loopFrom: 0 }); P.clip!.breathe = true; }
 function sitChair() {
   const okSeat = (s?: Json) => has(s.sit) && !(CH.noBackSit && s.dir === 'back');   // 후면 앉기 그림이 실패한 인물(앉지 않고 섬)은 후면 자리를 건너뜀(10-29 아벤샤)
@@ -1177,11 +1178,15 @@ function drawPlayer() {
   else if (P.hp <= 25 && P.mode !== 'dead') tint = { c: '#d0101a', over: 0.42 * (0.5 + 0.5 * Math.sin(P.t * Math.PI * 2 * 1.3)), noEdge: true };
   else if (P.mode === 'charge') { const lv = Math.min(3, chLv()); tint = { c: CH_COL[lv], over: 0.08 + 0.08 * Math.sin(P.t * 20), noEdge: true }; }
   // 의자: C01 사무 의자 1배(판정 전). 정면·옆은 사람 뒤 층, 후면은 등받이가 몸을 가리게 사람 앞 층(seat_fit.json front=true, 10-28 사용자 지적: 등받이를 뚫고 앉음)
-  const chair = () => { if (!(P.seat && showChair && CHAIR[P.seat.img] && CHAIR[P.seat.img].complete)) return; const cf = chairFit(P.seat.dir, P.clip && P.clip.id), im = CHAIR[cf.img || P.seat.img] && CHAIR[cf.img || P.seat.img].complete ? CHAIR[cf.img || P.seat.img] : CHAIR[P.seat.img];
-    ctx.save(); ctx.translate(Math.round(P.x + P.face * cf.dx * kk), Math.round(P.y + cf.dy * kk)); ctx.scale((P.face < 0 ? -1 : 1) * kk * cf.s, kk * cf.s); ctx.drawImage(im, -100, -171); ctx.restore(); };
+  // 의자 자리 고정(필드 지도 의자, P.seat.cx·cy): 의자는 그 자리에, 사람을 맞춤값(줄마다 다를 수 있음)만큼 옮겨 그린다. 없으면 사람 기준(시험장)
+  const cf0 = P.seat ? chairFit(P.seat.dir, P.clip && P.clip.id) : null;
+  const anchored = !!(P.seat && P.seat.cx != null && cf0);
+  const bx = anchored ? P.seat.cx - P.face * cf0.dx * kk : P.x, by = anchored ? P.seat.cy - cf0.dy * kk : P.y;
+  const chair = () => { if (!(P.seat && showChair && CHAIR[P.seat.img] && CHAIR[P.seat.img].complete)) return; const cf = cf0!, im = CHAIR[cf.img || P.seat.img] && CHAIR[cf.img || P.seat.img].complete ? CHAIR[cf.img || P.seat.img] : CHAIR[P.seat.img];
+    ctx.save(); ctx.translate(Math.round(anchored ? P.seat.cx : P.x + P.face * cf.dx * kk), Math.round(anchored ? P.seat.cy : P.y + cf.dy * kk)); ctx.scale((P.face < 0 ? -1 : 1) * kk * cf.s, kk * cf.s); ctx.drawImage(im, -100, -171); ctx.restore(); };
   const chairFront = P.seat && P.seat.dir === 'back';
   if (!chairFront) chair();
-  drawSprite(id, f, P.x, P.y, P.z, P.face, 1, tint, vis, c && c.breathe ? (Math.sin(P.t * 2.6) > 0 ? 1 : 0) : 0);
+  drawSprite(id, f, bx, by, P.z, P.face, 1, tint, vis, c && c.breathe ? (Math.sin(P.t * 2.6) > 0 ? 1 : 0) : 0);
   if (chairFront) chair();
   if (P.fadeOut && P.t < P.fadeOut.until && !P.seat && A[P.fadeOut.id]) drawSprite(P.fadeOut.id, P.fadeOut.f, P.x, P.y, P.z, P.face, 0.85 * (P.fadeOut.until - P.t) / P.fadeOut.d, null, vis);   // 대기로 넘어갈 때 앞 동작 장을 잠깐 겹쳐 흐리게(10-29)
   if (P.mode === 'charge') { const m = handPt(); drawVfxAt('charge_gather', m.x, m.y, 1.2 + Math.min(1, P.charge) * 0.8, P.t); }
@@ -1465,5 +1470,7 @@ function drawCut() {
     knock, hit, stun, die, sitAt, rise, seatAct, runScene, playLife, lifeIds, emote, act, toIdle, has, nOf, SCENES,
     /** 시험장 전용 스위치: 필살 게이지 무시 */
     get freeSuper() { return freeSuper; }, set freeSuper(v: boolean) { freeSuper = v; },
+    /** 시험장 의자 맞추기: 고친 값 묶음(바꾸면 바로 그림에 반영)·지금 맞춤 값 */
+    chairEdits, chairFit,
   };
 }

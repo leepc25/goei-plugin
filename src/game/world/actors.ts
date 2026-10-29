@@ -8,6 +8,8 @@ import type { Hop, PlaceGraph } from './places';
 import { pick, range, type Rng } from './rng';
 
 export type ActorKind = 'named' | 'mob';
+/** 활동 클립 → 의자에서 하는 일 (fighter/seats.ts SEATS acts 이름) */
+const SEAT_KIND: Record<string, string> = { work: 'type', eat: 'eat', drink: 'drink', rest: 'doze', hobby: 'book', talk: 'talk' };
 export interface ActorDef {
   id: string;
   /** 이름표 (몹은 원형 이름) */
@@ -30,6 +32,10 @@ type Plan = 'none' | 'do' | 'post' | 'exit' | 'steal' | 'harass' | 'chase' | 'pa
 export interface Actor {
   def: ActorDef;
   scene: string;
+  /** 지도 의자에 앉아 있음 (i = 장면 의자 번호). 그림은 그 인물 의자 맞춤값으로 (fighter/seats.ts) */
+  seat?: { i: number; dir: 'front' | 'side' | 'back'; kind: string; x: number; y: number };
+  /** 앉으러 가는 의자 번호 */
+  seatPick?: number;
   x: number;
   y: number;
   face: 1 | -1;
@@ -133,7 +139,7 @@ export class WorldSim {
   /** 실제로 흐른 생활 초 */
   time = 0;
   private hour: number | null = null;
-  private player: { scene: string; x: number; y: number } | null = null;
+  private player: { scene: string; x: number; y: number; seat?: number | null } | null = null;
   readonly spawns: SpawnRule[];
   readonly posts: Post[];
   private has: (look: string, clip: string) => boolean;
@@ -278,6 +284,7 @@ export class WorldSim {
     return true;
   }
   private struck(a: Actor, dir: 1 | -1): void {
+    a.seatPick = undefined;
     a.x += dir * 36;
     a.face = (-dir) as 1 | -1;
     a.goal = null;
@@ -326,10 +333,10 @@ export class WorldSim {
   }
 
   /** 생활 시간을 dt초 진행. player = 보이는 장면과 주인공 발, hour = 필드 시(모르면 null) */
-  step(dt: number, player?: { scene: string; x: number; y?: number; hour?: number | null }): void {
+  step(dt: number, player?: { scene: string; x: number; y?: number; hour?: number | null; seat?: number | null }): void {
     this.time += dt;
     this.hour = player?.hour ?? null;
-    this.player = player ? { scene: player.scene, x: player.x, y: player.y ?? 0 } : null;
+    this.player = player ? { scene: player.scene, x: player.x, y: player.y ?? 0, seat: player.seat ?? null } : null;
     for (const [s, u] of this.uproar) {
       u.v = Math.max(0, u.v - (player?.scene === s ? 1.5 : 5) * dt);
       if (u.v <= 0) this.uproar.delete(s);
@@ -343,6 +350,8 @@ export class WorldSim {
   // ── 한 사람 ──
 
   private setClip(a: Actor, clip: string): void {
+    // 의자에서 하는 일이 아니면 일어선다
+    if (!clip.startsWith('seat:')) a.seat = undefined;
     if (a.clip !== clip) {
       a.clip = clip;
       a.clipAt = this.time;
@@ -353,7 +362,20 @@ export class WorldSim {
     a.iconT = sec;
   }
   private canClip(a: Actor, clip: string): boolean {
-    return this.has(a.def.look ?? a.def.name, clip);
+    const look = a.def.look ?? a.def.name;
+    // 앉아서 하는 일은 의자가 있어야: 서서 하는 줄이 없으면 의자 줄로 (허공에 앉지 않는다)
+    return this.has(look, clip) || (!!SEAT_KIND[clip] && this.has(look, `seat:${SEAT_KIND[clip]}`));
+  }
+  /** 장면의 빈 의자 (다른 사람·주인공이 앉지 않은 것) 중 x 에 가까운 것 */
+  private freeSeat(scene: string, x: number): number | null {
+    const seats = this.graph.scene(scene)?.seats ?? [];
+    let best: number | null = null;
+    seats.forEach((st, i) => {
+      if (this.player?.scene === scene && this.player.seat === st.box) return;
+      if (this.actors.some((q) => q.scene === scene && (q.seat?.i === i || q.seatPick === i))) return;
+      if (best === null || Math.abs(st.x - x) < Math.abs(seats[best].x - x)) best = i;
+    });
+    return best;
   }
 
   private stepActor(a: Actor, dt: number): void {
@@ -446,6 +468,7 @@ export class WorldSim {
   }
 
   private idle(a: Actor, min = 2, max = 7): void {
+    a.seatPick = undefined;
     a.act = 'idle';
     a.doing = '대기';
     a.run = 1;
@@ -580,8 +603,14 @@ export class WorldSim {
     this.walkTo(a, this.randomSpot(a.scene), '서성이는 중');
   }
 
-  /** 수다는 상대 옆으로, 나머지는 장면 안 빈 곳 */
+  /** 수다는 상대 옆으로, 앉아서 하는 일은 빈 의자로(서서 하는 줄이 없거나 의자가 있으면), 나머지는 장면 안 빈 곳 */
   private taskSpot(a: Actor, t: Activity): { x: number; y: number } {
+    a.seatPick = undefined;
+    if (!t.partner && SEAT_KIND[t.clip] && this.has(a.def.look ?? a.def.name, `seat:${SEAT_KIND[t.clip]}`)) {
+      const i = this.freeSeat(a.scene, a.x);
+      const st = i === null ? null : this.graph.scene(a.scene)?.seats?.[i];
+      if (st && i !== null) { a.seatPick = i; return { x: st.x, y: st.y }; }
+    }
     if (t.partner) {
       const q = this.actors.find((o) => o !== a && o.def.kind === 'named' && o.scene === a.scene && (o.act === 'idle' || o.act === 'walk') && !o.route.length);
       if (q) return { x: q.x + (q.x > a.x ? -90 : 90), y: q.y };
@@ -618,6 +647,26 @@ export class WorldSim {
     a.doing = t.label;
     a.wait = range(this.rng, t.sec[0], t.sec[1]);
     a.plan = 'none';
+    // 의자에 왔으면 앉는다 (그 의자가 아직 비었을 때)
+    const pick = a.seatPick;
+    a.seatPick = undefined;
+    const st = pick === undefined ? null : this.graph.scene(a.scene)?.seats?.[pick];
+    const taken = pick !== undefined && (this.actors.some((q) => q !== a && q.scene === a.scene && q.seat?.i === pick) || (this.player?.scene === a.scene && this.player.seat === st?.box));
+    if (st && pick !== undefined && !taken) {
+      const kind = SEAT_KIND[t.clip];
+      this.setClip(a, `seat:${kind}`);
+      a.x = st.x;
+      a.y = st.y;
+      a.face = st.face === 'W' ? -1 : st.face === 'E' ? 1 : a.face;
+      a.seat = { i: pick, dir: st.face === 'N' ? 'back' : st.face ? 'side' : 'front', kind, x: st.x, y: st.y };
+      a.doing = `${t.label} (의자)`;
+      return;
+    }
+    // 의자를 못 잡았고 서서 하는 줄도 없으면 그 일을 하지 않는다 (없는 동작을 대기 그림으로 때우지 않는다)
+    if (!this.has(a.def.look ?? a.def.name, t.clip)) {
+      a.task = undefined;
+      return this.idle(a, 1, 3);
+    }
     this.setClip(a, t.clip);
   }
 
@@ -723,6 +772,7 @@ export class WorldSim {
     return { x, y: a.y };
   }
   private flee(a: Actor, fromX: number): void {
+    a.seatPick = undefined;
     a.run = 1.8;
     a.exitAt = this.gateFar(a, fromX);
     this.walkTo(a, a.exitAt, '도망', 'exit');

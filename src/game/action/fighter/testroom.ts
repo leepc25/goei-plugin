@@ -123,6 +123,49 @@ function fill(p: FighterPlayer) {
   lab.append(free, document.createTextNode('필살 게이지 무시'));
   live.append(el('h2', {}, '스위치'), lab);
 
+  // 의자 맞추기 (옛 테스트룸 칸 그대로): 앉아 있는 방향의 의자를 1화소씩 옮기고 「값 복사」로 chairs/<키>.json 에 넣을 값을 낸다.
+  // 고친 값은 이 브라우저에 인물별로 남는다(옛 테스트룸과 같은 열쇠 chair.<키>)
+  const chairBox = el('div');
+  live.append(el('h2', {}, '의자 맞추기'), el('div', { class: 'm' }, '1화소씩 · 값 복사해서 Claude에게 주면 chairs/<키>.json 에 고정'), chairBox);
+  const store = `chair.${cfg.key}`;
+  try { Object.assign(c.chairEdits, JSON.parse(localStorage.getItem(store) ?? '{}')); } catch { /* 저장소를 못 쓰면 이번만 */ }
+  const save = () => { try { localStorage.setItem(store, JSON.stringify(c.chairEdits)); } catch { /* 저장 못 함 */ } };
+  const NAME: Record<string, string> = { front: '정면', side: '옆', back: '후면' };
+  let lastSeat = '';
+  const drawChairBox = () => {
+    const seat = c.P.seat as { dir: string } | null;
+    const k = seat ? `${seat.dir}:${JSON.stringify(c.chairFit(seat.dir))}` : '';
+    if (k === lastSeat) return;
+    lastSeat = k;
+    chairBox.innerHTML = '';
+    if (!seat) { chairBox.append(el('div', { class: 'm' }, '의자에 앉으면(장면 · 의자) 여기서 맞춥니다.')); return; }
+    const f = c.chairFit(seat.dir);
+    chairBox.append(el('div', { class: 'm' }, `${cfg.name} · ${NAME[seat.dir] ?? seat.dir} · 앞뒤 ${f.dx} · 위아래 ${f.dy} · 크기 ${f.s}`));
+    const row = el('div', { class: 'grid' });
+    const nudge = (key: 'dx' | 'dy' | 's', v: number) => {
+      const cur = c.chairFit(seat.dir);
+      const e = { dx: cur.dx, dy: cur.dy, s: cur.s };
+      e[key] = +(e[key] + v).toFixed(2);
+      c.chairEdits[seat.dir] = e;
+      save();
+    };
+    for (const [lab, key, v] of [['◀ 뒤로', 'dx', -1], ['앞으로 ▶', 'dx', 1], ['▲ 위로', 'dy', -1], ['아래로 ▼', 'dy', 1], ['작게', 's', -0.02], ['크게', 's', 0.02]] as const) row.append(btn(lab, () => nudge(key, v)));
+    row.append(btn('이 방향 원래 값으로', () => { delete c.chairEdits[seat.dir]; save(); }));
+    const ta = el('textarea', { rows: '3', style: 'width:100%;margin-top:4px;background:#111;color:#ddd;border:1px solid #3a3f45' }) as HTMLTextAreaElement;
+    ta.hidden = true;
+    row.append(btn('값 복사', () => {
+      const out: Record<string, unknown> = {};
+      for (const d of ['front', 'side', 'back']) { const v = c.chairFit(d); out[d] = { dx: v.dx, dy: v.dy, s: v.s, ...(v.img ? { img: v.img } : {}) }; }
+      ta.value = `"${cfg.key}": ${JSON.stringify(out)}`;
+      ta.hidden = false;
+      void navigator.clipboard?.writeText(ta.value).catch(() => {});
+      ta.select();
+    }));
+    chairBox.append(row, ta);
+  };
+  drawChairBox();
+  chairTick = drawChairBox;
+
   for (const [title, list] of c.SCENES as [string, [string, () => void][]][]) {
     const g = el('div', { class: 'grid' });
     for (const [label, fn] of list) g.append(btn(label, fn));
@@ -141,10 +184,12 @@ function fill(p: FighterPlayer) {
   live.append(el('h2', {}, '조작'), el('div', { class: 'm' }, '방향키 이동(두 번 빠르게 = 달리기) · Space 점프 · Q 약공 · W 강공 · C 막기·회피 · A 사격 · S 충전(누르고 떼기) · D 고유기 · F 필살 · Tab 무기 · R 전투 자세 · Z 앉기 · X 웅크림 · V 도망 · B 뒷걸음 · Esc 메뉴'));
 }
 
+let chairTick: () => void = () => {};
 mountGame(box, { assets });
 let shown: FighterPlayer | null = null;
 setInterval(() => {
   const w = (globalThis as { __goeiEngine?: { world: { player: unknown } | null } }).__goeiEngine?.world;
   const p = w?.player;
   if (p instanceof FighterPlayer && p !== shown) { shown = p; fill(p); }
-}, 300);
+  chairTick();
+}, 200);

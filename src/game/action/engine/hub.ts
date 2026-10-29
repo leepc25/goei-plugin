@@ -11,7 +11,7 @@ import { SCREEN_H, SCREEN_W } from './contract';
 import { HQ_PLACE, drawFloor, drawHqWall, drawPropArt, drawHqTextureWall } from '../art/bg';
 import { drawHqDoorRound2 } from '../art/hqDoorRound2';
 import { drawCallLit, drawHqField, drawHqFieldLight, drawHqFieldObject, drawHqSigns, hasHqField } from '../art/hqField';
-import { charTop, drawCharClip, charArt, charFx, CHAR_K } from '../art/charPacks';
+import { charTop, drawCharClip, drawCharSeat, charArt, charFx, CHAR_K } from '../art/charPacks';
 import { persp, view as fieldView } from './view';
 import { blockByProps, clearSpot, type BlockProp } from './propBlock';
 import { PAINTED, clampPainted, doorReachY } from '../hq/painted';
@@ -49,10 +49,12 @@ export interface HubHost {
 }
 
 /** 보이는 장면의 행위자 하나 (월드 좌표, 발 기준) */
-export interface LiveActor { id: string; name: string; kind: 'named' | 'mob'; x: number; y: number; face: 1 | -1; look?: string; moving: boolean; clip?: string; since?: number; icon?: string; say?: string }
+export interface LiveActor { id: string; name: string; kind: 'named' | 'mob'; x: number; y: number; face: 1 | -1; look?: string; moving: boolean; clip?: string; since?: number; icon?: string; say?: string;
+  /** 지도 의자에 앉음: 의자 번호(장면 상자 번호)·앉기 방향·하는 일·의자 자리 */
+  seat?: { box: number; dir: 'front' | 'side' | 'back'; kind: string; x: number; y: number } }
 export interface HubLife {
   /** 생활 시간 진행 (실시간 초). at = 보이는 장면과 주인공 발 */
-  tick(dt: number, at: { scene: string; x: number; y?: number }): void;
+  tick(dt: number, at: { scene: string; x: number; y?: number; seat?: number | null }): void;
   actors(sceneId: string): LiveActor[];
   /** 관찰 창이 켜져 있으면 글 줄, 꺼져 있으면 null */
   observer(sceneId: string): string[] | null;
@@ -162,9 +164,10 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
       props: [],
       encounters: [],
       platforms: sc.painted ? sc.boxes.filter((b) => b.solid && b.h > 0 && b.h < 400).map((b) => ({ x0: b.x - b.w / 2, x1: b.x + b.w / 2, y0: b.y - b.d, y1: b.y, h: b.h })) : undefined,
-      depthLayers: sc.boxes.map((b) => ({ y: b.y, occludedSilhouette: !sc.painted, x0: b.x - b.w / 2, x1: b.x + b.w / 2, draw: (c: CanvasRenderingContext2D) => {
+      depthLayers: sc.boxes.map((b, bi) => ({ y: b.y, occludedSilhouette: !sc.painted, x0: b.x - b.w / 2, x1: b.x + b.w / 2, draw: (c: CanvasRenderingContext2D) => {
         if (sc.painted && hasHqField(sc.painted)) { drawHqFieldObject(c, sc.painted, b.kind); return; }
-        if (b === sitChair) return;
+        // 누가 앉은 의자는 앉은 사람이 자기 맞춤값으로 그린다 (주인공 = 엔진, 이름 인물 = drawCharSeat)
+        if (b === sitChair || live.some((q) => q.seat?.box === bi)) return;
         drawBox(c, b, sc.look);
       } })).concat(people.map((p) => ({ y: p.y, x0: p.x - 60, x1: p.x + 60, occludedSilhouette: false, draw: (c: CanvasRenderingContext2D) => { drawCharClip(c, p.name, p.x, p.y, p.face, performance.now()); } })))
         // 움직이는 행위자: 자리 수만큼 층을 두고 매 프레임 지금 목록의 i번째를 읽는다 (깊이 정렬은 y 게터로)
@@ -308,7 +311,7 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
     tick(a: StageApi) {
       if (sitChair && !(a.world.player as Player).seat && !(a.world.player as { sitting?: boolean }).sitting) sitChair = null;
       if (host.life && scene) {
-        host.life.tick(1 / 30, { scene: scene.id, x: a.world.player.x, y: a.world.player.y });
+        host.life.tick(1 / 30, { scene: scene.id, x: a.world.player.x, y: a.world.player.y, seat: sitChair ? scene.boxes.indexOf(sitChair) : null });
         // 주인공 공격이 행위자에게 닿았나 (필드 행위자는 전투 몸이 아니라 따로 본다)
         const boxes = a.world.player.frame().hit;
         if (boxes.length && host.life.hit) {
@@ -389,6 +392,7 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
         if (s.place) return host.openPlace(s.place);
         if (s.say) return a.world.say(s.say, 3);
         if (s.seat && s.act?.[0]) {
+          if (s.chair !== undefined && live.some((q) => q.seat?.box === s.chair)) return a.world.say('누가 앉아 있다.', 1.5);
           const exit = clearSpot(s.x, s.y ?? a.world.player.y, solids, scene.lane ?? LANE);
           if ((a.world.player as Player).sit(s.act[0], s.seat.x, s.seat.y, s.face ?? 1, exit) && s.chair !== undefined) sitChair = scene.boxes[s.chair] ?? null;
           host.sat?.();
@@ -907,6 +911,7 @@ const namedTop = (name: string) => (charArt(name) ? charTop(name) : -230);
 /** 행위자 그리기: 이름 인물은 인물 팩(통합 테스트룸 생활 클립, 10-29) → 실루엣, 몹은 host가 주는 그림(없으면 실루엣) */
 function drawLiveActor(c: CanvasRenderingContext2D, a: LiveActor, life: HubLife): void {
   const t = (life.lifeTime?.() ?? performance.now() / 1000) * 1000;
+  if (a.seat && drawCharSeat(c, a.kind === 'named' ? a.name : a.look ?? a.name, a.seat.x, a.seat.y, a.face, t, a.seat.dir, a.seat.kind)) return;
   if (a.kind === 'named' && drawCharClip(c, a.name, a.x, a.y, a.face, t, a.clip, (a.since ?? 0) * 1000)) return;
   if (a.kind === 'mob' && life.drawMob) return life.drawMob(c, a);
   silhouette(c, a);

@@ -3,6 +3,7 @@
 // 인물 엔진 fighter/core.ts 가 바로 쓴다(A = 줄 측정값, IMG = 시트, CH = 설정, VFX = 이펙트, CHAIR = 의자).
 // 필드 생태계(hub.ts drawLiveActor)도 같은 그림으로 생활 클립을 그린다: 클립 이름(docs/필드_클립_이름_약속.md) ↔ 줄 번호는 아래 FIELD_CLIP.
 import { snapTo, spr } from '../engine/view';
+import { SEATS, SEAT_IDS, SEAT_LOOP, seatBody, seatFit, type SeatDir } from '../fighter/seats';
 
 /** 줄(동작) 측정값. 테스트룸 build.py analyze 가 잰 것 (src 대신 file) */
 export interface LineMeta {
@@ -105,12 +106,12 @@ export const charArt = (nameOrKey: string): CharArt | null => { const r = roster
 export const FIELD_CLIP: Record<string, { ids: string[]; fps?: number; loop?: boolean }> = {
   idle: { ids: ['1'], fps: 1 / 0.6 },
   walk: { ids: ['4'], fps: 11 }, run: { ids: ['5_1', '5'], fps: 15 },
-  work: { ids: ['124', '121', '63', '105', '69'], fps: 6 },
-  eat: { ids: ['64', '98', '71', '26'], fps: 6 }, drink: { ids: ['65', '99', '142', '26'], fps: 6 },
-  rest: { ids: ['73', '76', '66', '2'], fps: 4 },
+  work: { ids: ['124', '121'], fps: 6 },
+  eat: { ids: ['26'], fps: 6 }, drink: { ids: ['142', '26'], fps: 6 },
+  rest: { ids: ['2'], fps: 4 },
   pee: { ids: ['102', '101'], fps: 5 }, poo: { ids: ['102'], fps: 5 },
-  hobby: { ids: ['149', '148', '90', '155', '2'], fps: 5 },
-  talk: { ids: ['29', '62', '97', '70'], fps: 7 },
+  hobby: { ids: ['90', '155', '2'], fps: 5 },
+  talk: { ids: ['29'], fps: 7 },
   greet: { ids: ['28', '30'], fps: 7, loop: false }, bow: { ids: ['30'], fps: 7, loop: false },
   gesture: { ids: ['29'], fps: 7, loop: false }, nod: { ids: ['30'], fps: 7, loop: false }, shake: { ids: ['31'], fps: 7, loop: false },
   surprise: { ids: ['34', '33'], fps: 8, loop: false }, laugh: { ids: ['35'], fps: 7, loop: false }, angry: { ids: ['32'], fps: 7, loop: false },
@@ -123,6 +124,8 @@ export const FIELD_CLIP: Record<string, { ids: string[]; fps?: number; loop?: bo
 export function hasCharClip(nameOrKey: string, clip: string): boolean {
   const a = charArt(nameOrKey);
   if (!a) return false;
+  // 의자에서 하는 일 (seat:<일>): 앉는 줄이 하나라도 있으면 앉을 수 있다 (그 일 줄이 없으면 앉아 숨쉬기)
+  if (clip.startsWith('seat:')) return SEATS.some((s) => !!a.A[s.sit]);
   const m = FIELD_CLIP[clip];
   return !!m && m.ids.some((id) => !!a.A[id]);
 }
@@ -141,7 +144,7 @@ export function drawCharClip(c: CanvasRenderingContext2D, nameOrKey: string, x: 
   let id = cm.ids.find((i) => !!a.A[i]);
   let m = id ? a.A[id] : null;
   if (!m) { id = '1'; m = a.A['1']; if (!m) return false; }
-  const im = a.IMG[id!];
+  if (!a.IMG[id!]) return false;
   const loopIds = (a.cfg.loops ?? {})[id!];
   let f: number;
   if (id === '1') f = Math.floor(now / 600) % 2; // 평상 대기: 앞 두 장만 (테스트룸 규칙)
@@ -152,19 +155,56 @@ export function drawCharClip(c: CanvasRenderingContext2D, nameOrKey: string, x: 
     else f = n % m.n;
   }
   f = Math.max(0, Math.min(m.n - 1, f));
+  drawLine(c, a, id!, f, x, y, dir);
+  return true;
+}
+/** 줄 하나의 한 장을 발 (x, y)에 그린다 (그림자 포함). 앉은 줄은 장마다 가장 낮은 점(발)을 땅에 (엔진 groundBase 와 같음) */
+function drawLine(c: CanvasRenderingContext2D, a: CharArt, id: string, f: number, x: number, y: number, dir: 1 | -1, shade = true) {
+  const m = a.A[id], im = a.IMG[id];
+  if (!m || !im) return;
   const k = spr(y) * CHAR_K;
   const flip = (a.cfg.dir === 'W' || a.cfg.dir === 'SW') ? dir > 0 : dir < 0;
   // 땅 기준선: 테스트룸 BASE (캔버스 아래 4px, 그 줄의 가장 낮은 점이 더 위면 그 점)
-  const base = Math.min(m.h - 4, m.floor);
+  const base = SEAT_IDS.has(id) ? Math.min(m.h - 4, m.floor, m.bot[f] ?? m.floor) : Math.min(m.h - 4, m.floor);
   c.save();
   c.imageSmoothingEnabled = false;
   const ft = m.foot[f] ?? [0, 40];
-  shadow(c, x + (flip ? -ft[0] : ft[0]) * k, y, Math.min(80, ft[1]), k);
+  if (shade) shadow(c, x + (flip ? -ft[0] : ft[0]) * k, y, Math.min(80, ft[1]), k);
   snapTo(c, x, y);
   c.scale(flip ? -k : k, k);
   // 시트는 장마다 cw×ch 로 잘려 있고(ox, oy = 원본 128×256 안의 자리) — 코어 drawSprite 와 같은 식 (10-29: w 로 잘라 옆 장이 겹쳐 보이던 것)
   c.drawImage(im, f * m.cw, 0, m.cw, m.ch, -Math.round(m.w / 2) + m.ox, -base + m.oy, m.cw, m.ch);
   c.restore();
+}
+
+/** 지도 의자 (cx, cy)에 앉은 인물: 의자는 그 자리에, 사람은 이 인물 의자 맞춤값(chairs/<키>.json)만큼 옮겨 그린다 (주인공 엔진과 같은 규칙, fighter/seats.ts).
+ * dir = 앉기 방향, face = 보는 쪽, kind = 앉아서 하는 일(talk·eat·type·doze…, 그 방향에 줄이 없으면 앉아 숨쉬기). 그림 없으면 false */
+export function drawCharSeat(c: CanvasRenderingContext2D, nameOrKey: string, cx: number, cy: number, face: 1 | -1, now: number, dir: SeatDir, kind = ''): boolean {
+  const a = charArt(nameOrKey);
+  if (!a) return false;
+  let row = SEATS.find((s) => s.dir === dir && a.A[s.sit] && !(dir === 'back' && a.cfg.noBackSit));
+  if (!row) row = SEATS.find((s) => a.A[s.sit] && !(s.dir === 'back' && a.cfg.noBackSit));
+  if (!row) return false;
+  const act = row.acts[kind];
+  const id = act && a.A[act] ? act : row.sit;
+  const m = a.A[id];
+  let f: number;
+  if (id === row.sit) f = m.n - 1;   // 앉아 있기: 앉는 줄 마지막 장
+  else {
+    const n = Math.floor((now / 1000) * 6), L = ((a.cfg.loops ?? {})[id] ?? []).map((v) => Math.max(0, Math.min(m.n - 1, v - 1)));
+    f = SEAT_LOOP.has(id) && L.length ? (n < L[0] ? n % m.n : L[(n - L[0]) % L.length]) : n % m.n;
+  }
+  const fit = seatFit(a.cfg as never, row.dir, id);
+  const k = spr(cy) * CHAR_K;
+  const body = seatBody(cx, cy, face, fit, k);
+  const im = charFx()?.CHAIR[fit.img || row.img] ?? charFx()?.CHAIR[row.img];
+  const chair = () => {
+    if (!im?.complete) return;
+    c.save(); c.imageSmoothingEnabled = false; c.translate(Math.round(cx), Math.round(cy)); c.scale(face * k * fit.s, k * fit.s); c.drawImage(im, -100, -171); c.restore();
+  };
+  if (row.dir !== 'back') chair();
+  drawLine(c, a, id, f, body.x, body.y, face, false);
+  if (row.dir === 'back') chair();
   return true;
 }
 /** 발 기준 머리 꼭대기 (화면 px, 음수, 원근 미포함) */

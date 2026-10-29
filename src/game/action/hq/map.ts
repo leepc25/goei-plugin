@@ -96,6 +96,8 @@ export interface HqScene {
   boxes: HqBox[];
   fixtures: { x: number; w: number; kind: RoomFix['k'] }[];
   things: HqThing[];
+  /** 의자 자리 (boxes 의 의자). 주인공·이름 인물이 앉는다 */
+  seats?: { x: number; y: number; face?: 'E' | 'W' | 'N'; box: number }[];
 }
 
 /** 화면 px (docs/필드_그림_통합_지침.md): 맨 뒤 줄에서 1 m = 142 px (키 1.65 m = 235 px), 벽·바닥 선 y420, 걷는 띠 y420–669, 배경 세로 700 */
@@ -122,6 +124,7 @@ function fromRoom(r: Room) {
     boxes,
     fixtures: [],
     spots,
+    seats: boxes.map((b, i) => ({ x: b.x, y: b.y, face: b.face, box: i })),
   };
 }
 

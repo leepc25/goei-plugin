@@ -21,6 +21,8 @@ export interface PlaceScene {
   lane?: [number, number];
   legacy?: boolean;
   doors: PlaceDoor[];
+  /** 지도 의자 (box = 장면 상자 번호, face = 앉은 사람이 보는 쪽). 이름 인물이 일·식사·휴식을 앉아서 할 자리 */
+  seats?: { x: number; y: number; face?: 'E' | 'W' | 'N'; box: number }[];
 }
 export interface ElevatorStop {
   scene: string;
