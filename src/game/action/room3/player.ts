@@ -223,6 +223,26 @@ export class Room3Player extends Player {
     this.input(p);
   }
 
+  /** 본부 의자 자리(hub.ts seat): 엔진 앉기 클립 대신 테스트룸 앉기(코어 sitAt, 의자 그림·맞춤 chairs/<키>.json 그대로). 조사 키로 일어나 exit 자리로 */
+  private coreSeat: { exit: { x: number; y: number } } | null = null;
+  sit(clip: string, x: number, y: number, face: 1 | -1, exit: { x: number; y: number }): boolean {
+    const P = this.core.P as unknown as { x: number; y: number; z: number; vx: number; face: 1 | -1; mode: string; seat: unknown };
+    const can = ['60', '96', '61'].some((id) => this.core.has(id));
+    if (!can || P.mode !== 'ground' || this.z > 0) return super.sit(clip, x, y, face, exit);
+    P.x = x; P.y = y; P.z = 0; P.vx = 0; P.face = face;
+    this.core.sitAt(clip.includes('side') ? 'side' : clip.includes('back') ? 'back' : 'front');
+    if (!P.seat) return super.sit(clip, x, y, face, exit);
+    this.coreSeat = { exit };
+    this.sync();
+    return true;
+  }
+  private coreSeatStep(p: Pad) {
+    const P = this.core.P as unknown as { x: number; y: number; mode: string; seat: unknown };
+    if (!this.coreSeat) return;
+    if (P.mode === 'seat' && (p.pressed.has('interact') || p.pressed.has('sit') || p.pressed.has('jump'))) this.core.rise(false);
+    if (!P.seat && P.mode !== 'seatUp') { const e = this.coreSeat.exit; this.coreSeat = null; P.x = e.x; P.y = e.y; this.sync(); }
+  }
+
   private input(p: Pad) {
     const names = this.heldNames;
     names.clear();
@@ -263,6 +283,8 @@ export class Room3Player extends Player {
     this.wantItem = p.pressed.has('item1') ? 1 : p.pressed.has('item2') ? 2 : p.pressed.has('item3') ? 3 : p.pressed.has('item4') ? 4 : 0;
     if (this.comboClock > 0 && --this.comboClock === 0) this.combo = 0;
     this.statusStep(world, 1 / 30);
+    this.coreSeatStep(p);
+    if (this.coreSeat) { this.heldNames.clear(); this.core.frameView({ x0: w.camX, lane: w.lane }); this.sync(); return; } // 앉아 있는 동안은 일어나기만
     if (this.phase !== 'down') this.input(p); // 쓰러지면 후송을 기다린다
     this.core.frameView({ x0: w.camX, lane: w.lane });
     this.sync();

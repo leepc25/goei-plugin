@@ -1,0 +1,156 @@
+[
+{
+"key": "1.1_쟈알디",
+"name": "쟈알디",
+"num": "1.1",
+"pack": "char-1.1",
+"color": "#C8283C",
+"dir": "W",
+"armed": true,
+"npc": false,
+"kb": 1423
+},
+{
+"key": "1.2_스팡달",
+"name": "스팡달",
+"num": "1.2",
+"pack": "char-1.2",
+"color": "#7A3FB0",
+"dir": "W",
+"armed": false,
+"npc": false,
+"kb": 1299
+},
+{
+"key": "1.3_잼트리",
+"name": "잼트리",
+"num": "1.3",
+"pack": "char-1.3",
+"color": "#6E9A3C",
+"dir": "E",
+"armed": false,
+"npc": false,
+"kb": 1596
+},
+{
+"key": "1.4_에일린",
+"name": "에일린",
+"num": "1.4",
+"pack": "char-1.4",
+"color": "#CFC7A6",
+"dir": "E",
+"armed": true,
+"npc": false,
+"kb": 1647
+},
+{
+"key": "1.5_고그니쟈",
+"name": "고그니쟈",
+"num": "1.5",
+"pack": "char-1.5",
+"color": "#E8D23A",
+"dir": "E",
+"armed": true,
+"npc": false,
+"kb": 2343
+},
+{
+"key": "1.6_큐라스",
+"name": "큐라스",
+"num": "1.6",
+"pack": "char-1.6",
+"color": "#8FE36A",
+"dir": "E",
+"armed": false,
+"npc": false,
+"kb": 1452
+},
+{
+"key": "1.7_고르고디오",
+"name": "고르고디오",
+"num": "1.7",
+"pack": "char-1.7",
+"color": "#2F6BFF",
+"dir": "E",
+"armed": true,
+"npc": false,
+"kb": 1991
+},
+{
+"key": "1.8_데쥬레",
+"name": "데쥬레",
+"num": "1.8",
+"pack": "char-1.8",
+"color": "#FF7EB6",
+"dir": "E",
+"armed": true,
+"npc": false,
+"kb": 1440
+},
+{
+"key": "1.9_데드폴",
+"name": "데드폴",
+"num": "1.9",
+"pack": "char-1.9",
+"color": "#3A4C8C",
+"dir": "E",
+"armed": true,
+"npc": false,
+"kb": 1434
+},
+{
+"key": "1.10_게슈간",
+"name": "게슈간",
+"num": "1.10",
+"pack": "char-1.10",
+"color": "#6EC6FF",
+"dir": "E",
+"armed": false,
+"npc": false,
+"kb": 1622
+},
+{
+"key": "1.11_로제몬",
+"name": "로제몬",
+"num": "1.11",
+"pack": "char-1.11",
+"color": "#B04FD0",
+"dir": "W",
+"armed": false,
+"npc": false,
+"kb": 1579
+},
+{
+"key": "1.12_콘쥬스",
+"name": "콘쥬스",
+"num": "1.12",
+"pack": "char-1.12",
+"color": "#FF5FA2",
+"dir": "W",
+"armed": false,
+"npc": false,
+"kb": 1591
+},
+{
+"key": "2.1_사장",
+"name": "사장",
+"num": "2.1",
+"pack": "char-2.1",
+"color": "#8A8A96",
+"dir": "E",
+"armed": false,
+"npc": false,
+"kb": 1429
+},
+{
+"key": "2.2_도필헌",
+"name": "도필헌",
+"num": "2.2",
+"pack": "char-2.2",
+"color": "#B08A4E",
+"dir": "E",
+"armed": false,
+"npc": false,
+"kb": 1573
+}
+]
