@@ -158,7 +158,7 @@
 .gw .gw-basepage .dir-add input { flex: 1; min-width: 0; }
 
 /* ── 조작: 전부 같은 높이·모서리·선·글자 ── */
-.gw .gx-mini, .gw .gx-chip, .gw .gw-pre, .gw .gx-select, .gw select, .gw .gx-segs, .gw .adv-step, .gw .st-step, .gw .ph-tool, .gw .adv-num,
+.gw .gx-mini, .gw .gx-chip, .gw .gw-pre, .gw .gx-select, .gw select, .gw .gx-segs, .gw .adv-step, .gw .st-step, .gw .ph-tool:not(.ph-tools > .ph-tool), .gw .adv-num,
 .gw input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="file"]):not([type="hidden"]) { height: var(--h); min-height: var(--h); max-height: var(--h); margin: 0; padding: 0 12px; border: 1px solid var(--line); border-radius: var(--r); background: var(--void); color: var(--text); font: inherit; font-size: 13px; font-weight: 500; line-height: 1; vertical-align: middle; }
 .gw input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="file"]):not([type="hidden"])::placeholder { color: var(--dim); }
 .gw input:focus, .gw select:focus, .gw textarea:focus { outline: none; border-color: var(--signal); }
@@ -337,7 +337,7 @@
   .gw-win > .gw-phead .gx-head-act > .gx-x { width: 40px; height: 40px; }
   .gw-win > .ph-drawer { grid-area: drawer; margin: 0; }
   .gw-win > .ph-drawer .ph-tools { grid-template-columns: repeat(4, minmax(0, 1fr)); }
-  .gw-win > .ph-drawer .ph-tool { width: auto; height: 44px; border: 0; border-radius: 12px; background: none; }
+  /* 서랍 단추는 본 창 서랍(.ph-drawer .ph-tools .ph-tool)과 같은 규칙을 그대로 (입력칸 규칙에서 뺐다) */
   .gw-win > .ph-drawer .ph-tool[aria-pressed="true"] { background: var(--accent-bg); color: var(--signal); }
   .gw-win > .gw-nav { grid-area: nav; position: static; border: 0; border-top: 1px solid var(--panel2); background: var(--void); }
   .gw-win.phone .gw-tree { top: var(--gw-top-h, 60px); }

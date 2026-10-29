@@ -143,8 +143,8 @@ export function targetMark(on: boolean, action: string, value: string, btn = fal
 export function aimMark(on: boolean, action: string, value: string): string {
   const label = on ? '목표 해제' : '목표로 지정';
   return `<button class="gx-aim${on ? ' on' : ''}" data-action="${action}" data-value="${esc(value)}" aria-pressed="${on}" title="${label}" aria-label="${label}">
-    <svg viewBox="0 0 100 100" aria-hidden="true"><circle class="r1" cx="50" cy="50" r="42"/><circle class="r2" cx="50" cy="50" r="24"/><path class="tk" d="M50 2v16M50 82v16M2 50h16M82 50h16"/><circle class="dot" cx="50" cy="50" r="4"/></svg>
-    <span class="gx-aim-l">${on ? '목표' : '목표 지정'}</span></button>`;
+    <svg viewBox="0 0 100 100" aria-hidden="true"><g class="rot"><circle class="orb" cx="50" cy="50" r="46"/><path class="tick" d="M50 1v6M50 93v6M1 50h6M93 50h6M15.4 15.4l4.2 4.2M80.4 80.4l4.2 4.2M84.6 15.4l-4.2 4.2M19.6 80.4l-4.2 4.2"/></g><circle class="ring" cx="50" cy="50" r="34"/><path class="arm" d="M50 12v12M50 76v12M12 50h12M76 50h12"/><path class="brk" d="M32 24h-8v8M68 24h8v8M32 76h-8v-8M68 76h8v-8"/><circle class="dot" cx="50" cy="50" r="3.5"/></svg>
+    <span class="gx-aim-l">${on ? '목표 고정' : '목표 지정'}</span></button>`;
 }
 
 /** 상세 창 (상황판·임무 탭 공통, 창 맨 위에 하나): 상황판 CCTV와 같은 화면·효과 (2026-10-21 사용자). 가로 600px, 세로는 상황판 CCTV 비율.
