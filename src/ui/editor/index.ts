@@ -454,6 +454,8 @@ function body(ctx: ChatContext): string {
   return installPage(ctx);
 }
 
+let lastDrawn = '';
+
 export function render(): void {
   if (!root || !edUi.open || !host) return;
   const ctx = host.ctx();
@@ -471,6 +473,16 @@ export function render(): void {
   const tabs = TABS.map(([id, label, icon]) => `<button class="gw-tab${tab === id ? ' on' : ''}" role="tab" aria-selected="${tab === id}" data-action="ed-tab" data-value="${id}">${icon}<span>${label}</span></button>`).join('');
   const dirty = anyDirty();
   // 머리는 유령 아이콘 + 「설정」만 (2026-10-29 사용자: 봇 이름·현재 채팅·「바꾸면 바로 저장」 글귀는 지저분함)
+  // 다시 그려도 보던 자리를 지킨다 (2026-10-29 사용자: 값 하나 바꿀 때마다 맨 위로 튕겼다). 같은 화면(노드)일 때만 — 다른 화면으로 가면 맨 위부터
+  const KEEP = ['.gw-body', '.gw-tree', '.gw-list', '.nw-groups'];
+  const sameNode = lastDrawn === edUi.node;
+  const keep = sameNode ? KEEP.map((q) => root!.querySelector<HTMLElement>(q)?.scrollTop ?? 0) : [];
+  const act = document.activeElement as HTMLInputElement | null;
+  const focusSel = sameNode && act && root.contains(act) && (act.dataset?.input || act.dataset?.change || act.getAttribute('name'))
+    ? `${act.tagName.toLowerCase()}${act.dataset?.input ? `[data-input="${CSS.escape(act.dataset.input)}"]` : act.dataset?.change ? `[data-change="${CSS.escape(act.dataset.change)}"]` : `[name="${CSS.escape(act.getAttribute('name')!)}"]`}${act.dataset?.key ? `[data-key="${CSS.escape(act.dataset.key)}"]` : ''}`
+    : '';
+  const caret = focusSel && typeof act!.selectionStart === 'number' ? [act!.selectionStart, act!.selectionEnd ?? act!.selectionStart] : null;
+  lastDrawn = edUi.node;
   root.innerHTML = `<div class="gw-win${edUi.drawer ? ' drawer' : ''}">
     <header class="gw-top">
       <button class="gx-x gw-menu" data-action="ed-drawer" aria-label="메뉴">${ICONS.list}</button>
@@ -483,6 +495,14 @@ export function render(): void {
     ${confirm}
   </div>`;
   labelSwitches(root);
+  if (keep.length) KEEP.forEach((q, i) => { const el = root!.querySelector<HTMLElement>(q); if (el && keep[i]) el.scrollTop = keep[i]; });
+  if (focusSel) {
+    const el = [...root.querySelectorAll<HTMLInputElement>(focusSel)].find((x) => x.offsetParent);
+    if (el) {
+      el.focus({ preventScroll: true });
+      if (caret) try { el.setSelectionRange(caret[0], caret[1]); } catch { /* 커서를 못 두는 칸 */ }
+    }
+  }
 }
 
 const env = { render: () => render(), refresh: async () => { await host?.refresh(); render(); } };

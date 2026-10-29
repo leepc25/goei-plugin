@@ -138,6 +138,15 @@ export function targetMark(on: boolean, action: string, value: string, btn = fal
   return `<button class="${btn ? 'gx-evbtn ' : ''}gx-tgt${on ? ' on' : ''}" data-action="${action}" data-value="${esc(value)}" aria-pressed="${on}" title="${on ? '목표 해제' : '목표로 지정'}" aria-label="${on ? '목표 해제' : '목표로 지정'}">${TGT}${btn ? '' : `<span>${on ? '해제' : '선택'}</span>`}</button>`;
 }
 
+/** 카드 가운데 선택 과녁 (2026-10-29 사용자: 제목 옆 작은 표식은 누르기 어렵고 눈에 안 띈다 → FPS 조준점처럼 크고 반투명하게, 누르면 잠금 효과).
+ *  상황판 CCTV·임무 상세·커스텀 임무 카드가 같은 것을 쓴다. 안 고름: 흐린 조준점 「목표 지정」 / 고름: 민트 잠금 「목표」. 다시 누르면 해제 */
+export function aimMark(on: boolean, action: string, value: string): string {
+  const label = on ? '목표 해제' : '목표로 지정';
+  return `<button class="gx-aim${on ? ' on' : ''}" data-action="${action}" data-value="${esc(value)}" aria-pressed="${on}" title="${label}" aria-label="${label}">
+    <svg viewBox="0 0 100 100" aria-hidden="true"><circle class="r1" cx="50" cy="50" r="42"/><circle class="r2" cx="50" cy="50" r="24"/><path class="tk" d="M50 2v16M50 82v16M2 50h16M82 50h16"/><circle class="dot" cx="50" cy="50" r="4"/></svg>
+    <span class="gx-aim-l">${on ? '목표' : '목표 지정'}</span></button>`;
+}
+
 /** 상세 창 (상황판·임무 탭 공통, 창 맨 위에 하나): 상황판 CCTV와 같은 화면·효과 (2026-10-21 사용자). 가로 600px, 세로는 상황판 CCTV 비율.
  *  종료는 오른쪽 위 한 곳에만. 닫기는 바깥 누르기·Esc·뒤로 */
 export function evPopup(clock = ''): string {
@@ -246,8 +255,9 @@ const SKY = '<i class="gx-opfx sky" aria-hidden="true"><i class="c2"></i><i clas
 const SHADE = '<svg viewBox="0 0 100 140" preserveAspectRatio="none" aria-hidden="true"><path d="M50 2c17 0 27 14 27 33 0 14-5 25-12 31 20 6 35 22 35 50v24H0v-24c0-28 15-44 35-50-7-6-12-17-12-31C23 16 33 2 50 2z"/></svg>';
 const FX = `<i class="gx-oplost" aria-hidden="true"><b>SIGNAL LOST</b></i><i class="gx-opshade" aria-hidden="true">${SHADE}</i>`;
 
-function opsPick(c: OpsCard | undefined): string {
-  return c?.key && !c.ended ? targetMark(!!c.selected, 'pick-event', c.key, true) : '';
+function opsPick(_c: OpsCard | undefined): string {
+  // 상세 창 단추줄의 목표 단추는 카드 가운데 과녁(aimMark)으로 옮겼다
+  return '';
 }
 
 function opsFeed(c: OpsCard | undefined, clock: string, empty: string): string {
@@ -271,8 +281,9 @@ function feedView(c: EvCard, clock: string, cls = ''): string {
   const tear = c.art?.pic && !c.ended ? `<i class="gx-optear" aria-hidden="true" style="--pic:url('${esc(c.art.pic)}')"><i></i><i></i></i>` : '';
   const fxkey = ` data-fxkey="${esc(`${cls ? 'pop' : 'board'}:${c.key ?? c.name}`)}"`;
   return `<div class="gx-opview feed k-${c.kind}${c.ended ? ' ended' : ''}${cls}"${grade}${fxkey}>${pic}${tear}${STATIC}${c.ended ? '' : FX}
+    ${c.key && !c.ended ? aimMark(!!c.selected, 'pick-event', c.key) : ''}
     <div class="gx-opbar">${osd(`<span class="rec"><i></i>${c.ended ? 'END' : 'REC'}</span>`, cam, clock)}<span class="gx-evart-act">${btns}</span></div>
-    <div class="gx-opcap"><span class="gx-evart-l1">${gradeMark(c)}<b>${name}</b>${c.key && !c.ended ? targetMark(!!c.selected, 'pick-event', c.key) : ''}${c.ended && c.mine ? '<span class="gx-badge live gx-minetag">내가 출동</span>' : ''}</span>${whoLine(c.chips)}<span class="gx-evart-l2"><small>${c.loc}</small>${statusNote(c)}</span>${c.extra ?? ''}${desc}</div>
+    <div class="gx-opcap"><span class="gx-evart-l1">${gradeMark(c)}<b>${name}</b>${c.ended && c.mine ? '<span class="gx-badge live gx-minetag">내가 출동</span>' : ''}</span>${whoLine(c.chips)}<span class="gx-evart-l2"><small>${c.loc}</small>${statusNote(c)}</span>${c.extra ?? ''}${desc}</div>
   </div>`;
 }
 

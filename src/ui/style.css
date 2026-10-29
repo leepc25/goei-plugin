@@ -2543,6 +2543,23 @@ button.mk-go:hover { color: var(--signal); }
   .gx-map .gx-canvas:not(.ph) > .gx-mapzoom { width: 100%; }
   .gx-map .gx-mapimg { width: 100%; max-width: none; max-height: none; }
 }
+/* 카드 가운데 선택 과녁 (evcard.ts aimMark, 2026-10-29): 크고 반투명, 누르면 잠금 효과. 카드(.gx-opview·.gx-mx-art)는 position: relative */
+.gx-aim { position: absolute; left: 50%; top: 50%; z-index: 3; display: flex; flex-direction: column; align-items: center; gap: 2px; width: 112px; height: 112px; padding: 0; border: 0; background: none; color: rgba(255, 255, 255, .72); transform: translate(-50%, -50%); cursor: pointer; filter: drop-shadow(0 1px 3px rgba(0, 0, 0, .9)); transition: color .15s ease, opacity .15s ease; }
+.gx-aim svg { width: 88px; height: 88px; fill: none; stroke: currentColor; stroke-width: 2.6; }
+.gx-aim .r1 { stroke-dasharray: 6 5; opacity: .75; }
+.gx-aim .r2 { opacity: .9; }
+.gx-aim .dot { fill: currentColor; stroke: none; opacity: .5; }
+.gx-aim-l { font-size: 11px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; text-shadow: 0 1px 3px rgba(0, 0, 0, .9); }
+.gx-aim:hover { color: rgba(255, 255, 255, .95); }
+.gx-aim:active svg { transform: scale(.92); }
+.gx-aim.on { color: #5EEAD4; }
+.gx-aim.on .r1 { stroke-dasharray: none; opacity: 1; animation: gx-aim-lock .45s cubic-bezier(.2, .9, .3, 1.2); }
+.gx-aim.on .r2 { animation: gx-aim-lock2 .45s ease-out; }
+.gx-aim.on .dot { fill: #ff3b30; opacity: 1; }
+.gx-aim.on .tk { stroke-width: 3; }
+@keyframes gx-aim-lock { from { transform: scale(1.6); transform-origin: 50% 50%; opacity: 0; } to { transform: scale(1); opacity: 1; } }
+@keyframes gx-aim-lock2 { from { transform: scale(.4); transform-origin: 50% 50%; opacity: 0; } to { transform: scale(1); opacity: .9; } }
+@media (prefers-reduced-motion: reduce) { .gx-aim.on .r1, .gx-aim.on .r2 { animation: none; } }
 /* 목표 표식 (2026-10-21 사용자: 제목 바로 오른쪽, 이질감 없이). 상태 딱지처럼 고정폭 글자·각진 테두리.
    안 고름: 흐린 점선 「목표 지정」 / 고름: 민트 「목표」. 제목은 한 줄, 길면 말줄임 (표식은 줄지 않는다) */
 .gx-tgt { flex: none; display: inline-flex; align-items: center; gap: 3px; height: 20px; margin: 0 0 0 2px; padding: 0 2px; border: 0; border-radius: 3px; background: none; color: rgba(255, 255, 255, .55); font: 700 11px/1 var(--mono); letter-spacing: .04em; text-shadow: 0 1px 2px rgba(0, 0, 0, .8); cursor: pointer; transition: color .15s; }

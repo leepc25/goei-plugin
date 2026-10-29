@@ -18,7 +18,7 @@ import { updateChat, type CharacterSnapshot, type ChatContext } from '../host/ri
 import { noticeClass, sendNow } from '../host/send';
 import { markUnsent } from '../host/unsent';
 import { ICONS } from './icons';
-import { elapsedText, endedCard, evCard, peopleChips, targetMark } from './evcard';
+import { elapsedText, endedCard, evCard, peopleChips, aimMark, } from './evcard';
 import { agentInner, stLabel } from './images';
 import { agentContact } from './phone';
 import { mapZoomControls } from './mapzoom';
@@ -519,11 +519,11 @@ export function missionList(ctx: ChatContext, opening = false): string {
       return `<li class="gx-ev gx-mx${sel ? ' sel' : ''}${wikiBtn ? ' has-wiki' : ''}"><button class="gx-mx-art k-${kind}${art.pic ? '' : ' none'}" data-action="mission-open" data-value="${val}" aria-expanded="false"${bg}>
         ${status ? `<span class="gx-evart-top">${status}</span>` : ''}<span class="gx-evart-cap">${cap}</span></button>${wikiBtn}</li>`;
     }
-    // 선택 단추는 임무 상세 창처럼 오른쪽 위 단추 줄 맨 앞 (2026-10-21 사용자)
-    const mark = sel ? targetMark(true, 'mission-unpick', '') : targetMark(false, 'mission-pick', val);
+    // 선택은 카드 가운데 큰 과녁 (2026-10-29 사용자, evcard aimMark). 펼친 카드에만
+    const aim = sel ? aimMark(true, 'mission-unpick', '') : aimMark(false, 'mission-pick', val);
     return `<li class="gx-ev gx-mx open${sel ? ' sel' : ''}"><div class="gx-mx-art k-${kind}${art.pic ? '' : ' none'}" data-action="mission-open" data-value="${val}"${bg}>
-      <span class="gx-evart-top">${status}<span class="gx-evart-act"><button class="gx-evbtn" data-action="mission-open" data-value="${val}" aria-label="접기" title="접기">${ICONS.up}</button>${wikiBtn}</span></span>
-      <span class="gx-evart-cap">${capOpen(mark)}${art.desc ? `<span class="gx-evc-desc">${esc(art.desc)}</span>` : ''}</span></div></li>`;
+      ${aim}<span class="gx-evart-top">${status}<span class="gx-evart-act"><button class="gx-evbtn" data-action="mission-open" data-value="${val}" aria-label="접기" title="접기">${ICONS.up}</button>${wikiBtn}</span></span>
+      <span class="gx-evart-cap">${capOpen('')}${art.desc ? `<span class="gx-evc-desc">${esc(art.desc)}</span>` : ''}</span></div></li>`;
   };
   const hit = (r: { name: string; sub: string }) => `${r.name} ${r.sub}`.toLowerCase().includes(q);
   if (!q) {
