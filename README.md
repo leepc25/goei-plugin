@@ -12,6 +12,7 @@ RisuAI용 괴담 시뮬레이션 「괴이 ː ANOMALY」의 전용 플러그인�
 
 플러그인 파일(`goei-plugin.js`)은 괴이 카드인지 확인하는 작은 시작기입니다. Risu는 켜진 플러그인을 모든 봇에서 읽으므로,
 기능 전체(본체)는 괴이 카드를 열 때만 꺼내 씁니다. 본체는 Risu 플러그인 저장소에 두고, 플러그인을 업데이트하면 맞는 판을 다시 받습니다.
+세계 자료(요원·조직·괴이 기록, `goei-data-world.N.txt`)는 본체가 처음 뜰 때 받아 저장소에 두고, 설치 자료(`goei-data-install.N.txt`)는 설치·점검 때만 받습니다.
 게임 코드(`game/goei-game.N.txt`)와 게임 그림 팩(`game/*.pack`)도 게임을 처음 열 때만 받습니다.
 
 ## 업데이트
@@ -23,8 +24,8 @@ RisuAI용 괴담 시뮬레이션 「괴이 ː ANOMALY」의 전용 플러그인�
 
 - 게임 본체: [구조](src/game/action/README.md). 플러그인 게임 창에서 열고, 단일 HTML 시연판은 `release/demo/`에 있습니다.
 - 게임 기획: [관리국 괴이 탐사 게임 상세 기획서](docs/관리국_괴이탐사_게임_상세기획서.md). 기존 관찰형 순찰에서 1인 벨트스크롤 탐사형으로 확장하기 위한 설계 초안이며, 현재 구현 범위와는 구분합니다.
-- `npm run build`: `dist/goei-plugin.js`(시작기, `src/main.ts`), `dist/goei-body.js`(본체, `src/body.ts`)와 받기용 조각 `dist/goei-body.json`·`goei-body.N.txt`, 게임 코드·그림 팩(`dist/game/`). 원본 카드가 있으면 실제 카드 시험용 `dist-test/real-module.json`도 풉니다.
-- 릴리스 때 `release/`에 `goei-plugin.js`와 함께 `goei-body.json`·`goei-body.*.txt`도 복사합니다. 시작기는 자기 판과 같은 본체만 받습니다.
+- `npm run build`: `dist/goei-plugin.js`(시작기, `src/main.ts`), `dist/goei-body.js`(본체, `src/body.ts`)와 받기용 조각 `dist/goei-body.json`·`goei-body.N.txt`, 자료 팩 `dist/goei-data-world.*`·`goei-data-install.*`(`scripts/data-pack.mjs`), 게임 코드·그림 팩(`dist/game/`). 원본 카드가 있으면 실제 카드 시험용 `dist-test/real-module.json`도 풉니다.
+- 릴리스 때 `release/`에 `goei-plugin.js`와 함께 `goei-body.json`·`goei-body.*.txt`, `goei-data-world.*`·`goei-data-install.*`도 복사합니다. 시작기는 자기 판과 같은 본체만 받고, 본체는 자기에게 박힌 지문과 같은 자료 팩만 씁니다.
 - 시작기는 Risu 플러그인 칸의 nonce를 붙인 `<script>`로 본체를 실행합니다(그 칸은 eval·blob이 막혀 있음). 시험: `tests/browser.mjs`의 「시작기」.
 - 카드 사진: `tools/build_lite_card.py`가 카드 사진마다 [이름, 지문, 확장자, 크기]를 매니페스트(`pictures`)에 적고 사진 파일을 결과 폴더의 `pic/지문.확장자`로 씁니다. 릴리스 때 `release/pic/`도 함께 올리면, 창의 카드 업데이트가 지문이 바뀐 카드 사진과 새 사진만 받아 바꿉니다(`src/host/picpack.ts`). 다 받지 못하면 카드도 바꾸지 않습니다.
 - 지도: `assets/maps/`의 1100px·AVIF 품질 50 지도로 원본 지도(1402px)를 바꿔 넣습니다.
