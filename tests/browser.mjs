@@ -3152,11 +3152,13 @@ if (fixture.globalLore.some(packed)) {
   await page.click('.gx-rpt [data-action="rec-back"]');
   await page.waitForSelector('.gx-rcard');
   await noOverflow('폰 보고서 목록');
-  await page.click('[data-action="rec-sub"][data-value="journal"]');
+  // 폰은 하위 탭 줄 대신 아래 숨은 서랍(일지·보고서·인물·세력, 2026-10-29 사용자)
+  await page.click('.gx-rdrawer .ph-grip');
+  const tabW = await page.$$eval('.gx-rdrawer .ph-tool[data-action="rec-sub"]', (l) => l.map((b) => b.getBoundingClientRect().width));
+  assert.ok(tabW.length === 4 && Math.max(...tabW) - Math.min(...tabW) <= 1, `폰 서랍 네 칸 같은 너비 (${tabW.join(',')})`);
+  await page.click('.gx-rdrawer [data-action="rec-sub"][data-value="journal"]');
   await page.waitForSelector('.gx-jr-row');
   await noOverflow('폰 일지');
-  const tabW = await page.$$eval('.gx-rec-tabs .ph-sub', (l) => l.map((b) => b.getBoundingClientRect().width));
-  assert.ok(Math.max(...tabW) - Math.min(...tabW) <= 1, `폰 하위 탭 같은 너비 (${tabW.join(',')})`);
   // 폰 머리 사원증 창의 잔고 줄 → 가계부
   await page.click('.gx-idbtn');
   await page.waitForSelector('.gx-idpop .gx-wallet');
