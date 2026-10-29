@@ -1918,5 +1918,21 @@
   "kind": "own",
   "mode": "center",
   "desc": "A spectral cavalry lance thrust: a thick ghostly cobalt-blue lance shape with a glowing cyan tip drives forward and bursts into a jagged cyan flash, blue light shards and pale blue mist streaming backward. Large and thick: about two character heights wide and half a character height tall. Fast, 8 frames. Colors: cobalt blue, cyan glow, white, pale blue mist. A standalone effect, not attached to any hand or character. Size reference only: the given character. Pixel art effect, transparent background, crisp hard-edged pixels, no blur, no background scenery. Draw only the effect: no people, no character body or hands, no creatures, monsters, animals, faces, letters or numbers. Absolutely no circles, no rings, no round shockwaves, no halo."
+ },
+ {
+  "name": "x3-1.4-F-tracer-storm",
+  "key": "1.4_에일린",
+  "row": "전용(10-29)",
+  "kind": "own",
+  "mode": "center",
+  "desc": "A finishing-move storm of rifle fire: dozens of bright white-gold tracer streaks fanning across the full width from left to right, each ending in a sharp orange impact burst with flying sparks and brass casings tumbling. Huge: about four character heights wide. Dramatic, 10 frames. Colors: white, pale gold, orange, brass. A standalone effect, not attached to any hand or character. Size reference only: the given character. Pixel art effect, transparent background, crisp hard-edged pixels, no blur, no background scenery. Draw only the effect: no people, no character body or hands, no creatures, monsters, animals, faces, letters or numbers. Absolutely no circles, no concentric rings, no round shockwaves, no halo."
+ },
+ {
+  "name": "x3-1.7-F-wall-breach",
+  "key": "1.7_고르고디오",
+  "row": "전용(10-29)",
+  "kind": "own",
+  "mode": "center",
+  "desc": "A breakthrough charge finisher: a thick wall of grey concrete slabs shatters outward from the center in big square chunks with cobalt blue booster flames blasting through the gap, dust and debris streaming sideways. Huge: about four character heights wide. 10 frames. Colors: cobalt blue, grey concrete, white, dark dust. A standalone effect, not attached to any hand or character. Size reference only: the given character. Pixel art effect, transparent background, crisp hard-edged pixels, no blur, no background scenery. Draw only the effect: no people, no character body or hands, no creatures, monsters, animals, faces, letters or numbers. Absolutely no circles, no concentric rings, no round shockwaves, no halo."
  }
 ]
