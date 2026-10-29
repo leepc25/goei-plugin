@@ -560,6 +560,82 @@ for (const [send, show, keepTags, when] of [[0, 0, 4, false], [2, 1, 1, true]]) 
   await page.close();
 }
 
+// ── 8) 요청 조립 단계가 하나씩 던져도(예외 주입 globalThis.__goeiFaultSteps) 요청은 나가고 플러그인 표식은 없다 (개선 나3 정책: 막지 않고 표식만 지움) ──
+{
+  const { page, errors, logs } = await boot(browser, fixture, { message: [], scriptstate: {} }, { fixtureDir });
+  const saved = await startChat(page, 'A00', 2);
+  const greeting = fixture.alternateGreetings[saved.fmIndex];
+  const MARKERS = ['%%SCENE_CARD:', '%%/SCENE_CARD%%', '%%PHONE_CALL:', '%%/PHONE_CALL%%', '%%GOEI_START%%', '%%/GOEI_START%%', '%%GOEI_UNSENT%%', '%%SEED%%', '%%/SEED%%'];
+  // 플러그인이 채팅에 남기는 표식을 모두 담은 원문 요청 (첫 전송이라 로어 단계가 시드 표식도 끼운다)
+  const raw = () => [
+    sys('SYSTEM PROMPT'),
+    bot(`${greeting}\n${STATUS}`),
+    usr(core.startRecord('시작 화면에서 적은 첫 상황')),
+    bot(`[AN|명일 아파트|발생] 괴이가 나타났다.\n[🔓|부록 하나]\n${STATUS2}`),
+    usr(`${core.sceneRecord({ target: '명일 아파트', party: '쟈알디' }, '{{user}} moves to 명일 아파트 with 쟈알디.')}\n추가 요청`),
+    usr(core.phone.callRecord('에일린', '지원 요청')),
+    usr(core.setUnsent('아직 안 보낸 글', true)),
+    usr('마지막 행동'),
+  ];
+  const leaked = (out) => out.filter((m) => typeof m.content === 'string' && MARKERS.some((k) => m.content.includes(k))).map((m) => m.content.slice(0, 60));
+  const setFault = (names) => page.evaluate((n) => { globalThis.__goeiFaultSteps = n; }, names);
+  const check = (out, name) => {
+    assert.ok(Array.isArray(out) && out.length >= 5, `요청이 나간다 (${out?.length})`);
+    assert.deepEqual(leaked(out), [], `${name}: 표식이 모델에 가지 않음`);
+    assert.equal([...out].reverse().find((m) => m.role === 'user')?.content, '마지막 행동', '마지막 사용자 메시지 유지');
+    assert.ok(out.some((m) => m.content.includes('{{user}} moves to 명일 아파트 with 쟈알디.')), '지시문 본문은 남음');
+    assert.ok(out.some((m) => m.content.includes('places a phone call to 에일린')), '전화 본문은 남음');
+    assert.ok(out.some((m) => m.content === '시작 화면에서 적은 첫 상황' || m.content.includes('시작 화면에서 적은 첫 상황')), '시작 카드 본문은 남음');
+    assert.ok(!out.some((m) => m.role === 'assistant' && (m.content.includes('[AN|') || m.content.includes('[🔓|'))), '지난 응답의 상황판 태그·해금 표시 없음');
+  };
+
+  await R.section('8-0 주입 없음: 표식 없음 · 실패 로그 없음 · 로어(시드 본문) 있음', async () => {
+    logs.length = 0;
+    const out = await request(page, raw());
+    check(out, '정상');
+    assert.ok(loreOf(out) && loreOf(out).content.includes('[Affiliation code: A00]'), '시드 본문은 들어감');
+    assert.ok(!logs.some((l) => l.includes('요청 조립 실패')), `실패 로그 없음: ${logs.join(' | ')}`);
+  });
+
+  // 단계 이름은 src/body.ts onBeforeRequest 의 step()/stepAsync() 이름. 「시드 채팅 읽기」는 채팅 읽기가 실패했고 요청에 시드 표식이 있을 때만 돈다
+  // (채팅을 못 읽으면 로어 단계가 시드를 끼우지 않으니, 원문에 시드 표식이 있는 경우로 — 옛 카드의 📕Start Lore 자리 항목 모양)
+  const STEPS = [['지시문·전화 풀기'], ['시작 카드 표식'], ['옛 이미지 태그'], ['채팅 읽기'], ['유저 이름'], ['기록 태그 정리'], ['로어'], ['주인공'], ['막간'], ['명부 다듬기'], ['참고 기록'], ['신분'], ['상태창 모양'], ['상태창'], ['인물 기록'], ['이미지 지침'], ['시드'], ['채팅 읽기', '시드 채팅 읽기']];
+  for (const names of STEPS) {
+    await R.section(`8-단계 「${names.join('·')}」 가 던져도 요청은 나가고 표식은 없다`, async () => {
+      await setFault(names);
+      logs.length = 0;
+      const out = await request(page, names.includes('시드 채팅 읽기') ? [sys(`${core.SEED_OPEN}\n시드 글\n${core.SEED_CLOSE}`), ...raw()] : raw());
+      check(out, names.join('·'));
+      const line = logs.find((l) => l.includes('[goei] 요청 조립 실패: 단계'));
+      assert.ok(line, `실패 로그 한 줄: ${logs.join(' | ')}`);
+      for (const n of names) assert.ok(line.includes(`${n}(시험용 예외 주입)`), `로그에 단계 이름 「${n}」: ${line}`);
+      assert.equal(logs.filter((l) => l.includes('요청 조립 실패')).length, 1, '모아서 한 줄');
+    });
+  }
+
+  await R.section('8-전체 본체 beforeRequest 가 통째로 던지면 시작기가 표식만 지워 보낸다', async () => {
+    await setFault(['beforeRequest']);
+    logs.length = 0;
+    const out = await request(page, raw());
+    assert.deepEqual(leaked(out), [], '표식 없음');
+    assert.equal(out.length, raw().length, '단계는 하나도 못 돌아 메시지 수는 원문과 같음');
+    assert.ok(out.some((m) => m.content.includes('{{user}} moves to 명일 아파트 with 쟈알디.')) && out.at(-1).content === '마지막 행동', '단계가 안 돌아 이미지 지침도 없음');
+    assert.ok(!out.some((m) => m.role === 'assistant' && m.content.includes('[AN|')), '괴이 카드라 지난 응답 상황판 태그도 지움');
+    assert.ok(logs.some((l) => l.includes('[goei] 요청 처리기 실패') && l.includes('시험용 예외 주입(beforeRequest)')), `시작기 로그: ${logs.join(' | ')}`);
+  });
+
+  await R.section('8-복구 주입을 끄면 다시 정상', async () => {
+    await setFault(null);
+    logs.length = 0;
+    const out = await request(page, raw());
+    check(out, '복구');
+    assert.ok(loreOf(out), '로어 덩어리');
+    assert.ok(!logs.some((l) => l.includes('요청 조립 실패') || l.includes('요청 처리기 실패')));
+  });
+  assert.deepEqual(errors, []);
+  await page.close();
+}
+
 await browser.close();
 console.log(`\n${R.results.length - R.failed()}/${R.results.length} 통과`);
 process.exit(R.failed() ? 1 : 0);

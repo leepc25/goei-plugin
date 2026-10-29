@@ -3,6 +3,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
+import { createHash } from 'node:crypto';
 
 const root = new URL('../', import.meta.url);
 const read = (p) => readFileSync(new URL(p, root), 'utf8');
@@ -36,10 +37,15 @@ test('본체 조각: 이어 붙이면 goei-body.js, 판·길이·지문이 맞�
   assert.equal(index.version, pkg.version);
   assert.match(body, new RegExp(`^// goei-body ${pkg.version.replace(/\./g, '\\.')}\\n`));
   assert.equal(index.hash, fnv(body), '목록의 hash = 본체 글 FNV-1a');
+  // sha256(개선 나2): 이어 붙인 본체 전체의 UTF-8 바이트, 소문자 hex 64자. 조각마다는 넣지 않는다
+  assert.match(index.sha256, /^[0-9a-f]{64}$/);
+  assert.equal(index.sha256, createHash('sha256').update(body, 'utf8').digest('hex'), '목록의 sha256 = 본체 UTF-8 sha256');
+  assert.deepEqual(Object.keys(index).sort(), ['hash', 'length', 'parts', 'sha256', 'version'], '목록 열쇠 (조각별 지문 없음)');
   // 글자 하나만 바뀌어도(길이 같음) 지문이 다르다 — 시작기가 길이만 보던 구멍
   const broken = body.slice(0, 1000) + (body[1000] === 'a' ? 'b' : 'a') + body.slice(1001);
   assert.equal(broken.length, body.length);
   assert.notEqual(fnv(broken), index.hash);
+  assert.notEqual(createHash('sha256').update(broken, 'utf8').digest('hex'), index.sha256);
 });
 
 test('게임 코드 조각: 이어 붙이면 goei-game.js', { skip: !existsSync(new URL('dist/game/goei-game.js', root)) }, () => {
@@ -90,6 +96,7 @@ test('release 폴더: 시작기·본체 조각·version.json·card-update.json �
   assert.equal(body.length, rel.length);
   assert.equal(/^\/\/ goei-body (\S+)/.exec(body)?.[1], ver, '본체 첫 줄의 판 = 시작기 판');
   if (typeof rel.hash === 'string') assert.equal(rel.hash, fnv(body));
+  if (typeof rel.sha256 === 'string') assert.equal(rel.sha256, createHash('sha256').update(body, 'utf8').digest('hex'));
   const v = JSON.parse(read('release/version.json'));
   assert.equal(v.plugin, ver);
   assert.equal(v.card, ver);

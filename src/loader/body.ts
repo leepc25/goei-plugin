@@ -69,7 +69,7 @@ async function getText(name: string): Promise<string> {
 /** 이 판의 본체를 조각으로 받아 붙인다 (Risu 웹 프록시는 1MB 넘는 파일을 못 받는다) */
 export async function fetchBody(version: string): Promise<string> {
   if (!BASE) throw new BodyError('받을 곳이 정해지지 않았어요.');
-  let index: { version?: unknown; parts?: unknown; length?: unknown; hash?: unknown } | null = null;
+  let index: { version?: unknown; parts?: unknown; length?: unknown; hash?: unknown; sha256?: unknown } | null = null;
   try {
     index = JSON.parse((await getText('goei-body.json')).replace(/^﻿/, ''));
   } catch {
@@ -83,7 +83,23 @@ export async function fetchBody(version: string): Promise<string> {
     code += await getText(name);
   }
   if (code.length !== index.length || bodyVersion(code) !== version) throw new BodyError('본체를 끝까지 받지 못했어요.');
-  // 지문이 있는 판(0.17.9~)은 글자까지 맞는지 본다. 옛 release 의 목록에는 지문이 없다
-  if (typeof index.hash === 'string' && bodyHash(code) !== index.hash) throw new BodyError('받은 본체가 깨져 있어요. 다시 받아 주세요.');
+  // 지문이 있는 판(0.17.9~)은 글자까지 맞는지 본다: crypto.subtle 이 있는 환경(보안 컨텍스트)이면 sha256(전체 UTF-8 바이트),
+  // 없으면 hash(UTF-16 FNV-1a). 둘 다 없는 옛 release 의 목록은 길이·판만 (호환). 불일치는 받기 창의 「다시 받기」로
+  const got = typeof index.sha256 === 'string' ? await sha256(code) : null;
+  if (got !== null) {
+    if (got !== index.sha256) throw new BodyError('받은 본체가 깨져 있어요(sha256). 다시 받아 주세요.');
+  } else if (typeof index.hash === 'string' && bodyHash(code) !== index.hash) throw new BodyError('받은 본체가 깨져 있어요(hash). 다시 받아 주세요.');
   return code;
+}
+
+/** 본체 전체의 sha256 (UTF-8 바이트, 소문자 hex). crypto.subtle 이 없거나(보안 컨텍스트 아님) 실패하면 null → 부르는 쪽이 hash 로 */
+export async function sha256(code: string): Promise<string | null> {
+  try {
+    const subtle = globalThis.crypto?.subtle;
+    if (!subtle) return null;
+    const d = await subtle.digest('SHA-256', new TextEncoder().encode(code));
+    return [...new Uint8Array(d)].map((b) => b.toString(16).padStart(2, '0')).join('');
+  } catch {
+    return null;
+  }
 }

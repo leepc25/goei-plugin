@@ -68,9 +68,11 @@ function textHash(text) {
   for (let i = 0; i < text.length; i++) h = Math.imul(h ^ text.charCodeAt(i), 0x01000193) >>> 0;
   return h.toString(16).padStart(8, '0');
 }
+// 목록: length(JS 글자 수) · hash(FNV-1a, crypto.subtle 이 없는 환경용) · sha256(이어 붙인 본체 전체의 UTF-8 바이트, 보안 컨텍스트에서 시작기가 본다. QC 개선 나2).
+// 조각마다 sha256 은 넣지 않는다: 시작기는 전체를 다시 받을 뿐 조각 단위 재시도가 없고, 받는 쪽 코드가 커진다 (docs/qc/09_개선_나_2_3.md)
 writeFileSync(
   'dist/goei-body.json',
-  JSON.stringify({ version: pkg.version, parts: partNames, length: bodyCode.length, hash: textHash(bodyCode) }) + '\n',
+  JSON.stringify({ version: pkg.version, parts: partNames, length: bodyCode.length, hash: textHash(bodyCode), sha256: createHash('sha256').update(bodyCode).digest('hex') }) + '\n',
 );
 
 // 게임 코드 팩: 게임 코드는 본체에 넣지 않고 따로 받는다 (src/host/game/code.ts, src/game/entry.ts).

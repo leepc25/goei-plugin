@@ -68,6 +68,7 @@ import { identityText } from './core/people/identity';
 import { extraNames, temperOf } from './core/people/base';
 import { requestPeopleUpdate, directorNoteText, factionNamesOf } from './host/people';
 import { bookText } from './core/refs';
+import { stripMarkers } from './core/sanitize';
 
 const PLUGIN_ID = 'goei-plugin';
 const WATCH_MS = 1000;
@@ -75,69 +76,102 @@ const WATCH_MS = 1000;
 /** 지금 보고 있는 캐릭터가 괴이봇 Lite인지 (감시 루프가 갱신). 다른 봇에서는 아무것도 하지 않기 위해 쓴다 */
 let liteNow = false;
 
+/** 시험용 예외 주입: 가짜 Risu 가 globalThis.__goeiFaultSteps 에 단계 이름 목록을 두면 그 단계가 던진다 (tests/qc-pipeline-browser.mjs). 실제 Risu 에는 없다 */
+const faultOn = (name: string): boolean => {
+  const g = (globalThis as { __goeiFaultSteps?: unknown }).__goeiFaultSteps;
+  return Array.isArray(g) && g.includes(name);
+};
+const reason = (e: unknown) => (e instanceof Error ? e.message : String(e));
+
+/**
+ * 본편 요청 조립. 정책(QC 개선 나3, 2026-10-29 · 사용자 확인 전): 어느 단계가 실패해도 요청은 막지 않는다. 그 단계는 건너뛰고(이전 모양 유지),
+ * 맨 끝의 정리 단계(core/sanitize.ts stripMarkers)가 플러그인 표식을 한 번 더 지워 모델이 표식 글자를 보지 않게 한다.
+ * 실패한 단계는 모아 한 줄 로그 `[goei] 요청 조립 실패: 단계 …` 로 남긴다. 이 함수는 던지지 않는다 (던지면 시작기 main.ts 가 sanitize 로 같은 처리)
+ */
 async function onBeforeRequest<M extends PromptMessage>(messages: M[], type: string): Promise<M[]> {
   if (type !== 'model' || !Array.isArray(messages)) return messages;
-  setWaiting(true);
-  setOpeningHint(null); // 첫 전송: 시작 메시지 안내는 이제 필요 없다
-  // 지시문·전화 표식은 이 봇에만 있으니 판정과 상관없이 벗긴다 (없으면 그대로)
-  messages = unwrapCalls(unwrapScenes(messages).messages).messages;
-  const marked = (t: unknown) => typeof t === 'string' && (t.includes(UNSENT_MARK) || t.includes(START_MARK));
-  if (messages.some((m) => marked(m?.content))) {
-    messages = messages.map((m) => (marked(m?.content) ? { ...m, content: stripStartCard(stripUnsentMark(m.content)) } : m));
-  }
-  // 오래된 메시지의 이미지 태그는 요청에서 뺀다 (원본 「🖼️에셋리퀘제거」)
-  if (liteNow || messages.some((m) => typeof m?.content === 'string' && imgTagsKnown(m.content, modulePicker()))) messages = stripOldImgTags(messages, getPrefs().imgSend ?? IMG_RECENT.def);
-  // 채팅·캐릭터는 요청마다 한 번만 읽어 모든 단계에 넘긴다 (QC 2026-10-28: 단계마다 따로 읽어 요청 하나에 채팅 9번·캐릭터 3번을 읽고 세계 로어를 3번 조립했다)
-  let ctx: ChatContext | null = null;
-  if (liteNow) {
-    ctx = await loadContext().catch(() => null);
-    // 유저 이름(상태창 지침·명부의 {{user}})은 채팅에 그려진 숨은 칸에서 읽는다. 새로고침 뒤 창을 열지 않고 보내면 비어 있다
-    await readUser().catch(() => undefined);
-    messages = stripHistoryTags(messages);
-    if (ctx) {
-      const c = ctx;
-      messages = safe(() => fixLore(messages, c), messages);
-      messages = await withPlayer(messages, c).catch((e) => safe(() => { throw e; }, messages));
-      messages = safe(() => withVisit(messages, c), messages);
-      messages = trimRoster(messages);
-      const mctx = safe(() => moduleContext(sceneText(messages), c), [] as string[]);
-      if (mctx.length) {
-        // 마지막 사용자 메시지 바로 앞에 (원본은 맨 끝). 모델이 이번 행동보다 참고 기록을 「지금 할 일」로 읽지 않게
-        const at = messages.map((m) => m?.role).lastIndexOf('user');
-        const add = mctx.map((t) => ({ role: 'system', content: t }) as M);
-        messages = at < 0 ? [...messages, ...add] : [...messages.slice(0, at), ...add, ...messages.slice(at)];
-      }
-      // 지난 응답의 상태창 줄은 지우고 마지막 한 줄만 직전 상태 블록으로 (core/statusctx.ts). 신분 칸이 빠졌으면 아는 값을 채운다
-      // 칸 구성(설정)대로 다시 만들고 잔고 칸은 장부 값으로 (core/world/statuscols.ts · core/wallet.ts)
-      messages = withStatusBlock(messages, safe(() => knownIdentity(c), ''), safe(() => statusShape(c), undefined));
-      // 장면 인물의 살아 있는 기록 (core/people). 절 단위 혼합이면 그 인물의 시트 원문은 빼고 기록으로 대신한다
-      messages = await withPeople(messages, c).catch((e) => safe(() => { throw e; }, messages));
-      // 이미지 태그 지침 (core/imgprompt): 카드 로어북 「Asset」 대신 설정으로 조립. 옛 카드의 로어북 본문이 남아 있으면 지운다
-      messages = safe(() => withImgPrompt(messages, c), messages);
+  if (faultOn('beforeRequest')) throw new Error('시험용 예외 주입(beforeRequest)');
+  const failed: string[] = [];
+  /** 한 단계: 던지면 이름·까닭을 모으고 fallback(= 그 단계 이전 모양) */
+  const step = <T>(name: string, run: () => T, fallback: T): T => {
+    try {
+      if (faultOn(name)) throw new Error('시험용 예외 주입');
+      return run();
+    } catch (error) {
+      failed.push(`${name}(${reason(error)})`);
+      return fallback;
     }
-  }
-  // 시드 표식이 없는 요청은 아무것도 읽지 않고 바로 돌려보낸다 (매 전송마다 드는 비용을 0에 가깝게).
-  if (!messages.some((m) => typeof m?.content === 'string' && m.content.includes(SEED_OPEN))) return messages;
+  };
+  const stepAsync = async <T>(name: string, run: () => Promise<T>, fallback: T): Promise<T> => {
+    try {
+      if (faultOn(name)) throw new Error('시험용 예외 주입');
+      return await run();
+    } catch (error) {
+      failed.push(`${name}(${reason(error)})`);
+      return fallback;
+    }
+  };
   try {
-    const chat = ctx?.chat ?? ((await risuai.getChatFromIndex(await risuai.getCurrentCharacterIndex(), await risuai.getCurrentChatIndex())) as Chat | null);
-    if (!chat) return messages;
-    // 요청 도중에는 채팅을 저장하지 않는다. 응답이 붙기 전에 채팅 객체를 바꾸면 응답이 사라질 수 있다.
-    // 남은 seed_lore 변수는 여기서 걸러지므로 두 번째 전송부터는 모델에 가지 않는다.
-    return processRequest(messages, chat).messages;
+    setWaiting(true);
+    setOpeningHint(null); // 첫 전송: 시작 메시지 안내는 이제 필요 없다
+    // 지시문·전화 표식은 이 봇에만 있으니 판정과 상관없이 벗긴다 (없으면 그대로)
+    messages = step('지시문·전화 풀기', () => unwrapCalls(unwrapScenes(messages).messages).messages, messages);
+    const marked = (t: unknown) => typeof t === 'string' && (t.includes(UNSENT_MARK) || t.includes(START_MARK));
+    if (messages.some((m) => marked(m?.content))) {
+      messages = step('시작 카드 표식', () => messages.map((m) => (marked(m?.content) ? { ...m, content: stripStartCard(stripUnsentMark(m.content)) } : m)), messages);
+    }
+    // 오래된 메시지의 이미지 태그는 요청에서 뺀다 (원본 「🖼️에셋리퀘제거」)
+    if (liteNow || messages.some((m) => typeof m?.content === 'string' && imgTagsKnown(m.content, modulePicker()))) {
+      messages = step('옛 이미지 태그', () => stripOldImgTags(messages, getPrefs().imgSend ?? IMG_RECENT.def), messages);
+    }
+    // 채팅·캐릭터는 요청마다 한 번만 읽어 모든 단계에 넘긴다 (QC 2026-10-28: 단계마다 따로 읽어 요청 하나에 채팅 9번·캐릭터 3번을 읽고 세계 로어를 3번 조립했다)
+    let ctx: ChatContext | null = null;
+    if (liteNow) {
+      ctx = await stepAsync('채팅 읽기', () => loadContext(), null);
+      // 유저 이름(상태창 지침·명부의 {{user}})은 채팅에 그려진 숨은 칸에서 읽는다. 새로고침 뒤 창을 열지 않고 보내면 비어 있다
+      await stepAsync('유저 이름', () => readUser(), undefined);
+      messages = step('기록 태그 정리', () => stripHistoryTags(messages), messages);
+      if (ctx) {
+        const c = ctx;
+        messages = step('로어', () => fixLore(messages, c), messages);
+        messages = await stepAsync('주인공', () => withPlayer(messages, c), messages);
+        messages = step('막간', () => withVisit(messages, c), messages);
+        messages = step('명부 다듬기', () => trimRoster(messages), messages);
+        const mctx = step('참고 기록', () => moduleContext(sceneText(messages), c), [] as string[]);
+        if (mctx.length) {
+          // 마지막 사용자 메시지 바로 앞에 (원본은 맨 끝). 모델이 이번 행동보다 참고 기록을 「지금 할 일」로 읽지 않게
+          const at = messages.map((m) => m?.role).lastIndexOf('user');
+          const add = mctx.map((t) => ({ role: 'system', content: t }) as M);
+          messages = at < 0 ? [...messages, ...add] : [...messages.slice(0, at), ...add, ...messages.slice(at)];
+        }
+        // 지난 응답의 상태창 줄은 지우고 마지막 한 줄만 직전 상태 블록으로 (core/statusctx.ts). 신분 칸이 빠졌으면 아는 값을 채운다
+        // 칸 구성(설정)대로 다시 만들고 잔고 칸은 장부 값으로 (core/world/statuscols.ts · core/wallet.ts)
+        messages = step('상태창', () => withStatusBlock(messages, step('신분', () => knownIdentity(c), ''), step('상태창 모양', () => statusShape(c), undefined)), messages);
+        // 장면 인물의 살아 있는 기록 (core/people). 절 단위 혼합이면 그 인물의 시트 원문은 빼고 기록으로 대신한다
+        messages = await stepAsync('인물 기록', () => withPeople(messages, c), messages);
+        // 이미지 태그 지침 (core/imgprompt): 카드 로어북 「Asset」 대신 설정으로 조립. 옛 카드의 로어북 본문이 남아 있으면 지운다
+        messages = step('이미지 지침', () => withImgPrompt(messages, c), messages);
+      }
+    }
+    // 시드 표식이 있는 요청만 (첫 전송·그 리롤): 수명대로 표식을 떼거나 블록을 지운다. 없으면 아무것도 읽지 않는다 (매 전송마다 드는 비용을 0에 가깝게)
+    if (messages.some((m) => typeof m?.content === 'string' && m.content.includes(SEED_OPEN))) {
+      // 요청 도중에는 채팅을 저장하지 않는다. 응답이 붙기 전에 채팅 객체를 바꾸면 응답이 사라질 수 있다.
+      // 남은 seed_lore 변수는 여기서 걸러지므로 두 번째 전송부터는 모델에 가지 않는다.
+      const chat = ctx?.chat ?? (await stepAsync('시드 채팅 읽기', async () => (await risuai.getChatFromIndex(await risuai.getCurrentCharacterIndex(), await risuai.getCurrentChatIndex())) as Chat | null, null));
+      if (chat) messages = step('시드', () => processRequest(messages, chat).messages, messages);
+    }
   } catch (error) {
-    console.log(`[goei] beforeRequest 실패: ${error instanceof Error ? error.message : String(error)}`);
-    return messages;
+    // 단계 밖(끼우기·판정)에서 던진 것. 마지막으로 성공한 모양을 그대로 쓴다
+    failed.push(`전체(${reason(error)})`);
   }
+  if (failed.length) console.log(`[goei] 요청 조립 실패: 단계 ${failed.join(' · ')} — 그 단계는 건너뛰고 표식만 지워 보냅니다`);
+  // 마지막 정리: 어느 단계가 실패했어도 플러그인 표식은 모델에 가지 않게 (정상이면 이미 지워져 있어 바뀌는 것이 없다)
+  return sanitize(messages);
 }
 
-/** 한 단계가 실패해도 요청은 그대로 나간다 (예외는 기록만) */
-function safe<T>(run: () => T, fallback: T): T {
-  try {
-    return run();
-  } catch (error) {
-    console.log(`[goei] 요청 가공 단계 실패: ${error instanceof Error ? error.message : String(error)}`);
-    return fallback;
-  }
+/** 플러그인 표식만 지운다 (core/sanitize.ts). 시작기도 본체 beforeRequest 가 던졌을 때 이것을 부른다. 던지지 않는다 */
+function sanitize<M extends PromptMessage>(messages: M[]): M[] {
+  return stripMarkers(messages, { worldTags: liteNow });
 }
 
 // ── 본편 로어북 고르기 (core/lore.ts) ──
@@ -671,6 +705,8 @@ function startWatcher(fab: Fab | null): () => void {
 
 export interface BodyHandlers {
   beforeRequest: typeof onBeforeRequest;
+  /** beforeRequest 가 던졌을 때 시작기가 부른다: 원문에서 플러그인 표식만 지운다 (던지지 않음) */
+  sanitize: typeof sanitize;
   input: typeof onInput;
   output: typeof onOutput;
   display: typeof onDisplay;
@@ -709,6 +745,7 @@ export async function start(): Promise<BodyHandlers> {
   }
   return {
     beforeRequest: onBeforeRequest,
+    sanitize,
     input: onInput,
     output: onOutput,
     display: onDisplay,
