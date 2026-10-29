@@ -8,7 +8,7 @@ import numpy as np
 from PIL import Image
 
 CHAIR_FLOOR = 171; SEAT_TOP = 96; SEAT_H = CHAIR_FLOOR - SEAT_TOP   # 75
-SEAT_FRONT_EAST = 131; KNEE_AHEAD = 34                                # 옆 의자 좌석 앞 끝 x, 무릎은 그보다 이만큼 앞
+SEAT_FRONT_EAST = 131; KNEE_AHEAD = 34; BACKREST_FRONT_EAST = 87                                # 옆 의자 좌석 앞 끝 x, 무릎은 그보다 이만큼 앞
 SEAT_CX = {"south": 92, "south-east": 98, "south-west": 86, "north": 93, "north-east": 98, "north-west": 87}
 
 
@@ -43,13 +43,23 @@ def side_measure(im):
     return floor - seat_y, knee, floor
 
 
+def side_hipback(im, seat_y):
+    """옆모습 엉덩이 뒤 끝 x: 좌석 위 2~14px 띠에서 각 줄 왼쪽 끝의 최댓값"""
+    m = mask(im); band = [int(np.nonzero(m[y])[0].min()) for y in range(seat_y - 14, seat_y - 1) if 0 <= y < m.shape[0] and m[y].any()]
+    return max(band) if band else None
+
+
 def fit(side_im, front_im, back_im, imgs, prev=None):
     """imgs = {front: south|south-east|south-west, side: east, back: north|north-east|north-west}. prev = 전 판 값(정면 dy 만 이어 씀)"""
     out = {}
     if side_im is not None and (r := side_measure(side_im)):
         seat_h, knee, floor = r; W, H = side_im.size
-        out["side"] = {"dx": round((knee - KNEE_AHEAD) - W / 2 - (SEAT_FRONT_EAST - 100), 1), "dy": round(floor - (H - 4) + max(0, min(10, SEAT_H - seat_h)), 1), "s": 1.0, "img": "east"}
-    for key, im, dy0 in (("front", front_im, -20), ("back", back_im, 12)):   # 정면: 의자가 뒤라 바닥선 위(-20), 후면: 앞이라 아래(+12). 인물마다 다르게 하지 않음
+        # 10-29 밤(사용자: 등받이에서 떨어져 좌석 앞에 걸터앉음): 엉덩이 뒤 끝을 등받이 앞(x=87)에 붙임. 엉덩이 띠(좌석 위 2~14px)의 왼쪽 끝 중 가장 안쪽 값(늘어진 머리·코트는 더 왼쪽이라 걸러짐). 허벅지 길이가 이상하면 무릎 규칙으로
+        hb = side_hipback(side_im, floor - seat_h)
+        if hb is not None and 40 <= knee - hb <= 110: dx = hb - W / 2 - (BACKREST_FRONT_EAST - 100)
+        else: dx = (knee - KNEE_AHEAD) - W / 2 - (SEAT_FRONT_EAST - 100)
+        out["side"] = {"dx": round(dx, 1), "dy": round(floor - (H - 4) + max(0, min(10, SEAT_H - seat_h)), 1), "s": 1.0, "img": "east"}
+    for key, im, dy0 in (("front", front_im, -12), ("back", back_im, 12)):   # 정면: 의자가 뒤라 바닥선 위(-12; 10-29 밤 -20에서 내림 — 발 아래 의자 바닥이 떠 보임), 후면: 앞이라 아래(+12). 인물마다 다르게 하지 않음
         if im is None: continue
         cx, floor = hip_center(im); W, H = im.size
         img = imgs.get(key) or ("south" if key == "front" else "north")

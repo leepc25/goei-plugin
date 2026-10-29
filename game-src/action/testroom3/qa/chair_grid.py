@@ -7,7 +7,8 @@ import sys, json, re
 from pathlib import Path
 HERE = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(HERE)); sys.path.insert(0, str(HERE / "qa"))
-VIEW, OUT = sys.argv[1], sys.argv[2]; KEYS = sys.argv[3].split(",") if len(sys.argv) > 3 else None
+MAIN = __name__ == "__main__"   # 다른 도구가 cell() 만 가져다 쓸 수 있게(10-29)
+if MAIN: VIEW, OUT = sys.argv[1], sys.argv[2]; KEYS = sys.argv[3].split(",") if len(sys.argv) > 3 else None
 sys.argv = sys.argv[:1]
 import build, fit_chair as fc
 from PIL import Image, ImageDraw
@@ -41,7 +42,8 @@ def frame73(cfg):
         return max(frames, key=lambda f: int(((np.array(f)[:, :, 3] > 40) ^ ra).sum()))
     return frames[-1]
 
-keys = KEYS or sorted([p.stem for p in (HERE / "chars").glob("*.json")], key=lambda s: [int(x) for x in re.findall(r"\d+", s.split("_")[0])])
+if not MAIN: KEYS = None; VIEW = None
+keys = [] if not MAIN else (KEYS or sorted([p.stem for p in (HERE / "chars").glob("*.json")], key=lambda s: [int(x) for x in re.findall(r"\d+", s.split("_")[0])]))
 cells = []
 for key in keys:
     try: cfg, _ = fc.load(key)
@@ -69,9 +71,10 @@ for key in keys:
     else:
         im = ims[VIEW]; p = vals[VIEW]
         cells.append(cell(im, p, VIEW == "back", f"{key} {VIEW} {p['img']} dx={p['dx']} dy={p['dy']}"))
-if not cells: sys.exit("셀 없음")
-cols = 6 if VIEW == "dirs" else 3; rows = (len(cells) + cols - 1) // cols
-cw, ch = cells[0].size
-S = Image.new("RGB", (cw * cols, ch * rows), (30, 30, 30))
-for i, c in enumerate(cells): S.paste(c, ((i % cols) * cw, (i // cols) * ch))
-S.save(OUT); print(OUT, len(cells), "셀")
+if MAIN:
+    if not cells: sys.exit("셀 없음")
+    cols = 6 if VIEW == "dirs" else 3; rows = (len(cells) + cols - 1) // cols
+    cw, ch = cells[0].size
+    S = Image.new("RGB", (cw * cols, ch * rows), (30, 30, 30))
+    for i, c in enumerate(cells): S.paste(c, ((i % cols) * cw, (i // cols) * ch))
+    S.save(OUT); print(OUT, len(cells), "셀")
