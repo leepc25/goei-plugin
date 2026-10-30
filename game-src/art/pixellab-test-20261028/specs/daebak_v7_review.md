@@ -4,7 +4,6 @@
 
 ## 점검 결과
 
-- FAIL 2005자 > 2000
 - WARN 설명이 김(21낱말): a tinted glass shop front on the left with a closed glass entrance door and a red neon sign reading "OPEN"
 - WARN 설명이 김(34낱말): beside the glass door, a worn reception counter facing the camera, an open gap at its end to step behind it, with a candy bowl, a document tray, a guestbook, newspapers, a desk bell
 - WARN 설명이 김(26낱말): in the far right corner, away from the counter, on dark carpet, a green felt poker table with poker chips, cards and an open cigar box
@@ -63,7 +62,7 @@
 |---|---|---|---|---|---|
 | 0 | a tinted glass shop front on the left with a closed glass entrance door and a red neon sign reading "OPEN" | 위키 짙은 선팅 유리·네온 OPEN 간판 | tinted glass, neon sign reading "OPEN", entrance door | a tinted glass shop front on the left with a closed glass entrance door and a red neon sign reading "OPEN" |  |
 | 1 | a flat TV hung flush on the wall, dark screen | 위키 소리 죽인 벽걸이 TV(매달린 TV 안 되게) | flat TV, flush on the wall | a flat TV hung flush on the wall, dark screen |  |
-| 2 | a potted rubber plant and an umbrella stand by the window | 설계안 화분·우산꽂이 | potted, umbrella stand | a potted rubber plant and an umbrella stand by the window |  |
+| 2 | a potted plant and an umbrella stand by the window | 설계안 화분·우산꽂이 | potted, umbrella stand | a potted plant and an umbrella stand by the window |  |
 | 3 | beside the glass door, a worn reception counter facing the camera, an open gap at its end to step behind it, with a candy bowl, a document tray, a guestbook, newspapers, a desk bell | 위키·설계안 접수대·사탕 그릇·서류 트레이·방명록·신문, 들어가는 틈(사용자) | reception counter, open gap, candy bowl, document tray, guestbook, newspapers | beside the glass door, a worn reception counter facing the camera, an open gap at its end to step behind it, with a candy bowl, a document tray, a guestbook, newspapers, a desk bell |  |
 | 4 | a baseball bat leaning behind the counter | 위키 여담 카운터 뒤 비상용 야구방망이 | baseball bat | a baseball bat leaning behind the counter |  |
 | 5 | a tall shelf crammed with ring binders, contract folders and document boxes | 위키 계약서 함정 | binders, contract folders, document boxes | a tall shelf crammed with ring binders, contract folders and document boxes |  |
@@ -92,12 +91,12 @@
 - 원근·바닥 몫·양옆 벽·문·채우기가 이 장면에 정한 대로인가?
   - one-point, 바닥 40%, 양쪽 벽 닫힘, 작은 방, 문 1(왼쪽 유리문), packed, 명암 대비, 느슨한 틀
 
-## 2차 요청문 (2005자)
+## 2차 요청문 (1998자)
 
 ```
 Pixel art game background of a small, cramped, cluttered fixer's office in a run-down 1990s Seoul underground arcade, late at night. Camera at standing eye height, about 20 degrees above the floor, looking slightly down. One-point perspective, side walls receding toward the middle. The floor fills the lower 40 percent of the image. Both side walls are visible, a closed room.
 FLOOR: stained beige tiles, dirty grout, dark carpet in the right corner, pools of hard light, deep black shadow under furniture.
-PACKED WITH STUFF, every area filled, no empty wall, no empty floor corner: a tinted glass shop front on the left with a closed glass entrance door and a red neon sign reading "OPEN"; a flat TV hung flush on the wall, dark screen; a potted rubber plant and an umbrella stand by the window; beside the glass door, a worn reception counter facing the camera, an open gap at its end to step behind it, with a candy bowl, a document tray, a guestbook, newspapers, a desk bell; a baseball bat leaning behind the counter; a tall shelf crammed with ring binders, contract folders and document boxes; a cork board crowded with job flyers and contracts; two faded framed photos, a fire extinguisher box; two grey filing cabinets with folders and a small fan on top; in the far right corner, away from the counter, on dark carpet, a green felt poker table with poker chips, cards and an open cigar box; a framed picture over a low sideboard with binders; a wall shelf of liquor bottles and shot glasses; a worn doormat inside the glass door.
+PACKED WITH STUFF, every area filled, no empty wall, no empty floor corner: a tinted glass shop front on the left with a closed glass entrance door and a red neon sign reading "OPEN"; a flat TV hung flush on the wall, dark screen; a potted plant and an umbrella stand by the window; beside the glass door, a worn reception counter facing the camera, an open gap at its end to step behind it, with a candy bowl, a document tray, a guestbook, newspapers, a desk bell; a baseball bat leaning behind the counter; a tall shelf crammed with ring binders, contract folders and document boxes; a cork board crowded with job flyers and contracts; two faded framed photos, a fire extinguisher box; two grey filing cabinets with folders and a small fan on top; in the far right corner, away from the counter, on dark carpet, a green felt poker table with poker chips, cards and an open cigar box; a framed picture over a low sideboard with binders; a wall shelf of liquor bottles and shot glasses; a worn doormat inside the glass door.
 WALL: dark red-brown wallpaper, water stains, peeling patches; fluorescent tubes.
 LIGHT: strong contrast, bright lit surfaces and pitch-dark shadowed corners.
 STYLE: dense, highly detailed pixel art, crisp pixel clusters, selective dark outline, rich medium-to-detailed shading, dark red-brown and beige with green felt and red neon accents, no dithering, no blur. No people, chairs, sofas, benches, coffee tables, clocks, other doors, doorways or glass partitions.
