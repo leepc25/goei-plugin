@@ -1,5 +1,5 @@
 # 괴이봇 플러그인 개발
-- **배경 채우기는 packed가 기본 (사용자 2026-10-30: 「텅 비어 보이는 도트만큼 흉한 게 없다」):** normal·bare는 사용자가 정했을 때만. 대기실 v6·v7이 내 normal 선택으로 휑해짐. bg_check가 막음.
+- **배경 채우기는 무조건 packed (사용자 2026-10-30: 「앞으로는 무조건 팩드다」):** 대기실 v7(normal)은 휑했고 v8(packed)이 훨씬 나음. bg_check가 packed 아니면 실패.
 - **배경 요청문에서 물건을 절대 빼지 않는다 (사용자 2026-10-30):** 2,000자는 군말을 줄여 맞춘다, 빼야 할 것 같으면 묻는다. 도구(bg_check 0번)가 막음. [bg-never-remove-items](bg-never-remove-items.md)
 - **GPT art style = reference image, NO procedures (user 2026-10-23 20:08, supersedes 19:48):** GPT cannot pixel-convert, resize, run code, or draw true pixel art however explained. Never put conversion/downscale/palette/pixel steps in GPT guides. Instead: "match the style of the attached 쟈알디 room image" (user attaches it), keep sizes. Ceiling: not drawn separately, only molding/lights in top 40px.
 - [Field bg: GPT fails long images + cross-image style (2026-10-24), options pending](goei-bg-consistency-problem.md)

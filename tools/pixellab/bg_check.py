@@ -127,9 +127,8 @@ def check(spec, prompt, prev=None):
         elif isinstance(by, str):
             if not by.startswith('omit:') or len(by) < 8: fails.append(f'설계안 항목을 이유 없이 뺌: {b.get("src")}')
         elif not by or any((not isinstance(i, int)) or i >= len(items) for i in by): fails.append(f'설계안 항목을 맡는 물건 줄이 없음: {b.get("src")}')
-    # 0-1 채우기: 텅 빈 도트가 가장 흉하다(사용자 10-30). packed가 기본, normal·bare는 사용자 결정(brief.user에 적힘)일 때만
-    if spec.get('density') != 'packed' and not any(spec.get('density', '') in u for u in spec.get('brief', {}).get('user', [])):
-        fails.append(f'채우기 {spec.get("density")}: packed가 기본 — normal·bare는 사용자가 정했을 때만(brief.user에 「{spec.get("density")}」 적기)')
+    # 0-1 채우기: 무조건 packed (사용자 10-30: 「앞으로는 무조건 팩드다」, 텅 빈 도트가 가장 흉하다)
+    if spec.get('density') != 'packed': fails.append(f'채우기 {spec.get("density")}: 무조건 packed (사용자 10-30)')
     # 1 빠뜨림
     for m in spec.get('must', []):
         if m['kw'].lower() not in low: fails.append(f'빠뜨림: "{m["kw"]}" ({m.get("from", "")})')
