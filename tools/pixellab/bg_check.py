@@ -144,7 +144,7 @@ def check(spec, prompt, prev=None):
             if re.search(rf"\b{w}\b", tt): fails.append(f'사람을 부르는 말 "{w}"(사람이 그려짐, room side·empty walkway처럼): {tt.strip()}')
     # 2-2 간판: 글씨를 지어내 엉터리 한글이 나옴(대기실 v6 「킨료정」) → 글씨 없는 그림 표시로
     for t in texts:
-        if re.search(r'\bsign\b|signboard|sign board', t.lower()) and 'no letters' not in t.lower(): fails.append(f'간판에 글씨가 지어내짐 → "no letters"와 그림 표시(red cross 등)를 적을 것: {t}')
+        if re.search(r'\bsign\b|signboard|sign board', t.lower()) and 'no letters' not in t.lower() and not re.search(r'reading "[^"]+"', t): fails.append(f'간판에 글씨가 지어내짐 → "no letters"와 그림 표시, 또는 정확한 글자(reading "OPEN")를 적을 것: {t}')
     # 4 크기
     sized = [s.lower() for s in spec.get('sized', [])]
     for t in texts:
