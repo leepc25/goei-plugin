@@ -1,0 +1,788 @@
+[
+ {
+  "num": "1.1",
+  "name": "쟈알디",
+  "skill": "충전2",
+  "title": "구역 정리 2단",
+  "effect": "두통",
+  "sec": 3,
+  "existing": false,
+  "why": "「바닥 전체가 터져 오른다」 둘레 폭발의 진동·굉음(폭발 자체엔 상태 이상 대신 가장 가벼운 두통)"
+ },
+ {
+  "num": "1.2",
+  "name": "스팡달",
+  "skill": "충전1",
+  "title": "가시 격자 1단",
+  "effect": "출혈",
+  "sec": 3,
+  "existing": false,
+  "why": "「검은 가시 하나가 창처럼 뻗어」 꿰뚫는 가시"
+ },
+ {
+  "num": "1.2",
+  "name": "스팡달",
+  "skill": "충전2",
+  "title": "가시 격자 2단",
+  "effect": "묶기",
+  "sec": 1.5,
+  "existing": false,
+  "why": "위키 「격자 구속」, 「가시가 엇갈려 솟아 격자」"
+ },
+ {
+  "num": "1.3",
+  "name": "잼트리",
+  "skill": "필살",
+  "title": "모두의 언니",
+  "effect": "표식",
+  "sec": 6,
+  "existing": true,
+  "why": "이미 있음: 화면 6곳 표식(time 6)"
+ },
+ {
+  "num": "1.3",
+  "name": "잼트리",
+  "skill": "고유기",
+  "title": "목덜미 쿡",
+  "effect": "침묵",
+  "sec": 2,
+  "existing": false,
+  "why": "「두 손가락을 목 높이로 찔러 넣는다」 목을 찔려 목소리가 막힘"
+ },
+ {
+  "num": "1.4",
+  "name": "에일린",
+  "skill": "고유기2",
+  "title": "판독",
+  "effect": "표식",
+  "sec": 6,
+  "existing": true,
+  "why": "이미 있음: 「판독」 scan+mark 6초"
+ },
+ {
+  "num": "1.4",
+  "name": "에일린",
+  "skill": "고유기",
+  "title": "제압사격",
+  "effect": "공포",
+  "sec": 2,
+  "existing": false,
+  "why": "「제압사격」 suppress — 탄에 눌려 몸이 굳음"
+ },
+ {
+  "num": "1.5",
+  "name": "고그니쟈",
+  "skill": "고유기",
+  "title": "비상 장치 가동",
+  "effect": "침묵",
+  "sec": 2.5,
+  "existing": false,
+  "why": "「해치 틈에서 노란 전기 아크…감전시켜」"
+ },
+ {
+  "num": "1.5",
+  "name": "고그니쟈",
+  "skill": "필살",
+  "title": "오오, 그 녀석은 성질이 좀 있지!",
+  "effect": "두통",
+  "sec": 4,
+  "existing": false,
+  "why": "「그 녀석이 포효 → 검은 음압 충격 원뿔」 음파"
+ },
+ {
+  "num": "1.6",
+  "name": "큐라스",
+  "skill": "고유기",
+  "title": "요격",
+  "effect": "침묵",
+  "sec": 2,
+  "existing": false,
+  "why": "위키 「날아오는 투척물, 공중의 총알을 태워 없애는 요격」 — 기술을 끊는 요격"
+ },
+ {
+  "num": "1.7",
+  "name": "고르고디오",
+  "skill": "충전0",
+  "title": "식칼 내려치기 0단",
+  "effect": "출혈",
+  "sec": 3,
+  "existing": false,
+  "why": "「식칼을 바로 앞 바닥에 내리쳐」 식칼"
+ },
+ {
+  "num": "1.8",
+  "name": "데쥬레",
+  "skill": "필살",
+  "title": "이건 꽝이에요",
+  "effect": "표식",
+  "sec": 5,
+  "existing": false,
+  "why": "「분홍 레이저 막이 화면을 훑고」 증언 재현 주사선이 표적을 짚음"
+ },
+ {
+  "num": "1.9",
+  "name": "데드폴",
+  "skill": "고유기",
+  "title": "되감기",
+  "effect": "둔화",
+  "sec": 3,
+  "existing": false,
+  "why": "「공격을 한 적이 시간이 되감겨」 시간(이상)"
+ },
+ {
+  "num": "1.10",
+  "name": "게슈간",
+  "skill": "고유기",
+  "title": "고정",
+  "effect": "묶기",
+  "sec": 2,
+  "existing": false,
+  "why": "기술명 「고정」, 「발밑 일그러짐 고리, 공중으로 들려」 염동"
+ },
+ {
+  "num": "1.10",
+  "name": "게슈간",
+  "skill": "충전2",
+  "title": "던지기 / 짓뭉개기 2단",
+  "effect": "둔화",
+  "sec": 3,
+  "existing": false,
+  "why": "「공간이 구겨지듯 오므라들며 짓눌려」 공간 왜곡"
+ },
+ {
+  "num": "1.11",
+  "name": "로제몬",
+  "skill": "충전0",
+  "title": "인형술 0단",
+  "effect": "묶기",
+  "sec": 1.5,
+  "existing": false,
+  "why": "「보라 실이 붙어 질질 끌려옴」 실"
+ },
+ {
+  "num": "1.11",
+  "name": "로제몬",
+  "skill": "필살",
+  "title": "앙상블",
+  "effect": "혼란",
+  "sec": 3,
+  "existing": false,
+  "why": "「꼭두각시처럼 끌려」 조종당해 방향이 뒤집힘(마지막 타에)"
+ },
+ {
+  "num": "1.12",
+  "name": "콘쥬스",
+  "skill": "고유기",
+  "title": "바리케이드 번쩍",
+  "effect": "둔화",
+  "sec": 2.5,
+  "existing": false,
+  "why": "「바리케이드를 뽑아 들어 쿵 내려 세움」 가로막혀 발이 묶임"
+ },
+ {
+  "num": "2.1",
+  "name": "사장",
+  "skill": "필살",
+  "title": "정지",
+  "effect": "둔화",
+  "sec": 5,
+  "existing": false,
+  "why": "「세상이 멈춤 → X자 선이 칠흑 틈으로」 시간 정지 여파"
+ },
+ {
+  "num": "2.2",
+  "name": "도필헌",
+  "skill": "필살",
+  "title": "거짓말이 빠진 방",
+  "effect": "공포",
+  "sec": 3,
+  "existing": false,
+  "why": "위키 「가만히 앉아 있는 것만으로 방을 장악」 — 「거짓말이 빠진 방」의 압박"
+ },
+ {
+  "num": "2.3",
+  "name": "이길환",
+  "skill": "고유기",
+  "title": "아, 아, 테스트",
+  "effect": "두통",
+  "sec": 4,
+  "existing": false,
+  "why": "「「삐익—」 하울링 음파 고리」"
+ },
+ {
+  "num": "2.3",
+  "name": "이길환",
+  "skill": "필살",
+  "title": "튜토리얼",
+  "effect": "혼란",
+  "sec": 3,
+  "existing": false,
+  "why": "「음파 막 → 겹고리 음파 네 겹」 귀가 먹먹해 방향을 잃음(마지막 타에)"
+ },
+ {
+  "num": "2.4",
+  "name": "이기석",
+  "skill": "충전1",
+  "title": "인류의 방패! 1단",
+  "effect": "묶기",
+  "sec": 1.5,
+  "existing": false,
+  "why": "「의수가 와이어를 끌며 직선 7m 관통」 와이어"
+ },
+ {
+  "num": "2.5",
+  "name": "김조학",
+  "skill": "고유기",
+  "title": "책상 내려치기",
+  "effect": "공포",
+  "sec": 3,
+  "existing": false,
+  "why": "위키 「공포, 침묵, 선택적인 증거」 — 책상 내려치기 위압"
+ },
+ {
+  "num": "2.5",
+  "name": "김조학",
+  "skill": "충전0",
+  "title": "선택적인 증거 제시 0단",
+  "effect": "침묵",
+  "sec": 2,
+  "existing": false,
+  "why": "위키 「공포, 침묵」, 「서류철 모서리가 명치를 찔러」 숨이 막힘"
+ },
+ {
+  "num": "2.6",
+  "name": "이도형",
+  "skill": "고유기",
+  "title": "흉백",
+  "effect": "출혈",
+  "sec": 3,
+  "existing": false,
+  "why": "「흰 베기 세 줄이 터진다」 칼"
+ },
+ {
+  "num": "2.6",
+  "name": "이도형",
+  "skill": "필살",
+  "title": "건물 가르기",
+  "effect": "출혈",
+  "sec": 5,
+  "existing": false,
+  "why": "「한 번에 수평으로 휘둘러 화면 가로 전체」 건물 가르기"
+ },
+ {
+  "num": "2.7",
+  "name": "고영훈",
+  "skill": "충전2",
+  "title": "셋으로 나눈다 2단",
+  "effect": "출혈",
+  "sec": 3,
+  "existing": false,
+  "why": "「교차 베기 → 흰 베기 세 줄이 별 모양」"
+ },
+ {
+  "num": "2.8",
+  "name": "노기균",
+  "skill": "충전2",
+  "title": "검증 대련 2단",
+  "effect": "출혈",
+  "sec": 3,
+  "existing": false,
+  "why": "「네 번 벰 → 어깨 높이 가로 검기 6m」"
+ },
+ {
+  "num": "2.9",
+  "name": "송주익",
+  "skill": "고유기",
+  "title": "시범 베기",
+  "effect": "출혈",
+  "sec": 3,
+  "existing": false,
+  "why": "「머리 위에서 무릎 높이까지 곧게 내려친다」 시범 베기"
+ },
+ {
+  "num": "2.10",
+  "name": "곽성주",
+  "skill": "충전2",
+  "title": "제압 사격 2단",
+  "effect": "공포",
+  "sec": 3,
+  "existing": false,
+  "why": "기술명 「제압 사격」, 「3초 연사…탄착점이 걸어 나가며」"
+ },
+ {
+  "num": "2.11",
+  "name": "조성춘",
+  "skill": "충전1",
+  "title": "실황 중계 1단",
+  "effect": "두통",
+  "sec": 4,
+  "existing": false,
+  "why": "「노란 일그러짐이 앞 5m 원뿔로」 고함 음압"
+ },
+ {
+  "num": "2.11",
+  "name": "조성춘",
+  "skill": "필살",
+  "title": "진공작전",
+  "effect": "혼란",
+  "sec": 3,
+  "existing": false,
+  "why": "「거대한 노란 음압 원뿔」 고함에 정신이 나감(마지막 타에)"
+ },
+ {
+  "num": "2.12",
+  "name": "윤병수",
+  "skill": "고유기",
+  "title": "화염방사",
+  "effect": "공포",
+  "sec": 2.5,
+  "existing": false,
+  "why": "「노즐을 쓸어 올린다…불길」 불길 앞에서 몸이 굳음"
+ },
+ {
+  "num": "2.13",
+  "name": "김성진",
+  "skill": "고유기",
+  "title": "야 저거 봤냐",
+  "effect": "혼란",
+  "sec": 2,
+  "existing": false,
+  "why": "기술명 「야 저거 봤냐」 — 딴 데 보게 만드는 수작"
+ },
+ {
+  "num": "2.14",
+  "name": "송진섭",
+  "skill": "충전1",
+  "title": "지도 왼쪽이요! 1단",
+  "effect": "침묵",
+  "sec": 2.5,
+  "existing": false,
+  "why": "「앞 6m 직선 펄스 띠」 전기 펄스"
+ },
+ {
+  "num": "2.14",
+  "name": "송진섭",
+  "skill": "충전2",
+  "title": "지도 왼쪽이요! 2단",
+  "effect": "표식",
+  "sec": 5,
+  "existing": false,
+  "why": "「레이더 쓸림 선이 한 바퀴 회전」 레이더 포착"
+ },
+ {
+  "num": "3.1",
+  "name": "청달래",
+  "skill": "고유기",
+  "title": "뻗는 손",
+  "effect": "공포",
+  "sec": 3,
+  "existing": false,
+  "why": "「손을 뻗었고 그 사람이 털썩 쓰러졌다 … 썩어 가는 백일몽」 (옛 설계도 2초 공포)"
+ },
+ {
+  "num": "3.2",
+  "name": "호유원",
+  "skill": "필살",
+  "title": "가장 소중한 것이 만나러 와요",
+  "effect": "묶기",
+  "sec": 3,
+  "existing": true,
+  "why": "이미 있음: 빙의 bind 3초"
+ },
+ {
+  "num": "3.2",
+  "name": "호유원",
+  "skill": "고유기",
+  "title": "확인했어요, ~님",
+  "effect": "혼란",
+  "sec": 2.5,
+  "existing": false,
+  "why": "「손등 여우 꼬리 무늬 → 금빛 여우불 폭발」 여우불에 홀림"
+ },
+ {
+  "num": "3.3",
+  "name": "백석주",
+  "skill": "고유기",
+  "title": "어깨 도장",
+  "effect": "두통",
+  "sec": 4,
+  "existing": false,
+  "why": "「두 손바닥으로 귀를 친다」"
+ },
+ {
+  "num": "3.4",
+  "name": "진나솔",
+  "skill": "충전1",
+  "title": "외알 안경 1단",
+  "effect": "출혈",
+  "sec": 3,
+  "existing": false,
+  "why": "「실 한 가닥이 수평으로…가로로 베여」"
+ },
+ {
+  "num": "3.4",
+  "name": "진나솔",
+  "skill": "필살",
+  "title": "퇴근",
+  "effect": "묶기",
+  "sec": 2.5,
+  "existing": false,
+  "why": "「화면 전체 실 그물이 한꺼번에 조이며」"
+ },
+ {
+  "num": "3.5",
+  "name": "이성해",
+  "skill": "고유기",
+  "title": "죄송해여!",
+  "effect": "침묵",
+  "sec": 2,
+  "existing": false,
+  "why": "「손날을 목 높이로 곧게 찌름」 목을 찔려 말이 막힘"
+ },
+ {
+  "num": "3.6",
+  "name": "이자헌",
+  "skill": "고유기",
+  "title": "버터나이프 틈",
+  "effect": "둔화",
+  "sec": 2.5,
+  "existing": false,
+  "why": "「버터나이프로 세로 틈」 3.6-D-space-rift 공간 틈에 끌려 처박힘"
+ },
+ {
+  "num": "3.7",
+  "name": "은하제",
+  "skill": "고유기",
+  "title": "수갑",
+  "effect": "묶기",
+  "sec": 0.2,
+  "existing": true,
+  "why": "이미 있음: 수갑 끌어당김 끝 bind 0.2"
+ },
+ {
+  "num": "3.7",
+  "name": "은하제",
+  "skill": "필살",
+  "title": "통화 연결",
+  "effect": "묶기",
+  "sec": 2.2,
+  "existing": true,
+  "why": "이미 있음: 수갑 사슬 bind 2.2"
+ },
+ {
+  "num": "3.8",
+  "name": "박민성",
+  "skill": "충전2",
+  "title": "문 담당 2단",
+  "effect": "둔화",
+  "sec": 2.5,
+  "existing": false,
+  "why": "「퍼 올려 머리 위로 던짐 → 깔림」 깔려서 몸이 무거움"
+ },
+ {
+  "num": "3.9",
+  "name": "백사헌",
+  "skill": "필살",
+  "title": "추가 지급",
+  "effect": "두통",
+  "sec": 4,
+  "existing": false,
+  "why": "「뒷머리를 꽂고 → 두 무릎으로 내리찍음」 머리를 찧음"
+ },
+ {
+  "num": "3.10",
+  "name": "고영은",
+  "skill": "고유기",
+  "title": "헤드램프",
+  "effect": "표식",
+  "sec": 5,
+  "existing": false,
+  "why": "「이마에서 흰 빛 원뿔」 헤드램프로 비춰 짚음"
+ },
+ {
+  "num": "3.10",
+  "name": "고영은",
+  "skill": "충전1",
+  "title": "중증도 분류 1단",
+  "effect": "혼란",
+  "sec": 2,
+  "existing": false,
+  "why": "「눈 가리고 → 이마 → 주먹」 눈이 가려져 방향을 잃음"
+ },
+ {
+  "num": "3.11",
+  "name": "강이학",
+  "skill": "충전2",
+  "title": "협상 테이블 2단",
+  "effect": "오염",
+  "sec": 0,
+  "existing": false,
+  "why": "「적 몸에서 괴이 화폐가 뽑혀 나와」 괴이 힘",
+  "stage": 1
+ },
+ {
+  "num": "3.12",
+  "name": "장허운",
+  "skill": "충전1",
+  "title": "기둥 들기 1단",
+  "effect": "묶기",
+  "sec": 1.5,
+  "existing": false,
+  "why": "「발목을 움켜쥐고 끌어당기며」"
+ },
+ {
+  "num": "3.13",
+  "name": "곽제강",
+  "skill": "충전1",
+  "title": "혼돈 변수 투입 1단",
+  "effect": "오염",
+  "sec": 0,
+  "existing": false,
+  "why": "「시료병 세 개…연보라 거품 펑펑펑」 오염 시료",
+  "stage": 1
+ },
+ {
+  "num": "3.13",
+  "name": "곽제강",
+  "skill": "충전2",
+  "title": "혼돈 변수 투입 2단",
+  "effect": "혼란",
+  "sec": 3,
+  "existing": false,
+  "why": "「플라스크를 던진다 → 연보라 꿈결 기둥」 꿈결"
+ },
+ {
+  "num": "3.14",
+  "name": "이연화",
+  "skill": "충전2",
+  "title": "배합 실험 2단",
+  "effect": "오염",
+  "sec": 0,
+  "existing": false,
+  "why": "「병을 던진다 → 시약 비·남보라 연기」 오염 시약",
+  "stage": 1
+ },
+ {
+  "num": "3.15",
+  "name": "이병진",
+  "skill": "고유기",
+  "title": "빨간 펜",
+  "effect": "출혈",
+  "sec": 3,
+  "existing": false,
+  "why": "「빨간 사인펜을 쭉 내리긋는다…베인다」"
+ },
+ {
+  "num": "3.15",
+  "name": "이병진",
+  "skill": "필살",
+  "title": "처음으로 쓸모 있어진 순간",
+  "effect": "공포",
+  "sec": 4,
+  "existing": false,
+  "why": "「제문의 한자 획이 칼날처럼 떨어지고 → 붉은 낙관」 제문(정신)"
+ },
+ {
+  "num": "3.16",
+  "name": "제이",
+  "skill": "고유기",
+  "title": "앞발",
+  "effect": "출혈",
+  "sec": 3,
+  "existing": false,
+  "why": "위키 「단두대처럼 검은 발톱을 내리꽂고」"
+ },
+ {
+  "num": "3.16",
+  "name": "제이",
+  "skill": "충전1",
+  "title": "냄새가 달라요 1단",
+  "effect": "오염",
+  "sec": 0,
+  "existing": false,
+  "why": "「그림자 입이 벌어졌다 닫히며」 괴이 그림자 늑대에 물림",
+  "stage": 1
+ },
+ {
+  "num": "4.1",
+  "name": "차여진",
+  "skill": "필살",
+  "title": "두 번째 휴대전화",
+  "effect": "출혈",
+  "sec": 4,
+  "existing": false,
+  "why": "「화면 밖에서 검붉은 베기 섬광…X자 베기」"
+ },
+ {
+  "num": "4.2",
+  "name": "서윤지",
+  "skill": "고유기",
+  "title": "업무 관련 금품 수수 불가",
+  "effect": "침묵",
+  "sec": 2,
+  "existing": false,
+  "why": "기술명 「업무 관련 금품 수수 불가」 서류를 밀어 반려 — 기술을 받아 주지 않음"
+ },
+ {
+  "num": "4.3",
+  "name": "고연지",
+  "skill": "충전2",
+  "title": "마취 2단",
+  "effect": "오염",
+  "sec": 0,
+  "existing": false,
+  "why": "「목에 마취 주사를 꽂는다 → 잠든다」 속성표 오염(약물)",
+  "stage": 1
+ },
+ {
+  "num": "4.3",
+  "name": "고연지",
+  "skill": "필살",
+  "title": "수술 여섯 시간째",
+  "effect": "둔화",
+  "sec": 4,
+  "existing": false,
+  "why": "「마취 가스 → 잠든 적 사이 손놀림」 마취가 덜 깸"
+ },
+ {
+  "num": "4.4",
+  "name": "윤지아",
+  "skill": "필살",
+  "title": "시술 준비 끝",
+  "effect": "둔화",
+  "sec": 3,
+  "existing": false,
+  "why": "「세 번 내리꽂아 앉힘」 위키 「칼을 내려놓고 사탕을」 — 기운이 빠짐"
+ },
+ {
+  "num": "4.5",
+  "name": "마덕희",
+  "skill": "고유기",
+  "title": "자기야, 이거 안 좋은 거네요",
+  "effect": "표식",
+  "sec": 4,
+  "existing": false,
+  "why": "기술명 「자기야, 이거 안 좋은 거네요」 감정사가 「검지로 가슴」 값을 짚음"
+ },
+ {
+  "num": "4.6",
+  "name": "문혜란",
+  "skill": "충전2",
+  "title": "앉아, 앉아 2단",
+  "effect": "표식",
+  "sec": 5,
+  "existing": false,
+  "why": "「표시된 카드 다섯 장을 튕긴다」"
+ },
+ {
+  "num": "4.7",
+  "name": "신유리",
+  "skill": "고유기",
+  "title": "추심",
+  "effect": "출혈",
+  "sec": 3,
+  "existing": false,
+  "why": "「단검을 두 번 짧게 찌른다」"
+ },
+ {
+  "num": "4.7",
+  "name": "신유리",
+  "skill": "필살",
+  "title": "추심 시 사전 통보 없음",
+  "effect": "공포",
+  "sec": 4,
+  "existing": false,
+  "why": "「콘크리트 벽이 좁혀 → 철문」 추심 협박"
+ },
+ {
+  "num": "4.8",
+  "name": "블라렛",
+  "skill": "고유기",
+  "title": "성검 발현",
+  "effect": "표식",
+  "sec": 4,
+  "existing": false,
+  "why": "「십자가에서 흰 빛의 십자 장검」 신성"
+ },
+ {
+  "num": "4.9",
+  "name": "살라딘",
+  "skill": "충전0",
+  "title": "형제여! 0단",
+  "effect": "두통",
+  "sec": 3,
+  "existing": false,
+  "why": "「함성 자체가 터짐 → 푸른 음파 고리」"
+ },
+ {
+  "num": "4.10",
+  "name": "아벤샤",
+  "skill": "충전1",
+  "title": "흐르는 모래 1단",
+  "effect": "둔화",
+  "sec": 3,
+  "existing": false,
+  "why": "「모래 줄기가 되어 흘러가…다리를 휩쓸려」"
+ },
+ {
+  "num": "5.1",
+  "name": "세크리엠",
+  "skill": "고유기",
+  "title": "피의 칼날",
+  "effect": "출혈",
+  "sec": 3,
+  "existing": false,
+  "why": "「손톱 끝에서 진홍 초승달 칼날 세 갈래」 피의 칼날"
+ },
+ {
+  "num": "5.1",
+  "name": "세크리엠",
+  "skill": "필살",
+  "title": "붉은 눈",
+  "effect": "공포",
+  "sec": 4,
+  "existing": false,
+  "why": "기술명 「붉은 눈」 흡혈귀의 붉은 파동"
+ },
+ {
+  "num": "5.2",
+  "name": "브라우니",
+  "skill": "충전2",
+  "title": "정답은? 2단",
+  "effect": "침묵",
+  "sec": 2.5,
+  "existing": false,
+  "why": "「TV 화면에서 백색 잡음 전파 띠」 전파"
+ },
+ {
+  "num": "5.2",
+  "name": "브라우니",
+  "skill": "필살",
+  "title": "화요퀴즈쇼",
+  "effect": "혼란",
+  "sec": 3,
+  "existing": false,
+  "why": "기술명 「화요퀴즈쇼」 「정답은?」 — 문제에 휘말려 헷갈림(마지막 타에)"
+ },
+ {
+  "num": "5.3",
+  "name": "탐미주의",
+  "skill": "필살",
+  "title": "예술은 조각이다",
+  "effect": "묶기",
+  "sec": 1.5,
+  "existing": true,
+  "why": "이미 있음: 대리석으로 굳힘 lift+bind 1.5"
+ },
+ {
+  "num": "5.3",
+  "name": "탐미주의",
+  "skill": "고유기",
+  "title": "물감",
+  "effect": "오염",
+  "sec": 0,
+  "existing": false,
+  "why": "「목에 검은 물감 소용돌이…검은 물감을 쏟는다」 괴이 물감",
+  "stage": 1
+ }
+]
