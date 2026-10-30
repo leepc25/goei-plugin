@@ -1,0 +1,363 @@
+{
+ "file": "songil_v5_632x424",
+ "bgScale": 2,
+ "w": 1264,
+ "h": 848,
+ "under": true,
+ "floor": [
+  [
+   0,
+   700
+  ],
+  [
+   215,
+   525
+  ],
+  [
+   1264,
+   525
+  ],
+  [
+   1264,
+   849
+  ],
+  [
+   0,
+   849
+  ]
+ ],
+ "lane": [
+  525,
+  837
+ ],
+ "blocks": [
+  {
+   "poly": [
+    [
+     125,
+     805
+    ],
+    [
+     255,
+     805
+    ],
+    [
+     412,
+     612
+    ],
+    [
+     335,
+     602
+    ]
+   ],
+   "h": 999
+  },
+  {
+   "poly": [
+    [
+     438,
+     515
+    ],
+    [
+     668,
+     515
+    ],
+    [
+     668,
+     556
+    ],
+    [
+     438,
+     556
+    ]
+   ],
+   "h": 999
+  },
+  {
+   "poly": [
+    [
+     1138,
+     515
+    ],
+    [
+     1264,
+     515
+    ],
+    [
+     1264,
+     556
+    ],
+    [
+     1138,
+     556
+    ]
+   ],
+   "h": 999
+  },
+  {
+   "poly": [
+    [
+     1195,
+     556
+    ],
+    [
+     1264,
+     556
+    ],
+    [
+     1264,
+     849
+    ],
+    [
+     1195,
+     849
+    ]
+   ],
+   "h": 999
+  },
+  {
+   "poly": [
+    [
+     1105,
+     792
+    ],
+    [
+     1212,
+     792
+    ],
+    [
+     1212,
+     849
+    ],
+    [
+     1105,
+     849
+    ]
+   ],
+   "h": 999
+  },
+  {
+   "poly": [
+    [
+     1022,
+     772
+    ],
+    [
+     1128,
+     772
+    ],
+    [
+     1128,
+     849
+    ],
+    [
+     1022,
+     849
+    ]
+   ],
+   "h": 999
+  },
+  {
+   "poly": [
+    [
+     108,
+     560
+    ],
+    [
+     188,
+     560
+    ],
+    [
+     188,
+     606
+    ],
+    [
+     108,
+     606
+    ]
+   ],
+   "h": 999
+  }
+ ],
+ "doors": {
+  "out": {
+   "kind": "exit",
+   "side": "S",
+   "x": 650,
+   "y": 848,
+   "to": "jr_b1",
+   "toDoor": "songil",
+   "label": "나가기"
+  },
+  "jinryo": {
+   "kind": "door",
+   "x": 745,
+   "y": 525,
+   "to": "jr_jinryo",
+   "toDoor": "out",
+   "label": "진료실",
+   "door": {
+    "x0": 678,
+    "x1": 812,
+    "y0": 205,
+    "y1": 522,
+    "anim": "none",
+    "behind": "dark"
+   }
+  },
+  "op": {
+   "kind": "door",
+   "x": 1059,
+   "y": 525,
+   "to": "jr_op",
+   "toDoor": "out",
+   "label": "수술실",
+   "door": {
+    "x0": 990,
+    "x1": 1128,
+    "y0": 205,
+    "y1": 522,
+    "anim": "none",
+    "behind": "dark"
+   }
+  }
+ },
+ "lamps": [
+  {
+   "x": 445,
+   "y": 40,
+   "kind": "down",
+   "r": 420
+  },
+  {
+   "x": 900,
+   "y": 40,
+   "kind": "down",
+   "r": 420
+  }
+ ],
+ "objects": [
+  {
+   "id": "counter0",
+   "name": "접수대 1",
+   "file": "",
+   "x": 122,
+   "y": 548,
+   "w": 28,
+   "h": 254,
+   "sortY": 805,
+   "coverMask": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABwAAAD+CAIAAACm4/JKAAAA5ElEQVR4nO3cQQ7CIBRFUTDuf8t18DUhMdXSQqHpeXNPrtiQjsyp6ZZlSSk92qKxfJyIujeXc5qx9Lsx1qX0Ouiz9gPlOa5tjq+fcy5/6DbolkGhUOjcaMXNv+XOj40rjcbywv9dPdMbyoBS6J3R6ud02FtfRengW+o66J8z3X6O5c4t3dcYO6v0SGOsf+nxxljP0laNsT6lbRtjNz9TKBTacpe7+dc20RsKFAqFQqFQKBQKhUKhUCgUCoVCoVAoFAqFQqFQKBQKhUKhUCgUCoVCoVAoFAqFQqGf+U8EKBQKvRv6AoplPcbVznVmAAAAAElFTkSuQmCC"
+  },
+  {
+   "id": "counter1",
+   "name": "접수대 2",
+   "file": "",
+   "x": 150,
+   "y": 532,
+   "w": 40,
+   "h": 270,
+   "sortY": 805,
+   "coverMask": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACgAAAEOCAIAAAB0HsKlAAABJ0lEQVR4nO3W0Q6CQAwEQDD+/y+fD41GQyBgPa6G2VdpxvWoME2JtNZaa9/N3jJwJvPRgfeK83x4/JVhjQ8kc6LL1G78266Rqo17dI1U2uNfbep2apxxvxNdZnTjM7tGhjW+n1x0em7N6D2Ob7Fna/dfuTYbGXfG+y/9ruvaPVS1cf5/O6aWves1zt+927M19vjjg/SmbqfSGffuGqnR+JyukRqNjybzLP+3xvn3ltqNe7yX1Wvc++2z3tOpd4Y1vh48n3+6kev91GAwGAwGg8FgMBgMBoPBYDAYDAaDwWAwGAwGg8FgMBgMBoPBYDAYDAaDwWAwGAwGg8FgMBgMBoPBYDAYDAaDwWAwGAwGg8FgMBgMBoPBYDAYDAaDwWAwGAwGg8FF4QeDdWrao9flJQAAAABJRU5ErkJggg=="
+  },
+  {
+   "id": "counter2",
+   "name": "접수대 3",
+   "file": "",
+   "x": 190,
+   "y": 504,
+   "w": 40,
+   "h": 298,
+   "sortY": 805,
+   "coverMask": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACgAAAEqCAIAAADoI4WFAAAA8klEQVR4nO3WywrCQBBFwSj+/y+3iwYZcDNqZx6m7jqkOJBMchyli4iI6LnyXgv3DwwG7w/fqm7UeWC9Nq24eM5q8ALwYzyZj/2/F7+/3Nd7uHydhq2g+NPW3J7F37Xm9in+pbLdDsVVrblVi2sr261XfF5rbqXis1tzs4vHVLabVzy+NXe9nz0wGAwGg8FgMBgMBoPBYDAYDAaDwWAwGAwGg8FgMBgMBoPBYDAYDAaDwWAwGAwGg8FgMBgMBoPBYDAYDAaDwWAwGAwGg8FgMBgMBoPBYDAYDAaDwWAwGAwGg8FgMBgMBoPBYDAYDAaDt4Gf6Uw1F3itcuQAAAAASUVORK5CYII="
+  },
+  {
+   "id": "counter3",
+   "name": "접수대 4",
+   "file": "",
+   "x": 230,
+   "y": 440,
+   "w": 40,
+   "h": 362,
+   "sortY": 805,
+   "coverMask": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACgAAAFqCAIAAADne4/pAAABWElEQVR4nO3dQQ6CMBAFUDDe/8p1MRsiwYBgcabv71y9fKdg0jZxmhZprbXWpi559GHAYPBmzj/x2RqDwWAwGAwGg8FgMBgMBoPB4FvhZ09suf1ZvfF6q7du461t7YqNP2/hV2m8/6Aif+OjhzI5G585ehrvZxHcLQdW9bUXJv678S8uh9zWeO521eUt9zVefujZfrwXiFUNBoPBYDAYDAaDwWAwGAwGg8FgMBgMBoPBYDAYDAaDwWAwGAwGg8FgMBgMBoPBYDAYDAaDwWAwGAwGg8FgMBgMBoPBYDAYDAaDwWAwGAwGg8FgMBgMBoPBYDAYDAaDwWAwGAwGg8vAF/9X/Z7M8zyN0ji6RsZbXNVnvJxuZLyvuu6M19ONVGy81TVSq/HnrpEqjfd0jYz3Ask/4/3TjWRufLRrJGfj77pGxnucss34zHQjeRqf7xrJ0PiqrpHbGr8ATO8y86N8GcYAAAAASUVORK5CYII="
+  },
+  {
+   "id": "counter4",
+   "name": "접수대 5",
+   "file": "",
+   "x": 270,
+   "y": 459,
+   "w": 40,
+   "h": 307,
+   "sortY": 757,
+   "coverMask": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACgAAAEzCAIAAADM+tbWAAABVUlEQVR4nO3WW26DQBREQYi8/y2Tj/4ZCcWKzTDMo3oDpeMLtvet+Y7j2Lbtpz2cgZttb4nlscpmLy5bsxmLz5Xl1nudxr/x+4ueN3Lxp63ZaMXfVZYbp/h6azZCca3WrNfiupXleiq+r7JcH8VtWrOni1u2Zuv99Xnuxu2vm633UYPBYDAYDAaDwWAwGAwGg8FgMBgMBoPBYDAYDAaDwWAwGAwGg8FgMBgMBoPBYDAYDAaDwWAwGAwGg8FgMBgMBoPBYDAYDAaDwWAwGAwGg8FgMBgMBoPBYDAYDAZ3Cr/ak/u+b6sUpzWbvbhszdZ7nea98fm62YzFf7VmcxW/b83GL/5PZbn1vkDAzVbhqf70ec7GLP6uNRut+Eprtt7rNM6Nr183W++jHuHGta6b9V1ctzXrtfiO1qy/4vtas56K727N+ihu05qt9yPx9I1bXjd7rPgXT+Asie4hMY8AAAAASUVORK5CYII="
+  },
+  {
+   "id": "counter5",
+   "name": "접수대 6",
+   "file": "",
+   "x": 310,
+   "y": 448,
+   "w": 40,
+   "h": 268,
+   "sortY": 710,
+   "coverMask": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACgAAAEMCAIAAAA51mOuAAABI0lEQVR4nO3Uy26DQBREQU/k//9lsugNEnLkMDDMo3qPSodrU14V27bt9LM/NXDNyrnHalqzEYrrK/fru/ja1qyn4jv6juujuE1r9lxxy8r9HisGg8FgMBgMBoPBYDAYDAaDwWAwGAwGg8FgMBgMBoPBYDAYDAaDwWAwGAwGg8FgMBgMBoPBYDAYDAaDwWAwGAwGg8FgMBgMBoPBYDAYDAaDwWAwGDwW/G5PllJeK77qNW6c62azF+9bs3mLj63ZjMWfWrP1PiBz3fjv62azFH/Tmo1f/H1rtt7faeQb//e62ZjF51qz0YprWrNxiutbsxGKr2rN1vtk9n3ja6+b9Vp8R2u23o+rvxvfd91svVfd043vvm7WR3Gb1uzp4pat2WPFvwCzF1x0f4nPAAAAAElFTkSuQmCC"
+  },
+  {
+   "id": "counter6",
+   "name": "접수대 7",
+   "file": "",
+   "x": 350,
+   "y": 440,
+   "w": 40,
+   "h": 224,
+   "sortY": 662,
+   "coverMask": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACgAAADgCAIAAAD+J7PjAAAA+0lEQVR4nO3Wyw6CMBRF0WL8/1+ugzvwAZoKUvtYZwxZ2WlJSGnXcs45533vxi5HXgaDP20pfO7gHV7vf8U/TyncfJcLDAaDwWAwGAwGg8FgMBgMBoPBYDAYDAaDwWAwGAwGg8FgMBgMBoPBYDAYDAaDwWAwGAwGg8FgMBgMBoPBYDAYDAaDwWAwGFywa31yWZY0S3G0xua7XKOf8ePpxsYtXrfGRix+1xqb73Ma64w/n25slOKS1lj/xeWtsZ6Lv22N9Vm8rzXWW/GR1ljbxcf71mu1+IzWWHvF57XGGvv1OTt3G66gbsB11Fe4mvoE11TvcGU1Nfc5VdgNTBUOCbyTFZYAAAAASUVORK5CYII="
+  },
+  {
+   "id": "counter7",
+   "name": "접수대 8",
+   "file": "",
+   "x": 390,
+   "y": 446,
+   "w": 28,
+   "h": 176,
+   "sortY": 615,
+   "coverMask": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABwAAACwCAIAAACTsZlWAAAAw0lEQVR4nO3ZQQ7CIBQEUDHe/8q4+IlBjbG1v6Xgm1VXL1MoJNBSa71kpJTyeL6miC+BQqGZuW0n2lUfOV/T946RcSYKCoVCoVAoFAqFQqFQKHQytGTdSbdxLwWFQtOStkvt/ufMLgWFQqFQKBQKhUKhUOh86Orz/qczfptxXh8Khc6H1lq/Xrn23k+X7KSRc4xpN3TRmC4fzUiPpms7Ro5t+lvHyFFNt3SMjPPxQ6F/iz6t/e2rPrJn06yOkXEmahf0Dg9yEJEcvWt/AAAAAElFTkSuQmCC"
+  },
+  {
+   "id": "fan",
+   "name": "선풍기",
+   "file": "",
+   "x": 1098,
+   "y": 546,
+   "w": 116,
+   "h": 294,
+   "sortY": 848,
+   "coverMask": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAHQAAAEmCAIAAAA8ySM4AAAExUlEQVR4nO3d0XLaMBgFYZzJ+7+ye+FOxx1jkCyt9Eva77ol6XIwjgtke4Wx7zt6+9u2obd/9dP46y2l9Z354heajt6yywU1Wu7dWku2c9zm9RZyHxncfl0u6LfuzX1eTfvn6xTn77nud+hyQdXuqFpH1WfnEuevUn42Umu/LhdU4S66e9bOvYU4XO4Ais4WSjbba63l58XpXC7o4XLLj7MrcLmg7OXOtFn63+JyQRl3Wt37OcK5rddzB9bt0Nl3uW2eM1wuqPL13BQRjrZtuFwQvtx1dnrlckGLxt33vcFDatG4bXQ4W4jA89zh4XG3bZvjEtoDLhdkXJBxQYvGbfNz46JxX036Noq75jnDustt4L81ca9Uvfsqffl/aAPrEHed46/LBf1dUJuj7VWE4y/xyuLjNl0uaNHruQf61fAuF9RtuRGOts+kf+cuF1RhubnvQFths8efdLmg35Idff6719fzjrLZWt+5ywVt6e8zH2V36eh/ncsFvVluy/cYzs3lgowLMi7IuCDjgr5cW/A8oYTLBRkXZFzQl2sLKuFyQcYFGRdkXJBxQcYFGRf05trC3P9v1pLLBRkXZFyQcUHGBXlVDORyQcYFGRe09Lt5OL4PDfezzjtx23O5IOOCjAu6/aQQPfbvOczlgkKf547+7gyXCzJuZedHm3FBb342i3BcG/Ed79fv2eWCis4WUi5KpL9Dc75LHC4XdDuWlKNb+63FPObedXC5oNtj7nFvxFxKHJ8fuy4XlHTQTHnGby/3WaHun08pEPrCTV3tXxrbf4Adff7s1dzPS7vymCtSyu9Ge/b70xY65t6J8OSsbMPfaTFPEw8TPqG1+f2SKSaMG4dxQcYFGRdkXJBxQcYFGRdkXNC0cSP8kDZt3Ahmjtt9vDPH7S7K1bkHvg6z+7VHlwsaNW7342mKUeMOYdS43Y+nKUaNOwTjgowLMi7IuCDjgowLMi7IuCDjgowLMi7IuCDjgowLMi7IuCDjgowLMi7IuCDjgowLMi7IuCDjgowLMi7IuCDjgowLMi7IuCDjgowLMi7IuCDjgowLMi7IuCDjgowLMi7IuCDjgowLGuBTC67SPyak78cyuFzQYMt99tE2vfbrckHGBRkXZFyQcUHGBRkXZFyQcUHGBRkXZFyQcUHGBRkXZFyQcUHGBRkXZFyQcUHGBRkXZFyQcUHGBRkXZFyQcUHGBRkXZFyQcUHGBRkXZFyQcUHGBRkXZFyQcUHGBRkXZFyQcUHGBRkXZFyQcUHGBRkXZFyQcUHGBRkXZFyQcUHGBRkXZFyQcUHGBRkXZFyQcUFLfPLzVZvPgna5oBDLrbXHZ7gVu1wQvty+q0xH7NflgirfXaPs9E7d/bpcULU7avTNntXar8sFVbiLZtrsWfl+XS6o6M6ZdbNnJft1uSDjgoz7Rcmhz2Nuhtzjr8sFGTfDvu9ZD1bjgoybLX2/xgUZ96GU/RoX5PXcCu7Of10uqFrcbdt6/UrzsFwuyLgg44Iqx/XIe+ZyQUhc93twuSDjgowLAuN65HW5oEbLmvWa2eeHpssFNT0mzrTflKcTlwvq9mw+4op9xU0gnc9Do+3Xd/MMI8RPUPR+e/2g6HJBIZZ7yN1v/AsXLhf0B146PS8/8Bm2AAAAAElFTkSuQmCC"
+  },
+  {
+   "id": "plant",
+   "name": "화분",
+   "file": "",
+   "x": 1012,
+   "y": 642,
+   "w": 124,
+   "h": 194,
+   "sortY": 848,
+   "coverMask": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAHwAAADCCAIAAAAEvDHsAAAD5UlEQVR4nO2dzXKkMAwGl628/yvPHkhtJZWQ+EeiZdN9yinDfDQaYwtz/CnM6/X6//dxHOCRxPKXPoAnskzor9fro/hLs0zoO1G6UP6s9rpVXtMBDB3A0AEGy2LLQGK+5t7zKfej6QCJpn/zYZ1Wtn/KWr5rOsCUIPO3iD8bqukSxlTox3FMKrbTjEo7mg4QVgoz6nvv/1ylsms6QLAarO9Rpn/9xNhrSNMBUopgrO/Zlf3+WXtNB0j8uacG4C1usve6mg7wRh/A3VS4AdZ0gETTz2pYwayTOkei6QDpNb2C73UcP9F0gJtGL5Tv1Rw/0XQAYAK6pn1fyZud13SAjpMZO19R33dN34qmk5nX31LT9+y1Vk0HuDyleQ7Or/pnM9N31nKVaDrAN6flHu9mVkGziTq2K+s1HeDTqahm3E58tF7TAd7jj7rbnH9CY++r7fymmg7wFtvfVGGdqCbWdJhCHV57VHbvSIuSvnI0My6q7PvMTKSmAxQy/aSy71Hz7JoOAD8xfUW1kYzPHC1PR4dXBeP2QNMBbuoGGKNCZfeZo034paY/uY7b4bUVl6Y/2fFsNB0A63tpp8IY5oqxuq/pAJ9qeux+E9WszGDsXQaaDtAx92JnwM+0W6/pAJemR92PPc33k5+t13SAT6avsq/hWpzW2+EFU2gH0idg1y5GwC4YOt6LpgNMmb6342NjuZZMNB3g1re/rEXee5o0HaD7ZD7B8Y9k7Mmu6QCa3kFUldd0gJQ9vPZm3ndNB0js2n1Cr4B9L8sQZnreTEV9er+7pgMEmH7Pu6QziN0t0g6v0kw9ibFr90D2fqmaDvCLqlfndqexysz1OvY+R00H6Da93YuaXrfgrtIbktifvi5fuw9j0XSAx72lsZ2x54la0HSAgBO47iilF/fwWpiie3hVxjXSJbGXcRB3IF0MQwcwdABDBzB0AEMHMHQAQwcwdABDBzB0AEMHMHQAQwcwdABDBzB0ANdIu3GNdEnse+nAvpeFMXQAQwcwdABDBzB0AEMHCAj9OI7nPI4UgqYDGDqAoQMYOoChAxh6K4EjNEMHMHQAQwcw9FYCF8gMHcDQW3H0sjZhoTvX2I6mAxg6gKG34pCRwb12GUJyN/Ru5nM39BEmczf0QWZyN/RxhnM3dABDBwgO3RmYFjQdwNABDB3A0AEMHcDQAQwdwNABDB3A0McZvvc29EFmZjsS50k23h1jcn5J07uZn9HzjV6t2Mu4NoYOYOgAhg5g6ACGDmDoAImh2xlwhaYDGDqAoQPcWnOXnncM/H1ywuudO3/zsdEFaz07rLKmA5QbR2dcAdVuFzQd4B/eD1SL/n/YWgAAAABJRU5ErkJggg=="
+  },
+  {
+   "id": "right",
+   "name": "오른쪽 끝 물건",
+   "file": "",
+   "x": 1202,
+   "y": 528,
+   "w": 62,
+   "h": 296,
+   "sortY": 848,
+   "coverMask": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAD4AAAEoCAIAAACPW9UhAAACCElEQVR4nO3dXVLCMBhAUeu4/y3jQ3xgBB1Byk3KOQvA60emA/0J29tTnE6nh7/m+8Nf8WmkF6QXtr3/wB7HlsHUr9lv3sOrTn3vuf7ulabeTvrcwlOXXrhhrc+zyoejT322eQ/Hnfqc8x6OOPWZ5z0sPHXphStrff5VPhxl6qvMe1h46tILX2t9rVU+LDx16QXpBemFbcUj+rDw1KUXfIYp+JZUkF5wHqYgvSC94KpGQXrBddOC9IL0gvthCtIL0gvSC9IL0gvSC9IL0gvSC9IL0gvSC9ILdz5bPcNZyNeb+uCJ9jtJLzxgz4xqxb/21M898x0w9X+4+41aeOrSC9IL7rgruJO6IL3gCZmC9IL0gvSC9IL0gvSC9IL0gvSC9IL0gvSC9IL0gvSC9IL0gvSC9IL0gvSC9IL0gnu/CtIL7i4t2FmwYLe1gl/aLHzUAX+1bd8XyMJTvyF927bLfz20wIKZal4AAMCf7Pgp/lFnEH76qrHwd1P7fhWc/So4v15wLakgvSC9IL3gfpiC9IL0gvTC13F9lWP5uYWnLr0gvSC9YD/HgrNfBekF6QXpBekFV/AK0gvSC9IL0gvSC9IL0gvSC9IL0gvSC9IL0gv2hylIL0gvSC9IL0gvSC9IL0gveKK9cPPuDfPMfuGpSy8ssBXlpbFjzM1Tn2cb0N0j/n9EOuCuPJ8hA4uac/fHcQAAAABJRU5ErkJggg=="
+  }
+ ],
+ "spots": []
+}

@@ -275,10 +275,8 @@ export const HQ_SCENES: HqScene[] = [
   floorHall('jr_heolgap', '헐값 매입', 'B1', [{ id: 'out', kind: 'exit', side: 'S', to: 'jr_alley', toDoor: 'heolgap', label: '나가기' }], { spots: JR_ROOM_SPOTS.jr_heolgap }),
   floorHall('jr_youngchang', '영창 컨설팅', 'B2', [{ id: 'out', kind: 'steel', to: 'jr_b2', toDoor: 'youngchang', label: '나가기' }], { spots: JR_ROOM_SPOTS.jr_youngchang }),
   floorHall('jr_songil', '손길 의원', 'B1', [
-    { id: 'out', kind: 'glass', to: 'jr_b1', toDoor: 'songil', label: '나가기' },
+    { id: 'out', kind: 'exit', side: 'S', to: 'jr_b1', toDoor: 'songil', label: '나가기' },
     { id: 'jinryo', kind: 'door', to: 'jr_jinryo', toDoor: 'out', label: '진료실' },
-    { id: 'wc', kind: 'door', locked: true, label: '화장실' },
-    { id: 'store', kind: 'door', locked: true, label: '창고' },
     { id: 'op', kind: 'door', to: 'jr_op', toDoor: 'out', label: '수술실' },
   ], { spots: JR_ROOM_SPOTS.jr_songil }),
   floorHall('jr_jinryo', '진료실', 'B1', [{ id: 'out', kind: 'door', to: 'jr_songil', toDoor: 'jinryo', label: '대기실로' }], { spots: JR_ROOM_SPOTS.jr_jinryo }),
