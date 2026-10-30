@@ -4,6 +4,7 @@
 사용:
   python3 tools/pixellab/bg_prompt.py <명세.json>            → 같은 폴더에 <이름>_prompt.txt, <이름>_req.json
   python3 tools/pixellab/bg_prompt.py <명세.json> --sketch <밑그림.png> "<밑그림 쓰는 법>"
+  python3 tools/pixellab/bg_prompt.py <명세.json> --no-ref1      → 참고 그림 1(헐값매입) 없이
 
 명세 칸 (모두 영어 문장 조각, 끝 마침표 없이):
   name        파일 이름 (예: op_v4)
@@ -112,6 +113,7 @@ def main():
     req['description'] = text
     req['reference_images'] = req['reference_images'][:1]
     req['reference_images'][0]['usage_description'] = REF1_USAGE
+    if '--no-ref1' in sys.argv: req['reference_images'] = []   # 참고 그림 1의 배치가 따라 들어와서 뺄 때(사용자 10-30 진료실 v4)
     if '--sketch' in sys.argv:
         i = sys.argv.index('--sketch'); p, usage = sys.argv[i + 1], sys.argv[i + 2]
         from PIL import Image
