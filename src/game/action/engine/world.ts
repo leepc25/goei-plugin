@@ -169,8 +169,9 @@ export class World implements WorldView {
       },
       hurtPlayer: (dmg, stagger = true) => {
         const p = this.player;
-        if (stagger) p.applyHit({ x0: 0, x1: 0, z0: 0, z1: 0, y: p.y, attackId: newAttackId(), dmg, react: 'flinch', dir: (-p.dir) as 1 | -1, push: 2 }, this);
-        else p.hp = Math.max(0, p.hp - dmg);
+        if (stagger) return p.applyHit({ x0: 0, x1: 0, z0: 0, z1: 0, y: p.y, attackId: newAttackId(), dmg, react: 'flinch', dir: (-p.dir) as 1 | -1, push: 2 }, this).kind !== 'immune';
+        p.hp = Math.max(0, p.hp - dmg);
+        return true;
       },
       heal: (n) => {
         this.player.hp = Math.min(this.player.hpMax, this.player.hp + n);

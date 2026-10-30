@@ -393,7 +393,10 @@ function hudState(w: World, shell: Shell): HudState {
     // 아래 자막은 3초까지만 (바닥 띠를 오래 가리지 않게)
     message: w.subtitle && w.tick - w.subtitleAt < 90 ? w.subtitle.text : undefined,
     // 가드 게이지는 가드 중이거나 닳았을 때만
-    meters: p.guarding || p.guardMeter < 100 ? [{ label: '가드', v: p.guardMeter, max: 100, color: '#9ad08a' }] : [],
+    meters: [
+      ...(p.guarding || p.guardMeter < 100 ? [{ label: '가드', v: p.guardMeter, max: 100, color: '#9ad08a' }] : []),
+      ...(p instanceof FighterPlayer && p.dodgeMeter < p.dodgeMax ? [{ label: '회피', v: p.dodgeMeter, max: p.dodgeMax, color: '#8fc6e8' }] : []),
+    ],
     // 걸린 상태 효과 (출혈×2 5 · 오염×1 …)
     status: ((p as { status?: StatusSet }).status?.view() ?? []).map((v) => ({ label: `${v.label}${v.stacks > 1 ? `×${v.stacks}` : ''}${v.t !== null ? ` ${Math.ceil(v.t)}` : ''}`, good: false })),
     compact: shell.touchShown,
@@ -874,7 +877,8 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
         // 디버프는 글자만이 아니라 실제로 건다 (src/game/combat/status.ts, 에일린)
         const st = (w.player as { status?: StatusSet }).status;
         const put = (k?: string, ticks?: number) => { if (st && k && k in STATUS) st.apply(k as DebuffKind, ticks ? ticks / 30 : undefined); };
-        if (e.name === 'hurtPlayer') { w.api.hurtPlayer(d.dmg ?? 10); put(d.debuff?.kind, d.debuff?.ticks); }
+        // 회피·무적으로 피했으면 디버프도 안 건다(10-30: 피해는 0인데 출혈 등이 걸리던 버그)
+        if (e.name === 'hurtPlayer') { if (w.api.hurtPlayer(d.dmg ?? 10) !== false) put(d.debuff?.kind, d.debuff?.ticks); }
         else if (e.name === 'debuff') { put(d.kind, d.ticks); if (d.text) w.say(d.text, 1.5); }
       });
       const items = linkItems(w, run);

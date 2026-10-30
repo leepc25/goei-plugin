@@ -99,7 +99,8 @@ function atkSeq(id?: Json, heavy?: Json) {
 // ── 상태 ──
 const P0 = () => ({ x: 420, y: 580, z: 0, vz: 0, face: 1, mode: 'ground', combat: false, armed: false, clip: null, pvx: 0, pvy: 0, pdec: 0,
             jumps: 0, airAtk: false, airVX: 230, takeoff: 0, spin: 0, buf: null, chainT: 0, combo: 0, stunT: 0, idleT: 0, lastTap: {}, runLatch: false,
-            hp: 100, sp: 0, heat: 0, overT: 0, lastShot: 0, chargeShown: 0, armorT: 0, inv: 0, charge: 0, ghostT: 0, dying: false, t: 0, buffT: 0, vanish: null, cd: {}, seat: null });
+            hp: 100, sp: 0, heat: 0, overT: 0, lastShot: 0, chargeShown: 0, armorT: 0, inv: 0, charge: 0,
+            dodgeN: 2, dodgeMax: 2, dodgeCd: 0.8, dodgeT: 0, ghostT: 0, dying: false, t: 0, buffT: 0, vanish: null, cd: {}, seat: null });
 let P: PState = P0() as PState;
 let zoom = 0;
 let paused = false, hitstop = 0, shake = 0, flash = 0, dark = 0, cut = 0;
@@ -601,6 +602,9 @@ function dodge() {
   if (dx && dx === P.face && P.prevFace === -dx && P.t - P.faceT < 0.3) P.face = P.prevFace;
   const fwd = dx * P.face > 0, len = Math.hypot(dx, dy);
   const id = fwd && has('16_1') ? '16_1' : has('16') ? '16' : null; if (!id) return;
+  // 회피는 2번까지 모아 두고 하나 쓰면 0.8초 뒤 다시 찬다(10-30 사용자: 연타하면 0.24초 캔슬 < 무적 0.3초라 무적이 끊기지 않던 것). 퍽은 dodgeMax·dodgeCd를 바꾼다
+  if (P.dodgeN < 1) return;
+  P.dodgeN--; if (P.dodgeT <= 0) P.dodgeT = P.dodgeCd;
   sfx('evade'); P.dodgeV = { x: dx / len * 780, y: dy / len * 520 }; P.inv = 0.3; P.ghostT = 0.2;
   P.pvx = 0; P.pdec = 0;
   const n = nOf(id), d = 0.32 / n;
@@ -1045,6 +1049,7 @@ function update(dt?: Json) {
   if (P.mode !== 'air' && P.z > 0) { P.vz = Math.min(P.vz || 0, 300) - 2700 * dt; P.z = Math.max(0, P.z + P.vz * dt); if (P.z === 0) { P.vz = 0; dust(P.x, P.y, 4, 1); sfx('land'); } }
   if (P.clip && (P.clip.id === 'SH_D' || P.clip.id === 'SH_E') && Math.random() < dt * 60) { const k = K(P.y); fx.push({ k: 'mote', x: P.x + (Math.random() - 0.5) * 70 * k, y: P.y - (230 + Math.random() * 40) * k, vy: 700 + Math.random() * 200, c: 'rgba(170,220,255,.8)', t: 0.3 }); }   // 샤워 물줄기(코드)
   P.inv = Math.max(0, P.inv - dt); P.wakeArmor = Math.max(0, (P.wakeArmor || 0) - dt);
+  if (P.dodgeN < P.dodgeMax) { P.dodgeT -= dt; if (P.dodgeT <= 0) { P.dodgeN++; P.dodgeT = P.dodgeN < P.dodgeMax ? P.dodgeCd : 0; } }
   if (P.overT > 0) { P.overT -= dt; P.heat = 100 * Math.max(0, P.overT) / 2.6; if (Math.random() < dt * 6) { const p = P.armed ? muzzle() : { x: P.x + P.face * 30 * K(P.y), y: P.y - 150 * K(P.y) }; steam(p.x, p.y, 1.2); } }
   else if (P.t - P.lastShot > 0.35) P.heat = Math.max(0, P.heat - 30 * dt);
   if (P.ghostT > 0) { P.ghostT -= dt; P.ghostN = (P.ghostN || 0) + dt; if (P.clip && P.ghostN > 0.05 && !(P.ghostN = 0)) fx.push({ k: 'ghost', id: P.clip.id, f: curF(), x: P.x, y: P.y, z: P.z, face: P.face, t: 0.18, t0: 0.18 }); }

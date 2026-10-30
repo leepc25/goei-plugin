@@ -99,6 +99,9 @@ export class FighterPlayer extends Player {
     return best;
   }
   /** 그리는 순서용 깊이: 물건 위에 서 있으면 그 물건 앞 모서리보다 앞으로 */
+  /** 회피 충전: 쓸 수 있는 회피 수 + 다음 하나가 찬 만큼(0~1) */
+  get dodgeMeter(): number { const P = this.core.P; return P.dodgeN + (P.dodgeN < P.dodgeMax && P.dodgeCd > 0 ? 1 - Math.max(0, P.dodgeT) / P.dodgeCd : 0); }
+  get dodgeMax(): number { return this.core.P.dodgeMax; }
   get sortY() {
     const p = this.z > 4 ? this.platformAt(this.x, this.y) : null;
     return p && this.z >= p.h - 8 ? p.y1 + 2 : this.y;

@@ -172,7 +172,8 @@ export interface StageApi {
   readonly world: WorldView;
   spawn(s: SpawnSpec): void;
   setProp(id: string, patch: Partial<PropSpec> | null): void;
-  hurtPlayer(dmg: number, stagger?: boolean): void;
+  /** false = 무적·회피로 안 맞음 */
+  hurtPlayer(dmg: number, stagger?: boolean): boolean;
   heal(n: number): void;
   note(key: string, value: unknown): void;
   finish(how: 'next' | 'withdraw' | 'return'): void;
