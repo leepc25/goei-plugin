@@ -17,7 +17,8 @@
    "채우기 더 강조(packed+, 사용자 10-30)",
    "낮은 탁자가 바닥 한가운데 덩그러니 → 소파 세트로 오브젝트로(사용자 10-30)",
    "좁게(양쪽 벽 닫음, 바닥 40%), 내용물 더하기, 색은 그대로·명암 대비 넣기(사용자 10-30)",
-   "유리 칸막이 쓰지 않음(사용자 10-30), 안쪽 사무실은 카펫으로만"
+   "유리 칸막이 쓰지 않음(사용자 10-30), 안쪽 사무실은 카펫으로만",
+   "좁게(사용자 10-30, v3도 넓어 보임): 작은 방, 폭 약 4m·깊이 3m, 뒷벽이 가깝게"
   ],
   "items": [
    {
@@ -188,14 +189,14 @@
  "sized": [
   "reception counter"
  ],
- "place": "fixer's office, 1990s Seoul underground arcade",
+ "place": "a small cramped fixer's office, 4 m wide, 3 m deep, back wall close, 1990s Seoul underground arcade",
  "time": "night",
  "light": "fluorescent and neon",
  "view": "one-point",
  "floor_share": "the lower 40 percent",
  "sides": "both",
  "density": "packed+",
- "floor": "stained beige tiles; on the right, dark carpet marks the inner office, no partition",
+ "floor": "stained beige tiles; dark carpet on the right marks the inner office",
  "walls": "dark red-brown wallpaper; tube lights",
  "items": [
   {
@@ -499,7 +500,7 @@
   "brief": "위키·설계안 항목 모두 줄·칸·as_objects에 대응. 뺀 것: 소파·의자(오브젝트), 낮은 탁자(소파 세트라 같이 오브젝트), 금색 시계·삼단봉(인물 몫)",
   "meaning": "v1에서 빠진 「flat, wall-mounted」(TV 모양)를 되살리고 「flush on the wall」로 브래킷을 막음. 접수대 틈은 clear empty gap으로, 칸막이는 low·only waist high로. 모양·설치·통로 말은 도구가 못 빼게 막음. 뺀 것은 재질·색·같은 뜻뿐",
   "over": "같은 물건 두 번 없음. 더한 4줄(구인 게시판·서류 선반·서류장·술병 선반)은 위키 근거. 억지 채우기 없음. 안쪽 사무실 카펫 가운데는 포커 테이블",
-  "frame": "one-point, 바닥 40%, 양쪽 벽 닫음(사용자: 좁게), 문 0(아래 출구), 채우기 packed+, 명암 대비 강하게(사용자), 색은 그대로, 참고 그림 1·밑그림 없음, 유리 칸막이·유리벽 금지(사용자)"
+  "frame": "one-point, 바닥 40%, 양쪽 벽 닫음(사용자: 좁게), 문 0(아래 출구), 채우기 packed+, 명암 대비 강하게(사용자), 색은 그대로, 참고 그림 1·밑그림 없음, 유리 칸막이·유리벽 금지(사용자); 방 크기를 숫자로(폭 4m·깊이 3m, 뒷벽 가까이) — v3는 양쪽 벽을 닫아도 넓어 보였음"
  },
  "as_objects": [
   {

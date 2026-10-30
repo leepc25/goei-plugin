@@ -22,6 +22,7 @@
 - 사용자: 낮은 탁자가 바닥 한가운데 덩그러니 → 소파 세트로 오브젝트로(사용자 10-30)
 - 사용자: 좁게(양쪽 벽 닫음, 바닥 40%), 내용물 더하기, 색은 그대로·명암 대비 넣기(사용자 10-30)
 - 사용자: 유리 칸막이 쓰지 않음(사용자 10-30), 안쪽 사무실은 카펫으로만
+- 사용자: 좁게(사용자 10-30, v3도 넓어 보임): 작은 방, 폭 약 4m·깊이 3m, 뒷벽이 가깝게
 
 ## 설계안·위키 항목 대조
 
@@ -85,14 +86,14 @@
 - 이유 없는 채움 물건·같은 물건 두 번·쓸데없이 긴 설명이 있나?
   - 같은 물건 두 번 없음. 더한 4줄(구인 게시판·서류 선반·서류장·술병 선반)은 위키 근거. 억지 채우기 없음. 안쪽 사무실 카펫 가운데는 포커 테이블
 - 원근·바닥 몫·양옆 벽·문·채우기가 이 장면에 정한 대로인가?
-  - one-point, 바닥 40%, 양쪽 벽 닫음(사용자: 좁게), 문 0(아래 출구), 채우기 packed+, 명암 대비 강하게(사용자), 색은 그대로, 참고 그림 1·밑그림 없음, 유리 칸막이·유리벽 금지(사용자)
+  - one-point, 바닥 40%, 양쪽 벽 닫음(사용자: 좁게), 문 0(아래 출구), 채우기 packed+, 명암 대비 강하게(사용자), 색은 그대로, 참고 그림 1·밑그림 없음, 유리 칸막이·유리벽 금지(사용자); 방 크기를 숫자로(폭 4m·깊이 3m, 뒷벽 가까이) — v3는 양쪽 벽을 닫아도 넓어 보였음
 
-## 2차 요청문 (1950자)
+## 2차 요청문 (1988자)
 
 ```
-Pixel art game background: fixer's office, 1990s Seoul underground arcade, night, fluorescent and neon.
+Pixel art game background: a small cramped fixer's office, 4 m wide, 3 m deep, back wall close, 1990s Seoul underground arcade, night, fluorescent and neon.
 Camera at standing eye height, about 20 degrees above the floor, looking slightly down. One-point perspective, side walls receding toward the middle. The floor fills the lower 40 percent of the image. Both side walls are visible, a closed room.
-FLOOR: stained beige tiles; on the right, dark carpet marks the inner office, no partition.
+FLOOR: stained beige tiles; dark carpet on the right marks the inner office.
 WALLS: dark red-brown wallpaper; tube lights.
 VERY CLUTTERED: every wall, shelf and corner packed with small props. THINGS (a standing adult is 150 pixels tall): Left wall, front: dark tinted glass shop window, red neon sign reading "OPEN". Left wall, high: a flat TV mounted flush, dark screen. Floor by the window: a potted plant, an umbrella stand. Floor, left part: a reception counter facing the camera, chest high (95 pixels), a metre in front of the back wall, a clear empty gap to the left wall, a walkway behind. On the counter: a candy bowl, a document tray, a guestbook, newspapers. Back wall, behind the counter: a baseball bat; a tall shelf of binders, contract folders, document boxes. Floor, front center: a worn doormat. Back wall, left part: two faded photos; a fire extinguisher box; a cork board crowded with job flyers and contracts. Inner office floor: a green felt poker table, poker chips, cards, a cigar box. Inner office back wall: a framed picture, a low sideboard with binders. Back wall, right of the counter: two filing cabinets, folders and a fan on top. Right wall, inner office: a shelf of liquor bottles and shot glasses.
 LIGHT: strong contrast, bright pools under tubes, pitch-dark corners and shadows.
