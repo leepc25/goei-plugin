@@ -148,9 +148,12 @@ export function graded(p: PerkText): boolean { return p.kind === '숫자' && !UN
 /** 등급이 고정된 퍽의 등급 (숫자 중 켜고 끄기는 일반, 그 밖은 희귀, 센 것은 특급). 쌍은 따로(금색) */
 export function fixedGrade(p: PerkText): Grade { return p.kind === '숫자' ? 0 : EPIC.has(p.name) ? 2 : 1; }
 
+/** 쌍 퍽: 조건이 맞으면 후보에 이 확률로 1개 (10-30 사용자: 35%) */
+export const PAIR_CHANCE = 0.35;
+
 export type Offer = { type: 'perk'; def: PerkText; rank: number; grade: Grade } | { type: 'trait'; def: TraitText };
 
-/** 방 보상 후보: 3개(특성 「탐욕」 4개). 쌍 퍽은 조건이 맞으면 최대 1개, 특성은 최대 1개(25%).
+/** 방 보상 후보: 3개(특성 「탐욕」 4개). 쌍 퍽은 조건이 맞으면 35%로 1개, 특성은 최대 1개(25%).
  * 같은 것은 두 번 안 나온다. 랭크가 다 찬 퍽은 안 나온다(응급 치료는 몇 번이고). 특성 「외길」: 가진 퍽 가중 2배, 랭크 1짜리 절반 */
 export function draft(kit: Kit, own: Owned, rand: () => number = Math.random, depth = 0): Offer[] {
   const n = own.traits.has('탐욕') ? 4 : 3;
@@ -170,7 +173,7 @@ export function draft(kit: Kit, own: Owned, rand: () => number = Math.random, de
   const out: Offer[] = [];
   const used = new Set<string>();
   const pairs = pool.filter((p) => p.kind === '쌍');
-  if (pairs.length && rand() < 0.5) { const p = pick(pairs, w)!; out.push({ type: 'perk', def: p, rank: (own.ranks.get(p.name) ?? 0) + 1, grade: 2 }); used.add(p.name); }
+  if (pairs.length && rand() < PAIR_CHANCE) { const p = pick(pairs, w)!; out.push({ type: 'perk', def: p, rank: (own.ranks.get(p.name) ?? 0) + 1, grade: 2 }); used.add(p.name); }
   const traits = TRAIT_TEXT.filter((t) => !own.traits.has(t.name) && traitOk(t, kit));
   if (traits.length && rand() < 0.25) { const t = traits[Math.floor(rand() * traits.length)]; out.push({ type: 'trait', def: t }); used.add(t.name); }
   const rest = pool.filter((p) => p.kind !== '쌍');
