@@ -17,8 +17,17 @@ export interface Derived {
 export const NEUTRAL_BASE: BaseStats = { str: 5, dex: 5, con: 5, int: 5, wil: 5 };
 export const CRIT = 0.05, CRIT_DMG = 2;
 
-export function baseOf(name: string | undefined): BaseStats {
-  return (name && BASE_STATS[name]) || NEUTRAL_BASE;
+/** 역할별 기본 분배 (힘/민/체/지/정, docs/설계_능력치_기술피해_안.md 2장 — 10-30에 정한 표). 이름 있는 55명 표에 없는 NPC 71명은 인물 팩의 역할(bal.role)로 이 값을 쓴다 */
+export const ROLE_BASE: Record<string, BaseStats> = {
+  tank: { str: 6, dex: 3, con: 8, int: 3, wil: 5 },
+  bruiser: { str: 8, dex: 4, con: 6, int: 3, wil: 4 },
+  striker: { str: 6, dex: 8, con: 4, int: 3, wil: 4 },
+  ranged: { str: 3, dex: 8, con: 4, int: 5, wil: 5 },
+  control: { str: 3, dex: 4, con: 4, int: 8, wil: 6 },
+  support: { str: 3, dex: 4, con: 5, int: 6, wil: 7 },
+};
+export function baseOf(name: string | undefined, role?: string): BaseStats {
+  return (name && BASE_STATS[name]) || (role && ROLE_BASE[role]) || NEUTRAL_BASE;
 }
 export function derive(b: BaseStats): Derived {
   return {
