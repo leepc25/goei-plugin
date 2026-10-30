@@ -54,15 +54,17 @@ async function main() {
 
   // ── 오른쪽: 탭
   const rx = X + 350, ry = Y + 36, rw = WW - 390;
-  const tabs: [string, string][] = [['skill', '기술'], ['item', '소지품'], ['perk', '퍽']];
+  const tabs: [string, string][] = [['skill', '기술'], ['item', '인벤토리'], ['perk', '퍽']];
   tabs.forEach(([k, n], i) => {
-    const tx = rx + i * 150; nine('row', tx, ry, 140, 48, 2);
-    T(n, tx + 70, ry + 12, k === TAB ? GOLD : DIM, 22, 'center');
-    if (k === TAB) { c.fillStyle = GOLD; c.fillRect(tx + 14, ry + 42, 112, 3); }
+    const tx = rx + i * 170; nine('row', tx, ry, 160, 48, 2);
+    T(n, tx + 92, ry + 12, k === TAB ? GOLD : DIM, 22, 'center');
+    if (k === TAB) { c.fillStyle = GOLD; c.fillRect(tx + 34, ry + 42, 116, 3); }
   });
+  T('Q', rx - 20, ry + 12, DIM, 22, 'center'); T('E', rx + 3 * 170 + 4, ry + 12, DIM, 22, 'left');
   const cy = ry + 70, ch = HH - 120;
   nine('row', rx, cy, rw, ch, 2);
 
+  T('Tab 닫기 · Q/E 탭 · 방향키 고르기', X + WW / 2, Y + HH + 14, DIM, 22, 'center');
   if (TAB === 'skill') {
     const sk: [string, string][] = [['attack', '약공'], ['attack', '강공'], ['shoot', '사격'], ['shoot', '충전'], ['unique', '고유'], ['ult', '필살']];
     sk.forEach(([ic, n], i) => {
@@ -74,7 +76,7 @@ async function main() {
     T('사격', rx + 40, cy + 340, GOLD, 33);
     T('권총 연사. 오래 쏘면 과열된다.', rx + 40, cy + 390, INK);
   } else if (TAB === 'item') {
-    T('퀵칸', rx + 40, cy + 24, DIM);
+    T('퀵슬롯', rx + 40, cy + 24, DIM);
     ['medkit', 'flash', 'flash', 'energy'].forEach((k, i) => {
       const sx = rx + 40 + i * 104, sy = cy + 58; slot(sx, sy, 88); c.drawImage(img['item_' + k], sx + 16, sy + 16, 56, 56);
       c.drawImage(img['key_' + (i + 1)], sx - 6, sy - 8, 26, 26);
@@ -98,10 +100,11 @@ async function main() {
     card(rx + 40, cy + 56, 150, 200, GOLD, '준비된 사수');
     T('이번 괴이', rx + 230, cy + 22, DIM);
     const tmp: [string, string][] = [['#b4b8bc', '탄 +1'], ['#b4b8bc', '3단 점프'], ['#b4b8bc', '체력 +'], ['#d05040', '무모함']];
-    tmp.forEach(([col, n], i) => card(rx + 230 + (i % 2) * 170, cy + 56 + Math.floor(i / 2) * 214, 150, 200, col, n, i === 0));
+    tmp.forEach(([col, n], i) => card(rx + 230 + (i % 2) * 170, cy + 58 + Math.floor(i / 2) * 192, 150, 180, col, n, i === 0));
+    T('▼ 더 보기 (6)', rx + 400, cy + 446, DIM, 22, 'center');
     T('탄 +1', rx + 40, cy + 300, GOLD, 33);
     T('사격이 두 발', rx + 40, cy + 346, INK);
     T('나간다.', rx + 40, cy + 378, INK);
   }
 }
-main();
+main().then(() => {});

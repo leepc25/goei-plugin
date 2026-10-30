@@ -197,18 +197,21 @@
       T(String(v), lx + 268, yy, up ? GOOD : INK2, 22, "right");
     });
     const rx = X + 350, ry = Y + 36, rw = WW - 390;
-    const tabs = [["skill", "\uAE30\uC220"], ["item", "\uC18C\uC9C0\uD488"], ["perk", "\uD37D"]];
+    const tabs = [["skill", "\uAE30\uC220"], ["item", "\uC778\uBCA4\uD1A0\uB9AC"], ["perk", "\uD37D"]];
     tabs.forEach(([k, n], i) => {
-      const tx = rx + i * 150;
-      nine("row", tx, ry, 140, 48, 2);
-      T(n, tx + 70, ry + 12, k === TAB ? GOLD : DIM, 22, "center");
+      const tx = rx + i * 170;
+      nine("row", tx, ry, 160, 48, 2);
+      T(n, tx + 92, ry + 12, k === TAB ? GOLD : DIM, 22, "center");
       if (k === TAB) {
         c.fillStyle = GOLD;
-        c.fillRect(tx + 14, ry + 42, 112, 3);
+        c.fillRect(tx + 34, ry + 42, 116, 3);
       }
     });
+    T("Q", rx - 20, ry + 12, DIM, 22, "center");
+    T("E", rx + 3 * 170 + 4, ry + 12, DIM, 22, "left");
     const cy = ry + 70, ch = HH - 120;
     nine("row", rx, cy, rw, ch, 2);
+    T("Tab \uB2EB\uAE30 \xB7 Q/E \uD0ED \xB7 \uBC29\uD5A5\uD0A4 \uACE0\uB974\uAE30", X + WW / 2, Y + HH + 14, DIM, 22, "center");
     if (TAB === "skill") {
       const sk = [["attack", "\uC57D\uACF5"], ["attack", "\uAC15\uACF5"], ["shoot", "\uC0AC\uACA9"], ["shoot", "\uCDA9\uC804"], ["unique", "\uACE0\uC720"], ["ult", "\uD544\uC0B4"]];
       sk.forEach(([ic, n], i) => {
@@ -225,7 +228,7 @@
       T("\uC0AC\uACA9", rx + 40, cy + 340, GOLD, 33);
       T("\uAD8C\uCD1D \uC5F0\uC0AC. \uC624\uB798 \uC3D8\uBA74 \uACFC\uC5F4\uB41C\uB2E4.", rx + 40, cy + 390, INK2);
     } else if (TAB === "item") {
-      T("\uD035\uCE78", rx + 40, cy + 24, DIM);
+      T("\uD035\uC2AC\uB86F", rx + 40, cy + 24, DIM);
       ["medkit", "flash", "flash", "energy"].forEach((k, i) => {
         const sx = rx + 40 + i * 104, sy = cy + 58;
         slot(sx, sy, 88);
@@ -259,11 +262,13 @@
       card(rx + 40, cy + 56, 150, 200, GOLD, "\uC900\uBE44\uB41C \uC0AC\uC218");
       T("\uC774\uBC88 \uAD34\uC774", rx + 230, cy + 22, DIM);
       const tmp = [["#b4b8bc", "\uD0C4 +1"], ["#b4b8bc", "3\uB2E8 \uC810\uD504"], ["#b4b8bc", "\uCCB4\uB825 +"], ["#d05040", "\uBB34\uBAA8\uD568"]];
-      tmp.forEach(([col, n], i) => card(rx + 230 + i % 2 * 170, cy + 56 + Math.floor(i / 2) * 214, 150, 200, col, n, i === 0));
+      tmp.forEach(([col, n], i) => card(rx + 230 + i % 2 * 170, cy + 58 + Math.floor(i / 2) * 192, 150, 180, col, n, i === 0));
+      T("\u25BC \uB354 \uBCF4\uAE30 (6)", rx + 400, cy + 446, DIM, 22, "center");
       T("\uD0C4 +1", rx + 40, cy + 300, GOLD, 33);
       T("\uC0AC\uACA9\uC774 \uB450 \uBC1C", rx + 40, cy + 346, INK2);
       T("\uB098\uAC04\uB2E4.", rx + 40, cy + 378, INK2);
     }
   }
-  main();
+  main().then(() => {
+  });
 })();
