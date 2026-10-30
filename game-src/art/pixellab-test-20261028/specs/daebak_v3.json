@@ -15,7 +15,8 @@
    "채우기 packed(사용자 10-30: 소품이 부족해 보임)",
    "v1: TV가 브래킷에 매달려 튀어나옴, 접수대가 막혀 들어갈 수 없음 → 고침(사용자 10-30)",
    "채우기 더 강조(packed+, 사용자 10-30)",
-   "낮은 탁자가 바닥 한가운데 덩그러니 → 소파 세트로 오브젝트로(사용자 10-30)"
+   "낮은 탁자가 바닥 한가운데 덩그러니 → 소파 세트로 오브젝트로(사용자 10-30)",
+   "좁게(양쪽 벽 닫음, 바닥 40%), 내용물 더하기, 색은 그대로·명암 대비 넣기(사용자 10-30)"
   ],
   "items": [
    {
@@ -137,7 +138,7 @@
    },
    {
     "src": "설계안: 형광등과 네온 반사",
-    "by": "칸:walls fluorescent"
+    "by": "칸:light fluorescent"
    },
    {
     "src": "사용자: 문 없음, 아래 출구",
@@ -192,20 +193,20 @@
  "sized": [
   "reception counter"
  ],
- "place": "a fixer's office in a 1990s Seoul underground arcade",
+ "place": "fixer's office, 1990s Seoul underground arcade",
  "time": "night",
- "light": "fluorescent and neon light",
+ "light": "fluorescent and neon",
  "view": "one-point",
- "floor_share": "the lower half",
- "sides": "left",
+ "floor_share": "the lower 40 percent",
+ "sides": "both",
  "density": "packed+",
- "floor": "worn stained beige tiles; dark carpet in the inner office",
- "walls": "dark red-brown wallpaper; fluorescent tubes",
+ "floor": "stained beige tiles; dark carpet in inner office",
+ "walls": "dark red-brown wallpaper; tube lights",
  "items": [
   {
    "full": "on the left wall, near the front, a wide dark tinted glass storefront window facing the arcade, with a tacky red neon sign reading \"OPEN\" hanging inside it, its red glow lighting the room",
    "why": "위키: 짙은 선팅 유리, 촌스러운 네온 OPEN 간판 / 설계안 네온 붉은 빛이 바닥에 번짐",
-   "at": "Left wall, front part",
+   "at": "Left wall, front",
    "text": "dark tinted glass shop window, red neon sign reading \"OPEN\"",
    "keep": [
     "left wall",
@@ -231,12 +232,12 @@
    "full": "high on the left wall a flat TV mounted flush on the wall, not on a bracket, with the sound off, its screen a dark muted colour",
    "why": "위키 소리 죽인 벽걸이 TV, 설계안 화면은 어두운 색 면 / v1: 「flat wall-mounted」를 빼서 브래킷에 매달린 TV가 튀어나옴",
    "at": "Left wall, high",
-   "text": "a flat TV mounted flush on the wall, dark muted screen",
+   "text": "a flat TV mounted flush, dark screen",
    "keep": [
     "left wall",
     "flat TV",
-    "mounted flush on the wall",
-    "dark muted screen"
+    "mounted flush",
+    "dark screen"
    ],
    "drop_ok": {
     "bracket": "mounted flush로 같은 뜻, 글자 수",
@@ -244,7 +245,8 @@
     "sound": "소리는 그림에 안 보임",
     "off": "소리는 그림에 안 보임",
     "colour": "dark muted screen으로 같은 뜻",
-    "high": "묶음 at(Left wall, high)이 맡음"
+    "high": "묶음 at(Left wall, high)이 맡음",
+    "muted": "dark screen으로 충분"
    }
   },
   {
@@ -271,7 +273,7 @@
    "full": "on the floor at the left, a long wooden reception counter about 2.4 m wide, its long side facing the camera, chest high (95 pixels), standing a metre in front of the back wall, with a clear gap of open empty floor between its left end and the left wall, nothing in the gap, leading to a walkway behind it",
    "why": "위키·설계안 접수대(폭 2.4m), 뒤로 들어갈 통로(대기실 v6 교훈) / v1: 접수대가 막혀 들어갈 수 없음 → 왼벽과의 틈을 비우라고 명시",
    "at": "Floor, left part",
-   "text": "a long reception counter facing the camera, chest high (95 pixels), a metre in front of the back wall; a clear empty gap between its left end and the left wall, a walkway behind",
+   "text": "a reception counter facing the camera, chest high (95 pixels), a metre in front of the back wall, a clear empty gap to the left wall, a walkway behind",
    "keep": [
     "reception counter",
     "facing the camera",
@@ -292,7 +294,10 @@
     "nothing": "clear empty gap으로 같은 뜻",
     "leading": "a walkway behind it으로 같은 뜻",
     "with": "군말",
-    "open": "clear empty gap으로 같은 뜻"
+    "open": "clear empty gap으로 같은 뜻",
+    "between": "gap to the left wall로 같은 뜻",
+    "end": "gap to the left wall로 같은 뜻",
+    "long": "길이는 모델이 정함, 글자 수"
    }
   },
   {
@@ -350,13 +355,14 @@
    "full": "on the back wall left part two framed pictures with blank faded photos",
    "why": "설계안 벽 액자 ×3(사진 느낌 빈 면) 중 둘",
    "at": "Back wall, left part",
-   "text": "two framed faded photos",
+   "text": "two faded photos",
    "keep": [
-    "two framed"
+    "two faded photos"
    ],
    "drop_ok": {
     "pictures": "framed photos로 같은 뜻",
-    "blank": "faded로 충분"
+    "blank": "faded로 충분",
+    "framed": "액자 틀은 photos on the wall로 모델이 그림, 글자 수"
    }
   },
   {
@@ -375,10 +381,10 @@
    "full": "on the floor on the right part, a low glass partition only waist high, no taller than the counter, with a dark wooden frame, running from the back wall toward the camera, separating the inner office, with an open gap in it to walk through",
    "why": "설계안 안쪽 사무실 낮은 유리 칸막이, 들어갈 틈(문 없음) / v1: 천장까지 닿는 유리벽으로 나옴",
    "at": "Floor, right part",
-   "text": "a low glass partition only waist high, from the back wall toward the camera, an open gap",
+   "text": "a low waist-high glass partition from the back wall toward the camera, an open gap",
    "keep": [
-    "low glass partition",
-    "waist high",
+    "low",
+    "waist-high glass partition",
     "back wall",
     "open gap"
    ],
@@ -395,28 +401,30 @@
     "office": "다음 줄 묶음",
     "with": "군말",
     "walk": "open gap으로 충분",
-    "through": "open gap으로 충분"
+    "through": "open gap으로 충분",
+    "only": "waist-high로 충분",
+    "high": "waist-high로 남김",
+    "waist": "waist-high로 남김"
    }
   },
   {
    "full": "on the floor in the inner office on the right, on dark carpet, an oval poker table with green felt standing free like an island, stacks of colourful poker chips and playing cards on it, and an open wooden cigar box on the table",
    "why": "위키 안쪽 사무실 포커 테이블·칩 / 설계안 녹색 펠트, 방 안 섬, 칩 더미·카드 / 사용자 10-30: 시가 상자 넣기",
    "at": "Inner office floor",
-   "text": "an oval green felt poker table alone, poker chips, cards, a cigar box on it",
+   "text": "a green felt poker table, poker chips, cards, a cigar box",
    "keep": [
     "poker table",
     "green felt",
-    "alone",
     "chips",
     "cards",
     "cigar box"
    ],
    "drop_ok": {
-    "standing": "alone으로 같은 뜻",
+    "standing": "같은 이유",
     "free": "free-standing으로 남김",
     "colourful": "칩 색은 모델이 앎",
-    "island": "standing alone으로 같은 뜻",
-    "like": "standing alone으로 같은 뜻",
+    "island": "같은 이유",
+    "like": "같은 이유",
     "stacks": "poker chips로 충분",
     "playing": "cards로 충분",
     "carpet": "floor 칸 dark carpet이 맡음",
@@ -425,7 +433,9 @@
     "wooden": "상자 재질 세부",
     "right": "inner office 묶음이 오른쪽(칸막이 너머)",
     "poker": "poker table로 남김",
-    "chips": "남김"
+    "chips": "남김",
+    "alone": "좁은 방이라 섬처럼은 필요 없음, 글자 수",
+    "oval": "모양 세부, 글자 수"
    }
   },
   {
@@ -443,22 +453,87 @@
     "wooden": "재질 세부",
     "right": "inner office 묶음이 오른쪽"
    }
+  },
+  {
+   "full": "on the back wall, left part, a cork board crowded with pinned job flyers, wanted notices and contract pages",
+   "why": "위키: 알선 사무소, 「대박 알선 덕에 첫 일을 구했다」, 프리랜서 일감 / 사용자 10-30: 내용물 더하기",
+   "at": "Back wall, left part",
+   "text": "a cork board crowded with job flyers and contracts",
+   "keep": [
+    "cork board",
+    "job flyers",
+    "contracts"
+   ],
+   "drop_ok": {
+    "wanted": "job flyers로 충분",
+    "notices": "job flyers로 충분",
+    "pinned": "cork board로 충분",
+    "pages": "contracts로 충분",
+    "contract": "contracts로 남김"
+   }
+  },
+  {
+   "full": "on the back wall behind the counter a tall shelf packed with binders, contract folders and document boxes",
+   "why": "위키: 계약서 함정, 「9항에 안 된다고 나와 있어」 / 설계안 서류 트레이 / 사용자: 내용물 더하기",
+   "at": "Back wall, behind the counter",
+   "text": "a tall shelf of binders, contract folders, document boxes",
+   "keep": [
+    "shelf",
+    "binders",
+    "contract folders",
+    "document boxes"
+   ],
+   "drop_ok": {
+    "packed": "density 칸이 맡음"
+   }
+  },
+  {
+   "full": "against the back wall right of the counter two grey metal filing cabinets with stacked folders and a desk fan on top",
+   "why": "알선 사무소 서류(계약서) 보관, 옛 대박 알선 그림에도 있던 서류장 / 사용자: 내용물 더하기",
+   "at": "Back wall, right of the counter",
+   "text": "two filing cabinets, folders and a fan on top",
+   "keep": [
+    "filing cabinets",
+    "folders",
+    "fan"
+   ],
+   "drop_ok": {
+    "metal": "재질 세부",
+    "desk": "small fan으로 같은 뜻",
+    "against": "묶음 at으로 같은 뜻",
+    "back": "묶음 at",
+    "wall": "묶음 at",
+    "grey": "색 세부",
+    "stacked": "folders로 충분",
+    "small": "fan으로 충분"
+   }
+  },
+  {
+   "full": "on the right wall of the inner office a shelf of liquor bottles and shot glasses",
+   "why": "위키: 문혜란은 프리랜서와 술도 사고 건배사도 진심 / 사용자: 내용물 더하기",
+   "at": "Right wall, inner office",
+   "text": "a shelf of liquor bottles and shot glasses",
+   "keep": [
+    "liquor bottles",
+    "shot glasses"
+   ],
+   "drop_ok": {}
   }
  ],
- "shadow": "deep shadows under furniture",
+ "shadow": "strong contrast, bright pools under tubes, pitch-dark corners and shadows",
  "palette": "red-brown, beige, green, red neon",
  "no": [
   "doors",
   "doorways"
  ],
  "review": {
-  "fit": "12줄 모두 알선 사무소 물건. 소파·의자·낮은 탁자(소파 세트)·시계·사람 없음",
+  "fit": "16줄 모두 알선 사무소 물건(위키·설계안·사무소 쓰임). 소파·의자·낮은 탁자·시계·사람 없음",
   "place": "접수대는 왼쪽, 뒷벽에서 1m 띄우고 왼벽과의 틈을 비움(nothing in the gap), 화분·우산꽂이는 창 옆으로 옮겨 틈을 막지 않게. 가운데는 다니는 바닥. 낮은 탁자 양옆 빈 바닥은 소파 오브젝트 자리. 안쪽 사무실은 허리 높이 칸막이 틈으로. 사람 말 없음",
   "size": "접수대 가슴 높이 95(사람 150의 0.63배, 1.1m). 탁자·포커 테이블은 숫자 없이(크기 범위 없음, 낮은 탁자·허리 높이 칸막이로 몸 기준)",
   "brief": "위키·설계안 항목 모두 줄·칸·as_objects에 대응. 뺀 것: 소파·의자(오브젝트), 낮은 탁자(소파 세트라 같이 오브젝트), 금색 시계·삼단봉(인물 몫)",
   "meaning": "v1에서 빠진 「flat, wall-mounted」(TV 모양)를 되살리고 「flush on the wall」로 브래킷을 막음. 접수대 틈은 clear empty gap으로, 칸막이는 low·only waist high로. 모양·설치·통로 말은 도구가 못 빼게 막음. 뺀 것은 재질·색·같은 뜻뿐",
-  "over": "같은 물건 두 번 없음(액자는 둘+하나로 설계안 3). 줄마다 근거. 억지 채우기 없음, 채우기 packed(사용자 결정)",
-  "frame": "one-point, 바닥 아래 절반, 왼쪽 벽만(선팅 유리·TV 벽, 오른쪽 안쪽 사무실은 그림 끝으로 이어짐), 문 0(아래 출구), 채우기 packed(사용자 결정), 참고 그림 1·밑그림 없음"
+  "over": "같은 물건 두 번 없음. 더한 4줄(구인 게시판·서류 선반·서류장·술병 선반)은 위키 근거. 억지 채우기 없음. 안쪽 사무실 카펫 가운데는 포커 테이블",
+  "frame": "one-point, 바닥 40%, 양쪽 벽 닫음(사용자: 좁게), 문 0(아래 출구), 채우기 packed+, 명암 대비 강하게(사용자), 색은 그대로, 참고 그림 1·밑그림 없음"
  },
  "as_objects": [
   {

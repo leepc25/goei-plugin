@@ -36,7 +36,7 @@ VIEW = {
 DENSITY = {
     'packed': "PACKED WITH STUFF, every area filled, no empty wall, no empty floor corner.",   # 헐값매입 1차 문장
     # 더 강조(사용자 10-30 대박 알선): 벽·선반·탁자 위까지 잔물건으로
-    'packed+': "VERY CLUTTERED, PACKED WITH STUFF: every wall, shelf and corner crowded with small props, no empty wall, no bare surface.",
+    'packed+': "VERY CLUTTERED: every wall, shelf and corner packed with small props.",
     'normal': "",
     'bare': "Sparse and bare, only the listed things.",
 }
