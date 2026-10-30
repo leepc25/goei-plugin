@@ -86,7 +86,8 @@ def check(spec, prompt, prev=None):
     if prev:
         new_words = set().union(*[obj_words(it) for it in spec.get('items', []) if isinstance(it, dict)]) if spec.get('items') else set()
         # as_objects: 배경에서 빼고 오브젝트로 따로 뽑는 것(탁자·책상·의자·소파, 사용자 10-30) — 뺀 것으로 치지 않음
-        new_fulls = {it.get('full') for it in spec.get('items', []) if isinstance(it, dict)} | {o.get('full') for o in spec.get('as_objects', [])}
+        new_fulls = {it.get('full') for it in spec.get('items', []) if isinstance(it, dict)} | {o.get('full') for o in spec.get('as_objects', [])} \
+            | {o.get('full') for o in spec.get('removed_by_user', []) if '사용자' in str(o.get('by', ''))}   # 사용자가 빼라고 한 것만(이유에 사용자 말 원문)
         old_items = [it for it in prev.get('items', []) if isinstance(it, dict)] + [{'full': k} for k in (prev.get('removed_items') or {})]
         for it in old_items:
             if it.get('full') in new_fulls: continue
