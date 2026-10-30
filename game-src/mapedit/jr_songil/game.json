@@ -208,27 +208,27 @@
     "id": "counter0",
     "file": "me_jr_songil_counter0",
     "x": 136,
-    "y": 502,
+    "y": 497,
     "w": 64,
-    "h": 225,
+    "h": 230,
     "sortY": 726
    },
    {
     "id": "counter1",
     "file": "me_jr_songil_counter1",
     "x": 200,
-    "y": 483,
+    "y": 468,
     "w": 56,
-    "h": 244,
+    "h": 259,
     "sortY": 726
    },
    {
     "id": "counter2",
     "file": "me_jr_songil_counter2",
     "x": 256,
-    "y": 472,
+    "y": 456,
     "w": 36,
-    "h": 255,
+    "h": 271,
     "sortY": 703
    },
    {
