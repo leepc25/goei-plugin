@@ -17,17 +17,15 @@ export interface Derived {
 export const NEUTRAL_BASE: BaseStats = { str: 5, dex: 5, con: 5, int: 5, wil: 5 };
 export const CRIT = 0.05, CRIT_DMG = 2;
 
-/** 역할별 기본 분배 (힘/민/체/지/정, docs/설계_능력치_기술피해_안.md 2장 — 10-30에 정한 표). 이름 있는 55명 표에 없는 NPC 71명은 인물 팩의 역할(bal.role)로 이 값을 쓴다 */
-export const ROLE_BASE: Record<string, BaseStats> = {
-  tank: { str: 6, dex: 3, con: 8, int: 3, wil: 5 },
-  bruiser: { str: 8, dex: 4, con: 6, int: 3, wil: 4 },
-  striker: { str: 6, dex: 8, con: 4, int: 3, wil: 4 },
-  ranged: { str: 3, dex: 8, con: 4, int: 5, wil: 5 },
-  control: { str: 3, dex: 4, con: 4, int: 8, wil: 6 },
-  support: { str: 3, dex: 4, con: 5, int: 6, wil: 7 },
-};
-export function baseOf(name: string | undefined, role?: string): BaseStats {
-  return (name && BASE_STATS[name]) || (role && ROLE_BASE[role]) || NEUTRAL_BASE;
+export function baseOf(name: string | undefined): BaseStats {
+  return (name && BASE_STATS[name]) || NEUTRAL_BASE;
+}
+/** NPC·몹 한 명의 힘민체지정 (10-30 사용자): 합 25를 다섯 칸에 무작위로 나눈다. 칸마다 1부터 시작해 0이 되지 않는다(NPC는 한 칸 상한 없음).
+ * 이름 있는 55명은 표(baseStats.gen.ts)를 쓴다. 더 세거나 약하게 하는 보정은 전부 퍽으로 한다 */
+export function rollBase(rng: () => number, total = 25): BaseStats {
+  const v = [1, 1, 1, 1, 1];
+  for (let n = total - 5; n > 0; n--) v[Math.min(4, Math.floor(rng() * 5))]++;
+  return { str: v[0], dex: v[1], con: v[2], int: v[3], wil: v[4] };
 }
 export function derive(b: BaseStats): Derived {
   return {

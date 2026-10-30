@@ -3,8 +3,8 @@
 //   audio/ 효과음·음악 (createGameAudio)
 //   hq/    본부·필드 건물 지도 (hqMap)
 // 적(enemy/)·아이템(items/)·대사(story/)를 여기에 잇는다. 옛 차원 승강기 출동(층·임무·정산)은 2026-10-28에 지웠다.
-import { CHAR_GRADE, npcStats } from '../../combat/grades';
-import { GRADE_DMG, gradeOf } from '../../world/mobs';
+import { BASE_STATS } from '../../combat/baseStats.gen';
+import { derive, rollBase } from '../../combat/stats';
 import { clockText } from '../../../core/fieldclock';
 import type { GameAssets, GameBridge } from '../../bridge';
 import { persp, view } from './view';
@@ -309,9 +309,9 @@ function hqAdapter(bridge: Partial<GameBridge> | undefined, ui: { chooseFloor: H
       if (!b) continue;
       if (!(b instanceof FighterAi)) { b.alive = false; continue; }
       if (!w.toFight(a.def.id)) { b.alive = false; continue; }
-      // 몸 = 몹 등급 체력 (docs/게임_성장_경제_설계.md 2-3). 이름표는 원형 이름
-      b.hp = b.hpMax = Math.max(1, a.hpMax ?? b.hpMax);
-      b.dmgMul = GRADE_DMG[gradeOf(a.def.archetype ?? a.def.name)];
+      // 몸 = 그 몹이 생겨날 때 굴린 힘민체지정 (10-30 사용자: 등급 배수 버림). 이름표는 원형 이름
+      if (a.base) { b.base = a.base; b.stat = derive(a.base); b.baseHp = b.stat.hp; }
+      b.hp = Math.max(1, a.hp ?? b.hpMax); b.hpMax = Math.max(1, a.hpMax ?? b.hpMax);
       b.label = a.def.name;
       (b as unknown as { dir: 1 | -1 }).dir = a.face;
       fights.set(a.def.id, { body: b as typeof b & { hp: number; hpMax: number; alive: boolean; label: string }, t: 0, scene: sceneId });
@@ -540,9 +540,8 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
       const personas = [{ aggression: 0.75, patience: 0.35, zoning: 0.2, courage: 0.9 }, { aggression: 0.35, patience: 0.8, zoning: 0.3, courage: 0.8 }, { aggression: 0.4, patience: 0.5, zoning: 0.85, courage: 0.7 }];
       const ai = new FighterAi((w.player as unknown as { clips: ConstructorParameters<typeof FighterAi>[0] }).clips, art, { id: `ai${n}`, grade: 'B', difficulty: aiDiff, persona: personas[(n - 1) % personas.length], seed: 1000 + n, squad, label: `AI ${art.cfg.name} ${n}` });
       ai.x = spec.x; ai.y = spec.y;
-      // NPC 상태 능력치: 이름 있는 인물은 초기값 표 등급, 그 밖은 숙련 (docs/설계_인물_초기값.md, 10-30)
-      const ns = npcStats(CHAR_GRADE[art.cfg.name] ?? '숙련', ai.baseHp, ai.base.wil);
-      ai.hp = ai.hpMax = ns.hp; ai.dmgMul = ns.dmgMul; ai.shield = ai.shieldMax = ns.shield;
+      // 힘민체지정만으로(10-30 사용자): 이름 있는 55명은 표, 그 밖의 NPC는 한 명마다 합 25를 무작위로 나눔. 보정은 퍽
+      if (!BASE_STATS[art.cfg.name]) { ai.base = rollBase(Math.random); ai.stat = derive(ai.base); ai.baseHp = ai.hp = ai.hpMax = ai.stat.hp; }
       return ai as never;
     }
     if (DEF_BY_KIND[spec.kind]) {

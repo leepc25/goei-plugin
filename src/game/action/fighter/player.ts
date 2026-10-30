@@ -107,7 +107,7 @@ export class FighterPlayer extends Player {
     super(clips);
     this.art = art;
     this.label = art.cfg.name;
-    this.base = baseOf(art.cfg.name, (art.cfg as { bal?: { role?: string } }).bal?.role);
+    this.base = baseOf(art.cfg.name);
     this.stat = derive(this.base);
     this.baseHp = this.hp = this.hpMax = this.stat.hp;
     // 멈춤(히트스톱)은 테스트룸 코드가 스스로 한다: 엔진이 플레이어에 거는 멈춤은 받지 않는다

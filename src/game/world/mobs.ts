@@ -29,11 +29,7 @@ export interface Archetype {
 /** 몸 등급 (docs/게임_성장_경제_설계.md 2-3, 기본값): 체력과 주머니 돈 범위. 원형 역할로 정한다 */
 export type MobGrade = 'F' | 'E' | 'D' | 'C';
 // 10-30: 체력 1,000 단위로(docs/설계_인물_초기값.md 등급표) — F 시민 0.15 · D 거리 0.3 · C 훈련 0.6. E 는 쓰지 않음
-export const GRADE_HP: Record<MobGrade, number> = { F: 150, E: 150, D: 300, C: 600 };
 /** 주는 피해 배수 (같은 표) */
-export const GRADE_DMG: Record<MobGrade, number> = { F: 0.3, E: 0.3, D: 0.5, C: 0.8 };
-const ROLE_GRADE: Record<MobRole, MobGrade> = { civilian: 'F', student: 'F', worker: 'F', staff: 'C', thug: 'D', guard: 'C', police: 'C' };
-export const gradeOf = (archetype: string | undefined): MobGrade => ROLE_GRADE[ARCHETYPES[archetype ?? '']?.role ?? 'civilian'];
 /** 주머니 돈 (원): 소매치기가 옮기고, 기절한 불량배·취객은 떨어뜨린다. 행인을 때려 돈 버는 구조는 막는다(떨어뜨리는 원형만) */
 export const POCKET: Partial<Record<string, [number, number]>> = {
   행인: [0, 30000], 회사원: [5000, 50000], 관광객: [10000, 80000], 학생: [0, 10000], 주민: [0, 20000], 산책객: [0, 10000], 승객: [0, 20000], 상인: [20000, 100000],

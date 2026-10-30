@@ -3,7 +3,8 @@
 // 몹: 나올 때마다 성향을 뽑고(mobs.ts), 지나가다 자기 판단으로 사건을 일으킨다(소매치기·시비). 근무형은 근무시간에 자리를 지킨다.
 // 소란도는 장면 단위. 경찰·경비는 플레이어 범죄에만 나선다(crime). 화면 밖 장면도 같은 규칙으로 돈다. 생활은 실시간, 시계와 무관.
 import { ACTIVITIES, TEMPER, choose, decayNeeds, fullNeeds, onDuty, type Activity, type Needs } from './needs';
-import { ARCHETYPES, DROPS, GRADE_HP, POCKET, gradeOf, inShift, rollTemper, type Post, type Temperament } from './mobs';
+import { ARCHETYPES, DROPS, POCKET, inShift, rollTemper, type Post, type Temperament } from './mobs';
+import { derive, rollBase, type BaseStats } from '../combat/stats';
 import type { Hop, PlaceGraph } from './places';
 import { pick, range, type Rng } from './rng';
 
@@ -77,6 +78,8 @@ export interface Actor {
   /** 몹 몸 (등급 체력, 설계 2-3). 0이 되면 기절 → 일어나 떠난다 */
   hp?: number;
   hpMax?: number;
+  /** 힘민체지정 (몹: 생겨날 때 무작위 합 25) */
+  base?: BaseStats;
   /** 주머니 돈 (원) */
   pocket?: number;
   /** 그중 훔친 돈 */
@@ -174,8 +177,9 @@ export class WorldSim {
       const arch = ARCHETYPES[def.archetype ?? def.name];
       a.temper = rollTemper(this.rng, arch);
       a.drunk = !!arch?.drinks && this.isNight() && this.rng() < 0.35;
-      // 몸: 등급 체력 ±10%, 주머니 돈 (백 원 단위)
-      a.hpMax = a.hp = Math.round(GRADE_HP[gradeOf(def.archetype ?? def.name)] * (0.9 + this.rng() * 0.2));
+      // 몸: 한 명마다 힘민체지정(합 25 무작위)을 굴리고 체력은 그 공식으로 (10-30 사용자). 주머니 돈 (백 원 단위)
+      a.base = rollBase(this.rng);
+      a.hpMax = a.hp = derive(a.base).hp;
       const pk = POCKET[def.archetype ?? def.name];
       a.pocket = pk ? Math.round(range(this.rng, pk[0], pk[1]) / 100) * 100 : 0;
     }

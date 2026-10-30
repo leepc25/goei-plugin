@@ -11,6 +11,7 @@ import { armDebuff, checkDebuffs } from './debuff';
 import { drawFigure, drawSwing } from './look';
 import { drawAilments } from '../ui/ailments';
 import { STATUS, StatusSet } from '../../combat/status';
+import { derive, rollBase, type BaseStats, type Derived } from '../../combat/stats';
 import { PIXEL_FONT, kitPiece, kitSlice, nine } from '../ui/kit';
 
 export type St = 'spawn' | 'idle' | 'walk' | 'attack' | 'hurt' | 'air' | 'down' | 'getup' | 'bound' | 'grabbing' | 'dormant' | 'hidden' | 'flee' | 'dead' | 'stunned';
@@ -145,9 +146,12 @@ export class Enemy implements Body {
   hitBy = new Set<number>();
   readonly def: EnemyDef;
   brain: Brain;
-  /** 발사체 피해 배율 (호명·정예) */
+  /** 힘민체지정 (10-30 사용자: 한 명마다 합 25 무작위, 체력·피해는 이 공식으로. 정예 배수 없음, 보정은 퍽) */
+  base: BaseStats;
+  stat: Derived;
+  /** 공격 피해 배율: 사격 역할은 민(사격), 그 밖은 힘(근접) × 과장님 호명 */
   get power(): number {
-    return (this.rally > 0 ? 1.25 : 1) * (this.elite ? 1.2 : 1);
+    return (this.def.role === 'shoot' ? this.stat.aim : this.stat.power) * (this.rally > 0 ? 1.25 : 1);
   }
 
   constructor(def: EnemyDef, x: number, y: number, brain: Brain, opts: { elite?: boolean; affixes?: Affix[]; rand?: () => number } = {}) {
@@ -157,7 +161,9 @@ export class Enemy implements Body {
     this.x = x;
     this.y = y;
     this.z = def.hover ?? 0;
-    this.hp = this.hpMax = def.hp;
+    this.base = rollBase(opts.rand ?? Math.random);
+    this.stat = derive(this.base);
+    this.hp = this.hpMax = this.stat.hp;
     this.grabbable = def.grabbable;
     this.boss = false;
     this.armorBase = def.armor;
@@ -167,7 +173,6 @@ export class Enemy implements Body {
     if (opts.elite) {
       this.elite = true;
       this.affixes = opts.affixes ?? [];
-      this.hp = this.hpMax = Math.round(def.hp * 1.6);
       this.label = '정예 ' + def.label;
     }
   }
@@ -463,7 +468,7 @@ export class Enemy implements Body {
     }
     const weak = !!mod.weak || this.weakOpen > 0;
     if (weak) mult *= 2;
-    const dmg = Math.max(1, Math.round(hit.dmg * mult));
+    const dmg = Math.max(1, Math.round(hit.dmg * mult * this.stat.taken));   // 받는 피해: 체·정 (힘민체지정)
     this.hp -= dmg;
     this.lastHurt = this.age;
     this.flash = 6;
