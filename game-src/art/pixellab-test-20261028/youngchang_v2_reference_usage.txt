@@ -1,0 +1,1 @@
+Copy only the camera angle, the low viewing height, the perspective, the pixel density and the level of detail and shading of this image. Do not copy any of its objects, furniture, layout, room shape or colors.
