@@ -47,9 +47,9 @@ SIDES = {
     'none': "No side walls: the room keeps going past both image edges.",
 }
 STYLE = "dense, highly detailed pixel art, crisp pixel clusters, selective dark outline, rich medium-to-detailed shading"
-ALWAYS_NO = ["people", "chairs", "sofas", "benches", "tables", "desks", "clocks"]   # 탁자·책상·의자·소파는 오브젝트로 따로(사용자 10-30)
+ALWAYS_NO = ["people", "chairs", "sofas", "benches", "coffee tables", "clocks"]   # 소파 앞 낮은 탁자는 소파처럼 오브젝트로(사용자 10-30: 대박 알선 바닥 한가운데 좌식 탁자)
 BANNED = [  # 채우기 문구는 density 칸으로만 넣는다(아래)
-          r"\bchair\b", r"\bsofa\b", r"\btables?\b", r"\bdesks?\b", r"\bbench\b", r"\bclock\b", r"\bbucket\b.*\bdrip\b", r"\bleak\b", r"\bcurtain\b.*\brail\b"]
+          r"\bchair\b", r"\bsofa\b", r"\bcoffee tables?\b", r"\blow tables?\b", r"\bbench\b", r"\bclock\b", r"\bbucket\b.*\bdrip\b", r"\bleak\b", r"\bcurtain\b.*\brail\b"]
 PLACE_WORDS = ("back wall", "left", "right", "front", "center", "middle", "corner", "beside", "next to", "behind", "above", "in front of", "on the")
 REF1_USAGE = ("Copy only the camera angle, the low viewing height, the perspective, the pixel density and the level of detail "
               "and shading of this image. Do not copy any of its objects, furniture, layout, room shape or colors.")

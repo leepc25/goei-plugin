@@ -15,7 +15,7 @@
    "채우기 packed(사용자 10-30: 소품이 부족해 보임)",
    "v1: TV가 브래킷에 매달려 튀어나옴, 접수대가 막혀 들어갈 수 없음 → 고침(사용자 10-30)",
    "채우기 더 강조(packed+, 사용자 10-30)",
-   "탁자·책상·의자·소파는 배경에 그리지 않음 → 낮은 탁자·포커 테이블은 오브젝트로(사용자 10-30)"
+   "낮은 탁자가 바닥 한가운데 덩그러니 → 소파 세트로 오브젝트로(사용자 10-30)"
   ],
   "items": [
    {
@@ -52,7 +52,9 @@
    },
    {
     "src": "위키·설계안: 안쪽 사무실 포커 테이블(녹색 펠트)",
-    "by": "omit: 탁자는 배경에 그리지 않고 오브젝트로 따로(사용자 10-30) — as_objects"
+    "by": [
+     10
+    ]
    },
    {
     "src": "설계안: 포커 의자 ×4",
@@ -60,7 +62,9 @@
    },
    {
     "src": "위키·설계안: 칩 더미·카드",
-    "by": "omit: 탁자는 배경에 그리지 않고 오브젝트로 따로(사용자 10-30) — as_objects"
+    "by": [
+     10
+    ]
    },
    {
     "src": "위키·설계안: 카운터 뒤 야구방망이",
@@ -86,11 +90,11 @@
    },
    {
     "src": "설계안: 낮은 탁자",
-    "by": "omit: 탁자는 배경에 그리지 않고 오브젝트로 따로(사용자 10-30) — as_objects"
+    "by": "omit: 소파 세트 낮은 탁자는 소파 오브젝트와 같이 따로(as_objects)"
    },
    {
     "src": "설계안: 신문·머그컵 ×4",
-    "by": "omit: 탁자는 배경에 그리지 않고 오브젝트로 따로(사용자 10-30) — as_objects"
+    "by": "omit: 소파 세트 낮은 탁자는 소파 오브젝트와 같이 따로(as_objects)"
    },
    {
     "src": "설계안: 방문자 방명록",
@@ -108,7 +112,7 @@
     "src": "설계안: 벽 액자 ×3",
     "by": [
      7,
-     10
+     11
     ]
    },
    {
@@ -119,7 +123,9 @@
    },
    {
     "src": "설계안: 시가 상자 없음 → 사용자 10-30: 넣기",
-    "by": "omit: 탁자는 배경에 그리지 않고 오브젝트로 따로(사용자 10-30) — as_objects"
+    "by": [
+     10
+    ]
    },
    {
     "src": "설계안: 바닥 낡은 베이지 타일, 안쪽 짙은 카펫",
@@ -159,6 +165,14 @@
    "from": "위키 벽걸이 TV"
   },
   {
+   "kw": "poker table",
+   "from": "위키 포커 테이블"
+  },
+  {
+   "kw": "poker chips",
+   "from": "위키 칩"
+  },
+  {
    "kw": "baseball bat",
    "from": "위키 야구방망이"
   },
@@ -185,7 +199,7 @@
  "floor_share": "the lower half",
  "sides": "left",
  "density": "packed+",
- "floor": "worn stained beige tiles; dark carpet in the inner office, its middle left empty; red neon glow",
+ "floor": "worn stained beige tiles; dark carpet in the inner office",
  "walls": "dark red-brown wallpaper; fluorescent tubes",
  "items": [
   {
@@ -385,6 +399,36 @@
    }
   },
   {
+   "full": "on the floor in the inner office on the right, on dark carpet, an oval poker table with green felt standing free like an island, stacks of colourful poker chips and playing cards on it, and an open wooden cigar box on the table",
+   "why": "위키 안쪽 사무실 포커 테이블·칩 / 설계안 녹색 펠트, 방 안 섬, 칩 더미·카드 / 사용자 10-30: 시가 상자 넣기",
+   "at": "Inner office floor",
+   "text": "an oval green felt poker table alone, poker chips, cards, a cigar box on it",
+   "keep": [
+    "poker table",
+    "green felt",
+    "alone",
+    "chips",
+    "cards",
+    "cigar box"
+   ],
+   "drop_ok": {
+    "standing": "alone으로 같은 뜻",
+    "free": "free-standing으로 남김",
+    "colourful": "칩 색은 모델이 앎",
+    "island": "standing alone으로 같은 뜻",
+    "like": "standing alone으로 같은 뜻",
+    "stacks": "poker chips로 충분",
+    "playing": "cards로 충분",
+    "carpet": "floor 칸 dark carpet이 맡음",
+    "dark": "floor 칸 dark carpet이 맡음",
+    "open": "cigar box로 충분",
+    "wooden": "상자 재질 세부",
+    "right": "inner office 묶음이 오른쪽(칸막이 너머)",
+    "poker": "poker table로 남김",
+    "chips": "남김"
+   }
+  },
+  {
    "full": "on the back wall of the inner office a third framed picture and a low wooden sideboard with binders",
    "why": "설계안 벽 액자 ×3 중 하나, 사무실 서류",
    "at": "Inner office back wall",
@@ -408,24 +452,19 @@
   "doorways"
  ],
  "review": {
-  "fit": "11줄 모두 알선 사무소 물건. 탁자·책상·의자·소파·시계·사람 없음(낮은 탁자·포커 테이블과 그 위 물건은 as_objects로 따로)",
+  "fit": "12줄 모두 알선 사무소 물건. 소파·의자·낮은 탁자(소파 세트)·시계·사람 없음",
   "place": "접수대는 왼쪽, 뒷벽에서 1m 띄우고 왼벽과의 틈을 비움(nothing in the gap), 화분·우산꽂이는 창 옆으로 옮겨 틈을 막지 않게. 가운데는 다니는 바닥. 낮은 탁자 양옆 빈 바닥은 소파 오브젝트 자리. 안쪽 사무실은 허리 높이 칸막이 틈으로. 사람 말 없음",
   "size": "접수대 가슴 높이 95(사람 150의 0.63배, 1.1m). 탁자·포커 테이블은 숫자 없이(크기 범위 없음, 낮은 탁자·허리 높이 칸막이로 몸 기준)",
-  "brief": "위키·설계안 항목 모두 줄·칸·as_objects에 대응. 뺀 것: 소파·의자(오브젝트), 금색 시계·삼단봉(인물 몫). 낮은 탁자·포커 테이블(+칩·카드·시가 상자·머그·신문)은 오브젝트로 따로 뽑음",
+  "brief": "위키·설계안 항목 모두 줄·칸·as_objects에 대응. 뺀 것: 소파·의자(오브젝트), 낮은 탁자(소파 세트라 같이 오브젝트), 금색 시계·삼단봉(인물 몫)",
   "meaning": "v1에서 빠진 「flat, wall-mounted」(TV 모양)를 되살리고 「flush on the wall」로 브래킷을 막음. 접수대 틈은 clear empty gap으로, 칸막이는 low·only waist high로. 모양·설치·통로 말은 도구가 못 빼게 막음. 뺀 것은 재질·색·같은 뜻뿐",
-  "over": "같은 물건 두 번 없음. 줄마다 근거. 억지 채우기 없음. 채우기 packed+(사용자). 안쪽 사무실 카펫 가운데는 포커 테이블 오브젝트 자리로 비움",
+  "over": "같은 물건 두 번 없음(액자는 둘+하나로 설계안 3). 줄마다 근거. 억지 채우기 없음, 채우기 packed(사용자 결정)",
   "frame": "one-point, 바닥 아래 절반, 왼쪽 벽만(선팅 유리·TV 벽, 오른쪽 안쪽 사무실은 그림 끝으로 이어짐), 문 0(아래 출구), 채우기 packed(사용자 결정), 참고 그림 1·밑그림 없음"
  },
  "as_objects": [
   {
    "full": "on the floor in front of the back wall, middle, a low wooden coffee table with four coffee mugs and a newspaper on it, with empty floor on both sides of it",
    "why": "설계안 낮은 탁자, 머그컵 ×4, 신문 (소파는 오브젝트로 양옆에 놓을 자리)",
-   "object": "낮은 탁자 + 머그 4·신문: 오브젝트로 따로 뽑아 배치(사용자 10-30: 탁자는 배경에 그리지 않음)"
-  },
-  {
-   "full": "on the floor in the inner office on the right, on dark carpet, an oval poker table with green felt standing free like an island, stacks of colourful poker chips and playing cards on it, and an open wooden cigar box on the table",
-   "why": "위키 안쪽 사무실 포커 테이블·칩 / 설계안 녹색 펠트, 방 안 섬, 칩 더미·카드 / 사용자 10-30: 시가 상자 넣기",
-   "object": "포커 테이블 + 칩·카드·시가 상자: 오브젝트로 따로(사용자 10-30)"
+   "object": "낮은 탁자(+머그·신문)는 소파와 한 세트라 소파 오브젝트와 같이 따로(사용자 10-30: 바닥 한가운데 좌식 탁자는 말이 안 됨)"
   }
  ]
 }

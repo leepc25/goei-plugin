@@ -13,11 +13,12 @@
   "curtain rail",
   "ceiling-rail curtain",
   "people",
-  "table",
-  "desk",
   "stool",
   "couch",
-  "armchair"
+  "armchair",
+  "coffee table",
+  "low table",
+  "tea table"
  ],
  "visitor_things": [
   "blood pressure",
