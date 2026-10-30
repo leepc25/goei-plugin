@@ -197,7 +197,7 @@
     c.drawImage(img.bg, 0, 0, W, H);
     c.fillStyle = "rgba(5,7,10,0.75)";
     c.fillRect(0, 0, W, H);
-    const X = 80, Y = 34, WW = 1120, HH = 652;
+    const X = 80, Y = 10, WW = 1120, HH = 700;
     nine("panel", X, Y, WW, HH);
     const P = 30;
     const top = Y + P, bot = Y + HH - P;
@@ -213,29 +213,43 @@
     c.fillRect(lx + 104, top + 88, lw - 104, 12);
     c.fillStyle = "#c8473f";
     c.fillRect(lx + 104, top + 88, (lw - 104) * 0.72, 12);
-    T("\uCCB4\uB825", lx, top + 118, DIM);
-    T("684 / 950", lx + lw, top + 118, INK2, 22, "right");
-    let y = top + 162;
+    T("\uCCB4\uB825", lx, top + 114, DIM);
+    T("684 / 950", lx + lw, top + 114, INK2, 22, "right");
+    let y = top + 140;
     head("\uAE30\uBCF8 \uB2A5\uB825\uCE58", lx, y, lw);
-    y += 44;
+    y += 40;
     const stats = [["\uD798", 3, 0], ["\uBBFC", 8, 1], ["\uCCB4", 4, 0], ["\uC9C0", 6, 0], ["\uC815", 4, 0]];
-    for (const [n, v, up] of stats) {
-      T(n, lx, y, INK2);
+    stats.forEach(([n, v, up], i) => {
+      const cx = lx + i % 2 * (lw / 2 + 6), cy2 = y + Math.floor(i / 2) * 30;
+      T(n, cx, cy2, INK2);
       for (let p = 0; p < 10; p++) {
         c.fillStyle = p < v ? p >= v - up ? GOOD : "#cfcabd" : "#262d34";
-        c.fillRect(lx + 36 + p * 21, y + 4, 17, 16);
+        c.fillRect(cx + 28 + p * 9, cy2 + 6, 7, 13);
       }
-      T(String(v), lx + lw, y, up ? GOOD : INK2, 22, "right");
-      y += 28;
-    }
-    y += 8;
+      T(String(v), cx + lw / 2 - 12, cy2, up ? GOOD : INK2, 22, "right");
+    });
+    y += 90;
     head("\uC804\uD22C \uC218\uCE58", lx, y, lw);
-    y += 42;
-    const der = [["\uADFC\uC811 \uACF5\uACA9", "94"], ["\uC0AC\uACA9 \uACF5\uACA9", "109", "124"], ["\uC774\uB2A5 \uACF5\uACA9", "102"], ["\uBC1B\uB294 \uD53C\uD574", "\u22121%"], ["\uC774\uB3D9 \uC18D\uB3C4", "105"], ["\uAE30\uC220 \uCFE8", "\u22122%", "\u221210%"], ["\uC0C1\uD0DC \uC774\uC0C1", "\u22125%"]];
+    y += 38;
+    const der = [
+      ["\uCD5C\uB300 \uCCB4\uB825", "950"],
+      ["\uADFC\uC811 \uACF5\uACA9", "94"],
+      ["\uC0AC\uACA9 \uACF5\uACA9", "109", "124"],
+      ["\uC774\uB2A5 \uACF5\uACA9", "103"],
+      ["\uCE58\uBA85", "0% \xB7 \uD53C\uD574 200%"],
+      ["\uBC1B\uB294 \uD53C\uD574", "+2%"],
+      ["\uACBD\uC9C1 \uC800\uD56D", "0"],
+      ["\uC774\uB3D9 \uC18D\uB3C4", "105"],
+      ["\uD68C\uD53C", "2\uD68C \xB7 0.8\uCD08"],
+      ["\uAE30\uC220 \uCFE8", "\u22122%", "\u221210%"],
+      ["\uD544\uC0B4 \uCDA9\uC804", "\u22123%"],
+      ["\uC0C1\uD0DC \uC774\uC0C1 \uC9C0\uC18D", "+5%"],
+      ["\uAD34\uC774 \uC815\uC2E0 \uD53C\uD574", "+4%"]
+    ];
     for (const [n, a, b] of der) {
       T(n, lx, y, DIM);
       T(b ? `${a} \u25B8 ${b}` : a, lx + lw, y, b ? GOOD : INK2, 22, "right");
-      y += 26;
+      y += 24;
     }
     const R0 = L + LW + 14;
     const tabs = [["skill", "\uAE30\uC220", "attack"], ["item", "\uAC00\uBC29", ""], ["perk", "\uD37D", "ult"]];
@@ -361,7 +375,7 @@
       btn("\uD035\uC2AC\uB86F\uC5D0 \uB123\uAE30", DX, top + 264, DW);
       btn("\uBC84\uB9AC\uAE30", DX, top + 318, DW);
     }
-    T("Tab \uB2EB\uAE30 \xB7 Q/E \uD0ED \xB7 \uBC29\uD5A5\uD0A4 \uACE0\uB974\uAE30 \xB7 Space \uD655\uC778", X + WW / 2, Y + HH + 6, DIM, 22, "center");
+    T("Tab \uB2EB\uAE30", R0 + 38, bot - 30, DIM, 22, "center");
   }
   main();
 })();

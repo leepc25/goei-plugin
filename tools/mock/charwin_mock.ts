@@ -38,7 +38,7 @@ async function main() {
   const head = (s: string, x: number, y: number, w: number, right = '') => { T(s, x, y, GOLD); if (right) T(right, x + w, y, DIM, 22, 'right'); hr(x, y + 30, w); };
 
   c.drawImage(img.bg, 0, 0, W, H); c.fillStyle = 'rgba(5,7,10,0.75)'; c.fillRect(0, 0, W, H);
-  const X = 80, Y = 34, WW = 1120, HH = 652;
+  const X = 80, Y = 10, WW = 1120, HH = 700;
   nine('panel', X, Y, WW, HH);
   const P = 30;                       // 틀 안쪽 여백
   const top = Y + P, bot = Y + HH - P;
@@ -53,19 +53,25 @@ async function main() {
   T('에일린', lx + 104, top + 18, INK, 33);
   T('사격형 · 관리국', lx + 104, top + 58, DIM);
   c.fillStyle = '#2e353c'; c.fillRect(lx + 104, top + 88, lw - 104, 12); c.fillStyle = '#c8473f'; c.fillRect(lx + 104, top + 88, (lw - 104) * 0.72, 12);
-  T('체력', lx, top + 118, DIM); T('684 / 950', lx + lw, top + 118, INK, 22, 'right');
-  // 기본 능력치
-  let y = top + 162; head('기본 능력치', lx, y, lw); y += 44;
+  T('체력', lx, top + 114, DIM); T('684 / 950', lx + lw, top + 114, INK, 22, 'right');
+  // 기본 능력치 (2열)
+  let y = top + 140; head('기본 능력치', lx, y, lw); y += 40;
   const stats: [string, number, number][] = [['힘', 3, 0], ['민', 8, 1], ['체', 4, 0], ['지', 6, 0], ['정', 4, 0]];
-  for (const [n, v, up] of stats) {
-    T(n, lx, y, INK);
-    for (let p = 0; p < 10; p++) { c.fillStyle = p < v ? (p >= v - up ? GOOD : '#cfcabd') : '#262d34'; c.fillRect(lx + 36 + p * 21, y + 4, 17, 16); }
-    T(String(v), lx + lw, y, up ? GOOD : INK, 22, 'right'); y += 28;
-  }
-  // 전투 수치 (100 = 기준)
-  y += 8; head('전투 수치', lx, y, lw); y += 42;
-  const der: [string, string, string?][] = [['근접 공격', '94'], ['사격 공격', '109', '124'], ['이능 공격', '102'], ['받는 피해', '−1%'], ['이동 속도', '105'], ['기술 쿨', '−2%', '−10%'], ['상태 이상', '−5%']];
-  for (const [n, a, b] of der) { T(n, lx, y, DIM); T(b ? `${a} ▸ ${b}` : a, lx + lw, y, b ? GOOD : INK, 22, 'right'); y += 26; }
+  stats.forEach(([n, v, up], i) => {
+    const cx = lx + (i % 2) * (lw / 2 + 6), cy2 = y + Math.floor(i / 2) * 30;
+    T(n, cx, cy2, INK);
+    for (let p = 0; p < 10; p++) { c.fillStyle = p < v ? (p >= v - up ? GOOD : '#cfcabd') : '#262d34'; c.fillRect(cx + 28 + p * 9, cy2 + 6, 7, 13); }
+    T(String(v), cx + lw / 2 - 12, cy2, up ? GOOD : INK, 22, 'right');
+  });
+  // 전투 수치 (공격은 100 = 기준)
+  y += 90; head('전투 수치', lx, y, lw); y += 38;
+  const der: [string, string, string?][] = [
+    ['최대 체력', '950'], ['근접 공격', '94'], ['사격 공격', '109', '124'], ['이능 공격', '103'],
+    ['치명', '0% · 피해 200%'], ['받는 피해', '+2%'], ['경직 저항', '0'],
+    ['이동 속도', '105'], ['회피', '2회 · 0.8초'], ['기술 쿨', '−2%', '−10%'], ['필살 충전', '−3%'],
+    ['상태 이상 지속', '+5%'], ['괴이 정신 피해', '+4%'],
+  ];
+  for (const [n, a, b] of der) { T(n, lx, y, DIM); T(b ? `${a} ▸ ${b}` : a, lx + lw, y, b ? GOOD : INK, 22, 'right'); y += 24; }
 
   // ═══ 가운데: 세로 탭 (폭 76)
   const R0 = L + LW + 14;
@@ -140,6 +146,6 @@ async function main() {
     const btn = (s: string, x: number, y: number, w: number) => { nine('row', x, y, w, 44, 2); T(s, x + w / 2, y + 10, INK, 22, 'center'); };
     btn('사용', DX, top + 210, DW); btn('퀵슬롯에 넣기', DX, top + 264, DW); btn('버리기', DX, top + 318, DW);
   }
-  T('Tab 닫기 · Q/E 탭 · 방향키 고르기 · Space 확인', X + WW / 2, Y + HH + 6, DIM, 22, 'center');
+  T('Tab 닫기', R0 + 38, bot - 30, DIM, 22, 'center');
 }
 main();
