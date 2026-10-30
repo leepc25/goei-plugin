@@ -28,6 +28,8 @@ def hits(o, out):
         h = o.get("hit")
         if isinstance(h, dict) and isinstance(h.get("dmg"), (int, float)):
             out.append(h)
+        if o.get("t") == "suppress":   # 에일린 제압사격: 발마다 피해가 fx 자체에 있다
+            out.append(o)
         for v in o.values():
             hits(v, out)
     elif isinstance(o, list):

@@ -507,7 +507,7 @@ const FX = {
     const ddx = (T.x - p.x) * dir;
     if (!!T && ddx > 30 && ddx < dist + 40 && Math.abs(T.y - P.y) < 90) {   // 줄 차이 70 → 90(10-29 밤)
       const bulletY = p.y + ddx * Math.tan(ang), dk = K(T.y);
-      if (bulletY > T.y - T.z - 220 * dk && bulletY < T.y - T.z + 10) later(ddx / 3200, () => { damageTarget(s.dmg || 7, 'light'); T.vx += dir * 140; T.stag = Math.max(T.stag, 0.45); vfx('bullet_hit_body', T.x - dir * 10, bulletY, 2); hitstop = Math.max(hitstop, 0.012); shake = Math.max(shake, 3); });
+      if (bulletY > T.y - T.z - 220 * dk && bulletY < T.y - T.z + 10) later(ddx / 3200, () => { curHit = s; curLast = true; damageTarget(s.dmg || 7, 'light'); curHit = null; T.vx += dir * 140; T.stag = Math.max(T.stag, 0.45); vfx('bullet_hit_body', T.x - dir * 10, bulletY, 2); hitstop = Math.max(hitstop, 0.012); shake = Math.max(shake, 3); });
     }
   },
   // 에일린: 판독 표적 → 포격
