@@ -19,6 +19,9 @@
   7 오버: 한 물건 설명이 18낱말 초과, 같은 낱말 반복 4번 이상, 같은 물건 두 번
   8 분위기: clean인데 더러움 낱말
   9 틀: 명암(shadow) 칸에 그림자 낱말 없음, 바닥에 빛·그림자 없음, 2,000자 초과
+  10 정제: 1차(full)에서 2차(text)로 줄이며 뺀 낱말마다 drop_ok {낱말: 이유}가 없으면 실패
+  11 대조: brief.items [{src: 설계안·위키 항목, by: [물건 줄 번호] | "omit: 이유"}] 없거나 빈 항목이면 실패
+  12 3차: review {fit, place, size, brief, meaning, over, frame} 자가 검토 답이 없으면 실패
 """
 import json, os, re, sys
 from collections import Counter
@@ -27,6 +30,32 @@ ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)
 DB = json.load(open(os.path.join(ROOT, 'tools/pixellab/room_items.json'), encoding='utf-8'))
 DIRT = ['dirty', 'dust', 'grime', 'stain', 'rust', 'trash', 'litter', 'mold', 'filthy']
 STOP = set('a an the of and with on in at to its it is as by for from one two left right back front wall side'.split())
+
+
+# 자리·연결 말(뜻 없는 군말). 물건·재질·색·크기 낱말은 여기 넣지 않는다 → 빼면 이유를 적어야 함
+FILLER = set('a an the of and with on in at to its it is as by for from into onto about some each both side sides part '
+             'room directly against next beside above below under over through top bottom front back left right center '
+             'standing facing hanging holding showing laid out its their this that'.split())
+
+
+def cut_words(full, text):
+    tl = text.lower(); out = []
+    for w in re.findall(r"[a-z][a-z\-]*", full.lower()):
+        if w in FILLER or len(w) < 3 or w in tl or w.rstrip('s') in tl: continue
+        if w not in out: out.append(w)
+    return out
+
+
+# 3차 자가 검토: 2차 요청문을 다 쓴 뒤 내가 직접 읽고 칸마다 답한다(spec.review). 빈 답·짧은 답이면 실패
+REVIEW_Q = {
+    'fit': '이 방에 안 맞는 물건이 2차 문장에 있나? 줄마다 확인한 결과',
+    'place': '손님 물건이 직원 쪽에 있거나, 캐릭터가 못 다가가는 자리에 꼭 필요한 것이 있나?',
+    'size': '큰 가구·문 크기가 서 있는 사람 150px(에일린) 기준으로 맞나? 숫자로',
+    'brief': '위키·설계안·사용자 결정 중 빠진 것이 있나? 있으면 왜 뺐나',
+    'meaning': '2차로 줄이며 1차 뜻이 바뀌거나 중요한 세부(기구·재질·잠금 등)가 빠졌나?',
+    'over': '이유 없는 채움 물건·같은 물건 두 번·쓸데없이 긴 설명이 있나?',
+    'frame': '원근·바닥 몫·양옆 벽·문·채우기가 이 장면에 정한 대로인가?',
+}
 
 
 def check(spec, prompt):
@@ -46,7 +75,23 @@ def check(spec, prompt):
         # 정제 점검: keep 낱말이 2차 문장에 남았는지
         for kw in it.get('keep', []):
             if kw.lower() not in (it.get('text') or '').lower(): fails.append(f'정제하다 빠짐 "{kw}": {it.get("text")}')
+        # 줄이며 뺀 낱말: 하나하나 빼도 되는 이유(drop_ok: {낱말: 이유})가 있어야 함
+        cut = cut_words(it.get('full', ''), it.get('text', ''))
+        ok = {k.lower(): v for k, v in (it.get('drop_ok') or {}).items() if str(v).strip()}
+        bad = [w for w in cut if w not in ok]
+        if bad: fails.append(f'이유 없이 뺀 낱말 {bad}: {it.get("text")}')
     texts = [(it['text'] if isinstance(it, dict) else it) for it in items]
+    # 1-0 설계안·위키 항목 대조: brief.items = [{"src": "원문 항목", "by": [물건 줄 번호(0부터)] 또는 "omit: 이유"}]
+    bi = spec.get('brief', {}).get('items')
+    if bi is None: fails.append('brief.items(설계안·위키 항목 목록과 맡는 줄)가 없음')
+    for b in bi or []:
+        by = b.get('by')
+        if isinstance(by, str) and by.startswith('칸:'):   # 물건 줄이 아니라 floor·walls·light 같은 칸이 맡음 → 그 칸에 그 낱말이 실제로 있어야 함
+            f, _, kw = by[2:].strip().partition(' ')
+            if kw.strip().lower() not in str(spec.get(f, '')).lower(): fails.append(f'설계안 항목 "{b.get("src")}": {f} 칸에 "{kw.strip()}" 없음')
+        elif isinstance(by, str):
+            if not by.startswith('omit:') or len(by) < 8: fails.append(f'설계안 항목을 이유 없이 뺌: {b.get("src")}')
+        elif not by or any((not isinstance(i, int)) or i >= len(items) for i in by): fails.append(f'설계안 항목을 맡는 물건 줄이 없음: {b.get("src")}')
     # 1 빠뜨림
     for m in spec.get('must', []):
         if m['kw'].lower() not in low: fails.append(f'빠뜨림: "{m["kw"]}" ({m.get("from", "")})')
@@ -90,11 +135,15 @@ def check(spec, prompt):
     # 8 분위기
     if spec.get('mood') == 'clean':
         for w in DIRT:
-            if w in low: warns.append(f'깨끗한 방인데 더러움 낱말: {w}')
+            if re.search(rf'\b{w}', low): warns.append(f'깨끗한 방인데 더러움 낱말: {w}')
     # 9 틀
     if not re.search(r'shadow', spec.get('shadow', '').lower()): fails.append('명암 칸에 그림자(shadow)가 없음')
     if not re.search(r'light|shadow|glow|pool', spec.get('floor', '').lower()): warns.append('바닥 칸에 빛·그림자 없음')
     if len(prompt) > 2000: fails.append(f'{len(prompt)}자 > 2000')
+    # 10 3차 자가 검토
+    rv = spec.get('review') or {}
+    for k, q in REVIEW_Q.items():
+        if len(str(rv.get(k, '')).strip()) < 10: fails.append(f'3차 검토 답 없음 review.{k}: {q}')
     return fails, warns
 
 

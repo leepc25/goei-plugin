@@ -12,6 +12,92 @@
    "양쪽 벽 닫힘(작은 밀실)",
    "수술대 사람 0.5배 높이",
    "링거대·산소통·폐기물 통은 대기실에서 뺀 것"
+  ],
+  "items": [
+   {
+    "src": "위키: 바랜 간판·플라스틱 의자·잡지·접수 창구·진료실",
+    "by": "omit: 대기실·진료실 것이라 수술실에 넣지 않음, 의자는 사용자 결정으로 전부 뺌"
+   },
+   {
+    "src": "위키: 형광등이 쨍한 수술실",
+    "by": "칸:walls fluorescent"
+   },
+   {
+    "src": "위키: 강박적으로 깨끗",
+    "by": "칸:place obsessively clean"
+   },
+   {
+    "src": "위키: 뒷벽 이중 잠금 약품장",
+    "by": [
+     4
+    ]
+   },
+   {
+    "src": "위키: 사람 하나 들어갈 냉장고(검체 보관)",
+    "by": [
+     6
+    ]
+   },
+   {
+    "src": "위키: 장기 적출·이식",
+    "by": [
+     9
+    ]
+   },
+   {
+    "src": "위키: 이상 의수족·초능력 장비 이식",
+    "by": [
+     10
+    ]
+   },
+   {
+    "src": "위키: 이상 오염 치료",
+    "by": [
+     12
+    ]
+   },
+   {
+    "src": "설계안: 바닥 PVC 청회",
+    "by": "칸:floor blue-grey"
+   },
+   {
+    "src": "설계안: 벽 흰 타일",
+    "by": "칸:walls white tiles"
+   },
+   {
+    "src": "설계안: 수술대 2.0×0.7×0.9, 긴 옆면이 화면 쪽",
+    "by": [
+     0
+    ]
+   },
+   {
+    "src": "설계안: 무영등(천장)",
+    "by": [
+     1
+    ]
+   },
+   {
+    "src": "설계안: 기구 트레이 ×2",
+    "by": [
+     3
+    ]
+   },
+   {
+    "src": "설계안: 바닥 반사",
+    "by": "칸:floor glossy"
+   },
+   {
+    "src": "사용자: 링거대·산소통·폐기물 통 수술실로",
+    "by": [
+     2,
+     12,
+     8
+    ]
+   },
+   {
+    "src": "사용자: 문 없음(아래 출구)",
+    "by": "omit: 문은 그리지 않음 — no 칸에 doors, doorways"
+   }
   ]
  },
  "must": [
@@ -61,15 +147,15 @@
   "medicine cabinet",
   "fridge"
  ],
- "place": "a cramped, obsessively clean operating room of an unlicensed clinic in a run-down 1990s Seoul underground arcade",
+ "place": "an unlicensed clinic's cramped, obsessively clean operating room in a 1990s Seoul underground arcade",
  "time": "night",
  "light": "a harsh surgical lamp",
  "view": "one-point",
  "floor_share": "the lower 40 percent",
  "sides": "both",
  "density": "packed",
- "floor": "blue-grey tiles, dark grout, a drain, mop streaks, a pool of light under the table",
- "walls": "white tiles, yellowed grout, a few chipped tiles, steel baseboard; two fluorescent tubes",
+ "floor": "glossy blue-grey tiles, a drain, a bright pool of light under the table",
+ "walls": "white tiles, yellowed grout; two fluorescent tubes",
  "items": [
   {
    "full": "in the center of the room a heavy steel operating table standing on a single central pedestal with a wide base, its long side facing the camera, about 2.0 m long and 0.9 m high (190 by 85 pixels), a thin black padded mattress, leather wrist and ankle straps hanging from the sides",
@@ -80,16 +166,37 @@
     "190 by 85",
     "straps"
    ],
-   "text": "center: a steel operating table on one pedestal, long side to camera, 190 by 85 pixels, wrist straps"
+   "text": "center: a steel operating table on one pedestal, long side to camera, 190 by 85 pixels, leather straps",
+   "drop_ok": {
+    "single": "one pedestal과 같은 뜻",
+    "central": "center·one pedestal로 충분",
+    "wide": "받침 넓이는 세부, 글자 아낌",
+    "base": "pedestal에 포함",
+    "high": "85 pixels 숫자로 대신",
+    "thin": "매트 두께 세부",
+    "padded": "mattress에 포함",
+    "heavy": "글자 수(2000자) 때문에 뺌, steel로 무게감",
+    "black": "매트 색은 팔레트가 맡음",
+    "mattress": "수술대 위 매트는 당연, 글자 수(2000자)",
+    "wrist": "leather straps로 손목·발목 끈 둘 다",
+    "ankle": "leather straps로 손목·발목 끈 둘 다"
+   }
   },
   {
    "full": "directly above the table a large surgical lamp with two round heads, hanging from the ceiling on a jointed metal arm",
    "why": "설계안 무영등(천장)",
    "keep": [
     "surgical lamp",
-    "two-headed"
+    "two-headed",
+    "jointed"
    ],
-   "text": "above it a two-headed surgical lamp on a ceiling arm"
+   "text": "above it a two-headed surgical lamp on a jointed ceiling arm",
+   "drop_ok": {
+    "table": "above it(앞 줄 수술대)로 가리킴",
+    "round": "무영등 머리는 원래 둥긂",
+    "metal": "팔 재질 세부, 글자 아낌",
+    "large": "무영등은 원래 큼, 글자 수"
+   }
   },
   {
    "full": "at the head of the table on its left an IV drip stand with a hanging fluid bag; on its right a vital signs monitor with a green line on a rolling stand",
@@ -98,15 +205,35 @@
     "IV stand",
     "monitor"
    ],
-   "text": "left of the table an IV stand, right of it a monitor on a stand"
+   "text": "left of the table an IV stand, right a vital signs monitor",
+   "drop_ok": {
+    "head": "left of the table로 자리 충분",
+    "drip": "IV stand·fluid bag과 같은 뜻",
+    "green": "화면 선 색, 작아서 안 보임",
+    "line": "화면 선, 작아서 안 보임",
+    "fluid": "IV stand에 수액 주머니는 당연히 달림",
+    "bag": "IV stand에 수액 주머니는 당연히 달림",
+    "rolling": "스탠드 바퀴 세부, 글자 수"
+   }
   },
   {
    "full": "on both sides of the table a small stainless steel instrument trolley on wheels, its top tray laid out neatly with scalpels, clamps, scissors and gauze",
    "why": "설계안 기구 트레이 ×2",
    "keep": [
-    "trolleys"
+    "trolleys",
+    "scalpels",
+    "clamps",
+    "gauze"
    ],
-   "text": "beside the table two instrument trolleys"
+   "text": "beside the table two steel instrument trolleys, trays of scalpels, clamps and gauze",
+   "drop_ok": {
+    "small": "trolley는 원래 작음",
+    "stainless": "steel과 같은 뜻",
+    "wheels": "trolley에 포함",
+    "tray": "trays로 남김",
+    "neatly": "깨끗한 방(mood clean)으로 충분",
+    "scissors": "clamps·scalpels와 겹치는 작은 기구"
+   }
   },
   {
    "full": "against the left part of the back wall a tall grey steel medicine cabinet, about 1.8 m (165 pixels), glass doors showing rows of brown medicine bottles and vials, a heavy chain wrapped through both handles and locked with two padlocks",
@@ -114,18 +241,41 @@
    "keep": [
     "medicine cabinet",
     "165 pixels",
-    "chained"
+    "chained",
+    "padlocks"
    ],
-   "text": "on the back wall left a steel medicine cabinet, 165 pixels tall, bottles behind glass, chained shut"
+   "text": "on the back wall left a medicine cabinet, 165 pixels tall, bottles behind glass, chained with two padlocks",
+   "drop_ok": {
+    "grey": "팔레트 칸(greyed white, steel)이 맡음",
+    "doors": "문 0개라 문 낱말 금지 → glass front로",
+    "rows": "bottles로 충분",
+    "vials": "bottles와 겹침",
+    "heavy": "chained shut으로 충분",
+    "wrapped": "chained로 같은 뜻",
+    "handles": "사슬 감는 자리 세부",
+    "locked": "padlocks에 포함",
+    "brown": "약병 색은 모델이 앎, 글자 수",
+    "steel": "팔레트 칸 steel이 맡음, 글자 수"
+   }
   },
   {
    "full": "on the back wall next to the cabinet a deep steel scrub sink with a long-lever tap, and above it a wall rack holding boxes of latex gloves and masks",
    "why": "수술 전 손 씻기·장갑",
    "keep": [
     "sink",
-    "glove"
+    "gloves",
+    "masks"
    ],
-   "text": "on the back wall a sink under glove boxes"
+   "text": "on the back wall a scrub sink under boxes of gloves and masks",
+   "drop_ok": {
+    "cabinet": "자리 말(약품장 옆), on the back wall로 충분",
+    "long-lever": "수도꼭지 세부, 작아서 안 보임",
+    "tap": "sink에 포함",
+    "rack": "boxes로 충분",
+    "deep": "싱크 깊이 세부, 글자 수",
+    "steel": "팔레트 칸 steel이 맡음, 반복 줄임",
+    "latex": "gloves로 충분"
+   }
   },
   {
    "full": "against the right part of the back wall a large white industrial refrigerator big enough for a person to fit inside, about 1.9 m (170 by 80 pixels), a heavy lever handle and a vent grille at the bottom",
@@ -135,7 +285,19 @@
     "person",
     "170 by 80"
    ],
-   "text": "on the back wall right a white fridge big enough for a person, 170 by 80 pixels"
+   "text": "on the back wall right a white fridge big enough for a person, 170 by 80 pixels",
+   "drop_ok": {
+    "large": "170 by 80 pixels 숫자로 대신",
+    "refrigerator": "fridge와 같은 말",
+    "fit": "big enough for a person으로 같은 뜻",
+    "inside": "big enough for a person으로 같은 뜻",
+    "heavy": "industrial로 충분",
+    "vent": "아래 환기구 세부, 작음",
+    "grille": "아래 환기구 세부, 작음",
+    "industrial": "big enough for a person으로 충분",
+    "lever": "손잡이 세부, 작음",
+    "handle": "손잡이 세부, 작음"
+   }
   },
   {
    "full": "on the back wall a small yellow sharps disposal box",
@@ -143,7 +305,11 @@
    "keep": [
     "sharps"
    ],
-   "text": "on the back wall a yellow sharps box"
+   "text": "on the back wall a yellow sharps box",
+   "drop_ok": {
+    "small": "원래 작은 상자",
+    "disposal": "sharps box와 같은 뜻"
+   }
   },
   {
    "full": "in the back corner a small red biohazard waste bin with a pedal lid",
@@ -151,7 +317,13 @@
    "keep": [
     "biohazard"
    ],
-   "text": "in the back corner a red biohazard bin"
+   "text": "in the back corner a red biohazard bin",
+   "drop_ok": {
+    "small": "원래 작은 통",
+    "waste": "bin과 같은 뜻",
+    "pedal": "뚜껑 페달은 작아서 안 보임",
+    "lid": "뚜껑 페달은 작아서 안 보임"
+   }
   },
   {
    "full": "on the floor next to the refrigerator two stacked white-and-blue organ transport cooler boxes",
@@ -159,16 +331,33 @@
    "keep": [
     "organ"
    ],
-   "text": "next to the fridge two organ coolers"
+   "text": "next to the fridge two stacked organ coolers",
+   "drop_ok": {
+    "floor": "자리 말, 바닥 놓임은 당연",
+    "refrigerator": "fridge와 같은 말",
+    "white-and-blue": "색은 팔레트가 맡음",
+    "boxes": "coolers와 같은 뜻",
+    "transport": "organ coolers로 충분"
+   }
   },
   {
    "full": "on the right side wall a steel wall rack holding odd mechanical prosthetic arms and legs with exposed joints and wires, and small boxed implant devices",
    "why": "위키: 이상 의수족, 초능력 장비 이식",
    "keep": [
     "prosthetic",
-    "right wall"
+    "right wall",
+    "implants"
    ],
-   "text": "on the right wall a rack of odd mechanical prosthetic limbs"
+   "text": "on the right wall a rack of mechanical prosthetic limbs, exposed wires, boxed implants",
+   "drop_ok": {
+    "joints": "mechanical·exposed wires로 충분",
+    "small": "implant devices는 원래 작음",
+    "steel": "팔레트 칸 steel이 맡음, 반복 줄임",
+    "odd": "mechanical·exposed wires가 이상함을 보여 줌",
+    "arms": "limbs로 같은 뜻",
+    "legs": "limbs로 같은 뜻",
+    "devices": "implants로 같은 뜻"
+   }
   },
   {
    "full": "on the left side wall a narrow shelf of brown disinfectant bottles and rolled bandages",
@@ -177,16 +366,33 @@
     "disinfectant",
     "left wall"
    ],
-   "text": "on the left wall a shelf of disinfectant bottles"
+   "text": "on the left wall a shelf of disinfectant and bandages",
+   "drop_ok": {
+    "narrow": "벽 선반 폭 세부",
+    "brown": "약병 색은 모델이 앎, 글자 수",
+    "bottles": "disinfectant로 충분",
+    "rolled": "bandages로 충분"
+   }
   },
   {
    "full": "at the front left a green oxygen cylinder on a small two-wheeled cart, and beside it a sealed steel drum wrapped in yellow and black hazard stripes",
    "why": "산소: 수술실 쓰임(대기실에서 옮김) / 드럼: 위키 이상 오염 치료",
    "keep": [
     "oxygen",
+    "sealed",
     "hazard"
    ],
-   "text": "at the front left an oxygen tank and a hazard-striped drum"
+   "text": "at the front left an oxygen cylinder and a sealed hazard-striped drum",
+   "drop_ok": {
+    "small": "cart 크기 세부",
+    "two-wheeled": "cart로 충분",
+    "wrapped": "in hazard stripes로 같은 뜻",
+    "yellow": "hazard stripes가 노랑·검정",
+    "black": "hazard stripes가 노랑·검정",
+    "green": "산소통 색은 모델이 앎",
+    "cart": "글자 수, 산소통 받침 세부",
+    "steel": "팔레트 칸 steel이 맡음, 반복 줄임"
+   }
   },
   {
    "full": "at the front right a suction machine with a clear canister on a small cart",
@@ -194,15 +400,30 @@
    "keep": [
     "suction"
    ],
-   "text": "at the front right a suction machine cart"
+   "text": "at the front right a suction cart",
+   "drop_ok": {
+    "clear": "통 투명함은 작아서 안 보임",
+    "small": "cart 크기 세부",
+    "canister": "suction machine에 포함, 글자 수",
+    "machine": "suction cart로 같은 뜻"
+   }
   }
  ],
- "shadow": "bright table under the lamp, greyer walls, deep shadows under cabinets, trolleys and table, glossy steel highlights",
+ "shadow": "bright table under the lamp, deep shadows under furniture, steel highlights",
  "palette": "cold greyed white, steel and blue-grey with blue-black shadows and green, yellow, red accents",
  "no": [
   "blood",
   "text",
   "doors",
   "doorways"
- ]
+ ],
+ "review": {
+  "fit": "14줄 모두 수술실 물건. room_items 수술실 금지(잡지·정수기·접수대·X선판·시력표·체중계·TV) 없음. 대기실 것(의자·잡지) 없음",
+  "place": "손님 물건 없음(수술실은 직원만). 수술대 앞은 비워 둠(앞 왼쪽·오른쪽 끝에만 산소통·흡인기), 캐릭터가 수술대까지 감",
+  "size": "수술대 190×85(사람 150의 0.57배, 0.9m), 약품장 165(1.8m), 냉장고 170×80(1.9m) — 사람 150=1.7m 비율과 맞음",
+  "brief": "위키·설계안 항목 16개 모두 줄·칸에 대응. 뺀 것은 대기실·진료실 물건과 문뿐(이유 적음)",
+  "meaning": "1차의 메스·집게·거즈, 마스크, 자물쇠 둘, 이식 장치, 밀봉 드럼, 가죽 발목 끈, 뼈대 드러난 의수족을 2차에 남김. 2000자 때문에 뺀 것: 수액 주머니·바퀴·손잡이·페달 같은 작은 세부(줄마다 이유)",
+  "over": "커튼 같은 채움 물건 없음. 줄마다 근거 있음. 같은 물건 두 번 없음. steel 반복은 팔레트 칸으로 옮겨 줄임",
+  "frame": "one-point, 바닥 40%, 양옆 벽 닫힘(작은 밀실, 사용자 결정), 문 0, packed(헐값매입 1차 문장)"
+ }
 }

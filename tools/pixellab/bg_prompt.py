@@ -83,13 +83,30 @@ def build(spec):
 
 
 def main():
+    """한 번에: 1차 상세안·2차 정제(명세) → 요청문 만들기 → 점검 → 검토서. 실패해도 검토서는 쓰고, 요청 JSON은 통과할 때만 만든다."""
     spec_path = sys.argv[1]
     spec = json.load(open(spec_path, encoding='utf-8'))
     text = build(spec)
-    from bg_check import report   # 점검을 통과해야만 만든다
-    if not report(spec, text): raise SystemExit('점검 실패: 고친 뒤 다시')
-    if len(text) > 2000: raise SystemExit(f'{len(text)}자: 2,000자를 넘음. 묘사 말고 군더더기를 줄일 것')
+    from bg_check import check, cut_words, REVIEW_Q
+    fails, warns = check(spec, text)
     out = os.path.dirname(os.path.abspath(spec_path))
+    br = spec.get('brief', {})
+    L = [f"# 검토서 {spec['name']}", '', f"방 {spec.get('room')} · 분위기 {spec.get('mood')} · 문 {spec.get('doors')} · 원근 {spec['view']} · 바닥 {spec['floor_share']} · 양옆 {spec['sides']} · 채우기 {spec['density']}", '',
+         '## 점검 결과', ''] + [f'- FAIL {f}' for f in fails] + [f'- WARN {w}' for w in warns] + (['- 통과'] if not fails and not warns else []) + \
+        ['', '## 근거', '', f"- 위키: {br.get('wiki', '')}", f"- 설계안: {br.get('design', '')}"] + [f"- 사용자: {u}" for u in br.get('user', [])] + \
+        ['', '## 설계안·위키 항목 대조', ''] + [f"- {b.get('src')} → " + (', '.join(f'{i}번' for i in b['by']) if isinstance(b.get('by'), list) else str(b.get('by'))) for b in br.get('items', [])] + \
+        ['', '## 1차 상세안 → 2차 정제', '', '| # | 1차 (상세) | 근거 | 남길 낱말 | 2차 (실제) | 뺀 낱말(이유) |', '|---|---|---|---|---|---|']
+    for i, it in enumerate(spec['items']):
+        cut = cut_words(it.get('full', ''), it.get('text', '')); dok = {k.lower(): v for k, v in (it.get('drop_ok') or {}).items()}
+        cs = '; '.join(w + '(' + str(dok.get(w, '**이유 없음**')) + ')' for w in cut)
+        L.append(f"| {i} | {it.get('full')} | {it.get('why')} | {', '.join(it.get('keep', []))} | {it.get('text')} | {cs} |")
+    rv = spec.get('review') or {}
+    L += ['', '## 3차 자가 검토', ''] + [f"- {q}\n  - {rv.get(k) or '**답 없음**'}" for k, q in REVIEW_Q.items()]
+    L += ['', f'## 2차 요청문 ({len(text)}자)', '', '```', text, '```']
+    open(os.path.join(out, f"{spec['name']}_review.md"), 'w', encoding='utf-8').write('\n'.join(L) + '\n')
+    for f in fails: print('FAIL', f)
+    for w in warns: print('WARN', w)
+    if fails: raise SystemExit(f"점검 실패 {len(fails)}건: 요청 JSON 안 만듦. 검토서 {spec['name']}_review.md")
     open(os.path.join(out, f"{spec['name']}_prompt.txt"), 'w', encoding='utf-8').write(text)
     req = json.load(open(os.path.join(ROOT, 'tools/pixellab/req/base_req.json')))
     req['description'] = text
@@ -102,21 +119,7 @@ def main():
         req['reference_images'].append({'image': {'type': 'base64', 'base64': base64.b64encode(open(p, 'rb').read()).decode(), 'format': 'png'},
                                         'size': {'width': w, 'height': h}, 'usage_description': usage[:500]})
     json.dump(req, open(os.path.join(out, f"{spec['name']}_req.json"), 'w'))
-    # 검토서: 1차 상세안 → 2차 정제(줄인 내용) → 점검 결과
-    from bg_check import check
-    fails, warns = check(spec, text)
-    stop = set('a an the of and with on in at to its it is as by for from'.split())
-    L = [f"# 검토서 {spec['name']}", '', f"방 {spec.get('room')} · 분위기 {spec.get('mood')} · 문 {spec.get('doors')} · 원근 {spec['view']} · 바닥 {spec['floor_share']} · 양옆 {spec['sides']} · 채우기 {spec['density']}", '',
-         '## 근거', '', f"- 위키: {spec.get('brief', {}).get('wiki', '')}", f"- 설계안: {spec.get('brief', {}).get('design', '')}"] + [f"- 사용자: {u}" for u in spec.get('brief', {}).get('user', [])] + \
-        ['', '## 1차 상세안 → 2차 정제', '', '| 1차 (상세) | 근거 | 남길 낱말 | 2차 (실제) | 줄이며 뺀 낱말 |', '|---|---|---|---|---|']
-    for it in spec['items']:
-        full_w = [w for w in re.findall(r"[a-z\-]+", it['full'].lower()) if w not in stop]
-        cut = sorted(set(w for w in full_w if w not in it['text'].lower()))
-        L.append(f"| {it['full']} | {it['why']} | {', '.join(it['keep'])} | {it['text']} | {', '.join(cut)} |")
-    L += ['', f'## 2차 요청문 ({len(text)}자)', '', '```', text, '```', '', '## 점검', ''] + [f'- FAIL {f}' for f in fails] + [f'- WARN {w}' for w in warns] + (['- 통과'] if not fails and not warns else [])
-    open(os.path.join(out, f"{spec['name']}_review.md"), 'w', encoding='utf-8').write('\n'.join(L) + '\n')
-    print(f"{spec['name']}: {len(text)}자, 물건 {len(spec['items'])}개, 참고 그림 {len(req['reference_images'])}장")
-    print(text)
+    print(f"통과: {spec['name']} {len(text)}자, 물건 {len(spec['items'])}개, 참고 그림 {len(req['reference_images'])}장 → _prompt.txt, _req.json, _review.md")
 
 
 if __name__ == '__main__':
