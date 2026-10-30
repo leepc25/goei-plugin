@@ -610,7 +610,7 @@ if (fixture.globalLore.some((e) => String(e.comment).startsWith('📚Lore slot')
     await pickCustom(page);
     await page.waitForTimeout(200);
     await page.screenshot({ path: `${shots}/9-mission-wide.png` });
-    for (const t of ['board', 'map', 'phone', 'wiki', 'settings']) {
+    for (const t of ['board', 'map', 'phone', 'wiki']) {
       await page.click(`.gx-nav .gx-nb:not(.mob)[data-value="${t}"]`); await page.waitForTimeout(150);
       await page.screenshot({ path: `${shots}/9-tab-${t}.png` });
     }
