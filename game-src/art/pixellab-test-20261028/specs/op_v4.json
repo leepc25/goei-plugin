@@ -72,60 +72,129 @@
  "walls": "white tiles, yellowed grout, a few chipped tiles, steel baseboard; two fluorescent tubes",
  "items": [
   {
-   "text": "center: a steel operating table on one pedestal, long side to camera, 190 by 85 pixels, wrist straps",
-   "why": "설계안 수술대 2.0×0.9m"
+   "full": "in the center of the room a heavy steel operating table standing on a single central pedestal with a wide base, its long side facing the camera, about 2.0 m long and 0.9 m high (190 by 85 pixels), a thin black padded mattress, leather wrist and ankle straps hanging from the sides",
+   "why": "설계안 수술대 2.0×0.7×0.9, 긴 옆면이 화면 쪽",
+   "keep": [
+    "operating table",
+    "pedestal",
+    "190 by 85",
+    "straps"
+   ],
+   "text": "center: a steel operating table on one pedestal, long side to camera, 190 by 85 pixels, wrist straps"
   },
   {
-   "text": "above it a two-headed surgical lamp on a ceiling arm",
-   "why": "설계안 무영등"
+   "full": "directly above the table a large surgical lamp with two round heads, hanging from the ceiling on a jointed metal arm",
+   "why": "설계안 무영등(천장)",
+   "keep": [
+    "surgical lamp",
+    "two-headed"
+   ],
+   "text": "above it a two-headed surgical lamp on a ceiling arm"
   },
   {
-   "text": "left of the table an IV stand, right of it a monitor on a stand",
-   "why": "수술실 쓰임(수액·생체 감시), 링거대는 대기실에서 옮김"
+   "full": "at the head of the table on its left an IV drip stand with a hanging fluid bag; on its right a vital signs monitor with a green line on a rolling stand",
+   "why": "수술실 쓰임(수액·생체 감시), 링거대는 대기실에서 옮김",
+   "keep": [
+    "IV stand",
+    "monitor"
+   ],
+   "text": "left of the table an IV stand, right of it a monitor on a stand"
   },
   {
-   "text": "beside the table two instrument trolleys",
-   "why": "설계안 기구 트레이 ×2"
+   "full": "on both sides of the table a small stainless steel instrument trolley on wheels, its top tray laid out neatly with scalpels, clamps, scissors and gauze",
+   "why": "설계안 기구 트레이 ×2",
+   "keep": [
+    "trolleys"
+   ],
+   "text": "beside the table two instrument trolleys"
   },
   {
-   "text": "on the back wall left a steel medicine cabinet, 165 pixels tall, bottles behind glass, chained shut",
-   "why": "위키 이중 잠금 약품장"
+   "full": "against the left part of the back wall a tall grey steel medicine cabinet, about 1.8 m (165 pixels), glass doors showing rows of brown medicine bottles and vials, a heavy chain wrapped through both handles and locked with two padlocks",
+   "why": "위키: 뒷벽 이중 잠금 약품장",
+   "keep": [
+    "medicine cabinet",
+    "165 pixels",
+    "chained"
+   ],
+   "text": "on the back wall left a steel medicine cabinet, 165 pixels tall, bottles behind glass, chained shut"
   },
   {
-   "text": "on the back wall a sink under glove boxes",
-   "why": "수술 전 손 씻기"
+   "full": "on the back wall next to the cabinet a deep steel scrub sink with a long-lever tap, and above it a wall rack holding boxes of latex gloves and masks",
+   "why": "수술 전 손 씻기·장갑",
+   "keep": [
+    "sink",
+    "glove"
+   ],
+   "text": "on the back wall a sink under glove boxes"
   },
   {
-   "text": "on the back wall right a white fridge big enough for a person, 170 by 80 pixels",
-   "why": "위키 사람 들어갈 냉장고(검체 보관)"
+   "full": "against the right part of the back wall a large white industrial refrigerator big enough for a person to fit inside, about 1.9 m (170 by 80 pixels), a heavy lever handle and a vent grille at the bottom",
+   "why": "위키: 사람 하나 들어갈 냉장고(검체 보관)",
+   "keep": [
+    "fridge",
+    "person",
+    "170 by 80"
+   ],
+   "text": "on the back wall right a white fridge big enough for a person, 170 by 80 pixels"
   },
   {
-   "text": "on the back wall a yellow sharps box",
-   "why": "수술실 쓰임(주삿바늘)"
+   "full": "on the back wall a small yellow sharps disposal box",
+   "why": "수술실 쓰임(주삿바늘)",
+   "keep": [
+    "sharps"
+   ],
+   "text": "on the back wall a yellow sharps box"
   },
   {
-   "text": "in the back corner a red biohazard bin",
-   "why": "수술실 쓰임, 대기실에서 옮김"
+   "full": "in the back corner a small red biohazard waste bin with a pedal lid",
+   "why": "수술실 쓰임, 대기실에서 옮김",
+   "keep": [
+    "biohazard"
+   ],
+   "text": "in the back corner a red biohazard bin"
   },
   {
-   "text": "next to the fridge two organ coolers",
-   "why": "위키 사람 들어갈 냉장고(검체 보관)"
+   "full": "on the floor next to the refrigerator two stacked white-and-blue organ transport cooler boxes",
+   "why": "위키: 장기 적출·이식",
+   "keep": [
+    "organ"
+   ],
+   "text": "next to the fridge two organ coolers"
   },
   {
-   "text": "on the right wall a rack of odd mechanical prosthetic limbs",
-   "why": "위키 이상 의수족·장비 이식"
+   "full": "on the right side wall a steel wall rack holding odd mechanical prosthetic arms and legs with exposed joints and wires, and small boxed implant devices",
+   "why": "위키: 이상 의수족, 초능력 장비 이식",
+   "keep": [
+    "prosthetic",
+    "right wall"
+   ],
+   "text": "on the right wall a rack of odd mechanical prosthetic limbs"
   },
   {
-   "text": "on the left wall a shelf of disinfectant bottles",
-   "why": "수술실 쓰임(소독)"
+   "full": "on the left side wall a narrow shelf of brown disinfectant bottles and rolled bandages",
+   "why": "수술실 쓰임(소독)",
+   "keep": [
+    "disinfectant",
+    "left wall"
+   ],
+   "text": "on the left wall a shelf of disinfectant bottles"
   },
   {
-   "text": "at the front left an oxygen tank and a hazard-striped drum",
-   "why": "수술실 쓰임(마취·호흡), 대기실에서 옮김"
+   "full": "at the front left a green oxygen cylinder on a small two-wheeled cart, and beside it a sealed steel drum wrapped in yellow and black hazard stripes",
+   "why": "산소: 수술실 쓰임(대기실에서 옮김) / 드럼: 위키 이상 오염 치료",
+   "keep": [
+    "oxygen",
+    "hazard"
+   ],
+   "text": "at the front left an oxygen tank and a hazard-striped drum"
   },
   {
-   "text": "at the front right a suction machine cart",
-   "why": "수술실 쓰임(흡인)"
+   "full": "at the front right a suction machine with a clear canister on a small cart",
+   "why": "수술실 쓰임(흡인)",
+   "keep": [
+    "suction"
+   ],
+   "text": "at the front right a suction machine cart"
   }
  ],
  "shadow": "bright table under the lamp, greyer walls, deep shadows under cabinets, trolleys and table, glossy steel highlights",

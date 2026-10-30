@@ -37,9 +37,15 @@ def check(spec, prompt):
     for k in ('brief', 'must', 'mood', 'doors', 'sized'):
         if k not in spec: fails.append(f'{k} 칸이 없음')
     items = spec.get('items', [])
-    # 3 근거
+    # 3 근거 (1차 상세안: full·why·keep 필수, 2차: text)
     for it in items:
-        if not isinstance(it, dict) or not it.get('why', '').strip(): fails.append(f'근거(why) 없음: {it if isinstance(it, str) else it.get("text")}')
+        if not isinstance(it, dict): fails.append(f'물건은 {{full, why, keep, text}} 형식이어야 함: {it}'); continue
+        name = it.get('text') or it.get('full')
+        for k in ('full', 'why', 'keep', 'text'):
+            if not it.get(k): fails.append(f'1차/2차 칸 {k} 없음: {name}')
+        # 정제 점검: keep 낱말이 2차 문장에 남았는지
+        for kw in it.get('keep', []):
+            if kw.lower() not in (it.get('text') or '').lower(): fails.append(f'정제하다 빠짐 "{kw}": {it.get("text")}')
     texts = [(it['text'] if isinstance(it, dict) else it) for it in items]
     # 1 빠뜨림
     for m in spec.get('must', []):

@@ -60,7 +60,7 @@ def build(spec):
     if spec['view'] not in VIEW: raise SystemExit('view는 one-point|flat')
     if spec['density'] not in DENSITY: raise SystemExit('density는 packed|normal|bare')
     errs = []
-    spec = dict(spec, items=[(it['text'] if isinstance(it, dict) else it) for it in spec['items']])
+    spec = dict(spec, items=[(it.get('text') if isinstance(it, dict) else it) or '' for it in spec['items']])
     for it in spec['items']:
         if not any(w in it.lower() for w in PLACE_WORDS): errs.append(f'자리 말 없음: {it}')
     text_all = ' '.join([spec['place'], spec['floor'], spec['walls'], spec['shadow']] + spec['items']).lower()
@@ -102,6 +102,19 @@ def main():
         req['reference_images'].append({'image': {'type': 'base64', 'base64': base64.b64encode(open(p, 'rb').read()).decode(), 'format': 'png'},
                                         'size': {'width': w, 'height': h}, 'usage_description': usage[:500]})
     json.dump(req, open(os.path.join(out, f"{spec['name']}_req.json"), 'w'))
+    # 검토서: 1차 상세안 → 2차 정제(줄인 내용) → 점검 결과
+    from bg_check import check
+    fails, warns = check(spec, text)
+    stop = set('a an the of and with on in at to its it is as by for from'.split())
+    L = [f"# 검토서 {spec['name']}", '', f"방 {spec.get('room')} · 분위기 {spec.get('mood')} · 문 {spec.get('doors')} · 원근 {spec['view']} · 바닥 {spec['floor_share']} · 양옆 {spec['sides']} · 채우기 {spec['density']}", '',
+         '## 근거', '', f"- 위키: {spec.get('brief', {}).get('wiki', '')}", f"- 설계안: {spec.get('brief', {}).get('design', '')}"] + [f"- 사용자: {u}" for u in spec.get('brief', {}).get('user', [])] + \
+        ['', '## 1차 상세안 → 2차 정제', '', '| 1차 (상세) | 근거 | 남길 낱말 | 2차 (실제) | 줄이며 뺀 낱말 |', '|---|---|---|---|---|']
+    for it in spec['items']:
+        full_w = [w for w in re.findall(r"[a-z\-]+", it['full'].lower()) if w not in stop]
+        cut = sorted(set(w for w in full_w if w not in it['text'].lower()))
+        L.append(f"| {it['full']} | {it['why']} | {', '.join(it['keep'])} | {it['text']} | {', '.join(cut)} |")
+    L += ['', f'## 2차 요청문 ({len(text)}자)', '', '```', text, '```', '', '## 점검', ''] + [f'- FAIL {f}' for f in fails] + [f'- WARN {w}' for w in warns] + (['- 통과'] if not fails and not warns else [])
+    open(os.path.join(out, f"{spec['name']}_review.md"), 'w', encoding='utf-8').write('\n'.join(L) + '\n')
     print(f"{spec['name']}: {len(text)}자, 물건 {len(spec['items'])}개, 참고 그림 {len(req['reference_images'])}장")
     print(text)
 
