@@ -100,7 +100,9 @@ def check(spec, prompt, prev=None):
         if k not in spec: fails.append(f'{k} 칸이 없음')
     items = spec.get('items', [])
     # 3 근거 (1차 상세안: full·why·keep 필수, 2차: text)
+    loose = spec.get('mode') == 'loose'   # 느슨한 틀: 1차=2차(풍성한 묘사 그대로), 자리·모양·크기 규칙 없음
     for it in items:
+        if loose: continue
         if not isinstance(it, dict): fails.append(f'물건은 {{full, why, keep, text}} 형식이어야 함: {it}'); continue
         name = it.get('text') or it.get('full')
         for k in ('full', 'why', 'keep', 'text'):

@@ -70,7 +70,8 @@ def build(spec):
     for it in spec['items']:
         at = (it.get('at') or '').strip() if isinstance(it, dict) else ''
         t = ((it.get('text') if isinstance(it, dict) else it) or '').strip()
-        if at:
+        if spec.get('mode') == 'loose': pass   # 느슨한 틀(헐값매입 최초 방식): 자리 지정 없이 나열
+        elif at:
             if not re.search(r'wall|floor|ceiling', at.lower()) and not at.lower().startswith('on the '): errs.append(f'at이 모호함(벽·바닥·천장 또는 on the 가구): {at}')
         elif not any(w in t.lower() for w in PLACE_WORDS): errs.append(f'자리 말 없음: {t}')
         groups.setdefault(at, []).append(t)
@@ -81,7 +82,18 @@ def build(spec):
     n = len(spec['items'])
     if not 10 <= n <= 28: errs.append(f'물건 줄 수 {n} (10~28줄, 한 줄 1~2개)')
     if errs: raise SystemExit('\n'.join(errs))
+    no = ALWAYS_NO + [x for x in spec.get('no', []) if x not in ALWAYS_NO]
     things = ' '.join((f"{at[0].upper() + at[1:]}: " if at else '') + '; '.join(ts) + '.' for at, ts in groups.items())
+    if spec.get('mode') == 'loose':
+        # 사용자 10-30: 「너무 컨트롤하려 해서 결과가 나빠진다」 — 헐값매입 최초 요청문처럼 물건을 풍성하게 한 덩어리로 나열, 자리·크기 숫자 없음
+        return "\n".join([
+            f"Pixel art game background of {spec['place']}, {spec['time']}. {CAMERA} {VIEW[spec['view']]} The floor fills {spec['floor_share']} of the image. {SIDES[spec['sides']]}",
+            f"FLOOR: {spec['floor']}.",
+            DENSITY[spec['density']].rstrip('.') + ": " + '; '.join(spec['items']) + ".",
+            f"WALL: {spec['walls']}.",
+            f"LIGHT: {spec['shadow']}.",
+            f"STYLE: {STYLE}, {spec['palette']}, no dithering, no blur. No " + ", ".join(no[:-1]) + " or " + no[-1] + ".",
+        ])
     no = ALWAYS_NO + [x for x in spec.get('no', []) if x not in ALWAYS_NO]
     parts = [
         f"Pixel art game background: {spec['place']}, {spec['time']}, {spec['light']}.",
