@@ -110,6 +110,15 @@ def check(spec, prompt):
             if w in t.lower(): fails.append(f'금지 물건 "{w}": {t}')
     for w in DB['rooms'].get(room, {}).get('not_here', []):
         if w in low: fails.append(f'이 방({room})에 있으면 안 됨: "{w}"')
+    # 2-1 사람 부르는 말: 「staff behind it」「patient side」 같은 말이 있으면 No people이 있어도 사람이 그려짐(대기실 v6: 접수대 뒤에 사람)
+    for it in items:
+        if not isinstance(it, dict): continue
+        tt = ((it.get('at') or '') + ' ' + (it.get('text') or '')).lower()
+        for w in DB.get('people_words', []):
+            if re.search(rf"\b{w}\b", tt): fails.append(f'사람을 부르는 말 "{w}"(사람이 그려짐, room side·empty walkway처럼): {tt.strip()}')
+    # 2-2 간판: 글씨를 지어내 엉터리 한글이 나옴(대기실 v6 「킨료정」) → 글씨 없는 그림 표시로
+    for t in texts:
+        if re.search(r'\bsign\b|signboard|sign board', t.lower()) and 'no letters' not in t.lower(): fails.append(f'간판에 글씨가 지어내짐 → "no letters"와 그림 표시(red cross 등)를 적을 것: {t}')
     # 4 크기
     sized = [s.lower() for s in spec.get('sized', [])]
     for t in texts:

@@ -131,5 +131,24 @@
   "corridor": {
    "not_here": []
   }
- }
+ },
+ "people_words": [
+  "staff",
+  "doctor",
+  "doctor's",
+  "nurse",
+  "patient",
+  "patients",
+  "receptionist",
+  "customer",
+  "customers",
+  "visitor",
+  "visitors",
+  "guest",
+  "guests",
+  "person",
+  "man",
+  "woman",
+  "worker"
+ ]
 }

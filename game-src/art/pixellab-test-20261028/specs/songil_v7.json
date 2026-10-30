@@ -17,7 +17,8 @@
    "포스터 글씨는 괜찮음",
    "바깥 복도로 나가는 길은 화면 아래 출구 표시(문 안 그림)",
    "v6가 휑함 → 자리 묶음 문법으로 글자를 아껴 뺐던 물건을 되살림(사용자 10-30)",
-   "v6에서 접수대 뒤 뒷벽에 빈 출입구(서류 칸)가 생김 → 뒷벽은 막힌 벽"
+   "v6에서 접수대 뒤 뒷벽에 빈 출입구(서류 칸)가 생김 → 뒷벽은 막힌 벽",
+   "물건 빼지 말 것 — 2000자는 군말을 줄여 맞춤(사용자 10-30)"
   ],
   "items": [
    {
@@ -96,7 +97,9 @@
    },
    {
     "src": "사용자: 바깥 출구는 화면 아래",
-    "by": "omit: 출구는 게임 화면 아래 화살표가 표시함, 발판 줄은 2000자 때문에 뺌"
+    "by": [
+     15
+    ]
    }
   ]
  },
@@ -130,23 +133,27 @@
    "from": "설계안 손 소독제"
   },
   {
-   "kw": "clinic sign",
-   "from": "위키 바랜 옛 병원 간판"
-  },
-  {
    "kw": "PVC",
    "from": "설계안 바닥"
   },
   {
    "kw": "no tiles",
    "from": "진료실 v2~v4 바닥이 타일로 나옴"
+  },
+  {
+   "kw": "no letters",
+   "from": "v6 간판 엉터리 글씨"
+  },
+  {
+   "kw": "empty walkway",
+   "from": "v6 접수대에 들어갈 통로 없음"
   }
  ],
  "sized": [
   "reception counter",
   "door"
  ],
- "place": "an unlicensed clinic's waiting room in a run-down 1990s Seoul underground arcade",
+ "place": "an unlicensed clinic's waiting room in a 1990s Seoul underground arcade",
  "time": "night",
  "light": "harsh fluorescent light",
  "view": "one-point",
@@ -154,13 +161,13 @@
  "sides": "left",
  "density": "normal",
  "floor": "worn pale green PVC sheet, no tiles, scuffs",
- "walls": "yellowed cracked plaster, pale green lower band; the back wall behind the counter is solid; two fluorescent tubes",
+ "walls": "yellowed cracked plaster, pale green lower band, solid back wall; two fluorescent tubes",
  "items": [
   {
-   "full": "on the floor at the left, along the left wall, a long straight wooden reception counter at a right angle to the back wall, running from the back toward the camera, chest high (97 pixels), its long side facing right into the room, its back end about one metre in front of the back wall so staff can walk in behind it",
-   "why": "위키·설계안 접수 창구, 사용자 결정 | 자(뒷벽과 수직), 뒤 끝 띄움",
+   "full": "on the floor at the left, along the left wall, a long straight wooden reception counter at a right angle to the back wall, running from the back toward the camera, chest high (97 pixels), its long side facing right into the room; its back end stops about one metre in front of the back wall, leaving an empty open walkway behind it from the room into the space between the counter and the left wall",
+   "why": "위키·설계안 접수 창구, 사용자 결정 | 자(뒷벽과 수직), 뒤 끝 띄움; v6: 뒤 끝이 뒷벽에 붙어 들어갈 통로가 없었고 「staff behind it」 때문에 사람이 그려짐 → 사람 말 빼고 빈 통로로",
    "at": "Floor, left, along the left wall",
-   "text": "a reception counter at a right angle to the back wall, chest high (97 pixels), back end a metre in front of the back wall, staff behind it",
+   "text": "a short reception counter at a right angle to the back wall, chest high (97 pixels), back end a metre in front of the back wall, an empty walkway behind it",
    "keep": [
     "left wall",
     "reception counter",
@@ -168,18 +175,27 @@
     "97 pixels",
     "chest high",
     "in front of the back wall",
+    "empty walkway",
     "behind"
    ],
    "drop_ok": {
+    "long": "short로 바꿈: 뒤 끝이 뒷벽에서 떨어져야 해서",
     "straight": "at a right angle(| 자)로 충분",
     "wooden": "재질은 모델이 정함",
-    "running": "at a right angle to the back wall로 같은 뜻",
+    "running": "at a right angle로 같은 뜻",
     "toward": "at a right angle로 같은 뜻",
     "camera": "at a right angle로 같은 뜻",
+    "side": "군말",
+    "facing": "at a right angle로 방향 충분",
+    "into": "남김",
+    "room": "walkway into the counter로 충분",
+    "about": "군말",
     "one": "a metre로 같은 뜻",
-    "can": "staff space behind it으로 같은 뜻",
-    "walk": "staff space behind it으로 같은 뜻",
-    "space": "staff behind it으로 충분"
+    "open": "empty로 같은 뜻",
+    "space": "into the counter로 같은 뜻",
+    "between": "into the counter로 같은 뜻",
+    "stops": "back end a metre in front of로 같은 뜻",
+    "leaving": "an empty walkway로 같은 뜻"
    }
   },
   {
@@ -229,18 +245,19 @@
    }
   },
   {
-   "full": "on the left wall above the counter a faded old clinic sign board with peeling letters",
-   "why": "위키: 바랜 옛 병원 간판",
+   "full": "on the left wall above the counter a faded old clinic sign board with a red cross symbol and no letters",
+   "why": "위키: 바랜 옛 병원 간판; v6: 간판 글씨가 「킨료정」으로 지어내짐 → 글씨 없이 적십자만",
    "at": "Left wall, above the counter",
-   "text": "a faded old clinic sign",
+   "text": "a faded clinic sign, red cross only, no letters",
    "keep": [
     "faded",
-    "clinic sign"
+    "clinic sign",
+    "no letters"
    ],
    "drop_ok": {
-    "peeling": "faded로 충분",
-    "letters": "글씨는 그림이 정함",
-    "board": "sign으로 충분"
+    "old": "faded로 충분",
+    "board": "sign으로 충분",
+    "symbol": "red cross only로 같은 뜻"
    }
   },
   {
@@ -262,7 +279,7 @@
   {
    "full": "on the back wall between the counter and the exam room door, on the patient side, an eye chart",
    "why": "손님(환자) 물건, 접수대 앞 손님 쪽",
-   "at": "Back wall, left part, patient side",
+   "at": "Back wall, left, room side",
    "text": "an eye chart",
    "keep": [
     "eye chart"
@@ -271,13 +288,14 @@
     "between": "Back wall, left part(접수대 쪽 부분)로 자리 충분",
     "counter": "left part로 충분",
     "exam": "left part로 충분",
-    "door": "left part로 충분, 문 낱말 수를 2개로 맞춤"
+    "door": "left part로 충분, 문 낱말 수를 2개로 맞춤",
+    "patient": "사람 낱말이 사람을 그리게 함(v6) → room side"
    }
   },
   {
    "full": "on the back wall left of the exam room door two faded health posters",
    "why": "설계안 포스터 ×2 (글씨는 사용자 허락)",
-   "at": "Back wall, left part, patient side",
+   "at": "Back wall, left, room side",
    "text": "two faded health posters",
    "keep": [
     "two faded health posters"
@@ -290,7 +308,7 @@
   {
    "full": "on the floor in front of the back wall below the eye chart a blood pressure machine on a stand and a weight scale with a height rod, on the patient side",
    "why": "손님 물건(혈압계·체중계)은 손님 쪽, 사용자: 접수대 뒤 금지",
-   "at": "Floor in front of the back wall, left part, patient side",
+   "at": "Floor in front of the back wall, left, room side",
    "text": "a blood pressure machine and a weight scale",
    "keep": [
     "blood pressure machine",
@@ -301,13 +319,14 @@
     "chart": "묶음 at으로 자리 충분",
     "stand": "받침 세부",
     "height": "키 막대 세부, 2000자",
-    "rod": "키 막대 세부, 2000자"
+    "rod": "키 막대 세부, 2000자",
+    "patient": "사람 낱말이 사람을 그리게 함(v6) → room side"
    }
   },
   {
    "full": "on the floor in front of the back wall beside them a pair of wooden crutches and an umbrella stand",
    "why": "낡은 의원 대기실 손님 물건, v6에서 빼서 휑해짐",
-   "at": "Floor in front of the back wall, left part, patient side",
+   "at": "Floor in front of the back wall, left, room side",
    "text": "crutches and an umbrella stand",
    "keep": [
     "crutches",
@@ -322,7 +341,7 @@
   {
    "full": "on the back wall right of the middle, well away from the counter, a pale green exam room door, closed, facing the camera, 170 by 80 pixels, with open bare floor in front of it",
    "why": "사용자: 뒷벽 진료실 문, 접수대에서 떨어지게 오른쪽, 문 앞 빈 바닥; 설계안 문 연한 녹색",
-   "at": "Back wall, right part, well away from the counter",
+   "at": "Back wall, right, well away from the counter",
    "text": "a pale green exam room door, closed, facing the camera, 170 by 80 pixels, open floor in front of it",
    "keep": [
     "back wall",
@@ -342,7 +361,7 @@
   {
    "full": "on the back wall at the right a white operating room door with a small square window, closed, facing the camera, 170 by 80 pixels, the same height as the exam room door, open floor in front of it",
    "why": "사용자: 뒷벽 수술실 문, 진료실 문과 같은 크기(대기실 3차에 옆벽 문이 커짐)",
-   "at": "Back wall, right part, well away from the counter",
+   "at": "Back wall, right, well away from the counter",
    "text": "a white operating room door with a small window, the same size, closed, open floor in front of it",
    "keep": [
     "white operating room door",
@@ -364,10 +383,10 @@
   {
    "full": "on the back wall between the two doors a cork board of pinned notices and a wall-mounted hand sanitizer dispenser",
    "why": "설계안 손 소독제, 대기실 공지",
-   "at": "Back wall, right part, well away from the counter",
-   "text": "between the two doors a cork board and a hand sanitizer",
+   "at": "Back wall, right, well away from the counter",
+   "text": "between the doors a cork board, a hand sanitizer",
    "keep": [
-    "between the two doors",
+    "between the doors",
     "cork board",
     "hand sanitizer"
    ],
@@ -375,7 +394,8 @@
     "pinned": "notices로 충분",
     "wall-mounted": "묶음 at(back wall)로 같은 뜻",
     "dispenser": "hand sanitizer로 충분",
-    "notices": "cork board로 충분, 2000자"
+    "notices": "cork board로 충분, 2000자",
+    "two": "between the doors로 같은 뜻"
    }
   },
   {
@@ -402,7 +422,7 @@
    "full": "on the floor at the right front a plastic potted plant, a standing fan and a small trash bin",
    "why": "낡은 대기실 손님 쪽 물건",
    "at": "Floor, right front",
-   "text": "a potted plant, a standing fan and a trash bin",
+   "text": "a potted plant, a standing fan, a trash bin",
    "keep": [
     "potted plant",
     "standing fan",
@@ -412,21 +432,37 @@
     "plastic": "화분 재질 세부",
     "small": "원래 작음"
    }
+  },
+  {
+   "full": "on the floor at the front center a worn dirty rubber doormat, where the way out to the corridor is",
+   "why": "사용자: 바깥 출구는 화면 아래 — 발판이 나가는 자리. 사용자 10-30: 물건 빼지 말 것",
+   "at": "Floor, front center",
+   "text": "a rubber doormat",
+   "keep": [
+    "rubber doormat"
+   ],
+   "drop_ok": {
+    "dirty": "worn으로 충분",
+    "where": "발판 쓰임 설명, 그림에 필요 없음",
+    "way": "발판 쓰임 설명",
+    "corridor": "발판 쓰임 설명",
+    "worn": "바닥 칸 worn이 맡음"
+   }
   }
  ],
- "shadow": "bright middle floor, deep shadows under furniture",
- "palette": "cold off-white, pale green, steel grey, red and candy accents",
+ "shadow": "deep shadows under the counter and furniture",
+ "palette": "cold off-white, pale green, steel grey, red accents",
  "no": [
   "other doors",
   "doorways"
  ],
  "review": {
-  "fit": "15줄 모두 대기실 물건. room_items 대기실 금지(엑스레이·링거대·산소·폐기물·수술대·무영등·기구 수레·메스·진찰 침대·흡인기) 없음. 의자·시계·누수·커튼 없음. 구급함 하나",
-  "place": "손님 물건(시력표·포스터·혈압계·체중계·목발·우산꽂이)은 'patient side' 묶음, 정수기·잡지·화분·선풍기는 오른쪽 바닥. 접수대 뒤 묶음에는 차트·전화·구급함(직원 것)만. 문 둘은 'well away from the counter' 묶음, 문 앞 빈 바닥. 뒷벽 접수대 뒤는 막힌 벽(v6에 빈 출입구가 생김)",
+  "fit": "16줄 모두 대기실 물건. room_items 대기실 금지(엑스레이·링거대·산소·폐기물·수술대·무영등·기구 수레·메스·진찰 침대·흡인기) 없음. 의자·시계·누수·커튼 없음. 구급함 하나",
+  "place": "손님 물건(시력표·포스터·혈압계·체중계·목발·우산꽂이)은 'room side' 묶음(접수대 바깥 방 쪽). 접수대 뒤 묶음에는 차트·전화·구급함만. 접수대 뒤 끝은 뒷벽에서 1m 떨어져 빈 통로로 들어감(v6에 통로 없었음). 사람 낱말(staff·patient) 없음(v6에 접수대 뒤 사람이 그려짐). 문 둘은 접수대에서 멀리, 문 앞 빈 바닥",
   "size": "접수대 가슴 높이 97(사람 150의 0.65배, 1.1m), 문 170×80(사람보다 조금 큼, 1.9m) — 대기실 3차에 오른쪽 옆벽 문이 1.8배로 커져서 둘 다 뒷벽, 같은 높이로 적음",
-  "brief": "위키·설계안·사용자 항목 모두 줄·칸에 대응. 뺀 것: 의자(오브젝트로 따로), 시계(전역 금지). v6에서 2000자 때문에 뺐던 TV·목발·우산꽂이·구급함·발판·선풍기를 자리 묶음 문법으로 글자를 아껴 되살림. 발판은 2000자 때문에 다시 뺌(출구는 게임 화살표가 보여 줌)",
-  "meaning": "접수대 | 자·뒤 끝 1m·가슴 높이, 문 둘 자리·닫힘·정면·같은 크기·문 앞 빈 바닥, 손님 쪽 묶음을 남김. 뺀 것은 재질·같은 뜻·묶음 머리가 맡는 자리뿐, 줄마다 이유",
-  "over": "같은 물건 두 번 없음. 줄마다 근거. 억지 채우기 없음. 문 앞을 비워야 해서 채우기는 normal, 대신 v6보다 물건 4줄 많음",
+  "brief": "위키·설계안·사용자 항목 모두 줄·칸에 대응. 뺀 것: 의자(오브젝트로 따로), 시계(전역 금지)뿐. v6에서 뺐던 TV·목발·우산꽂이·구급함·발판·선풍기 모두 되살림(사용자: 물건 빼지 말 것). 2000자는 물건이 아니라 군말(벽·팔레트·자리 묶음 말)을 줄여 맞춤",
+  "meaning": "접수대 | 자·뒤 끝 1m·빈 통로·가슴 높이, 문 둘 자리·닫힘·정면·같은 크기·문 앞 빈 바닥, 간판 글씨 없음을 남김. 뺀 것은 재질·같은 뜻·사람 낱말·묶음 머리가 맡는 자리뿐, 줄마다 이유",
+  "over": "같은 물건 두 번 없음. 줄마다 근거. 억지 채우기 없음. 문 앞을 비워야 해서 채우기는 normal, 물건은 하나도 빼지 않음",
   "frame": "one-point, 바닥 아래 절반(대기실은 다니는 바닥이 넓어야 함), 왼쪽 벽만(오른쪽 열림, 사용자 결정), 문 2(뒷벽), 채우기 normal(문 앞 비움 때문). 밑그림·참고 그림 1 여부는 사용자가 정함"
  }
 }
