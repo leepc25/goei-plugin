@@ -492,7 +492,8 @@ export class WorldSim {
         if (a.scare === 'freeze' && a.scareFrom === undefined && this.player?.armed && this.player.scene === a.scene) { a.wait = Math.max(a.wait, 0.5); return; }
         if (a.wait > 0) return;
         const from = src ?? a.x;
-        if (a.scare === 'sit' && this.canClip(a, 'crawl')) { this.flee(a, from, 'crawl', 0.35); return; }
+        // 주저앉았다가 네발로 기어 달아남(42). 엎드려 기기(38)는 쓰러진 몸 전용이라 여기선 안 씀
+        if (a.scare === 'sit' && this.canClip(a, 'scramble')) { this.flee(a, from, 'scramble', 0.5); return; }
         if (a.scare === 'cower' && this.canClip(a, 'scramble')) { this.flee(a, from, 'scramble', 0.6); return; }
         this.flee(a, from);
         return;
@@ -1228,7 +1229,7 @@ export class WorldSim {
     a.seatPick = undefined;
     a.run = run;
     a.exitAt = this.gateFar(a, fromX);
-    this.walkTo(a, a.exitAt, clip === 'crawl' ? '기어서 도망' : '도망', 'exit');
+    this.walkTo(a, a.exitAt, clip === 'crawl' || clip === 'scramble' ? '기어서 도망' : '도망', 'exit');
     this.setClip(a, this.canClip(a, clip) ? clip : this.canClip(a, 'flee') ? 'flee' : 'walk');
     a.fleeClip = clip;
     this.iconOn(a, '!', 1.5);
