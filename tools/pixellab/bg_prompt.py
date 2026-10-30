@@ -35,6 +35,8 @@ VIEW = {
 # 채우기 정도: 장면마다 정한다 (사용자 10-30: 채우기 문구를 일괄로 빼지 말 것)
 DENSITY = {
     'packed': "PACKED WITH STUFF, every area filled, no empty wall, no empty floor corner.",   # 헐값매입 1차 문장
+    # 더 강조(사용자 10-30 대박 알선): 벽·선반·탁자 위까지 잔물건으로
+    'packed+': "VERY CLUTTERED, PACKED WITH STUFF: every wall, shelf, table top and corner crowded with small props, no empty wall, no bare surface.",
     'normal': "",
     'bare': "Sparse and bare, only the listed things.",
 }
@@ -60,7 +62,7 @@ def build(spec):
     if miss: raise SystemExit(f'빈 칸: {miss}')
     if spec['sides'] not in SIDES: raise SystemExit('sides는 both|left|right|none')
     if spec['view'] not in VIEW: raise SystemExit('view는 one-point|flat')
-    if spec['density'] not in DENSITY: raise SystemExit('density는 packed|normal|bare')
+    if spec['density'] not in DENSITY: raise SystemExit('density는 packed|packed+|normal|bare')
     errs = []
     # 물건마다 at(자리 묶음: "back wall", "left wall", "floor, left", "on the counter" …)이 있으면 자리를 묶음 머리에 한 번만 적는다.
     # 「on the back wall」을 줄마다 되풀이하던 글자를 아껴 물건을 덜 뺀다(사용자 10-30: 문법 구조 바꿔)

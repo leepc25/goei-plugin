@@ -13,7 +13,8 @@
    "참고 그림 1·밑그림 없이(진료실 v4·대기실 v7과 같은 설정)",
    "시가 상자 넣기(설계안의 '없음'을 바꿈)",
    "채우기 packed(사용자 10-30: 소품이 부족해 보임)",
-   "v1: TV가 브래킷에 매달려 튀어나옴, 접수대가 막혀 들어갈 수 없음 → 고침(사용자 10-30)"
+   "v1: TV가 브래킷에 매달려 튀어나옴, 접수대가 막혀 들어갈 수 없음 → 고침(사용자 10-30)",
+   "채우기 더 강조(packed+, 사용자 10-30)"
   ],
   "items": [
    {
@@ -196,11 +197,11 @@
  ],
  "place": "a fixer's office in a 1990s Seoul underground arcade",
  "time": "night",
- "light": "fluorescent and red neon light",
+ "light": "fluorescent and neon light",
  "view": "one-point",
  "floor_share": "the lower half",
  "sides": "left",
- "density": "packed",
+ "density": "packed+",
  "floor": "worn stained beige tiles; dark carpet in the inner office",
  "walls": "dark red-brown wallpaper; fluorescent tubes",
  "items": [
@@ -319,18 +320,19 @@
    "full": "leaning against the back wall behind the counter a wooden baseball bat for emergencies",
    "why": "위키 여담: 카운터 뒤 비상용 야구방망이",
    "at": "Back wall, behind the counter",
-   "text": "a baseball bat leaning there",
+   "text": "a baseball bat",
    "keep": [
     "back wall",
     "behind the counter",
     "baseball bat"
    ],
    "drop_ok": {
-    "leaning": "남김",
+    "leaning": "세운 모양은 모델이 정함, 글자 수(packed+)",
     "against": "on the wall로 같은 뜻",
     "emergencies": "쓰임 설명, 그림에 안 보임",
     "wooden": "방망이 재질 세부",
-    "wall": "묶음 at(back wall)으로 충분"
+    "wall": "묶음 at(back wall)으로 충분",
+    "there": "군말"
    }
   },
   {
@@ -464,8 +466,8 @@
    }
   }
  ],
- "shadow": "red glow by the window, deep shadows under furniture",
- "palette": "dark red-brown, beige, green felt, red neon",
+ "shadow": "deep shadows under furniture",
+ "palette": "red-brown, beige, green, red neon",
  "no": [
   "doors",
   "doorways"

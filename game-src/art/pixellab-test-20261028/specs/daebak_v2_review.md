@@ -1,6 +1,6 @@
 # 검토서 daebak_v2
 
-방 office · 분위기 worn · 문 0 · 원근 one-point · 바닥 the lower half · 양옆 left · 채우기 packed
+방 office · 분위기 worn · 문 0 · 원근 one-point · 바닥 the lower half · 양옆 left · 채우기 packed+
 
 ## 점검 결과
 
@@ -18,6 +18,7 @@
 - 사용자: 시가 상자 넣기(설계안의 '없음'을 바꿈)
 - 사용자: 채우기 packed(사용자 10-30: 소품이 부족해 보임)
 - 사용자: v1: TV가 브래킷에 매달려 튀어나옴, 접수대가 막혀 들어갈 수 없음 → 고침(사용자 10-30)
+- 사용자: 채우기 더 강조(packed+, 사용자 10-30)
 
 ## 설계안·위키 항목 대조
 
@@ -55,7 +56,7 @@
 | 2 | on the floor by the shop window, near the front, away from the counter, a tall potted plant in a white pot and an umbrella stand | 설계안 화분·우산꽂이 / v1: 화분이 접수대 끝 통로를 막음 → 창 옆으로 | potted plant, umbrella stand | Floor by the window: a potted plant, an umbrella stand | shop(window로 충분); near(front로 같은 뜻); away(front(창 옆)로 접수대와 떨어짐); counter(front로 충분); tall(화분 키는 모델이 정함); white(화분 색 세부) |
 | 3 | on the floor at the left, a long wooden reception counter about 2.4 m wide, its long side facing the camera, chest high (95 pixels), standing a metre in front of the back wall, with a clear gap of open empty floor between its left end and the left wall, nothing in the gap, leading to a walkway behind it | 위키·설계안 접수대(폭 2.4m), 뒤로 들어갈 통로(대기실 v6 교훈) / v1: 접수대가 막혀 들어갈 수 없음 → 왼벽과의 틈을 비우라고 명시 | reception counter, facing the camera, 95 pixels, chest high, in front of the back wall, clear empty gap, left wall, walkway, behind | Floor, left part: a long reception counter facing the camera, chest high (95 pixels), a metre in front of the back wall; a clear empty gap between its left end and the left wall, a walkway behind | wooden(재질은 모델이 정함); wide(long으로 충분); open(clear empty gap으로 같은 뜻); nothing(clear empty gap으로 같은 뜻); leading(a walkway behind it으로 같은 뜻) |
 | 4 | on top of the counter a candy bowl, a document tray, an open blank guestbook and a stack of newspapers | 설계안 카운터 뒤 서류 트레이·사탕 그릇, 방명록(빈), 신문 | candy bowl, document tray, guestbook, newspapers | On the counter: a candy bowl, a document tray, a guestbook, newspapers | open(blank로 충분); blank(방명록 내용 세부); stack(newspapers로 충분) |
-| 5 | leaning against the back wall behind the counter a wooden baseball bat for emergencies | 위키 여담: 카운터 뒤 비상용 야구방망이 | back wall, behind the counter, baseball bat | Back wall, behind the counter: a baseball bat leaning there | wooden(방망이 재질 세부); emergencies(쓰임 설명, 그림에 안 보임) |
+| 5 | leaning against the back wall behind the counter a wooden baseball bat for emergencies | 위키 여담: 카운터 뒤 비상용 야구방망이 | back wall, behind the counter, baseball bat | Back wall, behind the counter: a baseball bat | leaning(세운 모양은 모델이 정함, 글자 수(packed+)); wooden(방망이 재질 세부); emergencies(쓰임 설명, 그림에 안 보임) |
 | 6 | on the floor at the front center a worn doormat where the way out to the arcade is | 사용자: 바깥 출입은 화면 아래 출구 — 발판이 나가는 자리 | doormat | Floor, front center: a worn doormat | where(쓰임 설명); way(쓰임 설명); arcade(쓰임 설명) |
 | 7 | on the back wall left part two framed pictures with blank faded photos | 설계안 벽 액자 ×3(사진 느낌 빈 면) 중 둘 | two framed | Back wall, left part: two framed faded photos | pictures(framed photos로 같은 뜻); blank(faded로 충분) |
 | 8 | on the back wall left part a red fire extinguisher box | 설계안 소화기함 | fire extinguisher box | Back wall, left part: a fire extinguisher box | red(소화기함 색은 모델이 앎) |
@@ -81,14 +82,14 @@
 - 원근·바닥 몫·양옆 벽·문·채우기가 이 장면에 정한 대로인가?
   - one-point, 바닥 아래 절반, 왼쪽 벽만(선팅 유리·TV 벽, 오른쪽 안쪽 사무실은 그림 끝으로 이어짐), 문 0(아래 출구), 채우기 packed(사용자 결정), 참고 그림 1·밑그림 없음
 
-## 2차 요청문 (1993자)
+## 2차 요청문 (1998자)
 
 ```
-Pixel art game background: a fixer's office in a 1990s Seoul underground arcade, night, fluorescent and red neon light.
+Pixel art game background: a fixer's office in a 1990s Seoul underground arcade, night, fluorescent and neon light.
 Camera at standing eye height, about 20 degrees above the floor, looking slightly down. One-point perspective, side walls receding toward the middle. The floor fills the lower half of the image. Only the left side wall is visible; on the right the room continues past the image edge.
 FLOOR: worn stained beige tiles; dark carpet in the inner office.
 WALLS: dark red-brown wallpaper; fluorescent tubes.
-PACKED WITH STUFF, every area filled, no empty wall, no empty floor corner. THINGS (a standing adult is 150 pixels tall): Left wall, front part: dark tinted glass shop window, red neon sign reading "OPEN". Left wall, high: a flat TV mounted flush on the wall, dark muted screen. Floor by the window: a potted plant, an umbrella stand. Floor, left part: a long reception counter facing the camera, chest high (95 pixels), a metre in front of the back wall; a clear empty gap between its left end and the left wall, a walkway behind. On the counter: a candy bowl, a document tray, a guestbook, newspapers. Back wall, behind the counter: a baseball bat leaning there. Floor, front center: a worn doormat. Back wall, left part: two framed faded photos; a fire extinguisher box. Floor in front of the back wall, middle: a low coffee table, four mugs, a newspaper, empty floor both sides. Floor, right part: a low glass partition only waist high, from the back wall toward the camera, an open gap. Inner office floor: an oval green felt poker table alone, poker chips, cards, a cigar box on it. Inner office back wall: a framed picture, a low sideboard with binders.
-LIGHT: red glow by the window, deep shadows under furniture.
-STYLE: dense, highly detailed pixel art, crisp pixel clusters, selective dark outline, rich medium-to-detailed shading, dark red-brown, beige, green felt, red neon, no dithering, no blur. No people, chairs, sofas, benches, clocks, doors or doorways.
+VERY CLUTTERED, PACKED WITH STUFF: every wall, shelf, table top and corner crowded with small props, no empty wall, no bare surface. THINGS (a standing adult is 150 pixels tall): Left wall, front part: dark tinted glass shop window, red neon sign reading "OPEN". Left wall, high: a flat TV mounted flush on the wall, dark muted screen. Floor by the window: a potted plant, an umbrella stand. Floor, left part: a long reception counter facing the camera, chest high (95 pixels), a metre in front of the back wall; a clear empty gap between its left end and the left wall, a walkway behind. On the counter: a candy bowl, a document tray, a guestbook, newspapers. Back wall, behind the counter: a baseball bat. Floor, front center: a worn doormat. Back wall, left part: two framed faded photos; a fire extinguisher box. Floor in front of the back wall, middle: a low coffee table, four mugs, a newspaper, empty floor both sides. Floor, right part: a low glass partition only waist high, from the back wall toward the camera, an open gap. Inner office floor: an oval green felt poker table alone, poker chips, cards, a cigar box on it. Inner office back wall: a framed picture, a low sideboard with binders.
+LIGHT: deep shadows under furniture.
+STYLE: dense, highly detailed pixel art, crisp pixel clusters, selective dark outline, rich medium-to-detailed shading, red-brown, beige, green, red neon, no dithering, no blur. No people, chairs, sofas, benches, clocks, doors or doorways.
 ```
