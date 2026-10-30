@@ -483,6 +483,7 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
   let fieldShop: FieldShop | null = null;
   // 필드 NPC 살해 허용 (설정): 전투 몸·필드 행위자가 함께 본다
   fighterHooks.killOk = () => shell.settings.npcKill;
+  fighterHooks.permaDeath = () => shell.settings.deathMode === 'perma';
   const shell = mountGameShell(box, {
     synth: true,
     bag: { available: () => !!game?.inHub && !!fieldShop, open: () => fieldShop?.openBag() },

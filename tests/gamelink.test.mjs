@@ -43,6 +43,9 @@ test('report is normalized and marks are stripped', () => {
   const text = reportText(r);
   assert.match(text, /^\[관리국 출동 보고서\] 조사: 로비 SEED · 귀환 · 최저 B-2/);
   assert.match(text, /찾은 규칙: 인사는 두 번 \/ 3/);
+  // 사망 처리 옵션: 영구 사망 = 사망, 패퇴 = 부상·후송
+  assert.match(reportText(normReport({ mission: 'a', outcome: 'death' })), / · 사망/);
+  assert.match(reportText(normReport({ mission: 'a', outcome: 'evac' })), / · 부상·후송/);
 });
 
 test('record lorebook keeps the latest five and can be removed', () => {
@@ -51,7 +54,7 @@ test('record lorebook keeps the latest five and can be removed', () => {
   const entry = chat.localLore.find((e) => e.comment === RECORD_COMMENT);
   assert.equal(entry.alwaysActive, true);
   assert.equal(recordLines(chat), 5);
-  assert.match(entry.content.split('\n')[2], /2026-10-07 임무 7 · 후송/);
+  assert.match(entry.content.split('\n')[2], /2026-10-07 임무 7 · 부상·후송/);
   assert.equal(chat.localLore.length, 2, 'other local lore stays');
   const gone = withoutRecord(chat);
   assert.equal(gone.localLore.length, 1);

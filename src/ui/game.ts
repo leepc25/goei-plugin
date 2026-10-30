@@ -90,7 +90,7 @@ function linkHtml(card: CardSnapshot | null, reports: PendingReport[], record: n
   const free = card.agents.filter((a) => !a.locked).length;
   const reps = reports.map((p) => row(
     esc(p.report.mission),
-    `${{ return: '귀환', evac: '후송', withdraw: '자발 철수' }[p.report.outcome]}${p.report.depth ? ` · ${esc(p.report.depth)}` : ''} · ${when(p.at)}${p.report.summary ? ` · ${esc(p.report.summary)}` : ''}`,
+    `${{ return: '귀환', evac: '부상·후송', withdraw: '자발 철수', death: '사망' }[p.report.outcome]}${p.report.depth ? ` · ${esc(p.report.depth)}` : ''} · ${when(p.at)}${p.report.summary ? ` · ${esc(p.report.summary)}` : ''}`,
     `<button class="gx-mini${p.posted ? '' : ' primary'}" data-g="post" data-at="${p.at}"${p.posted || busy ? ' disabled' : ''}>${p.posted ? '채팅에 놓음' : '보고서 붙이기'}</button>
      <button class="gx-mini" data-g="record" data-at="${p.at}"${p.recorded || busy ? ' disabled' : ''}>${p.recorded ? '기록함' : '기록 로어북에 남기기'}</button>
      <button class="gx-mini" data-g="drop" data-at="${p.at}" aria-label="결과 지우기">${ICONS.trash}</button>`,

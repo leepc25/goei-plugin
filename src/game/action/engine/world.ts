@@ -88,7 +88,7 @@ export class World implements WorldView {
   kills = 0;
   floors = 0;
   notes: Record<string, unknown> = {};
-  ended: 'next' | 'withdraw' | 'return' | 'evac' | null = null;
+  ended: 'next' | 'withdraw' | 'return' | 'evac' | 'death' | null = null;
   itemState?: { snapshot(): unknown; restore(v: unknown): void };
   /** 전투·공중·투사체가 없는 안정된 시점만 저장한다. */
   canCheckpoint() {
@@ -342,9 +342,9 @@ export class World implements WorldView {
     if (this.stage?.tick) this.stage.tick(this.stageApi, this.floor);
     const exitX = this.floor.exitX ?? this.floor.length - 80;
     if (this.encActive < 0 && p.x >= exitX && !this.ended) this.ended = 'next';
-    // 플레이어 쓰러짐 → 후송
+    // 플레이어 쓰러짐 → 후송. 영구 사망으로 죽었으면(killed) 사망
     if (p.phase === 'dead' || (p.hp <= 0 && p.phase === 'down')) {
-      if (++this.deadT > 75 && !this.ended) this.ended = 'evac';
+      if (++this.deadT > 75 && !this.ended) this.ended = (p as { killed?: unknown }).killed ? 'death' : 'evac';
     }
     this.camera();
     p.finishLocomotion();

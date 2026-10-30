@@ -87,7 +87,7 @@ export type GameEvent =
   | { type: 'combat:start' | 'combat:boss' | 'combat:clear'; index: number }
   | { type: 'enter:floor'; floor: FloorPlan }
   | { type: 'hp:low' }
-  | { type: 'run:end'; how: 'return' | 'withdraw' | 'evac' }
+  | { type: 'run:end'; how: 'return' | 'withdraw' | 'evac' | 'death' }
   | { type: 'custom'; name: string; data?: unknown };
 
 /** 적·층·아이템이 보는 세계 */
@@ -208,7 +208,7 @@ export interface RunConfigCore {
 
 /** 엔진이 채우는 결과. 본부의 RunResult가 이것을 포함하고 나머지는 notes(층·아이템 모듈 기록)에서 꺼낸다 */
 export interface RunResultCore {
-  how: 'return' | 'withdraw' | 'evac';
+  how: 'return' | 'withdraw' | 'evac' | 'death';
   floors: number;
   kills: number;
   maxCombo: number;

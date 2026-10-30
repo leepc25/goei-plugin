@@ -43,7 +43,7 @@ const REACT: Record<string, { react: React; push: number; lift: number; strength
 };
 
 /** 다른 모듈이 붙이는 곳. sfx: 효과음. extraTargets: 전투 몸이 아닌 필드 행위자도 때릴 수 있게 (src/game/world, 엔진 modules가 채운다) */
-export const fighterHooks: { sfx: (e: Record<string, unknown>) => void; extraTargets?: () => { body: Body; x: number; y: number; z: number }[]; openDraft?: (p: FighterPlayer, offers: Offer[]) => void; killOk?: () => boolean } = { sfx: () => {} };
+export const fighterHooks: { sfx: (e: Record<string, unknown>) => void; extraTargets?: () => { body: Body; x: number; y: number; z: number }[]; openDraft?: (p: FighterPlayer, offers: Offer[]) => void; killOk?: () => boolean; permaDeath?: () => boolean } = { sfx: () => {} };
 
 type Core = ReturnType<typeof createFighterCore>;
 
@@ -372,6 +372,11 @@ export class FighterPlayer extends Player {
       world.emit({ type: 'hp:low' });
     }
     if (this.hp <= 0 && this.team !== 'player' && fighterHooks.killOk?.()) {
+      this.dieNow(lying);
+      return { kind: 'hit', killed: true };
+    }
+    // 주인공: 설정 「내가 죽으면」이 영구 사망이면 사망(44·45) → 출동 결과 「사망」, 패퇴면 쓰러져 후송
+    if (this.hp <= 0 && this.team === 'player' && (fighterHooks.permaDeath?.() ?? false)) {
       this.dieNow(lying);
       return { kind: 'hit', killed: true };
     }

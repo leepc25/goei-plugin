@@ -98,7 +98,7 @@ export interface GameReport {
   /** 같은 출동을 두 번 넘겨도 한 번만 받도록 (예: 출동 시드) */
   id?: string;
   mission: string;
-  outcome: 'return' | 'evac' | 'withdraw';
+  outcome: 'return' | 'evac' | 'withdraw' | 'death';
   /** 예: B-12 */
   depth: string;
   agents: { id: string; name: string; hp?: number; injured?: boolean }[];
