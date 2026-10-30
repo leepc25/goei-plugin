@@ -4,8 +4,7 @@
 
 ## 점검 결과
 
-- FAIL 2068자 > 2000
-- WARN 설명이 김(24낱말): on the left wall a dark tinted glass shop front with a closed glass entrance door, a tacky red neon sign reading "OPEN" inside
+- WARN 설명이 김(21낱말): a tinted glass shop front on the left with a closed glass entrance door and a red neon sign reading "OPEN"
 - WARN 설명이 김(33낱말): a worn wooden reception counter facing the camera, an open gap at its left end to step behind it, cluttered with a candy bowl, a document tray, a guestbook, newspapers, a desk bell
 - WARN 설명이 김(22낱말): in the back corner on dark carpet, a green felt poker table with poker chips, playing cards and an open cigar box
 
@@ -59,7 +58,7 @@
 
 | # | 1차 (상세) | 근거 | 남길 낱말 | 2차 (실제) | 뺀 낱말(이유) |
 |---|---|---|---|---|---|
-| 0 | on the left wall a dark tinted glass shop front with a closed glass entrance door, a tacky red neon sign reading "OPEN" inside | 위키 짙은 선팅 유리·네온 OPEN 간판 | tinted glass, neon sign reading "OPEN", entrance door | on the left wall a dark tinted glass shop front with a closed glass entrance door, a tacky red neon sign reading "OPEN" inside |  |
+| 0 | a tinted glass shop front on the left with a closed glass entrance door and a red neon sign reading "OPEN" | 위키 짙은 선팅 유리·네온 OPEN 간판 | tinted glass, neon sign reading "OPEN", entrance door | a tinted glass shop front on the left with a closed glass entrance door and a red neon sign reading "OPEN" |  |
 | 1 | a flat TV hung flush on the wall, dark screen | 위키 소리 죽인 벽걸이 TV(매달린 TV 안 되게) | flat TV, flush on the wall | a flat TV hung flush on the wall, dark screen |  |
 | 2 | a potted rubber plant and an umbrella stand by the window | 설계안 화분·우산꽂이 | potted, umbrella stand | a potted rubber plant and an umbrella stand by the window |  |
 | 3 | a worn wooden reception counter facing the camera, an open gap at its left end to step behind it, cluttered with a candy bowl, a document tray, a guestbook, newspapers, a desk bell | 위키·설계안 접수대·사탕 그릇·서류 트레이·방명록·신문, 들어가는 틈(사용자) | reception counter, open gap, candy bowl, document tray, guestbook, newspapers | a worn wooden reception counter facing the camera, an open gap at its left end to step behind it, cluttered with a candy bowl, a document tray, a guestbook, newspapers, a desk bell |  |
@@ -71,7 +70,7 @@
 | 9 | in the back corner on dark carpet, a green felt poker table with poker chips, playing cards and an open cigar box | 위키 안쪽 포커 테이블·칩, 사용자 시가 상자 | poker table, green felt, poker chips, cards, cigar box | in the back corner on dark carpet, a green felt poker table with poker chips, playing cards and an open cigar box |  |
 | 10 | a framed picture over a low sideboard with binders | 설계안 액자, 사무실 서류 | framed, sideboard, binders | a framed picture over a low sideboard with binders |  |
 | 11 | a wall shelf of liquor bottles and shot glasses | 위키 술도 사고 건배사도 진심 | liquor bottles, shot glasses | a wall shelf of liquor bottles and shot glasses |  |
-| 12 | a worn doormat on the floor just inside the glass door | 출입구는 왼쪽 유리문(모델이 그린 대로 쓰기), 발판은 그 문 앞 | doormat | a worn doormat on the floor just inside the glass door |  |
+| 12 | a worn doormat inside the glass door | 출입구는 왼쪽 유리문(모델이 그린 대로 쓰기), 발판은 그 문 앞 | doormat | a worn doormat inside the glass door |  |
 
 ## 3차 자가 검토
 
@@ -90,13 +89,13 @@
 - 원근·바닥 몫·양옆 벽·문·채우기가 이 장면에 정한 대로인가?
   - one-point, 바닥 40%, 양쪽 벽 닫힘, 작은 방, 문 1(왼쪽 유리문), packed, 명암 대비, 느슨한 틀
 
-## 2차 요청문 (2068자)
+## 2차 요청문 (1997자)
 
 ```
 Pixel art game background of a small, cramped, cluttered fixer's office inside a run-down 1990s Seoul underground arcade, late at night. Camera at standing eye height, about 20 degrees above the floor, looking slightly down. One-point perspective, side walls receding toward the middle. The floor fills the lower 40 percent of the image. Both side walls are visible, a closed room.
-FLOOR: stained beige tiles, dirty grout, scuffs, dark carpet in the back corner, pools of hard light and deep black shadow under furniture.
-PACKED WITH STUFF, every area filled, no empty wall, no empty floor corner: on the left wall a dark tinted glass shop front with a closed glass entrance door, a tacky red neon sign reading "OPEN" inside; a flat TV hung flush on the wall, dark screen; a potted rubber plant and an umbrella stand by the window; a worn wooden reception counter facing the camera, an open gap at its left end to step behind it, cluttered with a candy bowl, a document tray, a guestbook, newspapers, a desk bell; a baseball bat leaning behind the counter; a tall shelf crammed with ring binders, contract folders and document boxes; a cork board crowded with job flyers and contracts; two faded framed photos, a fire extinguisher box; two grey filing cabinets topped with folders and a small fan; in the back corner on dark carpet, a green felt poker table with poker chips, playing cards and an open cigar box; a framed picture over a low sideboard with binders; a wall shelf of liquor bottles and shot glasses; a worn doormat on the floor just inside the glass door.
-WALL: dark red-brown wallpaper, water stains, peeling patches, wooden baseboard; fluorescent tubes, red neon glow.
+FLOOR: stained beige tiles, dirty grout, dark carpet in the back corner, pools of hard light, deep black shadow under furniture.
+PACKED WITH STUFF, every area filled, no empty wall, no empty floor corner: a tinted glass shop front on the left with a closed glass entrance door and a red neon sign reading "OPEN"; a flat TV hung flush on the wall, dark screen; a potted rubber plant and an umbrella stand by the window; a worn wooden reception counter facing the camera, an open gap at its left end to step behind it, cluttered with a candy bowl, a document tray, a guestbook, newspapers, a desk bell; a baseball bat leaning behind the counter; a tall shelf crammed with ring binders, contract folders and document boxes; a cork board crowded with job flyers and contracts; two faded framed photos, a fire extinguisher box; two grey filing cabinets topped with folders and a small fan; in the back corner on dark carpet, a green felt poker table with poker chips, playing cards and an open cigar box; a framed picture over a low sideboard with binders; a wall shelf of liquor bottles and shot glasses; a worn doormat inside the glass door.
+WALL: dark red-brown wallpaper, water stains, peeling patches; fluorescent tubes, neon glow.
 LIGHT: strong contrast, bright lit surfaces and pitch-dark shadowed corners.
 STYLE: dense, highly detailed pixel art, crisp pixel clusters, selective dark outline, rich medium-to-detailed shading, dark red-brown and beige with green felt and red neon accents, no dithering, no blur. No people, chairs, sofas, benches, coffee tables, clocks, other doors, doorways or glass partitions.
 ```

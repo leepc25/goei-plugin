@@ -181,8 +181,8 @@
  "density": "packed",
  "place": "a small, cramped, cluttered fixer's office inside a run-down 1990s Seoul underground arcade",
  "light": "fluorescent and red neon",
- "floor": "stained beige tiles, dirty grout, scuffs, dark carpet in the back corner, pools of hard light and deep black shadow under furniture",
- "walls": "dark red-brown wallpaper, water stains, peeling patches, wooden baseboard; fluorescent tubes, red neon glow",
+ "floor": "stained beige tiles, dirty grout, dark carpet in the back corner, pools of hard light, deep black shadow under furniture",
+ "walls": "dark red-brown wallpaper, water stains, peeling patches; fluorescent tubes, neon glow",
  "shadow": "strong contrast, bright lit surfaces and pitch-dark shadowed corners",
  "must": [
   {
@@ -224,8 +224,8 @@
  ],
  "items": [
   {
-   "full": "on the left wall a dark tinted glass shop front with a closed glass entrance door, a tacky red neon sign reading \"OPEN\" inside",
-   "text": "on the left wall a dark tinted glass shop front with a closed glass entrance door, a tacky red neon sign reading \"OPEN\" inside",
+   "full": "a tinted glass shop front on the left with a closed glass entrance door and a red neon sign reading \"OPEN\"",
+   "text": "a tinted glass shop front on the left with a closed glass entrance door and a red neon sign reading \"OPEN\"",
    "why": "위키 짙은 선팅 유리·네온 OPEN 간판",
    "keep": [
     "tinted glass",
@@ -343,8 +343,8 @@
    ]
   },
   {
-   "full": "a worn doormat on the floor just inside the glass door",
-   "text": "a worn doormat on the floor just inside the glass door",
+   "full": "a worn doormat inside the glass door",
+   "text": "a worn doormat inside the glass door",
    "why": "출입구는 왼쪽 유리문(모델이 그린 대로 쓰기), 발판은 그 문 앞",
    "keep": [
     "doormat"
