@@ -1,5 +1,5 @@
 Pixel art game background: an obsessively clean back-alley operating room in a run-down 1990s Seoul underground arcade, night, harsh fluorescent light. Camera about 20 degrees above the floor looking down: floor fills the lower half. Both side walls visible at an angle, a closed room.
-FLOOR: blue-grey ceramic floor tiles, dark grout lines running toward the back, a steel floor drain, glossy reflections under the table.
+FLOOR: blue-grey ceramic floor tiles, dark grout lines running toward the back, a floor drain, glossy reflections under the table.
 WALLS: white ceramic tiles on all walls, yellowed grout, a few cracked tiles, steel baseboard; two fluorescent tubes on top.
 LAYOUT (a standing adult is 150 pixels tall):
 CENTER: a large steel operating table on one pedestal, long side to the camera, 190 by 85 pixels, black mattress, white sheet, leather wrist straps; above it a two-headed surgical lamp hanging from the ceiling; an IV stand at its left, a vital signs monitor on a stand at its right.
