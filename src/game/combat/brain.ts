@@ -18,6 +18,8 @@ export interface SelfSense {
   hp: number; // 0~1
   sp: number; // 필살 게이지 0~100
   guard: number; // 방어 게이지 0~100
+  /** 공격 간격 배수 (두통 1.25). 없으면 1 */
+  gap?: number;
 }
 export interface FoeSense {
   x: number; y: number; z: number;
@@ -105,6 +107,8 @@ export class FighterBrain {
   /** 플레이어 버릇 (10장): 점프·회피 반격 횟수 → 대공·유인 가중 */
   private habit = { jump: 0, attack: 0 };
   private lastFoe: FoeSense | null = null;
+  /** 이번 틱의 공격 간격 배수 */
+  private gap = 1;
   constructor(readonly id: string, readonly grade: Grade, readonly difficulty: Difficulty, readonly persona: Persona, private rng: Rng, private squad?: Squad, private squadKey: object = {}) {
     this.g = GRADE[grade];
     this.d = DIFF[difficulty];
@@ -124,6 +128,7 @@ export class FighterBrain {
     if (this.hist.length > 40) this.hist.shift();
     const foe = this.hist[Math.max(0, this.hist.length - 1 - this.reactTicks)];
     this.learn(foeNow);
+    this.gap = me.gap ?? 1;
     const out: Decision = { hold: new Set(), press: [], release: [] };
     if (me.stunned) {
       this.script = [];
@@ -158,7 +163,7 @@ export class FighterBrain {
       this.align(out, dy, dist);
       return this.finish(out);
     }
-    this.tacT = this.g.tactic + Math.floor(this.rng() * 4);
+    this.tacT = Math.round((this.g.tactic + Math.floor(this.rng() * 4)) * this.gap);
     this.chooseTactic(me, foe, dist, dy, toward, away, out);
     return this.finish(out);
   }
@@ -190,6 +195,7 @@ export class FighterBrain {
   }
 
   private plan(steps: Step[], name: string): void {
+    if (this.gap !== 1) for (const s of steps) if (s.press) s.ticks = Math.round(s.ticks * this.gap);
     this.script = steps;
     this.tactic = name;
   }

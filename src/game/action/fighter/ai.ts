@@ -53,7 +53,7 @@ export class FighterAi extends FighterPlayer {
       free: ['ground', 'chain', 'block'].includes(me.mode),
       air: me.mode === 'air',
       stunned: ['down', 'belly', 'stun'].includes(me.mode) || this.phase === 'down',
-      hp: this.hp / this.hpMax, sp: me.sp ?? 0, guard: this.guard,
+      hp: this.hp / this.hpMax, sp: me.sp ?? 0, guard: this.guard, gap: this.status.attackGap(),
     };
     const d = this.brain.tick(self, foeSense(world.player as unknown as Body));
     const p = this.pad;
@@ -80,5 +80,21 @@ export class FighterAi extends FighterPlayer {
     this.core.drawBody(ctx);
     this.core.drawFxLayer(ctx);
     ctx.restore();
+    this.drawBar(ctx);
+  }
+
+  /** 머리 위 체력 막대(맞은 뒤에만), 방어막이 있으면 그 위에 흰 막대 */
+  private drawBar(ctx: CanvasRenderingContext2D): void {
+    if (!this.alive || (this.hp >= this.hpMax && this.shield >= this.shieldMax)) return;
+    // 몸 자리 기준 좌표 (draw 가 받은 ctx 원점 = 발밑)
+    const top = -this.height() - 14, w = 70;
+    ctx.fillStyle = 'rgba(0,0,0,.6)';
+    ctx.fillRect(-w / 2, top, w, this.shieldMax ? 10 : 6);
+    ctx.fillStyle = '#e8c35a';
+    ctx.fillRect(-w / 2, top + (this.shieldMax ? 4 : 0), (w * Math.max(0, this.hp)) / this.hpMax, 6);
+    if (this.shieldMax) {
+      ctx.fillStyle = '#dfe8ee';
+      ctx.fillRect(-w / 2, top, (w * this.shield) / this.shieldMax, 3);
+    }
   }
 }

@@ -33,6 +33,8 @@ export const STATUS_NUM = {
   /** 오염: 단계마다 최대 체력 감소 */
   taintPerStack: 0.2,
   headacheSp: 0.5,
+  /** 두통 걸린 AI 적의 공격 간격 배수 (10-30 결정) */
+  headacheGap: 1.25,
   fearSpeed: 0.75,
   slowSpeed: 0.6,
   maxDebuffs: 3,
@@ -110,7 +112,11 @@ export class StatusSet {
   }
   spMul(): number {
     return this.has('headache') ? STATUS_NUM.headacheSp : 1;
+  }  /** AI 두뇌의 공격 간격 배수: 두통이면 느려진다 */
+  attackGap(): number {
+    return this.has('headache') ? STATUS_NUM.headacheGap : 1;
   }
+
   canBlock(): boolean {
     return !this.has('fear');
   }

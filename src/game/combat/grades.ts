@@ -2,7 +2,7 @@
 // 플레이어(조작 상태)는 등급 배수 없이 기준 체력 1,000 (힘민체지정은 아직 안 넣음 — 넣으면 progression 에서 산출)
 
 export type NpcGrade = '시민' | '거리' | '훈련' | '숙련' | '적당히' | '상당히' | '재난급';
-/** 체력·주는 피해 배수, 방어막 비율(방어막 체계는 아직 없음) */
+/** 체력·주는 피해 배수, 방어막 비율(체력 × 비율. fighter/player.ts applyHit 이 먼저 깎는다) */
 export const GRADE: Record<NpcGrade, { hp: number; dmg: number; shield: number }> = {
   시민: { hp: 0.15, dmg: 0.3, shield: 0 }, 거리: { hp: 0.3, dmg: 0.5, shield: 0 }, 훈련: { hp: 0.6, dmg: 0.8, shield: 0 }, 숙련: { hp: 1, dmg: 1, shield: 0 },
   적당히: { hp: 1.3, dmg: 1.2, shield: 0.2 }, 상당히: { hp: 2, dmg: 1.5, shield: 0.4 }, 재난급: { hp: 3, dmg: 2, shield: 1 },
@@ -14,7 +14,8 @@ export const NPC_SKILL_MUL = 0.5;
 export const CHAR_GRADE: Record<string, NpcGrade> = { '쟈알디': '상당히', '스팡달': '적당히', '잼트리': '적당히', '에일린': '적당히', '고그니쟈': '적당히', '큐라스': '적당히', '고르고디오': '상당히', '데쥬레': '적당히', '데드폴': '적당히', '게슈간': '적당히', '로제몬': '적당히', '콘쥬스': '적당히', '사장': '상당히', '도필헌': '적당히', '이길환': '적당히', '이기석': '적당히', '김조학': '훈련', '이도형': '상당히', '고영훈': '적당히', '노기균': '적당히', '송주익': '적당히', '곽성주': '상당히', '조성춘': '적당히', '윤병수': '적당히', '김성진': '적당히', '송진섭': '적당히', '청달래': '적당히', '호유원': '적당히', '백석주': '적당히', '진나솔': '적당히', '이성해': '적당히', '이자헌': '적당히', '은하제': '적당히', '박민성': '적당히', '백사헌': '훈련', '고영은': '적당히', '강이학': '훈련', '장허운': '적당히', '곽제강': '적당히', '이연화': '적당히', '이병진': '적당히', '제이': '적당히', '차여진': '적당히', '서윤지': '적당히', '고연지': '훈련', '윤지아': '훈련', '마덕희': '적당히', '문혜란': '적당히', '신유리': '적당히', '블라렛': '적당히', '살라딘': '재난급', '아벤샤': '적당히', '세크리엠': '재난급', '브라우니': '적당히', '탐미주의': '재난급' };
 
 /** NPC 상태 = 그 인물 능력치 체력(힘민체지정, 없으면 BASE_HP) × 등급 배수. 역할 보정은 능력치(체)가 대신한다 */
-export function npcStats(grade: NpcGrade, baseHp = BASE_HP): { hp: number; dmgMul: number } {
+export function npcStats(grade: NpcGrade, baseHp = BASE_HP): { hp: number; dmgMul: number; shield: number } {
   const g = GRADE[grade];
-  return { hp: Math.round(baseHp * g.hp), dmgMul: g.dmg };
+  const hp = Math.round(baseHp * g.hp);
+  return { hp, dmgMul: g.dmg, shield: Math.round(hp * g.shield) };
 }

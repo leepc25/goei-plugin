@@ -65,6 +65,9 @@ export class FighterPlayer extends Player {
   private guardWait = 0;
   private underFn = (ctx: CanvasRenderingContext2D, camX: number) => this.drawUnder(ctx, camX);
 
+  /** 방어막 (NPC 등급, combat/grades.ts): 체력보다 먼저 깎이고, 남은 동안 경직·밀림 없음. 깨지면 잠깐 휘청. 다시 차지 않는다 */
+  shield = 0;
+  shieldMax = 0;
   /** 인물 팩 (그림·설정) */
   readonly art: CharArt;
   /** 기본 능력치(힘민체지정)와 산출 전투 수치 (combat/stats.ts) */
@@ -197,9 +200,12 @@ export class FighterPlayer extends Player {
 
   frame(): { hit: Hit[]; hurt: WBox[] } {
     const k = spr(this.y) * CHAR_K;
+    return { hit: [], hurt: this.alive ? [{ x0: this.x - 26 * k, x1: this.x + 26 * k, z0: this.z, z1: this.z + this.height(), y: this.y, dy: 16 }] : [] };
+  }
+  /** 화면 위 키(서 있는 그림 기준) */
+  height(): number {
     const m = this.art.A['1'];
-    const h = m ? Math.min(m.h - 4, m.floor) - (m.top[0] ?? 14) : 210;
-    return { hit: [], hurt: this.alive ? [{ x0: this.x - 26 * k, x1: this.x + 26 * k, z0: this.z, z1: this.z + h * k, y: this.y, dy: 16 }] : [] };
+    return (m ? Math.min(m.h - 4, m.floor) - (m.top[0] ?? 14) : 210) * spr(this.y) * CHAR_K;
   }
 
   applyHit(hit: Hit, world: WorldView): HitResult {
@@ -232,7 +238,20 @@ export class FighterPlayer extends Player {
     const strength = hit.strength ?? (hit.react === 'down' || hit.react === 'launch' ? 3 : hit.react === 'stagger' ? 2 : 1);
     const armored = this.core.armored() || strength <= (this.progression?.stats.poise ?? 0);
     // 방어(defense): 받는 피해 감소 (가드·무적·부적 뒤 실제 체력 피해에만, 엔진 defendedHit과 같음)
-    const taken = hit.dmg * this.stat.taken * (1 - (this.progression?.stats.defense ?? 0)) * (this.core.armored() ? 0.5 : 1);
+    let taken = hit.dmg * this.stat.taken * (1 - (this.progression?.stats.defense ?? 0)) * (this.core.armored() ? 0.5 : 1);
+    if (this.shield > 0) {
+      const cut = Math.min(this.shield, Math.round(taken));
+      this.shield -= cut;
+      taken -= cut;
+      world.emit({ type: 'hurt', x: this.x, dmg: cut, hp: this.hp });
+      if (this.shield > 0) { P.armorT = 0.28; return { kind: 'armor' }; }
+      // 방어막이 깨짐: 잠깐 휘청 (남은 피해는 체력으로)
+      this.core.stun();
+      P.stunT = 0.8;
+      world.emit({ type: 'guard', x: this.x });
+      this.hp = Math.max(0, this.hp - Math.round(taken));
+      return { kind: 'hit' };
+    }
     this.hp = Math.max(0, this.hp - Math.round(taken));
     world.emit({ type: 'hurt', x: this.x, dmg: taken, hp: this.hp });
     if (!this.lowWarned && this.hp < this.hpMax * 0.3) {
