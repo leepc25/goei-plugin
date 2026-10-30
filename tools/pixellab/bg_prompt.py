@@ -22,6 +22,7 @@
   no          추가로 그리지 말 것 (예: ["doors", "doorways", "blood"])
 """
 import json, sys, os, base64, re
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 # 고정은 카메라 높이·각도뿐. 원근·바닥 몫·양옆 벽은 장면마다 다르게 정한다(사용자 10-30: 「소실점 없음·양끝 벽」은 상황에 따라)
 CAMERA = "Camera at standing eye height, about 20 degrees above the floor, looking slightly down."
@@ -59,6 +60,7 @@ def build(spec):
     if spec['view'] not in VIEW: raise SystemExit('view는 one-point|flat')
     if spec['density'] not in DENSITY: raise SystemExit('density는 packed|normal|bare')
     errs = []
+    spec = dict(spec, items=[(it['text'] if isinstance(it, dict) else it) for it in spec['items']])
     for it in spec['items']:
         if not any(w in it.lower() for w in PLACE_WORDS): errs.append(f'자리 말 없음: {it}')
     text_all = ' '.join([spec['place'], spec['floor'], spec['walls'], spec['shadow']] + spec['items']).lower()
@@ -84,6 +86,8 @@ def main():
     spec_path = sys.argv[1]
     spec = json.load(open(spec_path, encoding='utf-8'))
     text = build(spec)
+    from bg_check import report   # 점검을 통과해야만 만든다
+    if not report(spec, text): raise SystemExit('점검 실패: 고친 뒤 다시')
     if len(text) > 2000: raise SystemExit(f'{len(text)}자: 2,000자를 넘음. 묘사 말고 군더더기를 줄일 것')
     out = os.path.dirname(os.path.abspath(spec_path))
     open(os.path.join(out, f"{spec['name']}_prompt.txt"), 'w', encoding='utf-8').write(text)

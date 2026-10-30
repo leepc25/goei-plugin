@@ -1,0 +1,133 @@
+{
+ "_설명": "방 종류별로 '여기 있으면 안 되는 물건'(not_here)과 크기 상식(sizes: 서 있는 사람 150px 기준 배경 픽셀 범위)을 적는다. 실패할 때마다 여기에 더한다.",
+ "global_not": [
+  "chair",
+  "stool to sit",
+  "sofa",
+  "bench",
+  "wheelchair",
+  "clock",
+  "leak",
+  "drip",
+  "bucket catching",
+  "curtain rail",
+  "ceiling-rail curtain",
+  "people"
+ ],
+ "visitor_things": [
+  "blood pressure",
+  "weight scale",
+  "water cooler",
+  "magazine",
+  "leaflet",
+  "umbrella",
+  "hand sanitizer",
+  "eye chart",
+  "candy"
+ ],
+ "staff_place_words": [
+  "behind the counter",
+  "behind the desk",
+  "staff side"
+ ],
+ "sizes": {
+  "door": [
+   155,
+   190
+  ],
+  "operating table": [
+   75,
+   95
+  ],
+  "examination bed": [
+   55,
+   75
+  ],
+  "desk": [
+   65,
+   85
+  ],
+  "counter": [
+   85,
+   105
+  ],
+  "medicine cabinet": [
+   140,
+   175
+  ],
+  "fridge": [
+   150,
+   180
+  ],
+  "refrigerator": [
+   150,
+   180
+  ],
+  "safe": [
+   80,
+   120
+  ],
+  "filing cabinet": [
+   90,
+   125
+  ],
+  "shelf unit": [
+   130,
+   170
+  ],
+  "trolley": [
+   65,
+   85
+  ]
+ },
+ "rooms": {
+  "waiting_room": {
+   "not_here": [
+    "x-ray",
+    "iv stand",
+    "oxygen",
+    "biohazard",
+    "operating table",
+    "surgical lamp",
+    "instrument trolley",
+    "scalpel",
+    "examination bed",
+    "suction"
+   ]
+  },
+  "exam_room": {
+   "not_here": [
+    "operating table",
+    "surgical lamp",
+    "oxygen",
+    "suction",
+    "magazine rack",
+    "water cooler",
+    "reception counter",
+    "candy"
+   ]
+  },
+  "operating_room": {
+   "not_here": [
+    "magazine",
+    "water cooler",
+    "candy",
+    "reception counter",
+    "umbrella",
+    "x-ray light box",
+    "eye chart",
+    "weight scale",
+    "tv"
+   ]
+  },
+  "shop": {
+   "not_here": []
+  },
+  "office": {
+   "not_here": []
+  },
+  "corridor": {
+   "not_here": []
+  }
+ }
+}

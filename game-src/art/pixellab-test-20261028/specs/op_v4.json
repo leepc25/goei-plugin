@@ -1,5 +1,66 @@
 {
  "name": "op_v4",
+ "room": "operating_room",
+ "mood": "clean",
+ "doors": 0,
+ "brief": {
+  "wiki": "바랜 옛 병원 간판이 붙은 무면허 의원. 플라스틱 의자, 오래된 잡지, 접수 창구, 진료실 두 개, 그리고 형광등이 쨍한 진짜 수술실이 있다. 수술실은 강박적으로 깨끗하다. 뒷벽에는 이중 잠금 약품장과 사람 하나 들어갈 만한 냉장고가 있는데, 원장은 이걸 \\\"검체 보관\\\"이라고 부른다. 그 말투가 질문을 끝내는 말투라서 아무도 더 묻지 않는다.\\n[Paragraph]원장 ➡",
+  "design": "설계안 jr_op: 바닥 PVC 청회, 벽 흰 타일, 쨍한 조명, 수술대(2.0×0.7×0.9, 긴 옆면이 화면 쪽), 무영등(천장), 이중 잠금 약품장 B02, 사람 하나 들어갈 냉장고(0.9×0.9×1.9), 기구 트레이 ×2, 강박적으로 깨끗(바닥 반사)",
+  "user": [
+   "의자 전부 빼기",
+   "문 없음(아래 출구)",
+   "양쪽 벽 닫힘(작은 밀실)",
+   "수술대 사람 0.5배 높이",
+   "링거대·산소통·폐기물 통은 대기실에서 뺀 것"
+  ]
+ },
+ "must": [
+  {
+   "kw": "operating table",
+   "from": "설계안 수술대"
+  },
+  {
+   "kw": "surgical lamp",
+   "from": "설계안 무영등"
+  },
+  {
+   "kw": "medicine cabinet",
+   "from": "위키 이중 잠금 약품장"
+  },
+  {
+   "kw": "chained",
+   "from": "위키 이중 잠금"
+  },
+  {
+   "kw": "fridge",
+   "from": "위키 사람 들어갈 냉장고"
+  },
+  {
+   "kw": "trolleys",
+   "from": "설계안 기구 트레이 ×2"
+  },
+  {
+   "kw": "white tiles",
+   "from": "설계안 벽 흰 타일"
+  },
+  {
+   "kw": "blue-grey",
+   "from": "설계안 바닥 청회"
+  },
+  {
+   "kw": "prosthetic",
+   "from": "위키 이상 의수족"
+  },
+  {
+   "kw": "organ",
+   "from": "위키 장기 적출·이식"
+  }
+ ],
+ "sized": [
+  "operating table",
+  "medicine cabinet",
+  "fridge"
+ ],
  "place": "a cramped, obsessively clean operating room of an unlicensed clinic in a run-down 1990s Seoul underground arcade",
  "time": "night",
  "light": "a harsh surgical lamp",
@@ -8,22 +69,64 @@
  "sides": "both",
  "density": "packed",
  "floor": "blue-grey tiles, dark grout, a drain, mop streaks, a pool of light under the table",
- "walls": "white tiles, yellowed grout, chipped tiles, rust drips, steel baseboard; two fluorescent tubes",
+ "walls": "white tiles, yellowed grout, a few chipped tiles, steel baseboard; two fluorescent tubes",
  "items": [
-  "center: a steel operating table on one pedestal, long side to camera, 190 by 85 pixels, black mattress, straps",
-  "above it a two-headed surgical lamp on a ceiling arm",
-  "left of the table an IV stand, right of it a monitor on a stand",
-  "beside the table two instrument trolleys",
-  "on the back wall left a steel medicine cabinet, 165 pixels tall, bottles behind glass, chained shut",
-  "on the back wall a sink under glove boxes",
-  "on the back wall right a white fridge big enough for a person, 170 by 80 pixels",
-  "on the back wall a yellow sharps box",
-  "in the back corner a red biohazard bin",
-  "next to the fridge two organ coolers",
-  "on the right wall a rack of odd mechanical prosthetic limbs",
-  "on the left wall a shelf of disinfectant bottles",
-  "at the front left an oxygen tank and a hazard-striped drum",
-  "at the front right a suction machine cart"
+  {
+   "text": "center: a steel operating table on one pedestal, long side to camera, 190 by 85 pixels, wrist straps",
+   "why": "설계안 수술대 2.0×0.9m"
+  },
+  {
+   "text": "above it a two-headed surgical lamp on a ceiling arm",
+   "why": "설계안 무영등"
+  },
+  {
+   "text": "left of the table an IV stand, right of it a monitor on a stand",
+   "why": "수술실 쓰임(수액·생체 감시), 링거대는 대기실에서 옮김"
+  },
+  {
+   "text": "beside the table two instrument trolleys",
+   "why": "설계안 기구 트레이 ×2"
+  },
+  {
+   "text": "on the back wall left a steel medicine cabinet, 165 pixels tall, bottles behind glass, chained shut",
+   "why": "위키 이중 잠금 약품장"
+  },
+  {
+   "text": "on the back wall a sink under glove boxes",
+   "why": "수술 전 손 씻기"
+  },
+  {
+   "text": "on the back wall right a white fridge big enough for a person, 170 by 80 pixels",
+   "why": "위키 사람 들어갈 냉장고(검체 보관)"
+  },
+  {
+   "text": "on the back wall a yellow sharps box",
+   "why": "수술실 쓰임(주삿바늘)"
+  },
+  {
+   "text": "in the back corner a red biohazard bin",
+   "why": "수술실 쓰임, 대기실에서 옮김"
+  },
+  {
+   "text": "next to the fridge two organ coolers",
+   "why": "위키 사람 들어갈 냉장고(검체 보관)"
+  },
+  {
+   "text": "on the right wall a rack of odd mechanical prosthetic limbs",
+   "why": "위키 이상 의수족·장비 이식"
+  },
+  {
+   "text": "on the left wall a shelf of disinfectant bottles",
+   "why": "수술실 쓰임(소독)"
+  },
+  {
+   "text": "at the front left an oxygen tank and a hazard-striped drum",
+   "why": "수술실 쓰임(마취·호흡), 대기실에서 옮김"
+  },
+  {
+   "text": "at the front right a suction machine cart",
+   "why": "수술실 쓰임(흡인)"
+  }
  ],
  "shadow": "bright table under the lamp, greyer walls, deep shadows under cabinets, trolleys and table, glossy steel highlights",
  "palette": "cold greyed white, steel and blue-grey with blue-black shadows and green, yellow, red accents",
