@@ -140,6 +140,7 @@
   var DIM = "#8a9096";
   var GOOD = "#8fe08a";
   var GOLD = "#ffd36a";
+  var TAB = new URLSearchParams(location.search).get("tab") || "skill";
   async function main() {
     const ff = new FontFace(PIXEL_FONT, `url(${PIXEL_FONT_URL})`);
     await ff.load();
@@ -157,10 +158,9 @@
     for (const [k, v] of Object.entries(KEY_IMG)) img["key_" + k] = await load(v);
     img.body = await load("eileen.png");
     img.bg = await load("bg.png");
-    const T = (s, x, y, col = INK2, size = 11, align = "left", sc = 2) => {
-      const t = pixelText(s, col, size);
-      const w = t.width * sc;
-      c.drawImage(t, Math.round(align === "center" ? x - w / 2 : align === "right" ? x - w : x), y, w, t.height * sc);
+    const T = (s, x, y, col = INK2, size = 22, align = "left") => {
+      const t = pixelText(s, col, size, null);
+      c.drawImage(t, Math.round(align === "center" ? x - t.width / 2 : align === "right" ? x - t.width : x), y);
     };
     const nine = (k, x, y, w, h, sc = 2) => {
       const im = img["kit_" + k];
@@ -171,117 +171,99 @@
       const dx = [x, x + l * sc, x + w - r * sc, x + w], dy = [y, y + t * sc, y + h - b * sc, y + h];
       for (let i = 0; i < 3; i++) for (let j = 0; j < 3; j++) c.drawImage(im, sx[j], sy[i], sx[j + 1] - sx[j], sy[i + 1] - sy[i], dx[j], dy[i], dx[j + 1] - dx[j], dy[i + 1] - dy[i]);
     };
-    const draw = (k, x, y, sc = 1) => {
-      const im = img[k];
-      c.drawImage(im, x, y, im.naturalWidth * sc, im.naturalHeight * sc);
-    };
+    const slot = (x, y, s) => nine("slot", x, y, s, s, 2);
     c.drawImage(img.bg, 0, 0, W, H);
     c.fillStyle = "rgba(5,7,10,0.72)";
     c.fillRect(0, 0, W, H);
-    const X = 60, Y = 34, WW = 1160, HH = 652;
+    const X = 110, Y = 50, WW = 1060, HH = 620;
     nine("panel", X, Y, WW, HH);
-    draw("hud_portrait", X + 40, Y + 36);
-    const pw = img.hud_portrait.naturalWidth, ph = img.hud_portrait.naturalHeight;
-    c.save();
-    c.beginPath();
-    c.rect(X + 48, Y + 44, pw - 16, ph - 16);
-    c.clip();
-    c.drawImage(img.body, 2, 0, 58, 58, X + 48, Y + 44, pw - 16, pw - 16);
-    c.restore();
-    T("\uC5D0\uC77C\uB9B0", X + 40 + pw + 16, Y + 40, INK2, 22, "left", 1);
-    T("\uAD00\uB9AC\uAD6D 1\uD300 \xB7 \uC0AC\uACA9\uD615", X + 40 + pw + 18, Y + 72, DIM);
-    T("\uC0C1\uD0DC  \uCD9C\uB3D9 \uC911 \xB7 \uBA85\uC77C\uC544\uD30C\uD2B8 4\uCE35", X + 40 + pw + 18, Y + 98, GOLD);
-    const hx = X + 560, hy = Y + 46;
-    draw("hud_hp", hx, hy);
-    const hi = HUD_ART.hp.inner;
+    const lx = X + 40;
+    T("\uC5D0\uC77C\uB9B0", lx, Y + 40, INK2, 33);
+    const hy = Y + 90;
+    c.fillStyle = "#2e353c";
+    c.fillRect(lx, hy, 260, 14);
     c.fillStyle = "#c8473f";
-    c.fillRect(hx + hi[0], hy + hi[1], (hi[2] - hi[0]) * 0.72, hi[3] - hi[1]);
-    T("\uCCB4\uB825  684 / 950", hx, hy + 44, INK2);
-    draw("hud_gauge", hx, hy + 76);
-    T("\uD544\uC0B4", hx + HUD_ART.gauge.w + 10, hy + 74, DIM);
-    const box = (x, y, w, h, title) => {
-      nine("row", x, y, w, h, 2);
-      T(title, x + 16, y + 10, GOLD);
-    };
-    const top = Y + 150;
-    box(X + 30, top, 300, 466, "\uB2A5\uB825\uCE58");
-    c.drawImage(img.body, X + 40, top + 54, 62, 234);
+    c.fillRect(lx, hy, 260 * 0.72, 14);
+    T("684 / 950", lx + 260, hy + 22, DIM, 22, "right");
+    c.drawImage(img.body, lx, hy + 60, 62, 234);
     const stats = [["\uD798", 3, 0], ["\uBBFC", 8, 1], ["\uCCB4", 4, 0], ["\uC9C0", 6, 0], ["\uC815", 4, 0]];
     stats.forEach(([n, v, up], i) => {
-      const yy = top + 60 + i * 44;
-      T(n, X + 120, yy, INK2);
+      const yy = hy + 70 + i * 46;
+      T(n, lx + 90, yy, INK2);
       for (let p = 0; p < 10; p++) {
         c.fillStyle = p < v ? p >= v - up ? GOOD : "#d8d4c8" : "#2e353c";
-        c.fillRect(X + 152 + p * 15, yy + 6, 11, 14);
-        c.fillStyle = "#07090b";
-        c.fillRect(X + 152 + p * 15, yy + 20, 11, 2);
+        c.fillRect(lx + 122 + p * 12, yy + 4, 9, 18);
       }
-      T(String(v), X + 316, yy, up ? GOOD : INK2, 11, "right");
+      T(String(v), lx + 268, yy, up ? GOOD : INK2, 22, "right");
     });
-    const der = [["\uCD5C\uB300 \uCCB4\uB825", "950", ""], ["\uADFC\uC811 \uD53C\uD574", "0.94", ""], ["\uC0AC\uACA9 \uD53C\uD574", "1.09", "1.24"], ["\uC18D\uB3C4", "1.05", ""], ["\uAE30\uC220 \uCFE8", "0.98", "0.90"], ["\uBC1B\uB294 \uD53C\uD574", "1.01", ""]];
-    der.forEach(([n, a, b], i) => {
-      const yy = top + 300 + i * 27;
-      T(n, X + 46, yy, DIM, 11, "left", 2);
-      T(b ? `${a} \u2192 ${b}` : a, X + 316, yy, b ? GOOD : INK2, 11, "right");
-    });
-    const mx = X + 350;
-    box(mx, top, 400, 250, "\uAE30\uC220");
-    const sk = [["attack", "\uC57D\uACF5"], ["attack", "\uAC15\uACF5"], ["shoot", "\uC0AC\uACA9"], ["shoot", "\uCDA9\uC804"], ["unique", "\uACE0\uC720"], ["ult", "\uD544\uC0B4"]];
-    sk.forEach(([ic, n], i) => {
-      const sx = mx + 22 + i % 3 * 124, sy = top + 46 + Math.floor(i / 3) * 96;
-      draw("hud_slot", sx, sy);
-      const s = img.hud_slot;
-      const ti = img["touch_" + ic];
-      c.drawImage(ti, sx + (s.naturalWidth - 40) / 2, sy + (s.naturalHeight - 40) / 2, 40, 40);
-      T(n, sx + s.naturalWidth + 6, sy + 18, i === 2 ? GOLD : INK2);
-      if (i === 2) {
-        c.strokeStyle = GOLD;
-        c.lineWidth = 2;
-        c.strokeRect(sx - 3, sy - 3, s.naturalWidth + 6, s.naturalHeight + 6);
+    const rx = X + 350, ry = Y + 36, rw = WW - 390;
+    const tabs = [["skill", "\uAE30\uC220"], ["item", "\uC18C\uC9C0\uD488"], ["perk", "\uD37D"]];
+    tabs.forEach(([k, n], i) => {
+      const tx = rx + i * 150;
+      nine("row", tx, ry, 140, 48, 2);
+      T(n, tx + 70, ry + 12, k === TAB ? GOLD : DIM, 22, "center");
+      if (k === TAB) {
+        c.fillStyle = GOLD;
+        c.fillRect(tx + 14, ry + 42, 112, 3);
       }
     });
-    T("\uC0AC\uACA9 \xB7 \uC5F0\uC0AC  \uD55C \uBC1C 7 \xB7 \uACFC\uC5F4 9%/\uBC1C", mx + 22, top + 236 - 20, INK2);
-    box(mx, top + 262, 400, 204, "\uC18C\uC9C0\uD488");
-    const quick = ["medkit", "flash", "flash", "energy"];
-    quick.forEach((k, i) => {
-      const sx = mx + 22 + i * 64, sy = top + 304;
-      draw("hud_item", sx, sy);
-      c.drawImage(img["item_" + k], sx + 8, sy + 8, 40, 40);
-      c.drawImage(img["key_" + (i + 1)], sx - 4, sy - 6, 20, 20);
-    });
-    T("\uD035\uCE78", mx + 300, top + 318, DIM);
-    const bag = ["bandage", "antidote", "salt", "ammo", "", "", "", ""];
-    bag.forEach((k, i) => {
-      const sx = mx + 22 + i * 46, sy = top + 400;
-      c.drawImage(img.kit_slot, sx, sy, 42, 42);
-      if (k) c.drawImage(img["item_" + k], sx + 7, sy + 7, 28, 28);
-    });
-    T("\uAC00\uBC29 4/8", mx + 22, top + 364, DIM);
-    const rx = mx + 412;
-    box(rx, top, 330, 466, "\uD37D");
-    T("\uACE0\uC720", rx + 18, top + 46, GOLD);
-    const badge = (x, y, col, mark) => {
-      c.drawImage(img.kit_slot, x, y, 56, 56);
-      c.fillStyle = col;
-      c.fillRect(x + 10, y + 10, 36, 36);
-      c.fillStyle = "#0b0d10";
-      c.fillRect(x + 14, y + 14, 28, 28);
-      T(mark, x + 28, y + 20, col, 11, "center", 2);
-    };
-    badge(rx + 18, top + 72, GOLD, "?");
-    T("\uC900\uBE44\uB41C \uC0AC\uC218", rx + 86, top + 78, INK2);
-    T("\uBA40\uB9AC \uC788\uB294 \uC801 \uC0AC\uACA9 +15%", rx + 86, top + 104, DIM, 11, "left", 1);
-    T("\uC784\uC2DC (\uC774\uBC88 \uAD34\uC774)  4", rx + 18, top + 148, INK2);
-    const tmp = [["#b4b8bc", "?"], ["#b4b8bc", "?"], ["#b4b8bc", "?"], ["#d05040", "?"]];
-    tmp.forEach(([col, m], i) => badge(rx + 18 + i * 64, top + 174, col, m));
-    for (let i = 4; i < 8; i++) c.drawImage(img.kit_slot, rx + 18 + (i - 4) * 64, top + 240, 56, 56);
-    nine("row", rx + 18, top + 310, 292, 140, 2);
-    T("\uD0C4 +1", rx + 34, top + 322, GOLD);
-    T("\uACF5\uC6A9 \uD37D \xB7 \uC0AC\uACA9", rx + 296, top + 322, DIM, 11, "right", 1);
-    T("\uAE30\uBCF8 \uC0AC\uACA9\uC774 \uD55C \uBC88\uC5D0", rx + 34, top + 352, INK2);
-    T("\uB450 \uBC1C \uB098\uAC04\uB2E4.", rx + 34, top + 380, INK2);
-    T("\uD37D \uADF8\uB9BC\uC740 \uBBF8\uC815(\uCE74\uB4DC\xB7\uBC43\uC9C0 \uB514\uC790\uC778 \uD6C4 \uAD50\uCCB4)", rx + 34, top + 420, DIM, 11, "left", 1);
-    T("Tab \uB2EB\uAE30 \xB7 \uBC29\uD5A5\uD0A4 \uCE78 \uC774\uB3D9 \xB7 E \uC790\uC138\uD788", X + WW / 2, Y + HH - 26, DIM, 11, "center", 1);
+    const cy = ry + 70, ch = HH - 120;
+    nine("row", rx, cy, rw, ch, 2);
+    if (TAB === "skill") {
+      const sk = [["attack", "\uC57D\uACF5"], ["attack", "\uAC15\uACF5"], ["shoot", "\uC0AC\uACA9"], ["shoot", "\uCDA9\uC804"], ["unique", "\uACE0\uC720"], ["ult", "\uD544\uC0B4"]];
+      sk.forEach(([ic, n], i) => {
+        const sx = rx + 40 + i % 3 * 210, sy = cy + 36 + Math.floor(i / 3) * 140;
+        slot(sx, sy, 96);
+        c.drawImage(img["touch_" + ic], sx + 20, sy + 20, 56, 56);
+        T(n, sx + 48, sy + 104, i === 2 ? GOLD : INK2, 22, "center");
+        if (i === 2) {
+          c.strokeStyle = GOLD;
+          c.lineWidth = 3;
+          c.strokeRect(sx - 4, sy - 4, 104, 104);
+        }
+      });
+      T("\uC0AC\uACA9", rx + 40, cy + 340, GOLD, 33);
+      T("\uAD8C\uCD1D \uC5F0\uC0AC. \uC624\uB798 \uC3D8\uBA74 \uACFC\uC5F4\uB41C\uB2E4.", rx + 40, cy + 390, INK2);
+    } else if (TAB === "item") {
+      T("\uD035\uCE78", rx + 40, cy + 24, DIM);
+      ["medkit", "flash", "flash", "energy"].forEach((k, i) => {
+        const sx = rx + 40 + i * 104, sy = cy + 58;
+        slot(sx, sy, 88);
+        c.drawImage(img["item_" + k], sx + 16, sy + 16, 56, 56);
+        c.drawImage(img["key_" + (i + 1)], sx - 6, sy - 8, 26, 26);
+      });
+      T("\uAC00\uBC29", rx + 40, cy + 176, DIM);
+      T("4 / 12", rx + rw - 40, cy + 176, DIM, 22, "right");
+      const bag = ["bandage", "antidote", "salt", "ammo"];
+      for (let i = 0; i < 12; i++) {
+        const sx = rx + 40 + i % 6 * 100, sy = cy + 210 + Math.floor(i / 6) * 100;
+        slot(sx, sy, 88);
+        if (bag[i]) c.drawImage(img["item_" + bag[i]], sx + 16, sy + 16, 56, 56);
+      }
+    } else {
+      const card = (x, y, w, h, rim, name, on = false) => {
+        nine("slot", x, y, w, h, 2);
+        c.fillStyle = rim;
+        c.fillRect(x + 12, y + 12, w - 24, 4);
+        c.fillStyle = "#10141a";
+        c.fillRect(x + 16, y + 22, w - 32, h - 78);
+        T("\uADF8\uB9BC", x + w / 2, y + (h - 56) / 2, "#3a424a", 22, "center");
+        T(name, x + w / 2, y + h - 46, on ? GOLD : INK2, 22, "center");
+        if (on) {
+          c.strokeStyle = GOLD;
+          c.lineWidth = 3;
+          c.strokeRect(x - 4, y - 4, w + 8, h + 8);
+        }
+      };
+      T("\uACE0\uC720", rx + 40, cy + 22, GOLD);
+      card(rx + 40, cy + 56, 150, 200, GOLD, "\uC900\uBE44\uB41C \uC0AC\uC218");
+      T("\uC774\uBC88 \uAD34\uC774", rx + 230, cy + 22, DIM);
+      const tmp = [["#b4b8bc", "\uD0C4 +1"], ["#b4b8bc", "3\uB2E8 \uC810\uD504"], ["#b4b8bc", "\uCCB4\uB825 +"], ["#d05040", "\uBB34\uBAA8\uD568"]];
+      tmp.forEach(([col, n], i) => card(rx + 230 + i % 2 * 170, cy + 56 + Math.floor(i / 2) * 214, 150, 200, col, n, i === 0));
+      T("\uD0C4 +1", rx + 40, cy + 300, GOLD, 33);
+      T("\uC0AC\uACA9\uC774 \uB450 \uBC1C", rx + 40, cy + 346, INK2);
+      T("\uB098\uAC04\uB2E4.", rx + 40, cy + 378, INK2);
+    }
   }
   main();
 })();
