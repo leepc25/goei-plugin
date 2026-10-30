@@ -244,7 +244,7 @@ export class FighterPlayer extends Player {
       this.shield -= cut;
       taken -= cut;
       world.emit({ type: 'hurt', x: this.x, dmg: cut, hp: this.hp });
-      if (this.shield > 0) { P.armorT = 0.28; return { kind: 'armor' }; }
+      if (this.shield > 0) { P.armorT = 0.28; (P as { armorC?: string }).armorC = '#5ab8ff'; return { kind: 'armor' }; }   // 슈퍼아머 번쩍과 같고 색만 하늘색
       // 방어막이 깨짐: 잠깐 휘청 (남은 피해는 체력으로)
       this.core.stun();
       P.stunT = 0.8;

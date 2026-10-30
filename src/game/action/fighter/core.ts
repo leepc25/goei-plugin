@@ -747,7 +747,7 @@ function takeHit(kind?: Json) {
   if (P.mode === 'air') { P.airAtk = false; P.spin = 0; }
   if (P.inv > 0) { fx.push({ k: 'num', x: P.x, y: P.y - 230, v: '회피', t: 0.6 }); return; }
   if (P.mode === 'block') { sfx('guard'); shake = 4; if (!vfx('guard_block', P.x + P.face * 50 * K(P.y), P.y - 140 * K(P.y), 2.2, { flip: P.face < 0 })) sparks(P.x + P.face * 50, P.y - 140, 8, false, '#9fd0ff'); pushP(-200, 1200); return; }
-  if (armored()) { gainSp(5); sfx('armor'); P.armorT = 0.28; hitstop = 0.06; shake = 6; return; }
+  if (armored()) { gainSp(5); sfx('armor'); P.armorT = 0.28; P.armorC = ''; hitstop = 0.06; shake = 6; return; }
   if (P.mode === 'charge') P.charge = 0;
   if (kind === 'knock') return knock();
   if (kind === 'low') return hitAs('18_1', -300, 12, 0.09);
@@ -1192,7 +1192,7 @@ function drawPlayer() {
   if (vis > 0.05) shadow(P.x + fx0, P.y, P.z + lift * kk, Math.min(80, ft[1]), kk * Math.max(0.3, vis), air ? 0 : groundBase(id, a, f) - contact, Math.min(10, ft[3] || 0));
   if (vis <= 0.01) return;
   let tint: Json = null;
-  if (P.armorT > 0) tint = { c: '#ff2a2a', over: 0.35 * (P.armorT / 0.28) };
+  if (P.armorT > 0) tint = { c: P.armorC || '#ff2a2a', over: 0.35 * (P.armorT / 0.28) };   // armorC: 방어막에 맞으면 하늘색(fighter/player.ts)
   else if (armored() && showArmor) tint = { c: 'rgba(255,60,40,.55)', over: 0 };
   else if (P.healT > 0) tint = { c: '#7dff8a', over: 0.35 * P.healT, noEdge: true };
   else if (P.buffT > 0 && P.buffEdge) tint = { c: P.buffC || CH.color, over: 0, ea: 0.5 + 0.3 * Math.sin(P.t * 8) };   // 버프: 몸 테두리만(둘레 기운 없음)
