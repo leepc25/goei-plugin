@@ -26,9 +26,9 @@ export interface ActorDef {
   /** 몹 원형 이름 (mobs.ts ARCHETYPES) */
   archetype?: string;
 }
-export type Act = 'idle' | 'walk' | 'pause' | 'door' | 'do' | 'notice' | 'post' | 'watch' | 'argue' | 'down' | 'scared' | 'gone';
+export type Act = 'idle' | 'walk' | 'pause' | 'dead' | 'door' | 'do' | 'notice' | 'post' | 'watch' | 'argue' | 'down' | 'scared' | 'gone';
 /** 걸어서 닿은 뒤 할 일 */
-type Plan = 'none' | 'do' | 'post' | 'exit' | 'steal' | 'harass' | 'chase' | 'patrol' | 'roam-post';
+type Plan = 'none' | 'do' | 'post' | 'exit' | 'steal' | 'harass' | 'chase' | 'patrol' | 'roam-post' | 'cordon';
 
 export interface Actor {
   def: ActorDef;
@@ -97,6 +97,12 @@ export interface Actor {
   detour?: { x: number; y: number }[];
   buddy?: string;
   buddyDy?: number;
+  /** 겁먹은 까닭이 있는 자리 x (시체 등). 없으면 주인공 */
+  scareFrom?: number;
+  /** 시체를 이미 봤다 (한 번만 반응) */
+  sawBody?: boolean;
+  /** 죽은 게임 시각(시간 누계) */
+  diedAt?: number;
 }
 
 /** 길에 놓인 막힌 곳 (폴리스 라인·부서진 물건 등). wall = 길을 위아래 끝까지 막음 → 돌아섬 */
@@ -145,7 +151,13 @@ export type SimEvent =
   | { kind: 'shift'; scene: string; who: string; on: boolean }
   | { kind: 'hurt'; scene: string; who: string; named: boolean; faction?: string; x: number; down: boolean }
   /** 기절한 몹이 떨어뜨린 돈 (불량배·취객·소매치기) */
-  | { kind: 'drop'; scene: string; who: string; amount: number; stolen: number; x: number };
+  | { kind: 'drop'; scene: string; who: string; amount: number; stolen: number; x: number }
+  /** NPC 사망 (살해 허용일 때만). 시체는 장면에 남고 경찰이 1시간 뒤 수습 */
+  | { kind: 'kill'; scene: string; who: string; x: number }
+  /** 시체를 본 사람: 신고(용감) */
+  | { kind: 'report'; scene: string; who: string; x: number }
+  /** 경찰이 시체를 수습함 */
+  | { kind: 'cleared'; scene: string; n: number };
 
 export interface SimOptions {
   spawns?: SpawnRule[];
@@ -156,11 +168,21 @@ export interface SimOptions {
   sceneFaction?: (scene: string) => string | null;
   /** 세력 평판 구간 (인물 기록 factions()). 몹의 첫 반응을 정한다 (8-6장) */
   stance?: (faction: string) => 'friendly' | 'favorable' | 'neutral' | 'wary' | 'hostile' | null;
+  /** 설정 「필드에서 NPC 살해 허용」 (기본 끔: 체력 0 = 기절) */
+  killOk?: () => boolean;
 }
 
 const WALK = 150;
 const MARGIN = 60;
 const NOTICE_PX = 280;
+/** 한 장면에 남는 시체 상한 (넘치면 오래된 것부터 치움) */
+export const CORPSE_MAX = 5;
+/** 시체 수습까지 게임 시간 (시간) */
+export const CLEAR_HOURS = 1;
+/** 수습 뒤 「사건 현장」으로 사람이 덜 들어오는 게임 시간 (시간) */
+export const INCIDENT_HOURS = 24;
+/** 시체를 알아보는 거리 */
+const SEE_BODY_PX = 260;
 /** 소란도 단계 문턱 (0~100 → 0~3) */
 export const UPROAR_STEPS = [20, 50, 80];
 let serial = 0;
@@ -184,7 +206,15 @@ export class WorldSim {
     this.has = o.has ?? (() => false);
     this.sceneFaction = o.sceneFaction ?? (() => null);
     this.stance = o.stance ?? (() => null);
+    this.killOk = o.killOk ?? (() => false);
   }
+  private killOk: () => boolean;
+  /** 게임 시간 누계(시간). 필드 시계가 움직인 만큼만 흐른다 (시계 없으면 실시간 3분 = 1시간) */
+  gameH = 0;
+  /** 경찰이 와서 라인을 친 장면 */
+  private cordoned = new Set<string>();
+  /** 사건 현장: 수습한 게임 시각 */
+  private sites = new Map<string, number>();
   private sceneFaction: (scene: string) => string | null;
   private stance: (faction: string) => 'friendly' | 'favorable' | 'neutral' | 'wary' | 'hostile' | null;
   /** 몹의 소속: 경비·직원(근무형·staff·guard)은 장면 소속, 나머지는 없음 */
@@ -250,13 +280,18 @@ export class WorldSim {
     return a;
   }
   /** 전투에서 돌아옴. down = 쓰러뜨림(기절 → 깨면 떠남), 아니면 싸움이 끊긴 것(주인공이 장면을 떠남 등) */
-  fromFight(id: string, x: number, y: number, down: boolean): void {
+  fromFight(id: string, x: number, y: number, down: boolean | 'dead' | 'deadLying'): void {
     const a = this.actors.find((q) => q.def.id === id);
     if (!a || !a.fighting) return;
     a.fighting = false;
     a.x = x;
     a.y = y;
     a.plan = 'none';
+    if (down === 'dead' || down === 'deadLying') {
+      a.hp = 0;
+      this.kill(a, down === 'deadLying', true);
+      return;
+    }
     if (down) {
       a.hp = 0;
       this.struck(a, a.face);
@@ -306,6 +341,7 @@ export class WorldSim {
   hitBoxes(scene: string, boxes: HitBox[], dir: 1 | -1): Actor[] {
     const out: Actor[] = [];
     for (const a of this.inScene(scene)) {
+      if (a.act === 'dead') continue;
       for (const b of boxes) {
         if (a.hitBy === b.attackId) continue;
         if (a.x + 30 < b.x0 || a.x - 30 > b.x1 || Math.abs(a.y - b.y) > (b.dy ?? 18) + 14 || b.z0 > 200) continue;
@@ -322,8 +358,14 @@ export class WorldSim {
   hitActor(id: string, dir: 1 | -1, attackId: number, dmg = 12): boolean {
     const a = this.actors.find((q) => q.def.id === id);
     if (!a || a.act === 'gone' || a.act === 'door' || a.hitBy === attackId) return false;
-    // 이미 기절해 쓰러진 몹은 더 때려도 반응하지 않는다
-    if (a.def.kind === 'mob' && (a.hp ?? 1) <= 0) return false;
+    if (a.act === 'dead') return false;
+    // 이미 기절해 쓰러진 몹: 살해 허용이면 더 때려 죽일 수 있다(누운 채 사망 45), 아니면 반응 없음
+    if (a.def.kind === 'mob' && (a.hp ?? 1) <= 0) {
+      if (!this.killOk()) return false;
+      a.hitBy = attackId;
+      this.kill(a, true);
+      return true;
+    }
     a.hitBy = attackId;
     if (a.def.kind === 'mob' && a.hp !== undefined) a.hp = Math.max(0, a.hp - dmg);
     this.struck(a, dir);
@@ -336,7 +378,8 @@ export class WorldSim {
     a.face = (-dir) as 1 | -1;
     a.goal = null;
     a.route = [];
-    // 몹: 체력이 바닥나면 기절(쓰러져 오래 누움), 아니면 휘청
+    // 몹: 체력이 바닥나면 기절(쓰러져 오래 누움), 아니면 휘청. 살해 허용이면 사망(선 채 44)
+    if (a.def.kind === 'mob' && (a.hp ?? 1) <= 0 && this.killOk()) return this.kill(a, false);
     const down = a.def.kind === 'mob' && (a.hp ?? 1) <= 0;
     if (down && a.pocket && (DROPS.has(a.def.archetype ?? '') || a.stolen)) {
       this.events.push({ kind: 'drop', scene: a.scene, who: a.def.name, amount: a.pocket, stolen: a.stolen ?? 0, x: a.x });
@@ -382,7 +425,10 @@ export class WorldSim {
   /** 생활 시간을 dt초 진행. player = 보이는 장면과 주인공 발, hour = 필드 시(모르면 null) */
   step(dt: number, player?: { scene: string; x: number; y?: number; hour?: number | null; seat?: number | null; armed?: boolean; face?: number }): void {
     this.time += dt;
-    this.hour = player?.hour ?? null;
+    const h = player?.hour ?? null;
+    if (h != null && this.hour != null) this.gameH += (h - this.hour + 24) % 24;
+    else if (h == null) this.gameH += dt / 180;
+    this.hour = h;
     this.player = player ? { scene: player.scene, x: player.x, y: player.y ?? 0, seat: player.seat ?? null, armed: !!player.armed, face: player.face ?? 1 } : null;
     for (const [s, u] of this.uproar) {
       u.v = Math.max(0, u.v - (player?.scene === s ? 1.5 : 5) * dt);
@@ -390,6 +436,7 @@ export class WorldSim {
     }
     for (const a of [...this.actors]) if (!a.fighting) this.stepActor(a, dt);
     for (let i = this.actors.length - 1; i >= 0; i--) if (this.actors[i].act === 'gone') this.actors.splice(i, 1);
+    this.stepCorpses();
     for (const r of this.spawns) this.stepSpawn(r, dt);
     for (const p of this.posts) this.stepPost(p);
   }
@@ -428,20 +475,23 @@ export class WorldSim {
   private stepActor(a: Actor, dt: number): void {
     if (a.iconT > 0 && (a.iconT -= dt) <= 0) a.icon = undefined;
     if (a.sayT > 0 && (a.sayT -= dt) <= 0) a.say = undefined;
+    if (a.act === 'dead') return;
     if (a.noticeCd > 0) a.noticeCd -= dt;
     if (a.needs) decayNeeds(a.needs, dt, TEMPER[a.def.name], onDuty(this.hour, TEMPER[a.def.name]));
     if (a.def.kind === 'mob') this.mobThink(a, dt);
     if (a.def.kind === 'named') this.namedNotice(a);
     if (a.def.kind === 'mob') this.threatened(a, dt);
+    this.seeBody(a);
     switch (a.act) {
       // 겁에 질림(무기를 들이밀었을 때): 주저앉아 있다가 뒤로 기거나, 뒷걸음질 친 뒤 달아난다
       case 'scared': {
         a.wait -= dt;
-        if (a.scare === 'backoff' && this.player) a.x += Math.sign(a.x - this.player.x || 1) * 55 * dt;
+        const src = a.scareFrom ?? this.player?.x;
+        if (a.scare === 'backoff' && src !== undefined) a.x += Math.sign(a.x - src || 1) * 55 * dt;
         // 얼어붙음: 주인공이 무기를 거두거나 떠날 때까지 주저앉은 채 꼼짝 못 함
-        if (a.scare === 'freeze' && this.player?.armed && this.player.scene === a.scene) { a.wait = Math.max(a.wait, 0.5); return; }
+        if (a.scare === 'freeze' && a.scareFrom === undefined && this.player?.armed && this.player.scene === a.scene) { a.wait = Math.max(a.wait, 0.5); return; }
         if (a.wait > 0) return;
-        const from = this.player?.x ?? a.x;
+        const from = src ?? a.x;
         if (a.scare === 'sit' && this.canClip(a, 'crawl')) { this.flee(a, from, 'crawl', 0.35); return; }
         if (a.scare === 'cower' && this.canClip(a, 'scramble')) { this.flee(a, from, 'scramble', 0.6); return; }
         this.flee(a, from);
@@ -710,6 +760,8 @@ export class WorldSim {
       case 'exit':
         a.act = 'gone';
         return;
+      case 'cordon':
+        return this.arriveCordon(a);
       case 'steal':
         return this.doSteal(a);
       case 'harass':
@@ -970,6 +1022,158 @@ export class WorldSim {
   }
   /** 무기를 들이밀면(주인공이 무기를 꺼내 3m 안에서 이쪽을 봄) 겁 반응 — 동작은 그 인물에게 있는 줄만(없으면 비슷한 줄로).
    * 용기 낮음: 놀라 주저앉았다가 뒤로 기어 도망 · 보통: 뒷걸음질 → 달아나기 · 높음: 불량배는 맞서고, 그 밖은 화내고 비켜 감. 근무형·경찰·경비는 겁먹지 않음 */
+  // ── 사망·시체 (10-30) ──
+
+  /** 장면의 시체 */
+  corpses(scene: string): Actor[] {
+    return this.actors.filter((a) => a.scene === scene && a.act === 'dead');
+  }
+  /** 사건 현장 표시 (수습 뒤 INCIDENT_HOURS 동안) */
+  incident(scene: string): boolean {
+    const t = this.sites.get(scene);
+    return t !== undefined && this.gameH - t < INCIDENT_HOURS;
+  }
+  /** 죽음: 선 채면 사망(44), 누워 있었으면 누운 채 사망(45). 시체로 남고 큰 범죄 → 경찰 출동, 한 명은 현장으로 */
+  private kill(a: Actor, lying: boolean, fromFight = false): void {
+    a.seat = undefined;
+    a.seatPick = undefined;
+    a.goal = null;
+    a.route = [];
+    a.detour = [];
+    a.hp = 0;
+    a.act = 'dead';
+    a.doing = '사망';
+    a.say = undefined;
+    a.icon = undefined;
+    a.diedAt = this.gameH;
+    // 그림: 사망 줄이 없으면 쓰러진 끝 장(19)으로
+    this.setClip(a, lying ? (this.canClip(a, 'dieLie') ? 'dieLie' : 'down') : this.canClip(a, 'die') ? 'die' : 'down');
+    if (fromFight) a.clipAt = this.time - 60;   // 전투 몸이 이미 쓰러지는 걸 틀었다 → 끝 장부터
+    for (const q of this.actors) if (q.buddy === a.def.id) q.buddy = undefined;
+    if (a.pocket && (DROPS.has(a.def.archetype ?? '') || a.stolen)) {
+      this.events.push({ kind: 'drop', scene: a.scene, who: a.def.name, amount: a.pocket, stolen: a.stolen ?? 0, x: a.x });
+      a.pocket = 0;
+      a.stolen = 0;
+    }
+    this.events.push({ kind: 'kill', scene: a.scene, who: a.def.name, x: a.x });
+    // 상한: 넘치면 오래된 시체부터 치움
+    const list = this.corpses(a.scene).sort((p, q) => (p.diedAt ?? 0) - (q.diedAt ?? 0));
+    for (let i = 0; i < list.length - CORPSE_MAX; i++) list[i].act = 'gone';
+    this.crime(a.scene, a.x, 60);
+    this.dispatchCordon(a.scene, a.x, a.y);
+  }
+  /** 현장 경찰(거리)·경비(실내) 한 명: 시체로 가서 라인을 치고 수습까지 지킨다. 이미 있으면 안 부름 */
+  private dispatchCordon(scene: string, x: number, y: number): void {
+    if (this.actors.some((q) => q.scene === scene && q.plan === 'cordon')) return;
+    const len = this.graph.scene(scene)?.length ?? 1280;
+    const arch = this.graph.kind(scene) === 'street' ? '경찰' : '경비';
+    const gate = Math.abs(x - 30) > Math.abs(x - (len - 30)) ? len - 30 : 30;
+    const [top, bot] = this.graph.lane(scene);
+    const c = this.add({ id: `mob${++serial}`, name: arch, kind: 'mob', brain: 'transit', home: scene, archetype: arch, look: arch, speed: 170 }, { scene, x: gate, y: this.laneMid(scene) });
+    c.run = 1.3;
+    const side = x > gate ? -1 : 1;
+    this.walkTo(c, { x: x + side * 110, y: Math.max(top + 10, Math.min(bot - 10, y + 40)) }, '현장으로 가는 중', 'cordon');
+  }
+  /** 라인 묶기: 가까운 시체끼리 하나로 (시체 둘레 앞뒤·좌우로 라바콘) */
+  private cordonBoxes(scene: string): Obstacle[] {
+    const [top, bot] = this.graph.lane(scene);
+    const boxes = this.corpses(scene).map((c) => ({ x0: c.x - 75, x1: c.x + 75, y0: Math.max(top, c.y - 30), y1: Math.min(bot, c.y + 22) }));
+    let merged = true;
+    while (merged) {
+      merged = false;
+      for (let i = 0; i < boxes.length && !merged; i++) for (let j = i + 1; j < boxes.length && !merged; j++) {
+        const p = boxes[i], q = boxes[j];
+        if (p.x0 - 20 < q.x1 && q.x0 - 20 < p.x1 && p.y0 - 20 < q.y1 && q.y0 - 20 < p.y1) {
+          boxes[i] = { x0: Math.min(p.x0, q.x0), x1: Math.max(p.x1, q.x1), y0: Math.min(p.y0, q.y0), y1: Math.max(p.y1, q.y1) };
+          boxes.splice(j, 1);
+          merged = true;
+        }
+      }
+    }
+    return boxes.map((b, i) => ({ id: `cordon${i}`, ...b }));
+  }
+  private setCordon(scene: string): void {
+    for (const b of this.obstacles(scene).filter((o) => o.id.startsWith('cordon'))) this.setObstacle(scene, null, b.id);
+    if (!this.cordoned.has(scene)) return;
+    for (const b of this.cordonBoxes(scene)) this.setObstacle(scene, b);
+  }
+  /** 매 틱: 현장 경찰 도착 → 라인, 1시간 지난 시체 수습, 다 치우면 라인 걷고 경찰 떠남, 사건 현장 표시 */
+  private stepCorpses(): void {
+    const scenes = new Set(this.actors.filter((a) => a.act === 'dead' || a.plan === 'cordon').map((a) => a.scene));
+    for (const sc of [...this.cordoned]) scenes.add(sc);
+    for (const sc of scenes) {
+      const bodies = this.corpses(sc);
+      // 시체가 있는 동안은 소란이 가라앉지 않는다
+      if (bodies.length) this.uproar.set(sc, { v: Math.max(this.uproar.get(sc)?.v ?? 0, 80), x: bodies[0].x });
+      const old = bodies.filter((b) => this.gameH - (b.diedAt ?? 0) >= CLEAR_HOURS);
+      if (old.length) {
+        for (const b of old) b.act = 'gone';
+        this.events.push({ kind: 'cleared', scene: sc, n: old.length });
+      }
+      if (this.corpses(sc).length) {
+        if (this.cordoned.has(sc) && old.length) this.setCordon(sc);
+        continue;
+      }
+      // 다 치움: 라인 걷고 현장 경찰은 떠난다
+      if (old.length || this.cordoned.has(sc)) this.sites.set(sc, this.gameH);
+      this.cordoned.delete(sc);
+      this.setCordon(sc);
+      for (const q of this.actors.filter((x) => x.scene === sc && x.plan === 'cordon')) {
+        const len = this.graph.scene(sc)?.length ?? 1280;
+        q.exitAt = { x: q.x < len / 2 ? 30 : len - 30, y: q.y };
+        q.run = 1;
+        this.walkTo(q, q.exitAt, '현장 정리 끝', 'exit');
+      }
+    }
+  }
+  /** 현장 경찰이 도착: 라인을 치고 지킨다 */
+  private arriveCordon(a: Actor): void {
+    a.act = 'watch';
+    a.doing = '현장 통제';
+    a.wait = 1e9;
+    a.run = 1;
+    a.face = (this.corpses(a.scene).some((b) => b.x > a.x) ? 1 : -1);
+    this.setClip(a, 'idle');
+    this.cordoned.add(a.scene);
+    this.setCordon(a.scene);
+  }
+  /** 시체를 봄 (경찰·경비·현장 사람 빼고, 한 번만): 겁 많으면 겁 반응·도망, 중간이면 놀라 피해 감, 용감하면 신고 */
+  private seeBody(a: Actor): void {
+    if (a.sawBody || a.fighting || a.post || a.def.kind !== 'mob' || !['walk', 'idle', 'pause'].includes(a.act) || a.plan === 'chase' || a.plan === 'cordon') return;
+    const role = ARCHETYPES[a.def.archetype ?? '']?.role;
+    if (role === 'police' || role === 'guard') return;
+    const b = this.actors.find((q) => q.act === 'dead' && q.scene === a.scene && Math.abs(q.x - a.x) < SEE_BODY_PX && Math.abs(q.y - a.y) < 140);
+    if (!b) return;
+    a.sawBody = true;
+    a.buddy = undefined;
+    const c = a.temper?.courage ?? 0.3;
+    this.iconOn(a, '!', 2);
+    if (c < 0.4) return this.scareAt(a, b.x, b.x);
+    if (c < 0.7 || this.cordoned.has(a.scene)) {
+      // 놀라서 현장을 피해 돌아감
+      a.act = 'scared';
+      a.scare = 'run';
+      a.scareFrom = b.x;
+      a.goal = null;
+      a.wait = 1.2;
+      a.doing = '놀람';
+      a.face = b.x > a.x ? 1 : -1;
+      this.setClip(a, this.canClip(a, 'surprise') ? 'surprise' : 'idle');
+      return;
+    }
+    // 용감: 신고 (경찰이 아직 없으면 현장 경찰을 부른다), 그 뒤 피해 감
+    a.act = 'scared';
+    a.scare = 'run';
+    a.scareFrom = b.x;
+    a.goal = null;
+    a.wait = 3;
+    a.doing = '신고 중';
+    a.face = b.x > a.x ? 1 : -1;
+    this.setClip(a, this.canClip(a, 'call') ? 'call' : this.canClip(a, 'phone') ? 'phone' : 'surprise');
+    this.events.push({ kind: 'report', scene: a.scene, who: a.def.name, x: b.x });
+    this.dispatchCordon(a.scene, b.x, b.y);
+  }
+
   private threatened(a: Actor, dt: number): void {
     if (a.scareCd && (a.scareCd -= dt) > 0) return;
     const p = this.player;
@@ -989,6 +1193,14 @@ export class WorldSim {
       this.setClip(a, this.canClip(a, 'angry') ? 'angry' : 'idle');
       return;
     }
+    this.scareAt(a, p.x);
+  }
+  /** 겁에 질림: from = 겁나게 한 것의 x (무기 든 주인공·시체) */
+  private scareAt(a: Actor, from: number, why?: number): void {
+    const c = a.temper?.courage ?? 0.3;
+    const dx = a.x - from;
+    a.scareFrom = why;
+    a.goal = null;
     a.act = 'scared';
     a.face = dx > 0 ? -1 : 1;
     // 도망도 사람마다: 용기가 낮을수록 얼어붙거나 기어서, 높을수록 뒷걸음질·뛰어서. 같은 용기라도 무작위로 갈림
@@ -1163,8 +1375,11 @@ export class WorldSim {
   private stepSpawn(r: SpawnRule, dt: number): void {
     const night = this.isNight();
     const lvl = this.uproarLevel(r.scene);
-    const want = Math.max(0, (night ? r.target.night : r.target.day) - lvl); // 소란이 크면 덜 들어온다
-    const have = this.actors.filter((a) => a.def.kind === 'mob' && a.def.brain === 'transit' && a.scene === r.scene && a.plan !== 'chase').length;
+    // 소란이 크면 덜 들어온다. 시체가 있거나 사건 현장(수습 뒤 하루)이면 더 덜
+    const inc = this.sites.get(r.scene);
+    const scared = this.corpses(r.scene).length ? 2 : inc !== undefined && this.gameH - inc < INCIDENT_HOURS ? 1 : 0;
+    const want = Math.max(0, (night ? r.target.night : r.target.day) - lvl - scared);
+    const have = this.actors.filter((a) => a.def.kind === 'mob' && a.def.brain === 'transit' && a.scene === r.scene && a.plan !== 'chase' && a.plan !== 'cordon' && a.act !== 'dead').length;
     if (have >= want) return void this.spawnT.delete(r.scene);
     const visible = this.player?.scene === r.scene;
     if (!visible) {

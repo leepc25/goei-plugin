@@ -166,7 +166,7 @@ function hqAdapter(bridge: Partial<GameBridge> | undefined, ui: { chooseFloor: H
   if (typeof window !== 'undefined') window.addEventListener('keydown', (e) => { if (e.key === 'F9' || e.key === '`') { observing = !observing; e.preventDefault(); } });
   const world = () => {
     if (!sim && ready) {
-      sim = createHqWorld(map, seed, present.filter((p) => ROOM_SCENE[p.room]).map((p) => ({ name: p.name, scene: ROOM_SCENE[p.room] })), hasCharClip, { stance: (f) => factionBy.get(f)?.stage ?? null });
+      sim = createHqWorld(map, seed, present.filter((p) => ROOM_SCENE[p.room]).map((p) => ({ name: p.name, scene: ROOM_SCENE[p.room] })), hasCharClip, { killOk: () => fighterHooks.killOk?.() ?? false, stance: (f) => factionBy.get(f)?.stage ?? null });
       chatter = new Chatter(sim, new Lines(dialogueData as unknown as DialogueData, sim.rng), lineCtx);
     }
     // 개발 도구·브라우저 시험: 세계를 들여다본다 (관찰 창과 같은 정보)
@@ -205,6 +205,12 @@ function hqAdapter(bridge: Partial<GameBridge> | undefined, ui: { chooseFloor: H
         (globalThis as { __goeiEngine?: { world?: { say(t: string, s: number): void } } }).__goeiEngine?.world?.say(`${e.amount.toLocaleString('en-US')}원을 주웠다`, 2);
         continue;
       }
+      // 살해: 장부에 무겁게 (보고서·모델이 받는다)
+      if (e.kind === 'kill') {
+        const sceneName = map.scenes.find((s) => s.id === e.scene)?.name ?? e.scene;
+        void b?.field?.record({ kind: 'kill', text: `${sceneName}에서 ${e.who}을(를) 죽였다`, scene: sceneName, weight: 3, visit: visitId }).catch(() => {});
+        continue;
+      }
       if (e.kind !== 'hurt') continue;
       if (!foughtHere) { foughtHere = true; if (fieldClock.sec !== null) fieldClock.sec += rules().fight * 60; }
       const w = sim;
@@ -232,7 +238,9 @@ function hqAdapter(bridge: Partial<GameBridge> | undefined, ui: { chooseFloor: H
   fighterHooks.extraTargets = () => {
     const w = sim;
     if (!w || !lifeScene) return [];
-    return w.inScene(lifeScene).filter((a) => a.act !== 'down').map((a) => ({
+    // 기절해 누운 몹은 살해 허용일 때만 맞힐 수 있다. 시체는 안 맞음
+    const kill = fighterHooks.killOk?.() ?? false;
+    return w.inScene(lifeScene).filter((a) => a.act !== 'dead' && (a.act !== 'down' || kill)).map((a) => ({
       x: a.x, y: a.y, z: 0,
       body: { id: -1, team: 'enemy', kind: 'npc', x: a.x, y: a.y, z: 0, dir: a.face, hp: Math.max(1, a.hp ?? 1), hpMax: a.hpMax ?? 1, alive: true, stop: 0, frame: () => ({ hit: [], hurt: [] }), step: () => {},
         // 몹은 등급 체력이 있다 (설계 2-3): 에일린 피해가 그대로 깎인다
@@ -270,6 +278,7 @@ function hqAdapter(bridge: Partial<GameBridge> | undefined, ui: { chooseFloor: H
       if ((flushT += dt) > 20) { flushT = 0; flushMobs(at.scene); }
     },
     lifeTime: () => sim?.time ?? 0,
+    cordons: (sceneId) => (world()?.obstacles(sceneId) ?? []).filter((o) => o.id.startsWith('cordon')),
     hit: (sceneId, boxes, dir) => world()?.hitBoxes(sceneId, boxes, dir).length ?? 0,
     actors: (sceneId) => (world()?.inScene(sceneId) ?? []).map((a) => {
       const st = a.seat ? world()?.graph.scene(sceneId)?.seats?.[a.seat.i] : undefined;
@@ -280,7 +289,7 @@ function hqAdapter(bridge: Partial<GameBridge> | undefined, ui: { chooseFloor: H
     // 몹: 인물 팩(look = 몹 그림 이름, src/game/world/mobs.ts looks) → 받는 동안·없으면 실루엣. 처음 보이는 그림은 그때 받는다
     drawMob: (c, a) => {
       if (a.look && !charArt(a.look)) void loadChar(a.look);
-      if (!(a.look && drawCharClip(c, a.look, a.x, a.y, a.face, performance.now(), a.clip, (a.since ?? 0) * 1000))) silhouette(c, a);
+      if (!(a.look && drawCharClip(c, a.look, a.x, a.y, a.face, (sim?.time ?? 0) * 1000, a.clip, (a.since ?? 0) * 1000))) silhouette(c, a);   // 생활 시각 기준(한 번 트는 클립·시체가 since 와 맞게)
     },
     combat: (api, sceneId) => combatStep(api, sceneId),
   };
@@ -308,7 +317,8 @@ function hqAdapter(bridge: Partial<GameBridge> | undefined, ui: { chooseFloor: H
       if (f.body.hp > 0) continue;
       if ((f.t += 1 / 30) < 1.5) continue;
       f.body.alive = false;
-      w.fromFight(id, f.body.x, f.body.y, true);
+      // 살해 허용이면 죽은 몸(44·45) → 필드 시체, 아니면 기절
+      w.fromFight(id, f.body.x, f.body.y, (f.body as unknown as FighterAi).killed ?? true);
       fights.delete(id);
     }
     for (const a of w.challengers(sceneId)) {
@@ -471,6 +481,8 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
     save: (t) => { uiPrefs.save(t); localStore.save(t); },
   } : undefined;
   let fieldShop: FieldShop | null = null;
+  // 필드 NPC 살해 허용 (설정): 전투 몸·필드 행위자가 함께 본다
+  fighterHooks.killOk = () => shell.settings.npcKill;
   const shell = mountGameShell(box, {
     synth: true,
     bag: { available: () => !!game?.inHub && !!fieldShop, open: () => fieldShop?.openBag() },

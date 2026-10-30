@@ -122,7 +122,7 @@ export const FIELD_CLIP: Record<string, { ids: string[]; fps?: number; loop?: bo
   // 걷다 잠깐 멈춰 하는 일(10-30 사람처럼 걷기, world/actors.ts PAUSES): 그 줄이 있는 인물만
   phone: { ids: ['147'], fps: 5 }, call: { ids: ['116'], fps: 5 }, coffee: { ids: ['142'], fps: 5 }, limber: { ids: ['143'], fps: 6, loop: false }, music: { ids: ['151'], fps: 6 },
   smoke: { ids: ['145', '90'], fps: 5 }, browse: { ids: ['168'], fps: 4 }, snack: { ids: ['157'], fps: 6 }, front: { ids: ['50'], fps: 1 / 0.6 }, back: { ids: ['57'], fps: 1 / 0.6 }, spot: { ids: ['33'], fps: 8, loop: false },
-  down: { ids: ['19'], fps: 10, loop: false }, getup: { ids: ['20'], fps: 9, loop: false },
+  down: { ids: ['19'], fps: 10, loop: false }, die: { ids: ['44'], fps: 9, loop: false }, dieLie: { ids: ['45'], fps: 6, loop: false }, getup: { ids: ['20'], fps: 9, loop: false },
   sit: { ids: ['60', '96', '61'], fps: 1 / 0.6 }, lie: { ids: ['76', '75'], fps: 4 },
 };
 /** 그 인물에게 그 클립 그림이 있나 (받아 둔 인물만 참). 필드 세계는 그림 있는 행동만 켠다 */

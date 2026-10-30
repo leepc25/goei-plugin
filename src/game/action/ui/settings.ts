@@ -39,6 +39,10 @@ export interface UiSettings {
   /** 시간 보내기 선택지 짧게·길게 (분) */
   tWaitShort: number;
   tWaitLong: number;
+  /** 사망 처리 (docs/설계_출동루프_3판.md 2-8, 10-30): 영구 사망(보고서 「사망」) · 패퇴(후송, 「부상·후송」) */
+  deathMode: 'perma' | 'evac';
+  /** 필드에서 NPC 살해 허용 (docs/필드_기능_설계.md: 끔 = 체력 0이면 기절, 켬 = 사망·시체) */
+  npcKill: boolean;
 }
 
 export const DEFAULT_SETTINGS: UiSettings = {
@@ -66,6 +70,8 @@ export const DEFAULT_SETTINGS: UiSettings = {
   tFight: 10,
   tWaitShort: 30,
   tWaitLong: 60,
+  deathMode: 'perma',
+  npcKill: false,
 };
 
 export interface SettingsStore {

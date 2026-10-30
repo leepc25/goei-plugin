@@ -43,7 +43,7 @@ const REACT: Record<string, { react: React; push: number; lift: number; strength
 };
 
 /** 다른 모듈이 붙이는 곳. sfx: 효과음. extraTargets: 전투 몸이 아닌 필드 행위자도 때릴 수 있게 (src/game/world, 엔진 modules가 채운다) */
-export const fighterHooks: { sfx: (e: Record<string, unknown>) => void; extraTargets?: () => { body: Body; x: number; y: number; z: number }[]; openDraft?: (p: FighterPlayer, offers: Offer[]) => void } = { sfx: () => {} };
+export const fighterHooks: { sfx: (e: Record<string, unknown>) => void; extraTargets?: () => { body: Body; x: number; y: number; z: number }[]; openDraft?: (p: FighterPlayer, offers: Offer[]) => void; killOk?: () => boolean } = { sfx: () => {} };
 
 type Core = ReturnType<typeof createFighterCore>;
 
@@ -305,8 +305,12 @@ export class FighterPlayer extends Player {
       if (P.dodging && this.perks.reflectOnDodge() && !this.attackerOf(hit)) this.core.perkApi.reflect(hit.dmg, this.perks.reflectSplit());
       return { kind: 'immune' };
     }
-    // 누운 몸도 맞는다(10-30 사용자: 모든 상황에서 공격을 받음) → 움찔(43). 체력 0으로 쓰러진 몸은 사망 처리가 정해질 때까지 그대로
-    if (this.phase === 'down') return { kind: 'immune' };
+    // 누운 몸도 맞는다(10-30 사용자: 모든 상황에서 공격을 받음) → 움찔(43).
+    // 체력 0으로 쓰러진(기절) NPC 몸: 살해 허용이면 더 맞아 누운 채 사망(45), 아니면 그대로. 죽은 몸은 안 맞음
+    if (this.phase === 'down') {
+      if (this.team !== 'player' && !this.killed && fighterHooks.killOk?.()) { this.dieNow(true); return { kind: 'hit', killed: true }; }
+      return { kind: 'immune' };
+    }
     const lying = P.mode === 'down' || P.mode === 'belly';
     const front = hit.dir === -P.face;
     if (P.mode === 'block' && front) {
@@ -367,6 +371,10 @@ export class FighterPlayer extends Player {
       this.lowWarned = true;
       world.emit({ type: 'hp:low' });
     }
+    if (this.hp <= 0 && this.team !== 'player' && fighterHooks.killOk?.()) {
+      this.dieNow(lying);
+      return { kind: 'hit', killed: true };
+    }
     if (this.hp <= 0) {
       if (lying) this.core.takeHit('hit'); else this.core.knock();
       this.phase = 'down';
@@ -381,6 +389,18 @@ export class FighterPlayer extends Player {
     const kind = hit.blow ? 'push' : hit.react === 'launch' ? (noKnock ? 'low' : 'launch') : hit.react === 'down' ? (noKnock ? 'low' : 'knock') : hit.react === 'stagger' ? 'low' : 'hit';
     this.core.takeHit(kind);
     return { kind: 'hit' };
+  }
+
+  /** NPC 사망 (살해 허용): 선 채 44 · 누워서 45, 그 줄이 없으면 쓰러지기. killed = 'dead' | 'deadLying' (필드 시체로 넘길 때 씀) */
+  killed: 'dead' | 'deadLying' | null = null;
+  private dieNow(lying: boolean): void {
+    this.hp = 0;
+    this.phase = 'down';
+    this.killed = lying ? 'deadLying' : 'dead';
+    if (this.core.has(lying ? '45' : '44')) {
+      if (lying) this.core.P.mode = 'down';
+      this.core.die();
+    } else if (!lying) this.core.knock();
   }
 
   /** 이 공격을 한 근접 상대 (앞 220px 안, 같은 줄). 없으면 투사체로 본다 */

@@ -431,3 +431,67 @@ test('겁 반응: 무기를 들이밀면 용기에 따라 얼어붙기·주저�
   s2.step(1 / 30, { scene: 'jongno', x: 1000, y: 560, armed: true, face: -1 });
   assert.notEqual(m2.act, 'scared');
 });
+
+test('사망·시체: 살해 허용이면 체력 0에서 사망(44)·기절한 몸을 더 때리면 누운 채 사망(45), 시체는 장면에 남고 경찰이 와서 라바콘 라인, 1시간 뒤 수습·사건 현장', () => {
+  let kill = false;
+  const sim = new A.WorldSim(graph(), R.mulberry32(8), { killOk: () => kill, has: (_l, c) => ['die', 'dieLie', 'walk', 'call', 'surprise', 'idle'].includes(c) });
+  const at = (id, x) => sim.add({ id, name: '행인', kind: 'mob', brain: 'transit', home: 'jongno', archetype: '행인' }, { scene: 'jongno', x, y: 560 });
+  const v1 = at('v1', 1000), v2 = at('v2', 1600);
+  let id = 1;
+  // 살해 끔: 기절
+  while (v1.hp > 0) sim.hitActor('v1', 1, id++, 60);
+  assert.equal(v1.act, 'down');
+  // 살해 켬: 기절한 몸을 더 때리면 누운 채 사망
+  kill = true;
+  assert.ok(sim.hitActor('v1', 1, id++, 10));
+  assert.equal(v1.act, 'dead');
+  assert.equal(v1.clip, 'dieLie');
+  // 선 채 맞아 죽으면 44
+  while (v2.act !== 'dead') sim.hitActor('v2', 1, id++, 80);
+  assert.equal(v2.clip, 'die');
+  assert.equal(sim.events.filter((e) => e.kind === 'kill').length, 2);
+  assert.equal(sim.hitActor('v2', 1, id++, 80), false, '시체는 안 맞음');
+  // 현장 경찰이 와서 라인을 친다 (시체 둘레, 멀리 떨어진 둘은 따로)
+  const cop = sim.actors.find((a) => a.plan === 'cordon');
+  assert.ok(cop, '현장 경찰 출동');
+  for (let t = 0; t < 30 * 30 && cop.doing !== '현장 통제'; t++) sim.step(1 / 30, { scene: 'office', x: 0, hour: 12 });
+  assert.equal(cop.doing, '현장 통제');
+  const lines = sim.obstacles('jongno').filter((o) => o.id.startsWith('cordon'));
+  assert.equal(lines.length, 2);
+  for (const b of [v1, v2]) assert.ok(lines.some((o) => o.x0 < b.x && o.x1 > b.x && o.y0 <= b.y && o.y1 >= b.y), `시체 ${b.x} 둘레`);
+  assert.ok(!lines.some((o) => o.wall), '길을 통째로 막지 않음');
+  // 시체를 본 행인: 겁먹거나 놀라 피하거나 신고 (태연히 지나가지 않음)
+  const seen = new Set();
+  for (let seed = 1; seed < 30; seed++) {
+    const m = sim.add({ id: `s${seed}`, name: '행인', kind: 'mob', brain: 'transit', home: 'jongno', archetype: '행인' }, { scene: 'jongno', x: v1.x - 180, y: 560 });
+    m.temper.courage = (seed % 10) / 10;
+    m.exitAt = { x: 3900, y: 560 };
+    sim.walkTo(m, m.exitAt, '지나가는 중', 'exit');
+    sim.step(1 / 30, { scene: 'office', x: 0, hour: 12 });
+    assert.equal(m.act, "scared", `용기 ${m.temper.courage}: ${m.act} ${m.x} 시체 ${sim.corpses("jongno").map((b) => Math.round(b.x))}`);
+    seen.add(m.doing);
+  }
+  assert.ok(seen.has('신고 중') || seen.has('놀람'), [...seen].join(','));
+  // 시체가 있는 동안은 사람이 덜 들어온다
+  assert.ok(sim.uproarLevel('jongno') >= 3);
+  // 게임 시간 1시간: 수습 → 라인 걷음, 현장 경찰 떠남, 사건 현장 표시
+  sim.step(1 / 30, { scene: 'office', x: 0, hour: 13.1 });
+  assert.equal(sim.corpses('jongno').length, 0);
+  assert.equal(sim.obstacles('jongno').filter((o) => o.id.startsWith('cordon')).length, 0);
+  assert.notEqual(cop.plan, 'cordon');
+  assert.ok(sim.incident('jongno'));
+  assert.ok(sim.events.some((e) => e.kind === 'cleared'));
+});
+
+test('시체 상한: 한 장면 5구, 넘치면 오래된 것부터 치움', () => {
+  const sim = new A.WorldSim(graph(), R.mulberry32(9), { killOk: () => true });
+  let id = 1;
+  for (let i = 0; i < 7; i++) {
+    const m = sim.add({ id: `k${i}`, name: '행인', kind: 'mob', brain: 'transit', home: 'jongno', archetype: '행인' }, { scene: 'jongno', x: 300 + i * 400, y: 560 });
+    while (m.act !== 'dead') sim.hitActor(m.def.id, 1, id++, 200);
+    sim.step(1 / 30, { scene: 'office', x: 0, hour: 12 });
+  }
+  const left = sim.corpses('jongno');
+  assert.equal(left.length, 5);
+  assert.ok(!left.some((a) => a.def.id === 'k0' || a.def.id === 'k1'), '오래된 것부터');
+});

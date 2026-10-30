@@ -66,7 +66,11 @@ export interface HubLife {
   hit?(sceneId: string, boxes: { x0: number; x1: number; y: number; dy?: number; z0: number; z1: number; attackId: number }[], dir: 1 | -1): number;
   /** 매 틱: 주인공을 막아선 행위자를 전투 AI 몸으로 세우고(ai-char), 쓰러진 몸을 행위자로 되돌린다 */
   combat?(api: StageApi, sceneId: string): void;
+  /** 시체 둘레 폴리스 라인 (라바콘 + 노란 테이프, 10-30). 깊이 층으로 그린다 */
+  cordons?(sceneId: string): { x0: number; x1: number; y0: number; y1: number }[];
 }
+/** 폴리스 라인 층 자리 수 (장면당 시체 상한 5 → 라인 최대 5) */
+const CORDON_SLOTS = 5;
 /** 행위자 깊이 층 자리 수 (한 화면 상한보다 넉넉히) */
 const LIFE_SLOTS = 24;
 
@@ -100,6 +104,8 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
   let curPeople: { name: string; x: number; y: number }[] = [];
   /** 보이는 장면의 행위자 (host.life) */
   let live: LiveActor[] = [];
+  /** 지금 장면의 폴리스 라인 (시체 둘레) */
+  let cords: { x0: number; x1: number; y0: number; y1: number }[] = [];
   let opening: { id: string; t: number; len: number; then: () => void } | null = null;
   /** 들어온 문이 뒤에서 닫히는 것·메뉴 문이 다시 닫히는 것 */
   let closing: { id: string; t: number; len: number } | null = null;
@@ -177,6 +183,14 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
           get x1() { return (live[i]?.x ?? -1e9) + 60; },
           occludedSilhouette: false,
           draw: (c: CanvasRenderingContext2D) => { const a = live[i]; if (a) drawLiveActor(c, a, host.life!); },
+        })) : [])
+        // 폴리스 라인: 라인마다 뒤쪽(뒷줄 라바콘·옆 테이프)과 앞쪽(앞줄 라바콘·테이프) 두 층 → 시체·사람과 깊이로 겹친다
+        .concat(host.life?.cordons ? Array.from({ length: CORDON_SLOTS * 2 }, (_, i) => ({
+          get y() { const b = cords[i >> 1]; return b ? (i & 1 ? b.y1 : b.y0) : -1e9; },
+          get x0() { return cords[i >> 1]?.x0 ?? -1e9; },
+          get x1() { return cords[i >> 1]?.x1 ?? -1e9; },
+          occludedSilhouette: false,
+          draw: (c: CanvasRenderingContext2D) => { const b = cords[i >> 1]; if (b) drawCordon(c, b, !!(i & 1), performance.now() / 1000); },
         })) : []),
       drawBackground(c: CanvasRenderingContext2D, camX: number) {
         if (sc.painted && drawHqField(c, sc.painted, camX, doorFx, host.hour?.() ?? null)) {
@@ -320,6 +334,7 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
         }
         host.life.combat?.(a, scene.id);
         live = host.life.actors(scene.id);
+        cords = host.life.cordons?.(scene.id) ?? [];
         // 이름 인물 대화 자리(visit:이름)를 지금 서 있는 곳으로 옮긴다 (E → npcLink 대화)
         const named = live.filter((q) => q.kind === 'named');
         scene.spots = scene.spots.filter((q) => !q.id.startsWith('visit:')).concat(named.map((q) => ({ id: `visit:${q.name}`, x: q.x, y: q.y, who: q.name, verb: '대화', face: q.face, open: true })));
@@ -915,6 +930,52 @@ function drawLiveActor(c: CanvasRenderingContext2D, a: LiveActor, life: HubLife)
   if (a.kind === 'named' && drawCharClip(c, a.name, a.x, a.y, a.face, t, a.clip, (a.since ?? 0) * 1000)) return;
   if (a.kind === 'mob' && life.drawMob) return life.drawMob(c, a);
   silhouette(c, a);
+}
+/** 라바콘 하나 (발 x, y). 원근만큼 작아진다 */
+function drawCone(c: CanvasRenderingContext2D, x: number, y: number): number {
+  const k = persp(y), h = 34 * k, w = 22 * k;
+  c.fillStyle = 'rgba(0,0,0,0.3)';
+  c.beginPath(); c.ellipse(x, y, w * 0.75, 4 * k, 0, 0, Math.PI * 2); c.fill();
+  c.fillStyle = '#2a2a2a';
+  c.fillRect(Math.round(x - w * 0.62), Math.round(y - 4 * k), Math.round(w * 1.24), Math.max(2, Math.round(4 * k)));
+  c.fillStyle = '#f26a1b';
+  c.beginPath(); c.moveTo(x - w / 2, y - 4 * k); c.lineTo(x - 3 * k, y - h); c.lineTo(x + 3 * k, y - h); c.lineTo(x + w / 2, y - 4 * k); c.closePath(); c.fill();
+  c.fillStyle = '#f4f1e8';   // 흰 띠
+  const t0 = 0.45, t1 = 0.62, at = (t: number) => w / 2 - (w / 2 - 3 * k) * t;
+  c.beginPath(); c.moveTo(x - at(t0), y - 4 * k - (h - 4 * k) * t0); c.lineTo(x - at(t1), y - 4 * k - (h - 4 * k) * t1); c.lineTo(x + at(t1), y - 4 * k - (h - 4 * k) * t1); c.lineTo(x + at(t0), y - 4 * k - (h - 4 * k) * t0); c.closePath(); c.fill();
+  return h;
+}
+/** 노란 테이프 한 칸: 두 라바콘 꼭대기를 잇고 가운데가 살짝 처지며 바람에 흔들린다. words = 「POLICE LINE」 글씨 */
+function drawTape(c: CanvasRenderingContext2D, x0: number, y0: number, x1: number, y1: number, t: number, words: boolean): void {
+  const k = persp((y0 + y1) / 2), sag = 5 * k + 2 * k * Math.sin(t * 2.3 + x0 * 0.05);
+  const mx = (x0 + x1) / 2, my = (y0 + y1) / 2 + sag * 2;
+  c.strokeStyle = '#f2d21b';
+  c.lineWidth = Math.max(2, 5 * k);
+  c.beginPath(); c.moveTo(x0, y0); c.quadraticCurveTo(mx, my, x1, y1); c.stroke();
+  if (!words || Math.abs(x1 - x0) < 60 * k) return;
+  c.save();
+  c.fillStyle = '#111';
+  c.font = `bold ${Math.max(6, Math.round(5 * k))}px sans-serif`;
+  c.textAlign = 'center';
+  c.textBaseline = 'middle';
+  c.fillText('POLICE LINE', mx, (y0 + y1) / 2 + sag);
+  c.restore();
+}
+/** 폴리스 라인: 시체 둘레 네모. back = 뒷줄 라바콘과 좌우 테이프, front = 앞줄 라바콘과 앞 테이프 */
+function drawCordon(c: CanvasRenderingContext2D, b: { x0: number; x1: number; y0: number; y1: number }, front: boolean, t: number): void {
+  const n = Math.max(1, Math.round((b.x1 - b.x0) / 70));
+  const xs = Array.from({ length: n + 1 }, (_, i) => b.x0 + ((b.x1 - b.x0) * i) / n);
+  const y = front ? b.y1 : b.y0;
+  c.save();
+  const top = xs.map((x) => ({ x, y: y - drawCone(c, x, y) * 0.8 }));
+  if (!front) {
+    // 옆 테이프 (뒤 모서리 → 앞 모서리)
+    const hb = 34 * persp(b.y0) * 0.8, hf = 34 * persp(b.y1) * 0.8;
+    drawTape(c, b.x0, b.y0 - hb, b.x0, b.y1 - hf, t, false);
+    drawTape(c, b.x1, b.y0 - hb, b.x1, b.y1 - hf, t, false);
+  }
+  for (let i = 0; i < top.length - 1; i++) drawTape(c, top[i].x, top[i].y, top[i + 1].x, top[i + 1].y, t, front);
+  c.restore();
 }
 /** 그림이 없을 때 대역: 바닥 그림자 + 회색 몸 (검수 전 표시) */
 export function silhouette(c: CanvasRenderingContext2D, a: { x: number; y: number; kind: 'named' | 'mob' }): void {

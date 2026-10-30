@@ -191,6 +191,9 @@ export function mountGameShell(box: HTMLElement, o: ShellOptions = {}): Shell {
         { type: 'choice' as const, label: 'NPC 대화 모델', options: [['main', '주 모델'], ['aux', '보조 모델']] as [string, string][], get: () => s.talkModel, set: (v: string) => (s.talkModel = v as UiSettings['talkModel']) },
         { type: 'toggle' as const, label: '본편 최근 채팅 같이 보내기', get: () => s.talkRecent, set: (v: boolean) => (s.talkRecent = v) },
       ]),
+      { type: 'head', label: '사망' },
+      { type: 'choice', label: '내가 죽으면', options: [['perma', '영구 사망'], ['evac', '패퇴(후송)']], get: () => s.deathMode, set: (v) => (s.deathMode = v as UiSettings['deathMode']) },
+      { type: 'toggle', label: '필드에서 NPC 살해 허용', get: () => s.npcKill, set: (v) => (s.npcKill = v) },
       { type: 'head', label: '필드 시간' },
       ...([['tScene', '장면 넘어가기', 60], ['tRegion', '지역 이동', 180], ['tTalk', '대화 한 번', 60], ['tFight', '싸움 (장면당 한 번)', 60], ['tWaitShort', '시간 보내기 · 짧게', 240], ['tWaitLong', '시간 보내기 · 길게', 480]] as const).map(([k, label, max]) => ({
         type: 'slider' as const, label, get: () => s[k], set: (v: number) => (s[k] = Math.round(v)), min: 0, max, step: 5, fmt: (v: number) => (v ? `${Math.round(v)}분` : '안 감'),
