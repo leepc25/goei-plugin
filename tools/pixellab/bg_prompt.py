@@ -12,6 +12,7 @@
   light       빛 한 줄: 예: "harsh fluorescent light"
   view        원근: "one-point" (소실점, 양옆 벽이 안쪽으로 모임) | "flat" (소실점 없는 정면)
   floor_share 바닥이 차지하는 몫: 예 "the lower third", "the lower 40 percent"
+  density     채우기: "packed" (헐값매입 1차 문장: 빽빽하게, 빈 벽·바닥 구석 없이) | "normal" (문구 없음) | "bare" (휑하게)
   sides       양옆 벽: "both" | "left" (왼쪽만 벽, 오른쪽 열림) | "right" | "none"
   floor       바닥 재질·사용감·빛 웅덩이·그림자
   walls       벽 재질·얼룩·걸레받이; 천장 조명
@@ -28,6 +29,12 @@ VIEW = {
     'one-point': "One-point perspective, side walls receding toward the middle.",
     'flat': "Flat front view, no vanishing point.",
 }
+# 채우기 정도: 장면마다 정한다 (사용자 10-30: 채우기 문구를 일괄로 빼지 말 것)
+DENSITY = {
+    'packed': "PACKED WITH STUFF, every area filled, no empty wall, no empty floor corner.",   # 헐값매입 1차 문장
+    'normal': "",
+    'bare': "Sparse and bare, only the listed things.",
+}
 SIDES = {
     'both': "Both side walls are visible, a closed room.",
     'left': "Only the left side wall is visible; on the right the room keeps going past the image edge, cut off by the frame.",
@@ -36,7 +43,7 @@ SIDES = {
 }
 STYLE = "dense, highly detailed pixel art, crisp pixel clusters, selective dark outline, rich medium-to-detailed shading"
 ALWAYS_NO = ["people", "chairs", "sofas", "benches", "clocks"]
-BANNED = [r"\bfill(ed)?\b.*\bevery\b", r"\bpacked\b", r"\bno empty\b", r"\bkeep empty\b", r"\bleave empty\b",   # 채우기·비우기 지시문 금지
+BANNED = [  # 채우기 문구는 density 칸으로만 넣는다(아래)
           r"\bchair\b", r"\bsofa\b", r"\bbench\b", r"\bclock\b", r"\bbucket\b.*\bdrip\b", r"\bleak\b", r"\bcurtain\b.*\brail\b"]
 PLACE_WORDS = ("back wall", "left", "right", "front", "center", "middle", "corner", "beside", "next to", "behind", "above", "in front of", "on the")
 REF1_USAGE = ("Copy only the camera angle, the low viewing height, the perspective, the pixel density and the level of detail "
@@ -45,11 +52,12 @@ ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)
 
 
 def build(spec):
-    need = ['name', 'place', 'time', 'light', 'view', 'floor_share', 'sides', 'floor', 'walls', 'items', 'shadow', 'palette']
+    need = ['name', 'place', 'time', 'light', 'view', 'floor_share', 'sides', 'density', 'floor', 'walls', 'items', 'shadow', 'palette']
     miss = [k for k in need if not spec.get(k)]
     if miss: raise SystemExit(f'빈 칸: {miss}')
     if spec['sides'] not in SIDES: raise SystemExit('sides는 both|left|right|none')
     if spec['view'] not in VIEW: raise SystemExit('view는 one-point|flat')
+    if spec['density'] not in DENSITY: raise SystemExit('density는 packed|normal|bare')
     errs = []
     for it in spec['items']:
         if not any(w in it.lower() for w in PLACE_WORDS): errs.append(f'자리 말 없음: {it}')
@@ -65,7 +73,7 @@ def build(spec):
         f"{CAMERA} {VIEW[spec['view']]} The floor fills {spec['floor_share']} of the image. {SIDES[spec['sides']]}",
         f"FLOOR: {spec['floor']}.",
         f"WALLS: {spec['walls']}.",
-        "THINGS (a standing adult is 150 pixels tall): " + "; ".join(spec['items']) + ".",
+        (DENSITY[spec['density']] + " " if DENSITY[spec['density']] else "") + "THINGS (a standing adult is 150 pixels tall): " + "; ".join(spec['items']) + ".",
         f"LIGHT: {spec['shadow']}.",
         f"STYLE: {STYLE}, {spec['palette']}, no dithering, no blur. No " + ", ".join(no[:-1]) + " or " + no[-1] + ".",
     ]
