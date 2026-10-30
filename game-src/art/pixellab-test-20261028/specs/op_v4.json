@@ -3,6 +3,8 @@
  "place": "a cramped, obsessively clean operating room of an unlicensed clinic in a run-down 1990s Seoul underground arcade",
  "time": "night",
  "light": "a harsh surgical lamp",
+ "view": "one-point",
+ "floor_share": "the lower 40 percent",
  "sides": "both",
  "floor": "blue-grey tiles, dark grout, a drain, mop streaks, a pool of light under the table",
  "walls": "white tiles, yellowed grout, chipped tiles, rust drips, steel baseboard; two fluorescent tubes",

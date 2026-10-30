@@ -10,7 +10,9 @@
   place       장소 한 줄: 무엇을 하는 곳, 상태, "in a run-down 1990s Seoul underground arcade"
   time        예: "late night"
   light       빛 한 줄: 예: "harsh fluorescent light"
-  sides       양옆 벽: "both" | "left" (왼쪽만 벽, 오른쪽 열림) | "right"
+  view        원근: "one-point" (소실점, 양옆 벽이 안쪽으로 모임) | "flat" (소실점 없는 정면)
+  floor_share 바닥이 차지하는 몫: 예 "the lower third", "the lower 40 percent"
+  sides       양옆 벽: "both" | "left" (왼쪽만 벽, 오른쪽 열림) | "right" | "none"
   floor       바닥 재질·사용감·빛 웅덩이·그림자
   walls       벽 재질·얼룩·걸레받이; 천장 조명
   items       [ "자리 말 + 물건 묘사", ... ]  (12~28줄, 한 줄에 물건 1~2개, 자리 말 필수: on the back wall / left / right / in front / center ...)
@@ -20,12 +22,17 @@
 """
 import json, sys, os, base64, re
 
-CAMERA = ("Camera about 20 degrees above the floor looking down: the floor fills the lower half, "
-          "the back wall shows only as a low strip with its baseboard along the top edge. No vanishing point.")
+# 고정은 카메라 높이·각도뿐. 원근·바닥 몫·양옆 벽은 장면마다 다르게 정한다(사용자 10-30: 「소실점 없음·양끝 벽」은 상황에 따라)
+CAMERA = "Camera at standing eye height, about 20 degrees above the floor, looking slightly down."
+VIEW = {
+    'one-point': "One-point perspective, side walls receding toward the middle.",
+    'flat': "Flat front view, no vanishing point.",
+}
 SIDES = {
-    'both': "Plain wall stubs at both ends, a closed room.",
-    'left': "A plain wall stub on the left only; on the right the room keeps going past the image edge, cut off by the frame.",
-    'right': "A plain wall stub on the right only; on the left the room keeps going past the image edge, cut off by the frame.",
+    'both': "Both side walls are visible, a closed room.",
+    'left': "Only the left side wall is visible; on the right the room keeps going past the image edge, cut off by the frame.",
+    'right': "Only the right side wall is visible; on the left the room keeps going past the image edge, cut off by the frame.",
+    'none': "No side walls: the room keeps going past both image edges.",
 }
 STYLE = "dense, highly detailed pixel art, crisp pixel clusters, selective dark outline, rich medium-to-detailed shading"
 ALWAYS_NO = ["people", "chairs", "sofas", "benches", "clocks"]
@@ -38,10 +45,11 @@ ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)
 
 
 def build(spec):
-    need = ['name', 'place', 'time', 'light', 'sides', 'floor', 'walls', 'items', 'shadow', 'palette']
+    need = ['name', 'place', 'time', 'light', 'view', 'floor_share', 'sides', 'floor', 'walls', 'items', 'shadow', 'palette']
     miss = [k for k in need if not spec.get(k)]
     if miss: raise SystemExit(f'빈 칸: {miss}')
-    if spec['sides'] not in SIDES: raise SystemExit('sides는 both|left|right')
+    if spec['sides'] not in SIDES: raise SystemExit('sides는 both|left|right|none')
+    if spec['view'] not in VIEW: raise SystemExit('view는 one-point|flat')
     errs = []
     for it in spec['items']:
         if not any(w in it.lower() for w in PLACE_WORDS): errs.append(f'자리 말 없음: {it}')
@@ -54,8 +62,8 @@ def build(spec):
     no = ALWAYS_NO + [x for x in spec.get('no', []) if x not in ALWAYS_NO]
     parts = [
         f"Pixel art game background: {spec['place']}, {spec['time']}, {spec['light']}.",
-        f"{CAMERA} {SIDES[spec['sides']]}",
-        f"FLOOR (lower half): {spec['floor']}.",
+        f"{CAMERA} {VIEW[spec['view']]} The floor fills {spec['floor_share']} of the image. {SIDES[spec['sides']]}",
+        f"FLOOR: {spec['floor']}.",
         f"WALLS: {spec['walls']}.",
         "THINGS (a standing adult is 150 pixels tall): " + "; ".join(spec['items']) + ".",
         f"LIGHT: {spec['shadow']}.",
