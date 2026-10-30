@@ -17,7 +17,8 @@
   sides       양옆 벽: "both" | "left" (왼쪽만 벽, 오른쪽 열림) | "right" | "none"
   floor       바닥 재질·사용감·빛 웅덩이·그림자
   walls       벽 재질·얼룩·걸레받이; 천장 조명
-  items       [ "자리 말 + 물건 묘사", ... ]  (12~28줄, 한 줄에 물건 1~2개, 자리 말 필수: on the back wall / left / right / in front / center ...)
+  items       [{full, why, keep, text, at, drop_ok}, ...]  (12~28줄, 한 줄에 물건 1~2개)
+              at = 자리 묶음("back wall, right part" / "left wall" / "floor, left" / "on the counter"). 같은 at끼리 묶여 「Back wall, right part: a; b.」로 한 번만 적힌다
   shadow      명암 대비 한 줄: 어디가 밝고 어디가 짙은 그림자인지
   palette     팔레트: 대비 있게 (어둡거나 바랜 바탕 + 밝은 포인트)
   no          추가로 그리지 말 것 (예: ["doors", "doorways", "blood"])
@@ -39,8 +40,8 @@ DENSITY = {
 }
 SIDES = {
     'both': "Both side walls are visible, a closed room.",
-    'left': "Only the left side wall is visible; on the right the room keeps going past the image edge, cut off by the frame.",
-    'right': "Only the right side wall is visible; on the left the room keeps going past the image edge, cut off by the frame.",
+    'left': "Only the left side wall is visible; on the right the room continues past the image edge.",
+    'right': "Only the right side wall is visible; on the left the room continues past the image edge.",
     'none': "No side walls: the room keeps going past both image edges.",
 }
 STYLE = "dense, highly detailed pixel art, crisp pixel clusters, selective dark outline, rich medium-to-detailed shading"
@@ -61,22 +62,31 @@ def build(spec):
     if spec['view'] not in VIEW: raise SystemExit('view는 one-point|flat')
     if spec['density'] not in DENSITY: raise SystemExit('density는 packed|normal|bare')
     errs = []
-    spec = dict(spec, items=[(it.get('text') if isinstance(it, dict) else it) or '' for it in spec['items']])
+    # 물건마다 at(자리 묶음: "back wall", "left wall", "floor, left", "on the counter" …)이 있으면 자리를 묶음 머리에 한 번만 적는다.
+    # 「on the back wall」을 줄마다 되풀이하던 글자를 아껴 물건을 덜 뺀다(사용자 10-30: 문법 구조 바꿔)
+    groups = {}
     for it in spec['items']:
-        if not any(w in it.lower() for w in PLACE_WORDS): errs.append(f'자리 말 없음: {it}')
-    text_all = ' '.join([spec['place'], spec['floor'], spec['walls'], spec['shadow']] + spec['items']).lower()
+        at = (it.get('at') or '').strip() if isinstance(it, dict) else ''
+        t = ((it.get('text') if isinstance(it, dict) else it) or '').strip()
+        if at:
+            if not re.search(r'wall|floor|ceiling', at.lower()) and not at.lower().startswith('on the '): errs.append(f'at이 모호함(벽·바닥·천장 또는 on the 가구): {at}')
+        elif not any(w in t.lower() for w in PLACE_WORDS): errs.append(f'자리 말 없음: {t}')
+        groups.setdefault(at, []).append(t)
+    spec = dict(spec, items=[t for g in groups.values() for t in g])
+    text_all = ' '.join([spec['place'], spec['floor'], spec['walls'], spec['shadow']] + list(groups) + spec['items']).lower()
     for pat in BANNED:
         if re.search(pat, text_all): errs.append(f'금지 표현: /{pat}/')
     n = len(spec['items'])
     if not 12 <= n <= 28: errs.append(f'물건 줄 수 {n} (12~28줄, 한 줄 1~2개)')
     if errs: raise SystemExit('\n'.join(errs))
+    things = ' '.join((f"{at[0].upper() + at[1:]}: " if at else '') + '; '.join(ts) + '.' for at, ts in groups.items())
     no = ALWAYS_NO + [x for x in spec.get('no', []) if x not in ALWAYS_NO]
     parts = [
         f"Pixel art game background: {spec['place']}, {spec['time']}, {spec['light']}.",
         f"{CAMERA} {VIEW[spec['view']]} The floor fills {spec['floor_share']} of the image. {SIDES[spec['sides']]}",
         f"FLOOR: {spec['floor']}.",
         f"WALLS: {spec['walls']}.",
-        (DENSITY[spec['density']] + " " if DENSITY[spec['density']] else "") + "THINGS (a standing adult is 150 pixels tall): " + "; ".join(spec['items']) + ".",
+        (DENSITY[spec['density']] + " " if DENSITY[spec['density']] else "") + "THINGS (a standing adult is 150 pixels tall): " + things,
         f"LIGHT: {spec['shadow']}.",
         f"STYLE: {STYLE}, {spec['palette']}, no dithering, no blur. No " + ", ".join(no[:-1]) + " or " + no[-1] + ".",
     ]
@@ -98,9 +108,9 @@ def main():
         ['', '## 설계안·위키 항목 대조', ''] + [f"- {b.get('src')} → " + (', '.join(f'{i}번' for i in b['by']) if isinstance(b.get('by'), list) else str(b.get('by'))) for b in br.get('items', [])] + \
         ['', '## 1차 상세안 → 2차 정제', '', '| # | 1차 (상세) | 근거 | 남길 낱말 | 2차 (실제) | 뺀 낱말(이유) |', '|---|---|---|---|---|---|']
     for i, it in enumerate(spec['items']):
-        cut = cut_words(it.get('full', ''), it.get('text', '')); dok = {k.lower(): v for k, v in (it.get('drop_ok') or {}).items()}
+        cut = cut_words(it.get('full', ''), (it.get('at') or '') + ' ' + it.get('text', '')); dok = {k.lower(): v for k, v in (it.get('drop_ok') or {}).items()}
         cs = '; '.join(w + '(' + str(dok.get(w, '**이유 없음**')) + ')' for w in cut)
-        L.append(f"| {i} | {it.get('full')} | {it.get('why')} | {', '.join(it.get('keep', []))} | {it.get('text')} | {cs} |")
+        L.append(f"| {i} | {it.get('full')} | {it.get('why')} | {', '.join(it.get('keep', []))} | {(it.get('at') + ': ') if it.get('at') else ''}{it.get('text')} | {cs} |")
     rv = spec.get('review') or {}
     L += ['', '## 3차 자가 검토', ''] + [f"- {q}\n  - {rv.get(k) or '**답 없음**'}" for k, q in REVIEW_Q.items()]
     L += ['', f'## 2차 요청문 ({len(text)}자)', '', '```', text, '```']

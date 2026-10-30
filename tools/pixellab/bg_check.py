@@ -78,14 +78,14 @@ def check(spec, prompt):
             if not it.get(k): fails.append(f'1차/2차 칸 {k} 없음: {name}')
         # 정제 점검: keep 낱말이 2차 문장에 남았는지
         for kw in it.get('keep', []):
-            if kw.lower() not in (it.get('text') or '').lower(): fails.append(f'정제하다 빠짐 "{kw}": {it.get("text")}')
+            if kw.lower() not in ((it.get('at') or '') + ' ' + (it.get('text') or '')).lower(): fails.append(f'정제하다 빠짐 "{kw}": {it.get("text")}')
         # 자리 말(어느 벽·바닥·천장)은 이유를 적어도 못 뺀다 (진료실 v3·v4: 「on the back wall」을 빼서 엑스레이가 왼벽, 주삿바늘 상자가 바닥으로)
-        fl, tl2 = (it.get('full') or '').lower(), (it.get('text') or '').lower()
+        fl, tl2 = (it.get('full') or '').lower(), ((it.get('at') or '') + ' ' + (it.get('text') or '')).lower()   # at(자리 묶음 머리)도 그 줄의 말
         for ph in LOC_PHRASES:
             if re.search(rf'\b{ph}\b', fl) and not re.search(rf'\b{ph}\b', tl2): fails.append(f'자리 말 "{ph}"을 뺌(못 뺌): {it.get("text")}')
-        if re.match(r'^(left|right|center|middle)\s*:', tl2): fails.append(f'자리가 모호함(벽인지 바닥인지): "{tl2.split(":")[0]}:" → "against the left wall" / "on the floor at left, ..." 처럼: {it.get("text")}')
+        if not it.get('at') and re.match(r'^(left|right|center|middle)\s*:', tl2.strip()): fails.append(f'자리가 모호함(벽인지 바닥인지): "{tl2.split(":")[0]}:" → "against the left wall" / "on the floor at left, ..." 처럼: {it.get("text")}')
         # 줄이며 뺀 낱말: 하나하나 빼도 되는 이유(drop_ok: {낱말: 이유})가 있어야 함
-        cut = cut_words(it.get('full', ''), it.get('text', ''))
+        cut = cut_words(it.get('full', ''), (it.get('at') or '') + ' ' + it.get('text', ''))
         ok = {k.lower(): v for k, v in (it.get('drop_ok') or {}).items() if str(v).strip()}
         bad = [w for w in cut if w not in ok]
         if bad: fails.append(f'이유 없이 뺀 낱말 {bad}: {it.get("text")}')
