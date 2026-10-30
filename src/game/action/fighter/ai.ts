@@ -1,5 +1,6 @@
 // 전투 AI 상대(10-29 본 게임 탑재): 인물 플레이어(fighter/player.ts)를 가상 버튼으로 조종하는 적 몸 (docs/전투_AI_설계.md 3장 「AI도 플레이어와 같은 버튼」).
 // eileen/aiFighter.ts 를 126명 공용으로: 어떤 인물 팩이든 같은 두뇌를 그 키트에 붙인다(13장).
+import { NPC_SKILL_MUL } from '../../combat/grades';
 import type { Body, WorldView } from '../engine/contract';
 import type { Btn as PadBtn, Pad } from '../engine/input';
 import type { FrameInfo } from '../engine/art';
@@ -33,6 +34,7 @@ export class FighterAi extends FighterPlayer {
     Object.defineProperty(this, 'team', { value: 'enemy', configurable: true });
     Object.defineProperty(this, 'kind', { value: 'ai-char', configurable: true });
     this.label = o.label ?? `AI ${art.cfg.name}`;
+    this.skillMul = NPC_SKILL_MUL;
     this.brain = new FighterBrain(o.id, o.grade, o.difficulty, o.persona, mulberry32(o.seed), o.squad);
   }
   /** 때릴 상대 = 주인공 (주인공 편 동행자가 생기면 여기에) */

@@ -9,6 +9,8 @@ ROOT = Path(__file__).resolve().parents[1]
 TR = ROOT / "game-src" / "action" / "testroom3"
 sys.path.insert(0, str(TR))
 import build  # noqa: E402
+sys.path.insert(0, str(ROOT / "tools"))
+import damage_std  # noqa: E402
 from PIL import Image  # noqa: E402
 
 PACKS = ROOT / "game-pack"
@@ -43,6 +45,7 @@ def write_char(cfg):
     for old in d.iterdir():   # 설정에서 빠진 줄의 그림 정리(그림 원본은 motion3 에 그대로)
         if old.name not in keep: old.unlink()
     (d / "pack.json").write_text(json.dumps({"id": pack_id(key), "required": False}, ensure_ascii=False) + "\n", encoding="utf-8")
+    damage_std.normalize(payload, lines)   # 기본 피해 표준값(docs/설계_기본피해_표준.md, 10-30)
     (d / "char.json").write_text(json.dumps({"cfg": payload, "A": lines}, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
     size = sum(f.stat().st_size for f in d.iterdir())
     return size, len(lines)

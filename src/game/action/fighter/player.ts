@@ -81,7 +81,7 @@ export class FighterPlayer extends Player {
       mod: { speed: () => this.speedMul(), sp: () => this.spMul() },
       // 물건 윗면은 이미 그 높이에 있을 때만 땅이다 (아래에서 걸어 들어가면 올라서지 않고 막힌다)
       ground: (x: number, y: number) => { const p = this.platformAt(x, y); return p && this.core.P.z >= p.h - 10 ? p.h : 0; },
-      hurt: (t: { body: Body }, dmg: number, kind: string, face: 1 | -1, hitstop: number, o: { push?: number; src?: 'ranged' | 'blast' }) => this.hurtTarget(t.body, dmg, kind, face, hitstop, o),
+      hurt: (t: { body: Body }, dmg: number, kind: string, face: 1 | -1, hitstop: number, o: { push?: number; src?: 'ranged' | 'blast' | 'skill' }) => this.hurtTarget(t.body, dmg, kind, face, hitstop, o),
       clamp: (P: { x: number; y: number }) => {
         const w = this.world;
         if (!w) return;
@@ -102,6 +102,8 @@ export class FighterPlayer extends Player {
   /** 회피 충전: 쓸 수 있는 회피 수 + 다음 하나가 찬 만큼(0~1) */
   get dodgeMeter(): number { const P = this.core.P; return P.dodgeN + (P.dodgeN < P.dodgeMax && P.dodgeCd > 0 ? 1 - Math.max(0, P.dodgeT) / P.dodgeCd : 0); }
   get dodgeMax(): number { return this.core.P.dodgeMax; }
+  /** 고유기·충전·필살 피해 배율: NPC만 0.5 (docs/설계_기본피해_표준.md 3장) */
+  skillMul = 1;
   get sortY() {
     const p = this.z > 4 ? this.platformAt(this.x, this.y) : null;
     return p && this.z >= p.h - 8 ? p.y1 + 2 : this.y;
@@ -138,7 +140,7 @@ export class FighterPlayer extends Player {
   /** 상태 효과가 거는 배율 */
   statusMod?: { speed(): number; sp(): number } = { speed: () => this.status.speedMul(), sp: () => this.status.spMul() };
 
-  private hurtTarget(t: Body, dmg: number, kind: string, face: 1 | -1, hitstop: number, o: { push?: number; src?: 'ranged' | 'blast' }) {
+  private hurtTarget(t: Body, dmg: number, kind: string, face: 1 | -1, hitstop: number, o: { push?: number; src?: 'ranged' | 'blast' | 'skill' }) {
     const w = this.world as (WorldView & { kills: number; emit(e: unknown): void }) | null;
     if (!w || !t.alive) return;
     const r = REACT[kind] ?? REACT.light;
@@ -151,7 +153,7 @@ export class FighterPlayer extends Player {
       scale *= 2;
       w.say('치명!', 0.8);
     }
-    const hit: Hit = { x0: t.x - 1, x1: t.x + 1, z0: 0, z1: 400, y: t.y, dy: 999, attackId: newAttackId(), dmg: dmg * this.dmgMul * scale, react: r.react, dir: face, push: o.push ?? r.push, lift: r.lift, stop: 0, strength: r.strength };
+    const hit: Hit = { x0: t.x - 1, x1: t.x + 1, z0: 0, z1: 400, y: t.y, dy: 999, attackId: newAttackId(), dmg: dmg * this.dmgMul * scale * (o.src === 'skill' ? this.skillMul : 1), react: r.react, dir: face, push: o.push ?? r.push, lift: r.lift, stop: 0, strength: r.strength };
     const res = t.applyHit(hit, w);
     if (res.kind === 'immune') return;
     // 맞은 적은 테스트룸 멈춤만큼 멈춘다

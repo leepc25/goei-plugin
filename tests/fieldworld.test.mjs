@@ -375,8 +375,9 @@ test('몹 몸: 등급 체력만큼 맞아야 기절, 기절한 불량배는 주�
   const sim = new A.WorldSim(graph(), R.mulberry32(8));
   const thug = sim.add({ id: 't1', name: '불량배', kind: 'mob', brain: 'transit', home: 'jongno', archetype: '불량배' }, { scene: 'jongno', x: 1000, y: 560 });
   const walker = sim.add({ id: 'w1', name: '행인', kind: 'mob', brain: 'transit', home: 'jongno', archetype: '행인' }, { scene: 'jongno', x: 1500, y: 560 });
-  assert.ok(thug.hpMax >= 108 && thug.hpMax <= 132, `불량배 D등급 ${thug.hpMax}`);
-  assert.ok(walker.hpMax <= 55, `행인 F등급 ${walker.hpMax}`);
+  // 10-30 체력 1,000 단위(docs/설계_인물_초기값.md): 불량배 거리 0.3 = 300, 행인 시민 0.15 = 150 (±10%)
+  assert.ok(thug.hpMax >= 270 && thug.hpMax <= 330, `불량배 D등급 ${thug.hpMax}`);
+  assert.ok(walker.hpMax <= 165, `행인 F등급 ${walker.hpMax}`);
   thug.pocket = 20000;
   let id = 1;
   while (thug.hp > 0) assert.ok(sim.hitActor('t1', 1, id++, 30));

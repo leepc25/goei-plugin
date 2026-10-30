@@ -27,7 +27,7 @@ export interface RunProgression {
 }
 
 type ProgressionRun = RunConfigCore & { launch?: { stats?: AgentStats; relics?: string[]; moves?: string[]; agent?: string } };
-const NEUTRAL: AgentStats = { hp: 220, power: 1, aim: 1, defense: 0, speed: 1, poise: 0, charge: 1 };
+const NEUTRAL: AgentStats = { hp: 1000, power: 1, aim: 1, defense: 0, speed: 1, poise: 0, charge: 1 };
 const positive = (value: unknown, fallback: number) => typeof value === 'number' && Number.isFinite(value) && value > 0 ? value : fallback;
 
 /** 직접 연습/시연은 기존 수치, 본부 출동은 이미 커피·유물·피로를 반영한 stats를 사용한다. */

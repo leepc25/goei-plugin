@@ -183,6 +183,9 @@ const dust = (x?: Json, y?: Json, n?: Json, s = 1) => { for (let i = 0; i < n; i
 function muzzleFlash(p?: Json, big?: Json) { if (!(CH.gun || []).length) return; for (let i = 0; i < (big ? 3 : 1); i++) fx.push({ k: 'shell', x: p.x - P.face * 30, y: p.y, vx: -P.face * (80 + Math.random() * 80), vy: -220 - Math.random() * 120, g: P.y, t: 1.2 }); }
 
 function inReach(hx?: Json, pad = 60, hh = 100, wide = false) { pad *= K(P.y); const l = proxies().filter(q => { const dk = K(q.y), hOk = wide ? P.z < q.z + 215 * dk && hh > q.z - 120 * dk : hh > q.z - 110 * dk && hh < q.z + 240 * dk; return Math.abs(q.y - P.y) < (wide ? 100 : 80) && (q.x - P.x) * P.face > (wide ? -60 : -20) && Math.abs(q.x - hx) < pad && hOk; }); if (l.length) { hitList = l; T = l[0]; } return l.length > 0; }
+// 고유기·충전·필살 동작 줄(피해 출처 「기술」 판정용: NPC 기술 배율)
+let skillClipSet: Set<string> | null = null;
+const skillClips = () => skillClipSet ??= new Set([CH.skills?.skill?.anim, CH.skills?.skill2?.anim, CH.skills?.charge?.hold, CH.skills?.charge?.release, CH.skills?.super?.anim, ...((CH.skills?.super?.steps || []) as Json[]).map((s: Json) => s.anim)].filter(Boolean).map(String));
 function damageTarget(dmg?: Json, kind?: Json) {
   if (T.mark > 0) dmg = Math.round(dmg * 1.5);
   T.hp = Math.max(0, T.hp - dmg); T.hits++; if (!P.inSuper) gainSp(dmg * 0.45); T.hitT = 1.0; T.flash = 0.09;
@@ -201,7 +204,7 @@ function damageTarget(dmg?: Json, kind?: Json) {
   else if (air) { T.juggle++; T.vz = Math.max(T.vz, (big ? 560 : 420) * Math.max(0.3, 1 - T.juggle * 0.12)); T.vx = dir * (big ? 160 : 70); }
   else T.vx = dir * (big ? 460 : 55);
   num(T.x + (Math.random() - 0.5) * 30, T.y - 200 - T.z, dmg, big);
-  if (T.body) env.hurt(T, dmg, kind, P.face, hitstop, { src: curSrc });
+  if (T.body) env.hurt(T, dmg, kind, P.face, hitstop, { src: curSrc ?? (P.inSuper || (P.clip && skillClips().has(P.clip.id)) || P.mode === 'charge' ? 'skill' : null) });
 }
 function fireEv(e?: Json) {
   if (e && e.fn) e.fn();
