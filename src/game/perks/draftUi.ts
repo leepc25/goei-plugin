@@ -1,5 +1,5 @@
 // 방 보상 3택1 창 (임시 퍽·특성). 카드 그림은 아직 없어서(PixelLab 보류) 글 카드: 분류 띠·이름·종류·랭크·효과.
-// 테두리: 일반 회색 · 희귀 파랑 · 특급 보라 · 쌍 금색 · 특성 빨강(10-30 A안). 특성은 장점·대가. 숫자 키(1~4)나 눌러서 고른다. 열린 동안 월드를 멈춘다.
+// 테두리: 일반 회색 · 희귀 파랑 · 특급 보라 · 쌍 금색 · 특성 빨강(10-30 A안). 특성은 장점·대가. 고르기: 눌러서 · 숫자 키(1~4) · 방향키 ←→(A·D) + Enter·Space·E · 게임패드 십자키·왼쪽 막대 + A. 열린 동안 월드를 멈춘다.
 import { GRADE_MUL, GRADE_NAME, draft, graded, kitOf, type Offer } from './rules';
 
 export const GRADE_COLOR = ['#8a8f96', '#4a8fe0', '#a86ae0'] as const;
@@ -16,7 +16,7 @@ const css = `
 .pk-title{color:#f2e3b0;font-size:20px;letter-spacing:2px;text-shadow:2px 2px 0 #000}
 .pk-row{display:flex;gap:14px;flex-wrap:wrap;justify-content:center}
 .pk-card{width:220px;min-height:250px;background:#16181c;border:4px solid #4a4f57;box-shadow:0 0 0 2px #000,6px 6px 0 #000;color:#ddd;cursor:pointer;display:flex;flex-direction:column;image-rendering:pixelated}
-.pk-card:hover,.pk-card:focus{transform:translateY(-4px);outline:none;border-color:#e8e2c8}
+.pk-card:hover,.pk-card.sel{transform:translateY(-6px);outline:none;box-shadow:0 0 0 2px #000,6px 6px 0 #000,0 0 18px 2px rgba(242,227,176,.55)}
 .pk-grade{font-size:12px;color:#fff;padding:1px 6px;align-self:flex-start;text-shadow:1px 1px 0 #000}
 .pk-band{height:10px}
 .pk-in{padding:10px 12px;display:flex;flex-direction:column;gap:8px;flex:1}
@@ -45,13 +45,34 @@ export function openDraft(root: HTMLElement, p: FighterPlayer, o: { world?: { pa
     else if (pick?.type === 'trait') p.perks.addTrait(pick.def.name);
     ov.remove();
     window.removeEventListener('keydown', onKey, true);
+    cancelAnimationFrame(padRaf);
     if (o.world) o.world.paused = was;
     o.onDone?.(pick);
   };
   let offers: Offer[] = [];
+  let sel = 0;
+  const mark = () => ov.querySelectorAll('.pk-card').forEach((c, i) => c.classList.toggle('sel', i === sel));
+  const move = (d: number) => { if (!offers.length) return; sel = (sel + d + offers.length) % offers.length; mark(); };
   const onKey = (e: KeyboardEvent) => {
     const n = Number(e.key);
-    if (n >= 1 && n <= offers.length) { e.preventDefault(); e.stopPropagation(); close(offers[n - 1]); }
+    const hit = () => { e.preventDefault(); e.stopPropagation(); };
+    if (n >= 1 && n <= offers.length) { hit(); close(offers[n - 1]); }
+    else if (e.key === 'ArrowLeft' || e.code === 'KeyA') { hit(); move(-1); }
+    else if (e.key === 'ArrowRight' || e.code === 'KeyD') { hit(); move(1); }
+    else if ((e.key === 'Enter' || e.key === ' ' || e.code === 'KeyE') && offers[sel]) { hit(); close(offers[sel]); }
+  };
+  // 게임패드: 십자키·왼쪽 막대 좌우로 옮기고 A(0번)로 고른다. 누른 순간만 본다(창이 열릴 때 누르고 있던 것은 무시)
+  let padRaf = 0, padPrev: Record<string, boolean> = { l: true, r: true, a: true };
+  const padTick = () => {
+    const g = [...(navigator.getGamepads?.() ?? [])].find((x) => x && x.connected);
+    if (g) {
+      const now = { l: !!g.buttons[14]?.pressed || (g.axes[0] ?? 0) < -0.5, r: !!g.buttons[15]?.pressed || (g.axes[0] ?? 0) > 0.5, a: !!g.buttons[0]?.pressed };
+      if (now.l && !padPrev.l) move(-1);
+      if (now.r && !padPrev.r) move(1);
+      if (now.a && !padPrev.a && offers[sel]) return close(offers[sel]);
+      padPrev = now;
+    }
+    padRaf = requestAnimationFrame(padTick);
   };
   let preset = o.offers ?? null;
   const render = () => {
@@ -79,6 +100,7 @@ export function openDraft(root: HTMLElement, p: FighterPlayer, o: { world?: { pa
         c.innerHTML = `<div class="pk-band" style="background:${TRAIT_COLOR}"></div><div class="pk-in"><div class="pk-name">${f.def.name}</div><div class="pk-tag"><b style="background:${TRAIT_COLOR}">특성</b><span>장점 + 대가</span></div><div class="pk-eff">${f.def.good}</div><div class="pk-cost">대가: ${f.def.cost}</div><div class="pk-key">${i + 1}</div></div>`;
       }
       c.onclick = () => close(f);
+      c.onmouseenter = () => { sel = i; mark(); };
       row.append(c);
     });
     box.append(row);
@@ -101,9 +123,11 @@ export function openDraft(root: HTMLElement, p: FighterPlayer, o: { world?: { pa
     box.append(btns);
     ov.append(box);
     if (!offers.length) box.querySelector('.pk-title')!.textContent = '더 받을 퍽이 없다';
+    sel = 0; mark();
   };
   render();
   window.addEventListener('keydown', onKey, true);
+  padRaf = requestAnimationFrame(padTick);
   if (getComputedStyle(root).position === 'static') root.style.position = 'relative';
   root.append(ov);
 }
