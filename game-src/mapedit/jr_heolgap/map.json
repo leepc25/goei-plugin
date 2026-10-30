@@ -141,8 +141,37 @@
    "h": 999
   }
  ],
- "doors": {},
- "lamps": [],
+ "doors": {
+  "out": {
+   "kind": "exit",
+   "side": "S",
+   "x": 640,
+   "y": 848,
+   "to": "jr_alley",
+   "toDoor": "heolgap",
+   "label": "나가기"
+  }
+ },
+ "lamps": [
+  {
+   "x": 380,
+   "y": 40,
+   "kind": "down",
+   "r": 420
+  },
+  {
+   "x": 980,
+   "y": 40,
+   "kind": "down",
+   "r": 420
+  },
+  {
+   "x": 1186,
+   "y": 440,
+   "kind": "lamp",
+   "r": 240
+  }
+ ],
  "objects": [
   {
    "id": "counter",

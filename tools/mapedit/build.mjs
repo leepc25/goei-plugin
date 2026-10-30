@@ -27,8 +27,16 @@ const DIRS = [['south', '남'], ['south-east', '남동'], ['east', '동'], ['nor
 // anchor = 바닥 가운데(원본 200칸의 100,171)를 8방향 합집합으로 자른 그림 안 좌표
 const chairs = [['c01', 'C01 사무의자', [50, 135]], ['c02', 'C02 기댄 사무의자', [63, 134]]].map(([set, label, anchor]) => ({ set, label, anchor,
   dirs: DIRS.map(([d, k]) => ({ d, k, url: 'data:image/png;base64,' + readFileSync(`game-src/art/objects/chairs/${set}_${d}.png`).toString('base64') })) }));
+// Claude가 미리 찍어 둔 장면: game-src/mapedit/<장면>/map.json + 그림 (에디터가 처음부터 연다)
+const SCENE_LABEL = { jr_heolgap: '중림 · 헐값매입' };
+const mimeOf = (n) => (n.endsWith('.png') ? 'image/png' : n.endsWith('.webp') ? 'image/webp' : 'image/jpeg');
+const scenes = readdirSync('game-src/mapedit', { withFileTypes: true }).filter((d) => d.isDirectory()).map((d) => {
+  const dir = `game-src/mapedit/${d.name}`, map = JSON.parse(readFileSync(`${dir}/map.json`, 'utf8')), files = {};
+  for (const f of readdirSync(dir)) if (/\.(png|webp|jpe?g)$/.test(f)) files[f] = `data:${mimeOf(f)};base64,` + readFileSync(`${dir}/${f}`).toString('base64');
+  return { id: d.name, label: SCENE_LABEL[d.name] || d.name, map, files };
+});
 const charUrl = 'data:image/png;base64,' + readFileSync('tools/mapedit/eileen_stand.png').toString('base64');
 const html = readFileSync('tools/mapedit/index.html', 'utf8')
-  .replace("<script>\n'use strict';", `<script>window.__MAPEDIT_EMBED__ = ${JSON.stringify({ props, chairs, char: charUrl })};</script>\n<script>\n'use strict';`);
+  .replace("<script>\n'use strict';", `<script>window.__MAPEDIT_EMBED__ = ${JSON.stringify({ props, chairs, scenes, char: charUrl })};</script>\n<script>\n'use strict';`);
 writeFileSync('release/demo/goei-map-editor.html', html);
-console.log('release/demo/goei-map-editor.html', (html.length / 1048576).toFixed(1) + 'MB', '소품', props.length, '의자', chairs.length + '×8');
+console.log('release/demo/goei-map-editor.html', (html.length / 1048576).toFixed(1) + 'MB', '소품', props.length, '의자', chairs.length + '×8', '장면', scenes.map((q) => q.id).join(','));
