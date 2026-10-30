@@ -432,25 +432,31 @@ test('겁 반응: 무기를 들이밀면 용기에 따라 얼어붙기·주저�
   assert.notEqual(m2.act, 'scared');
 });
 
-test('사망·시체: 살해 허용이면 체력 0에서 사망(44)·기절한 몸을 더 때리면 누운 채 사망(45), 시체는 장면에 남고 경찰이 와서 라바콘 라인, 1시간 뒤 수습·사건 현장', () => {
+test('사망·시체: 체력 0은 항상 먼저 기절, 살해 허용이면 2초 뒤 무기로 확인 사살 → 누운 채 사망(45), 시체는 장면에 남고 경찰이 와서 라바콘 라인, 1시간 뒤 수습·사건 현장', () => {
   let kill = false;
   const sim = new A.WorldSim(graph(), R.mulberry32(8), { killOk: () => kill, has: (_l, c) => ['die', 'dieLie', 'walk', 'call', 'surprise', 'idle'].includes(c) });
   const at = (id, x) => sim.add({ id, name: '행인', kind: 'mob', brain: 'transit', home: 'jongno', archetype: '행인' }, { scene: 'jongno', x, y: 560 });
   const v1 = at('v1', 1000), v2 = at('v2', 1600);
   let id = 1;
-  // 살해 끔: 기절
+  // 살해 끔: 기절, 무기로 쳐도 기절 그대로
   while (v1.hp > 0) sim.hitActor('v1', 1, id++, 60);
   assert.equal(v1.act, 'down');
-  // 살해 켬: 기절한 몸을 더 때리면 누운 채 사망
+  sim.time += 3;
+  assert.equal(sim.hitActor('v1', 1, id++, 10, true), false);
+  // 살해 켬: 체력 0은 그래도 먼저 기절 (연타 중 죽지 않음)
   kill = true;
-  assert.ok(sim.hitActor('v1', 1, id++, 10));
+  while (v2.hp > 0) sim.hitActor('v2', 1, id++, 80, true);
+  assert.equal(v2.act, 'down', '체력 0 = 기절');
+  assert.equal(sim.hitActor('v2', 1, id++, 80, true), false, '기절 직후 2초는 무기로도 안 죽음');
+  // 맨손은 기절한 몸을 못 죽임, 2초 뒤 무기(lethal)면 누운 채 사망(45)
+  sim.time += 2.1;
+  assert.equal(sim.hitActor('v1', 1, id++, 10, false), false, '맨손');
+  assert.ok(sim.hitActor('v1', 1, id++, 10, true));
   assert.equal(v1.act, 'dead');
   assert.equal(v1.clip, 'dieLie');
-  // 선 채 맞아 죽으면 44
-  while (v2.act !== 'dead') sim.hitActor('v2', 1, id++, 80);
-  assert.equal(v2.clip, 'die');
+  assert.ok(sim.hitActor('v2', 1, id++, 10, true));
   assert.equal(sim.events.filter((e) => e.kind === 'kill').length, 2);
-  assert.equal(sim.hitActor('v2', 1, id++, 80), false, '시체는 안 맞음');
+  assert.equal(sim.hitActor('v2', 1, id++, 80, true), false, '시체는 안 맞음');
   // 현장 경찰이 와서 라인을 친다 (시체 둘레, 멀리 떨어진 둘은 따로)
   const cop = sim.actors.find((a) => a.plan === 'cordon');
   assert.ok(cop, '현장 경찰 출동');
@@ -488,10 +494,29 @@ test('시체 상한: 한 장면 5구, 넘치면 오래된 것부터 치움', () 
   let id = 1;
   for (let i = 0; i < 7; i++) {
     const m = sim.add({ id: `k${i}`, name: '행인', kind: 'mob', brain: 'transit', home: 'jongno', archetype: '행인' }, { scene: 'jongno', x: 300 + i * 400, y: 560 });
-    while (m.act !== 'dead') sim.hitActor(m.def.id, 1, id++, 200);
+    while (m.hp > 0) sim.hitActor(m.def.id, 1, id++, 200, true);
+    sim.time += 2.1;
+    sim.hitActor(m.def.id, 1, id++, 200, true);
     sim.step(1 / 30, { scene: 'office', x: 0, hour: 12 });
   }
   const left = sim.corpses('jongno');
   assert.equal(left.length, 5);
   assert.ok(!left.some((a) => a.def.id === 'k0' || a.def.id === 'k1'), '오래된 것부터');
+});
+
+test('기절에서 깨어날 때: 겁 많으면 엎드린 채 기어서(38) 달아나고, 아니면 일어나 떠난다', () => {
+  const run = (courage) => {
+    const sim = new A.WorldSim(graph(), R.mulberry32(4), { has: (_l, c) => ['crawl', 'walk', 'down'].includes(c) });
+    const m = sim.add({ id: 'w', name: '행인', kind: 'mob', brain: 'transit', home: 'jongno', archetype: '행인' }, { scene: 'jongno', x: 1500, y: 560 });
+    m.temper.courage = courage;
+    let id = 1;
+    while (m.hp > 0) sim.hitActor('w', 1, id++, 200);
+    for (let t = 0; t < 30 * 7; t++) sim.step(1 / 30, { scene: 'jongno', x: 1300, y: 560, hour: 12 });
+    return m;
+  };
+  const shy = run(0.1);
+  assert.equal(shy.clip, 'crawl', `${shy.act} ${shy.doing} ${shy.fleeClip}`);
+  assert.equal(shy.doing, '기어서 도망');
+  const brave = run(0.6);
+  assert.notEqual(brave.clip, 'crawl');
 });

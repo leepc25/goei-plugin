@@ -38,6 +38,8 @@ export interface Hit extends WBox {
   low?: boolean;
   /** 크게 날리는 한 방(테스트룸 blow): 맞은 쪽은 크게 밀려나기(18_2) */
   blow?: boolean;
+  /** 무기 쪽 공격(칼·총·투척·이능·기술·폭발, 무기 든 근접): 살해 허용일 때 기절한 몸을 죽일 수 있다. 맨손은 기절까지만 */
+  lethal?: boolean;
   grab?: boolean;
   armorBreak?: boolean;
   /** 강도 1·2·3 (효과음·충격파 크기) */

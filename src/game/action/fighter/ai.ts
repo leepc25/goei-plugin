@@ -82,7 +82,34 @@ export class FighterAi extends FighterPlayer {
     p.mx = p.held.has('right') ? 1 : p.held.has('left') ? -1 : 0;
     p.my = p.held.has('down') ? 1 : p.held.has('up') ? -1 : 0;
     p.evade = false;
+    this.lieStep(p, foe.x);
     this.tick(world, p);
+  }
+
+  // 쓰러진 뒤 (두뇌는 누운 동안 아무것도 안 누름): 기상 지연이 지나면 일어난다. 체력이 낮고 겁 많으면 일어나지 않고 엎드려 기어(38) 상대 반대쪽으로 물러났다가 일어남
+  private lieLag = -1;
+  private crawlT = 0;
+  private crawled = false;
+  private lieStep(p: Pad, foeX: number): void {
+    const P = this.core.P as unknown as { mode: string; t: number; downAt?: number; wakeDelay: number; wakeExtra?: number };
+    if (this.phase === 'down' || (P.mode !== 'down' && P.mode !== 'belly')) { this.lieLag = -1; if (P.mode !== 'belly') this.crawled = false; return; }
+    p.held.clear(); p.pressed.clear(); p.released.clear(); p.mx = 0; p.my = 0;
+    const away = foeX > this.x ? 'left' : 'right';
+    if (P.mode === 'belly') {
+      if ((this.crawlT -= 1 / 30) > 0) { p.held.add(away); p.mx = away === 'right' ? 1 : -1; }
+      else p.pressed.add('up');
+      return;
+    }
+    if (this.lieLag < 0) this.lieLag = 0.2 + Math.random() * 0.7;
+    if (P.t - (P.downAt ?? -9) < P.wakeDelay + (P.wakeExtra ?? 0) + this.lieLag) return;
+    if (!this.crawled && this.core.has('38') && this.hp / this.hpMax < 0.35 && this.brain.persona.courage < 0.5) {
+      this.crawled = true;
+      this.crawlT = 1.5 + Math.random() * 2;
+      p.pressed.add(away);
+      p.held.add(away);
+      return;
+    }
+    p.pressed.add('up');
   }
 
   /** 렌더러가 몸 자리로 옮겨 놓고 부른다: 월드 좌표로 되돌려 코어가 그린다 */

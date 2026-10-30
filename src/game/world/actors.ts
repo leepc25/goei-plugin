@@ -103,6 +103,8 @@ export interface Actor {
   sawBody?: boolean;
   /** 죽은 게임 시각(시간 누계) */
   diedAt?: number;
+  /** 기절한 생활 시각(초): 이 뒤 KO_GRACE 동안은 무기로 맞아도 안 죽음 */
+  downAt?: number;
 }
 
 /** 길에 놓인 막힌 곳 (폴리스 라인·부서진 물건 등). wall = 길을 위아래 끝까지 막음 → 돌아섬 */
@@ -183,6 +185,8 @@ export const CLEAR_HOURS = 1;
 export const INCIDENT_HOURS = 24;
 /** 시체를 알아보는 거리 */
 const SEE_BODY_PX = 260;
+/** 기절 직후 죽지 않는 초 (연타 마지막 대에 실수로 죽지 않게) */
+export const KO_GRACE = 2;
 /** 소란도 단계 문턱 (0~100 → 0~3) */
 export const UPROAR_STEPS = [20, 50, 80];
 let serial = 0;
@@ -355,13 +359,13 @@ export class WorldSim {
     return out;
   }
   /** 행위자 하나를 맞힘 (에일린 코어 표적 경로). 같은 틱 여러 번은 hitBy로 거른다 */
-  hitActor(id: string, dir: 1 | -1, attackId: number, dmg = 12): boolean {
+  hitActor(id: string, dir: 1 | -1, attackId: number, dmg = 12, lethal = false): boolean {
     const a = this.actors.find((q) => q.def.id === id);
     if (!a || a.act === 'gone' || a.act === 'door' || a.hitBy === attackId) return false;
     if (a.act === 'dead') return false;
-    // 이미 기절해 쓰러진 몹: 살해 허용이면 더 때려 죽일 수 있다(누운 채 사망 45), 아니면 반응 없음
+    // 이미 기절해 쓰러진 몹: 살해 허용이고 기절 2초 뒤 무기 쪽 공격(lethal)이면 누운 채 사망(45). 맨손·연타 중엔 기절 그대로 (10-30)
     if (a.def.kind === 'mob' && (a.hp ?? 1) <= 0) {
-      if (!this.killOk()) return false;
+      if (!this.killOk() || !lethal || this.time - (a.downAt ?? this.time) < KO_GRACE) return false;
       a.hitBy = attackId;
       this.kill(a, true);
       return true;
@@ -378,8 +382,7 @@ export class WorldSim {
     a.face = (-dir) as 1 | -1;
     a.goal = null;
     a.route = [];
-    // 몹: 체력이 바닥나면 기절(쓰러져 오래 누움), 아니면 휘청. 살해 허용이면 사망(선 채 44)
-    if (a.def.kind === 'mob' && (a.hp ?? 1) <= 0 && this.killOk()) return this.kill(a, false);
+    // 몹: 체력이 바닥나면 기절(쓰러져 오래 누움), 아니면 휘청. 체력 0은 살해 허용이어도 먼저 기절
     const down = a.def.kind === 'mob' && (a.hp ?? 1) <= 0;
     if (down && a.pocket && (DROPS.has(a.def.archetype ?? '') || a.stolen)) {
       this.events.push({ kind: 'drop', scene: a.scene, who: a.def.name, amount: a.pocket, stolen: a.stolen ?? 0, x: a.x });
@@ -397,6 +400,7 @@ export class WorldSim {
     }
     a.act = 'down';
     a.doing = down ? '기절' : '휘청';
+    if (down) a.downAt = this.time;
     a.wait = down ? 6 : 0.6;
     this.setClip(a, down && this.canClip(a, 'down') ? 'down' : 'idle');
     this.iconOn(a, '!', 1.5);
@@ -531,6 +535,8 @@ export class WorldSim {
         // 기절에서 깨면 체력 조금 돌아오고 (근무형이 아니면) 무조건 자리를 뜬다
         if (a.def.kind === 'mob' && (a.hp ?? 1) <= 0) {
           a.hp = Math.round((a.hpMax ?? 50) * 0.3);
+          // 겁 많으면 일어나지도 못하고 엎드린 채 기어서(38) 달아난다
+          if (!a.post && (a.temper?.courage ?? 1) < 0.4 && this.canClip(a, 'crawl')) return this.flee(a, this.player?.x ?? a.x, 'crawl', 0.3);
           if (!a.post) return this.flee(a, this.player?.x ?? a.x);
           return this.resume(a);
         }
@@ -923,7 +929,7 @@ export class WorldSim {
   // ── 몹 판단 (8-1장: 사건은 NPC 판단에서) ──
 
   private mobThink(a: Actor, dt: number): void {
-    if (a.act === 'gone' || a.act === 'door') return;
+    if (a.act === 'gone' || a.act === 'door' || a.act === 'down' || a.act === 'dead') return;   // 기절해 누운 몸은 판단하지 않는다 (깨어날 때 따로)
     const lvl = this.uproarLevel(a.scene);
     const t = a.temper;
     if (!t) return;

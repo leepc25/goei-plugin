@@ -268,7 +268,7 @@ export class FighterPlayer extends Player {
       scale *= 2;
       w.say('치명!', 0.8);
     }
-    const hit: Hit = { x0: t.x - 1, x1: t.x + 1, z0: 0, z1: 400, y: t.y, dy: 999, attackId: newAttackId(), dmg: dmg * this.dmgMul * scale * (o.src === 'skill' ? this.skillMul : 1), react: r.react, dir: face, push: o.push ?? r.push, lift: r.lift, stop: 0, strength: r.strength, blow: kind === 'blow' };
+    const hit: Hit = { x0: t.x - 1, x1: t.x + 1, z0: 0, z1: 400, y: t.y, dy: 999, attackId: newAttackId(), dmg: dmg * this.dmgMul * scale * (o.src === 'skill' ? this.skillMul : 1), react: r.react, dir: face, push: o.push ?? r.push, lift: r.lift, stop: 0, strength: r.strength, blow: kind === 'blow', lethal: !!o.src && ['skill', 'ranged', 'blast'].includes(o.src) || form !== 'body' || !!this.core.P.armed };
     const res = t.applyHit(hit, w);
     if (res.kind === 'immune') return;
     // 기술 부가효과: 맞은 상대에게 상태 이상 (docs/퍽/기술_부가효과.md). 막았으면 안 걸림. 상대 정신력으로 지속이 줄어듦. 퍽: 지속 연장·깊은 상처
@@ -306,11 +306,8 @@ export class FighterPlayer extends Player {
       return { kind: 'immune' };
     }
     // 누운 몸도 맞는다(10-30 사용자: 모든 상황에서 공격을 받음) → 움찔(43).
-    // 체력 0으로 쓰러진(기절) NPC 몸: 살해 허용이면 더 맞아 누운 채 사망(45), 아니면 그대로. 죽은 몸은 안 맞음
-    if (this.phase === 'down') {
-      if (this.team !== 'player' && !this.killed && fighterHooks.killOk?.()) { this.dieNow(true); return { kind: 'hit', killed: true }; }
-      return { kind: 'immune' };
-    }
+    // 체력 0으로 쓰러진(기절) 몸: 전투 몸은 곧 필드 행위자로 돌아가 거기서 기절·확인 사살을 다룬다 (10-30: 체력 0 = 항상 먼저 기절)
+    if (this.phase === 'down') return { kind: 'immune' };
     const lying = P.mode === 'down' || P.mode === 'belly';
     const front = hit.dir === -P.face;
     if (P.mode === 'block' && front) {
@@ -371,10 +368,6 @@ export class FighterPlayer extends Player {
       this.lowWarned = true;
       world.emit({ type: 'hp:low' });
     }
-    if (this.hp <= 0 && this.team !== 'player' && fighterHooks.killOk?.()) {
-      this.dieNow(lying);
-      return { kind: 'hit', killed: true };
-    }
     // 주인공: 설정 「내가 죽으면」이 영구 사망이면 사망(44·45) → 출동 결과 「사망」, 패퇴면 쓰러져 후송
     if (this.hp <= 0 && this.team === 'player' && (fighterHooks.permaDeath?.() ?? false)) {
       this.dieNow(lying);
@@ -396,7 +389,7 @@ export class FighterPlayer extends Player {
     return { kind: 'hit' };
   }
 
-  /** NPC 사망 (살해 허용): 선 채 44 · 누워서 45, 그 줄이 없으면 쓰러지기. killed = 'dead' | 'deadLying' (필드 시체로 넘길 때 씀) */
+  /** 영구 사망(주인공): 선 채 44 · 누워서 45, 그 줄이 없으면 쓰러지기. NPC는 체력 0이면 항상 기절(필드에서 무기로 확인 사살 → 시체) */
   killed: 'dead' | 'deadLying' | null = null;
   private dieNow(lying: boolean): void {
     this.hp = 0;

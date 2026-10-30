@@ -244,7 +244,7 @@ function hqAdapter(bridge: Partial<GameBridge> | undefined, ui: { chooseFloor: H
       x: a.x, y: a.y, z: 0,
       body: { id: -1, team: 'enemy', kind: 'npc', x: a.x, y: a.y, z: 0, dir: a.face, hp: Math.max(1, a.hp ?? 1), hpMax: a.hpMax ?? 1, alive: true, stop: 0, frame: () => ({ hit: [], hurt: [] }), step: () => {},
         // 몹은 등급 체력이 있다 (설계 2-3): 에일린 피해가 그대로 깎인다
-        applyHit: (h: { dir: 1 | -1; attackId: number; dmg?: number }) => (w.hitActor(a.def.id, h.dir, h.attackId, h.dmg ?? 12) ? { kind: 'hit' as const } : { kind: 'immune' as const }) } as unknown as Body,
+        applyHit: (h: { dir: 1 | -1; attackId: number; dmg?: number; lethal?: boolean }) => (w.hitActor(a.def.id, h.dir, h.attackId, h.dmg ?? 12, !!h.lethal) ? { kind: 'hit' as const } : { kind: 'immune' as const }) } as unknown as Body,
     }));
   };
   // 선물 상대: 지금 장면에서 주인공과 가까운 이름 인물
@@ -317,8 +317,8 @@ function hqAdapter(bridge: Partial<GameBridge> | undefined, ui: { chooseFloor: H
       if (f.body.hp > 0) continue;
       if ((f.t += 1 / 30) < 1.5) continue;
       f.body.alive = false;
-      // 살해 허용이면 죽은 몸(44·45) → 필드 시체, 아니면 기절
-      w.fromFight(id, f.body.x, f.body.y, (f.body as unknown as FighterAi).killed ?? true);
+      // 체력 0 = 항상 기절로 필드에 돌아감. 확인 사살(살해 허용·무기)은 필드 행위자에서 (actors.ts hitActor)
+      w.fromFight(id, f.body.x, f.body.y, true);
       fights.delete(id);
     }
     for (const a of w.challengers(sceneId)) {
