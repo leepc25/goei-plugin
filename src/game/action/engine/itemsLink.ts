@@ -142,7 +142,7 @@ export function linkItems(w: World, run: RunConfigCore & { launch?: { items?: ({
       .map((b) => ({ id: b.id, x: b.x, y: b.y, z: b.z, w: 56, h: 170, human: true }));
   // 상태 효과(에일린 status)도 넘긴다: 효과 없을 때 해제 아이템을 소비하지 않게
   const st = () => (p as unknown as { status?: StatusSet }).status;
-  const ctx = () => ({ hp: p.hp, max: p.hpMax, gauge: p.gauge / 100, energy: p.skillCd > 0 ? 0 : 1, energyMax: 1, bleed: !!st()?.has('bleed'), taint: st()?.stacks('taint') ?? 0, headache: !!st()?.has('headache'), mind: !!(st()?.has('fear') || st()?.has('confuse')) });
+  const ctx = () => ({ hp: p.hp, max: p.hpMax, noHeal: !!(p as { perks?: { traits: Set<string> } }).perks?.traits.has('단식'), gauge: p.gauge / 100, energy: p.skillCd > 0 ? 0 : 1, energyMax: 1, bleed: !!st()?.has('bleed'), taint: st()?.stacks('taint') ?? 0, headache: !!st()?.has('headache'), mind: !!(st()?.has('fear') || st()?.has('confuse')) });
 
   const apply = (evs: ItemEvent[]) => {
     for (const e of evs) {

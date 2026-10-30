@@ -525,6 +525,8 @@ export class PerkRun {
     const h = this.host; if (!h) return;
     this.n.rooms = Math.min(10, (this.n.rooms ?? 0) + 1);
     if (this.has('회복 체질')) h.me.hp = Math.min(h.me.hpMax, h.me.hp + h.me.hpMax * 0.03 * this.r('회복 체질'));
+    // 단식: 잃은 체력의 절반 (대가: 회복약을 못 씀, engine/itemsLink.ts)
+    if (this.traits.has('단식')) h.me.hp = Math.min(h.me.hpMax, h.me.hp + (h.me.hpMax - h.me.hp) * 0.5);
   }
   /** 방 안이 먼저 지친다: 적 공격 간격 배수 */
   enemyGap(): number { if (!this.has('방 안이 먼저 지친다')) return 1; return this.roomT > 30 ? 1 / 0.75 : this.roomT > 15 ? 1 / 0.85 : 1; }

@@ -59,7 +59,7 @@ const PERK_AILS: Record<string, Ail[]> = {
 };
 
 /** 아이템 체계 보류(10-30 사용자): 아이템에 기대는 퍽·특성은 후보에 안 낸다 */
-export const HELD = new Set(['약 잘 쓰는 손', '넉넉한 주머니', '아끼기', '한 모금', '퀵 드로우', '응급 자동 사용', '맨몸', '단식']);
+export const HELD = new Set(['약 잘 쓰는 손', '넉넉한 주머니', '아끼기', '한 모금', '퀵 드로우', '응급 자동 사용', '맨몸']);
 
 /** 쌍 퍽: [반드시, 이 중 하나] */
 export const PAIRS: Record<string, [string, string[]]> = {

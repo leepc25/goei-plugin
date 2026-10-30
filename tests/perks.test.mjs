@@ -96,3 +96,14 @@ test('상태: 정신 방벽은 공포·혼란을 막고, 깊은 상처는 출혈
   const da = a.step(1, { maxHp: 1000 }), db = b.step(1, { maxHp: 1000 });
   assert.ok(Math.abs(db / da - 1.6) < 1e-9);
 });
+
+test('단식: 방을 깨면 잃은 체력의 절반, 출현 가능', () => {
+  const k = new RT.PerkRun();
+  const me = { hp: 400, hpMax: 1000, baseHp: 1000 };
+  k.host = { me, setHpMax() {} };
+  k.addTrait('단식');
+  k.roomClear();
+  assert.equal(me.hp, 700);
+  assert.equal(R.traitOk(D.TRAIT_TEXT.find((t) => t.name === '단식'), kit()), true);
+  assert.equal(R.traitOk(D.TRAIT_TEXT.find((t) => t.name === '맨몸'), kit()), false);
+});

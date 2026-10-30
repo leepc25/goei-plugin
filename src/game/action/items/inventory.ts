@@ -32,6 +32,8 @@ export interface ItemRun {
 export interface UseContext {
   hp: number;
   max: number;
+  /** 회복약을 쓸 수 없음 (특성 「단식」) */
+  noHeal?: boolean;
   bleed?: boolean;
   taint?: number;
   headache?: boolean;
@@ -98,7 +100,7 @@ function useless(effect: ItemEffect, c?: UseContext): boolean {
   if (!c) return false;
   switch (effect.type) {
     case 'heal':
-      return c.hp >= c.max;
+      return c.hp >= c.max || !!c.noHeal;
     case 'cure':
       if (effect.status === 'bleed') return !c.bleed && c.hp >= c.max;
       if (effect.status === 'taint') return !c.taint;
