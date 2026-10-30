@@ -1,4 +1,5 @@
-"""배경 요청 명세 점검 (docs/배경_생성_공용지침.md). bg_prompt.py가 만들기 전에 반드시 돌린다(실패하면 만들지 않음).
+"""배경 요청 명세 점검. 0번 규칙: 물건은 빼지 않는다(앞 판 대조·removed_items·글자 수 때문인 omit은 실패)
+ (docs/배경_생성_공용지침.md). bg_prompt.py가 만들기 전에 반드시 돌린다(실패하면 만들지 않음).
 
 장면 명세(JSON)에 아래를 더 적는다:
   room        방 종류: waiting_room | exam_room | operating_room | shop | office | corridor   (tools/pixellab/room_items.json)
@@ -62,8 +63,33 @@ REVIEW_Q = {
 }
 
 
-def check(spec, prompt):
+def load_prev(spec_path):
+    """같은 폴더에서 바로 앞 판 명세(이름_v<n> 중 n이 가장 큰 아래 판)를 찾는다. 없으면 None."""
+    d, f = os.path.split(os.path.abspath(spec_path)); m = re.match(r'(.+)_v(\d+)\.json$', f)
+    if not m: return None
+    olds = sorted((int(g.group(1)), g.group(0)) for g in (re.match(rf'{re.escape(m.group(1))}_v(\d+)\.json$', x) for x in os.listdir(d)) if g and int(g.group(1)) < int(m.group(2)))
+    return json.load(open(os.path.join(d, olds[-1][1]), encoding='utf-8')) if olds else None
+
+
+def obj_words(it):
+    # 물건 낱말: keep 중 자리·크기·꼴 말이 아닌 것
+    return {k.lower() for k in it.get('keep', []) if not re.search(r'wall|floor|ceiling|front|behind|side|left|right|\d|closed|facing|same|high|one$|away|between', k.lower())}
+
+
+def check(spec, prompt, prev=None):
     fails, warns = [], []
+    # 0 물건은 빼지 않는다 (사용자 10-30: 「다시는 물건을 빼지 마라」). 2,000자는 군말을 줄여 맞춘다
+    if spec.get('removed_items'): fails.append(f'물건을 뺌(removed_items): {list(spec["removed_items"])} — 물건은 빼지 않는다, 군말을 줄일 것')
+    for b in spec.get('brief', {}).get('items', []):
+        if isinstance(b.get('by'), str) and b['by'].startswith('omit:') and re.search(r'2000|2,000|글자|자 수|길이', b['by']): fails.append(f'글자 수 때문에 설계안 항목을 뺌: {b.get("src")} — 물건은 빼지 않는다')
+    if prev:
+        new_words = set().union(*[obj_words(it) for it in spec.get('items', []) if isinstance(it, dict)]) if spec.get('items') else set()
+        new_fulls = {it.get('full') for it in spec.get('items', []) if isinstance(it, dict)}
+        old_items = [it for it in prev.get('items', []) if isinstance(it, dict)] + [{'full': k} for k in (prev.get('removed_items') or {})]
+        for it in old_items:
+            if it.get('full') in new_fulls: continue
+            ow = obj_words(it)
+            if not ow or not any(any(w in nw or nw in w for nw in new_words) for w in ow): fails.append(f'앞 판({prev.get("name")})에 있던 물건을 뺌: {it.get("text") or it.get("full")} — 물건은 빼지 않는다')
     low = prompt.lower()
     room = spec.get('room')
     if room not in DB['rooms']: fails.append(f'room 칸이 없거나 모름: {room}')
@@ -170,8 +196,8 @@ def check(spec, prompt):
     return fails, warns
 
 
-def report(spec, prompt):
-    fails, warns = check(spec, prompt)
+def report(spec, prompt, prev=None):
+    fails, warns = check(spec, prompt, prev)
     print(f'== 점검: {spec.get("name")} ({len(prompt)}자, 물건 {len(spec.get("items", []))}줄)')
     for f in fails: print('FAIL', f)
     for w in warns: print('WARN', w)
@@ -183,5 +209,5 @@ if __name__ == '__main__':
     sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
     from bg_prompt import build
     spec = json.load(open(sys.argv[1], encoding='utf-8'))
-    ok = report(spec, build(spec))
+    ok = report(spec, build(spec), load_prev(sys.argv[1]))
     sys.exit(0 if ok else 1)

@@ -1,4 +1,5 @@
 # 괴이봇 플러그인 개발
+- **배경 요청문에서 물건을 절대 빼지 않는다 (사용자 2026-10-30):** 2,000자는 군말을 줄여 맞춘다, 빼야 할 것 같으면 묻는다. 도구(bg_check 0번)가 막음. [bg-never-remove-items](bg-never-remove-items.md)
 - **GPT art style = reference image, NO procedures (user 2026-10-23 20:08, supersedes 19:48):** GPT cannot pixel-convert, resize, run code, or draw true pixel art however explained. Never put conversion/downscale/palette/pixel steps in GPT guides. Instead: "match the style of the attached 쟈알디 room image" (user attaches it), keep sizes. Ceiling: not drawn separately, only molding/lights in top 40px.
 - [Field bg: GPT fails long images + cross-image style (2026-10-24), options pending](goei-bg-consistency-problem.md)
 - **Field bg via PixelLab parts (2026-10-24, thread 필드 남은 작업 이어가기 cmsg_01SMy6spzkHA3Ttz9fg54ZY8AxFavXcX43PuMsNQkXhSxC):** lobby test OK (style matched, ~130 gens). User cost rule: one shared floor for all 관리국, only a few wall types, 가짜 관리국 reuses 관리국 parts. Full ~120 scenes est. 22k–43k gens before reuse. v0.16.56 released 2026-10-24.

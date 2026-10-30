@@ -98,8 +98,8 @@ def main():
     spec_path = sys.argv[1]
     spec = json.load(open(spec_path, encoding='utf-8'))
     text = build(spec)
-    from bg_check import check, cut_words, REVIEW_Q
-    fails, warns = check(spec, text)
+    from bg_check import check, cut_words, REVIEW_Q, load_prev
+    fails, warns = check(spec, text, load_prev(spec_path))
     out = os.path.dirname(os.path.abspath(spec_path))
     br = spec.get('brief', {})
     L = [f"# 검토서 {spec['name']}", '', f"방 {spec.get('room')} · 분위기 {spec.get('mood')} · 문 {spec.get('doors')} · 원근 {spec['view']} · 바닥 {spec['floor_share']} · 양옆 {spec['sides']} · 채우기 {spec['density']}", '',
