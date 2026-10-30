@@ -40,6 +40,7 @@ FILLER = set('a an the of and with on in at to its it is as by for from into ont
              'standing facing hanging holding showing laid out its their this that'.split())
 
 
+PROTECT = {'flat', 'wall-mounted', 'mounted', 'flush', 'waist-high', 'low', 'gap', 'walkway', 'empty', 'clear', 'closed', 'facing', 'free-standing'}
 LOC_PHRASES = ['back wall', 'left wall', 'right wall', 'side wall', 'floor', 'ceiling', 'corner', 'in front of', 'behind']
 
 
@@ -113,7 +114,8 @@ def check(spec, prompt, prev=None):
         # 줄이며 뺀 낱말: 하나하나 빼도 되는 이유(drop_ok: {낱말: 이유})가 있어야 함
         cut = cut_words(it.get('full', ''), (it.get('at') or '') + ' ' + it.get('text', ''))
         ok = {k.lower(): v for k, v in (it.get('drop_ok') or {}).items() if str(v).strip()}
-        bad = [w for w in cut if w not in ok]
+        # 모양·설치·통로 말은 이유를 적어도 못 뺀다 (대박 알선 v1: 「flat wall-mounted」를 빼서 TV가 브래킷에 매달려 튀어나옴)
+        bad = [w for w in cut if w not in ok or w in PROTECT]
         if bad: fails.append(f'이유 없이 뺀 낱말 {bad}: {it.get("text")}')
     texts = [(it['text'] if isinstance(it, dict) else it) for it in items]
     # 1-0 설계안·위키 항목 대조: brief.items = [{"src": "원문 항목", "by": [물건 줄 번호(0부터)] 또는 "omit: 이유"}]
