@@ -527,7 +527,7 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
       const ai = new FighterAi((w.player as unknown as { clips: ConstructorParameters<typeof FighterAi>[0] }).clips, art, { id: `ai${n}`, grade: 'B', difficulty: aiDiff, persona: personas[(n - 1) % personas.length], seed: 1000 + n, squad, label: `AI ${art.cfg.name} ${n}` });
       ai.x = spec.x; ai.y = spec.y;
       // NPC 상태 능력치: 이름 있는 인물은 초기값 표 등급, 그 밖은 숙련 (docs/설계_인물_초기값.md, 10-30)
-      const ns = npcStats(CHAR_GRADE[art.cfg.name] ?? '숙련', (art.cfg.bal as { role?: string } | undefined)?.role);
+      const ns = npcStats(CHAR_GRADE[art.cfg.name] ?? '숙련', ai.baseHp);
       ai.hp = ai.hpMax = ns.hp; ai.dmgMul = ns.dmgMul;
       return ai as never;
     }

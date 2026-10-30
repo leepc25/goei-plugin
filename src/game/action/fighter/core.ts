@@ -21,8 +21,10 @@ export interface FighterEnv {
   A: Record<string, Json>; IMG: Record<string, HTMLImageElement>; CH: Json; VFX?: Record<string, Json>; CHAIR?: Record<string, HTMLImageElement>;
   held: Set<string>; K(y: number): number; sfx(type: string, extra?: Json): void; font?(n: number): string;
   targets(): { body: Json; x: number; y: number; z: number }[];
-  hurt(t: Target, dmg: number, kind: string, face: number, hitstop: number, o: { src?: string | null }): void;
-  clamp(P: PState): void; ground(x: number, y: number): number; mod?: { speed(): number; sp(): number }; heal?(v: number): void;
+  hurt(t: Target, dmg: number, kind: string, face: number, hitstop: number, o: { src?: string | null; form?: string; el?: string; debuff?: Json; crit?: boolean }): void;
+  clamp(P: PState): void; ground(x: number, y: number): number; mod?: { speed(): number; sp(): number; cd?(): number }; heal?(v: number): void;
+  /** 치명 굴림·치명 피해 배율 (없으면 치명 없음) */
+  crit?(): boolean; critDmg?(): number;
 }
 export function createFighterCore(env: FighterEnv) {
   const VFX = env.VFX || {}, CHAIR = env.CHAIR || {};
@@ -110,7 +112,7 @@ let freeSuper = false, showArmor = true, grayT = 0;
 const BAL = () => CH.bal || {};
 const isHot = () => !!(CH.ranged && CH.ranged.heat) || BAL().gun === 'rapid';
 function cdReady(k?: Json) { const t = (P.cd[k] || 0) - P.t; if (t <= 0) return true; sfx('empty'); fx.push({ k: 'num', x: P.x - 40, y: P.y - 250 * K(P.y), v: `쿨타임 ${t.toFixed(1)}초`, t: 0.6 }); return false; }
-function setCd(k?: Json) { const v = (BAL().cd || {})[k]; if (v) P.cd[k] = P.t + v; }
+function setCd(k?: Json) { const v = (BAL().cd || {})[k]; if (v) P.cd[k] = P.t + v * (env.mod?.cd?.() ?? 1); }   // 기술 쿨 × 능력치(지)
 const atkDmg = (id?: Json, big?: Json) => { const a = BAL().atk || {}; const v = a[id] ?? (big ? 34 : 12); return id === '14' && big ? Math.round(v * 1.8) : v; };   // 점프 강공격(내려찍기)은 약의 1.8배(10-28 「점프 강·약 피해 같음」)
 function gainSp(v?: Json) { if (P.noGain > P.t) return; v *= env.mod ? env.mod.sp() : 1; const was = P.sp; P.sp = Math.min(100, P.sp + v); if (was < 100 && P.sp >= 100) { sfx('ability'); flash = 0.06; fx.push({ k: 'num', x: P.x - 50, y: P.y - 260 * K(P.y), v: '필살기 준비', t: 1.0 }); } }
 function spReady() { if (freeSuper || P.sp >= 100) { if (!freeSuper) P.sp = 0; return true; } sfx('empty'); fx.push({ k: 'num', x: P.x - 50, y: P.y - 250 * K(P.y), v: '게이지 부족', t: 0.7 }); return false; }
@@ -177,7 +179,6 @@ function sparks(x?: Json, y?: Json, n?: Json, big?: Json, col?: Json) {
 }
 const steam = (x?: Json, y?: Json, s = 1) => VFX.steam_wisp ? vfx('steam_wisp', x, y, 1.6) : fx.push({ k: 'steam', x: x + (Math.random() - 0.5) * 6, y, vx: (Math.random() - 0.5) * 16, vy: -40 - Math.random() * 30, r: 1.6 * s, t: 0.6, t0: 0.6 });
 const ring = (x?: Json, y?: Json, r?: Json, t?: Json, c?: Json, w = 4, sy = 1) => fx.push({ k: 'ring', x, y, r0: r * 0.2, r, t, t0: t, c, w, sy });
-const num = (x?: Json, y?: Json, v?: Json, big?: Json) => fx.push({ k: 'num', x, y, v, t: 0.7, big });
 const dust = (x?: Json, y?: Json, n?: Json, s = 1) => { for (let i = 0; i < n; i++) fx.push({ k: 'dust', x: x + (Math.random() - 0.5) * 30 * s, y, vx: (Math.random() - 0.5) * 160 * s, vy: -Math.random() * 60, r: 6 + Math.random() * 8 * s, t: 0.45, t0: 0.45 }); };
 // 총 쏠 때 불꽃은 그림에 그려진 것만 씀 — 코드는 탄피만
 function muzzleFlash(p?: Json, big?: Json) { if (!(CH.gun || []).length) return; for (let i = 0; i < (big ? 3 : 1); i++) fx.push({ k: 'shell', x: p.x - P.face * 30, y: p.y, vx: -P.face * (80 + Math.random() * 80), vy: -220 - Math.random() * 120, g: P.y, t: 1.2 }); }
@@ -186,8 +187,12 @@ function inReach(hx?: Json, pad = 60, hh = 100, wide = false) { pad *= K(P.y); c
 // 고유기·충전·필살 동작 줄(피해 출처 「기술」 판정용: NPC 기술 배율)
 let skillClipSet: Set<string> | null = null;
 const skillClips = () => skillClipSet ??= new Set([CH.skills?.skill?.anim, CH.skills?.skill2?.anim, CH.skills?.charge?.hold, CH.skills?.charge?.release, CH.skills?.super?.anim, ...((CH.skills?.super?.steps || []) as Json[]).map((s: Json) => s.anim)].filter(Boolean).map(String));
+// 지금 맞히는 기술 타격(꼬리표: 판정 형태 form·속성 el·부가효과 debuff, tools/skill_tags.py). strike 가 잠깐 넣었다 뺀다
+let curHit: Json = null, curLast = true;
 function damageTarget(dmg?: Json, kind?: Json) {
   if (T.mark > 0) dmg = Math.round(dmg * 1.5);
+  // 치명(10-30): 모두 5% · 2배. 「치명!」 글자 없이 큰 노란 숫자·큰 불꽃·조금 긴 멈춤
+  const crit = !!env.crit?.(); if (crit) { dmg = Math.round(dmg * (env.critDmg?.() ?? 2)); hitstop = Math.max(hitstop, 0.16); if (!vfx('hit_heavy', T.x, T.y - T.z - 110 * K(T.y), 2.4, { flip: P.face < 0 })) sparks(T.x, T.y - T.z - 110 * K(T.y), 16, true); }
   T.hp = Math.max(0, T.hp - dmg); T.hits++; if (!P.inSuper) gainSp(dmg * 0.45); T.hitT = 1.0; T.flash = 0.09;
   const big = kind !== 'light', air = T.z > 0 || T.vz > 0, dir = Math.sign(T.x - P.x) || P.face;
   T.stag = kind === 'launch' ? 0.9 : big ? 0.5 : 0.34;
@@ -203,8 +208,13 @@ function damageTarget(dmg?: Json, kind?: Json) {
   else if (kind === 'turn') { T.turnT = 0.6; T.turnDir = dir; T.vx = 0; T.stag = 0.15; }   // 홱 뒤돌아 등을 보인 채 2m 밀려 걸어감(로제몬 D)
   else if (air) { T.juggle++; T.vz = Math.max(T.vz, (big ? 560 : 420) * Math.max(0.3, 1 - T.juggle * 0.12)); T.vx = dir * (big ? 160 : 70); }
   else T.vx = dir * (big ? 460 : 55);
-  num(T.x + (Math.random() - 0.5) * 30, T.y - 200 - T.z, dmg, big);
-  if (T.body) env.hurt(T, dmg, kind, P.face, hitstop, { src: curSrc ?? (P.inSuper || (P.clip && skillClips().has(P.clip.id)) || P.mode === 'charge' ? 'skill' : null) });
+  fx.push({ k: 'num', x: T.x + (Math.random() - 0.5) * 30, y: T.y - 200 - T.z, v: dmg, t: crit ? 0.9 : 0.7, big, crit });
+  // 부가효과 중 표식·묶기는 코어 반응(받는 피해 ×1.5 / 못 움직임)으로, 나머지는 상대 상태 이상으로(player.ts)
+  const db = curLast ? curHit?.debuff : undefined;
+  if (db?.k === 'mark') { T.mark = Math.max(T.mark, db.s || 6); vfx('fx-mark', T.x, T.y - T.z - 240 * K(T.y), 1.8 * K(T.y), { center: true }); }
+  else if (db?.k === 'bind') T.bindT = Math.max(T.bindT, db.s || 1.5);
+  const src = curSrc ?? (P.inSuper || (P.clip && skillClips().has(P.clip.id)) || P.mode === 'charge' ? 'skill' : null);
+  if (T.body) env.hurt(T, dmg, kind, P.face, hitstop, { src, form: curHit?.form ?? (src === 'ranged' ? 'gun' : undefined), el: curHit?.el, debuff: db && db.k !== 'mark' && db.k !== 'bind' ? db : undefined, crit });
 }
 function fireEv(e?: Json) {
   if (e && e.fn) e.fn();
@@ -253,7 +263,7 @@ function strike(h?: Json, y?: Json) {
   const one = (i?: Json) => {
     const kind = i === n - 1 ? (h.kind || 'heavy') : (h.mid || 'light'), big = kind !== 'light';
     hitstop = Math.max(hitstop, h.stop ?? (big ? 0.14 : 0.07)); shake = Math.max(shake, h.shake ?? (big ? 12 : 5));
-    damageTarget(Math.round((h.dmg || 20) / n), kind); sfx('hit', { strength: big ? 3 : 1, kind: h.sfx });
+    curHit = h; curLast = i === n - 1; damageTarget(Math.round((h.dmg || 20) / n), kind); curHit = null; curLast = true; sfx('hit', { strength: big ? 3 : 1, kind: h.sfx });
     const hy = y ?? T.y - T.z - 110 * K(T.y);
     if (!h.noVfx) { if (h.vfx && VFX[h.vfx]) vfx(h.vfx, T.x, hy, (h.vs || 1) * K(T.y), { center: true, flip: P.face < 0, tint: h.tint }); else if (!vfx(big ? 'hit_heavy' : 'hit_light', T.x, hy, big ? 1.8 : 2.2, { flip: P.face < 0 })) sparks(T.x, hy, 10, big); }   // h.vfx: 맞는 자리 그림(3판 타격 불꽃 등)
     if (h.text) fx.push({ k: 'num', x: T.x - 30, y: hy - 70, v: h.text, t: 1.2 });
@@ -1300,7 +1310,7 @@ function drawFx(glow?: Json) {
     const k = e.t0 ? e.t / e.t0 : 1;
     if (e.k === 'spark') { ctx.strokeStyle = e.c; ctx.lineWidth = e.s; ctx.lineCap = 'round'; ctx.beginPath(); ctx.moveTo(e.x, e.y); ctx.lineTo(e.x - e.vx * 0.035, e.y - e.vy * 0.035); ctx.stroke(); }
     else if (e.k === 'ring') { ctx.strokeStyle = e.c; ctx.globalAlpha = k; ctx.lineWidth = e.w * k + 1; ctx.beginPath(); ctx.ellipse(e.x, e.y, e.r0 + (e.r - e.r0) * (1 - k), (e.r0 + (e.r - e.r0) * (1 - k)) * e.sy, 0, 0, Math.PI * 2); ctx.stroke(); ctx.globalAlpha = 1; }
-    else if (e.k === 'num') { ctx.fillStyle = typeof e.v === 'string' ? '#9fd0ff' : e.big ? '#ffcf4a' : '#fff'; ctx.font = `bold ${e.big ? 30 : 22}px sans-serif`; ctx.strokeStyle = '#000'; ctx.lineWidth = 4; ctx.strokeText(e.v, e.x - 14, e.y); ctx.fillText(e.v, e.x - 14, e.y); }
+    else if (e.k === 'num') { ctx.fillStyle = typeof e.v === 'string' ? '#9fd0ff' : e.crit ? '#ffe94a' : e.big ? '#ffcf4a' : '#fff'; ctx.font = `bold ${e.crit ? 42 : e.big ? 30 : 22}px sans-serif`; ctx.strokeStyle = '#000'; ctx.lineWidth = 4; ctx.strokeText(e.v, e.x - 14, e.y); ctx.fillText(e.v, e.x - 14, e.y); }
     else if (e.k === 'blood') { ctx.fillStyle = `rgba(150,10,16,${Math.min(1, e.t)})`; if (e.landed) { ctx.beginPath(); ctx.ellipse(e.x, e.y, e.s * 2.2, e.s * 0.8, 0, 0, Math.PI * 2); ctx.fill(); } else ctx.fillRect(e.x - e.s / 2, e.y - e.s / 2, e.s, e.s); }
     else if (e.k === 'mortar') {
       const p = 1 - k, y = -80 + (e.y - 30 + 80) * p, x = e.x + (1 - p) * 140, ang = Math.atan2(e.y + 50, -140);

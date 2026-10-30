@@ -53,7 +53,8 @@ export function progressionFor(run?: ProgressionRun): RunProgression {
 /** World 생성 때만 호출. 첫 피격 보호는 기존 ward 저장값을 쓰므로 방 이동·복원으로 재충전되지 않는다. */
 export function initializeProgression(player: { progression: RunProgression; hp: number; hpMax: number; ward: number }, run: ProgressionRun) {
   player.progression = progressionFor(run);
-  player.hp = player.hpMax = player.progression.stats.hp;
+  // 인물 능력치(힘민체지정)에서 나온 체력이 있으면 그것 (combat/stats.ts, 10-30)
+  player.hp = player.hpMax = (player as { baseHp?: number }).baseHp ?? player.progression.stats.hp;
   if (player.progression.relics.includes('first_guard')) player.ward++;
 }
 

@@ -2,6 +2,10 @@
 // eileen/player.ts(에일린 시험판)를 126명 공용으로 일반화한 것: 그림·설정은 인물 팩(art/charPacks.ts)에서, 이펙트·의자는 action-fx 팩에서.
 // 엔진과 맞닿는 곳만 여기서 한다: 입력(Pad → 테스트룸 동작), 위치 동기화, 적에게 맞히기(env.hurt → 적 applyHit), 적에게 맞기(applyHit → core.takeHit),
 // 체력·게이지(게임 값), 그리기(바닥 층·몸·이펙트 층·화면 효과). 판정 크기·반응은 테스트룸 값을 게임 적 반응 등급으로 옮긴다.
+import { baseOf, derive, type BaseStats, type Derived } from '../../combat/stats';
+import type { DebuffKind } from '../../combat/status';
+/** 코어가 타격마다 넘기는 꼬리표 */
+type HurtOpt = { push?: number; src?: 'ranged' | 'blast' | 'skill' | null; form?: 'body' | 'gun' | 'psi'; el?: string; debuff?: { k: DebuffKind; s: number }; crit?: boolean };
 import { Player } from '../engine/player';
 import { Fighter } from '../engine/fighter';
 import { newAttackId } from '../engine/ids';
@@ -63,10 +67,18 @@ export class FighterPlayer extends Player {
 
   /** 인물 팩 (그림·설정) */
   readonly art: CharArt;
+  /** 기본 능력치(힘민체지정)와 산출 전투 수치 (combat/stats.ts) */
+  base: BaseStats;
+  stat: Derived;
+  /** 능력치에서 나온 최대 체력 (출동 시작 때 progression 이 이 값을 쓴다) */
+  baseHp: number;
   constructor(clips: Record<string, FrameInfo[]>, art: CharArt) {
     super(clips);
     this.art = art;
     this.label = art.cfg.name;
+    this.base = baseOf(art.cfg.name);
+    this.stat = derive(this.base);
+    this.baseHp = this.hp = this.hpMax = this.stat.hp;
     // 멈춤(히트스톱)은 테스트룸 코드가 스스로 한다: 엔진이 플레이어에 거는 멈춤은 받지 않는다
     Object.defineProperty(this, 'stop', { get: () => 0, set: () => {}, configurable: true });
     const fx = charFx();
@@ -78,10 +90,12 @@ export class FighterPlayer extends Player {
       font: (n: number) => pfont(n).f,
       targets: () => this.targets(),
       // 능력치(본부 출동 stats)·상태 효과 배율 (docs/게임_성장_경제_설계.md 2-2·6장)
-      mod: { speed: () => this.speedMul(), sp: () => this.spMul() },
+      mod: { speed: () => this.speedMul(), sp: () => this.spMul(), cd: () => this.stat.cd },
+      // 치명: 플레이어·NPC·적 모두 같은 확률 (10-30)
+      crit: () => Math.random() < this.stat.crit, critDmg: () => this.stat.critDmg,
       // 물건 윗면은 이미 그 높이에 있을 때만 땅이다 (아래에서 걸어 들어가면 올라서지 않고 막힌다)
       ground: (x: number, y: number) => { const p = this.platformAt(x, y); return p && this.core.P.z >= p.h - 10 ? p.h : 0; },
-      hurt: (t: { body: Body }, dmg: number, kind: string, face: 1 | -1, hitstop: number, o: { push?: number; src?: 'ranged' | 'blast' | 'skill' }) => this.hurtTarget(t.body, dmg, kind, face, hitstop, o),
+      hurt: (t: { body: Body }, dmg: number, kind: string, face: 1 | -1, hitstop: number, o: HurtOpt) => this.hurtTarget(t.body, dmg, kind, face, hitstop, o),
       clamp: (P: { x: number; y: number }) => {
         const w = this.world;
         if (!w) return;
@@ -129,24 +143,27 @@ export class FighterPlayer extends Player {
 
   /** 이동·회피·점프 속도 배율: 능력치 speed × 상태 효과 */
   protected speedMul(): number {
-    return (this.progression?.stats.speed ?? 1) * (this.statusMod?.speed() ?? 1);
+    return this.stat.speed * (this.progression?.stats.speed ?? 1) * (this.statusMod?.speed() ?? 1);
   }
   /** 필살 게이지 차는 배율: 능력치 charge × 상태 효과 */
   protected spMul(): number {
-    return (this.progression?.stats.charge ?? 1) * (this.statusMod?.sp() ?? 1);
+    return this.stat.sp * (this.progression?.stats.charge ?? 1) * (this.statusMod?.sp() ?? 1);
   }
   /** 상태 효과 (출혈·오염·두통·혼란·공포·둔화·침묵, src/game/combat/status.ts). 적 공격의 debuff 이벤트가 건다 */
   status = new StatusSet();
   /** 상태 효과가 거는 배율 */
   statusMod?: { speed(): number; sp(): number } = { speed: () => this.status.speedMul(), sp: () => this.status.spMul() };
 
-  private hurtTarget(t: Body, dmg: number, kind: string, face: 1 | -1, hitstop: number, o: { push?: number; src?: 'ranged' | 'blast' | 'skill' }) {
+  private hurtTarget(t: Body, dmg: number, kind: string, face: 1 | -1, hitstop: number, o: HurtOpt) {
     const w = this.world as (WorldView & { kills: number; emit(e: unknown): void }) | null;
     if (!w || !t.alive) return;
     const r = REACT[kind] ?? REACT.light;
     // 근접·기술은 힘, 원거리(사격·충전탄·제압사격)는 사격 배율 (폭발은 배율 없음: 엔진 progressionHit 'ability'와 같음)
     const st = this.progression?.stats;
-    let scale = (o.src === 'ranged' ? st?.aim : o.src === 'blast' ? 1 : st?.power) ?? 1;
+    // 판정 형태로 어느 능력치가 피해를 키울지 (docs/설계_능력치_기술피해_안.md 4장): 몸 = 힘, 총·투척 = 민, 이능 = 지. 꼬리표가 없으면 사격은 총, 나머지는 몸
+    const form = o.form ?? (o.src === 'ranged' ? 'gun' : 'body');
+    let scale = form === 'gun' ? this.stat.aim * (st?.aim ?? 1) : form === 'psi' ? this.stat.psi : this.stat.power * (st?.power ?? 1);
+    if (o.src === 'blast' && !o.form) scale = 1;
     // 에일린 전용 유물 「조준경 덮개」(숙련 8): 출동마다 첫 사격 명중은 치명 ×2
     if (o.src === 'ranged' && !this.firstShotUsed && this.label === '에일린' && this.progression?.relics.includes('own_eileen')) {
       this.firstShotUsed = true;
@@ -156,6 +173,9 @@ export class FighterPlayer extends Player {
     const hit: Hit = { x0: t.x - 1, x1: t.x + 1, z0: 0, z1: 400, y: t.y, dy: 999, attackId: newAttackId(), dmg: dmg * this.dmgMul * scale * (o.src === 'skill' ? this.skillMul : 1), react: r.react, dir: face, push: o.push ?? r.push, lift: r.lift, stop: 0, strength: r.strength };
     const res = t.applyHit(hit, w);
     if (res.kind === 'immune') return;
+    // 기술 부가효과: 맞은 상대에게 상태 이상 (docs/퍽/기술_부가효과.md). 막았으면 안 걸림. 상대 정신력으로 지속이 줄어듦
+    const tf = t as Body & { status?: StatusSet; stat?: Derived };
+    if (o.debuff && res.kind !== 'guard' && tf.status) tf.status.apply(o.debuff.k, o.debuff.s > 0 ? o.debuff.s * (tf.stat?.statusDur ?? 1) : undefined);
     // 맞은 적은 테스트룸 멈춤만큼 멈춘다
     t.stop = Math.max(t.stop, Math.round(Math.max(hitstop, kind === 'light' ? 0.085 : 0.16) * 30));
     this.combo = this.comboClock > 0 ? this.combo + 1 : 1;
@@ -206,7 +226,7 @@ export class FighterPlayer extends Player {
     const strength = hit.strength ?? (hit.react === 'down' || hit.react === 'launch' ? 3 : hit.react === 'stagger' ? 2 : 1);
     const armored = this.core.armored() || strength <= (this.progression?.stats.poise ?? 0);
     // 방어(defense): 받는 피해 감소 (가드·무적·부적 뒤 실제 체력 피해에만, 엔진 defendedHit과 같음)
-    const taken = hit.dmg * (1 - (this.progression?.stats.defense ?? 0)) * (this.core.armored() ? 0.5 : 1);
+    const taken = hit.dmg * this.stat.taken * (1 - (this.progression?.stats.defense ?? 0)) * (this.core.armored() ? 0.5 : 1);
     this.hp = Math.max(0, this.hp - Math.round(taken));
     world.emit({ type: 'hurt', x: this.x, dmg: taken, hp: this.hp });
     if (!this.lowWarned && this.hp < this.hpMax * 0.3) {

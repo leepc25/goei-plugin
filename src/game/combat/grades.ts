@@ -10,12 +10,11 @@ export const GRADE: Record<NpcGrade, { hp: number; dmg: number; shield: number }
 export const BASE_HP = 1000;
 /** NPC가 고유기·충전·필살을 쓸 때만 곱함 (평타·사격은 그대로) */
 export const NPC_SKILL_MUL = 0.5;
-const ROLE_HP: Record<string, number> = { tank: 1.2, bruiser: 1.1 };
 /** 이름 있는 인물 55명 등급 (초기값 표에서 뽑음) */
 export const CHAR_GRADE: Record<string, NpcGrade> = { '쟈알디': '상당히', '스팡달': '적당히', '잼트리': '적당히', '에일린': '적당히', '고그니쟈': '적당히', '큐라스': '적당히', '고르고디오': '상당히', '데쥬레': '적당히', '데드폴': '적당히', '게슈간': '적당히', '로제몬': '적당히', '콘쥬스': '적당히', '사장': '상당히', '도필헌': '적당히', '이길환': '적당히', '이기석': '적당히', '김조학': '훈련', '이도형': '상당히', '고영훈': '적당히', '노기균': '적당히', '송주익': '적당히', '곽성주': '상당히', '조성춘': '적당히', '윤병수': '적당히', '김성진': '적당히', '송진섭': '적당히', '청달래': '적당히', '호유원': '적당히', '백석주': '적당히', '진나솔': '적당히', '이성해': '적당히', '이자헌': '적당히', '은하제': '적당히', '박민성': '적당히', '백사헌': '훈련', '고영은': '적당히', '강이학': '훈련', '장허운': '적당히', '곽제강': '적당히', '이연화': '적당히', '이병진': '적당히', '제이': '적당히', '차여진': '적당히', '서윤지': '적당히', '고연지': '훈련', '윤지아': '훈련', '마덕희': '적당히', '문혜란': '적당히', '신유리': '적당히', '블라렛': '적당히', '살라딘': '재난급', '아벤샤': '적당히', '세크리엠': '재난급', '브라우니': '적당히', '탐미주의': '재난급' };
 
-/** 인물 이름(또는 몹 등급)과 역할 → NPC 상태 체력·피해 배수 */
-export function npcStats(grade: NpcGrade, role?: string): { hp: number; dmgMul: number } {
+/** NPC 상태 = 그 인물 능력치 체력(힘민체지정, 없으면 BASE_HP) × 등급 배수. 역할 보정은 능력치(체)가 대신한다 */
+export function npcStats(grade: NpcGrade, baseHp = BASE_HP): { hp: number; dmgMul: number } {
   const g = GRADE[grade];
-  return { hp: Math.round(BASE_HP * g.hp * (ROLE_HP[role ?? ''] ?? 1)), dmgMul: g.dmg };
+  return { hp: Math.round(baseHp * g.hp), dmgMul: g.dmg };
 }

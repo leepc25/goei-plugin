@@ -11,6 +11,7 @@ sys.path.insert(0, str(TR))
 import build  # noqa: E402
 sys.path.insert(0, str(ROOT / "tools"))
 import damage_std  # noqa: E402
+import skill_tags  # noqa: E402
 from PIL import Image  # noqa: E402
 
 PACKS = ROOT / "game-pack"
@@ -46,6 +47,7 @@ def write_char(cfg):
         if old.name not in keep: old.unlink()
     (d / "pack.json").write_text(json.dumps({"id": pack_id(key), "required": False}, ensure_ascii=False) + "\n", encoding="utf-8")
     damage_std.normalize(payload, lines)   # 기본 피해 표준값(docs/설계_기본피해_표준.md, 10-30)
+    skill_tags.tag(payload)   # 판정 형태·속성·부가효과 꼬리표(10-30)
     (d / "char.json").write_text(json.dumps({"cfg": payload, "A": lines}, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
     size = sum(f.stat().st_size for f in d.iterdir())
     return size, len(lines)
