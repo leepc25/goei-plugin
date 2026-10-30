@@ -100,7 +100,7 @@ function atkSeq(id?: Json, heavy?: Json) {
 const P0 = () => ({ x: 420, y: 580, z: 0, vz: 0, face: 1, mode: 'ground', combat: false, armed: false, clip: null, pvx: 0, pvy: 0, pdec: 0,
             jumps: 0, airAtk: false, airVX: 230, takeoff: 0, spin: 0, buf: null, chainT: 0, combo: 0, stunT: 0, idleT: 0, lastTap: {}, runLatch: false,
             hp: 100, sp: 0, heat: 0, overT: 0, lastShot: 0, chargeShown: 0, armorT: 0, inv: 0, charge: 0,
-            dodgeN: 2, dodgeMax: 2, dodgeCd: 0.8, dodgeT: 0, ghostT: 0, dying: false, t: 0, buffT: 0, vanish: null, cd: {}, seat: null });
+            dodgeN: 2, dodgeMax: 2, dodgeCd: 0.8, dodgeT: 0, wakeDelay: 0.6, downAt: -9, wakeBuf: null, ghostT: 0, dying: false, t: 0, buffT: 0, vanish: null, cd: {}, seat: null });
 let P: PState = P0() as PState;
 let zoom = 0;
 let paused = false, hitstop = 0, shake = 0, flash = 0, dark = 0, cut = 0;
@@ -745,7 +745,7 @@ function takeHit(kind?: Json) {
 // 공격 종류 → 피격 동작(사용자 2026-10-25): 약 = 맞기 상단(18) · 강 = 맞기 하단(18-1) · 날리기 = 크게 밀려나기(18-2) · 띄우기 = 띄워지기(18-3) · 다운 = 쓰러지기(19) · 누운 채 = 움찔(43) · HP 0 = 사망(44 서서 / 45 누워서)
 function hitAs(id?: Json, push?: Json, dmg?: Json, d = 0.055) { if (!has(id)) return hit(); gainSp(10); sfx('hurt', { strength: 2 }); P.combat = true; P.combo = 0; P.armed = false; pushP(push, 1100); flash = 0.05; shake = Math.max(shake, 6); P.hp = Math.max(1, P.hp - dmg); act(id, { seq: [{ f: 0, d: 0.02 }, ...S(R(1, nOf(id) - 1), d)] }); }
 const LIE19 = () => CH.lie19 && CH.lie19.length ? CH.lie19.map((f?: Json) => cf('19', f - 1)) : LP('19');   // 누운 반복 = 빌드가 잰 「다 누운 장」만(10-29: 표의 반복 구간에 무릎 세운 장이 섞여 활어처럼 퍼덕임)
-function lieLoop() { const n = nOf('19'), lp = LIE19() || [n - 1]; P.mode = 'down'; play('19', { seq: lp.map((f?: Json) => ({ f, d: lp.length <= 2 ? 0.6 : 0.3 })), loopFrom: 0 }); }
+function lieLoop() { const n = nOf('19'), lp = LIE19() || [n - 1]; if (P.mode !== 'down') P.downAt = P.t; P.mode = 'down'; play('19', { seq: lp.map((f?: Json) => ({ f, d: lp.length <= 2 ? 0.6 : 0.3 })), loopFrom: 0 }); }
 function launched() {
   if (!has('18_3')) return knock();
   gainSp(20); sfx('hurt', { strength: 2 }); P.combat = true; P.combo = 0; P.armed = false; pushP(-380, 700); shake = 8;
@@ -933,6 +933,8 @@ function onPress(a?: Json) {
     }
     return;
   }
+  // 기상 지연: 바닥에 닿고 wakeDelay(0.6초) 동안은 못 일어난다. 그동안 누른 키는 기억했다가 끝나면 일어난다(10-30 사용자 「벌떡벌떡 일어나면 되냐」). 누운 동안 무적은 그대로
+  if (m === 'down' && P.t - (P.downAt ?? -9) < P.wakeDelay) { if (a !== 'hit') P.wakeBuf = a; return; }
   if (m === 'down') { if (a === 'crawl' || a === 'left' || a === 'right') return belly(); if (['jump', 'up', 'light', 'left', 'right', 'down', 'run'].includes(a)) return getUp(); return; }   // 누운 채 방향키·달리기도 일어나기(10-28: 쓰러진 뒤 「달리기가 안 됨」으로 보였음)
   if (m === 'belly') { if (a === 'jump' || a === 'crawl' || a === 'up') return getUp(); return; }
   if (m === 'stun') { P.stunT -= 0.18; return; }
@@ -1049,6 +1051,8 @@ function update(dt?: Json) {
   if (P.mode !== 'air' && P.z > 0) { P.vz = Math.min(P.vz || 0, 300) - 2700 * dt; P.z = Math.max(0, P.z + P.vz * dt); if (P.z === 0) { P.vz = 0; dust(P.x, P.y, 4, 1); sfx('land'); } }
   if (P.clip && (P.clip.id === 'SH_D' || P.clip.id === 'SH_E') && Math.random() < dt * 60) { const k = K(P.y); fx.push({ k: 'mote', x: P.x + (Math.random() - 0.5) * 70 * k, y: P.y - (230 + Math.random() * 40) * k, vy: 700 + Math.random() * 200, c: 'rgba(170,220,255,.8)', t: 0.3 }); }   // 샤워 물줄기(코드)
   P.inv = Math.max(0, P.inv - dt); P.wakeArmor = Math.max(0, (P.wakeArmor || 0) - dt);
+  if (P.mode === 'down' && P.wakeBuf && P.t - (P.downAt ?? -9) >= P.wakeDelay) { const k = P.wakeBuf; P.wakeBuf = null; onPress(k); }
+  else if (P.mode !== 'down') P.wakeBuf = null;
   if (P.dodgeN < P.dodgeMax) { P.dodgeT -= dt; if (P.dodgeT <= 0) { P.dodgeN++; P.dodgeT = P.dodgeN < P.dodgeMax ? P.dodgeCd : 0; } }
   if (P.overT > 0) { P.overT -= dt; P.heat = 100 * Math.max(0, P.overT) / 2.6; if (Math.random() < dt * 6) { const p = P.armed ? muzzle() : { x: P.x + P.face * 30 * K(P.y), y: P.y - 150 * K(P.y) }; steam(p.x, p.y, 1.2); } }
   else if (P.t - P.lastShot > 0.35) P.heat = Math.max(0, P.heat - 30 * dt);
@@ -1085,7 +1089,7 @@ function update(dt?: Json) {
       }
       break;
     }
-    case 'act': if (P.knockT > 0) { P.knockT -= dt; if (P.knockT <= 0) P.mode = 'down'; } break;
+    case 'act': if (P.knockT > 0) { P.knockT -= dt; if (P.knockT <= 0) { P.mode = 'down'; P.downAt = P.t; } } break;
     case 'chain': P.chainT -= dt; if (P.chainT <= 0) chainExpire(); break;
     case 'air': {
       if (P.takeoff > 0) { P.takeoff -= dt; if (P.takeoff <= 0) { P.vz = 1180; dust(P.x, P.y, 3, 0.7); } else break; }
