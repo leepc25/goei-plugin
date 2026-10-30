@@ -878,6 +878,7 @@ function takeHit(kind?: Json) {
   if (P.mode === 'dead') return;
   if (P.mode === 'air') { P.airAtk = false; P.spin = 0; }
   if (P.inv > 0) { fx.push({ k: 'num', x: P.x, y: P.y - 230, v: '회피', t: 0.6 }); if (P.dodging) env.perk?.evaded(); return; }
+  if (P.mode === 'down' || P.mode === 'belly') return flinch();   // 누운 채 맞음 → 움찔(43)
   if (P.mode === 'block') { sfx('guard'); shake = 4; if (!vfx('guard_block', P.x + P.face * 50 * K(P.y), P.y - 140 * K(P.y), 2.2, { flip: P.face < 0 })) sparks(P.x + P.face * 50, P.y - 140, 8, false, '#9fd0ff'); pushP(-200, 1200); return; }
   if (armored()) { gainSp(5 * (P.hurtSp || 1)); sfx('armor'); P.armorT = 0.28; P.armorC = ''; hitstop = 0.06; shake = 6; return; }
   if (P.mode === 'charge') P.charge = 0;
@@ -900,7 +901,8 @@ function launched() {
 function flinch() {   // 누운 채 맞음: 움찔했다 다시 누워 숨쉬기
   flash = 0.05; shake = Math.max(shake, 4); sfx('hurt');
   if (!has('43')) return;
-  play('43', { seq: S(R(0, nOf('43') - 1), 0.07), onEnd: () => { if (P.mode === 'down') lieLoop(); } });
+  const crawling = P.mode === 'belly';
+  play('43', { seq: S(R(0, nOf('43') - 1), 0.07), onEnd: () => { if (P.mode === 'down' || P.mode === 'belly') { if (crawling) belly(); else lieLoop(); } } });
 }
 function die() {
   if (P.mode === 'dead') { P.mode = 'ground'; P.hp = 100; P.dying = false; return toIdle(); }   // 테스트룸: 다시 누르면 되살림

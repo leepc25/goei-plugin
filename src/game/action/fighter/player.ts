@@ -305,7 +305,9 @@ export class FighterPlayer extends Player {
       if (P.dodging && this.perks.reflectOnDodge() && !this.attackerOf(hit)) this.core.perkApi.reflect(hit.dmg, this.perks.reflectSplit());
       return { kind: 'immune' };
     }
-    if (P.mode === 'down' || P.mode === 'belly' || this.phase === 'down') return { kind: 'immune' };
+    // 누운 몸도 맞는다(10-30 사용자: 모든 상황에서 공격을 받음) → 움찔(43). 체력 0으로 쓰러진 몸은 사망 처리가 정해질 때까지 그대로
+    if (this.phase === 'down') return { kind: 'immune' };
+    const lying = P.mode === 'down' || P.mode === 'belly';
     const front = hit.dir === -P.face;
     if (P.mode === 'block' && front) {
       // 퍽: 막기 사건(가시 방패·혼쭐·금품 수수 불가·쌓인 울분·탄 되받기·맨손으로 쳐낸다·가드 강화·완전 방어)
@@ -366,11 +368,12 @@ export class FighterPlayer extends Player {
       world.emit({ type: 'hp:low' });
     }
     if (this.hp <= 0) {
-      this.core.knock();
+      if (lying) this.core.takeHit('hit'); else this.core.knock();
       this.phase = 'down';
       return { kind: 'hit', killed: true };
     }
     this.status.onHit();
+    if (lying) { this.core.takeHit('hit'); return { kind: 'hit' }; }
     if (armored) { this.core.takeHit('hit'); return { kind: 'armor' }; }
     P.face = (Math.sign(hit.dir) === 1 ? -1 : 1) as 1 | -1;
     // 공격 종류 → 피격 동작(10-25 결정): 약 = 맞기(18) · 강 = 맞기 하단(18_1) · 날리기 = 크게 밀려나기(18_2) · 띄우기 = 띄워지기(18_3) · 다운 = 쓰러지기(19). 그 줄이 없는 인물은 엔진이 18·19로 대신함
