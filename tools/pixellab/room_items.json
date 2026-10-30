@@ -12,7 +12,12 @@
   "bucket catching",
   "curtain rail",
   "ceiling-rail curtain",
-  "people"
+  "people",
+  "table",
+  "desk",
+  "stool",
+  "couch",
+  "armchair"
  ],
  "visitor_things": [
   "blood pressure",

@@ -85,7 +85,8 @@ def check(spec, prompt, prev=None):
         if isinstance(b.get('by'), str) and b['by'].startswith('omit:') and re.search(r'2000|2,000|글자|자 수|길이', b['by']): fails.append(f'글자 수 때문에 설계안 항목을 뺌: {b.get("src")} — 물건은 빼지 않는다')
     if prev:
         new_words = set().union(*[obj_words(it) for it in spec.get('items', []) if isinstance(it, dict)]) if spec.get('items') else set()
-        new_fulls = {it.get('full') for it in spec.get('items', []) if isinstance(it, dict)}
+        # as_objects: 배경에서 빼고 오브젝트로 따로 뽑는 것(탁자·책상·의자·소파, 사용자 10-30) — 뺀 것으로 치지 않음
+        new_fulls = {it.get('full') for it in spec.get('items', []) if isinstance(it, dict)} | {o.get('full') for o in spec.get('as_objects', [])}
         old_items = [it for it in prev.get('items', []) if isinstance(it, dict)] + [{'full': k} for k in (prev.get('removed_items') or {})]
         for it in old_items:
             if it.get('full') in new_fulls: continue

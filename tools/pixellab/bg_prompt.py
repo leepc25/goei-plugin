@@ -36,7 +36,7 @@ VIEW = {
 DENSITY = {
     'packed': "PACKED WITH STUFF, every area filled, no empty wall, no empty floor corner.",   # 헐값매입 1차 문장
     # 더 강조(사용자 10-30 대박 알선): 벽·선반·탁자 위까지 잔물건으로
-    'packed+': "VERY CLUTTERED, PACKED WITH STUFF: every wall, shelf, table top and corner crowded with small props, no empty wall, no bare surface.",
+    'packed+': "VERY CLUTTERED, PACKED WITH STUFF: every wall, shelf and corner crowded with small props, no empty wall, no bare surface.",
     'normal': "",
     'bare': "Sparse and bare, only the listed things.",
 }
@@ -47,9 +47,9 @@ SIDES = {
     'none': "No side walls: the room keeps going past both image edges.",
 }
 STYLE = "dense, highly detailed pixel art, crisp pixel clusters, selective dark outline, rich medium-to-detailed shading"
-ALWAYS_NO = ["people", "chairs", "sofas", "benches", "clocks"]
+ALWAYS_NO = ["people", "chairs", "sofas", "benches", "tables", "desks", "clocks"]   # 탁자·책상·의자·소파는 오브젝트로 따로(사용자 10-30)
 BANNED = [  # 채우기 문구는 density 칸으로만 넣는다(아래)
-          r"\bchair\b", r"\bsofa\b", r"\bbench\b", r"\bclock\b", r"\bbucket\b.*\bdrip\b", r"\bleak\b", r"\bcurtain\b.*\brail\b"]
+          r"\bchair\b", r"\bsofa\b", r"\btables?\b", r"\bdesks?\b", r"\bbench\b", r"\bclock\b", r"\bbucket\b.*\bdrip\b", r"\bleak\b", r"\bcurtain\b.*\brail\b"]
 PLACE_WORDS = ("back wall", "left", "right", "front", "center", "middle", "corner", "beside", "next to", "behind", "above", "in front of", "on the")
 REF1_USAGE = ("Copy only the camera angle, the low viewing height, the perspective, the pixel density and the level of detail "
               "and shading of this image. Do not copy any of its objects, furniture, layout, room shape or colors.")
@@ -79,7 +79,7 @@ def build(spec):
     for pat in BANNED:
         if re.search(pat, text_all): errs.append(f'금지 표현: /{pat}/')
     n = len(spec['items'])
-    if not 12 <= n <= 28: errs.append(f'물건 줄 수 {n} (12~28줄, 한 줄 1~2개)')
+    if not 10 <= n <= 28: errs.append(f'물건 줄 수 {n} (10~28줄, 한 줄 1~2개)')
     if errs: raise SystemExit('\n'.join(errs))
     things = ' '.join((f"{at[0].upper() + at[1:]}: " if at else '') + '; '.join(ts) + '.' for at, ts in groups.items())
     no = ALWAYS_NO + [x for x in spec.get('no', []) if x not in ALWAYS_NO]
