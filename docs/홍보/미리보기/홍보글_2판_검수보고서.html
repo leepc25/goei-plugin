@@ -1,0 +1,122 @@
+<title>홍보글 2판 검수 보고서</title>
+
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Noto+Sans+KR:wght@400;600;800&family=Nanum+Myeongjo:wght@800&display=swap">
+<style>
+/* 레이아웃: 관리국 열람 문서 — 좁은 본문 단, 위에 기록 머리, 사진 자리는 감시 화면 틀 */
+:root{
+  --bg:#F3F5F4; --paper:#FFFFFF; --fg:#18201E; --dim:#5C6965; --line:#D5DDDA; --accent:#0E7C6B; --accent-soft:#DDEFEB; --warn:#9A5B00; --warn-soft:#FBEEDB; --code:#EEF2F1;
+  --f-display:'Nanum Myeongjo','Noto Serif KR',serif; --f-body:'Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',system-ui,sans-serif; --f-mono:'IBM Plex Mono',ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#0B1215;--paper:#111B1E;--fg:#E3ECE9;--dim:#94A6A1;--line:#24343A;--accent:#5EEAD4;--accent-soft:#12332F;--warn:#F5B544;--warn-soft:#33270F;--code:#17242A;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0B1215;--paper:#111B1E;--fg:#E3ECE9;--dim:#94A6A1;--line:#24343A;--accent:#5EEAD4;--accent-soft:#12332F;--warn:#F5B544;--warn-soft:#33270F;--code:#17242A;color-scheme:dark}
+body{background:var(--bg);color:var(--fg);font-family:var(--f-body);font-size:15.5px;line-height:1.75;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:28px 64px}
+.wrap{max-width:780px;margin:0 auto;display:flex;flex-direction:column;gap:0}
+.head{display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap;font-family:var(--f-mono);font-size:12px;letter-spacing:.12em;color:var(--dim);text-transform:uppercase;border-bottom:1px solid var(--line);padding-bottom:10px;margin-bottom:18px}
+.head b{color:var(--accent);font-weight:600}
+.doc{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:28px clamp(18px,4vw,44px) 36px;min-width:0}
+h1{font-family:var(--f-display);font-size:clamp(26px,4.6vw,34px);line-height:1.3;margin:0 0 16px;text-wrap:balance}
+h2{font-size:21px;font-weight:800;margin:36px 0 10px;padding-top:14px;border-top:2px solid var(--fg);text-wrap:balance}
+h3{font-size:17px;margin:24px 0 8px}
+p,li{max-width:68ch}
+p{margin:8px 0}
+ul,ol{margin:6px 0 10px;padding-left:22px}
+li{margin:3px 0}
+b{font-weight:700}
+a{color:var(--accent)}
+code{font-family:var(--f-mono);font-size:.88em;background:var(--code);padding:1px 5px;border-radius:4px;overflow-wrap:anywhere}
+pre{background:var(--code);border:1px solid var(--line);border-radius:8px;padding:12px 14px;overflow-x:auto}
+pre code{background:none;padding:0;font-size:13px;white-space:pre}
+blockquote{margin:12px 0;padding:8px 14px;border-left:3px solid var(--accent);background:var(--accent-soft);border-radius:0 8px 8px 0}
+blockquote p{margin:4px 0}
+hr{border:0;border-top:1px dashed var(--line);margin:22px 0}
+.tw{overflow-x:auto;margin:10px 0;border:1px solid var(--line);border-radius:8px}
+table{border-collapse:collapse;width:100%;font-size:14px;font-variant-numeric:tabular-nums}
+th,td{padding:8px 10px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+th{background:var(--code);font-weight:700;white-space:nowrap}
+tr:last-child td{border-bottom:0}
+.slot{margin:14px 0;border:1px dashed var(--accent);border-radius:10px;aspect-ratio:16/6;max-width:100%;display:grid;place-items:center;background:repeating-linear-gradient(0deg,var(--accent-soft) 0 2px,transparent 2px 5px);font-family:var(--f-mono);font-size:12.5px;color:var(--accent);text-align:center;padding:10px}
+.decide h2{border-top-color:var(--warn)}
+.note{font-size:13px;color:var(--dim);margin-top:14px}
+@media (max-width:520px){body{font-size:15px}.doc{border-radius:10px}th{white-space:normal}}
+</style>
+
+<div class="wrap"><div class="head"><span><b>괴이 ː ANOMALY</b> · 1판 대비 전수 대조</span><span>2026-10-30 · 검토용</span></div><article class="doc"><h1>홍보글 2판 검수 보고서 (2026-10-30)</h1>
+<p>대상: <code>docs/홍보/홍보글_2판_초안.md</code> 비교 기준: 1판 <code>docs/홍보/아카라이브_홍보글.html</code> 전문(문장 단위) 검수 방법: 1판 문장마다 2판에 있는지 확인하고, 내용은 <b>코드·자료 파일을 직접 열어</b> 대조함(서브에이전트 보고는 쓰지 않음). 2판에 새로 넣은 숫자·예시도 같은 방식으로 다시 확인함.</p>
+<h2>1. 무엇이 잘못됐었나</h2>
+<div class="tw"><table><thead><tr><th>#</th><th>잘못</th><th>원인</th></tr></thead><tbody>
+<tr><td>1</td><td>「전화 걸기」「읽씹」을 「없는 기능」이라며 뺌</td><td>자료 수집을 맡긴 서브에이전트 보고를 코드 확인 없이 그대로 믿음. 실제로는 <code>src/ui/phone.ts</code>에 전화 걸기 화면, <code>src/core/phone.ts</code>에 읽음 상태·재촉이 있음</td></tr>
+<tr><td>2</td><td>「모델은 언제 부르나」 표에 인물 기록·괴담톡·괴담넷·위키를 「본편만으론 안 됨」으로 적음</td><td>같은 원인. 실제로는 넷 다 메인 모델 선택 가능(<code>src/ui/phone.ts</code> 946, <code>src/ui/wiki.ts</code> 546, <code>src/ui/people.ts</code> 334, <code>src/core/gnet.ts</code> 144)</td></tr>
+<tr><td>3</td><td>1판에 있던 내용을 2판에서 내 판단으로 많이 뺌</td><td>「구호 줄이기」를 이유로 1판 문장을 지움. 사용자 지시는 「내용이 부실하니 다시 만들라」였지 빼라가 아니었음</td></tr>
+<tr><td>4</td><td>「대련 난이도」를 뺐다가 되돌림</td><td>코드와 차이가 있어도 지우지 말고 결정을 받아야 했음</td></tr>
+</tbody></table></div>
+<h2>2. 1판 대비 전수 대조</h2>
+<p>상태: ✅ 2판에 있었음 / 🔁 빠졌던 것을 되돌림 / ✏️ 되돌리되 코드에 맞춰 고치고 「검토 때 정할 것」에 올림</p>
+<div class="tw"><table><thead><tr><th>1판 내용</th><th>상태</th><th>코드·자료 근거</th></tr></thead><tbody>
+<tr><td>「출근길 지하철, 단골 편의점, 오래된 아파트. 당신이 아는 서울 뒤편에, 괴이가 산다.」</td><td>🔁</td><td>— (문구)</td></tr>
+<tr><td>「현대 대한민국을 무대로 한 괴담 시뮬레이션 RP 봇. 채팅 한 줄이 도시 전체를 움직이는, RisuAI 전용 플러그인 + 카드.」</td><td>🔁</td><td>—</td></tr>
+<tr><td>딱지: RisuAI 플러그인 · 한국어·English · 자동 업데이트 · 무료</td><td>🔁</td><td>영어 첫 메시지 <code>src/data/install/greetings.json</code>, 업데이트 확인 <code>src/ui/update.ts</code></td></tr>
+<tr><td>숫자 띠: 괴이 63 · 인물 55 · 장면 28 · 그림 1,700+</td><td>🔁 (1,751로 정확히)</td><td><code>anomalies.json</code> 63, <code>agents.json</code> 55, <code>scenarios.json</code> 28(직접 입력·커스텀 제외), <code>pictures.json</code> 1,751</td></tr>
+<tr><td>01 세력 5개 소개(관리국·가짜 관리국·백일몽·민간인·프리랜서)</td><td>🔁</td><td><code>src/data/world/orgs.json</code>(「꿈결」「이물」), <code>scenarios.json</code></td></tr>
+<tr><td>소속마다 첫 장면 + 직접 입력 + 커스텀 임무, 시작은 유령 버튼 한 번</td><td>🔁</td><td><code>scenarios.json</code> 각 세력 끝 「직접 입력」「커스텀 임무」</td></tr>
+<tr><td>02 「괴이는 규칙으로 움직인다 / 규칙을 읽으면 살고, 어기면 끝 / 그림자에서 심연까지 일곱 단계」</td><td>🔁</td><td>—</td></tr>
+<tr><td>등급 7단계 F Shade ~ S Abyss, 「사망자 거의 없음」~「생존법 미확립 · 우주적 공포」</td><td>🔁 (단계별 뜻 추가)</td><td><code>src/data/guides/rp.txt</code> Classification</td></tr>
+<tr><td>03 「채팅창 하나에 도시 하나 / 이야기 밖에서도 세계는 돌아갑니다」</td><td>✅</td><td><code>src/core/world/engine.ts</code></td></tr>
+<tr><td>상황판 LIVE: 괴이·사건·미스틱 사이트가 이야기 시간에 맞춰 생기고, 번지고, 끝난다</td><td>🔁</td><td><code>engine.ts</code> DEFAULT_SETTINGS(상한·확률·TTL 48/48/12/24)</td></tr>
+<tr><td>지도 현장 눌러 목표 → 요원 투입 → 다음 장면이 거기서</td><td>🔁 (2판 흐름 예시와 함께)</td><td><code>src/ui/field.ts</code>, <code>src/ui/evcard.ts</code> aimMark</td></tr>
+<tr><td>요원 휴게·외근·작전·부상·실종</td><td>🔁 (전체 9종)</td><td>상태 목록 <code>src/core/world/*.ts</code></td></tr>
+<tr><td>현장 사진 첨부</td><td>✏️ 「카드 그림 자동 + 명부에서 직접 골라 바꿈」으로</td><td><code>src/ui/evpic.ts</code>, <code>src/ui/directory.ts</code> dir-photo-pick/set</td></tr>
+<tr><td>CCTV 연출</td><td>🔁 (효과 종류까지)</td><td><code>src/ui/cctvfx.ts</code></td></tr>
+<tr><td>발생 확률·상한 조절</td><td>✅</td><td><code>engine.ts</code> WorldSettings</td></tr>
+<tr><td>괴담넷: 익명 괴담 커뮤니티가 이야기를 따라 굴러감, 오늘 일이 내일 「목격담」</td><td>🔁</td><td><code>src/core/gnet.ts</code>(채팅 참고 턴)</td></tr>
+<tr><td>괴담넷: 글·댓글·쪽지 · 괴담갤/세정게 말투 · 자동 새로고침</td><td>✅/🔁</td><td><code>src/ui/gnet.ts</code> 616(성격 3종), 703 autoRefreshGnet</td></tr>
+<tr><td>괴담톡: 진짜 메신저처럼, 답장 안 하면 재촉, 단톡방에선 자기들끼리, 읽씹도 기억</td><td>🔁 (1판 문구 그대로)</td><td><code>src/core/phone.ts</code> followupSent·lastMessageRead, <code>src/data/guides/phone.txt</code></td></tr>
+<tr><td>괴담톡: 1:1 · 단톡방 초대 · 조직 공지 · 전화 걸기</td><td>🔁</td><td><code>src/core/phone.ts</code> LIMITS.members 9, <code>src/ui/phone.ts</code> callView</td></tr>
+<tr><td>괴담위키: 나무위키 말투, 모르는 이름 바로 펼쳐 보기, 없는 문서 새로 쓰기</td><td>🔁</td><td><code>src/ui/wiki.ts</code>, <code>card/wiki-base.json</code> 143편</td></tr>
+<tr><td>괴담위키: 인물·장소·괴이 문서 · 링크 타고 탐색 · 본편 반영</td><td>🔁</td><td><code>src/ui/wiki.ts</code> 548 wiki-context</td></tr>
+<tr><td>인물 기록: 「말 편하게 해」 한마디가 다음 턴에도</td><td>🔁</td><td><code>src/core/people/prompt/*</code> address·speech 규칙</td></tr>
+<tr><td>다친 곳, 아는 비밀, 지킨 약속, 호감과 호칭</td><td>🔁 (칸 11개 전부)</td><td><code>src/core/people/types.ts</code> SLOTS, address</td></tr>
+<tr><td>근거 인용 · 되감기 · 고정 · 세력 평판 5단계</td><td>✅/🔁(고정)</td><td><code>types.ts</code> Entry.quote·pin·replaces, FactionStage 5</td></tr>
+<tr><td>상태창: 날짜·시각·위치·날씨·목표·동행·신분·잔고 매 턴 한 줄, 칸 골라 쓰기, 테마 세 가지</td><td>🔁</td><td><code>src/core/world/statuscols.ts</code>, <code>src/ui/settings.ts</code> 286 테마</td></tr>
+<tr><td>캐릭터 이미지: 장면에 맞는 표정 자동, 본편이 붙이거나 보조가 나중에</td><td>✅</td><td><code>src/ui/settings.ts</code> 302, <code>pictures.json</code>(1인당 28장)</td></tr>
+<tr><td>가계부: 쓴 돈·받은 돈 근거와 함께, 「월급날은 기쁘고 장비값은 아픕니다」</td><td>🔁</td><td><code>src/ui/wallet.ts</code></td></tr>
+<tr><td>캐릭터로 플레이: 요원 하나를 골라 그 사람으로</td><td>🔁</td><td><code>src/ui/app.ts</code> 73·1480·1574</td></tr>
+<tr><td>세계 편집: 괴이·요원·조직·거점 추가, 세력 관계·지침 내 입맛대로</td><td>✅</td><td><code>src/ui/editor/</code>, <code>relations.json</code> pairs 78</td></tr>
+<tr><td>04 필드 BETA: 「채팅에서 나와, 본부를 걸어 보세요」, 실제 모델과 대화, 본편에 이어짐</td><td>🔁</td><td><code>src/core/visitPrompt.ts</code>, <code>docs/본부_방문_모델연결.md</code></td></tr>
+<tr><td>살아 있는 본부: 출근하고, 밥 먹고, 졸고, 수다 떠는 요원과 직원들</td><td>🔁</td><td><code>src/game/world/needs.ts</code>(hunger·energy·social, 「먹는 중」「수다 중」)</td></tr>
+<tr><td>흐르는 시간: 걷고 대화하고 싸울 때만 시계</td><td>✏️ 「장면을 옮기고, 대화하고, 싸울 때만(걷기만으로는 안 감)」</td><td><code>src/game/world/clock.ts</code> 1~3행</td></tr>
+<tr><td>밤엔 야간 경비</td><td>🔁</td><td><code>src/game/world/hq.ts</code> 51 (경비, 18시~9시)</td></tr>
+<tr><td>지하철로 서울: 종각~영등포 시장·강남·망원·여의도 한강공원</td><td>🔁</td><td><code>src/game/world/hq.ts</code> 16, <code>src/game/action/hq/map.ts</code></td></tr>
+<tr><td>대련: 대전 액션식 전투 AI 1:1, 1:2, 난이도 네 단계</td><td>🔁 (난이도는 「검토 때 정할 것」 3번)</td><td><code>src/game/combat/brain.ts</code> DIFF, <code>src/game/action/engine/modules.ts</code> 582</td></tr>
+<tr><td>05 「3분이면 출근」, zip 받기 · 플러그인 넣기(확인 창 허용) · 카드 가져오기 → 👻</td><td>🔁</td><td><code>.github/workflows/release.yml</code>(zip 안 <code>괴이_ANOMALY.charx</code>)</td></tr>
+<tr><td>받으러 가기 →</td><td>🔁</td><td>Releases 주소</td></tr>
+<tr><td>업데이트는 플러그인 탭과 「점검 → 업데이트」, 채팅은 그대로</td><td>✅</td><td><code>README.md</code></td></tr>
+<tr><td>FAQ 다른 봇 무거워지나</td><td>🔁 (설치 쪽에만 있던 것을 FAQ에도)</td><td><code>README.md</code> 시작기 설명</td></tr>
+<tr><td>FAQ 보조 모델 필요한가</td><td>✏️ 「메인 모델로 바꿀 수 있음」 추가</td><td>위 1번 표 2행 근거</td></tr>
+<tr><td>FAQ 모바일</td><td>🔁 (터치 스틱·버튼)</td><td><code>src/ui/mbar.ts</code>, 필드 모바일 조작</td></tr>
+<tr><td>FAQ 영어</td><td>🔁</td><td><code>greetings.json</code> <code>*-en-*</code></td></tr>
+<tr><td>FAQ 설정이 많아 보임</td><td>✅</td><td>—</td></tr>
+<tr><td>끝: 「— END OF TRANSMISSION — / 오늘 퇴근길, 평소와 다른 골목으로 가 보시겠어요?」</td><td>🔁</td><td>—</td></tr>
+<tr><td>장식: REC ● 00:00:13 · STANDBY, 큰 숫자 띠</td><td>🔁 (HTML로 옮길 때 그대로 쓴다고 명시)</td><td>—</td></tr>
+<tr><td>이미지·영상 자리 7곳</td><td>🔁</td><td>—</td></tr>
+</tbody></table></div>
+<h2>3. 2판에서 새로 넣은 숫자·예시 재확인 (직접 대조)</h2>
+<div class="tw"><table><thead><tr><th>내용</th><th>결과</th><th>근거</th></tr></thead><tbody>
+<tr><td>상황판 기본값: 프리셋 괴이 2, 랜덤 1, 사건 1(50%), 특수 1, 지속 48/48/12/24시간</td><td>맞음</td><td><code>src/core/world/engine.ts</code> 173~191</td></tr>
+<tr><td>일지 500줄, 보고서 100건</td><td>맞음</td><td><code>src/core/journal/settings.ts</code> 11~12</td></tr>
+<tr><td>보고서 PNG 900×1200</td><td>맞음</td><td><code>src/core/journal/png.ts</code> 9~10</td></tr>
+<tr><td>호감 8단계 이름, 계기 점수, 메시지당 ±10</td><td>맞음</td><td><code>src/core/people/types.ts</code> 11~12·163~170, <code>affinity.ts</code> 25</td></tr>
+<tr><td>세력 평판 5단계</td><td>맞음</td><td><code>types.ts</code> 231~</td></tr>
+<tr><td>단톡방 최대 9명</td><td>맞음</td><td><code>src/core/phone.ts</code> 36</td></tr>
+<tr><td>괴담넷 새로고침마다 글 4~9개</td><td><b>고침</b> → 기본 5~7개, 4~6·5~7·6~8·7~9 중 고름</td><td><code>src/core/gnet.ts</code> 97~102</td></tr>
+<tr><td>본부 대화: 본편 최근 6마디, 요원과 최근 8회</td><td>맞음(설정에서 바꿀 수 있음)</td><td><code>src/core/advanced.ts</code> 148, <code>docs/본부_방문_모델연결.md</code> 14</td></tr>
+<tr><td>그림 태그 최근 6개만 보냄</td><td>맞음(1~30)</td><td><code>src/core/imgtag.ts</code> 14</td></tr>
+<tr><td>그림 1,751장, 캐릭터 1,540장(55명 × 28장)</td><td>맞음</td><td><code>pictures.json</code> (예: Jyaldi 기본 1 + default·감정 27)</td></tr>
+<tr><td>위키 143편, 세력 관계 78쌍</td><td>맞음</td><td><code>card/wiki-base.json</code>, <code>relations.json</code> pairs</td></tr>
+<tr><td>첫 장면 28개(7·7·7·5·2)</td><td>맞음</td><td><code>scenarios.json</code></td></tr>
+<tr><td>괴이 예시 7개 규칙(30초·없는 4층·7층 버튼·엎드려 세 번 절·B-12·성인 시설 안내·고액 경비 알바)</td><td>맞음</td><td><code>card/wiki-base.json</code>, <code>anomalies.json</code>(샛별 고시원 「prostrate yourself and bow three times」)</td></tr>
+<tr><td>인물 예시 대사(「잠은 잘 잤을까?」「검의 세계로…」)</td><td>맞음</td><td><code>src/data/install/greetings.json</code>, <code>card/wiki-base.json</code></td></tr>
+</tbody></table></div>
+<h2>4. 앞으로</h2>
+<ul><li>홍보글에서 1판 문장은 지우지 않는다. 코드와 다르면 「검토 때 정할 것」에 올린다.</li><li>기능 유무는 서브에이전트 보고만 보고 판단하지 않고, 코드를 직접 열어 확인한다.</li></ul></article></div>
