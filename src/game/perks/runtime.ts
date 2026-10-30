@@ -73,6 +73,9 @@ export interface PerkHost {
   resetSkillCd(): void;
 }
 
+/** 판 저장 모양 */
+export interface PerkSave { v: 1; active: boolean; ranks: [string, number][]; grades: [string, Grade[]][]; traits: string[]; n: Record<string, number>; runUsed: string[]; time: number }
+
 /** 미끼 잔상: 인물 AI 적이 이 자리를 노린다 (fighter/ai.ts) */
 export const perkDecoy = { x: 0, y: 0, until: -1 };
 /** 혼란 적의 공격이 다른 적에게도 (제 편 때리기, fighter/ai.ts·player.ts) */
@@ -131,6 +134,29 @@ export class PerkRun {
   topGrade(name: string): Grade { return Math.max(0, ...(this.grades.get(name) ?? [0])) as Grade; }
   has(name: string): boolean { return this.ranks.has(name) || this.traits.has(name); }
   private get T() { return this.time; }
+
+  /* ───────── 괴이 한 판 (들어감 → 죽음·중간 복귀·귀환) ───────── */
+  /** 괴이 안에 있나 */
+  active = false;
+  /** 괴이에 들어감: 퍽을 비우고 첫 방에 들어간다 */
+  startRun(): void { this.reset(); this.active = true; this.roomEnter(); }
+  /** 판 끝: 퍽은 모두 사라진다(설계_출동루프_3판 2-7·2-8). 보고서용 요약을 돌려준다 */
+  endRun(reason: 'death' | 'retreat' | 'return'): { reason: string; rooms: number; kills: number; perks: string[] } {
+    const out = { reason, rooms: this.n.rooms ?? 0, kills: this.n.hunt ?? 0, perks: [...this.ranks.keys(), ...this.traits] };
+    this.reset();
+    this.active = false;
+    return out;
+  }
+  /** 판 저장용 (출동 저장 world.snapshot 에 같이 들어감) */
+  snapshot(): PerkSave {
+    return { v: 1, active: this.active, ranks: [...this.ranks], grades: [...this.grades], traits: [...this.traits], n: { ...this.n }, runUsed: [...this.runUsed], time: this.time };
+  }
+  restore(s: PerkSave | null | undefined): void {
+    if (!s || s.v !== 1) return;
+    this.active = s.active; this.ranks = new Map(s.ranks); this.grades = new Map(s.grades); this.traits = new Set(s.traits);
+    this.n = { ...s.n }; this.runUsed = new Set(s.runUsed); this.time = s.time ?? 0; this.roomUsed.clear();
+    this.changed();
+  }
 
   /* ───────── 얻기·잃기 ───────── */
   add(name: string, grade: Grade = 0): void {

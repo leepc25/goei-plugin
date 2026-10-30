@@ -137,6 +137,22 @@ function fill(p: FighterPlayer) {
     btn('방 들어감', () => p.perks.roomEnter()),
     btn('방 깸', () => p.perks.roomClear()),
     btn('퍽 다 비우기', () => p.perks.reset()),
+  );
+  // 괴이 한 판 시험(던전 전): 들어감 → 방 깸 → 죽음·중간 복귀·귀환에 퍽이 지워지는지, 저장 → 새로고침 → 이어하기에 그대로 돌아오는지
+  const runRow = el('div', { class: 'grid' });
+  const runMsg = el('div', { class: 'm' });
+  const SAVE = 'goei.testroom.perkRun';
+  const ended = (r: { reason: string; rooms: number; kills: number; perks: string[] }) => { runMsg.textContent = `판 끝(${({ death: '죽음', retreat: '중간 복귀', return: '귀환' } as Record<string, string>)[r.reason]}): 깬 방 ${r.rooms} · 처치 ${r.kills} · 지운 퍽 ${r.perks.length}개`; };
+  runRow.append(
+    btn('괴이 들어감', () => { p.perks.startRun(); runMsg.textContent = '판 시작'; }),
+    btn('죽음', () => ended(p.perks.endRun('death'))),
+    btn('중간 복귀', () => ended(p.perks.endRun('retreat'))),
+    btn('귀환', () => ended(p.perks.endRun('return'))),
+    btn('저장', () => { try { localStorage.setItem(SAVE, JSON.stringify(p.perks.snapshot())); runMsg.textContent = '저장함 · 새로고침 뒤 「이어하기」'; } catch { runMsg.textContent = '저장 못 함'; } }),
+    btn('이어하기', () => { try { p.perks.restore(JSON.parse(localStorage.getItem(SAVE) ?? 'null')); runMsg.textContent = '저장한 판을 불러옴'; } catch { runMsg.textContent = '불러오기 못 함'; } }),
+  );
+  perkBox.append(el('div', { class: 'm', style: 'margin-top:6px;color:#e8c27a' }, '괴이 한 판'), runRow, runMsg);
+  ctl.append(
     btn('적 3 (칼잡이)', () => { const w = world(); if (w) for (let i = 0; i < 3; i++) w.api.spawn({ kind: 'fb_sword', x: w.player.x + 260 + i * 90, y: w.player.y + (i - 1) * 40 }); }),
     btn('적 AI 1', () => { const w = world(); if (w) w.api.spawn({ kind: 'ai-char', x: w.player.x + 300, y: w.player.y }); }),
   );
@@ -149,7 +165,7 @@ function fill(p: FighterPlayer) {
   let seen = '';
   const drawOwn = () => {
     const st = p.perks.stacks().map((x) => `${x.name} ${x.v}/${x.max}`).join(' · ');
-    const key = `${p.perks.version}|${st}`;
+    const key = `${p.perks.version}|${st}|${p.perks.active}|${p.perks.depth}`;
     if (key === seen) return;
     seen = key;
     ownBox.innerHTML = '';
@@ -159,6 +175,7 @@ function fill(p: FighterPlayer) {
     if (!p.perks.ranks.size && !p.perks.traits.size) g.append(el('span', {}, '없음'));
     ownBox.append(g);
     if (st) ownBox.append(el('div', {}, `쌓임: ${st}`));
+    ownBox.append(el('div', {}, `판: ${p.perks.active ? `진행 중 · 깬 방 ${p.perks.depth}` : '밖'}`));
   };
   perkTick = drawOwn;
   const cats = [...new Set(PERK_TEXT.map((x) => x.cat))];

@@ -137,3 +137,26 @@ test('퍽 등급 A안: 먹을 때마다 그 카드 등급 배율을 더한다, �
   assert.ok(Math.abs(a0 - 0.65) < 1e-9 && e9 > e0);
   for (const f of R.draft(kit(), own(), Math.random)) if (f.type === 'perk') assert.ok([0, 1, 2].includes(f.grade));
 });
+
+test('괴이 한 판: 들어감·끝에 퍽이 지워지고, 저장·이어하기에 그대로 돌아온다', () => {
+  const me = { hp: 1000, hpMax: 1000, baseHp: 1000, shield: 0, shieldMax: 0 };
+  const host = { me, P: { x: 0, y: 0 }, text() {}, setHpMax(v) { me.hpMax = v; }, addSp() {} };
+  const k = new RT.PerkRun(); k.host = host;
+  k.startRun();
+  assert.equal(k.active, true);
+  k.add('정조준', 1); k.add('튼튼한 몸', 2); k.addTrait('철벽'); k.roomClear(); k.roomClear();
+  const save = JSON.parse(JSON.stringify(k.snapshot()));
+  const k2 = new RT.PerkRun(); k2.host = host;
+  k2.restore(save);
+  assert.equal(k2.active, true);
+  assert.equal(k2.depth, 2);
+  assert.ok(Math.abs(k2.r('정조준') - 1.4) < 1e-9);
+  assert.equal(k2.traits.has('철벽'), true);
+  assert.equal(me.hpMax, Math.round(1000 * (1 + 0.08 * 1.75)));
+  const r = k2.endRun('death');
+  assert.equal(r.rooms, 2);
+  assert.equal(r.perks.length, 3);
+  assert.equal(k2.active, false);
+  assert.equal(k2.ranks.size + k2.traits.size, 0);
+  assert.equal(me.hpMax, 1000);
+});

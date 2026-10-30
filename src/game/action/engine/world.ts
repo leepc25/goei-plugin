@@ -99,16 +99,18 @@ export class World implements WorldView {
   snapshot(): string {
     const keys = ['x', 'y', 'dir', 'hp', 'hpMax', 'ammo', 'mag', 'reserve', 'gauge', 'guardMeter', 'skillCd', 'maxCombo', 'ward', 'dmgMul'] as const;
     return encodeState({ tick: this.tick, kills: this.kills, floors: this.floors, notes: this.notes, rng: this.rand.state(),
-      player: Object.fromEntries(keys.map(k => [k, this.player[k]])), items: this.itemState?.snapshot() });
+      player: Object.fromEntries(keys.map(k => [k, this.player[k]])), items: this.itemState?.snapshot(), perks: (this.player as { perks?: { snapshot(): unknown } }).perks?.snapshot() });
   }
   restore(state: string) {
-    const s = decodeState<{ tick: number; kills: number; floors: number; notes: Record<string, unknown>; rng: number; player: Partial<Player>; items: unknown }>(state);
+    const s = decodeState<{ tick: number; kills: number; floors: number; notes: Record<string, unknown>; rng: number; player: Partial<Player>; items: unknown; perks?: unknown }>(state);
     if (!s.player || !(Number(s.player.hp) > 0)) throw new Error('손상된 출동 상태');
     this.tick = s.tick; this.kills = s.kills; this.floors = s.floors; this.notes = s.notes;
     Object.assign(this.player, s.player);
     this.player.px = this.player.x; this.player.py = this.player.y;
     this.player.resetLocomotion();
     this.itemState?.restore(s.items);
+    // 임시 퍽(괴이 한 판): 퍽·등급·쌓임·깬 방 수 (src/game/perks/runtime.ts)
+    (this.player as { perks?: { restore(v: unknown): void } }).perks?.restore(s.perks);
     this.rand.restore(s.rng);
     this.camera();
     this.prevCamX = this.camX;
