@@ -11,7 +11,8 @@
    "문은 그리지 않고 바깥 출입은 화면 아래 출구 표시",
    "물건은 빼지 않음",
    "참고 그림 1·밑그림 없이(진료실 v4·대기실 v7과 같은 설정)",
-   "시가 상자 넣기(설계안의 '없음'을 바꿈)"
+   "시가 상자 넣기(설계안의 '없음'을 바꿈)",
+   "채우기 packed(사용자 10-30: 소품이 부족해 보임)"
   ],
   "items": [
    {
@@ -198,8 +199,8 @@
  "view": "one-point",
  "floor_share": "the lower half",
  "sides": "left",
- "density": "normal",
- "floor": "worn stained beige tiles; dark carpet in the inner office on the right; red neon glow",
+ "density": "packed",
+ "floor": "worn stained beige tiles; dark carpet in the inner office; red neon glow",
  "walls": "scuffed dark red-brown wallpaper; fluorescent tubes",
  "items": [
   {
@@ -230,7 +231,7 @@
    "full": "high on the left wall a flat wall-mounted TV with the sound off, its screen a dark muted colour",
    "why": "위키 소리 죽인 벽걸이 TV, 설계안 화면은 어두운 색 면",
    "at": "Left wall, high",
-   "text": "a wall-mounted TV, dark muted screen",
+   "text": "a TV, dark muted screen",
    "keep": [
     "left wall",
     "TV",
@@ -241,35 +242,37 @@
     "sound": "소리는 그림에 안 보임",
     "off": "소리는 그림에 안 보임",
     "colour": "dark muted screen으로 같은 뜻",
-    "middle": "high로 자리 충분"
+    "middle": "high로 자리 충분",
+    "wall-mounted": "Left wall 묶음으로 같은 뜻"
    }
   },
   {
    "full": "on the floor in front of the left wall a tall potted plant in a white pot and an umbrella stand",
    "why": "설계안 화분·우산꽂이",
    "at": "Floor in front of the left wall",
-   "text": "a tall potted plant and an umbrella stand",
+   "text": "a potted plant, an umbrella stand",
    "keep": [
     "potted plant",
     "umbrella stand"
    ],
    "drop_ok": {
     "white": "화분 색 세부",
-    "pot": "potted plant로 충분"
+    "pot": "potted plant로 충분",
+    "tall": "화분 키는 모델이 정함"
    }
   },
   {
    "full": "on the floor at the left, a long wooden reception counter about 2.4 m wide, its long side facing the camera, chest high (95 pixels), standing a metre in front of the back wall with an empty walkway at its left end leading behind it",
    "why": "위키·설계안 접수대(폭 2.4m), 뒤로 들어갈 통로(대기실 v6 교훈)",
    "at": "Floor, left part",
-   "text": "a long reception counter facing the camera, chest high (95 pixels), a metre in front of the back wall, an empty walkway at its left end behind it",
+   "text": "a long reception counter facing the camera, chest high (95 pixels), a metre in front of the back wall, a walkway at its left end behind it",
    "keep": [
     "reception counter",
     "facing the camera",
     "95 pixels",
     "chest high",
     "in front of the back wall",
-    "empty walkway",
+    "walkway",
     "behind"
    ],
    "drop_ok": {
@@ -279,7 +282,8 @@
     "with": "군말",
     "wooden": "재질은 모델이 정함",
     "side": "facing the camera로 같은 뜻",
-    "leading": "behind it으로 같은 뜻"
+    "leading": "behind it으로 같은 뜻",
+    "empty": "walkway로 충분, 2000자"
    }
   },
   {
@@ -303,7 +307,7 @@
    "full": "leaning against the back wall behind the counter a wooden baseball bat for emergencies",
    "why": "위키 여담: 카운터 뒤 비상용 야구방망이",
    "at": "Back wall, behind the counter",
-   "text": "a wooden baseball bat leaning on the wall",
+   "text": "a baseball bat leaning on it",
    "keep": [
     "back wall",
     "behind the counter",
@@ -312,7 +316,9 @@
    "drop_ok": {
     "leaning": "남김",
     "against": "on the wall로 같은 뜻",
-    "emergencies": "쓰임 설명, 그림에 안 보임"
+    "emergencies": "쓰임 설명, 그림에 안 보임",
+    "wooden": "방망이 재질 세부",
+    "wall": "묶음 at(back wall)으로 충분"
    }
   },
   {
@@ -374,7 +380,7 @@
    "full": "on the floor on the right part, a low waist-high glass partition with a dark wooden frame, running from the back wall toward the camera, separating the inner office, with an open gap in it to walk through",
    "why": "설계안 안쪽 사무실 낮은 유리 칸막이, 들어갈 틈(문 없음)",
    "at": "Floor, right part",
-   "text": "a waist-high glass partition from the back wall toward the camera, with an open gap",
+   "text": "a waist-high glass partition from the back wall toward the camera, an open gap",
    "keep": [
     "glass partition",
     "waist-high",
@@ -398,7 +404,7 @@
   {
    "full": "on the floor in the inner office on the right, on dark carpet, an oval poker table with green felt standing free like an island, stacks of colourful poker chips and playing cards on it, and an open wooden cigar box on the table",
    "why": "위키 안쪽 사무실 포커 테이블·칩 / 설계안 녹색 펠트, 방 안 섬, 칩 더미·카드 / 사용자 10-30: 시가 상자 넣기",
-   "at": "Floor, inner office, right",
+   "at": "Inner office floor",
    "text": "an oval green felt poker table standing alone, poker chips, cards and a cigar box on it",
    "keep": [
     "poker table",
@@ -419,13 +425,14 @@
     "carpet": "floor 칸 dark carpet이 맡음",
     "dark": "floor 칸 dark carpet이 맡음",
     "open": "cigar box로 충분",
-    "wooden": "상자 재질 세부"
+    "wooden": "상자 재질 세부",
+    "right": "inner office 묶음이 오른쪽(칸막이 너머)"
    }
   },
   {
    "full": "on the back wall of the inner office a third framed picture and a low wooden sideboard with binders",
    "why": "설계안 벽 액자 ×3 중 하나, 사무실 서류",
-   "at": "Back wall, right, inner office",
+   "at": "Inner office back wall",
    "text": "a framed picture over a low sideboard with binders",
    "keep": [
     "framed picture",
@@ -434,7 +441,8 @@
    ],
    "drop_ok": {
     "third": "앞 줄 두 개와 합쳐 셋",
-    "wooden": "재질 세부"
+    "wooden": "재질 세부",
+    "right": "inner office 묶음이 오른쪽"
    }
   }
  ],
@@ -450,7 +458,7 @@
   "size": "접수대 가슴 높이 95(사람 150의 0.63배, 1.1m). 탁자·포커 테이블은 숫자 없이(크기 범위 없음, 낮은 탁자·허리 높이 칸막이로 몸 기준)",
   "brief": "위키·설계안 항목 모두 줄·칸에 대응. 뺀 것: 소파·의자(사용자: 오브젝트), 금색 시계(설계안: 인물 몫, 시계 전역 금지), 삼단봉(인물). 시가 상자는 사용자 결정으로 포커 테이블에 넣음",
   "meaning": "네온 OPEN·선팅 유리, 접수대 방향·높이·통로, 칸막이 틈, 포커 테이블 녹색 펠트·섬·칩·카드를 남김. 뺀 것은 재질·색·같은 뜻·쓰임 설명뿐, 줄마다 이유",
-  "over": "같은 물건 두 번 없음(액자는 둘+하나로 설계안 3). 줄마다 근거. 억지 채우기 없음, 채우기 normal(설계안 '보통')",
-  "frame": "one-point, 바닥 아래 절반, 왼쪽 벽만(선팅 유리·TV 벽, 오른쪽 안쪽 사무실은 그림 끝으로 이어짐), 문 0(아래 출구), 채우기 normal, 참고 그림 1·밑그림 없음"
+  "over": "같은 물건 두 번 없음(액자는 둘+하나로 설계안 3). 줄마다 근거. 억지 채우기 없음, 채우기 packed(사용자 결정)",
+  "frame": "one-point, 바닥 아래 절반, 왼쪽 벽만(선팅 유리·TV 벽, 오른쪽 안쪽 사무실은 그림 끝으로 이어짐), 문 0(아래 출구), 채우기 packed(사용자 결정), 참고 그림 1·밑그림 없음"
  }
 }
