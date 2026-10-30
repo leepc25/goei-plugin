@@ -1,0 +1,292 @@
+{
+ "file": "jinryo_v2_632x424",
+ "bgScale": 2,
+ "w": 1264,
+ "h": 848,
+ "under": true,
+ "floor": [
+  [
+   0,
+   690
+  ],
+  [
+   180,
+   545
+  ],
+  [
+   1075,
+   545
+  ],
+  [
+   1180,
+   690
+  ],
+  [
+   1180,
+   760
+  ],
+  [
+   1264,
+   760
+  ],
+  [
+   1264,
+   849
+  ],
+  [
+   0,
+   849
+  ]
+ ],
+ "lane": [
+  545,
+  837
+ ],
+ "blocks": [
+  {
+   "poly": [
+    [
+     68,
+     578
+    ],
+    [
+     394,
+     578
+    ],
+    [
+     394,
+     640
+    ],
+    [
+     68,
+     640
+    ]
+   ],
+   "h": 999
+  },
+  {
+   "poly": [
+    [
+     386,
+     515
+    ],
+    [
+     494,
+     515
+    ],
+    [
+     494,
+     553
+    ],
+    [
+     386,
+     553
+    ]
+   ],
+   "h": 999
+  },
+  {
+   "poly": [
+    [
+     486,
+     515
+    ],
+    [
+     542,
+     515
+    ],
+    [
+     542,
+     548
+    ],
+    [
+     486,
+     548
+    ]
+   ],
+   "h": 999
+  },
+  {
+   "poly": [
+    [
+     536,
+     515
+    ],
+    [
+     729,
+     515
+    ],
+    [
+     729,
+     550
+    ],
+    [
+     536,
+     550
+    ]
+   ],
+   "h": 999
+  },
+  {
+   "poly": [
+    [
+     738,
+     515
+    ],
+    [
+     864,
+     515
+    ],
+    [
+     864,
+     554
+    ],
+    [
+     738,
+     554
+    ]
+   ],
+   "h": 999
+  },
+  {
+   "poly": [
+    [
+     868,
+     538
+    ],
+    [
+     906,
+     538
+    ],
+    [
+     958,
+     657
+    ],
+    [
+     922,
+     657
+    ]
+   ],
+   "h": 999
+  },
+  {
+   "poly": [
+    [
+     972,
+     540
+    ],
+    [
+     1184,
+     540
+    ],
+    [
+     1184,
+     686
+    ],
+    [
+     972,
+     686
+    ]
+   ],
+   "h": 999
+  },
+  {
+   "poly": [
+    [
+     964,
+     582
+    ],
+    [
+     1048,
+     582
+    ],
+    [
+     1048,
+     645
+    ],
+    [
+     964,
+     645
+    ]
+   ],
+   "h": 999
+  }
+ ],
+ "doors": {
+  "out": {
+   "kind": "exit",
+   "side": "S",
+   "x": 640,
+   "y": 848,
+   "to": "jr_songil",
+   "toDoor": "jinryo",
+   "label": "대기실로"
+  }
+ },
+ "lamps": [
+  {
+   "x": 360,
+   "y": 35,
+   "kind": "down",
+   "r": 420
+  },
+  {
+   "x": 905,
+   "y": 35,
+   "kind": "down",
+   "r": 420
+  }
+ ],
+ "objects": [
+  {
+   "id": "desk",
+   "name": "의사 책상",
+   "file": "",
+   "x": 72,
+   "y": 380,
+   "w": 318,
+   "h": 260,
+   "sortY": 638,
+   "coverMask": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAT4AAAEECAIAAAA+u8+sAAAEzElEQVR4nO3dS3LaQABFUZPy/rdMBsqABEP46NOXPmfopCqKzPVDMsanLwZwPp//+cjpdDrkSKj4dfQBAK+QLiRJF5KkC0nShSTpQpJ0IUm6kCRdSJIuJEkXkqQLSdKFpO+jD+BnfpIG7rO6kLT56l7v56XrLb3/94GF1YWkga517+/t5Z/e32pXxczA6kLShqt7awkvP/7ala3rYbC6kLTy6tpD2IfVhaQVVveRpbXGsC6rC0kvru7nrejyP/I9YSqsLiRJF5KkC0nShSTpQpJ0IUm6kCRdSJIuJEkXkqQLSU+/hvnzXr08Jq+p5j6rC0nShSTpQpJ0/3I+n13MkyBdSJIurGD/52vShaSBfufQWvz+IfZ01HfgrS4kfeDqvmb5qun2Mvd/V9Y4z+OsLiRZXfjj+jnXyM/CrC4kWV14wjg7bHUh6enbZeN81YGZWV1Iki4kSReS3GHe1SOvxXE3gUdYXUhyh3lDa73e1TnnmtWFJKu7mq1/psSZ55LVhSSre9P7K/r+ubo+hnnOP7csjwqrC0lW9491r1TXPUu2l0tWF8KmfjXVdveEvdMVW7h8xFpdSJpudR9f2sc3c5x3CWQeVheSJlrd7X5qZ7R36OXzXD+6rC4kTbG6t/awcge4cpzsyepC0hSre22tHavvOeO79RizupA0xepusYH2lmNZXUjyk0NPuP+d25nPDFvzfV34EFNc627N3rI/qwtJVvct9pajWF1IeugOs22BY7nDDB/iP9e69hbGZHUh6YfVtbQwPqsLSX+trr2FCqsLSd+WFoqsLiRJF5KkC0nShSTpQpJ0IUm6kCRdSJIuJEkXkqQLSTffm8prm2Ec3psKPoR0IUm6kCRdSJIuJEkXkqQLSdKFJOlCknQhSbqQJF1Iki4kSReSpAtJ0oUk6UKSdCFJupAkXUiSLiRJF5KkC0nShSTpQpJ0IUm6kCRdSJIuJEkXkqQLSdKFJOlCknQhSbqQJF1Iki4kSReSpAtJ0oUk6UKSdCFJupAkXUiSLiRJF5KkC0nShSTpQpJ0IUm6kCRdSJIuJEkXkqQLSdKFJOlCknQhSbqQJF1Iki4kSReSpAtJ0oUk6UKSdCFJupAkXUiSLiRJF5KkC0nShSTpQpJ0IUm6kCRdSJIuJEkXkqQLSdKFJOlCknQhSbqQJF1Iki4kSReSpAtJ0oUk6UKSdCFJupAkXUiSLiRJF5KkC0nShSTpQpJ0IUm6kCRdSJIuJEkXkqQLSdKFJOlCknQhSbqQJF1Iki4kfR99AMA9p9Ppx49bXUiSLiRJF5Jc68Kgbl3lLqwuJEkXkqQLSa51YTj3r3IXVheSpAtJ0oWxPPJs+Uu6MJQHu/2SLkS5wwxDeHxvF1YXkqQLSdKFJNe6cLBnr3IXVheSpAtJ0oUk6UKSdCFJunCk124vf0kXDvRyt1/ShSjpQpJXU8EB3nmqvLC6kCRdSJIuJLnWhV29f5W7kC7sZK1oF9KFza0b7cK1LiQ9vbqXXz/O5/OqB/P/f/Ed+xwtXNpibxcTre52JxH29+6jeZUp2zMq28s+tn5Uv7u6uSnLHTD8aMPH8SP7Nk9IM6/9PJ/lPW14resTdmnaszHtf3xrTuvne23wJTe4ie4wT+uFCHU7vt8BndE94bxMsAAAAABJRU5ErkJggg=="
+  },
+  {
+   "id": "screen",
+   "name": "칸막이",
+   "file": "",
+   "x": 872,
+   "y": 248,
+   "w": 78,
+   "h": 394,
+   "sortY": 652,
+   "coverMask": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAE4AAAGKCAIAAAAtxuBcAAADoUlEQVR4nO3c3U4bQRAF4VmL93/lzYUTY4IX7PX8dFdXXSElAr6cGcdakWztoH3fbx9v23b02xJ1Wf0NzOsp6r7v9yMnrdCqDy7hMwNmvL1VVz13IbMs7KqnP13ghV21y6cOtrCrdv8yARYutOokaoR30a46prXbFlp10ivw4Zef+MpcaNXF1Jm3t9Cqi+/q98bd3kKrfqz+Bj4b/WpcaFWpxKQSk0pMKjGpxKQSk0osEHX0c6ZA1NGFe7Z0rdcTiXtRoVUDPVu6b8RPOLpqpHot7KpRe2fhQqsmpr767iox9dWS3dXv/TfsDxe40KpB3wOPqNCqUolJJSaVmFRiUolJJSaVmFRiUolJJSaVmFRiUolJJSaVmFRiUolJJSaVmFRiUolJJSaVmFRiUolJJSaVmFRiUolJJSaVmFRiUolJJSaVmFRiUolJJSaVmFRiUolJJSaVmFRiUolJJSaVmFRiUolJJSaVmFRiUolJJSaVmFRiUolJJSaVmFRiUolJJSaVmFRiUolJJSaVmFRiUolJJSaVmFRiUolJJSaVmFRiUolJJSaVmFRiUolJJSaVmFRiUolJJSaVmFRiUolJJSaVmFRiUolJJSaVmFRiUolJJSaVmFRiUolJJSaVmFRiUolJJSaVmFRiUolJJSaVmFRiH0e/sG3b7eN936d8M2MrtKpUYlKJSSW2/fzLjL9RrxVaVSoxqcQOX4FJr73Xqq7KW/K+z1XZznaj4p3tSq3gbK1dijhba5f7x2XsLu3rw0Fwf1+WKmgLvYX4pOKH/bIqW1vyAF8DD/tgVar28QFGagvf1Vu8YX9aFab1AP+LNOzvq2K0Tx1ghta7+i3AsC+sml3rAT4o9bAvr5pXe+YAJ9V6V38r47DnV02n9QA/V65h3101kbbDAc6i9a6+WIphu60aX+sBPlXwYTuvGlnrAX6jsMMOWTWmdtQBDqj1rvYo2rBjVw2l9QD3K86wM1YNop10gCNoC93VqX/Yc36i/Oj/Ppi66tpjXOgAz6YuHHbNF17yz0DWHOAl23pXxzd/2JWrTtYWOsDr35p2fzUO8W7pYdOO8Xpqm6UNQZ3T+rt6a/RbqECrjj7Ggaiji0UdOmwsahupDUdtw7QRqYMKSh0xbFBqG6CNS+1eaGrfYUNTW1dtdGrHElB7DZuA2jppc1BbD20a6vtlor45bCZqe0+bjPpO+ainh81HbWe1gZ4YjijW0/1pSSUmlZhUYn8Aj4qBb3XckfcAAAAASUVORK5CYII="
+  },
+  {
+   "id": "bed",
+   "name": "진찰 침대",
+   "file": "",
+   "x": 970,
+   "y": 385,
+   "w": 212,
+   "h": 295,
+   "sortY": 684,
+   "coverMask": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAANQAAAEnCAIAAABezfpMAAAEMklEQVR4nO3c227aQABFURzl/3+ZPhipRI3LzfY2zFqvVZWo2pwMoZ7pBLs7n8+n0+mr/jYYl/jIiI+M+MiIj4z4yHw/99fmt8pvbZqmfb7Q/G+125d7I5aPzJMvxw9YvoT9m/klM7EbL0QLt4/RFtHyEfvlBWftKuPsn+UjJr4DOZ/PQ/3YER+ZH59wDPWyI2f5yIjvcMY5+YmPzOXMN8hLjUOxfGTEd1AjnPzER0Z8ZMRHRnyH9tknP/GRER8Z8ZER3xv41JOf+Mhc4pumaZwHCDgIy0fmybta2N/bHftu/iy1fGQ8t0vG8pERHxnxkREfGfGRWfxNjPe8bM3ykREfGfGRER8Z8ZFxGz0Zy0dGfGTER+au5zac/NiC5SMjPjLiIyM+MuIj8+Pdrne17Mnykbksn81jf5aPjPjIiI+M+MiIj4z4yIiPjPjIiI+M+MiIj4z/1ULG8pFxGz0Zy0dGfGTER8adzGQsHxnxkREfGfGRER8Z8ZERHxnxkREfGfGRER8Z8ZERHxnxkREfGfGRER8Z8ZERHxnxkREfGfGRER8Z8ZERHxnxkREfGfGRER8Z8ZFZvCJt5qI0tmP5yIiPjPjIiI+M+MiIj4z4yIiPjPjIiI+M+MiIj4z4yIiPjPjIiI+M+MiIj4z4yIiPjPjIiI+M+MiIj4z4yIiPjPjIiI+M+MiIj4z4yIiPjPjILN5M6k5Stmb5yIiPjPjIiI+M+MiIj4z4yIiPjPjIiI+M+MiIj4z4yIiPjPjIiI+M+MiIj4z4yIiPjPjIiI+M+MiIj4z4yIiPzOJ1GddcncEWLB8Z8ZERH5m7znwzJz/WZfnIPLB816wgr7N8ZJ5cvpn94xWWj4z4yIiPzEtnvns4F7LE8pERHxnxkREfGfGRER8Z8ZERHxnxkdn8E46Zzzn4l+Ujs9Pyzewf1ywfGfGRER+Zy5nPaYz9WT4yk82jYvnIiI+M+MiIj4z4yIiPjPjIiI+M+MiIj4z4yIiPjPjIiI+M+MiIj4z4yIiPjPjIfC/9wTT9vczAcx5swfKRuSu+aZquhxBWYfnIPBCf/WNdlo/Mw/HZP9Zi+cg8GZ/943WWj8yXDaNi+ci8tHk+8+UVlo+M+MiIj4z4yIiPjPjIiI+M+MiIj4z4yIiPjPjIiI/M4o0F786NC8dn+ciIj4z4yAwRn+dUjmmI+DimgeKzf0czUHwczXDx2b/jGC4+juMDn9u9f9iO+f2Pw/KRcfqxfxnLR8byXdi//Vk+MuIjIz4yznw/OPntyfKRsXy/sH/7sHxkLN8i+7c1y0dGfGTER8aZ7wYnv+1YPjKW7y72bwuWj4zle4D9W5flI2P5Hmb/1vKxl0NyZPPjreJjc0tPUjvzkREf2/rPBRLiI+PMtzJXYN3P8pERHxnxkREfGfGRER8Z8ZER38PcZ78W8ZH5A4txqfkuSmIsAAAAAElFTkSuQmCC"
+  }
+ ],
+ "spots": [
+  {
+   "id": "bed",
+   "x": 1075,
+   "y": 700,
+   "verb": "눕기",
+   "face": -1,
+   "act": [
+    "liesit",
+    "doze"
+   ],
+   "seat": {
+    "x": 1075,
+    "y": 610
+   }
+  }
+ ]
+}

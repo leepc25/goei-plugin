@@ -28,7 +28,7 @@ const DIRS = [['south', '남'], ['south-east', '남동'], ['east', '동'], ['nor
 const chairs = [['c01', 'C01 사무의자', [50, 135]], ['c02', 'C02 기댄 사무의자', [63, 134]]].map(([set, label, anchor]) => ({ set, label, anchor,
   dirs: DIRS.map(([d, k]) => ({ d, k, url: 'data:image/png;base64,' + readFileSync(`game-src/art/objects/chairs/${set}_${d}.png`).toString('base64') })) }));
 // Claude가 미리 찍어 둔 장면: game-src/mapedit/<장면>/map.json + 그림 (에디터가 처음부터 연다)
-const SCENE_LABEL = { jr_heolgap: '중림 · 헐값매입', jr_youngchang: '중림 · 영창 컨설팅', jr_songil: '중림 · 손길 의원 대기실' };
+const SCENE_LABEL = { jr_heolgap: '중림 · 헐값매입', jr_youngchang: '중림 · 영창 컨설팅', jr_songil: '중림 · 손길 의원 대기실', jr_jinryo: '중림 · 손길 의원 진료실' };
 const mimeOf = (n) => (n.endsWith('.png') ? 'image/png' : n.endsWith('.webp') ? 'image/webp' : 'image/jpeg');
 const scenes = readdirSync('game-src/mapedit', { withFileTypes: true }).filter((d) => d.isDirectory()).map((d) => {
   const dir = `game-src/mapedit/${d.name}`, map = JSON.parse(readFileSync(`${dir}/map.json`, 'utf8')), files = {};
