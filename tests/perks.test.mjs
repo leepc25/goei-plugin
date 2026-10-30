@@ -107,3 +107,17 @@ test('단식: 방을 깨면 잃은 체력의 절반, 출현 가능', () => {
   assert.equal(R.traitOk(D.TRAIT_TEXT.find((t) => t.name === '단식'), kit()), true);
   assert.equal(R.traitOk(D.TRAIT_TEXT.find((t) => t.name === '맨몸'), kit()), false);
 });
+
+test('위기 회복: 30% 아래로 넘어가는 순간 25% 회복, 방마다 랭크만큼', () => {
+  const k = new RT.PerkRun();
+  const me = { hp: 1000, hpMax: 1000, baseHp: 1000 };
+  k.host = { me, P: { x: 0, y: 0 }, text() {}, setHpMax() {}, addSp() {} };
+  k.add('위기 회복');
+  me.hp = 250; k.hurt(100);
+  assert.equal(me.hp, 500);
+  assert.ok(k.takenMul() < 0.6);
+  me.hp = 200; k.hurt(400);
+  assert.equal(me.hp, 200);
+  k.roomEnter(); me.hp = 250; k.hurt(100);
+  assert.equal(me.hp, 500);
+});

@@ -112,6 +112,7 @@ export class PerkRun {
   private bombsThisDodge = 0;
   private armorRefillAt = -1;
   private killWindow = 0;
+  private crisisUntil = -1;
   /** 바뀌었을 때 화면(시험장·창)이 다시 그린다 */
   version = 0;
 
@@ -144,7 +145,7 @@ export class PerkRun {
   takenMul(): number {
     const h = this.host;
     const low = !!h && h.me.hp <= h.me.hpMax * 0.3;
-    return (1 - 0.05 * this.r('두꺼운 가죽')) * (this.traits.has('철벽') ? 0.75 : 1) * (this.traits.has('무모함') ? 1.15 : 1) * (this.traits.has('탐욕') ? 1.1 : 1) * (low && this.has('배수진') ? 0.85 : 1);
+    return (this.T < this.crisisUntil ? 0.5 : 1) * (1 - 0.05 * this.r('두꺼운 가죽')) * (this.traits.has('철벽') ? 0.75 : 1) * (this.traits.has('무모함') ? 1.15 : 1) * (this.traits.has('탐욕') ? 1.1 : 1) * (low && this.has('배수진') ? 0.85 : 1);
   }
   /** 걷기·달리기 */
   walkMul(): number { return (1 + 0.06 * this.r('가벼운 발')) * (this.traits.has('철벽') ? 0.85 : 1) * (this.traits.has('경량화') ? 1.2 : 1) * (this.traits.has('겁쟁이') && this.T - this.dodgeEndAt < 1 ? 1.3 : 1); }
@@ -436,6 +437,14 @@ export class PerkRun {
   /* ───────── 맞음 ───────── */
   hurt(dmg: number): void {
     this.lastHurtT = this.T; this.n.clean = 0;
+    // 위기 회복: 30% 아래로 넘어가는 순간 25% 회복 + 1초 받는 피해 절반 (방마다 랭크만큼)
+    const h = this.host;
+    if (h && this.has('위기 회복') && h.me.hp < h.me.hpMax * 0.3 && h.me.hp + dmg >= h.me.hpMax * 0.3 && (this.n.crisis ?? 0) < this.r('위기 회복')) {
+      this.n.crisis = (this.n.crisis ?? 0) + 1;
+      h.me.hp = Math.min(h.me.hpMax, h.me.hp + h.me.hpMax * 0.25);
+      this.crisisUntil = this.T + 1;
+      h.text(h.P.x, h.P.y - 260, '위기 회복');
+    }
     if (this.has('되갚기')) this.n.payback = Math.min(5, (this.n.payback ?? 0) + 1);
     if (this.has('치유 반지')) this.ringDmg += dmg;
   }
@@ -516,7 +525,7 @@ export class PerkRun {
   /* ───────── 방 ───────── */
   roomEnter(): void {
     const h = this.host; if (!h) return;
-    this.roomUsed.clear(); this.roomT = 0; this.n.clean = 0; this.n.payback = 0; this.armorRefillAt = -1;
+    this.roomUsed.clear(); this.roomT = 0; this.n.clean = 0; this.n.payback = 0; this.n.crisis = 0; this.armorRefillAt = -1;
     if (this.has('시작 게이지')) h.addSp(20 * this.r('시작 게이지'));
     if (this.has('방어막')) { h.me.shieldMax = h.me.shield = Math.round(h.me.hpMax * 0.1); }
     if (this.traits.has('피에 굶주림')) h.me.hp = Math.max(1, h.me.hp - h.me.hpMax * 0.1);
@@ -524,7 +533,6 @@ export class PerkRun {
   roomClear(): void {
     const h = this.host; if (!h) return;
     this.n.rooms = Math.min(10, (this.n.rooms ?? 0) + 1);
-    if (this.has('회복 체질')) h.me.hp = Math.min(h.me.hpMax, h.me.hp + h.me.hpMax * 0.03 * this.r('회복 체질'));
     // 단식: 잃은 체력의 절반 (대가: 회복약을 못 씀, engine/itemsLink.ts)
     if (this.traits.has('단식')) h.me.hp = Math.min(h.me.hpMax, h.me.hp + (h.me.hpMax - h.me.hp) * 0.5);
   }
