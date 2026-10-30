@@ -36,6 +36,8 @@ export interface Hit extends WBox {
   /** 히트스톱 틱 (기본 flinch 2, stagger 3, launch·down 5) */
   stop?: number;
   low?: boolean;
+  /** 크게 날리는 한 방(테스트룸 blow): 맞은 쪽은 크게 밀려나기(18_2) */
+  blow?: boolean;
   grab?: boolean;
   armorBreak?: boolean;
   /** 강도 1·2·3 (효과음·충격파 크기) */

@@ -268,7 +268,7 @@ export class FighterPlayer extends Player {
       scale *= 2;
       w.say('치명!', 0.8);
     }
-    const hit: Hit = { x0: t.x - 1, x1: t.x + 1, z0: 0, z1: 400, y: t.y, dy: 999, attackId: newAttackId(), dmg: dmg * this.dmgMul * scale * (o.src === 'skill' ? this.skillMul : 1), react: r.react, dir: face, push: o.push ?? r.push, lift: r.lift, stop: 0, strength: r.strength };
+    const hit: Hit = { x0: t.x - 1, x1: t.x + 1, z0: 0, z1: 400, y: t.y, dy: 999, attackId: newAttackId(), dmg: dmg * this.dmgMul * scale * (o.src === 'skill' ? this.skillMul : 1), react: r.react, dir: face, push: o.push ?? r.push, lift: r.lift, stop: 0, strength: r.strength, blow: kind === 'blow' };
     const res = t.applyHit(hit, w);
     if (res.kind === 'immune') return;
     // 기술 부가효과: 맞은 상대에게 상태 이상 (docs/퍽/기술_부가효과.md). 막았으면 안 걸림. 상대 정신력으로 지속이 줄어듦. 퍽: 지속 연장·깊은 상처
@@ -373,8 +373,10 @@ export class FighterPlayer extends Player {
     this.status.onHit();
     if (armored) { this.core.takeHit('hit'); return { kind: 'armor' }; }
     P.face = (Math.sign(hit.dir) === 1 ? -1 : 1) as 1 | -1;
-    const knock = (hit.react === 'down' || hit.react === 'launch') && !(this.team === 'player' && this.perks.noKnock());
-    this.core.takeHit(knock ? 'knock' : 'hit');
+    // 공격 종류 → 피격 동작(10-25 결정): 약 = 맞기(18) · 강 = 맞기 하단(18_1) · 날리기 = 크게 밀려나기(18_2) · 띄우기 = 띄워지기(18_3) · 다운 = 쓰러지기(19). 그 줄이 없는 인물은 엔진이 18·19로 대신함
+    const noKnock = this.team === 'player' && this.perks.noKnock();
+    const kind = hit.blow ? 'push' : hit.react === 'launch' ? (noKnock ? 'low' : 'launch') : hit.react === 'down' ? (noKnock ? 'low' : 'knock') : hit.react === 'stagger' ? 'low' : 'hit';
+    this.core.takeHit(kind);
     return { kind: 'hit' };
   }
 
@@ -412,7 +414,7 @@ export class FighterPlayer extends Player {
     const P = this.core.P as unknown as { x: number; y: number; mode: string; seat: unknown };
     if (!this.coreSeat) return;
     if (P.mode === 'seat' && (p.pressed.has('interact') || p.pressed.has('sit') || p.pressed.has('jump'))) this.core.rise(false);
-    if (!P.seat && P.mode !== 'seatUp') { const e = this.coreSeat.exit; this.coreSeat = null; P.x = e.x; P.y = e.y; this.sync(); }
+    if (!P.seat && P.mode !== 'seatUp') { const e = this.coreSeat.exit; this.coreSeat = null; if (P.mode === 'act' || P.mode === 'down') return; P.x = e.x; P.y = e.y; this.sync(); }   // 맞아서 굴러떨어졌으면 그 자리에 둠
   }
 
   private input(p: Pad) {

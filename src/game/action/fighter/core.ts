@@ -881,6 +881,7 @@ function takeHit(kind?: Json) {
   if (P.mode === 'block') { sfx('guard'); shake = 4; if (!vfx('guard_block', P.x + P.face * 50 * K(P.y), P.y - 140 * K(P.y), 2.2, { flip: P.face < 0 })) sparks(P.x + P.face * 50, P.y - 140, 8, false, '#9fd0ff'); pushP(-200, 1200); return; }
   if (armored()) { gainSp(5 * (P.hurtSp || 1)); sfx('armor'); P.armorT = 0.28; P.armorC = ''; hitstop = 0.06; shake = 6; return; }
   if (P.mode === 'charge') P.charge = 0;
+  if (P.seat && (P.mode === 'seat' || P.mode === 'seatUp')) return seatHit(kind === 'knock' || kind === 'push' || kind === 'launch');   // 의자에 앉은 채 맞음: 약 = 일어나며 맞기, 강 = 옆이면 굴러떨어지기(169)
   if (kind === 'knock') return knock();
   if (kind === 'low') return hitAs('18_1', -300, 12, 0.09);
   if (kind === 'push') return hitAs('18_2', -620, 16, 0.06);
