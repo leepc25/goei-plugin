@@ -1,5 +1,5 @@
 {
- "file": "jinryo_v2_632x424",
+ "file": "jinryo_v4_632x424",
  "bgScale": 2,
  "w": 1264,
  "h": 848,
@@ -7,27 +7,19 @@
  "floor": [
   [
    0,
-   690
+   790
   ],
   [
-   180,
-   545
+   395,
+   582
   ],
   [
-   1075,
-   545
-  ],
-  [
-   1180,
-   690
-  ],
-  [
-   1180,
-   760
+   965,
+   582
   ],
   [
    1264,
-   760
+   790
   ],
   [
    1264,
@@ -39,27 +31,39 @@
   ]
  ],
  "lane": [
-  545,
+  582,
   837
  ],
  "blocks": [
   {
    "poly": [
     [
-     68,
-     578
+     100,
+     600
     ],
     [
-     394,
-     578
+     395,
+     570
     ],
     [
-     394,
-     640
+     490,
+     565
     ],
     [
-     68,
-     640
+     490,
+     648
+    ],
+    [
+     125,
+     785
+    ],
+    [
+     0,
+     790
+    ],
+    [
+     0,
+     600
     ]
    ],
    "h": 999
@@ -67,20 +71,20 @@
   {
    "poly": [
     [
-     386,
-     515
+     455,
+     560
     ],
     [
-     494,
-     515
+     650,
+     560
     ],
     [
-     494,
-     553
+     650,
+     588
     ],
     [
-     386,
-     553
+     455,
+     588
     ]
    ],
    "h": 999
@@ -88,20 +92,20 @@
   {
    "poly": [
     [
-     486,
-     515
+     650,
+     545
     ],
     [
-     542,
-     515
+     712,
+     545
     ],
     [
-     542,
-     548
+     712,
+     585
     ],
     [
-     486,
-     548
+     650,
+     585
     ]
    ],
    "h": 999
@@ -109,62 +113,24 @@
   {
    "poly": [
     [
-     536,
-     515
+     810,
+     585
     ],
     [
-     729,
-     515
+     1012,
+     585
     ],
     [
-     729,
-     550
+     1012,
+     600
     ],
-    [
-     536,
-     550
-    ]
-   ],
-   "h": 999
-  },
-  {
-   "poly": [
-    [
-     738,
-     515
-    ],
-    [
-     864,
-     515
-    ],
-    [
-     864,
-     554
-    ],
-    [
-     738,
-     554
-    ]
-   ],
-   "h": 999
-  },
-  {
-   "poly": [
     [
      868,
-     538
+     652
     ],
     [
-     906,
-     538
-    ],
-    [
-     958,
-     657
-    ],
-    [
-     922,
-     657
+     810,
+     652
     ]
    ],
    "h": 999
@@ -172,20 +138,20 @@
   {
    "poly": [
     [
-     972,
-     540
+     903,
+     595
     ],
     [
-     1184,
-     540
+     1082,
+     595
     ],
     [
-     1184,
-     686
+     1082,
+     700
     ],
     [
-     972,
-     686
+     903,
+     700
     ]
    ],
    "h": 999
@@ -193,20 +159,20 @@
   {
    "poly": [
     [
-     964,
-     582
+     1075,
+     600
     ],
     [
-     1048,
-     582
+     1264,
+     600
     ],
     [
-     1048,
-     645
+     1264,
+     818
     ],
     [
-     964,
-     645
+     1075,
+     818
     ]
    ],
    "h": 999
@@ -225,58 +191,23 @@
  },
  "lamps": [
   {
-   "x": 360,
-   "y": 35,
+   "x": 430,
+   "y": 60,
    "kind": "down",
    "r": 420
   },
   {
-   "x": 905,
-   "y": 35,
+   "x": 860,
+   "y": 60,
    "kind": "down",
    "r": 420
-  }
- ],
- "objects": [
-  {
-   "id": "desk",
-   "name": "의사 책상",
-   "file": "",
-   "x": 72,
-   "y": 380,
-   "w": 318,
-   "h": 260,
-   "sortY": 638,
-   "coverMask": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAT4AAAEECAIAAAA+u8+sAAAEzElEQVR4nO3dS3LaQABFUZPy/rdMBsqABEP46NOXPmfopCqKzPVDMsanLwZwPp//+cjpdDrkSKj4dfQBAK+QLiRJF5KkC0nShSTpQpJ0IUm6kCRdSJIuJEkXkqQLSdKFpO+jD+BnfpIG7rO6kLT56l7v56XrLb3/94GF1YWkga517+/t5Z/e32pXxczA6kLShqt7awkvP/7ala3rYbC6kLTy6tpD2IfVhaQVVveRpbXGsC6rC0kvru7nrejyP/I9YSqsLiRJF5KkC0nShSTpQpJ0IUm6kCRdSJIuJEkXkqQLSU+/hvnzXr08Jq+p5j6rC0nShSTpQpJ0/3I+n13MkyBdSJIurGD/52vShaSBfufQWvz+IfZ01HfgrS4kfeDqvmb5qun2Mvd/V9Y4z+OsLiRZXfjj+jnXyM/CrC4kWV14wjg7bHUh6enbZeN81YGZWV1Iki4kSReS3GHe1SOvxXE3gUdYXUhyh3lDa73e1TnnmtWFJKu7mq1/psSZ55LVhSSre9P7K/r+ubo+hnnOP7csjwqrC0lW9491r1TXPUu2l0tWF8KmfjXVdveEvdMVW7h8xFpdSJpudR9f2sc3c5x3CWQeVheSJlrd7X5qZ7R36OXzXD+6rC4kTbG6t/awcge4cpzsyepC0hSre22tHavvOeO79RizupA0xepusYH2lmNZXUjyk0NPuP+d25nPDFvzfV34EFNc627N3rI/qwtJVvct9pajWF1IeugOs22BY7nDDB/iP9e69hbGZHUh6YfVtbQwPqsLSX+trr2FCqsLSd+WFoqsLiRJF5KkC0nShSTpQpJ0IUm6kCRdSJIuJEkXkqQLSTffm8prm2Ec3psKPoR0IUm6kCRdSJIuJEkXkqQLSdKFJOlCknQhSbqQJF1Iki4kSReSpAtJ0oUk6UKSdCFJupAkXUiSLiRJF5KkC0nShSTpQpJ0IUm6kCRdSJIuJEkXkqQLSdKFJOlCknQhSbqQJF1Iki4kSReSpAtJ0oUk6UKSdCFJupAkXUiSLiRJF5KkC0nShSTpQpJ0IUm6kCRdSJIuJEkXkqQLSdKFJOlCknQhSbqQJF1Iki4kSReSpAtJ0oUk6UKSdCFJupAkXUiSLiRJF5KkC0nShSTpQpJ0IUm6kCRdSJIuJEkXkqQLSdKFJOlCknQhSbqQJF1Iki4kSReSpAtJ0oUk6UKSdCFJupAkXUiSLiRJF5KkC0nShSTpQpJ0IUm6kCRdSJIuJEkXkqQLSdKFJOlCknQhSbqQJF1Iki4kfR99AMA9p9Ppx49bXUiSLiRJF5Jc68Kgbl3lLqwuJEkXkqQLSa51YTj3r3IXVheSpAtJ0oWxPPJs+Uu6MJQHu/2SLkS5wwxDeHxvF1YXkqQLSdKFJNe6cLBnr3IXVheSpAtJ0oUk6UKSdCFJunCk124vf0kXDvRyt1/ShSjpQpJXU8EB3nmqvLC6kCRdSJIuJLnWhV29f5W7kC7sZK1oF9KFza0b7cK1LiQ9vbqXXz/O5/OqB/P/f/Ed+xwtXNpibxcTre52JxH29+6jeZUp2zMq28s+tn5Uv7u6uSnLHTD8aMPH8SP7Nk9IM6/9PJ/lPW14resTdmnaszHtf3xrTuvne23wJTe4ie4wT+uFCHU7vt8BndE94bxMsAAAAABJRU5ErkJggg=="
-  },
-  {
-   "id": "screen",
-   "name": "칸막이",
-   "file": "",
-   "x": 872,
-   "y": 248,
-   "w": 78,
-   "h": 394,
-   "sortY": 652,
-   "coverMask": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAE4AAAGKCAIAAAAtxuBcAAADoUlEQVR4nO3c3U4bQRAF4VmL93/lzYUTY4IX7PX8dFdXXSElAr6cGcdakWztoH3fbx9v23b02xJ1Wf0NzOsp6r7v9yMnrdCqDy7hMwNmvL1VVz13IbMs7KqnP13ghV21y6cOtrCrdv8yARYutOokaoR30a46prXbFlp10ivw4Zef+MpcaNXF1Jm3t9Cqi+/q98bd3kKrfqz+Bj4b/WpcaFWpxKQSk0pMKjGpxKQSk0osEHX0c6ZA1NGFe7Z0rdcTiXtRoVUDPVu6b8RPOLpqpHot7KpRe2fhQqsmpr767iox9dWS3dXv/TfsDxe40KpB3wOPqNCqUolJJSaVmFRiUolJJSaVmFRiUolJJSaVmFRiUolJJSaVmFRiUolJJSaVmFRiUolJJSaVmFRiUolJJSaVmFRiUolJJSaVmFRiUolJJSaVmFRiUolJJSaVmFRiUolJJSaVmFRiUolJJSaVmFRiUolJJSaVmFRiUolJJSaVmFRiUolJJSaVmFRiUolJJSaVmFRiUolJJSaVmFRiUolJJSaVmFRiUolJJSaVmFRiUolJJSaVmFRiUolJJSaVmFRiUolJJSaVmFRiUolJJSaVmFRiUolJJSaVmFRiUolJJSaVmFRiUolJJSaVmFRiUolJJSaVmFRiUolJJSaVmFRiH0e/sG3b7eN936d8M2MrtKpUYlKJSSW2/fzLjL9RrxVaVSoxqcQOX4FJr73Xqq7KW/K+z1XZznaj4p3tSq3gbK1dijhba5f7x2XsLu3rw0Fwf1+WKmgLvYX4pOKH/bIqW1vyAF8DD/tgVar28QFGagvf1Vu8YX9aFab1AP+LNOzvq2K0Tx1ghta7+i3AsC+sml3rAT4o9bAvr5pXe+YAJ9V6V38r47DnV02n9QA/V65h3101kbbDAc6i9a6+WIphu60aX+sBPlXwYTuvGlnrAX6jsMMOWTWmdtQBDqj1rvYo2rBjVw2l9QD3K86wM1YNop10gCNoC93VqX/Yc36i/Oj/Ppi66tpjXOgAz6YuHHbNF17yz0DWHOAl23pXxzd/2JWrTtYWOsDr35p2fzUO8W7pYdOO8Xpqm6UNQZ3T+rt6a/RbqECrjj7Ggaiji0UdOmwsahupDUdtw7QRqYMKSh0xbFBqG6CNS+1eaGrfYUNTW1dtdGrHElB7DZuA2jppc1BbD20a6vtlor45bCZqe0+bjPpO+ainh81HbWe1gZ4YjijW0/1pSSUmlZhUYn8Aj4qBb3XckfcAAAAASUVORK5CYII="
-  },
-  {
-   "id": "bed",
-   "name": "진찰 침대",
-   "file": "",
-   "x": 970,
-   "y": 385,
-   "w": 212,
-   "h": 295,
-   "sortY": 684,
-   "coverMask": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAANQAAAEnCAIAAABezfpMAAAEMklEQVR4nO3c227aQABFURzl/3+ZPhipRI3LzfY2zFqvVZWo2pwMoZ7pBLs7n8+n0+mr/jYYl/jIiI+M+MiIj4z4yHw/99fmt8pvbZqmfb7Q/G+125d7I5aPzJMvxw9YvoT9m/klM7EbL0QLt4/RFtHyEfvlBWftKuPsn+UjJr4DOZ/PQ/3YER+ZH59wDPWyI2f5yIjvcMY5+YmPzOXMN8hLjUOxfGTEd1AjnPzER0Z8ZMRHRnyH9tknP/GRER8Z8ZER3xv41JOf+Mhc4pumaZwHCDgIy0fmybta2N/bHftu/iy1fGQ8t0vG8pERHxnxkREfGfGRWfxNjPe8bM3ykREfGfGRER8Z8ZFxGz0Zy0dGfGTER+au5zac/NiC5SMjPjLiIyM+MuIj8+Pdrne17Mnykbksn81jf5aPjPjIiI+M+MiIj4z4yIiPjPjIiI+M+MiIj4z/1ULG8pFxGz0Zy0dGfGTER8adzGQsHxnxkREfGfGRER8Z8ZERHxnxkREfGfGRER8Z8ZERHxnxkREfGfGRER8Z8ZERHxnxkREfGfGRER8Z8ZERHxnxkREfGfGRER8Z8ZFZvCJt5qI0tmP5yIiPjPjIiI+M+MiIj4z4yIiPjPjIiI+M+MiIj4z4yIiPjPjIiI+M+MiIj4z4yIiPjPjIiI+M+MiIj4z4yIiPjPjIiI+M+MiIj4z4yIiPjPjILN5M6k5Stmb5yIiPjPjIiI+M+MiIj4z4yIiPjPjIiI+M+MiIj4z4yIiPjPjIiI+M+MiIj4z4yIiPjPjIiI+M+MiIj4z4yIiPzOJ1GddcncEWLB8Z8ZERH5m7znwzJz/WZfnIPLB816wgr7N8ZJ5cvpn94xWWj4z4yIiPzEtnvns4F7LE8pERHxnxkREfGfGRER8Z8ZERHxnxkdn8E46Zzzn4l+Ujs9Pyzewf1ywfGfGRER+Zy5nPaYz9WT4yk82jYvnIiI+M+MiIj4z4yIiPjPjIiI+M+MiIj4z4yIiPjPjIiI+M+MiIj4z4yIiPjPjIfC/9wTT9vczAcx5swfKRuSu+aZquhxBWYfnIPBCf/WNdlo/Mw/HZP9Zi+cg8GZ/943WWj8yXDaNi+ci8tHk+8+UVlo+M+MiIj4z4yIiPjPjIiI+M+MiIj4z4yIiPjPjIiI/M4o0F786NC8dn+ciIj4z4yAwRn+dUjmmI+DimgeKzf0czUHwczXDx2b/jGC4+juMDn9u9f9iO+f2Pw/KRcfqxfxnLR8byXdi//Vk+MuIjIz4yznw/OPntyfKRsXy/sH/7sHxkLN8i+7c1y0dGfGTER8aZ7wYnv+1YPjKW7y72bwuWj4zle4D9W5flI2P5Hmb/1vKxl0NyZPPjreJjc0tPUjvzkREf2/rPBRLiI+PMtzJXYN3P8pERHxnxkREfGfGRER8Z8ZER38PcZ78W8ZH5A4txqfkuSmIsAAAAAElFTkSuQmCC"
   }
  ],
  "spots": [
   {
    "id": "bed",
-   "x": 1075,
-   "y": 700,
+   "x": 975,
+   "y": 715,
    "verb": "눕기",
    "face": -1,
    "act": [
@@ -284,9 +215,88 @@
     "doze"
    ],
    "seat": {
-    "x": 1075,
-    "y": 610
+    "x": 995,
+    "y": 640
    }
+  }
+ ],
+ "objects": [
+  {
+   "id": "desk0",
+   "name": "의사 책상",
+   "file": "",
+   "x": 100,
+   "y": 430,
+   "w": 100,
+   "h": 360,
+   "sortY": 770,
+   "coverMask": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAAFoCAIAAAAuNcnMAAAEh0lEQVR4nO3d0XKaagBGUTyT939lzwUzGTtU60bBH1nrqjeNdvsVxBgzTRu7Xq/X63XrW9nHf/vczHck2ynW7OjJdo11dGIFYgViBWIFYgViBWIFYgViBWIFH4h13CtEywrECsQKxArECn4+fQdGd3vitqzAsv6wfAJ4uVx+/2xZwUmXde8S4nZHS5YVnGJZj49Ez7OsYE3g5JkXGNY9zs/f4ru+vmUFBz5mrTujvfL1LSs4wLK2XtDjW7llWcFwy9ruXPb4Vp5hWcFfHrTH1evjXB/DcXa0ZFnBz6e+hbfFgmbb/YssK9j8bHjEBd1jWcFwz7PuGeHtEZYV/GVZ2x1lnjfCjpYsKxjumDXmpmaWFXx4WSPvaMmygl2XdawdzbzXYaXLK4/2vWdkR1zQzHsd3uaPkMddxDr1WsWyguGewW/n9Wteywq+fFnvfQXFsoJDLutTr7hZViBWIFZwgGPWCN8TmFlWMNyyxtnRkmUFH1vWyAu6x7KCDZd1xO08ZlnBm5f1fWu6ZVnBG5b13Wu6ZVlBXtZ5drRkWcE/lnXmHS1ZViBWIFYgViBWIFYgViBWIFYgViBWMNz3DbfwrndkW1bwtct6/ZNH5q/gc0pX+sf74Ed+Pev23u5zPy0rOMwxa4TVW1Yw9LL2Pyo9ZlnBcMsabU23LCsY7qfvR1vTLcsKPrCskY9Kj1lW4HMdAssKhjsb7sNvGtjccM/g9+GzlTcnViBWIFYgViBWIFaw0/Oso18VziwrECsQK9jpmLW8yj/iUcyyArECsQKvwQf7LevopaYnf1fYilesvyDN0nv+G35lmqWXYp2k0S9nw2B9rLPNalod64SlphXHrHNmmjlmBfl3sp6ZZQViBWIFYgViBWIFYgViBWIFYgViBWIFYgViBWIFYgViBWIFYgViBWIFYgViBWIFYgViBWIFYgViBWIFYgViBWIFd390wvv/liwrECsQKxArECsQKxArECsQK3jqh589m59ZViBWIFYQPrDBkcuyArECsQKxArECsQKxArECsQKxArECH+YXWFYgViBWIFYgVrDyF1ee85xoWYFYgViBWIFYgViBWIFYgViBWIFYgViBWIFYgViBWIFYgViBWIFYgViBWIFYgViBWIFYgViBWIFYgViBWIFYgViBWIFYgViBWIFYgViBWIFYgViBWIFYgViBWIFYgViBWIFYgViBWIFYgViBWIFYgViBWIFYgViBWIFYgViBWIFYgViBWIFYgViBWIFYgViBWIFYgViBWIFYgViBWIFYgViBWIFYgViBWIFYgViBWIFYgViBWIFYgViBWIFYgViBWIFYgViBWIFYgViBWIFYgViBWIFYgViBWIFYgViBWIFYgViBWIFYgViBWIFYgViBWIFYgViBWIFYgViBWIFYgViBWIFYgViBWIFYgVjB5ZW/fL1e33U/DsGyArECsQKxArECsQKxArECsQKxArGCl64Nx/TKFevl8iiIZQU/n74Do3i8qZllBWIFYgViBWJN03NH9+nkZ8MnG/0677JqqWma/gccfcvVJEJieAAAAABJRU5ErkJggg=="
+  },
+  {
+   "id": "desk1",
+   "name": "의사 책상",
+   "file": "",
+   "x": 200,
+   "y": 410,
+   "w": 100,
+   "h": 380,
+   "sortY": 732,
+   "coverMask": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAAF8CAIAAAC2colBAAAEWElEQVR4nO3cQXLaQABFwSjl+19ZWcQLykQ2L5LQDHSvkzJ+/NKAjP3r1wDWdV3X9epH8bPfVz+AmYgViBWIFYgViBWIFYgViBWIFYgVfFz9AEZ3+6bVsgLL+vTIbQ/LCt5uWXtunFlWIFYgVvAW16yjbvBbVvCCyzrvB0WWFUy8rK0FLcvy4L+sLCuYYFmPL+hslhU8+8n5p++vKXVBTsMhTHDN2vL8D95YVnDYNev+ef7+WjPFB7K+sKwgL2vGRRzFsoLNZb3zgrZYVvC5rP1n2Xnv9cdhWcHH3+f/+e/gZ2RZwX8O6vWuR4+wrGDKV/CPXGHPeJyWFWzezxphQfeuPbUtK9h8BT+OPWs69vuyrOBjtE2N/F7CsoLLfroz8oK2WFYgViBWcFmsWf6Wwy3LCsQKxApePNayLAe+oHvxWMe6ONZcZ6JlBWIFYgVvEeuoM/EtYh1loM9nnX2Ha/93ZFnBxJ+Df4Sf7lzmBZfld3eGMP2ynnlqW1bww0ubMV9tXXWjwrKCCa5Z49zwsqxguGvWyCwrECsQK5jgNDzb1iu7++u1ZQVvdxruuR9rWcEbXbP23+O3rECsQKzg7U7DPSwrECsQKxArECsQKxArECsQKxArECsQKxAruOBO6e0dy7nualhWcPqyZvz7DVssKxArECtY5jqPrmVZwUBH1fgbt6xArECs4OJr1u11avz3jJYVXPb5rDG38z3LCp56zZpxTbcsKzhxWbPv6J5lBQcv6/XWdMuygl3Leu0d3bOswJ3SwLICsQKxArECsQKxArECsQKxArECsQKxArECsQKxArECsQKxArECsQKxArECsQKxArECsQKxArECsQKxArECsQKxArECsQKxArECsQKxArECsQKxArECsQKxArECsQKxArECsQKxArECsQKxArECsQKxArECsQKxArECsQKxArECsQKxArECsQKxArECsQKxArECsQKxArECsQKxArECsQKxArECsQKxArECsQKxArECsQKxArECsQKxArECsQKxArECsQKxArECsQKxArECsQKxArECsQKxArECsQKxArECsQKxArECsQKxArECsQKxArECsQKxArECsQKxArECsQKxArECsQKxArECsQKxArECsQKxArECsQKxArECsQKxArECsQKxArECsQKxArECsQKxArECsQKxArECsQKxArECsQKxArECsQKxArECsQKxArECsQKxArECsQKxArECsQKxArECsQKxArECsQKxArECsQKxArECsQKxArECsQKxArECsQKxArECsQKxArECsQKxArECsQKxArECsQKxArECsQKxArECsQKxArECsQKxArECsQKxArECsQKxArECsQKxArECsQKxArECsQKxArECsQKxArECsQKxArECsYLlOV9mXdevX3h50pc+kGUFYgViBWIFYgUnHkm3J+D92Tfj+WhZwcFP5vdrOu//PodlBX8Awwu2rDj8F5oAAAAASUVORK5CYII="
+  },
+  {
+   "id": "desk2",
+   "name": "의사 책상",
+   "file": "",
+   "x": 300,
+   "y": 416,
+   "w": 100,
+   "h": 364,
+   "sortY": 694,
+   "coverMask": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAAFsCAIAAAC1pIvaAAAEEElEQVR4nO3dzW7TQABGUYz6/q9sFt4Yggm3sZ2xc86OH1XV5dMkTNNm+rFhnuetPxrWNE2Hfvyfh370m/la/+KKazqTZQXT/dZ03MllWYFYgVjB1/O/cq71iTPaeWpZwUnLenyEWlZz9HPufVlWIFYgVnBSrHmeR3to+wbLCsQKxArECsQKxArECsQKxAoOv3W41r3Cv1lWIFYgVjDcHfwR6oXH1jlrWcHhy1r/q179kdGyArECsQKxArECsYL7x9rxS3A3fAb/ep2t12Hcf1k7EisQKxArECsQKxArECsQKxArECsQKxAr8FqHTY93D5YVvDnWtV4fb1nBqV+RvjrLCt5wBz/y96r+m2UFb/tO1iuyrMAz+MCyght+RXpf68drywoG+ilHWz/7YRyWFQwUa/wbiIFijU+sQKxArECsYKDnWeOzrECsQKxg87LJWfbIsoIn15j2tWZZwc43pePfSb3CsgLvNBBYVuD/hoFlBWIFYgViBWIFYgViBWIFYgVDvD7rKq9ftqxArECswK1DYFmBWIFYgViBWIFYgViBWIFYgViBWIFYgViBWIFYgViBWIFYgViBWIFYgViBWIFYgViBWIFYgViBWIFYgViBWIFYgViBWIFYgViBWIFYgViBWIFYgViBWIFYgViBWIFYgViBWIFYgViBWIFYgViBWIFYgViBWIFYgViBWIFYgViBWIFYgViBWIFYgViBWIFYgViBWIFYgViBWIFYgViBWIFYgViBWIFYgViBWIFYgViBWIFYgViBWIFYgViBWIFYgViBWIFYgViBWIFYgViBWIFYgViBWIFYgViBWIFYgViBWIFYgViBWIFYgViBWIFYgVjB17s/gb+bpumP35nn+S2fyZplBWIFYgViBWIFYgViBWIFYgViBWIFYgViBWIFYgViBWIFYgViBWIFYgViBWIFYgViBWIFYgViBWIFYgViBWIFYgViBWIFYgViBWIFYgViBWIFYgViBWIFYgViBWIFYgViBWIFYgViBWIFYgViBWIFYgViBWIFYgViBWIFYgViBWIFYgViBWIFYgViBWIFYgViBWIFYgViBWIFYgViBWIFYgViBWIFYgViBWIFYgViBWIFYgViBYO+V9holvcus6xArECswJn1xPqdFi0rsKxNj+/eaVmBZf3mcU1rlhVY1pM1rVlWIFYgVvDRZ9b/n1YLywrECsQKPvTMqqfVwrKCj1vW9za1sKzgg5b1yqYWlhXcfFmvr2nNsoLbLmvfTS0sKxArECu44Zl1xGm1sKzgVss6blMLywrECsQKpnme3/057ODo02phWcHlHw3P2dTCsoJLLuvMNa1ZVnCZZb1rTWuWFYgViBVc4Mwa4bRaWFYw9LLG2dTCsoJfiEZjJZDiIHYAAAAASUVORK5CYII="
+  },
+  {
+   "id": "desk3",
+   "name": "의사 책상",
+   "file": "",
+   "x": 400,
+   "y": 410,
+   "w": 95,
+   "h": 316,
+   "sortY": 657,
+   "coverMask": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAF8AAAE8CAIAAAApOfriAAADfElEQVR4nO3dSU5jURQFQVyq/W/ZNXgMPoZK4/Y3L2IBgFJHV4C7j4/NO5/P5/N5lW/9Z5XvuhfqFHWKOkWdok5Rp6hT1CnqFHWKOkWdok5Rp6hT1CnqFHWKOkWdok5Rp6hT1CnqFHWKOkWdok5Rp6hT1CnqFHWKOkWd8nftH+B+b3giqu2UHW9n6XQ6veLL2k5Rp6hT1CnqFHWKOkWdok5Rp6hT1CnqFHWKOkWdok75oc6K7x2wNbZT1CnqFHWKOkWdok5Rp6hT1CnqlJM/qZYunsthO0WdLy7+P6FOUaeoU9Qp6hR1ijpFnaJOOchz3Z/F31k3UKeoU9ydTz++Ssd2iu3Ua7tsp6hT1CnqFHWKOkWdMt3vO8vfbq4+Dmw7RZ2iTlGnqFPUKeoUdYo6RZ2iTlGnqFPUKeoUdYo6RZ2iTlGnqFPUKeoUdYo6RZ2iTlGnqFPUKeoUdYo6RZ2iTlGnqFPUKeoUdYo6RZ2iTlGnqFPUKeoUdYo6RZ2iTlGnqFPUKeoUdYo6RZ2iTlGnTPcuIUvxfmiD7RR1ijpFnaJOUaeoU9Qp6hR1ijpFnaJOUaeoU9Qp6pSp61x8/uV3U9e5Sp2iTlGnqFPUKeqU6R4LvfopCUu2U9Qpp5uWNhvbKdNd5e98bt+d1CnqFHWKOkWdok5Rp6hT1CnqFHWKOkWdok5Rp6hT1CnqFHWKOkWdok5Rp6hT1CnqFHWKOkWdok5Rp6hT1CnqFHWKOkWdok6Z+vnK3lHvIeoUdcp0d+fqrVmynTLFdm7ay5LtFHWKOuXgd+fuizPYTjnsdh5czWA7RZ2iTjnU3XnKrVmynaJOUacc5O48/eIMtlN2v50XrWawnbLj7bx0NYPtlF1u5w2rGWyn7Gw7b1vNYDtlN9t582oG2yk72M4qqxlsp2x6OyuuZrCdstHtrL6awXbK5razkdUMtlM2tJ1NrWawnaJOUads4u5s8OIMtlNW3s5mVzPYTlltOxtfzWA7ZYXt7GI1g+2Ut25nR6sZbKe8fDu728uS7ZQXbmfXqxlsp6hT1CkvuTsHuDiD7ZQnb+cwqxlspzxtOwdbzWA7RZ2iTnno7hzy1izZTrlzO4dfzWA75ebtTLKawXbKDduZajWD7RR1ijrlV3dnwosz2E65sp1pVzPYTvnvdiZfzWA75ct27OWC7ZTP7VjNj2yn/AN8LyossfjuSwAAAABJRU5ErkJggg=="
+  },
+  {
+   "id": "screen",
+   "name": "칸막이",
+   "file": "",
+   "x": 812,
+   "y": 266,
+   "w": 203,
+   "h": 362,
+   "sortY": 652,
+   "coverMask": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMsAAAFqCAIAAAA7rjmbAAAFOklEQVR4nO3dzVLqaABF0aSL93/l9IAuipYfgXwbYlhrpNYdBGrn3AhR5+mGZVlOH8/zfOufwX3/fPoA2Ln/jZPdYjgbRutw+aV9rNf5Hv8VK5/5bT5kG0brv5PmmP9n12vUMfzdq8k1R77NAZtsGLUr12GftWbJtrDEa5wf+f3HstnFumTDaM2PnPfvP2PG7tD2z/gdbNUtNozWQ9dh77yyGXXW/q3vKEddQW7wkdowWpv7XnK9v7VeR8fjXLPfm32kNozWDjfsaLPn9B2vLdnGH6kNo6UwWgqj9dbrsB28Qs2zbBitZMNsFSdXNmxZFokwys0NExlDuA6jtdvX9L9ngzf+SG0Yrd1uGO939R1SG0ZLYbQURkthtBRGS2G0FEZLYbQURkthtBRGS2G0FEZLYbQURkthtBRGS2G0FEZLYbQURkthtBRGS2G0FEZLYbQURkthtBRGS2G0FEZLYbQURkthtBRGS2G0FEZLYbQURkthDHP1r5MojJEuI1MYg/2ITGGMdx6ZwkicIlMYlWNkCqOlMFoKo6UwWgqjpTBaCqOlMFoKo6UwWgqjpTBaCqOlMFoKo6UwWgqjpTBaCqOlMFoKo6UwWgqjpTBaCqOlMFoKo6UwWgqjpTBah08fAPs0z/PxAxtGS2G0FEZLYbQURkthtLxawWCn1ymObBgthdFSGC2F0VIYLYXRUhgthdFSGC2F0VIYLYXRUhgthdFSGC2F0VIYLYXRUhgthdFSGC2F0VIYLYXRUhgthdFSGC2F0VIYLYXRUhgthdFSGIMty7Isy+lThdFSGC2F0VIYLYXRUhgthdFSGC2F0VIYLYXRUhgthdFSGC2F0VIYLYXRUhitw4+/ygxj2TBaCqOlMFoKo3X49AGwT6cfmbRhtBRGaJ5nhdFSGC2F0VIYLYXRUhgthdFSGC2F0VIYLYXRUhgthdFSGC2F0VIYLYXRUhgthdFSGC2F0VIYLYXRUhgthdFSGC2F0VIYLYXRUhgthdFSGC2F0VIYLYXRUhgthdFSGKFlWRRGS2G0FEZLYbQURkthtBRGS2G0FEZLYbQURkthtBRGS2G0FEZLYbQURkthtBRGS2G0FEZLYbQURkthtBRGS2G0FEZLYbQURkthtBRGS2G0FEZLYbQURkthtBRGS2G0FEZLYbQURkthtBRGS2G0FEZLYbQURkthtBRGS2G0FEZLYbQURkthtBRGS2G0FEbr8OkDYG/meT7/1IbRsmEM82O9jmwYLYXRUhgthdFSGC2F0VIYLYXRUhgthTHMsizLsvz4osJoKYyWwmgpjJbCaCmMkS5vEVMYw7gDkdDVvCaFMcStvCaFsd6dvCaFsdL9vCaFscaveU0K42WP5DUpjJrCaCmMlsJoKYxXPHiZPymMFzye16QwnvVUXpPCeMqzeU27LGye5xeeCH712rO6w8IovHzS7rYwSzbQmmdyt4UxysoTdee/x7WYscsfa+YOG0ZLYU/7tiu8q7+N4nEKo6UwHvLykimMlsJoKYyWwmgpjEd555uQd74JDX7n+9tesyZlw2gpjN+Nf1/SDSqMcqUweXHJ+5Js1M7vcf0s35JPChtOVT/4X5KWwmgpjJbCaCmMlsJoKYyWwmgpjJbCaCmMlsJoKYyWwmjld++c383i7tkvZMNovfUORHv2hWwYrXDD7t9PfGfP3Ii8JzaM1kNrcf+a6Tsn59Zz8p3Pxh02jNbT12HOUZ5iw2g9tGF2i5fZMFoKo6UwWgqjpTBaCqOlMFoKo6UwWgqjpTBaCqOlMFr/Anklrio+cCF4AAAAAElFTkSuQmCC"
+  },
+  {
+   "id": "bed",
+   "name": "진찰 침대",
+   "file": "",
+   "x": 904,
+   "y": 436,
+   "w": 181,
+   "h": 264,
+   "sortY": 700,
+   "coverMask": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAALUAAAEICAIAAACWEiLhAAADjUlEQVR4nO3d4XKaQBhA0W4m7//K9IeZTuPEi0YFdM95gTLt7cfCCow/m1iWZZs/6OWMMfY+hPKx9wFwaPrY2bIsRx6u+qD8cPI7cs6cbLZqMT8o3zI0OV7RU2eJ+UH5Ss/keHVPmiLmB8X8eEMPnCXmB0UfFH1Q9PGGHrinow/KpysXgvlB+dz7AHg89z/YiD4o+qDo4w25/8FGPsYYB38Egx2ZHxR9vK2HrEL0QdEHRR8Uz79M5BcXquYHRR8UfVD0MZFf3BHRB+VbH/ZiOGN+UPQxnZtWIfqg6IOiD8rFqxV7MTNYvVw1Pyj6oOiDsnL6sQqZQaxCzA+KPij6oOiD2pHRB0UfFH1Qrvq1mLsg8zi7F2J+UPRB0Qflhl+rW4XM498qxPyg6IOiD4o+KPqgDFclXDLGMD8o+qDog+L7UVPz/Bx30QdFHxR9UPRB0cfUVt9Fpg/K1+WvXRhO/H6dG/j+CxfZv2WFPrhoWRZ9ULz/lGJ+ULy/kGJ+UPRB0QdFHxR9UPTBRfZfWKEPij64yP4cK/RB0QdFHxR9UPRB0QdFHxR9UPRB0QdFHxR9UPRB0QdFHxR9UPRB0QdFHxR9UPRB0QdFHxR9UFbeL3XiLVPTMj8o+qDog6IPij4o+qDog6IPij4o+qDog6IPij4o+qDog6IPij4o+qDog6IPij4o+qDog6IPij4o+qB87n0AHMsY3x65NT8o+qDog6IPij4o+qDog6IPij4o+qDog6IPij4o+qDog6IPij4o+qDog6IPij4o+qDog6IPij4o+qDog6IPysrz2b58Oznzg6IPij4o+qDog6IPij4o+qDog6IPij4o+qDog6IPij4o+qDog6IPij4o+qDog+L7Ynw5+7LYiT7ex4//wHdyfqFcVZynpI7pGQPjjPlBuTlAs+Q4zA92pg+KPig39zHG2OC0x0GYH5Rf9mGKTML8oOiDog+KPij6oNz8+w/7L1MxPyg3zA+TY0LmB0UfFH1Q9EHRB0UfFH1Q9EHRB0UfFH1Q9EHRB0UfFH1Q9EHRB0UfFH1Q9EHRB0UfFH1Q9EHRB0UfFH1Q7nqHmCdy9+X9yexMHxR9UHb4ftT/Z00rmIMzPyg7f39ur5cwm1tXmnR+eD/4le6aH/6K396k84MrTd2H+bdq6j5Y5T/QRp5xxWT/hZ3pg6KPjbzoHZfXO+K3cf+KxPqDnemDog/KX/A2iQVFPOQYAAAAAElFTkSuQmCC"
+  },
+  {
+   "id": "trolley",
+   "name": "기구 수레",
+   "file": "",
+   "x": 1078,
+   "y": 560,
+   "w": 186,
+   "h": 250,
+   "sortY": 818,
+   "coverMask": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAALoAAAD6CAIAAACZNMrKAAADe0lEQVR4nO3c0Y6TUABFUZnM//8yPlSTJo0jGwpc6FpvEx1T4/Z4gdrpFwea5/mHH52m6bBXss7X2S+AK5HLQOZ5/nl+TicXgtH/sbyNOhtjnmOsC4FcCORC8H32C2ClFddQ289D1uWSzrreti6XsT2Rx6+wZWOsC4FcLmOaptNvxsiFwNnlYp4H5vgDr3UhGPHBxM1s2YAlh5Ujn0ZZFwJnl12861Sx/U7Je1kXAutyAf/aGFdGDO1PsIO/RZSd1FORdSGY7ArLN8a6EMiFQC4E7rvs6Nynx3uwLgRhXcZ5cjG+1y3Z49ny8awLgVwIn/wgF4JwdnkO0DnmTtzVZRcr77uM8w6M/VjQV9aFYNNd3TttyavPOastf0ewdSHwzGiR0d6Rv4cla2pdCKxL8GmnmYfn3+nXCB8DwVWE/wlwv3dvvMuS+0+eSPNxVq7Ls/H/ThzjE9bXuhC4Mnqbuy7KM+tCIBcCuRD4BAYC60IgFwK5EMiFQC4EciGQC4FcCORCIBcCuRDIhUAuBHIhkAuBXAjkQiAXArkQyIVALgRyIZALgVwI5EIgFwK5EMiFQC4EciGQC4FcCORCIBcCuRDIhUAuBHIhkAuBXAjkQiAXArkQyIVALgRyIZALgVwI5EIgFwK5EMiFQC4EciGQC4FcCORCIBcCuRDIhUAuBHIhkAuBXAjkQiAXArkQyIVALgRyIZALgVwI5EIgFwK5EMiFQC4EciGQC4FcCORCIBcCuRDIhUAuBHIhkAuBXAjkQiAXArkQyIVALgRyIZALgVwI5EIgFwK5EMiFQC4EciGQC4FcCORCIBcCuRDIhUAuBHIhkAuBXAjkQiAXArkQyIVALgRyIZALgVwI5EIgFwK5EMiFQC4EciGQC4FcCORCIBcCuRDIhUAuBHIhkAuBXAjkQiAXArkQyIVALgRyIZALgVwI5EIgFwK5EMiFQC4EciGQC4FcCORCIBcCuRDIhUAuBHIhkAuBXAjkQiAXArkQyIVALgRyIZALgVwI5EIgFwK5EMiFQC4EciGQC8H0/MU8z2e9Di7BuhDIhUAuBNP/f8pfTjZYF4KwLg+PjZmm/I0r2LPRHPGnvppcRjN0Lg+iGYezC4FcCORC8H32C2CRd12KbjwIWheCW10ZHXM36JNZFwK5EMiFQC4EciGQC8Flrjx/vpx2CX2M3/NHl9ve6X2IAAAAAElFTkSuQmCC"
   }
  ]
 }

@@ -280,7 +280,7 @@ export const HQ_SCENES: HqScene[] = [
     { id: 'op', kind: 'door', to: 'jr_op', toDoor: 'out', label: '수술실' },
   ], { spots: JR_ROOM_SPOTS.jr_songil }),
   floorHall('jr_jinryo', '진료실', 'B1', [{ id: 'out', kind: 'exit', side: 'S', to: 'jr_songil', toDoor: 'jinryo', label: '대기실로' }], { spots: JR_ROOM_SPOTS.jr_jinryo }),
-  floorHall('jr_op', '수술실', 'B1', [{ id: 'out', kind: 'door', to: 'jr_songil', toDoor: 'op', label: '대기실로' }], { spots: JR_ROOM_SPOTS.jr_op }),
+  floorHall('jr_op', '수술실', 'B1', [{ id: 'out', kind: 'exit', side: 'S', to: 'jr_songil', toDoor: 'op', label: '대기실로' }], { spots: JR_ROOM_SPOTS.jr_op }),
 ];
 export const SCENE_BY_ID = Object.fromEntries(HQ_SCENES.map((s) => [s.id, s])) as Record<SceneId, HqScene>;
 
