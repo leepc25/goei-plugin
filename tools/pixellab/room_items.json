@@ -8,7 +8,7 @@
   "wheelchair",
   "clock",
   "leak",
-  "drip",
+  "ceiling drip",
   "bucket catching",
   "curtain rail",
   "ceiling-rail curtain",
@@ -92,7 +92,9 @@
     "instrument trolley",
     "scalpel",
     "examination bed",
-    "suction"
+    "suction",
+    "drip stand",
+    "iv drip"
    ]
   },
   "exam_room": {
