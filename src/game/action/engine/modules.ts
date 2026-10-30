@@ -11,7 +11,19 @@ import { persp, view } from './view';
 import { KEYMAP } from './input';
 import { drawGuardBar } from '../ui/pixelHud';
 import { FighterPlayer, fighterHooks } from '../fighter/player';
-import { openDraft } from '../../perks/draftUi';
+import { GRADE_COLOR, PAIR_COLOR, TRAIT_COLOR, openDraft } from '../../perks/draftUi';
+import { PERK_TEXT } from '../../perks/defs.gen';
+
+const PERK_KIND = new Map(PERK_TEXT.map((d) => [d.name, d.kind]));
+/** HUD 퍽 칸: 얻은 순서대로, 특성은 맨 뒤. 이름 앞 두 글자 · 등급 테두리 · 쌓임 숫자 */
+function perkChips(p: FighterPlayer): { t: string; c: string; n?: number }[] {
+  const st = new Map(p.perks.stacks().map((x) => [x.name, x.v]));
+  const two = (n: string) => n.replace(/\s/g, '').slice(0, 2);
+  return [
+    ...[...p.perks.ranks.keys()].map((n) => ({ t: two(n), c: PERK_KIND.get(n) === '쌍' ? PAIR_COLOR : GRADE_COLOR[p.perks.topGrade(n)], n: st.get(n) || undefined })),
+    ...[...p.perks.traits].map((n) => ({ t: two(n), c: TRAIT_COLOR })),
+  ];
+}
 import { FighterAi } from '../fighter/ai';
 import { charArt, charFace, charTop, drawCharClip, hasCharClip, loadChar } from '../art/charPacks';
 import { setPixelScale } from './contract';
@@ -393,6 +405,7 @@ function hudState(w: World, shell: Shell): HudState {
     items: w.items.map((it) => ({ id: it?.id, label: it?.label ?? '', count: it?.n ?? 0 })),
     field: fieldClock.sec !== null || fieldClock.place || (w.stage?.id === 'hq' && fieldWallet.won !== null) ? { clock: fieldClock.sec === null ? undefined : clockText(fieldClock.sec), place: fieldClock.place || undefined, wallet: fieldWallet.won === null ? undefined : wonText(fieldWallet.won) } : undefined,
     floor: { depth: '', name: f.title },
+    perks: p instanceof FighterPlayer && p.perks.active ? perkChips(p) : undefined,
     boss: boss ? { name: boss.label, hp: boss.hp, max: boss.hpMax } : null,
     // 아래 자막은 3초까지만 (바닥 띠를 오래 가리지 않게)
     message: w.subtitle && w.tick - w.subtitleAt < 90 ? w.subtitle.text : undefined,

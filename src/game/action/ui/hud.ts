@@ -43,6 +43,8 @@ export interface HudState {
   floor: { depth: string; name: string; variant?: string };
   /** 필드: 시각과 장소 이름 (우상단 작게) */
   field?: { clock?: string; place?: string; wallet?: string };
+  /** 임시 퍽 칸 (괴이 판 중, 와우 버프식): t = 두 글자, c = 테두리 색(등급·쌍·특성), n = 쌓임 숫자 */
+  perks?: { t: string; c: string; n?: number }[];
   boss?: { name: string; hp: number; max: number } | null;
   /** 구형 조사 안내. 좌표는 호환을 위해 받고 고정 안내 영역에 표시한다. */
   prompt?: { text: string; key: string; x: number; y: number } | null;
@@ -92,6 +94,26 @@ export function pfont(size: number) {
   return { n, f: `700 ${n}px "${PIXEL_FONT}", ${FONT}` };
 }
 /** 외곽선 글자 */
+/** 퍽 칸: 맨 위 검은 띠 안, 시계·돈 왼쪽에서 왼쪽으로 쌓음(2줄까지, 체력 칸 오른쪽 끝(x 360)을 넘지 않음). 다 안 들어가면 칸을 줄이고 글자를 한 자로 (10-30 사용자: 화면을 가리지 않게) */
+export function drawPerkChips(c: CanvasRenderingContext2D, list: { t: string; c: string; n?: number }[], right: number, left = 360) {
+  const gap = 4, avail = right - left, perRow = Math.ceil(list.length / 2);
+  const sz = Math.max(12, Math.min(26, Math.floor((avail + gap) / Math.max(1, perRow)) - gap));
+  const cols = Math.max(1, Math.floor((avail + gap) / (sz + gap)));
+  const small = sz < 22, top = 14;
+  c.save();
+  list.forEach((p, i) => {
+    const col = i % cols, row = Math.floor(i / cols);
+    if (row > 1) return;
+    const x = Math.round(right - (col + 1) * sz - col * gap), y = top + row * (sz + gap + 4);
+    c.fillStyle = '#000'; c.fillRect(x - 1, y - 1, sz + 2, sz + 2);
+    c.fillStyle = p.c; c.fillRect(x, y, sz, sz);
+    c.fillStyle = '#1b1d22'; c.fillRect(x + 2, y + 2, sz - 4, sz - 4);
+    label(c, small ? p.t.slice(0, 1) : p.t, x + sz / 2, y + sz / 2 + 4, small ? 10 : 11, '#fff', 'center', 800);
+    if (p.n) label(c, String(p.n), x + sz + 2, y + sz + 4, 10, '#ffe08a', 'right', 900);
+  });
+  c.restore();
+}
+
 export function label(c: CanvasRenderingContext2D, s: string, x: number, y: number, size = 16, color = C.text, align: CanvasTextAlign = 'left', weight = 700) {
   const p = pixelOn ? pfont(size) : null;
   if (p) size = p.n;
@@ -360,6 +382,7 @@ export class Hud {
   /** 층: 오른쪽 위 구석에 글자만 (판 없음). 바뀔 때는 Fx 층 제목이 크게 알린다 */
   private floor(c: CanvasRenderingContext2D, s: HudState) {
     const f = s.floor;
+    if (s.perks?.length) drawPerkChips(c, s.perks, W - (s.compact ? 100 : 20) - 170);
     if (s.field) {
       const r = W - (s.compact ? 100 : 20);
       if (s.field.clock) label(c, s.field.clock, r, 34, 26, '#fff', 'right', 900);
