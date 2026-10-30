@@ -87,14 +87,15 @@ def convert(scene_id: str, m: dict, files: dict) -> dict:
             objects.append({'id': o['id'], 'file': name, 'x': o['x'], 'y': o['y'], 'w': o['w'], 'h': o['h'], 'sortY': o['sortY']})
     doors = {}
     for did, d in (m.get('doors') or {}).items():
-        doors[did] = {'x0': d['x'] - 80, 'x1': d['x'] + 80, 'y0': d['y'] - 48, 'y1': d['y'], 'anim': 'none', 'behind': 'dark'}
+        # door가 있으면(그림 속 문짝 자리·여닫는 방식) 그대로, 없으면 바닥 출구 자리만
+        doors[did] = d.get('door') or {'x0': d['x'] - 80, 'x1': d['x'] + 80, 'y0': d['y'] - 48, 'y1': d['y'], 'anim': 'none', 'behind': 'dark'}
     spots = []
     for s in m.get('spots', []):
         sp = {'id': s['id'], 'x': s['x'], 'y': s['y'], 'verb': s.get('verb', '앉기'), 'face': s.get('face', 1), 'act': s.get('act') or ACTS.get(s.get('dir', 'side')), 'seat': s['seat']}
         spots.append(sp)
     lane = m.get('lane') or [min(p[1] for p in m['floor']), max(p[1] for p in m['floor']) - 12]
     scene = {'file': file, 'w': W, 'h': H, 'under': True, 'lane': lane, 'floor': m.get('floor'), 'holes': holes,
-             'dotK': round(1.5 * H / 890, 4), 'doors': doors, 'lamps': m.get('lamps', []), 'windows': [], 'objects': objects}
+             'dotK': round(1.5 * H / 890, 4), 'blocks': [], 'doors': doors, 'lamps': m.get('lamps', []), 'windows': [], 'objects': objects}
     return {'scene': scene, 'spots': spots, 'files': names}
 
 

@@ -624,7 +624,7 @@ function exportScene() {
     file: S.bgName.replace(/\.[^.]+$/, ''), bgScale: S.bgScale, w: S.w, h: S.h, under: true,
     lane: [Math.min(...ys), Math.max(...ys) - 12], floor: floor ? floor.poly : null,
     blocks: S.items.filter((i) => i.kind === 'block').map((i) => ({ poly: i.poly, h: i.h ?? 999 })),
-    doors: Object.fromEntries(S.items.filter((i) => i.kind === 'exit').map((i) => [i.id, { kind: 'exit', side: 'S', x: i.x, y: i.y, to: i.to || '', toDoor: i.toDoor || '', label: i.label || '' }])),
+    doors: Object.fromEntries(S.items.filter((i) => i.kind === 'exit').map((i) => [i.id, { kind: 'exit', side: i.door ? 'N' : 'S', x: i.x, y: i.y, to: i.to || '', toDoor: i.toDoor || '', label: i.label || '', door: i.door }])),
     lamps: S.items.filter((i) => i.kind === 'lamp').map((i) => ({ x: i.x, y: i.y, kind: i.lk || 'lamp', r: i.r, color: i.color || undefined })),
     // 게임 자리: (x, y) = E를 누르는 곳(앉은 발보다 조금 앞), seat = 앉으면 발이 가는 곳
     spots: S.items.filter((i) => i.kind === 'seat').map((i) => ({ id: i.id, x: i.x, y: i.y + 20, verb: i.verb || '앉기', face: i.face ?? 1, act: ['chairsit', 'seatthink'], seat: { x: i.x, y: i.y }, hipY: i.hipY }))
@@ -701,7 +701,7 @@ async function loadScene(scene, urls, sceneId) {
   S.items = [];
   if (scene.floor) S.items.push({ id: uid('f'), kind: 'floor', name: '바닥', poly: scene.floor });
   for (const b of scene.blocks || []) S.items.push({ id: uid('b'), kind: 'block', name: '막힘', poly: b.poly, h: b.h ?? 999 });
-  for (const [id, d] of Object.entries(scene.doors || {})) S.items.push({ id, kind: 'exit', name: d.label || '출입구', x: d.x, y: d.y, to: d.to, toDoor: d.toDoor, label: d.label });
+  for (const [id, d] of Object.entries(scene.doors || {})) S.items.push({ id, kind: 'exit', name: d.label || '출입구', x: d.x, y: d.y, to: d.to, toDoor: d.toDoor, label: d.label, door: d.door });
   for (const l of scene.lamps || []) S.items.push({ id: uid('l'), kind: 'lamp', name: '조명', x: l.x, y: l.y, r: l.r, lk: l.kind, color: l.color });
   for (const s of (scene.spots || []).filter((q) => !q.chair)) S.items.push({ id: s.id, kind: 'seat', name: '앉는 자리', x: s.seat?.x ?? s.x, y: s.seat?.y ?? s.y, hipY: s.hipY ?? (s.seat?.y ?? s.y) - 60, verb: s.verb, face: s.face });
   for (const o of scene.objects || []) {
