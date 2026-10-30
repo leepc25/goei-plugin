@@ -121,3 +121,19 @@ test('위기 회복: 30% 아래로 넘어가는 순간 25% 회복, 방마다 랭
   k.roomEnter(); me.hp = 250; k.hurt(100);
   assert.equal(me.hp, 500);
 });
+
+test('퍽 등급 A안: 먹을 때마다 그 카드 등급 배율을 더한다, 켜고 끄는 퍽은 횟수', () => {
+  const k = new RT.PerkRun();
+  k.add('정조준', 0); k.add('정조준', 2);
+  assert.ok(Math.abs(k.r('정조준') - 2.75) < 1e-9);
+  assert.equal(k.count('정조준'), 2);
+  assert.equal(k.topGrade('정조준'), 2);
+  k.add('연속 회피', 2);
+  assert.equal(k.dodgeMax(), 3);
+  k.add('정조준', 1); k.add('정조준', 1);
+  assert.equal(k.count('정조준'), 3);
+  // 등급 확률: 방이 깊을수록 높은 등급
+  const [a0, , e0] = R.gradeOdds(0), [, , e9] = R.gradeOdds(9);
+  assert.ok(Math.abs(a0 - 0.65) < 1e-9 && e9 > e0);
+  for (const f of R.draft(kit(), own(), Math.random)) if (f.type === 'perk') assert.ok([0, 1, 2].includes(f.grade));
+});

@@ -1,6 +1,10 @@
 // 방 보상 3택1 창 (임시 퍽·특성). 카드 그림은 아직 없어서(PixelLab 보류) 글 카드: 분류 띠·이름·종류·랭크·효과.
-// 쌍 퍽은 금색 테두리, 특성은 보라 테두리에 장점·대가. 숫자 키(1~4)나 눌러서 고른다. 열린 동안 월드를 멈춘다.
-import { draft, kitOf, type Offer } from './rules';
+// 테두리: 일반 회색 · 희귀 파랑 · 특급 보라 · 쌍 금색 · 특성 빨강(10-30 A안). 특성은 장점·대가. 숫자 키(1~4)나 눌러서 고른다. 열린 동안 월드를 멈춘다.
+import { GRADE_MUL, GRADE_NAME, draft, graded, kitOf, type Offer } from './rules';
+
+export const GRADE_COLOR = ['#8a8f96', '#4a8fe0', '#a86ae0'] as const;
+export const PAIR_COLOR = '#e0b43a';
+export const TRAIT_COLOR = '#e05a5a';
 import type { FighterPlayer } from '../action/fighter/player';
 
 const CAT_COLOR: Record<string, string> = {
@@ -13,7 +17,7 @@ const css = `
 .pk-row{display:flex;gap:14px;flex-wrap:wrap;justify-content:center}
 .pk-card{width:220px;min-height:250px;background:#16181c;border:4px solid #4a4f57;box-shadow:0 0 0 2px #000,6px 6px 0 #000;color:#ddd;cursor:pointer;display:flex;flex-direction:column;image-rendering:pixelated}
 .pk-card:hover,.pk-card:focus{transform:translateY(-4px);outline:none;border-color:#e8e2c8}
-.pk-card.pair{border-color:#e0b43a}.pk-card.trait{border-color:#9a6ae0}
+.pk-grade{font-size:12px;color:#fff;padding:1px 6px;align-self:flex-start;text-shadow:1px 1px 0 #000}
 .pk-band{height:10px}
 .pk-in{padding:10px 12px;display:flex;flex-direction:column;gap:8px;flex:1}
 .pk-name{font-size:17px;color:#fff;text-shadow:1px 1px 0 #000}
@@ -37,7 +41,7 @@ export function openDraft(root: HTMLElement, p: FighterPlayer, o: { world?: { pa
   const ov = document.createElement('div');
   ov.className = 'pk-ov';
   const close = (pick: Offer | null) => {
-    if (pick?.type === 'perk') p.perks.add(pick.def.name);
+    if (pick?.type === 'perk') p.perks.add(pick.def.name, pick.grade);
     else if (pick?.type === 'trait') p.perks.addTrait(pick.def.name);
     ov.remove();
     window.removeEventListener('keydown', onKey, true);
@@ -50,7 +54,7 @@ export function openDraft(root: HTMLElement, p: FighterPlayer, o: { world?: { pa
     if (n >= 1 && n <= offers.length) { e.preventDefault(); e.stopPropagation(); close(offers[n - 1]); }
   };
   const render = () => {
-    offers = draft(kit, { ranks: p.perks.ranks, traits: p.perks.traits });
+    offers = draft(kit, { ranks: p.perks.ranks, traits: p.perks.traits }, Math.random, p.perks.depth);
     ov.innerHTML = '';
     const box = document.createElement('div');
     box.className = 'pk-box';
@@ -61,13 +65,16 @@ export function openDraft(root: HTMLElement, p: FighterPlayer, o: { world?: { pa
       const c = document.createElement('div');
       c.tabIndex = 0;
       if (f.type === 'perk') {
-        const d = f.def, pair = d.kind === '쌍';
-        c.className = `pk-card${pair ? ' pair' : ''}`;
-        const max = d.rank >= 99 ? '' : ` · ${f.rank}/${d.rank}`;
-        c.innerHTML = `<div class="pk-band" style="background:${CAT_COLOR[d.cat] ?? '#888'}"></div><div class="pk-in"><div class="pk-name">${d.name}</div><div class="pk-tag"><b style="background:${CAT_COLOR[d.cat] ?? '#888'}">${d.cat}</b><span>${d.kind}${max}</span></div><div class="pk-eff">${d.eff}</div>${d.cond && pair ? `<div class="pk-tag">${d.cond}</div>` : ''}<div class="pk-key">${i + 1}</div></div>`;
+        const d = f.def, pair = d.kind === '쌍', col = pair ? PAIR_COLOR : GRADE_COLOR[f.grade];
+        c.className = 'pk-card';
+        c.style.borderColor = col;
+        const max = d.rank >= 99 ? '' : ` · ${f.rank}/${d.rank}번째`;
+        const gtxt = pair ? '쌍' : GRADE_NAME[f.grade] + (graded(d) && f.grade ? ` · 수치 ×${GRADE_MUL[f.grade]}` : '');
+        c.innerHTML = `<div class="pk-band" style="background:${CAT_COLOR[d.cat] ?? '#888'}"></div><div class="pk-in"><div class="pk-name">${d.name}</div><div class="pk-grade" style="background:${col}">${gtxt}</div><div class="pk-tag"><b style="background:${CAT_COLOR[d.cat] ?? '#888'}">${d.cat}</b><span>${d.kind}${max}</span></div><div class="pk-eff">${d.eff}</div>${d.cond && pair ? `<div class="pk-tag">${d.cond}</div>` : ''}<div class="pk-key">${i + 1}</div></div>`;
       } else {
-        c.className = 'pk-card trait';
-        c.innerHTML = `<div class="pk-band" style="background:#9a6ae0"></div><div class="pk-in"><div class="pk-name">${f.def.name}</div><div class="pk-tag"><b style="background:#9a6ae0">특성</b><span>장점 + 대가</span></div><div class="pk-eff">${f.def.good}</div><div class="pk-cost">대가: ${f.def.cost}</div><div class="pk-key">${i + 1}</div></div>`;
+        c.className = 'pk-card';
+        c.style.borderColor = TRAIT_COLOR;
+        c.innerHTML = `<div class="pk-band" style="background:${TRAIT_COLOR}"></div><div class="pk-in"><div class="pk-name">${f.def.name}</div><div class="pk-tag"><b style="background:${TRAIT_COLOR}">특성</b><span>장점 + 대가</span></div><div class="pk-eff">${f.def.good}</div><div class="pk-cost">대가: ${f.def.cost}</div><div class="pk-key">${i + 1}</div></div>`;
       }
       c.onclick = () => close(f);
       row.append(c);

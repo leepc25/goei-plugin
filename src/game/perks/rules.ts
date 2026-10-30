@@ -130,15 +130,37 @@ export function traitOk(t: TraitText, kit: Kit): boolean {
   return true;
 }
 
-export type Offer = { type: 'perk'; def: PerkText; rank: number } | { type: 'trait'; def: TraitText };
+/** 퍽 등급 (10-30 사용자 A안): 숫자 퍽은 먹을 때마다 그 카드 등급 배율만큼 기본 수치를 더한다(일반 8 + 특급 14 = 정조준 +22%).
+ * 한 번만 먹는 퍽(변화·조합·쌓임·쌍, 숫자 중 켜고 끄는 것)은 퍽마다 등급 고정: 출현 빈도와 테두리 색만 다르다 */
+export type Grade = 0 | 1 | 2;
+export const GRADE_NAME = ['일반', '희귀', '특급'] as const;
+export const GRADE_MUL = [1, 1.4, 1.75] as const;
+/** 처음 나올 확률(방 0): 일반 65 · 희귀 28 · 특급 7. 방이 깊어질수록 희귀 +2%p·특급 +1%p (최대 희귀 40·특급 20) */
+export function gradeOdds(depth = 0): [number, number, number] {
+  const r = Math.min(0.4, 0.28 + 0.02 * depth), e = Math.min(0.2, 0.07 + 0.01 * depth);
+  return [1 - r - e, r, e];
+}
+/** 숫자 퍽 중 등급 배율을 받지 않는 것(정수·켜고 끄기) */
+const UNGRADED = new Set(['연속 회피', '3단 점프', '다운 무시', '정신 방벽', '완전 방어', '맨손으로 쳐낸다', '고통 증폭']);
+/** 한 번만 먹는 퍽 중 특급으로 고정할 센 것 */
+const EPIC = new Set(['죽은 채로 있을 수가 없다', '입막음 처형', '고유기 2회', '기절 추격', '틈새 사격', '규정상 이렇게 해도 돼', '앙코르', '따라 치는 그림자', '시체 폭발']);
+export function graded(p: PerkText): boolean { return p.kind === '숫자' && !UNGRADED.has(p.name); }
+/** 등급이 고정된 퍽의 등급 (숫자 중 켜고 끄기는 일반, 그 밖은 희귀, 센 것은 특급). 쌍은 따로(금색) */
+export function fixedGrade(p: PerkText): Grade { return p.kind === '숫자' ? 0 : EPIC.has(p.name) ? 2 : 1; }
+
+export type Offer = { type: 'perk'; def: PerkText; rank: number; grade: Grade } | { type: 'trait'; def: TraitText };
 
 /** 방 보상 후보: 3개(특성 「탐욕」 4개). 쌍 퍽은 조건이 맞으면 최대 1개, 특성은 최대 1개(25%).
  * 같은 것은 두 번 안 나온다. 랭크가 다 찬 퍽은 안 나온다(응급 치료는 몇 번이고). 특성 「외길」: 가진 퍽 가중 2배, 랭크 1짜리 절반 */
-export function draft(kit: Kit, own: Owned, rand: () => number = Math.random): Offer[] {
+export function draft(kit: Kit, own: Owned, rand: () => number = Math.random, depth = 0): Offer[] {
   const n = own.traits.has('탐욕') ? 4 : 3;
   const oneWay = own.traits.has('외길');
   const pool = PERK_TEXT.filter((p) => (own.ranks.get(p.name) ?? 0) < p.rank && perkOk(p.name, kit, own));
-  const w = (p: PerkText) => (p.name === '다운 무시' ? 0.3 : 1) * (oneWay && own.ranks.has(p.name) ? 2 : 1) * (oneWay && p.rank === 1 ? 0.5 : 1);
+  const odds = gradeOdds(depth);
+  // 고정 등급 퍽은 등급 확률에 비례해 덜 나온다(희귀 0.6 · 특급 0.25, 깊을수록 늘어남)
+  const fixW = (p: PerkText) => graded(p) ? 1 : [1, odds[1] / 0.28 * 0.6, odds[2] / 0.07 * 0.25][fixedGrade(p)];
+  const w = (p: PerkText) => fixW(p) * (p.name === '다운 무시' ? 0.3 : 1) * (oneWay && own.ranks.has(p.name) ? 2 : 1) * (oneWay && p.rank === 1 ? 0.5 : 1);
+  const roll = (p: PerkText): Grade => { if (!graded(p)) return fixedGrade(p); const x = rand(); return x < odds[2] ? 2 : x < odds[2] + odds[1] ? 1 : 0; };
   const pick = <T>(list: T[], wt: (x: T) => number): T | null => {
     const total = list.reduce((s, x) => s + wt(x), 0);
     let r = rand() * total;
@@ -148,7 +170,7 @@ export function draft(kit: Kit, own: Owned, rand: () => number = Math.random): O
   const out: Offer[] = [];
   const used = new Set<string>();
   const pairs = pool.filter((p) => p.kind === '쌍');
-  if (pairs.length && rand() < 0.5) { const p = pick(pairs, w)!; out.push({ type: 'perk', def: p, rank: (own.ranks.get(p.name) ?? 0) + 1 }); used.add(p.name); }
+  if (pairs.length && rand() < 0.5) { const p = pick(pairs, w)!; out.push({ type: 'perk', def: p, rank: (own.ranks.get(p.name) ?? 0) + 1, grade: 2 }); used.add(p.name); }
   const traits = TRAIT_TEXT.filter((t) => !own.traits.has(t.name) && traitOk(t, kit));
   if (traits.length && rand() < 0.25) { const t = traits[Math.floor(rand() * traits.length)]; out.push({ type: 'trait', def: t }); used.add(t.name); }
   const rest = pool.filter((p) => p.kind !== '쌍');
@@ -157,7 +179,7 @@ export function draft(kit: Kit, own: Owned, rand: () => number = Math.random): O
     if (!left.length) break;
     const p = pick(left, w)!;
     used.add(p.name);
-    out.push({ type: 'perk', def: p, rank: (own.ranks.get(p.name) ?? 0) + 1 });
+    out.push({ type: 'perk', def: p, rank: (own.ranks.get(p.name) ?? 0) + 1, grade: roll(p) });
   }
   // 섞기 (쌍·특성이 늘 앞에 오지 않게)
   for (let i = out.length - 1; i > 0; i--) { const j = Math.floor(rand() * (i + 1)); [out[i], out[j]] = [out[j], out[i]]; }

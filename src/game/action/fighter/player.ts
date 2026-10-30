@@ -467,7 +467,7 @@ export class FighterPlayer extends Player {
     P.dodgeMax = k.dodgeMax(); P.dodgeCd = k.dodgeCd(); P.dodgeInv = k.dodgeInv(); P.dodgeLen = k.dodgeLen();
     P.maxJumps = k.maxJumps(); P.airMul = k.airMul(); P.runMul = k.runMul();
     P.shotMul = k.shotCdMul(); P.heatMul = k.heatMul(); P.overCut = k.overCut(); P.noShoot = k.noShoot();
-    P.skillCdMul = k.skillCdMul(); P.chargeMul = k.chargeMul(); P.chargeBig = k.r('충전 강화') >= 3; P.hurtSp = k.hurtSp(); P.ukemi = k.ukemi();
+    P.skillCdMul = k.skillCdMul(); P.chargeMul = k.chargeMul(); P.chargeBig = k.count('충전 강화') >= 3; P.hurtSp = k.hurtSp(); P.ukemi = k.ukemi();
     const sm = k.skillCharges(); if (sm !== (P.skillMax || 1)) { P.skillMax = sm; P.skillN = Math.min(sm, Math.max(1, P.skillN || 1)); }
     this.status.immune = k.mindGuard() ? new Set(['fear', 'confuse']) : undefined;
     this.status.taintPer = k.taintPer();

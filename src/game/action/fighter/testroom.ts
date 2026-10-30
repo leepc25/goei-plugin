@@ -7,7 +7,7 @@ import { mountGame } from '../main';
 import { FighterPlayer } from './player';
 import type { GameAssets } from '../../bridge';
 import { PERK_TEXT, TRAIT_TEXT } from '../../perks/defs.gen';
-import { HELD, kitOf, perkOk } from '../../perks/rules';
+import { GRADE_NAME, HELD, kitOf, perkOk, type Grade } from '../../perks/rules';
 import { openDraft } from '../../perks/draftUi';
 
 type Row = { key: string; name: string; num: string; npc: boolean };
@@ -140,6 +140,9 @@ function fill(p: FighterPlayer) {
     btn('적 3 (칼잡이)', () => { const w = world(); if (w) for (let i = 0; i < 3; i++) w.api.spawn({ kind: 'fb_sword', x: w.player.x + 260 + i * 90, y: w.player.y + (i - 1) * 40 }); }),
     btn('적 AI 1', () => { const w = world(); if (w) w.api.spawn({ kind: 'ai-char', x: w.player.x + 300, y: w.player.y }); }),
   );
+  const gradeSel = el('select', { 'aria-label': '넣을 등급' }) as HTMLSelectElement;
+  GRADE_NAME.forEach((n, i) => gradeSel.append(el('option', { value: String(i) }, `+ 로 넣을 등급: ${n}`)));
+  perkBox.append(gradeSel);
   const ownBox = el('div', { class: 'm' });
   const listBox = el('div');
   perkBox.append(ctl, el('div', { class: 'm', style: 'margin-top:6px;color:#e8c27a' }, '가진 것'), ownBox, listBox);
@@ -151,7 +154,7 @@ function fill(p: FighterPlayer) {
     seen = key;
     ownBox.innerHTML = '';
     const g = el('div', { class: 'grid' });
-    for (const [n, r] of p.perks.ranks) g.append(btn(`− ${n}${r > 1 ? ` ${r}` : ''}`, () => p.perks.remove(n)));
+    for (const [n] of p.perks.ranks) g.append(btn(`− ${n} (${(p.perks.grades.get(n) ?? []).map((x) => GRADE_NAME[x]).join('·')})`, () => p.perks.remove(n)));
     for (const n of p.perks.traits) g.append(btn(`− [특성] ${n}`, () => p.perks.remove(n)));
     if (!p.perks.ranks.size && !p.perks.traits.size) g.append(el('span', {}, '없음'));
     ownBox.append(g);
@@ -163,7 +166,7 @@ function fill(p: FighterPlayer) {
     const g = el('div', { class: 'grid' });
     for (const d of PERK_TEXT.filter((x) => x.cat === cat && !HELD.has(x.name))) {
       const ok = perkOk(d.name, kit, { ranks: new Map([...PERK_TEXT.map((x) => [x.name, 1] as [string, number])]), traits: new Set(['저주받은 손']) });
-      const b = btn(`+ ${d.name}`, () => p.perks.add(d.name), `${d.kind} · 랭크 ${d.rank >= 99 ? '∞' : d.rank}${d.cond ? ` · 조건 ${d.cond}` : ''}\n${d.eff}`);
+      const b = btn(`+ ${d.name}`, () => p.perks.add(d.name, Number(gradeSel.value) as Grade), `${d.kind} · 랭크 ${d.rank >= 99 ? '∞' : d.rank}${d.cond ? ` · 조건 ${d.cond}` : ''}\n${d.eff}`);
       if (!ok) b.style.opacity = '0.45';
       if (d.kind === '쌍') b.style.borderColor = '#e0b43a';
       g.append(b);

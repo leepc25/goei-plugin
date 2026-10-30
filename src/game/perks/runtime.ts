@@ -4,7 +4,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { PERK_TEXT } from './defs.gen';
 import { STATUS_NUM, type DebuffKind, type StatusSet } from '../combat/status';
-import type { Kit } from './rules';
+import { GRADE_MUL, fixedGrade, graded, type Grade, type Kit } from './rules';
 
 /** 맞힘 출처 */
 export type HitSrc = 'light' | 'heavy' | 'slide' | 'jump' | 'shot' | 'skill' | 'charge' | 'super' | 'perk' | 'other';
@@ -80,9 +80,14 @@ export const perkWorld = { friendlyFire: false };
 
 const ail = (k: string) => k as DebuffKind;
 const RANK = new Map(PERK_TEXT.map((p) => [p.name, p.rank]));
+const GRADED = new Set(PERK_TEXT.filter(graded).map((p) => p.name));
+const DEF = new Map(PERK_TEXT.map((p) => [p.name, p]));
 
 export class PerkRun {
+  /** 먹은 횟수 (랭크 상한 검사·켜고 끄는 퍽) */
   ranks = new Map<string, number>();
+  /** 먹을 때마다 그 카드의 등급 (A안: 숫자 퍽은 등급 배율을 더함) */
+  grades = new Map<string, Grade[]>();
   traits = new Set<string>();
   host: PerkHost | null = null;
   /** 쌓임 계수 */
@@ -113,24 +118,35 @@ export class PerkRun {
   private armorRefillAt = -1;
   private killWindow = 0;
   private crisisUntil = -1;
+  /** 이번 괴이에서 깬 방 수 (깊을수록 높은 등급이 잘 나옴) */
+  get depth(): number { return this.n.rooms ?? 0; }
   /** 바뀌었을 때 화면(시험장·창)이 다시 그린다 */
   version = 0;
 
-  r(name: string): number { return this.ranks.get(name) ?? 0; }
+  /** 숫자 퍽의 세기 = 먹은 카드 등급 배율의 합(일반 1·희귀 1.4·특급 1.75). 등급 없는 퍽은 먹은 횟수 */
+  r(name: string): number { return GRADED.has(name) ? (this.grades.get(name) ?? []).reduce((s: number, g) => s + GRADE_MUL[g], 0) : this.count(name); }
+  /** 먹은 횟수 */
+  count(name: string): number { return this.ranks.get(name) ?? 0; }
+  /** 먹은 것 중 가장 높은 등급 (테두리 색) */
+  topGrade(name: string): Grade { return Math.max(0, ...(this.grades.get(name) ?? [0])) as Grade; }
   has(name: string): boolean { return this.ranks.has(name) || this.traits.has(name); }
   private get T() { return this.time; }
 
   /* ───────── 얻기·잃기 ───────── */
-  add(name: string): void {
-    if (name === '응급 치료') { const h = this.host; if (h) h.me.hp = Math.min(h.me.hpMax, h.me.hp + h.me.hpMax * 0.3); return; }
-    this.ranks.set(name, Math.min(RANK.get(name) ?? 1, this.r(name) + 1));
+  add(name: string, grade: Grade = 0): void {
+    if (name === '응급 치료') { const h = this.host; if (h) h.me.hp = Math.min(h.me.hpMax, h.me.hp + h.me.hpMax * 0.3 * GRADE_MUL[grade]); return; }
+    if (this.count(name) >= (RANK.get(name) ?? 1)) return;
+    // 등급이 고정된 퍽(변화·조합·쌓임·쌍·켜고 끄기)은 그 퍽의 등급으로
+    const d = DEF.get(name); if (d && !graded(d)) grade = d.kind === '쌍' ? 2 : fixedGrade(d);
+    this.ranks.set(name, this.count(name) + 1);
+    this.grades.set(name, [...(this.grades.get(name) ?? []), grade]);
     this.changed();
   }
   addTrait(name: string): void { this.traits.add(name); this.changed(); }
-  remove(name: string): void { if (!this.ranks.delete(name)) this.traits.delete(name); this.changed(); }
+  remove(name: string): void { this.grades.delete(name); if (!this.ranks.delete(name)) this.traits.delete(name); this.changed(); }
   /** 죽거나 괴이를 나오면 다 사라진다 */
   reset(): void {
-    this.ranks.clear(); this.traits.clear(); this.n = {}; this.runUsed.clear(); this.roomUsed.clear();
+    this.ranks.clear(); this.grades.clear(); this.traits.clear(); this.n = {}; this.runUsed.clear(); this.roomUsed.clear();
     this.changed();
   }
   private changed() { this.version++; this.applyHpMax(); }
@@ -324,7 +340,7 @@ export class PerkRun {
     if (s?.has('slow') && this.has('얼어붙은 발') && ['launch', 'down', 'blow', 'spike'].includes(c.kind)) { h.hit(c.t, (c.body.hpMax ?? 1000) * 0.06, 'light', 'frozen'); this.wakeLate(c.body, 0.5); }
     if (s?.stacks('taint') && c.src === 'super' && this.has('오염 연소') && this.ready(c.body, 'burn', 1.5)) { const n = s.stacks('taint'); h.hit(c.t, (c.body.hpMax ?? 1000) * 0.1 * n, 'heavy', 'burn'); s.cure('taint'); }
     if (this.has('바닥 차갑지?') && ['launch', 'down', 'blow', 'spike'].includes(c.kind)) this.wakeLate(c.body, 0.6);
-    if (this.has('공중 사냥') && this.r('공중 사냥') >= 2) c.body.maxLaunch = 3;
+    if (this.count('공중 사냥') >= 2) c.body.maxLaunch = 3;
     if (this.has('벽꽝 강화')) c.body.wallDmg = 0.15;
     if (this.has('보이지 않는 사슬') && c.t.bindT > 0) for (const q of h.foes()) if (q !== c.t && q.bindT > 0) h.hit(q, c.dmg * 0.25, 'light', 'chain');
     if (c.crit) {
@@ -439,7 +455,7 @@ export class PerkRun {
     this.lastHurtT = this.T; this.n.clean = 0;
     // 위기 회복: 30% 아래로 넘어가는 순간 25% 회복 + 1초 받는 피해 절반 (방마다 랭크만큼)
     const h = this.host;
-    if (h && this.has('위기 회복') && h.me.hp < h.me.hpMax * 0.3 && h.me.hp + dmg >= h.me.hpMax * 0.3 && (this.n.crisis ?? 0) < this.r('위기 회복')) {
+    if (h && this.has('위기 회복') && h.me.hp < h.me.hpMax * 0.3 && h.me.hp + dmg >= h.me.hpMax * 0.3 && (this.n.crisis ?? 0) < this.count('위기 회복')) {
       this.n.crisis = (this.n.crisis ?? 0) + 1;
       h.me.hp = Math.min(h.me.hpMax, h.me.hp + h.me.hpMax * 0.25);
       this.crisisUntil = this.T + 1;
@@ -455,7 +471,7 @@ export class PerkRun {
     if (this.has('죽은 채로 있을 수가 없다') && !this.runUsed.has('revive')) {
       this.runUsed.add('revive');
       const lose = [...this.ranks.keys()].filter((n) => n !== '죽은 채로 있을 수가 없다');
-      if (lose.length) { const n = lose[Math.floor(Math.random() * lose.length)]; this.ranks.delete(n); h.text(h.P.x, h.P.y - 290, `${n} 잃음`); }
+      if (lose.length) { const n = lose[Math.floor(Math.random() * lose.length)]; this.ranks.delete(n); this.grades.delete(n); h.text(h.P.x, h.P.y - 290, `${n} 잃음`); }
       this.ranks.delete('죽은 채로 있을 수가 없다'); this.changed();
       h.me.hp = 1; h.P.inv = Math.max(h.P.inv, 2.4);
       h.later(2, () => { h.me.hp = Math.round(h.me.hpMax * 0.4); h.text(h.P.x, h.P.y - 260, '일어났다'); });
