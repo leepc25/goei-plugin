@@ -80,3 +80,17 @@ test('같은 씨앗이면 같은 판단', () => {
   const go = () => pressed(run(new B.FighterBrain('a', 'B', 'normal', persona, R.mulberry32(9)), 200, (i) => me({ x: 400 + i }), (i) => foe({ x: 800 - i, attacking: i % 40 < 6 }))).join(',');
   assert.equal(go(), go());
 });
+
+test('인물마다 가진 동작만: 점프 공격·사격·기술이 없는 몸은 그것을 계획하지 않고, 용기 낮으면 뒷걸음질 → 달아남', () => {
+  const pressed = new Set();
+  const b = new B.FighterBrain('x', 'B', 'normal', { aggression: 0.9, patience: 0.2, zoning: 0.9, courage: 0.9 }, R.mulberry32(5), undefined, {}, { jumpAtk: false, jump: false, shoot: false, skill: false, charge: false, super: false });
+  const me = (x) => ({ x, y: 560, z: 0, face: 1, free: true, air: false, stunned: false, hp: 1, sp: 100, guard: 100 });
+  const foe = (x) => ({ x, y: 560, z: 0, attacking: false, recovering: false, air: false, down: false, hp: 1 });
+  for (let t = 0; t < 3000; t++) { const d = b.tick(me(400), foe(400 + 120 + (t % 400))); d.press.forEach((p) => pressed.add(p)); }
+  for (const p of ['jump', 'shoot', 'skill', 'charge', 'super']) assert.ok(!pressed.has(p), `${p} 를 눌렀다`);
+  const c = new B.FighterBrain('y', 'B', 'normal', { aggression: 0.2, patience: 0.5, zoning: 0.2, courage: 0.1 }, R.mulberry32(6), undefined, {}, { flee: true, back: true });
+  const held = new Set();
+  for (let t = 0; t < 400; t++) { const d = c.tick({ ...me(400), hp: 0.3 }, foe(520)); d.hold.forEach((h) => held.add(h)); }
+  assert.equal(c.strategy, 'flee');
+  assert.ok(held.has('back') && held.has('flee'), [...held].join(','));
+});

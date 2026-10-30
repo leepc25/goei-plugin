@@ -4,7 +4,10 @@
 import type { Rng } from '../world/rng';
 
 /** 가상 버튼 (에일린 시험판 정본: Q 약·W 강·C 막기·A 원거리·S 충전·D 기술·F 필살·Shift 회피/달리기·Space 점프) */
-export type Btn = 'left' | 'right' | 'up' | 'down' | 'light' | 'heavy' | 'block' | 'dodge' | 'jump' | 'shoot' | 'charge' | 'skill' | 'super' | 'run';
+export type Btn = 'left' | 'right' | 'up' | 'down' | 'light' | 'heavy' | 'block' | 'dodge' | 'jump' | 'shoot' | 'charge' | 'skill' | 'super' | 'run' | 'flee' | 'back';
+/** 이 몸이 가진 동작·기술 (인물마다 다름, 10-30 사용자): 없는 것은 계획에 넣지 않는다 */
+export interface FighterKit { heavy: boolean; jump: boolean; jumpAtk: boolean; skill: boolean; charge: boolean; super: boolean; shoot: boolean; dodge: boolean; block: boolean; flee: boolean; back: boolean }
+const FULL_KIT: FighterKit = { heavy: true, jump: true, jumpAtk: true, skill: true, charge: true, super: true, shoot: true, dodge: true, block: true, flee: false, back: false };
 
 export interface SelfSense {
   x: number; y: number; z: number;
@@ -101,6 +104,7 @@ export class FighterBrain {
   private hist: FoeSense[] = [];
   private script: Step[] = [];
   private stratT = 0;
+  private picked = false;
   private tacT = 0;
   private holding = new Set<Btn>();
   private defendT = 0;
@@ -109,7 +113,9 @@ export class FighterBrain {
   private lastFoe: FoeSense | null = null;
   /** 이번 틱의 공격 간격 배수 */
   private gap = 1;
-  constructor(readonly id: string, readonly grade: Grade, readonly difficulty: Difficulty, readonly persona: Persona, private rng: Rng, private squad?: Squad, private squadKey: object = {}) {
+  readonly kit: FighterKit;
+  constructor(readonly id: string, readonly grade: Grade, readonly difficulty: Difficulty, readonly persona: Persona, private rng: Rng, private squad?: Squad, private squadKey: object = {}, kit: Partial<FighterKit> = {}) {
+    this.kit = { ...FULL_KIT, ...kit };
     this.g = GRADE[grade];
     this.d = DIFF[difficulty];
   }
@@ -152,8 +158,8 @@ export class FighterBrain {
     if (foe.attacking && dist < 190 && Math.abs(dy) < 50 && me.free && !this.script.length) {
       if (this.chance(this.g.defend * this.d.defend)) {
         this.tactic = '방어';
-        if (me.guard > 35 && this.chance(0.65)) this.defendT = 8 + Math.floor(this.rng() * 10);
-        else out.press.push('dodge');
+        if (me.guard > 35 && this.kit.block && (this.chance(0.65) || !this.kit.dodge)) this.defendT = 8 + Math.floor(this.rng() * 10);
+        else if (this.kit.dodge) out.press.push('dodge');
         return this.finish(out);
       }
     }
@@ -183,9 +189,10 @@ export class FighterBrain {
       careful: 40 - 30 * gap + 30 * p.patience,
       zone: 20 + 40 * p.zoning,
       rest: 0,
-      flee: 100 * (1 - p.courage) * (1 - me.hp) - 30,
+      flee: 160 * (1 - p.courage) * (1 - me.hp) - 20,   // 10-30: 용기가 낮을수록 체력이 덜 줄어도 기세가 꺾여 달아남(몹은 실제 성격 값)
     };
-    s[this.strategy] += 15; // 자꾸 바뀌지 않게
+    if (this.picked) s[this.strategy] += 15; // 자꾸 바뀌지 않게 (첫 판단엔 없음)
+    this.picked = true;
     return (Object.entries(s) as [Strategy, number][]).sort((a, b) => b[1] - a[1])[0][0];
   }
 
@@ -209,7 +216,7 @@ export class FighterBrain {
     const p = this.persona;
     this.align(out, dy, dist);
     const sameLane = Math.abs(dy) < 40;
-    const routes = ROUTES.filter((r) => r.diff <= this.g.routes);
+    const routes = ROUTES.filter((r) => r.diff <= this.g.routes && (this.kit.heavy || !r.seq.includes('heavy')) && (this.kit.jump || !r.seq.includes('jump')) && (this.kit.skill || !r.seq.includes('skill')));
     const route = () => routes[Math.floor(this.rng() * routes.length)];
     const combo = (r = route()) => {
       if (!this.attackOk(r.seq.includes('heavy') ? 'heavy' : 'light')) return false;
@@ -222,8 +229,12 @@ export class FighterBrain {
       this.plan(steps, `콤보 ${r.id}`);
       return true;
     };
+    // 기세가 꺾임: 뒷걸음질(37)로 물러나다 겁에 질려 달아남(36). 그 동작이 없으면 그냥 뛰어서
     if (this.strategy === 'flee') {
-      this.plan([{ hold: [away, 'run'], ticks: 30 }], '거리 벌림(도망)');
+      const steps: Step[] = [];
+      if (this.kit.back && dist < 260) steps.push({ hold: ['back'], ticks: 20 });
+      steps.push(this.kit.flee ? { hold: ['flee', away], ticks: 60 } : { hold: [away, 'run'], ticks: 30 });
+      this.plan(steps, '도망');
       return;
     }
     if (this.strategy === 'rest' || (!this.attackOk('light') && dist < 260)) {
@@ -232,17 +243,17 @@ export class FighterBrain {
       return;
     }
     // 필살: 게이지 100이고 가까우면 (난이도별 조건)
-    if (me.sp >= 100 && dist < 260 && sameLane) {
+    if (me.sp >= 100 && dist < 260 && sameLane && this.kit.super) {
       const ok = this.d.super === 'low' ? me.hp < 0.3 : true;
       if (ok && this.attackOk('super')) return this.plan([{ press: 'super', ticks: 30 }], '필살');
     }
     // 빈틈 벌주기: 상대가 공격 뒤 빈틈이고 가까우면 대시해서 콤보
     if (foe.recovering && dist < 240 && sameLane && this.chance(this.g.punish * this.d.punish)) {
-      if (dist > 130) return this.plan([{ hold: [toward, 'run'], ticks: Math.ceil((dist - 110) / 14) }, { press: 'light', ticks: 6 }, { press: 'light', ticks: 6 }, { press: 'heavy', ticks: 10 }], '빈틈 벌주기');
+      if (dist > 130) return this.plan([{ hold: [toward, 'run'], ticks: Math.ceil((dist - 110) / 14) }, { press: 'light', ticks: 6 }, { press: 'light', ticks: 6 }, { press: this.kit.heavy ? 'heavy' : 'light', ticks: 10 }], '빈틈 벌주기');
       if (combo(routes[routes.length - 1])) { this.tactic = '빈틈 벌주기 콤보'; return; }
     }
     // 대공: 상대가 뛰어들면 강공격 (버릇: 점프를 많이 하면 대공을 더)
-    if (foe.air && dist < 230 && this.chance(0.35 + Math.min(0.4, this.habit.jump * 0.04))) {
+    if (foe.air && dist < 230 && this.kit.heavy && this.chance(0.35 + Math.min(0.4, this.habit.jump * 0.04))) {
       if (this.attackOk('heavy')) return this.plan([{ press: 'heavy', ticks: 12 }], '대공');
     }
     // 다운된 상대: 신중하면 물러서 기다리고, 공세면 일어날 자리에 붙는다
@@ -257,19 +268,19 @@ export class FighterBrain {
     // 중거리: 점프 공격·돌진 공격·기술
     if (dist < 400 && sameLane) {
       const r = this.rng();
-      if (this.strategy === 'press' && r < 0.25 + p.aggression * 0.2 && this.attackOk('light')) {
+      if (this.strategy === 'press' && this.kit.jumpAtk && r < 0.25 + p.aggression * 0.2 && this.attackOk('light')) {
         return this.plan([{ press: 'jump', hold: [toward], ticks: 8 }, { press: 'light', hold: [toward], ticks: 16 }], '점프 공격');
       }
       if (this.strategy === 'press' && dist > 180 && r < 0.6 && this.attackOk('light')) {
         // 달리다 약 = 돌진 공격 (확정 2판)
         return this.plan([{ hold: [toward, 'run'], ticks: Math.ceil((dist - 140) / 14) }, { press: 'light', hold: [toward, 'run'], ticks: 14 }], '돌진 공격');
       }
-      if (dist > 160 && r < 0.75 && this.attackOk('skill')) return this.plan([{ press: 'skill', ticks: 24 }], '기술');
+      if (dist > 160 && r < 0.75 && this.kit.skill && this.attackOk('skill')) return this.plan([{ press: 'skill', ticks: 24 }], '기술');
     }
     // 원거리: 견제 (충전·사격)
     if (this.strategy === 'zone' && dist > 300) {
-      if (this.chance(0.4) && this.attackOk('charge')) return this.plan([{ press: 'charge', hold: ['charge'], ticks: 16 + Math.floor(this.rng() * 22) }, { release: 'charge', ticks: 14 }], '충전기');
-      if (sameLane) return this.plan([{ press: 'shoot', ticks: 14 }], '사격 견제');
+      if (this.chance(0.4) && this.kit.charge && this.attackOk('charge')) return this.plan([{ press: 'charge', hold: ['charge'], ticks: 16 + Math.floor(this.rng() * 22) }, { release: 'charge', ticks: 14 }], '충전기');
+      if (sameLane && this.kit.shoot) return this.plan([{ press: 'shoot', ticks: 14 }], '사격 견제');
     }
     // 신중: 상대 사거리 바로 밖에서 서성
     if (this.strategy === 'careful' && dist < 230) return this.plan([{ hold: [away], ticks: 8 }, { ticks: 8 }], '거리 재기');

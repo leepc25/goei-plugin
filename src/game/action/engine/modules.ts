@@ -299,6 +299,12 @@ function hqAdapter(bridge: Partial<GameBridge> | undefined, ui: { chooseFloor: H
     const spawn = (spec: { kind: string; x: number; y: number }): Body | undefined => { const n = api.world.bodies.length; api.spawn(spec); return api.world.bodies.length > n ? api.world.bodies[api.world.bodies.length - 1] : undefined; };
     for (const [id, f] of fights) {
       if (f.scene !== sceneId || !f.body.alive || !api.world.bodies.includes(f.body)) { f.body.alive = false; w.fromFight(id, f.body.x, f.body.y, false); fights.delete(id); continue; }
+      // 기세가 꺾여 장면 끝까지 달아났으면 싸움에서 빠져 필드의 「도망치는 사람」으로
+      const ai = f.body as unknown as FighterAi;
+      if (f.body.hp > 0 && ai.brain?.strategy === 'flee') {
+        const [b0, b1] = (api.world as unknown as { bounds: [number, number] }).bounds ?? [0, 99999];
+        if (f.body.x < b0 + 60 || f.body.x > b1 - 60) { f.body.alive = false; w.fledFight(id, f.body.x, f.body.y); fights.delete(id); continue; }
+      }
       if (f.body.hp > 0) continue;
       if ((f.t += 1 / 30) < 1.5) continue;
       f.body.alive = false;
@@ -317,6 +323,8 @@ function hqAdapter(bridge: Partial<GameBridge> | undefined, ui: { chooseFloor: H
       b.hp = Math.max(1, a.hp ?? b.hpMax); b.hpMax = Math.max(1, a.hpMax ?? b.hpMax);
       b.label = a.def.name;
       (b as unknown as { dir: 1 | -1 }).dir = a.face;
+      // 싸우다 도망: 전투 두뇌의 용기를 그 몹의 실제 성격으로 (용기가 낮을수록 체력이 덜 줄어도 꺾임)
+      if (a.temper) (b.brain.persona as { courage: number }).courage = a.temper.courage;
       fights.set(a.def.id, { body: b as typeof b & { hp: number; hpMax: number; alive: boolean; label: string }, t: 0, scene: sceneId });
     }
   }

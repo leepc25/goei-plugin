@@ -11,7 +11,7 @@ import type { CharArt } from '../art/charPacks';
 import { FighterBrain, Squad, type Btn, type Difficulty, type FoeSense, type Grade, type Persona, type SelfSense } from '../../combat/brain';
 import { mulberry32 } from '../../world/rng';
 
-const BTN: Record<Btn, PadBtn | null> = { left: 'left', right: 'right', up: 'up', down: 'down', light: 'light', heavy: 'heavy', block: 'block', dodge: 'dodge', jump: 'jump', shoot: 'shoot', charge: 'charge', skill: 'skill', super: 'super', run: null };
+const BTN: Record<Btn, PadBtn | null> = { left: 'left', right: 'right', up: 'up', down: 'down', light: 'light', heavy: 'heavy', block: 'block', dodge: 'dodge', jump: 'jump', shoot: 'shoot', charge: 'charge', skill: 'skill', super: 'super', run: null, flee: 'flee', back: 'back' };
 
 /** 상대 몸 → 두뇌가 보는 모습 (테스트룸 코어면 자세까지 읽는다) */
 export function foeSense(b: Body): FoeSense {
@@ -36,7 +36,12 @@ export class FighterAi extends FighterPlayer {
     Object.defineProperty(this, 'team', { value: 'enemy', configurable: true });
     Object.defineProperty(this, 'kind', { value: 'ai-char', configurable: true });
     this.label = o.label ?? `AI ${art.cfg.name}`;
-    this.brain = new FighterBrain(o.id, o.grade, o.difficulty, o.persona, mulberry32(o.seed), o.squad);
+    // 인물마다 가진 동작·기술이 다르다: 없는 것은 두뇌가 계획하지 않는다 (점프 공격 14·강공 12·사격 15 등)
+    const has = (id: string) => !!art.A[id], sk = (art.cfg as { skills?: Record<string, unknown> }).skills ?? {};
+    this.brain = new FighterBrain(o.id, o.grade, o.difficulty, o.persona, mulberry32(o.seed), o.squad, {}, {
+      heavy: has('12'), jump: has('7'), jumpAtk: has('7') && has('14'), skill: !!sk.skill, charge: !!sk.charge, super: !!sk.super,
+      shoot: has('15') && (art.cfg as { bal?: { gun?: string } }).bal?.gun !== 'none', dodge: has('16'), block: has('17'), flee: has('36'), back: has('37'),
+    });
   }
   /** 때릴 상대 = 주인공 (주인공 편 동행자가 생기면 여기에) */
   protected foes(): Body[] {
