@@ -962,7 +962,7 @@ function drawTape(c: CanvasRenderingContext2D, x0: number, y0: number, x1: numbe
   c.restore();
 }
 /** 폴리스 라인: 시체 둘레 네모. back = 뒷줄 라바콘과 좌우 테이프, front = 앞줄 라바콘과 앞 테이프 */
-function drawCordon(c: CanvasRenderingContext2D, b: { x0: number; x1: number; y0: number; y1: number }, front: boolean, t: number): void {
+export function drawCordon(c: CanvasRenderingContext2D, b: { x0: number; x1: number; y0: number; y1: number }, front: boolean, t: number): void {
   const n = Math.max(1, Math.round((b.x1 - b.x0) / 70));
   const xs = Array.from({ length: n + 1 }, (_, i) => b.x0 + ((b.x1 - b.x0) * i) / n);
   const y = front ? b.y1 : b.y0;
