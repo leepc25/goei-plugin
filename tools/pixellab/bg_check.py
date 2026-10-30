@@ -116,9 +116,14 @@ def check(spec, prompt):
         nums = re.findall(r'(\d+)\s*(?:by\s*(\d+)\s*)?pixels?(?:\s*(tall|long|wide))?', t)
         if not nums: continue
         if not any(s in t.lower() for s in sized): fails.append(f'크기 숫자는 큰 가구·문만(sized): {t}')
-        for key, (lo, hi) in DB['sizes'].items():
-            if key in t.lower():
-                for a, b, unit in nums:
+        tl = t.lower()
+        for m in re.finditer(r'(\d+)\s*(?:by\s*(\d+)\s*)?pixels?(?:\s*(tall|long|wide))?', tl):
+            # 숫자 바로 앞에 나온 가구 낱말만 그 숫자의 주인 (문 줄에 「away from the counter」가 있어도 counter 크기로 재지 않음)
+            before = {k: tl.rfind(k, 0, m.start()) for k in DB['sizes']}
+            key = max(before, key=before.get)
+            if before[key] < 0: continue
+            lo, hi = DB['sizes'][key]
+            for a, b, unit in [m.groups()]:
                     h = int(b) if b else int(a)   # "A by B" 는 B가 높이(가구 길이×높이) 또는 높이×폭 — 둘 중 큰 쪽이 높이인 문은 따로
                     if key == 'door' or key in ('fridge', 'refrigerator'): h = max(int(a), int(b or 0))
                     if unit == 'long' or unit == 'wide': continue
