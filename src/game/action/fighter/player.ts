@@ -17,7 +17,9 @@ import type { Pad, Btn } from '../engine/input';
 import type { FrameInfo } from '../engine/art';
 import { createFighterCore } from './core';
 import { seatBody } from './seats';
-import { StatusSet } from '../../combat/status';
+import { STATUS, StatusSet } from '../../combat/status';
+import { PerkRun, perkWorld, type PerkHost } from '../../perks/runtime';
+import { kitOf } from '../../perks/rules';
 
 /** 테스트룸 동작 이름 ↔ 엔진 버튼 */
 const PRESS: [Btn, string][] = [
@@ -65,6 +67,8 @@ export class FighterPlayer extends Player {
   private guardWait = 0;
   private underFn = (ctx: CanvasRenderingContext2D, camX: number) => this.drawUnder(ctx, camX);
 
+  /** 임시 퍽 (괴이 안에서만, src/game/perks). 인물 AI 는 빈 묶음 */
+  perks = new PerkRun();
   /** 방어막 (NPC 등급, combat/grades.ts): 체력보다 먼저 깎이고, 남은 동안 경직·밀림 없음. 깨지면 잠깐 휘청. 다시 차지 않는다 */
   shield = 0;
   shieldMax = 0;
@@ -95,7 +99,9 @@ export class FighterPlayer extends Player {
       // 능력치(본부 출동 stats)·상태 효과 배율 (docs/게임_성장_경제_설계.md 2-2·6장)
       mod: { speed: () => this.speedMul(), sp: () => this.spMul(), cd: () => this.stat.cd },
       // 치명: 플레이어·NPC·적 모두 같은 확률 (10-30)
-      crit: () => Math.random() < this.stat.crit, critDmg: () => this.stat.critDmg,
+      crit: () => Math.random() < this.stat.crit, critDmg: () => this.stat.critDmg, critP: () => this.stat.crit,
+      perk: this.perks,
+      bind: (t: { body: Body }, sec: number) => this.bindBody(t.body, sec),
       // 물건 윗면은 이미 그 높이에 있을 때만 땅이다 (아래에서 걸어 들어가면 올라서지 않고 막힌다)
       ground: (x: number, y: number) => { const p = this.platformAt(x, y); return p && this.core.P.z >= p.h - 10 ? p.h : 0; },
       hurt: (t: { body: Body }, dmg: number, kind: string, face: 1 | -1, hitstop: number, o: HurtOpt) => this.hurtTarget(t.body, dmg, kind, face, hitstop, o),
@@ -106,6 +112,65 @@ export class FighterPlayer extends Player {
         P.x = Math.max(w.bounds[0] + 30, Math.min(w.bounds[1] - 30, P.x));
       },
     });
+    this.perks.host = this.perkHost();
+  }
+
+  /** 퍽이 엔진을 만지는 손잡이 (src/game/perks/runtime.ts PerkHost) */
+  private perkHost(): PerkHost {
+    const api = this.core.perkApi;
+    const me = this; // eslint-disable-line @typescript-eslint/no-this-alias
+    return {
+      kit: kitOf(this.art.cfg, (id) => this.core.has(id), this.base.str),
+      get P() { return me.core.P; },
+      me: {
+        get hp() { return me.hp; }, set hp(v: number) { me.hp = Math.max(0, Math.min(me.hpMax, v)); },
+        get hpMax() { return me.hpMax; }, set hpMax(v: number) { me.hpMax = v; },
+        get baseHp() { return me.baseHp; }, set baseHp(v: number) { me.baseHp = v; },
+        get shield() { return me.shield; }, set shield(v: number) { me.shield = v; },
+        get shieldMax() { return me.shieldMax; }, set shieldMax(v: number) { me.shieldMax = v; },
+        get x() { return me.x; }, set x(v: number) { me.x = v; },
+        get y() { return me.y; }, set y(v: number) { me.y = v; },
+      },
+      foes: () => api.proxies(),
+      hit: (t, dmg, kind, tag, depth) => api.hit(t, dmg, kind, tag, depth),
+      boom: (b) => api.boom(b),
+      status: (body, k, s, mul) => this.putStatus(body, k, s, mul),
+      statusOf: (body) => (body as { status?: unknown }).status instanceof StatusSet ? (body as { status: StatusSet }).status : null,
+      mark: (t, s) => api.mark(t, s),
+      bind: (t, s) => api.bind(t, s),
+      stun: (t, s) => this.stunBody(t.body, s),
+      later: (s, fn) => api.later(s, fn),
+      text: (x, y, v) => api.text(x, y, v),
+      ghost: (ids, mul) => api.ghost(ids, mul),
+      replaySkill: (mul) => api.replaySkill(mul),
+      moveBody: (body, dx) => { body.x += dx; if (body.core?.P) body.core.P.x += dx; },
+      bounds: () => (this.world?.bounds ?? [0, 1280]) as [number, number],
+      isDown: (body) => body.core?.P ? ['down', 'belly'].includes(body.core.P.mode) : body.state === 'down' || body.state === 'getup',
+      isStunned: (t) => t.stunT > 0 || t.body.state === 'stunned' || t.body.core?.P?.mode === 'stun',
+      isElite: (body) => !!body.elite || !!body.boss || (body.shieldMax ?? 0) > 0,
+      setHpMax: (v) => { this.hpMax = v; },
+      addSp: (v) => api.gainSp(v),
+      gainDodge: () => { this.core.P.dodgeN = Math.min(this.core.P.dodgeMax, this.core.P.dodgeN + 1); },
+      resetSkillCd: () => { this.core.P.cd.skill = 0; this.core.P.skillN = this.core.P.skillMax || 1; },
+    };
+  }
+  /** 상대에게 상태 이상 (퍽): 상대 정신력으로 지속 감소. 새로 걸리면 머리 위에 이름 */
+  private putStatus(body: any, k: DebuffKind, s: number, mul?: number) { // eslint-disable-line @typescript-eslint/no-explicit-any
+    const st = (body as { status?: unknown }).status;
+    if (!(st instanceof StatusSet) || !body.alive || body.hp <= 0) return;
+    if (st.apply(k, k === 'taint' ? undefined : s * (body.stat?.statusDur ?? 1), mul)) this.core.perkApi.text(body.x, body.y - (body.z || 0) - 250, STATUS[k].label);
+  }
+  /** 기절: 엔진 적은 stunned, 인물은 스턴 동작 */
+  private stunBody(body: any, s: number) { // eslint-disable-line @typescript-eslint/no-explicit-any
+    if (!body.alive || body.hp <= 0) return;
+    if (body.core?.P) { if (!['down', 'belly', 'dead'].includes(body.core.P.mode)) { body.core.stun(); body.core.P.stunT = s; } return; }
+    if (typeof body.set === 'function' && body.state !== 'dead' && body.state !== 'spawn') { body.move = null; body.set('stunned'); body.stunT = Math.round(s * 30); }
+  }
+  /** 묶기: 엔진 적은 bound(못 움직임), 인물은 스턴 */
+  private bindBody(body: any, s: number) { // eslint-disable-line @typescript-eslint/no-explicit-any
+    if (!body.alive || body.hp <= 0) return;
+    if (body.core?.P) return this.stunBody(body, s);
+    if (typeof body.set === 'function' && body.state !== 'dead' && body.state !== 'spawn' && body.state !== 'air') { body.move = null; body.set('bound'); body.bindT = Math.round(s * 30); }
   }
 
   /** 발 자리 아래 올라설 물건 (데스크 등) */
@@ -152,18 +217,18 @@ export class FighterPlayer extends Player {
 
   /** 이동·회피·점프 속도 배율: 능력치 speed × 상태 효과 */
   protected speedMul(): number {
-    return this.stat.speed * (this.progression?.stats.speed ?? 1) * (this.statusMod?.speed() ?? 1);
+    return this.stat.speed * (this.progression?.stats.speed ?? 1) * (this.statusMod?.speed() ?? 1) * this.perks.walkMul();
   }
   /** 필살 게이지 차는 배율: 능력치 charge × 상태 효과 */
   protected spMul(): number {
-    return this.stat.sp * (this.progression?.stats.charge ?? 1) * (this.statusMod?.sp() ?? 1);
+    return this.stat.sp * (this.progression?.stats.charge ?? 1) * (this.statusMod?.sp() ?? 1) * this.perks.spMul();
   }
   /** 상태 효과 (출혈·오염·두통·혼란·공포·둔화·침묵, src/game/combat/status.ts). 적 공격의 debuff 이벤트가 건다 */
   status = new StatusSet();
   /** 상태 효과가 거는 배율 */
   statusMod?: { speed(): number; sp(): number } = { speed: () => this.status.speedMul(), sp: () => this.status.spMul() };
 
-  private hurtTarget(t: Body, dmg: number, kind: string, face: 1 | -1, hitstop: number, o: HurtOpt) {
+  private hurtTarget(t: Body, dmg: number, kind: string, face: 1 | -1, hitstop: number, o: HurtOpt): { killed?: boolean; guard?: boolean } | void {
     const w = this.world as (WorldView & { kills: number; emit(e: unknown): void }) | null;
     if (!w || !t.alive) return;
     const r = REACT[kind] ?? REACT.light;
@@ -182,9 +247,8 @@ export class FighterPlayer extends Player {
     const hit: Hit = { x0: t.x - 1, x1: t.x + 1, z0: 0, z1: 400, y: t.y, dy: 999, attackId: newAttackId(), dmg: dmg * this.dmgMul * scale * (o.src === 'skill' ? this.skillMul : 1), react: r.react, dir: face, push: o.push ?? r.push, lift: r.lift, stop: 0, strength: r.strength };
     const res = t.applyHit(hit, w);
     if (res.kind === 'immune') return;
-    // 기술 부가효과: 맞은 상대에게 상태 이상 (docs/퍽/기술_부가효과.md). 막았으면 안 걸림. 상대 정신력으로 지속이 줄어듦
-    const tf = t as Body & { status?: StatusSet; stat?: Derived };
-    if (o.debuff && res.kind !== 'guard' && tf.status) tf.status.apply(o.debuff.k, o.debuff.s > 0 ? o.debuff.s * (tf.stat?.statusDur ?? 1) : undefined);
+    // 기술 부가효과: 맞은 상대에게 상태 이상 (docs/퍽/기술_부가효과.md). 막았으면 안 걸림. 상대 정신력으로 지속이 줄어듦. 퍽: 지속 연장·깊은 상처
+    if (o.debuff && res.kind !== 'guard') this.putStatus(t, o.debuff.k, (o.debuff.s > 0 ? o.debuff.s : STATUS[o.debuff.k].sec) * this.perks.outDur(o.debuff.k), o.debuff.k === 'bleed' ? this.perks.bleedMul() : undefined);
     // 맞은 적은 테스트룸 멈춤만큼 멈춘다
     t.stop = Math.max(t.stop, Math.round(Math.max(hitstop, kind === 'light' ? 0.085 : 0.16) * 30));
     this.combo = this.comboClock > 0 ? this.combo + 1 : 1;
@@ -194,6 +258,7 @@ export class FighterPlayer extends Player {
       w.kills++;
       if (t.team === 'enemy' && !(t instanceof Fighter)) w.emit({ type: 'enemyDie', x: t.x, kind: t.kind });
     }
+    return { killed: !!res.killed, guard: res.kind === 'guard' };
   }
 
   /* ───────── 엔진 쪽 ───────── */
@@ -210,11 +275,21 @@ export class FighterPlayer extends Player {
 
   applyHit(hit: Hit, world: WorldView): HitResult {
     const P = this.core.P;
-    if (P.inv > 0 || this.invuln > 0) { this.core.takeHit('hit'); return { kind: 'immune' }; }
+    if (P.inv > 0 || this.invuln > 0) {
+      this.core.takeHit('hit');
+      // 빈틈 없음(퍽): 회피 무적 중에 닿은 투사체도 되돌린다
+      if (P.dodging && this.perks.reflectOnDodge() && !this.attackerOf(hit)) this.core.perkApi.reflect(hit.dmg, this.perks.reflectSplit());
+      return { kind: 'immune' };
+    }
     if (P.mode === 'down' || P.mode === 'belly' || this.phase === 'down') return { kind: 'immune' };
     const front = hit.dir === -P.face;
     if (P.mode === 'block' && front) {
-      this.spendGuard(14 + hit.dmg * 0.6);
+      // 퍽: 막기 사건(가시 방패·혼쭐·금품 수수 불가·쌓인 울분·탄 되받기·맨손으로 쳐낸다·가드 강화·완전 방어)
+      const attacker = this.attackerOf(hit);
+      const pr = this.perks.blocked({ melee: !!attacker, attacker, dmg: hit.dmg });
+      if (!pr.noDrain) this.spendGuard((14 + hit.dmg * 0.6) / this.perks.guardMul());
+      if (pr.reflect) this.core.perkApi.reflect(hit.dmg, this.perks.reflectSplit());
+      if (this.guardBroken && this.perks.guardBreak()) { this.core.onRelease('block'); world.emit({ type: 'guard', x: this.x }); return { kind: 'guard' }; }
       if (this.guardBroken) {
         // 가드 브레이크: 막던 자세가 깨지고 잠깐 휘청인다
         this.core.onRelease('block');
@@ -224,7 +299,7 @@ export class FighterPlayer extends Player {
         return { kind: 'hit' };
       }
       this.core.takeHit('hit');
-      this.hp = Math.max(1, this.hp - Math.round(hit.dmg * 0.1));
+      this.hp = Math.max(1, this.hp - Math.round(hit.dmg * (this.team === 'player' ? this.perks.blockChip() : 0.1)));
       world.emit({ type: 'guard', x: this.x });
       return { kind: 'guard' };
     }
@@ -236,23 +311,31 @@ export class FighterPlayer extends Player {
     }
     // 경직 저항(poise): 이 값 이하 세기의 공격엔 움찔하지 않는다 (피해는 받음). 세기가 없으면 반응으로 어림한다
     const strength = hit.strength ?? (hit.react === 'down' || hit.react === 'launch' ? 3 : hit.react === 'stagger' ? 2 : 1);
-    const armored = this.core.armored() || strength <= (this.progression?.stats.poise ?? 0);
+    // 수술 여섯 시간째(퍽): 충전 중에는 맞아도 끊기지 않는다(피해는 받음)
+    const armored = this.core.armored() || strength <= (this.progression?.stats.poise ?? 0) || (P.mode === 'charge' && this.perks.keepCharge());
     // 방어(defense): 받는 피해 감소 (가드·무적·부적 뒤 실제 체력 피해에만, 엔진 defendedHit과 같음)
-    let taken = hit.dmg * this.stat.taken * (1 - (this.progression?.stats.defense ?? 0)) * (this.core.armored() ? 0.5 : 1);
+    let taken = hit.dmg * this.stat.taken * (1 - (this.progression?.stats.defense ?? 0)) * (this.core.armored() ? 0.5 : 1) * this.perks.takenMul();
     if (this.shield > 0) {
       const cut = Math.min(this.shield, Math.round(taken));
       this.shield -= cut;
       taken -= cut;
       world.emit({ type: 'hurt', x: this.x, dmg: cut, hp: this.hp });
       if (this.shield > 0) { P.armorT = 0.28; (P as { armorC?: string }).armorC = '#5ab8ff'; return { kind: 'armor' }; }   // 슈퍼아머 번쩍과 같고 색만 하늘색
-      // 방어막이 깨짐: 잠깐 휘청 (남은 피해는 체력으로)
-      this.core.stun();
-      P.stunT = 0.8;
       world.emit({ type: 'guard', x: this.x });
+      // 방어막이 깨짐: NPC 는 잠깐 휘청 (남은 피해는 체력으로). 플레이어 보호막(퍽 「방어막」)은 휘청 없이 반응 장갑만
+      if (this.team === 'player') { this.perks.shieldBroke(); this.shieldMax = 0; }
+      else { this.core.stun(); P.stunT = 0.8; }
       this.hp = Math.max(0, this.hp - Math.round(taken));
       return { kind: 'hit' };
     }
+    // 죽을 한 방: 버티기·죽은 채로 있을 수가 없다(퍽)
+    if (this.hp - Math.round(taken) <= 0 && this.team === 'player') {
+      const r = this.perks.lethal();
+      if (r === 'hold') { world.emit({ type: 'hurt', x: this.x, dmg: taken, hp: this.hp }); this.core.takeHit('hit'); return { kind: 'hit' }; }
+      if (r === 'revive') { world.emit({ type: 'hurt', x: this.x, dmg: taken, hp: this.hp }); this.core.knock(); return { kind: 'hit' }; }
+    }
     this.hp = Math.max(0, this.hp - Math.round(taken));
+    if (this.team === 'player') this.perks.hurt(taken);
     world.emit({ type: 'hurt', x: this.x, dmg: taken, hp: this.hp });
     if (!this.lowWarned && this.hp < this.hpMax * 0.3) {
       this.lowWarned = true;
@@ -266,8 +349,15 @@ export class FighterPlayer extends Player {
     this.status.onHit();
     if (armored) { this.core.takeHit('hit'); return { kind: 'armor' }; }
     P.face = (Math.sign(hit.dir) === 1 ? -1 : 1) as 1 | -1;
-    this.core.takeHit(hit.react === 'down' || hit.react === 'launch' ? 'knock' : 'hit');
+    const knock = (hit.react === 'down' || hit.react === 'launch') && !(this.team === 'player' && this.perks.noKnock());
+    this.core.takeHit(knock ? 'knock' : 'hit');
     return { kind: 'hit' };
+  }
+
+  /** 이 공격을 한 근접 상대 (앞 220px 안, 같은 줄). 없으면 투사체로 본다 */
+  private attackerOf(hit: Hit) {
+    const P = this.core.P;
+    return this.core.perkApi.proxies().filter((q) => Math.abs(q.y - P.y) < 70 && Math.abs(q.x - P.x) < 220 && Math.sign(q.x - P.x) === -Math.sign(hit.dir || -P.face)).sort((a, b) => Math.abs(a.x - P.x) - Math.abs(b.x - P.x))[0] ?? null;
   }
 
   listen(p: Pad) {
@@ -360,12 +450,51 @@ export class FighterPlayer extends Player {
     const P = this.core.P;
     P.x += this.x - this.synced.x; P.y += this.y - this.synced.y; // 틱 뒤 막힘·끝 보정
     this.core.frameView({ x0: w.camX, lane: w.lane });
+    this.perkSync(dt);
     this.core.update(dt);
     this.guardStep(dt);
     this.calmStep(dt);
     const s = this.core.shake;
     if (s > 6) w.shake(2, Math.min(4, s / 6));
     this.sync();
+  }
+
+  /** 퍽 수치를 코어 상태에 넘기고(장마다), 퍽 시계를 돌린다 */
+  private perkSync(dt: number) {
+    const k = this.perks, P = this.core.P;
+    if (!k.ranks.size && !k.traits.size && !k.host) return;
+    P.atkSpd = k.atkSpd(); P.slideMul = k.slideMul(); P.heavyRange = k.heavyRange();
+    P.dodgeMax = k.dodgeMax(); P.dodgeCd = k.dodgeCd(); P.dodgeInv = k.dodgeInv(); P.dodgeLen = k.dodgeLen();
+    P.maxJumps = k.maxJumps(); P.airMul = k.airMul(); P.runMul = k.runMul();
+    P.shotMul = k.shotCdMul(); P.heatMul = k.heatMul(); P.overCut = k.overCut(); P.noShoot = k.noShoot();
+    P.skillCdMul = k.skillCdMul(); P.chargeMul = k.chargeMul(); P.chargeBig = k.r('충전 강화') >= 3; P.hurtSp = k.hurtSp(); P.ukemi = k.ukemi();
+    const sm = k.skillCharges(); if (sm !== (P.skillMax || 1)) { P.skillMax = sm; P.skillN = Math.min(sm, Math.max(1, P.skillN || 1)); }
+    this.status.immune = k.mindGuard() ? new Set(['fear', 'confuse']) : undefined;
+    this.status.taintPer = k.taintPer();
+    if (this.team !== 'player') return;
+    k.tick(dt);
+    // 방 안이 먼저 지친다·제 편 때리기·당구: 적 몸에 직접
+    const w = this.world as (WorldView & { bodies: Body[] }) | null;
+    if (!w) return;
+    const gap = k.enemyGap();
+    const foes = w.bodies.filter((b) => b.alive && b.team === 'enemy' && b.hp > 0 && b.kind !== 'bullet') as (Body & Record<string, any>)[]; // eslint-disable-line @typescript-eslint/no-explicit-any
+    for (const e of foes) e.perkGap = gap;
+    if (perkWorld.friendlyFire) for (const e of foes) {
+      if (e.core || !e.status?.has?.('confuse') || e.state !== 'attack' || typeof e.frame !== 'function') continue;
+      const hits = (e.frame() as { hit: Hit[] }).hit;
+      for (const o of foes) if (o !== e) for (const b of (o.frame() as { hurt: WBox[] }).hurt) for (const h of hits) if (h.x0 < b.x1 && b.x0 < h.x1 && (h.z0 ?? 0) < b.z1 && b.z0 < (h.z1 ?? 999) && Math.abs(h.y - b.y) <= (h.dy ?? 20) + (b.dy ?? 0)) o.applyHit(h, w);
+    }
+    if (k.has('당구')) for (const e of foes) {
+      if (e.core || !e.mem) continue;
+      if (!e.mem.wallHit) { e.mem.billiard = false; continue; }
+      if (e.mem.billiard || e.state !== 'air') continue;
+      const o = foes.find((o) => o !== e && Math.abs(o.x - e.x) < 46 && Math.abs(o.y - e.y) < 30);
+      if (!o) continue;
+      e.mem.billiard = true;
+      const pain = (b: typeof e) => Math.round((b.hpMax ?? 300) * (b.wallDmg ?? 0.06) * 0.5);
+      for (const b of [e, o]) b.applyHit({ x0: b.x - 1, x1: b.x + 1, z0: 0, z1: 400, y: b.y, dy: 999, attackId: newAttackId(), dmg: pain(b), react: 'down', dir: (b.x >= e.x ? 1 : -1) as 1 | -1, push: 8, lift: 8, stop: 4, strength: 3 }, w);
+      w.shake(4, 3);
+    }
   }
 
   /** 전투 자세(무기 꺼냄 포함)로 있다가 가까이(700px) 적이 없고 공격·방어 키를 안 누른 채 5초가 지나면

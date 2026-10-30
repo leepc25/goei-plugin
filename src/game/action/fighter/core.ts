@@ -4,6 +4,7 @@
 // env: { A, IMG, CH, VFX, CHAIR, held:Set, K(y), sfx(type, extra), font(n), targets():[{body,x,y,z}], hurt(T, dmg, kind, face, hitstop, o), clamp(P), ground(x,y), mod?:{speed(),sp()}, heal?(v) }
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { SEATS as SEAT_TABLE, SEAT_LOOP as SEAT_LOOP_IDS, SEAT_IDS as SEAT_ID_SET, seatFit } from './seats';
+import type { PerkRun, PerkCtx, HitSrc, Boom } from '../../perks/runtime';
 /** 인물 설정(char.json cfg)·줄 측정값(A)·이펙트 정의·기술 부품은 JSON 자료라 모양이 인물·기술마다 다르다 → 자료 쪽은 느슨한 형(Json)으로 둔다 */
 type Json = any;
 /** 부품 실행 맥락 ({ o, pt, basic, … }) */
@@ -21,10 +22,16 @@ export interface FighterEnv {
   A: Record<string, Json>; IMG: Record<string, HTMLImageElement>; CH: Json; VFX?: Record<string, Json>; CHAIR?: Record<string, HTMLImageElement>;
   held: Set<string>; K(y: number): number; sfx(type: string, extra?: Json): void; font?(n: number): string;
   targets(): { body: Json; x: number; y: number; z: number }[];
-  hurt(t: Target, dmg: number, kind: string, face: number, hitstop: number, o: { src?: string | null; form?: string; el?: string; debuff?: Json; crit?: boolean }): void;
+  hurt(t: Target, dmg: number, kind: string, face: number, hitstop: number, o: { src?: string | null; form?: string; el?: string; debuff?: Json; crit?: boolean }): { killed?: boolean; guard?: boolean } | void;
   clamp(P: PState): void; ground(x: number, y: number): number; mod?: { speed(): number; sp(): number; cd?(): number }; heal?(v: number): void;
   /** 치명 굴림·치명 피해 배율 (없으면 치명 없음) */
   crit?(): boolean; critDmg?(): number;
+  /** 치명 확률 (있으면 crit() 대신 이것 + 퍽 가산으로 굴림) */
+  critP?(): number;
+  /** 퍽 (docs/설계_퍽_목록_3판.md, src/game/perks/runtime.ts). 인물 AI 는 빈 묶음 */
+  perk?: PerkRun;
+  /** 묶기를 실제 몸에 (엔진 적은 bound, 인물 AI 는 스턴) */
+  bind?(t: Target, sec: number): void;
 }
 export function createFighterCore(env: FighterEnv) {
   const VFX = env.VFX || {}, CHAIR = env.CHAIR || {};
@@ -35,6 +42,10 @@ export function createFighterCore(env: FighterEnv) {
   const sfx = (type?: Json, extra = {}) => env.sfx(type, { x: P.x, ...extra });
   const boomSnd = (strength = 2, x = 0) => env.sfx('boom', { strength, x });
   let runT = 0, curSrc: string | null = null;
+  /** 퍽 피해 이름·폭발 연쇄 깊이 · 지금 기술 출처(투사체가 늦게 맞아도 쏜 기술을 기억) */
+  let curTag = '', curDepth = 0, curUse: HitSrc | null = null;
+  /** 띄운 상대가 떨어지기 전 높이 (패대기) */
+  const prevZ = new WeakMap<object, number>();
   /** 표적 대리: 게임 적 몸 하나마다 반응 상태(mark·bindT·liftT·stunT…)를 붙여 둔다. T = 지금 가장 가까운 앞 상대 */
   const proxyMap = new Map<Json, Target>();
   const proxyOf = (t?: Json) => { let p = proxyMap.get(t.body); if (!p) { p = ({ body: t.body, juggle: 0, bounced: false, stunT: 0, vx: 0, z: 0, vz: 0, ang: 0, va: 0, hits: 0, hitT: 0, flash: 0, stag: 0, hp: 400, mark: 0, atkT: 2.2, wind: 0, bindT: 0, bindC: '#7A3FB0', liftT: 0 } as unknown as Target); proxyMap.set(t.body, p); } p.x = t.x; p.y = t.y; p.z = t.z + (p.liftT > 0 ? p.z : 0); return p; };
@@ -48,6 +59,7 @@ export function createFighterCore(env: FighterEnv) {
     const seen = new Set();
     proxiesNow = env.targets().map(t => { const p = proxyOf(t); seen.add(t.body); p.mark = Math.max(0, p.mark - dt); p.bindT = Math.max(0, p.bindT - dt); p.stunT = Math.max(0, p.stunT - dt); p.liftT = Math.max(0, (p.liftT || 0) - dt); p.stag = Math.max(0, p.stag - dt); p.hitT = Math.max(0, p.hitT - dt); if (p.hitT === 0) p.hits = 0; return p; });
     for (const b of [...proxyMap.keys()]) if (!seen.has(b)) proxyMap.delete(b);
+    if (env.perk) for (const p of proxiesNow) { const z0 = prevZ.get(p.body) ?? 0; prevZ.set(p.body, p.z); if (z0 > 6 && p.z <= 1 && (p.juggle > 0 || p.launched)) { p.juggle = 0; p.launched = false; env.perk.enemyLanded(p); } }
     const front = proxiesNow.filter(p => Math.abs(p.y - P.y) < 120 && (p.x - P.x) * P.face > -40).sort((a, b) => Math.abs(a.x - P.x) - Math.abs(b.x - P.x));
     T = front[0] || proxiesNow.sort((a, b) => Math.abs(a.x - P.x) - Math.abs(b.x - P.x))[0] || null;
   }
@@ -89,7 +101,7 @@ function impactOf(id?: Json) { const a = A[id]; if (CH.hit && CH.hit[id]) return
 // 준비 짧게 → 때리는 장 보여 줌 → 마무리 빠르게(캔슬 가능). 멈춤(히트스톱)은 맞았을 때만.
 const SPD = () => ({ slow: 1.25, fast: 0.85 } as Record<string, number>)[(CH.bal || {}).speed] || 1;   // 손 빠르기(밸런스 표): 느린 인물은 평타 동작이 길고 한 대가 아픔(10-28)
 function atkSeq(id?: Json, heavy?: Json) {
-  const a = A[id], imp = impactOf(id), s = [], k = SPD();
+  const a = A[id], imp = impactOf(id), s = [], k = SPD() / (P.atkSpd || 1);
   for (let f = 0; f < a.n; f++) {
     if (f < imp) s.push({ f, d: (f === 0 ? 0.04 : (heavy ? 0.06 : 0.045)) * k });
     else if (f === imp) s.push({ f, d: (heavy ? 0.13 : 0.08) * k, ev: heavy ? 'hitH' : 'hit' });
@@ -102,7 +114,7 @@ function atkSeq(id?: Json, heavy?: Json) {
 const P0 = () => ({ x: 420, y: 580, z: 0, vz: 0, face: 1, mode: 'ground', combat: false, armed: false, clip: null, pvx: 0, pvy: 0, pdec: 0,
             jumps: 0, airAtk: false, airVX: 230, takeoff: 0, spin: 0, buf: null, chainT: 0, combo: 0, stunT: 0, idleT: 0, lastTap: {}, runLatch: false,
             hp: 100, sp: 0, heat: 0, overT: 0, lastShot: 0, chargeShown: 0, armorT: 0, inv: 0, charge: 0,
-            dodgeN: 2, dodgeMax: 2, dodgeCd: 0.8, dodgeT: 0, wakeDelay: 0.6, downAt: -9, wakeBuf: null, ghostT: 0, dying: false, t: 0, buffT: 0, vanish: null, cd: {}, seat: null });
+            dodgeN: 2, dodgeMax: 2, dodgeCd: 0.8, dodgeT: 0, maxJumps: 2, skillN: 1, wakeDelay: 0.6, downAt: -9, wakeBuf: null, ghostT: 0, dying: false, t: 0, buffT: 0, vanish: null, cd: {}, seat: null });
 let P: PState = P0() as PState;
 let zoom = 0;
 let paused = false, hitstop = 0, shake = 0, flash = 0, dark = 0, cut = 0;
@@ -112,7 +124,7 @@ let freeSuper = false, showArmor = true, grayT = 0;
 const BAL = () => CH.bal || {};
 const isHot = () => !!(CH.ranged && CH.ranged.heat) || BAL().gun === 'rapid';
 function cdReady(k?: Json) { const t = (P.cd[k] || 0) - P.t; if (t <= 0) return true; sfx('empty'); fx.push({ k: 'num', x: P.x - 40, y: P.y - 250 * K(P.y), v: `쿨타임 ${t.toFixed(1)}초`, t: 0.6 }); return false; }
-function setCd(k?: Json) { const v = (BAL().cd || {})[k]; if (v) P.cd[k] = P.t + v * (env.mod?.cd?.() ?? 1); }   // 기술 쿨 × 능력치(지)
+function setCd(k?: Json) { const v = (BAL().cd || {})[k]; if (v) P.cd[k] = P.t + v * (k === 'shot' ? (P.shotMul || 1) : (env.mod?.cd?.() ?? 1) * (k === 'skill' || k === 'skill2' ? (P.skillCdMul || 1) : 1)); }   // 기술 쿨 × 능력치(지) × 퍽. 사격 간격은 퍽만
 const atkDmg = (id?: Json, big?: Json) => { const a = BAL().atk || {}; const v = a[id] ?? (big ? 34 : 12); return id === '14' && big ? Math.round(v * 1.8) : v; };   // 점프 강공격(내려찍기)은 약의 1.8배(10-28 「점프 강·약 피해 같음」)
 function gainSp(v?: Json) { if (P.noGain > P.t) return; v *= env.mod ? env.mod.sp() : 1; const was = P.sp; P.sp = Math.min(100, P.sp + v); if (was < 100 && P.sp >= 100) { sfx('ability'); flash = 0.06; fx.push({ k: 'num', x: P.x - 50, y: P.y - 260 * K(P.y), v: '필살기 준비', t: 1.0 }); } }
 function spReady() { if (freeSuper || P.sp >= 100) { if (!freeSuper) P.sp = 0; return true; } sfx('empty'); fx.push({ k: 'num', x: P.x - 50, y: P.y - 250 * K(P.y), v: '게이지 부족', t: 0.7 }); return false; }
@@ -189,18 +201,44 @@ let skillClipSet: Set<string> | null = null;
 const skillClips = () => skillClipSet ??= new Set([CH.skills?.skill?.anim, CH.skills?.skill2?.anim, CH.skills?.charge?.hold, CH.skills?.charge?.release, CH.skills?.super?.anim, ...((CH.skills?.super?.steps || []) as Json[]).map((s: Json) => s.anim)].filter(Boolean).map(String));
 // 지금 맞히는 기술 타격(꼬리표: 판정 형태 form·속성 el·부가효과 debuff, tools/skill_tags.py). strike 가 잠깐 넣었다 뺀다
 let curHit: Json = null, curLast = true;
-function damageTarget(dmg?: Json, kind?: Json) {
+/** 지금 맞힘의 출처 (퍽 조건) */
+function srcNow(): HitSrc {
+  if (curSrc === 'perk') return 'perk';
+  if (curSrc === 'ranged') return 'shot';
+  if (curUse) return curUse;
+  if (P.inSuper) return 'super';
+  const id = P.clip && P.clip.id;
+  if (P.useSrc && id && skillClips().has(id)) return P.useSrc;
+  if (id === '9' || id === '10' || id === '11') return 'light';
+  if (id === '12') return 'heavy';
+  if (id === '13') return 'slide';
+  if (id === '14') return 'jump';
+  if (P.mode === 'charge' || P.useSrc === 'charge') return 'charge';
+  if (id && skillClips().has(id)) return 'skill';
+  return 'other';
+}
+function damageTarget(dmg?: Json, kind?: Json): { killed?: boolean; guard?: boolean } | void {
+  const pk = env.perk;
+  let c: PerkCtx | null = null;
+  if (pk && T.body) {
+    const sr = srcNow(), id = (P.clip && P.clip.id) || '', L = comboIds();
+    c = { t: T, body: T.body, src: sr, step: sr === 'light' ? L.indexOf(id) + 1 : 0, last: sr === 'light' && id === L[L.length - 1], kind, dmg, tag: curTag, depth: curDepth, lv: P.chargeLv, maxLv: sr === 'charge' && P.chargeLv >= chLevels().length, thrown: BAL().gun === 'thrown', critAdd: 0, forceCrit: false, critDmgAdd: 0, hpBefore: T.body.hp };
+    pk.pre(c); dmg = c.dmg; kind = c.kind;
+    if (c.kill) dmg = Math.max(dmg, (T.body.hp || 0) + (T.body.shield || 0) + 1);
+  }
   if (T.mark > 0) dmg = Math.round(dmg * 1.5);
-  // 치명(10-30): 모두 5% · 2배. 「치명!」 글자 없이 큰 노란 숫자·큰 불꽃·조금 긴 멈춤
-  const crit = !!env.crit?.(); if (crit) { dmg = Math.round(dmg * (env.critDmg?.() ?? 2)); hitstop = Math.max(hitstop, 0.16); if (!vfx('hit_heavy', T.x, T.y - T.z - 110 * K(T.y), 2.4, { flip: P.face < 0 })) sparks(T.x, T.y - T.z - 110 * K(T.y), 16, true); }
-  T.hp = Math.max(0, T.hp - dmg); T.hits++; if (!P.inSuper) gainSp(dmg * 0.45); T.hitT = 1.0; T.flash = 0.09;
+  // 치명(10-30): 모두 5% · 2배. 「치명!」 글자 없이 큰 노란 숫자·큰 불꽃·조금 긴 멈춤. 퍽은 확률 가산·확정 치명·치명 피해 가산
+  const crit = dmg > 0 && (!!c?.forceCrit || (env.critP ? Math.random() < env.critP() + (c?.critAdd ?? 0) : !!env.crit?.()));
+  if (crit) { dmg = Math.round(dmg * ((env.critDmg?.() ?? 2) + (c?.critDmgAdd ?? 0))); hitstop = Math.max(hitstop, 0.16); if (!vfx('hit_heavy', T.x, T.y - T.z - 110 * K(T.y), 2.4, { flip: P.face < 0 })) sparks(T.x, T.y - T.z - 110 * K(T.y), 16, true); }
+  dmg = Math.round(dmg);
+  T.hp = Math.max(0, T.hp - dmg); T.hits++; if (!P.inSuper && dmg > 0) gainSp(dmg * 0.45); T.hitT = 1.0; T.flash = 0.09;
   const big = kind !== 'light', air = T.z > 0 || T.vz > 0, dir = Math.sign(T.x - P.x) || P.face;
   T.stag = kind === 'launch' ? 0.9 : big ? 0.5 : 0.34;
   T.va += dir * (kind === 'launch' ? 7 : big ? 4.5 : 2);
   if (['down', 'spike', 'blow', 'launch'].includes(kind)) T.liftT = 0;
   if (T.bindT > 0) { T.vx = 0; }
   else if (kind === 'spike' && air) { T.vz = -1100; T.vx = dir * 120; T.juggle++; }
-  else if (kind === 'launch') { T.vz = air ? Math.max(T.vz, 720) : 980; T.vx = dir * 90; T.juggle = air ? T.juggle + 1 : 0; T.bounced = false; }
+  else if (kind === 'launch') { T.vz = air ? Math.max(T.vz, 720) : 980; T.vx = dir * 90; T.juggle = air ? T.juggle + 1 : 0; T.launched = true; T.bounced = false; }
   else if (kind === 'blow') { T.vz = 420; T.vx = dir * 980; T.juggle++; T.bounced = true; }
   else if (kind === 'down') { T.vz = 260; T.vx = dir * 420; T.juggle++; T.bounced = true; }
   else if (kind === 'stun') { T.stunT = 1.4; T.vx = dir * 200; }
@@ -208,13 +246,86 @@ function damageTarget(dmg?: Json, kind?: Json) {
   else if (kind === 'turn') { T.turnT = 0.6; T.turnDir = dir; T.vx = 0; T.stag = 0.15; }   // 홱 뒤돌아 등을 보인 채 2m 밀려 걸어감(로제몬 D)
   else if (air) { T.juggle++; T.vz = Math.max(T.vz, (big ? 560 : 420) * Math.max(0.3, 1 - T.juggle * 0.12)); T.vx = dir * (big ? 160 : 70); }
   else T.vx = dir * (big ? 460 : 55);
-  fx.push({ k: 'num', x: T.x + (Math.random() - 0.5) * 30, y: T.y - 200 - T.z, v: dmg, t: crit ? 0.9 : 0.7, big, crit });
+  if (dmg > 0) fx.push({ k: 'num', x: T.x + (Math.random() - 0.5) * 30, y: T.y - 200 - T.z, v: dmg, t: crit ? 0.9 : 0.7, big, crit });
   // 부가효과 중 표식·묶기는 코어 반응(받는 피해 ×1.5 / 못 움직임)으로, 나머지는 상대 상태 이상으로(player.ts)
   const db = curLast ? curHit?.debuff : undefined;
-  if (db?.k === 'mark') { T.mark = Math.max(T.mark, db.s || 6); vfx('fx-mark', T.x, T.y - T.z - 240 * K(T.y), 1.8 * K(T.y), { center: true }); }
-  else if (db?.k === 'bind') T.bindT = Math.max(T.bindT, db.s || 1.5);
-  const src = curSrc ?? (P.inSuper || (P.clip && skillClips().has(P.clip.id)) || P.mode === 'charge' ? 'skill' : null);
-  if (T.body) env.hurt(T, dmg, kind, P.face, hitstop, { src, form: curHit?.form ?? (src === 'ranged' ? 'gun' : undefined), el: curHit?.el, debuff: db && db.k !== 'mark' && db.k !== 'bind' ? db : undefined, crit });
+  if (db?.k === 'mark') markT(T, db.s || 6);
+  else if (db?.k === 'bind') bindT(T, db.s || 1.5);
+  const src = curSrc === 'perk' ? 'blast' : curSrc ?? (P.inSuper || (P.clip && skillClips().has(P.clip.id)) || P.mode === 'charge' || curUse ? 'skill' : null);
+  let res: { killed?: boolean; guard?: boolean } | void = undefined;
+  if (T.body) res = env.hurt(T, dmg, kind, P.face, hitstop, { src, form: curSrc === 'perk' ? undefined : curHit?.form ?? (src === 'ranged' ? 'gun' : undefined), el: curHit?.el, debuff: db && db.k !== 'mark' && db.k !== 'bind' ? db : undefined, crit });
+  if (pk && c) { c.crit = crit; c.dmg = dmg; c.killed = !!res?.killed; c.guarded = !!res?.guard; pk.post(c); }
+  return res;
+}
+/** 표식(받는 피해 ×1.5)·묶기: 코어 대리 + 실제 몸(엔진 bind) */
+function markT(t: Target, sec: number) { t.mark = Math.max(t.mark, sec); vfx('fx-mark', t.x, t.y - t.z - 240 * K(t.y), 1.8 * K(t.y), { center: true }); }
+function bindT(t: Target, sec: number) { t.bindT = Math.max(t.bindT, sec); t.vx = 0; env.bind?.(t, sec); }
+/** 퍽이 일으키는 피해 (그 맞힘에는 맞힘 퍽이 다시 걸리지 않는다) */
+function perkHit(t: Target, dmg: number, kind: string, tag: string, depth = 0) {
+  const t0 = T, s0 = curSrc, g0 = curTag, d0 = curDepth, h0 = curHit;
+  T = t; curSrc = 'perk'; curTag = tag; curDepth = depth; curHit = null;
+  const r = damageTarget(dmg, kind);
+  T = t0; curSrc = s0; curTag = g0; curDepth = d0; curHit = h0;
+  return r;
+}
+/** 퍽 폭발·충격파: 그림(기존 이펙트) + 반지름 안 상대 */
+function perkBoom(b: Boom) {
+  const k = K(b.gy);
+  if (b.style === 'blast') { if (!vfx('eileen-rpg-explosion', b.x, b.gy - 4, Math.max(0.8, b.r / 110) * 1.4 * k)) sparks(b.x, b.gy - 40, 16, true); dust(b.x, b.gy, 6, 1.2); boomSnd(2, b.x); shake = Math.max(shake, 6); }
+  else if (b.style === 'shock') { ring(b.x, b.gy, Math.max(60, b.r), 0.4, 'rgba(255,255,255,.85)', 6, 0.3); if (VFX['fx-shockwave']) vfx('fx-shockwave', b.x, b.gy + 10 * k, Math.max(60, b.r) * k / 70, { bottom: true, under: true, tint: '#ffffff' }); dust(b.x, b.gy, 10, 1.6); sfx('hit', { strength: 3 }); shake = Math.max(shake, 5); }
+  else if (b.style === 'heat') { ring(b.x, b.gy, b.r, 0.45, 'rgba(255,150,60,.9)', 7, 0.3); for (let i = 0; i < 10; i++) steam(b.x + (Math.random() - 0.5) * b.r, b.gy - 60 * k, 1.6); boomSnd(2, b.x); shake = Math.max(shake, 6); }
+  if (!b.r) return;
+  const list = proxies().filter(q => q.body !== b.skip && Math.abs(q.x - b.x) < b.r && Math.abs(q.y - b.gy) < b.r * 0.35 + 40);
+  for (const q of list) perkHit(q, typeof b.dmg === 'function' ? b.dmg(q) : b.dmg, b.kind, b.tag, b.depth || 0);
+}
+/** 잔상 공격: 지금 자리·방향에서 그 줄들을 반투명으로 다시 재생하며 맞는 장마다 피해 × mul (새 그림 없음) */
+function ghostAttack(ids: string[], mul: number) {
+  const x = P.x, y = P.y, face = P.face; let at = 0;
+  for (const id of ids) {
+    if (!A[id]) continue;
+    const big = id === '12', a = A[id];
+    for (const e of atkSeq(id, big)) {
+      const f = e.f, t = at;
+      later(t, () => fx.push({ k: 'ghost', id, f, x, y, z: 0, face, t: e.d + 0.04, t0: e.d + 0.04, a: 0.5 }));
+      if (e.ev) later(t, () => { const hx = x + face * a.reach[f] * K(y); for (const q of proxies()) if (Math.abs(q.y - y) < 80 && (q.x - x) * face > -20 && Math.abs(q.x - hx) < 95 * K(y)) { perkHit(q, atkDmg(id, big) * mul, big ? 'heavy' : 'light', 'ghost'); sparks(q.x, q.y - 110 * K(q.y), 6, false, '#a8ccff'); } });
+      at += e.d;
+    }
+  }
+}
+/** 앙코르: 마지막에 쓴 고유기 동작을 잔상이 다시(피해 = 고유기 표준 × mul) */
+function replaySkill(mul: number) {
+  const id = P.lastSkillAnim; if (!id || !A[id]) return;
+  const x = P.x, y = P.y, face = P.face, n = nOf(id), d = 0.08;
+  for (let f = 0; f < n; f++) later(f * d, () => fx.push({ k: 'ghost', id, f, x, y, z: 0, face, t: d + 0.04, t0: d + 0.04, a: 0.5 }));
+  later(n * d * 0.5, () => { for (const q of proxies()) if ((q.x - x) * face > -40 && Math.abs(q.x - x) < 320 && Math.abs(q.y - y) < 90) perkHit(q, 280 * mul, 'heavy', 'ghost'); ring(x + face * 150, y, 200, 0.4, '#a8ccff', 5, 0.3); });
+}
+/** 퍽 사격(겹탄·관통탄·도탄·난사·탄막 반사): 기본 사격 한 발을 줄마다 나눠 앞 상대를 맞힌다 */
+function perkBullet(s: Json, p: Json, dir: number) {
+  const m = env.perk!.shotMods(), use = curSrc;
+  const lanes = m.spread ? [(Math.random() - 0.5) * 100] : m.lanes, band = m.spread ? 70 : 60;
+  const base = (s.hit && s.hit.dmg) || 7, each = lanes.length > 1 ? 0.7 : 1;
+  const hitAt = (q: Target, dmg: number, delay: number) => later(delay, () => { if (!vfx('bullet_hit_body', q.x - dir * 10, q.y - q.z - 110 * K(q.y), 2)) sparks(q.x, q.y - 110 * K(q.y), 4, false, '#fff6d0'); const t0 = T, s0 = curSrc; T = q; hitList = [q]; curSrc = use; strike({ noVfx: true, stop: s.big ? 0.08 : 0.02, shake: s.big ? 9 : 2, ...(s.hit || { kind: 'light' }), dmg: Math.round(dmg) }); curSrc = s0; T = t0 || T; });
+  const gp = MZ_GAP * K(P.y), sx = p.x + dir * gp, sy = p.hy;
+  for (const ln of lanes) {
+    const ly = P.y + ln, list = proxies().filter(q => Math.abs(q.y - ly) < band && (q.x - P.x) * dir > 0).sort((a, b) => Math.abs(a.x - P.x) - Math.abs(b.x - P.x));
+    const hits = m.pierce ? list : list.slice(0, 1);
+    const wall = dir > 0 ? W + 20 : VX0 - 20, endX = hits.length ? hits[hits.length - 1].x : wall, tt = Math.abs(endX - sx) / 3400;
+    fx.push({ k: 'bullet', x: sx, y: sy + ln * 0.4, x2: endX, y2: sy + ln * 0.4 + (Math.random() - 0.5) * 16, t: tt, t0: tt });
+    hits.forEach((q, i) => hitAt(q, base * each * (i ? 0.7 : 1), Math.abs(q.x - sx) / 3400));
+    // 도탄: 아무도 못 맞히면 화면 끝에서 한 번 튕겨 뒤쪽 상대를(70%, 탄막 반사면 둘로 갈라짐)
+    if (!hits.length && m.bounce) {
+      const back = proxies().filter(q => Math.abs(q.y - ly) < band * 1.5 && (q.x - P.x) * dir < 0).sort((a, b) => Math.abs(a.x - wall) - Math.abs(b.x - wall)).slice(0, m.split ? 2 : 1);
+      later(tt, () => { sparks(wall, sy, 6, false, '#fff6d0'); for (const q of back) { const t2 = Math.abs(q.x - wall) / 3400; fx.push({ k: 'bullet', x: wall, y: sy, x2: q.x, y2: q.y - 110 * K(q.y), t: t2, t0: t2 }); hitAt(q, base * each * 0.7, t2); } });
+    }
+  }
+  shake = Math.max(shake, s.big ? 6 : 1.5);
+}
+/** 되돌린 탄(탄 되받기·빈틈 없음): 앞쪽 가장 가까운 상대(탄막 반사면 둘) */
+function reflectShot(dmg: number, split: boolean) {
+  const m = { x: P.x + P.face * 40 * K(P.y), y: P.y - 140 * K(P.y) };
+  const list = proxies().filter(q => Math.abs(q.y - P.y) < 120).sort((a, b) => Math.abs(a.x - P.x) - Math.abs(b.x - P.x)).slice(0, split ? 2 : 1);
+  for (const q of list) { const tt = Math.abs(q.x - m.x) / 3400; fx.push({ k: 'bullet', x: m.x, y: m.y, x2: q.x, y2: q.y - 110 * K(q.y), t: tt, t0: tt }); later(tt, () => { perkHit(q, dmg, 'light', 'reflect'); sparks(q.x, q.y - 110 * K(q.y), 6, false, '#fff6d0'); }); }
+  sfx('guard');
 }
 function fireEv(e?: Json) {
   if (e && e.fn) e.fn();
@@ -224,7 +335,7 @@ function fireEv(e?: Json) {
     const big = e.ev !== 'hit';
     const ry = id === '14' && CH.reachY && CH.reachY['14'] && CH.reachY['14'][f], p = framePt(id, f, a.reach[f], ry != null && ry !== false ? ry : a.h * (e.hy || 0.42));   // 점프 공격은 앞으로 뻗은 손발 높이에서
     const wide = id === '14';   // 공중공격은 판정을 넓게(사용자 2026-10-25): 앞뒤 160·위아래·깊이 넓게
-    if (inReach(p.x, wide ? 160 : big ? 115 : 90, P.y - p.y, wide)) {   // 10-29 밤 사용자: 판정이 엄격 → 앞 여유 70/100 → 90/115, 줄 차이 64 → 80
+    if (inReach(p.x, wide ? 160 : big ? 115 * (P.heavyRange || 1) : 90, P.y - p.y, wide)) {   // 10-29 밤 사용자: 판정이 엄격 → 앞 여유 70/100 → 90/115, 줄 차이 64 → 80
       hitstop = big ? 0.16 : 0.085; shake = big ? 16 : 8; P.connected = true;
       { const list = [...hitList]; hitList = []; for (const t of list) { T = t; damageTarget(atkDmg(id, big), e.kind || (big ? 'heavy' : 'light')); } T = list[0]; }
       sfx('hit', { strength: big ? 3 : 1, kind: (CH.kick || []).includes(id) ? 'kick' : undefined });
@@ -236,9 +347,11 @@ function fireEv(e?: Json) {
     }
   } else if (e.ev === 'shot') {
     const p = muzzle();
-    if (isHot()) { P.heat = Math.min(100, P.heat + (BAL().heatPer || 9)); P.lastShot = P.t; if (P.heat >= 100) { P.overT = 2.6; sfx('empty'); for (let i = 0; i < 8; i++) steam(p.x, p.y, 1.4); } }
+    if (isHot()) { P.heat = Math.min(100, P.heat + (BAL().heatPer || 9) * (P.heatMul || 1)); P.lastShot = P.t; if (P.heat >= 100) { P.overT = Math.max(0.4, 2.6 - (P.overCut || 0)); sfx('empty'); for (let i = 0; i < 8; i++) steam(p.x, p.y, 1.4); env.perk?.overheat(); } }
     const pj = CH.ranged && CH.ranged.proj || { t: 'proj', kind: 'orb' };
-    curSrc = 'ranged'; runFx([BAL().shotDmg ? { ...pj, hit: { ...(pj.hit || { kind: 'light' }), dmg: BAL().shotDmg } } : pj], { o: p, basic: true }); curSrc = null;
+    // 탄피 모으기: 20발마다 다음 한 발이 강한 한 발(피해 75, 크게 밀침)
+    const strong = !!env.perk?.shot(), hit0 = { ...(pj.hit || { kind: 'light' }), ...(BAL().shotDmg ? { dmg: BAL().shotDmg } : {}) };
+    curSrc = 'ranged'; runFx([{ ...pj, hit: strong ? { ...hit0, dmg: 75, kind: 'blow' } : hit0, big: strong || pj.big }], { o: p, basic: true }); curSrc = null;
   } else if (e.ev === 'run') runFx(e.list, e.ctx || {});
   else if (e.ev === 'slideHit') {
     if (!P.slideHit) { const p = framePt(id, f, a.reach[f], a.h * 0.6); if (!!T && Math.abs(T.y - P.y) < 64 && Math.abs(T.x - p.x) < 80 * K(P.y)) { P.slideHit = true; fireEv({ f, ev: 'hit', hy: 0.6 }); } }
@@ -255,7 +368,7 @@ function posOf(s?: Json, c?: Json) {
   if (s.at === 'front') return { x: P.x + f * (s.dx ?? 150) * k, gy: P.y, hy: P.y - (s.h ?? 110) * k, k };
   const m = c.o || muzzle(); return { x: m.x + f * (s.dx || 0) * k, gy: P.y, hy: m.y + (s.dy || 0) * k, k };
 }
-const near = (x?: Json, gy?: Json, rx?: Json, ry = 90) => { const l = proxies().filter(T => Math.abs(T.x - x) < rx && Math.abs(T.y - gy) < ry); if (l.length) { hitList = l; T = l[0]; } return l.length > 0; };   // 줄 차이 70 → 90(10-29 밤 사용자: 판정이 너무 엄격)
+const near = (x?: Json, gy?: Json, rx?: Json, ry = 90) => { rx *= P.rangeMul || 1; const l = proxies().filter(T => Math.abs(T.x - x) < rx && Math.abs(T.y - gy) < ry); if (l.length) { hitList = l; T = l[0]; } return l.length > 0; };   // 줄 차이 70 → 90(10-29 밤 사용자: 판정이 너무 엄격)
 // 맞았을 때만: 멈춤·흔들림·타격 그림
 function strike(h?: Json, y?: Json) {
   if (!h) return;
@@ -359,6 +472,7 @@ const FX = {
   // 투사체: bullet(예광탄 그림) | orb(빛 구슬) | spike(검은 가시) | pen(볼펜) | card | knife
   proj(s?: Json, c?: Json) {
     const p = posOf({ at: 'hand', ...s }, c), dir = P.face;
+    if ((s.kind || 'orb') === 'bullet' && c.basic && env.perk) { muzzleFlash(p, s.big); sfx('shot'); return perkBullet(s, p, dir); }
     if ((s.kind || 'orb') === 'bullet') {
       muzzleFlash(p, s.big); sfx('shot');
       const hitD = !!T && Math.abs(T.y - P.y) < 60 && (T.x - P.x) * dir > 0;
@@ -367,12 +481,16 @@ const FX = {
       gp = MZ_GAP * K(P.y), sx = p.x + dir * Math.cos(g) * gp, sy = p.hy + Math.sin(g) * gp;
       fx.push({ k: 'bullet', x: sx, y: sy, x2: endX, y2: sy + Math.abs(endX - sx) * Math.tan(g) + (Math.random() - 0.5) * 20, t: tt, t0: tt });
       shake = Math.max(shake, s.big ? 6 : 1.5);
-      if (hitD) later(tt, () => { if (!vfx('bullet_hit_body', endX, p.hy, 2)) sparks(endX, p.hy, 4, false, '#fff6d0'); strike({ noVfx: true, stop: s.big ? 0.08 : 0.02, shake: s.big ? 9 : 2, ...(s.hit || { dmg: 7, kind: 'light' }) }); });
+      const use = curSrc;   // 늦게 맞아도 사격 출처(판정 형태 총 = 민)
+      if (hitD) later(tt, () => { if (!vfx('bullet_hit_body', endX, p.hy, 2)) sparks(endX, p.hy, 4, false, '#fff6d0'); const s0 = curSrc; curSrc = use; strike({ noVfx: true, stop: s.big ? 0.08 : 0.02, shake: s.big ? 9 : 2, ...(s.hit || { dmg: 7, kind: 'light' }) }); curSrc = s0; });
       return;
     }
     sfx(s.sfx || 'whiff');
     const fancy = !c.basic && s.plain !== true;   // 기술 투사체: 1.5배·인물 색 잔상 꼬리·빛무리·맞으면 큰 불꽃(10-29 사용자: 초라한 투사체 하나 딸랑)
-    fx.push({ k: 'proj', kind: s.kind || 'orb', vfx: s.vfx, tint: s.tint, rot: s.rot, x: p.x, y: p.hy + (s.dy || 0) * p.k, gy: P.y, dir, v: s.speed || 1300, c: s.color || CH.color, size: (s.size || 1) * p.k * (fancy ? 1.5 : 1), hit: s.hit, pierce: s.pierce, done: new Set(), t: s.life || 1.4, end: s.end, fancy, trail: [] });
+    // 퍽: 투척은 부메랑, 총(구슬·상자 탄)은 겹탄(위아래 2발 70%)·관통탄·도탄
+    const m = c.basic && env.perk ? env.perk.shotMods() : null, thrown = BAL().gun === 'thrown';
+    const lanes = m && !thrown ? m.lanes : [0], mul = lanes.length > 1 ? 0.7 : 1;
+    for (const ln of lanes) fx.push({ k: 'proj', kind: s.kind || 'orb', vfx: s.vfx, tint: s.tint, rot: s.rot, x: p.x, x0: p.x, y: p.hy + (s.dy || 0) * p.k + ln * 0.4, gy: P.y + ln, dir, v: s.speed || 1300, c: s.color || CH.color, size: (s.size || 1) * p.k * (fancy ? 1.5 : 1), hit: s.hit, pierce: s.pierce || (!!m && !thrown && m.pierce), done: new Set(), t: s.life || 1.4, end: s.end, fancy, trail: [], src: curSrc, use: curSrc === 'ranged' ? null : (curUse ?? srcNow()), boomer: !!m && thrown && m.boomerang, bounce: !!m && !thrown && m.bounce, split: !!m && m.split, mul, nHit: 0 });
     if (fancy) { muzzleFlash(p, true); flash = Math.max(flash, 0.04); }
   },
   // 굵은 광선(충전): charge_beam 그림을 가로로 이어 붙임
@@ -408,7 +526,7 @@ const FX = {
     P.x = T.x + from * side * (s.dist || 85) * K(T.y); P.y = T.y; P.face = -from * side;
     if (s.puddle !== false) FX.puddle({ at: 'self', r: 70, time: 0.6, color: s.color || '#000' }, {});
   },
-  bind(s?: Json) { if (!!!T) return; T.bindT = s.time || 2; T.bindC = s.color || CH.color; T.vx = 0; },
+  bind(s?: Json) { if (!!!T) return; T.bindT = s.time || 2; T.bindC = s.color || CH.color; T.vx = 0; env.bind?.(T, s.time || 2); },
   mark(s?: Json) { if (!!!T) return; T.mark = s.time || 6; T.markC = s.color || '#ff5a4a'; ring(T.x, T.y - 230 * K(T.y), 40, 0.3, T.markC, 3); if (s.text) fx.push({ k: 'num', x: T.x - 30, y: T.y - 260 * K(T.y), v: s.text, t: 1.2 }); },
   buff(s?: Json) { P.buffT = s.time || 4; P.buffC = s.color || CH.color; P.buffEdge = s.edge !== false; if (s.label) fx.push({ k: 'num', x: P.x - 40, y: P.y - 250 * K(P.y), v: s.label, t: 1.2 }); sfx('ability'); },
   heal(s?: Json) { const v = s.v || 30; P.hp = Math.min(100, P.hp + v); if (P.hp > 25) P.dying = false; vfx('heal', P.x, P.y + 4, 3.4 * K(P.y)); P.healT = 0.8; fx.push({ k: 'num', x: P.x - 20, y: P.y - 240 * K(P.y), v: '+' + v, t: 0.9 }); sfx('heal'); },
@@ -550,7 +668,7 @@ const COMMON = {
 };
 
 // ── 흐름 ──
-function toIdle0() { P.mode = 'ground'; P.clip = null; P.combo = 0; P.idleT = 0; P.inSuper = false; P.returning = false; }
+function toIdle0() { P.mode = 'ground'; P.clip = null; P.combo = 0; P.idleT = 0; P.inSuper = false; P.returning = false; P.useSrc = null; P.rangeMul = 1; }
 // 동작이 끝나 대기로 갈 때: 끝 장과 대기 첫 장이 크게 다른 줄(빌드가 잰 seam ≥ 0.35)은 두 장을 거꾸로 짧게 되짚고 대기로(10-29 사용자: 동작 사이가 뚝뚝 끊김). 예약 입력이 있으면 바로
 function toIdle() {
   const prev = P.clip && P.clip.id;
@@ -587,7 +705,7 @@ function light() {
   const L = comboIds(); if (!L.length) return;
   P.combat = true; P.armed = false;
   if (P.combo >= L.length) P.combo = 0;
-  const id = L[P.combo]; P.combo++; sfx('whiff'); P.connected = false;
+  const id = L[P.combo]; P.combo++; sfx('whiff'); P.connected = false; env.perk?.lightStart(id);
   pushP(170, 900);
   act(id, { seq: atkSeq(id, false), onEnd: () => {
     if (P.combo >= L.length) { P.blowWin = P.t + 0.35; P.combo = 0; return afterBuf(toIdle); }
@@ -605,7 +723,7 @@ function heavy() {
 function chainExpire() { const id = P.clip!.id; P.combo = 0; reverseOut(id, R(A[id].n - 1, 0), 0.03); }
 function slide() {
   if (!has('13')) return light();
-  P.combat = true; P.combo = 0; pushP(840, 1150); P.slideHit = false;
+  P.combat = true; P.combo = 0; pushP(840 * (P.slideMul || 1), 1150); P.slideHit = false;
   act('13', { seq: atkSeq('13', false).map((e, i, all) => i === 1 ? { ...e, ev: 'dust' } : (i >= 2 && i <= all.length - 2) ? { ...e, ev: 'slideHit' } : e) });
 }
 function dodge() {
@@ -618,14 +736,16 @@ function dodge() {
   // 회피는 2번까지 모아 두고 하나 쓰면 0.8초 뒤 다시 찬다(10-30 사용자: 연타하면 0.24초 캔슬 < 무적 0.3초라 무적이 끊기지 않던 것). 퍽은 dodgeMax·dodgeCd를 바꾼다
   if (P.dodgeN < 1) return;
   P.dodgeN--; if (P.dodgeT <= 0) P.dodgeT = P.dodgeCd;
-  sfx('evade'); P.dodgeV = { x: dx / len * 780, y: dy / len * 520 }; P.inv = 0.3; P.ghostT = 0.2;
+  const dl = P.dodgeLen || 1;
+  sfx('evade'); P.dodgeV = { x: dx / len * 780 * dl, y: dy / len * 520 * dl }; P.inv = P.dodgeInv || 0.3; P.ghostT = 0.2; P.dodging = true;
+  env.perk?.dodge();
   P.pvx = 0; P.pdec = 0;
   const n = nOf(id), d = 0.32 / n;
-  act(id, { seq: S(R(0, n - 1), d).map((e?: Json, i?: Json) => i >= n - 2 ? { ...e, cancel: true } : e), onEnd: () => { P.dodgeV = null; afterBuf(toIdle); } });
+  act(id, { seq: S(R(0, n - 1), d).map((e?: Json, i?: Json) => i >= n - 2 ? { ...e, cancel: true } : e), onEnd: () => { P.dodgeV = null; P.dodging = false; env.perk?.dodgeEnd(); afterBuf(toIdle); } });
 }
 // 원거리: 반복 구간이 있으면 첫 장 = 발사, 끝 장에서 누르고 있으면 되돌아감. 없으면 그림 불꽃 장(또는 뻗은 장)마다 발사
 function shoot() {
-  if (!has('15')) return;
+  if (!has('15') || P.noShoot) return;
   if ((BAL().cd || {}).shot) { if ((P.cd.shot || 0) > P.t) { if ((BAL().cd.shot) >= 1) cdReady('shot'); return; } setCd('shot'); }   // 연사 무기 말고는 한 발씩 + 간격(1초 이상만 「쿨타임」 표시)
   const a = A['15'];
   if (P.overT > 0) return ensureArmed(() => act('15', { seq: [...S(R(0, Math.min(3, a.n - 1)), 0.035), { f: Math.min(3, a.n - 1), d: 0.25, fn: () => { sfx('empty'); const p = muzzle(); steam(p.x, p.y, 1); } }, ...S(R(Math.min(4, a.n - 1), a.n - 1), 0.05)] }));
@@ -636,7 +756,7 @@ function shoot() {
       for (let f = 0; f < a0; f++) s.push({ f, d: 0.035 });
       const to = s.length;
       const fl = R(a0, a1).filter(f => a.flash[f]), fire = fl.length ? fl : [a0];   // 그림에 총구 불꽃이 있는 장마다 한 발(10-28 블라렛 쌍권총: 번갈아 쏘는데 1발만 나감)
-      for (let f = a0; f <= a1; f++) s.push({ f, d: 0.06, ev: fire.includes(f) ? 'shot' : undefined });
+      for (let f = a0; f <= a1; f++) s.push({ f, d: 0.06 * (P.shotMul || 1), ev: fire.includes(f) ? 'shot' : undefined });
       if (isHot()) s[s.length - 1].rep = { key: 'shoot', to };   // 누른 채 연사는 과열 있는 연사 무기만(사용자 2026-10-26)
       for (let f = a1 + 1; f < a.n; f++) s.push({ f, d: 0.05 });
     } else {
@@ -678,20 +798,28 @@ function doSkill(sp?: Json, then?: Json) {
 }
 // 여러 동작을 잇는 기술(steps): 고유기술·둘째 기술·NPC 특수공격도 필살기처럼 차례로
 function runSkill(sp?: Json, then?: Json) { if (!sp) return; P.hitVfx = sp.hitVfx ? { n: sp.hitVfx, s: sp.hitScale || 1, until: P.t + (sp.hitFor || 2.5), last: -9 } : null; const steps = sp.steps || [sp]; const go = (i?: Json) => i >= steps.length ? (then ? then() : (P.skArmor = false, (CH.armed && sp.armed) || (P.armed = false), afterBuf(toIdle))) : doSkill({ ...steps[i], armed: steps[i].armed ?? sp.armed, armor: steps[i].armor ?? (i ? undefined : sp.armor) }, () => go(i + 1)); go(0); }
-function skill() { if (!cdReady('skill')) return; setCd('skill'); const sp = CH.skills.skill; if (sp && sp.alt && P.buffT > 0 && CH.skills[sp.alt]) return runSkill(CH.skills[sp.alt]); runSkill(sp); }
-function skill2() { if (!CH.skills.skill2 || !cdReady('skill2')) return; setCd('skill2'); runSkill(CH.skills.skill2); }
+// 고유기 2회(퍽): 쿨마다 하나씩 차는 횟수(회피 dodgeN 과 같은 방식). 1회면 쿨 그대로
+function skill() {
+  if ((P.skillMax || 1) > 1) { if (P.skillN < 1) return void cdReady('skill'); P.skillN--; if ((P.cd.skill || 0) <= P.t) setCd('skill'); }
+  else { if (!cdReady('skill')) return; setCd('skill'); }
+  P.useSrc = 'skill'; env.perk?.skillUse();
+  const sp = CH.skills.skill; const use = sp && sp.alt && P.buffT > 0 && CH.skills[sp.alt] ? CH.skills[sp.alt] : sp;
+  P.lastSkillAnim = use && (use.anim || (use.steps && use.steps[0] && use.steps[0].anim));
+  runSkill(use);
+}
+function skill2() { if (!CH.skills.skill2 || !cdReady('skill2')) return; setCd('skill2'); P.useSrc = 'skill'; env.perk?.skillUse(); runSkill(CH.skills.skill2); }
 function superMove() {
   const sp = CH.skills.super; if (!sp) return;
   if (!spReady()) return;
-  P.inSuper = true; P.noGain = P.t + 8; P.hitVfx = null;
+  P.inSuper = true; P.noGain = P.t + 8; P.hitVfx = null; env.perk?.superUse();
   // 컷인: 화면 정지 + 요원 색 띠 + 기술명
   sfx('super'); cut = 1.1; dark = 1.6; flash = 0.12; hitstop = 0.9;
   const steps = sp.steps || [sp];
-  const run = (i?: Json) => { if (i >= steps.length) { P.inSuper = false; P.inv = 0; return afterBuf(toIdle); } doSkill({ armorAll: true, ...steps[i], armed: steps[i].armed ?? sp.armed }, () => run(i + 1)); };
+  const run = (i?: Json) => { if (i >= steps.length) { P.inSuper = false; P.inv = 0; env.perk?.superEnd(); return afterBuf(toIdle); } doSkill({ armorAll: true, ...steps[i], armed: steps[i].armed ?? sp.armed }, () => run(i + 1)); };
   P.inv = 30; later(0.85, () => run(0));   // 컷인이 걷힌 뒤 몸동작·효과
 }
 const CH_COL = ['rgba(255,255,255,.8)', '#fff6c0', '#8fdcff', '#c89bff'];
-const chLevels = () => (CH.skills.charge && CH.skills.charge.levels) || [0.5, 1.2];
+const chLevels = () => ((CH.skills.charge && CH.skills.charge.levels) || [0.5, 1.2]).map((t?: Json) => t * (P.chargeMul || 1));
 const chLv = () => chLevels().filter((t?: Json) => P.charge >= t).length;
 function charge() {
   const sp = CH.skills.charge; if (!sp) return;   // 충전기는 쿨타임 없음(사용자 2026-10-26)
@@ -706,6 +834,8 @@ function charge() {
 }
 function release() {
   const sp = CH.skills.charge, lv = chLv(), list = (sp.lv || {})[lv] || [];
+  P.useSrc = 'charge'; env.perk?.chargeUse();
+  if (lv >= chLevels().length && P.chargeBig) P.rangeMul = 1.25;   // 충전 강화 3랭크: 최대 단계 범위 +25%
   { const hv = (sp.hitVfx || {})[lv]; P.hitVfx = hv ? { n: hv, s: (sp.hitScale || {})[lv] || 1, until: P.t + 2.5, last: -9 } : null; }   // 충전 단계별 전용 타격 그림(10-29)
   P.chargeLv = lv; P.relMz = muzzle();
   const rl = (sp.releaseLv && sp.releaseLv[lv]) || sp.release, rid = has(rl) ? rl : idleId(), n = nOf(rid);
@@ -719,12 +849,12 @@ const jf = () => { const n = nOf('7'), ap = PK('apex', '7'); return { up: [0, Ma
 function jump() {
   if (!has('7')) return;
   P.mode = 'air'; P.z = 0; P.vz = 0; P.jumps = 1; P.airAtk = false; P.spin = 0;
-  P.airVX = (down('run') || P.runLatch) ? 430 : 250; P.takeoff = 0.06; sfx('jump');
+  P.airVX = ((down('run') || P.runLatch) ? 430 : 250) * (P.airMul || 1); P.takeoff = 0.06; sfx('jump');
   play('7', { seq: S(jf().up, 0.03) });
 }
 function doubleJump() {
   const j = jf();
-  sfx('jump', { pitch: 1.35 }); P.jumps = 2; P.vz = 1040; const up = R(Math.min(1, j.top), j.top); P.spin = up.length * 0.045; play('7', { seq: S(up, 0.045) });   // 2단 점프: 오르는 장을 다 거쳐 부드럽게(10-28 게슈간 뚝뚝 끊김)
+  sfx('jump', { pitch: 1.35 }); P.jumps++; P.vz = 1040; const up = R(Math.min(1, j.top), j.top); P.spin = up.length * 0.045; play('7', { seq: S(up, 0.045) });   // 2단 점프: 오르는 장을 다 거쳐 부드럽게(10-28 게슈간 뚝뚝 끊김)
   if (!vfx('double_jump', P.x, P.y - P.z + 2, 2.2)) fx.push({ k: 'burst', x: P.x, y: P.y - P.z + 4, t: 0.3, t0: 0.3 });
   ring(P.x, P.y - P.z + 4, 70, 0.25, 'rgba(220,240,255,.9)', 4, 0.35);
 }
@@ -735,7 +865,9 @@ function jumpAttack(heavyKind?: Json) {
   play('14', { seq: atkSeq('14', heavyKind).map((e, i, s) => { const { ev, ...r } = e; return { ...r, d: i === s.length - 1 ? 9 : e.d }; }) });
 }
 function land() {
-  sfx('land'); P.z = 0; P.vz = 0; P.airAtk = false; shake = Math.max(shake, 2); if (!vfx('land_dust', P.x, P.y, 2.2, { bottom: true })) dust(P.x, P.y, 5);
+  const slam = P.airAtk && P.airHeavy;
+  sfx('land'); P.z = 0; P.vz = 0; P.airAtk = false;
+  env.perk?.land({ heavy: slam, jumps: P.jumps }); shake = Math.max(shake, 2); if (!vfx('land_dust', P.x, P.y, 2.2, { bottom: true })) dust(P.x, P.y, 5);
   P.mode = 'act';
   const j = jf();
   play('7', { seq: [{ f: j.land[0], d: 0.045, cancel: true }, { f: j.land[1], d: 0.05, cancel: true }], onEnd: toIdle });
@@ -745,9 +877,9 @@ function land() {
 function takeHit(kind?: Json) {
   if (P.mode === 'dead') return;
   if (P.mode === 'air') { P.airAtk = false; P.spin = 0; }
-  if (P.inv > 0) { fx.push({ k: 'num', x: P.x, y: P.y - 230, v: '회피', t: 0.6 }); return; }
+  if (P.inv > 0) { fx.push({ k: 'num', x: P.x, y: P.y - 230, v: '회피', t: 0.6 }); if (P.dodging) env.perk?.evaded(); return; }
   if (P.mode === 'block') { sfx('guard'); shake = 4; if (!vfx('guard_block', P.x + P.face * 50 * K(P.y), P.y - 140 * K(P.y), 2.2, { flip: P.face < 0 })) sparks(P.x + P.face * 50, P.y - 140, 8, false, '#9fd0ff'); pushP(-200, 1200); return; }
-  if (armored()) { gainSp(5); sfx('armor'); P.armorT = 0.28; P.armorC = ''; hitstop = 0.06; shake = 6; return; }
+  if (armored()) { gainSp(5 * (P.hurtSp || 1)); sfx('armor'); P.armorT = 0.28; P.armorC = ''; hitstop = 0.06; shake = 6; return; }
   if (P.mode === 'charge') P.charge = 0;
   if (kind === 'knock') return knock();
   if (kind === 'low') return hitAs('18_1', -300, 12, 0.09);
@@ -756,12 +888,12 @@ function takeHit(kind?: Json) {
   hit();
 }
 // 공격 종류 → 피격 동작(사용자 2026-10-25): 약 = 맞기 상단(18) · 강 = 맞기 하단(18-1) · 날리기 = 크게 밀려나기(18-2) · 띄우기 = 띄워지기(18-3) · 다운 = 쓰러지기(19) · 누운 채 = 움찔(43) · HP 0 = 사망(44 서서 / 45 누워서)
-function hitAs(id?: Json, push?: Json, dmg?: Json, d = 0.055) { if (!has(id)) return hit(); gainSp(10); sfx('hurt', { strength: 2 }); P.combat = true; P.combo = 0; P.armed = false; pushP(push, 1100); flash = 0.05; shake = Math.max(shake, 6); P.hp = Math.max(1, P.hp - dmg); act(id, { seq: [{ f: 0, d: 0.02 }, ...S(R(1, nOf(id) - 1), d)] }); }
+function hitAs(id?: Json, push?: Json, dmg?: Json, d = 0.055) { if (!has(id)) return hit(); gainSp(10 * (P.hurtSp || 1)); sfx('hurt', { strength: 2 }); P.combat = true; P.combo = 0; P.armed = false; pushP(push, 1100); flash = 0.05; shake = Math.max(shake, 6); P.hp = Math.max(1, P.hp - dmg); act(id, { seq: [{ f: 0, d: 0.02 }, ...S(R(1, nOf(id) - 1), d)] }); }
 const LIE19 = () => CH.lie19 && CH.lie19.length ? CH.lie19.map((f?: Json) => cf('19', f - 1)) : LP('19');   // 누운 반복 = 빌드가 잰 「다 누운 장」만(10-29: 표의 반복 구간에 무릎 세운 장이 섞여 활어처럼 퍼덕임)
 function lieLoop() { const n = nOf('19'), lp = LIE19() || [n - 1]; if (P.mode !== 'down') P.downAt = P.t; P.mode = 'down'; play('19', { seq: lp.map((f?: Json) => ({ f, d: lp.length <= 2 ? 0.6 : 0.3 })), loopFrom: 0 }); }
 function launched() {
   if (!has('18_3')) return knock();
-  gainSp(20); sfx('hurt', { strength: 2 }); P.combat = true; P.combo = 0; P.armed = false; pushP(-380, 700); shake = 8;
+  gainSp(20 * (P.hurtSp || 1)); sfx('hurt', { strength: 2 }); P.combat = true; P.combo = 0; P.armed = false; pushP(-380, 700); shake = 8;
   P.mode = 'act'; P.knockT = 0; play('18_3', { seq: S(R(0, nOf('18_3') - 1), 0.07), onEnd: () => { dust(P.x, P.y, 6, 1.2); sfx('down'); lieLoop(); } });
 }
 function flinch() {   // 누운 채 맞음: 움찔했다 다시 누워 숨쉬기
@@ -776,18 +908,18 @@ function die() {
   sfx('hurt', { strength: 3 }); P.hp = 0; P.combat = false; P.armed = false; P.knockT = 0; P.mode = 'dead';
   play(id, { seq: S(R(0, nOf(id) - 1), lying ? 0.12 : 0.08), onEnd: () => fx.push({ k: 'num', x: P.x - 24, y: P.y - 60, v: '사망', t: 1.5 }) });
 }
-function hit() { if (!has('18')) return; gainSp(10); sfx('hurt'); P.combat = true; P.combo = 0; P.armed = false; pushP(-280, 1400); flash = 0.05; act('18', { seq: [{ f: 0, d: 0.02 }, ...S(R(1, A['18'].n - 1), 0.055)] }); }
+function hit() { if (!has('18')) return; gainSp(10 * (P.hurtSp || 1)); sfx('hurt'); P.combat = true; P.combo = 0; P.armed = false; pushP(-280, 1400); flash = 0.05; act('18', { seq: [{ f: 0, d: 0.02 }, ...S(R(1, A['18'].n - 1), 0.055)] }); }
 // 날아가 쓰러지기(19): 반복 구간(누워 숨) 앞까지 쓰러지고, 누운 채 반복
 function knock() {
   if (!has('19')) return hit();
-  gainSp(20); sfx('hurt', { strength: 2 }); P.combat = true; P.combo = 0; P.armed = false; if (CH.fallRev) P.face = -P.face; pushP(CH.fallRev ? 560 : -560, 650);   // fallRev: 19가 앞으로 엎어지게 그려진 인물 → 몸을 돌려 맞은 반대쪽에 머리가 떨어지게(10-28 이성해 등) shake = 8;
+  gainSp(20 * (P.hurtSp || 1)); sfx('hurt', { strength: 2 }); P.combat = true; P.combo = 0; P.armed = false; if (CH.fallRev) P.face = -P.face; pushP(CH.fallRev ? 560 : -560, 650);   // fallRev: 19가 앞으로 엎어지게 그려진 인물 → 몸을 돌려 맞은 반대쪽에 머리가 떨어지게(10-28 이성해 등) shake = 8;
   const n = nOf('19'), lp = LIE19() || [n - 1], fall = R(0, Math.max(0, lp[0] - 1));
   P.mode = 'act';
   const dustAt = Math.max(1, Math.round(fall.length * 0.65));
   play('19', { seq: [...S(fall, 0.07).map((e?: Json, i?: Json) => i === dustAt ? { ...e, ev: 'dust' } : e), ...lp.map((f?: Json) => ({ f, d: lp.length <= 2 ? 0.6 : 0.3 }))], loopFrom: fall.length });
   P.knockT = fall.length * 0.07;
 }
-function getUp() { if (!has('20')) return toIdle(); sfx('wakeup'); P.knockT = 0; act('20', { seq: S(R(0, nOf('20') - 1), 0.06), onEnd: () => { P.wakeArmor = 0.6; afterBuf(toIdle); } }); }
+function getUp() { if (!has('20')) return toIdle(); sfx('wakeup'); P.knockT = 0; P.wakeExtra = 0; act('20', { seq: S(R(0, nOf('20') - 1), 0.06), onEnd: () => { P.wakeArmor = 0.6; afterBuf(toIdle); } }); }
 function belly() {
   if (!has('38')) return;
   if (P.mode === 'down' && (CH.turn19 || []).includes('38')) P.face = -P.face;   // 기기 첫 장이 누운 장과 좌우 반대로 그려짐 → 몸을 돌려 머리 자리 유지(10-28 이기석)
@@ -920,8 +1052,10 @@ function onPress(a?: Json) {
   if ((P.mode === 'flee' || P.mode === 'back') && !['left', 'right', 'up', 'down', 'run'].includes(a)) toIdle();
   if (P.scene && ['left', 'right', 'up', 'down'].includes(a)) { P.scene = null; return toIdle(); }
   const m = P.mode;
+  // 낙법(퍽): 쓰러지는 순간(넘어지는 중이거나 닿고 0.3초 안) 회피 → 바로 일어나며 회피(모아 둔 회피를 씀, 기상 지연 무시)
+  if (a === 'dodge' && P.ukemi && P.dodgeN >= 1 && ((m === 'act' && P.knockT > 0) || (m === 'down' && P.t - (P.downAt ?? -9) < 0.3))) { P.knockT = 0; P.wakeBuf = null; toIdle0(); P.wakeArmor = 0.2; return dodge(); }
   if (m === 'air') {
-    if (a === 'jump' && P.jumps < 2) doubleJump();
+    if (a === 'jump' && P.jumps < (P.maxJumps || 2)) doubleJump();
     else if ((a === 'light' || a === 'heavy') && !P.airAtk) jumpAttack(a === 'heavy');
     return;
   }
@@ -947,7 +1081,7 @@ function onPress(a?: Json) {
     return;
   }
   // 기상 지연: 바닥에 닿고 wakeDelay(0.6초) 동안은 못 일어난다. 그동안 누른 키는 기억했다가 끝나면 일어난다(10-30 사용자 「벌떡벌떡 일어나면 되냐」). 누운 동안 무적은 그대로
-  if (m === 'down' && P.t - (P.downAt ?? -9) < P.wakeDelay) { if (a !== 'hit') P.wakeBuf = a; return; }
+  if (m === 'down' && P.t - (P.downAt ?? -9) < P.wakeDelay + (P.wakeExtra || 0)) { if (a !== 'hit') P.wakeBuf = a; return; }
   if (m === 'down') { if (a === 'crawl' || a === 'left' || a === 'right') return belly(); if (['jump', 'up', 'light', 'left', 'right', 'down', 'run'].includes(a)) return getUp(); return; }   // 누운 채 방향키·달리기도 일어나기(10-28: 쓰러진 뒤 「달리기가 안 됨」으로 보였음)
   if (m === 'belly') { if (a === 'jump' || a === 'crawl' || a === 'up') return getUp(); return; }
   if (m === 'stun') { P.stunT -= 0.18; return; }
@@ -961,7 +1095,7 @@ function onPress(a?: Json) {
     case 'light': return running && moving ? slide() : light();
     case 'heavy': return running && moving ? slide() : heavy();   // 뛰다 강공격도 돌진 공격(사용자 2026-10-25)
     case 'dodge': return dodge();
-    case 'block': if (!has('17')) return; P.combat = true; P.armed = false; P.mode = 'block'; return play('17', { seq: S(R(0, nOf('17') - 1), 0.03) });
+    case 'block': if (!has('17')) return; P.combat = true; P.armed = false; P.mode = 'block'; env.perk?.blockPressed(); return play('17', { seq: S(R(0, nOf('17') - 1), 0.03) });
     case 'shoot': return shoot();
     case 'skill': return skillPress();
     case 'skill2': return skill2();
@@ -1018,13 +1152,23 @@ function updateFx(dt?: Json) {
     else if (e.k === 'proj') {
       e.x += e.dir * e.v * dt;
       if (e.fancy) { e.trail.push([e.x, e.y]); if (e.trail.length > 9) e.trail.shift(); }
-      const dk = K(T.y);
-      if (!!T && !e.done.has(1) && Math.abs(T.y - e.gy) < 60 && Math.abs(T.x - e.x) < 34 * dk && e.y > T.y - T.z - 240 * dk && e.y < T.y - T.z + 10) {
-        e.done.add(1); strike(e.hit || { dmg: 8, kind: 'light' }, e.y);
-        if (e.fancy) { vfx('x3-c-hit-spark-heavy', T.x, e.y, 1.1 * e.size, { center: true, flip: e.dir < 0, tint: e.c }); ring(T.x, e.y, 60 * e.size, 0.3, e.c, 4, 1); sparks(T.x, e.y, 12, true, e.c); shake = Math.max(shake, 7); }
-        if (e.end) runFx(e.end, { pt: { x: T.x, y: T.y, z: T.z }, o: { x: e.x, y: e.y } });
-        if (!e.pierce) e.t = 0;
+      // 맞는 상대: 가장 가까운 앞 상대만 보던 것 → 지나가는 길의 상대 누구든(관통이면 여럿, 같은 상대는 한 번)
+      const q = proxies().find(q => { const dk = K(q.y); return !e.done.has(q.body) && Math.abs(q.y - e.gy) < 60 && Math.abs(q.x - e.x) < 34 * dk && e.y > q.y - q.z - 240 * dk && e.y < q.y - q.z + 10; });
+      if (q) {
+        e.done.add(q.body); const t0 = T, s0 = curSrc, u0 = curUse; T = q; hitList = [q]; curSrc = e.src; curUse = e.use;
+        const h0 = e.hit || { dmg: 8, kind: 'light' }, km = (e.mul ?? 1) * (e.back ? (e.boomer ? 0.6 : 0.7) : 1) * (e.nHit++ ? 0.7 : 1);
+        strike(km !== 1 ? { ...h0, dmg: Math.round((h0.dmg || 8) * km) } : h0, e.y);
+        curSrc = s0; curUse = u0;
+        if (e.fancy) { vfx('x3-c-hit-spark-heavy', q.x, e.y, 1.1 * e.size, { center: true, flip: e.dir < 0, tint: e.c }); ring(q.x, e.y, 60 * e.size, 0.3, e.c, 4, 1); sparks(q.x, e.y, 12, true, e.c); shake = Math.max(shake, 7); }
+        if (e.end) runFx(e.end, { pt: { x: q.x, y: q.y, z: q.z }, o: { x: e.x, y: e.y } });
+        T = t0 || T;
+        if (!e.pierce && !e.back && !e.boomer) e.t = 0;
       }
+      // 부메랑 투척: 사거리 끝(약 5m)에서 돌아오며 한 번 더(60%, 돌아오는 길은 관통)
+      if (e.boomer && !e.back && Math.abs(e.x - e.x0) > 520) { e.back = true; e.dir = -e.dir; e.done = new Set(); e.t = 1.2; }
+      if (e.boomer && e.back && Math.abs(e.x - P.x) < 30) e.t = 0;
+      // 도탄: 아무도 못 맞히고 화면 끝에 닿으면 한 번 튕겨 돌아온다(70%, 탄막 반사면 두 발로 갈라짐)
+      if (e.bounce && !e.back && !e.nHit && (e.x < VX0 + 10 || e.x > W - 10)) { e.back = true; e.dir = -e.dir; e.done = new Set(); e.t = 1.4; sparks(e.x, e.y, 6, false, '#fff6d0'); if (e.split) fx.push({ ...e, y: e.y + 30, gy: e.gy + 40, done: new Set(), trail: [] }); }
       if (e.x < VX0 - 40 || e.x > W + 40) e.t = 0;
     }
     else if (e.k === 'wave') {
@@ -1064,13 +1208,15 @@ function update(dt?: Json) {
   if (P.mode !== 'air' && P.z > 0) { P.vz = Math.min(P.vz || 0, 300) - 2700 * dt; P.z = Math.max(0, P.z + P.vz * dt); if (P.z === 0) { P.vz = 0; dust(P.x, P.y, 4, 1); sfx('land'); } }
   if (P.clip && (P.clip.id === 'SH_D' || P.clip.id === 'SH_E') && Math.random() < dt * 60) { const k = K(P.y); fx.push({ k: 'mote', x: P.x + (Math.random() - 0.5) * 70 * k, y: P.y - (230 + Math.random() * 40) * k, vy: 700 + Math.random() * 200, c: 'rgba(170,220,255,.8)', t: 0.3 }); }   // 샤워 물줄기(코드)
   P.inv = Math.max(0, P.inv - dt); P.wakeArmor = Math.max(0, (P.wakeArmor || 0) - dt);
-  if (P.mode === 'down' && P.wakeBuf && P.t - (P.downAt ?? -9) >= P.wakeDelay) { const k = P.wakeBuf; P.wakeBuf = null; onPress(k); }
+  if (P.mode === 'down' && P.wakeBuf && P.t - (P.downAt ?? -9) >= P.wakeDelay + (P.wakeExtra || 0)) { const k = P.wakeBuf; P.wakeBuf = null; onPress(k); }
   else if (P.mode !== 'down') P.wakeBuf = null;
+  if ((P.skillMax || 1) > 1 && P.skillN < P.skillMax && (P.cd.skill || 0) <= P.t) { P.skillN++; if (P.skillN < P.skillMax) setCd('skill'); }
   if (P.dodgeN < P.dodgeMax) { P.dodgeT -= dt; if (P.dodgeT <= 0) { P.dodgeN++; P.dodgeT = P.dodgeN < P.dodgeMax ? P.dodgeCd : 0; } }
   if (P.overT > 0) { P.overT -= dt; P.heat = 100 * Math.max(0, P.overT) / 2.6; if (Math.random() < dt * 6) { const p = P.armed ? muzzle() : { x: P.x + P.face * 30 * K(P.y), y: P.y - 150 * K(P.y) }; steam(p.x, p.y, 1.2); } }
   else if (P.t - P.lastShot > 0.35) P.heat = Math.max(0, P.heat - 30 * dt);
   if (P.ghostT > 0) { P.ghostT -= dt; P.ghostN = (P.ghostN || 0) + dt; if (P.clip && P.ghostN > 0.05 && !(P.ghostN = 0)) fx.push({ k: 'ghost', id: P.clip.id, f: curF(), x: P.x, y: P.y, z: P.z, face: P.face, t: 0.18, t0: 0.18 }); }
   if (P.dash) { const d = P.dash; P.x += P.face * d.v * dt; d.t -= dt; if (!d.done && !!T && Math.abs(T.y - P.y) < 70 && Math.abs(T.x - P.x) < 70 * K(P.y)) { d.done = true; if (d.hit !== null) { const h = d.hit || { dmg: 40, kind: 'blow' }; d.delay ? later(d.delay, () => strike(h)) : strike(h); } if (d.stop) d.t = Math.min(d.t, d.stop); } if (d.t <= 0 || P.x < 75 || P.x > W - 75) P.dash = null; }
+  if (P.dodgeV && P.dodging) env.perk?.dodgeTick();
   if (P.dodgeV) { P.x += P.dodgeV.x * dt; P.y += P.dodgeV.y * dt; P.dodgeV.x *= Math.pow(0.004, dt); P.dodgeV.y *= Math.pow(0.004, dt); }
   if (P.pvx) { P.x += P.face * P.pvx * dt; const s = Math.sign(P.pvx); P.pvx -= s * P.pdec * dt; if (Math.sign(P.pvx) !== s) P.pvx = 0; }
   const dx = (down('right') ? 1 : 0) - (down('left') ? 1 : 0), dy = (down('down') ? 1 : 0) - (down('up') ? 1 : 0);
@@ -1079,10 +1225,12 @@ function update(dt?: Json) {
     case 'ground': {
       if (down('flee') && has('36')) { P.mode = 'flee'; play('36', { fps: 14, loopFrom: 0 }); break; }
       if (down('back') && has('37')) { P.mode = 'back'; play('37', { fps: 10, onEnd: () => { if (P.mode !== 'back') return; if (has('37_1')) { const n = nOf('37_1'), lp = LP('37_1') || R(Math.min(1, n - 1), n - 1); play('37_1', { seq: S(lp, 0.11), loopFrom: 0 }); } else { const n = nOf('37'); play('37', { seq: [{ f: n - 2, d: 0.17 }, { f: n - 1, d: 0.17 }], loopFrom: 0 }); } } }); break; }
+      if (!(dx || dy)) P.runT = 0;
       if (dx || dy) {
         if (P.armed) P.armed = false;
         if (dx && dx !== P.face) { P.prevFace = P.face; P.faceT = P.t; P.face = dx; }
-        const sp = (running ? 430 : 230) * (P.dying ? 0.6 : 1) * (env.mod ? env.mod.speed() : 1);
+        const sp = (running ? 430 * (P.runMul || 1) : 230) * (P.dying ? 0.6 : 1) * (env.mod ? env.mod.speed() : 1);
+        P.runT = running ? (P.runT || 0) + dt : 0;
         P.x += dx * sp * dt; P.y += dy * sp * 0.55 * dt;
         const id = running && !P.dying && has('5') ? (has('5_1') ? '5_1' : '5') : '4';   // 5_1: 끝 장이 첫 장으로 닫힌 뛰기 반복(끝 장은 첫 장과 같아 뺌)
         const cyc = CH.cycle && CH.cycle[id];   // 끝→첫 장이 튀는 인물은 잘 이어지는 구간만 되풀이(10-29: 걷기·뛰기 뚝뚝 끊김)
@@ -1121,6 +1269,7 @@ function update(dt?: Json) {
     case 'charge': {
       if (!down('charge') && !down('skill')) { release(); break; }
       P.charge = Math.min(chLevels()[chLevels().length - 1] + 0.3, P.charge + dt);
+      env.perk?.chargeTick(dt);
       const lv = chLv();
       if (lv > P.chargeShown) { P.chargeShown = lv; sfx('ability'); const m = handPt(); ring(m.x, m.y, 30 + lv * 14, 0.3, CH_COL[Math.min(3, lv)], 3); flash = 0.04; }
       break;
@@ -1285,7 +1434,7 @@ function drawFxUnder() {
   for (const e of fx) if (e.k === 'puddle') { const k = e.t / e.t0, g = Math.min(1, (1 - k) * 5) * Math.min(1, k * 3); ctx.fillStyle = 'rgba(8,4,14,' + (0.85 * g) + ')'; ctx.beginPath(); ctx.ellipse(e.x, e.y, e.r * (0.5 + 0.5 * g), e.r * 0.26 * (0.5 + 0.5 * g), 0, 0, Math.PI * 2); ctx.fill(); ctx.strokeStyle = e.c; ctx.globalAlpha = 0.6 * g; ctx.lineWidth = 2; ctx.stroke(); ctx.globalAlpha = 1; }
   for (const e of fx) if (e.k === 'dust') { const k = e.t / e.t0; ctx.fillStyle = `rgba(200,190,170,${0.45 * k})`; ctx.beginPath(); ctx.arc(e.x, e.y - 4, e.r * (1.6 - k), 0, Math.PI * 2); ctx.fill(); }
   for (const e of fx) if (e.k === 'drop' && e.y >= e.g) drawDrop(e);
-  for (const e of fx) if (e.k === 'ghost' && A[e.id]) drawSprite(e.id, e.f, e.x, e.y, e.z, e.face, 0.16 * e.t / e.t0, { c: '#a8ccff', over: 0.3, noEdge: true });
+  for (const e of fx) if (e.k === 'ghost' && A[e.id]) drawSprite(e.id, e.f, e.x, e.y, e.z, e.face, e.a ? e.a : 0.16 * e.t / e.t0, { c: '#a8ccff', over: 0.3, noEdge: true });
 }
 // 소환물·떨어지는 것: 작은 도트 그림(코드)
 function drawIcon(icon?: Json, x?: Json, y?: Json, s?: Json, c?: Json, face = 1) {
@@ -1490,6 +1639,8 @@ function drawCut() {
     P, A, CH, onPress, onRelease, takeHit, update, frameView, drawUnder, drawBody, drawFxLayer, drawScreen, armored,
     get hitstop() { return hitstop; }, get shake() { return shake; }, get zoom() { return zoom; }, get target() { return T; },
     knock, hit, stun, die, sitAt, rise, seatAct, runScene, playLife, lifeIds, emote, act, toIdle, has, nOf, SCENES,
+    /** 퍽 손잡이 (fighter/player.ts 가 PerkHost 로 묶음) */
+    perkApi: { proxies, hit: perkHit, boom: perkBoom, ghost: ghostAttack, replaySkill, reflect: reflectShot, mark: markT, bind: bindT, later: (t: number, fn: () => void) => later(t, fn), text: (x: number, y: number, v: string) => fx.push({ k: 'num', x: x - 30, y, v, t: 1.1 }), gainSp: (v: number) => { P.sp = Math.min(100, P.sp + v); } },
     /** 시험장 전용 스위치: 필살 게이지 무시 */
     get freeSuper() { return freeSuper; }, set freeSuper(v: boolean) { freeSuper = v; },
     /** 시험장 의자 맞추기: 고친 값 묶음(바꾸면 바로 그림에 반영)·지금 맞춤 값 */

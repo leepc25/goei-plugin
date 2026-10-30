@@ -1,6 +1,9 @@
 // 전투 AI 상대(10-29 본 게임 탑재): 인물 플레이어(fighter/player.ts)를 가상 버튼으로 조종하는 적 몸 (docs/전투_AI_설계.md 3장 「AI도 플레이어와 같은 버튼」).
 // eileen/aiFighter.ts 를 126명 공용으로: 어떤 인물 팩이든 같은 두뇌를 그 키트에 붙인다(13장).
 import { NPC_SKILL_MUL } from '../../combat/grades';
+import { STATUS } from '../../combat/status';
+import { perkDecoy, perkWorld } from '../../perks/runtime';
+import { drawAilments } from '../ui/ailments';
 import type { Body, WorldView } from '../engine/contract';
 import type { Btn as PadBtn, Pad } from '../engine/input';
 import type { FrameInfo } from '../engine/art';
@@ -40,8 +43,13 @@ export class FighterAi extends FighterPlayer {
   /** 때릴 상대 = 주인공 (주인공 편 동행자가 생기면 여기에) */
   protected foes(): Body[] {
     const w = this.worldNow;
-    return w && w.player.alive ? [w.player as unknown as Body] : [];
+    const out = w && w.player.alive ? [w.player as unknown as Body] : [];
+    // 제 편 때리기(플레이어 퍽): 혼란 걸린 동안은 다른 적도 맞는다
+    if (w && perkWorld.friendlyFire && this.status.has('confuse')) out.push(...(w as WorldView & { bodies: Body[] }).bodies.filter((b) => b !== (this as unknown as Body) && b.alive && b.team === 'enemy' && b.hp > 0 && b.kind !== 'bullet'));
+    return out;
   }
+  /** 방 안이 먼저 지친다(플레이어 퍽): 공격 간격 배수 */
+  perkGap = 1;
   protected extraFoes() {
     return [];
   }
@@ -53,9 +61,12 @@ export class FighterAi extends FighterPlayer {
       free: ['ground', 'chain', 'block'].includes(me.mode),
       air: me.mode === 'air',
       stunned: ['down', 'belly', 'stun'].includes(me.mode) || this.phase === 'down',
-      hp: this.hp / this.hpMax, sp: me.sp ?? 0, guard: this.guard, gap: this.status.attackGap(),
+      hp: this.hp / this.hpMax, sp: me.sp ?? 0, guard: this.guard, gap: this.status.attackGap() * this.perkGap,
     };
-    const d = this.brain.tick(self, foeSense(world.player as unknown as Body));
+    const foe = foeSense(world.player as unknown as Body);
+    // 미끼 잔상(플레이어 퍽): 남아 있는 동안 그 자리를 노린다
+    if (perkDecoy.until > performance.now()) { foe.x = perkDecoy.x; foe.y = perkDecoy.y; foe.attacking = false; }
+    const d = this.brain.tick(self, foe);
     const p = this.pad;
     p.pressed.clear();
     p.released.clear();
@@ -85,7 +96,7 @@ export class FighterAi extends FighterPlayer {
 
   /** 머리 위 체력 막대(맞은 뒤에만), 방어막이 있으면 그 위에 흰 막대 */
   private drawBar(ctx: CanvasRenderingContext2D): void {
-    if (!this.alive || (this.hp >= this.hpMax && this.shield >= this.shieldMax)) return;
+    if (!this.alive || (this.hp >= this.hpMax && this.shield >= this.shieldMax && !this.status.list.length)) return;
     // 몸 자리 기준 좌표 (draw 가 받은 ctx 원점 = 발밑)
     const top = -this.height() - 14, w = 70;
     ctx.fillStyle = 'rgba(0,0,0,.6)';
@@ -96,5 +107,6 @@ export class FighterAi extends FighterPlayer {
       ctx.fillStyle = '#dfe8ee';
       ctx.fillRect(-w / 2, top, (w * this.shield) / this.shieldMax, 3);
     }
+    drawAilments(ctx, this.status.list.map((s) => STATUS[s.kind].label + (s.stacks > 1 ? s.stacks : '')), top - 4);
   }
 }

@@ -45,11 +45,17 @@ export interface Status {
   stacks: number;
   /** 남은 초 */
   t: number;
+  /** 거는 쪽 배율 (퍽 「깊은 상처」: 출혈 피해 ×) */
+  mul?: number;
 }
 
 export class StatusSet {
   list: Status[] = [];
   private blockT = 0;
+  /** 걸리지 않는 상태 (퍽 「정신 방벽」: 공포·혼란) */
+  immune?: Set<DebuffKind>;
+  /** 오염 단계마다 줄어드는 최대 체력 (퍽 「내성」으로 줄어듦) */
+  taintPer?: number;
 
   has(k: DebuffKind): boolean {
     return this.list.some((s) => s.kind === k);
@@ -59,13 +65,15 @@ export class StatusSet {
   }
 
   /** 걸기. sec 생략이면 기본 시간. 새로 걸렸으면 true (글귀를 띄울지) */
-  apply(kind: DebuffKind, sec?: number): boolean {
+  apply(kind: DebuffKind, sec?: number, mul?: number): boolean {
+    if (this.immune?.has(kind)) return false;
     const def = STATUS[kind];
     const dur = def.sec === Infinity ? Infinity : Math.max(0.5, sec ?? def.sec);
     const cur = this.list.find((s) => s.kind === kind);
     if (cur) {
       cur.stacks = Math.min(def.max, cur.stacks + (def.max > 1 ? 1 : 0));
       cur.t = Math.max(cur.t, dur);
+      if (mul) cur.mul = Math.max(cur.mul ?? 1, mul);
       return false;
     }
     if (this.list.length >= STATUS_NUM.maxDebuffs) {
@@ -73,7 +81,7 @@ export class StatusSet {
       const out = [...this.list].sort((a, b) => a.t - b.t)[0];
       this.list = this.list.filter((s) => s !== out);
     }
-    this.list.push({ kind, stacks: 1, t: dur });
+    this.list.push({ kind, stacks: 1, t: dur, ...(mul ? { mul } : {}) });
     return true;
   }
 
@@ -93,7 +101,7 @@ export class StatusSet {
   step(dt: number, o: { maxHp: number; running?: boolean; blocking?: boolean }): number {
     let dmg = 0;
     const bleed = this.stacks('bleed');
-    if (bleed) dmg += o.maxHp * STATUS_NUM.bleedPerSec * bleed * (o.running ? 2 : 1) * dt;
+    if (bleed) dmg += o.maxHp * STATUS_NUM.bleedPerSec * bleed * (o.running ? 2 : 1) * dt * (this.list.find((s) => s.kind === 'bleed')?.mul ?? 1);
     // 막기를 이어 하면 출혈이 멎는다
     this.blockT = o.blocking ? this.blockT + dt : 0;
     if (bleed && this.blockT >= STATUS_NUM.bleedBlockStop) this.cure('bleed');
@@ -112,7 +120,8 @@ export class StatusSet {
   }
   spMul(): number {
     return this.has('headache') ? STATUS_NUM.headacheSp : 1;
-  }  /** AI 두뇌의 공격 간격 배수: 두통이면 느려진다 */
+  }
+  /** AI 두뇌의 공격 간격 배수: 두통이면 느려진다 */
   attackGap(): number {
     return this.has('headache') ? STATUS_NUM.headacheGap : 1;
   }
@@ -128,7 +137,7 @@ export class StatusSet {
   }
   /** 오염으로 줄어든 최대 체력 비율 (1 = 그대로) */
   maxHpRatio(): number {
-    return Math.max(0.2, 1 - STATUS_NUM.taintPerStack * this.stacks('taint'));
+    return Math.max(0.2, 1 - (this.taintPer ?? STATUS_NUM.taintPerStack) * this.stacks('taint'));
   }
 
   /** 화면 표시용 */

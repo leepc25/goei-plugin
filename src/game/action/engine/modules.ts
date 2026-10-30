@@ -877,11 +877,14 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
       if (run.stageId === 'hq') return void npc.attach(w, { hub: (hq.hub?.() ?? null) as never, hq: true }); // 본부 걷기: 아이템·대사 안내·전투 기록 없음
       w.threat = (b) => (DEF_BY_KIND[b.kind] ? isThreat(b as never) : true);
       w.on((e) => {
+        // 임시 퍽(src/game/perks): 층(방)에 들어감 · 전투를 끝냄
+        if (w.player instanceof FighterPlayer && e.type === 'enter:floor') w.player.perks.roomEnter();
+        if (w.player instanceof FighterPlayer && e.type === 'combat:clear') w.player.perks.roomClear();
         if (e.type !== 'custom') return;
         const d = (e.data ?? {}) as { dmg?: number; text?: string; kind?: string; ticks?: number; debuff?: { kind?: string; ticks?: number } };
         // 디버프는 글자만이 아니라 실제로 건다 (src/game/combat/status.ts, 에일린)
         const st = (w.player as { status?: StatusSet }).status;
-        const dur = (w.player as { stat?: { statusDur: number } }).stat?.statusDur ?? 1;   // 정신력(정)으로 지속이 줄어듦
+        const dur = ((w.player as { stat?: { statusDur: number } }).stat?.statusDur ?? 1) * (w.player instanceof FighterPlayer ? w.player.perks.inDur() : 1);   // 정신력(정)으로 지속이 줄어듦 · 퍽 내성
         const put = (k?: string, ticks?: number) => { if (st && k && k in STATUS) st.apply(k as DebuffKind, ticks ? (ticks / 30) * dur : undefined); };
         // 회피·무적으로 피했으면 디버프도 안 건다(10-30: 피해는 0인데 출혈 등이 걸리던 버그)
         if (e.name === 'hurtPlayer') { if (w.api.hurtPlayer(d.dmg ?? 10) !== false) put(d.debuff?.kind, d.debuff?.ticks); }

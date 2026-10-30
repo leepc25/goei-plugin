@@ -9,6 +9,8 @@ import type { Armor, Body, Debuff, FrameBoxes, Hit, HitResult, LocalBox, Move, P
 import { rollDrops, fireDropHook } from './drops';
 import { armDebuff, checkDebuffs } from './debuff';
 import { drawFigure, drawSwing } from './look';
+import { drawAilments } from '../ui/ailments';
+import { STATUS, StatusSet } from '../../combat/status';
 import { PIXEL_FONT, kitPiece, kitSlice, nine } from '../ui/kit';
 
 export type St = 'spawn' | 'idle' | 'walk' | 'attack' | 'hurt' | 'air' | 'down' | 'getup' | 'bound' | 'grabbing' | 'dormant' | 'hidden' | 'flee' | 'dead' | 'stunned';
@@ -105,6 +107,16 @@ export class Enemy implements Body {
   /** 과장님 호명 버프 남은 틱 */
   rally = 0;
   slow = 0;
+  /** 상태 이상 (플레이어 기술 부가효과·퍽이 건다, src/game/combat/status.ts) */
+  status = new StatusSet();
+  /** 벽꽝 추가 피해(최대 체력 비율, 퍽 「벽꽝 강화」 0.15) · 다운 전 띄우기 횟수(퍽 「공중 사냥」 3) */
+  wallDmg = 0.06;
+  maxLaunch = 2;
+  /** 공격 간격 배수 (퍽 「방 안이 먼저 지친다」) · 공격 끝난 뒤 쉬는 틱(두통·지침) */
+  perkGap = 1;
+  restT = 0;
+  /** 기상 지연 틱 (퍽 「바닥 차갑지?」·「얼어붙은 발」) */
+  wakeExtra = 0;
   /** 0~1 보이는 정도 (발소리·소리와 냄새) */
   alpha = 1;
   /** 그로기 게이지 (수호자) */
@@ -167,7 +179,7 @@ export class Enemy implements Body {
     return this.affixes.includes(a);
   }
   speed(): number {
-    return this.def.speed * (this.has('fast') ? 1.35 : 1) * (this.rally > 0 ? 1.3 : 1) * (this.slow > 0 ? 0.6 : 1);
+    return this.def.speed * (this.has('fast') ? 1.35 : 1) * (this.rally > 0 ? 1.3 : 1) * (this.slow > 0 ? 0.6 : 1) * this.status.speedMul();
   }
   set(s: St) {
     if (this.state !== s) (this.state = s), (this.st = 0);
@@ -185,7 +197,12 @@ export class Enemy implements Body {
 
   /** 공격 시작. 예고 장이 있으면 enemyTell/bossTell을 낸다 */
   start(move: Move, w: WorldView, cd = 0) {
+    // 침묵: 특수기(쿨 있는 기술)를 못 쓴다
+    if (cd && this.status.has('silence')) { this.restT = 15; return; }
+    cd *= this.status.attackGap() * this.perkGap;
     this.move = move;
+    // 혼란: 엉뚱한 쪽으로 휘두른다 (퍽 「제 편 때리기」면 다른 적이 맞음)
+    if (this.status.has('confuse')) this.dir = (this.dir === 1 ? -1 : 1);
     this.mf = 0;
     this.atk = newAttackId(move.specs.length);
     this.mem.last = move.id;
@@ -266,6 +283,13 @@ export class Enemy implements Body {
       if (++this.deadT > 24) this.alive = false;
       return;
     }
+    // 상태 이상: 출혈 지속 피해(쓰러뜨리지는 않음, 1 남김)·오염 최대 체력
+    if (this.status.list.length) {
+      const d = this.status.step(1 / 30, { maxHp: this.hpMax });
+      if (d > 0 && this.hp > 1) this.hp = Math.max(1, this.hp - d);
+      const cap = this.hpMax * this.status.maxHpRatio();
+      if (this.hp > cap) this.hp = cap;
+    }
     if (this.has('regen') && this.age - this.lastHurt > 90 && this.hp < this.hpMax) this.hp = Math.min(this.hpMax, this.hp + this.hpMax * 0.003);
     stillTicks(w);
     if (this.state === 'spawn' && this.st >= 12) this.set('idle');
@@ -285,7 +309,7 @@ export class Enemy implements Body {
         if (--this.stunT <= 0) this.set('idle');
         break;
       case 'down':
-        if (this.st >= (this.mem.downFor ?? 30)) (this.set('getup'), (this.launches = 0));
+        if (this.st >= (this.mem.downFor ?? 30) + this.wakeExtra) (this.set('getup'), (this.launches = 0), (this.wakeExtra = 0));
         break;
       case 'getup':
         if (this.st >= 12) ((this.inv = 10), this.set('idle'));
@@ -301,6 +325,10 @@ export class Enemy implements Body {
         break;
       case 'idle':
       case 'walk':
+        if (this.restT > 0) { this.restT--; break; }
+        // 공포: 플레이어에게서 물러난다 · 혼란: 갈피 없이 오락가락
+        if (this.status.has('fear')) { this.face(w.player.x); this.x -= this.dir * this.speed(); this.set('walk'); break; }
+        if (this.status.has('confuse') && this.age % 60 < 30) { this.x += Math.sin(this.age * 0.15) * this.speed(); this.set('walk'); break; }
         this.brain.think?.(this, w);
         break;
     }
@@ -334,6 +362,9 @@ export class Enemy implements Body {
     this.move = null;
     this.mf = 0;
     this.set('idle');
+    // 두통(×1.25)·방 지침: 공격 사이를 그만큼 더 쉰다
+    const g = this.status.attackGap() * this.perkGap;
+    if (g > 1) this.restT = Math.round(40 * (g - 1));
   }
   private beginGrab(g: { ticks: number; dmgPerTick: number; every?: number }, w: WorldView) {
     this.set('grabbing');
@@ -380,7 +411,7 @@ export class Enemy implements Body {
       // 벽 충돌: 강하게 밀려 벽에 닿으면 추가 피해 + 다운 (E.1)
       if ((this.x < bx0 + 20 || this.x > bx1 - 20) && Math.abs(this.vx) > 7 && !this.mem.wallHit) {
         this.mem.wallHit = true;
-        this.hp -= Math.round(this.hpMax * 0.06);
+        this.hp -= Math.round(this.hpMax * this.wallDmg);
         this.vx = -this.vx * 0.3;
         w.fx('spark-big', this.x, this.y, 80);
         w.shake(5, 3);
@@ -490,7 +521,7 @@ export class Enemy implements Body {
         this.vx = hit.dir * push;
         return;
       case 'launch':
-        if (this.launches >= 2) return this.knockDown(hit);
+        if (this.launches >= this.maxLaunch) return this.knockDown(hit);
         this.launches++;
         this.set('air');
         this.vz = hit.lift ?? 12;
@@ -617,6 +648,12 @@ export function drawEnemy(e: Enemy, ctx: CanvasRenderingContext2D) {
       ctx.fillStyle = '#7fd0ff';
       ctx.fillRect(e.x - w / 2, top + 7, (w * Math.min(1, e.groggy / e.groggyMax)) / 1, 3);
     }
+  }
+  if (e.state !== 'dead' && e.status.list.length) {
+    ctx.save();
+    ctx.translate(e.x, e.y - e.z - e.def.h - 18);
+    drawAilments(ctx, e.status.list.map((s) => STATUS[s.kind].label + (s.stacks > 1 ? s.stacks : '')), 0);
+    ctx.restore();
   }
   if (e.bubble) drawBubble(ctx, e.bubble, e.x, e.y - e.z - e.def.h - 30);
   ctx.restore();

@@ -6,6 +6,9 @@
 import { mountGame } from '../main';
 import { FighterPlayer } from './player';
 import type { GameAssets } from '../../bridge';
+import { PERK_TEXT, TRAIT_TEXT } from '../../perks/defs.gen';
+import { HELD, kitOf, perkOk } from '../../perks/rules';
+import { openDraft } from '../../perks/draftUi';
 
 type Row = { key: string; name: string; num: string; npc: boolean };
 
@@ -123,6 +126,54 @@ function fill(p: FighterPlayer) {
   lab.append(free, document.createTextNode('필살 게이지 무시'));
   live.append(el('h2', {}, '스위치'), lab);
 
+  // 퍽 (임시 · 괴이 안, src/game/perks): 3택1 보상 창·하나씩 넣고 빼기·방 사건·쌓임 표시
+  const perkBox = el('div');
+  live.append(el('h2', {}, '퍽 (임시 · 괴이 안)'), el('div', { class: 'm' }, '「3택1 보상」은 본 게임 방 보상 창 그대로 · 아래 목록 + 로 바로 넣기(회색 = 이 인물 출현 조건 밖, 시험용으로는 넣을 수 있음) · 아이템 보류 8개는 뺌'), perkBox);
+  const world = () => (globalThis as { __goeiEngine?: { world: { paused: boolean; api: { spawn(s: object): unknown }; player: { x: number; y: number } } | null } }).__goeiEngine?.world ?? null;
+  const kit = kitOf(cfg, (id) => c.has(id), p.base.str);
+  const ctl = el('div', { class: 'grid' });
+  ctl.append(
+    btn('3택1 보상', () => openDraft(box, p, { world: world() })),
+    btn('방 들어감', () => p.perks.roomEnter()),
+    btn('방 깸', () => p.perks.roomClear()),
+    btn('퍽 다 비우기', () => p.perks.reset()),
+    btn('적 3 (칼잡이)', () => { const w = world(); if (w) for (let i = 0; i < 3; i++) w.api.spawn({ kind: 'fb_sword', x: w.player.x + 260 + i * 90, y: w.player.y + (i - 1) * 40 }); }),
+    btn('적 AI 1', () => { const w = world(); if (w) w.api.spawn({ kind: 'ai-char', x: w.player.x + 300, y: w.player.y }); }),
+  );
+  const ownBox = el('div', { class: 'm' });
+  const listBox = el('div');
+  perkBox.append(ctl, el('div', { class: 'm', style: 'margin-top:6px;color:#e8c27a' }, '가진 것'), ownBox, listBox);
+  let seen = '';
+  const drawOwn = () => {
+    const st = p.perks.stacks().map((x) => `${x.name} ${x.v}/${x.max}`).join(' · ');
+    const key = `${p.perks.version}|${st}`;
+    if (key === seen) return;
+    seen = key;
+    ownBox.innerHTML = '';
+    const g = el('div', { class: 'grid' });
+    for (const [n, r] of p.perks.ranks) g.append(btn(`− ${n}${r > 1 ? ` ${r}` : ''}`, () => p.perks.remove(n)));
+    for (const n of p.perks.traits) g.append(btn(`− [특성] ${n}`, () => p.perks.remove(n)));
+    if (!p.perks.ranks.size && !p.perks.traits.size) g.append(el('span', {}, '없음'));
+    ownBox.append(g);
+    if (st) ownBox.append(el('div', {}, `쌓임: ${st}`));
+  };
+  perkTick = drawOwn;
+  const cats = [...new Set(PERK_TEXT.map((x) => x.cat))];
+  for (const cat of cats) {
+    const g = el('div', { class: 'grid' });
+    for (const d of PERK_TEXT.filter((x) => x.cat === cat && !HELD.has(x.name))) {
+      const ok = perkOk(d.name, kit, { ranks: new Map([...PERK_TEXT.map((x) => [x.name, 1] as [string, number])]), traits: new Set(['저주받은 손']) });
+      const b = btn(`+ ${d.name}`, () => p.perks.add(d.name), `${d.kind} · 랭크 ${d.rank >= 99 ? '∞' : d.rank}${d.cond ? ` · 조건 ${d.cond}` : ''}\n${d.eff}`);
+      if (!ok) b.style.opacity = '0.45';
+      if (d.kind === '쌍') b.style.borderColor = '#e0b43a';
+      g.append(b);
+    }
+    listBox.append(el('div', { class: 'm', style: 'margin-top:6px' }, cat), g);
+  }
+  const tg = el('div', { class: 'grid' });
+  for (const t of TRAIT_TEXT.filter((x) => !HELD.has(x.name))) { const b = btn(`+ ${t.name}`, () => p.perks.addTrait(t.name), `장점 ${t.good}\n대가 ${t.cost}`); b.style.borderColor = '#9a6ae0'; tg.append(b); }
+  listBox.append(el('div', { class: 'm', style: 'margin-top:6px' }, '특성'), tg);
+
   // 의자 맞추기 (옛 테스트룸 칸 그대로): 앉아 있는 방향의 의자를 1화소씩 옮기고 「값 복사」로 chairs/<키>.json 에 넣을 값을 낸다.
   // 고친 값은 이 브라우저에 인물별로 남는다(옛 테스트룸과 같은 열쇠 chair.<키>)
   const chairBox = el('div');
@@ -185,6 +236,7 @@ function fill(p: FighterPlayer) {
 }
 
 let chairTick: () => void = () => {};
+let perkTick: () => void = () => {};
 mountGame(box, { assets });
 let shown: FighterPlayer | null = null;
 setInterval(() => {
@@ -192,4 +244,5 @@ setInterval(() => {
   const p = w?.player;
   if (p instanceof FighterPlayer && p !== shown) { shown = p; fill(p); }
   chairTick();
+  perkTick();
 }, 200);
