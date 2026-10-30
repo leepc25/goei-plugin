@@ -260,7 +260,10 @@ function hqAdapter(bridge: Partial<GameBridge> | undefined, ui: { chooseFloor: H
       lifeScene = at.scene;
       const w = world();
       if (!w) return;
-      w.step(dt, { ...at, hour: fieldClock.sec === null ? null : (fieldClock.sec / 3600) % 24 });
+      // 무기를 들이민 주인공(겁 반응): 무기를 꺼낸 채 바라보는 쪽
+      const pl = (globalThis as { __goeiEngine?: { world?: { player?: unknown } | null } }).__goeiEngine?.world?.player;
+      const P = pl instanceof FighterPlayer ? pl.core.P : null;
+      w.step(dt, { ...at, hour: fieldClock.sec === null ? null : (fieldClock.sec / 3600) % 24, armed: !!P?.armed, face: P?.face ?? 1 });
       const evs = w.events.splice(0);
       record(evs);
       chatter?.step(dt, at.scene, at.x, evs);

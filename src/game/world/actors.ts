@@ -26,7 +26,7 @@ export interface ActorDef {
   /** 몹 원형 이름 (mobs.ts ARCHETYPES) */
   archetype?: string;
 }
-export type Act = 'idle' | 'walk' | 'door' | 'do' | 'notice' | 'post' | 'watch' | 'argue' | 'down' | 'gone';
+export type Act = 'idle' | 'walk' | 'door' | 'do' | 'notice' | 'post' | 'watch' | 'argue' | 'down' | 'scared' | 'gone';
 /** 걸어서 닿은 뒤 할 일 */
 type Plan = 'none' | 'do' | 'post' | 'exit' | 'steal' | 'harass' | 'chase' | 'patrol' | 'roam-post';
 
@@ -78,6 +78,10 @@ export interface Actor {
   /** 몹 몸 (등급 체력, 설계 2-3). 0이 되면 기절 → 일어나 떠난다 */
   hp?: number;
   hpMax?: number;
+  /** 겁 반응 종류(sit 주저앉음·backoff 뒷걸음질)·다시 반응할 때까지 남은 초·도망 동작 */
+  scare?: 'freeze' | 'sit' | 'cower' | 'backoff' | 'run';
+  scareCd?: number;
+  fleeClip?: string;
   /** 힘민체지정 (몹: 생겨날 때 무작위 합 25) */
   base?: BaseStats;
   /** 주머니 돈 (원) */
@@ -142,7 +146,7 @@ export class WorldSim {
   /** 실제로 흐른 생활 초 */
   time = 0;
   private hour: number | null = null;
-  private player: { scene: string; x: number; y: number; seat?: number | null } | null = null;
+  private player: { scene: string; x: number; y: number; seat?: number | null; armed?: boolean; face?: number } | null = null;
   readonly spawns: SpawnRule[];
   readonly posts: Post[];
   private has: (look: string, clip: string) => boolean;
@@ -337,10 +341,10 @@ export class WorldSim {
   }
 
   /** 생활 시간을 dt초 진행. player = 보이는 장면과 주인공 발, hour = 필드 시(모르면 null) */
-  step(dt: number, player?: { scene: string; x: number; y?: number; hour?: number | null; seat?: number | null }): void {
+  step(dt: number, player?: { scene: string; x: number; y?: number; hour?: number | null; seat?: number | null; armed?: boolean; face?: number }): void {
     this.time += dt;
     this.hour = player?.hour ?? null;
-    this.player = player ? { scene: player.scene, x: player.x, y: player.y ?? 0, seat: player.seat ?? null } : null;
+    this.player = player ? { scene: player.scene, x: player.x, y: player.y ?? 0, seat: player.seat ?? null, armed: !!player.armed, face: player.face ?? 1 } : null;
     for (const [s, u] of this.uproar) {
       u.v = Math.max(0, u.v - (player?.scene === s ? 1.5 : 5) * dt);
       if (u.v <= 0) this.uproar.delete(s);
@@ -389,7 +393,21 @@ export class WorldSim {
     if (a.needs) decayNeeds(a.needs, dt, TEMPER[a.def.name], onDuty(this.hour, TEMPER[a.def.name]));
     if (a.def.kind === 'mob') this.mobThink(a, dt);
     if (a.def.kind === 'named') this.namedNotice(a);
+    if (a.def.kind === 'mob') this.threatened(a, dt);
     switch (a.act) {
+      // 겁에 질림(무기를 들이밀었을 때): 주저앉아 있다가 뒤로 기거나, 뒷걸음질 친 뒤 달아난다
+      case 'scared': {
+        a.wait -= dt;
+        if (a.scare === 'backoff' && this.player) a.x += Math.sign(a.x - this.player.x || 1) * 55 * dt;
+        // 얼어붙음: 주인공이 무기를 거두거나 떠날 때까지 주저앉은 채 꼼짝 못 함
+        if (a.scare === 'freeze' && this.player?.armed && this.player.scene === a.scene) { a.wait = Math.max(a.wait, 0.5); return; }
+        if (a.wait > 0) return;
+        const from = this.player?.x ?? a.x;
+        if (a.scare === 'sit' && this.canClip(a, 'crawl')) { this.flee(a, from, 'crawl', 0.35); return; }
+        if (a.scare === 'cower' && this.canClip(a, 'scramble')) { this.flee(a, from, 'scramble', 0.6); return; }
+        this.flee(a, from);
+        return;
+      }
       case 'door': {
         a.wait -= dt;
         if (a.wait > 0) return;
@@ -460,7 +478,9 @@ export class WorldSim {
     const d = Math.hypot(dx, dy);
     const step = (a.def.speed ?? WALK) * a.run * dt;
     if (Math.abs(dx) > 1) a.face = dx > 0 ? 1 : -1;
-    this.setClip(a, a.run > 1.2 && this.canClip(a, 'run') ? 'run' : 'walk');
+    // 도망 중이면 도망 동작(달아나기·기어서)을 유지 (그 인물에게 없으면 뛰기·걷기)
+    const fleeing = (a.doing === '도망' || a.doing === '기어서 도망') && a.fleeClip && this.canClip(a, a.fleeClip);
+    this.setClip(a, fleeing ? a.fleeClip! : a.run > 1.2 && this.canClip(a, 'run') ? 'run' : 'walk');
     if (d <= step) {
       a.x = a.goal.x;
       a.y = a.goal.y;
@@ -775,12 +795,57 @@ export class WorldSim {
     const x = [...gates].sort((p, q) => Math.abs(q - fromX) - Math.abs(p - fromX))[0];
     return { x, y: a.y };
   }
-  private flee(a: Actor, fromX: number): void {
+  /** 무기를 들이밀면(주인공이 무기를 꺼내 3m 안에서 이쪽을 봄) 겁 반응 — 동작은 그 인물에게 있는 줄만(없으면 비슷한 줄로).
+   * 용기 낮음: 놀라 주저앉았다가 뒤로 기어 도망 · 보통: 뒷걸음질 → 달아나기 · 높음: 불량배는 맞서고, 그 밖은 화내고 비켜 감. 근무형·경찰·경비는 겁먹지 않음 */
+  private threatened(a: Actor, dt: number): void {
+    if (a.scareCd && (a.scareCd -= dt) > 0) return;
+    const p = this.player;
+    if (!p?.armed || p.scene !== a.scene || a.fighting || a.post || !a.temper) return;
+    if (['down', 'scared', 'gone', 'door', 'argue'].includes(a.act) || a.doing === '도망' || a.doing === '기어서 도망') return;
+    const role = ARCHETYPES[a.def.archetype ?? '']?.role;
+    if (role === 'police' || role === 'guard') return;
+    const dx = a.x - p.x;
+    if (Math.abs(dx) > 300 || Math.abs(a.y - p.y) > 90 || Math.sign(dx) !== Math.sign(p.face ?? 1)) return;
+    a.scareCd = 8;
     a.seatPick = undefined;
-    a.run = 1.8;
+    const c = a.temper.courage;
+    this.iconOn(a, '!', 1.5);
+    if (c >= 0.7) {
+      if (role === 'thug') { a.act = 'argue'; a.doing = '맞섬'; a.wait = 3; this.iconOn(a, '#', 3); return; }
+      a.act = 'argue'; a.doing = '화냄'; a.wait = 1.2;
+      this.setClip(a, this.canClip(a, 'angry') ? 'angry' : 'idle');
+      return;
+    }
+    a.act = 'scared';
+    a.face = dx > 0 ? -1 : 1;
+    // 도망도 사람마다: 용기가 낮을수록 얼어붙거나 기어서, 높을수록 뒷걸음질·뛰어서. 같은 용기라도 무작위로 갈림
+    const w: [NonNullable<Actor['scare']>, number][] = [['freeze', 1 - c * 2], ['sit', 1.1 - c * 1.5], ['cower', 1 - c], ['backoff', 0.2 + c], ['run', 0.3 + c]];
+    let r = this.rng() * w.reduce((n, [, v]) => n + Math.max(0, v), 0);
+    a.scare = w.find(([, v]) => (r -= Math.max(0, v)) <= 0)?.[0] ?? 'run';
+    const clip = (...l: string[]) => l.find((x) => this.canClip(a, x)) ?? 'idle';
+    switch (a.scare) {
+      case 'freeze': a.wait = 3; a.doing = '얼어붙음'; this.setClip(a, clip('sitdown', 'cower', 'surprise')); break;
+      case 'sit': a.wait = 1.6; a.doing = '주저앉음'; this.setClip(a, clip('sitdown', 'cower', 'surprise')); break;
+      case 'cower': a.wait = 1.4; a.doing = '웅크려 떪'; this.setClip(a, clip('cower', 'sitdown', 'surprise')); break;
+      case 'backoff': a.wait = 1.3; a.doing = '뒷걸음질'; this.setClip(a, clip('backoff', 'surprise')); break;
+      case 'run': a.wait = 0.4; a.doing = '놀람'; this.setClip(a, clip('surprise', 'idle')); break;
+    }
+    this.events.push({ kind: 'flee', scene: a.scene, who: a.def.name });
+  }
+  /** 전투에서 달아남(기세가 꺾임): 전투 몸에서 돌아와 장면 밖으로 */
+  fledFight(id: string, x: number, y: number): void {
+    const a = this.actors.find((q) => q.def.id === id);
+    if (!a || !a.fighting) return;
+    a.fighting = false; a.x = x; a.y = y; a.plan = 'none';
+    this.flee(a, this.player?.x ?? x);
+  }
+  private flee(a: Actor, fromX: number, clip = 'flee', run = 1.8): void {
+    a.seatPick = undefined;
+    a.run = run;
     a.exitAt = this.gateFar(a, fromX);
-    this.walkTo(a, a.exitAt, '도망', 'exit');
-    this.setClip(a, this.canClip(a, 'flee') ? 'flee' : 'walk');
+    this.walkTo(a, a.exitAt, clip === 'crawl' ? '기어서 도망' : '도망', 'exit');
+    this.setClip(a, this.canClip(a, clip) ? clip : this.canClip(a, 'flee') ? 'flee' : 'walk');
+    a.fleeClip = clip;
     this.iconOn(a, '!', 1.5);
     this.events.push({ kind: 'flee', scene: a.scene, who: a.def.name });
   }

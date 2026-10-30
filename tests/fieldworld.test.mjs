@@ -408,3 +408,26 @@ test('소매치기: 피해자 주머니에서 실제로 옮기고, 잡아 기절
   assert.ok(drop && drop.stolen > 0 && drop.amount >= drop.stolen);
   assert.equal(total(), sum - drop.amount, '떨어뜨린 만큼 주머니에서 빠짐');
 });
+
+test('겁 반응: 무기를 들이밀면 용기에 따라 얼어붙기·주저앉아 기기·웅크려 기기·뒷걸음질·달아나기로 갈림, 경찰은 안 겁먹음', () => {
+  const seen = new Set();
+  for (let seed = 1; seed < 60; seed++) {
+    const sim = new A.WorldSim(graph(), R.mulberry32(seed));
+    const m = sim.add({ id: 'w1', name: '행인', kind: 'mob', brain: 'transit', home: 'jongno', archetype: '행인' }, { scene: 'jongno', x: 1100, y: 560 });
+    m.temper.courage = (seed % 10) / 10;
+    sim.step(1 / 30, { scene: 'jongno', x: 1000, y: 560, armed: true, face: 1 });
+    if (m.temper.courage >= 0.7) { assert.notEqual(m.act, 'scared'); continue; }
+    assert.equal(m.act, 'scared', `용기 ${m.temper.courage}`);
+    seen.add(m.scare);
+  }
+  assert.ok(seen.size >= 4, `갈래 ${[...seen]}`);
+  const sim = new A.WorldSim(graph(), R.mulberry32(3));
+  const cop = sim.add({ id: 'c1', name: '경찰', kind: 'mob', brain: 'transit', home: 'jongno', archetype: '경찰' }, { scene: 'jongno', x: 1100, y: 560 });
+  sim.step(1 / 30, { scene: 'jongno', x: 1000, y: 560, armed: true, face: 1 });
+  assert.notEqual(cop.act, 'scared');
+  // 무기를 안 꺼냈거나 등을 보이면 반응 없음
+  const s2 = new A.WorldSim(graph(), R.mulberry32(4));
+  const m2 = s2.add({ id: 'w2', name: '행인', kind: 'mob', brain: 'transit', home: 'jongno', archetype: '행인' }, { scene: 'jongno', x: 1100, y: 560 });
+  s2.step(1 / 30, { scene: 'jongno', x: 1000, y: 560, armed: true, face: -1 });
+  assert.notEqual(m2.act, 'scared');
+});

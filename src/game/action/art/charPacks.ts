@@ -117,6 +117,8 @@ export const FIELD_CLIP: Record<string, { ids: string[]; fps?: number; loop?: bo
   surprise: { ids: ['34', '33'], fps: 8, loop: false }, laugh: { ids: ['35'], fps: 7, loop: false }, angry: { ids: ['32'], fps: 7, loop: false },
   stretch: { ids: ['2'], fps: 5, loop: false }, sigh: { ids: ['2'], fps: 5, loop: false }, armcross: { ids: ['2'], fps: 5 }, think: { ids: ['2'], fps: 5 }, scratch: { ids: ['2'], fps: 5, loop: false },
   scared: { ids: ['41', '37'], fps: 7 }, flee: { ids: ['36'], fps: 12 }, cower: { ids: ['41'], fps: 7 },
+  // 겁 반응(10-30 동작 활용표): 주저앉기 → 뒤로 기기, 뒷걸음질, 네발로 허둥지둥
+  sitdown: { ids: ['39'], fps: 8, loop: false }, backoff: { ids: ['37_1', '37'], fps: 8 }, crawl: { ids: ['38_1', '38'], fps: 8 }, scramble: { ids: ['42_1', '42'], fps: 9 },
   down: { ids: ['19'], fps: 10, loop: false }, getup: { ids: ['20'], fps: 9, loop: false },
   sit: { ids: ['60', '96', '61'], fps: 1 / 0.6 }, lie: { ids: ['76', '75'], fps: 4 },
 };
