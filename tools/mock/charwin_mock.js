@@ -140,7 +140,9 @@
   var DIM = "#8a9096";
   var GOOD = "#8fe08a";
   var GOLD = "#ffd36a";
-  var TAB = new URLSearchParams(location.search).get("tab") || "skill";
+  var RED = "#e0705f";
+  var LINE = "#2a3138";
+  var TAB = new URLSearchParams(location.search).get("tab") || "perk";
   async function main() {
     const ff = new FontFace(PIXEL_FONT, `url(${PIXEL_FONT_URL})`);
     await ff.load();
@@ -158,117 +160,208 @@
     for (const [k, v] of Object.entries(KEY_IMG)) img["key_" + k] = await load(v);
     img.body = await load("eileen.png");
     img.bg = await load("bg.png");
-    const T = (s, x, y, col = INK2, size = 22, align = "left") => {
+    const T = (s, x, y2, col = INK2, size = 22, align = "left") => {
       const t = pixelText(s, col, size, null);
-      c.drawImage(t, Math.round(align === "center" ? x - t.width / 2 : align === "right" ? x - t.width : x), y);
+      c.drawImage(t, Math.round(align === "center" ? x - t.width / 2 : align === "right" ? x - t.width : x), Math.round(y2));
     };
-    const nine = (k, x, y, w, h, sc = 2) => {
+    const nine = (k, x, y2, w, h, sc = 2) => {
       const im = img["kit_" + k];
       const m = KIT_META[k];
       const [t, r, b, l] = m.slice;
       const iw = m.w, ih = m.h;
       const sx = [0, l, iw - r, iw], sy = [0, t, ih - b, ih];
-      const dx = [x, x + l * sc, x + w - r * sc, x + w], dy = [y, y + t * sc, y + h - b * sc, y + h];
+      const dx = [x, x + l * sc, x + w - r * sc, x + w], dy = [y2, y2 + t * sc, y2 + h - b * sc, y2 + h];
       for (let i = 0; i < 3; i++) for (let j = 0; j < 3; j++) c.drawImage(im, sx[j], sy[i], sx[j + 1] - sx[j], sy[i + 1] - sy[i], dx[j], dy[i], dx[j + 1] - dx[j], dy[i + 1] - dy[i]);
     };
-    const slot = (x, y, s) => nine("slot", x, y, s, s, 2);
+    const well = (x, y2, w, h) => {
+      c.fillStyle = "#0c0f13";
+      c.fillRect(x, y2, w, h);
+      c.fillStyle = "#1d2329";
+      c.fillRect(x, y2, w, 2);
+      c.fillRect(x, y2, 2, h);
+    };
+    const hr = (x, y2, w) => {
+      c.fillStyle = LINE;
+      c.fillRect(x, y2, w, 2);
+    };
+    const sel = (x, y2, w, h) => {
+      c.strokeStyle = GOLD;
+      c.lineWidth = 2;
+      c.strokeRect(x + 1, y2 + 1, w - 2, h - 2);
+    };
+    const head = (s, x, y2, w, right = "") => {
+      T(s, x, y2, GOLD);
+      if (right) T(right, x + w, y2, DIM, 22, "right");
+      hr(x, y2 + 30, w);
+    };
     c.drawImage(img.bg, 0, 0, W, H);
-    c.fillStyle = "rgba(5,7,10,0.72)";
+    c.fillStyle = "rgba(5,7,10,0.75)";
     c.fillRect(0, 0, W, H);
-    const X = 110, Y = 50, WW = 1060, HH = 620;
+    const X = 80, Y = 34, WW = 1120, HH = 652;
     nine("panel", X, Y, WW, HH);
-    const lx = X + 40;
-    T("\uC5D0\uC77C\uB9B0", lx, Y + 40, INK2, 33);
-    const hy = Y + 90;
+    const P = 30;
+    const top = Y + P, bot = Y + HH - P;
+    const L = X + P, LW = 330;
+    well(L, top, LW, bot - top);
+    const lx = L + 18, lw = LW - 36;
+    c.fillStyle = "#1a2026";
+    c.fillRect(lx, top + 16, 88, 88);
+    c.drawImage(img.body, 4, 0, 52, 52, lx + 2, top + 18, 84, 84);
+    T("\uC5D0\uC77C\uB9B0", lx + 104, top + 18, INK2, 33);
+    T("\uC0AC\uACA9\uD615 \xB7 \uAD00\uB9AC\uAD6D", lx + 104, top + 58, DIM);
     c.fillStyle = "#2e353c";
-    c.fillRect(lx, hy, 260, 14);
+    c.fillRect(lx + 104, top + 88, lw - 104, 12);
     c.fillStyle = "#c8473f";
-    c.fillRect(lx, hy, 260 * 0.72, 14);
-    T("684 / 950", lx + 260, hy + 22, DIM, 22, "right");
-    c.drawImage(img.body, lx, hy + 60, 62, 234);
+    c.fillRect(lx + 104, top + 88, (lw - 104) * 0.72, 12);
+    T("\uCCB4\uB825", lx, top + 118, DIM);
+    T("684 / 950", lx + lw, top + 118, INK2, 22, "right");
+    let y = top + 162;
+    head("\uAE30\uBCF8 \uB2A5\uB825\uCE58", lx, y, lw);
+    y += 44;
     const stats = [["\uD798", 3, 0], ["\uBBFC", 8, 1], ["\uCCB4", 4, 0], ["\uC9C0", 6, 0], ["\uC815", 4, 0]];
-    stats.forEach(([n, v, up], i) => {
-      const yy = hy + 70 + i * 46;
-      T(n, lx + 90, yy, INK2);
+    for (const [n, v, up] of stats) {
+      T(n, lx, y, INK2);
       for (let p = 0; p < 10; p++) {
-        c.fillStyle = p < v ? p >= v - up ? GOOD : "#d8d4c8" : "#2e353c";
-        c.fillRect(lx + 122 + p * 12, yy + 4, 9, 18);
+        c.fillStyle = p < v ? p >= v - up ? GOOD : "#cfcabd" : "#262d34";
+        c.fillRect(lx + 36 + p * 21, y + 4, 17, 16);
       }
-      T(String(v), lx + 268, yy, up ? GOOD : INK2, 22, "right");
-    });
-    const rx = X + 350, ry = Y + 36, rw = WW - 390;
-    const tabs = [["skill", "\uAE30\uC220"], ["item", "\uC778\uBCA4\uD1A0\uB9AC"], ["perk", "\uD37D"]];
-    tabs.forEach(([k, n], i) => {
-      const tx = rx + i * 170;
-      nine("row", tx, ry, 160, 48, 2);
-      T(n, tx + 92, ry + 12, k === TAB ? GOLD : DIM, 22, "center");
-      if (k === TAB) {
-        c.fillStyle = GOLD;
-        c.fillRect(tx + 34, ry + 42, 116, 3);
-      }
-    });
-    T("Q", rx - 20, ry + 12, DIM, 22, "center");
-    T("E", rx + 3 * 170 + 4, ry + 12, DIM, 22, "left");
-    const cy = ry + 70, ch = HH - 120;
-    nine("row", rx, cy, rw, ch, 2);
-    T("Tab \uB2EB\uAE30 \xB7 Q/E \uD0ED \xB7 \uBC29\uD5A5\uD0A4 \uACE0\uB974\uAE30", X + WW / 2, Y + HH + 14, DIM, 22, "center");
-    if (TAB === "skill") {
-      const sk = [["attack", "\uC57D\uACF5"], ["attack", "\uAC15\uACF5"], ["shoot", "\uC0AC\uACA9"], ["shoot", "\uCDA9\uC804"], ["unique", "\uACE0\uC720"], ["ult", "\uD544\uC0B4"]];
-      sk.forEach(([ic, n], i) => {
-        const sx = rx + 40 + i % 3 * 210, sy = cy + 36 + Math.floor(i / 3) * 140;
-        slot(sx, sy, 96);
-        c.drawImage(img["touch_" + ic], sx + 20, sy + 20, 56, 56);
-        T(n, sx + 48, sy + 104, i === 2 ? GOLD : INK2, 22, "center");
-        if (i === 2) {
-          c.strokeStyle = GOLD;
-          c.lineWidth = 3;
-          c.strokeRect(sx - 4, sy - 4, 104, 104);
-        }
-      });
-      T("\uC0AC\uACA9", rx + 40, cy + 340, GOLD, 33);
-      T("\uAD8C\uCD1D \uC5F0\uC0AC. \uC624\uB798 \uC3D8\uBA74 \uACFC\uC5F4\uB41C\uB2E4.", rx + 40, cy + 390, INK2);
-    } else if (TAB === "item") {
-      T("\uD035\uC2AC\uB86F", rx + 40, cy + 24, DIM);
-      ["medkit", "flash", "flash", "energy"].forEach((k, i) => {
-        const sx = rx + 40 + i * 104, sy = cy + 58;
-        slot(sx, sy, 88);
-        c.drawImage(img["item_" + k], sx + 16, sy + 16, 56, 56);
-        c.drawImage(img["key_" + (i + 1)], sx - 6, sy - 8, 26, 26);
-      });
-      T("\uAC00\uBC29", rx + 40, cy + 176, DIM);
-      T("4 / 12", rx + rw - 40, cy + 176, DIM, 22, "right");
-      const bag = ["bandage", "antidote", "salt", "ammo"];
-      for (let i = 0; i < 12; i++) {
-        const sx = rx + 40 + i % 6 * 100, sy = cy + 210 + Math.floor(i / 6) * 100;
-        slot(sx, sy, 88);
-        if (bag[i]) c.drawImage(img["item_" + bag[i]], sx + 16, sy + 16, 56, 56);
-      }
-    } else {
-      const card = (x, y, w, h, rim, name, on = false) => {
-        nine("slot", x, y, w, h, 2);
-        c.fillStyle = rim;
-        c.fillRect(x + 12, y + 12, w - 24, 4);
-        c.fillStyle = "#10141a";
-        c.fillRect(x + 16, y + 22, w - 32, h - 78);
-        T("\uADF8\uB9BC", x + w / 2, y + (h - 56) / 2, "#3a424a", 22, "center");
-        T(name, x + w / 2, y + h - 46, on ? GOLD : INK2, 22, "center");
-        if (on) {
-          c.strokeStyle = GOLD;
-          c.lineWidth = 3;
-          c.strokeRect(x - 4, y - 4, w + 8, h + 8);
-        }
-      };
-      T("\uACE0\uC720", rx + 40, cy + 22, GOLD);
-      card(rx + 40, cy + 56, 150, 200, GOLD, "\uC900\uBE44\uB41C \uC0AC\uC218");
-      T("\uC774\uBC88 \uAD34\uC774", rx + 230, cy + 22, DIM);
-      const tmp = [["#b4b8bc", "\uD0C4 +1"], ["#b4b8bc", "3\uB2E8 \uC810\uD504"], ["#b4b8bc", "\uCCB4\uB825 +"], ["#d05040", "\uBB34\uBAA8\uD568"]];
-      tmp.forEach(([col, n], i) => card(rx + 230 + i % 2 * 170, cy + 58 + Math.floor(i / 2) * 192, 150, 180, col, n, i === 0));
-      T("\u25BC \uB354 \uBCF4\uAE30 (6)", rx + 400, cy + 446, DIM, 22, "center");
-      T("\uD0C4 +1", rx + 40, cy + 300, GOLD, 33);
-      T("\uC0AC\uACA9\uC774 \uB450 \uBC1C", rx + 40, cy + 346, INK2);
-      T("\uB098\uAC04\uB2E4.", rx + 40, cy + 378, INK2);
+      T(String(v), lx + lw, y, up ? GOOD : INK2, 22, "right");
+      y += 28;
     }
+    y += 8;
+    head("\uC804\uD22C \uC218\uCE58", lx, y, lw);
+    y += 42;
+    const der = [["\uADFC\uC811 \uACF5\uACA9", "94"], ["\uC0AC\uACA9 \uACF5\uACA9", "109", "124"], ["\uC774\uB2A5 \uACF5\uACA9", "102"], ["\uBC1B\uB294 \uD53C\uD574", "\u22121%"], ["\uC774\uB3D9 \uC18D\uB3C4", "105"], ["\uAE30\uC220 \uCFE8", "\u22122%", "\u221210%"], ["\uC0C1\uD0DC \uC774\uC0C1", "\u22125%"]];
+    for (const [n, a, b] of der) {
+      T(n, lx, y, DIM);
+      T(b ? `${a} \u25B8 ${b}` : a, lx + lw, y, b ? GOOD : INK2, 22, "right");
+      y += 26;
+    }
+    const R0 = L + LW + 14;
+    const tabs = [["skill", "\uAE30\uC220", "attack"], ["item", "\uAC00\uBC29", ""], ["perk", "\uD37D", "ult"]];
+    tabs.forEach(([k, n, ic], i) => {
+      const ty = top + i * 96, on = k === TAB;
+      c.fillStyle = on ? "#1c232a" : "#0c0f13";
+      c.fillRect(R0, ty, 76, 88);
+      if (on) {
+        c.fillStyle = GOLD;
+        c.fillRect(R0, ty, 4, 88);
+      }
+      if (ic) c.drawImage(img["touch_" + ic], R0 + 20, ty + 8, 40, 40);
+      else c.drawImage(img.item_medkit, R0 + 20, ty + 8, 40, 40);
+      T(n, R0 + 40, ty + 56, on ? GOLD : DIM, 22, "center");
+    });
+    T("Q \u25B2", R0 + 38, top + 300, DIM, 22, "center");
+    T("E \u25BC", R0 + 38, top + 330, DIM, 22, "center");
+    const R = R0 + 90, RW = X + WW - P - R;
+    well(R, top, RW, bot - top);
+    const listW = 330, LX = R + 18, DX = R + listW + 30, DW = RW - listW - 48;
+    c.fillStyle = LINE;
+    c.fillRect(R + listW + 12, top + 16, 2, bot - top - 32);
+    if (TAB === "perk") {
+      head("\uACE0\uC720", LX, top + 16, listW - 18);
+      const emb = (x, y2, rim, on = false) => {
+        c.fillStyle = rim;
+        c.beginPath();
+        c.arc(x + 32, y2 + 32, 30, 0, 7);
+        c.fill();
+        c.fillStyle = "#121820";
+        c.beginPath();
+        c.arc(x + 32, y2 + 32, 24, 0, 7);
+        c.fill();
+        T("?", x + 32, y2 + 21, "#4a525a", 22, "center");
+        if (on) sel(x - 4, y2 - 4, 72, 72);
+      };
+      emb(LX, top + 60, GOLD);
+      T("\uC900\uBE44\uB41C \uC0AC\uC218", LX + 80, top + 80, INK2);
+      head("\uC774\uBC88 \uAD34\uC774", LX, top + 146, listW - 18, "7");
+      const rims = ["#b4b8bc", "#b4b8bc", "#b4b8bc", RED, "#b4b8bc", "#7a2030", "#b4b8bc"];
+      rims.forEach((r, i) => emb(LX + i % 4 * 78, top + 192 + Math.floor(i / 4) * 78, r, i === 0));
+      for (let i = rims.length; i < 16; i++) {
+        const ex = LX + i % 4 * 78, ey = top + 192 + Math.floor(i / 4) * 78;
+        c.strokeStyle = "#1d2329";
+        c.lineWidth = 2;
+        c.beginPath();
+        c.arc(ex + 32, ey + 32, 29, 0, 7);
+        c.stroke();
+      }
+      const cw = 200, chh = 300, cx = DX + (DW - cw) / 2, cy = top + 16;
+      nine("slot", cx, cy, cw, chh, 2);
+      c.fillStyle = "#b4b8bc";
+      c.fillRect(cx + 14, cy + 14, cw - 28, 4);
+      c.fillStyle = "#121820";
+      c.fillRect(cx + 36, cy + 30, 128, 128);
+      T("\uADF8\uB9BC 128", cx + 100, cy + 82, "#3a424a", 22, "center");
+      T("\uD0C4 +1", cx + 100, cy + 170, GOLD, 33, "center");
+      T("\uACF5\uC6A9 \uD37D \xB7 \uC0AC\uACA9", cx + 100, cy + 212, DIM, 22, "center");
+      T("\u2605 \u2606 \u2606", cx + 100, cy + 242, GOLD, 22, "center");
+      T("\uAE30\uBCF8 \uC0AC\uACA9\uC774 \uB450 \uBC1C \uB098\uAC04\uB2E4.", DX, top + 336, INK2);
+      hr(DX, top + 374, DW);
+      T("\uB2A5\uB825\uCE58 \uBCC0\uD654", DX, top + 390, DIM);
+      T("\uC0AC\uACA9 \uACF5\uACA9", DX, top + 424, INK2);
+      T("109 \u25B8 124", DX + DW, top + 424, GOOD, 22, "right");
+      T("\uD0C4 \uC218", DX, top + 454, INK2);
+      T("1 \u25B8 2", DX + DW, top + 454, GOOD, 22, "right");
+    } else if (TAB === "skill") {
+      head("\uAE30\uC220", LX, top + 16, listW - 18);
+      const sk = [["attack", "\uC57D\uACF5", "A"], ["attack", "\uAC15\uACF5", "S"], ["shoot", "\uC0AC\uACA9", "D"], ["shoot", "\uCDA9\uC804", "D \uAE38\uAC8C"], ["unique", "\uACE0\uC720", "Q"], ["ult", "\uD544\uC0B4", "W"]];
+      sk.forEach(([ic, n, key], i) => {
+        const ry = top + 60 + i * 68;
+        c.fillStyle = "#121820";
+        c.fillRect(LX, ry, 56, 56);
+        c.drawImage(img["touch_" + ic], LX + 8, ry + 8, 40, 40);
+        T(n, LX + 72, ry + 16, i === 2 ? GOLD : INK2);
+        T(key, LX + listW - 18, ry + 16, DIM, 22, "right");
+        if (i === 2) sel(LX - 6, ry - 6, listW - 6, 68);
+      });
+      c.fillStyle = "#121820";
+      c.fillRect(DX, top + 16, 96, 96);
+      c.drawImage(img.touch_shoot, DX + 16, top + 32, 64, 64);
+      T("\uC0AC\uACA9", DX + 112, top + 24, GOLD, 33);
+      T("\uC0AC\uACA9 \xB7 \uBB3C\uB9AC", DX + 112, top + 70, DIM);
+      hr(DX, top + 132, DW);
+      const rows = [["\uD53C\uD574", "7", "8"], ["\uC5F0\uC0AC", "\uCD08\uB2F9 6\uBC1C"], ["\uACFC\uC5F4", "\uBC1C\uB2F9 9%"], ["\uCFE8", "\uC5C6\uC74C"]];
+      rows.forEach(([a, b, d], i) => {
+        T(a, DX, top + 150 + i * 32, DIM);
+        T(d ? `${b} \u25B8 ${d}` : b, DX + DW, top + 150 + i * 32, d ? GOOD : INK2, 22, "right");
+      });
+      hr(DX, top + 290, DW);
+      T("\uAD8C\uCD1D\uC744 \uBE60\uB974\uAC8C \uC5F0\uC0AC\uD55C\uB2E4.", DX, top + 306, INK2);
+      T("\uC624\uB798 \uC3D8\uBA74 \uACFC\uC5F4\uB3FC \uBA48\uCD98\uB2E4.", DX, top + 336, INK2);
+    } else {
+      head("\uD035\uC2AC\uB86F", LX, top + 16, listW - 18);
+      ["medkit", "flash", "flash", "energy"].forEach((k, i) => {
+        const sx = LX + i * 78, sy = top + 60;
+        c.fillStyle = "#121820";
+        c.fillRect(sx, sy, 64, 64);
+        c.drawImage(img["item_" + k], sx + 8, sy + 8, 48, 48);
+        c.drawImage(img["key_" + (i + 1)], sx - 6, sy - 8, 22, 22);
+      });
+      head("\uAC00\uBC29", LX, top + 146, listW - 18, "4 / 16");
+      const bag = ["bandage", "antidote", "salt", "ammo"];
+      for (let i = 0; i < 16; i++) {
+        const sx = LX + i % 4 * 78, sy = top + 192 + Math.floor(i / 4) * 78;
+        c.fillStyle = "#121820";
+        c.fillRect(sx, sy, 64, 64);
+        if (bag[i]) c.drawImage(img["item_" + bag[i]], sx + 8, sy + 8, 48, 48);
+        if (i === 1) sel(sx - 4, sy - 4, 72, 72);
+      }
+      c.fillStyle = "#121820";
+      c.fillRect(DX, top + 16, 96, 96);
+      c.drawImage(img.item_antidote, DX + 8, top + 24, 80, 80);
+      T("\uD574\uB3C5\uC81C", DX + 112, top + 24, GOLD, 33);
+      T("\uC18C\uBAA8\uD488 \xB7 1\uAC1C", DX + 112, top + 70, DIM);
+      hr(DX, top + 132, DW);
+      T("\uC624\uC5FC\xB7\uB3C5 \uC0C1\uD0DC\uB97C \uC5C6\uC564\uB2E4.", DX, top + 150, INK2);
+      const btn = (s, x, y2, w) => {
+        nine("row", x, y2, w, 44, 2);
+        T(s, x + w / 2, y2 + 10, INK2, 22, "center");
+      };
+      btn("\uC0AC\uC6A9", DX, top + 210, DW);
+      btn("\uD035\uC2AC\uB86F\uC5D0 \uB123\uAE30", DX, top + 264, DW);
+      btn("\uBC84\uB9AC\uAE30", DX, top + 318, DW);
+    }
+    T("Tab \uB2EB\uAE30 \xB7 Q/E \uD0ED \xB7 \uBC29\uD5A5\uD0A4 \uACE0\uB974\uAE30 \xB7 Space \uD655\uC778", X + WW / 2, Y + HH + 6, DIM, 22, "center");
   }
-  main().then(() => {
-  });
+  main();
 })();
