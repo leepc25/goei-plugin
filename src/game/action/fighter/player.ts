@@ -116,6 +116,12 @@ export class FighterPlayer extends Player {
   /** 회피 충전: 쓸 수 있는 회피 수 + 다음 하나가 찬 만큼(0~1) */
   get dodgeMeter(): number { const P = this.core.P; return P.dodgeN + (P.dodgeN < P.dodgeMax && P.dodgeCd > 0 ? 1 - Math.max(0, P.dodgeT) / P.dodgeCd : 0); }
   get dodgeMax(): number { return this.core.P.dodgeMax; }
+  /** 아이템 쓸 때 몸짓(엔진은 옛 동작 이름 drink·eat·bandage·toss 를 부름): 인물 팩 공통 줄 「26 섭취」로. 던지는 동작은 공통 줄에 없어서 몸짓 없이 효과만(10-30 동작 대조) */
+  override play(key: string, world: WorldView): void {
+    if (key === 'drink' || key === 'eat' || key === 'bandage') { if (this.core.has('26')) this.core.emote('26', 7); return; }
+    if (key === 'toss') return;
+    super.play(key, world);
+  }
   /** 고유기·충전·필살 피해 배율: NPC만 0.5 (docs/설계_기본피해_표준.md 3장) */
   skillMul = 1;
   get sortY() {
