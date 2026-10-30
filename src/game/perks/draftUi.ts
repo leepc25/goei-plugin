@@ -32,7 +32,7 @@ const css = `
 let styled = false;
 
 /** 열기. 고르면 그 퍽·특성을 얻고 닫힌다 */
-export function openDraft(root: HTMLElement, p: FighterPlayer, o: { world?: { paused: boolean } | null; onDone?: (picked: Offer | null) => void } = {}): void {
+export function openDraft(root: HTMLElement, p: FighterPlayer, o: { world?: { paused: boolean } | null; onDone?: (picked: Offer | null) => void; offers?: Offer[] } = {}): void {
   if (!styled) { document.head.insertAdjacentHTML('beforeend', `<style>${css}</style>`); styled = true; }
   root.querySelector('.pk-ov')?.remove();
   const kit = kitOf(p.art.cfg, (id) => p.core.has(id), p.base.str);
@@ -53,8 +53,10 @@ export function openDraft(root: HTMLElement, p: FighterPlayer, o: { world?: { pa
     const n = Number(e.key);
     if (n >= 1 && n <= offers.length) { e.preventDefault(); e.stopPropagation(); close(offers[n - 1]); }
   };
+  let preset = o.offers ?? null;
   const render = () => {
-    offers = draft(kit, { ranks: p.perks.ranks, traits: p.perks.traits }, Math.random, p.perks.depth);
+    offers = preset ?? draft(kit, { ranks: p.perks.ranks, traits: p.perks.traits }, Math.random, p.perks.depth);
+    preset = null;
     ov.innerHTML = '';
     const box = document.createElement('div');
     box.className = 'pk-box';

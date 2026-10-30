@@ -19,7 +19,8 @@ import { createFighterCore } from './core';
 import { seatBody } from './seats';
 import { STATUS, StatusSet } from '../../combat/status';
 import { PerkRun, perkWorld, type PerkHost } from '../../perks/runtime';
-import { kitOf } from '../../perks/rules';
+import { draft, kitOf, type Offer } from '../../perks/rules';
+import { GRADE_COLOR, PAIR_COLOR, TRAIT_COLOR } from '../../perks/draftUi';
 
 /** 테스트룸 동작 이름 ↔ 엔진 버튼 */
 const PRESS: [Btn, string][] = [
@@ -42,7 +43,7 @@ const REACT: Record<string, { react: React; push: number; lift: number; strength
 };
 
 /** 다른 모듈이 붙이는 곳. sfx: 효과음. extraTargets: 전투 몸이 아닌 필드 행위자도 때릴 수 있게 (src/game/world, 엔진 modules가 채운다) */
-export const fighterHooks: { sfx: (e: Record<string, unknown>) => void; extraTargets?: () => { body: Body; x: number; y: number; z: number }[] } = { sfx: () => {} };
+export const fighterHooks: { sfx: (e: Record<string, unknown>) => void; extraTargets?: () => { body: Body; x: number; y: number; z: number }[]; openDraft?: (p: FighterPlayer, offers: Offer[]) => void } = { sfx: () => {} };
 
 type Core = ReturnType<typeof createFighterCore>;
 
@@ -69,6 +70,29 @@ export class FighterPlayer extends Player {
 
   /** 임시 퍽 (괴이 안에서만, src/game/perks). 인물 AI 는 빈 묶음 */
   perks = new PerkRun();
+  /** 방 보상: 전투가 끝나면 마지막 적 자리에 떨어지는 카드(후보는 떨어질 때 미리 굴림). 다가가 E로 집으면 3택1 창. 안 집고 다음 방으로 가면 그때 창 */
+  reward: { x: number; y: number; t: number; offers: Offer[]; color: string } | null = null;
+  /** 전투 끝(괴이 판 진행 중일 때만): 보상 카드를 떨어뜨린다 */
+  dropReward(at?: { x: number; y: number }) {
+    if (!this.perks.active || this.reward) return;
+    const kit = kitOf(this.art.cfg, (id) => this.core.has(id), this.base.str);
+    const offers = draft(kit, { ranks: this.perks.ranks, traits: this.perks.traits }, Math.random, this.perks.depth);
+    if (!offers.length) return;
+    const pair = offers.some((f) => f.type === 'perk' && f.def.kind === '쌍');
+    const top = Math.max(...offers.map((f) => (f.type === 'perk' ? f.grade : 0)));
+    const p = at ?? this.perks.lastKill ?? { x: this.x + this.dir * 160, y: this.y };
+    const [b0, b1] = this.world?.bounds ?? [0, 99999];
+    this.reward = { x: Math.max(b0 + 60, Math.min(b1 - 60, p.x)), y: p.y, t: 0, offers, color: pair ? PAIR_COLOR : offers.every((f) => f.type === 'trait') ? TRAIT_COLOR : GRADE_COLOR[top] };
+    fighterHooks.sfx({ type: 'pickup', x: p.x });
+  }
+  /** 보상을 집음 → 3택1 창 */
+  takeReward() {
+    const r = this.reward;
+    if (!r) return;
+    this.reward = null;
+    fighterHooks.openDraft?.(this, r.offers);
+  }
+  private rewardNear(): boolean { const r = this.reward; return !!r && Math.abs(r.x - this.x) < 80 && Math.abs(r.y - this.y) < 50; }
   /** 방어막 (NPC 등급, combat/grades.ts): 체력보다 먼저 깎이고, 남은 동안 경직·밀림 없음. 깨지면 잠깐 휘청. 다시 차지 않는다 */
   shield = 0;
   shieldMax = 0;
@@ -428,6 +452,8 @@ export class FighterPlayer extends Player {
     P.hp = Math.round((this.hp / this.hpMax) * 100);
     this.lastTickAt = performance.now();
     this.wantInteract = p.pressed.has('interact');
+    // 방 보상 카드: 가까이에서 E
+    if (this.wantInteract && this.rewardNear()) { this.wantInteract = false; this.takeReward(); }
     this.wantItem = p.pressed.has('item1') ? 1 : p.pressed.has('item2') ? 2 : p.pressed.has('item3') ? 3 : p.pressed.has('item4') ? 4 : 0;
     if (this.comboClock > 0 && --this.comboClock === 0) this.combo = 0;
     this.statusStep(world, 1 / 30);
@@ -556,7 +582,28 @@ export class FighterPlayer extends Player {
 
   private drawUnder(ctx: CanvasRenderingContext2D, camX: number) {
     this.core.frameView({ x0: camX, lane: this.world?.lane ?? [440, 669] });
-    ctx.save(); ctx.translate(-camX, 0); this.core.drawUnder(ctx); ctx.restore();
+    ctx.save(); ctx.translate(-camX, 0); this.core.drawUnder(ctx); this.drawReward(ctx); ctx.restore();
+  }
+  /** 바닥 보상 카드 (코드 그림: 도트 카드 + 테두리 등급 색 + 빛, 반짝임은 공용 이펙트 item_sparkle). PixelLab 카드 그림이 생기면 여기만 바꾼다 */
+  private drawReward(ctx: CanvasRenderingContext2D) {
+    const r = this.reward;
+    if (!r) return;
+    if (!this.perks.active) { this.reward = null; return; }   // 판이 끝나면(죽음·복귀·귀환) 사라짐
+    r.t += 1 / 60;
+    const k = spr(r.y) * CHAR_K, drop = Math.max(0, 1 - r.t * 3), bob = Math.sin(r.t * 3) * 4 * k;
+    const cx = Math.round(r.x), cy = Math.round(r.y - (46 + drop * 60) * k - bob);
+    ctx.save();
+    ctx.fillStyle = 'rgba(0,0,0,.35)'; ctx.beginPath(); ctx.ellipse(cx, r.y, 22 * k, 6 * k, 0, 0, Math.PI * 2); ctx.fill();
+    const g = ctx.createRadialGradient(cx, cy, 0, cx, cy, 46 * k); g.addColorStop(0, r.color + 'aa'); g.addColorStop(1, r.color + '00');
+    ctx.fillStyle = g; ctx.fillRect(cx - 46 * k, cy - 46 * k, 92 * k, 92 * k);
+    const w = Math.round(22 * k), h = Math.round(30 * k), b = Math.max(2, Math.round(3 * k));
+    ctx.fillStyle = '#000'; ctx.fillRect(cx - w / 2 - 1, cy - h / 2 - 1, w + 2, h + 2);
+    ctx.fillStyle = r.color; ctx.fillRect(cx - w / 2, cy - h / 2, w, h);
+    ctx.fillStyle = '#16181c'; ctx.fillRect(cx - w / 2 + b, cy - h / 2 + b, w - b * 2, h - b * 2);
+    ctx.fillStyle = r.color; ctx.fillRect(cx - 2 * k, cy - 6 * k, 4 * k, 8 * k); ctx.fillRect(cx - 2 * k, cy + 4 * k, 4 * k, 3 * k);
+    if (this.rewardNear()) { ctx.font = pfont(16).f; ctx.textAlign = 'center'; ctx.lineWidth = 4; ctx.strokeStyle = '#000'; ctx.fillStyle = '#f2e3b0'; ctx.strokeText('E 보상', cx, cy - h / 2 - 10); ctx.fillText('E 보상', cx, cy - h / 2 - 10); }
+    ctx.restore();
+    if (Math.floor(r.t * 2) !== Math.floor((r.t - 1 / 60) * 2)) this.core.perkApi.vfx('item_sparkle', cx + (Math.random() - 0.5) * 20, cy, 2 * k);
   }
   /** 몸 (x,y = 화면 좌표 발 자리: 보간된 값이라 테스트룸 P 대신 이것을 쓴다) */
   drawSelf(ctx: CanvasRenderingContext2D, camX: number) {

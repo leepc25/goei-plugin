@@ -121,6 +121,8 @@ export class PerkRun {
   private armorRefillAt = -1;
   private killWindow = 0;
   private crisisUntil = -1;
+  /** 마지막으로 쓰러뜨린 자리 (방 보상이 떨어질 곳) */
+  lastKill: { x: number; y: number } | null = null;
   /** 이번 괴이에서 깬 방 수 (깊을수록 높은 등급이 잘 나옴) */
   get depth(): number { return this.n.rooms ?? 0; }
   /** 바뀌었을 때 화면(시험장·창)이 다시 그린다 */
@@ -145,6 +147,7 @@ export class PerkRun {
     const out = { reason, rooms: this.n.rooms ?? 0, kills: this.n.hunt ?? 0, perks: [...this.ranks.keys(), ...this.traits] };
     this.reset();
     this.active = false;
+    this.lastKill = null;
     return out;
   }
   /** 판 저장용 (출동 저장 world.snapshot 에 같이 들어감) */
@@ -402,6 +405,7 @@ export class PerkRun {
   /** 처치 */
   kill(c: PerkCtx): void {
     const h = this.host; if (!h) return;
+    this.lastKill = { x: c.t.x, y: c.t.y };
     const s = this.st(c.body);
     const elite = h.isElite(c.body);
     this.n.chain = Math.min(5, (this.n.chain ?? 0) + 1); this.lastKillT = this.T;

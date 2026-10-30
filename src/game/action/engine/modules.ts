@@ -11,6 +11,7 @@ import { persp, view } from './view';
 import { KEYMAP } from './input';
 import { drawGuardBar } from '../ui/pixelHud';
 import { FighterPlayer, fighterHooks } from '../fighter/player';
+import { openDraft } from '../../perks/draftUi';
 import { FighterAi } from '../fighter/ai';
 import { charArt, charFace, charTop, drawCharClip, hasCharClip, loadChar } from '../art/charPacks';
 import { setPixelScale } from './contract';
@@ -744,6 +745,7 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
   };
   // 에일린 테스트룸 전투의 소리는 화면 효과 없이 소리만
   fighterHooks.sfx = (e) => audio.event(e as never);
+  fighterHooks.openDraft = (p, offers) => openDraft(shell.canvas.parentElement ?? document.body, p, { world, offers });
   const listeners: ((e: GameEvent) => void)[] = [
     (e) => {
       audio.event(e as never);
@@ -878,8 +880,9 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
       w.threat = (b) => (DEF_BY_KIND[b.kind] ? isThreat(b as never) : true);
       w.on((e) => {
         // 임시 퍽(src/game/perks): 층(방)에 들어감 · 전투를 끝냄
-        if (w.player instanceof FighterPlayer && e.type === 'enter:floor') w.player.perks.roomEnter();
-        if (w.player instanceof FighterPlayer && e.type === 'combat:clear') w.player.perks.roomClear();
+        // 방 보상: 전투가 끝나면 카드가 떨어지고(괴이 판 진행 중일 때만), 안 집고 다음 방으로 가면 그때 3택1 창
+        if (w.player instanceof FighterPlayer && e.type === 'enter:floor') { if (w.player.reward) w.player.takeReward(); w.player.perks.roomEnter(); }
+        if (w.player instanceof FighterPlayer && e.type === 'combat:clear') { w.player.perks.roomClear(); w.player.dropReward(); }
         if (e.type !== 'custom') return;
         const d = (e.data ?? {}) as { dmg?: number; text?: string; kind?: string; ticks?: number; debuff?: { kind?: string; ticks?: number } };
         // 디버프는 글자만이 아니라 실제로 건다 (src/game/combat/status.ts, 에일린)

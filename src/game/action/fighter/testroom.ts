@@ -145,6 +145,7 @@ function fill(p: FighterPlayer) {
   const ended = (r: { reason: string; rooms: number; kills: number; perks: string[] }) => { runMsg.textContent = `판 끝(${({ death: '죽음', retreat: '중간 복귀', return: '귀환' } as Record<string, string>)[r.reason]}): 깬 방 ${r.rooms} · 처치 ${r.kills} · 지운 퍽 ${r.perks.length}개`; };
   runRow.append(
     btn('괴이 들어감', () => { p.perks.startRun(); runMsg.textContent = '판 시작'; }),
+    btn('전투 끝(보상 떨어짐)', () => { p.perks.roomClear(); p.dropReward({ x: p.x + 160, y: p.y }); runMsg.textContent = p.perks.active ? '보상 카드가 떨어짐 · 가까이 가서 E' : '괴이 밖이라 안 떨어짐'; }),
     btn('죽음', () => ended(p.perks.endRun('death'))),
     btn('중간 복귀', () => ended(p.perks.endRun('retreat'))),
     btn('귀환', () => ended(p.perks.endRun('return'))),

@@ -1640,7 +1640,7 @@ function drawCut() {
     get hitstop() { return hitstop; }, get shake() { return shake; }, get zoom() { return zoom; }, get target() { return T; },
     knock, hit, stun, die, sitAt, rise, seatAct, runScene, playLife, lifeIds, emote, act, toIdle, has, nOf, SCENES,
     /** 퍽 손잡이 (fighter/player.ts 가 PerkHost 로 묶음) */
-    perkApi: { proxies, hit: perkHit, boom: perkBoom, ghost: ghostAttack, replaySkill, reflect: reflectShot, mark: markT, bind: bindT, later: (t: number, fn: () => void) => later(t, fn), text: (x: number, y: number, v: string) => fx.push({ k: 'num', x: x - 30, y, v, t: 1.1 }), gainSp: (v: number) => { P.sp = Math.min(100, P.sp + v); } },
+    perkApi: { proxies, hit: perkHit, boom: perkBoom, ghost: ghostAttack, replaySkill, reflect: reflectShot, mark: markT, bind: bindT, later: (t: number, fn: () => void) => later(t, fn), text: (x: number, y: number, v: string) => fx.push({ k: 'num', x: x - 30, y, v, t: 1.1 }), gainSp: (v: number) => { P.sp = Math.min(100, P.sp + v); }, vfx: (n: string, x: number, y: number, s: number, o: Json = {}) => vfx(n, x, y, s, o) },
     /** 시험장 전용 스위치: 필살 게이지 무시 */
     get freeSuper() { return freeSuper; }, set freeSuper(v: boolean) { freeSuper = v; },
     /** 시험장 의자 맞추기: 고친 값 묶음(바꾸면 바로 그림에 반영)·지금 맞춤 값 */
