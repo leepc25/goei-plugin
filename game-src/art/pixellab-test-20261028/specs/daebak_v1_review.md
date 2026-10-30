@@ -14,6 +14,7 @@
 - 사용자: 문은 그리지 않고 바깥 출입은 화면 아래 출구 표시
 - 사용자: 물건은 빼지 않음
 - 사용자: 참고 그림 1·밑그림 없이(진료실 v4·대기실 v7과 같은 설정)
+- 사용자: 시가 상자 넣기(설계안의 '없음'을 바꿈)
 
 ## 설계안·위키 항목 대조
 
@@ -36,7 +37,7 @@
 - 설계안: 화분·우산꽂이 → 2번
 - 설계안: 벽 액자 ×3 → 7번, 12번
 - 설계안: 소화기함 → 8번
-- 설계안: 시가 상자 없음 → omit: 설계안이 없다고 정함
+- 설계안: 시가 상자 없음 → 사용자 10-30: 넣기 → 11번
 - 설계안: 바닥 낡은 베이지 타일, 안쪽 짙은 카펫 → 칸:floor beige
 - 설계안: 벽 짙은 붉은 갈색 → 칸:walls red-brown
 - 설계안: 형광등과 네온 반사 → 칸:walls fluorescent
@@ -57,19 +58,19 @@
 | 8 | on the back wall left part a red fire extinguisher box | 설계안 소화기함 | fire extinguisher box | Back wall, left part: a red fire extinguisher box |  |
 | 9 | on the floor in front of the back wall, middle, a low wooden coffee table with four coffee mugs and a newspaper on it, with empty floor on both sides of it | 설계안 낮은 탁자, 머그컵 ×4, 신문 (소파는 오브젝트로 양옆에 놓을 자리) | low coffee table, four mugs, newspaper, empty floor | Floor in front of the back wall, middle: a low coffee table, four mugs, a newspaper, empty floor on both sides | wooden(재질 세부) |
 | 10 | on the floor on the right part, a low waist-high glass partition with a dark wooden frame, running from the back wall toward the camera, separating the inner office, with an open gap in it to walk through | 설계안 안쪽 사무실 낮은 유리 칸막이, 들어갈 틈(문 없음) | glass partition, waist-high, back wall, open gap | Floor, right part: a waist-high glass partition from the back wall toward the camera, with an open gap | low(waist-high로 같은 뜻); dark(틀 색 세부); wooden(틀 재질 세부); frame(틀 세부); running(from ~ toward로 같은 뜻); separating(inner office 묶음이 맡음); inner(다음 줄 묶음이 맡음); office(다음 줄 묶음이 맡음); walk(open gap으로 충분) |
-| 11 | on the floor in the inner office on the right, on dark carpet, an oval poker table with green felt standing free like an island, stacks of colourful poker chips and playing cards on it | 위키 안쪽 사무실 포커 테이블·칩 / 설계안 녹색 펠트, 방 안 섬, 칩 더미·카드 | poker table, green felt, standing alone, poker chips, cards | Floor, inner office, right: an oval green felt poker table standing alone, poker chips and cards on it | dark(floor 칸 dark carpet이 맡음); carpet(floor 칸 dark carpet이 맡음); free(free-standing으로 남김); like(standing alone으로 같은 뜻); island(standing alone으로 같은 뜻); stacks(poker chips로 충분); colourful(칩 색은 모델이 앎); playing(cards로 충분) |
+| 11 | on the floor in the inner office on the right, on dark carpet, an oval poker table with green felt standing free like an island, stacks of colourful poker chips and playing cards on it, and an open wooden cigar box on the table | 위키 안쪽 사무실 포커 테이블·칩 / 설계안 녹색 펠트, 방 안 섬, 칩 더미·카드 / 사용자 10-30: 시가 상자 넣기 | poker table, green felt, standing alone, poker chips, cards, cigar box | Floor, inner office, right: an oval green felt poker table standing alone, poker chips, cards and a cigar box on it | dark(floor 칸 dark carpet이 맡음); carpet(floor 칸 dark carpet이 맡음); free(free-standing으로 남김); like(standing alone으로 같은 뜻); island(standing alone으로 같은 뜻); stacks(poker chips로 충분); colourful(칩 색은 모델이 앎); playing(cards로 충분); open(cigar box로 충분); wooden(상자 재질 세부) |
 | 12 | on the back wall of the inner office a third framed picture and a low wooden sideboard with binders | 설계안 벽 액자 ×3 중 하나, 사무실 서류 | framed picture, sideboard, binders | Back wall, right, inner office: a framed picture over a low sideboard with binders | third(앞 줄 두 개와 합쳐 셋); wooden(재질 세부) |
 
 ## 3차 자가 검토
 
 - 이 방에 안 맞는 물건이 2차 문장에 있나? 줄마다 확인한 결과
-  - 13줄 모두 알선 사무소 물건(위키·설계안). 의자·소파·시계·사람 없음. 시가 상자 없음(설계안)
+  - 13줄 모두 알선 사무소 물건(위키·설계안). 의자·소파·시계·사람 없음. 시가 상자 넣음(사용자)
 - 손님 물건이 직원 쪽에 있거나, 캐릭터가 못 다가가는 자리에 꼭 필요한 것이 있나?
   - 접수대는 왼쪽, 뒷벽에서 1m 띄우고 왼쪽 끝에 빈 통로(대기실 v6 교훈). 가운데는 물건 없이 다니는 바닥(물건이 아닌 '빈 바닥' 줄은 글자 때문에 뺌). 낮은 탁자 양옆 빈 바닥은 소파 오브젝트 자리. 오른쪽 안쪽 사무실은 유리 칸막이 틈으로 들어감. 사람 말 없음
 - 큰 가구·문 크기가 서 있는 사람 150px(에일린) 기준으로 맞나? 숫자로
   - 접수대 가슴 높이 95(사람 150의 0.63배, 1.1m). 탁자·포커 테이블은 숫자 없이(크기 범위 없음, 낮은 탁자·허리 높이 칸막이로 몸 기준)
 - 위키·설계안·사용자 결정 중 빠진 것이 있나? 있으면 왜 뺐나
-  - 위키·설계안 항목 모두 줄·칸에 대응. 뺀 것: 소파·의자(사용자: 오브젝트), 금색 시계(설계안: 인물 몫, 시계 전역 금지), 삼단봉(인물), 시가 상자(설계안: 없음)
+  - 위키·설계안 항목 모두 줄·칸에 대응. 뺀 것: 소파·의자(사용자: 오브젝트), 금색 시계(설계안: 인물 몫, 시계 전역 금지), 삼단봉(인물). 시가 상자는 사용자 결정으로 포커 테이블에 넣음
 - 2차로 줄이며 1차 뜻이 바뀌거나 중요한 세부(기구·재질·잠금 등)가 빠졌나?
   - 네온 OPEN·선팅 유리, 접수대 방향·높이·통로, 칸막이 틈, 포커 테이블 녹색 펠트·섬·칩·카드를 남김. 뺀 것은 재질·색·같은 뜻·쓰임 설명뿐, 줄마다 이유
 - 이유 없는 채움 물건·같은 물건 두 번·쓸데없이 긴 설명이 있나?
@@ -84,7 +85,7 @@ Pixel art game background: a tacky fixer's agency office in a 1990s Seoul underg
 Camera at standing eye height, about 20 degrees above the floor, looking slightly down. One-point perspective, side walls receding toward the middle. The floor fills the lower half of the image. Only the left side wall is visible; on the right the room continues past the image edge.
 FLOOR: worn stained beige tiles; dark carpet in the inner office on the right; red neon glow.
 WALLS: scuffed dark red-brown wallpaper; fluorescent tubes.
-THINGS (a standing adult is 150 pixels tall): Left wall, front part: dark tinted glass shop window, tacky red neon sign reading "OPEN". Left wall, high: a wall-mounted TV, dark muted screen. Floor in front of the left wall: a tall potted plant and an umbrella stand. Floor, left part: a long reception counter facing the camera, chest high (95 pixels), a metre in front of the back wall, an empty walkway at its left end behind it. On the counter: a candy bowl, a document tray, a blank guestbook, newspapers. Back wall, behind the counter: a wooden baseball bat leaning on the wall. Floor, front center: a worn doormat. Back wall, left part: two framed faded photos; a red fire extinguisher box. Floor in front of the back wall, middle: a low coffee table, four mugs, a newspaper, empty floor on both sides. Floor, right part: a waist-high glass partition from the back wall toward the camera, with an open gap. Floor, inner office, right: an oval green felt poker table standing alone, poker chips and cards on it. Back wall, right, inner office: a framed picture over a low sideboard with binders.
+THINGS (a standing adult is 150 pixels tall): Left wall, front part: dark tinted glass shop window, tacky red neon sign reading "OPEN". Left wall, high: a wall-mounted TV, dark muted screen. Floor in front of the left wall: a tall potted plant and an umbrella stand. Floor, left part: a long reception counter facing the camera, chest high (95 pixels), a metre in front of the back wall, an empty walkway at its left end behind it. On the counter: a candy bowl, a document tray, a blank guestbook, newspapers. Back wall, behind the counter: a wooden baseball bat leaning on the wall. Floor, front center: a worn doormat. Back wall, left part: two framed faded photos; a red fire extinguisher box. Floor in front of the back wall, middle: a low coffee table, four mugs, a newspaper, empty floor on both sides. Floor, right part: a waist-high glass partition from the back wall toward the camera, with an open gap. Floor, inner office, right: an oval green felt poker table standing alone, poker chips, cards and a cigar box on it. Back wall, right, inner office: a framed picture over a low sideboard with binders.
 LIGHT: red glow by the window, deep shadows under furniture.
-STYLE: dense, highly detailed pixel art, crisp pixel clusters, selective dark outline, rich medium-to-detailed shading, dark red-brown, beige, green felt, red neon, no dithering, no blur. No people, chairs, sofas, benches, clocks, doors, doorways or cigar boxes.
+STYLE: dense, highly detailed pixel art, crisp pixel clusters, selective dark outline, rich medium-to-detailed shading, dark red-brown, beige, green felt, red neon, no dithering, no blur. No people, chairs, sofas, benches, clocks, doors or doorways.
 ```
