@@ -79,12 +79,27 @@ STEPS = {
  "G": ("A", 8, "loop", f"Bare and barefoot {side}: drop into a defensive low crouch, {LOW}, {GUARD}. Hold the crouch, the shoulders rising and falling with heavy breathing. {DRAW}"),
  "H1": ("G", 8, "G", f"Bare and barefoot {side}, in a low crouch with {GUARD}: struck in the stomach, the body folds forward at the waist, the face twisting in pain with the eyes squeezed shut, the hands never leaving the body, sliding one step back on the heels, then rises back into the same low crouch. {DRAW}"),  # 10-31: H1 배(앞으로 접힘)·H2 가슴(뒤로 밀림), 둘 다 경계→경계, 맞을 때마다 둘 중 하나
  "H2": ("G", 12, "G", f"Bare and barefoot {side}, in a low crouch with {GUARD}: knocked backward by a heavy blow to the chest, the shoulders jolt back and the whole body rocks back, the head staying on the shoulders, staggering three big steps backward with the knees almost buckling, the hands never leaving the body, then sinks back into the same low crouch. {DRAW}"),
- "H3": ("H2@peak", 12, None, f"Bare and barefoot {side}: struck hard in the chest, the head snaps back and the body reels backward two fast stumbling steps, the knees give way and the body drops straight down, the hips hit the floor, then the back slams flat onto the floor and the head bounces once. The body ends lying flat on the back along the floor, the arms at the sides. {DRAW}"),
+ "H3": ("H2@peak", 12, None, f"Bare and barefoot {side}: struck hard in the chest, the upper body reels backward two fast stumbling steps, the knees give way and the body drops straight down, the hips hit the floor, then the back slams flat onto the floor and the head bounces once. The body ends lying flat on the back along the floor, the arms at the sides. {DRAW}"),
  "H4": ("H3", 8, "H3", f"Bare and barefoot, lying flat on the back on the floor {side}: flinch, pull both knees up toward the chest and cross both forearms over the face, then let the arms and legs drop back flat along the floor, the body staying on the floor the whole time. {DRAW}"),
  "H5": ("H3", 16, "G", f"Bare and barefoot, lying flat on the back on the floor {side}: roll onto one side, push up with one hand onto one knee, then rise into a defensive low crouch, {LOW}, {GUARD}. {DRAW}"),
  "H6": ("G", 8, "loop", f"Bare and barefoot, running {side} with fast even strides, both legs alternating evenly with the same step length, the upper body leaning forward, {COVER}. {DRAW}"),
 }
 CANVAS = (256, 256)
+
+# ── 지침 검사 (docs/샤워_뽑기_지침.md, 10-31 사용자: 말로는 안 된다 → 장치). 어기면 보내지 않고 멈춘다 ──
+BANNED = ["flushed", "pale", "panick", "trembl", "in the face", "snaps back", "whips", "leave the floor", "through the air", "flies", "flying", "tap one foot", "fists raised", "fighting stance"]
+NEED_START = {"H1": "G", "H2": "G", "H3": "H2@peak", "H4": "H3", "H5": "H3", "H6": "G", "G": "A"}
+def lint(n):
+    src, frames, opt, prompt = STEPS[n]
+    bad = [w for w in BANNED if w in prompt.lower()]
+    errs = [f"{n}: 쓰지 않는 말 {bad}"] if bad else []
+    if n in NEED_START and src != NEED_START[n]: errs.append(f"{n}: 시작 장이 {src} — 지침은 {NEED_START[n]}")
+    if frames % 4 or not 4 <= frames <= 40: errs.append(f"{n}: 장 수 {frames} (4의 배수 4~40)")
+    if "Only the" not in prompt: errs.append(f"{n}: 끝에 Only the … is drawn. 없음")
+    if g == "man" and "chest" in COVER: errs.append("남자 가리기에 가슴")
+    return errs
+_errs = [e for n in STEPS for e in lint(n)]
+if _errs: sys.exit("지침 위반 — 보내지 않음:\n" + "\n".join(_errs))
 def b64(im):
     b = io.BytesIO(); im.save(b, "PNG"); return {"type": "base64", "base64": base64.b64encode(b.getvalue()).decode(), "format": "png"}
 def biggest(im):   # 가장 큰 덩어리(몸)만 남긴 사본 — 시작 장용
@@ -156,6 +171,11 @@ def run(n):
     fr = [m3.fetch_png(u) for u in urls]
     for i, im in enumerate(fr): im.save(o / f"{i:02d}.png")
     m3.sheet(fr, OUT / f"샤워2_{n}_sheet.png")
+    gif = []   # 지침 1-3: 끝나면 바로 보여 줄 움직이는 그림
+    for im in fr:
+        b = Image.new("RGBA", im.size, (60, 60, 70, 255)); b.alpha_composite(im); gif.append(b.convert("RGB"))
+    gif[0].save(OUT / f"샤워2_{n}.gif", save_all=True, append_images=gif[1:], duration=120, loop=0)
+    assert fr[0].size == CANVAS, f"캔버스 {fr[0].size} ≠ 256×256"
     return n, f"완료 {len(fr)}장 {json.dumps(j.get('usage'))}"
 from concurrent.futures import ThreadPoolExecutor as _E
 _one = [a for a in sys.argv[2:] if not a.startswith("--")]
