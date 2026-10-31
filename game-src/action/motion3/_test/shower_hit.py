@@ -25,8 +25,10 @@ C = {  # 키: (옆 방향, 성별, 몸 묘사(옷 없이), 벗는 순서)
 }
 key = sys.argv[1]
 if key in C: D, g, SUB, SEQ = C[key]
-else:   # 목록 전원: shower_targets.json(옷 뺀 몸 묘사) + 일반 벗는 순서
-    _t = json.load(open(Path(__file__).resolve().parent / "shower_targets.json"))[key]
+else:   # 목록 전원: shower_targets.json(방향·성별) + 일반 벗는 순서
+    # 10-31 사용자: 뽑을 때는 동작만 들어가면 된다, 방향만 정해 주면 됨(몸 묘사 불필요). 웹에서 직접 뽑은 3명은 방향·성별만(사용자: 성인, 캐릭터 표의 고등학생 표기는 잘못)
+    _t = {**{k: {"dir": "east", "g": "woman", "body": ""} for k in ("6.11_불량배여2", "6.52_학생여1", "6.53_학생여2")},
+          **json.load(open(Path(__file__).resolve().parent / "shower_targets.json"))}[key]
     D, g, SUB = _t["dir"], _t["g"], _t["body"]
     _p = "he" if g == "man" else "she"; _P = _p.capitalize(); _h = "his" if g == "man" else "her"
     SEQ = (f"{_p} takes off the clothes one piece at a time with clear hand movements: first any outer layer such as a jacket, coat, cardigan or vest, pushing it back off {_h} shoulders, pulling the arms out of the sleeves and dropping it; then any necktie, scarf or accessory on the body; then the top, unbuttoning it or pulling it off over the head and dropping it"
@@ -142,7 +144,7 @@ def run(n):
         if sh.exists(): sh.rename(old / "sheet.png")
     src, frames, opt, prompt = STEPS[n]; start = m3.pad(last(src), CANVAS)
     body = {"character_id": CID, "mode": "pixminimax", "action_description": prompt, "animation_name": f"test 샤워피격 {n}",
-            "directions": [D], "frame_count": frames, "subject_description": SUB, "initial_pose": f"standing upright {side}",
+            "directions": [D], "frame_count": frames, "initial_pose": f"standing upright {side}",
             "keep_first_frame": False, "enhance_prompt": False, "custom_start_frame": b64(start)}
     if opt == "loop": body["end_frame"] = b64(start)
     if opt in STEPS:   # 끝 장 = 다른 줄의 끝 장(경계 자세 등)
