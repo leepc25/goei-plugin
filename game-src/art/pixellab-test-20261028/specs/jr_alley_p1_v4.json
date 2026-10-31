@@ -1,0 +1,208 @@
+{
+ "room": "corridor",
+ "mood": "worn",
+ "mode": "loose",
+ "view": "corridor",
+ "floor_share": "the lower 30 percent",
+ "density": "packed+",
+ "place": "a run-down 1990s Seoul underground arcade corridor, low ceiling right above the sign",
+ "time": "night",
+ "light": "half-dead fluorescent tubes and warm shop light",
+ "palette": "dark cold blue-grey, amber lamp light accents",
+ "walls": "grimy concrete, peeling paint, exposed brick, rust streaks, mold, cracks; ceiling strip, tangled cables, fluorescent tubes, most dead, one flickering",
+ "floor": "smooth dark poured concrete like one wet sheet, mottled grime, oil stains, many puddles, wet stains, varied litter all over the walkway, light pool, shadows under objects",
+ "shadow": "strong contrast, amber lamp pools, dark patches, black shadow under objects",
+ "name": "jr_alley_p1_v4",
+ "sides": "left",
+ "doors": 1,
+ "no": [
+  "other doors"
+ ],
+ "sized": [],
+ "items": [
+  {
+   "full": "far left 20 percent of the image: a dead-end wall with a lowered rusty shutter, military equipment cases and boxes piled in front of it",
+   "text": "far left 20 percent of the image: a solid end wall closes the walkway from floor to ceiling, a lowered rusty shutter in it, equipment cases piled against it",
+   "why": "의뢰문 ① 왼쪽 끝 셔터 막다른 벽·장비 케이스, 사용자 왼쪽 벽 처리 주의",
+   "keep": [
+    "end wall",
+    "lowered rusty shutter",
+    "equipment cases"
+   ]
+  },
+  {
+   "full": "back wall, centered: a big pawn shop filling the middle 80 percent of the width, recessed like a deep lit room, a heavy old wooden door in the middle and lit display windows crammed with small jewelry, watches, porcelain and nameless odd objects, an old dark wooden board with carved gold letters reading \"헐값매입\"",
+   "text": "back wall, centered: a big pawn shop filling the middle 80 percent of the width, recessed like a deep lit room, a heavy wooden door, lit display windows crammed with jewelry, watches, porcelain and odd objects, a dark wooden board with gold letters reading \"헐값매입\"",
+   "why": "위키 헐값 매입, 앞골목 가게 틀",
+   "keep": [
+    "pawn shop",
+    "wooden door",
+    "display windows",
+    "reading \"헐값매입\""
+   ]
+  },
+  {
+   "full": "clear empty floor in front of the wooden door",
+   "text": "clear empty floor in front of the wooden door",
+   "why": "게임 출입구 앞 비움",
+   "keep": [
+    "clear empty floor"
+   ]
+  },
+  {
+   "full": "left of the shop: a caged wall lamp with a dim amber glow, a rusted trash can, a burst trash bag",
+   "text": "left of the shop: a rusted trash can, a burst trash bag",
+   "why": "소품 왼쪽",
+   "keep": [
+    "caged wall lamp",
+    "trash can"
+   ]
+  },
+  {
+   "full": "right of the shop: a caged wall lamp, tangled cables hanging down, stacked boxes, a torn blank poster",
+   "text": "right of the shop: stacked boxes, a torn blank poster",
+   "why": "소품 오른쪽",
+   "keep": [
+    "tangled cables",
+    "stacked boxes",
+    "blank poster"
+   ]
+  },
+  {
+   "full": "wall base: collapsed cardboard, broken bottles, each a different shape",
+   "text": "wall base: collapsed cardboard, broken bottles, each a different shape",
+   "why": "사용자 쓰레기 제각각",
+   "keep": [
+    "broken bottles",
+    "each a different shape"
+   ]
+  },
+  {
+   "full": "a small CCTV camera over the door",
+   "text": "a CCTV camera over the door",
+   "why": "암시장 경계",
+   "keep": [
+    "CCTV camera"
+   ]
+  },
+  {
+   "full": "a caged wall lamp with a dim amber glow",
+   "text": "a caged wall lamp",
+   "why": "앞 판 물건 유지",
+   "keep": [
+    "caged wall lamp"
+   ]
+  },
+  {
+   "full": "tangled cables hanging down the wall",
+   "text": "tangled cables down the wall",
+   "why": "앞 판 물건 유지",
+   "keep": [
+    "tangled cables"
+   ]
+  },
+  {
+   "full": "right 10 percent of the image: only bare back wall and floor, no side wall",
+   "text": "right 10 percent of the image: only bare back wall and floor, no side wall",
+   "why": "사용자 이음매: 앞 기둥 자리",
+   "keep": [
+    "right 10 percent"
+   ]
+  }
+ ],
+ "must": [
+  {
+   "kw": "reading \"헐값매입\"",
+   "from": "가게 이름"
+  },
+  {
+   "kw": "one wet sheet",
+   "from": "사용자 바닥 선 금지"
+  }
+ ],
+ "brief": {
+  "wiki": "중림 뒷골목",
+  "design": "GPT 의뢰문 뒷골목 칸 구성",
+  "user": [
+   "사용자 10-31: ②③④ 그대로, ⑥ 보류, ①⑤⑦ 다시. ①⑦은 왼쪽 벽·오른쪽 벽 처리 주의 → 끝 칸만 그쪽 옆벽 문장, 끝은 바닥부터 천장까지 막힘. 가게 줄은 앞골목 틀, 소품은 가게 왼쪽·오른쪽에 나눠",
+   "v3: 왼쪽 막이를 허락 없이 오브젝트로 빼서 뚫림(사용자) → 배경에 끝벽으로"
+  ],
+  "items": [
+   {
+    "src": "0번 줄 근거",
+    "by": [
+     0
+    ]
+   },
+   {
+    "src": "1번 줄 근거",
+    "by": [
+     1
+    ]
+   },
+   {
+    "src": "2번 줄 근거",
+    "by": [
+     2
+    ]
+   },
+   {
+    "src": "3번 줄 근거",
+    "by": [
+     3
+    ]
+   },
+   {
+    "src": "4번 줄 근거",
+    "by": [
+     4
+    ]
+   },
+   {
+    "src": "5번 줄 근거",
+    "by": [
+     5
+    ]
+   },
+   {
+    "src": "6번 줄 근거",
+    "by": [
+     6
+    ]
+   },
+   {
+    "src": "7번 줄 근거",
+    "by": [
+     7
+    ]
+   },
+   {
+    "src": "8번 줄 근거",
+    "by": [
+     8
+    ]
+   },
+   {
+    "src": "9번 줄 근거",
+    "by": [
+     9
+    ]
+   }
+  ]
+ },
+ "review": {
+  "fit": "뒷골목 이 칸의 가게·소품, 의자·사람 없음",
+  "place": "가게 가운데, 소품은 가게 왼쪽·오른쪽, 문 앞 비움",
+  "size": "크기 숫자 없음(느슨한 틀)",
+  "brief": "칸 내용 대응, 빠진 것 없음",
+  "meaning": "1차=2차(느슨한 틀)",
+  "over": "같은 물건 두 번 없음, packed+",
+  "frame": "구조 문장은 앞골목과 같음(끝 칸만 그쪽 옆벽), 가이드 v6"
+ },
+ "removed_by_user": [
+  {
+   "full": "left 10 percent of the image: only bare back wall and floor, no side wall",
+   "by": "사용자 10-31: 「1과 7은 왼쪽벽 오른쪽벽 처리에 주의하고」 — ①은 통로 왼쪽 끝이라 이음 비움 대신 끝벽"
+  }
+ ]
+}

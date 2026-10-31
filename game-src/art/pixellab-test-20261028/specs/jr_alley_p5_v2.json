@@ -1,0 +1,200 @@
+{
+ "room": "corridor",
+ "mood": "worn",
+ "mode": "loose",
+ "view": "corridor",
+ "floor_share": "the lower 30 percent",
+ "density": "packed+",
+ "place": "a run-down 1990s Seoul underground arcade corridor, low ceiling right above the sign",
+ "time": "night",
+ "light": "half-dead fluorescent tubes and warm shop light",
+ "palette": "dark cold blue-grey, amber lamp light accents",
+ "walls": "grimy concrete, peeling paint, exposed brick, rust streaks, mold, cracks; ceiling strip, tangled cables, fluorescent tubes, most dead, one flickering",
+ "floor": "smooth dark poured concrete like one wet sheet, mottled grime, oil stains, many puddles, wet stains, varied litter all over the walkway, light pool, shadows under objects",
+ "shadow": "strong contrast, amber lamp pools, dark patches, black shadow under objects",
+ "name": "jr_alley_p5_v2",
+ "sides": "none",
+ "doors": 1,
+ "no": [
+  "other doors",
+  "stairs",
+  "side walls"
+ ],
+ "sized": [],
+ "items": [
+  {
+   "full": "left 10 percent of the image: only bare back wall and floor, no side wall",
+   "text": "left 10 percent of the image: only bare back wall and floor, no side wall",
+   "why": "사용자 이음매: 앞 기둥 자리",
+   "keep": [
+    "left 10 percent"
+   ]
+  },
+  {
+   "full": "back wall, centered: a big drinking bar filling the middle 80 percent of the width, recessed like a deep lit room, an old wooden door and big steamed-up windows showing shelves of liquor bottles and a drinks fridge, a small round hanging sign reading \"막잔\"",
+   "text": "back wall, centered: a big drinking bar filling the middle 80 percent of the width, recessed like a deep lit room, an old wooden door, big steamed-up windows with liquor shelves and a drinks fridge, a small round hanging sign reading \"막잔\"",
+   "why": "의뢰문 ⑤ 작은 술집, 간판 둥근 매달린 판, 앞골목 가게 틀",
+   "keep": [
+    "drinking bar",
+    "wooden door",
+    "steamed-up windows",
+    "reading \"막잔\""
+   ]
+  },
+  {
+   "full": "clear empty floor in front of the wooden door",
+   "text": "clear empty floor in front of the wooden door",
+   "why": "문 앞 비움",
+   "keep": [
+    "clear empty floor"
+   ]
+  },
+  {
+   "full": "left of the shop: stacks of empty beer crates, empty bottles, a caged wall lamp",
+   "text": "left of the shop: stacks of empty beer crates, empty bottles",
+   "why": "의뢰문 빈 맥주 상자·빈 병, 소품 왼쪽",
+   "keep": [
+    "beer crates",
+    "empty bottles"
+   ]
+  },
+  {
+   "full": "right of the shop: an overflowing metal trash can, a rusty air conditioner unit, tangled cables, a caged wall lamp",
+   "text": "right of the shop: an overflowing metal trash can, a rusty air conditioner unit",
+   "why": "설계안 쓰레기통·공조, 소품 오른쪽",
+   "keep": [
+    "trash can",
+    "air conditioner"
+   ]
+  },
+  {
+   "full": "wall base: collapsed cardboard, burst trash bag, cigarette butts, each a different shape",
+   "text": "wall base: collapsed cardboard, burst trash bag, cigarette butts, each a different shape",
+   "why": "사용자 쓰레기 제각각",
+   "keep": [
+    "burst trash bag",
+    "each a different shape"
+   ]
+  },
+  {
+   "full": "a torn blank poster",
+   "text": "a torn blank poster",
+   "why": "벽 종이 몇 군데만",
+   "keep": [
+    "blank poster"
+   ]
+  },
+  {
+   "full": "a caged wall lamp with a dim amber glow",
+   "text": "a caged wall lamp with a dim amber glow",
+   "why": "앞 판 물건 유지",
+   "keep": [
+    "caged wall lamp"
+   ]
+  },
+  {
+   "full": "tangled cables hanging down the wall",
+   "text": "tangled cables hanging down the wall",
+   "why": "앞 판 물건 유지",
+   "keep": [
+    "tangled cables"
+   ]
+  },
+  {
+   "full": "right 10 percent of the image: only bare back wall and floor, no side wall",
+   "text": "right 10 percent of the image: only bare back wall and floor, no side wall",
+   "why": "사용자 이음매: 앞 기둥 자리",
+   "keep": [
+    "right 10 percent"
+   ]
+  }
+ ],
+ "must": [
+  {
+   "kw": "reading \"막잔\"",
+   "from": "가게 이름"
+  },
+  {
+   "kw": "one wet sheet",
+   "from": "사용자 바닥 선 금지"
+  }
+ ],
+ "brief": {
+  "wiki": "중림 뒷골목",
+  "design": "GPT 의뢰문 뒷골목 칸 구성",
+  "user": [
+   "사용자 10-31: ②③④ 그대로, ⑥ 보류, ①⑤⑦ 다시. ①⑦은 왼쪽 벽·오른쪽 벽 처리 주의 → 끝 칸만 그쪽 옆벽 문장, 끝은 바닥부터 천장까지 막힘. 가게 줄은 앞골목 틀, 소품은 가게 왼쪽·오른쪽에 나눠"
+  ],
+  "items": [
+   {
+    "src": "0번 줄 근거",
+    "by": [
+     0
+    ]
+   },
+   {
+    "src": "1번 줄 근거",
+    "by": [
+     1
+    ]
+   },
+   {
+    "src": "2번 줄 근거",
+    "by": [
+     2
+    ]
+   },
+   {
+    "src": "3번 줄 근거",
+    "by": [
+     3
+    ]
+   },
+   {
+    "src": "4번 줄 근거",
+    "by": [
+     4
+    ]
+   },
+   {
+    "src": "5번 줄 근거",
+    "by": [
+     5
+    ]
+   },
+   {
+    "src": "6번 줄 근거",
+    "by": [
+     6
+    ]
+   },
+   {
+    "src": "7번 줄 근거",
+    "by": [
+     7
+    ]
+   },
+   {
+    "src": "8번 줄 근거",
+    "by": [
+     8
+    ]
+   },
+   {
+    "src": "9번 줄 근거",
+    "by": [
+     9
+    ]
+   }
+  ]
+ },
+ "review": {
+  "fit": "뒷골목 이 칸의 가게·소품, 의자·사람 없음",
+  "place": "가게 가운데, 소품은 가게 왼쪽·오른쪽, 문 앞 비움",
+  "size": "크기 숫자 없음(느슨한 틀)",
+  "brief": "칸 내용 대응, 빠진 것 없음",
+  "meaning": "1차=2차(느슨한 틀)",
+  "over": "같은 물건 두 번 없음, packed+",
+  "frame": "구조 문장은 앞골목과 같음(끝 칸만 그쪽 옆벽), 가이드 v6"
+ }
+}
