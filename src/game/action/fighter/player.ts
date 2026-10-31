@@ -173,6 +173,12 @@ export class FighterPlayer extends Player {
       isStunned: (t) => t.stunT > 0 || t.body.state === 'stunned' || t.body.core?.P?.mode === 'stun',
       isElite: (body) => !!body.elite || !!body.boss || (body.shieldMax ?? 0) > 0,
       setHpMax: (v) => { this.hpMax = v; },
+      applyStats: (bn) => {
+        if (this.team !== 'player') return;   // NPC 몸은 생길 때 정한 능력치 그대로 (NPC 퍽이 직접 고침)
+        const b = this.base;
+        this.stat = derive({ str: b.str + bn.str, dex: b.dex + bn.dex, con: b.con + bn.con, int: b.int + bn.int, wil: b.wil + bn.wil });
+        this.baseHp = this.stat.hp;
+      },
       addSp: (v) => api.gainSp(v),
       gainDodge: () => { this.core.P.dodgeN = Math.min(this.core.P.dodgeMax, this.core.P.dodgeN + 1); },
       resetSkillCd: () => { this.core.P.cd.skill = 0; this.core.P.skillN = this.core.P.skillMax || 1; },

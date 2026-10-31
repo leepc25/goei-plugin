@@ -68,6 +68,8 @@ export interface PerkHost {
   isStunned(t: any): boolean;
   isElite(body: any): boolean;
   setHpMax(v: number): void;
+  /** 스탯 퍽(힘·민·체·지·정 단련): 더할 값으로 능력치·산출 수치·기본 체력을 다시 계산 (주인공만) */
+  applyStats?(bonus: { str: number; dex: number; con: number; int: number; wil: number }): void;
   addSp(v: number): void;
   gainDodge(): void;
   resetSkillCd(): void;
@@ -178,7 +180,12 @@ export class PerkRun {
     this.ranks.clear(); this.grades.clear(); this.traits.clear(); this.n = {}; this.runUsed.clear(); this.roomUsed.clear();
     this.changed();
   }
-  private changed() { this.version++; this.applyHpMax(); }
+  private changed() { this.version++; this.host?.applyStats?.(this.statBonus()); this.applyHpMax(); }
+  /** 스탯 퍽(10-30 사용자): 고를 때마다 일반 +1 · 희귀 +2 · 특급 +3, 최대 3번, 한 칸 10을 넘어도 된다 */
+  statBonus(): { str: number; dex: number; con: number; int: number; wil: number } {
+    const g = (n: string) => (this.grades.get(n) ?? []).reduce((s: number, x) => s + x + 1, 0);
+    return { str: g('힘 단련'), dex: g('민 단련'), con: g('체 단련'), int: g('지 단련'), wil: g('정 단련') };
+  }
 
   /* ───────── 수치 (엔진이 읽음) ───────── */
   /** 최대 체력 배율 */

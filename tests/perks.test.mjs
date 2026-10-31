@@ -15,8 +15,8 @@ const kit = (o = {}) => ({ shot: true, thrown: false, hot: false, skill: true, c
 const own = (names = [], traits = []) => ({ ranks: new Map(names.map((n) => [n, 1])), traits: new Set(traits) });
 const seq = (...v) => { let i = 0; return () => v[i++ % v.length]; };
 
-test('목록: 공용 139 + 특성 20, 아이템 보류 8개는 후보에 없다', () => {
-  assert.equal(D.PERK_TEXT.length, 139);
+test('목록: 공용 139 + 스탯 퍽 5 + 특성 20, 아이템 보류 8개는 후보에 없다', () => {
+  assert.equal(D.PERK_TEXT.length, 144);
   assert.equal(D.TRAIT_TEXT.length, 20);
   for (const n of ['약 잘 쓰는 손', '넉넉한 주머니', '아끼기', '한 모금', '퀵 드로우', '응급 자동 사용']) assert.equal(R.perkOk(n, kit(), own()), false);
 });
@@ -159,4 +159,23 @@ test('괴이 한 판: 들어감·끝에 퍽이 지워지고, 저장·이어하�
   assert.equal(k2.active, false);
   assert.equal(k2.ranks.size + k2.traits.size, 0);
   assert.equal(me.hpMax, 1000);
+});
+
+test('스탯 퍽: 고를 때마다 일반 +1·희귀 +2·특급 +3, 최대 3번, 10을 넘어도 됨, 체 단련은 체력도 올림', () => {
+  const me = { hp: 1100, hpMax: 1100, baseHp: 1100 };
+  let got = null;
+  const host = { me, P: { x: 0, y: 0 }, text() {}, setHpMax(v) { me.hpMax = v; }, addSp() {}, applyStats(b) { got = b; me.baseHp = 500 + (6 + b.con) * 100; } };
+  const k = new RT.PerkRun(); k.host = host;
+  for (const n of ['힘 단련', '민 단련', '체 단련', '지 단련', '정 단련']) assert.ok(R.graded(D.PERK_TEXT.find((p) => p.name === n)), n);
+  k.add('체 단련', 2); k.add('체 단련', 0);
+  assert.equal(k.statBonus().con, 4);
+  assert.equal(got.con, 4);
+  assert.equal(me.hpMax, 1500);
+  k.add('체 단련', 1); k.add('체 단련', 2);
+  assert.equal(k.count('체 단련'), 3, '최대 3번');
+  assert.equal(k.statBonus().con, 6);
+  k.add('힘 단련', 2);
+  assert.deepEqual(k.statBonus(), { str: 3, dex: 0, con: 6, int: 0, wil: 0 });
+  k.reset();
+  assert.deepEqual(k.statBonus(), { str: 0, dex: 0, con: 0, int: 0, wil: 0 });
 });
