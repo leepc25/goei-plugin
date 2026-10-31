@@ -10,6 +10,7 @@ import { defaultRelation, type Stance } from './factions';
 import { applyTemper, catOf, rollNpcPerks } from './npcperks';
 import type { Hop, PlaceGraph } from './places';
 import { pick, range, type Rng } from './rng';
+import { reactCell, type ReactCell, type ReactSituation } from './namedReact';
 
 export type ActorKind = 'named' | 'mob';
 /** 장면 의자의 앉는 방향 (N = 등, E·W = 옆, 없으면 정면) */
@@ -35,7 +36,7 @@ export interface ActorDef {
 }
 export type Act = 'idle' | 'walk' | 'pause' | 'dead' | 'door' | 'do' | 'notice' | 'post' | 'watch' | 'argue' | 'down' | 'scared' | 'gone';
 /** 걸어서 닿은 뒤 할 일 */
-type Plan = 'none' | 'do' | 'post' | 'exit' | 'steal' | 'harass' | 'chase' | 'patrol' | 'roam-post' | 'cordon' | 'treat';
+type Plan = 'none' | 'do' | 'post' | 'exit' | 'steal' | 'harass' | 'chase' | 'patrol' | 'roam-post' | 'cordon' | 'treat' | 'react';
 
 export interface Actor {
   def: ActorDef;
@@ -150,6 +151,10 @@ export interface Actor {
   escort?: string;
   /** 경보 대응 중인 거점 세력 (모이는 쪽) */
   alarm?: string;
+  /** 캐릭터 반응: 상황별 마지막 반응 시각(생활 초), 본 시체 id, 다가간 뒤 틀 동작 */
+  reactAt?: Partial<Record<ReactSituation, number>>;
+  sawBodies?: string[];
+  reactClip?: string;
   /** 방문자: 경계 거점에 머문 초 (경고 → 내보냄) */
   stay?: number;
   /** 동행 (10-31 사용자 「전부 만들어야지」, 필드 기능 7장): 주인공을 따라 걷는 중. 욕구·할 일은 멈춘다 */
@@ -553,6 +558,7 @@ export class WorldSim {
       a.stolen = 0;
     }
     this.events.push({ kind: 'hurt', scene: a.scene, who: a.def.name, id: a.def.id, named: a.def.kind === 'named', x: a.x, down, hostile });
+    this.witness(a, down);
     // 이름 인물 (C4, 10-31 사용자 가안): 첫 대는 화내고, NAMED_FIGHT_SEC 안에 또 맞으면 맞서 싸운다(전투 AI 몸, 그 인물 그림·능력치 표 ×1.5).
     // 싸움에서 체력 0이 되면 아래 몹처럼 기절
     if (a.def.kind === 'named' && !(a.hp !== undefined && a.hp <= 0)) {
@@ -985,6 +991,99 @@ export class WorldSim {
     if (victim && this.alarms.get(fac)?.threats.includes(victim.def.id)) return;
     this.raiseAlarm(scene, x, 'player', why);
   }
+  // ── 캐릭터 반응 (10-31 사용자 결정 3번): 캐릭터는 고정된 개성 — 반응표(namedReact.json)의 인물별 포즈·말풍선·행동 ──
+  /** 반응 가능한 캐릭터인가 (동행·싸움·경보 대응·쓰러짐 중이면 아님) */
+  private canReact(a: Actor): boolean {
+    return a.def.kind === 'named' && !a.following && !a.fighting && !a.brawl && !a.alarm && !['down', 'dead', 'gone', 'door', 'scared'].includes(a.act) && a.plan !== 'chase';
+  }
+  /** 반응표대로 한다. at = 반응할 곳(무기 든 주인공·시체·소란·맞은 동료), offender = 'player' 또는 가해 행위자, cool = 같은 상황 다시 반응까지 초 */
+  private namedReact(a: Actor, s: ReactSituation, at: { x: number; y: number }, offender?: 'player' | Actor, cool = 12): boolean {
+    const cell: ReactCell | null = reactCell(a.def.name, s);
+    if (!cell || !this.canReact(a)) return false;
+    const last = a.reactAt?.[s];
+    if (last !== undefined && this.time - last < cool) return false;
+    (a.reactAt ??= {})[s] = this.time;
+    const clip = this.canClip(a, cell.clip) ? cell.clip : 'idle';
+    if (cell.icon) this.iconOn(a, cell.icon, 2);
+    a.seatPick = undefined;
+    a.task = undefined;
+    const face = () => { a.face = at.x > a.x ? 1 : -1; };
+    const hold = (doing: string, sec = 3) => { a.act = 'watch'; a.goal = null; a.route = []; a.wait = sec; a.doing = doing; face(); this.setClip(a, clip); };
+    switch (cell.act) {
+      case 'ignore':
+        return true;
+      case 'watch':
+        hold('바라봄');
+        return true;
+      case 'confront':
+        hold('맞서 버팀', 3.5);
+        return true;
+      case 'report':
+        hold('무전·신고', 3);
+        return true;
+      case 'cower':
+        hold('웅크림', 3.5);
+        return true;
+      case 'approach':
+      case 'protect':
+        a.reactClip = clip;
+        a.run = cell.act === 'protect' ? 1.6 : 1;
+        this.walkTo(a, { x: at.x + (a.x < at.x ? -80 : 80), y: at.y || a.y }, cell.act === 'protect' ? '동료에게 달려감' : '살피러 감', 'react');
+        return true;
+      case 'avoid':
+        this.evade(a, at.x);
+        a.run = 1;
+        a.doing = '자리를 피함';
+        return true;
+      case 'flee':
+        this.evade(a, at.x);
+        a.doing = '달아남';
+        return true;
+      case 'attack':
+        if (offender === 'player') {
+          a.run = 1.5;
+          a.target = undefined;
+          this.walkTo(a, { x: at.x, y: at.y || a.y }, '주인공에게 덤빔', 'chase');
+          a.perks ??= ['스탯 뻥튀기', '체력 뻥튀기'];
+        } else if (offender && offender !== a) {
+          this.startBrawl(a, offender);
+        } else hold('맞서 버팀', 3);
+        return true;
+    }
+    return false;
+  }
+  /** 매 틱 보는 것: 무기 든 주인공, 시체, 소란 */
+  private namedSense(a: Actor): void {
+    if (!this.canReact(a)) return;
+    const p = this.player;
+    // 무기를 겨눔: 무기를 꺼낸 주인공이 이쪽을 보고 가까이 (몹 겁 반응과 같은 거리)
+    if (p?.armed && p.scene === a.scene && Math.abs(a.x - p.x) < 300 && Math.abs(a.y - p.y) < 90 && Math.sign(a.x - p.x) === Math.sign(p.face ?? 1)) {
+      if (this.namedReact(a, 'weapon', p, 'player', 8)) return;
+    }
+    // 시체: 처음 보는 시체마다 한 번
+    const b = this.actors.find((q) => q.act === 'dead' && q.scene === a.scene && Math.abs(q.x - a.x) < SEE_BODY_PX && Math.abs(q.y - a.y) < 140 && !a.sawBodies?.includes(q.def.id));
+    if (b) {
+      (a.sawBodies ??= []).push(b.def.id);
+      if (this.namedReact(a, 'body', b, undefined, 0)) return;
+    }
+    // 근처 소란
+    const u = this.uproar.get(a.scene);
+    if (u && this.uproarLevel(a.scene) >= 1 && Math.abs(u.x - a.x) < 700) this.namedReact(a, 'uproar', { x: u.x, y: a.y }, undefined, 25);
+  }
+  /** 주인공이 누군가를 때림·쓰러뜨림·죽임: 근처 캐릭터가 본다. 같은 편(같은 소속·캐릭터끼리)이면 동료가 맞음·쓰러짐, 아니면 범죄 목격 */
+  private witness(victim: Actor, down: boolean): void {
+    const p = this.player;
+    const vf = this.factionOf(victim);
+    for (const a of this.actors) {
+      if (a === victim || a.def.kind !== 'named' || a.scene !== victim.scene || Math.abs(a.x - victim.x) > 700) continue;
+      const af = this.factionOf(a);
+      const ally = victim.def.kind === 'named' ? (!af || !vf || af === vf) : !!vf && vf === af;
+      const s: ReactSituation = ally ? (down ? 'allyDown' : 'allyHit') : 'crime';
+      // 쓰러진 동료는 곁으로, 맞은 동료·범죄는 가해자(주인공) 쪽으로
+      const at = s === 'allyDown' ? victim : p && p.scene === a.scene ? p : victim;
+      this.namedReact(a, s, at, 'player', s === 'crime' ? 10 : 4);
+    }
+  }
   // ── 주인공 쫓아냄 (10-31 사용자 결정 2번): 경계 거점에 들어온 주인공에게 경비가 따라붙어 경고 → 「나가 주시죠」 → 버티면 경보 ──
   // 버팀 판정 = 위치·시간: 출구 쪽으로 가는 중이면 시간이 멈추고, 서 있거나 안쪽으로 가면 흐른다. 말: 경비가 [[허가]]면 머물게 두고, [[경보]]면 바로 경보
   /** 「나가 주시죠」 뒤 버틸 수 있는 초 */
@@ -1298,6 +1397,7 @@ export class WorldSim {
     if (a.needs) decayNeeds(a.needs, dt, TEMPER[a.def.name], onDuty(this.hour, TEMPER[a.def.name]));
     if (a.def.kind === 'mob') this.mobThink(a, dt);
     if (a.def.kind === 'named' && this.namedBlocks(a)) return;   // 호감 적대: 보자마자 막아섬 (C4 다안)
+    if (a.def.kind === 'named') this.namedSense(a);   // 캐릭터 반응 (반응표)
     if (a.def.kind === 'named' || a.post) this.namedNotice(a);   // 주인공 응대: 이름 인물·직원
     this.socialStep(a, dt);
     if (a.def.kind === 'mob') this.threatened(a, dt);
@@ -1623,6 +1723,15 @@ export class WorldSim {
         return this.doSteal(a);
       case 'harass':
         return this.doHarass(a);
+      case 'react':
+        // 반응표 「다가감·동료 곁으로」: 닿으면 그 동작으로 잠깐
+        a.act = 'watch';
+        a.doing = a.doing === '동료에게 달려감' ? '동료 곁을 지킴' : '살핌';
+        a.wait = 3.5;
+        a.run = 1;
+        this.setClip(a, a.reactClip ?? 'idle');
+        a.reactClip = undefined;
+        return;
       case 'chase':
         // 플레이어(또는 도둑) 앞에 섰다: 경고하고 지켜본다 (전투 연결 전)
         a.act = 'watch';
@@ -1997,6 +2106,7 @@ export class WorldSim {
   /** 죽음: 선 채면 사망(44), 누워 있었으면 누운 채 사망(45). 시체로 남고 큰 범죄 → 경찰 출동, 한 명은 현장으로 */
   private kill(a: Actor, lying: boolean, fromFight = false): void {
     this.playerViolence(a.scene, a.x, a, 'murder');
+    this.witness(a, true);
     a.seat = undefined;
     a.seatPick = undefined;
     a.goal = null;

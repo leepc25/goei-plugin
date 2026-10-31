@@ -154,3 +154,31 @@ test('쫓아냄: 경비가 [[허가]]면 머물고, [[경보]]면 바로 경보'
   assert.ok(w2.alarmIn('lobby'));
   void g;
 });
+
+test('캐릭터 반응: 반응표대로 인물마다 다르게 (무기·동료가 맞음·시체)', () => {
+  const w = sim();
+  const e = named(w, '에일린', 'office', 900);
+  const k = named(w, '콘쥬스', 'office', 960);
+  const z = named(w, '쟈알디', 'office', 1300);
+  run(w, 0.3, { scene: 'office', x: 700, y: 560 });
+  // 무기를 꺼내 오른쪽(에일린·콘쥬스 쪽)을 봄
+  run(w, 0.2, { scene: 'office', x: 700, y: 560, armed: true, face: 1 });
+  assert.equal(e.doing, '맞서 버팀');   // 에일린: confront
+  assert.equal(e.icon, '…');
+  assert.equal(k.doing, '자리를 피함'); // 콘쥬스: avoid
+  // 주인공이 콘쥬스를 때림 → 에일린(동료가 맞음 = attack) 주인공에게 덤빔
+  const w2 = sim();
+  const e2 = named(w2, '에일린', 'office', 900);
+  const k2 = named(w2, '콘쥬스', 'office', 1000);
+  run(w2, 0.3, { scene: 'office', x: 950, y: 560 });
+  w2.hitActor(k2.def.id, 1, 5, 10);
+  assert.equal(e2.plan, 'chase');
+  // 시체를 봄: 쟈알디 approach
+  const w3 = sim();
+  const z3 = named(w3, '쟈알디', 'office', 900);
+  const body = w3.add({ id: 'm1', name: '행인', kind: 'mob', brain: 'transit', home: 'office', archetype: '시민', look: '시민' }, { scene: 'office', x: 1000, y: 560 });
+  body.act = 'dead';
+  run(w3, 0.3, { scene: 'street', x: 100, y: 560 });
+  assert.ok(['살피러 감', '살핌'].includes(z3.doing), z3.doing);
+  void z;
+});
