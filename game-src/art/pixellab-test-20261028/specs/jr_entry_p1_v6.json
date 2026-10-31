@@ -5,14 +5,14 @@
  "mode": "loose",
  "view": "street",
  "sides": "open",
- "floor_share": "the lower 30 percent, all sidewalk, with only a very thin curb and road line at the bottom edge",
+ "floor_share": "the lower 30 percent, all sidewalk, a very thin curb line at the bottom",
  "density": "packed",
  "place": "the ground floor shop fronts of a run-down 1990s Seoul shopping street, seen up close from the sidewalk, the image top right above the shop signs",
  "time": "late morning daylight",
  "light": "plain daylight, no lamps lit",
  "floor": "smooth grey concrete sidewalk like one sheet, litter",
  "walls": "grimy concrete and old tile, peeling paint, rust",
- "shadow": "soft daylight shadows under objects and the canopy, dark stairwell",
+ "shadow": "soft shadows under objects and the canopy, dark stairwell",
  "palette": "faded grey, beige, dull blue, rust, soft daylight",
  "doors": 0,
  "no": [
@@ -22,7 +22,7 @@
  "items": [
   {
    "full": "right 30 percent: only the front end of a freestanding arcade entrance on the sidewalk like a Seoul subway exit, the rest continuing past the right edge, open end facing left, stairs going down to the right into darkness, waist-high railings on both sides, a glass canopy over it",
-   "text": "right 35 percent: only the front end of a big freestanding arcade entrance on the sidewalk like a Seoul subway exit, the rest past the right edge, open end facing left, stairs going down to the right into darkness, waist-high railings, a glass canopy as high as the shutters behind",
+   "text": "right 35 percent: the front end of a big freestanding arcade entrance on the sidewalk like a subway exit, the rest past the right edge, open end facing left, stairs going down to the right into darkness, waist-high railings, a glass canopy as high as the shutters behind",
    "why": "사용자: 오른쪽에 지하철 출입구 같은 지하상가 입구",
    "keep": []
   },
@@ -40,19 +40,19 @@
   },
   {
    "full": "back: old low-rise shop buildings along the whole width, ground floor and part of the second floor, tops cut off",
-   "text": "back: old shop fronts along the whole width, signs right under the top edge, no upper floors",
+   "text": "back: old shop fronts along the whole width, no upper floors",
    "why": "거리 뒤 건물",
    "keep": []
   },
   {
    "full": "on the building fronts: faded blank signs, closed shutters, a small open shop, a note reading \"임대\" on an empty window",
-   "text": "on the building fronts: faded blank signs, closed shutters, a small open shop, a note reading \"임대\" on a window",
+   "text": "on the building fronts: signs reading \"중림슈퍼\", \"제일수선\", \"영진철물\", closed shutters, a small open shop, a note reading \"임대\" on a window",
    "why": "낡은 상가 거리",
    "keep": []
   },
   {
    "full": "against the buildings: a vending machine, a parked motorbike, potted plants, trash bags and boxes",
-   "text": "against the buildings: a vending machine nearly as tall as a shop door, a parked motorbike, potted plants, trash bags and boxes",
+   "text": "against the buildings: a vending machine nearly as tall as the shutters, a parked motorbike, potted plants, trash bags and boxes",
    "why": "거리 소품(인도 뒤쪽, 걷는 길 비움)",
    "keep": []
   },
@@ -64,7 +64,7 @@
   },
   {
    "full": "an old public phone",
-   "text": "an old phone booth as tall as a shop door",
+   "text": "an old phone booth nearly as tall as the shutters",
    "why": "공중전화",
    "keep": []
   },
@@ -76,7 +76,7 @@
   },
   {
    "full": "bottom 8 percent: a curb and an asphalt strip, no cars, no markings",
-   "text": "bottom edge: a very thin curb and road line, no cars",
+   "text": "bottom edge: a very thin curb and road line",
    "why": "사용자: 차도는 맨 아래 띠, 걷지 않음",
    "keep": []
   },
@@ -108,7 +108,8 @@
    "v2 작음·입구가 건물에 붙음 → 가이드 맨 위 선(가게 앞면 윗선), 입구는 건물과 떨어져 인도 위(사용자 「그래」)",
    "v3 작음 → 첫 줄에 높이 한계, 바닥 30%, 전선 뺌·현수막 낮춤(사용자 「그런거 빼고 낮춰봐」)",
    "v4 인도 얕음 → 바닥 30%는 인도만, 차도는 그 아래 아주 얇게, 입구는 v1 문장(사용자 「그래 한번 뽑아봐」)",
-   "v5 소품 작음·입구가 셔터보다 작음(사용자) → 자판기·공중전화 가게 문 높이로, 입구 지붕 셔터 높이, 간판 지붕 위, 가이드 v4"
+   "v5 간판 한글 엉망(사용자) → 정확한 이름 중림슈퍼·제일수선·영진철물(사용자 「네가 지정을 해주던가」)",
+   "v5 소품 작음·입구가 셔터보다 작음(사용자) → 자판기·공중전화 셔터 높이 가깝게, 입구 지붕 셔터 높이, 간판 지붕 위, 가이드 v4"
   ],
   "items": [
    {
@@ -182,7 +183,7 @@
  "review": {
   "fit": "낡은 상가 거리 낮, 사람·차 없음",
   "place": "입구 오른쪽, 소품은 건물 앞(인도 뒤쪽), 걷는 길·입구 앞 비움",
-  "size": "자판기·공중전화 '가게 문만큼'(문 기준 말), 입구 지붕 = 뒤 셔터 높이, 가이드 v4 사각형",
+  "size": "자판기·공중전화 '셔터 높이 가깝게'(셔터 기준 말), 입구 지붕 = 뒤 셔터 높이, 가이드 v4 사각형",
   "brief": "사용자 결정 모두 대응",
   "meaning": "1차=2차(느슨한 틀)",
   "over": "같은 물건 두 번 없음, packed+",
