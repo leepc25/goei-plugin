@@ -4,7 +4,6 @@
 
 ## 점검 결과
 
-- FAIL 2014자 > 2000
 - WARN 설명이 김(21낱말): far left: angled left side wall, stairs along it rising from the front floor to the back, out the top-left, side-on
 - WARN 설명이 김(23낱말): back wall: open snack bar recessed like a deep lit room, inner side walls visible, sign board reading "은정분식" in blocky pixel letters
 
@@ -63,7 +62,7 @@
 | 10 | a faded red fire extinguisher box on the wall and a broken CCTV camera hanging from the ceiling strip by its cable | 설계안 소화기함(바램)·CCTV(부서짐) | fire extinguisher box, broken CCTV camera | fire extinguisher box, broken CCTV camera | faded(**이유 없음**); red(fire extinguisher box(색은 팔레트)); wall(**이유 없음**); ceiling(남음); strip(남음); cable(dangling이 같은 뜻) |
 | 11 | an umbrella stand with broken umbrellas and one torn blank poster on the wall | 설계안 우산통·낡은 포스터(빈 면) | umbrella stand, blank poster | umbrella stand, blank poster | broken(**이유 없음**); one(**이유 없음**); torn(**이유 없음**); wall(poster 위치는 벽(packed가 채움)) |
 | 12 | a rusty air conditioner unit and tangled cables on the wall above the snack bar | 설계안 공조 | air conditioner, tangled cables | rusty air conditioner | unit(**이유 없음**); tangled(**이유 없음**); cables(**이유 없음**); wall(above the snack bar가 벽); snack(**이유 없음**); bar(**이유 없음**) |
-| 13 | right image edge: only bare wall and floor, nothing placed | 사용자 10-31 이음매(오른쪽 끝 10%)에 물건 금지, 앞 기둥 오브젝트가 가림. 왼쪽 끝은 통로 끝 계단이라 이음 없음 | right image edge | right image edge: only bare wall and floor, nothing placed |  |
+| 13 | right image edge: only bare wall and floor | 사용자 10-31 이음매(오른쪽 끝 10%)에 물건 금지, 앞 기둥 오브젝트가 가림. 왼쪽 끝은 통로 끝 계단이라 이음 없음 | right image edge | right image edge: only bare wall and floor |  |
 
 ## 3차 자가 검토
 
@@ -82,12 +81,12 @@
 - 원근·바닥 몫·양옆 벽·문·채우기가 이 장면에 정한 대로인가?
   - flat 정면, 왼쪽 옆벽만, 카메라 기본, 낮은 천장(간판 바로 위), 밑그림 없음, 바닥 선 없음, 오른쪽 끝은 벽·바닥만(왼쪽 끝은 계단, 이음 없음), packed, 느슨한 틀
 
-## 2차 요청문 (2014자)
+## 2차 요청문 (1998자)
 
 ```
 Pixel art game background of the west end of a run-down 1990s Seoul underground arcade corridor, low ceiling right above the sign, night. Camera at standing eye height, about 20 degrees above the floor, looking slightly down. Flat front view, no vanishing point. The floor fills the lower 40 percent of the image. Only the left side wall is visible; on the right the room continues past the image edge.
 FLOOR: ONE CONTINUOUS POURED CONCRETE SURFACE, no lines, no grid, no slabs; oil stains, puddles, grime, varied litter all over the walkway, warm light pool, shadows under objects.
-PACKED WITH STUFF, every area filled, no empty wall, no empty floor corner: far left: angled left side wall, stairs along it rising from the front floor to the back, out the top-left, side-on; railing, wall handrail, daylight from above, clear floor before the first step; back wall: open snack bar recessed like a deep lit room, inner side walls visible, sign board reading "은정분식" in blocky pixel letters; steel standing counter jutting onto the walkway, top and front visible, no seats; steaming fish cake pot, red tteokbokki griddle, bowls, cash tin; three menu boards, numbers only, pots, noodle packets; water dispenser, tissue box, drinks fridge; drink crates, cardboard boxes; wall base: wet cardboard, burst trash bag, soju bottles, each a different shape; overflowing trash can, recycling bin; fire extinguisher box, broken CCTV camera; umbrella stand, blank poster; rusty air conditioner; right image edge: only bare wall and floor, nothing placed.
+PACKED WITH STUFF, every area filled, no empty wall, no empty floor corner: far left: angled left side wall, stairs along it rising from the front floor to the back, out the top-left, side-on; railing, wall handrail, daylight from above, clear floor before the first step; back wall: open snack bar recessed like a deep lit room, inner side walls visible, sign board reading "은정분식" in blocky pixel letters; steel standing counter jutting onto the walkway, top and front visible, no seats; steaming fish cake pot, red tteokbokki griddle, bowls, cash tin; three menu boards, numbers only, pots, noodle packets; water dispenser, tissue box, drinks fridge; drink crates, cardboard boxes; wall base: wet cardboard, burst trash bag, soju bottles, each a different shape; overflowing trash can, recycling bin; fire extinguisher box, broken CCTV camera; umbrella stand, blank poster; rusty air conditioner; right image edge: only bare wall and floor.
 WALL: grimy concrete, rust, mold, cracks; ceiling strip, tangled cables, fluorescent tubes, one dead, one flickering.
 LIGHT: strong contrast, bright snack bar, dark stairwell, black shadow under the counter.
 STYLE: dense, highly detailed pixel art, crisp pixel clusters, selective dark outline, rich medium-to-detailed shading, dark grey and beige, warm orange and red, no dithering, no blur. No people, chairs, sofas, benches, coffee tables, clocks, doors or floor lines.

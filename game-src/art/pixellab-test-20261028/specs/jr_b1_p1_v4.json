@@ -371,8 +371,8 @@
    }
   },
   {
-   "full": "right image edge: only bare wall and floor, nothing placed",
-   "text": "right image edge: only bare wall and floor, nothing placed",
+   "full": "right image edge: only bare wall and floor",
+   "text": "right image edge: only bare wall and floor",
    "why": "사용자 10-31 이음매(오른쪽 끝 10%)에 물건 금지, 앞 기둥 오브젝트가 가림. 왼쪽 끝은 통로 끝 계단이라 이음 없음",
    "keep": [
     "right image edge"
