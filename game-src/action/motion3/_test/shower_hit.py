@@ -77,12 +77,12 @@ LOW = "the hips sunk low, the feet wide apart and the knees deeply bent, the sho
 # 10-31 고침: 캔버스 256×256(전투 줄과 같게), G = 경계 자세, H1(선 채 배를 맞음 → G)과 H2(G에서 얼굴을 맞음 → G)는 맞는 곳·움직임이 다름
 STEPS = {
  "G": ("A", 8, "loop", f"Bare and barefoot {side}: drop into a defensive low crouch, {LOW}, {GUARD}. Hold the crouch, the shoulders rising and falling with heavy breathing. {DRAW}"),
- "H1": ("A", 8, "G", f"Bare and barefoot {side}: the body folds forward at the waist as if struck in the stomach, the face twisting in pain with the eyes squeezed shut, and staggers back a full step with the knees buckling. Then drop into a defensive low crouch, {LOW}, {GUARD}. {DRAW}"),
- "H2": ("G", 8, "G", f"Bare and barefoot {side}, in a low crouch with {GUARD}: struck in the face, the head whips sideways and back, the whole body is knocked backward and slides one long step back on the heels, the face twisting in pain. Then sink back into the same low crouch, {GUARD}. {DRAW}"),
+ "H1": ("A", 8, "G", f"Bare and barefoot {side}: struck in the stomach, the body folds forward at the waist with both hands pressed to the stomach, the face twisting in pain with the eyes squeezed shut, and staggers back a full step with the knees buckling, then stays bent low. {DRAW}"),
+ "H2": ("G", 12, "G", f"Bare and barefoot {side}, in a low crouch with the hands kept pressed to the body: struck hard in the face, the head is thrown back, the back arches and the whole body is knocked backward, staggering three big steps back with the knees almost buckling, then sinks back into the same low crouch. {DRAW}"),
  "H3": ("G", 16, None, f"Bare and barefoot {side}: the face twists in pain and both feet leave the floor as the body is thrown backward through the air, the arms flung forward and the legs kicking. Land flat on the back and lie in a straight horizontal line along the floor, the head and the feet at the same height, the arms at the sides. Lying there, only the chest rises and falls a little. {DRAW}"),
  "H4": ("H3", 8, "H3", f"Bare and barefoot, lying flat on the back on the floor {side}: flinch, pull both knees up toward the chest and cross both forearms over the face, then let the arms and legs drop back flat along the floor, the body staying on the floor the whole time. {DRAW}"),
  "H5": ("H3", 16, "G", f"Bare and barefoot, lying flat on the back on the floor {side}: roll onto one side, push up with one hand onto one knee, then rise into a defensive low crouch, {LOW}, {GUARD}. {DRAW}"),
- "H6": ("G", 8, "loop", f"Bare and barefoot, running {side} in place with quick short steps, the upper body hunched forward, {COVER}, the head ducked. {DRAW}"),
+ "H6": ("G", 8, "loop", f"Bare and barefoot, running {side} with fast even strides, both legs alternating evenly with the same step length, the upper body leaning forward, {COVER}. {DRAW}"),
 }
 CANVAS = (256, 256)
 def b64(im):
