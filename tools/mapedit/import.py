@@ -93,9 +93,10 @@ def convert(scene_id: str, m: dict, files: dict) -> dict:
     for s in m.get('spots', []):
         sp = {'id': s['id'], 'x': s['x'], 'y': s['y'], 'verb': s.get('verb', '앉기'), 'face': s.get('face', 1), 'act': s.get('act') or ACTS.get(s.get('dir', 'side')), 'seat': s['seat']}
         spots.append(sp)
+    # 사람 배율 dotK: map.json에 있으면 그것(사용자 10-31 중림 지상: 배경 2배·사람 0.85), 없으면 장면 세로로 계산
     lane = m.get('lane') or [min(p[1] for p in m['floor']), max(p[1] for p in m['floor']) - 12]
     scene = {'file': file, 'w': W, 'h': H, 'under': True, 'lane': lane, 'floor': m.get('floor'), 'holes': holes,
-             'dotK': round(1.5 * H / 890, 4), 'blocks': [], 'doors': doors, 'lamps': m.get('lamps', []), 'windows': [], 'objects': objects}
+             'dotK': m.get('dotK') or round(1.5 * H / 890, 4), 'blocks': [], 'doors': doors, 'lamps': m.get('lamps', []), 'windows': [], 'objects': objects}
     return {'scene': scene, 'spots': spots, 'files': names}
 
 

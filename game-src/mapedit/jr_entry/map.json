@@ -1,0 +1,68 @@
+{
+ "file": "jr_entry_street",
+ "bgScale": 2,
+ "dotK": 0.85,
+ "w": 2836,
+ "h": 848,
+ "under": true,
+ "floor": [
+  [
+   250,
+   600
+  ],
+  [
+   2390,
+   600
+  ],
+  [
+   2390,
+   712
+  ],
+  [
+   250,
+   712
+  ]
+ ],
+ "lane": [
+  600,
+  700
+ ],
+ "blocks": [],
+ "doors": {
+  "west": {
+   "kind": "door",
+   "x": 280,
+   "y": 610,
+   "to": "street",
+   "toDoor": "jr",
+   "label": "버스 정류장",
+   "door": {
+    "x0": 220,
+    "x1": 340,
+    "y0": 400,
+    "y1": 600,
+    "anim": "none",
+    "behind": "dark"
+   }
+  },
+  "down": {
+   "kind": "door",
+   "x": 2430,
+   "y": 610,
+   "to": "jr_b1",
+   "toDoor": "up",
+   "label": "지하상가로 내려가기",
+   "door": {
+    "x0": 2390,
+    "x1": 2470,
+    "y0": 500,
+    "y1": 690,
+    "anim": "none",
+    "behind": "dark"
+   }
+  }
+ },
+ "lamps": [],
+ "spots": [],
+ "objects": []
+}
