@@ -14,18 +14,20 @@ const DIST = resolve(new URL('../dist/game', import.meta.url).pathname);
 /** 선택: touch = 폰 흉내(hasTouch·isMobile), dsf = 기기 픽셀 배율(폰 사진은 3), card = bridge.card() 가 줄 본편 스냅숏(시각 minute 등), uiPrefs = $hq_ui 설정 JSON 글, people = 인물 기록·세력 평판 (factions 배열), query = 주소 ?seed=…&hour=… */
 export async function openField({ width = 1873, height = 1082, panel = true, card = null, uiPrefs = null, people = null, query = '', touch = false, dsf = 1 } = {}) {
   const code = readFileSync(`${DIST}/goei-game.js`, 'utf8');
-  const packs = {};
-  for (const f of readdirSync(DIST)) if (f.endsWith('.pack')) packs[f.replace(/\.pack$/, '')] = readFileSync(`${DIST}/${f}`).toString('base64');
+  // 팩(전부 약 180MB)을 base64로 한꺼번에 넘기면 브라우저가 죽는다 (10-31): 이름만 넘기고 쓸 때 가짜 주소에서 받아 온다
+  const packs = readdirSync(DIST).filter((f) => f.endsWith('.pack')).map((f) => f.replace(/\.pack$/, ''));
   const b = await chromium.launch();
   const page = await b.newPage({ viewport: { width, height }, deviceScaleFactor: dsf, ...(touch ? { hasTouch: true, isMobile: true } : {}) });
   const errors = [];
   page.on('pageerror', (e) => errors.push(e.message));
   page.on('console', (m) => m.type() === 'error' && errors.push(m.text()));
   // 주소 ?seed·hour: about:blank 에서는 history.replaceState 가 막힌다 → 가짜 주소로 먼저 가고(setContent 는 주소를 유지) 그 위에 내용을 쓴다
-  if (query) {
-    await page.route('http://goei.test/**', (r) => r.fulfill({ contentType: 'text/html', body: '<!doctype html><html></html>' }));
-    await page.goto(`http://goei.test/${query.startsWith('?') ? query : `?${query}`}`);
-  }
+  await page.route('http://goei.test/**', (r) => {
+    const m = /\/pack\/([^/?]+)$/.exec(new URL(r.request().url()).pathname);
+    if (m) return r.fulfill({ contentType: 'application/octet-stream', body: readFileSync(`${DIST}/${decodeURIComponent(m[1])}.pack`) });
+    return r.fulfill({ contentType: 'text/html', body: '<!doctype html><html></html>' });
+  });
+  await page.goto(`http://goei.test/${query ? (query.startsWith('?') ? query : `?${query}`) : ''}`);
   // 상황창: 왼쪽 메뉴 줄 · 가운데 본문(필드) · 오른쪽 신분증 줄 (리스 플러그인 창 흉내)
   await page.setContent(`<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>
     html,body{margin:0;height:100%;background:#111}
@@ -44,7 +46,13 @@ export async function openField({ width = 1873, height = 1082, panel = true, car
       for (const [name, start, size] of head.files) files.set(name, b.subarray(12 + len + start, 12 + len + start + size));
       return { atlas: head.atlas ?? null, files };
     };
-    const P = Object.fromEntries(Object.entries(packs).map(([k, v]) => [k, parse(unb(v))]));
+    void unb;
+    const cache = new Map();
+    const pack = (id) => {
+      if (!packs.includes(id)) return Promise.resolve(null);
+      if (!cache.has(id)) cache.set(id, fetch(`/pack/${encodeURIComponent(id)}`).then((r) => r.arrayBuffer()).then((a) => parse(new Uint8Array(a))));
+      return cache.get(id);
+    };
     const MIME = { png: 'image/png', webp: 'image/webp', json: 'application/json', ogg: 'audio/ogg', mp3: 'audio/mpeg', txt: 'text/plain' };
     const saves = new Map();
     const h = window.__h = { records: [], sent: [], closed: 0, full: null, won: 140000, trades: [], prefs: uiPrefs, factions: people?.factions ?? [], peopleList: people?.people ?? [] };
@@ -62,13 +70,14 @@ export async function openField({ width = 1873, height = 1082, panel = true, car
       talk: { model: async () => '응, 후배.', lore: async () => null, recent: async () => [] },
       saves: { list: async () => [], read: async (s) => saves.get(s) ?? null, write: async (s, d) => void saves.set(s, d), remove: async (s) => void saves.delete(s), last: async () => (saves.size ? 0 : null) },
       assets: {
-        ready: async (id) => !!P[id],
-        url: async (id, f) => { const b = P[id]?.files.get(f) ?? P[id]?.files.get(f + '.png'); return b ? URL.createObjectURL(new Blob([b], { type: MIME[f.split('.').pop()] ?? 'application/octet-stream' })) : ''; },
-        bytes: async (id, f) => P[id]?.files.get(f) ?? null,
-        atlas: async (id) => P[id]?.atlas ?? null,
-        list: async () => Object.keys(P).map((id) => ({ id, bytes: 0, ready: true, old: false })),
+        ready: async (id) => packs.includes(id),
+        url: async (id, f) => { const P = await pack(id); const b = P?.files.get(f) ?? P?.files.get(f + '.png'); return b ? URL.createObjectURL(new Blob([b], { type: MIME[f.split('.').pop()] ?? 'application/octet-stream' })) : ''; },
+        bytes: async (id, f) => (await pack(id))?.files.get(f) ?? null,
+        atlas: async (id) => (await pack(id))?.atlas ?? null,
+        list: async () => packs.map((id) => ({ id, bytes: 0, ready: true, old: false })),
       },
       card: async () => card, photo: async () => '', report: () => {},
+      onBeforeSend: (cb) => { h.beforeSend = cb; return () => { if (h.beforeSend === cb) h.beforeSend = null; }; },
       viewport: vp, waiting: () => false, onWaiting: () => () => {}, narrow: () => false, close: () => void h.closed++, onHidden: () => () => {},
     };
     h.bridge = bridge;
