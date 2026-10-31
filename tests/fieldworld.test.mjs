@@ -634,3 +634,25 @@ test('직원 쉬는 시간: 근무 중 배고프면 같은 소속 건물 안 휴
   assert.ok(went, `휴게실에서 먹음 (${a.scene} ${a.doing})`);
   assert.ok(back, `자리로 돌아옴 (${a.scene} ${a.doing})`);
 });
+
+test('역할 표·인원 자동: 사무실 1곳당 사무 3(의자에서 책상 일), 훈련장 1곳당 전투원 4(훈련 동작 돌아가며)', () => {
+  const sc = [
+    { id: 'lobby', name: '1층 로비', floor: '1F', length: 2000, lane: [420, 669], doors: [{ id: 'up', x: 1500, kind: 'stairs', up: 'f3' }] },
+    { id: 'f3', name: '3층', floor: '3F', length: 2400, lane: [420, 669], doors: [{ id: 'down', x: 1500, kind: 'stairs', down: 'lobby' }, { id: 'office', x: 400, kind: 'glass', to: 'office', toDoor: 'out' }, { id: 'tr', x: 900, kind: 'door', to: 'gym', toDoor: 'out' }] },
+    { id: 'office', name: '종합대응팀', floor: '3F', length: 1600, lane: [470, 680], doors: [{ id: 'out', x: 200, kind: 'exit', side: 'S', to: 'f3', toDoor: 'office' }], seats: [{ x: 600, y: 560, box: 0 }, { x: 800, y: 560, box: 1 }, { x: 1000, y: 560, box: 2 }] },
+    { id: 'gym', name: '훈련장', floor: '3F', length: 1600, lane: [470, 680], doors: [{ id: 'out', x: 200, kind: 'exit', side: 'S', to: 'f3', toDoor: 'tr' }] },
+  ];
+  const g = new P.PlaceGraph(sc, []);
+  const posts = H.autoPosts(g);
+  assert.deepEqual(posts.map((p) => [p.scene, p.archetype, p.how, p.count]), [['office', '행정 직원', 'desk', 3], ['gym', '관리국 요원', 'train', 4]]);
+  const sim = new A.WorldSim(g, R.mulberry32(3), { posts, has: (_l, c) => ['walk', 'idle', 'work', 'seat:type', 'pushup', 'limber'].includes(c), sceneFaction: () => 'A00' });
+  for (let t = 0; t < 30 * 60; t++) sim.step(1 / 30, { scene: 'elsewhere', x: 0, hour: 10 });
+  const desk = sim.actors.filter((a) => a.post?.how === 'desk'), gym = sim.actors.filter((a) => a.post?.how === 'train');
+  assert.equal(desk.length, 3);
+  assert.equal(gym.length, 4);
+  assert.ok(desk.filter((a) => a.seat?.kind === 'type').length >= 2, desk.map((a) => `${a.scene} ${a.doing}`).join(' / '));
+  assert.ok(gym.some((a) => a.doing.startsWith('훈련 중')), gym.map((a) => `${a.scene} ${a.doing}`).join(' / '));
+  // 퇴근 시간이면 나간다
+  for (let t = 0; t < 30 * 5; t++) sim.step(1 / 30, { scene: 'elsewhere', x: 0, hour: 19 });
+  assert.ok(sim.actors.filter((a) => a.post).length === 0);
+});

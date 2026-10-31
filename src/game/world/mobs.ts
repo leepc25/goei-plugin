@@ -61,6 +61,8 @@ export const ARCHETYPES: Record<string, Archetype> = {
   청소부: { name: '청소부', role: 'worker', range: { courage: [0.2, 0.6] }, looks: 청소부 },
   // 경비 그림은 따로 없어 관리국 직원 그림으로
   경비: { name: '경비', role: 'guard', range: { courage: [0.6, 1], curious: [0.4, 0.9] }, looks: 관리국 },
+  // 관리국 전투원 (10-31): 훈련장에서 훈련, 그림은 관리국 4장 복사
+  '관리국 요원': { name: '관리국 요원', role: 'guard', range: { courage: [0.6, 1], haste: [0.3, 0.8] }, looks: 관리국 },
   경찰: { name: '경찰', role: 'police', range: { courage: [0.6, 1], haste: [0.3, 0.7] }, looks: 경찰 },
   '편의점 점원': { name: '편의점 점원', role: 'staff', range: {}, looks: 상인 },
   // 의무실 근무형 (본부 B2 의무실·연구실)
@@ -88,7 +90,8 @@ export interface Post {
   id: string;
   archetype: string;
   scene: string;
-  how: 'fixed' | 'patrol' | 'roam';
+  /** desk = 그 방 의자에서 책상 일(타자), train = 그 방에서 훈련 동작을 돌아가며 (10-31 자율 행동 2단계) */
+  how: 'fixed' | 'patrol' | 'roam' | 'desk' | 'train';
   /** fixed: 서는 x. patrol: [왼쪽, 오른쪽] */
   spot?: number;
   span?: [number, number];

@@ -112,6 +112,8 @@ export interface Actor {
   used?: string[];
   /** 구경꾼: 다시 구경할 때까지 초 */
   lookCd?: number;
+  /** 훈련 중인 동작 (전투원) */
+  trainClip?: string;
 }
 
 /** 길에 놓인 막힌 곳 (폴리스 라인·부서진 물건 등). wall = 길을 위아래 끝까지 막음 → 돌아섬 */
@@ -577,7 +579,8 @@ export class WorldSim {
       case 'do':
         if (a.task && a.needs) a.needs[a.task.need] = Math.min(100, a.needs[a.task.need] + a.task.fill * dt);
         a.wait -= dt;
-        if (a.wait <= 0 || (a.task && a.needs && a.needs[a.task.need] >= 100)) {
+        // 직원의 책상 일은 욕구가 차도 정한 시간만큼 (근무라서). 그 밖은 욕구가 다 차면 끝
+        if (a.wait <= 0 || (a.task && a.needs && a.needs[a.task.need] >= 100 && !(a.post && a.task.id === 'work'))) {
           a.last = a.task?.id;
           a.task = undefined;
           this.idle(a, 1, 3);
@@ -819,6 +822,12 @@ export class WorldSim {
         return this.startTask(a);
       case 'post':
         a.act = 'post';
+        if (a.post?.how === 'train') {
+          a.doing = `훈련 중 (${({ pushup: '팔굽혀펴기', work: '장비 점검', limber: '기지개' } as Record<string, string>)[a.trainClip ?? ''] ?? '대기'})`;
+          a.wait = range(this.rng, 10, 25);
+          this.setClip(a, a.trainClip ?? 'idle');
+          return;
+        }
         a.doing = `근무 중 (${a.post?.archetype ?? ''})`;
         a.wait = range(this.rng, 4, 9);
         this.setClip(a, this.canClip(a, 'work') ? 'work' : 'idle');
@@ -1426,6 +1435,20 @@ export class WorldSim {
       const x = Math.abs(a.x - l) < Math.abs(a.x - r) ? r : l;
       return this.walkTo(a, { x, y: range(this.rng, top + 20, bot - 10) }, '순찰', 'post');
     }
+    // 책상 일(사무): 그 방 빈 의자에 앉아 타자. 끝나면 decide → 다시 여기 (사이사이 쉬는 시간)
+    if (p.how === 'desk' || p.how === 'train') {
+      if (a.scene !== p.scene) return this.travel(a, p.scene, 'roam-post');
+      if (this.takeBreak(a)) return;
+      if (p.how === 'desk') {
+        const work = ACTIVITIES.find((t) => t.id === 'work')!;
+        a.task = work;
+        return this.walkTo(a, this.taskSpot(a, work), '책상으로', 'do');
+      }
+      // 훈련(전투원): 장비 점검·팔굽혀펴기·기지개 중 그 그림에 있는 것을 돌아가며, 방 안 아무 데서나
+      const opts = ['pushup', 'work', 'limber'].filter((c) => this.canClip(a, c) && c !== a.trainClip);
+      a.trainClip = opts.length ? pick(this.rng, opts) : 'idle';
+      return this.walkTo(a, this.randomSpot(a.scene), '훈련하러', 'post');
+    }
     // 순회: 경로의 다음 장면으로, 머문 뒤 또 다음
     const route = p.route?.length ? p.route : [p.scene];
     const want = route[(a.postI ?? 0) % route.length];
@@ -1442,8 +1465,7 @@ export class WorldSim {
     a.wait -= dt;
     if (a.wait > 0) return;
     if (this.takeBreak(a)) return;
-    if (a.post?.how === 'roam') return this.goPost(a);
-    if (a.post?.how === 'patrol') return this.goPost(a);
+    if (a.post?.how === 'roam' || a.post?.how === 'patrol' || a.post?.how === 'train') return this.goPost(a);
     // 고정: 자리에서 조금씩 몸만 돌린다
     a.face = this.rng() < 0.5 ? 1 : -1;
     a.wait = range(this.rng, 4, 9);

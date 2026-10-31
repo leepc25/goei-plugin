@@ -49,10 +49,29 @@ export function hqPosts(graph: PlaceGraph): Post[] {
     { id: 'cleaner', archetype: '청소부', scene: 'lobby', how: 'roam', route: ['lobby', 'f2', 'f3', 'b1', 'lobby'], stay: 40, shifts: [[6, 9], [20, 23]], count: 1, gate },
     // 의무실·연구실(B2): 의사·간호사 주간 근무 (문은 방 아래 출입이라 gate = 출입 x)
     ...clinicPosts(graph),
+    // 방 종류로 인원 자동 (10-31 자율 행동 2단계): 방이 늘거나 옮겨도 여기 고칠 것 없음
+    ...autoPosts(graph),
     // 필드 가게 주인 (src/game/world/fieldShop.ts SHOPS: 편의점 24시간, 시장 노점 06~19시). 가게 자리 x는 hq/map.ts spots와 같게
     ...(graph.scene('jongno') ? [{ id: 'cvs-clerk', archetype: '편의점 점원', scene: 'jongno', how: 'fixed', spot: 1300, shifts: [[0, 24]], count: 1, gate: 2200 } as Post] : []),
     ...(graph.scene('yeongdeungpo') ? [{ id: 'market-seller', archetype: '상인', scene: 'yeongdeungpo', how: 'fixed', spot: 1500, shifts: [[6, 19]], count: 1, gate: 200 } as Post] : []),
   ];
+}
+
+/** 역할 표: 관리국 건물 안 장소 종류 → 그 방에 상주하는 역할·인원·근무시간. 사무실 1곳당 사무 3, 훈련장 1곳당 전투원 4 */
+const ROLE_BY_KIND: Partial<Record<string, { archetype: string; how: Post['how']; per: number; shifts: [number, number][] }>> = {
+  office: { archetype: '행정 직원', how: 'desk', per: 3, shifts: [[9, 18]] },
+  training: { archetype: '관리국 요원', how: 'train', per: 4, shifts: [[9, 18]] },
+};
+export function autoPosts(graph: PlaceGraph): Post[] {
+  const out: Post[] = [];
+  for (const id of graph.ids()) {
+    if (hqSceneFaction(id) !== 'A00') continue;
+    const r = ROLE_BY_KIND[graph.kind(id)];
+    if (!r) continue;
+    const gate = graph.scene(id)?.doors[0]?.x ?? 100;
+    out.push({ id: `auto-${id}`, archetype: r.archetype, scene: id, how: r.how, shifts: r.shifts, count: r.per, gate });
+  }
+  return out;
 }
 
 function clinicPosts(graph: PlaceGraph): Post[] {
