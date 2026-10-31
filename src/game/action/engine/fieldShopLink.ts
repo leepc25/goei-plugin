@@ -177,7 +177,7 @@ export function createFieldShop(h: FieldShopHost): FieldShop {
     const it = FIELD_ITEMS[id];
     if (!it || !takeBag(st, id)) return;
     if (it.heal) h.heal(it.heal);
-    h.record(`${eul(it.name)} ${it.verb ?? '썼다'}`);
+    h.record(`{user} ${({ 먹었다: 'ate', 마셨다: 'drank', 피웠다: 'smoked' } as Record<string, string>)[it.verb ?? ''] ?? 'used'} ${it.name}.`);   // 모델에게 가는 장부 글은 영어 (10-31)
     save();
     say(`${eul(it.name)} ${it.verb ?? '썼다'}.${it.heal ? ` 체력 +${Math.round(it.heal * 100)}%` : ''}`);
   }

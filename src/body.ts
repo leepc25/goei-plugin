@@ -283,7 +283,8 @@ async function withVisit<M extends PromptMessage>(messages: M[]): Promise<M[]> {
   if (!chat || (!visitRecord(chat).turns.length && !fieldRecord(chat).events.length)) return messages;
   const char = await getChar<LoreChar>(charIndex);
   const me = char ? playerAgent(char.globalLore, chat.scriptstate) : undefined;
-  return withFieldFacts(withInterludes(messages, chat, char ? visitContextRules({ char }) : null, me?.name || userInfo().name || '주인공'), chat);
+  const visitor = me?.name || userInfo().name || '주인공';
+  return withFieldFacts(withInterludes(messages, chat, char ? visitContextRules({ char }) : null, visitor), chat, visitor);
 }
 
 let rulesCache: { charIndex: number; gnet: string | null; phone: string | null; wiki: string | null; registry: Registry } | null = null;

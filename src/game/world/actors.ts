@@ -151,11 +151,11 @@ export type SimEvent =
   | { kind: 'notice'; scene: string; who: string }
   | { kind: 'police'; scene: string; n: number }
   | { kind: 'shift'; scene: string; who: string; on: boolean }
-  | { kind: 'hurt'; scene: string; who: string; named: boolean; faction?: string; x: number; down: boolean }
+  | { kind: 'hurt'; scene: string; who: string; id: string; named: boolean; faction?: string; x: number; down: boolean; hostile: boolean }
   /** 기절한 몹이 떨어뜨린 돈 (불량배·취객·소매치기) */
   | { kind: 'drop'; scene: string; who: string; amount: number; stolen: number; x: number }
   /** NPC 사망 (살해 허용일 때만). 시체는 장면에 남고 경찰이 1시간 뒤 수습 */
-  | { kind: 'kill'; scene: string; who: string; x: number }
+  | { kind: 'kill'; scene: string; who: string; id: string; x: number }
   /** 시체를 본 사람: 신고(용감) */
   | { kind: 'report'; scene: string; who: string; x: number }
   /** 경찰이 시체를 수습함 */
@@ -298,7 +298,7 @@ export class WorldSim {
     }
     if (down) {
       a.hp = 0;
-      this.struck(a, a.face);
+      this.struck(a, a.face, true);
       this.crime(a.scene, a.x, 15);
       return;
     }
@@ -351,7 +351,7 @@ export class WorldSim {
         if (a.x + 30 < b.x0 || a.x - 30 > b.x1 || Math.abs(a.y - b.y) > (b.dy ?? 18) + 14 || b.z0 > 200) continue;
         a.hitBy = b.attackId;
         out.push(a);
-        this.struck(a, dir);
+        this.struck(a, dir, this.hostile(a));
         break;
       }
     }
@@ -372,11 +372,15 @@ export class WorldSim {
     }
     a.hitBy = attackId;
     if (a.def.kind === 'mob' && a.hp !== undefined) a.hp = Math.max(0, a.hp - dmg);
-    this.struck(a, dir);
+    this.struck(a, dir, this.hostile(a));
     this.crime(a.scene, a.x, 15);
     return true;
   }
-  private struck(a: Actor, dir: 1 | -1): void {
+  /** 맞기 전에 이미 주인공에게 맞서던 몸인가 (막아섬·시비 뒤 맞섬): 먼저 친 게 누구인지 기록용 */
+  private hostile(a: Actor): boolean {
+    return a.plan === 'chase' || (a.act === 'argue' && a.doing === '맞섬') || (a.act === 'watch' && a.doing === '막아섬');
+  }
+  private struck(a: Actor, dir: 1 | -1, hostile = false): void {
     a.seatPick = undefined;
     a.x += dir * 36;
     a.face = (-dir) as 1 | -1;
@@ -389,7 +393,7 @@ export class WorldSim {
       a.pocket = 0;
       a.stolen = 0;
     }
-    this.events.push({ kind: 'hurt', scene: a.scene, who: a.def.name, named: a.def.kind === 'named', x: a.x, down });
+    this.events.push({ kind: 'hurt', scene: a.scene, who: a.def.name, id: a.def.id, named: a.def.kind === 'named', x: a.x, down, hostile });
     if (a.def.kind === 'named') {
       a.act = 'argue';
       a.doing = '맞고 화남';
@@ -1062,7 +1066,7 @@ export class WorldSim {
       a.pocket = 0;
       a.stolen = 0;
     }
-    this.events.push({ kind: 'kill', scene: a.scene, who: a.def.name, x: a.x });
+    this.events.push({ kind: 'kill', scene: a.scene, who: a.def.name, id: a.def.id, x: a.x });
     // 상한: 넘치면 오래된 시체부터 치움
     const list = this.corpses(a.scene).sort((p, q) => (p.diedAt ?? 0) - (q.diedAt ?? 0));
     for (let i = 0; i < list.length - CORPSE_MAX; i++) list[i].act = 'gone';

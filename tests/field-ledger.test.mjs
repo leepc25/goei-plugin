@@ -46,7 +46,7 @@ test('막간: 이동 사건이 있으면 그 기준 메시지 뒤에 사건 줄�
   assert.ok(text.startsWith(INTERLUDE_HEAD));
   assert.ok(text.indexOf('사무실 → 복도') < text.indexOf('복도 → 휴게실'));
   assert.ok(!text.includes('Nothing else happened'));
-  assert.ok(text.includes('[Field facts]'));
+  assert.ok(text.includes('What happened in the field'));
 });
 
 test('막간: 이동 사건이 없으면 카드 규칙문이 그대로', () => {
@@ -76,4 +76,31 @@ test('기준 메시지가 사라진 사건은 막간과 확정 사실에서 빠�
 test('사건도 대화도 없으면 아무것도 바꾸지 않는다', () => {
   const req = [{ role: 'assistant', content: '사무실이다.' }, { role: 'user', content: '다음' }];
   assert.deepEqual(withInterludes(req, base(), null, '주인공'), req);
+});
+
+test('막간 영어 짧은 문장(10-31): 장소 머리, 이어진 이동·돈은 한 줄, {user}는 주인공 이름, 사실 키도', () => {
+  let c = base();
+  const add = (id, at, kind, text, extra = {}) => (c = withFieldEvent(c, { id, at, anchor: 'c1', kind, text, ...extra }));
+  add('m1', 1, 'move', '15:10 {user} moved to 종로 거리.', { scene: '종로 거리', fact: { key: '{user} location', value: '종로 거리' } });
+  add('m2', 2, 'move', '15:20 {user} moved to 종로 골목.', { scene: '종로 골목', fact: { key: '{user} location', value: '종로 골목' } });
+  add('t1', 3, 'trade', '15:21 Money: -1500 편의점 컵라면', { scene: '종로 골목' });
+  add('t2', 4, 'trade', '15:21 Money: -4500 편의점 담배', { scene: '종로 골목' });
+  add('f1', 5, 'provoke', '15:40 {user} attacked first: pedestrian A, B (fists). A knocked out; B fled.', { scene: '종로 골목', weight: 2 });
+  const out = withFieldFacts(withInterludes([{ role: 'assistant', content: '사무실이다.' }, { role: 'user', content: '다음' }], c, null, '데드폴'), c, '데드폴');
+  const text = out.find((m) => m.content.startsWith(INTERLUDE_HEAD)).content;
+  assert.match(text, /15:20 데드폴 moved to 종로 거리 → 종로 골목\./);
+  assert.match(text, /\[종로 골목\]\n15:20 데드폴 moved to 종로 거리 → 종로 골목\.\n15:21 Money \(won\): -1500 편의점 컵라면, -4500 편의점 담배\n15:40 데드폴 attacked first/);
+  assert.ok(!text.includes('{user}'));
+  const facts = out.find((m) => m.content.startsWith(FACTS_HEAD)).content;
+  assert.match(facts, /- 데드폴 location: 종로 골목/);
+});
+
+test('지난 막간은 큰일(weight 2 이상)만', () => {
+  let c = { ...base(), message: [{ role: 'char', data: '하나', chatId: 'c1' }, { role: 'user', data: '둘', chatId: 'c2' }, { role: 'char', data: '셋', chatId: 'c3' }] };
+  c = withFieldEvent(c, { id: 'a', at: 1, anchor: 'c1', kind: 'move', text: 'small', weight: 1 });
+  c = withFieldEvent(c, { id: 'b', at: 2, anchor: 'c1', kind: 'kill', text: 'big', weight: 3 });
+  c = withFieldEvent(c, { id: 'c', at: 3, anchor: 'c3', kind: 'move', text: 'latest small', weight: 1 });
+  const g = interludes(c);
+  assert.deepEqual(g[0].events.map((e) => e.text), ['big']);
+  assert.deepEqual(g[1].events.map((e) => e.text), ['latest small']);
 });

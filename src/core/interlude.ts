@@ -5,25 +5,20 @@
 import { messageText } from './refs';
 import type { Chat } from './types';
 import { visitRecord, type VisitTurn } from './visit';
-import { currentFacts, fieldRecord, type FieldEvent, type FieldFact, type FieldKind } from './field';
+import { currentFacts, fieldRecord, type FieldEvent, type FieldFact } from './field';
 
-export const INTERLUDE_HEAD = '[필드 막간]';
+export const INTERLUDE_HEAD = '[Field log]';
 const DEFAULT_RULES = 'The block below is a face-to-face conversation the protagonist had at bureau HQ right after the preceding scene and before the next input. It really happened. Nothing else happened in between and only a few minutes passed.';
-const ROOM: Record<string, string> = { office: '사무실', lounge: '휴게실', infirmary: '의무실', quarters: '숙소' };
 /** 막간 하나에 넣을 최대 대화 수 (가장 최근 것부터) */
 const MAX_TURNS = 30;
 
 export interface Interlude { anchor: string; index: number; turns: VisitTurn[]; events: FieldEvent[] }
 
-const KIND_LABEL: Record<FieldKind, string> = {
-  move: '이동', act: '행동', hurt: '부상', down: '쓰러짐', kill: '살해', flee: '도주', provoke: '도발', gift: '선물', trade: '거래', quest: '의뢰',
-  follow: '동행', unfollow: '동행 해제', enter_anomaly: '괴이 진입', exit_anomaly: '괴이 퇴장', enter_site: '거점 진입', detected: '발각', appoint: '약속', call: '통화',
-};
 /** 막간 하나에 넣을 최대 사건 수 (가장 최근 것부터) */
 const MAX_EVENTS = 60;
 export const FACTS_HEAD = '[Field facts]';
-const EVENT_NOTE = 'Besides conversations, the block lists other things that happened in the field (movement, actions, fights and so on) in the order they happened. All of it really happened, and time passes naturally as these events imply. If the protagonist ended up somewhere other than where the preceding scene was, continue from the final location in the [Field facts] block.';
-const FACTS_NOTE = 'These are the current facts established in the field. Do not contradict them; permanent changes cannot be undone.';
+const EVENT_NOTE = 'What happened in the field, in order, grouped under [place]. All real; times are the field clock.';
+const FACTS_NOTE = 'Current facts from the field. Do not contradict them.';
 
 /** 채팅 메시지 chatId → 순서 */
 function anchorsOf(chat: Chat): Map<string, number> {
@@ -40,7 +35,9 @@ export function interludes(chat: Chat): Interlude[] {
   const slot = (a: string) => groups.get(a) ?? (groups.set(a, { turns: [], events: [] }), groups.get(a)!);
   for (const t of visitRecord(chat).turns) if (t.anchor && at.has(t.anchor)) slot(t.anchor).turns.push(t);
   for (const e of fieldRecord(chat).events) if (at.has(e.anchor)) slot(e.anchor).events.push(e);
-  return [...groups].map(([anchor, g]) => ({ anchor, index: at.get(anchor)!, turns: g.turns.slice(-MAX_TURNS), events: g.events.slice(-MAX_EVENTS) })).sort((a, b) => a.index - b.index);
+  const list = [...groups].map(([anchor, g]) => ({ anchor, index: at.get(anchor)!, turns: g.turns.slice(-MAX_TURNS), events: g.events.slice(-MAX_EVENTS) })).sort((a, b) => a.index - b.index);
+  // 지난 막간은 큰일만 (싸움·살해·쓰러짐·동행 등 weight 2 이상): 토큰을 아낀다 (10-31). 가장 최근 막간은 다 넣는다
+  return list.map((g, i) => (i < list.length - 1 ? { ...g, events: g.events.filter((e) => (e.weight ?? 1) >= 2) } : g));
 }
 
 /** 확정 사실: 아직 있는 메시지에 붙은 사건에서만 (다시 굴려 사라진 일은 빠진다) */
@@ -57,39 +54,64 @@ export function orphanTurns(chat: Chat): VisitTurn[] {
 
 const safe = (s: string) => s.replace(/\{\{/g, '｛｛').replace(/\}\}/g, '｝｝').replace(/%%/g, '％％');
 
-const ORDER_NOTE = 'Lines are in the order they happened. A heading marks where and to whom the protagonist spoke next; "(행동)" is something the protagonist did rather than said; "(끼어듦)" is a nearby person chiming in.';
+const ORDER_NOTE = 'Dialogue is in order. "— with X —" marks who {user} spoke to next; "(action)" = done, not said; "(cut in)" = a bystander joined in.';
 
-/** 막간 글: 일어난 순서대로 (2026-10-23 사용자: 요원별로 묶으면 순서와 끼어들기를 알 수 없다) */
+/** 이어진 이동·돈 줄을 한 줄로 묶는다: 「15:10 {user} moved to A.」+「15:20 {user} moved to B.」 → 「15:20 {user} moved to A → B.」, 돈 줄은 「Money (won): -1500 편의점 컵라면, -4500 편의점 담배」 */
+function mergeRuns(evs: FieldEvent[]): FieldEvent[] {
+  const out: FieldEvent[] = [];
+  for (const e of evs) {
+    const prev = out[out.length - 1];
+    if (prev && prev.kind === e.kind && prev.scene === e.scene && e.kind === 'trade') {
+      const m = /Money: (.*)$/.exec(e.text);
+      if (m) { out[out.length - 1] = { ...prev, text: `${prev.text}, ${m[1]}` }; continue; }
+    }
+    if (prev && prev.kind === 'move' && e.kind === 'move') {
+      const a = /moved to (.*)\.$/.exec(prev.text), b = /^(\d\d:\d\d )?.*moved to (.*)\.$/.exec(e.text);
+      if (a && b) { out[out.length - 1] = { ...e, text: `${b[1] ?? ''}{user} moved to ${a[1]} → ${b[2]}.` }; continue; }
+    }
+    out.push(e);
+  }
+  return out.map((e) => (e.kind === 'trade' ? { ...e, text: e.text.replace('Money: ', 'Money (won): ') } : e));
+}
+
+/** 막간 글: 일어난 순서대로 (2026-10-23 사용자: 요원별로 묶으면 순서와 끼어들기를 알 수 없다). 모델만 읽는 글이라 영어 짧은 문장(10-31), 주인공 = {user} → 이름 */
 export function interludeText(g: Interlude, rules: string | null, visitor: string): string {
   const parts: string[] = [];
   let at = '';
+  let place = '';
+  const me = safe(visitor);
+  const who = (t: string) => safe(t).replace(/\{user\}/g, me);
   type Item = { at: number; turn?: VisitTurn; ev?: FieldEvent };
-  const items: Item[] = [...g.turns.map((t) => ({ at: t.at || 0, turn: t })), ...g.events.map((e) => ({ at: e.at || 0, ev: e }))].sort((a, b) => a.at - b.at);
+  const items: Item[] = [...g.turns.map((t) => ({ at: t.at || 0, turn: t })), ...mergeRuns([...g.events].sort((a, b) => a.at - b.at)).map((e) => ({ at: e.at || 0, ev: e }))].sort((a, b) => a.at - b.at);
   items.forEach(({ turn: t, ev }) => {
     if (ev) {
       at = '';
-      parts.push('', `(${KIND_LABEL[ev.kind]}) ${safe(ev.text)}`);
+      if (ev.scene && ev.scene !== place) { place = ev.scene; parts.push(`[${safe(place)}]`); }
+      parts.push(who(ev.text));
       return;
     }
     if (!t) return;
-    const me = safe(t.visitor || visitor);
+    const v = safe(t.visitor || visitor);
     const here = `${t.room ?? ''}|${t.name}`;
     if (here !== at) {
       at = here;
-      parts.push('', `— ${t.room ? `${ROOM[t.room] ?? t.room}, ` : ''}${safe(t.name)}에게 —`);
+      parts.push('', `— with ${safe(t.name)}${t.room ? ` (${safe(t.room)})` : ''} —`);
     }
-    parts.push(t.act ? `${me} (행동): ${safe(t.user)}` : `${me}: ${safe(t.user)}`, `${safe(t.name)}: ${safe(t.reply)}`, ...(t.extra ?? []).map((e) => `${safe(e.name)} (끼어듦): ${safe(e.line)}`));
+    parts.push(t.act ? `${v} (action): ${safe(t.user)}` : `${v}: ${safe(t.user)}`, `${safe(t.name)}: ${safe(t.reply)}`, ...(t.extra ?? []).map((e) => `${safe(e.name)} (cut in): ${safe(e.line)}`));
   });
   const base = rules?.trim() || DEFAULT_RULES;
-  const head = g.events.length ? [base.replace(/\s*Nothing else happened in between and only a few minutes passed\./, ''), EVENT_NOTE] : [base];
-  return [INTERLUDE_HEAD, ...head, ORDER_NOTE, ...parts].join('\n').replace(/\n{3,}/g, '\n\n');
+  // 대화가 없으면 대화 규칙문은 빼고 사건 안내만 (토큰 절약, 10-31)
+  const talk = g.events.length ? base.replace(/\s*Nothing else happened in between and only a few minutes passed\./, '') : base;
+  const head = [...(g.turns.length ? [talk] : []), ...(g.events.length ? [EVENT_NOTE] : [])];
+  return [INTERLUDE_HEAD, ...head, ...(g.turns.length ? [ORDER_NOTE.replace(/\{user\}/g, me)] : []), ...parts].join('\n').replace(/\n{3,}/g, '\n\n');
 }
 
 /** 지금 확정된 사실을 마지막 사용자 메시지 앞에 넣는다. 없으면 그대로 */
-export function withFieldFacts<M extends { role?: unknown; content?: unknown }>(messages: M[], chat: Chat): M[] {
+export function withFieldFacts<M extends { role?: unknown; content?: unknown }>(messages: M[], chat: Chat, visitor = '{user}'): M[] {
   const facts = liveFacts(chat);
   if (!facts.length || messages.some((m) => typeof m?.content === 'string' && m.content.startsWith(FACTS_HEAD))) return messages;
-  const text = [FACTS_HEAD, FACTS_NOTE, ...facts.map((f) => `- ${safe(f.key)}: ${safe(f.value)}${f.permanent ? ' (permanent)' : ''}`)].join('\n');
+  const me = safe(visitor);
+  const text = [FACTS_HEAD, FACTS_NOTE, ...facts.map((f) => `- ${safe(f.key).replace(/\{user\}/g, me)}: ${safe(f.value)}${f.permanent ? ' (permanent)' : ''}`)].join('\n');
   const at = messages.map((m) => m?.role).lastIndexOf('user');
   const block = { role: 'system', content: text } as M;
   return at < 0 ? [...messages, block] : [...messages.slice(0, at), block, ...messages.slice(at)];
