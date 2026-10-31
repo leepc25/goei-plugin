@@ -3,7 +3,8 @@
 from PIL import Image
 import numpy as np
 D = 'game-src/art/pixellab-test-20261028/'
-for n in ('jr_pillar5_front_v1', 'jr_pillar5_alley_v1'):
+import sys
+for n in (sys.argv[1:] or ('jr_pillar5_front_v1', 'jr_pillar5_alley_v1')):
     p = Image.open(D + n + '_632x424.png').convert('RGBA')
     a = np.asarray(p)[:, :, 3] > 0
     xs = np.where(a.sum(0) > 200)[0]
