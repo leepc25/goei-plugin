@@ -33,6 +33,8 @@ CAMERAS = {'room': CAMERA, 'corridor': "Camera a little above standing eye heigh
 VIEW = {
     'one-point': "One-point perspective, side walls receding toward the middle.",
     'flat': "Flat front view, no vanishing point.",
+    # 통로 칸(이어 붙임): one-point의 「side walls receding」 때문에 오른쪽에 안쪽 옆벽이 생김(중림 앞골목 ① v6, 사용자 10-31) → 뒷벽은 끝까지 곧게
+    'corridor': "One-point depth, but the back wall runs straight and level across the full width.",
 }
 # 채우기 정도: 장면마다 정한다 (사용자 10-30: 채우기 문구를 일괄로 빼지 말 것)
 DENSITY = {
@@ -63,7 +65,7 @@ def build(spec):
     miss = [k for k in need if not spec.get(k)]
     if miss: raise SystemExit(f'빈 칸: {miss}')
     if spec['sides'] not in SIDES: raise SystemExit('sides는 both|left|right|none')
-    if spec['view'] not in VIEW: raise SystemExit('view는 one-point|flat')
+    if spec['view'] not in VIEW: raise SystemExit('view는 one-point|flat|corridor')
     if spec['density'] not in DENSITY: raise SystemExit('density는 packed|packed+|normal|bare')
     errs = []
     # 물건마다 at(자리 묶음: "back wall", "left wall", "floor, left", "on the counter" …)이 있으면 자리를 묶음 머리에 한 번만 적는다.
