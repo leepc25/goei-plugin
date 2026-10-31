@@ -110,7 +110,7 @@ export const FIELD_CLIP: Record<string, { ids: string[]; fps?: number; loop?: bo
   work: { ids: ['124', '121'], fps: 6 },
   eat: { ids: ['26'], fps: 6 }, drink: { ids: ['142', '26'], fps: 6 },
   rest: { ids: ['2'], fps: 4 },
-  pee: { ids: ['102', '101'], fps: 5 }, poo: { ids: ['102'], fps: 5 },
+  pee: { ids: ['100', '102'], fps: 5 }, poo: { ids: ['102'], fps: 5 },
   hobby: { ids: ['90', '155', '2'], fps: 5 },
   talk: { ids: ['29'], fps: 7 },
   greet: { ids: ['28', '30'], fps: 7, loop: false }, bow: { ids: ['30'], fps: 7, loop: false },
@@ -151,9 +151,13 @@ function shadow(c: CanvasRenderingContext2D, x: number, y: number, w: number, k:
   c.beginPath(); c.ellipse(x, y - 2 * k, Math.max(16, w) * 0.58 * k, 5 * k, 0, 0, Math.PI * 2); c.fill();
 }
 
+/** 한 번만 하고 끝내는 몸짓 (10-31 사용자: 기지개·경례를 반복하면 이상하다, 한 번만) — 되풀이하지 않고 마지막 장에서 멈춘다 */
+export const ONCE_LINES = new Set(['143', '134', '68', '72', '165', '159', '158', '146', '162', '163', '164', '141', '112', '127', '169', '104', '100', '152']);
+
 /** 생활 줄의 지금 장 (10-31 사용자: 책을 펼쳤다 덮었다를 내내 되풀이하지 않는다). tools/life_phases.py 가 잰 값:
  *  phases[줄] = [p, q] → 시작(0..p-1) 한 번, 가운데(p..q) 왕복 반복, 끝(q+1..) 은 활동이 끝나기 직전(until)에 한 번.
- *  gest = 한 번 하고 기본 자세로 돌아오는 몸짓(커피 한 모금 등) → 다 틀고 마지막 장에서 잠깐 쉬었다 다시.
+ *  dwell = 소품을 든 몸짓(커피 한 모금·흡연 등): 가운데 = 소품을 든 구간, 든 채(p) 잠깐 쉬었다 한 번 하고 다시.
+ *  gest = 소품 구간을 못 잡은 몸짓 → 다 틀고 마지막 장에서 잠깐 쉬었다 다시.
  *  둘 다 없으면 null (부르는 쪽 기존 방식). t·left = 장 단위(경과·남은) */
 export function lifeFrame(cfg: CharCfg, id: string, n: number, t: number, left: number | null): number | null {
   const ph = (cfg.phases as Record<string, [number, number]> | undefined)?.[id];
@@ -163,8 +167,12 @@ export function lifeFrame(cfg: CharCfg, id: string, n: number, t: number, left: 
     if (t < p) return Math.floor(t);
     const L = q - p;
     if (L <= 0) return p;
-    const k = Math.floor(t - p) % (2 * L);
-    return p + (k <= L ? k : 2 * L - k);
+    // dwell = 소품을 든 몸짓(커피·흡연 등): 든 채(p) 잠깐 쉬었다가 한 번 하고 다시 든 채로
+    const hold = (cfg.dwell as string[] | undefined)?.includes(id) ? 10 : 0;
+    const k = Math.floor(t - p) % (2 * L + hold);
+    if (k < hold) return p;
+    const j = k - hold;
+    return p + (j <= L ? j : 2 * L - j);
   }
   if ((cfg.gest as string[] | undefined)?.includes(id)) {
     const hold = 14;   // 마지막 장(기본 자세)에서 쉬는 장 수 (6fps 기준 약 2.3초)
@@ -174,11 +182,15 @@ export function lifeFrame(cfg: CharCfg, id: string, n: number, t: number, left: 
   return null;
 }
 
+/** 자세로 들어갔다 나오는 줄 (10-31 사용자: 이어지는 동작): 이 줄을 틀 때 먼저 in 줄을 한 번, 끝날 때 out 줄(없으면 in 거꾸로)을 한 번.
+ *  눕기(75) → 누워 쉬기·아파하기 → 눕기 거꾸로(일어나기), 하의 내리고 앉기(101) → 볼일(102) → 닦고 일어나기(103) */
+const ENTER: Record<string, { in: string; out?: string }> = { '76': { in: '75' }, '77': { in: '75' }, '102': { in: '101', out: '103' } };
+
 /** 생활 클립 그리기. x,y = 발 가운데(월드), dir 1 = 오른쪽 보기, now·since·until = ms(until = 이 일이 끝나는 때, 끝 구간을 그 직전에 튼다). 그림 없으면 false (부르는 쪽이 실루엣) */
 export function drawCharClip(c: CanvasRenderingContext2D, nameOrKey: string, x: number, y: number, dir: 1 | -1, now: number, clip = 'idle', since = 0, until?: number): boolean {
   const a = charArt(nameOrKey);
   if (!a) return false;
-  const cm = clip.startsWith('line:') ? { ids: [clip.slice(5)], fps: 6 } as (typeof FIELD_CLIP)[string] : FIELD_CLIP[clip] ?? FIELD_CLIP.idle;
+  const cm = clip.startsWith('line:') ? { ids: [clip.slice(5)], fps: 6, ...(ONCE_LINES.has(clip.slice(5)) ? { loop: false } : {}) } as (typeof FIELD_CLIP)[string] : FIELD_CLIP[clip] ?? FIELD_CLIP.idle;
   if (cm.seq) {
     // 이어 틀기: 있는 줄들의 장을 한 줄로 늘어놓고 차례로
     const ids = cm.ids.filter((i) => !!a.A[i] && !!a.IMG[i]);
@@ -194,13 +206,24 @@ export function drawCharClip(c: CanvasRenderingContext2D, nameOrKey: string, x: 
   if (!a.IMG[id!]) return false;
   const loopIds = (a.cfg.loops ?? {})[id!];
   const fps = cm.fps ?? 6;
-  const lf = id !== '1' && cm.loop !== false ? lifeFrame(a.cfg, id!, m.n, ((now - since) / 1000) * fps, until === undefined ? null : ((until - now) / 1000) * fps) : null;
+  let T = ((now - since) / 1000) * fps, left = until === undefined ? null : ((until - now) / 1000) * fps;
+  const en = ENTER[id!], inL = en && a.A[en.in] && a.IMG[en.in] ? en.in : null;
+  if (inL) {
+    const outL = en.out && a.A[en.out] && a.IMG[en.out] ? en.out : null;
+    const inN = a.A[inL].n, outN = outL ? a.A[outL].n : inN;
+    if (T < inN) { drawLine(c, a, inL, Math.floor(T), x, y, dir); return true; }
+    if (left !== null && left < outN) { if (outL) drawLine(c, a, outL, Math.max(0, outN - 1 - Math.floor(left)), x, y, dir); else drawLine(c, a, inL, Math.max(0, Math.floor(left)), x, y, dir); return true; }
+    T -= inN;
+    if (left !== null) left -= outN;
+  }
+  const once = cm.loop === false || ONCE_LINES.has(id!);
+  const lf = id !== '1' && !once ? lifeFrame(a.cfg, id!, m.n, T, left) : null;
   let f: number;
   if (lf !== null) f = lf;
   else if (id === '1') f = Math.floor(now / 600) % 2; // 평상 대기: 앞 두 장만 (테스트룸 규칙)
   else {
-    const n = Math.floor(((now - (cm.loop === false ? since : 0)) / 1000) * (cm.fps ?? 6));
-    if (cm.loop === false) f = Math.min(n, m.n - 1);
+    const n = Math.floor(((now - (once ? since : 0)) / 1000) * (cm.fps ?? 6));
+    if (once) f = Math.min(n, m.n - 1);
     else if (loopIds?.length && clip !== 'walk' && clip !== 'run') { const L = loopIds.map((v) => Math.max(0, Math.min(m!.n - 1, v - 1))); f = n < L[0] ? n : L[(n - L[0]) % L.length]; }
     else f = n % m.n;
   }
@@ -239,9 +262,19 @@ export function drawCharSeat(c: CanvasRenderingContext2D, nameOrKey: string, cx:
   const act = row.acts[kind] ?? (Object.values(row.acts).includes(kind) ? kind : undefined);
   const id = act && a.A[act] ? act : row.sit;
   const m = a.A[id];
-  const lf = id === row.sit ? null : lifeFrame(a.cfg, id, m.n, ((now - since) / 1000) * 6, until === undefined ? null : ((until - now) / 1000) * 6);
+  const once = ONCE_LINES.has(id);
+  // 앉기 줄을 먼저 한 번(앉는 모습), 일이 끝나기 직전에 거꾸로(일어나는 모습) — 10-31 이어지는 동작
+  const sitN = a.A[row.sit].n;
+  let T = ((now - since) / 1000) * 6, left = until === undefined ? null : ((until - now) / 1000) * 6;
+  let sitF: number | null = null;
+  if (since > 0 && T < sitN) sitF = Math.floor(T);
+  else if (left !== null && left < sitN) sitF = Math.max(0, Math.floor(left));
+  T -= sitN;
+  if (left !== null) left -= sitN;
+  const lf = sitF !== null || id === row.sit ? null : once ? Math.min(m.n - 1, Math.floor(T)) : lifeFrame(a.cfg, id, m.n, T, left);
   let f: number;
-  if (id === row.sit) f = m.n - 1;   // 앉아 있기: 앉는 줄 마지막 장
+  if (sitF !== null) f = sitF;
+  else if (id === row.sit) f = m.n - 1;   // 앉아 있기: 앉는 줄 마지막 장
   else if (lf !== null) f = lf;
   else {
     const n = Math.floor((now / 1000) * 6), L = ((a.cfg.loops ?? {})[id] ?? []).map((v) => Math.max(0, Math.min(m.n - 1, v - 1)));
@@ -256,7 +289,7 @@ export function drawCharSeat(c: CanvasRenderingContext2D, nameOrKey: string, cx:
     c.save(); c.imageSmoothingEnabled = false; c.translate(Math.round(cx), Math.round(cy)); c.scale(face * k * fit.s, k * fit.s); c.drawImage(im, -100, -171); c.restore();
   };
   if (row.dir !== 'back') chair();
-  drawLine(c, a, id, f, body.x, body.y, face, false);
+  drawLine(c, a, sitF !== null ? row.sit : id, f, body.x, body.y, face, false);
   if (row.dir === 'back') chair();
   return true;
 }

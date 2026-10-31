@@ -40,7 +40,7 @@ export const ACTIVITIES: Activity[] = [
 /** 활동마다 실제로 할 수 있는 줄 (10-31 사용자: 앉아서 하는 것과 서서 하는 것은 다르다, 상황에 따라 다양하게).
  * line = 인물 팩 줄 번호, seat = 의자 방향(그 방향 의자에 앉아서), 없으면 서서. 인물에게 그 줄 그림이 있을 때만 후보.
  * 고를 때: 빈 의자가 있으면 앉는 쪽도 후보, 바로 전에 한 줄은 덜 고른다(actors.ts taskSpot) */
-export interface ActOpt { line: string; label: string; seat?: 'front' | 'side' | 'back' }
+export interface ActOpt { line: string; label: string; seat?: 'front' | 'side' | 'back'; /** 한 번만 하고 끝나는 몸짓 (기지개 등): 몇 초만 */ once?: boolean }
 export const ACT_OPTS: Record<string, ActOpt[]> = {
   work: [
     { line: '63', label: '타자 치는 중', seat: 'front' }, { line: '105', label: '타자 치는 중', seat: 'side' }, { line: '69', label: '타자 치는 중', seat: 'back' },
@@ -61,7 +61,7 @@ export const ACT_OPTS: Record<string, ActOpt[]> = {
   rest: [
     { line: '66', label: '조는 중', seat: 'front' }, { line: '73', label: '기대 쉬는 중', seat: 'front' },
     { line: '65', label: '차 마시는 중', seat: 'front' }, { line: '99', label: '차 마시는 중', seat: 'side' }, { line: '71', label: '차 마시는 중', seat: 'back' },
-    { line: '142', label: '커피 마시는 중' }, { line: '143', label: '기지개' },
+    { line: '142', label: '커피 마시는 중' }, { line: '143', label: '기지개', once: true },
   ],
   eat: [
     { line: '64', label: '먹는 중', seat: 'front' }, { line: '98', label: '먹는 중', seat: 'side' }, { line: '71', label: '먹는 중', seat: 'back' },

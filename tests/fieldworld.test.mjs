@@ -156,6 +156,27 @@ test('욕구 AI: 클립이 있으면 활동을 하고 욕구가 찬다, 없으�
   assert.ok(acts.has('work'), `활동: ${[...acts]}`);
 });
 
+test('활동 줄 고르기(10-31): 앉는 줄은 그 방향 빈 의자에서, 서는 줄은 서서, 여러 줄을 번갈아, 한 번 하는 몸짓은 몇 초만', () => {
+  const sc = scenes.map((s) => (s.id === 'office' || s.id === 'lounge' ? { ...s, seats: [{ x: 600, y: 560, box: 0 }, { x: 900, y: 560, face: 'E', box: 1 }] } : s));
+  const lines = ['line:63', 'line:105', 'line:149', 'line:148', 'line:117', 'line:142', 'line:143', 'line:64', 'line:157', 'line:66'];
+  const sim = new A.WorldSim(new P.PlaceGraph(sc, elevator, kinds), R.mulberry32(5), { has: (_l, c) => ['walk', 'idle', 'seat:type', 'seat:eat'].includes(c) || lines.includes(c) });
+  const a = sim.add({ id: 'j', name: '잼트리', kind: 'named', brain: 'needs', home: 'office', roam: ['office', 'f3', 'lounge'], look: '잼트리' });
+  const seen = new Map();
+  let onceSec = 0;
+  for (let t = 0; t < 30 * 3600; t++) {
+    sim.step(1 / 30, { scene: 'street', x: 0, hour: 11 });
+    if (a.act !== 'do' || !a.opt) continue;
+    seen.set(a.opt.line, a.seat ? `seat:${a.seat.dir}` : 'stand');
+    if (a.opt.once) onceSec = Math.max(onceSec, a.wait);
+  }
+  for (const [line, how] of seen) {
+    const o = Object.values(N.ACT_OPTS).flat().find((x) => x.line === line);
+    assert.equal(how, o.seat ? `seat:${o.seat}` : 'stand', `${line} ${how}`);
+  }
+  assert.ok(seen.size >= 4, `여러 줄을 번갈아: ${[...seen.keys()]}`);
+  assert.ok(onceSec <= 4, '기지개는 몇 초만');
+});
+
 test('욕구 AI: 수다는 상대와 둘이 같이', () => {
   const sim = new A.WorldSim(graph(), R.mulberry32(4), { has: (_l, c) => c === 'talk' });
   const a = sim.add({ id: 'a', name: '큐라스', kind: 'named', brain: 'needs', home: 'office', roam: ['office'] });

@@ -2,7 +2,7 @@
 // 이름 인물: 욕구 + 의무 → 할 일 고르기(needs.ts). 클립이 있는 활동만 켜지고, 없으면 서성이기·장면 오가기.
 // 몹: 나올 때마다 성향을 뽑고(mobs.ts), 지나가다 자기 판단으로 사건을 일으킨다(소매치기·시비). 근무형은 근무시간에 자리를 지킨다.
 // 소란도는 장면 단위. 경찰·경비는 플레이어 범죄에만 나선다(crime). 화면 밖 장면도 같은 규칙으로 돈다. 생활은 실시간, 시계와 무관.
-import { ACTIVITIES, TEMPER, choose, decayNeeds, fullNeeds, onDuty, type Activity, type Needs } from './needs';
+import { ACTIVITIES, ACT_OPTS, TEMPER, choose, decayNeeds, fullNeeds, onDuty, type ActOpt, type Activity, type Needs } from './needs';
 import { ARCHETYPES, DROPS, POCKET, inShift, rollTemper, type Post, type Temperament } from './mobs';
 import { baseOf, derive, rollBase, type BaseStats } from '../combat/stats';
 import { NAMED_MUL } from './npcperks';
@@ -12,6 +12,8 @@ import type { Hop, PlaceGraph } from './places';
 import { pick, range, type Rng } from './rng';
 
 export type ActorKind = 'named' | 'mob';
+/** 장면 의자의 앉는 방향 (N = 등, E·W = 옆, 없으면 정면) */
+const seatDir = (face?: 'E' | 'W' | 'N'): 'front' | 'side' | 'back' => (face === 'N' ? 'back' : face ? 'side' : 'front');
 /** 활동 클립 → 의자에서 하는 일 (fighter/seats.ts SEATS acts 이름) */
 const SEAT_KIND: Record<string, string> = { work: 'type', eat: 'eat', drink: 'drink', rest: 'doze', hobby: 'book', talk: 'talk' };
 export interface ActorDef {
@@ -58,6 +60,11 @@ export interface Actor {
   /** 지금 그릴 클립과 시작 시각(생활 초) */
   clip: string;
   clipAt: number;
+  /** 이 클립(일)이 끝나는 생활 초 — 그림이 끝 구간(책 덮기·컵 내리기)을 그 직전에 튼다 */
+  clipUntil?: number;
+  /** 활동에서 고른 줄 (ACT_OPTS), 바로 전에 한 줄 (같은 것 연달아 덜 고르게) */
+  opt?: ActOpt;
+  lastLine?: string;
   /** 머리 위 아이콘 (! ? ♪ … #) */
   icon?: string;
   iconT: number;
@@ -828,6 +835,7 @@ export class WorldSim {
     if (a.clip !== clip) {
       a.clip = clip;
       a.clipAt = this.time;
+      a.clipUntil = undefined;
     }
   }
   private iconOn(a: Actor, icon: string, sec: number): void {
@@ -840,10 +848,11 @@ export class WorldSim {
     return this.has(look, clip) || (!!SEAT_KIND[clip] && this.has(look, `seat:${SEAT_KIND[clip]}`));
   }
   /** 장면의 빈 의자 (다른 사람·주인공이 앉지 않은 것) 중 x 에 가까운 것 */
-  private freeSeat(scene: string, x: number): number | null {
+  private freeSeat(scene: string, x: number, dir?: 'front' | 'side' | 'back'): number | null {
     const seats = this.graph.scene(scene)?.seats ?? [];
     let best: number | null = null;
     seats.forEach((st, i) => {
+      if (dir && seatDir(st.face) !== dir) return;
       if (this.player?.scene === scene && this.player.seat === st.box) return;
       if (this.actors.some((q) => q.scene === scene && (q.seat?.i === i || q.seatPick === i))) return;
       if (best === null || Math.abs(st.x - x) < Math.abs(seats[best].x - x)) best = i;
@@ -1103,6 +1112,7 @@ export class WorldSim {
     a.wait = sec;
     a.side = 0;
     this.setClip(a, clip);
+    a.clipUntil = this.time + sec;
     if (!buddy) return;
     buddy.act = 'pause';
     buddy.doing = doing === '일행과 수다' ? doing : '일행 기다림';
@@ -1288,7 +1298,30 @@ export class WorldSim {
   private taskSpot(a: Actor, t: Activity): { x: number; y: number } {
     a.seatPick = undefined;
     a.station = undefined;
+    a.opt = undefined;
     if (t.id === 'train') { const st = this.trainSpot(a); if (st) return st; }
+    // 그 인물에게 그림이 있는 줄 중에서 고른다 (10-31): 앉는 줄은 그 방향 빈 의자가 있을 때만. 바로 전에 한 줄은 덜 고른다
+    const look = a.def.look ?? a.def.name;
+    const opts = (ACT_OPTS[t.id] ?? []).filter((o) => this.has(look, `line:${o.line}`));
+    if (opts.length && !t.partner) {
+      const cand: { o: ActOpt; seat: number | null; w: number }[] = [];
+      for (const o of opts) {
+        const seat = o.seat ? this.freeSeat(a.scene, a.x, o.seat) : null;
+        if (o.seat && seat === null) continue;
+        cand.push({ o, seat, w: (o.line === a.lastLine ? 0.25 : 1) * (o.seat ? 1.2 : 1) * (o.once ? 0.5 : 1) });
+      }
+      if (cand.length) {
+        let r = this.rng() * cand.reduce((n, c) => n + c.w, 0);
+        const c = cand.find((x) => (r -= x.w) <= 0) ?? cand[cand.length - 1];
+        a.opt = c.o;
+        if (c.seat !== null) {
+          const st = this.graph.scene(a.scene)!.seats![c.seat];
+          a.seatPick = c.seat;
+          return { x: st.x, y: st.y };
+        }
+        return this.randomSpot(a.scene);
+      }
+    }
     if (!t.partner && SEAT_KIND[t.clip] && this.has(a.def.look ?? a.def.name, `seat:${SEAT_KIND[t.clip]}`)) {
       const i = this.freeSeat(a.scene, a.x);
       const st = i === null ? null : this.graph.scene(a.scene)?.seats?.[i];
@@ -1327,22 +1360,35 @@ export class WorldSim {
       return;
     }
     a.act = 'do';
-    a.doing = t.label;
-    a.wait = range(this.rng, t.sec[0], t.sec[1]);
+    a.doing = a.opt?.label ?? t.label;
+    a.wait = a.opt?.once ? range(this.rng, 2.5, 4) : range(this.rng, t.sec[0], t.sec[1]);
     a.plan = 'none';
+    if (a.opt) a.lastLine = a.opt.line;
     // 의자에 왔으면 앉는다 (그 의자가 아직 비었을 때)
     const pick = a.seatPick;
     a.seatPick = undefined;
     const st = pick === undefined ? null : this.graph.scene(a.scene)?.seats?.[pick];
     const taken = pick !== undefined && (this.actors.some((q) => q !== a && q.scene === a.scene && q.seat?.i === pick) || (this.player?.scene === a.scene && this.player.seat === st?.box));
     if (st && pick !== undefined && !taken) {
-      const kind = SEAT_KIND[t.clip];
+      const kind = a.opt?.seat ? a.opt.line : SEAT_KIND[t.clip];
       this.setClip(a, `seat:${kind}`);
+      a.clipUntil = this.time + a.wait;
       a.x = st.x;
       a.y = st.y;
       a.face = st.face === 'W' ? -1 : st.face === 'E' ? 1 : a.face;
       a.seat = { i: pick, dir: st.face === 'N' ? 'back' : st.face ? 'side' : 'front', kind, x: st.x, y: st.y };
-      a.doing = `${t.label} (의자)`;
+      a.doing = `${a.opt?.label ?? t.label} (의자)`;
+      return;
+    }
+    // 고른 줄이 앉는 줄인데 의자를 놓쳤으면 그 일을 하지 않는다 (허공에 앉지 않는다)
+    if (a.opt?.seat) {
+      a.task = undefined;
+      a.opt = undefined;
+      return this.idle(a, 1, 3);
+    }
+    if (a.opt) {
+      this.setClip(a, `line:${a.opt.line}`);
+      a.clipUntil = this.time + a.wait;
       return;
     }
     // 훈련 장비 앞: 과녁이면 사격, 샌드백·허수아비면 연타 (오른쪽을 보고)
@@ -1363,6 +1409,7 @@ export class WorldSim {
       return this.idle(a, 1, 3);
     }
     this.setClip(a, t.clip);
+    a.clipUntil = this.time + a.wait;
   }
 
   // ── 몹 판단 (8-1장: 사건은 NPC 판단에서) ──

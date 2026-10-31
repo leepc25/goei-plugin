@@ -16,6 +16,8 @@ ROOT = Path(__file__).resolve().parents[1]
 PACKS = ROOT / "game-pack"
 # 앉기·눕기 자체(자세로 들어가는 줄)와 화장실 들어가기, 걷기류는 나누지 않는다
 SKIP = {"60", "61", "96", "75", "101", "103", "86", "87"}
+# 한 번만 하는 몸짓(charPacks.ts ONCE_LINES 와 같게): 기지개·경례·고개 들어 맞기·돌아보기 등 — 나누지 않는다
+SKIP |= {"143", "134", "68", "72", "165", "159", "158", "146", "162", "163", "164", "141", "112", "127", "169", "104", "100", "152"}
 
 
 def life(lid):
@@ -52,6 +54,22 @@ def phase(fr):
     return [a, b]
 
 
+def active(fr):
+    """소품을 꺼내 들었다 내리는 몸짓: 첫 장(빈손)과 많이 다른 장이 시작되는 곳 ~ 끝나는 곳 = 소품을 든 구간.
+    그 구간을 왕복하고 첫 장(소품 든 채)에서 잠깐 쉰다 → 컵을 든 채 쉬다 한 모금, 다시 든 채 쉬기"""
+    n = len(fr)
+    if n < 5: return None
+    d0 = [diff(f, fr[0]) for f in fr]
+    M = max(d0)
+    if M < 0.02: return None
+    on = [i for i in range(1, n) if d0[i] > 0.3 * M]
+    if not on: return None
+    s, e = on[0], on[-1]
+    if e >= n - 1: e = n - 2
+    if e - s < 2: return None
+    return [s, e]
+
+
 def spans(num):
     """동작표에서 줄마다 「시작 장 → 끝 장」 칸. 끝이 「같은 장 (반복」이면 되풀이 줄, 「N번 끝 장」으로 닫히면 한 번 하는 몸짓"""
     md = next(iter((ROOT / "docs/동작표_3판").glob(f"{num}_*.md")), None)
@@ -71,7 +89,7 @@ def run(only=None, show=None):
         p = d / "char.json"
         if not p.exists(): continue
         j = json.loads(p.read_text(encoding="utf-8"))
-        ph, gest = {}, []
+        ph, gest, dwell = {}, [], []
         sp = spans(num)
         for lid, meta in j["A"].items():
             if not life(lid): continue
@@ -79,10 +97,15 @@ def run(only=None, show=None):
             if "반복" in end or "같은 장" in end:
                 r = phase(frames(d, meta))
                 if r: ph[lid] = r
-            elif "끝 장" in end: gest.append(lid)   # 한 번 하고 기본 자세로 돌아오는 몸짓 → 틀고 잠깐 쉬고 다시
+            elif "끝 장" in end:
+                # 한 번 하고 기본 자세로 돌아오는 몸짓: 소품을 든 구간이 잡히면 그 구간 왕복(첫 장에서 쉼), 아니면 틀고 잠깐 쉬고 다시
+                r = active(frames(d, meta))
+                if r: ph[lid] = r; dwell.append(lid)
+                else: gest.append(lid)
             if show and show == f"{num}:{lid}": print(lid, meta["n"], end, ph.get(lid), lid in gest)
         j["cfg"]["phases"] = ph
         j["cfg"]["gest"] = gest
+        j["cfg"]["dwell"] = dwell
         p.write_text(json.dumps(j, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
         out[num] = len(ph)
     return out
