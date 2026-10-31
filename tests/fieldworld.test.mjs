@@ -851,3 +851,28 @@ test('방문 대응 경계: 경비가 따라붙어 경고하고 내보냄, 우�
   for (let i = 0; i < 100; i++) sim3.step(0.1, { scene: 'street', x: 100, hour: 14 });
   assert.ok(!g3.greeted && !g3.escort && !g3.brawl, '중립 = 무시');
 });
+
+// C4 (10-31 사용자 가안): 이름 인물은 첫 대에 화내고, 6초 안에 또 맞으면 맞서 싸운다 (전투 AI 몸으로 넘김). 싸움에서 지면 기절
+test('이름 인물: 한 대 = 화냄, 6초 안에 또 = 맞섬(전투로), 지면 기절 뒤 깨어남', () => {
+  const sim = new A.WorldSim(graph(), R.mulberry32(31));
+  const n = sim.add({ id: 'npc:잼트리', name: '잼트리', kind: 'named', brain: 'needs', home: 'office', look: '잼트리' }, { scene: 'office', x: 600, y: 560 });
+  sim.step(0.1, { scene: 'office', x: 500, hour: 14 });
+  assert.ok(sim.hitActor(n.def.id, 1, 1));
+  assert.equal(n.doing, '맞고 화남');
+  assert.equal(sim.challengers('office').length, 0, '한 대로는 안 싸움');
+  for (let i = 0; i < 70; i++) sim.step(0.1, { scene: 'office', x: 500, hour: 14 });   // 7초 지남
+  sim.hitActor(n.def.id, 1, 2);
+  assert.equal(n.doing, '맞고 화남', '6초가 지나면 다시 처음부터');
+  for (let i = 0; i < 20; i++) sim.step(0.1, { scene: 'office', x: 500, hour: 14 });
+  sim.hitActor(n.def.id, 1, 3);
+  assert.equal(n.doing, '맞섬');
+  assert.deepEqual(n.perks, ['스탯 뻥튀기', '체력 뻥튀기'], '이름 인물 퍽 (×1.5)');
+  assert.deepEqual(sim.challengers('office').map((a) => a.def.id), [n.def.id], '전투 AI로 넘길 몸');
+  assert.ok(sim.toFight(n.def.id));
+  sim.fromFight(n.def.id, 620, 560, true);
+  assert.equal(n.act, 'down');
+  assert.equal(n.doing, '기절');
+  for (let i = 0; i < 200 && n.act === 'down'; i++) sim.step(0.1, { scene: 'office', x: 500, hour: 14 });
+  assert.notEqual(n.act, 'down', '깨어남');
+  assert.ok(n.hp > 0);
+});

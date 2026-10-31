@@ -126,6 +126,8 @@ export interface Actor {
   station?: string;
   /** 평소 거리 순찰 중인 경찰 (C16, 10-31) */
   patrol?: boolean;
+  /** 이름 인물이 맞고 화난 생활 시각 (또 맞으면 맞선다, C4) */
+  angryAt?: number;
   /** 필드 안 NPC끼리 싸움 (방문 대응 10-31): 상대 id, 다음 타격까지 초 */
   brawl?: { foe: string; t: number };
   /** 이미 인사한 방문자 id */
@@ -237,6 +239,8 @@ export const INCIDENT_HOURS = 24;
 const SEE_BODY_PX = 260;
 /** 기절 직후 죽지 않는 초 (연타 마지막 대에 실수로 죽지 않게) */
 export const KO_GRACE = 2;
+/** 이름 인물: 화난 뒤 이 초 안에 또 맞으면 맞서 싸운다 (C4, 10-31 사용자 가안) */
+export const NAMED_FIGHT_SEC = 6;
 /** 소란도 단계 문턱 (0~100 → 0~3) */
 export const UPROAR_STEPS = [20, 50, 80];
 let serial = 0;
@@ -331,7 +335,7 @@ export class WorldSim {
   }
   /** 전투 AI로 넘길 행위자: 주인공을 막아선 몹(적대 세력·경찰·시비 뒤 맞섬) */
   challengers(scene: string): Actor[] {
-    return this.inScene(scene).filter((a) => a.def.kind === 'mob' && ((a.plan === 'chase' && !a.target && a.act === 'watch') || (a.act === 'argue' && a.doing === '맞섬')));
+    return this.inScene(scene).filter((a) => (a.def.kind === 'mob' && a.plan === 'chase' && !a.target && a.act === 'watch') || (a.act === 'argue' && a.doing === '맞섬'));
   }
   /** 전투 AI 몸으로 넘김 (돌아올 때까지 시뮬에서 뺌) */
   toFight(id: string): Actor | null {
@@ -485,17 +489,22 @@ export class WorldSim {
     a.goal = null;
     a.route = [];
     // 몹: 체력이 바닥나면 기절(쓰러져 오래 누움), 아니면 휘청. 체력 0은 살해 허용이어도 먼저 기절
-    const down = a.def.kind === 'mob' && (a.hp ?? 1) <= 0;
+    const down = (a.hp ?? 1) <= 0;   // 몹·이름 인물(싸움에서 진 뒤)
     if (down && a.pocket && (DROPS.has(a.def.archetype ?? '') || a.stolen)) {
       this.events.push({ kind: 'drop', scene: a.scene, who: a.def.name, amount: a.pocket, stolen: a.stolen ?? 0, x: a.x });
       a.pocket = 0;
       a.stolen = 0;
     }
     this.events.push({ kind: 'hurt', scene: a.scene, who: a.def.name, id: a.def.id, named: a.def.kind === 'named', x: a.x, down, hostile });
-    if (a.def.kind === 'named') {
+    // 이름 인물 (C4, 10-31 사용자 가안): 첫 대는 화내고, NAMED_FIGHT_SEC 안에 또 맞으면 맞서 싸운다(전투 AI 몸, 그 인물 그림·능력치 표 ×1.5).
+    // 싸움에서 체력 0이 되면 아래 몹처럼 기절
+    if (a.def.kind === 'named' && !(a.hp !== undefined && a.hp <= 0)) {
+      const again = a.angryAt !== undefined && this.time - a.angryAt < NAMED_FIGHT_SEC;
+      a.angryAt = this.time;
       a.act = 'argue';
-      a.doing = '맞고 화남';
+      a.doing = again ? '맞섬' : '맞고 화남';
       a.wait = 3;
+      if (again) a.perks ??= ['스탯 뻥튀기', '체력 뻥튀기'];
       this.setClip(a, this.canClip(a, 'angry') ? 'angry' : 'idle');
       this.iconOn(a, '#', 3);
       return;
@@ -892,6 +901,8 @@ export class WorldSim {
           }
           return this.flee(a, this.player?.x ?? a.x);
         }
+        // 이름 인물: 기절에서 깨면 체력 조금 돌아오고 하던 일로 (화는 그대로 남아 또 맞으면 바로 맞선다)
+        if (a.def.kind === 'named' && a.hp !== undefined && a.hp <= 0) { a.hp = Math.round((a.hpMax ?? 1000) * 0.3); a.angryAt = this.time; }
         return this.resume(a);
       case 'post':
         return this.postStand(a, dt);

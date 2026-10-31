@@ -448,9 +448,10 @@ function hqAdapter(bridge: Partial<GameBridge> | undefined, ui: { chooseFloor: H
       applyNpcPerks(b, a.perks ?? [], !!a.drunk);
       // 싸움 기록: 덤벼 온 까닭 (경찰·경비 = 무슨 신고로 출동, 불량배 = 시비, 적대 세력 = 그 소속)
       const fac = w.mobFaction(a);
-      const why = isLaw(a.def.archetype) ? `responding to a${crimeAt.get(sceneId) === 'murder' ? ' murder' : 'n assault'} report` : fac ? `${fac}, hostile` : 'picked a fight';
+      const named = a.def.kind === 'named';
+      const why = named ? 'fought back after being hit' : isLaw(a.def.archetype) ? `responding to a${crimeAt.get(sceneId) === 'murder' ? ' murder' : 'n assault'} report` : fac ? `${fac}, hostile` : 'picked a fight';
       fightScene = sceneId;
-      const whyKo = isLaw(a.def.archetype) ? `${crimeAt.get(sceneId) === 'murder' ? '살인' : '폭행'} 신고로 출동` : fac ? `${fac}, 적대` : '시비';
+      const whyKo = named ? '맞고 맞받아침' : isLaw(a.def.archetype) ? `${crimeAt.get(sceneId) === 'murder' ? '살인' : '폭행'} 신고로 출동` : fac ? `${fac}, 적대` : '시비';
       fightLog.joined(hm().trim(), sceneId, a.def.id, a.def.archetype ?? a.def.name, why, whyKo);
       fights.set(a.def.id, { body: b as typeof b & { hp: number; hpMax: number; alive: boolean; label: string }, t: 0, scene: sceneId });
     }
