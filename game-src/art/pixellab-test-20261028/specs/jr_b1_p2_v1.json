@@ -1,0 +1,233 @@
+{
+ "name": "jr_b1_p2_v1",
+ "room": "corridor",
+ "mood": "worn",
+ "doors": 0,
+ "mode": "loose",
+ "view": "flat",
+ "floor_share": "the same lower part as in the reference image",
+ "sides": "none",
+ "density": "packed",
+ "place": "a run-down 1990s Seoul underground arcade corridor, continuing right from the reference image",
+ "time": "late at night",
+ "light": "half-dead fluorescent tubes and warm shop light",
+ "floor": "seamless grey concrete, no grid, no seams, oil stains, puddle, grime, varied litter, warm light pool, black shadow under objects",
+ "walls": "same grimy concrete as the reference, rust streaks, mold, cracks; same thin ceiling strip, cables, fluorescent tubes, one dead",
+ "shadow": "strong contrast, bright shop, dark edges, shadow under the cart",
+ "palette": "dark grey and beige with warm orange accents, same as the reference",
+ "no": [
+  "doors",
+  "stairs",
+  "side walls",
+  "floor tiles"
+ ],
+ "brief": {
+  "wiki": "중림 지하상가: 망해 가는 지하상가, 낡은 점포, 손님 없는 매대, 반쯤 꺼진 형광등, 문 닫은 가게 반·연 가게 반",
+  "design": "설계안 jr_b1 소품: 점포 앞 임시 매대, 쌓인 상자, 철제 쓰레기통(넘침), 소화기함 ×2, 낡은 포스터(빈 면), 분리수거, 공조. GPT 의뢰문 ②: 열린 철물점 「성원철물」(손바닥만 한 공구와 작은 철물이 벽과 선반에 수백 개, 가게 앞 통로 바닥에 바퀴 달린 매대와 철물 상자, 바닥 기름 자국), 간판은 기둥에 붙은 세로 돌출판",
+  "user": [
+   "칸마다 따로 그려 이어 붙임, 1번째 장(①)을 참고 그림으로(사용자 10-31)",
+   "바닥 격자 금지, 이음매(양끝)에는 기둥·벽·바닥·천장만",
+   "간판 정확한 이름·도트 글씨",
+   "쓰레기 제각각, 가게 입체감, 한 장에 가게 하나",
+   "채우기 packed, 느슨한 틀"
+  ],
+  "items": [
+   {
+    "src": "GPT 의뢰문: 열린 철물점 성원철물",
+    "by": [
+     1
+    ]
+   },
+   {
+    "src": "GPT 의뢰문: 공구·철물 수백 개",
+    "by": [
+     2
+    ]
+   },
+   {
+    "src": "GPT 의뢰문·설계안: 바퀴 매대·임시 매대",
+    "by": [
+     3
+    ]
+   },
+   {
+    "src": "GPT 의뢰문·설계안: 철물 상자·쌓인 상자",
+    "by": [
+     4
+    ]
+   },
+   {
+    "src": "GPT 의뢰문: 바닥 기름 자국",
+    "by": [
+     5
+    ]
+   },
+   {
+    "src": "설계안: 철제 쓰레기통·분리수거",
+    "by": [
+     7
+    ]
+   },
+   {
+    "src": "설계안: 소화기함",
+    "by": [
+     8
+    ]
+   },
+   {
+    "src": "설계안: 낡은 포스터(빈 면)",
+    "by": [
+     9
+    ]
+   },
+   {
+    "src": "설계안: 공조",
+    "by": [
+     10
+    ]
+   },
+   {
+    "src": "사용자: 이음매 기둥",
+    "by": [
+     0,
+     11
+    ]
+   },
+   {
+    "src": "위키: 반쯤 꺼진 형광등",
+    "by": "칸:walls dead"
+   },
+   {
+    "src": "사용자: 바닥 격자 금지",
+    "by": "칸:floor no grid"
+   }
+  ]
+ },
+ "must": [
+  {
+   "kw": "reading \"성원철물\"",
+   "from": "가게 이름"
+  },
+  {
+   "kw": "same plain concrete pillar",
+   "from": "① 오른쪽 기둥과 이음"
+  },
+  {
+   "kw": "no grid",
+   "from": "사용자"
+  }
+ ],
+ "sized": [],
+ "items": [
+  {
+   "full": "left image edge: the same plain concrete pillar as the right edge of the reference image",
+   "text": "left image edge: the same plain concrete pillar as the right edge of the reference image",
+   "why": "사용자 이음매: ① 오른쪽 끝 기둥에서 이어짐",
+   "keep": [
+    "same plain concrete pillar"
+   ]
+  },
+  {
+   "full": "back wall: an open hardware store recessed like a lit room, inner side walls visible, vertical blade sign reading \"성원철물\" in blocky pixel letters",
+   "text": "back wall: an open hardware store recessed like a lit room, inner side walls visible, vertical blade sign reading \"성원철물\" in blocky pixel letters",
+   "why": "GPT 의뢰문 ② 성원철물(사용자 확인), 한 장에 가게 하나·입체감·간판 도트",
+   "keep": [
+    "hardware store",
+    "reading \"성원철물\""
+   ]
+  },
+  {
+   "full": "hundreds of tiny tools and metal parts hung and piled messily on walls and shelves: pliers, wrenches, hammers, screws, hinges, padlocks, wire coils",
+   "text": "hundreds of tiny tools and metal parts hung and piled messily on walls and shelves: pliers, wrenches, hammers, screws, hinges, padlocks, wire coils",
+   "why": "GPT 의뢰문 손바닥만 한 공구·철물 수백 개",
+   "keep": [
+    "tiny tools",
+    "padlocks"
+   ]
+  },
+  {
+   "full": "wheeled display cart sticking out onto the walkway, top and side faces visible, with bins of nails and bolts",
+   "text": "wheeled display cart sticking out onto the walkway, top and side faces visible, with bins of nails and bolts",
+   "why": "GPT 의뢰문 바퀴 매대, 설계안 점포 앞 임시 매대",
+   "keep": [
+    "wheeled display cart",
+    "sticking out"
+   ]
+  },
+  {
+   "full": "hardware boxes, a coiled hose, a stack of buckets for sale",
+   "text": "hardware boxes, a coiled hose, a stack of buckets for sale",
+   "why": "GPT 의뢰문 철물 상자, 설계안 쌓인 상자",
+   "keep": [
+    "hardware boxes"
+   ]
+  },
+  {
+   "full": "oil stain under the cart",
+   "text": "oil stain under the cart",
+   "why": "GPT 의뢰문 바닥 기름 자국",
+   "keep": [
+    "oil stain"
+   ]
+  },
+  {
+   "full": "at the wall base: collapsed cardboard, torn trash bag, rusty cans, each a different shape",
+   "text": "at the wall base: collapsed cardboard, torn trash bag, rusty cans, each a different shape",
+   "why": "사용자 쓰레기 제각각",
+   "keep": [
+    "each a different shape"
+   ]
+  },
+  {
+   "full": "dented metal trash can, recycling bin",
+   "text": "dented metal trash can, recycling bin",
+   "why": "설계안 철제 쓰레기통·분리수거 ×2(둘째)",
+   "keep": [
+    "trash can",
+    "recycling bin"
+   ]
+  },
+  {
+   "full": "faded fire extinguisher box",
+   "text": "faded fire extinguisher box",
+   "why": "설계안 소화기함 ×2(둘째)",
+   "keep": [
+    "fire extinguisher box"
+   ]
+  },
+  {
+   "full": "two torn blank posters",
+   "text": "two torn blank posters",
+   "why": "설계안 낡은 포스터(빈 면)",
+   "keep": [
+    "blank posters"
+   ]
+  },
+  {
+   "full": "air conditioner, tangled cables",
+   "text": "air conditioner, tangled cables",
+   "why": "설계안 공조",
+   "keep": [
+    "air conditioner"
+   ]
+  },
+  {
+   "full": "right image edge: only a plain concrete pillar, nothing else",
+   "text": "right image edge: only a plain concrete pillar, nothing else",
+   "why": "사용자 이음매: 다음 장과 이어 붙임",
+   "keep": [
+    "plain concrete pillar",
+    "nothing else"
+   ]
+  }
+ ],
+ "review": {
+  "fit": "12줄 모두 지하상가 통로·철물점 물건. 계단·문·옆벽·의자·사람 없음",
+  "place": "매대만 통로로 조금 나옴, 통로 가운데 비움. 양끝은 기둥만(왼쪽은 ① 기둥과 같은 것)",
+  "size": "크기 숫자 없음(느슨한 틀), 공구는 tiny",
+  "brief": "설계안·의뢰문 항목 모두 대응. 마네킹·전단지 꽂이는 ③ 칸",
+  "meaning": "1차=2차(느슨한 틀)",
+  "over": "같은 물건 두 번 없음, packed",
+  "frame": "flat 정면, 옆벽 없음, 바닥 몫·벽선·천장·색은 참고 그림(①)과 같게, 문 없음, 양끝 기둥"
+ }
+}
