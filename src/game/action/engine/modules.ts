@@ -354,6 +354,7 @@ function hqAdapter(bridge: Partial<GameBridge> | undefined, ui: { chooseFloor: H
     },
     lifeTime: () => sim?.time ?? 0,
     cordons: (sceneId) => (world()?.obstacles(sceneId) ?? []).filter((o) => o.id.startsWith('cordon')),
+    gear: (sceneId) => world()?.gear(sceneId) ?? [],
     hit: (sceneId, boxes, dir) => world()?.hitBoxes(sceneId, boxes, dir).length ?? 0,
     actors: (sceneId) => (world()?.inScene(sceneId) ?? []).map((a) => {
       const st = a.seat ? world()?.graph.scene(sceneId)?.seats?.[a.seat.i] : undefined;

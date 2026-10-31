@@ -68,9 +68,13 @@ export interface HubLife {
   combat?(api: StageApi, sceneId: string): void;
   /** 시체 둘레 폴리스 라인 (라바콘 + 노란 테이프, 10-30). 깊이 층으로 그린다 */
   cordons?(sceneId: string): { x0: number; x1: number; y0: number; y1: number }[];
+  /** 훈련장 장비 (샌드백·허수아비·사격 과녁, 10-31: 그림은 일단 코드 drawGear, 나중에 교체). busy = 누가 치는 중 → 흔들림 */
+  gear?(sceneId: string): { kind: 'sandbag' | 'dummy' | 'target'; x: number; y: number; busy: boolean }[];
 }
 /** 폴리스 라인 층 자리 수 (장면당 시체 상한 5 → 라인 최대 5) */
 const CORDON_SLOTS = 5;
+/** 훈련 장비 층 자리 수 (훈련장 한 곳 7개) */
+const GEAR_SLOTS = 8;
 /** 행위자 깊이 층 자리 수 (한 화면 상한보다 넉넉히) */
 const LIFE_SLOTS = 24;
 
@@ -106,6 +110,8 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
   let live: LiveActor[] = [];
   /** 지금 장면의 폴리스 라인 (시체 둘레) */
   let cords: { x0: number; x1: number; y0: number; y1: number }[] = [];
+  /** 지금 장면의 훈련 장비 */
+  let gears: { kind: 'sandbag' | 'dummy' | 'target'; x: number; y: number; busy: boolean }[] = [];
   let opening: { id: string; t: number; len: number; then: () => void } | null = null;
   /** 들어온 문이 뒤에서 닫히는 것·메뉴 문이 다시 닫히는 것 */
   let closing: { id: string; t: number; len: number } | null = null;
@@ -183,6 +189,14 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
           get x1() { return (live[i]?.x ?? -1e9) + 60; },
           occludedSilhouette: false,
           draw: (c: CanvasRenderingContext2D) => { const a = live[i]; if (a) drawLiveActor(c, a, host.life!); },
+        })) : [])
+        // 훈련 장비: 장비마다 한 층 (사람과 깊이로 겹친다)
+        .concat(host.life?.gear ? Array.from({ length: GEAR_SLOTS }, (_, i) => ({
+          get y() { return gears[i]?.y ?? -1e9; },
+          get x0() { return (gears[i]?.x ?? -1e9) - 40; },
+          get x1() { return (gears[i]?.x ?? -1e9) + 40; },
+          occludedSilhouette: false,
+          draw: (c: CanvasRenderingContext2D) => { const g = gears[i]; if (g) drawGear(c, g, performance.now() / 1000); },
         })) : [])
         // 폴리스 라인: 라인마다 뒤쪽(뒷줄 라바콘·옆 테이프)과 앞쪽(앞줄 라바콘·테이프) 두 층 → 시체·사람과 깊이로 겹친다
         .concat(host.life?.cordons ? Array.from({ length: CORDON_SLOTS * 2 }, (_, i) => ({
@@ -335,6 +349,7 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
         host.life.combat?.(a, scene.id);
         live = host.life.actors(scene.id);
         cords = host.life.cordons?.(scene.id) ?? [];
+        gears = host.life.gear?.(scene.id) ?? [];
         // 이름 인물 대화 자리(visit:이름)를 지금 서 있는 곳으로 옮긴다 (E → npcLink 대화)
         const named = live.filter((q) => q.kind === 'named');
         scene.spots = scene.spots.filter((q) => !q.id.startsWith('visit:')).concat(named.map((q) => ({ id: `visit:${q.name}`, x: q.x, y: q.y, who: q.name, verb: '대화', face: q.face, open: true })));
@@ -931,6 +946,45 @@ function drawLiveActor(c: CanvasRenderingContext2D, a: LiveActor, life: HubLife)
   if (a.kind === 'mob' && life.drawMob) return life.drawMob(c, a);
   silhouette(c, a);
 }
+/** 훈련 장비 (임시 코드 그림, 10-31 사용자 1안: 나중에 그림으로 교체). 발 자리 (x, y), 원근 배율. busy 면 맞는 것처럼 흔들린다 */
+export function drawGear(c: CanvasRenderingContext2D, g: { kind: 'sandbag' | 'dummy' | 'target'; x: number; y: number; busy: boolean }, t: number): void {
+  const k = persp(g.y);
+  const sway = g.busy ? Math.sin(t * 9 + g.x) : 0;
+  c.save();
+  c.fillStyle = 'rgba(0,0,0,0.3)';
+  c.beginPath(); c.ellipse(g.x, g.y, 26 * k, 6 * k, 0, 0, Math.PI * 2); c.fill();
+  if (g.kind === 'sandbag') {
+    // 천장 사슬 + 매달린 붉은 가죽 자루
+    const top = g.y - 300 * k, ang = sway * 0.12;
+    c.strokeStyle = '#4a4f55'; c.lineWidth = Math.max(1, 3 * k);
+    c.beginPath(); c.moveTo(g.x, top); c.lineTo(g.x + Math.sin(ang) * 70 * k, top + 70 * k); c.stroke();
+    c.translate(g.x, top + 70 * k); c.rotate(ang);
+    c.fillStyle = '#8a2e26'; c.fillRect(-22 * k, 0, 44 * k, 150 * k);
+    c.fillStyle = '#6d231d'; c.fillRect(-22 * k, 0, 44 * k, 10 * k); c.fillRect(-22 * k, 140 * k, 44 * k, 10 * k);
+    c.fillStyle = 'rgba(255,255,255,0.12)'; c.fillRect(-16 * k, 14 * k, 6 * k, 120 * k);
+  } else if (g.kind === 'dummy') {
+    // 받침 + 나무 기둥 + 짚 몸통 + 머리 (맞으면 흔들림)
+    const ang = sway * 0.06;
+    c.fillStyle = '#3d3a36'; c.fillRect(g.x - 24 * k, g.y - 8 * k, 48 * k, 8 * k);
+    c.translate(g.x, g.y - 8 * k); c.rotate(ang);
+    c.fillStyle = '#6b4a2b'; c.fillRect(-5 * k, -150 * k, 10 * k, 150 * k);
+    c.fillStyle = '#c9a65b'; c.fillRect(-26 * k, -205 * k, 52 * k, 90 * k);
+    c.fillStyle = '#b08c45'; c.fillRect(-26 * k, -165 * k, 52 * k, 6 * k);
+    c.fillStyle = '#6b4a2b'; c.fillRect(-48 * k, -195 * k, 96 * k, 8 * k);
+    c.fillStyle = '#c9a65b'; c.beginPath(); c.arc(0, -225 * k, 20 * k, 0, Math.PI * 2); c.fill();
+  } else {
+    // 사격 과녁: 다리 둘 + 흰 판 + 붉은 고리 (맞으면 살짝 떨림)
+    const dx = sway * 2 * k;
+    c.strokeStyle = '#3d3a36'; c.lineWidth = Math.max(1, 4 * k);
+    c.beginPath(); c.moveTo(g.x - 16 * k, g.y); c.lineTo(g.x - 8 * k, g.y - 90 * k); c.moveTo(g.x + 16 * k, g.y); c.lineTo(g.x + 8 * k, g.y - 90 * k); c.stroke();
+    c.fillStyle = '#ece8df'; c.fillRect(g.x - 30 * k + dx, g.y - 190 * k, 60 * k, 100 * k);
+    for (const [r, col] of [[24, '#c23b30'], [17, '#ece8df'], [10, '#c23b30'], [4, '#ece8df']] as const) {
+      c.fillStyle = col; c.beginPath(); c.arc(g.x + dx, g.y - 140 * k, r * k, 0, Math.PI * 2); c.fill();
+    }
+  }
+  c.restore();
+}
+
 /** 라바콘 하나 (발 x, y). 원근만큼 작아진다 */
 function drawCone(c: CanvasRenderingContext2D, x: number, y: number): number {
   const k = persp(y), h = 34 * k, w = 22 * k;

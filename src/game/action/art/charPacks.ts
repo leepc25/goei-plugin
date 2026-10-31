@@ -103,7 +103,8 @@ export const charArt = (nameOrKey: string): CharArt | null => { const r = roster
 /* ───────── 필드 생활 클립 (hub.ts) ───────── */
 
 /** 필드 클립 이름(docs/필드_클립_이름_약속.md) → 테스트룸 줄 번호 후보(앞에서부터 있는 것). loop=false 는 한 번 재생 뒤 마지막 장 */
-export const FIELD_CLIP: Record<string, { ids: string[]; fps?: number; loop?: boolean }> = {
+/** seq = ids 를 차례로 이어 튼다 (그 인물에게 있는 줄만, 끝나면 처음부터): 약공 연타 9→10→11→강 12 같은 훈련 */
+export const FIELD_CLIP: Record<string, { ids: string[]; fps?: number; loop?: boolean; seq?: boolean }> = {
   idle: { ids: ['1'], fps: 1 / 0.6 },
   walk: { ids: ['4'], fps: 11 }, run: { ids: ['5_1', '5'], fps: 15 },
   work: { ids: ['124', '121'], fps: 6 },
@@ -121,6 +122,8 @@ export const FIELD_CLIP: Record<string, { ids: string[]; fps?: number; loop?: bo
   sitdown: { ids: ['39'], fps: 8, loop: false }, backoff: { ids: ['37_1', '37'], fps: 8 }, crawl: { ids: ['38_1', '38'], fps: 8 }, scramble: { ids: ['42_1', '42'], fps: 9 },
   // 걷다 잠깐 멈춰 하는 일(10-30 사람처럼 걷기, world/actors.ts PAUSES): 그 줄이 있는 인물만
   pushup: { ids: ['144'], fps: 6 },
+  // 훈련장 장비(10-31): 샌드백·허수아비 = 약공 연타 → 강공 이어서, 사격대 = 원거리 공격
+  strike: { ids: ['9', '10', '11', '12'], fps: 11, seq: true }, shoot: { ids: ['15'], fps: 9 },
   // 상호작용(10-31): 무전 보고·수첩 메모, 진료(의사)·치료받기
   radio: { ids: ['118'], fps: 5 }, memo: { ids: ['119'], fps: 5 }, exam: { ids: ['107', '108', '109', '110', '113'], fps: 5 }, treat: { ids: ['78', '76'], fps: 4 },
   // 훈련(욕구): 팔굽혀펴기 → 장비 점검 → 기지개 → 약공 연습(모든 인물에게 있음) 중 그 인물에게 있는 첫 줄
@@ -151,6 +154,15 @@ export function drawCharClip(c: CanvasRenderingContext2D, nameOrKey: string, x: 
   const a = charArt(nameOrKey);
   if (!a) return false;
   const cm = FIELD_CLIP[clip] ?? FIELD_CLIP.idle;
+  if (cm.seq) {
+    // 이어 틀기: 있는 줄들의 장을 한 줄로 늘어놓고 차례로
+    const ids = cm.ids.filter((i) => !!a.A[i] && !!a.IMG[i]);
+    const total = ids.reduce((n, i) => n + a.A[i].n, 0);
+    if (total) {
+      let k = Math.floor((now / 1000) * (cm.fps ?? 6)) % total;
+      for (const i of ids) { if (k < a.A[i].n) { drawLine(c, a, i, k, x, y, dir); return true; } k -= a.A[i].n; }
+    }
+  }
   let id = cm.ids.find((i) => !!a.A[i]);
   let m = id ? a.A[id] : null;
   if (!m) { id = '1'; m = a.A['1']; if (!m) return false; }

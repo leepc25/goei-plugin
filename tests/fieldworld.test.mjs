@@ -658,7 +658,7 @@ test('역할 표·인원 자동: 사무실 1곳당 사무 3(의자에서 책상 
   assert.equal(desk.length, 3);
   assert.equal(gym.length, 4);
   assert.ok(desk.filter((a) => a.seat?.kind === 'type').length >= 2, desk.map((a) => `${a.scene} ${a.doing}`).join(' / '));
-  assert.ok(gym.some((a) => a.doing.startsWith('훈련 중')), gym.map((a) => `${a.scene} ${a.doing}`).join(' / '));
+  assert.ok(gym.some((a) => /훈련|샌드백|허수아비|사격/.test(a.doing)), gym.map((a) => `${a.scene} ${a.doing}`).join(' / '));   // 장비가 있으면 장비에서
   // 퇴근 시간이면 나간다
   for (let t = 0; t < 30 * 5; t++) sim.step(1 / 30, { scene: 'elsewhere', x: 0, hour: 19 });
   assert.ok(sim.actors.filter((a) => a.post).length === 0);
@@ -720,4 +720,26 @@ test('상호작용: 동료끼리 지나가다 인사·한가하면 선 채 대�
   gd.act = 'post'; gd.noticeCd = 0; gd.wait = 99;
   sim.step(1 / 30, { scene: 'hall', x: gd.x + 100, y: gd.y, hour: 12 });
   assert.equal(gd.act, 'notice');
+});
+
+test('훈련장 장비: 샌드백·허수아비·과녁이 방 길이에 비례해 놓이고, 훈련은 빈 장비 앞에서 연타·사격(한 장비에 한 명)', () => {
+  const sc = [{ id: 'gym', name: '훈련장', floor: 'B1', length: 2000, lane: [470, 680], doors: [{ id: 'out', x: 100, kind: 'exit', side: 'S' }] }];
+  const g = new P.PlaceGraph(sc, []);
+  const sim = new A.WorldSim(g, R.mulberry32(4), {
+    posts: [{ id: 'tr', archetype: '관리국 요원', scene: 'gym', how: 'train', shifts: [[0, 24]], count: 4, gate: 100 }],
+    has: (_l, c) => ['walk', 'idle', 'train', 'strike', 'shoot'].includes(c), sceneFaction: () => 'A00',
+  });
+  const gs = sim.gear('gym');
+  assert.deepEqual(gs.map((q) => q.kind), ['sandbag', 'sandbag', 'dummy', 'dummy', 'target', 'target', 'target']);
+  assert.ok(gs[0].x < gs[2].x && gs[2].x < gs[4].x && gs[4].x <= 2000);
+  assert.deepEqual(sim.gear('nope'), []);
+  const doings = new Set();
+  for (let t = 0; t < 30 * 90; t++) {
+    sim.step(1 / 30, { scene: 'else', x: 0, hour: 12 });
+    const users = sim.actors.filter((a) => a.act === 'do' && a.station);
+    assert.equal(new Set(users.map((a) => a.station)).size, users.length, '한 장비에 한 명');
+    for (const a of users) doings.add(a.doing);
+  }
+  assert.ok(doings.has('사격 훈련') && (doings.has('샌드백 치기') || doings.has('허수아비 치기')), [...doings].join(','));
+  assert.ok(sim.gear('gym').some((q) => q.busy));
 });

@@ -118,7 +118,12 @@ export interface Actor {
   chatCd?: number;
   /** 진료할 사람 id (의사) */
   patient?: string;
+  /** 쓰는 훈련 장비 (장면#번호) */
+  station?: string;
 }
+
+/** 훈련장 장비 하나 (10-31 사용자: 샌드백·허수아비·사격 과녁. 그림은 일단 코드, 나중에 교체) */
+export interface Gear { kind: 'sandbag' | 'dummy' | 'target'; x: number; y: number; busy: boolean }
 
 /** 길에 놓인 막힌 곳 (폴리스 라인·부서진 물건 등). wall = 길을 위아래 끝까지 막음 → 돌아섬 */
 export interface Obstacle { id: string; x0: number; x1: number; y0: number; y1: number; wall?: boolean }
@@ -585,7 +590,7 @@ export class WorldSim {
         if (a.task && a.needs) a.needs[a.task.need] = Math.min(100, a.needs[a.task.need] + a.task.fill * dt);
         a.wait -= dt;
         // 직원의 책상 일은 욕구가 차도 정한 시간만큼 (근무라서). 그 밖은 욕구가 다 차면 끝
-        if (a.wait <= 0 || (a.task && a.needs && a.needs[a.task.need] >= 100 && !(a.post && a.task.id === 'work'))) {
+        if (a.wait <= 0 || (a.task && a.needs && a.needs[a.task.need] >= 100 && !(a.post && (a.task.id === 'work' || a.task.id === 'train')))) {
           a.last = a.task?.id;
           a.task = undefined;
           this.idle(a, 1, 3);
@@ -953,6 +958,8 @@ export class WorldSim {
   /** 수다는 상대 옆으로, 앉아서 하는 일은 빈 의자로(서서 하는 줄이 없거나 의자가 있으면), 나머지는 장면 안 빈 곳 */
   private taskSpot(a: Actor, t: Activity): { x: number; y: number } {
     a.seatPick = undefined;
+    a.station = undefined;
+    if (t.id === 'train') { const st = this.trainSpot(a); if (st) return st; }
     if (!t.partner && SEAT_KIND[t.clip] && this.has(a.def.look ?? a.def.name, `seat:${SEAT_KIND[t.clip]}`)) {
       const i = this.freeSeat(a.scene, a.x);
       const st = i === null ? null : this.graph.scene(a.scene)?.seats?.[i];
@@ -1008,6 +1015,18 @@ export class WorldSim {
       a.seat = { i: pick, dir: st.face === 'N' ? 'back' : st.face ? 'side' : 'front', kind, x: st.x, y: st.y };
       a.doing = `${t.label} (의자)`;
       return;
+    }
+    // 훈련 장비 앞: 과녁이면 사격, 샌드백·허수아비면 연타 (오른쪽을 보고)
+    if (t.id === 'train' && a.station) {
+      const gi = Number(a.station.split('#')[1]);
+      const g = this.gear(a.scene)[gi];
+      if (g) {
+        a.face = 1;
+        const clip = g.kind === 'target' ? 'shoot' : 'strike';
+        this.setClip(a, this.canClip(a, clip) ? clip : 'train');
+        a.doing = g.kind === 'target' ? '사격 훈련' : g.kind === 'sandbag' ? '샌드백 치기' : '허수아비 치기';
+        return;
+      }
     }
     // 의자를 못 잡았고 서서 하는 줄도 없으면 그 일을 하지 않는다 (없는 동작을 대기 그림으로 때우지 않는다)
     if (!this.has(a.def.look ?? a.def.name, t.clip)) {
@@ -1122,6 +1141,40 @@ export class WorldSim {
   /** 무기를 들이밀면(주인공이 무기를 꺼내 3m 안에서 이쪽을 봄) 겁 반응 — 동작은 그 인물에게 있는 줄만(없으면 비슷한 줄로).
    * 용기 낮음: 놀라 주저앉았다가 뒤로 기어 도망 · 보통: 뒷걸음질 → 달아나기 · 높음: 불량배는 맞서고, 그 밖은 화내고 비켜 감. 근무형·경찰·경비는 겁먹지 않음 */
   // ── 사망·시체 (10-30) ──
+
+  /**
+   * 훈련장(장소 종류 training) 장비: 방 길이·걷는 띠에 비례해 놓는다(방 크기가 바뀌어도 따라감).
+   * 앞쪽 샌드백 2, 가운데 허수아비 2, 끝 사격 과녁 3(사수는 과녁 왼쪽 사대에). busy = 지금 누가 쓰는 중
+   */
+  gear(scene: string): Gear[] {
+    if (this.graph.kind(scene) !== 'training') return [];
+    const len = this.graph.scene(scene)?.length ?? 1280;
+    const [top, bot] = this.graph.lane(scene);
+    const d = bot - top;
+    const g: Omit<Gear, 'busy'>[] = [
+      { kind: 'sandbag', x: len * 0.18, y: top + d * 0.25 }, { kind: 'sandbag', x: len * 0.3, y: top + d * 0.25 },
+      { kind: 'dummy', x: len * 0.44, y: top + d * 0.45 }, { kind: 'dummy', x: len * 0.56, y: top + d * 0.45 },
+      { kind: 'target', x: len * 0.92, y: top + d * 0.15 }, { kind: 'target', x: len * 0.92, y: top + d * 0.45 }, { kind: 'target', x: len * 0.92, y: top + d * 0.75 },
+    ];
+    return g.map((q, i) => ({ ...q, x: Math.round(q.x), y: Math.round(q.y), busy: this.stationUser(scene, i) !== null }));
+  }
+  /** 그 장비를 지금 쓰는(또는 쓰러 가는) 사람 */
+  private stationUser(scene: string, i: number): Actor | null {
+    const key = `${scene}#${i}`;
+    return this.actors.find((q) => q.station === key && q.scene === scene && q.task?.id === 'train' && (q.act === 'do' || (q.act === 'walk' && q.plan === 'do'))) ?? null;
+  }
+  /** 훈련 자리: 쏠 수 있으면 사대 먼저(반반), 아니면 샌드백·허수아비. 비어 있는 것 중 가까운 것. 없으면 null */
+  private trainSpot(a: Actor): { x: number; y: number } | null {
+    const gs = this.gear(a.scene);
+    if (!gs.length) return null;
+    const shoot = this.canClip(a, 'shoot') && this.rng() < 0.5;
+    const free = gs.map((g, i) => ({ g, i })).filter(({ g, i }) => (shoot ? g.kind === 'target' : g.kind !== 'target') && this.stationUser(a.scene, i) === null);
+    if (!free.length) return null;
+    const { g, i } = free.sort((p, q) => Math.abs(p.g.x - a.x) - Math.abs(q.g.x - a.x))[0];
+    a.station = `${a.scene}#${i}`;
+    // 사수는 과녁에서 왼쪽으로 떨어진 사대, 타격은 장비 왼쪽 바로 앞 (오른쪽을 본다)
+    return { x: g.kind === 'target' ? Math.round(g.x - (this.graph.scene(a.scene)?.length ?? 1280) * 0.26) : g.x - 118, y: g.y + 4 };
+  }
 
   /** 장면의 시체 */
   corpses(scene: string): Actor[] {
@@ -1464,7 +1517,10 @@ export class WorldSim {
         a.task = work;
         return this.walkTo(a, this.taskSpot(a, work), '책상으로', 'do');
       }
-      // 훈련(전투원): 장비 점검·팔굽혀펴기·기지개 중 그 그림에 있는 것을 돌아가며, 방 안 아무 데서나
+      // 훈련(전투원): 빈 훈련 장비가 있으면 거기서(샌드백·허수아비·사격), 없으면 장비 점검·팔굽혀펴기·기지개를 돌아가며 방 안 아무 데서나
+      const train = ACTIVITIES.find((t) => t.id === 'train')!;
+      const st = this.trainSpot(a);
+      if (st) { a.task = train; return this.walkTo(a, st, '훈련하러', 'do'); }
       const opts = ['pushup', 'work', 'limber'].filter((c) => this.canClip(a, c) && c !== a.trainClip);
       a.trainClip = opts.length ? pick(this.rng, opts) : 'idle';
       return this.walkTo(a, this.randomSpot(a.scene), '훈련하러', 'post');
