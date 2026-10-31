@@ -36,6 +36,12 @@ def pack_id(key): return "char-" + key.split("_")[0]
 def write_char(cfg):
     key = cfg["key"]; d = PACKS / pack_id(key)
     A, _ = build.analyze(cfg, force)
+    # 원본 그림 폴더가 없는 컨테이너(예: 에일린 game-src/action/eileen)에서 다시 만들면 줄이 빠진다(10-31 에일린 50줄 빠짐) → 있던 줄이 줄어들면 멈춘다
+    old = d / "char.json"
+    if old.exists():
+        had = set(json.loads(old.read_text(encoding="utf-8"))["A"])
+        lost = had - set(A)
+        if lost: raise SystemExit(f"{key}: 원본이 없어 줄 {len(lost)}개가 빠짐({sorted(lost)[:6]}…) — 팩을 덮어쓰지 않음")
     payload = build.payload_of(cfg, A)
     d.mkdir(parents=True, exist_ok=True)
     keep = {"pack.json", "char.json"}
