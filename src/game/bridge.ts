@@ -223,7 +223,7 @@ export interface GamePeople {
   /** 세력 평판 전부 (아는 세력 모두, 장부가 없으면 시작값). 기능이 꺼져 있으면 빈 목록 */
   factions(): Promise<FactionView[]>;
   /** 세력끼리 관계 (설정 → 세력 관계, 카드에서 고친 값 또는 기본 표). 열쇠 「보는 쪽 코드>대상 코드」(예: A00>B00), 중립은 빠짐.
-   *  세력 평판 기능이 꺼져 있으면 null → 게임은 자기 기본값(관리국·가짜 관리국·백일몽 서로 적대, 10-31 사용자) */
+   *  세력 평판 기능이 꺼져 있으면 null → 게임은 자기 기본값(world/factions.ts, 10-31 사용자) */
   relations?(): Promise<Record<string, FactionView['stage']> | null>;
   /** 기록이 갱신될 때 (갱신기가 끝났을 때) */
   onChange(cb: () => void): () => void;

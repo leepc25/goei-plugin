@@ -815,10 +815,12 @@ test('순찰 경찰: 지나가다 시체를 보면 현장 경찰이 된다 (라�
 });
 
 // 방문 대응 (10-31 사용자): 다른 세력 사람이 세력 거점에 들어오면 세력 관계대로. 기본값 = 큰 세력 셋 서로 적대, 나머지 중립
-test('세력 관계 기본값: 관리국·가짜 관리국·백일몽은 서로 적대, 협회·중림 등은 중립. 플러그인 표가 있으면 그것', async () => {
+test('세력 관계 기본값: 가짜 관리국은 둘과 적대, 관리국 ↔ 백일몽 경계, 협회·중림 등은 중립. 플러그인 표가 있으면 그것', async () => {
   const F = await imp('factions');
   assert.equal(F.defaultRelation('A00', 'B00'), 'hostile');
-  assert.equal(F.defaultRelation('C00', 'A00'), 'hostile');
+  assert.equal(F.defaultRelation('C00', 'A00'), 'wary', '관리국 ↔ 백일몽 = 경계 (플러그인 기본 표와 맞춤)');
+  assert.equal(F.defaultRelation('A00', 'C00'), 'wary');
+  assert.equal(F.defaultRelation('B00', 'C00'), 'hostile');
   assert.equal(F.defaultRelation('A00', 'E00'), 'neutral');
   assert.equal(F.defaultRelation('A00', 'A00'), 'friendly');
   const rel = F.relationFrom({ 'A00>C00': 'wary' });
