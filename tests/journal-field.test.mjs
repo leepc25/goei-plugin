@@ -133,7 +133,7 @@ test('필드 방문 한 번 → 보고서 한 장: 경과는 한글, 출동은 �
   const list = [
     ev('a1', 'enter_field', '{user} entered the field.', T0, { ...v, ko: '필드 입장' }),
     ev('a2', 'move', '15:10 {user} moved to 종로.', T0 + 60_000, { ...v, scene: '종로', ko: '15:10 {user}: 종로(으)로 이동' }),
-    ev('a3', 'act', '필드 가방: 컵라면', T0 + 70_000, { ...v, ko: '' }),
+    ev('a3', 'act', '{user} carrying: 컵라면×1', T0 + 70_000, { ...v, ko: '', fact: { key: '{user} carrying', value: '컵라면×1' } }),
     ev('a4', 'trade', '15:11 Money: -1500 컵라면', T0 + 80_000, { ...v, ko: '15:11 컵라면 −1,500원' }),
     ev('a5', 'enter_anomaly', '작전 투입: 젖은 복도', T0 + 2 * 60_000, v),
     ev('a6', 'provoke', '15:20 {user} attacked first: thug A (fists).', T0 + 3 * 60_000, { ...v, ko: '15:20 {user} 먼저 공격: 불량배 A (맨손)' }),
@@ -151,7 +151,7 @@ test('필드 방문 한 번 → 보고서 한 장: 경과는 한글, 출동은 �
   assert.equal(lines[0], '필드 입장');
   assert.ok(lines.includes('(이동) 15:10 민준: 종로(으)로 이동'));
   assert.ok(lines.includes('(도발) 15:20 민준 먼저 공격: 불량배 A (맨손)'));
-  assert.ok(!lines.some((t) => t.includes('필드 가방') || t.includes('컵라면')), '확정 사실 줄·돈 줄은 경과에 없음 (돈은 거래 칸)');
+  assert.ok(!lines.some((t) => t.includes('carrying') || t.includes('컵라면')), '확정 사실 줄·돈 줄은 경과에 없음 (돈은 거래 칸)');
   assert.equal(lines[lines.length - 1], '15:40 필드에서 나옴');
 });
 

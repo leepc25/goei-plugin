@@ -57,7 +57,7 @@ export interface FieldShopHost {
   record(text: string, ko?: string): void;
   /** 흥정 운 (가게 주인 성향이 들어갈 자리) */
   rng(): number;
-  /** 확정 사실 (본편 요청에 들어감): 「필드 가방」 = 지금 든 것 */
+  /** 확정 사실 (본편 요청 [Field facts]에 들어감): 「{user} carrying」 = 지금 든 것 */
   fact?(key: string, value: string): void;
   /** 가까이 있는 이름 인물 (선물 상대). 없으면 null */
   nearPerson?(): string | null;
@@ -91,8 +91,9 @@ export function createFieldShop(h: FieldShopHost): FieldShop {
   const save = () => {
     void h.store?.save(JSON.stringify(st));
     // 가방이 바뀌었으면 본편에 확정 사실로 (같은 key는 나중 것이 이긴다)
-    const bag = Object.entries(st.bag).map(([id, n]) => `${FIELD_ITEMS[id]?.name ?? id}×${n}`).join(', ') || '없음';
-    if (bag !== lastBag) { lastBag = bag; h.fact?.('필드 가방', bag); }
+    // 모델에게 가는 글이라 이름은 영어(10-31), 물건 이름은 고유명사라 그대로
+    const bag = Object.entries(st.bag).map(([id, n]) => `${FIELD_ITEMS[id]?.name ?? id}×${n}`).join(', ') || 'none';
+    if (bag !== lastBag) { lastBag = bag; h.fact?.('{user} carrying', bag); }
   };
   let shop: ShopDef | null = null;
   let tab: 'buy' | 'sell' | 'bag' = 'buy';

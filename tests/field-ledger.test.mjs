@@ -115,3 +115,12 @@ test('모델 글(활동 결과)은 영어 text 만: 한글 ko·방문 시작/끝
   assert.match(block, /15:10 민준 moved to 종로\./);
   assert.ok(!/이동|필드 입장|필드에서 나옴|entered the field|left the field/.test(block), block);
 });
+
+test('가방 같은 확정 사실만 담은 줄은 [Field log]에 안 넣고 [Field facts]에만', () => {
+  let c = base();
+  c = withFieldEvent(c, { id: 'm', at: 1, anchor: 'c1', kind: 'move', text: '{user} moved to 종로.', scene: '종로' });
+  c = withFieldEvent(c, { id: 'f', at: 2, anchor: 'c1', kind: 'act', text: '{user} carrying: 컵라면×1', ko: '', fact: { key: '{user} carrying', value: '컵라면×1' } });
+  assert.deepEqual(interludes(c)[0].events.map((e) => e.id), ['m']);
+  const out = withFieldFacts([{ role: 'user', content: '다음' }], c, '민준');
+  assert.match(out[0].content, /- 민준 carrying: 컵라면×1/);
+});

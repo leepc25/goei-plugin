@@ -35,7 +35,8 @@ export function interludes(chat: Chat): Interlude[] {
   const slot = (a: string) => groups.get(a) ?? (groups.set(a, { turns: [], events: [] }), groups.get(a)!);
   for (const t of visitRecord(chat).turns) if (t.anchor && at.has(t.anchor)) slot(t.anchor).turns.push(t);
   // 방문 시작·끝은 보고서용 표식이라 모델 글에는 안 넣는다 (쓰러짐·끝 사정은 그 앞 줄이 말한다)
-  for (const e of fieldRecord(chat).events) if (at.has(e.anchor) && e.kind !== 'enter_field' && e.kind !== 'exit_field') slot(e.anchor).events.push(e);
+  // 확정 사실만 담은 줄(ko 가 빈 글, 예: 가방)도 [Field facts] 칸에만 둔다 (10-31: 바뀔 때마다 줄이 쌓여 토큰을 썼다)
+  for (const e of fieldRecord(chat).events) if (at.has(e.anchor) && e.kind !== 'enter_field' && e.kind !== 'exit_field' && !(e.fact && e.ko === '')) slot(e.anchor).events.push(e);
   const list = [...groups].map(([anchor, g]) => ({ anchor, index: at.get(anchor)!, turns: g.turns.slice(-MAX_TURNS), events: g.events.slice(-MAX_EVENTS) })).sort((a, b) => a.index - b.index);
   // 지난 막간은 큰일만 (싸움·살해·쓰러짐·동행 등 weight 2 이상): 토큰을 아낀다 (10-31). 가장 최근 막간은 다 넣는다
   return list.map((g, i) => (i < list.length - 1 ? { ...g, events: g.events.filter((e) => (e.weight ?? 1) >= 2) } : g));

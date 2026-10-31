@@ -24,7 +24,7 @@ export interface FieldEvent {
   kind: FieldKind;
   /** 모델에게 가는 한 줄 = 활동 결과 (영어 짧은 문장, 주인공 {user}). 게임이 만든다 */
   text: string;
-  /** 사람이 읽는 한 줄 = 기록 메뉴 보고서 (한글, 주인공 {user}). 빈 글이면 보고서에 안 넣음(확정 사실만 담은 줄 등), 없으면 text */
+  /** 사람이 읽는 한 줄 = 기록 메뉴 보고서 (한글, 주인공 {user}). 빈 글이면 보고서에 안 넣음. 빈 글 + fact = 확정 사실만 담은 줄 → [Field log]에도 안 넣고 [Field facts]에만. 없으면 text */
   ko?: string;
   /** 장면 이름 */
   scene?: string;
