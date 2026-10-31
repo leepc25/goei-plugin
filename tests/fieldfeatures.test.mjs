@@ -182,3 +182,21 @@ test('캐릭터 반응: 반응표대로 인물마다 다르게 (무기·동료�
   assert.ok(['살피러 감', '살핌'].includes(z3.doing), z3.doing);
   void z;
 });
+
+test('말다툼·수다: 캐릭터끼리도 말다툼(화난 포즈·#), 수다는 먼저 건 쪽 「…」', () => {
+  let argue = 0, chat = 0;
+  for (let seed = 1; seed <= 80; seed++) {
+    const w = new A.WorldSim(new P.PlaceGraph(scenes, [], kinds), R.mulberry32(seed), {});
+    const a = named(w, '가', 'office', 800), b = named(w, '나', 'office', 860);
+    a.needs.social = 10; b.needs.social = 10;
+    for (let t = 0; t < 120; t += 1 / 30) {
+      a.x = 800; b.x = 860; a.y = b.y = 560;   // 붙어 서 있게
+      for (const q of [a, b]) if (q.act === 'walk' || q.act === 'idle') { q.act = 'idle'; q.wait = 99; q.goal = null; }
+      w.step(1 / 30, { scene: 'street', x: 0, y: 560 });
+      if (a.doing === '말다툼' && b.doing === '말다툼' && a.icon === '#') argue++;
+      if (a.doing.includes('먼저 말 걺') && a.icon === '…') chat++;
+    }
+  }
+  assert.ok(argue >= 1, '말다툼이 일어남');
+  assert.ok(chat >= 1, '수다 「…」');
+});

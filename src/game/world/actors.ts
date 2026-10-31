@@ -1892,11 +1892,12 @@ export class WorldSim {
         p.goal = null;
         p.route = [];
         p.plan = 'none';
-        p.doing = `${o.def.name}와 ${t.label}`;
+        p.doing = `${o.def.name}와 ${t.label}${p === a ? ' (먼저 말 걺)' : ' (말을 받음)'}`;
         p.face = o.x > p.x ? 1 : -1;
         this.setClip(p, this.canClip(p, t.clip) ? t.clip : 'idle');
       }
-      this.iconOn(a, '♪', 2);
+      // 먼저 건 쪽 머리 위 「…」 말풍선 (10-31 필드 기능 6번: 주제는 정하지 않음)
+      this.iconOn(a, '…', 2.5);
       return;
     }
     a.act = 'do';
@@ -2495,7 +2496,7 @@ export class WorldSim {
     const mate = (q: Actor) => (q.def.kind === 'named' || !!q.post) && !q.fighting;
     if (!mate(a) || !['walk', 'idle', 'post'].includes(a.act) || a.seat) { a.chatCd = range(this.rng, 3, 8); return; }
     const q = this.actors.find((o) => o !== a && o.scene === a.scene && mate(o) && ['walk', 'idle', 'post'].includes(o.act) && !o.seat
-      && (o.chatCd ?? 0) <= 0 && Math.abs(o.x - a.x) < 110 && Math.abs(o.y - a.y) < 50);
+      && (o.chatCd ?? 0) <= 10 && Math.abs(o.x - a.x) < 110 && Math.abs(o.y - a.y) < 50);   // 상대는 방금 수다를 끝낸 게 아니면 됨 (둘 다 0초가 같은 틱에 겹쳐야 하던 탓에 거의 안 일어났다)
     if (!q) { a.chatCd = range(this.rng, 3, 8); return; }
     a.chatCd = q.chatCd = range(this.rng, 30, 70);
     const both = (clipA: string, clipB: string, doing: string, sec: number) => {
@@ -2505,12 +2506,14 @@ export class WorldSim {
       }
     };
     const soc = (x: Actor) => x.temper?.social ?? 0.5;
-    // 둘 다 사교성이 아주 낮으면 드물게 말다툼
-    if (soc(a) < 0.25 && soc(q) < 0.25 && this.rng() < 0.1) { both('angry', 'angry', '말다툼', range(this.rng, 2, 4)); this.iconOn(a, '#', 2); return; }
+    // 말다툼: 화내는 포즈 + 말풍선으로 끝 (10-31 사용자). 몹은 둘 다 사교성이 아주 낮을 때, 캐릭터끼리는 성격 수치가 없으니 낮은 확률로
+    const named2 = a.def.kind === 'named' && q.def.kind === 'named';
+    if ((named2 ? this.rng() < 0.04 : soc(a) < 0.25 && soc(q) < 0.25 && this.rng() < 0.1)) { both('angry', 'angry', '말다툼', range(this.rng, 2, 4)); this.iconOn(a, '#', 2); this.iconOn(q, '#', 2); return; }
     // 둘 중 하나라도 걷는 중: 지나가다 인사 (먼저 본 쪽 응대, 상대 끄덕)
     if (a.act === 'walk' || q.act === 'walk') { both('greet', 'nod', '인사', 1.4); return; }
     // 둘 다 한가: 수다 욕구가 덜 찼으면 선 채 대화 (손짓·끄덕)
-    if ((a.needs?.social ?? 50) < 80 || (q.needs?.social ?? 50) < 80) { both('talk', 'nod', `대화 (${q.def.name})`, range(this.rng, 6, 12)); q.doing = `대화 (${a.def.name})`; this.iconOn(a, '♪', 1.5); }
+    // 수다: 주제는 정하지 않는다(10-31 사용자). 먼저 건 쪽은 손짓 + 「…」 말풍선, 받은 쪽은 끄덕
+    if ((a.needs?.social ?? 50) < 80 || (q.needs?.social ?? 50) < 80) { const sec = range(this.rng, 6, 12); both('talk', 'nod', `대화 (${q.def.name}에게 먼저 말 걺)`, sec); q.doing = `대화 (${a.def.name}의 말을 받음)`; this.iconOn(a, '…', 2.5); }
   }
 
   /** 직원 쉬는 시간: 일 말고 가장 급한 욕구(배고픔·화장실·쉬기·수다)가 크면 같은 소속 건물 안에서 그 일을 할 곳으로. 끝나면 decide → 자리로 */
