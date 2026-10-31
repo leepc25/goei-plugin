@@ -5,7 +5,11 @@ import sys, json, time, base64, io, subprocess, urllib.request, urllib.error
 from pathlib import Path
 from PIL import Image
 API="https://api.pixellab.ai/v2"; BASE=Path(__file__).resolve().parent
+import sys as _s, pathlib as _pl
+_s.path.insert(0, str(_pl.Path(__file__).resolve().parents[3] / "tools"))
+import pixellab_gate  # noqa: E402  (10-31 사용자 승인 없는 생성 막기)
 def req(m,p,b=None):
+    pixellab_gate.guard(m, p)
     r=urllib.request.Request(API+p,data=json.dumps(b).encode() if b is not None else None,method=m,headers={"Content-Type":"application/json"})
     try:
         with urllib.request.urlopen(r,timeout=180) as x: t=x.read(); return json.loads(t) if t.strip() else {}

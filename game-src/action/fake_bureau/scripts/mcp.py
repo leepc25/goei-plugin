@@ -1,3 +1,9 @@
+# --- PixelLab 생성 승인 문 (2026-10-31 사용자: 시키지 않은 생성 금지) — 이 파일의 모든 생성 요청은 .pixellab_ok 회수가 있어야 나간다
+import sys as _gs, pathlib as _gp
+_gs.path.insert(0, str(next(p for p in _gp.Path(__file__).resolve().parents if (p / "tools" / "pixellab_gate.py").exists()) / "tools"))
+import pixellab_gate as _gate  # noqa: E402
+_gate.spend(__file__ + " 실행")
+# ---
 import json,sys,urllib.request,ssl,os
 URL='https://api.pixellab.ai/mcp'
 def call(method,params=None,id=1):

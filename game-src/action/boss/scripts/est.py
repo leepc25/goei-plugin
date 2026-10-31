@@ -1,3 +1,9 @@
+# --- PixelLab 생성 승인 문 (2026-10-31 사용자: 시키지 않은 생성 금지) — 이 파일의 모든 생성 요청은 .pixellab_ok 회수가 있어야 나간다
+import sys as _gs, pathlib as _gp
+_gs.path.insert(0, str(next(p for p in _gp.Path(__file__).resolve().parents if (p / "tools" / "pixellab_gate.py").exists()) / "tools"))
+import pixellab_gate as _gate  # noqa: E402
+_gate.spend(__file__ + " 실행")
+# ---
 # estimate-skeleton (0.1회): python3 est.py 그림.png → 그림.skel.json
 import sys,json,base64,urllib.request,ssl
 for f in sys.argv[1:]:

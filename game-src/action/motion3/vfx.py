@@ -1,6 +1,12 @@
 """PixelLab VFX(/v2/vfx)로 이펙트 그림을 만들어 테스트룸 vfx 폴더에 넣는다.
 사용: python3 game-src/action/motion3/vfx.py <이름> "<설명(영어)>" [<키(회수 기록용)>]
 결과: game-src/action/testroom3/vfx/<이름>.png + .json (build.py가 읽음)"""
+# --- PixelLab 생성 승인 문 (2026-10-31 사용자: 시키지 않은 생성 금지) — 이 파일의 모든 생성 요청은 .pixellab_ok 회수가 있어야 나간다
+import sys as _gs, pathlib as _gp
+_gs.path.insert(0, str(next(p for p in _gp.Path(__file__).resolve().parents if (p / "tools" / "pixellab_gate.py").exists()) / "tools"))
+import pixellab_gate as _gate  # noqa: E402
+_gate.spend(__file__ + " 실행")
+# ---
 import json, subprocess, sys, time, urllib.request
 from pathlib import Path
 

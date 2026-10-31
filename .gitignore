@@ -9,3 +9,4 @@ out/
 
 # Claude 임시 워크트리 (병렬 작업용, 커밋 금지)
 .claude/worktrees/
+.pixellab_ok

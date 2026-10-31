@@ -1,3 +1,9 @@
+# --- PixelLab 생성 승인 문 (2026-10-31 사용자: 시키지 않은 생성 금지) — 이 파일의 모든 생성 요청은 .pixellab_ok 회수가 있어야 나간다
+import sys as _gs, pathlib as _gp
+_gs.path.insert(0, str(next(p for p in _gp.Path(__file__).resolve().parents if (p / "tools" / "pixellab_gate.py").exists()) / "tools"))
+import pixellab_gate as _gate  # noqa: E402
+_gate.spend(__file__ + " 실행")
+# ---
 # 고른 후보(3/4 대기)를 192×144에 쟈알디 base-idle-side와 같은 자리(몸 중심 x≈57, 발바닥 y=136)로 옮기고,
 # 관절 추정(REST estimate-skeleton, 0.1회) → animate_with_skeleton_v3로 옆모습 대기 4장을 뽑아 옆모습 기준 그림을 얻는다(쟈알디 base-idle-side와 같은 방법).
 # 사용: python3 profile.py id:후보번호:목표키 ...   결과 ../base/<id>-pad.png, ../base/<id>-pad.kp.json, ../profile/<id>/NN.png

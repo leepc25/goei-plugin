@@ -55,7 +55,12 @@ def log(key, msg):
         with open(cdir(key) / "spend.log", "a") as f: f.write(line + "\n")
 
 
+sys.path.insert(0, str(ROOT / "tools"))
+import pixellab_gate  # noqa: E402  (10-31 사용자 승인 없는 생성 막기)
+
+
 def req(method, path, body=None, timeout=120):
+    pixellab_gate.guard(method, path, (body or {}).get("animation_name", "") if isinstance(body, dict) else "")
     data = json.dumps(body).encode() if body is not None else None
     r = urllib.request.Request(API + path, data=data, method=method, headers={"Content-Type": "application/json"})
     with urllib.request.urlopen(r, timeout=timeout) as resp:

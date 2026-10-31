@@ -1,5 +1,11 @@
 """필살기 전용 이펙트를 차례로 뽑아 인물 설정에 붙인다(docs/필살기_이펙트_설명.json). 잔액이 RESERVE 아래면 멈춤.
 사용: python3 supers.py [RESERVE]"""
+# --- PixelLab 생성 승인 문 (2026-10-31 사용자: 시키지 않은 생성 금지) — 이 파일의 모든 생성 요청은 .pixellab_ok 회수가 있어야 나간다
+import sys as _gs, pathlib as _gp
+_gs.path.insert(0, str(next(p for p in _gp.Path(__file__).resolve().parents if (p / "tools" / "pixellab_gate.py").exists()) / "tools"))
+import pixellab_gate as _gate  # noqa: E402
+_gate.spend(__file__ + " 실행")
+# ---
 import json, subprocess, sys, urllib.request
 from pathlib import Path
 BASE = Path(__file__).resolve().parent; ROOT = BASE.parents[2]

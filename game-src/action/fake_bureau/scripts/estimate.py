@@ -1,3 +1,9 @@
+# --- PixelLab 생성 승인 문 (2026-10-31 사용자: 시키지 않은 생성 금지) — 이 파일의 모든 생성 요청은 .pixellab_ok 회수가 있어야 나간다
+import sys as _gs, pathlib as _gp
+_gs.path.insert(0, str(next(p for p in _gp.Path(__file__).resolve().parents if (p / "tools" / "pixellab_gate.py").exists()) / "tools"))
+import pixellab_gate as _gate  # noqa: E402
+_gate.spend(__file__ + " 실행")
+# ---
 # 후보 그림을 대상 캔버스(발바닥 y=135, 몸 가운데 = 기준 x)에 놓고 관절을 추정(REST estimate-skeleton, 0.1회).
 # 추정기는 LEFT/RIGHT를 화면 기준으로 붙이므로, 오른쪽을 볼 때 그림에서 앞(x가 큰 쪽) 팔다리를 RIGHT로 다시 붙인다.
 import sys,os,json,base64,io,subprocess
