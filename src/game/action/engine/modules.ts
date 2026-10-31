@@ -56,6 +56,7 @@ import type { Actor, SimEvent } from '../../world/actors';
 import { ARCHETYPES } from '../../world/mobs';
 import { FightLog, enName, isLaw } from '../../world/fightlog';
 import { settleLine } from '../../world/fieldmoney';
+import { npcPerkDef, rollNpcPerks } from '../../world/npcperks';
 import type { FactionView, PersonView } from '../../bridge';
 import { FieldClock } from '../../world/clock';
 import type { WorldSim } from '../../world/actors';
@@ -388,6 +389,8 @@ function hqAdapter(bridge: Partial<GameBridge> | undefined, ui: { chooseFloor: H
         const [b0, b1] = (api.world as unknown as { bounds: [number, number] }).bounds ?? [0, 99999];
         if (f.body.x < b0 + 60 || f.body.x > b1 - 60) { f.body.alive = false; w.fledFight(id, f.body.x, f.body.y); fights.delete(id); fightLog.fled(id); continue; }
       }
+      // 지원 요청(경찰 퍽): 체력 절반 아래면 한 번 경찰을 더 부른다
+      if (f.body.hp > 0 && f.body.hp < f.body.hpMax * 0.5) w.backup(id);
       if (f.body.hp > 0) continue;
       if ((f.t += 1 / 30) < 1.5) continue;
       f.body.alive = false;
@@ -398,7 +401,7 @@ function hqAdapter(bridge: Partial<GameBridge> | undefined, ui: { chooseFloor: H
     for (const a of w.challengers(sceneId)) {
       const look = a.def.look ?? a.def.name;
       if (!charArt(look)) { void loadChar(look); continue; }
-      const b = spawn({ kind: `ai-char:${look}`, x: a.x, y: a.y });
+      const b = spawn({ kind: `ai-char:${look}`, x: a.x, y: a.y, npcPerks: [] } as { kind: string; x: number; y: number });
       if (!b) continue;
       if (!(b instanceof FighterAi)) { b.alive = false; continue; }
       if (!w.toFight(a.def.id)) { b.alive = false; continue; }
@@ -409,6 +412,7 @@ function hqAdapter(bridge: Partial<GameBridge> | undefined, ui: { chooseFloor: H
       (b as unknown as { dir: 1 | -1 }).dir = a.face;
       // 싸우다 도망: 전투 두뇌의 용기를 그 몹의 실제 성격으로 (용기가 낮을수록 체력이 덜 줄어도 꺾임)
       if (a.temper) (b.brain.persona as { courage: number }).courage = a.temper.courage;
+      applyNpcPerks(b, a.perks ?? [], !!a.drunk);
       // 싸움 기록: 덤벼 온 까닭 (경찰·경비 = 무슨 신고로 출동, 불량배 = 시비, 적대 세력 = 그 소속)
       const fac = w.mobFaction(a);
       const why = isLaw(a.def.archetype) ? `responding to a${crimeAt.get(sceneId) === 'murder' ? ' murder' : 'n assault'} report` : fac ? `${fac}, hostile` : 'picked a fight';
@@ -527,6 +531,30 @@ function heldWeapon(w: World) {
 }
 
 /** 게임 창이 닫힐 때(main.ts 정리): 필드 마감(싸움 기록·돈 정산). 창은 이미 닫히는 중 */
+/**
+ * NPC 퍽을 전투 몸에 (docs/퍽/NPC_퍽_안.md). 「기존」 퍽은 주인공 퍽을 그대로 PerkRun 에,
+ * 강적 = 힘민체지정 +5(무작위 칸, 10 넘어도 됨)·정예, 방어막 = 최대 체력 10% 보호막, 자리 지킴 = 도망 안 감, 싸움꾼 = 공격성 +0.2,
+ * 술기운(취했을 때) = 받는 피해 −20%·공격 간격 +20%, 협공 = 분대가 한 번에 거는 공격 수 +1
+ */
+function applyNpcPerks(b: FighterAi, perks: readonly string[], drunk = false): void {
+  b.npcPerks = [...perks];
+  for (const n of perks) { const d = npcPerkDef(n); if (d?.reuse) b.perks.add(d.reuse); }
+  const persona = b.brain.persona as { courage: number; aggression: number };
+  if (perks.includes('강적')) {
+    const keys = ['str', 'dex', 'con', 'int', 'wil'] as const;
+    for (let i = 0; i < 5; i++) b.base[keys[Math.floor(Math.random() * keys.length)]]++;
+    b.stat = derive(b.base); b.baseHp = b.stat.hp; b.hp = b.hpMax = b.stat.hp;
+    (b as unknown as { elite: boolean }).elite = true;
+    b.label = `${b.label} (강적)`;
+  }
+  if (perks.includes('방어막')) b.shield = b.shieldMax = Math.round(b.hpMax * 0.1);
+  if (perks.includes('자리 지킴')) persona.courage = 1;
+  if (perks.includes('싸움꾼')) persona.aggression = Math.min(1, persona.aggression + 0.2);
+  if (perks.includes('술기운') && drunk) { b.stat = { ...b.stat, taken: b.stat.taken * 0.8 }; b.npcGap = 1.2; }
+  const sq = (b.brain as unknown as { squad?: { cap: number } }).squad;
+  if (perks.includes('협공') && sq) sq.cap += 1;
+}
+
 export function endFieldVisit(): void {
   fieldLink.endVisit?.(false);
 }
@@ -648,6 +676,8 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
       ai.x = spec.x; ai.y = spec.y;
       // 힘민체지정만으로(10-30 사용자): 이름 있는 55명은 표, 그 밖의 NPC는 한 명마다 합 25를 무작위로 나눔. 보정은 퍽
       if (!BASE_STATS[art.cfg.name]) { ai.base = rollBase(Math.random); ai.stat = derive(ai.base); ai.baseHp = ai.hp = ai.hpMax = ai.stat.hp; }
+      // NPC 퍽: 필드 몹은 행위자의 퍽을 combatStep 이 붙인다(npcPerks 표시). 그 밖(괴이·시험장)의 이름 없는 인물은 전투 NPC 퍽을 굴림
+      if (!(spec as { npcPerks?: string[] }).npcPerks && !BASE_STATS[art.cfg.name]) applyNpcPerks(ai, rollNpcPerks(Math.random, 'fighter'));
       return ai as never;
     }
     if (DEF_BY_KIND[spec.kind]) {

@@ -586,6 +586,10 @@ export class PerkRun {
   enemyGap(): number { if (!this.has('방 안이 먼저 지친다')) return 1; return this.roomT > 30 ? 1 / 0.75 : this.roomT > 15 ? 1 / 0.85 : 1; }
 
   /** 매 장 */
+  /** NPC 몸의 퍽 시계: 시간만 흐른다 (위기 회복 1초 등) */
+  tickNpc(dt: number): void {
+    this.time += dt; this.roomT += dt;
+  }
   tick(dt: number): void {
     const h = this.host; if (!h) return;
     this.time += dt; this.roomT += dt;

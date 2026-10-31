@@ -5,6 +5,7 @@
 import { ACTIVITIES, TEMPER, choose, decayNeeds, fullNeeds, onDuty, type Activity, type Needs } from './needs';
 import { ARCHETYPES, DROPS, POCKET, inShift, rollTemper, type Post, type Temperament } from './mobs';
 import { derive, rollBase, type BaseStats } from '../combat/stats';
+import { applyTemper, catOf, rollNpcPerks } from './npcperks';
 import type { Hop, PlaceGraph } from './places';
 import { pick, range, type Rng } from './rng';
 
@@ -105,6 +106,12 @@ export interface Actor {
   diedAt?: number;
   /** 기절한 생활 시각(초): 이 뒤 KO_GRACE 동안은 무기로 맞아도 안 죽음 */
   downAt?: number;
+  /** NPC 전용 퍽 (world/npcperks.ts): 생겨날 때 한 번 */
+  perks?: string[];
+  /** 한 번만 쓰는 퍽을 썼나 (뒤끝·지원 요청·호출·끈질긴 추적) */
+  used?: string[];
+  /** 구경꾼: 다시 구경할 때까지 초 */
+  lookCd?: number;
 }
 
 /** 길에 놓인 막힌 곳 (폴리스 라인·부서진 물건 등). wall = 길을 위아래 끝까지 막음 → 돌아섬 */
@@ -242,12 +249,16 @@ export class WorldSim {
     if (def.kind === 'mob') {
       const arch = ARCHETYPES[def.archetype ?? def.name];
       a.temper = rollTemper(this.rng, arch);
+      // NPC 퍽: 경찰은 전부, 나머지는 역할·성격으로 무작위. 성격에 얹는 퍽은 바로 (겁쟁이·깡다구·손버릇·구경꾼)
+      a.perks = rollNpcPerks(this.rng, catOf(arch?.role), a.temper);
+      applyTemper(a.perks, a.temper);
       a.drunk = !!arch?.drinks && this.isNight() && this.rng() < 0.35;
       // 몸: 한 명마다 힘민체지정(합 25 무작위)을 굴리고 체력은 그 공식으로 (10-30 사용자). 주머니 돈 (백 원 단위)
       a.base = rollBase(this.rng);
       a.hpMax = a.hp = derive(a.base).hp;
       const pk = POCKET[def.archetype ?? def.name];
       a.pocket = pk ? Math.round(range(this.rng, pk[0], pk[1]) / 100) * 100 : 0;
+      if (a.perks.includes('주머니 두둑')) a.pocket *= 2;
     }
     this.actors.push(a);
     return a;
@@ -281,6 +292,12 @@ export class WorldSim {
     a.fighting = true;
     a.goal = null;
     a.route = [];
+    // 패거리(불량배): 같은 장면 불량배 둘까지 같이 덤빈다. 호출(경비): 한 번 경비 1명을 부른다
+    if (this.perk(a, '패거리')) {
+      const mates = this.inScene(a.scene).filter((q) => q !== a && !q.fighting && ['walk', 'idle', 'pause', 'watch'].includes(q.act) && ARCHETYPES[q.def.archetype ?? '']?.role === 'thug').slice(0, 2);
+      for (const q of mates) { q.act = 'argue'; q.doing = '맞섬'; q.wait = 3; q.goal = null; this.iconOn(q, '#', 2); }
+    }
+    if (this.once(a, '호출')) this.reinforce(a.scene, '경비', this.player?.x ?? a.x);
     return a;
   }
   /** 전투에서 돌아옴. down = 쓰러뜨림(기절 → 깨면 떠남), 아니면 싸움이 끊긴 것(주인공이 장면을 떠남 등) */
@@ -376,6 +393,30 @@ export class WorldSim {
     this.crime(a.scene, a.x, 15);
     return true;
   }
+  private perk(a: Actor, name: string): boolean {
+    return !!a.perks?.includes(name);
+  }
+  /** 한 번만 쓰는 퍽: 처음이면 true (쓴 것으로 적는다) */
+  private once(a: Actor, name: string): boolean {
+    if (!this.perk(a, name) || a.used?.includes(name)) return false;
+    (a.used ??= []).push(name);
+    return true;
+  }
+  /** 경찰·경비 한 명을 장면 끝 출입구에서 주인공 쪽으로 (지원 요청·호출) */
+  private reinforce(scene: string, arch: '경찰' | '경비', x: number): void {
+    const len = this.graph.scene(scene)?.length ?? 1280;
+    const gate = Math.abs(x - 30) > Math.abs(x - (len - 30)) ? 30 : len - 30;
+    const c = this.add({ id: `mob${++serial}`, name: arch, kind: 'mob', brain: 'transit', home: scene, archetype: arch, look: arch, speed: 170 }, { scene, x: gate, y: this.laneMid(scene) });
+    c.plan = 'chase';
+    c.run = 1.4;
+    this.walkTo(c, { x, y: c.y }, arch === '경찰' ? '지원 출동' : '호출받고 오는 중', 'chase');
+    this.iconOn(c, '!', 3);
+  }
+  /** 지원 요청(경찰 퍽): 싸우던 경찰 체력이 절반 아래 → 한 번 경찰 1명을 더 부른다 (전투 쪽에서 부름) */
+  backup(id: string): void {
+    const a = this.actors.find((q) => q.def.id === id);
+    if (a && this.once(a, '지원 요청')) this.reinforce(a.scene, '경찰', this.player?.x ?? a.x);
+  }
   /** 맞기 전에 이미 주인공에게 맞서던 몸인가 (막아섬·시비 뒤 맞섬): 먼저 친 게 누구인지 기록용 */
   private hostile(a: Actor): boolean {
     return a.plan === 'chase' || (a.act === 'argue' && a.doing === '맞섬') || (a.act === 'watch' && a.doing === '막아섬');
@@ -437,6 +478,20 @@ export class WorldSim {
     if (h != null && this.hour != null) this.gameH += (h - this.hour + 24) % 24;
     else if (h == null) this.gameH += dt / 180;
     this.hour = h;
+    // 끈질긴 추적(경찰 퍽): 주인공이 장면을 옮기면 쫓던 경찰이 한 번 따라 들어온다
+    const was = this.player?.scene;
+    if (player && was && was !== player.scene) {
+      for (const a of this.actors.filter((q) => q.scene === was && q.plan === 'chase' && !q.fighting)) {
+        if (!this.once(a, '끈질긴 추적')) continue;
+        const len = this.graph.scene(player.scene)?.length ?? 1280;
+        a.scene = player.scene;
+        a.x = Math.abs(player.x - 30) > Math.abs(player.x - (len - 30)) ? 30 : len - 30;
+        a.y = player.y ?? this.laneMid(player.scene);
+        a.route = [];
+        this.walkTo(a, { x: player.x, y: a.y }, '쫓아옴', 'chase');
+        this.iconOn(a, '!', 2);
+      }
+    }
     this.player = player ? { scene: player.scene, x: player.x, y: player.y ?? 0, seat: player.seat ?? null, armed: !!player.armed, face: player.face ?? 1 } : null;
     for (const [s, u] of this.uproar) {
       u.v = Math.max(0, u.v - (player?.scene === s ? 1.5 : 5) * dt);
@@ -490,6 +545,7 @@ export class WorldSim {
     if (a.def.kind === 'named') this.namedNotice(a);
     if (a.def.kind === 'mob') this.threatened(a, dt);
     this.seeBody(a);
+    this.gawk(a, dt);
     switch (a.act) {
       // 겁에 질림(무기를 들이밀었을 때): 주저앉아 있다가 뒤로 기거나, 뒷걸음질 친 뒤 달아난다
       case 'scared': {
@@ -539,6 +595,8 @@ export class WorldSim {
         // 기절에서 깨면 체력 조금 돌아오고 (근무형이 아니면) 무조건 자리를 뜬다
         if (a.def.kind === 'mob' && (a.hp ?? 1) <= 0) {
           a.hp = Math.round((a.hpMax ?? 50) * 0.3);
+          // 뒤끝(불량배): 한 번은 도망 대신 다시 맞선다
+          if (this.once(a, '뒤끝')) { a.act = 'argue'; a.doing = '맞섬'; a.wait = 3; this.iconOn(a, '#', 3); this.setClip(a, this.canClip(a, 'angry') ? 'angry' : 'idle'); return; }
           // 겁 많으면 일어나지도 못하고 엎드린 채 기어서(38) 달아난다
           if (!a.post && (a.temper?.courage ?? 1) < 0.4 && this.canClip(a, 'crawl')) return this.flee(a, this.player?.x ?? a.x, 'crawl', 0.3);
           if (!a.post) return this.flee(a, this.player?.x ?? a.x);
@@ -546,7 +604,7 @@ export class WorldSim {
         }
         // 일어나서: 겁 많으면 도망, 배짱 있으면 맞선다 (실제 싸움은 전투 AI)
         if (a.def.kind === 'mob' && a.temper && !a.post) {
-          if (a.temper.courage > 0.75 && ARCHETYPES[a.def.archetype ?? '']?.role === 'thug') {
+          if (a.temper.courage > (this.perk(a, '싸움꾼') ? 0.55 : 0.75) && ARCHETYPES[a.def.archetype ?? '']?.role === 'thug') {
             a.act = 'argue';
             a.doing = '맞섬';
             a.wait = 3;
@@ -963,8 +1021,9 @@ export class WorldSim {
         return;
       }
     }
-    if (a.post || a.plan === 'chase' || a.plan === 'steal' || a.plan === 'harass' || a.act === 'argue') return;
-    // 소란: 겁 많은 개체는 도망, 호기심 많은 개체는 구경 (근무형·경찰 제외)
+    if (a.post || a.plan === 'chase' || a.plan === 'cordon' || a.plan === 'steal' || a.plan === 'harass' || a.act === 'argue') return;
+    // 소란: 겁 많은 개체는 도망, 호기심 많은 개체는 구경 (근무형·경찰·경비 제외)
+    if (['police', 'guard'].includes(ARCHETYPES[a.def.archetype ?? '']?.role ?? '')) return;
     const u = this.uproar.get(a.scene);
     if (lvl >= 1 && u) {
       if (t.courage < 0.25 + 0.15 * lvl && a.run < 1.5) return this.flee(a, u.x);
@@ -1148,6 +1207,19 @@ export class WorldSim {
     this.cordoned.add(a.scene);
     this.setCordon(a.scene);
   }
+  /** 구경꾼(퍽): 소란이 난 장면에서 걷다가 멈춰 구경한다 (뒷짐 구경·발견·두리번 중 가진 줄) */
+  private gawk(a: Actor, dt: number): void {
+    if (!this.perk(a, '구경꾼') || (a.lookCd = (a.lookCd ?? 0) - dt) > 0) return;
+    if (!['walk', 'idle'].includes(a.act) || a.fighting || a.plan === 'chase' || this.uproarLevel(a.scene) < 1) return;
+    a.lookCd = 25;
+    const clip = ['browse', 'spot', 'idle'].find((c) => this.canClip(a, c)) ?? 'idle';
+    const u = this.uproar.get(a.scene);
+    if (u) a.face = u.x > a.x ? 1 : -1;
+    a.act = 'pause';
+    a.doing = '구경';
+    a.wait = range(this.rng, 4, 8);
+    this.setClip(a, clip);
+  }
   /** 시체를 봄 (경찰·경비·현장 사람 빼고, 한 번만): 겁 많으면 겁 반응·도망, 중간이면 놀라 피해 감, 용감하면 신고 */
   private seeBody(a: Actor): void {
     if (a.sawBody || a.fighting || a.post || a.def.kind !== 'mob' || !['walk', 'idle', 'pause'].includes(a.act) || a.plan === 'chase' || a.plan === 'cordon') return;
@@ -1159,8 +1231,9 @@ export class WorldSim {
     a.buddy = undefined;
     const c = a.temper?.courage ?? 0.3;
     this.iconOn(a, '!', 2);
-    if (c < 0.4) return this.scareAt(a, b.x, b.x);
-    if (c < 0.7 || this.cordoned.has(a.scene)) {
+    const reporter = this.perk(a, '신고 정신') && !this.cordoned.has(a.scene);   // 신고 정신(퍽): 겁먹어도 먼저 신고
+    if (c < 0.4 && !reporter) return this.scareAt(a, b.x, b.x);
+    if ((c < 0.7 && !reporter) || this.cordoned.has(a.scene)) {
       // 놀라서 현장을 피해 돌아감
       a.act = 'scared';
       a.scare = 'run';
@@ -1198,7 +1271,7 @@ export class WorldSim {
     a.seatPick = undefined;
     const c = a.temper.courage;
     this.iconOn(a, '!', 1.5);
-    if (c >= 0.7) {
+    if (c >= (this.perk(a, '싸움꾼') ? 0.55 : 0.7)) {
       if (role === 'thug') { a.act = 'argue'; a.doing = '맞섬'; a.wait = 3; this.iconOn(a, '#', 3); return; }
       a.act = 'argue'; a.doing = '화냄'; a.wait = 1.2;
       this.setClip(a, this.canClip(a, 'angry') ? 'angry' : 'idle');
@@ -1237,7 +1310,7 @@ export class WorldSim {
   }
   private flee(a: Actor, fromX: number, clip = 'flee', run = 1.8): void {
     a.seatPick = undefined;
-    a.run = run;
+    a.run = run * (this.perk(a, '날쌘 도망') ? 1.3 : 1);   // 날쌘 도망(퍽): 30% 빨리
     a.exitAt = this.gateFar(a, fromX);
     this.walkTo(a, a.exitAt, clip === 'crawl' || clip === 'scramble' ? '기어서 도망' : '도망', 'exit');
     this.setClip(a, this.canClip(a, clip) ? clip : this.canClip(a, 'flee') ? 'flee' : 'walk');

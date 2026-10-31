@@ -326,7 +326,7 @@ export class FighterPlayer extends Player {
         return { kind: 'hit' };
       }
       this.core.takeHit('hit');
-      this.hp = Math.max(1, this.hp - Math.round(hit.dmg * (this.team === 'player' ? this.perks.blockChip() : 0.1)));
+      this.hp = Math.max(1, this.hp - Math.round(hit.dmg * this.perks.blockChip()));   // 완전 방어: 주인공·NPC(경비 퍽) 모두
       world.emit({ type: 'guard', x: this.x });
       return { kind: 'guard' };
     }
@@ -356,13 +356,13 @@ export class FighterPlayer extends Player {
       return { kind: 'hit' };
     }
     // 죽을 한 방: 버티기·죽은 채로 있을 수가 없다(퍽)
-    if (this.hp - Math.round(taken) <= 0 && this.team === 'player') {
+    if (this.hp - Math.round(taken) <= 0) {   // 버티기: 주인공·NPC 퍽 모두 (NPC는 「죽은 채로…」를 받지 않음)
       const r = this.perks.lethal();
       if (r === 'hold') { world.emit({ type: 'hurt', x: this.x, dmg: taken, hp: this.hp }); this.core.takeHit('hit'); return { kind: 'hit' }; }
       if (r === 'revive') { world.emit({ type: 'hurt', x: this.x, dmg: taken, hp: this.hp }); this.core.knock(); return { kind: 'hit' }; }
     }
     this.hp = Math.max(0, this.hp - Math.round(taken));
-    if (this.team === 'player') this.perks.hurt(taken);
+    this.perks.hurt(taken);   // 위기 회복 등: NPC 퍽도
     world.emit({ type: 'hurt', x: this.x, dmg: taken, hp: this.hp });
     if (!this.lowWarned && this.hp < this.hpMax * 0.3) {
       this.lowWarned = true;
@@ -383,7 +383,7 @@ export class FighterPlayer extends Player {
     if (armored) { this.core.takeHit('hit'); return { kind: 'armor' }; }
     P.face = (Math.sign(hit.dir) === 1 ? -1 : 1) as 1 | -1;
     // 공격 종류 → 피격 동작(10-25 결정): 약 = 맞기(18) · 강 = 맞기 하단(18_1) · 날리기 = 크게 밀려나기(18_2) · 띄우기 = 띄워지기(18_3) · 다운 = 쓰러지기(19). 그 줄이 없는 인물은 엔진이 18·19로 대신함
-    const noKnock = this.team === 'player' && this.perks.noKnock();
+    const noKnock = this.perks.noKnock();   // 다운 무시·방어막: NPC 퍽도
     const kind = hit.blow ? 'push' : hit.react === 'launch' ? (noKnock ? 'low' : 'launch') : hit.react === 'down' ? (noKnock ? 'low' : 'knock') : hit.react === 'stagger' ? 'low' : 'hit';
     this.core.takeHit(kind);
     return { kind: 'hit' };
@@ -520,7 +520,7 @@ export class FighterPlayer extends Player {
     const sm = k.skillCharges(); if (sm !== (P.skillMax || 1)) { P.skillMax = sm; P.skillN = Math.min(sm, Math.max(1, P.skillN || 1)); }
     this.status.immune = k.mindGuard() ? new Set(['fear', 'confuse']) : undefined;
     this.status.taintPer = k.taintPer();
-    if (this.team !== 'player') return;
+    if (this.team !== 'player') return k.tickNpc(dt);   // NPC: 퍽 시계만 (주인공 전용 세계 효과는 안 건드림)
     k.tick(dt);
     // 방 안이 먼저 지친다·제 편 때리기·당구: 적 몸에 직접
     const w = this.world as (WorldView & { bodies: Body[] }) | null;

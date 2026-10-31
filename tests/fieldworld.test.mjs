@@ -6,7 +6,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { pathToFileURL } from 'node:url';
 const dir = await mkdtemp(join(tmpdir(), 'goei-fieldworld-'));
-const names = ['rng', 'clock', 'places', 'actors', 'observer', 'needs', 'mobs', 'lines', 'speech', 'districts', 'hq'];
+const names = ['rng', 'clock', 'places', 'actors', 'observer', 'needs', 'mobs', 'lines', 'speech', 'districts', 'hq', 'npcperks'];
 await build({ entryPoints: names.map((n) => `src/game/world/${n}.ts`), outdir: dir, outbase: 'src', bundle: true, platform: 'node', format: 'esm', outExtension: { '.js': '.mjs' }, logLevel: 'silent' });
 const imp = (n) => import(pathToFileURL(join(dir, `game/world/${n}.mjs`)));
 const R = await imp('rng'), C = await imp('clock'), P = await imp('places'), A = await imp('actors'), O = await imp('observer'), N = await imp('needs'), M = await imp('mobs'), L = await imp('lines'), SP = await imp('speech'), D = await imp('districts'), H = await imp('hq');
@@ -519,4 +519,80 @@ test('기절에서 깨어날 때: 겁 많으면 엎드린 채 기어서(38) 달�
   assert.equal(shy.doing, '기어서 도망');
   const brave = run(0.6);
   assert.notEqual(brave.clip, 'crawl');
+});
+
+test('NPC 퍽: 경찰은 전부, 나머지는 무작위(겁쟁이·깡다구 같이 안 붙음), 성격에 얹힘', async () => {
+  const NP = await imp('npcperks');
+  const rng = R.mulberry32(3);
+  assert.deepEqual(NP.rollNpcPerks(rng, 'police'), NP.NPC_PERKS.police.map((p) => p.name));
+  for (let i = 0; i < 300; i++) {
+    const c = NP.rollNpcPerks(rng, 'civilian', { courage: 0.5, social: 0.5, haste: 0.5, curious: 0.5, sly: 0 });
+    assert.ok(c.length <= 1);
+    const f = NP.rollNpcPerks(rng, 'fighter');
+    assert.ok(f.length >= 2 && f.length <= 4 && new Set(f).size === f.length, f.join(','));
+    const g = NP.rollNpcPerks(rng, 'guard');
+    assert.ok(!(g.includes('겁쟁이') && g.includes('깡다구')));
+  }
+  const t = { courage: 0.5, social: 0.5, haste: 0.5, curious: 0.5, sly: 0 };
+  NP.applyTemper(['겁쟁이', '손버릇'], t);
+  assert.equal(t.courage, 0.2);
+  assert.equal(t.sly, 0.3);
+  // 필드 몹은 생겨날 때 퍽이 붙고, 경찰은 전부
+  const sim = new A.WorldSim(graph(), R.mulberry32(5));
+  const cop = sim.add({ id: 'c', name: '경찰', kind: 'mob', brain: 'transit', home: 'jongno', archetype: '경찰' }, { scene: 'jongno', x: 500, y: 560 });
+  assert.ok(cop.perks.includes('지원 요청') && cop.perks.includes('끈질긴 추적') && cop.perks.length === 6);
+});
+
+test('NPC 퍽 필드 효과: 패거리·뒤끝·신고 정신·날쌘 도망·지원 요청·끈질긴 추적·호출', () => {
+  const mk = (sim, id, arch, x, perks) => { const m = sim.add({ id, name: arch, kind: 'mob', brain: 'transit', home: 'jongno', archetype: arch }, { scene: 'jongno', x, y: 560 }); m.perks = perks; return m; };
+  // 패거리: 하나가 싸움에 들어가면 같은 장면 불량배 둘까지 맞섬
+  let sim = new A.WorldSim(graph(), R.mulberry32(1));
+  const t1 = mk(sim, 't1', '불량배', 1000, ['패거리']), t2 = mk(sim, 't2', '불량배', 1200, []), t3 = mk(sim, 't3', '불량배', 1400, []), w = mk(sim, 'w', '행인', 1300, []);
+  sim.toFight('t1');
+  assert.equal(t2.doing, '맞섬'); assert.equal(t3.doing, '맞섬'); assert.notEqual(w.doing, '맞섬');
+  // 뒤끝: 기절에서 깨면 한 번 다시 맞섬
+  sim = new A.WorldSim(graph(), R.mulberry32(2));
+  const g = mk(sim, 'g', '불량배', 1000, ['뒤끝']);
+  let id = 1; while (g.hp > 0) sim.hitActor('g', 1, id++, 300);
+  for (let t = 0; t < 30 * 7; t++) sim.step(1 / 30, { scene: 'office', x: 0, hour: 12 });
+  assert.equal(g.doing, '맞섬');
+  // 날쌘 도망: 도망 속도 ×1.3
+  sim = new A.WorldSim(graph(), R.mulberry32(3));
+  const q = mk(sim, 'q', '행인', 1000, ['날쌘 도망']);
+  sim.flee(q, 900);
+  assert.ok(Math.abs(q.run - 1.8 * 1.3) < 1e-9);
+  // 지원 요청: 한 번만 경찰을 더 부름
+  sim = new A.WorldSim(graph(), R.mulberry32(4));
+  const cop = mk(sim, 'cop', '경찰', 1000, ['지원 요청']);
+  const n0 = sim.actors.length;
+  sim.backup('cop'); sim.backup('cop');
+  assert.equal(sim.actors.length, n0 + 1);
+  // 호출: 경비가 싸움에 들어가면 한 번 경비 1명
+  sim = new A.WorldSim(graph(), R.mulberry32(5));
+  mk(sim, 'gd', '경비', 1000, ['호출']);
+  const n1 = sim.actors.length;
+  sim.toFight('gd');
+  assert.equal(sim.actors.filter((a) => a.def.archetype === '경비').length, 2);
+  assert.equal(sim.actors.length, n1 + 1);
+  // 끈질긴 추적: 쫓던 경찰이 주인공을 따라 다음 장면으로 (한 번)
+  sim = new A.WorldSim(graph(), R.mulberry32(6));
+  const ch = mk(sim, 'ch', '경찰', 1000, ['끈질긴 추적']);
+  sim.step(1 / 30, { scene: 'jongno', x: 900, y: 560, hour: 12 });
+  sim.walkTo(ch, { x: 900, y: 560 }, '쫓는 중', 'chase');
+  sim.step(1 / 30, { scene: 'street', x: 1000, y: 560, hour: 12 });
+  assert.equal(ch.scene, 'street');
+  assert.equal(ch.plan, 'chase');
+});
+
+test('NPC 퍽: 신고 정신은 겁 많아도 시체를 보면 먼저 신고', () => {
+  const sim = new A.WorldSim(graph(), R.mulberry32(8), { killOk: () => true, has: (_l, c) => ['call', 'walk'].includes(c) });
+  const v = sim.add({ id: 'v', name: '행인', kind: 'mob', brain: 'transit', home: 'jongno', archetype: '행인' }, { scene: 'jongno', x: 1000, y: 560 });
+  let id = 1; while (v.hp > 0) sim.hitActor('v', 1, id++, 300, true);
+  sim.time += 3; sim.hitActor('v', 1, id++, 10, true);
+  const r = sim.add({ id: 'r', name: '행인', kind: 'mob', brain: 'transit', home: 'jongno', archetype: '행인' }, { scene: 'jongno', x: v.x - 150, y: 560 });
+  r.temper.courage = 0.1; r.perks = ['신고 정신'];
+  for (const a of sim.actors.filter((x) => x.plan === 'cordon')) a.act = 'gone';
+  r.exitAt = { x: 3900, y: 560 }; sim.walkTo(r, r.exitAt, '지나가는 중', 'exit');
+  sim.step(1 / 30, { scene: 'office', x: 0, hour: 12 });
+  assert.equal(r.doing, '신고 중');
 });

@@ -16,7 +16,7 @@ export function observerLines(sim: WorldSim, clock: FieldClock, scene: string, s
   ];
   for (const a of here.slice(0, 14)) {
     const mark = a.def.kind === 'named' ? '●' : a.post ? '◆' : '·';
-    out.push(`${mark} ${a.def.name}  ${a.doing}${a.def.kind === 'named' ? needLine(a) : temperLine(a)}`);
+    out.push(`${mark} ${a.def.name}  ${a.doing}${a.def.kind === 'named' ? needLine(a) : temperLine(a)}${a.perks?.length ? `  [${a.perks.join('·')}]` : ''}`);   // NPC 퍽
   }
   if (here.length > 14) out.push(`  … 외 ${here.length - 14}명`);
   const named = sim.actors.filter((a) => a.def.kind === 'named' && a.scene !== scene);

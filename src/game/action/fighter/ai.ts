@@ -53,6 +53,10 @@ export class FighterAi extends FighterPlayer {
   }
   /** 방 안이 먼저 지친다(플레이어 퍽): 공격 간격 배수 */
   perkGap = 1;
+  /** NPC 퍽 공격 간격 배수 (술기운 1.2) */
+  npcGap = 1;
+  /** 붙은 NPC 퍽 이름 (표시용) */
+  npcPerks: string[] = [];
   protected extraFoes() {
     return [];
   }
@@ -64,7 +68,7 @@ export class FighterAi extends FighterPlayer {
       free: ['ground', 'chain', 'block'].includes(me.mode),
       air: me.mode === 'air',
       stunned: ['down', 'belly', 'stun'].includes(me.mode) || this.phase === 'down',
-      hp: this.hp / this.hpMax, sp: me.sp ?? 0, guard: this.guard, gap: this.status.attackGap() * this.perkGap,
+      hp: this.hp / this.hpMax, sp: me.sp ?? 0, guard: this.guard, gap: this.status.attackGap() * this.perkGap * this.npcGap,
     };
     const foe = foeSense(world.player as unknown as Body);
     // 미끼 잔상(플레이어 퍽): 남아 있는 동안 그 자리를 노린다
@@ -138,5 +142,17 @@ export class FighterAi extends FighterPlayer {
       ctx.fillRect(-w / 2, top, (w * this.shield) / this.shieldMax, 3);
     }
     drawAilments(ctx, this.status.list.map((s) => STATUS[s.kind].label + (s.stacks > 1 ? s.stacks : '')), top - 4);
+    // NPC 퍽 이름: 막대 아래 작은 글씨 (docs/퍽/NPC_퍽_안.md 「전투 체력 막대 옆에 보인다」)
+    if (this.npcPerks.length) {
+      ctx.save();
+      ctx.font = '11px Galmuri11, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillStyle = 'rgba(0,0,0,.7)';
+      const t = this.npcPerks.join('·');
+      ctx.fillText(t, 1, top + (this.shieldMax ? 22 : 18));
+      ctx.fillStyle = '#cfd8dc';
+      ctx.fillText(t, 0, top + (this.shieldMax ? 21 : 17));
+      ctx.restore();
+    }
   }
 }
