@@ -224,6 +224,16 @@
    "folder": "18",
    "mirror": false,
    "name": "맞기"
+  },
+  "11": {
+   "folder": "11",
+   "mirror": false,
+   "name": "약3"
+  },
+  "24": {
+   "folder": "24",
+   "mirror": false,
+   "name": "충전 방출"
   }
  },
  "picks": {
