@@ -35,6 +35,8 @@ VIEW = {
     'flat': "Flat front view, no vanishing point.",
     # 통로 칸(이어 붙임): one-point의 「side walls receding」 때문에 오른쪽에 안쪽 옆벽이 생김(중림 앞골목 ① v6, 사용자 10-31) → 뒷벽은 끝까지 곧게
     'corridor': "One-point depth, but the back wall runs straight and level across the full width.",
+    # 지상 거리(사용자 10-31 중림 지상): 뒤는 벽이 아니라 건물 앞면
+    'street': "One-point depth, but the building fronts behind the sidewalk run straight and level across the full width.",
 }
 # 채우기 정도: 장면마다 정한다 (사용자 10-30: 채우기 문구를 일괄로 빼지 말 것)
 DENSITY = {
@@ -49,6 +51,7 @@ SIDES = {
     'left': "Only the left side wall is visible; on the right the room continues past the image edge.",
     'right': "Only the right side wall is visible; on the left the room continues past the image edge.",
     'none': "No side walls: the room keeps going past both image edges.",
+    'open': "Nothing closes the sides: the street keeps going past both image edges.",   # 바깥 거리
 }
 STYLE = "dense, highly detailed pixel art, crisp pixel clusters, selective dark outline, rich medium-to-detailed shading"
 ALWAYS_NO = ["people", "chairs", "sofas", "benches", "coffee tables", "clocks"]   # 소파 앞 낮은 탁자는 소파처럼 오브젝트로(사용자 10-30: 대박 알선 바닥 한가운데 좌식 탁자)
@@ -64,8 +67,8 @@ def build(spec):
     need = ['name', 'place', 'time', 'light', 'view', 'floor_share', 'sides', 'density', 'floor', 'walls', 'items', 'shadow', 'palette']
     miss = [k for k in need if not spec.get(k)]
     if miss: raise SystemExit(f'빈 칸: {miss}')
-    if spec['sides'] not in SIDES: raise SystemExit('sides는 both|left|right|none')
-    if spec['view'] not in VIEW: raise SystemExit('view는 one-point|flat|corridor')
+    if spec['sides'] not in SIDES: raise SystemExit('sides는 both|left|right|none|open')
+    if spec['view'] not in VIEW: raise SystemExit('view는 one-point|flat|corridor|street')
     if spec['density'] not in DENSITY: raise SystemExit('density는 packed|packed+|normal|bare')
     errs = []
     # 물건마다 at(자리 묶음: "back wall", "left wall", "floor, left", "on the counter" …)이 있으면 자리를 묶음 머리에 한 번만 적는다.
