@@ -1,19 +1,19 @@
 ===== STREET ENTRANCE (jr_entry, 7 panels, day) =====
 The 6 attached images are STYLE reference only (pixel look, dark outlines, shading, colors). Do not copy their objects, layouts or composition.
 
-Draw 7 panels, ① to ⑦. Side by side they form one continuous street in Jungnim-dong, Seoul: a row of run-down 3-story commercial buildings about to be demolished, with the entrance to "Jungnim Underground Arcade" at the right end. Daytime, overcast. Each panel is a separate image.
+Draw 7 panels, ① to ⑦. Side by side they form one continuous street in Jungnim-dong, Seoul: a row of run-down 3-story commercial buildings about to be demolished, with the entrance to "Jungnim Underground Arcade" at the right end. Daytime, overcast. Each panel is a separate image, drawn in order.
 
 MUST
 1. Draw every panel by hand. No code, no copy-paste, cropping, tiling, mirroring, resizing or color reduction.
 2. PIXEL GRID: each panel is pixel art on a 632×424 grid, output at 1536×1024, so one grid pixel = one ~2.4×2.4 px square block. Outlines are 1 block thick. No detail smaller than 1 block, including sign letters. No anti-aliasing, gradients or blur.
 3. COLORS: at most 64 colors per panel, the same palette in all 7 panels (faded beige, grey and rust base + a few bright accents: sign colors, green kiosk).
 4. SIZES in grid pixels (a person is 150 tall): shop door 170×80; shop window bottom 40 (shin); vending machine 160 tall; box stack 45 (knee); trash bag 35; potted plant 30; bottle or can 8–10.
-5. CAMERA: standing eye height, looking ~20° down. Building base line horizontal at y=254 (60%) in every panel. Sidewalk y=254–320, curb at y=320, asphalt road y=330–424. The frame shows the ground floor and the bottom of the 2nd floor; the sky is not visible.
+5. CAMERA: standing eye height, looking ~20° down. Building base line horizontal at y=254 (60%) in every panel. Sidewalk y=254–320, curb at y=320, asphalt road y=330–424. The sidewalk is one seamless slab of worn concrete with NO paving blocks, NO tile grid, NO joint lines; the road is plain asphalt with no lane markings. Grid lines break when panels are joined. The frame shows the ground floor and the bottom of the 2nd floor; the sky is not visible.
 6. One shop per panel; its front fills ~80% of the panel width. Shop widths, heights and sign sizes differ.
 7. DEPTH: shop entrances are recessed into the facade. Awnings, projecting signs and AC units stick out and cast shadows on the sidewalk. Props stand on the sidewalk in front of the buildings: bottom edge clearly below y=254, top and side faces visible, dark shadow.
-8. SEAMS: left and right 10% of every panel are identical in design — a plain concrete wall strip between buildings with one vertical drainpipe, sidewalk, curb and road only; same colors, brightness and line heights in all 7 panels.
-9. DECAY AND MESS: half-lowered rusty shutters, marks where old signs were torn off, X-shaped tape on cracked windows, peeling paint, rust streaks, tangled power lines. Litter scattered over the whole sidewalk and the road edge (crumpled paper, crushed cans, cigarette butts, plastic scraps, flattened cardboard, leaves), puddles, cracked and patched paving, weeds in cracks. Trash-bag piles at the building bases. Every piece a different shape, size, color and angle.
-10. SIGNS: exact Korean name in quotes, large, chunky pixel lettering with depth (raised letters with shadow, chipped paint, or faded paint on metal). Each sign a different form: ① long board above an awning, ② long board with a cross, ③ green long board, ④ board above a yellow awning, ⑤ light box, ⑥ raised letters on a rusty plate, ⑦ sign on the kiosk roof.
+8. CONTINUOUS PANELS: draw ① first, then draw each next panel as the direct continuation of the previous one. The left 10% of each panel from ② on shows exactly what is in the right 10% of the previous panel (same pillar, same wall stains, same floor stains and litter, same lines), so neighboring panels overlap and join. Every line cut at a panel's right edge (ceiling, lights, pipes, wall base, floor edge) continues at the same height in the next panel. The edge 10% of each panel contains only a plain concrete wall strip between buildings with one vertical drainpipe, sidewalk, curb and road only; no shop, sign or large object.
+9. DECAY AND MESS: half-lowered rusty shutters, marks where old signs were torn off, X-shaped tape on cracked windows, peeling paint, rust streaks, tangled power lines. Litter scattered over the whole sidewalk and the road edge (crumpled paper, crushed cans, cigarette butts, plastic scraps, flattened cardboard, leaves), puddles, irregular cracks and patches, weeds in cracks. Trash-bag piles at the building bases. Every piece a different shape, size, color and angle.
+10. SIGNS: exact Korean name in quotes, large. The letters are drawn with the same chunky pixel blocks as the rest of the image, with stair-stepped edges — NOT a computer font. Letters have depth (raised letters with shadow, chipped paint, or faded paint on metal). Each sign a different form: ① long board above an awning, ② long board with a cross, ③ green long board, ④ board above a yellow awning, ⑤ light box, ⑥ raised letters on a rusty plate, ⑦ sign on the kiosk roof.
 11. ENDS: no side walls. The street continues out of the frame at both ends.
 
 NEVER
@@ -21,10 +21,10 @@ NEVER
 - Clean, tidy or new-looking buildings
 - Objects flat against the wall; small items bigger than the sizes above
 - Fine detail smaller than one grid pixel; smooth gradients; more than 64 colors
-- A shop, sign or object in the seam strips
-- One vanishing point for the whole street; slanted building fronts; sidewalk tile grid converging in perspective
+- A shop, sign or large object in the edge 10%
+- Paving blocks, tiles, grid or joint lines on the sidewalk; lane markings on the road; one vanishing point for the whole street; slanted building fronts
 - Large objects in the middle of the sidewalk or in front of the arcade entrance
-- Smooth computer-font letters; any text other than the given names and the bus numbers; text on flyers, posters or banners
+- Computer-font or smooth vector letters on signs; any text other than the given names and the bus numbers; text on flyers, posters or banners
 - People; cars; chairs, stools, benches
 
 PANELS (one shop each)
@@ -41,7 +41,7 @@ Output: 7 landscape images (3:2), ① first.
 ===== B2 CORRIDOR (jr_b2, 6 panels) =====
 The 6 attached images are STYLE reference only (pixel look, dark outlines, shading, colors). Do not copy their objects, layouts or composition.
 
-Draw 6 panels, ① to ⑥. Side by side they form one continuous corridor: B2 of "Jungnim Underground Arcade", a run-down 1990s Seoul underground mall that is secretly a black market. B2 is the old storage level: bare concrete, exposed pipes, warehouse units turned into shady shops, darker and colder than B1. A few dim fluorescent tubes (some dead), small caged wall lamps. Each panel is a separate image.
+Draw 6 panels, ① to ⑥. Side by side they form one continuous corridor: B2 of "Jungnim Underground Arcade", a run-down 1990s Seoul underground mall that is secretly a black market. B2 is the old storage level: bare concrete, exposed pipes, warehouse units turned into shady shops, darker and colder than B1. A few dim fluorescent tubes (some dead), small caged wall lamps. Each panel is a separate image, drawn in order.
 
 MUST
 1. Draw every panel by hand. No code, no copy-paste, cropping, tiling, mirroring, resizing or color reduction.
@@ -51,9 +51,9 @@ MUST
 5. CAMERA: standing eye height, looking ~20° down. Back-wall base line horizontal at y=254 (60%) in every panel. Floor = bottom 170 px (40%). Ceiling = thin top strip.
 6. One shop per panel; its front fills ~80% of the panel width.
 7. DEPTH: each shop is a recessed warehouse unit — its inner side walls and ceiling visible going inward. Pillars stick out from the wall with visible side faces. Carts, cases and crates stand on the floor in front of the wall: bottom edge clearly below y=254, top and side faces visible, dark floor shadow.
-8. SEAMS: left and right 10% of every panel are identical in design — one concrete pillar, wall, floor and ceiling only; same colors, brightness and line heights in all 6 panels.
-9. FLOOR: seamless dark grey epoxy over concrete, worn through in places. Litter scattered over the whole walkway, not only at the walls (crumpled paper, crushed cans, cigarette butts, bottle caps, plastic scraps, flattened cardboard), plus water stains from ceiling leaks and oil stains. Garbage piles at wall bases (collapsed boxes, burst trash bags, bottles). Every piece a different shape, size, color and angle.
-10. SIGNS: exact Korean name in quotes, large, chunky pixel lettering with depth (raised letters with shadow, chipped paint, or glowing). Each sign a different form: ① small metal plate beside a door, ② vertical red blade sign, ③ painted letters on the wall above the glass, ④ glowing light box, ⑤ orange board, ⑥ black plate with white letters.
+8. CONTINUOUS PANELS: draw ① first, then draw each next panel as the direct continuation of the previous one. The left 10% of each panel from ② on shows exactly what is in the right 10% of the previous panel (same pillar, same wall stains, same floor stains and litter, same lines), so neighboring panels overlap and join. Every line cut at a panel's right edge (ceiling, lights, pipes, wall base, floor edge) continues at the same height in the next panel. The edge 10% of each panel contains only one concrete pillar, wall, floor and ceiling only; no shop, sign or large object.
+9. FLOOR: one seamless slab of dark grey epoxy over concrete, worn through in places — NO tiles, NO grid, NO joint lines or seams anywhere on the floor, because grid lines break when panels are joined. Litter scattered over the whole walkway, not only at the walls (crumpled paper, crushed cans, cigarette butts, bottle caps, plastic scraps, flattened cardboard), plus water stains from ceiling leaks and oil stains. Garbage piles at wall bases (collapsed boxes, burst trash bags, bottles). Every piece a different shape, size, color and angle.
+10. SIGNS: exact Korean name in quotes, large. The letters are drawn with the same chunky pixel blocks as the rest of the image, with stair-stepped edges — NOT a computer font. Letters have depth (raised letters with shadow, chipped paint, or glowing). Each sign a different form: ① small metal plate beside a door, ② vertical red blade sign, ③ painted letters on the wall above the glass, ④ glowing light box, ⑤ orange board, ⑥ black plate with white letters.
 11. ENDS: side walls only at the two ends. ① left edge: concrete end wall with a lowered shutter, seen angled inward. ⑥ right edge: right wall seen angled inward. No side walls between panels.
 
 NEVER
@@ -61,11 +61,11 @@ NEVER
 - Clean or tidy look
 - Objects flat against the wall; small items bigger than the sizes above
 - Fine detail smaller than one grid pixel; smooth gradients; more than 64 colors
-- A shop, sign or object in the seam pillars; bright light pools at the seams
-- Floor tiles or grid; one vanishing point for the whole corridor; slanted back wall
+- A shop, sign or large object in the edge 10%; bright light pools at the edges
+- Floor tiles, grid or joint lines; one vanishing point for the whole corridor; slanted back wall
 - Large objects in the middle of the walkway, or in front of doors or the stairs
 - Fire doors; stairs on the back wall; stairs seen head-on
-- Smooth computer-font letters; any text other than the given names; text on flyers or notes
+- Computer-font or smooth vector letters on signs; any text other than the given names; text on flyers or notes
 - People (even inside shops); chairs, stools, benches, wheelchairs
 
 PANELS (one shop each)
