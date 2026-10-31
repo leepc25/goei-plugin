@@ -1,6 +1,5 @@
 // QC 게임 ② 필드 세계 시뮬·시계·장부 다리 (src/game/world/*, engine/modules.ts hqAdapter). 리스 필드 모드 틀(field-harness)로:
-//  씨앗 × 시각 6벌 생태계(이름 인물 욕구·근무형·몹·소란·경찰·말풍선·관찰 창 F9) 오류 없이 → 필드 시계(장면·지역·대화·싸움·시간 보내기, 0 포함) →
-//  지하철로 지역 4곳 이동·귀환 → 장부 witness·visit → 세력 태도(경계·적대) → 열고 닫기 뒤 대화 시계 한 번만(리스너 누수 회귀).
+//  씨앗 × 시각 6벌 생태계(이름 인물 욕구·근무형·몹·소란·경찰·말풍선·관찰 창 F9) 오류 없이 → 필드 시계(장면·대화·싸움·시간 보내기, 0 포함) → 장부 witness·visit → 세력 태도(경계·적대) → 열고 닫기 뒤 대화 시계 한 번만(리스너 누수 회귀).
 // 사용: npm run build && node tests/qc-field-world-browser.mjs [사진 폴더]
 import assert from 'node:assert/strict';
 import { mkdirSync } from 'node:fs';
@@ -46,7 +45,7 @@ for (const [seed, hour] of [[1, 0], [7, 6], [42, 10], [1, 14], [7, 18], [42, 22]
   await page.keyboard.press('F9'); // 관찰 창
   // 본부 안팎을 돌며 세계를 굴린다 (화면 밖 장면도 같은 규칙으로 돈다)
   const seen = {};
-  for (const sc of ['office', 'f3', 'lobby', 'street', 'jongno']) {
+  for (const sc of ['office', 'f3', 'lobby', 'street']) {
     await jump(page, sc);
     await page.waitForTimeout(2500);
     seen[sc] = await page.evaluate((sc) => { const w = window.__goeiWorld; return { n: w.inScene(sc).length, named: w.inScene(sc).filter((a) => a.def.kind === 'named').map((a) => `${a.def.name}:${a.doing}`), mobs: w.inScene(sc).filter((a) => a.def.kind === 'mob').map((a) => a.def.name), uproar: w.uproarLevel(sc), say: w.inScene(sc).filter((a) => a.say).length }; }, sc);
@@ -54,7 +53,7 @@ for (const [seed, hour] of [[1, 0], [7, 6], [42, 10], [1, 14], [7, 18], [42, 22]
   }
   const total = await page.evaluate(() => ({ actors: window.__goeiWorld.actors.length, named: window.__goeiWorld.actors.filter((a) => a.def.kind === 'named').map((a) => `${a.def.name}@${a.scene}:${a.doing}`), time: Math.round(window.__goeiWorld.time), night: window.__goeiWorld.isNight() }));
   assert.ok(total.named.length >= 1, `이름 인물 ${JSON.stringify(total.named)}`);
-  assert.ok(seen.lobby.n + seen.street.n + seen.jongno.n > 0, `몹이 보충된다 ${JSON.stringify(seen)}`);
+  assert.ok(seen.lobby.n + seen.street.n > 0, `몹이 보충된다 ${JSON.stringify(seen)}`);
   // 근무형: 안내 직원 9~18시, 야간 경비 18~9시, 경비 순찰 늘
   const posts = await page.evaluate(() => window.__goeiWorld.actors.filter((a) => a.post).map((a) => `${a.post.id}:${a.def.name}`));
   const onDuty = hour >= 9 && hour < 18;
@@ -67,7 +66,7 @@ for (const [seed, hour] of [[1, 0], [7, 6], [42, 10], [1, 14], [7, 18], [42, 22]
   assert.ok(obs);
   await page.keyboard.press('F9');
   assert.deepEqual(errors, [], `오류 ${errors}`);
-  ok(`생태계 seed ${seed} / ${hour}시`, `행위자 ${total.actors} · 근무 ${posts.join(',')} · 로비 ${seen.lobby.mobs.join(',')} · 거리 ${seen.street.n}+${seen.jongno.n}`);
+  ok(`생태계 seed ${seed} / ${hour}시`, `행위자 ${total.actors} · 근무 ${posts.join(',')} · 로비 ${seen.lobby.mobs.join(',')} · 거리 ${seen.street.n}`);
   await browser.close();
 }
 
@@ -159,7 +158,7 @@ for (const [seed, hour] of [[1, 0], [7, 6], [42, 10], [1, 14], [7, 18], [42, 22]
   await browser.close();
 }
 
-// ── ③ 시간 설정 0 (안 감) · 지하철로 지역 4곳 이동·귀환 ──
+// ── ③ 시간 설정 0 (안 감) ──
 {
   const prefs = JSON.stringify({ tScene: 0, tRegion: 0, tTalk: 0, tFight: 0, tWaitShort: 0, tWaitLong: 0 });
   const { browser, page, errors } = await openField({ width: 1280, height: 720, panel: false, query: '?seed=5', card: card(22 * 60), uiPrefs: prefs });
@@ -180,37 +179,7 @@ for (const [seed, hour] of [[1, 0], [7, 6], [42, 10], [1, 14], [7, 18], [42, 22]
   await closeMenus(page);
   await browser.close();
 }
-{
-  const { browser, page, errors } = await openField({ width: 1280, height: 720, panel: false, query: '?seed=9', card: card(12 * 60) });
-  await enterHub(page);
-  await jump(page, 'jongno', 2100);
-  let t = await lastClock(page);
-  assert.equal(t, '12:10');
-  await useDoor(page, 'metro');
-  assert.equal(await lastClock(page), '12:20', '승강장은 장면 +10');
-  const log = [];
-  for (const [door, scene] of [['yeongdeungpo', 'yeongdeungpo'], ['gangnam', 'gangnam'], ['mangwon', 'mangwon'], ['yeouido', 'yeouido']]) {
-    await useDoor(page, door);
-    assert.equal(await page.evaluate(() => window.__goeiEngine.world.stage.current().id), scene);
-    const arrived = await lastClock(page);
-    log.push(`${scene} ${arrived}`);
-    // 지역이 바뀌었으니 +30
-    await page.waitForTimeout(1500);
-    const mobs = await page.evaluate((s) => window.__goeiWorld.inScene(s).map((a) => a.def.name), scene);
-    log.push(`(${mobs.length}명)`);
-    if (shots) await page.screenshot({ path: `${shots}/region-${scene}.png` });
-    await useDoor(page, 'metro');
-  }
-  // 12:20 → 영등포 12:50 → 승강장 13:00 → 강남 13:30 → 승강장 13:40 → 망원 14:10 → 승강장 14:20 → 여의도 14:50 → 승강장 15:00
-  assert.deepEqual(log.filter((l) => !l.startsWith('(')), ['yeongdeungpo 12:50', 'gangnam 13:30', 'mangwon 14:10', 'yeouido 14:50'], log.join(' '));
-  await useDoor(page, 'jonggak');
-  assert.equal(await lastClock(page), '15:30', '종로로 귀환 = 지역 이동 +30');
-  const facts = await page.evaluate(() => window.__h.records.filter((e) => e.fact?.key === '{user} location').map((e) => e.fact.value));
-  assert.equal(facts.at(-1), '종로 큰길');
-  assert.deepEqual(errors, []);
-  ok('지하철 지역 4곳 이동·귀환', log.join(' '));
-  await browser.close();
-}
+// (10-31 사용자: 종로 큰길·지하철·지역 장면은 가설이라 뺐다 → 지하철 지역 이동 시험도 뺌. 지도가 완성되면 다시)
 
 // ── ④ 세력 태도: 적대 = 막아섬, 경계 = 지켜봄 · 인물 기록 호감·호칭이 대사 칸에 ──
 for (const stage of ['hostile', 'wary']) {

@@ -185,6 +185,8 @@ export interface SpawnRule {
   mix: string[];
   /** 밤(19:30~05시) 원형 목록. 없으면 mix */
   nightMix?: string[];
+  /** 시간대별 유동인구 (있으면 target·mix 대신): from~to 시(자정 넘김 가능)에 n명, mix 에서 뽑는다 */
+  bands?: { from: number; to: number; n: number; mix: string[] }[];
 }
 
 /** 바깥(대사·장부·연출)에 알릴 일 */
@@ -1916,7 +1918,8 @@ export class WorldSim {
     // 소란이 크면 덜 들어온다. 시체가 있거나 사건 현장(수습 뒤 하루)이면 더 덜
     const inc = this.sites.get(r.scene);
     const scared = this.corpses(r.scene).length ? 2 : inc !== undefined && this.gameH - inc < INCIDENT_HOURS ? 1 : 0;
-    const want = Math.max(0, (night ? r.target.night : r.target.day) - lvl - scared);
+    const band = this.bandOf(r);
+    const want = Math.max(0, (band ? band.n : night ? r.target.night : r.target.day) - lvl - scared);
     const have = this.actors.filter((a) => a.def.kind === 'mob' && a.def.brain === 'transit' && a.scene === r.scene && a.plan !== 'chase' && a.plan !== 'cordon' && a.act !== 'dead').length;
     if (have >= want) return void this.spawnT.delete(r.scene);
     const visible = this.player?.scene === r.scene;
@@ -1930,6 +1933,15 @@ export class WorldSim {
     this.spawnOne(r, this.player!.x, false, want - have);
   }
 
+  /** 지금 시각의 유동인구 구간 (시계 없으면 낮 12시로 본다) */
+  private bandOf(r: SpawnRule): { n: number; mix: string[] } | null {
+    if (!r.bands?.length) return null;
+    const h = this.hour ?? 12;
+    return r.bands.find((b) => (b.from <= b.to ? h >= b.from && h < b.to : h >= b.from || h < b.to)) ?? r.bands[0];
+  }
+  private mixOf(r: SpawnRule): string[] {
+    return this.bandOf(r)?.mix ?? (this.isNight() && r.nightMix?.length ? r.nightMix : r.mix);
+  }
   /** 한 명(또는 일행 둘) 들여보냄. 들어온 수 */
   private spawnOne(r: SpawnRule, playerX: number | null, anywhere: boolean, room = 1): number {
     const len = this.graph.scene(r.scene)?.length ?? 1280;
@@ -1938,7 +1950,8 @@ export class WorldSim {
     const others = gates.filter((g) => g !== from);
     const to = pick(this.rng, others.length ? others : gates);
     const [top, bot] = this.graph.lane(r.scene);
-    const name = pick(this.rng, this.isNight() && r.nightMix?.length ? r.nightMix : r.mix);
+    const mix = this.mixOf(r);
+    const name = pick(this.rng, mix);
     const arch = ARCHETYPES[name];
     const look = arch?.looks?.length ? pick(this.rng, arch.looks) : name;
     const a = this.add({ id: `mob${++serial}`, name, kind: 'mob', brain: 'transit', home: r.scene, archetype: name, look, speed: range(this.rng, 110, 170) }, { scene: r.scene, x: anywhere ? range(this.rng, MARGIN, len - MARGIN) : from, y: range(this.rng, top + 20, bot - 10) });
@@ -1948,7 +1961,7 @@ export class WorldSim {
     // 일행: 친화가 높으면 가끔 아는 사람과 같이 들어와 나란히 걷는다 (시민·학생·직장인·불량배)
     const role = arch?.role;
     if (room < 2 || !a.temper || !['civilian', 'student', 'worker', 'thug'].includes(role ?? '') || this.rng() >= 0.3 * a.temper.social) return 1;
-    const mates = (this.isNight() && r.nightMix?.length ? r.nightMix : r.mix).filter((m) => ARCHETYPES[m]?.role === role);
+    const mates = mix.filter((m) => ARCHETYPES[m]?.role === role);
     const name2 = mates.length ? pick(this.rng, mates) : name;
     const arch2 = ARCHETYPES[name2];
     const dy = a.y - top > bot - a.y ? -26 : 26;

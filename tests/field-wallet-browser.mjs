@@ -17,20 +17,8 @@ try {
   assert.ok(h.rec[0].visit, '방문 id');
   const enter = await page.evaluate(() => window.__h.records.find((r) => r.kind === 'enter_field'));
   assert.ok(enter && enter.visit === h.rec[0].visit && enter.ko === '필드 입장', '방문 시작 표식');
-  // 필드 가게: 종로 큰길 편의점에서 사면 가계부에서 빠지고 가방은 채팅 상태($fd_state)에 저장
-  await page.evaluate(() => window.__goeiEngine.world.stage.jump('jongno', 1300));
-  await page.waitForTimeout(1500);
-  await page.keyboard.press('KeyE');
-  await page.waitForSelector('.gf-shop:not([hidden])');
-  await page.click('.gf-shop [data-buy="onigiri"]');
-  await page.waitForFunction(() => window.__goeiWallet.balance() === 138800 - 1200);
-  const fd = await page.evaluate(() => JSON.parse(window.__h.fd));
-  assert.equal(fd.bag.onigiri, 1);
-  assert.equal(fd.shops.cvs.stock.onigiri, 7);
-
-  // 가방이 바뀌면 본편에 확정 사실 「{user} carrying」
-  await page.waitForFunction(() => window.__h.records.some((r) => r.fact?.key === '{user} carrying' && r.fact.value === '삼각김밥×1'));
-  await page.keyboard.press('Escape');
+  // 필드 가게(편의점)는 10-31 사용자 「실제로 없고 역할도 없다」로 지도에서 뺐다 → 돈 한 번 더 (가방 확정 사실 시험은 가게가 다시 생길 때)
+  await page.evaluate(() => window.__goeiWallet.pay(-1200, '삼각김밥'));
   // 나오지 않고 응답을 보냄 → 필드 강제 종료: 가계부 한 줄 정산, 끝 표식 하나, 창 닫힘. 두 번 불려도 한 번만
   await page.evaluate(() => window.__h.beforeSend());
   await page.evaluate(() => window.__h.beforeSend?.());

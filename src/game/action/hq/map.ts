@@ -8,7 +8,7 @@ import { PAINTED, PAINTED_LANE, doorX } from './painted';
 import { JR_ROOM_SPOTS } from './jrRooms.gen';
 
 export type SceneId =
-  | 'street' | 'jongno' | 'pasta' | 'metro' | 'yeongdeungpo' | 'gangnam' | 'mangwon' | 'yeouido' | 'lobby' | 'swat' | 'f2' | 'f3' | 'office' | 'interview' | 'lounge' | 'wc' | 'wc3'
+  | 'street' | 'pasta' | 'lobby' | 'swat' | 'f2' | 'f3' | 'office' | 'interview' | 'lounge' | 'wc' | 'wc3'
   | 'b1' | 'edu' | 'training' | 'clinic' | 'b2' | 'b3' | 'tooth'
   | 'jr_entry' | 'jr_b1' | 'jr_alley' | 'jr_b2'
   | 'jr_daebak' | 'jr_heolgap' | 'jr_youngchang' | 'jr_songil' | 'jr_jinryo' | 'jr_op';
@@ -160,44 +160,12 @@ export const HQ_SCENES: HqScene[] = [
     doors: [
       { id: 'main', x: 640, kind: 'main', to: 'lobby', toDoor: 'main' }, { id: 'pasta', x: 1500, kind: 'shop', to: 'pasta', toDoor: 'out', needs: 'pasta' },
       // 임시 연결: 이동수단(노선표)이 생기기 전까지 거리 동쪽 끝에서 중림으로 바로 간다
-      // 필드 세계: 종로 큰길로 (중림 임시 출구와 겹치지 않게 조금 안쪽)
-      { id: 'east', x: 1720, kind: 'door', to: 'jongno', toDoor: 'west', label: '종로 큰길' },
       { id: 'jr', x: 1840, kind: 'exit', side: 'S', to: 'jr_entry', toDoor: 'west', label: '중림 지하상가 (임시)' },
     ],
     things: [{ kind: 'streetlamp', x: 300, w: 30, h: 360 }, { kind: 'streetlamp', x: 1150, w: 30, h: 360 }, { kind: 'bike', x: 860, w: 120, h: 80 }],
   },
-  // 종로 큰길: 필드 세계 첫 시연 범위(docs/필드_세계_NPC_설계.md 20장). 그림 전까지 회색 거리
-  {
-    id: 'jongno', name: '종로 큰길', floor: 'out', length: 4000, look: 'street', legacy: true, boxes: [], fixtures: [],
-    // 편의점 (점원은 근무형 몹, src/game/world/hq.ts). 그림 전까지 회색 거리의 임시 자리
-    spots: [{ id: 'cvs', x: 1300, verb: '편의점', shop: 'cvs' }],
-    doors: [{ id: 'west', x: 60, kind: 'door', to: 'street', toDoor: 'east', label: '종로 뒷골목' }, { id: 'metro', x: 2200, kind: 'door', to: 'metro', toDoor: 'jonggak', label: '종각역' }],
-    things: [{ kind: 'streetlamp', x: 700, w: 30, h: 360 }, { kind: 'streetlamp', x: 1700, w: 30, h: 360 }, { kind: 'streetlamp', x: 2700, w: 30, h: 360 }, { kind: 'streetlamp', x: 3600, w: 30, h: 360 }],
-  },
-  // 지하철 승강장 하나에서 각 지역 역으로 내린다 (내린 지역이 바뀌면 시계 「지역 이동」 +30분). 그림 전까지 회색 장면, 좌표 임시
-  {
-    id: 'metro', name: '지하철 승강장', floor: 'out', length: 3200, look: 'corridor', legacy: true, boxes: [], fixtures: [], spots: [],
-    doors: [
-      { id: 'jonggak', x: 300, kind: 'door', to: 'jongno', toDoor: 'metro', label: '종각역 (종로)' },
-      { id: 'yeongdeungpo', x: 1000, kind: 'door', to: 'yeongdeungpo', toDoor: 'metro', label: '영등포시장역' },
-      { id: 'gangnam', x: 1700, kind: 'door', to: 'gangnam', toDoor: 'metro', label: '강남역' },
-      { id: 'mangwon', x: 2400, kind: 'door', to: 'mangwon', toDoor: 'metro', label: '망원역' },
-      { id: 'yeouido', x: 3000, kind: 'door', to: 'yeouido', toDoor: 'metro', label: '여의나루역' },
-    ],
-    things: [],
-  },
-  ...([
-    ['yeongdeungpo', '영등포 시장', 3600, '영등포시장역'],
-    ['gangnam', '강남 번화가', 4000, '강남역'],
-    ['mangwon', '망원 주택가', 3000, '망원역'],
-    ['yeouido', '여의도 한강공원', 4000, '여의나루역'],
-  ] as const).map(([id, name, length, station]): HqScene => ({
-    id, name, floor: 'out', length, look: 'street', legacy: true, boxes: [], fixtures: [],
-    // 영등포 시장: 노점 (상인은 근무형 몹)
-    spots: id === 'yeongdeungpo' ? [{ id: 'market', x: 1500, verb: '노점', shop: 'market' }] : [],
-    doors: [{ id: 'metro', x: 200, kind: 'door', to: 'metro', toDoor: id, label: station }],
-    things: [1, 2, 3].map((i) => ({ kind: 'streetlamp', x: Math.round((length * i) / 4), w: 30, h: 360 })),
-  })),
+  // 10-31 사용자: 종로 큰길·지하철 승강장·지역 회색 장면 4곳(영등포·강남·망원·여의도)과 편의점·노점은 가설로 만든 것이라 뺐다.
+  // 거리는 각 세력·중립 건물로 들어가는 길거리뿐 — 지도가 완성되면 그때 더한다
   {
     id: 'pasta', name: '파스타집', floor: 'out', length: 1280, look: 'pasta', legacy: true, boxes: [], fixtures: [],
     doors: [{ id: 'out', x: 110, kind: 'shop', to: 'street', toDoor: 'pasta' }],

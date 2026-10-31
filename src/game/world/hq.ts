@@ -8,11 +8,11 @@ import { streetSpawns } from './districts';
 
 /** 장소 종류는 방 이름 낱말로 정한다(world/places.ts kindFromName, 10-31): 층 배치·방이 바뀌어도 여기 고칠 것 없음 */
 
-/** 바깥 거리 장면 (모두 같은 거리 인구, 10-31) */
-export const HQ_STREETS = ['street', 'jongno', 'metro', 'yeongdeungpo', 'gangnam', 'mangwon', 'yeouido'];
+/** 바깥 거리 장면 (모두 같은 거리 유동인구, 10-31). 지금은 관리국 정문 앞 거리뿐 — 다른 세력·중립 건물 길거리가 생기면 여기 */
+export const HQ_STREETS = ['street'];
 /** 지역: 바뀌면 시계 「지역 이동」. 승강장은 지역 없음(타고 내릴 때 정해진다). 본부 안은 종로 */
-const HQ_DISTRICT: Record<string, string> = { yeongdeungpo: 'yeongdeungpo', gangnam: 'gangnam', mangwon: 'mangwon', yeouido: 'yeouido' };
-export const hqDistrict = (scene: string): string | null => (scene === 'metro' ? null : HQ_DISTRICT[scene] ?? 'jongno');
+const HQ_DISTRICT: Record<string, string> = {};   // 다른 지역 장면이 생기면 장면 → 지역 (10-31: 가설 지역 장면은 뺐다)
+export const hqDistrict = (scene: string): string | null => HQ_DISTRICT[scene] ?? 'jongno';
 
 /** 장면 소속: 본부 안은 관리국(A00). 바깥 거리·가게·중림 지하상가(jr_*, 민간 상가)는 없음 */
 export const hqSceneFaction = (scene: string): string | null => (scene === 'pasta' || scene.startsWith('jr_') || HQ_STREETS.includes(scene) ? null : 'A00');
@@ -27,9 +27,8 @@ export function hqRoam(graph: PlaceGraph, home: string): string[] {
 export function hqSpawns(graph: PlaceGraph): SpawnRule[] {
   const lobbyMain = graph.scene('lobby')?.doors.find((d) => d.id === 'main')?.x;
   // 바깥 거리는 모두 같은 인구 (승강장은 타는 곳마다 드나든다)
-  const metroGates = graph.scene('metro')?.doors.map((d) => d.x);
   return [
-    ...streetSpawns(HQ_STREETS.filter((s) => graph.scene(s)), { street: [30, 1890], ...(metroGates?.length ? { metro: metroGates } : {}) }),
+    ...streetSpawns(HQ_STREETS.filter((s) => graph.scene(s)), { street: [30, 1890] }),
     ...(lobbyMain !== undefined ? [{ scene: 'lobby', target: { day: 2, night: 0 }, refill: [6, 12], gates: [lobbyMain], mix: ['행인', '행정 직원'] } as SpawnRule] : []),
   ];
 }
@@ -52,9 +51,6 @@ export function hqPosts(graph: PlaceGraph): Post[] {
     ...clinicPosts(graph),
     // 방 종류로 인원 자동 (10-31 자율 행동 2단계): 방이 늘거나 옮겨도 여기 고칠 것 없음
     ...autoPosts(graph),
-    // 필드 가게 주인 (src/game/world/fieldShop.ts SHOPS: 편의점 24시간, 시장 노점 06~19시). 가게 자리 x는 hq/map.ts spots와 같게
-    ...(graph.scene('jongno') ? [{ id: 'cvs-clerk', archetype: '편의점 점원', scene: 'jongno', how: 'fixed', spot: 1300, shifts: [[0, 24]], count: 1, gate: 2200 } as Post] : []),
-    ...(graph.scene('yeongdeungpo') ? [{ id: 'market-seller', archetype: '상인', scene: 'yeongdeungpo', how: 'fixed', spot: 1500, shifts: [[6, 19]], count: 1, gate: 200 } as Post] : []),
   ];
 }
 

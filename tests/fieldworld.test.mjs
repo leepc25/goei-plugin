@@ -325,12 +325,26 @@ test('거리 인구: 모든 거리에 같은 규칙 하나(시민 = 행인 + 기
   for (const gone of ['회사원', '관광객', '배달원', '취객', '주민', '산책객', '승객', '방문객']) assert.ok(!M.ARCHETYPES[gone], `옛 시민 원형 ${gone}`);
   for (const n of Object.keys(M.ARCHETYPES)) assert.ok(L.NPC_TYPE[n], `대사 연결 ${n}`);
   assert.equal(H.hqDistrict('office'), 'jongno');
-  assert.equal(H.hqDistrict('metro'), null);
+  assert.deepEqual(H.HQ_STREETS, ['street'], '거리는 관리국 정문 앞뿐 (10-31: 가설 장면 뺌)');
   assert.ok(D.isRegionMove('jongno', 'gangnam'));
   assert.ok(!D.isRegionMove('jongno', 'jongno'));
   assert.ok(!D.isRegionMove('jongno', null));
-  assert.equal(H.hqSceneFaction('gangnam'), null);
+  assert.equal(H.hqSceneFaction('street'), null);
   assert.equal(H.hqSceneFaction('office'), 'A00');
+});
+
+test('거리 유동인구: 시간대마다 인원·구성이 다르다 (출퇴근 붐빔, 새벽 거의 없음, 등하교 학생, 밤 불량배)', () => {
+  const g = new P.PlaceGraph([{ id: 's', name: '거리', length: 3000, legacy: true, doors: [] }], [], { s: 'street' });
+  const count = (hour) => { const sim = new A.WorldSim(g, R.mulberry32(3), { spawns: D.streetSpawns(['s']) }); sim.step(0.1, { scene: 'x', x: 0, y: 0, hour }); return sim.inScene('s').filter((a) => a.def.kind === 'mob'); };
+  assert.ok(count(8).length > count(3).length * 4, '출근 > 새벽');
+  assert.ok(count(19).length >= count(12).length, '퇴근 ≥ 점심');
+  assert.ok(count(3).length <= 1);
+  for (const b of D.STREET_BANDS) for (const n of b.mix) assert.ok(M.ARCHETYPES[n], n);
+  assert.ok(D.STREET_BANDS.find((b) => b.from === 7).mix.includes('학생'), '등교 학생');
+  assert.ok(!D.STREET_BANDS.find((b) => b.from === 9).mix.includes('학생'), '수업 중엔 학생 없음');
+  assert.ok(D.STREET_BANDS.find((b) => b.from === 22).mix.filter((m) => m === '불량배').length >= 2, '밤 불량배');
+  // 24시간이 빠짐없이 덮인다
+  for (let h = 0; h < 24; h++) assert.ok(D.STREET_BANDS.some((b) => h >= b.from && h < b.to), `${h}시`);
 });
 
 test('밤: 거리 밤에는 nightMix에서만 나온다', () => {
