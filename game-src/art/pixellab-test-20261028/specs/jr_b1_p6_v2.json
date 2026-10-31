@@ -1,0 +1,178 @@
+{
+ "place": "a run-down 1990s Seoul underground arcade corridor, low ceiling right above the sign",
+ "time": "night",
+ "light": "half-dead fluorescent tubes and warm shop light",
+ "view": "corridor",
+ "floor_share": "the lower 30 percent",
+ "sides": "none",
+ "density": "packed+",
+ "floor": "smooth dark poured concrete like one wet sheet, mottled grime, oil stains, puddles, varied litter all over the walkway, light pool, shadows under objects",
+ "walls": "grimy concrete, rust, mold, cracks; ceiling strip, tangled cables, fluorescent tubes, one dead, one flickering",
+ "palette": "dark grey, beige, warm orange and red",
+ "mode": "loose",
+ "room": "corridor",
+ "mood": "worn",
+ "name": "jr_b1_p6_v2",
+ "doors": 0,
+ "no": [
+  "doors",
+  "stairs",
+  "side walls"
+ ],
+ "shadow": "strong contrast, bright shop, dark edges, black shadow under objects",
+ "sized": [],
+ "items": [
+  {
+   "full": "left 10 percent of the image: only bare back wall and floor, no side wall",
+   "text": "left 10 percent of the image: only bare back wall and floor, no side wall",
+   "why": "사용자 이음매: 앞 기둥 자리",
+   "keep": [
+    "left 10 percent"
+   ]
+  },
+  {
+   "full": "back wall, centered: a big open general store filling the middle 80 percent of the width, recessed like a deep lit room, overflowing with small electric fans, space heaters, kettles, plastic baskets and junk, a round blue sign with white letters reading \"금성생활\"",
+   "text": "back wall, centered: a big open general store filling the middle 80 percent of the width, recessed like a deep lit room, overflowing with small electric fans, space heaters, kettles, plastic baskets and junk, a round blue sign with white letters reading \"금성생활\"",
+   "why": "GPT 의뢰문 ⑥, 사용자 간판 다르게: 둥근 파란 판",
+   "keep": [
+    "general store",
+    "small electric fans",
+    "space heaters",
+    "round blue sign",
+    "reading \"금성생활\""
+   ]
+  },
+  {
+   "full": "a display stand jutting onto the walkway, top and front visible, piled with boxed goods",
+   "text": "a display stand jutting onto the walkway, top and front visible, piled with boxed goods",
+   "why": "GPT 의뢰문 매대",
+   "keep": [
+    "display stand"
+   ]
+  },
+  {
+   "full": "stacked boxes spilling out beside the stand",
+   "text": "stacked boxes spilling out beside the stand",
+   "why": "GPT 의뢰문 쌓인 상자",
+   "keep": [
+    "stacked boxes"
+   ]
+  },
+  {
+   "full": "wall base right beside the store: collapsed cardboard, burst trash bag, crushed cans, each a different shape",
+   "text": "wall base right beside the store: collapsed cardboard, burst trash bag, crushed cans, each a different shape",
+   "why": "사용자 쓰레기 제각각",
+   "keep": [
+    "burst trash bag",
+    "each a different shape"
+   ]
+  },
+  {
+   "full": "an overflowing dented metal trash can, a recycle bin",
+   "text": "an overflowing dented metal trash can, a recycle bin",
+   "why": "설계안 쓰레기통·분리수거",
+   "keep": [
+    "trash can"
+   ]
+  },
+  {
+   "full": "a rusty air conditioner unit, tangled cables",
+   "text": "a rusty air conditioner unit, tangled cables",
+   "why": "설계안 공조",
+   "keep": [
+    "air conditioner"
+   ]
+  },
+  {
+   "full": "an umbrella stand",
+   "text": "an umbrella stand",
+   "why": "설계안 우산통",
+   "keep": [
+    "umbrella stand"
+   ]
+  },
+  {
+   "full": "a torn blank poster on the wall",
+   "text": "a torn blank poster on the wall",
+   "why": "사용자 벽 종이 몇 군데만",
+   "keep": [
+    "blank poster"
+   ]
+  },
+  {
+   "full": "right 10 percent of the image: only bare back wall and floor, no side wall",
+   "text": "right 10 percent of the image: only bare back wall and floor, no side wall",
+   "why": "사용자 이음매: 앞 기둥 자리",
+   "keep": [
+    "right 10 percent"
+   ]
+  }
+ ],
+ "must": [
+  {
+   "kw": "reading \"금성생활\"",
+   "from": "가게 이름"
+  },
+  {
+   "kw": "one wet sheet",
+   "from": "사용자 바닥 선 금지"
+  }
+ ],
+ "brief": {
+  "wiki": "낡은 점포",
+  "design": "GPT 의뢰문 ⑥ 금성생활",
+  "user": [
+   "사용자 10-31 「다시 뽑아」: ②③④와 같은 가이드 v6·같은 고정 문장(place·floor·walls·palette 등), 가게 내용·간판 낱말만 다르게"
+  ],
+  "items": [
+   {
+    "src": "금성생활",
+    "by": [
+     1
+    ]
+   },
+   {
+    "src": "매대·상자",
+    "by": [
+     2,
+     3
+    ]
+   },
+   {
+    "src": "쓰레기",
+    "by": [
+     4
+    ]
+   },
+   {
+    "src": "쓰레기통·공조·우산통·포스터",
+    "by": [
+     5,
+     6,
+     7,
+     8
+    ]
+   },
+   {
+    "src": "이음 비움",
+    "by": [
+     0,
+     9
+    ]
+   },
+   {
+    "src": "위키: 반쯤 꺼진 형광등",
+    "by": "칸:walls dead"
+   }
+  ]
+ },
+ "review": {
+  "fit": "10줄: 잡화점·매대·상자·쓰레기·소품",
+  "place": "가게 가운데, 양끝 비움",
+  "size": "크기 숫자 없음(느슨한 틀)",
+  "brief": "위키·설계안·의뢰문 항목 대응, 빠진 것 없음",
+  "meaning": "1차=2차(느슨한 틀)",
+  "over": "같은 물건 두 번 없음, packed+",
+  "frame": "②③④와 같은 가이드 v6·고정 문장, 가게 내용·간판만 다름"
+ }
+}

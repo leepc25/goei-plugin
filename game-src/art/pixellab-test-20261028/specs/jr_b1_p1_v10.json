@@ -1,0 +1,190 @@
+{
+ "place": "a run-down 1990s Seoul underground arcade corridor, low ceiling right above the sign",
+ "time": "night",
+ "light": "half-dead fluorescent tubes and warm shop light",
+ "view": "corridor",
+ "floor_share": "the lower 30 percent",
+ "sides": "none",
+ "density": "packed+",
+ "floor": "smooth dark poured concrete like one wet sheet, mottled grime, oil stains, puddles, varied litter all over the walkway, light pool, shadows under objects",
+ "walls": "grimy concrete, rust, mold, cracks; ceiling strip, tangled cables, fluorescent tubes, one dead, one flickering",
+ "palette": "dark grey, beige, warm orange and red",
+ "mode": "loose",
+ "room": "corridor",
+ "mood": "worn",
+ "name": "jr_b1_p1_v10",
+ "doors": 0,
+ "no": [
+  "doors",
+  "side walls"
+ ],
+ "shadow": "strong contrast, bright shop, dark edges, black shadow under objects",
+ "sized": [],
+ "items": [
+  {
+   "full": "far left 20 percent of the image: concrete stairs to street level rising along the left edge from the front floor to the back and out the top, seen from the side, railing, daylight from above, clear floor before the first step",
+   "text": "far left 20 percent of the image: concrete stairs to street level rising along the left edge from the front floor to the back and out the top, seen from the side, railing, daylight from above, clear floor before the first step",
+   "why": "설계안 서쪽 계단, 사용자 계단 모양",
+   "keep": [
+    "stairs",
+    "seen from the side",
+    "clear floor",
+    "staircase",
+    "railing",
+    "daylight"
+   ]
+  },
+  {
+   "full": "back wall, centered: an open tteokbokki and fish cake snack bar recessed like a deep lit room, crammed with cooking gear, food, drinks and clutter, a long red sign board with chunky yellow letters reading \"은정분식\"",
+   "text": "back wall, centered: an open tteokbokki and fish cake snack bar recessed like a deep lit room, crammed with cooking gear, food, drinks and clutter, a long red sign board with chunky yellow letters reading \"은정분식\"",
+   "why": "위키 입구 근처 분식집, 사용자 간판 다르게: 붉은 가로판·노란 글씨",
+   "keep": [
+    "snack bar",
+    "fish cake",
+    "reading \"은정분식\""
+   ]
+  },
+  {
+   "full": "steel standing counter jutting onto the walkway, top and front visible, no seats",
+   "text": "steel standing counter jutting onto the walkway, top and front visible, no seats",
+   "why": "설계안 주방 카운터",
+   "keep": [
+    "standing counter",
+    "no seats"
+   ]
+  },
+  {
+   "full": "drink crates, cardboard boxes",
+   "text": "drink crates, cardboard boxes",
+   "why": "설계안 쌓인 상자",
+   "keep": [
+    "drink crates",
+    "cardboard boxes"
+   ]
+  },
+  {
+   "full": "wall base: wet cardboard, burst trash bag, soju bottles, each a different shape",
+   "text": "wall base: wet cardboard, burst trash bag, soju bottles, each a different shape",
+   "why": "사용자 쓰레기 제각각",
+   "keep": [
+    "burst trash bag",
+    "each a different shape"
+   ]
+  },
+  {
+   "full": "overflowing trash can, recycling bin",
+   "text": "overflowing trash can, recycling bin",
+   "why": "설계안 쓰레기통·분리수거",
+   "keep": [
+    "trash can",
+    "recycling bin"
+   ]
+  },
+  {
+   "full": "fire extinguisher box, broken CCTV camera",
+   "text": "fire extinguisher box, broken CCTV camera",
+   "why": "설계안 소화기함·CCTV",
+   "keep": [
+    "fire extinguisher box",
+    "broken CCTV camera"
+   ]
+  },
+  {
+   "full": "umbrella stand, blank poster",
+   "text": "umbrella stand, blank poster",
+   "why": "설계안 우산통·포스터",
+   "keep": [
+    "umbrella stand",
+    "blank poster"
+   ]
+  },
+  {
+   "full": "rusty air conditioner",
+   "text": "rusty air conditioner",
+   "why": "설계안 공조",
+   "keep": [
+    "air conditioner"
+   ]
+  },
+  {
+   "full": "right image edge: only bare wall and floor",
+   "text": "right 10 percent of the image: only bare back wall and floor, no side wall",
+   "why": "사용자 이음매: 앞 기둥 자리",
+   "keep": [
+    "right 10 percent"
+   ]
+  }
+ ],
+ "must": [
+  {
+   "kw": "reading \"은정분식\"",
+   "from": "가게 이름"
+  },
+  {
+   "kw": "stairs",
+   "from": "설계안 계단"
+  },
+  {
+   "kw": "one wet sheet",
+   "from": "사용자 바닥 선 금지"
+  }
+ ],
+ "brief": {
+  "wiki": "상가 입구 근처 분식집",
+  "design": "설계안 jr_b1 서쪽 계단·분식집, 통로 소품",
+  "user": [
+   "사용자 10-31 「다시 뽑아」: ②③④와 같은 가이드 v6·같은 고정 문장(place·floor·walls·palette 등), 가게 내용·간판 낱말만 다르게",
+   "계단은 옆벽 문장 없이 물건 줄로(고정 문장을 안 바꾸려고)"
+  ],
+  "items": [
+   {
+    "src": "설계안: 계단",
+    "by": [
+     0
+    ]
+   },
+   {
+    "src": "위키·설계안: 분식집",
+    "by": [
+     1,
+     2
+    ]
+   },
+   {
+    "src": "설계안: 상자·쓰레기통·소화기함·CCTV·우산통·포스터·공조",
+    "by": [
+     3,
+     5,
+     6,
+     7,
+     8
+    ]
+   },
+   {
+    "src": "사용자: 쓰레기 제각각",
+    "by": [
+     4
+    ]
+   },
+   {
+    "src": "사용자: 오른쪽 이음 비움",
+    "by": [
+     9
+    ]
+   },
+   {
+    "src": "위키: 반쯤 꺼진 형광등",
+    "by": "칸:walls dead"
+   }
+  ]
+ },
+ "review": {
+  "fit": "10줄: 계단·분식집·카운터·통로 소품",
+  "place": "계단 왼쪽 20%, 분식집 가운데, 오른쪽 10% 비움",
+  "size": "크기 숫자 없음(느슨한 틀)",
+  "brief": "위키·설계안·의뢰문 항목 대응, 빠진 것 없음",
+  "meaning": "1차=2차(느슨한 틀)",
+  "over": "같은 물건 두 번 없음, packed+",
+  "frame": "②③④와 같은 가이드 v6·고정 문장, 가게 내용·간판만 다름"
+ }
+}

@@ -1,0 +1,204 @@
+{
+ "place": "a run-down 1990s Seoul underground arcade corridor, low ceiling right above the sign",
+ "time": "night",
+ "light": "half-dead fluorescent tubes and warm shop light",
+ "view": "corridor",
+ "floor_share": "the lower 30 percent",
+ "sides": "none",
+ "density": "packed+",
+ "floor": "smooth dark poured concrete like one wet sheet, mottled grime, oil stains, puddles, varied litter all over the walkway, light pool, shadows under objects",
+ "walls": "grimy concrete, rust, mold, cracks; ceiling strip, tangled cables, fluorescent tubes, one dead, one flickering",
+ "palette": "dark grey, beige, warm orange and red",
+ "mode": "loose",
+ "room": "corridor",
+ "mood": "worn",
+ "name": "jr_b1_p7_v2",
+ "doors": 1,
+ "no": [
+  "other doors",
+  "side walls"
+ ],
+ "shadow": "strong contrast, bright shop, dark edges, black shadow under objects",
+ "sized": [],
+ "items": [
+  {
+   "full": "left 10 percent of the image: only bare back wall and floor, no side wall",
+   "text": "left 10 percent of the image: only bare back wall and floor, no side wall",
+   "why": "사용자 이음매: 앞 기둥 자리",
+   "keep": [
+    "left 10 percent"
+   ]
+  },
+  {
+   "full": "back wall, centered: an unlicensed clinic front, a cloudy frosted glass door in the middle, frosted windows, a faded old hospital sign, a green cross light box sticking out, a white lit sign board with green letters reading \"손길의원\"",
+   "text": "back wall, centered: an unlicensed clinic front, a cloudy frosted glass door in the middle, frosted windows, a faded old hospital sign, a green cross light box sticking out, a white lit sign board with green letters reading \"손길의원\"",
+   "why": "위키 손길 의원, GPT 의뢰문 ⑦, 사용자 간판 다르게",
+   "keep": [
+    "clinic",
+    "frosted glass door",
+    "green cross light box",
+    "reading \"손길의원\""
+   ]
+  },
+  {
+   "full": "clear empty floor in front of the glass door",
+   "text": "clear empty floor in front of the glass door",
+   "why": "게임 출입구 앞 비움",
+   "keep": [
+    "clear empty floor"
+   ]
+  },
+  {
+   "full": "far right 20 percent of the image: a rectangular stairwell cut into the floor at the right edge, steps going down to the back into darkness, a waist-high railing on its walkway edge",
+   "text": "far right 20 percent of the image: a rectangular stairwell cut into the floor at the right edge, steps going down to the back into darkness, a waist-high railing on its walkway edge",
+   "why": "GPT 의뢰문 B2 계단 구멍·난간, 게임 출입구 down",
+   "keep": [
+    "rectangular stairwell",
+    "going down",
+    "railing",
+    "clear floor"
+   ]
+  },
+  {
+   "full": "a \"B2\" plate with a down arrow and a flickering lamp above the stairwell",
+   "text": "a \"B2\" plate with a down arrow and a flickering lamp above the stairwell",
+   "why": "GPT 의뢰문 B2 판·등",
+   "keep": [
+    "\"B2\"",
+    "flickering lamp"
+   ]
+  },
+  {
+   "full": "clear floor before the first step",
+   "text": "clear floor before the first step",
+   "why": "GPT 의뢰문 계단 첫 단 앞 비움",
+   "keep": [
+    "clear floor"
+   ]
+  },
+  {
+   "full": "wall base: collapsed cardboard, burst trash bag, bottles, each a different shape",
+   "text": "wall base: collapsed cardboard, burst trash bag, bottles, each a different shape",
+   "why": "사용자 쓰레기 제각각",
+   "keep": [
+    "burst trash bag",
+    "each a different shape"
+   ]
+  },
+  {
+   "full": "a dented metal trash can",
+   "text": "a dented metal trash can",
+   "why": "설계안 쓰레기통",
+   "keep": [
+    "trash can"
+   ]
+  },
+  {
+   "full": "a torn blank poster",
+   "text": "a torn blank poster",
+   "why": "사용자 벽 종이 몇 군데만",
+   "keep": [
+    "blank poster"
+   ]
+  },
+  {
+   "full": "a rusty air conditioner unit",
+   "text": "a rusty air conditioner unit",
+   "why": "설계안 공조",
+   "keep": [
+    "air conditioner"
+   ]
+  },
+  {
+   "full": "an umbrella stand",
+   "text": "an umbrella stand",
+   "why": "설계안 우산통",
+   "keep": [
+    "umbrella stand"
+   ]
+  }
+ ],
+ "must": [
+  {
+   "kw": "reading \"손길의원\"",
+   "from": "가게 이름"
+  },
+  {
+   "kw": "stairwell",
+   "from": "B2 계단"
+  },
+  {
+   "kw": "one wet sheet",
+   "from": "사용자 바닥 선 금지"
+  }
+ ],
+ "brief": {
+  "wiki": "손길 의원: 바랜 옛 병원 간판이 붙은 무면허 의원",
+  "design": "GPT 의뢰문 ⑦ 손길의원·B2 계단",
+  "user": [
+   "사용자 10-31 「다시 뽑아」: ②③④와 같은 가이드 v6·같은 고정 문장(place·floor·walls·palette 등), 가게 내용·간판 낱말만 다르게",
+   "계단은 옆벽 문장 없이 물건 줄로"
+  ],
+  "items": [
+   {
+    "src": "손길의원",
+    "by": [
+     1
+    ]
+   },
+   {
+    "src": "문 앞 비움",
+    "by": [
+     2
+    ]
+   },
+   {
+    "src": "B2 계단·판",
+    "by": [
+     3,
+     4
+    ]
+   },
+   {
+    "src": "쓰레기",
+    "by": [
+     6
+    ]
+   },
+   {
+    "src": "쓰레기통·포스터·공조·우산통",
+    "by": [
+     7,
+     8,
+     9,
+     10
+    ]
+   },
+   {
+    "src": "왼쪽 이음 비움",
+    "by": [
+     0
+    ]
+   },
+   {
+    "src": "위키: 반쯤 꺼진 형광등",
+    "by": "칸:walls dead"
+   },
+   {
+    "src": "계단 첫 단 앞 비움",
+    "by": [
+     5
+    ]
+   }
+  ]
+ },
+ "review": {
+  "fit": "10줄: 의원·유리문·B2 계단·소품",
+  "place": "왼쪽 10% 비움, 의원 가운데, 계단 오른쪽 20%, 문 앞 비움",
+  "size": "크기 숫자 없음(느슨한 틀)",
+  "brief": "위키·설계안·의뢰문 항목 대응, 빠진 것 없음",
+  "meaning": "1차=2차(느슨한 틀)",
+  "over": "같은 물건 두 번 없음, packed+",
+  "frame": "②③④와 같은 가이드 v6·고정 문장, 가게 내용·간판만 다름"
+ }
+}
