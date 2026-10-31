@@ -79,7 +79,7 @@ STEPS = {
  "G": ("A", 8, "loop", f"Bare and barefoot {side}: drop into a defensive low crouch, {LOW}, {GUARD}. Hold the crouch, the shoulders rising and falling with heavy breathing. {DRAW}"),
  "H1": ("G", 8, "G", f"Bare and barefoot {side}, in a low crouch with {GUARD}: struck in the stomach, the body folds forward at the waist, the face twisting in pain with the eyes squeezed shut, the hands never leaving the body, sliding one step back on the heels, then rises back into the same low crouch. {DRAW}"),  # 10-31: H1 배(앞으로 접힘)·H2 가슴(뒤로 밀림), 둘 다 경계→경계, 맞을 때마다 둘 중 하나
  "H2": ("G", 12, "G", f"Bare and barefoot {side}, in a low crouch with {GUARD}: knocked backward by a heavy blow to the chest, the shoulders jolt back and the whole body rocks back, the head staying on the shoulders, staggering three big steps backward with the knees almost buckling, the hands never leaving the body, then sinks back into the same low crouch. {DRAW}"),
- "H3": ("G", 12, None, f"Bare and barefoot {side}: struck hard in the chest, the head snaps back and the body reels backward two fast stumbling steps, the knees give way and the body drops straight down, the hips hit the floor, then the back slams flat onto the floor and the head bounces once. The body ends lying flat on the back along the floor, the arms at the sides. {DRAW}"),
+ "H3": ("H2@peak", 12, None, f"Bare and barefoot {side}: struck hard in the chest, the head snaps back and the body reels backward two fast stumbling steps, the knees give way and the body drops straight down, the hips hit the floor, then the back slams flat onto the floor and the head bounces once. The body ends lying flat on the back along the floor, the arms at the sides. {DRAW}"),
  "H4": ("H3", 8, "H3", f"Bare and barefoot, lying flat on the back on the floor {side}: flinch, pull both knees up toward the chest and cross both forearms over the face, then let the arms and legs drop back flat along the floor, the body staying on the floor the whole time. {DRAW}"),
  "H5": ("H3", 16, "G", f"Bare and barefoot, lying flat on the back on the floor {side}: roll onto one side, push up with one hand onto one knee, then rise into a defensive low crouch, {LOW}, {GUARD}. {DRAW}"),
  "H6": ("G", 8, "loop", f"Bare and barefoot, running {side} with fast even strides, both legs alternating evenly with the same step length, the upper body leaning forward, {COVER}. {DRAW}"),
@@ -102,7 +102,16 @@ def biggest(im):   # 가장 큰 덩어리(몸)만 남긴 사본 — 시작 장�
                 sz.append(c)
     if n > 1: a[(lab != 1 + int(np.argmax(sz))) & m] = 0
     return Image.fromarray(a)
+def peak(n):   # 그 줄에서 첫 장과 가장 많이 다른 장(가장 크게 밀려난 순간) — 쓰러지기는 맞는 자세에서 시작(10-31 사용자)
+    fs = sorted((OUT / f"샤워2_{n}").glob("[0-9][0-9].png"))
+    a0 = np.array(Image.open(fs[0]).convert("RGBA"))[..., 3] > 0
+    def d(f):
+        a = np.array(Image.open(f).convert("RGBA"))[..., 3] > 0
+        u = (a | a0).sum(); return 1 - (a & a0).sum() / u if u else 0
+    f = max(fs, key=d)
+    clean = biggest(Image.open(f).convert("RGBA")); clean.save(OUT / f"샤워2_{n}_가장밀림_정리.png"); return clean
 def last(n):
+    if n.endswith("@peak"): return peak(n[:-5])
     if n == "REG": return m3.fetch_png(m3.req("GET", f"/characters/{CID}")["rotation_urls"][D]).convert("RGBA")
     im = Image.open(sorted((OUT / f"샤워2_{n}").glob("[0-9][0-9].png"))[-1]).convert("RGBA")
     clean = biggest(im); clean.save(OUT / f"샤워2_{n}_끝장_정리.png"); return clean
