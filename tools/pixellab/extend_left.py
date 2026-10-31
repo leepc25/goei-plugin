@@ -11,6 +11,9 @@ ov = int(sys.argv[6]) if len(sys.argv) > 6 else 0
 # 위쪽만 더 넓게 다시 그리기(사용자 10-31: 처마 띠 이음선) — [위쪽 폭] [위쪽 높이]: 그 높이 위로는 위쪽 폭만큼 덮는다(간판·가게가 없는 2층·처마)
 ov_top = int(sys.argv[7]) if len(sys.argv) > 7 else ov
 top_h = int(sys.argv[8]) if len(sys.argv) > 8 else 0
+# 아래쪽(바닥)도 더 넓게 다시 그리기(본부 3층 10-31: 문틀에 바로 붙여 이을 때) — [아래 폭] [아래 시작 y]
+ov_bot = int(sys.argv[9]) if len(sys.argv) > 9 else ov
+bot_y = int(sys.argv[10]) if len(sys.argv) > 10 else 0
 im = Image.open(src).convert("RGBA")
 w, h = keep + new, im.height
 assert w <= 512 and h <= 512
@@ -18,6 +21,7 @@ win = Image.new("RGBA", (w, h), (255, 255, 255, 255))
 win.paste(im.crop((0, 0, keep, h)), (new, 0))
 mask = Image.new("RGB", (w, h), (0, 0, 0)); mask.paste((255, 255, 255), (0, 0, new + ov, h))
 if top_h: mask.paste((255, 255, 255), (0, 0, new + ov_top, top_h))
+if bot_y: mask.paste((255, 255, 255), (0, bot_y, new + ov_bot, h))
 def b64(img):
     buf = io.BytesIO(); img.save(buf, "PNG"); return base64.b64encode(buf.getvalue()).decode()
 body = {"description": open(prompt_path, encoding="utf-8").read().strip(),
