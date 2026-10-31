@@ -120,6 +120,8 @@ export interface Actor {
   patient?: string;
   /** 쓰는 훈련 장비 (장면#번호) */
   station?: string;
+  /** 평소 거리 순찰 중인 경찰 (C16, 10-31) */
+  patrol?: boolean;
 }
 
 /** 훈련장 장비 하나 (10-31 사용자: 샌드백·허수아비·사격 과녁. 그림은 일단 코드, 나중에 교체) */
@@ -144,6 +146,16 @@ const PAUSES: { clip: string; doing: string; sec: [number, number] }[] = [
   { clip: 'rest', doing: '잠깐 멈춤', sec: [1.5, 3.5] },
   { clip: 'idle', doing: '두리번', sec: [2, 3.5] },
 ];
+
+/** 순찰 경찰이 걷다 멈춰 하는 일 (그 줄이 있는 그림만) */
+const PATROL_PAUSES: { clip: string; doing: string; sec: [number, number] }[] = [
+  { clip: 'radio', doing: '무전 보고', sec: [3, 5] },
+  { clip: 'memo', doing: '수첩 메모', sec: [3, 5] },
+  { clip: 'idle', doing: '주위를 살핌', sec: [2, 4] },
+  { clip: 'spot', doing: '뭔가 발견', sec: [1.2, 2] },
+];
+/** 평소 거리 순찰 (C16, 10-31 사용자 「평소에도 종종 등장」): 거리 장면마다 이 초 간격으로 한 번 들어올지 굴린다 */
+export const PATROL = { every: [90, 200] as [number, number], chance: 0.5, pair: 0.6, speed: [95, 115] as [number, number] };
 
 /** 엔진 공격 판정 상자 (contract Hit의 모양만) */
 export interface HitBox { x0: number; x1: number; y: number; dy?: number; z0: number; z1: number; attackId: number }
@@ -213,6 +225,8 @@ export class WorldSim {
   readonly actors: Actor[] = [];
   readonly events: SimEvent[] = [];
   private spawnT = new Map<string, number>();
+  /** 거리 장면마다 다음 순찰을 굴릴 때까지 초 */
+  private patrolT = new Map<string, number>();
   private uproar = new Map<string, { v: number; x: number }>();
   /** 실제로 흐른 생활 초 */
   time = 0;
@@ -354,11 +368,20 @@ export class WorldSim {
     const len = this.graph.scene(scene)?.length ?? 1280;
     const street = this.graph.kind(scene) === 'street';
     const n = 1 + this.uproarLevel(scene);
+    // 순찰 중인 경찰이 그 장면에 있으면 그들이 먼저 달려온다 (C16)
+    for (const p of this.actors.filter((q) => q.scene === scene && q.patrol && q.plan !== 'chase' && !q.fighting && !['down', 'dead', 'gone'].includes(q.act))) {
+      p.plan = 'chase';
+      p.run = 1.4;
+      p.buddy = undefined;
+      this.walkTo(p, { x, y: p.y }, '현장으로 달려감', 'chase');
+      this.iconOn(p, '!', 3);
+      this.say(p, '거기 멈춰!', 2);
+    }
     const have = this.actors.filter((a) => a.scene === scene && a.plan === 'chase').length;
     for (let i = have; i < n; i++) {
       const gate = Math.abs(x - 30) > Math.abs(x - (len - 30)) ? 30 : len - 30;
       const arch = street ? '경찰' : '경비';
-      const a = this.add({ id: `mob${++serial}`, name: arch, kind: 'mob', brain: 'transit', home: scene, archetype: arch, look: arch, speed: 170 }, { scene, x: gate, y: this.laneMid(scene) });
+      const a = this.add({ id: `mob${++serial}`, name: arch, kind: 'mob', brain: 'transit', home: scene, archetype: arch, look: this.lookOf(arch), speed: 170 }, { scene, x: gate, y: this.laneMid(scene) });
       a.plan = 'chase';
       a.run = 1.4;
       this.walkTo(a, { x, y: a.y }, '플레이어에게 가는 중', 'chase');
@@ -417,7 +440,7 @@ export class WorldSim {
   private reinforce(scene: string, arch: '경찰' | '경비', x: number): void {
     const len = this.graph.scene(scene)?.length ?? 1280;
     const gate = Math.abs(x - 30) > Math.abs(x - (len - 30)) ? 30 : len - 30;
-    const c = this.add({ id: `mob${++serial}`, name: arch, kind: 'mob', brain: 'transit', home: scene, archetype: arch, look: arch, speed: 170 }, { scene, x: gate, y: this.laneMid(scene) });
+    const c = this.add({ id: `mob${++serial}`, name: arch, kind: 'mob', brain: 'transit', home: scene, archetype: arch, look: this.lookOf(arch), speed: 170 }, { scene, x: gate, y: this.laneMid(scene) });
     c.plan = 'chase';
     c.run = 1.4;
     this.walkTo(c, { x, y: c.y }, arch === '경찰' ? '지원 출동' : '호출받고 오는 중', 'chase');
@@ -513,6 +536,57 @@ export class WorldSim {
     this.stepCorpses();
     for (const r of this.spawns) this.stepSpawn(r, dt);
     for (const p of this.posts) this.stepPost(p);
+    this.stepPatrol(dt);
+  }
+
+  /** 평소 거리 순찰 (C16): 거리 장면마다 가끔 경찰 1~2명이 한쪽 끝에서 들어와 천천히 걸어 반대쪽으로 나간다.
+   *  걷다 무전·메모·두리번. 순찰이 있는 동안 그 장면에선 소매치기·시비를 안 벌이고, 범죄가 나면 먼저 달려온다(crime). 시체를 보면 현장을 맡는다 */
+  private stepPatrol(dt: number): void {
+    for (const r of this.spawns) {
+      const scene = r.scene;
+      if (this.graph.kind(scene) !== 'street') continue;
+      const left = (this.patrolT.get(scene) ?? range(this.rng, PATROL.every[0], PATROL.every[1]) * 0.5) - dt;
+      if (left > 0) { this.patrolT.set(scene, left); continue; }
+      this.patrolT.set(scene, range(this.rng, PATROL.every[0], PATROL.every[1]));
+      // 이미 경찰이 있거나(순찰·출동·현장) 소란이 크면 건너뜀
+      if (this.actors.some((a) => a.scene === scene && a.def.archetype === '경찰' && a.act !== 'gone') || this.uproarLevel(scene) >= 2) continue;
+      if (this.rng() >= PATROL.chance) continue;
+      this.spawnPatrol(scene, r.gates);
+    }
+  }
+  /** 순찰 경찰 한 조를 들여보낸다 (시험·개발 도구도 부른다). 들어온 사람들 */
+  spawnPatrol(scene: string, gates?: number[]): Actor[] {
+    const len = this.graph.scene(scene)?.length ?? 1280;
+    const gs = gates?.length ? gates : [30, len - 30];
+    const px = this.player?.scene === scene ? this.player.x : null;
+    // 보이는 장면이면 주인공에서 먼 쪽 출입구로 (갑자기 옆에 생기지 않게)
+    const from = px === null ? pick(this.rng, gs) : [...gs].sort((p, q) => Math.abs(q - px) - Math.abs(p - px))[0];
+    const to = gs.filter((g) => g !== from).sort((p, q) => Math.abs(q - from) - Math.abs(p - from))[0] ?? (from < len / 2 ? len - 30 : 30);
+    const [top, bot] = this.graph.lane(scene);
+    const y = range(this.rng, top + 30, bot - 30);
+    const speed = range(this.rng, PATROL.speed[0], PATROL.speed[1]);
+    const out: Actor[] = [];
+    const n = this.rng() < PATROL.pair ? 2 : 1;
+    const arch = ARCHETYPES['경찰'];
+    for (let i = 0; i < n; i++) {
+      const dy = i === 0 ? 0 : y - top > bot - y ? -26 : 26;
+      const a = this.add({ id: `mob${++serial}`, name: '경찰', kind: 'mob', brain: 'transit', home: scene, archetype: '경찰', look: arch?.looks?.length ? pick(this.rng, arch.looks) : '경찰', speed }, { scene, x: from - (i ? Math.sign(to - from) * 24 : 0), y: y + dy });
+      a.patrol = true;
+      a.exitAt = { x: to, y: y + dy };
+      if (i && out[0]) { a.buddy = out[0].def.id; a.buddyDy = dy; }
+      this.walkTo(a, a.exitAt, i ? '동료와 순찰' : '순찰 중', 'exit');
+      out.push(a);
+    }
+    return out;
+  }
+  /** 원형의 그림 하나 (원형 이름 = 실루엣이라 그림 목록에서 고른다) */
+  private lookOf(arch: string): string {
+    const l = ARCHETYPES[arch]?.looks;
+    return l?.length ? pick(this.rng, l) : arch;
+  }
+  /** 그 장면에 순찰 경찰이 있나 (싸움·쓰러짐·나감 제외) */
+  private patrolIn(scene: string): Actor | undefined {
+    return this.actors.find((q) => q.scene === scene && q.patrol && q.plan !== 'chase' && !q.fighting && !['down', 'dead', 'gone'].includes(q.act));
   }
 
   // ── 한 사람 ──
@@ -770,6 +844,12 @@ export class WorldSim {
     const kind = this.graph.kind(a.scene), outside = kind === 'street' || kind === 'shop';
     const role = ARCHETYPES[a.def.archetype ?? '']?.role;
     const buddy = this.actors.find((q) => q.buddy === a.def.id && q.scene === a.scene);
+    if (a.patrol) {
+      const po = PATROL_PAUSES.filter((o) => this.canClip(a, o.clip));
+      if (!po.length) return;
+      const o = pick(this.rng, po);
+      return this.pauseAs(a, o.clip, o.doing, range(this.rng, o.sec[0], o.sec[1]), buddy);
+    }
     const w: Record<string, number> = {
       phone: 3, call: 1.2, coffee: morning ? 3 : 0.8, limber: morning ? 2 : 0.7, music: role === 'student' ? 2.5 : 1, smoke: (night ? 2.5 : 1) * (role === 'thug' ? 2 : 1),
       browse: 0.5 + 2.5 * t.curious, snack: 0.8, front: 0.8, back: outside ? 1.5 : 0.4, spot: t.curious, rest: 1, idle: 2,
@@ -1100,6 +1180,8 @@ export class WorldSim {
       return;
     }
     if (this.incidents(a.scene) >= 2) return;
+    // 순찰 경찰이 있는 동안은 손을 안 댄다 (C16)
+    if (this.patrolIn(a.scene)) return;
     // 소매치기: 손버릇 있는 개체가 가까운 걷는 행인을 노린다
     if (t.sly > 0.3 && this.rng() < 0.05 + t.sly * 0.1) {
       const v = this.nearMob(a, 500, (q) => q.act === 'walk' && q.plan === 'exit' && !q.post);
@@ -1221,7 +1303,7 @@ export class WorldSim {
     const arch = this.graph.kind(scene) === 'street' ? '경찰' : '경비';
     const gate = Math.abs(x - 30) > Math.abs(x - (len - 30)) ? len - 30 : 30;
     const [top, bot] = this.graph.lane(scene);
-    const c = this.add({ id: `mob${++serial}`, name: arch, kind: 'mob', brain: 'transit', home: scene, archetype: arch, look: arch, speed: 170 }, { scene, x: gate, y: this.laneMid(scene) });
+    const c = this.add({ id: `mob${++serial}`, name: arch, kind: 'mob', brain: 'transit', home: scene, archetype: arch, look: this.lookOf(arch), speed: 170 }, { scene, x: gate, y: this.laneMid(scene) });
     c.run = 1.3;
     const side = x > gate ? -1 : 1;
     this.walkTo(c, { x: x + side * 110, y: Math.max(top + 10, Math.min(bot - 10, y + 40)) }, '현장으로 가는 중', 'cordon');
@@ -1306,6 +1388,18 @@ export class WorldSim {
   private seeBody(a: Actor): void {
     if (a.sawBody || a.fighting || a.post || a.def.kind !== 'mob' || !['walk', 'idle', 'pause'].includes(a.act) || a.plan === 'chase' || a.plan === 'cordon') return;
     const role = ARCHETYPES[a.def.archetype ?? '']?.role;
+    // 순찰 경찰이 시체를 봄: 현장 경찰이 아직 없으면 자기가 맡는다 (라인·수습까지)
+    if (a.patrol) {
+      const body = this.actors.find((q) => q.act === 'dead' && q.scene === a.scene && Math.abs(q.x - a.x) < SEE_BODY_PX * 1.5);
+      if (!body || this.actors.some((q) => q.scene === a.scene && q.plan === 'cordon')) return;
+      a.sawBody = true;
+      a.patrol = false;
+      a.buddy = undefined;
+      const [top, bot] = this.graph.lane(a.scene);
+      this.iconOn(a, '!', 2);
+      this.say(a, '여기 현장 통제합니다.', 2.5);
+      return this.walkTo(a, { x: body.x + (a.x < body.x ? -110 : 110), y: Math.max(top + 10, Math.min(bot - 10, body.y + 40)) }, '현장으로 가는 중', 'cordon');
+    }
     if (role === 'police' || role === 'guard') return;
     const b = this.actors.find((q) => q.act === 'dead' && q.scene === a.scene && Math.abs(q.x - a.x) < SEE_BODY_PX && Math.abs(q.y - a.y) < 140);
     if (!b) return;

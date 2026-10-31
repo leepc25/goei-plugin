@@ -743,3 +743,59 @@ test('훈련장 장비: 샌드백·허수아비·과녁이 방 길이에 비례�
   assert.ok(doings.has('사격 훈련') && (doings.has('샌드백 치기') || doings.has('허수아비 치기')), [...doings].join(','));
   assert.ok(sim.gear('gym').some((q) => q.busy));
 });
+
+// C16 평소 거리 순찰 (10-31): 거리 장면에 가끔 경찰 1~2명이 천천히 지나가고, 범죄가 나면 먼저 달려오고, 시체를 보면 현장을 맡는다
+test('순찰 경찰: 거리에만 가끔 들어와 지나가고, 실내엔 없음', () => {
+  const sim = new A.WorldSim(graph(), R.mulberry32(5), [
+    { scene: 'jongno', target: { day: 0, night: 0 }, refill: [1, 2], mix: ['행인'] },
+    { scene: 'lobby', target: { day: 0, night: 0 }, refill: [1, 2], mix: ['방문객'] },
+  ]);
+  const seen = new Set();
+  for (let i = 0; i < 20 * 60 * 10; i++) {
+    sim.step(0.1, { scene: 'f3', x: 400, hour: 14 });
+    for (const a of sim.actors) if (a.patrol) seen.add(`${a.scene}:${a.def.id}`);
+  }
+  const ids = [...seen];
+  assert.ok(ids.length >= 2, `20분 동안 순찰 ${ids.length}`);
+  assert.ok(ids.every((k) => k.startsWith('jongno:')), `거리에만 ${ids}`);
+});
+
+test('순찰 경찰: 범죄가 나면 그 장면 순찰이 먼저 달려오고, 있는 동안 소매치기·시비를 안 벌인다', () => {
+  const sim = new A.WorldSim(graph(), R.mulberry32(8));
+  const [p] = sim.spawnPatrol('jongno');
+  assert.ok(p.patrol && p.plan === 'exit' && /순찰/.test(p.doing));
+  const before = sim.actors.filter((a) => a.def.archetype === '경찰').length;
+  sim.crime('jongno', 2000);
+  assert.equal(p.plan, 'chase', '순찰이 달려옴');
+  // 순찰(들)이 출동 인원(1 + 소란 단계)에 먼저 들어가고, 모자란 만큼만 새로 부른다
+  const need = 1 + sim.uproarLevel('jongno');
+  assert.equal(sim.actors.filter((a) => a.def.archetype === '경찰').length, Math.max(before, need), '모자란 만큼만 새로');
+  // 손버릇 높은 불량배: 순찰이 있으면 소매치기 안 함
+  const sim2 = new A.WorldSim(graph(), R.mulberry32(9));
+  sim2.spawnPatrol('jongno');
+  const t = sim2.add({ id: 't1', name: '불량배', kind: 'mob', brain: 'transit', home: 'jongno', archetype: '불량배', look: '불량배' }, { scene: 'jongno', x: 1000, y: 550 });
+  t.temper = { courage: 0.9, social: 0.5, haste: 0.5, curious: 0.1, sly: 1 };
+  for (let i = 0; i < 6; i++) sim2.add({ id: `v${i}`, name: '행인', kind: 'mob', brain: 'transit', home: 'jongno', archetype: '행인', look: '행인' }, { scene: 'jongno', x: 900 + i * 60, y: 560 });
+  for (const a of sim2.actors) if (a.def.id !== 't1' && !a.patrol) { a.exitAt = { x: 3900, y: a.y }; }
+  let stole = false;
+  for (let i = 0; i < 600; i++) { sim2.step(0.1, { scene: 'f3', x: 400, hour: 14 }); if (sim2.events.some((e) => e.kind === 'steal')) stole = true; if (!sim2.actors.some((a) => a.patrol)) break; }
+  assert.equal(stole, false, '순찰이 있는 동안 소매치기 없음');
+});
+
+test('순찰 경찰: 지나가다 시체를 보면 현장 경찰이 된다 (라인)', () => {
+  const sim = new A.WorldSim(graph(), R.mulberry32(12));
+  const body = sim.add({ id: 'b1', name: '행인', kind: 'mob', brain: 'transit', home: 'jongno', archetype: '행인', look: '행인' }, { scene: 'jongno', x: 600, y: 560 });
+  body.act = 'dead';
+  body.goal = null;
+  const team = sim.spawnPatrol('jongno', [30, 3970]);
+  // 한 조(1~2명) 중 한 명이 맡는다
+  const cop = () => team.find((q) => q.plan === 'cordon');
+  for (let i = 0; i < 1200 && !cop(); i++) sim.step(0.1, { scene: 'f3', x: 400, hour: 14 });
+  const p = cop();
+  assert.ok(p, `순찰 → 현장 (${team.map((q) => q.doing)})`);
+  assert.equal(p.patrol, false);
+  assert.equal(team.filter((q) => q.plan === 'cordon').length, 1, '한 명만');
+  for (let i = 0; i < 600 && p.doing !== '현장 통제'; i++) sim.step(0.1, { scene: 'f3', x: 400, hour: 14 });
+  assert.equal(p.doing, '현장 통제');
+  assert.ok(sim.obstacles('jongno').length > 0, '라바콘 라인');
+});
