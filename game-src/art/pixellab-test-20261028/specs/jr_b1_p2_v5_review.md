@@ -1,6 +1,6 @@
 # 검토서 jr_b1_p2_v5
 
-방 corridor · 분위기 worn · 문 0 · 원근 corridor · 바닥 the lower 30 percent · 양옆 none · 채우기 packed+
+방 corridor · 분위기 worn · 문 0 · 원근 corridor · 바닥 the lower 40 percent · 양옆 none · 채우기 packed+
 
 ## 점검 결과
 
@@ -21,6 +21,7 @@
 - 사용자: v3(10-31): 바닥 이음선 또 생김 → 「선·격자·판」 낱말 쓰지 않고 있는 모양만(물에 젖은 한 장처럼 부은 콘크리트). 가게가 왼쪽에 몰림 → 가게를 더 크게 가운데에(사용자: 그래야 이어 붙이고 기둥으로 가린다). 팔레트는 ①과 같게, 가게 빛만 흰색
 - 사용자: v4(10-31): 장마다 원근이 다름이 가장 큰 문제(사용자) → 「그림 말고 선으로만 원근을 잡아서 첨부」(사용자 제안): 선 가이드 jr_corridor_guide_v1을 참고 그림으로
 - 사용자: 가이드 고침: 위 천장이 너무 큼(사용자) → 천장선 y36, 소실점 y170(눈높이), 가게 안 깊이 얕게
+- 사용자: 가이드 고침: 통행 바닥이 여전히 좁음(사용자) → 뒷벽선 y262(바닥 약 38%), 천장 y26, 가게 입구 사람의 약 1.4배
 
 ## 설계안·위키 항목 대조
 
@@ -68,12 +69,12 @@
 - 이유 없는 채움 물건·같은 물건 두 번·쓸데없이 긴 설명이 있나?
   - 같은 물건 두 번 없음, packed+
 - 원근·바닥 몫·양옆 벽·문·채우기가 이 장면에 정한 대로인가?
-  - 통로 원근(뒷벽 끝까지 곧게), 옆벽 없음, 가게 가운데 80%, 양끝 10% 비움, 바닥은 선 낱말 없이 부은 콘크리트, 참고 그림 없음, 벽·천장 ①과 같음, 팔레트 ①과 같음(가게 빛만 흰색), 원근은 선 가이드(뒷벽선 y300·천장선 y36·소실점 316,170·가게 입구 x126~506 y92~300)
+  - 통로 원근(뒷벽 끝까지 곧게), 옆벽 없음, 가게 가운데 80%, 양끝 10% 비움, 바닥은 선 낱말 없이 부은 콘크리트, 참고 그림 없음, 벽·천장 ①과 같음, 팔레트 ①과 같음(가게 빛만 흰색), 원근은 선 가이드(뒷벽선 y262·천장선 y26·소실점 316,132·가게 입구 x126~506 y66~262)
 
 ## 2차 요청문 (1996자)
 
 ```
-Pixel art game background of a run-down 1990s Seoul underground arcade corridor, low ceiling right above the sign, night. Camera at standing eye height, about 20 degrees above the floor, looking slightly down. One-point depth, but the back wall runs straight and level across the full width. The floor fills the lower 30 percent of the image. No side walls: the room keeps going past both image edges.
+Pixel art game background of a run-down 1990s Seoul underground arcade corridor, low ceiling right above the sign, night. Camera at standing eye height, about 20 degrees above the floor, looking slightly down. One-point depth, but the back wall runs straight and level across the full width. The floor fills the lower 40 percent of the image. No side walls: the room keeps going past both image edges.
 FLOOR: smooth dark poured concrete like one wet sheet, mottled grime, oil stains, puddles, varied litter all over the walkway, light pool, shadows under objects.
 VERY CLUTTERED: every wall, shelf and corner packed with small props: left 10 percent of the image: only bare back wall and floor, no side wall; back wall, centered: a big open hardware store filling the middle 80 percent of the width, recessed like a deep room lit by cold white fluorescent tubes, inner side walls visible, crammed with hundreds of tiny tools, padlocks, metal parts and clutter, vertical blade sign reading "성원철물" in pixel letters; in front of the store: wheeled display cart jutting onto the walkway, top and front visible, bins of nails and bolts; hardware boxes, coiled hose, stacked buckets beside the cart; oil stain under the cart; wall base right beside the store: collapsed cardboard, torn trash bag, rusty cans, each a different shape; dented metal trash can, recycle bin; faded fire extinguisher box; two torn blank posters; rusty air conditioner, tangled cables; right 10 percent of the image: only bare back wall and floor, no side wall.
 WALL: grimy concrete, rust, mold, cracks; ceiling strip, tangled cables, fluorescent tubes, one dead, one flickering.
