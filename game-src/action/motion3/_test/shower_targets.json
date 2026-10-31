@@ -682,5 +682,11 @@
   "g": "woman",
   "body": "an ordinary Korean woman in her late twenties with straight black shoulder-length hair and a center part",
   "full": "an ordinary Korean woman in her late twenties with straight black shoulder-length hair and a center part, gray-blue blouse, charcoal ankle-length trousers, black low-heeled office shoes and a small handbag at the left hip on a narrow shoulder strap"
+ },
+ "1.12_콘쥬스": {
+  "dir": "west",
+  "g": "woman",
+  "body": "a slim young woman in her early twenties with a chin-length black bob with straight bangs and one pink streak at the front",
+  "full": "a slim young woman in her early twenties with a chin-length black bob with straight bangs and one pink streak at the front, navy uniform blazer with white piping, white shirt, dark gray necktie, short gray pleated skirt, black knee socks and black loafers"
  }
 }

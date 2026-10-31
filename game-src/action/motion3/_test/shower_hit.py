@@ -53,13 +53,29 @@ SHOUT = {
  "화냄": f"{COVER}, leaning forward angrily and yelling at the intruder with the mouth wide open, jabbing toward the door again and again",
  "무심": f"{LOOSE}, giving the intruder one flat look, then calmly turning the back to them",
 }[TYPE] + (f", {MANNER}" if MANNER else "")
+# S1~S5도 성향마다 다르게 (10-31 사용자: 여섯 가지 전부 달라야)
+_C = {"당당": LOOSE, "무심": LOOSE}.get(TYPE, COVER)
+_M = f", {MANNER}" if MANNER else ""
+HIT = {"당당": f"{pro} grunts and staggers half a step back, {_C}, then straightens up glaring",
+       "수줍": f"{pro} cries out, curls up and turns the shoulders away, {_C}, staggering back",
+       "화냄": f"{pro} yelps and staggers back, {_C}, then snarls back furiously",
+       "무심": f"{pro} staggers half a step back with a flat face, {_C}, then stands still again"}[TYPE] + _M
+RUN = {"당당": f"running {side} in place with long, steady strides, {_C}, the head up",
+       "수줍": f"running {side} in place hunched forward with short panicked steps, {_C}, the face flushed",
+       "화냄": f"running {side} in place with stomping steps, {_C}, shouting over the shoulder",
+       "무심": f"jogging {side} in place at an even pace, {_C}, the face calm"}[TYPE] + _M
+FALL = {"당당": "lands on the back, then props up on one elbow glaring", "수줍": "lands on the back and curls up tight",
+        "화냄": "lands on the back and shouts in pain and anger", "무심": "lands on the back and lies still with a blank face"}[TYPE]
+RISE = {"당당": "gets up briskly", "수줍": "gets up slowly and timidly, hunching", "화냄": "scrambles up furiously", "무심": "gets up without hurry"}[TYPE]
+CROUCH = {"당당": "drops into a low crouch on one knee, glaring up at the attacker", "수줍": "drops into a low crouch hugging the knees to the chest, the head ducked, trembling",
+          "화냄": "drops into a low crouch, hugging the knees and yelling", "무심": "squats down low, arms around the knees, the face calm"}[TYPE]
 STEPS = {
- "S1": ("A", 8, "back", f"Standing bare {side}, struck hard from the front: {pro} flinches with a startled, pained face, hunches and turns the shoulders away, {COVER}, and staggers half a step back, then straightens a little, still covering. No towel. {DRAW}"),
- "S2": ("A", 8, "loop", f"Running {side} in place, barefoot and bare, hunched forward with a panicked face, {COVER} the whole time, short quick steps. No towel. {DRAW}"),
- "S3": ("A", 8, None, f"Standing bare {side}, hit by a heavy blow: {pro} is thrown backward off the feet, lands on the back on the floor and lies there with the knees drawn up and {COVER}. Last frame: lying on the back on the floor, covering. No towel. {DRAW}"),
- "S4": ("S3", 8, "back", f"Lying bare on the back on the floor {side}, {COVER}: {pro} rolls to one side, gets up onto the knees and then to the feet, still covering, and ends standing hunched and covering. No towel. {DRAW}"),
+ "S1": ("A", 8, "back", f"Standing bare {side}, struck hard from the front: {HIT}. No towel, no effect lines. {DRAW}"),
+ "S2": ("A", 8, "loop", f"Barefoot and bare, {RUN}, the whole time. No towel, no effect lines. {DRAW}"),
+ "S3": ("A", 8, None, f"Standing bare {side}, hit by a heavy blow: {pro} is thrown backward off the feet, {FALL}, {_C}. Last frame: lying on the floor, covering. No towel, no effect lines. {DRAW}"),
+ "S4": ("S3", 8, "back", f"Lying bare on the floor {side}, {_C}: {pro} {RISE}, rolling to one side, onto the knees and then to the feet, still covering{_M}. No towel, no effect lines. {DRAW}"),
  "S6": ("A", 8, "loop", f"Standing bare {side}, reacting to someone who walked in by mistake: {SHOUT}. The feet stay planted. No towel, no effect lines. {DRAW}"),
- "S5": ("A", 8, None, f"Standing bare {side}, frightened: {pro} drops into a low crouch, hugging the knees to the chest and hiding the body, the head ducked, trembling. Last frame: crouched low, knees to the chest, covering. No towel. {DRAW}"),
+ "S5": ("A", 8, None, f"Standing bare {side}, cornered: {pro} {CROUCH}{_M}. Last frame: crouched low, knees to the chest, covering. No towel, no effect lines. {DRAW}"),
 }
 def b64(im):
     b = io.BytesIO(); im.save(b, "PNG"); return {"type": "base64", "base64": base64.b64encode(b.getvalue()).decode(), "format": "png"}

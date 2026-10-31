@@ -8,7 +8,7 @@
 "dir": "W",
 "armed": true,
 "npc": false,
-"kb": 1423
+"kb": 1555
 },
 {
 "key": "1.2_스팡달",
@@ -19,7 +19,7 @@
 "dir": "W",
 "armed": false,
 "npc": false,
-"kb": 1299
+"kb": 1402
 },
 {
 "key": "1.3_잼트리",
@@ -30,7 +30,7 @@
 "dir": "E",
 "armed": false,
 "npc": false,
-"kb": 1596
+"kb": 1697
 },
 {
 "key": "1.4_에일린",
@@ -41,7 +41,7 @@
 "dir": "E",
 "armed": true,
 "npc": false,
-"kb": 1647
+"kb": 760
 },
 {
 "key": "1.5_고그니쟈",
@@ -52,7 +52,7 @@
 "dir": "E",
 "armed": true,
 "npc": false,
-"kb": 2343
+"kb": 2570
 },
 {
 "key": "1.6_큐라스",
@@ -63,7 +63,7 @@
 "dir": "E",
 "armed": false,
 "npc": false,
-"kb": 1452
+"kb": 1607
 },
 {
 "key": "1.7_고르고디오",
@@ -74,7 +74,7 @@
 "dir": "E",
 "armed": true,
 "npc": false,
-"kb": 1991
+"kb": 2196
 },
 {
 "key": "1.8_데쥬레",
@@ -85,7 +85,7 @@
 "dir": "E",
 "armed": true,
 "npc": false,
-"kb": 1440
+"kb": 1558
 },
 {
 "key": "1.9_데드폴",
@@ -96,7 +96,7 @@
 "dir": "E",
 "armed": true,
 "npc": false,
-"kb": 1434
+"kb": 1584
 },
 {
 "key": "1.10_게슈간",
@@ -107,7 +107,7 @@
 "dir": "E",
 "armed": false,
 "npc": false,
-"kb": 1622
+"kb": 1780
 },
 {
 "key": "1.11_로제몬",
@@ -118,7 +118,7 @@
 "dir": "W",
 "armed": false,
 "npc": false,
-"kb": 1579
+"kb": 1706
 },
 {
 "key": "1.12_콘쥬스",
@@ -129,7 +129,7 @@
 "dir": "W",
 "armed": false,
 "npc": false,
-"kb": 1591
+"kb": 1789
 },
 {
 "key": "2.1_사장",
@@ -140,7 +140,7 @@
 "dir": "E",
 "armed": false,
 "npc": false,
-"kb": 1429
+"kb": 1545
 },
 {
 "key": "2.2_도필헌",
@@ -151,7 +151,7 @@
 "dir": "E",
 "armed": false,
 "npc": false,
-"kb": 1573
+"kb": 1700
 },
 {
 "key": "2.3_이길환",
@@ -162,7 +162,7 @@
 "dir": "E",
 "armed": true,
 "npc": false,
-"kb": 1512
+"kb": 1646
 },
 {
 "key": "2.4_이기석",
@@ -173,7 +173,7 @@
 "dir": "E",
 "armed": true,
 "npc": false,
-"kb": 1487
+"kb": 1666
 },
 {
 "key": "2.5_김조학",
@@ -184,7 +184,7 @@
 "dir": "E",
 "armed": true,
 "npc": false,
-"kb": 1720
+"kb": 1869
 },
 {
 "key": "2.6_이도형",
@@ -195,7 +195,7 @@
 "dir": "E",
 "armed": true,
 "npc": false,
-"kb": 2083
+"kb": 2332
 },
 {
 "key": "2.7_고영훈",
@@ -206,7 +206,7 @@
 "dir": "E",
 "armed": true,
 "npc": false,
-"kb": 1295
+"kb": 1386
 },
 {
 "key": "2.8_노기균",
@@ -217,7 +217,7 @@
 "dir": "E",
 "armed": true,
 "npc": false,
-"kb": 1698
+"kb": 1875
 },
 {
 "key": "2.9_송주익",
@@ -228,7 +228,7 @@
 "dir": "E",
 "armed": true,
 "npc": false,
-"kb": 1539
+"kb": 1707
 },
 {
 "key": "2.10_곽성주",
@@ -239,7 +239,7 @@
 "dir": "E",
 "armed": true,
 "npc": false,
-"kb": 2076
+"kb": 2321
 },
 {
 "key": "2.11_조성춘",
@@ -250,7 +250,7 @@
 "dir": "E",
 "armed": false,
 "npc": false,
-"kb": 1810
+"kb": 2013
 },
 {
 "key": "2.12_윤병수",
@@ -261,7 +261,7 @@
 "dir": "E",
 "armed": true,
 "npc": false,
-"kb": 1438
+"kb": 1571
 },
 {
 "key": "2.13_김성진",
@@ -272,7 +272,7 @@
 "dir": "E",
 "armed": true,
 "npc": false,
-"kb": 1647
+"kb": 1808
 },
 {
 "key": "2.14_송진섭",
@@ -283,7 +283,7 @@
 "dir": "E",
 "armed": true,
 "npc": false,
-"kb": 1586
+"kb": 1753
 },
 {
 "key": "3.1_청달래",
@@ -294,7 +294,7 @@
 "dir": "E",
 "armed": false,
 "npc": false,
-"kb": 1230
+"kb": 1311
 },
 {
 "key": "3.2_호유원",
@@ -305,7 +305,7 @@
 "dir": "E",
 "armed": true,
 "npc": false,
-"kb": 1890
+"kb": 2084
 },
 {
 "key": "3.3_백석주",
@@ -316,7 +316,7 @@
 "dir": "E",
 "armed": false,
 "npc": false,
-"kb": 1382
+"kb": 1480
 },
 {
 "key": "3.4_진나솔",
@@ -327,7 +327,7 @@
 "dir": "E",
 "armed": false,
 "npc": false,
-"kb": 1290
+"kb": 1403
 },
 {
 "key": "3.5_이성해",
@@ -338,7 +338,7 @@
 "dir": "W",
 "armed": false,
 "npc": false,
-"kb": 1527
+"kb": 1677
 },
 {
 "key": "3.6_이자헌",
@@ -349,7 +349,7 @@
 "dir": "E",
 "armed": true,
 "npc": false,
-"kb": 1569
+"kb": 1690
 },
 {
 "key": "3.7_은하제",
@@ -360,7 +360,7 @@
 "dir": "E",
 "armed": true,
 "npc": false,
-"kb": 1328
+"kb": 1437
 },
 {
 "key": "3.8_박민성",
@@ -371,7 +371,7 @@
 "dir": "E",
 "armed": false,
 "npc": false,
-"kb": 1831
+"kb": 2019
 },
 {
 "key": "3.9_백사헌",
@@ -382,7 +382,7 @@
 "dir": "W",
 "armed": false,
 "npc": false,
-"kb": 1510
+"kb": 1679
 },
 {
 "key": "3.10_고영은",
@@ -393,7 +393,7 @@
 "dir": "E",
 "armed": false,
 "npc": false,
-"kb": 1262
+"kb": 1370
 },
 {
 "key": "3.11_강이학",
@@ -404,7 +404,7 @@
 "dir": "E",
 "armed": false,
 "npc": false,
-"kb": 1282
+"kb": 1367
 },
 {
 "key": "3.12_장허운",
@@ -415,7 +415,7 @@
 "dir": "W",
 "armed": false,
 "npc": false,
-"kb": 1761
+"kb": 1942
 },
 {
 "key": "3.13_곽제강",
@@ -426,7 +426,7 @@
 "dir": "E",
 "armed": true,
 "npc": false,
-"kb": 1978
+"kb": 2138
 },
 {
 "key": "3.14_이연화",
@@ -437,7 +437,7 @@
 "dir": "E",
 "armed": true,
 "npc": false,
-"kb": 1811
+"kb": 1945
 },
 {
 "key": "3.15_이병진",
@@ -448,7 +448,7 @@
 "dir": "E",
 "armed": true,
 "npc": false,
-"kb": 1898
+"kb": 2134
 },
 {
 "key": "3.16_제이",
@@ -459,7 +459,7 @@
 "dir": "E",
 "armed": false,
 "npc": false,
-"kb": 1525
+"kb": 1636
 },
 {
 "key": "4.1_차여진",
@@ -470,7 +470,7 @@
 "dir": "E",
 "armed": true,
 "npc": false,
-"kb": 1782
+"kb": 1891
 },
 {
 "key": "4.2_서윤지",
@@ -481,7 +481,7 @@
 "dir": "E",
 "armed": true,
 "npc": false,
-"kb": 1330
+"kb": 1414
 },
 {
 "key": "4.3_고연지",
@@ -492,7 +492,7 @@
 "dir": "E",
 "armed": true,
 "npc": false,
-"kb": 1756
+"kb": 1950
 },
 {
 "key": "4.4_윤지아",
@@ -503,7 +503,7 @@
 "dir": "E",
 "armed": false,
 "npc": false,
-"kb": 1555
+"kb": 1655
 },
 {
 "key": "4.5_마덕희",
@@ -514,7 +514,7 @@
 "dir": "W",
 "armed": false,
 "npc": false,
-"kb": 1302
+"kb": 1369
 },
 {
 "key": "4.6_문혜란",
@@ -525,7 +525,7 @@
 "dir": "E",
 "armed": true,
 "npc": false,
-"kb": 1389
+"kb": 1500
 },
 {
 "key": "4.7_신유리",
@@ -536,7 +536,7 @@
 "dir": "E",
 "armed": true,
 "npc": false,
-"kb": 1637
+"kb": 1734
 },
 {
 "key": "4.8_블라렛",
@@ -547,7 +547,7 @@
 "dir": "W",
 "armed": true,
 "npc": false,
-"kb": 1634
+"kb": 1762
 },
 {
 "key": "4.9_살라딘",
@@ -558,7 +558,7 @@
 "dir": "E",
 "armed": true,
 "npc": false,
-"kb": 1582
+"kb": 1732
 },
 {
 "key": "4.10_아벤샤",
@@ -569,7 +569,7 @@
 "dir": "E",
 "armed": false,
 "npc": false,
-"kb": 1720
+"kb": 1847
 },
 {
 "key": "5.1_세크리엠",
@@ -580,7 +580,7 @@
 "dir": "E",
 "armed": false,
 "npc": false,
-"kb": 1773
+"kb": 1912
 },
 {
 "key": "5.2_브라우니",
@@ -591,7 +591,7 @@
 "dir": "E",
 "armed": false,
 "npc": false,
-"kb": 2140
+"kb": 2385
 },
 {
 "key": "5.3_탐미주의",
@@ -602,7 +602,7 @@
 "dir": "E",
 "armed": false,
 "npc": false,
-"kb": 1692
+"kb": 1849
 },
 {
 "key": "6.1_가짜관리국검사A",
@@ -613,7 +613,7 @@
 "dir": "E",
 "armed": true,
 "npc": true,
-"kb": 1472
+"kb": 1599
 },
 {
 "key": "6.2_가짜관리국검사B",
@@ -624,7 +624,7 @@
 "dir": "E",
 "armed": true,
 "npc": true,
-"kb": 1611
+"kb": 1767
 },
 {
 "key": "6.3_가짜관리국검사C",
@@ -635,7 +635,7 @@
 "dir": "E",
 "armed": true,
 "npc": true,
-"kb": 1463
+"kb": 1648
 },
 {
 "key": "6.4_가짜관리국진압A",
@@ -646,7 +646,7 @@
 "dir": "E",
 "armed": true,
 "npc": true,
-"kb": 1494
+"kb": 1629
 },
 {
 "key": "6.5_가짜관리국진압B",
@@ -657,7 +657,7 @@
 "dir": "E",
 "armed": true,
 "npc": true,
-"kb": 1588
+"kb": 1753
 },
 {
 "key": "6.6_가짜관리국진압C",
@@ -668,7 +668,7 @@
 "dir": "E",
 "armed": true,
 "npc": true,
-"kb": 1717
+"kb": 1889
 },
 {
 "key": "6.7_불량배남1",
@@ -679,7 +679,7 @@
 "dir": "E",
 "armed": false,
 "npc": true,
-"kb": 1029
+"kb": 1143
 },
 {
 "key": "6.8_불량배남2",
@@ -690,7 +690,7 @@
 "dir": "E",
 "armed": false,
 "npc": true,
-"kb": 1159
+"kb": 1281
 },
 {
 "key": "6.9_불량배남3",
@@ -701,7 +701,7 @@
 "dir": "E",
 "armed": false,
 "npc": true,
-"kb": 1236
+"kb": 1371
 },
 {
 "key": "6.10_불량배여1",
@@ -712,7 +712,7 @@
 "dir": "E",
 "armed": false,
 "npc": true,
-"kb": 1319
+"kb": 1439
 },
 {
 "key": "6.11_불량배여2",
@@ -723,7 +723,7 @@
 "dir": "E",
 "armed": false,
 "npc": true,
-"kb": 1099
+"kb": 1204
 },
 {
 "key": "6.12_불량배여3",
@@ -734,7 +734,7 @@
 "dir": "W",
 "armed": false,
 "npc": true,
-"kb": 928
+"kb": 1023
 },
 {
 "key": "6.13_경찰남1",
@@ -745,7 +745,7 @@
 "dir": "E",
 "armed": true,
 "npc": true,
-"kb": 1201
+"kb": 1327
 },
 {
 "key": "6.14_경찰남2",
@@ -756,7 +756,7 @@
 "dir": "E",
 "armed": true,
 "npc": true,
-"kb": 1270
+"kb": 1398
 },
 {
 "key": "6.15_경찰여1",
@@ -767,7 +767,7 @@
 "dir": "E",
 "armed": true,
 "npc": true,
-"kb": 1007
+"kb": 1108
 },
 {
 "key": "6.16_경찰여2",
@@ -778,7 +778,7 @@
 "dir": "W",
 "armed": true,
 "npc": true,
-"kb": 1024
+"kb": 1125
 },
 {
 "key": "6.17_관리국남A",
@@ -789,7 +789,7 @@
 "dir": "E",
 "armed": true,
 "npc": true,
-"kb": 1287
+"kb": 1415
 },
 {
 "key": "6.18_관리국남B",
@@ -800,7 +800,7 @@
 "dir": "E",
 "armed": false,
 "npc": true,
-"kb": 1255
+"kb": 1366
 },
 {
 "key": "6.19_관리국여A",
@@ -811,7 +811,7 @@
 "dir": "W",
 "armed": true,
 "npc": true,
-"kb": 973
+"kb": 1037
 },
 {
 "key": "6.20_관리국여B",
@@ -822,7 +822,7 @@
 "dir": "E",
 "armed": true,
 "npc": true,
-"kb": 1175
+"kb": 1256
 },
 {
 "key": "6.21_백일몽남A",
@@ -833,7 +833,7 @@
 "dir": "E",
 "armed": true,
 "npc": true,
-"kb": 1176
+"kb": 1298
 },
 {
 "key": "6.22_백일몽남B",
@@ -844,7 +844,7 @@
 "dir": "E",
 "armed": true,
 "npc": true,
-"kb": 1291
+"kb": 1415
 },
 {
 "key": "6.23_백일몽여A",
@@ -855,7 +855,7 @@
 "dir": "W",
 "armed": true,
 "npc": true,
-"kb": 1070
+"kb": 1128
 },
 {
 "key": "6.24_백일몽여B",
@@ -866,7 +866,7 @@
 "dir": "E",
 "armed": true,
 "npc": true,
-"kb": 1152
+"kb": 1251
 },
 {
 "key": "6.25_협회남1",
@@ -877,7 +877,7 @@
 "dir": "E",
 "armed": true,
 "npc": true,
-"kb": 1548
+"kb": 1652
 },
 {
 "key": "6.26_협회남2",
@@ -888,7 +888,7 @@
 "dir": "E",
 "armed": true,
 "npc": true,
-"kb": 1205
+"kb": 1275
 },
 {
 "key": "6.27_협회여1",
@@ -899,7 +899,7 @@
 "dir": "E",
 "armed": true,
 "npc": true,
-"kb": 1104
+"kb": 1167
 },
 {
 "key": "6.28_협회여2",
@@ -910,7 +910,7 @@
 "dir": "E",
 "armed": true,
 "npc": true,
-"kb": 964
+"kb": 1032
 },
 {
 "key": "6.29_협회여3",
@@ -921,7 +921,7 @@
 "dir": "E",
 "armed": true,
 "npc": true,
-"kb": 1066
+"kb": 1123
 },
 {
 "key": "6.30_프리랜서남1",
@@ -932,7 +932,7 @@
 "dir": "E",
 "armed": false,
 "npc": true,
-"kb": 1709
+"kb": 1873
 },
 {
 "key": "6.31_프리랜서남2",
@@ -943,7 +943,7 @@
 "dir": "E",
 "armed": false,
 "npc": true,
-"kb": 1453
+"kb": 1597
 },
 {
 "key": "6.32_프리랜서남3",
@@ -954,7 +954,7 @@
 "dir": "E",
 "armed": true,
 "npc": true,
-"kb": 1409
+"kb": 1532
 },
 {
 "key": "6.33_프리랜서남4",
@@ -965,7 +965,7 @@
 "dir": "E",
 "armed": true,
 "npc": true,
-"kb": 1459
+"kb": 1586
 },
 {
 "key": "6.34_프리랜서여1",
@@ -976,7 +976,7 @@
 "dir": "E",
 "armed": true,
 "npc": true,
-"kb": 1453
+"kb": 1567
 },
 {
 "key": "6.35_프리랜서여2",
@@ -987,7 +987,7 @@
 "dir": "E",
 "armed": true,
 "npc": true,
-"kb": 1569
+"kb": 1734
 },
 {
 "key": "6.36_프리랜서여3",
@@ -998,7 +998,7 @@
 "dir": "E",
 "armed": true,
 "npc": true,
-"kb": 1187
+"kb": 1297
 },
 {
 "key": "6.37_프리랜서여4",
@@ -1009,7 +1009,7 @@
 "dir": "E",
 "armed": true,
 "npc": true,
-"kb": 1285
+"kb": 1403
 },
 {
 "key": "6.38_프리랜서여5",
@@ -1020,7 +1020,7 @@
 "dir": "E",
 "armed": true,
 "npc": true,
-"kb": 1224
+"kb": 1337
 },
 {
 "key": "6.39_상인남1",
@@ -1031,7 +1031,7 @@
 "dir": "E",
 "armed": false,
 "npc": true,
-"kb": 1270
+"kb": 1411
 },
 {
 "key": "6.40_상인남2",
@@ -1042,7 +1042,7 @@
 "dir": "E",
 "armed": false,
 "npc": true,
-"kb": 1489
+"kb": 1637
 },
 {
 "key": "6.41_상인남3",
@@ -1053,7 +1053,7 @@
 "dir": "E",
 "armed": false,
 "npc": true,
-"kb": 1186
+"kb": 1321
 },
 {
 "key": "6.42_상인남4",
@@ -1064,7 +1064,7 @@
 "dir": "E",
 "armed": false,
 "npc": true,
-"kb": 1195
+"kb": 1292
 },
 {
 "key": "6.43_상인여1",
@@ -1075,7 +1075,7 @@
 "dir": "E",
 "armed": false,
 "npc": true,
-"kb": 1136
+"kb": 1248
 },
 {
 "key": "6.44_상인여2",
@@ -1086,7 +1086,7 @@
 "dir": "E",
 "armed": false,
 "npc": true,
-"kb": 853
+"kb": 943
 },
 {
 "key": "6.45_상인여3",
@@ -1097,7 +1097,7 @@
 "dir": "E",
 "armed": false,
 "npc": true,
-"kb": 1025
+"kb": 1148
 },
 {
 "key": "6.46_의사1",
@@ -1108,7 +1108,7 @@
 "dir": "E",
 "armed": false,
 "npc": true,
-"kb": 1434
+"kb": 1551
 },
 {
 "key": "6.47_간호사1",
@@ -1119,7 +1119,7 @@
 "dir": "E",
 "armed": false,
 "npc": true,
-"kb": 1088
+"kb": 1146
 },
 {
 "key": "6.48_청소부남1",
@@ -1130,7 +1130,7 @@
 "dir": "E",
 "armed": false,
 "npc": true,
-"kb": 1303
+"kb": 1442
 },
 {
 "key": "6.49_청소부여1",
@@ -1141,7 +1141,7 @@
 "dir": "E",
 "armed": false,
 "npc": true,
-"kb": 1064
+"kb": 1174
 },
 {
 "key": "6.50_학생남1",
@@ -1152,7 +1152,7 @@
 "dir": "E",
 "armed": false,
 "npc": true,
-"kb": 927
+"kb": 1063
 },
 {
 "key": "6.51_학생남2",
@@ -1163,7 +1163,7 @@
 "dir": "E",
 "armed": false,
 "npc": true,
-"kb": 1078
+"kb": 1243
 },
 {
 "key": "6.52_학생여1",
@@ -1174,7 +1174,7 @@
 "dir": "E",
 "armed": false,
 "npc": true,
-"kb": 1085
+"kb": 1210
 },
 {
 "key": "6.53_학생여2",
@@ -1185,7 +1185,7 @@
 "dir": "E",
 "armed": false,
 "npc": true,
-"kb": 1042
+"kb": 1157
 },
 {
 "key": "6.54_시민남1",
@@ -1196,7 +1196,7 @@
 "dir": "E",
 "armed": false,
 "npc": true,
-"kb": 1145
+"kb": 1251
 },
 {
 "key": "6.55_시민남2",
@@ -1207,7 +1207,7 @@
 "dir": "E",
 "armed": false,
 "npc": true,
-"kb": 1122
+"kb": 1257
 },
 {
 "key": "6.56_시민남3",
@@ -1218,7 +1218,7 @@
 "dir": "E",
 "armed": false,
 "npc": true,
-"kb": 1170
+"kb": 1294
 },
 {
 "key": "6.57_시민남4",
@@ -1229,7 +1229,7 @@
 "dir": "E",
 "armed": false,
 "npc": true,
-"kb": 1200
+"kb": 1321
 },
 {
 "key": "6.58_시민남5",
@@ -1240,7 +1240,7 @@
 "dir": "E",
 "armed": false,
 "npc": true,
-"kb": 1101
+"kb": 1220
 },
 {
 "key": "6.59_시민남6",
@@ -1251,7 +1251,7 @@
 "dir": "E",
 "armed": false,
 "npc": true,
-"kb": 1342
+"kb": 1520
 },
 {
 "key": "6.60_시민남7",
@@ -1262,7 +1262,7 @@
 "dir": "E",
 "armed": false,
 "npc": true,
-"kb": 1317
+"kb": 1476
 },
 {
 "key": "6.61_시민남8",
@@ -1273,7 +1273,7 @@
 "dir": "E",
 "armed": false,
 "npc": true,
-"kb": 1172
+"kb": 1319
 },
 {
 "key": "6.62_시민남9",
@@ -1284,7 +1284,7 @@
 "dir": "E",
 "armed": false,
 "npc": true,
-"kb": 1129
+"kb": 1259
 },
 {
 "key": "6.63_시민여1",
@@ -1295,7 +1295,7 @@
 "dir": "E",
 "armed": false,
 "npc": true,
-"kb": 903
+"kb": 982
 },
 {
 "key": "6.64_시민여2",
@@ -1306,7 +1306,7 @@
 "dir": "E",
 "armed": false,
 "npc": true,
-"kb": 1005
+"kb": 1125
 },
 {
 "key": "6.65_시민여3",
@@ -1317,7 +1317,7 @@
 "dir": "E",
 "armed": false,
 "npc": true,
-"kb": 926
+"kb": 1020
 },
 {
 "key": "6.66_시민여4",
@@ -1328,7 +1328,7 @@
 "dir": "E",
 "armed": false,
 "npc": true,
-"kb": 893
+"kb": 992
 },
 {
 "key": "6.67_시민여5",
@@ -1339,7 +1339,7 @@
 "dir": "E",
 "armed": false,
 "npc": true,
-"kb": 944
+"kb": 1048
 },
 {
 "key": "6.68_시민여6",
@@ -1350,7 +1350,7 @@
 "dir": "E",
 "armed": false,
 "npc": true,
-"kb": 1170
+"kb": 1279
 },
 {
 "key": "6.69_시민여7",
@@ -1361,7 +1361,7 @@
 "dir": "E",
 "armed": false,
 "npc": true,
-"kb": 1041
+"kb": 1181
 },
 {
 "key": "6.70_시민여8",
@@ -1372,7 +1372,7 @@
 "dir": "E",
 "armed": false,
 "npc": true,
-"kb": 858
+"kb": 965
 },
 {
 "key": "6.71_시민여9",
@@ -1383,6 +1383,6 @@
 "dir": "E",
 "armed": false,
 "npc": true,
-"kb": 1021
+"kb": 1127
 }
 ]
