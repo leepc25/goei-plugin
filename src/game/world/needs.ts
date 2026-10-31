@@ -3,8 +3,9 @@
 // 활동은 그 인물에게 클립이 있을 때만 켜진다 — 없는 동작을 대기 그림으로 때우지 않는다. 켜진 활동이 없으면 서성이기.
 import type { PlaceGraph, PlaceKind } from './places';
 
-export type NeedId = 'work' | 'hunger' | 'energy' | 'bladder' | 'bowel' | 'social' | 'fun';
-export const NEEDS: NeedId[] = ['work', 'hunger', 'energy', 'bladder', 'bowel', 'social', 'fun'];
+/** train = 단련(10-31 사용자: 전투 NPC·이름 요원은 모두 훈련장에 가서 훈련한다. 사무·안내·의료·청소 직원은 없음) */
+export type NeedId = 'work' | 'hunger' | 'energy' | 'bladder' | 'bowel' | 'social' | 'fun' | 'train';
+export const NEEDS: NeedId[] = ['work', 'hunger', 'energy', 'bladder', 'bowel', 'social', 'fun', 'train'];
 export type Needs = Record<NeedId, number>;
 
 /** 활동 하나: 어느 욕구를, 어떤 클립으로, 어떤 장소 종류에서, 얼마나 */
@@ -32,10 +33,12 @@ export const ACTIVITIES: Activity[] = [
   { id: 'poo', need: 'bowel', clip: 'poo', where: ['restroom'], sec: [25, 40], fill: 5, label: '화장실(대)' },
   { id: 'chat', need: 'social', clip: 'talk', where: ['office', 'lounge', 'corridor'], sec: [12, 25], fill: 6, label: '수다 중', partner: true },
   { id: 'hobby', need: 'fun', clip: 'hobby', where: ['lounge'], sec: [30, 60], fill: 3, label: '취미' },
+  // 훈련: 팔굽혀펴기·장비 점검·기지개, 그 줄이 없으면 약공 연습(모든 인물에게 있음). 싸우는 몸만 (choose fighter)
+  { id: 'train', need: 'train', clip: 'train', where: ['training'], sec: [40, 90], fill: 2.5, label: '훈련' },
 ];
 
 /** 생활 1초당 줄어드는 양 (기본). 인물 계수가 곱해진다. 대략 몇 분에 한 번씩 각 욕구가 고개를 든다 */
-export const DECAY: Needs = { work: 0.35, hunger: 0.12, energy: 0.08, bladder: 0.2, bowel: 0.05, social: 0.18, fun: 0.12 };
+export const DECAY: Needs = { work: 0.35, hunger: 0.12, energy: 0.08, bladder: 0.2, bowel: 0.05, social: 0.18, fun: 0.12, train: 0.06 };
 
 /** 인물별 성향 (욕구 계수·취향). 없는 칸은 1. 원작 근거는 docs/본부_설계_2판.md 4장 */
 export interface Temper {
@@ -102,11 +105,14 @@ export function choose(o: {
   partnerIn: (scene: string) => boolean;
   rand: () => number;
   last?: string;
+  /** 싸우는 몸(이름 요원·전투 NPC)인가: 훈련은 이 몸만 */
+  fighter?: boolean;
 }): Choice | null {
   const t = TEMPER[o.name];
   let best: Choice | null = null;
   for (const a of ACTIVITIES) {
     if (!o.has(a.clip)) continue;
+    if (a.need === 'train' && !o.fighter) continue;
     const lack = 100 - o.needs[a.need];
     if (lack < 25) continue;
     const kinds = a.id === 'hobby' && t?.hobbyAt ? t.hobbyAt : a.where;

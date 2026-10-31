@@ -899,7 +899,7 @@ export class WorldSim {
       const c = choose({
         name: a.def.name, needs: a.needs, scene: a.scene, roam, graph: this.graph, has: (clip) => this.canClip(a, clip), duty: onDuty(this.hour, TEMPER[a.def.name]),
         partnerIn: (s) => this.actors.some((q) => q !== a && q.def.kind === 'named' && q.scene === s && (q.act === 'idle' || q.act === 'walk') && !q.route.length),
-        rand: this.rng, last: a.last,
+        rand: this.rng, last: a.last, fighter: true,   // 이름 요원은 모두 싸우는 몸
       });
       if (c) {
         a.task = c.act;
@@ -1480,7 +1480,7 @@ export class WorldSim {
     const c = choose({
       name: a.def.name, needs: a.needs, scene: a.scene, roam, graph: this.graph, has: (clip) => this.canClip(a, clip), duty: false,
       partnerIn: (s) => this.actors.some((q) => q !== a && q.scene === s && (q.def.kind === 'named' || !!q.post) && ['idle', 'walk', 'post'].includes(q.act) && !q.route.length),
-      rand: this.rng, last: a.last,
+      rand: this.rng, last: a.last, fighter: ['guard', 'police'].includes(ARCHETYPES[a.def.archetype ?? '']?.role ?? ''),   // 경비·요원만 훈련
     });
     if (!c || c.score < 30) return false;
     a.task = c.act;

@@ -121,6 +121,8 @@ export const FIELD_CLIP: Record<string, { ids: string[]; fps?: number; loop?: bo
   sitdown: { ids: ['39'], fps: 8, loop: false }, backoff: { ids: ['37_1', '37'], fps: 8 }, crawl: { ids: ['38_1', '38'], fps: 8 }, scramble: { ids: ['42_1', '42'], fps: 9 },
   // 걷다 잠깐 멈춰 하는 일(10-30 사람처럼 걷기, world/actors.ts PAUSES): 그 줄이 있는 인물만
   pushup: { ids: ['144'], fps: 6 },
+  // 훈련(욕구): 팔굽혀펴기 → 장비 점검 → 기지개 → 약공 연습(모든 인물에게 있음) 중 그 인물에게 있는 첫 줄
+  train: { ids: ['144', '121', '143', '9'], fps: 6 },
   phone: { ids: ['147'], fps: 5 }, call: { ids: ['116'], fps: 5 }, coffee: { ids: ['142'], fps: 5 }, limber: { ids: ['143'], fps: 6, loop: false }, music: { ids: ['151'], fps: 6 },
   smoke: { ids: ['145', '90'], fps: 5 }, browse: { ids: ['168'], fps: 4 }, snack: { ids: ['157'], fps: 6 }, front: { ids: ['50'], fps: 1 / 0.6 }, back: { ids: ['57'], fps: 1 / 0.6 }, spot: { ids: ['33'], fps: 8, loop: false },
   down: { ids: ['19'], fps: 10, loop: false }, die: { ids: ['44'], fps: 9, loop: false }, dieLie: { ids: ['45'], fps: 6, loop: false }, getup: { ids: ['20'], fps: 9, loop: false },

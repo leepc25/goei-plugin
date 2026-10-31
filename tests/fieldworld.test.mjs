@@ -663,3 +663,28 @@ test('역할 표·인원 자동: 사무실 1곳당 사무 3(의자에서 책상 
   for (let t = 0; t < 30 * 5; t++) sim.step(1 / 30, { scene: 'elsewhere', x: 0, hour: 19 });
   assert.ok(sim.actors.filter((a) => a.post).length === 0);
 });
+
+test('훈련 욕구: 이름 요원·전투 NPC는 훈련장에 가서 훈련, 사무·안내·의료·청소 직원은 안 감', () => {
+  const sc = [
+    { id: 'f3', name: '3층', floor: '3F', length: 2400, lane: [420, 669], doors: [{ id: 'gym', x: 900, kind: 'door', to: 'gym', toDoor: 'out' }, { id: 'office', x: 400, kind: 'glass', to: 'office', toDoor: 'out' }] },
+    { id: 'office', name: '종합대응팀', floor: '3F', length: 1600, lane: [470, 680], doors: [{ id: 'out', x: 200, kind: 'exit', side: 'S', to: 'f3', toDoor: 'office' }] },
+    { id: 'gym', name: '훈련장', floor: '3F', length: 1600, lane: [470, 680], doors: [{ id: 'out', x: 200, kind: 'exit', side: 'S', to: 'f3', toDoor: 'gym' }] },
+  ];
+  const g = new P.PlaceGraph(sc, []);
+  const sim = new A.WorldSim(g, R.mulberry32(2), {
+    posts: [{ id: 'g', archetype: '경비', scene: 'f3', how: 'fixed', spot: 1200, shifts: [[0, 24]], count: 1, gate: 100 }, { id: 'd', archetype: '안내 직원', scene: 'f3', how: 'fixed', spot: 1400, shifts: [[0, 24]], count: 1, gate: 100 }],
+    has: (_l, c) => ['walk', 'idle', 'train', 'work'].includes(c), sceneFaction: () => 'A00',
+  });
+  const agent = sim.add({ id: 'n', name: '쟈알디', kind: 'named', brain: 'needs', home: 'office', roam: ['office', 'f3', 'gym'], look: '쟈알디' });
+  sim.step(1 / 30, { scene: 'elsewhere', x: 0, hour: 20 });
+  const guard = sim.actors.find((a) => a.post?.id === 'g'), desk = sim.actors.find((a) => a.post?.id === 'd');
+  for (const a of [agent, guard, desk]) { for (const k of Object.keys(a.needs)) a.needs[k] = 100; a.needs.train = 5; }
+  const seen = new Set();
+  for (let t = 0; t < 30 * 300; t++) {
+    sim.step(1 / 30, { scene: 'elsewhere', x: 0, hour: 20 });
+    for (const a of [agent, guard, desk]) if (a.scene === 'gym' && a.act === 'do' && a.task?.id === 'train') seen.add(a.def.id);
+  }
+  assert.ok(seen.has('n'), '이름 요원 훈련');
+  assert.ok(seen.has(guard.def.id), '경비 훈련');
+  assert.ok(!seen.has(desk.def.id), '안내 직원은 안 감');
+});
