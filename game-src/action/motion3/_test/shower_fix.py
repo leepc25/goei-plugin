@@ -52,11 +52,19 @@ def dered(a, P):
     lab, n = ndimage.label(off, np.ones((3, 3)))
     sz = ndimage.sum(off, lab, range(1, n + 1)) if n else []
     kill = np.isin(lab, [i + 1 for i, v in enumerate(sz) if v >= 40])
+    # 흰·검은 줄기(10-31 점검: 색이 G 팔레트에도 있어 위에서 안 걸림) → 아주 밝거나 아주 어두운 픽셀 덩어리 중 가로로 긴 것(폭 > 높이×3, 40px 이상)
+    rgb = a[..., :3].astype(int); lum = rgb.sum(-1)
+    ext = al & ((rgb.max(-1) - rgb.min(-1) < 28) | (lum < 90) | (rgb.min(-1) > 215))   # 무채색(검정·회색·흰색)
+    le, ne = ndimage.label(ext, np.ones((3, 3)))
+    for i, sl in enumerate(ndimage.find_objects(le)):
+        if sl is None: continue
+        h = sl[0].stop - sl[0].start; w = sl[1].stop - sl[1].start
+        if w > 3 * h and w >= 20 and (le[sl] == i + 1).sum() >= 40: kill |= le == i + 1
     a = a.copy(); a[kill] = 0
     lab2, n2 = ndimage.label(a[..., 3] > 0, np.ones((3, 3)))
     if n2 > 1:
         sz2 = ndimage.sum(a[..., 3] > 0, lab2, range(1, n2 + 1))
-        small = np.isin(lab2, [i + 1 for i, v in enumerate(sz2) if v < 30])
+        small = np.isin(lab2, [i + 1 for i, v in enumerate(sz2) if v < 300])
         a[small] = 0; kill |= small
     return a, int(kill.sum())
 
@@ -80,9 +88,15 @@ def fix(k, n):
     fl = floor_of(k, n) if n in GROUND else None
     out, moved, red = [], [], 0
     P = palette(k) if n in DERED else None
-    for f in fs:
-        a = np.array(Image.open(f).convert("RGBA"))
-        if n in DERED: a, c = dered(a, P); red += c
+    arrs = [np.array(Image.open(f).convert("RGBA")) for f in fs]
+    for i, f in enumerate(fs):
+        a = arrs[i]
+        if n in DERED:
+            a, c = dered(a, P); red += c
+            # 맞는 순간 장(첫 두 장)에 이펙트가 있었으면 이펙트 없는 다음 장으로 바꿈(10-31 점검: 몸에 붙은 흰 줄기는 다 안 지워짐)
+            if c > 0 and i < 2 and n == "H3" and len(arrs) > i + 1:
+                b, c2 = dered(arrs[i + 1], P)
+                if c2 == 0: a = b
         if fl is not None:
             b = bottom(a)
             if b is not None:
