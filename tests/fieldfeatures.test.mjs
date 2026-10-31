@@ -200,3 +200,20 @@ test('말다툼·수다: 캐릭터끼리도 말다툼(화난 포즈·#), 수다�
   assert.ok(argue >= 1, '말다툼이 일어남');
   assert.ok(chat >= 1, '수다 「…」');
 });
+
+test('퇴근·출근: 근무가 끝나면 거점 밖으로 나가 없어지고, 근무 시작에 그 입구로 들어온다. 동행 중엔 안 나간다', () => {
+  const w = sim();
+  const a = named(w, '에일린', 'office', 800);
+  const f = named(w, '쟈알디', 'office', 900);
+  run(w, 0.3, { scene: 'street', x: 100, y: 560, hour: 12 });
+  run(w, 0.1, { scene: 'office', x: 950, y: 560, hour: 12 });
+  w.setFollow('쟈알디', 'follow');
+  run(w, 90, { scene: 'office', x: 950, y: 560, hour: 20 });
+  assert.equal(a.commute?.state, 'off', `퇴근 ${a.scene} ${a.doing}`);
+  assert.ok(!w.inScene('office').includes(a) && !w.inScene('street').includes(a));
+  assert.ok(!f.commute && f.scene === 'office', '동행 중엔 안 나감');
+  assert.ok(w.events.some((e) => e.kind === 'shift' && e.who === '에일린' && !e.on));
+  run(w, 1, { scene: 'office', x: 950, y: 560, hour: 9 });
+  assert.ok(!a.commute && a.scene !== '', '출근');
+  assert.ok(w.events.some((e) => e.kind === 'shift' && e.who === '에일린' && e.on));
+});

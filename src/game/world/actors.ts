@@ -151,6 +151,8 @@ export interface Actor {
   escort?: string;
   /** 경보 대응 중인 거점 세력 (모이는 쪽) */
   alarm?: string;
+  /** 퇴근 (10-31 필드 기능 8번): out = 출구로 가는 중, off = 퇴근해 필드에 없음(나간 장면) */
+  commute?: { state: 'out' | 'off'; scene?: string; x?: number };
   /** 캐릭터 반응: 상황별 마지막 반응 시각(생활 초), 본 시체 id, 다가간 뒤 틀 동작 */
   reactAt?: Partial<Record<ReactSituation, number>>;
   sawBodies?: string[];
@@ -991,6 +993,64 @@ export class WorldSim {
     if (victim && this.alarms.get(fac)?.threats.includes(victim.def.id)) return;
     this.raiseAlarm(scene, x, 'player', why);
   }
+  // ── 퇴근·출근 (10-31 사용자 결정 8번): 근무가 끝나면 거점 출구로 나가 다음 근무까지 없고, 근무 시작 때 그 입구로 들어온다. 동행·기다림 중엔 안 나간다 ──
+  /** 퇴근해 필드에 없는 사람 (관찰 창·시험용) */
+  offDuty(): Actor[] {
+    return this.actors.filter((a) => a.commute?.state === 'off');
+  }
+  /** true = 이번 틱은 퇴근·출근이 맡았다 */
+  private stepCommute(a: Actor): boolean {
+    if (a.def.kind !== 'named' || a.def.brain !== 'needs' || this.hour == null) return false;
+    const fac = this.sceneFaction(a.def.home);
+    if (!fac) return false;
+    const duty = onDuty(this.hour, TEMPER[a.def.name]);
+    const c = a.commute;
+    if (c?.state === 'off') {
+      if (!duty) return true;
+      // 출근: 나갔던 바깥 장면의 그 문으로 들어와 자기 자리로
+      a.commute = undefined;
+      a.scene = c.scene ?? a.def.home;
+      a.x = c.x ?? a.x;
+      a.act = 'idle';
+      a.wait = 0;
+      const path = this.graph.route(a.scene, a.def.home);
+      const d = path?.length ? this.graph.doorSpot(a.scene, path[0].exit) : null;
+      if (path?.length && d) { a.route = path; this.walkTo(a, d, '출근', 'none'); }
+      this.events.push({ kind: 'shift', scene: a.scene, who: a.def.name, on: true });
+      return true;
+    }
+    if (duty || a.following || a.hold || a.fighting || a.brawl || a.alarm || ['down', 'dead', 'gone', 'door', 'scared'].includes(a.act)) {
+      if (c?.state === 'out' && duty) a.commute = undefined;   // 다시 근무 시간 (가다 말고 돌아섬)
+      return false;
+    }
+    // 거점 밖에 닿음 = 퇴근 완료
+    if (this.sceneFaction(a.scene) !== fac) {
+      a.commute = { state: 'off', scene: a.scene, x: a.x };
+      a.goal = null;
+      a.route = [];
+      a.act = 'idle';
+      a.doing = '퇴근함';
+      a.scene = '';
+      this.events.push({ kind: 'shift', scene: c?.scene ?? '', who: a.def.name, on: false });
+      return true;
+    }
+    if (c?.state === 'out' && (a.act === 'walk' || a.route.length)) return false;   // 나가는 중
+    // 퇴근 시작: 가장 가까운 거점 밖 장면으로
+    let best: { path: Hop[]; d: { x: number; y: number } } | null = null;
+    for (const id of this.graph.ids()) {
+      if (this.sceneFaction(id) === fac) continue;
+      const path = this.graph.route(a.scene, id);
+      const d = path?.length ? this.graph.doorSpot(a.scene, path[0].exit) : null;
+      if (path?.length && d && (!best || path.length < best.path.length)) best = { path, d };
+    }
+    if (!best) return false;
+    a.commute = { state: 'out', scene: a.scene };
+    a.task = undefined;
+    a.seatPick = undefined;
+    a.route = best.path;
+    this.walkTo(a, best.d, '퇴근', 'none');
+    return false;
+  }
   // ── 캐릭터 반응 (10-31 사용자 결정 3번): 캐릭터는 고정된 개성 — 반응표(namedReact.json)의 인물별 포즈·말풍선·행동 ──
   /** 반응 가능한 캐릭터인가 (동행·싸움·경보 대응·쓰러짐 중이면 아님) */
   private canReact(a: Actor): boolean {
@@ -1393,6 +1453,7 @@ export class WorldSim {
       if (a.needs) decayNeeds(a.needs, dt, TEMPER[a.def.name], false);
       return this.stepFollow(a, dt);
     }
+    if (this.stepCommute(a)) return;
     if (a.noticeCd > 0) a.noticeCd -= dt;
     if (a.needs) decayNeeds(a.needs, dt, TEMPER[a.def.name], onDuty(this.hour, TEMPER[a.def.name]));
     if (a.def.kind === 'mob') this.mobThink(a, dt);
@@ -1796,6 +1857,7 @@ export class WorldSim {
   private decide(a: Actor): void {
     // 「기다려」: 그 자리에 남는다 (다시 「따라와」·「돌아가」 전까지)
     if (a.hold) { a.act = 'idle'; a.wait = 5; a.doing = '기다리는 중'; return; }
+    if (a.commute?.state === 'out') { a.commute = undefined; return this.idle(a, 0.2, 0.5); }   // 길이 끊김: 다시 퇴근 길을 찾는다
     if (a.post) return this.goPost(a);
     if (a.def.brain === 'transit') return this.idle(a, 1, 3);
     const roam = (a.def.roam ?? [a.def.home]).filter((s) => this.graph.scene(s));
