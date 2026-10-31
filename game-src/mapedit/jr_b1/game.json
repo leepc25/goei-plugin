@@ -1,0 +1,143 @@
+{
+ "scene": {
+  "file": "me_jr_b1",
+  "w": 8848,
+  "h": 848,
+  "under": true,
+  "lane": [
+   690,
+   836
+  ],
+  "floor": [
+   [
+    0,
+    690
+   ],
+   [
+    8848,
+    690
+   ],
+   [
+    8848,
+    848
+   ],
+   [
+    0,
+    848
+   ]
+  ],
+  "holes": [],
+  "dotK": 1.4292,
+  "blocks": [],
+  "doors": {
+   "up": {
+    "x0": 0,
+    "x1": 200,
+    "y0": 120,
+    "y1": 660,
+    "anim": "none",
+    "behind": "dark"
+   },
+   "daebak": {
+    "x0": 4342,
+    "x1": 4482,
+    "y0": 260,
+    "y1": 636,
+    "anim": "none",
+    "behind": "dark"
+   },
+   "alley": {
+    "x0": 5832,
+    "x1": 6112,
+    "y0": 190,
+    "y1": 610,
+    "anim": "none",
+    "behind": "dark"
+   },
+   "songil": {
+    "x0": 8134,
+    "x1": 8284,
+    "y0": 220,
+    "y1": 636,
+    "anim": "none",
+    "behind": "dark"
+   },
+   "down": {
+    "x0": 8574,
+    "x1": 8848,
+    "y0": 380,
+    "y1": 690,
+    "anim": "none",
+    "behind": "dark"
+   }
+  },
+  "lamps": [],
+  "windows": [],
+  "objects": [
+   {
+    "id": "pillar1",
+    "file": "me_jr_b1_pillar1",
+    "x": 1159,
+    "y": 0,
+    "w": 210,
+    "h": 848,
+    "sortY": 9999
+   },
+   {
+    "id": "pillar2",
+    "file": "me_jr_b1_pillar2",
+    "x": 2424,
+    "y": 0,
+    "w": 208,
+    "h": 848,
+    "sortY": 9999
+   },
+   {
+    "id": "pillar3",
+    "file": "me_jr_b1_pillar3",
+    "x": 3688,
+    "y": 0,
+    "w": 208,
+    "h": 848,
+    "sortY": 9999
+   },
+   {
+    "id": "pillar4",
+    "file": "me_jr_b1_pillar4",
+    "x": 4952,
+    "y": 0,
+    "w": 208,
+    "h": 848,
+    "sortY": 9999
+   },
+   {
+    "id": "pillar5",
+    "file": "me_jr_b1_pillar5",
+    "x": 6215,
+    "y": 0,
+    "w": 210,
+    "h": 848,
+    "sortY": 9999
+   },
+   {
+    "id": "pillar6",
+    "file": "me_jr_b1_pillar6",
+    "x": 7480,
+    "y": 0,
+    "w": 208,
+    "h": 848,
+    "sortY": 9999
+   }
+  ]
+ },
+ "spots": [],
+ "files": [
+  "me_jr_b1",
+  "me_jr_b1_pillar1",
+  "me_jr_b1_pillar2",
+  "me_jr_b1_pillar3",
+  "me_jr_b1_pillar4",
+  "me_jr_b1_pillar5",
+  "me_jr_b1_pillar6"
+ ]
+}

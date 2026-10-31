@@ -1,0 +1,176 @@
+{
+ "file": "jr_b1_strip",
+ "bgScale": 2,
+ "w": 8848,
+ "h": 848,
+ "under": true,
+ "floor": [
+  [
+   0,
+   690
+  ],
+  [
+   8848,
+   690
+  ],
+  [
+   8848,
+   848
+  ],
+  [
+   0,
+   848
+  ]
+ ],
+ "lane": [
+  690,
+  836
+ ],
+ "blocks": [],
+ "doors": {
+  "up": {
+   "kind": "door",
+   "x": 100,
+   "y": 700,
+   "to": "jr_entry",
+   "toDoor": "down",
+   "label": "지상으로",
+   "door": {
+    "x0": 0,
+    "x1": 200,
+    "y0": 120,
+    "y1": 660,
+    "anim": "none",
+    "behind": "dark"
+   }
+  },
+  "daebak": {
+   "kind": "glass",
+   "x": 4412,
+   "y": 700,
+   "to": "jr_daebak",
+   "toDoor": "out",
+   "label": "대박 알선",
+   "door": {
+    "x0": 4342,
+    "x1": 4482,
+    "y0": 260,
+    "y1": 636,
+    "anim": "none",
+    "behind": "dark"
+   }
+  },
+  "alley": {
+   "kind": "door",
+   "x": 5972,
+   "y": 700,
+   "to": "jr_alley",
+   "toDoor": "b1",
+   "label": "뒷골목",
+   "door": {
+    "x0": 5832,
+    "x1": 6112,
+    "y0": 190,
+    "y1": 610,
+    "anim": "none",
+    "behind": "dark"
+   }
+  },
+  "songil": {
+   "kind": "glass",
+   "x": 8208,
+   "y": 700,
+   "to": "jr_songil",
+   "toDoor": "out",
+   "label": "손길 의원",
+   "door": {
+    "x0": 8134,
+    "x1": 8284,
+    "y0": 220,
+    "y1": 636,
+    "anim": "none",
+    "behind": "dark"
+   }
+  },
+  "down": {
+   "kind": "door",
+   "x": 8714,
+   "y": 700,
+   "to": "jr_b2",
+   "toDoor": "up",
+   "label": "지하 2층으로",
+   "door": {
+    "x0": 8574,
+    "x1": 8848,
+    "y0": 380,
+    "y1": 690,
+    "anim": "none",
+    "behind": "dark"
+   }
+  }
+ },
+ "lamps": [],
+ "spots": [],
+ "objects": [
+  {
+   "id": "pillar1",
+   "name": "앞 기둥 1",
+   "file": "pillar1",
+   "x": 1159,
+   "y": 0,
+   "w": 210,
+   "h": 848,
+   "sortY": 9999
+  },
+  {
+   "id": "pillar2",
+   "name": "앞 기둥 2",
+   "file": "pillar2",
+   "x": 2424,
+   "y": 0,
+   "w": 208,
+   "h": 848,
+   "sortY": 9999
+  },
+  {
+   "id": "pillar3",
+   "name": "앞 기둥 3",
+   "file": "pillar3",
+   "x": 3688,
+   "y": 0,
+   "w": 208,
+   "h": 848,
+   "sortY": 9999
+  },
+  {
+   "id": "pillar4",
+   "name": "앞 기둥 4",
+   "file": "pillar4",
+   "x": 4952,
+   "y": 0,
+   "w": 208,
+   "h": 848,
+   "sortY": 9999
+  },
+  {
+   "id": "pillar5",
+   "name": "앞 기둥 5",
+   "file": "pillar1",
+   "x": 6215,
+   "y": 0,
+   "w": 210,
+   "h": 848,
+   "sortY": 9999
+  },
+  {
+   "id": "pillar6",
+   "name": "앞 기둥 6",
+   "file": "pillar2",
+   "x": 7480,
+   "y": 0,
+   "w": 208,
+   "h": 848,
+   "sortY": 9999
+  }
+ ]
+}
