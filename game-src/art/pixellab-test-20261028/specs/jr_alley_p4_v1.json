@@ -1,0 +1,193 @@
+{
+ "room": "corridor",
+ "mood": "worn",
+ "mode": "loose",
+ "view": "corridor",
+ "floor_share": "the lower 40 percent",
+ "sides": "none",
+ "density": "packed+",
+ "place": "a narrow, dark back alley of a run-down 1990s Seoul underground arcade, low ceiling right above the sign",
+ "time": "night",
+ "light": "a few caged wall lamps and shop light",
+ "floor": "smooth dark poured concrete like one wet sheet, mottled grime, many puddles, wet stains, varied litter all over the walkway, shadows under objects",
+ "walls": "bare stained concrete and exposed old brick, peeling paint, mold, water marks; low ceiling strip, tangled pipes and cables, caged wall lamps, no fluorescent tubes",
+ "palette": "dark cold blue-grey, amber lamp light accents",
+ "shadow": "strong contrast, amber lamp pools, very dark patches, black shadow under objects",
+ "sized": [],
+ "name": "jr_alley_p4_v1",
+ "doors": 0,
+ "no": [
+  "doors",
+  "stairs",
+  "side walls"
+ ],
+ "items": [
+  {
+   "full": "left 10 percent of the image: only bare back wall and floor, no side wall",
+   "text": "left 10 percent of the image: only bare back wall and floor, no side wall",
+   "why": "사용자 이음매: 앞 기둥 자리",
+   "keep": [
+    "left 10 percent"
+   ]
+  },
+  {
+   "full": "back wall, centered, in the shop-sized space: on its left a closed vacant shop with a dented rusty rolling shutter, graffiti and an empty sign board with no letters; on its right a wide bright passage cut into the wall leading straight back to the brighter main corridor",
+   "text": "back wall, centered, in the shop-sized space: on its left a closed vacant shop with a dented rusty rolling shutter, graffiti and an empty sign board with no letters; on its right a wide bright passage cut into the wall leading straight back to the brighter main corridor",
+   "why": "의뢰문 ④ 지하 1층으로 돌아가는 넓은 통로 입구, 앞골목 ⑤처럼 셔터와 한 장에, 게임 출입구 b1",
+   "keep": [
+    "rolling shutter",
+    "no letters",
+    "wide bright passage"
+   ]
+  },
+  {
+   "full": "a painted left arrow beside the passage",
+   "text": "a painted left arrow beside the passage",
+   "why": "의뢰문 왼쪽 화살표",
+   "keep": [
+    "left arrow"
+   ]
+  },
+  {
+   "full": "clear empty floor in front of the passage",
+   "text": "clear empty floor in front of the passage",
+   "why": "게임 출입구 앞 비움",
+   "keep": [
+    "clear empty floor"
+   ]
+  },
+  {
+   "full": "stacked boxes in front of the shutter",
+   "text": "stacked boxes in front of the shutter",
+   "why": "의뢰문 쌓인 상자",
+   "keep": [
+    "stacked boxes"
+   ]
+  },
+  {
+   "full": "tangled cables down the wall",
+   "text": "tangled cables down the wall",
+   "why": "의뢰문 엉킨 전선",
+   "keep": [
+    "tangled cables"
+   ]
+  },
+  {
+   "full": "wall base beside the shop: collapsed cardboard, burst trash bag, bottles, each a different shape",
+   "text": "wall base beside the shop: collapsed cardboard, burst trash bag, bottles, each a different shape",
+   "why": "사용자 쓰레기 제각각",
+   "keep": [
+    "burst trash bag",
+    "each a different shape"
+   ]
+  },
+  {
+   "full": "a caged wall lamp with a dim amber glow",
+   "text": "a caged wall lamp with a dim amber glow",
+   "why": "의뢰문: 형광등 대신 벽등",
+   "keep": [
+    "caged wall lamp"
+   ]
+  },
+  {
+   "full": "a faded fire extinguisher box",
+   "text": "a faded fire extinguisher box",
+   "why": "설계안 소화기함",
+   "keep": [
+    "fire extinguisher box"
+   ]
+  },
+  {
+   "full": "right 10 percent of the image: only bare back wall and floor, no side wall",
+   "text": "right 10 percent of the image: only bare back wall and floor, no side wall",
+   "why": "사용자 이음매: 앞 기둥 자리",
+   "keep": [
+    "right 10 percent"
+   ]
+  }
+ ],
+ "must": [
+  {
+   "kw": "one wet sheet",
+   "from": "사용자 바닥 선 금지"
+  }
+ ],
+ "brief": {
+  "wiki": "중림 지하상가 뒷골목: 앞쪽보다 좁고 어둡고 조용, 장물·무기·정체불명 물건·이상한 약재",
+  "design": "GPT 의뢰문 뒷골목 7칸(장면 구성 근거)",
+  "user": [
+   "사용자 10-31: 뒷골목 7칸 한번에, 앞골목과 같은 가이드 v6, 고정 문장 7칸 같게, 간판 모양·색 칸마다 다르게, 뒷골목은 더 어둡고(벽등·가게 불빛만) 차가운 푸른 회색, 맨 콘크리트·벽돌, 잠기고 숨기는 가게"
+  ],
+  "items": [
+   {
+    "src": "0번 줄 근거",
+    "by": [
+     0
+    ]
+   },
+   {
+    "src": "1번 줄 근거",
+    "by": [
+     1
+    ]
+   },
+   {
+    "src": "2번 줄 근거",
+    "by": [
+     2
+    ]
+   },
+   {
+    "src": "3번 줄 근거",
+    "by": [
+     3
+    ]
+   },
+   {
+    "src": "4번 줄 근거",
+    "by": [
+     4
+    ]
+   },
+   {
+    "src": "5번 줄 근거",
+    "by": [
+     5
+    ]
+   },
+   {
+    "src": "6번 줄 근거",
+    "by": [
+     6
+    ]
+   },
+   {
+    "src": "7번 줄 근거",
+    "by": [
+     7
+    ]
+   },
+   {
+    "src": "8번 줄 근거",
+    "by": [
+     8
+    ]
+   },
+   {
+    "src": "9번 줄 근거",
+    "by": [
+     9
+    ]
+   }
+  ]
+ },
+ "review": {
+  "fit": "10줄 모두 뒷골목 이 칸의 가게·소품, 의자·사람 없음",
+  "place": "가게 가운데(가이드 v6), 문·통로 앞 비움, 이음 쪽 10% 비움, 양끝 칸은 막다른 곳 20%",
+  "size": "크기 숫자 없음(느슨한 틀)",
+  "brief": "의뢰문 칸 내용 모두 대응, 빠진 것 없음",
+  "meaning": "1차=2차(느슨한 틀)",
+  "over": "같은 물건 두 번 없음, packed+",
+  "frame": "고정 문장 7칸 같음, 가이드 v6, 간판만 칸마다 다름"
+ }
+}
