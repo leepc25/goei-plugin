@@ -8,7 +8,7 @@ export function drawAlarmLights(c: CanvasRenderingContext2D, len: number, laneTo
   c.fillStyle = `rgba(255,24,16,${(0.05 + 0.07 * pulse).toFixed(3)})`;
   c.fillRect(Math.max(0, from) * z, 0, (Math.min(len, to) - Math.max(0, from)) * z, (laneTop + 400) * z);
   c.globalCompositeOperation = 'lighter';
-  const ly = laneTop - 260;
+  const ly = Math.max(36, laneTop - 430);   // 천장
   const gap = 520;
   for (let i = 0, x = gap / 2; x < len; i++, x += gap) {
     if (x < from - 500 || x > to + 500) continue;
@@ -18,7 +18,7 @@ export function drawAlarmLights(c: CanvasRenderingContext2D, len: number, laneTo
     const bx = x * z, by = ly * z;
     // 빛줄기: 경광등에서 바닥 쪽으로 퍼지는 삼각형
     const reach = 520 * z;
-    const ex = bx + sweep * reach, ey = by + 380 * z;
+    const ex = bx + sweep * reach, ey = (laneTop + 160) * z;
     const half = (90 + 60 * Math.abs(toward)) * z;
     const g = c.createLinearGradient(bx, by, ex, ey);
     const al = 0.12 + 0.28 * Math.max(0, toward);
