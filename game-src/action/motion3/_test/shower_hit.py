@@ -147,7 +147,7 @@ def run(n):
     m3.sheet(fr, OUT / f"샤워2_{n}_sheet.png")
     return n, f"완료 {len(fr)}장 {json.dumps(j.get('usage'))}"
 from concurrent.futures import ThreadPoolExecutor as _E
-_one = [a for a in sys.argv[2:] if a.startswith("S")]
+_one = [a for a in sys.argv[2:] if not a.startswith("--")]
 if _one:   # 줄만: python3 _test/shower_hit.py <키> S4 [S6 …] [--redo]
     for s in _one: print(key, run(s), flush=True)
     sys.exit()
