@@ -1,6 +1,7 @@
 // 몹 자료 (docs/필드_세계_NPC_설계.md 6장, 사용자 확정: 외형·역할·성향·상태 분리, 성향은 나올 때마다 새로 뽑는다).
 // 원형 = 역할 + 성향을 뽑는 범위 + 무엇을 할 수 있나. 그림 이름(look)과 따로다.
 import type { Rng } from './rng';
+import PROFILES from './mobProfiles.json';
 
 export interface Temperament {
   /** 용기: 높으면 맞서고 말린다, 낮으면 도망 */
@@ -113,3 +114,8 @@ export const inShift = (hour: number | null | undefined, shifts: [number, number
   if (hour == null) return true;
   return shifts.some(([a, b]) => (a <= b ? hour >= a && hour < b : hour >= a || hour < b));
 };
+
+// 몹 그림 신상 (10-31 사용자: 직업이 안 적힌 시민은 그냥 엑스트라 시민, 성별·나이대는 그림과 맞아야 한다).
+// 그림 설계 문서(docs/동작표_3판/6.*.md Subject·인상)에서 tools/build_mob_profiles.py 가 뽑는다. 모델에 몹을 넘길 때·관찰 창이 쓴다
+export interface MobProfile { sex: '남' | '여'; age: string; job?: string; note: string }
+export const profileOf = (look: string | undefined): MobProfile | null => (look ? ((PROFILES as Record<string, MobProfile>)[look] ?? null) : null);

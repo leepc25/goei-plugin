@@ -2,6 +2,7 @@
 import type { FieldClock } from './clock';
 import type { Actor, WorldSim } from './actors';
 import { NEEDS } from './needs';
+import { profileOf } from './mobs';
 
 const NEED_KO: Record<string, string> = { work: '업무', hunger: '허기', energy: '피로', bladder: '소', bowel: '대', social: '사교', fun: '휴식' };
 const needLine = (a: Actor) => (a.needs ? '  ' + NEEDS.map((n) => `${NEED_KO[n]}${Math.round(a.needs![n])}`).join(' ') : '');
@@ -16,7 +17,8 @@ export function observerLines(sim: WorldSim, clock: FieldClock, scene: string, s
   ];
   for (const a of here.slice(0, 14)) {
     const mark = a.def.kind === 'named' ? '●' : a.post ? '◆' : '·';
-    out.push(`${mark} ${a.def.name}  ${a.doing}${a.def.kind === 'named' ? needLine(a) : temperLine(a)}${a.perks?.length ? `  [${a.perks.join('·')}]` : ''}`);   // NPC 퍽
+    const pf = a.def.kind === 'mob' ? profileOf(a.def.look) : null;   // 그림 신상: 성별·나이대·직업
+    out.push(`${mark} ${a.def.name}${pf ? `(${pf.sex}·${pf.age}${pf.job && pf.job !== a.def.name ? `·${pf.job}` : ''})` : ''}  ${a.doing}${a.def.kind === 'named' ? needLine(a) : temperLine(a)}${a.perks?.length ? `  [${a.perks.join('·')}]` : ''}`);   // NPC 퍽
   }
   if (here.length > 14) out.push(`  … 외 ${here.length - 14}명`);
   const named = sim.actors.filter((a) => a.def.kind === 'named' && a.scene !== scene);

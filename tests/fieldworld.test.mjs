@@ -876,3 +876,12 @@ test('이름 인물: 한 대 = 화냄, 6초 안에 또 = 맞섬(전투로), 지�
   assert.notEqual(n.act, 'down', '깨어남');
   assert.ok(n.hp > 0);
 });
+
+test('몹 그림 신상: 성별·나이대는 그림 설계 문서대로, 직업은 적힌 것만 (안 적힌 시민 = 직업 없음)', () => {
+  assert.deepEqual([M.profileOf('시민여2').sex, M.profileOf('시민여2').age, M.profileOf('시민여2').job], ['여', '60대 후반', undefined]);
+  assert.equal(M.profileOf('시민여9').job, '회사원');
+  assert.equal(M.profileOf('청소부여1').sex, '여');
+  assert.equal(M.profileOf('학생남1').age, '10대(고등학생)');
+  assert.equal(M.profileOf('없는그림'), null);
+  for (const a of Object.values(M.ARCHETYPES)) for (const l of a.looks ?? []) assert.ok(M.profileOf(l), `원형 ${a.name}의 그림 ${l} 신상 없음`);
+});
