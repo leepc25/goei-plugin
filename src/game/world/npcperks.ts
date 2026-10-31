@@ -4,7 +4,9 @@
 import type { Temperament, MobRole } from './mobs';
 import type { Rng } from './rng';
 
-export type NpcCat = 'civilian' | 'thug' | 'police' | 'guard' | 'fighter';
+export type NpcCat = 'civilian' | 'thug' | 'police' | 'guard' | 'fighter' | 'named';
+/** 이름 있는 인물(55명)이 NPC로 나올 때 (10-31 사용자): 스탯 뻥튀기·체력 뻥튀기 둘 다, 배수는 일단 1.5 */
+export const NAMED_MUL = { stat: 1.5, hp: 1.5 };
 export interface NpcPerkDef {
   name: string;
   /** 어디서 듣나: 필드 시뮬·전투 몸·둘 다 */
@@ -34,6 +36,7 @@ export const NPC_PERKS: Record<NpcCat, NpcPerkDef[]> = {
     { name: '다운 무시', where: 'fight', reuse: '다운 무시' }, { name: '낙법', where: 'fight', reuse: '낙법' }, { name: '고유기 숙련', where: 'fight', reuse: '고유기 숙련' },
     { name: '정신 방벽', where: 'fight', reuse: '정신 방벽' }, { name: '협공', where: 'fight' },
   ],
+  named: [{ name: '스탯 뻥튀기', where: 'fight' }, { name: '체력 뻥튀기', where: 'fight' }],
 };
 export const npcPerkDef = (name: string): NpcPerkDef | undefined => Object.values(NPC_PERKS).flat().find((p) => p.name === name);
 
@@ -45,7 +48,7 @@ export function catOf(role: MobRole | undefined): NpcCat {
 /** 생겨날 때 한 번. 경찰 = 전부, 시민 = 50%로 1개, 불량배·경비 = 1~2개(경비 방어막 50%), 전투 NPC = 2~3개(강적 10%). 성격으로 기울인다 */
 export function rollNpcPerks(rng: Rng, cat: NpcCat, t?: Temperament): string[] {
   const all = NPC_PERKS[cat].map((p) => p.name);
-  if (cat === 'police') return all;
+  if (cat === 'police' || cat === 'named') return all;
   const c = t?.courage ?? 0.5, cur = t?.curious ?? 0.5, sly = t?.sly ?? 0;
   const w = (n: string): number => {
     switch (n) {

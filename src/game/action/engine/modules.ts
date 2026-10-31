@@ -56,7 +56,7 @@ import type { Actor, SimEvent } from '../../world/actors';
 import { ARCHETYPES } from '../../world/mobs';
 import { FightLog, enName, isLaw } from '../../world/fightlog';
 import { settleLine } from '../../world/fieldmoney';
-import { npcPerkDef, rollNpcPerks } from '../../world/npcperks';
+import { NAMED_MUL, npcPerkDef, rollNpcPerks } from '../../world/npcperks';
 import type { FactionView, PersonView } from '../../bridge';
 import { FieldClock } from '../../world/clock';
 import type { WorldSim } from '../../world/actors';
@@ -538,6 +538,7 @@ function heldWeapon(w: World) {
  */
 function applyNpcPerks(b: FighterAi, perks: readonly string[], drunk = false): void {
   b.npcPerks = [...perks];
+  b.base = { ...b.base };   // 이 몸만 고친다 (원본 능력치 표·다른 몸과 나눠 쓰지 않게)
   for (const n of perks) { const d = npcPerkDef(n); if (d?.reuse) b.perks.add(d.reuse); }
   const persona = b.brain.persona as { courage: number; aggression: number };
   if (perks.includes('강적')) {
@@ -547,6 +548,12 @@ function applyNpcPerks(b: FighterAi, perks: readonly string[], drunk = false): v
     (b as unknown as { elite: boolean }).elite = true;
     b.label = `${b.label} (강적)`;
   }
+  // 이름 있는 인물(NPC로 나올 때): 힘민체지정 ×1.5(분배 모양 그대로, 10 넘어도 됨) → 그 공식 체력에 ×1.5
+  if (perks.includes('스탯 뻥튀기')) {
+    for (const k of ['str', 'dex', 'con', 'int', 'wil'] as const) b.base[k] = Math.round(b.base[k] * NAMED_MUL.stat * 10) / 10;
+    b.stat = derive(b.base); b.baseHp = b.stat.hp; b.hp = b.hpMax = b.stat.hp;
+  }
+  if (perks.includes('체력 뻥튀기')) { b.baseHp = b.hpMax = Math.round(b.hpMax * NAMED_MUL.hp); b.hp = b.hpMax; }   // baseHp 도: 퍽 체력 배율을 다시 셀 때 안 풀리게
   if (perks.includes('방어막')) b.shield = b.shieldMax = Math.round(b.hpMax * 0.1);
   if (perks.includes('자리 지킴')) persona.courage = 1;
   if (perks.includes('싸움꾼')) persona.aggression = Math.min(1, persona.aggression + 0.2);
@@ -677,7 +684,8 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
       // 힘민체지정만으로(10-30 사용자): 이름 있는 55명은 표, 그 밖의 NPC는 한 명마다 합 25를 무작위로 나눔. 보정은 퍽
       if (!BASE_STATS[art.cfg.name]) { ai.base = rollBase(Math.random); ai.stat = derive(ai.base); ai.baseHp = ai.hp = ai.hpMax = ai.stat.hp; }
       // NPC 퍽: 필드 몹은 행위자의 퍽을 combatStep 이 붙인다(npcPerks 표시). 그 밖(괴이·시험장)의 이름 없는 인물은 전투 NPC 퍽을 굴림
-      if (!(spec as { npcPerks?: string[] }).npcPerks && !BASE_STATS[art.cfg.name]) applyNpcPerks(ai, rollNpcPerks(Math.random, 'fighter'));
+      // 이름 있는 인물(55명)은 스탯 뻥튀기·체력 뻥튀기 (10-31 사용자)
+      if (!(spec as { npcPerks?: string[] }).npcPerks) applyNpcPerks(ai, rollNpcPerks(Math.random, BASE_STATS[art.cfg.name] ? 'named' : 'fighter'));
       return ai as never;
     }
     if (DEF_BY_KIND[spec.kind]) {

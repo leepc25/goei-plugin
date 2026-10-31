@@ -18,7 +18,7 @@ export const NEUTRAL_BASE: BaseStats = { str: 5, dex: 5, con: 5, int: 5, wil: 5 
 export const CRIT = 0.05, CRIT_DMG = 2;
 
 export function baseOf(name: string | undefined): BaseStats {
-  return (name && BASE_STATS[name]) || NEUTRAL_BASE;
+  return { ...((name && BASE_STATS[name]) || NEUTRAL_BASE) };   // 복사본: 몸마다 고쳐도(퍽 뻥튀기·강적) 원본 표가 안 바뀌게
 }
 /** NPC·몹 한 명의 힘민체지정 (10-30 사용자): 합 25를 다섯 칸에 무작위로 나눈다. 칸마다 1부터 시작해 0이 되지 않는다(NPC는 한 칸 상한 없음).
  * 이름 있는 55명은 표(baseStats.gen.ts)를 쓴다. 더 세거나 약하게 하는 보정은 전부 퍽으로 한다 */
