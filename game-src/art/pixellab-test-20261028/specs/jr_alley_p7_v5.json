@@ -1,0 +1,205 @@
+{
+ "room": "corridor",
+ "mood": "worn",
+ "mode": "loose",
+ "view": "corridor",
+ "floor_share": "the lower 30 percent",
+ "density": "packed+",
+ "place": "a run-down 1990s Seoul underground arcade corridor, low ceiling right above the sign",
+ "time": "night",
+ "light": "half-dead fluorescent tubes and warm shop light",
+ "palette": "dark cold blue-grey, amber lamp light accents",
+ "walls": "grimy concrete, peeling paint, exposed brick, rust streaks, mold, cracks; ceiling strip, tangled cables, fluorescent tubes, most dead, one flickering",
+ "floor": "smooth dark poured concrete like one wet sheet, mottled grime, oil stains, many puddles, wet stains, varied litter all over the walkway, light pool, shadows under objects",
+ "shadow": "strong contrast, amber lamp pools, dark patches, black shadow under objects",
+ "name": "jr_alley_p7_v5",
+ "sides": "none",
+ "doors": 0,
+ "no": [
+  "doors",
+  "stairs",
+  "side walls"
+ ],
+ "sized": [],
+ "items": [
+  {
+   "full": "left 10 percent of the image: only bare back wall and floor, no side wall",
+   "text": "left 10 percent of the image: only bare back wall and floor, no side wall",
+   "why": "사용자 이음매: 앞 기둥 자리",
+   "keep": [
+    "left 10 percent"
+   ]
+  },
+  {
+   "full": "back wall, centered: a big herbal medicine shop filling the middle 80 percent of the width, recessed like a deep lit room, a half-raised rusty shutter and a plastic strip curtain, bundles of dried herbs hanging, shelves of small jars and glass bottles, an old scale, a torn striped awning with letters reading \"진성약업사\"",
+   "text": "back wall, centered: a big herbal medicine shop front spanning the wall from the left empty strip to the fence, standing on the walkway floor line, a half-raised shutter, a strip curtain, dried herbs, jars, a scale; right above the opening, just under the ceiling strip, a striped awning reading \"진성약업사\"",
+   "why": "의뢰문 ⑦ 약재 가게, 간판 찢긴 줄무늬 차양, 앞골목 가게 틀",
+   "keep": [
+    "herbal medicine shop",
+    "dried herbs",
+    "reading \"진성약업사\""
+   ]
+  },
+  {
+   "full": "herb sacks and boxes jutting onto the walkway",
+   "text": "herb sacks jutting onto the walkway",
+   "why": "의뢰문 약재 자루와 상자",
+   "keep": [
+    "herb sacks"
+   ]
+  },
+  {
+   "full": "far right 20 percent of the image: a dead end closed by a rusty chain-link fence, military cases and an overflowing trash can in front of it",
+   "text": "far right 20 percent: a rusty chain-link fence across the walkway from floor to ceiling, a padlocked gate in it, military cases piled against it",
+   "why": "의뢰문 오른쪽 끝 녹슨 철망 담장, 사용자 철망으로 막기·오른쪽 벽 처리 주의",
+   "keep": [
+    "chain-link fence",
+    "padlocked gate",
+    "military cases",
+    "overflowing trash can"
+   ]
+  },
+  {
+   "full": "left of the shop: a caged wall lamp, a burst trash bag, stacked boxes",
+   "text": "left of the shop: a caged wall lamp, a burst trash bag, stacked boxes",
+   "why": "소품 왼쪽",
+   "keep": [
+    "caged wall lamp",
+    "stacked boxes"
+   ]
+  },
+  {
+   "full": "right of the shop: tangled cables, a rusty air conditioner unit, a small CCTV camera",
+   "text": "right of the shop: an air conditioner, a CCTV camera",
+   "why": "소품 오른쪽",
+   "keep": [
+    "air conditioner",
+    "CCTV camera"
+   ]
+  },
+  {
+   "full": "wall base: collapsed cardboard, bottles, each a different shape",
+   "text": "wall base: wet cardboard, bottles, each a different shape",
+   "why": "사용자 쓰레기 제각각",
+   "keep": [
+    "bottles",
+    "each a different shape"
+   ]
+  },
+  {
+   "full": "a torn blank poster",
+   "text": "a torn blank poster",
+   "why": "벽 종이 몇 군데만",
+   "keep": [
+    "blank poster"
+   ]
+  },
+  {
+   "full": "a caged wall lamp with a dim amber glow",
+   "text": "an overflowing trash can",
+   "why": "앞 판 물건 유지",
+   "keep": [
+    "caged wall lamp"
+   ]
+  },
+  {
+   "full": "tangled cables hanging down the wall",
+   "text": "tangled cables down the wall",
+   "why": "앞 판 물건 유지",
+   "keep": [
+    "tangled cables"
+   ]
+  }
+ ],
+ "must": [
+  {
+   "kw": "reading \"진성약업사\"",
+   "from": "가게 이름"
+  },
+  {
+   "kw": "one wet sheet",
+   "from": "사용자 바닥 선 금지"
+  }
+ ],
+ "brief": {
+  "wiki": "중림 뒷골목",
+  "design": "GPT 의뢰문 뒷골목 칸 구성",
+  "user": [
+   "사용자 10-31: ②③④ 그대로, ⑥ 보류, ①⑤⑦ 다시. ①⑦은 왼쪽 벽·오른쪽 벽 처리 주의 → 끝 칸만 그쪽 옆벽 문장, 끝은 바닥부터 천장까지 막힘. 가게 줄은 앞골목 틀, 소품은 가게 왼쪽·오른쪽에 나눠",
+   "사용자 「6,7 다시 뽑아」: v2와 같은 요청으로 다시",
+   "v3: 판+차양 두 층이라 가게가 내려감(높이 안 맞음, 사용자) → 간판 자리 고정: 천장 띠 바로 아래·입구 바로 위 한 줄, 줄무늬 천 간판 하나",
+   "v4: 천장 높이 안 맞음(형광등 약 37, 다른 칸 20~27, 사용자) → 옆벽 문장 빼고 첫 줄 다른 칸과 같게, 철망은 오른쪽 20% 안에서 통로를 가로막게, 가게 앞면 바닥선·넓게"
+  ],
+  "items": [
+   {
+    "src": "0번 줄 근거",
+    "by": [
+     0
+    ]
+   },
+   {
+    "src": "1번 줄 근거",
+    "by": [
+     1
+    ]
+   },
+   {
+    "src": "2번 줄 근거",
+    "by": [
+     2
+    ]
+   },
+   {
+    "src": "3번 줄 근거",
+    "by": [
+     3
+    ]
+   },
+   {
+    "src": "4번 줄 근거",
+    "by": [
+     4
+    ]
+   },
+   {
+    "src": "5번 줄 근거",
+    "by": [
+     5
+    ]
+   },
+   {
+    "src": "6번 줄 근거",
+    "by": [
+     6
+    ]
+   },
+   {
+    "src": "7번 줄 근거",
+    "by": [
+     7
+    ]
+   },
+   {
+    "src": "8번 줄 근거",
+    "by": [
+     8
+    ]
+   },
+   {
+    "src": "9번 줄 근거",
+    "by": [
+     9
+    ]
+   }
+  ]
+ },
+ "review": {
+  "fit": "뒷골목 이 칸의 가게·소품, 의자·사람 없음",
+  "place": "가게 가운데, 소품은 가게 왼쪽·오른쪽, 문 앞 비움",
+  "size": "크기 숫자 없음(느슨한 틀)",
+  "brief": "칸 내용 대응, 빠진 것 없음",
+  "meaning": "1차=2차(느슨한 틀)",
+  "over": "같은 물건 두 번 없음, packed+",
+  "frame": "첫 줄 다른 칸과 완전히 같음(옆벽 문장 없음), 철망은 물건 줄, 가게 앞면 바닥선에, 간판 자리 천장 띠 바로 아래"
+ }
+}

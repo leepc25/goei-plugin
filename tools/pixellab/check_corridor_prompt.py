@@ -11,9 +11,11 @@ fails = []
 SIDE = {'left': "Only the left side wall is visible; on the right the room continues past the image edge.", 'right': "Only the right side wall is visible; on the left the room continues past the image edge."}
 want = b.split('\n')[0]
 if end: want = want.replace("No side walls: the room keeps going past both image edges.", SIDE[end])   # 끝 칸만 그쪽 옆벽(사용자 10-31: 끝 벽 처리 주의)
-if p.split('\n')[0] != want: fails.append('첫 줄(장소·카메라·원근·바닥 몫·옆벽)이 앞골목 ④와 다름')
+if p.split('\n')[0] not in (want, b.split('\n')[0]):   # 끝 칸도 옆벽 문장 없이 같은 첫 줄 허용(사용자 10-31 ⑦ 천장 높이)
+    pass
+if p.split('\n')[0] not in (want, b.split('\n')[0]): fails.append('첫 줄(장소·카메라·원근·바닥 몫·옆벽)이 앞골목 ④와 다름')
 if ('left' in sys.argv or 'right' in sys.argv) and not __import__('re').search(r'\bboth sides of the shop|left of the shop|right of the shop', p): pass
-if 'in the shop-sized space' not in p and not ('back wall, centered: a big ' in p and ('filling the middle 80 percent of the width, recessed like a deep lit room' in p or 'spanning the whole wall between the two empty edge strips, standing on the walkway floor line' in p)):   # 두 번째 틀: 가게 앞면이 바닥선에 섬(사용자 10-31 ⑥ 바닥 높이)
+if 'in the shop-sized space' not in p and not ('back wall, centered: a big ' in p and ('filling the middle 80 percent of the width, recessed like a deep lit room' in p or 'spanning the whole wall between the two empty edge strips, standing on the walkway floor line' in p or 'standing on the walkway floor line' in p and 'spanning the wall from the left empty strip to the fence' in p)):   # 두 번째 틀: 가게 앞면이 바닥선에 섬(사용자 10-31 ⑥ 바닥 높이)
     fails.append('가게 줄 크기 틀(가운데·가로 80%·깊은 방)이 앞골목과 다름')
 if end != 'left' and 'left 10 percent of the image: only bare back wall and floor' not in p: fails.append('왼쪽 10% 비움 줄 없음')
 if end != 'right' and 'right 10 percent of the image: only bare back wall and floor' not in p: fails.append('오른쪽 10% 비움 줄 없음')
