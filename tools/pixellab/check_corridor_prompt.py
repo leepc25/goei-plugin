@@ -18,6 +18,8 @@ if 'in the shop-sized space' not in p and not ('back wall, centered: a big ' in 
 if end != 'left' and 'left 10 percent of the image: only bare back wall and floor' not in p: fails.append('왼쪽 10% 비움 줄 없음')
 if end != 'right' and 'right 10 percent of the image: only bare back wall and floor' not in p: fails.append('오른쪽 10% 비움 줄 없음')
 for f in fails: print('FAIL', f)
+if 'reading "' in p and 'OPEN' not in p and not any(k in p for k in ('right above the opening, just under the ceiling strip','sign board','sign band','blade sign','hanging sign','empty sign board')): fails.append('간판 자리 문구 없음')
+if ('neon sign reading' in p or 'awning' in p) and 'right above the opening, just under the ceiling strip' not in p: fails.append('네온·차양 간판은 자리를 「천장 띠 바로 아래·입구 바로 위」로 고정해야 함(사용자 10-31: 높이 안 맞음)')
 if 'left of the shop' not in p or 'right of the shop' not in p: fails.append('소품이 가게 양쪽에 나뉘어 있지 않음(left of the shop / right of the shop)')
 if fails: sys.exit(1)
 print('통과(앞골목 기준과 구조 같음)')
