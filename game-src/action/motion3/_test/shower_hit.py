@@ -12,6 +12,7 @@ from concurrent.futures import ThreadPoolExecutor
 import numpy as np
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 import m3
+sys.path.insert(0, str(Path(__file__).resolve().parent))
 from PIL import Image
 C = {  # 키: (옆 방향, 성별, 몸 묘사(옷 없이), 벗는 순서)
  "1.6_큐라스": ("east", "man", "a lean wiry man in his early thirties with pale sage-green hair swept back, hollow cheeks",
@@ -79,7 +80,8 @@ GUARD = GUARD_M if g == "man" else GUARD_W
 LOW = "the hips sunk low, the feet wide apart and the knees deeply bent, the shoulders turned sideways away from the enemy, the chin tucked and the eyes glaring ahead"
 # 10-31 고침: 캔버스 256×256(전투 줄과 같게), G = 경계 자세, H1(선 채 배를 맞음 → G)과 H2(G에서 얼굴을 맞음 → G)는 맞는 곳·움직임이 다름
 STEPS = {
- "G": ("A", 8, "loop", f"Bare and barefoot {side}: drop into a defensive low crouch, {LOW}, {GUARD}. Hold the crouch, the shoulders rising and falling with heavy breathing. {DRAW}"),
+  # G: 끝 장 없음(10-31 검사: 끝 장 = A 선 자세로 주면 마지막 장이 다시 선 자세로 튐)
+ "G": ("A", 8, None, f"Bare and barefoot {side}: drop into a defensive low crouch, {LOW}, {GUARD}. Hold the crouch, the shoulders rising and falling with heavy breathing. {DRAW}"),
  "H1": ("G", 8, "G", f"Bare and barefoot {side}, in a low crouch with {GUARD}: struck in the stomach, the body folds forward at the waist, the face twisting in pain with the eyes squeezed shut, the hands never leaving the body, sliding one step back on the heels, then rises back into the same low crouch. {DRAW}"),  # 10-31: H1 배(앞으로 접힘)·H2 가슴(뒤로 밀림), 둘 다 경계→경계, 맞을 때마다 둘 중 하나
  "H2": ("G", 12, "G", f"Bare and barefoot {side}, in a low crouch with {GUARD}: knocked backward by a heavy blow to the chest, the shoulders jolt back and the whole body rocks back, the head staying on the shoulders, staggering three big steps backward with the knees almost buckling, the hands never leaving the body, then sinks back into the same low crouch. {DRAW}"),
  "H3": ("H2@peak", 12, None, f"Bare and barefoot {side}: struck hard in the chest, the upper body reels backward two fast stumbling steps, the knees give way and the body drops straight down, the hips hit the floor, then the back slams flat onto the floor and the head bounces once. The body ends lying flat on the back along the floor, the arms at the sides. {DRAW}"),
@@ -201,6 +203,8 @@ def run(n):
         b = Image.new("RGBA", im.size, (60, 60, 70, 255)); b.alpha_composite(im); gif.append(b.convert("RGB"))
     gif[0].save(OUT / f"샤워2_{n}.gif", save_all=True, append_images=gif[1:], duration=120, loop=0)
     assert fr[0].size == CANVAS, f"캔버스 {fr[0].size} ≠ 256×256"
+    if n in ("H1", "H2", "H3", "H4", "H5"):   # 10-31 사용자: 허공에 쓰러짐은 코드로 → 바닥 붙이기·이펙트 지우기(원본은 _원본/)
+        import shower_fix; shower_fix.fix(key, n)
     return n, f"완료 {len(fr)}장 {json.dumps(j.get('usage'))}"
 from concurrent.futures import ThreadPoolExecutor as _E
 _one = [a for a in sys.argv[2:] if not a.startswith("--")]

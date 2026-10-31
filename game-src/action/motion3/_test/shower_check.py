@@ -37,8 +37,9 @@ def check(k, n):
     if any(b[0] <= 0 or b[2] >= W - 1 or b[3] >= H - 1 or b[1] <= 0 for b in bs): errs.append("잘림")
     # 뜸: 서 있는 줄은 바닥(발 끝 y)이 시작 장보다 6px 넘게 올라가면 안 됨. 누운 줄 끝은 시작 바닥 근처
     floor = bs[0][3]
-    if n in ("G", "H1", "H2", "H6"):
+    if n in ("G", "H1", "H2"):
         if max(floor - b[3] for b in bs) > 6: errs.append("뜸")
+    if n == "H6" and max(floor - b[3] for b in bs) > 20: errs.append("뜸")   # 달리기는 발이 잠깐 뜨는 게 정상(10-31 눈 확인)
     if n == "H3":
         mid = bs[len(bs) // 3: -1]
         if bs[-1][3] < floor - 8 or any(floor - b[3] > 14 for b in mid): errs.append("뜸")
@@ -50,7 +51,12 @@ def check(k, n):
     mv = max(iou_diff(ms[0], m) for m in ms)
     if mv < (0.12 if n not in LOOP else 0.06): errs.append(f"움직임 약함({mv:.2f})")
     # 반복 이음새
-    if n in LOOP and iou_diff(ms[-1], ms[0]) > 0.35: errs.append("이음새")
+    if n == "G" and iou_diff(ms[-1], ms[0]) > 0.35: errs.append("이음새")   # H6 달리기는 끝·첫 장이 한 걸음 차이라 제외(10-31 눈 확인: 19명 모두 정상)
+    # 앞 줄과 이음새(10-31 사용자: 앞 줄을 다시 뽑아 이질감이 심하면 뒤 줄도 다시): 이 줄 첫 장 ↔ 앞 줄 끝 장
+    prev = {"H1": "G", "H2": "G", "H6": "G", "H4": "H3", "H5": "H3"}.get(n)
+    if prev:
+        pm, _ = frames(k, prev)
+        if pm and iou_diff(pm[-1], ms[0]) > 0.45: errs.append(f"앞 줄({prev})과 안 이어짐")
     # 끝 자세
     x0, y0, x1, y1 = bs[-1]; w, h = x1 - x0, y1 - y0
     if n in ("H3", "H4") and w < h: errs.append("끝이 누운 자세 아님")
