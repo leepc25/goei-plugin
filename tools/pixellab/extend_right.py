@@ -1,5 +1,6 @@
 """PixelLab inpaint-v3로 그림을 오른쪽으로 이어 그린다. 앞 그림 오른쪽 keep px + 새 영역 new px를 한 창(최대 512)에 넣고 새 영역만 마스크.
-사용: python3 extend_right.py <앞 그림> <프롬프트.txt> <출력(이어 붙인 전체)> <keep> <new>"""
+사용: python3 extend_right.py <앞 그림> <프롬프트.txt> <출력(이어 붙인 전체)> <keep> <new> [겹침 ov] [위 겹침] [위 높이] [아래 겹침] [아래 시작 y]
+겹침: 앞 그림 쪽으로도 마스크를 덮어 섞는다(extend_left와 같음). 위·아래만 넓게 덮으면 가운데 문·물건은 건드리지 않는다(본부 3층 10-31)."""
 import base64, io, json, sys, time
 import requests
 from PIL import Image
@@ -11,7 +12,14 @@ w, h = keep + new, im.height
 win = Image.new("RGBA", (w, h), (255, 255, 255, 255))
 win.paste(im.crop((im.width - keep, 0, im.width, h)), (0, 0))
 mask = Image.new("RGB", (w, h), (0, 0, 0))
-mask.paste((255, 255, 255), (keep, 0, w, h))
+ov = int(sys.argv[6]) if len(sys.argv) > 6 else 0
+ov_top = int(sys.argv[7]) if len(sys.argv) > 7 else ov
+top_h = int(sys.argv[8]) if len(sys.argv) > 8 else 0
+ov_bot = int(sys.argv[9]) if len(sys.argv) > 9 else ov
+bot_y = int(sys.argv[10]) if len(sys.argv) > 10 else 0
+mask.paste((255, 255, 255), (keep - ov, 0, w, h))
+if top_h: mask.paste((255, 255, 255), (keep - ov_top, 0, w, top_h))
+if bot_y: mask.paste((255, 255, 255), (keep - ov_bot, bot_y, w, h))
 
 def b64(img):
     buf = io.BytesIO(); img.save(buf, "PNG"); return base64.b64encode(buf.getvalue()).decode()
@@ -43,6 +51,6 @@ res = Image.open(io.BytesIO(base64.b64decode(data.split(",")[-1]))).convert("RGB
 res.save(out_path.replace(".png", "_window.png"))
 out = Image.new("RGBA", (im.width + new, h))
 out.paste(im, (0, 0))
-out.paste(res.crop((keep, 0, w, h)), (im.width, 0))
+out.paste(Image.composite(res.crop((0, 0, w, h)), win, mask.convert('L')), (im.width - keep, 0))
 out.save(out_path)
 print(json.dumps({"seconds": round(time.time() - t0, 1), "window": res.size, "out": out.size, "generations_used": round(b0 - balance(), 2)}))
