@@ -32,8 +32,7 @@ if not pn: fails.append('STYLE 끝 금지 목록(No …) 없음')
 else:
     want_no = bn.group(1)
     ok = {want_no}
-    if end == 'left': ok.add(want_no.replace(', stairs or side walls', ' or stairs'))
-    if end == 'right': ok.add(want_no.replace(', stairs or side walls', ' or side walls'))
+    if end: ok |= {want_no.replace(', stairs or side walls', ' or stairs'), want_no.replace(', stairs or side walls', ' or side walls')}   # 끝 칸: 옆벽 또는 계단 하나만 허용
     if pn.group(1) not in ok: fails.append(f'금지 목록이 앞골목 ④와 다름: 「{pn.group(1)}」 ≠ 「{want_no}」')
 # --same-shop: 가게 줄을 한 틀로(사용자 10-31 「전부 그림이 다르냐」): 폭 · 바닥선 · 가운데 문과 양옆 넓은 창 · 간판 자리
 if '--same-shop' in sys.argv:
