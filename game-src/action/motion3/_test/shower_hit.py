@@ -28,6 +28,7 @@ if key in C: D, g, SUB, SEQ = C[key]
 else:   # 목록 전원: shower_targets.json(방향·성별) + 일반 벗는 순서
     # 10-31 사용자: 뽑을 때는 동작만 들어가면 된다, 방향만 정해 주면 됨(몸 묘사 불필요). 웹에서 직접 뽑은 3명은 방향·성별만(사용자: 성인, 캐릭터 표의 고등학생 표기는 잘못)
     _t = {**{k: {"dir": "east", "g": "woman", "body": ""} for k in ("6.11_불량배여2", "6.52_학생여1", "6.53_학생여2")},
+          **{k: {"dir": "east", "g": "man", "body": ""} for k in ("6.50_학생남1", "6.51_학생남2", "6.7_불량배남1", "6.9_불량배남3")},
           **json.load(open(Path(__file__).resolve().parent / "shower_targets.json"))}[key]
     D, g, SUB = _t["dir"], _t["g"], _t["body"]
     _p = "he" if g == "man" else "she"; _P = _p.capitalize(); _h = "his" if g == "man" else "her"

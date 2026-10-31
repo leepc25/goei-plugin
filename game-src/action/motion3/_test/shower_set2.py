@@ -23,7 +23,9 @@ C = {  # 키: (옆 방향, 성별, 몸 묘사(옷 없이), 벗는 순서)
 key = sys.argv[1]
 if key in C: D, g, SUB, SEQ = C[key]
 else:   # 목록 전원: shower_targets.json(옷 뺀 몸 묘사) + 일반 벗는 순서
-    _t = json.load(open(Path(__file__).resolve().parent / "shower_targets.json"))[key]
+    # 10-31 사용자: 샤워 없던 4명(성인, 캐릭터 표의 고등학생 표기는 잘못)도 샤워부터. 뽑을 때는 동작만 — 방향만 정하고 몸 묘사는 보내지 않는다
+    _t = {**{k: {"dir": "east", "g": "man", "body": ""} for k in ("6.50_학생남1", "6.51_학생남2", "6.7_불량배남1", "6.9_불량배남3")},
+          **json.load(open(Path(__file__).resolve().parent / "shower_targets.json"))}[key]
     D, g, SUB = _t["dir"], _t["g"], _t["body"]
     _p = "he" if g == "man" else "she"; _P = _p.capitalize(); _h = "his" if g == "man" else "her"
     SEQ = (f"{_p} takes off the clothes one piece at a time with clear hand movements: first any outer layer such as a jacket, coat, cardigan or vest, pushing it back off {_h} shoulders, pulling the arms out of the sleeves and dropping it; then any necktie, scarf or accessory on the body; then the top, unbuttoning it or pulling it off over the head and dropping it"
@@ -66,7 +68,7 @@ def run(n):
     if any((OUT / f"샤워2_{n}").glob("[0-9][0-9].png")): return n, "이미 있음(덮어쓰지 않음)"
     src, frames, opt, prompt = STEPS[n]; start = last(src)
     body = {"character_id": CID, "mode": "pixminimax", "action_description": prompt, "animation_name": f"test 샤워2 {n}",
-            "directions": [D], "frame_count": frames, "subject_description": SUB, "initial_pose": f"standing upright {side}",
+            "directions": [D], "frame_count": frames, "initial_pose": f"standing upright {side}",
             "keep_first_frame": False, "enhance_prompt": False, "custom_start_frame": b64(start)}
     if opt == "loop": body["end_frame"] = b64(start)
     for _ in range(40):
