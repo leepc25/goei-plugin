@@ -84,3 +84,34 @@ test('반응표: 55명, 칸 값은 정해진 동작·행동만', () => {
   assert.equal(n, 6);
   assert.equal(NR.reactOf('콘쥬스').combat, false);
 });
+
+test('경보: 거점 안에서 주인공이 때리면 켜지고, 다른 방 전투원까지 모이고, 비전투원은 피하고, 떠나면 꺼진다', () => {
+  const w = sim();
+  w.noAssist = (n) => n === '콘쥬스';
+  const fighter = named(w, '에일린', 'f3', 1800);
+  const civ = named(w, '콘쥬스', 'office', 900);
+  const victim = named(w, '잼트리', 'office', 700);
+  const P = { scene: 'office', x: 650, y: 560 };
+  run(w, 0.5, P);
+  assert.ok(w.hitActor(victim.def.id, 1, 1, 10));
+  assert.ok(w.alarmIn('office') && w.alarmIn('f3'), '거점 전체');
+  assert.ok(w.events.some((e) => e.kind === 'alarm' && e.on && e.threat === '{user}'));
+  run(w, 8, P);
+  assert.equal(fighter.alarm, 'A00');
+  assert.ok(fighter.scene === 'office' || fighter.route.length || fighter.act === 'door', `현장으로: ${fighter.scene} ${fighter.doing}`);
+  assert.equal(civ.alarm, 'A00');
+  assert.ok(civ.x > 900, `반대쪽으로 피함 x=${civ.x}`);
+  // 주인공이 거점 밖으로 → 15초 뒤 해제
+  run(w, 20, { scene: 'street', x: 600, y: 560 });
+  assert.ok(!w.alarmIn('office'));
+  assert.ok(w.events.some((e) => e.kind === 'alarm' && !e.on));
+});
+
+test('경보: 적대 방문자는 들어오자마자 경보, 위협은 방문자', () => {
+  const w = sim({ relation: (v, t) => (v === 'A00' && t === 'B00' ? 'hostile' : 'neutral') });
+  named(w, '에일린', 'f3', 1800);
+  const v = w.spawnVisitor('lobby', '불량배', 'B00', 400);
+  run(w, 1, { scene: 'street', x: 600, y: 560 });
+  assert.ok(w.alarmIn('lobby'));
+  assert.deepEqual(w.alarmOf('A00').threats, [v.def.id]);
+});

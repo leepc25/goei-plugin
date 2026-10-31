@@ -148,6 +148,8 @@ export interface Actor {
   greeted?: string[];
   /** 경계: 따라붙어 지켜보는 방문자 id (경비) */
   escort?: string;
+  /** 경보 대응 중인 거점 세력 (모이는 쪽) */
+  alarm?: string;
   /** 방문자: 경계 거점에 머문 초 (경고 → 내보냄) */
   stay?: number;
   /** 동행 (10-31 사용자 「전부 만들어야지」, 필드 기능 7장): 주인공을 따라 걷는 중. 욕구·할 일은 멈춘다 */
@@ -234,7 +236,9 @@ export type SimEvent =
   /** 말풍선 칸 하나 (speech.ts speakCell). cell = game-src/dialogue2 칸 열쇠, ctx = 그 순간 정보(say = 대사 자료가 없을 때 쓸 글) */
   | { kind: 'cue'; scene: string; who: string; id: string; cell: string; ctx?: Record<string, string> }
   /** 동행 시작·끝 (follow·wait·return·hit = 맞아서 그만둠) */
-  | { kind: 'follow'; scene: string; who: string; mode: 'follow' | 'wait' | 'return' | 'hit' };
+  | { kind: 'follow'; scene: string; who: string; mode: 'follow' | 'wait' | 'return' | 'hit' }
+  /** 거점 경보 켜짐·꺼짐 (why = 까닭, threat = 위협 이름 또는 {user}) */
+  | { kind: 'alarm'; scene: string; faction: string; on: boolean; why: string; threat: string };
 
 export interface SimOptions {
   spawns?: SpawnRule[];
@@ -403,6 +407,7 @@ export class WorldSim {
       a.hp = 0;
       this.struck(a, a.face, true);
       this.crime(a.scene, a.x, 15);
+      this.playerViolence(a.scene, a.x, a, 'assault');
       return;
     }
     a.act = 'idle';
@@ -468,6 +473,7 @@ export class WorldSim {
       }
     }
     if (out.length) this.crime(scene, out[0].x, 15 * out.length);
+    if (out.length) this.playerViolence(scene, out[0].x, out[0], 'assault');
     return out;
   }
   /** 행위자 하나를 맞힘 (에일린 코어 표적 경로). 같은 틱 여러 번은 hitBy로 거른다 */
@@ -486,6 +492,7 @@ export class WorldSim {
     if (a.def.kind === 'mob' && a.hp !== undefined) a.hp = Math.max(0, a.hp - dmg);
     this.struck(a, dir, this.hostile(a));
     this.crime(a.scene, a.x, 15);
+    this.playerViolence(a.scene, a.x, a, 'assault');
     return true;
   }
   private perk(a: Actor, name: string): boolean {
@@ -633,6 +640,7 @@ export class WorldSim {
     for (const p of this.posts) this.stepPost(p);
     this.stepPatrol(dt);
     if ((this.visitT -= dt) <= 0) { this.visitT = 0.5; this.stepVisitors(0.5); }
+    this.stepAlarms(dt);
   }
 
   // ── 방문 대응 (10-31 사용자, 살아 있는 세상 4단계): 다른 세력 사람이 세력 거점 장면에 들어오면 거점 사람들이 세력 관계대로 ──
@@ -726,6 +734,8 @@ export class WorldSim {
           continue;
         }
         if (st !== 'hostile') continue;
+        // 적대 방문자 = 들어오자마자 거점 경보 (10-31 사용자: 싸움 전이라도). 경보가 모든 방의 전투원을 모은다
+        this.raiseAlarm(scene, v.x, v.def.id, 'intruder');
         // 적대: 싸울 수 있는 우리 쪽이 둘까지 붙는다. 비전투원은 겁먹고 피한다
         const fighters = near((q) => this.combatant(q), 2000).slice(0, 2);
         for (const q of ours) if (!this.combatant(q) && Math.abs(q.x - v.x) < 500 && q.def.kind === 'mob' && !q.post) this.scareAt(q, v.x);
@@ -846,6 +856,134 @@ export class WorldSim {
   private lookOf(arch: string): string {
     const l = ARCHETYPES[arch]?.looks;
     return l?.length ? pick(this.rng, l) : arch;
+  }
+  // ── 경보 (10-31 사용자 결정 docs/필드기능_결정_1031.md 9번): 거점 전체 상태. 켜지면 경비·전투 가능한 요원이 위협에게 몰려가 공격, 비전투원은 피함 ──
+  /** 거점 세력 → 경보 (threats = 'player' 또는 행위자 id) */
+  readonly alarms = new Map<string, { scene: string; x: number; threats: string[]; quiet: number; tick: number; why: string }>();
+  /** 위협이 사라지고 이만큼(초) 지나면 해제 */
+  static ALARM_CLEAR = 15;
+  /** 그 거점 세력의 경보 (없으면 null) */
+  alarmOf(faction: string | null | undefined): { scene: string; x: number; threats: string[]; why: string } | null {
+    return faction ? this.alarms.get(faction) ?? null : null;
+  }
+  /** 장면이 경보 중인 거점인가 */
+  alarmIn(scene: string): boolean {
+    return !!this.alarmOf(this.sceneFaction(scene));
+  }
+  /** 경보를 켠다 (이미 켜져 있으면 위협만 더한다). threat = 'player' 또는 행위자 id */
+  raiseAlarm(scene: string, x: number, threat: string, why: string): void {
+    const fac = this.sceneFaction(scene);
+    if (!fac) return;
+    let al = this.alarms.get(fac);
+    if (!al) {
+      al = { scene, x, threats: [], quiet: 0, tick: 0, why };
+      this.alarms.set(fac, al);
+      const t = threat === 'player' ? '{user}' : this.actors.find((q) => q.def.id === threat)?.def.name ?? threat;
+      this.events.push({ kind: 'alarm', scene, faction: fac, on: true, why, threat: t });
+    }
+    if (!al.threats.includes(threat)) { al.threats.push(threat); al.tick = 0; }   // 새 위협이면 바로 모은다
+    al.scene = scene;
+    al.x = x;
+    al.quiet = 0;
+  }
+  /** 위협이 아직 거점 안에 있나 */
+  private threatAt(fac: string, t: string): { scene: string; x: number; y: number; actor?: Actor } | null {
+    if (t === 'player') {
+      const p = this.player;
+      return p && this.sceneFaction(p.scene) === fac ? { scene: p.scene, x: p.x, y: p.y } : null;
+    }
+    const a = this.actors.find((q) => q.def.id === t);
+    if (!a || a.fighting || ['down', 'dead', 'gone'].includes(a.act) || (a.plan === 'exit' && a.doing === '쫓겨남') || this.sceneFaction(a.scene) !== fac) return null;
+    return { scene: a.scene, x: a.x, y: a.y, actor: a };
+  }
+  /** 경보에 싸우러 가는 사람: 경비·경찰·전투 계열 이름 인물·다른 세력 아닌 전투원 */
+  private alarmFighter(a: Actor, fac: string): boolean {
+    if (a.def.kind === 'named') return !this.noAssist(a.def.name) && (!a.def.faction || a.def.faction === fac);
+    const role = ARCHETYPES[a.def.archetype ?? '']?.role;
+    return (role === 'guard' || role === 'police') && (this.mobFaction(a) === fac || !a.def.faction);
+  }
+  private stepAlarms(dt: number): void {
+    for (const [fac, al] of this.alarms) {
+      const live = al.threats.map((t) => [t, this.threatAt(fac, t)] as const).filter(([, v]) => !!v) as [string, NonNullable<ReturnType<WorldSim['threatAt']>>][];
+      if (!live.length) {
+        if ((al.quiet += dt) < WorldSim.ALARM_CLEAR) continue;
+        this.alarms.delete(fac);
+        for (const a of this.actors) {
+          if (a.alarm !== fac) continue;
+          a.alarm = undefined;
+          a.run = 1;
+          if (a.fighting || a.brawl || ['down', 'dead', 'gone'].includes(a.act)) continue;
+          a.plan = 'none';
+          a.route = [];
+          this.resume(a);
+        }
+        this.events.push({ kind: 'alarm', scene: al.scene, faction: fac, on: false, why: al.why, threat: '' });
+        continue;
+      }
+      al.quiet = 0;
+      al.scene = live[0][1].scene;
+      al.x = live[0][1].x;
+      if ((al.tick -= dt) > 0) continue;
+      al.tick = 1.5;
+      for (const a of this.actors) {
+        if (a.following || a.fighting || ['down', 'dead', 'gone', 'door'].includes(a.act) || this.sceneFaction(a.scene) !== fac) continue;
+        if (al.threats.includes(a.def.id)) continue;
+        // 가장 가까운 위협 (같은 장면 먼저)
+        const [tid, t] = live.slice().sort(([, p], [, q]) => (p.scene === a.scene ? 0 : 1) - (q.scene === a.scene ? 0 : 1) || Math.abs(p.x - a.x) - Math.abs(q.x - a.x))[0];
+        if (this.alarmFighter(a, fac)) {
+          a.alarm = fac;
+          if (a.brawl) continue;
+          a.seatPick = undefined;
+          a.task = undefined;
+          a.escort = undefined;
+          a.run = 1.6;
+          if (t.scene !== a.scene) {
+            if (a.route.length && a.plan === 'chase') continue;   // 이미 가는 중
+            const path = this.graph.route(a.scene, t.scene);
+            const d = path && this.graph.doorSpot(a.scene, path[0].exit);
+            if (!path || !d) continue;
+            a.route = path;
+            this.walkTo(a, d, '경보: 현장으로 달려감', 'chase');
+            this.iconOn(a, '!', 2);
+            continue;
+          }
+          if (tid === 'player') {
+            if (a.plan === 'chase' && !a.target) continue;
+            a.target = undefined;
+            this.walkTo(a, { x: t.x, y: t.y || a.y }, '경보: 침입자에게', 'chase');
+            this.iconOn(a, '!', 2);
+          } else if (t.actor) {
+            this.startBrawl(a, t.actor);
+            a.doing = `경보: ${t.actor.def.name}와 싸움`;
+          }
+          continue;
+        }
+        // 비전투원: 위협이 있는 장면이면 반대쪽으로 피한다 (다른 방은 그대로)
+        if (a.scene !== t.scene || a.alarm === fac || a.act === 'scared') continue;
+        if (Math.abs(a.x - t.x) > 900) continue;
+        a.alarm = fac;
+        this.evade(a, t.x);
+      }
+    }
+  }
+  /** 대피: 위협 반대쪽 끝으로 달려가 머문다 (사라지지 않음. 지나가던 사람은 그대로 나감) */
+  private evade(a: Actor, fromX: number): void {
+    if (a.def.kind === 'mob' && !a.post && !a.def.faction && a.def.brain === 'transit') return this.flee(a, fromX);
+    const len = this.graph.scene(a.scene)?.length ?? 1280;
+    const x = fromX < len / 2 ? len - 90 : 90;
+    a.seatPick = undefined;
+    a.task = undefined;
+    a.run = 1.6;
+    this.walkTo(a, { x, y: a.y }, '대피', 'none');
+    this.setClip(a, this.canClip(a, 'run') ? 'run' : 'walk');
+    this.iconOn(a, '!', 1.5);
+  }
+  /** 주인공이 거점 안에서 누군가를 때림·쓰러뜨림·죽임: 맞은 쪽이 위협(침입자)이 아니면 주인공이 위협 */
+  private playerViolence(scene: string, x: number, victim: Actor | undefined, why: string): void {
+    const fac = this.sceneFaction(scene);
+    if (!fac) return;
+    if (victim && this.alarms.get(fac)?.threats.includes(victim.def.id)) return;
+    this.raiseAlarm(scene, x, 'player', why);
   }
   // ── 동행 (10-31 사용자 결정 docs/필드기능_결정_1031.md 1번): 모델 답의 [[동행]]·[[기다림]]·[[복귀]] 표시로만 켜고 끈다 ──
   /** 따라오는 사람 id (앞에서부터 주인공 뒤 순서, 최대 MAX_FOLLOW) */
@@ -1756,6 +1894,7 @@ export class WorldSim {
   }
   /** 죽음: 선 채면 사망(44), 누워 있었으면 누운 채 사망(45). 시체로 남고 큰 범죄 → 경찰 출동, 한 명은 현장으로 */
   private kill(a: Actor, lying: boolean, fromFight = false): void {
+    this.playerViolence(a.scene, a.x, a, 'murder');
     a.seat = undefined;
     a.seatPick = undefined;
     a.goal = null;

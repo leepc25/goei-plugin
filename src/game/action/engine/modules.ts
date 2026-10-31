@@ -56,6 +56,8 @@ import type { Actor, SimEvent } from '../../world/actors';
 import { ARCHETYPES, profileOf } from '../../world/mobs';
 import { FightLog, enName, isLaw } from '../../world/fightlog';
 import { reactOf } from '../../world/namedReact';
+import { drawAlarmLights } from '../../world/alarmFx';
+import { view as fieldViewport } from './view';
 import { newAttackId } from './ids';
 import { settleLine } from '../../world/fieldmoney';
 import { NAMED_MUL, npcPerkDef, rollNpcPerks } from '../../world/npcperks';
@@ -265,6 +267,16 @@ function hqAdapter(bridge: Partial<GameBridge> | undefined, ui: { chooseFloor: H
         void b?.field?.record({ kind: 'act', ...line, scene: sceneNameOf(e.scene), visit: visitId }).catch(() => {});
         continue;
       }
+      // 거점 경보 켜짐·꺼짐 (10-31 필드 기능 9번)
+      if (e.kind === 'alarm') {
+        const fn = factionBy.get(e.faction)?.name ?? FACTION_NAMES[e.faction] ?? e.faction;
+        const why = ({ intruder: ['an intruder', '침입자'], assault: ['an assault', '폭행'], murder: ['a killing', '살인'], trespass: ['a trespasser refusing to leave', '퇴거 거부'], threat: ['a threat', '위협'] } as Record<string, [string, string]>)[e.why] ?? [e.why, e.why];
+        const line = e.on
+          ? { text: `${hm()}The ${fn} base alarm went off over ${why[0]} (${e.threat === '{user}' ? '{user}' : enName(e.threat)}). Guards and agents converged.`, ko: `${hm()}${fn} 거점 경보 (${why[1]}, ${e.threat === '{user}' ? '{user}' : e.threat})` }
+          : { text: `${hm()}The ${fn} base alarm was lifted.`, ko: `${hm()}${fn} 거점 경보 해제` };
+        void b?.field?.record({ kind: 'act', ...line, scene: sceneNameOf(e.scene), weight: e.on ? 2 : 1, visit: visitId }).catch(() => {});
+        continue;
+      }
       // 동행 시작·끝 (모델 답의 [[동행]]·[[기다림]]·[[복귀]], 맞아 쓰러짐). 지금 동행 = 확정 사실
       if (e.kind === 'follow') {
         const w = sim;
@@ -354,6 +366,7 @@ function hqAdapter(bridge: Partial<GameBridge> | undefined, ui: { chooseFloor: H
     setTimeout(() => void endVisit(true, 'down'), 1200);
   };
   let flushT = 0;
+  let sirenT = 0;
   const clockView = () => { const c = new FieldClock(fieldClock.sec === null ? null : fieldClock.sec / 60); return c; };
   // 필드 행위자를 에일린 공격 표적으로 (전투 몸이 아니므로 가짜 몸을 건넨다. 보이는 장면만)
   let lifeScene = '';
@@ -436,6 +449,8 @@ function hqAdapter(bridge: Partial<GameBridge> | undefined, ui: { chooseFloor: H
       w.step(dt, { ...at, hour: fieldClock.sec === null ? null : (fieldClock.sec / 3600) % 24, armed: !!P?.armed, face: P?.face ?? 1 });
       const evs = w.events.splice(0);
       record(evs);
+      // 경보 사이렌: 경보 중인 거점 안에 있으면 1.6초마다 한 바퀴, 음악은 낮춘다
+      if (w.alarmIn(at.scene)) { if ((sirenT -= dt) <= 0) { sirenT = 1.6; ui.sfx('siren'); } } else sirenT = 0;
       chatter?.step(dt, at.scene, at.x, evs);
       knockedOut(dt, at.scene);
       fightScene = at.scene;
@@ -559,7 +574,17 @@ function hqAdapter(bridge: Partial<GameBridge> | undefined, ui: { chooseFloor: H
         if (fieldClock.sec !== null) fieldClock.sec += sec;
         void b?.field?.record({ kind: 'move', text: `${hm()}{user} moved to ${to.name}.`, ko: `${hm()}{user}: ${to.name}(으)로 이동`, scene: to.name, weight: 1, visit: visitId, fact: { key: '{user} location', value: to.name } }).catch(() => {});   // 이어진 이동은 막간에서 한 줄로
       },
-      overlay: ui.overlay,
+      // 경보 중인 거점 장면: 경광등 빛 (그 위에 말풍선·이름표)
+      overlay: (c, people, player) => {
+        const w = sim;
+        const sc = lifeScene ? map.scenes.find((q) => q.id === lifeScene) : undefined;
+        if (w && sc && w.alarmIn(sc.id)) {
+          const z = fieldViewport.zoom;
+          const px = player.x / z;
+          drawAlarmLights(c, sc.length, (sc.lane ?? [LANE_TOP, LANE_BOT])[0], z, performance.now() / 1000, px - fieldViewport.w, px + fieldViewport.w);
+        }
+        ui.overlay?.(c, people, player);
+      },
       hour: () => (fieldClock.sec === null ? null : (fieldClock.sec / 3600) % 24),
       shop: (id) => ui.shop?.(id) ?? null,
       // 앉기·눕기 자리: 시간 보내기 (16-2장). 고른 만큼 시계가 간다
@@ -985,7 +1010,8 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
   window.addEventListener('keydown', floorKeys, true);
   const hq = hqAdapter(bridge, {
     chooseFloor,
-    sfx: (n) => audio.play(n as never),
+    // 사이렌은 음악을 낮춘다 (경보 중 1.6초마다 다시 틀므로 계속 낮게)
+    sfx: (n) => { audio.play(n as never); if (n === 'siren') audio.duck(1.7, 0.35); },
     overlay: visit ? (c, people, player) => visit.draw(c, people, player) : undefined,
     choose: (o) => shell.choose(o),
     shop: (id) => fieldShop?.open(id) ?? null,
