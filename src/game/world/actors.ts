@@ -126,6 +126,8 @@ export interface Actor {
   station?: string;
   /** 평소 거리 순찰 중인 경찰 (C16, 10-31) */
   patrol?: boolean;
+  /** 주인공이 말을 걸기 전에 하던 일 (몹 대화, 모델에 넣는다) */
+  talkFrom?: string;
   /** 이름 인물이 맞고 화난 생활 시각 (또 맞으면 맞선다, C4) */
   angryAt?: number;
   /** 호감 적대 이름 인물이 마지막으로 싸움에서 돌아온 생활 시각 (1분은 다시 막지 않음) */
@@ -792,6 +794,27 @@ export class WorldSim {
   private lookOf(arch: string): string {
     const l = ARCHETYPES[arch]?.looks;
     return l?.length ? pick(this.rng, l) : arch;
+  }
+  /** 몹에게 말을 걸 수 있나 (10-31 사용자: 몹도 이름 인물처럼 대화). 싸움·기절·사망·겁먹음·쫓김·막아섬·나가는 문 앞이면 안 됨 */
+  canTalk(a: Actor): boolean {
+    return a.def.kind === 'mob' && !a.fighting && !a.brawl && !['down', 'dead', 'gone', 'door', 'scared', 'argue'].includes(a.act) && a.plan !== 'chase' && a.plan !== 'steal' && a.plan !== 'harass';
+  }
+  /** 대화 중인 몹: 그 자리에 멈춰 주인공을 본다 (매 틱 다시 부르는 동안만, 대화창을 닫으면 1초 뒤 하던 일로) */
+  holdTalk(id: string, px: number): void {
+    const a = this.actors.find((q) => q.def.id === id);
+    if (!a || !this.canTalk(a)) return;
+    if (a.act !== 'pause' || a.doing !== '주인공과 대화') {
+      a.talkFrom = a.doing;
+      a.goal = null;
+      a.route = [];
+      a.seatPick = undefined;
+      a.buddy = undefined;
+      a.act = 'pause';
+      a.doing = '주인공과 대화';
+      this.setClip(a, this.canClip(a, 'talk') ? 'talk' : 'idle');
+    }
+    a.wait = 1;
+    a.face = px > a.x ? 1 : -1;
   }
   /** 그 장면에 순찰 경찰이 있나 (싸움·쓰러짐·나감 제외) */
   private patrolIn(scene: string): Actor | undefined {

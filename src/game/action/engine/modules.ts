@@ -6,7 +6,7 @@
 import { BASE_STATS } from '../../combat/baseStats.gen';
 import { derive, rollBase } from '../../combat/stats';
 import { clockText } from '../../../core/fieldclock';
-import type { GameAssets, GameBridge } from '../../bridge';
+import type { GameAssets, GameBridge, MobTalk } from '../../bridge';
 import { persp, view } from './view';
 import { KEYMAP } from './input';
 import { drawGuardBar } from '../ui/pixelHud';
@@ -53,7 +53,7 @@ import { Lines, NPC_TYPE, type DialogueData, type LineCtx } from '../../world/li
 import { Chatter } from '../../world/speech';
 import dialogueData from '../../world/dialogue.json';
 import type { Actor, SimEvent } from '../../world/actors';
-import { ARCHETYPES } from '../../world/mobs';
+import { ARCHETYPES, profileOf } from '../../world/mobs';
 import { FightLog, enName, isLaw } from '../../world/fightlog';
 import { settleLine } from '../../world/fieldmoney';
 import { NAMED_MUL, npcPerkDef, rollNpcPerks } from '../../world/npcperks';
@@ -99,7 +99,7 @@ const fieldWallet: { won: number | null } = { won: null };
 let observing = false;
 const observerOn = () => observing;
 /** 필드 가게 창이 쓰는 돈·장부 (hqAdapter 안에서 채운다: 가계부 다리·방문 id가 거기 있다) */
-const fieldLink: { pay?: (amount: number, memo: string) => Promise<number | null>; record?: (text: string, ko?: string) => void; fact?: (key: string, value: string) => void; nearPerson?: () => string | null; gift?: (who: string, item: string, counts: boolean) => void ; endVisit?: (close: boolean) => void } = {};
+const fieldLink: { mobOf?: (key: string) => MobTalk | null; talkTarget?: () => string; pay?: (amount: number, memo: string) => Promise<number | null>; record?: (text: string, ko?: string) => void; fact?: (key: string, value: string) => void; nearPerson?: () => string | null; gift?: (who: string, item: string, counts: boolean) => void ; endVisit?: (close: boolean) => void } = {};
 const wonText = (n: number) => `${n < 0 ? '−' : ''}₩ ${Math.abs(Math.trunc(n)).toLocaleString('en-US')}`;
 
 function hqAdapter(bridge: Partial<GameBridge> | undefined, ui: { chooseFloor: HubHost['chooseFloor']; sfx: (n: string) => void; overlay?: HubHost['overlay']; rules?: () => ClockRules; shop?: (id: string) => string | null; choose?: (o: { title: string; lines?: string[]; options: string[]; cancel?: boolean }) => Promise<number> }): HqModuleLike & { goto(place: string): void; visitReady: Promise<void>; visitor(): { agentId: string; name: string }; dispose(): void } {
@@ -351,6 +351,31 @@ function hqAdapter(bridge: Partial<GameBridge> | undefined, ui: { chooseFloor: H
         applyHit: (h: { dir: 1 | -1; attackId: number; dmg?: number; lethal?: boolean }) => (w.hitActor(a.def.id, h.dir, h.attackId, h.dmg ?? 12, !!h.lethal) ? { kind: 'hit' as const } : { kind: 'immune' as const }) } as unknown as Body,
     }));
   };
+  // ── 몹에게 말 걸기 (10-31 사용자: 몹도 이름 인물과 같이 모델로) ──
+  // 모델에 주는 인물 글: 그림 신상(성별·나이대·직업·인상) + 종류 말투(대사 자료 voice) + 성격 + 소속·태도 + 하던 일. 이름은 정해 두지 않는다
+  const lvl = (v: number | undefined, lo: string, hi: string) => (v === undefined ? '보통' : v < 0.35 ? lo : v > 0.65 ? hi : '보통');
+  fieldLink.mobOf = (key) => {
+    const w = sim;
+    const a = key.startsWith('mob:') ? w?.actors.find((q) => q.def.id === key.slice(4)) : undefined;
+    if (!w || !a || !w.canTalk(a)) return null;
+    const pf = profileOf(a.def.look);
+    const voice = (dialogueData as unknown as { npc: Record<string, { voice?: string }> }).npc[NPC_TYPE[a.def.archetype ?? a.def.name] ?? '']?.voice ?? '';
+    const fac = w.mobFaction(a);
+    const facName = fac ? factionBy.get(fac)?.name ?? FACTION_NAMES[fac] ?? fac : '';
+    const stance = fac ? factionBy.get(fac)?.stageLabel : undefined;
+    const t = a.temper;
+    const label = `${a.def.name}${pf ? `(${pf.sex}·${pf.age.replace(/\(.*\)/, '')})` : ''}`;
+    const lore = [
+      `이름 없는 사람(${a.def.name}). 이름은 정해져 있지 않다: 주인공이 물으면 나이·성별에 맞는 평범한 한국 이름을 하나 대고, 그 뒤로는 그 이름을 쓴다.`,
+      pf ? `성별 ${pf.sex === '여' ? '여자' : '남자'}, 나이 ${pf.age}${pf.job ? `, 직업 ${pf.job}` : ', 직업은 정해지지 않은 평범한 시민'}.` : '',
+      pf?.note ? `생김새·인상: ${pf.note}` : '',
+      voice ? `말투: ${voice}` : '',
+      t ? `성격: 용기 ${lvl(t.courage, '낮음(겁 많음)', '높음')}, 붙임성 ${lvl(t.social, '낮음', '높음')}, 성급함 ${lvl(t.haste, '느긋함', '높음')}, 호기심 ${lvl(t.curious, '낮음', '높음')}${a.drunk ? ', 지금 술에 취함' : ''}.` : '',
+      fac ? `소속: ${facName}${stance ? ` (이 소속은 주인공에게 「${stance}」)` : ''}.` : '어느 조직에도 속하지 않은 일반인. 괴이와 비밀 조직의 일은 모른다.',
+      `지금: ${sceneNameOf(a.scene)}에서 ${a.doing === '주인공과 대화' ? a.talkFrom ?? '지나가던 중' : a.doing}${a.doing === '주인공과 대화' ? ' 주인공이 말을 걸어 멈춰 섰다' : ''}.`,
+    ].filter(Boolean).join('\n');
+    return { id: `mob:${visitId}:${a.def.id}`, name: label, lore, place: sceneNameOf(a.scene), doing: a.doing === '주인공과 대화' ? a.talkFrom ?? a.doing : a.doing };
+  };
   // 선물 상대: 지금 장면에서 주인공과 가까운 이름 인물
   let lastAt = { x: 0, y: 0 };
   fieldLink.nearPerson = () => {
@@ -375,6 +400,9 @@ function hqAdapter(bridge: Partial<GameBridge> | undefined, ui: { chooseFloor: H
       // 무기를 들이민 주인공(겁 반응): 무기를 꺼낸 채 바라보는 쪽
       const pl = (globalThis as { __goeiEngine?: { world?: { player?: unknown } | null } }).__goeiEngine?.world?.player;
       const P = pl instanceof FighterPlayer ? pl.core.P : null;
+      // 말 거는 중인 몹은 멈춰 서서 주인공을 본다
+      const tk = fieldLink.talkTarget?.() ?? '';
+      if (tk.startsWith('mob:')) w.holdTalk(tk.slice(4), at.x);
       w.step(dt, { ...at, hour: fieldClock.sec === null ? null : (fieldClock.sec / 3600) % 24, armed: !!P?.armed, face: P?.face ?? 1 });
       const evs = w.events.splice(0);
       record(evs);
@@ -390,7 +418,7 @@ function hqAdapter(bridge: Partial<GameBridge> | undefined, ui: { chooseFloor: H
     hit: (sceneId, boxes, dir) => world()?.hitBoxes(sceneId, boxes, dir).length ?? 0,
     actors: (sceneId) => (world()?.inScene(sceneId) ?? []).map((a) => {
       const st = a.seat ? world()?.graph.scene(sceneId)?.seats?.[a.seat.i] : undefined;
-      return { id: a.def.id, name: a.def.name, kind: a.def.kind, x: a.x, y: a.y, face: a.face, look: a.def.look, moving: a.act === 'walk', clip: a.clip, since: a.clipAt, icon: a.icon, say: a.say,
+      return { id: a.def.id, name: a.def.name, kind: a.def.kind, x: a.x, y: a.y, face: a.face, look: a.def.look, moving: a.act === 'walk', clip: a.clip, since: a.clipAt, icon: a.icon, say: a.say, ...(a.def.kind === 'mob' && b?.visit?.sendMob && world()!.canTalk(a) ? { talk: true } : {}),
         ...(a.seat && st ? { seat: { box: st.box, dir: a.seat.dir, kind: a.seat.kind, x: a.seat.x, y: a.seat.y } } : {}) };
     }),
     observer: (sceneId) => (observing && sim ? observerLines(sim, clockView(), sceneId, seed) : null),
@@ -676,7 +704,8 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
   if (bridge?.visit && bridge.assets) void loadFieldFx(bridge.assets, ffx, cutins);
   // NPC 자유 대화 (npcLink.ts): 껍데기 놀이판 층에 대화창
   // 본부 방문: 머리 위 이름표·말풍선과 아래 한 줄 입력 (talk.ts)
-  const visit = bridge?.visit ? mountTalk(shell.stage.ui, bridge.visit, bridge.field) : null;
+  const visit = bridge?.visit ? mountTalk(shell.stage.ui, bridge.visit, bridge.field, (k) => fieldLink.mobOf?.(k) ?? null) : null;
+  fieldLink.talkTarget = () => visit?.target() ?? '';
   const npc = linkNpcTalk({
     visit: visit ? name => { if (name) visit.open(name); } : undefined,
     layer: shell.stage.ui,

@@ -63,7 +63,9 @@ export async function openField({ width = 1873, height = 1082, panel = true, car
       api: 1, slot: 0,
       uiPrefs: { load: async () => h.prefs, save: (t) => { h.prefs = t; } },
       ...(people ? { people: { people: async () => h.peopleList, sheet: async () => null, factions: async () => h.factions, onChange: () => () => {} } } : {}),
-      visit: { state: async () => state(), send: async (id, text) => { h.sent.push([id, text]); turns.push({ id: String(turns.length), at: Date.now(), agentId: id, name: '잼트리', user: text, reply: '응.' }); return state(); } },
+      visit: { state: async () => state(), send: async (id, text) => { h.sent.push([id, text]); turns.push({ id: String(turns.length), at: Date.now(), agentId: id, name: '잼트리', user: text, reply: '응.' }); return state(); },
+        // 몹에게 말 걸기 (10-31): 받은 몹 정보를 h.mobTalks 에 남기고 고정 답
+        sendMob: async (mob, text) => { (h.mobTalks ??= []).push({ mob, text }); turns.push({ id: String(turns.length), at: Date.now(), agentId: mob.id, name: mob.name, user: text, reply: '네? 저요?', room: mob.place }); return state(); } },
       wallet: { balance: async () => h.won, add: async (n, m) => { h.won += n; h.trades.push([n, m]); return h.won; } },
       fieldState: { load: async () => h.fd ?? null, save: async (t) => void (h.fd = t) },
       field: { record: async (ev) => void h.records.push(ev), entry: async () => ({ allow: true, presence: 'none', site: 'hq', minute: 22 * 60 }) },

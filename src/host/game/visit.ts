@@ -132,5 +132,49 @@ export function createVisit(): GameVisit {
         return stateOf({ ...c, chat: saved });
       } finally { busy = false; }
     },
+    // 몹에게 말 걸기 (10-31 사용자): 이름 인물과 같은 프롬프트·모델·저장. 인물 글은 로어북 대신 게임이 그림 신상·말투·성격으로 만들어 준다
+    async sendMob(mob, input) {
+      if (busy || isWaiting()) throw new Error('진행 중인 응답이 끝난 뒤 보내 주세요.');
+      const acted = /^\*([^*]+)\*?$/.exec(input.trim());
+      const act = !!acted;
+      const text = (acted ? acted[1] : input).trim();
+      if (!text || text.length > 2000) throw new Error('대화는 1~2000자로 입력해 주세요.');
+      if (!mob?.id || !mob.name || !mob.lore) throw new Error('말을 걸 수 없는 사람이에요.');
+      busy = true;
+      try {
+        const c = await context();
+        const me = playerAgent(c.char.globalLore, c.chat.scriptstate);
+        const src = playerSource({ char: c.char as RefSource['char'], chat: c.chat, persona: me ? '' : await readPersona() });
+        const visitorName = me?.name ?? (String(await risuai.parseRisuChat('{{user}}') ?? '').replace(/\{\{[^}]*\}\}/g, '').trim() || '방문자');
+        const anchor = anchorOf(c.chat);
+        const now = visitRecord(c.chat).turns.filter(t => (t.anchor ?? '') === anchor);
+        const lines = (ts: VisitTurn[]): VisitLine[] => ts.flatMap(t => [{ speaker: t.visitor || visitorName, text: t.user, ...(t.act ? { action: true } : {}) }, { speaker: t.name, text: t.reply }]);
+        const ss = c.chat.scriptstate;
+        const prompt = fitPrompt(budgetFor(ss, 'hq'), () => visitPrompt(src, {
+          agent: { id: mob.id, name: mob.name, state: '', situation: mob.doing, room: mob.place, lore: mob.lore },
+          visitor: visitorName,
+          conversation: lines(now.filter(t => t.agentId === mob.id)),
+          elsewhere: [],
+          bystanders: [],
+          said: text,
+          act,
+          scene: sceneOf(c, me?.id),
+          skipBooks: me ? [me.lore] : [],
+        }, factionNamesOf(c)));
+        const model = advValue(ss, 'hq', 'model') === 'main' ? 'main' : 'aux';
+        const raw = await runModel(prompt.messages, model);
+        const reply = parseVisitGroup(raw, mob.name, [], prompt.limit).line;
+        lastExchange = { at: Date.now(), model, messages: prompt.messages, raw, reply };
+        const turn: VisitTurn = { id: uid(), at: Date.now(), agentId: mob.id, name: mob.name, user: text, reply, anchor, room: mob.place, ...(me ? { visitor: me.name } : {}), ...(act ? { act } : {}) };
+        const char = await risuai.getCharacterFromIndex(c.charIndex) as { chaId?: string } | null;
+        if (!char || char.chaId !== c.char.chaId) throw new Error('원래 카드가 바뀌어 대화를 저장하지 못했어요.');
+        const saved = await updateChat(c.charIndex, c.chatIndex, chat => {
+          if (chat.id !== c.chat.id) throw new Error('원래 채팅이 바뀌어 대화를 저장하지 못했어요.');
+          return withVisitTurn(chat, turn);
+        });
+        if (!saved) throw new Error('대화 기록을 저장하지 못했어요.');
+        return stateOf({ ...c, chat: saved });
+      } finally { busy = false; }
+    },
   };
 }

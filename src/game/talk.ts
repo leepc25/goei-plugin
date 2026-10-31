@@ -1,10 +1,11 @@
 // 본부 방문 대화 화면 (2026-10-22 설계 2판): RPG처럼 머리 위 이름표와 말풍선, 아래 한 줄 입력.
 // 요청·모델·저장은 플러그인(host/game/visit.ts)이 한다. 여기는 보이는 것만.
-import type { GameField, GameVisit, VisitState } from './bridge';
+import type { GameField, GameVisit, MobTalk, VisitState } from './bridge';
 import { canJoin, classify, fieldCompanions } from '../core/fieldfollow';
 import { ensureKit, PIXEL_FONT } from './action/ui/kit';
 
-export interface TalkPerson { name: string; x: number; y: number; top: number }
+/** name = 열쇠 (이름 인물 = 이름, 몹 = mob:<id>), label = 이름표 글 (몹) */
+export interface TalkPerson { name: string; x: number; y: number; top: number; label?: string; mob?: boolean }
 interface Bubble { who: string; text: string; until: number; pending?: boolean; /** 이때부터 보인다 (끼어든 말은 앞 말 뒤에) */ from?: number }
 
 const FONT = (px: number) => `${px}px "${PIXEL_FONT}", "Galmuri11", sans-serif`;
@@ -37,7 +38,8 @@ const CSS = `
 .gt-log[data-open]{display:block}
 `;
 
-export function mountTalk(root: HTMLElement, api: GameVisit, field?: GameField) {
+/** mobOf = 몹 열쇠(mob:<id>) → 말 걸 몹 정보 (없으면 몹 대화 없음, 10-31) */
+export function mountTalk(root: HTMLElement, api: GameVisit, field?: GameField, mobOf?: (key: string) => MobTalk | null) {
   ensureKit();
   const st = document.createElement('style');
   st.textContent = CSS;
@@ -97,8 +99,9 @@ export function mountTalk(root: HTMLElement, api: GameVisit, field?: GameField) 
     sendBtn.disabled = busy || !target;
     input.disabled = busy;
   };
+  const isMob = (k: string) => k.startsWith('mob:');
   const renderLog = () => {
-    const agent = state.agents.find((a) => a.name === target);
+    const agent = isMob(target) ? { id: mobOf?.(target)?.id } : state.agents.find((a) => a.name === target);
     const turns = state.turns.filter((t) => t.agentId === agent?.id || t.extra?.some((e) => e.agentId === agent?.id)).slice(-30);
     log.textContent = turns.length ? turns.map((t) => [t.act ? `${t.visitor || me()}: *${t.user}*` : `${t.visitor || me()}: ${t.user}`, `${t.name}: ${t.reply}`, ...(t.extra ?? []).map((e) => `${e.name}: ${e.line}`)].join('\n')).join('\n\n') : '아직 나눈 말이 없어요.';
     log.scrollTop = log.scrollHeight;
@@ -107,7 +110,8 @@ export function mountTalk(root: HTMLElement, api: GameVisit, field?: GameField) 
   async function open(name: string) {
     target = name;
     msg.textContent = '';
-    to.textContent = `${name}에게`;
+    const mob = isMob(name) ? mobOf?.(name) ?? null : null;
+    to.textContent = `${mob ? mob.name : name}에게`;
     bar.setAttribute('data-open', '');
     refresh();
     // 터치 기기는 바로 키패드를 띄우지 않는다: 터치판 대사창 모드의 「선택」(또는 입력칸 누르기)으로 연다 (모바일 조작 설계 2026-10-28)
@@ -115,7 +119,7 @@ export function mountTalk(root: HTMLElement, api: GameVisit, field?: GameField) 
     try {
       state = await api.state();
       if (dead) return;
-      if (!state.agents.some((a) => a.name === name && a.room)) msg.textContent = '지금 이 요원과는 대화할 수 없어요.';
+      if (isMob(name) ? !mob || !api.sendMob : !state.agents.some((a) => a.name === name && a.room)) msg.textContent = isMob(name) ? '지금 이 사람과는 대화할 수 없어요.' : '지금 이 요원과는 대화할 수 없어요.';
       if (log.hasAttribute('data-open')) renderLog();
     } catch (e) {
       if (!dead) msg.textContent = e instanceof Error ? e.message : String(e);
@@ -150,8 +154,40 @@ export function mountTalk(root: HTMLElement, api: GameVisit, field?: GameField) 
       void field.record({ kind: 'unfollow', text: `${agent.name} ${want === 'wait' ? 'stayed behind to wait' : 'went back to their post'}.`, ko: `${agent.name} ${want === 'wait' ? '남아서 기다림' : '자리로 돌아감'}`, who: [agent.name], weight: 2, fact: { key: 'companions', value: followers.join(', ') || 'none' } }).catch(() => {});
     }
   }
+  /** 몹에게 말 걸기 (10-31 사용자: 이름 인물과 같이 모델) */
+  const sendMob = async (raw: string) => {
+    const key = target;
+    const mob = mobOf?.(key);
+    if (busy || !mob || !api.sendMob) return;
+    const bare = raw.replace(/^\*+|\*+$/g, '').trim();
+    const text = act || /^\*/.test(raw) ? `*${bare}*` : raw;
+    if (!bare) return;
+    busy = true;
+    msg.textContent = '';
+    input.value = '';
+    say(me(), text);
+    say(key, '…', true);
+    refresh();
+    try {
+      state = await api.sendMob(mob, text);
+      if (dead) return;
+      exchanged++;
+      say(key, state.turns.filter((t) => t.agentId === mob.id).at(-1)?.reply ?? '');
+      if (log.hasAttribute('data-open')) renderLog();
+    } catch (e) {
+      if (dead) return;
+      for (let i = bubbles.length - 1; i >= 0; i--) if (bubbles[i].who === key) bubbles.splice(i, 1);
+      msg.textContent = e instanceof Error ? e.message : String(e);
+      input.value = input.value || raw;
+    } finally {
+      busy = false;
+      refresh();
+      if (!dead && bar.hasAttribute('data-open')) input.focus();
+    }
+  };
   const send = async () => {
     const raw = input.value.trim();
+    if (isMob(target)) return sendMob(raw);
     const agent = state.agents.find((a) => a.name === target && a.room);
     if (busy || !raw || !agent) return;
     const bare = raw.replace(/^\*+|\*+$/g, '').trim();
@@ -237,10 +273,14 @@ export function mountTalk(root: HTMLElement, api: GameVisit, field?: GameField) 
       const near = !!player && !isPlayer && Math.abs(p.x - player.x) < REACH && Math.abs(p.y - player.y) < 80;
       const x = Math.round(p.x);
       c.font = FONT(TAG_PX);
-      const tw = Math.ceil(c.measureText(p.name).width) + 8;
+      // 몹: 이름표는 말 상대이거나 말풍선이 있을 때만 (거리에 수십 명이라 가까운 몹마다 달면 겹친다)
+      const label = p.mob ? mobOf?.(p.name)?.name ?? p.label ?? '' : p.name;
+      const speaking = bubbles.some((q) => q.who === p.name && (q.from ?? 0) <= now);
+      if (p.mob && p.name !== target && !speaking) continue;
+      const tw = Math.ceil(c.measureText(label).width) + 8;
       const tagBottom = place(x, tw, 18, Math.round(p.y + p.top));
       // 지금 조작하는 주인공은 이름표를 달지 않는다 (사용자 2026-10-25). 자리만 잡아 말풍선을 머리 위에 띄운다
-      if (!isPlayer) tag(c, p.name, x, tagBottom - 9, near || p.name === target);
+      if (!isPlayer) tag(c, label, x, tagBottom - 9, near || p.name === target);
       // 내가 입력하는 동안 내 머리 위에 움직이는 점 (말을 보내면 그 말로 바뀐다)
       const typing = isPlayer && !busy && bar.hasAttribute('data-open') && document.activeElement === input && input.value.trim() !== '';
       const b = bubbles.find((q) => q.who === p.name && (q.from ?? 0) <= now) ?? (typing ? { who: p.name, text: '', until: Infinity, pending: true } : undefined);
@@ -255,6 +295,8 @@ export function mountTalk(root: HTMLElement, api: GameVisit, field?: GameField) 
 
   return {
     open: (name: string) => void open(name),
+    /** 지금 말 상대 열쇠 (없으면 '') */
+    target: () => (bar.hasAttribute('data-open') ? target : ''),
     isOpen: () => bar.hasAttribute('data-open'),
     close,
     draw,

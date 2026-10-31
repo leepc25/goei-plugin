@@ -37,7 +37,7 @@ export interface HubHost {
   /** 본부 방문: 이 장면에 서 있는 요원 (상태 태그로 정한 방). 발 위치와 보는 쪽 */
   visitors?(sceneId: string): { name: string; x: number; y: number; face: 1 | -1 }[];
   /** 장면 맨 위에 그리기 (월드 좌표): 이름표·말풍선. people = 이 방 요원, player = 주인공 발 */
-  overlay?(c: CanvasRenderingContext2D, people: { name: string; x: number; y: number; top: number }[], player: { name: string; x: number; y: number; top: number }): void;
+  overlay?(c: CanvasRenderingContext2D, people: { name: string; x: number; y: number; top: number; label?: string; mob?: boolean }[], player: { name: string; x: number; y: number; top: number }): void;
   /** 필드 시각 (시, 0~24). 없으면 시간대 조명은 기기 시계 */
   hour?(): number | null;
   /** 앉기·눕기 자리에 앉았다 (시간 보내기 고르기) */
@@ -50,6 +50,8 @@ export interface HubHost {
 
 /** 보이는 장면의 행위자 하나 (월드 좌표, 발 기준) */
 export interface LiveActor { id: string; name: string; kind: 'named' | 'mob'; x: number; y: number; face: 1 | -1; look?: string; moving: boolean; clip?: string; since?: number; icon?: string; say?: string;
+  /** 몹: 지금 말을 걸 수 있나 (10-31 사용자: 몹도 이름 인물처럼 대화) */
+  talk?: boolean;
   /** 지도 의자에 앉음: 의자 번호(장면 상자 번호)·앉기 방향·하는 일·의자 자리 */
   seat?: { box: number; dir: 'front' | 'side' | 'back'; kind: string; x: number; y: number } }
 export interface HubLife {
@@ -255,7 +257,9 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
         c.scale(1 / z, 1 / z);
         // 사람 그림은 월드 배율로 그려지므로(배경과 같이 커짐) 머리 높이도 z를 곱한다
         const shown = host.life ? live.filter((a) => a.kind === 'named') : people;
-        host.overlay?.(c, shown.map((p) => ({ name: p.name, x: p.x * z, y: p.y * z, top: namedTop(p.name) * persp(p.y) * z })), { name: '', x: w.player.x * z, y: (w.player.y - w.player.z) * z, top: ((w.player as { art?: { key: string } }).art ? charTop((w.player as { art?: { key: string } }).art!.key) : -230) * persp(w.player.y) * z });
+        const mobsShown = host.life ? live.filter((a) => a.kind === 'mob' && a.talk) : [];
+        host.overlay?.(c, [...shown.map((p) => ({ name: p.name, x: p.x * z, y: p.y * z, top: namedTop(p.name) * persp(p.y) * z })),
+          ...mobsShown.map((p) => ({ name: `mob:${p.id}`, label: p.name, mob: true, x: p.x * z, y: p.y * z, top: (p.look && charArt(p.look) ? charTop(p.look) : -230) * persp(p.y) * z }))], { name: '', x: w.player.x * z, y: (w.player.y - w.player.z) * z, top: ((w.player as { art?: { key: string } }).art ? charTop((w.player as { art?: { key: string } }).art!.key) : -230) * persp(w.player.y) * z });
         c.restore();
         // 행위자 머리 위 아이콘·말풍선 (화면 px)
         if (host.life) {
@@ -352,7 +356,9 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
         gears = host.life.gear?.(scene.id) ?? [];
         // 이름 인물 대화 자리(visit:이름)를 지금 서 있는 곳으로 옮긴다 (E → npcLink 대화)
         const named = live.filter((q) => q.kind === 'named');
-        scene.spots = scene.spots.filter((q) => !q.id.startsWith('visit:')).concat(named.map((q) => ({ id: `visit:${q.name}`, x: q.x, y: q.y, who: q.name, verb: '대화', face: q.face, open: true })));
+        // 몹도 말을 걸 수 있다 (10-31 사용자): 자리 열쇠 = mob:<id> (같은 이름 몹이 여럿이라 이름 대신 id)
+        const talkers = live.filter((q) => q.kind === 'mob' && q.talk);
+        scene.spots = scene.spots.filter((q) => !q.id.startsWith('visit:')).concat(named.map((q) => ({ id: `visit:${q.name}`, x: q.x, y: q.y, who: q.name, verb: '대화', face: q.face, open: true })), talkers.map((q) => ({ id: `visit:mob:${q.id}`, x: q.x, y: q.y, who: `mob:${q.id}`, verb: '대화', face: q.face, open: true })));
         curPeople = named;
       }
       if (fadeOut > 0 && --fadeOut === 0 && pending) {

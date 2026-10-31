@@ -124,3 +124,12 @@ test('가방 같은 확정 사실만 담은 줄은 [Field log]에 안 넣고 [Fi
   const out = withFieldFacts([{ role: 'user', content: '다음' }], c, '민준');
   assert.match(out[0].content, /- 민준 carrying: 컵라면×1/);
 });
+
+test('몹과 나눈 말도 이름 인물 대화처럼 원문 그대로 [Field log]에 (10-31)', () => {
+  const c = { ...base(), goeiHqVisitV1: { turns: [{ id: 't1', at: 5, agentId: 'mob:v1:mob13', name: '행인(여·20대 후반)', user: '저기요, 이 근처 사세요?', reply: '네? 저요? 아니요, 출근길이에요.', anchor: 'c1', room: '종로 뒷골목' }] } };
+  const out = withInterludes([{ role: 'user', content: '출근' }, { role: 'assistant', content: '사무실이다.' }, { role: 'user', content: '다음' }], c, null, '민준');
+  const block = out.find((m) => m.content.startsWith(INTERLUDE_HEAD)).content;
+  assert.match(block, /— with 행인\(여·20대 후반\) \(종로 뒷골목\) —/);
+  assert.match(block, /민준: 저기요, 이 근처 사세요\?/);
+  assert.match(block, /행인\(여·20대 후반\): 네\? 저요\? 아니요, 출근길이에요\./);
+});
