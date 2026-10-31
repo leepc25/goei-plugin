@@ -31422,7 +31422,7 @@ void main() {
     ], { spots: [{ id: "van", x: 370, y: LANE_TOP + 50, verb: "출동", depart: true }] }),
     // ── 중림 지하상가 (중립지역, 그림 4장). 지상 입구 → 지하 1층 앞골목 → (가운데 통로) 뒷골목 / (동쪽 계단) 지하 2층 ──
     floorHall("jr_entry", "중림 지하상가 입구", "out", [
-      { id: "west", kind: "exit", side: "S", to: "street", toDoor: "jr", label: "종로로 (임시)" },
+      { id: "west", kind: "door", to: "street", toDoor: "jr", label: "버스 정류장" },
       { id: "down", kind: "door", to: "jr_b1", toDoor: "up", label: "지하상가로 내려가기" }
     ]),
     floorHall("jr_b1", "중림 지하상가 지하 1층", "B1", [
