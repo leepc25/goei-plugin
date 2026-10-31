@@ -1,7 +1,6 @@
 // 본부 방문 대화 화면 (2026-10-22 설계 2판): RPG처럼 머리 위 이름표와 말풍선, 아래 한 줄 입력.
 // 요청·모델·저장은 플러그인(host/game/visit.ts)이 한다. 여기는 보이는 것만.
-import type { GameField, GameVisit, MobTalk, VisitState } from './bridge';
-import { canJoin, classify, fieldCompanions } from '../core/fieldfollow';
+import type { GameField, GameVisit, MobTalk, TalkOpts, VisitState } from './bridge';
 import { ensureKit, PIXEL_FONT } from './action/ui/kit';
 
 /** name = 열쇠 (이름 인물 = 이름, 몹 = mob:<id>), label = 이름표 글 (몹) */
@@ -38,8 +37,14 @@ const CSS = `
 .gt-log[data-open]{display:block}
 `;
 
+/** 필드 세계와 잇기 (10-31 필드 기능): 말을 걸 때 하던 일·쓸 수 있는 행동 표시를 묻고, 답에 붙은 표시를 넘긴다 */
+export interface TalkWorld {
+  opts?(key: string): TalkOpts;
+  onTags?(key: string, name: string, tags: string[]): void;
+}
+
 /** mobOf = 몹 열쇠(mob:<id>) → 말 걸 몹 정보 (없으면 몹 대화 없음, 10-31) */
-export function mountTalk(root: HTMLElement, api: GameVisit, field?: GameField, mobOf?: (key: string) => MobTalk | null) {
+export function mountTalk(root: HTMLElement, api: GameVisit, field?: GameField, mobOf?: (key: string) => MobTalk | null, world?: TalkWorld) {
   ensureKit();
   const st = document.createElement('style');
   st.textContent = CSS;
@@ -135,25 +140,6 @@ export function mountTalk(root: HTMLElement, api: GameVisit, field?: GameField, 
     input.blur();
     target = '';
   }
-  /** 「따라와」「기다려」 같은 분명한 부탁은 모델 없이 코드가 장부에 남긴다 (7-2). 애매하면 아무것도 하지 않는다 */
-  const followers: string[] = [];
-  function follow(agent: { name: string; state?: string }, text: string) {
-    if (!field || /^\*/.test(text)) return;
-    const want = classify(text);
-    if (want === 'follow') {
-      const ok = canJoin({ state: agent.state, affinity: 0 });
-      if (!ok.ok) { msg.textContent = ok.reason ?? ''; return; }
-      if (followers.includes(agent.name)) return;
-      followers.push(agent.name);
-      const { shown, rest } = fieldCompanions(followers);
-      void field.record({ kind: 'follow', text: `${agent.name} started following {user}.`, ko: `${agent.name} 동행 시작`, who: [agent.name], weight: 2, fact: { key: 'companions', value: [...shown, ...(rest.length ? [`(+ ${rest.join(', ')})`] : [])].join(', ') } }).catch(() => {});
-    } else if (want === 'wait' || want === 'return') {
-      const i = followers.indexOf(agent.name);
-      if (i < 0) return;
-      followers.splice(i, 1);
-      void field.record({ kind: 'unfollow', text: `${agent.name} ${want === 'wait' ? 'stayed behind to wait' : 'went back to their post'}.`, ko: `${agent.name} ${want === 'wait' ? '남아서 기다림' : '자리로 돌아감'}`, who: [agent.name], weight: 2, fact: { key: 'companions', value: followers.join(', ') || 'none' } }).catch(() => {});
-    }
-  }
   /** 몹에게 말 걸기 (10-31 사용자: 이름 인물과 같이 모델) */
   const sendMob = async (raw: string) => {
     const key = target;
@@ -172,7 +158,9 @@ export function mountTalk(root: HTMLElement, api: GameVisit, field?: GameField, 
       state = await api.sendMob(mob, text);
       if (dead) return;
       exchanged++;
-      say(key, state.turns.filter((t) => t.agentId === mob.id).at(-1)?.reply ?? '');
+      const turn = state.turns.filter((t) => t.agentId === mob.id).at(-1);
+      say(key, turn?.reply ?? '');
+      if (turn?.tags?.length) world?.onTags?.(key, mob.name, turn.tags);
       if (log.hasAttribute('data-open')) renderLog();
     } catch (e) {
       if (dead) return;
@@ -200,11 +188,11 @@ export function mountTalk(root: HTMLElement, api: GameVisit, field?: GameField, 
     say(agent.name, '…', true);
     refresh();
     try {
-      state = await api.send(agent.id, text, 'aux', nearby(agent.name));
+      state = await api.send(agent.id, text, 'aux', nearby(agent.name), world?.opts?.(agent.name) ?? {});
       if (dead) return;
       exchanged++;
-      follow(agent, text);
       const turn = state.turns.filter((t) => t.agentId === agent.id).at(-1);
+      if (turn?.tags?.length) world?.onTags?.(agent.name, agent.name, turn.tags);
       say(agent.name, turn?.reply ?? '');
       // 끼어든 말은 앞 말을 읽을 틈을 두고 차례로
       let delay = 0;

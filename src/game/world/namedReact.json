@@ -1,0 +1,1838 @@
+{
+  "쟈알디": {
+    "combat": true,
+    "weapon": {
+      "clip": "spot",
+      "icon": "…",
+      "act": "confront"
+    },
+    "body": {
+      "clip": "smoke",
+      "icon": "…",
+      "act": "approach"
+    },
+    "uproar": {
+      "clip": "smoke",
+      "icon": "…",
+      "act": "approach"
+    },
+    "crime": {
+      "clip": "angry",
+      "icon": "!",
+      "act": "attack"
+    },
+    "allyHit": {
+      "clip": "angry",
+      "icon": "!",
+      "act": "attack"
+    },
+    "allyDown": {
+      "clip": "spot",
+      "icon": "…",
+      "act": "protect"
+    },
+    "notes": "이도형이 보이면 냉정함이 깨져 화냄 / # / 곧장 공격. 기밀을 함부로 다루는 짓이면 노려봄 / # / 캐물음."
+  },
+  "스팡달": {
+    "combat": true,
+    "weapon": {
+      "clip": "laugh",
+      "icon": "♪",
+      "act": "confront"
+    },
+    "body": {
+      "clip": "spot",
+      "icon": "♪",
+      "act": "approach"
+    },
+    "uproar": {
+      "clip": "spot",
+      "icon": "…",
+      "act": "approach"
+    },
+    "crime": {
+      "clip": "spot",
+      "icon": "…",
+      "act": "attack"
+    },
+    "allyHit": {
+      "clip": "angry",
+      "icon": "!",
+      "act": "attack"
+    },
+    "allyDown": {
+      "clip": "shake",
+      "icon": "…",
+      "act": "protect"
+    }
+  },
+  "잼트리": {
+    "combat": false,
+    "weapon": {
+      "clip": "angry",
+      "icon": "#",
+      "act": "confront"
+    },
+    "body": {
+      "clip": "memo",
+      "icon": "…",
+      "act": "report"
+    },
+    "uproar": {
+      "clip": "gesture",
+      "icon": "!",
+      "act": "approach"
+    },
+    "crime": {
+      "clip": "memo",
+      "icon": "…",
+      "act": "report"
+    },
+    "allyHit": {
+      "clip": "backoff",
+      "icon": "!",
+      "act": "avoid"
+    },
+    "allyDown": {
+      "clip": "sitdown",
+      "icon": "…",
+      "act": "protect"
+    }
+  },
+  "에일린": {
+    "combat": true,
+    "weapon": {
+      "clip": "angry",
+      "icon": "…",
+      "act": "confront"
+    },
+    "body": {
+      "clip": "spot",
+      "icon": "…",
+      "act": "watch"
+    },
+    "uproar": {
+      "clip": "spot",
+      "icon": "!",
+      "act": "avoid"
+    },
+    "crime": {
+      "clip": "angry",
+      "icon": "!",
+      "act": "attack"
+    },
+    "allyHit": {
+      "clip": "angry",
+      "icon": "!",
+      "act": "attack"
+    },
+    "allyDown": {
+      "clip": "scramble",
+      "icon": "!",
+      "act": "protect"
+    }
+  },
+  "고르고디오": {
+    "combat": true,
+    "weapon": {
+      "clip": "angry",
+      "icon": "!",
+      "act": "attack"
+    },
+    "body": {
+      "clip": "gesture",
+      "icon": "!",
+      "act": "approach"
+    },
+    "uproar": {
+      "clip": "gesture",
+      "icon": "!",
+      "act": "approach"
+    },
+    "crime": {
+      "clip": "angry",
+      "icon": "#",
+      "act": "attack"
+    },
+    "allyHit": {
+      "clip": "angry",
+      "icon": "!",
+      "act": "protect"
+    },
+    "allyDown": {
+      "clip": "scramble",
+      "icon": "!",
+      "act": "protect"
+    }
+  },
+  "큐라스": {
+    "combat": true,
+    "weapon": {
+      "clip": "backoff",
+      "icon": "!",
+      "act": "confront"
+    },
+    "body": {
+      "clip": "spot",
+      "icon": "…",
+      "act": "report"
+    },
+    "uproar": {
+      "clip": "gesture",
+      "icon": "?",
+      "act": "approach"
+    },
+    "crime": {
+      "clip": "angry",
+      "icon": "!",
+      "act": "confront"
+    },
+    "allyHit": {
+      "clip": "angry",
+      "icon": "!",
+      "act": "attack"
+    },
+    "allyDown": {
+      "clip": "angry",
+      "icon": "!",
+      "act": "protect"
+    }
+  },
+  "데드폴": {
+    "combat": true,
+    "weapon": {
+      "clip": "angry",
+      "icon": "!",
+      "act": "confront"
+    },
+    "body": {
+      "clip": "think",
+      "icon": "…",
+      "act": "report"
+    },
+    "uproar": {
+      "clip": "spot",
+      "icon": "?",
+      "act": "approach"
+    },
+    "crime": {
+      "clip": "angry",
+      "icon": "!",
+      "act": "attack"
+    },
+    "allyHit": {
+      "clip": "gesture",
+      "icon": "!",
+      "act": "protect"
+    },
+    "allyDown": {
+      "clip": "sitdown",
+      "icon": "…",
+      "act": "protect"
+    }
+  },
+  "게슈간": {
+    "combat": true,
+    "weapon": {
+      "clip": "angry",
+      "icon": "#",
+      "act": "attack"
+    },
+    "body": {
+      "clip": "spot",
+      "icon": "…",
+      "act": "watch"
+    },
+    "uproar": {
+      "clip": "spot",
+      "icon": "…",
+      "act": "watch"
+    },
+    "crime": {
+      "clip": "angry",
+      "icon": "#",
+      "act": "attack"
+    },
+    "allyHit": {
+      "clip": "angry",
+      "icon": "!",
+      "act": "attack"
+    },
+    "allyDown": {
+      "clip": "gesture",
+      "icon": "…",
+      "act": "protect"
+    }
+  },
+  "로제몬": {
+    "combat": true,
+    "weapon": {
+      "clip": "angry",
+      "icon": "#",
+      "act": "confront"
+    },
+    "body": {
+      "clip": "backoff",
+      "icon": "…",
+      "act": "avoid"
+    },
+    "uproar": {
+      "clip": "gesture",
+      "icon": "#",
+      "act": "watch"
+    },
+    "crime": {
+      "clip": "gesture",
+      "icon": "!",
+      "act": "watch"
+    },
+    "allyHit": {
+      "clip": "scramble",
+      "icon": "!",
+      "act": "protect"
+    },
+    "allyDown": {
+      "clip": "scramble",
+      "icon": "?",
+      "act": "protect"
+    }
+  },
+  "콘쥬스": {
+    "combat": false,
+    "weapon": {
+      "clip": "think",
+      "icon": "?",
+      "act": "avoid"
+    },
+    "body": {
+      "clip": "surprise",
+      "icon": "!",
+      "act": "cower"
+    },
+    "uproar": {
+      "clip": "spot",
+      "icon": "!",
+      "act": "approach"
+    },
+    "crime": {
+      "clip": "think",
+      "icon": "?",
+      "act": "watch"
+    },
+    "allyHit": {
+      "clip": "scramble",
+      "icon": "!",
+      "act": "protect"
+    },
+    "allyDown": {
+      "clip": "scramble",
+      "icon": "!",
+      "act": "protect"
+    }
+  },
+  "고그니쟈": {
+    "combat": false,
+    "weapon": {
+      "clip": "laugh",
+      "icon": "!",
+      "act": "confront"
+    },
+    "body": {
+      "clip": "laugh",
+      "icon": "!",
+      "act": "approach"
+    },
+    "uproar": {
+      "clip": "call",
+      "icon": "!",
+      "act": "watch"
+    },
+    "crime": {
+      "clip": "laugh",
+      "icon": "?",
+      "act": "watch"
+    },
+    "allyHit": {
+      "clip": "call",
+      "icon": "!",
+      "act": "watch"
+    },
+    "allyDown": {
+      "clip": "surprise",
+      "icon": "!",
+      "act": "approach"
+    }
+  },
+  "데쥬레": {
+    "combat": false,
+    "weapon": {
+      "clip": "cower",
+      "icon": "!",
+      "act": "cower"
+    },
+    "body": {
+      "clip": "surprise",
+      "icon": "!",
+      "act": "approach"
+    },
+    "uproar": {
+      "clip": "scared",
+      "icon": "!",
+      "act": "flee"
+    },
+    "crime": {
+      "clip": "scared",
+      "icon": "…",
+      "act": "avoid"
+    },
+    "allyHit": {
+      "clip": "shake",
+      "icon": "…",
+      "act": "cower"
+    },
+    "allyDown": {
+      "clip": "shake",
+      "icon": "!",
+      "act": "protect"
+    },
+    "notes": "스팡달이 보이면 웅크림 / ! / 사과하며 무너짐."
+  },
+  "이도형": {
+    "combat": true,
+    "weapon": {
+      "clip": "laugh",
+      "icon": "♪",
+      "act": "attack"
+    },
+    "body": {
+      "clip": "smoke",
+      "icon": "…",
+      "act": "ignore"
+    },
+    "uproar": {
+      "clip": "laugh",
+      "icon": "♪",
+      "act": "approach"
+    },
+    "crime": {
+      "clip": "idle",
+      "icon": "…",
+      "act": "ignore"
+    },
+    "allyHit": {
+      "clip": "gesture",
+      "icon": "…",
+      "act": "attack"
+    },
+    "allyDown": {
+      "clip": "idle",
+      "icon": "…",
+      "act": "ignore"
+    },
+    "notes": "쟈알디를 어떻게 기억하는지 위키에 없음."
+  },
+  "고영훈": {
+    "combat": true,
+    "weapon": {
+      "clip": "angry",
+      "icon": "…",
+      "act": "attack"
+    },
+    "body": {
+      "clip": "phone",
+      "icon": "…",
+      "act": "ignore"
+    },
+    "uproar": {
+      "clip": "spot",
+      "icon": "…",
+      "act": "watch"
+    },
+    "crime": {
+      "clip": "idle",
+      "icon": "…",
+      "act": "ignore"
+    },
+    "allyHit": {
+      "clip": "angry",
+      "icon": "!",
+      "act": "attack"
+    },
+    "allyDown": {
+      "clip": "spot",
+      "icon": "…",
+      "act": "ignore"
+    }
+  },
+  "노기균": {
+    "combat": true,
+    "weapon": {
+      "clip": "angry",
+      "icon": "!",
+      "act": "attack"
+    },
+    "body": {
+      "clip": "think",
+      "icon": "?",
+      "act": "approach"
+    },
+    "uproar": {
+      "clip": "laugh",
+      "icon": "!",
+      "act": "approach"
+    },
+    "crime": {
+      "clip": "angry",
+      "icon": "#",
+      "act": "confront"
+    },
+    "allyHit": {
+      "clip": "angry",
+      "icon": "!",
+      "act": "attack"
+    },
+    "allyDown": {
+      "clip": "scramble",
+      "icon": "!",
+      "act": "protect"
+    }
+  },
+  "송주익": {
+    "combat": true,
+    "weapon": {
+      "clip": "angry",
+      "icon": "!",
+      "act": "confront"
+    },
+    "body": {
+      "clip": "radio",
+      "icon": "!",
+      "act": "report"
+    },
+    "uproar": {
+      "clip": "spot",
+      "icon": "!",
+      "act": "approach"
+    },
+    "crime": {
+      "clip": "angry",
+      "icon": "#",
+      "act": "confront"
+    },
+    "allyHit": {
+      "clip": "angry",
+      "icon": "#",
+      "act": "attack"
+    },
+    "allyDown": {
+      "clip": "radio",
+      "icon": "!",
+      "act": "protect"
+    }
+  },
+  "곽성주": {
+    "combat": true,
+    "weapon": {
+      "clip": "angry",
+      "icon": "#",
+      "act": "attack"
+    },
+    "body": {
+      "clip": "idle",
+      "icon": "…",
+      "act": "ignore"
+    },
+    "uproar": {
+      "clip": "angry",
+      "icon": "#",
+      "act": "approach"
+    },
+    "crime": {
+      "clip": "angry",
+      "icon": "#",
+      "act": "confront"
+    },
+    "allyHit": {
+      "clip": "angry",
+      "icon": "#",
+      "act": "protect"
+    },
+    "allyDown": {
+      "clip": "angry",
+      "icon": "!",
+      "act": "protect"
+    }
+  },
+  "조성춘": {
+    "combat": true,
+    "weapon": {
+      "clip": "angry",
+      "icon": "!",
+      "act": "attack"
+    },
+    "body": {
+      "clip": "surprise",
+      "icon": "!",
+      "act": "watch"
+    },
+    "uproar": {
+      "clip": "angry",
+      "icon": "#",
+      "act": "approach"
+    },
+    "crime": {
+      "clip": "angry",
+      "icon": "?",
+      "act": "confront"
+    },
+    "allyHit": {
+      "clip": "angry",
+      "icon": "#",
+      "act": "attack"
+    },
+    "allyDown": {
+      "clip": "angry",
+      "icon": "!",
+      "act": "attack"
+    }
+  },
+  "윤병수": {
+    "combat": true,
+    "weapon": {
+      "clip": "angry",
+      "icon": "…",
+      "act": "attack"
+    },
+    "body": {
+      "clip": "smoke",
+      "icon": "…",
+      "act": "ignore"
+    },
+    "uproar": {
+      "clip": "smoke",
+      "icon": "…",
+      "act": "watch"
+    },
+    "crime": {
+      "clip": "spot",
+      "icon": "…",
+      "act": "approach"
+    },
+    "allyHit": {
+      "clip": "angry",
+      "icon": "…",
+      "act": "attack"
+    },
+    "allyDown": {
+      "clip": "angry",
+      "icon": "…",
+      "act": "attack"
+    }
+  },
+  "김성진": {
+    "combat": true,
+    "weapon": {
+      "clip": "angry",
+      "icon": "!",
+      "act": "attack"
+    },
+    "body": {
+      "clip": "surprise",
+      "icon": "!",
+      "act": "approach"
+    },
+    "uproar": {
+      "clip": "laugh",
+      "icon": "♪",
+      "act": "approach"
+    },
+    "crime": {
+      "clip": "surprise",
+      "icon": "!",
+      "act": "watch"
+    },
+    "allyHit": {
+      "clip": "angry",
+      "icon": "!",
+      "act": "protect"
+    },
+    "allyDown": {
+      "clip": "scramble",
+      "icon": "!",
+      "act": "protect"
+    },
+    "notes": "동료가 맞을 때 특히 송진섭이면 제일 먼저 뛰어듦."
+  },
+  "송진섭": {
+    "combat": true,
+    "weapon": {
+      "clip": "surprise",
+      "icon": "!",
+      "act": "attack"
+    },
+    "body": {
+      "clip": "surprise",
+      "icon": "!",
+      "act": "watch"
+    },
+    "uproar": {
+      "clip": "surprise",
+      "icon": "?",
+      "act": "watch"
+    },
+    "crime": {
+      "clip": "surprise",
+      "icon": "?",
+      "act": "watch"
+    },
+    "allyHit": {
+      "clip": "angry",
+      "icon": "!",
+      "act": "confront"
+    },
+    "allyDown": {
+      "clip": "surprise",
+      "icon": "!",
+      "act": "protect"
+    }
+  },
+  "이길환": {
+    "combat": false,
+    "weapon": {
+      "clip": "gesture",
+      "icon": "…",
+      "act": "report"
+    },
+    "body": {
+      "clip": "idle",
+      "icon": "…",
+      "act": "ignore"
+    },
+    "uproar": {
+      "clip": "gesture",
+      "icon": "…",
+      "act": "report"
+    },
+    "crime": {
+      "clip": "gesture",
+      "icon": "…",
+      "act": "report"
+    },
+    "allyHit": {
+      "clip": "gesture",
+      "icon": "…",
+      "act": "report"
+    },
+    "allyDown": {
+      "clip": "gesture",
+      "icon": "…",
+      "act": "approach"
+    }
+  },
+  "이기석": {
+    "combat": true,
+    "weapon": {
+      "clip": "angry",
+      "icon": "!",
+      "act": "confront"
+    },
+    "body": {
+      "clip": "sigh",
+      "icon": "…",
+      "act": "watch"
+    },
+    "uproar": {
+      "clip": "gesture",
+      "icon": "!",
+      "act": "approach"
+    },
+    "crime": {
+      "clip": "angry",
+      "icon": "!",
+      "act": "confront"
+    },
+    "allyHit": {
+      "clip": "angry",
+      "icon": "!",
+      "act": "attack"
+    },
+    "allyDown": {
+      "clip": "surprise",
+      "icon": "!",
+      "act": "protect"
+    }
+  },
+  "김조학": {
+    "combat": false,
+    "weapon": {
+      "clip": "armcross",
+      "icon": "…",
+      "act": "report"
+    },
+    "body": {
+      "clip": "idle",
+      "icon": "…",
+      "act": "ignore"
+    },
+    "uproar": {
+      "clip": "angry",
+      "icon": "#",
+      "act": "report"
+    },
+    "crime": {
+      "clip": "angry",
+      "icon": "#",
+      "act": "confront"
+    },
+    "allyHit": {
+      "clip": "angry",
+      "icon": "#",
+      "act": "report"
+    },
+    "allyDown": {
+      "clip": "idle",
+      "icon": "…",
+      "act": "watch"
+    },
+    "notes": "괴이 영상 퍼뜨리는 짓엔 책상 내리치며 폭발."
+  },
+  "도필헌": {
+    "combat": false,
+    "weapon": {
+      "clip": "sitdown",
+      "icon": "…",
+      "act": "report"
+    },
+    "body": {
+      "clip": "idle",
+      "icon": "…",
+      "act": "ignore"
+    },
+    "uproar": {
+      "clip": "coffee",
+      "icon": "…",
+      "act": "ignore"
+    },
+    "crime": {
+      "clip": "think",
+      "icon": "…",
+      "act": "watch"
+    },
+    "allyHit": {
+      "clip": "gesture",
+      "icon": "…",
+      "act": "report"
+    },
+    "allyDown": {
+      "clip": "idle",
+      "icon": "…",
+      "act": "ignore"
+    }
+  },
+  "사장": {
+    "combat": true,
+    "weapon": {
+      "clip": "think",
+      "icon": "…",
+      "act": "watch"
+    },
+    "body": {
+      "clip": "idle",
+      "icon": "…",
+      "act": "ignore"
+    },
+    "uproar": {
+      "clip": "idle",
+      "icon": "…",
+      "act": "ignore"
+    },
+    "crime": {
+      "clip": "think",
+      "icon": "…",
+      "act": "watch"
+    },
+    "allyHit": {
+      "clip": "spot",
+      "icon": "…",
+      "act": "watch"
+    },
+    "allyDown": {
+      "clip": "spot",
+      "icon": "…",
+      "act": "watch"
+    },
+    "notes": "전투 가능 불명(시간 정지·분신). 필드에 평소 나오는 인물인지 위키상 의문(진짜 전환점에만 현장에 나타남)."
+  },
+  "백석주": {
+    "combat": true,
+    "weapon": {
+      "clip": "spot",
+      "icon": "…",
+      "act": "confront"
+    },
+    "body": {
+      "clip": "idle",
+      "icon": "…",
+      "act": "ignore"
+    },
+    "uproar": {
+      "clip": "armcross",
+      "icon": "#",
+      "act": "watch"
+    },
+    "crime": {
+      "clip": "idle",
+      "icon": "…",
+      "act": "ignore"
+    },
+    "allyHit": {
+      "clip": "angry",
+      "icon": "#",
+      "act": "attack"
+    },
+    "allyDown": {
+      "clip": "sitdown",
+      "icon": "!",
+      "act": "protect"
+    },
+    "notes": "맞음·쓰러짐 반응은 A조원일 때만, 다른 조·외부인이면 무시하고 지나감. 자기 조원 시체면 달려가 치유 반지. 규칙 안 어긴 빈틈 찌르기 범죄엔 박수 / ♪."
+  },
+  "진나솔": {
+    "combat": true,
+    "weapon": {
+      "clip": "angry",
+      "icon": "…",
+      "act": "attack"
+    },
+    "body": {
+      "clip": "think",
+      "icon": "…",
+      "act": "approach"
+    },
+    "uproar": {
+      "clip": "sigh",
+      "icon": "#",
+      "act": "ignore"
+    },
+    "crime": {
+      "clip": "idle",
+      "icon": "…",
+      "act": "ignore"
+    },
+    "allyHit": {
+      "clip": "think",
+      "icon": "…",
+      "act": "protect"
+    },
+    "allyDown": {
+      "clip": "gesture",
+      "icon": "…",
+      "act": "protect"
+    },
+    "notes": "범죄에 캐낼 약점이 보이면 외알 안경 걸침 / !. 쓰러진 동료가 쓸모없으면 옆으로 밀쳐 둠. 길을 막는 소란이면 실로 제압."
+  },
+  "이성해": {
+    "combat": true,
+    "weapon": {
+      "clip": "think",
+      "icon": "?",
+      "act": "confront"
+    },
+    "body": {
+      "clip": "spot",
+      "icon": "…",
+      "act": "approach"
+    },
+    "uproar": {
+      "clip": "greet",
+      "icon": "?",
+      "act": "approach"
+    },
+    "crime": {
+      "clip": "laugh",
+      "icon": "!",
+      "act": "attack"
+    },
+    "allyHit": {
+      "clip": "laugh",
+      "icon": "!",
+      "act": "attack"
+    },
+    "allyDown": {
+      "clip": "scramble",
+      "icon": "…",
+      "act": "protect"
+    },
+    "notes": "겨눈 상대를 나쁜 놈으로 판정하면 웃으며 달려가 근접 제압. 맞은 쪽이 나쁜 사람이면 무시."
+  },
+  "이자헌": {
+    "combat": true,
+    "weapon": {
+      "clip": "idle",
+      "icon": "…",
+      "act": "confront"
+    },
+    "body": {
+      "clip": "idle",
+      "icon": "…",
+      "act": "ignore"
+    },
+    "uproar": {
+      "clip": "gesture",
+      "icon": "!",
+      "act": "confront"
+    },
+    "crime": {
+      "clip": "think",
+      "icon": "…",
+      "act": "watch"
+    },
+    "allyHit": {
+      "clip": "angry",
+      "icon": "!",
+      "act": "attack"
+    },
+    "allyDown": {
+      "clip": "idle",
+      "icon": "…",
+      "act": "protect"
+    },
+    "notes": "시체가 자기 조원이면 끝까지 경위 조사·보고서 다시 씀."
+  },
+  "은하제": {
+    "combat": true,
+    "weapon": {
+      "clip": "sigh",
+      "icon": "…",
+      "act": "watch"
+    },
+    "body": {
+      "clip": "memo",
+      "icon": "?",
+      "act": "approach"
+    },
+    "uproar": {
+      "clip": "smoke",
+      "icon": "…",
+      "act": "watch"
+    },
+    "crime": {
+      "clip": "memo",
+      "icon": "#",
+      "act": "watch"
+    },
+    "allyHit": {
+      "clip": "angry",
+      "icon": "#",
+      "act": "attack"
+    },
+    "allyDown": {
+      "clip": "scramble",
+      "icon": "!",
+      "act": "protect"
+    },
+    "notes": "박민성이 위험하면 제일 먼저 뛰어듦."
+  },
+  "박민성": {
+    "combat": true,
+    "weapon": {
+      "clip": "backoff",
+      "icon": "!",
+      "act": "confront"
+    },
+    "body": {
+      "clip": "shake",
+      "icon": "!",
+      "act": "watch"
+    },
+    "uproar": {
+      "clip": "shake",
+      "icon": "!",
+      "act": "approach"
+    },
+    "crime": {
+      "clip": "scratch",
+      "icon": "?",
+      "act": "watch"
+    },
+    "allyHit": {
+      "clip": "scared",
+      "icon": "!",
+      "act": "protect"
+    },
+    "allyDown": {
+      "clip": "scramble",
+      "icon": "!",
+      "act": "protect"
+    }
+  },
+  "백사헌": {
+    "combat": true,
+    "weapon": {
+      "clip": "cower",
+      "icon": "…",
+      "act": "cower"
+    },
+    "body": {
+      "clip": "browse",
+      "icon": "♪",
+      "act": "approach"
+    },
+    "uproar": {
+      "clip": "spot",
+      "icon": "…",
+      "act": "avoid"
+    },
+    "crime": {
+      "clip": "laugh",
+      "icon": "…",
+      "act": "ignore"
+    },
+    "allyHit": {
+      "clip": "laugh",
+      "icon": "…",
+      "act": "ignore"
+    },
+    "allyDown": {
+      "clip": "browse",
+      "icon": "?",
+      "act": "approach"
+    },
+    "notes": "자리 내준 동료가 맞거나 쓰러지면 화냄 / #. 무기 앞에선 틈 보이면 숨음. 쓸 만한 범죄는 메모(약점 수집)."
+  },
+  "고영은": {
+    "combat": true,
+    "weapon": {
+      "clip": "backoff",
+      "icon": "!",
+      "act": "avoid"
+    },
+    "body": {
+      "clip": "sitdown",
+      "icon": "?",
+      "act": "approach"
+    },
+    "uproar": {
+      "clip": "gesture",
+      "icon": "!",
+      "act": "approach"
+    },
+    "crime": {
+      "clip": "angry",
+      "icon": "#",
+      "act": "protect"
+    },
+    "allyHit": {
+      "clip": "sitdown",
+      "icon": "!",
+      "act": "protect"
+    },
+    "allyDown": {
+      "clip": "sitdown",
+      "icon": "!",
+      "act": "protect"
+    }
+  },
+  "강이학": {
+    "combat": true,
+    "weapon": {
+      "clip": "bow",
+      "icon": "♪",
+      "act": "confront"
+    },
+    "body": {
+      "clip": "browse",
+      "icon": "♪",
+      "act": "approach"
+    },
+    "uproar": {
+      "clip": "gesture",
+      "icon": "?",
+      "act": "approach"
+    },
+    "crime": {
+      "clip": "gesture",
+      "icon": "♪",
+      "act": "ignore"
+    },
+    "allyHit": {
+      "clip": "idle",
+      "icon": "…",
+      "act": "ignore"
+    },
+    "allyDown": {
+      "clip": "gesture",
+      "icon": "…",
+      "act": "ignore"
+    },
+    "notes": "흥정이 안 통하면 도망. 계약·이득이 있으면 동료를 도움. 정보로 팔 범죄면 장부에 적음."
+  },
+  "장허운": {
+    "combat": true,
+    "weapon": {
+      "clip": "scared",
+      "icon": "…",
+      "act": "cower"
+    },
+    "body": {
+      "clip": "surprise",
+      "icon": "!",
+      "act": "cower"
+    },
+    "uproar": {
+      "clip": "scared",
+      "icon": "!",
+      "act": "cower"
+    },
+    "crime": {
+      "clip": "scared",
+      "icon": "…",
+      "act": "cower"
+    },
+    "allyHit": {
+      "clip": "scramble",
+      "icon": "!",
+      "act": "protect"
+    },
+    "allyDown": {
+      "clip": "scramble",
+      "icon": "!",
+      "act": "protect"
+    },
+    "notes": "큰 목소리·자신 있는 목소리가 시키면 그대로 따름."
+  },
+  "곽제강": {
+    "combat": false,
+    "weapon": {
+      "clip": "memo",
+      "icon": "?",
+      "act": "approach"
+    },
+    "body": {
+      "clip": "think",
+      "icon": "♪",
+      "act": "approach"
+    },
+    "uproar": {
+      "clip": "memo",
+      "icon": "!",
+      "act": "approach"
+    },
+    "crime": {
+      "clip": "memo",
+      "icon": "♪",
+      "act": "watch"
+    },
+    "allyHit": {
+      "clip": "think",
+      "icon": "?",
+      "act": "watch"
+    },
+    "allyDown": {
+      "clip": "think",
+      "icon": "?",
+      "act": "approach"
+    }
+  },
+  "이연화": {
+    "combat": false,
+    "weapon": {
+      "clip": "backoff",
+      "icon": "…",
+      "act": "confront"
+    },
+    "body": {
+      "clip": "surprise",
+      "icon": "!",
+      "act": "approach"
+    },
+    "uproar": {
+      "clip": "gesture",
+      "icon": "!",
+      "act": "watch"
+    },
+    "crime": {
+      "clip": "angry",
+      "icon": "#",
+      "act": "confront"
+    },
+    "allyHit": {
+      "clip": "sitdown",
+      "icon": "!",
+      "act": "protect"
+    },
+    "allyDown": {
+      "clip": "sitdown",
+      "icon": "!",
+      "act": "protect"
+    },
+    "notes": "범죄 현장에 다친 사람이 있으면 먼저 처치."
+  },
+  "이병진": {
+    "combat": false,
+    "weapon": {
+      "clip": "cower",
+      "icon": "!",
+      "act": "cower"
+    },
+    "body": {
+      "clip": "scared",
+      "icon": "!",
+      "act": "cower"
+    },
+    "uproar": {
+      "clip": "backoff",
+      "icon": "?",
+      "act": "avoid"
+    },
+    "crime": {
+      "clip": "idle",
+      "icon": "…",
+      "act": "ignore"
+    },
+    "allyHit": {
+      "clip": "scared",
+      "icon": "!",
+      "act": "flee"
+    },
+    "allyDown": {
+      "clip": "scared",
+      "icon": "!",
+      "act": "cower"
+    },
+    "notes": "맞은 동료가 목숨 구해 준 은인이면 땀 흘리며 다가감."
+  },
+  "제이": {
+    "combat": true,
+    "weapon": {
+      "clip": "angry",
+      "icon": "…",
+      "act": "attack"
+    },
+    "body": {
+      "clip": "spot",
+      "icon": "…",
+      "act": "approach"
+    },
+    "uproar": {
+      "clip": "idle",
+      "icon": "…",
+      "act": "ignore"
+    },
+    "crime": {
+      "clip": "idle",
+      "icon": "…",
+      "act": "ignore"
+    },
+    "allyHit": {
+      "clip": "angry",
+      "icon": "!",
+      "act": "protect"
+    },
+    "allyDown": {
+      "clip": "scramble",
+      "icon": "…",
+      "act": "protect"
+    },
+    "notes": "소란·범죄에서 사람이 다치려 하면 달려가 해치는 쪽 앞을 막아섬. 스트레스가 크면 폭주 위험."
+  },
+  "호유원": {
+    "combat": true,
+    "weapon": {
+      "clip": "greet",
+      "icon": "♪",
+      "act": "confront"
+    },
+    "body": {
+      "clip": "idle",
+      "icon": "…",
+      "act": "ignore"
+    },
+    "uproar": {
+      "clip": "idle",
+      "icon": "…",
+      "act": "ignore"
+    },
+    "crime": {
+      "clip": "greet",
+      "icon": "♪",
+      "act": "approach"
+    },
+    "allyHit": {
+      "clip": "idle",
+      "icon": "…",
+      "act": "watch"
+    },
+    "allyDown": {
+      "clip": "sitdown",
+      "icon": "♪",
+      "act": "approach"
+    },
+    "notes": "전투 가능 불명(빙의·금제·구미호병). 동료=이병진 등 자기 계열."
+  },
+  "청달래": {
+    "combat": true,
+    "weapon": {
+      "clip": "gesture",
+      "icon": "…",
+      "act": "attack"
+    },
+    "body": {
+      "clip": "gesture",
+      "icon": "…",
+      "act": "watch"
+    },
+    "uproar": {
+      "clip": "spot",
+      "icon": "?",
+      "act": "approach"
+    },
+    "crime": {
+      "clip": "idle",
+      "icon": "…",
+      "act": "watch"
+    },
+    "allyHit": {
+      "clip": "gesture",
+      "icon": "…",
+      "act": "attack"
+    },
+    "allyDown": {
+      "clip": "gesture",
+      "icon": "…",
+      "act": "watch"
+    },
+    "notes": "회사 것에 대한 침해 범죄면 천천히 걸어가 정리."
+  },
+  "차여진": {
+    "combat": false,
+    "weapon": {
+      "clip": "backoff",
+      "icon": "!",
+      "act": "avoid"
+    },
+    "body": {
+      "clip": "phone",
+      "icon": "…",
+      "act": "ignore"
+    },
+    "uproar": {
+      "clip": "coffee",
+      "icon": "…",
+      "act": "avoid"
+    },
+    "crime": {
+      "clip": "idle",
+      "icon": "…",
+      "act": "ignore"
+    },
+    "allyHit": {
+      "clip": "spot",
+      "icon": "…",
+      "act": "watch"
+    },
+    "allyDown": {
+      "clip": "phone",
+      "icon": "…",
+      "act": "ignore"
+    },
+    "notes": "동료=서윤지."
+  },
+  "서윤지": {
+    "combat": false,
+    "weapon": {
+      "clip": "memo",
+      "icon": "…",
+      "act": "watch"
+    },
+    "body": {
+      "clip": "memo",
+      "icon": "…",
+      "act": "watch"
+    },
+    "uproar": {
+      "clip": "idle",
+      "icon": "…",
+      "act": "ignore"
+    },
+    "crime": {
+      "clip": "memo",
+      "icon": "…",
+      "act": "watch"
+    },
+    "allyHit": {
+      "clip": "memo",
+      "icon": "…",
+      "act": "watch"
+    },
+    "allyDown": {
+      "clip": "memo",
+      "icon": "…",
+      "act": "watch"
+    },
+    "notes": "동료=차여진."
+  },
+  "고연지": {
+    "combat": false,
+    "weapon": {
+      "clip": "gesture",
+      "icon": "…",
+      "act": "confront"
+    },
+    "body": {
+      "clip": "spot",
+      "icon": "…",
+      "act": "approach"
+    },
+    "uproar": {
+      "clip": "idle",
+      "icon": "…",
+      "act": "ignore"
+    },
+    "crime": {
+      "clip": "idle",
+      "icon": "…",
+      "act": "ignore"
+    },
+    "allyHit": {
+      "clip": "idle",
+      "icon": "…",
+      "act": "watch"
+    },
+    "allyDown": {
+      "clip": "sitdown",
+      "icon": "…",
+      "act": "approach"
+    },
+    "notes": "동료=윤지아."
+  },
+  "윤지아": {
+    "combat": false,
+    "weapon": {
+      "clip": "greet",
+      "icon": "?",
+      "act": "approach"
+    },
+    "body": {
+      "clip": "sitdown",
+      "icon": "…",
+      "act": "approach"
+    },
+    "uproar": {
+      "clip": "greet",
+      "icon": "?",
+      "act": "approach"
+    },
+    "crime": {
+      "clip": "idle",
+      "icon": "…",
+      "act": "ignore"
+    },
+    "allyHit": {
+      "clip": "greet",
+      "icon": "?",
+      "act": "approach"
+    },
+    "allyDown": {
+      "clip": "sitdown",
+      "icon": "!",
+      "act": "protect"
+    },
+    "notes": "시체·소란은 의원 안이면 다가가고, 밖의 큰 일이면 끼지 않고 지나감. 동료=고연지."
+  },
+  "마덕희": {
+    "combat": false,
+    "weapon": {
+      "clip": "spot",
+      "icon": "…",
+      "act": "watch"
+    },
+    "body": {
+      "clip": "browse",
+      "icon": "♪",
+      "act": "approach"
+    },
+    "uproar": {
+      "clip": "spot",
+      "icon": "…",
+      "act": "watch"
+    },
+    "crime": {
+      "clip": "think",
+      "icon": "♪",
+      "act": "watch"
+    },
+    "allyHit": {
+      "clip": "idle",
+      "icon": "…",
+      "act": "ignore"
+    },
+    "allyDown": {
+      "clip": "idle",
+      "icon": "…",
+      "act": "ignore"
+    }
+  },
+  "문혜란": {
+    "combat": true,
+    "weapon": {
+      "clip": "angry",
+      "icon": "!",
+      "act": "attack"
+    },
+    "body": {
+      "clip": "idle",
+      "icon": "…",
+      "act": "watch"
+    },
+    "uproar": {
+      "clip": "angry",
+      "icon": "!",
+      "act": "attack"
+    },
+    "crime": {
+      "clip": "memo",
+      "icon": "…",
+      "act": "watch"
+    },
+    "allyHit": {
+      "clip": "angry",
+      "icon": "!",
+      "act": "attack"
+    },
+    "allyDown": {
+      "clip": "sitdown",
+      "icon": "…",
+      "act": "protect"
+    }
+  },
+  "신유리": {
+    "combat": true,
+    "weapon": {
+      "clip": "angry",
+      "icon": "…",
+      "act": "confront"
+    },
+    "body": {
+      "clip": "idle",
+      "icon": "…",
+      "act": "ignore"
+    },
+    "uproar": {
+      "clip": "spot",
+      "icon": "…",
+      "act": "watch"
+    },
+    "crime": {
+      "clip": "idle",
+      "icon": "…",
+      "act": "ignore"
+    },
+    "allyHit": {
+      "clip": "idle",
+      "icon": "…",
+      "act": "ignore"
+    },
+    "allyDown": {
+      "clip": "idle",
+      "icon": "…",
+      "act": "ignore"
+    },
+    "notes": "진짜 위험하다고 보면 존댓말로 바뀜."
+  },
+  "블라렛": {
+    "combat": true,
+    "weapon": {
+      "clip": "angry",
+      "icon": "♪",
+      "act": "attack"
+    },
+    "body": {
+      "clip": "spot",
+      "icon": "?",
+      "act": "approach"
+    },
+    "uproar": {
+      "clip": "greet",
+      "icon": "♪",
+      "act": "approach"
+    },
+    "crime": {
+      "clip": "armcross",
+      "icon": "…",
+      "act": "watch"
+    },
+    "allyHit": {
+      "clip": "angry",
+      "icon": "!",
+      "act": "attack"
+    },
+    "allyDown": {
+      "clip": "sitdown",
+      "icon": "?",
+      "act": "approach"
+    },
+    "notes": "흡혈귀 관련 범죄면 공격(추정)."
+  },
+  "살라딘": {
+    "combat": true,
+    "weapon": {
+      "clip": "angry",
+      "icon": "#",
+      "act": "confront"
+    },
+    "body": {
+      "clip": "idle",
+      "icon": "…",
+      "act": "watch"
+    },
+    "uproar": {
+      "clip": "angry",
+      "icon": "!",
+      "act": "approach"
+    },
+    "crime": {
+      "clip": "angry",
+      "icon": "#",
+      "act": "confront"
+    },
+    "allyHit": {
+      "clip": "angry",
+      "icon": "#",
+      "act": "attack"
+    },
+    "allyDown": {
+      "clip": "scramble",
+      "icon": "!",
+      "act": "protect"
+    },
+    "notes": "범죄 피해자가 형제이거나 이단·마술·흡혈귀 짓이면 즉시 공격."
+  },
+  "브라우니": {
+    "combat": true,
+    "weapon": {
+      "clip": "angry",
+      "icon": "#",
+      "act": "confront"
+    },
+    "body": {
+      "clip": "idle",
+      "icon": "…",
+      "act": "ignore"
+    },
+    "uproar": {
+      "clip": "gesture",
+      "icon": "!",
+      "act": "approach"
+    },
+    "crime": {
+      "clip": "idle",
+      "icon": "…",
+      "act": "watch"
+    },
+    "allyHit": {
+      "clip": "angry",
+      "icon": "#",
+      "act": "attack"
+    },
+    "allyDown": {
+      "clip": "sitdown",
+      "icon": "?",
+      "act": "protect"
+    }
+  },
+  "아벤샤": {
+    "combat": true,
+    "weapon": {
+      "clip": "gesture",
+      "icon": "♪",
+      "act": "attack"
+    },
+    "body": {
+      "clip": "browse",
+      "icon": "♪",
+      "act": "approach"
+    },
+    "uproar": {
+      "clip": "coffee",
+      "icon": "…",
+      "act": "ignore"
+    },
+    "crime": {
+      "clip": "idle",
+      "icon": "…",
+      "act": "ignore"
+    },
+    "allyHit": {
+      "clip": "idle",
+      "icon": "…",
+      "act": "watch"
+    },
+    "allyDown": {
+      "clip": "idle",
+      "icon": "…",
+      "act": "watch"
+    },
+    "notes": "겨눈 쪽이 진짜 실력자면 납작 엎드려 아부 / !. 사제·성기사면 은신해 순간이동으로 빠짐. 살라딘 이름을 들으면 굳음 / …. 쟈알디와는 마주쳤지만 싸움은 안 남."
+  },
+  "세크리엠": {
+    "combat": true,
+    "weapon": {
+      "clip": "angry",
+      "icon": "#",
+      "act": "attack"
+    },
+    "body": {
+      "clip": "spot",
+      "icon": "…",
+      "act": "approach"
+    },
+    "uproar": {
+      "clip": "idle",
+      "icon": "…",
+      "act": "watch"
+    },
+    "crime": {
+      "clip": "idle",
+      "icon": "…",
+      "act": "watch"
+    },
+    "allyHit": {
+      "clip": "angry",
+      "icon": "#",
+      "act": "attack"
+    },
+    "allyDown": {
+      "clip": "idle",
+      "icon": "…",
+      "act": "watch"
+    },
+    "notes": "십자가·축복 무기·마늘이면 박쥐 떼로 흩어져 빠짐. 블라렛이 보이면 웃으며 조롱 / ♪. 최면이 안 먹히면 당황 / !. 필드 기본은 도움이 필요한 척 / ?."
+  },
+  "탐미주의": {
+    "combat": true,
+    "weapon": {
+      "clip": "laugh",
+      "icon": "♪",
+      "act": "confront"
+    },
+    "body": {
+      "clip": "think",
+      "icon": "♪",
+      "act": "approach"
+    },
+    "uproar": {
+      "clip": "laugh",
+      "icon": "♪",
+      "act": "approach"
+    },
+    "crime": {
+      "clip": "idle",
+      "icon": "♪",
+      "act": "watch"
+    },
+    "allyHit": null,
+    "allyDown": null,
+    "notes": "동료 없음. 마네킹이 부서지면 다른 마네킹에서 잡음 → 고개 듦 / …. 서프라이즈를 너무 빨리 눈치채면 삐짐 / #. 필드에 평소 나오는지 위키상 의문."
+  }
+}

@@ -15,6 +15,8 @@ export interface VisitTurn {
   room?: string;
   /** 요원 답 뒤에 끼어든 옆 요원 말 (설계 2판 7단계) */
   extra?: { agentId: string; name: string; line: string }[];
+  /** 답 끝의 필드 행동 표시 (10-31 필드 기능: 동행·기다림·복귀·허가·경보) */
+  tags?: string[];
 }
 export interface VisitRecord { turns: VisitTurn[] }
 export type VisitRoom = 'office' | 'lounge' | 'infirmary' | 'quarters';

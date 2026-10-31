@@ -2,7 +2,7 @@ import { uid } from './uid';
 import type { GameVisit, VisitState } from '../../game/bridge';
 import { cardSnapshot } from '../../core/gamelink';
 import { anchorOf, visitRecord, visitRoom, withoutOldLore, withVisitTurn, type VisitTurn } from '../../core/visit';
-import { agentLore, parseVisitGroup, visitPrompt, type VisitAgent, type VisitLine } from '../../core/visitPrompt';
+import { agentLore, parseVisitGroup, takeFieldTags, visitPrompt, type FieldTag, type VisitAgent, type VisitLine } from '../../core/visitPrompt';
 import { advValue, budgetFor } from '../../core/advanced';
 import { fitPrompt } from '../../core/budget';
 import type { RefSource } from '../../core/refs';
@@ -63,7 +63,7 @@ export function createVisit(): GameVisit {
       if (clean !== c.chat) await updateChat(c.charIndex, c.chatIndex, chat => chat.id === c.chat.id ? withoutOldLore(chat) : null).catch(() => null);
       return stateOf(c);
     },
-    async send(agentId, input, which, nearby = []) {
+    async send(agentId, input, which, nearby = [], opts = {}) {
       if (busy || isWaiting()) throw new Error('진행 중인 응답이 끝난 뒤 보내 주세요.');
       // *…*로 감싸면 말이 아니라 행동 (2026-10-23 사용자: 행동 지시를 대사로 받아들임)
       const acted = /^\*([^*]+)\*?$/.exec(input.trim());
@@ -103,7 +103,7 @@ export function createVisit(): GameVisit {
         }
         const ss = c.chat.scriptstate;
         const prompt = fitPrompt(budgetFor(ss, 'hq'), () => visitPrompt(src, {
-          agent: { id: a.id, name: a.name, rank: row?.rank, state: a.state, situation: a.situation, room: visitRoom(a) ?? '', lore },
+          agent: { id: a.id, name: a.name, rank: row?.rank, state: a.state, situation: a.situation, room: visitRoom(a) ?? '', lore, ...(opts.doing ? { doing: opts.doing } : {}) },
           visitor: visitorName,
           conversation: lines(now.filter(withHim)),
           elsewhere: others.map(n => ({ agent: n, lines: lines(now.filter(t => t.name === n && !withHim(t))) })),
@@ -112,16 +112,19 @@ export function createVisit(): GameVisit {
           act,
           scene: sceneOf(c, me?.id),
           skipBooks: me ? [me.lore] : [],
+          tags: (opts.tags ?? []) as FieldTag[],
         }, factionNamesOf(c)));
         const model = advValue(ss, 'hq', 'model') === 'main' ? 'main' : 'aux';
         void which;
-        const raw = await runModel(prompt.messages, model);
+        const got0 = takeFieldTags(await runModel(prompt.messages, model));
+        const raw = got0.raw;
+        const tags = got0.tags.filter(t => opts.tags?.includes(t));
         const got = parseVisitGroup(raw, a.name, prompt.bystanders, prompt.limit);
         const reply = got.line;
         const extra = got.extra.map(e => ({ agentId: bystanders.find(b => b.name === e.speaker)!.id, name: e.speaker, line: e.line }));
         lastExchange = { at: Date.now(), model, messages: prompt.messages, raw, reply: [reply, ...extra.map(e => `${e.name}: ${e.line}`)].join('\n') };
         // If the active chat changes during inference, save only to the captured origin.
-        const turn: VisitTurn = { id: uid(), at: Date.now(), agentId, name: a.name, user: text, reply, anchor, room: visitRoom(a) ?? undefined, ...(me ? { visitor: me.name } : {}), ...(act ? { act } : {}), ...(extra.length ? { extra } : {}) };
+        const turn: VisitTurn = { id: uid(), at: Date.now(), agentId, name: a.name, user: text, reply, anchor, room: visitRoom(a) ?? undefined, ...(me ? { visitor: me.name } : {}), ...(act ? { act } : {}), ...(extra.length ? { extra } : {}), ...(tags.length ? { tags } : {}) };
         const char = await risuai.getCharacterFromIndex(c.charIndex) as { chaId?: string } | null;
         if (!char || char.chaId !== c.char.chaId) throw new Error('원래 카드가 바뀌어 대화를 저장하지 못했어요.');
         const saved = await updateChat(c.charIndex, c.chatIndex, chat => {
@@ -160,12 +163,15 @@ export function createVisit(): GameVisit {
           act,
           scene: sceneOf(c, me?.id),
           skipBooks: me ? [me.lore] : [],
+          tags: (mob.tags ?? []) as FieldTag[],
         }, factionNamesOf(c)));
         const model = advValue(ss, 'hq', 'model') === 'main' ? 'main' : 'aux';
-        const raw = await runModel(prompt.messages, model);
+        const got0 = takeFieldTags(await runModel(prompt.messages, model));
+        const raw = got0.raw;
+        const tags = got0.tags.filter(t => mob.tags?.includes(t));
         const reply = parseVisitGroup(raw, mob.name, [], prompt.limit).line;
         lastExchange = { at: Date.now(), model, messages: prompt.messages, raw, reply };
-        const turn: VisitTurn = { id: uid(), at: Date.now(), agentId: mob.id, name: mob.name, user: text, reply, anchor, room: mob.place, ...(me ? { visitor: me.name } : {}), ...(act ? { act } : {}) };
+        const turn: VisitTurn = { id: uid(), at: Date.now(), agentId: mob.id, name: mob.name, user: text, reply, anchor, room: mob.place, ...(me ? { visitor: me.name } : {}), ...(act ? { act } : {}), ...(tags.length ? { tags } : {}) };
         const char = await risuai.getCharacterFromIndex(c.charIndex) as { chaId?: string } | null;
         if (!char || char.chaId !== c.char.chaId) throw new Error('원래 카드가 바뀌어 대화를 저장하지 못했어요.');
         const saved = await updateChat(c.charIndex, c.chatIndex, chat => {

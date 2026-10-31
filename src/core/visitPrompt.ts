@@ -9,7 +9,39 @@ import { cleanOutput } from './world/tags';
 export const VISIT_BOOK = 'Visit';
 export class VisitError extends Error {}
 
-export interface VisitAgent { id: string; name: string; rank?: string; state: string; situation: string; room: string; lore: string }
+export interface VisitAgent { id: string; name: string; rank?: string; state: string; situation: string; room: string; lore: string; /** 필드에서 말을 걸렸을 때 하던 일 (10-31 필드 기능 4번) */ doing?: string }
+
+// ── 필드 행동 표시 (10-31 사용자 결정 docs/필드기능_결정_1031.md): 모델이 승낙·거절을 정하고, 플러그인은 답 끝의 표시로만 안다 ──
+export type FieldTag = 'follow' | 'wait' | 'return' | 'permit' | 'alarm';
+const TAG_KO: Record<FieldTag, string> = { follow: '동행', wait: '기다림', return: '복귀', permit: '허가', alarm: '경보' };
+const TAG_OF: Record<string, FieldTag> = {
+  동행: 'follow', 따라감: 'follow', follow: 'follow', 기다림: 'wait', 대기: 'wait', wait: 'wait', 복귀: 'return', return: 'return',
+  허가: 'permit', permit: 'permit', 경보: 'alarm', alarm: 'alarm',
+};
+const TAG_HELP: Record<FieldTag, string> = {
+  follow: '[[동행]] — you agree, in this reply, to come along with the protagonist right now (you will walk with them)',
+  wait: '[[기다림]] — you agree to stay right here and wait for the protagonist',
+  return: '[[복귀]] — you stop accompanying the protagonist and go back to your own work',
+  permit: '[[허가]] — you allow the protagonist to stay in this restricted area after all',
+  alarm: '[[경보]] — the protagonist threatened you or forced the issue, and you raise the alarm',
+};
+/** 표시 규칙 (system 끝에 붙인다) */
+export function fieldTagRules(tags: readonly FieldTag[]): string {
+  if (!tags.length) return '';
+  return ['Field action tags: if, and only if, your character actually decides one of the following in this reply, put that tag alone on a new line at the very end. Never use a tag when refusing, hesitating or just talking about it. At most one tag.', ...tags.map((t) => `- ${TAG_HELP[t]}`)].join('\n');
+}
+/** 답에서 표시를 떼어 낸다 ([[동행]] 등, 영어 이름도). 알 수 없는 [[…]]는 그대로 둔다 */
+export function takeFieldTags(raw: string): { raw: string; tags: FieldTag[] } {
+  const tags: FieldTag[] = [];
+  const out = String(raw ?? '').replace(/\[\[\s*([^\]\s]+)\s*\]\]/g, (m, w: string) => {
+    const t = TAG_OF[w.toLowerCase()] ?? TAG_OF[w];
+    if (!t) return m;
+    if (!tags.includes(t)) tags.push(t);
+    return '';
+  });
+  return { raw: out, tags };
+}
+export const fieldTagName = (t: FieldTag): string => TAG_KO[t];
 /** 이번 막간에 오간 말 (말한 사람 이름, 말) */
 export interface VisitLine { speaker: string; text: string; /** 말이 아니라 행동 */ action?: boolean }
 export interface VisitPromptInput {
@@ -29,6 +61,8 @@ export interface VisitPromptInput {
   bystanders?: VisitAgent[];
   /** 따로 넣었으니 참고 자료에서 뺄 로어북 (주인공 요원의 로어북) */
   skipBooks?: string[];
+  /** 이번 답에 쓸 수 있는 필드 행동 표시 */
+  tags?: FieldTag[];
 }
 export interface VisitPrompt { messages: { role: 'system' | 'user'; content: string }[]; limit: number; /** 끼어들기 형식으로 보냈으면 그 요원 이름들 */ bystanders: string[] }
 
@@ -86,7 +120,7 @@ export function visitPrompt(src: RefSource, input: VisitPromptInput, names: Reco
     else if (r.content !== input.agent.lore && !by.some((b) => b.lore === r.content) && !r.sources.some((x) => input.skipBooks?.includes(x))) universe.activeLoreBooks.push({ source: r.sources.join(' / '), content: r.content, kind: r.kind });
   }
   const body = {
-    agent: { name: input.agent.name, ...(input.agent.rank ? { rank: input.agent.rank } : {}), lore: input.agent.lore, status: input.agent.state, situation: input.agent.situation, where: ROOM[input.agent.room] ?? input.agent.room },
+    agent: { name: input.agent.name, ...(input.agent.rank ? { rank: input.agent.rank } : {}), lore: input.agent.lore, status: input.agent.state, situation: input.agent.situation, where: ROOM[input.agent.room] ?? input.agent.room, ...(input.agent.doing ? { doingWhenSpokenTo: input.agent.doing } : {}) },
     ...(by.length ? { bystanders: by.map((b) => ({ name: b.name, ...(b.rank ? { rank: b.rank } : {}), lore: b.lore, status: b.state, situation: b.situation })) } : {}),
     protagonist: { name: input.visitor, ...(protagonist ? { lore: protagonist } : {}) },
     ...(input.scene && Object.values(input.scene).some(Boolean) ? { mainScene: Object.fromEntries(Object.entries(input.scene).filter(([, v]) => v)) } : {}),
@@ -100,7 +134,7 @@ export function visitPrompt(src: RefSource, input: VisitPromptInput, names: Reco
     limit,
     bystanders: by.map((b) => b.name),
     messages: [
-      { role: 'system', content: factionCodesToNames(rules(src, limit, by.length > 0), names) },
+      { role: 'system', content: factionCodesToNames([rules(src, limit, by.length > 0), fieldTagRules(input.tags ?? [])].filter(Boolean).join('\n\n'), names) },
       { role: 'user', content: factionCodesToNames(JSON.stringify(body), names) },
     ],
   };

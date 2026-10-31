@@ -6,7 +6,7 @@
 import { BASE_STATS } from '../../combat/baseStats.gen';
 import { derive, rollBase } from '../../combat/stats';
 import { clockText } from '../../../core/fieldclock';
-import type { GameAssets, GameBridge, MobTalk } from '../../bridge';
+import type { GameAssets, GameBridge, MobTalk, TalkOpts } from '../../bridge';
 import { persp, view } from './view';
 import { KEYMAP } from './input';
 import { drawGuardBar } from '../ui/pixelHud';
@@ -55,6 +55,8 @@ import dialogueData from '../../world/dialogue.json';
 import type { Actor, SimEvent } from '../../world/actors';
 import { ARCHETYPES, profileOf } from '../../world/mobs';
 import { FightLog, enName, isLaw } from '../../world/fightlog';
+import { reactOf } from '../../world/namedReact';
+import { newAttackId } from './ids';
 import { settleLine } from '../../world/fieldmoney';
 import { NAMED_MUL, npcPerkDef, rollNpcPerks } from '../../world/npcperks';
 import type { FactionView, PersonView } from '../../bridge';
@@ -99,7 +101,7 @@ const fieldWallet: { won: number | null } = { won: null };
 let observing = false;
 const observerOn = () => observing;
 /** 필드 가게 창이 쓰는 돈·장부 (hqAdapter 안에서 채운다: 가계부 다리·방문 id가 거기 있다) */
-const fieldLink: { mobOf?: (key: string) => MobTalk | null; talkTarget?: () => string; pay?: (amount: number, memo: string) => Promise<number | null>; record?: (text: string, ko?: string) => void; fact?: (key: string, value: string) => void; nearPerson?: () => string | null; gift?: (who: string, item: string, counts: boolean) => void ; endVisit?: (close: boolean) => void } = {};
+const fieldLink: { talkOpts?: (name: string) => TalkOpts; onTags?: (key: string, name: string, tags: string[]) => void; mobOf?: (key: string) => MobTalk | null; talkTarget?: () => string; pay?: (amount: number, memo: string) => Promise<number | null>; record?: (text: string, ko?: string) => void; fact?: (key: string, value: string) => void; nearPerson?: () => string | null; gift?: (who: string, item: string, counts: boolean) => void ; endVisit?: (close: boolean) => void } = {};
 const wonText = (n: number) => `${n < 0 ? '−' : ''}₩ ${Math.abs(Math.trunc(n)).toLocaleString('en-US')}`;
 
 function hqAdapter(bridge: Partial<GameBridge> | undefined, ui: { chooseFloor: HubHost['chooseFloor']; sfx: (n: string) => void; overlay?: HubHost['overlay']; rules?: () => ClockRules; shop?: (id: string) => string | null; choose?: (o: { title: string; lines?: string[]; options: string[]; cancel?: boolean }) => Promise<number> }): HqModuleLike & { goto(place: string): void; visitReady: Promise<void>; visitor(): { agentId: string; name: string }; dispose(): void } {
@@ -200,6 +202,8 @@ function hqAdapter(bridge: Partial<GameBridge> | undefined, ui: { chooseFloor: H
     if (!sim && ready) {
       sim = createHqWorld(map, seed, present.filter((p) => ROOM_SCENE[p.room]).map((p) => ({ name: p.name, scene: ROOM_SCENE[p.room] })), hasCharClip, { killOk: () => fighterHooks.killOk?.() ?? false, stance: (f) => factionBy.get(f)?.stage ?? null, relation: (v, t) => relation(v, t), namedHostile: (n) => peopleBy.get(n)?.affinity.cell === 'hostile' });
       chatter = new Chatter(sim, new Lines(dialogueData as unknown as DialogueData, sim.rng), lineCtx);
+      // 비전투 계열 캐릭터는 동행이어도 싸움을 거들지 않는다 (반응표 combat)
+      sim.noAssist = (n) => reactOf(n)?.combat === false;
     }
     // 개발 도구·브라우저 시험: 세계를 들여다본다 (관찰 창과 같은 정보)
     if (sim) (globalThis as { __goeiWorld?: WorldSim }).__goeiWorld = sim;
@@ -259,6 +263,20 @@ function hqAdapter(bridge: Partial<GameBridge> | undefined, ui: { chooseFloor: H
             ? { text: `${hm()}The ${enName(e.loser)} ${e.how === 'down' ? 'was knocked out' : 'fled'}.`, ko: `${hm()}${e.loser} ${e.how === 'down' ? '기절' : '도주'}`, weight: 1 as const }
             : { text: `${hm()}A ${enName(e.by)} threw a ${enName(e.who)} out.`, ko: `${hm()}${e.by}이(가) ${e.who}을(를) 내보냄`, weight: 1 as const };
         void b?.field?.record({ kind: 'act', ...line, scene: sceneNameOf(e.scene), visit: visitId }).catch(() => {});
+        continue;
+      }
+      // 동행 시작·끝 (모델 답의 [[동행]]·[[기다림]]·[[복귀]], 맞아 쓰러짐). 지금 동행 = 확정 사실
+      if (e.kind === 'follow') {
+        const w = sim;
+        const names = w ? w.followers.map((id) => w.actors.find((q) => q.def.id === id)?.def.name).filter((n): n is string => !!n) : [];
+        const line = e.mode === 'follow'
+          ? { kind: 'follow', text: `${hm()}${e.who} started following {user}.`, ko: `${hm()}${e.who} 동행 시작` }
+          : e.mode === 'wait'
+            ? { kind: 'unfollow', text: `${hm()}${e.who} stayed behind to wait.`, ko: `${hm()}${e.who} 남아서 기다림` }
+            : e.mode === 'hit'
+              ? { kind: 'unfollow', text: `${hm()}${e.who} was knocked down and stopped following {user}.`, ko: `${hm()}${e.who} 쓰러져 동행 끝` }
+              : { kind: 'unfollow', text: `${hm()}${e.who} went back to their own work.`, ko: `${hm()}${e.who} 자리로 돌아감` };
+        void b?.field?.record({ ...line, scene: sceneNameOf(e.scene), who: [e.who], weight: 2, visit: visitId, fact: { key: 'companions', value: names.join(', ') || 'none' } }).catch(() => {});
         continue;
       }
       if (e.kind === 'kill') {
@@ -376,6 +394,18 @@ function hqAdapter(bridge: Partial<GameBridge> | undefined, ui: { chooseFloor: H
     ].filter(Boolean).join('\n');
     return { id: `mob:${visitId}:${a.def.id}`, name: label, lore, place: sceneNameOf(a.scene), doing: a.doing === '주인공과 대화' ? a.talkFrom ?? a.doing : a.doing };
   };
+  // 필드 대화 ↔ 세계 (10-31 필드 기능 1·4번): 말을 걸 때 하던 일과 쓸 수 있는 표시, 답의 표시 → 동행
+  fieldLink.talkOpts = (name) => {
+    const a = sim?.findActor(name);
+    const doing = a && !a.following && !['idle', 'walk'].includes(a.act) ? a.doing : undefined;
+    return { ...(doing ? { doing } : {}), tags: ['follow', 'wait', 'return'] };
+  };
+  fieldLink.onTags = (key, name, tags) => {
+    const w = sim;
+    if (!w) return;
+    const id = key.startsWith('mob:') ? key.slice(4) : name;
+    for (const t of tags) if (t === 'follow' || t === 'wait' || t === 'return') w.setFollow(id, t);
+  };
   // 선물 상대: 지금 장면에서 주인공과 가까운 이름 인물
   let lastAt = { x: 0, y: 0 };
   fieldLink.nearPerson = () => {
@@ -458,6 +488,19 @@ function hqAdapter(bridge: Partial<GameBridge> | undefined, ui: { chooseFloor: H
       // 체력 0 = 항상 기절로 필드에 돌아감. 확인 사살(살해 허용·무기)은 필드 행위자에서 (actors.ts hitActor)
       w.fromFight(id, f.body.x, f.body.y, true);
       fights.delete(id);
+    }
+    // 동행 거들기: 따라오는 사람(전투 계열)은 가장 가까운 싸움 상대에게 붙어 때린다. 맞힘은 시뮬이 모아 둔 것을 여기서 전투 몸에
+    const foes = [...fights.values()].filter((f) => f.scene === sceneId && f.body.alive && f.body.hp > 0).map((f) => f.body);
+    for (const id of w.followers) {
+      const a = w.actors.find((q) => q.def.id === id);
+      if (!a || a.scene !== sceneId || w.noAssist(a.def.name)) { if (a) w.setAssist(id, null); continue; }
+      const t = foes.sort((p, q) => Math.abs(p.x - a.x) - Math.abs(q.x - a.x))[0];
+      w.setAssist(id, t ? { x: t.x, y: t.y } : null);
+    }
+    for (const h of w.assistHits.splice(0)) {
+      const t = foes.filter((f) => Math.abs(f.x - h.x) < 140 && Math.abs(f.y - h.y) < 60).sort((p, q) => Math.abs(p.x - h.x) - Math.abs(q.x - h.x))[0];
+      if (!t) continue;
+      t.applyHit({ x0: t.x - 30, x1: t.x + 30, z0: 0, z1: 160, y: t.y, attackId: newAttackId(), dmg: h.dmg, react: 'flinch', dir: h.dir, push: 3, strength: 1 }, api.world as never);
     }
     for (const a of w.challengers(sceneId)) {
       const look = a.def.look ?? a.def.name;
@@ -704,7 +747,7 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
   if (bridge?.visit && bridge.assets) void loadFieldFx(bridge.assets, ffx, cutins);
   // NPC 자유 대화 (npcLink.ts): 껍데기 놀이판 층에 대화창
   // 본부 방문: 머리 위 이름표·말풍선과 아래 한 줄 입력 (talk.ts)
-  const visit = bridge?.visit ? mountTalk(shell.stage.ui, bridge.visit, bridge.field, (k) => fieldLink.mobOf?.(k) ?? null) : null;
+  const visit = bridge?.visit ? mountTalk(shell.stage.ui, bridge.visit, bridge.field, (k) => fieldLink.mobOf?.(k) ?? null, { opts: (n) => fieldLink.talkOpts?.(n) ?? {}, onTags: (k, n, t) => fieldLink.onTags?.(k, n, t) }) : null;
   fieldLink.talkTarget = () => visit?.target() ?? '';
   const npc = linkNpcTalk({
     visit: visit ? name => { if (name) visit.open(name); } : undefined,

@@ -137,17 +137,19 @@ export interface VisitState {
   /** 본부에 온 사람: 상황판 주인공(캐릭터로 플레이)이면 그 요원, 아니면 유저 페르소나(agentId '') */
   visitor: { agentId: string; name: string };
   agents: { id: string; name: string; state: string; situation: string; room: string | null }[];
-  turns: { id: string; at: number; agentId: string; name: string; user: string; reply: string; visitor?: string; act?: boolean; extra?: { agentId: string; name: string; line: string }[] }[];
+  turns: { id: string; at: number; agentId: string; name: string; user: string; reply: string; visitor?: string; act?: boolean; extra?: { agentId: string; name: string; line: string }[]; /** 답 끝의 필드 행동 표시 (follow·wait·return·permit·alarm) */ tags?: string[] }[];
 }
+/** 필드에서 말을 걸 때 게임이 알려 주는 것: 하던 일, 이번 답에 쓸 수 있는 행동 표시 */
+export interface TalkOpts { doing?: string; tags?: ('follow' | 'wait' | 'return' | 'permit' | 'alarm')[] }
 export interface GameVisit {
   state(): Promise<VisitState>;
   /** nearby = 같은 방 가까이 있어 끼어들 수 있는 요원 id */
-  send(agentId: string, text: string, which: 'main' | 'aux', nearby?: string[]): Promise<VisitState>;
+  send(agentId: string, text: string, which: 'main' | 'aux', nearby?: string[], opts?: TalkOpts): Promise<VisitState>;
   /** 몹(이름 없는 사람)에게 말 걸기 (10-31 사용자: 이름 인물과 같이 모델 호출). 주고받은 말은 이름 인물 대화와 같이 원문 그대로 본편 요청에 들어간다 */
   sendMob?(mob: MobTalk, text: string): Promise<VisitState>;
 }
 /** 말을 거는 몹: id(이번 필드 동안 같은 사람), 이름표(「행인(여·60대 후반)」), 모델에 줄 인물 글(그림 신상·말투·성격·태도), 장소, 하던 일 */
-export interface MobTalk { id: string; name: string; lore: string; place: string; doing: string }
+export interface MobTalk { id: string; name: string; lore: string; place: string; doing: string; /** 이번 답에 쓸 수 있는 행동 표시 (경고 중인 경비 = permit·alarm) */ tags?: TalkOpts['tags'] }
 
 /** 필드 장부에 남길 사건 (게임 코드가 만든다). 본편 응답을 요청할 때 정제돼 들어간다 (docs/필드_기능_설계.md 8장) */
 export interface GameFieldEvent {
