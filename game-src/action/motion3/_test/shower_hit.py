@@ -62,11 +62,18 @@ RUN = {"당당": "long steady running strides", "수줍": "short quick running s
 FALL = {"당당": "then props up on one elbow", "수줍": "then curls up on the side", "화냄": "then lifts the head with the mouth open", "무심": "then lies still"}[TYPE]
 RISE = {"당당": "quickly", "수줍": "slowly, hunched", "화냄": "quickly", "무심": "without hurry"}[TYPE]
 CROUCH = {"당당": "kneels on one knee with the head raised", "수줍": "crouches low with the knees to the chest and the head ducked", "화냄": "crouches low with the head raised and the mouth open", "무심": "squats down low with the arms around the knees"}[TYPE]
+# 피격 줄(S1~S4)은 그 인물 동작표의 기본 줄 문장을 그대로, 옷만 없는 몸으로 (10-31 사용자: 기본 피격 모션 그대로 갖다 뽑아라, 옷만 안 입으면 된다)
+_T = m3.table(key)["rows"]
+BASEROW = {"S1": "18", "S2": "5", "S3": "19", "S4": "20"}
+def _base(n):
+    r = _T.get(BASEROW[n])
+    return (r["frames"], r["prompt"]) if r else (8, "")
+_BARE = f" The {g} is bare, wearing nothing, barefoot."
 STEPS = {
- "S1": ("A", 8, None, f"Standing bare {side}: {HIT}. Big, clear body movement in every frame. {DRAW}"),
- "S2": ("A", 8, None, f"Running {side} in place, barefoot and bare, {COVER}, with {RUN}. Every frame is a running pose. {DRAW}"),
- "S3": ("A", 8, None, f"Standing bare {side}: the body falls backward onto the floor and lands lying on the back, {FALL}, {COVER}. The body lies on the floor at the bottom of the picture. {DRAW}"),
- "S4": ("S3", 8, "back", f"Lying bare on the floor at the bottom of the picture {side}, {COVER}: the body rolls to one side, kneels, and stands up {RISE}. {DRAW}"),
+ "S1": ("A", _base("S1")[0], None, _base("S1")[1] + _BARE + f" {DRAW}"),
+ "S2": ("A", _base("S2")[0], None, _base("S2")[1] + _BARE + f" {DRAW}"),
+ "S3": ("A", _base("S3")[0], None, _base("S3")[1] + _BARE + f" {DRAW}"),
+ "S4": ("S3", _base("S4")[0], None, _base("S4")[1] + _BARE + f" {DRAW}"),
  "S5": ("A", 8, None, f"Standing bare {side}: the body lowers to the floor and {CROUCH}, {COVER}. The feet stay on the floor at the bottom of the picture. {DRAW}"),
  "S6": ("A", 8, None, f"Standing bare {side}: {SHOUT}. The feet stay planted. {DRAW}"),
 }
