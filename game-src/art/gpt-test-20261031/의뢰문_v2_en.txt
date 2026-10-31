@@ -1,0 +1,80 @@
+===== FRONT (B1, 7 panels) =====
+The 6 attached images are STYLE reference only (pixel look, dark outlines, shading, colors). Do not copy their objects, layouts or composition.
+
+Draw 7 panels, ① to ⑦. Side by side they form one continuous corridor: B1 of "Jungnim Underground Arcade", a run-down 1990s Seoul underground mall that is secretly a black market. Each panel is a separate image.
+
+MUST
+1. Draw every panel by hand. No code, no copy-paste, cropping, tiling, mirroring, resizing or color reduction.
+2. PIXEL GRID: each panel is pixel art on a 632×424 grid, output at 1536×1024, so one grid pixel = one ~2.4×2.4 px square block. Outlines are 1 block thick. No detail smaller than 1 block, including sign letters. No anti-aliasing, gradients or blur.
+3. COLORS: at most 64 colors per panel, the same palette in all 7 panels (dark, desaturated base + a few bright accents: warm shop light, neon).
+4. SIZES in grid pixels (a person is 150 tall): shop entrance 220 tall; door 170×80; counter / display table 75 tall (waist); box stack 45 (knee); trash bag 35; bottle or can 8–10; hand tool 10–15; key 2–3.
+5. CAMERA: standing eye height, looking ~20° down. Back-wall base line horizontal at y=254 (60%) in every panel. Floor = bottom 170 px (40%). Ceiling = thin top strip.
+6. One shop per panel; its front fills ~80% of the panel width.
+7. DEPTH: each shop is a recessed room — its inner side walls and ceiling visible going inward. Pillars stick out from the wall with visible side faces. Counters, carts and crates stand on the floor in front of the wall: bottom edge clearly below y=254, top and side faces visible, dark floor shadow.
+8. SEAMS: left and right 10% of every panel are identical in design — one concrete pillar, wall, floor, ceiling only; same colors, brightness and line heights in all 7 panels.
+9. FLOOR: seamless worn concrete. Litter scattered over the whole walkway, not only at the walls (crumpled paper, crushed cans, cigarette butts, bottle caps, plastic scraps, flattened cardboard), plus puddles and oil stains. Garbage piles at wall bases (collapsed boxes, burst trash bags, bottles). Every piece a different shape, size, color and angle.
+10. SIGNS: exact Korean name in quotes, large, chunky pixel lettering with depth (raised letters with shadow, chipped paint, or glowing neon). Each sign a different form: ① long board, ② vertical blade sign on a pillar, ③ text on a torn awning, ④ paint on glass, ⑥ round sign, ⑦ green-cross light box.
+11. ENDS: side walls only at the two ends. ① left edge: left wall seen angled inward. ⑦ right edge: right wall seen angled inward. No side walls between panels.
+
+NEVER
+- Repeated or duplicated elements: the same litter, stain, box, shelf, floor patch or wall detail twice
+- Clean or tidy look
+- Objects flat against the wall; small items bigger than the sizes above
+- Fine detail smaller than one grid pixel; smooth gradients; more than 64 colors
+- A shop, sign or object in the seam pillars; bright light pools at the seams
+- Floor tiles or grid; one vanishing point for the whole corridor; slanted back wall
+- Large objects in the middle of the walkway or in front of doors, passages or stairs
+- Stairs or fire doors on the back wall; stairs seen head-on
+- Smooth computer-font letters; any text other than the given names; text on flyers; walls covered in paper
+- People (even inside shops); chairs, stools, benches
+
+PANELS (one shop each)
+① Left end: stairs up along the left wall, ~1/5 of floor width, rising from the foreground toward the back and up out of the top-left, metal rails. Open snack bar "은정분식": counter sticking out onto the walkway, fish-cake pot, tteokbokki griddle, standing counter only.
+② Open hardware store "성원철물": tiny tools piled everywhere; wheeled cart out on the walkway.
+③ Closed tailor "동진수선": rusty dented shutter with graffiti; loaded hand truck in front.
+④ "대박 알선": tinted glass front and glass door, red neon "OPEN" reflected in a floor puddle; clear in front of the door.
+⑤ Narrow dark corridor cut into the back wall to the back alley, up-arrow sign; clear in front.
+⑥ Open general store "금성생활": small fans, heaters and junk overflowing onto the walkway.
+⑦ Clinic "손길의원": cloudy glass door; clear in front of the door. Right end: rectangular stairwell cut into the floor along the right wall, ~1/5 of floor width, going down toward the back into darkness, waist-high rail on its walkway edge, "B2 ↓" plate on the right wall.
+
+Output: 7 landscape images (3:2), ① first.
+
+===== BACK ALLEY (7 panels) =====
+The 6 attached images are STYLE reference only (pixel look, dark outlines, shading, colors). Do not copy their objects, layouts or composition.
+
+Draw 7 panels, ① to ⑦. Side by side they form one continuous back alley of "Jungnim Underground Arcade", a run-down 1990s Seoul underground mall that is secretly a black market. Narrower and darker than the main corridor: no fluorescent tubes, only a few wall lamps and shop light, very dark patches. Each panel is a separate image.
+
+MUST
+1. Draw every panel by hand. No code, no copy-paste, cropping, tiling, mirroring, resizing or color reduction.
+2. PIXEL GRID: each panel is pixel art on a 632×424 grid, output at 1536×1024, so one grid pixel = one ~2.4×2.4 px square block. Outlines are 1 block thick. No detail smaller than 1 block, including sign letters. No anti-aliasing, gradients or blur.
+3. COLORS: at most 64 colors per panel, the same palette in all 7 panels (dark, desaturated base + a few bright accents: warm lamp light, neon).
+4. SIZES in grid pixels (a person is 150 tall): shop entrance 220 tall; door 170×80; display case / counter 75 tall (waist); box or equipment case 45 (knee); trash bag 35; gun or knife 25–40 (forearm); gas mask 20 (head); bottle or jar 8–10; ring or key 2–3.
+5. CAMERA: standing eye height, looking ~20° down. Back-wall base line horizontal at y=254 (60%) in every panel. Floor = bottom 170 px (40%). Ceiling = thin top strip.
+6. One shop per panel; its front fills ~80% of the panel width. No large empty wall.
+7. DEPTH: each shop is a recessed room — its inner side walls and ceiling visible going inward. Pillars stick out from the wall with visible side faces. Display stands, carts and crates stand on the floor in front of the wall: bottom edge clearly below y=254, top and side faces visible, dark floor shadow.
+8. SEAMS: left and right 10% of every panel are identical in design — one concrete pillar, wall, floor, ceiling only; same colors, brightness and line heights in all 7 panels.
+9. FLOOR: seamless worn concrete. Litter scattered over the whole walkway, not only at the walls (crumpled paper, crushed cans, cigarette butts, bottle caps, plastic scraps, flattened cardboard), plus puddles and oil stains. Garbage piles at wall bases (collapsed boxes, burst trash bags, bottles). Every piece a different shape, size, color and angle.
+10. SIGNS: exact Korean name in quotes, large, chunky pixel lettering with depth (raised letters with shadow, chipped paint, or glowing neon). Each sign a different form: ① long wooden board, ② vertical blade sign on a pillar, ③ raised letters on a rusty plate, ⑤ round hanging sign, ⑥ neon, ⑦ text on a torn awning.
+11. ENDS: side walls only at the two ends. ① left edge: dead-end wall with a lowered shutter, seen angled inward. ⑦ right edge: dead end closed by a rusty chain-link fence, seen angled inward. No side walls between panels.
+
+NEVER
+- Repeated or duplicated elements: the same litter, stain, box, shelf, lamp, pipe layout, floor patch or wall detail twice
+- Clean or tidy look
+- Objects flat against the wall; small items bigger than the sizes above
+- Fine detail smaller than one grid pixel; smooth gradients; more than 64 colors
+- A shop, sign or object in the seam pillars; bright light pools at the seams
+- Floor tiles or grid; one vanishing point for the whole alley; slanted back wall
+- Large objects in the middle of the walkway or in front of doors or passages
+- Smooth computer-font letters; any text other than the given names; text on flyers; walls covered in paper
+- People (even inside shops); chairs, stools, tables
+
+PANELS (one shop each)
+① Left end: shutter dead-end wall with equipment cases and boxes piled in front. Cramped pawn shop "헐값매입": wooden door and display window with small jewelry, watches and odd objects; clear in front of the door.
+② Equipment shop "현장장비": gas masks, hazmat suits, vests, helmets packed inside; wheeled cart with a yellow tarp load out on the floor.
+③ Weapon shop "대성무기": guns and knives on a wire-mesh wall, locked steel door with a barred window, low display crates sticking out.
+④ Wide bright passage cut into the back wall back to the B1 corridor, left-arrow sign; clear in front.
+⑤ Small bar "막잔": old wooden door, steamed-up window with bottle shelves, empty beer crates outside.
+⑥ Curio shop "이물상회": dark shop, one strange small object per glass case (backward-running desk clock, cracked mask, black cube); low glass display table sticking out.
+⑦ Herb shop "진성약재": half-raised shutter, plastic strip curtain, hanging dried herbs, jars and a scale; herb sacks out front. Right end: chain-link fence with military cases and an overflowing trash can in front.
+
+Output: 7 landscape images (3:2), ① first.
