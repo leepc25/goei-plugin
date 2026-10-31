@@ -27,3 +27,7 @@
 - A 대조: v4 요청문 그대로
 - B: 「Flat front view」 → 「One-point perspective, the floor recedes toward the back wall」(옆벽 없음)
 - C: B + 「corridor」 대신 넓은 바닥 묘사(「a wide underground arcade walkway, open concrete floor in front of the shop」)
+
+## 결과: v6 (632, one-point) — 짐작 틀림
+- 원근만 실내와 같게 바꿨는데 뒷벽선 약 77%(그대로). 오른쪽에 안쪽 옆벽·통로가 생기고 바닥 판 선이 다시 생김.
+- 남은 차이: 실내는 물건(책상·침대·테이블)이 **바닥 위 방 안**에 놓이고, 통로는 내용이 **벽 안으로 들어간 가게 + 간판 + 천장**이라 세로 공간을 벽이 다 먹는 것으로 보임(확인 안 됨).
