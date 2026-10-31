@@ -41,12 +41,24 @@ REL = "hands stay in front of the body or at the head and face, elbows never go 
 # 가리는 자세: 남자는 아래만(10-31 사용자: 남자는 위를 가릴 필요가 없다), 여자는 가슴과 아래
 COVER = "one hand covering the groin" if g == "man" else "one forearm pressed across the chest and the other hand covering the groin"
 FREE = "the other hand waves sharply toward the door, telling the intruder to get out" if g == "man" else "the head jerks toward the door, telling the intruder to get out"
+# 성향(docs/샤워_반응_성향표.md, 위키 근거): 당당·수줍·화냄·무심 → 가리는 정도·소리치는 모습이 다르다 (10-31 사용자: 인물마다 달라야)
+import re as _re
+_tbl = (Path(__file__).resolve().parents[4] / "docs/샤워_반응_성향표.md").read_text(encoding="utf-8")
+_m = _re.search(r"^\| " + _re.escape(key) + r" \| [^|]+ \| ([^|]+?) \| ([^|]+?) \|", _tbl, _re.M)
+TYPE, MANNER = (_m.group(1).strip(), _m.group(2).strip()) if _m else ("수줍", "")
+LOOSE = "one hand loosely covering the groin" if g == "man" else "one arm loosely across the chest and the other hand covering the groin"
+SHOUT = {
+ "당당": f"standing tall, {LOOSE}, not hiding much, glaring coldly at the intruder and saying firmly to get out, one finger pointing at the door",
+ "수줍": f"{COVER}, hunching and turning the body away from the intruder, the face flushed, crying out in embarrassment and shrinking back",
+ "화냄": f"{COVER}, leaning forward angrily and yelling at the intruder with the mouth wide open, jabbing toward the door again and again",
+ "무심": f"{LOOSE}, giving the intruder one flat look, then calmly turning the back to them",
+}[TYPE] + (f", {MANNER}" if MANNER else "")
 STEPS = {
  "S1": ("A", 8, "back", f"Standing bare {side}, struck hard from the front: {pro} flinches with a startled, pained face, hunches and turns the shoulders away, {COVER}, and staggers half a step back, then straightens a little, still covering. No towel. {DRAW}"),
  "S2": ("A", 8, "loop", f"Running {side} in place, barefoot and bare, hunched forward with a panicked face, {COVER} the whole time, short quick steps. No towel. {DRAW}"),
  "S3": ("A", 8, None, f"Standing bare {side}, hit by a heavy blow: {pro} is thrown backward off the feet, lands on the back on the floor and lies there with the knees drawn up and {COVER}. Last frame: lying on the back on the floor, covering. No towel. {DRAW}"),
  "S4": ("S3", 8, "back", f"Lying bare on the back on the floor {side}, {COVER}: {pro} rolls to one side, gets up onto the knees and then to the feet, still covering, and ends standing hunched and covering. No towel. {DRAW}"),
- "S6": ("A", 8, "loop", f"Standing bare {side}, {COVER}, shocked and angry at someone who walked in by mistake: {pro} shouts with the mouth wide open, leaning the upper body back a little, and {FREE}. The feet stay planted. No towel, no effect lines. {DRAW}"),
+ "S6": ("A", 8, "loop", f"Standing bare {side}, reacting to someone who walked in by mistake: {SHOUT}. The feet stay planted. No towel, no effect lines. {DRAW}"),
  "S5": ("A", 8, None, f"Standing bare {side}, frightened: {pro} drops into a low crouch, hugging the knees to the chest and hiding the body, the head ducked, trembling. Last frame: crouched low, knees to the chest, covering. No towel. {DRAW}"),
 }
 def b64(im):
