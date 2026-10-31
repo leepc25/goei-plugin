@@ -52,7 +52,7 @@
   },
   {
    "full": "against the buildings: a vending machine, a parked motorbike, potted plants, trash bags and boxes",
-   "text": "against the buildings: a vending machine nearly as tall as the shutters, a parked motorbike, potted plants, trash bags and boxes",
+   "text": "against the buildings: a vending machine nearly as tall as the shutters, a motorbike, potted plants, trash bags, boxes",
    "why": "거리 소품(인도 뒤쪽, 걷는 길 비움)",
    "keep": []
   },
@@ -70,7 +70,7 @@
   },
   {
    "full": "a torn redevelopment banner, no letters",
-   "text": "a torn banner on a shutter",
+   "text": "a torn banner",
    "why": "재개발 현수막",
    "keep": []
   },
@@ -82,7 +82,7 @@
   },
   {
    "full": "left 10 percent: only building fronts and sidewalk, continuing past the edge",
-   "text": "left 10 percent: shop fronts continuing past the edge",
+   "text": "left 10 percent: a bare wall between shops, continuing past the edge",
    "why": "왼쪽으로 이어 그리기 자리",
    "keep": []
   }

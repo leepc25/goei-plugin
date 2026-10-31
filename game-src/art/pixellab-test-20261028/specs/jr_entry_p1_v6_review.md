@@ -6,7 +6,7 @@
 
 - WARN 설명이 김(48낱말): right 35 percent: the front end of a big freestanding arcade entrance on the sidewalk like a subway exit, the rest past the right edge, open end facing left, stairs going down to the right into darkness, waist-high railings, a glass canopy as high as the shutters behind
 - WARN 설명이 김(22낱말): on the building fronts: signs reading "중림슈퍼", "제일수선", "영진철물", closed shutters, a small open shop, a note reading "임대" on a window
-- WARN 설명이 김(21낱말): against the buildings: a vending machine nearly as tall as the shutters, a parked motorbike, potted plants, trash bags and boxes
+- WARN 설명이 김(19낱말): against the buildings: a vending machine nearly as tall as the shutters, a motorbike, potted plants, trash bags, boxes
 - WARN 같은 낱말 4번: shutters
 - WARN 바닥 칸에 빛·그림자 없음
 
@@ -47,12 +47,12 @@
 | 2 | clear sidewalk at the entrance | 출입구 앞 비움 |  | clear sidewalk at the entrance |  |
 | 3 | back: old low-rise shop buildings along the whole width, ground floor and part of the second floor, tops cut off | 거리 뒤 건물 |  | back: old shop fronts along the whole width, no upper floors | low-rise(**이유 없음**); buildings(**이유 없음**); ground(**이유 없음**); second(**이유 없음**); tops(**이유 없음**); cut(**이유 없음**); off(**이유 없음**) |
 | 4 | on the building fronts: faded blank signs, closed shutters, a small open shop, a note reading "임대" on an empty window | 낡은 상가 거리 |  | on the building fronts: signs reading "중림슈퍼", "제일수선", "영진철물", closed shutters, a small open shop, a note reading "임대" on a window | faded(**이유 없음**); blank(**이유 없음**); empty(**이유 없음**) |
-| 5 | against the buildings: a vending machine, a parked motorbike, potted plants, trash bags and boxes | 거리 소품(인도 뒤쪽, 걷는 길 비움) |  | against the buildings: a vending machine nearly as tall as the shutters, a parked motorbike, potted plants, trash bags and boxes |  |
+| 5 | against the buildings: a vending machine, a parked motorbike, potted plants, trash bags and boxes | 거리 소품(인도 뒤쪽, 걷는 길 비움) |  | against the buildings: a vending machine nearly as tall as the shutters, a motorbike, potted plants, trash bags, boxes | parked(**이유 없음**) |
 | 6 | a utility pole with tangled wires | 전봇대·전선 |  | a utility pole cut off at the top | tangled(**이유 없음**); wires(**이유 없음**) |
 | 7 | an old public phone | 공중전화 |  | an old phone booth nearly as tall as the shutters | public(**이유 없음**) |
-| 8 | a torn redevelopment banner, no letters | 재개발 현수막 |  | a torn banner on a shutter | redevelopment(**이유 없음**); letters(**이유 없음**) |
+| 8 | a torn redevelopment banner, no letters | 재개발 현수막 |  | a torn banner | redevelopment(**이유 없음**); letters(**이유 없음**) |
 | 9 | bottom 8 percent: a curb and an asphalt strip, no cars, no markings | 사용자: 차도는 맨 아래 띠, 걷지 않음 |  | bottom edge: a very thin curb and road line | percent(**이유 없음**); asphalt(**이유 없음**); strip(**이유 없음**); cars(**이유 없음**); markings(**이유 없음**) |
-| 10 | left 10 percent: only building fronts and sidewalk, continuing past the edge | 왼쪽으로 이어 그리기 자리 |  | left 10 percent: shop fronts continuing past the edge | only(**이유 없음**); building(**이유 없음**); sidewalk(**이유 없음**) |
+| 10 | left 10 percent: only building fronts and sidewalk, continuing past the edge | 왼쪽으로 이어 그리기 자리 |  | left 10 percent: a bare wall between shops, continuing past the edge | only(**이유 없음**); building(**이유 없음**); fronts(**이유 없음**); sidewalk(**이유 없음**) |
 
 ## 3차 자가 검토
 
@@ -71,12 +71,12 @@
 - 원근·바닥 몫·양옆 벽·문·채우기가 이 장면에 정한 대로인가?
   - 카메라·원근 문장 지하와 같음, 첫 줄 높이 한계(v4), 바닥 30% 인도만, 가이드 v3
 
-## 2차 요청문 (2000자)
+## 2차 요청문 (1992자)
 
 ```
 Pixel art game background of the ground floor shop fronts of a run-down 1990s Seoul shopping street, seen up close from the sidewalk, the image top right above the shop signs, late morning daylight. Camera at standing eye height, about 20 degrees above the floor, looking slightly down. One-point depth, but the building fronts behind the sidewalk run straight and level across the full width. The floor fills the lower 30 percent, all sidewalk, a very thin curb line at the bottom of the image. Nothing closes the sides: the street keeps going past both image edges.
 FLOOR: smooth grey concrete sidewalk like one sheet, litter.
-PACKED WITH STUFF, every area filled, no empty wall, no empty floor corner: right 35 percent: the front end of a big freestanding arcade entrance on the sidewalk like a subway exit, the rest past the right edge, open end facing left, stairs going down to the right into darkness, waist-high railings, a glass canopy as high as the shutters behind; on top of the canopy, above the entrance: a sign board reading "중림지하상가"; clear sidewalk at the entrance; back: old shop fronts along the whole width, no upper floors; on the building fronts: signs reading "중림슈퍼", "제일수선", "영진철물", closed shutters, a small open shop, a note reading "임대" on a window; against the buildings: a vending machine nearly as tall as the shutters, a parked motorbike, potted plants, trash bags and boxes; a utility pole cut off at the top; an old phone booth nearly as tall as the shutters; a torn banner on a shutter; bottom edge: a very thin curb and road line; left 10 percent: shop fronts continuing past the edge.
+PACKED WITH STUFF, every area filled, no empty wall, no empty floor corner: right 35 percent: the front end of a big freestanding arcade entrance on the sidewalk like a subway exit, the rest past the right edge, open end facing left, stairs going down to the right into darkness, waist-high railings, a glass canopy as high as the shutters behind; on top of the canopy, above the entrance: a sign board reading "중림지하상가"; clear sidewalk at the entrance; back: old shop fronts along the whole width, no upper floors; on the building fronts: signs reading "중림슈퍼", "제일수선", "영진철물", closed shutters, a small open shop, a note reading "임대" on a window; against the buildings: a vending machine nearly as tall as the shutters, a motorbike, potted plants, trash bags, boxes; a utility pole cut off at the top; an old phone booth nearly as tall as the shutters; a torn banner; bottom edge: a very thin curb and road line; left 10 percent: a bare wall between shops, continuing past the edge.
 WALL: grimy concrete and old tile, peeling paint, rust.
 LIGHT: soft shadows under objects and the canopy, dark stairwell.
 STYLE: dense, highly detailed pixel art, crisp pixel clusters, selective dark outline, rich medium-to-detailed shading, faded grey, beige, dull blue, rust, soft daylight, no dithering, no blur. No people, chairs, sofas, benches, coffee tables, clocks or cars.
