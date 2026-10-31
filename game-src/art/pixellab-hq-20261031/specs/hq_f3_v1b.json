@@ -1,0 +1,173 @@
+{
+ "name": "hq_f3_v1b",
+ "room": "corridor",
+ "mood": "clean",
+ "mode": "loose",
+ "view": "corridor",
+ "sides": "none",
+ "floor_share": "the lower 30 percent",
+ "density": "packed",
+ "place": "the third floor corridor of a modern government office building in Seoul",
+ "time": "daytime",
+ "light": "even cool white office light",
+ "floor": "smooth light grey polished floor like one sheet, faint reflections, shadows under objects",
+ "walls": "clean light grey walls, warm wood panel accents, a thin dark baseboard; ceiling strip with flat LED panels",
+ "shadow": "soft even light, darker corners and soft shadows under objects and in the door recesses",
+ "palette": "bright white and light grey, warm wood, dark navy accents",
+ "doors": 4,
+ "no": [
+  "other doors",
+  "letters",
+  "numbers"
+ ],
+ "sized": [],
+ "items": [
+  {
+   "full": "back wall, left part: the wide glass double doors of the main response team office, frosted glass band, a dark navy stripe beside the door, closed",
+   "text": "back wall, left part: the wide glass double doors of the main response team office, frosted glass band, a dark navy stripe beside the door, closed",
+   "why": "종합대응팀 사무실 입구",
+   "keep": []
+  },
+  {
+   "full": "clear empty floor in front of the glass doors",
+   "text": "clear empty floor in front of the glass doors",
+   "why": "출입구 앞 비움",
+   "keep": []
+  },
+  {
+   "full": "back wall, middle: a plain wooden door to the women's restroom with a red women pictogram plate, no letters, closed",
+   "text": "back wall, middle: a plain wooden door to the women's restroom with a red women pictogram plate, no letters, closed",
+   "why": "화장실(여)",
+   "keep": []
+  },
+  {
+   "full": "back wall, middle right: a wooden door to the lounge with a coffee cup pictogram plate, no letters, closed",
+   "text": "back wall, middle right: a wooden door to the lounge with a coffee cup pictogram plate, no letters, closed",
+   "why": "휴게실",
+   "keep": []
+  },
+  {
+   "full": "back wall, right end: brushed steel elevator doors set flat in the back wall, a call button panel beside them, a small arrow light above, no numbers, closed",
+   "text": "back wall, right end: brushed steel elevator doors set flat in the back wall, a call button panel beside them, a small arrow light above, no numbers, closed",
+   "why": "엘리베이터(모든 층 같은 자리)",
+   "keep": []
+  },
+  {
+   "full": "clear empty floor in front of the elevator",
+   "text": "clear empty floor in front of the elevator",
+   "why": "엘리베이터 앞 비움",
+   "keep": []
+  },
+  {
+   "full": "between the doors: tall potted plants, a water dispenser, a fire extinguisher cabinet",
+   "text": "between the doors: tall potted plants, a water dispenser, a fire extinguisher cabinet",
+   "why": "복도 소품",
+   "keep": []
+  },
+  {
+   "full": "on the walls: framed abstract prints, a blank notice board, a hand sanitizer",
+   "text": "on the walls: framed abstract prints, a blank notice board, a hand sanitizer",
+   "why": "벽 소품",
+   "keep": []
+  },
+  {
+   "full": "along the wall base: recycling bins, a stack of document boxes",
+   "text": "along the wall base: recycling bins, a stack of document boxes",
+   "why": "복도 소품",
+   "keep": []
+  },
+  {
+   "full": "ceiling: flat white LED panel lights, a smoke detector, an air vent",
+   "text": "ceiling: flat white LED panel lights, a smoke detector, an air vent",
+   "why": "천장",
+   "keep": []
+  }
+ ],
+ "must": [
+  {
+   "kw": "like one sheet",
+   "from": "바닥 줄 금지"
+  }
+ ],
+ "brief": {
+  "wiki": "관리국 본부",
+  "design": "본부 설계 2판 규칙: 글씨·숫자·로고 없이 기호·색 띠",
+  "user": [
+   "사용자 10-31: 본부 최소 구조, 3F = 종합대응팀·화장실(여)·휴게실·엘리베이터",
+   "현대적인 사무실(B2 빼고)",
+   "복도는 한 층의 일부, 양 끝은 이어짐",
+   "엘리베이터 오른쪽 끝 뒷벽"
+  ],
+  "items": [
+   {
+    "src": "0번 줄 근거",
+    "by": [
+     0
+    ]
+   },
+   {
+    "src": "1번 줄 근거",
+    "by": [
+     1
+    ]
+   },
+   {
+    "src": "2번 줄 근거",
+    "by": [
+     2
+    ]
+   },
+   {
+    "src": "3번 줄 근거",
+    "by": [
+     3
+    ]
+   },
+   {
+    "src": "4번 줄 근거",
+    "by": [
+     4
+    ]
+   },
+   {
+    "src": "5번 줄 근거",
+    "by": [
+     5
+    ]
+   },
+   {
+    "src": "6번 줄 근거",
+    "by": [
+     6
+    ]
+   },
+   {
+    "src": "7번 줄 근거",
+    "by": [
+     7
+    ]
+   },
+   {
+    "src": "8번 줄 근거",
+    "by": [
+     8
+    ]
+   },
+   {
+    "src": "9번 줄 근거",
+    "by": [
+     9
+    ]
+   }
+  ]
+ },
+ "review": {
+  "fit": "현대 사무 복도, 사람·의자·벤치 없음",
+  "place": "문은 모두 뒷벽 정면, 엘리베이터 오른쪽 끝, 문 앞 비움",
+  "size": "가이드 사각형으로 엘리베이터 크기(문 높이 기준)",
+  "brief": "사용자 결정(3F 문 셋+엘리베이터, 현대 사무실, 양 끝 이어짐) 모두 넣음, 빠진 것 없음",
+  "meaning": "1차=2차(느슨한 틀)",
+  "over": "같은 물건 두 번 없음, packed",
+  "frame": "카메라 문장은 중림과 같음, 뒷벽 곧게, 바닥 30%, 양 끝 이어짐, 가이드 없음(사용자 「가이드를 넣지 말아봐」)"
+ }
+}
