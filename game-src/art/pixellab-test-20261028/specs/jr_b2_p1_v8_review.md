@@ -4,9 +4,8 @@
 
 ## 점검 결과
 
-- FAIL 2006자 > 2000
 - WARN 설명이 김(64낱말): back wall, centered: a big storage unit front filling the middle 80 percent of the width, standing on the walkway floor line, reaching up to the ceiling strip, a full-height steel door, three deadbolts, in the middle and wide steel shutters on both sides of it, a bare bulb; right above the opening, just under the ceiling strip, a steel plate reading "창고 B-7"
-- WARN 설명이 김(25낱말): left 10 percent of the image: a narrow stairwell cut into the floor, steps going down into darkness, a waist-high railing on its walkway edge
+- WARN 설명이 김(24낱말): left 10 percent of the image: a narrow stairwell in the floor, steps going down into darkness, a waist-high railing on its walkway edge
 - WARN 같은 낱말 4번: floor
 - WARN 같은 낱말 4번: steel
 - WARN 바닥 칸에 빛·그림자 없음
@@ -50,7 +49,7 @@
 |---|---|---|---|---|---|
 | 0 | back wall, centered: a big storage unit front filling the middle 80 percent of the width, recessed like a deep lit room, a heavy steel door in the middle, three deadbolts, a bare bulb; right above the opening, just under the ceiling strip, a steel plate reading "창고 B-7" | 위키 영창컨설팅: 간판 없음, 철문 「창고 B-7」, 데드볼트 셋, 깜빡이는 조명 |  | back wall, centered: a big storage unit front filling the middle 80 percent of the width, standing on the walkway floor line, reaching up to the ceiling strip, a full-height steel door, three deadbolts, in the middle and wide steel shutters on both sides of it, a bare bulb; right above the opening, just under the ceiling strip, a steel plate reading "창고 B-7" | recessed(**이유 없음**); like(**이유 없음**); deep(**이유 없음**); lit(**이유 없음**); heavy(**이유 없음**) |
 | 1 | clear empty floor in front of the steel door | 게임 출입구 앞 비움 |  | clear empty floor in front of the steel door |  |
-| 2 | far left 20 percent of the image: a rectangular stairwell cut into the floor, steps going down into darkness, a waist-high railing on its walkway edge | 사용자 「1번해봐」: 왼쪽 끝은 벽 대신 내려가는 계단 입구(앞골목 ⑦ 계단 문장) |  | left 10 percent of the image: a narrow stairwell cut into the floor, steps going down into darkness, a waist-high railing on its walkway edge | far(**이유 없음**); rectangular(**이유 없음**) |
+| 2 | far left 20 percent of the image: a rectangular stairwell cut into the floor, steps going down into darkness, a waist-high railing on its walkway edge | 사용자 「1번해봐」: 왼쪽 끝은 벽 대신 내려가는 계단 입구(앞골목 ⑦ 계단 문장) |  | left 10 percent of the image: a narrow stairwell in the floor, steps going down into darkness, a waist-high railing on its walkway edge | far(**이유 없음**); rectangular(**이유 없음**); cut(**이유 없음**) |
 | 3 | a chain across the stairwell and a plate reading "출입금지" | 계단은 막힘(게임에서 못 들어감) |  | a chain across the stairwell and a plate reading "출입금지" |  |
 | 4 | left of the shop: a fire extinguisher box, a burst trash bag | 설계안 소화기함 |  | left of the shop: a fire extinguisher box, a burst trash bag |  |
 | 5 | right of the shop: a CCTV camera, a buzzer, crates | 사채업자 경계 |  | right of the shop: a CCTV camera, a buzzer, crates |  |
@@ -77,12 +76,12 @@
 - 원근·바닥 몫·양옆 벽·문·채우기가 이 장면에 정한 대로인가?
   - 첫 줄·가게 줄 문구·가이드 v8은 ②③④와 같음, 금지 목록은 끝 칸(계단 허용), 계단 줄은 가게 줄 뒤
 
-## 2차 요청문 (2006자)
+## 2차 요청문 (2000자)
 
 ```
 Pixel art game background of a run-down 1990s Seoul underground arcade corridor, low ceiling right above the sign, night. Camera at standing eye height, about 20 degrees above the floor, looking slightly down. One-point depth, but the back wall runs straight and level across the full width. The floor fills the lower 30 percent of the image. No side walls: the room keeps going past both image edges.
 FLOOR: smooth dark poured concrete like one wet sheet, grime, oil stains, dark puddles, varied litter all over the walkway.
-VERY CLUTTERED: every wall, shelf and corner packed with small props: back wall, centered: a big storage unit front filling the middle 80 percent of the width, standing on the walkway floor line, reaching up to the ceiling strip, a full-height steel door, three deadbolts, in the middle and wide steel shutters on both sides of it, a bare bulb; right above the opening, just under the ceiling strip, a steel plate reading "창고 B-7"; clear empty floor in front of the steel door; left 10 percent of the image: a narrow stairwell cut into the floor, steps going down into darkness, a waist-high railing on its walkway edge; a chain across the stairwell and a plate reading "출입금지"; left of the shop: a fire extinguisher box, a burst trash bag; right of the shop: a CCTV camera, a buzzer, crates; wall base: cardboard, bottles, cigarette butts, each a different shape; a torn blank notice; dripping pipes; a green exit sign, no letters; right 10 percent of the image: only bare back wall and floor, no side wall.
+VERY CLUTTERED: every wall, shelf and corner packed with small props: back wall, centered: a big storage unit front filling the middle 80 percent of the width, standing on the walkway floor line, reaching up to the ceiling strip, a full-height steel door, three deadbolts, in the middle and wide steel shutters on both sides of it, a bare bulb; right above the opening, just under the ceiling strip, a steel plate reading "창고 B-7"; clear empty floor in front of the steel door; left 10 percent of the image: a narrow stairwell in the floor, steps going down into darkness, a waist-high railing on its walkway edge; a chain across the stairwell and a plate reading "출입금지"; left of the shop: a fire extinguisher box, a burst trash bag; right of the shop: a CCTV camera, a buzzer, crates; wall base: cardboard, bottles, cigarette butts, each a different shape; a torn blank notice; dripping pipes; a green exit sign, no letters; right 10 percent of the image: only bare back wall and floor, no side wall.
 WALL: raw concrete, water stains, soot, graffiti; ceiling strip, tangled cables, fluorescent tubes, nearly all dead, one flickering.
 LIGHT: very dark, black shadows under objects, small light pools.
 STYLE: dense, highly detailed pixel art, crisp pixel clusters, selective dark outline, rich medium-to-detailed shading, near-black grey-green, green and red accents, no dithering, no blur. No people, chairs, sofas, benches, coffee tables, clocks, other doors or side walls.
