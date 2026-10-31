@@ -958,5 +958,8 @@
   },
   "shotDmg": 7,
   "superType": "aoe"
- }
+ },
+ "drop": [
+  "149"
+ ]
 }
