@@ -688,3 +688,36 @@ test('훈련 욕구: 이름 요원·전투 NPC는 훈련장에 가서 훈련, �
   assert.ok(seen.has(guard.def.id), '경비 훈련');
   assert.ok(!seen.has(desk.def.id), '안내 직원은 안 감');
 });
+
+test('상호작용: 동료끼리 지나가다 인사·한가하면 선 채 대화, 경비 무전 보고, 의사 진료, 직원도 주인공을 보면 응대', () => {
+  const clips = ['walk', 'idle', 'greet', 'nod', 'talk', 'radio', 'exam', 'treat', 'angry'];
+  const sc = [{ id: 'hall', name: '3층', floor: '3F', length: 2400, lane: [420, 669], doors: [] }, { id: 'med', name: '의무실', floor: 'B2', length: 1600, lane: [470, 680], doors: [] }];
+  const g = new P.PlaceGraph(sc, []);
+  // 인사·대화
+  let sim = new A.WorldSim(g, R.mulberry32(1), { has: (_l, c) => clips.includes(c) });
+  const x = sim.add({ id: 'x', name: '쟈알디', kind: 'named', brain: 'roam', home: 'hall' }, { scene: 'hall', x: 1000, y: 560 });
+  const y = sim.add({ id: 'y', name: '에일린', kind: 'named', brain: 'roam', home: 'hall' }, { scene: 'hall', x: 1060, y: 560 });
+  x.chatCd = 0; y.chatCd = 0; x.act = y.act = 'idle'; x.wait = y.wait = 99;
+  sim.step(1 / 30, { scene: 'else', x: 0, hour: 12 });
+  assert.ok(x.doing.startsWith('대화') && y.doing.startsWith('대화'), `${x.doing} / ${y.doing}`);
+  assert.equal(x.clip, 'talk');
+  // 무전 보고·의사 진료
+  sim = new A.WorldSim(g, R.mulberry32(3), {
+    posts: [{ id: 'gd', archetype: '경비', scene: 'hall', how: 'fixed', spot: 500, shifts: [[0, 24]], count: 1, gate: 100 }, { id: 'dr', archetype: '의사', scene: 'med', how: 'fixed', spot: 900, shifts: [[0, 24]], count: 1, gate: 100 }],
+    has: (_l, c) => clips.includes(c),
+  });
+  const pt = sim.add({ id: 'pt', name: '데드폴', kind: 'named', brain: 'roam', home: 'med' }, { scene: 'med', x: 400, y: 560 });
+  pt.act = 'idle'; pt.wait = 1e9;
+  const seen = new Set();
+  for (let t = 0; t < 30 * 200; t++) {
+    sim.step(1 / 30, { scene: 'else', x: 0, hour: 12 });
+    for (const a of sim.actors) seen.add(a.doing);
+  }
+  assert.ok(seen.has('무전 보고'), [...seen].join(','));
+  assert.ok(seen.has('진료 중') && seen.has('치료받는 중'), [...seen].join(','));
+  // 직원이 주인공을 보면 응대
+  const gd = sim.actors.find((a) => a.post?.id === 'gd');
+  gd.act = 'post'; gd.noticeCd = 0; gd.wait = 99;
+  sim.step(1 / 30, { scene: 'hall', x: gd.x + 100, y: gd.y, hour: 12 });
+  assert.equal(gd.act, 'notice');
+});

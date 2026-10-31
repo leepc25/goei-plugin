@@ -121,6 +121,8 @@ export const FIELD_CLIP: Record<string, { ids: string[]; fps?: number; loop?: bo
   sitdown: { ids: ['39'], fps: 8, loop: false }, backoff: { ids: ['37_1', '37'], fps: 8 }, crawl: { ids: ['38_1', '38'], fps: 8 }, scramble: { ids: ['42_1', '42'], fps: 9 },
   // 걷다 잠깐 멈춰 하는 일(10-30 사람처럼 걷기, world/actors.ts PAUSES): 그 줄이 있는 인물만
   pushup: { ids: ['144'], fps: 6 },
+  // 상호작용(10-31): 무전 보고·수첩 메모, 진료(의사)·치료받기
+  radio: { ids: ['118'], fps: 5 }, memo: { ids: ['119'], fps: 5 }, exam: { ids: ['107', '108', '109', '110', '113'], fps: 5 }, treat: { ids: ['78', '76'], fps: 4 },
   // 훈련(욕구): 팔굽혀펴기 → 장비 점검 → 기지개 → 약공 연습(모든 인물에게 있음) 중 그 인물에게 있는 첫 줄
   train: { ids: ['144', '121', '143', '9'], fps: 6 },
   phone: { ids: ['147'], fps: 5 }, call: { ids: ['116'], fps: 5 }, coffee: { ids: ['142'], fps: 5 }, limber: { ids: ['143'], fps: 6, loop: false }, music: { ids: ['151'], fps: 6 },

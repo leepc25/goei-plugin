@@ -29,7 +29,7 @@ export interface ActorDef {
 }
 export type Act = 'idle' | 'walk' | 'pause' | 'dead' | 'door' | 'do' | 'notice' | 'post' | 'watch' | 'argue' | 'down' | 'scared' | 'gone';
 /** 걸어서 닿은 뒤 할 일 */
-type Plan = 'none' | 'do' | 'post' | 'exit' | 'steal' | 'harass' | 'chase' | 'patrol' | 'roam-post' | 'cordon';
+type Plan = 'none' | 'do' | 'post' | 'exit' | 'steal' | 'harass' | 'chase' | 'patrol' | 'roam-post' | 'cordon' | 'treat';
 
 export interface Actor {
   def: ActorDef;
@@ -114,6 +114,10 @@ export interface Actor {
   lookCd?: number;
   /** 훈련 중인 동작 (전투원) */
   trainClip?: string;
+  /** 동료와 다시 어울릴 때까지 초 (인사·대화·다툼) */
+  chatCd?: number;
+  /** 진료할 사람 id (의사) */
+  patient?: string;
 }
 
 /** 길에 놓인 막힌 곳 (폴리스 라인·부서진 물건 등). wall = 길을 위아래 끝까지 막음 → 돌아섬 */
@@ -544,7 +548,8 @@ export class WorldSim {
     if (a.noticeCd > 0) a.noticeCd -= dt;
     if (a.needs) decayNeeds(a.needs, dt, TEMPER[a.def.name], onDuty(this.hour, TEMPER[a.def.name]));
     if (a.def.kind === 'mob') this.mobThink(a, dt);
-    if (a.def.kind === 'named') this.namedNotice(a);
+    if (a.def.kind === 'named' || a.post) this.namedNotice(a);   // 주인공 응대: 이름 인물·직원
+    this.socialStep(a, dt);
     if (a.def.kind === 'mob') this.threatened(a, dt);
     this.seeBody(a);
     this.gawk(a, dt);
@@ -627,6 +632,7 @@ export class WorldSim {
         // 가다 잠깐 멈춤: 두리번(평상 대기)은 좌우로 고개를 돌리듯 몸을 돌린다. 끝나면 가던 길로
         const t0 = this.time - a.clipAt;
         if (a.clip === 'idle' && Math.floor(t0 / 0.9) !== Math.floor((t0 - dt) / 0.9)) a.face = (-a.face) as 1 | -1;
+        if (a.doing.startsWith('대화') && a.needs) a.needs.social = Math.min(100, a.needs.social + 6 * dt);   // 선 채 대화는 수다 욕구를 채운다
         a.wait -= dt;
         if (a.wait > 0) return;
         if (!a.goal) return this.resume(a);
@@ -840,6 +846,20 @@ export class WorldSim {
         return;
       case 'cordon':
         return this.arriveCordon(a);
+      case 'treat': {
+        // 진료: 의사는 진료 줄, 환자는 치료받기(그 줄이 있으면)
+        const pt = this.actors.find((q) => q.def.id === a.patient);
+        a.patient = undefined;
+        a.act = 'pause';
+        a.doing = '진료 중';
+        a.wait = range(this.rng, 6, 10);
+        this.setClip(a, 'exam');
+        if (pt && pt.scene === a.scene) {
+          a.face = pt.x > a.x ? 1 : -1;
+          if (pt.act !== 'do' && this.canClip(pt, 'treat')) { pt.act = 'pause'; pt.goal = null; pt.doing = '치료받는 중'; pt.wait = a.wait; pt.face = (-a.face) as 1 | -1; this.setClip(pt, 'treat'); }
+        }
+        return;
+      }
       case 'steal':
         return this.doSteal(a);
       case 'harass':
@@ -877,7 +897,7 @@ export class WorldSim {
   private namedNotice(a: Actor): void {
     const p = this.player;
     if (!p || p.scene !== a.scene || a.noticeCd > 0) return;
-    if (a.act !== 'idle' && a.act !== 'walk') return;
+    if (a.act !== 'idle' && a.act !== 'walk' && !(a.post && a.act === 'post')) return;
     if (a.plan === 'do' || a.route.length) return;
     if (Math.abs(p.x - a.x) > NOTICE_PX || Math.abs(p.y - a.y) > 160) return;
     a.noticeCd = range(this.rng, 20, 35);
@@ -1465,10 +1485,44 @@ export class WorldSim {
     a.wait -= dt;
     if (a.wait > 0) return;
     if (this.takeBreak(a)) return;
+    // 경비·요원: 근무 중 가끔 무전 보고·수첩 메모 (그 줄이 있는 그림만)
+    if (['guard', 'police'].includes(ARCHETYPES[a.def.archetype ?? '']?.role ?? '') && this.rng() < 0.2) {
+      const clip = ['radio', 'memo'].find((c) => this.canClip(a, c));
+      if (clip) { a.doing = clip === 'radio' ? '무전 보고' : '수첩 메모'; a.wait = range(this.rng, 3, 5); this.setClip(a, clip); return; }
+    }
+    // 의사: 의무실에 사람이 있으면 다가가 진료 (청진·맥·소독·붕대·기록 줄)
+    if (a.def.archetype === '의사' && this.canClip(a, 'exam') && this.rng() < 0.5) {
+      const pt = this.actors.find((q) => q !== a && q.scene === a.scene && q.def.kind === 'named' && !q.fighting && q.act !== 'walk');
+      if (pt) { a.patient = pt.def.id; return this.walkTo(a, { x: pt.x + (pt.x > a.x ? -80 : 80), y: pt.y }, '진료하러', 'treat'); }
+    }
     if (a.post?.how === 'roam' || a.post?.how === 'patrol' || a.post?.how === 'train') return this.goPost(a);
     // 고정: 자리에서 조금씩 몸만 돌린다
     a.face = this.rng() < 0.5 ? 1 : -1;
     a.wait = range(this.rng, 4, 9);
+  }
+
+  /** 동료(이름 요원·직원)끼리: 지나가다 인사, 둘 다 한가하면 선 채 대화, 드물게 말다툼. 그림에 있는 줄만 */
+  private socialStep(a: Actor, dt: number): void {
+    if ((a.chatCd = (a.chatCd ?? range(this.rng, 5, 20)) - dt) > 0) return;
+    const mate = (q: Actor) => (q.def.kind === 'named' || !!q.post) && !q.fighting;
+    if (!mate(a) || !['walk', 'idle', 'post'].includes(a.act) || a.seat) { a.chatCd = range(this.rng, 3, 8); return; }
+    const q = this.actors.find((o) => o !== a && o.scene === a.scene && mate(o) && ['walk', 'idle', 'post'].includes(o.act) && !o.seat
+      && (o.chatCd ?? 0) <= 0 && Math.abs(o.x - a.x) < 110 && Math.abs(o.y - a.y) < 50);
+    if (!q) { a.chatCd = range(this.rng, 3, 8); return; }
+    a.chatCd = q.chatCd = range(this.rng, 30, 70);
+    const both = (clipA: string, clipB: string, doing: string, sec: number) => {
+      for (const [p, o, c] of [[a, q, clipA], [q, a, clipB]] as const) {
+        p.act = 'pause'; p.doing = doing; p.wait = sec; p.face = o.x > p.x ? 1 : -1;
+        this.setClip(p, this.canClip(p, c) ? c : 'idle');
+      }
+    };
+    const soc = (x: Actor) => x.temper?.social ?? 0.5;
+    // 둘 다 사교성이 아주 낮으면 드물게 말다툼
+    if (soc(a) < 0.25 && soc(q) < 0.25 && this.rng() < 0.1) { both('angry', 'angry', '말다툼', range(this.rng, 2, 4)); this.iconOn(a, '#', 2); return; }
+    // 둘 중 하나라도 걷는 중: 지나가다 인사 (먼저 본 쪽 응대, 상대 끄덕)
+    if (a.act === 'walk' || q.act === 'walk') { both('greet', 'nod', '인사', 1.4); return; }
+    // 둘 다 한가: 수다 욕구가 덜 찼으면 선 채 대화 (손짓·끄덕)
+    if ((a.needs?.social ?? 50) < 80 || (q.needs?.social ?? 50) < 80) { both('talk', 'nod', `대화 (${q.def.name})`, range(this.rng, 6, 12)); q.doing = `대화 (${a.def.name})`; this.iconOn(a, '♪', 1.5); }
   }
 
   /** 직원 쉬는 시간: 일 말고 가장 급한 욕구(배고픔·화장실·쉬기·수다)가 크면 같은 소속 건물 안에서 그 일을 할 곳으로. 끝나면 decide → 자리로 */
