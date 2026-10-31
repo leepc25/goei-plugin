@@ -71,7 +71,7 @@ def run(n):
             "directions": [D], "frame_count": frames, "initial_pose": f"standing upright {side}",
             "keep_first_frame": False, "enhance_prompt": False, "custom_start_frame": b64(start)}
     if opt == "loop": body["end_frame"] = b64(start)
-    for _ in range(40):
+    for _ in range(240):
         try: r = m3.req("POST", "/characters/animations", body); break
         except Exception as e:
             msg = str(e)

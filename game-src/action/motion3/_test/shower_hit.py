@@ -153,7 +153,7 @@ def run(n):
     if opt and opt.startswith("back"):
         end = m3.pad(last(opt.split(":")[1] if ":" in opt else "A"), CANVAS)
         body["end_frame"] = b64(end)
-    for _ in range(40):
+    for _ in range(240):
         try: r = m3.req("POST", "/characters/animations", body); break
         except Exception as e:
             msg = str(e)
