@@ -70,15 +70,21 @@ def _base(n):
     return (r["frames"], r["prompt"]) if r else (8, "")
 _BARE = f" The {g} is bare, wearing nothing, barefoot."
 # 맨몸 피격 7줄 (10-31 사용자 확정): 경계 자세(첫 피격 뒤 기본 자세)를 기준으로. 맞기는 크게
+GUARD_M = "one hand held over the groin and the other forearm raised in front of the face"
+GUARD_W = "one forearm pressed across the chest and the other hand held over the groin, the shoulders hunched forward"
+GUARD = GUARD_M if g == "man" else GUARD_W
+LOW = "the hips sunk low, the feet wide apart and the knees deeply bent, the shoulders turned sideways away from the enemy, the chin tucked and the eyes glaring ahead"
+# 10-31 고침: 캔버스 256×256(전투 줄과 같게), G = 경계 자세, H1(선 채 배를 맞음 → G)과 H2(G에서 얼굴을 맞음 → G)는 맞는 곳·움직임이 다름
 STEPS = {
- "G": ("A", 8, "loop", f"Standing bare {side}, the knees slightly bent and the body half-crouched, {COVER}, the head up watching an enemy ahead, breathing slowly so the shoulders rise and fall a little. {DRAW}"),
- "H1": ("A", 8, "G", f"Standing bare {side}, hit hard in the chest: the head snaps back, the upper body bends far backward and the arms fly out, the body staggers three steps back, then hunches into a half-crouch with {COVER}, watching ahead. {DRAW}"),
- "H2": ("G", 8, "G", f"Half-crouched bare {side} with {COVER}: hit hard, the head snaps back and the whole body jerks far backward, staggering two big steps back, then settles into the half-crouch again, still covering. {DRAW}"),
- "H3": ("G", 16, None, f"Half-crouched bare {side} with {COVER}: hit by a heavy blow, the head snaps back, both feet leave the floor and the body flies backward through the air, then lands flat on the back on the floor and lies there. {DRAW}"),
- "H4": ("H3", 8, "H3", f"Lying bare on the back on the floor {side}: hit again, the body jerks and curls up for a moment, then lies flat again. {DRAW}"),
- "H5": ("H3", 16, "G", f"Lying bare on the back on the floor {side}: rolls to one side, pushes up onto the knees, then rises into a half-crouch with {COVER}, watching ahead. {DRAW}"),
- "H6": ("G", 8, "loop", f"Running {side} in place, barefoot and bare, the body hunched forward, {COVER}, quick running steps. {DRAW}"),
+ "G": ("A", 8, "loop", f"Bare and barefoot {side}: drop into a defensive low crouch, {LOW}, {GUARD}. Hold the crouch, the shoulders rising and falling with heavy breathing. {DRAW}"),
+ "H1": ("A", 8, "G", f"Bare and barefoot {side}: the body folds forward at the waist as if struck in the stomach, the face twisting in pain with the eyes squeezed shut, and staggers back a full step with the knees buckling. Then drop into a defensive low crouch, {LOW}, {GUARD}. {DRAW}"),
+ "H2": ("G", 8, "G", f"Bare and barefoot {side}, in a low crouch with {GUARD}: struck in the face, the head whips sideways and back, the whole body is knocked backward and slides one long step back on the heels, the face twisting in pain. Then sink back into the same low crouch, {GUARD}. {DRAW}"),
+ "H3": ("G", 16, None, f"Bare and barefoot {side}: the face twists in pain and both feet leave the floor as the body is thrown backward through the air, the arms flung forward and the legs kicking. Land flat on the back and lie in a straight horizontal line along the floor, the head and the feet at the same height, the arms at the sides. Lying there, only the chest rises and falls a little. {DRAW}"),
+ "H4": ("H3", 8, "H3", f"Bare and barefoot, lying flat on the back on the floor {side}: flinch, pull both knees up toward the chest and cross both forearms over the face, then let the arms and legs drop back flat along the floor, the body staying on the floor the whole time. {DRAW}"),
+ "H5": ("H3", 16, "G", f"Bare and barefoot, lying flat on the back on the floor {side}: roll onto one side, push up with one hand onto one knee, then rise into a defensive low crouch, {LOW}, {GUARD}. {DRAW}"),
+ "H6": ("G", 8, "loop", f"Bare and barefoot, running {side} in place with quick short steps, the upper body hunched forward, {COVER}, the head ducked. {DRAW}"),
 }
+CANVAS = (256, 256)
 def b64(im):
     b = io.BytesIO(); im.save(b, "PNG"); return {"type": "base64", "base64": base64.b64encode(b.getvalue()).decode(), "format": "png"}
 def biggest(im):   # 가장 큰 덩어리(몸)만 남긴 사본 — 시작 장용
@@ -110,7 +116,7 @@ def run(n):
         old = OUT / "_old" / f"샤워2_{n}_{k}"; old.parent.mkdir(exist_ok=True); d.rename(old)
         sh = OUT / f"샤워2_{n}_sheet.png"
         if sh.exists(): sh.rename(old / "sheet.png")
-    src, frames, opt, prompt = STEPS[n]; start = last(src)
+    src, frames, opt, prompt = STEPS[n]; start = m3.pad(last(src), CANVAS)
     body = {"character_id": CID, "mode": "pixminimax", "action_description": prompt, "animation_name": f"test 샤워피격 {n}",
             "directions": [D], "frame_count": frames, "subject_description": SUB, "initial_pose": f"standing upright {side}",
             "keep_first_frame": False, "enhance_prompt": False, "custom_start_frame": b64(start)}
@@ -118,11 +124,7 @@ def run(n):
     if opt in STEPS:   # 끝 장 = 다른 줄의 끝 장(경계 자세 등)
         opt = "back:" + opt
     if opt and opt.startswith("back"):
-        end = last(opt.split(":")[1] if ":" in opt else "A")
-        if end.size != start.size:   # 시작·끝 장 크기를 맞춘다 (PixelLab 422)
-            size = (max(end.width, start.width), max(end.height, start.height))
-            start, end = m3.pad(start, size), m3.pad(end, size)
-            body["custom_start_frame"] = b64(start)
+        end = m3.pad(last(opt.split(":")[1] if ":" in opt else "A"), CANVAS)
         body["end_frame"] = b64(end)
     for _ in range(40):
         try: r = m3.req("POST", "/characters/animations", body); break
