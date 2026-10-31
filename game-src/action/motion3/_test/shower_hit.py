@@ -74,9 +74,9 @@ STEPS = {
  "G": ("A", 8, "loop", f"Standing bare {side}, the knees slightly bent and the body half-crouched, {COVER}, the head up watching an enemy ahead, breathing slowly so the shoulders rise and fall a little. {DRAW}"),
  "H1": ("A", 8, "G", f"Standing bare {side}, hit hard in the chest: the head snaps back, the upper body bends far backward and the arms fly out, the body staggers three steps back, then hunches into a half-crouch with {COVER}, watching ahead. {DRAW}"),
  "H2": ("G", 8, "G", f"Half-crouched bare {side} with {COVER}: hit hard, the head snaps back and the whole body jerks far backward, staggering two big steps back, then settles into the half-crouch again, still covering. {DRAW}"),
- "H3": ("G", 10, None, f"Half-crouched bare {side} with {COVER}: hit by a heavy blow, the head snaps back, both feet leave the floor and the body flies backward through the air, then lands flat on the back on the floor and lies there. {DRAW}"),
- "H4": ("H3", 6, "H3", f"Lying bare on the back on the floor {side}: hit again, the body jerks and curls up for a moment, then lies flat again. {DRAW}"),
- "H5": ("H3", 8, "G", f"Lying bare on the back on the floor {side}: rolls to one side, pushes up onto the knees, then rises into a half-crouch with {COVER}, watching ahead. {DRAW}"),
+ "H3": ("G", 16, None, f"Half-crouched bare {side} with {COVER}: hit by a heavy blow, the head snaps back, both feet leave the floor and the body flies backward through the air, then lands flat on the back on the floor and lies there. {DRAW}"),
+ "H4": ("H3", 8, "H3", f"Lying bare on the back on the floor {side}: hit again, the body jerks and curls up for a moment, then lies flat again. {DRAW}"),
+ "H5": ("H3", 16, "G", f"Lying bare on the back on the floor {side}: rolls to one side, pushes up onto the knees, then rises into a half-crouch with {COVER}, watching ahead. {DRAW}"),
  "H6": ("G", 8, "loop", f"Running {side} in place, barefoot and bare, the body hunched forward, {COVER}, quick running steps. {DRAW}"),
 }
 def b64(im):
