@@ -236,9 +236,9 @@
    "name": "네발로 기기 반복"
   },
   "14": {
-   "folder": "_old/14_2",
+   "folder": "14_E",
    "mirror": false,
-   "name": "점프 공격 (fail 2회차판)"
+   "name": "점프 공격"
   }
  },
  "picks": {
