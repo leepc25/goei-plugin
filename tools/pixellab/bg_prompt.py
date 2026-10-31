@@ -28,6 +28,8 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 # 고정은 카메라 높이·각도뿐. 원근·바닥 몫·양옆 벽은 장면마다 다르게 정한다(사용자 10-30: 「소실점 없음·양끝 벽」은 상황에 따라)
 CAMERA = "Camera at standing eye height, about 20 degrees above the floor, looking slightly down."
+# 통로(벨트스크롤 이어 붙이기)용: 20도로는 뒷벽선이 78%까지 내려가 벽이 사람의 2.2배, 바닥 22%(중림 앞골목 ① v1·v2) → 더 내려다봄 (사용자 10-31 허락)
+CAMERAS = {'room': CAMERA, 'corridor': "Camera a little above standing eye height, looking down at about 35 degrees."}
 VIEW = {
     'one-point': "One-point perspective, side walls receding toward the middle.",
     'flat': "Flat front view, no vanishing point.",
@@ -87,7 +89,7 @@ def build(spec):
     if spec.get('mode') == 'loose':
         # 사용자 10-30: 「너무 컨트롤하려 해서 결과가 나빠진다」 — 헐값매입 최초 요청문처럼 물건을 풍성하게 한 덩어리로 나열, 자리·크기 숫자 없음
         return "\n".join([
-            f"Pixel art game background of {spec['place']}, {spec['time']}. {CAMERA} {VIEW[spec['view']]} The floor fills {spec['floor_share']} of the image. {SIDES[spec['sides']]}",
+            f"Pixel art game background of {spec['place']}, {spec['time']}. {CAMERAS[spec.get('camera', 'room')]} {VIEW[spec['view']]} The floor fills {spec['floor_share']} of the image. {SIDES[spec['sides']]}",
             f"FLOOR: {spec['floor']}.",
             DENSITY[spec['density']].rstrip('.') + ": " + '; '.join(spec['items']) + ".",
             f"WALL: {spec['walls']}.",
@@ -97,7 +99,7 @@ def build(spec):
     no = ALWAYS_NO + [x for x in spec.get('no', []) if x not in ALWAYS_NO]
     parts = [
         f"Pixel art game background: {spec['place']}, {spec['time']}, {spec['light']}.",
-        f"{CAMERA} {VIEW[spec['view']]} The floor fills {spec['floor_share']} of the image. {SIDES[spec['sides']]}",
+        f"{CAMERAS[spec.get('camera', 'room')]} {VIEW[spec['view']]} The floor fills {spec['floor_share']} of the image. {SIDES[spec['sides']]}",
         f"FLOOR: {spec['floor']}.",
         f"WALLS: {spec['walls']}.",
         (DENSITY[spec['density']] + " " if DENSITY[spec['density']] else "") + "THINGS (a standing adult is 150 pixels tall): " + things,
