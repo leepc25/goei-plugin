@@ -4,20 +4,18 @@ import { WorldSim, type SimOptions, type SpawnRule } from './actors';
 import type { Post } from './mobs';
 import { PlaceGraph, type ElevatorStop, type PlaceScene } from './places';
 import { mulberry32 } from './rng';
-import { areaSpawns, type AreaKind } from './districts';
+import { streetSpawns } from './districts';
 
 /** 장소 종류는 방 이름 낱말로 정한다(world/places.ts kindFromName, 10-31): 층 배치·방이 바뀌어도 여기 고칠 것 없음 */
 
-/** 바깥 장면 꼬리표 (6-4장 인구) */
-export const HQ_AREAS: Record<string, AreaKind> = {
-  street: 'alley', jongno: 'downtown', metro: 'subway', yeongdeungpo: 'market', gangnam: 'nightlife', mangwon: 'residential', yeouido: 'park',
-};
+/** 바깥 거리 장면 (모두 같은 거리 인구, 10-31) */
+export const HQ_STREETS = ['street', 'jongno', 'metro', 'yeongdeungpo', 'gangnam', 'mangwon', 'yeouido'];
 /** 지역: 바뀌면 시계 「지역 이동」. 승강장은 지역 없음(타고 내릴 때 정해진다). 본부 안은 종로 */
 const HQ_DISTRICT: Record<string, string> = { yeongdeungpo: 'yeongdeungpo', gangnam: 'gangnam', mangwon: 'mangwon', yeouido: 'yeouido' };
 export const hqDistrict = (scene: string): string | null => (scene === 'metro' ? null : HQ_DISTRICT[scene] ?? 'jongno');
 
 /** 장면 소속: 본부 안은 관리국(A00). 바깥 거리·가게·중림 지하상가(jr_*, 민간 상가)는 없음 */
-export const hqSceneFaction = (scene: string): string | null => (scene === 'pasta' || scene.startsWith('jr_') || HQ_AREAS[scene] ? null : 'A00');
+export const hqSceneFaction = (scene: string): string | null => (scene === 'pasta' || scene.startsWith('jr_') || HQ_STREETS.includes(scene) ? null : 'A00');
 
 /** 이름 인물이 오가는 장면 (10-31 사용자: 정해진 곳이 아니라 건물 전체). 관리국 건물 안 장면 전부, 다친 사람(의무실에서 시작)만 의무실에 묶인다 */
 export function hqRoam(graph: PlaceGraph, home: string): string[] {
@@ -28,11 +26,11 @@ export function hqRoam(graph: PlaceGraph, home: string): string[] {
 /** 몹 보충 (6-2장). 수치는 시연판에서 조정 */
 export function hqSpawns(graph: PlaceGraph): SpawnRule[] {
   const lobbyMain = graph.scene('lobby')?.doors.find((d) => d.id === 'main')?.x;
-  // 바깥은 꼬리표로 (승강장은 타는 곳마다 드나든다)
+  // 바깥 거리는 모두 같은 인구 (승강장은 타는 곳마다 드나든다)
   const metroGates = graph.scene('metro')?.doors.map((d) => d.x);
   return [
-    ...areaSpawns(Object.fromEntries(Object.entries(HQ_AREAS).filter(([s]) => graph.scene(s))), { street: [30, 1890], ...(metroGates?.length ? { metro: metroGates } : {}) }),
-    ...(lobbyMain !== undefined ? [{ scene: 'lobby', target: { day: 2, night: 0 }, refill: [6, 12], gates: [lobbyMain], mix: ['방문객', '행정 직원'] } as SpawnRule] : []),
+    ...streetSpawns(HQ_STREETS.filter((s) => graph.scene(s)), { street: [30, 1890], ...(metroGates?.length ? { metro: metroGates } : {}) }),
+    ...(lobbyMain !== undefined ? [{ scene: 'lobby', target: { day: 2, night: 0 }, refill: [6, 12], gates: [lobbyMain], mix: ['행인', '행정 직원'] } as SpawnRule] : []),
   ];
 }
 

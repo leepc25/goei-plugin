@@ -211,7 +211,7 @@ test('근무형 순회: 여러 장면을 돈다', () => {
 });
 
 test('소란도: 쌓이면 단계가 오르고 시간이 지나면 식는다, 겁 많은 몹은 도망', () => {
-  const sim = new A.WorldSim(graph(), R.mulberry32(8), { spawns: [{ scene: 'jongno', target: { day: 10, night: 2 }, refill: [9, 9], mix: ['관광객'] }] });
+  const sim = new A.WorldSim(graph(), R.mulberry32(8), { spawns: [{ scene: 'jongno', target: { day: 10, night: 2 }, refill: [9, 9], mix: ['행인'] }] });
   sim.step(1 / 30, { scene: 'office', x: 0, hour: 12 });
   sim.disturb('jongno', 60, 2000);
   assert.equal(sim.uproarLevel('jongno'), 2);
@@ -289,18 +289,18 @@ test('대사: 같은 조직은 직급 비교 칸, 다른 조직은 소속 칸, �
   assert.equal(lines.bark('named', '잼트리', 'work', { hour: 12, faction: 'A00', level: 2 }), '서류 정리 중~');
   assert.equal(lines.bark('named', '잼트리', 'eat', { hour: 12, faction: 'A00', level: 2 }), null, '생태계 대사가 없으면 억지로 안 한다');
   assert.equal(lines.bark('named', '잼트리', 'chat', { hour: 12, faction: 'A00', level: 2 }, { partner: '큐라스' }), '큐라스 씨, 그거 알아요?');
-  assert.equal(lines.bark('mob', '관광객', 'victim', { hour: 12, faction: 'A00', level: 1 }, { archetype: '관광객' }), '내 지갑!', '원형 → 대사 종류(시민)');
+  assert.equal(lines.bark('mob', '행인', 'victim', { hour: 12, faction: 'A00', level: 1 }, { archetype: '행인' }), '내 지갑!', '원형 → 대사 종류(시민)');
   assert.equal(L.timeKey(7), 'morning');
   assert.equal(L.timeKey(22), 'night');
 });
 
 test('대사 연출: 소매치기 사건이 나면 피해자가 말한다, 보이는 장면만', () => {
   const sim = new A.WorldSim(graph(), R.mulberry32(3));
-  const v = sim.add({ id: 'v', name: '관광객', kind: 'mob', brain: 'transit', home: 'jongno', archetype: '관광객' }, { x: 900, y: 560 });
+  const v = sim.add({ id: 'v', name: '행인', kind: 'mob', brain: 'transit', home: 'jongno', archetype: '행인' }, { x: 900, y: 560 });
   const ch = new SP.Chatter(sim, new L.Lines(dlg, sim.rng), () => ({ hour: 12, faction: 'A00', level: 1 }));
-  ch.step(1 / 30, 'office', 0, [{ kind: 'steal', scene: 'jongno', thief: '불량배', victim: '관광객', x: 900 }]);
+  ch.step(1 / 30, 'office', 0, [{ kind: 'steal', scene: 'jongno', thief: '불량배', victim: '행인', x: 900 }]);
   assert.equal(v.say, undefined, '안 보이는 장면은 말 안 함');
-  ch.step(1 / 30, 'jongno', 800, [{ kind: 'steal', scene: 'jongno', thief: '불량배', victim: '관광객', x: 900 }]);
+  ch.step(1 / 30, 'jongno', 800, [{ kind: 'steal', scene: 'jongno', thief: '불량배', victim: '행인', x: 900 }]);
   assert.equal(v.say, '내 지갑!');
 });
 
@@ -316,13 +316,13 @@ test('시간 보내기 선택지: 짧게·길게·다음 시간대·근무 끝�
   assert.deepEqual(C.waitOptions(C.clockRules({ waitShort: 0 }), null).map((o) => o.label), ['1시간']);
 });
 
-test('장소 꼬리표 → 인구 규칙, 지역 이동 판정', () => {
-  const rules = D.areaSpawns({ a: 'market', b: 'nightlife' }, { a: [10, 20] });
+test('거리 인구: 모든 거리에 같은 규칙 하나(시민 = 행인 + 기믹 종류), 지역 이동 판정', () => {
+  const rules = D.streetSpawns(['a', 'b'], { a: [10, 20] });
   assert.equal(rules.length, 2);
   assert.deepEqual(rules[0].gates, [10, 20]);
-  assert.ok(rules[0].target.day > rules[0].target.night, '시장은 낮이 붐빈다');
-  assert.ok(rules[1].target.night > rules[1].target.day, '유흥가는 밤이 붐빈다');
-  for (const r of Object.values(D.POPULATION)) for (const n of [...r.mix, ...(r.nightMix ?? [])]) assert.ok(M.ARCHETYPES[n], `원형 ${n}`);
+  assert.deepEqual(rules[0].mix, rules[1].mix, '거리마다 같음');
+  for (const n of [...D.STREET_POP.mix, ...D.STREET_POP.nightMix]) assert.ok(M.ARCHETYPES[n], `원형 ${n}`);
+  for (const gone of ['회사원', '관광객', '배달원', '취객', '주민', '산책객', '승객', '방문객']) assert.ok(!M.ARCHETYPES[gone], `옛 시민 원형 ${gone}`);
   for (const n of Object.keys(M.ARCHETYPES)) assert.ok(L.NPC_TYPE[n], `대사 연결 ${n}`);
   assert.equal(H.hqDistrict('office'), 'jongno');
   assert.equal(H.hqDistrict('metro'), null);
@@ -333,13 +333,13 @@ test('장소 꼬리표 → 인구 규칙, 지역 이동 판정', () => {
   assert.equal(H.hqSceneFaction('office'), 'A00');
 });
 
-test('밤 원형: 유흥가 밤에는 nightMix에서만 나온다', () => {
+test('밤: 거리 밤에는 nightMix에서만 나온다', () => {
   const g = new P.PlaceGraph([{ id: 'gn', name: '강남', length: 3000, legacy: true, doors: [] }], [], { gn: 'street' });
-  const sim = new A.WorldSim(g, R.mulberry32(5), { spawns: D.areaSpawns({ gn: 'nightlife' }) });
+  const sim = new A.WorldSim(g, R.mulberry32(5), { spawns: D.streetSpawns(['gn']) });
   sim.step(0.1, { scene: 'elsewhere', x: 0, y: 0, hour: 23 });
   const mobs = sim.inScene('gn').filter((a) => a.def.kind === 'mob');
-  assert.equal(mobs.length, D.POPULATION.nightlife.target.night);
-  for (const m of mobs) assert.ok(D.POPULATION.nightlife.nightMix.includes(m.def.archetype), m.def.archetype);
+  assert.equal(mobs.length, D.STREET_POP.target.night);
+  for (const m of mobs) assert.ok(D.STREET_POP.nightMix.includes(m.def.archetype), m.def.archetype);
 });
 
 test('필드 가게: 값·떨이·평판 거부·재고 회복·가방 칸·흥정', async () => {
@@ -748,7 +748,7 @@ test('훈련장 장비: 샌드백·허수아비·과녁이 방 길이에 비례�
 test('순찰 경찰: 거리에만 가끔 들어와 지나가고, 실내엔 없음', () => {
   const sim = new A.WorldSim(graph(), R.mulberry32(5), [
     { scene: 'jongno', target: { day: 0, night: 0 }, refill: [1, 2], mix: ['행인'] },
-    { scene: 'lobby', target: { day: 0, night: 0 }, refill: [1, 2], mix: ['방문객'] },
+    { scene: 'lobby', target: { day: 0, night: 0 }, refill: [1, 2], mix: ['행인'] },
   ]);
   const seen = new Set();
   for (let i = 0; i < 20 * 60 * 10; i++) {

@@ -196,7 +196,7 @@ export type SimEvent =
   | { kind: 'police'; scene: string; n: number }
   | { kind: 'shift'; scene: string; who: string; on: boolean }
   | { kind: 'hurt'; scene: string; who: string; id: string; named: boolean; faction?: string; x: number; down: boolean; hostile: boolean }
-  /** 기절한 몹이 떨어뜨린 돈 (불량배·취객·소매치기) */
+  /** 기절한 몹이 떨어뜨린 돈 (불량배·소매치기) */
   | { kind: 'drop'; scene: string; who: string; amount: number; stolen: number; x: number }
   /** NPC 사망 (살해 허용일 때만). 시체는 장면에 남고 경찰이 1시간 뒤 수습 */
   | { kind: 'kill'; scene: string; who: string; id: string; x: number }

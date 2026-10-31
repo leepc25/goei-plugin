@@ -5,9 +5,9 @@ import { ARCHETYPES } from './mobs';
 
 /** 원형 이름 → 영어 (모델 글용). 이름 있는 인물·없는 원형은 그대로 */
 const EN: Record<string, string> = {
-  행인: 'pedestrian', 회사원: 'office worker', 관광객: 'tourist', 학생: 'student', 배달원: 'courier', 불량배: 'thug', 방문객: 'visitor',
+  행인: 'pedestrian', 학생: 'student', 불량배: 'thug',
   '행정 직원': 'admin clerk', '안내 직원': 'receptionist', 청소부: 'cleaner', 경비: 'guard', 경찰: 'police officer', '편의점 점원': 'store clerk',
-  의사: 'doctor', 간호사: 'nurse', 상인: 'merchant', 취객: 'drunk', 주민: 'resident', 산책객: 'stroller', 승객: 'passenger',
+  의사: 'doctor', 간호사: 'nurse', 상인: 'merchant',
 };
 export const enName = (name: string): string => EN[name] ?? name;
 /** 싸움이 끝났다고 보는 조용한 초 */

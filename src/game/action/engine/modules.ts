@@ -237,7 +237,7 @@ function hqAdapter(bridge: Partial<GameBridge> | undefined, ui: { chooseFloor: H
   let foughtHere = false;
   const record = (evs: SimEvent[]) => {
     for (const e of evs) {
-      // 기절한 불량배·취객·소매치기가 떨어뜨린 돈: 줍는다 (가계부에 필드 수입). 훔친 돈이 섞였으면 그렇게 적는다
+      // 기절한 불량배·소매치기가 떨어뜨린 돈: 줍는다 (가계부에 필드 수입). 훔친 돈이 섞였으면 그렇게 적는다
       if (e.kind === 'drop' && e.amount > 0) {
         const c = e.who.charCodeAt(e.who.length - 1) - 0xac00;
         const memo = e.stolen ? '소매치기에게서 되찾은 돈' : `${e.who}${c >= 0 && c <= 11171 && c % 28 !== 0 ? '이' : '가'} 떨어뜨린 돈`;

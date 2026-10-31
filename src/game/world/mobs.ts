@@ -31,13 +31,13 @@ export interface Archetype {
 export type MobGrade = 'F' | 'E' | 'D' | 'C';
 // 10-30: 체력 1,000 단위로(docs/설계_인물_초기값.md 등급표) — F 시민 0.15 · D 거리 0.3 · C 훈련 0.6. E 는 쓰지 않음
 /** 주는 피해 배수 (같은 표) */
-/** 주머니 돈 (원): 소매치기가 옮기고, 기절한 불량배·취객은 떨어뜨린다. 행인을 때려 돈 버는 구조는 막는다(떨어뜨리는 원형만) */
+/** 주머니 돈 (원): 소매치기가 옮기고, 기절한 불량배는 떨어뜨린다. 행인을 때려 돈 버는 구조는 막는다(떨어뜨리는 원형만) */
 export const POCKET: Partial<Record<string, [number, number]>> = {
-  행인: [0, 30000], 회사원: [5000, 50000], 관광객: [10000, 80000], 학생: [0, 10000], 주민: [0, 20000], 산책객: [0, 10000], 승객: [0, 20000], 상인: [20000, 100000],
-  불량배: [3000, 40000], 취객: [5000, 60000],
+  행인: [0, 30000], 학생: [0, 10000], 상인: [20000, 100000],
+  불량배: [3000, 40000],
 };
 /** 기절하면 주머니를 떨어뜨리는 원형 (설계 8장: 경찰·경비·행인은 안 떨굼) */
-export const DROPS = new Set(['불량배', '취객']);
+export const DROPS = new Set(['불량배']);
 
 const BASE: Record<keyof Temperament, [number, number]> = { courage: [0.1, 0.8], social: [0.1, 0.8], haste: [0.1, 0.7], curious: [0.1, 0.8], sly: [0, 0.05] };
 
@@ -50,13 +50,10 @@ const 경찰 = ['경찰남1', '경찰남2', '경찰여1', '경찰여2'];
 const 상인 = ['상인남1', '상인남2', '상인남3', '상인남4', '상인여1', '상인여2', '상인여3'];
 const 청소부 = ['청소부남1', '청소부여1'];
 export const ARCHETYPES: Record<string, Archetype> = {
+  // 시민 = 그냥 행인 하나 (10-31 사용자). 시민 그림 18장, 직업 없음, 성별·나이대는 그림 신상(mobProfiles)
   행인: { name: '행인', role: 'civilian', range: {}, looks: 시민 },
-  회사원: { name: '회사원', role: 'civilian', range: { haste: [0.3, 0.9] }, drinks: true, looks: 시민 },
-  관광객: { name: '관광객', role: 'civilian', range: { curious: [0.5, 1], courage: [0.1, 0.5] }, looks: 시민 },
   학생: { name: '학생', role: 'student', range: { courage: [0, 0.6], curious: [0.4, 1] }, looks: 학생 },
-  배달원: { name: '배달원', role: 'worker', range: { haste: [0.6, 1] }, looks: 시민 },
   불량배: { name: '불량배', role: 'thug', range: { courage: [0.5, 1], haste: [0.5, 1], sly: [0.05, 0.5] }, drinks: true, looks: 불량배 },
-  방문객: { name: '방문객', role: 'civilian', range: { courage: [0.1, 0.5] }, looks: 시민 },
   '행정 직원': { name: '행정 직원', role: 'staff', range: { courage: [0.1, 0.5], social: [0.3, 0.9] }, looks: 관리국 },
   '안내 직원': { name: '안내 직원', role: 'staff', range: { social: [0.5, 1] }, looks: 관리국 },
   청소부: { name: '청소부', role: 'worker', range: { courage: [0.2, 0.6] }, looks: 청소부 },
@@ -71,10 +68,6 @@ export const ARCHETYPES: Record<string, Archetype> = {
   간호사: { name: '간호사', role: 'staff', range: { social: [0.5, 1] }, looks: ['간호사1'] },
   // 장소 종류별 인구(6-4장)에 쓰는 원형
   상인: { name: '상인', role: 'worker', range: { social: [0.4, 1], courage: [0.3, 0.8] }, looks: 상인 },
-  취객: { name: '취객', role: 'civilian', range: { haste: [0.4, 1], courage: [0.4, 1], curious: [0.3, 0.9] }, drinks: true, looks: 시민 },
-  주민: { name: '주민', role: 'civilian', range: { haste: [0, 0.5] }, looks: 시민 },
-  산책객: { name: '산책객', role: 'civilian', range: { haste: [0, 0.4], social: [0.3, 0.9] }, looks: 시민 },
-  승객: { name: '승객', role: 'civilian', range: { haste: [0.4, 1], curious: [0, 0.4] }, looks: 시민 },
 };
 
 export function rollTemper(r: Rng, a: Archetype | undefined): Temperament {
