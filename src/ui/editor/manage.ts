@@ -22,14 +22,32 @@ const kb = (n: number) => (n >= 1e6 ? `${(n / 1e6).toFixed(1)}MB` : n >= 1e3 ? `
 export type ManageNode = 'manage:backup' | 'manage:diag' | 'manage:log';
 export const isManageNode = (n: string): n is ManageNode => n === 'manage:backup' || n === 'manage:diag' || n === 'manage:log';
 
+/** 게임 자산 팩은 팩마다 키가 다르다 (goei:game:pack:<id>): 저장소 키 목록에서 모아 합산한다 */
+const GAME_PACK_PREFIX = 'goei:game:pack:';
+const GAME_PACKS = `${GAME_PACK_PREFIX}*`;
+
 /** 저장소 항목: [키, 이름, 설명, 지우기 동작] */
 const STORE: [string, string, string, string?][] = [
   ['goei:prefs', '기기 설정', '화면·이미지·지침 고친 글·추가 규칙·새 채팅 기본값'],
   ['goei:wikibase', '위키 기본 문서', '카드에서 뺀 기본 문서 묶음. 지우면 설치·점검에서 다시 받아요', 'man-drop-wiki'],
   ['goei:tok-o200k', '토크나이저', 'o200k_base 순위표. 지우면 토큰 수가 어림값이 돼요', 'man-drop-tok'],
   ['goei-people-diag', '인물 기록 실행 기록', '최근 갱신의 입력·출력 원문', 'man-drop-diag'],
-  ['goei:game-pack:action-normal-v4', '게임 동작 팩', '필드 게임 캐릭터 동작'],
+  // 2026-10-28 QC: 옛 키(goei:game-pack:action-normal-v4)는 쓰는 곳이 없어 늘 「없음」이었다. 실제 키로 (src/main.ts·host/game/code.ts·host/game/packs.ts)
+  ['goei:body', '플러그인 본체', '괴이 카드를 열 때 받아 둔 goei-body.js. 플러그인 판이 바뀌면 다시 받아요'],
+  ['goei:data-world', '세계 자료', '요원·조직·괴이·파밍·부록 기본 기록과 세력 관계 기본값. 본체가 뜰 때 받아 두고, 플러그인 판이 바뀌면 다시 받아요'],
+  ['goei:data-install', '설치 자료', '인사말·카드 사진 목록·기본 명부·아이콘 정보. 설치·점검을 처음 열 때 받아 두고, 플러그인 판이 바뀌면 다시 받아요'],
+  ['goei:game:code', '게임 코드', '필드 게임 코드. 플러그인 판이 바뀌면 다시 받아요'],
+  [GAME_PACKS, '게임 자산 팩', '필드 게임 그림·소리 묶음 (받은 팩 전부)'],
 ];
+
+async function sizeOf(key: string): Promise<number> {
+  try {
+    const raw: unknown = await risuai.pluginStorage.getItem(key);
+    return typeof raw === 'string' ? raw.length : raw ? JSON.stringify(raw).length : 0;
+  } catch {
+    return 0;
+  }
+}
 
 export const manUi = {
   sizes: null as Record<string, number> | null,
@@ -44,12 +62,16 @@ export const manUi = {
 async function refresh(): Promise<void> {
   const sizes: Record<string, number> = {};
   for (const [key] of STORE) {
-    try {
-      const raw: unknown = await risuai.pluginStorage.getItem(key);
-      sizes[key] = typeof raw === 'string' ? raw.length : raw ? JSON.stringify(raw).length : 0;
-    } catch {
-      sizes[key] = 0;
-    }
+    if (key === GAME_PACKS) {
+      let total = 0;
+      try {
+        const keys: unknown = await risuai.pluginStorage.keys();
+        for (const k of Array.isArray(keys) ? keys : []) if (typeof k === 'string' && k.startsWith(GAME_PACK_PREFIX)) total += await sizeOf(k);
+      } catch {
+        // 키 목록을 못 읽는 판: 0
+      }
+      sizes[key] = total;
+    } else sizes[key] = await sizeOf(key);
   }
   manUi.sizes = sizes;
   try {
@@ -194,6 +216,7 @@ export async function manageAction(action: string, root: HTMLElement | null): Pr
         if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) throw new Error('설정 JSON 이 아니에요.');
         await savePrefs(() => parsed as ReturnType<typeof getPrefs>);
         manUi.importText = '';
+        manUi.sizes = null;
         manUi.info = '설정을 가져왔어요. 창을 닫았다 열면 전부 반영돼요.';
       } catch (error) {
         manUi.notice = `가져오지 못했어요: ${error instanceof Error ? error.message : String(error)}`;

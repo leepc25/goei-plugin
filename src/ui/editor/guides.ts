@@ -1,5 +1,5 @@
 // 지침 편집 (docs/설계안_세계편집.md 3장): 글칸 하나 + 자리표 안내 + 토큰. 고친 글은 이 기기 설정(prefs.guides)에 두고 core/guides.ts 가 요청에 쓴다.
-import { guideDefault, guideOverridden, guideText, GUIDE_LABEL, joinGuide, setGuideOverride, splitGuide, type GuideName } from '../../core/guides';
+import { guideDefault, guideOverridden, guideText, GUIDE_LABEL, isGuideName, joinGuide, setGuideOverride, splitGuide, type GuideName } from '../../core/guides';
 import { tokenizerName } from '../../core/tokenizer';
 import { tokens } from '../../core/gnet';
 import { savePrefs } from '../../host/prefs';
@@ -8,6 +8,8 @@ import { ICONS } from '../icons';
 const esc = (s: unknown) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]!);
 
 export const guideUi = { draft: {} as Partial<Record<GuideName, string>>, info: '' };
+/** 저장 상한 (core/settings.ts setPrefs 와 같은 값) */
+export const GUIDE_MAX = 120000;
 
 const HELP: Record<GuideName, string> = {
   GNet: '괴담넷 게시판 글 생성 지침. 절마다 플러그인이 요청에 따라 골라 써요.',
@@ -23,10 +25,11 @@ export function guidePage(name: GuideName, crumb = ''): string {
   const text = guideUi.draft[name] ?? guideText(name);
   const dirty = guideUi.draft[name] !== undefined && guideUi.draft[name] !== guideText(name);
   // 절 단위 글칸 (2026-10-27 사용자): 구분 줄(@@SECTION·===·##)은 플러그인이 들고, 사용자는 절 본문만 고친다
+  // 글칸 첫 줄바꿈 하나는 HTML 이 떼어 버리므로(<textarea>\n…) 하나를 더 넣어 본문이 줄바꿈으로 시작해도 그대로 보이게 (2026-10-28 QC: 제목 뒤 빈 줄이 사라졌다)
   const parts = splitGuide(text);
   const rows = parts
     .map((p, i) => `<div class="gw-field"><div class="gw-field-head"><b>${esc(p.title)}</b>${p.head && p.head !== '\n' ? `<small class="gw-ftitle">${esc(p.head.trim())}</small>` : ''}<span class="gw-ftok">${tokens(p.body) ? `${tokens(p.body).toLocaleString()}토큰` : ''}</span></div>
-      <textarea data-input="ed-guide-sec" data-key="${name}|${i}" rows="3" spellcheck="false">${esc(p.body)}</textarea></div>`)
+      <textarea data-input="ed-guide-sec" data-key="${name}|${i}" rows="3" spellcheck="false">\n${esc(p.body)}</textarea></div>`)
     .join('');
   const title = crumb
     ? `<h2>${esc(GUIDE_LABEL[name])}<small>이 기기 공통${guideOverridden(name) ? ' · 고침' : ' · 기본'} · ${parts.length}절</small></h2>`
@@ -38,6 +41,17 @@ export function guidePage(name: GuideName, crumb = ''): string {
       <p class="gx-muted">${esc(HELP[name])}</p>${guideUi.info ? `<p class="gx-hint">${esc(guideUi.info)}</p>` : ''}</header>
     <div class="gw-fields gw-guide-secs">${rows}</div>
   </div>`;
+}
+
+/** 입력 중 머리의 「지침 저장」「기본으로」 잠금과 토큰 수만 맞춘다 (창 전체를 다시 그리면 커서가 날아간다, 2026-10-28 QC: 입력해도 저장 단추가 잠긴 채였다) */
+export function guideBarSync(root: ParentNode, name: string): void {
+  if (!isGuideName(name)) return;
+  const text = guideUi.draft[name] ?? guideText(name);
+  const dirty = guideUi.draft[name] !== undefined && guideUi.draft[name] !== guideText(name);
+  root.querySelector(`[data-action="ed-guide-save"][data-value="${name}"]`)?.toggleAttribute('disabled', !dirty);
+  root.querySelector(`[data-action="ed-guide-reset"][data-value="${name}"]`)?.toggleAttribute('disabled', !(guideOverridden(name) || dirty));
+  const tok = root.querySelector('.gw-head .gw-tokens');
+  if (tok) tok.textContent = `${tokenizerName() ? '' : '약 '}${tokens(text).toLocaleString()}토큰`;
 }
 
 export function guideInput(input: string, key: string, value: string): boolean {
@@ -64,6 +78,11 @@ export async function guideAction(action: string, value: string | undefined): Pr
   if (action === 'ed-guide-save') {
     const text = guideUi.draft[name];
     if (text === undefined) return true;
+    // 저장 상한 (core/settings.ts setPrefs 가 120,000자에서 자른다). 넘기면 잘린 채 저장되던 것을 막는다 (2026-10-28 QC)
+    if (text.length > GUIDE_MAX) {
+      guideUi.info = `지침은 ${GUIDE_MAX.toLocaleString()}자까지예요 (지금 ${text.length.toLocaleString()}자). 줄여 주세요.`;
+      return true;
+    }
     const isDefault = text.replace(/\r/g, '') === guideDefault(name);
     setGuideOverride(name, isDefault ? '' : text);
     await savePrefs((p) => {

@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<title>공유용 이미지 카드</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap">
+<style>
+body{margin:0;font-family:'IBM Plex Sans KR','Noto Sans KR',system-ui,sans-serif;color:#E9F0EE}
+a{color:#5EEAD4}a:hover{color:#8FF3E4}
+</style>
+</helmet>
+<div style="width: 900px; height: 1200px; box-sizing: border-box; background: #1A2226; padding: 48px; display: flex; flex-direction: column; gap: 24px; border: 1px solid #37464D;">
+  <header style="display: flex; align-items: center; gap: 14px; padding-bottom: 20px; border-bottom: 1px solid #3F8879;">
+    <div style="width: 44px; height: 44px; border-radius: 12px; background: #1D403A; display: grid; place-items: center;">
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="#5EEAD4" aria-hidden="true"><path d="M12 2.5c-3.7 0-6 2.7-6 6.3V20l2.2-1.6L10.4 20l1.6-1.6L13.6 20l2.2-1.6L18 20V8.8c0-3.6-2.3-6.3-6-6.3Zm-2.2 7.6a1.1 1.1 0 1 1 0-2.2 1.1 1.1 0 0 1 0 2.2Zm4.4 0a1.1 1.1 0 1 1 0-2.2 1.1 1.1 0 0 1 0 2.2Z"/></svg>
+    </div>
+    <div>
+      <b style="font-size: 20px;">괴이 <span style="color:#5EEAD4;font-weight:300;margin:0 .3em">ː</span><span style="color:#5EEAD4">ANOMALY</span></b>
+      <div style="font-family:'JetBrains Mono',monospace; font-size: 12px; color: #97A9A5; letter-spacing: .14em;">INCIDENT REPORT · RPT-2025-0510-03</div>
+    </div>
+    <div style="margin-left: auto; text-align: right;">
+      <div style="font-family:'JetBrains Mono',monospace; font-size: 15px; color: #E9F0EE;">2025.05.10 (토)</div>
+      <div style="font-size: 13px; color: #97A9A5;">관리국 종합대응팀</div>
+    </div>
+  </header>
+
+  <section style="display: flex; gap: 22px; align-items: center;">
+    <div style="width: 200px; height: 200px; flex: none; border-radius: 18px; background: #151C1F; border: 1px solid #37464D; display: grid; place-items: center; color: #97A9A5; font-size: 13px; text-align: center; line-height: 1.5;">사건 그림<br>(상황판 카드와 같은 그림)</div>
+    <div style="flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; gap: 10px;">
+      <div style="display: flex; align-items: center; gap: 10px;">
+        <span style="width: 40px; height: 40px; border-radius: 12px; background: #2C383E; color: #BECBC8; display: grid; place-items: center; font-family:'JetBrains Mono',monospace; font-weight: 700; font-size: 18px;">B</span>
+        <span style="font-size: 14px; padding: 6px 11px; border-radius: 999px; background: #2C383E; color: #BECBC8; box-shadow: inset 0 0 0 1px #46565D; font-weight: 600;">괴이 · 종료</span>
+        <span style="font-size: 14px; padding: 6px 11px; border-radius: 999px; background: #45381C; color: #F5B544; font-weight: 600;">내가 출동</span>
+      </div>
+      <h1 style="margin: 0; font-size: 40px; line-height: 1.15; font-weight: 700;">거울 속 사람</h1>
+      <div style="font-size: 16px; color: #BECBC8;">중림 지하상가 3번 출구 안쪽 · 서울 중구</div>
+    </div>
+  </section>
+
+  <section style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px;">
+    <div style="padding: 14px 16px; border-radius: 16px; border: 1px solid #37464D; background: #232D32;"><div style="font-size: 13px; color: #97A9A5;">발생</div><b style="font-family:'JetBrains Mono',monospace;font-size:22px">17:38</b></div>
+    <div style="padding: 14px 16px; border-radius: 16px; border: 1px solid #37464D; background: #232D32;"><div style="font-size: 13px; color: #97A9A5;">투입</div><b style="font-family:'JetBrains Mono',monospace;font-size:22px">17:51</b></div>
+    <div style="padding: 14px 16px; border-radius: 16px; border: 1px solid #37464D; background: #232D32;"><div style="font-size: 13px; color: #97A9A5;">종료</div><b style="font-family:'JetBrains Mono',monospace;font-size:22px">19:02</b></div>
+    <div style="padding: 14px 16px; border-radius: 16px; border: 1px solid #3F8879; background: #1D403A;"><div style="font-size: 13px; color: #8FF3E4;">소요</div><b style="font-family:'JetBrains Mono',monospace;font-size:22px;color:#5EEAD4">1h 24m</b></div>
+  </section>
+
+  <section style="padding: 20px 22px; border-radius: 18px; border: 1px solid #37464D; background: #232D32; display: flex; flex-direction: column; gap: 10px;">
+    <h3 style="margin: 0; font-size: 13px; color: #A6B8B4; font-weight: 600; letter-spacing: .06em;">경과</h3>
+    <div style="display: flex; gap: 14px; font-size: 16px;"><span style="font-family:'JetBrains Mono',monospace;color:#97A9A5;width:60px;flex:none">17:38</span><span>목격담 2건. 거울에 비친 사람이 혼자 움직임.</span></div>
+    <div style="display: flex; gap: 14px; font-size: 16px;"><span style="font-family:'JetBrains Mono',monospace;color:#97A9A5;width:60px;flex:none">17:51</span><span>에일린 · 큐라스와 출동. 셔터 안쪽 진입.</span></div>
+    <div style="display: flex; gap: 14px; font-size: 16px;"><span style="font-family:'JetBrains Mono',monospace;color:#97A9A5;width:60px;flex:none">18:40</span><span>거울 7장 중 4장 파손, 큐라스 경상.</span></div>
+    <div style="display: flex; gap: 14px; font-size: 16px;"><span style="font-family:'JetBrains Mono',monospace;color:#97A9A5;width:60px;flex:none">19:02</span><span style="color:#5EEAD4;font-weight:600">격리 완료. 현장 봉쇄 해제.</span></div>
+  </section>
+
+  <section style="display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 12px;">
+    <div style="padding: 18px 20px; border-radius: 18px; border: 1px solid #37464D; background: #232D32; display: flex; flex-direction: column; gap: 12px;">
+      <h3 style="margin: 0; font-size: 13px; color: #A6B8B4; font-weight: 600; letter-spacing: .06em;">투입 요원</h3>
+      <div style="display: flex; gap: 12px; align-items: center;"><div style="width: 48px; height: 48px; border-radius: 12px; background: #151C1F; border: 1px solid #37464D; flex: none;"></div><div><b style="font-size: 16px;">에일린</b><div style="font-size: 13px; color: #97A9A5;">종합대응팀 · 이상 없음</div></div></div>
+      <div style="display: flex; gap: 12px; align-items: center;"><div style="width: 48px; height: 48px; border-radius: 12px; background: #151C1F; border: 1px solid #37464D; flex: none;"></div><div><b style="font-size: 16px;">큐라스</b><div style="font-size: 13px; color: #F5B544;">진압팀 · 경상</div></div></div>
+    </div>
+    <div style="padding: 18px 20px; border-radius: 18px; border: 1px solid #37464D; background: #232D32; display: flex; flex-direction: column; gap: 10px;">
+      <h3 style="margin: 0; font-size: 13px; color: #A6B8B4; font-weight: 600; letter-spacing: .06em;">인물 기록 변화</h3>
+      <div style="display: flex; justify-content: space-between; font-size: 16px;"><span>에일린</span><b style="font-family:'JetBrains Mono',monospace;color:#5EEAD4">+6 신뢰</b></div>
+      <div style="display: flex; justify-content: space-between; font-size: 16px;"><span>큐라스</span><b style="font-family:'JetBrains Mono',monospace;color:#5EEAD4">+3</b></div>
+      <div style="display: flex; justify-content: space-between; font-size: 16px;"><span>쟈알디</span><b style="font-family:'JetBrains Mono',monospace;color:#FF7A6B">−2</b></div>
+    </div>
+  </section>
+
+  <section style="display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: 12px;">
+    <div style="padding: 18px 20px; border-radius: 18px; border: 1px solid #37464D; background: #232D32;">
+      <h3 style="margin: 0 0 8px; font-size: 13px; color: #A6B8B4; font-weight: 600; letter-spacing: .06em;">결과</h3>
+      <p style="margin: 0; font-size: 16px; line-height: 1.55;">거울 속 사람은 깨진 거울 조각과 함께 격리 상자로 옮겨졌다. 지하상가 상인 3명이 목격자로 기록됐다.</p>
+    </div>
+    <div style="padding: 18px 20px; border-radius: 18px; border: 1px solid #37464D; background: #232D32; display: flex; flex-direction: column; gap: 8px;">
+      <h3 style="margin: 0; font-size: 13px; color: #A6B8B4; font-weight: 600; letter-spacing: .06em;">가계부</h3>
+      <div style="display: flex; justify-content: space-between; font-size: 15px;"><span>처리 수당</span><b style="font-family:'JetBrains Mono',monospace;color:#5EEAD4">+80,000</b></div>
+      <div style="display: flex; justify-content: space-between; font-size: 15px;"><span>택시</span><b style="font-family:'JetBrains Mono',monospace;color:#FF7A6B">−12,500</b></div>
+      <div style="display: flex; justify-content: space-between; font-size: 15px; padding-top: 8px; border-top: 1px solid #37464D;"><span style="color:#97A9A5">잔고</span><b style="font-family:'JetBrains Mono',monospace">₩ 207,500</b></div>
+    </div>
+  </section>
+
+  <footer style="margin-top: auto; display: flex; justify-content: space-between; align-items: center; padding-top: 16px; border-top: 1px solid #37464D; font-size: 12px; color: #97A9A5;">
+    <span style="font-family:'JetBrains Mono',monospace; letter-spacing: .14em;">ANOMALY SIMULATION 2.4</span>
+    <span>이 보고서는 상황판·인물 기록·가계부에서 자동으로 만들어졌어요</span>
+  </footer>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":900,"height":1200}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

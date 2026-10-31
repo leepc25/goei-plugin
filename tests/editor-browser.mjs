@@ -2,6 +2,7 @@
 // 사용법: node tests/editor-browser.mjs <경량카드.charx 에서 뽑은 fixture.json> [screenshot-dir]
 //   fixture.json: { name, globalLore, alternateGreetings } (tools: python3 -c 로 slim.charx 에서 만든다. tests/editor-fixture.py)
 import { createRequire } from 'node:module';
+import { distPackFiles, distWorldPack } from './data-init.mjs';
 import { execSync } from 'node:child_process';
 import { readFileSync, mkdirSync } from 'node:fs';
 import assert from 'node:assert/strict';
@@ -13,6 +14,10 @@ const shots = process.argv[3];
 if (shots) mkdirSync(shots, { recursive: true });
 const plugin = readFileSync(new URL('../dist/goei-plugin.js', import.meta.url), 'utf8');
 const bodyCode = readFileSync(new URL('../dist/goei-body.js', import.meta.url), 'utf8');
+/** 세계 자료 팩 (개선 나1): 본체처럼 가짜 저장소에 미리 둔다 (저장소에 자료가 있는 보통 경우). 받기 시험은 noBody 쪽에서 */
+const worldPack = distWorldPack();
+/** 받기 흉내: 설치·점검 화면이 받는 설치 자료 팩만 (나머지는 404) */
+const served = distPackFiles('goei-data-install');
 
 function hostScript(char, chat) {
   return `
@@ -28,8 +33,9 @@ function hostScript(char, chat) {
       removeEventListener: async (type, id) => { const l = listeners.get(id); if (l) document.removeEventListener(l.type, l.h); },
       remove: async () => { el.remove(); }, addClass: async (c) => { el.classList.add(c); }, removeClass: async (c) => { el.classList.remove(c); }, hasClass: async (c) => el.classList.contains(c), textContent: async () => el.textContent,
     });
-    window.__store = { 'p:goei:body': ${JSON.stringify(bodyCode)} };
-    window.__rootDoc = { querySelector: async (q) => wrap(document.querySelector(q)), querySelectorAll: async (q) => [...document.querySelectorAll(q)].map(wrap), createElement: async (t) => wrap(document.createElement(t)), body: wrap(document.body), head: wrap(document.head) };
+    window.__store = { 'p:goei:body': ${JSON.stringify(bodyCode)}, 'p:goei:data-world': ${JSON.stringify(worldPack)} };
+    window.__files = ${JSON.stringify(served)};
+    window.__rootDoc = { ...wrap(document.documentElement), querySelector: async (q) => wrap(document.querySelector(q)), querySelectorAll: async (q) => [...document.querySelectorAll(q)].map(wrap), createElement: async (t) => wrap(document.createElement(t)), body: wrap(document.body), head: wrap(document.head) };
     window.__char = ${JSON.stringify(char)};
     window.__chat = ${JSON.stringify(chat)};
     const clone = (v) => JSON.parse(JSON.stringify(v));
@@ -53,7 +59,8 @@ function hostScript(char, chat) {
       getCurrentLorebookEntries: async () => clone(window.__char.globalLore || []),
       getDatabase: async () => ({ modules: [], enabledModules: [] }),
       readImage: async () => { throw new Error('no asset'); }, saveAsset: async () => 'assets/x.png', readInlay: async () => null,
-      parseRisuChat: async (t) => String(t), nativeFetch: async () => ({ ok: false, status: 404, json: async () => ({}), text: async () => '' }),
+      parseRisuChat: async (t) => String(t),
+      nativeFetch: async (url) => { const r = window.__files[String(url).split('?')[0].split('/').pop()]; return r ? { ok: true, status: 200, json: async () => JSON.parse(r), text: async () => r } : { ok: false, status: 404, json: async () => ({}), text: async () => '' }; },
     };`;
 }
 

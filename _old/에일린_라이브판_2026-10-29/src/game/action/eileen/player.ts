@@ -11,7 +11,7 @@ import type { Body, Hit, HitResult, React, WBox, WorldView } from '../engine/con
 import type { Pad, Btn } from '../engine/input';
 import type { FrameInfo } from '../engine/art';
 import { createEileenCore } from './core';
-import { StatusSet } from '../../combat/status';
+import type { AutoPilot, AutoSelf } from './autoPilot';
 
 /** 테스트룸 동작 이름 ↔ 엔진 버튼 */
 /** 에일린 그림 배율 (사용자 2026-10-25: 문에 비해 작다 → 처음 맞춰 본 크기로). 걷는 띠 가운데쯤(y500)에서 약 270px, 맨 뒤 260px · 맨 앞 305px */
@@ -47,10 +47,6 @@ export class EileenPlayer extends Player {
   private started = false;
   private lastTickAt = 0;
   private lastFrameAt = 0;
-  /** 「조준경 덮개」 유물: 이번 출동 첫 사격을 썼나 */
-  private firstShotUsed = false;
-  /** 마지막으로 코어에서 받아 온 게이지 (바깥에서 바뀌었는지 보려고) */
-  private gaugeSeen = 0;
   /** 방어 게이지 0..100 (사용자 2026-10-25: 방어를 무제한으로 못 하게). 막아낸 공격만큼만 깎이고, 안 맞으면 다시 찬다
    * (막고만 있으면 줄지 않는다). 맞아서 바닥나면 가드가 깨져 잠깐 휘청이고, 40까지 차오를 때까지 다시 못 막는다 */
   guard = 100;
@@ -73,11 +69,9 @@ export class EileenPlayer extends Player {
       sfx: (type: string, extra: Record<string, unknown>) => eileenHooks.sfx({ type, ...extra }),
       font: (n: number) => pfont(n).f,
       targets: () => this.targets(),
-      // 능력치(본부 출동 stats)·상태 효과 배율 (docs/게임_성장_경제_설계.md 2-2·6장)
-      mod: { speed: () => this.speedMul(), sp: () => this.spMul() },
       // 물건 윗면은 이미 그 높이에 있을 때만 땅이다 (아래에서 걸어 들어가면 올라서지 않고 막힌다)
       ground: (x: number, y: number) => { const p = this.platformAt(x, y); return p && this.core.P.z >= p.h - 10 ? p.h : 0; },
-      hurt: (t: { body: Body }, dmg: number, kind: string, face: 1 | -1, hitstop: number, o: { push?: number; src?: 'ranged' | 'blast' }) => this.hurtTarget(t.body, dmg, kind, face, hitstop, o),
+      hurt: (t: { body: Body }, dmg: number, kind: string, face: 1 | -1, hitstop: number, o: { push?: number }) => this.hurtTarget(t.body, dmg, kind, face, hitstop, o),
       clamp: (P: { x: number; y: number }) => {
         const w = this.world;
         if (!w) return;
@@ -86,6 +80,11 @@ export class EileenPlayer extends Player {
       },
     });
   }
+
+  /** 엔진 동작(줍기·마시기·붕대 등 MOVES)은 옛 주인공 그림용이다. 에일린은 테스트룸 코어가 스스로 그리고, 이 몸의 tick 은 move 를
+   *  진행·해제하지 않는다: 걸면 영원히 남아 첫 E·줍기·아이템 사용 뒤로 아이템을 다시 못 쓰고(useItem 이 move 로 막힘)
+   *  저장 지점(canCheckpoint)도 다시 오지 않았다 (QC 2026-10-28). 그래서 걸지 않는다 */
+  play(_key: string, _world: WorldView): void {}
 
   /** 발 자리 아래 올라설 물건 (데스크 등) */
   private platformAt(x: number, y: number) {
@@ -118,33 +117,11 @@ export class EileenPlayer extends Player {
     return this.world;
   }
 
-  /** 이동·회피·점프 속도 배율: 능력치 speed × 상태 효과 */
-  protected speedMul(): number {
-    return (this.progression?.stats.speed ?? 1) * (this.statusMod?.speed() ?? 1);
-  }
-  /** 필살 게이지 차는 배율: 능력치 charge × 상태 효과 */
-  protected spMul(): number {
-    return (this.progression?.stats.charge ?? 1) * (this.statusMod?.sp() ?? 1);
-  }
-  /** 상태 효과 (출혈·오염·두통·혼란·공포·둔화·침묵, src/game/combat/status.ts). 적 공격의 debuff 이벤트가 건다 */
-  status = new StatusSet();
-  /** 상태 효과가 거는 배율 */
-  statusMod?: { speed(): number; sp(): number } = { speed: () => this.status.speedMul(), sp: () => this.status.spMul() };
-
-  private hurtTarget(t: Body, dmg: number, kind: string, face: 1 | -1, hitstop: number, o: { push?: number; src?: 'ranged' | 'blast' }) {
+  private hurtTarget(t: Body, dmg: number, kind: string, face: 1 | -1, hitstop: number, o: { push?: number }) {
     const w = this.world as (WorldView & { kills: number; emit(e: unknown): void }) | null;
     if (!w || !t.alive) return;
     const r = REACT[kind] ?? REACT.light;
-    // 근접·기술은 힘, 원거리(사격·충전탄·제압사격)는 사격 배율 (폭발은 배율 없음: 엔진 progressionHit 'ability'와 같음)
-    const st = this.progression?.stats;
-    let scale = (o.src === 'ranged' ? st?.aim : o.src === 'blast' ? 1 : st?.power) ?? 1;
-    // 에일린 전용 유물 「조준경 덮개」(숙련 8): 출동마다 첫 사격 명중은 치명 ×2
-    if (o.src === 'ranged' && !this.firstShotUsed && this.progression?.relics.includes('own_eileen')) {
-      this.firstShotUsed = true;
-      scale *= 2;
-      w.say('치명!', 0.8);
-    }
-    const hit: Hit = { x0: t.x - 1, x1: t.x + 1, z0: 0, z1: 400, y: t.y, dy: 999, attackId: newAttackId(), dmg: dmg * this.dmgMul * scale, react: r.react, dir: face, push: o.push ?? r.push, lift: r.lift, stop: 0, strength: r.strength };
+    const hit: Hit = { x0: t.x - 1, x1: t.x + 1, z0: 0, z1: 400, y: t.y, dy: 999, attackId: newAttackId(), dmg: dmg * this.dmgMul, react: r.react, dir: face, push: o.push ?? r.push, lift: r.lift, stop: 0, strength: r.strength };
     const res = t.applyHit(hit, w);
     if (res.kind === 'immune') return;
     // 맞은 적은 테스트룸 멈춤만큼 멈춘다
@@ -191,13 +168,9 @@ export class EileenPlayer extends Player {
       world.say('부적이 대신 맞았다', 1);
       return { kind: 'immune' };
     }
-    // 경직 저항(poise): 이 값 이하 세기의 공격엔 움찔하지 않는다 (피해는 받음). 세기가 없으면 반응으로 어림한다
-    const strength = hit.strength ?? (hit.react === 'down' || hit.react === 'launch' ? 3 : hit.react === 'stagger' ? 2 : 1);
-    const armored = this.core.armored() || strength <= (this.progression?.stats.poise ?? 0);
-    // 방어(defense): 받는 피해 감소 (가드·무적·부적 뒤 실제 체력 피해에만, 엔진 defendedHit과 같음)
-    const taken = hit.dmg * (1 - (this.progression?.stats.defense ?? 0)) * (this.core.armored() ? 0.5 : 1);
-    this.hp = Math.max(0, this.hp - Math.round(taken));
-    world.emit({ type: 'hurt', x: this.x, dmg: taken, hp: this.hp });
+    const armored = this.core.armored();
+    this.hp = Math.max(0, this.hp - (armored ? Math.round(hit.dmg * 0.5) : hit.dmg));
+    world.emit({ type: 'hurt', x: this.x, dmg: hit.dmg, hp: this.hp });
     if (!this.lowWarned && this.hp < this.hpMax * 0.3) {
       this.lowWarned = true;
       world.emit({ type: 'hp:low' });
@@ -207,7 +180,6 @@ export class EileenPlayer extends Player {
       this.phase = 'down';
       return { kind: 'hit', killed: true };
     }
-    this.status.onHit();
     if (armored) { this.core.takeHit('hit'); return { kind: 'armor' }; }
     P.face = (Math.sign(hit.dir) === 1 ? -1 : 1) as 1 | -1;
     this.core.takeHit(hit.react === 'down' || hit.react === 'launch' ? 'knock' : 'hit');
@@ -221,29 +193,22 @@ export class EileenPlayer extends Player {
   private input(p: Pad) {
     const names = this.heldNames;
     names.clear();
-    // 혼란: 좌우가 뒤집힌다
-    const flip = this.status.flipped();
-    const nameOf = (n: string) => (flip && n === 'left' ? 'right' : flip && n === 'right' ? 'left' : n);
-    for (const [b, n] of PRESS) if (p.held.has(b)) names.add(nameOf(n));
+    for (const [b, n] of PRESS) if (p.held.has(b)) names.add(n);
     if (p.run) names.add('run');
-    // 공포: 막지 못한다. 침묵: 기술·필살을 못 쓴다
-    if (!this.status.canBlock()) names.delete('block');
-    const silenced = !this.status.canSkill();
-    if (silenced) { names.delete('skill'); names.delete('super'); }
     // 방어: 게이지가 다 회복되지 않았거나(깨진 뒤 40 미만) 거의 없으면 들어가지 않는다
     if (this.guardBroken || this.guard < 8) names.delete('block');
     // 방향키는 쓰러짐·웅크림·주저앉음일 때만 테스트룸에 넘긴다 (좌우 = 기기, 위 = 일어나기)
     const lying = ['down', 'belly', 'sit', 'scoot', 'crouch', 'crawl4'].includes(this.core.P.mode);
-    for (const [b, n0] of PRESS) {
-      const n = nameOf(n0);
-      if (!p.pressed.has(b) || (silenced && (n === 'skill' || n === 'super'))) continue;
-      if ((lying || !['left', 'right', 'up', 'down'].includes(n)) && (n !== 'block' || names.has('block'))) this.core.onPress(n);
-    }
+    for (const [b, n] of PRESS) if (p.pressed.has(b) && (lying || !['left', 'right', 'up', 'down'].includes(n)) && (n !== 'block' || names.has('block'))) this.core.onPress(n);
     if (p.evade) this.core.onPress('dodge');
     for (const b of ['block', 'charge'] as Btn[]) if (p.released.has(b)) this.core.onRelease(b);
   }
 
+  /** 자동전투 (모바일 AUTO·O 키): 엔진 모듈이 붙인다. 켜져 있으면 사람 입력에 두뇌 입력을 섞는다 */
+  auto: AutoPilot | null = null;
+
   tick(world: WorldView, p: Pad) {
+    if (this.auto?.on && !this.seat) p = this.auto.apply(this as unknown as AutoSelf, world, p);
     this.world = world;
     const w = world as WorldView & { underlays: ((c: CanvasRenderingContext2D, camX: number) => void)[]; camX: number };
     if (!w.underlays.includes(this.underFn)) w.underlays.push(this.underFn);
@@ -257,7 +222,6 @@ export class EileenPlayer extends Player {
     this.wantInteract = p.pressed.has('interact');
     this.wantItem = p.pressed.has('item1') ? 1 : p.pressed.has('item2') ? 2 : p.pressed.has('item3') ? 3 : p.pressed.has('item4') ? 4 : 0;
     if (this.comboClock > 0 && --this.comboClock === 0) this.combo = 0;
-    this.statusStep(world, 1 / 30);
     if (this.phase !== 'down') this.input(p); // 쓰러지면 후송을 기다린다
     this.core.frameView({ x0: w.camX, lane: w.lane });
     this.sync();
@@ -301,17 +265,6 @@ export class EileenPlayer extends Player {
     this.core.onPress('combat');
   }
 
-  /** 상태 효과 시간·피해 (엔진 틱마다). 지속 피해로는 쓰러지지 않는다(1 남김). 오염은 최대 체력을 줄인다 */
-  private statusStep(world: WorldView, dt: number) {
-    if (!this.status.list.length) return;
-    const P = this.core.P;
-    const dmg = this.status.step(dt, { maxHp: this.hpMax, running: this.running, blocking: P.mode === 'block' });
-    if (dmg > 0 && this.hp > 1) this.hp = Math.max(1, this.hp - dmg);
-    const cap = this.hpMax * this.status.maxHpRatio();
-    if (this.hp > cap) this.hp = cap;
-    void world;
-  }
-
   private spendGuard(n: number) {
     this.guard = Math.max(0, this.guard - n);
     this.guardWait = 0.8;
@@ -333,9 +286,7 @@ export class EileenPlayer extends Player {
     this.px = this.x; this.py = this.y; this.pz = this.z; // 보간 없이 지금 자리 (장마다 움직인다)
     this.synced.x = this.x; this.synced.y = this.y;
     this.dir = P.face > 0 ? 1 : -1;
-    // 엔진·아이템이 게이지를 바꿨으면(각성제 등) 먼저 코어 필살 게이지에 넘긴다 (코어 값으로 덮어써서 아이템이 헛돌던 문제)
-    if (this.gauge !== this.gaugeSeen) P.sp = Math.max(0, Math.min(100, this.gauge));
-    this.gauge = this.gaugeSeen = P.sp;
+    this.gauge = P.sp;
     this.running = this.core.P.mode === 'ground' && this.heldNames.has('run');
   }
 

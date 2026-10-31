@@ -1,11 +1,8 @@
 // 일반 적 두뇌. 역할별 공통 행동 + 가짜 관리국·백일몽 고유 행동. 옛 승강기 괴이 두뇌(규칙형·천장·얼룩 등)는 2026-10-28에 지웠다.
 // 벨트스크롤 관례: 한 번에 공격하는 적은 2체까지(공격권). 나머지는 둘러싸고 기다린다.
-import { pfont } from '../engine/pxfont';
-import { emitDebuff } from './debuff';
-import { Enemy, stillTicks, type Brain } from './enemy';
+import { Enemy, type Brain } from './enemy';
 import type { Attack } from './roster';
 import type { WorldView } from './types';
-import { spawnInto } from './registry';
 import { walkTo } from './navigation';
 
 export const MAX_ATTACKERS = 2;

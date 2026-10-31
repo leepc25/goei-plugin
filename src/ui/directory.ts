@@ -6,7 +6,7 @@ import {
 } from '../core/world/directory';
 import { tokens } from '../core/gnet';
 import { readUnlocked, unlockedValue, UNLOCK_VAR } from '../core/lore';
-import { MAP_CODES, placeWhere, regionName, SIDO_NAME, SIGUN } from '../core/world/geo';
+import { MAP_CODES, placeWhere, regionName, SIGUN } from '../core/world/geo';
 import { assetNames, assetUrl, DEFAULT_CROP, facePic, mainPic, parseCrop, personCrop, splitPic, type PicSource } from '../host/assets';
 import { LEGACY_DATA } from '../core/lorebooks';
 import { SCENARIOS } from '../core/scenarios';
@@ -158,6 +158,9 @@ function loreSources(lore: ChatContext['char']['globalLore']): Map<string, strin
   sourceCache.set(books, out);
   return out;
 }
+
+/** 로어북이 든 폴더 이름 (다른 폴더에서 온 후보의 출처 표시) */
+export const loreSourceOf = (ctx: ChatContext, name: string): string => loreSources(ctx.char.globalLore).get(name) ?? '';
 
 /** 다른 폴더에서 발생 후보로 고를 수 있는 로어북 (설정 폴더·폴더 없는 것·이미 있는 것 제외) */
 export function directoryExtList(ctx: ChatContext): string {

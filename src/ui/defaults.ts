@@ -4,7 +4,7 @@ import { loadVarDefaults, saveVarDefaults } from '../host/prefs';
 import { updateChat, type ChatContext } from '../host/risu';
 import { ICONS } from './icons';
 
-export type DefaultsPane = 'ph' | 'gn' | 'wiki' | 'visit' | 'pp';
+export type DefaultsPane = 'ph' | 'gn' | 'wiki' | 'visit' | 'pp' | 'jr';
 
 const PREFIXES: Record<DefaultsPane, string[]> = {
   ph: ['$ph_'],
@@ -13,23 +13,28 @@ const PREFIXES: Record<DefaultsPane, string[]> = {
   visit: ['$hq_'],
   /** 인물 기록 (core/people/settings.ts PP). 메인 설정의 「덮어쓰기/불러오기」도 같은 접두어를 함께 다룬다 */
   pp: ['$pp_'],
+  /** 기록 (core/journal/settings.ts JR): 채팅에 보고서 표시·일지 컨텍스트·소감 자동·상한 둘 */
+  jr: ['$jr_'],
 };
 /** 메인 설정의 「덮어쓰기/불러오기」가 기능 설정과 함께 다루는 접두어 */
 export const MAIN_PREFIXES = ['$gen_', '$hq_adv_', '$pp_'];
-const NAME: Record<DefaultsPane, string> = { ph: '괴담톡', gn: '괴담넷', wiki: '위키', visit: '필드', pp: '인물 기록' };
+/** 설정 창 머리의 「기본값으로 저장」「기본값 불러오기」가 한 번에 다루는 채팅 변수 접두어 전부 (2026-10-29 사용자: 「현재 모든 상태가 한방에」).
+ *  화면·이미지·상황판·괴이 발생·테마는 settings.ts set-bar-yes 가 따로 더한다 */
+export const ALL_PREFIXES = [...new Set([...MAIN_PREFIXES, ...Object.values(PREFIXES).flat()])];
+const NAME: Record<DefaultsPane, string> = { ph: '괴담톡', gn: '괴담넷', wiki: '위키', visit: '필드', pp: '인물 기록', jr: '기록' };
 
 export const defaultsAsk = { pane: '' as DefaultsPane | '', what: '' as '' | 'save' | 'load' };
 
 /** 설정·명부 위쪽 줄과 같은 두 버튼 */
 export const defaultsButtons = (pane: DefaultsPane, off = false): string =>
-  `<span class="ps-defaults"><button class="st-act save" data-action="${pane}-def-ask" data-value="save" ${off ? 'disabled' : ''}>${ICONS.pen}덮어쓰기</button><button class="st-act" data-action="${pane}-def-ask" data-value="load" ${off ? 'disabled' : ''}>${ICONS.refresh}불러오기</button></span>`;
+  `<span class="ps-defaults"><button class="st-act save" data-action="${pane}-def-ask" data-value="save" ${off ? 'disabled' : ''}>${ICONS.pen}기본값으로 저장</button><button class="st-act" data-action="${pane}-def-ask" data-value="load" ${off ? 'disabled' : ''}>${ICONS.refresh}기본값 불러오기</button></span>`;
 
 /** 버튼을 누른 뒤 확인 줄 (설정 화면 머리 아래) */
 export function defaultsConfirm(pane: DefaultsPane): string {
   if (defaultsAsk.pane !== pane || !defaultsAsk.what) return '';
   const save = defaultsAsk.what === 'save';
-  const text = save ? `지금 ${NAME[pane]} 설정으로 새 채팅 기본값을 덮어쓸까요?` : `저장해 둔 ${NAME[pane]} 기본값을 지금 채팅에 불러올까요?`;
-  return `<div class="st-confirm st-barconfirm ps-defconfirm"><p>${text}</p><div class="gx-row-btns"><button class="gx-mini${save ? ' ps-save' : ' danger'}" data-action="${pane}-def-yes">${save ? '덮어쓰기' : '불러오기'}</button><button class="gx-mini" data-action="${pane}-def-no">취소</button></div></div>`;
+  const text = save ? `지금 ${NAME[pane]} 설정을 새 채팅 기본값으로 저장할까요?` : `저장해 둔 ${NAME[pane]} 기본값을 이 채팅에 불러올까요?`;
+  return `<div class="st-confirm st-barconfirm ps-defconfirm"><p>${text}</p><div class="gx-row-btns"><button class="gx-mini${save ? ' ps-save' : ' danger'}" data-action="${pane}-def-yes">${save ? '저장' : '불러오기'}</button><button class="gx-mini" data-action="${pane}-def-no">취소</button></div></div>`;
 }
 
 /**

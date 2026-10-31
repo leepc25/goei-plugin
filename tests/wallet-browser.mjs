@@ -1,7 +1,8 @@
-// 가계부 탭 (src/ui/wallet.ts): PC 왼쪽 메뉴, 모바일 머리 잔고 단추·ID카드 잔고 칩으로 들어가 내역·합계·추가·수정·지우기
+// 가계부 탭 (src/ui/wallet.ts): PC 는 사원증 잔고 줄(2026-10-29: 왼쪽 메뉴 자리는 「기록」), 모바일 머리 잔고 단추·ID카드 잔고 줄로 들어가 내역·합계·추가·수정·지우기
 // 사용법: node tests/wallet-browser.mjs <fixture.json> [screenshot-dir]   (fixture: tests/make_fixture.py)
 // 호스트 흉내(hostScript·boot·open)는 tests/browser.mjs 와 같다.
 import { createRequire } from 'node:module';
+import { distWorldPack } from './data-init.mjs';
 import { execSync } from 'node:child_process';
 import { readFileSync, mkdirSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
@@ -17,6 +18,8 @@ const plugin = readFileSync(process.env.PLUGIN || new URL('../dist/goei-plugin.j
 
 // 본체는 시작기가 pluginStorage에서 꺼낸다. 따로 시험하는 곳(noBody) 말고는 미리 넣어 둔다
 const bodyCode = readFileSync(new URL('../dist/goei-body.js', import.meta.url), 'utf8');
+/** 세계 자료 팩 (개선 나1): 본체처럼 가짜 저장소에 미리 둔다 (저장소에 자료가 있는 보통 경우). 받기 시험은 noBody 쪽에서 */
+const worldPack = distWorldPack();
 function hostScript(char, chat, { rootDom = true, noBody = false } = {}) {
   return `
     window.__calls = { setChat: [], show: [], hide: 0, replacers: [], listeners: [], handlers: {} };
@@ -42,7 +45,8 @@ function hostScript(char, chat, { rootDom = true, noBody = false } = {}) {
     });
     window.__store = {};
     if (!${noBody}) window.__store['p:goei:body'] = ${JSON.stringify(bodyCode)};
-    window.__rootDoc = ${rootDom} ? { querySelector: async (q) => wrap(document.querySelector(q)), querySelectorAll: async (q) => [...document.querySelectorAll(q)].map(wrap), createElement: async (t) => wrap(document.createElement(t)) } : null;
+    if (!${noBody}) window.__store['p:goei:data-world'] = ${JSON.stringify(worldPack)};
+    window.__rootDoc = ${rootDom} ? { ...wrap(document.documentElement), querySelector: async (q) => wrap(document.querySelector(q)), querySelectorAll: async (q) => [...document.querySelectorAll(q)].map(wrap), createElement: async (t) => wrap(document.createElement(t)) } : null;
     window.__char = ${JSON.stringify(char)};
     window.__liteChar = window.__char;
     window.__chat = ${JSON.stringify(chat)};
@@ -93,7 +97,7 @@ async function boot(char, chat, viewport = process.env.VP ? { width: +process.en
   await page.exposeFunction('__readAsset', (p) => {
     try { return readFileSync(new URL(p, `file://${fixtureDir}/`)).toString('base64'); } catch { return null; }
   });
-  await page.setContent('<!doctype html><html><head><meta charset="utf-8"></head><body style="margin:0;height:100vh"><div class="default-chat-screen" style="height:100%;background:#f3f3f3"><button id="other" style="margin:40px">다른 버튼</button></div></body></html>');
+  await page.setContent('<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"></head><body style="margin:0;height:100vh"><div class="default-chat-screen" style="height:100%;background:#f3f3f3"><button id="other" style="margin:40px">다른 버튼</button></div></body></html>');
   // 실제 Risu 플러그인 창은 allow-forms 없는 iframe이라 form 제출 이벤트가 아예 일어나지 않는다
   await page.addScriptTag({ content: "document.addEventListener('submit', (e) => { e.preventDefault(); e.stopImmediatePropagation(); }, true);" });
   await page.addScriptTag({ content: hostScript(char, chat, opts) });
@@ -126,19 +130,21 @@ const chat = () => ({
 const walletOf = (page) => page.evaluate(() => JSON.parse(window.__chat.scriptstate.$st_wallet));
 const rows = (page) => page.locator('.gx-wt-row').count();
 
-// PC: 왼쪽 메뉴 「가계부」
+// PC: 사원증 잔고 줄 (왼쪽 메뉴에 「가계부」 없음 — 그 자리는 「기록」)
 {
   const { page, errors } = await boot(fixture, chat(), { width: 1280, height: 860 });
   await open(page);
   await page.waitForSelector('.gx-nav');
-  await page.click('.gx-nav > .gx-nb[data-value="wallet"]');
+  assert.equal(await page.locator('.gx-nav > .gx-nb[data-value="wallet"]').count(), 0, '가계부는 메뉴에 없다');
+  assert.equal(await page.locator('.gx-nav > .gx-nb[data-value="records"]').count(), 1, '그 자리에 기록');
+  await page.click('.gx-nav-brand .gx-wallet');
   await page.waitForSelector('.gx-wallettab');
   assert.match(await page.textContent('.gx-wt-balrow b'), /153,800/, '잔고 = 시작 + 살아 있는 거래 (지운 메시지 거래 빠짐)');
   assert.match(await page.textContent('.gx-wt-tile.bal'), /시작 ₩ 140,000 · 거래 3건/);
   const tiles = await page.locator('.gx-wt-tile').allTextContents();
   assert.match(tiles[1], /수입\s*\+30,000\s*1건/);
   assert.match(tiles[2], /지출\s*−16,200\s*2건/);
-  assert.match(tiles[3], /오늘 · 01\.02\s*−1,200\s*1건/);
+  assert.match(tiles[3], /TODAY · 01\.02\s*−1,200\s*1건/);
   // 날짜 묶음 (최신 위) · 그 거래 뒤 잔고 · 필드 장면·시각 · 본문 근거
   assert.deepEqual(await page.locator('.gx-wt-day h3 span').allTextContents(), ['2025.01.02 (목)', '2025.01.01 (수)']);
   assert.equal(await rows(page), 3);
@@ -208,12 +214,12 @@ const rows = (page) => page.locator('.gx-wt-row').count();
   const { page, errors } = await boot(fixture, c, { width: 1280, height: 860 });
   await open(page);
   await page.waitForSelector('.gx-nav');
-  await page.click('.gx-nav > .gx-nb[data-value="wallet"]');
+  await page.click('.gx-nav-brand .gx-wallet');
   await page.waitForSelector('.gx-wallettab');
   assert.equal(await page.locator('.gx-wt-pen').count(), 0, '꺼져 있으면 ✎ 없음');
   assert.equal(await page.locator('.gx-wt-del').count(), 0, '꺼져 있으면 ✕ 없음');
   await page.click('[data-action="ed-open"][data-value="set:screen"] >> nth=0');
-  await page.click('[data-action="ed-node"][data-value="set:board"]');
+  await page.click('[data-action="ed-node"][data-value="set:status"]');
   await page.waitForSelector('[data-action="set-wallet-edit"]');
   assert.equal(await page.isDisabled('.st-won'), true, '이야기가 시작된 채팅은 시작 잔고 잠김');
   await page.click('[data-action="set-wallet-edit"][data-value="1"]');
@@ -231,7 +237,7 @@ const rows = (page) => page.locator('.gx-wt-row').count();
   const { page } = await boot(fixture, c, { width: 1280, height: 860 });
   await open(page);
   await page.waitForSelector('.gx-nav');
-  assert.equal(await page.locator('.gx-nav > .gx-nb[data-value="wallet"]').count(), 0);
+  assert.equal(await page.locator('.gx-nav-brand .gx-wallet').count(), 0, '잔고 칸을 끄면 사원증 잔고 줄 없음');
   assert.equal(await page.locator('.gx-hwallet').count(), 0);
   await page.close();
 }

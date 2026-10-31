@@ -20,7 +20,6 @@ export function fireDropHook(c: DropContext) {
   hook?.(c);
 }
 
-const int = (r: () => number, a: number, b: number) => a + Math.floor(r() * (b - a + 1));
 
 /** 처치 드랍 표. 회복 조각·탄만 (옛 출동 현금·이상 파편·회수물·강화 선택은 2026-10-28에 지웠다). 정예는 회복 조각 확률 +10%p */
 export function rollDrops(table: DropTable, r: () => number, elite = false): Drop[] {

@@ -93,7 +93,8 @@ try {
       continue;
     }
     const depthCount = seen.floors.filter((f) => !f.startsWith('승강기')).length;
-    const want = s.props.find((q) => q.kind === 'button' && q.id === 'btn0') ?? (depthCount < FLOORS ? s.props.find((q) => q.kind === 'panel') : null);
+    // 방 진행(stage/gen/world.ts): 다음 방은 끝의 문(door), 승강기 홀은 패널·단추
+    const want = s.props.find((q) => q.kind === 'button' && q.id === 'btn0') ?? (depthCount < FLOORS ? s.props.find((q) => q.kind === 'panel') ?? s.props.find((q) => q.kind === 'door') : null);
     if (!want) break;
     await tp(want.x, want.y > 480 ? want.y : undefined);
     await page.keyboard.press('KeyE');
@@ -111,8 +112,8 @@ try {
   await page.keyboard.press('Escape');
   await page.waitForTimeout(300);
   await S('pause');
-  await page.getByText('본부로 귀환').first().click();
-  await page.getByText('귀환', { exact: true }).first().click();
+  await page.getByText('출동 포기').first().click();
+  await page.getByText('철수', { exact: true }).first().click();
   // 귀환 컷신을 넘기며 본부까지
   for (let i = 0; i < 80 && !(await page.evaluate(() => window.__goeiEngine.inHub)); i++) {
     await page.keyboard.press('Space');

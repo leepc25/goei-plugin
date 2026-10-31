@@ -20,19 +20,6 @@ export interface Registry {
   byLore: Map<string, RegistryEntry[]>;
 }
 
-const s = (v: unknown) => (typeof v === 'string' ? v.trim() : '');
-const list = (v: unknown) => (Array.isArray(v) ? v.map(s).filter(Boolean) : []);
-
-function json(lore: LoreEntry[], comment: string): Record<string, unknown> | null {
-  const raw = lore.find((e) => e.comment === comment)?.content;
-  if (typeof raw !== 'string') return null;
-  try {
-    return JSON.parse(raw) as Record<string, unknown>;
-  } catch {
-    return null;
-  }
-}
-
 /** 너무 넓은 보통 낱말·직급 로마자: 한 항목만 가리키는 이름이 아니다 */
 const COMMON_ALIAS = /^(?:amusement park|hotel|호텔|지하실|basement|tattoo|문신|좋은 친구|(?:ban|team|gwa|bu|guk|sa|won|sil|cha)-?jang)$/i;
 

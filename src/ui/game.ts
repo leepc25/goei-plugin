@@ -2,7 +2,7 @@
 // 덮개는 창 그리기(innerHTML)와 따로 들고 있다가 그린 뒤 다시 붙인다.
 // 처음 화면은 시작 화면: 게임 파일 받기 → 저장 칸 고르기 → 본편 연동(읽은 것·넘겨받은 결과 쓰기).
 // 게임 코드는 본체에 들지 않고 코드 팩으로 받는다(host/game/code.ts). 쓰는 것은 사용자가 버튼을 누를 때만이다.
-import { SLOT_IDS, type CardSnapshot, type SlotId, type SlotInfo } from '../game/bridge';
+import type { CardSnapshot, SlotId, SlotInfo } from '../game/bridge';
 import { RECORD_COMMENT } from '../core/gamelink';
 import { codeState, codeStats, installGameCode, loadGameCode } from '../host/game/code';
 import { fetchStats, forgetIndex, gameIndex, type GameIndex } from '../host/game/fetch';
@@ -10,7 +10,9 @@ import { downloadGamePack, installGamePack, liveUrls, packStateOf, releaseAll } 
 import { gameSaves } from '../host/game/saves';
 import { clearRecord, dropReport, onReports, pendingReports, postReport, readCard, recordReport, type PendingReport } from '../host/game/card';
 import { makeBridge } from '../host/game';
-import { makeViewport, type ViewportCtl } from '../host/game/viewport';
+import { makeViewport, phone, type ViewportCtl } from '../host/game/viewport';
+import { setFabHidden } from '../host/overlay';
+import { uprightInput } from './uprightInput';
 import { loadContext } from '../host/risu';
 import { ICONS } from './icons';
 
@@ -24,6 +26,7 @@ let generation = 0;
 let busy = '';
 let notice = '';
 let offReports: (() => void) | null = null;
+let offUpright: (() => void) | null = null;
 
 /** 측정 (시작 화면 아래 「측정」에 보인다, 시험이 읽는다) */
 export const gameStats = { openMs: 0, codeMs: 0, mountMs: 0, heapOpen: 0, heapAfter: 0 };
@@ -37,7 +40,6 @@ const when = (t: number) => {
   const d = new Date(t);
   return `${d.getMonth() + 1}/${d.getDate()} ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
 };
-const SLOT_NAME = (n: SlotId) => (n === 0 ? '자동 저장' : `${n}번 칸`);
 
 interface Files {
   index: GameIndex | null;
@@ -102,10 +104,6 @@ function linkHtml(card: CardSnapshot | null, reports: PendingReport[], record: n
   ].join(''));
 }
 
-function statsHtml(): string {
-  const s = gameStats;
-  return row('측정', `게임 코드 ${kb(codeStats.bytes || 0)} · 꺼내기 ${codeStats.readMs}ms · 실행 ${codeStats.runMs}ms${codeStats.fromNet ? ' (방금 받음)' : ''} · 붙이기 ${s.mountMs}ms · 받은 양 ${kb(fetchStats.bytes)}/${fetchStats.requests}번 · 그림 주소 ${liveUrls()}개${s.heapOpen ? ` · 힙 ${kb(s.heapOpen)} → ${kb(heap())}` : ''}`);
-}
 
 async function home(): Promise<void> {
   const box = layer?.querySelector<HTMLElement>('.gx-game-box');
@@ -124,7 +122,6 @@ async function home(): Promise<void> {
   const open = new Set([...box.querySelectorAll<HTMLDetailsElement>('details[data-keep]')].filter((d) => d.open).map((d) => d.dataset.keep));
   box.innerHTML = `<div class="gx-gl gx-settings">
     ${filesHtml(f)}${startHtml(slots, last, !needFiles(f))}${linkHtml(card, reports, record)}
-    <details class="ps-adv gx-gl-dev" data-keep="game-dev"><summary class="ps-adv-sum"><b>시험용</b></summary><div class="ps-rows">${statsHtml()}</div></details>
     <input type="file" accept=".js,.pack" multiple hidden data-g-file></div>`;
   box.querySelectorAll<HTMLDetailsElement>('details[data-keep]').forEach((d) => (d.open = open.has(d.dataset.keep)));
 }
@@ -173,10 +170,29 @@ async function putFiles(list: FileList): Promise<void> {
   }
 }
 
+/** 폰 필드 (모바일 조작 설계 2026-10-28): 창 머리·아래 메뉴·신분증 칸(창의 왼쪽 메뉴 줄)·유령 버튼을 숨긴다. 나가면 되돌린다 */
+let chromeHidden: HTMLElement | null = null;
+function phoneChrome(on: boolean): void {
+  if (on && layer) {
+    chromeHidden = layer.closest<HTMLElement>('.gx') ?? null;
+    chromeHidden?.classList.add('gx-fieldfull');
+    layer.classList.add('gx-phone');
+  } else {
+    chromeHidden?.classList.remove('gx-fieldfull');
+    chromeHidden = null;
+    layer?.classList.remove('gx-phone');
+  }
+  setFabHidden(on);
+}
+
 async function play(slot: SlotId): Promise<void> {
   const box = layer?.querySelector<HTMLElement>('.gx-game-box');
   if (!box || !viewport) return;
   const me = ++generation;
+  // 폰이면 무조건 가로 전체화면: 전체화면 요청은 「들어가기」 손짓 안에서 바로 (게임 코드를 꺼내기 전에)
+  const onPhone = phone();
+  const going = onPhone ? viewport.phoneFull(true) : null;
+  if (onPhone) phoneChrome(true);
   const t0 = performance.now();
   gameStats.heapOpen = heap();
   busy = '게임을 여는 중';
@@ -186,13 +202,17 @@ async function play(slot: SlotId): Promise<void> {
     if (me !== generation || !layer) return;
     view = 'play';
     // 게임은 창 전체를 쓴다(통합 규격 3장: 캔버스가 창 면적 80% 이상, 폰 가로는 높이 100%, 폰 세로는 돌려 꽉 채움)
-    viewport.fill(true);
+    if (going) await going;
+    else viewport.fill(true);
     setHead();
     box.innerHTML = '';
     const bridge = makeBridge(viewport, slot, () => (onExit ? onExit() : closeGame()), (cb) => {
       hiddenSubs.add(cb);
       return () => void hiddenSubs.delete(cb);
     });
+    // 진단·시험용 (게임이 두는 __goeiEngine 처럼) 플러그인 쪽 다리 — 이 채팅의 변수 `$goei_diag` 가 '1' 일 때만 페이지 전역에 둔다.
+    // 다리는 채팅 저장(필드 장부·일지·보고서)을 열어 주므로 평소엔 노출하지 않는다 (2026-10-29 검토). 닫으면 지운다
+    if ((await loadContext().catch(() => null))?.chat.scriptstate?.$goei_diag === '1') (globalThis as { __goeiBridge?: unknown }).__goeiBridge = bridge;
     const t1 = performance.now();
     unmount = mod.mount(box, bridge);
     gameStats.mountMs = Math.round(performance.now() - t1);
@@ -201,6 +221,8 @@ async function play(slot: SlotId): Promise<void> {
   } catch (e) {
     busy = '';
     view = 'home';
+    phoneChrome(false);
+    if (viewport.phone) await viewport.phoneFull(false);
     viewport.fill(false);
     setHead();
     say(`게임을 열지 못했어요: ${e instanceof Error ? e.message : String(e)}`);
@@ -211,6 +233,7 @@ function stop(): void {
   generation++;
   unmount?.();
   unmount = null;
+  delete (globalThis as { __goeiBridge?: unknown }).__goeiBridge;
   releaseAll();
   gameStats.heapAfter = heap();
 }
@@ -218,6 +241,8 @@ function stop(): void {
 function toHome(): void {
   stop();
   view = 'home';
+  phoneChrome(false);
+  if (viewport?.phone) void viewport.phoneFull(false);
   viewport?.fill(false);
   notice = '';
   setHead();
@@ -289,8 +314,12 @@ async function onClick(e: MouseEvent): Promise<void> {
 export const gameOpen = () => !!layer;
 const hiddenSubs = new Set<(hidden: boolean) => void>();
 /** 다른 탭으로 갈 때: 게임을 떼어 두고 멈춘다. 돌아오면 다시 붙인다 (닫지 않는다, 2026-10-23 사용자) */
+let hidden = false;
 export function hideGame(): void {
-  if (!layer?.isConnected) return;
+  // 창을 다시 그리면(탭 바꿈) 틀이 먼저 바뀌어 게임 층이 이미 떨어져 있을 수 있다: 연결 여부가 아니라 「숨김」 표식으로 한 번만 알린다
+  // (예전엔 isConnected 로 거르다 탭을 바꿔도 멈춤 알림이 안 가 게임이 떼어진 채 계속 돌았다 — 일시정지·소리 끔·저장 없음, QC 2026-10-28)
+  if (!layer || hidden) return;
+  hidden = true;
   layer.remove();
   hiddenSubs.forEach((f) => f(true));
 }
@@ -307,6 +336,8 @@ export function openGame(panel: Element | null, exit?: () => void): void {
   layer.innerHTML = `<div class="gx-game-in"><header class="gx-head"></header><div class="gx-game-box"></div></div>`;
   panel.append(layer);
   viewport = makeViewport(layer, { inFrame: true });
+  // 아이폰(돌려 보이는 중): 입력칸을 바로 세워 키패드 위에
+  offUpright = uprightInput(layer, () => !!viewport?.rotated);
   view = 'home';
   notice = '';
   setHead();
@@ -323,22 +354,25 @@ export function openGame(panel: Element | null, exit?: () => void): void {
 
 export function closeGame(): void {
   stop();
+  phoneChrome(false);
   offReports?.();
   offReports = null;
+  offUpright?.();
+  offUpright = null;
   viewport?.dispose();
   viewport = null;
   layer?.remove();
   layer = null;
   onExit = null;
   hiddenSubs.clear();
+  hidden = false;
   view = 'home';
   busy = '';
 }
 
 /** 창을 다시 그린 뒤: 열려 있던 게임을 새 창 틀에 다시 붙인다 */
 export function reattachGame(panel: Element | null): void {
-  if (!layer || !panel || layer.parentElement === panel) return;
-  const was = layer.isConnected;
+  if (!layer || !panel || (layer.parentElement === panel && !hidden)) return;
   panel.append(layer);
-  if (!was) hiddenSubs.forEach((f) => f(false));
+  if (hidden) { hidden = false; hiddenSubs.forEach((f) => f(false)); }
 }

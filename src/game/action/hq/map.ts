@@ -5,6 +5,7 @@
 import type { PlaceId } from './data';
 import { ROOMS, mirror, type Room, type RoomFix, type RoomItem } from './rooms';
 import { PAINTED, PAINTED_LANE, doorX } from './painted';
+import { JR_ROOM_SPOTS } from './jrRooms.gen';
 
 export type SceneId =
   | 'street' | 'jongno' | 'pasta' | 'metro' | 'yeongdeungpo' | 'gangnam' | 'mangwon' | 'yeouido' | 'lobby' | 'swat' | 'f2' | 'f3' | 'office' | 'interview' | 'lounge' | 'wc' | 'wc3'
@@ -104,7 +105,6 @@ export interface HqScene {
 export const PX_M = 142;
 export const LANE_TOP = 420;
 export const LANE_BOT = 669;
-const HEIGHT: Record<string, number> = { desk: 106, big: 121, wall: 283, glass: 190 };
 
 /** 회색 방(그림 없는 방)은 의자만 둔다 (사용자 2026-10-29: 「가구 같은 거 넣지 말고 회색 룸에 의자들만 놔둬. 이미지 뽑고 나면 교체」).
  * rooms.ts 의 책상·침대·벽 집기·벽 붙박이는 그림이 올 때까지 그리지도 막지도 않는다. 의자마다 앉기 자리 하나(E → 인물 팩 앉기, 코어 sitAt) */
@@ -144,6 +144,8 @@ function floorHall(id: SceneId, name: string, floor: HqScene['floor'], doors: Om
     // 막는 상자는 그림을 그리지 않는다 (오브젝트 그림은 첫 상자 자리에서 한 번만, 깊이 순서는 sortY)
     boxes: [
       ...p.objects.flatMap((o) => (o.solid ?? []).map((b, i) => ({ kind: i ? `${o.id}:${i}` : o.id, x: (b.x0 + b.x1) / 2, w: b.x1 - b.x0, y: i ? b.y1 : o.sortY, d: b.y1 - b.y0, h: b.h ?? o.sortY - o.y, solid: true }))),
+      // 막지 않는 오브젝트(가림만): 그림 자리용 빈 상자
+      ...p.objects.filter((o) => !o.solid?.length).map((o) => ({ kind: o.id, x: o.x + o.w / 2, w: o.w, y: o.sortY, d: 1, h: 0, solid: false })),
       // 그림 속 화분·벤치: 바닥 상자만 (그림은 배경에 이미 있다)
       ...(p.blocks ?? []).map(([x0, x1, y1, h]) => ({ kind: 'block', x: (x0 + x1) / 2, w: x1 - x0, y: y1, d: y1 - (p.lane ?? PAINTED_LANE)[0], h: h ?? 999, solid: true })),
     ],
@@ -275,18 +277,18 @@ export const HQ_SCENES: HqScene[] = [
     { id: 'youngchang', kind: 'steel', to: 'jr_youngchang', toDoor: 'out', label: '창고 B-7 (영창 컨설팅)' },
   ]),
   // 가게 안 (GPT 빈 방 + GPT 가구, tools/jr/rooms.py)
-  floorHall('jr_daebak', '대박 알선', 'B1', [{ id: 'out', kind: 'glass', to: 'jr_b1', toDoor: 'daebak', label: '나가기' }]),
-  floorHall('jr_heolgap', '헐값 매입', 'B1', [{ id: 'out', kind: 'door', to: 'jr_alley', toDoor: 'heolgap', label: '나가기' }]),
-  floorHall('jr_youngchang', '영창 컨설팅', 'B2', [{ id: 'out', kind: 'steel', to: 'jr_b2', toDoor: 'youngchang', label: '나가기' }]),
+  floorHall('jr_daebak', '대박 알선', 'B1', [{ id: 'out', kind: 'glass', to: 'jr_b1', toDoor: 'daebak', label: '나가기' }], { spots: JR_ROOM_SPOTS.jr_daebak }),
+  floorHall('jr_heolgap', '헐값 매입', 'B1', [{ id: 'out', kind: 'door', to: 'jr_alley', toDoor: 'heolgap', label: '나가기' }], { spots: JR_ROOM_SPOTS.jr_heolgap }),
+  floorHall('jr_youngchang', '영창 컨설팅', 'B2', [{ id: 'out', kind: 'steel', to: 'jr_b2', toDoor: 'youngchang', label: '나가기' }], { spots: JR_ROOM_SPOTS.jr_youngchang }),
   floorHall('jr_songil', '손길 의원', 'B1', [
     { id: 'out', kind: 'glass', to: 'jr_b1', toDoor: 'songil', label: '나가기' },
     { id: 'jinryo', kind: 'door', to: 'jr_jinryo', toDoor: 'out', label: '진료실' },
     { id: 'wc', kind: 'door', locked: true, label: '화장실' },
     { id: 'store', kind: 'door', locked: true, label: '창고' },
     { id: 'op', kind: 'door', to: 'jr_op', toDoor: 'out', label: '수술실' },
-  ]),
-  floorHall('jr_jinryo', '진료실', 'B1', [{ id: 'out', kind: 'door', to: 'jr_songil', toDoor: 'jinryo', label: '대기실로' }]),
-  floorHall('jr_op', '수술실', 'B1', [{ id: 'out', kind: 'door', to: 'jr_songil', toDoor: 'op', label: '대기실로' }]),
+  ], { spots: JR_ROOM_SPOTS.jr_songil }),
+  floorHall('jr_jinryo', '진료실', 'B1', [{ id: 'out', kind: 'door', to: 'jr_songil', toDoor: 'jinryo', label: '대기실로' }], { spots: JR_ROOM_SPOTS.jr_jinryo }),
+  floorHall('jr_op', '수술실', 'B1', [{ id: 'out', kind: 'door', to: 'jr_songil', toDoor: 'op', label: '대기실로' }], { spots: JR_ROOM_SPOTS.jr_op }),
 ];
 export const SCENE_BY_ID = Object.fromEntries(HQ_SCENES.map((s) => [s.id, s])) as Record<SceneId, HqScene>;
 

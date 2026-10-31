@@ -11,17 +11,23 @@ try { ({ chromium } = require('playwright')); } catch { ({ chromium } = createRe
 
 const DIST = resolve(new URL('../dist/game', import.meta.url).pathname);
 
-export async function openField({ width = 1873, height = 1082, panel = true } = {}) {
+/** 선택: touch = 폰 흉내(hasTouch·isMobile), dsf = 기기 픽셀 배율(폰 사진은 3), card = bridge.card() 가 줄 본편 스냅숏(시각 minute 등), uiPrefs = $hq_ui 설정 JSON 글, people = 인물 기록·세력 평판 (factions 배열), query = 주소 ?seed=…&hour=… */
+export async function openField({ width = 1873, height = 1082, panel = true, card = null, uiPrefs = null, people = null, query = '', touch = false, dsf = 1 } = {}) {
   const code = readFileSync(`${DIST}/goei-game.js`, 'utf8');
   const packs = {};
   for (const f of readdirSync(DIST)) if (f.endsWith('.pack')) packs[f.replace(/\.pack$/, '')] = readFileSync(`${DIST}/${f}`).toString('base64');
   const b = await chromium.launch();
-  const page = await b.newPage({ viewport: { width, height } });
+  const page = await b.newPage({ viewport: { width, height }, deviceScaleFactor: dsf, ...(touch ? { hasTouch: true, isMobile: true } : {}) });
   const errors = [];
   page.on('pageerror', (e) => errors.push(e.message));
   page.on('console', (m) => m.type() === 'error' && errors.push(m.text()));
+  // 주소 ?seed·hour: about:blank 에서는 history.replaceState 가 막힌다 → 가짜 주소로 먼저 가고(setContent 는 주소를 유지) 그 위에 내용을 쓴다
+  if (query) {
+    await page.route('http://goei.test/**', (r) => r.fulfill({ contentType: 'text/html', body: '<!doctype html><html></html>' }));
+    await page.goto(`http://goei.test/${query.startsWith('?') ? query : `?${query}`}`);
+  }
   // 상황창: 왼쪽 메뉴 줄 · 가운데 본문(필드) · 오른쪽 신분증 줄 (리스 플러그인 창 흉내)
-  await page.setContent(`<!doctype html><html><head><meta charset="utf-8"><style>
+  await page.setContent(`<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>
     html,body{margin:0;height:100%;background:#111}
     .gx-panel{position:absolute;inset:14px;display:grid;grid-template-columns:${panel ? '72px 1fr 220px' : '1fr'};border-radius:24px;overflow:hidden;background:#05080a}
     .side{background:#1a2226}.gx-fieldhost{position:relative;overflow:hidden}
@@ -29,7 +35,7 @@ export async function openField({ width = 1873, height = 1082, panel = true } = 
     .gx-game.gx-panelfull{position:absolute;inset:0;z-index:60}
   </style></head><body><div class="gx-panel">${panel ? '<div class="side"></div>' : ''}<main class="gx-fieldhost"><div class="gx-game"><div class="gx-game-box" id="box"></div></div></main>${panel ? '<div class="side"></div>' : ''}</div></body></html>`);
   await page.addScriptTag({ content: code });
-  await page.evaluate(async (packs) => {
+  await page.evaluate(async ({ packs, card, uiPrefs, people }) => {
     const unb = (s) => Uint8Array.from(atob(s), (c) => c.charCodeAt(0));
     const parse = (b) => {
       const len = b[8] | (b[9] << 8) | (b[10] << 16) | (b[11] << 24);
@@ -41,13 +47,14 @@ export async function openField({ width = 1873, height = 1082, panel = true } = 
     const P = Object.fromEntries(Object.entries(packs).map(([k, v]) => [k, parse(unb(v))]));
     const MIME = { png: 'image/png', webp: 'image/webp', json: 'application/json', ogg: 'audio/ogg', mp3: 'audio/mpeg', txt: 'text/plain' };
     const saves = new Map();
-    const h = window.__h = { records: [], sent: [], closed: 0, full: null, won: 140000, trades: [] };
+    const h = window.__h = { records: [], sent: [], closed: 0, full: null, won: 140000, trades: [], prefs: uiPrefs, factions: people?.factions ?? [], peopleList: people?.people ?? [] };
     const turns = [];
     const state = () => ({ visitor: { agentId: '', name: '에일린' }, agents: [{ id: 'jaemtri', name: '잼트리', state: '대기', situation: '사무실', room: 'office' }], turns: [...turns] });
     const vp = { full: false, rotated: false, mode: null, async enter(k = 'browser') { this.mode = k; h.full = k; }, async exit() { this.mode = null; h.full = null; }, toLocal: (x, y, el) => { const r = el.getBoundingClientRect(); return { x: x - r.left, y: y - r.top }; }, onChange: () => () => {} };
     const bridge = {
       api: 1, slot: 0,
-      uiPrefs: { load: async () => null, save: () => {} },
+      uiPrefs: { load: async () => h.prefs, save: (t) => { h.prefs = t; } },
+      ...(people ? { people: { people: async () => h.peopleList, sheet: async () => null, factions: async () => h.factions, onChange: () => () => {} } } : {}),
       visit: { state: async () => state(), send: async (id, text) => { h.sent.push([id, text]); turns.push({ id: String(turns.length), at: Date.now(), agentId: id, name: '잼트리', user: text, reply: '응.' }); return state(); } },
       wallet: { balance: async () => h.won, add: async (n, m) => { h.won += n; h.trades.push([n, m]); return h.won; } },
       fieldState: { load: async () => h.fd ?? null, save: async (t) => void (h.fd = t) },
@@ -61,11 +68,14 @@ export async function openField({ width = 1873, height = 1082, panel = true } = 
         atlas: async (id) => P[id]?.atlas ?? null,
         list: async () => Object.keys(P).map((id) => ({ id, bytes: 0, ready: true, old: false })),
       },
-      card: async () => null, photo: async () => '', report: () => {},
+      card: async () => card, photo: async () => '', report: () => {},
       viewport: vp, waiting: () => false, onWaiting: () => () => {}, narrow: () => false, close: () => void h.closed++, onHidden: () => () => {},
     };
-    window.__goeiGame.mount(document.getElementById('box'), bridge);
-  }, packs);
+    h.bridge = bridge;
+    h.unmount = window.__goeiGame.mount(document.getElementById('box'), bridge);
+    // 다시 붙이기 (열고 닫기 반복 시험): h.remount()
+    h.remount = () => { h.unmount?.(); h.unmount = window.__goeiGame.mount(document.getElementById('box'), bridge); };
+  }, { packs, card, uiPrefs, people });
   return { browser: b, page, errors };
 }
 

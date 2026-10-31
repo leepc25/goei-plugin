@@ -1,4 +1,12 @@
-id)) throw new ScriptError(`대본 id 중복: ${s2.id}`);
+.]+)\s*(\+=|-=|=)\s*(.+?)\s*$/.exec(part);
+      if (m) applySet(m[1], m[2], m[3], flags);
+    }
+  }
+  var ScriptLibrary = class {
+    scripts = /* @__PURE__ */ new Map();
+    add(src, where) {
+      for (const s2 of parseScripts(src, where)) {
+        if (this.scripts.has(s2.id)) throw new ScriptError(`대본 id 중복: ${s2.id}`);
         this.scripts.set(s2.id, s2);
       }
       return this;
@@ -4601,12 +4609,4 @@ ${who}: ${text2.replace(/\n/g, " ")}
       const v = this.actors.find((q) => q.def.id === a.target);
       a.target = void 0;
       if (!v || v.scene !== a.scene) return this.resume(a);
-      this.events.push({ kind: "steal", scene: a.scene, thief: a.def.name, victim: v.def.name, x: v.x });
-      this.disturb(a.scene, 12, v.x);
-      a.run = 1.9;
-      a.exitAt = this.gateFar(a, v.x);
-      this.walkTo(a, a.exitAt, "훔치고 달아남", "exit");
-      this.iconOn(v, "!", 2.5);
-      if ((v.temper?.courage ?? 0) > 0.6) {
-        v.target = a.def.id;
-      
+      this.events.push({ kind: "steal", scene: a.scene, thief: a.def.name, victim: v.def.name, x: v

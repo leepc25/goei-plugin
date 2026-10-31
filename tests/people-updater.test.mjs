@@ -297,3 +297,44 @@ test('다시 읽기: only 인물만 반영하고 읽음 표시는 그대로; 이
   assert.equal(rep.applied.newPeople.length, 0);
   assert.deepEqual(store.read, {}, '읽음 표시 안 바뀜');
 });
+
+test('소감 얹기: ended 가 있으면 자료 ended_now·want.debriefs, 응답 debriefs 는 목록이어야, 반영은 사건 id·요원·본문 규칙으로 받고 버린다', () => {
+  const { c, store } = setup();
+  const ended = [{ id: 'r1', kind: '괴이', name: '소라 랜드', loc: '서울 종로구', agents: ['쟈알디', '데쥬레'], result: '격리 완료', trail_tail: ['진입'], mine: true }];
+  const plain = U.buildUpdate(c, store, [3], { settings: settings(), system: 'SYS', values: {}, names });
+  assert.equal(plain.data.ended_now, undefined);
+  assert.equal(plain.data.want.debriefs, false);
+  assert.deepEqual(plain.ended, []);
+  const input = U.buildUpdate(c, store, [3], { settings: settings(), system: 'SYS', values: {}, names, ended });
+  assert.deepEqual(input.data.ended_now, ended);
+  assert.equal(input.data.want.debriefs, true);
+  // 지침 절은 debrief 가 켜질 때만
+  const text = 'A\n<<SECTION:debrief>>DEB<<END:debrief>>\nZ';
+  assert.match(U.assemblePrompt(text, new Set(['debrief'])), /DEB/);
+  assert.doesNotMatch(U.assemblePrompt(text, new Set()), /DEB|<<|>>/);
+  // 응답 읽기
+  assert.throws(() => U.parseUpdate('{"debriefs":"x"}'));
+  assert.deepEqual(U.parseUpdate('{"debriefs":[]}'), { debriefs: [] });
+  const r = {
+    entries: [],
+    debriefs: [
+      { id: 'r1', who: '데쥬레', text: '금고는 지켰다. 다만 쟈알디의 팔이 마음에 걸린다.' },
+      { id: 'r1', who: '쟈알디', text: '둘째 것은 사건당 1건에 걸린다.' },
+      { id: 'r9', who: '쟈알디', text: '이번 턴 종료가 아닌 사건.' },
+      { id: 'r1', who: '쟈알디', text: '{{user}} 템플릿.' },
+    ],
+  };
+  const rep = U.applyUpdate(store, c, input, r, { settings: settings(), debrief: true });
+  assert.deepEqual(rep.debriefs, [{ id: 'r1', who: '데쥬레', text: '금고는 지켰다. 다만 쟈알디의 팔이 마음에 걸린다.' }]);
+  assert.equal(rep.applied.debriefs, 1);
+  const drops = rep.dropped.filter((d) => d.kind === 'debrief').map((d) => d.reason);
+  assert.deepEqual(drops, ['사건당 1건', '이번 턴에 종료된 사건이 아님', '템플릿 기호가 들어 있음']);
+  // 절이 꺼져 있거나(ctx.debrief 없음) ended 가 비면 아무것도 받지 않는다
+  const off = U.applyUpdate(store, c, input, r, { settings: settings() });
+  assert.equal(off.debriefs, undefined);
+  const none = U.applyUpdate(store, c, plain, r, { settings: settings(), debrief: true });
+  assert.equal(none.debriefs, undefined);
+  // 다시 읽기(only)에서는 받지 않는다
+  const only = U.applyUpdate(store, c, input, r, { settings: settings(), debrief: true, only: ['쟈알디'], keepRead: true });
+  assert.equal(only.debriefs, undefined);
+});

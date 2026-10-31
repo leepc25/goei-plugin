@@ -6,6 +6,8 @@ import { setUnsent } from '../../core/dispatch';
 import { assetUrl, facePic, mainPic, splitPic } from '../assets';
 import { loadContext, updateChat, type CharacterSnapshot } from '../risu';
 import { isWaiting } from '../waiting';
+import { lastStatusFields } from '../../core/world/tags';
+import { statusClockMinute } from '../../core/world/status';
 
 let lastChar: CharacterSnapshot | null = null;
 
@@ -13,7 +15,10 @@ export async function readCard(): Promise<CardSnapshot | null> {
   const ctx = await loadContext().catch(() => null);
   if (!ctx) return null;
   lastChar = ctx.char;
-  return cardSnapshot(ctx.char, ctx.chat, { main: (r) => mainPic(ctx.char, r), face: (r) => facePic(ctx.char, r, true) });
+  const snap = cardSnapshot(ctx.char, ctx.chat, { main: (r) => mainPic(ctx.char, r), face: (r) => facePic(ctx.char, r, true) });
+  // 세계 시각이 없으면(상황판 꺼짐·시작 전) 마지막 상태줄 시각으로 필드 시계를 시작한다 (field.entry 와 같은 규칙)
+  if (snap.minute == null) snap.minute = statusClockMinute(lastStatusFields(((ctx.chat.message ?? []) as { role?: string; data?: string }[]).filter((m) => m.role === 'char').slice(-6).map((m) => String(m.data ?? ''))));
+  return snap;
 }
 
 /** 요원 사진 주소. 「#틀」은 떼고 그림 전체를 준다 */

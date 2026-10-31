@@ -330,9 +330,14 @@ export function protectedPost(s: GnetSettings, p: GPost): boolean {
   return s.keepReplied && p.comments.some((c) => c.mine);
 }
 
+/**
+ * 상한은 보호하지 않은 글에만 센다 (보호한 글은 그 위에 얹힘). 예전엔 전체 수로 세서, 보호한 내 글이 상한(5~9)만큼 쌓이면
+ * 새로고침마다 받은 새 글이 전부 잘려 게시판이 영영 안 바뀌었다 (QC 2026-10-28)
+ */
 export function trimBoard(st: GState, s: GnetSettings): void {
   const cap = postLimit(s);
-  while (st.posts.length > cap) {
+  const open = () => st.posts.filter((p) => !protectedPost(s, p)).length;
+  while (open() > cap) {
     let idx = -1;
     for (let i = st.posts.length - 1; i >= 0; i--) {
       if (!protectedPost(s, st.posts[i])) {

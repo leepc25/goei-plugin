@@ -40,7 +40,7 @@ export function sceneFactionCodes(store: PeopleStore, people: string[], texts: s
 
 /** 본편에 넣을 세력 절: 중립은 생략. 비어 있으면 '' */
 export function factionsBlock(list: FactionNow[], user = '{{user}}'): string {
-  const lines = list.filter((f) => f.stage.id !== 'neutral').map((f) => `- ${f.name} → ${user}: ${f.stage.behavior.replace(/\{\{user\}\}/g, user)}`);
+  const lines = list.filter((f) => f.stage.id !== 'neutral').map((f) => `- ${f.name} → ${user}: ${f.stage.behavior.replace(/\{\{user\}\}/g, () => user)}`);
   if (!lines.length) return '';
   return ['## Factions → ' + user + ' (standing of each organization toward ' + user + ', kept by the system; members act accordingly)', ...lines].join('\n');
 }

@@ -125,6 +125,22 @@ export function statusMinute(date: string, time: string): number | null {
   return Number.isFinite(ms) ? Math.floor(ms / 60000) : null;
 }
 
+/** 상황판(세계 시뮬)이 꺼져 있거나 아직 시작 전이라 세계 시각이 없을 때: 마지막 상태줄 [▣] 의 날짜·시각 (오전·오후 포함).
+ *  날짜가 없으면 그날의 분만. 예전에는 「10:20」 숫자만 읽어 「02:47 PM」을 2시 47분으로 읽었고, 게임 시계(card())는 아예 읽지 않아
+ *  상황판을 끈 채팅에서 필드 시계가 --:-- 로 멈춰 있었다 (QC 2026-10-28) */
+export function statusClockMinute(st: { date?: string; time?: string } | null): number | null {
+  if (!st?.time) return null;
+  const abs = statusMinute(st.date ?? '', st.time);
+  if (abs !== null) return abs;
+  const t = /(\d{1,2})\s*[:시]\s*(\d{1,2})?/.exec(st.time);
+  if (!t) return null;
+  let h = Number(t[1]);
+  const m = t[2] ? Number(t[2]) : 0;
+  if (/PM|p\.m\.|오후/i.test(st.time) && h < 12) h += 12;
+  if (/AM|a\.m\.|오전/i.test(st.time) && h === 12) h = 0;
+  return h > 23 || m > 59 ? null : h * 60 + m;
+}
+
 const DAY_MIN = 1440;
 
 /** 「오늘 오전 10:00」·「어제 오후 9:10」·「3월 12일 오후 9:10」 (지금 장면 기준) */

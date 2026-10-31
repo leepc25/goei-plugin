@@ -122,8 +122,11 @@ function renamed(current: LoreEntry[], incoming: LoreEntry[]): LoreEntry[] {
   const target = incoming.find((e) => e.comment === DIRECTORY_COMMENT);
   const hasNew = current.some((e) => e.comment === DIRECTORY_COMMENT);
   const keepNames = new Set(incoming.map((e) => e.comment));
+  // 자리 항목(📚Lore slot, 0.16.x 카드)은 카드가 낸 것이라 「직접 넣은 항목」이 아니다. 새 카드에 없으면 뺀다 (QC 2026-10-28:
+  // 남겨 두면 업데이트한 카드가 계속 옛 경로(채팅 변수로 자리 채우기)로 돌고 로어북 목록에 쓸모없는 항목 4개가 남는다)
+  const retired = (e: LoreEntry) => RETIRED.includes(String(e.comment ?? '')) || String(e.comment ?? '').startsWith('📚Lore slot');
   return current
-    .filter((e) => !RETIRED.includes(String(e.comment ?? '')) || keepNames.has(e.comment))
+    .filter((e) => !retired(e) || keepNames.has(e.comment))
     .filter((e) => !(hasNew && e.comment === OLD_DIRECTORY))
     .map((e) => (e.comment === OLD_DIRECTORY && target ? { ...e, comment: DIRECTORY_COMMENT, folder: (target as { folder?: string }).folder } : e))
     .filter((e, i, all) => !isDirectory(e.comment) || all.findIndex((x) => isDirectory(x.comment)) === i);

@@ -7,11 +7,17 @@ import type { GameViewport } from '../../game/bridge';
 export interface ViewportCtl extends GameViewport {
   /** 게임 중: 브라우저 전체화면은 묻지 않고 창(iframe) 전체를 덮는다. 세로로 든 폰이면 돌려 보인다 */
   fill(on: boolean): void;
+  /** 폰 필드 (모바일 조작 설계 2026-10-28: 폰이면 무조건 가로 전체화면): 안드로이드 = 브라우저 전체화면 + 가로 고정,
+   *  막히거나 아이폰 = 창 전체 덮기 + 세로면 게임을 90도 돌림. 사용자 손짓(들어가기 누름) 안에서 불러야 전체화면이 된다 */
+  phoneFull(on: boolean): Promise<void>;
+  /** 폰 필드 중인가 */
+  readonly phone: boolean;
   dispose(): void;
 }
 
 const portrait = () => innerHeight > innerWidth;
-const phone = () => Math.min(innerWidth, innerHeight) <= 560 || matchMedia('(pointer: coarse)').matches;
+/** 폰 판정: 손가락 기기이거나 짧은 변이 560px 이하 (game.ts 「들어가기」도 이것으로 고른다) */
+export const phone = () => Math.min(innerWidth, innerHeight) <= 560 || (typeof matchMedia !== 'undefined' && matchMedia('(pointer: coarse)').matches);
 
 export function makeViewport(layer: HTMLElement, opt: { inFrame?: boolean } = {}): ViewportCtl {
   let full = false;
@@ -22,12 +28,14 @@ export function makeViewport(layer: HTMLElement, opt: { inFrame?: boolean } = {}
   let rotated = false;
   /** 사용자가 돌려 보기를 원하는가 (전체화면을 누르면 켜진다) */
   let wantRotate = false;
+  /** 폰 필드 중 (창 틀 안이어도 돌린다) */
+  let phoneOn = false;
   const subs = new Set<() => void>();
   const emit = () => subs.forEach((f) => f());
 
   const apply = () => {
-    // 창 틀 안에서 돌릴 때는 돌려 보이지 않는다 (틀 크기 그대로)
-    const rot = !opt.inFrame && wantRotate && full && portrait() && phone();
+    // 창 틀 안에서 돌릴 때는 돌려 보이지 않는다 (틀 크기 그대로). 폰 필드는 창 틀 안이어도 창 전체를 덮고 돌린다
+    const rot = (!opt.inFrame || phoneOn) && wantRotate && full && portrait() && phone();
     if (rot !== rotated) rotated = rot;
     layer.classList.toggle('gx-full', full);
     layer.classList.toggle('gx-panelfull', mode === 'panel');
@@ -40,6 +48,12 @@ export function makeViewport(layer: HTMLElement, opt: { inFrame?: boolean } = {}
   const onFs = () => {
     // 브라우저 전체화면에서 사용자가 뒤로 가기·Esc로 나오면 창 안 전체화면도 푼다
     if (!document.fullscreenElement && layer.dataset.nativeFs === '1') {
+      // 폰 필드: 뒤로 가기로 전체화면만 풀리면 창 전체 덮기로 남는다 (나가는 길은 메뉴)
+      if (phoneOn) {
+        delete layer.dataset.nativeFs;
+        winFill = true;
+        return apply();
+      }
       if (mode === 'browser') mode = null;
       full = opt.inFrame ? full : false;
       wantRotate = false;
@@ -61,6 +75,14 @@ export function makeViewport(layer: HTMLElement, opt: { inFrame?: boolean } = {}
     },
     get mode() {
       return mode;
+    },
+    get phone() {
+      return phoneOn;
+    },
+    async phoneFull(on) {
+      if (!on) return vp.exit();
+      phoneOn = true;
+      await vp.enter('browser');
     },
     async enter(kind = 'browser') {
       full = true;
@@ -98,7 +120,8 @@ export function makeViewport(layer: HTMLElement, opt: { inFrame?: boolean } = {}
     },
     async exit() {
       // 필드 게임 중(창 틀 안)에는 틀 채우기는 그대로 두고 전체화면만 푼다
-      full = opt.inFrame && mode !== null ? full : false;
+      full = opt.inFrame && mode !== null && !phoneOn ? full : false;
+      phoneOn = false;
       mode = null;
       winFill = false;
       wantRotate = false;

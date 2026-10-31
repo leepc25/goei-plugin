@@ -9,7 +9,7 @@ import { orgOf } from '../../core/world/directory';
 import { FIELDS, WORLD_KIND_LABEL, type FieldDef, type WorldKind } from '../../core/world/schema';
 import { tokens } from '../../core/gnet';
 import type { ChatContext } from '../../host/risu';
-import { agentPanel, appendixPanel, directoryDraft, orgPanel, placePanel } from '../directory';
+import { agentPanel, appendixPanel, directoryDraft, directoryExtList, dirUi, loreSourceOf, orgPanel, placePanel } from '../directory';
 import { ICONS } from '../icons';
 import { edUi, overridesOf, setOverrides } from './index';
 
@@ -67,7 +67,10 @@ function rowsOf(ctx: ChatContext, kind: WorldKind, over: WorldOverrides): { name
     const sub =
       kind === 'agent' ? d.agents.find((a) => a.lore === name)?.english ?? '' : kind === 'org' ? d.orgs.find((o) => o.name === name)?.spec.english ?? '' : (d.anomalies.find((p) => p.lore === name) ?? d.sites.find((p) => p.lore === name))?.english ?? '';
     const state = bucket[name]?.deleted ? 'deleted' : !isDefaultRecord(kind, name) ? 'new' : bucket[name] ? 'edited' : 'default';
-    return { name, sub: sub || (rec ? '' : '로어 칸 없음'), state, preset: presetOf(d, kind, name) };
+    // 괴이·파밍 폴더 밖 로어북을 발생 후보로 넣은 줄: 출처 폴더를 보여 준다 (명부의 「다른 폴더에서 온 후보」, 사용자 2026-10-21)
+    const place = kind === 'anomaly' || kind === 'site' ? (kind === 'anomaly' ? d.anomalies : d.sites).find((p) => p.lore === name) : undefined;
+    const outside = place && !place.inFolder ? `다른 폴더에서 온 후보${loreSourceOf(ctx, name) ? ` · ${loreSourceOf(ctx, name)}` : ''}` : '';
+    return { name, sub: [sub, outside].filter(Boolean).join(' · ') || (rec ? '' : '로어 칸 없음'), state, preset: presetOf(d, kind, name) };
   });
 }
 
@@ -105,7 +108,7 @@ function fieldRow(kind: WorldKind, rec: WorldRecord, def: FieldDef, name: string
   const ph = recUi.variant ? '비우면 기본 글' : auto ? `자동: ${auto}` : '';
   const ctl = def.type === 'line'
     ? `<input data-input="ed-field" data-key="${esc(key)}" value="${esc(v)}" autocomplete="off" placeholder="${esc(ph)}">`
-    : `<textarea data-input="ed-field" data-key="${esc(key)}" rows="3" placeholder="${esc(ph)}">${esc(v)}</textarea>`;
+    : `<textarea data-input="ed-field" data-key="${esc(key)}" rows="3" placeholder="${esc(ph)}">\n${esc(v)}</textarea>`;
   return `<div class="gw-field" data-field-row="${esc(def.id)}" draggable="true">
     <div class="gw-field-head"><span class="gw-grip" title="끌어서 순서 바꾸기">${ICONS.grip}</span><b>${esc(def.label)}</b><small class="gw-ftitle">${esc(def.title)}</small>${def.hint ? `<span class="gw-fhint" title="${esc(def.hint)}">?</span>` : ''}<span class="gw-ftok">${tok ? `${tok}토큰` : ''}</span>
       <span class="gw-fmove"><button class="gx-mini icon" data-action="ed-field-up" data-value="${esc(def.id)}" aria-label="위로">${ICONS.up}</button><button class="gx-mini icon" data-action="ed-field-down" data-value="${esc(def.id)}" aria-label="아래로">${ICONS.down}</button></span></div>
@@ -118,7 +121,7 @@ function extraRow(kind: WorldKind, rec: WorldRecord, e: ExtraField, i: number, n
   const place = e.kind === 'line' ? `<small class="gw-ftitle">${e.sec === 'appearance' ? 'Appearance' : 'Identity'} 절 · 한 줄${e.at ? ` · ${esc(e.at)} 뒤` : ' · 맨 앞'}</small>` : '<small class="gw-ftitle">절</small>';
   const ctl = e.kind === 'line'
     ? `<input data-input="ed-extra" data-key="${esc(key)}" value="${esc(e.value)}" autocomplete="off">`
-    : `<textarea data-input="ed-extra" data-key="${esc(key)}" rows="3">${esc(e.value)}</textarea>`;
+    : `<textarea data-input="ed-extra" data-key="${esc(key)}" rows="3">\n${esc(e.value)}</textarea>`;
   return `<div class="gw-field extra" data-field-row="${esc(id)}" draggable="${e.kind === 'block'}">
     <div class="gw-field-head"><span class="gw-grip">${e.kind === 'block' ? ICONS.grip : ''}</span><input class="gw-xname" data-input="ed-extra-name" data-key="${esc(key)}" value="${esc(e.name)}" aria-label="칸 이름">${place}<span class="gw-ftok">${tokens(e.value) ? `${tokens(e.value)}토큰` : ''}</span>
       <span class="gw-fmove">${e.kind === 'block' ? `<button class="gx-mini icon" data-action="ed-field-up" data-value="${esc(id)}" aria-label="위로">${ICONS.up}</button><button class="gx-mini icon" data-action="ed-field-down" data-value="${esc(id)}" aria-label="아래로">${ICONS.down}</button>` : ''}<button class="gx-mini icon danger" data-action="ed-extra-del" data-value="${i}" aria-label="칸 지우기">${ICONS.trash}</button></span></div>
@@ -142,9 +145,12 @@ export function recordPage(ctx: ChatContext, kind: WorldKind, over: WorldOverrid
   const pick = `<select class="gw-list-pick" data-change="ed-sel" aria-label="${WORLD_KIND_LABEL[kind]} 고르기">${rowsOf(ctx, kind, over)
     .map((r) => `<option value="${esc(r.name)}"${r.name === sel ? ' selected' : ''}>${esc(r.name)}${r.sub ? ` · ${esc(r.sub)}` : ''}${r.state === 'deleted' ? ' (지움)' : r.state === 'new' ? ' (추가)' : r.state === 'edited' ? ' (고침)' : ''}</option>`)
     .join('')}</select>`;
+  // 괴이·파밍: 다른 폴더의 로어북을 발생 후보로 넣는 칸 (예전 명부 「후보 추가」. 2026-10-27 명부를 기록 화면에 합치며 빠졌던 것, 2026-10-28 QC 되살림)
+  const ext = kind === 'anomaly' || kind === 'site';
   const list = `<aside class="gw-list-pane">
     <div class="gw-list-tools">${pick}<input class="dir-search" type="search" data-input="ed-q" value="${esc(q)}" placeholder="${WORLD_KIND_LABEL[kind]} 검색" aria-label="검색">
-      <button class="gx-mini" data-action="ed-add-toggle" aria-expanded="${recUi.adding}">${ICONS.plus}추가</button></div>
+      <button class="gx-mini" data-action="ed-add-toggle" aria-expanded="${recUi.adding}">${ICONS.plus}추가</button>${ext ? `<button class="gx-mini${dirUi.adding ? ' on' : ''}" data-action="dir-add-toggle" aria-expanded="${dirUi.adding}" title="다른 폴더의 로어북을 발생 후보로">${ICONS.plus}폴더 밖</button>` : ''}</div>
+    ${ext && dirUi.adding ? `<div class="gw-add dir-ext"><input class="gx-search" data-input="dir-ext-q" value="${esc(dirUi.addQ)}" placeholder="다른 폴더의 로어북 이름·폴더 검색" aria-label="후보로 넣을 로어북 검색" autocomplete="off"><div class="dir-ext-list">${directoryExtList(ctx)}</div></div>` : ''}
     ${recUi.adding ? `<div class="gw-add"><input name="ed-new-name" placeholder="새 ${WORLD_KIND_LABEL[kind]} 이름 (한글)" data-enter="ed-add" autocomplete="off"><button class="gx-mini" data-action="ed-add" data-take="ed-new-name">만들기</button>
       <p class="gx-muted">${kind === 'agent' ? '요원은 만든 뒤 「기본 정보」에서 영문명·소속·부서를 채워요. 영문명은 그림 에셋 이름과 같아야 해요.' : kind === 'org' ? '조직은 만든 뒤 「기본 정보」에서 영문명·코드를 정해요.' : '만든 뒤 기본 정보에서 영문명·별칭을 채워요.'}</p></div>` : ''}
     ${kind === 'anomaly' ? anomalyNoteBox(over) : ''}
@@ -248,8 +254,11 @@ export function recordInput(name: string, key: string, value: string, ctx: ChatC
     setOverrides(next);
     return true;
   }
+  // 기록 칸 입력만. 다른 글칸(지침 절 `GNet|0` 등)의 열쇠를 종류|이름으로 읽으면 없는 종류로 worldRecords 가 터져 그 뒤 처리기(지침 초안)까지 막혔다 (QC 2026-10-28)
+  if (name !== 'ed-field' && name !== 'ed-extra' && name !== 'ed-extra-name') return false;
   const [kind, recName, id] = key.split('|') as [WorldKind, string, string];
-  if (!kind || !recName) return false;
+  // 기록 종류가 아닌 키(지침 절 「RP|3」 등)는 내 것이 아니다 (2026-10-28 QC: 지침 글칸 입력이 여기서 터져 지침 편집이 통째로 안 됐다)
+  if (!(kind in FIELDS) || !recName) return false;
   const over = overridesOf(ctx);
   const rec = structuredClone(worldRecord(kind, recName, over) ?? emptyRecord());
   if (name === 'ed-field') {

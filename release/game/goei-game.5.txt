@@ -1,1305 +1,4 @@
-    energy: (g2) => {
-      rect(g2, C2.special, 10, 6, 12, 22);
-      rect(g2, C2.metal, 10, 4, 12, 3);
-      poly(g2, C2.cash, [17, 9, 12, 18, 16, 18, 14, 25, 20, 15, 16, 15]);
-    },
-    adrenaline: (g2) => {
-      rect(g2, C2.white, 6, 14, 18, 5);
-      rect(g2, C2.red, 9, 15, 10, 3);
-      rect(g2, C2.metal, 24, 15, 6, 2);
-      rect(g2, C2.dark, 3, 12, 3, 9);
-    },
-    // 임시 무기: 한 손 근접 묶음
-    pipe: (g2) => line(g2, C2.metal, 5, [6, 26, 26, 6]),
-    chairleg: (g2) => {
-      line(g2, C2.wood, 6, [8, 26, 24, 8]);
-      rect(g2, C2.dark, 21, 4, 7, 7);
-    },
-    kitchenknife: (g2) => {
-      poly(g2, C2.white, [6, 26, 22, 8, 26, 6, 24, 12, 10, 28]);
-      line(g2, C2.dark, 4, [6, 26, 2, 30]);
-    },
-    katana: (g2) => {
-      line(g2, "#2a2f33", 3, [5, 27, 28, 4]);
-      line(g2, C2.white, 1, [9, 22, 27, 5]);
-      rect(g2, C2.gold, 7, 22, 6, 3);
-    },
-    // 총 묶음
-    smg: (g2) => {
-      rect(g2, C2.dark, 4, 11, 22, 7);
-      rect(g2, C2.dark, 10, 18, 5, 9);
-      rect(g2, C2.metal, 17, 18, 3, 7);
-      rect(g2, C2.metal, 26, 13, 4, 3);
-    },
-    servicepistol: (g2) => {
-      rect(g2, C2.dark, 7, 10, 18, 6);
-      poly(g2, C2.dark, [9, 16, 15, 16, 13, 26, 7, 26]);
-      rect(g2, C2.metal, 25, 11, 3, 3);
-    },
-    shotgun: (g2) => {
-      rect(g2, C2.metal, 8, 12, 22, 4);
-      rect(g2, C2.wood, 2, 13, 10, 6);
-      rect(g2, C2.dark, 14, 16, 8, 4);
-    },
-    // 바닥에 떨어지는 것
-    cash: (g2) => {
-      rect(g2, "#7aa35a", 4, 10, 20, 12);
-      circ(g2, C2.cash, 22, 20, 7);
-      circ(g2, "#b9a23c", 22, 20, 4);
-    },
-    shard: (g2) => poly(g2, C2.shard, [16, 3, 24, 14, 18, 29, 9, 17]),
-    heal: (g2) => {
-      circ(g2, C2.heal, 16, 16, 10);
-      rect(g2, C2.white, 14, 10, 4, 12);
-      rect(g2, C2.white, 10, 14, 12, 4);
-    },
-    "ammo-pistol": (g2) => {
-      for (const x of [8, 14, 20]) {
-        rect(g2, C2.gold, x, 12, 4, 14);
-        rect(g2, C2.metal, x, 8, 4, 4);
-      }
-    },
-    "ammo-rifle": (g2) => {
-      rect(g2, C2.dark, 10, 6, 12, 22);
-      rect(g2, C2.gold, 12, 3, 8, 4);
-    },
-    // 회수물
-    scrap: (g2) => {
-      poly(g2, C2.metal, [6, 22, 12, 8, 22, 10, 26, 24, 14, 27]);
-      circ(g2, C2.dark, 15, 17, 3);
-    },
-    oddcoin: (g2) => {
-      circ(g2, C2.gold, 16, 16, 11);
-      circ(g2, "#a38a2c", 16, 16, 7);
-      rect(g2, C2.gold, 14, 11, 4, 10);
-    },
-    rustkey: (g2) => {
-      circ(g2, "#a0603a", 10, 12, 6);
-      circ(g2, "#2b2f33", 10, 12, 2);
-      rect(g2, "#a0603a", 14, 11, 14, 3);
-      rect(g2, "#a0603a", 22, 14, 3, 5);
-    },
-    photo: (g2) => {
-      rect(g2, C2.white, 6, 5, 20, 22);
-      rect(g2, "#6b7378", 8, 7, 16, 14);
-      circ(g2, "#d0d4d6", 16, 13, 4);
-    },
-    tooth: (g2) => poly(g2, C2.white, [9, 6, 23, 6, 24, 14, 20, 28, 17, 18, 15, 18, 12, 28, 8, 14]),
-    dreamcatcher: (g2) => {
-      line(g2, C2.shard, 2, [16, 4, 16, 4]);
-      g2.strokeStyle = C2.shard;
-      g2.lineWidth = 2;
-      g2.beginPath();
-      g2.arc(16, 14, 9, 0, Math.PI * 2);
-      g2.stroke();
-      line(g2, C2.white, 1, [9, 9, 23, 19]);
-      line(g2, C2.white, 1, [9, 19, 23, 9]);
-      line(g2, C2.shard, 2, [12, 23, 11, 30]);
-      line(g2, C2.shard, 2, [20, 23, 21, 30]);
-    },
-    blackbox: (g2) => {
-      rect(g2, "#25292c", 5, 8, 22, 18);
-      rect(g2, C2.throw, 5, 8, 22, 4);
-      circ(g2, C2.red, 22, 20, 2);
-    },
-    // 환경 물건
-    chair: (g2) => {
-      rect(g2, C2.wood, 9, 4, 4, 22);
-      rect(g2, C2.wood, 9, 15, 15, 4);
-      rect(g2, C2.wood, 21, 15, 3, 13);
-      rect(g2, C2.wood, 9, 26, 3, 3);
-    },
-    pot: (g2) => {
-      poly(g2, "#b0653d", [9, 16, 23, 16, 21, 29, 11, 29]);
-      circ(g2, C2.heal, 16, 11, 6);
-    },
-    extinguisher: (g2) => {
-      rect(g2, C2.red, 11, 9, 10, 20);
-      rect(g2, C2.dark, 13, 5, 6, 4);
-      line(g2, C2.dark, 2, [19, 6, 25, 10, 25, 18]);
-    },
-    tv: (g2) => {
-      rect(g2, "#55595d", 4, 7, 24, 18);
-      rect(g2, "#7fa0a8", 7, 10, 18, 12);
-      line(g2, C2.dark, 2, [12, 7, 9, 2]);
-      line(g2, C2.dark, 2, [20, 7, 23, 2]);
-    },
-    table: (g2) => {
-      rect(g2, C2.wood, 3, 13, 26, 5);
-      rect(g2, C2.wood, 6, 18, 3, 8);
-      rect(g2, C2.wood, 23, 18, 3, 8);
-    },
-    bin: (g2) => {
-      poly(g2, C2.metal, [8, 9, 24, 9, 22, 29, 10, 29]);
-      rect(g2, C2.dark, 7, 6, 18, 3);
-    },
-    crate: (g2) => {
-      rect(g2, C2.wood, 5, 6, 22, 22);
-      line(g2, "#7a5a3a", 2, [5, 6, 27, 28]);
-      line(g2, "#7a5a3a", 2, [27, 6, 5, 28]);
-    },
-    drawer: (g2) => {
-      rect(g2, C2.wood, 6, 4, 20, 25);
-      for (const y of [7, 15, 23]) rect(g2, "#7a5a3a", 8, y, 16, 5);
-    },
-    mailbox: (g2) => {
-      rect(g2, C2.metal, 5, 5, 22, 22);
-      for (const x of [7, 17]) for (const y of [7, 16]) rect(g2, C2.dark, x, y, 8, 3);
-    },
-    barrel: (g2) => {
-      rect(g2, C2.red, 9, 5, 14, 23);
-      rect(g2, C2.dark, 9, 10, 14, 2);
-      rect(g2, C2.dark, 9, 21, 14, 2);
-      poly(g2, C2.cash, [16, 13, 19, 19, 13, 19]);
-    },
-    locker: (g2) => {
-      rect(g2, "#5d7a6b", 8, 3, 16, 26);
-      rect(g2, C2.white, 12, 7, 8, 4);
-      rect(g2, C2.dark, 20, 15, 2, 5);
-    },
-    crackedwall: (g2) => {
-      rect(g2, "#6e6a64", 3, 3, 26, 26);
-      line(g2, "#2b2a28", 2, [16, 3, 13, 12, 18, 17, 14, 29]);
-      line(g2, "#2b2a28", 1, [13, 12, 7, 15]);
-    },
-    // 상인
-    madeokhee: (g2) => {
-      rect(g2, C2.cash, 6, 12, 20, 14);
-      circ(g2, C2.dark, 16, 19, 3);
-      rect(g2, C2.dark, 12, 7, 8, 5);
-    },
-    backalley: (g2) => {
-      rect(g2, C2.white, 6, 6, 20, 20);
-      rect(g2, C2.red, 14, 9, 4, 14);
-      rect(g2, C2.red, 9, 14, 14, 4);
-    },
-    shinyuri: (g2) => {
-      rect(g2, "#7aa35a", 5, 9, 22, 14);
-      rect(g2, "#5b8040", 5, 13, 22, 3);
-      circ(g2, C2.white, 16, 16, 3);
-    },
-    vending: (g2) => {
-      rect(g2, "#4b6c8f", 7, 3, 18, 26);
-      rect(g2, "#9fc1df", 9, 6, 10, 14);
-      rect(g2, C2.dark, 21, 8, 2, 6);
-      rect(g2, C2.dark, 10, 23, 12, 3);
-    }
-  };
-  var thinImgs = /* @__PURE__ */ new Map();
-  function drawItemIcon(ctx, id, x, y, size2) {
-    const all = typeof window !== "undefined" ? window.__GOEI_ITEM_ART__ : void 0;
-    const a = all?.[id];
-    if (a && a.w > a.h * 2.2 && size2 <= 72 && a.src) {
-      const src = a.src;
-      let im = thinImgs.get(src);
-      if (!im) thinImgs.set(src, im = Object.assign(new Image(), { src }));
-      if (!im.complete || !im.naturalWidth) {
-        im.addEventListener("load", () => drawItemIcon(ctx, id, x, y, size2), { once: true });
-        return;
-      }
-      const k = size2 * 1.3 / a.w;
-      ctx.save();
-      ctx.imageSmoothingEnabled = false;
-      ctx.translate(x + size2 / 2, y + size2 / 2);
-      ctx.rotate(-Math.PI / 4);
-      ctx.drawImage(im, -a.w * k / 2, -a.h * k / 2, a.w * k, a.h * k);
-      ctx.restore();
-      return;
-    }
-    if (drawItemArt(ctx, id, x, y, size2)) return;
-    if (a) {
-      const src = a.src;
-      if (src) {
-        const im = new Image();
-        im.onload = () => drawItemIcon(ctx, id, x, y, size2);
-        im.src = src;
-      }
-      return;
-    }
-    const d3 = ICONS2[id];
-    if (!d3) return;
-    ctx.save();
-    ctx.translate(x, y);
-    ctx.scale(size2 / 32, size2 / 32);
-    d3(ctx);
-    ctx.restore();
-  }
-
-  // src/game/action/items/engine.ts
-  var TICK = 30;
-  var react = (knockdown, kb) => knockdown ? "down" : kb >= 140 ? "stagger" : "flinch";
-  function itemHit(e, sourceX) {
-    return {
-      attackId: newAttackId(),
-      x0: e.x,
-      x1: e.x,
-      z0: 0,
-      z1: 0,
-      y: e.y,
-      dmg: e.damage,
-      react: react(e.knockdown, e.knockback),
-      dir: e.x < sourceX ? -1 : 1,
-      push: e.knockback / TICK,
-      armorBreak: e.armorBreak
-    };
-  }
-  function toGameEvents(events, x, ammo = 0) {
-    const out = [];
-    for (const e of events) {
-      switch (e.t) {
-        case "pickup":
-          out.push({ type: e.kind === "heal" ? "heal" : "pickup", x: e.x, id: e.ref ?? e.kind });
-          break;
-        case "equip":
-          out.push({ type: "pickup", x, id: e.weapon });
-          break;
-        case "lift":
-          out.push({ type: "pickup", x, id: e.prop });
-          break;
-        case "use":
-          out.push({ type: e.effect.type === "heal" || e.effect.type === "cure" ? "heal" : "item", x, id: e.id });
-          break;
-        case "shot":
-          out.push({ type: "shot", x: e.x, ammo });
-          break;
-        case "dry":
-          out.push({ type: "empty", x });
-          break;
-        case "reload":
-          out.push({ type: "reload", x });
-          break;
-        case "throw":
-          out.push({ type: "whiff", x });
-          break;
-        case "break":
-        case "burst":
-        case "weaponBreak":
-        case "full":
-        case "drop":
-          out.push({ type: "custom", name: "item:" + e.t, data: e });
-          break;
-      }
-    }
-    return out;
-  }
-
-  // src/game/action/items/link.ts
-  var ENEMY_WEAPONS = {
-    fb_smg: { p: 0.3, pool: ["smg"] },
-    fb_sword: { p: 0.5, pool: ["katana"] },
-    fb_chief: { p: 0.35, pool: ["servicepistol", "shotgun"] },
-    fb_shield: { p: 0.2, pool: ["pipe"] },
-    dd_member: { p: 0.1, pool: ["kitchenknife"] }
-  };
-  var COMMON_RELICS = ["scrap", "oddcoin", "tooth", "photo"];
-  function spawnEnemyDrops(field, run, drops, x, y, kind = "") {
-    const ev = [];
-    const put3 = (k, ref, amount = 1) => {
-      spawnPickup(field, k, x, y, ref, amount);
-      ev.push({ t: "drop", kind: k, ref, x, y });
-    };
-    for (const d3 of drops) {
-      if (!Number.isSafeInteger(d3.n) || d3.n <= 0) continue;
-      switch (d3.item) {
-        case "cash": {
-          const parts = Math.min(4, Math.max(1, Math.ceil(d3.n / 10)));
-          let left = d3.n;
-          for (let i = 0; i < parts; i++) {
-            const k = i === parts - 1 ? left : Math.ceil(d3.n / parts);
-            left -= k;
-            if (k > 0) put3("cash", void 0, k);
-          }
-          break;
-        }
-        case "shard":
-          for (let i = 0; i < d3.n; i++) put3("shard");
-          break;
-        case "heal":
-          for (let i = 0; i < d3.n; i++) put3("heal");
-          break;
-        case "ammo":
-          if (usesAmmo(run)) for (let i = 0; i < d3.n; i++) put3("ammo");
-          else put3("cash", void 0, 4 * d3.n);
-          break;
-        case "relic":
-          for (let i = 0; i < d3.n; i++) put3("relic", COMMON_RELICS[Math.floor(rand(field) * COMMON_RELICS.length)]);
-          break;
-        case "dream":
-          for (let i = 0; i < d3.n; i++) put3("relic", "dreamcatcher");
-          break;
-        case "key":
-          for (let i = 0; i < d3.n; i++) put3("relic", "rustkey");
-          break;
-      }
-    }
-    if (usesAmmo(run) && run.mag + run.reserve < 8 && rand(field) < 0.25) put3("ammo");
-    const w = ENEMY_WEAPONS[kind];
-    if (w && rand(field) < w.p) put3("weapon", w.pool[Math.floor(rand(field) * w.pool.length)]);
-    return ev;
-  }
-  function strikeProps(field, run, hits, seen2, targets = []) {
-    const ev = [];
-    if (!hits.length) return ev;
-    for (const e of field.ents.slice()) {
-      if (e.type !== "prop" || !field.ents.includes(e)) continue;
-      const d3 = PROPS[e.prop];
-      if (d3.use === "throw") continue;
-      for (const h of hits) {
-        const key2 = h.attackId + ":" + e.id;
-        if (seen2.has(key2)) continue;
-        if (h.x1 < e.x - d3.w / 2 || h.x0 > e.x + d3.w / 2 || h.z0 > d3.h + 110 || h.z1 < 0 || Math.abs(h.y - e.y) > (h.dy ?? 18) + 24) continue;
-        seen2.add(key2);
-        ev.push(...damageProp(field, run, e, Math.max(6, h.dmg), targets));
-        break;
-      }
-    }
-    if (seen2.size > 400) seen2.clear();
-    return ev;
-  }
-  function furnishFloor(field, floor, lane, r = () => rand(field)) {
-    const pick7 = (a) => a[Math.floor(r() * a.length)];
-    const end = Number.isFinite(floor.exitX) ? floor.exitX : floor.length - 80;
-    const x0 = (floor.startX ?? 200) + 260, x1 = Math.max(x0 + 200, Math.min(end, floor.length - 80) - 160);
-    const taken = (floor.props ?? []).map((p) => [p.x - (p.w ?? 40) / 2 - 60, p.x + (p.w ?? 40) / 2 + 60]);
-    const spot = () => {
-      for (let i = 0; i < 12; i++) {
-        const x = x0 + r() * (x1 - x0);
-        if (!taken.some(([a, b]) => x > a && x < b)) {
-          taken.push([x - 90, x + 90]);
-          return x;
-        }
-      }
-      return null;
-    };
-    const front = lane[1] - 20, back = lane[0] + 10;
-    const put3 = (id, y) => {
-      const x = spot();
-      if (x !== null) placeProp(field, id, x, y);
-    };
-    put3(pick7(["chair", "bin", "pot"]), front - r() * 40);
-    put3(pick7(["tv", "extinguisher", "table", "chair"]), front - 20 - r() * 40);
-    put3(pick7(["crate", "crate", "drawer", "mailbox"]), back);
-    put3(pick7(["barrel", "locker", "crate"]), back + r() * 20);
-    const wx = spot();
-    if (wx !== null) {
-      const p = spawnPickup(field, "weapon", wx, (lane[0] + lane[1]) / 2, pick7(Object.keys(WEAPONS).filter((id) => id !== "katana" && id !== "smg")));
-      Object.assign(p, { vx: 0, vy: 0, vz: 0, z: 0 });
-    }
-  }
-
-  // src/game/action/items/shopPanel.ts
-  var CSS = `
-.gi-shop{position:absolute;inset:0;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;z-index:30;padding:12px;box-sizing:border-box;pointer-events:auto;font-family:system-ui,-apple-system,'Apple SD Gothic Neo','Malgun Gothic',sans-serif;color:#e8ecee}
-.gi-shop[hidden]{display:none}
-.gi-shop .panel{background:#1b2226;border:1px solid #3a464d;border-radius:14px;width:min(560px,100%);max-height:100%;overflow:auto;padding:14px 16px;box-sizing:border-box}
-.gi-shop header{display:flex;align-items:center;gap:10px}
-.gi-shop header div{display:flex;flex-direction:column}
-.gi-shop header small{color:#8a969c}
-.gi-shop .cash{margin-left:auto;color:#e6d36a;font-weight:700}
-.gi-shop .say{color:#cfd6da;margin:10px 0}
-.gi-shop h4{margin:14px 0 6px;color:#8a969c;font-size:13px}
-.gi-shop .row{display:flex;align-items:center;gap:10px;width:100%;text-align:left;background:#232d32;border:1px solid #33404a;border-radius:10px;color:inherit;font:inherit;padding:8px 10px;margin:0 0 6px;cursor:pointer}
-.gi-shop .row:disabled{opacity:.45;cursor:default}
-.gi-shop .row.sel{border-color:#e6d36a}
-.gi-shop .t{display:flex;flex-direction:column;flex:1;min-width:0}
-.gi-shop .t small{color:#8a969c;font-size:12px}
-.gi-shop .p{display:flex;flex-direction:column;align-items:flex-end;color:#e6d36a;font-weight:700;white-space:nowrap}
-.gi-shop .p small{color:#8a969c;font-weight:400;font-size:11px}
-.gi-shop .msg{min-height:20px;color:#9fd9a6;margin:8px 0}
-.gi-shop footer{display:flex;justify-content:flex-end}
-.gi-shop footer button{font:inherit;padding:8px 16px;border-radius:8px;border:1px solid #4a565d;background:#2c383e;color:#e8ecee;cursor:pointer}
-`;
-  var WHY = { cash: "현금이 모자라", stock: "품절", full: "1~4칸이 가득", ammoFull: "탄이 가득", loan: "빚부터 갚아" };
-  function createShopPanel(root) {
-    if (!document.getElementById("gi-shop-css")) {
-      const s2 = document.createElement("style");
-      s2.id = "gi-shop-css";
-      s2.textContent = CSS;
-      document.head.appendChild(s2);
-    }
-    const box2 = document.createElement("div");
-    box2.className = "gi-shop";
-    box2.hidden = true;
-    root.appendChild(box2);
-    let cur = null;
-    let sel = 0;
-    let msg = "";
-    const render = () => {
-      if (!cur) return;
-      const { shop, run } = cur;
-      const v = VENDORS[shop.vendor];
-      const icon2 = (o) => o.kind === "ammo" ? "ammo-" + o.ref : o.kind === "clinic" ? "backalley" : o.kind === "loan" ? "shinyuri" : o.kind === "gamble" ? "vending" : o.ref;
-      const rows = shop.offers.map(
-        (o) => `<button class="row" data-k="${o.key}" ${o.stock <= 0 ? "disabled" : ""}><canvas width="40" height="40" data-icon="${icon2(o)}"></canvas>
-        <span class="t"><b>${o.name}</b><small>${o.desc}</small></span>
-        <span class="p">${o.kind === "loan" ? "빌리기" : o.hpCost ? "체력 20%" : o.price + "원"}<small>${o.stock <= 0 ? "품절" : o.kind === "loan" ? "" : "남음 " + o.stock}</small></span></button>`
-      ).join("");
-      const bag = shop.buys ? `<h4>회수물 팔기</h4>${run.bag.map((b, i) => b ? `<button class="row" data-sell="${i}"><canvas width="40" height="40" data-icon="${b.id}"></canvas><span class="t"><b>${b.name}</b></span><span class="p">${sellPrice(shop, b.value)}원</span></button>` : "").join("") || '<p class="say">가방이 비었다</p>'}` : "";
-      box2.innerHTML = `<div class="panel"><header><canvas width="44" height="44" data-icon="${shop.vendor}"></canvas><div><b>${v.name}</b><small>${v.title}</small></div><span class="cash">현금 ${run.cash}${run.debt ? ` · 빚 ${run.debt}` : ""}</span></header>
-      <p class="say">「${shop.greet}」</p>${rows}${bag}<p class="msg">${msg}</p><footer><button data-close>나가기</button></footer></div>`;
-      box2.querySelectorAll("canvas[data-icon]").forEach((c) => drawItemIcon(c.getContext("2d"), c.dataset.icon, 0, 0, c.width));
-      const list = [...box2.querySelectorAll(".row")];
-      sel = Math.max(0, Math.min(sel, list.length - 1));
-      list[sel]?.classList.add("sel");
-    };
-    const press = (b) => {
-      if (!cur) return;
-      if (b.dataset.close !== void 0) return close();
-      if (b.dataset.sell !== void 0) {
-        msg = `${sell(cur.shop, cur.run, +b.dataset.sell)}원 받음`;
-        return render();
-      }
-      const k = b.dataset.k;
-      if (!k) return;
-      const r = buy2(cur.shop, cur.run, k, cur.context?.());
-      if (r.ok) {
-        cur.onBuy(r);
-        msg = `받음: ${r.got}`;
-      } else msg = r.message ?? (r.currency === "hp" ? "체력이 모자라거나 체력 거래를 사용할 수 없다" : WHY[r.why]);
-      render();
-    };
-    box2.addEventListener("click", (e) => {
-      const b = e.target.closest("button");
-      if (b) press(b);
-    });
-    const onKey = (e) => {
-      if (!cur) return;
-      e.stopImmediatePropagation();
-      e.preventDefault();
-      if (e.repeat) return;
-      const list = [...box2.querySelectorAll(".row")];
-      if (e.code === "Escape" || e.code === "KeyQ") close();
-      else if (e.code === "ArrowDown" || e.code === "ArrowUp") {
-        sel = (sel + (e.code === "ArrowDown" ? 1 : list.length - 1)) % Math.max(1, list.length);
-        render();
-        list[sel]?.scrollIntoView({ block: "nearest" });
-      } else if (["KeyA", "KeyE", "Enter", "Space"].includes(e.code) && list[sel] && !list[sel].disabled) press(list[sel]);
-    };
-    window.addEventListener("keydown", onKey, true);
-    function close() {
-      if (!cur) return;
-      const c = cur.onClose;
-      cur = null;
-      box2.hidden = true;
-      box2.innerHTML = "";
-      c?.();
-    }
-    return {
-      open(shop, run, onBuy, onClose, context) {
-        cur = { shop, run, onBuy, onClose, context };
-        sel = 0;
-        msg = "";
-        box2.hidden = false;
-        render();
-      },
-      close,
-      isOpen: () => !!cur,
-      dispose() {
-        window.removeEventListener("keydown", onKey, true);
-        box2.remove();
-      }
-    };
-  }
-
-  // src/game/action/enemy/debuff.ts
-  var DEBUFF_TEXT = {
-    bleed: "출혈 · 피가 멎지 않는다",
-    taint: "오염 · 숨이 탁해진다",
-    headache: "두통 · 머리가 울린다",
-    confuse: "혼란 · 방향이 뒤집힌다",
-    fear: "공포 · 몸이 굳는다",
-    slow: "느려졌다",
-    silence: "목소리가 안 나온다"
-  };
-  var seen = /* @__PURE__ */ new WeakMap();
-  var armed = [];
-  function state(w) {
-    let s2 = seen.get(w);
-    if (!s2) seen.set(w, s2 = { tick: -1, hp: w.player.hp, said: {} });
-    return s2;
-  }
-  function emitDebuff(w, debuff, from) {
-    const s2 = state(w);
-    const quiet = w.tick - (s2.said[debuff.kind] ?? -999) < 90;
-    if (!quiet) s2.said[debuff.kind] = w.tick;
-    w.emit({ type: "custom", name: "debuff", data: { ...debuff, from, text: quiet ? void 0 : DEBUFF_TEXT[debuff.kind] } });
-  }
-  function armDebuff(hit2, debuff, from) {
-    armed.push({ hit: hit2, debuff, from });
-  }
-  function checkDebuffs(w) {
-    const s2 = state(w);
-    if (s2.tick === w.tick) return;
-    s2.tick = w.tick;
-    const p = w.player;
-    if (p.hp < s2.hp) {
-      for (const a of armed) {
-        const h = a.hit;
-        if (p.x >= h.x0 - 30 && p.x <= h.x1 + 30 && Math.abs(p.y - h.y) <= (h.dy ?? 20) + 20) {
-          emitDebuff(w, a.debuff, a.from);
-          break;
-        }
-      }
-    }
-    s2.hp = p.hp;
-    armed = [];
-  }
-
-  // src/game/action/enemy/geom.ts
-  function overlap2(a, b) {
-    return a.x0 < b.x1 && b.x0 < a.x1 && a.z0 < b.z1 && b.z0 < a.z1 && Math.abs(a.y - b.y) <= (a.dy ?? 18) + (b.dy ?? 18);
-  }
-  function toWorld2(b, x, y, z, dir) {
-    const a = x + b.fx0 * dir, c = x + b.fx1 * dir;
-    return { x0: Math.min(a, c), x1: Math.max(a, c), z0: z + b.z0, z1: z + b.z1, y, dy: b.dy, part: b.part };
-  }
-
-  // src/game/action/enemy/proj.ts
-  var PROJ = {
-    bullet: { label: "탄", w: 18, h: 6, z: 128, speed: 17, life: 48, dmg: 5, react: "none", color: "#ffd36b" },
-    shard: { label: "조각", w: 24, h: 24, z: 110, speed: 9, life: 80, dmg: 8, react: "flinch", push: 4, homeY: 1.2, color: "#a99cf0" },
-    static: { label: "지지직", w: 40, h: 170, z: 0, speed: 6.5, life: 110, dmg: 7, react: "stagger", push: 8, unblockable: true, debuff: { kind: "headache", ticks: 60 }, color: "#9fd3e6" },
-    table: { label: "밥상", w: 90, h: 40, z: 150, speed: 8, vz: 9, gravity: 0.55, life: 70, dmg: 18, react: "down", push: 8, color: "#8a6a44" },
-    chair: { label: "날아오는 가구", w: 70, h: 60, z: 90, speed: 11, life: 140, dmg: 14, react: "stagger", push: 10, color: "#7a5a36" },
-    spoon: { label: "숟가락", w: 22, h: 6, z: 120, speed: 15, life: 50, dmg: 4, react: "flinch", color: "#d8d8d8" },
-    web: { label: "거미줄", w: 36, h: 36, z: 90, speed: 7, life: 90, dmg: 2, react: "none", debuff: { kind: "slow", ticks: 120 }, color: "#e8e2d0" },
-    ring: { label: "충격파", w: 20, h: 26, z: 0, speed: 0, life: 26, dmg: 10, react: "stagger", push: 10, low: true, grow: 13, pierce: true, unblockable: true, color: "#e86b4f" },
-    beam: { label: "모서리 빛", w: 1400, h: 46, z: 70, speed: 0, life: 34, dmg: 16, react: "stagger", push: 6, pierce: true, arm: 20, color: "#c8b8ff" },
-    cloud: { label: "썩은 내", w: 160, h: 150, z: 0, speed: 0, life: 210, dmg: 2, react: "none", pierce: true, every: 15, unblockable: true, debuff: { kind: "taint", ticks: 300 }, color: "#7c8a4a" },
-    smoke: { label: "연막", w: 180, h: 160, z: 0, speed: 0, life: 70, dmg: 0, react: "none", pierce: true, harmless: true, color: "#9a98a8" },
-    whistle: { label: "호루라기", w: 20, h: 200, z: 0, speed: 0, life: 22, dmg: 6, react: "stagger", push: 12, grow: 18, pierce: true, unblockable: true, debuff: { kind: "fear", ticks: 45 }, color: "#f0e9a0" }
-  };
-  var Proj = class {
-    constructor(def, name, x, y, dir, owner, attackBase, mult = 1) {
-      this.def = def;
-      this.owner = owner;
-      this.mult = mult;
-      this.kind = "proj:" + name;
-      this.label = def.label;
-      this.x = x;
-      this.y = y;
-      this.z = def.z;
-      this.dir = dir;
-      this.vx = def.speed * dir;
-      this.vz = def.vz ?? 0;
-      this.half = def.w / 2;
-      this.attackId = attackBase;
-    }
-    id = newBodyId();
-    team = "enemy";
-    kind;
-    x;
-    y;
-    z;
-    dir;
-    hp = 1;
-    hpMax = 1;
-    alive = true;
-    stop = 0;
-    label;
-    vx;
-    vz;
-    t = 0;
-    half;
-    done = false;
-    attackId;
-    box() {
-      const d3 = this.def;
-      return { x0: this.x - this.half, x1: this.x + this.half, z0: this.z, z1: this.z + d3.h, y: this.y, dy: d3.low ? 16 : 20 };
-    }
-    frame() {
-      const d3 = this.def;
-      if (!this.alive || d3.harmless || d3.arm && this.t < d3.arm) return { hit: [], hurt: [] };
-      const hit2 = {
-        ...this.box(),
-        attackId: this.attackId,
-        dmg: Math.round(d3.dmg * this.mult),
-        react: d3.react,
-        dir: this.dir,
-        push: d3.push ?? 2,
-        stop: 2,
-        low: d3.low,
-        armorBreak: d3.unblockable,
-        strength: d3.react === "down" ? 3 : d3.react === "stagger" ? 2 : 1
-      };
-      if (d3.debuff) {
-        hit2.debuff = d3.debuff;
-        armDebuff(hit2, d3.debuff, this.id);
-      }
-      return { hit: [hit2], hurt: [] };
-    }
-    step(world) {
-      const d3 = this.def;
-      checkDebuffs(world);
-      if (this.done) return void (this.alive = false);
-      this.t++;
-      if (d3.every && this.t % d3.every === 0) this.attackId = newAttackId();
-      this.x += this.vx;
-      if (d3.gravity) {
-        this.z += this.vz;
-        this.vz -= d3.gravity;
-        if (this.z <= 0) {
-          this.z = 0;
-          world.fx("dust", this.x, this.y, 0);
-          world.shake(4, 2);
-          this.alive = false;
-        }
-      }
-      if (d3.grow) this.half += d3.grow;
-      if (d3.homeY) {
-        const dy = world.player.y - this.y;
-        this.y += Math.max(-d3.homeY, Math.min(d3.homeY, dy));
-      }
-      if (this.t >= d3.life) this.alive = false;
-      if (!d3.pierce && !d3.harmless && !(d3.arm && this.t < d3.arm)) {
-        const p = world.player;
-        if (p.alive && p.frame().hurt.some((h) => overlap2(this.box(), h))) this.done = true;
-      }
-    }
-    applyHit() {
-      return { kind: "immune" };
-    }
-    draw(ctx) {
-      const d3 = this.def;
-      const b = this.box();
-      ctx.save();
-      if (d3.arm && this.t < d3.arm) {
-        ctx.globalAlpha = 0.25 + 0.5 * (this.t >> 2 & 1);
-        ctx.fillStyle = "#ff4040";
-        ctx.fillRect(b.x0, this.y - b.z1 + d3.h / 2 - 2, b.x1 - b.x0, 4);
-        ctx.restore();
-        return;
-      }
-      ctx.globalAlpha = d3.harmless ? 0.55 * (1 - this.t / d3.life) + 0.2 : d3.pierce ? 0.55 : 0.95;
-      ctx.fillStyle = d3.color;
-      if (d3.grow) {
-        ctx.fillRect(b.x0, this.y - b.z1, 10, b.z1 - b.z0);
-        ctx.fillRect(b.x1 - 10, this.y - b.z1, 10, b.z1 - b.z0);
-      } else ctx.fillRect(b.x0, this.y - b.z1, b.x1 - b.x0, b.z1 - b.z0);
-      ctx.globalAlpha = 0.3;
-      ctx.fillStyle = "#000";
-      ctx.beginPath();
-      ctx.ellipse(this.x, this.y, Math.min(60, this.half), 6, 0, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.restore();
-    }
-  };
-
-  // src/game/action/enemy/drops.ts
-  var hook = null;
-  function fireDropHook(c) {
-    hook?.(c);
-  }
-  var int = (r, a, b) => a + Math.floor(r() * (b - a + 1));
-  function rollDrops2(table, r, elite = false) {
-    const out = [];
-    const add = (item, n) => n > 0 && out.push({ item, n });
-    const k = elite ? 1.5 : 1;
-    const heal2 = (p) => r() < p + (elite ? 0.1 : 0) && add("heal", 1);
-    switch (table) {
-      case "none":
-        return out;
-      case "common":
-        add("cash", Math.round(int(r, 1, 3) * k));
-        heal2(0.15);
-        add("shard", Math.round(int(r, 1, 2) * k));
-        if (r() < 0.02) add("relic", 1);
-        break;
-      case "bureau":
-        add("cash", Math.round(int(r, 3, 6) * k));
-        heal2(0.1);
-        add("shard", Math.round(1 * k));
-        if (r() < 0.05) add(r() < 0.5 ? "ammo" : "relic", 1);
-        break;
-      case "daydream":
-        add("cash", Math.round(int(r, 6, 10) * k));
-        heal2(0.1);
-        add("shard", Math.round(1 * k));
-        if (r() < 0.03) add("dream", 1);
-        break;
-      case "mid":
-        add("cash", int(r, 12, 20));
-        add("heal", 1);
-        add("shard", 5);
-        add("relic", 1);
-        break;
-      case "guardian":
-        add("cash", int(r, 40, 60));
-        add("heal", 2);
-        add("shard", 10);
-        add("relic", 1);
-        add("upgrade", 1);
-        break;
-    }
-    return out;
-  }
-
-  // src/game/action/enemy/look.ts
-  var PALE = "#9c968a";
-  var GREY = "#6f6d68";
-  var LOOKS = {
-    lurker: { shape: "human", bulk: 0.16, head: 0.075, hunch: 0.05, eye: "#f2efe6", top: "#5d6670", bottom: "#2c3138", skin: PALE, hair: "#1c1c1e", extras: ["tie"] },
-    hollow: { shape: "human", bulk: 0.15, arm: 0.5, head: 0.07, hunch: 0.08, eye: "#d8d4c8", top: "#6b5f4f", bottom: "#3b342c", skin: GREY },
-    shooter: { shape: "human", bulk: 0.13, arm: 0.48, head: 0.07, hunch: 0.03, eye: "#ffd760", top: "#c9c3b4", bottom: "#3d4048", skin: PALE, acc: "#5a4c3a", hair: "#24201c", extras: ["strap"] },
-    thief: { shape: "human", bulk: 0.16, head: 0.072, hunch: 0.07, eye: "#e8e2d0", top: "#55603f", bottom: "#3a3a40", skin: "#a08670", acc: "#7a5a3a", extras: ["cap", "backpack"] },
-    charger: { shape: "human", bulk: 0.27, head: 0.07, hunch: 0.16, leg: 0.4, eye: "#ff6a3a", top: "#7a4a32", bottom: "#3a2c26", skin: "#8a6a5a", acc: "#d8d0c0", extras: ["target"] },
-    resident: { shape: "human", bulk: 0.17, head: 0.08, hunch: 0.02, eye: "#f2efe6", top: "#d2cbbb", bottom: "#4a5a6a", skin: "#a8927e", hair: "#2a2622", extras: ["jaw"] },
-    hum: { shape: "human", bulk: 0.14, head: 0.07, hunch: 0.06, eye: "#9fd3e6", top: "#4a5e6a", bottom: "#2c3a42", skin: "#7a9aa8" },
-    noise: { shape: "human", bulk: 0.14, head: 0.075, hunch: 0.06, eye: "#c8e070", arms: 1, top: "#55603a", bottom: "#33381f", skin: "#8a9a6a" },
-    mummy: { shape: "human", bulk: 0.12, head: 0.07, hunch: 0.12, eye: "#d8c890", top: "#b8a888", bottom: "#8a7a5a", skin: "#a89878", extras: ["wrap"] },
-    guard: { shape: "human", bulk: 0.2, head: 0.07, eye: "#ffe08a", top: "#44506a", bottom: "#2c3446", skin: "#a8927e", acc: "#c8a850", extras: ["cap", "tie"] },
-    proctor: { shape: "human", bulk: 0.17, head: 0.07, hunch: 0.02, eye: "#ffe08a", top: "#5a4a34", bottom: "#33291e", skin: "#a8927e", acc: "#c8a850", hair: "#3a3a3a", extras: ["coat", "strap", "cap"] },
-    elder_f: { shape: "human", bulk: 0.17, head: 0.085, hunch: 0.16, leg: 0.38, eye: "#ff5040", flipFace: true, top: "#7a5a6a", bottom: "#5a6a4a", skin: "#b09880", acc: "#d8d0b8", hair: "#c8c4bc", extras: ["apron", "hair"] },
-    elder_m: { shape: "human", bulk: 0.14, arm: 0.44, head: 0.07, hunch: 0.05, eye: "#ff5040", flipFace: true, top: "#6a6450", bottom: "#4a4436", skin: "#b09880", hair: "#d0ccc4" },
-    family_f: { shape: "human", bulk: 0.16, head: 0.08, hunch: 0.04, eye: "#e070ff", top: "#c88a9a", bottom: "#6a4a7a", skin: "#b8a08a", hair: "#7a3a9a", extras: ["hair", "skirt", "jaw"] },
-    family_m: { shape: "human", bulk: 0.25, arm: 0.42, head: 0.068, hunch: 0.04, eye: "#f2efe6", top: "#5a6a7a", bottom: "#33302c", skin: "#a8927e", hair: "#1c1c1e" },
-    shadow: { shape: "human", bulk: 0.21, arm: 0.5, head: 0.08, hunch: 0.06, eye: "#ffffff", arms: 2, top: "#1a1820", bottom: "#100e14", skin: "#24222a", extras: ["melt"] },
-    fb_smg: { shape: "human", bulk: 0.18, head: 0.07, eye: "", top: "#1e2026", bottom: "#16181c", skin: "#a8927e", acc: "#4a4e56", hair: "#101012", extras: ["glasses", "tie"] },
-    fb_shield: { shape: "human", bulk: 0.2, head: 0.07, hunch: 0.04, eye: "", top: "#1e2026", bottom: "#16181c", skin: "#a8927e", acc: "#6a7a8a", hair: "#101012", extras: ["glasses", "shield"] },
-    fb_chief: { shape: "human", bulk: 0.19, head: 0.075, eye: "", top: "#2a2a30", bottom: "#1a1a1e", skin: "#a8927e", acc: "#8a2a2a", hair: "#6a6a6a", extras: ["glasses", "coat", "tie"] },
-    fb_sword: { shape: "human", bulk: 0.16, head: 0.07, hunch: 0.03, eye: "", top: "#1e2026", bottom: "#16181c", skin: "#a8927e", acc: "#c8ccd0", hair: "#101012", extras: ["glasses", "sword"] },
-    dd_member: { shape: "human", bulk: 0.16, head: 0.075, eye: "#ffffff", top: "#2e2a36", bottom: "#1e1c24", skin: "#e8e2d8", extras: ["mask", "tie"] },
-    doorframe: { shape: "human", bulk: 0.36, head: 0.06, hunch: 0.28, leg: 0.36, eye: "#ff5040", top: "#6a5a4a", bottom: "#3a3026", skin: "#8a7a6a", acc: "#5a4030", extras: ["shield"] },
-    crawler: { shape: "spider", eye: "#ff4030", top: "#4a3a30", skin: "#8a7464" },
-    legs: { shape: "spider", eye: "#ff4030", top: "#3a3028", skin: "#9a8474" },
-    predator: { shape: "beast", eye: "#ffcf40", top: "#4a3a34", skin: "#8a5a4a", acc: "#e8dcc8" },
-    tv402: { shape: "snake", eye: "#9fd3e6", top: "#5a6a5a", skin: "#a8927e", acc: "#3a3a3e" },
-    toucher: { shape: "hand", skin: "#d9d6cc" },
-    doorhand: { shape: "hand", skin: "#d9d6cc" },
-    dusty: { shape: "furniture", eye: "#ffcf40", top: "#7a5a3a", acc: "#a89a80" }
-  };
-  function lookFor(kind) {
-    return LOOKS[kind] ?? null;
-  }
-  function poseOf(e) {
-    const f = e.frameNow();
-    const p = { tilt: 0, lean: 0, step: 0, armF: 0.2, armB: -0.15, reach: 1, crouch: 0, lie: 0, open: 0 };
-    switch (e.state) {
-      case "walk":
-      case "flee": {
-        const s2 = Math.sin(e.age * (e.state === "flee" ? 0.5 : 0.32));
-        p.step = s2;
-        p.armF = 0.15 - s2 * 0.5;
-        p.armB = -0.15 + s2 * 0.5;
-        p.lean = e.state === "flee" ? 0.25 : 0.04;
-        p.crouch = Math.abs(s2) * -3;
-        break;
-      }
-      case "attack": {
-        if (f?.tele) {
-          p.lean = -0.16;
-          p.armF = 2.5;
-          p.armB = -0.6;
-          p.crouch = 8;
-          p.open = 0.5;
-        } else if (f?.hit.length) {
-          const b = f.hit[0];
-          const shoulderZ = e.def.h * 0.78;
-          const midZ = (b.z0 + b.z1) / 2;
-          const midX = Math.max(10, (b.fx0 + b.fx1) / 2);
-          p.armF = Math.max(0.3, Math.min(2.6, Math.atan2(midX, shoulderZ - midZ)));
-          p.reach = Math.min(1.7, Math.max(1, Math.hypot(midX, shoulderZ - midZ) / (e.def.h * 0.42)));
-          p.lean = 0.22;
-          p.armB = -0.9;
-          p.step = 0.7;
-          p.open = 1;
-        } else {
-          p.lean = 0.1;
-          p.armF = 1;
-          p.step = 0.4;
-        }
-        break;
-      }
-      case "grabbing":
-        p.armF = 1.5;
-        p.armB = 1.3;
-        p.lean = 0.15;
-        p.open = 1;
-        break;
-      case "hurt":
-      case "bound": {
-        const k = Math.max(0, 1 - e.st / 10);
-        p.tilt = -0.28 * (0.4 + 0.6 * k);
-        p.lean = -0.18 * k;
-        p.armF = 1.1;
-        p.armB = 0.9;
-        break;
-      }
-      case "stunned":
-        p.tilt = Math.sin(e.age * 0.25) * 0.12;
-        p.lean = 0.2;
-        p.armF = 0.1;
-        p.armB = 0.1;
-        p.crouch = 10;
-        break;
-      case "air":
-        p.tilt = -0.5 - Math.min(0.9, e.st * 0.05);
-        p.armF = 2.2;
-        p.armB = 2;
-        p.step = 0.6;
-        break;
-      case "down":
-      case "dead":
-        p.lie = 1;
-        p.armF = 2.9;
-        p.armB = 3.05;
-        break;
-      case "getup":
-        p.lie = Math.max(0, 1 - e.st / 12);
-        p.crouch = 18 * p.lie;
-        break;
-      default:
-        p.crouch = Math.sin(e.age * 0.09) * 2;
-    }
-    return p;
-  }
-  function lighten(c, k) {
-    const m = c.startsWith("#") ? [parseInt(c.slice(1, 3), 16), parseInt(c.slice(3, 5), 16), parseInt(c.slice(5, 7), 16)] : (c.match(/\d+/g) ?? ["0", "0", "0"]).slice(0, 3).map(Number);
-    return `rgb(${m.map((v) => Math.round(v + (255 - v) * k)).join(",")})`;
-  }
-  function dim(c, k = 0.7) {
-    if (c === "#ffffff") return c;
-    const m = c.startsWith("#") ? [parseInt(c.slice(1, 3), 16), parseInt(c.slice(3, 5), 16), parseInt(c.slice(5, 7), 16)] : (c.match(/\d+/g) ?? ["0", "0", "0"]).slice(0, 3).map(Number);
-    return `rgb(${m.map((v) => Math.round(v * k)).join(",")})`;
-  }
-  function segEdge(ctx, w, x0, y0, x1, y1, bend, color) {
-    if (color !== "#ffffff") seg(ctx, w + PIXEL * 1.6, x0, y0, x1, y1, bend, dim(color, 0.45));
-    seg(ctx, w, x0, y0, x1, y1, bend, color);
-  }
-  function seg(ctx, w, x0, y0, x1, y1, bend, color) {
-    ctx.strokeStyle = color;
-    ctx.lineWidth = w;
-    ctx.beginPath();
-    ctx.moveTo(x0, y0);
-    ctx.lineTo((x0 + x1) / 2 + bend, (y0 + y1) / 2);
-    ctx.lineTo(x1, y1);
-    ctx.stroke();
-  }
-  function dot(ctx, x, y, r, color) {
-    ctx.fillStyle = color;
-    ctx.beginPath();
-    ctx.arc(x, y, Math.max(1, r), 0, Math.PI * 2);
-    ctx.fill();
-  }
-  function human(ctx, e, L, p, paint) {
-    const h = e.def.h;
-    const leg = h * (L.leg ?? 0.46) - p.crouch;
-    const bulk = h * (L.bulk ?? 0.15);
-    const r = h * (L.head ?? 0.075) * 1.2;
-    const arm = h * (L.arm ?? 0.38);
-    const hunch = h * (L.hunch ?? 0);
-    const torso = h - leg - p.crouch - r * 2;
-    const stride = h * 0.11;
-    const hipY = -leg;
-    const lean = p.lean + (L.hunch ?? 0) * 0.8;
-    const neckX = Math.sin(lean) * torso + hunch * 0.4;
-    const neckY = hipY - Math.cos(lean) * torso;
-    const sx = neckX - Math.sin(lean) * bulk * 0.3;
-    const sy = neckY + bulk * 0.35;
-    const headX = neckX + Math.sin(lean) * r * 1.1 + r * 0.2;
-    const headY = neckY - Math.cos(lean) * r * 0.95;
-    const armEnd = (a, len) => [sx + Math.sin(a) * len, sy + Math.cos(a) * len];
-    const [fx, fy] = armEnd(p.armF, arm * p.reach);
-    const [bx, by] = armEnd(p.armB, arm);
-    const x = L.extras ?? [];
-    const limbW = bulk * 0.5;
-    const legW = bulk * 0.62;
-    ctx.lineCap = "round";
-    ctx.lineJoin = "round";
-    const legTo = (s2, back) => {
-      const footX = -s2 * stride;
-      (back ? seg : segEdge)(ctx, legW, 0, hipY, footX, -legW * 0.3, h * 0.04, back ? dim(paint("bottom")) : paint("bottom"));
-      seg(ctx, legW * 0.7, footX - legW * 0.1, -legW * 0.3, footX + legW * 0.9, -legW * 0.3, 0, paint("detail"));
-    };
-    seg(ctx, limbW, sx, sy, bx, by, -arm * 0.08, dim(paint("top")));
-    dot(ctx, bx, by, limbW * 0.55, dim(paint("skin")));
-    for (let i = 0; i < (L.arms ?? 0); i++) {
-      const a = p.armB + 1 + i;
-      seg(ctx, limbW * 0.8, sx, sy + 10 + i * 16, sx + Math.sin(a) * arm, sy + 10 + i * 16 + Math.cos(a) * arm, arm * 0.1, paint("skin"));
-    }
-    legTo(p.step, true);
-    if (x.includes("backpack")) {
-      ctx.fillStyle = paint("acc");
-      const bw = h * 0.15;
-      ctx.beginPath();
-      ctx.roundRect(neckX - bulk * 0.45 - bw, neckY + bulk * 0.15, bw, torso * 0.62, bw * 0.25);
-      ctx.fill();
-    }
-    ctx.fillStyle = paint("top");
-    ctx.beginPath();
-    const nx = Math.cos(lean), ny = Math.sin(lean);
-    ctx.moveTo(neckX - nx * bulk * 0.55, neckY - ny * bulk * 0.55 + bulk * 0.15);
-    ctx.lineTo(neckX + nx * bulk * 0.55, neckY + ny * bulk * 0.55 + bulk * 0.15);
-    ctx.lineTo(nx * bulk * 0.42, hipY + ny * bulk * 0.42);
-    ctx.lineTo(-nx * bulk * 0.42, hipY - ny * bulk * 0.42);
-    ctx.closePath();
-    ctx.fill();
-    dot(ctx, neckX, neckY + bulk * 0.2, bulk * 0.52, paint("top"));
-    seg(ctx, legW * 1.15, -bulk * 0.05, hipY - 2, bulk * 0.05, hipY + legW * 0.4, 0, paint("bottom"));
-    if (x.includes("coat") || x.includes("skirt") || x.includes("apron") || x.includes("melt")) {
-      const low2 = x.includes("melt") ? 0 : x.includes("coat") ? -leg * 0.3 : -leg * 0.5;
-      const flare = x.includes("melt") ? bulk * 1.5 : bulk * 0.8;
-      ctx.fillStyle = x.includes("apron") ? paint("acc") : x.includes("coat") ? paint("top") : paint("bottom");
-      ctx.beginPath();
-      ctx.moveTo(-bulk * 0.48, hipY - bulk * 0.3);
-      ctx.lineTo(bulk * 0.48, hipY - bulk * 0.3);
-      ctx.lineTo(flare, low2);
-      ctx.lineTo(-flare, low2);
-      ctx.closePath();
-      ctx.fill();
-    }
-    legTo(-p.step, false);
-    if (x.includes("tie")) seg(ctx, bulk * 0.12, neckX + bulk * 0.3, neckY + bulk * 0.25, (neckX + 0) / 2 + bulk * 0.3, (neckY + hipY) / 2, 0, paint("acc"));
-    if (x.includes("target")) {
-      const tx = neckX / 2 - bulk * 0.4, ty = (hipY + neckY) / 2;
-      dot(ctx, tx, ty, bulk * 0.36, paint("acc"));
-      dot(ctx, tx, ty, bulk * 0.22, "#a83a2a");
-      dot(ctx, tx, ty, bulk * 0.09, paint("acc"));
-    }
-    if (x.includes("strap")) seg(ctx, Math.max(3, bulk * 0.1), neckX - bulk * 0.35, neckY + bulk * 0.3, bulk * 0.4, hipY, 0, paint("acc"));
-    if (x.includes("wrap"))
-      for (let i = 1; i < 6; i++) {
-        const t = i / 6;
-        const yy = hipY + (neckY - hipY) * t;
-        const xx = neckX * t;
-        seg(ctx, 3, xx - bulk * 0.45, yy + 4, xx + bulk * 0.45, yy - 4, 0, "#6a5a40");
-      }
-    dot(ctx, neckX + r * 0.1, neckY + 2, r * 0.45, paint("skin"));
-    dot(ctx, headX, headY, r, paint("skin"));
-    if (x.includes("hair")) {
-      dot(ctx, headX - r * 0.35, headY - r * 0.3, r * 1.1, paint("hair"));
-      dot(ctx, headX + r * 0.1, headY - r * 0.55, r * 0.75, paint("hair"));
-    } else if (L.hair) {
-      ctx.fillStyle = paint("hair");
-      ctx.beginPath();
-      ctx.arc(headX, headY, r * 1.04, Math.PI * 0.85, Math.PI * 1.9);
-      ctx.fill();
-    }
-    if (x.includes("cap")) {
-      ctx.fillStyle = paint("top");
-      ctx.fillRect(headX - r * 1.02, headY - r * 1.15, r * 2.04, r * 0.75);
-      ctx.fillStyle = paint("detail");
-      ctx.fillRect(headX + r * 0.2, headY - r * 0.5, r * 1.3, r * 0.22);
-      ctx.fillStyle = paint("acc");
-      ctx.fillRect(headX - r * 0.1, headY - r * 0.95, r * 0.4, r * 0.3);
-    }
-    if (x.includes("mask")) {
-      ctx.fillStyle = paint("skin");
-      ctx.beginPath();
-      ctx.moveTo(headX - r * 0.6, headY - r * 0.6);
-      ctx.lineTo(headX - r * 0.3, headY - r * 1.9);
-      ctx.lineTo(headX + r * 0.15, headY - r * 0.8);
-      ctx.fill();
-      dot(ctx, headX + r * 0.9, headY + r * 0.2, r * 0.35, paint("skin"));
-    }
-    if (x.includes("glasses")) {
-      ctx.fillStyle = "#05070a";
-      ctx.fillRect(headX + r * 0.05, headY - r * 0.3, r * 0.98, r * 0.32);
-    }
-    if (x.includes("jaw") && p.open > 0) {
-      ctx.fillStyle = "#4a0808";
-      ctx.fillRect(headX + r * 0.15, headY + r * 0.15, r * 0.8, r * 1.5 * p.open);
-    }
-    segEdge(ctx, limbW, sx, sy, fx, fy, arm * 0.06, paint("top"));
-    dot(ctx, fx, fy, limbW * 0.62, paint("skin"));
-    if (x.includes("sword")) seg(ctx, Math.max(3, h * 0.016), fx, fy, fx + Math.sin(p.armF + 0.4) * h * 0.42, fy + Math.cos(p.armF + 0.4) * h * 0.42, 0, paint("acc"));
-    if (x.includes("shield")) {
-      const shx = Math.max(fx, sx + bulk * 0.6);
-      ctx.fillStyle = paint("acc");
-      ctx.beginPath();
-      ctx.roundRect(shx - h * 0.02, sy - h * 0.14, h * 0.07, h * 0.52, 4);
-      ctx.fill();
-    }
-  }
-  function spider(ctx, e, L, p, paint) {
-    const big = e.kind === "legs";
-    const w = e.def.w;
-    const h = big ? e.def.h * 0.55 : e.def.h * 0.6;
-    const cy = -(big ? e.def.h * 0.72 : h * 0.9);
-    const legN = big ? 5 : 4;
-    const walk = e.state === "walk" || e.state === "flee" ? e.age * 0.4 : 0;
-    ctx.lineCap = "round";
-    ctx.lineJoin = "round";
-    for (const side of [-1, 1]) {
-      for (let i = 0; i < legN; i++) {
-        const ph = Math.sin(walk + i * 1.3 + (side > 0 ? 0 : Math.PI)) * 8;
-        const fx = side * (w * 0.25 + i * w * 0.07) + ph + (p.armF > 1.4 && side > 0 && i === legN - 1 ? w * 0.3 : 0);
-        const kx = fx * 0.6;
-        const ky = cy - (big ? e.def.h * 0.3 : h * 0.35);
-        ctx.strokeStyle = side < 0 ? paint("detail") : paint("skin");
-        ctx.lineWidth = big ? e.def.h * 0.045 : Math.max(5, h * 0.12);
-        ctx.beginPath();
-        ctx.moveTo(0, cy);
-        ctx.lineTo(kx, ky);
-        ctx.lineTo(fx, 0);
-        ctx.stroke();
-      }
-      if (side < 0) {
-        ctx.fillStyle = paint("top");
-        ctx.beginPath();
-        ctx.ellipse(-w * 0.06, cy, w * 0.22, h * 0.34, p.tilt, 0, Math.PI * 2);
-        ctx.fill();
-        for (let k = 0; k < 4; k++) dot(ctx, -w * 0.18 + k * w * 0.07, cy - h * 0.22, h * 0.07, paint("skin"));
-        dot(ctx, w * 0.16, cy - 4, Math.min(w * 0.11, h * 0.24), paint("skin"));
-      }
-    }
-  }
-  function beast(ctx, e, L, p, paint) {
-    const w = e.def.w;
-    const h = e.def.h;
-    const sway = e.state === "walk" ? Math.sin(e.age * 0.2) * 6 : 0;
-    const jaw = p.open * 0.5 + (e.weakOpen > 0 ? 0.6 : 0);
-    ctx.lineCap = "round";
-    for (const lx of [-0.28, 0.06]) seg(ctx, h * 0.1, w * lx, -h * 0.35, w * lx - sway, 0, 6, paint("detail"));
-    ctx.fillStyle = paint("top");
-    ctx.beginPath();
-    ctx.ellipse(-w * 0.08, -h * 0.5 + sway * 0.3, w * 0.36, h * 0.3, -0.08, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.fillStyle = paint("detail");
-    for (let i = 0; i < 6; i++) {
-      const bx = -w * 0.34 + i * w * 0.09;
-      ctx.beginPath();
-      ctx.moveTo(bx, -h * 0.74);
-      ctx.lineTo(bx + w * 0.03, -h * 0.9);
-      ctx.lineTo(bx + w * 0.06, -h * 0.74);
-      ctx.fill();
-    }
-    seg(ctx, h * 0.12, -w * 0.4, -h * 0.5, -w * 0.55, -h * 0.12 + sway, -w * 0.1, paint("top"));
-    ctx.fillStyle = paint("skin");
-    ctx.beginPath();
-    ctx.moveTo(w * 0.16, -h * 0.74);
-    ctx.lineTo(w * 0.5, -h * 0.55 - jaw * h * 0.25);
-    ctx.lineTo(w * 0.22, -h * 0.45);
-    ctx.closePath();
-    ctx.moveTo(w * 0.2, -h * 0.42);
-    ctx.lineTo(w * 0.46, -h * 0.36 + jaw * h * 0.2);
-    ctx.lineTo(w * 0.14, -h * 0.24);
-    ctx.closePath();
-    ctx.fill();
-    ctx.fillStyle = paint("acc");
-    for (let i = 0; i < 4; i++) {
-      const tx = w * (0.26 + i * 0.05);
-      ctx.fillRect(tx, -h * 0.5 - jaw * h * 0.1 * i * 0.3, 3, h * 0.05);
-    }
-    for (const lx of [-0.12, 0.2]) seg(ctx, h * 0.11, w * lx, -h * 0.35, w * lx + sway, 0, 6, paint("top"));
-  }
-  function snake(ctx, e, L, p, paint) {
-    const w = e.def.w;
-    const h = e.def.h;
-    const wave = e.age * 0.15;
-    ctx.lineCap = "round";
-    ctx.lineJoin = "round";
-    ctx.fillStyle = paint("acc");
-    ctx.fillRect(-w * 0.52, -h * 0.4, w * 0.27, h * 0.4);
-    ctx.fillStyle = "#7aa8b8";
-    ctx.fillRect(-w * 0.49, -h * 0.35, w * 0.2, h * 0.26);
-    ctx.strokeStyle = paint("top");
-    ctx.lineWidth = h * 0.22;
-    ctx.beginPath();
-    ctx.moveTo(-w * 0.38, -h * 0.2);
-    for (let i = 1; i <= 8; i++) {
-      const t = i / 8;
-      ctx.lineTo(-w * 0.38 + t * w * 0.68, -h * 0.12 - Math.sin(wave + t * 5) * 10 - t * t * h * 0.5 * (1 + p.lean));
-    }
-    ctx.stroke();
-    dot(ctx, w * 0.32, -h * 0.68 * (1 + p.lean * 0.5), h * 0.14, paint("skin"));
-    ctx.fillStyle = "#1c1a18";
-    ctx.beginPath();
-    ctx.arc(w * 0.3, -h * 0.68 * (1 + p.lean * 0.5), h * 0.15, Math.PI * 0.9, Math.PI * 1.9);
-    ctx.fill();
-  }
-  function hand(ctx, e, p, paint) {
-    const h = e.def.h;
-    const reach = p.open ? 1.25 : 1;
-    ctx.lineCap = "round";
-    ctx.strokeStyle = paint("skin");
-    ctx.lineWidth = h * 0.08;
-    ctx.beginPath();
-    ctx.moveTo(-10, -h * 0.2);
-    ctx.quadraticCurveTo(10, -h * 0.75, 30 * reach, -h * 0.85);
-    ctx.stroke();
-    ctx.lineWidth = h * 0.028;
-    ctx.beginPath();
-    for (let i = 0; i < 4; i++) {
-      ctx.moveTo(30 * reach, -h * 0.85);
-      ctx.lineTo(30 * reach + h * 0.12 + i * 2, -h * 0.85 - h * 0.09 + i * h * 0.055);
-    }
-    ctx.stroke();
-  }
-  function furniture(ctx, e, L, p, paint) {
-    const w = e.def.w;
-    const h = e.def.h;
-    const wig = Math.sin(e.age * 0.6) * 4;
-    ctx.lineCap = "round";
-    for (const [lx, s2, part] of [[-0.38, 1, "detail"], [0.15, 1, "detail"], [-0.15, -1, "top"], [0.38, -1, "top"]]) seg(ctx, Math.max(5, h * 0.1), w * lx, -h * 0.6, w * lx + wig * s2, 0, wig, paint(part));
-    ctx.fillStyle = paint("top");
-    ctx.fillRect(-w * 0.47, -h * 0.78, w * 0.94, h * 0.2);
-    ctx.fillStyle = paint("acc");
-    ctx.fillRect(-w * 0.47, -h * 0.82, w * 0.94, h * 0.06);
-  }
-  function drawShape(ctx, e, L, p, paint) {
-    if (L.shape === "human") human(ctx, e, L, p, paint);
-    else if (L.shape === "spider") spider(ctx, e, L, p, paint);
-    else if (L.shape === "beast") beast(ctx, e, L, p, paint);
-    else if (L.shape === "snake") snake(ctx, e, L, p, paint);
-    else if (L.shape === "hand") hand(ctx, e, p, paint);
-    else furniture(ctx, e, L, p, paint);
-  }
-  var CW = 240;
-  var CH = 280;
-  var OX = 120;
-  var OY = 140;
-  var boards = null;
-  function board(i) {
-    if (!boards) {
-      boards = [];
-      for (let k = 0; k < 4; k++) {
-        const c = typeof OffscreenCanvas !== "undefined" ? new OffscreenCanvas(CW, CH) : Object.assign(document.createElement("canvas"), { width: CW, height: CH });
-        boards.push({ c, x: c.getContext("2d", { willReadFrequently: k === 0 }) });
-      }
-    }
-    const b = boards[i];
-    b.x.setTransform(1, 0, 0, 1, 0, 0);
-    b.x.globalCompositeOperation = "source-over";
-    b.x.globalAlpha = 1;
-    b.x.clearRect(0, 0, CW, CH);
-    return b;
-  }
-  function mix(hex2, to, k) {
-    const a = parseInt(hex2.slice(1), 16), b = parseInt(to.slice(1), 16);
-    const ch = (s2) => Math.round((a >> s2 & 255) * (1 - k) + (b >> s2 & 255) * k);
-    return `rgb(${ch(16)},${ch(8)},${ch(0)})`;
-  }
-  var cache4 = /* @__PURE__ */ new WeakMap();
-  var OUTFITS = [
-    ["#8a3a34", "#2e2a2c", "#1c1612"],
-    // 붉은 재킷
-    ["#3f6a52", "#2a2f2c", "#141414"],
-    // 녹색 점퍼
-    ["#5c4f86", "#2a2836", "#3a2a1e"],
-    // 보라 카디건
-    ["#a08450", "#3d3426", "#5a4a3a"],
-    // 낙타색 코트
-    ["#3c5a8a", "#22283a", "#101012"],
-    // 파란 셔츠
-    ["#7a5a3c", "#4a3c2c", "#24201c"],
-    // 갈색 양복
-    ["#c8b890", "#3a4458", "#2a2622"],
-    // 베이지 니트
-    ["#4a4a52", "#6a5a46", "#c8c4bc"]
-    // 회색 정장, 흰머리
-  ];
-  function varied(e, L) {
-    if (L.shape !== "human" || e.boss || e.kind.startsWith("fb_")) return { L, scale: 1 };
-    const v = e.id * 2654435761 >>> 0;
-    const o = OUTFITS[v % OUTFITS.length];
-    const k = 0.75 + (v >> 4) % 3 * 0.12;
-    return {
-      L: {
-        ...L,
-        top: mix(L.top ?? "#5a5a5a", o[0], Math.min(1, k)),
-        bottom: mix(L.bottom ?? "#2a2a2a", o[1], Math.min(1, k)),
-        hair: (v >> 7) % 3 ? o[2] : L.hair,
-        // 얼굴도 회색 가면처럼 보이지 않게 사람 피부색 몇 가지 (독립 검수: 회색 무표정)
-        skin: mix(L.skin ?? "#a8927e", ["#c8a080", "#b08460", "#d4b090", "#9a7458"][(v >>> 14) % 4], 0.75),
-        bulk: (L.bulk ?? 0.16) * (0.86 + (v >> 9) % 4 * 0.07)
-      },
-      scale: 0.92 + (v >> 12) % 4 * 0.04
-    };
-  }
-  function drawFigure(e, ctx, outline) {
-    const L0 = lookFor(e.kind);
-    if (!L0 || typeof document === "undefined") return false;
-    const { L, scale } = varied(e, L0);
-    const p = poseOf(e);
-    const base2 = e.def.color;
-    const col = {
-      top: L.top ?? mix(base2, "#101216", 0.35),
-      bottom: L.bottom ?? mix(base2, "#101216", 0.6),
-      skin: L.skin ?? mix(base2, "#c8c0b0", 0.3),
-      acc: L.acc ?? mix(base2, "#e8e0d0", 0.4),
-      hair: L.hair ?? "#1c1a1a",
-      detail: "#14161a"
-    };
-    const flash = e.flash > 0 && p.lie === 0 && e.state !== "dead" && e.state !== "down";
-    const transform = (x) => {
-      x.setTransform(1 / PIXEL, 0, 0, 1 / PIXEL, OX, OY + (e.mem.cling && L.shape === "spider" ? -40 : 40));
-      x.scale(e.dir * scale, scale);
-      const upright = L.shape === "human" || L.shape === "hand";
-      if (e.mem.cling && L.shape === "spider") x.scale(1, -1);
-      if (p.lie > 0 && !upright) {
-        x.translate(0, -e.def.h * 0.25 * p.lie);
-        x.scale(1, 1 - 1.5 * p.lie);
-        x.translate(0, e.def.h * 0.25 * p.lie);
-      } else if (p.lie > 0) {
-        x.translate(e.def.h * 0.45 * p.lie, 0);
-        x.rotate(-Math.PI / 2 * p.lie);
-        x.translate(0, e.def.h * 0.05 * p.lie);
-      } else if (p.tilt) x.rotate(p.tilt);
-    };
-    const key2 = `${e.age}|${e.state}|${e.st}|${e.mf}|${flash}|${outline}|${e.dir}|${e.weakOpen > 0}|${!!e.mem.cling}`;
-    let cached = cache4.get(e);
-    if (!cached || cached.key !== key2) {
-      if (!cached) {
-        const c = typeof OffscreenCanvas !== "undefined" ? new OffscreenCanvas(CW, CH) : Object.assign(document.createElement("canvas"), { width: CW, height: CH });
-        cached = { key: "", c, x: c.getContext("2d") };
-        cache4.set(e, cached);
-      }
-      cached.key = key2;
-      const M3 = board(0);
-      transform(M3.x);
-      drawShape(M3.x, e, L, p, () => "#ffffff");
-      const hw = Math.min(OX, Math.ceil(Math.max(e.def.w * 0.75, e.def.h * (p.lie > 0 || L.shape !== "human" ? 1.05 : 0.7)) / PIXEL) + 10);
-      const img5 = M3.x.getImageData(OX - hw, 0, hw * 2, CH);
-      const a = img5.data;
-      for (let i = 3; i < a.length; i += 4) a[i] = a[i] > 110 ? 255 : 0;
-      M3.x.putImageData(img5, OX - hw, 0);
-      const C4 = board(1);
-      transform(C4.x);
-      drawShape(C4.x, e, L, p, flash ? (part) => lighten(col[part], 0.55) : (part) => col[part]);
-      C4.x.setTransform(1, 0, 0, 1, 0, 0);
-      C4.x.globalCompositeOperation = "destination-in";
-      C4.x.drawImage(M3.c, 0, 0);
-      {
-        const front = e.dir;
-        const S2 = board(2);
-        S2.x.drawImage(M3.c, 0, 0);
-        S2.x.globalCompositeOperation = "source-in";
-        S2.x.fillStyle = "rgba(6,8,14,.42)";
-        S2.x.fillRect(0, 0, CW, CH);
-        S2.x.globalCompositeOperation = "destination-out";
-        S2.x.drawImage(M3.c, 3 * front, -3);
-        C4.x.globalCompositeOperation = "source-atop";
-        C4.x.drawImage(S2.c, 0, 0);
-        const R = board(2);
-        R.x.drawImage(M3.c, 0, 0);
-        R.x.globalCompositeOperation = "source-in";
-        R.x.fillStyle = "rgba(214,226,240,.55)";
-        R.x.fillRect(0, 0, CW, CH);
-        R.x.globalCompositeOperation = "destination-out";
-        R.x.drawImage(M3.c, -front, 1);
-        C4.x.drawImage(R.c, 0, 0);
-      }
-      const F = board(3);
-      F.x.drawImage(M3.c, -1, 0);
-      F.x.drawImage(M3.c, 1, 0);
-      F.x.drawImage(M3.c, 0, -1);
-      F.x.drawImage(M3.c, 0, 1);
-      F.x.globalCompositeOperation = "source-in";
-      F.x.fillStyle = outline || "#07080a";
-      F.x.fillRect(0, 0, CW, CH);
-      F.x.globalCompositeOperation = "source-over";
-      F.x.drawImage(C4.c, 0, 0);
-      cached.x.clearRect(0, 0, CW, CH);
-      cached.x.drawImage(F.c, 0, 0);
-    }
-    const oy = e.mem.cling && L.shape === "spider" ? -40 : 40;
-    ctx.save();
-    ctx.imageSmoothingEnabled = false;
-    ctx.drawImage(cached.c, Math.round(e.x - OX * PIXEL), Math.round(e.y - e.z - (OY + oy) * PIXEL), CW * PIXEL, CH * PIXEL);
-    ctx.restore();
-    if (L.eye && !flash && e.state !== "dead" && e.state !== "down" && p.lie === 0) {
-      const eye = eyeAt(e, L, p);
+, L, p);
       if (eye) {
         ctx.save();
         ctx.fillStyle = L.eye;
@@ -5006,4 +3705,1321 @@
       }, () => w.say(VENDORS[vendor].bye, 2), () => ({ hp: p.hp, max: p.hpMax }));
     });
     const hitSeen = /* @__PURE__ */ new Set();
-    const overlapT = /* @__PURE__ */ new WeakMa
+    const overlapT = /* @__PURE__ */ new WeakMap();
+    const lastX = /* @__PURE__ */ new WeakMap();
+    const frontFor = (h) => Math.min(90, Math.max(PROP_DEPTH, h * 0.8));
+    const floorSolids = () => w.props.filter((q) => (q.kind === "prop" || q.kind === "table" || q.kind === "clutter") && q.y > w.lane[0] + 20).map((q) => {
+      const a = propArtSize(q.kind, q.label, w.floor?.type);
+      return { x: q.x, y: q.y, w: Math.max(a?.w ?? 0, q.w, 100), back: Math.min(200, Math.max(PROP_DEPTH, (a?.h ?? 0) * 0.75)), front: frontFor(a?.h ?? 0), h: a?.h ?? 0 };
+    });
+    const itemSolid = (e) => ({ x: e.x, y: e.y, w: PROPS[e.prop].w, back: Math.min(200, Math.max(PROP_DEPTH, PROPS[e.prop].h * 0.6)), front: frontFor(PROPS[e.prop].h), h: PROPS[e.prop].h });
+    const allSolids = () => [...field.ents.filter((e) => e.type === "prop" && PROPS[e.prop]).map((e) => itemSolid(e)), ...floorSolids()];
+    w.spawnAdjust = (s2) => {
+      const q = clearSpot(s2.x, s2.y, allSolids(), w.lane);
+      return q.x === s2.x && q.y === s2.y ? s2 : { ...s2, x: q.x, y: q.y };
+    };
+    Object.defineProperty(w, "itemField", { get: () => field, configurable: true });
+    Object.defineProperty(w, "solidsNow", { get: () => allSolids(), configurable: true });
+    Object.defineProperty(w, "propRects", {
+      get: () => [
+        ...w.props.filter((q) => !["hubdoor", "hubspot", "hatch"].includes(q.kind) && !isHighSign(q.kind, q.label)).map((q) => {
+          const a = propArtSize(q.kind, q.label, w.floor?.type);
+          return a ? { x: q.x, y: q.y, w: a.w, h: a.h, what: `${q.kind}:${q.label ?? ""}` } : null;
+        }).filter(Boolean),
+        ...field.ents.filter((e) => e.type === "prop" && PROPS[e.prop]).map((e) => ({ x: e.x, y: e.y, w: PROPS[e.prop].w, h: PROPS[e.prop].h, what: `물건:${e.prop}` }))
+      ],
+      configurable: true
+    });
+    w.itemState = {
+      snapshot: () => ({ inventory: ir, fields: [...fields], current: w.floor.id, lastReserve, shopSeed, shops: [...shops] }),
+      restore(value) {
+        const s2 = value;
+        if (!s2?.inventory || !Array.isArray(s2.fields)) throw new Error("손상된 아이템 저장");
+        Object.assign(ir, s2.inventory);
+        fields.clear();
+        for (const [k, v] of s2.fields) fields.set(k, v);
+        field = fields.get(s2.current);
+        if (!field) throw new Error("방 아이템 저장 누락");
+        lastReserve = s2.lastReserve;
+        shopSeed = s2.shopSeed;
+        shops.clear();
+        for (const [k, v] of s2.shops ?? []) shops.set(k, v);
+        syncSlots();
+        syncCarry();
+      }
+    };
+    return {
+      run: ir,
+      /** 대화로 받은 소모품 (빈 칸이 없으면 못 받는다) */
+      give(id) {
+        const n = addItem(ir, id, 1);
+        syncSlots();
+        return n > 0;
+      },
+      /** 시연(?start=items): 들 물건·임시 무기를 한 줄로 늘어놓는다 */
+      showcase() {
+        const ym = (w.lane[0] + w.lane[1]) / 2;
+        Object.keys(PROPS).forEach((id, i) => placeProp(field, id, 520 + i * 150, ym + (i % 2 * 2 - 1) * 50));
+        Object.keys(WEAPONS).forEach((id, i) => spawnPickup(field, "weapon", 600 + i * 140, ym));
+      },
+      tick() {
+        lastReserve = ir.reserve = p.reserve;
+        const hits = p.frame().hit;
+        if (hits.length) apply(strikeProps(field, ir, hits, hitSeen, targets()));
+        apply(stepField(field, ir, { x: p.x, y: p.y, z: p.z, dir: p.dir }, {}, targets(), 1 / TICK_HZ, ctx()));
+        for (const b of w.bodies)
+          if (b instanceof Enemy && b.alive && b.hp > 0 && slowAt(field, b.x, b.y) < 1) b.slow = Math.max(b.slow, 2);
+        const ents = field.ents.filter((e) => e.type === "prop" && PROPS[e.prop]);
+        const solids = ents.map((e) => itemSolid(e));
+        const fixed2 = floorSolids();
+        if (solids.length || fixed2.length) {
+          const bodies = [p, ...w.bodies].filter((b) => b.alive && b.kind !== "bullet" && b.kind !== "item" && b.team !== "neutral" && !b.kind.startsWith("proj"));
+          const views = bodies.map((b) => ({ x: b.x, y: b.y, z: b.z, px: b === p ? p.px : lastX.get(b) }));
+          const stuck = blockByProps(views, [...solids, ...fixed2], w.lane);
+          bodies.forEach((b, i) => {
+            b.x = views[i].x;
+            b.y = views[i].y;
+            lastX.set(b, b.x);
+          });
+          ents.forEach((e, i) => {
+            const n = stuck.has(i) ? (overlapT.get(e) ?? 0) + 1 : 0;
+            overlapT.set(e, n);
+            if (n > TICK_HZ / 2) nudgeProp(solids[i], bodies, solids, 40, (w.floor?.length ?? 99999) - 40), e.x = solids[i].x, overlapT.set(e, 0);
+          });
+        }
+        syncCarry();
+        recordInventory();
+        w.notes.held = ir.held ? { name: WEAPONS[ir.held.id].name, uses: ir.held.uses, max: WEAPONS[ir.held.id].uses } : null;
+      },
+      draw(c, camX) {
+        for (const e of field.ents) {
+          if (e.type === "prop") {
+            const d3 = PROPS[e.prop];
+            const s2 = Math.max(d3?.w ?? 60, d3?.h ?? 60);
+            c.fillStyle = "rgba(0,0,0,0.3)";
+            c.beginPath();
+            c.ellipse(e.x - camX, e.y, s2 * 0.4, 6, 0, 0, Math.PI * 2);
+            c.fill();
+            if (e.flash > 0) c.globalAlpha = 0.6;
+            if (!drawPropArt(c, `item_${e.prop}`, d3?.name, e.x - camX, e.y) && !drawPropSized(c, e.prop, e.x - camX, e.y)) drawItemIcon(c, e.prop, e.x - camX - s2 / 2, e.y - s2, s2);
+            c.globalAlpha = 1;
+            continue;
+          }
+          if (e.type !== "pickup") continue;
+          const x = e.x - camX;
+          const y = e.y - e.z;
+          c.fillStyle = "rgba(0,0,0,0.3)";
+          c.beginPath();
+          c.ellipse(x, e.y, 14, 5, 0, 0, Math.PI * 2);
+          c.fill();
+          const bob = Math.sin((w.tick + e.id * 7) / 6) * 3;
+          const id = e.ref ?? e.kind;
+          if (!drawFloorArt(c, id, x, y - 4 + bob)) drawItemIcon(c, id, x - 14, y - 34 + bob, 28);
+        }
+        for (const pj of field.projs) {
+          c.fillStyle = "#d8e0e4";
+          if (pj.kind === "prop" && pj.ref) {
+            if (!drawPropSized(c, pj.ref, pj.x - camX, pj.y - pj.z + (PROPS[pj.ref]?.h ?? 56) / 2)) drawItemIcon(c, pj.ref, pj.x - camX - 28, pj.y - pj.z - 28, 56);
+          } else c.fillRect(pj.x - camX - 5, pj.y - pj.z - 5, 10, 10);
+        }
+        for (const z of field.zones) {
+          c.strokeStyle = z.kind === "salt" ? "rgba(240,240,240,0.6)" : "rgba(160,170,180,0.5)";
+          c.lineWidth = 3;
+          c.beginPath();
+          c.ellipse(z.x - camX, z.y, z.r, z.r * 0.35, 0, 0, Math.PI * 2);
+          c.stroke();
+        }
+      },
+      bodiesHit(_b) {
+      }
+    };
+  }
+
+  // src/game/action/engine/render.ts
+  var lerp2 = (a, b, t) => a + (b - a) * t;
+  function makeRenderer(ctx, art4, opt) {
+    const ghosts = [];
+    function background(w, camX) {
+      const f = w.floor;
+      const pal = f.palette ?? { wall: "#2b343a", floor: "#3a4247", accent: "#5b6a72" };
+      const [top] = w.lane;
+      if (!view.hub) {
+        ctx.fillStyle = "#0d1114";
+        ctx.fillRect(0, 0, SCREEN_W, SCREEN_H);
+      }
+      if (f.drawBackground) {
+        ctx.save();
+        ctx.translate(-camX, 0);
+        f.drawBackground(ctx, camX);
+        ctx.restore();
+        return;
+      }
+      const wallTop = 110;
+      ctx.fillStyle = pal.wall;
+      ctx.fillRect(0, wallTop, SCREEN_W, top - wallTop - 20);
+      const step2 = 320;
+      for (let x = Math.floor(camX / step2) * step2; x < camX + view.w + step2; x += step2) {
+        const sx = x - camX;
+        ctx.fillStyle = "rgba(0,0,0,0.22)";
+        ctx.fillRect(sx, wallTop, 26, top - wallTop - 20);
+        ctx.fillStyle = pal.accent;
+        ctx.globalAlpha = 0.35;
+        ctx.fillRect(sx + 70, wallTop + 70, 150, 90);
+        ctx.globalAlpha = 1;
+        ctx.fillStyle = "rgba(255,255,255,0.05)";
+        ctx.fillRect(sx + 26, wallTop, 6, top - wallTop - 20);
+      }
+      ctx.fillStyle = "rgba(0,0,0,0.35)";
+      ctx.fillRect(0, top - 34, SCREEN_W, 14);
+      const g2 = ctx.createLinearGradient(0, top - 20, 0, SCREEN_H);
+      g2.addColorStop(0, pal.floor);
+      g2.addColorStop(1, "#1a1f22");
+      ctx.fillStyle = g2;
+      ctx.fillRect(0, top - 20, SCREEN_W, SCREEN_H - top + 20);
+      ctx.strokeStyle = "rgba(255,255,255,0.05)";
+      ctx.lineWidth = 2;
+      for (let x = Math.floor(camX / 160) * 160; x < camX + view.w + 400; x += 160) {
+        const sx = x - camX;
+        ctx.beginPath();
+        ctx.moveTo(sx, top - 20);
+        ctx.lineTo(sx - (SCREEN_W / 2 - sx) * 0.35, SCREEN_H);
+        ctx.stroke();
+      }
+      for (const y of [top + 30, top + 90, top + 160]) {
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.lineTo(SCREEN_W, y);
+        ctx.stroke();
+      }
+      const ex = (f.exitX ?? f.length - 80) - camX;
+      if (Number.isFinite(ex) && ex > -100 && ex < SCREEN_W + 100) {
+        ctx.fillStyle = "rgba(80,200,120,0.18)";
+        ctx.fillRect(ex, wallTop + 120, 90, top - wallTop - 140);
+        ctx.fillStyle = "#7fe0a0";
+        ctx.font = pfont(22).f;
+        ctx.fillText("출구", ex + 22, wallTop + 110);
+      }
+    }
+    function drawProps(w, camX, list = w.props) {
+      for (const p of list) {
+        const sx = p.x - camX;
+        if (sx < -p.w - 200 || sx > view.w + p.w + 200) continue;
+        if (p.kind === "hubdoor" || p.kind === "hubspot") continue;
+        if (p.actor) {
+          const a = p.actor;
+          const list2 = art4.clips[a.clip ?? "idle"];
+          const fr = list2 ? Math.floor(w.tick / 5) % list2.length : 0;
+          ctx.save();
+          if (a.hue) ctx.filter = `hue-rotate(${a.hue}deg) saturate(1.3)`;
+          const ok = sprite(a.clip ?? "idle", fr, 0, sx, p.y, a.face ?? -1);
+          ctx.restore();
+          if (!ok) {
+            ctx.fillStyle = "#59636a";
+            ctx.fillRect(sx - 20, p.y - 200, 40, 200);
+          }
+          continue;
+        }
+        if (p.kind === "item" && drawSupply(ctx, p.label, sx, p.y, w.tick)) continue;
+        if (!drawPropArt(ctx, p.kind, p.label, sx, p.y, w.floor.type) && w.showBoxes) {
+          ctx.fillStyle = p.kind === "door" || p.kind === "elevator" ? "#4d5b63" : p.kind === "pickup" ? "#c9a640" : "#59636a";
+          ctx.fillRect(sx - p.w / 2, p.y - p.h, p.w, p.h);
+          ctx.strokeStyle = "rgba(0,0,0,0.5)";
+          ctx.strokeRect(sx - p.w / 2, p.y - p.h, p.w, p.h);
+        }
+      }
+    }
+    let ghostK = 1;
+    function sprite(clip, frame2, origin, x, y, dir, alpha = 1) {
+      const list = art4.clips[clip];
+      const fi = list?.[Math.min(frame2, list.length - 1)];
+      if (!fi || !art4.atlas) return false;
+      ctx.save();
+      ctx.globalAlpha = alpha * ghostK;
+      snapTo(ctx, x, y);
+      if (dir < 0) ctx.scale(-1, 1);
+      const P = PIXEL * spr(y);
+      ctx.drawImage(art4.atlas, fi.sx, fi.sy, fi.w, fi.h, (fi.ox - origin) * P, fi.oy * P, fi.w * P, fi.h * P);
+      ctx.restore();
+      return true;
+    }
+    function grayBody(b, ox, oy) {
+      const fr = b.frame();
+      ctx.fillStyle = b.team === "enemy" ? "#7a848b" : "#9aa6ad";
+      for (const h of fr.hurt) ctx.fillRect(h.x0 - ox, h.y - h.z1 - oy, h.x1 - h.x0, h.z1 - h.z0);
+    }
+    let drawCam = 0;
+    function drawPlayer(p, x, y, z, w) {
+      if (p.ally) sprite(p.ally.clip, p.ally.f, 0, x + (p.ally.x - p.x), y + (p.ally.y - p.y), p.ally.dir);
+      const a = p.anim();
+      if (p instanceof EileenPlayer && !p.seat) {
+        p.drawSelf(ctx, drawCam);
+        return;
+      }
+      if (drawTestPlayer(ctx, a.clip, a.frame, p.clipLen(a.clip), x, y - z, p.dir)) return;
+      const blink = p.invuln > 0 && w.tick % 4 < 2 ? 0.5 : 1;
+      if (!sprite(a.clip, a.frame, a.origin, x, y - z, p.dir, blink)) {
+        ctx.fillStyle = "#c0453a";
+        ctx.fillRect(x - 20, y - z - 190, 40, 190);
+      }
+      const held = p.heldAt();
+      if (held && p.carry && w.drawHeld) w.drawHeld(ctx, p.carry, x + p.dir * held.dx, y - z - held.dz, held.deg, p.dir);
+      if (p.moveKey === "evade" || p.moveKey === "dash" || p.running && w.tick % 3 === 0) {
+        if (w.tick % 2 === 0) ghosts.push({ x: p.x, y: p.y - p.z, clip: a.clip, frame: a.frame, origin: a.origin, dir: p.dir, t: 8 });
+      }
+    }
+    function drawFx(w, camX) {
+      for (const f of w.fxs) {
+        const k = f.t / f.life;
+        const sx = f.x - camX;
+        const sy = f.y - f.z;
+        ctx.save();
+        switch (f.kind) {
+          case "spark":
+          case "spark-big": {
+            const big = f.kind === "spark-big";
+            const n = big ? 12 : 8;
+            const r = (big ? 150 : 90) * (0.45 + k);
+            if (k < 0.6) {
+              ctx.fillStyle = `rgba(255,255,255,${0.95 - k * 1.5})`;
+              ctx.beginPath();
+              ctx.arc(sx, sy, (big ? 64 : 40) * (1 - k * 0.8), 0, Math.PI * 2);
+              ctx.fill();
+            }
+            ctx.strokeStyle = k < 0.3 ? "#ffffff" : "#ffd36a";
+            ctx.lineWidth = big ? 11 : 8;
+            for (let i = 0; i < n; i++) {
+              const an = i / n * Math.PI * 2 + f.seed % 10;
+              ctx.beginPath();
+              ctx.moveTo(sx + Math.cos(an) * r * 0.3, sy + Math.sin(an) * r * 0.3);
+              ctx.lineTo(sx + Math.cos(an) * r, sy + Math.sin(an) * r);
+              ctx.stroke();
+            }
+            if (k < 0.35) {
+              ctx.fillStyle = "#ffffff";
+              ctx.beginPath();
+              ctx.arc(sx, sy, f.kind === "spark" ? 14 : 26, 0, Math.PI * 2);
+              ctx.fill();
+            }
+            break;
+          }
+          case "ring": {
+            const s2 = Number(f.text ?? 2);
+            ctx.strokeStyle = `rgba(255,240,200,${1 - k})`;
+            ctx.lineWidth = s2 >= 3 ? 8 : 4;
+            ctx.beginPath();
+            ctx.ellipse(sx, sy, (s2 >= 3 ? 150 : 80) * k + 10, (s2 >= 3 ? 90 : 50) * k + 6, 0, 0, Math.PI * 2);
+            ctx.stroke();
+            break;
+          }
+          case "boom": {
+            const D3 = 8;
+            const r = 30 + 110 * Math.min(1, k * 2.2);
+            const fade = 1 - k;
+            const cols = k < 0.15 ? ["#ffffff", "#fff3b0", "#ffd24a"] : k < 0.5 ? ["#fff0a0", "#ffb43c", "#e0601e"] : ["#ff9a3c", "#b8401a", "#4a2a22"];
+            const rnd3 = (i) => {
+              const v = Math.sin(f.seed * 12.9898 + i * 78.233) * 43758.5453;
+              return v - Math.floor(v);
+            };
+            ctx.globalAlpha = Math.min(1, fade * 1.6);
+            for (let gy = -r; gy <= r; gy += D3)
+              for (let gx = -r; gx <= r; gx += D3) {
+                const an = Math.atan2(gy, gx);
+                const edge2 = r * (0.72 + 0.28 * Math.sin(an * 5 + f.seed) * Math.cos(an * 3 - f.seed * 0.7));
+                const d3 = Math.hypot(gx, gy * 1.25);
+                if (d3 > edge2) continue;
+                const t = d3 / edge2;
+                ctx.fillStyle = t < 0.4 ? cols[0] : t < 0.75 ? cols[1] : cols[2];
+                ctx.fillRect(Math.round((sx + gx) / D3) * D3, Math.round((sy + gy) / D3) * D3, D3, D3);
+              }
+            ctx.fillStyle = k < 0.4 ? "#ffd24a" : "#6a3a28";
+            for (let i = 0; i < 14; i++) {
+              const an = rnd3(i) * Math.PI * 2;
+              const dist = r * (0.9 + rnd3(i + 40) * 0.9) * Math.min(1, k * 1.6 + 0.2);
+              const sz = D3 * (rnd3(i + 80) < 0.5 ? 1 : 0.5);
+              ctx.fillRect(Math.round(sx + Math.cos(an) * dist), Math.round(sy + Math.sin(an) * dist * 0.7 + 60 * k * k), sz, sz);
+            }
+            break;
+          }
+          case "dust":
+            ctx.fillStyle = `rgba(200,200,190,${0.5 * (1 - k)})`;
+            for (let i = -1; i <= 1; i += 2) {
+              ctx.beginPath();
+              ctx.ellipse(sx + i * (20 + 50 * k), sy - 6, 22 * (1 - k * 0.5), 10, 0, 0, Math.PI * 2);
+              ctx.fill();
+            }
+            break;
+          case "flash":
+            ctx.fillStyle = "#fff6c8";
+            ctx.beginPath();
+            ctx.arc(sx, sy, 22 * (1 - k), 0, Math.PI * 2);
+            ctx.fill();
+            break;
+          case "text":
+            ctx.globalAlpha = 1 - k;
+            ctx.fillStyle = "#fff";
+            ctx.font = pfont(26).f;
+            ctx.textAlign = "center";
+            ctx.fillText(f.text ?? "", sx, sy - 30 * k);
+            break;
+        }
+        ctx.restore();
+      }
+    }
+    function boxes(w, camX) {
+      const all = [w.player, ...w.bodies];
+      const rect2 = (b, col) => {
+        ctx.strokeStyle = col;
+        ctx.lineWidth = 2;
+        ctx.strokeRect(b.x0 - camX, b.y - b.z1, b.x1 - b.x0, b.z1 - b.z0);
+        ctx.beginPath();
+        ctx.moveTo(b.x0 - camX, b.y);
+        ctx.lineTo(b.x1 - camX, b.y);
+        ctx.stroke();
+      };
+      for (const b of all) {
+        const f = b.frame();
+        for (const h of f.hurt) rect2(h, "#3dff7a");
+        for (const h of f.hit) rect2(h, h.grab ? "#ffe03d" : "#ff3d3d");
+        ctx.fillStyle = "#fff";
+        ctx.fillRect(b.x - camX - 3, b.y - 3, 6, 6);
+      }
+      ctx.fillStyle = "#ffffffcc";
+      ctx.font = "16px monospace";
+      const p = w.player;
+      ctx.fillText(`판정 보기 · ${p.state} 장 ${p.mf} · x ${p.x.toFixed(0)} y ${p.y.toFixed(0)} z ${p.z.toFixed(0)} · 틱 ${w.tick}`, 20, SCREEN_H - 16);
+    }
+    function hud(w) {
+      const p = w.player;
+      ctx.fillStyle = "rgba(0,0,0,0.55)";
+      ctx.fillRect(20, 20, 420, 92);
+      ctx.fillStyle = "#e8eef0";
+      ctx.font = pfont(20).f;
+      ctx.fillText("쟈알디", 34, 46);
+      ctx.fillStyle = "#3a2224";
+      ctx.fillRect(120, 30, 300, 18);
+      ctx.fillStyle = p.hp < p.hpMax * 0.3 ? "#ff5148" : "#e2b23c";
+      ctx.fillRect(120, 30, 300 * p.hp / p.hpMax, 18);
+      ctx.fillStyle = "#222b30";
+      ctx.fillRect(120, 54, 300, 8);
+      ctx.fillStyle = p.gauge >= 100 ? w.tick % 10 < 5 ? "#ffffff" : "#6ad0ff" : "#3f9fd6";
+      ctx.fillRect(120, 54, 3 * p.gauge, 8);
+      ctx.fillStyle = "#222b30";
+      ctx.fillRect(120, 66, 300, 5);
+      ctx.fillStyle = "#9ad08a";
+      ctx.fillRect(120, 66, 3 * p.guardMeter, 5);
+      ctx.font = pfont(16).f;
+      ctx.fillStyle = "#c9d3d8";
+      ctx.fillText("탄", 34, 98);
+      for (let i = 0; i < p.mag; i++) {
+        ctx.fillStyle = i < p.ammo ? "#ffd36a" : "#3a4247";
+        ctx.fillRect(60 + i * 14, 84, 9, 18);
+      }
+      ctx.fillStyle = "#c9d3d8";
+      ctx.fillText(`/ ${p.reserve}${p.moveKey === "reload" ? "  재장전…" : ""}`, 60 + p.mag * 14 + 6, 98);
+      ctx.fillText(p.skillCd > 0 ? `폭파 ${Math.ceil(p.skillCd / 30)}` : "폭파 준비", 300, 98);
+      w.items.forEach((it, i) => {
+        const x = 460 + i * 64;
+        ctx.fillStyle = "rgba(0,0,0,0.55)";
+        ctx.fillRect(x, 20, 58, 58);
+        ctx.fillStyle = "#8e9aa1";
+        ctx.font = pfont(14).f;
+        ctx.fillText(String(i + 1), x + 4, 36);
+        if (it) {
+          ctx.fillStyle = it.n > 0 ? "#e8eef0" : "#5a646a";
+          ctx.fillText(it.label, x + 4, 58);
+          ctx.fillText(`×${it.n}`, x + 30, 74);
+        }
+      });
+      if (p.combo >= 2) {
+        ctx.save();
+        ctx.font = pfont(54).f;
+        ctx.textAlign = "right";
+        ctx.fillStyle = "#ffd36a";
+        ctx.strokeStyle = "#000";
+        ctx.lineWidth = 6;
+        ctx.strokeText(`${p.combo} HIT`, SCREEN_W - 30, 80);
+        ctx.fillText(`${p.combo} HIT`, SCREEN_W - 30, 80);
+        ctx.restore();
+      }
+      const boss2 = w.boss();
+      if (boss2) {
+        ctx.fillStyle = "rgba(0,0,0,0.6)";
+        ctx.fillRect(240, SCREEN_H - 62, 800, 40);
+        ctx.fillStyle = "#e8eef0";
+        ctx.font = pfont(18).f;
+        ctx.fillText(boss2.label, 252, SCREEN_H - 36);
+        ctx.fillStyle = "#5a1e1e";
+        ctx.fillRect(470, SCREEN_H - 50, 556, 16);
+        ctx.fillStyle = "#ff5148";
+        ctx.fillRect(470, SCREEN_H - 50, 556 * boss2.hp / boss2.hpMax, 16);
+      }
+    }
+    function overlayText(w) {
+      if (w.goT > 0 && !w.paused && w.tick % 20 < 13) {
+        drawGoSign(ctx, 790, 18, w.tick / 30);
+      }
+      if (w.banner && opt.hud) {
+        const a = Math.min(1, w.banner.t / 15);
+        ctx.fillStyle = `rgba(0,0,0,${0.6 * a})`;
+        ctx.fillRect(0, 170, SCREEN_W, 70);
+        ctx.fillStyle = `rgba(232,238,240,${a})`;
+        ctx.font = pfont(34).f;
+        ctx.textAlign = "center";
+        ctx.fillText(w.banner.text, SCREEN_W / 2, 217);
+        ctx.textAlign = "left";
+      }
+      if (w.subtitle && opt.hud) {
+        ctx.font = pfont(24).f;
+        ctx.textAlign = "center";
+        const tw = ctx.measureText(w.subtitle.text).width;
+        ctx.fillStyle = "rgba(0,0,0,0.65)";
+        ctx.fillRect(SCREEN_W / 2 - tw / 2 - 18, 130, tw + 36, 40);
+        ctx.fillStyle = "#fff";
+        ctx.fillText(w.subtitle.text, SCREEN_W / 2, 159);
+        ctx.textAlign = "left";
+      }
+    }
+    function cutin(w) {
+      const k = 1 - w.cutin / 22;
+      ctx.fillStyle = "rgba(0,0,0,0.72)";
+      ctx.fillRect(0, 0, SCREEN_W, SCREEN_H);
+      ctx.fillStyle = "#b8352c";
+      const bandY = 230;
+      ctx.fillRect(0, bandY, SCREEN_W, 260);
+      ctx.strokeStyle = "rgba(255,255,255,0.25)";
+      for (let i = 0; i < 18; i++) {
+        const y = bandY + (i * 37 + w.tick * 23) % 260;
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.lineTo(SCREEN_W, y);
+        ctx.stroke();
+      }
+      const x = lerp2(-400, 260, Math.min(1, k * 3));
+      if (art4.cutin) {
+        ctx.imageSmoothingEnabled = false;
+        ctx.drawImage(art4.cutin, x - 200, bandY - 40, 340, 340);
+      }
+      ctx.font = pfont(72).f;
+      ctx.fillStyle = "#fff";
+      ctx.fillText("전부 폭파", x + 220, bandY + 160);
+    }
+    return {
+      draw(w, alpha) {
+        ctx.imageSmoothingEnabled = false;
+        const shake = w.shakeT > 0 ? (w.tick % 2 ? 1 : -1) * w.shakeP * 2 : 0;
+        if (w.player instanceof EileenPlayer) w.player.frameStep();
+        const camX = Math.round(lerp2(w.prevCamX, w.camX, alpha));
+        drawCam = camX;
+        w.drawCamX = camX;
+        ctx.save();
+        ctx.translate(shake, w.shakeT > 0 ? w.tick % 3 - 1 : 0);
+        background(w, camX);
+        const layers = w.floor.depthLayers ?? [];
+        const props2 = [...w.props.map((p) => ({ y: p.y, prop: p })), ...layers.map((l) => ({ y: l.y, layer: l }))].sort((a, b) => a.y - b.y);
+        const all = [w.player, ...w.bodies].filter((b) => b.alive);
+        let pi = 0;
+        const propsUpTo = (y) => {
+          while (pi < props2.length && props2[pi].y <= y) {
+            const d3 = props2[pi++];
+            if (d3.prop) drawProps(w, camX, [d3.prop]);
+            else if (d3.layer) {
+              const l = d3.layer;
+              ctx.save();
+              ctx.translate(-camX, 0);
+              l.draw(ctx);
+              ctx.restore();
+            }
+          }
+        };
+        propsUpTo(w.lane[0]);
+        for (const u of w.underlays) u(ctx, camX);
+        const pos = (b) => {
+          const f = b;
+          return { x: lerp2(f.px ?? b.x, b.x, alpha), y: lerp2(f.py ?? b.y, b.y, alpha), z: lerp2(f.pz ?? b.z, b.z, alpha) };
+        };
+        for (const b of all) {
+          if (b.kind === "bullet" || !(b instanceof Fighter)) continue;
+          const q = pos(b);
+          ctx.fillStyle = "rgba(0,0,0,0.35)";
+          ctx.beginPath();
+          ctx.ellipse(q.x - camX, q.y, 46 * Math.max(0.5, 1 - q.z / 400), 12, 0, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        for (const g2 of ghosts) {
+          sprite(g2.clip, g2.frame, g2.origin, g2.x - camX, g2.y, g2.dir, g2.t / 8 * 0.35);
+          g2.t--;
+        }
+        for (let i = ghosts.length - 1; i >= 0; i--) if (ghosts[i].t <= 0) ghosts.splice(i, 1);
+        const worldSpace = (b) => !(b instanceof Fighter) && !(b instanceof Bullet);
+        for (const b of all) {
+          const back = b.drawBack;
+          if (!back) continue;
+          ctx.save();
+          ctx.translate(-camX, 0);
+          back.call(b, ctx);
+          ctx.restore();
+        }
+        const sy = (b) => b.sortY ?? b.y;
+        all.sort((a, b) => sy(a) - sy(b));
+        for (const b of all) {
+          const q = pos(b);
+          propsUpTo(b === w.player ? sy(b) : q.y);
+          const jitter = b.stop > 0 && b !== w.player ? w.tick % 2 ? 3 : -3 : 0;
+          if (b === w.player) drawPlayer(w.player, q.x - camX, q.y, q.z, w);
+          else if (b.draw && worldSpace(b)) {
+            ctx.save();
+            ctx.translate(-camX + jitter, 0);
+            b.draw(ctx, w);
+            ctx.restore();
+          } else if (b.draw) {
+            ctx.save();
+            ctx.translate(Math.round(q.x - camX + jitter), Math.round(q.y - q.z));
+            b.draw(ctx, w);
+            ctx.restore();
+          } else grayBody(b, camX - jitter, 0);
+        }
+        propsUpTo(Infinity);
+        {
+          const pl = w.player;
+          if (pl.alive && (w.props.some((p) => p.y > pl.y + 2 && Math.abs(p.x - pl.x) < p.w / 2 + 50 && !["hubdoor", "hubspot", "door", "elevator", "hatch"].includes(p.kind)) || layers.some((l) => l.occludedSilhouette !== false && l.y > pl.y + 2 && pl.x > l.x0 - 50 && pl.x < l.x1 + 50))) {
+            const q = pos(pl);
+            ctx.save();
+            ctx.globalAlpha = 0.4;
+            ghostK = 0.4;
+            drawPlayer(pl, q.x - camX, q.y, q.z, w);
+            ghostK = 1;
+            ctx.restore();
+          }
+        }
+        w.hintShown = false;
+        if (w.player instanceof EileenPlayer) w.player.drawFxLayer(ctx, camX);
+        drawFx(w, camX);
+        if (w.floor.drawForeground) {
+          ctx.save();
+          ctx.translate(-camX, 0);
+          w.floor.drawForeground(ctx, camX, w);
+          ctx.restore();
+        } else if (w.light < 1) {
+          ctx.fillStyle = `rgba(0,0,0,${(1 - w.light) * 0.9})`;
+          ctx.fillRect(0, 0, SCREEN_W, SCREEN_H);
+        }
+        if (w.showBoxes) boxes(w, camX);
+        ctx.restore();
+        if (w.cutin > 0) cutin(w);
+        if (w.player instanceof EileenPlayer) {
+          ctx.save();
+          const hz = ctx.canvas.height / SCREEN_H;
+          ctx.setTransform(hz, 0, 0, hz, 0, 0);
+          w.player.drawScreen(ctx);
+          ctx.restore();
+        }
+        if (opt.hud) hud(w);
+        overlayText(w);
+      }
+    };
+  }
+
+  // src/game/action/engine/checkpoint.ts
+  var encodeState = (v) => JSON.stringify(v, (_k, x) => x instanceof Set ? { $set: [...x] } : x instanceof Map ? { $map: [...x] } : x === Infinity ? { $infinity: true } : x);
+  var decodeState = (s2) => JSON.parse(s2, (_k, x) => x && typeof x === "object" ? "$set" in x ? new Set(x.$set) : "$map" in x ? new Map(x.$map) : x.$infinity ? Infinity : x : x);
+
+  // src/game/action/engine/world.ts
+  function mulberry32(seed) {
+    let a = seed >>> 0;
+    const next = () => {
+      a = a + 1831565813 >>> 0;
+      let t = a;
+      t = Math.imul(t ^ t >>> 15, t | 1);
+      t ^= t + Math.imul(t ^ t >>> 7, t | 61);
+      return ((t ^ t >>> 14) >>> 0) / 4294967296;
+    };
+    return Object.assign(next, { state: () => a, restore: (v) => {
+      a = v >>> 0;
+    } });
+  }
+  var fallbackEnemy = (s2, w) => s2.kind.startsWith("dummy") ? new Dummy(s2.x, s2.y, s2.kind === "dummy") : new Thug(s2, w);
+  var STOP_DEFAULT = { none: 1, flinch: 3, stagger: 4, launch: 6, down: 6, bind: 4 };
+  var World = class {
+    constructor(run, clips, stage, enemyFactory) {
+      this.run = run;
+      this.stage = stage;
+      this.rand = mulberry32(run.seed || 1);
+      this.player = playerFactory.make(clips);
+      initializeProgression(this.player, run);
+      this.enemyFactory = enemyFactory ?? fallbackEnemy;
+      const self = this;
+      this.stageApi = {
+        get world() {
+          return self;
+        },
+        spawn: (s2) => this.spawn(s2),
+        setProp: (id, patch) => {
+          const i = this.props.findIndex((p) => p.id === id);
+          if (i < 0) {
+            if (patch) this.props.push({ id, kind: "decor", x: 0, y: this.lane[0], w: 40, h: 40, ...patch });
+            return;
+          }
+          if (patch === null) this.props.splice(i, 1);
+          else this.props[i] = { ...this.props[i], ...patch };
+        },
+        hurtPlayer: (dmg, stagger = true) => {
+          const p = this.player;
+          if (stagger) p.applyHit({ x0: 0, x1: 0, z0: 0, z1: 0, y: p.y, attackId: newAttackId(), dmg, react: "flinch", dir: -p.dir, push: 2 }, this);
+          else p.hp = Math.max(0, p.hp - dmg);
+        },
+        heal: (n) => {
+          this.player.hp = Math.min(this.player.hpMax, this.player.hp + n);
+          this.emit({ type: "heal", x: this.player.x });
+        },
+        note: (k, v) => this.notes[k] = v,
+        finish: (how) => {
+          if (!this.ended) this.ended = how;
+        },
+        movePlayer: (x, y) => {
+          const p = this.player;
+          p.x = p.px = x;
+          if (y !== void 0) p.y = p.py = y;
+          p.vx = p.vy = 0;
+        }
+      };
+    }
+    tick = 0;
+    rand;
+    player;
+    bodies = [];
+    floor;
+    lane = [440, 690];
+    bounds = [0, SCREEN_W];
+    noise = 0;
+    light = 1;
+    fxs = [];
+    camX = 0;
+    prevCamX = 0;
+    /** 이번 장에 실제로 그린 카메라 (틱 사이 보간·반올림 뒤). 화면 위 표시(말풍선 등)는 이걸 써야 몸과 같이 움직인다 */
+    drawCamX = 0;
+    shakeT = 0;
+    shakeP = 0;
+    subtitle = null;
+    banner = null;
+    props = [];
+    encIndex = 0;
+    encActive = -1;
+    encWave = 0;
+    encBodies = [];
+    goT = 0;
+    /** 메뉴로 멈춤: 겹쳐 그릴 안내(GO 등)를 숨긴다 */
+    paused = false;
+    /** 필살기 컷인 남은 틱 (그동안 세계 정지) */
+    cutin = 0;
+    showBoxes = false;
+    /** 이번 프레임에 머리 위 상호작용 아이콘이 떴나 (말풍선을 그 위로 올린다) */
+    hintShown = false;
+    kills = 0;
+    floors = 0;
+    notes = {};
+    ended = null;
+    itemState;
+    recovery;
+    /** 전투·공중·투사체가 없는 안정된 시점만 저장한다. */
+    canCheckpoint() {
+      return !this.ended && this.player.hp > 0 && this.player.phase === "free" && !this.player.move && !this.player.airborne && !this.player.grabbed && this.encActive < 0 && !this.bodies.some((b) => b.alive && b.hp > 0 && b.team !== "player");
+    }
+    snapshot() {
+      const keys2 = ["x", "y", "dir", "hp", "hpMax", "ammo", "mag", "reserve", "gauge", "guardMeter", "skillCd", "maxCombo", "ward", "dmgMul"];
+      return encodeState({
+        tick: this.tick,
+        kills: this.kills,
+        floors: this.floors,
+        notes: this.notes,
+        rng: this.rand.state(),
+        player: Object.fromEntries(keys2.map((k) => [k, this.player[k]])),
+        items: this.itemState?.snapshot()
+      });
+    }
+    restore(state2) {
+      const s2 = decodeState(state2);
+      if (!s2.player || !(Number(s2.player.hp) > 0)) throw new Error("손상된 출동 상태");
+      this.tick = s2.tick;
+      this.kills = s2.kills;
+      this.floors = s2.floors;
+      this.notes = s2.notes;
+      Object.assign(this.player, s2.player);
+      this.player.px = this.player.x;
+      this.player.py = this.player.y;
+      this.player.resetLocomotion();
+      this.itemState?.restore(s2.items);
+      this.rand.restore(s2.rng);
+      this.camera();
+      this.prevCamX = this.camX;
+    }
+    deadT = 0;
+    hitMemo = /* @__PURE__ */ new Map();
+    listeners = [];
+    stageApi;
+    enemyFactory;
+    /** 모듈이 매 틱 덧붙이는 일 (아이템 등) */
+    hooks = [];
+    /** E: 아이템 줍기·들기·내려놓기 (처리했으면 true) */
+    pickHook = null;
+    /** 맞을 때 불꽃·고리·흔들림을 엔진이 그릴지 (화면 껍데기가 있으면 껍데기 fx가 맡아 끈다) */
+    hitFx = true;
+    /** 든 물건 그리기: (sx, sy)=손잡이가 올 화면 자리, deg=각도(오른쪽 보기 기준), dir=보는 방향 */
+    drawHeld = null;
+    /** 싸움 구간을 막는 몸인가 (적 모듈: 평화로운 주민 등은 아님) */
+    threat = () => true;
+    /** E를 눌렀을 때 (적 모듈 규칙 신호 등). 가장 가까운 소품을 같이 준다 */
+    interactHooks = [];
+    /** E를 눌렀을 때 대화를 열었으면 true (그러면 원래 E 처리를 하지 않는다) */
+    talkHook = null;
+    /** 몸 아래에 덧그리기 (바닥 물건 등). ctx는 화면 좌표 */
+    underlays = [];
+    itemUse = null;
+    items = [
+      { id: "bandage", label: "붕대", n: 2 },
+      { id: "ammo", label: "탄약 상자", n: 1 },
+      null,
+      null
+    ];
+    get api() {
+      return this.stageApi;
+    }
+    on(f) {
+      this.listeners.push(f);
+      return () => this.listeners = this.listeners.filter((g2) => g2 !== f);
+    }
+    emit(e) {
+      for (const f of this.listeners) {
+        try {
+          f(e);
+        } catch (err) {
+          console.warn("[goei] 이벤트 처리 오류", err);
+        }
+      }
+      if (this.stage?.onEvent) this.stage.onEvent(this.stageApi, this.floor, e);
+    }
+    add(b) {
+      this.bodies.push(b);
+    }
+    addBullet(o) {
+      this.add(new Bullet(o.x, o.y, o.z, o.dir));
+      this.fx("flash", o.x, o.y, o.z);
+    }
+    fx(kind, x, y, z, text2) {
+      const life = { spark: 10, "spark-big": 14, dust: 12, flash: 3, boom: 16, ring: 9, text: 30 }[kind];
+      this.fxs.push({ kind, x, y, z, t: 0, life, text: text2, seed: Math.floor(this.rand() * 1e6) });
+      if (this.fxs.length > 80) this.fxs.shift();
+    }
+    shake(ticks, power = 2) {
+      this.shakeT = Math.max(this.shakeT, ticks);
+      this.shakeP = Math.max(this.shakeT > 0 ? this.shakeP : 0, power);
+    }
+    /** 자막이 뜬 틱 */
+    subtitleAt = 0;
+    say(text2, seconds = 2) {
+      this.subtitle = { text: text2, t: Math.round(seconds * 30) };
+      this.subtitleAt = this.tick;
+    }
+    /** 생성 자리 고치기 (바닥 물건 위에 생겨나지 않게, itemsLink가 단다) */
+    spawnAdjust = null;
+    spawn(s2) {
+      if (this.spawnAdjust) s2 = this.spawnAdjust(s2);
+      const b = this.enemyFactory(s2, this);
+      this.add(b);
+      this.emit({ type: "enemySpawn", x: b.x, kind: s2.kind });
+      return b;
+    }
+    /* ───────── 층 ───────── */
+    enterFloor(f) {
+      this.floor = f;
+      this.lane = f.lane ?? [440, 690];
+      this.bounds = [0, f.length];
+      this.props = (f.props ?? []).map((p2) => ({ ...p2 }));
+      this.bodies = [];
+      this.encIndex = 0;
+      this.encActive = -1;
+      this.encBodies = [];
+      this.ended = null;
+      this.noise = 0;
+      this.light = 1;
+      const p = this.player;
+      p.x = p.px = f.startX;
+      p.y = p.py = (this.lane[0] + this.lane[1]) / 2;
+      p.z = p.pz = 0;
+      p.vx = p.vy = p.vz = 0;
+      p.seat = null;
+      p.move = null;
+      p.moveKey = "";
+      p.grabbed = null;
+      p.enter("free");
+      p.stop = 0;
+      p.resetLocomotion();
+      p.dir = 1;
+      this.camX = f.length <= view.w ? -(view.w - f.length) / 2 : Math.max(0, Math.min(f.length - view.w, p.x - view.w / 2));
+      this.prevCamX = this.camX;
+      this.banner = { text: f.banner ?? f.title, t: 70 };
+      this.subtitle = null;
+      this.floors++;
+      this.emit({ type: "enter:floor", floor: f });
+    }
+    /* ───────── 한 틱 ───────── */
+    step(pad) {
+      this.prevCamX = this.camX;
+      this.tick++;
+      if (pad.pressed.has("hitbox")) this.showBoxes = !this.showBoxes;
+      for (const f of this.fxs) f.t++;
+      this.fxs = this.fxs.filter((f) => f.t < f.life);
+      if (this.subtitle && --this.subtitle.t <= 0) this.subtitle = null;
+      if (this.banner && --this.banner.t <= 0) this.banner = null;
+      if (this.shakeT > 0) this.shakeT--;
+      if (this.goT > 0) this.goT--;
+      for (const b of [this.player, ...this.bodies]) {
+        const f = b;
+        f.px = b.x;
+        f.py = b.y;
+        f.pz = b.z;
+      }
+      if (this.cutin > 0) {
+        this.cutin--;
+        return;
+      }
+      const p = this.player;
+      if (p.stop > 0) {
+        p.stop--;
+        p.listen(pad);
+      } else {
+        p.tick(this, pad);
+        if (p.wantSuper) {
+          p.wantSuper = false;
+          this.cutin = 22;
+          this.emit({ type: "super", x: p.x, move: "super" });
+        }
+        if (p.wantInteract) this.interact();
+        if (p.wantItem) this.useItem(p.wantItem);
+      }
+      for (const b of this.bodies) {
+        if (!b.alive) continue;
+        if (b.stop > 0) {
+          b.stop--;
+          continue;
+        }
+        b.step(this);
+      }
+      this.separate();
+      this.resolveHits();
+      this.bodies = this.bodies.filter((b) => {
+        if (b instanceof Fighter && b.phase === "dead" && b.t > 30) b.alive = false;
+        return b.alive;
+      });
+      for (const h of this.hooks) h();
+      this.stepEncounters();
+      if (this.stage?.tick) this.stage.tick(this.stageApi, this.floor);
+      const exitX = this.floor.exitX ?? this.floor.length - 80;
+      if (this.encActive < 0 && p.x >= exitX && !this.ended) this.ended = "next";
+      if (p.phase === "dead" || p.hp <= 0 && p.phase === "down") {
+        if (++this.deadT > 75 && !this.ended) this.ended = "evac";
+      }
+      this.camera();
+      p.finishLocomotion();
+    }
+    interact() {
+      const p = this.player;
+      let best = null;
+      for (const pr of this.props) {
+        const d3 = Math.abs(pr.x - p.x);
+        if (d3 < 60 && (!best || d3 < Math.abs(best.x - p.x))) best = pr;
+      }
+      if (!p.carry && this.talkHook?.(best)) return;
+      if ((p.carry || !best) && this.pickHook?.()) return;
+      this.interactWith(best);
+    }
+    /** 원래 E가 하던 일 (대화창의 「거래」「인사」 같은 버튼이 부른다) */
+    interactWith(best) {
+      const p = this.player;
+      for (const h of this.interactHooks) h(best);
+      if (best && this.stage?.onInteract) {
+        p.play("pickup", this);
+        this.stage.onInteract(this.stageApi, this.floor, best);
+      }
+    }
+    useItem(slot) {
+      const p = this.player;
+      if (p.move || p.airborne) return;
+      if (this.itemUse) {
+        const r = this.itemUse(slot, this.stageApi);
+        if (r) {
+          p.play(r.anim, this);
+          this.emit({ type: "item", x: p.x });
+        }
+        return;
+      }
+      const it = this.items[slot - 1];
+      if (!it || it.n <= 0) return;
+      if (it.id === "bandage") {
+        if (p.hp >= p.hpMax) return this.say("다친 곳이 없다", 1);
+        p.hp = Math.min(p.hpMax, p.hp + 60);
+        p.play("bandage", this);
+        this.emit({ type: "heal", x: p.x, id: it.id });
+      } else if (it.id === "ammo") {
+        p.reserve += 24;
+        p.play("pickup", this);
+        this.emit({ type: "item", x: p.x, id: it.id });
+        this.say("탄약 +24", 1);
+      }
+      it.n--;
+    }
+    /** 적 모듈 몸(Fighter가 아님)이 요원 몸 안으로 파고들지 않게 최소 간격만큼 적을 밀어낸다 (검수 5-4).
+     *  잡기형(선호 거리가 아주 가까운 종)·잡는 중·쓰러짐·공중은 빼고, 적은 자기가 있던 쪽으로 밀린다. */
+    separateFromPlayer() {
+      const p = this.player;
+      if (!p.alive || p.z > 0) return;
+      for (const b of this.bodies) {
+        const e = b;
+        if (!e.alive || b.team === "player" || b instanceof Fighter || !e.def || e.z > 0) continue;
+        if (e.state && /^(dead|down|getup|grabbing|air|bound|hidden|dormant|spawn)$/.test(e.state)) continue;
+        if (e.kind === "toucher" || e.def.keep && e.def.keep[1] < 30) continue;
+        const dy = Math.abs(e.y - p.y);
+        if (dy > 85) continue;
+        const min = (84 + e.def.w * 0.35) * (dy > 45 ? 0.8 : 1);
+        const dx = e.x - p.x;
+        if (Math.abs(dx) >= min) continue;
+        const s2 = dx === 0 ? -p.dir : Math.sign(dx);
+        e.x += s2 * Math.min(16, min - Math.abs(dx));
+      }
+    }
+    /** 적 모듈 몸끼리: 한 몸처럼 포개지지 않게 옆(x)으로 벌린다 (검수 16-3) */
+    separateEnemies() {
+      const skip = (e) => !e.alive || e.team === "player" || e.kind.startsWith("proj") || e instanceof Fighter || !e.def || e.z > 0 || !!e.state && /^(dead|down|getup|grabbing|air|bound|hidden|spawn)$/.test(e.state);
+      const list = this.bodies.filter((e) => !skip(e));
+      for (let i = 0; i < list.length; i++)
+        for (let j = i + 1; j < list.length; j++) {
+          const a = list[i], b = list[j];
+          const dy = Math.abs(a.y - b.y);
+          if (dy > 95) continue;
+          const min = (70 + (a.def.w + b.def.w) * 0.5) * (dy > 50 ? 0.8 : 1);
+          const dx = b.x - a.x;
+          if (Math.abs(dx) >= min) continue;
+          const s2 = dx === 0 ? a.id < b.id ? 1 : -1 : Math.sign(dx);
+          const push = Math.min(10, (min - Math.abs(dx)) / 2);
+          a.x -= s2 * push;
+          b.x += s2 * push;
+        }
+    }
+    /** 겹친 몸을 옆으로 밀어낸다 (벨트스크롤에서 서로 뚫고 지나가지 않게) */
+    separate() {
+      this.separateFromPlayer();
+      this.separateEnemies();
+      const list = [this.player, ...this.bodies].filter((b) => b.alive && b.kind !== "bullet" && b.z <= 0);
+      for (let i = 0; i < list.length; i++)
+        for (let j = i + 1; j < list.length; j++) {
+          const a = list[i];
+          const b = list[j];
+          if (!(a instanceof Fighter) || !(b instanceof Fighter)) continue;
+          if (a.phase === "held" || b.phase === "held" || a.phase === "down" || b.phase === "down" || a.phase === "dead" || b.phase === "dead") continue;
+          if (a.invuln > 0 || b.invuln > 0) continue;
+          if (Math.abs(a.y - b.y) > 30) continue;
+          const min = (a.width + b.width) * 0.8;
+          const dx = b.x - a.x;
+          if (Math.abs(dx) < min) {
+            const push = (min - Math.abs(dx)) / 2;
+            const s2 = dx === 0 ? 1 : Math.sign(dx);
+            if (a.team === "player" && a instanceof Player && a.move) b.x += s2 * push * 2;
+            else {
+              a.x -= s2 * push;
+              b.x += s2 * push;
+            }
+          }
+        }
+    }
+    resolveHits() {
+      const all = [this.player, ...this.bodies].filter((b) => b.alive);
+      const frames = new Map(all.map((b) => [b, b.frame()]));
+      for (const a of all) {
+        const fa = frames.get(a);
+        if (!fa.hit.length) continue;
+        for (const h of fa.hit)
+          for (const t of all) {
+            if (t === a || t.team === a.team || t.team === "neutral" || !t.alive) continue;
+            const ft = frames.get(t);
+            if (!ft.hurt.some((hb) => overlap(h, hb))) continue;
+            const key2 = `${a.id}:${h.attackId}:${t.id}`;
+            if (this.hitMemo.has(key2)) continue;
+            this.hitMemo.set(key2, this.tick);
+            this.applyHit(a, t, h);
+            if (a.kind === "bullet") a.alive = false;
+            if (!a.alive) break;
+          }
+      }
+      if (this.hitMemo.size > 400) {
+        for (const [k, v] of this.hitMemo) if (this.tick - v > 120) this.hitMemo.delete(k);
+      }
+    }
+    applyHit(a, t, h) {
+      if (a.kind === "bullet") h = progressionHit(h, this.player.progression, "ranged");
+      const side = Math.sign(t.x - a.x);
+      if (side && side !== h.dir) h = { ...h, dir: side };
+      const r = t.applyHit(h, this);
+      const at2 = { x: (Math.max(h.x0, t.x - 30) + Math.min(h.x1, t.x + 30)) / 2, y: t.y, z: (h.z0 + h.z1) / 2 };
+      if (r.kind === "immune") return;
+      const stop = h.stop ?? STOP_DEFAULT[h.react];
+      if (r.kind === "guard") {
+        a.stop = Math.max(a.stop, 3);
+        t.stop = Math.max(t.stop, 3);
+        this.fx("spark", at2.x, at2.y, at2.z);
+        return;
+      }
+      a.stop = Math.max(a.stop, stop);
+      t.stop = Math.max(t.stop, stop);
+      const strength = h.strength ?? (h.react === "down" || h.react === "launch" ? 3 : h.react === "stagger" ? 2 : 1);
+      this.fx(strength >= 3 ? "spark-big" : "spark", at2.x, at2.y, at2.z);
+      if (this.hitFx) {
+        if (strength >= 2) this.fx("ring", at2.x, at2.y, at2.z, String(strength));
+        if (strength >= 3) this.shake(6, 3);
+      }
+      if (h.noise) this.emit({ type: "custom", name: "noise", data: h.noise });
+      const p = this.player;
+      if (a === p || a.kind === "bullet") {
+        p.onConnect(this, !!r.killed);
+        if (r.killed) this.kills++;
+      }
+      const mk = a.kind === "bullet" ? "bullet" : a !== p ? "enemy" : { airkick: "kick", lowkick: "low", dash: "dash", blast: "blast", groundblast: "blast", grabblast: "blast", super: "super", grabknee: "kick" }[p.moveKey] ?? "punch";
+      this.emit({ type: "hit", strength, x: at2.x, y: at2.y, z: at2.z, dmg: h.dmg, react: h.react, target: t.kind, combo: a === p ? p.combo : 0, kind: mk });
+      if (r.killed && t.team === "enemy" && !(t instanceof Fighter)) this.emit({ type: "enemyDie", x: t.x, kind: t.kind });
+      if (a === p && p.moveKey === "grabknee") p.keepHeld();
+    }
+    stepEncounters() {
+      const encs = this.floor.encounters;
+      const p = this.player;
+      if (this.encActive < 0) {
+        const e2 = encs[this.encIndex];
+        if (e2 && p.x >= e2.triggerX) {
+          this.encActive = this.encIndex;
+          this.goT = 0;
+          this.encWave = 0;
+          this.bounds = [e2.lockFrom, e2.lockTo];
+          this.spawnWave();
+          this.emit({ type: "combat:start", index: this.encActive });
+          if (e2.waves.some((w) => w.some((s2) => s2.boss))) this.emit({ type: "combat:boss", index: this.encActive });
+        }
+        return;
+      }
+      const e = encs[this.encActive];
+      this.encBodies = this.encBodies.filter((b) => b.alive && b.hp > 0 && this.threat(b) && !(b instanceof Fighter && (b.phase === "dead" || b.phase === "down" && b.hp <= 0)));
+      if (this.encBodies.length) return;
+      this.encWave++;
+      if (this.encWave < e.waves.length) {
+        this.spawnWave();
+        return;
+      }
+      this.emit({ type: "combat:clear", index: this.encActive });
+      this.encActive = -1;
+      this.encIndex++;
+      this.bounds = [0, this.floor.length];
+      this.goT = 90;
+    }
+    spawnWave() {
+      const e = this.floor.encounters[this.encActive];
+      this.encBodies = e.waves[this.encWave].map((s2) => this.spawn(s2));
+    }
+    camera() {
+      const p = this.player;
+      const [b0, b1] = this.bounds;
+      const W5 = view.w;
+      if (this.floor.length <= W5) {
+        this.camX = -(W5 - this.floor.length) / 2;
+        return;
+      }
+      const target = p.x - W5 / 2 + p.dir * 90;
+      let cx = this.camX + (target - this.camX) * 0.14;
+      cx = Math.max(b0, Math.min(b1 - W5, cx));
+      cx = Math.max(0, Math.min(this.floor.length - W5, cx));
+      this.camX = cx;
+      if (this.encActive >= 0) p.x = Math.max(cx + 90, Math.min(cx + W5 - 90, p.x));
+    }
+    /** 보스 체력 막대용 */
+    boss() {
+      const b = this.bodies.find((x) => x.alive && x.boss);
+      return b ? { label: b.label ?? b.kind, hp: b.hp, hpMax: b.hpMax } : null;
+    }
+  };
+
+  // src/game/action/engine/game.ts
+  var BASE_ZOOM = 1;
+  var Game = class {
+    constructor(box2, art4, mods) {
+      this.box = box2;
+      this.art = art4;
+      this.mods = mods;
+      if (mods.surface) {
+        this.canvas = mods.surface.canvas;
+        this.ctx = mods.surface.ctx;
+        this.ownCanvas = false;
+      } else {
+        this.canvas = document.createElement("canvas");
+        this.canvas.width = SCREEN_W;
+        this.canvas.height = SCREEN_H;
+        this.canvas.className = "goei-engine-canvas";
+        box2.appendChild(this.canvas);
+        this.ctx = this.canvas.getContext("2d");
+        this.ownCanvas = true;
+      }
+      this.renderer = makeRenderer(this.ctx, art4, { hud: mods.hud !== false });
+      this.input.attach();
+      this.canvas.addEventListener("pointerdown", (e) => this.onPointer(e));
+      this.scene = this.idleScene("title");
+      this.toTitle();
+    }
+    canvas;
+    ctx;
+    input = new Input();
+    world = null;
+    scene;
+    paused = false;
+    ownCanvas;
+    renderer;
+    raf = 0;
+    acc = 0;
+    last = 0;
+    menuIndex = 0;
+    run = null;
+    runStage = null;
+    lastResult = null;
+    hqRoot = null;
+    wasPaused = false;
+    menuItems = [];
+    titleItems = [];
+    /** 꼬리표 시작은 주 루프가 돈 뒤에 (start()에서) */
+    booted = false;
+    start() {
+      if (!this.booted) {
+        this.booted = true;
+        queueMicrotask(() => this.mods.boot?.(this));
+      }
+      const frame2 = (now) => {
+        if (this.dead) return;
+        this.raf = requestAnimationFrame(frame2);
+        if (!this.last) this.last = now;
+        let dt = (now - this.last) / 1e3;
+        this.last = now;
+        if (dt > 0.25) dt = 0.25;
+        this.mods.frame?.(dt);
+        this.acc += dt;
+        const T3 = 1 / TICK_HZ;
+        while (this.acc >= T3) {
+          this.acc -= T3;
+          this.tickOnce();
+        }
+        const paused = this.paused || !!this.mods.paused?.();
+        if (paused !== this.wasPaused) {
+          this.wasPaused = paused;
+          this.mods.onPause?.(paused);
+        }
+        if (!this.mods.covered?.()) {
+          const w = this.world;
+          const H6 = this.inHub ? view.worldH : SCREEN_H;
+          const cssH = this.canvas.getBoundingClientRect().height;
+          const fixed2 = this.inHub && cssH >= 600;
+          view.zoom = (fixed2 ? BASE_ZOOM * (this.canvas.height / cssH) : this.canvas.height / H6) * Math.max(1, charSize.k);
+          if (w) view.lane = w.lane;
+          const vw = this.canvas.width / view.zoom;
+          view.w = this.inHub ? Math.max(SCREEN_W, vw) : SCREEN_W;
+          view.hub = this.inHub;
+          view.crop = 0;
+          const frozen = paused || !!this.mods.blocking?.() || !!this.mods.hq?.isOpen?.();
+          if (vw < SCREEN_W && w) {
+            const a = frozen ? 1 : this.acc / T3, cam = Math.round(w.prevCamX + (w.camX - w.prevCamX) * a), px = (w.player.px ?? w.player.x) + (w.player.x - (w.player.px ?? w.player.x)) * a, raw = Math.max(0, Math.min(SCREEN_W - vw, px - cam - vw / 2));
+            view.crop = Math.round((cam + raw) * view.zoom) / view.zoom - cam;
+          }
+          view.cropY = 0;
+          const vh = this.canvas.height / view.zoom;
+          if (this.inHub) {
+            this.ctx.fillStyle = "#000";
+            this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+          }
+          if (vh > H6 + 0.5) {
+            view.cropY = -Math.round((vh - H6) / 2 * view.zoom) / view.zoom;
+          } else if (vh < H6 - 0.5 && w) {
+            const a = frozen ? 1 : this.acc / T3, p = w.player;
+            const py = (p.py ?? p.y) + (p.y - (p.py ?? p.y)) * a;
+            view.cropY = Math.round(Math.max(0, Math.min(H6 - vh, py - vh * 0.7)) * view.zoom) / view.zoom;
+          }
+          this.ctx.save();
+          this.ctx.scale(view.zoom, view.zoom);
+          this.ctx.translate(-view.crop, -view.cropY);
+          this.scene.draw(paused ? 1 : this.acc / T3);
+          this.ctx.restore();
+          this.mods.overlay?.(this.ctx, this.world, dt);
+        }
+      };
+      this.raf = requestAnimationFrame(frame2);
+    }
+    /** 시험용: 틱을 n번 바로 돌린다 */
+    advance(n) {
+      for (let i = 0; i < n; i++) this.tickOnce();
+      this.scene.draw(1);
+    }
+    tickOnce() {
+      const p = this.input.sample();
+      if (typeof document !== "undefined" && document.hidden) return;
+      if (this.mods.paused?.() && this.scene.name === "battle") return;
+      this.scene.tick(p);
+    }
+    destroy() {
+      this.checkpoint();
+      this.dead = true;
+      cancelAnimationFrame(this.raf);
+      this.world = null;
+      this.run = null;
+      this.input.detach();
+      if (this.ownCanvas) this.canvas.remove();
+      if (this.hqRoot) {
+        this.mods.hq?.unmount();
+        this.hqRoot.remove();
+      }
+      this.mods.dispose?.();
+    }
+    /* ───────── 제목·본부 ───────── */
+    toTitle() {
+      this.checkpoint();
+      this.world = null;
+      this.inHub = false;
+      this.paused = false;
+      if (this.hqRoot) this.hqRoot.hidden = true;
+      if (this.mods.openTitle) {
+        this.scene = this.idleScene("title");
+        this.mods.openTitle();
+      } else this.scene = this.titleScene();
+      this.mods.onScene?.("title");
+    }
+    /** 새로 시작: 본부가 있으면 본부로, 없으면 첫 층 모듈로 바로 출동 */
+    start_new(stageId) {
+      if (this.mods.hq && !stageId) return this.showHq();
+      const stage = this.mods.stages.find((s2) => s2.id === stageId) ?? this.mods.stages[0];
+      this.deploy({ seed: Math.floor(Math.random() * 1e9), agent: "eileen", stageId: stage.id });
+    }
+    dead = false;
+    /** 본부를 걷는 중인가 (엔진 벨트 장면) */
+    inHub = false;
+    showHq() {
+      const hq2 = this.mods.hq;
+      this.world = null;
+      this.scene = this.idleScene("hq");
+      if (!hq2.hub) this.canvas.style.visibility = "hidden";
+      if (!this.hqRoot) {
+        this.hqRoot = document.createElement("div");
+        this.hqRoot.className = "goei-engine-hq";
+        (hq2.hub && this.mods.hqLayer?.() || this.box).appendChild(this.hqRoot);
+        hq2.mount(this.hqRoot, {
+          deploy: (run) => this.deploy(run),
+          stages: () => this.mods.stages.map((s2) => ({ id: s2.id, label: s2.label }))
+        });
+      }
+      this.hqRoot.hidden = false;
+      if (hq2.hub) {
+        const stage = hq2.hub();
+        const run = { seed: Math.floor(Math.random() * 1e9), agent: "eileen", stageId: stage.id };
+        this.hqRoot.hidden = !hq2.isOpen?.();
+        this.hqRoot.classList.add("goei-engine-hq-panel");
+        this.canvas.style.visibility = "";
+        this.inHub = true;
+        const w = new World(run, this.art.clips, stage, this.mods.enemyFactory);
+        for (const l o

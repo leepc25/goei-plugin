@@ -137,7 +137,6 @@ export function rand(f: { seed: number }): number {
   return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
 }
 const pick = <T>(f: { seed: number }, a: T[]) => a[Math.floor(rand(f) * a.length)];
-const between = (f: { seed: number }, lo: number, hi: number) => lo + Math.floor(rand(f) * (hi - lo + 1));
 
 export function createField(seed = 1, depth = 1, bounds = { x0: 40, x1: 1240, y0: 480, y1: 680 }): Field {
   return { seed: seed | 0 || 1, nextId: 1, depth, ents: [], projs: [], zones: [], bounds };

@@ -255,9 +255,25 @@ export function displaySection(lore: LoreEntry[]): Record<string, Record<string,
   return out;
 }
 
+/** 명부에도 옛 「Phone tabs」 로어북에도 탭이 없을 때 쓰는 기본 괴담톡 탭 (배포 카드 명부와 같은 값).
+ *  2026-10-29 사용자: 명부에서 이 칸이 빠진 봇은 괴담톡이 「탭 설정이 없어요」만 띄우고 통째로 안 나왔다 */
+export const DEFAULT_PHONE_TABS = {
+  order_by_faction: { B00: ['T02', 'T01'] },
+  tabs: [
+    { id: 'T01', name: '관리', visible_for: ['A00'], name_by_faction: { B00: '가짜' } },
+    { id: 'T02', name: '가짜', visible_for: ['B00'], name_by_faction: { B00: '관리' } },
+    { id: 'T03', name: '백일', visible_for: ['C00'] },
+    { id: 'T04', name: '중립', visible_for: ['A00', 'B00', 'C00', 'D00', 'E00'] },
+    { id: 'T05', name: '기타', visible_for: ['A00', 'B00', 'C00', 'D00', 'E00'] },
+    { id: 'X01', name: '괴이', visible_for: ['A00', 'B00', 'C00', 'D00', 'E00'] },
+  ],
+};
+
 export function phoneTabsSection(lore: LoreEntry[]): PhoneTabsData {
   const saved = readDirectoryData(lore)?.['괴담톡 탭'];
-  const d = saved && typeof saved === 'object' ? obj(saved) : obj(book(lore, 'Phone tabs'));
+  const fromBook = obj(book(lore, 'Phone tabs'));
+  const picked = saved && typeof saved === 'object' ? obj(saved) : fromBook;
+  const d = Array.isArray(picked.tabs) && (picked.tabs as unknown[]).length ? picked : obj(DEFAULT_PHONE_TABS);
   const tabs = (Array.isArray(d.tabs) ? (d.tabs as unknown[]) : []).map(obj).map((t) => {
     const tab: PhoneTabData = { id: s(t.id), name: s(t.name), visible_for: list(t.visible_for) };
     const by = strMap(t.name_by_faction);

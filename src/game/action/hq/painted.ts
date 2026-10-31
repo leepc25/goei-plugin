@@ -56,6 +56,7 @@ export interface PaintedScene {
 }
 
 import { JR_ROOMS } from './jrRooms.gen';
+import { JR_CUTS } from './jrCuts.gen';
 
 const downs = (xs: number[], y = 18): PaintedLamp[] => xs.map((x) => ({ x, y, kind: 'down' as const }));
 const sign = (x: number, y: number): PaintedLamp => ({ x, y, kind: 'sign', color: '#3cff8a', r: 34 });
@@ -176,19 +177,18 @@ export const PAINTED: Record<string, PaintedScene> = {
   // 문은 그림 속 계단·통로 자리(문짝 없음). 막는 상자는 바닥에 튀어나온 매대·의자·상자 앞 모서리
   jr_entry: {
     file: 'jr_entry', w: 5521, under: false, lane: [428, 669],
-    blocks: [[80, 620, 505], [605, 665, 446], [2860, 3060, 442], [4500, 4660, 442], [5000, 5521, 528]],
+    // 정류장·지하상가 출입구는 오린 그림(jrCuts)과 그 바닥 상자: 뒤(건물 쪽 y430~456)로 지나다닌다
+    blocks: [[2860, 3060, 442], [4500, 4660, 442]],
     doors: {
-      down: { x0: 4880, x1: 5000, y0: 300, y1: 505, anim: 'none', behind: 'dark' },
+      down: { x0: 4892, x1: 4990, y0: 300, y1: 500, anim: 'none', behind: 'dark' },
       west: { x0: 0, x1: 60, y0: 420, y1: 669, anim: 'none' },
     },
     lamps: [], windows: [], objects: [],
   },
   jr_b1: {
     file: 'jr_b1', w: 6425, under: true, lane: [428, 669],
-    blocks: [
-      [345, 485, 442], [580, 870, 490], [1690, 1950, 462], [2240, 2460, 446], [2650, 3020, 452],
-      [3740, 4110, 462], [4320, 4810, 462], [4830, 5000, 442], [5340, 5720, 452], [6000, 6160, 475],
-    ],
+    // 막는 상자는 오린 소품(jrCuts)이 가진다. 지하 2층 계단 구멍은 막고 앞에서 E
+    blocks: [[6148, 6425, 460], [4290, 4400, 442], [4830, 5000, 442], [5340, 5720, 448]],
     doors: {
       up: { x0: 40, x1: 320, y0: 100, y1: 420, anim: 'none', behind: 'dark' },
       daebak: { x0: 2970, x1: 3120, y0: 130, y1: 410, anim: 'none', behind: 'dark' },
@@ -200,10 +200,8 @@ export const PAINTED: Record<string, PaintedScene> = {
   },
   jr_alley: {
     file: 'jr_alley', w: 6059, under: true, lane: [428, 669],
-    blocks: [
-      [80, 250, 440], [535, 625, 448], [1335, 1760, 470], [1780, 1860, 442], [1890, 2140, 446],
-      [3490, 3910, 455], [4270, 4850, 452], [5090, 5530, 442], [5490, 6059, 472],
-    ],
+    // 막는 상자는 오린 소품(jrCuts)이 가진다. 벽에 붙은 진열대·상자만 여기
+    blocks: [[1780, 2215, 442], [3780, 3930, 442], [4280, 4800, 442], [4990, 5120, 442], [5400, 5690, 442]],
     doors: {
       b1: { x0: 2800, x1: 3070, y0: 130, y1: 420, anim: 'none', behind: 'dark' },
       heolgap: { x0: 355, x1: 460, y0: 125, y1: 400, anim: 'none', behind: 'dark' },
@@ -227,6 +225,9 @@ export const PAINTED: Record<string, PaintedScene> = {
   // 중림 가게 안 방 6개 (tools/jr/rooms.py → jrRooms.gen.ts)
   ...JR_ROOMS,
 };
+
+// 중림 장면에서 오린 소품(가림용): tools/jr/cuts.py
+for (const [k, cs] of Object.entries(JR_CUTS)) if (PAINTED[k]) PAINTED[k].objects = [...PAINTED[k].objects, ...cs];
 
 /** 문 가운데 x */
 export const doorX = (scene: string, id: string) => {

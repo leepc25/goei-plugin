@@ -1,13 +1,13 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { build } from 'esbuild';
+import { buildWithData } from './data-init.mjs';
 import { mkdtemp } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { pathToFileURL } from 'node:url';
 
 const dir = await mkdtemp(join(tmpdir(), 'goei-people-req-'));
-await build({
+await buildWithData({
   entryPoints: ['src/core/people/request.ts', 'src/core/people/types.ts', 'src/core/people/settings.ts', 'src/core/people/seed.ts', 'src/core/people/base.ts'],
   outdir: dir, outbase: 'src', bundle: true, platform: 'node', format: 'esm', outExtension: { '.js': '.mjs' }, logLevel: 'silent',
 });

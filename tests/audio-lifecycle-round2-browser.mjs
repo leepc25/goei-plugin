@@ -10,7 +10,7 @@ const { chromium } = require(process.env.PLAYWRIGHT_MODULE || `${execSync('npm r
 const bundle = await build({ stdin: { contents: `export * from './src/game/action/audio/index'; export * from './src/game/action/audio/engine'; export * from './src/game/action/audio/music'; export * from './src/game/action/audio/videoTrack';`, resolveDir: process.cwd() }, bundle: true, format: 'iife', globalName: 'AudioTest', write: false });
 const server = createServer((req, res) => { res.setHeader('Content-Type', 'text/html'); res.end(`<button id="start">Start</button><script>${bundle.outputFiles[0].text}</script>`); });
 await new Promise(r => server.listen(0, '127.0.0.1', r));
-const browser = await chromium.launch({ executablePath: process.env.CHROMIUM_PATH || '/usr/bin/chromium', headless: true, args: ['--no-sandbox', '--autoplay-policy=user-gesture-required'] });
+const browser = await chromium.launch({ executablePath: process.env.CHROMIUM_PATH || undefined, headless: true, args: ['--no-sandbox', '--autoplay-policy=user-gesture-required'] });
 const results = [];
 async function check(name, fn) {
   if (process.env.AUDIO_CASE && !name.includes(process.env.AUDIO_CASE)) return;

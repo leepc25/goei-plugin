@@ -2,7 +2,7 @@
 // 생성은 창을 닫아도 계속되고, 끝나면 원래 채팅의 로어북에 저장한다.
 import { onOffSwitch } from './controls';
 import { factionNames, parseCatalog } from '../core/world/catalog';
-import { buildRegistry, searchRegistry, type Registry } from '../core/world/registry';
+import { buildRegistry, type Registry } from '../core/world/registry';
 import { hasBook, type RefSource } from '../core/refs';
 import {
   type WikiDoc, acceptArticle, baseDocs, canonicalTitle, deleteDoc, findDoc, listDocs, renderArticle, saveDoc, validTitle, wikiPrompt, wikiSettings, WikiError,
@@ -14,7 +14,6 @@ import { fitPrompt } from '../core/budget';
 import { advancedBox } from './advanced';
 import { personaText } from '../host/user';
 import { playerSource } from '../core/player';
-import { saveVarDefaults } from '../host/prefs';
 import { GHOST_ICON, ICONS } from './icons';
 import { defaultsAction, defaultsButtons, defaultsConfirm } from './defaults';
 import { toast } from './toast';
@@ -29,10 +28,9 @@ import { lastStatusFields } from '../core/world/tags';
 import { placeWhere } from '../core/world/geo';
 import { factionList } from '../core/factions';
 import { updateChat, type ChatContext } from '../host/risu';
-import { factionView as peopleFactionView, peopleDocsView, peopleHomeTile, peopleListView, personView, resetPeopleUi } from './people';
 
-/** people·person·docs: 이 채팅의 인물 기록 (ui/people.ts). person 은 title 에 인물 이름 */
-type WikiView = 'home' | 'compose' | 'doc' | 'settings' | 'new' | 'people' | 'person' | 'docs' | 'faction';
+/** 위키는 문서만 (2026-10-29: 이 채팅의 인물·개인 기록·세력·기록 문서 화면은 왼쪽 메뉴 「기록」으로 옮겼다, ui/records.ts) */
+type WikiView = 'home' | 'compose' | 'doc' | 'settings' | 'new';
 /** 명부 항목 분류: 괴이·특수·거점·인물·조직 */
 type Cat = 'an' | 'ms' | 'lm' | 'ag' | 'org';
 /** 서랍 탭. 세력은 거점과 조직을 함께, 명부에 없는 새 주제는 기타 (사람 문서면 인물) */
@@ -114,7 +112,6 @@ function go(view: WikiView, title = '', query = wiki.query) {
   if (wiki.view !== view || wiki.title !== title) wiki.history.push({ view: wiki.view, title: wiki.title, query: wiki.query });
   if (wiki.history.length > 30) wiki.history.shift();
   if (wiki.view !== view || wiki.title !== title) Object.assign(wiki, { docReq: '', rewrite: null });
-  if (wiki.view !== view || wiki.title !== title) resetPeopleUi();
   wiki.view = view;
   wiki.title = title;
   wiki.query = query;
@@ -147,16 +144,18 @@ function openTitle(ctx: ChatContext, raw: string, from: 'link' | 'direct' | 'sea
 }
 
 /** 검색줄 Enter·검색: 정확히 맞는 제목이면 바로 열고, 아무것도 안 맞으면 그 제목으로 작성 화면. 나머지는 왼쪽 목록이 걸러 보여 준다 */
-function search(ctx: ChatContext, q: string) {
+/** 문서·작성 화면으로 갔으면 true. 못 찾으면 목록을 펼치고 false */
+function search(ctx: ChatContext, q: string): boolean {
   const query = q.trim();
   wiki.query = query;
-  if (!query) return;
+  if (!query) return false;
   const own = ownDoc(ctx, query);
   const c = own ? { title: own, known: true } : canonicalTitle(registry(ctx), source(ctx), query);
-  if (findDoc(ctx.chat, c.title, ctx.char.globalLore)) return go('doc', c.title, query);
-  if (c.known) return openTitle(ctx, c.title, 'direct');
+  if (findDoc(ctx.chat, c.title, ctx.char.globalLore)) return go('doc', c.title, query), true;
+  if (c.known) return openTitle(ctx, c.title, 'direct'), true;
   // 여러 개가 걸리면 목록을 펼쳐 고르게. 하나도 없으면 목록에 「없어요 · 작성하기」가 뜬다 (바로 작성 화면으로 가지 않는다)
   wiki.listOpen = true;
+  return false;
 }
 
 // ── 생성 ──
@@ -466,7 +465,6 @@ function rail(): string {
   const label = open ? '목록 접기' : '목록 펼치기';
   return `<nav class="nw-rail" aria-label="위키 메뉴">
     ${tool('wiki-home', ICONS.wiki, '위키 메인', wiki.view === 'home' ? 'aria-pressed="true"' : '')}
-    ${tool('wiki-settings', ICONS.settings, '위키 설정', wiki.view === 'settings' ? 'aria-pressed="true"' : '')}
     <button class="nw-grab" type="button" data-action="wiki-list" aria-expanded="${open}" aria-label="${label}" title="${label}"><span class="nw-grab-ico${open ? '' : ' flip'}">${ICONS.back}</span></button>
   </nav>`;
 }
@@ -523,7 +521,6 @@ function homeView(ctx: ChatContext): string {
       <div class="nw-hero-q"><input class="gx-search" type="search" name="wiki-home-q" data-input="wiki-home-query" data-enter="wiki-search" placeholder="이름·제목 검색" value="${esc(wiki.homeQuery)}" aria-label="위키 검색" autocomplete="off"></div>
       <div class="nw-hero-res">${wikiHomeResults(ctx)}</div>
     </section>
-    ${sec('이 채팅의 기록', 0, `<div class="nw-tiles">${peopleHomeTile(ctx)}</div><p class="nw-hnone">요원이든 아니든 이 채팅에 등장해 기록된 사람은 모두 여기에 있어요. 사원증의 「기록」도 같은 곳이에요.</p>`)}
     ${liveCards ? sec('지금 얽힌 문서', 0, `<div class="nw-cards">${liveCards}</div>`) : ''}
     ${sec('이번 이야기에서 쓴 문서', story.length, story.length ? `<div class="nw-cards">${storyCards}</div>${story.length > 8 ? `<button class="gx-mini nw-more-btn" data-action="wiki-browse" data-value="story">${story.length}개 모두 보기</button>` : ''}` : '<p class="nw-hnone">아직 이번 이야기에서 쓴 문서가 없어요.</p>')}
     ${sec('분류', 0, `<div class="nw-tiles">${tiles}</div>`)}
@@ -655,10 +652,6 @@ function paneHtml(ctx: ChatContext): string {
   if (wiki.view === 'compose') return compose(ctx);
   if (wiki.view === 'settings') return settingsView(ctx);
   if (wiki.view === 'new') return newView(ctx);
-  if (wiki.view === 'people') return peopleListView(ctx);
-  if (wiki.view === 'person') return personView(ctx, wiki.title);
-  if (wiki.view === 'docs') return peopleDocsView(ctx);
-  if (wiki.view === 'faction') return peopleFactionView(ctx, wiki.title);
   return homeView(ctx);
 }
 
@@ -685,7 +678,6 @@ export function wikiTab(ctx: ChatContext): string {
       tool('wiki-home', ICONS.wiki, '위키 메인', wiki.view === 'home' ? 'aria-pressed="true"' : '', '메인'),
       tool('wiki-find', ICONS.search, '위키 검색', '', '검색'),
       tool('wiki-list', ICONS.list, open ? '목록 접기' : '목록 펼치기', `aria-pressed="${open}"`, '목록'),
-      tool('wiki-settings', ICONS.settings, '위키 설정', wiki.view === 'settings' ? 'aria-pressed="true"' : '', '설정'),
     ].join(''))}
     ${note}
   </main>`;
@@ -815,12 +807,12 @@ export function bindWikiSide(root: HTMLElement, act: (value: string) => void): v
     const dx = (e.changedTouches[0]?.clientX ?? t0.x) - t0.x;
     const dy = (e.changedTouches[0]?.clientY ?? t0.y) - t0.y;
     t0 = null;
-    // PC는 설정한 쪽(기본 왼쪽)에서, 모바일은 오른쪽에서 열리므로 접는 방향도 그쪽으로
-    const fromLeft = wide() && root.closest<HTMLElement>('[data-wiki-side]')?.dataset.wikiSide !== 'right';
+    // 설정한 쪽(기본 오른쪽)에서 열리므로 접는 방향도 그쪽으로 (PC·폰 같음, 2026-10-29)
+    const fromLeft = root.closest<HTMLElement>('[data-wiki-side]')?.dataset.wikiSide === 'left';
     const out = fromLeft ? dx < -36 : dx > 36;
     if (out && Math.abs(dx) > Math.abs(dy) * 1.5 && wiki.listOpen) act('close');
   }, { passive: true });
-  // 모바일 책갈피를 왼쪽으로 끌어도 열린다
+  // 모바일 책갈피를 안쪽으로 끌어도 열린다 (오른쪽 책갈피는 왼쪽으로, 왼쪽 책갈피는 오른쪽으로)
   const edge = root.querySelector<HTMLElement>('.nw-edge');
   let e0: number | null = null;
   edge?.addEventListener('touchstart', (e) => (e0 = e.touches[0]?.clientX ?? null), { passive: true });
@@ -828,7 +820,8 @@ export function bindWikiSide(root: HTMLElement, act: (value: string) => void): v
     if (e0 === null) return;
     const dx = (e.changedTouches[0]?.clientX ?? e0) - e0;
     e0 = null;
-    if (dx < -24 && !wiki.listOpen) act('open');
+    const leftSide = root.closest<HTMLElement>('[data-wiki-side]')?.dataset.wikiSide === 'left';
+    if ((leftSide ? dx > 24 : dx < -24) && !wiki.listOpen) act('open');
   }, { passive: true });
 }
 
@@ -879,11 +872,13 @@ export async function handleWiki(action: string, value: string | undefined, ctx:
       // 메인의 분류 칸: 서랍을 그 탭으로 연다
       Object.assign(wiki, { tab: (TABS.some(([t]) => t === v) ? v : 'all') as Tab, listOpen: true, query: '' });
       break;
-    case 'wiki-search':
+    case 'wiki-search': {
       wiki.homeQuery = '';
-      search(ctx, v);
-      if (wiki.view === 'compose' || wiki.view === 'doc') wiki.listOpen = false;
+      // 검색으로 문서·작성 화면에 갔을 때만 목록을 접는다. 못 찾으면 search 가 목록을 펼쳐 「없어요 · 작성하기」를 보이는데,
+      // 예전엔 문서를 보던 중이면 곧바로 다시 접혀 검색이 아무 반응 없는 것처럼 보였다 (QC 2026-10-28)
+      if (search(ctx, v) && (wiki.view === 'compose' || wiki.view === 'doc')) wiki.listOpen = false;
       break;
+    }
     case 'wiki-pick':
       // 왼쪽 목록에서 고르기. PC는 열린 항목을 다시 누르면 닫힌다
       if ((wiki.view === 'doc' || wiki.view === 'compose') && canon(ctx)(v) === wiki.title && wide()) {
@@ -967,30 +962,6 @@ export async function handleWiki(action: string, value: string | undefined, ctx:
     case 'wiki-settings':
       if (wiki.view === 'settings') go('home');
       else go('settings');
-      wiki.listOpen = false;
-      break;
-    case 'wiki-people':
-      // 이 채팅의 인물 기록 (ui/people.ts)
-      resetPeopleUi();
-      go('people');
-      wiki.listOpen = false;
-      break;
-    case 'wiki-person':
-      if (!v) break;
-      resetPeopleUi();
-      go('person', v);
-      wiki.listOpen = false;
-      break;
-    case 'wiki-docs':
-      resetPeopleUi();
-      go('docs');
-      wiki.listOpen = false;
-      break;
-    case 'wiki-faction':
-      // 세력 평판 상세 (ui/people.ts factionView). title = 조직 코드
-      if (!v) break;
-      resetPeopleUi();
-      go('faction', v);
       wiki.listOpen = false;
       break;
     default:

@@ -40,6 +40,10 @@ export interface EvCard {
   locCode?: string;
   /** 막 끝난 상황 (다음 응답까지 흐리게) */
   ended?: boolean;
+  /** 종료된 상황의 보고서 id (기록 메뉴, 2026-10-29). 있으면 줄 끝·큰 보기에 보고서 지름길 */
+  rpt?: string;
+  /** 내가 출동한 상황 (보고서 배지) */
+  mine?: boolean;
 }
 
 /** 배치·방문자 이름 칩: 요원은 사진+이름, 그 밖의 이름은 이름표 */
@@ -134,6 +138,28 @@ export function targetMark(on: boolean, action: string, value: string, btn = fal
   return `<button class="${btn ? 'gx-evbtn ' : ''}gx-tgt${on ? ' on' : ''}" data-action="${action}" data-value="${esc(value)}" aria-pressed="${on}" title="${on ? '목표 해제' : '목표로 지정'}" aria-label="${on ? '목표 해제' : '목표로 지정'}">${TGT}${btn ? '' : `<span>${on ? '해제' : '선택'}</span>`}</button>`;
 }
 
+/** 카드 가운데 선택 과녁 (2026-10-29 사용자: 제목 옆 작은 표식은 누르기 어렵고 눈에 안 띈다 → FPS 조준점처럼 크고 반투명하게, 누르면 잠금 효과).
+ *  상황판 CCTV·임무 상세·커스텀 임무 카드가 같은 것을 쓴다. 안 고름: 흐린 조준점 「목표 지정」 / 고름: 민트 잠금 「목표」. 다시 누르면 해제 */
+// 과녁 효과는 누른 그 과녁에만, 상태가 바뀐 첫 그리기에서 한 번 (창은 조작마다 통째로 다시 그려서, 안 막으면 매번 효과가 다시 돈다)
+const aimHit = { key: '', wasOn: false, used: true };
+if (typeof document !== 'undefined') {
+  document.addEventListener('pointerdown', (ev) => {
+    const b = (ev.target as HTMLElement | null)?.closest?.<HTMLElement>('.gx-aim');
+    if (b) Object.assign(aimHit, { key: b.dataset.key ?? '', wasOn: b.classList.contains('on'), used: false });
+  }, true);
+}
+
+/** 카드 가운데 선택 과녁 (2026-10-29 사용자). 글자 없음. 안 고름: 크고 얇고 흐린 조준선이 천천히 돌고 숨 쉰다.
+ *  고르면 같은 중심에서 2/3 크기로 조여들며 붉게 잠기고(퍼지는 고리·모서리 괄호·빛나는 점), 해제하면 흰 고리와 함께 다시 커진다.
+ *  key = 카드 열쇠 (해제 동작은 값이 비어 있어 따로 받는다) */
+export function aimMark(on: boolean, action: string, value: string, key = value): string {
+  const label = on ? '해제' : '선택';
+  const fx = !aimHit.used && aimHit.key === key && aimHit.wasOn !== on;
+  if (fx) aimHit.used = true;
+  return `<button class="gx-aim${on ? ' on' : ''}${fx ? ' fx' : ''}" data-action="${action}" data-value="${esc(value)}" data-key="${esc(key)}" aria-pressed="${on}" title="${label}" aria-label="${label}">
+    <svg viewBox="0 0 100 100" aria-hidden="true"><circle class="burst" cx="50" cy="50" r="34"/><g class="rot"><circle class="orb" cx="50" cy="50" r="46"/><path class="tick" d="M50 2v5M50 93v5M2 50h5M93 50h5"/></g><circle class="ring" cx="50" cy="50" r="34"/><path class="arm" d="M50 14v14M50 72v14M14 50h14M72 50h14"/><path class="brk" d="M30 22h-8v8M70 22h8v8M30 78h-8v-8M70 78h8v-8"/><circle class="dot" cx="50" cy="50" r="1.6"/></svg></button>`;
+}
+
 /** 상세 창 (상황판·임무 탭 공통, 창 맨 위에 하나): 상황판 CCTV와 같은 화면·효과 (2026-10-21 사용자). 가로 600px, 세로는 상황판 CCTV 비율.
  *  종료는 오른쪽 위 한 곳에만. 닫기는 바깥 누르기·Esc·뒤로 */
 export function evPopup(clock = ''): string {
@@ -196,7 +222,7 @@ function opsRow(c: OpsCard, on: boolean): string {
   const thumb = c.art?.pic ? `<img src="${esc(c.art.pic)}" alt="" loading="lazy">` : `<span class="gx-oprow-ico">${MARK[c.kind]}</span>`;
   return `<li class="gx-oprow k-${c.kind}${on ? ' sel' : ''}${c.ended ? ' ended' : ''}" data-action="ops-sel" data-value="${esc(c.id)}" aria-current="${on}">
     <span class="gx-oprow-pic">${thumb}</span>
-    <span class="gx-oprow-t"><b>${gradeMark(c)}<span>${esc(c.name)}</span>${c.selected ? '<span class="gx-badge gx-goaltag">목표</span>' : ''}</b><small><span>${c.loc}</span>${statusNote(c)}</small></span>${depMark(c)}</li>`;
+    <span class="gx-oprow-t"><b>${gradeMark(c)}<span>${esc(c.name)}</span>${c.selected ? '<span class="gx-badge gx-goaltag">목표</span>' : ''}${c.ended && c.mine ? '<span class="gx-badge live gx-minetag">내가 출동</span>' : ''}</b><small><span>${c.loc}</span>${statusNote(c)}</small></span>${c.ended && c.rpt ? `<button class="gx-oprpt" data-action="rec-open" data-value="${esc(c.rpt)}" title="보고서" aria-label="${esc(c.name)} 보고서">${ICONS.records}</button>` : depMark(c)}</li>`;
 }
 
 const camNo = (loc: string) => String((Array.from(loc).reduce((h, ch) => (h * 31 + ch.charCodeAt(0)) % 97, 7) % 89) + 10).padStart(2, '0');
@@ -227,7 +253,8 @@ function osd(sig: string, cam: string, clock: string): string {
 function evBtns(c: EvCard): string {
   const key = c.key ? esc(c.key) : '';
   const name = esc(c.name);
-  return `${c.name === '이름 미확인' ? '' : `<button class="gx-evbtn" data-action="wiki-goto" data-value="${name}" title="위키" aria-label="${name} 위키">${ICONS.wiki}</button>`}
+  return `${c.rpt ? `<button class="gx-evbtn" data-action="rec-open" data-value="${esc(c.rpt)}" title="보고서" aria-label="${name} 보고서">${ICONS.records}</button>` : ''}
+    ${c.name === '이름 미확인' ? '' : `<button class="gx-evbtn" data-action="wiki-goto" data-value="${name}" title="위키" aria-label="${name} 위키">${ICONS.wiki}</button>`}
     ${c.key ? `<button class="gx-evbtn end${c.confirmEnd ? ' danger' : ''}" data-action="end-event" data-value="${key}" title="${c.confirmEnd ? '한 번 더 누르면 종료' : '상황 종료'}" aria-label="${name} ${c.confirmEnd ? '정말 종료' : '상황 종료'}">${ICONS.trash}</button>` : ''}`;
 }
 
@@ -241,8 +268,9 @@ const SKY = '<i class="gx-opfx sky" aria-hidden="true"><i class="c2"></i><i clas
 const SHADE = '<svg viewBox="0 0 100 140" preserveAspectRatio="none" aria-hidden="true"><path d="M50 2c17 0 27 14 27 33 0 14-5 25-12 31 20 6 35 22 35 50v24H0v-24c0-28 15-44 35-50-7-6-12-17-12-31C23 16 33 2 50 2z"/></svg>';
 const FX = `<i class="gx-oplost" aria-hidden="true"><b>SIGNAL LOST</b></i><i class="gx-opshade" aria-hidden="true">${SHADE}</i>`;
 
-function opsPick(c: OpsCard | undefined): string {
-  return c?.key && !c.ended ? targetMark(!!c.selected, 'pick-event', c.key, true) : '';
+function opsPick(_c: OpsCard | undefined): string {
+  // 상세 창 단추줄의 목표 단추는 카드 가운데 과녁(aimMark)으로 옮겼다
+  return '';
 }
 
 function opsFeed(c: OpsCard | undefined, clock: string, empty: string): string {
@@ -266,8 +294,9 @@ function feedView(c: EvCard, clock: string, cls = ''): string {
   const tear = c.art?.pic && !c.ended ? `<i class="gx-optear" aria-hidden="true" style="--pic:url('${esc(c.art.pic)}')"><i></i><i></i></i>` : '';
   const fxkey = ` data-fxkey="${esc(`${cls ? 'pop' : 'board'}:${c.key ?? c.name}`)}"`;
   return `<div class="gx-opview feed k-${c.kind}${c.ended ? ' ended' : ''}${cls}"${grade}${fxkey}>${pic}${tear}${STATIC}${c.ended ? '' : FX}
+    ${c.key && !c.ended ? aimMark(!!c.selected, 'pick-event', c.key) : ''}
     <div class="gx-opbar">${osd(`<span class="rec"><i></i>${c.ended ? 'END' : 'REC'}</span>`, cam, clock)}<span class="gx-evart-act">${btns}</span></div>
-    <div class="gx-opcap"><span class="gx-evart-l1">${gradeMark(c)}<b>${name}</b>${c.key && !c.ended ? targetMark(!!c.selected, 'pick-event', c.key) : ''}</span>${whoLine(c.chips)}<span class="gx-evart-l2"><small>${c.loc}</small>${statusNote(c)}</span>${c.extra ?? ''}${desc}</div>
+    <div class="gx-opcap"><span class="gx-evart-l1">${gradeMark(c)}<b>${name}</b>${c.ended && c.mine ? '<span class="gx-badge live gx-minetag">내가 출동</span>' : ''}</span>${whoLine(c.chips)}<span class="gx-evart-l2"><small>${c.loc}</small>${statusNote(c)}</span>${c.extra ?? ''}${desc}</div>
   </div>`;
 }
 
@@ -304,5 +333,7 @@ export function opsBoard(cards: OpsCard[], o: { mapUrl: string | null; clock: st
   const sel = cards.find((c) => c.id === opsUi.sel);
   const view = opsUi.mode === 'map' ? opsMap(cards, opsUi.sel, o.mapUrl, o.clock) : opsFeed(sel, o.clock, o.empty);
   const rows = cards.map((c) => opsRow(c, c.id === opsUi.sel)).join('');
-  return `<div class="gx-ops">${view}<section class="gx-oplog"><h2>${headSeg('ops-mode', opsUi.mode, [['feed', 'CCTV', ICONS.cctv], ['map', '위성 지도', ICONS.pin]])}<span class="gx-opcnt">${o.counts}</span></h2>${rows ? `<ul>${rows}</ul>` : `<p class="gx-none">${esc(o.empty)}</p>`}</section></div>`;
+  // 목록 바닥 (2026-10-29 기록 메뉴): 종료 줄은 다음 응답에 빠지고, 전부는 기록 › 일지에
+  const foot = '<footer class="gx-oplog-foot"><small>종료 줄은 다음 응답에 빠져요.</small><button data-action="rec-journal">기록에서 전부 보기 ›</button></footer>';
+  return `<div class="gx-ops">${view}<section class="gx-oplog"><h2>${headSeg('ops-mode', opsUi.mode, [['feed', 'CCTV', ICONS.cctv], ['map', '위성 지도', ICONS.pin]])}<span class="gx-opcnt">${o.counts}</span></h2>${rows ? `<ul>${rows}</ul>` : `<p class="gx-none">${esc(o.empty)}</p>`}${foot}</section></div>`;
 }

@@ -1,0 +1,19 @@
+<!doctype html><html><head><meta charset="utf-8"><link rel="stylesheet" href="base.css"><style>
+.led{position:relative;z-index:3;display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr;align-items:end;padding:10px 6px 16px}
+.bal b{font-size:40px}
+.tx{display:grid;grid-template-columns:40px 1fr auto;gap:12px;align-items:center;padding:10px 14px;border:1px solid var(--line);border-radius:12px;background:var(--panel)}
+.ic{display:grid;place-items:center;width:36px;height:36px;border-radius:10px;font-family:var(--mono);font-weight:800;font-size:18px}
+.ic.in{background:var(--accent-bg);color:var(--signal)}.ic.out{background:#FBE3DF;color:var(--danger)}
+.amt{font-family:var(--mono);font-size:16px;font-weight:700}.amt.in{color:var(--signal)}.amt.out{color:var(--danger)}
+.src{font-size:12px;color:var(--dim)}
+</style></head><body><div class="wrap">
+<div class="mon"><div class="osd"><span><span class="rec" style="color:#5EEAD4"><i style="background:#5EEAD4;box-shadow:0 0 6px #5EEAD4"></i>LEDGER</span><span class="cam">가계부 · 예나</span></span><span>2025.05.10 21:05</span></div>
+<div class="led"><div class="st bal"><small>BALANCE · 잔고</small><b class="mint">₩ 395,000</b><span>시작 ₩140,000 · 거래 6건</span></div><div class="st"><small>INCOME</small><b class="mint">+320,000</b><span>2건</span></div><div class="st"><small>SPEND</small><b class="red">−65,000</b><span>4건</span></div><div class="st"><small>TODAY · 05.10</small><b class="wht">+300,000</b><span>1건</span></div></div></div>
+<div class="tools"><span class="chip on">전체</span><span class="chip">수입</span><span class="chip">지출</span><span class="q">찾기: 메모·근거</span></div>
+<div class="day">2025.05.10 · 토</div>
+<div class="tx"><span class="ic in">+</span><div><b style="font-size:14.5px">소라 랜드 출동 수당</b><div class="src">관리국 정산 · 응답 #42</div></div><span class="amt in">+₩300,000</span></div>
+<div class="tx"><span class="ic out">−</span><div><b style="font-size:14.5px">편의점 · 컵라면, 생수</b><div class="src">필드 · 중림 지하상가</div></div><span class="amt out">−₩8,500</span></div>
+<div class="day">2025.05.09 · 금</div>
+<div class="tx"><span class="ic out">−</span><div><b style="font-size:14.5px">택시비 (춘천 → 서울)</b><div class="src">응답 #38</div></div><span class="amt out">−₩45,000</span></div>
+<div class="tx"><span class="ic in">+</span><div><b style="font-size:14.5px">헐값 매입 · 녹슨 회중시계</b><div class="src">필드 · 헐값 매입</div></div><span class="amt in">+₩20,000</span></div>
+</div></body></html>

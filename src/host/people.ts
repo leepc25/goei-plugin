@@ -6,8 +6,8 @@ import { generate, runModel, LlmError, type LlmMessage } from './llm';
 import { buildDirector, directorBlock, parseDirector, type DirectorNote } from '../core/people/director';
 import { loadContext, updateChat, type ChatContext } from './risu';
 import { isWaiting, onWaiting } from './waiting';
-import { peopleStore, withPeople, unreadIndexes, messageKey, messageHash as messageHashOf, liveness } from '../core/people/store';
-import { applyUpdate, assemblePrompt, buildUpdate, clearStoryRecords, enabledSections, mentionIndexes, parseUpdate, planBatches, recordChars, type ApplyReport, type UpdateInput } from '../core/people/updater';
+import { peopleStore, withPeople, splitUnread, unreadIndexes, messageKey, messageHash as messageHashOf, liveness } from '../core/people/store';
+import { applyUpdate, assemblePrompt, buildUpdate, clearStoryRecords, enabledSections, mentionIndexes, parseUpdate, planBatches, recordChars, type ApplyReport } from '../core/people/updater';
 import { applyConsolidate, buildConsolidate, parseConsolidate, type ConsolidateReport } from '../core/people/consolidate';
 import { peopleSettings, type PeopleSettings } from '../core/people/settings';
 import { seedPerson } from '../core/people/seed';
@@ -24,6 +24,7 @@ import { parseIdentity } from '../core/people/identity';
 import type { Identity, PeopleStore } from '../core/people/types';
 import { factionList } from '../core/factions';
 import type { LoreEntry } from '../core/types';
+import { endedInBatch, endedNowOf, journalSettings, readReports, reportVars, withDebriefs } from '../core/journal';
 
 // ── 진단 ──
 
@@ -60,7 +61,7 @@ export async function loadDiag(): Promise<DiagRun[]> {
     return [];
   }
 }
-async function pushDiag(run: DiagRun, keepRaw: boolean): Promise<void> {
+export async function pushDiag(run: DiagRun, keepRaw: boolean): Promise<void> {
   try {
     const list = await loadDiag();
     const item = keepRaw ? run : { ...run, system: undefined, data: undefined, raw: run.ok ? undefined : run.raw };
@@ -168,12 +169,15 @@ export function statusIdentity(chat: Chat): ReturnType<typeof parseIdentity> {
 
 // ── 실행 ──
 
-let inflight: Promise<RunResult> | null = null;
-let pendingReason: string | null = null;
+/** 돌고 있는 갱신 수. 요청은 차례로 잇는다 (QC 2026-10-28: 예전엔 돌고 있을 때 들어온 요청의 이유·옵션(수동·범위)을 버리고
+ *  처음 요청의 옵션으로 한 번 더 돌았고, 부른 쪽은 처음 요청의 결과를 받았다) */
+let running = 0;
+let chain: Promise<unknown> = Promise.resolve();
+export const peopleUpdating = () => running > 0;
 
 export interface RunResult { ran: number; applied: number; skipped: string[]; errors: string[] }
 
-/** 안 읽은 응답을 묶음으로 읽어 기록에 반영한다. 이미 돌고 있으면 끝난 뒤 한 번 더 */
+/** 안 읽은 응답을 묶음으로 읽어 기록에 반영한다. 이미 돌고 있으면 끝난 뒤 이어서 (읽을 것이 없으면 바로 끝난다) */
 export interface RunScope {
   /** 읽을 응답 위치 (없으면 안 읽은 것). backfill·다시 읽기 */
   indexes?: number[];
@@ -182,19 +186,12 @@ export interface RunScope {
 }
 
 export function requestPeopleUpdate(reason: string, o: { manual?: boolean; scope?: RunScope } = {}): Promise<RunResult> {
-  if (inflight) {
-    pendingReason = reason;
-    return inflight;
-  }
-  inflight = runOnce(reason, o).finally(() => {
-    inflight = null;
-    if (pendingReason) {
-      const r = pendingReason;
-      pendingReason = null;
-      void requestPeopleUpdate(r, o);
-    }
+  running++;
+  const run = chain.then(() => runOnce(reason, o)).finally(() => {
+    running--;
   });
-  return inflight;
+  chain = run.catch(() => {});
+  return run;
 }
 
 async function waitNotBusy(): Promise<void> {
@@ -220,10 +217,8 @@ async function runOnce(reason: string, o: { manual?: boolean; scope?: RunScope }
   // 읽은 적이 없으면(기능을 중간에 켬) 마지막 응답 하나만 — 지난 응답은 「지난 응답 읽기」로 사용자가 고른다
   const allUnread = unreadIndexes(ctx.chat, store);
   let unread = allUnread;
-  if (!o.scope?.indexes) {
-    const lastRead = Math.max(-1, ...ctx.chat.message.map((m, i) => (store.read[messageKey(m, i)] !== undefined ? i : -1)));
-    unread = lastRead < 0 ? allUnread.slice(-1) : allUnread.filter((i) => i > lastRead);
-  } else unread = o.scope.indexes.filter((i) => ctx.chat.message[i]?.role === 'char');
+  if (!o.scope?.indexes) unread = splitUnread(ctx.chat, store).newer;
+  else unread = o.scope.indexes.filter((i) => ctx.chat.message[i]?.role === 'char');
   setStatus({ unread: allUnread.length });
   if (!unread.length) return result;
   const sheet = sheetOf(ctx);
@@ -262,11 +257,15 @@ async function runOnce(reason: string, o: { manual?: boolean; scope?: RunScope }
       const walletOn = colConfig(fresh.chat.scriptstate).wallet !== 'off';
       const walletStart = getPrefs().walletStart ?? WALLET_START_DEFAULT;
       const balance = walletOn ? walletBalance(readWallet(fresh.chat.scriptstate, walletStart), aliveAnchors(fresh.chat)) : null;
-      const input = buildUpdate(fresh.chat, curStore, batches[b], { settings, system: '', values: Object.fromEntries(input0Names(curStore).map((n) => [n, valuesOf(n)])), names: allNames(), exclude, factionNames: factionNamesOf(fresh.char.globalLore), only: o.scope?.only, wallet: balance });
+      // 소감 (core/journal/debrief): 설정 「소감 자동」이 켜져 있고 이 묶음에서 종료된 사건(보고서)이 있으면 같은 호출에 얹는다. 다시 읽기(only)는 제외
+      const batchKeys = batches[b].map((i) => (fresh.chat.message[i] ? messageKey(fresh.chat.message[i], i) : '')).filter(Boolean);
+      const ended = journalSettings(fresh.chat.scriptstate).debriefAuto && !o.scope?.only ? endedInBatch(readReports(fresh.chat), batchKeys).map(endedNowOf) : [];
+      const input = buildUpdate(fresh.chat, curStore, batches[b], { settings, system: '', values: Object.fromEntries(input0Names(curStore).map((n) => [n, valuesOf(n)])), names: allNames(), exclude, factionNames: factionNamesOf(fresh.char.globalLore), only: o.scope?.only, wallet: balance, ended });
       // 지침은 자료를 본 뒤 조립한다 (저장 상한을 넘긴 인물이 있으면 정리 절을 켠다)
       const sections = enabledSections(settings);
       if (input.tidy.length) sections.add('tidy');
       if (walletOn) sections.add('wallet');
+      if (ended.length) sections.add('debrief');
       const system = assemblePrompt(promptFor(settings), sections, settings.rules, settings.lang);
       input.system = system;
       if (!input.people.length) {
@@ -314,6 +313,7 @@ async function runOnce(reason: string, o: { manual?: boolean; scope?: RunScope }
           only: o.scope?.only,
           keepRead: !!o.scope?.only,
           wallet: walletOn,
+          debrief: ended.length > 0,
         });
         diag.report = report;
         let next = cur;
@@ -321,6 +321,11 @@ async function runOnce(reason: string, o: { manual?: boolean; scope?: RunScope }
           let w = readWallet(cur.scriptstate, walletStart);
           for (const e of report.wallet) w = addWalletEntry(w, { ...e, src: 'story' });
           next = { ...cur, scriptstate: { ...(cur.scriptstate ?? {}), ...walletVars(w) } };
+        }
+        // 소감은 보고서($goei_reports)에 (종료 턴이면 turn, 지난 응답 읽기면 backfill)
+        if (report.debriefs?.length) {
+          const d = withDebriefs(readReports(next), report.debriefs, reason === 'backfill' ? 'backfill' : 'turn');
+          if (d.applied) next = { ...next, scriptstate: { ...(next.scriptstate ?? {}), ...reportVars(d.store) } };
         }
         return withPeople(next, s);
       });
@@ -334,9 +339,10 @@ async function runOnce(reason: string, o: { manual?: boolean; scope?: RunScope }
       result.ran++;
       result.applied += diag.report ? diag.report.applied.entries + diag.report.applied.cues + diag.report.applied.address + diag.report.applied.docs + diag.report.applied.suspicion : 0;
     } catch (error) {
+      // 응답 원문이 오류에 붙어 있으면(형식 오류 재시도 끝) 먼저 꺼내야 단계가 parse 로 적힌다 (QC 2026-10-28: 늘 build 로 적혔다)
+      if (!diag.raw && error && typeof error === 'object' && 'raw' in error) diag.raw = String((error as { raw?: unknown }).raw ?? '');
       diag.stage = error instanceof LlmError ? 'model' : diag.raw ? 'parse' : 'build';
       diag.error = error instanceof Error ? error.message : String(error);
-      if (!diag.raw && error && typeof error === 'object' && 'raw' in error) diag.raw = String((error as { raw?: unknown }).raw ?? '');
       result.errors.push(diag.error);
       console.log(`[goei] 인물 기록 갱신 실패: ${diag.error}`);
     } finally {
@@ -380,7 +386,7 @@ export async function backfillPeople(turns: number): Promise<RunResult> {
 
 /** 인물별 다시 읽기: 이 인물의 이야기 기록을 지우고, 그 인물이 나온 최근 turns 개 응답을 이 인물만 대상으로 다시 읽는다. 읽음 표시는 그대로 */
 export async function rereadPerson(name: string, turns: number): Promise<RunResult & { cleared: number }> {
-  if (inflight) return { ran: 0, applied: 0, skipped: ['갱신이 돌고 있어요'], errors: [], cleared: 0 };
+  if (running) return { ran: 0, applied: 0, skipped: ['갱신이 돌고 있어요'], errors: [], cleared: 0 };
   const ctx = await loadContext().catch(() => null);
   if (!ctx) return { ran: 0, applied: 0, skipped: ['채팅을 읽지 못했어요'], errors: [], cleared: 0 };
   const store = peopleStore(ctx.chat);
@@ -400,7 +406,7 @@ export async function rereadPerson(name: string, turns: number): Promise<RunResu
 
 /** 인물 기록 「정리」: 보조 모델이 이 인물의 살아 있는 항목을 더 적은 항목으로 다시 쓴다 (사용자가 눌렀을 때만, 1회 호출) */
 export async function consolidatePerson(name: string): Promise<{ ok: boolean; message: string; report?: ConsolidateReport }> {
-  if (inflight) return { ok: false, message: '갱신이 돌고 있어요. 끝난 뒤 다시 눌러 주세요.' };
+  if (running) return { ok: false, message: '갱신이 돌고 있어요. 끝난 뒤 다시 눌러 주세요.' };
   const ctx = await loadContext().catch(() => null);
   if (!ctx) return { ok: false, message: '채팅을 읽지 못했어요.' };
   return consolidateInner(ctx, name, peopleSettings(ctx.chat.scriptstate));
@@ -442,6 +448,7 @@ async function consolidateInner(ctx: ChatContext, name: string, settings: People
     const msg = r.slots ? `정리: ${r.slots}칸, 항목 ${r.before} → ${r.after}${r.dropped.length ? ` (${r.dropped.length}칸은 결과가 맞지 않아 그대로)` : ''}` : `바뀐 칸이 없어요${r.dropped.length ? ` (${r.dropped[0].reason})` : ''}`;
     return { ok: true, message: msg, report: r };
   } catch (error) {
+    if (!diag.raw && error && typeof error === 'object' && 'raw' in error) diag.raw = String((error as { raw?: unknown }).raw ?? '');
     diag.stage = error instanceof LlmError ? 'model' : diag.raw ? 'parse' : 'build';
     diag.error = error instanceof Error ? error.message : String(error);
     return { ok: false, message: `정리 실패: ${diag.error}` };

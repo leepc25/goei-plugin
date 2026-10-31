@@ -1,7 +1,7 @@
 // 괴담넷·괴담톡 자동 확인을 모델 한 번으로 (원본 P.tryCombinedAuto, 2026-10-21 사용자: 플러그인으로 옮기며 빠졌던 것 복원).
 // 두 작업이 각자 요청문을 만들어 ask()로 맡기면, 둘 다 모이면 한 요청으로 보내고 응답을 둘로 갈라 돌려준다.
 // 한쪽이 모델을 부르지 않고 끝나면(done) 남은 쪽은 혼자 보낸다. 각 작업의 검사·재시도·저장은 그대로 각자 한다.
-import { LlmError, runModel, type LlmMessage, type ModelChoice } from './llm';
+import { runModel, type LlmMessage, type ModelChoice } from './llm';
 
 export type JointKind = 'gnet' | 'phone';
 type Msg = LlmMessage & { images?: string[] };
@@ -162,10 +162,10 @@ export class Joint {
     try {
       parts = splitCombined(raw);
     } catch (error) {
-      const e = new LlmError(error instanceof Error ? error.message : String(error), raw);
-      g.reject(e);
-      p.reject(e);
-      return;
+      // 통합 응답을 못 가르면 (울타리·설명문·중간 잘림) 두 작업을 따로 한 번씩 보낸다. 모델 연결 오류(LlmError)는 형식 재시도가 없어서
+      // 여기서 버리면 그 턴의 자동 확인이 통째로 사라졌다 (QC 2026-10-28)
+      console.log(`[goei] 통합 자동 확인 응답을 가르지 못해 따로 보내요: ${error instanceof Error ? error.message : String(error)}`);
+      parts = { gnet: null, phone: null };
     }
     // null이면 그 작업만 따로 한 번 더 (다른 결과로 대신 채우지 않는다)
     for (const [k, w] of [['gnet', g], ['phone', p]] as const) {

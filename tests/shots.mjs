@@ -2,6 +2,7 @@
 // 가짜 risuai API로 시작 화면 → 저장까지 확인한다.
 // 사용법: node tests/browser.mjs <fixture.json> [screenshot-dir]
 import { createRequire } from 'node:module';
+import { distWorldPack } from './data-init.mjs';
 import { execSync } from 'node:child_process';
 import { readFileSync, mkdirSync, writeFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
@@ -18,6 +19,8 @@ const manifest = JSON.parse(fixture.globalLore.find((e) => e.comment === 'Plugin
 
 // 본체는 시작기가 pluginStorage에서 꺼낸다 (src/main.ts)
 const bodyCode = readFileSync(new URL('../dist/goei-body.js', import.meta.url), 'utf8');
+/** 세계 자료 팩 (개선 나1): 본체처럼 가짜 저장소에 미리 둔다 (저장소에 자료가 있는 보통 경우). 받기 시험은 noBody 쪽에서 */
+const worldPack = distWorldPack();
 function hostScript(char, chat, { rootDom = true } = {}) {
   return `
     window.__calls = { setChat: [], show: [], hide: 0, replacers: [], listeners: [], handlers: {} };
@@ -37,8 +40,8 @@ function hostScript(char, chat, { rootDom = true } = {}) {
       removeEventListener: async (type, id) => { await new Promise((r) => setTimeout(r, 30)); const l = listeners.get(id); if (l) { document.removeEventListener(l[0], l[1]); listeners.delete(id); } },
       remove: async () => { el.remove(); },
     });
-    window.__store = { 'p:goei:body': ${JSON.stringify(bodyCode)} };
-    window.__rootDoc = ${rootDom} ? { querySelector: async (q) => wrap(document.querySelector(q)), createElement: async (t) => wrap(document.createElement(t)) } : null;
+    window.__store = { 'p:goei:body': ${JSON.stringify(bodyCode)}, 'p:goei:data-world': ${JSON.stringify(worldPack)} };
+    window.__rootDoc = ${rootDom} ? { ...wrap(document.documentElement), querySelector: async (q) => wrap(document.querySelector(q)), createElement: async (t) => wrap(document.createElement(t)) } : null;
     window.__char = ${JSON.stringify(char)};
     window.__liteChar = window.__char;
     window.__chat = ${JSON.stringify(chat)};

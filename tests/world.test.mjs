@@ -1,4 +1,5 @@
 import { test } from 'node:test';
+import { REAL } from './realcard.mjs';
 import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
 import {
@@ -49,8 +50,8 @@ test('catalog keeps only visible entries', () => {
   assert.equal(catalog.people.length, 4);
 });
 
-test('real card catalog parses', { skip: !existsSync('/mnt/project-files/analysis/extracted/module.json') }, () => {
-  const m = JSON.parse(readFileSync('/mnt/project-files/analysis/extracted/module.json', 'utf8'));
+test('real card catalog parses', { skip: !existsSync(REAL) }, () => {
+  const m = JSON.parse(readFileSync(REAL, 'utf8'));
   const c = parseCatalog(m.lorebook ?? m.module?.lorebook);
   assert.ok(c.anomalies.length > 20, `anomalies ${c.anomalies.length}`);
   assert.ok(c.mysticSites.length > 0 && c.landmarks.length >= 5);

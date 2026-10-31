@@ -4,9 +4,10 @@
 import { PAINTED, type PaintedDoor, type PaintedScene } from '../hq/painted';
 import { view } from '../engine/view';
 import { JR_ROOM_FILES } from '../hq/jrRooms.gen';
+import { JR_CUT_FILES } from '../hq/jrCuts.gen';
 
 const FILES = ['lobby', 'f2', 'f3', 'b1', 'b2', 'b3', 'desk'];
-const JR_FILES = ['jr_entry', 'jr_b1', 'jr_alley', 'jr_b2', ...JR_ROOM_FILES];
+const JR_FILES = ['jr_entry', 'jr_b1', 'jr_alley', 'jr_b2', ...JR_ROOM_FILES, ...JR_CUT_FILES];
 let images: Record<string, HTMLImageElement> | null = null;
 let revision = 0;
 declare global { interface Window { __GOEI_HQ_FIELD__?: Record<string, string> } }
@@ -491,30 +492,6 @@ export function drawHqGuide(c: CanvasRenderingContext2D, scene: string, doors: L
   row(east, 1);
   c.restore();
 }
-
-/* ───────── 출동 안내 화살표 (B3 승합차 위) ───────── */
-
-/** 도트 화살표 (아래를 가리킴, 한 칸 U px). 테두리 상자 없이 그림자와 함께 떠 있다 */
-function pixelArrow(c: CanvasRenderingContext2D, x: number, y: number, U: number, rot: number) {
-  // 7칸 폭 화살표: 몸통 3칸 × 4줄 + 머리 7·5·3·1칸
-  const rows: [number, number][] = [[-1, 3], [-1, 3], [-1, 3], [-1, 3], [-3, 7], [-2, 5], [-1, 3], [0, 1]];
-  const draw = (col: string, dx: number, dy: number) => {
-    c.fillStyle = col;
-    rows.forEach(([x0, w], i) => c.fillRect(dx + x0 * U, dy + i * U, w * U, U));
-  };
-  c.save();
-  c.translate(Math.round(x), Math.round(y));
-  c.rotate(rot);
-  const ox = 0, oy = -rows.length * U; // 끝(뾰족한 곳)이 (x, y)
-  draw('rgba(0,0,0,0.35)', ox + U, oy + U); // 그림자
-  draw('#c98a1c', ox, oy); // 어두운 바탕 = 외곽
-  c.fillStyle = '#ffd25a';
-  rows.forEach(([x0, w], i) => { if (w > 1) c.fillRect(ox + (x0 + 0.0) * U + U * 0.0, oy + i * U, (w - 1) * U, U); });
-  c.fillStyle = '#fff3c4';
-  c.fillRect(ox - U, oy, U, U * 3); // 밝은 면
-  c.restore();
-}
-
 
 /* ───────── 엘리베이터 호출 단추: 층을 고르면 초록 ───────── */
 const greenCache = new Map<string, { cv: HTMLCanvasElement; x: number; y: number } | null>();

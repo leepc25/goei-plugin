@@ -8,15 +8,17 @@ import type { Chat } from '../core/types';
 import { basicSettings, worldSettings } from '../core/settings';
 import {
   activeEvents, agentLocked, endedShown, factionNames, cancelMission, type Catalog, endEvent, type EventKind, locName, MAP_CODES,
-  type MissionKind, NATION_PINS, parseCatalog, readWorld, REGION_PINS, regionName, requestMission, rosterFor, SEALED_LOC, SIDO_NAME,
+  type MissionKind, NATION_PINS, parseCatalog, readWorld, REGION_PINS, regionName, requestMission, rosterFor, SEALED_LOC,
   SIGUN, type WorldEvent, worldOn, worldVars, type WorldSettings, type WorldState, codesToNames, landmarkLoc, landmarksOf, placeWhere, prevWorldVars,
 } from '../core/world';
+import { buildClosures, journalSettings, recordVars } from '../core/journal';
+import { chatCardsAt, refreshStatusContext } from '../host/statusview';
 import { assetUrl } from '../host/assets';
 import { updateChat, type CharacterSnapshot, type ChatContext } from '../host/risu';
 import { noticeClass, sendNow } from '../host/send';
 import { markUnsent } from '../host/unsent';
 import { ICONS } from './icons';
-import { elapsedText, endedCard, evCard, peopleChips, targetMark } from './evcard';
+import { elapsedText, endedCard, evCard, peopleChips, aimMark, } from './evcard';
 import { agentInner, stLabel } from './images';
 import { agentContact } from './phone';
 import { mapZoomControls } from './mapzoom';
@@ -143,14 +145,6 @@ function placeKey(ev: WorldEvent, c: Catalog): string {
   return ev.loc;
 }
 
-function placeName(key: string, c: Catalog): string {
-  if (key.startsWith('fac:')) {
-    const lm = c.landmarks.find((l) => l.name === key.slice(4));
-    return lm ? `${lm.name} · ${lm.gu || SIDO_NAME[lm.sido] || ''}` : key.slice(4);
-  }
-  return locName(key);
-}
-
 function placeTarget(key: string): Target {
   return key.startsWith('fac:') ? { type: 'facility', name: key.slice(4) } : { type: 'place', loc: key };
 }
@@ -211,6 +205,7 @@ function mapBar(x: Ctx): string {
       <select class="gx-select" data-change="map-region" aria-label="지역">${options}</select>
       <div class="gx-mapfind"><input class="gx-search" type="search" placeholder="장소 검색" value="${esc(field.mapq)}" data-input="map-query" aria-label="장소 검색" autocomplete="off">
         <div class="gx-mapsug">${mapSuggest(x.catalog)}</div></div>
+      ${modeSwap('mission')}
     </div>`;
   return bar;
 }
@@ -433,6 +428,11 @@ function fieldDrawer(x: Ctx, withMap: boolean): string {
 
 /** 모바일 단계 바: ① 목표 → ② 편성 (CSS로 모바일에서만 보이고, 고른 단계만 보인다).
  *  swap: 오른쪽 끝 임무↔커스텀 전환 (v0.16.18: 위에 따로 있던 전환 줄은 자리만 차지했다) */
+/** PC: 임무 ↔ 커스텀 전환 단추 (2026-10-29 사용자: 왼쪽 메뉴의 「커스텀」을 없애고 임무 창 안에서 전환. 지역·검색 줄 오른쪽 끝, 눈에 띄게). 폰은 단계 줄의 전환 단추를 쓴다 */
+function modeSwap(to: 'map' | 'mission'): string {
+  return `<button class="gx-mswap desk" data-action="tab" data-value="${to}" aria-label="${to === 'map' ? '임무로 전환' : '커스텀으로 전환'}">${ICONS.swap}<span>${to === 'map' ? '임무' : '커스텀'}</span></button>`;
+}
+
 function stepBar(goal: string | null, swap?: 'map' | 'mission'): string {
   const used = field.team.length + field.support + 1;
   const b = (k: 'goal' | 'team', n: string, label: string, sub: string) =>
@@ -519,11 +519,11 @@ export function missionList(ctx: ChatContext, opening = false): string {
       return `<li class="gx-ev gx-mx${sel ? ' sel' : ''}${wikiBtn ? ' has-wiki' : ''}"><button class="gx-mx-art k-${kind}${art.pic ? '' : ' none'}" data-action="mission-open" data-value="${val}" aria-expanded="false"${bg}>
         ${status ? `<span class="gx-evart-top">${status}</span>` : ''}<span class="gx-evart-cap">${cap}</span></button>${wikiBtn}</li>`;
     }
-    // 선택 단추는 임무 상세 창처럼 오른쪽 위 단추 줄 맨 앞 (2026-10-21 사용자)
-    const mark = sel ? targetMark(true, 'mission-unpick', '') : targetMark(false, 'mission-pick', val);
+    // 선택은 카드 가운데 큰 과녁 (2026-10-29 사용자, evcard aimMark). 펼친 카드에만
+    const aim = sel ? aimMark(true, 'mission-unpick', '', val) : aimMark(false, 'mission-pick', val);
     return `<li class="gx-ev gx-mx open${sel ? ' sel' : ''}"><div class="gx-mx-art k-${kind}${art.pic ? '' : ' none'}" data-action="mission-open" data-value="${val}"${bg}>
-      <span class="gx-evart-top">${status}<span class="gx-evart-act"><button class="gx-evbtn" data-action="mission-open" data-value="${val}" aria-label="접기" title="접기">${ICONS.up}</button>${wikiBtn}</span></span>
-      <span class="gx-evart-cap">${capOpen(mark)}${art.desc ? `<span class="gx-evc-desc">${esc(art.desc)}</span>` : ''}</span></div></li>`;
+      ${aim}<span class="gx-evart-top">${status}<span class="gx-evart-act"><button class="gx-evbtn" data-action="mission-open" data-value="${val}" aria-label="접기" title="접기">${ICONS.up}</button>${wikiBtn}</span></span>
+      <span class="gx-evart-cap">${capOpen('')}${art.desc ? `<span class="gx-evc-desc">${esc(art.desc)}</span>` : ''}</span></div></li>`;
   };
   const hit = (r: { name: string; sub: string }) => `${r.name} ${r.sub}`.toLowerCase().includes(q);
   if (!q) {
@@ -559,7 +559,7 @@ export function missionTab(ctx: ChatContext, opening: boolean, notice: string, b
     ${stepBar(field.mname, opening ? undefined : 'map')}
     <div class="gx-mapcol">
       ${intro}
-      <div class="gx-mfilter">${segs}<input class="gx-search" type="search" placeholder="검색" value="${esc(field.query)}" data-input="mission-query" aria-label="검색">${cancelChip('mission-unpick', !!field.mname)}</div>
+      <div class="gx-mfilter">${segs}<input class="gx-search" type="search" placeholder="검색" value="${esc(field.query)}" data-input="mission-query" aria-label="검색">${cancelChip('mission-unpick', !!field.mname)}${opening ? '' : modeSwap('map')}</div>
       <div class="gx-mbox">${missionList(ctx, opening)}</div>
     </div>
     <div class="gx-sidecol">
@@ -687,18 +687,45 @@ export function sendMission(ctx: ChatContext, env: FieldEnv, opening: boolean): 
   });
 }
 
+/** 손 종료의 기준 메시지: 마지막 봇 응답 (상태창·위치·카드 열쇠를 거기서 읽는다). 응답이 없으면 마지막 메시지 */
+function closeIndexOf(chat: Chat): number {
+  const list = chat.message ?? [];
+  for (let i = list.length - 1; i >= 0; i--) if (list[i].role === 'char') return i;
+  return Math.max(0, list.length - 1);
+}
+
 async function saveWorld(ctx: ChatContext, env: FieldEnv, change: (w: WorldState, x: Ctx) => string | null): Promise<void> {
   env.setBusy(true);
   env.setNotice('');
   try {
-    await updateChat(ctx.charIndex, ctx.chatIndex, (latest) => {
+    let closedAt = -1;
+    const saved = await updateChat(ctx.charIndex, ctx.chatIndex, (latest) => {
       const x = ctxOf(ctx, latest);
       const w = structuredClone(x.world);
       const err = change(w, x);
       if (err) throw new Error(err);
       const prev = prevWorldVars(latest.scriptstate, (p) => change(p, x));
-      return { ...latest, scriptstate: { ...(latest.scriptstate ?? {}), ...worldVars(w, x.catalog, x.settings, x.faction), ...prev } };
+      const next: Chat = { ...latest, scriptstate: { ...(latest.scriptstate ?? {}), ...worldVars(w, x.catalog, x.settings, x.faction), ...prev } };
+      // 손으로 끝낸 상황도 일지·보고서에 (core/journal). 기준은 마지막 봇 응답 (마지막이 유저 메시지면 상태창이 없어 카드 열쇠·위치가 비었다)
+      if (w.closed?.length) {
+        const index = closeIndexOf(latest);
+        const built = buildClosures({ chat: next, index, world: w, closed: w.closed, catalog: x.catalog, faction: x.faction, settings: journalSettings(latest.scriptstate) });
+        if (built.rows.length) {
+          next.scriptstate = { ...next.scriptstate, ...recordVars(built.journal, built.reports) };
+          closedAt = index;
+        }
+      }
+      return next;
     });
+    // 손 종료로 보고서가 생겼으면 채팅 카드 열쇠 표를 다시 모으고, 카드가 붙을 응답이 있으면 채팅을 그대로 한 번 저장해 다시 그리게 한다
+    if (saved && closedAt >= 0) {
+      try {
+        await refreshStatusContext(ctx.charIndex, ctx.chatIndex, { chat: saved, char: ctx.char });
+        if (chatCardsAt(saved, closedAt).length) await updateChat(ctx.charIndex, ctx.chatIndex, (cur) => ({ ...cur }));
+      } catch {
+        /* 다시 못 그려도 종료는 저장됐다 (다음 저장·채팅 전환 때 보인다) */
+      }
+    }
     env.setBusy(false);
     await env.refresh();
   } catch (error) {

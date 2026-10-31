@@ -1,4 +1,13 @@
-& p.x < g2.x - 100)) bad.push("열쇠 찾으러 갈 입구가 셔터 뒤");
+wall")) bad.push("목표 벽 없음");
+    }
+    if (f.guardian && !room2) {
+      const g2 = f.spawns.find((s2) => s2.role === "guardian");
+      const panel = f.placed.find((p) => p.kind === "panel");
+      if (!g2 || !panel || g2.x > panel.x) bad.push("수호자 방 도달");
+    }
+    if (!room2 && !f.placed.some((p) => p.kind === "panel")) bad.push("패널 없음");
+    for (const g2 of f.placed.filter((p) => p.kind === "locked")) {
+      if (!f.placed.some((p) => (p.kind === "hatch" || p.kind === "servicedoor") && p.x < g2.x - 100)) bad.push("열쇠 찾으러 갈 입구가 셔터 뒤");
       const panel = f.placed.find((p) => p.kind === "panel");
       if (panel && panel.x < g2.x) bad.push("패널이 셔터 앞");
     }
@@ -2891,8 +2900,6 @@ ${RULE[id].variant.text}` : ""}`, 4);
       }
     };
     const resolveChoice = (api, prop, ch) => {
-      const o = out;
-      const p = api.world.player;
       if (ch.choice === "deal") {
         clearChoices(api, "deal:");
         return applyDeal(api, ch.deal);
@@ -2997,11 +3004,6 @@ ${RULE[id].variant.text}` : ""}`, 4);
       });
     };
     const quietK = () => out?.upgrades.includes("quiet") ? 0.5 : 1;
-    const upperId = (d3) => {
-      const f = nodes.get(`floor:${d3}`)?.plan.stage.floor;
-      const u = f?.placed.find((q) => q.kind === "upper");
-      return u ? `p${u.id}` : null;
-    };
     let rushT = 0;
     const metroTick = (api) => {
       const o = out;
@@ -3855,12 +3857,4 @@ ${SET_BONUS[u.set]}`;
   function applySets(src, flags) {
     if (!src) return;
     for (const part of src.split(";")) {
-      const m = /^\s*([\w.]+)\s*(\+=|-=|=)\s*(.+?)\s*$/.exec(part);
-      if (m) applySet(m[1], m[2], m[3], flags);
-    }
-  }
-  var ScriptLibrary = class {
-    scripts = /* @__PURE__ */ new Map();
-    add(src, where) {
-      for (const s2 of parseScripts(src, where)) {
-        if (this.scripts.has(s2.
+      const m = /^\s*([\w

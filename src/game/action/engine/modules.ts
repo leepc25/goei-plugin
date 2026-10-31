@@ -39,7 +39,6 @@ import type { Body, GameEvent, HqModuleLike, StageModule } from './contract';
 import type { EngineModules, Game } from './game';
 import { DEF_BY_KIND, arenaStage, createEnemy, isThreat } from '../enemy';
 import { CUTSCENES, VIDEOS, mountStory, type AgentId, type StoryApi } from '../story';
-import type { SpeakerId } from '../story/types';
 import { linkItems } from './itemsLink';
 import { makeHub, silhouette, type HubHost, type HubLife } from './hub';
 import { createHqWorld, hqDistrict } from '../../world/hq';
@@ -102,9 +101,14 @@ const observerOn = () => observing;
 const fieldLink: { pay?: (amount: number, memo: string) => Promise<number | null>; record?: (text: string) => void; fact?: (key: string, value: string) => void; nearPerson?: () => string | null; gift?: (who: string, item: string, counts: boolean) => void ; endVisit?: (close: boolean) => void } = {};
 const wonText = (n: number) => `${n < 0 ? '−' : ''}₩ ${Math.abs(Math.trunc(n)).toLocaleString('en-US')}`;
 
-function hqAdapter(bridge: Partial<GameBridge> | undefined, ui: { chooseFloor: HubHost['chooseFloor']; sfx: (n: string) => void; overlay?: HubHost['overlay']; rules?: () => ClockRules; shop?: (id: string) => string | null; choose?: (o: { title: string; lines?: string[]; options: string[]; cancel?: boolean }) => Promise<number> }): HqModuleLike & { goto(place: string): void; visitReady: Promise<void>; visitor(): { agentId: string; name: string } } {
+function hqAdapter(bridge: Partial<GameBridge> | undefined, ui: { chooseFloor: HubHost['chooseFloor']; sfx: (n: string) => void; overlay?: HubHost['overlay']; rules?: () => ClockRules; shop?: (id: string) => string | null; choose?: (o: { title: string; lines?: string[]; options: string[]; cancel?: boolean }) => Promise<number> }): HqModuleLike & { goto(place: string): void; visitReady: Promise<void>; visitor(): { agentId: string; name: string }; dispose(): void } {
   const map = hqMap();
   const b = bridge as (Partial<GameBridge> & { slot?: number; photo?: (name: string) => string | undefined }) | undefined;
+  // 필드 시각·장소·잔고·관찰 창은 모듈 변수라 게임을 닫았다 다시 열어도 남아 있었다 (main 10-29 고침을 옮김). 열 때마다 새로
+  fieldClock.sec = null;
+  fieldClock.place = '';
+  fieldWallet.won = null;
+  observing = false;
   // 본부 걷기는 엔진 벨트 장면(engine/hub.ts): 건물 지도는 hqMap(), 엔진은 장면 옮기기·그리기
   // 본부 방문: 상태 태그로 정한 방(사무실·휴게실·의무실)에 요원을 세운다. 들어가기 전에 한 번 읽는다
   let present: { name: string; room: string }[] = [];
@@ -143,7 +147,8 @@ function hqAdapter(bridge: Partial<GameBridge> | undefined, ui: { chooseFloor: H
   const readWallet = () => void b?.wallet?.balance().then((n) => { fieldWallet.won = n === null ? null : n + unsettled(); }).catch(() => {});
   readPeople();
   readWallet();
-  b?.people?.onChange(() => { readPeople(); readWallet(); });
+  // 끊는 함수를 들고 있다가 dispose 에서 푼다 (2026-10-28 QC: 안 풀어 필드를 열고 닫을 때마다 게임 하나(약 10MB)가 통째로 남았다)
+  const offPeople = b?.people?.onChange(() => { readPeople(); readWallet(); });
   /** 필드 거래: 같은 장부에 출처 「필드」로 적는다 (+ 들어옴, − 나감). 가게·거래 화면이 이걸 부른다 */
   /** 장부 줄 앞 필드 시각 「15:40 」 (시계가 없으면 빈칸) */
   const hm = () => (fieldClock.sec === null ? '' : `${String(Math.floor(fieldClock.sec / 3600) % 24).padStart(2, '0')}:${String(Math.floor(fieldClock.sec / 60) % 60).padStart(2, '0')} `);
@@ -170,7 +175,8 @@ function hqAdapter(bridge: Partial<GameBridge> | undefined, ui: { chooseFloor: H
   fieldLink.record = (text) => void b?.field?.record({ kind: 'act', text: `${hm()}${text}`, scene: fieldClock.place || undefined, weight: 1, visit: visitId }).catch(() => {});
   fieldLink.fact = (key, value) => void b?.field?.record({ kind: 'act', text: `${key}: ${value}`, scene: fieldClock.place || undefined, weight: 1, fact: { key, value }, visit: visitId }).catch(() => {});
   // 개발 도구·브라우저 시험
-  (globalThis as { __goeiWallet?: unknown }).__goeiWallet = { pay, balance: () => fieldWallet.won };
+  const walletHook = { pay, balance: () => fieldWallet.won };
+  (globalThis as { __goeiWallet?: unknown }).__goeiWallet = walletHook;
   /** 이번 필드 방문 id (방문마다 호감·평판 상한을 따로 세게) */
   const visitId = `v${Date.now().toString(36)}`;
   const ROOM_SCENE: Record<string, string> = { office: 'office', lounge: 'lounge', infirmary: 'clinic' };
@@ -180,8 +186,10 @@ function hqAdapter(bridge: Partial<GameBridge> | undefined, ui: { chooseFloor: H
   const seed = seedParam ? (Number(seedParam) >>> 0 || hashSeed(seedParam)) : (Date.now() >>> 0);
   let sim: WorldSim | null = null;
   // 모델 대화 한 번(창을 열고 닫을 때까지) = 시계 +10분 (사용자 확정 2026-10-26)
-  if (typeof window !== 'undefined') window.addEventListener('goei:talk-closed', () => { if (fieldClock.sec !== null) fieldClock.sec += rules().talk * 60; });
-  if (typeof window !== 'undefined') window.addEventListener('keydown', (e) => { if (e.key === 'F9' || e.key === '`') { observing = !observing; e.preventDefault(); } });
+  const onTalkClosed = () => { if (fieldClock.sec !== null) fieldClock.sec += rules().talk * 60; };
+  const onObserveKey = (e: KeyboardEvent) => { if (e.key === 'F9' || e.key === '`') { observing = !observing; e.preventDefault(); } };
+  if (typeof window !== 'undefined') window.addEventListener('goei:talk-closed', onTalkClosed);
+  if (typeof window !== 'undefined') window.addEventListener('keydown', onObserveKey);
   const world = () => {
     if (!sim && ready) {
       sim = createHqWorld(map, seed, present.filter((p) => ROOM_SCENE[p.room]).map((p) => ({ name: p.name, scene: ROOM_SCENE[p.room] })), hasCharClip, { killOk: () => fighterHooks.killOk?.() ?? false, stance: (f) => factionBy.get(f)?.stage ?? null });
@@ -480,6 +488,17 @@ function hqAdapter(bridge: Partial<GameBridge> | undefined, ui: { chooseFloor: H
     hub: () => hub,
     goto: (place: string) => hub.goto(place),
     isOpen: () => false,
+    dispose: () => {
+      if (typeof window !== 'undefined') {
+        window.removeEventListener('goei:talk-closed', onTalkClosed);
+        window.removeEventListener('keydown', onObserveKey);
+      }
+      offPeople?.();
+      // 개발 도구·시험 손잡이: 이 게임 것이면 놓는다 (닫은 게임이 남지 않게)
+      const g = globalThis as { __goeiWallet?: unknown; __goeiWorld?: unknown };
+      if (g.__goeiWallet === walletHook) delete g.__goeiWallet;
+      if (sim && g.__goeiWorld === sim) delete g.__goeiWorld;
+    },
     mount() {},
     onReturn() {},
     unmount() {},
@@ -628,7 +647,6 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
   ffx.sfx = (n) => audio.event({ type: n === 'super' ? 'super' : 'hit', kind: n === 'slam' ? 'super' : undefined, strength: 3 } as never);
   const cutins = new Map<string, HTMLImageElement>();
   if (bridge?.visit && bridge.assets) void loadFieldFx(bridge.assets, ffx, cutins);
-  const inField = () => !!game?.inHub && !!bridge?.visit && !mods.blocking?.() && !shell.paused;
   // NPC 자유 대화 (npcLink.ts): 껍데기 놀이판 층에 대화창
   // 본부 방문: 머리 위 이름표·말풍선과 아래 한 줄 입력 (talk.ts)
   const visit = bridge?.visit ? mountTalk(shell.stage.ui, bridge.visit, bridge.field) : null;
@@ -641,10 +659,12 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
     day: () => (fieldClock.sec === null ? 0 : Math.floor(fieldClock.sec / 86400)),
     photo: (k) => (bridge as { photo?: (n: string) => string | undefined } | undefined)?.photo?.(k) || (demoPhotos as Record<string, string>)[k],
     sfx: (n) => audio.play(n as never),
-    onOpen: (on) => shell.touch.setVisible(!on && shell.mode === 'play'),
+    // 대화창이 열리면 터치판은 숨지 않고 대사창 모드 (frame 이 한 곳에서 정한다)
+    onOpen: () => {},
   });
   (globalThis as { __goeiNpc?: unknown }).__goeiNpc = npc; // 시험용
   (globalThis as { __goeiStage?: unknown }).__goeiStage = shell.stage; // 시험용
+  Object.assign(globalThis as object, { __goeiTouch: shell.touch, __goeiInput: shell.input }); // 시험용 (모바일 조작)
   // 필드 요원: 지금 그림(몸 약 97도트)을 화면 약 255px로 (PixelLab 256 캔버스 몸 약 170도트 ×1.5 크기를 미리 보기). 원근은 view.persp
   setPixelScale(bridge?.visit ? 2.625 : 2.75);
   (globalThis as { __goeiSetPixel?: (p: number) => void }).__goeiSetPixel = setPixelScale; // 시험용
@@ -931,6 +951,14 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
     },
     onPlay: () => shell.play(),
     frame: (dt) => {
+      // 터치판 모드를 한 곳에서 정한다 (모바일 조작 설계 2026-10-28): 본부 창(임무 창구 등)·승강기 층 단추·NPC 대화창·방문 대화·메뉴가 뜨면
+      // 「대사창 모드」(선택·취소 + 스틱 ↑↓, 선택지 글자 직접 누르기도 됨). 영상이 도는 동안만 숨긴다
+      const dialogUp = (!!game?.inHub && (!!hq.isOpen?.() || !floorBox.hidden)) || npc.isOpen() || !!visit?.isOpen() || shell.menu.isOpen;
+      shell.touch.setMode(dialogUp ? 'dialog' : 'play');
+      shell.touch.setVisible(!story.isVideoPlaying() && (shell.mode === 'play' || shell.menu.isOpen));
+      // 못 씀(흐림·자리 유지): 에일린 전투 몸이 아니면 전투 버튼, 싸움이 없으면 AUTO
+      const fighter = !!(world?.player as { core?: unknown } | undefined)?.core;
+      for (const id of ['light', 'heavy', 'dodge', 'block', 'unique', 'ult'] as const) shell.touch.setOff(id, !fighter);
       ffx.opt = { shake: shell.settings.shake, flash: shell.settings.flash, numbers: shell.settings.numbers };
       ffx.update(shell.paused ? 0 : dt);
       { const o = ffx.camera(); shell.canvas.style.translate = o.x || o.y ? `${o.x}px ${o.y}px` : ''; }
@@ -1014,9 +1042,7 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
       }
       ffx.drawScreen(ctx);
       syncNavigationButton(shell.canvas, hs.navigation);
-      shell.touch.setItems(hs.items);
       shell.touch.setGauge(w.player.gauge / 100);
-      shell.touch.hint('reload', w.player.ammo <= 2 && w.player.reserve > 0);
       shell.fx.drawTransition(ctx);
     },
     onScene: (name) => {
@@ -1062,6 +1088,7 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
     boot: (g) => { void hq.visitReady.then(() => { if (bridge?.visit || !bootFromUrl(g)) g.toTitle(); }); return true; },
     dispose: () => {
       offHidden?.();
+      hq.dispose();
       npc.dispose();
       const g = globalThis as { __goeiStory?: unknown; __goeiStoryStart?: unknown; __goeiNpc?: unknown };
       delete g.__goeiStory;

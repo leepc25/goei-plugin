@@ -3,6 +3,7 @@ import { readFileSync, writeFileSync, mkdirSync, readdirSync, unlinkSync, exists
 import { createHash } from 'node:crypto';
 import { buildGamePack } from './game-pack.mjs';
 import { rmSync } from 'node:fs';
+import { INSTALL_PACK_NAME, WORLD_PACK_NAME, installPackText, packOf, worldPackText } from './data-pack.mjs';
 
 const pkg = JSON.parse(readFileSync(new URL('../package.json', import.meta.url)));
 if (process.env.GOEI_BUILD_VERSION) pkg.version = process.env.GOEI_BUILD_VERSION;
@@ -19,9 +20,24 @@ const header = [
 ].join('\n');
 
 mkdirSync('dist', { recursive: true });
+
+// 자료 팩 (QC 개선 나1, scripts/data-pack.mjs): 세계 자료·설치 자료는 본체에 번들하지 않고 goei-data-<이름>.json + .N.txt 로 따로 받는다.
+// 지문(hash·sha256·length)을 본체에 박아(define) 본체가 자기와 맞는 자료만 쓴다. 조각은 본체와 같은 200KB 이하
+const dataPacks = [packOf(WORLD_PACK_NAME, worldPackText(), pkg.version), packOf(INSTALL_PACK_NAME, installPackText(), pkg.version)];
+for (const f of readdirSync('dist')) if (/^goei-data-[a-z]+\.(\d+\.)?(txt|json)$/.test(f)) unlinkSync(`dist/${f}`);
+for (const p of dataPacks) {
+  p.parts.forEach((part, i) => writeFileSync(`dist/${p.partNames[i]}`, part));
+  writeFileSync(`dist/${p.name}.json`, JSON.stringify(p.index) + '\n');
+}
+const [worldPack, installPack] = dataPacks;
+// 세계 자료를 한 파일로도 (goei-data-world.txt): 릴리스 zip 에 넣어, 네트워크가 막힌 환경에서 본체(goei-body.js)와 함께 받기 창에 파일로 넣는다 (host/datapanel.ts)
+writeFileSync(`dist/${worldPack.name}.txt`, worldPack.text);
+
 const define = {
   __UPDATE_BASE__: JSON.stringify(updateBase),
   __PLUGIN_VERSION__: JSON.stringify(pkg.version),
+  __WORLD_PACK__: JSON.stringify(JSON.stringify(worldPack.expect)),
+  __INSTALL_PACK__: JSON.stringify(JSON.stringify(installPack.expect)),
 };
 const common = {
   define,
@@ -40,9 +56,16 @@ const code = header + loader.outputFiles[0].text;
 writeFileSync('dist/goei-plugin.js', code);
 
 // 본체: 첫 줄의 판으로 시작기와 맞는지 본다. 받을 때는 조각(goei-body.N.txt)으로 받는다 (Risu 웹 프록시는 1MB 넘는 파일을 못 받는다)
-const bodyOut = await build({ ...common, entryPoints: ['src/body-entry.ts'], format: 'iife' });
+// 배포 본체에서는 시험용 예외 주입 블록(src/body.ts faultOn 의 GOEI_TEST: 이름표)을 통째로 뺀다
+const bodyOut = await build({ ...common, entryPoints: ['src/body-entry.ts'], format: 'iife', dropLabels: ['GOEI_TEST'] });
 const bodyCode = `// goei-body ${pkg.version}\n` + bodyOut.outputFiles[0].text;
 writeFileSync('dist/goei-body.js', bodyCode);
+// 시험 본체: 같은 본체에 예외 주입 블록만 남긴 것. 요청 조립 실패 시험(tests/qc-pipeline-browser.mjs 8절·qc-static-risu-browser.mjs)만 이것을 쓴다
+mkdirSync('dist-test', { recursive: true });
+{
+  const t = await build({ ...common, entryPoints: ['src/body-entry.ts'], format: 'iife' });
+  writeFileSync('dist-test/goei-body.js', `// goei-body ${pkg.version}\n` + t.outputFiles[0].text);
+}
 for (const f of readdirSync('dist')) if (/^goei-body\.\d+\.txt$/.test(f)) unlinkSync(`dist/${f}`);
 const bodyParts = [];
 {
@@ -62,9 +85,17 @@ const partNames = bodyParts.map((p, i) => {
   writeFileSync(`dist/${name}`, p);
   return name;
 });
+/** 글 지문 (src/loader/body.ts bodyHash 와 같게): UTF-16 단위의 FNV-1a 32비트. 시작기가 조각을 이어 붙인 뒤 글자까지 맞는지 본다 */
+function textHash(text) {
+  let h = 0x811c9dc5;
+  for (let i = 0; i < text.length; i++) h = Math.imul(h ^ text.charCodeAt(i), 0x01000193) >>> 0;
+  return h.toString(16).padStart(8, '0');
+}
+// 목록: length(JS 글자 수) · hash(FNV-1a, crypto.subtle 이 없는 환경용) · sha256(이어 붙인 본체 전체의 UTF-8 바이트, 보안 컨텍스트에서 시작기가 본다. QC 개선 나2).
+// 조각마다 sha256 은 넣지 않는다: 시작기는 전체를 다시 받을 뿐 조각 단위 재시도가 없고, 받는 쪽 코드가 커진다 (docs/qc/09_개선_나_2_3.md)
 writeFileSync(
   'dist/goei-body.json',
-  JSON.stringify({ version: pkg.version, parts: partNames, length: bodyCode.length }) + '\n',
+  JSON.stringify({ version: pkg.version, parts: partNames, length: bodyCode.length, hash: textHash(bodyCode), sha256: createHash('sha256').update(bodyCode).digest('hex') }) + '\n',
 );
 
 // 게임 코드 팩: 게임 코드는 본체에 넣지 않고 따로 받는다 (src/host/game/code.ts, src/game/entry.ts).
@@ -110,7 +141,7 @@ writeFileSync(
   JSON.stringify({ version: pkg.version, code: { parts: gameParts, length: gameCode.length, bytes: Buffer.byteLength(gameCode) }, packs: gamePacks }, null, 1) + '\n',
 );
 
-// 테스트용: 순수 로직만 묶은 모듈
+// 테스트용: 순수 로직만 묶은 모듈. 세계·설치 자료는 본체처럼 묶음에 없으므로 입구(core.mjs)가 tests/data-init.mjs 로 파일에서 읽어 넣은 뒤 내보낸다
 await build({
   define,
   entryPoints: ['src/core/index.ts'],
@@ -119,8 +150,26 @@ await build({
   target: 'es2022',
   charset: 'utf8',
   loader: { '.txt': 'text' },
-  outfile: 'dist-test/core.mjs',
+  outfile: 'dist-test/core.bundle.mjs',
 });
+writeFileSync(
+  'dist-test/core.mjs',
+  [
+    '// 시험용 입구 (scripts/build.mjs 가 만든다): 본체가 자료 팩으로 받는 세계·설치 자료를 파일에서 넣고(tests/data-init.mjs) core 를 그대로 내보낸다',
+    "import * as core from './core.bundle.mjs';",
+    "import { initTestData } from '../tests/data-init.mjs';",
+    'initTestData(core);',
+    "export * from './core.bundle.mjs';",
+    '',
+  ].join('\n'),
+);
+
+// 시험용: 원본 카드의 module.json (tests/realcard.mjs 가 찾는다. 「실제 카드」 시험 15개가 이걸 읽는다). python3 가 없으면 그 시험들은 건너뛴다
+if (existsSync('card/원본_봇카드.jpeg')) {
+  const { spawnSync } = await import('node:child_process');
+  const r = spawnSync('python3', ['-I', 'tests/extract_module.py'], { encoding: 'utf8' });
+  if (r.status !== 0) console.log(`실제 카드 module.json 을 풀지 못했어요 (실제 카드 시험은 건너뜀): ${(r.stderr || r.error?.message || '').trim().split('\n').pop()}`);
+}
 
 
 // 게임 엔진 시연판 (전투·조작·장면 관리). 쟈알디 그림 묶음(game-pack/jyaldi)을 내장한 단일 HTML.
@@ -202,6 +251,7 @@ const info = {
   bytes: Buffer.byteLength(code),
   bodyBytes: Buffer.byteLength(bodyCode),
   bodyParts: partNames.length,
+  dataPacks: dataPacks.map((p) => `${p.name} ${Buffer.byteLength(p.text)} (${p.parts.length}조각, hash ${p.expect.hash})`),
   gameBytes: Buffer.byteLength(gameCode),
   gameParts: gameParts.length,
   gamePacks: gamePacks.map((p) => `${p.id} ${p.bytes}`),

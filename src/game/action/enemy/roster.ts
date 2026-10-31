@@ -1,7 +1,7 @@
 // 일반 적 · 중간 보스 도감: 가짜 관리국·백일몽. 옛 차원 승강기·재현의 층 괴이와 수호자 부하는 2026-10-28에 지웠다.
 // 수치(체력·가격·틀 수)는 게임 설계이며 시험판에서 조정한다.
-import { B, bake, humanoid, lowBody } from './frames';
-import { charge, grab, S, shoot, strike } from './moves';
+import { B, bake, humanoid } from './frames';
+import { charge, S, shoot, strike } from './moves';
 import type { Armor, FloorType, LocalBox, Move, Role } from './types';
 
 export type AiKind =
@@ -72,7 +72,6 @@ export interface EnemyDef {
   color: string;
 }
 
-const H = 190; // 사람 키 (논리 px, 도트 95)
 
 // ─── 가짜 관리국 (모든 괴이에 난입) ─────────────────────────────
 

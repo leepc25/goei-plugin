@@ -146,6 +146,15 @@ export interface Fab {
 
 const POS_KEY = 'goei-plugin:fab-pos';
 
+/** 폰 필드(가로 전체화면) 중에는 유령 버튼을 숨긴다 (모바일 조작 설계 2026-10-28). 게임 창(ui/game.ts)이 부른다 */
+let fieldHidden = false;
+const hiddenSubs = new Set<(hidden: boolean) => void>();
+export function setFabHidden(on: boolean): void {
+  if (fieldHidden === on) return;
+  fieldHidden = on;
+  hiddenSubs.forEach((f) => f(on));
+}
+
 interface DragState {
   x: number;
   y: number;
@@ -310,25 +319,37 @@ export async function createFab(onOpen: () => void): Promise<Fab> {
 
   // 리스너는 선택지용사처럼 버튼 상자(host)에 건다. 웹 Risu에서 플러그인을 업데이트하면 리스너가 지워져
   // 버튼이 모양만 남는 일이 있었다(껐다 켜면 살아남). 그래서 버튼이 다시 보일 때마다 새로 건다.
-  let ids: { type: string; id: string }[] = [];
+  // 끌기(move·up·cancel)는 본 문서(doc)에 건다: 2026-10 Risu 부터 SafeElement 리스너가 문서가 아니라 그 요소에만 걸려서,
+  // 버튼 상자에 걸면 손가락이 48px 상자를 벗어나는 순간 끌기가 끊긴다. 옛 Risu(문서 전체에 걸림)에서는 어느 쪽이든 같다
+  let ids: { target: SafeEl; type: string; id: string }[] = [];
   const unbind = async () => {
     const old = ids;
     ids = [];
-    for (const { type, id } of old) await host.removeEventListener(type, id).catch(() => {});
+    for (const { target, type, id } of old) await target.removeEventListener(type, id).catch(() => {});
   };
-  const bind = async () => {
+  // 옛 Risu 문서 객체에 리스너 메서드가 없으면 버튼 상자에 건다 (없어서 버튼이 통째로 안 뜨는 것보다 낫다)
+  const moveTarget: SafeEl = typeof (doc as Partial<SafeEl> | null)?.addEventListener === 'function' ? (doc as unknown as SafeEl) : host;
+  // 다시 걸기는 한 줄로 세운다: 리스너 걸고 떼기가 비동기라, 겹쳐 돌면 앞 차례가 걸던 것을 뒤 차례가 못 떼고 남긴다
+  let binding: Promise<void> = Promise.resolve();
+  const bind = () => (binding = binding.catch(() => {}).then(bindNow));
+  const bindNow = async () => {
     await unbind();
-    for (const [type, fn] of [
-      ['pointerdown', onDown],
-      ['pointermove', onMove],
-      ['pointerup', onUp],
-      ['pointercancel', onUp],
-      ['click', onClick],
+    for (const [target, type, fn] of [
+      [host, 'pointerdown', onDown],
+      [moveTarget, 'pointermove', onMove],
+      [moveTarget, 'pointerup', onUp],
+      [moveTarget, 'pointercancel', onUp],
+      [host, 'click', onClick],
     ] as const) {
-      ids.push({ type, id: await host.addEventListener(type, fn as (e: unknown) => void, { passive: true }) });
+      ids.push({ target, type, id: await target.addEventListener(type, fn as (e: unknown) => void, { passive: true }) });
     }
   };
   await bind();
+  const onHidden = (h: boolean) => {
+    if (h) drag = null;
+    void host.setStyle('display', visible && !h ? 'block' : 'none').catch(() => {});
+  };
+  hiddenSubs.add(onHidden);
 
   return {
     async setVisible(next, intro = false) {
@@ -353,7 +374,7 @@ export async function createFab(onOpen: () => void): Promise<Fab> {
         await host.setAttribute('x-goei-intro', 'true');
         introTimer = setTimeout(endIntro, INTRO_MS + 400);
       }
-      await host.setStyle('display', next ? 'block' : 'none');
+      await host.setStyle('display', next && !fieldHidden ? 'block' : 'none');
     },
     endIntro,
     async setTheme(theme) {
@@ -364,6 +385,7 @@ export async function createFab(onOpen: () => void): Promise<Fab> {
       return !!(await doc.querySelector('.default-chat-screen'));
     },
     async remove() {
+      hiddenSubs.delete(onHidden);
       visible = false;
       drag = null;
       pending = null;

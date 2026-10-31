@@ -4,7 +4,7 @@ import { Fx } from './fx';
 import { PadReader } from './gamepad';
 import { Hud, statusHtml } from './hud';
 import { InputHub } from './input';
-import { ACTS, CODE, KEY_NAME, LABEL, PAD_NAME } from './keys';
+import { ACTS, CODE, KEY_NAME, LABEL, PAD_NAME, TOUCH_CHARGE } from './keys';
 import { Menu, choiceScreen, esc, type MenuItem, type Screen } from './menu';
 import { DEFAULT_SETTINGS, localStore, parseSettings, type SettingsStore, type UiSettings } from './settings';
 import { mountStage, type Stage } from './stage';
@@ -101,8 +101,8 @@ export function mountGameShell(box: HTMLElement, o: ShellOptions = {}): Shell {
     else tap(code);
   });
   touch.vw = () => stage.vw;
-  if (o.field) touch.setField(true);
-  touch.toLocal = o.toLocal ?? ((x, y, el) => stage.toLocal(x, y, el));
+  // 화면 → 층 좌표: 플러그인 창이 게임을 돌리면(폰 세로) viewport.toLocal, 껍데기가 스스로 돌려 보이는 중이면 그 변환
+  touch.toLocal = (x, y, el) => (stage.turned || !o.toLocal ? stage.toLocal(x, y, el) : o.toLocal(x, y, el));
   if (o.fill) stage.setFit('fill');
   else if (o.field) stage.setFit('height');
   const apply = () => {
@@ -121,11 +121,15 @@ export function mountGameShell(box: HTMLElement, o: ShellOptions = {}): Shell {
   };
   menu.onOpen = (open) => {
     if (open) input.releaseSource('kb'), input.releaseSource('pad');
-    touch.setVisible(!open && shell.mode === 'play');
+    // 메뉴·선택 창이 열리면 터치판은 숨지 않고 「대사창 모드」(선택·취소 + 스틱 ↑↓) (모바일 조작 설계 2026-10-28)
+    touch.setMode(open ? 'dialog' : 'play');
+    touch.setVisible(open || shell.mode === 'play');
   };
   // 메뉴가 열려 있으면 모든 키를 메뉴가 먹는다. 패드 B(KeyE)는 뒤로
-  input.capture = (code, down) => {
+  input.capture = (code, down, src) => {
     if (!menu.isOpen) {
+      // 터치 대사창 모드의 「취소」: 본부 창·대화창이 받게 그대로 보낸다 (일시정지를 열지 않는다)
+      if (code === 'Escape' && src === 'touch' && touch.touchMode === 'dialog') return false;
       if (code === 'Escape' && shell.mode === 'play') {
         if (down) shell.openPause();
         return true;
@@ -146,7 +150,9 @@ export function mountGameShell(box: HTMLElement, o: ShellOptions = {}): Shell {
       .map((a) => {
         const kb = a === 'left' ? '<kbd>←</kbd><kbd>→</kbd><kbd>↑</kbd><kbd>↓</kbd>' : `<kbd>${esc(KEY_NAME[a])}</kbd>`;
         const pd = PAD_NAME[CODE[a]] ?? '';
-        const tc = a === 'left' ? '왼쪽 스틱' : a === 'menu' ? '☰' : a === 'auto' ? '메뉴' : a.startsWith('item') ? '아래 칸' : a === 'evade' ? '회피 (스틱 끝 = 달리기)' : '버튼';
+        // 터치 (모바일 조작 설계): 버튼 8개 + 자동·메뉴. 나머지 PC 키는 모바일에서 뺐다
+        const TC: Partial<Record<string, string>> = { left: '왼쪽 절반 스틱', attack: '약공격', reload: '강공격', guard: '막기 (누른 채)', unique: '고유 (짧게)', hitbox: TOUCH_CHARGE.code ? '고유 길게 (충전)' : '', ult: '필살', interact: '조사', jump: '점프', evade: '회피 (스틱 끝 = 달리기)', auto: 'AUTO', menu: '메뉴' };
+        const tc = TC[a] || '—';
         return `<tr><td>${esc(a === 'left' ? '이동 (좌우 + 안쪽·앞쪽)' : LABEL[a])}</td><td>${kb}</td><td>${esc(pd)}</td><td>${esc(tc)}</td></tr>`;
       })
       .join('');
@@ -223,7 +229,7 @@ export function mountGameShell(box: HTMLElement, o: ShellOptions = {}): Shell {
     },
     set mode(m) {
       mode = m;
-      touch.setVisible(m === 'play' && !menu.isOpen);
+      touch.setVisible(m === 'play' || menu.isOpen);
     },
     get paused() {
       return menu.isOpen || mode !== 'play';

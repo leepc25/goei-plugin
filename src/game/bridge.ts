@@ -190,6 +190,8 @@ export interface GameField {
   entry?(): Promise<GameEntry>;
   /** 사용자가 판정을 직접 고친다 (null = 자동) */
   override?(v: 'inside' | 'outside' | null): void;
+  /** 이 세션에서 마지막으로 만들어진 필드 출동 보고서 (exit_anomaly 뒤 플러그인이 만든다). 없으면 null. 게임은 본부 복귀 때 자막 한 줄에만 쓴다 */
+  lastReport?(): Promise<{ id: string; title: string; summary: string } | null>;
 }
 
 /** 게임 안 설정(화면·소리·조작) 저장소: 플러그인이 이 채팅 변수로 둔다 (메인 설정 → 필드에서도 고침) */

@@ -83,36 +83,22 @@ export function peopleBlockFor(chat: Chat, o: RequestOpts): { text: string; peop
 
 const squash = (s: string) => s.replace(/\s+/g, ' ').trim();
 
-/** 요청에서 시트 원문을 뺀다 (split·record 모드). 로어북 고르기가 넣은 자리 글에 그대로 들어 있을 때만 */
+/** 요청에서 시트 원문을 뺀다 (split·record 모드). 로어북 고르기가 넣은 글에 그대로 들어 있을 때만.
+ *  공백·줄바꿈 차이는 무시한다 (낱말 사이를 `\s+` 로 맞춘 정규식. 예전 「첫 낱말 ~ 끝 낱말」 자르기는 첫 `###` 부터 엉뚱한 범위를 지웠다. QC 2026-10-28) */
 export function stripSheets<M extends PromptMessage>(messages: M[], sheets: string[]): M[] {
   if (!sheets.length) return messages;
-  const targets = sheets.map(squash).filter(Boolean);
+  const escRe = (t: string) => t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const targets = sheets.map(squash).filter(Boolean).map((t) => ({ t, re: new RegExp(t.split(' ').map(escRe).join('\\s+')) }));
   return messages.map((m) => {
     if (typeof m?.content !== 'string') return m;
     let text = m.content;
     let changed = false;
-    for (const t of targets) {
+    for (const { t, re } of targets) {
       const i = text.indexOf(t);
-      if (i >= 0) {
-        text = text.slice(0, i) + text.slice(i + t.length);
+      const next = i >= 0 ? text.slice(0, i) + text.slice(i + t.length) : text.replace(re, '');
+      if (next !== text) {
+        text = next;
         changed = true;
-        continue;
-      }
-      // 공백 차이: 줄별로 압축해 비교
-      const flat = squash(text);
-      const j = flat.indexOf(t);
-      if (j >= 0 && flat === squash(text)) {
-        // 줄바꿈이 섞인 원문에서 같은 자리를 찾기 어렵다 → 줄 단위로 겹치는 줄을 지운다
-        const lines = t.split(' ');
-        const first = lines[0];
-        const start = text.indexOf(first);
-        if (start >= 0) {
-          const end = text.indexOf(lines[lines.length - 1], start);
-          if (end > start) {
-            text = text.slice(0, start) + text.slice(end + lines[lines.length - 1].length);
-            changed = true;
-          }
-        }
       }
     }
     return changed ? { ...m, content: text.replace(/\n{3,}/g, '\n\n') } : m;

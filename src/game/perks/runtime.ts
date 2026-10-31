@@ -83,7 +83,6 @@ export const perkDecoy = { x: 0, y: 0, until: -1 };
 /** 혼란 적의 공격이 다른 적에게도 (제 편 때리기, fighter/ai.ts·player.ts) */
 export const perkWorld = { friendlyFire: false };
 
-const ail = (k: string) => k as DebuffKind;
 const RANK = new Map(PERK_TEXT.map((p) => [p.name, p.rank]));
 const GRADED = new Set(PERK_TEXT.filter(graded).map((p) => p.name));
 const DEF = new Map(PERK_TEXT.map((p) => [p.name, p]));
@@ -112,14 +111,12 @@ export class PerkRun {
   private blockPress = -99;
   private dodgeAt = -99;
   private dodgeEndAt = -99;
-  private dodgeFrom: { x: number; y: number } | null = null;
   private dodgeHit = new Set<object>();
   /** 회피 시작 때 상대가 어느 쪽에 있었나 (꿰뚫는 회피: 쪽이 바뀌면 통과) */
   private dodgeSide = new Map<object, number>();
   private comboHits: Record<string, boolean> = {};
   private shots = 0;
   private shotHits = 0;
-  private bombsThisDodge = 0;
   private armorRefillAt = -1;
   private killWindow = 0;
   private crisisUntil = -1;
@@ -434,7 +431,7 @@ export class PerkRun {
   /* ───────── 회피 ───────── */
   dodge(): void {
     const h = this.host; if (!h) return;
-    this.dodgeAt = this.T; this.dodgeFrom = { x: h.P.x, y: h.P.y }; this.dodgeHit.clear(); this.n.gapUsed = 0;
+    this.dodgeAt = this.T; this.dodgeHit.clear(); this.n.gapUsed = 0;
     this.dodgeSide.clear(); for (const q of h.foes()) this.dodgeSide.set(q.body, Math.sign(q.x - h.P.x));
     if (this.has('회피 폭탄')) { const x = h.P.x, gy = h.P.y; h.later(0.6, () => h.boom({ x, gy, r: 150, dmg: 60, kind: 'heavy', tag: 'dodgebomb', style: 'blast' })); }
     if (this.has('미끼 잔상')) { perkDecoy.x = h.P.x; perkDecoy.y = h.P.y; perkDecoy.until = performance.now() + 1500; }

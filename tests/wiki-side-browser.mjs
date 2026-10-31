@@ -2,6 +2,7 @@
 // 사용법: node tests/wiki-side-browser.mjs <fixture.json> [screenshot-dir]   (fixture: tests/make_fixture.py)
 // 호스트 흉내(hostScript·boot·open)는 tests/browser.mjs 와 같다.
 import { createRequire } from 'node:module';
+import { distWorldPack } from './data-init.mjs';
 import { execSync } from 'node:child_process';
 import { readFileSync, mkdirSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
@@ -17,6 +18,8 @@ const plugin = readFileSync(process.env.PLUGIN || new URL('../dist/goei-plugin.j
 
 // 본체는 시작기가 pluginStorage에서 꺼낸다. 따로 시험하는 곳(noBody) 말고는 미리 넣어 둔다
 const bodyCode = readFileSync(new URL('../dist/goei-body.js', import.meta.url), 'utf8');
+/** 세계 자료 팩 (개선 나1): 본체처럼 가짜 저장소에 미리 둔다 (저장소에 자료가 있는 보통 경우). 받기 시험은 noBody 쪽에서 */
+const worldPack = distWorldPack();
 function hostScript(char, chat, { rootDom = true, noBody = false } = {}) {
   return `
     window.__calls = { setChat: [], show: [], hide: 0, replacers: [], listeners: [], handlers: {} };
@@ -42,7 +45,8 @@ function hostScript(char, chat, { rootDom = true, noBody = false } = {}) {
     });
     window.__store = {};
     if (!${noBody}) window.__store['p:goei:body'] = ${JSON.stringify(bodyCode)};
-    window.__rootDoc = ${rootDom} ? { querySelector: async (q) => wrap(document.querySelector(q)), querySelectorAll: async (q) => [...document.querySelectorAll(q)].map(wrap), createElement: async (t) => wrap(document.createElement(t)) } : null;
+    if (!${noBody}) window.__store['p:goei:data-world'] = ${JSON.stringify(worldPack)};
+    window.__rootDoc = ${rootDom} ? { ...wrap(document.documentElement), querySelector: async (q) => wrap(document.querySelector(q)), querySelectorAll: async (q) => [...document.querySelectorAll(q)].map(wrap), createElement: async (t) => wrap(document.createElement(t)) } : null;
     window.__char = ${JSON.stringify(char)};
     window.__liteChar = window.__char;
     window.__chat = ${JSON.stringify(chat)};
@@ -93,7 +97,7 @@ async function boot(char, chat, viewport = process.env.VP ? { width: +process.en
   await page.exposeFunction('__readAsset', (p) => {
     try { return readFileSync(new URL(p, `file://${fixtureDir}/`)).toString('base64'); } catch { return null; }
   });
-  await page.setContent('<!doctype html><html><head><meta charset="utf-8"></head><body style="margin:0;height:100vh"><div class="default-chat-screen" style="height:100%;background:#f3f3f3"><button id="other" style="margin:40px">다른 버튼</button></div></body></html>');
+  await page.setContent('<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"></head><body style="margin:0;height:100vh"><div class="default-chat-screen" style="height:100%;background:#f3f3f3"><button id="other" style="margin:40px">다른 버튼</button></div></body></html>');
   // 실제 Risu 플러그인 창은 allow-forms 없는 iframe이라 form 제출 이벤트가 아예 일어나지 않는다
   await page.addScriptTag({ content: "document.addEventListener('submit', (e) => { e.preventDefault(); e.stopImmediatePropagation(); }, true);" });
   await page.addScriptTag({ content: hostScript(char, chat, opts) });
@@ -117,30 +121,30 @@ const box = (page, sel) => page.locator(sel).first().boundingBox();
   await page.click('.gx-nav > .gx-nb[data-value="wiki"]');
   await page.waitForSelector('.nw-rail');
   let rail = await box(page, '.nw-rail'), main = await box(page, '.nw-main');
-  assert.ok(rail.x < main.x, '기본은 왼쪽');
-  // 설정 → 화면 → 위키 목록 위치: 오른쪽
+  assert.ok(rail.x > main.x, '기본은 오른쪽 (2026-10-29 사용자)');
+  // 설정 → 화면 → 위키 목록 위치: 왼쪽
   await page.click('[data-action="ed-open"][data-value="set:screen"] >> nth=0');
   await page.waitForSelector('[data-action="set-wiki-side"]');
-  await page.click('[data-action="set-wiki-side"][data-value="right"]');
-  await page.waitForFunction(() => document.querySelector('.gx')?.dataset.wikiSide === 'right');
+  await page.click('[data-action="set-wiki-side"][data-value="left"]');
+  await page.waitForFunction(() => document.querySelector('.gx')?.dataset.wikiSide === 'left');
   await page.click('.gw [data-action="ed-close"]');
   await page.waitForFunction(() => !document.querySelector('.gw') || getComputedStyle(document.querySelector('.gw')).display === 'none');
   await page.waitForTimeout(300);
   rail = await box(page, '.nw-rail'); main = await box(page, '.nw-main');
-  assert.ok(rail.x > main.x, '오른쪽으로 옮김');
+  assert.ok(rail.x < main.x, '왼쪽으로 옮김');
   await page.click('.nw-grab');
   await page.waitForSelector('.list-open');
   await page.waitForTimeout(400);
   const panel = await box(page, '.nw-panel');
-  assert.ok(Math.abs(panel.x + panel.width - rail.x) < 4, '서랍이 세로바 왼쪽에 붙어 열림');
-  if (shots) await page.screenshot({ path: `${shots}/wiki-right.png` });
+  assert.ok(Math.abs(panel.x - (rail.x + rail.width)) < 4, '서랍이 세로바 오른쪽에 붙어 열림');
+  if (shots) await page.screenshot({ path: `${shots}/wiki-left.png` });
   assert.deepEqual(errors, []);
   await page.close();
 }
-// 모바일은 그대로 오른쪽 책갈피
+// 모바일 책갈피도 PC 설정을 따른다 (기본 오른쪽)
 {
   const { page } = await boot(fixture, chat(), { width: 390, height: 844 });
-  await page.evaluate(() => { window.__store['p:goei:prefs'] = JSON.stringify({ ...(JSON.parse(window.__store['p:goei:prefs'] || '{}')), wikiSide: 'right' }); });
+  await page.evaluate(() => { window.__store['p:goei:prefs'] = JSON.stringify({ ...(JSON.parse(window.__store['p:goei:prefs'] || '{}')) }); });
   await open(page);
   await page.locator('[data-value="wiki"]:visible').first().click();
   await page.waitForSelector('.nw-edge');

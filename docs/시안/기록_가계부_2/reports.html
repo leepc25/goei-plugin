@@ -1,0 +1,23 @@
+<!doctype html><html><head><meta charset="utf-8"><link rel="stylesheet" href="base.css"><style>
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.card{border:1px solid var(--line);border-radius:14px;background:var(--panel);overflow:hidden}
+.card.mine{box-shadow:inset 0 3px 0 #F5B544}
+.shot{position:relative;height:150px;background:#0b110f}
+.shot img{width:100%;height:100%;object-fit:cover;filter:saturate(.5) contrast(1.12) brightness(.8) sepia(.15)}
+.shot::after{content:'';position:absolute;inset:0;background:repeating-linear-gradient(0deg,rgba(255,255,255,.05) 0 1px,transparent 1px 3px),linear-gradient(to top,rgba(5,9,8,.85),transparent 60%)}
+.shot .o{position:absolute;z-index:2;left:10px;top:8px;right:10px;display:flex;justify-content:space-between;font-family:var(--mono);font-size:10px;letter-spacing:.12em;color:rgba(255,255,255,.85)}
+.shot .no{position:absolute;z-index:2;left:10px;bottom:10px;font-family:var(--mono);font-size:11px;letter-spacing:.1em;color:#fff;border:1px solid rgba(255,255,255,.5);padding:2px 7px;border-radius:4px;background:rgba(0,0,0,.35)}
+.shot .stamp{position:absolute;z-index:2;right:12px;bottom:10px;font-family:var(--mono);font-size:12px;font-weight:700;letter-spacing:.18em;color:#ff6b5f;border:2px solid #ff6b5f;padding:2px 8px;border-radius:4px;transform:rotate(-6deg);opacity:.9}
+.body{padding:12px 14px 14px;display:flex;flex-direction:column;gap:7px}
+.sum{display:flex;gap:6px;flex-wrap:wrap}.pill{font-size:11.5px;font-weight:700;padding:3px 8px;border-radius:999px;background:var(--panel2);color:var(--sub)}.pill.p{color:var(--signal);background:var(--accent-bg)}.pill.m{color:var(--danger);background:#FBE3DF}
+</style></head><body><div class="wrap">
+<div class="subs"><div class="sub">일지</div><div class="sub on">보고서</div><div class="sub">인물</div><div class="sub">세력</div></div>
+<div class="tools"><span class="chip on">내가 출동 3</span><span class="chip">요원 처리 9</span><span class="q">찾기: 이름·장소·요원</span></div>
+<div class="grid">
+<div class="card mine"><div class="shot"><img src="/tmp/claude-0/-home-user-goei-plugin/0e71b2dd-505a-531e-9831-266ee973ae4a/scratchpad/mock2/../fx/assets/Sora Land.avif"><div class="o"><span><span class="rec"><i></i>END</span> CAM-07</span><span>05.10 21:02</span></div><span class="no">RPT-0510-03</span><span class="stamp">CLOSED</span></div>
+<div class="body"><div class="l1"><span class="g">A</span><b>소라 랜드</b><span class="badge">내가 출동</span></div><div class="l2">서울 노원구 · 1시간 24분</div><div class="who"><img class="ava" src="/tmp/claude-0/-home-user-goei-plugin/0e71b2dd-505a-531e-9831-266ee973ae4a/scratchpad/mock2/../fx/assets/Jyaldi.avif"><img class="ava" src="/tmp/claude-0/-home-user-goei-plugin/0e71b2dd-505a-531e-9831-266ee973ae4a/scratchpad/mock2/../fx/assets/Spangdal.avif">쟈알디 · 스팡달</div><div class="res">격리 완료. 현장 봉쇄 해제</div><div class="sum"><span class="pill p">호감 +2 · +1</span><span class="pill p">수당 ₩300,000</span></div></div></div>
+<div class="card"><div class="shot"><img src="/tmp/claude-0/-home-user-goei-plugin/0e71b2dd-505a-531e-9831-266ee973ae4a/scratchpad/mock2/../fx/assets/Myeongil Apartment.avif"><div class="o"><span><span class="rec"><i></i>END</span> CAM-12</span><span>05.10 18:40</span></div><span class="no">RPT-0510-02</span><span class="stamp">CLOSED</span></div>
+<div class="body"><div class="l1"><span class="g b">B</span><b>명일 아파트</b></div><div class="l2">경기 하남시 · 3시간 10분</div><div class="who"><img class="ava" src="/tmp/claude-0/-home-user-goei-plugin/0e71b2dd-505a-531e-9831-266ee973ae4a/scratchpad/mock2/../fx/assets/Jaemtri.avif">잼트리</div><div class="res">입주민 대피 완료</div><div class="sum"><span class="pill">간이 보고서</span></div></div></div>
+<div class="card"><div class="shot"><img src="/tmp/claude-0/-home-user-goei-plugin/0e71b2dd-505a-531e-9831-266ee973ae4a/scratchpad/mock2/../fx/assets/The Church.avif"><div class="o"><span><span class="rec"><i></i>END</span> CAM-03</span><span>05.09 23:15</span></div><span class="no">RPT-0509-01</span><span class="stamp">CLOSED</span></div>
+<div class="body"><div class="l1"><span class="g in">사</span><b>폐교회 실종 신고</b></div><div class="l2">강원 춘천시 · 52분</div><div class="who"><img class="ava" src="/tmp/claude-0/-home-user-goei-plugin/0e71b2dd-505a-531e-9831-266ee973ae4a/scratchpad/mock2/../fx/assets/Aileen.avif">에일린</div><div class="res">실종자 1명 확보</div><div class="sum"><span class="pill m">지출 ₩45,000</span></div></div></div>
+</div></div></body></html>

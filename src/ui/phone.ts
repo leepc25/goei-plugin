@@ -3,7 +3,6 @@
 // 생성은 창을 닫아도 계속되고 끝나면 원래 채팅에 저장한다.
 import { onOffSwitch } from './controls';
 import { composeBody, describe, previewText, type UserKind } from '../core/attach';
-import { keepOpen } from './panels';
 import { attachAction, attachBody, attachEditor, attachInput, emptyAttachment, type Attachments } from './attach';
 import {
   applyEvents, bulletinUnread, callRecord, commitAnnouncements, commitInvitations, contactDetails, cooldownMark, directory, LIMITS, listedRooms,
@@ -30,7 +29,6 @@ import { advancedBox } from './advanced';
 import { fitPrompt } from '../core/budget';
 import { personaText } from '../host/user';
 import { playerSource } from '../core/player';
-import { saveVarDefaults } from '../host/prefs';
 import { updateChat, type ChatContext } from '../host/risu';
 
 type Sub = 'contacts' | 'chats' | 'notices';
@@ -90,11 +88,20 @@ export interface PhoneEnv {
   visible(): boolean;
   /** 전화 기록을 남긴 뒤 창을 닫는다 */
   close(): Promise<void>;
+  /** 지금 창이 보고 있는 채팅 (자동 확인이 다른 채팅 것이면 그 화면을 건드리지 않는다) */
+  current?(): { charIndex: number; chatIndex: number } | null;
 }
 
 const quietEnv: PhoneEnv = { render: () => {}, refresh: async () => {}, visible: () => false, close: async () => {} };
 let liveEnv: PhoneEnv | null = null;
 const envOr = (env?: PhoneEnv) => env ?? liveEnv ?? quietEnv;
+/** 자동 확인용: 창이 그 채팅을 보고 있을 때만 산 env (아니면 조용히). 괴담넷(autoRefreshGnet)과 같은 규칙 */
+function envForAuto(ctx: { charIndex: number; chatIndex: number }): PhoneEnv {
+  const env = liveEnv;
+  if (!env) return quietEnv;
+  const showing = env.current?.();
+  return showing === undefined || (showing && chatKey(showing) === chatKey(ctx)) ? env : quietEnv;
+}
 
 const PAGE = 40;
 const jobs = new Map<string, string>();
@@ -343,7 +350,7 @@ async function createGroup(ctx: ChatContext, env: PhoneEnv) {
 
 /** 전체 새 메시지 확인 (원본 refreshInbox). automatic: 채팅 응답 뒤 자동 확인 */
 export function refreshInbox(ctx: ChatContext, env?: PhoneEnv, automatic = false, joint?: Joint) {
-  const e = envOr(env);
+  const e = env ?? (automatic ? envForAuto(ctx) : envOr(env));
   return run(ctx, e, automatic ? '새 메시지를 자동으로 확인하는 중이에요.' : '새 메시지를 확인하는 중이에요.', async () => {
     const startLength = ctx.chat.message?.length ?? 0;
     const st = readPhone(ctx.chat);
@@ -433,7 +440,10 @@ export async function autoRefresh(ctx: ChatContext, messageIndex: number, env?: 
   } catch {
     return; // 괴담톡 로어북이 없는 카드
   }
+  // 창이 다른 채팅을 보고 있으면 그 화면의 알림은 건드리지 않는다 (괴담넷과 같음)
+  const notice = phone.notice;
   await refreshInbox({ ...ctx, chat: saved }, env, true, joint);
+  if (!env && envForAuto(ctx) === quietEnv) phone.notice = notice;
 }
 
 /** 괴담톡 탭을 열 때: 「창을 열 때」 설정이고 마지막 채팅 응답을 아직 확인하지 않았으면 한 번 확인 */
@@ -1016,7 +1026,6 @@ export function phoneTab(ctx: ChatContext, env: PhoneEnv): string {
     tool('ph-group', ICONS.group, '단톡 만들기', busy ? 'disabled' : '', '단톡'),
     tool('ph-add', ICONS.addUser, '연락처 추가', '', '추가'),
     tool('ph-call', ICONS.call, '전화 걸기', 'data-value=""', '전화'),
-    tool('ph-settings', ICONS.settings, '괴담톡 설정', phone.view === 'settings' ? 'aria-pressed="true"' : '', '설정'),
   ].join('');
   return `<main class="gx-body ph ph-app ${detail ? 'is-detail' : 'is-list'}">
     <section class="ph-side" aria-label="괴담톡 목록">

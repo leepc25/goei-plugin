@@ -99,7 +99,8 @@ export interface Prefs {
   /** 창 모양 (이 기기·모든 채팅 공통): 메뉴 위치, 창 바깥 어둡기(%) */
   nav?: 'left' | 'right';
   /** 위키 목록 서랍 쪽 (PC, 이 기기 공통, 2026-10-27 사용자). 없으면 왼쪽. 모바일은 늘 오른쪽 책갈피 */
-  wikiSide?: 'right';
+  /** 위키 목록·세로바 쪽 (기본 오른쪽, 2026-10-29 사용자). 폰의 「목록」 책갈피도 따라간다 */
+  wikiSide?: 'left' | 'right';
   /** 상황판 요원 칸 모양 (이 기기 공통): 모니터 벽(기본) 또는 목록 */
   agents?: 'wall' | 'list';
   dim?: number;
@@ -115,6 +116,8 @@ export interface Prefs {
   imgSend?: number;
   /** 즐겨찾기 (이 기기·모든 채팅 공통, 최대 MARK_MAX): 창 안 화면 상태와 이름 */
   marks?: Mark[];
+  /** 기본 즐겨찾기(DEFAULT_MARKS)를 이 기기에 한 번 채웠나. 채운 뒤에는 지워도 다시 넣지 않는다 (2026-10-29 사용자) */
+  marksSeeded?: boolean;
   /** 이미지 태그 지침 (core/imgprompt.ts): 틀, 끈 이름, 임의 추가 이름, 표정 세트. 없으면 기본 */
   imgPrompt?: string;
   imgNamesOff?: string[];
@@ -130,6 +133,8 @@ export interface Prefs {
   relationsSym?: boolean;
   /** 새 채팅의 시작 잔고 (원). 없으면 0 */
   walletStart?: number;
+  /** 상황판 창 둘레 기기 틀 (PC, 이 기기 공통, 2026-10-29 사용자). 없으면 일반 태블릿. 폰·필드 전체화면·좁은 창에서는 안 그린다 (ui/frame.ts) */
+  frame?: 'none' | 'tablet' | 'tactical';
 }
 
 /** 즐겨찾기 하나: s는 app.ts가 앞뒤 이동 기록에 쓰는 화면 상태 그대로, name은 저장할 때 붙인 이름 */
@@ -138,6 +143,13 @@ export interface Mark {
   name: string;
 }
 export const MARK_MAX = 5;
+/** 즐겨찾기 기본값 (2026-10-29 사용자): 한 번도 저장한 적이 없을 때. 비우면 빈 채로 저장돼 다시 채우지 않는다 */
+export const DEFAULT_MARKS: Mark[] = [
+  { s: { tab: 'field' }, name: '필드' },
+  { s: { tab: 'wallet' }, name: '가계부' },
+  { s: { tab: 'records' }, name: '기록' },
+  { s: { tab: 'settings' }, name: '설정' },
+];
 
 /** 창 바깥 어둡기 기본값 (%). 예전엔 100%라 뒤 채팅이 거의 안 보였다 */
 export const DIM_DEFAULT = 50;
@@ -146,7 +158,7 @@ export const DIM_STEPS = [0, 25, 50, 75, 100];
 let prefs: Prefs = { basic: {}, world: {} };
 
 /** 기능 설정으로 기본값에 담을 수 있는 채팅 변수 (상태·기록 변수는 빼고 설정만) */
-export const PREF_VAR = /^(\$ph_(model|auto|status|related|context|incoming|incoming_chance|group_invites|group_invite_chance|announcements|announcement_gap|announcement_history|announcement_page_size|all_contacts|anomaly_contacts|storage_(auto|limit)_(dm|group|notice))|\$lb_cfg_lb-gn\.[a-z_]+|\$gn_storage_(auto|limit)_dm|\$nw_(mode|model|length|refresh_previous|writing_request|context)|\$ph_context_(messages|announcements)|\$(ph|nw)_adv_[a-z_]+|\$hq_(adv_[a-z_]+|ui)|\$gen_[a-z_]+|\$pp_[a-z_]+|\$st_col_[a-z]+|\$st_wallet_edit)$/;
+export const PREF_VAR = /^(\$ph_(model|auto|status|related|context|incoming|incoming_chance|group_invites|group_invite_chance|announcements|announcement_gap|announcement_history|announcement_page_size|all_contacts|anomaly_contacts|storage_(auto|limit)_(dm|group|notice))|\$lb_cfg_lb-gn\.[a-z_]+|\$gn_storage_(auto|limit)_dm|\$nw_(mode|model|length|refresh_previous|writing_request|context)|\$ph_context_(messages|announcements)|\$(ph|nw)_adv_[a-z_]+|\$hq_(adv_[a-z_]+|ui)|\$gen_[a-z_]+|\$pp_[a-z_]+|\$jr_[a-z_]+|\$st_col_[a-z]+|\$st_wallet_edit)$/;
 
 export function getPrefs(): Prefs {
   return prefs;
@@ -178,7 +190,7 @@ export function setPrefs(raw: unknown): Prefs {
     for (const [k, v] of Object.entries(o.vars as Record<string, unknown>)) if (PREF_VAR.test(k) && typeof v === 'string') vars[k] = v;
   }
   const nav = o.nav === 'right' ? 'right' : undefined;
-  const wikiSide = o.wikiSide === 'right' ? 'right' : undefined;
+  const wikiSide = o.wikiSide === 'left' ? 'left' : o.wikiSide === 'right' ? 'right' : undefined;
   const agents = o.agents === 'list' ? 'list' : undefined;
   const dim = int(o.dim, 0, 100);
   const status = o.status === 'off' || o.status === 'light' || o.status === 'dark' || o.status === 'paper' ? o.status : undefined;
@@ -187,10 +199,14 @@ export function setPrefs(raw: unknown): Prefs {
   const imgFoldOn = o.imgFoldOn === false ? false : undefined;
   const show = imgRecent(o.imgShow);
   const send = imgRecent(o.imgSend);
-  const marks: Mark[] = (Array.isArray(o.marks) ? o.marks : [])
+  const savedMarks: Mark[] = (Array.isArray(o.marks) ? o.marks : [])
     .filter((m): m is Mark => !!m && typeof m === 'object' && typeof (m as Mark).name === 'string' && !!(m as Mark).s && typeof (m as Mark).s.tab === 'string')
     .slice(0, MARK_MAX)
     .map((m) => ({ s: m.s, name: m.name.slice(0, 80) }));
+  // 기본 즐겨찾기는 기기마다 한 번만: 이미 있는 것은 두고 빠진 기본 항목만 빈칸에 붙인다. 한 번 채운 뒤(marksSeeded)엔 손대지 않는다
+  const marks: Mark[] = o.marksSeeded === true
+    ? savedMarks
+    : [...savedMarks, ...DEFAULT_MARKS.filter((d) => !savedMarks.some((m) => JSON.stringify(m.s) === JSON.stringify(d.s)))].slice(0, MARK_MAX);
   const strList = (v: unknown, max: number, len: number) => (Array.isArray(v) ? v.filter((x): x is string => typeof x === 'string' && !!x.trim()).map((x) => x.trim().slice(0, len)).slice(0, max) : []);
   const imgPrompt = typeof o.imgPrompt === 'string' && o.imgPrompt.trim() ? o.imgPrompt.slice(0, 6000) : undefined;
   const imgNamesOff = strList(o.imgNamesOff, 200, 40);
@@ -213,8 +229,9 @@ export function setPrefs(raw: unknown): Prefs {
   }
   setUserRules(rules);
   const relationsSym = o.relationsSym === false ? false : undefined;
+  const frame = o.frame === 'none' || o.frame === 'tactical' ? o.frame : undefined;
   const walletStart = int(o.walletStart, 0, 1_000_000_000_000);
-  prefs = { basic, world, ...(walletStart !== null ? { walletStart } : {}), ...(editorWidth !== null ? { editorWidth } : {}), ...(Object.keys(guides).length ? { guides } : {}), ...(rules.length ? { rules } : {}), ...(relationsSym === false ? { relationsSym } : {}), ...(theme ? { theme } : {}), ...(imgPrompt ? { imgPrompt } : {}), ...(imgNamesOff.length ? { imgNamesOff } : {}), ...(imgNamesExtra.length ? { imgNamesExtra } : {}), ...(imgKeywords.length ? { imgKeywords } : {}), ...(Object.keys(vars).length ? { vars } : {}), ...(nav ? { nav } : {}), ...(wikiSide ? { wikiSide } : {}), ...(agents ? { agents } : {}), ...(dim !== null ? { dim } : {}), ...(status ? { status } : {}), ...(size !== null ? { imgSize: size } : {}), ...(fold !== null ? { imgFold: fold } : {}), ...(imgFoldOn === false ? { imgFoldOn } : {}), ...(show !== null ? { imgShow: show } : {}), ...(send !== null ? { imgSend: send } : {}), ...(marks.length ? { marks } : {}) };
+  prefs = { basic, world, ...(walletStart !== null ? { walletStart } : {}), ...(frame ? { frame } : {}), ...(editorWidth !== null ? { editorWidth } : {}), ...(Object.keys(guides).length ? { guides } : {}), ...(rules.length ? { rules } : {}), ...(relationsSym === false ? { relationsSym } : {}), ...(theme ? { theme } : {}), ...(imgPrompt ? { imgPrompt } : {}), ...(imgNamesOff.length ? { imgNamesOff } : {}), ...(imgNamesExtra.length ? { imgNamesExtra } : {}), ...(imgKeywords.length ? { imgKeywords } : {}), ...(Object.keys(vars).length ? { vars } : {}), ...(nav ? { nav } : {}), ...(wikiSide ? { wikiSide } : {}), ...(agents ? { agents } : {}), ...(dim !== null ? { dim } : {}), ...(status ? { status } : {}), ...(size !== null ? { imgSize: size } : {}), ...(fold !== null ? { imgFold: fold } : {}), ...(imgFoldOn === false ? { imgFoldOn } : {}), ...(show !== null ? { imgShow: show } : {}), ...(send !== null ? { imgSend: send } : {}), ...(marks.length ? { marks } : {}), marksSeeded: true };
   return prefs;
 }
 

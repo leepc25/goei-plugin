@@ -57,7 +57,7 @@ function atkSeq(id, heavy) {
 
 // ── 상태 ──
 const P = { x: 420, y: 580, z: 0, vz: 0, face: 1, mode: 'ground', combat: false, armed: false, clip: null, pvx: 0, pvy: 0, pdec: 0,
-            jumps: 0, airAtk: false, airVX: 230, takeoff: 0, spin: 0, buf: null, chainT: 0, combo: 0, stunT: 0, idleT: 0, lastTap: {}, runLatch: false,
+            jumps: 0, airAtk: false, airVX: 230, takeoff: 0, spin: 0, buf: null, bufQ: [], chainT: 0, combo: 0, stunT: 0, idleT: 0, lastTap: {}, runLatch: false,
             hp: 100, sp: 0, heat: 0, overT: 0, lastShot: 0, chargeShown: 0, armorT: 0, inv: 0, charge: 0, ghostT: 0, dying: false, t: 0 };
 let zoom = 0, zx = W / 2, zy = H / 2, dShake = 0;
 let hitstop = 0, shake = 0, flash = 0, dark = 0, cut = 0, speed = 1, showNo = false, showDummy = true, counter = false, last = performance.now();
@@ -226,8 +226,12 @@ function ensureArmed(then) {
   if (P.armed) return then();
   P.combat = true; sfx('reload'); act('W', { seq: S(R(0, 3), 0.04), onEnd: () => { P.armed = true; then(); } });
 }
+// 선입력: 동작 중에 누른 버튼을 최대 3개까지 차례로 기억한다 (사용자 2026-10-29: 하나만 기억하면 약3 연타 중 강을 빨리 누를 때 세 번째 약이 사라져 「띄우기」가 나갔다)
+const BUF_MAX = 3;   // 약·약·약(연타 중 셋)·강까지 기억
+function bufPush(a) { if (P.bufQ.length < BUF_MAX) P.bufQ.push(a); else P.bufQ[BUF_MAX - 1] = a; P.buf = P.bufQ[0]; }
+function bufClear() { P.bufQ.length = 0; P.buf = null; }
 function afterBuf(fallback) {
-  const b = P.buf; P.buf = null;
+  const b = P.bufQ.shift() || null; P.buf = P.bufQ[0] || null;
   if (b === 'light') return light();
   if (b === 'heavy') return heavy();
   if (b === 'dodge') return dodge();
@@ -246,7 +250,7 @@ function light() {
   pushP(170, 900);
   act(id, { seq: atkSeq(id, false), onEnd: () => {
     if (id === '11') { P.blowWin = P.t + 0.35; P.combo = 0; return afterBuf(toIdle); }   // 약3 뒤 잠깐은 강 = 날리기
-    if (P.buf) return afterBuf(toIdle);
+    if (P.bufQ.length) return afterBuf(toIdle);
     P.mode = 'chain'; P.chainT = 0.26;   // 친 자세로 잠깐 → 이어지지 않으면 거꾸로 틀어 전투 자세로
   } });
 }
@@ -440,15 +444,15 @@ function onPress(a) {
   }
   if (m === 'act') {
     const CANCEL_INTO = { skill, super: rocketSuper, shoot, charge };   // 공격 뒤 캔슬 구간 → 기술·필살기·원거리·충전
-    if (CANCEL_INTO[a] && canCancel() && P.clip && ['9', '10', '11', '12', '13', '16', '16_1'].includes(P.clip.id)) { P.buf = null; return CANCEL_INTO[a](); }
+    if (CANCEL_INTO[a] && canCancel() && P.clip && ['9', '10', '11', '12', '13', '16', '16_1'].includes(P.clip.id)) { bufClear(); return CANCEL_INTO[a](); }
     if (['light', 'heavy', 'dodge', 'jump'].includes(a)) {
       const id = P.clip && P.clip.id;
       if (canCancel() && ['9', '10', '11', '12', '13', '16', '16_1', '7'].includes(id)) {
         if (id === '7') { if (a === 'jump') return jump(); }
-        else if (id === '9' || id === '10') { P.buf = a; return; }
-        else { P.buf = null; return a === 'light' ? light() : a === 'heavy' ? heavy() : a === 'dodge' ? dodge() : jump(); }
+        else if (id === '9' || id === '10') { bufPush(a); return; }
+        else { bufClear(); return a === 'light' ? light() : a === 'heavy' ? heavy() : a === 'dodge' ? dodge() : jump(); }
       }
-      P.buf = a;
+      bufPush(a);
     }
     return;
   }
