@@ -30,7 +30,7 @@ export interface PlaceScene {
  */
 const NAME_KINDS: [RegExp, PlaceKind][] = [
   [/화장실/, 'restroom'], [/휴게/, 'lounge'], [/격리실|유치장|감금/, 'cell'], [/의무|의원|진료|수술|연구/, 'clinic'], [/훈련/, 'training'],
-  [/교육|면담|회의/, 'room'], [/팀$|사무/, 'office'], [/로비/, 'lobby'], [/주차|차고/, 'garage'],
+  [/교육|면담|회의/, 'room'], [/팀$|사무|행정/, 'office'], [/로비/, 'lobby'], [/주차|차고/, 'garage'],
   [/집$|식당|카페|편의점|가게|상점|매입|알선|컨설팅/, 'shop'], [/층|구역|복도|입구|골목|통로|승강장/, 'corridor'],
 ];
 export function kindFromName(s: { name: string; floor?: string }): PlaceKind {

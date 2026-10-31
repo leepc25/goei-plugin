@@ -57,7 +57,7 @@ export function hqPosts(graph: PlaceGraph): Post[] {
   ];
 }
 
-/** 역할 표: 관리국 건물 안 장소 종류 → 그 방에 상주하는 역할·인원·근무시간. 사무실 1곳당 사무 3, 훈련장 1곳당 전투원 4 */
+/** 역할 표: 관리국 건물 안 장소 종류 → 그 방에 상주하는 역할·인원·근무시간. 사무실 1곳당 사무 3(지금 지도엔 없음: 행정실 같은 방이 생기면 자동), 훈련장 1곳당 전투원 4 */
 const ROLE_BY_KIND: Partial<Record<string, { archetype: string; how: Post['how']; per: number; shifts: [number, number][] }>> = {
   office: { archetype: '행정 직원', how: 'desk', per: 3, shifts: [[9, 18]] },
   training: { archetype: '관리국 요원', how: 'train', per: 4, shifts: [[9, 18]] },
@@ -68,8 +68,12 @@ export function autoPosts(graph: PlaceGraph): Post[] {
     if (hqSceneFaction(id) !== 'A00') continue;
     const r = ROLE_BY_KIND[graph.kind(id)];
     if (!r) continue;
+    const name = graph.scene(id)?.name ?? '';
+    // 사무실 중 종합대응팀 = 이름 요원들 방(상태 태그) → 이름 없는 직원 안 둠. 진압팀 = 진압팀원(관리국 요원)이 책상 일 (10-31 사용자)
+    if (/종합대응/.test(name)) continue;
+    const role = /진압/.test(name) ? { ...r, archetype: '관리국 요원' } : r;
     const gate = graph.scene(id)?.doors[0]?.x ?? 100;
-    out.push({ id: `auto-${id}`, archetype: r.archetype, scene: id, how: r.how, shifts: r.shifts, count: r.per, gate });
+    out.push({ id: `auto-${id}`, archetype: role.archetype, scene: id, how: role.how, shifts: role.shifts, count: role.per, gate });
   }
   return out;
 }

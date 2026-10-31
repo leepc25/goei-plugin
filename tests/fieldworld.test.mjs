@@ -642,9 +642,16 @@ test('역할 표·인원 자동: 사무실 1곳당 사무 3(의자에서 책상 
     { id: 'office', name: '종합대응팀', floor: '3F', length: 1600, lane: [470, 680], doors: [{ id: 'out', x: 200, kind: 'exit', side: 'S', to: 'f3', toDoor: 'office' }], seats: [{ x: 600, y: 560, box: 0 }, { x: 800, y: 560, box: 1 }, { x: 1000, y: 560, box: 2 }] },
     { id: 'gym', name: '훈련장', floor: '3F', length: 1600, lane: [470, 680], doors: [{ id: 'out', x: 200, kind: 'exit', side: 'S', to: 'f3', toDoor: 'tr' }] },
   ];
-  const g = new P.PlaceGraph(sc, []);
-  const posts = H.autoPosts(g);
-  assert.deepEqual(posts.map((p) => [p.scene, p.archetype, p.how, p.count]), [['office', '행정 직원', 'desk', 3], ['gym', '관리국 요원', 'train', 4]]);
+  let g = new P.PlaceGraph(sc, []);
+  let posts = H.autoPosts(g);
+  assert.deepEqual(posts.map((p) => [p.scene, p.archetype, p.how, p.count]), [['gym', '관리국 요원', 'train', 4]]);   // 종합대응팀 = 이름 요원 방: 이름 없는 직원 안 둠
+  sc[2].name = '행정실';
+  assert.deepEqual(H.autoPosts(new P.PlaceGraph(sc, [])).map((p) => [p.scene, p.archetype, p.how, p.count]), [['office', '행정 직원', 'desk', 3], ['gym', '관리국 요원', 'train', 4]]);
+  sc[2].name = '진압팀';
+  assert.deepEqual(H.autoPosts(new P.PlaceGraph(sc, [])).map((p) => [p.archetype, p.how]), [['관리국 요원', 'desk'], ['관리국 요원', 'train']]);
+  sc[2].name = '행정실';
+  g = new P.PlaceGraph(sc, []);
+  posts = H.autoPosts(g);
   const sim = new A.WorldSim(g, R.mulberry32(3), { posts, has: (_l, c) => ['walk', 'idle', 'work', 'seat:type', 'pushup', 'limber'].includes(c), sceneFaction: () => 'A00' });
   for (let t = 0; t < 30 * 60; t++) sim.step(1 / 30, { scene: 'elsewhere', x: 0, hour: 10 });
   const desk = sim.actors.filter((a) => a.post?.how === 'desk'), gym = sim.actors.filter((a) => a.post?.how === 'train');
