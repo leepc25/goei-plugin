@@ -198,7 +198,7 @@ function hqAdapter(bridge: Partial<GameBridge> | undefined, ui: { chooseFloor: H
   if (typeof window !== 'undefined') window.addEventListener('keydown', onObserveKey);
   const world = () => {
     if (!sim && ready) {
-      sim = createHqWorld(map, seed, present.filter((p) => ROOM_SCENE[p.room]).map((p) => ({ name: p.name, scene: ROOM_SCENE[p.room] })), hasCharClip, { killOk: () => fighterHooks.killOk?.() ?? false, stance: (f) => factionBy.get(f)?.stage ?? null, relation: (v, t) => relation(v, t) });
+      sim = createHqWorld(map, seed, present.filter((p) => ROOM_SCENE[p.room]).map((p) => ({ name: p.name, scene: ROOM_SCENE[p.room] })), hasCharClip, { killOk: () => fighterHooks.killOk?.() ?? false, stance: (f) => factionBy.get(f)?.stage ?? null, relation: (v, t) => relation(v, t), namedHostile: (n) => peopleBy.get(n)?.affinity.cell === 'hostile' });
       chatter = new Chatter(sim, new Lines(dialogueData as unknown as DialogueData, sim.rng), lineCtx);
     }
     // 개발 도구·브라우저 시험: 세계를 들여다본다 (관찰 창과 같은 정보)
@@ -449,9 +449,10 @@ function hqAdapter(bridge: Partial<GameBridge> | undefined, ui: { chooseFloor: H
       // 싸움 기록: 덤벼 온 까닭 (경찰·경비 = 무슨 신고로 출동, 불량배 = 시비, 적대 세력 = 그 소속)
       const fac = w.mobFaction(a);
       const named = a.def.kind === 'named';
-      const why = named ? 'fought back after being hit' : isLaw(a.def.archetype) ? `responding to a${crimeAt.get(sceneId) === 'murder' ? ' murder' : 'n assault'} report` : fac ? `${fac}, hostile` : 'picked a fight';
+      const grudge = named && a.doing !== '맞섬';   // 호감 적대로 막아섬 (맞받아친 게 아니라)
+      const why = grudge ? 'hostile toward {user}' : named ? 'fought back after being hit' : isLaw(a.def.archetype) ? `responding to a${crimeAt.get(sceneId) === 'murder' ? ' murder' : 'n assault'} report` : fac ? `${fac}, hostile` : 'picked a fight';
       fightScene = sceneId;
-      const whyKo = named ? '맞고 맞받아침' : isLaw(a.def.archetype) ? `${crimeAt.get(sceneId) === 'murder' ? '살인' : '폭행'} 신고로 출동` : fac ? `${fac}, 적대` : '시비';
+      const whyKo = grudge ? '{user}에게 적대' : named ? '맞고 맞받아침' : isLaw(a.def.archetype) ? `${crimeAt.get(sceneId) === 'murder' ? '살인' : '폭행'} 신고로 출동` : fac ? `${fac}, 적대` : '시비';
       fightLog.joined(hm().trim(), sceneId, a.def.id, a.def.archetype ?? a.def.name, why, whyKo);
       fights.set(a.def.id, { body: b as typeof b & { hp: number; hpMax: number; alive: boolean; label: string }, t: 0, scene: sceneId });
     }

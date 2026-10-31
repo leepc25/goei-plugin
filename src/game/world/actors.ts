@@ -128,6 +128,8 @@ export interface Actor {
   patrol?: boolean;
   /** 이름 인물이 맞고 화난 생활 시각 (또 맞으면 맞선다, C4) */
   angryAt?: number;
+  /** 호감 적대 이름 인물이 마지막으로 싸움에서 돌아온 생활 시각 (1분은 다시 막지 않음) */
+  blockAt?: number;
   /** 필드 안 NPC끼리 싸움 (방문 대응 10-31): 상대 id, 다음 타격까지 초 */
   brawl?: { foe: string; t: number };
   /** 이미 인사한 방문자 id */
@@ -226,6 +228,8 @@ export interface SimOptions {
   killOk?: () => boolean;
   /** 세력끼리 관계 (보는 쪽 → 대상). 없으면 기본값 (world/factions.ts) */
   relation?: (viewer: string, target: string) => Stance;
+  /** 이름 인물의 호감이 적대 구간인가 (인물 기록). 없으면 아무도 아님 */
+  namedHostile?: (name: string) => boolean;
 }
 
 const WALK = 150;
@@ -270,7 +274,9 @@ export class WorldSim {
     this.stance = o.stance ?? (() => null);
     this.killOk = o.killOk ?? (() => false);
     this.relation = o.relation ?? defaultRelation;
+    this.namedHostile = o.namedHostile ?? (() => false);
   }
+  private namedHostile: (name: string) => boolean;
   private relation: (viewer: string, target: string) => Stance;
   private killOk: () => boolean;
   /** 게임 시간 누계(시간). 필드 시계가 움직인 만큼만 흐른다 (시계 없으면 실시간 3분 = 1시간) */
@@ -337,7 +343,7 @@ export class WorldSim {
   }
   /** 전투 AI로 넘길 행위자: 주인공을 막아선 몹(적대 세력·경찰·시비 뒤 맞섬) */
   challengers(scene: string): Actor[] {
-    return this.inScene(scene).filter((a) => (a.def.kind === 'mob' && a.plan === 'chase' && !a.target && a.act === 'watch') || (a.act === 'argue' && a.doing === '맞섬'));
+    return this.inScene(scene).filter((a) => (a.plan === 'chase' && !a.target && a.act === 'watch') || (a.act === 'argue' && a.doing === '맞섬'));
   }
   /** 전투 AI 몸으로 넘김 (돌아올 때까지 시뮬에서 뺌) */
   toFight(id: string): Actor | null {
@@ -359,6 +365,7 @@ export class WorldSim {
     const a = this.actors.find((q) => q.def.id === id);
     if (!a || !a.fighting) return;
     a.fighting = false;
+    a.blockAt = this.time;
     a.x = x;
     a.y = y;
     a.plan = 'none';
@@ -830,6 +837,7 @@ export class WorldSim {
     if (a.noticeCd > 0) a.noticeCd -= dt;
     if (a.needs) decayNeeds(a.needs, dt, TEMPER[a.def.name], onDuty(this.hour, TEMPER[a.def.name]));
     if (a.def.kind === 'mob') this.mobThink(a, dt);
+    if (a.def.kind === 'named' && this.namedBlocks(a)) return;   // 호감 적대: 보자마자 막아섬 (C4 다안)
     if (a.def.kind === 'named' || a.post) this.namedNotice(a);   // 주인공 응대: 이름 인물·직원
     this.socialStep(a, dt);
     if (a.def.kind === 'mob') this.threatened(a, dt);
@@ -1184,6 +1192,20 @@ export class WorldSim {
 
   // ── 이름 인물 ──
 
+  /** 호감이 적대 구간인 이름 인물 (10-31 사용자 C4 다안): 주인공을 보면 막아서고(몹 적대 세력과 같은 길), 막아서면 전투 AI가 싸운다.
+   *  싸움이 끝난 뒤(이기든 지든) 1분은 다시 막지 않는다 */
+  private namedBlocks(a: Actor): boolean {
+    const p = this.player;
+    if (!p || p.scene !== a.scene || !this.namedHostile(a.def.name)) return false;
+    if (a.plan === 'chase' || a.fighting || ['down', 'dead', 'gone', 'door', 'argue'].includes(a.act) || a.seat) return false;
+    if (this.time < (a.blockAt ?? -1e9) + 60 || Math.abs(p.x - a.x) > 520) return false;
+    a.perks ??= ['스탯 뻥튀기', '체력 뻥튀기'];
+    a.task = undefined;
+    a.run = 1.4;
+    this.walkTo(a, { x: p.x + (a.x > p.x ? 70 : -70), y: p.y || a.y }, '주인공을 막아섬', 'chase');
+    this.iconOn(a, '!', 2);
+    return true;
+  }
   private namedNotice(a: Actor): void {
     const p = this.player;
     if (!p || p.scene !== a.scene || a.noticeCd > 0) return;

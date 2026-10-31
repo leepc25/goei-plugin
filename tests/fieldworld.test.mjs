@@ -901,3 +901,20 @@ test('몹 그림 신상: 성별·나이대는 그림 설계 문서대로, 직업
   assert.equal(M.profileOf('없는그림'), null);
   for (const a of Object.values(M.ARCHETYPES)) for (const l of a.looks ?? []) assert.ok(M.profileOf(l), `원형 ${a.name}의 그림 ${l} 신상 없음`);
 });
+
+test('호감 적대 이름 인물 (C4 다안): 주인공을 보면 막아서고 전투로 넘김, 싸움 뒤 1분은 다시 안 막음', () => {
+  const sim = new A.WorldSim(graph(), R.mulberry32(41), { namedHostile: (n) => n === '스팡달' });
+  const n = sim.add({ id: 'npc:스팡달', name: '스팡달', kind: 'named', brain: 'needs', home: 'office', look: '스팡달' }, { scene: 'office', x: 900, y: 560 });
+  const f = sim.add({ id: 'npc:잼트리', name: '잼트리', kind: 'named', brain: 'needs', home: 'office', look: '잼트리' }, { scene: 'office', x: 950, y: 560 });
+  for (let i = 0; i < 100 && !sim.challengers('office').length; i++) sim.step(0.1, { scene: 'office', x: 600, y: 560, hour: 14 });
+  assert.deepEqual(sim.challengers('office').map((a) => a.def.id), [n.def.id], '스팡달만 막아섬');
+  assert.equal(n.doing, '막아섬');
+  assert.deepEqual(n.perks, ['스탯 뻥튀기', '체력 뻥튀기']);
+  assert.notEqual(f.plan, 'chase', '적대 아닌 인물은 안 막음');
+  sim.toFight(n.def.id);
+  sim.fromFight(n.def.id, 700, 560, false);
+  for (let i = 0; i < 300; i++) sim.step(0.1, { scene: 'office', x: 600, y: 560, hour: 14 });
+  assert.notEqual(n.plan, 'chase', '1분 안엔 다시 안 막음');
+  for (let i = 0; i < 400 && n.plan !== 'chase'; i++) sim.step(0.1, { scene: 'office', x: n.x - 200, y: 560, hour: 14 });   // 가까이 (520px 안)
+  assert.ok(n.plan === 'chase' || sim.challengers('office').length, `1분 지나면 다시 막음 ${JSON.stringify({ sc: n.scene, act: n.act, plan: n.plan, doing: n.doing, seat: !!n.seat, x: n.x })}`);
+});
