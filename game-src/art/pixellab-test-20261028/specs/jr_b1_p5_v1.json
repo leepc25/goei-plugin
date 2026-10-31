@@ -1,0 +1,198 @@
+{
+ "name": "jr_b1_p5_v1",
+ "room": "corridor",
+ "mood": "worn",
+ "doors": 0,
+ "mode": "loose",
+ "view": "corridor",
+ "floor_share": "the lower 30 percent",
+ "sides": "none",
+ "density": "packed+",
+ "place": "a run-down 1990s Seoul underground arcade corridor, low ceiling right above the sign",
+ "time": "night",
+ "light": "half-dead fluorescent tubes and warm shop light",
+ "floor": "smooth dark poured concrete like one wet sheet, mottled grime, oil stains, puddles, varied litter all over the walkway, light pool, shadows under objects",
+ "walls": "grimy concrete, rust, mold, cracks; ceiling strip, tangled cables, fluorescent tubes, one dead, one flickering",
+ "shadow": "strong contrast, flickering light deep in the passage, dark edges, black shadow under the boxes",
+ "palette": "dark grey, beige, warm orange and red",
+ "no": [
+  "doors",
+  "stairs",
+  "side walls"
+ ],
+ "brief": {
+  "wiki": "중림 지하상가: 문 닫은 가게가 반",
+  "design": "설계안 jr_b1: 닫힌 셔터, 쌓인 상자, 소화기함. GPT 의뢰문 ⑤: 뒷골목으로 들어가는 좁은 통로 입구(뒷벽에 뚫려 안쪽으로 깊게 이어지는 어두운 복도, 복도 안 깜빡이는 등, 입구 옆 위 화살표, 앞을 비워 둠), 입구 양옆 벽에 엉킨 전선과 쌓인 상자. 게임 출입구 alley",
+  "user": [
+   "한 장에 셔터랑 입구를 같이(사용자 10-31)",
+   "가이드 v7: v6과 같은 천장선·통행로선, 사각형 둘(셔터 x80~350, 통로 x380~540)"
+  ],
+  "items": [
+   {
+    "src": "위키·설계안: 닫힌 셔터",
+    "by": [
+     1
+    ]
+   },
+   {
+    "src": "GPT 의뢰문: 통로 입구·깜빡이는 등",
+    "by": [
+     2
+    ]
+   },
+   {
+    "src": "GPT 의뢰문: 위 화살표",
+    "by": [
+     3
+    ]
+   },
+   {
+    "src": "GPT 의뢰문: 앞 비움",
+    "by": [
+     4
+    ]
+   },
+   {
+    "src": "GPT 의뢰문: 엉킨 전선·쌓인 상자",
+    "by": [
+     5,
+     6
+    ]
+   },
+   {
+    "src": "사용자: 쓰레기 제각각",
+    "by": [
+     7
+    ]
+   },
+   {
+    "src": "설계안: 소화기함",
+    "by": [
+     8
+    ]
+   },
+   {
+    "src": "사용자: 이음매 비움",
+    "by": [
+     0,
+     9
+    ]
+   },
+   {
+    "src": "위키: 반쯤 꺼진 형광등",
+    "by": "칸:walls dead"
+   }
+  ]
+ },
+ "must": [
+  {
+   "kw": "rolling shutter",
+   "from": "사용자 셔터"
+  },
+  {
+   "kw": "dark narrow passage",
+   "from": "뒷골목 입구"
+  },
+  {
+   "kw": "one wet sheet",
+   "from": "사용자 바닥 선 금지"
+  }
+ ],
+ "sized": [],
+ "items": [
+  {
+   "full": "left 10 percent of the image: only bare back wall and floor, no side wall",
+   "text": "left 10 percent of the image: only bare back wall and floor, no side wall",
+   "why": "사용자 이음매: 앞 기둥 자리",
+   "keep": [
+    "left 10 percent"
+   ]
+  },
+  {
+   "full": "back wall, left part: a big closed vacant shop with a dented rusty rolling shutter pulled down, graffiti, a torn blank poster, an empty sign board with no letters",
+   "text": "back wall, left part: a big closed vacant shop with a dented rusty rolling shutter pulled down, graffiti, a torn blank poster, an empty sign board with no letters",
+   "why": "위키 문 닫은 가게가 반, 설계안 닫힌 셔터, 사용자 「한 장에 셔터랑 입구를 같이」",
+   "keep": [
+    "closed vacant shop",
+    "rolling shutter",
+    "no letters"
+   ]
+  },
+  {
+   "full": "back wall, right part: a tall opening cut into the wall leading into a dark narrow passage that goes straight back to the back alley, its inner walls and ceiling visible, a flickering lamp deep inside",
+   "text": "back wall, right part: a tall opening cut into the wall leading into a dark narrow passage that goes straight back to the back alley, its inner walls and ceiling visible, a flickering lamp deep inside",
+   "why": "GPT 의뢰문 ⑤ 뒷골목 통로 입구, 게임 출입구 alley",
+   "keep": [
+    "opening",
+    "dark narrow passage",
+    "flickering lamp"
+   ]
+  },
+  {
+   "full": "a painted up arrow on the wall beside the opening",
+   "text": "a painted up arrow on the wall beside the opening",
+   "why": "GPT 의뢰문 입구 옆 위 화살표",
+   "keep": [
+    "up arrow"
+   ]
+  },
+  {
+   "full": "clear empty floor in front of the opening",
+   "text": "clear empty floor in front of the opening",
+   "why": "게임 출입구 앞 비움(공용지침 4-4)",
+   "keep": [
+    "clear empty floor"
+   ]
+  },
+  {
+   "full": "tangled cables hanging down the wall between the shutter and the opening",
+   "text": "tangled cables hanging down the wall between the shutter and the opening",
+   "why": "GPT 의뢰문 입구 양옆 엉킨 전선",
+   "keep": [
+    "tangled cables"
+   ]
+  },
+  {
+   "full": "stacked boxes in front of the shutter",
+   "text": "stacked boxes in front of the shutter",
+   "why": "GPT 의뢰문 입구 옆 쌓인 상자, 설계안 쌓인 상자",
+   "keep": [
+    "stacked boxes"
+   ]
+  },
+  {
+   "full": "wall base: collapsed cardboard, burst trash bag, bottles, each a different shape",
+   "text": "wall base: collapsed cardboard, burst trash bag, bottles, each a different shape",
+   "why": "사용자 쓰레기 제각각",
+   "keep": [
+    "burst trash bag",
+    "each a different shape"
+   ]
+  },
+  {
+   "full": "a faded fire extinguisher box",
+   "text": "a faded fire extinguisher box",
+   "why": "설계안 소화기함",
+   "keep": [
+    "fire extinguisher box"
+   ]
+  },
+  {
+   "full": "right 10 percent of the image: only bare back wall and floor, no side wall",
+   "text": "right 10 percent of the image: only bare back wall and floor, no side wall",
+   "why": "사용자 이음매: 앞 기둥 자리",
+   "keep": [
+    "right 10 percent"
+   ]
+  }
+ ],
+ "review": {
+  "fit": "10줄: 닫힌 빈 가게 셔터·뒷골목 통로 입구·화살표·전선·상자·쓰레기·소화기함. 문·의자·사람·간판 글씨 없음",
+  "place": "셔터 왼쪽, 통로 오른쪽(가이드 v7), 통로 앞 비움, 양끝 10% 비움",
+  "size": "크기 숫자 없음(느슨한 틀)",
+  "brief": "의뢰문·설계안 항목 대응",
+  "meaning": "1차=2차(느슨한 틀)",
+  "over": "같은 물건 두 번 없음, packed+",
+  "frame": "통로, 옆벽 없음, 문 0, 바닥 선 낱말 없음, 가이드 v7(천장선·통행로선은 ②③④와 같음), 벽·천장·팔레트 ①과 같음"
+ }
+}
