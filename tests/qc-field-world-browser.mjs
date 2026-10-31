@@ -16,7 +16,8 @@ const jump = async (page, id, x = 400) => {
   await page.waitForFunction((id) => window.__goeiEngine.world?.stage.current()?.id === id, id, { timeout: 10000 });
   await page.waitForTimeout(600);
 };
-const lastClock = (page) => page.evaluate(() => [...window.__h.records].reverse().find((e) => e.fact?.key === '필드 시각')?.fact.value ?? null);
+// 필드 시각: 10-31부터 이동 줄(모델용 영어) 앞에 「HH:MM 」(싸움 줄은 싸움이 시작된 시각), 시간 보내기는 확정 사실 'field time'
+const lastClock = (page) => page.evaluate(() => { for (const e of [...window.__h.records].reverse()) { if (e.fact?.key === 'field time') return e.fact.value; const m = e.kind === 'move' && /^(\d\d:\d\d) /.exec(e.text); if (m) return m[1]; } return null; });
 const closeMenus = async (page) => { for (let i = 0; i < 4; i++) { if (!(await page.evaluate(() => !!document.querySelector('.mn.on') || !!document.querySelector('.gt-bar[data-open]')))) return; await page.keyboard.press('Escape'); await page.waitForTimeout(200); } };
 /** 화면(합성 결과) 오른쪽 위 관찰 창 자리의 어두운 비율: 엔진 캔버스는 그린 뒤 비워질 수 있어 스크린숏을 페이지에서 풀어 잰다 */
 const darkTopRight = async (page) => {
@@ -77,12 +78,12 @@ for (const [seed, hour] of [[1, 0], [7, 6], [42, 10], [1, 14], [7, 18], [42, 22]
   await jump(page, 'f3');
   assert.equal(await lastClock(page), '10:10', '장면 넘어가기 +10');
   const mv = await page.evaluate(() => window.__h.records.filter((e) => e.kind === 'move').map((e) => e.text));
-  assert.ok(mv.some((t) => /종합대응팀 → 3층 \(10:10\)/.test(t)), `이동 사건 ${mv}`);
+  assert.ok(mv.some((t) => /^10:10 \{user\} moved to 3층\.$/.test(t)), `이동 사건 ${mv}`);
   // 시간 보내기: 앉기 자리(사무실 seat) → 선택지 전부
   await jump(page, 'office');
   assert.equal(await lastClock(page), '10:20');
   const sit = async () => {
-    await page.evaluate(() => { const w = window.__goeiEngine.world; const s = w.stage.current().spots.find((q) => q.id === 'seat'); w.player.x = s.x; w.player.y = s.y; });
+    await page.evaluate(() => { const w = window.__goeiEngine.world; const near = (q) => Math.min(9e9, ...window.__goeiWorld.inScene(w.stage.current().id).map((a) => Math.hypot(a.x - q.x, (a.y - q.y) * 2))); const s = w.stage.current().spots.filter((q) => q.chair !== undefined).sort((p, q) => near(q) - near(p))[0]; w.player.x = s.x; w.player.y = s.y; });
     await page.waitForTimeout(250);
     await page.keyboard.press('KeyE');
     await page.waitForSelector('.mn.on');
@@ -91,9 +92,9 @@ for (const [seed, hour] of [[1, 0], [7, 6], [42, 10], [1, 14], [7, 18], [42, 22]
   const opts = await sit();
   assert.deepEqual(opts.filter((o) => !/그냥 있기|뒤로|닫기/.test(o)), ['30분', '1시간', '낮까지', '근무 끝까지'], `10:20 선택지 ${opts}`);
   await page.locator('.mn.on .mn-row > span', { hasText: /^근무 끝까지$/ }).click();
-  await page.waitForFunction(() => window.__h.records.some((e) => /시간을 보냈다/.test(e.text)));
+  await page.waitForFunction(() => window.__h.records.some((e) => /waited until/.test(e.text)));
   assert.equal(await lastClock(page), '18:00', '근무 끝까지');
-  const waited = await page.evaluate(() => window.__h.records.find((e) => /시간을 보냈다/.test(e.text)));
+  const waited = await page.evaluate(() => window.__h.records.find((e) => /waited until/.test(e.text)));
   assert.equal(waited.kind, 'act', '장부 사건 종류 (wait 는 장부에 없음)');
   await page.waitForTimeout(400);
   // 앉은 자리에서 일어나야 다시 앉을 수 있다: 옆으로 비켰다 다시
@@ -110,11 +111,11 @@ for (const [seed, hour] of [[1, 0], [7, 6], [42, 10], [1, 14], [7, 18], [42, 22]
   await page.locator('.mn.on .mn-row > span', { hasText: /^그냥 있기$/ }).click();
   await page.waitForTimeout(300);
   assert.equal(await lastClock(page), '18:30', '그냥 있기는 시계가 안 간다');
-  // 대화 한 번 = +10: 잼트리(사무실) 옆에서 E → 보내기 → 닫기
+  // 대화 한 번 = +10: 잼트리 옆에서 E → 보내기 → 닫기 (10-31: 이름 인물은 건물 전체를 돌아다녀 사무실에 없을 수 있다 → 옆으로 데려온다)
   await page.evaluate(() => { window.__goeiEngine.world.player.x += 200; });
   const talk = async () => {
     for (let i = 0; i < 25 && !(await page.evaluate(() => document.querySelector('.gt-bar[data-open]'))); i++) {
-      await page.evaluate(() => { const w = window.__goeiEngine.world; const a = window.__goeiWorld.inScene('office').find((q) => q.def.name === '잼트리'); if (a) { w.player.x = a.x - 40; w.player.y = a.y; } });
+      await page.evaluate(() => { const w = window.__goeiEngine.world; const a = window.__goeiWorld.actors.find((q) => q.def.name === '잼트리'); if (a) { a.scene = 'office'; a.goal = null; a.route = []; a.x = w.player.x + 40; a.y = w.player.y; } });
       await page.waitForTimeout(200);
       await page.keyboard.press('KeyE');
       await page.waitForTimeout(250);
@@ -144,7 +145,9 @@ for (const [seed, hour] of [[1, 0], [7, 6], [42, 10], [1, 14], [7, 18], [42, 22]
   const clockAfterFight = await lastClock(page);
   assert.equal(clockAfterFight, '19:20', '싸움 +10 (한 번만) 뒤 장면 +10');
   const prov = await page.evaluate(() => window.__h.records.filter((e) => e.kind === 'provoke'));
-  assert.ok(prov.length >= 1 && /1층 로비에서 사람 2명을 때렸다/.test(prov[0].text), `몹 사건 묶음 ${JSON.stringify(prov)}`);
+  // 싸움 한 건 = 한 줄 (world/fightlog.ts): 모델 글은 영어, 보고서 글은 한글
+  assert.ok(prov.length >= 1 && /^19:00 \{user\} attacked first: /.test(prov[0].text), `몹 사건 묶음 ${JSON.stringify(prov)}`);
+  assert.ok(/^19:00 \{user\} 먼저 공격: /.test(prov[0].ko ?? ''), `보고서 한글 ${prov[0].ko}`);
   assert.ok(prov[0].visit && /^v/.test(prov[0].visit), '방문 id');
   assert.equal(prov[0].witness?.faction, 'A00', `목격 소속 (로비 경비·안내 직원은 관리국) ${JSON.stringify(prov[0].witness)}`);
   assert.equal(prov[0].witness?.named, false);
@@ -164,7 +167,7 @@ for (const [seed, hour] of [[1, 0], [7, 6], [42, 10], [1, 14], [7, 18], [42, 22]
   await jump(page, 'f3');
   assert.equal(await lastClock(page), '22:00', '장면 0분');
   await jump(page, 'office');
-  await page.evaluate(() => { const w = window.__goeiEngine.world; const s = w.stage.current().spots.find((q) => q.id === 'seat'); w.player.x = s.x; w.player.y = s.y; });
+  await page.evaluate(() => { const w = window.__goeiEngine.world; const near = (q) => Math.min(9e9, ...window.__goeiWorld.inScene(w.stage.current().id).map((a) => Math.hypot(a.x - q.x, (a.y - q.y) * 2))); const s = w.stage.current().spots.filter((q) => q.chair !== undefined).sort((p, q) => near(q) - near(p))[0]; w.player.x = s.x; w.player.y = s.y; });
   await page.waitForTimeout(250);
   await page.keyboard.press('KeyE');
   await page.waitForSelector('.mn.on');
@@ -202,7 +205,7 @@ for (const [seed, hour] of [[1, 0], [7, 6], [42, 10], [1, 14], [7, 18], [42, 22]
   assert.deepEqual(log.filter((l) => !l.startsWith('(')), ['yeongdeungpo 12:50', 'gangnam 13:30', 'mangwon 14:10', 'yeouido 14:50'], log.join(' '));
   await useDoor(page, 'jonggak');
   assert.equal(await lastClock(page), '15:30', '종로로 귀환 = 지역 이동 +30');
-  const facts = await page.evaluate(() => window.__h.records.filter((e) => e.fact?.key === '주인공 위치').map((e) => e.fact.value));
+  const facts = await page.evaluate(() => window.__h.records.filter((e) => e.fact?.key === '{user} location').map((e) => e.fact.value));
   assert.equal(facts.at(-1), '종로 큰길');
   assert.deepEqual(errors, []);
   ok('지하철 지역 4곳 이동·귀환', log.join(' '));
@@ -240,7 +243,7 @@ for (const stage of ['hostile', 'wary']) {
   await jump(page, 'office');
   const before = await lastClock(page);
   for (let i = 0; i < 25 && !(await page.evaluate(() => document.querySelector('.gt-bar[data-open]'))); i++) {
-    await page.evaluate(() => { const w = window.__goeiEngine.world; const a = window.__goeiWorld.inScene('office').find((q) => q.def.name === '잼트리'); if (a) { w.player.x = a.x - 40; w.player.y = a.y; } });
+    await page.evaluate(() => { const w = window.__goeiEngine.world; const a = window.__goeiWorld.actors.find((q) => q.def.name === '잼트리'); if (a) { a.scene = 'office'; a.goal = null; a.route = []; a.x = w.player.x + 40; a.y = w.player.y; } });
     await page.waitForTimeout(200);
     await page.keyboard.press('KeyE');
     await page.waitForTimeout(250);
@@ -269,7 +272,7 @@ for (const stage of ['hostile', 'wary']) {
   await browser.close();
 }
 // ── ⑥ 창 크기·터치: PC 상황창(1100×900, 좌우 메뉴 줄) · 폰 세로 390×844 · 폰 가로 844×390 (터치) ──
-//  본부까지 들어가 화면 캔버스가 상자를 채우는지, 터치면 스틱·단추가 보이는지, 임무 창(잼트리 책상 E)이 뜨면 터치 조작이 숨고 창 단추를 손가락으로 누를 수 있는지, 프레임 시간
+//  본부까지 들어가 화면 캔버스가 상자를 채우는지, 터치면 스틱·단추가 보이는지, 대화창이 뜨면 터치판이 대사창 모드가 되고 입력 칸을 손가락으로 누를 수 있는지, 프레임 시간
 for (const vp of [{ width: 1100, height: 900, panel: true, touch: false }, { width: 390, height: 844, panel: false, touch: true }, { width: 844, height: 390, panel: false, touch: true }]) {
   const { browser, page, errors } = await openField({ ...vp, query: '?seed=5', card: card(10 * 60) });
   await enterHub(page);
@@ -281,21 +284,23 @@ for (const vp of [{ width: 1100, height: 900, panel: true, touch: false }, { wid
   if (vp.touch) assert.ok(await tpShown(), '터치 조작이 보인다');
   // 프레임 시간 (rAF 간격, 3초)
   const fps = await page.evaluate(() => new Promise((res) => { const ts = []; const f = (t) => { ts.push(t); if (ts.length < 180) requestAnimationFrame(f); else { const d = ts.slice(1).map((x, i) => x - ts[i]).sort((a, b) => a - b); res({ med: +d[d.length >> 1].toFixed(1), p95: +d[Math.floor(d.length * 0.95)].toFixed(1) }); } }; requestAnimationFrame(f); }));
-  // 잼트리 책상 E → 임무 창: 터치 조작 숨김, 창 단추를 탭으로 누를 수 있다
-  await page.evaluate(() => { const w = window.__goeiEngine.world; const s = w.stage.current().spots.find((q) => q.id === 'jaemtri'); w.player.x = s.x; w.player.y = s.y; });
-  await page.waitForTimeout(250);
-  await page.keyboard.press('KeyE');
-  await page.waitForSelector('[data-mission]', { state: 'visible', timeout: 5000 }).then((h) => h.dispose());
+  // 대화창(10-31: 옛 임무 창구는 없어졌다): 잼트리를 옆으로 데려와 E → 터치판은 대사창 모드, 입력 칸을 손가락으로 누를 수 있다
+  for (let i = 0; i < 25 && !(await page.evaluate(() => document.querySelector('.gt-bar[data-open]'))); i++) {
+    await page.evaluate(() => { const w = window.__goeiEngine.world; const a = window.__goeiWorld.actors.find((q) => q.def.name === '잼트리'); if (a) { a.scene = w.stage.current().id; a.goal = null; a.route = []; a.x = w.player.x + 40; a.y = w.player.y; } });
+    await page.waitForTimeout(200);
+    await page.keyboard.press('KeyE');
+    await page.waitForTimeout(250);
+  }
+  await page.waitForSelector('.gt-bar[data-open]', { timeout: 5000 });
   await page.waitForTimeout(300);
   if (vp.touch) {
-    // 모바일 조작 설계 (2026-10-28): 창이 뜨면 터치판은 숨지 않고 대사창 모드 — 선택·취소 두 버튼만 (옛 규칙: 전부 숨김)
+    // 모바일 조작 설계 (2026-10-28): 창이 뜨면 터치판은 숨지 않고 대사창 모드 — 선택·취소 두 버튼만
     const ids = await page.evaluate(() => [...document.querySelectorAll('.tp-b')].filter((b) => getComputedStyle(b).display !== 'none').map((b) => b.dataset.id).sort());
-    assert.ok(await tpShown(), '임무 창이 뜨면 터치판은 대사창 모드');
+    assert.ok(await tpShown(), '대화창이 뜨면 터치판은 대사창 모드');
     assert.deepEqual(ids, ['cancel', 'ok'], `대사창 모드 버튼 ${ids}`);
-    const btn = page.locator('[data-mission]').first();
-    const box = await btn.boundingBox();
-    const top = await page.evaluate(([x, y]) => { const el = document.elementFromPoint(x, y); return el?.closest('[data-mission]') ? 'mission' : el?.className ?? ''; }, [box.x + box.width / 2, box.y + box.height / 2]);
-    assert.equal(top, 'mission', `임무 단추 위에 다른 것이 겹친다 (${top})`);
+    const box = await page.locator('.gt-in').boundingBox();
+    const top = await page.evaluate(([x, y]) => { const el = document.elementFromPoint(x, y); return el?.closest('.gt-in') ? 'input' : el?.className ?? ''; }, [box.x + box.width / 2, box.y + box.height / 2]);
+    assert.equal(top, 'input', `대화 입력 칸 위에 다른 것이 겹친다 (${top})`);
   }
   await page.keyboard.press('Escape');
   await page.waitForTimeout(400);

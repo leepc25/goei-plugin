@@ -253,6 +253,8 @@ function hqAdapter(bridge: Partial<GameBridge> | undefined, ui: { chooseFloor: H
         continue;
       }
       if (e.kind !== 'hurt') continue;
+      // 싸움 줄 시각 = 싸움이 시작된 때 (아래에서 시계가 싸움 시간만큼 가기 전)
+      const at = hm();
       if (!foughtHere) { foughtHere = true; if (fieldClock.sec !== null) fieldClock.sec += rules().fight * 60; }
       const w = sim;
       if (!w) return;
@@ -264,12 +266,12 @@ function hqAdapter(bridge: Partial<GameBridge> | undefined, ui: { chooseFloor: H
       if (witness) witnessAt.set(e.scene, witness);
       if (!e.hostile && crimeAt.get(e.scene) !== 'murder') crimeAt.set(e.scene, 'assault');
       if (e.named) {
-        void b?.field?.record({ kind: 'hurt', text: `${hm()}{user} hit ${e.who}${e.hostile ? '' : ' unprovoked'}.`, ko: `${hm()}{user}: ${e.who} 때림${e.hostile ? '' : ' (먼저)'}`, scene: sceneNameOf(e.scene), who: [e.who], weight: 2, visit: visitId, ...(witness ? { witness } : {}) }).catch(() => {});
+        void b?.field?.record({ kind: 'hurt', text: `${at}{user} hit ${e.who}${e.hostile ? '' : ' unprovoked'}.`, ko: `${at}{user}: ${e.who} 때림${e.hostile ? '' : ' (먼저)'}`, scene: sceneNameOf(e.scene), who: [e.who], weight: 2, visit: visitId, ...(witness ? { witness } : {}) }).catch(() => {});
         continue;
       }
       fightScene = e.scene;
       const a = w.actors.find((q) => q.def.id === e.id);
-      fightLog.userHit(hm().trim(), e.scene, e.id, a?.def.archetype ?? e.who, means(), e.hostile);
+      fightLog.userHit(at.trim(), e.scene, e.id, a?.def.archetype ?? e.who, means(), e.hostile);
       if (e.down) fightLog.knockedOut(e.id);
     }
   };
