@@ -1428,7 +1428,7 @@ export class WorldSim {
     const [top, bot] = this.graph.lane(a.scene);
     if (p.how === 'fixed') {
       if (a.scene !== p.scene) return this.travel(a, p.scene, 'roam-post');
-      return this.walkTo(a, { x: p.spot ?? 400, y: top + 30 }, '자리로', 'post');
+      return this.walkTo(a, { x: p.spot ?? 400, y: p.y ?? top + 30 }, '자리로', 'post');
     }
     if (p.how === 'patrol') {
       const [l, r] = p.span ?? [100, (this.graph.scene(a.scene)?.length ?? 1280) - 100];

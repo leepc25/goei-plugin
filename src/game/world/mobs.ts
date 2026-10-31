@@ -94,6 +94,8 @@ export interface Post {
   how: 'fixed' | 'patrol' | 'roam' | 'desk' | 'train';
   /** fixed: 서는 x. patrol: [왼쪽, 오른쪽] */
   spot?: number;
+  /** fixed: 서는 깊이 y (없으면 걷는 띠 뒤쪽) */
+  y?: number;
   span?: [number, number];
   /** roam: 도는 장면 순서, 장면마다 머무는 초 */
   route?: string[];

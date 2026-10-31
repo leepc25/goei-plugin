@@ -41,10 +41,13 @@ export function hqPosts(graph: PlaceGraph): Post[] {
   const lobby = graph.scene('lobby');
   if (!lobby) return [];
   const gate = lobby.doors.find((d) => d.id === 'main')?.x ?? 300;
-  const desk = Math.round(lobby.length * 0.55);
+  // 데스크 자리: 로비 그림의 데스크 물건(지도 boxes 'desk') 가운데 뒤에 선다. 그림이 바뀌면 따라간다 (없으면 로비 55%)
+  const box = (lobby as { boxes?: { kind: string; x: number; y: number; d: number }[] }).boxes?.find((b) => b.kind === 'desk');
+  const desk = Math.round(box?.x ?? lobby.length * 0.55);
+  const deskY = box ? Math.round(box.y - box.d - 8) : undefined;
   return [
-    { id: 'desk', archetype: '안내 직원', scene: 'lobby', how: 'fixed', spot: desk, shifts: [[9, 18]], count: 1, gate },
-    { id: 'night', archetype: '경비', scene: 'lobby', how: 'fixed', spot: desk, shifts: [[18, 9]], count: 1, gate },
+    { id: 'desk', archetype: '안내 직원', scene: 'lobby', how: 'fixed', spot: desk, y: deskY, shifts: [[9, 18]], count: 1, gate },
+    { id: 'night', archetype: '경비', scene: 'lobby', how: 'fixed', spot: desk, y: deskY, shifts: [[18, 9]], count: 1, gate },
     { id: 'guard', archetype: '경비', scene: 'lobby', how: 'patrol', span: [gate + 120, Math.min(lobby.length - 120, gate + 900)], shifts: [[0, 24]], count: 1, gate },
     { id: 'cleaner', archetype: '청소부', scene: 'lobby', how: 'roam', route: ['lobby', 'f2', 'f3', 'b1', 'lobby'], stay: 40, shifts: [[6, 9], [20, 23]], count: 1, gate },
     // 의무실·연구실(B2): 의사·간호사 주간 근무 (문은 방 아래 출입이라 gate = 출입 x)
