@@ -54,16 +54,16 @@ SHOUT = {
  "화냄": f"{_C}, leaning the upper body forward, the mouth wide open shouting{_POINT}",
  "무심": f"{_C}, glancing once over the shoulder with a flat face, then turning the back",
 }[TYPE]
-HIT = {"당당": f"{_C}, the upper body rocks back and the feet take half a step back, then the body straightens up",
-       "수줍": f"{_C}, the shoulders hunch and turn away and the feet take half a step back",
-       "화냄": f"{_C}, the upper body rocks back half a step, then leans forward again with the mouth open",
-       "무심": f"{_C}, the body rocks back half a step and settles again"}[TYPE]
+HIT = {"당당": f"{_C}, the head snaps back and the upper body bends far backward, the body staggers two big steps back, then straightens up with the chin raised",
+       "수줍": f"{_C}, the head snaps back, the body doubles over and twists away, staggering two big steps back",
+       "화냄": f"{_C}, the head snaps back and the body staggers two big steps back, then lurches forward again with the mouth open",
+       "무심": f"{_C}, the head snaps back and the body staggers two big steps back, then stops and stands still"}[TYPE]
 RUN = {"당당": "long steady running strides", "수줍": "short quick running steps, the head ducked", "화냄": "heavy stomping running steps", "무심": "an even jogging pace"}[TYPE]
 FALL = {"당당": "then props up on one elbow", "수줍": "then curls up on the side", "화냄": "then lifts the head with the mouth open", "무심": "then lies still"}[TYPE]
 RISE = {"당당": "quickly", "수줍": "slowly, hunched", "화냄": "quickly", "무심": "without hurry"}[TYPE]
 CROUCH = {"당당": "kneels on one knee with the head raised", "수줍": "crouches low with the knees to the chest and the head ducked", "화냄": "crouches low with the head raised and the mouth open", "무심": "squats down low with the arms around the knees"}[TYPE]
 STEPS = {
- "S1": ("A", 8, "back", f"Standing bare {side}: {HIT}. {DRAW}"),
+ "S1": ("A", 8, None, f"Standing bare {side}: {HIT}. Big, clear body movement in every frame. {DRAW}"),
  "S2": ("A", 8, None, f"Running {side} in place, barefoot and bare, {COVER}, with {RUN}. Every frame is a running pose. {DRAW}"),
  "S3": ("A", 8, None, f"Standing bare {side}: the body falls backward onto the floor and lands lying on the back, {FALL}, {COVER}. The body lies on the floor at the bottom of the picture. {DRAW}"),
  "S4": ("S3", 8, "back", f"Lying bare on the floor at the bottom of the picture {side}, {COVER}: the body rolls to one side, kneels, and stands up {RISE}. {DRAW}"),
