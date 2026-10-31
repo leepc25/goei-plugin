@@ -51,12 +51,14 @@ def one(k, lines, env=None, redo=False):
             time.sleep(30)
 
 
-def retries():   # 로그에서 줄마다 다시 뽑아 완료한 횟수(SHOWER_V 1·2)
+def retries():   # 줄마다 다시 뽑은 횟수 = 재뽑기 시작(10-31 22:26) 뒤에 _old/로 옮겨진 이전 판 수. 실행기를 다시 띄워도, 도중에 끊겨도 정확히 셈
+    import datetime
+    t0 = datetime.datetime(2026, 10, 31, 22, 26).timestamp()
     c = {}
-    if LOG.exists():
-        for line in LOG.read_text().splitlines():
-            p = line.split(" ")
-            if len(p) > 4 and p[3] in ("1", "2") and "완료" in line: c[(p[1], p[2])] = c.get((p[1], p[2]), 0) + 1
+    for o in HERE.glob("*/_old/샤워2_*_*"):
+        parts = o.name.split("_")
+        if len(parts) == 3 and parts[1] in LINES and o.stat().st_ctime >= t0:
+            k = o.parent.parent.name; c[(k, parts[1])] = c.get((k, parts[1]), 0) + 1
     return c
 
 
