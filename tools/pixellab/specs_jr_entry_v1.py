@@ -9,7 +9,7 @@ D = 'game-src/art/pixellab-test-20261028/specs/'
 items = [
  ("right 30 percent: only the front end of a freestanding arcade entrance on the sidewalk like a Seoul subway exit, the rest continuing past the right edge, open end facing left, stairs going down to the right into darkness, waist-high railings on both sides, a glass canopy over it", "사용자: 오른쪽에 지하철 출입구 같은 지하상가 입구"),
  ("on top of the canopy, right above the entrance: a sign board reading \"중림지하상가\"", "사용자: 간판은 입구 위"),
- ("clear sidewalk before the entrance", "출입구 앞 비움"),
+ ("clear sidewalk at the entrance", "출입구 앞 비움"),
  ("back: old low-rise shop buildings along the whole width, ground floor and part of the second floor, tops cut off", "거리 뒤 건물"),
  ("on the building fronts: faded blank signs, closed shutters, a small open shop, a note reading \"임대\" on an empty window", "낡은 상가 거리"),
  ("against the buildings: a vending machine, a parked motorbike, potted plants, trash bags and boxes", "거리 소품(인도 뒤쪽, 걷는 길 비움)"),
