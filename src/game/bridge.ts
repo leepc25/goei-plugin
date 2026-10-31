@@ -277,6 +277,8 @@ export interface GameBridge {
   close(): void;
   /** 창의 다른 탭으로 가서 게임이 안 보이게 됐다/다시 보인다. 게임은 멈추고 소리를 끈다 (2026-10-23) */
   onHidden?(cb: (hidden: boolean) => void): () => void;
+  /** 본편 응답을 보내기 직전에 부른다 (10-31: 응답을 보내면 필드 마감). 콜백이 끝날 때까지(최대 3초) 요청이 기다린다 */
+  onBeforeSend?(cb: () => Promise<void>): () => void;
 }
 
 /** 코드 팩이 남기는 것 */

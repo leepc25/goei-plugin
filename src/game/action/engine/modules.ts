@@ -55,6 +55,7 @@ import dialogueData from '../../world/dialogue.json';
 import type { Actor, SimEvent } from '../../world/actors';
 import { ARCHETYPES } from '../../world/mobs';
 import { FightLog, enName, isLaw } from '../../world/fightlog';
+import { settleLine } from '../../world/fieldmoney';
 import type { FactionView, PersonView } from '../../bridge';
 import { FieldClock } from '../../world/clock';
 import type { WorldSim } from '../../world/actors';
@@ -97,7 +98,7 @@ const fieldWallet: { won: number | null } = { won: null };
 let observing = false;
 const observerOn = () => observing;
 /** 필드 가게 창이 쓰는 돈·장부 (hqAdapter 안에서 채운다: 가계부 다리·방문 id가 거기 있다) */
-const fieldLink: { pay?: (amount: number, memo: string) => Promise<number | null>; record?: (text: string) => void; fact?: (key: string, value: string) => void; nearPerson?: () => string | null; gift?: (who: string, item: string, counts: boolean) => void } = {};
+const fieldLink: { pay?: (amount: number, memo: string) => Promise<number | null>; record?: (text: string) => void; fact?: (key: string, value: string) => void; nearPerson?: () => string | null; gift?: (who: string, item: string, counts: boolean) => void ; endVisit?: (close: boolean) => void } = {};
 const wonText = (n: number) => `${n < 0 ? '−' : ''}₩ ${Math.abs(Math.trunc(n)).toLocaleString('en-US')}`;
 
 function hqAdapter(bridge: Partial<GameBridge> | undefined, ui: { chooseFloor: HubHost['chooseFloor']; sfx: (n: string) => void; overlay?: HubHost['overlay']; rules?: () => ClockRules; shop?: (id: string) => string | null; choose?: (o: { title: string; lines?: string[]; options: string[]; cancel?: boolean }) => Promise<number> }): HqModuleLike & { goto(place: string): void; visitReady: Promise<void>; visitor(): { agentId: string; name: string } } {
@@ -135,7 +136,10 @@ function hqAdapter(bridge: Partial<GameBridge> | undefined, ui: { chooseFloor: H
     void b?.people?.factions().then((l) => { factionBy.clear(); for (const f of l) factionBy.set(f.code, f); }).catch(() => {});
   };
   // 잔고: 들어갈 때, 본편 갱신기가 끝날 때(거래를 적었을 수 있음) 다시 읽는다
-  const readWallet = () => void b?.wallet?.balance().then((n) => { fieldWallet.won = n; }).catch(() => {});
+  // 필드 돈(10-31 사용자, F13): 필드 안에서는 잔고만 바로 바뀌고, 가계부에는 필드를 마감할 때 합산 한 줄. 장부 잔고 + 아직 안 적은 몫
+  const purse: { amount: number; memo: string }[] = [];
+  const unsettled = () => purse.reduce((n, p) => n + p.amount, 0);
+  const readWallet = () => void b?.wallet?.balance().then((n) => { fieldWallet.won = n === null ? null : n + unsettled(); }).catch(() => {});
   readPeople();
   readWallet();
   b?.people?.onChange(() => { readPeople(); readWallet(); });
@@ -143,13 +147,21 @@ function hqAdapter(bridge: Partial<GameBridge> | undefined, ui: { chooseFloor: H
   /** 장부 줄 앞 필드 시각 「15:40 」 (시계가 없으면 빈칸) */
   const hm = () => (fieldClock.sec === null ? '' : `${String(Math.floor(fieldClock.sec / 3600) % 24).padStart(2, '0')}:${String(Math.floor(fieldClock.sec / 60) % 60).padStart(2, '0')} `);
   const pay = async (amount: number, memo: string): Promise<number | null> => {
-    const after = (await b?.wallet?.add(amount, memo, { place: fieldClock.place || undefined, time: fieldClock.sec === null ? undefined : clockText(fieldClock.sec) }).catch(() => null)) ?? null;
-    if (after !== null) {
-      fieldWallet.won = after;
-      // 모델에게 가는 장부 글은 영어 짧은 문장(10-31). 이어진 돈 줄은 막간에서 한 줄로 묶인다 (core/interlude.ts)
-      void b?.field?.record({ kind: 'trade', text: `${hm()}Money: ${amount < 0 ? '' : '+'}${amount} ${memo}`, scene: fieldClock.place || undefined, weight: 1, visit: visitId }).catch(() => {});
-    }
-    return after;
+    if (fieldWallet.won === null) return null;
+    purse.push({ amount, memo });
+    fieldWallet.won += amount;
+    // 모델에게 가는 장부 글은 영어 짧은 문장(10-31). 이어진 돈 줄은 막간에서 한 줄로 묶인다 (core/interlude.ts)
+    void b?.field?.record({ kind: 'trade', text: `${hm()}Money: ${amount < 0 ? '' : '+'}${amount} ${memo}`, scene: fieldClock.place || undefined, weight: 1, visit: visitId }).catch(() => {});
+    return fieldWallet.won;
+  };
+  /** 가계부 한 줄 정산: 구입·판매·주움·뜯김·그 밖을 묶어 합계로 */
+  const settle = async (): Promise<void> => {
+    if (!purse.length || !b?.wallet) return;
+    const line = settleLine(purse.splice(0));
+    if (!line) return;
+    const { net, memo } = line;
+    const after = await b.wallet.add(net, memo, { place: fieldClock.place || undefined, time: fieldClock.sec === null ? undefined : clockText(fieldClock.sec) }).catch(() => null);
+    if (after !== null && after !== undefined) fieldWallet.won = after + unsettled();
   };
   // 시연판(본편 없음): 가계부 대신 이번 판 동안만 쓰는 지갑 (시작 잔고 기본값과 같은 14만 원)
   if (!b?.wallet) fieldWallet.won = 140_000;
@@ -250,6 +262,19 @@ function hqAdapter(bridge: Partial<GameBridge> | undefined, ui: { chooseFloor: H
       if (e.down) fightLog.knockedOut(e.id);
     }
   };
+  // ── 필드 마감 (10-31 사용자: 필드 한 번 = 막간 한 번) ──
+  // 본편 응답을 보내기 직전(bridge.onBeforeSend)·쓰러짐·창 닫힘: 진행 중인 싸움 기록을 닫고, 돈을 가계부 한 줄로 정산하고, 창을 닫는다
+  let visitOver = false;
+  const endVisit = async (close: boolean): Promise<void> => {
+    if (!visitOver) {
+      visitOver = true;
+      fightLog.leave();
+      await settle().catch(() => {});
+    }
+    if (close) b?.close?.();
+  };
+  b?.onBeforeSend?.(() => (b?.visit ? endVisit(true) : Promise.resolve()));
+  fieldLink.endVisit = (close) => void endVisit(close);
   // ── 필드에서 짐 (10-31 사용자: 1안 = 쓰러지면 필드 종료, 뒷이야기는 모델이. 2안 「필드 안에서 깨어남」은 보류) ──
   // 주인공이 체력 0으로 2.5초 쓰러져 있으면: 누구에게 당했는지 장부에 한 줄, 불량배·적대 세력이면 지갑에서 돈을 뜯김(경찰·경비는 안 뜯음), 그리고 필드를 닫는다
   let koT = 0, koDone = false;
@@ -274,8 +299,8 @@ function hqAdapter(bridge: Partial<GameBridge> | undefined, ui: { chooseFloor: H
     if (robbed > 0) void fieldLink.pay?.(-robbed, `${who}에게 뜯김`);
     fightScene = sceneId;
     fightLog.userDown(!!pl.killed, foe?.def.id ?? null, robbed > 0 ? `${enName(foe?.def.archetype ?? who)} took ${robbed} won from {user}.` : '');
-    // 장부에 다 쌓인 뒤 닫는다
-    setTimeout(() => b.close?.(), 1200);
+    // 장부에 다 쌓인 뒤 마감·닫기
+    setTimeout(() => void endVisit(true), 1200);
   };
   let flushT = 0;
   const clockView = () => { const c = new FieldClock(fieldClock.sec === null ? null : fieldClock.sec / 60); return c; };
@@ -501,6 +526,11 @@ function heldWeapon(w: World) {
   return h ? { name: h.name, mag: h.uses, magMax: h.max, reserve: 0, reload: null } : null;
 }
 
+/** 게임 창이 닫힐 때(main.ts 정리): 필드 마감(싸움 기록·돈 정산). 창은 이미 닫히는 중 */
+export function endFieldVisit(): void {
+  fieldLink.endVisit?.(false);
+}
+
 export interface Wiring {
   mods: EngineModules;
   /** 게임이 붙을 상자 (껍데기가 있으면 그 무대) */
@@ -547,7 +577,7 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
     onContinue: async () => { if (await gate()) game?.start_new(); },
     // 필드는 저장 슬롯이 없다: 상태는 본편 채팅 변수(가방 $fd_state 등)에 있다
     hasSave: () => false,
-    onRetreat: () => bridge?.visit ? bridge.close?.() : game?.endRun('withdraw'),
+    onRetreat: () => bridge?.visit ? (fieldLink.endVisit ? fieldLink.endVisit(true) : bridge.close?.()) : game?.endRun('withdraw'),
     onTitle: () => game?.toTitle(),
     toLocal: bridge?.viewport ? (x, y, el) => bridge.viewport!.toLocal(x, y, el) : undefined,
     field: bridge?.visit ? {

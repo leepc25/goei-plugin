@@ -10,7 +10,7 @@ import { prepareHqTextures } from './art/hqTextures';
 import { prepareHqDoorRound2 } from './art/hqDoorRound2';
 import { loadArt } from './engine/art';
 import { Game } from './engine/game';
-import { engineModules } from './engine/modules';
+import { engineModules, endFieldVisit } from './engine/modules';
 import { mountTouch } from './engine/touch';
 
 const CSS = `
@@ -78,6 +78,7 @@ export function mountGame(box: HTMLElement, bridge?: Partial<GameBridge>): () =>
   });
   return () => {
     dead = true;
+    endFieldVisit();
     releaseDoorArt();
     releaseField();
     releaseHqArt();

@@ -1,3 +1,4 @@
+import { onBeforeSend } from './send';
 // 플러그인 쪽 게임 다리: 저장 칸·자산 팩·본편 스냅숏·결과 받기·화면을 하나로 묶어 게임 코드에 넘긴다.
 import { createUiPrefs } from './uiprefs';
 import type { GameBridge, SlotId } from '../../game/bridge';
@@ -35,5 +36,6 @@ export function makeBridge(viewport: ViewportCtl, slot: SlotId, close: () => voi
     narrow: () => matchMedia('(max-width: 760px)').matches,
     close,
     onHidden,
+    onBeforeSend,
   };
 }

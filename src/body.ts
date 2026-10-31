@@ -1,3 +1,5 @@
+import { flushGamesBeforeSend } from './host/game/send';
+import { fieldIdle } from './host/game/field';
 import { clearUnsent, unsentShown } from './host/unsent';
 import { refreshStatusContext, renderStatus, setWikiOpener } from './host/statusview';
 import { openingShown, refreshOpeningHint, setOpeningHint, setRepickOpener, wantsOpeningHint } from './host/openinghint';
@@ -77,6 +79,9 @@ let liteNow = false;
 
 async function onBeforeRequest<M extends PromptMessage>(messages: M[], type: string): Promise<M[]> {
   if (type !== 'model' || !Array.isArray(messages)) return messages;
+  // 열린 필드가 있으면 먼저 마감(돈 정산·싸움 기록·창 닫기)하고 그 기록이 다 쌓인 뒤 막간을 끼운다 (10-31)
+  await flushGamesBeforeSend().catch(() => {});
+  await fieldIdle().catch(() => {});
   setWaiting(true);
   setOpeningHint(null); // 첫 전송: 시작 메시지 안내는 이제 필요 없다
   // 지시문·전화 표식은 이 봇에만 있으니 판정과 상관없이 벗긴다 (없으면 그대로)

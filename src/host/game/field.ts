@@ -15,9 +15,14 @@ import { playerAgent } from '../../core/player';
 
 const KINDS: FieldKind[] = ['move', 'act', 'hurt', 'down', 'kill', 'flee', 'provoke', 'gift', 'trade', 'quest', 'follow', 'unfollow', 'enter_anomaly', 'exit_anomaly', 'enter_site', 'detected', 'appoint', 'call'];
 
+/** 쌓는 중인 필드 사건이 다 들어갈 때까지 (응답 보내기 직전에 기다린다) */
+const tails = new Set<() => Promise<unknown>>();
+export const fieldIdle = (): Promise<unknown> => Promise.all([...tails].map((t) => t()));
+
 export function createField(): GameField {
   const opening = loadContext();
   let chain: Promise<unknown> = Promise.resolve();
+  tails.add(() => chain);
   let forced: 'inside' | 'outside' | null = null;
   return {
     override(v) { forced = v; },

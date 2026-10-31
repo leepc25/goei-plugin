@@ -32,3 +32,13 @@ test('싸움 한 건 = 한 줄: 먼저 친 쪽·상대 A·B·수단·결과, 살
   assert.equal(out[2].text, '15:42 Police officer A, B (responding to a murder report) attacked {user}; {user} fought back (weapon). A knocked out; police officer B knocked {user} out.');
   assert.equal(out[3].text, '{user} lost consciousness; the field visit ended here.');
 });
+
+test('필드 돈 정산: 가계부 한 줄로 묶음 (구입·판매·주움·뜯김)', async () => {
+  const d = await mkdtemp(join(tmpdir(), 'goei-money-'));
+  await build({ entryPoints: ['src/game/world/fieldmoney.ts'], outdir: d, outbase: 'src', bundle: true, platform: 'node', format: 'esm', outExtension: { '.js': '.mjs' }, logLevel: 'silent' });
+  const M = await import(pathToFileURL(join(d, 'game/world/fieldmoney.mjs')));
+  assert.equal(M.settleLine([]), null);
+  const r = M.settleLine([{ amount: -1500, memo: '편의점 컵라면' }, { amount: -4500, memo: '편의점 담배' }, { amount: 3000, memo: '불량배가 떨어뜨린 돈' }, { amount: 2000, memo: '편의점에 라이터 팜' }, { amount: -32000, memo: '불량배에게 뜯김' }]);
+  assert.equal(r.net, -33000);
+  assert.equal(r.memo, '필드 정산: 구입 −6,000 · 주움 +3,000 · 판매 +2,000 · 뜯김 −32,000');
+});
