@@ -98,7 +98,7 @@ const fieldWallet: { won: number | null } = { won: null };
 let observing = false;
 const observerOn = () => observing;
 /** 필드 가게 창이 쓰는 돈·장부 (hqAdapter 안에서 채운다: 가계부 다리·방문 id가 거기 있다) */
-const fieldLink: { pay?: (amount: number, memo: string) => Promise<number | null>; record?: (text: string) => void; fact?: (key: string, value: string) => void; nearPerson?: () => string | null; gift?: (who: string, item: string, counts: boolean) => void ; endVisit?: (close: boolean) => void } = {};
+const fieldLink: { pay?: (amount: number, memo: string) => Promise<number | null>; record?: (text: string, ko?: string) => void; fact?: (key: string, value: string) => void; nearPerson?: () => string | null; gift?: (who: string, item: string, counts: boolean) => void ; endVisit?: (close: boolean) => void } = {};
 const wonText = (n: number) => `${n < 0 ? '−' : ''}₩ ${Math.abs(Math.trunc(n)).toLocaleString('en-US')}`;
 
 function hqAdapter(bridge: Partial<GameBridge> | undefined, ui: { chooseFloor: HubHost['chooseFloor']; sfx: (n: string) => void; overlay?: HubHost['overlay']; rules?: () => ClockRules; shop?: (id: string) => string | null; choose?: (o: { title: string; lines?: string[]; options: string[]; cancel?: boolean }) => Promise<number> }): HqModuleLike & { goto(place: string): void; visitReady: Promise<void>; visitor(): { agentId: string; name: string }; dispose(): void } {
@@ -157,7 +157,7 @@ function hqAdapter(bridge: Partial<GameBridge> | undefined, ui: { chooseFloor: H
     purse.push({ amount, memo });
     fieldWallet.won += amount;
     // 모델에게 가는 장부 글은 영어 짧은 문장(10-31). 이어진 돈 줄은 막간에서 한 줄로 묶인다 (core/interlude.ts)
-    void b?.field?.record({ kind: 'trade', text: `${hm()}Money: ${amount < 0 ? '' : '+'}${amount} ${memo}`, scene: fieldClock.place || undefined, weight: 1, visit: visitId }).catch(() => {});
+    void b?.field?.record({ kind: 'trade', text: `${hm()}Money: ${amount < 0 ? '' : '+'}${amount} ${memo}`, ko: `${hm()}${memo} ${amount < 0 ? '−' : '+'}${Math.abs(amount).toLocaleString('en-US')}원`, scene: fieldClock.place || undefined, weight: 1, visit: visitId }).catch(() => {});
     return fieldWallet.won;
   };
   /** 가계부 한 줄 정산: 구입·판매·주움·뜯김·그 밖을 묶어 합계로 */
@@ -172,13 +172,15 @@ function hqAdapter(bridge: Partial<GameBridge> | undefined, ui: { chooseFloor: H
   // 시연판(본편 없음): 가계부 대신 이번 판 동안만 쓰는 지갑 (시작 잔고 기본값과 같은 14만 원)
   if (!b?.wallet) fieldWallet.won = 140_000;
   fieldLink.pay = (amount, memo) => (b?.wallet ? pay(amount, memo) : Promise.resolve((fieldWallet.won = (fieldWallet.won ?? 0) + amount)));
-  fieldLink.record = (text) => void b?.field?.record({ kind: 'act', text: `${hm()}${text}`, scene: fieldClock.place || undefined, weight: 1, visit: visitId }).catch(() => {});
-  fieldLink.fact = (key, value) => void b?.field?.record({ kind: 'act', text: `${key}: ${value}`, scene: fieldClock.place || undefined, weight: 1, fact: { key, value }, visit: visitId }).catch(() => {});
+  fieldLink.record = (text, ko) => void b?.field?.record({ kind: 'act', text: `${hm()}${text}`, ...(ko ? { ko: `${hm()}${ko}` } : {}), scene: fieldClock.place || undefined, weight: 1, visit: visitId }).catch(() => {});
+  fieldLink.fact = (key, value) => void b?.field?.record({ kind: 'act', text: `${key}: ${value}`, ko: '', scene: fieldClock.place || undefined, weight: 1, fact: { key, value }, visit: visitId }).catch(() => {});
   // 개발 도구·브라우저 시험
   const walletHook = { pay, balance: () => fieldWallet.won };
   (globalThis as { __goeiWallet?: unknown }).__goeiWallet = walletHook;
   /** 이번 필드 방문 id (방문마다 호감·평판 상한을 따로 세게) */
   const visitId = `v${Date.now().toString(36)}`;
+  // 방문 시작 표식 (10-31 사용자: 필드 방문 한 번 = 기록 메뉴 보고서 한 장). 모델 글에는 안 들어간다 (core/interlude.ts)
+  if (b?.visit) void b.field?.record({ kind: 'enter_field', text: '{user} entered the field.', ko: '필드 입장', weight: 1, visit: visitId }).catch(() => {});
   const ROOM_SCENE: Record<string, string> = { office: 'office', lounge: 'lounge', infirmary: 'clinic' };
   // 필드 세계 (src/game/world): 요원은 처음 선 방에서 서성이고 이웃 장면을 오간다, 거리·로비는 몹이 오간다.
   // 씨앗: 주소 ?seed=숫자 가 있으면 그것 (재현), 없으면 이번 입장마다 새로
@@ -217,7 +219,7 @@ function hqAdapter(bridge: Partial<GameBridge> | undefined, ui: { chooseFloor: H
   let fightScene = '';
   const fightLog = new FightLog((l) => {
     const wit = l.kind === 'provoke' || l.kind === 'kill' ? witnessAt.get(fightScene) : undefined;
-    void b?.field?.record({ kind: l.kind, text: l.text, scene: sceneNameOf(fightScene), weight: l.weight, visit: visitId, ...(l.who ? { who: l.who } : {}), ...(wit ? { witness: wit } : {}) }).catch(() => {});
+    void b?.field?.record({ kind: l.kind, text: l.text, ko: l.ko, scene: sceneNameOf(fightScene), weight: l.weight, visit: visitId, ...(l.who ? { who: l.who } : {}), ...(wit ? { witness: wit } : {}) }).catch(() => {});
   });
   const flushMobs = (_sceneId?: string) => fightLog.leave();
   /** {user}가 지금 무기를 들었나 (싸움 줄의 수단) */
@@ -241,7 +243,7 @@ function hqAdapter(bridge: Partial<GameBridge> | undefined, ui: { chooseFloor: H
       }
       // 목격: 보이는 장면의 소매치기만 (그 밖의 잡일은 넘기지 않음)
       if (e.kind === 'steal' && e.scene === lifeScene) {
-        void b?.field?.record({ kind: 'act', text: `${hm()}{user} saw a ${enName(e.thief)} pickpocket a ${enName(e.victim)}.`, scene: sceneNameOf(e.scene), weight: 1, visit: visitId }).catch(() => {});
+        void b?.field?.record({ kind: 'act', text: `${hm()}{user} saw a ${enName(e.thief)} pickpocket a ${enName(e.victim)}.`, ko: `${hm()}{user}: 소매치기 목격 (${e.thief} → ${e.victim})`, scene: sceneNameOf(e.scene), weight: 1, visit: visitId }).catch(() => {});
         continue;
       }
       if (e.kind === 'kill') {
@@ -262,7 +264,7 @@ function hqAdapter(bridge: Partial<GameBridge> | undefined, ui: { chooseFloor: H
       if (witness) witnessAt.set(e.scene, witness);
       if (!e.hostile && crimeAt.get(e.scene) !== 'murder') crimeAt.set(e.scene, 'assault');
       if (e.named) {
-        void b?.field?.record({ kind: 'hurt', text: `${hm()}{user} hit ${e.who}${e.hostile ? '' : ' unprovoked'}.`, scene: sceneNameOf(e.scene), who: [e.who], weight: 2, visit: visitId, ...(witness ? { witness } : {}) }).catch(() => {});
+        void b?.field?.record({ kind: 'hurt', text: `${hm()}{user} hit ${e.who}${e.hostile ? '' : ' unprovoked'}.`, ko: `${hm()}{user}: ${e.who} 때림${e.hostile ? '' : ' (먼저)'}`, scene: sceneNameOf(e.scene), who: [e.who], weight: 2, visit: visitId, ...(witness ? { witness } : {}) }).catch(() => {});
         continue;
       }
       fightScene = e.scene;
@@ -274,15 +276,20 @@ function hqAdapter(bridge: Partial<GameBridge> | undefined, ui: { chooseFloor: H
   // ── 필드 마감 (10-31 사용자: 필드 한 번 = 막간 한 번) ──
   // 본편 응답을 보내기 직전(bridge.onBeforeSend)·쓰러짐·창 닫힘: 진행 중인 싸움 기록을 닫고, 돈을 가계부 한 줄로 정산하고, 창을 닫는다
   let visitOver = false;
-  const endVisit = async (close: boolean): Promise<void> => {
+  /** how: leave = 나가기·창 닫기, send = 나오지 않고 응답을 보내 강제 종료, down = 쓰러짐 */
+  const END_KO = { leave: '필드에서 나옴', send: '응답을 보내 필드 종료', down: '쓰러져 필드 종료' } as const;
+  const END_EN = { leave: '{user} left the field.', send: 'The field visit ended as the story went on.', down: 'The field visit ended with {user} down.' } as const;
+  const endVisit = async (close: boolean, how: keyof typeof END_KO = 'leave'): Promise<void> => {
     if (!visitOver) {
       visitOver = true;
       fightLog.leave();
       await settle().catch(() => {});
+      // 방문 끝 표식: 플러그인이 이걸 받으면 이번 방문의 보고서를 만든다 (core/journal/field.ts)
+      if (b?.visit) await b.field?.record({ kind: 'exit_field', text: `${hm()}${END_EN[how]}`, ko: `${hm()}${END_KO[how]}`, scene: fieldClock.place || undefined, weight: 1, visit: visitId }).catch(() => {});
     }
     if (close) b?.close?.();
   };
-  b?.onBeforeSend?.(() => (b?.visit ? endVisit(true) : Promise.resolve()));
+  b?.onBeforeSend?.(() => (b?.visit ? endVisit(true, 'send') : Promise.resolve()));
   fieldLink.endVisit = (close) => void endVisit(close);
   // ── 필드에서 짐 (10-31 사용자: 1안 = 쓰러지면 필드 종료, 뒷이야기는 모델이. 2안 「필드 안에서 깨어남」은 보류) ──
   // 주인공이 체력 0으로 2.5초 쓰러져 있으면: 누구에게 당했는지 장부에 한 줄, 불량배·적대 세력이면 지갑에서 돈을 뜯김(경찰·경비는 안 뜯음), 그리고 필드를 닫는다
@@ -307,9 +314,9 @@ function hqAdapter(bridge: Partial<GameBridge> | undefined, ui: { chooseFloor: H
     const robbed = foe && !isLaw(foe.def.archetype) && (role === 'thug' || !!fac) && won > 0 ? Math.round((won * (0.2 + Math.random() * 0.3)) / 100) * 100 : 0;
     if (robbed > 0) void fieldLink.pay?.(-robbed, `${who}에게 뜯김`);
     fightScene = sceneId;
-    fightLog.userDown(!!pl.killed, foe?.def.id ?? null, robbed > 0 ? `${enName(foe?.def.archetype ?? who)} took ${robbed} won from {user}.` : '');
+    fightLog.userDown(!!pl.killed, foe?.def.id ?? null, robbed > 0 ? `${enName(foe?.def.archetype ?? who)} took ${robbed} won from {user}.` : '', robbed > 0 ? `${who}에게 ${robbed.toLocaleString('en-US')}원 뜯김` : '');
     // 장부에 다 쌓인 뒤 마감·닫기
-    setTimeout(() => void endVisit(true), 1200);
+    setTimeout(() => void endVisit(true, 'down'), 1200);
   };
   let flushT = 0;
   const clockView = () => { const c = new FieldClock(fieldClock.sec === null ? null : fieldClock.sec / 60); return c; };
@@ -338,8 +345,8 @@ function hqAdapter(bridge: Partial<GameBridge> | undefined, ui: { chooseFloor: H
   // 선물 사건: 오늘 처음이면 gift(인물 기록이 「작은친절」 호감 계기로), 아니면 그냥 행동
   fieldLink.gift = (who, item, counts) => {
     const c = item.charCodeAt(item.length - 1) - 0xac00;
-    const text = `${who}에게 ${item}${c >= 0 && c <= 11171 && c % 28 !== 0 ? '을' : '를'} 선물했다`;
-    void b?.field?.record({ kind: counts ? 'gift' : 'act', text, scene: fieldClock.place || undefined, who: [who], weight: 1, visit: visitId }).catch(() => {});
+    const ko = `${hm()}{user}: ${who}에게 ${item}${c >= 0 && c <= 11171 && c % 28 !== 0 ? '을' : '를'} 선물`;
+    void b?.field?.record({ kind: counts ? 'gift' : 'act', text: `${hm()}{user} gave ${item} to ${who} as a gift.`, ko, scene: fieldClock.place || undefined, who: [who], weight: 1, visit: visitId }).catch(() => {});
   };
   const life: HubLife = {
     tick: (dt, at) => {
@@ -426,7 +433,8 @@ function hqAdapter(bridge: Partial<GameBridge> | undefined, ui: { chooseFloor: H
       const fac = w.mobFaction(a);
       const why = isLaw(a.def.archetype) ? `responding to a${crimeAt.get(sceneId) === 'murder' ? ' murder' : 'n assault'} report` : fac ? `${fac}, hostile` : 'picked a fight';
       fightScene = sceneId;
-      fightLog.joined(hm().trim(), sceneId, a.def.id, a.def.archetype ?? a.def.name, why);
+      const whyKo = isLaw(a.def.archetype) ? `${crimeAt.get(sceneId) === 'murder' ? '살인' : '폭행'} 신고로 출동` : fac ? `${fac}, 적대` : '시비';
+      fightLog.joined(hm().trim(), sceneId, a.def.id, a.def.archetype ?? a.def.name, why, whyKo);
       fights.set(a.def.id, { body: b as typeof b & { hp: number; hpMax: number; alive: boolean; label: string }, t: 0, scene: sceneId });
     }
   }
@@ -459,7 +467,7 @@ function hqAdapter(bridge: Partial<GameBridge> | undefined, ui: { chooseFloor: H
         if (d) lastDistrict = d;
         const sec = (region ? rules().region : rules().scene) * 60;
         if (fieldClock.sec !== null) fieldClock.sec += sec;
-        void b?.field?.record({ kind: 'move', text: `${hm()}{user} moved to ${to.name}.`, scene: to.name, weight: 1, visit: visitId, fact: { key: '{user} location', value: to.name } }).catch(() => {});   // 이어진 이동은 막간에서 한 줄로
+        void b?.field?.record({ kind: 'move', text: `${hm()}{user} moved to ${to.name}.`, ko: `${hm()}{user}: ${to.name}(으)로 이동`, scene: to.name, weight: 1, visit: visitId, fact: { key: '{user} location', value: to.name } }).catch(() => {});   // 이어진 이동은 막간에서 한 줄로
       },
       overlay: ui.overlay,
       hour: () => (fieldClock.sec === null ? null : (fieldClock.sec / 3600) % 24),
@@ -474,7 +482,7 @@ function hqAdapter(bridge: Partial<GameBridge> | undefined, ui: { chooseFloor: H
           if (!o) return;
           if (fieldClock.sec !== null) fieldClock.sec += o.minutes * 60;
           const at = fieldClock.sec === null ? '' : clockText(fieldClock.sec);
-          if (at) void b?.field?.record({ kind: 'act', text: `{user} waited until ${hm().trim()}.`, scene: fieldClock.place || undefined, weight: 1, visit: visitId, fact: { key: 'field time', value: hm().trim() } }).catch(() => {});
+          if (at) void b?.field?.record({ kind: 'act', text: `{user} waited until ${hm().trim()}.`, ko: `{user}: ${hm().trim()}까지 시간 보냄`, scene: fieldClock.place || undefined, weight: 1, visit: visitId, fact: { key: 'field time', value: hm().trim() } }).catch(() => {});
         }).catch(() => {});
       },
       // 본부 대화창이 떠 있으면 머리 위 표시를 숨긴다 (독립 검수: 브리핑 뒤 ↓ 표시)
@@ -900,7 +908,7 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
     balance: () => fieldWallet.won,
     pay: (amount, memo) => fieldLink.pay?.(amount, memo) ?? Promise.resolve(null),
     heal: (ratio) => { const p = game?.world?.player; if (p) p.hp = Math.min(p.hpMax, p.hp + p.hpMax * ratio); },
-    record: (text) => fieldLink.record?.(text),
+    record: (text, ko) => fieldLink.record?.(text, ko),
     rng: Math.random,
     nearPerson: () => fieldLink.nearPerson?.() ?? null,
     fact: (key, value) => fieldLink.fact?.(key, value),

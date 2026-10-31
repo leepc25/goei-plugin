@@ -22,6 +22,9 @@ test('싸움 한 건 = 한 줄: 먼저 친 쪽·상대 A·B·수단·결과, 살
   log.killed('15:41', 's', 'p1', '행인', 'weapon');
   assert.equal(out[1].kind, 'kill');
   assert.equal(out[1].text, '15:41 {user} killed pedestrian A (with a weapon) while they were knocked out.');
+  // 보고서용 한글 (기록 메뉴)
+  assert.equal(out[0].ko, '15:40 {user} 먼저 공격: 행인 A, B (맨손). A 기절, B 도주');
+  assert.equal(out[1].ko, '15:41 {user}: 기절해 있던 행인 A 살해 (무기)');
   // 출동한 경찰이 덤빔 → 하나 기절시키고 다른 하나에게 짐
   log.joined('15:42', 's', 'c1', '경찰', 'responding to a murder report');
   log.joined('15:42', 's', 'c2', '경찰', 'responding to a murder report');

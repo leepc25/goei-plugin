@@ -53,7 +53,8 @@ export interface FieldShopHost {
   /** 주인공 체력 비율 회복 */
   heal(ratio: number): void;
   /** 장부 사건 (먹었다·샀다) */
-  record(text: string): void;
+  /** text = 모델용 영어, ko = 보고서 한글 */
+  record(text: string, ko?: string): void;
   /** 흥정 운 (가게 주인 성향이 들어갈 자리) */
   rng(): number;
   /** 확정 사실 (본편 요청에 들어감): 「필드 가방」 = 지금 든 것 */
@@ -177,7 +178,7 @@ export function createFieldShop(h: FieldShopHost): FieldShop {
     const it = FIELD_ITEMS[id];
     if (!it || !takeBag(st, id)) return;
     if (it.heal) h.heal(it.heal);
-    h.record(`{user} ${({ 먹었다: 'ate', 마셨다: 'drank', 피웠다: 'smoked' } as Record<string, string>)[it.verb ?? ''] ?? 'used'} ${it.name}.`);   // 모델에게 가는 장부 글은 영어 (10-31)
+    h.record(`{user} ${({ 먹었다: 'ate', 마셨다: 'drank', 피웠다: 'smoked' } as Record<string, string>)[it.verb ?? ''] ?? 'used'} ${it.name}.`, `{user}: ${it.name} ${({ 먹었다: '먹음', 마셨다: '마심', 피웠다: '피움' } as Record<string, string>)[it.verb ?? ''] ?? '씀'}`);   // 모델에게 가는 장부 글은 영어 (10-31)
     save();
     say(`${eul(it.name)} ${it.verb ?? '썼다'}.${it.heal ? ` 체력 +${Math.round(it.heal * 100)}%` : ''}`);
   }

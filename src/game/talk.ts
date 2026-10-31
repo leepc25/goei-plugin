@@ -142,12 +142,12 @@ export function mountTalk(root: HTMLElement, api: GameVisit, field?: GameField) 
       if (followers.includes(agent.name)) return;
       followers.push(agent.name);
       const { shown, rest } = fieldCompanions(followers);
-      void field.record({ kind: 'follow', text: `${agent.name} started following {user}.`, who: [agent.name], weight: 2, fact: { key: 'companions', value: [...shown, ...(rest.length ? [`(+ ${rest.join(', ')})`] : [])].join(', ') } }).catch(() => {});
+      void field.record({ kind: 'follow', text: `${agent.name} started following {user}.`, ko: `${agent.name} 동행 시작`, who: [agent.name], weight: 2, fact: { key: 'companions', value: [...shown, ...(rest.length ? [`(+ ${rest.join(', ')})`] : [])].join(', ') } }).catch(() => {});
     } else if (want === 'wait' || want === 'return') {
       const i = followers.indexOf(agent.name);
       if (i < 0) return;
       followers.splice(i, 1);
-      void field.record({ kind: 'unfollow', text: `${agent.name} ${want === 'wait' ? 'stayed behind to wait' : 'went back to their post'}.`, who: [agent.name], weight: 2, fact: { key: 'companions', value: followers.join(', ') || 'none' } }).catch(() => {});
+      void field.record({ kind: 'unfollow', text: `${agent.name} ${want === 'wait' ? 'stayed behind to wait' : 'went back to their post'}.`, ko: `${agent.name} ${want === 'wait' ? '남아서 기다림' : '자리로 돌아감'}`, who: [agent.name], weight: 2, fact: { key: 'companions', value: followers.join(', ') || 'none' } }).catch(() => {});
     }
   }
   const send = async () => {

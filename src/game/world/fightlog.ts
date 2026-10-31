@@ -14,9 +14,13 @@ export const enName = (name: string): string => EN[name] ?? name;
 export const QUIET = 8;
 
 export type Means = 'fists' | 'weapon';
-export interface FightLine { kind: 'provoke' | 'act' | 'kill' | 'down'; text: string; weight: 1 | 2 | 3; who?: string[] }
+/** text = 모델에게 가는 영어(활동 결과), ko = 기록 메뉴 보고서 한글 */
+export interface FightLine { kind: 'provoke' | 'act' | 'kill' | 'down'; text: string; ko: string; weight: 1 | 2 | 3; who?: string[] }
 interface Foe { id: string; name: string; tag: string; out?: 'knocked out' | 'fled' | 'killed' }
-interface Episode { at: string; scene: string; first: 'user' | 'them'; why?: string; foes: Foe[]; means: Set<Means>; user?: string; quiet: number }
+interface Episode { at: string; scene: string; first: 'user' | 'them'; why?: string; foes: Foe[]; means: Set<Means>; user?: string; userKo?: string; whyKo?: string; quiet: number }
+/** 영어 글자표 「pedestrian B」 → 한글 「행인 B」 */
+const koTag = (f: { name: string; tag: string }) => `${f.name} ${f.tag.slice(-1)}`;
+const koMeans = (m: Means) => (m === 'weapon' ? '무기' : '맨손');
 
 export class FightLog {
   private ep: Episode | null = null;
@@ -55,9 +59,10 @@ export class FightLog {
     this.foe(scene, id, name);
   }
   /** 상대가 덤벼 옴 (경찰 출동·시비 뒤 맞섬·적대 세력) */
-  joined(at: string, scene: string, id: string, name: string, why: string): void {
+  joined(at: string, scene: string, id: string, name: string, why: string, whyKo?: string): void {
     const ep = this.open(at, scene, 'them', why);
-    if (!ep.foes.length) { ep.first = 'them'; ep.why = why; }
+    if (!ep.foes.length) { ep.first = 'them'; ep.why = why; ep.whyKo = whyKo; }
+    else if (ep.why === why && whyKo) ep.whyKo = whyKo;
     this.foe(scene, id, name);
   }
   knockedOut(id: string): void { this.out(id, 'knocked out'); }
@@ -71,15 +76,17 @@ export class FightLog {
     const tag = this.tagOf(scene, id, name);
     const f = this.ep?.foes.find((q) => q.id === id);
     if (f) f.out = 'killed';
-    this.emit({ kind: 'kill', weight: 3, text: `${at} {user} killed ${tag} (${means === 'weapon' ? 'with a weapon' : 'bare-handed'}) while they were knocked out.` });
+    this.emit({ kind: 'kill', weight: 3, text: `${at} {user} killed ${tag} (${means === 'weapon' ? 'with a weapon' : 'bare-handed'}) while they were knocked out.`, ko: `${at} {user}: 기절해 있던 ${koTag({ name, tag })} 살해 (${koMeans(means)})` });
   }
   /** {user}가 쓰러짐: 그 싸움을 닫고 끝 줄까지 */
-  userDown(dead: boolean, byId: string | null, extra = ''): void {
-    const by = byId ? this.ep?.foes.find((q) => q.id === byId)?.tag : undefined;
-    if (this.ep) this.ep.user = `${by ?? 'someone'} ${dead ? 'killed {user}' : 'knocked {user} out'}`;
-    else if (dead || by) this.emit({ kind: 'down', weight: 3, text: `${by ?? 'Someone'} ${dead ? 'killed {user}' : 'knocked {user} out'}.` });
+  userDown(dead: boolean, byId: string | null, extra = '', extraKo = ''): void {
+    const f = byId ? this.ep?.foes.find((q) => q.id === byId) : undefined;
+    const by = f?.tag;
+    const byKo = f ? koTag(f) : '누군가';
+    if (this.ep) { this.ep.user = `${by ?? 'someone'} ${dead ? 'killed {user}' : 'knocked {user} out'}`; this.ep.userKo = `${byKo}에게 {user} ${dead ? '사망' : '기절'}`; }
+    else if (dead || by) this.emit({ kind: 'down', weight: 3, text: `${by ?? 'Someone'} ${dead ? 'killed {user}' : 'knocked {user} out'}.`, ko: `${byKo}에게 {user} ${dead ? '사망' : '기절'}` });
     this.close(true);
-    this.emit({ kind: 'down', weight: 3, text: `{user} ${dead ? 'died' : 'lost consciousness'}; the field visit ended here.${extra ? ` ${extra}` : ''}` });
+    this.emit({ kind: 'down', weight: 3, text: `{user} ${dead ? 'died' : 'lost consciousness'}; the field visit ended here.${extra ? ` ${extra}` : ''}`, ko: `{user} ${dead ? '사망' : '의식을 잃음'}, 필드 종료${extraKo ? `. ${extraKo}` : ''}` });
   }
   /** 매 틱: 조용하면 닫는다 */
   tick(dt: number, busy: boolean): void {
@@ -115,8 +122,23 @@ export class FightLog {
     }
     if (ep.user) outs.push(ep.user);
     const text = `${head}${outs.length ? ` ${outs.join('; ')}.` : ''}`;
+    // 보고서 한글: 「15:10 {user}가 먼저 공격: 행인 A, B (맨손). A 기절, B 도주」
+    const koList = (fs: Foe[]) => {
+      const by = new Map<string, string[]>();
+      for (const f of fs) by.set(f.name, [...(by.get(f.name) ?? []), f.tag.slice(-1)]);
+      return [...by].map(([n, ts]) => `${n} ${ts.join(', ')}`).join(' · ');
+    };
+    const koM = ep.means.size ? ` (${[...ep.means].map(koMeans).join(', ')})` : '';
+    const koHead = ep.first === 'user' ? `${ep.at} {user} 먼저 공격: ${koList(ep.foes)}${koM}` : `${ep.at} ${koList(ep.foes)}${ep.whyKo ? ` (${ep.whyKo})` : ''}이(가) {user} 공격${koM ? `, {user} 맞서 싸움${koM}` : ''}`;
+    const koOuts: string[] = [];
+    for (const [k, w] of [['knocked out', '기절'], ['fled', '도주']] as const) {
+      const fs = ep.foes.filter((f) => f.out === k);
+      if (fs.length) koOuts.push(`${fs.map((f) => f.tag.slice(-1)).join(', ')} ${w}`);
+    }
+    if (ep.userKo) koOuts.push(ep.userKo);
+    const ko = `${koHead}${koOuts.length ? `. ${koOuts.join(', ')}` : ''}`;
     // {user}가 먼저 친 싸움 = 도발(평판 계기), 당한 싸움 = 행동
-    this.emit({ kind: ep.first === 'user' ? 'provoke' : 'act', weight: down || ep.foes.length >= 3 ? 3 : 2, text });
+    this.emit({ kind: ep.first === 'user' ? 'provoke' : 'act', weight: down || ep.foes.length >= 3 ? 3 : 2, text, ko });
   }
 }
 

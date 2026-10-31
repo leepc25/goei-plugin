@@ -148,8 +148,10 @@ export interface GameVisit {
 /** 필드 장부에 남길 사건 (게임 코드가 만든다). 본편 응답을 요청할 때 정제돼 들어간다 (docs/필드_기능_설계.md 8장) */
 export interface GameFieldEvent {
   kind: string;
-  /** 사람이 읽는 한 줄 */
+  /** 모델에게 가는 한 줄 = 활동 결과 (영어 짧은 문장, 주인공 {user}) */
   text: string;
+  /** 사람이 읽는 한 줄 = 기록 메뉴 보고서 (한글). 빈 글 = 보고서에 안 넣음, 없으면 text */
+  ko?: string;
   scene?: string;
   who?: string[];
   weight?: 1 | 2 | 3;

@@ -104,3 +104,14 @@ test('지난 막간은 큰일(weight 2 이상)만', () => {
   assert.deepEqual(g[0].events.map((e) => e.text), ['big']);
   assert.deepEqual(g[1].events.map((e) => e.text), ['latest small']);
 });
+
+test('모델 글(활동 결과)은 영어 text 만: 한글 ko·방문 시작/끝 표식은 안 들어간다', () => {
+  let c = base();
+  c = withFieldEvent(c, { id: 's', at: 1, anchor: 'c1', kind: 'enter_field', text: '{user} entered the field.', ko: '필드 입장', visit: 'v1' });
+  c = withFieldEvent(c, { id: 'm', at: 2, anchor: 'c1', kind: 'move', text: '15:10 {user} moved to 종로.', ko: '15:10 {user}: 종로(으)로 이동', scene: '종로', visit: 'v1' });
+  c = withFieldEvent(c, { id: 'x', at: 3, anchor: 'c1', kind: 'exit_field', text: '{user} left the field.', ko: '필드에서 나옴', visit: 'v1' });
+  const out = withInterludes([{ role: 'user', content: '출근' }, { role: 'assistant', content: '사무실이다.' }, { role: 'user', content: '다음' }], c, null, '민준');
+  const block = out.find((m) => m.content.startsWith(INTERLUDE_HEAD)).content;
+  assert.match(block, /15:10 민준 moved to 종로\./);
+  assert.ok(!/이동|필드 입장|필드에서 나옴|entered the field|left the field/.test(block), block);
+});

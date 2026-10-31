@@ -8,7 +8,9 @@ export const MAX_EVENTS = 300;
 
 export type FieldKind =
   | 'move' | 'act' | 'hurt' | 'down' | 'kill' | 'flee' | 'provoke' | 'gift' | 'trade' | 'quest'
-  | 'follow' | 'unfollow' | 'enter_anomaly' | 'exit_anomaly' | 'enter_site' | 'detected' | 'appoint' | 'call';
+  | 'follow' | 'unfollow' | 'enter_anomaly' | 'exit_anomaly' | 'enter_site' | 'detected' | 'appoint' | 'call'
+  /** 필드 방문 시작·끝 (10-31 사용자: 방문 한 번 = 보고서 한 장, 출동은 그 안의 한 덩어리). 모델 글에는 안 넣는다 */
+  | 'enter_field' | 'exit_field';
 
 /** 지금 확정된 사실 하나. 같은 key는 가장 나중 것이 이긴다. permanent는 되돌릴 수 없는 일(사망 등) */
 export interface FieldFact { key: string; value: string; permanent?: boolean }
@@ -20,8 +22,10 @@ export interface FieldEvent {
   /** 그때 본편 마지막 메시지 chatId (다시 굴리기·삭제에 안전한 기준) */
   anchor: string;
   kind: FieldKind;
-  /** 사람이 읽는 한 줄 (게임이 만든다) */
+  /** 모델에게 가는 한 줄 = 활동 결과 (영어 짧은 문장, 주인공 {user}). 게임이 만든다 */
   text: string;
+  /** 사람이 읽는 한 줄 = 기록 메뉴 보고서 (한글, 주인공 {user}). 빈 글이면 보고서에 안 넣음(확정 사실만 담은 줄 등), 없으면 text */
+  ko?: string;
   /** 장면 이름 */
   scene?: string;
   who?: string[];
@@ -35,7 +39,7 @@ export interface FieldEvent {
 }
 export interface FieldRecord { events: FieldEvent[] }
 
-const KINDS = new Set<string>(['move', 'act', 'hurt', 'down', 'kill', 'flee', 'provoke', 'gift', 'trade', 'quest', 'follow', 'unfollow', 'enter_anomaly', 'exit_anomaly', 'enter_site', 'detected', 'appoint', 'call']);
+const KINDS = new Set<string>(['move', 'act', 'hurt', 'down', 'kill', 'flee', 'provoke', 'gift', 'trade', 'quest', 'follow', 'unfollow', 'enter_anomaly', 'exit_anomaly', 'enter_site', 'detected', 'appoint', 'call', 'enter_field', 'exit_field']);
 
 /** 요청에 그대로 들어가는 글이라 템플릿 기호와 줄바꿈을 막는다 */
 export const plain = (s: unknown, max = 300) =>
@@ -56,6 +60,7 @@ export function withFieldEvent(chat: Chat, ev: FieldEvent): Chat {
   const clean: FieldEvent = {
     ...ev,
     text: plain(ev.text),
+    ...(typeof ev.ko === 'string' ? { ko: plain(ev.ko) } : {}),
     scene: ev.scene ? plain(ev.scene, 60) : undefined,
     who: ev.who?.map((w) => plain(w, 40)).slice(0, 8),
     fact: ev.fact ? { key: plain(ev.fact.key, 40), value: plain(ev.fact.value, 120), ...(ev.fact.permanent ? { permanent: true } : {}) } : undefined,

@@ -126,3 +126,42 @@ test('같은 출동의 종료를 새 id 로 다시 받아도 (플러그인 다�
   assert.ok(third.added && third.report.id !== first.report.id && third.report.head.name === '명일 아파트');
   assert.deepEqual(third.report.trail.map((t) => t.text), ['작전 투입: 명일 아파트', '작전 종료 (철수): 명일 아파트, 처치 0, 부상 1'], '앞 출동의 사건·종료는 안 섞인다');
 });
+
+// 10-31 사용자: 출동과 필드는 하나. 필드 방문 한 번(enter_field~exit_field) = 보고서 한 장, 출동은 그 안의 한 덩어리. 보고서 글 = 한글(ko), 모델 글(text)과 따로
+test('필드 방문 한 번 → 보고서 한 장: 경과는 한글, 출동은 이름·결과, 방문 안 출동 종료는 따로 안 만듦', () => {
+  const v = { visit: 'v9' };
+  const list = [
+    ev('a1', 'enter_field', '{user} entered the field.', T0, { ...v, ko: '필드 입장' }),
+    ev('a2', 'move', '15:10 {user} moved to 종로.', T0 + 60_000, { ...v, scene: '종로', ko: '15:10 {user}: 종로(으)로 이동' }),
+    ev('a3', 'act', '필드 가방: 컵라면', T0 + 70_000, { ...v, ko: '' }),
+    ev('a4', 'trade', '15:11 Money: -1500 컵라면', T0 + 80_000, { ...v, ko: '15:11 컵라면 −1,500원' }),
+    ev('a5', 'enter_anomaly', '작전 투입: 젖은 복도', T0 + 2 * 60_000, v),
+    ev('a6', 'provoke', '15:20 {user} attacked first: thug A (fists).', T0 + 3 * 60_000, { ...v, ko: '15:20 {user} 먼저 공격: 불량배 A (맨손)' }),
+    ev('a7', 'exit_anomaly', '작전 종료 (귀환): 젖은 복도, 처치 1, 부상 0', T0 + 9 * 60_000, v),
+  ];
+  const mid = chatWith(list);
+  assert.equal(buildFieldReport({ chat: mid, exit: list[6], player: '민준', site: '관리국 본부', baseMinute: BASE, settings: S }), null);
+  const exit = ev('a8', 'exit_field', '15:40 {user} left the field.', T0 + 20 * 60_000, { ...v, ko: '15:40 필드에서 나옴' });
+  const r = buildFieldReport({ chat: chatWith([...list, exit]), exit, player: '민준', site: '관리국 본부', baseMinute: BASE, settings: S, now: '2025-01-01T02:44:00.000Z' });
+  assert.ok(r && r.added);
+  assert.equal(r.report.head.name, '젖은 복도');
+  assert.equal(r.report.head.duration, 20);
+  assert.equal(r.report.result, '작전 종료 (귀환): 젖은 복도, 처치 1, 부상 0');
+  const lines = r.report.trail.map((t) => t.text);
+  assert.equal(lines[0], '필드 입장');
+  assert.ok(lines.includes('(이동) 15:10 민준: 종로(으)로 이동'));
+  assert.ok(lines.includes('(도발) 15:20 민준 먼저 공격: 불량배 A (맨손)'));
+  assert.ok(!lines.some((t) => t.includes('필드 가방') || t.includes('컵라면')), '확정 사실 줄·돈 줄은 경과에 없음 (돈은 거래 칸)');
+  assert.equal(lines[lines.length - 1], '15:40 필드에서 나옴');
+});
+
+test('출동 없는 필드 방문: 이름 「필드 활동」, 결과 = 어떻게 나왔나', () => {
+  const v = { visit: 'v8' };
+  const enter = ev('b1', 'enter_field', '{user} entered the field.', T0, { ...v, ko: '필드 입장' });
+  const exit = ev('b2', 'exit_field', 'The field visit ended as the story went on.', T0 + 5 * 60_000, { ...v, ko: '응답을 보내 필드 종료', anchor: '#3' });
+  const r = buildFieldReport({ chat: chatWith([enter, exit]), exit, player: '민준', site: '관리국 본부', baseMinute: BASE, settings: S });
+  assert.ok(r && r.added);
+  assert.equal(r.report.head.name, '필드 활동');
+  assert.equal(r.report.result, '응답을 보내 필드 종료');
+  assert.equal(r.report.head.duration, 5, '끝 표식이 새 메시지에 붙어도 같은 방문이면 이어 본다');
+});
