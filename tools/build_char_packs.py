@@ -12,6 +12,7 @@ import build  # noqa: E402
 sys.path.insert(0, str(ROOT / "tools"))
 import damage_std  # noqa: E402
 import skill_tags  # noqa: E402
+import life_phases  # noqa: E402
 from PIL import Image  # noqa: E402
 
 PACKS = ROOT / "game-pack"
@@ -49,6 +50,7 @@ def write_char(cfg):
     damage_std.normalize(payload, lines)   # 기본 피해 표준값(docs/설계_기본피해_표준.md, 10-30)
     skill_tags.tag(payload)   # 판정 형태·속성·부가효과 꼬리표(10-30)
     (d / "char.json").write_text(json.dumps({"cfg": payload, "A": lines}, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
+    life_phases.run({pack_id(key)[5:]})   # 생활 줄 시작·반복·끝 구간(10-31)
     size = sum(f.stat().st_size for f in d.iterdir())
     return size, len(lines)
 

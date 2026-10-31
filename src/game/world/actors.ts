@@ -154,7 +154,6 @@ const PAUSES: { clip: string; doing: string; sec: [number, number] }[] = [
   { clip: 'call', doing: '통화 중', sec: [5, 10] },
   { clip: 'coffee', doing: '커피 마시는 중', sec: [4, 8] },
   { clip: 'limber', doing: '기지개', sec: [2.5, 4] },
-  { clip: 'music', doing: '음악 듣는 중', sec: [4, 8] },
   { clip: 'smoke', doing: '담배 피우는 중', sec: [5, 10] },
   { clip: 'browse', doing: '뒷짐 지고 구경', sec: [4, 8] },
   { clip: 'snack', doing: '간식 먹는 중', sec: [3, 6] },
@@ -1087,7 +1086,7 @@ export class WorldSim {
       return this.pauseAs(a, o.clip, o.doing, range(this.rng, o.sec[0], o.sec[1]), buddy);
     }
     const w: Record<string, number> = {
-      phone: 3, call: 1.2, coffee: morning ? 3 : 0.8, limber: morning ? 2 : 0.7, music: role === 'student' ? 2.5 : 1, smoke: (night ? 2.5 : 1) * (role === 'thug' ? 2 : 1),
+      phone: 3, call: 1.2, coffee: morning ? 3 : 0.8, limber: morning ? 2 : 0.7, smoke: (night ? 2.5 : 1) * (role === 'thug' ? 2 : 1),
       browse: 0.5 + 2.5 * t.curious, snack: 0.8, front: 0.8, back: outside ? 1.5 : 0.4, spot: t.curious, rest: 1, idle: 2,
     };
     // 일행이 있으면 서로 마주 보고 수다
