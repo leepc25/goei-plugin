@@ -343,6 +343,18 @@ test('대사 연출: 소매치기 사건이 나면 피해자가 말한다, 보�
   assert.equal(v.say, '내 지갑!');
 });
 
+test('인물끼리 대화·시비는 글 대사 대신 작은 말풍선 (10-31 사용자), 피해자 외침 같은 말은 그대로', () => {
+  const sim = new A.WorldSim(graph(), R.mulberry32(3));
+  const a = sim.add({ id: 'a', name: '불량배', kind: 'mob', brain: 'transit', home: 'jongno', archetype: '불량배' }, { x: 900, y: 560 });
+  const b = sim.add({ id: 'b', name: '행인', kind: 'mob', brain: 'transit', home: 'jongno', archetype: '행인' }, { x: 950, y: 560 });
+  const ch = new SP.Chatter(sim, new L.Lines(dlg, sim.rng), () => ({ hour: 12, faction: 'A00', level: 1 }));
+  ch.step(1 / 30, 'jongno', 800, [{ kind: 'harass', scene: 'jongno', who: '불량배', target: '행인', x: 900 }]);
+  assert.equal(a.icon, '#');
+  assert.equal(b.icon, '?');
+  assert.equal(a.say, undefined);
+  assert.equal(b.say, undefined);
+});
+
 test('시간 보내기 선택지: 짧게·길게·다음 시간대·근무 끝까지', () => {
   const r = C.clockRules({});
   const at10 = C.waitOptions(r, 10 * 60);

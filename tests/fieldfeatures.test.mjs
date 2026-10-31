@@ -217,3 +217,4 @@ test('퇴근·출근: 근무가 끝나면 거점 밖으로 나가 없어지고, 
   assert.ok(!a.commute && a.scene !== '', '출근');
   assert.ok(w.events.some((e) => e.kind === 'shift' && e.who === '에일린' && e.on));
 });
+

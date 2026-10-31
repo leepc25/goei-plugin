@@ -3,6 +3,8 @@
 import type { Actor, SimEvent, WorldSim } from './actors';
 import type { LineCtx, Lines } from './lines';
 
+/** 인물끼리 상호작용 상황 → 말풍선 기호 (수다 = 「…」 결정, 시비 = 화남 #·당한 쪽 ?) */
+const PAIR: Record<string, string> = { chat: '…', harass: '#', harassed: '?' };
 const TASK_TAG: Record<string, string> = { work: 'work', eat: 'eat', rest: 'rest', pee: 'restroom', poo: 'restroom', chat: 'chat', hobby: 'hobby' };
 
 export class Chatter {
@@ -14,6 +16,13 @@ export class Chatter {
     return this.sim.time - (this.last.get(a.def.id) ?? -999) > gap;
   }
   private talk(a: Actor, tag: string, partner?: string): boolean {
+    // 인물끼리 주고받는 것(대화·시비)은 대사를 정해 둘 수 없다 → 머리 위 작은 말풍선 (10-31 사용자). 그 밖의 말은 대사 자료대로
+    const pair = PAIR[tag];
+    if (pair) {
+      this.sim.emote(a, pair, 2.5);
+      this.last.set(a.def.id, this.sim.time);
+      return true;
+    }
     const t = this.lines.bark(a.def.kind, a.def.name, tag, this.ctx(a), { archetype: a.def.archetype, partner });
     if (!t) return false;
     this.sim.say(a, t, Math.min(4.5, 1.8 + t.length * 0.12));

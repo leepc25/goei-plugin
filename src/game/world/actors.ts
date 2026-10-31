@@ -583,6 +583,10 @@ export class WorldSim {
   }
 
   /** 행위자 말풍선 (대사 연결이 부른다) */
+  /** 머리 위 작은 말풍선 기호 (인물끼리 상호작용) */
+  emote(a: Actor, icon: string, sec = 2): void {
+    this.iconOn(a, icon, sec);
+  }
   say(a: Actor, text: string, sec = 3.2): void {
     a.say = text;
     a.sayT = sec;
