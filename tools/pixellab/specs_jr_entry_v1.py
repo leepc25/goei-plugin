@@ -7,7 +7,7 @@
 import json
 D = 'game-src/art/pixellab-test-20261028/specs/'
 items = [
- ("right 60 percent: a long freestanding arcade entrance on the sidewalk like a Seoul subway exit, running from the middle to past the right edge, open end facing left, stairs going down to the right into darkness, waist-high railings along both sides, a long glass canopy over it", "사용자: 오른쪽에 지하철 출입구 같은 지하상가 입구"),
+ ("right 30 percent: only the front end of a freestanding arcade entrance on the sidewalk like a Seoul subway exit, the rest continuing past the right edge, open end facing left, stairs going down to the right into darkness, waist-high railings on both sides, a glass canopy over it", "사용자: 오른쪽에 지하철 출입구 같은 지하상가 입구"),
  ("on top of the canopy, right above the entrance: a sign board reading \"중림지하상가\"", "사용자: 간판은 입구 위"),
  ("clear sidewalk before the entrance", "출입구 앞 비움"),
  ("back: old low-rise shop buildings along the whole width, ground floor and part of the second floor, tops cut off", "거리 뒤 건물"),
