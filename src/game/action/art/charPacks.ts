@@ -231,6 +231,21 @@ export function drawCharClip(c: CanvasRenderingContext2D, nameOrKey: string, x: 
   drawLine(c, a, id!, f, x, y, dir);
   return true;
 }
+// 바닥 맞추기 (10-31 사용자: 쓰러졌다 일어나는데 허공에서 일어난다): 전투 엔진(fighter/core.ts groundBase)과 같은 규칙을 필드 그림에도.
+// PixelLab은 누운·앉은·웅크린 장을 캔버스 위쪽에 그려서 줄 하나의 바닥선으로는 떠 보인다 → 그 장의 몸 아래 선을 바닥에
+const FLAT_IDS = new Set(['19', '20', '38', '38_1', '43', '45']);
+const LIE_IDS = new Set(['20', '38', '38_1', '39', '40', '41', '42', '42_1', '43', '45', 'SH_S4', 'SH_S5']);
+const FALL_IDS = new Set(['18_3', '44', '75', '76', '77', '169', 'SH_S3']);
+function groundOf(id: string, m: LineMeta, f: number): number {
+  const BASE = Math.min(m.h - 4, m.floor);
+  const bot = m.bot[f] ?? m.floor;
+  if (SEAT_IDS.has(id)) return Math.min(BASE, bot);
+  const low = (m.bot[f] - m.top[f]) < 0.55 * (m.bot[0] - m.top[0]);
+  if (FALL_IDS.has(id)) return low && m.mbot ? m.mbot[f] + 3 : Math.min(BASE, bot + 2);
+  const lieFrom = m.bot.indexOf(Math.min(...m.bot)) + 1;
+  if (LIE_IDS.has(id) || (id === '19' && f >= lieFrom)) return FLAT_IDS.has(id) && m.mbot ? m.mbot[f] + 3 : bot + 2;
+  return BASE;
+}
 /** 줄 하나의 한 장을 발 (x, y)에 그린다 (그림자 포함). 앉은 줄은 장마다 가장 낮은 점(발)을 땅에 (엔진 groundBase 와 같음) */
 function drawLine(c: CanvasRenderingContext2D, a: CharArt, id: string, f: number, x: number, y: number, dir: 1 | -1, shade = true) {
   const m = a.A[id], im = a.IMG[id];
@@ -238,7 +253,7 @@ function drawLine(c: CanvasRenderingContext2D, a: CharArt, id: string, f: number
   const k = spr(y) * CHAR_K;
   const flip = (a.cfg.dir === 'W' || a.cfg.dir === 'SW') ? dir > 0 : dir < 0;
   // 땅 기준선: 테스트룸 BASE (캔버스 아래 4px, 그 줄의 가장 낮은 점이 더 위면 그 점)
-  const base = SEAT_IDS.has(id) ? Math.min(m.h - 4, m.floor, m.bot[f] ?? m.floor) : Math.min(m.h - 4, m.floor);
+  const base = groundOf(id, m, f);
   c.save();
   c.imageSmoothingEnabled = false;
   const ft = m.foot[f] ?? [0, 40];

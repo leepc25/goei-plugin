@@ -36,46 +36,39 @@ T = m3.table(key); CID = T["cid"]
 OUT = Path(__file__).resolve().parent / key; OUT.mkdir(exist_ok=True)
 side = f"seen from the side facing {D}"
 pro = "he" if g == "man" else ("it" if g == "creature" else "she"); Pro = pro.capitalize()
-DRAW = f"Draw only the {g}, no locker, furniture, shower head, wall or water."
+DRAW = f"Only the {g} is drawn."
 REL = "hands stay in front of the body or at the head and face, elbows never go behind the back"
 # 가리는 자세: 남자는 아래만(10-31 사용자: 남자는 위를 가릴 필요가 없다), 여자는 가슴과 아래
-COVER = "one hand covering the groin" if g == "man" else "one forearm pressed across the chest and the other hand covering the groin"
-FREE = "the other hand waves sharply toward the door, telling the intruder to get out" if g == "man" else "the head jerks toward the door, telling the intruder to get out"
-# 성향(docs/샤워_반응_성향표.md, 위키 근거): 당당·수줍·화냄·무심 → 가리는 정도·소리치는 모습이 다르다 (10-31 사용자: 인물마다 달라야)
+# 10-31 문장 규칙(사용자: 프롬프트가 문제): 몸 움직임만 짧게. 맞는 말·감정 색 말(flushed·pale·panicked·trembling)·금지문 쓰지 않음. 손이 할 일은 가리기 하나(여자는 두 손 다 가리기 → 나머지는 고개·상체로).
+COVER = "one hand held over the groin" if g == "man" else "one forearm across the chest and the other hand held over the groin"
 import re as _re
 _tbl = (Path(__file__).resolve().parents[4] / "docs/샤워_반응_성향표.md").read_text(encoding="utf-8")
 _m = _re.search(r"^\| " + _re.escape(key) + r" \| [^|]+ \| ([^|]+?) \| ([^|]+?) \|", _tbl, _re.M)
-TYPE, MANNER = (_m.group(1).strip(), _m.group(2).strip()) if _m else ("수줍", "")
-LOOSE = "one hand loosely covering the groin" if g == "man" else "one arm loosely across the chest and the other hand covering the groin"
+TYPE = _m.group(1).strip() if _m else "수줍"
+FREE_HAND = g == "man"   # 남자는 한 손이 빔
+_C = COVER
+_POINT = ", the other arm stretched out pointing at the door" if FREE_HAND else ""
 SHOUT = {
- "당당": f"standing tall, {LOOSE}, not hiding much, glaring coldly at the intruder and saying firmly to get out, one finger pointing at the door",
- "수줍": f"{COVER}, hunching and turning the body away from the intruder, the face flushed, crying out in embarrassment and shrinking back",
- "화냄": f"{COVER}, leaning forward angrily and yelling at the intruder with the mouth wide open, jabbing toward the door again and again",
- "무심": f"{LOOSE}, giving the intruder one flat look, then calmly turning the back to them",
-}[TYPE] + (f", {MANNER}" if MANNER else "")
-# S1~S5도 성향마다 다르게 (10-31 사용자: 여섯 가지 전부 달라야)
-_C = {"당당": LOOSE, "무심": LOOSE}.get(TYPE, COVER)
-_M = f", {MANNER}" if MANNER else ""
-HIT = {"당당": f"{pro} grunts and staggers half a step back, {_C}, then straightens up glaring",
-       "수줍": f"{pro} cries out, curls up and turns the shoulders away, {_C}, staggering back",
-       "화냄": f"{pro} yelps and staggers back, {_C}, then snarls back furiously",
-       "무심": f"{pro} staggers half a step back with a flat face, {_C}, then stands still again"}[TYPE] + _M
-RUN = {"당당": f"running {side} in place with long, steady strides, {_C}, the head up",
-       "수줍": f"running {side} in place hunched forward with short panicked steps, {_C}, the face flushed",
-       "화냄": f"running {side} in place with stomping steps, {_C}, shouting over the shoulder",
-       "무심": f"jogging {side} in place at an even pace, {_C}, the face calm"}[TYPE] + _M
-FALL = {"당당": "lands on the back, then props up on one elbow glaring", "수줍": "lands on the back and curls up tight",
-        "화냄": "lands on the back and shouts in pain and anger", "무심": "lands on the back and lies still with a blank face"}[TYPE]
-RISE = {"당당": "gets up briskly", "수줍": "gets up slowly and timidly, hunching", "화냄": "scrambles up furiously", "무심": "gets up without hurry"}[TYPE]
-CROUCH = {"당당": "drops into a low crouch on one knee, glaring up at the attacker", "수줍": "drops into a low crouch hugging the knees to the chest, the head ducked, trembling",
-          "화냄": "drops into a low crouch, hugging the knees and yelling", "무심": "squats down low, arms around the knees, the face calm"}[TYPE]
+ "당당": f"{_C}, standing tall with the chin raised, the mouth open speaking firmly{_POINT}",
+ "수줍": f"{_C}, turning the shoulders away and ducking the head, the mouth open in a short cry",
+ "화냄": f"{_C}, leaning the upper body forward, the mouth wide open shouting{_POINT}",
+ "무심": f"{_C}, glancing once over the shoulder with a flat face, then turning the back",
+}[TYPE]
+HIT = {"당당": f"{_C}, the upper body rocks back and the feet take half a step back, then the body straightens up",
+       "수줍": f"{_C}, the shoulders hunch and turn away and the feet take half a step back",
+       "화냄": f"{_C}, the upper body rocks back half a step, then leans forward again with the mouth open",
+       "무심": f"{_C}, the body rocks back half a step and settles again"}[TYPE]
+RUN = {"당당": "long steady running strides", "수줍": "short quick running steps, the head ducked", "화냄": "heavy stomping running steps", "무심": "an even jogging pace"}[TYPE]
+FALL = {"당당": "then props up on one elbow", "수줍": "then curls up on the side", "화냄": "then lifts the head with the mouth open", "무심": "then lies still"}[TYPE]
+RISE = {"당당": "quickly", "수줍": "slowly, hunched", "화냄": "quickly", "무심": "without hurry"}[TYPE]
+CROUCH = {"당당": "kneels on one knee with the head raised", "수줍": "crouches low with the knees to the chest and the head ducked", "화냄": "crouches low with the head raised and the mouth open", "무심": "squats down low with the arms around the knees"}[TYPE]
 STEPS = {
- "S1": ("A", 8, "back", f"Standing bare {side}, struck hard from the front: {HIT}. No towel, no effect lines. {DRAW}"),
- "S2": ("A", 8, "loop", f"Barefoot and bare, {RUN}, the whole time. No towel, no effect lines. {DRAW}"),
- "S3": ("A", 8, None, f"Standing bare {side}, hit by a heavy blow: {pro} is thrown backward off the feet, {FALL}, {_C}. Last frame: lying on the floor, covering. No towel, no effect lines. {DRAW}"),
- "S4": ("S3", 8, "back", f"Lying bare on the floor {side}, {_C}: {pro} {RISE}, rolling to one side, onto the knees and then to the feet, still covering{_M}. No towel, no effect lines. {DRAW}"),
- "S6": ("A", 8, "loop", f"Standing bare {side}, reacting to someone who walked in by mistake: {SHOUT}. The feet stay planted. No towel, no effect lines. {DRAW}"),
- "S5": ("A", 8, None, f"Standing bare {side}, cornered: {pro} {CROUCH}{_M}. Last frame: crouched low, knees to the chest, covering. No towel, no effect lines. {DRAW}"),
+ "S1": ("A", 8, "back", f"Standing bare {side}: {HIT}. {DRAW}"),
+ "S2": ("A", 8, None, f"Running {side} in place, barefoot and bare, {COVER}, with {RUN}. Every frame is a running pose. {DRAW}"),
+ "S3": ("A", 8, None, f"Standing bare {side}: the body falls backward onto the floor and lands lying on the back, {FALL}, {COVER}. The body lies on the floor at the bottom of the picture. {DRAW}"),
+ "S4": ("S3", 8, "back", f"Lying bare on the floor at the bottom of the picture {side}, {COVER}: the body rolls to one side, kneels, and stands up {RISE}. {DRAW}"),
+ "S5": ("A", 8, None, f"Standing bare {side}: the body lowers to the floor and {CROUCH}, {COVER}. The feet stay on the floor at the bottom of the picture. {DRAW}"),
+ "S6": ("A", 8, None, f"Standing bare {side}: {SHOUT}. The feet stay planted. {DRAW}"),
 }
 def b64(im):
     b = io.BytesIO(); im.save(b, "PNG"); return {"type": "base64", "base64": base64.b64encode(b.getvalue()).decode(), "format": "png"}
