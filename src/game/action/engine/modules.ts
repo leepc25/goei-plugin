@@ -53,6 +53,7 @@ import { Lines, NPC_TYPE, type DialogueData, type LineCtx } from '../../world/li
 import { Chatter } from '../../world/speech';
 import dialogueData from '../../world/dialogue.json';
 import type { Actor, SimEvent } from '../../world/actors';
+import { ARCHETYPES } from '../../world/mobs';
 import type { FactionView, PersonView } from '../../bridge';
 import { FieldClock } from '../../world/clock';
 import type { WorldSim } from '../../world/actors';
@@ -231,6 +232,35 @@ function hqAdapter(bridge: Partial<GameBridge> | undefined, ui: { chooseFloor: H
       }
     }
   };
+  // ── 필드에서 짐 (10-31 사용자: 1안 = 쓰러지면 필드 종료, 뒷이야기는 모델이. 2안 「필드 안에서 깨어남」은 보류) ──
+  // 주인공이 체력 0으로 2.5초 쓰러져 있으면: 누구에게 당했는지 장부에 한 줄, 불량배·적대 세력이면 지갑에서 돈을 뜯김(경찰·경비는 안 뜯음), 그리고 필드를 닫는다
+  let koT = 0, koDone = false;
+  const knockedOut = (dt: number, sceneId: string) => {
+    const pl = (globalThis as { __goeiEngine?: { world?: { player?: unknown } | null } }).__goeiEngine?.world?.player;
+    if (!(pl instanceof FighterPlayer) || !b?.visit || koDone) return;
+    if (pl.hp > 0 || pl.phase !== 'down') { koT = 0; return; }
+    if ((koT += dt) < 2.5) return;
+    koDone = true;
+    const w = sim;
+    // 당한 상대 = 싸우던 몸 중 가장 가까운 것
+    let foe: Actor | undefined, best = Infinity;
+    for (const [id, f] of fights) {
+      const d = Math.abs(f.body.x - pl.x) + Math.abs(f.body.y - pl.y);
+      if (d < best) { best = d; foe = w?.actors.find((q) => q.def.id === id); }
+    }
+    const who = foe?.def.name ?? '누군가';
+    const role = ARCHETYPES[foe?.def.archetype ?? '']?.role;
+    const fac = foe && w ? w.mobFaction(foe) : null;
+    const sceneName = map.scenes.find((q) => q.id === sceneId)?.name ?? fieldClock.place ?? sceneId;
+    const won = fieldWallet.won ?? 0;
+    const robbed = foe && role !== 'police' && role !== 'guard' && (role === 'thug' || !!fac) && won > 0 ? Math.round((won * (0.2 + Math.random() * 0.3)) / 100) * 100 : 0;
+    if (robbed > 0) void fieldLink.pay?.(-robbed, `${who}에게 뜯김`);
+    const text = `${sceneName}에서 ${who}에게 당해 ${pl.killed ? '사망' : '기절'}${robbed > 0 ? ` · ${robbed.toLocaleString('en-US')}원을 뜯김` : ''}`;
+    flushMobs(sceneId);
+    void (b.field?.record({ kind: 'down', text, scene: sceneName, ...(foe ? { who: [who] } : {}), weight: 3, visit: visitId }) ?? Promise.resolve())
+      .catch(() => {})
+      .finally(() => setTimeout(() => b.close?.(), 600));
+  };
   let flushT = 0;
   const clockView = () => { const c = new FieldClock(fieldClock.sec === null ? null : fieldClock.sec / 60); return c; };
   // 필드 행위자를 에일린 공격 표적으로 (전투 몸이 아니므로 가짜 몸을 건넨다. 보이는 장면만)
@@ -275,6 +305,7 @@ function hqAdapter(bridge: Partial<GameBridge> | undefined, ui: { chooseFloor: H
       const evs = w.events.splice(0);
       record(evs);
       chatter?.step(dt, at.scene, at.x, evs);
+      knockedOut(dt, at.scene);
       if ((flushT += dt) > 20) { flushT = 0; flushMobs(at.scene); }
     },
     lifeTime: () => sim?.time ?? 0,
