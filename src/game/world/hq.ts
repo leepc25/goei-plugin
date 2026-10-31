@@ -2,14 +2,11 @@
 // 장소가 늘면 꼬리표·오가는 범위·보충 규칙을 여기(나중엔 게임 팩 JSON)에 더한다.
 import { WorldSim, type SimOptions, type SpawnRule } from './actors';
 import type { Post } from './mobs';
-import { PlaceGraph, type ElevatorStop, type PlaceKind, type PlaceScene } from './places';
+import { PlaceGraph, type ElevatorStop, type PlaceScene } from './places';
 import { mulberry32 } from './rng';
 import { areaSpawns, type AreaKind } from './districts';
 
-export const HQ_KINDS: Record<string, PlaceKind> = {
-  street: 'street', jongno: 'street', pasta: 'shop', metro: 'street', yeongdeungpo: 'street', gangnam: 'street', mangwon: 'street', yeouido: 'street', lobby: 'lobby', f2: 'corridor', f3: 'corridor', b1: 'corridor', b2: 'corridor', b3: 'garage',
-  office: 'office', swat: 'office', interview: 'room', edu: 'room', lounge: 'lounge', wc: 'restroom', wc3: 'restroom', training: 'training', clinic: 'clinic', tooth: 'cell',
-};
+/** 장소 종류는 방 이름 낱말로 정한다(world/places.ts kindFromName, 10-31): 층 배치·방이 바뀌어도 여기 고칠 것 없음 */
 
 /** 바깥 장면 꼬리표 (6-4장 인구) */
 export const HQ_AREAS: Record<string, AreaKind> = {
@@ -22,12 +19,11 @@ export const hqDistrict = (scene: string): string | null => (scene === 'metro' ?
 /** 장면 소속: 본부 안은 관리국(A00). 바깥 거리·가게·중림 지하상가(jr_*, 민간 상가)는 없음 */
 export const hqSceneFaction = (scene: string): string | null => (scene === 'pasta' || scene.startsWith('jr_') || HQ_AREAS[scene] ? null : 'A00');
 
-/** 이름 인물이 오가는 장면: 처음 선 장면(본편 상태로 정한 방) → 범위. 부상은 의무실에 묶인다 */
-export const HQ_ROAM: Record<string, string[]> = {
-  office: ['office', 'f3', 'lounge', 'wc3'],
-  lounge: ['lounge', 'f3', 'office', 'wc3'],
-  clinic: ['clinic'],
-};
+/** 이름 인물이 오가는 장면 (10-31 사용자: 정해진 곳이 아니라 건물 전체). 관리국 건물 안 장면 전부, 다친 사람(의무실에서 시작)만 의무실에 묶인다 */
+export function hqRoam(graph: PlaceGraph, home: string): string[] {
+  if (home === 'clinic') return ['clinic'];
+  return graph.ids().filter((id) => hqSceneFaction(id) === 'A00');
+}
 
 /** 몹 보충 (6-2장). 수치는 시연판에서 조정 */
 export function hqSpawns(graph: PlaceGraph): SpawnRule[] {
@@ -76,12 +72,12 @@ export function createHqWorld(
   has: (look: string, clip: string) => boolean = () => false,
   extra: Pick<SimOptions, 'stance' | 'killOk'> = {},
 ): WorldSim {
-  const graph = new PlaceGraph(map.scenes, map.elevator, HQ_KINDS);
+  const graph = new PlaceGraph(map.scenes, map.elevator);
   const sim = new WorldSim(graph, mulberry32(seed), { spawns: hqSpawns(graph), posts: hqPosts(graph), has, sceneFaction: hqSceneFaction, ...extra });
   for (const p of present) {
     if (!graph.scene(p.scene)) continue;
     // 부상(의무실)이면 침대 곁에만: 오가는 범위가 의무실 하나
-    sim.add({ id: `npc:${p.name}`, name: p.name, kind: 'named', brain: 'needs', home: p.scene, roam: HQ_ROAM[p.scene] ?? [p.scene], look: p.name });
+    sim.add({ id: `npc:${p.name}`, name: p.name, kind: 'named', brain: 'needs', home: p.scene, roam: hqRoam(graph, p.scene), look: p.name });
   }
   return sim;
 }

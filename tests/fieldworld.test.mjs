@@ -596,3 +596,41 @@ test('NPC 퍽: 신고 정신은 겁 많아도 시체를 보면 먼저 신고', (
   sim.step(1 / 30, { scene: 'office', x: 0, hour: 12 });
   assert.equal(r.doing, '신고 중');
 });
+
+test('방 이름 → 장소 종류 (10-31: 층 배치가 바뀌어도 고칠 곳 없게)', () => {
+  const k = (name, floor = '2F') => P.kindFromName({ name, floor });
+  assert.equal(k('화장실'), 'restroom');
+  assert.equal(k('휴게실'), 'lounge');
+  assert.equal(k('종합대응팀'), 'office');
+  assert.equal(k('의무실·연구실'), 'clinic');
+  assert.equal(k('격리실'), 'cell');
+  assert.equal(k('격리 구역'), 'corridor');
+  assert.equal(k('지하 주차장'), 'garage');
+  assert.equal(k('1층 로비', '1F'), 'lobby');
+  assert.equal(k('면담실'), 'room');
+  assert.equal(k('파스타집', 'out'), 'shop');
+  assert.equal(k('종로 큰길', 'out'), 'street');
+  // 종류를 따로 주지 않으면 이름으로
+  const g = new P.PlaceGraph([{ id: 'x', name: '3층 휴게실', floor: '3F', length: 1000, doors: [] }]);
+  assert.equal(g.kind('x'), 'lounge');
+});
+
+test('직원 쉬는 시간: 근무 중 배고프면 같은 소속 건물 안 휴게실로 가서 먹고 자리로 돌아온다', () => {
+  const sim = new A.WorldSim(graph(), R.mulberry32(7), {
+    posts: [{ id: 'desk', archetype: '안내 직원', scene: 'f3', how: 'fixed', spot: 600, shifts: [[0, 24]], count: 1, gate: 300 }],
+    has: (_l, c) => ['walk', 'idle', 'eat', 'work'].includes(c),
+    sceneFaction: (s) => (['f3', 'office', 'lounge', 'lobby'].includes(s) ? 'A00' : null),
+  });
+  sim.step(1 / 30, { scene: 'elsewhere', x: 0, hour: 12 });
+  const a = sim.actors.find((q) => q.post);
+  assert.ok(a && a.needs, '직원에게 욕구');
+  a.needs.hunger = 5;
+  let went = false, back = false;
+  for (let t = 0; t < 30 * 400; t++) {
+    sim.step(1 / 30, { scene: 'elsewhere', x: 0, hour: 12 });
+    if (a.scene === 'lounge' && a.act === 'do') went = true;
+    if (went && a.scene === 'f3' && a.act === 'post') { back = true; break; }
+  }
+  assert.ok(went, `휴게실에서 먹음 (${a.scene} ${a.doing})`);
+  assert.ok(back, `자리로 돌아옴 (${a.scene} ${a.doing})`);
+});

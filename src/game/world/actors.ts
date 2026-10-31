@@ -940,7 +940,7 @@ export class WorldSim {
     const t = a.task;
     if (!t) return this.idle(a);
     if (t.partner) {
-      const q = this.actors.find((o) => o !== a && o.def.kind === 'named' && o.scene === a.scene && Math.abs(o.x - a.x) < 220 && (o.act === 'idle' || o.act === 'walk' || o.act === 'notice'));
+      const q = this.actors.find((o) => o !== a && (o.def.kind === 'named' || !!o.post) && o.scene === a.scene && Math.abs(o.x - a.x) < 220 && (o.act === 'idle' || o.act === 'walk' || o.act === 'post' || o.act === 'notice'));
       if (!q) {
         a.task = undefined;
         return this.idle(a, 1, 2);
@@ -1395,9 +1395,11 @@ export class WorldSim {
     const workers = this.actors.filter((a) => a.post?.id === p.id && a.plan !== 'exit');
     if (on && workers.length < p.count) {
       const [top, bot] = this.graph.lane(p.scene);
-      const a = this.add({ id: `post${++serial}`, name: p.archetype, kind: 'mob', brain: 'post', home: p.scene, archetype: p.archetype, look: p.archetype }, { scene: p.scene, x: p.gate, y: (top + bot) / 2 });
+      const a = this.add({ id: `post${++serial}`, name: p.archetype, kind: 'mob', brain: 'post', home: p.scene, archetype: p.archetype, look: ARCHETYPES[p.archetype]?.looks?.length ? pick(this.rng, ARCHETYPES[p.archetype]!.looks!) : p.archetype }, { scene: p.scene, x: p.gate, y: (top + bot) / 2 });
       a.post = p;
       a.postI = 0;
+      // 직원도 욕구가 있다 (10-31 자율 행동 1단계): 근무 중에 배고프거나 급하면 쉬러 갔다가 자리로 돌아온다
+      a.needs = fullNeeds(this.rng);
       this.goPost(a);
       this.events.push({ kind: 'shift', scene: p.scene, who: p.archetype, on: true });
     } else if (!on) {
@@ -1439,11 +1441,34 @@ export class WorldSim {
   private postStand(a: Actor, dt: number): void {
     a.wait -= dt;
     if (a.wait > 0) return;
+    if (this.takeBreak(a)) return;
     if (a.post?.how === 'roam') return this.goPost(a);
     if (a.post?.how === 'patrol') return this.goPost(a);
     // 고정: 자리에서 조금씩 몸만 돌린다
     a.face = this.rng() < 0.5 ? 1 : -1;
     a.wait = range(this.rng, 4, 9);
+  }
+
+  /** 직원 쉬는 시간: 일 말고 가장 급한 욕구(배고픔·화장실·쉬기·수다)가 크면 같은 소속 건물 안에서 그 일을 할 곳으로. 끝나면 decide → 자리로 */
+  private takeBreak(a: Actor): boolean {
+    const p = a.post;
+    if (!p || !a.needs) return false;
+    const fac = this.sceneFaction(p.scene);
+    const roam = fac ? this.graph.ids().filter((id) => this.sceneFaction(id) === fac) : [p.scene];
+    const c = choose({
+      name: a.def.name, needs: a.needs, scene: a.scene, roam, graph: this.graph, has: (clip) => this.canClip(a, clip), duty: false,
+      partnerIn: (s) => this.actors.some((q) => q !== a && q.scene === s && (q.def.kind === 'named' || !!q.post) && ['idle', 'walk', 'post'].includes(q.act) && !q.route.length),
+      rand: this.rng, last: a.last,
+    });
+    if (!c || c.score < 30) return false;
+    a.task = c.act;
+    if (c.scene === a.scene) { this.walkTo(a, this.taskSpot(a, c.act), `${c.act.label} 하러`, 'do'); return true; }
+    const path = this.graph.route(a.scene, c.scene);
+    const d = path && this.graph.doorSpot(a.scene, path[0].exit);
+    if (!path || !d) { a.task = undefined; return false; }
+    a.route = path;
+    this.walkTo(a, d, `${c.act.label} 하러 ${this.graph.scene(c.scene)?.name ?? c.scene}(으)로`, 'do');
+    return true;
   }
 
   private travel(a: Actor, scene: string, plan: Plan): void {
