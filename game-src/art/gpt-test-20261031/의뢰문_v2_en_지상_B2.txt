@@ -1,4 +1,4 @@
-===== STREET ENTRANCE (jr_entry, 7 panels, day) — v5 =====
+===== STREET ENTRANCE (jr_entry, 7 panels, day) — v6 =====
 The 6 attached images are STYLE reference only (pixel look, dark outlines, shading, colors). Do not copy their objects, layouts or composition.
 
 Draw 7 panels, ① to ⑦. Side by side they form one continuous OUTDOOR street in Jungnim-dong, Seoul, in daylight: the sidewalk in front of old 3-story buildings about to be demolished. At the right end, a subway-style entrance on the sidewalk leads down to "Jungnim Underground Arcade". This is outside under the open sky — not an underground mall. Each panel is a separate image, drawn in order.
@@ -10,9 +10,9 @@ MUST
 4. SIZES in grid pixels (a person is 150 tall): shop door 170×80; ground floor height 260; utility pole full image height; vending machine 160; delivery motorbike 90; box stack 45; trash bag 35; potted plant 30; bottle or can 8–10.
 5. CAMERA: standing eye height, looking ~20° down. Building base line horizontal at y=254 (60%) in every panel. Sidewalk y=254–320, curb at y=320, asphalt road y=330–424. The top of the frame cuts through the 2nd-floor windows.
 6. OUTDOOR LIGHT: soft daylight from the sky. Awnings, poles, signs and props cast short daylight shadows on the sidewalk. Shop interiors are darker than the street. No ceiling, no fluorescent tubes.
-7. BUILDINGS: ordinary separate street buildings, not a mall. Each panel's building is its own 3-story building with a different width, facade material (painted concrete, old wall tiles, brick, metal panels), color and window style; the shop is simply its ground floor. Buildings meet with visible joints, a narrow gap or a small alley between some of them. 2nd floor: windows covered with newspaper or shutters, old sign frames, AC units, tangled power lines.
+7. BUILDINGS: an ordinary street, not a mall. Over the whole 7-panel street there are 4 old 3-story buildings (A, B, C, D below) standing wall to wall, each about 1.5–2 panels wide, each with a different facade material (painted concrete, old wall tiles, brick, metal panels), color, window style and ground-floor height. Buildings do NOT line up with the panels: building edges fall inside panels, and buildings continue across panel edges. Only ONE narrow alley gap in the whole street (between B and C). The ground floor of each building is split into 2 shops of different widths. 2nd floor: windows covered with newspaper or shutters, old sign frames, AC units, tangled power lines.
 8. DEPTH: awnings, projecting signs and AC units stick out over the sidewalk. Props stand on the sidewalk in front of the buildings: bottom edge clearly below y=254, top and side faces visible, shadow on the sidewalk.
-9. CONTINUOUS PANELS: draw ① first, then draw each next panel as the direct continuation of the previous one. The left 10% of each panel from ② on shows exactly what is in the right 10% of the previous panel (same building edge, same drainpipe, same sidewalk stains and litter), so neighboring panels overlap and join. Every line cut at a panel's right edge (power lines, sign band, building base, curb, road edge) continues at the same height in the next panel. The edge 10% contains only building wall, drainpipe, sidewalk, curb and road; no shop door, sign or large object.
+9. CONTINUOUS PANELS: draw ① first, then draw each next panel as the direct continuation of the previous one. The left 10% of each panel from ② on shows exactly what is in the right 10% of the previous panel (same facade, windows, awning, sidewalk stains and litter), so neighboring panels overlap and join. Facades, windows, awnings and power lines continue across panel edges at the same height. Never cut a sign's letters, a door or the arcade entrance with a panel edge.
 10. SIDEWALK AND ROAD: the sidewalk is old worn concrete with irregular cracks and asphalt patches — NO paving blocks, NO tile grid, NO joint lines, because grid lines break when panels are joined. The road is plain asphalt with no lane markings.
 11. DECAY AND MESS: half-lowered rusty shutters, marks where old signs were torn off, X-shaped tape on cracked windows, peeling paint, rust streaks, weeds in cracks. Litter scattered over the whole sidewalk and the gutter (crumpled paper, crushed cans, cigarette butts, plastic scraps, flattened cardboard, fallen leaves), puddles. Trash-bag piles at the building bases. Every piece a different shape, size, color and angle.
 12. SIGNS: exact Korean name in quotes, large. The letters are drawn with the same chunky pixel blocks as the rest of the image, with stair-stepped edges — NOT a computer font. Letters have depth (raised letters with shadow, chipped paint, faded paint on metal). Each sign a different form: ① long board above an awning, ② long board with a cross, ③ green long board, ④ board above a yellow awning, ⑤ light box, ⑥ raised letters on a rusty plate, ⑦ sign board on the entrance roof.
@@ -20,26 +20,25 @@ MUST
 14. ENDS: no walls. The street continues out of the frame at both ends.
 
 NEVER
-- Anything that looks underground or indoors: ceiling, fluorescent tubes, pillars, a continuous mall wall of identical shop units
+- Anything that looks underground or indoors: ceiling, fluorescent tubes, pillars, a mall wall of identical shop units
+- One building per panel; building edges or gaps placed at panel edges; gaps between every building
 - The arcade entrance built into or attached to a building wall; stairs seen head-on; a door
 - Repeated or duplicated elements: the same litter, stain, box, window, shutter, facade or sign twice
 - Clean, tidy or new-looking buildings
 - Objects flat against the wall; small items bigger than the sizes above
 - Fine detail smaller than one grid pixel; smooth gradients; more than 64 colors
-- A shop door, sign or large object in the edge 10%
+- Sign letters, a door or the arcade entrance cut by a panel edge
 - Paving blocks, tiles, grid or joint lines on the sidewalk; lane markings on the road; one vanishing point for the whole street; slanted building fronts
 - Large objects in the middle of the sidewalk or at the left end of the arcade entrance
 - Computer-font or smooth vector letters on signs; any text other than the given names and the bus numbers; text on flyers, posters or banners
 - People; cars; chairs, stools, benches
 
-PANELS (one building each)
-① Bus stop shelter on the sidewalk (no bench) with a route sign "271 606 701 702"; building with laundry "명진세탁", green awning, clothes hanging inside.
-② Building with pharmacy "충정약국": glass front with medicine shelves, a red cross on the sign; a street lamp at the curb.
-③ Building with real estate office "성진부동산": glass front with listing boards (pictures of buildings only, no text); a torn blank redevelopment banner across the 2nd floor; a payphone booth.
-④ Building with side-dish shop "미도반찬": yellow awning, side dishes in trays, stacked plastic crates and potted plants out front; a delivery motorbike parked at the curb.
-⑤ Building with stationery shop "은성문구": glass front with stacked paper and supplies; a vending machine on the sidewalk beside it.
-⑥ Building with electrical shop "만리전기": lamps, cables and parts inside; cable spools and a hand truck out front; a utility pole at the curb with tangled power lines.
-⑦ A closed shop with a lowered shutter in the building behind; in front of it on the sidewalk, the arcade entrance (see 13). Clear sidewalk at its left end where the stairs begin.
+STREET, LEFT TO RIGHT (buildings cross panel edges)
+- Building A (from ① to the middle of ②), painted concrete: laundry "명진세탁" (green awning, clothes hanging inside) and pharmacy "충정약국" (glass front, medicine shelves, red cross on the sign). Bus stop shelter (no bench) on the sidewalk in ① with a route sign "271 606 701 702"; a street lamp at the curb in ②.
+- Building B (middle of ② to ④), old wall tiles: real estate office "성진부동산" (listing boards with pictures of buildings only, no text; torn blank redevelopment banner across the 2nd floor; payphone booth on the sidewalk) and side-dish shop "미도반찬" (yellow awning, side dishes in trays, stacked plastic crates and potted plants out front; delivery motorbike at the curb).
+- Narrow dark alley between B and C, in ④, with trash bags.
+- Building C (④ to ⑥), brick: stationery shop "은성문구" (stacked paper and supplies; vending machine on the sidewalk) and electrical shop "만리전기" (lamps, cables, parts; cable spools and a hand truck out front). Utility pole with tangled power lines at the curb in ⑥.
+- Building D (⑥ to ⑦), metal panels: two closed shops with lowered rusty shutters. In front of D in ⑦, the arcade entrance (see 13) on the sidewalk, with clear sidewalk at its left end where the stairs begin.
 
 Output: 7 landscape images (3:2), ① first.
 
