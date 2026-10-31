@@ -185,7 +185,7 @@ export interface SpawnRule {
   mix: string[];
   /** 밤(19:30~05시) 원형 목록. 없으면 mix */
   nightMix?: string[];
-  /** 시간대별 유동인구 (있으면 target·mix 대신): from~to 시(자정 넘김 가능)에 n명, mix 에서 뽑는다 */
+  /** 시간대별 유동인구 (있으면 target·mix 대신): from~to 시(자정 넘김 가능)에 장면 1,000px당 n명, mix 에서 뽑는다 */
   bands?: { from: number; to: number; n: number; mix: string[] }[];
 }
 
@@ -1929,7 +1929,8 @@ export class WorldSim {
     }
     const left = (this.spawnT.get(r.scene) ?? 0) - dt;
     if (left > 0) return void this.spawnT.set(r.scene, left);
-    this.spawnT.set(r.scene, range(this.rng, r.refill[0], r.refill[1]) * (1 + lvl));
+    // 붐비는 시간일수록 자주 들어온다 (사람이 지나가 나가는 만큼 채운다)
+    this.spawnT.set(r.scene, (range(this.rng, r.refill[0], r.refill[1]) * (1 + lvl)) / Math.max(1, want / 6));
     this.spawnOne(r, this.player!.x, false, want - have);
   }
 
@@ -1937,7 +1938,9 @@ export class WorldSim {
   private bandOf(r: SpawnRule): { n: number; mix: string[] } | null {
     if (!r.bands?.length) return null;
     const h = this.hour ?? 12;
-    return r.bands.find((b) => (b.from <= b.to ? h >= b.from && h < b.to : h >= b.from || h < b.to)) ?? r.bands[0];
+    const b = r.bands.find((q) => (q.from <= q.to ? h >= q.from && h < q.to : h >= q.from || h < q.to)) ?? r.bands[0];
+    // n 은 1,000px당 인원 → 장면 길이만큼
+    return { n: Math.round((b.n * (this.graph.scene(r.scene)?.length ?? 1000)) / 1000), mix: b.mix };
   }
   private mixOf(r: SpawnRule): string[] {
     return this.bandOf(r)?.mix ?? (this.isNight() && r.nightMix?.length ? r.nightMix : r.mix);

@@ -333,12 +333,12 @@ test('거리 인구: 모든 거리에 같은 규칙 하나(시민 = 행인 + 기
   assert.equal(H.hqSceneFaction('office'), 'A00');
 });
 
-test('거리 유동인구: 시간대마다 인원·구성이 다르다 (출퇴근 붐빔, 새벽 거의 없음, 등하교 학생, 밤 불량배)', () => {
+test('거리 유동인구: 시간대마다 인원·구성이 다르다 (출퇴근 붐빔, 새벽 한산, 등하교 학생, 밤 불량배)', () => {
   const g = new P.PlaceGraph([{ id: 's', name: '거리', length: 3000, legacy: true, doors: [] }], [], { s: 'street' });
   const count = (hour) => { const sim = new A.WorldSim(g, R.mulberry32(3), { spawns: D.streetSpawns(['s']) }); sim.step(0.1, { scene: 'x', x: 0, y: 0, hour }); return sim.inScene('s').filter((a) => a.def.kind === 'mob'); };
-  assert.ok(count(8).length > count(3).length * 4, '출근 > 새벽');
+  assert.ok(count(8).length >= count(3).length * 3, '출근 > 새벽');
   assert.ok(count(19).length >= count(12).length, '퇴근 ≥ 점심');
-  assert.ok(count(3).length <= 1);
+  assert.ok(count(3).length >= 3, '새벽에도 비지 않음');
   for (const b of D.STREET_BANDS) for (const n of b.mix) assert.ok(M.ARCHETYPES[n], n);
   assert.ok(D.STREET_BANDS.find((b) => b.from === 7).mix.includes('학생'), '등교 학생');
   assert.ok(!D.STREET_BANDS.find((b) => b.from === 9).mix.includes('학생'), '수업 중엔 학생 없음');
@@ -352,7 +352,7 @@ test('밤: 거리 밤에는 nightMix에서만 나온다', () => {
   const sim = new A.WorldSim(g, R.mulberry32(5), { spawns: D.streetSpawns(['gn']) });
   sim.step(0.1, { scene: 'elsewhere', x: 0, y: 0, hour: 23 });
   const mobs = sim.inScene('gn').filter((a) => a.def.kind === 'mob');
-  assert.equal(mobs.length, D.STREET_POP.target.night);
+  assert.equal(mobs.length, Math.round((D.STREET_BANDS.find((b) => b.from === 22).n * 3000) / 1000), '밤 구간 × 장면 길이');
   for (const m of mobs) assert.ok(D.STREET_POP.nightMix.includes(m.def.archetype), m.def.archetype);
 });
 
