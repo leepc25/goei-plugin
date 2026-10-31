@@ -115,3 +115,42 @@ test('경보: 적대 방문자는 들어오자마자 경보, 위협은 방문자
   assert.ok(w.alarmIn('lobby'));
   assert.deepEqual(w.alarmOf('A00').threats, [v.def.id]);
 });
+
+const guardAt = (w, scene, x) => { const g = w.add({ id: `g${x}`, name: '경비', kind: 'mob', brain: 'transit', home: scene, archetype: '경비', look: '경비' }, { scene, x, y: 560 }); g.exitAt = undefined; g.act = 'idle'; g.wait = 999; return g; };
+
+test('쫓아냄: 경계 거점에서 버티면(제자리) 경보, 출구로 가면 시간이 멈추고 나가면 쫓겨남', () => {
+  const w = sim({ stance: (f) => (f === 'A00' ? 'wary' : null) });
+  const g = guardAt(w, 'lobby', 1200);
+  run(w, 14.5, { scene: 'lobby', x: 1000, y: 560 });
+  assert.equal(g.escort, 'player');
+  assert.ok(w.guardingPlayer(g.def.id));
+  run(w, 10, { scene: 'lobby', x: 1000, y: 560 });
+  assert.ok(!w.alarmIn('lobby'), '아직');
+  run(w, 12, { scene: 'lobby', x: 1000, y: 560 });
+  assert.ok(w.alarmIn('lobby'), '버팀 → 경보');
+  assert.ok(w.events.some((e) => e.kind === 'alarm' && e.why === 'trespass'));
+
+  const w2 = sim({ stance: (f) => (f === 'A00' ? 'wary' : null) });
+  guardAt(w2, 'lobby', 1200);
+  run(w2, 15, { scene: 'lobby', x: 1600, y: 560 });
+  // 출구(x=300 문) 쪽으로 천천히 걸음: 시간이 안 흐름
+  run(w2, 40, (t) => ({ scene: 'lobby', x: 1600 - t * 30, y: 560 }));
+  assert.ok(!w2.alarmIn('lobby'), '나가는 중엔 안 울림');
+  run(w2, 1, { scene: 'street', x: 640, y: 560 });
+  assert.ok(w2.events.some((e) => e.kind === 'expel' && e.who === '{user}'));
+});
+
+test('쫓아냄: 경비가 [[허가]]면 머물고, [[경보]]면 바로 경보', () => {
+  const w = sim({ stance: (f) => (f === 'A00' ? 'wary' : null) });
+  const g = guardAt(w, 'lobby', 1200);
+  run(w, 15, { scene: 'lobby', x: 1000, y: 560 });
+  w.permitPlayer();
+  run(w, 40, { scene: 'lobby', x: 1000, y: 560 });
+  assert.ok(!w.alarmIn('lobby'));
+  const w2 = sim({ stance: (f) => (f === 'A00' ? 'wary' : null) });
+  const g2 = guardAt(w2, 'lobby', 1200);
+  run(w2, 7, { scene: 'lobby', x: 1000, y: 560 });
+  w2.threatAlarm(g2.def.id);
+  assert.ok(w2.alarmIn('lobby'));
+  void g;
+});

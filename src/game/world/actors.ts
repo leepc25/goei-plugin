@@ -639,7 +639,7 @@ export class WorldSim {
     for (const r of this.spawns) this.stepSpawn(r, dt);
     for (const p of this.posts) this.stepPost(p);
     this.stepPatrol(dt);
-    if ((this.visitT -= dt) <= 0) { this.visitT = 0.5; this.stepVisitors(0.5); }
+    if ((this.visitT -= dt) <= 0) { this.visitT = 0.5; this.stepVisitors(0.5); this.stepPlayerVisit(0.5); }
     this.stepAlarms(dt);
   }
 
@@ -671,7 +671,7 @@ export class WorldSim {
   private stepVisitors(dt: number): void {
     // 따라붙던 방문자가 나갔거나 쫓겨 나가는 중이면 경비는 자리로
     for (const e of this.actors) {
-      if (!e.escort) continue;
+      if (!e.escort || e.escort === 'player') continue;   // 주인공 경계는 stepPlayerVisit
       const v = this.actors.find((q) => q.def.id === e.escort);
       if (v && v.scene === e.scene && v.act !== 'gone' && !(v.plan === 'exit' && (v.stay ?? 0) < 0)) continue;
       e.escort = undefined;
@@ -984,6 +984,108 @@ export class WorldSim {
     if (!fac) return;
     if (victim && this.alarms.get(fac)?.threats.includes(victim.def.id)) return;
     this.raiseAlarm(scene, x, 'player', why);
+  }
+  // ── 주인공 쫓아냄 (10-31 사용자 결정 2번): 경계 거점에 들어온 주인공에게 경비가 따라붙어 경고 → 「나가 주시죠」 → 버티면 경보 ──
+  // 버팀 판정 = 위치·시간: 출구 쪽으로 가는 중이면 시간이 멈추고, 서 있거나 안쪽으로 가면 흐른다. 말: 경비가 [[허가]]면 머물게 두고, [[경보]]면 바로 경보
+  /** 「나가 주시죠」 뒤 버틸 수 있는 초 */
+  static EXPEL_SEC = 20;
+  playerVisit: { fac: string; stay: number; out: number; left: number; guard?: string; permit: boolean; last: number } | null = null;
+  /** 경비가 주인공을 경고 중인가 (그 경비에게 말을 걸면 [[허가]]·[[경보]]를 쓸 수 있다) */
+  guardingPlayer(id: string): boolean {
+    const v = this.playerVisit;
+    return !!v && !v.permit && v.guard === id;
+  }
+  /** 경비가 허락함: 이번 방문은 머물게 둔다 */
+  permitPlayer(): void {
+    if (!this.playerVisit) return;
+    this.playerVisit.permit = true;
+    const g = this.actors.find((q) => q.def.id === this.playerVisit!.guard);
+    if (g) { g.escort = undefined; this.resume(g); }
+  }
+  /** 경비가 위협받음: 시간이 남아 있어도 바로 경보 */
+  threatAlarm(id?: string): void {
+    const p = this.player;
+    if (!p || !this.sceneFaction(p.scene)) return;
+    const g = id ? this.actors.find((q) => q.def.id === id) : undefined;
+    if (g) { g.escort = undefined; }
+    this.raiseAlarm(p.scene, p.x, 'player', 'threat');
+  }
+  /** 장면 → 거점 밖까지 남은 길 (문 수 × 1만 + 다음 문까지 가로 거리). 거점 밖이면 0 */
+  private exitCost(scene: string, x: number, fac: string): number {
+    if (this.sceneFaction(scene) !== fac) return 0;
+    let best = Infinity;
+    for (const id of this.graph.ids()) {
+      if (this.sceneFaction(id) === fac) continue;
+      const path = this.graph.route(scene, id);
+      if (!path?.length) continue;
+      const d = this.graph.doorSpot(scene, path[0].exit);
+      const c = path.length * 10000 + (d ? Math.abs(d.x - x) : 0);
+      if (c < best) best = c;
+    }
+    return best;
+  }
+  private stepPlayerVisit(dt: number): void {
+    const p = this.player;
+    const fac = p ? this.sceneFaction(p.scene) : null;
+    const v = this.playerVisit;
+    // 거점 밖으로 나감: 경고를 받았으면 「쫓겨남」
+    if (!p || !fac || (v && v.fac !== fac)) {
+      if (v) {
+        const g = this.actors.find((q) => q.def.id === v.guard);
+        if (g?.escort === 'player') { g.escort = undefined; if (!g.fighting && !g.brawl) this.resume(g); }
+        if (v.out > 0 && !v.permit) this.events.push({ kind: 'expel', scene: g?.scene ?? '', who: '{user}', by: g?.def.name ?? '경비' });
+      }
+      this.playerVisit = null;
+      if (!p || !fac) return;
+    }
+    const st = this.stance(fac);
+    // 적대 세력 거점에 들어옴 = 침입자 (적대 방문자와 같다)
+    if (st === 'hostile') { this.raiseAlarm(p.scene, p.x, 'player', 'intruder'); return; }
+    if (st !== 'wary') return;
+    const pv = (this.playerVisit ??= { fac, stay: 0, out: 0, left: WorldSim.EXPEL_SEC, permit: false, last: this.exitCost(p.scene, p.x, fac) });
+    if (pv.permit || this.alarms.has(fac)) return;
+    // 따라붙는 경비 (없으면 거점 안 아무 경비, 같은 장면 먼저)
+    let g = this.actors.find((q) => q.def.id === pv.guard && q.escort === 'player' && !q.fighting && !['down', 'dead', 'gone'].includes(q.act));
+    if (!g) {
+      g = this.actors.filter((q) => !q.escort && !q.fighting && !q.brawl && !['down', 'dead', 'gone', 'door'].includes(q.act) && this.sceneFaction(q.scene) === fac && ARCHETYPES[q.def.archetype ?? '']?.role === 'guard')
+        .sort((a, b) => (a.scene === p.scene ? 0 : 1) - (b.scene === p.scene ? 0 : 1) || Math.abs(a.x - p.x) - Math.abs(b.x - p.x))[0];
+      if (!g) return;
+      g.escort = 'player';
+      pv.guard = g.def.id;
+      this.iconOn(g, '!', 1.5);
+    }
+    if (g.scene !== p.scene) {
+      if (!g.route.length) {
+        const path = this.graph.route(g.scene, p.scene);
+        const d = path && this.graph.doorSpot(g.scene, path[0].exit);
+        if (path && d) { g.route = path; this.walkTo(g, d, '주인공을 따라감', 'none'); }
+      }
+    } else if (g.doing === '주인공과 대화') {
+      // 말을 듣는 중: 그 자리
+    } else if (Math.abs(g.x - p.x) > 140) {
+      this.walkTo(g, { x: p.x + (g.x < p.x ? -90 : 90), y: p.y || g.y }, '주인공을 따라감', 'none');
+    } else if (g.act !== 'watch') {
+      g.act = 'watch';
+      g.doing = '주인공 경계';
+      g.goal = null;
+      g.wait = 1;
+      g.face = p.x > g.x ? 1 : -1;
+      this.setClip(g, 'idle');
+    }
+    pv.stay += dt;
+    if (pv.stay >= 6 && pv.stay - dt < 6) this.say(g, '여긴 관계자 외 출입 금지입니다.', 2.5);
+    if (pv.stay < 14) return;
+    if (pv.out === 0) { this.say(g, '나가 주시죠.', 2.5); this.iconOn(g, '#', 2); }
+    pv.out += dt;
+    // 버팀 판정: 출구까지 남은 길이 줄었으면(나가는 중) 시간이 멈춘다
+    const cost = this.exitCost(p.scene, p.x, fac);
+    // 경비와 말하는 동안도 멈춘다 (말로 넘기는 길)
+    if (cost >= pv.last - 4 && g.doing !== '주인공과 대화') pv.left -= dt;
+    pv.last = cost;
+    if (pv.left > 0) return;
+    this.say(g, '경보 울려!', 2);
+    g.escort = undefined;
+    this.raiseAlarm(p.scene, p.x, 'player', 'trespass');
   }
   // ── 동행 (10-31 사용자 결정 docs/필드기능_결정_1031.md 1번): 모델 답의 [[동행]]·[[기다림]]·[[복귀]] 표시로만 켜고 끈다 ──
   /** 따라오는 사람 id (앞에서부터 주인공 뒤 순서, 최대 MAX_FOLLOW) */

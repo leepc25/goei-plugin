@@ -257,6 +257,11 @@ function hqAdapter(bridge: Partial<GameBridge> | undefined, ui: { chooseFloor: H
         continue;
       }
       // 방문 대응 (세력끼리): 보이는 장면에서 일어난 것만 장부에 (주인공이 본 일)
+      // 주인공이 경고를 받고 거점에서 나감 (10-31 필드 기능 2번)
+      if (e.kind === 'expel' && e.who === '{user}') {
+        void b?.field?.record({ kind: 'act', text: `${hm()}A ${enName(e.by)} told {user} to leave, and {user} left.`, ko: `${hm()}{user}: ${e.by}의 경고를 받고 쫓겨남`, scene: fieldClock.place || undefined, weight: 2, visit: visitId }).catch(() => {});
+        continue;
+      }
       if ((e.kind === 'brawl' || e.kind === 'brawlEnd' || e.kind === 'expel') && e.scene === lifeScene) {
         const fn = (c: string) => factionBy.get(c)?.name ?? FACTION_NAMES[c] ?? c;
         const line = e.kind === 'brawl'
@@ -405,7 +410,9 @@ function hqAdapter(bridge: Partial<GameBridge> | undefined, ui: { chooseFloor: H
       fac ? `소속: ${facName}${stance ? ` (이 소속은 주인공에게 「${stance}」)` : ''}.` : '어느 조직에도 속하지 않은 일반인. 괴이와 비밀 조직의 일은 모른다.',
       `지금: ${sceneNameOf(a.scene)}에서 ${a.doing === '주인공과 대화' ? a.talkFrom ?? '지나가던 중' : a.doing}${a.doing === '주인공과 대화' ? ' 주인공이 말을 걸어 멈춰 섰다' : ''}.`,
     ].filter(Boolean).join('\n');
-    return { id: `mob:${visitId}:${a.def.id}`, name: label, lore, place: sceneNameOf(a.scene), doing: a.doing === '주인공과 대화' ? a.talkFrom ?? a.doing : a.doing };
+    // 주인공을 경고 중인 경비: 허락하거나([[허가]]) 위협받아 경보를 울릴 수 있다([[경보]])
+    const guarding = w.guardingPlayer(a.def.id);
+    return { id: `mob:${visitId}:${a.def.id}`, name: label, lore: guarding ? `${lore}\n지금 이 사람은 경비로서 주인공에게 관계자 외 출입 금지 구역에서 나가라고 경고하는 중이다.` : lore, place: sceneNameOf(a.scene), doing: a.doing === '주인공과 대화' ? a.talkFrom ?? a.doing : a.doing, ...(guarding ? { tags: ['permit', 'alarm'] as ('permit' | 'alarm')[] } : {}) };
   };
   // 필드 대화 ↔ 세계 (10-31 필드 기능 1·4번): 말을 걸 때 하던 일과 쓸 수 있는 표시, 답의 표시 → 동행
   fieldLink.talkOpts = (name) => {
@@ -417,7 +424,11 @@ function hqAdapter(bridge: Partial<GameBridge> | undefined, ui: { chooseFloor: H
     const w = sim;
     if (!w) return;
     const id = key.startsWith('mob:') ? key.slice(4) : name;
-    for (const t of tags) if (t === 'follow' || t === 'wait' || t === 'return') w.setFollow(id, t);
+    for (const t of tags) {
+      if (t === 'follow' || t === 'wait' || t === 'return') w.setFollow(id, t);
+      else if (t === 'permit') w.permitPlayer();
+      else if (t === 'alarm') w.threatAlarm(id);
+    }
   };
   // 선물 상대: 지금 장면에서 주인공과 가까운 이름 인물
   let lastAt = { x: 0, y: 0 };
