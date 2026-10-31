@@ -51,6 +51,15 @@ def one(k, lines, env=None, redo=False):
             time.sleep(30)
 
 
+def retries():   # 로그에서 줄마다 다시 뽑아 완료한 횟수(SHOWER_V 1·2)
+    c = {}
+    if LOG.exists():
+        for line in LOG.read_text().splitlines():
+            p = line.split(" ")
+            if len(p) > 4 and p[3] in ("1", "2") and "완료" in line: c[(p[1], p[2])] = c.get((p[1], p[2]), 0) + 1
+    return c
+
+
 def main():
     keys = sorted(p.parent.name for p in HERE.glob("*/샤워2_A"))
     keys = sorted(set(keys) | set(BOYS))
@@ -63,17 +72,31 @@ def main():
     with ThreadPoolExecutor(20) as ex: list(ex.map(lambda k: one(k, LINES), keys))
     miss = [(k, n) for k in keys for n in LINES if not has(k, n)]
     log("1차 끝, 빠진 줄", len(miss), miss[:40])
-    # 3) 전수검사 → 재뽑기 2번
-    for v in ("1", "2"):
+    # 3) 전수검사 → 재뽑기(줄마다 최대 2번, 몇 번 다시 뽑았는지는 로그에서 셈 — 실행기를 다시 띄워도 이어짐)
+    for rnd in range(3):
         sh(["python3", "_test/shower_check.py"] + keys)
         bad = json.load(open(HERE / "_shower_check.json"))
-        todo = {k: [n for n in LINES if n in d and d[n] != ["없음"]] for k, d in bad.items()}
-        todo = {k: v_ for k, v_ in todo.items() if v_}
+        done = retries()
+        todo = {}
+        for k, d in bad.items():
+            for n in LINES:
+                if n in d and d[n] != ["없음"] and done.get((k, n), 0) < 2: todo.setdefault(k, []).append(n)
+        # G를 다시 뽑으면 G에서 시작하는 H1·H2·H6도 같이(10-31 사용자: 이질감이 심하면 다시)
+        for k, ls in todo.items():
+            if "G" in ls:
+                for n in ("H1", "H2", "H6"):
+                    if n not in ls and done.get((k, n), 0) < 2: ls.append(n)
+            ls.sort(key=LINES.index)
         cnt = sum(len(x) for x in todo.values())
-        log(f"검사 {v}회차 전: 걸린 줄 {cnt}", json.dumps(todo, ensure_ascii=False)[:2000])
+        log(f"검사 {rnd + 1}회째: 다시 뽑을 줄 {cnt}", json.dumps(todo, ensure_ascii=False)[:3000])
         if not cnt: break
-        add_gate(cnt, f"사용자 「전수검사해서 잘못된 거 프롬프트 바꿔서 최대 2번까지만 다시 뽑아」 재뽑기 {v}회차 {cnt}줄")
-        with ThreadPoolExecutor(20) as ex: list(ex.map(lambda kv: one(kv[0], kv[1], {"SHOWER_V": v}, redo=True), todo.items()))
+        add_gate(cnt, f"사용자 「전수검사해서 잘못된 거 프롬프트 바꿔서 최대 2번까지만 다시 뽑아」 재뽑기 {cnt}줄")
+        def go(kv):
+            k, ls = kv
+            for n in ls:
+                v = str(done.get((k, n), 0) + 1)
+                one(k, [n], {"SHOWER_V": v}, redo=True)
+        with ThreadPoolExecutor(20) as ex: list(ex.map(go, todo.items()))
     sh(["python3", "_test/shower_check.py"] + keys)
     bad = json.load(open(HERE / "_shower_check.json"))
     log("최종 검사: 걸린 줄", sum(len(d) for d in bad.values()))

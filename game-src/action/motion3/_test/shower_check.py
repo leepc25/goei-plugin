@@ -26,6 +26,13 @@ def iou_diff(a, b):
     return 1 - (a & b).sum() / u if u else 0
 
 
+def align(a, b):   # b를 a의 발 끝(맨 아래)·가로 가운데에 맞춰 옮김
+    ba, bb = box(a), box(b)
+    if not ba or not bb: return a, b
+    dy = ba[3] - bb[3]; dx = (ba[0] + ba[2]) // 2 - (bb[0] + bb[2]) // 2
+    return a, np.roll(np.roll(b, dy, 0), dx, 1)
+
+
 def check(k, n):
     ms, fs = frames(k, n)
     if not ms: return ["없음"]
@@ -53,10 +60,10 @@ def check(k, n):
     # 반복 이음새
     if n == "G" and iou_diff(ms[-1], ms[0]) > 0.35: errs.append("이음새")   # H6 달리기는 끝·첫 장이 한 걸음 차이라 제외(10-31 눈 확인: 19명 모두 정상)
     # 앞 줄과 이음새(10-31 사용자: 앞 줄을 다시 뽑아 이질감이 심하면 뒤 줄도 다시): 이 줄 첫 장 ↔ 앞 줄 끝 장
-    prev = {"H1": "G", "H2": "G", "H6": "G", "H4": "H3", "H5": "H3"}.get(n)
+    prev = {"H4": "H3", "H5": "H3"}.get(n)   # H1·H2·H6은 웅크림→맞음/달리기라 첫 장이 원래 다름(10-31 눈 확인: 걸린 것 대부분 정상). G를 다시 뽑으면 실행기가 H1·H2·H6을 같이 다시 뽑는다
     if prev:
         pm, _ = frames(k, prev)
-        if pm and iou_diff(pm[-1], ms[0]) > 0.45: errs.append(f"앞 줄({prev})과 안 이어짐")
+        if pm and iou_diff(*align(pm[-1], ms[0])) > 0.5: errs.append(f"앞 줄({prev})과 안 이어짐")   # 10-31 눈 확인: 몇 칸 밀린 것은 정상 → 발 끝·가운데 맞춘 뒤 비교
     # 끝 자세
     x0, y0, x1, y1 = bs[-1]; w, h = x1 - x0, y1 - y0
     if n in ("H3", "H4") and w < h: errs.append("끝이 누운 자세 아님")
