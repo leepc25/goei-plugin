@@ -1,0 +1,200 @@
+{
+ "room": "corridor",
+ "mood": "worn",
+ "mode": "loose",
+ "view": "corridor",
+ "floor_share": "the lower 30 percent",
+ "sides": "none",
+ "density": "packed+",
+ "place": "a run-down 1990s Seoul underground arcade corridor, low ceiling right above the sign",
+ "time": "night",
+ "light": "half-dead fluorescent tubes and warm shop light",
+ "floor": "smooth dark poured concrete like one wet sheet, mottled grime, oil stains, many puddles, wet stains, varied litter all over the walkway, light pool, shadows under objects",
+ "walls": "grimy concrete, peeling paint, exposed brick, rust streaks, mold, cracks; ceiling strip, tangled cables, fluorescent tubes, most dead, one flickering",
+ "palette": "dark cold blue-grey, amber lamp light accents",
+ "shadow": "strong contrast, amber lamp pools, dark patches, black shadow under objects",
+ "sized": [],
+ "name": "jr_alley_p6_v2",
+ "doors": 0,
+ "no": [
+  "doors",
+  "stairs",
+  "side walls"
+ ],
+ "items": [
+  {
+   "full": "left 10 percent of the image: only bare back wall and floor, no side wall",
+   "text": "left 10 percent of the image: only bare back wall and floor, no side wall",
+   "why": "사용자 이음매: 앞 기둥 자리",
+   "keep": [
+    "left 10 percent"
+   ]
+  },
+  {
+   "full": "back wall, centered: a dark junk and curio shop recessed like a deep room, piles of old junk and glass cases each holding one strange small object: a small brass timepiece whose hands run backward, a cracked mask, a palm-sized black cube, a flickering pink neon sign reading \"만물상회\"",
+   "text": "back wall, centered: a big dark junk and curio shop filling the middle 80 percent of the width, recessed like a deep lit room, piles of old junk and glass cases each holding one strange small object: a backward-running brass timepiece, a cracked mask, a black cube, a flickering pink neon sign reading \"만물상회\"",
+   "why": "의뢰문 ⑥ 정체불명 물건 가게(거꾸로 도는 탁상 시계(시계 낱말 금지라 timepiece)·금 간 가면·검은 정육면체), 사용자 이름 만물상회(고물상 겉모습), 간판 네온",
+   "keep": [
+    "junk and curio shop",
+    "glass cases",
+    "cracked mask",
+    "black cube",
+    "reading \"만물상회\""
+   ]
+  },
+  {
+   "full": "a low glass display table jutting onto the walkway",
+   "text": "a low glass display table jutting onto the walkway",
+   "why": "의뢰문 가게 앞 낮은 유리 진열대",
+   "keep": [
+    "low glass display table"
+   ]
+  },
+  {
+   "full": "a locked military box beside it",
+   "text": "left of the shop: a locked military box, a rusted trash can",
+   "why": "의뢰문 잠긴 군용 상자",
+   "keep": [
+    "locked military box"
+   ]
+  },
+  {
+   "full": "wall base beside the shop: collapsed cardboard, burst trash bag, crushed cans, each a different shape",
+   "text": "wall base beside the shop: collapsed cardboard, burst trash bag, crushed cans, each a different shape",
+   "why": "사용자 쓰레기 제각각",
+   "keep": [
+    "burst trash bag",
+    "each a different shape"
+   ]
+  },
+  {
+   "full": "a dented metal trash can",
+   "text": "right of the shop: a dented metal trash can, a torn blank poster",
+   "why": "설계안 쓰레기통",
+   "keep": [
+    "trash can"
+   ]
+  },
+  {
+   "full": "a caged wall lamp with a dim amber glow",
+   "text": "a caged wall lamp",
+   "why": "의뢰문: 형광등 대신 벽등",
+   "keep": [
+    "caged wall lamp"
+   ]
+  },
+  {
+   "full": "tangled cables hanging down the wall",
+   "text": "tangled cables down the wall",
+   "why": "의뢰문 엉킨 전선",
+   "keep": [
+    "tangled cables"
+   ]
+  },
+  {
+   "full": "a torn blank poster",
+   "text": "a torn blank poster",
+   "why": "벽 종이 몇 군데만",
+   "keep": [
+    "blank poster"
+   ]
+  },
+  {
+   "full": "right 10 percent of the image: only bare back wall and floor, no side wall",
+   "text": "right 10 percent of the image: only bare back wall and floor, no side wall",
+   "why": "사용자 이음매: 앞 기둥 자리",
+   "keep": [
+    "right 10 percent"
+   ]
+  }
+ ],
+ "must": [
+  {
+   "kw": "reading \"만물상회\"",
+   "from": "사용자 확정 가게 이름"
+  },
+  {
+   "kw": "one wet sheet",
+   "from": "사용자 바닥 선 금지"
+  }
+ ],
+ "brief": {
+  "wiki": "중림 지하상가 뒷골목: 앞쪽보다 좁고 어둡고 조용, 장물·무기·정체불명 물건·이상한 약재",
+  "design": "GPT 의뢰문 뒷골목 7칸(장면 구성 근거)",
+  "user": [
+   "사용자 10-31: 뒷골목 7칸 한번에, 앞골목과 같은 가이드 v6, 고정 문장 7칸 같게, 간판 모양·색 칸마다 다르게, 뒷골목은 더 어둡고(벽등·가게 불빛만) 차가운 푸른 회색, 맨 콘크리트·벽돌, 잠기고 숨기는 가게",
+   "v1은 옛 고정 문장 → 사용자 「6,7 다시 뽑아」: 구조 문장 앞골목과 같게, 가게 틀, 소품 양쪽"
+  ],
+  "items": [
+   {
+    "src": "0번 줄 근거",
+    "by": [
+     0
+    ]
+   },
+   {
+    "src": "1번 줄 근거",
+    "by": [
+     1
+    ]
+   },
+   {
+    "src": "2번 줄 근거",
+    "by": [
+     2
+    ]
+   },
+   {
+    "src": "3번 줄 근거",
+    "by": [
+     3
+    ]
+   },
+   {
+    "src": "4번 줄 근거",
+    "by": [
+     4
+    ]
+   },
+   {
+    "src": "5번 줄 근거",
+    "by": [
+     5
+    ]
+   },
+   {
+    "src": "6번 줄 근거",
+    "by": [
+     6
+    ]
+   },
+   {
+    "src": "7번 줄 근거",
+    "by": [
+     7
+    ]
+   },
+   {
+    "src": "8번 줄 근거",
+    "by": [
+     8
+    ]
+   },
+   {
+    "src": "9번 줄 근거",
+    "by": [
+     9
+    ]
+   }
+  ]
+ },
+ "review": {
+  "fit": "10줄 모두 뒷골목 이 칸의 가게·소품, 의자·사람 없음",
+  "place": "가게 가운데(가이드 v6), 문·통로 앞 비움, 이음 쪽 10% 비움, 양끝 칸은 막다른 곳 20%",
+  "size": "크기 숫자 없음(느슨한 틀)",
+  "brief": "의뢰문 칸 내용 모두 대응, 빠진 것 없음",
+  "meaning": "1차=2차(느슨한 틀)",
+  "over": "같은 물건 두 번 없음, packed+",
+  "frame": "고정 문장 7칸 같음, 가이드 v6, 간판만 칸마다 다름"
+ }
+}
