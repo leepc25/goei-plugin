@@ -1,0 +1,188 @@
+{
+ "name": "jr_b1_p7_v1",
+ "room": "corridor",
+ "mood": "worn",
+ "doors": 1,
+ "mode": "loose",
+ "view": "corridor",
+ "floor_share": "the lower 30 percent",
+ "sides": "right",
+ "density": "packed+",
+ "place": "a run-down 1990s Seoul underground arcade corridor, low ceiling right above the sign",
+ "time": "night",
+ "light": "half-dead fluorescent tubes and warm shop light",
+ "floor": "smooth dark poured concrete like one wet sheet, mottled grime, oil stains, puddles, varied litter all over the walkway, light pool, shadows under objects",
+ "walls": "grimy concrete, rust, mold, cracks; ceiling strip, tangled cables, fluorescent tubes, one dead",
+ "shadow": "strong contrast, pale clinic glow, pitch-dark stairwell, black shadow under the props",
+ "palette": "dark grey and beige, pale sickly green clinic light, white and green accents",
+ "no": [
+  "other doors",
+  "side walls on the left"
+ ],
+ "brief": {
+  "wiki": "손길 의원: 중림동 지하 뒤쪽 계단 끝, 바랜 옛 병원 간판이 붙은 무면허 의원",
+  "design": "GPT 의뢰문 ⑦: 무면허 의원 「손길의원」(뿌연 유리문과 유리창, 녹색 십자 돌출 간판, 문 앞은 비워 둠)과 오른쪽 끝 지하 2층으로 내려가는 계단(오른쪽 벽에 붙어 바닥에 뚫린 직사각형 계단 구멍, 뒤로 갈수록 낮아짐, 통로 쪽 허리 높이 난간, 오른쪽 벽 손잡이, B2 판과 깜빡이는 등, 첫 단 앞 비움). 게임 출입구 songil·down",
+  "user": [
+   "가이드(천장선·통행로선은 ②~⑤와 같고 가게는 계단 왼쪽 x72~442), 사용자 「1, 6, 7 전부 뽑아」",
+   "사용자 10-31: 간판이 전부 똑같이 생김·색도 똑같음 → 앞으로 뽑을 것은 간판 모양·색을 칸마다 다르게"
+  ],
+  "items": [
+   {
+    "src": "위키·의뢰문: 손길의원 정면·유리문·녹색 십자·옛 병원 간판",
+    "by": [
+     1
+    ]
+   },
+   {
+    "src": "의뢰문: 문 앞 비움",
+    "by": [
+     2
+    ]
+   },
+   {
+    "src": "의뢰문: B2 계단 구멍·난간·손잡이·B2 판·등·첫 단 앞 비움",
+    "by": [
+     3,
+     4,
+     5,
+     6
+    ]
+   },
+   {
+    "src": "사용자: 쓰레기 제각각",
+    "by": [
+     7
+    ]
+   },
+   {
+    "src": "설계안: 쓰레기통",
+    "by": [
+     8
+    ]
+   },
+   {
+    "src": "사용자: 이음매 비움",
+    "by": [
+     0
+    ]
+   },
+   {
+    "src": "위키: 반쯤 꺼진 형광등",
+    "by": "칸:walls dead"
+   }
+  ]
+ },
+ "must": [
+  {
+   "kw": "reading \"손길의원\"",
+   "from": "가게 이름"
+  },
+  {
+   "kw": "stairwell",
+   "from": "B2 계단"
+  },
+  {
+   "kw": "one wet sheet",
+   "from": "사용자 바닥 선 금지"
+  }
+ ],
+ "sized": [],
+ "items": [
+  {
+   "full": "left 10 percent of the image: only bare back wall and floor, no side wall",
+   "text": "left 10 percent of the image: only bare back wall and floor, no side wall",
+   "why": "사용자 이음매: 앞 기둥 자리",
+   "keep": [
+    "left 10 percent"
+   ]
+  },
+  {
+   "full": "back wall, left of the stairs: an unlicensed clinic front, a cloudy frosted glass door in the middle, frosted windows, a faded old hospital sign, a green cross light box sticking out, a white lit sign board with green letters reading \"손길의원\"",
+   "text": "back wall, left of the stairs: an unlicensed clinic front, a cloudy frosted glass door in the middle, frosted windows, a faded old hospital sign, a green cross light box sticking out, a white lit sign board with green letters reading \"손길의원\"",
+   "why": "위키 손길 의원(바랜 옛 병원 간판), GPT 의뢰문 ⑦(뿌연 유리문·녹색 십자 돌출 간판), 게임 출입구 songil, 사용자 10-31: 간판이 전부 똑같이 생김·색도 똑같음 → 앞으로 뽑을 것은 간판 모양·색을 칸마다 다르게: 흰 불 들어오는 판·녹색 글씨·녹색 십자",
+   "keep": [
+    "clinic",
+    "frosted glass door",
+    "green cross light box",
+    "reading \"손길의원\""
+   ]
+  },
+  {
+   "full": "clear empty floor in front of the glass door",
+   "text": "clear empty floor in front of the glass door",
+   "why": "게임 출입구 앞 비움",
+   "keep": [
+    "clear empty floor"
+   ]
+  },
+  {
+   "full": "far right: angled right side wall, a rectangular stairwell cut into the floor along it, steps going down to the back into darkness",
+   "text": "far right: angled right side wall, a rectangular stairwell cut into the floor along it, steps going down to the back into darkness",
+   "why": "GPT 의뢰문 ⑦ 오른쪽 끝 지하 2층으로 내려가는 계단(바닥에 뚫린 계단 구멍), 게임 출입구 down",
+   "keep": [
+    "rectangular stairwell",
+    "going down"
+   ]
+  },
+  {
+   "full": "waist-high railing on the stairwell's walkway edge, handrail on the right wall",
+   "text": "waist-high railing on the stairwell's walkway edge, handrail on the right wall",
+   "why": "GPT 의뢰문 난간·손잡이",
+   "keep": [
+    "railing",
+    "handrail"
+   ]
+  },
+  {
+   "full": "a \"B2\" plate with a down arrow and a flickering lamp above the stairs",
+   "text": "a \"B2\" plate with a down arrow and a flickering lamp above the stairs",
+   "why": "GPT 의뢰문 B2 판·깜빡이는 등",
+   "keep": [
+    "\"B2\"",
+    "flickering lamp"
+   ]
+  },
+  {
+   "full": "clear floor before the first step",
+   "text": "clear floor before the first step",
+   "why": "GPT 의뢰문 계단 첫 단 앞 비움",
+   "keep": [
+    "clear floor"
+   ]
+  },
+  {
+   "full": "wall base: collapsed cardboard, burst trash bag, bottles, each a different shape",
+   "text": "wall base: collapsed cardboard, burst trash bag, bottles, each a different shape",
+   "why": "사용자 쓰레기 제각각",
+   "keep": [
+    "burst trash bag",
+    "each a different shape"
+   ]
+  },
+  {
+   "full": "a dented metal trash can",
+   "text": "a dented metal trash can",
+   "why": "설계안 쓰레기통",
+   "keep": [
+    "trash can"
+   ]
+  },
+  {
+   "full": "a torn blank poster",
+   "text": "a torn blank poster",
+   "why": "사용자: 벽 종이는 몇 군데만, 글자 없이",
+   "keep": [
+    "blank poster"
+   ]
+  }
+ ],
+ "review": {
+  "fit": "10줄: 의원 정면·유리문·B2 계단·난간·B2 판·쓰레기·쓰레기통·포스터. 의자·사람 없음",
+  "place": "의원 왼쪽, 계단 오른쪽 끝, 유리문 앞·계단 첫 단 앞 비움, 왼쪽 끝 10% 비움",
+  "size": "크기 숫자 없음(느슨한 틀)",
+  "brief": "위키·의뢰문 항목 모두 대응, 빠진 것 없음",
+  "meaning": "1차=2차(느슨한 틀)",
+  "over": "같은 물건 두 번 없음, packed+",
+  "frame": "통로, 오른쪽 옆벽(계단)만, 문 1, 가이드 right, 간판 흰 판·녹색 글씨·녹색 십자"
+ }
+}
