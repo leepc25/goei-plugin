@@ -11,6 +11,7 @@ import { personBlock, unknownTo } from '../../core/people/inject';
 import { latestNote } from '../../core/people/updater';
 import { temperOf } from '../../core/people/base';
 import { onPeopleStatus } from '../people';
+import { relationStage } from '../../core/world/records';
 
 export function createPeople(): GamePeople {
   return {
@@ -67,6 +68,20 @@ export function createPeople(): GamePeople {
         const f = factionNow(store, code, changes, uf, settings, names);
         return { code, name: f.name, value: f.value, stage: f.stage.id, stageLabel: f.stage.label, bounds: settings.factionBounds };
       });
+    },
+    async relations() {
+      const c = await loadContext().catch(() => null);
+      if (!c) return null;
+      const settings = peopleSettings(c.chat.scriptstate);
+      if (!settings.on || !settings.features.has('faction_rep')) return null;
+      const codes = knownFactionCodes(peopleStore(c.chat), factionNamesOf(c.char.globalLore));
+      const out: Record<string, FactionView['stage']> = {};
+      for (const a of codes) for (const b of codes) {
+        if (a === b) continue;
+        const st = relationStage(a, b);
+        if (st !== 'neutral') out[`${a}>${b}`] = st;
+      }
+      return out;
     },
     onChange(cb) {
       let wasBusy = false;

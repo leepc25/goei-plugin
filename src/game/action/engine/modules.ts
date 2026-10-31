@@ -43,6 +43,7 @@ import { linkItems } from './itemsLink';
 import { makeHub, silhouette, type HubHost, type HubLife } from './hub';
 import { createHqWorld, hqDistrict } from '../../world/hq';
 import { isRegionMove } from '../../world/districts';
+import { FACTION_NAMES, relationFrom } from '../../world/factions';
 import { STATUS, type DebuffKind, type StatusSet } from '../../combat/status';
 import { createFieldShop, type FieldShop } from './fieldShopLink';
 import { DEFAULT_CLOCK, clockRules, waitOptions, type ClockRules } from '../../world/clock';
@@ -136,9 +137,12 @@ function hqAdapter(bridge: Partial<GameBridge> | undefined, ui: { chooseFloor: H
   // 인물 기록(호감 단계·호칭)과 세력 평판: 대사 칸·몹 반응에 쓴다. 기록이 갱신되면 다시 읽는다
   const peopleBy = new Map<string, PersonView>();
   const factionBy = new Map<string, FactionView>();
+  let relation = relationFrom(null);
   const readPeople = () => {
     void b?.people?.people().then((l) => { peopleBy.clear(); for (const p of l) peopleBy.set(p.name, p); }).catch(() => {});
     void b?.people?.factions().then((l) => { factionBy.clear(); for (const f of l) factionBy.set(f.code, f); }).catch(() => {});
+    // 세력끼리 관계 (방문 대응): 세력 평판 기능이 켜져 있으면 플러그인 표, 아니면(null) 게임 기본값 (world/factions.ts)
+    void (b?.people?.relations?.() ?? Promise.resolve(null)).then((t) => { relation = relationFrom(t); }).catch(() => {});
   };
   // 잔고: 들어갈 때, 본편 갱신기가 끝날 때(거래를 적었을 수 있음) 다시 읽는다
   // 필드 돈(10-31 사용자, F13): 필드 안에서는 잔고만 바로 바뀌고, 가계부에는 필드를 마감할 때 합산 한 줄. 장부 잔고 + 아직 안 적은 몫
@@ -194,7 +198,7 @@ function hqAdapter(bridge: Partial<GameBridge> | undefined, ui: { chooseFloor: H
   if (typeof window !== 'undefined') window.addEventListener('keydown', onObserveKey);
   const world = () => {
     if (!sim && ready) {
-      sim = createHqWorld(map, seed, present.filter((p) => ROOM_SCENE[p.room]).map((p) => ({ name: p.name, scene: ROOM_SCENE[p.room] })), hasCharClip, { killOk: () => fighterHooks.killOk?.() ?? false, stance: (f) => factionBy.get(f)?.stage ?? null });
+      sim = createHqWorld(map, seed, present.filter((p) => ROOM_SCENE[p.room]).map((p) => ({ name: p.name, scene: ROOM_SCENE[p.room] })), hasCharClip, { killOk: () => fighterHooks.killOk?.() ?? false, stance: (f) => factionBy.get(f)?.stage ?? null, relation: (v, t) => relation(v, t) });
       chatter = new Chatter(sim, new Lines(dialogueData as unknown as DialogueData, sim.rng), lineCtx);
     }
     // 개발 도구·브라우저 시험: 세계를 들여다본다 (관찰 창과 같은 정보)
@@ -244,6 +248,17 @@ function hqAdapter(bridge: Partial<GameBridge> | undefined, ui: { chooseFloor: H
       // 목격: 보이는 장면의 소매치기만 (그 밖의 잡일은 넘기지 않음)
       if (e.kind === 'steal' && e.scene === lifeScene) {
         void b?.field?.record({ kind: 'act', text: `${hm()}{user} saw a ${enName(e.thief)} pickpocket a ${enName(e.victim)}.`, ko: `${hm()}{user}: 소매치기 목격 (${e.thief} → ${e.victim})`, scene: sceneNameOf(e.scene), weight: 1, visit: visitId }).catch(() => {});
+        continue;
+      }
+      // 방문 대응 (세력끼리): 보이는 장면에서 일어난 것만 장부에 (주인공이 본 일)
+      if ((e.kind === 'brawl' || e.kind === 'brawlEnd' || e.kind === 'expel') && e.scene === lifeScene) {
+        const fn = (c: string) => factionBy.get(c)?.name ?? FACTION_NAMES[c] ?? c;
+        const line = e.kind === 'brawl'
+          ? { text: `${hm()}{user} saw a ${enName(e.a)} (${fn(e.af)}) fight a ${enName(e.b)} (${fn(e.bf)}).`, ko: `${hm()}{user}: ${e.a}(${fn(e.af)})와 ${e.b}(${fn(e.bf)})의 싸움을 봄`, weight: 2 as const }
+          : e.kind === 'brawlEnd'
+            ? { text: `${hm()}The ${enName(e.loser)} ${e.how === 'down' ? 'was knocked out' : 'fled'}.`, ko: `${hm()}${e.loser} ${e.how === 'down' ? '기절' : '도주'}`, weight: 1 as const }
+            : { text: `${hm()}A ${enName(e.by)} threw a ${enName(e.who)} out.`, ko: `${hm()}${e.by}이(가) ${e.who}을(를) 내보냄`, weight: 1 as const };
+        void b?.field?.record({ kind: 'act', ...line, scene: sceneNameOf(e.scene), visit: visitId }).catch(() => {});
         continue;
       }
       if (e.kind === 'kill') {

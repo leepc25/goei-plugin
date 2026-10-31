@@ -4,7 +4,9 @@
 // 소란도는 장면 단위. 경찰·경비는 플레이어 범죄에만 나선다(crime). 화면 밖 장면도 같은 규칙으로 돈다. 생활은 실시간, 시계와 무관.
 import { ACTIVITIES, TEMPER, choose, decayNeeds, fullNeeds, onDuty, type Activity, type Needs } from './needs';
 import { ARCHETYPES, DROPS, POCKET, inShift, rollTemper, type Post, type Temperament } from './mobs';
-import { derive, rollBase, type BaseStats } from '../combat/stats';
+import { baseOf, derive, rollBase, type BaseStats } from '../combat/stats';
+import { NAMED_MUL } from './npcperks';
+import { defaultRelation, type Stance } from './factions';
 import { applyTemper, catOf, rollNpcPerks } from './npcperks';
 import type { Hop, PlaceGraph } from './places';
 import { pick, range, type Rng } from './rng';
@@ -26,6 +28,8 @@ export interface ActorDef {
   speed?: number;
   /** 몹 원형 이름 (mobs.ts ARCHETYPES) */
   archetype?: string;
+  /** 소속 세력 코드 (다른 세력 거점에 들어온 방문자 등, 방문 대응 10-31). 없으면 장면 소속·없음 */
+  faction?: string;
 }
 export type Act = 'idle' | 'walk' | 'pause' | 'dead' | 'door' | 'do' | 'notice' | 'post' | 'watch' | 'argue' | 'down' | 'scared' | 'gone';
 /** 걸어서 닿은 뒤 할 일 */
@@ -122,6 +126,14 @@ export interface Actor {
   station?: string;
   /** 평소 거리 순찰 중인 경찰 (C16, 10-31) */
   patrol?: boolean;
+  /** 필드 안 NPC끼리 싸움 (방문 대응 10-31): 상대 id, 다음 타격까지 초 */
+  brawl?: { foe: string; t: number };
+  /** 이미 인사한 방문자 id */
+  greeted?: string[];
+  /** 경계: 따라붙어 지켜보는 방문자 id (경비) */
+  escort?: string;
+  /** 방문자: 경계 거점에 머문 초 (경고 → 내보냄) */
+  stay?: number;
 }
 
 /** 훈련장 장비 하나 (10-31 사용자: 샌드백·허수아비·사격 과녁. 그림은 일단 코드, 나중에 교체) */
@@ -189,7 +201,13 @@ export type SimEvent =
   /** 시체를 본 사람: 신고(용감) */
   | { kind: 'report'; scene: string; who: string; x: number }
   /** 경찰이 시체를 수습함 */
-  | { kind: 'cleared'; scene: string; n: number };
+  | { kind: 'cleared'; scene: string; n: number }
+  /** 세력끼리 싸움이 붙음 (방문 대응): a = 거점 쪽, b = 방문자 */
+  | { kind: 'brawl'; scene: string; a: string; af: string; b: string; bf: string; x: number }
+  /** 그 싸움에서 한쪽이 쓰러지거나 달아남 */
+  | { kind: 'brawlEnd'; scene: string; winner: string; loser: string; how: 'down' | 'fled' }
+  /** 경계: 방문자를 내보냄 */
+  | { kind: 'expel'; scene: string; who: string; by: string };
 
 export interface SimOptions {
   spawns?: SpawnRule[];
@@ -202,6 +220,8 @@ export interface SimOptions {
   stance?: (faction: string) => 'friendly' | 'favorable' | 'neutral' | 'wary' | 'hostile' | null;
   /** 설정 「필드에서 NPC 살해 허용」 (기본 끔: 체력 0 = 기절) */
   killOk?: () => boolean;
+  /** 세력끼리 관계 (보는 쪽 → 대상). 없으면 기본값 (world/factions.ts) */
+  relation?: (viewer: string, target: string) => Stance;
 }
 
 const WALK = 150;
@@ -243,7 +263,9 @@ export class WorldSim {
     this.sceneFaction = o.sceneFaction ?? (() => null);
     this.stance = o.stance ?? (() => null);
     this.killOk = o.killOk ?? (() => false);
+    this.relation = o.relation ?? defaultRelation;
   }
+  private relation: (viewer: string, target: string) => Stance;
   private killOk: () => boolean;
   /** 게임 시간 누계(시간). 필드 시계가 움직인 만큼만 흐른다 (시계 없으면 실시간 3분 = 1시간) */
   gameH = 0;
@@ -256,6 +278,7 @@ export class WorldSim {
   /** 몹의 소속: 경비·직원(근무형·staff·guard)은 장면 소속, 나머지는 없음 */
   mobFaction(a: Actor): string | null {
     if (a.def.kind !== 'mob') return null;
+    if (a.def.faction) return a.def.faction;
     const role = ARCHETYPES[a.def.archetype ?? a.def.name]?.role;
     return a.post || role === 'guard' || role === 'staff' ? this.sceneFaction(a.scene) : null;
   }
@@ -537,6 +560,174 @@ export class WorldSim {
     for (const r of this.spawns) this.stepSpawn(r, dt);
     for (const p of this.posts) this.stepPost(p);
     this.stepPatrol(dt);
+    if ((this.visitT -= dt) <= 0) { this.visitT = 0.5; this.stepVisitors(0.5); }
+  }
+
+  // ── 방문 대응 (10-31 사용자, 살아 있는 세상 4단계): 다른 세력 사람이 세력 거점 장면에 들어오면 거점 사람들이 세력 관계대로 ──
+  // 우호·호의 = 인사, 중립 = 무시, 경계 = 경비가 따라붙어 지켜보다 경고 → 내보냄, 적대 = 경비·전투원이 막아서 싸우고 비전투원은 겁먹고 피함.
+  // 관계는 세력 평판 기능이 켜져 있으면 플러그인 세력 관계 표, 꺼져 있으면 기본값(큰 세력 셋 서로 적대). 주인공 대응은 따로(세력 평판 구간, mobThink)
+  private visitT = 0;
+  /** 그 사람의 소속: 따로 정한 세력 → 근무형·경비·직원은 장면 소속 */
+  factionOf(a: Actor): string | null {
+    return a.def.faction ?? this.mobFaction(a);
+  }
+  /** 싸울 수 있는 몸인가 (경비·경찰·불량배·관리국 요원·이름 인물·다른 세력 방문자) */
+  private combatant(a: Actor): boolean {
+    const role = ARCHETYPES[a.def.archetype ?? '']?.role;
+    return a.def.kind === 'named' || !!a.def.faction || role === 'guard' || role === 'police' || role === 'thug';
+  }
+  private free(a: Actor): boolean {
+    return !a.brawl && !a.fighting && !['down', 'dead', 'gone', 'door', 'scared'].includes(a.act) && a.plan !== 'chase' && a.plan !== 'cordon';
+  }
+  /** 다른 세력 방문자를 들여보낸다 (C15 세력 NPC 배치·시험이 부른다) */
+  spawnVisitor(scene: string, archetype: string, faction: string, x?: number): Actor {
+    const len = this.graph.scene(scene)?.length ?? 1280;
+    const arch = ARCHETYPES[archetype];
+    const a = this.add({ id: `mob${++serial}`, name: archetype, kind: 'mob', brain: 'transit', home: scene, archetype, look: arch?.looks?.length ? pick(this.rng, arch.looks) : archetype, faction }, { scene, x: x ?? 60, y: this.laneMid(scene) });
+    a.exitAt = { x: len - 60, y: a.y };
+    this.walkTo(a, a.exitAt, '둘러보는 중', 'exit');
+    return a;
+  }
+  private stepVisitors(dt: number): void {
+    // 따라붙던 방문자가 나갔거나 쫓겨 나가는 중이면 경비는 자리로
+    for (const e of this.actors) {
+      if (!e.escort) continue;
+      const v = this.actors.find((q) => q.def.id === e.escort);
+      if (v && v.scene === e.scene && v.act !== 'gone' && !(v.plan === 'exit' && (v.stay ?? 0) < 0)) continue;
+      e.escort = undefined;
+      if (e.post) this.goPost(e);
+      else this.resume(e);
+    }
+    const scenes = new Set(this.actors.map((a) => a.scene));
+    for (const scene of scenes) {
+      const home = this.sceneFaction(scene);
+      if (!home) continue;
+      const here = this.inScene(scene).filter((a) => !a.brawl);
+      const visitors = here.filter((v) => { const f = this.factionOf(v); return !!f && f !== home && this.free(v); });
+      if (!visitors.length) continue;
+      const ours = here.filter((q) => this.factionOf(q) === home && this.free(q));
+      for (const v of visitors) {
+        const st = this.relation(home, this.factionOf(v)!);
+        const near = (ok: (q: Actor) => boolean, d = 520) => ours.filter((q) => ok(q) && Math.abs(q.x - v.x) < d).sort((p, q) => Math.abs(p.x - v.x) - Math.abs(q.x - v.x));
+        if (st === 'friendly' || st === 'favorable') {
+          const g = near((q) => !q.greeted?.includes(v.def.id) && q.act !== 'notice', 400)[0];
+          if (!g) continue;
+          (g.greeted ??= []).push(v.def.id);
+          g.act = 'notice';
+          g.doing = '방문자에게 인사';
+          g.goal = null;
+          g.face = v.x > g.x ? 1 : -1;
+          g.wait = 2.2;
+          this.setClip(g, this.canClip(g, 'greet') ? 'greet' : 'idle');
+          this.say(g, st === 'friendly' ? '오셨어요!' : '안녕하세요.', 2);
+          continue;
+        }
+        if (st === 'wary') {
+          // 경비 하나가 따라붙어 지켜보고, 오래 머물면 경고 → 내보낸다
+          let e = ours.find((q) => q.escort === v.def.id);
+          if (!e) {
+            e = near((q) => !q.escort && ARCHETYPES[q.def.archetype ?? '']?.role === 'guard', 2000)[0];
+            if (!e) continue;
+            e.escort = v.def.id;
+            this.iconOn(e, '!', 1.5);
+          }
+          if (Math.abs(e.x - v.x) > 140) {
+            this.walkTo(e, { x: v.x + (e.x < v.x ? -90 : 90), y: v.y }, '방문자를 따라감', 'none');
+          } else if (e.act !== 'watch') {
+            e.act = 'watch';
+            e.doing = '방문자 경계';
+            e.goal = null;
+            e.wait = 1;
+            e.face = v.x > e.x ? 1 : -1;
+            this.setClip(e, 'idle');
+          }
+          v.stay = (v.stay ?? 0) + dt;
+          if (v.stay >= 6 && v.stay - dt < 6) this.say(e, '여긴 관계자 외 출입 금지입니다.', 2.5);
+          if (v.stay >= 14) {
+            this.say(e, '나가 주시죠.', 2);
+            v.exitAt = this.gateFar(v, e.x);
+            this.walkTo(v, v.exitAt, '쫓겨남', 'exit');
+            v.plan = 'exit';
+            v.stay = -1e9;
+            this.events.push({ kind: 'expel', scene, who: v.def.name, by: e.def.name });
+          }
+          continue;
+        }
+        if (st !== 'hostile') continue;
+        // 적대: 싸울 수 있는 우리 쪽이 둘까지 붙는다. 비전투원은 겁먹고 피한다
+        const fighters = near((q) => this.combatant(q), 2000).slice(0, 2);
+        for (const q of ours) if (!this.combatant(q) && Math.abs(q.x - v.x) < 500 && q.def.kind === 'mob' && !q.post) this.scareAt(q, v.x);
+        if (!fighters.length) continue;
+        for (const f of fighters) this.startBrawl(f, v);
+        // 방문자: 싸울 수 있으면 맞서고, 아니면 달아난다
+        if (this.combatant(v) && (v.temper?.courage ?? 0.7) >= 0.35) this.startBrawl(v, fighters[0]);
+        else this.flee(v, fighters[0].x);
+        this.disturb(scene, 25, v.x);
+        this.events.push({ kind: 'brawl', scene, a: fighters[0].def.name, af: home, b: v.def.name, bf: this.factionOf(v)!, x: v.x });
+      }
+    }
+  }
+  private startBrawl(a: Actor, foe: Actor): void {
+    if (a.brawl) return;
+    a.brawl = { foe: foe.def.id, t: range(this.rng, 0.4, 0.9) };
+    a.escort = undefined;
+    a.goal = null;
+    a.route = [];
+    a.seatPick = undefined;
+    a.doing = `${foe.def.name}와 싸움`;
+    this.iconOn(a, '#', 2);
+    // 이름 인물은 체력이 없으면 표(×1.5, 10-31 이름 인물 퍽)로
+    if (a.hp === undefined) { a.base ??= baseOf(a.def.look ?? a.def.name); a.hpMax = a.hp = Math.round(derive(a.base).hp * (a.def.kind === 'named' ? NAMED_MUL.hp : 1)); }
+  }
+  private endBrawl(a: Actor): void {
+    a.brawl = undefined;
+    a.run = 1;
+    if (a.post) return this.goPost(a);
+    this.resume(a);
+  }
+  /** NPC끼리 싸움 한 틱: 붙을 때까지 다가가고, 붙으면 0.9~1.4초마다 한 대 (피해 = 힘·받는 피해 공식). 체력 0 = 기절, 겁 많으면 30% 아래서 달아남 */
+  private stepBrawl(a: Actor, dt: number): void {
+    const f = this.actors.find((q) => q.def.id === a.brawl!.foe);
+    if (!f || f.scene !== a.scene || ['down', 'dead', 'gone', 'door'].includes(f.act) || f.fighting || (f.plan === 'exit' && f.act === 'walk' && !f.brawl)) return this.endBrawl(a);
+    if (a.sayT > 0 && (a.sayT -= dt) <= 0) a.say = undefined;
+    if (a.iconT > 0 && (a.iconT -= dt) <= 0) a.icon = undefined;
+    a.face = f.x > a.x ? 1 : -1;
+    const gap = Math.abs(f.x - a.x);
+    if (gap > 80 || Math.abs(f.y - a.y) > 24) {
+      const sp = (a.def.speed ?? WALK) * 1.4 * dt;
+      a.x += Math.sign(f.x - a.x) * Math.min(sp, Math.max(0, gap - 70));
+      a.y += Math.sign(f.y - a.y) * Math.min(sp * 0.5, Math.abs(f.y - a.y));
+      a.act = 'walk';
+      if (a.clip !== 'walk') this.setClip(a, 'walk');
+      return;
+    }
+    a.act = 'argue';
+    if ((a.brawl!.t -= dt) > 0) { if (a.clip === 'walk') this.setClip(a, 'idle'); return; }
+    a.brawl!.t = range(this.rng, 0.9, 1.4);
+    this.setClip(a, this.canClip(a, 'strike') ? 'strike' : 'idle');
+    const ab = a.base ?? baseOf(a.def.look), fb = f.base ?? baseOf(f.def.look);
+    const dmg = Math.round(60 * derive(ab).power * derive(fb).taken * range(this.rng, 0.8, 1.2));
+    if (f.hp === undefined) this.startBrawl(f, a);
+    f.hp = Math.max(0, (f.hp ?? 0) - dmg);
+    f.x += a.face * 10;
+    if (f.hp <= 0) {
+      f.brawl = undefined;
+      f.act = 'down';
+      f.doing = '기절';
+      f.downAt = this.time;
+      f.wait = range(this.rng, 15, 25);
+      f.goal = null;
+      this.setClip(f, this.canClip(f, 'down') ? 'down' : 'idle');
+      this.events.push({ kind: 'brawlEnd', scene: a.scene, winner: a.def.name, loser: f.def.name, how: 'down' });
+      return this.endBrawl(a);
+    }
+    if (f.hpMax && f.hp < f.hpMax * 0.3 && (f.temper?.courage ?? 0.7) < 0.5) {
+      f.brawl = undefined;
+      this.flee(f, a.x);
+      this.events.push({ kind: 'brawlEnd', scene: a.scene, winner: a.def.name, loser: f.def.name, how: 'fled' });
+      return this.endBrawl(a);
+    }
+    if (!f.brawl) this.startBrawl(f, a);
   }
 
   /** 평소 거리 순찰 (C16): 거리 장면마다 가끔 경찰 1~2명이 한쪽 끝에서 들어와 천천히 걸어 반대쪽으로 나간다.
@@ -624,6 +815,7 @@ export class WorldSim {
     if (a.iconT > 0 && (a.iconT -= dt) <= 0) a.icon = undefined;
     if (a.sayT > 0 && (a.sayT -= dt) <= 0) a.say = undefined;
     if (a.act === 'dead') return;
+    if (a.brawl) return this.stepBrawl(a, dt);
     if (a.noticeCd > 0) a.noticeCd -= dt;
     if (a.needs) decayNeeds(a.needs, dt, TEMPER[a.def.name], onDuty(this.hour, TEMPER[a.def.name]));
     if (a.def.kind === 'mob') this.mobThink(a, dt);

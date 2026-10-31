@@ -6,7 +6,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { pathToFileURL } from 'node:url';
 const dir = await mkdtemp(join(tmpdir(), 'goei-fieldworld-'));
-const names = ['rng', 'clock', 'places', 'actors', 'observer', 'needs', 'mobs', 'lines', 'speech', 'districts', 'hq', 'npcperks'];
+const names = ['rng', 'clock', 'places', 'actors', 'observer', 'needs', 'mobs', 'lines', 'speech', 'districts', 'hq', 'npcperks', 'factions'];
 await build({ entryPoints: names.map((n) => `src/game/world/${n}.ts`), outdir: dir, outbase: 'src', bundle: true, platform: 'node', format: 'esm', outExtension: { '.js': '.mjs' }, logLevel: 'silent' });
 const imp = (n) => import(pathToFileURL(join(dir, `game/world/${n}.mjs`)));
 const R = await imp('rng'), C = await imp('clock'), P = await imp('places'), A = await imp('actors'), O = await imp('observer'), N = await imp('needs'), M = await imp('mobs'), L = await imp('lines'), SP = await imp('speech'), D = await imp('districts'), H = await imp('hq');
@@ -798,4 +798,56 @@ test('순찰 경찰: 지나가다 시체를 보면 현장 경찰이 된다 (라�
   for (let i = 0; i < 600 && p.doing !== '현장 통제'; i++) sim.step(0.1, { scene: 'f3', x: 400, hour: 14 });
   assert.equal(p.doing, '현장 통제');
   assert.ok(sim.obstacles('jongno').length > 0, '라바콘 라인');
+});
+
+// 방문 대응 (10-31 사용자): 다른 세력 사람이 세력 거점에 들어오면 세력 관계대로. 기본값 = 큰 세력 셋 서로 적대, 나머지 중립
+test('세력 관계 기본값: 관리국·가짜 관리국·백일몽은 서로 적대, 협회·중림 등은 중립. 플러그인 표가 있으면 그것', async () => {
+  const F = await imp('factions');
+  assert.equal(F.defaultRelation('A00', 'B00'), 'hostile');
+  assert.equal(F.defaultRelation('C00', 'A00'), 'hostile');
+  assert.equal(F.defaultRelation('A00', 'E00'), 'neutral');
+  assert.equal(F.defaultRelation('A00', 'A00'), 'friendly');
+  const rel = F.relationFrom({ 'A00>C00': 'wary' });
+  assert.equal(rel('A00', 'C00'), 'wary');
+  assert.equal(rel('A00', 'B00'), 'neutral', '표에 없으면 중립');
+  assert.equal(F.relationFrom(null)('A00', 'B00'), 'hostile', '기능 꺼짐 = 기본값');
+});
+
+const hqSim = (seed, relation) => new A.WorldSim(graph(), R.mulberry32(seed), { sceneFaction: (s) => (['lobby', 'f3', 'office', 'lounge'].includes(s) ? 'A00' : null), ...(relation ? { relation } : {}) });
+const guardAt = (sim, x) => sim.add({ id: `g${x}`, name: '경비', kind: 'mob', brain: 'transit', home: 'lobby', archetype: '경비', look: '경비' }, { scene: 'lobby', x, y: 540 });
+
+test('방문 대응 적대: 경비가 막아서 싸우고, 한쪽이 쓰러지면 끝 (장부 사건)', () => {
+  const sim = hqSim(21);
+  const g = guardAt(sim, 900);
+  const v = sim.spawnVisitor('lobby', '불량배', 'B00', 300);
+  for (let i = 0; i < 20 && !g.brawl; i++) sim.step(0.1, { scene: 'street', x: 100, hour: 14 });
+  assert.ok(g.brawl && g.brawl.foe === v.def.id, '경비가 붙음');
+  assert.ok(sim.events.some((e) => e.kind === 'brawl' && e.bf === 'B00'));
+  let end;
+  for (let i = 0; i < 1200 && !end; i++) { sim.step(0.1, { scene: 'street', x: 100, hour: 14 }); end = sim.events.find((e) => e.kind === 'brawlEnd'); }
+  assert.ok(end, '싸움이 끝남');
+  const loser = [g, v].find((q) => q.def.name === end.loser && (q.act === 'down' || q.act === 'walk' || q.act === 'gone'));
+  assert.ok(loser, JSON.stringify(end));
+  assert.ok(!g.brawl && !v.brawl, '둘 다 싸움에서 빠짐');
+});
+
+test('방문 대응 경계: 경비가 따라붙어 경고하고 내보냄, 우호는 인사, 중립은 무시', () => {
+  const sim = hqSim(22, (a, b) => ({ 'A00>E00': 'wary', 'A00>C00': 'favorable' })[`${a}>${b}`] ?? 'neutral');
+  const g = guardAt(sim, 1200);
+  const v = sim.spawnVisitor('lobby', '행인', 'E00', 300);
+  v.goal = null; v.act = 'idle'; v.wait = 1e9; v.plan = 'none';   // 머무는 방문자
+  for (let i = 0; i < 300 && !sim.events.some((e) => e.kind === 'expel'); i++) sim.step(0.1, { scene: 'street', x: 100, hour: 14 });
+  assert.ok(sim.events.some((e) => e.kind === 'expel' && e.by === '경비'), '내보냄');
+  assert.equal(v.doing, '쫓겨남');
+  assert.ok(!g.brawl, '경계는 싸우지 않음');
+  const sim2 = hqSim(23, (a, b) => (b === 'C00' ? 'favorable' : 'neutral'));
+  const g2 = guardAt(sim2, 400);
+  sim2.spawnVisitor('lobby', '행인', 'C00', 300);
+  for (let i = 0; i < 20 && !g2.greeted; i++) sim2.step(0.1, { scene: 'street', x: 100, hour: 14 });
+  assert.ok(g2.greeted?.length, '호의 = 인사');
+  const sim3 = hqSim(24, () => 'neutral');
+  const g3 = guardAt(sim3, 400);
+  sim3.spawnVisitor('lobby', '행인', 'D00', 300);
+  for (let i = 0; i < 100; i++) sim3.step(0.1, { scene: 'street', x: 100, hour: 14 });
+  assert.ok(!g3.greeted && !g3.escort && !g3.brawl, '중립 = 무시');
 });
