@@ -58,7 +58,6 @@ import { FightLog, enName, isLaw } from '../../world/fightlog';
 import { reactOf } from '../../world/namedReact';
 import { drawAlarmLights } from '../../world/alarmFx';
 import { view as fieldViewport } from './view';
-import { newAttackId } from './ids';
 import { settleLine } from '../../world/fieldmoney';
 import { NAMED_MUL, npcPerkDef, rollNpcPerks } from '../../world/npcperks';
 import type { FactionView, PersonView } from '../../bridge';
@@ -488,10 +487,14 @@ function hqAdapter(bridge: Partial<GameBridge> | undefined, ui: { chooseFloor: H
   // ── 필드 전투 AI (2026-10-29 AI 세팅): 주인공을 막아선 몹(적대 세력·경찰 출동·시비 뒤 맞섬)은 그 그림의 인물 팩으로 전투 AI 몸(ai-char:<그림>)을 세워 싸운다.
   // 몸이 쓰러지면 1.5초 뒤 행위자로 되돌려 기절(깨면 떠남)·장부 기록. 주인공이 장면을 떠나면 싸움은 끊기고 행위자는 그 자리에 선다
   const fights = new Map<string, { body: Body & { hp: number; hpMax: number; alive: boolean; label: string }; t: number; scene: string }>();
+  /** 싸움에 나선 동행 (주인공 편 전투 AI 몸) */
+  const allies = new Map<string, { body: Body & { hp: number; hpMax: number; alive: boolean; label: string }; scene: string }>();
   const endFights = (down: boolean) => {
     const w = sim;
     for (const [id, f] of fights) { f.body.alive = false; w?.fromFight(id, f.body.x, f.body.y, down); }
     fights.clear();
+    for (const [id, f] of allies) { f.body.alive = false; w?.fromAlly(id, f.body.x, f.body.y, false); }
+    allies.clear();
   };
   function combatStep(api: { spawn(s: { kind: string; x: number; y: number }): void; world: { bodies: readonly Body[] } }, sceneId: string) {
     const w = sim;
@@ -515,18 +518,29 @@ function hqAdapter(bridge: Partial<GameBridge> | undefined, ui: { chooseFloor: H
       w.fromFight(id, f.body.x, f.body.y, true);
       fights.delete(id);
     }
-    // 동행 거들기: 따라오는 사람(전투 계열)은 가장 가까운 싸움 상대에게 붙어 때린다. 맞힘은 시뮬이 모아 둔 것을 여기서 전투 몸에
-    const foes = [...fights.values()].filter((f) => f.scene === sceneId && f.body.alive && f.body.hp > 0).map((f) => f.body);
-    for (const id of w.followers) {
-      const a = w.actors.find((q) => q.def.id === id);
-      if (!a || a.scene !== sceneId || w.noAssist(a.def.name)) { if (a) w.setAssist(id, null); continue; }
-      const t = foes.sort((p, q) => Math.abs(p.x - a.x) - Math.abs(q.x - a.x))[0];
-      w.setAssist(id, t ? { x: t.x, y: t.y } : null);
+    // 동행 = 주인공 편 전투 AI 몸 (10-31 사용자: 동행은 그대로 적들과 싸운다). 이 장면에 싸움이 붙으면 전투 계열 동행을 몸으로 세우고,
+    // 싸움이 끝나면 다시 따라 걷는 행위자로. 몸이 쓰러지면 동행이 풀리고 그 자리에 쓰러진 채 남는다
+    const fighting = [...fights.values()].some((f) => f.scene === sceneId && f.body.alive && f.body.hp > 0);
+    for (const [id, f] of allies) {
+      if (f.scene !== sceneId || !api.world.bodies.includes(f.body) || !fighting || f.body.hp <= 0) {
+        const down = f.body.hp <= 0;
+        if (!down && fighting && f.scene === sceneId && api.world.bodies.includes(f.body)) continue;
+        f.body.alive = false;
+        w.fromAlly(id, f.body.x, f.body.y, down, f.body.hp);
+        allies.delete(id);
+      }
     }
-    for (const h of w.assistHits.splice(0)) {
-      const t = foes.filter((f) => Math.abs(f.x - h.x) < 140 && Math.abs(f.y - h.y) < 60).sort((p, q) => Math.abs(p.x - h.x) - Math.abs(q.x - h.x))[0];
-      if (!t) continue;
-      t.applyHit({ x0: t.x - 30, x1: t.x + 30, z0: 0, z1: 160, y: t.y, attackId: newAttackId(), dmg: h.dmg, react: 'flinch', dir: h.dir, push: 3, strength: 1 }, api.world as never);
+    if (fighting) for (const id of [...w.followers]) {
+      const a = w.actors.find((q) => q.def.id === id);
+      if (!a || allies.has(id) || a.scene !== sceneId || a.fighting || w.noAssist(a.def.name) || ['down', 'dead', 'gone', 'door'].includes(a.act)) continue;
+      const look = a.def.look ?? a.def.name;
+      if (!charArt(look)) { void loadChar(look); continue; }
+      const b = spawn({ kind: `ally-char:${look}`, x: a.x, y: a.y } as { kind: string; x: number; y: number });
+      if (!(b instanceof FighterAi)) { if (b) b.alive = false; continue; }
+      if (!w.toAlly(id)) { b.alive = false; continue; }
+      b.hp = Math.max(1, Math.min(b.hpMax, a.hp && a.hp > 0 ? a.hp : b.hpMax));
+      (b as unknown as { dir: 1 | -1 }).dir = a.face;
+      allies.set(id, { body: b as typeof b & { hp: number; hpMax: number; alive: boolean; label: string }, scene: sceneId });
     }
     for (const a of w.challengers(sceneId)) {
       const look = a.def.look ?? a.def.name;
@@ -825,9 +839,23 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
   };
   let squad = new Squad(DIFF[aiDiff].melee);
   let aiN = 0;
+  let allyN = 0;
+  const allySquad = new Squad(DIFF[aiDiff].melee);
   const unknownKinds = new Set<string>();
   const enemyFactory: EnemyFactory = (spec, w) => {
     // 통합 테스트룸 인물 AI: 'ai-char' = 주인공과 같은 인물, 'ai-char:<이름>' = 그 인물 팩(받아 둔 것만). 대련('ai-eileen')도 주인공이 인물 팩이면 그 인물로
+    // 주인공 편 AI (동행): 'ally-char:<이름>' = 그 인물 팩, 적 AI와 같은 두뇌로 적 편 몸과 싸운다 (필드 동행·나중에 괴이 안)
+    if (spec.kind.startsWith('ally-char:') && w.player instanceof FighterPlayer) {
+      const who = spec.kind.slice(10);
+      const art = charArt(who);
+      if (!art) { void loadChar(who); return fallbackEnemy(spec, w); }
+      const n = ++allyN;
+      const ai = new FighterAi((w.player as unknown as { clips: ConstructorParameters<typeof FighterAi>[0] }).clips, art, { id: `ally${n}`, grade: 'B', difficulty: aiDiff, persona: { aggression: 0.6, patience: 0.5, zoning: 0.3, courage: 0.85 }, seed: 5000 + n, squad: allySquad, label: art.cfg.name, side: 'ally' });
+      ai.x = spec.x; ai.y = spec.y;
+      if (!BASE_STATS[art.cfg.name]) { ai.base = rollBase(Math.random); ai.stat = derive(ai.base); ai.baseHp = ai.hp = ai.hpMax = ai.stat.hp; }
+      applyNpcPerks(ai, rollNpcPerks(Math.random, BASE_STATS[art.cfg.name] ? 'named' : 'fighter'));
+      return ai as never;
+    }
     if ((spec.kind === 'ai-char' || spec.kind.startsWith('ai-char:') || spec.kind === 'ai-eileen') && w.player instanceof FighterPlayer) {
       const who = spec.kind.startsWith('ai-char:') ? spec.kind.slice(8) : '';
       const art = who ? charArt(who) : w.player.art;

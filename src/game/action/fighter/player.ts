@@ -222,6 +222,8 @@ export class FighterPlayer extends Player {
   }
   /** 고유기·충전·필살 피해 배율: NPC만 0.5 (docs/설계_기본피해_표준.md 3장) */
   skillMul = 1;
+  /** 주인공 편 AI 몸 (동행, fighter/ai.ts side 'ally'): 주인공 전용 처리(영구 사망·보호막 퍽)를 받지 않는다 */
+  allySide = false;
   get sortY() {
     const p = this.z > 4 ? this.platformAt(this.x, this.y) : null;
     return p && this.z >= p.h - 8 ? p.y1 + 2 : this.y;
@@ -356,7 +358,7 @@ export class FighterPlayer extends Player {
       if (this.shield > 0) { P.armorT = 0.28; (P as { armorC?: string }).armorC = '#5ab8ff'; return { kind: 'armor' }; }   // 슈퍼아머 번쩍과 같고 색만 하늘색
       world.emit({ type: 'guard', x: this.x });
       // 방어막이 깨짐: NPC 는 잠깐 휘청 (남은 피해는 체력으로). 플레이어 보호막(퍽 「방어막」)은 휘청 없이 반응 장갑만
-      if (this.team === 'player') { this.perks.shieldBroke(); this.shieldMax = 0; }
+      if (this.team === 'player' && !this.allySide) { this.perks.shieldBroke(); this.shieldMax = 0; }
       else { this.core.stun(); P.stunT = 0.8; }
       this.hp = Math.max(0, this.hp - Math.round(taken));
       return { kind: 'hit' };
@@ -375,7 +377,7 @@ export class FighterPlayer extends Player {
       world.emit({ type: 'hp:low' });
     }
     // 주인공: 설정 「내가 죽으면」이 영구 사망이면 사망(44·45) → 출동 결과 「사망」, 패퇴면 쓰러져 후송
-    if (this.hp <= 0 && this.team === 'player' && (fighterHooks.permaDeath?.() ?? false)) {
+    if (this.hp <= 0 && this.team === 'player' && !this.allySide && (fighterHooks.permaDeath?.() ?? false)) {
       this.dieNow(lying);
       return { kind: 'hit', killed: true };
     }

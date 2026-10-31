@@ -30,11 +30,14 @@ export function foeSense(b: Body): FoeSense {
 export class FighterAi extends FighterPlayer {
   readonly brain: FighterBrain;
   private pad: Pad = { held: new Set(), pressed: new Set(), released: new Set(), mx: 0, my: 0, evade: false, run: false, downDouble: false };
-  constructor(clips: Record<string, FrameInfo[]>, art: CharArt, o: { id: string; grade: Grade; difficulty: Difficulty; persona: Persona; seed: number; squad?: Squad; label?: string }) {
+  /** side: enemy = 주인공·동행과 싸움(기본), ally = 주인공 편(동행)으로 적과 싸움 — 같은 두뇌·같은 몸 */
+  constructor(clips: Record<string, FrameInfo[]>, art: CharArt, o: { id: string; grade: Grade; difficulty: Difficulty; persona: Persona; seed: number; squad?: Squad; label?: string; side?: 'enemy' | 'ally' }) {
     super(clips, art);
-    // 적 편 몸 (Player는 'player'로 굳어 있어서 덮는다)
-    Object.defineProperty(this, 'team', { value: 'enemy', configurable: true });
-    Object.defineProperty(this, 'kind', { value: 'ai-char', configurable: true });
+    const ally = o.side === 'ally';
+    // 편 (Player는 'player'로 굳어 있어서 덮는다). 동행은 주인공과 같은 편이라 서로 맞지 않는다
+    Object.defineProperty(this, 'team', { value: ally ? 'player' : 'enemy', configurable: true });
+    Object.defineProperty(this, 'kind', { value: ally ? 'ally-char' : 'ai-char', configurable: true });
+    this.allySide = ally;
     this.label = o.label ?? `AI ${art.cfg.name}`;
     // 인물마다 가진 동작·기술이 다르다: 없는 것은 두뇌가 계획하지 않는다 (점프 공격 14·강공 12·사격 15 등)
     const has = (id: string) => !!art.A[id], sk = (art.cfg as { skills?: Record<string, unknown> }).skills ?? {};
@@ -43,10 +46,13 @@ export class FighterAi extends FighterPlayer {
       shoot: has('15') && (art.cfg as { bal?: { gun?: string } }).bal?.gun !== 'none', dodge: has('16'), block: has('17'), flee: has('36'), back: has('37'),
     });
   }
-  /** 때릴 상대 = 주인공 (주인공 편 동행자가 생기면 여기에) */
+  /** 때릴 상대: 적 편 = 주인공 + 동행(주인공 편 AI 몸), 동행 = 적 편 몸 전부 */
   protected foes(): Body[] {
-    const w = this.worldNow;
-    const out = w && w.player.alive ? [w.player as unknown as Body] : [];
+    const w = this.worldNow as (WorldView & { bodies: Body[] }) | null;
+    if (!w) return [];
+    if (this.allySide) return w.bodies.filter((b) => b.alive && b.team === 'enemy' && b.hp > 0 && b.kind !== 'bullet');
+    const out = w.player.alive ? [w.player as unknown as Body] : [];
+    out.push(...w.bodies.filter((b) => b !== (this as unknown as Body) && b.alive && b.team === 'player' && b.hp > 0 && b.kind !== 'bullet'));
     // 제 편 때리기(플레이어 퍽): 혼란 걸린 동안은 다른 적도 맞는다
     if (w && perkWorld.friendlyFire && this.status.has('confuse')) out.push(...(w as WorldView & { bodies: Body[] }).bodies.filter((b) => b !== (this as unknown as Body) && b.alive && b.team === 'enemy' && b.hp > 0 && b.kind !== 'bullet'));
     return out;
@@ -70,11 +76,23 @@ export class FighterAi extends FighterPlayer {
       stunned: ['down', 'belly', 'stun'].includes(me.mode) || this.phase === 'down',
       hp: this.hp / this.hpMax, sp: me.sp ?? 0, guard: this.guard, gap: this.status.attackGap() * this.perkGap * this.npcGap,
     };
-    const foe = foeSense(world.player as unknown as Body);
-    // 미끼 잔상(플레이어 퍽): 남아 있는 동안 그 자리를 노린다
-    if (perkDecoy.until > performance.now()) { foe.x = perkDecoy.x; foe.y = perkDecoy.y; foe.attacking = false; }
-    const d = this.brain.tick(self, foe);
+    // 노릴 상대: 가장 가까운 상대 (적 편은 주인공·동행 중, 동행은 적 중)
+    const t = this.foes().filter((b) => b.team !== this.team).sort((a, b) => Math.abs(a.x - this.x) + Math.abs(a.y - this.y) * 2 - (Math.abs(b.x - this.x) + Math.abs(b.y - this.y) * 2))[0];
     const p = this.pad;
+    if (!t) {
+      // 상대가 없음: 동행은 주인공 곁으로, 적 편은 그대로 선다
+      p.pressed.clear(); p.released.clear(); p.held.clear(); p.mx = 0; p.my = 0; p.run = false; p.evade = false;
+      const pl = world.player as unknown as Body;
+      if (this.allySide && pl.alive && Math.abs(pl.x - this.x) > 160) { const k = pl.x > this.x ? 'right' : 'left'; p.held.add(k); p.mx = k === 'right' ? 1 : -1; p.run = Math.abs(pl.x - this.x) > 400; }
+      if (this.allySide && pl.alive && Math.abs(pl.y - this.y) > 30) { const k = pl.y > this.y ? 'down' : 'up'; p.held.add(k); p.my = k === 'down' ? 1 : -1; }
+      this.lieStep(p, pl.x);
+      this.tick(world, p);
+      return;
+    }
+    const foe = foeSense(t);
+    // 미끼 잔상(플레이어 퍽): 주인공을 노릴 때 남아 있는 동안 그 자리를 노린다
+    if (t === (world.player as unknown as Body) && perkDecoy.until > performance.now()) { foe.x = perkDecoy.x; foe.y = perkDecoy.y; foe.attacking = false; }
+    const d = this.brain.tick(self, foe);
     p.pressed.clear();
     p.released.clear();
     const was = new Set(p.held);

@@ -163,8 +163,6 @@ export interface Actor {
   following?: boolean;
   /** 「기다려」: 그 자리에 남아 기다린다 (할 일을 고르지 않음) */
   hold?: boolean;
-  /** 동행 중 싸움 거들기: 때릴 전투 몸 자리, 다음 타격까지 초 */
-  assist?: { x: number; y: number; t: number } | null;
 }
 
 /** 훈련장 장비 하나 (10-31 사용자: 샌드백·허수아비·사격 과녁. 그림은 일단 코드, 나중에 교체) */
@@ -279,6 +277,8 @@ export const CLEAR_HOURS = 1;
 export const INCIDENT_HOURS = 24;
 /** 시체를 알아보는 거리 */
 const SEE_BODY_PX = 260;
+/** 경보 때 비전투원이 피하는 거리 (위협에서 이만큼 안이면 대피). 화면 폭(1280)의 3분의 1쯤 */
+const ALARM_EVADE_PX = 450;
 /** 기절 직후 죽지 않는 초 (연타 마지막 대에 실수로 죽지 않게) */
 export const KO_GRACE = 2;
 /** 이름 인물: 화난 뒤 이 초 안에 또 맞으면 맞서 싸운다 (C4, 10-31 사용자 가안) */
@@ -972,7 +972,7 @@ export class WorldSim {
         }
         // 비전투원: 위협이 있는 장면이면 반대쪽으로 피한다 (다른 방은 그대로)
         if (a.scene !== t.scene || a.alarm === fac || a.act === 'scared') continue;
-        if (Math.abs(a.x - t.x) > 900) continue;
+        if (Math.abs(a.x - t.x) > ALARM_EVADE_PX) continue;
         a.alarm = fac;
         this.evade(a, t.x);
       }
@@ -1255,8 +1255,6 @@ export class WorldSim {
   readonly followers: string[] = [];
   /** 주인공 발자국 (최근 몇 초) */
   private trail: { t: number; x: number; y: number }[] = [];
-  /** 동행이 전투 몸을 때린 것 (게임 쪽이 꺼내 전투 몸에 맞힌다) */
-  readonly assistHits: { who: string; x: number; y: number; dir: 1 | -1; dmg: number }[] = [];
   /** 싸움에서 빠지는 사람 (비전투 계열): 동행이어도 거들지 않는다 */
   noAssist: (name: string) => boolean = () => false;
   /** 이름(또는 id)으로 행위자 */
@@ -1286,7 +1284,6 @@ export class WorldSim {
       if (i < 0 && !a.following && !(mode === 'return' && a.hold)) return false;
       if (i >= 0) this.followers.splice(i, 1);
       a.following = false;
-      a.assist = null;
       a.hold = mode === 'wait';
       if (a.act !== 'down') {
         a.goal = null;
@@ -1299,14 +1296,33 @@ export class WorldSim {
     this.events.push({ kind: 'follow', scene: a.scene, who: a.def.name, mode });
     return true;
   }
-  /** 싸움 거들기 대상 (게임 쪽이 매 틱 정한다). null = 싸움 없음 */
-  setAssist(id: string, at: { x: number; y: number } | null): void {
+  /** 동행이 주인공 편 전투 몸으로 싸우러 나감 (돌아올 때까지 시뮬에서 뺀다) */
+  toAlly(id: string): boolean {
     const a = this.actors.find((q) => q.def.id === id);
-    if (!a?.following) return;
-    if (!at) { a.assist = null; return; }
-    a.assist = { x: at.x, y: at.y, t: a.assist?.t ?? range(this.rng, 0.3, 0.8) };
+    if (!a?.following || a.fighting) return false;
+    a.fighting = true;
+    a.goal = null;
+    a.route = [];
+    return true;
   }
-  /** 동행 한 틱: 주인공이 지나간 자리를 조금 뒤처져 걷는다. 싸움 중이면 상대에게 붙어 때린다 */
+  /** 싸움 끝: 다시 따라 걷는다. down = 몸이 쓰러짐 → 그 자리에 기절, 동행이 풀린다 */
+  fromAlly(id: string, x: number, y: number, down: boolean, hp?: number): void {
+    const a = this.actors.find((q) => q.def.id === id);
+    if (!a || !a.fighting) return;
+    a.fighting = false;
+    if (hp !== undefined) { a.hp = hp; a.hpMax ??= hp; }
+    a.x = x;
+    a.y = y;
+    if (!down) { a.act = 'idle'; a.wait = 0.3; this.setClip(a, 'idle'); return; }
+    a.hp = 0;
+    a.act = 'down';
+    a.doing = '기절';
+    a.downAt = this.time;
+    a.wait = range(this.rng, 15, 25);
+    this.setClip(a, this.canClip(a, 'down') ? 'down' : 'idle');
+    this.setFollow(id, 'hit');
+  }
+  /** 동행 한 틱: 주인공이 지나간 자리를 조금 뒤처져 걷는다 (싸움은 주인공 편 전투 AI 몸이 한다: toAlly) */
   private stepFollow(a: Actor, dt: number): void {
     const p = this.player;
     if (a.act === 'down' || a.act === 'scared') return;   // 맞아 쓰러짐·겁먹음은 그대로 (쓰러짐은 struck 에서 동행이 풀린다)
@@ -1315,26 +1331,6 @@ export class WorldSim {
     if (a.scene !== p.scene) { this.joinScene(a, p.scene, p.x, p.y); return; }
     const order = Math.max(0, this.followers.indexOf(a.def.id));
     const speed = (a.def.speed ?? WALK);
-    if (a.assist) {
-      const t = a.assist;
-      const gap = Math.abs(t.x - a.x);
-      a.face = t.x > a.x ? 1 : -1;
-      a.act = 'walk';
-      a.doing = '주인공을 거들어 싸움';
-      if (gap > 80 || Math.abs(t.y - a.y) > 24) {
-        const sp = speed * 1.5 * dt;
-        a.x += Math.sign(t.x - a.x) * Math.min(sp, Math.max(0, gap - 70));
-        a.y += Math.sign(t.y - a.y) * Math.min(sp * 0.5, Math.abs(t.y - a.y));
-        if (a.clip !== 'run' && a.clip !== 'walk') this.setClip(a, this.canClip(a, 'run') ? 'run' : 'walk');
-        return;
-      }
-      if ((t.t -= dt) > 0) { if (a.clip === 'run' || a.clip === 'walk') this.setClip(a, 'idle'); return; }
-      t.t = range(this.rng, 0.9, 1.4);
-      this.setClip(a, this.canClip(a, 'strike') ? 'strike' : 'idle');
-      a.base ??= baseOf(a.def.look ?? a.def.name);
-      this.assistHits.push({ who: a.def.id, x: t.x, y: t.y, dir: a.face, dmg: Math.round(60 * derive(a.base).power * range(this.rng, 0.8, 1.2)) });
-      return;
-    }
     // 1초 + 사람마다 0.6초 뒤 발자국. 너무 붙으면 간격을 둔다
     const want = this.time - (1 + order * 0.6);
     let hit = this.trail[0] ?? { t: this.time, x: p.x, y: p.y };
