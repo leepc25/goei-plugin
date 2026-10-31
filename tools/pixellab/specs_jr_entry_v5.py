@@ -6,7 +6,7 @@ d = json.load(open(D + 'jr_entry_p1_v4.json')); d['name'] = 'jr_entry_p1_v5'
 d['floor_share'] = "the lower 30 percent, all sidewalk, with only a very thin curb and road line at the bottom edge"
 T = {
  "right 30 percent: the front end of a freestanding arcade entrance on the sidewalk like a subway exit, apart from the buildings, the rest past the right edge, open end facing left, stairs going down left to right into darkness, waist-high railings, a glass canopy":
- "right 30 percent: only the front end of a freestanding arcade entrance on the sidewalk like a Seoul subway exit, the rest continuing past the right edge, open end facing left, stairs going down to the right into darkness, waist-high railings on both sides, a glass canopy",
+ "right 30 percent: only the front end of a freestanding arcade entrance on the sidewalk like a Seoul subway exit, the rest past the right edge, open end facing left, stairs going down to the right into darkness, waist-high railings on both sides, a glass canopy",
  "bottom edge: a curb and a thin asphalt strip, no cars": "bottom edge: a very thin curb and road line, no cars",
 }
 for i in d['items']: i['text'] = T.get(i['text'], i['text'])

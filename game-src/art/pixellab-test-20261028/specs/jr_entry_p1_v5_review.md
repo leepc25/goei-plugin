@@ -4,8 +4,7 @@
 
 ## 점검 결과
 
-- FAIL 2008자 > 2000
-- WARN 설명이 김(47낱말): right 30 percent: only the front end of a freestanding arcade entrance on the sidewalk like a Seoul subway exit, the rest continuing past the right edge, open end facing left, stairs going down to the right into darkness, waist-high railings on both sides, a glass canopy
+- WARN 설명이 김(46낱말): right 30 percent: only the front end of a freestanding arcade entrance on the sidewalk like a Seoul subway exit, the rest past the right edge, open end facing left, stairs going down to the right into darkness, waist-high railings on both sides, a glass canopy
 - WARN 설명이 김(20낱말): on the building fronts: faded blank signs, closed shutters, a small open shop, a note reading "임대" on a window
 - WARN 같은 낱말 4번: edge
 - WARN 바닥 칸에 빛·그림자 없음
@@ -40,7 +39,7 @@
 
 | # | 1차 (상세) | 근거 | 남길 낱말 | 2차 (실제) | 뺀 낱말(이유) |
 |---|---|---|---|---|---|
-| 0 | right 30 percent: only the front end of a freestanding arcade entrance on the sidewalk like a Seoul subway exit, the rest continuing past the right edge, open end facing left, stairs going down to the right into darkness, waist-high railings on both sides, a glass canopy over it | 사용자: 오른쪽에 지하철 출입구 같은 지하상가 입구 |  | right 30 percent: only the front end of a freestanding arcade entrance on the sidewalk like a Seoul subway exit, the rest continuing past the right edge, open end facing left, stairs going down to the right into darkness, waist-high railings on both sides, a glass canopy |  |
+| 0 | right 30 percent: only the front end of a freestanding arcade entrance on the sidewalk like a Seoul subway exit, the rest continuing past the right edge, open end facing left, stairs going down to the right into darkness, waist-high railings on both sides, a glass canopy over it | 사용자: 오른쪽에 지하철 출입구 같은 지하상가 입구 |  | right 30 percent: only the front end of a freestanding arcade entrance on the sidewalk like a Seoul subway exit, the rest past the right edge, open end facing left, stairs going down to the right into darkness, waist-high railings on both sides, a glass canopy | continuing(**이유 없음**) |
 | 1 | on top of the canopy, right above the entrance: a sign board reading "중림지하상가" | 사용자: 간판은 입구 위 |  | on the canopy, right above the entrance: a sign board reading "중림지하상가" |  |
 | 2 | clear sidewalk at the entrance | 출입구 앞 비움 |  | clear sidewalk at the entrance |  |
 | 3 | back: old low-rise shop buildings along the whole width, ground floor and part of the second floor, tops cut off | 거리 뒤 건물 |  | back: old shop fronts along the whole width, signs right under the top edge, no upper floors | low-rise(**이유 없음**); buildings(**이유 없음**); ground(**이유 없음**); second(**이유 없음**); cut(**이유 없음**); off(**이유 없음**) |
@@ -69,12 +68,12 @@
 - 원근·바닥 몫·양옆 벽·문·채우기가 이 장면에 정한 대로인가?
   - 카메라·원근 문장 지하와 같음, 첫 줄 높이 한계(v4), 바닥 30% 인도만, 가이드 v3
 
-## 2차 요청문 (2008자)
+## 2차 요청문 (1997자)
 
 ```
 Pixel art game background of the ground floor shop fronts of a run-down 1990s Seoul shopping street, seen up close from the sidewalk, the image top right above the shop signs, late morning daylight. Camera at standing eye height, about 20 degrees above the floor, looking slightly down. One-point depth, but the building fronts behind the sidewalk run straight and level across the full width. The floor fills the lower 30 percent, all sidewalk, with only a very thin curb and road line at the bottom edge of the image. Nothing closes the sides: the street keeps going past both image edges.
 FLOOR: smooth grey concrete sidewalk like one sheet, litter.
-PACKED WITH STUFF, every area filled, no empty wall, no empty floor corner: right 30 percent: only the front end of a freestanding arcade entrance on the sidewalk like a Seoul subway exit, the rest continuing past the right edge, open end facing left, stairs going down to the right into darkness, waist-high railings on both sides, a glass canopy; on the canopy, right above the entrance: a sign board reading "중림지하상가"; clear sidewalk at the entrance; back: old shop fronts along the whole width, signs right under the top edge, no upper floors; on the building fronts: faded blank signs, closed shutters, a small open shop, a note reading "임대" on a window; against the buildings: a vending machine, a parked motorbike, potted plants, trash bags and boxes; a utility pole cut off at the top; an old public phone; a torn redevelopment banner on a shutter; bottom edge: a very thin curb and road line, no cars; left 10 percent: shop fronts continuing past the edge.
+PACKED WITH STUFF, every area filled, no empty wall, no empty floor corner: right 30 percent: only the front end of a freestanding arcade entrance on the sidewalk like a Seoul subway exit, the rest past the right edge, open end facing left, stairs going down to the right into darkness, waist-high railings on both sides, a glass canopy; on the canopy, right above the entrance: a sign board reading "중림지하상가"; clear sidewalk at the entrance; back: old shop fronts along the whole width, signs right under the top edge, no upper floors; on the building fronts: faded blank signs, closed shutters, a small open shop, a note reading "임대" on a window; against the buildings: a vending machine, a parked motorbike, potted plants, trash bags and boxes; a utility pole cut off at the top; an old public phone; a torn redevelopment banner on a shutter; bottom edge: a very thin curb and road line, no cars; left 10 percent: shop fronts continuing past the edge.
 WALL: grimy concrete and old tile, peeling paint, rust.
 LIGHT: soft daylight shadows under objects and the canopy, dark stairwell.
 STYLE: dense, highly detailed pixel art, crisp pixel clusters, selective dark outline, rich medium-to-detailed shading, faded grey, beige, dull blue, rust, soft daylight, no dithering, no blur. No people, chairs, sofas, benches, coffee tables, clocks or cars.
