@@ -1,0 +1,109 @@
+{
+ "scene": {
+  "file": "me_jr_alley",
+  "w": 7584,
+  "h": 848,
+  "under": true,
+  "lane": [
+   690,
+   836
+  ],
+  "floor": [
+   [
+    120,
+    690
+   ],
+   [
+    7470,
+    690
+   ],
+   [
+    7470,
+    848
+   ],
+   [
+    120,
+    848
+   ]
+  ],
+  "holes": [],
+  "dotK": 1.4292,
+  "blocks": [],
+  "doors": {
+   "heolgap": {
+    "x0": 466,
+    "x1": 600,
+    "y0": 250,
+    "y1": 580,
+    "anim": "none",
+    "behind": "dark"
+   },
+   "b1": {
+    "x0": 4414,
+    "x1": 4696,
+    "y0": 256,
+    "y1": 624,
+    "anim": "none",
+    "behind": "dark"
+   }
+  },
+  "lamps": [],
+  "windows": [],
+  "objects": [
+   {
+    "id": "pillar1",
+    "file": "me_jr_alley_pillar1",
+    "x": 1206,
+    "y": 0,
+    "w": 116,
+    "h": 848,
+    "sortY": 9999
+   },
+   {
+    "id": "pillar2",
+    "file": "me_jr_alley_pillar2",
+    "x": 2470,
+    "y": 0,
+    "w": 116,
+    "h": 848,
+    "sortY": 9999
+   },
+   {
+    "id": "pillar3",
+    "file": "me_jr_alley_pillar3",
+    "x": 3734,
+    "y": 0,
+    "w": 116,
+    "h": 848,
+    "sortY": 9999
+   },
+   {
+    "id": "pillar4",
+    "file": "me_jr_alley_pillar4",
+    "x": 4996,
+    "y": 0,
+    "w": 120,
+    "h": 848,
+    "sortY": 9999
+   },
+   {
+    "id": "pillar5",
+    "file": "me_jr_alley_pillar5",
+    "x": 6260,
+    "y": 0,
+    "w": 120,
+    "h": 848,
+    "sortY": 9999
+   }
+  ]
+ },
+ "spots": [],
+ "files": [
+  "me_jr_alley",
+  "me_jr_alley_pillar1",
+  "me_jr_alley_pillar2",
+  "me_jr_alley_pillar3",
+  "me_jr_alley_pillar4",
+  "me_jr_alley_pillar5"
+ ]
+}

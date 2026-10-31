@@ -1,0 +1,118 @@
+{
+ "file": "jr_alley_strip",
+ "bgScale": 2,
+ "w": 7584,
+ "h": 848,
+ "under": true,
+ "floor": [
+  [
+   120,
+   690
+  ],
+  [
+   7470,
+   690
+  ],
+  [
+   7470,
+   848
+  ],
+  [
+   120,
+   848
+  ]
+ ],
+ "lane": [
+  690,
+  836
+ ],
+ "blocks": [],
+ "doors": {
+  "heolgap": {
+   "kind": "door",
+   "x": 532,
+   "y": 700,
+   "to": "jr_heolgap",
+   "toDoor": "out",
+   "label": "헐값 매입",
+   "door": {
+    "x0": 466,
+    "x1": 600,
+    "y0": 250,
+    "y1": 580,
+    "anim": "none",
+    "behind": "dark"
+   }
+  },
+  "b1": {
+   "kind": "door",
+   "x": 4554,
+   "y": 700,
+   "to": "jr_b1",
+   "toDoor": "alley",
+   "label": "앞골목",
+   "door": {
+    "x0": 4414,
+    "x1": 4696,
+    "y0": 256,
+    "y1": 624,
+    "anim": "none",
+    "behind": "dark"
+   }
+  }
+ },
+ "lamps": [],
+ "spots": [],
+ "objects": [
+  {
+   "id": "pillar1",
+   "name": "앞 기둥 1",
+   "file": "pillar1",
+   "x": 1206,
+   "y": 0,
+   "w": 116,
+   "h": 848,
+   "sortY": 9999
+  },
+  {
+   "id": "pillar2",
+   "name": "앞 기둥 2",
+   "file": "pillar2",
+   "x": 2470,
+   "y": 0,
+   "w": 116,
+   "h": 848,
+   "sortY": 9999
+  },
+  {
+   "id": "pillar3",
+   "name": "앞 기둥 3",
+   "file": "pillar3",
+   "x": 3734,
+   "y": 0,
+   "w": 116,
+   "h": 848,
+   "sortY": 9999
+  },
+  {
+   "id": "pillar4",
+   "name": "앞 기둥 4",
+   "file": "pillar4",
+   "x": 4996,
+   "y": 0,
+   "w": 120,
+   "h": 848,
+   "sortY": 9999
+  },
+  {
+   "id": "pillar5",
+   "name": "앞 기둥 5",
+   "file": "pillar5",
+   "x": 6260,
+   "y": 0,
+   "w": 120,
+   "h": 848,
+   "sortY": 9999
+  }
+ ]
+}

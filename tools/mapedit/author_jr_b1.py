@@ -18,8 +18,8 @@ W, H = strip.width * K, 848
 FLOOR_Y = 690                                   # 그림 y345 × 2: 가게 앞 물건 바닥선보다 앞
 objects = []
 for i in range(1, len(PANELS)):
-    n = (i - 1) % 4 + 1
-    pl = Image.open(A / f'jr_pillar4_v1_{n}.png'); pl.save(OUT / f'pillar{n}.png')
+    n = (i - 1) % 5 + 1   # 앞 기둥 v3(정면만·어둡게, 사용자 10-31 확정)
+    pl = Image.open(A / f'jr_pillar5_front_v3_front_{n}.png'); pl.save(OUT / f'pillar{n}.png')
     w = pl.width * K
     objects.append({'id': f'pillar{i}', 'name': f'앞 기둥 {i}', 'file': f'pillar{n}', 'x': PW * i * K - w // 2, 'y': 0, 'w': w, 'h': H, 'sortY': 9999})
 def door(x0, x1, y0, y1):                       # 그림(632 기준, 칸 i) 좌표 → 게임 좌표

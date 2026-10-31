@@ -77,54 +77,54 @@
    {
     "id": "pillar1",
     "file": "me_jr_b1_pillar1",
-    "x": 1159,
+    "x": 1194,
     "y": 0,
-    "w": 210,
+    "w": 140,
     "h": 848,
     "sortY": 9999
    },
    {
     "id": "pillar2",
     "file": "me_jr_b1_pillar2",
-    "x": 2424,
+    "x": 2459,
     "y": 0,
-    "w": 208,
+    "w": 138,
     "h": 848,
     "sortY": 9999
    },
    {
     "id": "pillar3",
     "file": "me_jr_b1_pillar3",
-    "x": 3688,
+    "x": 3722,
     "y": 0,
-    "w": 208,
+    "w": 140,
     "h": 848,
     "sortY": 9999
    },
    {
     "id": "pillar4",
     "file": "me_jr_b1_pillar4",
-    "x": 4952,
+    "x": 4986,
     "y": 0,
-    "w": 208,
+    "w": 140,
     "h": 848,
     "sortY": 9999
    },
    {
     "id": "pillar5",
     "file": "me_jr_b1_pillar5",
-    "x": 6215,
+    "x": 6249,
     "y": 0,
-    "w": 210,
+    "w": 142,
     "h": 848,
     "sortY": 9999
    },
    {
     "id": "pillar6",
     "file": "me_jr_b1_pillar6",
-    "x": 7480,
+    "x": 7514,
     "y": 0,
-    "w": 208,
+    "w": 140,
     "h": 848,
     "sortY": 9999
    }
