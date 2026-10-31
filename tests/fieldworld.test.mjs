@@ -343,16 +343,24 @@ test('대사 연출: 소매치기 사건이 나면 피해자가 말한다, 보�
   assert.equal(v.say, '내 지갑!');
 });
 
-test('인물끼리 대화·시비는 글 대사 대신 작은 말풍선 (10-31 사용자), 피해자 외침 같은 말은 그대로', () => {
+test('인물끼리 대화·시비는 대개 작은 말풍선, 가끔 대사 (10-31 사용자), 피해자 외침 같은 말은 그대로', () => {
   const sim = new A.WorldSim(graph(), R.mulberry32(3));
   const a = sim.add({ id: 'a', name: '불량배', kind: 'mob', brain: 'transit', home: 'jongno', archetype: '불량배' }, { x: 900, y: 560 });
   const b = sim.add({ id: 'b', name: '행인', kind: 'mob', brain: 'transit', home: 'jongno', archetype: '행인' }, { x: 950, y: 560 });
   const ch = new SP.Chatter(sim, new L.Lines(dlg, sim.rng), () => ({ hour: 12, faction: 'A00', level: 1 }));
   ch.step(1 / 30, 'jongno', 800, [{ kind: 'harass', scene: 'jongno', who: '불량배', target: '행인', x: 900 }]);
-  assert.equal(a.icon, '#');
-  assert.equal(b.icon, '?');
-  assert.equal(a.say, undefined);
-  assert.equal(b.say, undefined);
+  // 대개는 말풍선, 가끔 대사 (한 사람은 둘 중 하나만, 장면에 글은 하나까지)
+  for (const [p, e] of [[a, '#'], [b, '?']]) assert.ok((p.icon === e) !== !!p.say, `${p.def.name}: ${p.icon} / ${p.say}`);
+  assert.ok(!(a.say && b.say), '글 말풍선은 하나까지');
+  let lines = 0, emotes = 0;
+  for (let seed = 1; seed <= 200; seed++) {
+    const s2 = new A.WorldSim(graph(), R.mulberry32(seed));
+    const x = s2.add({ id: 'a', name: '불량배', kind: 'mob', brain: 'transit', home: 'jongno', archetype: '불량배' }, { x: 900, y: 560 });
+    s2.add({ id: 'b', name: '행인', kind: 'mob', brain: 'transit', home: 'jongno', archetype: '행인' }, { x: 950, y: 560 });
+    new SP.Chatter(s2, new L.Lines(dlg, s2.rng), () => ({ hour: 12, faction: 'A00', level: 1 })).step(1 / 30, 'jongno', 800, [{ kind: 'harass', scene: 'jongno', who: '불량배', target: '행인', x: 900 }]);
+    if (x.say) lines++; else if (x.icon) emotes++;
+  }
+  assert.ok(emotes > lines * 2, `말풍선 ${emotes} · 대사 ${lines}`);   // 대사 자료에 그 줄이 없으면 늘 말풍선
 });
 
 test('시간 보내기 선택지: 짧게·길게·다음 시간대·근무 끝까지', () => {

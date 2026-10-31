@@ -5,6 +5,8 @@ import type { LineCtx, Lines } from './lines';
 
 /** 인물끼리 상호작용 상황 → 말풍선 기호 (수다 = 「…」 결정, 시비 = 화남 #·당한 쪽 ?) */
 const PAIR: Record<string, string> = { chat: '…', harass: '#', harassed: '?' };
+/** 인물끼리 상호작용에서 말풍선 대신 대사를 칠 확률 */
+export const PAIR_LINE = 0.25;
 const TASK_TAG: Record<string, string> = { work: 'work', eat: 'eat', rest: 'rest', pee: 'restroom', poo: 'restroom', chat: 'chat', hobby: 'hobby' };
 
 export class Chatter {
@@ -16,10 +18,13 @@ export class Chatter {
     return this.sim.time - (this.last.get(a.def.id) ?? -999) > gap;
   }
   private talk(a: Actor, tag: string, partner?: string): boolean {
-    // 인물끼리 주고받는 것(대화·시비)은 대사를 정해 둘 수 없다 → 머리 위 작은 말풍선 (10-31 사용자). 그 밖의 말은 대사 자료대로
+    // 인물끼리 주고받는 것(대화·시비): 대사를 칠 때도 있지만 대개는 머리 위 작은 말풍선으로 대신한다 (10-31 사용자).
+    // 대사는 PAIR_LINE 확률로, 그 장면에 글 말풍선이 하나도 없을 때만 (화면이 지저분하지 않게)
     const pair = PAIR[tag];
     if (pair) {
-      this.sim.emote(a, pair, 2.5);
+      const line = this.sim.rng() < PAIR_LINE && !this.sim.inScene(a.scene).some((q) => q.say) ? this.lines.bark(a.def.kind, a.def.name, tag, this.ctx(a), { archetype: a.def.archetype, partner }) : null;
+      if (line) this.sim.say(a, line, Math.min(4.5, 1.8 + line.length * 0.12));
+      else this.sim.emote(a, pair, 2.5);
       this.last.set(a.def.id, this.sim.time);
       return true;
     }
