@@ -74,7 +74,13 @@ def run(n):
             "directions": [D], "frame_count": frames, "subject_description": SUB, "initial_pose": f"standing upright {side}",
             "keep_first_frame": False, "enhance_prompt": False, "custom_start_frame": b64(start)}
     if opt == "loop": body["end_frame"] = b64(start)
-    if opt == "back": body["end_frame"] = b64(last("A"))
+    if opt == "back":
+        end = last("A")
+        if end.size != start.size:   # 시작·끝 장 크기를 맞춘다 (PixelLab 422)
+            size = (max(end.width, start.width), max(end.height, start.height))
+            start, end = m3.pad(start, size), m3.pad(end, size)
+            body["custom_start_frame"] = b64(start)
+        body["end_frame"] = b64(end)
     for _ in range(40):
         try: r = m3.req("POST", "/characters/animations", body); break
         except Exception as e:
@@ -98,5 +104,7 @@ def run(n):
     m3.sheet(fr, OUT / f"샤워2_{n}_sheet.png")
     return n, f"완료 {len(fr)}장 {json.dumps(j.get('usage'))}"
 from concurrent.futures import ThreadPoolExecutor as _E
+if len(sys.argv) > 2:   # 줄 하나만: python3 _test/shower_hit.py <키> S4
+    print(key, run(sys.argv[2]), flush=True); sys.exit()
 with _E(3) as ex: print(key, list(ex.map(run, ["S1", "S2", "S3", "S5"])), flush=True)
 print(key, run("S4"), flush=True)
