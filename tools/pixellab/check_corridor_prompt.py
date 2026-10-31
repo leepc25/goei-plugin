@@ -21,7 +21,9 @@ if end != 'left' and 'left 10 percent of the image: only bare back wall and floo
 if end != 'right' and 'right 10 percent of the image: only bare back wall and floor' not in p: fails.append('오른쪽 10% 비움 줄 없음')
 if 'reading "' in p and 'OPEN' not in p and not any(k in p for k in ('right above the opening, just under the ceiling strip','sign board','sign band','blade sign','hanging sign','empty sign board')): fails.append('간판 자리 문구 없음')
 if ('neon sign reading' in p or 'awning' in p) and 'right above the opening, just under the ceiling strip' not in p: fails.append('네온·차양 간판은 자리를 「천장 띠 바로 아래·입구 바로 위」로 고정해야 함(사용자 10-31: 높이 안 맞음)')
-if 'left of the shop' not in p or 'right of the shop' not in p: fails.append('소품이 가게 양쪽에 나뉘어 있지 않음(left of the shop / right of the shop)')
+if '--front-props' in sys.argv:   # 가게 양옆 벽 소품 금지(사용자 10-31 지하 2층: 80%+양끝 10%라 양옆 소품이 가게를 줄임)
+    if 'left of the shop' in p or 'right of the shop' in p: fails.append('가게 양옆 벽 소품 있음(--front-props: 소품은 가게 앞면·앞 바닥·천장으로)')
+elif 'left of the shop' not in p or 'right of the shop' not in p: fails.append('소품이 가게 양쪽에 나뉘어 있지 않음(left of the shop / right of the shop)')
 # 금지 목록(STYLE 끝 「No …」)은 앞골목 ④와 같아야 함. 끝 칸만 그쪽 것(왼쪽 옆벽 / 오른쪽 계단)을 뺄 수 있음(사용자 10-31 지하 2층 v1: 가운데 칸에서 stairs·side walls를 빼 제각각)
 import re as _re
 _no = lambda t: _re.search(r'No (people.*?)\.\s*$', t.strip().split('\n')[-1])
