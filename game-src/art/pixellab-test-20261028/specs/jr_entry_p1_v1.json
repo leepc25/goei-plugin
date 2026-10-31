@@ -21,8 +21,8 @@
  "sized": [],
  "items": [
   {
-   "full": "right 35 percent: a freestanding arcade entrance on the sidewalk like a Seoul subway exit, open end facing left, stairs going down to the right into darkness, waist-high railings on both sides, a glass canopy over it",
-   "text": "right 35 percent: a freestanding arcade entrance on the sidewalk like a Seoul subway exit, open end facing left, stairs going down to the right into darkness, waist-high railings on both sides, a glass canopy over it",
+   "full": "right 60 percent: a long freestanding arcade entrance on the sidewalk like a Seoul subway exit, running from the middle to past the right edge, open end facing left, stairs going down to the right into darkness, waist-high railings along both sides, a long glass canopy over it",
+   "text": "right 60 percent: a long freestanding arcade entrance on the sidewalk like a Seoul subway exit, running from the middle to past the right edge, open end facing left, stairs going down to the right into darkness, waist-high railings along both sides, a long glass canopy over it",
    "why": "사용자: 오른쪽에 지하철 출입구 같은 지하상가 입구",
    "keep": []
   },
@@ -33,8 +33,8 @@
    "keep": []
   },
   {
-   "full": "clear empty sidewalk in front of the entrance",
-   "text": "clear empty sidewalk in front of the entrance",
+   "full": "clear sidewalk before the entrance",
+   "text": "clear sidewalk before the entrance",
    "why": "출입구 앞 비움",
    "keep": []
   },
@@ -45,14 +45,14 @@
    "keep": []
   },
   {
-   "full": "on the building fronts: faded blank signs, closed rusty shutters, a small open shop, a note reading \"임대\" on an empty window",
-   "text": "on the building fronts: faded blank signs, closed rusty shutters, a small open shop, a note reading \"임대\" on an empty window",
+   "full": "on the building fronts: faded blank signs, closed shutters, a small open shop, a note reading \"임대\" on an empty window",
+   "text": "on the building fronts: faded blank signs, closed shutters, a small open shop, a note reading \"임대\" on an empty window",
    "why": "낡은 상가 거리",
    "keep": []
   },
   {
-   "full": "against the buildings: a vending machine, a parked delivery motorbike, potted plants, trash bags and boxes",
-   "text": "against the buildings: a vending machine, a parked delivery motorbike, potted plants, trash bags and boxes",
+   "full": "against the buildings: a vending machine, a parked motorbike, potted plants, trash bags and boxes",
+   "text": "against the buildings: a vending machine, a parked motorbike, potted plants, trash bags and boxes",
    "why": "거리 소품(인도 뒤쪽, 걷는 길 비움)",
    "keep": []
   },
@@ -75,8 +75,8 @@
    "keep": []
   },
   {
-   "full": "bottom 8 percent: a granite curb and a strip of asphalt road, no cars, no road markings",
-   "text": "bottom 8 percent: a granite curb and a strip of asphalt road, no cars, no road markings",
+   "full": "bottom 8 percent: a curb and an asphalt strip, no cars, no markings",
+   "text": "bottom 8 percent: a curb and an asphalt strip, no cars, no markings",
    "why": "사용자: 차도는 맨 아래 띠, 걷지 않음",
    "keep": []
   },
