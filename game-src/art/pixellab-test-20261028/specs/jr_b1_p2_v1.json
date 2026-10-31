@@ -5,7 +5,7 @@
  "doors": 0,
  "mode": "loose",
  "view": "flat",
- "floor_share": "the same lower part as in the reference image",
+ "floor_share": "the lower quarter",
  "sides": "none",
  "density": "packed",
  "place": "a run-down 1990s Seoul underground arcade corridor, continuing right from the reference image",

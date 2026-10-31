@@ -1,6 +1,6 @@
 # 검토서 jr_b1_p2_v1
 
-방 corridor · 분위기 worn · 문 0 · 원근 flat · 바닥 the same lower part as in the reference image · 양옆 none · 채우기 packed
+방 corridor · 분위기 worn · 문 0 · 원근 flat · 바닥 the lower quarter · 양옆 none · 채우기 packed
 
 ## 점검 결과
 
@@ -67,10 +67,10 @@
 - 원근·바닥 몫·양옆 벽·문·채우기가 이 장면에 정한 대로인가?
   - flat 정면, 옆벽 없음, 바닥 몫·벽선·천장·색은 참고 그림(①)과 같게, 문 없음, 양끝 기둥
 
-## 2차 요청문 (1988자)
+## 2차 요청문 (1960자)
 
 ```
-Pixel art game background of a run-down 1990s Seoul underground arcade corridor, continuing right from the reference image, late at night. Camera at standing eye height, about 20 degrees above the floor, looking slightly down. Flat front view, no vanishing point. The floor fills the same lower part as in the reference image of the image. No side walls: the room keeps going past both image edges.
+Pixel art game background of a run-down 1990s Seoul underground arcade corridor, continuing right from the reference image, late at night. Camera at standing eye height, about 20 degrees above the floor, looking slightly down. Flat front view, no vanishing point. The floor fills the lower quarter of the image. No side walls: the room keeps going past both image edges.
 FLOOR: seamless grey concrete, no grid, no seams, oil stains, puddle, grime, varied litter, warm light pool, black shadow under objects.
 PACKED WITH STUFF, every area filled, no empty wall, no empty floor corner: left image edge: the same plain concrete pillar as the right edge of the reference image; back wall: an open hardware store recessed like a lit room, inner side walls visible, vertical blade sign reading "성원철물" in blocky pixel letters; hundreds of tiny tools and metal parts hung and piled messily on walls and shelves: pliers, wrenches, hammers, screws, hinges, padlocks, wire coils; wheeled display cart sticking out onto the walkway, top and side faces visible, with bins of nails and bolts; hardware boxes, a coiled hose, a stack of buckets for sale; oil stain under the cart; at the wall base: collapsed cardboard, torn trash bag, rusty cans, each a different shape; dented metal trash can, recycling bin; faded fire extinguisher box; two torn blank posters; air conditioner, tangled cables; right image edge: only a plain concrete pillar, nothing else.
 WALL: same grimy concrete as the reference, rust streaks, mold, cracks; same thin ceiling strip, cables, fluorescent tubes, one dead.
