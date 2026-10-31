@@ -177,6 +177,24 @@ test('활동 줄 고르기(10-31): 앉는 줄은 그 방향 빈 의자에서, �
   assert.ok(onceSec <= 4, '기지개는 몇 초만');
 });
 
+test('앉아 있다 맞으면(10-31): 굴러떨어지기(169) → 일어나기 → 반응, 서 있으면 바로 반응', () => {
+  const sc = scenes.map((s) => (s.id === 'office' ? { ...s, seats: [{ x: 600, y: 560, box: 0 }] } : s));
+  const sim = new A.WorldSim(new P.PlaceGraph(sc, elevator, kinds), R.mulberry32(5), { has: (_l, c) => ['walk', 'idle', 'angry', 'getup', 'line:169', 'line:63'].includes(c) });
+  const a = sim.add({ id: 'j', name: '잼트리', kind: 'named', brain: 'needs', home: 'office', roam: ['office'], look: '잼트리' });
+  let t = 0;
+  while (!a.seat && t++ < 30 * 3600) sim.step(1 / 30, { scene: 'street', x: 0, hour: 11 });
+  assert.ok(a.seat, '의자에 앉음');
+  sim.hitActor('j', 1, 1);
+  assert.equal(a.clip, 'line:169');
+  const clips = [];
+  for (let i = 0; i < 30 * 4; i++) { sim.step(1 / 30, { scene: 'street', x: 0, hour: 11 }); if (clips.at(-1) !== a.clip) clips.push(a.clip); }
+  assert.deepEqual(clips.slice(0, 2), ['line:169', 'getup']);
+  assert.ok(clips.includes('angry'), clips.join(','));
+  const b = sim.add({ id: 'k', name: '쟈알디', kind: 'named', brain: 'needs', home: 'office', roam: ['office'], look: '쟈알디' }, { scene: 'office', x: 900, y: 560 });
+  sim.hitActor('k', 1, 2);
+  assert.equal(b.clip, 'angry');
+});
+
 test('욕구 AI: 수다는 상대와 둘이 같이', () => {
   const sim = new A.WorldSim(graph(), R.mulberry32(4), { has: (_l, c) => c === 'talk' });
   const a = sim.add({ id: 'a', name: '큐라스', kind: 'named', brain: 'needs', home: 'office', roam: ['office'] });

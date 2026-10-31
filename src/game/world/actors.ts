@@ -65,6 +65,9 @@ export interface Actor {
   /** 활동에서 고른 줄 (ACT_OPTS), 바로 전에 한 줄 (같은 것 연달아 덜 고르게) */
   opt?: ActOpt;
   lastLine?: string;
+  /** 이어 틀 클립 (맞고 의자에서 굴러떨어짐 → 일어나기 → 반응): 머리 클립이 끝나면 다음으로 */
+  clipQ?: { clip: string; sec: number }[];
+  clipQT?: number;
   /** 머리 위 아이콘 (! ? ♪ … #) */
   icon?: string;
   iconT: number;
@@ -499,7 +502,23 @@ export class WorldSim {
   private hostile(a: Actor): boolean {
     return a.plan === 'chase' || (a.act === 'argue' && a.doing === '맞섬') || (a.act === 'watch' && a.doing === '막아섬');
   }
+  /** 맞음: 앉아 있었으면(의자·화장실) 굴러떨어지기(169) → 일어나기 → 반응, 누워 있었으면 누운 채 움찔(43) → 반응 (10-31 사용자: 앉은 피격은 굴러떨어지기로 통일) */
   private struck(a: Actor, dir: 1 | -1, hostile = false): void {
+    // 서서 소변(100)은 앉은 게 아니라 그냥 피격 자세로 (10-31 사용자)
+    const seated = !!a.seat || (a.act === 'do' && (a.clip === 'poo' || (a.clip === 'pee' && !this.canClip(a, 'line:100'))));
+    const lying = a.clip === 'lie' || a.clip === 'treat';
+    this.struckCore(a, dir, hostile);
+    const react = a.clip;
+    const seq: { clip: string; sec: number }[] = [];
+    if (seated && this.canClip(a, 'line:169')) seq.push({ clip: 'line:169', sec: 1.6 }, ...(this.canClip(a, 'getup') ? [{ clip: 'getup', sec: 1 }] : []));
+    else if (lying && this.canClip(a, 'line:43')) seq.push({ clip: 'line:43', sec: 0.9 });
+    if (!seq.length) return;
+    this.setClip(a, seq[0].clip);
+    a.clipQ = [...seq.slice(1), { clip: react, sec: 0 }];
+    a.clipQT = seq[0].sec;
+    a.wait += seq.reduce((n, s) => n + s.sec, 0);
+  }
+  private struckCore(a: Actor, dir: 1 | -1, hostile = false): void {
     a.seatPick = undefined;
     a.x += dir * 36;
     a.face = (-dir) as 1 | -1;
@@ -829,7 +848,8 @@ export class WorldSim {
 
   // ── 한 사람 ──
 
-  private setClip(a: Actor, clip: string): void {
+  private setClip(a: Actor, clip: string, fromQ = false): void {
+    if (!fromQ) a.clipQ = undefined;
     // 의자에서 하는 일이 아니면 일어선다
     if (!clip.startsWith('seat:')) a.seat = undefined;
     if (a.clip !== clip) {
@@ -861,6 +881,12 @@ export class WorldSim {
   }
 
   private stepActor(a: Actor, dt: number): void {
+    if (a.clipQ?.length && (a.clipQT = (a.clipQT ?? 0) - dt) <= 0) {
+      const n = a.clipQ.shift()!;
+      this.setClip(a, n.clip, true);
+      a.clipQT = n.sec;
+      if (!a.clipQ.length) a.clipQ = undefined;
+    }
     if (a.iconT > 0 && (a.iconT -= dt) <= 0) a.icon = undefined;
     if (a.sayT > 0 && (a.sayT -= dt) <= 0) a.say = undefined;
     if (a.act === 'dead') return;
