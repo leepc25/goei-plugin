@@ -5,7 +5,7 @@ S1 맨몸 맞기 · S2 몸 가린 채 뛰기(반복) · S3 맨몸 날아가 쓰�
 A 옷 벗기 16장(손 동작 순서, 35번 문장) → B 맨몸 걷기(반복) · D 물 맞으며 쉬기(반복) · E 몸 씻기(반복). 옷 입기 = A 거꾸로.
 A 끝 장의 떨어진 조각(옷 더미 등)은 다음 줄 시작 장에서만 지운다(원본 A는 그대로 둠).
 사용: python3 _test/shower_set2.py <키>   결과 _test/<키>/샤워2_<단계>/"""
-import sys, json, time, base64, io
+import sys, os, json, time, base64, io
 from pathlib import Path
 from collections import deque
 from concurrent.futures import ThreadPoolExecutor
@@ -88,6 +88,28 @@ STEPS = {
  "H6": ("G", 8, "loop", f"Bare and barefoot, running {side} with fast even strides, both legs alternating evenly with the same step length, the upper body leaning forward, {COVER}. {DRAW}"),
 }
 CANVAS = (256, 256)
+# 10-31 사용자 「전수검사해서 잘못된 거 프롬프트 바꿔서 최대 2번까지만 다시 뽑아」: 재뽑기 판 문장(덧대지 않고 새로 씀). SHOWER_V=1·2
+_V = os.environ.get("SHOWER_V", "")
+VAR = {
+ "1": {
+  "G": f"Bare and barefoot {side}: bend the knees deeply and lower the hips into a wide low crouch, the feet planted far apart, the torso turned sideways, {GUARD}, glaring forward. Breathe heavily, the shoulders rising and falling evenly. {DRAW}",
+  "H1": f"Bare and barefoot {side}, crouching low with {GUARD}: a blow lands on the stomach, the body bends forward sharply at the waist, the feet slide back one step along the floor, then the body returns to the same low crouch. {DRAW}",
+  "H2": f"Bare and barefoot {side}, crouching low with {GUARD}: a hard push on the chest rocks the upper body backward, the body takes three quick steps backward with the feet on the floor, then settles back into the same low crouch. {DRAW}",
+  "H3": f"Bare and barefoot {side}: stumbles backward two steps, the knees bend and give way, sits down hard on the floor, then falls back so the back lies flat on the floor, the arms at the sides. The body ends lying flat on the back. {DRAW}",
+  "H4": f"Bare and barefoot, lying on the back on the floor {side}: the body jolts once, the knees bend up and the arms cover the head, then the body relaxes flat on the floor again. The body stays lying on the floor. {DRAW}",
+  "H5": f"Bare and barefoot, lying on the back on the floor {side}: turns onto one side, gets onto hands and knees, pushes up onto one knee, then rises into a low wide crouch, {GUARD}. {DRAW}",
+  "H6": f"Bare and barefoot, running {side}, a steady run cycle with both legs moving evenly, leaning forward, {COVER}. {DRAW}"},
+ "2": {
+  "G": f"Bare and barefoot {side}: a wide defensive squat with the knees bent and the hips low, the body turned sideways, {GUARD}. Small steady breathing movement only, the feet staying planted on the floor. {DRAW}",
+  "H1": f"Bare and barefoot {side}, crouching low with {GUARD}: hunches forward around the stomach in pain, steps back once with the feet on the floor, then settles back into the low crouch. {DRAW}",
+  "H2": f"Bare and barefoot {side}, crouching low with {GUARD}: the chest is pushed back, the shoulders tilt back, stumbling backward three steps, then crouches low again. {DRAW}",
+  "H3": f"Bare and barefoot {side}: the legs give out, the body sinks down onto the hips on the floor, then tips backward and lies flat on the back along the floor. {DRAW}",
+  "H4": f"Bare and barefoot, lying on the back on the floor {side}: a small flinch, curling slightly, then lying flat again, the back on the floor the whole time. {DRAW}",
+  "H5": f"Bare and barefoot, lying on the back on the floor {side}: sits up, gets one foot under the body, rises up into a low crouch with the knees bent, {GUARD}. {DRAW}",
+  "H6": f"Bare and barefoot, jogging {side} at an even pace, each step the same length, {COVER}. {DRAW}"},
+}
+if _V in VAR:
+    for _n, _p in VAR[_V].items(): STEPS[_n] = STEPS[_n][:3] + (_p,)
 
 # ── 지침 검사 (docs/샤워_뽑기_지침.md, 10-31 사용자: 말로는 안 된다 → 장치). 어기면 보내지 않고 멈춘다 ──
 BANNED = ["flushed", "pale", "panick", "trembl", "in the face", "snaps back", "whips", "leave the floor", "through the air", "flies", "flying", "tap one foot", "fists raised", "fighting stance"]
