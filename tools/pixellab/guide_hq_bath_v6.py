@@ -29,7 +29,7 @@ bg.resize((W * 2, H * 2), Image.NEAREST).save(P + '/hq_bath_guide_v6_x2_view.png
 from pathlib import Path
 e = Image.open(Path(__file__).resolve().parents[1] / 'mapedit/eileen_stand.png').convert('RGBA')
 v = Image.open(P + '/hq_bath_guide_v6_x2_view.png').convert('RGBA')
-for fx, fy2, hh in ((460, 846, 334), (200, 640, 250), (460, 640, 250)):
+for fx, fy2, hh in ((300, 640, 250), (560, 640, 250), (460, 846, 334)):
     s = e.resize((max(1, round(e.width * hh / e.height)), hh), Image.NEAREST)
     v.alpha_composite(s, (fx - s.width // 2, fy2 - hh))
 v.save(P + '/hq_bath_guide_v6_x2_view.png')
