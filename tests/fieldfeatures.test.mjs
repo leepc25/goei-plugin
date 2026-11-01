@@ -60,12 +60,12 @@ test('동행: 따라 걷고, 장면을 같이 넘고, 기다려·돌아가', () 
   assert.ok(!a.hold && !a.following);
 });
 
-test('동행: 최대 4명, 쓰러지면 풀림', () => {
+test('동행: 인원 제한 없음(11-01), 쓰러지면 풀림', () => {
   const w = sim();
   const ps = ['가', '나', '다', '라', '마'].map((n, i) => named(w, n, 'office', 500 + i * 60));
   run(w, 0.5, { scene: 'office', x: 600, y: 560 });
   const ok = ps.map((p) => w.setFollow(p.def.name, 'follow'));
-  assert.deepEqual(ok, [true, true, true, true, false]);
+  assert.deepEqual(ok, [true, true, true, true, true]);
   ps[0].act = 'down';
   run(w, 0.1, { scene: 'office', x: 600, y: 560 });
   assert.ok(!ps[0].following);

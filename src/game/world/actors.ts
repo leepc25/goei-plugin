@@ -273,8 +273,8 @@ export interface SimOptions {
 }
 
 const WALK = 150;
-/** 동행 인원 상한 (core/fieldfollow MAX_FOLLOWERS 와 같음) */
-export const MAX_FOLLOW = 4;
+/** 동행 인원 상한 없음 (11-01 사용자: 제한 두지 말 것). core/fieldfollow 도 같음 */
+export const MAX_FOLLOW = Infinity;
 /** 동행: 주인공 뒤 첫 사람 거리, 사람마다 더 벌어지는 거리 */
 const FOLLOW_GAP = [95, 55] as const;
 const MARGIN = 60;
@@ -922,11 +922,11 @@ export class WorldSim {
     if (!a || a.fighting || ['down', 'dead', 'gone'].includes(a.act) || (a.plan === 'exit' && a.doing === '쫓겨남') || this.sceneFaction(a.scene) !== fac) return null;
     return { scene: a.scene, x: a.x, y: a.y, actor: a };
   }
-  /** 경보에 싸우러 가는 사람: 경비·경찰·전투 계열 이름 인물·다른 세력 아닌 전투원 */
+  /** 경보에 싸우러 가는 사람: 그 거점 경비·전투 계열 이름 인물. 경찰은 아님 (11-01 사용자: 경보는 거점 안 일이라 경찰이 오는 건 이상함) */
   private alarmFighter(a: Actor, fac: string): boolean {
     if (a.def.kind === 'named') return !this.noAssist(a.def.name) && (!a.def.faction || a.def.faction === fac);
     const role = ARCHETYPES[a.def.archetype ?? '']?.role;
-    return (role === 'guard' || role === 'police') && (this.mobFaction(a) === fac || !a.def.faction);
+    return role === 'guard' && (this.mobFaction(a) === fac || !a.def.faction);
   }
   private stepAlarms(dt: number): void {
     for (const [fac, al] of this.alarms) {
@@ -1340,7 +1340,7 @@ export class WorldSim {
     }
   }
   // ── 동행 (10-31 사용자 결정 docs/필드기능_결정_1031.md 1번): 모델 답의 [[동행]]·[[기다림]]·[[복귀]] 표시로만 켜고 끈다 ──
-  /** 따라오는 사람 id (앞에서부터 주인공 뒤 순서, 최대 MAX_FOLLOW) */
+  /** 따라오는 사람 id (앞에서부터 주인공 뒤 순서, 인원 제한 없음) */
   readonly followers: string[] = [];
   /** 주인공 발자국 (최근 몇 초) */
   private trail: { t: number; x: number; y: number }[] = [];
