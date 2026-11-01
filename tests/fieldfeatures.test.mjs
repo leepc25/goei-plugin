@@ -364,3 +364,59 @@ test('필드 피격(1-2): 18번 휘청 한 번 + 밀려남(넉백), 쓰러지면
   run(w, 0.6, { scene: 'street', x: 700, y: 560 });
   assert.ok(a.x - x1 > d1, `쓰러질 땐 더 멀리 ${a.x - x1}`);
 });
+
+// ── 이성 화장실 침입 감지 (11-01 사용자: 문 진입만으로 반응 없음, 정면 700 / 등 뒤 300 / 벽 보고 200, 칸 안 없음) ──
+const wcScenes = [
+  { id: 'f3', name: '3층', length: 2400, lane: [420, 669], doors: [{ id: 'wc', x: 400, kind: 'glass', to: 'wc3', toDoor: 'out' }] },
+  { id: 'wc3', name: '화장실(여)', length: 1600, lane: [470, 680], sex: '여', toilets: [{ id: 'sink0', kind: 'sink', x: 1200, y: 560 }, { id: 'stall0', kind: 'stall', x: 300, y: 560 }], doors: [{ id: 'out', x: 200, kind: 'exit', side: 'S', to: 'f3', toDoor: 'wc' }] },
+];
+// 여자 인물: 102(앉아 볼일)·poo 만 있고 100(남 소변)은 없음
+const wcSim = () => new A.WorldSim(new P.PlaceGraph(wcScenes, [], { f3: 'corridor', wc3: 'restroom' }), R.mulberry32(11), { sceneFaction: () => 'A00', has: (_l, c) => ['idle', 'walk', 'run', 'line:102', 'poo'].includes(c) });
+// 여자: 102(앉아 볼일)만 있고 100(남 소변)은 없음
+const woman = (w, name, x, face = 1) => { const a = w.add({ id: `npc:${name}`, name, kind: 'named', brain: 'needs', home: 'wc3', roam: ['wc3'], look: name }, { scene: 'wc3', x, y: 560 }); a.face = face; a.plan = 'stay'; a.act = 'idle'; return a; };
+const intrudes = (w) => w.events.filter((e) => e.kind === 'intrude');
+const male = (x) => ({ scene: 'wc3', x, y: 560, sex: '남', face: 1 });
+
+test('이성 화장실: 문에 들어온 것만으로는 아무도 반응하지 않는다 (등 뒤 300px 밖)', () => {
+  const w = wcSim();
+  woman(w, '쟈알디', 1000, 1); // 동쪽을 봄, 주인공은 서쪽(등 뒤) 600px
+  run(w, 2, male(400));
+  assert.equal(intrudes(w).length, 0);
+});
+
+test('이성 화장실: 정면 700px 안이면 알아채고 들어옴 → 머묾1 → 머묾2 대사', () => {
+  const w = wcSim();
+  woman(w, '쟈알디', 400, 1); // 동쪽을 봄, 주인공은 동쪽 600px 앞
+  run(w, 0.5, male(1000));
+  const ev = intrudes(w);
+  assert.equal(ev.length, 1);
+  assert.equal(ev[0].stage, 0);
+  assert.ok(w.events.some((e) => e.kind === 'cue' && e.cell === 'toilet.intrude' && e.ctx?.target === '{user}'));
+  run(w, 18, male(1000));
+  assert.deepEqual(intrudes(w).map((e) => e.stage), [0, 1, 2]);
+  assert.ok(w.events.some((e) => e.kind === 'cue' && e.cell === 'toilet.stay2'));
+});
+
+test('이성 화장실: 등 뒤는 300px 안에서만, 같은 성별 주인공은 아무 일 없음', () => {
+  const w = wcSim();
+  woman(w, '쟈알디', 1000, 1); // 동쪽을 봄
+  run(w, 1, male(750)); // 등 뒤 250px
+  assert.equal(intrudes(w).length, 1);
+  const w2 = wcSim();
+  woman(w2, '쟈알디', 400, 1);
+  run(w2, 1, { scene: 'wc3', x: 1000, y: 560, sex: '여', face: 1 });
+  assert.equal(intrudes(w2).length, 0);
+});
+
+test('이성 화장실: 한 사람이 소리치면 700px 안의 같은 성별이 1~3초 뒤 따라 알아챈다, 장면을 나가면 처음으로', () => {
+  const w3 = wcSim();
+  woman(w3, '쟈알디', 700, 1); // 동쪽을 봄, 주인공(1000)은 정면 300px → 바로 감지
+  const b = woman(w3, '에일린', 1350, 1); // 동쪽을 봄, 주인공은 등 뒤 350px → 직접 감지 안 됨. 쟈알디와 650px → 소리 듣고 따라 감지
+  run(w3, 0.2, male(1000));
+  assert.deepEqual(intrudes(w3).map((e) => e.who), ['쟈알디']);
+  assert.equal(b.intrude?.stage, 'wait');
+  run(w3, 3.5, male(1000));
+  assert.deepEqual(intrudes(w3).map((e) => e.who).slice(0, 2), ['쟈알디', '에일린']);
+  run(w3, 1, { scene: 'f3', x: 400, y: 560, sex: '남', face: 1 });
+  assert.equal(b.intrude, undefined);
+});

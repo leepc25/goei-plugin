@@ -302,6 +302,11 @@ function hqAdapter(bridge: Partial<GameBridge> | undefined, ui: { chooseFloor: H
       }
       // 방문 대응 (세력끼리): 보이는 장면에서 일어난 것만 장부에 (주인공이 본 일)
       // 주인공이 경고를 받고 거점에서 나감 (10-31 필드 기능 2번)
+      // 이성 화장실·샤워실 침입을 들킴: 처음 들킨 것만 장부에 (머묾은 대사로만)
+      if (e.kind === 'intrude' && e.stage === 0 && e.scene === lifeScene) {
+        void b?.field?.record({ kind: 'detected', text: `${hm()}${enName(e.who)} caught {user} in the wrong-sex restroom and told {user} to get out.`, ko: `${hm()}{user}: ${e.who}에게 이성 화장실 침입 들킴`, scene: sceneNameOf(e.scene), who: [e.who], weight: 2, visit: visitId }).catch(() => {});
+        continue;
+      }
       if (e.kind === 'expel' && e.who === '{user}') {
         void b?.field?.record({ kind: 'act', text: `${hm()}A ${enName(e.by)} told {user} to leave, and {user} left.`, ko: `${hm()}{user}: ${e.by}의 경고를 받고 쫓겨남`, scene: fieldClock.place || undefined, weight: 2, visit: visitId }).catch(() => {});
         continue;
@@ -519,7 +524,10 @@ function hqAdapter(bridge: Partial<GameBridge> | undefined, ui: { chooseFloor: H
       // 말 거는 중인 몹은 멈춰 서서 주인공을 본다
       const tk = fieldLink.talkTarget?.() ?? '';
       if (tk.startsWith('mob:')) w.holdTalk(tk.slice(4), at.x);
-      w.step(dt, { ...at, hour: fieldClock.sec === null ? null : (fieldClock.sec / 3600) % 24, armed: !!P?.armed, face: P?.face ?? 1 });
+      // 주인공 성별(화장실·샤워실 이성 침입 감지용): 남 소변(100) 줄이 있으면 남, 앉아 볼일(102)이 있으면 여 (toilets.ts sexOf 와 같은 기준)
+      const has = pl instanceof FighterPlayer ? (pl as unknown as { core?: { has?: (id: string) => boolean } }).core?.has : undefined;
+      const sex = has ? (has('100') ? '남' : has('102') ? '여' : null) : null;
+      w.step(dt, { ...at, hour: fieldClock.sec === null ? null : (fieldClock.sec / 3600) % 24, armed: !!P?.armed, face: P?.face ?? 1, sex });
       const evs = w.events.splice(0);
       record(evs);
       // 경보 사이렌: 경보 중인 거점 안에 있으면 1.6초마다 한 바퀴, 음악은 낮춘다
