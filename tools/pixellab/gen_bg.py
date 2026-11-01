@@ -17,6 +17,8 @@ import subprocess as _sp
 if _sp.call([sys.executable, str(__import__('pathlib').Path(__file__).with_name('prompt_diff.py')), prompt_path]) != 0: sys.exit('요청문이 3층 원본 핵심 문장을 빠뜨림 — 중단')
 scale = float(sys.argv[6]) if len(sys.argv) > 6 else 0.5
 
+# 2026-11-01 14:33 사용자 「참고 이미지 넣지 말라고 몇번을 말하냐」: 참고 그림을 넣으면 보내지 않는다. 둘째 인자는 '' 로만
+if style_path: sys.exit('참고 그림 금지(사용자 11-01 14:33) — 둘째 인자를 \'\' 로 비워라')
 style = None
 if style_path:
     st = Image.open(style_path).convert("RGB")
