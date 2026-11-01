@@ -1,0 +1,54 @@
+{
+ "scale": 0.974025974025974,
+ "shifts": {
+  "east": {
+   "dx": -2,
+   "dy": 17,
+   "c01_seat_cx": 95.5,
+   "new_seat_cx": 97.0
+  },
+  "north-east": {
+   "dx": 0,
+   "dy": 14,
+   "c01_seat_cx": 95.5,
+   "new_seat_cx": 95.0
+  },
+  "north": {
+   "dx": 1,
+   "dy": 18,
+   "c01_seat_cx": 92.0,
+   "new_seat_cx": 91.0
+  },
+  "north-west": {
+   "dx": 4,
+   "dy": 14,
+   "c01_seat_cx": 92.0,
+   "new_seat_cx": 88.0
+  },
+  "west": {
+   "dx": 2,
+   "dy": 17,
+   "c01_seat_cx": 88.5,
+   "new_seat_cx": 87.0
+  },
+  "south-west": {
+   "dx": 2,
+   "dy": 14,
+   "c01_seat_cx": 89.5,
+   "new_seat_cx": 87.0
+  },
+  "south": {
+   "dx": 3,
+   "dy": 14,
+   "c01_seat_cx": 92.0,
+   "new_seat_cx": 89.0
+  },
+  "south-east": {
+   "dx": 0,
+   "dy": 14,
+   "c01_seat_cx": 95.0,
+   "new_seat_cx": 94.5
+  }
+ },
+ "rule": "C01 바닥선 171·좌석선 96에 맞춤, 방향별 좌석 가운데 x를 C01과 같게"
+}
