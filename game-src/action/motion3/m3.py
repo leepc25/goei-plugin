@@ -60,12 +60,15 @@ import pixellab_gate  # noqa: E402  (10-31 사용자 승인 없는 생성 막기
 
 
 def req(method, path, body=None, timeout=120):
-    pixellab_gate.guard(method, path, (body or {}).get("animation_name", "") if isinstance(body, dict) else "")
+    # 10-31: 429·409로 거절된 요청까지 회수를 써서 승인 891회 중 801회가 헛되이 빠짐 → 보내기 전엔 확인만, 성공한 생성만 회수를 쓴다
+    _what = (body or {}).get("animation_name", "") if isinstance(body, dict) else ""
+    pixellab_gate.check(method, path, _what)
     data = json.dumps(body).encode() if body is not None else None
     r = urllib.request.Request(API + path, data=data, method=method, headers={"Content-Type": "application/json"})
     with urllib.request.urlopen(r, timeout=timeout) as resp:
         raw = resp.read()
-        return json.loads(raw) if raw.strip() else {}
+    pixellab_gate.guard(method, path, _what)
+    return json.loads(raw) if raw.strip() else {}
 
 
 def fetch_png(url):

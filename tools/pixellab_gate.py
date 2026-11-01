@@ -32,6 +32,15 @@ def spend(what=""):
 GEN_PATHS = ("/characters/animations", "/animate-character", "/create-", "/generate", "/edit-", "/characters/")
 
 
+def check(method, path, what=""):
+    """보내기 전 확인만: 생성 경로인데 남은 회수가 없으면 NotApproved (쓰지는 않음)"""
+    if method.upper() == "POST" and any(path.startswith(p) for p in GEN_PATHS):
+        if not GATE.exists(): raise NotApproved(f"PixelLab 생성 승인 없음(.pixellab_ok 없음): {what}")
+        try: left = int(GATE.read_text(encoding="utf-8").split("\n")[0].strip())
+        except ValueError: left = 0
+        if left <= 0: raise NotApproved(f"PixelLab 승인 회수를 다 씀: {what} — 사용자에게 다시 묻는다")
+
+
 def guard(method, path, what=""):
     """POST 생성 경로면 승인을 쓴다 (GET 조회는 그냥 통과)"""
     if method.upper() == "POST" and any(path.startswith(p) for p in GEN_PATHS):
