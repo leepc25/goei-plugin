@@ -34,10 +34,12 @@ FOOT, RIGHT, PITCH, N = 368, 398, 158, 3
 xs = [RIGHT - 206 - PITCH * i for i in range(N)]
 y = FOOT - 252
 K = 334 / 234                                      # 요원과 같은 2배 화면 배율
-toilet = Image.open(D + 'toilet8/toilet_user_1330.png').convert('RGBA')
+TS = float(sys.argv[4]) if len(sys.argv) > 4 else 0.7   # 13:33 사용자 「사이즈를 많이 줄여야」
+# 13:33 「물탱크가 수평이 되도록」: 물탱크 윗변(4px/60px 기울기)을 세로 밀기로 수평 맞춘 판
+toilet = Image.open(D + 'toilet8/toilet_user_1330_level.png').convert('RGBA')
 tb = toilet.getbbox()
-toilet = toilet.crop(tb); toilet = toilet.resize((round(toilet.width * K), round(toilet.height * K)), Image.NEAREST)
-SEAT = ((79 - tb[0]) * K, (132 - tb[1]) * K)       # 좌석 가운데(원본 그림 79,132)
+toilet = toilet.crop(tb); toilet = toilet.resize((round(toilet.width * K * TS), round(toilet.height * K * TS)), Image.NEAREST)
+SEAT = ((70 - tb[0]) * K * TS, (89 - tb[1]) * K * TS)  # 좌석 가운데(수평판 그림 70,89)
 TCX, TFOOT = 120, 244                           # 칸 캔버스: 변기 가운데 x120(요원 다리가 기둥에 덜 가리게 왼쪽으로), 밑동 y244
 kyu = Image.open('game-src/action/motion3/1.6_큐라스/102/00.png').convert('RGBA')
 kyu = kyu.resize((round(kyu.width * K), round(kyu.height * K)), Image.NEAREST)
