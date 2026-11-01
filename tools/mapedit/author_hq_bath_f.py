@@ -10,8 +10,10 @@ import numpy as np
 from PIL import Image, ImageDraw
 from scipy import ndimage as nd
 ROOT = Path(__file__).resolve().parents[2]
-SRC = ROOT / 'game-src/art/pixellab-hq-20261031/hq_bath_f_p5_extL1_heads.png'
-OUT = ROOT / 'game-src/mapedit/bath_f'
+import os
+SCENE = os.environ.get('SCENE', 'bath_f')      # SCENE=bath_m 이면 남자 샤워실: 같은 그림을 색만 바꾼 hq_bath_m_recolor.png, 마스크·자리 동일(사용자 17:35·18:30)
+SRC = ROOT / ('game-src/art/pixellab-hq-20261031/hq_bath_m_recolor.png' if SCENE == 'bath_m' else 'game-src/art/pixellab-hq-20261031/hq_bath_f_p5_extL1_heads.png')
+OUT = ROOT / f'game-src/mapedit/{SCENE}'
 K = 2
 im = Image.open(SRC).convert('RGB'); A = np.array(im).astype(int); W, H = im.size
 dark = A.max(2) <= 60
@@ -131,11 +133,11 @@ door = {'kind': 'exit', 'x': DOOR_X * K, 'y': int(top[DOOR_X] + 2) * K, 'label':
 SPR_DOTS = 247
 REFS = [(292, 1.217 * (292 - 196)), (412, 1.217 * (412 - 196))]
 TOPH = REFS[-1][1]
-m = {'file': 'hq_bath_f_strip', 'bgScale': K, 'dotK': round(TOPH * K / SPR_DOTS, 4), 'sizes': [[y * K, round(h / TOPH, 3)] for y, h in REFS],
+m = {'file': f'hq_{SCENE}_strip', 'bgScale': K, 'dotK': round(TOPH * K / SPR_DOTS, 4), 'sizes': [[y * K, round(h / TOPH, 3)] for y, h in REFS],
      'w': W * K, 'h': H * K, 'under': True, 'floor': floor, 'lane': [310 * K, H * K - 12], 'blocks': blocks, 'lamps': [], 'spots': [],
      'doors': {'out': door}, 'objects': [to_cover(o, mm, sy) for o, mm, sy in objects]}
 OUT.mkdir(parents=True, exist_ok=True)
-im.save(OUT / 'hq_bath_f_strip.png')
+im.save(OUT / f'hq_{SCENE}_strip.png')
 (OUT / 'map.json').write_text(json.dumps(m, ensure_ascii=False, default=int))
 Image.fromarray((s_mask * 255).astype('uint8')).save(OUT / 'cover_mask_1x.png')
 if len(sys.argv) > 1:
