@@ -65,3 +65,16 @@ def depth(k,dx,dy,cols=range(80,116)):
         while st+d<=max(cs) and 0<=st+d+cy-oy<Hh and P[st+d+cy-oy,px]: d+=1
         r.append(d)
     return int(np.median(r)) if r else None
+
+def expose(k,v,dx,dy,img,rows=range(60,95)):
+    """정면/후면: 등받이 줄에서 의자 왼끝이 사람 왼끝보다 얼마나 왼쪽으로 나왔나(중앙값), 오른쪽도"""
+    c,_=fc.load(k); im=fc.last(c,{'front':'60','back':'61'}[v]); P=np.array(im)[:,:,3]>40; Hh,Ww=P.shape
+    W,H=150,280; base=H-15; ox,oy=W//2-Ww//2, base-(Hh-4); cx,cy=round(W/2+dx-100),round(base+dy-171)
+    C=chair(img); L=[];R=[]
+    for r in rows:
+        cr=np.where(C[r])[0]; py=cy+r-oy
+        if not len(cr) or not(0<=py<Hh): continue
+        xs=np.where(P[py])[0]
+        if not len(xs): continue
+        L.append((xs.min()+ox)-(cr.min()+cx)); R.append((cr.max()+cx)-(xs.max()+ox))
+    return (int(np.median(L)) if L else None),(int(np.median(R)) if R else None)

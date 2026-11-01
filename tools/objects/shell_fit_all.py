@@ -11,7 +11,8 @@ os.environ['CHAIR_DIR']=str(ROOT/'game-src/art/objects/chairs_shell/fit')
 A=sys.argv[1:]; sys.argv=sys.argv[:1]
 sys.path.insert(0,str(TR)); sys.path.insert(0,str(TR/'qa'))
 import fit_chair as fc
-from PIL import Image, ImageDraw
+from PIL import Image, ImageDraw, ImageFont
+FONT=ImageFont.truetype('/usr/share/fonts/truetype/wqy/wqy-zenhei.ttc',12)
 F=ROOT/'game-src/art/objects/chairs_shell/fit_all.json'
 J=json.loads(F.read_text()) if F.exists() else {}
 LID={'front':'60','side':'96','back':'61'}
@@ -56,9 +57,9 @@ elif cmd=='sheet':
         else: T.alpha_composite(im,(ox,oy)); T.alpha_composite(ch,(cx,cy))
         for x in range(0,W,4): g.point((x,base),fill=(255,60,60,255))
         T=T.crop((0,TOP,W,H)).convert('RGB').resize((W*2,(H-TOP)*2),Image.NEAREST)
-        d=ImageDraw.Draw(T); d.rectangle([0,0,W*2,13],fill=(20,20,20)); d.text((3,1),f'{i} {k.split("_",1)[1]} {p["dx"]},{p["dy"]} {p["img"]}',fill=(255,255,255))
+        d=ImageDraw.Draw(T); d.rectangle([0,0,W*2,13],fill=(20,20,20)); d.text((3,1),f'{i} {k.split("_",1)[1]} {p["dx"]},{p["dy"]} {p["img"]}',fill=(255,255,255),font=FONT)
         cells.append(T)
-    cw,chh=cells[0].size; cols=6; rows=(len(cells)+cols-1)//cols
+    cw,chh=cells[0].size; cols=int(os.environ.get('COLS',6)); rows=(len(cells)+cols-1)//cols
     S=Image.new('RGB',(cw*cols,chh*rows),(30,30,30))
     for j,cc in enumerate(cells): S.paste(cc,((j%cols)*cw,(j//cols)*chh))
     S.save(out); print(out,S.size)
