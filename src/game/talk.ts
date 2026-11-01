@@ -41,6 +41,10 @@ const CSS = `
 export interface TalkWorld {
   opts?(key: string): TalkOpts;
   onTags?(key: string, name: string, tags: string[]): void;
+  /** 대사 자료(dialogue2) 한 줄: 모델이 없거나 실패하면 facing.talk, 말을 걸 때 하던 일 첫 말풍선은 busy.* (없으면 null) */
+  line?(key: string, cell: string): string | null;
+  /** 말을 거는 순간 그 사람이 하던 일의 busy 칸 (없으면 null) */
+  busyCell?(key: string): string | null;
 }
 
 /** mobOf = 몹 열쇠(mob:<id>) → 말 걸 몹 정보 (없으면 몹 대화 없음, 10-31) */
@@ -119,6 +123,10 @@ export function mountTalk(root: HTMLElement, api: GameVisit, field?: GameField, 
     to.textContent = `${mob ? mob.name : name}에게`;
     bar.setAttribute('data-open', '');
     refresh();
+    // 하던 일 중에 말을 걸었으면 그 일의 첫 말풍선 (대사 자료 busy 칸, 10-31 사용자). 자료가 없으면 아무 말 없음
+    const busyCell = world?.busyCell?.(name);
+    const first = busyCell ? world?.line?.(name, busyCell) : null;
+    if (first) say(name, first);
     // 터치 기기는 바로 키패드를 띄우지 않는다: 터치판 대사창 모드의 「선택」(또는 입력칸 누르기)으로 연다 (모바일 조작 설계 2026-10-28)
     if (typeof matchMedia === 'undefined' || !matchMedia('(pointer: coarse)').matches) input.focus();
     try {
@@ -165,6 +173,8 @@ export function mountTalk(root: HTMLElement, api: GameVisit, field?: GameField, 
     } catch (e) {
       if (dead) return;
       for (let i = bubbles.length - 1; i >= 0; i--) if (bubbles[i].who === key) bubbles.splice(i, 1);
+      const sub = world?.line?.(key, 'facing.talk');
+      if (sub) say(key, sub);
       msg.textContent = e instanceof Error ? e.message : String(e);
       input.value = input.value || raw;
     } finally {
@@ -206,6 +216,9 @@ export function mountTalk(root: HTMLElement, api: GameVisit, field?: GameField, 
     } catch (e) {
       if (dead) return;
       for (let i = bubbles.length - 1; i >= 0; i--) if (bubbles[i].who === agent.name) bubbles.splice(i, 1);
+      // 모델이 없거나 실패: 그 인물이 대신 하는 한 줄 (대사 자료 facing.talk). 오류 글은 그대로 보인다
+      const sub = world?.line?.(agent.name, 'facing.talk');
+      if (sub) say(agent.name, sub);
       msg.textContent = e instanceof Error ? e.message : String(e);
       input.value = input.value || raw;
     } finally {

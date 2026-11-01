@@ -6,10 +6,10 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { pathToFileURL } from 'node:url';
 const dir = await mkdtemp(join(tmpdir(), 'goei-fieldworld-'));
-const names = ['rng', 'clock', 'places', 'actors', 'observer', 'needs', 'mobs', 'lines', 'speech', 'districts', 'hq', 'npcperks', 'factions'];
+const names = ['rng', 'clock', 'places', 'actors', 'observer', 'needs', 'mobs', 'lines', 'speech', 'dialogue2', 'districts', 'hq', 'npcperks', 'factions'];
 await build({ entryPoints: names.map((n) => `src/game/world/${n}.ts`), outdir: dir, outbase: 'src', bundle: true, platform: 'node', format: 'esm', outExtension: { '.js': '.mjs' }, logLevel: 'silent' });
 const imp = (n) => import(pathToFileURL(join(dir, `game/world/${n}.mjs`)));
-const R = await imp('rng'), C = await imp('clock'), P = await imp('places'), A = await imp('actors'), O = await imp('observer'), N = await imp('needs'), M = await imp('mobs'), L = await imp('lines'), SP = await imp('speech'), D = await imp('districts'), H = await imp('hq');
+const R = await imp('rng'), C = await imp('clock'), P = await imp('places'), A = await imp('actors'), O = await imp('observer'), N = await imp('needs'), M = await imp('mobs'), L = await imp('lines'), SP = await imp('speech'), D2 = await imp('dialogue2'), D = await imp('districts'), H = await imp('hq');
 
 // 본부 지도 축소판: 거리 ─ 로비 ─(계단)─ 3층 복도 ─ 사무실·휴게실, 엘리베이터
 const scenes = [
@@ -333,31 +333,40 @@ test('대사: 같은 조직은 직급 비교 칸, 다른 조직은 소속 칸, �
   assert.equal(L.timeKey(22), 'night');
 });
 
+// 새 대사 자료(dialogue2) 축소판: NPC 파일은 n_<원형>_<성별>, 칸은 공통 칸 1갈래
+const dlg2 = {
+  'n_행인_남': { name: '행인_남', robbed: ['내 지갑!', '저 사람 잡아요!', '소매치기야!'], harassed: ['왜 이러세요.', '저 좀 놔 주세요.', '사람 불러요.'], glance: ['…'] },
+  'n_행인_여': { name: '행인_여', robbed: ['내 가방!', '도둑이야!', '누가 좀 잡아 줘요!'], harassed: ['저리 가요.', '소리 지를 거예요.', '뭐 하는 거예요.'] },
+  'n_불량배_남': { name: '불량배_남', pick_run: ['땡잡았다.'], harass: ['야, 어디 가.', '잠깐 서 봐.', '돈 좀 있냐.'] },
+  'n_불량배_여': { name: '불량배_여', pick_run: ['빠이.'], harass: ['거기 너.', '말 좀 하자.', '지갑 보여 봐.'] },
+};
+const chatter2 = (sim, ctx = () => ({ faction: 'A00', stance: 'neutral' })) => new SP.Chatter(sim, new D2.Dialogue2(async () => null, sim.rng, dlg2), ctx);
+
 test('대사 연출: 소매치기 사건이 나면 피해자가 말한다, 보이는 장면만', () => {
   const sim = new A.WorldSim(graph(), R.mulberry32(3));
-  const v = sim.add({ id: 'v', name: '행인', kind: 'mob', brain: 'transit', home: 'jongno', archetype: '행인' }, { x: 900, y: 560 });
-  const ch = new SP.Chatter(sim, new L.Lines(dlg, sim.rng), () => ({ hour: 12, faction: 'A00', level: 1 }));
+  const v = sim.add({ id: 'v', name: '행인', kind: 'mob', brain: 'transit', home: 'jongno', archetype: '행인', look: '시민남1' }, { x: 900, y: 560 });
+  const ch = chatter2(sim);
   ch.step(1 / 30, 'office', 0, [{ kind: 'steal', scene: 'jongno', thief: '불량배', victim: '행인', x: 900 }]);
   assert.equal(v.say, undefined, '안 보이는 장면은 말 안 함');
   ch.step(1 / 30, 'jongno', 800, [{ kind: 'steal', scene: 'jongno', thief: '불량배', victim: '행인', x: 900 }]);
-  assert.equal(v.say, '내 지갑!');
+  assert.ok(dlg2['n_행인_남'].robbed.includes(v.say), `${v.say}: 남자 행인 파일의 털림 칸`);
 });
 
 test('인물끼리 대화·시비는 대개 작은 말풍선, 가끔 대사 (10-31 사용자), 피해자 외침 같은 말은 그대로', () => {
   const sim = new A.WorldSim(graph(), R.mulberry32(3));
-  const a = sim.add({ id: 'a', name: '불량배', kind: 'mob', brain: 'transit', home: 'jongno', archetype: '불량배' }, { x: 900, y: 560 });
-  const b = sim.add({ id: 'b', name: '행인', kind: 'mob', brain: 'transit', home: 'jongno', archetype: '행인' }, { x: 950, y: 560 });
-  const ch = new SP.Chatter(sim, new L.Lines(dlg, sim.rng), () => ({ hour: 12, faction: 'A00', level: 1 }));
-  ch.step(1 / 30, 'jongno', 800, [{ kind: 'harass', scene: 'jongno', who: '불량배', target: '행인', x: 900 }]);
+  const a = sim.add({ id: 'a', name: '불량배', kind: 'mob', brain: 'transit', home: 'jongno', archetype: '불량배', look: '불량배남1' }, { x: 900, y: 560 });
+  const b = sim.add({ id: 'b', name: '행인', kind: 'mob', brain: 'transit', home: 'jongno', archetype: '행인', look: '시민여1' }, { x: 950, y: 560 });
+  chatter2(sim).step(1 / 30, 'jongno', 800, [{ kind: 'harass', scene: 'jongno', who: '불량배', target: '행인', x: 900 }]);
   // 대개는 말풍선, 가끔 대사 (한 사람은 둘 중 하나만, 장면에 글은 하나까지)
   for (const [p, e] of [[a, '#'], [b, '?']]) assert.ok((p.icon === e) !== !!p.say, `${p.def.name}: ${p.icon} / ${p.say}`);
   assert.ok(!(a.say && b.say), '글 말풍선은 하나까지');
+  if (b.say) assert.ok(dlg2['n_행인_여'].harassed.includes(b.say), '여자 행인은 여자 파일');
   let lines = 0, emotes = 0;
   for (let seed = 1; seed <= 200; seed++) {
     const s2 = new A.WorldSim(graph(), R.mulberry32(seed));
-    const x = s2.add({ id: 'a', name: '불량배', kind: 'mob', brain: 'transit', home: 'jongno', archetype: '불량배' }, { x: 900, y: 560 });
-    s2.add({ id: 'b', name: '행인', kind: 'mob', brain: 'transit', home: 'jongno', archetype: '행인' }, { x: 950, y: 560 });
-    new SP.Chatter(s2, new L.Lines(dlg, s2.rng), () => ({ hour: 12, faction: 'A00', level: 1 })).step(1 / 30, 'jongno', 800, [{ kind: 'harass', scene: 'jongno', who: '불량배', target: '행인', x: 900 }]);
+    const x = s2.add({ id: 'a', name: '불량배', kind: 'mob', brain: 'transit', home: 'jongno', archetype: '불량배', look: '불량배남1' }, { x: 900, y: 560 });
+    s2.add({ id: 'b', name: '행인', kind: 'mob', brain: 'transit', home: 'jongno', archetype: '행인', look: '시민남1' }, { x: 950, y: 560 });
+    chatter2(s2).step(1 / 30, 'jongno', 800, [{ kind: 'harass', scene: 'jongno', who: '불량배', target: '행인', x: 900 }]);
     if (x.say) lines++; else if (x.icon) emotes++;
   }
   assert.ok(emotes > lines * 2, `말풍선 ${emotes} · 대사 ${lines}`);   // 대사 자료에 그 줄이 없으면 늘 말풍선

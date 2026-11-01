@@ -49,7 +49,10 @@ import { createFieldShop, type FieldShop } from './fieldShopLink';
 import { DEFAULT_CLOCK, clockRules, waitOptions, type ClockRules } from '../../world/clock';
 import { hashSeed } from '../../world/rng';
 import { observerLines } from '../../world/observer';
-import { Lines, NPC_TYPE, type DialogueData, type LineCtx } from '../../world/lines';
+import { NPC_TYPE } from '../../world/lines';
+import { Dialogue2, repOf, type CueCtx } from '../../world/dialogue2';
+/** NPC 대사 파일 전부 (game-pack/dialogue index.json 과 같음): 몹은 아무 때나 생기니 미리 받아 둔다 */
+const NPC_FILES = ['가짜 관리국 검사부대_남', '가짜 관리국 진압부대_남', '간호사_여', '경비_남', '경비_여', '경찰_남', '경찰_여', '관리국 요원_남', '관리국 요원_여', '백일몽 직원_남', '백일몽 직원_여', '불량배_남', '불량배_여', '상인_남', '상인_여', '안내 직원_남', '안내 직원_여', '의사_남', '청소부_남', '청소부_여', '프리랜서_남', '프리랜서_여', '학생_남', '학생_여', '행인_남', '행인_여', '행정 직원_남', '행정 직원_여', '협회 직원_남', '협회 직원_여'];
 import { Chatter } from '../../world/speech';
 import dialogueData from '../../world/dialogue.json';
 import type { Actor, SimEvent } from '../../world/actors';
@@ -102,7 +105,7 @@ const fieldWallet: { won: number | null } = { won: null };
 let observing = false;
 const observerOn = () => observing;
 /** 필드 가게 창이 쓰는 돈·장부 (hqAdapter 안에서 채운다: 가계부 다리·방문 id가 거기 있다) */
-const fieldLink: { talkOpts?: (name: string) => TalkOpts; onTags?: (key: string, name: string, tags: string[]) => void; mobOf?: (key: string) => MobTalk | null; talkTarget?: () => string; pay?: (amount: number, memo: string) => Promise<number | null>; record?: (text: string, ko?: string) => void; fact?: (key: string, value: string) => void; nearPerson?: () => string | null; gift?: (who: string, item: string, counts: boolean) => void ; endVisit?: (close: boolean) => void } = {};
+const fieldLink: { talkOpts?: (name: string) => TalkOpts; onTags?: (key: string, name: string, tags: string[]) => void; mobOf?: (key: string) => MobTalk | null; talkTarget?: () => string; pay?: (amount: number, memo: string) => Promise<number | null>; record?: (text: string, ko?: string) => void; fact?: (key: string, value: string) => void; nearPerson?: () => string | null; cueLine?: (key: string, cell: string) => string | null; busyCell?: (key: string) => string | null; gift?: (who: string, item: string, counts: boolean) => void ; endVisit?: (close: boolean) => void } = {};
 const wonText = (n: number) => `${n < 0 ? '−' : ''}₩ ${Math.abs(Math.trunc(n)).toLocaleString('en-US')}`;
 
 function hqAdapter(bridge: Partial<GameBridge> | undefined, ui: { chooseFloor: HubHost['chooseFloor']; sfx: (n: string) => void; overlay?: HubHost['overlay']; rules?: () => ClockRules; shop?: (id: string) => string | null; choose?: (o: { title: string; lines?: string[]; options: string[]; cancel?: boolean }) => Promise<number> }): HqModuleLike & { goto(place: string): void; visitReady: Promise<void>; visitor(): { agentId: string; name: string }; dispose(): void } {
@@ -128,6 +131,8 @@ function hqAdapter(bridge: Partial<GameBridge> | undefined, ui: { chooseFloor: H
     .then(() => Promise.all(present.map((p) => loadChar(p.name)))).then(() => { ready = true; });
   // 필드 시각은 본편 상태줄 시각에서 시작한다 (docs/필드_세계_NPC_설계.md 16-3). 유저 소속·신분도 같이
   let me: { faction: string; level: number | null } = { faction: 'A00', level: 1 };
+  /** 주인공이 플레이 중인 이름 인물 (없으면 '') → 대사 chars.<인물> 칸 */
+  let playingAs = '';
   // 시연판(본편 없음): 시계를 10시에서 시작 (?hour=숫자 로 바꿈) — 근무·시간대·시간 보내기를 볼 수 있게
   if (!b?.card && fieldClock.sec === null) {
     const h = Number(typeof location !== 'undefined' ? new URLSearchParams(location.search).get('hour') ?? 10 : 10);
@@ -136,6 +141,7 @@ function hqAdapter(bridge: Partial<GameBridge> | undefined, ui: { chooseFloor: H
   void b?.card?.().then((snap) => {
     if (fieldClock.sec === null && snap?.minute != null) fieldClock.sec = snap.minute * 60;
     if (snap) me = { faction: snap.identity?.faction || snap.faction || 'A00', level: snap.identity?.level ?? null };
+    if (snap) playingAs = snap.player ? snap.agents.find((a) => a.id === snap.player)?.name ?? '' : '';
   }).catch(() => {});
   // 인물 기록(호감 단계·호칭)과 세력 평판: 대사 칸·몹 반응에 쓴다. 기록이 갱신되면 다시 읽는다
   const peopleBy = new Map<string, PersonView>();
@@ -202,7 +208,11 @@ function hqAdapter(bridge: Partial<GameBridge> | undefined, ui: { chooseFloor: H
   const world = () => {
     if (!sim && ready) {
       sim = createHqWorld(map, seed, present.filter((p) => ROOM_SCENE[p.room]).map((p) => ({ name: p.name, scene: ROOM_SCENE[p.room] })), hasCharClip, { killOk: () => fighterHooks.killOk?.() ?? false, stance: (f) => factionBy.get(f)?.stage ?? null, relation: (v, t) => relation(v, t), namedHostile: (n) => peopleBy.get(n)?.affinity.cell === 'hostile' });
-      chatter = new Chatter(sim, new Lines(dialogueData as unknown as DialogueData, sim.rng), lineCtx);
+      // 새 대사 자료(game-src/dialogue2 → 대사 팩 dialogue): 인물·NPC 파일 단위로 받아 둔다. 팩이 없으면(시연판) 대사 없이 돈다
+      dlg = new Dialogue2((file) => bridge?.assets ? bridge.assets.bytes('dialogue', file).catch(() => null) : Promise.resolve(null), sim.rng);
+      chatter = new Chatter(sim, dlg, cueCtx);
+      void dlg.prefetch('named', present.map((p) => p.name));
+      void dlg.prefetch('mob', NPC_FILES);
       // 비전투 계열 캐릭터는 동행이어도 싸움을 거들지 않는다 (반응표 combat)
       sim.noAssist = (n) => reactOf(n)?.combat === false;
     }
@@ -211,13 +221,31 @@ function hqAdapter(bridge: Partial<GameBridge> | undefined, ui: { chooseFloor: H
     return sim;
   };
   let chatter: Chatter | null = null;
-  /** 말하는 사람 기준 대사 칸: 플레이어 소속·직급, 적으로 보나 (호감 적대 구간·세력 적대·싸움 중) */
-  const lineCtx = (a: Actor): LineCtx => {
+  let dlg: Dialogue2 | null = null;
+  /** 말하는 사람 기준 대사 칸(dialogue2): 주인공 소속, 그 사람 쪽에서 본 주인공 평판(이름 인물 = 호감 구간, 몹 = 그 소속의 세력 평판), 플레이 중인 인물 */
+  const cueCtx = (a: Actor, target?: string): CueCtx => {
     const hour = fieldClock.sec === null ? null : (fieldClock.sec / 3600) % 24;
     const named = a.def.kind === 'named' ? peopleBy.get(a.def.name) : undefined;
-    const fac = a.def.kind === 'mob' ? sim?.mobFaction(a) ?? (dialogueData as unknown as DialogueData).npc[NPC_TYPE[a.def.archetype ?? a.def.name] ?? '']?.faction ?? null : named?.faction ?? null;
-    const enemy = a.act === 'argue' || a.plan === 'chase' || named?.affinity.cell === 'hostile' || (!!fac && factionBy.get(fac)?.stage === 'hostile');
-    return { hour, faction: me.faction, level: me.level, enemy };
+    const fac = a.def.kind === 'mob' ? sim?.mobFaction(a) : named?.faction ?? null;
+    const facStance = fac ? factionBy.get(fac)?.stage ?? null : null;
+    // 이름 인물: 호감 적대 → hostile, 따뜻·가까움 → friend, 기본 → 그 소속의 세력 평판. 싸우는 중이면 hostile
+    const cell = named?.affinity.cell;
+    const stance = a.act === 'argue' || a.plan === 'chase' ? 'hostile' : cell === 'hostile' ? 'hostile' : cell === 'warm' || cell === 'close' ? 'friend' : repOf(facStance);
+    return { hour, faction: me.faction, stance, player: playingAs || null, ...(target ? { target } : {}) };
+  };
+  /** 대사 자료 한 줄 (대화창 임시 글·하던 일 첫 말풍선용). key = 인물 이름 또는 mob:<id> */
+  fieldLink.cueLine = (key, cell) => {
+    const a = key.startsWith('mob:') ? sim?.actors.find((q) => q.def.id === key.slice(4)) : sim?.findActor(key);
+    return a && chatter ? chatter.line(a, cell) : null;
+  };
+  /** 말을 걸었을 때 하던 일 → busy 칸 (하던 일 중 주인공이 말 걸 때 첫 말풍선) */
+  fieldLink.busyCell = (key) => {
+    const a = key.startsWith('mob:') ? sim?.actors.find((q) => q.def.id === key.slice(4)) : sim?.findActor(key);
+    if (!a) return null;
+    const doing = a.doing === '주인공과 대화' ? a.talkFrom ?? '' : a.doing;
+    const id = a.task?.id ?? '';
+    const tag = id === 'work' ? 'work' : id === 'eat' ? 'eat' : id === 'rest' || id === 'hobby' ? 'rest' : id === 'pee' || id === 'poo' ? 'toilet' : id === 'train' ? 'train' : /담배/.test(doing) ? 'smoke' : /먹|식사|간식/.test(doing) ? 'eat' : /훈련/.test(doing) ? 'train' : a.post ? 'work' : '';
+    return tag ? `busy.${tag}` : null;
   };
   // 필드 장부(10-31 사용자): 모델에게 가는 글은 영어 짧은 문장, 주인공은 {user}(끼울 때 이름으로). 싸움은 한 건 = 한 줄(world/fightlog.ts)
   const sceneNameOf = (id: string) => map.scenes.find((q) => q.id === id)?.name ?? id;
@@ -797,7 +825,7 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
   if (bridge?.visit && bridge.assets) void loadFieldFx(bridge.assets, ffx, cutins);
   // NPC 자유 대화 (npcLink.ts): 껍데기 놀이판 층에 대화창
   // 본부 방문: 머리 위 이름표·말풍선과 아래 한 줄 입력 (talk.ts)
-  const visit = bridge?.visit ? mountTalk(shell.stage.ui, bridge.visit, bridge.field, (k) => fieldLink.mobOf?.(k) ?? null, { opts: (n) => fieldLink.talkOpts?.(n) ?? {}, onTags: (k, n, t) => fieldLink.onTags?.(k, n, t) }) : null;
+  const visit = bridge?.visit ? mountTalk(shell.stage.ui, bridge.visit, bridge.field, (k) => fieldLink.mobOf?.(k) ?? null, { opts: (n) => fieldLink.talkOpts?.(n) ?? {}, onTags: (k, n, t) => fieldLink.onTags?.(k, n, t), line: (k, c) => fieldLink.cueLine?.(k, c) ?? null, busyCell: (k) => fieldLink.busyCell?.(k) ?? null }) : null;
   fieldLink.talkTarget = () => visit?.target() ?? '';
   const npc = linkNpcTalk({
     visit: visit ? name => { if (name) visit.open(name); } : undefined,
