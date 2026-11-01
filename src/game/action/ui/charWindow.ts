@@ -6,7 +6,7 @@ import { hudArtImage, pixelIcon, pixelText, putText, type SkillIcon } from './pi
 import { kitPiece, kitSlice, nine } from './kit';
 import { CW_ART } from './charWindowArt';
 
-// 지난 스레드에서 뽑은 PixelLab 조각(창 틀·탭·카드 틀·뱃지 테)을 2배로 찍는다
+// PixelLab 조각 한 장(kit_0.png: 큰 판·작은 판·탭·빈 퍽 자리)을 1배로 찍는다
 type ArtKey = keyof typeof CW_ART;
 const cwImgs: Partial<Record<ArtKey, HTMLImageElement>> = {};
 function art(k: ArtKey): HTMLImageElement | null {
@@ -15,7 +15,7 @@ function art(k: ArtKey): HTMLImageElement | null {
   return im.complete && im.naturalWidth ? im : null;
 }
 /** 9칸 늘리기 (조각 1도트 = k px) */
-function stretch(c: CanvasRenderingContext2D, k: ArtKey, x: number, y: number, w: number, h: number, z = 2): boolean {
+function stretch(c: CanvasRenderingContext2D, k: ArtKey, x: number, y: number, w: number, h: number, z = 1): boolean {
   const im = art(k);
   if (!im) return false;
   const a = CW_ART[k] as { slice?: readonly number[] };
@@ -51,8 +51,8 @@ function plate(c: CanvasRenderingContext2D, x: number, y: number, w: number, h: 
 }
 /** 빈 뱃지 자리: 도트 원 */
 function socket(c: CanvasRenderingContext2D, cx: number, cy: number, r: number) {
-  const rim = art('rim');
-  if (rim) { c.drawImage(rim, cx - 32, cy - 32, 64, 64); return; }
+  const so = art('socket');
+  if (so) { c.drawImage(so, cx - 34, cy - 31, 68, 62); return; }
   for (let yy = -r; yy <= r; yy += 2) {
     const half = Math.floor(Math.sqrt(r * r - yy * yy) / 2) * 2;
     c.fillStyle = Math.abs(yy) > r - 4 || half < 6 ? RIM_D : SOCKET;
@@ -77,7 +77,7 @@ export function drawCharWindow(c: CanvasRenderingContext2D, d: CharWindowData, t
   c.imageSmoothingEnabled = false;
   c.fillStyle = 'rgba(0,0,0,0.6)'; c.fillRect(0, 0, W, H);
   const panel = kitPiece('panel');
-  if (!stretch(c, 'panel', 16, 16, W - 32, H - 32)) {
+  if (!stretch(c, 'frame', 16, 16, W - 32, H - 32)) {
     if (panel) nine(c, panel, kitSlice('panel'), 16, 16, W - 32, H - 32, 2);
     else plate(c, 16, 16, W - 32, H - 32, NAVY_D);
   }
@@ -86,7 +86,7 @@ export function drawCharWindow(c: CanvasRenderingContext2D, d: CharWindowData, t
 
   /* ── 머리 (늘 보임) ── */
   const hx = 104, hy = 54;
-  if (!stretch(c, 'banner', 40, 36, W - 80, 120)) plate(c, 48, 44, W - 96, 104);
+  if (!stretch(c, 'inner', 40, 36, W - 80, 120)) plate(c, 48, 44, W - 96, 104);
   const P = hudArtImage('portrait');
   if (d.face) c.drawImage(d.face, hx + 8, hy + 4, 64, 64);
   if (P) c.drawImage(P, hx, hy - 4);
@@ -114,17 +114,18 @@ export function drawCharWindow(c: CanvasRenderingContext2D, d: CharWindowData, t
   for (const name of CHAR_TABS) {
     const on = name === tab, t = T(name, on ? GOLD : DIM), w = t.width + 64;
     c.save(); if (!on) c.globalAlpha = 0.55;
-    if (!stretch(c, 'tab', tx, ty + 4, w, 40)) plate(c, tx, ty, w, 44, on ? '#1c2c58' : NAVY_D);
+    if (!stretch(c, 'tab', tx, ty, w, 40)) plate(c, tx, ty, w, 44, on ? '#1c2c58' : NAVY_D);
     c.restore();
-    putText(c, t, tx + 32, ty + 10);
+    if (on) { c.fillStyle = GOLD; c.fillRect(tx + 14, ty + 32, w - 28, 2); }
+    putText(c, t, tx + 32, ty + 8);
     tx += w + 8;
   }
   putText(c, T('E', DIM), tx + 6, ty + 10);
   putText(c, T('Tab 닫기', DIM), W - 64, ty + 10, 'right');
 
   /* ── 본문 ── */
-  const top = ty + 44, bh = H - 40 - top, L = 40, R = W - 40;
-  if (!stretch(c, 'panel', L, top, R - L, bh)) plate(c, L, top, R - L, bh);
+  const top = ty + 48, bh = H - 40 - top, L = 40, R = W - 40;
+  if (!stretch(c, 'inner', L, top, R - L, bh)) plate(c, L, top, R - L, bh);
   const SL = hudArtImage('slot');
 
   if (tab === '능력치') {
@@ -175,7 +176,7 @@ export function drawCharWindow(c: CanvasRenderingContext2D, d: CharWindowData, t
     c.fillStyle = RIM_D; c.fillRect(dx0 - 24, top + 24, 2, bh - 48);
     const pp = d.perks[d.perkPick];
     if (pp) {
-      stretch(c, 'card', dx0 - 16, top + 18, 160, 160);
+      stretch(c, 'inner', dx0 - 16, top + 18, 160, 160);
       if (pp.badge) c.drawImage(pp.badge, dx0, top + 34, 128, 128);
       putText(c, pixelText(pp.trait ? '특성' : '퍽', pp.trait ? '#ff9a8a' : DIM, 22), dx0 + 166, top + 40);
       putText(c, B(pp.name, GOLD), dx0 + 166, top + 72);
