@@ -8,7 +8,7 @@ import { clearArtCache, onSheetReady, renderButton, renderKnob, renderStickBase,
 import type { InputHub } from './input';
 import type { UiSettings } from './settings';
 
-export type TouchId = 'light' | 'heavy' | 'dodge' | 'block' | 'jump' | 'unique' | 'ult' | 'interact' | 'auto' | 'menu' | 'ok' | 'cancel';
+export type TouchId = 'light' | 'heavy' | 'dodge' | 'block' | 'jump' | 'unique' | 'ult' | 'interact' | 'auto' | 'menu' | 'char' | 'ok' | 'cancel';
 export type TouchMode = 'play' | 'dialog';
 
 interface Btn {
@@ -43,6 +43,8 @@ const DEF: Omit<Btn, 'el' | 'cx' | 'cy' | 'r'>[] = [
   { id: 'interact', cell: 7, text: '조사', dx: 0.34, dy: -2.66, d: 0.8, play: true },
   { id: 'auto', cell: null, text: 'AUTO', dx: 0, dy: 0, d: 0.8, play: true },
   { id: 'menu', cell: null, text: '', dx: 0, dy: 0, d: 0.65, play: true },
+  // 통합창(` 키, 11-01 사용자): 메뉴 옆
+  { id: 'char', cell: null, text: '통합창', dx: 0, dy: 0, d: 0.8, play: true },
   // 대사창 모드: 약공격 자리 = 선택, 점프 자리 = 취소
   { id: 'ok', cell: null, text: '선택', dx: 0, dy: 0, d: 1.45, dialog: true },
   { id: 'cancel', cell: null, text: '취소', dx: 0.02, dy: -1.44, d: 0.95, dialog: true },
@@ -50,6 +52,8 @@ const DEF: Omit<Btn, 'el' | 'cx' | 'cy' | 'r'>[] = [
 
 /** 회피: 엔진은 Shift 를 0.15초(5틱) 안에 떼면 회피로 읽는다. 터치는 누르는 순간 누르고 약 2틱 뒤 뗀다 */
 const DODGE_MS = 80;
+/** PC(터치 없음)에서도 보이는 아래 가운데 버튼 (11-01 사용자: PC에도 나오게) */
+const PC_BAR = new Set<TouchId>(['auto', 'menu', 'char']);
 /** 고유: 이보다 오래 누르면 충전(S 누른 채) */
 const CHARGE_MS = 300;
 
@@ -105,6 +109,8 @@ export class TouchPad {
   private imeUp = false;
   /** 자동전투 켜짐 (아래 가운데 버튼 안이 청록) */
   private autoOn = false;
+  /** PC: 터치판은 숨기고 아래 가운데 자동·메뉴·통합창만 마우스로 */
+  private pc = false;
   private baseX = 0;
   private baseY = 0;
   private lastDpr = 0;
@@ -229,14 +235,16 @@ export class TouchPad {
     const autoR = 0.4 * u,
       rowY = portrait ? ins.t + 10 + autoR : bh - ins.b - 12 - autoR;
     for (const b of this.btns) {
-      if (b.id === 'auto') place(b, flip(bw / 2 - 0.5 * u), rowY);
-      else if (b.id === 'menu') place(b, flip(bw / 2 + 0.42 * u), rowY);
+      if (b.id === 'auto') place(b, flip(bw / 2 - 0.92 * u), rowY);
+      else if (b.id === 'menu') place(b, flip(bw / 2), rowY);
+      else if (b.id === 'char') place(b, flip(bw / 2 + 0.92 * u), rowY);
       else place(b, flip(ax + b.dx * u), ay + b.dy * u * ky);
     }
     const auto = this.btns.find((b) => b.id === 'auto')!;
     const menu = this.btns.find((b) => b.id === 'menu')!;
-    const nl = Math.min(auto.cx - auto.r, menu.cx - menu.r) - 10,
-      nr = Math.max(auto.cx + auto.r, menu.cx + menu.r) + 10;
+    const chr = this.btns.find((b) => b.id === 'char')!;
+    const nl = Math.min(auto.cx - auto.r, menu.cx - menu.r, chr.cx - chr.r) - 10,
+      nr = Math.max(auto.cx + auto.r, menu.cx + menu.r, chr.cx + chr.r) + 10;
     this.noStick = { x: nl, y: rowY - autoR - 10, w: nr - nl, h: autoR * 2 + 20 };
     // 스틱: 왼쪽 절반 (HUD 얼굴 칸 아래부터)
     const zt = portrait ? Math.max(bh * 0.4, rowY + autoR + 10) : bh * 0.18;
@@ -269,6 +277,7 @@ export class TouchPad {
   }
   /** 이 모드에서 보이는 버튼인가 */
   private usable(b: Btn) {
+    if (this.pc) return PC_BAR.has(b.id);
     if (this.mode === 'dialog') return !!b.dialog;
     if (this.root.closest('.exploration-map')) return b.id === 'menu';
     return !!b.play;
@@ -284,7 +293,7 @@ export class TouchPad {
     if (this.mode === m) return;
     this.mode = m;
     this.releaseAll();
-    this.layout();
+    this.refresh();
   }
   get touchMode(): TouchMode {
     return this.mode;
@@ -308,7 +317,9 @@ export class TouchPad {
     const s = this.st();
     const coarse = typeof matchMedia !== 'undefined' && matchMedia('(pointer: coarse)').matches;
     const show = s.touch === 'on' || (s.touch === 'auto' && (coarse || this.seenTouch));
-    this.root.classList.toggle('hide', !show || !this.visible || this.imeUp);
+    this.pc = !show && this.visible && !this.imeUp && this.mode === 'play';
+    this.root.classList.toggle('pc', this.pc);
+    this.root.classList.toggle('hide', (!show && !this.pc) || !this.visible || this.imeUp);
     this.layout();
   }
   setVisible(on: boolean) {
@@ -318,18 +329,18 @@ export class TouchPad {
     this.refresh();
   }
   get shown() {
-    return !this.root.classList.contains('hide');
+    return !this.root.classList.contains('hide') && !this.pc;
   }
   /** 터치를 받는 중 (보이고 키패드가 아님) */
   private active() {
-    return this.shown && !this.imeUp;
+    return (this.shown || this.pc) && !this.imeUp;
   }
   /** 버튼 종류 → 틀 모양 */
   private kindOf(b: Btn): FrameKind {
     if (b.id === 'light' || b.id === 'ok') return 'main';
     if (b.id === 'ult') return 'ult';
     if (b.id === 'block' || b.id === 'dodge') return 'guard';
-    if (b.id === 'auto') return 'auto';
+    if (b.id === 'auto' || b.id === 'char') return 'auto';
     if (b.id === 'menu') return 'menu';
     return 'skill';
   }
@@ -338,7 +349,7 @@ export class TouchPad {
     const cv = b.el.querySelector<HTMLCanvasElement>(':scope > .tp-cv');
     if (!cv || !b.r) return;
     const size = Math.round(b.r * 2);
-    const art = renderButton({ size, kind: this.kindOf(b), cell: b.cell, text: b.id === 'auto' ? '자동\n전투' : b.text, on: b.id === 'auto' && this.autoOn });
+    const art = renderButton({ size, kind: this.kindOf(b), cell: b.cell, text: b.id === 'auto' ? '자동\n전투' : b.id === 'char' ? '통합\n창' : b.text, on: b.id === 'auto' && this.autoOn });
     if (cv.width !== art.width || cv.height !== art.height) (cv.width = art.width), (cv.height = art.height);
     const g = cv.getContext('2d');
     if (!g) return;
@@ -435,6 +446,7 @@ export class TouchPad {
       case 'interact': return CODE.interact;
       case 'auto': return CODE.auto;
       case 'menu': return 'Escape';
+      case 'char': return 'Backquote';
       case 'ok': return 'Enter';
       case 'cancel': return 'Escape';
     }
@@ -456,11 +468,11 @@ export class TouchPad {
   private hold(b: Btn, on: boolean) {
     b.el.classList.toggle('on', on);
     if (on && this.st().vibrate) navigator.vibrate?.(8);
-    if (b.id === 'menu') {
-      // 메뉴(일시정지): 숨은 스틱이 이어지지 않게 다 놓고 연다
+    if (b.id === 'menu' || b.id === 'char') {
+      // 메뉴(일시정지)·통합창: 숨은 스틱이 이어지지 않게 다 놓고 연다
       if (on) {
         this.releaseAll();
-        this.onMenu('Escape');
+        this.onMenu(b.id === 'menu' ? 'Escape' : 'Backquote');
       }
       return;
     }
@@ -512,6 +524,15 @@ export class TouchPad {
     if (!this.active() || (e.pointerType === 'mouse' && e.button !== 0)) return;
     const t = e.target as Element | null;
     const p = this.local(e);
+    if (this.pc) {
+      // PC: 아래 가운데 버튼만 받고, 그 밖 클릭은 그대로 둔다
+      const pb = this.hit(p.x, p.y);
+      if (!pb) return;
+      e.preventDefault();
+      this.ptr.set(e.pointerId, { kind: 'btn', b: pb });
+      this.hold(pb, true);
+      return;
+    }
     // 놀이 모드에서는 우리 버튼이 먼저, 대사창 모드에서는 선택지·입력칸이 먼저
     let b = this.mode === 'play' ? this.hit(p.x, p.y) : null;
     if (!b && t && !t.closest('.tp') && t.closest(EXEMPT)) return;

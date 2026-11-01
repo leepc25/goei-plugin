@@ -11,13 +11,14 @@ import { persp, view } from './view';
 import { KEYMAP } from './input';
 import { drawGuardBar, type SkillIcon } from '../ui/pixelHud';
 import { CharWindowCtl } from '../ui/charWindowCtl';
+import { badgeOf, loadBadges } from '../ui/badgeArt';
 import type { CharWindowData } from '../ui/charWindow';
 import { CW_SKILLS, CW_STATS } from '../ui/charWindowTable.gen';
 import { AGENT_NPCS } from '../npc/roster';
 import { FIELD_ITEMS, BAG_SLOTS } from '../../world/fieldShop';
 import { FighterPlayer, fighterHooks } from '../fighter/player';
 import { GRADE_COLOR, PAIR_COLOR, TRAIT_COLOR, openDraft } from '../../perks/draftUi';
-import { PERK_TEXT } from '../../perks/defs.gen';
+import { PERK_TEXT, TRAIT_TEXT } from '../../perks/defs.gen';
 
 const PERK_KIND = new Map(PERK_TEXT.map((d) => [d.name, d.kind]));
 /** HUD 퍽 칸: 얻은 순서대로, 특성은 맨 뒤. 이름 앞 두 글자 · 등급 테두리 · 쌓임 숫자 */
@@ -755,9 +756,10 @@ function charWindowData(w: World, hs: HudState, team: string, bag: Record<string
   const perks: CharWindowData['perks'] = pr?.active ? [
     ...[...pr.ranks].map(([n, r]) => {
       const t = PERK_TEXT.find((x) => x.name === n);
-      return { name: n, cat: t?.cat ?? '', effect: t?.eff ?? '', cond: t?.cond || undefined, rank: [r, t?.rank ?? r] as [number, number], grade: (['일반', '희귀', '특급'] as const)[pr.topGrade(n)] ?? '일반', badge: null };
+      const grade = (['일반', '희귀', '특급'] as const)[pr.topGrade(n)] ?? '일반';
+      return { name: n, cat: t?.cat ?? '', effect: t?.eff ?? '', cond: t?.cond || undefined, rank: [r, t?.rank ?? r] as [number, number], grade, badge: badgeOf(n, grade) };
     }),
-    ...[...pr.traits].map((n) => ({ name: n, cat: '특성', effect: '', trait: true, badge: null })),
+    ...[...pr.traits].map((n) => { const t = TRAIT_TEXT.find((x) => x.name === n); return { name: n, cat: '특성', effect: t?.good ?? '', cost: t?.cost, trait: true, badge: badgeOf(n) }; }),
   ] : [];
   const bagRows = Object.entries(bag).filter(([, c]) => c > 0).map(([id, c]) => ({ label: FIELD_ITEMS[id]?.name ?? id, count: c }));
   return {
@@ -897,6 +899,7 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
   fighterHooks.killOk = () => shell.settings.npcKill;
   fighterHooks.permaDeath = () => shell.settings.deathMode === 'perma';
   const charWin = new CharWindowCtl();
+  if (bridge?.assets) loadBadges((f) => bridge.assets!.url('ui-badges', f));
   const shell = mountGameShell(box, {
     synth: true,
     // 통합창: ` 로 열고 닫기 (11-01 사용자). 대화·가게·영상 등 다른 창이 떠 있으면 안 연다
@@ -1248,7 +1251,7 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
     frame: (dt) => {
       // 터치판 모드를 한 곳에서 정한다 (모바일 조작 설계 2026-10-28): 본부 창(임무 창구 등)·승강기 층 단추·NPC 대화창·방문 대화·메뉴가 뜨면
       // 「대사창 모드」(선택·취소 + 스틱 ↑↓, 선택지 글자 직접 누르기도 됨). 영상이 도는 동안만 숨긴다
-      const dialogUp = (!!game?.inHub && (!!hq.isOpen?.() || !floorBox.hidden)) || npc.isOpen() || !!visit?.isOpen() || shell.menu.isOpen;
+      const dialogUp = (!!game?.inHub && (!!hq.isOpen?.() || !floorBox.hidden)) || npc.isOpen() || !!visit?.isOpen() || shell.menu.isOpen || charWin.open;
       shell.touch.setMode(dialogUp ? 'dialog' : 'play');
       shell.touch.setVisible(!story.isVideoPlaying() && (shell.mode === 'play' || shell.menu.isOpen));
       // 못 씀(흐림·자리 유지): 에일린 전투 몸이 아니면 전투 버튼, 싸움이 없으면 AUTO
