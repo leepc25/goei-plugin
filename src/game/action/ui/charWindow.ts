@@ -153,40 +153,38 @@ export function drawCharWindow(c: CanvasRenderingContext2D, d: CharWindowData, t
     d.pick.desc.forEach((l, i) => putText(c, T(l), L + 40, y0 + 50 + i * 32));
     putText(c, T(d.pick.nums, '#9fd7ff'), L + 40, y0 + 50 + d.pick.desc.length * 32 + 10);
   } else if (tab === '퍽') {
-    const gw = 700, per = Math.floor((gw - 20) / 78);
+    const gw = 740, per = 5;
     for (let i = 0; i < d.perks.length; i++) {
-      const x = L + 48 + (i % per) * 78, y = top + 30 + Math.floor(i / per) * 78;
+      const x = L + 48 + (i % per) * 140, y = top + 30 + Math.floor(i / per) * 140;
       const p = d.perks[i];
-      if (p.badge) c.drawImage(p.badge, x, y, 64, 64);
-      if (i === d.perkPick) corners(c, x - 5, y - 5, 74, 74);
+      if (p.badge) c.drawImage(p.badge, x, y, 128, 128);
+      if (i === d.perkPick) corners(c, x - 6, y - 6, 140, 140);
     }
     putText(c, T(`이번 괴이에서 얻은 퍽 ${d.perks.length}개`, DIM), L + 48, top + bh - 46);
     const dx0 = L + gw + 40;
     c.fillStyle = RIM_D; c.fillRect(dx0 - 24, top + 24, 2, bh - 48);
     const pp = d.perks[d.perkPick];
     if (pp) {
-      stretch(c, 'inner', dx0 - 16, top + 18, 160, 160);
-      if (pp.badge) c.drawImage(pp.badge, dx0, top + 34, 128, 128);
-      putText(c, pixelText(pp.trait ? '특성' : '퍽', pp.trait ? '#ff9a8a' : DIM, 22), dx0 + 166, top + 40);
-      putText(c, B(pp.name, GOLD), dx0 + 166, top + 72);
-      putText(c, T(pp.effect), dx0, top + 186);
-      putText(c, T('괴이를 나오면 사라짐', DIM), dx0, top + 222);
+      putText(c, pixelText(pp.trait ? '특성' : '퍽', pp.trait ? '#ff9a8a' : DIM, 22), dx0, top + 30);
+      putText(c, B(pp.name, GOLD), dx0, top + 62);
+      putText(c, T(pp.effect), dx0, top + 120);
+      putText(c, T('괴이를 나오면 사라짐', DIM), dx0, top + 156);
     }
   } else {
     const slot = (x: number, y: number, it?: { label: string; count: number }, k?: string, on = false) => {
-      if (SL) c.drawImage(SL, x, y);
+      if (SL) c.drawImage(SL, x, y, 100, 100);
       if (it) {
-        putText(c, T(it.label.slice(0, 2)), x + 25, y + 14, 'center');
-        if (it.count > 1) putText(c, pixelText(String(it.count), GOLD, 11), x + 44, y + 34, 'right');
+        putText(c, B(it.label.slice(0, 2)), x + 50, y + 30, 'center');
+        if (it.count > 1) putText(c, T(String(it.count), GOLD), x + 88, y + 66, 'right');
       }
-      if (k) putText(c, pixelText(k, GOLD, 11), x + 4, y + 2);
-      if (on) corners(c, x - 5, y - 5, 60, 60);
+      if (k) putText(c, T(k, GOLD), x + 10, y + 6);
+      if (on) corners(c, x - 6, y - 6, 112, 112);
     };
-    putText(c, T('퀵슬롯', GOLD), L + 48, top + 24);
-    for (let i = 0; i < 4; i++) slot(L + 48 + i * 62, top + 60, d.quick[i], String(i + 1), i === 0);
-    putText(c, T(`가방 ${d.bag.length} / ${d.bagSlots}`, GOLD), L + 48, top + 140);
-    for (let i = 0; i < d.bagSlots; i++) slot(L + 48 + (i % 8) * 62, top + 176 + Math.floor(i / 8) * 62, d.bag[i]);
-    const dx0 = L + 600;
+    putText(c, T('퀵슬롯', GOLD), L + 48, top + 20);
+    for (let i = 0; i < 4; i++) slot(L + 48 + i * 112, top + 54, d.quick[i], String(i + 1), i === 0);
+    putText(c, T(`가방 ${d.bag.length} / ${d.bagSlots}`, GOLD), L + 48, top + 166);
+    for (let i = 0; i < d.bagSlots; i++) slot(L + 48 + (i % 4) * 112, top + 200 + Math.floor(i / 4) * 106, d.bag[i]);
+    const dx0 = L + 560;
     c.fillStyle = RIM_D; c.fillRect(dx0 - 24, top + 24, 2, bh - 48);
     const it = d.quick[0];
     if (it) {
