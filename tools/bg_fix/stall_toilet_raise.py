@@ -10,6 +10,7 @@ D = 'game-src/art/objects/restroom/'
 SRC = 'game-src/art/pixellab-hq-20261031/hq_restroom_m_stalls_v2.png'
 X0 = 14
 R = int(sys.argv[3]) if len(sys.argv) > 3 else 14
+WALL = 210                                        # 배경 벽 밑 띠 시작(배경 y326) = 칸 캔버스 y210
 a = np.array(Image.open(SRC).convert('RGBA'))
 L = a[..., :3].astype(int).mean(2)
 box = np.zeros(L.shape, bool); box[186:244, 122:178] = True
@@ -45,6 +46,9 @@ def raise_toilet(p_in, p_out):
     rows = list(range(186, 220)) + [220] * 0
     out = np.zeros_like(b)
     for y in range(144, 244): out[y - R] = tp[y]                     # 13:37 사용자: 늘이지 말고 변기 통째로 R 위로
+    # 13:40 사용자 「뒤 벽을 땡겨 올리고 바닥 처리」: 칸 안 뒷벽(원본 x121~181)을 캔버스 y에서 끊어
+    # 아래는 투명 → 배경의 벽 밑 띠(배경 y326~332)·바닥이 그대로 보임
+    b[WALL:227, 121 - X0:182 - X0, 3] = 0
     A = out[..., 3] > 0
     b[A] = out[A]
     Image.fromarray(b).save(D + p_out)
