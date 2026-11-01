@@ -14,3 +14,9 @@ r[231:332, 45 + OFF] = [40, 40, 44, 255]
 Image.fromarray(r).save(D + 'hq_restroom_m_ext3L_fix.png')
 o = np.array(Image.open(D + 'hq_restroom_m_ext3L.png').convert('RGBA'))
 ch = np.argwhere((r != o).any(2)); print('바뀐 범위 x', ch[:,1].min(), ch[:,1].max(), 'y', ch[:,0].min(), ch[:,0].max())
+
+# 3) 12:04 사용자가 짚은 곳 「이부분 여기만」: 창틀 기둥 발치의 밝은 토막(x404~415, y146~153) → 바로 왼쪽 벽 줄(x380~391)로 덮음
+r = np.array(Image.open(D + 'hq_restroom_m_ext3L_fix.png').convert('RGBA'))
+r[146:154, 404:416] = r[146:154, 380:392]
+Image.fromarray(r).save(D + 'hq_restroom_m_ext3L_fix.png')
+ch = np.argwhere((r != o).any(2)); print('바뀐 범위(전체) x', ch[:,1].min(), ch[:,1].max(), 'y', ch[:,0].min(), ch[:,0].max())
