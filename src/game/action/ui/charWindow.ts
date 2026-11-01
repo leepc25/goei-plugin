@@ -49,17 +49,6 @@ function plate(c: CanvasRenderingContext2D, x: number, y: number, w: number, h: 
   c.fillStyle = RIM_L; c.fillRect(x + 2 * u, y, w - 4 * u, u); c.fillRect(x, y + 2 * u, u, h - 4 * u); c.fillRect(x + u, y + u, u, u);
   c.fillStyle = fill; c.fillRect(x + 2 * u, y + u, w - 4 * u, h - 2 * u); c.fillRect(x + u, y + 2 * u, w - 2 * u, h - 4 * u);
 }
-/** 빈 뱃지 자리: 도트 원 */
-function socket(c: CanvasRenderingContext2D, cx: number, cy: number, r: number) {
-  const so = art('socket');
-  if (so) { c.drawImage(so, cx - 34, cy - 31, 68, 62); return; }
-  for (let yy = -r; yy <= r; yy += 2) {
-    const half = Math.floor(Math.sqrt(r * r - yy * yy) / 2) * 2;
-    c.fillStyle = Math.abs(yy) > r - 4 || half < 6 ? RIM_D : SOCKET;
-    c.fillRect(cx - half, cy + yy, half * 2, 2);
-    c.fillStyle = RIM_D; c.fillRect(cx - half, cy + yy, 2, 2); c.fillRect(cx + half - 2, cy + yy, 2, 2);
-  }
-}
 /** 고른 칸 표시: 금색 도트 모서리 네 개 */
 function corners(c: CanvasRenderingContext2D, x: number, y: number, w: number, h: number) {
   c.fillStyle = GOLD;
@@ -165,13 +154,13 @@ export function drawCharWindow(c: CanvasRenderingContext2D, d: CharWindowData, t
     putText(c, T(d.pick.nums, '#9fd7ff'), L + 40, y0 + 50 + d.pick.desc.length * 32 + 10);
   } else if (tab === '퍽') {
     const gw = 700, per = Math.floor((gw - 20) / 78);
-    for (let i = 0; i < d.perkSlots; i++) {
+    for (let i = 0; i < d.perks.length; i++) {
       const x = L + 48 + (i % per) * 78, y = top + 30 + Math.floor(i / per) * 78;
       const p = d.perks[i];
-      if (p?.badge) c.drawImage(p.badge, x, y, 64, 64); else socket(c, x + 32, y + 32, 28);
+      if (p.badge) c.drawImage(p.badge, x, y, 64, 64);
       if (i === d.perkPick) corners(c, x - 5, y - 5, 74, 74);
     }
-    putText(c, T(`이번 괴이에서 얻은 퍽 ${d.perks.length} / ${d.perkSlots}`, DIM), L + 48, top + bh - 46);
+    putText(c, T(`이번 괴이에서 얻은 퍽 ${d.perks.length}개`, DIM), L + 48, top + bh - 46);
     const dx0 = L + gw + 40;
     c.fillStyle = RIM_D; c.fillRect(dx0 - 24, top + 24, 2, bh - 48);
     const pp = d.perks[d.perkPick];
@@ -193,7 +182,7 @@ export function drawCharWindow(c: CanvasRenderingContext2D, d: CharWindowData, t
       if (k) putText(c, pixelText(k, GOLD, 11), x + 4, y + 2);
       if (on) corners(c, x - 5, y - 5, 60, 60);
     };
-    putText(c, T('퀵칸', GOLD), L + 48, top + 24);
+    putText(c, T('퀵슬롯', GOLD), L + 48, top + 24);
     for (let i = 0; i < 4; i++) slot(L + 48 + i * 62, top + 60, d.quick[i], String(i + 1), i === 0);
     putText(c, T(`가방 ${d.bag.length} / ${d.bagSlots}`, GOLD), L + 48, top + 140);
     for (let i = 0; i < d.bagSlots; i++) slot(L + 48 + (i % 8) * 62, top + 176 + Math.floor(i / 8) * 62, d.bag[i]);
