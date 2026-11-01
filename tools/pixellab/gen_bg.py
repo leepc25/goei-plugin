@@ -1,5 +1,8 @@
 """PixelLab generate-image-v2로 배경 한 장. 인증은 프록시가 넣는다.
 사용: python3 gen_bg.py <프롬프트.txt> <화풍그림> <출력.png> <가로> <세로> [화풍그림 축소배율]"""
+import sys as _s0
+# 2026-11-01 14:33 사용자 「참고 이미지 넣지 말라고 몇번을 말하냐」: 승인 회수를 쓰기 전에 막는다
+if len(_s0.argv) > 2 and _s0.argv[2]: _s0.exit('참고 그림 금지(사용자 11-01 14:33) — 둘째 인자를 \'\' 로 비워라')
 # --- PixelLab 생성 승인 문 (2026-10-31 사용자: 시키지 않은 생성 금지) — 이 파일의 모든 생성 요청은 .pixellab_ok 회수가 있어야 나간다
 import sys as _gs, pathlib as _gp
 _gs.path.insert(0, str(next(p for p in _gp.Path(__file__).resolve().parents if (p / "tools" / "pixellab_gate.py").exists()) / "tools"))
