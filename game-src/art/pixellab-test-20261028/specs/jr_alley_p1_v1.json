@@ -1,0 +1,198 @@
+{
+ "room": "corridor",
+ "mood": "worn",
+ "mode": "loose",
+ "view": "corridor",
+ "floor_share": "the lower 40 percent",
+ "sides": "none",
+ "density": "packed+",
+ "place": "a narrow, dark back alley of a run-down 1990s Seoul underground arcade, low ceiling right above the sign",
+ "time": "night",
+ "light": "a few caged wall lamps and shop light",
+ "floor": "smooth dark poured concrete like one wet sheet, mottled grime, many puddles, wet stains, varied litter all over the walkway, shadows under objects",
+ "walls": "bare stained concrete and exposed old brick, peeling paint, mold, water marks; low ceiling strip, tangled pipes and cables, caged wall lamps, no fluorescent tubes",
+ "palette": "dark cold blue-grey, amber lamp light accents",
+ "shadow": "strong contrast, amber lamp pools, very dark patches, black shadow under objects",
+ "sized": [],
+ "name": "jr_alley_p1_v1",
+ "doors": 1,
+ "no": [
+  "other doors",
+  "side walls"
+ ],
+ "items": [
+  {
+   "full": "far left 20 percent of the image: a dead-end wall with a lowered rusty shutter, military equipment cases and boxes piled in front of it",
+   "text": "far left 20 percent of the image: a dead-end wall with a lowered rusty shutter, military equipment cases and boxes piled in front of it",
+   "why": "의뢰문 ① 왼쪽 끝 셔터 막다른 벽·장비 케이스 더미",
+   "keep": [
+    "dead-end wall",
+    "equipment cases"
+   ]
+  },
+  {
+   "full": "back wall, centered: a cramped pawn shop with a heavy old wooden door in the middle and a lit display window crammed with small jewelry, watches, porcelain and nameless odd objects, an old dark wooden board with carved gold letters reading \"헐값매입\"",
+   "text": "back wall, centered: a cramped pawn shop with a heavy old wooden door in the middle and a lit display window crammed with small jewelry, watches, porcelain and nameless odd objects, an old dark wooden board with carved gold letters reading \"헐값매입\"",
+   "why": "위키 헐값 매입(유리 진열장·보석·시계·도자기·이름표 없는 기묘한 물건), 간판 나무판·금색 새김 글씨, 게임 출입구 heolgap",
+   "keep": [
+    "pawn shop",
+    "wooden door",
+    "display window",
+    "reading \"헐값매입\""
+   ]
+  },
+  {
+   "full": "clear empty floor in front of the wooden door",
+   "text": "clear empty floor in front of the wooden door",
+   "why": "게임 출입구 앞 비움",
+   "keep": [
+    "clear empty floor"
+   ]
+  },
+  {
+   "full": "wall base beside the shop: collapsed cardboard, burst trash bag, broken bottles, each a different shape",
+   "text": "wall base beside the shop: collapsed cardboard, burst trash bag, broken bottles, each a different shape",
+   "why": "사용자 쓰레기 제각각",
+   "keep": [
+    "burst trash bag",
+    "each a different shape"
+   ]
+  },
+  {
+   "full": "a rusted trash can",
+   "text": "a rusted trash can",
+   "why": "설계안 쓰레기통",
+   "keep": [
+    "trash can"
+   ]
+  },
+  {
+   "full": "a caged wall lamp with a dim amber glow",
+   "text": "a caged wall lamp with a dim amber glow",
+   "why": "의뢰문: 형광등 대신 벽등",
+   "keep": [
+    "caged wall lamp"
+   ]
+  },
+  {
+   "full": "tangled cables hanging down the wall",
+   "text": "tangled cables hanging down the wall",
+   "why": "의뢰문 엉킨 전선",
+   "keep": [
+    "tangled cables"
+   ]
+  },
+  {
+   "full": "a small CCTV camera over the door",
+   "text": "a small CCTV camera over the door",
+   "why": "암시장 경계",
+   "keep": [
+    "CCTV camera"
+   ]
+  },
+  {
+   "full": "a torn blank poster",
+   "text": "a torn blank poster",
+   "why": "벽 종이 몇 군데만",
+   "keep": [
+    "blank poster"
+   ]
+  },
+  {
+   "full": "right 10 percent of the image: only bare back wall and floor, no side wall",
+   "text": "right 10 percent of the image: only bare back wall and floor, no side wall",
+   "why": "사용자 이음매: 앞 기둥 자리",
+   "keep": [
+    "right 10 percent"
+   ]
+  }
+ ],
+ "must": [
+  {
+   "kw": "reading \"헐값매입\"",
+   "from": "사용자 확정 가게 이름"
+  },
+  {
+   "kw": "one wet sheet",
+   "from": "사용자 바닥 선 금지"
+  }
+ ],
+ "brief": {
+  "wiki": "중림 지하상가 뒷골목: 앞쪽보다 좁고 어둡고 조용, 장물·무기·정체불명 물건·이상한 약재",
+  "design": "GPT 의뢰문 뒷골목 7칸(장면 구성 근거)",
+  "user": [
+   "사용자 10-31: 뒷골목 7칸 한번에, 앞골목과 같은 가이드 v6, 고정 문장 7칸 같게, 간판 모양·색 칸마다 다르게, 뒷골목은 더 어둡고(벽등·가게 불빛만) 차가운 푸른 회색, 맨 콘크리트·벽돌, 잠기고 숨기는 가게"
+  ],
+  "items": [
+   {
+    "src": "0번 줄 근거",
+    "by": [
+     0
+    ]
+   },
+   {
+    "src": "1번 줄 근거",
+    "by": [
+     1
+    ]
+   },
+   {
+    "src": "2번 줄 근거",
+    "by": [
+     2
+    ]
+   },
+   {
+    "src": "3번 줄 근거",
+    "by": [
+     3
+    ]
+   },
+   {
+    "src": "4번 줄 근거",
+    "by": [
+     4
+    ]
+   },
+   {
+    "src": "5번 줄 근거",
+    "by": [
+     5
+    ]
+   },
+   {
+    "src": "6번 줄 근거",
+    "by": [
+     6
+    ]
+   },
+   {
+    "src": "7번 줄 근거",
+    "by": [
+     7
+    ]
+   },
+   {
+    "src": "8번 줄 근거",
+    "by": [
+     8
+    ]
+   },
+   {
+    "src": "9번 줄 근거",
+    "by": [
+     9
+    ]
+   }
+  ]
+ },
+ "review": {
+  "fit": "10줄 모두 뒷골목 이 칸의 가게·소품, 의자·사람 없음",
+  "place": "가게 가운데(가이드 v6), 문·통로 앞 비움, 이음 쪽 10% 비움, 양끝 칸은 막다른 곳 20%",
+  "size": "크기 숫자 없음(느슨한 틀)",
+  "brief": "의뢰문 칸 내용 모두 대응, 빠진 것 없음",
+  "meaning": "1차=2차(느슨한 틀)",
+  "over": "같은 물건 두 번 없음, packed+",
+  "frame": "고정 문장 7칸 같음, 가이드 v6, 간판만 칸마다 다름"
+ }
+}

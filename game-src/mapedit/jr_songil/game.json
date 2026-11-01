@@ -1,0 +1,303 @@
+{
+ "scene": {
+  "file": "me_jr_songil",
+  "w": 1264,
+  "h": 848,
+  "under": true,
+  "lane": [
+   585,
+   837
+  ],
+  "floor": [
+   [
+    92,
+    605
+   ],
+   [
+    142,
+    605
+   ],
+   [
+    142,
+    585
+   ],
+   [
+    1264,
+    585
+   ],
+   [
+    1264,
+    849
+   ],
+   [
+    0,
+    849
+   ],
+   [
+    0,
+    800
+   ],
+   [
+    92,
+    730
+   ]
+  ],
+  "holes": [
+   [
+    [
+     142,
+     726
+    ],
+    [
+     256,
+     726
+    ],
+    [
+     364,
+     588
+    ],
+    [
+     364,
+     578
+    ],
+    [
+     142,
+     578
+    ]
+   ],
+   [
+    [
+     368,
+     585
+    ],
+    [
+     636,
+     585
+    ],
+    [
+     636,
+     620
+    ],
+    [
+     368,
+     620
+    ]
+   ],
+   [
+    [
+     1070,
+     585
+    ],
+    [
+     1264,
+     585
+    ],
+    [
+     1264,
+     722
+    ],
+    [
+     1160,
+     722
+    ],
+    [
+     1070,
+     645
+    ]
+   ],
+   [
+    [
+     915,
+     770
+    ],
+    [
+     1002,
+     770
+    ],
+    [
+     1002,
+     848
+    ],
+    [
+     915,
+     848
+    ]
+   ],
+   [
+    [
+     1040,
+     812
+    ],
+    [
+     1145,
+     812
+    ],
+    [
+     1145,
+     848
+    ],
+    [
+     1040,
+     848
+    ]
+   ],
+   [
+    [
+     1160,
+     705
+    ],
+    [
+     1264,
+     705
+    ],
+    [
+     1264,
+     849
+    ],
+    [
+     1160,
+     849
+    ]
+   ]
+  ],
+  "dotK": 1.4292,
+  "blocks": [],
+  "doors": {
+   "out": {
+    "x0": 565,
+    "x1": 725,
+    "y0": 800,
+    "y1": 848,
+    "anim": "none",
+    "behind": "dark"
+   },
+   "jinryo": {
+    "x0": 648,
+    "x1": 792,
+    "y0": 243,
+    "y1": 582,
+    "anim": "none",
+    "behind": "dark"
+   },
+   "op": {
+    "x0": 968,
+    "x1": 1118,
+    "y0": 243,
+    "y1": 582,
+    "anim": "none",
+    "behind": "dark"
+   }
+  },
+  "lamps": [
+   {
+    "x": 690,
+    "y": 40,
+    "kind": "down",
+    "r": 420
+   },
+   {
+    "x": 1130,
+    "y": 40,
+    "kind": "down",
+    "r": 420
+   }
+  ],
+  "windows": [],
+  "objects": [
+   {
+    "id": "counter0",
+    "file": "me_jr_songil_counter0",
+    "x": 136,
+    "y": 497,
+    "w": 64,
+    "h": 230,
+    "sortY": 726
+   },
+   {
+    "id": "counter1",
+    "file": "me_jr_songil_counter1",
+    "x": 200,
+    "y": 468,
+    "w": 56,
+    "h": 259,
+    "sortY": 726
+   },
+   {
+    "id": "counter2",
+    "file": "me_jr_songil_counter2",
+    "x": 256,
+    "y": 456,
+    "w": 36,
+    "h": 271,
+    "sortY": 703
+   },
+   {
+    "id": "counter3",
+    "file": "me_jr_songil_counter3",
+    "x": 292,
+    "y": 440,
+    "w": 36,
+    "h": 239,
+    "sortY": 657
+   },
+   {
+    "id": "counter4",
+    "file": "me_jr_songil_counter4",
+    "x": 328,
+    "y": 440,
+    "w": 39,
+    "h": 191,
+    "sortY": 608
+   },
+   {
+    "id": "plant",
+    "file": "me_jr_songil_plant",
+    "x": 890,
+    "y": 616,
+    "w": 128,
+    "h": 232,
+    "sortY": 848
+   },
+   {
+    "id": "fan",
+    "file": "me_jr_songil_fan",
+    "x": 1022,
+    "y": 614,
+    "w": 120,
+    "h": 234,
+    "sortY": 846
+   },
+   {
+    "id": "trash",
+    "file": "me_jr_songil_trash",
+    "x": 1156,
+    "y": 702,
+    "w": 108,
+    "h": 146,
+    "sortY": 849
+   },
+   {
+    "id": "rack",
+    "file": "me_jr_songil_rack",
+    "x": 1066,
+    "y": 380,
+    "w": 198,
+    "h": 340,
+    "sortY": 722
+   }
+  ]
+ },
+ "spots": [],
+ "files": [
+  "me_jr_songil",
+  "me_jr_songil_counter0",
+  "me_jr_songil_counter1",
+  "me_jr_songil_counter2",
+  "me_jr_songil_counter3",
+  "me_jr_songil_counter4",
+  "me_jr_songil_plant",
+  "me_jr_songil_fan",
+  "me_jr_songil_trash",
+  "me_jr_songil_rack"
+ ]
+}

@@ -10,6 +10,12 @@
 >
 > 지킬 것: 사용자 결정·위키가 근거다. 옛 Claude 자료는 근거가 아니다. 사용자 말에 토 달지 않는다. 무엇이든 지우기 전에 목록을 보여 주고 허락받는다. 실패하면 덧대지 말고 다시 쓰거나 바꾼다.
 
+- **GPT 의뢰문은 고칠 때마다 전체를 한 덩어리로 (사용자 2026-10-30).** 바뀐 줄만 주지 않는다. md 파일 말고 채팅 본문. docs/GPT_배경_의뢰_지침.md
+- **통로·층 배경은 층마다 최소 3장 이어 그리기 (사용자 2026-10-30).** GPT 의뢰는 앞 장 첨부해 이어 그리게, 정면 시점(소실점 없음). 의뢰서는 md 말고 채팅에 복사용 본문으로.
+- **배경에 의자·소파·소파 앞 낮은 탁자(좌식 탁자) 그리지 않기 (사용자 2026-10-30):** 대박 알선 v1·v2에 바닥 한가운데 좌식 탁자만 덩그러니 → 말이 안 됨. 소파 세트로 오브젝트. 책상·포커 테이블·수술대 같은 방 중심 가구는 그림. bg_check·bg_prompt가 막음.
+- **가림 따기 = 그림 윤곽선 그대로 (사용자 2026-10-30):** 어림 다각형·GrabCut 그대로 쓰면 다리가 사라지거나 비침(대기실 v8 접수대). 4배 확대 격자로 좌표 읽고, 게임에서 물건 앞·옆·뒤에 세워 확대 캡처로 확인. [docs/가림_따기_지침.md]
+- **배경 채우기는 무조건 packed (사용자 2026-10-30: 「앞으로는 무조건 팩드다」):** 대기실 v7(normal)은 휑했고 v8(packed)이 훨씬 나음. bg_check가 packed 아니면 실패.
+- **배경 요청문에서 물건을 절대 빼지 않는다 (사용자 2026-10-30):** 2,000자는 군말을 줄여 맞춘다, 빼야 할 것 같으면 묻는다. 도구(bg_check 0번)가 막음. [bg-never-remove-items](bg-never-remove-items.md)
 - **GPT art style = reference image, NO procedures (user 2026-10-23 20:08, supersedes 19:48):** GPT cannot pixel-convert, resize, run code, or draw true pixel art however explained. Never put conversion/downscale/palette/pixel steps in GPT guides. Instead: "match the style of the attached 쟈알디 room image" (user attaches it), keep sizes. Ceiling: not drawn separately, only molding/lights in top 40px.
 - [Field bg: GPT fails long images + cross-image style (2026-10-24), options pending](goei-bg-consistency-problem.md)
 - **Field bg via PixelLab parts (2026-10-24, thread 필드 남은 작업 이어가기 cmsg_01SMy6spzkHA3Ttz9fg54ZY8AxFavXcX43PuMsNQkXhSxC):** lobby test OK (style matched, ~130 gens). User cost rule: one shared floor for all 관리국, only a few wall types, 가짜 관리국 reuses 관리국 parts. Full ~120 scenes est. 22k–43k gens before reuse. v0.16.56 released 2026-10-24.

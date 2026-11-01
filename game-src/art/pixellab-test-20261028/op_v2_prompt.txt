@@ -1,0 +1,9 @@
+Pixel art game background: a small, obsessively clean back-alley operating room at the end of a run-down 1990s Seoul underground arcade, late night, harsh bright fluorescent light. Camera about 20 degrees above the floor looking down: floor fills the lower half, back wall only a low strip with baseboard along the top. Plain wall stubs at both ends, a closed small room.
+FLOOR (lower half): smooth blue-grey PVC flooring, spotless and freshly mopped, soft light reflections.
+LAYOUT (a standing adult is 150 pixels tall):
+CENTER: a steel operating table on a single pedestal, long side toward the camera, 176 pixels long and 79 pixels tall, thin black mattress, folded white sheet, leather wrist straps; above it a round surgical lamp hanging from the ceiling on an arm; an IV stand with a hanging bag at its head.
+BACK WALL, left: a tall grey steel medicine cabinet, 160 pixels tall, glass doors over rows of brown bottles and vials, two padlocks and a chain across the handles; next to it a steel scrub sink.
+BACK WALL, right: a large white industrial refrigerator big enough for a person, 168 pixels tall and 80 pixels wide, heavy handle, vent grille at the bottom; beside it a small red biohazard bin.
+BESIDE THE TABLE: two small steel instrument trolleys, 79 pixels tall, one on each side, neatly laid scalpels, clamps and gauze.
+WALL: white square ceramic tiles, slightly yellowed grout, one or two cracked tiles, thin steel baseboard; two bright fluorescent tube lights at the very top edge, only a thin sliver of ceiling above them.
+STYLE: dense, highly detailed pixel art, crisp pixel clusters, selective dark outline, rich medium-to-detailed shading, clean cold palette of white, steel grey and pale blue with a few red accents, no dithering, no blur. No people, no chairs, no text, no clocks, no blood, no doors, no doorways.

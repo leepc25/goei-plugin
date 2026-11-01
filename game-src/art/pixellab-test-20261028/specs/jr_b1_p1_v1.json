@@ -1,0 +1,399 @@
+{
+ "name": "jr_b1_p1_v1",
+ "room": "corridor",
+ "mood": "worn",
+ "doors": 0,
+ "mode": "loose",
+ "view": "flat",
+ "floor_share": "the lower 40 percent",
+ "sides": "left",
+ "density": "packed",
+ "place": "the west end of a run-down 1990s Seoul underground arcade corridor",
+ "time": "late at night",
+ "light": "half-dead fluorescent tubes and warm snack bar light",
+ "floor": "seamless grey concrete, no grid, oil stains, puddle, grime, varied litter, warm light pool, black shadow under objects",
+ "walls": "grimy concrete, rust streaks, mold, cracks; thin ceiling strip, cables, fluorescent tubes, one dead, one flickering",
+ "shadow": "strong contrast, bright snack bar, pitch-dark stairwell, shadow under the counter",
+ "palette": "dark grey and beige with warm orange and red accents",
+ "no": [
+  "doors",
+  "floor tiles"
+ ],
+ "brief": {
+  "wiki": "중림 지하상가: 지상에서 내려가 보면 그냥 망해 가는 지하상가. 낡은 점포, 손님 없는 매대, 반쯤 꺼진 형광등. 문 닫은 가게가 반, 문 연 것처럼 보이는 가게가 반. 여담: 상가 입구 근처 분식집은 진짜로 분식만 판다. 중림에서 유일하게 가격이 정직한 곳이라 늘 붐빈다.",
+  "design": "설계안 jr_b1: 서쪽 끝에 지상으로 오르는 트인 계단 입구(난간, 위에서 새어 드는 바깥 빛), 열린 가게 1(분식집), 소품: 점포 앞 임시 매대, 쌓인 상자, 마네킹, 전단지 꽂이, 우산통, 철제 쓰레기통(넘침), 소화기함(바램), 낡은 포스터(빈 면), 양동이(누수), 깜빡이는 조명, 분리수거, 공조, CCTV(부서진 것). 분식집 jr_snack: 주방 카운터 + 뒤 조리대(불판, 어묵 통), 메뉴 포스터 ×3, 벽시계, 정수기, 휴지 통, 식탁 ×2.",
+  "user": [
+   "GPT 그림은 쓸 수 없다 → PixelLab으로 칸마다 따로 그려 우리가 이어 붙임, 1번째 장을 그린 뒤 다음 장부터 앞 장을 참고 그림으로(사용자 10-31)",
+   "한 장에 가게 하나 크게, 가게 입체감(입구가 벽 안으로 들어가고 카운터가 통로로 튀어나옴)",
+   "바닥 격자 금지(이어 붙이면 어긋남), 이음매(양끝)에는 기둥·벽·바닥·천장만",
+   "간판은 정확한 이름 은정분식, 글씨도 도트",
+   "쓰레기 모양 제각각, 지저분하게, 통로 바닥에도 쓰레기",
+   "① 왼쪽 끝 지상 계단: 왼쪽 옆벽을 따라 앞에서 뒤로 올라가 왼쪽 위로 사라짐, 계단 정면 모양 금지, 난간",
+   "의자·스툴 없이 서서 먹는 카운터, 사람 없음, 시계 없음",
+   "채우기 packed, 느슨한 틀"
+  ],
+  "items": [
+   {
+    "src": "설계안: 서쪽 끝 지상으로 오르는 트인 계단(난간, 바깥 빛)",
+    "by": [
+     0,
+     1
+    ]
+   },
+   {
+    "src": "설계안·위키: 열린 분식집(입구 근처, 정직한 가격)",
+    "by": [
+     2,
+     3,
+     4
+    ]
+   },
+   {
+    "src": "설계안 jr_snack: 주방 카운터·불판·어묵 통",
+    "by": [
+     3,
+     4
+    ]
+   },
+   {
+    "src": "설계안 jr_snack: 메뉴 포스터 ×3",
+    "by": [
+     5
+    ]
+   },
+   {
+    "src": "설계안 jr_snack: 정수기·휴지 통",
+    "by": [
+     6
+    ]
+   },
+   {
+    "src": "설계안 jr_snack: 벽시계",
+    "by": "omit: 시계는 전역 금지(공용지침 3-8)"
+   },
+   {
+    "src": "설계안 jr_snack: 식탁 ×2",
+    "by": "omit: 이 그림은 통로에서 본 가게 앞면. 의자 금지라 식탁은 의자 없이 덩그러니 됨 → GPT 의뢰문(사용자 확인)대로 서서 먹는 카운터로 맡음(3번)"
+   },
+   {
+    "src": "위키: 늘 붐빈다",
+    "by": [
+     7
+    ]
+   },
+   {
+    "src": "설계안: 점포 앞 임시 매대·쌓인 상자",
+    "by": [
+     7,
+     8
+    ]
+   },
+   {
+    "src": "설계안: 철제 쓰레기통(넘침)·분리수거",
+    "by": [
+     9
+    ]
+   },
+   {
+    "src": "설계안: 소화기함(바램)·CCTV(부서진 것)",
+    "by": [
+     10
+    ]
+   },
+   {
+    "src": "설계안: 우산통·낡은 포스터(빈 면)",
+    "by": [
+     11
+    ]
+   },
+   {
+    "src": "설계안: 깜빡이는 조명",
+    "by": "칸:walls flickering"
+   },
+   {
+    "src": "위키: 반쯤 꺼진 형광등",
+    "by": "칸:walls dead"
+   },
+   {
+    "src": "설계안: 공조",
+    "by": [
+     12
+    ]
+   },
+   {
+    "src": "설계안: 마네킹·전단지 꽂이",
+    "by": "omit: 통로 7칸에 나눠 둠 — ③ 동진수선(수선집) 앞에서 맡음, ① 칸에는 계단·분식집으로 자리가 없음"
+   },
+   {
+    "src": "설계안: 양동이(누수)",
+    "by": "omit: 누수·양동이는 전역 금지(공용지침 3-6)"
+   },
+   {
+    "src": "사용자: 이음매에 기둥·벽만",
+    "by": [
+     13
+    ]
+   },
+   {
+    "src": "사용자: 쓰레기 제각각·바닥 격자 금지",
+    "by": "칸:floor no grid"
+   }
+  ]
+ },
+ "must": [
+  {
+   "kw": "reading \"은정분식\"",
+   "from": "사용자: 정확한 가게 이름"
+  },
+  {
+   "kw": "stairs",
+   "from": "설계안 서쪽 계단"
+  },
+  {
+   "kw": "fish cake",
+   "from": "설계안 어묵 통"
+  },
+  {
+   "kw": "no grid",
+   "from": "사용자: 바닥 격자 금지"
+  },
+  {
+   "kw": "concrete pillar",
+   "from": "사용자: 이음매는 기둥"
+  }
+ ],
+ "sized": [],
+ "items": [
+  {
+   "full": "at the far left, a left side wall angled inward, with a concrete staircase running along it from the front floor up toward the back and out of the top-left corner, seen from the side, about a fifth of the floor width, worn metal nosing on each step",
+   "why": "설계안 서쪽 계단, 사용자 계단 모양(정면 금지)",
+   "keep": [
+    "staircase",
+    "from the front floor up toward the back",
+    "seen from the side"
+   ],
+   "text": "far left: angled left side wall, stairs along it rising from the front floor toward the back, out the top-left, seen from the side",
+   "drop_ok": {
+    "angled": "그대로 있음",
+    "worn": "floor 칸이 낡음을 맡음",
+    "about": "군말",
+    "running": "rising이 같은 뜻",
+    "up": "rising이 같은 뜻",
+    "nosing": "남음",
+    "each": "군말",
+    "step": "metal nosing이 계단 모서리"
+   }
+  },
+  {
+   "full": "a waist-high steel railing along the walkway edge of the stairs and a handrail on the left wall, faint grey daylight leaking down from the top of the stairs, clear floor in front of the first step",
+   "why": "설계안 난간·바깥 빛, 계단 앞 비움",
+   "keep": [
+    "railing",
+    "daylight",
+    "clear floor"
+   ],
+   "text": "waist-high railing on the walkway edge, wall handrail, daylight from above, clear floor before the first step",
+   "drop_ok": {
+    "along": "on its walkway edge가 같은 뜻",
+    "leaking": "from above가 같은 뜻(leak은 금지 낱말)",
+    "down": "from above",
+    "top": "from above",
+    "stairs": "its가 앞 줄 계단을 가리킴",
+    "first": "남음",
+    "handrail": "남음",
+    "faint": "grey daylight로",
+    "edge": "남음",
+    "left": "앞 줄이 왼쪽 벽"
+   }
+  },
+  {
+   "full": "filling most of the back wall, an open snack bar recessed into the wall like a deep lit room, its inner side walls and ceiling visible, greasy tiled kitchen inside, a long sign board above it reading \"은정분식\" in big chunky blocky pixel letters with chipped paint",
+   "why": "위키 입구 근처 분식집, 사용자 한 장에 가게 하나·입체감·간판",
+   "keep": [
+    "recessed",
+    "reading \"은정분식\"",
+    "chunky blocky pixel letters"
+   ],
+   "text": "back wall: an open snack bar recessed like a lit room, inner side walls visible, sign board reading \"은정분식\" in blocky pixel letters",
+   "drop_ok": {
+    "most": "filling the back wall",
+    "greasy": "palette·walls가 때를 맡음",
+    "inside": "tiled kitchen",
+    "big": "chunky가 큼",
+    "into": "군말",
+    "like": "남음",
+    "wall": "남음"
+   }
+  },
+  {
+   "full": "a worn steel standing counter sticking out from the snack bar onto the walkway, its top and side faces visible, casting a dark shadow on the floor, no seats",
+   "why": "설계안 주방 카운터, 사용자 서서 먹는 카운터·입체감",
+   "keep": [
+    "standing counter",
+    "sticking out",
+    "no seats"
+   ],
+   "text": "standing counter sticking out onto the walkway, top and side faces visible, no seats",
+   "drop_ok": {
+    "worn": "floor·walls가 낡음을 맡음",
+    "casting": "dark floor shadow",
+    "from": "군말",
+    "snack": "앞 줄이 분식집",
+    "bar": "앞 줄이 분식집"
+   }
+  },
+  {
+   "full": "on the counter a steaming fish cake pot with skewers, a red tteokbokki griddle, stacked plastic bowls, a sauce bottle and a cash tin",
+   "why": "설계안 불판·어묵 통",
+   "keep": [
+    "fish cake pot",
+    "tteokbokki griddle"
+   ],
+   "text": "fish cake pot, tteokbokki griddle, bowls, cash tin",
+   "drop_ok": {
+    "counter": "on it = 앞 줄 카운터",
+    "stacked": "plastic bowls",
+    "sauce": "남음"
+   }
+  },
+  {
+   "full": "inside on the back wall three greasy hand-painted menu boards with price numbers only, shelves of pots, ladles and noodle packets",
+   "why": "설계안 메뉴 포스터 ×3, 위키 정직한 가격",
+   "keep": [
+    "menu boards",
+    "price numbers only"
+   ],
+   "text": "three menu boards with price numbers only, pots, noodle packets",
+   "drop_ok": {
+    "hand-painted": "menu boards로 충분",
+    "inside": "남음",
+    "back": "inside가 가게 안"
+   }
+  },
+  {
+   "full": "inside the snack bar a dented water dispenser, a tissue box, a rice cooker and a small fridge with drinks",
+   "why": "설계안 정수기·휴지 통",
+   "keep": [
+    "water dispenser",
+    "tissue box"
+   ],
+   "text": "water dispenser, tissue box, drinks fridge",
+   "drop_ok": {
+    "inside": "앞 줄과 같은 가게 안",
+    "snack": "앞 줄",
+    "bar": "앞 줄",
+    "fridge": "drinks fridge",
+    "drinks": "남음"
+   }
+  },
+  {
+   "full": "beside the counter on the floor, stacked drink crates and a wobbly pile of empty cardboard boxes",
+   "why": "설계안 매대·쌓인 상자, 위키 늘 붐빔(장사가 됨)",
+   "keep": [
+    "drink crates",
+    "cardboard boxes"
+   ],
+   "text": "drink crates, cardboard boxes",
+   "drop_ok": {
+    "empty": "cardboard boxes로 충분"
+   }
+  },
+  {
+   "full": "at the wall base a collapsed heap of wet crushed cardboard, a burst trash bag and empty soju bottles, each piece a different shape",
+   "why": "사용자 쓰레기 제각각·지저분하게, 설계안 쌓인 상자",
+   "keep": [
+    "burst trash bag",
+    "different shape"
+   ],
+   "text": "burst trash bag, wet cardboard, bottles, each a different shape",
+   "drop_ok": {
+    "heap": "collapsed가 무너진 더미",
+    "crushed": "wet cardboard로",
+    "empty": "bottles로 충분",
+    "piece": "each a different shape",
+    "soju": "남음"
+   }
+  },
+  {
+   "full": "an overflowing dented metal trash can and a blue recycling bin with cans",
+   "why": "설계안 철제 쓰레기통(넘침)·분리수거",
+   "keep": [
+    "overflowing",
+    "recycling bin"
+   ],
+   "text": "overflowing trash can, recycling bin",
+   "drop_ok": {
+    "recycling": "남음",
+    "cans": "bin이 맡음"
+   }
+  },
+  {
+   "full": "a faded red fire extinguisher box on the wall and a broken CCTV camera hanging from the ceiling strip by its cable",
+   "why": "설계안 소화기함(바램)·CCTV(부서짐)",
+   "keep": [
+    "fire extinguisher box",
+    "broken CCTV camera"
+   ],
+   "text": "fire extinguisher box, broken CCTV camera",
+   "drop_ok": {
+    "red": "fire extinguisher box(색은 팔레트)",
+    "hanging": "dangling이 같은 뜻",
+    "cable": "dangling이 같은 뜻",
+    "ceiling": "남음",
+    "strip": "남음"
+   }
+  },
+  {
+   "full": "an umbrella stand with broken umbrellas and one torn blank poster on the wall",
+   "why": "설계안 우산통·낡은 포스터(빈 면)",
+   "keep": [
+    "umbrella stand",
+    "blank poster"
+   ],
+   "text": "umbrella stand, blank poster",
+   "drop_ok": {
+    "wall": "poster 위치는 벽(packed가 채움)"
+   }
+  },
+  {
+   "full": "a rusty air conditioner unit and tangled cables on the wall above the snack bar",
+   "why": "설계안 공조",
+   "keep": [
+    "air conditioner",
+    "tangled cables"
+   ],
+   "text": "air conditioner, tangled cables",
+   "drop_ok": {
+    "wall": "above the snack bar가 벽"
+   }
+  },
+  {
+   "full": "at the right image edge only a plain square concrete pillar sticking out from the back wall with its side face visible, bare floor and ceiling around it, nothing else",
+   "why": "사용자 이음매에 기둥·벽·바닥·천장만(다음 장과 이어 붙임)",
+   "keep": [
+    "concrete pillar",
+    "right image edge",
+    "nothing else"
+   ],
+   "text": "right image edge: only a plain concrete pillar, nothing else",
+   "drop_ok": {
+    "sticking": "pillar 자체가 벽 앞으로 나온 기둥",
+    "bare": "nothing else가 같은 뜻",
+    "floor": "nothing else가 같은 뜻",
+    "ceiling": "nothing else가 같은 뜻",
+    "around": "군말",
+    "back": "pillar는 뒷벽 기둥(자리는 right image edge)",
+    "wall": "right image edge가 자리"
+   }
+  }
+ ],
+ "review": {
+  "fit": "14줄 모두 지하상가 통로 서쪽 끝(계단·분식집·통로 소품) 물건. 의자·스툴·식탁·시계·사람·양동이 없음",
+  "place": "계단 앞·통로 가운데는 비움(계단 앞 clear floor). 카운터만 통로로 조금 튀어나옴. 오른쪽 끝은 기둥만(이음)",
+  "size": "크기 숫자 없음(느슨한 틀). 계단 폭은 바닥 가로의 5분의 1, 카운터는 서서 먹는 높이",
+  "brief": "설계안 항목 모두 대응. 뺀 것: 벽시계(전역 금지)·양동이(누수 금지)·식탁(의자 금지, 서서 먹는 카운터로)·마네킹·전단지 꽂이(③ 칸으로)",
+  "meaning": "2,000자 때문에 물건은 그대로 두고 꾸밈말(greasy·dented·steaming·worn 등)과 계단 쇠띠(metal nosing)를 줄임. 물건 줄 14개 모두 남음",
+  "over": "같은 물건 두 번 없음, 줄마다 근거. packed",
+  "frame": "flat 정면(뒷벽 수평), 왼쪽 옆벽만, 바닥 40%, 문 없음, 바닥 격자 없음, 오른쪽 끝 기둥, 명암 대비, 느슨한 틀"
+ }
+}

@@ -1,0 +1,245 @@
+{
+ "room": "corridor",
+ "mood": "worn",
+ "mode": "loose",
+ "view": "corridor",
+ "floor_share": "the lower 30 percent",
+ "density": "packed+",
+ "place": "a run-down 1990s Seoul underground arcade corridor, low ceiling right above the sign",
+ "time": "night",
+ "light": "half-dead fluorescent tubes and warm shop light",
+ "palette": "near-black grey-green, green and red accents",
+ "walls": "raw concrete, water stains, soot, graffiti; ceiling strip, tangled cables, fluorescent tubes, nearly all dead, one flickering",
+ "floor": "smooth dark poured concrete like one wet sheet, grime, oil stains, dark puddles, varied litter all over the walkway",
+ "shadow": "very dark, black shadows under objects, small light pools",
+ "name": "jr_b2_p1_v10",
+ "sides": "none",
+ "doors": 1,
+ "no": [
+  "other doors",
+  "side walls"
+ ],
+ "sized": [],
+ "items": [
+  {
+   "full": "back wall, centered: a big loan office front filling the middle 80 percent of the width, standing on the walkway floor line, a heavy steel door with three deadbolts in the middle and wide barred windows on both sides of it, steel plates behind, cold white light, a safe and files through gaps; right above the opening, just under the ceiling strip, a steel plate reading \"창고 B-7\"",
+   "text": "back wall, centered: a big loan office front filling the middle 80 percent of the width, standing on the walkway floor line, a heavy steel door with three deadbolts in the middle and wide barred windows on both sides of it, steel plates behind, cold white light, a safe and files through gaps; right above the opening, just under the ceiling strip, a big steel sign board reading \"창고 B-7\"",
+   "why": "위키 영창: 철문 「창고 B-7」·데드볼트 셋·금고·서류(화이트보드), ②③④와 같은 가게 틀",
+   "keep": []
+  },
+  {
+   "full": "clear empty floor in front of the steel door",
+   "text": "clear empty floor in front of the steel door",
+   "why": "출입구 앞 비움",
+   "keep": []
+  },
+  {
+   "full": "left 10 percent of the image: a narrow stairwell, steps going down into darkness, a waist-high railing on its walkway edge",
+   "text": "left 10 percent of the image: a narrow stairwell going down into darkness, a waist-high railing on its walkway edge",
+   "why": "사용자: 왼쪽 끝 막힌 계단(v7)",
+   "keep": []
+  },
+  {
+   "full": "on its railing: a chain and a plate reading \"출입금지\"",
+   "text": "on its railing: a chain and a plate reading \"출입금지\"",
+   "why": "계단 막힘",
+   "keep": []
+  },
+  {
+   "full": "left of the shop: a fire extinguisher box, a trash bag",
+   "text": "left of the shop: a fire extinguisher box, a trash bag",
+   "why": "설계안 소화기함",
+   "keep": []
+  },
+  {
+   "full": "right of the shop: CCTV, a buzzer, crates",
+   "text": "right of the shop: CCTV, buzzer, crates",
+   "why": "사채업자 경계",
+   "keep": []
+  },
+  {
+   "full": "wall base: cardboard, bottles, cigarette butts, each a different shape",
+   "text": "wall base: cardboard, bottles, cigarette butts, each a different shape",
+   "why": "쓰레기 제각각",
+   "keep": []
+  },
+  {
+   "full": "a torn blank notice",
+   "text": "a torn blank notice",
+   "why": "벽 소품",
+   "keep": []
+  },
+  {
+   "full": "a bare bulb",
+   "text": "a bare bulb",
+   "why": "깜빡이는 조명(위키)",
+   "keep": []
+  },
+  {
+   "full": "dripping pipes",
+   "text": "dripping pipes",
+   "why": "설계안 배관·물 얼룩",
+   "keep": []
+  },
+  {
+   "full": "a green exit sign, no letters",
+   "text": "a green exit sign, no letters",
+   "why": "설계안 비상구 유도등",
+   "keep": []
+  },
+  {
+   "full": "right 10 percent of the image: only bare back wall and floor, no side wall",
+   "text": "right 10 percent of the image: only bare back wall and floor, no side wall",
+   "why": "이음매",
+   "keep": []
+  }
+ ],
+ "must": [
+  {
+   "kw": "reading \"창고 B-7\"",
+   "from": "가게 이름"
+  },
+  {
+   "kw": "one wet sheet",
+   "from": "사용자 바닥 선 금지"
+  },
+  {
+   "kw": "reading \"출입금지\"",
+   "from": "막힌 계단"
+  }
+ ],
+ "brief": {
+  "wiki": "영창컨설팅: 지하 2층, 깜빡이는 조명·물 얼룩진 콘크리트, 철문 「창고 B-7」, 데드볼트 셋, 간판 없음",
+  "design": "필드_거점_설계안 jr_b2: 짙은 회색, 물 얼룩, 배관, 깜빡이는 조명, 소화기함, 비상구 유도등",
+  "user": [
+   "사용자 10-31: 지하 2층은 더 어둑하고 위험하게, 창고만 뽑지 말 것",
+   "사용자 10-31: 영창 컨설팅이 맨 왼쪽, 오른쪽 끝에 올라가는 계단",
+   "사용자 10-31: 「전체 한번에 뽑아」",
+   "구조 문장은 앞골목 ④ 그대로, 색·빛 상태·벽 표면·바닥 더러움·명암만 바꿈",
+   "v1 제각각(사용자 「전부 그림이 다르냐」) → 금지 목록 앞골목과 같게, 가게 줄 5장 같은 틀, 가이드 v8 80%(사용자 「80%로 해」)",
+   "청운기원: 무엇 하는 곳인지 보이게 — 신문지는 반만, 틈으로 화투 탁자·돈·재떨이·바둑판, 간판에 바둑돌(사용자)",
+   "천수보살 v1 간판에 태극기 → 무늬 없는 붉은·흰 천 깃발로",
+   "영창 v1 철문이 에일린보다 작음 → full-height",
+   "황금오락실: 그냥 오락실로 보임(사용자 「뭐가 위험한덴데」) → 불법 성인 도박 오락실, 검은 선팅, 쇠창살 환전 창구·돈다발",
+   "v2 ① 너무 작음(사용자) → 가운데 칸과 같은 80% 문구·가이드 v8, 왼쪽 옆벽은 왼쪽 10% 안",
+   "v3 ① 다른 장보다 작음(사용자) → 옆벽 문장 빼고 첫 줄·금지 목록 가운데 칸과 같게, 왼쪽 막이는 ⑦ v7b처럼 10% 안에서 꺾여 나오는 셔터 벽",
+   "v1~v5 ① 막이 벽이 매번 깊은 구석을 만듦 → 사용자 「1번해봐」: 왼쪽 끝은 계단 입구, 쇠사슬·출입금지",
+   "v6 바닥선 y295·가게 50% → 가게 줄·가이드 ②③④와 같게(80%·v8), 계단은 가게 뒤 순서로 왼쪽 10% 안(사용자 「더 가깝게」)",
+   "v1~v8 창고·셔터라 차고·벽감처럼 나와 크기 흔들림 → 사용자 「전면개편」: ②③④와 같은 '가운데 문+양옆 창, 안이 보임' 모양의 사채 사무실",
+   "v9 작음(사용자 「작아」) → 간판만 다른 장 같은 큰 판(사용자 「1」)"
+  ],
+  "items": [
+   {
+    "src": "0번 줄 근거",
+    "by": [
+     0
+    ]
+   },
+   {
+    "src": "1번 줄 근거",
+    "by": [
+     1
+    ]
+   },
+   {
+    "src": "2번 줄 근거",
+    "by": [
+     2
+    ]
+   },
+   {
+    "src": "3번 줄 근거",
+    "by": [
+     3
+    ]
+   },
+   {
+    "src": "4번 줄 근거",
+    "by": [
+     4
+    ]
+   },
+   {
+    "src": "5번 줄 근거",
+    "by": [
+     5
+    ]
+   },
+   {
+    "src": "6번 줄 근거",
+    "by": [
+     6
+    ]
+   },
+   {
+    "src": "7번 줄 근거",
+    "by": [
+     7
+    ]
+   },
+   {
+    "src": "8번 줄 근거",
+    "by": [
+     8
+    ]
+   },
+   {
+    "src": "9번 줄 근거",
+    "by": [
+     9
+    ]
+   },
+   {
+    "src": "10번 줄 근거",
+    "by": [
+     10
+    ]
+   },
+   {
+    "src": "11번 줄 근거",
+    "by": [
+     11
+    ]
+   }
+  ]
+ },
+ "review": {
+  "fit": "지하 2층 이 칸의 가게·소품, 의자·사람 없음",
+  "place": "가게 가운데, 소품은 가게 왼쪽·오른쪽, 문 앞 비움",
+  "size": "크기 숫자 없음(느슨한 틀)",
+  "brief": "칸 내용 대응, 빠진 것 없음",
+  "meaning": "1차=2차(느슨한 틀)",
+  "over": "같은 물건 두 번 없음, packed+",
+  "frame": "첫 줄·가게 줄 틀·가이드 v8은 ②③④와 같음, 금지 목록은 끝 칸(계단 허용), 계단 줄은 가게 줄 뒤"
+ },
+ "removed_by_user": [
+  {
+   "full": "a green exit sign light box, no letters",
+   "by": "사용자 10-31 「프롬프트 전면개편해 아예 저 창고 모습부터 전부 다시」 — 창고·셔터 모습을 버리고 새로 씀"
+  },
+  {
+   "full": "far left 20 percent of the image: a rectangular stairwell cut into the floor, steps going down into darkness, a waist-high railing on its walkway edge",
+   "by": "사용자 10-31 「프롬프트 전면개편해 아예 저 창고 모습부터 전부 다시」 — 창고·셔터 모습을 버리고 새로 씀"
+  },
+  {
+   "full": "a chain across the stairwell and a plate reading \"출입금지\"",
+   "by": "사용자 10-31 「프롬프트 전면개편해 아예 저 창고 모습부터 전부 다시」 — 창고·셔터 모습을 버리고 새로 씀"
+  },
+  {
+   "full": "right of the shop: a CCTV camera, a buzzer, crates",
+   "by": "사용자 10-31 「프롬프트 전면개편해 아예 저 창고 모습부터 전부 다시」 — 창고·셔터 모습을 버리고 새로 씀"
+  },
+  {
+   "full": "wall base: cardboard, broken bottles, cigarette butts, each a different shape",
+   "by": "사용자 10-31 「프롬프트 전면개편해 아예 저 창고 모습부터 전부 다시」 — 창고·셔터 모습을 버리고 새로 씀"
+  },
+  {
+   "full": "left of the shop: a fire extinguisher box, a burst trash bag",
+   "by": "사용자 10-31 「프롬프트 전면개편해 아예 저 창고 모습부터 전부 다시」 — 창고·셔터 모습을 버리고 새로 씀"
+  },
+  {
+   "full": "back wall, centered: a big storage unit front filling the middle 80 percent of the width, recessed like a deep lit room, a heavy steel door in the middle, three deadbolts, a bare bulb; right above the opening, just under the ceiling strip, a steel plate reading \"창고 B-7\"",
+   "by": "사용자 10-31 「프롬프트 전면개편해 아예 저 창고 모습부터 전부 다시」 — 창고·셔터 모습을 버리고 새로 씀"
+  }
+ ]
+}
