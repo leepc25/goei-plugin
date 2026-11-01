@@ -7,7 +7,10 @@ const load = (src: string) => new Promise<HTMLImageElement>((r) => { const im = 
 (async () => {
   ensureKit();
   const B = (window as unknown as { __badges: Record<string, string> }).__badges;
-  const [face, reck, jump, shot, vit] = await Promise.all([FACE_JYALDI[0], B.reckless, B.triplejump, B.extrashot, B.vitality].map(load));
+  const [face, reck, jump, shot, vit, sheet] = await Promise.all([FACE_JYALDI[0], B.reckless, B.triplejump, B.extrashot, B.vitality, B.body].map(load));
+  // 평상 대기 첫 장(63×234, 서쪽 보기) → 오른쪽 보게 뒤집기
+  const body = document.createElement('canvas'); body.width = 63; body.height = 234;
+  { const g = body.getContext('2d')!; g.translate(63, 0); g.scale(-1, 1); g.drawImage(sheet, 0, 0, 63, 234, 0, 0, 63, 234); }
   await document.fonts.ready;
   await new Promise((r) => setTimeout(r, 400));
   const cv = document.getElementById('c') as HTMLCanvasElement;
@@ -15,7 +18,7 @@ const load = (src: string) => new Promise<HTMLImageElement>((r) => { const im = 
   c.fillStyle = '#1c2428'; c.fillRect(0, 0, 1280, 720);
   const tab = (window as unknown as { __tab: '능력치' }).__tab;
   const draw = () => drawCharWindow(c, {
-    name: '쟈알디', team: '종합대응팀 · 부장', state: '출동 중', face, hp: 830, maxHp: 1200,
+    name: '쟈알디', team: '종합대응팀 · 부장', state: '출동 중', face, body, hp: 830, maxHp: 1200,
     base: [
       { label: '힘', v: 7, what: '몸으로 때리는 기술 피해' }, { label: '민', v: 3, what: '총·투척 피해, 속도' },
       { label: '체', v: 6, now: 7, what: '체력, 받는 피해' }, { label: '지', v: 5, what: '이능 기술 피해, 기술 쿨' },
@@ -38,7 +41,7 @@ const load = (src: string) => new Promise<HTMLImageElement>((r) => { const im = 
       { name: '무모함', effect: '피해↑ 받는 피해↑', badge: reck, trait: true },
     ],
     perkSlots: 24, perkPick: 0,
-    quick: [{ label: '붕대', count: 3 }, { label: '진통제', count: 1 }], bag: [{ label: '부적', count: 2 }, { label: '손전등', count: 1 }, { label: '열쇠', count: 1 }], bagSlots: 8,
+    quick: [{ label: '붕대', count: 3 }, { label: '진통제', count: 1 }], bag: [{ label: '부적', count: 2 }, { label: '손전등', count: 1 }, { label: '열쇠', count: 1 }], bagSlots: 12,
     money: '₩140,000',
   }, tab);
   draw(); setTimeout(() => { draw(); (window as unknown as { __done: boolean }).__done = true; }, 300);

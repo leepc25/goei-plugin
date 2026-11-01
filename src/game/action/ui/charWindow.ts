@@ -1,5 +1,6 @@
 // 통합 캐릭터 창 시안 (2026-11-01, 설계 docs/설계_통합창_퍽.md 2-2).
-// 창 하나 1280×720. 위 머리(얼굴·이름·소속·상태·체력)는 늘 보이고, 아래는 탭(능력치·기술·퍽·소지품)으로 넘긴다(사용자 11-01: 고유 퍽 없음, 힘민체지정, 탭으로).
+// 창 하나 1280×720. 왼쪽 3분의 1 = 전신 그림·이름·소속·체력·현금(늘 보임), 오른쪽 = 탭(능력치·기술·능력·소지품), 설명은 탭 아래 띠.
+// (사용자 11-01: 고유 퍽 없음, 힘민체지정, 탭, 「퍽」 대신 「능력」, 빈 데 없이)
 // 틀은 HUD 그림(초상·기술 칸·체력 막대·아이템 칸)과 kit 판을 그대로 쓰고, 칸 사이 판은 도트 모서리를 깎은 남색 판으로 코드가 그린다.
 // 아직 게임에 연결하지 않았다: 배치가 정해지면 Tab/일시정지 메뉴에 붙인다.
 import { hudArtImage, pixelIcon, pixelText, putText, type SkillIcon } from './pixelHud';
@@ -26,6 +27,8 @@ function stretch(c: CanvasRenderingContext2D, k: ArtKey, x: number, y: number, w
 
 export interface CharWindowData {
   name: string; team: string; state: string; face?: CanvasImageSource | null;
+  /** 전신 그림(게임 속 평상 대기 첫 장, 오른쪽 보기) */
+  body?: CanvasImageSource | null;
   hp: number; maxHp: number;
   /** 힘·민·체·지·정 (1~10, 요원마다 고정). now = 퍽으로 바뀐 값 */
   base: { label: string; v: number; now?: number; what: string }[];
@@ -58,7 +61,7 @@ function corners(c: CanvasRenderingContext2D, x: number, y: number, w: number, h
   }
 }
 
-export const CHAR_TABS = ['능력치', '기술', '퍽', '소지품'] as const;
+export const CHAR_TABS = ['능력치', '기술', '능력', '소지품'] as const;
 export type CharTab = (typeof CHAR_TABS)[number];
 
 export function drawCharWindow(c: CanvasRenderingContext2D, d: CharWindowData, tab: CharTab = '능력치', W = 1280, H = 720) {
@@ -72,107 +75,119 @@ export function drawCharWindow(c: CanvasRenderingContext2D, d: CharWindowData, t
   }
   const T = (s: string, col = INK) => pixelText(s, col, 22);
   const B = (s: string, col = INK) => pixelText(s, col, 33);
+  const box = (x: number, y: number, w: number, h: number) => { if (!stretch(c, 'inner', x, y, w, h)) plate(c, x, y, w, h); };
+  const SL = hudArtImage('slot');
+  const big = (x: number, y: number, s = 100) => { if (SL) c.drawImage(SL, x, y, s, s); };
+  const line = (x: number, y: number, w: number) => { c.fillStyle = RIM_D; c.fillRect(x, y, w, 2); };
 
-  /* ── 머리 (늘 보임) ── */
-  const hx = 104, hy = 54;
-  if (!stretch(c, 'inner', 40, 36, W - 80, 120)) plate(c, 48, 44, W - 96, 104);
-  const P = hudArtImage('portrait');
-  if (d.face) c.drawImage(d.face, hx + 8, hy + 4, 64, 64);
-  if (P) c.drawImage(P, hx, hy - 4);
-  putText(c, B(d.name), hx + 100, hy + 2);
+  /* ── 왼쪽: 인물 (늘 보임) ── */
+  const LX = 40, LW = 392, TOP = 40, BOT = H - 40;
+  box(LX, TOP, LW, BOT - TOP);
+  const cx = LX + LW / 2;
+  putText(c, B(d.name), cx, TOP + 22, 'center');
   const team = T(d.team, DIM);
-  putText(c, team, hx + 100, hy + 46);
+  putText(c, team, cx, TOP + 64, 'center');
   const tag = T(d.state, '#9fd7ff');
-  plate(c, hx + 116 + team.width, hy + 40, tag.width + 20, 34, '#16284a');
-  putText(c, tag, hx + 126 + team.width, hy + 46);
-  const HP = hudArtImage('hp');
-  const bx = W - 104 - 20 - 244 - 70, by = hy + 10;
-  putText(c, T('체력', DIM), bx, by - 2);
-  if (HP) {
-    c.drawImage(HP, bx + 70, by);
-    const [ix0, iy0, ix1, iy1] = [17, 5, 225, 14], r = d.hp / d.maxHp;
-    c.fillStyle = '#4fc25a'; c.fillRect(bx + 70 + ix0, by + iy0, Math.round((ix1 - ix0) * r), iy1 - iy0);
-    c.fillStyle = '#8be38f'; c.fillRect(bx + 70 + ix0, by + iy0, Math.round((ix1 - ix0) * r), 2);
+  plate(c, Math.round(cx - tag.width / 2 - 10), TOP + 96, tag.width + 20, 34, '#16284a');
+  putText(c, tag, cx, TOP + 102, 'center');
+  // 전신: 이름 칸 아래 빈 높이에 맞춰(최대 2배), 발이 체력 막대 위에 서게
+  const footY = BOT - 128;
+  c.fillStyle = 'rgba(0,0,0,0.35)'; c.fillRect(cx - 50, footY - 6, 100, 8); c.fillRect(cx - 40, footY - 8, 80, 12);
+  if (d.body) {
+    const bc = d.body as HTMLCanvasElement, k = Math.min(2, (footY - (TOP + 146)) / bc.height);
+    const bw = Math.round(bc.width * k), bh2 = Math.round(bc.height * k);
+    c.drawImage(d.body, Math.round(cx - bw / 2), footY - bh2, bw, bh2);
   }
-  putText(c, T(`${d.hp.toLocaleString()} / ${d.maxHp.toLocaleString()}`), bx + 70 + 244, by + 32, 'right');
+  // 체력
+  const HP = hudArtImage('hp'), hx = Math.round(cx - 122), hy = BOT - 104;
+  if (HP) {
+    c.drawImage(HP, hx, hy);
+    const [ix0, iy0, ix1, iy1] = [17, 5, 225, 14], r = d.hp / d.maxHp;
+    c.fillStyle = '#4fc25a'; c.fillRect(hx + ix0, hy + iy0, Math.round((ix1 - ix0) * r), iy1 - iy0);
+    c.fillStyle = '#8be38f'; c.fillRect(hx + ix0, hy + iy0, Math.round((ix1 - ix0) * r), 2);
+  }
+  putText(c, T('체력', DIM), LX + 28, hy + 30);
+  putText(c, T(`${d.hp.toLocaleString()} / ${d.maxHp.toLocaleString()}`), LX + LW - 28, hy + 30, 'right');
+  putText(c, T('현금', DIM), LX + 28, hy + 62);
+  putText(c, T(d.money, GOLD), LX + LW - 28, hy + 62, 'right');
 
-  /* ── 탭 줄 ── */
-  const ty = 160;
-  putText(c, T('Q', DIM), 60, ty + 10);
-  let tx = 92;
+  /* ── 오른쪽: 탭 ── */
+  const RX = LX + LW + 16, RW = W - 40 - RX;
+  let tx = RX;
   for (const name of CHAR_TABS) {
     const on = name === tab, t = T(name, on ? GOLD : DIM), w = t.width + 64;
     c.save(); if (!on) c.globalAlpha = 0.55;
-    if (!stretch(c, 'tab', tx, ty, w, 40)) plate(c, tx, ty, w, 44, on ? '#1c2c58' : NAVY_D);
+    if (!stretch(c, 'tab', tx, TOP, w, 40)) plate(c, tx, TOP, w, 44, on ? '#1c2c58' : NAVY_D);
     c.restore();
-    if (on) { c.fillStyle = GOLD; c.fillRect(tx + 14, ty + 32, w - 28, 2); }
-    putText(c, t, tx + 32, ty + 8);
+    if (on) { c.fillStyle = GOLD; c.fillRect(tx + 14, TOP + 32, w - 28, 2); }
+    putText(c, t, tx + 32, TOP + 8);
     tx += w + 8;
   }
-  putText(c, T('E', DIM), tx + 6, ty + 10);
-  putText(c, T('Tab 닫기', DIM), W - 64, ty + 10, 'right');
-
-  /* ── 본문 ── */
-  const top = ty + 48, bh = H - 40 - top, L = 40, R = W - 40;
-  if (!stretch(c, 'inner', L, top, R - L, bh)) plate(c, L, top, R - L, bh);
-  const SL = hudArtImage('slot');
+  putText(c, T('Q · E 탭   Tab 닫기', DIM), RX + RW, TOP + 10, 'right');
+  const top = TOP + 50, bh = BOT - top, R = RX + RW;
+  box(RX, top, RW, bh);
+  const IX = RX + 32;            // 안쪽 왼쪽
+  const strip = (h: number) => { const y = BOT - h; line(RX + 20, y, RW - 40); return y + 22; };
 
   if (tab === '능력치') {
-    // 왼쪽: 힘민체지정 크게 + 눈금 + 하는 일, 오른쪽: 산출 수치
     d.base.forEach((s, i) => {
-      const yy = top + 34 + i * 86, v = s.now ?? s.v;
-      putText(c, B(s.label), L + 48, yy);
-      putText(c, B(String(v), s.now !== undefined && s.now !== s.v ? UP : GOLD), L + 130, yy, 'right');
+      const yy = top + 28 + i * 106, v = s.now ?? s.v;
+      putText(c, B(s.label), IX, yy);
+      putText(c, B(String(v), s.now !== undefined && s.now !== s.v ? UP : GOLD), IX + 82, yy, 'right');
       for (let k = 0; k < 10; k++) {
-        const px = L + 156 + k * 26, py = yy + 8;
-        c.fillStyle = RIM_D; c.fillRect(px, py, 20, 20);
-        c.fillStyle = k < s.v ? '#e8c45a' : k < v ? UP : SOCKET; c.fillRect(px + 2, py + 2, 16, 16);
+        const px = IX + 104 + k * 26, py = yy + 6;
+        c.fillStyle = RIM_D; c.fillRect(px, py, 20, 24);
+        c.fillStyle = k < s.v ? '#e8c45a' : k < v ? UP : SOCKET; c.fillRect(px + 2, py + 2, 16, 20);
       }
-      putText(c, T(s.what, DIM), L + 48, yy + 44);
+      putText(c, T(s.what, DIM), IX, yy + 46);
     });
-    const dx0 = L + 640;
-    c.fillStyle = RIM_D; c.fillRect(dx0 - 30, top + 24, 2, bh - 48);
-    putText(c, T('전투 수치', GOLD), dx0, top + 26);
+    const dx0 = IX + 420;
+    c.fillStyle = RIM_D; c.fillRect(dx0 - 28, top + 24, 2, bh - 48);
+    putText(c, T('전투 수치', GOLD), dx0, top + 28);
     d.derived.forEach((s, i) => {
-      const yy = top + 72 + i * 44;
+      const yy = top + 82 + i * 58;
       putText(c, T(s.label, DIM), dx0, yy);
-      putText(c, T(s.now ?? s.v, s.now && s.now !== s.v ? UP : INK), R - 36, yy, 'right');
+      putText(c, T(s.now ?? s.v, s.now && s.now !== s.v ? UP : INK), R - 32, yy, 'right');
     });
   } else if (tab === '기술') {
     d.skills.forEach((k, i) => {
-      const x = L + 40 + i * 190, y = top + 34;
-      if (SL) c.drawImage(SL, x, y);
-      pixelIcon(c, k.icon, x + 25, y + 25, 2, k.off ? '#3b4148' : INK);
-      putText(c, T(k.key, GOLD), x + 60, y + 2);
-      putText(c, T(k.label, k.off ? '#4a525a' : INK), x + 60, y + 28);
-      if (i === d.pick.skill) corners(c, x - 8, y - 8, 140, 66);
+      const col = i % 3, row = Math.floor(i / 3);
+      const x = IX + col * 246, y = top + 30 + row * 130;
+      big(x, y);
+      pixelIcon(c, k.icon, x + 50, y + 50, 4, k.off ? '#3b4148' : INK);
+      putText(c, T(k.key, GOLD), x + 10, y + 6);
+      putText(c, B(k.label, k.off ? '#4a525a' : INK), x + 114, y + 18);
+      putText(c, T(k.name, DIM), x + 114, y + 60);
+      if (i === d.pick.skill) corners(c, x - 8, y - 8, 116, 116);
     });
-    const pk = d.skills[d.pick.skill], y0 = top + 130;
-    c.fillStyle = RIM_D; c.fillRect(L + 30, y0 - 14, R - L - 60, 2);
-    putText(c, B(pk.name, GOLD), L + 40, y0);
-    d.pick.desc.forEach((l, i) => putText(c, T(l), L + 40, y0 + 50 + i * 32));
-    putText(c, T(d.pick.nums, '#9fd7ff'), L + 40, y0 + 50 + d.pick.desc.length * 32 + 10);
-  } else if (tab === '퍽') {
-    const gw = 740, per = 5;
+    const pk = d.skills[d.pick.skill];
+    let y = strip(286);
+    putText(c, B(pk.name, GOLD), IX, y);
+    putText(c, T(pk.label, DIM), IX + B(pk.name).width + 16, y + 8);
+    y += 54;
+    d.pick.desc.forEach((l) => { putText(c, T(l), IX, y); y += 34; });
+    putText(c, T(d.pick.nums, '#9fd7ff'), IX, y + 10);
+  } else if (tab === '능력') {
+    const per = 5;
     for (let i = 0; i < d.perks.length; i++) {
-      const x = L + 48 + (i % per) * 140, y = top + 30 + Math.floor(i / per) * 140;
+      const x = IX + 8 + (i % per) * 146, y = top + 28 + Math.floor(i / per) * 146;
       const p = d.perks[i];
       if (p.badge) c.drawImage(p.badge, x, y, 128, 128);
       if (i === d.perkPick) corners(c, x - 6, y - 6, 140, 140);
     }
-    putText(c, T(`이번 괴이에서 얻은 퍽 ${d.perks.length}개`, DIM), L + 48, top + bh - 46);
-    const dx0 = L + gw + 40;
-    c.fillStyle = RIM_D; c.fillRect(dx0 - 24, top + 24, 2, bh - 48);
     const pp = d.perks[d.perkPick];
     if (pp) {
-      putText(c, pixelText(pp.trait ? '특성' : '퍽', pp.trait ? '#ff9a8a' : DIM, 22), dx0, top + 30);
-      putText(c, B(pp.name, GOLD), dx0, top + 62);
-      putText(c, T(pp.effect), dx0, top + 120);
-      putText(c, T('괴이를 나오면 사라짐', DIM), dx0, top + 156);
+      let y = strip(186);
+      putText(c, B(pp.name, pp.trait ? '#ff9a8a' : GOLD), IX, y);
+      if (pp.trait) putText(c, T('특성 · 대가 있음', '#ff9a8a'), IX + B(pp.name).width + 16, y + 8);
+      y += 54;
+      putText(c, T(pp.effect), IX, y);
+      putText(c, T('괴이를 나오면 사라짐', DIM), IX, y + 38);
+      putText(c, T(`얻은 능력 ${d.perks.length}개`, DIM), R - 32, y - 46, 'right');
     }
   } else {
     const slot = (x: number, y: number, it?: { label: string; count: number }, k?: string, on = false) => {
-      if (SL) c.drawImage(SL, x, y, 100, 100);
+      big(x, y);
       if (it) {
         putText(c, B(it.label.slice(0, 2)), x + 50, y + 30, 'center');
         if (it.count > 1) putText(c, T(String(it.count), GOLD), x + 88, y + 66, 'right');
@@ -180,20 +195,23 @@ export function drawCharWindow(c: CanvasRenderingContext2D, d: CharWindowData, t
       if (k) putText(c, T(k, GOLD), x + 10, y + 6);
       if (on) corners(c, x - 6, y - 6, 112, 112);
     };
-    putText(c, T('퀵슬롯', GOLD), L + 48, top + 20);
-    for (let i = 0; i < 4; i++) slot(L + 48 + i * 112, top + 54, d.quick[i], String(i + 1), i === 0);
-    putText(c, T(`가방 ${d.bag.length} / ${d.bagSlots}`, GOLD), L + 48, top + 166);
-    for (let i = 0; i < d.bagSlots; i++) slot(L + 48 + (i % 4) * 112, top + 200 + Math.floor(i / 4) * 106, d.bag[i]);
-    const dx0 = L + 560;
-    c.fillStyle = RIM_D; c.fillRect(dx0 - 24, top + 24, 2, bh - 48);
+    putText(c, T('퀵슬롯', GOLD), IX, top + 22);
+    for (let i = 0; i < 4; i++) slot(IX + i * 118, top + 56, d.quick[i], String(i + 1), i === 0);
+    putText(c, T(`가방 ${d.bag.length} / ${d.bagSlots}`, GOLD), IX, top + 176);
+    const per = 6;
+    for (let i = 0; i < d.bagSlots; i++) slot(IX + (i % per) * 118, top + 212 + Math.floor(i / per) * 110, d.bag[i]);
     const it = d.quick[0];
     if (it) {
-      putText(c, B(it.label, GOLD), dx0, top + 24);
-      putText(c, T(`${it.count}개`), dx0, top + 72);
-      putText(c, T('쓰기 · 버리기', '#9fd7ff'), dx0, top + 108);
+      const y = strip(108);
+      putText(c, B(it.label, GOLD), IX, y + 8);
+      putText(c, T(`${it.count}개`, DIM), IX + B(it.label).width + 16, y + 16);
+      const bw = 150;
+      for (const [j, name] of ['쓰기', '버리기'].entries()) {
+        const bx2 = R - 32 - (2 - j) * bw - (1 - j) * 16;
+        if (!stretch(c, 'tab', bx2, y, bw, 52)) plate(c, bx2, y, bw, 52);
+        putText(c, T(name, j === 0 ? GOLD : INK), bx2 + bw / 2, y + 14, 'center');
+      }
     }
-    putText(c, T('현금', DIM), dx0, top + bh - 80);
-    putText(c, B(d.money, GOLD), dx0, top + bh - 50);
   }
   c.restore();
 }
