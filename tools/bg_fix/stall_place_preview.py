@@ -6,7 +6,7 @@ D = 'game-src/art/objects/restroom/'
 BG = 'game-src/art/pixellab-hq-20261031/hq_restroom_m_final_984x424.png'
 body = Image.open(D + 'stall_body.png').convert('RGBA')
 doors = [Image.open(D + f'stall_door_{i}.png').convert('RGBA') for i in range(6)]
-FOOT, RIGHT, PITCH, N = 368, 392, 158, 3      # 캔버스 x229 = 가운데 기둥 오른쪽 끝, 발 y252
+FOOT, RIGHT, PITCH, N = 368, 400, 158, 3      # 캔버스 x229 = 가운데 기둥 오른쪽 끝, 발 y252
 xs = [RIGHT - 229 - PITCH * i for i in range(N)]
 y = FOOT - 252
 def render(states):
