@@ -147,6 +147,34 @@ def trace_pillar(xl, xr, yfoot, tol=7):
 pillar_masks = {k: trace_pillar(*v) for k, v in PILLARS.items()}
 
 
+# ── 바닥선 다시 깎기(17:50 사용자: 「녹색선이 바구니·기둥 안으로 파고들었다」) ──
+# 벽·칸막이에 붙은 물건(윗부분이 바닥선 위에 있거나, 바닥선에서 14px 안에 바닥이 닿는 것)과 기둥은
+# 그 뒤로 지나갈 수 없으므로 바닥선 자체가 물건 밑(+2px)을 돌아간다. 발 폭 ±FOOT_W 만큼 옆으로도.
+FOOT_W = 12
+wall_attached = []
+for m in masks:
+    ys, xs = np.nonzero(m)
+    touch = any(ys[xs == x].min() <= top[x] + 14 for x in np.unique(xs))
+    if not touch: continue
+    wall_attached.append(m)
+    for x in range(max(0, xs.min() - FOOT_W), min(W, xs.max() + FOOT_W + 1)):
+        col = np.nonzero(m[:, max(0, x - FOOT_W):x + FOOT_W + 1].any(1))[0]
+        if len(col): top[x] = max(top[x], col.max() + 2)
+for k, pm in pillar_masks.items():
+    ys, xs = np.nonzero(pm)
+    for x in range(max(0, xs.min() - FOOT_W), min(W, xs.max() + FOOT_W + 1)):
+        top[x] = max(top[x], ys.max() + 4)
+top = np.minimum(top, H - 1)
+floor_region = np.zeros((H, W), bool)
+for x in range(W): floor_region[top[x]:, x] = True
+# 검사: 바닥선이 벽 붙은 물건·기둥 픽셀(옆 FOOT_W 포함)과 겹치면 실패
+bad = 0
+for m in wall_attached + list(pillar_masks.values()):
+    wide = nd.binary_dilation(m, structure=np.ones((1, 2 * FOOT_W + 1)))
+    bad += int((wide & floor_region).sum())
+if bad: raise SystemExit(f'바닥선이 물건·기둥과 {bad}px 겹침 — 실패')
+print('검사 통과: 벽 붙은 물건', len(wall_attached), '기둥', len(pillar_masks), '바닥선 겹침 0px')
+
 objects, blocks = [], []
 for idx, m in enumerate(sorted(masks, key=lambda m: np.nonzero(m)[1].min())):
     ys, xs = np.nonzero(m); yb = ys.max() + 1
@@ -154,7 +182,6 @@ for idx, m in enumerate(sorted(masks, key=lambda m: np.nonzero(m)[1].min())):
     objects.append((oid, m, yb * K))
     depth = int(min(18, max(8, (yb - ys.min()) * 0.45)))
     # 발 자국은 사람 발 폭(±FOOT_W)만큼 옆으로 넓힌다(17:48 사용자: 대야 옆에 선 사람이 대야 속에 선 듯 보임)
-    FOOT_W = 12
     for x in range(max(0, xs.min() - FOOT_W) // 2 * 2, min(W - 1, xs.max() + FOOT_W) + 1, 2):
         c = np.nonzero(m[:, max(0, x - FOOT_W):x + 2 + FOOT_W].any(1))[0]
         if not len(c): continue
