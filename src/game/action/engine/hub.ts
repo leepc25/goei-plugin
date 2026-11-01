@@ -15,6 +15,7 @@ import { charTop, drawCharClip, drawCharSeat, charArt, charFx, CHAR_K } from '..
 import { persp, view as fieldView } from './view';
 import { blockByProps, clearSpot, type BlockProp } from './propBlock';
 import { PAINTED, clampPainted, doorReachY } from '../hq/painted';
+import { STALL_DOOR_SEC, seatFeet } from '../../world/toilets';
 import { LANE_BOT, LANE_TOP, type HqBox, type HqDoor, type HqMapView, type HqScene, type HqSpot } from '../hq/map';
 
 type Door = HqDoor & { open: boolean };
@@ -55,7 +56,9 @@ export interface LiveActor { id: string; name: string; kind: 'named' | 'mob'; x:
   /** 동행(ally)·적(foe) 구분 (11-01 1-3): 이름표 색 */
   rel?: 'ally' | 'foe';
   /** 지도 의자에 앉음: 의자 번호(장면 상자 번호)·앉기 방향·하는 일·의자 자리 */
-  seat?: { box: number; dir: 'front' | 'side' | 'back'; kind: string; x: number; y: number } }
+  seat?: { box: number; dir: 'front' | 'side' | 'back'; kind: string; x: number; y: number };
+  /** 화장실 칸을 쓰는 중: 그 칸 문 오브젝트 id, 문이 열려 있어야 하나(들어가는 중·나오는 중) */
+  toilet?: { door?: string; open: boolean } }
 export interface HubLife {
   /** 생활 시간 진행 (실시간 초). at = 보이는 장면과 주인공 발 */
   tick(dt: number, at: { scene: string; x: number; y?: number; seat?: number | null }): void;
@@ -74,6 +77,9 @@ export interface HubLife {
   cordons?(sceneId: string): { x0: number; x1: number; y0: number; y1: number }[];
   /** 훈련장 장비 (샌드백·허수아비·사격 과녁, 10-31: 그림은 일단 코드 drawGear, 나중에 교체). busy = 누가 치는 중 → 흔들림 */
   gear?(sceneId: string): { kind: 'sandbag' | 'dummy' | 'target'; x: number; y: number; busy: boolean }[];
+  /** 화장실(11-01): 그 자리를 누가 쓰거나 쓰러 가나 / 주인공이 쓰는 자리를 세계에 알린다 (NPC가 고르지 않게, 침입 감지가 알게) */
+  toiletBusy?(sceneId: string, id: string): boolean;
+  playerToilet?(t: { scene: string; id: string; kind: 'stall' | 'urinal' | 'sink'; phase: 'open' | 'in' | 'leave' } | null): void;
 }
 /** 폴리스 라인 층 자리 수 (장면당 시체 상한 5 → 라인 최대 5) */
 const CORDON_SLOTS = 5;
@@ -128,6 +134,9 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
   let solids: (BlockProp & { h?: number })[] = [];
   /** 주인공이 앉아 있는 방 의자 (코어가 인물 팩 의자를 그리는 동안 방 의자 그림은 숨긴다) */
   const gateOpen = new Map<string, number>();
+  /** 주인공이 쓰는 화장실 자리 (11-01): 칸은 문 열림(open) → 안(in, 앉은 장면 줄) → 나옴(leave), 소변기·세면대는 in만 */
+  let pT: { id: string; kind: 'stall' | 'urinal' | 'sink'; door?: string; phase: 'open' | 'in' | 'leave'; t: number; front: { x: number; y: number }; seat?: { x: number; y: number; k?: number } } | null = null;
+  const setPT = (v: typeof pT) => { pT = v; host.life?.playerToilet?.(v && scene ? { scene: scene.id, id: v.id, kind: v.kind, phase: v.phase } : null); };
   let sitChair: HqBox | null = null;
   /** 이 장면에서 걸은 거리 (px). 필드 시계가 쓴다 */
   let walked = 0;
@@ -138,6 +147,47 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
     opening && opening.id === id ? Math.min(1, opening.t / opening.len) : closing && closing.id === id ? Math.max(0, 1 - closing.t / closing.len) : 0;
   const doorFx = (id: string) => ({ open: openOf(id), shake: rattle && rattle.id === id ? (rattle.t % 4 < 2 ? 3 : -3) * (1 - rattle.t / RATTLE_T) : 0 });
 
+  /** 화장실 자리 쓰기 (E). 칸: 문 열림 → 좌석에 앉아 101 → 102 → 103 → 문 열고 나옴. 소변기(남자 줄 100이 있을 때)·세면대: 벽 보고 그 줄 */
+  const useToilet = (a: StageApi, id: string) => {
+    const t = scene?.toilets?.find((q) => q.id === id);
+    if (!t || !scene) return;
+    const pl = a.world.player as Player & { lifeScene?: (steps: { id: string; n?: number }[], x: number, y: number, face: 1 | -1) => boolean };
+    if (host.life?.toiletBusy?.(scene.id, id)) return a.world.say(t.kind === 'stall' ? '누가 쓰고 있다.' : '누가 쓰고 있다.', 1.5);
+    if (!pl.lifeScene) return;
+    if (t.kind === 'stall') {
+      a.movePlayer(t.x, t.y);
+      setPT({ id, kind: 'stall', door: t.door, phase: 'open', t: Math.round(STALL_DOOR_SEC * 30), front: { x: t.x, y: t.y }, seat: t.seat });
+      host.sfx('doorLatch');
+      return;
+    }
+    const steps = t.kind === 'urinal' ? [{ id: '100', n: 3 }] : [{ id: '104' }];
+    if (!pl.lifeScene(steps, t.x, t.y, 1)) return a.world.say(t.kind === 'urinal' ? '이 사람은 소변기를 쓰지 않는다.' : '지금은 할 수 없다.', 1.5);
+    setPT({ id, kind: t.kind, phase: 'in', t: 0, front: { x: t.x, y: t.y } });
+  };
+  const stepToilet = (a: StageApi) => {
+    if (!pT) return;
+    const pl = a.world.player as Player & { lifeScene?: (steps: { id: string; n?: number }[], x: number, y: number, face: 1 | -1) => boolean; lifeSceneOn?: boolean };
+    if (pT.phase === 'open') {
+      if (--pT.t > 0) return;
+      // 좌석: 사람마다 허벅지선이 다르면 발 자리를 옮긴다 (world/toilets.ts TOILET_LAP)
+      const look = (pl as { label?: string }).label ?? '';
+      const f = pT.seat ? seatFeet(pT.seat, look) : pT.front;
+      if (!pl.lifeScene?.([{ id: '101' }, { id: '102', n: 4 }, { id: '103' }], f.x, f.y, 1)) { a.movePlayer(pT.front.x, pT.front.y); setPT(null); return a.world.say('지금은 할 수 없다.', 1.5); }
+      setPT({ ...pT, phase: 'in' });
+      return;
+    }
+    if (pT.phase === 'in') {
+      if (pl.lifeSceneOn) return;
+      if (pT.kind !== 'stall') return setPT(null);
+      // 다 보면 문이 열리고 문 앞으로 나온다
+      a.movePlayer(pT.front.x, pT.front.y);
+      host.sfx('doorLatch');
+      setPT({ ...pT, phase: 'leave', t: Math.round(STALL_DOOR_SEC * 30) });
+      return;
+    }
+    if (--pT.t <= 0) setPT(null);
+  };
+
   const build = (id: string, x: number, y?: number): FloorPlan => {
     view = host.map();
     const base = sceneOf(id);
@@ -146,7 +196,11 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
       const at = clearSpot(p.x, p.y, base.boxes.filter((b) => b.solid).map((b) => ({ x: b.x, y: b.y, w: b.w, back: b.d + 6, front: 8 })), base.lane ?? LANE);
       return { ...p, x: at.x, y: at.y };
     });
-    const sc: Scene = { ...base, spots: [...base.spots, ...people.map((p) => ({ id: `visit:${p.name}`, x: p.x, y: p.y, who: p.name, verb: '대화', face: p.face, open: true }))] };
+    // 화장실 자리 (칸 문 앞·소변기·세면대): E로 쓴다
+    const toiletSpots = (base.toilets ?? []).map((t) => ({ id: `toilet:${t.id}`, x: t.x, y: t.y, verb: t.kind === 'stall' ? '칸' : t.kind === 'urinal' ? '소변기' : '손 씻기', face: 1 as const, open: true }));
+    const sc: Scene = { ...base, spots: [...base.spots, ...toiletSpots, ...people.map((p) => ({ id: `visit:${p.name}`, x: p.x, y: p.y, who: p.name, verb: '대화', face: p.face, open: true }))] };
+    if (pT) setPT(null);
+    gateOpen.clear();
     curPeople = people;
     speech = null;
     const prev = scene;
@@ -308,7 +362,7 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
 
   /** 지금 서 있는 자리에서 E가 닿는 문·자리 하나 */
   const target = (px: number, py: number): { id: string; kind: 'hubdoor' | 'hubspot'; x: number } | null => {
-    if (!scene) return null;
+    if (!scene || pT) return null;
     let best: { id: string; kind: 'hubdoor' | 'hubspot'; x: number; d: number } | null = null;
     const consider = (id: string, kind: 'hubdoor' | 'hubspot', x: number, ok: boolean) => {
       const d = Math.abs(x - px);
@@ -347,6 +401,14 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
       return build(s.scene, s.x, s.y);
     },
     tick(a: StageApi) {
+      // 화장실 칸 문(여러 장면 그림): 들어가는 중·나오는 중인 사람이 있으면 열리고, 아니면 닫힌다 (약 0.45초)
+      if (scene?.painted) for (const o of PAINTED[scene.painted]?.objects ?? []) {
+        if (!o.frames) continue;
+        const want = live.some((q) => q.toilet?.door === o.id && q.toilet.open) || (!!pT && pT.door === o.id && pT.phase !== 'in');
+        const t = gateOpen.get(o.id) ?? 0;
+        gateOpen.set(o.id, Math.max(0, Math.min(1, t + (want ? 1 : -1) / (STALL_DOOR_SEC * 30))));
+      }
+      if (pT) stepToilet(a);
       // 코드로 열리는 칸막이(그림 장면 gate 조각): 주인공이 앞뒤 가까이 오면 열리고 멀어지면 닫힌다
       if (scene?.painted) for (const o of PAINTED[scene.painted]?.objects ?? []) {
         if (!o.gate) continue;
@@ -403,8 +465,8 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
       if (closing && ++closing.t >= closing.len) closing = null;
       if (rattle && ++rattle.t >= RATTLE_T) rattle = null;
       // 물건보다 높이 떠 있으면(점프·올라선 몸) 막지 않는다
-      if (solids.length && !(p as Player).seat) blockByProps([p as never], solids.filter((s) => !(s.h !== undefined && p.z >= s.h - 6)), scene?.lane ?? LANE);
-      if (scene?.painted) {
+      if (solids.length && !(p as Player).seat && !pT) blockByProps([p as never], solids.filter((s) => !(s.h !== undefined && p.z >= s.h - 6)), scene?.lane ?? LANE);
+      if (scene?.painted && !pT) {
         // 그림 층: 양 끝 옆벽·튀어나온 벽 바깥으로 못 간다
         const q = clampPainted(scene.painted, p.x, p.y, p.z);
         if (q.x !== p.x || q.y !== p.y) a.movePlayer(q.x, q.y);
@@ -441,6 +503,7 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
           if (m) a.world.say(m, 2.5);
           return;
         }
+        if (s.id.startsWith('toilet:')) return useToilet(a, s.id.slice(7));
         if (s.place) return host.openPlace(s.place);
         if (s.say) return a.world.say(s.say, 3);
         if (s.seat && s.act?.[0]) {

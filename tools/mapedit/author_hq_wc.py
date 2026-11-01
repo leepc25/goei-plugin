@@ -26,6 +26,7 @@ body = Image.open(D / 'stall_body_tall.png').convert('RGBA')
 body_end = Image.open(D / 'stall_body_end_tall.png').convert('RGBA')
 endpost = Image.open(D / 'stall_endpost.png').convert('RGBA')
 doors = [Image.open(D / f'stall_door_{i}.png').convert('RGBA') for i in range(6)]
+LAP = 167                                # 앉은 줄 102 첫 장의 허벅지 윗선(캔버스 y) 기준값 — 큐라스로 맞춘 값(stall_toilet_raise.py HIP)
 SEAT = (133, 182)                        # 칸 캔버스 안 변기 좌석 가운데(엉덩이) — stall_toilet_raise.py SEAT(147-X0, 196-R)
 
 
@@ -98,11 +99,19 @@ def build(sid, bg_file, right, n, cut, used, urinals, sinks, exit_x, label):
     floor += [[W1 * K, top[-1] * K], [W1 * K, H1 * K], [0, H1 * K]]
     # 5) 쓰는 자리(1x → 2x): 칸(문 앞에서 E → 안으로), 소변기, 세면대
     toilets = []
+    lane = [min(top) * K, H1 * K - 12]
+    dotK = 1.5 * H1 * K / 890
+    scale = lambda yy: (0.85 + 0.15 * max(0, min(1, (yy - lane[0]) / (lane[1] - lane[0])))) * dotK   # 게임 원근(engine/view.ts persp) × dotK
     for i, x in enumerate(xs):
         if i not in used: continue
         dx = x + 117                                   # 문 가운데(캔버스 x63~171)
+        # 좌석: 앉은 사람(102 첫 장) 허벅지 윗선(캔버스 LAP) = 좌석 엉덩이 자리가 되게 하는 발 자리(x·y)와 그 깊이의 도트 배율 k.
+        # 사람마다 허벅지 윗선이 다르면 게임에서 발 y를 (LAP - 그 사람 값) × k 만큼 옮긴다 (src/game/world/toilets.ts)
+        hx, hy = (x + SEAT[0]) * K, (y + SEAT[1]) * K
+        fy = hy + (252 - LAP) * 1.2
+        for _ in range(4): k = scale(fy); fy = hy + (252 - LAP) * k
         toilets.append({'id': f'stall{i}', 'kind': 'stall', 'door': f'door{i}', 'x': dx * K, 'y': (FOOT + 6) * K,
-                        'seat': {'x': (x + SEAT[0]) * K, 'y': (y + SEAT[1]) * K}})
+                        'seat': {'x': hx, 'y': round(fy, 1), 'k': round(k, 4)}})
     for j, ux in enumerate(urinals):
         toilets.append({'id': f'urinal{j}', 'kind': 'urinal', 'x': round(ux * K), 'y': (line[round(ux)] + U_STAND) * K})
     for j, sx in enumerate(sinks):

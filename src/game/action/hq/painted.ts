@@ -34,6 +34,18 @@ export interface PaintedObject {
   cover?: [number, number][][];
   /** 코드로 열리는 게이트 날개(사용자 11-01 1층): 사람이 다가가면 흐려져 열리고 멀어지면 닫힌다. 막지 않는다 */
   gate?: boolean;
+  /** 여러 장면 그림(화장실 칸 문 0 닫힘 ~ 끝 열림). 열린 정도(0~1)로 장면을 고른다 (hub.ts gateOpen) */
+  frames?: string[];
+}
+/** 화장실 쓰는 자리 (tools/mapedit/author_hq_wc.py). stall = 대변기 칸(문 앞 x·y에서 E → 안 좌석 seat, door = 문 오브젝트 id),
+ *  urinal = 소변기(북쪽 보고 100), sink = 세면대(북쪽 보고 104). x·y = 서는 발 자리 */
+export interface HqToilet {
+  id: string;
+  kind: 'stall' | 'urinal' | 'sink';
+  x: number; y: number;
+  door?: string;
+  /** 앉은 사람 발 자리(기준 허벅지선)와 그 깊이의 도트 배율 */
+  seat?: { x: number; y: number; k?: number };
 }
 export interface PaintedScene {
   file: string;
@@ -63,6 +75,8 @@ export interface PaintedScene {
   posts?: Record<string, [number, number]>;
   /** 사람 앞줄 도트 배율(월드 px / 도트). 세로 890 화면 기준 앞 1.5배를 장면 세로에 맞춘 값(1.5 × h / 890). 없으면 CHAR_K */
   dotK?: number;
+  /** 화장실 쓰는 자리 */
+  toilets?: HqToilet[];
 }
 
 import { JR_ROOMS } from './jrRooms.gen';

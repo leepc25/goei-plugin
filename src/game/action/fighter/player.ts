@@ -421,6 +421,17 @@ export class FighterPlayer extends Player {
 
   /** 본부 의자 자리(hub.ts seat): 엔진 앉기 클립 대신 테스트룸 앉기(코어 sitAt, 의자 그림·맞춤 chairs/<키>.json 그대로). 조사 키로 일어나 exit 자리로 */
   private coreSeat: { exit: { x: number; y: number } } | null = null;
+  /** 화장실(11-01, hub.ts): 테스트룸 장면 줄을 (x, y)에서 튼다 — 칸 101 → 102 → 103, 소변 100, 손 씻기 104. 그 인물에게 없는 줄은 건너뛴다. 하나도 없거나 움직일 수 없는 때면 false */
+  lifeScene(steps: { id: string; n?: number; hold?: number }[], x: number, y: number, face: 1 | -1): boolean {
+    const P = this.core.P as unknown as { x: number; y: number; z: number; vx: number; face: 1 | -1; mode: string };
+    if (!steps.some((st) => this.core.has(st.id)) || P.mode !== 'ground' || this.z > 0) return false;
+    P.x = x; P.y = y; P.z = 0; P.vx = 0; P.face = face;
+    this.core.runScene(steps);
+    this.sync();
+    return true;
+  }
+  /** lifeScene 이 아직 도는 중인가 */
+  get lifeSceneOn(): boolean { return (this.core.P as unknown as { mode: string }).mode === 'act'; }
   /** 코어 의자에 앉아 있나 (hub.ts: 방 의자 그림 숨김) */
   get sitting(): boolean { return !!this.coreSeat; }
   sit(clip: string, x: number, y: number, face: 1 | -1, exit: { x: number; y: number }): boolean {

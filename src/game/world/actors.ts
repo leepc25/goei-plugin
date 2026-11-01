@@ -11,6 +11,7 @@ import { applyTemper, catOf, rollNpcPerks } from './npcperks';
 import type { Hop, PlaceGraph } from './places';
 import { pick, range, type Rng } from './rng';
 import { reactCell, type ReactCell, type ReactSituation } from './namedReact';
+import { STALL_DOOR_SEC, WASH, seatFeet, type ToiletUse } from './toilets';
 import type { FieldWorldSave } from './fieldSave';
 
 /** 옷 입은 클립 → 맨몸 클립 (art/charPacks.ts FIELD_CLIP 의 nude_*). 표에 없는 활동은 nude_idle(가린 채 경계). 샤워 기능이 Actor.nude 를 켠 인물만 */
@@ -140,8 +141,10 @@ export interface Actor {
   chatCd?: number;
   /** 진료할 사람 id (의사) */
   patient?: string;
-  /** 쓰는 훈련 장비 (장면#번호) */
+  /** 쓰는 훈련 장비 (장면#번호) · 화장실 자리 (장면#t:자리 id) */
   station?: string;
+  /** 화장실 자리를 쓰는 중 (11-01): 칸은 문 열림(open) → 안(in) → 나옴(leave), 소변기·세면대는 in만. t = 그 단계 남은 초 */
+  toilet?: { id: string; kind: 'stall' | 'urinal' | 'sink'; phase: 'open' | 'in' | 'leave'; t: number; door?: string };
   /** 평소 거리 순찰 중인 경찰 (C16, 10-31) */
   patrol?: boolean;
   /** 주인공이 말을 걸기 전에 하던 일 (몹 대화, 모델에 넣는다) */
@@ -1674,6 +1677,9 @@ export class WorldSim {
     if (this.stepCommute(a)) return;
     if (a.noticeCd > 0) a.noticeCd -= dt;
     if (a.needs) decayNeeds(a.needs, dt, TEMPER[a.def.name], onDuty(this.hour, TEMPER[a.def.name]));
+    // 화장실 자리: 하던 일이 끊겼으면(맞음·겁 등) 자리를 비운다. 칸 안에서 닫힌 문 뒤에 있는 동안은 바깥 일에 반응하지 않는다
+    if (a.toilet && a.act !== 'do') this.leaveToilet(a);
+    if (a.toilet?.kind === 'stall' && a.act === 'do') return this.stepStall(a, dt);
     if (a.def.kind === 'mob') this.mobThink(a, dt);
     if (a.def.kind === 'named' && this.namedBlocks(a)) return;   // 호감 적대: 보자마자 막아섬 (C4 다안)
     if (a.def.kind === 'named') this.namedSense(a);   // 캐릭터 반응 (반응표)
@@ -1714,9 +1720,13 @@ export class WorldSim {
         if (a.task && a.needs) a.needs[a.task.need] = Math.min(100, a.needs[a.task.need] + a.task.fill * dt);
         a.wait -= dt;
         // 직원의 책상 일은 욕구가 차도 정한 시간만큼 (근무라서). 그 밖은 욕구가 다 차면 끝
-        if (a.wait <= 0 || (a.task && a.needs && a.needs[a.task.need] >= 100 && !(a.post && (a.task.id === 'work' || a.task.id === 'train')))) {
+        if (a.wait <= 0 || (a.task && a.task.fill > 0 && a.needs && a.needs[a.task.need] >= 100 && !(a.post && (a.task.id === 'work' || a.task.id === 'train')))) {
           a.last = a.task?.id;
+          const wash = !!a.toilet && a.toilet.kind !== 'sink';
+          this.leaveToilet(a);
           a.task = undefined;
+          // 볼일 뒤엔 손 씻기 (동작 활용표: 소변 100 → 손 씻기 104, 대변 101~103 → 104)
+          if (wash && this.goWash(a)) return;
           this.idle(a, 1, 3);
         }
         return;
@@ -2100,7 +2110,7 @@ export class WorldSim {
     if (a.commute?.state === 'out') { a.commute = undefined; return this.idle(a, 0.2, 0.5); }   // 길이 끊김: 다시 퇴근 길을 찾는다
     if (a.post) return this.goPost(a);
     if (a.def.brain === 'transit') return this.idle(a, 1, 3);
-    const roam = (a.def.roam ?? [a.def.home]).filter((s) => this.graph.scene(s));
+    const roam = (a.def.roam ?? [a.def.home]).filter((s) => this.graph.scene(s) && this.sexOk(a, s));
     if (a.def.brain === 'needs' && a.needs) {
       const c = choose({
         name: a.def.name, needs: a.needs, scene: a.scene, roam, graph: this.graph, has: (clip) => this.canClip(a, clip), duty: onDuty(this.hour, TEMPER[a.def.name]),
@@ -2142,6 +2152,7 @@ export class WorldSim {
     a.station = undefined;
     a.opt = undefined;
     if (t.id === 'train') { const st = this.trainSpot(a); if (st) return st; }
+    if (t.id === 'pee' || t.id === 'poo') { const st = this.toiletSpot(a, t.id === 'pee' && this.canClip(a, 'line:100') ? ['urinal', 'stall'] : ['stall']); if (st) return st; }
     // 그 인물에게 그림이 있는 줄 중에서 고른다 (10-31): 앉는 줄은 그 방향 빈 의자가 있을 때만. 바로 전에 한 줄은 덜 고른다
     const look = a.def.look ?? a.def.name;
     const opts = (ACT_OPTS[t.id] ?? []).filter((o) => this.has(look, `line:${o.line}`));
@@ -2206,6 +2217,16 @@ export class WorldSim {
     a.doing = a.opt?.label ?? t.label;
     a.wait = a.opt?.once ? range(this.rng, 2.5, 4) : range(this.rng, t.sec[0], t.sec[1]);
     a.plan = 'none';
+    // 화장실 자리 (칸·소변기·세면대). 화장실인데 빈 자리가 없었으면 볼일을 보지 않고 잠깐 기다렸다 다시 고른다 (아무 데서나 보지 않는다)
+    const ts = this.toiletOf(a);
+    if (ts) return this.startToilet(a, ts);
+    if ((t.id === 'pee' || t.id === 'poo' || t.id === 'wash') && this.graph.scene(a.scene)?.toilets?.length) {
+      a.task = undefined;
+      a.station = undefined;
+      this.idle(a, 2, 4);
+      a.doing = '화장실 자리 기다림';
+      return;
+    }
     if (a.opt) a.lastLine = a.opt.line;
     // 의자에 왔으면 앉는다 (그 의자가 아직 비었을 때)
     const pick = a.seatPick;
@@ -2385,6 +2406,130 @@ export class WorldSim {
     return this.actors.find((q) => q.station === key && q.scene === scene && q.task?.id === 'train' && (q.act === 'do' || (q.act === 'walk' && q.plan === 'do'))) ?? null;
   }
   /** 훈련 자리: 쏠 수 있으면 사대 먼저(반반), 아니면 샌드백·허수아비. 비어 있는 것 중 가까운 것. 없으면 null */
+  // ── 화장실 (11-01, world/toilets.ts) ──
+  /** 성별: 남 소변(100) 줄이 있으면 남, 없고 앉아 볼일(102)이 있으면 여. 둘 다 없으면 모름(화장실을 쓰지 않는다) */
+  sexOf(a: Actor): '남' | '여' | null {
+    if (this.canClip(a, 'line:100')) return '남';
+    return this.canClip(a, 'line:102') || this.canClip(a, 'poo') ? '여' : null;
+  }
+  /** 남녀 구분 화장실이면 그 성별만 들어간다 (사용자 11-01: NPC끼리 잘못 들어가는 일은 없다) */
+  private sexOk(a: Actor, scene: string): boolean {
+    const x = this.graph.scene(scene)?.sex;
+    return !x || this.sexOf(a) === x;
+  }
+  /** 주인공이 쓰는 화장실 자리 (hub가 알려 준다): 그 자리는 NPC가 고르지 않는다 */
+  playerToilet: { scene: string; id: string; kind: 'stall' | 'urinal' | 'sink'; phase: 'open' | 'in' | 'leave' } | null = null;
+  /** 그 화장실 자리를 쓰거나 쓰러 가는 사람이 있나 (주인공 포함) */
+  toiletBusy(scene: string, id: string, except?: Actor): boolean {
+    if (this.playerToilet?.scene === scene && this.playerToilet.id === id) return true;
+    const key = `${scene}#t:${id}`;
+    return this.actors.some((q) => q !== except && q.scene === scene && q.station === key && (q.act === 'do' || (q.act === 'walk' && q.plan === 'do')));
+  }
+  /** 빈 자리 중 가까운 것 (kinds 앞쪽 종류부터). 고르면 a.station 에 적는다 */
+  private toiletSpot(a: Actor, kinds: ('stall' | 'urinal' | 'sink')[]): { x: number; y: number } | null {
+    const ts = this.graph.scene(a.scene)?.toilets;
+    if (!ts?.length) return null;
+    for (const k of kinds) {
+      const free = ts.filter((t) => t.kind === k && !this.toiletBusy(a.scene, t.id, a)).sort((p, q) => Math.abs(p.x - a.x) - Math.abs(q.x - a.x));
+      if (free.length) {
+        a.station = `${a.scene}#t:${free[0].id}`;
+        return { x: free[0].x, y: free[0].y };
+      }
+    }
+    return null;
+  }
+  /** 지금 와 있는 화장실 자리 (고른 자리가 이 장면이고 아직 비었을 때) */
+  private toiletOf(a: Actor) {
+    const m = a.station?.match(/^(.+)#t:(.+)$/);
+    if (!m || m[1] !== a.scene) return null;
+    const t = this.graph.scene(a.scene)?.toilets?.find((q) => q.id === m[2]);
+    if (!t || this.toiletBusy(a.scene, t.id, a)) { a.station = undefined; return null; }
+    return t;
+  }
+  private startToilet(a: Actor, t: NonNullable<ReturnType<WorldSim['toiletOf']>>): void {
+    a.x = t.x;
+    a.y = t.y;
+    if (t.kind === 'stall') {
+      // 문 앞: 문이 열린다 → (stepStall) 안으로
+      a.toilet = { id: t.id, kind: 'stall', phase: 'open', t: STALL_DOOR_SEC, door: t.door };
+      a.doing = `${a.task?.label ?? '화장실'} (칸)`;
+      a.face = 1;
+      this.setClip(a, 'idle');
+      return;
+    }
+    // 소변기·세면대: 벽(북)을 보고 선다
+    a.toilet = { id: t.id, kind: t.kind, phase: 'in', t: 0 };
+    a.face = 1;
+    if (t.kind === 'urinal') { a.doing = '소변 중'; this.setClip(a, 'line:100'); }
+    else { a.doing = '손 씻는 중'; this.setClip(a, 'line:104'); }
+    a.clipUntil = this.time + a.wait;
+  }
+  /** 칸: 문 열림 → 안에 앉음(101 → 102 → 끝에 103) → 문 열림·나옴 → 문 닫힘 */
+  private stepStall(a: Actor, dt: number): void {
+    const tl = a.toilet!;
+    const t = this.graph.scene(a.scene)?.toilets?.find((q) => q.id === tl.id);
+    if (!t?.seat) { this.leaveToilet(a); return this.idle(a, 1, 3); }
+    if (tl.phase === 'open') {
+      if ((tl.t -= dt) > 0) return;
+      const f = seatFeet(t.seat, a.def.look ?? a.def.name);
+      a.x = f.x;
+      a.y = f.y;
+      tl.phase = 'in';
+      this.setClip(a, 'poo');
+      a.clipUntil = this.time + a.wait;
+      return;
+    }
+    if (tl.phase === 'in') {
+      if (a.task && a.needs) a.needs[a.task.need] = Math.min(100, a.needs[a.task.need] + a.task.fill * dt);
+      if ((a.wait -= dt) > 0) return;
+      tl.phase = 'leave';
+      tl.t = STALL_DOOR_SEC;
+      a.x = t.x;
+      a.y = t.y;
+      this.setClip(a, 'idle');
+      return;
+    }
+    if ((tl.t -= dt) > 0) return;
+    a.last = a.task?.id;
+    a.task = undefined;
+    this.leaveToilet(a);
+    if (this.goWash(a)) return;
+    this.idle(a, 1, 3);
+  }
+  /** 화장실 자리를 비운다. 칸 안에 앉아 있었으면 문 앞으로 나온다 */
+  private leaveToilet(a: Actor): void {
+    const tl = a.toilet;
+    if (tl?.kind === 'stall' && tl.phase === 'in') {
+      const t = this.graph.scene(a.scene)?.toilets?.find((q) => q.id === tl.id);
+      if (t) { a.x = t.x; a.y = t.y; }
+    }
+    a.toilet = undefined;
+    if (a.station?.includes('#t:')) a.station = undefined;
+  }
+  /** 볼일 뒤 빈 세면대로 손 씻으러 (그 줄 104가 있을 때) */
+  private goWash(a: Actor): boolean {
+    if (!this.canClip(a, 'line:104')) return false;
+    const st = this.toiletSpot(a, ['sink']);
+    if (!st) return false;
+    a.task = WASH;
+    this.walkTo(a, st, '손 씻으러', 'do');
+    return true;
+  }
+  /** 화장실 안 사람들 (필드 스레드: 침입 감지·대사). 주인공도 넣는다 */
+  toiletUsers(scene: string): ToiletUse[] {
+    if (!this.graph.scene(scene)?.toilets) return [];
+    const out: ToiletUse[] = [];
+    for (const a of this.actors) {
+      if (a.scene !== scene || a.act === 'dead' || a.act === 'gone') continue;
+      const tl = a.toilet;
+      const at = tl ? tl.kind : 'walk';
+      out.push({ id: a.def.id, name: a.def.name, kind: a.def.kind, sex: this.sexOf(a), at, face: at === 'stall' ? 'S' : at === 'walk' ? (a.face > 0 ? 'E' : 'W') : 'N', x: a.x, y: a.y, ...(tl ? { spot: tl.id, phase: tl.phase } : {}) });
+    }
+    const p = this.player, pt = this.playerToilet;
+    if (p && p.scene === scene) out.push({ id: 'player', name: '주인공', kind: 'player', sex: null, at: pt?.scene === scene ? pt.kind : 'walk', face: pt?.scene === scene ? (pt.kind === 'stall' ? 'S' : 'N') : (p.face ?? 1) > 0 ? 'E' : 'W', x: p.x, y: p.y, ...(pt?.scene === scene ? { spot: pt.id, phase: pt.phase } : {}) });
+    return out;
+  }
+
   private trainSpot(a: Actor): { x: number; y: number } | null {
     const gs = this.gear(a.scene);
     if (!gs.length) return null;
@@ -2823,7 +2968,7 @@ export class WorldSim {
     const p = a.post;
     if (!p || !a.needs) return false;
     const fac = this.sceneFaction(p.scene);
-    const roam = fac ? this.graph.ids().filter((id) => this.sceneFaction(id) === fac) : [p.scene];
+    const roam = (fac ? this.graph.ids().filter((id) => this.sceneFaction(id) === fac) : [p.scene]).filter((id) => id === p.scene || this.sexOk(a, id));
     const c = choose({
       name: a.def.name, needs: a.needs, scene: a.scene, roam, graph: this.graph, has: (clip) => this.canClip(a, clip), duty: false,
       partnerIn: (s) => this.actors.some((q) => q !== a && q.scene === s && (q.def.kind === 'named' || !!q.post) && ['idle', 'walk', 'post'].includes(q.act) && !q.route.length),

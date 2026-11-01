@@ -4,7 +4,7 @@
 // 출입: 복도 북쪽 벽 문(N)으로 들어간 방은 방 아래(S)로 들어오고 나간다. 복도 아래 문(S)으로 들어간 방은 방 북쪽 벽 문으로.
 import type { PlaceId } from './data';
 import { ROOMS, mirror, type Room, type RoomFix, type RoomItem } from './rooms';
-import { PAINTED, PAINTED_LANE, doorX } from './painted';
+import { PAINTED, PAINTED_LANE, doorX, type HqToilet } from './painted';
 import { JR_ROOM_SPOTS } from './jrRooms.gen';
 import { MAPEDIT_SPOTS } from './mapedit.gen';
 
@@ -100,6 +100,10 @@ export interface HqScene {
   things: HqThing[];
   /** 의자 자리 (boxes 의 의자). 주인공·이름 인물이 앉는다 */
   seats?: { x: number; y: number; face?: 'E' | 'W' | 'N'; box: number }[];
+  /** 화장실 쓰는 자리 (칸·소변기·세면대) */
+  toilets?: HqToilet[];
+  /** 남녀 구분 화장실: 이 성별만 쓴다 (NPC는 다른 쪽에 들어가지 않는다) */
+  sex?: '남' | '여';
 }
 
 /** 화면 px (docs/필드_그림_통합_지침.md): 맨 뒤 줄에서 1 m = 142 px (키 1.65 m = 235 px), 벽·바닥 선 y420, 걷는 띠 y420–669, 배경 세로 700 */
@@ -186,7 +190,8 @@ export const HQ_SCENES: HqScene[] = [
     { id: 'elev', kind: 'elevator' },
     { id: 'wc', kind: 'door', to: 'wc', toDoor: 'out', label: '화장실(남)' },
   ]),
-  room({ id: 'wc', name: '화장실', floor: '2F', look: 'life', doors: [exitS('f2', 'wc', 'wc', true)] }, 'wc', true),
+  // 화장실은 그림 장면(PixelLab 11-01, tools/mapedit/author_hq_wc.py): 대변기 칸·소변기·세면대 자리(toilets). 나가는 곳은 화면 아래 오른쪽
+  floorHall('wc', '화장실(남)', '2F', [{ id: 'out', kind: 'exit', side: 'S', to: 'f2', toDoor: 'wc', label: '나가기' }], { toilets: PAINTED.wc?.toilets, sex: '남' }),
   room({ id: 'swat', name: '진압팀', floor: '2F', look: 'office', doors: [exitS('f2', 'swat', 'swat', true)] }, 'swat', true),
   // 3층은 새 본부 그림(PixelLab 2026-10-31~11-01, game-src/mapedit/hq_f3): 서→동 종합대응팀 유리문 · 엘리베이터 · 화장실(여) · 휴게실. 계단·탕비실 없음(본부 최소화, 사용자 10-31)
   floorHall('f3', '3층', '3F', [
@@ -195,7 +200,7 @@ export const HQ_SCENES: HqScene[] = [
     { id: 'wc', kind: 'door', to: 'wc3', toDoor: 'out', label: '화장실(여)' },
     { id: 'lounge', kind: 'glass', to: 'lounge', toDoor: 'out', label: '휴게실' },
   ]),
-  room({ id: 'wc3', name: '화장실', floor: '3F', look: 'life', doors: [exitS('f3', 'wc', 'wc', true)] }, 'wc', true),
+  floorHall('wc3', '화장실(여)', '3F', [{ id: 'out', kind: 'exit', side: 'S', to: 'f3', toDoor: 'wc', label: '나가기' }], { toilets: PAINTED.wc3?.toilets, sex: '여' }),
   room({ id: 'lounge', name: '휴게실', floor: '3F', look: 'life', doors: [exitS('f3', 'lounge', 'lounge')] }, 'lounge'),
   room({ id: 'office', name: '종합대응팀', floor: '3F', look: 'office', doors: [exitS('f3', 'office', 'office')] }, 'office'),
   // 지하 1층은 새 본부 그림(PixelLab 11-01, game-src/mapedit/b1): 서→동 샤워실(여) · 샤워실(남) · 훈련장 양문 · 엘리베이터. 교육장·계단 없음(본부 최소화)

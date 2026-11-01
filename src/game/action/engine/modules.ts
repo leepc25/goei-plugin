@@ -533,12 +533,14 @@ function hqAdapter(bridge: Partial<GameBridge> | undefined, ui: { chooseFloor: H
     lifeTime: () => sim?.time ?? 0,
     cordons: (sceneId) => (world()?.obstacles(sceneId) ?? []).filter((o) => o.id.startsWith('cordon')),
     gear: (sceneId) => world()?.gear(sceneId) ?? [],
+    toiletBusy: (sceneId, id) => world()?.toiletBusy(sceneId, id) ?? false,
+    playerToilet: (t) => { const w = world(); if (w) w.playerToilet = t; },
     hit: (sceneId, boxes, dir) => world()?.hitBoxes(sceneId, boxes, dir).length ?? 0,
     actors: (sceneId) => (world()?.inScene(sceneId) ?? []).map((a) => {
       const st = a.seat ? world()?.graph.scene(sceneId)?.seats?.[a.seat.i] : undefined;
       // 동행·적 구분(11-01 1-3): 동행 = 따라오는 인물, 적 = 쫓아오거나 맞서거나 (동행 아닌데) 싸우는 사람
       const rel = a.following ? 'ally' : a.plan === 'chase' || (a.act === 'argue' && a.doing === '맞섬') || (a.fighting && !a.following) ? 'foe' : undefined;
-      return { id: a.def.id, name: a.def.name, kind: a.def.kind, x: a.x, y: a.y, face: a.face, look: a.def.look, moving: a.act === 'walk', clip: a.clip, since: a.clipAt, until: a.clipUntil, icon: a.icon, say: a.say, ...(rel ? { rel } : {}), ...(a.def.kind === 'mob' && b?.visit?.sendMob && world()!.canTalk(a) ? { talk: true } : {}),
+      return { id: a.def.id, name: a.def.name, kind: a.def.kind, x: a.x, y: a.y, face: a.face, look: a.def.look, moving: a.act === 'walk', clip: a.clip, since: a.clipAt, until: a.clipUntil, icon: a.icon, say: a.say, ...(rel ? { rel } : {}), ...(a.toilet?.kind === 'stall' ? { toilet: { door: a.toilet.door, open: a.toilet.phase !== 'in' } } : {}), ...(a.def.kind === 'mob' && b?.visit?.sendMob && world()!.canTalk(a) ? { talk: true } : {}),
         ...(a.seat && st ? { seat: { box: st.box, dir: a.seat.dir, kind: a.seat.kind, x: a.seat.x, y: a.seat.y } } : {}) };
     }),
     observer: (sceneId) => (observing && sim ? observerLines(sim, clockView(), sceneId, seed) : null),

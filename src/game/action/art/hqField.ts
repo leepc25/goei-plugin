@@ -199,7 +199,8 @@ export function drawHqFieldObject(c: CanvasRenderingContext2D, scene: string, id
     c.restore();
     return;
   }
-  const im = images?.[o.file];
+  // 여러 장면 그림(화장실 칸 문): 열린 정도로 장면을 고른다
+  const im = images?.[o.frames ? o.frames[Math.max(0, Math.min(o.frames.length - 1, Math.round(open * (o.frames.length - 1))))] : o.file];
   if (!im) return;
   c.save(); c.imageSmoothingEnabled = true; c.imageSmoothingQuality = 'high';
   if (o.gate && open > 0) {

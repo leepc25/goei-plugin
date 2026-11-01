@@ -23,6 +23,10 @@ export interface PlaceScene {
   doors: PlaceDoor[];
   /** 지도 의자 (box = 장면 상자 번호, face = 앉은 사람이 보는 쪽). 이름 인물이 일·식사·휴식을 앉아서 할 자리 */
   seats?: { x: number; y: number; face?: 'E' | 'W' | 'N'; box: number }[];
+  /** 화장실 쓰는 자리: stall = 대변기 칸(x·y = 문 앞, seat = 좌석), urinal = 소변기, sink = 세면대 (x·y = 서는 발 자리) */
+  toilets?: { id: string; kind: 'stall' | 'urinal' | 'sink'; x: number; y: number; door?: string; seat?: { x: number; y: number; k?: number } }[];
+  /** 남녀 구분 화장실 */
+  sex?: '남' | '여';
 }
 /**
  * 방 이름 → 장소 종류 (10-31 사용자: 층 배치가 바뀌어도 고칠 곳이 없게, 방 종류를 따로 적지 않고 이름 낱말로).
