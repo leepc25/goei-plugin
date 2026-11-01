@@ -250,7 +250,7 @@ export function drawCharWindow(c: CanvasRenderingContext2D, d: CharWindowData, t
         // 퀵슬롯 개수 = 아래 테 빈 곳에 걸쳐서
         if (it.count > 1) putText(c, T(String(it.count), GOLD), x + (k ? 50 : 88), y + (k ? 86 : 66), k ? 'center' : 'right');
       }
-      if (k) putText(c, T(k, '#9fd7ff'), x + 50, y - 8, 'center'); // 퀵슬롯 번호 = 위 테 빈 곳, 하늘색(개수 금색과 구분)
+      if (k) putText(c, pixelText(k, '#9fd7ff', 16), x + 50, y - 5, 'center'); // 퀵슬롯 번호 = 위 테 빈 곳, 하늘색(개수 금색과 구분)
       if (on) bracketsOnly(c, x - 6, y - 6, 112, 112, 22);
     };
     putText(c, T('퀵슬롯', GOLD), IX, top + 22);
