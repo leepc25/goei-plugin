@@ -43,7 +43,7 @@ export interface CharWindowData {
   money: string;
 }
 
-const INK = '#e6e4dc', DIM = '#7d8790', GOLD = '#ffd66b', UP = '#7fe08a', OVER = '#8fe3ff';
+const INK = '#e6e4dc', DIM = '#7d8790', GOLD = '#ffd66b', UP = '#7fe08a';
 const NAVY = '#101a36', NAVY_D = '#0a1126', RIM_L = '#aeb8c8', RIM_D = '#4a5468', SOCKET = '#070c1c';
 
 /** 도트 판: 모서리 2도트 깎고, 위·왼쪽 밝은 테, 아래·오른쪽 어두운 테 (둥근 상자·표 선 아님) */
@@ -134,15 +134,14 @@ export function drawCharWindow(c: CanvasRenderingContext2D, d: CharWindowData, t
     d.base.forEach((s, i) => {
       const yy = top + 28 + i * 106, v = s.now ?? s.v;
       putText(c, B(s.label), IX, yy);
-      putText(c, B(String(v), v > 10 ? OVER : s.now !== undefined && s.now !== s.v ? UP : GOLD), IX + 82, yy, 'right');
-      // 눈금 10칸: 기본 = 금, 능력으로 오른 몫 = 초록. 10을 넘으면 둘째 바퀴를 하늘색으로 앞칸부터 덧칠하고 「+N」
-      for (let k = 0; k < 10; k++) {
-        const px = IX + 104 + k * 26, py = yy + 6;
-        c.fillStyle = RIM_D; c.fillRect(px, py, 20, 24);
-        c.fillStyle = k < Math.min(s.v, 10) ? '#e8c45a' : k < v ? UP : SOCKET; c.fillRect(px + 2, py + 2, 16, 20);
-        if (k < v - 10) { c.fillStyle = OVER; c.fillRect(px + 2, py + 2, 16, 20); c.fillStyle = '#ffffff'; c.fillRect(px + 2, py + 2, 16, 4); }
+      putText(c, B(String(v), s.now !== undefined && s.now !== s.v ? UP : GOLD), IX + 82, yy, 'right');
+      // 눈금: 기본 10칸(금 = 기본, 초록 = 능력으로 오른 몫). 10을 넘으면 10칸 뒤에 칸이 이어 붙는다(최대 20칸 자리)
+      const n = Math.max(10, v);
+      for (let k = 0; k < n; k++) {
+        const px = IX + 104 + k * 15 + (k >= 10 ? 6 : 0), py = yy + 8;
+        c.fillStyle = RIM_D; c.fillRect(px, py, 13, 20);
+        c.fillStyle = k < Math.min(s.v, 10) ? '#e8c45a' : k < v ? UP : SOCKET; c.fillRect(px + 2, py + 2, 9, 16);
       }
-      if (v > 10) putText(c, T(`+${v - 10}`, OVER), IX + 104 + 10 * 26 + 6, yy + 4);
       putText(c, T(s.what, DIM), IX, yy + 46);
     });
     const dx0 = IX + 446;
