@@ -8,7 +8,7 @@ body = Image.open(D + 'stall_body.png').convert('RGBA')
 body_end = Image.open(D + 'stall_body_end.png').convert('RGBA')
 endpost = Image.open(D + 'stall_endpost.png').convert('RGBA')
 doors = [Image.open(D + f'stall_door_{i}.png').convert('RGBA') for i in range(6)]
-FOOT, RIGHT, PITCH, N = 368, 413, 158, 3      # 캔버스 x229 = 가운데 기둥 오른쪽 끝, 발 y252
+FOOT, RIGHT, PITCH, N = 368, 391, 158, 3      # 캔버스 x229 = 가운데 기둥 오른쪽 끝, 발 y252
 xs = [RIGHT - 206 - PITCH * i for i in range(N)]   # 맨 오른쪽 칸은 끝 기둥(캔버스 x172~206)으로 끝남
 y = FOOT - 252
 def render(states):
