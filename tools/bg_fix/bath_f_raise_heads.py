@@ -139,4 +139,4 @@ for n,((bl,br),(rx0,rx1,ry0,ry1)) in SHADOW.items():
         for x in range(bl,br+1):
             if newhead[y,x] or CH[y,x]==3 or x in EDGE: continue
             out[y,x]=orig[y+P,x]; CH[y,x]=6
-Image.fromarray(out).save(OUT); np.save(OUT+'.ch.npy',CH)
+Image.fromarray(out).save(OUT)
