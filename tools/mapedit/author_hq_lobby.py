@@ -21,12 +21,13 @@ FLAPS = [[(539, 277), (574, 277), (574, 333), (539, 333)]]
 mask = Image.new('L', orig.size, 0); md = ImageDraw.Draw(mask)
 for q in FLAPS: md.polygon(q, fill=255)
 from PIL import ImageFilter
-mask = mask.filter(ImageFilter.MaxFilter(3))  # 유리 가장자리 1px까지
-# 열린 바탕: 날개 자리를 같은 줄 x690~719 띠(소화기 반사 없는 바닥·벽)를 되풀이해 채움
 base = orig.copy(); bp = base.load(); op = orig.load(); mp = mask.load()
+# 열린 바탕: 유리 자리를 원래 그림의 크게 흐린(중앙값 11) 어두운 안쪽으로 — 반사 줄 없이 비어 보이게
+from PIL import ImageFilter as _F
+med = orig.filter(_F.MedianFilter(11)); mdp = med.load()
 for y in range(orig.height):
     for x in range(orig.width):
-        if mp[x, y]: bp[x, y] = op[690 + (x - 570) % 30, y]
+        if mp[x, y]: bp[x, y] = tuple(int(q * 0.8) for q in mdp[x, y])
 base.save(OUT / 'hq_f1_strip.png')
 # 닫힌 날개 조각(원본 그대로)
 bx0, by0, bx1, by1 = mask.getbbox()
@@ -35,8 +36,11 @@ flap.save(OUT / 'gate_flaps.png')
 objects = [{'id': 'gate_flaps', 'file': 'gate_flaps', 'x': bx0 * K, 'y': by0 * K, 'w': (bx1 - bx0) * K, 'h': (by1 - by0) * K, 'sortY': 352 * K, 'gate': True}]
 def rect(x0, y0, x1, y1): return [[x0 * K, y0 * K], [x1 * K, y0 * K], [x1 * K, y1 * K], [x0 * K, y1 * K]]
 # 가림(사람이 뒤에 서면 앞에 그림): 뒤 게이트·앞 게이트·가운데 기둥·끝 기둥
-for oid, r, sy in (('gate_back', (488, 252, 578, 326), 326), ('gate_front', (522, 262, 628, 352), 352), ('post_mid', (613, 290, 629, 386), 386), ('post_end', (661, 300, 680, 418), 417)):
-    objects.append({'id': oid, 'cover': [rect(*r)], 'sortY': sy * K})
+for oid, rs, sy in (('gate_back', [(488, 252, 578, 326)], 326),
+                    # 앞 게이트 틀만(유리 자리 539~574·277~333은 빼야 열린 바탕이 닫힌 유리를 덮지 않는다)
+                    ('gate_front', [(522, 262, 539, 352), (574, 262, 628, 352), (539, 262, 574, 277), (539, 333, 574, 352)], 352),
+                    ('post_mid', [(613, 290, 629, 386)], 386), ('post_end', [(661, 300, 680, 418)], 417)):
+    objects.append({'id': oid, 'cover': [rect(*r) for r in rs], 'sortY': sy * K})
 # 막힘(발 자리): 게이트 몸통 줄, 가운데 기둥, 끝 기둥
 # 통로 = 앞 게이트 유리 줄 y335~352(유리가 열리면 그 띠로 좌우 통과). 뒤 게이트·옆 날개·끝 기둥 자리는 막음
 blocks = [{'poly': rect(*r), 'h': 999} for r in ((485, 292, 628, 335), (583, 352, 630, 386), (626, 352, 680, 418))]

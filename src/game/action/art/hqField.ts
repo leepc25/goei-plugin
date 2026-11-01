@@ -203,10 +203,12 @@ export function drawHqFieldObject(c: CanvasRenderingContext2D, scene: string, id
   if (!im) return;
   c.save(); c.imageSmoothingEnabled = true; c.imageSmoothingQuality = 'high';
   if (o.gate && open > 0) {
-    // 열리는 게이트 날개: 열릴수록 흐려져 사라진다(유리 날개가 기둥 안으로 들어감)
+    // 열리는 게이트 유리: 가운데서 갈라져 양쪽 기둥 안으로 밀려 들어간다
     if (open >= 1) { c.restore(); return; }
-    c.globalAlpha = 1 - open;
-    c.drawImage(im, o.x, o.y, o.w, o.h);
+    const hw = o.w / 2, sh = hw * open;
+    c.beginPath(); c.rect(o.x, o.y, o.w, o.h); c.clip();
+    c.drawImage(im, 0, 0, im.width / 2, im.height, o.x - sh, o.y, hw, o.h);
+    c.drawImage(im, im.width / 2, 0, im.width / 2, im.height, o.x + hw + sh, o.y, hw, o.h);
   } else c.drawImage(im, o.x, o.y, o.w, o.h);
   c.restore();
 }
