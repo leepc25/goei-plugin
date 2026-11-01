@@ -19,9 +19,11 @@ SHEETS = {1: [
  "red hot gun bursting steam", "running with winged shoes"]}
 n = int(sys.argv[1]); items = SHEETS[n]
 lst = "; ".join(f"{i+1} {t}" for i, t in enumerate(items))
-desc = ("pixel art icon sheet, 8 columns x 4 rows of 32 round silver medals, each 64x64, evenly spaced. "
-        "Every medal shows the same small agent in a black suit, white shirt and sunglasses with a thin white outline, doing one action. "
+desc = ("pixel art icon sheet, 8 columns x 4 rows of 32 single-color silver tokens, each 64x64, evenly spaced. "
+        "Each token is a thick 3D silver coin seen from the front with a visible beveled rim and shading, all silver. "
+        "The same small agent with sunglasses is embossed in silver relief on each token, doing one action. Silver only, no other colors. "
         f"Left to right, top to bottom: {lst}. No text. Everything else is up to you.")
+TAG = sys.argv[2] if len(sys.argv) > 2 else ""
 print(len(desc), desc, flush=True)
 body = {"description": desc, "image_size": {"width": 512, "height": 256}, "no_background": True}
 def post(p, b):
@@ -40,8 +42,8 @@ imgs = (r.get("last_response") or {}).get("images") or []
 for i, im in enumerate(imgs):
     b = im.get("base64") if isinstance(im, dict) else im
     if "," in b[:40]: b = b.split(",", 1)[1]
-    open(f"{OUT}/sheet{n}_{i}.png", "wb").write(base64.b64decode(b))
+    open(f"{OUT}/sheet{n}{TAG}_{i}.png", "wb").write(base64.b64decode(b))
 for im in imgs:
     if isinstance(im, dict): im.pop("base64", None)
-json.dump(r, open(f"{OUT}/sheet{n}_job.json", "w"), ensure_ascii=False)
+json.dump(r, open(f"{OUT}/sheet{n}{TAG}_job.json", "w"), ensure_ascii=False)
 print("DONE", r.get("status"), len(imgs), json.dumps(r.get("usage") or {}), flush=True)
