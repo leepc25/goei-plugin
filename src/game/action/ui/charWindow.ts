@@ -224,7 +224,7 @@ export function drawCharWindow(c: CanvasRenderingContext2D, d: CharWindowData, t
       }
     }
   } else {
-    // 가방 칸: 얇은 은테 판(창 안쪽 판과 같은 조각). 그림이 없을 때만 파인 홈(위·왼쪽 어둡고 아래·오른쪽 밝은 테) — 퀵슬롯은 화면 HUD 퀵슬롯 그림 그대로라 둘이 구분된다
+    // 가방 칸: 판에 파인 홈(위·왼쪽 어둡고 아래·오른쪽 밝은 테) — 퀵슬롯은 화면 HUD 퀵슬롯 그림 그대로라 둘이 구분된다
     const well = (x: number, y: number, s = 100) => {
       c.fillStyle = RIM_D; c.fillRect(x + 4, y + 4, s - 8, s - 8);
       c.fillStyle = '#03050b'; c.fillRect(x + 4, y + 4, s - 8, 4); c.fillRect(x + 4, y + 4, 4, s - 8);
@@ -233,7 +233,7 @@ export function drawCharWindow(c: CanvasRenderingContext2D, d: CharWindowData, t
     };
     const slot = (x: number, y: number, it?: { label: string; count: number }, k?: string, on = false) => {
       if (on) glow(c, x - 6, y - 6, 112, 112);
-      if (k) big(x, y); else if (!stretch(c, 'inner', x, y, 100, 100)) well(x, y);
+      if (k) big(x, y); else well(x, y);
       if (it) {
         putText(c, B(it.label.slice(0, 2)), x + 50, y + 30, 'center');
         if (it.count > 1) putText(c, T(String(it.count), GOLD), x + 88, y + 66, 'right');
