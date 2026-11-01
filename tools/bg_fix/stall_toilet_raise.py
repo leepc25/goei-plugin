@@ -1,5 +1,5 @@
 """대변기 칸: 원래 변기로 되돌리고 높이만 올림 (2026-11-01 13:35 사용자 「기존 변기로 환원한 다음 높이를 높여보자」, 생성 없음)
-변기 윗부분(원본 y186~219: 좌석·몸통)을 R px 위로 올리고, 가장 가는 목(y220~224)을 R줄 더 늘여 이음. 밑동(y225~)은 그대로.
+변기를 모양 그대로 통째로 R px 위로 옮김(13:37 사용자 「늘이지 말고 위치를 올려」).
 옛 자리는 벽 색으로 메우고(밸브는 그대로), 바닥 쪽은 투명.
 사용: python3 stall_toilet_raise.py <미리보기.png> <에일린2배.png> [R=14] [full]"""
 import sys
@@ -17,6 +17,15 @@ fg = ((L > 112) | (L < 60)) & box
 lab, n = nd.label(fg); sizes = nd.sum(fg, lab, range(1, n + 1)); m = lab == (1 + int(np.argmax(sizes)))
 m = nd.binary_fill_holes(m); m = nd.binary_opening(m, iterations=1) | (m & (L < 60)); m = nd.binary_fill_holes(m)
 m[226, :133] = False; m[226, 163:] = False        # 벽 밑 검은 선은 변기가 아님
+# 13:37 사용자 「배관이랑 통채로」: 벽 밸브·배관(원본 x128~172, y148~187)도 같이 옮김
+# 밸브: 네모(원본 x129~171, y144~188) 안에서 그 줄 벽 색(양옆 x117~128·172~183 중앙값)과 밝기가 10 넘게 다른 픽셀 = 밸브·배관·그늘
+v = np.zeros(L.shape, bool)
+for yy in range(144, 189):
+    wl = np.median(np.r_[L[yy, 117:129], L[yy, 172:184]])
+    v[yy, 129:172] = np.abs(L[yy, 129:172] - wl) > 10
+v = nd.binary_opening(v, iterations=1) | (v & (L < 60))
+v = nd.binary_fill_holes(v)
+m |= v
 
 def raise_toilet(p_in, p_out):
     b = np.array(Image.open(D + p_in).convert('RGBA'))
@@ -24,7 +33,7 @@ def raise_toilet(p_in, p_out):
     mc = np.zeros(b.shape[:2], bool); mc[:, :] = False
     mc[:, 122 - X0:178 - X0] = m[:, 122:178]
     tp[mc] = b[mc]
-    for y in range(186, 226):                      # 옛 자리: 벽(줄마다 양끝 벽 색 이음)
+    for y in range(144, 226):                      # 옛 자리: 벽(줄마다 양끝 벽 색 이음)
         xs = np.nonzero(mc[y])[0]
         if not len(xs): continue
         l, r = b[y, xs.min() - 1, :3].astype(int), b[y, xs.max() + 1, :3].astype(int)
@@ -35,11 +44,7 @@ def raise_toilet(p_in, p_out):
     b[227:][mc[227:]] = 0
     rows = list(range(186, 220)) + [220] * 0
     out = np.zeros_like(b)
-    for y in range(186, 220): out[y - R] = tp[y]                     # 좌석·몸통 R 위로
-    neck = list(range(220, 225))
-    tgt = list(range(220 - R, 225))                                    # 늘인 목
-    for i, y in enumerate(tgt): out[y] = tp[neck[min(len(neck) - 1, i * len(neck) // len(tgt))]]
-    for y in range(225, 244): out[y] = tp[y]                         # 밑동 그대로
+    for y in range(144, 244): out[y - R] = tp[y]                     # 13:37 사용자: 늘이지 말고 변기 통째로 R 위로
     A = out[..., 3] > 0
     b[A] = out[A]
     Image.fromarray(b).save(D + p_out)
