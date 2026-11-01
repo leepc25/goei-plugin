@@ -22,3 +22,9 @@ edge = p1[PY0:PY1, 44:46].min(axis=1)  # p1 판 왼쪽 그림자 색 대신 진�
 r[PY0:PY1, 45 + OFF] = [40, 40, 44, 255]
 Image.fromarray(r).save(D + 'hq_restroom_m_ext3L_fix.png')
 print('ok')
+
+# 3) 12:02 사용자 지적 「여기 어쩔거야」: 이음 x400~415, y154~229에 남은 옛 창틀 기둥 조각·파이프 토막 → 왼쪽 빈 콘크리트 벽(x370~385)으로 덮음
+r = np.array(Image.open(D + 'hq_restroom_m_ext3L_fix.png').convert('RGBA'))
+r[154:230, 400:416] = r[154:230, 370:386]
+Image.fromarray(r).save(D + 'hq_restroom_m_ext3L_fix.png')
+print('ok3')
