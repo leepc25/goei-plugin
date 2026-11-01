@@ -160,7 +160,7 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
       host.sfx('doorLatch');
       return;
     }
-    const steps = t.kind === 'urinal' ? [{ id: '100', n: 3 }] : [{ id: '104' }];
+    const steps = t.kind === 'urinal' ? [{ id: '100', n: 3 }] : [{ id: '104', n: 2 }];
     if (!pl.lifeScene(steps, t.x, t.y, 1)) return a.world.say(t.kind === 'urinal' ? '이 사람은 소변기를 쓰지 않는다.' : '지금은 할 수 없다.', 1.5);
     setPT({ id, kind: t.kind, phase: 'in', t: 0, front: { x: t.x, y: t.y } });
   };

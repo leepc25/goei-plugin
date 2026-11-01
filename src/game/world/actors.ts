@@ -11,7 +11,7 @@ import { applyTemper, catOf, rollNpcPerks } from './npcperks';
 import type { Hop, PlaceGraph } from './places';
 import { pick, range, type Rng } from './rng';
 import { reactCell, type ReactCell, type ReactSituation } from './namedReact';
-import { STALL_DOOR_SEC, WASH, seatFeet, type ToiletUse } from './toilets';
+import { FEMALE_LOOKS, MALE_LOOKS, STALL_DOOR_SEC, WASH, seatFeet, type ToiletUse } from './toilets';
 import type { FieldWorldSave } from './fieldSave';
 
 /** 옷 입은 클립 → 맨몸 클립 (art/charPacks.ts FIELD_CLIP 의 nude_*). 표에 없는 활동은 nude_idle(가린 채 경계). 샤워 기능이 Actor.nude 를 켠 인물만 */
@@ -2152,7 +2152,7 @@ export class WorldSim {
     a.station = undefined;
     a.opt = undefined;
     if (t.id === 'train') { const st = this.trainSpot(a); if (st) return st; }
-    if (t.id === 'pee' || t.id === 'poo') { const st = this.toiletSpot(a, t.id === 'pee' && this.canClip(a, 'line:100') ? ['urinal', 'stall'] : ['stall']); if (st) return st; }
+    if (t.id === 'pee' || t.id === 'poo') { const st = this.toiletSpot(a, t.id === 'pee' && this.sexOf(a) === '남' ? ['urinal', 'stall'] : ['stall']); if (st) return st; }
     // 그 인물에게 그림이 있는 줄 중에서 고른다 (10-31): 앉는 줄은 그 방향 빈 의자가 있을 때만. 바로 전에 한 줄은 덜 고른다
     const look = a.def.look ?? a.def.name;
     const opts = (ACT_OPTS[t.id] ?? []).filter((o) => this.has(look, `line:${o.line}`));
@@ -2409,6 +2409,9 @@ export class WorldSim {
   // ── 화장실 (11-01, world/toilets.ts) ──
   /** 성별: 남 소변(100) 줄이 있으면 남, 없고 앉아 볼일(102)이 있으면 여. 둘 다 없으면 모름(화장실을 쓰지 않는다) */
   sexOf(a: Actor): '남' | '여' | null {
+    const look = a.def.look ?? a.def.name;
+    if (MALE_LOOKS.has(look) || MALE_LOOKS.has(a.def.name)) return '남';
+    if (FEMALE_LOOKS.has(look) || FEMALE_LOOKS.has(a.def.name)) return '여';
     if (this.canClip(a, 'line:100')) return '남';
     return this.canClip(a, 'line:102') || this.canClip(a, 'poo') ? '여' : null;
   }
@@ -2508,7 +2511,7 @@ export class WorldSim {
   }
   /** 볼일 뒤 빈 세면대로 손 씻으러 (그 줄 104가 있을 때) */
   private goWash(a: Actor): boolean {
-    if (!this.canClip(a, 'line:104')) return false;
+    if (!this.sexOf(a)) return false;
     const st = this.toiletSpot(a, ['sink']);
     if (!st) return false;
     a.task = WASH;
