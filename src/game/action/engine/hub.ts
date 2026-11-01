@@ -80,6 +80,8 @@ export interface HubLife {
   /** 화장실(11-01): 그 자리를 누가 쓰거나 쓰러 가나 / 주인공이 쓰는 자리를 세계에 알린다 (NPC가 고르지 않게, 침입 감지가 알게) */
   toiletBusy?(sceneId: string, id: string): boolean;
   playerToilet?(t: { scene: string; id: string; kind: 'stall' | 'urinal' | 'sink'; phase: 'open' | 'in' | 'leave' } | null): void;
+  /** 주인공이 사람이 있는 칸 문을 열었다 (침입 감지·대사는 필드 쪽에서) */
+  playerPeek?(t: { scene: string; id: string }): void;
 }
 /** 폴리스 라인 층 자리 수 (장면당 시체 상한 5 → 라인 최대 5) */
 const CORDON_SLOTS = 5;
@@ -146,6 +148,8 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
   const openOf = (id: string) =>
     opening && opening.id === id ? Math.min(1, opening.t / opening.len) : closing && closing.id === id ? Math.max(0, 1 - closing.t / closing.len) : 0;
   /** 화장실 칸 안에 사람이 있나 (문 표시등 빨간 불, 사용자 15:19) — NPC가 칸에 있거나 주인공이 그 칸을 쓰는 중 */
+  /** 사람이 있는 칸 문을 주인공이 열어 둔 상태 (문 앞에 있는 동안만) */
+  let peek: { door: string; x: number; y: number; id: string } | null = null;
   const stallBusy = (doorId: string) => live.some((q) => q.toilet?.door === doorId) || (!!pT && pT.door === doorId);
   const doorFx = (id: string) => ({ open: openOf(id), shake: rattle && rattle.id === id ? (rattle.t % 4 < 2 ? 3 : -3) * (1 - rattle.t / RATTLE_T) : 0 });
 
@@ -154,7 +158,15 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
     const t = scene?.toilets?.find((q) => q.id === id);
     if (!t || !scene) return;
     const pl = a.world.player as Player & { lifeScene?: (steps: { id: string; n?: number }[], x: number, y: number, face: 1 | -1) => boolean };
-    if (host.life?.toiletBusy?.(scene.id, id)) return a.world.say(t.kind === 'stall' ? '누가 쓰고 있다.' : '누가 쓰고 있다.', 1.5);
+    // 사람이 있는 칸도 문은 열 수 있다 (사용자 15:19 「사람이 있건 없건 유저는 열수 있어」): 문만 열리고 들어가 앉지는 않는다. 문 앞에서 벗어나면 닫힌다
+    if (t.kind === 'stall' && t.door && host.life?.toiletBusy?.(scene.id, id)) {
+      a.movePlayer(t.x, t.y);
+      peek = { door: t.door, x: t.x, y: t.y, id };
+      host.life?.playerPeek?.({ scene: scene.id, id });
+      host.sfx('doorLatch');
+      return;
+    }
+    if (host.life?.toiletBusy?.(scene.id, id)) return a.world.say('누가 쓰고 있다.', 1.5);
     if (!pl.lifeScene) return;
     if (t.kind === 'stall') {
       a.movePlayer(t.x, t.y);
@@ -202,6 +214,7 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
     const toiletSpots = (base.toilets ?? []).map((t) => ({ id: `toilet:${t.id}`, x: t.x, y: t.y, verb: t.kind === 'stall' ? '칸' : t.kind === 'urinal' ? '소변기' : '손 씻기', face: 1 as const, open: true }));
     const sc: Scene = { ...base, spots: [...base.spots, ...toiletSpots, ...people.map((p) => ({ id: `visit:${p.name}`, x: p.x, y: p.y, who: p.name, verb: '대화', face: p.face, open: true }))] };
     if (pT) setPT(null);
+    peek = null;
     gateOpen.clear();
     curPeople = people;
     speech = null;
@@ -406,11 +419,13 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
       // 화장실 칸 문(여러 장면 그림): 들어가는 중·나오는 중인 사람이 있으면 열리고, 아니면 닫힌다 (약 0.45초)
       if (scene?.painted) for (const o of PAINTED[scene.painted]?.objects ?? []) {
         if (!o.frames) continue;
-        const want = live.some((q) => q.toilet?.door === o.id && q.toilet.open) || (!!pT && pT.door === o.id && pT.phase !== 'in');
+        const want = live.some((q) => q.toilet?.door === o.id && q.toilet.open) || (!!pT && pT.door === o.id && pT.phase !== 'in') || peek?.door === o.id;
         const t = gateOpen.get(o.id) ?? 0;
         gateOpen.set(o.id, Math.max(0, Math.min(1, t + (want ? 1 : -1) / (STALL_DOOR_SEC * 30))));
       }
       if (pT) stepToilet(a);
+      // 열어 둔 남의 칸 문: 문 앞에서 벗어나거나 안 사람이 나가면 닫힌다
+      if (peek && (Math.hypot(a.world.player.x - peek.x, a.world.player.y - peek.y) > 70 || !stallBusy(peek.door))) peek = null;
       // 코드로 열리는 칸막이(그림 장면 gate 조각): 주인공이 앞뒤 가까이 오면 열리고 멀어지면 닫힌다
       if (scene?.painted) for (const o of PAINTED[scene.painted]?.objects ?? []) {
         if (!o.gate) continue;
