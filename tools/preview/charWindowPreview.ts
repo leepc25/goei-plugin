@@ -24,7 +24,18 @@ const load = (src: string) => new Promise<HTMLImageElement>((r) => { const im = 
     ];
   // 스크롤 시험: 같은 견본 뱃지를 되풀이해 14개로
   const many = (window as unknown as { __many?: boolean }).__many;
-  const PERKS = (window as unknown as { __none?: boolean }).__none ? [] : many ? Array.from({ length: 14 }, (_, n) => BASE[n % 2]) : BASE;
+  // 1판 실제 뱃지(64px 32개 중 앞 12개)로 보기
+  const W = window as unknown as { __sheet?: string; __sheetNames?: [string, string, string][] };
+  let SHEET: typeof BASE = [];
+  if (W.__sheet) {
+    const sh = await load(W.__sheet);
+    SHEET = W.__sheetNames!.slice(0, 12).map(([name, eff, flavor], k) => {
+      const cv2 = document.createElement('canvas'); cv2.width = 64; cv2.height = 64;
+      cv2.getContext('2d')!.drawImage(sh, (k % 8) * 64, Math.floor(k / 8) * 64, 64, 64, 0, 0, 64, 64);
+      return { name, cat: k < 7 ? '연타' : '강타', flavor, effect: eff, rank: [k % 3 + 1, 3] as [number, number], grade: (['일반', '희귀', '특급'] as const)[k % 3], badge: cv2 };
+    });
+  }
+  const PERKS = W.__sheet ? SHEET : (window as unknown as { __none?: boolean }).__none ? [] : many ? Array.from({ length: 14 }, (_, n) => BASE[n % 2]) : BASE;
   const draw = () => drawCharWindow(c, {
     name: '쟈알디', team: '종합대응팀 · 부장', state: '출동 중', face, body, hp: 830, maxHp: 1200,
     base: [
@@ -43,7 +54,7 @@ const load = (src: string) => new Promise<HTMLImageElement>((r) => { const im = 
     ],
     pick: { skill: 3, desc: ['장갑을 당겨 끼고 편 손바닥을 내지르면 손바닥 바로 앞 한 점이 터진다.', '맞은 적은 크게 날아가 쓰러진다. 약공 3타 뒤에 쓰면 띄워진 채 날아간다.', '내지르는 동안 슈퍼아머.'], nums: '판정 이능(지) · 쿨 6초 · 앞 0.5~2m' },
     perks: PERKS,
-    perkSlots: 24, perkPick: 1,
+    perkSlots: 24, perkPick: (window as unknown as { __sheet?: string }).__sheet ? 7 : 1,
     ...((window as unknown as { __many?: boolean }).__many ? { perkPick: 12 } : {}),
     quick: [{ label: '붕대', count: 3 }, { label: '진통제', count: 1 }], bag: [{ label: '부적', count: 2 }, { label: '손전등', count: 1 }, { label: '열쇠', count: 1 }], bagSlots: 12,
     money: '₩140,000',
