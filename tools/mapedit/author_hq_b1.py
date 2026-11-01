@@ -22,13 +22,26 @@ doors = {
     'training': {'kind': 'steel', 'x': 1043 * K, 'y': FLOOR_Y + 10, 'to': 'training', 'toDoor': 'out', 'label': '훈련장', 'door': door(982, 1104, 162, 330)},
     'elev': {'kind': 'elevator', 'x': 1251 * K, 'y': FLOOR_Y + 10, 'label': '엘리베이터', 'door': door(1192, 1310, 155, 330)},
 }
-# 앞쪽 상자 무더기(1x): x0, x1, 위 y, 발밑 시작 y — 아래 끝은 그림 끝(424)
-PILES = [(559, 680, 350, 395), (855, 1040, 375, 400), (1420, 1505, 402, 410), (1515, 1568, 368, 395)]
-def rect(x0, x1, y0, y1): return [[x0 * K, y0 * K], [x1 * K, y0 * K], [x1 * K, y1 * K], [x0 * K, y1 * K]]
-blocks = [{'poly': rect(x0, x1, fy, 424), 'h': 999} for x0, x1, _, fy in PILES]
-objects = [{'id': f'pile{i}', 'cover': [rect(x0, x1, y0, 424)], 'sortY': H - 12} for i, (x0, x1, y0, _) in enumerate(PILES)]
+# 11-01 09:12 사용자 「못 가는 곳·벽과 바닥 연결선·앞에 보일 사물을 픽셀 단위로」: 네모 어림 버리고 그림 윤곽선에서 읽음(tools/mapedit/outline_trace.py)
+import sys; sys.path.insert(0, str(ROOT / 'tools/mapedit'))
+from outline_trace import floor_line, pile_tops, tops_poly, line_poly, mask_from_tops
+for f in OUT.glob('part_*.png'): f.unlink()
+# 앞쪽(카메라 쪽) 무더기 4곳: 읽을 x 범위와 바닥 쪽 시작 y
+PILES = [(540, 700, 350), (853, 1041, 366), (1400, 1515, 393), (1505, 1568, 362)]
+tops = [pile_tops(im, a, b, sy) for a, b, sy in PILES]
+# 바닥 윗선: 기둥마다 y370에서 위로(무더기 기둥은 무더기 윗선 위에서 시작)
+line = floor_line(im, 370, starts=[(554, 640, 349), (640, 682, 384), (1515, 1568, 364)])
+floor1 = line_poly(line, 10, 1562, 424)
+blocks = [{'poly': [[x * K, y * K] for x, y in tops_poly(t, 430)], 'h': 999} for t in tops if t]
+objects = []
+for i, t in enumerate(tops):
+    if not t: continue
+    mk = mask_from_tops(im.size, t, im.height)
+    bb = mk.getbbox(); cut = im.crop(bb).convert('RGBA'); cut.putalpha(mk.crop(bb))
+    cut = cut.resize((cut.width * K, cut.height * K), Image.NEAREST); cut.save(OUT / f'part_pile{i}.png')
+    objects.append({'id': f'pile{i}', 'file': f'part_pile{i}', 'x': bb[0] * K, 'y': bb[1] * K, 'w': cut.width, 'h': cut.height, 'sortY': H - 12})
 m = {'file': 'hq_b1_strip', 'bgScale': K, 'w': W, 'h': H, 'under': False,
-     'floor': [[X0, FLOOR_Y], [X1, FLOOR_Y], [X1, H], [X0, H]], 'lane': [FLOOR_Y, H - 12],
+     'floor': [[x * K, y * K] for x, y in floor1], 'lane': [min(line[10:1562]) * K, H - 12],
      'blocks': blocks, 'doors': doors, 'lamps': [], 'spots': [], 'objects': objects}
 (OUT / 'map.json').write_text(json.dumps(m, ensure_ascii=False, indent=1))
 print(W, H, list(doors))

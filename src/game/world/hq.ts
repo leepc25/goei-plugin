@@ -40,8 +40,10 @@ export function hqPosts(graph: PlaceGraph): Post[] {
   const gate = lobby.doors.find((d) => d.id === 'main')?.x ?? 300;
   // 데스크 자리: 로비 그림의 데스크 물건(지도 boxes 'desk') 가운데 뒤에 선다. 그림이 바뀌면 따라간다 (없으면 로비 55%)
   const box = (lobby as { boxes?: { kind: string; x: number; y: number; d: number }[] }).boxes?.find((b) => b.kind === 'desk');
-  const desk = Math.round(box?.x ?? lobby.length * 0.55);
-  const deskY = box ? Math.round(box.y - box.d - 8) : undefined;
+  // 그림에 근무 자리가 적혀 있으면 그 자리 (11-01 본부 1층 새 그림: 벽에 붙은 데스크 → 데스크 앞)
+  const post = (lobby as { posts?: Record<string, [number, number]> }).posts?.desk;
+  const desk = Math.round(post?.[0] ?? box?.x ?? lobby.length * 0.55);
+  const deskY = post ? post[1] : box ? Math.round(box.y - box.d - 8) : undefined;
   return [
     { id: 'desk', archetype: '안내 직원', scene: 'lobby', how: 'fixed', spot: desk, y: deskY, shifts: [[9, 18]], count: 1, gate },
     { id: 'night', archetype: '경비', scene: 'lobby', how: 'fixed', spot: desk, y: deskY, shifts: [[18, 9]], count: 1, gate },
@@ -90,7 +92,7 @@ export function createHqWorld(
   seed: number,
   present: { name: string; scene: string }[],
   has: (look: string, clip: string) => boolean = () => false,
-  extra: Pick<SimOptions, 'stance' | 'killOk' | 'relation' | 'namedHostile'> = {},
+  extra: Pick<SimOptions, 'stance' | 'killOk' | 'relation' | 'namedHostile' | 'nav'> = {},
 ): WorldSim {
   const graph = new PlaceGraph(map.scenes, map.elevator);
   const sim = new WorldSim(graph, mulberry32(seed), { spawns: hqSpawns(graph), posts: hqPosts(graph), has, sceneFaction: hqSceneFaction, ...extra });

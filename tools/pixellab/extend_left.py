@@ -8,7 +8,7 @@ _gs.path.insert(0, str(next(p for p in _gp.Path(__file__).resolve().parents if (
 import pixellab_gate as _gate  # noqa: E402
 _gate.spend(__file__ + " 실행")
 # ---
-import base64, io, json, sys, time
+import os, base64, io, json, sys, time
 import requests
 from PIL import Image
 API = "https://api.pixellab.ai/v2"
@@ -22,6 +22,9 @@ top_h = int(sys.argv[8]) if len(sys.argv) > 8 else 0
 # 아래쪽(바닥)도 더 넓게 다시 그리기(본부 3층 10-31: 문틀에 바로 붙여 이을 때) — [아래 폭] [아래 시작 y]
 ov_bot = int(sys.argv[9]) if len(sys.argv) > 9 else ov
 bot_y = int(sys.argv[10]) if len(sys.argv) > 10 else 0
+import subprocess as _sp
+# NO_FILL=1: 사용자가 그 건에 한해 꽉 채우기 문장을 빼라고 고른 경우만(2026-11-01 11:52 빈 벽 잇기)
+if __import__('os').environ.get('NO_FILL') != '1' and _sp.call([sys.executable, str(__import__('pathlib').Path(__file__).with_name('prompt_diff.py')), prompt_path]) != 0: sys.exit('요청문이 3층 원본 핵심 문장을 빠뜨림 — 중단')
 im = Image.open(src).convert("RGBA")
 w, h = keep + new, im.height
 assert w <= 512 and h <= 512
@@ -30,6 +33,9 @@ win.paste(im.crop((0, 0, keep, h)), (new, 0))
 mask = Image.new("RGB", (w, h), (0, 0, 0)); mask.paste((255, 255, 255), (0, 0, new + ov, h))
 if top_h: mask.paste((255, 255, 255), (0, 0, new + ov_top, top_h))
 if bot_y: mask.paste((255, 255, 255), (0, bot_y, new + ov_bot, h))
+# ERASE=1: 다시 그릴 칸 안의 옛 그림을 흰색으로 지우고 보낸다(extend_right와 같음, 사용자 11-01)
+if os.environ.get("ERASE") == "1":
+    win.paste((255, 255, 255, 255), (new, 0, new + ov, h))
 def soft_mask(mask, side):
     """붙일 때 이음 자리를 칼로 자르지 않고 서서히 섞는다(사용자 2026-11-01: 끝나는 지점부터 이어서 찐빠). 각 줄의 흰 칸 끝(옛 그림 쪽) FEATHER px를 0으로 가늘게 줄인다."""
     m = mask.convert("L"); px = m.load(); W, H = m.size
@@ -62,6 +68,24 @@ img = (lr.get("images") or [lr.get("image")])[0]
 data = img["base64"] if isinstance(img, dict) else img
 res = Image.open(io.BytesIO(base64.b64decode(data.split(",")[-1]))).convert("RGBA")
 res.save(out_path.replace(".png", "_window.png"))
-out = Image.new("RGBA", (im.width + new, h)); out.paste(im, (new, 0)); out.paste(Image.composite(res.crop((0, 0, w, h)), win, soft_mask(mask, 'left')).crop((0, 0, w, h)), (0, 0))
+out = Image.new("RGBA", (im.width + new, h)); out.paste(im, (new, 0))
+# 섞지 않고 자른다(사용자 11-01: 반투명 겹침으로 기둥·건조기가 유령처럼 겹쳐 망함).
+# 겹침 칸 [new, new+ov) 안에서 새 그림과 옛 그림이 가장 비슷한 세로 길(DP)을 찾아 그 왼쪽은 새 그림, 오른쪽은 옛 그림.
+import numpy as np
+R = np.asarray(res.crop((0, 0, w, h)).convert("RGB"), dtype=np.int32)
+O = np.asarray(im.crop((0, 0, keep, h)).convert("RGB"), dtype=np.int32)
+x0, x1 = new + 2, new + ov - 2
+D = np.abs(R[:, x0:x1] - O[:, x0 - new:x1 - new]).sum(axis=2).astype(np.float64)
+C = D.copy(); B = np.zeros(D.shape, dtype=np.int32)
+for y in range(1, h):
+    for x in range(D.shape[1]):
+        lo, hi = max(0, x - 1), min(D.shape[1], x + 2)
+        k = lo + int(np.argmin(C[y - 1, lo:hi])); B[y, x] = k; C[y, x] += C[y - 1, k]
+seam = [0] * h; x = int(np.argmin(C[-1]))
+for y in range(h - 1, -1, -1): seam[y] = x0 + x; x = B[y, x]
+newpart = res.crop((0, 0, w, h)).convert("RGBA")
+for y in range(h):
+    out.paste(newpart.crop((0, y, seam[y], y + 1)), (0, y))
+print("seam x(창 기준)", min(seam), max(seam))
 out.save(out_path)
 print(json.dumps({"job": job, "seconds": round(time.time() - t0), "window": res.size, "out": out.size, "usage": j.get("usage") or lr.get("usage")}))

@@ -283,6 +283,8 @@ export interface SimOptions {
   relation?: (viewer: string, target: string) => Stance;
   /** 이름 인물의 호감이 적대 구간인가 (인물 기록). 없으면 아무도 아님 */
   namedHostile?: (name: string) => boolean;
+  /** 그림 장면의 걸을 수 있는 바닥(바닥 다각형 안·막힘 밖). 있으면 걷는 사람이 막힌 곳을 돌아 열린 길(게이트 통로 등)로만 다닌다 */
+  nav?: { ok(scene: string, x: number, y: number): boolean; clamp(scene: string, x: number, y: number): { x: number; y: number } };
 }
 
 const WALK = 150;
@@ -334,6 +336,68 @@ export class WorldSim {
     this.killOk = o.killOk ?? (() => false);
     this.relation = o.relation ?? defaultRelation;
     this.namedHostile = o.namedHostile ?? (() => false);
+    this.nav = o.nav ?? null;
+  }
+  private nav: SimOptions['nav'] | null;
+  /** 가장 가까운 걸을 수 있는 바닥 점 (바닥 밖·막힘 안이면 밀어내고, 그래도 안 되면 둘레를 넓혀 가며 찾음) */
+  private navSnap(scene: string, x: number, y: number): { x: number; y: number } {
+    const nav = this.nav!;
+    if (nav.ok(scene, x, y)) return { x, y };
+    const c = nav.clamp(scene, x, y);
+    if (nav.ok(scene, c.x, c.y)) return c;
+    for (let r = 4; r <= 80; r += 4) for (let k = 0; k < 16; k++) {
+      const qx = x + Math.cos((k / 16) * Math.PI * 2) * r, qy = y + Math.sin((k / 16) * Math.PI * 2) * r;
+      if (nav.ok(scene, qx, qy)) return { x: qx, y: qy };
+    }
+    return c;
+  }
+  /** 두 점 사이 직선이 막힘 없이 걸을 수 있는 바닥 위인가 (6px 간격으로 확인) */
+  private clearLine(scene: string, ax: number, ay: number, bx: number, by: number): boolean {
+    const nav = this.nav!;
+    const n = Math.max(1, Math.ceil(Math.hypot(bx - ax, by - ay) / 6));
+    for (let i = 1; i <= n; i++) if (!nav.ok(scene, ax + ((bx - ax) * i) / n, ay + ((by - ay) * i) / n)) return false;
+    return true;
+  }
+  /** 막힌 곳을 피해 가는 길: 12px 칸 격자 너비 우선 탐색 → 보이는 점끼리 줄여 경유점. 길이 없으면 null */
+  private navPath(scene: string, from: { x: number; y: number }, to: { x: number; y: number }): { x: number; y: number }[] | null {
+    const nav = this.nav!, C = 12;
+    const len = this.graph.scene(scene)?.length ?? 1280;
+    const [top, bot] = this.graph.lane(scene);
+    const y0 = Math.min(top, from.y, to.y) - C, y1 = Math.max(bot, from.y, to.y) + C;
+    const W = Math.ceil(len / C) + 1, H = Math.ceil((y1 - y0) / C) + 1;
+    const cx = (x: number) => Math.max(0, Math.min(W - 1, Math.round(x / C))), cy = (y: number) => Math.max(0, Math.min(H - 1, Math.round((y - y0) / C)));
+    const okC = new Uint8Array(W * H);
+    for (let j = 0; j < H; j++) for (let i = 0; i < W; i++) okC[j * W + i] = nav.ok(scene, i * C, y0 + j * C) ? 1 : 0;
+    const s = cy(from.y) * W + cx(from.x), g = cy(to.y) * W + cx(to.x);
+    okC[s] = 1; okC[g] = 1;
+    const prev = new Int32Array(W * H).fill(-1); prev[s] = s;
+    const q = [s];
+    for (let h = 0; h < q.length && prev[g] < 0; h++) {
+      const k = q[h], i = k % W, j = (k - i) / W;
+      for (const [di, dj] of [[1, 0], [-1, 0], [0, 1], [0, -1], [1, 1], [1, -1], [-1, 1], [-1, -1]]) {
+        const ni = i + di, nj = j + dj;
+        if (ni < 0 || nj < 0 || ni >= W || nj >= H) continue;
+        const nk = nj * W + ni;
+        if (prev[nk] >= 0 || !okC[nk]) continue;
+        if (di && dj && (!okC[j * W + ni] || !okC[nj * W + i])) continue;   // 모서리 깎아 지나가기 금지
+        prev[nk] = k; q.push(nk);
+      }
+    }
+    if (prev[g] < 0) return null;
+    if (g === s) return [{ x: to.x, y: to.y }];
+    const cells: { x: number; y: number }[] = [];
+    for (let k = g; k !== s; k = prev[k]) cells.push({ x: (k % W) * C, y: y0 + Math.floor(k / W) * C });
+    cells.reverse();
+    cells[cells.length - 1] = { x: to.x, y: to.y };
+    // 줄이기: 지금 점에서 곧장 보이는 가장 먼 칸으로
+    const out: { x: number; y: number }[] = [];
+    let cur = from;
+    for (let i = 0; i < cells.length;) {
+      let j = cells.length - 1;
+      while (j > i && !this.clearLine(scene, cur.x, cur.y, cells[j].x, cells[j].y)) j--;
+      out.push(cells[j]); cur = cells[j]; i = j + 1;
+    }
+    return out;
   }
   private namedHostile: (name: string) => boolean;
   private relation: (viewer: string, target: string) => Stance;
@@ -1726,6 +1790,16 @@ export class WorldSim {
     // 느긋한 걸음: 뛰거나 쫓거나 달아나는 중이 아님 → 흔들림·비켜 가기·멈추기
     const casual = a.run <= 1.2 && !fleeing && a.plan !== 'chase' && a.doing !== '도망';
     const lead = this.leaderOf(a);
+    // 그림 장면: 목표가 막힌 곳이면 가장 가까운 바닥으로, 곧장 못 가면 막힌 곳을 돌아가는 길(경유점)
+    if (this.nav && !a.detour?.length) {
+      if (!this.nav.ok(a.scene, a.goal.x, a.goal.y)) a.goal = this.navSnap(a.scene, a.goal.x, a.goal.y);
+      if (!this.nav.ok(a.scene, a.x, a.y)) { const c = this.navSnap(a.scene, a.x, a.y); a.x = c.x; a.y = c.y; }
+      if (!this.clearLine(a.scene, a.x, a.y, a.goal.x, a.goal.y)) {
+        const path = this.navPath(a.scene, a, a.goal);
+        if (!path) { a.goal = null; return this.idle(a); }
+        if (path.length) { a.detour = path.slice(0, -1); a.goal = path[path.length - 1]; }
+      }
+    }
     // 장애물: 가는 길에 막힌 곳이 있으면 비켜 갈 경유점 (wall 이면 돌아섬)
     if (!a.detour?.length && this.planDetour(a)) return;
     const wp = a.detour?.[0];
@@ -1760,9 +1834,19 @@ export class WorldSim {
       vx = (dx / d) * step;
       vy = ((goal.y - a.y) / d) * step;
     }
+    const ox = a.x, oy = a.y;
     a.x += vx;
     const [top, bot] = this.graph.lane(a.scene);
     a.y = Math.max(Math.min(top, goal.y), Math.min(Math.max(bot, goal.y), a.y + vy));   // 띠 밖 목표(의자 등)면 그쪽은 열어 둠
+    // 그림 장면: 막힌 곳(게이트·기둥·물건 발자리, 벽 아래)으로는 한 발도 들어가지 않는다 → 제자리에서 길을 다시 찾음
+    if (this.nav && !this.nav.ok(a.scene, a.x, a.y)) {
+      a.x = ox; a.y = oy;
+      if (!this.nav.ok(a.scene, ox, oy)) { const c = this.navSnap(a.scene, ox, oy); a.x = c.x; a.y = c.y; }
+      a.side = 0;
+      // 곧장 갈 수 있으면 똑바로(옆걸음·줄 옮기기 없이), 아니면 다음 걸음에 길을 다시 찾는다
+      a.detour = this.clearLine(a.scene, a.x, a.y, a.goal!.x, a.goal!.y) ? [{ x: a.goal!.x, y: a.goal!.y }] : [];
+      return;
+    }
     if (casual && !wp && !lead) this.maybePause(a, dt);
   }
 
