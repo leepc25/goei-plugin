@@ -36,13 +36,14 @@ export interface CharWindowData {
   derived: { label: string; v: string; now?: string }[];
   skills: { key: string; label: string; icon: SkillIcon; name: string; off?: boolean }[];
   pick: { skill: number; desc: string[]; nums: string };
-  perks: { name: string; effect: string; badge?: CanvasImageSource | null; trait?: boolean }[];
+  /** 능력 (docs/퍽/퍽_목록_3판.json 그대로): 분류·효과·랭크·조건, 특성은 장점·대가 */
+  perks: { name: string; cat: string; effect: string; rank?: [number, number]; cond?: string; cost?: string; badge?: CanvasImageSource | null; trait?: boolean }[];
   perkSlots: number; perkPick: number;
   quick: { label: string; count: number }[]; bag: { label: string; count: number }[]; bagSlots: number;
   money: string;
 }
 
-const INK = '#e6e4dc', DIM = '#7d8790', GOLD = '#ffd66b', UP = '#7fe08a';
+const INK = '#e6e4dc', DIM = '#7d8790', GOLD = '#ffd66b', UP = '#7fe08a', OVER = '#8fe3ff';
 const NAVY = '#101a36', NAVY_D = '#0a1126', RIM_L = '#aeb8c8', RIM_D = '#4a5468', SOCKET = '#070c1c';
 
 /** 도트 판: 모서리 2도트 깎고, 위·왼쪽 밝은 테, 아래·오른쪽 어두운 테 (둥근 상자·표 선 아님) */
@@ -133,16 +134,19 @@ export function drawCharWindow(c: CanvasRenderingContext2D, d: CharWindowData, t
     d.base.forEach((s, i) => {
       const yy = top + 28 + i * 106, v = s.now ?? s.v;
       putText(c, B(s.label), IX, yy);
-      putText(c, B(String(v), s.now !== undefined && s.now !== s.v ? UP : GOLD), IX + 82, yy, 'right');
+      putText(c, B(String(v), v > 10 ? OVER : s.now !== undefined && s.now !== s.v ? UP : GOLD), IX + 82, yy, 'right');
+      // 눈금 10칸: 기본 = 금, 능력으로 오른 몫 = 초록. 10을 넘으면 둘째 바퀴를 하늘색으로 앞칸부터 덧칠하고 「+N」
       for (let k = 0; k < 10; k++) {
         const px = IX + 104 + k * 26, py = yy + 6;
         c.fillStyle = RIM_D; c.fillRect(px, py, 20, 24);
-        c.fillStyle = k < s.v ? '#e8c45a' : k < v ? UP : SOCKET; c.fillRect(px + 2, py + 2, 16, 20);
+        c.fillStyle = k < Math.min(s.v, 10) ? '#e8c45a' : k < v ? UP : SOCKET; c.fillRect(px + 2, py + 2, 16, 20);
+        if (k < v - 10) { c.fillStyle = OVER; c.fillRect(px + 2, py + 2, 16, 20); c.fillStyle = '#ffffff'; c.fillRect(px + 2, py + 2, 16, 4); }
       }
+      if (v > 10) putText(c, T(`+${v - 10}`, OVER), IX + 104 + 10 * 26 + 6, yy + 4);
       putText(c, T(s.what, DIM), IX, yy + 46);
     });
-    const dx0 = IX + 420;
-    c.fillStyle = RIM_D; c.fillRect(dx0 - 28, top + 24, 2, bh - 48);
+    const dx0 = IX + 446;
+    c.fillStyle = RIM_D; c.fillRect(dx0 - 22, top + 24, 2, bh - 48);
     putText(c, T('전투 수치', GOLD), dx0, top + 28);
     d.derived.forEach((s, i) => {
       const yy = top + 82 + i * 58;
@@ -177,13 +181,19 @@ export function drawCharWindow(c: CanvasRenderingContext2D, d: CharWindowData, t
     }
     const pp = d.perks[d.perkPick];
     if (pp) {
-      let y = strip(186);
-      putText(c, B(pp.name, pp.trait ? '#ff9a8a' : GOLD), IX, y);
-      if (pp.trait) putText(c, T('특성 · 대가 있음', '#ff9a8a'), IX + B(pp.name).width + 16, y + 8);
-      y += 54;
-      putText(c, T(pp.effect), IX, y);
-      putText(c, T('괴이를 나오면 사라짐', DIM), IX, y + 38);
-      putText(c, T(`얻은 능력 ${d.perks.length}개`, DIM), R - 32, y - 46, 'right');
+      let y = strip(200);
+      const nm = B(pp.name, pp.trait ? '#ff9a8a' : GOLD);
+      putText(c, nm, IX, y);
+      putText(c, T(pp.trait ? '특성' : pp.cat, DIM), IX + nm.width + 16, y + 8);
+      if (pp.rank && pp.rank[1] > 1) putText(c, T(`랭크 ${pp.rank[0]} / ${pp.rank[1]}`, GOLD), R - 32, y + 8, 'right');
+      y += 52;
+      if (pp.trait) {
+        putText(c, T(`장점  ${pp.effect}`, UP), IX, y);
+        putText(c, T(`대가  ${pp.cost ?? ''}`, '#ff7a6b'), IX, y + 36);
+      } else {
+        putText(c, T(pp.effect), IX, y);
+        if (pp.cond) putText(c, T(`조건  ${pp.cond}`, '#9fd7ff'), IX, y + 36);
+      }
     }
   } else {
     const slot = (x: number, y: number, it?: { label: string; count: number }, k?: string, on = false) => {

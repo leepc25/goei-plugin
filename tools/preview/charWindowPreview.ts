@@ -20,7 +20,7 @@ const load = (src: string) => new Promise<HTMLImageElement>((r) => { const im = 
   const draw = () => drawCharWindow(c, {
     name: '쟈알디', team: '종합대응팀 · 부장', state: '출동 중', face, body, hp: 830, maxHp: 1200,
     base: [
-      { label: '힘', v: 7, what: '몸으로 때리는 기술 피해' }, { label: '민', v: 3, what: '총·투척 피해, 속도' },
+      { label: '힘', v: 7, now: 12, what: '몸으로 때리는 기술 피해' }, { label: '민', v: 3, what: '총·투척 피해, 속도' },
       { label: '체', v: 6, now: 7, what: '체력, 받는 피해' }, { label: '지', v: 5, what: '이능 기술 피해, 기술 쿨' },
       { label: '정', v: 4, what: '필살 충전, 상태 이상·정신 피해' },
     ],
@@ -35,12 +35,11 @@ const load = (src: string) => new Promise<HTMLImageElement>((r) => { const im = 
     ],
     pick: { skill: 3, desc: ['장갑을 당겨 끼고 편 손바닥을 내지르면 손바닥 바로 앞 한 점이 터진다.', '맞은 적은 크게 날아가 쓰러진다. 약공 3타 뒤에 쓰면 띄워진 채 날아간다.', '내지르는 동안 슈퍼아머.'], nums: '판정 이능(지) · 쿨 6초 · 앞 0.5~2m' },
     perks: [
-      { name: '3단 점프', effect: '공중에서 한 번 더 뛴다', badge: jump },
-      { name: '탄 +1', effect: '사격 한 번에 탄 하나 더', badge: shot },
-      { name: '단련', effect: '체 +1', badge: vit },
-      { name: '무모함', effect: '피해↑ 받는 피해↑', badge: reck, trait: true },
+      { name: '3단 점프', cat: '몸놀림', effect: '점프 +1회(2 → 3), 공중 좌우 이동 +40%', rank: [1, 1], badge: jump },
+      { name: '체 단련', cat: '단련', effect: '체 +1. 최대 체력이 늘고 받는 피해가 준다', rank: [1, 3], badge: vit },
+      { name: '무모함', cat: '특성', effect: '모든 피해 +20%', cost: '받는 피해 +15%', badge: reck, trait: true },
     ],
-    perkSlots: 24, perkPick: 0,
+    perkSlots: 24, perkPick: 2,
     quick: [{ label: '붕대', count: 3 }, { label: '진통제', count: 1 }], bag: [{ label: '부적', count: 2 }, { label: '손전등', count: 1 }, { label: '열쇠', count: 1 }], bagSlots: 12,
     money: '₩140,000',
   }, tab);
