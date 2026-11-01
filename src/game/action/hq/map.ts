@@ -179,7 +179,6 @@ export const HQ_SCENES: HqScene[] = [
   floorHall('lobby', '1층 로비', '1F', [
     { id: 'main', kind: 'glass', to: 'street', toDoor: 'main', label: '현관' },
     { id: 'elev', kind: 'elevator' },
-    { id: 'stairs', kind: 'stairs', down: 'b1', label: '계단' }, // 2층 새 그림엔 계단 없음 → 1층 계단은 아래로만
   ]),
   // 2층은 새 본부 그림(PixelLab 11-01, game-src/mapedit/f2): 서→동 진압팀 철제문 · 엘리베이터 · 화장실(남). 계단·회의실·면담실 없음(본부 최소화)
   floorHall('f2', '2층', '2F', [
@@ -199,22 +198,19 @@ export const HQ_SCENES: HqScene[] = [
   room({ id: 'wc3', name: '화장실', floor: '3F', look: 'life', doors: [exitS('f3', 'wc', 'wc', true)] }, 'wc', true),
   room({ id: 'lounge', name: '휴게실', floor: '3F', look: 'life', doors: [exitS('f3', 'lounge', 'lounge')] }, 'lounge'),
   room({ id: 'office', name: '종합대응팀', floor: '3F', look: 'office', doors: [exitS('f3', 'office', 'office')] }, 'office'),
+  // 지하 1층은 새 본부 그림(PixelLab 11-01, game-src/mapedit/b1): 서→동 샤워실(여) · 샤워실(남) · 훈련장 양문 · 엘리베이터. 교육장·계단 없음(본부 최소화)
   floorHall('b1', '지하 1층', 'B1', [
-    { id: 'edu', kind: 'door', to: 'edu', toDoor: 'out', label: '교육장' },
+    { id: 'shower_f', kind: 'door', locked: true, label: '샤워실(여)' },
+    { id: 'shower_m', kind: 'door', locked: true, label: '샤워실(남)' },
     { id: 'training', kind: 'steel', to: 'training', toDoor: 'out', needs: 'training', label: '훈련장' },
     { id: 'elev', kind: 'elevator' },
-    { id: 'shower_m', kind: 'door', locked: true, label: '샤워실(남)' },
-    { id: 'shower_f', kind: 'door', locked: true, label: '샤워실(여)' },
-    { id: 'stairs', kind: 'stairs', up: 'lobby', label: '계단' },
   ]),
-  room({ id: 'edu', name: '교육장', floor: 'B1', look: 'office', doors: [exitS('b1', 'edu', 'edu', true)] }, 'edu', true),
   room({ id: 'training', name: '훈련장', floor: 'B1', look: 'lab', doors: [exitS('b1', 'training', 'training')] }, 'training'),
+  // 지하 2층은 새 본부 그림(PixelLab 11-01, game-src/mapedit/b2): 서→동 격리시설 방폭문 · 격리팀 사무실(의무실·연구실) · 엘리베이터. 심문실·창고 없음(본부 최소화)
   floorHall('b2', '격리 구역', 'B2', [
-    { id: 'interrogation', kind: 'steel', locked: true, label: '심문실' },
-    { id: 'isolation', kind: 'cell', to: 'tooth', toDoor: 'out', needs: 'tooth', label: '격리실' },
+    { id: 'isolation', kind: 'cell', to: 'tooth', toDoor: 'out', needs: 'tooth', label: '격리시설' },
+    { id: 'clinic', kind: 'steel', to: 'clinic', toDoor: 'out', label: '격리팀 사무실' },
     { id: 'elev', kind: 'elevator' },
-    { id: 'clinic', kind: 'slide', to: 'clinic', toDoor: 'out', label: '의무실·연구실' },
-    { id: 'archive', kind: 'steel', locked: true, label: '창고·서고' },
   ]),
   // 의무실 겸 실험실: 의무실(침대) + 격리 연구실(연구·감정)을 한 방으로. 장비 보급은 B3 보급실로 옮김
   { ...room({ id: 'clinic', name: '의무실·연구실', floor: 'B2', look: 'lab', doors: [] }, 'medlab'), doors: [exitS('b2', 'clinic', 'medlab')] },

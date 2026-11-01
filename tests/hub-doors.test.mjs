@@ -36,13 +36,9 @@ test('본부 그림 층: 계단 문 → 고른 층의 계단, 메뉴 문 → 문
   for(let i=0;i<60 && !w.ended;i++) w.step(pad);
   return {w,stage,opened,asked};
  };
- // 2층은 새 그림(11-01)이라 계단이 없다 → 지하 1층 계단(위 1층뿐)으로 본다: 묻지 않고 바로 간다
+ // 본부는 새 그림(11-01)으로 모든 층에 계단이 없다(엘리베이터만)
  const b1=map.scenes.find(s=>s.id==='b1');
- const st=run(b1.doors.find(d=>d.id==='stairs'),1,b1);
- assert.equal(st.asked,null);
- assert.equal(st.w.ended,'next');
- st.w.enterFloor(st.stage.nextFloor(st.w.run,st.w.floor,'next'));
- assert.equal(st.w.floor.id,'hq:lobby');
+ assert.ok(!map.scenes.some(s=>!s.id.startsWith('jr_')&&s.doors.some(d=>d.kind==='stairs')),'본부 계단 없음');
  // 3층은 새 그림(11-01)이라 장소 문(탕비실)이 없다 → 지하 주차장 보급실 문으로 같은 것을 본다
  const b3=map.scenes.find(s=>s.id==='b3');
  const ch=run(b3.doors.find(d=>d.id==='supply'),undefined,b3);
