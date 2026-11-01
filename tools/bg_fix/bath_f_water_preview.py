@@ -19,7 +19,7 @@ C_STEAM = (250, 253, 255)
 # 헤드 물 나오는 면(1x): 그림의 헤드 타원 아래쪽 가장자리 양끝. 물은 이 선 전체에서 선에 수직(벽 반대쪽 아래)으로 나간다(17:23 사용자: 한 점 아님, 꺾임 없음).
 FACE = {2: ((198, 146), (208, 138)), 3: ((240, 149), (249, 141)), 4: ((474, 144), (485, 135)), 5: ((500, 156), (510, 147)),
         6: ((650, 150), (660, 158)), 7: ((678, 138), (688, 146))}
-SPEED, SPREAD_DEG, G = 3.6, 14, 0.035   # 초속(px/걸음: 클수록 곧게), 면 수직 기준 양쪽 퍼짐(도), 중력
+SPEED, SPREAD_DEG, G = 3.6, 26, 0.035   # 17:29 「너무 뭉쳐서」 → 퍼짐 14→26, 1px, 점선 5/4   # 초속(px/걸음: 클수록 곧게), 면 수직 기준 양쪽 퍼짐(도), 중력
 def face_dir(n):
     (x0, y0), (x1, y1) = FACE[n]
     ex, ey = x1 - x0, y1 - y0; L = math.hypot(ex, ey)
@@ -64,10 +64,9 @@ def draw_water(layer, n, head_top, head_x, floor_y, frame, nframes=8):
             x += vx; y += vy
             if not on_body: vy += G
         for i, (px, py) in enumerate(pts):
-            if (i + frame * 2 + s * 2) % 9 < 7:   # 점선 7/2
-                col = C_HI if i % 11 < 2 else (C_MID if 1 <= s <= STREAMS - 2 else C_DEEP)
-                d.point((round(px), round(py)), fill=col)
-                d.point((round(px) + 1, round(py)), fill=col)   # 2px 굵기
+            if (i + frame * 2 + s * 3) % 9 < 7:   # 점선 7/2, 가닥마다 어긋나게
+                col = C_HI if i % 11 < 2 else C_DEEP   # 1px 이라 색은 진하게
+                d.point((round(px), round(py)), fill=col)   # 1px 굵기
     for k in range(14):                     # 머리·어깨 물방울
         a = rnd.random() * math.pi; r = 5 + rnd.random() * 14 + ((frame + k) % 4)
         d.point((round(head_x + math.cos(a) * r), round(head_top + 4 - abs(math.sin(a)) * r * 0.5)), fill=C_HI if k % 3 == 0 else C_MID)
@@ -107,7 +106,7 @@ def render(frame):
         draw_water(water, n, head_top, fx, fy, frame, NF)
     bg.alpha_composite(water)
     return bg.convert('RGB')
-out = sys.argv[1] if len(sys.argv) > 1 else '/mnt/project-files/hq-f3/now/샤워실여_물줄기_코드_v15_2배.png'
+out = sys.argv[1] if len(sys.argv) > 1 else '/mnt/project-files/hq-f3/now/샤워실여_물줄기_코드_v16_2배.png'
 frames = [render(f).resize((924 * 2, 424 * 2), Image.NEAREST) for f in range(NF)]
 frames[0].save(out)
 frames[0].save(out.replace('.png', '.gif'), save_all=True, append_images=frames[1:], duration=120, loop=0)
