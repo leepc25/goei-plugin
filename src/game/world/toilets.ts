@@ -17,11 +17,15 @@ export const WASH: Activity = { id: 'wash', need: 'bladder', clip: 'line:104', w
 /** 칸 문이 열리고 닫히는 데 걸리는 초 (문 그림 6장면) */
 export const STALL_DOOR_SEC = 0.45;
 
-/** 앉은 줄 102 첫 장의 허벅지 윗선(도트, 캔버스 y). 좌석 자리는 이 기준값(큐라스)으로 땄고, 사람마다 다르면 여기에 그 값을 적는다.
- * 2026-11-01 본부 인물 16명(종합대응·진압·격리팀 12명 + 관리국 요원 남녀 4명)을 기준값으로 앉혀 확인: 모두 좌석에 맞아 따로 적은 값 없음.
+/** 앉은 줄 102 첫 장의 허벅지 윗선(도트, 캔버스 y). 좌석 자리는 기준값 LAP_BASE로 땄고(tools/mapedit/author_hq_wc.py LAP), 사람마다 다르면 여기에 그 값을 적는다.
+ * 2026-11-01 변기를 80%로 줄이며(사용자 「80이 괜찮은거 같은데 … 사람들 앉는 위치를 다시 맞춰야」) 본부 인물 16명을
+ * 확대 그림으로 3px씩 올리고 내려 보며 좌석 테가 엉덩이 밑·허벅지 옆에 보이는 값으로 하나씩 맞췄다. 적지 않은 사람 = 기준값.
  * 열쇠 = 인물 그림 키(이름 인물은 이름, 몹은 look) */
-export const TOILET_LAP: Record<string, number> = {};
-export const LAP_BASE = 167;
+export const TOILET_LAP: Record<string, number> = {
+  쟈알디: 173, 스팡달: 173, 잼트리: 173, 에일린: 179, 고그니쟈: 176, 큐라스: 176, 고르고디오: 176, 데쥬레: 173,
+  데드폴: 176, 게슈간: 176, 로제몬: 173, 콘쥬스: 173, 관리국남A: 176, 관리국남B: 176, 관리국여A: 173, 관리국여B: 176,
+};
+export const LAP_BASE = 173;
 
 /** 칸 좌석에 앉은 사람의 발 자리: 기준 발 자리에서 (기준 허벅지선 - 그 사람 허벅지선) × 도트 배율만큼 */
 export function seatFeet(seat: { x: number; y: number; k?: number }, look: string): { x: number; y: number } {

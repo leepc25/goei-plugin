@@ -22,12 +22,13 @@ FOOT, PITCH = 368, 158
 U_GAP, S_GAP, C_GAP = 10, 10, 4         # 1x px: 소변기·세면대 앞 여유(원근), 건조기·휴지통 기둥 앞
 U_STAND, S_STAND = 24, 28              # 1x px: 서는 자리 = 밑선 + 이만큼
 
-body = Image.open(D / 'stall_body_tall.png').convert('RGBA')
-body_end = Image.open(D / 'stall_body_end_tall.png').convert('RGBA')
+# 변기·배관만 80%로 줄인 칸 몸통 (사용자 14:5x 「80이 괜찮은거 같은데」, tools/bg_fix/stall_toilet_scale.py)
+body = Image.open(D / 'stall_body_tall_s80.png').convert('RGBA')
+body_end = Image.open(D / 'stall_body_end_tall_s80.png').convert('RGBA')
 endpost = Image.open(D / 'stall_endpost.png').convert('RGBA')
 doors = [Image.open(D / f'stall_door_{i}.png').convert('RGBA') for i in range(6)]
-LAP = 167                                # 앉은 줄 102 첫 장의 허벅지 윗선(캔버스 y) 기준값 — 큐라스로 맞춘 값(stall_toilet_raise.py HIP)
-SEAT = (133, 182)                        # 칸 캔버스 안 변기 좌석 가운데(엉덩이) — stall_toilet_raise.py SEAT(147-X0, 196-R)
+LAP = 173                                # 앉은 줄 102 첫 장의 허벅지 윗선(캔버스 y) 기준값 — 80% 변기에서 본부 16명을 확대 그림으로 하나씩 앉혀 맞춘 대표값(toilets.ts LAP_BASE와 같게)
+SEAT = (133, 229 - (229 - 182) * 0.8)    # 칸 캔버스 안 변기 좌석 가운데(엉덩이): 100% 좌석 y182를 변기 밑(229) 기준 80%로
 
 
 def comp(dst, src, xy):
