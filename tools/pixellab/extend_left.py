@@ -23,7 +23,8 @@ top_h = int(sys.argv[8]) if len(sys.argv) > 8 else 0
 ov_bot = int(sys.argv[9]) if len(sys.argv) > 9 else ov
 bot_y = int(sys.argv[10]) if len(sys.argv) > 10 else 0
 import subprocess as _sp
-if _sp.call([sys.executable, str(__import__('pathlib').Path(__file__).with_name('prompt_diff.py')), prompt_path]) != 0: sys.exit('요청문이 3층 원본 핵심 문장을 빠뜨림 — 중단')
+# NO_FILL=1: 사용자가 그 건에 한해 꽉 채우기 문장을 빼라고 고른 경우만(2026-11-01 11:52 빈 벽 잇기)
+if __import__('os').environ.get('NO_FILL') != '1' and _sp.call([sys.executable, str(__import__('pathlib').Path(__file__).with_name('prompt_diff.py')), prompt_path]) != 0: sys.exit('요청문이 3층 원본 핵심 문장을 빠뜨림 — 중단')
 im = Image.open(src).convert("RGBA")
 w, h = keep + new, im.height
 assert w <= 512 and h <= 512
