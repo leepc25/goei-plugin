@@ -42,6 +42,7 @@ import { CUTSCENES, VIDEOS, mountStory, type AgentId, type StoryApi } from '../s
 import { linkItems } from './itemsLink';
 import { makeHub, silhouette, type HubHost, type HubLife } from './hub';
 import { createHqWorld, hqDistrict } from '../../world/hq';
+import { clampPainted, walkablePainted } from '../hq/painted';
 import { isRegionMove } from '../../world/districts';
 import { FACTION_NAMES, relationFrom } from '../../world/factions';
 import { STATUS, type DebuffKind, type StatusSet } from '../../combat/status';
@@ -201,7 +202,7 @@ function hqAdapter(bridge: Partial<GameBridge> | undefined, ui: { chooseFloor: H
   if (typeof window !== 'undefined') window.addEventListener('keydown', onObserveKey);
   const world = () => {
     if (!sim && ready) {
-      sim = createHqWorld(map, seed, present.filter((p) => ROOM_SCENE[p.room]).map((p) => ({ name: p.name, scene: ROOM_SCENE[p.room] })), hasCharClip, { killOk: () => fighterHooks.killOk?.() ?? false, stance: (f) => factionBy.get(f)?.stage ?? null, relation: (v, t) => relation(v, t), namedHostile: (n) => peopleBy.get(n)?.affinity.cell === 'hostile' });
+      sim = createHqWorld(map, seed, present.filter((p) => ROOM_SCENE[p.room]).map((p) => ({ name: p.name, scene: ROOM_SCENE[p.room] })), hasCharClip, { killOk: () => fighterHooks.killOk?.() ?? false, stance: (f) => factionBy.get(f)?.stage ?? null, relation: (v, t) => relation(v, t), namedHostile: (n) => peopleBy.get(n)?.affinity.cell === 'hostile', nav: { ok: walkablePainted, clamp: (sc, x, y) => clampPainted(sc, x, y) } });
       chatter = new Chatter(sim, new Lines(dialogueData as unknown as DialogueData, sim.rng), lineCtx);
       // 비전투 계열 캐릭터는 동행이어도 싸움을 거들지 않는다 (반응표 combat)
       sim.noAssist = (n) => reactOf(n)?.combat === false;

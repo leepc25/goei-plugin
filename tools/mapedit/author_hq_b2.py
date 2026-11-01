@@ -22,8 +22,22 @@ doors = {
     'clinic': {'kind': 'steel', 'x': 696 * K, 'y': FLOOR_Y + 10, 'to': 'clinic', 'toDoor': 'out', 'label': '격리팀 사무실', 'door': door(650, 742, 157, 318)},
     'elev': {'kind': 'elevator', 'x': 890 * K, 'y': FLOOR_Y + 10, 'label': '엘리베이터', 'door': door(835, 945, 160, 318)},
 }
+# 11-01 09:12 사용자 「벽·바닥 연결선·못 가는 곳을 픽셀 단위로」: 바닥 윗선 = 기둥마다 위로 올라가 처음 만나는 검은 윤곽선(벽·벽에 붙은 기계 아래 끝),
+# 바닥 아랫선 = 그림 아래 어두운 띠(53,46,47)가 시작하는 y 바로 위. tools/mapedit/outline_trace.py
+import sys; sys.path.insert(0, str(ROOT / 'tools/mapedit'))
+from outline_trace import floor_line
+line = floor_line(im, 360, thr=45)
+px = im.load()
+band = [next(y for y in range(360, im.height) if px[x, y] == (53, 46, 47)) for x in range(im.width)]
+LANE_BOT = (min(band) - 2) * K
+top = [(x, line[x]) for x in range(10, 1200)]
+pts = [top[0]]
+for i in range(1, len(top)):
+    if top[i][1] != top[i - 1][1]: pts += [(top[i][0], top[i - 1][1]), top[i]]
+pts += [(1200, line[1199]), (1200, min(band) - 1), (10, min(band) - 1)]
+FLOOR = [[x * K, y * K] for x, y in pts]
 m = {'file': 'hq_b2_strip', 'bgScale': K, 'w': W, 'h': H, 'under': False,
-     'floor': [[X0, FLOOR_Y], [X1, FLOOR_Y], [X1, LANE_BOT], [X0, LANE_BOT]], 'lane': [FLOOR_Y, LANE_BOT],
+     'floor': FLOOR, 'lane': [min(line[10:1200]) * K, LANE_BOT],
      'blocks': [], 'doors': doors, 'lamps': [], 'spots': [], 'objects': []}
 (OUT / 'map.json').write_text(json.dumps(m, ensure_ascii=False, indent=1))
 print(W, H, list(doors))

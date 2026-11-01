@@ -59,6 +59,8 @@ export interface PaintedScene {
   objects: PaintedObject[];
   /** 못 지나가는 바닥 다각형(맵 에디터 막힘, 윗면 높이 400 이상). 발이 안에 들어가면 가장 가까운 바깥으로 밀어낸다 */
   holes?: [number, number][][];
+  /** 근무 자리(발 x·y): 그림에 맞춘 고정 근무자 자리 (예: desk = 로비 안내 직원) */
+  posts?: Record<string, [number, number]>;
   /** 사람 앞줄 도트 배율(월드 px / 도트). 세로 890 화면 기준 앞 1.5배를 장면 세로에 맞춘 값(1.5 × h / 890). 없으면 CHAR_K */
   dotK?: number;
 }
@@ -251,6 +253,18 @@ export const doorX = (scene: string, id: string) => {
 
 /** 그림 층 기본 걷는 띠 */
 export const PAINTED_LANE: [number, number] = [440, 669];
+
+/** 발이 설 수 있는 바닥인가: 바닥 다각형 안이고 막힘(holes·높은 발판) 밖. 그림 장면이 아니면 늘 true (NPC 길찾기용) */
+export function walkablePainted(scene: string, x: number, y: number): boolean {
+  const p = PAINTED[scene];
+  if (!p) return true;
+  if (p.floor && !inPolygon(p.floor, x, y)) return false;
+  for (const h of p.holes ?? []) if (inPolygon(h, x, y)) return false;
+  if (p.holes) for (const o of p.objects) for (const b of o.solid ?? []) {
+    if (b.h !== undefined && x >= b.x0 && x <= b.x1 && y >= b.y0 && y <= b.y1) return false;
+  }
+  return true;
+}
 
 /** 옆벽·튀어나온 벽 바깥으로 나간 발을 바닥 안으로 되돌린다 */
 export function clampPainted(scene: string, x: number, y: number, z = 0): { x: number; y: number } {

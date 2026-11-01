@@ -141,7 +141,7 @@ function floorHall(id: SceneId, name: string, floor: HqScene['floor'], doors: Om
   // 맵 에디터로 만든 장면이면 앉는 자리도 그쪽 것
   if (MAPEDIT_SPOTS[id]) extra = { ...extra, spots: MAPEDIT_SPOTS[id] };
   return {
-    id, name, floor, look: id.startsWith('jr_') ? 'jr' : p.under ? 'labhall' : id === 'lobby' ? 'lobby' : 'hall', painted: id, length: p.w, lane: p.lane ?? PAINTED_LANE,
+    ...(p.posts ? { posts: p.posts } : {}), id, name, floor, look: id.startsWith('jr_') ? 'jr' : p.under ? 'labhall' : id === 'lobby' ? 'lobby' : 'hall', painted: id, length: p.w, lane: p.lane ?? PAINTED_LANE,
     doors: doors.map((d) => ({ ...d, x: doorX(id, d.id) })),
     spots: [], fixtures: [], things: [],
     // 막는 상자는 그림을 그리지 않는다 (오브젝트 그림은 첫 상자 자리에서 한 번만, 깊이 순서는 sortY)

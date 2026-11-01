@@ -348,7 +348,9 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
       if (scene?.painted) for (const o of PAINTED[scene.painted]?.objects ?? []) {
         if (!o.gate) continue;
         const pl = a.world.player;
-        const near = Math.abs(pl.x - (o.x + o.w / 2)) < o.w / 2 + 90 && Math.abs(pl.y - o.sortY) < 140;
+        const by = (x: number, y: number) => Math.abs(x - (o.x + o.w / 2)) < o.w / 2 + 90 && Math.abs(y - o.sortY) < 140;
+        // 주인공이나 돌아다니는 사람(직원 등)이 가까이 오면 열림
+        const near = by(pl.x, pl.y) || live.some((q) => by(q.x, q.y));
         const t = gateOpen.get(o.id) ?? 0;
         gateOpen.set(o.id, Math.max(0, Math.min(1, t + (near ? 0.12 : -0.08))));
       }
