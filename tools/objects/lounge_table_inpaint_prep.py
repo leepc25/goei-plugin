@@ -7,7 +7,7 @@ sys.path.insert(0,str(ROOT/'game-src/action/testroom3')); sys.path.insert(0,str(
 os.environ['CHAIR_DIR']=str(ROOT/'game-src/art/objects/chairs_shell/fit')
 import fit_chair as fc
 from PIL import Image, ImageDraw
-WX0=60; W=512; MX0,MY0,MX1,MY1=230,262,370,412; FOOT=400   # 자리: 폭 140, 높이 150, 발선 400
+WX0=60; W=512; MX0,MY0,MX1,MY1=200,262,420,412; FOOT=400   # 2차: 폭 220(1차 140은 상판이 잘림), 높이 150, 발선 400
 bg=Image.open(ROOT/'game-src/art/pixellab-hq-20261031/hq_lounge_p8s.png').convert('RGBA')
 win=bg.crop((WX0,0,WX0+W,bg.height)); mask=Image.new('RGB',win.size,(0,0,0)); ImageDraw.Draw(mask).rectangle([MX0-WX0,MY0,MX1-WX0-1,MY1-1],fill=(255,255,255))
 # 마스크 칸 안의 옛 그림은 지움(흰색)
@@ -23,5 +23,5 @@ pv.alpha_composite(c,(round(cx+fit['side']['dx']-100),round(foot+fit['side']['dy
 pv.alpha_composite(im,(round(cx-im.width/2),round(foot-(im.height-4))))
 g=ImageDraw.Draw(pv); g.rectangle([MX0,MY0,MX1-1,MY1-1],outline=(255,0,255,255),width=2); g.rectangle([WX0,0,WX0+W-1,bg.height-1],outline=(0,255,255,255),width=1)
 g.line([(MX0-40,FOOT),(MX1+40,FOOT)],fill=(255,80,80,255),width=1); g.line([(MX0-40,FOOT-120),(MX1+40,FOOT-120)],fill=(80,255,80,255),width=1)
-pv.convert('RGB').resize((bg.width*2,bg.height*2),Image.NEAREST).save('/mnt/project-files/hq-f3/now/lounge_table_inpaint_spot_x2.png')
+pv.convert('RGB').resize((bg.width*2,bg.height*2),Image.NEAREST).save('/mnt/project-files/hq-f3/now/lounge_table_inpaint_spot2_x2.png')
 print('ok')
