@@ -69,6 +69,8 @@ export interface PaintedScene {
   growTo?: number;
   /** 기준점 크기표 [발 y(월드), 배율(맨 앞 1)] — 문·물건 높이로 잰 점 사이에서만 크기가 바뀐다(engine/view.ts sizes). 있으면 far·growTo 대신 */
   sizes?: [number, number][];
+  /** 샤워기(샤워실): 헤드 물 나오는 면(월드 px 선)과 서는 자리(발). 자리(spot act 'shower')를 쓰면 물·김을 코드로 그린다 (hq/showerFx.ts) */
+  showers?: { id: string; head: [[number, number], [number, number]]; foot: [number, number]; face: 1 | -1 }[];
 }
 
 import { JR_ROOMS } from './jrRooms.gen';

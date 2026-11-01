@@ -33,7 +33,7 @@ test('본부: 방은 아래 출구로 복도에 연결', () => {
     const isHall = HALLS.includes(sc.id);
     for (const d of sc.doors) {
       if (isHall) assert.ok(d.side !== 'S', `${sc.id}.${d.id} 복도 남쪽 문`);
-      else if (d.to) assert.equal(d.side, 'S', `${sc.id}.${d.id} 방 출구 방향`);
+      else if (d.to && !(sc.painted && d.kind === 'exit' && M.PAINTED_DOORS(sc.painted)[d.id])) assert.equal(d.side, 'S', `${sc.id}.${d.id} 방 출구 방향`);   // 맵 에디터 방(샤워실)은 그림 속 옆벽 문으로 나간다
     }
   }
 });

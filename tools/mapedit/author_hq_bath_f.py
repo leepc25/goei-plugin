@@ -133,8 +133,14 @@ door = {'kind': 'exit', 'x': DOOR_X * K, 'y': int(top[DOOR_X] + 2) * K, 'label':
 SPR_DOTS = 247
 REFS = [(292, 1.217 * (292 - 196)), (412, 1.217 * (412 - 196))]
 TOPH = REFS[-1][1]
+# 샤워 자리 6곳(사용자 16:58 직접 찍음, 1x 발 좌표)과 샤워기 헤드 물 나오는 면(tools/bg_fix/bath_f_water_preview.py FACE, 1x) → 2배 월드 좌표
+FOOT = {2: (268, 356, -1), 3: (296, 318, -1), 4: (527, 352, -1), 5: (554, 314, -1), 6: (610, 314, 1), 7: (637, 356, 1)}
+FACE = {2: ((198, 146), (208, 138)), 3: ((240, 149), (249, 141)), 4: ((474, 144), (485, 135)), 5: ((500, 156), (510, 147)),
+        6: ((650, 150), (660, 158)), 7: ((678, 138), (688, 146))}
+spots_out = [{'id': f'shower{n}', 'x': fx * K, 'y': fy * K, 'verb': '샤워', 'face': face, 'act': ['shower']} for n, (fx, fy, face) in FOOT.items()]
+showers = [{'id': f'shower{n}', 'head': [[FACE[n][0][0] * K, FACE[n][0][1] * K], [FACE[n][1][0] * K, FACE[n][1][1] * K]], 'foot': [fx * K, fy * K], 'face': face} for n, (fx, fy, face) in FOOT.items()]
 m = {'file': f'hq_{SCENE}_strip', 'bgScale': K, 'dotK': round(TOPH * K / SPR_DOTS, 4), 'sizes': [[y * K, round(h / TOPH, 3)] for y, h in REFS],
-     'w': W * K, 'h': H * K, 'under': True, 'floor': floor, 'lane': [310 * K, H * K - 12], 'blocks': blocks, 'lamps': [], 'spots': [],
+     'w': W * K, 'h': H * K, 'under': True, 'floor': floor, 'lane': [310 * K, H * K - 12], 'blocks': blocks, 'lamps': [], 'spots': spots_out, 'showers': showers,
      'doors': {'out': door}, 'objects': [to_cover(o, mm, sy) for o, mm, sy in objects]}
 OUT.mkdir(parents=True, exist_ok=True)
 im.save(OUT / f'hq_{SCENE}_strip.png')

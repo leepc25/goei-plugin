@@ -998,7 +998,7 @@ function runScene(steps?: Json, label?: Json) {
   next();
 }
 // 샤워 규칙 재생(11-01 사용자): 통째 반복 금지 — 문지르는 구간만 속도 차등으로 반복, 들어가기·나오기 한 번, 현실 10분 이상. 계획은 fighter/shower.ts
-function runShower(seconds?: Json) {
+function runShower(seconds?: Json, quiet?: Json) {   // quiet = 필드(본부 샤워실): 「머리감기」 글자 안 띄움
   const steps = showerPlan({ seconds: seconds || 600, seed: (Math.random() * 1e9) | 0, has });
   if (!steps.length) return;
   P.seat = null; P.z = 0; P.combat = false; P.armed = false; P.mode = 'act'; P.scene = '샤워'; let i = 0;
@@ -1006,7 +1006,7 @@ function runShower(seconds?: Json) {
     if (P.scene !== '샤워') return;
     if (i >= steps.length) { P.scene = null; return toIdle(); }
     const st = steps[i++]; P.mode = 'act';
-    fx.push({ k: 'num', x: P.x - 60, y: P.y - 280 * K(P.y), v: st.label, t: 1.2 });
+    if (!quiet) fx.push({ k: 'num', x: P.x - 60, y: P.y - 280 * K(P.y), v: st.label, t: 1.2 });
     play(st.id, { seq: st.seq.map((e) => ({ ...e })), onEnd: next });
   };
   next();
@@ -1656,7 +1656,9 @@ function drawCut() {
   return {
     P, A, CH, onPress, onRelease, takeHit, update, frameView, drawUnder, drawBody, drawFxLayer, drawScreen, armored,
     get hitstop() { return hitstop; }, get shake() { return shake; }, get zoom() { return zoom; }, get target() { return T; },
-    knock, hit, stun, die, sitAt, rise, seatAct, runScene, playLife, lifeIds, emote, act, toIdle, has, nOf, SCENES,
+    knock, hit, stun, die, sitAt, rise, seatAct, runScene, runShower, playLife, lifeIds, emote, act, toIdle, has, nOf, SCENES,
+    /** 샤워 규칙 재생 중인가 (fighter/player.ts 샤워 자리) */
+    get showering() { return P.scene === '샤워'; },
     /** 퍽 손잡이 (fighter/player.ts 가 PerkHost 로 묶음) */
     perkApi: { proxies, hit: perkHit, boom: perkBoom, ghost: ghostAttack, replaySkill, reflect: reflectShot, mark: markT, bind: bindT, later: (t: number, fn: () => void) => later(t, fn), text: (x: number, y: number, v: string) => fx.push({ k: 'num', x: x - 30, y, v, t: 1.1 }), gainSp: (v: number) => { P.sp = Math.min(100, P.sp + v); }, vfx: (n: string, x: number, y: number, s: number, o: Json = {}) => vfx(n, x, y, s, o) },
     /** 시험장 전용 스위치: 필살 게이지 무시 */

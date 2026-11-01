@@ -10,7 +10,7 @@ import { MAPEDIT_SPOTS } from './mapedit.gen';
 
 export type SceneId =
   | 'street' | 'pasta' | 'lobby' | 'swat' | 'f2' | 'f3' | 'office' | 'interview' | 'lounge' | 'wc' | 'wc3'
-  | 'b1' | 'edu' | 'training' | 'clinic' | 'b2' | 'b3' | 'tooth'
+  | 'b1' | 'edu' | 'training' | 'clinic' | 'b2' | 'b3' | 'tooth' | 'bath_f' | 'bath_m'
   | 'jr_entry' | 'jr_b1' | 'jr_alley' | 'jr_b2'
   | 'jr_daebak' | 'jr_heolgap' | 'jr_youngchang' | 'jr_songil' | 'jr_jinryo' | 'jr_op';
 
@@ -200,11 +200,15 @@ export const HQ_SCENES: HqScene[] = [
   room({ id: 'office', name: '종합대응팀', floor: '3F', look: 'office', doors: [exitS('f3', 'office', 'office')] }, 'office'),
   // 지하 1층은 새 본부 그림(PixelLab 11-01, game-src/mapedit/b1): 서→동 샤워실(여) · 샤워실(남) · 훈련장 양문 · 엘리베이터. 교육장·계단 없음(본부 최소화)
   floorHall('b1', '지하 1층', 'B1', [
-    { id: 'shower_f', kind: 'door', locked: true, label: '샤워실(여)' },
-    { id: 'shower_m', kind: 'door', locked: true, label: '샤워실(남)' },
+    // 샤워실 두 곳(11-01): 여자 = 확정 그림 bath_f, 남자 = 같은 그림 색 바꾼 bath_m (game-src/mapedit/bath_*)
+    { id: 'shower_f', kind: 'door', to: 'bath_f', toDoor: 'out', label: '샤워실(여)' },
+    { id: 'shower_m', kind: 'door', to: 'bath_m', toDoor: 'out', label: '샤워실(남)' },
     { id: 'training', kind: 'steel', to: 'training', toDoor: 'out', needs: 'training', label: '훈련장' },
     { id: 'elev', kind: 'elevator' },
   ]),
+  // 샤워실: 출입문은 오른쪽 옆벽(그림 속 문). 자리 6곳(E → 샤워 규칙 재생)은 mapedit.gen 의 MAPEDIT_SPOTS
+  floorHall('bath_f', '샤워실(여)', 'B1', [{ id: 'out', kind: 'exit', to: 'b1', toDoor: 'shower_f', label: '나가기' }]),
+  floorHall('bath_m', '샤워실(남)', 'B1', [{ id: 'out', kind: 'exit', to: 'b1', toDoor: 'shower_m', label: '나가기' }]),
   room({ id: 'training', name: '훈련장', floor: 'B1', look: 'lab', doors: [exitS('b1', 'training', 'training')] }, 'training'),
   // 지하 2층은 새 본부 그림(PixelLab 11-01, game-src/mapedit/b2): 서→동 격리시설 방폭문 · 격리팀 사무실(의무실·연구실) · 엘리베이터. 심문실·창고 없음(본부 최소화)
   floorHall('b2', '격리 구역', 'B2', [

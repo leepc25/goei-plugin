@@ -91,12 +91,13 @@ def convert(scene_id: str, m: dict, files: dict) -> dict:
         doors[did] = d.get('door') or {'x0': d['x'] - 80, 'x1': d['x'] + 80, 'y0': d['y'] - 48, 'y1': d['y'], 'anim': 'none', 'behind': 'dark'}
     spots = []
     for s in m.get('spots', []):
-        sp = {'id': s['id'], 'x': s['x'], 'y': s['y'], 'verb': s.get('verb', '앉기'), 'face': s.get('face', 1), 'act': s.get('act') or ACTS.get(s.get('dir', 'side')), 'seat': s['seat']}
+        sp = {'id': s['id'], 'x': s['x'], 'y': s['y'], 'verb': s.get('verb', '앉기'), 'face': s.get('face', 1), 'act': s.get('act') or ACTS.get(s.get('dir', 'side'))}
+        if s.get('seat'): sp['seat'] = s['seat']          # 의자 자리만. 샤워 자리(act shower)는 seat 없음 (11-01 샤워실)
         spots.append(sp)
     # 사람 배율 dotK: map.json에 있으면 그것(사용자 10-31 중림 지상: 배경 2배·사람 0.85), 없으면 장면 세로로 계산
     lane = m.get('lane') or [min(p[1] for p in m['floor']), max(p[1] for p in m['floor']) - 12]
     scene = {'file': file, 'w': W, 'h': H, 'under': True, 'lane': lane, 'floor': m.get('floor'), 'holes': holes,
-             'dotK': m.get('dotK') or round(1.5 * H / 890, 4), **({'far': m['far']} if m.get('far') else {}), **({'growTo': m['growTo']} if m.get('growTo') else {}), **({'sizes': m['sizes']} if m.get('sizes') else {}), 'blocks': [], 'doors': doors, 'lamps': m.get('lamps', []), 'windows': [], 'objects': objects, **({'posts': m['posts']} if m.get('posts') else {})}
+             'dotK': m.get('dotK') or round(1.5 * H / 890, 4), **({'far': m['far']} if m.get('far') else {}), **({'growTo': m['growTo']} if m.get('growTo') else {}), **({'sizes': m['sizes']} if m.get('sizes') else {}), 'blocks': [], 'doors': doors, 'lamps': m.get('lamps', []), 'windows': [], 'objects': objects, **({'posts': m['posts']} if m.get('posts') else {}), **({'showers': m['showers']} if m.get('showers') else {})}
     return {'scene': scene, 'spots': spots, 'files': names}
 
 
