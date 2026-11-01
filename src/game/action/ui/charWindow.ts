@@ -64,22 +64,6 @@ function plate(c: CanvasRenderingContext2D, x: number, y: number, w: number, h: 
   c.fillStyle = RIM_L; c.fillRect(x + 2 * u, y, w - 4 * u, u); c.fillRect(x, y + 2 * u, u, h - 4 * u); c.fillRect(x + u, y + u, u, u);
   c.fillStyle = fill; c.fillRect(x + 2 * u, y + u, w - 4 * u, h - 2 * u); c.fillRect(x + u, y + 2 * u, w - 2 * u, h - 4 * u);
 }
-/** 고른 칸 표시: 금색 도트 모서리 네 개 */
-/** 고른 칸 표시: 뒤에 밝은 판(glow) + 금색 3px 테 + 굵은 모서리 꺾쇠 */
-function glow(c: CanvasRenderingContext2D, x: number, y: number, w: number, h: number) {
-  c.fillStyle = '#25397a'; c.fillRect(x, y, w, h);
-  c.fillStyle = '#30489a'; c.fillRect(x + 8, y + 8, w - 16, h - 16);
-}
-function corners(c: CanvasRenderingContext2D, x: number, y: number, w: number, h: number) {
-  c.fillStyle = EDGE_D; c.fillRect(x - 1, y - 1, w + 2, 5); c.fillRect(x - 1, y + h - 4, w + 2, 5); c.fillRect(x - 1, y - 1, 5, h + 2); c.fillRect(x + w - 4, y - 1, 5, h + 2);
-  c.fillStyle = GOLD; c.fillRect(x, y, w, 3); c.fillRect(x, y + h - 3, w, 3); c.fillRect(x, y, 3, h); c.fillRect(x + w - 3, y, 3, h);
-  c.fillStyle = '#fff3c4';
-  for (const [px, py, sx, sy] of [[x, y, 1, 1], [x + w, y, -1, 1], [x, y + h, 1, -1], [x + w, y + h, -1, -1]]) {
-    c.fillRect(sx > 0 ? px - 3 : px - 19, sy > 0 ? py - 3 : py - 3, 22, 6);
-    c.fillRect(sx > 0 ? px - 3 : px - 3, sy > 0 ? py - 3 : py - 19, 6, 22);
-  }
-}
-
 /** 네 귀퉁이 꺾쇠만(바탕·이어진 선 없음): 어두운 테 + 금 + 밝은 안쪽 한 줄 */
 function bracketsOnly(c: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, L = 26, t = 6) {
   for (const [sx, sy] of [[1, 1], [-1, 1], [1, -1], [-1, -1]]) {
@@ -185,13 +169,12 @@ export function drawCharWindow(c: CanvasRenderingContext2D, d: CharWindowData, t
     d.skills.forEach((k, i) => {
       const col = i % 3, row = Math.floor(i / 3);
       const x = IX + col * 246, y = top + 30 + row * 130;
-      if (i === d.pick.skill) glow(c, x - 8, y - 8, 116, 116);
       big(x, y);
       pixelIcon(c, k.icon, x + 50, y + 50, 4, k.off ? '#3b4148' : INK);
       putText(c, T(k.key, GOLD), x + 10, y + 6);
       putText(c, B(k.label, k.off ? '#4a525a' : INK), x + 114, y + 18);
       putText(c, T(k.name, DIM), x + 114, y + 60);
-      if (i === d.pick.skill) corners(c, x - 8, y - 8, 116, 116);
+      if (i === d.pick.skill) bracketsOnly(c, x - 8, y - 8, 116, 116, 22);
     });
     const pk = d.skills[d.pick.skill];
     let y = strip(286);
@@ -255,14 +238,13 @@ export function drawCharWindow(c: CanvasRenderingContext2D, d: CharWindowData, t
       c.fillStyle = SOCKET; c.fillRect(x + 8, y + 8, s - 16, s - 16);
     };
     const slot = (x: number, y: number, it?: { label: string; count: number }, k?: string, on = false) => {
-      if (on) glow(c, x - 6, y - 6, 112, 112);
       if (k) big(x, y); else well(x, y);
       if (it) {
         putText(c, B(it.label.slice(0, 2)), x + 50, y + 30, 'center');
         if (it.count > 1) putText(c, T(String(it.count), GOLD), x + 88, y + 66, 'right');
       }
       if (k) putText(c, T(k, GOLD), x + 10, y + 6);
-      if (on) corners(c, x - 6, y - 6, 112, 112);
+      if (on) bracketsOnly(c, x - 6, y - 6, 112, 112, 22);
     };
     putText(c, T('퀵슬롯', GOLD), IX, top + 22);
     for (let i = 0; i < 4; i++) slot(IX + i * 118, top + 56, d.quick[i], String(i + 1), i === 0);
