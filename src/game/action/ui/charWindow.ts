@@ -243,6 +243,8 @@ export function drawCharWindow(c: CanvasRenderingContext2D, d: CharWindowData, t
     };
     putText(c, T('퀵슬롯', GOLD), IX, top + 22);
     for (let i = 0; i < 4; i++) slot(IX + i * 118, top + 56, d.quick[i], String(i + 1), i === 0);
+    // 퀵슬롯 등록·해제 안내(퀵슬롯 오른쪽 빈자리): 고른 채 1~4(패드 십자키) = 넣기, 같은 숫자 한 번 더 = 빼기
+    putText(c, T('1~4  퀵슬롯 등록·해제', DIM), IX + 4 * 118 + 24, top + 90);
     putText(c, T(`가방 ${d.bag.length} / ${d.bagSlots}`, GOLD), IX, top + 176);
     const per = 6;
     for (let i = 0; i < d.bagSlots; i++) slot(IX + (i % per) * 118, top + 212 + Math.floor(i / per) * 110, d.bag[i]);
@@ -252,8 +254,6 @@ export function drawCharWindow(c: CanvasRenderingContext2D, d: CharWindowData, t
       putText(c, B(it.label, GOLD), IX, y + 8);
       putText(c, T(`${it.count}개`, DIM), IX + B(it.label).width + 16, y + 16);
       const bw = 150;
-      // 퀵슬롯 등록·해제 안내: 고른 채 1~4(패드 십자키) = 그 칸에 넣기, 같은 숫자 한 번 더 = 빼기
-      putText(c, T('1~4  퀵슬롯 등록·해제', DIM), R - 32 - 2 * bw - 16 - 28, y + 14, 'right');
       for (const [j, name] of ['쓰기', '버리기'].entries()) {
         const bx2 = R - 32 - (2 - j) * bw - (1 - j) * 16;
         if (!stretch(c, 'tab', bx2, y, bw, 52)) plate(c, bx2, y, bw, 52);
