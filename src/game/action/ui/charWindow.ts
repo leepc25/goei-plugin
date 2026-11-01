@@ -4,6 +4,25 @@
 // 아직 게임에 연결하지 않았다: 배치가 정해지면 Tab/일시정지 메뉴에 붙인다.
 import { hudArtImage, pixelIcon, pixelText, putText, type SkillIcon } from './pixelHud';
 import { kitPiece, kitSlice, nine } from './kit';
+import { CW_ART } from './charWindowArt';
+
+// 지난 스레드에서 뽑은 PixelLab 조각(창 틀·탭·카드 틀·뱃지 테)을 2배로 찍는다
+type ArtKey = keyof typeof CW_ART;
+const cwImgs: Partial<Record<ArtKey, HTMLImageElement>> = {};
+function art(k: ArtKey): HTMLImageElement | null {
+  let im = cwImgs[k];
+  if (!im) { im = new Image(); im.src = CW_ART[k].src; cwImgs[k] = im; }
+  return im.complete && im.naturalWidth ? im : null;
+}
+/** 9칸 늘리기 (조각 1도트 = k px) */
+function stretch(c: CanvasRenderingContext2D, k: ArtKey, x: number, y: number, w: number, h: number, z = 2): boolean {
+  const im = art(k);
+  if (!im) return false;
+  const a = CW_ART[k] as { slice?: readonly number[] };
+  const [t, r, b, l] = a.slice ?? [0, 0, 0, 0];
+  nine(c, im, [t, r, b, l], x, y, w, h, z);
+  return true;
+}
 
 export interface CharWindowData {
   name: string; team: string; state: string; face?: CanvasImageSource | null;
@@ -32,6 +51,8 @@ function plate(c: CanvasRenderingContext2D, x: number, y: number, w: number, h: 
 }
 /** 빈 뱃지 자리: 도트 원 */
 function socket(c: CanvasRenderingContext2D, cx: number, cy: number, r: number) {
+  const rim = art('rim');
+  if (rim) { c.drawImage(rim, cx - 32, cy - 32, 64, 64); return; }
   for (let yy = -r; yy <= r; yy += 2) {
     const half = Math.floor(Math.sqrt(r * r - yy * yy) / 2) * 2;
     c.fillStyle = Math.abs(yy) > r - 4 || half < 6 ? RIM_D : SOCKET;
@@ -56,14 +77,16 @@ export function drawCharWindow(c: CanvasRenderingContext2D, d: CharWindowData, t
   c.imageSmoothingEnabled = false;
   c.fillStyle = 'rgba(0,0,0,0.6)'; c.fillRect(0, 0, W, H);
   const panel = kitPiece('panel');
-  if (panel) nine(c, panel, kitSlice('panel'), 16, 16, W - 32, H - 32, 2);
-  else plate(c, 16, 16, W - 32, H - 32, NAVY_D);
+  if (!stretch(c, 'panel', 16, 16, W - 32, H - 32)) {
+    if (panel) nine(c, panel, kitSlice('panel'), 16, 16, W - 32, H - 32, 2);
+    else plate(c, 16, 16, W - 32, H - 32, NAVY_D);
+  }
   const T = (s: string, col = INK) => pixelText(s, col, 22);
   const B = (s: string, col = INK) => pixelText(s, col, 33);
 
   /* ── 머리 (늘 보임) ── */
-  const hx = 56, hy = 52;
-  plate(c, 48, 44, W - 96, 104);
+  const hx = 104, hy = 54;
+  if (!stretch(c, 'banner', 40, 36, W - 80, 120)) plate(c, 48, 44, W - 96, 104);
   const P = hudArtImage('portrait');
   if (d.face) c.drawImage(d.face, hx + 8, hy + 4, 64, 64);
   if (P) c.drawImage(P, hx, hy - 4);
@@ -74,7 +97,7 @@ export function drawCharWindow(c: CanvasRenderingContext2D, d: CharWindowData, t
   plate(c, hx + 116 + team.width, hy + 40, tag.width + 20, 34, '#16284a');
   putText(c, tag, hx + 126 + team.width, hy + 46);
   const HP = hudArtImage('hp');
-  const bx = W - 56 - 20 - 244 - 70, by = hy + 10;
+  const bx = W - 104 - 20 - 244 - 70, by = hy + 10;
   putText(c, T('체력', DIM), bx, by - 2);
   if (HP) {
     c.drawImage(HP, bx + 70, by);
@@ -89,32 +112,33 @@ export function drawCharWindow(c: CanvasRenderingContext2D, d: CharWindowData, t
   putText(c, T('Q', DIM), 60, ty + 10);
   let tx = 92;
   for (const name of CHAR_TABS) {
-    const t = T(name, name === tab ? GOLD : DIM), w = t.width + 40;
-    plate(c, tx, ty, w, 44, name === tab ? '#1c2c58' : NAVY_D);
-    if (name === tab) { c.fillStyle = GOLD; c.fillRect(tx + 8, ty + 38, w - 16, 2); }
-    putText(c, t, tx + 20, ty + 10);
+    const on = name === tab, t = T(name, on ? GOLD : DIM), w = t.width + 64;
+    c.save(); if (!on) c.globalAlpha = 0.55;
+    if (!stretch(c, 'tab', tx, ty + 4, w, 40)) plate(c, tx, ty, w, 44, on ? '#1c2c58' : NAVY_D);
+    c.restore();
+    putText(c, t, tx + 32, ty + 10);
     tx += w + 8;
   }
   putText(c, T('E', DIM), tx + 6, ty + 10);
   putText(c, T('Tab 닫기', DIM), W - 64, ty + 10, 'right');
 
   /* ── 본문 ── */
-  const top = ty + 54, bh = H - 44 - top, L = 48, R = W - 48;
-  plate(c, L, top, R - L, bh);
+  const top = ty + 44, bh = H - 40 - top, L = 40, R = W - 40;
+  if (!stretch(c, 'panel', L, top, R - L, bh)) plate(c, L, top, R - L, bh);
   const SL = hudArtImage('slot');
 
   if (tab === '능력치') {
     // 왼쪽: 힘민체지정 크게 + 눈금 + 하는 일, 오른쪽: 산출 수치
     d.base.forEach((s, i) => {
-      const yy = top + 26 + i * 86, v = s.now ?? s.v;
-      putText(c, B(s.label), L + 28, yy);
-      putText(c, B(String(v), s.now !== undefined && s.now !== s.v ? UP : GOLD), L + 110, yy, 'right');
+      const yy = top + 34 + i * 86, v = s.now ?? s.v;
+      putText(c, B(s.label), L + 48, yy);
+      putText(c, B(String(v), s.now !== undefined && s.now !== s.v ? UP : GOLD), L + 130, yy, 'right');
       for (let k = 0; k < 10; k++) {
-        const px = L + 136 + k * 26, py = yy + 8;
+        const px = L + 156 + k * 26, py = yy + 8;
         c.fillStyle = RIM_D; c.fillRect(px, py, 20, 20);
         c.fillStyle = k < s.v ? '#e8c45a' : k < v ? UP : SOCKET; c.fillRect(px + 2, py + 2, 16, 16);
       }
-      putText(c, T(s.what, DIM), L + 28, yy + 44);
+      putText(c, T(s.what, DIM), L + 48, yy + 44);
     });
     const dx0 = L + 640;
     c.fillStyle = RIM_D; c.fillRect(dx0 - 30, top + 24, 2, bh - 48);
@@ -141,19 +165,20 @@ export function drawCharWindow(c: CanvasRenderingContext2D, d: CharWindowData, t
   } else if (tab === '퍽') {
     const gw = 700, per = Math.floor((gw - 20) / 78);
     for (let i = 0; i < d.perkSlots; i++) {
-      const x = L + 34 + (i % per) * 78, y = top + 30 + Math.floor(i / per) * 78;
+      const x = L + 48 + (i % per) * 78, y = top + 30 + Math.floor(i / per) * 78;
       const p = d.perks[i];
       if (p?.badge) c.drawImage(p.badge, x, y, 64, 64); else socket(c, x + 32, y + 32, 28);
       if (i === d.perkPick) corners(c, x - 5, y - 5, 74, 74);
     }
-    putText(c, T(`이번 괴이에서 얻은 퍽 ${d.perks.length} / ${d.perkSlots}`, DIM), L + 34, top + bh - 46);
+    putText(c, T(`이번 괴이에서 얻은 퍽 ${d.perks.length} / ${d.perkSlots}`, DIM), L + 48, top + bh - 46);
     const dx0 = L + gw + 40;
     c.fillStyle = RIM_D; c.fillRect(dx0 - 24, top + 24, 2, bh - 48);
     const pp = d.perks[d.perkPick];
     if (pp) {
-      if (pp.badge) c.drawImage(pp.badge, dx0, top + 30, 128, 128);
-      putText(c, pixelText(pp.trait ? '특성' : '퍽', pp.trait ? '#ff9a8a' : DIM, 22), dx0 + 150, top + 40);
-      putText(c, B(pp.name, GOLD), dx0 + 150, top + 72);
+      stretch(c, 'card', dx0 - 16, top + 18, 160, 160);
+      if (pp.badge) c.drawImage(pp.badge, dx0, top + 34, 128, 128);
+      putText(c, pixelText(pp.trait ? '특성' : '퍽', pp.trait ? '#ff9a8a' : DIM, 22), dx0 + 166, top + 40);
+      putText(c, B(pp.name, GOLD), dx0 + 166, top + 72);
       putText(c, T(pp.effect), dx0, top + 186);
       putText(c, T('괴이를 나오면 사라짐', DIM), dx0, top + 222);
     }
@@ -167,10 +192,10 @@ export function drawCharWindow(c: CanvasRenderingContext2D, d: CharWindowData, t
       if (k) putText(c, pixelText(k, GOLD, 11), x + 4, y + 2);
       if (on) corners(c, x - 5, y - 5, 60, 60);
     };
-    putText(c, T('퀵칸', GOLD), L + 34, top + 24);
-    for (let i = 0; i < 4; i++) slot(L + 34 + i * 62, top + 60, d.quick[i], String(i + 1), i === 0);
-    putText(c, T(`가방 ${d.bag.length} / ${d.bagSlots}`, GOLD), L + 34, top + 140);
-    for (let i = 0; i < d.bagSlots; i++) slot(L + 34 + (i % 8) * 62, top + 176 + Math.floor(i / 8) * 62, d.bag[i]);
+    putText(c, T('퀵칸', GOLD), L + 48, top + 24);
+    for (let i = 0; i < 4; i++) slot(L + 48 + i * 62, top + 60, d.quick[i], String(i + 1), i === 0);
+    putText(c, T(`가방 ${d.bag.length} / ${d.bagSlots}`, GOLD), L + 48, top + 140);
+    for (let i = 0; i < d.bagSlots; i++) slot(L + 48 + (i % 8) * 62, top + 176 + Math.floor(i / 8) * 62, d.bag[i]);
     const dx0 = L + 600;
     c.fillStyle = RIM_D; c.fillRect(dx0 - 24, top + 24, 2, bh - 48);
     const it = d.quick[0];
