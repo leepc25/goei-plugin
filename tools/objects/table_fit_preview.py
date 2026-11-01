@@ -1,4 +1,5 @@
 import sys, json, os
+ARGV=list(sys.argv)
 from pathlib import Path
 ROOT=Path('/home/user/goei-plugin'); sys.path.insert(0,str(ROOT/'game-src/action/testroom3'))
 os.environ['CHAIR_DIR']=str(ROOT/'game-src/art/objects/chairs_shell/fit')
@@ -7,9 +8,9 @@ import fit_chair as fc
 from PIL import Image, ImageDraw
 import numpy as np
 key='1.1_쟈알디'; cfg,_=fc.load(key); ims,vals=fc.values(cfg)
-TW=int(sys.argv[1]) if len(sys.argv)>1 else 120
+TH=int(ARGV[1]) if len(ARGV)>1 else 98
 tab=Image.open(ROOT/'game-src/action/objects/T02_기둥테이블_1배/unknown.png').convert('RGBA'); tab=tab.crop(tab.getbbox())
-sc=TW/tab.width; tab=tab.resize((TW,round(tab.height*sc)),Image.LANCZOS)
+sc=TH/tab.height; tab=tab.resize((round(tab.width*sc),TH),Image.LANCZOS)
 a=np.array(tab); a[:,:,3]=np.where(a[:,:,3]>128,255,0); tab=Image.fromarray(a)
 tab=tab.crop(tab.getbbox()); print('table',tab.size)
 out=[]
@@ -30,5 +31,5 @@ for lid,v in [('63','front'),('60','front'),('64','front'),('105','side'),('98',
     out.append(T)
 Z=2; Sh=Image.new('RGB',(sum(o.width for o in out)*Z,out[0].height*Z),(40,40,44)); x=0
 for o in out: Sh.paste(o.convert('RGB').resize((o.width*Z,o.height*Z),Image.NEAREST),(x,0)); x+=o.width*Z
-Sh.save(sys.argv[2] if len(sys.argv)>2 else '/mnt/project-files/hq-f3/now/table_t02_fit_x2.png')
-tab.save(ROOT/'game-src/art/objects/table_t02_120.png')
+Sh.save(ARGV[2] if len(ARGV)>2 else '/mnt/project-files/hq-f3/now/table_t02_fit_x2.png')
+tab.save(ROOT/'game-src/art/objects/table_t02_h106.png')
