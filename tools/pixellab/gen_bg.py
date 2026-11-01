@@ -12,6 +12,9 @@ from PIL import Image
 
 API = "https://api.pixellab.ai/v2"
 prompt_path, style_path, out_path, w, h = sys.argv[1], sys.argv[2], sys.argv[3], int(sys.argv[4]), int(sys.argv[5])
+# 보내기 전 3층 원본과 문장 대조 — 핵심 문장이 빠지면 보내지 않는다(2026-11-01 사용자)
+import subprocess as _sp
+if _sp.call([sys.executable, str(__import__('pathlib').Path(__file__).with_name('prompt_diff.py')), prompt_path]) != 0: sys.exit('요청문이 3층 원본 핵심 문장을 빠뜨림 — 중단')
 scale = float(sys.argv[6]) if len(sys.argv) > 6 else 0.5
 
 style = None
