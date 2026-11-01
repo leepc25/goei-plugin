@@ -246,20 +246,20 @@ export function drawCharWindow(c: CanvasRenderingContext2D, d: CharWindowData, t
         if (quickImg.complete && quickImg.naturalWidth) c.drawImage(quickImg, x, y, 100, 100); else well(x, y);
       } else well(x, y);
       if (it) {
-        putText(c, B(it.label.slice(0, 2)), x + 50, y + (k ? 36 : 30), 'center');
-        // 퀵슬롯은 칸 귀퉁이 쇠붙이를 피해 숫자를 안쪽으로
-        if (it.count > 1) putText(c, T(String(it.count), GOLD), x + (k ? 66 : 88), y + (k ? 68 : 66), 'right');
+        putText(c, B(it.label.slice(0, 2)), x + 50, y + (k ? 38 : 30), 'center');
+        // 퀵슬롯 개수 = 아래 테 빈 곳에 걸쳐서
+        if (it.count > 1) putText(c, T(String(it.count), GOLD), x + (k ? 50 : 88), y + (k ? 86 : 66), k ? 'center' : 'right');
       }
-      if (k) putText(c, T(k, GOLD), x + 20, y + 13);
+      if (k) putText(c, T(k, '#9fd7ff'), x + 50, y - 8, 'center'); // 퀵슬롯 번호 = 위 테 빈 곳, 하늘색(개수 금색과 구분)
       if (on) bracketsOnly(c, x - 6, y - 6, 112, 112, 22);
     };
     putText(c, T('퀵슬롯', GOLD), IX, top + 22);
     for (let i = 0; i < 4; i++) slot(IX + i * 118, top + 56, d.quick[i], String(i + 1), i === 0);
     // 퀵슬롯 등록·해제 안내(퀵슬롯 오른쪽 빈자리): 고른 채 1~4(패드 십자키) = 넣기, 같은 숫자 한 번 더 = 빼기
     putText(c, T('1~4  퀵슬롯 등록·해제', DIM), IX + 4 * 118 + 24, top + 90);
-    putText(c, T(`가방 ${d.bag.length} / ${d.bagSlots}`, GOLD), IX, top + 176);
+    putText(c, T(`가방 ${d.bag.length} / ${d.bagSlots}`, GOLD), IX, top + 206);
     const per = 6;
-    for (let i = 0; i < d.bagSlots; i++) slot(IX + (i % per) * 118, top + 212 + Math.floor(i / per) * 110, d.bag[i]);
+    for (let i = 0; i < d.bagSlots; i++) slot(IX + (i % per) * 118, top + 242 + Math.floor(i / per) * 110, d.bag[i]);
     const it = d.quick[0];
     if (it) {
       const y = strip(108);
