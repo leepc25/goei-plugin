@@ -71,14 +71,18 @@ SHEETS[6] = [
  "plain empty token", "plain empty token"]
 n = int(sys.argv[1]); items = SHEETS[n]
 import re
-def short(t):  # 2,000자 제한(422) — 앞의 agent 낱말은 머리말이 이미 말하므로 뺀다
-    t = re.sub(r"^agent's ", "his ", t); t = re.sub(r"^agent ", "", t); return t
+def short(t):  # 2,000자 제한(422) — 머리말은 1판 그대로 두고 칸 설명만 줄인다(앞 agent·관사·색 낱말 빼기)
+    t = re.sub(r"^agent's ", "his ", t); t = re.sub(r"^agent ", "", t)
+    t = re.sub(r"\b(red|blue|black)\s", "", t); t = re.sub(r"\b(a|an|the)\s", "", t); return t
 lst = "; ".join(f"{i+1} {short(t) if n > 1 else t}" for i, t in enumerate(items))
-ROWS = len(items) // 8
-desc = (f"pixel art icon sheet, 8x{ROWS} grid of {len(items)} single-color silver tokens, 64x64 each. "
-        "Each token is a thick 3D silver coin with a beveled rim and shading. "
-        "The same small agent with sunglasses is embossed in silver relief on every token, doing one action. Silver only. "
-        f"Left to right, top to bottom: {lst}. No text. Everything else is up to you.")
+assert len(items) == 32, "1판과 같은 512x256 8x4만 쓴다"
+# 1판(사용자 승인, sheet1_token.log) 머리말 글자 그대로 — 고치지 말 것
+desc = ("pixel art icon sheet, 8 columns x 4 rows of 32 single-color silver tokens, each 64x64, evenly spaced. "
+        "Each token is a thick 3D silver coin seen from the front with a visible beveled rim and shading, all silver. "
+        "The same small agent with sunglasses is embossed in silver relief on each token, doing one action. "
+        f"Silver only, no other colors. Left to right, top to bottom: {lst}. No text. Everything else is up to you.")
+assert len(desc) <= 2000, len(desc)
+ROWS = 4
 TAG = sys.argv[2] if len(sys.argv) > 2 else ""
 print(len(desc), desc, flush=True)
 body = {"description": desc, "image_size": {"width": 512, "height": 64 * ROWS}, "no_background": True}
