@@ -1,44 +1,51 @@
-"""관리국 본부 1층(lobby) 장면 원본 만들기 (2026-11-01, 사용자 「칸막이 있는 걸로 써」「가운데 부분 코드로 열리게 따」).
-바탕: game-src/art/pixellab-hq-20261031/hq_f1_p7_ext1R_fix4.png (944×424, 칸막이 없는 판: 키오스크가 바닥에 섬).
-칸막이: hq_f1_p7_ext1R_fix3.png(칸막이 있는 판)에서 바탕과 다른 픽셀만 오려 세 조각으로 → 왼쪽·오른쪽은 고정(못 지나감), 가운데는 gate(사람이 다가가면 코드로 열림).
-현관 = 왼쪽 옆벽 유리문 60~150·y120~330, 엘리베이터 = 오른쪽 벽 800~897·y145~327. 배경 2배 = 1888×848.
+"""관리국 본부 1층(lobby) 장면 원본 만들기 (2026-11-01, 사용자 「차단게이트 있는 판(1층_p7_오른쪽잇기) 써라」「가운데 코드로 열리게 따」).
+그림: game-src/art/pixellab-hq-20261031/hq_f1_p7_ext1R.png (944×424: 왼쪽 옆벽 유리 현관·안내데스크·차단게이트·오른쪽 벽 엘리베이터). 배경 2배 = 1888×848.
+게이트 유리 날개 2장만 오려 gate 조각으로(다가가면 열림 = 흐려져 사라짐). 바탕에서는 날개 자리를 오른쪽 바닥·벽 줄을 옮겨 채움(생성 0).
+게이트 몸통·기둥은 못 지나감(holes), 사람보다 앞이면 가림(cover). 통로 = 가운데 기둥과 끝 기둥 사이(y386~404, 1x).
+문: 현관 유리문 60~150·y120~330, 엘리베이터 800~897·y145~327.
 출력: game-src/mapedit/lobby/ → python3 tools/mapedit/import.py game-src/mapedit/lobby lobby"""
 import json
 from pathlib import Path
-from PIL import Image, ImageChops
+from PIL import Image, ImageDraw
 ROOT = Path(__file__).resolve().parents[2]
 ART = ROOT / 'game-src/art/pixellab-hq-20261031'
-OUT = ROOT / 'game-src/mapedit/lobby'; OUT.mkdir(parents=True, exist_ok=True)
+OUT = ROOT / 'game-src/mapedit/lobby'
+for f in OUT.glob('part_*.png'): f.unlink()
+OUT.mkdir(parents=True, exist_ok=True)
 K = 2
-base = Image.open(ART / 'hq_f1_p7_ext1R_fix4.png').convert('RGB'); base.save(OUT / 'hq_f1_strip.png')
-part = Image.open(ART / 'hq_f1_p7_ext1R_fix3.png').convert('RGB')
-W, H = base.width * K, base.height * K
-PY0, PY1, PBOT = 234, 310, 308          # 칸막이 세로 범위(1x), 발밑 깊이
-CUTS = [('part_l', 466, 530, False), ('part_gate', 530, 650, True), ('part_r', 650, 688, False)]
-objects, blocks = [], []
-for oid, x0, x1, gate in CUTS:
-    a = part.crop((x0, PY0, x1, PY1)); b = base.crop((x0, PY0, x1, PY1))
-    m = ImageChops.difference(a, b).convert('L').point(lambda v: 255 if v > 12 else 0)
-    # 칸막이 몸통(y234~291, x466~684)은 통째로 불투명, 그 아래는 차단봉 다리·받침만(가는 기둥 자리)
-    body = Image.new('L', a.size, 0); body.paste(255, (0, 0, min(x1, 684) - x0, 291 - PY0))
-    legs = Image.new('L', a.size, 0)
-    for lx0, lx1 in ((470, 490), (580, 604)):
-        if lx1 > x0 and lx0 < x1: legs.paste(255, (max(lx0, x0) - x0, 291 - PY0, min(lx1, x1) - x0, PY1 - PY0))
-    m = ImageChops.lighter(body, ImageChops.multiply(m, legs))
-    im = a.convert('RGBA'); im.putalpha(m)
-    im.save(OUT / f'{oid}.png')
-    objects.append({'id': oid, 'file': oid, 'x': x0 * K, 'y': PY0 * K, 'w': (x1 - x0) * K, 'h': (PY1 - PY0) * K, 'sortY': PBOT * K, **({'gate': True} if gate else {})})
-    if not gate:  # 고정 칸막이 발밑은 못 지나감
-        blocks.append({'poly': [[x0 * K, 292 * K], [x1 * K, 292 * K], [x1 * K, PBOT * K], [x0 * K, PBOT * K]], 'h': 999})
+orig = Image.open(ART / 'hq_f1_p7_ext1R.png').convert('RGB')
+W, H = orig.width * K, orig.height * K
+# 유리 날개 두 장(1x 다각형)
+FLAPS = [[(581, 285), (616, 299), (616, 366), (582, 350)], [(626, 299), (664, 310), (664, 395), (626, 372)]]
+mask = Image.new('L', orig.size, 0); md = ImageDraw.Draw(mask)
+for q in FLAPS: md.polygon(q, fill=255)
+from PIL import ImageFilter
+mask = mask.filter(ImageFilter.MaxFilter(3))  # 유리 가장자리 1px까지
+# 열린 바탕: 날개 자리를 같은 줄 x690~719 띠(소화기 반사 없는 바닥·벽)를 되풀이해 채움
+base = orig.copy(); bp = base.load(); op = orig.load(); mp = mask.load()
+for y in range(orig.height):
+    for x in range(orig.width):
+        if mp[x, y]: bp[x, y] = op[690 + (x - 570) % 30, y]
+base.save(OUT / 'hq_f1_strip.png')
+# 닫힌 날개 조각(원본 그대로)
+bx0, by0, bx1, by1 = mask.getbbox()
+flap = orig.crop((bx0, by0, bx1, by1)).convert('RGBA'); flap.putalpha(mask.crop((bx0, by0, bx1, by1)))
+flap.save(OUT / 'gate_flaps.png')
+objects = [{'id': 'gate_flaps', 'file': 'gate_flaps', 'x': bx0 * K, 'y': by0 * K, 'w': (bx1 - bx0) * K, 'h': (by1 - by0) * K, 'sortY': 400 * K, 'gate': True}]
+def rect(x0, y0, x1, y1): return [[x0 * K, y0 * K], [x1 * K, y0 * K], [x1 * K, y1 * K], [x0 * K, y1 * K]]
+# 가림(사람이 뒤에 서면 앞에 그림): 뒤 게이트·앞 게이트·가운데 기둥·끝 기둥
+for oid, r, sy in (('gate_back', (488, 252, 578, 326), 326), ('gate_front', (522, 262, 628, 352), 352), ('post_mid', (613, 290, 629, 386), 386), ('post_end', (661, 300, 680, 418), 417)):
+    objects.append({'id': oid, 'cover': [rect(*r)], 'sortY': sy * K})
+# 막힘(발 자리): 게이트 몸통 줄, 가운데 기둥, 끝 기둥
+blocks = [{'poly': rect(*r), 'h': 999} for r in ((485, 292, 628, 352), (612, 352, 630, 386), (660, 404, 680, 418))]
 def door(x0, x1, y0, y1, anim='none'): return {'x0': x0 * K, 'x1': x1 * K, 'y0': y0 * K, 'y1': y1 * K, 'anim': anim, 'behind': 'dark'}
 doors = {
     'main': {'kind': 'glass', 'x': 110 * K, 'y': 330 * K, 'to': 'street', 'toDoor': 'main', 'label': '현관', 'door': door(60, 150, 120, 330)},
     'elev': {'kind': 'elevator', 'x': 848 * K, 'y': 330 * K, 'label': '엘리베이터', 'door': door(800, 897, 145, 327)},
 }
-# 바닥(1x): 왼쪽 비스듬한 유리벽, 가운데 데스크 앞, 칸막이 뒤(키오스크 앞)까지, 오른쪽 비스듬한 벽
-floor = [[60, 338], [150, 306], [466, 306], [466, 292], [700, 292], [940, 334], [940, 418], [60, 418]]
+floor = [[60, 338], [150, 306], [700, 300], [940, 334], [940, 418], [60, 418]]
 m = {'file': 'hq_f1_strip', 'bgScale': K, 'w': W, 'h': H, 'under': False,
-     'floor': [[x * K, y * K] for x, y in floor], 'lane': [292 * K, 418 * K],
+     'floor': [[x * K, y * K] for x, y in floor], 'lane': [300 * K, 418 * K],
      'blocks': blocks, 'doors': doors, 'lamps': [], 'spots': [], 'objects': objects}
 (OUT / 'map.json').write_text(json.dumps(m, ensure_ascii=False, indent=1))
-print(W, H, list(doors), [o['id'] for o in objects])
+print(W, H, [o['id'] for o in objects])
