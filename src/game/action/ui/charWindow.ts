@@ -6,6 +6,9 @@
 import { hudArtImage, pixelIcon, pixelText, putText, type SkillIcon } from './pixelHud';
 import { kitPiece, kitSlice, nine } from './kit';
 import { CW_ART } from './charWindowArt';
+import { RANK_STAR, RANK_STAR_POS } from './rankStarArt';
+import { QUICK_SLOT } from './quickSlotArt';
+let quickImg: HTMLImageElement | null = null;
 
 // PixelLab 조각 한 장(kit_0.png: 큰 판·작은 판·탭·빈 퍽 자리)을 1배로 찍는다
 type ArtKey = keyof typeof CW_ART;
@@ -14,6 +17,15 @@ function art(k: ArtKey): HTMLImageElement | null {
   let im = cwImgs[k];
   if (!im) { im = new Image(); im.src = CW_ART[k].src; cwImgs[k] = im; }
   return im.complete && im.naturalWidth ? im : null;
+}
+// 랭크 별(등급 색): 뱃지 64px 기준 자리를 2배로 찍는다
+const starImgs: Partial<Record<keyof typeof RANK_STAR, HTMLImageElement>> = {};
+function rankStars(c: CanvasRenderingContext2D, grade: keyof typeof RANK_STAR, rank: number, x: number, y: number, z: number) {
+  if (rank < 2) return; // 랭크1 = 표시 없음
+  let im = starImgs[grade];
+  if (!im) { im = new Image(); im.src = RANK_STAR[grade]; starImgs[grade] = im; }
+  if (!im.complete || !im.naturalWidth) return;
+  for (const [sx, sy] of RANK_STAR_POS[rank >= 3 ? 3 : 2]) c.drawImage(im, x + sx * z, y + sy * z, im.naturalWidth * z, im.naturalHeight * z);
 }
 /** 9칸 늘리기 (조각 1도트 = k px) */
 function stretch(c: CanvasRenderingContext2D, k: ArtKey, x: number, y: number, w: number, h: number, z = 1): boolean {
@@ -37,12 +49,13 @@ export interface CharWindowData {
   skills: { key: string; label: string; icon: SkillIcon; name: string; off?: boolean }[];
   pick: { skill: number; desc: string[]; nums: string };
   /** 능력 (docs/퍽/퍽_목록_3판.json 그대로): 분류·효과·랭크·조건, 특성은 장점·대가 */
-  perks: { name: string; cat: string; effect: string; flavor?: string; rank?: [number, number]; cond?: string; cost?: string; badge?: CanvasImageSource | null; trait?: boolean }[];
+  perks: { name: string; cat: string; effect: string; flavor?: string; rank?: [number, number]; cond?: string; cost?: string; badge?: CanvasImageSource | null; trait?: boolean; grade?: '일반' | '희귀' | '특급' }[];
   perkSlots: number; perkPick: number;
   quick: { label: string; count: number }[]; bag: { label: string; count: number }[]; bagSlots: number;
   money: string;
 }
 
+const GRADE_COL = { 일반: '#d08a4e', 희귀: '#d6dce6', 특급: '#ffd66b' } as const; // 동·은·금 메달
 const INK = '#e6e4dc', DIM = '#7d8790', GOLD = '#ffd66b', UP = '#7fe08a';
 const EDGE_D = '#05070d', NAVY = '#101a36', NAVY_D = '#0a1126', RIM_L = '#aeb8c8', RIM_D = '#4a5468', SOCKET = '#070c1c';
 
@@ -53,19 +66,14 @@ function plate(c: CanvasRenderingContext2D, x: number, y: number, w: number, h: 
   c.fillStyle = RIM_L; c.fillRect(x + 2 * u, y, w - 4 * u, u); c.fillRect(x, y + 2 * u, u, h - 4 * u); c.fillRect(x + u, y + u, u, u);
   c.fillStyle = fill; c.fillRect(x + 2 * u, y + u, w - 4 * u, h - 2 * u); c.fillRect(x + u, y + 2 * u, w - 2 * u, h - 4 * u);
 }
-/** 고른 칸 표시: 금색 도트 모서리 네 개 */
-/** 고른 칸 표시: 뒤에 밝은 판(glow) + 금색 3px 테 + 굵은 모서리 꺾쇠 */
-function glow(c: CanvasRenderingContext2D, x: number, y: number, w: number, h: number) {
-  c.fillStyle = '#25397a'; c.fillRect(x, y, w, h);
-  c.fillStyle = '#30489a'; c.fillRect(x + 8, y + 8, w - 16, h - 16);
-}
-function corners(c: CanvasRenderingContext2D, x: number, y: number, w: number, h: number) {
-  c.fillStyle = EDGE_D; c.fillRect(x - 1, y - 1, w + 2, 5); c.fillRect(x - 1, y + h - 4, w + 2, 5); c.fillRect(x - 1, y - 1, 5, h + 2); c.fillRect(x + w - 4, y - 1, 5, h + 2);
-  c.fillStyle = GOLD; c.fillRect(x, y, w, 3); c.fillRect(x, y + h - 3, w, 3); c.fillRect(x, y, 3, h); c.fillRect(x + w - 3, y, 3, h);
-  c.fillStyle = '#fff3c4';
-  for (const [px, py, sx, sy] of [[x, y, 1, 1], [x + w, y, -1, 1], [x, y + h, 1, -1], [x + w, y + h, -1, -1]]) {
-    c.fillRect(sx > 0 ? px - 3 : px - 19, sy > 0 ? py - 3 : py - 3, 22, 6);
-    c.fillRect(sx > 0 ? px - 3 : px - 3, sy > 0 ? py - 3 : py - 19, 6, 22);
+/** 네 귀퉁이 꺾쇠만(바탕·이어진 선 없음): 어두운 테 + 금 + 밝은 안쪽 한 줄 */
+function bracketsOnly(c: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, L = 26, t = 6) {
+  for (const [sx, sy] of [[1, 1], [-1, 1], [1, -1], [-1, -1]]) {
+    const px = sx > 0 ? x : x + w, py = sy > 0 ? y : y + h;
+    const bar = (bx: number, by: number, bw: number, bh: number, col: string) => { c.fillStyle = col; c.fillRect(sx > 0 ? bx : bx - bw, sy > 0 ? by : by - bh, bw, bh); };
+    bar(px - 2 * sx, py - 2 * sy, L + 4, t + 4, EDGE_D); bar(px - 2 * sx, py - 2 * sy, t + 4, L + 4, EDGE_D);
+    bar(px, py, L, t, GOLD); bar(px, py, t, L, GOLD);
+    bar(px, py, L, 2, '#fff3c4'); bar(px, py, 2, L, '#fff3c4');
   }
 }
 
@@ -131,7 +139,7 @@ export function drawCharWindow(c: CanvasRenderingContext2D, d: CharWindowData, t
     putText(c, t, tx + 32, TOP + 8);
     tx += w + 8;
   }
-  putText(c, T('Q · E 탭   Tab 닫기', DIM), RX + RW, TOP + 10, 'right');
+  putText(c, T('Q · E 탭   ` 닫기', DIM), RX + RW, TOP + 10, 'right');
   const top = TOP + 50, bh = BOT - top, R = RX + RW;
   box(RX, top, RW, bh);
   const IX = RX + 32;            // 안쪽 왼쪽
@@ -163,13 +171,12 @@ export function drawCharWindow(c: CanvasRenderingContext2D, d: CharWindowData, t
     d.skills.forEach((k, i) => {
       const col = i % 3, row = Math.floor(i / 3);
       const x = IX + col * 246, y = top + 30 + row * 130;
-      if (i === d.pick.skill) glow(c, x - 8, y - 8, 116, 116);
       big(x, y);
       pixelIcon(c, k.icon, x + 50, y + 50, 4, k.off ? '#3b4148' : INK);
       putText(c, T(k.key, GOLD), x + 10, y + 6);
       putText(c, B(k.label, k.off ? '#4a525a' : INK), x + 114, y + 18);
       putText(c, T(k.name, DIM), x + 114, y + 60);
-      if (i === d.pick.skill) corners(c, x - 8, y - 8, 116, 116);
+      if (i === d.pick.skill) bracketsOnly(c, x - 8, y - 8, 116, 116, 22);
     });
     const pk = d.skills[d.pick.skill];
     let y = strip(286);
@@ -179,21 +186,41 @@ export function drawCharWindow(c: CanvasRenderingContext2D, d: CharWindowData, t
     d.pick.desc.forEach((l) => { putText(c, T(l), IX, y); y += 34; });
     putText(c, T(d.pick.nums, '#9fd7ff'), IX, y + 10);
   } else if (tab === '능력') {
-    const per = 5;
-    for (let i = 0; i < d.perks.length; i++) {
-      const x = IX + 8 + (i % per) * 146, y = top + 28 + Math.floor(i / per) * 146;
+    // 뱃지 칸: 보이는 줄 수만큼만 그리고, 넘치면 칸 안에서 줄 단위로 넘어간다(고른 뱃지가 늘 보이게)
+    const per = 5, cell = 146, rowH = 146, gy0 = top + 24, gyEnd = BOT - 232 - 4;
+    const rows = Math.ceil(d.perks.length / per), vis = Math.max(1, Math.floor((gyEnd - gy0 + 8) / rowH));
+    const pickRow = Math.floor(Math.max(0, d.perkPick) / per);
+    const first = Math.min(Math.max(0, pickRow - vis + 1), Math.max(0, rows - vis));
+    c.save(); c.beginPath(); c.rect(RX + 8, top + 12, RW - 16, gyEnd - top - 12); c.clip();
+    for (let i = first * per; i < Math.min(d.perks.length, (first + vis) * per); i++) {
+      const x = IX + 8 + (i % per) * cell, y = gy0 + (Math.floor(i / per) - first) * rowH;
       const p = d.perks[i];
-      if (i === d.perkPick) glow(c, x - 6, y - 6, 140, 140);
+      // 고른 칸 상자는 뱃지와 랭크 점을 함께 감싼다(점이 상자 테에 걸치지 않게)
       if (p.badge) c.drawImage(p.badge, x, y, 128, 128);
-      if (i === d.perkPick) corners(c, x - 6, y - 6, 140, 140);
+      // 랭크: 2 = 별 1개, 3 = 별 2개를 토큰 위 테두리 선 가운데에 겹친다(별 색 = 등급 동·은·금)
+      if (p.badge && p.rank && !p.trait) rankStars(c, p.grade ?? '희귀', p.rank[0], x, y, 2);
+      if (i === d.perkPick) bracketsOnly(c, x - 8, y - 10, 142, 140);
     }
+    c.restore();
+    if (rows > vis) {
+      // 스크롤 막대: 오른쪽 끝 얇은 홈 + 금색 손잡이
+      const sx = R - 26, sy = gy0 - 6, sh = vis * rowH - 8;
+      c.fillStyle = SOCKET; c.fillRect(sx, sy, 8, sh);
+      const kh = Math.max(24, Math.round(sh * vis / rows)), ky = sy + Math.round((sh - kh) * first / (rows - vis));
+      c.fillStyle = GOLD; c.fillRect(sx, ky, 8, kh);
+    }
+    // 능력이 없을 때(괴이 밖): 흐린 글자 한 줄만
+    if (!d.perks.length) putText(c, T('얻은 능력 없음', DIM), RX + RW / 2, top + (BOT - top) / 2 - 16, 'center');
     const pp = d.perks[d.perkPick];
     if (pp) {
       let y = strip(232);
       const nm = B(pp.name, pp.trait ? '#ff9a8a' : GOLD);
       putText(c, nm, IX, y);
       putText(c, T(pp.trait ? '특성' : pp.cat, DIM), IX + nm.width + 16, y + 8);
-      if (pp.rank && pp.rank[1] > 1) putText(c, T(`랭크 ${pp.rank[0]} / ${pp.rank[1]}`, GOLD), R - 32, y + 8, 'right');
+      // 오른쪽 끝: 등급(색) + 랭크(지금/최대)
+      let rx = R - 32;
+      if (pp.rank) { const rk = T(`랭크 ${pp.rank[0]} / ${pp.rank[1]}`, INK); putText(c, rk, rx, y + 8, 'right'); rx -= rk.width + 24; }
+      if (pp.grade) putText(c, B(pp.grade, GRADE_COL[pp.grade]), rx, y + 2, 'right');
       y += 50;
       if (pp.flavor) { putText(c, T(`「${pp.flavor}」`, '#c9c3b0'), IX, y); y += 40; }
       if (pp.trait) {
@@ -205,21 +232,34 @@ export function drawCharWindow(c: CanvasRenderingContext2D, d: CharWindowData, t
       }
     }
   } else {
+    // 가방 칸: 판에 파인 홈(위·왼쪽 어둡고 아래·오른쪽 밝은 테) — 퀵슬롯은 화면 HUD 퀵슬롯 그림 그대로라 둘이 구분된다
+    const well = (x: number, y: number, s = 100) => {
+      c.fillStyle = RIM_D; c.fillRect(x + 4, y + 4, s - 8, s - 8);
+      c.fillStyle = '#03050b'; c.fillRect(x + 4, y + 4, s - 8, 4); c.fillRect(x + 4, y + 4, 4, s - 8);
+      c.fillStyle = '#5d6880'; c.fillRect(x + 4, y + s - 8, s - 8, 4); c.fillRect(x + s - 8, y + 4, 4, s - 8);
+      c.fillStyle = SOCKET; c.fillRect(x + 8, y + 8, s - 16, s - 16);
+    };
     const slot = (x: number, y: number, it?: { label: string; count: number }, k?: string, on = false) => {
-      if (on) glow(c, x - 6, y - 6, 112, 112);
-      big(x, y);
+      if (k) {
+        // 퀵슬롯 = 칸 16안 15번(기술 칸과 다른 모양), 1도트 = 2px
+        if (!quickImg) { quickImg = new Image(); quickImg.src = QUICK_SLOT; }
+        if (quickImg.complete && quickImg.naturalWidth) c.drawImage(quickImg, x, y, 100, 100); else well(x, y);
+      } else well(x, y);
       if (it) {
-        putText(c, B(it.label.slice(0, 2)), x + 50, y + 30, 'center');
-        if (it.count > 1) putText(c, T(String(it.count), GOLD), x + 88, y + 66, 'right');
+        putText(c, B(it.label.slice(0, 2)), x + 50, y + (k ? 38 : 30), 'center');
+        // 퀵슬롯 개수 = 아래 테 빈 곳에 걸쳐서
+        if (it.count > 1) putText(c, T(String(it.count), GOLD), x + (k ? 50 : 88), y + (k ? 86 : 66), k ? 'center' : 'right');
       }
-      if (k) putText(c, T(k, GOLD), x + 10, y + 6);
-      if (on) corners(c, x - 6, y - 6, 112, 112);
+      if (k) putText(c, pixelText(k, '#9fd7ff', 16), x + 50, y - 5, 'center'); // 퀵슬롯 번호 = 위 테 빈 곳, 하늘색(개수 금색과 구분)
+      if (on) bracketsOnly(c, x - 6, y - 6, 112, 112, 22);
     };
     putText(c, T('퀵슬롯', GOLD), IX, top + 22);
     for (let i = 0; i < 4; i++) slot(IX + i * 118, top + 56, d.quick[i], String(i + 1), i === 0);
-    putText(c, T(`가방 ${d.bag.length} / ${d.bagSlots}`, GOLD), IX, top + 176);
+    // 퀵슬롯 등록·해제 안내(퀵슬롯 오른쪽 빈자리): 고른 채 1~4(패드 십자키) = 넣기, 같은 숫자 한 번 더 = 빼기
+    putText(c, T('1~4  퀵슬롯 등록·해제', DIM), IX + 4 * 118 + 24, top + 90);
+    putText(c, T(`가방 ${d.bag.length} / ${d.bagSlots}`, GOLD), IX, top + 206);
     const per = 6;
-    for (let i = 0; i < d.bagSlots; i++) slot(IX + (i % per) * 118, top + 212 + Math.floor(i / per) * 110, d.bag[i]);
+    for (let i = 0; i < d.bagSlots; i++) slot(IX + (i % per) * 118, top + 242 + Math.floor(i / per) * 110, d.bag[i]);
     const it = d.quick[0];
     if (it) {
       const y = strip(108);

@@ -44,6 +44,8 @@ export interface ShellOptions {
   pauseInfo?: () => string;
   /** 필드 가방 (일시정지 메뉴 「가방」, 필드에 있을 때만) */
   bag?: { available(): boolean; open(): void };
+  /** 통합창(` 키): 열려 있는 동안 키는 창이 먹고 게임은 멈춘다 */
+  charWindow?: { isOpen(): boolean; canOpen(): boolean; toggle(on?: boolean): void; key(code: string): void };
   /** 필드(봇 보조): 일시정지는 계속·설정·조작법·나가기만, 설정에서 전체 화면·NPC 대화 칸을 뺀다 (2026-10-23 사용자) */
   field?: { onExit: () => void; fullscreen?: { enter(kind: 'browser' | 'panel'): Promise<void>; exit(): Promise<void>; mode(): 'browser' | 'panel' | null } };
 }
@@ -127,6 +129,15 @@ export function mountGameShell(box: HTMLElement, o: ShellOptions = {}): Shell {
   };
   // 메뉴가 열려 있으면 모든 키를 메뉴가 먹는다. 패드 B(KeyE)는 뒤로
   input.capture = (code, down, src) => {
+    const cw = o.charWindow;
+    if (!menu.isOpen && cw && shell.mode === 'play') {
+      if (cw.isOpen()) {
+        // 열려 있으면 모든 키를 창이 먹는다: ` · Esc = 닫기, 나머지 = 탭·고르기
+        if (down) { if (code === 'Backquote' || code === 'Escape') cw.toggle(false); else cw.key(code); }
+        return true;
+      }
+      if (code === 'Backquote' && cw.canOpen()) { if (down) { input.releaseSource('kb'); input.releaseSource('pad'); cw.toggle(true); } return true; }
+    }
     if (!menu.isOpen) {
       // 터치 대사창 모드의 「취소」: 본부 창·대화창이 받게 그대로 보낸다 (일시정지를 열지 않는다)
       if (code === 'Escape' && src === 'touch' && touch.touchMode === 'dialog') return false;
@@ -141,7 +152,7 @@ export function mountGameShell(box: HTMLElement, o: ShellOptions = {}): Shell {
     return true;
   };
   input.attachKeyboard(o.keyTarget ?? window, {
-    prevent: (code) => code.startsWith('Arrow') || code === 'Space' || code === 'Tab' || code === 'Escape' || /^Key|^Digit|^Shift/.test(code),
+    prevent: (code) => code.startsWith('Arrow') || code === 'Space' || code === 'Tab' || code === 'Escape' || code === 'Backquote' || /^Key|^Digit|^Shift/.test(code),
   });
   stage.onResize(() => touch.layout());
 
@@ -232,7 +243,7 @@ export function mountGameShell(box: HTMLElement, o: ShellOptions = {}): Shell {
       touch.setVisible(m === 'play' || menu.isOpen);
     },
     get paused() {
-      return menu.isOpen || mode !== 'play';
+      return menu.isOpen || mode !== 'play' || !!o.charWindow?.isOpen();
     },
     get touchShown() {
       return touch.shown;

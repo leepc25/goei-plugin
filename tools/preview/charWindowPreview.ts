@@ -17,6 +17,26 @@ const load = (src: string) => new Promise<HTMLImageElement>((r) => { const im = 
   const c = cv.getContext('2d')!;
   c.fillStyle = '#1c2428'; c.fillRect(0, 0, 1280, 720);
   const tab = (window as unknown as { __tab: '능력치' }).__tab;
+  const BASE = [
+      { name: '3단 점프', cat: '몸놀림', flavor: '두 번째 점프 뒤에 허공을 한 번 더 밟았다. 물리팀이 아직 조사 중이다.', effect: '점프 +1회(2 → 3), 공중 좌우 이동 +40%', rank: [1, 1], grade: '일반', badge: jump },
+      { name: '체 단련', cat: '단련', flavor: '이삿날 사무실 책상을 혼자 옮겼다.', effect: '체 +2. 최대 체력이 늘고 받는 피해가 준다', rank: [2, 3], grade: '희귀', badge: vit },
+      { name: '무모함', cat: '특성', flavor: '방패는 바닥에 두고 왔다. 다시 주우러 갈 생각도 없다.', effect: '모든 피해 +20%', cost: '받는 피해 +15%', badge: reck, trait: true },
+    ];
+  // 스크롤 시험: 같은 견본 뱃지를 되풀이해 14개로
+  const many = (window as unknown as { __many?: boolean }).__many;
+  // 1판 실제 뱃지(64px 32개 중 앞 12개)로 보기
+  const W = window as unknown as { __sheet?: string; __sheetNames?: [string, string, string][] };
+  let SHEET: typeof BASE = [];
+  if (W.__sheet) {
+    const W2 = W as unknown as { __sheetB: string; __sheetG: string };
+    const shs = await Promise.all([W2.__sheetB, W.__sheet, W2.__sheetG].map(load)); // 일반 = 동, 희귀 = 은, 특급 = 금
+    SHEET = W.__sheetNames!.slice(0, 12).map(([name, eff, flavor], k) => {
+      const cv2 = document.createElement('canvas'); cv2.width = 64; cv2.height = 64;
+      cv2.getContext('2d')!.drawImage(shs[k % 3], (k % 8) * 64, Math.floor(k / 8) * 64, 64, 64, 0, 0, 64, 64);
+      return { name, cat: k < 7 ? '연타' : '강타', flavor, effect: eff, rank: [Math.floor(k / 3) % 3 + 1, 3] as [number, number], grade: (['일반', '희귀', '특급'] as const)[k % 3], badge: cv2 };
+    });
+  }
+  const PERKS = W.__sheet ? SHEET : (window as unknown as { __none?: boolean }).__none ? [] : many ? Array.from({ length: 14 }, (_, n) => BASE[n % 2]) : BASE;
   const draw = () => drawCharWindow(c, {
     name: '쟈알디', team: '종합대응팀 · 부장', state: '출동 중', face, body, hp: 830, maxHp: 1200,
     base: [
@@ -34,12 +54,9 @@ const load = (src: string) => new Promise<HTMLImageElement>((r) => { const im = 
       { key: 'D', label: '고유', icon: 'bolt', name: '근접 폭파' }, { key: 'F', label: '필살', icon: 'star', name: '보면 알아' },
     ],
     pick: { skill: 3, desc: ['장갑을 당겨 끼고 편 손바닥을 내지르면 손바닥 바로 앞 한 점이 터진다.', '맞은 적은 크게 날아가 쓰러진다. 약공 3타 뒤에 쓰면 띄워진 채 날아간다.', '내지르는 동안 슈퍼아머.'], nums: '판정 이능(지) · 쿨 6초 · 앞 0.5~2m' },
-    perks: [
-      { name: '3단 점프', cat: '몸놀림', flavor: '허공을 세 번 밟고 올라간다', effect: '점프 +1회(2 → 3), 공중 좌우 이동 +40%', rank: [1, 1], badge: jump },
-      { name: '체 단련', cat: '단련', flavor: '버티는 몸이 먼저 만들어진다', effect: '체 +1. 최대 체력이 늘고 받는 피해가 준다', rank: [1, 3], badge: vit },
-      { name: '무모함', cat: '특성', flavor: '방패를 던져 버리고 돌진한다', effect: '모든 피해 +20%', cost: '받는 피해 +15%', badge: reck, trait: true },
-    ],
-    perkSlots: 24, perkPick: 2,
+    perks: PERKS,
+    perkSlots: 24, perkPick: (window as unknown as { __sheet?: string }).__sheet ? 7 : 1,
+    ...((window as unknown as { __many?: boolean }).__many ? { perkPick: 12 } : {}),
     quick: [{ label: '붕대', count: 3 }, { label: '진통제', count: 1 }], bag: [{ label: '부적', count: 2 }, { label: '손전등', count: 1 }, { label: '열쇠', count: 1 }], bagSlots: 12,
     money: '₩140,000',
   }, tab);
