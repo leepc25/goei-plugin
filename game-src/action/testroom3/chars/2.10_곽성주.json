@@ -1,0 +1,1247 @@
+{
+ "key": "2.10_곽성주",
+ "name": "곽성주",
+ "dir": "E",
+ "color": "#7D8793",
+ "armed": true,
+ "anims": {
+  "1": {
+   "folder": "1",
+   "mirror": false,
+   "name": "평상 대기"
+  },
+  "2": {
+   "folder": "2",
+   "mirror": false,
+   "name": "개인 대기"
+  },
+  "3_0": {
+   "folder": "3_0",
+   "mirror": false,
+   "name": "전투 자세 잡기"
+  },
+  "3": {
+   "folder": "3",
+   "mirror": false,
+   "name": "전투 대기"
+  },
+  "W": {
+   "folder": "W",
+   "mirror": false,
+   "name": "무기 꺼내기"
+  },
+  "W_1": {
+   "folder": "W_1",
+   "mirror": false,
+   "name": "무기 대기"
+  },
+  "4": {
+   "folder": "4",
+   "mirror": false,
+   "name": "걷기"
+  },
+  "5": {
+   "folder": "5",
+   "mirror": false,
+   "name": "뛰기"
+  },
+  "6": {
+   "folder": "6",
+   "mirror": false,
+   "name": "제자리 점프"
+  },
+  "7": {
+   "folder": "7",
+   "mirror": false,
+   "name": "방향 점프"
+  },
+  "8": {
+   "folder": "8",
+   "mirror": false,
+   "name": "달리다 점프"
+  },
+  "9": {
+   "folder": "9",
+   "mirror": false,
+   "name": "약1"
+  },
+  "10": {
+   "folder": "10",
+   "mirror": false,
+   "name": "약2"
+  },
+  "11": {
+   "folder": "11",
+   "mirror": false,
+   "name": "약3"
+  },
+  "12": {
+   "folder": "12",
+   "mirror": false,
+   "name": "강"
+  },
+  "13": {
+   "folder": "13",
+   "mirror": false,
+   "name": "돌진 공격"
+  },
+  "14": {
+   "folder": "14",
+   "mirror": false,
+   "name": "점프 공격"
+  },
+  "15": {
+   "folder": "15",
+   "mirror": false,
+   "name": "원거리 공격"
+  },
+  "16": {
+   "folder": "16",
+   "mirror": false,
+   "name": "뒤 회피"
+  },
+  "16_1": {
+   "folder": "16_1",
+   "mirror": false,
+   "name": "앞 회피"
+  },
+  "17": {
+   "folder": "17",
+   "mirror": false,
+   "name": "막기"
+  },
+  "19": {
+   "folder": "19",
+   "mirror": false,
+   "name": "날아가 쓰러지기"
+  },
+  "20": {
+   "folder": "20",
+   "mirror": false,
+   "name": "일어나기"
+  },
+  "21": {
+   "folder": "21",
+   "mirror": false,
+   "name": "스턴"
+  },
+  "22": {
+   "folder": "22",
+   "mirror": false,
+   "name": "고유기술 「전원 내 뒤로」"
+  },
+  "23": {
+   "folder": "23",
+   "mirror": false,
+   "name": "충전 「제압 사격」 모으기"
+  },
+  "24": {
+   "folder": "24",
+   "mirror": false,
+   "name": "충전 방출"
+  },
+  "25": {
+   "folder": "25",
+   "mirror": false,
+   "name": "필살기 「후퇴는 없다」"
+  },
+  "26": {
+   "folder": "26",
+   "mirror": false,
+   "name": "섭취"
+  },
+  "27": {
+   "folder": "27",
+   "mirror": false,
+   "name": "줍기"
+  },
+  "28": {
+   "folder": "28",
+   "mirror": false,
+   "name": "응대"
+  },
+  "29": {
+   "folder": "29",
+   "mirror": false,
+   "name": "말하며 손짓"
+  },
+  "30": {
+   "folder": "30",
+   "mirror": false,
+   "name": "끄덕이기"
+  },
+  "31": {
+   "folder": "31",
+   "mirror": false,
+   "name": "고개 젓기"
+  },
+  "32": {
+   "folder": "32",
+   "mirror": false,
+   "name": "화내기"
+  },
+  "33": {
+   "folder": "33",
+   "mirror": false,
+   "name": "발견 반응"
+  },
+  "34": {
+   "folder": "34",
+   "mirror": false,
+   "name": "놀라기"
+  },
+  "35": {
+   "folder": "35",
+   "mirror": false,
+   "name": "기뻐하기"
+  },
+  "36": {
+   "folder": "36",
+   "mirror": false,
+   "name": "도망"
+  },
+  "37": {
+   "folder": "37",
+   "mirror": false,
+   "name": "뒷걸음질 (움츠리기)"
+  },
+  "37_1": {
+   "folder": "37_1",
+   "mirror": false,
+   "name": "뒷걸음질 반복"
+  },
+  "38": {
+   "folder": "38",
+   "mirror": false,
+   "name": "엎드려 기기"
+  },
+  "38_1": {
+   "folder": "38_1",
+   "mirror": false,
+   "name": "엎드려 기기 반복"
+  },
+  "39": {
+   "folder": "39",
+   "mirror": false,
+   "name": "주저앉기"
+  },
+  "41": {
+   "folder": "41",
+   "mirror": false,
+   "name": "웅크려 떨기"
+  },
+  "42": {
+   "folder": "42",
+   "mirror": false,
+   "name": "네발로 기기"
+  },
+  "42_1": {
+   "folder": "42_1",
+   "mirror": false,
+   "name": "네발로 기기 반복"
+  },
+  "18": {
+   "folder": "3",
+   "mirror": false,
+   "frames": [
+    1,
+    2,
+    1,
+    2,
+    1
+   ],
+   "name": "맞기 (fail → 전투 대기 1~2장 + 흔들림)"
+  }
+ },
+ "picks": {
+  "combat": 3,
+  "weapon": 4,
+  "apex": 4,
+  "run": 3,
+  "crawl4": 10
+ },
+ "loops": {
+  "1": [
+   1,
+   2,
+   3,
+   4,
+   5
+  ],
+  "3": [
+   1,
+   2,
+   3,
+   4
+  ],
+  "W_1": [
+   1,
+   2,
+   3,
+   4
+  ],
+  "4": [
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7,
+   8
+  ],
+  "5": [
+   1,
+   2,
+   3,
+   4
+  ],
+  "15": [
+   2,
+   3,
+   4,
+   5,
+   6
+  ],
+  "21": [
+   4,
+   5,
+   6,
+   7,
+   8
+  ],
+  "23": [
+   6,
+   7,
+   8
+  ],
+  "29": [
+   1,
+   2,
+   3,
+   4
+  ],
+  "37_1": [
+   2,
+   3,
+   4,
+   5,
+   6,
+   7,
+   8,
+   9
+  ],
+  "38_1": [
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7,
+   8
+  ],
+  "39": [
+   8,
+   9,
+   10,
+   11,
+   12
+  ],
+  "41": [
+   3,
+   4,
+   5,
+   6,
+   7,
+   8
+  ],
+  "42_1": [
+   2,
+   3,
+   4,
+   5,
+   6,
+   7,
+   8,
+   9
+  ],
+  "19": [
+   12
+  ]
+ },
+ "hit": {
+  "9": 5,
+  "10": 6,
+  "11": 4,
+  "12": 5,
+  "13": 3,
+  "14": 4
+ },
+ "gun": [
+  "W",
+  "W_1",
+  "15",
+  "22",
+  "23",
+  "24",
+  "25"
+ ],
+ "kick": [],
+ "ranged": {
+  "proj": {
+   "t": "proj",
+   "kind": "bullet",
+   "hit": {
+    "dmg": 7,
+    "kind": "light"
+   },
+   "spread": 0.12
+  },
+  "heat": true,
+  "_note": "미니건 연사(과열 있음)"
+ },
+ "skills_2판": {
+  "skill": {
+   "name": "전원 내 뒤로",
+   "anim": "22",
+   "fps": 8,
+   "armed": true,
+   "armorAll": true,
+   "events": [
+    {
+     "f": 2,
+     "fx": [
+      {
+       "t": "text",
+       "v": "전원 내 뒤로!",
+       "big": true
+      },
+      {
+       "t": "waves",
+       "n": 3,
+       "r": 70,
+       "color": "#ffcf9a"
+      }
+     ]
+    },
+    {
+     "f": 5,
+     "hold": 0.25,
+     "fx": [
+      {
+       "t": "shake",
+       "v": 6
+      },
+      {
+       "t": "buff",
+       "time": 4,
+       "label": "방벽 자세 · 정면 피해 -90%",
+       "color": "#8a8f98",
+       "edge": false
+      },
+      {
+       "t": "ring",
+       "at": "self",
+       "dx": -110,
+       "r": 110,
+       "time": 4,
+       "color": "rgba(160,170,180,.6)"
+      }
+     ]
+    }
+   ]
+  },
+  "charge": {
+   "name": "제압 사격",
+   "hold": "23",
+   "release": "24",
+   "armed": true,
+   "levels": [
+    0.5,
+    1.2
+   ],
+   "fire": 1,
+   "lv": {
+    "0": [
+     {
+      "t": "proj",
+      "kind": "bullet",
+      "hit": {
+       "dmg": 41,
+       "kind": "light"
+      },
+      "big": true
+     }
+    ],
+    "1": [
+     {
+      "t": "repeat",
+      "n": 20,
+      "every": 0.1,
+      "fx": [
+       {
+        "t": "proj",
+        "kind": "bullet",
+        "hit": {
+         "dmg": 3,
+         "kind": "light"
+        },
+        "spread": 0.15
+       }
+      ]
+     }
+    ],
+    "2": [
+     {
+      "t": "repeat",
+      "n": 40,
+      "every": 0.1,
+      "fx": [
+       {
+        "t": "proj",
+        "kind": "bullet",
+        "hit": {
+         "dmg": 2,
+         "kind": "light"
+        },
+        "spread": 0.5
+       }
+      ]
+     },
+     {
+      "t": "later",
+      "in": 4,
+      "fx": [
+       {
+        "t": "proj",
+        "kind": "orb",
+        "speed": 1200,
+        "size": 1.4,
+        "color": "#ffb347",
+        "hit": {
+         "dmg": 23,
+         "kind": "blow"
+        },
+        "end": [
+         {
+          "t": "blast",
+          "scale": 1.3
+         }
+        ]
+       },
+       {
+        "t": "text",
+        "v": "과열!"
+       }
+      ]
+     }
+    ]
+   }
+  },
+  "super": {
+   "name": "후퇴는 없다",
+   "sub": "「전원 내 뒤로!」",
+   "anim": "25",
+   "fps": 8,
+   "armed": true,
+   "armorAll": true,
+   "push": -120,
+   "events": [
+    {
+     "f": 2,
+     "fx": [
+      {
+       "t": "text",
+       "v": "후퇴는 없다!",
+       "big": true
+      }
+     ]
+    },
+    {
+     "f": 5,
+     "to": 10,
+     "rep": 5,
+     "d": 0.05,
+     "fx": [
+      {
+       "t": "proj",
+       "kind": "bullet",
+       "hit": {
+        "dmg": 5,
+        "kind": "light"
+       },
+       "spread": 0.6
+      }
+     ]
+    },
+    {
+     "f": 11,
+     "hold": 0.6,
+     "fx": [
+      {
+       "t": "repeat",
+       "n": 3,
+       "every": 0.25,
+       "fx": [
+        {
+         "t": "proj",
+         "kind": "orb",
+         "speed": 1300,
+         "size": 1.4,
+         "color": "#ffb347",
+         "hit": {
+          "dmg": 45,
+          "kind": "launch"
+         },
+         "end": [
+          {
+           "t": "blast",
+           "scale": 1.6
+          }
+         ]
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  }
+ },
+ "skills": {
+  "skill": {
+   "name": "전원 내 뒤로",
+   "anim": "22",
+   "fps": 8,
+   "armed": true,
+   "armorAll": true,
+   "events": [
+    {
+     "f": 2,
+     "fx": [
+      {
+       "t": "v",
+       "vfx": "x3-c-hit-spark-heavy",
+       "at": "body",
+       "dx": -10,
+       "dy": -80,
+       "scale": 1.82,
+       "tint": "#ffffff"
+      }
+     ]
+    },
+    {
+     "f": 5,
+     "hold": 0.25,
+     "fx": [
+      {
+       "t": "v",
+       "vfx": "x3-2.10-D-earth-wave",
+       "at": "front",
+       "dx": 250,
+       "scale": 1,
+       "r": 210,
+       "delay": 0.12,
+       "hit": {
+        "dmg": 270,
+        "kind": "heavy",
+        "vfx": "x3-c-hit-spark-heavy",
+        "vs": 0.6,
+        "tint": "#e8dcc8"
+       }
+      },
+      {
+       "t": "v",
+       "vfx": "x3-c-dust-puff",
+       "at": "front",
+       "dx": 30,
+       "scale": 1.2,
+       "tint": "#d6c9b0"
+      },
+      {
+       "t": "shake",
+       "v": 6
+      }
+     ]
+    }
+   ]
+  },
+  "charge": {
+   "name": "제압 사격",
+   "hold": "23",
+   "release": "24",
+   "armed": true,
+   "levels": [
+    0.5,
+    1.2
+   ],
+   "fire": 1,
+   "lv": {
+    "0": [
+     {
+      "t": "v",
+      "vfx": "x3-c-muzzle-flash",
+      "at": "hand",
+      "scale": 1.2
+     },
+     {
+      "t": "repeat",
+      "n": 4,
+      "every": 0.08,
+      "fx": [
+       {
+        "t": "proj",
+        "kind": "bullet",
+        "hit": {
+         "dmg": 19,
+         "kind": "light"
+        },
+        "spread": 0.05
+       }
+      ]
+     }
+    ],
+    "1": [
+     {
+      "t": "repeat",
+      "n": 20,
+      "every": 0.1,
+      "fx": [
+       {
+        "t": "proj",
+        "kind": "bullet",
+        "hit": {
+         "dmg": 8,
+         "kind": "light"
+        },
+        "spread": 0.45
+       }
+      ]
+     },
+     {
+      "t": "barrage",
+      "n": 12,
+      "every": 0.16,
+      "jitter": 160,
+      "each": [
+       {
+        "t": "v",
+        "vfx": "x3-2.10-S-bullet-dirt",
+        "scale": 0.8
+       }
+      ]
+     }
+    ],
+    "2": [
+     {
+      "t": "repeat",
+      "n": 30,
+      "every": 0.1,
+      "fx": [
+       {
+        "t": "proj",
+        "kind": "bullet",
+        "hit": {
+         "dmg": 5,
+         "kind": "light"
+        },
+        "spread": 0.2
+       }
+      ]
+     },
+     {
+      "t": "later",
+      "in": 0.1,
+      "fx": [
+       {
+        "t": "v",
+        "vfx": "x3-2.10-S-bullet-dirt",
+        "at": "front",
+        "dx": 170,
+        "scale": 0.8,
+        "r": 56.2,
+        "hit": {
+         "dmg": 29,
+         "kind": "light",
+         "stop": 0.03,
+         "shake": 3
+        }
+       },
+       {
+        "t": "v",
+        "vfx": "x3-2.10-S-bullet-dirt",
+        "at": "front",
+        "dx": 145,
+        "scale": 0.8,
+        "r": 45
+       }
+      ]
+     },
+     {
+      "t": "later",
+      "in": 0.38,
+      "fx": [
+       {
+        "t": "v",
+        "vfx": "x3-2.10-S-bullet-dirt",
+        "at": "front",
+        "dx": 200,
+        "scale": 0.8,
+        "r": 45,
+        "hit": {
+         "dmg": 29,
+         "kind": "light",
+         "stop": 0.03,
+         "shake": 3
+        }
+       },
+       {
+        "t": "v",
+        "vfx": "x3-2.10-S-bullet-dirt",
+        "at": "front",
+        "dx": 235,
+        "scale": 0.8,
+        "r": 45
+       }
+      ]
+     },
+     {
+      "t": "later",
+      "in": 0.66,
+      "fx": [
+       {
+        "t": "v",
+        "vfx": "x3-2.10-S-bullet-dirt",
+        "at": "front",
+        "dx": 290,
+        "scale": 0.8,
+        "r": 45,
+        "hit": {
+         "dmg": 29,
+         "kind": "light",
+         "stop": 0.03,
+         "shake": 3
+        }
+       },
+       {
+        "t": "v",
+        "vfx": "x3-2.10-S-bullet-dirt",
+        "at": "front",
+        "dx": 325,
+        "scale": 0.8,
+        "r": 45
+       }
+      ]
+     },
+     {
+      "t": "later",
+      "in": 0.94,
+      "fx": [
+       {
+        "t": "v",
+        "vfx": "x3-2.10-S-bullet-dirt",
+        "at": "front",
+        "dx": 380,
+        "scale": 0.8,
+        "r": 45,
+        "hit": {
+         "dmg": 29,
+         "kind": "light",
+         "stop": 0.03,
+         "shake": 3
+        }
+       },
+       {
+        "t": "v",
+        "vfx": "x3-2.10-S-bullet-dirt",
+        "at": "front",
+        "dx": 415,
+        "scale": 0.8,
+        "r": 45
+       }
+      ]
+     },
+     {
+      "t": "later",
+      "in": 1.22,
+      "fx": [
+       {
+        "t": "v",
+        "vfx": "x3-2.10-S-bullet-dirt",
+        "at": "front",
+        "dx": 470,
+        "scale": 0.8,
+        "r": 45,
+        "hit": {
+         "dmg": 29,
+         "kind": "light",
+         "stop": 0.03,
+         "shake": 3
+        }
+       },
+       {
+        "t": "v",
+        "vfx": "x3-2.10-S-bullet-dirt",
+        "at": "front",
+        "dx": 505,
+        "scale": 0.8,
+        "r": 45
+       }
+      ]
+     },
+     {
+      "t": "later",
+      "in": 1.5,
+      "fx": [
+       {
+        "t": "v",
+        "vfx": "x3-2.10-S-bullet-dirt",
+        "at": "front",
+        "dx": 560,
+        "scale": 0.8,
+        "r": 45,
+        "hit": {
+         "dmg": 29,
+         "kind": "light",
+         "stop": 0.03,
+         "shake": 3
+        }
+       },
+       {
+        "t": "v",
+        "vfx": "x3-2.10-S-bullet-dirt",
+        "at": "front",
+        "dx": 595,
+        "scale": 0.8,
+        "r": 45
+       }
+      ]
+     },
+     {
+      "t": "later",
+      "in": 1.78,
+      "fx": [
+       {
+        "t": "v",
+        "vfx": "x3-2.10-S-bullet-dirt",
+        "at": "front",
+        "dx": 650,
+        "scale": 0.8,
+        "r": 45,
+        "hit": {
+         "dmg": 29,
+         "kind": "light",
+         "stop": 0.03,
+         "shake": 3
+        }
+       },
+       {
+        "t": "v",
+        "vfx": "x3-2.10-S-bullet-dirt",
+        "at": "front",
+        "dx": 685,
+        "scale": 0.8,
+        "r": 45
+       }
+      ]
+     },
+     {
+      "t": "later",
+      "in": 2.06,
+      "fx": [
+       {
+        "t": "v",
+        "vfx": "x3-2.10-S-bullet-dirt",
+        "at": "front",
+        "dx": 740,
+        "scale": 0.8,
+        "r": 45,
+        "hit": {
+         "dmg": 29,
+         "kind": "light",
+         "stop": 0.03,
+         "shake": 3
+        }
+       },
+       {
+        "t": "v",
+        "vfx": "x3-2.10-S-bullet-dirt",
+        "at": "front",
+        "dx": 775,
+        "scale": 0.8,
+        "r": 45
+       }
+      ]
+     },
+     {
+      "t": "later",
+      "in": 2.34,
+      "fx": [
+       {
+        "t": "v",
+        "vfx": "x3-2.10-S-bullet-dirt",
+        "at": "front",
+        "dx": 830,
+        "scale": 0.8,
+        "r": 45,
+        "hit": {
+         "dmg": 29,
+         "kind": "light",
+         "stop": 0.03,
+         "shake": 3
+        }
+       },
+       {
+        "t": "v",
+        "vfx": "x3-2.10-S-bullet-dirt",
+        "at": "front",
+        "dx": 865,
+        "scale": 0.8,
+        "r": 45
+       }
+      ]
+     },
+     {
+      "t": "later",
+      "in": 2.62,
+      "fx": [
+       {
+        "t": "v",
+        "vfx": "x3-2.10-S-bullet-dirt",
+        "at": "front",
+        "dx": 920,
+        "scale": 0.8,
+        "r": 45,
+        "hit": {
+         "dmg": 49,
+         "kind": "down",
+         "stop": 0.03,
+         "shake": 3
+        }
+       },
+       {
+        "t": "v",
+        "vfx": "x3-2.10-S-bullet-dirt",
+        "at": "front",
+        "dx": 955,
+        "scale": 0.8,
+        "r": 45
+       }
+      ]
+     },
+     {
+      "t": "later",
+      "in": 3.1,
+      "fx": [
+       {
+        "t": "v",
+        "vfx": "x3-c-smoke",
+        "at": "self",
+        "dx": -50,
+        "scale": 1.1,
+        "tint": "#f4f4f4"
+       },
+       {
+        "t": "v",
+        "vfx": "x3-c-smoke",
+        "at": "self",
+        "dx": 50,
+        "scale": 1.1,
+        "tint": "#f4f4f4"
+       },
+       {
+        "t": "v",
+        "vfx": "x3-c-smoke",
+        "at": "self",
+        "dx": 0,
+        "dy": -30,
+        "scale": 1.3,
+        "tint": "#ffffff"
+       },
+       {
+        "t": "v",
+        "vfx": "x3-c-ground-shockwave",
+        "at": "self",
+        "scale": 0.93,
+        "tint": "#ffffff",
+        "under": true,
+        "r": 231.2,
+        "hit": {
+         "dmg": 75,
+         "kind": "heavy"
+        }
+       }
+      ]
+     }
+    ]
+   }
+  },
+  "super": {
+   "name": "후퇴는 없다",
+   "sub": "「너희는 쏜다.」",
+   "anim": "25",
+   "fps": 8,
+   "armed": true,
+   "armorAll": true,
+   "push": -120,
+   "events": [
+    {
+     "f": 2,
+     "hold": 0.4,
+     "fx": [
+      {
+       "t": "v",
+       "vfx": "x3-2.10-F-bullet-wall",
+       "at": "screen",
+       "w": 1.05,
+       "dy": -90
+      },
+      {
+       "t": "v",
+       "vfx": "x3-c-hit-spark-heavy",
+       "at": "body",
+       "dy": -120,
+       "scale": 2.6,
+       "tint": "#ffffff"
+      },
+      {
+       "t": "shake",
+       "v": 16
+      },
+      {
+       "t": "later",
+       "in": 0.45,
+       "fx": [
+        {
+         "t": "screen",
+         "spots": 14,
+         "every": 0.1,
+         "each": [
+          {
+           "t": "v",
+           "vfx": "x3-2.10-S-bullet-dirt",
+           "scale": 0.9
+          },
+          {
+           "t": "v",
+           "vfx": "x3-c-ricochet-spark",
+           "dy": -40,
+           "scale": 1
+          }
+         ]
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "f": 5,
+     "to": 10,
+     "rep": 5,
+     "d": 0.05,
+     "fx": [
+      {
+       "t": "proj",
+       "kind": "bullet",
+       "hit": {
+        "dmg": 13,
+        "kind": "light"
+       },
+       "spread": 0.6
+      },
+      {
+       "t": "v",
+       "vfx": "x3-c-dust-puff",
+       "at": "self",
+       "dx": -20,
+       "scale": 0.5,
+       "tint": "#d6c9b0"
+      }
+     ]
+    },
+    {
+     "f": 11,
+     "hold": 0.9,
+     "fx": [
+      {
+       "t": "v",
+       "vfx": "x3-c-hit-spark-heavy",
+       "at": "body",
+       "dy": -100,
+       "scale": 2.08,
+       "tint": "#ffffff"
+      },
+      {
+       "t": "repeat",
+       "n": 3,
+       "every": 0.22,
+       "fx": [
+        {
+         "t": "proj",
+         "kind": "orb",
+         "vfx": "x3-o-2.10-panzerfaust",
+         "dx": -160,
+         "dy": -60,
+         "speed": 1250,
+         "size": 0.8,
+         "life": 1.6,
+         "hit": {
+          "dmg": 107,
+          "kind": "launch",
+          "stop": 0.16,
+          "shake": 16
+         },
+         "end": [
+          {
+           "t": "v",
+           "vfx": "x3-c-explosion-large",
+           "scale": 0.45,
+           "boom": 3
+          },
+          {
+           "t": "v",
+           "vfx": "x3-c-ground-crack",
+           "scale": 0.5,
+           "under": true,
+           "fade": 0.6
+          }
+         ]
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  }
+ },
+ "_note": "손으로 다듬음(표 「테스트룸」 절·fail 목록·기술안 2장). 그림 값은 자동. 다시 자동으로: build.py --reset 2.10_곽성주",
+ "jitter": {
+  "18": 3
+ },
+ "start": {
+  "9": 4
+ },
+ "bal": {
+  "role": "tank",
+  "speed": "slow",
+  "gun": "rapid",
+  "atk": {
+   "9": 17,
+   "10": 18,
+   "11": 22,
+   "12": 30,
+   "13": 23,
+   "14": 25
+  },
+  "cd": {
+   "skill": 5
+  },
+  "shotDmg": 6,
+  "heatPer": 9,
+  "superType": "aoe"
+ },
+ "drop": [
+  "155"
+ ],
+ "crawlRev": true
+}
