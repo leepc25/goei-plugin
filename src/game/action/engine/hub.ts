@@ -287,6 +287,8 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
 
   const go = (sceneId: string, x: number, y?: number) => {
     fieldView.worldH = sceneOf(sceneId).painted ? PAINTED[sceneOf(sceneId).painted!]?.h ?? 700 : SCREEN_H;
+    // 맵 에디터 장면(dotK)이면 사람 배율을 그 장면 규격으로 (중림 브랜치 10-29, 11-01 옮김)
+    fieldView.charMul = sceneOf(sceneId).painted && PAINTED[sceneOf(sceneId).painted!]?.dotK ? PAINTED[sceneOf(sceneId).painted!].dotK! / CHAR_K : 1;
     pending = { scene: sceneId, x, y };
     fadeOut = FADE;
   };
@@ -390,7 +392,7 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
       if (solids.length && !(p as Player).seat) blockByProps([p as never], solids.filter((s) => !(s.h !== undefined && p.z >= s.h - 6)), scene?.lane ?? LANE);
       if (scene?.painted) {
         // 그림 층: 양 끝 옆벽·튀어나온 벽 바깥으로 못 간다
-        const q = clampPainted(scene.painted, p.x, p.y);
+        const q = clampPainted(scene.painted, p.x, p.y, p.z);
         if (q.x !== p.x || q.y !== p.y) a.movePlayer(q.x, q.y);
       }
       // E가 닿는 것 하나만 엔진 소품으로 (엔진은 x 거리만 보므로 깊이는 여기서 고른다)

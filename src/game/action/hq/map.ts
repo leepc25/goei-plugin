@@ -6,6 +6,7 @@ import type { PlaceId } from './data';
 import { ROOMS, mirror, type Room, type RoomFix, type RoomItem } from './rooms';
 import { PAINTED, PAINTED_LANE, doorX } from './painted';
 import { JR_ROOM_SPOTS } from './jrRooms.gen';
+import { MAPEDIT_SPOTS } from './mapedit.gen';
 
 export type SceneId =
   | 'street' | 'pasta' | 'lobby' | 'swat' | 'f2' | 'f3' | 'office' | 'interview' | 'lounge' | 'wc' | 'wc3'
@@ -137,6 +138,8 @@ const exitS = (to: SceneId, toDoor: string, key: string, west = false): HqDoor =
 /** 층 복도: 확정 배경 그림 한 장. 문 x는 그림의 문 가운데, 집기는 그림에서 오린 오브젝트의 바닥 상자 */
 function floorHall(id: SceneId, name: string, floor: HqScene['floor'], doors: Omit<HqDoor, 'x'>[], extra: Partial<HqScene> = {}): HqScene {
   const p = PAINTED[id];
+  // 맵 에디터로 만든 장면이면 앉는 자리도 그쪽 것
+  if (MAPEDIT_SPOTS[id]) extra = { ...extra, spots: MAPEDIT_SPOTS[id] };
   return {
     id, name, floor, look: id.startsWith('jr_') ? 'jr' : p.under ? 'labhall' : id === 'lobby' ? 'lobby' : 'hall', painted: id, length: p.w, lane: p.lane ?? PAINTED_LANE,
     doors: doors.map((d) => ({ ...d, x: doorX(id, d.id) })),
@@ -184,18 +187,18 @@ export const HQ_SCENES: HqScene[] = [
     { id: 'elev', kind: 'elevator' },
     { id: 'meeting', kind: 'door', locked: true, label: '회의실' },
     { id: 'interview', kind: 'door', to: 'interview', toDoor: 'out', needs: 'interview', label: '면담실' },
-    { id: 'stairs', kind: 'stairs', up: 'f3', down: 'lobby', label: '계단' },
+    // 3층은 새 그림이라 계단이 없다(본부 최소화: 엘리베이터만). 2층 계단은 새 2층 그림이 올 때까지 아래로만
+    { id: 'stairs', kind: 'stairs', down: 'lobby', label: '계단' },
   ]),
   room({ id: 'wc', name: '화장실', floor: '2F', look: 'life', doors: [exitS('f2', 'wc', 'wc', true)] }, 'wc', true),
   room({ id: 'swat', name: '진압팀', floor: '2F', look: 'office', doors: [exitS('f2', 'swat', 'swat', true)] }, 'swat', true),
   room({ id: 'interview', name: '면담실', floor: '2F', look: 'life', doors: [exitS('f2', 'interview', 'interview')] }, 'interview'),
+  // 3층은 새 본부 그림(PixelLab 2026-10-31~11-01, game-src/mapedit/hq_f3): 서→동 종합대응팀 유리문 · 엘리베이터 · 화장실(여) · 휴게실. 계단·탕비실 없음(본부 최소화, 사용자 10-31)
   floorHall('f3', '3층', '3F', [
-    { id: 'wc', kind: 'door', to: 'wc3', toDoor: 'out', label: '화장실' },
-    { id: 'pantry', kind: 'door', place: 'pantry', label: '탕비실' },
-    { id: 'lounge', kind: 'door', to: 'lounge', toDoor: 'out', label: '휴게실' },
-    { id: 'elev', kind: 'elevator' },
     { id: 'office', kind: 'glass', to: 'office', toDoor: 'out', label: '종합대응팀' },
-    { id: 'stairs', kind: 'stairs', down: 'f2', label: '계단' },
+    { id: 'elev', kind: 'elevator' },
+    { id: 'wc', kind: 'door', to: 'wc3', toDoor: 'out', label: '화장실(여)' },
+    { id: 'lounge', kind: 'glass', to: 'lounge', toDoor: 'out', label: '휴게실' },
   ]),
   room({ id: 'wc3', name: '화장실', floor: '3F', look: 'life', doors: [exitS('f3', 'wc', 'wc', true)] }, 'wc', true),
   room({ id: 'lounge', name: '휴게실', floor: '3F', look: 'life', doors: [exitS('f3', 'lounge', 'lounge')] }, 'lounge'),
@@ -226,7 +229,7 @@ export const HQ_SCENES: HqScene[] = [
   ]),
   // ── 중림 지하상가 (중립지역, 그림 4장). 지상 입구 → 지하 1층 앞골목 → (가운데 통로) 뒷골목 / (동쪽 계단) 지하 2층 ──
   floorHall('jr_entry', '중림 지하상가 입구', 'out', [
-    { id: 'west', kind: 'exit', side: 'S', to: 'street', toDoor: 'jr', label: '종로로 (임시)' },
+    { id: 'west', kind: 'exit', side: 'S', to: 'street', toDoor: 'jr', label: '버스 정류장' },
     { id: 'down', kind: 'door', to: 'jr_b1', toDoor: 'up', label: '지하상가로 내려가기' },
   ]),
   floorHall('jr_b1', '중림 지하상가 지하 1층', 'B1', [
@@ -246,17 +249,15 @@ export const HQ_SCENES: HqScene[] = [
   ]),
   // 가게 안 (GPT 빈 방 + GPT 가구, tools/jr/rooms.py)
   floorHall('jr_daebak', '대박 알선', 'B1', [{ id: 'out', kind: 'glass', to: 'jr_b1', toDoor: 'daebak', label: '나가기' }], { spots: JR_ROOM_SPOTS.jr_daebak }),
-  floorHall('jr_heolgap', '헐값 매입', 'B1', [{ id: 'out', kind: 'door', to: 'jr_alley', toDoor: 'heolgap', label: '나가기' }], { spots: JR_ROOM_SPOTS.jr_heolgap }),
+  floorHall('jr_heolgap', '헐값 매입', 'B1', [{ id: 'out', kind: 'exit', side: 'S', to: 'jr_alley', toDoor: 'heolgap', label: '나가기' }], { spots: JR_ROOM_SPOTS.jr_heolgap }),
   floorHall('jr_youngchang', '영창 컨설팅', 'B2', [{ id: 'out', kind: 'steel', to: 'jr_b2', toDoor: 'youngchang', label: '나가기' }], { spots: JR_ROOM_SPOTS.jr_youngchang }),
   floorHall('jr_songil', '손길 의원', 'B1', [
-    { id: 'out', kind: 'glass', to: 'jr_b1', toDoor: 'songil', label: '나가기' },
+    { id: 'out', kind: 'exit', side: 'S', to: 'jr_b1', toDoor: 'songil', label: '나가기' },
     { id: 'jinryo', kind: 'door', to: 'jr_jinryo', toDoor: 'out', label: '진료실' },
-    { id: 'wc', kind: 'door', locked: true, label: '화장실' },
-    { id: 'store', kind: 'door', locked: true, label: '창고' },
     { id: 'op', kind: 'door', to: 'jr_op', toDoor: 'out', label: '수술실' },
   ], { spots: JR_ROOM_SPOTS.jr_songil }),
-  floorHall('jr_jinryo', '진료실', 'B1', [{ id: 'out', kind: 'door', to: 'jr_songil', toDoor: 'jinryo', label: '대기실로' }], { spots: JR_ROOM_SPOTS.jr_jinryo }),
-  floorHall('jr_op', '수술실', 'B1', [{ id: 'out', kind: 'door', to: 'jr_songil', toDoor: 'op', label: '대기실로' }], { spots: JR_ROOM_SPOTS.jr_op }),
+  floorHall('jr_jinryo', '진료실', 'B1', [{ id: 'out', kind: 'exit', side: 'S', to: 'jr_songil', toDoor: 'jinryo', label: '대기실로' }], { spots: JR_ROOM_SPOTS.jr_jinryo }),
+  floorHall('jr_op', '수술실', 'B1', [{ id: 'out', kind: 'exit', side: 'S', to: 'jr_songil', toDoor: 'op', label: '대기실로' }], { spots: JR_ROOM_SPOTS.jr_op }),
 ];
 export const SCENE_BY_ID = Object.fromEntries(HQ_SCENES.map((s) => [s.id, s])) as Record<SceneId, HqScene>;
 

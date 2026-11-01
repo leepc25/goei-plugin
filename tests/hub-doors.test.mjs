@@ -7,7 +7,7 @@ const pad = {mx:0,my:0,run:false,evade:false,downDouble:false,held:new Set(),pre
 test('본부: 열린 문 앞에서 E 한 번 → 문 열기 → 암전 → 연결된 방 (이동 예약 반복 없음)', () => {
  const map=M.hqMap();let checked=0;
  for(const scene of map.scenes) for(const door of scene.doors.filter(d=>d.open && d.to)) {
-  const y=door.side==='S'?M.LANE_BOT-14:M.LANE_TOP+16;
+  const y=door.side==='S'?(scene.lane?.[1]??M.LANE_BOT)-14:(scene.lane?.[0]??M.LANE_TOP)+16; // 맵 에디터 장면은 자기 걷는 띠
   const host={map:()=>({...map,start:{scene:scene.id,x:door.x,y}}),openPlace(){},bark:()=>null,chooseFloor(){},sfx(){}};
   const stage=M.makeHub(host,()=>({scene:scene.id,x:door.x,y}));
   const w=new M.World({agent:'jyaldi',seed:1,stageId:'hq'},{},stage);
@@ -25,7 +25,7 @@ test('본부: 열린 문 앞에서 E 한 번 → 문 열기 → 암전 → 연�
 
 test('본부 그림 층: 계단 문 → 고른 층의 계단, 메뉴 문 → 문 열린 뒤 장소 창', () => {
  const map=M.hqMap();
- const f2=map.scenes.find(s=>s.id==='f2'),f3=map.scenes.find(s=>s.id==='f3');
+ const f2=map.scenes.find(s=>s.id==='f2');
  const run=(door,pick,sc=f2)=>{
   const y=M.LANE_TOP+16;let opened=null,asked=null;
   const host={map:()=>({...map,start:{scene:sc.id,x:door.x,y}}),openPlace(id){opened=id},bark:()=>null,chooseFloor(o,cb){asked=o;cb(pick)},sfx(){}};
@@ -37,12 +37,14 @@ test('본부 그림 층: 계단 문 → 고른 층의 계단, 메뉴 문 → 문
   return {w,stage,opened,asked};
  };
  const st=run(f2.doors.find(d=>d.id==='stairs'),1);
- assert.deepEqual(st.asked.map(o=>o.label),['3','1']);
+ assert.equal(st.asked,null); // 2층 계단은 아래(1층)뿐이라(3층 새 그림엔 계단 없음) 묻지 않고 바로 간다
  assert.equal(st.w.ended,'next');
  st.w.enterFloor(st.stage.nextFloor(st.w.run,st.w.floor,'next'));
  assert.equal(st.w.floor.id,'hq:lobby');
- const ch=run(f3.doors.find(d=>d.id==='pantry'),undefined,f3);
- assert.equal(ch.opened,'pantry');assert.equal(ch.w.ended,null);
+ // 3층은 새 그림(11-01)이라 장소 문(탕비실)이 없다 → 지하 주차장 보급실 문으로 같은 것을 본다
+ const b3=map.scenes.find(s=>s.id==='b3');
+ const ch=run(b3.doors.find(d=>d.id==='supply'),undefined,b3);
+ assert.equal(ch.opened,'supply');assert.equal(ch.w.ended,null);
  const wc=run(f2.doors.find(d=>d.id==='meeting'));
  assert.equal(wc.opened,null);assert.equal(wc.w.ended,null);
 });
