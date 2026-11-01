@@ -86,7 +86,7 @@ body = Image.open(D + 'stall_body_tall.png'); body_end = Image.open(D + 'stall_b
 endpost = Image.open(D + 'stall_endpost.png').convert('RGBA')
 doors = [Image.open(D + f'stall_door_{i}.png').convert('RGBA') for i in range(6)]
 BG = 'game-src/art/pixellab-hq-20261031/hq_restroom_m_final_v2_984x424.png'   # 13:41 소변기 칸막이 손질판
-FOOT, RIGHT, PITCH, N = 368, 398, 158, 3
+FOOT, RIGHT, PITCH, N = 368, 413, 158, 3   # 13:52 사용자 「대변기칸 땡겨 경계까지」: 끝 기둥 오른쪽 끝 = 소변기 벽 이음줄 x412
 xs = [RIGHT - 206 - PITCH * i for i in range(N)]
 y = FOOT - 252
 K = 334 / 234
