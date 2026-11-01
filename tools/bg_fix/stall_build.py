@@ -7,7 +7,7 @@ import numpy as np
 from PIL import Image
 SRC = 'game-src/art/pixellab-hq-20261031/hq_restroom_m_stalls_v2.png'
 OUT = 'game-src/art/objects/restroom/'
-X0, X1 = 14, 244
+X0, X1 = 14, 246   # 12:45 기둥 발판 오른쪽 테두리(x245)까지
 a = np.array(Image.open(SRC).convert('RGBA'))
 H = a.shape[0]
 kill = np.load(OUT + '_floor_kill_v2.npy')
@@ -41,7 +41,11 @@ for y in range(218, 256):
         if 104 <= x <= 121 and y <= 237: continue          # 휴지통
         if y >= 227 or L[y, x] > 85: body[y, x, 3] = 0
 body[234:238, 162:172, 3] = 0                               # 변기 오른쪽 끝 줄
-body[:, 244:] = 0                    # 오른쪽 칸 버림(가운데 기둥 오른쪽 끝 x243까지 둠)
+body[:, 245:] = 0                    # 오른쪽 칸 버림(가운데 기둥 오른쪽 테두리 x244까지 둠)
+# 12:45 사용자 「마감 엉망 원본 갖다 쓰면 될걸」: 기둥 발판은 원본 픽셀 그대로(테두리 포함, 바닥 y253~ 제외)
+body[245:253, 59:87] = a[245:253, 59:87]      # 왼쪽 기둥 발판
+body[230:253, 184:245] = a[230:253, 184:245]  # 가운데 기둥 아래·발판
+body[244:253, 245] = a[244:253, 245]          # 발판 오른쪽 테두리
 # 3) 닫힌 문짝: 오른쪽 칸 문(x236~343, y46~231, 경첩 포함)을 -159 옮김
 closed = np.zeros_like(a)
 src = a[46:231, 236:344]  # y230 = 문짝 아래 테두리 줄(12:36 사용자 지적으로 포함)
@@ -72,3 +76,11 @@ Image.fromarray(body[:, X0:X1]).save(OUT + 'stall_body.png')
 for i, f in enumerate(frames):
     Image.fromarray(f[:, X0:X1]).save(OUT + f'stall_door_{i}.png')
 print('ok', X1 - X0, H)
+
+# 12:38 사용자 「끝 부분은 원래 오른쪽 것 써도 되잖아」: 줄 맨 오른쪽 칸은 넓은 가운데 기둥 대신 원본 오른쪽 칸의 좁은 끝 기둥(x342~376)
+endb = body.copy(); endb[:, 186:] = 0
+endp = np.zeros_like(a); piece = a[:253, 342:377].copy()
+endp[:253, 186:221] = piece
+Image.fromarray(endb[:, X0:X1]).save(OUT + 'stall_body_end.png')
+Image.fromarray(endp[:, X0:X1]).save(OUT + 'stall_endpost.png')
+print('end ok')

@@ -5,13 +5,16 @@ from PIL import Image
 D = 'game-src/art/objects/restroom/'
 BG = 'game-src/art/pixellab-hq-20261031/hq_restroom_m_final_984x424.png'
 body = Image.open(D + 'stall_body.png').convert('RGBA')
+body_end = Image.open(D + 'stall_body_end.png').convert('RGBA')
+endpost = Image.open(D + 'stall_endpost.png').convert('RGBA')
 doors = [Image.open(D + f'stall_door_{i}.png').convert('RGBA') for i in range(6)]
 FOOT, RIGHT, PITCH, N = 368, 413, 158, 3      # 캔버스 x229 = 가운데 기둥 오른쪽 끝, 발 y252
-xs = [RIGHT - 229 - PITCH * i for i in range(N)]
+xs = [RIGHT - 206 - PITCH * i for i in range(N)]   # 맨 오른쪽 칸은 끝 기둥(캔버스 x172~206)으로 끝남
 y = FOOT - 252
 def render(states):
     bg = Image.open(BG).convert('RGBA')
-    for x in xs: bg.alpha_composite(body, (x, y))
+    for i, x in enumerate(xs): bg.alpha_composite(body_end if i == 0 else body, (x, y))
+    bg.alpha_composite(endpost, (xs[0], y))
     for x, s in zip(xs, states): bg.alpha_composite(doors[s], (x, y))
     big = bg.resize((bg.width * 2, bg.height * 2), Image.NEAREST)
     e = Image.open(sys.argv[2]); big.alpha_composite(e, (20, 840 - e.height))
