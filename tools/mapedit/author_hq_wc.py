@@ -27,6 +27,30 @@ body = Image.open(D / 'stall_body_tall_s80.png').convert('RGBA')
 body_end = Image.open(D / 'stall_body_end_tall_s80.png').convert('RGBA')
 endpost = Image.open(D / 'stall_endpost.png').convert('RGBA')
 doors = [Image.open(D / f'stall_door_{i}.png').convert('RGBA') for i in range(6)]
+
+
+def busy_door(d):
+    """문 표시등: 원본 = 빈 칸(녹색 불 켜짐·빨간 불 흐림). 사람이 있으면 녹색 불을 끄고 빨간 불을 켠다 (사용자 15:19)"""
+    a = np.array(d).copy()
+    r, g, b, al = [a[..., k].astype(int) for k in range(4)]
+    green = (g > r + 40) & (g > b + 20) & (al > 0)
+    red = (r > g + 50) & (r > b + 40) & (al > 0)
+    a[green, :3] = (37, 81, 50)       # 녹색 테두리 색 = 꺼진 녹색
+    a[red, :3] = (214, 52, 52)        # 켜진 빨간 불
+    return Image.fromarray(a)
+
+
+def free_door(d):
+    """빈 칸: 녹색 불만 켜고 빨간 불은 끈다(원본의 흐린 분홍이 켜진 것처럼 보여서)"""
+    a = np.array(d).copy()
+    r, g, b, al = [a[..., k].astype(int) for k in range(4)]
+    red = (r > g + 50) & (r > b + 40) & (al > 0)
+    a[red, :3] = (84, 52, 52)         # 꺼진 빨간 불
+    return Image.fromarray(a)
+
+
+doors_busy = [busy_door(d) for d in doors]
+doors = [free_door(d) for d in doors]
 LAP = 173                                # 앉은 줄 102 첫 장의 허벅지 윗선(캔버스 y) 기준값 — 80% 변기에서 본부 16명을 확대 그림으로 하나씩 앉혀 맞춘 대표값(toilets.ts LAP_BASE와 같게)
 SEAT = (133, 229 - (229 - 182) * 0.8)    # 칸 캔버스 안 변기 좌석 가운데(엉덩이): 100% 좌석 y182를 변기 밑(229) 기준 80%로
 
@@ -70,10 +94,15 @@ def build(sid, bg_file, right, n, cut, used, urinals, sinks, exit_x, label):
         names = []
         bbs = [d.getbbox() for d in doors]
         x0 = min(bb[0] for bb in bbs); y0 = min(bb[1] for bb in bbs); x1 = max(bb[2] for bb in bbs); y1 = max(bb[3] for bb in bbs)
-        for s, d in enumerate(doors):
+        busy = []
+        for s, (d, db) in enumerate(zip(doors, doors_busy)):
             c = d.crop((x0, y0, x1, y1)); c = c.resize((c.width * K, c.height * K), Image.NEAREST)
             nm = f'part_door{i}_{s}'; c.save(out / f'{nm}.png'); names.append(nm)
-        objects.append({'id': f'door{i}', 'file': names[0], 'frames': names, 'x': (x + x0) * K, 'y': (y + y0) * K, 'w': (x1 - x0) * K, 'h': (y1 - y0) * K,
+            c = db.crop((x0, y0, x1, y1)); c = c.resize((c.width * K, c.height * K), Image.NEAREST)
+            nm = f'part_door{i}_{s}_busy'; c.save(out / f'{nm}.png'); busy.append(nm)
+        # 표시등: 빈 칸 녹색, 사람 있으면 빨간색(busy). 쓰지 않는 칸(남자 맨 왼쪽)은 늘 빨간 불
+        objects.append({'id': f'door{i}', 'file': names[0], 'frames': names, 'busy': busy, **({} if i in used else {'locked': True}),
+                        'x': (x + x0) * K, 'y': (y + y0) * K, 'w': (x1 - x0) * K, 'h': (y1 - y0) * K,
                         'sortY': FOOT * K + 0.5 + (n - i) * 0.01})
     # 4) 걷는 바닥 윗선(1x, 기둥마다)
     line = floor_line(bg0.convert('RGB'), 380)

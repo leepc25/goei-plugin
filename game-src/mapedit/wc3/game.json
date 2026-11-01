@@ -477,6 +477,14 @@
      "me_wc3_door0_3",
      "me_wc3_door0_4",
      "me_wc3_door0_5"
+    ],
+    "busy": [
+     "me_wc3_door0_b0",
+     "me_wc3_door0_b1",
+     "me_wc3_door0_b2",
+     "me_wc3_door0_b3",
+     "me_wc3_door0_b4",
+     "me_wc3_door0_b5"
     ]
    },
    {
@@ -494,6 +502,14 @@
      "me_wc3_door1_3",
      "me_wc3_door1_4",
      "me_wc3_door1_5"
+    ],
+    "busy": [
+     "me_wc3_door1_b0",
+     "me_wc3_door1_b1",
+     "me_wc3_door1_b2",
+     "me_wc3_door1_b3",
+     "me_wc3_door1_b4",
+     "me_wc3_door1_b5"
     ]
    },
    {
@@ -511,6 +527,14 @@
      "me_wc3_door2_3",
      "me_wc3_door2_4",
      "me_wc3_door2_5"
+    ],
+    "busy": [
+     "me_wc3_door2_b0",
+     "me_wc3_door2_b1",
+     "me_wc3_door2_b2",
+     "me_wc3_door2_b3",
+     "me_wc3_door2_b4",
+     "me_wc3_door2_b5"
     ]
    },
    {
@@ -528,6 +552,14 @@
      "me_wc3_door3_3",
      "me_wc3_door3_4",
      "me_wc3_door3_5"
+    ],
+    "busy": [
+     "me_wc3_door3_b0",
+     "me_wc3_door3_b1",
+     "me_wc3_door3_b2",
+     "me_wc3_door3_b3",
+     "me_wc3_door3_b4",
+     "me_wc3_door3_b5"
     ]
    }
   ],
@@ -613,23 +645,47 @@
   "me_wc3_door0_3",
   "me_wc3_door0_4",
   "me_wc3_door0_5",
+  "me_wc3_door0_b0",
+  "me_wc3_door0_b1",
+  "me_wc3_door0_b2",
+  "me_wc3_door0_b3",
+  "me_wc3_door0_b4",
+  "me_wc3_door0_b5",
   "me_wc3_door1_0",
   "me_wc3_door1_1",
   "me_wc3_door1_2",
   "me_wc3_door1_3",
   "me_wc3_door1_4",
   "me_wc3_door1_5",
+  "me_wc3_door1_b0",
+  "me_wc3_door1_b1",
+  "me_wc3_door1_b2",
+  "me_wc3_door1_b3",
+  "me_wc3_door1_b4",
+  "me_wc3_door1_b5",
   "me_wc3_door2_0",
   "me_wc3_door2_1",
   "me_wc3_door2_2",
   "me_wc3_door2_3",
   "me_wc3_door2_4",
   "me_wc3_door2_5",
+  "me_wc3_door2_b0",
+  "me_wc3_door2_b1",
+  "me_wc3_door2_b2",
+  "me_wc3_door2_b3",
+  "me_wc3_door2_b4",
+  "me_wc3_door2_b5",
   "me_wc3_door3_0",
   "me_wc3_door3_1",
   "me_wc3_door3_2",
   "me_wc3_door3_3",
   "me_wc3_door3_4",
-  "me_wc3_door3_5"
+  "me_wc3_door3_5",
+  "me_wc3_door3_b0",
+  "me_wc3_door3_b1",
+  "me_wc3_door3_b2",
+  "me_wc3_door3_b3",
+  "me_wc3_door3_b4",
+  "me_wc3_door3_b5"
  ]
 }

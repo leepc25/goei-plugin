@@ -469,6 +469,14 @@
     "part_door0_4",
     "part_door0_5"
    ],
+   "busy": [
+    "part_door0_0_busy",
+    "part_door0_1_busy",
+    "part_door0_2_busy",
+    "part_door0_3_busy",
+    "part_door0_4_busy",
+    "part_door0_5_busy"
+   ],
    "x": 904,
    "y": 292,
    "w": 344,
@@ -485,6 +493,14 @@
     "part_door1_3",
     "part_door1_4",
     "part_door1_5"
+   ],
+   "busy": [
+    "part_door1_0_busy",
+    "part_door1_1_busy",
+    "part_door1_2_busy",
+    "part_door1_3_busy",
+    "part_door1_4_busy",
+    "part_door1_5_busy"
    ],
    "x": 588,
    "y": 292,
@@ -503,6 +519,14 @@
     "part_door2_4",
     "part_door2_5"
    ],
+   "busy": [
+    "part_door2_0_busy",
+    "part_door2_1_busy",
+    "part_door2_2_busy",
+    "part_door2_3_busy",
+    "part_door2_4_busy",
+    "part_door2_5_busy"
+   ],
    "x": 272,
    "y": 292,
    "w": 344,
@@ -519,6 +543,14 @@
     "part_door3_3",
     "part_door3_4",
     "part_door3_5"
+   ],
+   "busy": [
+    "part_door3_0_busy",
+    "part_door3_1_busy",
+    "part_door3_2_busy",
+    "part_door3_3_busy",
+    "part_door3_4_busy",
+    "part_door3_5_busy"
    ],
    "x": -44,
    "y": 292,

@@ -145,6 +145,8 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
   const sceneOf = (id: string): Scene => view!.scenes.find((s) => s.id === id) ?? view!.scenes[0];
   const openOf = (id: string) =>
     opening && opening.id === id ? Math.min(1, opening.t / opening.len) : closing && closing.id === id ? Math.max(0, 1 - closing.t / closing.len) : 0;
+  /** 화장실 칸 안에 사람이 있나 (문 표시등 빨간 불, 사용자 15:19) — NPC가 칸에 있거나 주인공이 그 칸을 쓰는 중 */
+  const stallBusy = (doorId: string) => live.some((q) => q.toilet?.door === doorId) || (!!pT && pT.door === doorId);
   const doorFx = (id: string) => ({ open: openOf(id), shake: rattle && rattle.id === id ? (rattle.t % 4 < 2 ? 3 : -3) * (1 - rattle.t / RATTLE_T) : 0 });
 
   /** 화장실 자리 쓰기 (E). 칸: 문 열림 → 좌석에 앉아 101 → 102 → 103 → 문 열고 나옴. 소변기(남자 줄 100이 있을 때)·세면대: 벽 보고 그 줄 */
@@ -236,7 +238,7 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
       encounters: [],
       platforms: sc.painted ? sc.boxes.filter((b) => b.solid && b.h > 0 && b.h < 400).map((b) => ({ x0: b.x - b.w / 2, x1: b.x + b.w / 2, y0: b.y - b.d, y1: b.y, h: b.h })) : undefined,
       depthLayers: sc.boxes.map((b, bi) => ({ y: b.y, occludedSilhouette: !sc.painted, x0: b.x - b.w / 2, x1: b.x + b.w / 2, draw: (c: CanvasRenderingContext2D) => {
-        if (sc.painted && hasHqField(sc.painted)) { drawHqFieldObject(c, sc.painted, b.kind, gateOpen.get(b.kind) ?? 0); return; }
+        if (sc.painted && hasHqField(sc.painted)) { drawHqFieldObject(c, sc.painted, b.kind, gateOpen.get(b.kind) ?? 0, stallBusy(b.kind)); return; }
         // 누가 앉은 의자는 앉은 사람이 자기 맞춤값으로 그린다 (주인공 = 엔진, 이름 인물 = drawCharSeat)
         if (b === sitChair || live.some((q) => q.seat?.box === bi)) return;
         drawBox(c, b, sc.look);

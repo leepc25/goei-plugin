@@ -92,6 +92,14 @@ def convert(scene_id: str, m: dict, files: dict) -> dict:
                     fi = Image.open(io.BytesIO(files[find(files, f)])).convert('RGBA').resize((o['w'], o['h']), Image.NEAREST)
                     fn = webp(fi, f'me_{scene_id}_{o["id"]}_{j}'); names.append(fn); fr.append(fn)
                 extra['frames'] = fr; name = fr[0]
+                # 표시등 빨간 불 장면(사람 있음) — 같은 차례
+                if o.get('busy'):
+                    bz = []
+                    for j, f in enumerate(o['busy']):
+                        fi = Image.open(io.BytesIO(files[find(files, f)])).convert('RGBA').resize((o['w'], o['h']), Image.NEAREST)
+                        fn = webp(fi, f'me_{scene_id}_{o["id"]}_b{j}'); names.append(fn); bz.append(fn)
+                    extra['busy'] = bz
+                if o.get('locked'): extra['locked'] = True
             objects.append({'id': o['id'], 'file': name, 'x': o['x'], 'y': o['y'], 'w': o['w'], 'h': o['h'], 'sortY': o['sortY'], **extra})
     doors = {}
     for did, d in (m.get('doors') or {}).items():
