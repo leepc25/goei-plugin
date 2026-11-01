@@ -181,31 +181,32 @@ export function drawCharWindow(c: CanvasRenderingContext2D, d: CharWindowData, t
     putText(c, T(d.pick.nums, '#9fd7ff'), IX, y + 10);
   } else if (tab === '능력') {
     // 뱃지 칸: 보이는 줄 수만큼만 그리고, 넘치면 칸 안에서 줄 단위로 넘어간다(고른 뱃지가 늘 보이게)
-    const per = 5, cell = 146, gy0 = top + 28, gyEnd = BOT - 232 - 8;
-    const rows = Math.ceil(d.perks.length / per), vis = Math.max(1, Math.floor((gyEnd - gy0 + 18) / cell));
+    const per = 5, cell = 146, rowH = 164, gy0 = top + 24, gyEnd = BOT - 232 - 4;
+    const rows = Math.ceil(d.perks.length / per), vis = Math.max(1, Math.floor((gyEnd - gy0 + 8) / rowH));
     const pickRow = Math.floor(Math.max(0, d.perkPick) / per);
     const first = Math.min(Math.max(0, pickRow - vis + 1), Math.max(0, rows - vis));
     c.save(); c.beginPath(); c.rect(RX + 8, top + 12, RW - 16, gyEnd - top - 12); c.clip();
     for (let i = first * per; i < Math.min(d.perks.length, (first + vis) * per); i++) {
-      const x = IX + 8 + (i % per) * cell, y = gy0 + (Math.floor(i / per) - first) * cell;
+      const x = IX + 8 + (i % per) * cell, y = gy0 + (Math.floor(i / per) - first) * rowH;
       const p = d.perks[i];
-      if (i === d.perkPick) glow(c, x - 6, y - 6, 140, 140);
+      // 고른 칸 상자는 뱃지와 랭크 점을 함께 감싼다(점이 상자 테에 걸치지 않게)
+      if (i === d.perkPick) glow(c, x - 6, y - 6, 140, 160);
       if (p.badge) c.drawImage(p.badge, x, y, 128, 128);
       // 랭크 점(뱃지 바로 아래): 최대 랭크만큼, 얻은 만큼 금색(최대 1이면 안 찍음)
       if (p.rank && p.rank[1] > 1) {
-        const n = p.rank[1], dw = 10, gap = 6, w0 = n * dw + (n - 1) * gap, dx = x + 64 - w0 / 2, dy = y + 132;
+        const n = p.rank[1], dw = 10, gap = 6, w0 = n * dw + (n - 1) * gap, dx = x + 64 - w0 / 2, dy = y + 134;
         for (let k = 0; k < n; k++) {
           const px = dx + k * (dw + gap);
           c.fillStyle = EDGE_D; c.fillRect(px - 2, dy - 2, dw + 4, dw + 4);
           c.fillStyle = k < p.rank[0] ? GOLD : '#2a3350'; c.fillRect(px, dy, dw, dw);
         }
       }
-      if (i === d.perkPick) corners(c, x - 6, y - 6, 140, 140);
+      if (i === d.perkPick) corners(c, x - 6, y - 6, 140, 160);
     }
     c.restore();
     if (rows > vis) {
       // 스크롤 막대: 오른쪽 끝 얇은 홈 + 금색 손잡이
-      const sx = R - 26, sy = gy0 - 6, sh = vis * cell - 12;
+      const sx = R - 26, sy = gy0 - 6, sh = vis * rowH - 8;
       c.fillStyle = SOCKET; c.fillRect(sx, sy, 8, sh);
       const kh = Math.max(24, Math.round(sh * vis / rows)), ky = sy + Math.round((sh - kh) * first / (rows - vis));
       c.fillStyle = GOLD; c.fillRect(sx, ky, 8, kh);
