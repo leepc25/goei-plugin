@@ -12,7 +12,7 @@ import { HQ_PLACE, drawFloor, drawHqWall, drawPropArt, drawHqTextureWall } from 
 import { drawHqDoorRound2 } from '../art/hqDoorRound2';
 import { drawCallLit, drawHqField, drawHqFieldLight, drawHqFieldObject, drawHqSigns, hasHqField } from '../art/hqField';
 import { charTop, drawCharClip, drawCharSeat, charArt, charFx, CHAR_K } from '../art/charPacks';
-import { persp, view as fieldView } from './view';
+import { FAR, persp, view as fieldView } from './view';
 import { blockByProps, clearSpot, type BlockProp } from './propBlock';
 import { PAINTED, clampPainted, doorReachY } from '../hq/painted';
 import { LANE_BOT, LANE_TOP, type HqBox, type HqDoor, type HqMapView, type HqScene, type HqSpot } from '../hq/map';
@@ -290,6 +290,8 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
     fieldView.worldH = sceneOf(sceneId).painted ? PAINTED[sceneOf(sceneId).painted!]?.h ?? 700 : SCREEN_H;
     // 맵 에디터 장면(dotK)이면 사람 배율을 그 장면 규격으로 (중림 브랜치 10-29, 11-01 옮김)
     fieldView.charMul = sceneOf(sceneId).painted && PAINTED[sceneOf(sceneId).painted!]?.dotK ? PAINTED[sceneOf(sceneId).painted!].dotK! / CHAR_K : 1;
+    // 줄 맨 뒤 배율: 장면 그림 원근에 맞춘 값(없으면 0.85, 사용자 11-01 15:03 「장면마다 변하게」)
+    fieldView.far = (sceneOf(sceneId).painted && PAINTED[sceneOf(sceneId).painted!]?.far) || FAR;
     pending = { scene: sceneId, x, y };
     fadeOut = FADE;
   };

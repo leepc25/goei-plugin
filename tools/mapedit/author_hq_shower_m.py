@@ -128,7 +128,10 @@ for i, (x, y) in enumerate(fl[1:-1]):
 floor = [[x * K, y * K] for x, y in [(0, H)] + step + [(W, H)]]
 door = {'kind': 'glass', 'x': 72 * K, 'y': 356 * K, 'locked': True, 'label': '샤워실',
         'door': {'x0': 30 * K, 'x1': 110 * K, 'y0': 120 * K, 'y1': 352 * K, 'anim': 'none', 'behind': 'dark'}}
-m = {'file': 'hq_shower_m_strip', 'bgScale': K, 'w': W * K, 'h': H * K, 'under': True, 'floor': floor,
+# 줄 맨 뒤 배율(사용자 15:03 「해봐」): 맨 앞은 게임 공통 크기 그대로, 맨 뒤(y300, 뒤 통로)에서 사람 키 ≈ 사물함(104px)보다 조금 작은 97px(1x)
+# = 194(2x) ÷ 게임 맨 앞 키 353(2x, 도트 247 × dotK 1.4292) ≈ 0.55
+FAR_HERE = 0.55
+m = {'file': 'hq_shower_m_strip', 'bgScale': K, 'far': FAR_HERE, 'w': W * K, 'h': H * K, 'under': True, 'floor': floor,
      'lane': [300 * K, H * K - 12], 'blocks': blocks, 'lamps': [], 'spots': [],
      'doors': {'shower': door, 'out': {'kind': 'exit', 'side': 'S', 'x': 316 * K, 'y': H * K - 12, 'label': '나가기'}},
      'objects': [to_cover(o, mm, sy) for o, mm, sy in objects]}

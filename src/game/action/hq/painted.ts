@@ -63,6 +63,8 @@ export interface PaintedScene {
   posts?: Record<string, [number, number]>;
   /** 사람 앞줄 도트 배율(월드 px / 도트). 세로 890 화면 기준 앞 1.5배를 장면 세로에 맞춘 값(1.5 × h / 890). 없으면 CHAR_K */
   dotK?: number;
+  /** 줄 맨 뒤 사람 배율(맨 앞 1 대비). 없으면 0.85(engine/view.ts FAR). 그림 원근이 장면마다 달라 그림에서 재서 넣는다 (사용자 2026-11-01 15:03) */
+  far?: number;
 }
 
 import { JR_ROOMS } from './jrRooms.gen';
