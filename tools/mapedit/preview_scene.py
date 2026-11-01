@@ -10,7 +10,8 @@ feet = [tuple(map(int, a.split(','))) for a in sys.argv[4:]]
 g = json.loads((ROOT / f'game-src/mapedit/{sid}/game.json').read_text())['scene']
 PACK = ROOT / 'game-pack/jr-field'
 bg = Image.open(PACK / f"{g['file']}.webp").convert('RGBA')
-spr = Image.open(ROOT / 'game-src/action/motion3/1.6_큐라스/1/00.png').convert('RGBA')
+import os
+spr = Image.open(os.environ.get('PREVIEW_SPRITE') or ROOT / 'game-src/action/motion3/1.6_큐라스/1/00.png').convert('RGBA')   # PREVIEW_SPRITE=투명 PNG 로 바꿀 수 있음(샤워실은 실제 샤워 그림)
 spr = spr.crop(spr.getbbox())
 
 

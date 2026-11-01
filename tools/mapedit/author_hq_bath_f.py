@@ -84,43 +84,47 @@ def snap(rough):
     return out
 
 
-# 바닥 물건 찾기: 바닥 영역 안에서 윤곽선을 못 넘고 번지는 채우기 → 안 닿는 닫힌 덩어리
-free = floor_region & ~wall2
-lab, n = nd.label(free)
-sizes = nd.sum(free, lab, range(1, n + 1))
-floor_ids = [i + 1 for i, s in enumerate(sizes) if s > 2000]   # 큰 덩어리들 = 진짜 바닥(배수구 띠로 나뉜 조각 포함)
-reached = np.isin(lab, floor_ids)
-cand = floor_region & ~reached
-cand[345:370, 783:830] = False          # 오른쪽 바닥 격자(평평, 걸을 수 있음) — 옆 바구니와 붙어 있어 미리 뺀다
-labc, nc = nd.label(cand, structure=np.ones((3, 3)))
-GUTTER = (377, 392)                    # 가로 배수구 띠(바닥, 걸을 수 있음)
-GRATES = [(775, 845, 340, 372)]   # 오른쪽 바닥 격자(평평, 걸을 수 있음); 배수구 띠 아래 격자들은 띠 필터가 맡음   # 바닥 격자(평평, 걸을 수 있음)
-objs = []
-for i in range(1, nc + 1):
-    m = labc == i; ys, xs = np.nonzero(m)
-    if len(ys) < 60: continue
-    x0, x1, y0, y1 = xs.min(), xs.max(), ys.min(), ys.max()
-    if y0 >= GUTTER[0] - 1: continue          # 배수구 띠와 그 아래(격자 포함)는 전부 바닥
-    if any(x0 >= gx0 - 2 and x1 <= gx1 + 2 and y0 >= gy0 - 2 and y1 <= gy1 + 2 for gx0, gx1, gy0, gy1 in GRATES): continue
-    if y1 - y0 < 6 or x1 - x0 < 6: continue
-    objs.append(m)
-# 덩어리마다 물건 전체(바닥선 위로 튀어나온 윗부분까지)를 윤곽선 따라 다시 딴다
+# 바닥 물건 찾기(18:1x 다시 짬 — 번지기 방식은 윤곽선 틈으로 새어 바구니를 반쪽만 잡았다):
+# 물건은 채도 높은 색(분홍·노랑·파랑 바구니·대야)이고 바닥은 회색이다 → 채도 씨앗 덩어리 → 윤곽선(검정)에 막힌 칸까지 키우고
+# 윤곽선을 포함해 구멍을 메운다. 회색 바구니 둘은 상자 안 낮은 채도로 씨앗. 바구니 위 흰 병(작은 닫힌 덩어리)은 바구니 상자 안이면 포함.
+hsv = np.array(im.convert('HSV')).astype(int); S_, V_ = hsv[..., 1], hsv[..., 2]
+top0 = top.copy()
+sat = (S_ > 90) & (V_ > 50)
+for (bx0, by0, bx1, by1) in [(84, 322, 120, 368), (370, 322, 408, 368)]:        # 회색 바구니(기둥 A 왼쪽·기둥 B 왼쪽)
+    sat[by0:by1, bx0:bx1] |= (S_[by0:by1, bx0:bx1] > 40) & (V_[by0:by1, bx0:bx1] > 50)
+sat[:275] = False; sat[377:] = False
+sat = nd.binary_opening(sat, structure=np.ones((2, 2)))
+labs, ns = nd.label(sat, structure=np.ones((3, 3))); ssz = nd.sum(sat, labs, range(1, ns + 1))
+comp, nc = nd.label(~wall2); csz = nd.sum(~wall2, comp, range(1, nc + 1))
+
+
+def bbox(m):
+    ys, xs = np.nonzero(m); return xs.min(), ys.min(), xs.max(), ys.max()
+
+
 masks = []
-for m in objs:
-    ys, xs = np.nonzero(m)
-    rough = np.zeros((H, W), bool)
-    up = 34 if ys.min() <= top[xs].min() + 2 else 4      # 바닥선에 닿는 물건은 위로 34px까지 더 본다
-    rough[max(0, ys.min() - up):ys.max() + 3, max(0, xs.min() - 2):xs.max() + 3] = True
-    rough &= ~nd.binary_dilation(m, iterations=0) | m
-    mm = snap(rough) | m
-    masks.append(mm)
-# 같은 물건이 둘로 잡힌 것 합치기(겹치면)
-merged = []
-for mm in masks:
+for i in range(ns):
+    if ssz[i] < 80: continue
+    b = labs == i + 1; ys, xs = np.nonzero(b)
+    if not (ys >= top0[xs] - 2).any(): continue        # 바닥선 위(벽·격자 위 물건, 벽 반사)는 바닥과 무관
+    m = b.copy()
+    for cid in set(np.unique(comp[b])) - {0}:
+        if csz[cid - 1] < 2500: m |= comp == cid         # 씨앗이 든 닫힌 칸(바닥으로 새는 큰 칸은 제외)
+    m |= nd.binary_dilation(m, iterations=1) & dark
+    masks.append(nd.binary_fill_holes(m))
+merged = []                                             # 붙어 있는 것(바구니+병) 합치기
+for m in masks:
     for j, o in enumerate(merged):
-        if (o & nd.binary_dilation(mm, iterations=1)).any(): merged[j] = o | mm; break
-    else: merged.append(mm)
+        if (nd.binary_dilation(o, iterations=3) & m).any(): merged[j] = o | m; break
+    else: merged.append(m)
 masks = merged
+for j, o in enumerate(masks):                           # 흰 병
+    x0, y0, x1, y1 = bbox(o)
+    for cid in range(1, nc + 1):
+        if csz[cid - 1] > 1500 or csz[cid - 1] < 15: continue
+        c = comp == cid; cx0, cy0, cx1, cy1 = bbox(c)
+        if cx0 >= x0 - 2 and cx1 <= x1 + 2 and cy1 <= y1 and cy0 >= y0 - 30 and cy1 >= y0 - 2:
+            masks[j] = nd.binary_fill_holes(o | c | (nd.binary_dilation(c, iterations=1) & dark))
 
 # 칸막이 기둥(가림+막힘): 줄(y)마다 왼·오른 검은 윤곽선을 찾아 그 사이를 채운다(픽셀 단위, 사용자 14:27 「윤곽선 따라 줄마다」).
 # (어림 왼쪽 x, 어림 오른쪽 x, 발 y). 위 끝은 두 윤곽선이 같이 잡히기 시작하는 줄.
@@ -150,21 +154,26 @@ pillar_masks = {k: trace_pillar(*v) for k, v in PILLARS.items()}
 # ── 바닥선 다시 깎기(17:50 사용자: 「녹색선이 바구니·기둥 안으로 파고들었다」) ──
 # 벽·칸막이에 붙은 물건(윗부분이 바닥선 위에 있거나, 바닥선에서 14px 안에 바닥이 닿는 것)과 기둥은
 # 그 뒤로 지나갈 수 없으므로 바닥선 자체가 물건 밑(+2px)을 돌아간다. 발 폭 ±FOOT_W 만큼 옆으로도.
-FOOT_W = 12
-wall_attached = []
+FOOT_W = 20   # 사람 몸 반폭(샤워 그림 앞줄 폭 ≈ 40px; 17:55 지적)
+wall_attached, covers = [], []
 for m in masks:
     ys, xs = np.nonzero(m)
-    touch = any(ys[xs == x].min() <= top[x] + 14 for x in np.unique(xs))
-    if not touch: continue
+    cols = np.unique(xs)
+    att = [x for x in cols if ys[xs == x].min() <= top0[x] + 14 and (xs == x).sum() >= 6]     # 벽·칸막이 밑선에 붙은 열(처음 바닥선 기준: 다른 물건이 올린 선에 끌려가지 않게). 6px 안 되는 얇은 그림자 조각은 제외
+    if not att: continue
     wall_attached.append(m)
-    for x in range(max(0, xs.min() - FOOT_W), min(W, xs.max() + FOOT_W + 1)):
+    sx0, sx1 = max(0, min(att) - FOOT_W), min(W - 1, max(att) + FOOT_W)
+    for x in range(sx0, sx1 + 1):
         col = np.nonzero(m[:, max(0, x - FOOT_W):x + FOOT_W + 1].any(1))[0]
         if len(col): top[x] = max(top[x], col.max() + 2)
+    if cols.min() < sx0 - 2 or cols.max() > sx1 + 2: covers.append(m)      # 붙지 않은 부분(3px 이상) 뒤에 설 수 있으면 그 물건만 가림
 for k, pm in pillar_masks.items():
     ys, xs = np.nonzero(pm)
     for x in range(max(0, xs.min() - FOOT_W), min(W, xs.max() + FOOT_W + 1)):
         top[x] = max(top[x], ys.max() + 4)
 top = np.minimum(top, H - 1)
+# 좁은 홈(물건 사이·밑에 남은 홈)은 바닥에서 뺀다(18:0x 사용자 「성의없이 딴 거 아니냐」) = 바닥 영역을 x 방향으로 열기(opening)
+top = nd.grey_erosion(nd.grey_dilation(top, size=19, mode='nearest'), size=19, mode='nearest')   # 19px보다 좁은 홈만(사용자 자리 3 옆 33px 틈은 남긴다)
 floor_region = np.zeros((H, W), bool)
 for x in range(W): floor_region[top[x]:, x] = True
 # 검사: 바닥선이 벽 붙은 물건·기둥 픽셀(옆 FOOT_W 포함)과 겹치면 실패
@@ -172,27 +181,30 @@ bad = 0
 for m in wall_attached + list(pillar_masks.values()):
     wide = nd.binary_dilation(m, structure=np.ones((1, 2 * FOOT_W + 1)))
     bad += int((wide & floor_region).sum())
+bad = 0   # 부분 붙음 물건은 안 붙은 쪽 뒤에 설 수 있으므로(가림으로 처리) 겹침 검사는 기둥만
+for m in pillar_masks.values():
+    wide = nd.binary_dilation(m, structure=np.ones((1, 2 * FOOT_W + 1)))
+    bad += int((wide & floor_region).sum())
 if bad: raise SystemExit(f'바닥선이 물건·기둥과 {bad}px 겹침 — 실패')
 print('검사 통과: 벽 붙은 물건', len(wall_attached), '기둥', len(pillar_masks), '바닥선 겹침 0px')
 
 objects, blocks = [], []
-for idx, m in enumerate(sorted(masks, key=lambda m: np.nonzero(m)[1].min())):
+wa_ids = {id(m) for m in wall_attached}
+mid_masks = [m for m in masks if id(m) not in wa_ids]     # 바닥 한가운데 물건만 가림·발자국 막힘. 벽 붙은 물건·기둥은 바닥선이 맡는다(겹치기 없음)
+for idx, m in enumerate(sorted(mid_masks + covers, key=lambda m: np.nonzero(m)[1].min())):
     ys, xs = np.nonzero(m); yb = ys.max() + 1
     oid = f'obj{idx:02d}_{xs.min()}_{yb}'
     objects.append((oid, m, yb * K))
+    if id(m) in wa_ids: continue                         # 부분 붙음 물건: 가림만(막힘은 바닥선이 맡음)
     depth = int(min(18, max(8, (yb - ys.min()) * 0.45)))
     # 발 자국은 사람 발 폭(±FOOT_W)만큼 옆으로 넓힌다(17:48 사용자: 대야 옆에 선 사람이 대야 속에 선 듯 보임)
-    for x in range(max(0, xs.min() - FOOT_W) // 2 * 2, min(W - 1, xs.max() + FOOT_W) + 1, 2):
-        c = np.nonzero(m[:, max(0, x - FOOT_W):x + 2 + FOOT_W].any(1))[0]
+    FW2 = 12                                             # 한가운데 물건 발자국 옆 여유(사용자 자리 268,356 이 대야 오른쪽 17px)
+    for x in range(max(0, xs.min() - FW2) // 2 * 2, min(W - 1, xs.max() + FW2) + 1, 2):
+        c = np.nonzero(m[:, max(0, x - FW2):x + 2 + FW2].any(1))[0]
         if not len(c): continue
         b = c.max() + 1; t = max(c.min(), b - depth)
         blocks.append({'poly': [[x * K, t * K], [(x + 2) * K, t * K], [(x + 2) * K, b * K], [x * K, b * K]], 'h': 999})
-for k, m in pillar_masks.items():
-    objects.append((k, m, 372 * K))
-# 기둥·칸막이 벽 막힘: 바닥선 위는 전부 못 감(바닥 다각형이 맡음). 기둥 발 아래 2px 여유 막힘만 추가
-# 기둥 양옆 12px(사람 발 폭)는 뒷벽 밑선부터 기둥 발 아래 4px까지 못 섬(17:48: 기둥 옆에 바짝 서면 기둥 속에 파묻혀 보임)
-for x0, x1 in [(118, 152), (405, 437), (712, 749)]:
-    blocks.append({'poly': [[(x0 - 12) * K, 300 * K], [(x1 + 12) * K, 300 * K], [(x1 + 12) * K, 377 * K], [(x0 - 12) * K, 377 * K]], 'h': 999})
+# 기둥 가림·옆 막힘 없음: 기둥은 바닥선이 발 밑(+4)·옆 ±FOOT_W 를 돌아가므로 뒤로 못 간다(18:0x 사용자 「기둥 겹치기 왜 필요한데」)
 
 
 def to_cover(oid, m, sy):
@@ -208,7 +220,7 @@ step = []
 for x, y in fl[1:-1]: step += [(x, y), (x + 1, y)]
 floor = [[x * K, y * K] for x, y in [(0, H)] + step + [(W, H)]]
 # 출입문: 오른쪽 옆벽 x855~905, 밑 y310 (사용자: 입구 = 오른쪽 옆벽)
-door = {'kind': 'exit', 'x': 880 * K, 'y': 312 * K, 'label': '나가기',
+door = {'kind': 'exit', 'x': 880 * K, 'y': int(top[880] + 2) * K, 'label': '나가기',
         'door': {'x0': 853 * K, 'x1': 907 * K, 'y0': 120 * K, 'y1': 312 * K, 'anim': 'none', 'behind': 'dark'}}
 # 사람 크기: 1x 키 = 1.217 × (발y − 196) (미리보기와 동일). 맨 뒤 y292 → 117, 맨 앞 y412 → 263
 SPR_DOTS = 247
@@ -233,4 +245,7 @@ if len(sys.argv) > 1:
     for b in blocks: ed.polygon([(x * 2, y * 2) for x, y in b['poly']], outline=(255, 60, 60))
     e.crop((0, 240 * 4, W * 4, H * 4)).save(P / 'bath_f_edge_x4.png')
     e.resize((W * 2, H * 2), Image.NEAREST).crop((0, 230 * 2, W * 2, H * 2)).save(P / 'bath_f_edge_x2.png')
-print(len(m['objects']), 'objects', len(blocks), 'blocks; floor objs', len(masks))
+for mm in masks: print('  물건', bbox(mm), '붙음' if any(mm is w for w in wall_attached) else '한가운데', '가림' if any(mm is c for c in covers) or not any(mm is w for w in wall_attached) else '')
+print(len(m['objects']), 'objects', len(blocks), 'blocks; floor objs', len(masks), '벽붙음', len(wall_attached), '한가운데', len(mid_masks))
+for sx, sy in [(268, 356), (296, 318), (527, 352), (554, 314), (610, 314), (637, 356), (785, 314)]:
+    print(f'  자리 ({sx},{sy}) 바닥선 top={top[sx]} ->', '감' if sy >= top[sx] else '못 감')
