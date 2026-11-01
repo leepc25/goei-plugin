@@ -67,7 +67,11 @@ def raise_toilet(p_in, p_out):
                 elif yy > edge - 0.5: b[yy, xx] = [1, 1, 1, 255]
             elif yy < 227:
                 b[yy, xx, 3] = 0
-    bm = brush[..., 3] > 0
+    # 13:46 「여기 정확하지 못하다」: 솔 네모의 왼쪽 벽 조각은 빼고, 줄마다 첫 검은 윤곽선(x167~)부터만 솔로 친다
+    bm = np.zeros(brush.shape[:2], bool)
+    for r in range(brush.shape[0]):
+        dk = [c for c in range(1, brush.shape[1]) if brush[r, c, 3] > 0 and brush[r, c, :3].mean() < 30]
+        if dk: bm[r, dk[0]:] = brush[r, dk[0]:, 3] > 0
     BR = 5                                              # 13:44 「공중에 떠 있다」: 솔 밑이 바닥(캔버스 y226)에 닿게 5px만 올림
     sub = b[212 - BR:233 - BR, 166:173]
     sub[bm] = brush[bm]
