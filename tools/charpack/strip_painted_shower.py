@@ -20,6 +20,13 @@ def masks(fr):
     on = al > 0
     gray = on & (abs(r - g) < 26) & (abs(g - b) < 26) & (r > 60) & (r < 240)
     blue = on & (b > r + 40) & (b > 140) & (g > 110)
+    white = on & (r > 195) & (g > 210) & (b > 220) & (b >= r - 5)          # 물줄기 하이라이트(흰 점): 하늘색 옆에 붙은 것만
+    blue = blue | (white & ndimage.binary_dilation(blue, iterations=2))
+    # 머리카락 속 옅은 물 점: 푸른 기운이 있고 양옆보다 확 밝은 픽셀(1~2px)
+    lum = (r + g + b) / 3
+    left = np.roll(lum, 1, axis=1); right = np.roll(lum, -1, axis=1)
+    pale = on & (b > r + 12) & (b > 120) & (lum > np.minimum(left, right) + 35)
+    blue = blue | pale
     return on, gray, blue
 removed = 0
 for fi in (frames if frames is not None else range(a['n'])):
