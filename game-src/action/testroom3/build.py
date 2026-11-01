@@ -246,7 +246,10 @@ def life_line(lid):
 # 샤워 세트 2판(_test/<키>/샤워2_*): A 옷 벗기 → B 맨몸 걷기 · D 물 맞으며 쉬기 · E 몸 씻기(반복), 옷 입기 = A 거꾸로 (사용자 10-28: 테스트룸에서 시험)
 SHOWER = {"A": "샤워 옷 벗기", "B": "샤워 맨몸 걷기", "D": "샤워 물 맞으며 쉬기", "E": "샤워 몸 씻기",
           # 샤워 중 피격·반응(10-31): 맞기 · 가린 채 뛰기 · 쓰러지기 · 일어나기 · 웅크리기 · 소리치기
-          "S1": "샤워 중 맞기", "S2": "샤워 가린 채 뛰기", "S3": "샤워 중 쓰러지기", "S4": "샤워 중 일어나기", "S5": "샤워 가린 채 웅크리기", "S6": "샤워 가린 채 소리치기"}
+          "S1": "샤워 중 맞기", "S2": "샤워 가린 채 뛰기", "S3": "샤워 중 쓰러지기", "S4": "샤워 중 일어나기", "S5": "샤워 가린 채 웅크리기", "S6": "샤워 가린 채 소리치기",
+          # 맨몸 피격 7줄(10-31 뽑음, 11-01 전수점검·44줄 다시 뽑음, 125명): G 경계 자세(반복, 첫 장은 옷 벗기에서 넘어오는 선 자세라 반복에서 뺌) ·
+          # H1 배 맞기 · H2 가슴 맞기(튕김) · H3 날아가 쓰러지기 · H4 누운 채 맞기 · H5 일어나기(끝 = G) · H6 가린 채 도망(반복)
+          "G": "맨몸 경계 자세", "H1": "맨몸 배 맞기", "H2": "맨몸 가슴 맞기", "H3": "맨몸 날아가 쓰러지기", "H4": "맨몸 누운 채 맞기", "H5": "맨몸 일어나기", "H6": "맨몸 가린 채 도망"}
 def shower_anims(key):
     d = M3 / "_test" / key
     if not d.exists(): return {}
@@ -254,6 +257,11 @@ def shower_anims(key):
     side = (json.loads(tj.read_text()).get(key) or {}).get("dir", "east") if tj.exists() else "east"
     return {f"SH_{s}": {"folder": f"샤워2_{s}", "src": "test", "mirror": side == "west", "name": n}
             for s, n in SHOWER.items() if any((d / f"샤워2_{s}").glob("[0-9][0-9].png"))}
+def shower_loops(key, anims):
+    """맨몸 경계 자세(SH_G) 반복 = 2번 장부터(1번 장은 선 자세, 11-01 전수점검)"""
+    if "SH_G" not in anims: return {}
+    n = len(list((M3 / "_test" / key / "샤워2_G").glob("[0-9][0-9].png")))
+    return {"SH_G": list(range(2, n + 1))} if n > 2 else {}
 
 
 def auto_cfg(ch):
@@ -293,7 +301,7 @@ def auto_cfg(ch):
         "anims": anims,
         "picks": {"combat": pidx("전투 자세 장", "3_0", 4), "weapon": pidx("무기 자세 장", "W", 4), "apex": pidx("방향 점프 꼭대기 장", "7", 4),
                   "run": pidx("뛰기 한 장", "5", 2), "crawl4": pidx("네발로 기기 한 장", "42", 6)},
-        "loops": {**{k: v for k, v in loops.items() if v != "all"}, **pingpong(key, anims)},
+        "loops": {**{k: v for k, v in loops.items() if v != "all"}, **pingpong(key, anims), **shower_loops(key, anims)},
         "hit": hits,
         "gun": ["W", "W_1", "15"] if has("W") else [],
         "kick": [l for l in ("11", "12", "13", "14") if l in rows and re.search(r"차기|kick|knee|무릎|발", rows[l][0])],
@@ -334,7 +342,7 @@ def eileen_cfg(ch):
     anims.update(shower_anims(EILEEN_KEY))
     return {"key": EILEEN_KEY, "name": "에일린", "dir": "E", "color": "#CFC7A6", "src": "eileen", "armed": True, "anims": anims,
             "picks": {"combat": 4, "weapon": 4, "apex": 4, "run": 4, "crawl4": 6},
-            "loops": {"1": [1, 2], "19": [9, 11], "21": [2, 3, 4, 5, 6, 7, 8], "23": [5, 6, 7, 8], "39": [8, 9, 10, 11, 12], "41": [5, 6, 7, 8], "42": [5, 6, 7, 8, 9, 10, 11, 12], "15": [4, 5]},
+            "loops": {"1": [1, 2], "19": [9, 11], "21": [2, 3, 4, 5, 6, 7, 8], "23": [5, 6, 7, 8], "39": [8, 9, 10, 11, 12], "41": [5, 6, 7, 8], "42": [5, 6, 7, 8, 9, 10, 11, 12], "15": [4, 5], **shower_loops(EILEEN_KEY, anims)},
             "arc": {"19": [0, 4, 16, 34, 44, 38, 22, 6, 0, 0, 0, 0]},
             "hit": {}, "gun": ["W", "15", "22", "23", "24", "25", "W_1", "22_1"], "kick": ["11", "12", "13", "14"],
             "ranged": {"proj": {"t": "proj", "kind": "bullet", "hit": {"dmg": 7, "kind": "light"}}, "heat": True},

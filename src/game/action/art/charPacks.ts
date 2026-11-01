@@ -234,8 +234,8 @@ export function drawCharClip(c: CanvasRenderingContext2D, nameOrKey: string, x: 
 // 바닥 맞추기 (10-31 사용자: 쓰러졌다 일어나는데 허공에서 일어난다): 전투 엔진(fighter/core.ts groundBase)과 같은 규칙을 필드 그림에도.
 // PixelLab은 누운·앉은·웅크린 장을 캔버스 위쪽에 그려서 줄 하나의 바닥선으로는 떠 보인다 → 그 장의 몸 아래 선을 바닥에
 const FLAT_IDS = new Set(['19', '20', '38', '38_1', '43', '45']);
-const LIE_IDS = new Set(['20', '38', '38_1', '39', '40', '41', '42', '42_1', '43', '45', 'SH_S4', 'SH_S5']);
-const FALL_IDS = new Set(['18_3', '44', '75', '76', '77', '169', 'SH_S3']);
+const LIE_IDS = new Set(['20', '38', '38_1', '39', '40', '41', '42', '42_1', '43', '45', 'SH_S4', 'SH_S5', 'SH_H4', 'SH_H5']);   // 맨몸 누운 채 맞기·일어나기(11-01)
+const FALL_IDS = new Set(['18_3', '44', '75', '76', '77', '169', 'SH_S3', 'SH_H3']);   // 맨몸 날아가 쓰러지기(11-01)
 function groundOf(id: string, m: LineMeta, f: number): number {
   const BASE = Math.min(m.h - 4, m.floor);
   const bot = m.bot[f] ?? m.floor;
