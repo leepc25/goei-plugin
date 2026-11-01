@@ -29,15 +29,9 @@ mask.paste((255, 255, 255), (keep - ov, 0, w, h))
 if top_h: mask.paste((255, 255, 255), (keep - ov_top, 0, w, top_h))
 if bot_y: mask.paste((255, 255, 255), (keep - ov_bot, bot_y, w, h))
 
-# ERASE=1: 다시 그릴 칸 안의 옛 그림을 지우고 보낸다(프로젝트 규칙). 줄마다 남는 옛 그림의 중간값 색으로 채움.
+# ERASE=1: 다시 그릴 칸 안의 옛 그림을 지우고 보낸다(프로젝트 규칙). 새 칸과 같이 흰색으로 비움(줄무늬 채우기는 따라 그릴 위험, 사용자 11-01).
 if os.environ.get("ERASE") == "1":
-    import statistics as _st
-    wp = win.load()
-    for _y in range(h):
-        row = [wp[_x, _y][:3] for _x in range(0, max(1, keep - ov))]
-        c = tuple(int(_st.median(ch)) for ch in zip(*row)) + (255,)
-        for _x in range(keep - ov, keep):
-            wp[_x, _y] = c
+    win.paste((255, 255, 255, 255), (keep - ov, 0, keep, h))
 
 def soft_mask(mask, side):
     """붙일 때 이음 자리를 칼로 자르지 않고 서서히 섞는다(사용자 2026-11-01: 끝나는 지점부터 이어서 찐빠). 각 줄의 흰 칸 끝(옛 그림 쪽) FEATHER px를 0으로 가늘게 줄인다."""
