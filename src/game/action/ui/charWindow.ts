@@ -191,6 +191,15 @@ export function drawCharWindow(c: CanvasRenderingContext2D, d: CharWindowData, t
       const p = d.perks[i];
       if (i === d.perkPick) glow(c, x - 6, y - 6, 140, 140);
       if (p.badge) c.drawImage(p.badge, x, y, 128, 128);
+      // 랭크 점(뱃지 바로 아래): 최대 랭크만큼, 얻은 만큼 금색(최대 1이면 안 찍음)
+      if (p.rank && p.rank[1] > 1) {
+        const n = p.rank[1], dw = 10, gap = 6, w0 = n * dw + (n - 1) * gap, dx = x + 64 - w0 / 2, dy = y + 132;
+        for (let k = 0; k < n; k++) {
+          const px = dx + k * (dw + gap);
+          c.fillStyle = EDGE_D; c.fillRect(px - 2, dy - 2, dw + 4, dw + 4);
+          c.fillStyle = k < p.rank[0] ? GOLD : '#2a3350'; c.fillRect(px, dy, dw, dw);
+        }
+      }
       if (i === d.perkPick) corners(c, x - 6, y - 6, 140, 140);
     }
     c.restore();

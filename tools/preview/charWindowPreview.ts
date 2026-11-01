@@ -18,9 +18,9 @@ const load = (src: string) => new Promise<HTMLImageElement>((r) => { const im = 
   c.fillStyle = '#1c2428'; c.fillRect(0, 0, 1280, 720);
   const tab = (window as unknown as { __tab: '능력치' }).__tab;
   const BASE = [
-      { name: '3단 점프', cat: '몸놀림', flavor: '허공을 세 번 밟고 올라간다', effect: '점프 +1회(2 → 3), 공중 좌우 이동 +40%', rank: [1, 1], grade: '일반', badge: jump },
-      { name: '체 단련', cat: '단련', flavor: '버티는 몸이 먼저 만들어진다', effect: '체 +2. 최대 체력이 늘고 받는 피해가 준다', rank: [2, 3], grade: '희귀', badge: vit },
-      { name: '무모함', cat: '특성', flavor: '방패를 던져 버리고 돌진한다', effect: '모든 피해 +20%', cost: '받는 피해 +15%', badge: reck, trait: true },
+      { name: '3단 점프', cat: '몸놀림', flavor: '두 번째 점프 뒤에 허공을 한 번 더 밟았다. 물리팀이 아직 조사 중이다.', effect: '점프 +1회(2 → 3), 공중 좌우 이동 +40%', rank: [1, 1], grade: '일반', badge: jump },
+      { name: '체 단련', cat: '단련', flavor: '이삿날 사무실 책상을 혼자 옮겼다.', effect: '체 +2. 최대 체력이 늘고 받는 피해가 준다', rank: [2, 3], grade: '희귀', badge: vit },
+      { name: '무모함', cat: '특성', flavor: '방패는 바닥에 두고 왔다. 다시 주우러 갈 생각도 없다.', effect: '모든 피해 +20%', cost: '받는 피해 +15%', badge: reck, trait: true },
     ];
   // 스크롤 시험: 같은 견본 뱃지를 되풀이해 14개로
   const many = (window as unknown as { __many?: boolean }).__many;
