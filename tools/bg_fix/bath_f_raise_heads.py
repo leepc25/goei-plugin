@@ -73,6 +73,10 @@ def fringe(m):
         for dy,dx in ((0,1),(0,-1),(1,0),(-1,0)):
             yy,xx=y+dy,x+dx; y2,x2=y+2*dy,x+2*dx
             if not m[yy,xx] and L[yy,xx]<160 and L[y2,x2]-L[yy,xx]>=20 and not m[y2,x2]: add[yy,xx]=True
+        for dy in (-1,0,1):          # 8방향 이웃의 어두운(밝기<158) 픽셀도 윤곽에 붙은 것으로 본다
+            for dx in (-1,0,1):
+                yy,xx=y+dy,x+dx
+                if not m[yy,xx] and L[yy,xx]<158 and xx not in EDGE: add[yy,xx]=True
     return m|add
 MASKS={n:fringe(mask(n)) for n in BOX}
 ALLOBJ=dark.copy()
@@ -109,4 +113,30 @@ for n,(x0,x1,yt,yk) in BOX.items():
         for x in range(hl,hr+1):
             if not newhead[y,x]: out[y,x]=orig[yk,x]; CH[y,x]=3
     print(n,'hose band x',hl,hr,'rows',yk-DY,yk-1)
+# 2차(사용자 16:36 「조금만 더 깔끔하게」 2·4·6·7번): 옛 헤드·받침이 벽에 드리운 그림자(회청색, 밝기<158)가 옛 자리에 남음.
+# 그림자도 샤워기와 함께 위로 옮긴다(타일 한 주기 P만큼 → 격자가 어긋나지 않음). 옛 그림자 자리는 같은 열의 깨끗한 타일로,
+# 받침 밑 띠(호스 옆 그림자 열)는 아래쪽 호스 그림자를 P만큼 위로 복사해 잇는다. 픽셀 하나씩 문턱으로 바꾸는 방식은 점이 생겨 쓰지 않음.
+SHADOW={2:((176,188),(172,195,150,200)),4:((456,466),(452,476,150,200)),6:((666,677),(663,681,160,200)),7:((701,712),(695,719,150,200))}
+SH_T=158
+for n,((bl,br),(rx0,rx1,ry0,ry1)) in SHADOW.items():
+    x0,x1,yt,yk=BOX[n]; head=MASKS[n]; P=facep(br)
+    newhead=np.zeros((H,W),bool); newhead[:-DY]=head[DY:]
+    sh=np.zeros((H,W),bool)
+    for y in range(ry0,min(ry1,yk)):
+        for x in range(rx0,rx1):
+            if L[y,x]<SH_T and not dark[y,x] and not head[y,x] and x not in EDGE and not keep(y,x): sh[y,x]=True
+    bad=ALLOBJ|sh
+    for y,x in zip(*np.nonzero(sh)):          # 1) 옛 그림자 자리 비우기
+        r=region(y,x); v=None
+        for k in (-1,1,-2,2,-3,3,-4,4):
+            sy=y+k*P
+            if 0<=sy<H and region(sy,x)==r and not bad[sy,x] and L[sy,x]>=SH_T and CH[sy,x]==0: v=orig[sy,x]; break
+        if v is not None: out[y,x]=v; CH[y,x]=4
+    for y,x in zip(*np.nonzero(sh)):          # 2) 그림자를 P만큼 위로
+        if not newhead[y-P,x]: out[y-P,x]=orig[y,x]; CH[y-P,x]=5
+    for y,x in zip(*np.nonzero(newhead)): out[y,x]=orig[y+DY,x]   # 3) 헤드는 그림자 위에
+    for y in range(yk-DY,yk):                 # 4) 받침 밑 띠: 호스 열은 그대로(CH 3), 그림자 열은 아래 호스 그림자를 P 위로
+        for x in range(bl,br+1):
+            if newhead[y,x] or CH[y,x]==3 or x in EDGE: continue
+            out[y,x]=orig[y+P,x]; CH[y,x]=6
 Image.fromarray(out).save(OUT); np.save(OUT+'.ch.npy',CH)
