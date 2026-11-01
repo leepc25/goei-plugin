@@ -43,7 +43,7 @@ export interface CharWindowData {
   money: string;
 }
 
-const GRADE_COL = { 일반: '#e6e4dc', 희귀: '#7fb8ff', 특급: '#ffd66b' } as const;
+const GRADE_COL = { 일반: '#d08a4e', 희귀: '#d6dce6', 특급: '#ffd66b' } as const; // 동·은·금 메달
 const INK = '#e6e4dc', DIM = '#7d8790', GOLD = '#ffd66b', UP = '#7fe08a';
 const EDGE_D = '#05070d', NAVY = '#101a36', NAVY_D = '#0a1126', RIM_L = '#aeb8c8', RIM_D = '#4a5468', SOCKET = '#070c1c';
 
