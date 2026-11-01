@@ -181,7 +181,7 @@ export function drawCharWindow(c: CanvasRenderingContext2D, d: CharWindowData, t
     putText(c, T(d.pick.nums, '#9fd7ff'), IX, y + 10);
   } else if (tab === '능력') {
     // 뱃지 칸: 보이는 줄 수만큼만 그리고, 넘치면 칸 안에서 줄 단위로 넘어간다(고른 뱃지가 늘 보이게)
-    const per = 5, cell = 146, rowH = 164, gy0 = top + 24, gyEnd = BOT - 232 - 4;
+    const per = 5, cell = 146, rowH = 146, gy0 = top + 24, gyEnd = BOT - 232 - 4;
     const rows = Math.ceil(d.perks.length / per), vis = Math.max(1, Math.floor((gyEnd - gy0 + 8) / rowH));
     const pickRow = Math.floor(Math.max(0, d.perkPick) / per);
     const first = Math.min(Math.max(0, pickRow - vis + 1), Math.max(0, rows - vis));
@@ -190,18 +190,10 @@ export function drawCharWindow(c: CanvasRenderingContext2D, d: CharWindowData, t
       const x = IX + 8 + (i % per) * cell, y = gy0 + (Math.floor(i / per) - first) * rowH;
       const p = d.perks[i];
       // 고른 칸 상자는 뱃지와 랭크 점을 함께 감싼다(점이 상자 테에 걸치지 않게)
-      if (i === d.perkPick) glow(c, x - 6, y - 6, 140, 160);
+      if (i === d.perkPick) glow(c, x - 6, y - 6, 140, 140);
       if (p.badge) c.drawImage(p.badge, x, y, 128, 128);
-      // 랭크 점(뱃지 바로 아래): 최대 랭크만큼, 얻은 만큼 금색(최대 1이면 안 찍음)
-      if (p.rank && p.rank[1] > 1) {
-        const n = p.rank[1], dw = 10, gap = 6, w0 = n * dw + (n - 1) * gap, dx = x + 64 - w0 / 2, dy = y + 134;
-        for (let k = 0; k < n; k++) {
-          const px = dx + k * (dw + gap);
-          c.fillStyle = EDGE_D; c.fillRect(px - 2, dy - 2, dw + 4, dw + 4);
-          c.fillStyle = k < p.rank[0] ? GOLD : '#2a3350'; c.fillRect(px, dy, dw, dw);
-        }
-      }
-      if (i === d.perkPick) corners(c, x - 6, y - 6, 140, 160);
+      // 랭크는 월계수 테두리(랭크 2 = 아래 반쪽, 3 = 둘레 전체)를 뱃지 위에 씌워 보인다 — 그림 나오면 연결
+      if (i === d.perkPick) corners(c, x - 6, y - 6, 140, 140);
     }
     c.restore();
     if (rows > vis) {
