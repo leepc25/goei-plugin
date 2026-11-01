@@ -1,0 +1,339 @@
+{
+ "frames": [
+  {
+   "filename": "fx-shadow 0.png",
+   "frame": {
+    "x": 0,
+    "y": 0,
+    "w": 112,
+    "h": 104
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 112,
+    "h": 104
+   },
+   "sourceSize": {
+    "w": 112,
+    "h": 104
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.7403846153846154
+   },
+   "duration": 71
+  },
+  {
+   "filename": "fx-shadow 1.png",
+   "frame": {
+    "x": 112,
+    "y": 0,
+    "w": 112,
+    "h": 104
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 112,
+    "h": 104
+   },
+   "sourceSize": {
+    "w": 112,
+    "h": 104
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.7403846153846154
+   },
+   "duration": 71
+  },
+  {
+   "filename": "fx-shadow 2.png",
+   "frame": {
+    "x": 224,
+    "y": 0,
+    "w": 112,
+    "h": 104
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 112,
+    "h": 104
+   },
+   "sourceSize": {
+    "w": 112,
+    "h": 104
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.7403846153846154
+   },
+   "duration": 71
+  },
+  {
+   "filename": "fx-shadow 3.png",
+   "frame": {
+    "x": 336,
+    "y": 0,
+    "w": 112,
+    "h": 104
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 112,
+    "h": 104
+   },
+   "sourceSize": {
+    "w": 112,
+    "h": 104
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.7403846153846154
+   },
+   "duration": 71
+  },
+  {
+   "filename": "fx-shadow 4.png",
+   "frame": {
+    "x": 0,
+    "y": 104,
+    "w": 112,
+    "h": 104
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 112,
+    "h": 104
+   },
+   "sourceSize": {
+    "w": 112,
+    "h": 104
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.7403846153846154
+   },
+   "duration": 71
+  },
+  {
+   "filename": "fx-shadow 5.png",
+   "frame": {
+    "x": 112,
+    "y": 104,
+    "w": 112,
+    "h": 104
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 112,
+    "h": 104
+   },
+   "sourceSize": {
+    "w": 112,
+    "h": 104
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.7403846153846154
+   },
+   "duration": 71
+  },
+  {
+   "filename": "fx-shadow 6.png",
+   "frame": {
+    "x": 224,
+    "y": 104,
+    "w": 112,
+    "h": 104
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 112,
+    "h": 104
+   },
+   "sourceSize": {
+    "w": 112,
+    "h": 104
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.7403846153846154
+   },
+   "duration": 71
+  },
+  {
+   "filename": "fx-shadow 7.png",
+   "frame": {
+    "x": 336,
+    "y": 104,
+    "w": 112,
+    "h": 104
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 112,
+    "h": 104
+   },
+   "sourceSize": {
+    "w": 112,
+    "h": 104
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.7403846153846154
+   },
+   "duration": 71
+  },
+  {
+   "filename": "fx-shadow 8.png",
+   "frame": {
+    "x": 0,
+    "y": 208,
+    "w": 112,
+    "h": 104
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 112,
+    "h": 104
+   },
+   "sourceSize": {
+    "w": 112,
+    "h": 104
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.7403846153846154
+   },
+   "duration": 71
+  },
+  {
+   "filename": "fx-shadow 9.png",
+   "frame": {
+    "x": 112,
+    "y": 208,
+    "w": 112,
+    "h": 104
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 112,
+    "h": 104
+   },
+   "sourceSize": {
+    "w": 112,
+    "h": 104
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.7403846153846154
+   },
+   "duration": 71
+  },
+  {
+   "filename": "fx-shadow 10.png",
+   "frame": {
+    "x": 224,
+    "y": 208,
+    "w": 112,
+    "h": 104
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 112,
+    "h": 104
+   },
+   "sourceSize": {
+    "w": 112,
+    "h": 104
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.7403846153846154
+   },
+   "duration": 71
+  },
+  {
+   "filename": "fx-shadow 11.png",
+   "frame": {
+    "x": 336,
+    "y": 208,
+    "w": 112,
+    "h": 104
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 112,
+    "h": 104
+   },
+   "sourceSize": {
+    "w": 112,
+    "h": 104
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.7403846153846154
+   },
+   "duration": 71
+  }
+ ],
+ "meta": {
+  "app": "PixelLab VFX Creator",
+  "image": "fx-shadow.png",
+  "format": "RGBA8888",
+  "size": {
+   "w": 448,
+   "h": 312
+  },
+  "scale": "1",
+  "anchor": {
+   "kind": "origin",
+   "x": 56,
+   "y": 77
+  },
+  "frameTags": [
+   {
+    "name": "fx-shadow",
+    "from": 0,
+    "to": 11,
+    "direction": "forward"
+   }
+  ]
+ }
+}

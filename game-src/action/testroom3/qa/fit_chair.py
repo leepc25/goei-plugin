@@ -13,7 +13,8 @@ import build, chairfit
 from PIL import Image, ImageDraw
 import numpy as np
 
-CH = build.ROOT / "game-src/action/objects/C01_사무의자_1배"
+import os
+CH = Path(os.environ["CHAIR_DIR"]) if os.environ.get("CHAIR_DIR") else build.ROOT / "game-src/action/objects/C01_사무의자_1배"   # CHAIR_DIR=다른 의자 폴더(휴게실 의자 등)로 같은 맞춤값 미리보기(11-01)
 CH2 = build.ROOT / "game-src/action/objects/C02_기댄사무의자_1배_2차"   # 등받이 기운 의자(기대 쉬기 73): img=C02:<방향>
 def chair_png(name): return (CH2 / f"{name[4:]}.png") if name.startswith("C02:") else (CH / f"{name}.png")
 VIEWS = [("front", "60", "south"), ("side", "96", "east"), ("back", "61", "north")]

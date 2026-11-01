@@ -1,0 +1,339 @@
+{
+ "frames": [
+  {
+   "filename": "x3-1-5-f-yellow-eyes 0.png",
+   "frame": {
+    "x": 0,
+    "y": 0,
+    "w": 464,
+    "h": 192
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 464,
+    "h": 192
+   },
+   "sourceSize": {
+    "w": 464,
+    "h": 192
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.5
+   },
+   "duration": 250
+  },
+  {
+   "filename": "x3-1-5-f-yellow-eyes 1.png",
+   "frame": {
+    "x": 464,
+    "y": 0,
+    "w": 464,
+    "h": 192
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 464,
+    "h": 192
+   },
+   "sourceSize": {
+    "w": 464,
+    "h": 192
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.5
+   },
+   "duration": 250
+  },
+  {
+   "filename": "x3-1-5-f-yellow-eyes 2.png",
+   "frame": {
+    "x": 928,
+    "y": 0,
+    "w": 464,
+    "h": 192
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 464,
+    "h": 192
+   },
+   "sourceSize": {
+    "w": 464,
+    "h": 192
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.5
+   },
+   "duration": 250
+  },
+  {
+   "filename": "x3-1-5-f-yellow-eyes 3.png",
+   "frame": {
+    "x": 1392,
+    "y": 0,
+    "w": 464,
+    "h": 192
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 464,
+    "h": 192
+   },
+   "sourceSize": {
+    "w": 464,
+    "h": 192
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.5
+   },
+   "duration": 250
+  },
+  {
+   "filename": "x3-1-5-f-yellow-eyes 4.png",
+   "frame": {
+    "x": 0,
+    "y": 192,
+    "w": 464,
+    "h": 192
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 464,
+    "h": 192
+   },
+   "sourceSize": {
+    "w": 464,
+    "h": 192
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.5
+   },
+   "duration": 250
+  },
+  {
+   "filename": "x3-1-5-f-yellow-eyes 5.png",
+   "frame": {
+    "x": 464,
+    "y": 192,
+    "w": 464,
+    "h": 192
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 464,
+    "h": 192
+   },
+   "sourceSize": {
+    "w": 464,
+    "h": 192
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.5
+   },
+   "duration": 250
+  },
+  {
+   "filename": "x3-1-5-f-yellow-eyes 6.png",
+   "frame": {
+    "x": 928,
+    "y": 192,
+    "w": 464,
+    "h": 192
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 464,
+    "h": 192
+   },
+   "sourceSize": {
+    "w": 464,
+    "h": 192
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.5
+   },
+   "duration": 250
+  },
+  {
+   "filename": "x3-1-5-f-yellow-eyes 7.png",
+   "frame": {
+    "x": 1392,
+    "y": 192,
+    "w": 464,
+    "h": 192
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 464,
+    "h": 192
+   },
+   "sourceSize": {
+    "w": 464,
+    "h": 192
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.5
+   },
+   "duration": 250
+  },
+  {
+   "filename": "x3-1-5-f-yellow-eyes 8.png",
+   "frame": {
+    "x": 0,
+    "y": 384,
+    "w": 464,
+    "h": 192
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 464,
+    "h": 192
+   },
+   "sourceSize": {
+    "w": 464,
+    "h": 192
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.5
+   },
+   "duration": 250
+  },
+  {
+   "filename": "x3-1-5-f-yellow-eyes 9.png",
+   "frame": {
+    "x": 464,
+    "y": 384,
+    "w": 464,
+    "h": 192
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 464,
+    "h": 192
+   },
+   "sourceSize": {
+    "w": 464,
+    "h": 192
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.5
+   },
+   "duration": 250
+  },
+  {
+   "filename": "x3-1-5-f-yellow-eyes 10.png",
+   "frame": {
+    "x": 928,
+    "y": 384,
+    "w": 464,
+    "h": 192
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 464,
+    "h": 192
+   },
+   "sourceSize": {
+    "w": 464,
+    "h": 192
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.5
+   },
+   "duration": 250
+  },
+  {
+   "filename": "x3-1-5-f-yellow-eyes 11.png",
+   "frame": {
+    "x": 1392,
+    "y": 384,
+    "w": 464,
+    "h": 192
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 464,
+    "h": 192
+   },
+   "sourceSize": {
+    "w": 464,
+    "h": 192
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.5
+   },
+   "duration": 250
+  }
+ ],
+ "meta": {
+  "app": "PixelLab VFX Creator",
+  "image": "x3-1-5-f-yellow-eyes.png",
+  "format": "RGBA8888",
+  "size": {
+   "w": 1856,
+   "h": 576
+  },
+  "scale": "1",
+  "anchor": {
+   "kind": "origin",
+   "x": 232,
+   "y": 96
+  },
+  "frameTags": [
+   {
+    "name": "x3-1-5-f-yellow-eyes",
+    "from": 0,
+    "to": 11,
+    "direction": "forward"
+   }
+  ]
+ }
+}

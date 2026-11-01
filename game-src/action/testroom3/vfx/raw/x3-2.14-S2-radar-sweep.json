@@ -1,0 +1,339 @@
+{
+ "frames": [
+  {
+   "filename": "x3-2-14-s2-radar-sweep 0.png",
+   "frame": {
+    "x": 0,
+    "y": 0,
+    "w": 512,
+    "h": 156
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 512,
+    "h": 156
+   },
+   "sourceSize": {
+    "w": 512,
+    "h": 156
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.5
+   },
+   "duration": 83
+  },
+  {
+   "filename": "x3-2-14-s2-radar-sweep 1.png",
+   "frame": {
+    "x": 512,
+    "y": 0,
+    "w": 512,
+    "h": 156
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 512,
+    "h": 156
+   },
+   "sourceSize": {
+    "w": 512,
+    "h": 156
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.5
+   },
+   "duration": 83
+  },
+  {
+   "filename": "x3-2-14-s2-radar-sweep 2.png",
+   "frame": {
+    "x": 1024,
+    "y": 0,
+    "w": 512,
+    "h": 156
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 512,
+    "h": 156
+   },
+   "sourceSize": {
+    "w": 512,
+    "h": 156
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.5
+   },
+   "duration": 83
+  },
+  {
+   "filename": "x3-2-14-s2-radar-sweep 3.png",
+   "frame": {
+    "x": 1536,
+    "y": 0,
+    "w": 512,
+    "h": 156
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 512,
+    "h": 156
+   },
+   "sourceSize": {
+    "w": 512,
+    "h": 156
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.5
+   },
+   "duration": 83
+  },
+  {
+   "filename": "x3-2-14-s2-radar-sweep 4.png",
+   "frame": {
+    "x": 0,
+    "y": 156,
+    "w": 512,
+    "h": 156
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 512,
+    "h": 156
+   },
+   "sourceSize": {
+    "w": 512,
+    "h": 156
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.5
+   },
+   "duration": 83
+  },
+  {
+   "filename": "x3-2-14-s2-radar-sweep 5.png",
+   "frame": {
+    "x": 512,
+    "y": 156,
+    "w": 512,
+    "h": 156
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 512,
+    "h": 156
+   },
+   "sourceSize": {
+    "w": 512,
+    "h": 156
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.5
+   },
+   "duration": 83
+  },
+  {
+   "filename": "x3-2-14-s2-radar-sweep 6.png",
+   "frame": {
+    "x": 1024,
+    "y": 156,
+    "w": 512,
+    "h": 156
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 512,
+    "h": 156
+   },
+   "sourceSize": {
+    "w": 512,
+    "h": 156
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.5
+   },
+   "duration": 83
+  },
+  {
+   "filename": "x3-2-14-s2-radar-sweep 7.png",
+   "frame": {
+    "x": 1536,
+    "y": 156,
+    "w": 512,
+    "h": 156
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 512,
+    "h": 156
+   },
+   "sourceSize": {
+    "w": 512,
+    "h": 156
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.5
+   },
+   "duration": 83
+  },
+  {
+   "filename": "x3-2-14-s2-radar-sweep 8.png",
+   "frame": {
+    "x": 0,
+    "y": 312,
+    "w": 512,
+    "h": 156
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 512,
+    "h": 156
+   },
+   "sourceSize": {
+    "w": 512,
+    "h": 156
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.5
+   },
+   "duration": 83
+  },
+  {
+   "filename": "x3-2-14-s2-radar-sweep 9.png",
+   "frame": {
+    "x": 512,
+    "y": 312,
+    "w": 512,
+    "h": 156
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 512,
+    "h": 156
+   },
+   "sourceSize": {
+    "w": 512,
+    "h": 156
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.5
+   },
+   "duration": 83
+  },
+  {
+   "filename": "x3-2-14-s2-radar-sweep 10.png",
+   "frame": {
+    "x": 1024,
+    "y": 312,
+    "w": 512,
+    "h": 156
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 512,
+    "h": 156
+   },
+   "sourceSize": {
+    "w": 512,
+    "h": 156
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.5
+   },
+   "duration": 83
+  },
+  {
+   "filename": "x3-2-14-s2-radar-sweep 11.png",
+   "frame": {
+    "x": 1536,
+    "y": 312,
+    "w": 512,
+    "h": 156
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 512,
+    "h": 156
+   },
+   "sourceSize": {
+    "w": 512,
+    "h": 156
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.5
+   },
+   "duration": 83
+  }
+ ],
+ "meta": {
+  "app": "PixelLab VFX Creator",
+  "image": "x3-2-14-s2-radar-sweep.png",
+  "format": "RGBA8888",
+  "size": {
+   "w": 2048,
+   "h": 468
+  },
+  "scale": "1",
+  "anchor": {
+   "kind": "origin",
+   "x": 256,
+   "y": 78
+  },
+  "frameTags": [
+   {
+    "name": "x3-2-14-s2-radar-sweep",
+    "from": 0,
+    "to": 11,
+    "direction": "forward"
+   }
+  ]
+ }
+}

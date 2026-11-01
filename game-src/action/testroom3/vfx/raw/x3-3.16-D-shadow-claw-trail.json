@@ -1,0 +1,235 @@
+{
+ "frames": [
+  {
+   "filename": "x3-3-16-d-shadow-claw-trail 0.png",
+   "frame": {
+    "x": 0,
+    "y": 0,
+    "w": 128,
+    "h": 192
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 128,
+    "h": 192
+   },
+   "sourceSize": {
+    "w": 128,
+    "h": 192
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.9270833333333334
+   },
+   "duration": 63
+  },
+  {
+   "filename": "x3-3-16-d-shadow-claw-trail 1.png",
+   "frame": {
+    "x": 128,
+    "y": 0,
+    "w": 128,
+    "h": 192
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 128,
+    "h": 192
+   },
+   "sourceSize": {
+    "w": 128,
+    "h": 192
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.9270833333333334
+   },
+   "duration": 63
+  },
+  {
+   "filename": "x3-3-16-d-shadow-claw-trail 2.png",
+   "frame": {
+    "x": 256,
+    "y": 0,
+    "w": 128,
+    "h": 192
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 128,
+    "h": 192
+   },
+   "sourceSize": {
+    "w": 128,
+    "h": 192
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.9270833333333334
+   },
+   "duration": 63
+  },
+  {
+   "filename": "x3-3-16-d-shadow-claw-trail 3.png",
+   "frame": {
+    "x": 0,
+    "y": 192,
+    "w": 128,
+    "h": 192
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 128,
+    "h": 192
+   },
+   "sourceSize": {
+    "w": 128,
+    "h": 192
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.9270833333333334
+   },
+   "duration": 63
+  },
+  {
+   "filename": "x3-3-16-d-shadow-claw-trail 4.png",
+   "frame": {
+    "x": 128,
+    "y": 192,
+    "w": 128,
+    "h": 192
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 128,
+    "h": 192
+   },
+   "sourceSize": {
+    "w": 128,
+    "h": 192
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.9270833333333334
+   },
+   "duration": 63
+  },
+  {
+   "filename": "x3-3-16-d-shadow-claw-trail 5.png",
+   "frame": {
+    "x": 256,
+    "y": 192,
+    "w": 128,
+    "h": 192
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 128,
+    "h": 192
+   },
+   "sourceSize": {
+    "w": 128,
+    "h": 192
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.9270833333333334
+   },
+   "duration": 63
+  },
+  {
+   "filename": "x3-3-16-d-shadow-claw-trail 6.png",
+   "frame": {
+    "x": 0,
+    "y": 384,
+    "w": 128,
+    "h": 192
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 128,
+    "h": 192
+   },
+   "sourceSize": {
+    "w": 128,
+    "h": 192
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.9270833333333334
+   },
+   "duration": 63
+  },
+  {
+   "filename": "x3-3-16-d-shadow-claw-trail 7.png",
+   "frame": {
+    "x": 128,
+    "y": 384,
+    "w": 128,
+    "h": 192
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 128,
+    "h": 192
+   },
+   "sourceSize": {
+    "w": 128,
+    "h": 192
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.9270833333333334
+   },
+   "duration": 63
+  }
+ ],
+ "meta": {
+  "app": "PixelLab VFX Creator",
+  "image": "x3-3-16-d-shadow-claw-trail.png",
+  "format": "RGBA8888",
+  "size": {
+   "w": 384,
+   "h": 576
+  },
+  "scale": "1",
+  "anchor": {
+   "kind": "origin",
+   "x": 64,
+   "y": 178
+  },
+  "frameTags": [
+   {
+    "name": "x3-3-16-d-shadow-claw-trail",
+    "from": 0,
+    "to": 7,
+    "direction": "forward"
+   }
+  ]
+ }
+}

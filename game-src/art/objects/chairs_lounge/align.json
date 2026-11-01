@@ -1,54 +1,104 @@
 {
  "scale": 0.974025974025974,
- "shifts": {
+ "floor": 171,
+ "seat": 96,
+ "per_dir": {
   "east": {
-   "dx": -2,
-   "dy": 17,
-   "c01_seat_cx": 95.5,
-   "new_seat_cx": 97.0
+   "c01_seat_x": [
+    60,
+    131
+   ],
+   "new_seat_x_before": [
+    70,
+    124
+   ],
+   "dx": -10,
+   "dy": 17
   },
   "north-east": {
-   "dx": 0,
-   "dy": 14,
-   "c01_seat_cx": 95.5,
-   "new_seat_cx": 95.0
+   "c01_seat_x": [
+    61,
+    133
+   ],
+   "new_seat_x_before": [
+    61,
+    129
+   ],
+   "dx": 2,
+   "dy": 14
   },
   "north": {
-   "dx": 1,
-   "dy": 18,
-   "c01_seat_cx": 92.0,
-   "new_seat_cx": 91.0
+   "c01_seat_x": [
+    61,
+    124
+   ],
+   "new_seat_x_before": [
+    62,
+    120
+   ],
+   "dx": 2,
+   "dy": 18
   },
   "north-west": {
-   "dx": 4,
-   "dy": 14,
-   "c01_seat_cx": 92.0,
-   "new_seat_cx": 88.0
+   "c01_seat_x": [
+    53,
+    124
+   ],
+   "new_seat_x_before": [
+    55,
+    121
+   ],
+   "dx": 0,
+   "dy": 14
   },
   "west": {
-   "dx": 2,
-   "dy": 17,
-   "c01_seat_cx": 88.5,
-   "new_seat_cx": 87.0
+   "c01_seat_x": [
+    54,
+    123
+   ],
+   "new_seat_x_before": [
+    59,
+    115
+   ],
+   "dx": 8,
+   "dy": 17
   },
   "south-west": {
+   "c01_seat_x": [
+    52,
+    127
+   ],
+   "new_seat_x_before": [
+    52,
+    122
+   ],
    "dx": 2,
-   "dy": 14,
-   "c01_seat_cx": 89.5,
-   "new_seat_cx": 87.0
+   "dy": 14
   },
   "south": {
+   "c01_seat_x": [
+    62,
+    122
+   ],
+   "new_seat_x_before": [
+    61,
+    117
+   ],
    "dx": 3,
-   "dy": 14,
-   "c01_seat_cx": 92.0,
-   "new_seat_cx": 89.0
+   "dy": 14
   },
   "south-east": {
-   "dx": 0,
-   "dy": 14,
-   "c01_seat_cx": 95.0,
-   "new_seat_cx": 94.5
+   "c01_seat_x": [
+    58,
+    133
+   ],
+   "new_seat_x_before": [
+    59,
+    130
+   ],
+   "dx": 1,
+   "dy": 14
   }
  },
- "rule": "C01 바닥선 171·좌석선 96에 맞춤, 방향별 좌석 가운데 x를 C01과 같게"
+ "rule": "바닥 171(좌석 96), x: 동=좌석 뒤끝, 서=좌석 뒤끝(오른쪽), 나머지=좌석 가운데, C01 같은 줄(96~100)에서 잼"
 }

@@ -1,0 +1,183 @@
+{
+ "frames": [
+  {
+   "filename": "x3-4-3-s2-syringe-droplet 0.png",
+   "frame": {
+    "x": 0,
+    "y": 0,
+    "w": 40,
+    "h": 36
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 40,
+    "h": 36
+   },
+   "sourceSize": {
+    "w": 40,
+    "h": 36
+   },
+   "pivot": {
+    "x": 0.4,
+    "y": 0.6388888888888888
+   },
+   "duration": 83
+  },
+  {
+   "filename": "x3-4-3-s2-syringe-droplet 1.png",
+   "frame": {
+    "x": 40,
+    "y": 0,
+    "w": 40,
+    "h": 36
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 40,
+    "h": 36
+   },
+   "sourceSize": {
+    "w": 40,
+    "h": 36
+   },
+   "pivot": {
+    "x": 0.4,
+    "y": 0.6388888888888888
+   },
+   "duration": 83
+  },
+  {
+   "filename": "x3-4-3-s2-syringe-droplet 2.png",
+   "frame": {
+    "x": 80,
+    "y": 0,
+    "w": 40,
+    "h": 36
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 40,
+    "h": 36
+   },
+   "sourceSize": {
+    "w": 40,
+    "h": 36
+   },
+   "pivot": {
+    "x": 0.4,
+    "y": 0.6388888888888888
+   },
+   "duration": 83
+  },
+  {
+   "filename": "x3-4-3-s2-syringe-droplet 3.png",
+   "frame": {
+    "x": 0,
+    "y": 36,
+    "w": 40,
+    "h": 36
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 40,
+    "h": 36
+   },
+   "sourceSize": {
+    "w": 40,
+    "h": 36
+   },
+   "pivot": {
+    "x": 0.4,
+    "y": 0.6388888888888888
+   },
+   "duration": 83
+  },
+  {
+   "filename": "x3-4-3-s2-syringe-droplet 4.png",
+   "frame": {
+    "x": 40,
+    "y": 36,
+    "w": 40,
+    "h": 36
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 40,
+    "h": 36
+   },
+   "sourceSize": {
+    "w": 40,
+    "h": 36
+   },
+   "pivot": {
+    "x": 0.4,
+    "y": 0.6388888888888888
+   },
+   "duration": 83
+  },
+  {
+   "filename": "x3-4-3-s2-syringe-droplet 5.png",
+   "frame": {
+    "x": 80,
+    "y": 36,
+    "w": 40,
+    "h": 36
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 40,
+    "h": 36
+   },
+   "sourceSize": {
+    "w": 40,
+    "h": 36
+   },
+   "pivot": {
+    "x": 0.4,
+    "y": 0.6388888888888888
+   },
+   "duration": 83
+  }
+ ],
+ "meta": {
+  "app": "PixelLab VFX Creator",
+  "image": "x3-4-3-s2-syringe-droplet.png",
+  "format": "RGBA8888",
+  "size": {
+   "w": 120,
+   "h": 72
+  },
+  "scale": "1",
+  "anchor": {
+   "kind": "origin",
+   "x": 16,
+   "y": 23
+  },
+  "frameTags": [
+   {
+    "name": "x3-4-3-s2-syringe-droplet",
+    "from": 0,
+    "to": 5,
+    "direction": "forward"
+   }
+  ]
+ }
+}
