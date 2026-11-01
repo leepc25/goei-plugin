@@ -1,5 +1,5 @@
 """화장실 침입 대사 칸 (toilet, 11-01): 검사·합치기.
-칸: toilet.<소속 A00~E00·etc>.<friend·neutral·wary·hostile>.<intrude·stay1·stay2>, 칸마다 3줄.
+칸: toilet.<소속 A00~E00·etc>.<friend·neutral·wary·hostile>.<intrude·stay1·stay2·same_open>, 칸마다 3줄. 조각에 든 칸만 검사·덧붙임.
 규칙: 한 줄 한 문장, 쉼표 많아야 하나, 같은 파일 안 줄 겹침 없음, 층 숫자 없음, 주인공 호칭 없음.
 사용법:
   python3 tools/toilet_dialogue.py check <조각.json> <대상 대사 파일.json>   # 조각 검사
@@ -12,7 +12,7 @@ ROOT = Path(__file__).resolve().parent.parent
 SRC = ROOT / 'game-src/dialogue2'
 FACS = ['A00', 'B00', 'C00', 'D00', 'E00', 'etc']
 REPS = ['friend', 'neutral', 'wary', 'hostile']
-SLOTS = ['intrude', 'stay1', 'stay2']
+SLOTS_ALL = ['intrude', 'stay1', 'stay2', 'same_open']  # same_open: 같은 성별 주인공이 밖에서 칸 문을 엶 (11-01 사용자)
 ADDR = re.compile(r'(선배|후배님|요원님|씨[,!?. ]|씨$|님[,!?. ]|님$|손님|고객님|자기야|아가씨|총각|형씨|언니|오빠|누나|형님)')
 
 
@@ -22,7 +22,7 @@ def lines_of(x):
         for v in x: yield from lines_of(v)
     elif isinstance(x, dict):
         for k, v in x.items():
-            if k not in ('name', 'faction', 'sex', 'toilet'): yield from lines_of(v)
+            if k not in ('name', 'faction', 'sex'): yield from lines_of(v)
 
 
 def target(name):
@@ -34,6 +34,7 @@ def target(name):
 
 def check(frag, tgt):
     probs = []
+    SLOTS = [k for k in SLOTS_ALL if k in frag.get('A00', {}).get('friend', {})]
     if sorted(frag) != sorted(FACS): probs.append(f'소속 키 {sorted(frag)}')
     old = set(lines_of(json.loads(tgt.read_text(encoding='utf-8'))))
     seen = {}
@@ -77,8 +78,11 @@ def main():
             for k, v in d.items():
                 if k == 'toilet': continue
                 out[k] = v
-                if k == 'shower': out['toilet'] = {fac: frag[fac] for fac in FACS}
-            if 'toilet' not in out: out['toilet'] = {fac: frag[fac] for fac in FACS}
+                if k == 'shower': out['toilet'] = d.get('toilet', {})
+            out.setdefault('toilet', d.get('toilet', {}))
+            for fac in FACS:
+                for rep in REPS:
+                    out['toilet'].setdefault(fac, {}).setdefault(rep, {}).update(frag[fac][rep])
             tgt.write_text(json.dumps(out, ensure_ascii=False, indent=1) + ('\n' if raw.endswith('\n') else ''), encoding='utf-8')
             print(f.stem, '넣음')
         sys.exit(1 if bad else 0)
