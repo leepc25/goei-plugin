@@ -67,6 +67,8 @@ export interface PaintedScene {
   far?: number;
   /** 사람이 이 y(월드)까지만 커지고 그보다 앞에서는 그 크기 그대로(맨 앞에서 급격히 커지는 것 막기, 사용자 11-01 15:07). dotK는 이 자리 크기 */
   growTo?: number;
+  /** 기준점 크기표 [발 y(월드), 배율(맨 앞 1)] — 문·물건 높이로 잰 점 사이에서만 크기가 바뀐다(engine/view.ts sizes). 있으면 far·growTo 대신 */
+  sizes?: [number, number][];
 }
 
 import { JR_ROOMS } from './jrRooms.gen';

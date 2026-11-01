@@ -26,7 +26,16 @@ people = []
 for fx, fy in feet:
     if hz == 0:   # 게임과 같은 크기: 도트 키 × dotK × 원근(줄 맨 뒤 0.85 ~ 맨 앞 1, engine/view.ts FAR)
         a, b = g['lane'][0], g.get('growTo') or g['lane'][1]; t = min(1, max(0, (fy * 2 - a) / (b - a)))
-        far = g.get('far', 0.85); h = round(spr.height * g['dotK'] * (far + (1 - far) * t))
+        far = g.get('far', 0.85); k = far + (1 - far) * t
+        sz = g.get('sizes')
+        if sz:   # 기준점 사이에서만 바뀜 (engine/view.ts persp와 같은 계산)
+            y = fy * 2
+            if y <= sz[0][0]: k = sz[0][1]
+            elif y >= sz[-1][0]: k = sz[-1][1]
+            else:
+                for (y0, k0), (y1, k1) in zip(sz, sz[1:]):
+                    if y <= y1: k = k0 + (k1 - k0) * (y - y0) / (y1 - y0); break
+        h = round(spr.height * g['dotK'] * k)
     else:
         h = round(1.35 * (fy - hz) * 2)
     s = spr.resize((max(1, round(spr.width * h / spr.height)), h), Image.NEAREST)

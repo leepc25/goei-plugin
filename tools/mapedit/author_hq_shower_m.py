@@ -130,24 +130,18 @@ door = {'kind': 'glass', 'x': 72 * K, 'y': 356 * K, 'locked': True, 'label': '�
         'door': {'x0': 30 * K, 'x1': 110 * K, 'y0': 120 * K, 'y1': 352 * K, 'anim': 'none', 'behind': 'dark'}}
 # 줄 맨 뒤 배율(사용자 15:03 「해봐」): 맨 앞은 게임 공통 크기 그대로, 맨 뒤(y300, 뒤 통로)에서 사람 키 ≈ 사물함(104px)보다 조금 작은 97px(1x)
 # = 194(2x) ÷ 게임 맨 앞 키 353(2x, 도트 247 × dotK 1.4292) ≈ 0.55
-# 15:06 사용자 「장면마다 다르게, 문 크기 기준으로」: 왼쪽 벽 유리문 문짝 높이로 사람 키를 잼(사람 ≈ 문짝의 0.8, 문 2.1m·어른 1.7m).
-# 문짝: 앞 모서리 x34 위 y133·밑 y357(224px), 뒤 모서리 x90 위 y145·밑 y343(198px) → 사람 179·158 → 사람 키(1x) = 1.49 × (발 y − 237)
-# 맨 앞(줄 끝 y418) 270(1x) = 539(2x) → dotK = 539 / 도트 키 247, 맨 뒤(y300) 94(1x) → far = 94 / 270
-SPR_DOTS, HZ, CK = 247, 237, 1.49
-# 15:08 사용자 「문 기준으로 맞추고 원근을 조금 덜 적용하면」: 문 자리(발 y350)에서 사람 = 문짝 0.8(위 식),
-# 앞뒤로 커지고 작아지는 정도는 그림 원근의 절반(PERSP_HALF). y418(맨 앞)·y300(맨 뒤) 크기를 이 식으로.
-DOOR_Y, PERSP = 350, 1.0   # 15:11 사용자 「이런 씬에서는 위치에 따라 확대 축소를 더 과감하게」 → 그림 원근 그대로(절반 아님)
-# 15:09 사용자 「문 기준으로 보면 좀 작은데」: 유리 부분이 아니라 문틀 전체(앞 모서리 x30 위 y110 ~ 밑 y358, 248px)로 잼.
-# 문 바로 앞(발 y358)에 선 사람 = 문틀의 0.82 = 203(1x) → 그 자리 크기를 이 값에 맞춤
-DOOR_FRAME_H, DOOR_FOOT = 248, 358
-_base = lambda y: (1 + PERSP * (y - DOOR_Y) / (DOOR_Y - HZ))
-S0 = 0.82 * DOOR_FRAME_H * K / _base(DOOR_FOOT)
-size_at = lambda y: S0 * _base(y)
-lane_px = (300, 418)
-front2, back2 = size_at(lane_px[1]), size_at(lane_px[0])
-GROW_TO = 0
-DOTK_HERE, FAR_HERE = round(front2 / SPR_DOTS, 4), round(back2 / front2, 3)
-m = {'file': 'hq_shower_m_strip', 'bgScale': K, 'dotK': DOTK_HERE, 'far': FAR_HERE, **({'growTo': GROW_TO * K} if GROW_TO else {}), 'w': W * K, 'h': H * K, 'under': True, 'floor': floor,
+# 사람 크기 = 기준점 셋 사이에서만 바뀜 (사용자 15:21: 「문을 기준점, 앞 캐비닛을 기준점 — 키우기는 그 사이에서만,
+# 줄이기는 문부터 제일 안쪽 캐비닛 사이에서만」). 그 밖은 끝 기준점 크기 그대로.
+# 사람 = 문틀의 0.82 = 캐비닛의 0.91 (문 2.1m·캐비닛 1.9m·사람 1.72m). 1x로 잰 값:
+# - 제일 안쪽 캐비닛: 가운데 줄 뒤 끝 x464 위 y190 ~ 밑 y300 (110px) → 사람 100, 발 y300
+# - 문: 왼쪽 유리문 문틀 앞 모서리 x30 위 y110 ~ 밑 y358 (248px) → 사람 203, 발 y358
+# - 앞 캐비닛: 가운데 줄 끝판 x300 위 y150 ~ 밑 y374 (224px) → 사람 204, 발 y374
+SPR_DOTS = 247
+REFS = [(300, 0.91 * 110), (358, 0.82 * 248), (374, 0.91 * 224)]
+TOP = max(h for _, h in REFS)
+DOTK_HERE = round(TOP * K / SPR_DOTS, 4)
+SIZES = [[y * K, round(h / TOP, 3)] for y, h in REFS]
+m = {'file': 'hq_shower_m_strip', 'bgScale': K, 'dotK': DOTK_HERE, 'sizes': SIZES, 'w': W * K, 'h': H * K, 'under': True, 'floor': floor,
      'lane': [300 * K, H * K - 12], 'blocks': blocks, 'lamps': [], 'spots': [],
      'doors': {'shower': door, 'out': {'kind': 'exit', 'side': 'S', 'x': 316 * K, 'y': H * K - 12, 'label': '나가기'}},
      'objects': [to_cover(o, mm, sy) for o, mm, sy in objects]}
