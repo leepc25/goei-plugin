@@ -1,0 +1,66 @@
+{
+ "scene": {
+  "file": "me_b2",
+  "w": 2412,
+  "h": 848,
+  "under": true,
+  "lane": [
+   656,
+   772
+  ],
+  "floor": [
+   [
+    20,
+    656
+   ],
+   [
+    2400,
+    656
+   ],
+   [
+    2400,
+    772
+   ],
+   [
+    20,
+    772
+   ]
+  ],
+  "holes": [],
+  "dotK": 1.4292,
+  "blocks": [],
+  "doors": {
+   "isolation": {
+    "x0": 110,
+    "x1": 512,
+    "y0": 258,
+    "y1": 652,
+    "anim": "none",
+    "behind": "dark"
+   },
+   "clinic": {
+    "x0": 1300,
+    "x1": 1484,
+    "y0": 314,
+    "y1": 636,
+    "anim": "none",
+    "behind": "dark"
+   },
+   "elev": {
+    "x0": 1670,
+    "x1": 1890,
+    "y0": 320,
+    "y1": 636,
+    "anim": "none",
+    "behind": "dark"
+   }
+  },
+  "lamps": [],
+  "windows": [],
+  "objects": []
+ },
+ "spots": [],
+ "files": [
+  "me_b2"
+ ]
+}

@@ -5,9 +5,10 @@ import { PAINTED, type PaintedDoor, type PaintedScene } from '../hq/painted';
 import { view } from '../engine/view';
 import { JR_ROOM_FILES } from '../hq/jrRooms.gen';
 import { JR_CUT_FILES } from '../hq/jrCuts.gen';
+import { MAPEDIT_FILES } from '../hq/mapedit.gen';
 
 const FILES = ['lobby', 'f2', 'f3', 'b1', 'b2', 'b3', 'desk'];
-const JR_FILES = ['jr_entry', 'jr_b1', 'jr_alley', 'jr_b2', ...JR_ROOM_FILES, ...JR_CUT_FILES];
+const JR_FILES = ['jr_entry', 'jr_b1', 'jr_alley', 'jr_b2', ...JR_ROOM_FILES, ...JR_CUT_FILES, ...MAPEDIT_FILES];
 let images: Record<string, HTMLImageElement> | null = null;
 let revision = 0;
 declare global { interface Window { __GOEI_HQ_FIELD__?: Record<string, string> } }
@@ -182,12 +183,33 @@ function drawDoor(c: CanvasRenderingContext2D, im: HTMLImageElement, d: PaintedD
 }
 
 /** 오린 오브젝트 (깊이 순서 층에서 부른다) */
-export function drawHqFieldObject(c: CanvasRenderingContext2D, scene: string, id: string): void {
-  const o = PAINTED[scene]?.objects.find((q) => q.id === id);
-  const im = o && images?.[o.file];
-  if (!o || !im) return;
+export function drawHqFieldObject(c: CanvasRenderingContext2D, scene: string, id: string, open = 0): void {
+  const p = PAINTED[scene];
+  const o = p?.objects.find((q) => q.id === id);
+  if (!o) return;
+  if (o.cover) {
+    // 오리지 않은 가림: 배경 그림의 다각형 영역을 그대로 한 번 더 (사람이 뒤에 서면 가려진다)
+    const bg = images?.[p.file];
+    if (!bg) return;
+    c.save(); c.imageSmoothingEnabled = true; c.imageSmoothingQuality = 'high';
+    c.beginPath();
+    for (const poly of o.cover) { poly.forEach(([x, y], i) => (i ? c.lineTo(x, y) : c.moveTo(x, y))); c.closePath(); }
+    c.clip();
+    c.drawImage(bg, o.x, o.y, o.w, o.h, o.x, o.y, o.w, o.h);
+    c.restore();
+    return;
+  }
+  const im = images?.[o.file];
+  if (!im) return;
   c.save(); c.imageSmoothingEnabled = true; c.imageSmoothingQuality = 'high';
-  c.drawImage(im, o.x, o.y, o.w, o.h);
+  if (o.gate && open > 0) {
+    // 열리는 게이트 유리: 가운데서 갈라져 양쪽 기둥 안으로 밀려 들어간다
+    if (open >= 1) { c.restore(); return; }
+    const hw = o.w / 2, sh = hw * open;
+    c.beginPath(); c.rect(o.x, o.y, o.w, o.h); c.clip();
+    c.drawImage(im, 0, 0, im.width / 2, im.height, o.x - sh, o.y, hw, o.h);
+    c.drawImage(im, im.width / 2, 0, im.width / 2, im.height, o.x + hw + sh, o.y, hw, o.h);
+  } else c.drawImage(im, o.x, o.y, o.w, o.h);
   c.restore();
 }
 

@@ -1,0 +1,81 @@
+{
+ "file": "hq_b2_strip",
+ "bgScale": 2,
+ "w": 2412,
+ "h": 848,
+ "under": false,
+ "floor": [
+  [
+   20,
+   656
+  ],
+  [
+   2400,
+   656
+  ],
+  [
+   2400,
+   772
+  ],
+  [
+   20,
+   772
+  ]
+ ],
+ "lane": [
+  656,
+  772
+ ],
+ "blocks": [],
+ "doors": {
+  "isolation": {
+   "kind": "cell",
+   "x": 312,
+   "y": 666,
+   "to": "tooth",
+   "toDoor": "out",
+   "label": "격리시설",
+   "door": {
+    "x0": 110,
+    "x1": 512,
+    "y0": 258,
+    "y1": 652,
+    "anim": "none",
+    "behind": "dark"
+   }
+  },
+  "clinic": {
+   "kind": "steel",
+   "x": 1392,
+   "y": 666,
+   "to": "clinic",
+   "toDoor": "out",
+   "label": "격리팀 사무실",
+   "door": {
+    "x0": 1300,
+    "x1": 1484,
+    "y0": 314,
+    "y1": 636,
+    "anim": "none",
+    "behind": "dark"
+   }
+  },
+  "elev": {
+   "kind": "elevator",
+   "x": 1780,
+   "y": 666,
+   "label": "엘리베이터",
+   "door": {
+    "x0": 1670,
+    "x1": 1890,
+    "y0": 320,
+    "y1": 636,
+    "anim": "none",
+    "behind": "dark"
+   }
+  }
+ },
+ "lamps": [],
+ "spots": [],
+ "objects": []
+}

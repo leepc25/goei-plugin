@@ -21,6 +21,16 @@ assert h <= 512
 win = im.crop((wx0, 0, wx0 + w, h))
 mask = Image.new("RGB", (w, h), (0, 0, 0))
 for mx0, my0, mx1, my1 in rects: mask.paste((255, 255, 255), (mx0 - wx0, my0, mx1 - wx0, my1))
+# BLANK_Y=<y>: 마스크 칸 안 원래 그림을 지우고 보낸다(그 위는 벽색, 아래는 바닥색 — 칸 왼쪽 바로 옆 세로줄에서 줄마다 색을 따옴).
+# inpaint-v3는 칸 안 그림을 밑그림으로 거의 그대로 다시 그리므로, 물건을 없애려면 지워서 보내야 한다(사용자 2026-11-01 1층 게이트).
+import os
+if os.environ.get("BLANK_Y"):
+    by = int(os.environ["BLANK_Y"]); px = win.load()
+    for mx0, my0, mx1, my1 in rects:
+        sx = int(os.environ.get("BLANK_X", mx0 - 3)) - wx0
+        for y in range(my0, my1):
+            c = px[sx, y]
+            for x in range(mx0 - wx0, min(w, mx1 - wx0)): px[x, y] = c
 def b64(img):
     buf = io.BytesIO(); img.save(buf, "PNG"); return base64.b64encode(buf.getvalue()).decode()
 body = {"description": open(prompt_path, encoding="utf-8").read().strip(),
