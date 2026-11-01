@@ -214,7 +214,7 @@ export function drawCharWindow(c: CanvasRenderingContext2D, d: CharWindowData, t
       if (p.badge) c.drawImage(p.badge, x, y, 128, 128);
       // 랭크: 2 = 별 1개, 3 = 별 2개를 토큰 위 테두리 선 가운데에 겹친다(별 색 = 등급 동·은·금)
       if (p.badge && p.rank && !p.trait) rankStars(c, p.grade ?? '희귀', p.rank[0], x, y, 2);
-      if (i === d.perkPick) bracketsOnly(c, x - 8, y - 10, 144, 146);
+      if (i === d.perkPick) bracketsOnly(c, x - 8, y - 10, 142, 140);
     }
     c.restore();
     if (rows > vis) {
