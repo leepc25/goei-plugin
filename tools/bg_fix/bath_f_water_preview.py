@@ -58,11 +58,14 @@ def draw_water(layer, n, head_top, head_x, floor_y, frame, nframes=8):
         pts = []; on_body = False
         for i in range(400):
             pts.append((x, y))
-            if not on_body and abs(x - head_x) < 10 and y >= head_top: on_body = True; vx, vy = 0.0, max(vy, 1.5)
-            if on_body and y >= floor_y - 60 - abs(u - 0.5) * 50: break
+            if abs(x - head_x) < 10 and y >= head_top:   # 17:31 사용자: 몸 타고 흘러내리는 효과 없앰 → 몸에 닿으면 가닥 끝, 물방울만
+                for k in range(3):
+                    a_ = rnd.random() * math.pi; rr = 3 + rnd.random() * 6
+                    d.point((round(x + math.cos(a_) * rr), round(y - abs(math.sin(a_)) * rr * 0.6 + ((frame + k) % 3))), fill=C_HI)
+                break
             if y >= floor_y - 2: break
             x += vx; y += vy
-            if not on_body: vy += G
+            vy += G
         for i, (px, py) in enumerate(pts):
             if (i + frame * 2 + s * 3) % 9 < 7:   # 점선 7/2, 가닥마다 어긋나게
                 col = C_HI if i % 11 < 2 else C_DEEP   # 1px 이라 색은 진하게
@@ -106,7 +109,7 @@ def render(frame):
         draw_water(water, n, head_top, fx, fy, frame, NF)
     bg.alpha_composite(water)
     return bg.convert('RGB')
-out = sys.argv[1] if len(sys.argv) > 1 else '/mnt/project-files/hq-f3/now/샤워실여_물줄기_코드_v16_2배.png'
+out = sys.argv[1] if len(sys.argv) > 1 else '/mnt/project-files/hq-f3/now/샤워실여_물줄기_코드_v17_2배.png'
 frames = [render(f).resize((924 * 2, 424 * 2), Image.NEAREST) for f in range(NF)]
 frames[0].save(out)
 frames[0].save(out.replace('.png', '.gif'), save_all=True, append_images=frames[1:], duration=120, loop=0)
