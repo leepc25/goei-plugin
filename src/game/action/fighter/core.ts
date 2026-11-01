@@ -79,9 +79,9 @@ const arcOf = (id?: Json) => CH.arc && CH.arc[id];
 const ROOT = new Set(['38_1', '40', '37_1', '42_1']);   // 기는 동작: 몸을 제자리에 두고 이동은 코드로
 // 누운·앉은 동작은 PixelLab이 몸을 캔버스 위쪽에 그려서 떠 보임 → 그 장의 맨 아래 픽셀을 바닥에 맞춤(사용자 2026-10-25)
 const FLAT = new Set(['19', '20', '38', '38_1', '43', '45']);   // 바닥에 몸을 눕히는 줄: 몸통 아래 선으로 맞춤
-const LIE = new Set(['20', '38', '38_1', '39', '40', '41', '42', '42_1', '43', '45']);
+const LIE = new Set(['20', '38', '38_1', '39', '40', '41', '42', '42_1', '43', '45', 'SH_H4', 'SH_H5']);   // 맨몸 누운 채 맞기·일어나기(11-01)
 const lieFrom = (a?: Json) => a.bot.indexOf(Math.min(...a.bot)) + 1;   // 날아가 쓰러지기: 가장 높이 뜬 장 다음부터 땅
-const FALLS = new Set(['18_3', '44', '75', '76', '77']);   // 서서 시작해 눕는 줄: 누운 장만 몸통 아랫선으로(눕기 75~77도 10-28: 허공에 눕는 인물 → 바닥. 침대 높이는 나중에 물건에 맞춤)
+const FALLS = new Set(['18_3', '44', '75', '76', '77', 'SH_H3']);   // 서서 시작해 눕는 줄: 누운 장만 몸통 아랫선으로(눕기 75~77도 10-28: 허공에 눕는 인물 → 바닥. 침대 높이는 나중에 물건에 맞춤)
 // 누운 장 판정(10-28 고침): 바닥에서 떠 있게 그린 그림도 누운 것으로 봄(몸 높이만 봄). 누운 장들은 같은 바닥선(몸통 아랫선의 가운데 값)을 써서 반복 때 들썩이지 않게
 const lowF = (a?: Json, f?: Json) => (a.bot[f] - a.top[f]) < 0.55 * (a.bot[0] - a.top[0]);
 // 누운 장은 장마다 자기 몸통 아랫선을 바닥에(그림마다 높이가 달라 한 줄로 맞추면 위아래로 튐 — 10-28 데드폴)
@@ -988,7 +988,7 @@ function runScene(steps?: Json, label?: Json) {
     if (P.scene !== label) return;
     while (i < steps.length && !has(steps[i].id)) i++;
     if (i >= steps.length) { P.scene = null; return toIdle(); }
-    const st = steps[i++], n = nOf(st.id), fr = st.rev ? R(n - 1, 0) : R(0, n - 1), seq: Json[] = [];
+    const st = steps[i++], n = nOf(st.id), fr = st.rev ? R(n - 1, 0) : R(st.from || 0, n - 1), seq: Json[] = [];   // from: 첫 몇 장 건너뜀(맨몸 경계 자세 1번 장 = 선 자세)
     for (let k = 0; k < (st.n || 1); k++) seq.push(...S(fr, st.d || 0.13));
     if (st.hold) seq.push({ f: fr[fr.length - 1], d: st.hold });
     P.mode = 'act'; play(st.id, { seq, onEnd: next });
@@ -1004,6 +1004,10 @@ const SCENES = [
   ['샤워', [['한 번에(벗기→걷기→물→씻기→입기)', () => runScene([{ id: 'SH_A', d: 0.12 }, { id: 'SH_B', n: 2 }, { id: 'SH_D', n: 3 }, { id: 'SH_E', n: 3 }, { id: 'SH_A', rev: true, d: 0.1 }], '샤워')],
     ['옷 벗기', () => runScene([{ id: 'SH_A', d: 0.12, hold: 0.6 }], '옷 벗기')], ['맨몸 걷기', () => runScene([{ id: 'SH_B', n: 4 }])], ['물 맞으며 쉬기', () => runScene([{ id: 'SH_D', n: 4 }])],
     ['몸 씻기', () => runScene([{ id: 'SH_E', n: 4 }])], ['옷 입기(벗기 거꾸로)', () => runScene([{ id: 'SH_A', rev: true, d: 0.1 }], '옷 입기')]], () => has('SH_A')],
+  // 맨몸 피격(10-31 사용자: 샤워장에서도 전투, 맨몸으로는 공격 못 함 → 11-01 125명 연결): G 경계 자세(2번 장부터 반복) · H1 배 · H2 가슴 · H3 쓰러짐 → H4 누운 채 맞기 → H5 일어나기 · H6 가린 채 도망
+  ['맨몸 피격', [['한 번에(벗기→경계→배→가슴→쓰러짐→누워 맞기→일어나기→도망)', () => runScene([{ id: 'SH_A', d: 0.12 }, { id: 'SH_G', from: 1, n: 2 }, { id: 'SH_H1' }, { id: 'SH_G', from: 1 }, { id: 'SH_H2' }, { id: 'SH_H3', hold: 0.4 }, { id: 'SH_H4' }, { id: 'SH_H4' }, { id: 'SH_H5' }, { id: 'SH_G', from: 1 }, { id: 'SH_H6', n: 3 }], '맨몸 피격')],
+    ['경계 자세(반복)', () => runScene([{ id: 'SH_G', from: 1, n: 4 }])], ['배 맞기', () => runScene([{ id: 'SH_G', from: 1 }, { id: 'SH_H1' }, { id: 'SH_G', from: 1 }])], ['가슴 맞기', () => runScene([{ id: 'SH_G', from: 1 }, { id: 'SH_H2' }, { id: 'SH_G', from: 1 }])],
+    ['쓰러짐→누워 맞기→일어나기', () => runScene([{ id: 'SH_G', from: 1 }, { id: 'SH_H3', hold: 0.4 }, { id: 'SH_H4' }, { id: 'SH_H5' }, { id: 'SH_G', from: 1 }])], ['가린 채 도망(반복)', () => runScene([{ id: 'SH_H6', n: 4 }])]], () => has('SH_G')],
   ['화장실', [['남 소변(서서)', () => runScene([{ id: '57', hold: 0.4 }, { id: '100', n: 2 }, { id: '57', hold: 0.4 }], '소변')],
     ['앉아 볼일', () => runScene([{ id: '101' }, { id: '102', n: 4 }, { id: '103' }], '볼일')], ['손 씻기', () => runScene([{ id: '57', hold: 1.0 }, { id: '104' }], '손 씻기')]], () => has('101') || has('100')],
   ['눕기', [['눕기 → 쉬기·졸기', () => runScene([{ id: '75' }, { id: '76', n: 4, d: 0.2 }, { id: '75', rev: true }])], ['눕기 → 아파하기', () => runScene([{ id: '75' }, { id: '77', n: 2 }, { id: '75', rev: true }])]], () => has('75')],

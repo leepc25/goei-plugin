@@ -86,7 +86,8 @@ STEPS = {
  "H2": ("G", 12, "G", f"Bare and barefoot {side}, in a low crouch with {GUARD}: knocked backward by a heavy blow to the chest, the shoulders jolt back and the whole body rocks back, the head staying on the shoulders, staggering three big steps backward with the knees almost buckling, the hands never leaving the body, then sinks back into the same low crouch. {DRAW}"),
  "H3": ("H2@peak", 12, None, f"Bare and barefoot {side}: struck hard in the chest, the upper body reels backward two fast stumbling steps, the knees give way and the body drops straight down, the hips hit the floor, then the back slams flat onto the floor and the head bounces once. The body ends lying flat on the back along the floor, the arms at the sides. {DRAW}"),
  "H4": ("H3", 8, "H3", f"Bare and barefoot, lying flat on the back on the floor {side}: flinch, pull both knees up toward the chest and cross both forearms over the face, then let the arms and legs drop back flat along the floor, the body staying on the floor the whole time. {DRAW}"),
- "H5": ("H3", 16, "G", f"Bare and barefoot, lying flat on the back on the floor {side}: roll onto one side, push up with one hand onto one knee, then rise into a defensive low crouch, {LOW}, {GUARD}. {DRAW}"),
+ # H5 11-01 새로 씀(사용자 「프롬프트를 손봐야」): 끝 자세(경계 자세)는 글로 적지 않고 끝 장(G)으로만 맞춘다(동작표 규칙 「자세로 돌아온다는 글에 쓰지 않는다」). 10-31 판은 LOW·GUARD로 끝 자세를 적어 끝 장과 다투었음
+ "H5": ("H3", 16, "G", f"Bare and barefoot, lying flat on the back on the floor {side}: rolls onto one side, pushes up with one hand, gets one knee under the body, then gets up off the floor. {DRAW}"),
  "H6": ("G", 8, "loop", f"Bare and barefoot, running {side} with fast even strides, both legs alternating evenly with the same step length, the upper body leaning forward, {COVER}. {DRAW}"),
 }
 CANVAS = (256, 256)
@@ -203,7 +204,7 @@ def run(n):
         b = Image.new("RGBA", im.size, (60, 60, 70, 255)); b.alpha_composite(im); gif.append(b.convert("RGB"))
     gif[0].save(OUT / f"샤워2_{n}.gif", save_all=True, append_images=gif[1:], duration=120, loop=0)
     assert fr[0].size == CANVAS, f"캔버스 {fr[0].size} ≠ 256×256"
-    if n in ("H1", "H2", "H3", "H4", "H5"):   # 10-31 사용자: 허공에 쓰러짐은 코드로 → 바닥 붙이기·이펙트 지우기(원본은 _원본/)
+    if n in ("G", "H1", "H2", "H3", "H4", "H5", "H6"):   # 11-01: 모든 줄 작은 점 지우기. 10-31 사용자: 허공에 쓰러짐은 코드로 → 바닥 붙이기·이펙트 지우기(원본은 _원본/)
         import shower_fix; shower_fix.fix(key, n)
     return n, f"완료 {len(fr)}장 {json.dumps(j.get('usage'))}"
 from concurrent.futures import ThreadPoolExecutor as _E
