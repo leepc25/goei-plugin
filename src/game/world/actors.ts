@@ -12,6 +12,7 @@ import type { Hop, PlaceGraph } from './places';
 import { pick, range, type Rng } from './rng';
 import { reactCell, type ReactCell, type ReactSituation } from './namedReact';
 import { FEMALE_LOOKS, MALE_LOOKS, STALL_DOOR_SEC, WASH, seatFeet, type ToiletUse } from './toilets';
+import { temperOf } from './intrude';
 import type { FieldWorldSave } from './fieldSave';
 
 /** 옷 입은 클립 → 맨몸 클립 (art/charPacks.ts FIELD_CLIP 의 nude_*). 표에 없는 활동은 nude_idle(가린 채 경계). 샤워 기능이 Actor.nude 를 켠 인물만 */
@@ -144,11 +145,11 @@ export interface Actor {
   /** 쓰는 훈련 장비 (장면#번호) · 화장실 자리 (장면#t:자리 id) */
   station?: string;
   /** 화장실 자리를 쓰는 중 (11-01): 칸은 문 열림(open) → 안(in) → 나옴(leave), 소변기·세면대는 in만. t = 그 단계 남은 초 */
-  toilet?: { id: string; kind: 'stall' | 'urinal' | 'sink'; phase: 'open' | 'in' | 'leave'; t: number; door?: string };
+  toilet?: { id: string; kind: 'stall' | 'urinal' | 'sink'; phase: 'open' | 'in' | 'leave'; t: number; door?: string; /** 주인공이 밖에서 문을 연 때(sim time)까지 문이 열려 있음 (11-01) */ peek?: number };
   /** 평소 거리 순찰 중인 경찰 (C16, 10-31) */
   patrol?: boolean;
   /** 이성이 화장실·샤워실에 들어온 것을 알아챔 (11-01, docs/샤워_결정.md 「2026-11-01」). wait = 남이 소리친 걸 듣고 1~3초 뒤 알아챌 차례, 0 = 들어옴 대사 함, 1 = 머묾1, 2 = 머묾2. due = 다음 단계 시각(sim time) */
-  intrude?: { stage: 'wait' | 0 | 1 | 2; due?: number };
+  intrude?: { stage: 'wait' | 0 | 1 | 2 | 'done'; due?: number };
   /** 주인공이 말을 걸기 전에 하던 일 (몹 대화, 모델에 넣는다) */
   talkFrom?: string;
   /** 이름 인물이 맞고 화난 생활 시각 (또 맞으면 맞선다, C4) */
@@ -265,7 +266,7 @@ export type SimEvent =
   /** 이성 화장실·샤워실에 들어온 주인공을 알아챔 (11-01). stage 0 = 들어옴, 1 = 머묾1, 2 = 머묾2 */
   | { kind: 'intrude'; scene: string; who: string; id: string; stage: 0 | 1 | 2 }
   /** 경고를 무시하고 안쪽으로 들어가 경비가 덤빔 (11-01) */
-  | { kind: 'guardAttack'; scene: string; who: string; by: string }
+  | { kind: 'guardAttack'; scene: string; who: string; by: string; why?: 'intrude' }
   /** 대화에서 허락받아 이번 방문 출입증이 생김 (11-01) */
   | { kind: 'pass'; scene: string; faction: string }
   /** 말풍선 칸 하나 (speech.ts speakCell). cell = game-src/dialogue2 칸 열쇠, ctx = 그 순간 정보(say = 대사 자료가 없을 때 쓸 글) */
@@ -627,7 +628,10 @@ export class WorldSim {
   /** 맞음: 앉아 있었으면(의자·화장실) 굴러떨어지기(169) → 일어나기 → 반응, 누워 있었으면 누운 채 움찔(43) → 반응 (10-31 사용자: 앉은 피격은 굴러떨어지기로 통일) */
   private struck(a: Actor, dir: 1 | -1, hostile = false): void {
     // 서서 소변(100)은 앉은 게 아니라 그냥 피격 자세로 (10-31 사용자)
-    const seated = !!a.seat || (a.act === 'do' && (a.clip === 'poo' || (a.clip === 'pee' && !this.canClip(a, 'line:100'))));
+    // 변기에 앉아 있다가 맞음(11-01 사용자): 의자 피격과 같이 굴러떨어지기(169)로. 칸·소변기·세면대 자리는 비운다
+    const onToilet = a.toilet?.kind === 'stall' && a.toilet.phase === 'in';
+    const seated = !!a.seat || onToilet || (a.act === 'do' && (a.clip === 'poo' || (a.clip === 'pee' && !this.canClip(a, 'line:100'))));
+    if (a.toilet) { this.leaveToilet(a); a.task = undefined; }
     const lying = a.clip === 'lie' || a.clip === 'treat';
     // 맨몸(11-01): 쓰러진 채 또 맞으면 누운 채 맞기(SH_H4)만 틀고 그 마지막 장에 머문다
     const nudeLying = !!a.nude && a.act === 'down' && (a.hp ?? 1) <= 0;
@@ -1356,8 +1360,8 @@ export class WorldSim {
     if (g) this.guardAttack(g, p, '위협');
   }
   /** 경비가 주인공에게 덤빈다 (경고 무시·무기·대화 중 위협) */
-  private guardAttack(g: Actor, p: { scene: string; x: number; y: number }, why: '경고 무시' | '무기' | '위협'): void {
-    if (this.playerVisit) this.playerVisit.attacked = true;
+  private guardAttack(g: Actor, p: { scene: string; x: number; y: number }, why: '경고 무시' | '무기' | '위협', cause?: 'intrude'): void {
+    if (this.playerVisit && !cause) this.playerVisit.attacked = true;
     g.escort = undefined;
     g.task = undefined;
     g.seatPick = undefined;
@@ -1368,8 +1372,8 @@ export class WorldSim {
     if (path && d) { g.route = path; this.walkTo(g, d, `${why}: 쫓아감`, 'chase'); }
     else this.walkTo(g, { x: p.x, y: p.y || g.y }, `${why}: 덤빔`, 'chase');
     this.iconOn(g, '#', 2);
-    this.events.push({ kind: 'cue', scene: g.scene, who: g.def.name, id: g.def.id, cell: why === '무기' ? 'expel.attack_weapon' : why === '위협' ? 'expel.attack_threat' : 'expel.attack', ctx: { target: '{user}', say: why === '무기' ? '무기 내려!' : why === '위협' ? '그 말, 후회하게 될 겁니다.' : '경고했습니다!' } });
-    this.events.push({ kind: 'guardAttack', scene: p.scene, who: '{user}', by: g.def.name });
+    if (!cause) this.events.push({ kind: 'cue', scene: g.scene, who: g.def.name, id: g.def.id, cell: why === '무기' ? 'expel.attack_weapon' : why === '위협' ? 'expel.attack_threat' : 'expel.attack', ctx: { target: '{user}', say: why === '무기' ? '무기 내려!' : why === '위협' ? '그 말, 후회하게 될 겁니다.' : '경고했습니다!' } });
+    this.events.push({ kind: 'guardAttack', scene: p.scene, who: '{user}', by: g.def.name, ...(cause ? { why: cause } : {}) });
   }
   /** 장면 → 거점 밖까지 남은 길 (문 수 × 1만 + 다음 문까지 가로 거리). 거점 밖이면 0 */
   private exitCost(scene: string, x: number, fac: string): number {
@@ -2094,7 +2098,7 @@ export class WorldSim {
   }
   private namedNotice(a: Actor): void {
     const p = this.player;
-    if (!p || p.scene !== a.scene || a.noticeCd > 0) return;
+    if (!p || p.scene !== a.scene || a.noticeCd > 0 || a.toilet) return;   // 화장실 자리(칸·소변기·세면대)에서는 알은체하지 않는다 (11-01)
     if (a.act !== 'idle' && a.act !== 'walk' && !(a.post && a.act === 'post')) return;
     if (a.plan === 'do' || a.route.length) return;
     if (Math.abs(p.x - a.x) > NOTICE_PX || Math.abs(p.y - a.y) > 160) return;
@@ -2440,39 +2444,91 @@ export class WorldSim {
       for (const a of this.actors) if (a.intrude) a.intrude = undefined;
       return;
     }
-    const grp = sc.toilets ? 'toilet' : 'shower';
     const run = this.playerRunning() ? WorldSim.INTRUDE_RUN_MULT : 1;
     const users = sc.toilets ? this.toiletUsers(p.scene) : [];
-    const here = this.actors.filter((a) => a.scene === p.scene && !a.fighting && !['down', 'dead', 'gone', 'door'].includes(a.act) && (a.hp ?? 1) > 0 && this.sexOf(a) === roomSex);
-    const fire = (a: Actor, stage: 0 | 1 | 2) => {
-      const next = stage < 2 ? this.time + range(this.rng, WorldSim.INTRUDE_STAY_SEC[0], WorldSim.INTRUDE_STAY_SEC[1]) : undefined;
-      a.intrude = { stage, due: next };
-      const cell = stage === 0 ? 'intrude' : `stay${stage}`;
-      const fallback = stage === 0 ? '여기 들어오면 안 돼요!' : stage === 1 ? '아직도 있어요? 나가요!' : '진짜 나가라고요!';
-      this.events.push({ kind: 'cue', scene: a.scene, who: a.def.name, id: a.def.id, cell: `${grp}.${cell}`, ctx: { target: '{user}', say: fallback } });
-      this.events.push({ kind: 'intrude', scene: a.scene, who: a.def.name, id: a.def.id, stage });
-      this.iconOn(a, '!', 1.5);
-      // 소리를 들은 같은 성별: 1~3초 뒤 따라 알아챈다 (10-31: 가까운 한두 명만 먼저, 나머지는 늦게)
-      if (stage === 0) for (const q of here) if (q !== a && !q.intrude && Math.abs(q.x - a.x) < WorldSim.INTRUDE_PX.front && users.find((u) => u.id === q.def.id)?.at !== 'stall') q.intrude = { stage: 'wait', due: this.time + range(this.rng, WorldSim.INTRUDE_HEAR_SEC[0], WorldSim.INTRUDE_HEAR_SEC[1]) };
-    };
-    for (const a of here) {
+    for (const a of this.intrudeWitnesses(p.scene, roomSex)) {
       const st = a.intrude;
       if (!st) {
         const u = users.find((x) => x.id === a.def.id);
         const at = u?.at ?? 'walk';
-        if (at === 'stall') continue;
+        if (at === 'stall') continue;   // 닫힌 문 뒤: 주인공이 문을 열어야 안다 (peekStall)
         if (Math.abs(p.y - a.y) > 160) continue;
         const dx = p.x - a.x;
         const px = WorldSim.INTRUDE_PX;
         const reach = at === 'urinal' || at === 'sink' ? px.wall * run : Math.sign(dx) === a.face ? px.front : px.back * run;
-        if (Math.abs(dx) < reach) fire(a, 0);
+        if (Math.abs(dx) < reach) this.intrudeFire(a, 0);
         continue;
       }
-      if (st.due != null && this.time >= st.due) {
-        if (st.stage === 'wait') fire(a, 0);
-        else if (st.stage < 2) fire(a, (st.stage + 1) as 1 | 2);
+      if (st.stage === 'done' || st.due == null || this.time < st.due) continue;
+      if (st.stage === 'wait') this.intrudeFire(a, 0);
+      else if (st.stage === 2) this.intrudeAct(a);
+      else this.intrudeFire(a, (st.stage + 1) as 1 | 2);
+    }
+  }
+  /** 그 방 성별의 사람 중 반응할 수 있는 몸 (쓰러짐·사망·싸움 중 제외) */
+  private intrudeWitnesses(scene: string, roomSex: '남' | '여'): Actor[] {
+    return this.actors.filter((a) => a.scene === scene && !a.fighting && !['down', 'dead', 'gone', 'door'].includes(a.act) && (a.hp ?? 1) > 0 && this.sexOf(a) === roomSex);
+  }
+  /** 들어옴(0)·머묾1·머묾2 대사. 성향대로 다음 단계를 잡는다: 수줍은 바로 도망, 화냄은 2~3초 뒤 덤빔, 당당·무심은 머묾1·2 */
+  private intrudeFire(a: Actor, stage: 0 | 1 | 2): void {
+    const p = this.player;
+    const sc = this.graph.scene(a.scene);
+    const grp = sc?.toilets ? 'toilet' : 'shower';
+    const temper = temperOf(a.def.name);
+    const cell = stage === 0 ? 'intrude' : `stay${stage}`;
+    const fallback = stage === 0 ? '여기 들어오면 안 돼요!' : stage === 1 ? '아직도 있어요? 나가요!' : '진짜 나가라고요!';
+    this.events.push({ kind: 'cue', scene: a.scene, who: a.def.name, id: a.def.id, cell: `${grp}.${cell}`, ctx: { target: '{user}', say: fallback } });
+    this.events.push({ kind: 'intrude', scene: a.scene, who: a.def.name, id: a.def.id, stage });
+    this.iconOn(a, '!', 1.5);
+    const wasNew = !a.intrude || a.intrude.stage === 'wait';
+    if (stage === 0 && temper === '수줍') { a.intrude = { stage: 'done' }; this.intrudeLeave(a, true); }
+    else if (stage === 0 && temper === '화냄') a.intrude = { stage: 2, due: this.time + range(this.rng, 2, 3) };
+    else if (stage === 2 && temper === '무심') a.intrude = { stage: 'done' };
+    else a.intrude = { stage, due: this.time + range(this.rng, WorldSim.INTRUDE_STAY_SEC[0], WorldSim.INTRUDE_STAY_SEC[1]) };
+    // 소리를 들은 같은 성별: 1~3초 뒤 따라 알아챈다 (10-31: 가까운 한두 명만 먼저, 나머지는 늦게). 닫힌 칸 안은 못 본다
+    if (stage === 0 && wasNew && p && sc?.sex) {
+      for (const q of this.intrudeWitnesses(a.scene, sc.sex)) {
+        if (q === a || q.intrude || Math.abs(q.x - a.x) >= WorldSim.INTRUDE_PX.front) continue;
+        if (q.toilet?.kind === 'stall' && q.toilet.phase === 'in') continue;
+        q.intrude = { stage: 'wait', due: this.time + range(this.rng, WorldSim.INTRUDE_HEAR_SEC[0], WorldSim.INTRUDE_HEAR_SEC[1]) };
       }
     }
+  }
+  /** 머묾2 뒤 (또는 화냄은 들어옴 뒤): 당당 = 나감, 화냄 = 덤빔, 무심 = 계속 */
+  private intrudeAct(a: Actor): void {
+    const p = this.player;
+    a.intrude = { stage: 'done' };
+    const temper = temperOf(a.def.name);
+    if (temper === '화냄' && p) {
+      this.leaveToilet(a);
+      a.task = undefined;
+      this.guardAttack(a, p, '위협', 'intrude');
+      return;
+    }
+    if (temper === '당당') this.intrudeLeave(a, false);
+  }
+  /** 하던 일을 접고 방을 나간다 (flee = 도망치듯 뛰어서) */
+  private intrudeLeave(a: Actor, flee: boolean): void {
+    this.leaveToilet(a);
+    a.task = undefined;
+    a.seatPick = undefined;
+    a.station = undefined;
+    a.run = flee ? 1.8 : 1;
+    const dest = a.def.home !== a.scene ? a.def.home : (a.def.roam ?? []).find((s) => s !== a.scene) ?? a.def.home;
+    this.travel(a, dest, 'none');
+    if (flee) { this.setClip(a, this.canClip(a, 'flee') ? 'flee' : 'run'); a.fleeClip = 'flee'; this.events.push({ kind: 'flee', scene: a.scene, who: a.def.name }); }
+  }
+  /** 주인공이 밖에서 칸 문을 열었다 (11-01 사용자: 안에 사람이 있어도 열 수 있고, 그제야 안 사람이 알아챈다). 이성이면 침입 반응, 같은 성별이면 「문 닫아」 */
+  peekStall(scene: string, id: string): void {
+    const a = this.actors.find((q) => q.scene === scene && q.toilet?.id === id && q.toilet.kind === 'stall' && q.toilet.phase === 'in');
+    if (!a?.toilet) return;
+    const again = (a.toilet.peek ?? 0) > this.time;   // 열어 둔 채 또 누름: 말은 한 번만
+    a.toilet.peek = this.time + 1.2;
+    const p = this.player;
+    const roomSex = this.graph.scene(scene)?.sex;
+    if (!p?.sex || !roomSex) return;
+    if (p.sex !== roomSex) { if (!a.intrude || a.intrude.stage === 'wait') this.intrudeFire(a, 0); return; }
+    if (!again) this.events.push({ kind: 'cue', scene, who: a.def.name, id: a.def.id, cell: 'toilet.same_open', ctx: { target: '{user}', say: '사람 있어요! 문 닫아요!' } });
   }
 
   // ── 화장실 (11-01, world/toilets.ts) ──

@@ -368,7 +368,7 @@ test('필드 피격(1-2): 18번 휘청 한 번 + 밀려남(넉백), 쓰러지면
 // ── 이성 화장실 침입 감지 (11-01 사용자: 문 진입만으로 반응 없음, 정면 700 / 등 뒤 300 / 벽 보고 200, 칸 안 없음) ──
 const wcScenes = [
   { id: 'f3', name: '3층', length: 2400, lane: [420, 669], doors: [{ id: 'wc', x: 400, kind: 'glass', to: 'wc3', toDoor: 'out' }] },
-  { id: 'wc3', name: '화장실(여)', length: 1600, lane: [470, 680], sex: '여', toilets: [{ id: 'sink0', kind: 'sink', x: 1200, y: 560 }, { id: 'stall0', kind: 'stall', x: 300, y: 560 }], doors: [{ id: 'out', x: 200, kind: 'exit', side: 'S', to: 'f3', toDoor: 'wc' }] },
+  { id: 'wc3', name: '화장실(여)', length: 1600, lane: [470, 680], sex: '여', toilets: [{ id: 'sink0', kind: 'sink', x: 1200, y: 560 }, { id: 'stall0', kind: 'stall', x: 300, y: 560, door: 'd0', seat: { x: 300, y: 540 } }], doors: [{ id: 'out', x: 200, kind: 'exit', side: 'S', to: 'f3', toDoor: 'wc' }] },
 ];
 // 여자 인물: 102(앉아 볼일)·poo 만 있고 100(남 소변)은 없음
 const wcSim = () => new A.WorldSim(new P.PlaceGraph(wcScenes, [], { f3: 'corridor', wc3: 'restroom' }), R.mulberry32(11), { sceneFaction: () => 'A00', has: (_l, c) => ['idle', 'walk', 'run', 'line:102', 'poo'].includes(c) });
@@ -419,4 +419,60 @@ test('이성 화장실: 한 사람이 소리치면 700px 안의 같은 성별이
   assert.deepEqual(intrudes(w3).map((e) => e.who).slice(0, 2), ['쟈알디', '에일린']);
   run(w3, 1, { scene: 'f3', x: 400, y: 560, sex: '남', face: 1 });
   assert.equal(b.intrude, undefined);
+});
+
+// ── 성향별 반응 (11-01 사용자: 캐릭에 따라 무시·떠남·도망·공격), 칸 문 열어야 인식, 변기 피격 → 굴러떨어지기 ──
+test('이성 화장실: 수줍(데쥬레)은 들어옴 대사와 함께 바로 도망, 화냄(로제몬)은 2~3초 뒤 덤빈다', () => {
+  const w = wcSim();
+  woman(w, '데쥬레', 400, 1);
+  run(w, 0.5, male(800));
+  assert.ok(w.events.some((e) => e.kind === 'intrude' && e.who === '데쥬레' && e.stage === 0));
+  assert.ok(w.events.some((e) => e.kind === 'flee' && e.who === '데쥬레'));
+  assert.equal(intrudes(w).filter((e) => e.who === '데쥬레').length, 1); // 머묾 없음
+  const w2 = wcSim();
+  woman(w2, '로제몬', 400, 1);
+  run(w2, 4, male(800));
+  const atk = w2.events.find((e) => e.kind === 'guardAttack');
+  assert.ok(atk && atk.by === '로제몬' && atk.why === 'intrude');
+  assert.equal(intrudes(w2).length, 1); // 머묾 대사 없이 바로
+});
+
+test('이성 화장실: 무심(에일린)은 머묾2까지 말만 하고 계속, 당당(쟈알디)은 머묾2 뒤 나간다', () => {
+  const w = wcSim();
+  const a = woman(w, '에일린', 400, 1);
+  run(w, 20, male(800));
+  assert.deepEqual(intrudes(w).map((e) => e.stage), [0, 1, 2]);
+  assert.ok(!w.events.some((e) => e.kind === 'flee' || e.kind === 'guardAttack'));
+  assert.equal(a.intrude?.stage, 'done');
+});
+
+test('이성 화장실: 칸 안(문 닫힘)은 주인공이 문을 열어야 알아챈다, 같은 성별이 열면 「문 닫아」', () => {
+  const w = wcSim();
+  const a = woman(w, '쟈알디', 300, 1);
+  a.toilet = { id: 'stall0', kind: 'stall', phase: 'in', t: 0, door: 'd0' };
+  a.wait = 60; a.clip = 'poo'; a.act = 'do'; // 한참 앉아 있는 중
+  run(w, 2, male(400)); // 100px 앞에 서 있어도 모름
+  assert.equal(intrudes(w).length, 0);
+  w.peekStall('wc3', 'stall0');
+  run(w, 0.1, male(400));
+  assert.equal(intrudes(w).length, 1);
+  assert.ok(a.toilet.peek > w.time); // 문이 열려 있음
+  const w2 = wcSim();
+  const b = woman(w2, '쟈알디', 300, 1);
+  b.toilet = { id: 'stall0', kind: 'stall', phase: 'in', t: 0, door: 'd0' };
+  b.wait = 60; b.clip = 'poo'; b.act = 'do';
+  run(w2, 0.1, { scene: 'wc3', x: 400, y: 560, sex: '여', face: 1 });
+  w2.peekStall('wc3', 'stall0');
+  assert.ok(w2.events.some((e) => e.kind === 'cue' && e.cell === 'toilet.same_open'));
+  assert.equal(intrudes(w2).length, 0);
+});
+
+test('변기에 앉아 있다가 맞으면 굴러떨어지기(169)로 이어지고 칸을 비운다', () => {
+  const w = new A.WorldSim(new P.PlaceGraph(wcScenes, [], { f3: 'corridor', wc3: 'restroom' }), R.mulberry32(11), { sceneFaction: () => 'A00', has: (_l, c) => ['idle', 'walk', 'run', 'line:102', 'poo', 'line:169', 'getup', 'hit'].includes(c) });
+  const a = woman(w, '쟈알디', 300, 1);
+  a.toilet = { id: 'stall0', kind: 'stall', phase: 'in', t: 0, door: 'd0' };
+  a.clip = 'poo';
+  w.hitActor(a.def.id, 1, 1);
+  assert.equal(a.clip, 'line:169');
+  assert.equal(a.toilet, undefined);
 });
