@@ -1,6 +1,6 @@
 """장면 확인 그림: 배경(2배)에 요원을 원근 크기로 세우고, 깊이선(sortY)이 발보다 아래(앞)인 가림 그림을 그 위에 다시 그린다.
 걷는 바닥 밖·막힘 안이면 발 자리에 빨간 X. 사용: python3 preview_scene.py <장면id> <출력.png> <지평선y(1x)> <x,y>...(1x 발 자리)
-요원 키(1x) = 1.35 × (발 y − 지평선) (남자 탈의실: 사물함이 어른보다 조금 큼, 14:43 측정)."""
+지평선y를 0으로 주면 게임과 똑같은 크기(dotK·원근 0.85~1, 사용자 15:02 「장면마다 캐릭터 크기 오락가락」→ 항상 이것으로). 아니면 옛 방식 1.35 × (발 y − 지평선)."""
 import json, sys
 from pathlib import Path
 from PIL import Image, ImageDraw
@@ -24,7 +24,12 @@ def inside(pt, poly):
 
 people = []
 for fx, fy in feet:
-    h = round(1.35 * (fy - hz) * 2); s = spr.resize((max(1, round(spr.width * h / spr.height)), h), Image.NEAREST)
+    if hz == 0:   # 게임과 같은 크기: 도트 키 × dotK × 원근(줄 맨 뒤 0.85 ~ 맨 앞 1, engine/view.ts FAR)
+        a, b = g['lane']; t = min(1, max(0, (fy * 2 - a) / (b - a)))
+        h = round(spr.height * g['dotK'] * (0.85 + 0.15 * t))
+    else:
+        h = round(1.35 * (fy - hz) * 2)
+    s = spr.resize((max(1, round(spr.width * h / spr.height)), h), Image.NEAREST)
     people.append((fy * 2, fx * 2, s))
 layers = [(p[0], 'p', p) for p in people] + [(o['sortY'], 'o', o) for o in g['objects'] if o.get('file')]
 img = bg.copy()
