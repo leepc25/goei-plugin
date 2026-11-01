@@ -80,6 +80,17 @@ function corners(c: CanvasRenderingContext2D, x: number, y: number, w: number, h
   }
 }
 
+/** 네 귀퉁이 꺾쇠만(바탕·이어진 선 없음): 어두운 테 + 금 + 밝은 안쪽 한 줄 */
+function bracketsOnly(c: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, L = 26, t = 6) {
+  for (const [sx, sy] of [[1, 1], [-1, 1], [1, -1], [-1, -1]]) {
+    const px = sx > 0 ? x : x + w, py = sy > 0 ? y : y + h;
+    const bar = (bx: number, by: number, bw: number, bh: number, col: string) => { c.fillStyle = col; c.fillRect(sx > 0 ? bx : bx - bw, sy > 0 ? by : by - bh, bw, bh); };
+    bar(px - 2 * sx, py - 2 * sy, L + 4, t + 4, EDGE_D); bar(px - 2 * sx, py - 2 * sy, t + 4, L + 4, EDGE_D);
+    bar(px, py, L, t, GOLD); bar(px, py, t, L, GOLD);
+    bar(px, py, L, 2, '#fff3c4'); bar(px, py, 2, L, '#fff3c4');
+  }
+}
+
 export const CHAR_TABS = ['능력치', '기술', '능력', '소지품'] as const;
 export type CharTab = (typeof CHAR_TABS)[number];
 
@@ -200,11 +211,10 @@ export function drawCharWindow(c: CanvasRenderingContext2D, d: CharWindowData, t
       const x = IX + 8 + (i % per) * cell, y = gy0 + (Math.floor(i / per) - first) * rowH;
       const p = d.perks[i];
       // 고른 칸 상자는 뱃지와 랭크 점을 함께 감싼다(점이 상자 테에 걸치지 않게)
-      if (i === d.perkPick) glow(c, x - 6, y - 6, 140, 140);
       if (p.badge) c.drawImage(p.badge, x, y, 128, 128);
       // 랭크: 2 = 별 1개, 3 = 별 2개를 토큰 위 테두리 선 가운데에 겹친다(별 색 = 등급 동·은·금)
       if (p.badge && p.rank && !p.trait) rankStars(c, p.grade ?? '희귀', p.rank[0], x, y, 2);
-      if (i === d.perkPick) corners(c, x - 6, y - 6, 140, 140);
+      if (i === d.perkPick) bracketsOnly(c, x - 8, y - 10, 144, 146);
     }
     c.restore();
     if (rows > vis) {
