@@ -201,6 +201,8 @@ export function drawCharWindow(c: CanvasRenderingContext2D, d: CharWindowData, t
       const kh = Math.max(24, Math.round(sh * vis / rows)), ky = sy + Math.round((sh - kh) * first / (rows - vis));
       c.fillStyle = GOLD; c.fillRect(sx, ky, 8, kh);
     }
+    // 능력이 없을 때(괴이 밖): 흐린 글자 한 줄만
+    if (!d.perks.length) putText(c, T('얻은 능력 없음', DIM), RX + RW / 2, top + (BOT - top) / 2 - 16, 'center');
     const pp = d.perks[d.perkPick];
     if (pp) {
       let y = strip(232);
@@ -243,6 +245,8 @@ export function drawCharWindow(c: CanvasRenderingContext2D, d: CharWindowData, t
       putText(c, B(it.label, GOLD), IX, y + 8);
       putText(c, T(`${it.count}개`, DIM), IX + B(it.label).width + 16, y + 16);
       const bw = 150;
+      // 퀵슬롯 등록·해제 안내: 고른 채 1~4(패드 십자키) = 그 칸에 넣기, 같은 숫자 한 번 더 = 빼기
+      putText(c, T('1~4  퀵슬롯 등록·해제', DIM), R - 32 - 2 * bw - 16 - 28, y + 14, 'right');
       for (const [j, name] of ['쓰기', '버리기'].entries()) {
         const bx2 = R - 32 - (2 - j) * bw - (1 - j) * 16;
         if (!stretch(c, 'tab', bx2, y, bw, 52)) plate(c, bx2, y, bw, 52);

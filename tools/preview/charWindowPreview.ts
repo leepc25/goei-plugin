@@ -24,7 +24,7 @@ const load = (src: string) => new Promise<HTMLImageElement>((r) => { const im = 
     ];
   // 스크롤 시험: 같은 견본 뱃지를 되풀이해 14개로
   const many = (window as unknown as { __many?: boolean }).__many;
-  const PERKS = many ? Array.from({ length: 14 }, (_, n) => BASE[n % 2]) : BASE;
+  const PERKS = (window as unknown as { __none?: boolean }).__none ? [] : many ? Array.from({ length: 14 }, (_, n) => BASE[n % 2]) : BASE;
   const draw = () => drawCharWindow(c, {
     name: '쟈알디', team: '종합대응팀 · 부장', state: '출동 중', face, body, hp: 830, maxHp: 1200,
     base: [
