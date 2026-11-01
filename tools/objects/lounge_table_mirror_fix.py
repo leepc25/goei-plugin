@@ -7,11 +7,15 @@ a=np.array(Image.open(P+'hq_lounge_table_inp1.png').convert('RGB'))
 CX2=627  # 2*313.5
 def is_table(p):
     r,g,b=[int(v) for v in p]; mx=max(r,g,b)
-    return (r>150 and r>b+50 and g>90) or mx<70 or (r>=100 and r<=120 and g>=80 and g<=95 and b>=70 and b<=85)  # 나무 / 검은 윤곽 / 앞면 그늘
+    return (r>150 and r>b+50 and g>90) or mx<70 or (r>=100 and r<=120 and g>=80 and g<=95 and b>=70 and b<=85) or (r>180 and r>b+25)  # 나무 / 검은 윤곽 / 앞면 그늘 / 모서리 하이라이트
 n=0
 for y in range(284,313):
+    # 그 줄에서 가운데(313)와 이어진 테이블 픽셀 구간의 왼끝을 찾고, 그 안쪽만 거울로 쓴다(서랍 손잡이 같은 딴 어두운 픽셀 제외)
+    L=313
+    while L>230 and is_table(a[y,L-1]): L-=1
+    if not is_table(a[y,313]): continue
     for x in range(364,392):
         sx=CX2-x
-        if 230<=sx<313 and is_table(a[y,sx]):
+        if L<=sx<313 and is_table(a[y,sx]):
             a[y,x]=a[y,sx]; n+=1
 Image.fromarray(a).save(P+'hq_lounge_table_inp1_fix.png'); print('덮어쓴 픽셀',n)
