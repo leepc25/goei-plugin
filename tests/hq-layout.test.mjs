@@ -44,8 +44,8 @@ test('본부: 층마다 엘리베이터, 계단은 3층~B1 위아래 층의 계�
     assert.ok(sc.doors.some((d) => d.kind === 'elevator'), `${id} 엘리베이터`);
     assert.ok(M.ELEVATOR.some((e) => e.scene === id), `${id} 엘리베이터 단추`);
     const st = sc.doors.find((d) => d.kind === 'stairs');
-    // f3는 새 그림(11-01, 엘리베이터만)이라 계단 없음
-    if (id === 'b2' || id === 'b3' || id === 'f3') { assert.ok(!st, `${id} 계단 없음`); continue; }
+    // f3·f2는 새 그림(11-01, 엘리베이터만)이라 계단 없음
+    if (id === 'b2' || id === 'b3' || id === 'f3' || id === 'f2') { assert.ok(!st, `${id} 계단 없음`); continue; }
     assert.ok(st, `${id} 계단`);
     for (const to of [st.up, st.down].filter(Boolean)) {
       const back = byId[to].doors.find((d) => d.kind === 'stairs');

@@ -179,20 +179,16 @@ export const HQ_SCENES: HqScene[] = [
   floorHall('lobby', '1층 로비', '1F', [
     { id: 'main', kind: 'glass', to: 'street', toDoor: 'main', label: '현관' },
     { id: 'elev', kind: 'elevator' },
-    { id: 'stairs', kind: 'stairs', up: 'f2', down: 'b1', label: '계단' },
+    { id: 'stairs', kind: 'stairs', down: 'b1', label: '계단' }, // 2층 새 그림엔 계단 없음 → 1층 계단은 아래로만
   ]),
+  // 2층은 새 본부 그림(PixelLab 11-01, game-src/mapedit/f2): 서→동 진압팀 철제문 · 엘리베이터 · 화장실(남). 계단·회의실·면담실 없음(본부 최소화)
   floorHall('f2', '2층', '2F', [
-    { id: 'wc', kind: 'door', to: 'wc', toDoor: 'out', label: '화장실' },
-    { id: 'swat', kind: 'glass', to: 'swat', toDoor: 'out', label: '진압팀' },
+    { id: 'swat', kind: 'steel', to: 'swat', toDoor: 'out', label: '진압팀' },
     { id: 'elev', kind: 'elevator' },
-    { id: 'meeting', kind: 'door', locked: true, label: '회의실' },
-    { id: 'interview', kind: 'door', to: 'interview', toDoor: 'out', needs: 'interview', label: '면담실' },
-    // 3층은 새 그림이라 계단이 없다(본부 최소화: 엘리베이터만). 2층 계단은 새 2층 그림이 올 때까지 아래로만
-    { id: 'stairs', kind: 'stairs', down: 'lobby', label: '계단' },
+    { id: 'wc', kind: 'door', to: 'wc', toDoor: 'out', label: '화장실(남)' },
   ]),
   room({ id: 'wc', name: '화장실', floor: '2F', look: 'life', doors: [exitS('f2', 'wc', 'wc', true)] }, 'wc', true),
   room({ id: 'swat', name: '진압팀', floor: '2F', look: 'office', doors: [exitS('f2', 'swat', 'swat', true)] }, 'swat', true),
-  room({ id: 'interview', name: '면담실', floor: '2F', look: 'life', doors: [exitS('f2', 'interview', 'interview')] }, 'interview'),
   // 3층은 새 본부 그림(PixelLab 2026-10-31~11-01, game-src/mapedit/hq_f3): 서→동 종합대응팀 유리문 · 엘리베이터 · 화장실(여) · 휴게실. 계단·탕비실 없음(본부 최소화, 사용자 10-31)
   floorHall('f3', '3층', '3F', [
     { id: 'office', kind: 'glass', to: 'office', toDoor: 'out', label: '종합대응팀' },

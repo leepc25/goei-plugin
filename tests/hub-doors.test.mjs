@@ -36,8 +36,10 @@ test('본부 그림 층: 계단 문 → 고른 층의 계단, 메뉴 문 → 문
   for(let i=0;i<60 && !w.ended;i++) w.step(pad);
   return {w,stage,opened,asked};
  };
- const st=run(f2.doors.find(d=>d.id==='stairs'),1);
- assert.equal(st.asked,null); // 2층 계단은 아래(1층)뿐이라(3층 새 그림엔 계단 없음) 묻지 않고 바로 간다
+ // 2층은 새 그림(11-01)이라 계단이 없다 → 지하 1층 계단(위 1층뿐)으로 본다: 묻지 않고 바로 간다
+ const b1=map.scenes.find(s=>s.id==='b1');
+ const st=run(b1.doors.find(d=>d.id==='stairs'),1,b1);
+ assert.equal(st.asked,null);
  assert.equal(st.w.ended,'next');
  st.w.enterFloor(st.stage.nextFloor(st.w.run,st.w.floor,'next'));
  assert.equal(st.w.floor.id,'hq:lobby');
@@ -45,6 +47,6 @@ test('본부 그림 층: 계단 문 → 고른 층의 계단, 메뉴 문 → 문
  const b3=map.scenes.find(s=>s.id==='b3');
  const ch=run(b3.doors.find(d=>d.id==='supply'),undefined,b3);
  assert.equal(ch.opened,'supply');assert.equal(ch.w.ended,null);
- const wc=run(f2.doors.find(d=>d.id==='meeting'));
+ const wc=run(b1.doors.find(d=>d.id==='shower_m'),undefined,b1); // 잠긴 문(2층 회의실은 새 그림에 없음)
  assert.equal(wc.opened,null);assert.equal(wc.w.ended,null);
 });
