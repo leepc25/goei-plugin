@@ -27,6 +27,7 @@ ROOT = HERE.parents[2]
 DOCS = ROOT / "docs/동작표_3판"
 M3 = ROOT / "game-src/action/motion3"
 EIL = ROOT / "game-src/action/eileen"
+if not EIL.exists(): EIL = ROOT / "_old/에일린_라이브판_2026-10-29/game-src/action/eileen"   # 10-29 보관함으로 옮김(에일린 motion_v3 원본). 팩을 다시 만들 때 필요(11-01)
 OUT = HERE / "out"
 CHARS = HERE / "chars"
 SKILLDOC = ROOT / "docs/요원_기술안.md"
