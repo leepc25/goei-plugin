@@ -74,6 +74,7 @@ import { Squad, DIFF, type Difficulty } from '../../combat/brain';
 import { FieldFx, parseFxList } from '../fx/fieldFx';
 import { SUPER_TEXT } from '../fx/superText';
 import { drawTitleBg, setHudItemIcon } from '../ui';
+import type { PixelSlot } from '../ui/pixelHud';
 import { drawItemIcon } from '../items';
 import { dummyStage, trainingStage } from './training';
 import { fallbackEnemy, type EnemyFactory, type World } from './world';
@@ -1232,19 +1233,27 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
         if (!observerOn()) shell.hud.drawFieldCorner(ctx, hs.field, hs.compact);
       }
       // 왼쪽 아래 기술 칸 줄 (에일린): 터치 버튼이 있으면 그 자리라 숨긴다. 자막은 그 오른쪽에
-      const core = (w.player as { core?: { P: Record<string, any> } }).core;
+      const core = (w.player as { core?: { P: Record<string, any>; CH: Record<string, any>; has: (id: string) => boolean } }).core;
       if (core && !shell.touchShown && !mods.blocking?.() && !shell.paused) {
         const P = core.P, clip = P.clip?.id as string | undefined, off = ['down', 'belly', 'stun'].includes(P.mode);
         const lv = P.charge >= 2 ? 3 : P.charge > 1.3 ? 2 : P.charge > 0.5 ? 1 : 0;
         const key = (b: string) => { const c = Object.keys(KEYMAP).find((k) => KEYMAP[k] === b); return c ? c.replace(/^Key/, '') : '?'; };
-        cardEnd = shell.hud.drawSkillBox(ctx, { compact: hs.compact, slots: [
+        // 11-01 고침: 그 인물 설정(CH.skills·bal.cd)대로 — 총 없는 인물은 사격 칸 없음, 기술·충전 없는 인물은 그 칸 없음, 쿨타임·남은 횟수 실제 값, 쓰는 중 판정은 그 기술의 줄
+        const sk = (core.CH.skills ?? {}) as Record<string, { name?: string; anim?: string; hold?: string; release?: string } | undefined>;
+        const cdOf = (k: string) => { const left = Math.max(0, ((P.cd?.[k] as number | undefined) ?? 0) - P.t), base = (core.CH.bal?.cd?.[k] as number | undefined) ?? 0; return { left, frac: base > 0 ? left / base : left > 0 ? 1 : 0 }; };
+        const shotCd = cdOf('shot'), shotBase = (core.CH.bal?.cd?.shot as number | undefined) ?? 0;
+        const skCd = cdOf('skill'), skMax = (P.skillMax as number | undefined) ?? 1;
+        const skillActive = !!sk.skill?.anim && clip === sk.skill.anim, superActive = !!sk.super?.anim && clip === sk.super.anim;
+        const slots: PixelSlot[] = [
           { key: key('light'), icon: 'punch', name: '약공', cd: 0, off, active: ['9', '10', '11'].includes(clip ?? '') },
           { key: key('heavy'), icon: 'kick', name: '강공', cd: 0, off, active: clip === '12' },
-          { key: key('shoot'), icon: 'gun', name: '사격', cd: P.overT > 0 ? P.overT / 2.6 : 0, cdText: P.overT > 0 ? P.overT.toFixed(1) : undefined, off, active: clip === '15', bar: P.heat / 100, hot: P.overT > 0 || P.heat > 70 },
-          { key: key('charge'), icon: 'bolt', name: '충전', cd: 0, off, active: P.mode === 'charge', bar: P.mode === 'charge' ? P.charge / 2.2 : undefined, badge: P.mode === 'charge' && lv ? ['', '1', '2', 'MAX'][lv] : undefined },
-          { key: key('skill'), icon: 'wave', name: '기술', cd: 0, off, active: clip === '22_1' },
-          { key: key('super'), icon: 'star', name: '필살', cd: 0, off: off || P.sp < 100, full: P.sp >= 100, bar: P.sp / 100 },
-        ] }, dt);
+        ];
+        if (core.has('15') && !P.noShoot) slots.push({ key: key('shoot'), icon: 'gun', name: '사격', cd: P.overT > 0 ? P.overT / 2.6 : shotBase >= 1 ? shotCd.frac : 0, cdText: P.overT > 0 ? P.overT.toFixed(1) : shotBase >= 1 && shotCd.left > 0 ? shotCd.left.toFixed(1) : undefined, off, active: clip === '15', bar: P.heat / 100, hot: P.overT > 0 || P.heat > 70 });
+        if (sk.charge) slots.push({ key: key('charge'), icon: 'bolt', name: '충전', cd: 0, off, active: P.mode === 'charge', bar: P.mode === 'charge' ? P.charge / 2.2 : undefined, badge: P.mode === 'charge' && lv ? ['', '1', '2', 'MAX'][lv] : undefined });
+        if (sk.skill) slots.push({ key: key('skill'), icon: 'wave', name: '기술', cd: skMax > 1 ? (P.skillN >= 1 ? 0 : skCd.frac) : skCd.frac, cdText: (skMax > 1 ? P.skillN < 1 : true) && skCd.left > 0 ? skCd.left.toFixed(1) : undefined, off, active: skillActive, badge: skMax > 1 ? `${P.skillN}/${skMax}` : undefined });
+        slots.push({ key: key('super'), icon: 'star', name: '필살', cd: 0, off: off || P.sp < 100, full: P.sp >= 100, bar: P.sp / 100 });
+        const caption = skillActive ? sk.skill?.name : superActive ? sk.super?.name : P.mode === 'charge' ? sk.charge?.name : undefined;
+        cardEnd = shell.hud.drawSkillBox(ctx, { compact: hs.compact, slots, ...(caption ? { caption } : {}) }, dt);
       }
       if (!game?.inHub) shell.hud.draw(ctx, { ...hs, messageLeft: cardEnd }, dt); // 본부에서는 전투 HUD 없음
       else if (!mods.blocking?.() && !shell.paused) {

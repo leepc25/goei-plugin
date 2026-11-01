@@ -4,7 +4,7 @@ import { KEYMAP } from '../engine/input';
 // 지금 장소는 일시정지 메뉴(statusHtml). 옛 승강기 총애·출동 재화·규칙서 표시는 2026-10-28에 지웠다.
 // 터치 버튼이 보이면 compact: 아이템은 터치 버튼이 대신 보여 준다.
 import { agentFaces, kitImage, kitPiece, kitSlice, nine, PIXEL_FONT } from './kit';
-import { drawPixelCard, drawPixelHotbar, drawPixelItems, hotbarSize, pixelHudReady, type PixelSlot } from './pixelHud';
+import { drawPixelCard, drawPixelHotbar, drawPixelItems, hotbarSize, pixelHudReady, pixelText, type PixelSlot } from './pixelHud';
 import { ITEM_IMG } from './kit.gen';
 import { H as H0, W as W0 } from './stage';
 import { setExplorationMap } from './mapLayout';
@@ -670,6 +670,7 @@ export class Hud {
     c.setTransform(k, 0, 0, k, 0, 0);
     const sz = hotbarSize(s.slots.length);
     const end = drawPixelHotbar(c, s.slots, 16, H - sz.h - 10, this.t);
+    if (s.caption) { c.imageSmoothingEnabled = false; c.drawImage(pixelText(s.caption, '#ffe9a0', 11), 16, Math.round(H - sz.h - 10 - 16)); }
     c.restore();
     return end * k;
   }
@@ -841,6 +842,8 @@ export function statusHtml(s: HudState | null): string {
 export interface SkillBoxState {
   compact?: boolean;
   slots: PixelSlot[];
+  /** 칸 줄 위 한 줄 (지금 쓰는 기술의 제 이름, 11-01: 칸 50px 에 긴 이름이 안 들어가 위에 띄운다) */
+  caption?: string;
 }
 
 /** 필살기 키 이름: 지금 키 배치(에일린이면 F)에서 찾는다 */
