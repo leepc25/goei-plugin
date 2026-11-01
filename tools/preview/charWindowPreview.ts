@@ -27,10 +27,10 @@ const load = (src: string) => new Promise<HTMLImageElement>((r) => { const im = 
     ],
     skills: [
       { key: 'Z', label: '약공', icon: 'punch', name: '약공' }, { key: 'X', label: '강공', icon: 'kick', name: '강공' },
-      { key: 'C', label: '사격', icon: 'gun', name: '사격', off: true }, { key: 'S', label: '충전', icon: 'wave', name: '구역 정리' },
+      { key: 'S', label: '충전', icon: 'wave', name: '구역 정리' },
       { key: 'D', label: '고유', icon: 'bolt', name: '근접 폭파' }, { key: 'F', label: '필살', icon: 'star', name: '보면 알아' },
     ],
-    pick: { skill: 4, desc: ['장갑을 당겨 끼고 편 손바닥을 내지르면 손바닥 바로 앞 한 점이 터진다.', '맞은 적은 크게 날아가 쓰러진다. 약공 3타 뒤에 쓰면 띄워진 채 날아간다.', '내지르는 동안 슈퍼아머.'], nums: '판정 이능(지) · 쿨 6초 · 앞 0.5~2m' },
+    pick: { skill: 3, desc: ['장갑을 당겨 끼고 편 손바닥을 내지르면 손바닥 바로 앞 한 점이 터진다.', '맞은 적은 크게 날아가 쓰러진다. 약공 3타 뒤에 쓰면 띄워진 채 날아간다.', '내지르는 동안 슈퍼아머.'], nums: '판정 이능(지) · 쿨 6초 · 앞 0.5~2m' },
     perks: [
       { name: '3단 점프', effect: '공중에서 한 번 더 뛴다', badge: jump },
       { name: '탄 +1', effect: '사격 한 번에 탄 하나 더', badge: shot },
