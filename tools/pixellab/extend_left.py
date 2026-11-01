@@ -67,7 +67,24 @@ img = (lr.get("images") or [lr.get("image")])[0]
 data = img["base64"] if isinstance(img, dict) else img
 res = Image.open(io.BytesIO(base64.b64decode(data.split(",")[-1]))).convert("RGBA")
 res.save(out_path.replace(".png", "_window.png"))
-out = Image.new("RGBA", (im.width + new, h)); out.paste(im, (new, 0)); orig = Image.new("RGBA", (w, h), (255, 255, 255, 255)); orig.paste(im.crop((0, 0, keep, h)), (new, 0))  # 섞을 때는 지우기 전 원래 그림
-out.paste(Image.composite(res.crop((0, 0, w, h)), orig, soft_mask(mask, 'left')).crop((0, 0, w, h)), (0, 0))
+out = Image.new("RGBA", (im.width + new, h)); out.paste(im, (new, 0))
+# 섞지 않고 자른다(사용자 11-01: 반투명 겹침으로 기둥·건조기가 유령처럼 겹쳐 망함).
+# 겹침 칸 [new, new+ov) 안에서 새 그림과 옛 그림이 가장 비슷한 세로 길(DP)을 찾아 그 왼쪽은 새 그림, 오른쪽은 옛 그림.
+import numpy as np
+R = np.asarray(res.crop((0, 0, w, h)).convert("RGB"), dtype=np.int32)
+O = np.asarray(im.crop((0, 0, keep, h)).convert("RGB"), dtype=np.int32)
+x0, x1 = new + 2, new + ov - 2
+D = np.abs(R[:, x0:x1] - O[:, x0 - new:x1 - new]).sum(axis=2).astype(np.float64)
+C = D.copy(); B = np.zeros(D.shape, dtype=np.int32)
+for y in range(1, h):
+    for x in range(D.shape[1]):
+        lo, hi = max(0, x - 1), min(D.shape[1], x + 2)
+        k = lo + int(np.argmin(C[y - 1, lo:hi])); B[y, x] = k; C[y, x] += C[y - 1, k]
+seam = [0] * h; x = int(np.argmin(C[-1]))
+for y in range(h - 1, -1, -1): seam[y] = x0 + x; x = B[y, x]
+newpart = res.crop((0, 0, w, h)).convert("RGBA")
+for y in range(h):
+    out.paste(newpart.crop((0, y, seam[y], y + 1)), (0, y))
+print("seam x(창 기준)", min(seam), max(seam))
 out.save(out_path)
 print(json.dumps({"job": job, "seconds": round(time.time() - t0), "window": res.size, "out": out.size, "usage": j.get("usage") or lr.get("usage")}))
