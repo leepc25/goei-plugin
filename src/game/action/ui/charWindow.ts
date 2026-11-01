@@ -7,6 +7,8 @@ import { hudArtImage, pixelIcon, pixelText, putText, type SkillIcon } from './pi
 import { kitPiece, kitSlice, nine } from './kit';
 import { CW_ART } from './charWindowArt';
 import { RANK_STAR, RANK_STAR_POS } from './rankStarArt';
+import { QUICK_SLOT } from './quickSlotArt';
+let quickImg: HTMLImageElement | null = null;
 
 // PixelLab 조각 한 장(kit_0.png: 큰 판·작은 판·탭·빈 퍽 자리)을 1배로 찍는다
 type ArtKey = keyof typeof CW_ART;
@@ -238,12 +240,17 @@ export function drawCharWindow(c: CanvasRenderingContext2D, d: CharWindowData, t
       c.fillStyle = SOCKET; c.fillRect(x + 8, y + 8, s - 16, s - 16);
     };
     const slot = (x: number, y: number, it?: { label: string; count: number }, k?: string, on = false) => {
-      if (k) big(x, y); else well(x, y);
+      if (k) {
+        // 퀵슬롯 = 칸 16안 15번(기술 칸과 다른 모양), 1도트 = 2px
+        if (!quickImg) { quickImg = new Image(); quickImg.src = QUICK_SLOT; }
+        if (quickImg.complete && quickImg.naturalWidth) c.drawImage(quickImg, x, y, 100, 100); else well(x, y);
+      } else well(x, y);
       if (it) {
-        putText(c, B(it.label.slice(0, 2)), x + 50, y + 30, 'center');
-        if (it.count > 1) putText(c, T(String(it.count), GOLD), x + 88, y + 66, 'right');
+        putText(c, B(it.label.slice(0, 2)), x + 50, y + (k ? 36 : 30), 'center');
+        // 퀵슬롯은 칸 귀퉁이 쇠붙이를 피해 숫자를 안쪽으로
+        if (it.count > 1) putText(c, T(String(it.count), GOLD), x + (k ? 66 : 88), y + (k ? 68 : 66), 'right');
       }
-      if (k) putText(c, T(k, GOLD), x + 10, y + 6);
+      if (k) putText(c, T(k, GOLD), x + 20, y + 13);
       if (on) bracketsOnly(c, x - 6, y - 6, 112, 112, 22);
     };
     putText(c, T('퀵슬롯', GOLD), IX, top + 22);
