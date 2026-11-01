@@ -139,7 +139,7 @@ export function drawCharWindow(c: CanvasRenderingContext2D, d: CharWindowData, t
     putText(c, t, tx + 32, TOP + 8);
     tx += w + 8;
   }
-  putText(c, T('Q · E 탭   Tab 닫기', DIM), RX + RW, TOP + 10, 'right');
+  putText(c, T('Q · E 탭   ` 닫기', DIM), RX + RW, TOP + 10, 'right');
   const top = TOP + 50, bh = BOT - top, R = RX + RW;
   box(RX, top, RW, bh);
   const IX = RX + 32;            // 안쪽 왼쪽

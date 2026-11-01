@@ -339,3 +339,20 @@ export function charFace(nameOrKey: string, side = 44, flip = false): HTMLCanvas
   o.drawImage(a.IMG[id], Math.round(fx0 - side / 2), Math.max(0, top + 2), side, side, 0, 0, side, side);
   return face;
 }
+
+/** 통합창 전신: 평상 대기(1번) 첫 장, 오른쪽 보기로 */
+const bodies = new Map<string, HTMLCanvasElement>();
+export function charBody(nameOrKey: string): HTMLCanvasElement | null {
+  const a = charArt(nameOrKey), m = a?.A['1'], im = a?.IMG['1'];
+  if (!a || !m || !im || !im.naturalWidth) return null;
+  const hit = bodies.get(a.key);
+  if (hit) return hit;
+  const cv = document.createElement('canvas');
+  cv.width = m.cw; cv.height = m.ch;
+  const o = cv.getContext('2d')!;
+  o.imageSmoothingEnabled = false;
+  if (a.cfg.dir === 'W' || a.cfg.dir === 'SW') { o.translate(m.cw, 0); o.scale(-1, 1); }
+  o.drawImage(im, 0, 0, m.cw, m.ch, 0, 0, m.cw, m.ch);
+  bodies.set(a.key, cv);
+  return cv;
+}

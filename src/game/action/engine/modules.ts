@@ -9,7 +9,12 @@ import { clockText } from '../../../core/fieldclock';
 import type { GameAssets, GameBridge, MobTalk, TalkOpts } from '../../bridge';
 import { persp, view } from './view';
 import { KEYMAP } from './input';
-import { drawGuardBar } from '../ui/pixelHud';
+import { drawGuardBar, type SkillIcon } from '../ui/pixelHud';
+import { CharWindowCtl } from '../ui/charWindowCtl';
+import type { CharWindowData } from '../ui/charWindow';
+import { CW_SKILLS, CW_STATS } from '../ui/charWindowTable.gen';
+import { AGENT_NPCS } from '../npc/roster';
+import { FIELD_ITEMS, BAG_SLOTS } from '../../world/fieldShop';
 import { FighterPlayer, fighterHooks } from '../fighter/player';
 import { GRADE_COLOR, PAIR_COLOR, TRAIT_COLOR, openDraft } from '../../perks/draftUi';
 import { PERK_TEXT } from '../../perks/defs.gen';
@@ -25,7 +30,7 @@ function perkChips(p: FighterPlayer): { t: string; c: string; n?: number }[] {
   ];
 }
 import { FighterAi } from '../fighter/ai';
-import { charArt, charFace, charTop, drawCharClip, hasCharClip, loadChar } from '../art/charPacks';
+import { charArt, charBody, charFace, charTop, drawCharClip, hasCharClip, loadChar } from '../art/charPacks';
 import { setPixelScale } from './contract';
 import { mountTalk } from '../../talk';
 import { createGameAudio } from '../audio';
@@ -730,6 +735,56 @@ function heroTop(p: World['player']): number {
   return p instanceof FighterPlayer ? charTop(p.art.key) : -230;
 }
 
+/** 통합창 자료 (11-01): 능력치·산출 = docs/퍽/능력치_55명(산출 공식 그대로), 기술 = 기술_속성표, 능력 = 지금 판의 퍽, 소지품 = 퀵슬롯(HUD 칸)·필드 가방 */
+function charWindowData(w: World, hs: HudState, team: string, bag: Record<string, number>): Parameters<CharWindowCtl['draw']>[1] {
+  const p = w.player, fp = p instanceof FighterPlayer ? p : null;
+  const name = p.label ?? '';
+  const [str, dex, con, int, wil] = CW_STATS[name] ?? [5, 5, 5, 5, 5];
+  const pct = (v: number) => `${Math.round(v)}%`;
+  const sk = CW_SKILLS[name] ?? {};
+  const key = (b: string) => { const c = Object.keys(KEYMAP).find((k) => KEYMAP[k] === b); return c ? c.replace(/^Key/, '') : '?'; };
+  const row = (label: string, icon: SkillIcon, btn: string, id: string) => ({ key: key(btn), label, icon, name: sk[id]?.[0] ?? label, id });
+  const skills = [
+    row('약공', 'punch', 'light', ''), row('강공', 'kick', 'heavy', ''),
+    ...(sk['사격'] ? [row('사격', 'gun', 'shoot', '사격')] : []),
+    ...(sk['충전0'] || sk['충전1'] ? [row('충전', 'bolt', 'charge', sk['충전1'] ? '충전1' : '충전0')] : []),
+    ...(sk['고유기'] ? [row('기술', 'wave', 'skill', '고유기')] : []),
+    ...(sk['필살'] ? [row('필살', 'star', 'super', '필살')] : []),
+  ];
+  const pr = fp?.perks;
+  const perks: CharWindowData['perks'] = pr?.active ? [
+    ...[...pr.ranks].map(([n, r]) => {
+      const t = PERK_TEXT.find((x) => x.name === n);
+      return { name: n, cat: t?.cat ?? '', effect: t?.eff ?? '', cond: t?.cond || undefined, rank: [r, t?.rank ?? r] as [number, number], grade: (['일반', '희귀', '특급'] as const)[pr.topGrade(n)] ?? '일반', badge: null };
+    }),
+    ...[...pr.traits].map((n) => ({ name: n, cat: '특성', effect: '', trait: true, badge: null })),
+  ] : [];
+  const bagRows = Object.entries(bag).filter(([, c]) => c > 0).map(([id, c]) => ({ label: FIELD_ITEMS[id]?.name ?? id, count: c }));
+  return {
+    name, team, state: '필드', face: fp ? charFace(fp.art.key, 64) : null, body: fp ? charBody(fp.art.key) : null,
+    hp: Math.round(p.hp), maxHp: Math.round(p.hpMax),
+    base: [
+      { label: '힘', v: str, what: '몸으로 때리는 기술 피해' }, { label: '민', v: dex, what: '총·투척 피해, 속도' },
+      { label: '체', v: con, what: '체력, 받는 피해' }, { label: '지', v: int, what: '이능 기술 피해, 기술 쿨' },
+      { label: '정', v: wil, what: '필살 충전, 상태 이상·정신 피해' },
+    ],
+    derived: [
+      { label: '체력', v: (500 + con * 100).toLocaleString() }, { label: '근접', v: String(100 + (str - 5) * 8) },
+      { label: '사격', v: String(100 + (dex - 5) * 8) }, { label: '이능', v: String(100 + (int - 5) * 8) },
+      { label: '받는 피해', v: pct(100 - (con - 5) * 2 - (wil - 5) * 2) }, { label: '속도', v: String(100 + (dex - 5) * 3) },
+      { label: '기술 쿨', v: pct(100 - (int - 5) * 4) }, { label: '필살 충전', v: pct(100 + (wil - 5) * 6) },
+    ],
+    skills,
+    pick: (i) => {
+      const s = skills[i], t = s?.id ? sk[s.id] : undefined;
+      return { skill: i, desc: t?.[3] && t[3] !== t[0] ? [t[3]] : [], nums: t ? `판정 ${t[1]} · 속성 ${t[2]}` : '' };
+    },
+    perks, perkSlots: perks.length,
+    quick: (hs.items ?? []).map((it) => ({ label: it.label, count: it.count })), bag: bagRows, bagSlots: BAG_SLOTS,
+    money: hs.field?.wallet ?? '',
+  };
+}
+
 function hudState(w: World, shell: Shell): HudState {
   const p = w.player;
   const boss = w.boss();
@@ -841,8 +896,11 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
   // 필드 NPC 살해 허용 (설정): 전투 몸·필드 행위자가 함께 본다
   fighterHooks.killOk = () => shell.settings.npcKill;
   fighterHooks.permaDeath = () => shell.settings.deathMode === 'perma';
+  const charWin = new CharWindowCtl();
   const shell = mountGameShell(box, {
     synth: true,
+    // 통합창: ` 로 열고 닫기 (11-01 사용자). 대화·가게·영상 등 다른 창이 떠 있으면 안 연다
+    charWindow: { isOpen: () => charWin.open, canOpen: () => !!world && !mods.blocking?.(), toggle: (on) => charWin.toggle(on), key: (c) => charWin.key(c) },
     bag: { available: () => !!game?.inHub && !!fieldShop, open: () => fieldShop?.openBag() },
     store,
     title: VISIT_TITLE.title,
@@ -1278,6 +1336,10 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
         shell.hud.drawPrompt(ctx, { x: sx + side * (half + 18), y: sy, side, key, text: tg.locked ? `${tg.text} · 잠김` : tg.text, locked: tg.locked, compact: hs.compact });
       }
       ffx.drawScreen(ctx);
+      if (charWin.open) {
+        const me = Object.values(AGENT_NPCS).find((n) => n.name === w.player.label);
+        charWin.draw(ctx, charWindowData(w, hs, me?.role.split('.')[0].replace(/ 선임.*$/, ' 선임') ?? '', fieldShop?.state().bag ?? {}));
+      }
       syncNavigationButton(shell.canvas, hs.navigation);
       shell.touch.setGauge(w.player.gauge / 100);
       shell.fx.drawTransition(ctx);
