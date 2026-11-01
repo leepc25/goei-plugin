@@ -90,7 +90,7 @@ kyu = Image.open('game-src/action/motion3/1.6_큐라스/102/00.png').convert('RG
 kyu = kyu.resize((round(kyu.width * K), round(kyu.height * K)), Image.NEAREST)
 HIP = (65 * K, 167 * K)
 SEAT = (147 - X0, 196 - R)                         # 좌석 가운데(캔버스)
-states = [0, 5, 5]
+states = [0, 5, 0]                                 # 13:45 사용자: 맨 왼쪽(화면 밖에 걸친) 칸은 닫은 채 미사용
 bg = Image.open(BG).convert('RGBA')
 for i, x in enumerate(xs): bg.alpha_composite(body_end if i == 0 else body, (x, y))
 bg.alpha_composite(endpost, (xs[0], y))
