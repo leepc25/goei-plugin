@@ -35,9 +35,9 @@ const load = (src: string) => new Promise<HTMLImageElement>((r) => { const im = 
     ],
     pick: { skill: 3, desc: ['장갑을 당겨 끼고 편 손바닥을 내지르면 손바닥 바로 앞 한 점이 터진다.', '맞은 적은 크게 날아가 쓰러진다. 약공 3타 뒤에 쓰면 띄워진 채 날아간다.', '내지르는 동안 슈퍼아머.'], nums: '판정 이능(지) · 쿨 6초 · 앞 0.5~2m' },
     perks: [
-      { name: '3단 점프', cat: '몸놀림', effect: '점프 +1회(2 → 3), 공중 좌우 이동 +40%', rank: [1, 1], badge: jump },
-      { name: '체 단련', cat: '단련', effect: '체 +1. 최대 체력이 늘고 받는 피해가 준다', rank: [1, 3], badge: vit },
-      { name: '무모함', cat: '특성', effect: '모든 피해 +20%', cost: '받는 피해 +15%', badge: reck, trait: true },
+      { name: '3단 점프', cat: '몸놀림', flavor: '허공을 세 번 밟고 올라간다', effect: '점프 +1회(2 → 3), 공중 좌우 이동 +40%', rank: [1, 1], badge: jump },
+      { name: '체 단련', cat: '단련', flavor: '버티는 몸이 먼저 만들어진다', effect: '체 +1. 최대 체력이 늘고 받는 피해가 준다', rank: [1, 3], badge: vit },
+      { name: '무모함', cat: '특성', flavor: '방패를 던져 버리고 돌진한다', effect: '모든 피해 +20%', cost: '받는 피해 +15%', badge: reck, trait: true },
     ],
     perkSlots: 24, perkPick: 2,
     quick: [{ label: '붕대', count: 3 }, { label: '진통제', count: 1 }], bag: [{ label: '부적', count: 2 }, { label: '손전등', count: 1 }, { label: '열쇠', count: 1 }], bagSlots: 12,

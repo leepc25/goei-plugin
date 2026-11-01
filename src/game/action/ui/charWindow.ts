@@ -37,14 +37,14 @@ export interface CharWindowData {
   skills: { key: string; label: string; icon: SkillIcon; name: string; off?: boolean }[];
   pick: { skill: number; desc: string[]; nums: string };
   /** 능력 (docs/퍽/퍽_목록_3판.json 그대로): 분류·효과·랭크·조건, 특성은 장점·대가 */
-  perks: { name: string; cat: string; effect: string; rank?: [number, number]; cond?: string; cost?: string; badge?: CanvasImageSource | null; trait?: boolean }[];
+  perks: { name: string; cat: string; effect: string; flavor?: string; rank?: [number, number]; cond?: string; cost?: string; badge?: CanvasImageSource | null; trait?: boolean }[];
   perkSlots: number; perkPick: number;
   quick: { label: string; count: number }[]; bag: { label: string; count: number }[]; bagSlots: number;
   money: string;
 }
 
 const INK = '#e6e4dc', DIM = '#7d8790', GOLD = '#ffd66b', UP = '#7fe08a';
-const NAVY = '#101a36', NAVY_D = '#0a1126', RIM_L = '#aeb8c8', RIM_D = '#4a5468', SOCKET = '#070c1c';
+const EDGE_D = '#05070d', NAVY = '#101a36', NAVY_D = '#0a1126', RIM_L = '#aeb8c8', RIM_D = '#4a5468', SOCKET = '#070c1c';
 
 /** 도트 판: 모서리 2도트 깎고, 위·왼쪽 밝은 테, 아래·오른쪽 어두운 테 (둥근 상자·표 선 아님) */
 function plate(c: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, fill = NAVY) {
@@ -54,11 +54,18 @@ function plate(c: CanvasRenderingContext2D, x: number, y: number, w: number, h: 
   c.fillStyle = fill; c.fillRect(x + 2 * u, y + u, w - 4 * u, h - 2 * u); c.fillRect(x + u, y + 2 * u, w - 2 * u, h - 4 * u);
 }
 /** 고른 칸 표시: 금색 도트 모서리 네 개 */
+/** 고른 칸 표시: 뒤에 밝은 판(glow) + 금색 3px 테 + 굵은 모서리 꺾쇠 */
+function glow(c: CanvasRenderingContext2D, x: number, y: number, w: number, h: number) {
+  c.fillStyle = '#25397a'; c.fillRect(x, y, w, h);
+  c.fillStyle = '#30489a'; c.fillRect(x + 8, y + 8, w - 16, h - 16);
+}
 function corners(c: CanvasRenderingContext2D, x: number, y: number, w: number, h: number) {
-  c.fillStyle = GOLD;
+  c.fillStyle = EDGE_D; c.fillRect(x - 1, y - 1, w + 2, 5); c.fillRect(x - 1, y + h - 4, w + 2, 5); c.fillRect(x - 1, y - 1, 5, h + 2); c.fillRect(x + w - 4, y - 1, 5, h + 2);
+  c.fillStyle = GOLD; c.fillRect(x, y, w, 3); c.fillRect(x, y + h - 3, w, 3); c.fillRect(x, y, 3, h); c.fillRect(x + w - 3, y, 3, h);
+  c.fillStyle = '#fff3c4';
   for (const [px, py, sx, sy] of [[x, y, 1, 1], [x + w, y, -1, 1], [x, y + h, 1, -1], [x + w, y + h, -1, -1]]) {
-    c.fillRect(sx > 0 ? px : px - 10, sy > 0 ? py : py - 2, 10, 2);
-    c.fillRect(sx > 0 ? px : px - 2, sy > 0 ? py : py - 10, 2, 10);
+    c.fillRect(sx > 0 ? px - 3 : px - 19, sy > 0 ? py - 3 : py - 3, 22, 6);
+    c.fillRect(sx > 0 ? px - 3 : px - 3, sy > 0 ? py - 3 : py - 19, 6, 22);
   }
 }
 
@@ -135,12 +142,12 @@ export function drawCharWindow(c: CanvasRenderingContext2D, d: CharWindowData, t
       const yy = top + 28 + i * 106, v = s.now ?? s.v;
       putText(c, B(s.label), IX, yy);
       putText(c, B(String(v), s.now !== undefined && s.now !== s.v ? UP : GOLD), IX + 82, yy, 'right');
-      // 눈금: 기본 10칸(금 = 기본, 초록 = 능력으로 오른 몫). 10을 넘으면 10칸 뒤에 칸이 이어 붙는다(최대 20칸 자리)
-      const n = Math.max(10, v);
+      // 눈금: 막대 전체 폭(260px)은 고정. 10 이하면 10칸, 10을 넘으면 같은 폭 안에서 칸 수만 늘고 칸·간격이 좁아진다
+      const n = Math.max(10, v), BW = 260, step = BW / n, gap = Math.max(2, Math.round(step * 0.23));
       for (let k = 0; k < n; k++) {
-        const px = IX + 104 + k * 15 + (k >= 10 ? 6 : 0), py = yy + 8;
-        c.fillStyle = RIM_D; c.fillRect(px, py, 13, 20);
-        c.fillStyle = k < Math.min(s.v, 10) ? '#e8c45a' : k < v ? UP : SOCKET; c.fillRect(px + 2, py + 2, 9, 16);
+        const px = Math.round(IX + 104 + k * step), pw = Math.round(IX + 104 + (k + 1) * step) - px - gap, py = yy + 6;
+        c.fillStyle = RIM_D; c.fillRect(px, py, pw, 24);
+        c.fillStyle = k < Math.min(s.v, 10) ? '#e8c45a' : k < v ? UP : SOCKET; c.fillRect(px + 2, py + 2, Math.max(1, pw - 4), 20);
       }
       putText(c, T(s.what, DIM), IX, yy + 46);
     });
@@ -156,6 +163,7 @@ export function drawCharWindow(c: CanvasRenderingContext2D, d: CharWindowData, t
     d.skills.forEach((k, i) => {
       const col = i % 3, row = Math.floor(i / 3);
       const x = IX + col * 246, y = top + 30 + row * 130;
+      if (i === d.pick.skill) glow(c, x - 8, y - 8, 116, 116);
       big(x, y);
       pixelIcon(c, k.icon, x + 50, y + 50, 4, k.off ? '#3b4148' : INK);
       putText(c, T(k.key, GOLD), x + 10, y + 6);
@@ -175,17 +183,19 @@ export function drawCharWindow(c: CanvasRenderingContext2D, d: CharWindowData, t
     for (let i = 0; i < d.perks.length; i++) {
       const x = IX + 8 + (i % per) * 146, y = top + 28 + Math.floor(i / per) * 146;
       const p = d.perks[i];
+      if (i === d.perkPick) glow(c, x - 6, y - 6, 140, 140);
       if (p.badge) c.drawImage(p.badge, x, y, 128, 128);
       if (i === d.perkPick) corners(c, x - 6, y - 6, 140, 140);
     }
     const pp = d.perks[d.perkPick];
     if (pp) {
-      let y = strip(200);
+      let y = strip(232);
       const nm = B(pp.name, pp.trait ? '#ff9a8a' : GOLD);
       putText(c, nm, IX, y);
       putText(c, T(pp.trait ? '특성' : pp.cat, DIM), IX + nm.width + 16, y + 8);
       if (pp.rank && pp.rank[1] > 1) putText(c, T(`랭크 ${pp.rank[0]} / ${pp.rank[1]}`, GOLD), R - 32, y + 8, 'right');
-      y += 52;
+      y += 50;
+      if (pp.flavor) { putText(c, T(`「${pp.flavor}」`, '#c9c3b0'), IX, y); y += 40; }
       if (pp.trait) {
         putText(c, T(`장점  ${pp.effect}`, UP), IX, y);
         putText(c, T(`대가  ${pp.cost ?? ''}`, '#ff7a6b'), IX, y + 36);
@@ -196,6 +206,7 @@ export function drawCharWindow(c: CanvasRenderingContext2D, d: CharWindowData, t
     }
   } else {
     const slot = (x: number, y: number, it?: { label: string; count: number }, k?: string, on = false) => {
+      if (on) glow(c, x - 6, y - 6, 112, 112);
       big(x, y);
       if (it) {
         putText(c, B(it.label.slice(0, 2)), x + 50, y + 30, 'center');
