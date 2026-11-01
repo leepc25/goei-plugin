@@ -17,6 +17,14 @@ const load = (src: string) => new Promise<HTMLImageElement>((r) => { const im = 
   const c = cv.getContext('2d')!;
   c.fillStyle = '#1c2428'; c.fillRect(0, 0, 1280, 720);
   const tab = (window as unknown as { __tab: '능력치' }).__tab;
+  const BASE = [
+      { name: '3단 점프', cat: '몸놀림', flavor: '허공을 세 번 밟고 올라간다', effect: '점프 +1회(2 → 3), 공중 좌우 이동 +40%', rank: [1, 1], grade: '일반', badge: jump },
+      { name: '체 단련', cat: '단련', flavor: '버티는 몸이 먼저 만들어진다', effect: '체 +2. 최대 체력이 늘고 받는 피해가 준다', rank: [2, 3], grade: '희귀', badge: vit },
+      { name: '무모함', cat: '특성', flavor: '방패를 던져 버리고 돌진한다', effect: '모든 피해 +20%', cost: '받는 피해 +15%', badge: reck, trait: true },
+    ];
+  // 스크롤 시험: 같은 견본 뱃지를 되풀이해 14개로
+  const many = (window as unknown as { __many?: boolean }).__many;
+  const PERKS = many ? Array.from({ length: 14 }, (_, n) => BASE[n % 2]) : BASE;
   const draw = () => drawCharWindow(c, {
     name: '쟈알디', team: '종합대응팀 · 부장', state: '출동 중', face, body, hp: 830, maxHp: 1200,
     base: [
@@ -34,12 +42,9 @@ const load = (src: string) => new Promise<HTMLImageElement>((r) => { const im = 
       { key: 'D', label: '고유', icon: 'bolt', name: '근접 폭파' }, { key: 'F', label: '필살', icon: 'star', name: '보면 알아' },
     ],
     pick: { skill: 3, desc: ['장갑을 당겨 끼고 편 손바닥을 내지르면 손바닥 바로 앞 한 점이 터진다.', '맞은 적은 크게 날아가 쓰러진다. 약공 3타 뒤에 쓰면 띄워진 채 날아간다.', '내지르는 동안 슈퍼아머.'], nums: '판정 이능(지) · 쿨 6초 · 앞 0.5~2m' },
-    perks: [
-      { name: '3단 점프', cat: '몸놀림', flavor: '허공을 세 번 밟고 올라간다', effect: '점프 +1회(2 → 3), 공중 좌우 이동 +40%', rank: [1, 1], badge: jump },
-      { name: '체 단련', cat: '단련', flavor: '버티는 몸이 먼저 만들어진다', effect: '체 +1. 최대 체력이 늘고 받는 피해가 준다', rank: [1, 3], badge: vit },
-      { name: '무모함', cat: '특성', flavor: '방패를 던져 버리고 돌진한다', effect: '모든 피해 +20%', cost: '받는 피해 +15%', badge: reck, trait: true },
-    ],
-    perkSlots: 24, perkPick: 2,
+    perks: PERKS,
+    perkSlots: 24, perkPick: 1,
+    ...((window as unknown as { __many?: boolean }).__many ? { perkPick: 12 } : {}),
     quick: [{ label: '붕대', count: 3 }, { label: '진통제', count: 1 }], bag: [{ label: '부적', count: 2 }, { label: '손전등', count: 1 }, { label: '열쇠', count: 1 }], bagSlots: 12,
     money: '₩140,000',
   }, tab);

@@ -37,12 +37,13 @@ export interface CharWindowData {
   skills: { key: string; label: string; icon: SkillIcon; name: string; off?: boolean }[];
   pick: { skill: number; desc: string[]; nums: string };
   /** 능력 (docs/퍽/퍽_목록_3판.json 그대로): 분류·효과·랭크·조건, 특성은 장점·대가 */
-  perks: { name: string; cat: string; effect: string; flavor?: string; rank?: [number, number]; cond?: string; cost?: string; badge?: CanvasImageSource | null; trait?: boolean }[];
+  perks: { name: string; cat: string; effect: string; flavor?: string; rank?: [number, number]; cond?: string; cost?: string; badge?: CanvasImageSource | null; trait?: boolean; grade?: '일반' | '희귀' | '특급' }[];
   perkSlots: number; perkPick: number;
   quick: { label: string; count: number }[]; bag: { label: string; count: number }[]; bagSlots: number;
   money: string;
 }
 
+const GRADE_COL = { 일반: '#e6e4dc', 희귀: '#7fb8ff', 특급: '#ffd66b' } as const;
 const INK = '#e6e4dc', DIM = '#7d8790', GOLD = '#ffd66b', UP = '#7fe08a';
 const EDGE_D = '#05070d', NAVY = '#101a36', NAVY_D = '#0a1126', RIM_L = '#aeb8c8', RIM_D = '#4a5468', SOCKET = '#070c1c';
 
@@ -179,13 +180,26 @@ export function drawCharWindow(c: CanvasRenderingContext2D, d: CharWindowData, t
     d.pick.desc.forEach((l) => { putText(c, T(l), IX, y); y += 34; });
     putText(c, T(d.pick.nums, '#9fd7ff'), IX, y + 10);
   } else if (tab === '능력') {
-    const per = 5;
-    for (let i = 0; i < d.perks.length; i++) {
-      const x = IX + 8 + (i % per) * 146, y = top + 28 + Math.floor(i / per) * 146;
+    // 뱃지 칸: 보이는 줄 수만큼만 그리고, 넘치면 칸 안에서 줄 단위로 넘어간다(고른 뱃지가 늘 보이게)
+    const per = 5, cell = 146, gy0 = top + 28, gyEnd = BOT - 232 - 8;
+    const rows = Math.ceil(d.perks.length / per), vis = Math.max(1, Math.floor((gyEnd - gy0 + 18) / cell));
+    const pickRow = Math.floor(Math.max(0, d.perkPick) / per);
+    const first = Math.min(Math.max(0, pickRow - vis + 1), Math.max(0, rows - vis));
+    c.save(); c.beginPath(); c.rect(RX + 8, top + 12, RW - 16, gyEnd - top - 12); c.clip();
+    for (let i = first * per; i < Math.min(d.perks.length, (first + vis) * per); i++) {
+      const x = IX + 8 + (i % per) * cell, y = gy0 + (Math.floor(i / per) - first) * cell;
       const p = d.perks[i];
       if (i === d.perkPick) glow(c, x - 6, y - 6, 140, 140);
       if (p.badge) c.drawImage(p.badge, x, y, 128, 128);
       if (i === d.perkPick) corners(c, x - 6, y - 6, 140, 140);
+    }
+    c.restore();
+    if (rows > vis) {
+      // 스크롤 막대: 오른쪽 끝 얇은 홈 + 금색 손잡이
+      const sx = R - 26, sy = gy0 - 6, sh = vis * cell - 12;
+      c.fillStyle = SOCKET; c.fillRect(sx, sy, 8, sh);
+      const kh = Math.max(24, Math.round(sh * vis / rows)), ky = sy + Math.round((sh - kh) * first / (rows - vis));
+      c.fillStyle = GOLD; c.fillRect(sx, ky, 8, kh);
     }
     const pp = d.perks[d.perkPick];
     if (pp) {
@@ -193,7 +207,10 @@ export function drawCharWindow(c: CanvasRenderingContext2D, d: CharWindowData, t
       const nm = B(pp.name, pp.trait ? '#ff9a8a' : GOLD);
       putText(c, nm, IX, y);
       putText(c, T(pp.trait ? '특성' : pp.cat, DIM), IX + nm.width + 16, y + 8);
-      if (pp.rank && pp.rank[1] > 1) putText(c, T(`랭크 ${pp.rank[0]} / ${pp.rank[1]}`, GOLD), R - 32, y + 8, 'right');
+      // 오른쪽 끝: 등급(색) + 랭크(지금/최대)
+      let rx = R - 32;
+      if (pp.rank) { const rk = T(`랭크 ${pp.rank[0]} / ${pp.rank[1]}`, INK); putText(c, rk, rx, y + 8, 'right'); rx -= rk.width + 24; }
+      if (pp.grade) putText(c, B(pp.grade, GRADE_COL[pp.grade]), rx, y + 2, 'right');
       y += 50;
       if (pp.flavor) { putText(c, T(`「${pp.flavor}」`, '#c9c3b0'), IX, y); y += 40; }
       if (pp.trait) {
