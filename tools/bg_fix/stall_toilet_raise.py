@@ -51,20 +51,25 @@ def raise_toilet(p_in, p_out):
     # 13:42 사용자 「휴지통 윤곽선 날라갔다」「옆도 맞춰야지」: 휴지통(캔버스 x89~107)은 남기고,
     # 왼쪽 칸막이 옆판(x73~88)은 아래 끝을 (73,226)→(88,WALL) 사선으로 다시 자르고 검은 선을 긋고,
     # 오른쪽 구석 솔(x166~172, y212~232)은 변기처럼 위로 옮김
-    keep = np.zeros(b.shape[:2], bool); keep[205:238, 89:108] = b[205:238, 89:108, 3] > 0
+    # 13:44 「여기 명확하지 않아」: 휴지통은 줄마다 실제 왼쪽 윤곽선(binl)부터만 남기고, 그 왼쪽 옆판(x73~)은
+    # 아래 끝을 (73,226)→(94,WALL) 사선(구석 세로선 x94까지)으로 자르고 검은 선을 긋는다
+    binl = {210: 96, 211: 94, 212: 93, 213: 92, 214: 91, 215: 90, 216: 89}
     brush = b[212:233, 166:173].copy()
     b[212:233, 166:173, 3] = 0
-    for yy in range(WALL, 227):
+    for yy in range(WALL, 238):
+        bl = binl.get(yy, 90)
         for xx in range(73, 173):
-            if keep[yy, xx]: continue
-            if xx < 89:                                     # 옆판: 사선 아래만 지움
-                edge = 226 - (xx - 73) * (226 - WALL) / (88 - 73)
+            if 89 <= xx < 108 and xx >= bl and yy <= 237: continue      # 휴지통
+            if yy >= 227 and xx >= 108: continue
+            if xx <= 94:
+                edge = 226 - (xx - 73) * (226 - WALL) / (94 - 73)
                 if yy > edge + 0.5: b[yy, xx, 3] = 0
                 elif yy > edge - 0.5: b[yy, xx] = [1, 1, 1, 255]
-            else:
+            elif yy < 227:
                 b[yy, xx, 3] = 0
     bm = brush[..., 3] > 0
-    sub = b[212 - (226 - WALL):233 - (226 - WALL), 166:173]
+    BR = 5                                              # 13:44 「공중에 떠 있다」: 솔 밑이 바닥(캔버스 y226)에 닿게 5px만 올림
+    sub = b[212 - BR:233 - BR, 166:173]
     sub[bm] = brush[bm]
     A = out[..., 3] > 0
     b[A] = out[A]
@@ -90,7 +95,7 @@ bg = Image.open(BG).convert('RGBA')
 for i, x in enumerate(xs): bg.alpha_composite(body_end if i == 0 else body, (x, y))
 bg.alpha_composite(endpost, (xs[0], y))
 big = bg.resize((bg.width * 2, bg.height * 2), Image.NEAREST)
-big.alpha_composite(kyu, (round((xs[1] + SEAT[0]) * 2 - HIP[0]), round((y + SEAT[1]) * 2 - HIP[1])))
+if 'noagent' not in sys.argv: big.alpha_composite(kyu, (round((xs[1] + SEAT[0]) * 2 - HIP[0]), round((y + SEAT[1]) * 2 - HIP[1])))
 front = Image.new('RGBA', bg.size, (0, 0, 0, 0))
 for i, x in enumerate(xs):
     bb_ = body_end if i == 0 else body
