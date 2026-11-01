@@ -15,8 +15,9 @@ OUT.mkdir(parents=True, exist_ok=True)
 K = 2
 orig = Image.open(ART / 'hq_f1_p7_ext1R.png').convert('RGB')
 W, H = orig.width * K, orig.height * K
-# 유리 날개 두 장(1x 다각형)
-FLAPS = [[(581, 285), (616, 299), (616, 366), (582, 350)], [(626, 299), (664, 310), (664, 395), (626, 372)]]
+# 열리는 유리(1x 다각형)
+# 사용자 08:54 「가운데 기둥 사이 저거 하나만 열리게」: 앞 게이트 두 기둥 사이 유리 한 장만. 옆 날개는 닫힌 그림 그대로(못 지나감)
+FLAPS = [[(539, 277), (574, 277), (574, 333), (539, 333)]]
 mask = Image.new('L', orig.size, 0); md = ImageDraw.Draw(mask)
 for q in FLAPS: md.polygon(q, fill=255)
 from PIL import ImageFilter
@@ -31,13 +32,14 @@ base.save(OUT / 'hq_f1_strip.png')
 bx0, by0, bx1, by1 = mask.getbbox()
 flap = orig.crop((bx0, by0, bx1, by1)).convert('RGBA'); flap.putalpha(mask.crop((bx0, by0, bx1, by1)))
 flap.save(OUT / 'gate_flaps.png')
-objects = [{'id': 'gate_flaps', 'file': 'gate_flaps', 'x': bx0 * K, 'y': by0 * K, 'w': (bx1 - bx0) * K, 'h': (by1 - by0) * K, 'sortY': 400 * K, 'gate': True}]
+objects = [{'id': 'gate_flaps', 'file': 'gate_flaps', 'x': bx0 * K, 'y': by0 * K, 'w': (bx1 - bx0) * K, 'h': (by1 - by0) * K, 'sortY': 352 * K, 'gate': True}]
 def rect(x0, y0, x1, y1): return [[x0 * K, y0 * K], [x1 * K, y0 * K], [x1 * K, y1 * K], [x0 * K, y1 * K]]
 # 가림(사람이 뒤에 서면 앞에 그림): 뒤 게이트·앞 게이트·가운데 기둥·끝 기둥
 for oid, r, sy in (('gate_back', (488, 252, 578, 326), 326), ('gate_front', (522, 262, 628, 352), 352), ('post_mid', (613, 290, 629, 386), 386), ('post_end', (661, 300, 680, 418), 417)):
     objects.append({'id': oid, 'cover': [rect(*r)], 'sortY': sy * K})
 # 막힘(발 자리): 게이트 몸통 줄, 가운데 기둥, 끝 기둥
-blocks = [{'poly': rect(*r), 'h': 999} for r in ((485, 292, 628, 352), (612, 352, 630, 386), (660, 404, 680, 418))]
+# 통로 = 앞 게이트 유리 줄 y335~352(유리가 열리면 그 띠로 좌우 통과). 뒤 게이트·옆 날개·끝 기둥 자리는 막음
+blocks = [{'poly': rect(*r), 'h': 999} for r in ((485, 292, 628, 335), (583, 352, 630, 386), (626, 352, 680, 418))]
 def door(x0, x1, y0, y1, anim='none'): return {'x0': x0 * K, 'x1': x1 * K, 'y0': y0 * K, 'y1': y1 * K, 'anim': anim, 'behind': 'dark'}
 doors = {
     'main': {'kind': 'glass', 'x': 110 * K, 'y': 330 * K, 'to': 'street', 'toDoor': 'main', 'label': '현관', 'door': door(60, 150, 120, 330)},
