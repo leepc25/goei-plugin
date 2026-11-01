@@ -18,7 +18,9 @@ w, h = keep + new, im.height
 win = Image.new("RGBA", (w, h), (255, 255, 255, 255))
 win.paste(im.crop((im.width - keep, 0, im.width, h)), (0, 0))
 mask = Image.new("RGB", (w, h), (0, 0, 0))
-ov = int(sys.argv[6]) if len(sys.argv) > 6 else 0
+# 기본 겹침 60px(사용자 2026-11-01: 옛 그림 끝 바로 다음부터 이으면 이음선이 끊긴다) — 옛 그림 안쪽 60px까지 다시 그리고 그 안에서 섞는다
+ov = int(sys.argv[6]) if len(sys.argv) > 6 else 60
+FEATHER = min(ov, 60) * 2 // 3
 ov_top = int(sys.argv[7]) if len(sys.argv) > 7 else ov
 top_h = int(sys.argv[8]) if len(sys.argv) > 8 else 0
 ov_bot = int(sys.argv[9]) if len(sys.argv) > 9 else ov
@@ -27,6 +29,18 @@ mask.paste((255, 255, 255), (keep - ov, 0, w, h))
 if top_h: mask.paste((255, 255, 255), (keep - ov_top, 0, w, top_h))
 if bot_y: mask.paste((255, 255, 255), (keep - ov_bot, bot_y, w, h))
 
+def soft_mask(mask, side):
+    """붙일 때 이음 자리를 칼로 자르지 않고 서서히 섞는다(사용자 2026-11-01: 끝나는 지점부터 이어서 찐빠). 각 줄의 흰 칸 끝(옛 그림 쪽) FEATHER px를 0으로 가늘게 줄인다."""
+    m = mask.convert("L"); px = m.load(); W, H = m.size
+    for y in range(H):
+        xs = [x for x in range(W) if px[x, y] > 0]
+        if not xs or FEATHER <= 0: continue
+        n = min(FEATHER, len(xs))
+        edge = xs[-1] if side == "left" else xs[0]
+        for i in range(n):
+            x = edge - i if side == "left" else edge + i
+            px[x, y] = int(255 * (i + 1) / (n + 1))
+    return m
 def b64(img):
     buf = io.BytesIO(); img.save(buf, "PNG"); return base64.b64encode(buf.getvalue()).decode()
 
@@ -57,6 +71,6 @@ res = Image.open(io.BytesIO(base64.b64decode(data.split(",")[-1]))).convert("RGB
 res.save(out_path.replace(".png", "_window.png"))
 out = Image.new("RGBA", (im.width + new, h))
 out.paste(im, (0, 0))
-out.paste(Image.composite(res.crop((0, 0, w, h)), win, mask.convert('L')), (im.width - keep, 0))
+out.paste(Image.composite(res.crop((0, 0, w, h)), win, soft_mask(mask, 'right')), (im.width - keep, 0))
 out.save(out_path)
 print(json.dumps({"seconds": round(time.time() - t0, 1), "window": res.size, "out": out.size, "generations_used": round(b0 - balance(), 2)}))
