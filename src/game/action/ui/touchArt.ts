@@ -234,18 +234,30 @@ export function renderButton(a: ButtonArt): HTMLCanvasElement {
     for (let i = -1; i <= 1; i++) g.fillRect(c - bw / 2, c + i * ir * 0.42 - bh / 2, bw, bh);
   } else if (a.text) {
     const lines = a.text.split('\n');
-    // 도트 글꼴(GoeiPixel = Galmuri11)은 11px 배수에서만 또렷하다: 안쪽 원에 들어가는 가장 큰 11 배수로 (11-01 사용자: 글자 잘림·도트 느낌 없음)
+    // 도트 글꼴(GoeiPixel = Galmuri11)은 11px 배수에서만 또렷하다 (11-01 사용자: 글자 잘림·도트 느낌 없음)
+    // 한 줄 글자도 두 줄(「자동 전투」)과 같은 글자 크기로 (11-01 사용자: 「정보」 글자 너무 큼). PC 작은 버튼에서 11px로 뭉개지지 않게 15%까지 올림.
     const longest = Math.max(...lines.map((l) => l.length));
-    const want = Math.min(ir * (lines.length > 1 ? 0.62 : 0.8), (ir * 1.7) / longest, (ir * 1.6) / lines.length);
-    // 내림이면 PC(작은 버튼)에서 두 줄 글자가 11px로 너무 작아진다: 자리보다 15% 넘게 크지 않으면 올림
-    const fs = 11 * Math.max(1, Math.ceil(want / 11) * 11 <= want * 1.15 ? Math.ceil(want / 11) : Math.floor(want / 11));
+    const want = Math.min(ir * 0.62, (ir * 1.7) / Math.max(2, longest), (ir * 1.6) / Math.max(2, lines.length));
+    const up = Math.ceil(want / 11) * 11 <= want * 1.15;
+    const fs = 11 * Math.max(1, up ? Math.ceil(want / 11) : Math.floor(want / 11));
     g.font = `700 ${fs}px "${PIXEL_FONT}", monospace`;
     g.textAlign = 'center';
-    g.textBaseline = 'middle';
+    g.textBaseline = 'alphabetic';
     const sh = Math.max(1, Math.round(fs / 11));
+    // 위치: 줄 간격 대신 실제 글자 잉크(그려지는 픽셀) 위아래를 재서 원 가운데에 맞춘다 (11-01 사용자: 위치 어정쩡)
+    const ms = lines.map((ln) => g.measureText(ln));
+    const asc = Math.max(...ms.map((m) => m.actualBoundingBoxAscent || fs * 0.8));
+    const desc = Math.max(...ms.map((m) => m.actualBoundingBoxDescent || 0));
+    const gap = Math.round(fs * 0.2);
+    const lh = asc + desc + gap;
+    const block = lines.length * (asc + desc) + (lines.length - 1) * gap + sh;
+    const top = c - block / 2;
     lines.forEach((ln, i) => {
-      const y = Math.round(c + (i - (lines.length - 1) / 2) * fs * 1.05);
-      const x = Math.round(c);
+      const m = ms[i];
+      // 잉크(그림자 포함) 가로 가운데 (가운데 정렬 기준점과 실제 픽셀 가운데가 다를 때)
+      const off = ((m.actualBoundingBoxRight ?? 0) - (m.actualBoundingBoxLeft ?? 0)) / 2;
+      const x = Math.round(c - sh / 2 - off);
+      const y = Math.round(top + i * lh + asc);
       g.fillStyle = 'rgba(0,0,0,0.85)';
       g.fillText(ln, x + sh, y + sh);
       g.fillStyle = a.kind === 'auto' && a.on ? '#06201c' : '#fbecc9';

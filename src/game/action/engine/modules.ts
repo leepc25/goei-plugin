@@ -1124,6 +1124,14 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
     e.stopImmediatePropagation();
   };
   window.addEventListener('keydown', storyKeys, true);
+  // 정보 창: 폰(터치·펜)에서 탭 이름을 누르면 그 탭으로 (11-01 사용자). 마우스는 그대로 Q·E.
+  const charWinTap = (e: PointerEvent) => {
+    if (!charWin.open || e.pointerType === 'mouse') return;
+    const cv = shell.canvas, r = cv.getBoundingClientRect();
+    if (!r.width || !r.height || e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom) return;
+    if (charWin.tap(((e.clientX - r.left) * cv.width) / r.width, ((e.clientY - r.top) * cv.height) / r.height)) e.preventDefault();
+  };
+  window.addEventListener('pointerdown', charWinTap, true);
   // 엘리베이터 층 단추 (본부). 1~5 숫자키·Esc, 누르면 닫힌다
   let floorPick: ((i: number | null) => void) | null = null;
   const floorBox = document.createElement('div');
@@ -1399,6 +1407,7 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
       world = null;
       game = null;
       window.removeEventListener('keydown', storyKeys, true);
+      window.removeEventListener('pointerdown', charWinTap, true);
       window.removeEventListener('keydown', floorKeys, true);
       saveFlags();
       storyRoot.removeEventListener(VIDEO_AUDIO_EVENT, attachVideoAudio);
