@@ -134,10 +134,15 @@ door = {'kind': 'glass', 'x': 72 * K, 'y': 356 * K, 'locked': True, 'label': '�
 # 문짝: 앞 모서리 x34 위 y133·밑 y357(224px), 뒤 모서리 x90 위 y145·밑 y343(198px) → 사람 179·158 → 사람 키(1x) = 1.49 × (발 y − 237)
 # 맨 앞(줄 끝 y418) 270(1x) = 539(2x) → dotK = 539 / 도트 키 247, 맨 뒤(y300) 94(1x) → far = 94 / 270
 SPR_DOTS, HZ, CK = 247, 237, 1.49
+# 15:08 사용자 「문 기준으로 맞추고 원근을 조금 덜 적용하면」: 문 자리(발 y350)에서 사람 = 문짝 0.8(위 식),
+# 앞뒤로 커지고 작아지는 정도는 그림 원근의 절반(PERSP_HALF). y418(맨 앞)·y300(맨 뒤) 크기를 이 식으로.
+DOOR_Y, PERSP = 350, 0.5
+size_at = lambda y: CK * (DOOR_Y - HZ) * K * (1 + PERSP * (y - DOOR_Y) / (DOOR_Y - HZ))
 lane_px = (300, 418)
-front2 = CK * (lane_px[1] - HZ) * K; back2 = CK * (lane_px[0] - HZ) * K
+front2, back2 = size_at(lane_px[1]), size_at(lane_px[0])
+GROW_TO = 0
 DOTK_HERE, FAR_HERE = round(front2 / SPR_DOTS, 4), round(back2 / front2, 3)
-m = {'file': 'hq_shower_m_strip', 'bgScale': K, 'dotK': DOTK_HERE, 'far': FAR_HERE, 'w': W * K, 'h': H * K, 'under': True, 'floor': floor,
+m = {'file': 'hq_shower_m_strip', 'bgScale': K, 'dotK': DOTK_HERE, 'far': FAR_HERE, **({'growTo': GROW_TO * K} if GROW_TO else {}), 'w': W * K, 'h': H * K, 'under': True, 'floor': floor,
      'lane': [300 * K, H * K - 12], 'blocks': blocks, 'lamps': [], 'spots': [],
      'doors': {'shower': door, 'out': {'kind': 'exit', 'side': 'S', 'x': 316 * K, 'y': H * K - 12, 'label': '나가기'}},
      'objects': [to_cover(o, mm, sy) for o, mm, sy in objects]}

@@ -25,7 +25,7 @@ def inside(pt, poly):
 people = []
 for fx, fy in feet:
     if hz == 0:   # 게임과 같은 크기: 도트 키 × dotK × 원근(줄 맨 뒤 0.85 ~ 맨 앞 1, engine/view.ts FAR)
-        a, b = g['lane']; t = min(1, max(0, (fy * 2 - a) / (b - a)))
+        a, b = g['lane'][0], g.get('growTo') or g['lane'][1]; t = min(1, max(0, (fy * 2 - a) / (b - a)))
         far = g.get('far', 0.85); h = round(spr.height * g['dotK'] * (far + (1 - far) * t))
     else:
         h = round(1.35 * (fy - hz) * 2)

@@ -65,6 +65,8 @@ export interface PaintedScene {
   dotK?: number;
   /** 줄 맨 뒤 사람 배율(맨 앞 1 대비). 없으면 0.85(engine/view.ts FAR). 그림 원근이 장면마다 달라 그림에서 재서 넣는다 (사용자 2026-11-01 15:03) */
   far?: number;
+  /** 사람이 이 y(월드)까지만 커지고 그보다 앞에서는 그 크기 그대로(맨 앞에서 급격히 커지는 것 막기, 사용자 11-01 15:07). dotK는 이 자리 크기 */
+  growTo?: number;
 }
 
 import { JR_ROOMS } from './jrRooms.gen';

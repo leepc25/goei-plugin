@@ -8,12 +8,14 @@ export const view = { crop: 0, cropY: 0, zoom: 1, lane: [440, 690] as [number, n
   /** 사람 그림 배율에 더 곱할 값. 장면에 dotK(앞줄 도트 배율)가 있으면 dotK / CHAR_K, 아니면 1 (hub.ts가 장면에 들어갈 때 정한다) */
   charMul: 1,
   /** 이 장면의 줄 맨 뒤 배율(장면에 far가 있으면 그 값, 없으면 FAR). hub.ts가 장면에 들어갈 때 정한다 */
-  far: 0.85 };
+  far: 0.85,
+  /** 이 y(월드)보다 앞에서는 사람을 더 키우지 않는다(장면 grow 값, 없으면 줄 맨 앞까지 키움). 사용자 11-01 15:07 「제일 앞에서 너무 급격하게 커진다」 */
+  growTo: 0 };
 
 /** 필드 원근 기본값: 줄 맨 뒤 0.85배 ~ 맨 앞 1배 (장면마다 view.far로 바꿀 수 있음) */
 export const FAR = 0.85;
 export const persp = (y: number) => {
-  const [a, b] = view.lane;
+  const a = view.lane[0], b = view.growTo > a ? view.growTo : view.lane[1];
   const t = b > a ? Math.max(0, Math.min(1, (y - a) / (b - a))) : 1;
   return view.far + (1 - view.far) * t;
 };

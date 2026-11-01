@@ -292,6 +292,7 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
     fieldView.charMul = sceneOf(sceneId).painted && PAINTED[sceneOf(sceneId).painted!]?.dotK ? PAINTED[sceneOf(sceneId).painted!].dotK! / CHAR_K : 1;
     // 줄 맨 뒤 배율: 장면 그림 원근에 맞춘 값(없으면 0.85, 사용자 11-01 15:03 「장면마다 변하게」)
     fieldView.far = (sceneOf(sceneId).painted && PAINTED[sceneOf(sceneId).painted!]?.far) || FAR;
+    fieldView.growTo = (sceneOf(sceneId).painted && PAINTED[sceneOf(sceneId).painted!]?.growTo) || 0;
     pending = { scene: sceneId, x, y };
     fadeOut = FADE;
   };
