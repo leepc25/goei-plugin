@@ -36,7 +36,7 @@ export interface PaintedObject {
   gate?: boolean;
   /** 여러 장면 그림(화장실 칸 문 0 닫힘 ~ 끝 열림). 열린 정도(0~1)로 장면을 고른다 (hub.ts gateOpen) */
   frames?: string[];
-  /** 화장실 칸 문 표시등이 빨간 불(사람 있음)인 같은 장면들. locked = 쓰지 않는 칸(늘 빨간 불) */
+  /** 화장실 칸 문 표시등이 빨간 불(사람 있음)인 같은 장면들. locked = 쓰지 않는 칸(녹색 그대로, 상호작용 없음) */
   busy?: string[];
   locked?: boolean;
 }

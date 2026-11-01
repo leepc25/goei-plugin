@@ -200,8 +200,8 @@ export function drawHqFieldObject(c: CanvasRenderingContext2D, scene: string, id
     return;
   }
   // 여러 장면 그림(화장실 칸 문): 열린 정도로 장면을 고른다
-  // 화장실 칸 문 표시등: 사람이 있거나 쓰지 않는 칸이면 빨간 불 장면
-  const fr = (busy || o.locked) && o.busy ? o.busy : o.frames;
+  // 화장실 칸 문 표시등: 사람이 있으면 빨간 불 장면 (쓰지 않는 칸은 녹색 그대로·상호작용만 없음, 사용자 15:34)
+  const fr = busy && o.busy ? o.busy : o.frames;
   const im = images?.[fr ? fr[Math.max(0, Math.min(fr.length - 1, Math.round(open * (fr.length - 1))))] : o.file];
   if (!im) return;
   c.save(); c.imageSmoothingEnabled = true; c.imageSmoothingQuality = 'high';

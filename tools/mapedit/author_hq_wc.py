@@ -100,7 +100,7 @@ def build(sid, bg_file, right, n, cut, used, urinals, sinks, exit_x, label):
             nm = f'part_door{i}_{s}'; c.save(out / f'{nm}.png'); names.append(nm)
             c = db.crop((x0, y0, x1, y1)); c = c.resize((c.width * K, c.height * K), Image.NEAREST)
             nm = f'part_door{i}_{s}_busy'; c.save(out / f'{nm}.png'); busy.append(nm)
-        # 표시등: 빈 칸 녹색, 사람 있으면 빨간색(busy). 쓰지 않는 칸(남자 맨 왼쪽)은 늘 빨간 불
+        # 표시등: 빈 칸 녹색, 사람 있으면 빨간색(busy). 쓰지 않는 칸(남자 맨 왼쪽)은 녹색 그대로·자리 없음(사용자 15:34)
         objects.append({'id': f'door{i}', 'file': names[0], 'frames': names, 'busy': busy, **({} if i in used else {'locked': True}),
                         'x': (x + x0) * K, 'y': (y + y0) * K, 'w': (x1 - x0) * K, 'h': (y1 - y0) * K,
                         'sortY': FOOT * K + 0.5 + (n - i) * 0.01})
