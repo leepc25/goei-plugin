@@ -137,7 +137,12 @@ SPR_DOTS, HZ, CK = 247, 237, 1.49
 # 15:08 사용자 「문 기준으로 맞추고 원근을 조금 덜 적용하면」: 문 자리(발 y350)에서 사람 = 문짝 0.8(위 식),
 # 앞뒤로 커지고 작아지는 정도는 그림 원근의 절반(PERSP_HALF). y418(맨 앞)·y300(맨 뒤) 크기를 이 식으로.
 DOOR_Y, PERSP = 350, 0.5
-size_at = lambda y: CK * (DOOR_Y - HZ) * K * (1 + PERSP * (y - DOOR_Y) / (DOOR_Y - HZ))
+# 15:09 사용자 「문 기준으로 보면 좀 작은데」: 유리 부분이 아니라 문틀 전체(앞 모서리 x30 위 y110 ~ 밑 y358, 248px)로 잼.
+# 문 바로 앞(발 y358)에 선 사람 = 문틀의 0.82 = 203(1x) → 그 자리 크기를 이 값에 맞춤
+DOOR_FRAME_H, DOOR_FOOT = 248, 358
+_base = lambda y: (1 + PERSP * (y - DOOR_Y) / (DOOR_Y - HZ))
+S0 = 0.82 * DOOR_FRAME_H * K / _base(DOOR_FOOT)
+size_at = lambda y: S0 * _base(y)
 lane_px = (300, 418)
 front2, back2 = size_at(lane_px[1]), size_at(lane_px[0])
 GROW_TO = 0
