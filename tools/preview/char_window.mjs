@@ -14,7 +14,9 @@ const sheetArg = process.env.SHEET;
 let sheetJs = '';
 if (sheetArg) {
   const names = readFileSync('docs/퍽/뱃지_그림_문구_1101.txt', 'utf8').split('\n').filter((l) => l && !l.startsWith('#')).map((l) => { const a = l.split('|'); return [a[0], a[2], a[3]]; });
-  sheetJs = `window.__sheet=${JSON.stringify('data:image/png;base64,' + readFileSync(sheetArg).toString('base64'))};window.__sheetNames=${JSON.stringify(names)};`;
+  const u = (f) => JSON.stringify('data:image/png;base64,' + readFileSync(f).toString('base64'));
+  // 등급 색 판(동·금): 같은 이름 뒤에 _bronze·_gold
+  sheetJs = `window.__sheet=${u(sheetArg)};window.__sheetB=${u(sheetArg.replace('.png', '_bronze.png'))};window.__sheetG=${u(sheetArg.replace('.png', '_gold.png'))};window.__sheetNames=${JSON.stringify(names)};`;
 }
 const b = await chromium.launch();
 for (const tab of ['능력치', '기술', '능력', '소지품', '능력_스크롤', '능력_없음']) {

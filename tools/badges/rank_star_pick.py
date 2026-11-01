@@ -29,3 +29,19 @@ for gi, g in enumerate(('gold', 'silver', 'bronze')):
         b = badge(g, k + 1); out.alpha_composite(b, (k * C + 6, gi * (C + 8) + 4))
         b.save(f'{B}rank_{g}_{k+1}.png')
 out.resize((out.width * 3, out.height * 3), Image.NEAREST).save(sys.argv[1])
+# 통합창용 별 그림(금·은·동 14x14)을 TS로 내보낸다: python3 tools/badges/rank_star_pick.py <png> --ts
+if '--ts' in sys.argv:
+    import base64, io
+    def b64(im): bb = io.BytesIO(); im.save(bb, 'PNG'); return 'data:image/png;base64,' + base64.b64encode(bb.getvalue()).decode()
+    with open('src/game/action/ui/rankStarArt.ts', 'w') as f:
+        f.write('// tools/badges/rank_star_pick.py --ts 가 만든다. 손으로 고치지 말 것\n')
+        f.write('// 랭크 별(PixelLab star_8 = 64안 9번, 최종 확정 11-01). 64px 뱃지 기준 왼쪽 위 자리: 랭크2 = 별1, 랭크3 = 별2(테두리 선 가운데)\n')
+        f.write('export const RANK_STAR = ' + repr({'일반': b64(stars['bronze']), '희귀': b64(stars['silver']), '특급': b64(stars['gold'])}).replace("'", '"') + ' as const;\n')
+        f.write('export const RANK_STAR_POS: Record<2 | 3, [number, number][]> = {\n')
+
+        w, h = stars['silver'].size
+        for rank in (2, 3):
+            xs = [32] if rank == 2 else [32 - w // 2 - 1, 32 + w // 2 + 1]
+            ps = [(round(x - w / 2), round(PAD + rim_mid(toks['silver'], x) - h / 2) - PAD) for x in xs]
+            f.write(f'  {rank}: {[list(p) for p in ps]},\n')
+        f.write('};\n')

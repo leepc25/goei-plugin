@@ -6,6 +6,7 @@
 import { hudArtImage, pixelIcon, pixelText, putText, type SkillIcon } from './pixelHud';
 import { kitPiece, kitSlice, nine } from './kit';
 import { CW_ART } from './charWindowArt';
+import { RANK_STAR, RANK_STAR_POS } from './rankStarArt';
 
 // PixelLab 조각 한 장(kit_0.png: 큰 판·작은 판·탭·빈 퍽 자리)을 1배로 찍는다
 type ArtKey = keyof typeof CW_ART;
@@ -14,6 +15,15 @@ function art(k: ArtKey): HTMLImageElement | null {
   let im = cwImgs[k];
   if (!im) { im = new Image(); im.src = CW_ART[k].src; cwImgs[k] = im; }
   return im.complete && im.naturalWidth ? im : null;
+}
+// 랭크 별(등급 색): 뱃지 64px 기준 자리를 2배로 찍는다
+const starImgs: Partial<Record<keyof typeof RANK_STAR, HTMLImageElement>> = {};
+function rankStars(c: CanvasRenderingContext2D, grade: keyof typeof RANK_STAR, rank: number, x: number, y: number, z: number) {
+  if (rank < 2) return; // 랭크1 = 표시 없음
+  let im = starImgs[grade];
+  if (!im) { im = new Image(); im.src = RANK_STAR[grade]; starImgs[grade] = im; }
+  if (!im.complete || !im.naturalWidth) return;
+  for (const [sx, sy] of RANK_STAR_POS[rank >= 3 ? 3 : 2]) c.drawImage(im, x + sx * z, y + sy * z, im.naturalWidth * z, im.naturalHeight * z);
 }
 /** 9칸 늘리기 (조각 1도트 = k px) */
 function stretch(c: CanvasRenderingContext2D, k: ArtKey, x: number, y: number, w: number, h: number, z = 1): boolean {
@@ -192,7 +202,8 @@ export function drawCharWindow(c: CanvasRenderingContext2D, d: CharWindowData, t
       // 고른 칸 상자는 뱃지와 랭크 점을 함께 감싼다(점이 상자 테에 걸치지 않게)
       if (i === d.perkPick) glow(c, x - 6, y - 6, 140, 140);
       if (p.badge) c.drawImage(p.badge, x, y, 128, 128);
-      // 랭크는 월계수 테두리(랭크 2 = 아래 반쪽, 3 = 둘레 전체)를 뱃지 위에 씌워 보인다 — 그림 나오면 연결
+      // 랭크: 2 = 별 1개, 3 = 별 2개를 토큰 위 테두리 선 가운데에 겹친다(별 색 = 등급 동·은·금)
+      if (p.badge && p.rank && !p.trait) rankStars(c, p.grade ?? '희귀', p.rank[0], x, y, 2);
       if (i === d.perkPick) corners(c, x - 6, y - 6, 140, 140);
     }
     c.restore();

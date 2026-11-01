@@ -28,11 +28,12 @@ const load = (src: string) => new Promise<HTMLImageElement>((r) => { const im = 
   const W = window as unknown as { __sheet?: string; __sheetNames?: [string, string, string][] };
   let SHEET: typeof BASE = [];
   if (W.__sheet) {
-    const sh = await load(W.__sheet);
+    const W2 = W as unknown as { __sheetB: string; __sheetG: string };
+    const shs = await Promise.all([W2.__sheetB, W.__sheet, W2.__sheetG].map(load)); // 일반 = 동, 희귀 = 은, 특급 = 금
     SHEET = W.__sheetNames!.slice(0, 12).map(([name, eff, flavor], k) => {
       const cv2 = document.createElement('canvas'); cv2.width = 64; cv2.height = 64;
-      cv2.getContext('2d')!.drawImage(sh, (k % 8) * 64, Math.floor(k / 8) * 64, 64, 64, 0, 0, 64, 64);
-      return { name, cat: k < 7 ? '연타' : '강타', flavor, effect: eff, rank: [k % 3 + 1, 3] as [number, number], grade: (['일반', '희귀', '특급'] as const)[k % 3], badge: cv2 };
+      cv2.getContext('2d')!.drawImage(shs[k % 3], (k % 8) * 64, Math.floor(k / 8) * 64, 64, 64, 0, 0, 64, 64);
+      return { name, cat: k < 7 ? '연타' : '강타', flavor, effect: eff, rank: [Math.floor(k / 3) % 3 + 1, 3] as [number, number], grade: (['일반', '희귀', '특급'] as const)[k % 3], badge: cv2 };
     });
   }
   const PERKS = W.__sheet ? SHEET : (window as unknown as { __none?: boolean }).__none ? [] : many ? Array.from({ length: 14 }, (_, n) => BASE[n % 2]) : BASE;
