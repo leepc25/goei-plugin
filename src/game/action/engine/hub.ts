@@ -37,7 +37,7 @@ export interface HubHost {
   /** 본부 방문: 이 장면에 서 있는 요원 (상태 태그로 정한 방). 발 위치와 보는 쪽 */
   visitors?(sceneId: string): { name: string; x: number; y: number; face: 1 | -1 }[];
   /** 장면 맨 위에 그리기 (월드 좌표): 이름표·말풍선. people = 이 방 요원, player = 주인공 발 */
-  overlay?(c: CanvasRenderingContext2D, people: { name: string; x: number; y: number; top: number; label?: string; mob?: boolean }[], player: { name: string; x: number; y: number; top: number }): void;
+  overlay?(c: CanvasRenderingContext2D, people: { name: string; x: number; y: number; top: number; label?: string; mob?: boolean; rel?: 'ally' | 'foe' }[], player: { name: string; x: number; y: number; top: number }): void;
   /** 필드 시각 (시, 0~24). 없으면 시간대 조명은 기기 시계 */
   hour?(): number | null;
   /** 앉기·눕기 자리에 앉았다 (시간 보내기 고르기) */
@@ -52,6 +52,8 @@ export interface HubHost {
 export interface LiveActor { id: string; name: string; kind: 'named' | 'mob'; x: number; y: number; face: 1 | -1; look?: string; moving: boolean; clip?: string; since?: number; until?: number; icon?: string; say?: string;
   /** 몹: 지금 말을 걸 수 있나 (10-31 사용자: 몹도 이름 인물처럼 대화) */
   talk?: boolean;
+  /** 동행(ally)·적(foe) 구분 (11-01 1-3): 이름표 색 */
+  rel?: 'ally' | 'foe';
   /** 지도 의자에 앉음: 의자 번호(장면 상자 번호)·앉기 방향·하는 일·의자 자리 */
   seat?: { box: number; dir: 'front' | 'side' | 'back'; kind: string; x: number; y: number } }
 export interface HubLife {
@@ -257,9 +259,10 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
         c.scale(1 / z, 1 / z);
         // 사람 그림은 월드 배율로 그려지므로(배경과 같이 커짐) 머리 높이도 z를 곱한다
         const shown = host.life ? live.filter((a) => a.kind === 'named') : people;
-        const mobsShown = host.life ? live.filter((a) => a.kind === 'mob' && a.talk) : [];
-        host.overlay?.(c, [...shown.map((p) => ({ name: p.name, x: p.x * z, y: p.y * z, top: namedTop(p.name) * persp(p.y) * z })),
-          ...mobsShown.map((p) => ({ name: `mob:${p.id}`, label: p.name, mob: true, x: p.x * z, y: p.y * z, top: (p.look && charArt(p.look) ? charTop(p.look) : -230) * persp(p.y) * z }))], { name: '', x: w.player.x * z, y: (w.player.y - w.player.z) * z, top: ((w.player as { art?: { key: string } }).art ? charTop((w.player as { art?: { key: string } }).art!.key) : -230) * persp(w.player.y) * z });
+        // 몹 이름표: 말 걸 수 있는 몹과 적(쫓아오는·맞서는 몹, 11-01 1-3)
+        const mobsShown = host.life ? live.filter((a) => a.kind === 'mob' && (a.talk || a.rel === 'foe')) : [];
+        host.overlay?.(c, [...shown.map((p) => { const rel = (p as { rel?: 'ally' | 'foe' }).rel; return { name: p.name, x: p.x * z, y: p.y * z, top: namedTop(p.name) * persp(p.y) * z, ...(rel ? { rel } : {}) }; }),
+          ...mobsShown.map((p) => ({ name: `mob:${p.id}`, label: p.name, mob: true, x: p.x * z, y: p.y * z, top: (p.look && charArt(p.look) ? charTop(p.look) : -230) * persp(p.y) * z, ...(p.rel ? { rel: p.rel } : {}) }))], { name: '', x: w.player.x * z, y: (w.player.y - w.player.z) * z, top: ((w.player as { art?: { key: string } }).art ? charTop((w.player as { art?: { key: string } }).art!.key) : -230) * persp(w.player.y) * z });
         c.restore();
         // 행위자 머리 위 아이콘·말풍선 (화면 px)
         if (host.life) {

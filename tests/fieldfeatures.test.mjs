@@ -345,3 +345,22 @@ test('이어하기(1-8): 욕구·동행·맨몸을 적어 두고 다음 세계�
   assert.ok(a2.following);
   assert.ok(b2.nude);
 });
+
+test('필드 피격(1-2): 18번 휘청 한 번 + 밀려남(넉백), 쓰러지면 더 멀리', () => {
+  const w = sim({ has: (_l, c) => ['idle', 'walk', 'run', 'hit', 'down', 'angry'].includes(c) });
+  const a = w.add({ id: 'mob1', name: '취객', kind: 'mob', brain: 'roam', home: 'street', roam: ['street'], archetype: '취객' }, { scene: 'street', x: 800, y: 560 });
+  a.hp = 100; a.hpMax = 100;
+  run(w, 0.3, { scene: 'street', x: 700, y: 560 });
+  const x0 = a.x;
+  assert.ok(w.hitActor('mob1', 1, 1, 12));
+  assert.equal(a.clip, 'hit');
+  assert.ok(Math.abs(a.x - x0) < 5, '한 번에 튀지 않고');
+  run(w, 0.6, { scene: 'street', x: 700, y: 560 });
+  const d1 = a.x - x0;
+  assert.ok(d1 > 25 && d1 < 50, `밀려남 ${d1}`);
+  const x1 = a.x;
+  assert.ok(w.hitActor('mob1', 1, 2, 100));
+  assert.equal(a.clip, 'down');
+  run(w, 0.6, { scene: 'street', x: 700, y: 560 });
+  assert.ok(a.x - x1 > d1, `쓰러질 땐 더 멀리 ${a.x - x1}`);
+});

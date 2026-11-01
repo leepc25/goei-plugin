@@ -15,7 +15,7 @@ import type { FieldWorldSave } from './fieldSave';
 
 /** 옷 입은 클립 → 맨몸 클립 (art/charPacks.ts FIELD_CLIP 의 nude_*). 표에 없는 활동은 nude_idle(가린 채 경계). 샤워 기능이 Actor.nude 를 켠 인물만 */
 export const NUDE_CLIP: Record<string, string> = {
-  idle: 'nude_idle', walk: 'nude_walk', run: 'nude_run', down: 'nude_down', getup: 'nude_getup', flee: 'nude_flee', crawl: 'nude_flee', scramble: 'nude_flee',
+  idle: 'nude_idle', walk: 'nude_walk', run: 'nude_run', hit: 'nude_hit', down: 'nude_down', getup: 'nude_getup', flee: 'nude_flee', crawl: 'nude_flee', scramble: 'nude_flee',
   'line:43': 'nude_lie_hit', lie: 'nude_lie_hit', scared: 'nude_idle', cower: 'nude_idle', backoff: 'nude_idle',
 };
 
@@ -167,6 +167,8 @@ export interface Actor {
   armedSeen?: number;
   /** 맨몸(샤워 중, 11-01): 샤워 기능이 켠다. 켜진 동안 setClip 이 옷 입은 클립을 맨몸 클립(NUDE_CLIP)으로 바꿔 끼운다 */
   nude?: boolean;
+  /** 넉백 속도(px/s, 11-01 1-2): 맞으면 밀려나며 빠르게 줄어든다 */
+  kb?: number;
   /** 맨몸 서서 맞기 마지막에 튼 줄 (배·가슴 번갈아) */
   nudeHit?: string;
   /** 무기 반응으로 버티는 중 (노려봄·맞섬 등) */
@@ -574,7 +576,8 @@ export class WorldSim {
   }
   private struckCore(a: Actor, dir: 1 | -1, hostile = false): void {
     a.seatPick = undefined;
-    a.x += dir * 36;
+    // 넉백(1-2): 한 번에 옮기지 않고 밀려난다 (stepActor). 쓰러지는 맞음은 더 멀리
+    a.kb = dir * ((a.hp ?? 1) <= 0 ? 420 : 280);
     a.face = (-dir) as 1 | -1;
     a.goal = null;
     a.route = [];
@@ -604,7 +607,7 @@ export class WorldSim {
     a.doing = down ? '기절' : '휘청';
     if (down) a.downAt = this.time;
     a.wait = down ? 6 : 0.6;
-    this.setClip(a, down && this.canClip(a, 'down') ? 'down' : 'idle');
+    this.setClip(a, down ? (this.canClip(a, 'down') ? 'down' : 'idle') : this.canClip(a, 'hit') ? 'hit' : 'idle');
     this.iconOn(a, '!', 1.5);
   }
 
@@ -1589,6 +1592,13 @@ export class WorldSim {
     }
     if (a.iconT > 0 && (a.iconT -= dt) <= 0) a.icon = undefined;
     if (a.sayT > 0 && (a.sayT -= dt) <= 0) a.say = undefined;
+    // 넉백(1-2): 밀려나다 멎는다 (약 0.3초, 합계 ≈ 속도/8 px). 장면 끝은 넘지 않는다
+    if (a.kb) {
+      const len = this.graph.scene(a.scene)?.length ?? 1280;
+      a.x = Math.max(40, Math.min(len - 40, a.x + a.kb * dt));
+      a.kb -= a.kb * Math.min(1, dt * 8);
+      if (Math.abs(a.kb) < 8) a.kb = undefined;
+    }
     if (a.act === 'dead') return;
     if (a.brawl) return this.stepBrawl(a, dt);
     // 동행: 쓰러지면 동행이 풀린다(깨면 일과로). 따라오는 동안 자기 일·응대는 멈춘다 (욕구는 그대로 준다)

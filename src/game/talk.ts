@@ -4,7 +4,7 @@ import type { GameField, GameVisit, MobTalk, TalkOpts, VisitState } from './brid
 import { ensureKit, PIXEL_FONT } from './action/ui/kit';
 
 /** name = 열쇠 (이름 인물 = 이름, 몹 = mob:<id>), label = 이름표 글 (몹) */
-export interface TalkPerson { name: string; x: number; y: number; top: number; label?: string; mob?: boolean }
+export interface TalkPerson { name: string; x: number; y: number; top: number; label?: string; mob?: boolean; /** 동행(초록)·적(빨강) 이름표 (11-01 1-3) */ rel?: 'ally' | 'foe' }
 interface Bubble { who: string; text: string; until: number; pending?: boolean; /** 이때부터 보인다 (끼어든 말은 앞 말 뒤에) */ from?: number }
 
 const FONT = (px: number) => `${px}px "${PIXEL_FONT}", "Galmuri11", sans-serif`;
@@ -277,11 +277,11 @@ export function mountTalk(root: HTMLElement, api: GameVisit, field?: GameField, 
       // 몹: 이름표는 말 상대이거나 말풍선이 있을 때만 (거리에 수십 명이라 가까운 몹마다 달면 겹친다)
       const label = p.mob ? mobOf?.(p.name)?.name ?? p.label ?? '' : p.name;
       const speaking = bubbles.some((q) => q.who === p.name && (q.from ?? 0) <= now);
-      if (p.mob && p.name !== target && !speaking) continue;
+      if (p.mob && p.name !== target && !speaking && p.rel !== 'foe') continue;
       const tw = Math.ceil(c.measureText(label).width) + 8;
       const tagBottom = place(x, tw, 18, Math.round(p.y + p.top));
       // 지금 조작하는 주인공은 이름표를 달지 않는다 (사용자 2026-10-25). 자리만 잡아 말풍선을 머리 위에 띄운다
-      if (!isPlayer) tag(c, label, x, tagBottom - 9, near || p.name === target);
+      if (!isPlayer) tag(c, label, x, tagBottom - 9, near || p.name === target, p.rel);
       // 내가 입력하는 동안 내 머리 위에 움직이는 점 (말을 보내면 그 말로 바뀐다)
       const typing = isPlayer && !busy && bar.hasAttribute('data-open') && document.activeElement === input && input.value.trim() !== '';
       const b = bubbles.find((q) => q.who === p.name && (q.from ?? 0) <= now) ?? (typing ? { who: p.name, text: '', until: Infinity, pending: true } : undefined);
@@ -335,11 +335,13 @@ function pixelBox(c: CanvasRenderingContext2D, x: number, y: number, w: number, 
 
 /** 이름표: 상자 없이 작은 글씨와 어두운 테두리만 (2026-10-23 사용자: 투박하다, 튀지 않게) */
 const TAG_PX = 12;
-function tag(c: CanvasRenderingContext2D, name: string, x: number, y: number, bright: boolean) {
+/** 이름표 색 (11-01 1-3 기본값): 동행 = 초록, 적 = 빨강, 그 밖 = 상아색(가까우면 밝게) */
+const TAG_COL = { ally: ['#9fe8a8', 'rgba(140,212,150,.8)'], foe: ['#ff7b66', 'rgba(230,110,95,.85)'] } as const;
+function tag(c: CanvasRenderingContext2D, name: string, x: number, y: number, bright: boolean, rel?: 'ally' | 'foe') {
   c.font = FONT(TAG_PX);
   c.fillStyle = 'rgba(0,0,0,.75)';
   for (const [dx, dy] of [[-1, 0], [1, 0], [0, -1], [0, 1], [1, 1]]) c.fillText(name, x + dx, y + dy);
-  c.fillStyle = bright ? '#ece6d6' : 'rgba(206,200,186,.72)';
+  c.fillStyle = rel ? TAG_COL[rel][bright ? 0 : 1] : bright ? '#ece6d6' : 'rgba(206,200,186,.72)';
   c.fillText(name, x, y);
 }
 

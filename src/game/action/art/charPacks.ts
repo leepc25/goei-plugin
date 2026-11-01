@@ -130,6 +130,7 @@ export const FIELD_CLIP: Record<string, { ids: string[]; fps?: number; loop?: bo
   train: { ids: ['144', '121', '143', '9'], fps: 6 },
   phone: { ids: ['147'], fps: 5 }, call: { ids: ['116'], fps: 5 }, coffee: { ids: ['142'], fps: 5 }, limber: { ids: ['143'], fps: 6, loop: false },
   smoke: { ids: ['145', '90'], fps: 5 }, browse: { ids: ['168'], fps: 4 }, snack: { ids: ['157'], fps: 6 }, front: { ids: ['50'], fps: 1 / 0.6 }, back: { ids: ['57'], fps: 1 / 0.6 }, spot: { ids: ['33'], fps: 8, loop: false },
+  hit: { ids: ['18'], fps: 12, loop: false },   // 필드 피격 휘청(11-01, 1-2): 전투 18번 한 번
   down: { ids: ['19'], fps: 10, loop: false }, die: { ids: ['44'], fps: 9, loop: false }, dieLie: { ids: ['45'], fps: 6, loop: false }, getup: { ids: ['20'], fps: 9, loop: false },
   sit: { ids: ['60', '96', '61'], fps: 1 / 0.6 }, lie: { ids: ['76', '75'], fps: 4 },
   // 맨몸(샤워 중 피격, 11-01): 샤워 기능이 nude 를 켠 인물만. 경계 자세(SH_G, 팩 loops 로 2~8장 반복)·맨몸 걷기(SH_B)·배/가슴 맞기(H1/H2)·쓰러짐(H3)·누운 채 맞기(H4)·일어나기(H5)·가린 채 도망(H6)
