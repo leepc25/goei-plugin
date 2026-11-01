@@ -3,6 +3,7 @@
 // 대사창이 뜨면 「대사창 모드」(약공격 자리 = 선택 Enter, 점프 자리 = 취소 Escape, 스틱 = ↑↓←→), 입력칸에 초점이 가면 「키패드 모드」(전부 숨김).
 // 모든 버튼은 키보드와 같은 키 코드를 InputHub 에 누르고 뗀다. 손가락을 떼지 않고 옆 버튼으로 미끄러지면 그 버튼이 눌린다.
 // 터치는 게임 층 루트(.gs)에서 받는다: 버튼·스틱·대사창 선택지·입력칸·메뉴 항목 말고는 아무 영향도 없게 preventDefault 만 한다.
+import { PIXEL_FONT } from './kit';
 import { CODE, TOUCH_CHARGE } from './keys';
 import { clearArtCache, onSheetReady, renderButton, renderKnob, renderStickBase, type FrameKind } from './touchArt';
 import type { InputHub } from './input';
@@ -43,8 +44,8 @@ const DEF: Omit<Btn, 'el' | 'cx' | 'cy' | 'r'>[] = [
   { id: 'interact', cell: 7, text: '조사', dx: 0.34, dy: -2.66, d: 0.8, play: true },
   { id: 'auto', cell: null, text: 'AUTO', dx: 0, dy: 0, d: 0.8, play: true },
   { id: 'menu', cell: null, text: '', dx: 0, dy: 0, d: 0.65, play: true },
-  // 통합창(` 키, 11-01 사용자): 메뉴 옆
-  { id: 'char', cell: null, text: '통합창', dx: 0, dy: 0, d: 0.8, play: true },
+  // 정보 창(통합창, ` 키, 11-01 사용자 이름 「정보」): 메뉴 옆
+  { id: 'char', cell: null, text: '정보', dx: 0, dy: 0, d: 0.8, play: true },
   // 대사창 모드: 약공격 자리 = 선택, 점프 자리 = 취소
   { id: 'ok', cell: null, text: '선택', dx: 0, dy: 0, d: 1.45, dialog: true },
   { id: 'cancel', cell: null, text: '취소', dx: 0.02, dy: -1.44, d: 0.95, dialog: true },
@@ -141,6 +142,8 @@ export class TouchPad {
     this.knob = this.base.querySelector('.tp-knob')!;
     // 아이콘 시트가 읽히면 한 번 다시 그린다
     onSheetReady(() => this.paintAll());
+    // 도트 글꼴이 늦게 읽히면 글자 버튼을 다시 그린다 (먼저 그린 건 대체 글꼴이라 매끈하게 나옴)
+    void document.fonts?.load(`700 11px "${PIXEL_FONT}"`).then(() => { clearArtCache(); this.paintAll(); }, () => {});
     layer.append(this.root);
     const opt = { passive: false } as AddEventListenerOptions;
     const s = this.surface;
@@ -349,7 +352,7 @@ export class TouchPad {
     const cv = b.el.querySelector<HTMLCanvasElement>(':scope > .tp-cv');
     if (!cv || !b.r) return;
     const size = Math.round(b.r * 2);
-    const art = renderButton({ size, kind: this.kindOf(b), cell: b.cell, text: b.id === 'auto' ? '자동\n전투' : b.id === 'char' ? '통합\n창' : b.text, on: b.id === 'auto' && this.autoOn });
+    const art = renderButton({ size, kind: this.kindOf(b), cell: b.cell, text: b.id === 'auto' ? '자동\n전투' : b.text, on: b.id === 'auto' && this.autoOn });
     if (cv.width !== art.width || cv.height !== art.height) (cv.width = art.width), (cv.height = art.height);
     const g = cv.getContext('2d');
     if (!g) return;

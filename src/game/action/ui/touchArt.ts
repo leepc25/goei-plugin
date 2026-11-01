@@ -2,6 +2,7 @@
 // 큰 공격 버튼은 장식 테두리). 그림 파일을 줄여 쓰지 않고 기기 픽셀(devicePixelRatio) 해상도로 코드가 그린다. 아이콘만 PixelLab 시트에서
 // 정수 배로 꺼내 얹는다(도트가 뭉개지지 않게). 같은 모양·크기는 한 번만 그려 캐시한다.
 import { BTN_CELL, BTN_CELLS, BTN_INNER, BTN_SHEET } from './mobileButtons.gen';
+import { PIXEL_FONT } from './kit';
 
 export type FrameKind = 'main' | 'skill' | 'guard' | 'ult' | 'auto' | 'menu' | 'plain';
 
@@ -214,8 +215,10 @@ export function renderButton(a: ButtonArt): HTMLCanvasElement {
   if (icon) {
     // 안쪽 지름의 72% 안에 들어가는 가장 큰 정수 배 (작은 화면이면 1/2)
     const avail = ir * 2 * 0.72;
-    let s = Math.floor(avail / icon.width);
-    if (s < 1) s = avail / icon.width >= 0.5 ? 0.5 : avail / icon.width;
+    // 정수 배가 자리의 85%에 못 미치면(폰에서 1/2로 줄어 아이콘이 작아지던 문제, 11-01 사용자) 자리에 꽉 맞춘다
+    let s = avail / icon.width;
+    const fl = Math.floor(s);
+    if (fl >= 1 && fl / s >= 0.85) s = fl;
     const w = icon.width * s;
     g.save();
     g.imageSmoothingEnabled = false;
@@ -231,16 +234,22 @@ export function renderButton(a: ButtonArt): HTMLCanvasElement {
     for (let i = -1; i <= 1; i++) g.fillRect(c - bw / 2, c + i * ir * 0.42 - bh / 2, bw, bh);
   } else if (a.text) {
     const lines = a.text.split('\n');
-    const fs = Math.round(ir * (lines.length > 1 ? 0.62 : a.text.length > 2 ? 0.55 : 0.8));
-    g.font = `700 ${fs}px "Galmuri11", "Galmuri", "Pretendard", "Noto Sans KR", sans-serif`;
+    // 도트 글꼴(GoeiPixel = Galmuri11)은 11px 배수에서만 또렷하다: 안쪽 원에 들어가는 가장 큰 11 배수로 (11-01 사용자: 글자 잘림·도트 느낌 없음)
+    const longest = Math.max(...lines.map((l) => l.length));
+    const want = Math.min(ir * (lines.length > 1 ? 0.62 : 0.8), (ir * 1.7) / longest, (ir * 1.6) / lines.length);
+    // 내림이면 PC(작은 버튼)에서 두 줄 글자가 11px로 너무 작아진다: 자리보다 15% 넘게 크지 않으면 올림
+    const fs = 11 * Math.max(1, Math.ceil(want / 11) * 11 <= want * 1.15 ? Math.ceil(want / 11) : Math.floor(want / 11));
+    g.font = `700 ${fs}px "${PIXEL_FONT}", monospace`;
     g.textAlign = 'center';
     g.textBaseline = 'middle';
+    const sh = Math.max(1, Math.round(fs / 11));
     lines.forEach((ln, i) => {
-      const y = c + (i - (lines.length - 1) / 2) * fs * 1.05;
+      const y = Math.round(c + (i - (lines.length - 1) / 2) * fs * 1.05);
+      const x = Math.round(c);
       g.fillStyle = 'rgba(0,0,0,0.85)';
-      g.fillText(ln, c + Math.max(1, S * 0.012), y + Math.max(1, S * 0.012));
+      g.fillText(ln, x + sh, y + sh);
       g.fillStyle = a.kind === 'auto' && a.on ? '#06201c' : '#fbecc9';
-      g.fillText(ln, c, y);
+      g.fillText(ln, x, y);
     });
   }
 
