@@ -10,10 +10,17 @@ spec=json.load(open(f'{ROOT}/lounge_table/inpaint_spec.json')); x0,y0,x1,y1=spec
 box=np.zeros(im.shape[:2],bool); box[y0:y1,x0:x1]=True
 R,G,B=im[...,0],im[...,1],im[...,2]
 mx=im.max(2); mn=im.min(2); sat=(mx-mn)
-wood=box&(R>150)&(R>B+50)&(sat>50)&(G>90)           # 황갈 나무
+wood=box&(R>100)&(R>B+40)&(sat>40)&(G>60)           # 황갈 나무 + 앞면 적갈(147,84,75)
 dark=box&(mx<120)                                    # 어두운 금속·윤곽
 lab,n=ndimage.label(wood); sizes=ndimage.sum(wood,lab,range(1,n+1)); top=lab==(1+int(np.argmax(sizes)))
 top=top|(ndimage.binary_dilation(top,iterations=2)&box&(mx<90))  # 바로 붙은 검은 윤곽선 포함
+top=ndimage.binary_fill_holes(top)
+# 앞면 아래 그늘 줄(112,86,76 근처)·윤곽선: 상판 x 범위 안에서 줄의 절반 이상이 그 색이면 줄째 포함
+ys0,xs0=np.where(top); tl,tr=xs0.min(),xs0.max(); yb=ys0.max()
+shade=(np.abs(R-112)<=14)&(np.abs(G-86)<=14)&(np.abs(B-76)<=14)
+for y in range(yb-6,yb+6):
+    seg=(shade|(mx<70))[y,tl:tr+1]
+    if seg.mean()>0.5: top[y,tl:tr+1]|=seg
 top=ndimage.binary_fill_holes(top)
 ys,xs=np.where(top); ty1=ys.max(); cx=int(np.median(xs))
 # 기둥: 가운데 줄에서 cx를 지나는 어두운 가로 구간의 폭을 재고, 그 폭(+2) 안의 어두운 픽셀만
