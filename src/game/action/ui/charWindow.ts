@@ -80,6 +80,9 @@ function bracketsOnly(c: CanvasRenderingContext2D, x: number, y: number, w: numb
 export const CHAR_TABS = ['능력치', '기술', '능력', '소지품'] as const;
 export type CharTab = (typeof CHAR_TABS)[number];
 
+/** 마지막으로 그린 탭 자리 (창 1280×720 좌표, CHAR_TABS 순서) — 폰에서 탭 이름을 눌러 바꾸기용 (11-01 사용자) */
+export const CHAR_TAB_HITS: { x: number; y: number; w: number; h: number }[] = [];
+
 export function drawCharWindow(c: CanvasRenderingContext2D, d: CharWindowData, tab: CharTab = '능력치', W = 1280, H = 720) {
   c.save();
   c.imageSmoothingEnabled = false;
@@ -130,6 +133,7 @@ export function drawCharWindow(c: CanvasRenderingContext2D, d: CharWindowData, t
   /* ── 오른쪽: 탭 ── */
   const RX = LX + LW + 16, RW = W - 40 - RX;
   let tx = RX;
+  CHAR_TAB_HITS.length = 0;
   for (const name of CHAR_TABS) {
     const on = name === tab, t = T(name, on ? GOLD : DIM), w = t.width + 64;
     c.save(); if (!on) c.globalAlpha = 0.55;
@@ -137,6 +141,7 @@ export function drawCharWindow(c: CanvasRenderingContext2D, d: CharWindowData, t
     c.restore();
     if (on) { c.fillStyle = GOLD; c.fillRect(tx + 14, TOP + 32, w - 28, 2); }
     putText(c, t, tx + 32, TOP + 8);
+    CHAR_TAB_HITS.push({ x: tx, y: TOP, w, h: 44 });
     tx += w + 8;
   }
   putText(c, T('Q · E 탭   ` 닫기', DIM), RX + RW, TOP + 10, 'right');

@@ -352,7 +352,7 @@ export class TouchPad {
     const cv = b.el.querySelector<HTMLCanvasElement>(':scope > .tp-cv');
     if (!cv || !b.r) return;
     const size = Math.round(b.r * 2);
-    const art = renderButton({ size, kind: this.kindOf(b), cell: b.cell, text: b.id === 'auto' ? '자동\n전투' : b.text, on: b.id === 'auto' && this.autoOn });
+    const art = renderButton({ size, kind: this.kindOf(b), cell: b.cell, text: b.id === 'auto' ? (this.pc ? '자동' : '자동\n전투') : b.text, on: b.id === 'auto' && this.autoOn });
     if (cv.width !== art.width || cv.height !== art.height) (cv.width = art.width), (cv.height = art.height);
     const g = cv.getContext('2d');
     if (!g) return;
