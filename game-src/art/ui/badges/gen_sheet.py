@@ -65,10 +65,18 @@ SHEETS[5] = [
  "agent hugging a sack of coins while being hit", "agent standing firm before an empty bowl", "agent throwing his pistol to the floor and making a fist",
  "agent walking down one straight road, back view", "agent grinning with fangs",
  "agent opening a first aid box and pulling out a vial", "agent with a bulging suit pocket", "agent pouring a single drop from a vial"]
-SHEETS[6] = [
- "agent sipping from a vial and sparkling", "agent quick drawing a vial from a hip holster", "agent falling as a first aid box opens by itself",
- "agent with two bare fists turning out empty pockets", "laurel wreath on the bottom half only, empty token center", "laurel wreath all the way around, empty token center",
- "plain empty token", "plain empty token"]
+SHEETS[6] = [  # 11:28 사용자: 월계관 빼고 보류 4개 + 다시 뽑을 칸 28개(중복 괜찮음). 칸→능력 대응은 sheet6_칸표.md
+ "agent sipping from a vial, sparkles", "agent quick drawing a vial from a hip holster", "agent falling, first aid box opening",
+ "agent with bare fists, empty pockets out", "agent punching, three blurred fist afterimages", "agent throwing a huge cracked fist punch",
+ "agent punching the floor, round cracks", "agent chopping, three drops flying", "agent knocking two enemies' heads together",
+ "agent aiming, crosshair with near and far dots", "agent firing a pistol, bullet splitting in two", "agent's bullet piercing two folders",
+ "agent's bullet bouncing off a wall", "agent firing a sparking explosive bullet", "agent catching a thrown pen coming back",
+ "agent holding a steaming hot gun", "agent dodging sideways, three afterimages", "a punch passing through the see-through agent",
+ "agent raising a hand with a filling bar", "agent bowing, shadow copy behind", "agent inside a water bubble",
+ "agent scratching with long nails", "agent landing the first punch, shards cracking", "agent facing an enemy, crossed swords above",
+ "agent slamming an enemy stuck to the floor", "agent dropping a bead into a piggy bank", "agent in a gas mask, fog around",
+ "agent's shield bursting, glowing back", "agent swapping a stamped document", "agent denting a sandbag with a punch",
+ "agent firing a cannonball from a bottle", "agent patting his bulging suit pocket"]
 n = int(sys.argv[1]); items = SHEETS[n]
 import re
 def short(t):  # 2,000자 제한(422) — 머리말은 1판 그대로 두고 칸 설명만 줄인다(앞 agent·관사·색 낱말 빼기)
