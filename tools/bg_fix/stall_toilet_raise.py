@@ -108,7 +108,7 @@ for i, x in enumerate(xs):
 front.alpha_composite(endpost, (xs[0], y))
 big.alpha_composite(front.resize((bg.width * 2, bg.height * 2), Image.NEAREST))
 dl = Image.new('RGBA', bg.size, (0, 0, 0, 0))
-for x, s in zip(xs, states): dl.alpha_composite(doors[s], (x, y))
+for x, s in reversed(list(zip(xs, states))): dl.alpha_composite(doors[s], (x, y))   # 13:56 사용자: 왼쪽 칸 문부터 그려야 가운데 칸 열린 문이 그 위로 옴
 big.alpha_composite(dl.resize((bg.width * 2, bg.height * 2), Image.NEAREST))
 e = Image.open(sys.argv[2]); big.alpha_composite(e, (20, 840 - e.height))
 full = 'full' in sys.argv[3:]
