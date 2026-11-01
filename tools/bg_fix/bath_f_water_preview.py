@@ -2,11 +2,13 @@
 꼭지(헤드 아랫면, 새 그림 기준)에서 부채꼴 9가닥이 포물선으로 퍼져 떨어진다(중력). 사람은 SH_D(물 맞으며 쉬기)·SH_E(몸 씻기) 8장을 실제로 재생.
 머리 감기 동작은 팩에 없음(SH_A 옷 벗기·SH_B 맨몸 걷기·SH_D·SH_E뿐). 게임(TS) 이식 때 같은 수치: NOZZLE, SPREAD, SPEED, G, 점선 4/2."""
 import json, math, random, sys
+import numpy as np
 from PIL import Image, ImageDraw
 A = 'game-src/art/pixellab-hq-20261031/'
 BG = A + 'hq_bath_f_p5_extL1_heads.png'
 NOZZLE = {2: (203, 140), 3: (244, 144), 4: (480, 137), 5: (504, 149), 6: (662, 150), 7: (690, 137)}  # 1x, 물 나오는 점
-FOOT = {2: (222, 340, 'W'), 3: (266, 312, 'W'), 4: (500, 338, 'W'), 5: (526, 305, 'W'), 6: (642, 316, 'E'), 7: (670, 348, 'E')}  # 꼭지 거의 바로 밑(옆으로 18~22px)
+FOOT = {2: (232, 341, 'W'), 3: (284, 318, 'W'), 4: (528, 326, 'W'), 5: (548, 310, 'W'), 6: (668, 328, 'E'), 7: (690, 346, 'E')}  # 16:52 사용자: 바구니·대야 안 밟는 빈 바닥(3배 격자로 고름), 벽 밑선 안쪽
+OBJ = np.asarray(Image.open(A + 'hq_bath_f_floorobj_mask.png').convert('L')) > 0   # 바닥 물건(픽셀 마스크): 발 앞(아래)에 있으면 사람을 가린다
 CH = {2: ('1.2', 'SH_D'), 3: ('1.10', 'SH_E'), 4: ('1.9', 'SH_D'), 6: ('1.1', 'SH_E')}
 assert all(c != '1.12' for c, _ in CH.values())
 SHRINK = 0.88
@@ -70,11 +72,23 @@ def render(frame):
         if face == 'W': fr = fr.transpose(Image.FLIP_LEFT_RIGHT); cx = fr.width - cx
         px, py = fx - cx, fy - round(a['floor'] * k)
         bg.alpha_composite(fr, (px, py))
+        # 가림: 발보다 앞(아래 끝이 발 y보다 큰) 물건 픽셀은 배경을 다시 덮는다
+        sub = OBJ[py:py + fr.height, px:px + fr.width]
+        if sub.any():
+            cover = np.zeros_like(sub)
+            ys, xs = np.nonzero(sub)
+            # 덩어리 아래 끝으로 판단(간단히: 그 열에서 물건의 맨 아래 y)
+            for x in set(xs):
+                col = np.nonzero(OBJ[:, px + x])[0]; col = col[(col >= py) & (col < py + fr.height + 40)]
+                if len(col) and col.max() > fy: cover[:, x] = sub[:, x]
+            orig_bg = Image.open(BG).convert('RGBA').crop((px, py, px + fr.width, py + fr.height))
+            mask = Image.fromarray((cover * 255).astype('uint8'))
+            bg.paste(orig_bg, (px, py), mask)
         head_top = py + round(a['top'][fi] * k)
         draw_water(water, n, head_top, fx, fy, frame)
     bg.alpha_composite(water)
     return bg.convert('RGB')
-out = sys.argv[1] if len(sys.argv) > 1 else '/mnt/project-files/hq-f3/now/샤워실여_물줄기_코드_v3_2배.png'
+out = sys.argv[1] if len(sys.argv) > 1 else '/mnt/project-files/hq-f3/now/샤워실여_물줄기_코드_v4_2배.png'
 frames = [render(f).resize((924 * 2, 424 * 2), Image.NEAREST) for f in range(8)]
 frames[0].save(out)
 frames[0].save(out.replace('.png', '.gif'), save_all=True, append_images=frames[1:], duration=140, loop=0)
