@@ -28,3 +28,11 @@ r = np.array(Image.open(D + 'hq_restroom_m_ext3L_fix.png').convert('RGBA'))
 r[154:230, 400:416] = r[154:230, 370:386]
 Image.fromarray(r).save(D + 'hq_restroom_m_ext3L_fix.png')
 print('ok3')
+
+# 4) 12:02 사용자 지적: 창 띠 반복에 딸려 온 창 아래 턱(y146~153)의 꺾쇠·점선이 토막토막 → 그 줄은 생성된 빈 콘크리트 벽으로 되돌림
+o = np.array(Image.open(D + 'hq_restroom_m_ext3L.png').convert('RGBA'))
+r = np.array(Image.open(D + 'hq_restroom_m_ext3L_fix.png').convert('RGBA'))
+r[146:154, 0:400] = o[146:154, 0:400]
+r[146:154, 400:416] = o[146:154, 370:386]
+Image.fromarray(r).save(D + 'hq_restroom_m_ext3L_fix.png')
+print('ok4')
