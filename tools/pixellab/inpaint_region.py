@@ -27,7 +27,7 @@ import os
 if os.environ.get("BLANK_Y"):
     by = int(os.environ["BLANK_Y"]); px = win.load()
     for mx0, my0, mx1, my1 in rects:
-        sx = max(0, mx0 - wx0 - 3)
+        sx = int(os.environ.get("BLANK_X", mx0 - 3)) - wx0
         for y in range(my0, my1):
             c = px[sx, y]
             for x in range(mx0 - wx0, min(w, mx1 - wx0)): px[x, y] = c
