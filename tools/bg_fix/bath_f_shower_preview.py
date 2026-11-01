@@ -9,7 +9,8 @@ bg = Image.open(A + 'hq_bath_f_p5_extL1.png').convert('RGBA')
 FOOT = {2: (240, 340, 'W'), 3: (290, 312, 'W'), 4: (528, 338, 'W'), 5: (545, 305, 'W'), 6: (614, 316, 'E'), 7: (640, 348, 'E')}  # 바구니·대야 피해서 벽 면 앞 빈 바닥, 샤워기 쪽을 봄
 CH = {2: '1.2', 3: '1.10', 4: '1.9', 6: '1.1'}  # 스팡달·게슈간·데드폴·쟈알디
 assert '1.12' not in CH.values()
-def hgt(y): return 1.383 * (y - 196)
+SHRINK = 0.88  # 사용자 15:52 「사람을 조금 줄이고」
+def hgt(y): return 1.383 * (y - 196) * SHRINK
 for n in sorted(CH, key=lambda n: FOOT[n][1]):
     fx, fy, face = FOOT[n]
     d = json.load(open(f'game-pack/char-{CH[n]}/char.json')); a = d['A']['SH_E']
