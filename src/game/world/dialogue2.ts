@@ -10,7 +10,7 @@ export type Stance = 'friendly' | 'favorable' | 'neutral' | 'wary' | 'hostile';
 /** 주인공 소속 갈래 (칸_구조.md): 기본 다섯 + 그 밖 */
 export const FACTION_KEYS = ['A00', 'B00', 'C00', 'D00', 'E00'] as const;
 /** 주인공이 상대인 24갈래 묶음 */
-export const GROUPS_24 = ['facing', 'react', 'busy', 'companion', 'injured', 'combat', 'shower', 'expel'] as const;
+export const GROUPS_24 = ['facing', 'react', 'busy', 'companion', 'injured', 'combat', 'shower', 'toilet', 'expel'] as const;
 /** 주인공이 아닌 상대일 때 쓰는 묶음 → 그 묶음 (expel → expel_other, combat → combat.other) */
 const OTHER: Record<string, string> = { expel: 'expel_other', combat: 'combat.other' };
 /** chars.<인물> 에 있는 칸 (facing 과 같은 네 칸) */
