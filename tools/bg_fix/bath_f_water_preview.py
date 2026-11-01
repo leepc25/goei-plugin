@@ -7,9 +7,9 @@ from PIL import Image, ImageDraw
 A = 'game-src/art/pixellab-hq-20261031/'
 BG = A + 'hq_bath_f_p5_extL1_heads.png'
 NOZZLE = {2: (203, 140), 3: (244, 144), 4: (480, 137), 5: (504, 149), 6: (662, 150), 7: (690, 137)}  # 1x, 물 나오는 점
-FOOT = {2: (232, 341, 'W'), 3: (284, 318, 'W'), 4: (528, 326, 'W'), 5: (548, 310, 'W'), 6: (668, 328, 'E'), 7: (690, 346, 'E')}  # 16:52 사용자: 바구니·대야 안 밟는 빈 바닥(3배 격자로 고름), 벽 밑선 안쪽
+FOOT = {2: (268, 356, 'W'), 3: (284, 318, 'W'), 4: (545, 352, 'W'), 5: (548, 310, 'W'), 6: (668, 328, 'E'), 7: (619, 352, 'E')}  # 16:58~59 사용자가 찍은 앞줄 자리: 2번 (268,356) 4번 (545,352) 7번 (619,352). 뒷줄(3·5·6)은 뒤 빈 바닥
 OBJ = np.asarray(Image.open(A + 'hq_bath_f_floorobj_mask.png').convert('L')) > 0   # 바닥 물건(픽셀 마스크): 발 앞(아래)에 있으면 사람을 가린다
-CH = {2: ('1.2', 'SH_D'), 3: ('1.10', 'SH_E'), 4: ('1.9', 'SH_D'), 6: ('1.1', 'SH_E')}
+CH = {2: ('1.2', 'SH_D'), 3: ('1.10', 'SH_E'), 4: ('1.9', 'SH_D'), 7: ('1.1', 'SH_E')}
 assert all(c != '1.12' for c, _ in CH.values())
 SHRINK = 0.88
 SPREAD, STREAMS, SPEED, G = 40, 7, 2.2, 0.03   # 16:52 사용자: 덜 촘촘하게, 더 밑으로   # 부채꼴 전체 각도(도), 가닥 수, 초속(px/걸음), 중력
@@ -88,7 +88,7 @@ def render(frame):
         draw_water(water, n, head_top, fx, fy, frame)
     bg.alpha_composite(water)
     return bg.convert('RGB')
-out = sys.argv[1] if len(sys.argv) > 1 else '/mnt/project-files/hq-f3/now/샤워실여_물줄기_코드_v4_2배.png'
+out = sys.argv[1] if len(sys.argv) > 1 else '/mnt/project-files/hq-f3/now/샤워실여_물줄기_코드_v5_2배.png'
 frames = [render(f).resize((924 * 2, 424 * 2), Image.NEAREST) for f in range(8)]
 frames[0].save(out)
 frames[0].save(out.replace('.png', '.gif'), save_all=True, append_images=frames[1:], duration=140, loop=0)
