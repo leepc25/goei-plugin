@@ -7,17 +7,18 @@ import type { Chat } from './types';
 import { visitRecord, type VisitTurn } from './visit';
 import { currentFacts, fieldRecord, type FieldEvent, type FieldFact } from './field';
 
-export const INTERLUDE_HEAD = '[Field log]';
-const DEFAULT_RULES = 'The block below is a face-to-face conversation the protagonist had at bureau HQ right after the preceding scene and before the next input. It really happened. Nothing else happened in between and only a few minutes passed.';
+/** 블록 머리 (13-2 확정 2026-10-26, 11-01 다시 맞춤): `[Field visit · 10:40–12:10]` */
+export const INTERLUDE_HEAD = '[Field visit';
+/** 대화만 있고 사건이 없는 막간(옛 본부 방문)에 붙이는 한 줄. 카드 규칙문(visitContextRules)이 있으면 그것 */
+const TALK_ONLY_NOTE = 'A face-to-face talk the protagonist had right after the preceding scene. It really happened; only minutes passed.';
 /** 막간 하나에 넣을 최대 대화 수 (가장 최근 것부터) */
 const MAX_TURNS = 30;
 
-export interface Interlude { anchor: string; index: number; turns: VisitTurn[]; events: FieldEvent[] }
+export interface Interlude { anchor: string; index: number; turns: VisitTurn[]; events: FieldEvent[]; /** 방문 시작·끝 표식 (머리·끝 줄의 시각·장소용, 글에는 안 넣음) */ marks?: FieldEvent[] }
 
 /** 막간 하나에 넣을 최대 사건 수 (가장 최근 것부터) */
 const MAX_EVENTS = 60;
 export const FACTS_HEAD = '[Field facts]';
-const EVENT_NOTE = 'What happened in the field, in order, grouped under [place]. All real; times are the field clock.';
 const FACTS_NOTE = 'Current facts from the field. Do not contradict them.';
 
 /** 채팅 메시지 chatId → 순서 */
@@ -31,13 +32,17 @@ function anchorsOf(chat: Chat): Map<string, number> {
 /** 아직 있는 메시지 뒤에서 나눈 대화와 필드 사건을 막간별로 (채팅 순서) */
 export function interludes(chat: Chat): Interlude[] {
   const at = anchorsOf(chat);
-  const groups = new Map<string, { turns: VisitTurn[]; events: FieldEvent[] }>();
-  const slot = (a: string) => groups.get(a) ?? (groups.set(a, { turns: [], events: [] }), groups.get(a)!);
+  const groups = new Map<string, { turns: VisitTurn[]; events: FieldEvent[]; marks: FieldEvent[] }>();
+  const slot = (a: string) => groups.get(a) ?? (groups.set(a, { turns: [], events: [], marks: [] }), groups.get(a)!);
   for (const t of visitRecord(chat).turns) if (t.anchor && at.has(t.anchor)) slot(t.anchor).turns.push(t);
-  // 방문 시작·끝은 보고서용 표식이라 모델 글에는 안 넣는다 (쓰러짐·끝 사정은 그 앞 줄이 말한다)
+  // 방문 시작·끝은 표식: 글 줄로는 안 넣고 머리 `[Field visit · 시작–끝]`·끝 줄 `[End · …]`의 시각·장소로만 쓴다
   // 확정 사실만 담은 줄(ko 가 빈 글, 예: 가방)도 [Field facts] 칸에만 둔다 (10-31: 바뀔 때마다 줄이 쌓여 토큰을 썼다)
-  for (const e of fieldRecord(chat).events) if (at.has(e.anchor) && e.kind !== 'enter_field' && e.kind !== 'exit_field' && !(e.fact && e.ko === '')) slot(e.anchor).events.push(e);
-  const list = [...groups].map(([anchor, g]) => ({ anchor, index: at.get(anchor)!, turns: g.turns.slice(-MAX_TURNS), events: g.events.slice(-MAX_EVENTS) })).sort((a, b) => a.index - b.index);
+  for (const e of fieldRecord(chat).events) {
+    if (!at.has(e.anchor)) continue;
+    if (e.kind === 'enter_field' || e.kind === 'exit_field') slot(e.anchor).marks.push(e);
+    else if (!(e.fact && e.ko === '')) slot(e.anchor).events.push(e);
+  }
+  const list = [...groups].map(([anchor, g]) => ({ anchor, index: at.get(anchor)!, turns: g.turns.slice(-MAX_TURNS), events: g.events.slice(-MAX_EVENTS), marks: g.marks })).sort((a, b) => a.index - b.index);
   // 지난 막간은 큰일만 (싸움·살해·쓰러짐·동행 등 weight 2 이상): 토큰을 아낀다 (10-31). 가장 최근 막간은 다 넣는다
   return list.map((g, i) => (i < list.length - 1 ? { ...g, events: g.events.filter((e) => (e.weight ?? 1) >= 2) } : g));
 }
@@ -56,7 +61,6 @@ export function orphanTurns(chat: Chat): VisitTurn[] {
 
 const safe = (s: string) => s.replace(/\{\{/g, '｛｛').replace(/\}\}/g, '｝｝').replace(/%%/g, '％％');
 
-const ORDER_NOTE = 'Dialogue is in order. "— with X —" marks who {user} spoke to next; "(action)" = done, not said; "(cut in)" = a bystander joined in.';
 
 /** 이어진 이동·돈 줄을 한 줄로 묶는다: 「15:10 {user} moved to A.」+「15:20 {user} moved to B.」 → 「15:20 {user} moved to A → B.」, 돈 줄은 「Money (won): -1500 편의점 컵라면, -4500 편의점 담배」 */
 function mergeRuns(evs: FieldEvent[]): FieldEvent[] {
@@ -76,36 +80,72 @@ function mergeRuns(evs: FieldEvent[]): FieldEvent[] {
   return out.map((e) => (e.kind === 'trade' ? { ...e, text: e.text.replace('Money: ', 'Money (won): ') } : e));
 }
 
-/** 막간 글: 일어난 순서대로 (2026-10-23 사용자: 요원별로 묶으면 순서와 끼어들기를 알 수 없다). 모델만 읽는 글이라 영어 짧은 문장(10-31), 주인공 = {user} → 이름 */
+/** 줄 앞 필드 시각 「10:40 」 떼기 → [시각, 나머지] */
+const splitTime = (t: string): [string, string] => { const m = /^(\d\d:\d\d) (.*)$/.exec(t); return m ? [m[1], m[2]] : ['', t]; };
+const ROOM_KO: Record<string, string> = { office: '사무실', lounge: '휴게실', infirmary: '의무실', quarters: '숙소' };
+
+/** 막간 글 — 13-2 확정 형식(2026-10-26, 11-01 다시 맞춤):
+ *  [Field visit · 시작–끝] / [Scene · 장소 · 시각] 아래 그 장면의 대화 원문과 영어 짧은 사실 문장을 일어난 순서대로 / [End · 장소 · 시각 · with 동행].
+ *  같은 메시지 뒤 방문이 여럿이면 방문마다 블록. 안내문 없음(토큰). 주인공 {user} → 이름. 대화만 있는 옛 본부 방문은 카드 규칙문(없으면 한 줄)만 */
 export function interludeText(g: Interlude, rules: string | null, visitor: string): string {
-  const parts: string[] = [];
-  let at = '';
-  let place = '';
   const me = safe(visitor);
   const who = (t: string) => safe(t).replace(/\{user\}/g, me);
-  type Item = { at: number; turn?: VisitTurn; ev?: FieldEvent };
-  const items: Item[] = [...g.turns.map((t) => ({ at: t.at || 0, turn: t })), ...mergeRuns([...g.events].sort((a, b) => a.at - b.at)).map((e) => ({ at: e.at || 0, ev: e }))].sort((a, b) => a.at - b.at);
-  items.forEach(({ turn: t, ev }) => {
-    if (ev) {
-      at = '';
-      if (ev.scene && ev.scene !== place) { place = ev.scene; parts.push(`[${safe(place)}]`); }
-      parts.push(who(ev.text));
-      return;
+  // 방문별로 나눈다 (visit 없는 옛 사건·대화는 한 묶음)
+  const visits = new Map<string, { turns: VisitTurn[]; events: FieldEvent[]; marks: FieldEvent[] }>();
+  const of = (v: string) => visits.get(v) ?? (visits.set(v, { turns: [], events: [], marks: [] }), visits.get(v)!);
+  for (const e of g.events) of(e.visit ?? '').events.push(e);
+  for (const e of g.marks ?? []) of(e.visit ?? '').marks.push(e);
+  // 대화는 시각으로 가장 가까운 방문에 (방문 표식이 없으면 '')
+  const spans = [...visits].map(([v, x]) => { const ts = [...x.events, ...x.marks].map((e) => e.at || 0); return { v, a: Math.min(...ts), b: Math.max(...ts) }; }).filter((x) => Number.isFinite(x.a));
+  for (const t of g.turns) {
+    const at = t.at || 0;
+    const hit = spans.find((x) => at >= x.a - 60_000 && at <= x.b + 60_000) ?? spans.find((x) => at <= x.b) ?? spans[spans.length - 1];
+    of(hit?.v ?? '').turns.push(t);
+  }
+  const blocks: string[] = [];
+  for (const [, x] of visits) {
+    const turns = [...x.turns].sort((a, b) => (a.at || 0) - (b.at || 0));
+    const evs = mergeRuns([...x.events].sort((a, b) => (a.at || 0) - (b.at || 0)));
+    const items = [...evs.map((e) => ({ at: e.at || 0, ev: e })), ...turns.map((t) => ({ at: t.at || 0, turn: t }))].sort((a, b) => a.at - b.at) as { at: number; turn?: VisitTurn; ev?: FieldEvent }[];
+    if (!items.length) continue;
+    // 시작·끝 시각: 표식 줄의 시각, 없으면 첫·마지막 사건 줄의 시각
+    const enter = x.marks.find((e) => e.kind === 'enter_field'), exit = x.marks.find((e) => e.kind === 'exit_field');
+    const times = evs.map((e) => splitTime(e.text)[0]).filter(Boolean);
+    const t0 = (enter && splitTime(enter.text)[0]) || times[0] || '', t1 = (exit && splitTime(exit.text)[0]) || times[times.length - 1] || '';
+    const span = t0 && t1 && t0 !== t1 ? `${t0}–${t1}` : t0 || t1;
+    const parts: string[] = [`${INTERLUDE_HEAD}${span ? ` · ${span}` : ''}]`];
+    // 대화만 있는 막간(옛 본부 방문): 카드 규칙문 한 줄
+    if (!evs.length && turns.length) parts.push(rules?.trim() || TALK_ONLY_NOTE);
+    let place = '', partner = '', lastPlace = '', lastTime = '';
+    const followers: string[] = [];
+    for (const { turn: t, ev } of items) {
+      if (ev) {
+        const [tm, line] = splitTime(ev.text);
+        if (tm) lastTime = tm;
+        if (ev.scene && ev.scene !== place) { place = ev.scene; lastPlace = place; partner = ''; parts.push(`[Scene · ${safe(place)}${tm ? ` · ${tm}` : ''}]`); }
+        // 이동 줄은 장면 머리가 대신한다 (스쳐 지나간 장면은 뺀다, 13-2)
+        if (ev.kind === 'move' && ev.scene) continue;
+        if (ev.kind === 'follow') for (const w of ev.who ?? []) if (!followers.includes(w)) followers.push(w);
+        if (ev.kind === 'unfollow') for (const w of ev.who ?? []) { const k = followers.indexOf(w); if (k >= 0) followers.splice(k, 1); }
+        parts.push(who(line));
+        continue;
+      }
+      if (!t) continue;
+      // 대화: 장면 안에서 그대로. 장면을 모르면(옛 방문) 만난 방을 장면으로
+      const room = t.room ? ROOM_KO[t.room] ?? t.room : '';
+      if (!place && room && room !== lastPlace) { lastPlace = room; parts.push(`[Scene · ${safe(room)}]`); }
+      if (t.name !== partner) { partner = t.name; parts.push(`— with ${safe(t.name)} —`); }
+      const v = safe(t.visitor || visitor);
+      parts.push(t.act ? `${v} (action): ${safe(t.user)}` : `${v}: ${safe(t.user)}`, `${safe(t.name)}: ${safe(t.reply)}`, ...(t.extra ?? []).map((e) => `${safe(e.name)} (cut in): ${safe(e.line)}`));
     }
-    if (!t) return;
-    const v = safe(t.visitor || visitor);
-    const here = `${t.room ?? ''}|${t.name}`;
-    if (here !== at) {
-      at = here;
-      parts.push('', `— with ${safe(t.name)}${t.room ? ` (${safe(t.room)})` : ''} —`);
+    // 끝 줄: 방문이 끝났을 때만 (표식이 있을 때). 장소 = 끝 표식의 장면, 시각, 동행
+    if (exit) {
+      const endPlace = exit.scene || lastPlace, endTime = splitTime(exit.text)[0] || lastTime;
+      parts.push(`[End${endPlace ? ` · ${safe(endPlace)}` : ''}${endTime ? ` · ${endTime}` : ''}${followers.length ? ` · with ${followers.map(safe).join(', ')}` : ''}]`);
     }
-    parts.push(t.act ? `${v} (action): ${safe(t.user)}` : `${v}: ${safe(t.user)}`, `${safe(t.name)}: ${safe(t.reply)}`, ...(t.extra ?? []).map((e) => `${safe(e.name)} (cut in): ${safe(e.line)}`));
-  });
-  const base = rules?.trim() || DEFAULT_RULES;
-  // 대화가 없으면 대화 규칙문은 빼고 사건 안내만 (토큰 절약, 10-31)
-  const talk = g.events.length ? base.replace(/\s*Nothing else happened in between and only a few minutes passed\./, '') : base;
-  const head = [...(g.turns.length ? [talk] : []), ...(g.events.length ? [EVENT_NOTE] : [])];
-  return [INTERLUDE_HEAD, ...head, ...(g.turns.length ? [ORDER_NOTE.replace(/\{user\}/g, me)] : []), ...parts].join('\n').replace(/\n{3,}/g, '\n\n');
+    blocks.push(parts.join('\n'));
+  }
+  return blocks.join('\n\n').replace(/\n{3,}/g, '\n\n');
 }
 
 /** 지금 확정된 사실을 마지막 사용자 메시지 앞에 넣는다. 없으면 그대로 */

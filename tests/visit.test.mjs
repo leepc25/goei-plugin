@@ -98,7 +98,7 @@ test('interlude goes right after its anchor message in the main request, and dro
   assert.ok(out[3].content.startsWith(INTERLUDE_HEAD));
   assert.match(out[3].content,/RULES/);
   assert.match(out[3].content,/쟈알디: 서류 다 됐어\?\n에일린: 거의 다 됐어요\./);
-  assert.match(out[3].content,/— with 데드폴 \(office\) —/);
+  assert.match(out[3].content,/— with 데드폴 —/);
   assert.ok(!out[3].content.includes('사라진 답'));
   assert.deepEqual(orphanTurns(chat).map(x=>x.id),['3']);
   // 두 번 넣지 않는다

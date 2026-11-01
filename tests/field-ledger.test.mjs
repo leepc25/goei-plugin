@@ -46,7 +46,28 @@ test('막간: 이동 사건이 있으면 그 기준 메시지 뒤에 사건 줄�
   assert.ok(text.startsWith(INTERLUDE_HEAD));
   assert.ok(text.indexOf('사무실 → 복도') < text.indexOf('복도 → 휴게실'));
   assert.ok(!text.includes('Nothing else happened'));
-  assert.ok(text.includes('What happened in the field'));
+});
+
+test('막간: 13-2 형식 — [Field visit · 시작–끝], [Scene · 장소 · 시각] 아래 대화·사실 문장, 이동 줄은 장면 머리로, [End · 장소 · 시각 · with 동행]', () => {
+  let c = base();
+  const E = (id, at, extra) => { c = withFieldEvent(c, { id, at, anchor: 'c1', visit: 'v1', weight: 1, ...extra }); };
+  E('s', 1000, { kind: 'enter_field', text: '{user} entered the field.', ko: '필드 입장' });
+  E('m1', 2000, { kind: 'move', text: '10:40 {user} moved to 2층 사무실.', ko: '', scene: '2층 사무실' });
+  E('g', 4000, { kind: 'gift', text: '10:53 {user} gave 잼트리 coffee.', ko: '선물', scene: '2층 사무실', who: ['잼트리'] });
+  E('m2', 5000, { kind: 'move', text: '11:05 {user} moved to 1층 로비.', ko: '', scene: '1층 로비' });
+  E('f', 6000, { kind: 'follow', text: '11:25 잼트리 started following {user}.', ko: '동행', scene: '1층 로비', who: ['잼트리'] });
+  E('x', 7000, { kind: 'exit_field', text: '11:30 {user} left the field.', ko: '나옴', scene: '1층 로비' });
+  c = { ...c, goeiHqVisitV1: { turns: [{ id: 't', at: 3000, agentId: 'a', name: '잼트리', user: '커피 사 왔어', reply: '고마워', anchor: 'c1', room: 'office' }] } };
+  const out = withInterludes([{ role: 'assistant', content: '사무실이다.' }, { role: 'user', content: '다음' }], c, null, '에일린');
+  assert.equal(out[1].content, [
+    '[Field visit · 10:40–11:30]',
+    '[Scene · 2층 사무실 · 10:40]',
+    '— with 잼트리 —', '에일린: 커피 사 왔어', '잼트리: 고마워',
+    '에일린 gave 잼트리 coffee.',
+    '[Scene · 1층 로비 · 11:05]',
+    '잼트리 started following 에일린.',
+    '[End · 1층 로비 · 11:30 · with 잼트리]',
+  ].join('\n'));
 });
 
 test('막간: 이동 사건이 없으면 카드 규칙문이 그대로', () => {
@@ -88,8 +109,9 @@ test('막간 영어 짧은 문장(10-31): 장소 머리, 이어진 이동·돈�
   add('f1', 5, 'provoke', '15:40 {user} attacked first: pedestrian A, B (fists). A knocked out; B fled.', { scene: '종로 골목', weight: 2 });
   const out = withFieldFacts(withInterludes([{ role: 'assistant', content: '사무실이다.' }, { role: 'user', content: '다음' }], c, null, '데드폴'), c, '데드폴');
   const text = out.find((m) => m.content.startsWith(INTERLUDE_HEAD)).content;
-  assert.match(text, /15:20 데드폴 moved to 종로 거리 → 종로 골목\./);
-  assert.match(text, /\[종로 골목\]\n15:20 데드폴 moved to 종로 거리 → 종로 골목\.\n15:21 Money \(won\): -1500 편의점 컵라면, -4500 편의점 담배\n15:40 데드폴 attacked first/);
+  // 이동은 장면 머리로(스쳐 지나간 종로 거리는 빠짐), 돈은 한 줄, 줄 앞 시각은 떼고 장면 머리에만 (13-2)
+  assert.ok(!text.includes('moved to'), text);
+  assert.match(text, /\[Scene · 종로 골목 · 15:20\]\nMoney \(won\): -1500 편의점 컵라면, -4500 편의점 담배\n데드폴 attacked first/);
   assert.ok(!text.includes('{user}'));
   const facts = out.find((m) => m.content.startsWith(FACTS_HEAD)).content;
   assert.match(facts, /- 데드폴 location: 종로 골목/);
@@ -112,7 +134,7 @@ test('모델 글(활동 결과)은 영어 text 만: 한글 ko·방문 시작/끝
   c = withFieldEvent(c, { id: 'x', at: 3, anchor: 'c1', kind: 'exit_field', text: '{user} left the field.', ko: '필드에서 나옴', visit: 'v1' });
   const out = withInterludes([{ role: 'user', content: '출근' }, { role: 'assistant', content: '사무실이다.' }, { role: 'user', content: '다음' }], c, null, '민준');
   const block = out.find((m) => m.content.startsWith(INTERLUDE_HEAD)).content;
-  assert.match(block, /15:10 민준 moved to 종로\./);
+  assert.equal(block, '[Field visit · 15:10]\n[Scene · 종로 · 15:10]\n[End · 종로 · 15:10]');
   assert.ok(!/이동|필드 입장|필드에서 나옴|entered the field|left the field/.test(block), block);
 });
 
@@ -129,7 +151,7 @@ test('몹과 나눈 말도 이름 인물 대화처럼 원문 그대로 [Field lo
   const c = { ...base(), goeiHqVisitV1: { turns: [{ id: 't1', at: 5, agentId: 'mob:v1:mob13', name: '행인(여·20대 후반)', user: '저기요, 이 근처 사세요?', reply: '네? 저요? 아니요, 출근길이에요.', anchor: 'c1', room: '종로 뒷골목' }] } };
   const out = withInterludes([{ role: 'user', content: '출근' }, { role: 'assistant', content: '사무실이다.' }, { role: 'user', content: '다음' }], c, null, '민준');
   const block = out.find((m) => m.content.startsWith(INTERLUDE_HEAD)).content;
-  assert.match(block, /— with 행인\(여·20대 후반\) \(종로 뒷골목\) —/);
+  assert.match(block, /\[Scene · 종로 뒷골목\]\n— with 행인\(여·20대 후반\) —/);
   assert.match(block, /민준: 저기요, 이 근처 사세요\?/);
   assert.match(block, /행인\(여·20대 후반\): 네\? 저요\? 아니요, 출근길이에요\./);
 });
