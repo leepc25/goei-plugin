@@ -3,7 +3,7 @@
 import type { Chat } from './types';
 
 export const FIELD_KEY = 'goeiFieldV1';
-/** 장부에 남길 사건 수 (넘으면 오래된 것부터 버린다) */
+/** 장부에 남길 사건 수. 넘으면 작은 일(weight 1, 확정 사실 없음)부터 오래된 순으로 버리고, 큰일(weight 2 이상)과 확정 사실은 남긴다 (11-01 사용자: 1-7). 큰일만으로도 넘치면 그때 오래된 큰일부터 */
 export const MAX_EVENTS = 300;
 
 export type FieldKind =
@@ -45,11 +45,24 @@ const KINDS = new Set<string>(['move', 'act', 'hurt', 'down', 'kill', 'flee', 'p
 export const plain = (s: unknown, max = 300) =>
   String(s ?? '').replace(/\{\{/g, '｛｛').replace(/\}\}/g, '｝｝').replace(/%%/g, '％％').replace(/\s+/g, ' ').trim().slice(0, max);
 
+/** 상한에 맞춰 자른다: 작은 일(weight 1·사실 없음)을 오래된 것부터 버리고, 그래도 넘치면 큰일을 오래된 것부터. 순서는 그대로 */
+export function trimEvents(list: FieldEvent[], max = MAX_EVENTS): FieldEvent[] {
+  if (list.length <= max) return list;
+  const big = (e: FieldEvent) => (e.weight ?? 1) >= 2 || !!e.fact;
+  let dropped = list.length - max;
+  const out: FieldEvent[] = [];
+  for (const e of list) {
+    if (!big(e) && dropped > 0) { dropped--; continue; }
+    out.push(e);
+  }
+  return out.length > max ? out.slice(-max) : out;
+}
+
 export function fieldRecord(chat: Chat): FieldRecord {
   const v = chat[FIELD_KEY] as FieldRecord | undefined;
   const list = Array.isArray(v?.events) ? v!.events : [];
   return {
-    events: list.filter((e) => e && typeof e.id === 'string' && typeof e.text === 'string' && typeof e.anchor === 'string' && typeof e.at === 'number' && KINDS.has(e.kind)).slice(-MAX_EVENTS),
+    events: trimEvents(list.filter((e) => e && typeof e.id === 'string' && typeof e.text === 'string' && typeof e.anchor === 'string' && typeof e.at === 'number' && KINDS.has(e.kind))),
   };
 }
 
@@ -67,7 +80,7 @@ export function withFieldEvent(chat: Chat, ev: FieldEvent): Chat {
     ...(ev.witness ? { witness: { faction: plain(ev.witness.faction, 12), named: !!ev.witness.named } } : {}),
     ...(ev.visit ? { visit: plain(ev.visit, 40) } : {}),
   };
-  return { ...chat, [FIELD_KEY]: { events: [...old, clean].slice(-MAX_EVENTS) } };
+  return { ...chat, [FIELD_KEY]: { events: trimEvents([...old, clean]) } };
 }
 
 /** 확정 사실: 같은 key는 나중 것이 이긴다. 순서는 처음 나온 순서 */

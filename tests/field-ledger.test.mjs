@@ -133,3 +133,21 @@ test('몹과 나눈 말도 이름 인물 대화처럼 원문 그대로 [Field lo
   assert.match(block, /민준: 저기요, 이 근처 사세요\?/);
   assert.match(block, /행인\(여·20대 후반\): 네\? 저요\? 아니요, 출근길이에요\./);
 });
+
+test('장부 상한: 넘치면 작은 일부터 버리고 큰일·확정 사실은 남는다 (11-01 1-7)', () => {
+  let c = base();
+  for (let i = 0; i < MAX_EVENTS + 20; i++) {
+    const big = i % 50 === 0;
+    c = withFieldEvent(c, { ...ev(`e${i}`, i, 'c1'), ...(big ? { kind: 'kill', weight: 3 } : {}), ...(i === 3 ? { fact: { key: 'bag', value: 'lost' } } : {}) });
+  }
+  const list = fieldRecord(c).events;
+  assert.equal(list.length, MAX_EVENTS);
+  // 큰일 7건(0,50,…,300)과 사실 1건(3)은 전부 남는다
+  for (const i of [0, 50, 100, 150, 200, 250, 300, 3]) assert.ok(list.some((e) => e.id === `e${i}`), `e${i} 남아야`);
+  // 작은 일은 가장 오래된 것부터 빠진다 (e1, e2 는 없고 뒤쪽은 있다)
+  assert.ok(!list.some((e) => e.id === 'e1'));
+  assert.ok(list.some((e) => e.id === `e${MAX_EVENTS + 19}`));
+  // 순서는 그대로
+  const ats = list.map((e) => e.at);
+  assert.deepEqual(ats, [...ats].sort((a, b) => a - b));
+});

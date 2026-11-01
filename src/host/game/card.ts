@@ -1,11 +1,9 @@
 // 본편 연동 (Risu 쪽). 읽기: 게임을 열 때 지금 카드·채팅에서 스냅숏을 만든다.
-// 쓰기: 게임이 넘긴 정산 결과를 쌓아 두었다가, 사용자가 시작 화면의 버튼을 눌렀을 때만 이 채팅에 쓴다.
+// 쓰기: 게임이 넘긴 정산 결과를 쌓아 두었다가, 사용자가 시작 화면의 버튼을 눌렀을 때만 이 채팅의 기록 로어북에 쓴다 (채팅 메시지로는 넣지 않는다, 11-01).
 import type { CardSnapshot, GameReport } from '../../game/bridge';
-import { cardSnapshot, normReport, reportText, withoutRecord, withRecord } from '../../core/gamelink';
-import { setUnsent } from '../../core/dispatch';
+import { cardSnapshot, normReport, withoutRecord, withRecord } from '../../core/gamelink';
 import { assetUrl, facePic, mainPic, splitPic } from '../assets';
 import { loadContext, updateChat, type CharacterSnapshot } from '../risu';
-import { isWaiting } from '../waiting';
 import { lastStatusFields } from '../../core/world/tags';
 import { statusClockMinute } from '../../core/world/status';
 
@@ -35,7 +33,7 @@ const KEEP = 5;
 export interface PendingReport {
   at: number;
   report: GameReport;
-  /** 채팅에 놓았는가 / 기록 로어북에 남겼는가 */
+  /** 기록 로어북에 남겼는가 (posted 는 옛 「채팅에 놓기」 표식, 안 씀) */
   posted?: boolean;
   recorded?: boolean;
 }
@@ -72,21 +70,7 @@ async function mark(at: number, patch: Partial<PendingReport>): Promise<void> {
 
 export class LinkError extends Error {}
 
-/** 「보고서 붙이기」: 채팅에 유저 메시지로 놓고 「전송 대기」로 둔다. 보낼지는 사용자가 정한다 (전송 버튼 또는 취소) */
-export async function postReport(p: PendingReport): Promise<void> {
-  if (isWaiting()) throw new LinkError('응답을 받는 중이에요. 응답이 끝난 뒤 붙여 주세요.');
-  const ctx = await loadContext();
-  if (!ctx) throw new LinkError('괴이 카드 채팅을 열어 주세요.');
-  const text = reportText(p.report);
-  await updateChat(ctx.charIndex, ctx.chatIndex, (chat) => {
-    const list = chat.message ?? [];
-    const last = list[list.length - 1];
-    if (last?.role === 'user') throw new LinkError('마지막 메시지가 아직 보내지 않은 유저 메시지예요. 먼저 보내거나 지워 주세요.');
-    chat.message = [...list, { role: 'user', data: setUnsent(text, true) }];
-    return chat;
-  });
-  await mark(p.at, { posted: true });
-}
+// 「보고서 붙이기」(채팅에 유저 메시지로 놓기)는 11-01 사용자 결정으로 없앴다: 보고서는 플러그인 기록 탭에만, 모델에게는 [Field log]로만 간다.
 
 /** 「기록 로어북에 남기기」: 이 채팅 로어북 한 칸 (기본기획서 22.2, 켜는 사람만) */
 export async function recordReport(p: PendingReport): Promise<void> {
