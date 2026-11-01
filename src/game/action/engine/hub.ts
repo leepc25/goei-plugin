@@ -12,10 +12,11 @@ import { HQ_PLACE, drawFloor, drawHqWall, drawPropArt, drawHqTextureWall } from 
 import { drawHqDoorRound2 } from '../art/hqDoorRound2';
 import { drawCallLit, drawHqField, drawHqFieldLight, drawHqFieldObject, drawHqSigns, hasHqField } from '../art/hqField';
 import { charTop, drawCharClip, drawCharSeat, charArt, charFx, CHAR_K } from '../art/charPacks';
-import { persp, view as fieldView } from './view';
+import { FAR, persp, view as fieldView } from './view';
 import { blockByProps, clearSpot, type BlockProp } from './propBlock';
 import { PAINTED, clampPainted, doorReachY } from '../hq/painted';
 import { STALL_DOOR_SEC, seatFeet } from '../../world/toilets';
+import { drawShowerWater } from '../hq/showerFx';
 import { LANE_BOT, LANE_TOP, type HqBox, type HqDoor, type HqMapView, type HqScene, type HqSpot } from '../hq/map';
 
 type Door = HqDoor & { open: boolean };
@@ -140,6 +141,10 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
   let pT: { id: string; kind: 'stall' | 'urinal' | 'sink'; door?: string; phase: 'open' | 'in' | 'leave'; t: number; front: { x: number; y: number }; seat?: { x: number; y: number; k?: number } } | null = null;
   const setPT = (v: typeof pT) => { pT = v; host.life?.playerToilet?.(v && scene ? { scene: scene.id, id: v.id, kind: v.kind, phase: v.phase } : null); };
   let sitChair: HqBox | null = null;
+  /** 주인공이 쓰는 샤워 자리(spot id). 샤워가 끝나면 비운다 (물·김은 이 자리에만) */
+  let showerSpot: string | null = null;
+  let curWorld: WorldView | null = null;
+  type ShowerPlayer = { shower?(x: number, y: number, face: 1 | -1): boolean; showering?: boolean; art?: { key: string } };
   /** 이 장면에서 걸은 거리 (px). 필드 시계가 쓴다 */
   let walked = 0;
   let lastX: number | null = null;
@@ -256,6 +261,13 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
         if (b === sitChair || live.some((q) => q.seat?.box === bi)) return;
         drawBox(c, b, sc.look);
       } })).concat(people.map((p) => ({ y: p.y, x0: p.x - 60, x1: p.x + 60, occludedSilhouette: false, draw: (c: CanvasRenderingContext2D) => { drawCharClip(c, p.name, p.x, p.y, p.face, performance.now()); } })))
+        // 샤워기(샤워실): 주인공이 그 자리에서 샤워 중이면 물줄기·김을 사람 바로 앞 깊이에 그린다 (hq/showerFx.ts)
+        .concat((sc.painted && PAINTED[sc.painted]?.showers ? PAINTED[sc.painted].showers! : []).map((sh) => ({ y: sh.foot[1] + 1, x0: sh.foot[0] - 80, x1: sh.foot[0] + 80, occludedSilhouette: false, draw: (c: CanvasRenderingContext2D) => {
+          if (showerSpot !== sh.id) return;
+          const pl = (curWorld?.player ?? null) as (WorldView['player'] & ShowerPlayer) | null;
+          const top = pl ? (pl.art ? charTop(pl.art.key) : -230) * persp(pl.y) : -230;
+          drawShowerWater(c, sh, pl ? pl.y + top : null, performance.now());
+        } })))
         // 움직이는 행위자: 자리 수만큼 층을 두고 매 프레임 지금 목록의 i번째를 읽는다 (깊이 정렬은 y 게터로)
         .concat(host.life ? Array.from({ length: LIFE_SLOTS }, (_, i) => ({
           get y() { return live[i]?.y ?? -1e9; },
@@ -362,6 +374,10 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
     fieldView.worldH = sceneOf(sceneId).painted ? PAINTED[sceneOf(sceneId).painted!]?.h ?? 700 : SCREEN_H;
     // 맵 에디터 장면(dotK)이면 사람 배율을 그 장면 규격으로 (중림 브랜치 10-29, 11-01 옮김)
     fieldView.charMul = sceneOf(sceneId).painted && PAINTED[sceneOf(sceneId).painted!]?.dotK ? PAINTED[sceneOf(sceneId).painted!].dotK! / CHAR_K : 1;
+    // 줄 맨 뒤 배율: 장면 그림 원근에 맞춘 값(없으면 0.85, 사용자 11-01 15:03 「장면마다 변하게」)
+    fieldView.far = (sceneOf(sceneId).painted && PAINTED[sceneOf(sceneId).painted!]?.far) || FAR;
+    fieldView.growTo = (sceneOf(sceneId).painted && PAINTED[sceneOf(sceneId).painted!]?.growTo) || 0;
+    fieldView.sizes = (sceneOf(sceneId).painted && PAINTED[sceneOf(sceneId).painted!]?.sizes) || [];
     pending = { scene: sceneId, x, y };
     fadeOut = FADE;
   };
@@ -437,6 +453,8 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
         gateOpen.set(o.id, Math.max(0, Math.min(1, t + (near ? 0.12 : -0.08))));
       }
       if (sitChair && !(a.world.player as Player).seat && !(a.world.player as { sitting?: boolean }).sitting) sitChair = null;
+      curWorld = a.world;
+      if (showerSpot && !(a.world.player as ShowerPlayer).showering) showerSpot = null;
       if (host.life && scene) {
         host.life.tick(1 / 30, { scene: scene.id, x: a.world.player.x, y: a.world.player.y, seat: sitChair ? scene.boxes.indexOf(sitChair) : null });
         // 주인공 공격이 행위자에게 닿았나 (필드 행위자는 전투 몸이 아니라 따로 본다)
@@ -523,6 +541,15 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
         if (s.id.startsWith('toilet:')) return useToilet(a, s.id.slice(7));
         if (s.place) return host.openPlace(s.place);
         if (s.say) return a.world.say(s.say, 3);
+        if (s.act?.[0] === 'shower') {
+          // 샤워 자리(11-01 샤워실): 그 자리에 서서 샤워 규칙 재생. 샤워 그림(SH_D·SH_E)이 없는 인물은 못 한다
+          const pl = a.world.player as WorldView['player'] & ShowerPlayer;
+          if (s.y === undefined || !pl.shower) return;
+          if (!pl.shower(s.x, s.y, s.face ?? 1)) return a.world.say('샤워 동작 그림이 없다.', 1.5);
+          showerSpot = s.id;
+          host.sat?.();
+          return;
+        }
         if (s.seat && s.act?.[0]) {
           if (s.chair !== undefined && live.some((q) => q.seat?.box === s.chair)) return a.world.say('누가 앉아 있다.', 1.5);
           const exit = clearSpot(s.x, s.y ?? a.world.player.y, solids, scene.lane ?? LANE);

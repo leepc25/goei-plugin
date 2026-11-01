@@ -18,7 +18,10 @@ def sents(t): return [s.strip() for s in re.split(r'(?<=\.)\s+', t.strip()) if s
 def check(path):
     new = Path(path).read_text(encoding='utf-8')
     ok = True; rows = []
-    for m in MUST:
+    import os
+    # 2026-11-01 14:29 사용자 「그래」: 샤워실은 양옆 벽에 샤워기를 달아야 해서 「옆벽 없음·양 끝 트임」 문장을 뺀다 (SIDE_WALLS=1일 때만)
+    must = [m for m in MUST if not (os.environ.get('SIDE_WALLS') == '1' and m.startswith('The back wall, floor and ceiling run straight on past'))]
+    for m in must:
         hit = m in new
         rows.append(('그대로' if hit else '빠짐', m[:70]))
         ok &= hit

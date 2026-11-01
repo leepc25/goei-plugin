@@ -43,6 +43,7 @@ test('본부 그림 층: 계단 문 → 고른 층의 계단, 메뉴 문 → 문
  const b3=map.scenes.find(s=>s.id==='b3');
  const ch=run(b3.doors.find(d=>d.id==='supply'),undefined,b3);
  assert.equal(ch.opened,'supply');assert.equal(ch.w.ended,null);
- const wc=run(b1.doors.find(d=>d.id==='shower_m'),undefined,b1); // 잠긴 문(2층 회의실은 새 그림에 없음)
- assert.equal(wc.opened,null);assert.equal(wc.w.ended,null);
+ // 샤워실 문(11-01): 더는 잠기지 않고 남자 샤워실(bath_m) 장면으로 넘어간다 (본부에 잠긴 문은 이제 없다)
+ const wc=run(b1.doors.find(d=>d.id==='shower_m'),undefined,b1);
+ assert.equal(wc.opened,null);assert.equal(wc.w.ended,'next');
 });

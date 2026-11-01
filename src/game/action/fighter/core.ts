@@ -4,6 +4,7 @@
 // env: { A, IMG, CH, VFX, CHAIR, held:Set, K(y), sfx(type, extra), font(n), targets():[{body,x,y,z}], hurt(T, dmg, kind, face, hitstop, o), clamp(P), ground(x,y), mod?:{speed(),sp()}, heal?(v) }
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { SEATS as SEAT_TABLE, SEAT_LOOP as SEAT_LOOP_IDS, SEAT_IDS as SEAT_ID_SET, seatFit } from './seats';
+import { showerPlan } from './shower';
 import type { PerkRun, PerkCtx, HitSrc, Boom } from '../../perks/runtime';
 /** 인물 설정(char.json cfg)·줄 측정값(A)·이펙트 정의·기술 부품은 JSON 자료라 모양이 인물·기술마다 다르다 → 자료 쪽은 느슨한 형(Json)으로 둔다 */
 type Json = any;
@@ -996,6 +997,20 @@ function runScene(steps?: Json, label?: Json) {
   if (label) fx.push({ k: 'num', x: P.x - 60, y: P.y - 280 * K(P.y), v: label, t: 1.4 });
   next();
 }
+// 샤워 규칙 재생(11-01 사용자): 통째 반복 금지 — 문지르는 구간만 속도 차등으로 반복, 들어가기·나오기 한 번, 현실 10분 이상. 계획은 fighter/shower.ts
+function runShower(seconds?: Json, quiet?: Json) {   // quiet = 필드(본부 샤워실): 「머리감기」 글자 안 띄움
+  const steps = showerPlan({ seconds: seconds || 600, seed: (Math.random() * 1e9) | 0, has });
+  if (!steps.length) return;
+  P.seat = null; P.z = 0; P.combat = false; P.armed = false; P.mode = 'act'; P.scene = '샤워'; let i = 0;
+  const next = () => {
+    if (P.scene !== '샤워') return;
+    if (i >= steps.length) { P.scene = null; return toIdle(); }
+    const st = steps[i++]; P.mode = 'act';
+    if (!quiet) fx.push({ k: 'num', x: P.x - 60, y: P.y - 280 * K(P.y), v: st.label, t: 1.2 });
+    play(st.id, { seq: st.seq.map((e) => ({ ...e })), onEnd: next });
+  };
+  next();
+}
 const SCENES = [
   ['의자', [['정면 앉기', () => sitAt('front')], ['옆 앉기', () => sitAt('side')], ['후면 앉기', () => sitAt('back')],
     ['앉아 수다', () => seatAct('talk')], ['앉아 먹기', () => seatAct('eat')], ['앉아 마시기', () => seatAct('drink')], ['앉아 타자', () => seatAct('type')],
@@ -1003,7 +1018,7 @@ const SCENES = [
     ['앉은 채 맞기(약)', () => P.seat && seatHit(false)], ['앉은 채 맞기(강) · 옆 = 굴러떨어지기', () => P.seat && seatHit(true)]], () => has('60') || has('96')],
   ['샤워', [['한 번에(벗기→걷기→물→씻기→입기)', () => runScene([{ id: 'SH_A', d: 0.12 }, { id: 'SH_B', n: 2 }, { id: 'SH_D', n: 3 }, { id: 'SH_E', n: 3 }, { id: 'SH_A', rev: true, d: 0.1 }], '샤워')],
     ['옷 벗기', () => runScene([{ id: 'SH_A', d: 0.12, hold: 0.6 }], '옷 벗기')], ['맨몸 걷기', () => runScene([{ id: 'SH_B', n: 4 }])], ['물 맞으며 쉬기', () => runScene([{ id: 'SH_D', n: 4 }])],
-    ['몸 씻기', () => runScene([{ id: 'SH_E', n: 4 }])], ['옷 입기(벗기 거꾸로)', () => runScene([{ id: 'SH_A', rev: true, d: 0.1 }], '옷 입기')]], () => has('SH_A')],
+    ['몸 씻기', () => runScene([{ id: 'SH_E', n: 4 }])], ['샤워 규칙 재생 10분(구간 반복·속도 차등)', () => runShower(600)], ['샤워 규칙 재생 1분(맛보기)', () => runShower(60)], ['옷 입기(벗기 거꾸로)', () => runScene([{ id: 'SH_A', rev: true, d: 0.1 }], '옷 입기')]], () => has('SH_A')],
   // 맨몸 피격(10-31 사용자: 샤워장에서도 전투, 맨몸으로는 공격 못 함 → 11-01 125명 연결): G 경계 자세(2번 장부터 반복) · H1 배 · H2 가슴 · H3 쓰러짐 → H4 누운 채 맞기 → H5 일어나기 · H6 가린 채 도망
   ['맨몸 피격', [['한 번에(벗기→경계→배→가슴→쓰러짐→누워 맞기→일어나기→도망)', () => runScene([{ id: 'SH_A', d: 0.12 }, { id: 'SH_G', from: 1, n: 2 }, { id: 'SH_H1' }, { id: 'SH_G', from: 1 }, { id: 'SH_H2' }, { id: 'SH_H3', hold: 0.4 }, { id: 'SH_H4' }, { id: 'SH_H4' }, { id: 'SH_H5' }, { id: 'SH_G', from: 1 }, { id: 'SH_H6', n: 3 }], '맨몸 피격')],
     ['경계 자세(반복)', () => runScene([{ id: 'SH_G', from: 1, n: 4 }])], ['배 맞기', () => runScene([{ id: 'SH_G', from: 1 }, { id: 'SH_H1' }, { id: 'SH_G', from: 1 }])], ['가슴 맞기', () => runScene([{ id: 'SH_G', from: 1 }, { id: 'SH_H2' }, { id: 'SH_G', from: 1 }])],
@@ -1645,7 +1660,9 @@ function drawCut() {
   return {
     P, A, CH, onPress, onRelease, takeHit, update, frameView, drawUnder, drawBody, drawFxLayer, drawScreen, armored,
     get hitstop() { return hitstop; }, get shake() { return shake; }, get zoom() { return zoom; }, get target() { return T; },
-    knock, hit, stun, die, sitAt, rise, seatAct, runScene, playLife, lifeIds, emote, act, toIdle, has, nOf, SCENES,
+    knock, hit, stun, die, sitAt, rise, seatAct, runScene, runShower, playLife, lifeIds, emote, act, toIdle, has, nOf, SCENES,
+    /** 샤워 규칙 재생 중인가 (fighter/player.ts 샤워 자리) */
+    get showering() { return P.scene === '샤워'; },
     /** 퍽 손잡이 (fighter/player.ts 가 PerkHost 로 묶음) */
     perkApi: { proxies, hit: perkHit, boom: perkBoom, ghost: ghostAttack, replaySkill, reflect: reflectShot, mark: markT, bind: bindT, later: (t: number, fn: () => void) => later(t, fn), text: (x: number, y: number, v: string) => fx.push({ k: 'num', x: x - 30, y, v, t: 1.1 }), gainSp: (v: number) => { P.sp = Math.min(100, P.sp + v); }, vfx: (n: string, x: number, y: number, s: number, o: Json = {}) => vfx(n, x, y, s, o) },
     /** 시험장 전용 스위치: 필살 게이지 무시 */

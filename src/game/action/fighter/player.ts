@@ -450,6 +450,26 @@ export class FighterPlayer extends Player {
     this.sync();
     return true;
   }
+  /** 샤워 자리(hub.ts spot act 'shower'): 그 자리에 서서 샤워 규칙 재생(fighter/shower.ts, 현실 10분). 방향키·조사 키로 그만둔다 */
+  private coreShower: { exit: { x: number; y: number } } | null = null;
+  get showering(): boolean { return !!this.coreShower && this.core.showering; }
+  shower(x: number, y: number, face: 1 | -1, seconds = 600): boolean {
+    const P = this.core.P as unknown as { x: number; y: number; z: number; vx: number; face: 1 | -1; mode: string };
+    if (!(this.core.has('SH_D') || this.core.has('SH_E')) || P.mode !== 'ground' || this.z > 0) return false;
+    P.x = x; P.y = y; P.z = 0; P.vx = 0; P.face = face;
+    this.core.runShower(seconds, true);
+    if (!this.core.showering) return false;
+    this.coreShower = { exit: { x, y } };
+    this.sync();
+    return true;
+  }
+  private coreShowerStep(p: Pad) {
+    if (!this.coreShower) return;
+    const P = this.core.P as unknown as { x: number; y: number; mode: string; scene: unknown };
+    const quit = p.pressed.has('interact') || p.pressed.has('jump') || p.mx !== 0 || p.my !== 0;
+    if (quit && this.core.showering) { P.scene = null; this.core.toIdle(); }
+    if (!this.core.showering) { const e = this.coreShower.exit; this.coreShower = null; if (P.mode === 'ground') { P.x = e.x; P.y = e.y; this.sync(); } }
+  }
   private coreSeatStep(p: Pad) {
     const P = this.core.P as unknown as { x: number; y: number; mode: string; seat: unknown };
     if (!this.coreSeat) return;
@@ -500,6 +520,8 @@ export class FighterPlayer extends Player {
     if (this.comboClock > 0 && --this.comboClock === 0) this.combo = 0;
     this.statusStep(world, 1 / 30);
     this.coreSeatStep(p);
+    this.coreShowerStep(p);
+    if (this.coreShower) { this.heldNames.clear(); this.core.frameView({ x0: w.camX, lane: w.lane }); this.sync(); return; } // 샤워 중엔 그만두기만
     if (this.coreSeat) { this.heldNames.clear(); this.core.frameView({ x0: w.camX, lane: w.lane }); this.sync(); return; } // 앉아 있는 동안은 일어나기만
     if (this.phase !== 'down') this.input(p); // 쓰러지면 후송을 기다린다
     this.core.frameView({ x0: w.camX, lane: w.lane });
