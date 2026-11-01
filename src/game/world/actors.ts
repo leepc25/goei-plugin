@@ -744,9 +744,9 @@ export class WorldSim {
             this.setClip(e, 'idle');
           }
           v.stay = (v.stay ?? 0) + dt;
-          if (v.stay >= 6 && v.stay - dt < 6) this.say(e, '여긴 관계자 외 출입 금지입니다.', 2.5);
+          if (v.stay >= 6 && v.stay - dt < 6) this.events.push({ kind: 'cue', scene, who: e.def.name, id: e.def.id, cell: 'expel.warn', ctx: { target: v.def.name, say: '여긴 관계자 외 출입 금지입니다.' } });
           if (v.stay >= 14) {
-            this.say(e, '나가 주시죠.', 2);
+            this.events.push({ kind: 'cue', scene, who: e.def.name, id: e.def.id, cell: 'expel.attack', ctx: { target: v.def.name, say: '나가 주시죠.' } });
             v.exitAt = this.gateFar(v, e.x);
             this.walkTo(v, v.exitAt, '쫓겨남', 'exit');
             v.plan = 'exit';
@@ -902,6 +902,10 @@ export class WorldSim {
       this.alarms.set(fac, al);
       const t = threat === 'player' ? '{user}' : this.actors.find((q) => q.def.id === threat)?.def.name ?? threat;
       this.events.push({ kind: 'alarm', scene, faction: fac, on: true, why, threat: t });
+      if (threat === 'player') {
+        const g = this.actors.filter((q) => q.scene === scene && !q.fighting && !['down', 'dead', 'gone', 'door'].includes(q.act) && ARCHETYPES[q.def.archetype ?? '']?.role === 'guard').sort((a, b) => Math.abs(a.x - x) - Math.abs(b.x - x))[0];
+        if (g) this.events.push({ kind: 'cue', scene, who: g.def.name, id: g.def.id, cell: 'expel.alarm', ctx: { target: '{user}', say: '경보 울려!' } });
+      }
     }
     if (!al.threats.includes(threat)) { al.threats.push(threat); al.tick = 0; }   // 새 위협이면 바로 모은다
     al.scene = scene;
@@ -1216,7 +1220,7 @@ export class WorldSim {
     this.playerVisit.permit = true;
     this.events.push({ kind: 'pass', scene: p.scene, faction: fac });
     const g = this.actors.find((q) => q.def.id === this.playerVisit!.guard);
-    if (g?.escort === 'player') { g.escort = undefined; this.resume(g); }
+    if (g?.escort === 'player') { g.escort = undefined; this.resume(g); this.events.push({ kind: 'cue', scene: g.scene, who: g.def.name, id: g.def.id, cell: 'expel.pass_permit', ctx: { target: '{user}', say: '확인했습니다. 들어가세요.' } }); }
   }
   /** 경고 중인 경비가 대화에서 위협받음([[경보]]): 그 경비가 덤빈다. 거점 경보는 아님(경보는 기절·사망 목격으로만) */
   threatAlarm(id?: string): void {
@@ -1239,7 +1243,7 @@ export class WorldSim {
     if (path && d) { g.route = path; this.walkTo(g, d, `${why}: 쫓아감`, 'chase'); }
     else this.walkTo(g, { x: p.x, y: p.y || g.y }, `${why}: 덤빔`, 'chase');
     this.iconOn(g, '#', 2);
-    this.say(g, why === '무기' ? '무기 내려!' : why === '위협' ? '그 말, 후회하게 될 겁니다.' : '경고했습니다!', 2);
+    this.events.push({ kind: 'cue', scene: g.scene, who: g.def.name, id: g.def.id, cell: why === '무기' ? 'expel.attack_weapon' : why === '위협' ? 'expel.attack_threat' : 'expel.attack', ctx: { target: '{user}', say: why === '무기' ? '무기 내려!' : why === '위협' ? '그 말, 후회하게 될 겁니다.' : '경고했습니다!' } });
     this.events.push({ kind: 'guardAttack', scene: p.scene, who: '{user}', by: g.def.name });
   }
   /** 장면 → 거점 밖까지 남은 길 (문 수 × 1만 + 다음 문까지 가로 거리). 거점 밖이면 0 */
@@ -1278,7 +1282,7 @@ export class WorldSim {
     const guardOf = () => this.actors.find((q) => q.def.id === pv.guard && !q.fighting && !['down', 'dead', 'gone'].includes(q.act));
     // 그 거점 인물과 동행 중: 경비가 보내 준다
     if (this.followers.some((id) => { const f = this.actors.find((q) => q.def.id === id); return !!f && this.factionOf(f) === fac; })) {
-      if (pv.spotted) { const g = guardOf(); release(g); if (g) this.say(g, '아, 일행이셨군요. 지나가세요.', 2); }
+      if (pv.spotted) { const g = guardOf(); release(g); if (g) this.events.push({ kind: 'cue', scene: g.scene, who: g.def.name, id: g.def.id, cell: 'expel.pass_companion', ctx: { target: '{user}', say: '아, 일행이셨군요. 지나가세요.' } }); }
       pv.spotted = false;
       pv.guard = undefined;
       pv.scene = p.scene;
@@ -1296,7 +1300,7 @@ export class WorldSim {
       pv.guard = g.def.id;
       g.escort = 'player';
       this.iconOn(g, '!', 1.5);
-      this.say(g, st === 'hostile' ? '거기 서. 여긴 당신이 올 데가 아니야. 당장 나가.' : '여긴 관계자 외 출입 금지입니다. 나가 주시죠.', 3);
+      this.events.push({ kind: 'cue', scene: g.scene, who: g.def.name, id: g.def.id, cell: 'expel.warn', ctx: { target: '{user}', say: st === 'hostile' ? '거기 서. 여긴 당신이 올 데가 아니야. 당장 나가.' : '여긴 관계자 외 출입 금지입니다. 나가 주시죠.' } });
       this.events.push({ kind: 'warn', scene: p.scene, who: '{user}', by: g.def.name });
       return;
     }
