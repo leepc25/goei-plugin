@@ -85,16 +85,22 @@ test('반응표: 55명, 칸 값은 정해진 동작·행동만', () => {
   assert.equal(NR.reactOf('콘쥬스').combat, false);
 });
 
-test('경보: 거점 안에서 주인공이 때리면 켜지고, 다른 방 전투원까지 모이고, 비전투원은 피하고, 떠나면 꺼진다', () => {
+const mobAt = (w, scene, x, hp = 30) => { const m = w.add({ id: `m${x}`, name: '행정 직원', kind: 'mob', brain: 'transit', home: scene, archetype: '행정 직원', look: '행정 직원' }, { scene, x, y: 560 }); m.hp = hp; m.act = 'idle'; m.wait = 999; return m; };
+
+test('경보: 때리기만 해선 안 울리고, 기절시키는 걸 본 사람이 있으면 거점 전체 경보 → 전투원 모임·비전투원 피함·떠나면 꺼짐 (11-01)', () => {
   const w = sim();
   w.noAssist = (n) => n === '콘쥬스';
   const fighter = named(w, '에일린', 'f3', 1800);
   const civ = named(w, '콘쥬스', 'office', 900);
-  const victim = named(w, '잼트리', 'office', 700);
+  const victim = mobAt(w, 'office', 700, 25);
   const P = { scene: 'office', x: 650, y: 560 };
   run(w, 0.5, P);
   assert.ok(w.hitActor(victim.def.id, 1, 1, 10));
-  assert.ok(w.alarmIn('office') && w.alarmIn('f3'), '거점 전체');
+  assert.ok(!w.alarmIn('office'), '한 대로는 경보 아님');
+  run(w, 0.5, P);
+  assert.ok(w.hitActor(victim.def.id, 1, 2, 30));
+  assert.ok((victim.hp ?? 1) <= 0, '기절');
+  assert.ok(w.alarmIn('office') && w.alarmIn('f3'), '본 사람(콘쥬스) 있음 → 거점 전체');
   assert.ok(w.events.some((e) => e.kind === 'alarm' && e.on && e.threat === '{user}'));
   run(w, 8, P);
   assert.equal(fighter.alarm, 'A00');
@@ -118,38 +124,66 @@ test('경보: 적대 방문자는 들어오자마자 경보, 위협은 방문자
 
 const guardAt = (w, scene, x) => { const g = w.add({ id: `g${x}`, name: '경비', kind: 'mob', brain: 'transit', home: scene, archetype: '경비', look: '경비' }, { scene, x, y: 560 }); g.exitAt = undefined; g.act = 'idle'; g.wait = 999; return g; };
 
-test('쫓아냄: 경계 거점에서 버티면(제자리) 경보, 출구로 가면 시간이 멈추고 나가면 쫓겨남', () => {
+test('경보: 아무도 못 본 기절은 경보가 아니다', () => {
+  const w = sim();
+  const victim = mobAt(w, 'office', 300, 5);
+  run(w, 0.5, { scene: 'office', x: 250, y: 560 });
+  assert.ok(w.hitActor(victim.def.id, 1, 1, 30));
+  assert.ok(!w.alarmIn('office'));
+});
+
+test('쫓아냄: 경비가 목격 거리 안에서 봐야 따라붙음, 제자리는 시간 안 잼, 안쪽 방·층으로 가면 경비가 덤빔, 출구로 나가면 쫓겨남 (11-01)', () => {
   const w = sim({ stance: (f) => (f === 'A00' ? 'wary' : null) });
-  const g = guardAt(w, 'lobby', 1200);
-  run(w, 14.5, { scene: 'lobby', x: 1000, y: 560 });
+  const g = guardAt(w, 'lobby', 1900);
+  run(w, 3, { scene: 'lobby', x: 1000, y: 560 });
+  assert.ok(!g.escort, '멀리 있으면 못 봄');
+  run(w, 3, { scene: 'lobby', x: 1600, y: 560 });
   assert.equal(g.escort, 'player');
   assert.ok(w.guardingPlayer(g.def.id));
-  run(w, 10, { scene: 'lobby', x: 1000, y: 560 });
-  assert.ok(!w.alarmIn('lobby'), '아직');
-  run(w, 12, { scene: 'lobby', x: 1000, y: 560 });
-  assert.ok(w.alarmIn('lobby'), '버팀 → 경보');
-  assert.ok(w.events.some((e) => e.kind === 'alarm' && e.why === 'trespass'));
+  assert.ok(w.events.some((e) => e.kind === 'warn'));
+  run(w, 60, { scene: 'lobby', x: 1600, y: 560 });
+  assert.ok(!w.alarmIn('lobby') && g.plan !== 'chase', '제자리로는 아무 일 없음');
+  // 경고 무시하고 위층(안쪽)으로
+  run(w, 0.5, { scene: 'f3', x: 2000, y: 560 });
+  assert.ok(w.events.some((e) => e.kind === 'guardAttack'));
+  assert.equal(g.plan, 'chase');
+  assert.ok(!w.alarmIn('lobby'), '덤비는 건 경보가 아님');
 
-  const w2 = sim({ stance: (f) => (f === 'A00' ? 'wary' : null) });
-  guardAt(w2, 'lobby', 1200);
-  run(w2, 15, { scene: 'lobby', x: 1600, y: 560 });
-  // 출구(x=300 문) 쪽으로 천천히 걸음: 시간이 안 흐름
-  run(w2, 40, (t) => ({ scene: 'lobby', x: 1600 - t * 30, y: 560 }));
-  assert.ok(!w2.alarmIn('lobby'), '나가는 중엔 안 울림');
+  const w2 = sim({ stance: (f) => (f === 'A00' ? 'hostile' : null) });
+  guardAt(w2, 'f3', 1900);
+  run(w2, 3, { scene: 'f3', x: 1800, y: 560 });
+  assert.ok(w2.events.some((e) => e.kind === 'warn'), '적대도 경고부터');
+  assert.ok(!w2.alarmIn('f3'));
+  // 출구 쪽(로비)으로는 괜찮다 → 거리로 나가면 쫓겨남
+  run(w2, 0.5, { scene: 'lobby', x: 1500, y: 560 });
+  assert.ok(!w2.events.some((e) => e.kind === 'guardAttack'));
   run(w2, 1, { scene: 'street', x: 640, y: 560 });
   assert.ok(w2.events.some((e) => e.kind === 'expel' && e.who === '{user}'));
+});
+
+test('쫓아냄: 그 거점 인물과 동행 중이면 경비가 보내 줌 (11-01)', () => {
+  const w = sim({ stance: (f) => (f === 'A00' ? 'wary' : null) });
+  const g = guardAt(w, 'lobby', 1200);
+  const e = named(w, '에일린', 'lobby', 900);
+  e.def.faction = 'A00';
+  run(w, 0.5, { scene: 'lobby', x: 950, y: 560 });
+  assert.ok(w.setFollow('에일린', 'follow'));
+  run(w, 5, { scene: 'lobby', x: 1100, y: 560 });
+  assert.ok(!g.escort, '경고 안 함');
+  run(w, 0.5, { scene: 'f3', x: 2000, y: 560 });
+  assert.ok(!w.events.some((x) => x.kind === 'guardAttack'));
 });
 
 test('쫓아냄: 경비가 [[허가]]면 머물고, [[경보]]면 바로 경보', () => {
   const w = sim({ stance: (f) => (f === 'A00' ? 'wary' : null) });
   const g = guardAt(w, 'lobby', 1200);
-  run(w, 15, { scene: 'lobby', x: 1000, y: 560 });
+  run(w, 3, { scene: 'lobby', x: 1000, y: 560 });
   w.permitPlayer();
-  run(w, 40, { scene: 'lobby', x: 1000, y: 560 });
-  assert.ok(!w.alarmIn('lobby'));
+  run(w, 0.5, { scene: 'f3', x: 2000, y: 560 });
+  assert.ok(!w.events.some((e) => e.kind === 'guardAttack'), '허가 뒤엔 안쪽으로 가도 됨');
   const w2 = sim({ stance: (f) => (f === 'A00' ? 'wary' : null) });
   const g2 = guardAt(w2, 'lobby', 1200);
-  run(w2, 7, { scene: 'lobby', x: 1000, y: 560 });
+  run(w2, 3, { scene: 'lobby', x: 1000, y: 560 });
   w2.threatAlarm(g2.def.id);
   assert.ok(w2.alarmIn('lobby'));
   void g;
@@ -166,6 +200,14 @@ test('캐릭터 반응: 반응표대로 인물마다 다르게 (무기·동료�
   assert.equal(e.doing, '맞서 버팀');   // 에일린: confront
   assert.equal(e.icon, '…');
   assert.equal(k.doing, '자리를 피함'); // 콘쥬스: avoid
+  // 11-01: 무기를 든 동안은 계속 맞서 버팀(다시 하기 간격 없음), 넣으면 그만
+  run(w, 20, { scene: 'office', x: 700, y: 560, armed: true, face: 1 });
+  assert.equal(e.doing, '맞서 버팀', '든 동안 계속');
+  assert.equal(e.act, 'watch');
+  run(w, 3, { scene: 'office', x: 700, y: 560, armed: false, face: 1 });
+  assert.notEqual(e.doing, '맞서 버팀', '넣으면 그만');
+  run(w, 0.2, { scene: 'office', x: e.x - 200, y: e.y, armed: true, face: 1 });
+  assert.equal(e.doing, '맞서 버팀', `다시 꺼내면 다시 (x=${e.x})`);
   // 주인공이 콘쥬스를 때림 → 에일린(동료가 맞음 = attack) 주인공에게 덤빔
   const w2 = sim();
   const e2 = named(w2, '에일린', 'office', 900);

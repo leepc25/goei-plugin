@@ -55,7 +55,7 @@ import dialogueData from '../../world/dialogue.json';
 import type { Actor, SimEvent } from '../../world/actors';
 import { ARCHETYPES, profileOf } from '../../world/mobs';
 import { FightLog, enName, isLaw } from '../../world/fightlog';
-import { reactOf } from '../../world/namedReact';
+import { reactCell, reactOf } from '../../world/namedReact';
 import { drawAlarmLights } from '../../world/alarmFx';
 import { view as fieldViewport } from './view';
 import { settleLine } from '../../world/fieldmoney';
@@ -489,6 +489,8 @@ function hqAdapter(bridge: Partial<GameBridge> | undefined, ui: { chooseFloor: H
   const fights = new Map<string, { body: Body & { hp: number; hpMax: number; alive: boolean; label: string }; t: number; scene: string }>();
   /** 싸움에 나선 동행 (주인공 편 전투 AI 몸) */
   const allies = new Map<string, { body: Body & { hp: number; hpMax: number; alive: boolean; label: string }; scene: string }>();
+  /** 지난 틱 체력 (주인공·동행): 「동료가 맞음」 판정 */
+  const allyHpSeen = new Map<string, number>();
   const endFights = (down: boolean) => {
     const w = sim;
     for (const [id, f] of fights) { f.body.alive = false; w?.fromFight(id, f.body.x, f.body.y, down); }
@@ -532,7 +534,7 @@ function hqAdapter(bridge: Partial<GameBridge> | undefined, ui: { chooseFloor: H
     }
     if (fighting) for (const id of [...w.followers]) {
       const a = w.actors.find((q) => q.def.id === id);
-      if (!a || allies.has(id) || a.scene !== sceneId || a.fighting || w.noAssist(a.def.name) || ['down', 'dead', 'gone', 'door'].includes(a.act)) continue;
+      if (!a || allies.has(id) || a.scene !== sceneId || a.fighting || ['down', 'dead', 'gone', 'door'].includes(a.act)) continue;
       const look = a.def.look ?? a.def.name;
       if (!charArt(look)) { void loadChar(look); continue; }
       const b = spawn({ kind: `ally-char:${look}`, x: a.x, y: a.y } as { kind: string; x: number; y: number });
@@ -540,7 +542,20 @@ function hqAdapter(bridge: Partial<GameBridge> | undefined, ui: { chooseFloor: H
       if (!w.toAlly(id)) { b.alive = false; continue; }
       b.hp = Math.max(1, Math.min(b.hpMax, a.hp && a.hp > 0 ? a.hp : b.hpMax));
       (b as unknown as { dir: 1 | -1 }).dir = a.face;
+      // 싸움에 안 나서는 인물(반응표 combat=false, 11-01 사용자): 먼저 덤비지 않고 맞으면 반격. 그 전엔 반응표 「동료가 맞음」대로
+      if (w.noAssist(a.def.name)) {
+        const act = reactCell(a.def.name, 'allyHit')?.act;
+        b.passive = act === 'attack' ? 'attack' : act === 'avoid' || act === 'flee' || act === 'cower' ? 'keep' : 'stay';
+      }
       allies.set(id, { body: b as typeof b & { hp: number; hpMax: number; alive: boolean; label: string }, scene: sceneId });
+    }
+    // 「동료가 맞으면 덤빔」인 인물: 주인공이나 다른 동행이 맞으면 싸우기 시작
+    if (fighting && allies.size) {
+      const pl = (api.world as unknown as { player: { hp: number } }).player;
+      const hurt = pl.hp < (allyHpSeen.get('player') ?? pl.hp) || [...allies].some(([k, f]) => f.body.hp < (allyHpSeen.get(k) ?? f.body.hp));
+      if (hurt) for (const f of allies.values()) { const fb = f.body as unknown as FighterAi; if (fb.passive === 'attack') fb.provoked = true; }
+      allyHpSeen.set('player', pl.hp);
+      for (const [k, f] of allies) allyHpSeen.set(k, f.body.hp);
     }
     for (const a of w.challengers(sceneId)) {
       const look = a.def.look ?? a.def.name;

@@ -66,6 +66,14 @@ export class FighterAi extends FighterPlayer {
   protected extraFoes() {
     return [];
   }
+  /**
+   * 싸움에 안 나서는 동행 (반응표 combat=false, 11-01 사용자): 먼저 덤비지 않는다. 맞으면 반격(provoked).
+   * 'keep' = 피하는 인물(반응표 동료가 맞음이 피함·달아남·웅크림): 적과 거리를 둔다. 'stay' = 주인공 곁. 'attack' = 동료가 맞으면 덤빔
+   */
+  passive: 'keep' | 'stay' | 'attack' | null = null;
+  /** 맞았거나 동료가 맞아(attack) 이제 싸운다 */
+  provoked = false;
+  private lastHp = -1;
 
   step(world: WorldView): void {
     const me = this.core.P as unknown as { mode: string; z: number; sp: number };
@@ -76,6 +84,10 @@ export class FighterAi extends FighterPlayer {
       stunned: ['down', 'belly', 'stun'].includes(me.mode) || this.phase === 'down',
       hp: this.hp / this.hpMax, sp: me.sp ?? 0, guard: this.guard, gap: this.status.attackGap() * this.perkGap * this.npcGap,
     };
+    // 싸움에 안 나서는 동행: 맞으면 반격
+    if (this.passive && this.lastHp >= 0 && this.hp < this.lastHp) this.provoked = true;
+    this.lastHp = this.hp;
+    if (this.passive && !this.provoked) { this.passiveStep(world); return; }
     // 노릴 상대: 가장 가까운 상대 (적 편은 주인공·동행 중, 동행은 적 중)
     const t = this.foes().filter((b) => b.team !== this.team).sort((a, b) => Math.abs(a.x - this.x) + Math.abs(a.y - this.y) * 2 - (Math.abs(b.x - this.x) + Math.abs(b.y - this.y) * 2))[0];
     const p = this.pad;
@@ -105,6 +117,25 @@ export class FighterAi extends FighterPlayer {
     p.my = p.held.has('down') ? 1 : p.held.has('up') ? -1 : 0;
     p.evade = false;
     this.lieStep(p, foe.x);
+    this.tick(world, p);
+  }
+
+  /** 먼저 싸우지 않는 동행: 피하는 인물은 가까운 적에게서 물러나고, 아니면 주인공 곁에 선다 */
+  private passiveStep(world: WorldView): void {
+    const p = this.pad;
+    p.pressed.clear(); p.released.clear(); p.held.clear(); p.mx = 0; p.my = 0; p.run = false; p.evade = false;
+    const pl = world.player as unknown as Body;
+    const near = this.foes().sort((a, b) => Math.abs(a.x - this.x) - Math.abs(b.x - this.x))[0];
+    const hold = (k: 'left' | 'right' | 'up' | 'down') => { p.held.add(k); if (k === 'left' || k === 'right') p.mx = k === 'right' ? 1 : -1; else p.my = k === 'down' ? 1 : -1; };
+    if (this.passive === 'keep' && near && Math.abs(near.x - this.x) < 260) {
+      hold(near.x > this.x ? 'left' : 'right');
+      p.run = true;
+    } else if (pl.alive && Math.abs(pl.x - this.x) > 160) {
+      hold(pl.x > this.x ? 'right' : 'left');
+      p.run = Math.abs(pl.x - this.x) > 400;
+    }
+    if (pl.alive && Math.abs(pl.y - this.y) > 30) hold(pl.y > this.y ? 'down' : 'up');
+    this.lieStep(p, near?.x ?? pl.x);
     this.tick(world, p);
   }
 
