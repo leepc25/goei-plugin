@@ -169,7 +169,7 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
     const pl = a.world.player as Player & { lifeScene?: (steps: { id: string; n?: number }[], x: number, y: number, face: 1 | -1) => boolean; lifeSceneOn?: boolean };
     if (pT.phase === 'open') {
       if (--pT.t > 0) return;
-      // 좌석: 사람마다 허벅지선이 다르면 발 자리를 옮긴다 (world/toilets.ts TOILET_LAP)
+      // 좌석: 사람마다 허벅지선·좌우가 다르면 발 자리를 옮긴다 (world/toilets.ts TOILET_SEAT)
       const look = (pl as { label?: string }).label ?? '';
       const f = pT.seat ? seatFeet(pT.seat, look) : pT.front;
       if (!pl.lifeScene?.([{ id: '101' }, { id: '102', n: 4 }, { id: '103' }], f.x, f.y, 1)) { a.movePlayer(pT.front.x, pT.front.y); setPT(null); return a.world.say('지금은 할 수 없다.', 1.5); }

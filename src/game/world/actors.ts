@@ -2546,6 +2546,7 @@ export class WorldSim {
       const f = seatFeet(t.seat, a.def.look ?? a.def.name);
       a.x = f.x;
       a.y = f.y;
+      a.face = 1; // 좌석 좌우 옮김(TOILET_SEAT)은 뒤집지 않은 그림 기준
       tl.phase = 'in';
       this.setClip(a, 'poo');
       a.clipUntil = this.time + a.wait;
