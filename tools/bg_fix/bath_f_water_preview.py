@@ -10,10 +10,28 @@ FOOT = {2: (222, 340, 'W'), 3: (266, 312, 'W'), 4: (500, 338, 'W'), 5: (526, 305
 CH = {2: ('1.2', 'SH_D'), 3: ('1.10', 'SH_E'), 4: ('1.9', 'SH_D'), 6: ('1.1', 'SH_E')}
 assert all(c != '1.12' for c, _ in CH.values())
 SHRINK = 0.88
-SPREAD, STREAMS, SPEED, G = 40, 13, 2.2, 0.03   # 부채꼴 전체 각도(도), 가닥 수, 초속(px/걸음), 중력
+SPREAD, STREAMS, SPEED, G = 40, 7, 2.2, 0.03   # 16:52 사용자: 덜 촘촘하게, 더 밑으로   # 부채꼴 전체 각도(도), 가닥 수, 초속(px/걸음), 중력
 C_DEEP, C_MID, C_HI = (150, 205, 235, 225), (190, 230, 248, 235), (240, 252, 255, 255)
 def hgt(y): return 1.383 * (y - 196) * SHRINK
+C_STEAM = (250, 253, 255)
+def draw_steam(layer, n, head_top, head_x, floor_y, frame):
+    """뜨거운 물 김: 사람 주변(머리·어깨·꼭지)에서 반투명 흰 뭉치가 흔들리며 올라가다 옅어진다(16:52 사용자)."""
+    d = ImageDraw.Draw(layer)
+    rnd = random.Random(n * 7 + 1)
+    nx, ny = NOZZLE[n]
+    for k in range(18):
+        bx = head_x + rnd.uniform(-22, 22); by = head_top + rnd.uniform(-10, 70)
+        life = 48; t = (frame * 4 + k * 11) % life          # 0~life 로 올라가는 단계
+        y = by - t * 1.3; x = bx + math.sin((t + k * 5) / 7.0) * 4
+        alpha = int(170 * (1 - t / life) ** 0.8); r = 3 + t // 10    # 올라갈수록 커지고 옅어짐
+        if y < ny - 40: continue
+        for dy in range(-r, r + 1):
+            for dx in range(-r, r + 1):
+                if dx * dx + dy * dy <= r * r:
+                    edge = dx * dx + dy * dy > (r - 1) * (r - 1)
+                    d.point((round(x + dx), round(y + dy)), fill=C_STEAM + (alpha // 2 if edge else alpha,))
 def draw_water(layer, n, head_top, head_x, floor_y, frame):
+    draw_steam(layer, n, head_top, head_x, floor_y, frame)
     d = ImageDraw.Draw(layer)
     nx, ny = NOZZLE[n]
     rnd = random.Random(n * 100)
@@ -23,12 +41,12 @@ def draw_water(layer, n, head_top, head_x, floor_y, frame):
         th = aim + math.radians((s - (STREAMS - 1) / 2) * SPREAD / (STREAMS - 1))
         vx, vy = SPEED * math.sin(th) * 0.6, SPEED * math.cos(th) * 0.9   # 주로 아래로, 옆은 조금 → 완만한 부채꼴
         x, y = float(nx), float(ny); i = 0
-        end_y = head_top + 12 + abs(s - (STREAMS - 1) / 2) * 5     # 가운데는 머리에서 끝, 바깥 가닥은 어깨까지
-        while y < end_y and i < 400 and (y < head_top - 6 or abs(x - head_x) < 26):
-            if (i + frame * 2 + s) % 7 < 5:
+        end_y = floor_y - 60 - abs(s - (STREAMS - 1) / 2) * 12   # 가운데 가닥은 허벅지, 바깥은 허리쯤까지 흘러내림
+        while y < end_y and i < 400 and (y < head_top - 6 or abs(x - head_x) < 30):
+            if (i + frame * 2 + s * 2) % 9 < 6:   # 점선 6/3
                 col = C_HI if s == (STREAMS - 1) // 2 and i % 8 < 3 else (C_MID if 1 <= s <= STREAMS - 2 else C_DEEP)
                 d.point((round(x), round(y)), fill=col)
-                if 1 <= s <= STREAMS - 2: d.point((round(x) + 1, round(y)), fill=col)
+                if s == (STREAMS - 1) // 2: d.point((round(x) + 1, round(y)), fill=col)
             x += vx; y += vy; vy += G; i += 1
     for k in range(14):                     # 머리·어깨 물방울
         a = rnd.random() * math.pi; r = 5 + rnd.random() * 14 + ((frame + k) % 4)
@@ -56,7 +74,7 @@ def render(frame):
         draw_water(water, n, head_top, fx, fy, frame)
     bg.alpha_composite(water)
     return bg.convert('RGB')
-out = sys.argv[1] if len(sys.argv) > 1 else '/mnt/project-files/hq-f3/now/샤워실여_물줄기_코드_v2_2배.png'
+out = sys.argv[1] if len(sys.argv) > 1 else '/mnt/project-files/hq-f3/now/샤워실여_물줄기_코드_v3_2배.png'
 frames = [render(f).resize((924 * 2, 424 * 2), Image.NEAREST) for f in range(8)]
 frames[0].save(out)
 frames[0].save(out.replace('.png', '.gif'), save_all=True, append_images=frames[1:], duration=140, loop=0)
