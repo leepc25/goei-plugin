@@ -1,6 +1,7 @@
 // 필드 가게·가방 창 (docs/게임_성장_경제_설계.md 4·5장). 자료·계산은 src/game/world/fieldShop.ts, 돈은 가계부(bridge.wallet), 가방·재고는 bridge.fieldState.
 // 창이 열려 있는 동안 게임은 멈춘다(blocking). 마우스·터치로 고르고 Esc로 닫는다.
 import { BAG_SLOTS, FIELD_ITEMS, SHOPS, addBag, bagUsed, canAdd, emptyState, give, giftable, haggle, isOpen, parseState, priceOf, sellPriceOf, stockOf, takeBag, type FieldItemDef, type FieldState, type ShopDef } from '../../world/fieldShop';
+import type { FieldWorldSave } from '../../world/fieldSave';
 import type { GameFieldState } from '../../bridge';
 
 const CSS = `
@@ -70,6 +71,9 @@ export interface FieldShop {
   openBag(): void;
   isOpen(): boolean;
   state(): FieldState;
+  /** 필드 세계 이어하기 칸 (fieldSave.ts): 읽기 / 적고 바로 저장 */
+  world(): FieldWorldSave | undefined;
+  setWorld(w: FieldWorldSave): void;
   dispose(): void;
 }
 
@@ -240,6 +244,8 @@ export function createFieldShop(h: FieldShopHost): FieldShop {
     },
     isOpen: () => !el.hidden,
     state: () => st,
+    world: () => st.world,
+    setWorld: (w) => { st.world = w; save(); },
     dispose() {
       window.removeEventListener('keydown', onKey, true);
       el.remove();

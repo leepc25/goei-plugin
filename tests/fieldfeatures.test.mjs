@@ -316,3 +316,25 @@ test('맨몸(11-01): nude 켜면 클립이 맨몸으로 바뀌고, 맞으면 배
   assert.ok(w.setNude('npc:에일린', false));
   assert.ok(!a.clip.startsWith('nude_'));
 });
+
+test('이어하기(1-8): 욕구·동행·맨몸을 적어 두고 다음 세계에 되살린다 (지난 시간만큼 욕구가 더 줄어듦, 없는 인물은 건너뜀)', () => {
+  const w = sim();
+  const a = named(w, '에일린'), b = named(w, '잼트리', 'office', 900);
+  run(w, 1, { scene: 'office', x: 600, y: 560, hour: 10 });
+  a.needs.hunger = 40; b.needs.fun = 25;
+  assert.ok(w.setFollow('에일린', 'follow'));
+  w.setNude('npc:잼트리', true);
+  const s = w.snapshot();
+  assert.equal(s.needs['에일린'].hunger, 40);
+  assert.deepEqual(s.follow, ['에일린']);
+  assert.deepEqual(s.nude, ['잼트리']);
+  const txt = JSON.stringify({ ...s, clock: 36000, player: { scene: 'f3', x: 500 } });
+  const w2 = sim();
+  const a2 = named(w2, '에일린'), b2 = named(w2, '잼트리', 'office', 900);
+  run(w2, 0.1, { scene: 'office', x: 600, y: 560, hour: 12 });
+  w2.restore({ ...JSON.parse(txt), needs: { ...s.needs, '없는사람': { hunger: 1 } } }, 2);
+  assert.ok(a2.needs.hunger < 40 && a2.needs.hunger >= 30, `2시간 지나 더 줄어듦(30 아래로는 안 감) ${a2.needs.hunger}`);
+  assert.equal(b2.needs.fun, 25, '이미 30 아래면 그대로');
+  assert.ok(a2.following);
+  assert.ok(b2.nude);
+});

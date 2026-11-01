@@ -446,6 +446,10 @@ test('필드 가게: 값·떨이·평판 거부·재고 회복·가방 칸·흥�
   assert.equal(F.addBag(s, 'umbrella'), false, '가방 8칸');
   assert.ok(F.addBag(s, 'onigiri'), '같은 물건은 겹침');
   assert.equal(F.parseState(JSON.stringify(s)).bag.onigiri, 2);
+  // 이어하기 칸(world, 11-01): 그대로 남고, 깨진 값은 버린다
+  const w1 = F.parseState(JSON.stringify({ ...s, world: { v: 1, clock: 36000, needs: { 에일린: { hunger: 40, bad: 'x' } }, follow: ['에일린', 3], player: { scene: 'f3', x: 500 } } })).world;
+  assert.equal(w1.clock, 36000); assert.equal(w1.needs['에일린'].hunger, 40); assert.deepEqual(w1.follow, ['에일린']); assert.equal(w1.player.scene, 'f3');
+  assert.equal(F.parseState(JSON.stringify({ ...s, world: { v: 2 } })).world, undefined);
   let fails = 0;
   for (let i = 0; i < 5; i++) if (!F.haggle(s, mk, 1, () => 0.99)) fails++;
   assert.equal(fails, 5);

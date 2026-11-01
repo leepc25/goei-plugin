@@ -46,6 +46,7 @@ import { isRegionMove } from '../../world/districts';
 import { FACTION_NAMES, relationFrom } from '../../world/factions';
 import { STATUS, type DebuffKind, type StatusSet } from '../../combat/status';
 import { createFieldShop, type FieldShop } from './fieldShopLink';
+import type { FieldWorldSave } from '../../world/fieldSave';
 import { DEFAULT_CLOCK, clockRules, waitOptions, type ClockRules } from '../../world/clock';
 import { hashSeed } from '../../world/rng';
 import { observerLines } from '../../world/observer';
@@ -108,7 +109,7 @@ const observerOn = () => observing;
 const fieldLink: { talkOpts?: (name: string) => TalkOpts; onTags?: (key: string, name: string, tags: string[]) => void; mobOf?: (key: string) => MobTalk | null; talkTarget?: () => string; pay?: (amount: number, memo: string) => Promise<number | null>; record?: (text: string, ko?: string) => void; fact?: (key: string, value: string) => void; nearPerson?: () => string | null; cueLine?: (key: string, cell: string) => string | null; busyCell?: (key: string) => string | null; gift?: (who: string, item: string, counts: boolean) => void ; endVisit?: (close: boolean) => void } = {};
 const wonText = (n: number) => `${n < 0 ? '−' : ''}₩ ${Math.abs(Math.trunc(n)).toLocaleString('en-US')}`;
 
-function hqAdapter(bridge: Partial<GameBridge> | undefined, ui: { chooseFloor: HubHost['chooseFloor']; sfx: (n: string) => void; overlay?: HubHost['overlay']; rules?: () => ClockRules; shop?: (id: string) => string | null; choose?: (o: { title: string; lines?: string[]; options: string[]; cancel?: boolean }) => Promise<number> }): HqModuleLike & { goto(place: string): void; visitReady: Promise<void>; visitor(): { agentId: string; name: string }; dispose(): void } {
+function hqAdapter(bridge: Partial<GameBridge> | undefined, ui: { chooseFloor: HubHost['chooseFloor']; sfx: (n: string) => void; overlay?: HubHost['overlay']; rules?: () => ClockRules; shop?: (id: string) => string | null; choose?: (o: { title: string; lines?: string[]; options: string[]; cancel?: boolean }) => Promise<number>; worldSave?: { get(): FieldWorldSave | undefined; set(w: FieldWorldSave): void } }): HqModuleLike & { goto(place: string): void; visitReady: Promise<void>; visitor(): { agentId: string; name: string }; dispose(): void } {
   const map = hqMap();
   const b = bridge as (Partial<GameBridge> & { slot?: number; photo?: (name: string) => string | undefined }) | undefined;
   // 필드 시각·장소·잔고·관찰 창은 모듈 변수라 게임을 닫았다 다시 열어도 남아 있었다 (main 10-29 고침을 옮김). 열 때마다 새로
@@ -140,6 +141,8 @@ function hqAdapter(bridge: Partial<GameBridge> | undefined, ui: { chooseFloor: H
   }
   void b?.card?.().then((snap) => {
     if (fieldClock.sec === null && snap?.minute != null) fieldClock.sec = snap.minute * 60;
+    // 본편에 시계가 없으면 지난 방문에 저장한 필드 시각에서 이어 간다 (1-8)
+    if (fieldClock.sec === null && ui.worldSave?.get()?.clock != null) fieldClock.sec = ui.worldSave.get()!.clock!;
     if (snap) me = { faction: snap.identity?.faction || snap.faction || 'A00', level: snap.identity?.level ?? null };
     if (snap) playingAs = snap.player ? snap.agents.find((a) => a.id === snap.player)?.name ?? '' : '';
   }).catch(() => {});
@@ -215,6 +218,12 @@ function hqAdapter(bridge: Partial<GameBridge> | undefined, ui: { chooseFloor: H
       void dlg.prefetch('mob', NPC_FILES);
       // 비전투 계열 캐릭터는 동행이어도 싸움을 거들지 않는다 (반응표 combat)
       sim.noAssist = (n) => reactOf(n)?.combat === false;
+      // 이어하기(1-8): 지난 방문의 욕구·동행·맨몸을 되살린다. 지난 필드 시각과 지금 시각의 차이만큼 욕구가 더 줄어 있다
+      const sv = ui.worldSave?.get();
+      if (sv) {
+        const elapsedH = sv.clock != null && fieldClock.sec !== null ? (((fieldClock.sec - sv.clock) / 3600) % 24 + 24) % 24 : 0;
+        sim.restore(sv, elapsedH);
+      }
     }
     // 개발 도구·브라우저 시험: 세계를 들여다본다 (관찰 창과 같은 정보)
     if (sim) (globalThis as { __goeiWorld?: WorldSim }).__goeiWorld = sim;
@@ -368,9 +377,16 @@ function hqAdapter(bridge: Partial<GameBridge> | undefined, ui: { chooseFloor: H
   /** how: leave = 나가기·창 닫기, send = 나오지 않고 응답을 보내 강제 종료, down = 쓰러짐 */
   const END_KO = { leave: '필드에서 나옴', send: '응답을 보내 필드 종료', down: '쓰러져 필드 종료' } as const;
   const END_EN = { leave: '{user} left the field.', send: 'The field visit ended as the story went on.', down: 'The field visit ended with {user} down.' } as const;
+  /** 이어하기 저장(1-8): 세계 욕구·동행·맨몸 + 지금 시각 + 주인공 자리 (장면을 옮길 때·방문을 끝낼 때) */
+  const saveWorld = (player?: { scene: string; x: number; y?: number }) => {
+    if (!sim || !ui.worldSave) return;
+    const prev = ui.worldSave.get();
+    ui.worldSave.set({ ...sim.snapshot(), clock: fieldClock.sec, ...(player ?? prev?.player ? { player: player ?? prev!.player } : {}) });
+  };
   const endVisit = async (close: boolean, how: keyof typeof END_KO = 'leave'): Promise<void> => {
     if (!visitOver) {
       visitOver = true;
+      if (lifeScene) saveWorld({ scene: lifeScene, x: lastAt.x, y: lastAt.y });
       fightLog.leave();
       await settle().catch(() => {});
       // 방문 끝 표식: 플러그인이 이걸 받으면 이번 방문의 보고서를 만든다 (core/journal/field.ts)
@@ -633,7 +649,8 @@ function hqAdapter(bridge: Partial<GameBridge> | undefined, ui: { chooseFloor: H
   };
   const hub = makeHub(
     {
-      map: () => map,
+      // 이어하기(1-8): 지난 방문에 서 있던 장면·자리에서 시작 (그 장면이 지도에 있을 때만)
+      map: () => { const p = ui.worldSave?.get()?.player; return p && map.scenes.some((q) => q.id === p.scene) ? { ...map, start: { scene: p.scene as typeof map.start.scene, x: p.x, ...(p.y !== undefined ? { y: p.y } : {}) } } : map; },
       // 옛 본부 메뉴 자리는 닫혀 있다 (hqMap). 열린 자리는 앉기·가게·대화 자리뿐
       openPlace: () => {},
       bark: () => null,
@@ -644,6 +661,7 @@ function hqAdapter(bridge: Partial<GameBridge> | undefined, ui: { chooseFloor: H
       // 장면을 옮기면 장부에 이동 사건과 지금 위치(확정 사실)를 남긴다
       entered: (to, from, walkedPx) => {
         fieldClock.place = to.name;
+        saveWorld();
         // 장면 넘어가기 10분, 지하철로 다른 지역에 내리면 지역 이동 30분 (사용자 확정 2026-10-26, 설정 → 필드 시간). 걸은 거리는 시계와 무관
         void walkedPx;
         const d = hqDistrict(to.id);
@@ -1108,6 +1126,7 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
     overlay: visit ? (c, people, player) => visit.draw(c, people, player) : undefined,
     choose: (o) => shell.choose(o),
     shop: (id) => fieldShop?.open(id) ?? null,
+    worldSave: { get: () => fieldShop?.world(), set: (w) => fieldShop?.setWorld(w) },
     rules: () => { const t = shell.settings; return clockRules({ scene: t.tScene, region: t.tRegion, talk: t.tTalk, fight: t.tFight, waitShort: t.tWaitShort, waitLong: t.tWaitLong }); },
   });
   // 필드 가게·가방 창 (src/game/world/fieldShop.ts): 돈은 가계부, 가방·재고는 채팅 변수 $fd_state

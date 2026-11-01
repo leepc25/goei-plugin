@@ -2,6 +2,8 @@
 // 돈은 본편 가계부(원, bridge.wallet)로 낸다. 가방·가게 재고는 채팅별 상태 하나(FieldState, 채팅 변수 $fd_state)에 둔다.
 // 수치는 기본값 (설계 D7): 가게 배율·매입률·재고 회복 주기는 설정으로 뺄 자리.
 
+import { parseWorldSave, type FieldWorldSave } from './fieldSave';
+
 export type FieldItemKind = 'food' | 'drink' | 'med' | 'gift' | 'misc';
 
 export interface FieldItemDef {
@@ -80,6 +82,8 @@ export interface FieldState {
   /** 이름 인물에게 마지막으로 선물한 필드 날짜 (하루 한 번만 호감에 셈) */
   gifts?: Record<string, number>;
   shops: Record<string, { stock: Record<string, number>; at: number | null; haggleFail?: number; haggleDay?: number }>;
+  /** 필드 세계 이어하기 (fieldSave.ts, 11-01): 인물 욕구·동행·주인공 자리·시각 */
+  world?: FieldWorldSave;
 }
 export const BAG_SLOTS = 8;
 export const emptyState = (): FieldState => ({ bag: {}, shops: {} });
@@ -94,7 +98,8 @@ export function parseState(text: string | null | undefined): FieldState {
     for (const [k, v] of Object.entries(o.shops ?? {})) if (SHOPS[k] && v && typeof v === 'object') shops[k] = { stock: { ...(v.stock ?? {}) }, at: typeof v.at === 'number' ? v.at : null, haggleFail: v.haggleFail, haggleDay: v.haggleDay };
     const gifts: Record<string, number> = {};
     for (const [k, v] of Object.entries(o.gifts ?? {})) if (typeof v === 'number') gifts[k] = v;
-    return { bag, shops, ...(Object.keys(gifts).length ? { gifts } : {}) };
+    const world = parseWorldSave(o.world);
+    return { bag, shops, ...(Object.keys(gifts).length ? { gifts } : {}), ...(world ? { world } : {}) };
   } catch {
     return emptyState();
   }

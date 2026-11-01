@@ -11,6 +11,7 @@ import { applyTemper, catOf, rollNpcPerks } from './npcperks';
 import type { Hop, PlaceGraph } from './places';
 import { pick, range, type Rng } from './rng';
 import { reactCell, type ReactCell, type ReactSituation } from './namedReact';
+import type { FieldWorldSave } from './fieldSave';
 
 /** 옷 입은 클립 → 맨몸 클립 (art/charPacks.ts FIELD_CLIP 의 nude_*). 표에 없는 활동은 nude_idle(가린 채 경계). 샤워 기능이 Actor.nude 를 켠 인물만 */
 export const NUDE_CLIP: Record<string, string> = {
@@ -615,6 +616,31 @@ export class WorldSim {
     if (a.act === 'dead' || a.act === 'gone') return true;
     this.setClip(a, a.act === 'down' && (a.hp ?? 1) <= 0 ? 'down' : 'idle');
     return true;
+  }
+  /** 이어하기(11-01): 다음 방문에 되살릴 것만 (이름 인물 욕구·동행·맨몸). 시각·주인공 자리는 부르는 쪽이 채운다 */
+  snapshot(): Pick<FieldWorldSave, 'v' | 'needs' | 'follow' | 'nude'> {
+    const needs: Record<string, Needs> = {};
+    for (const a of this.actors) if (a.def.kind === 'named' && a.needs) needs[a.def.name] = { ...a.needs };
+    const follow = this.followers.map((id) => this.actors.find((q) => q.def.id === id)).filter((a): a is Actor => !!a && a.def.kind === 'named').map((a) => a.def.name);
+    const nude = this.actors.filter((a) => a.nude && a.def.kind === 'named').map((a) => a.def.name);
+    return { v: 1, needs, follow, ...(nude.length ? { nude } : {}) };
+  }
+  /** 이어하기: 저장한 욕구를 돌려 놓고 지난 필드 시간(elapsedH, 최대 하루)만큼 더 줄인 뒤, 동행·맨몸을 되살린다. 이번 방문에 없는 인물은 건너뜀 */
+  restore(s: FieldWorldSave, elapsedH = 0): void {
+    const h = Math.max(0, Math.min(24, elapsedH));
+    for (const a of this.actors) {
+      const n = a.def.kind === 'named' ? s.needs[a.def.name] : undefined;
+      if (!n || !a.needs) continue;
+      for (const k of Object.keys(a.needs) as (keyof Needs)[]) if (typeof n[k] === 'number') a.needs[k] = n[k];
+      // 생활 1시간 ≈ 실제 180초 (step: 시계가 없을 때 gameH += dt/180). 자리를 비운 사이 제 일은 알아서 챙겼다고 보고 30 아래로는 안 내려간다
+      if (h > 0) {
+        const before = { ...a.needs };
+        decayNeeds(a.needs, h * 180, TEMPER[a.def.name], onDuty(this.hour, TEMPER[a.def.name]));
+        for (const k of Object.keys(a.needs) as (keyof Needs)[]) a.needs[k] = Math.max(Math.min(30, before[k]), a.needs[k]);
+      }
+    }
+    for (const name of s.follow) this.setFollow(name, 'follow');
+    for (const name of s.nude ?? []) this.setNude(name, true);
   }
   /** 행위자 말풍선 (대사 연결이 부른다) */
   /** 머리 위 작은 말풍선 기호 (인물끼리 상호작용) */
