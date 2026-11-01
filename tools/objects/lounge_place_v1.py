@@ -11,7 +11,7 @@ import fit_chair as fc
 from PIL import Image
 S=float(ARGV[1]); OUT=ARGV[2]
 bg=Image.open(ROOT/'game-src/art/pixellab-hq-20261031/hq_lounge_p8s.png').convert('RGBA')
-tab=Image.open(ROOT/'game-src/art/objects/table_t02_w142_f100.png').convert('RGBA')
+tab=Image.open(os.environ.get('TABLE',str(ROOT/'game-src/art/objects/table_t02_w142_f100.png'))).convert('RGBA')
 CH=ROOT/'game-src/art/objects/chairs_shell/fit'
 fit=json.load(open(ROOT/'game-src/art/objects/chairs_shell/jyaldi_fit_v4.json'))
 cfg,_=fc.load('1.1_쟈알디')
