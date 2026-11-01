@@ -1,0 +1,81 @@
+"""대변기 칸: 원래 변기로 되돌리고 높이만 올림 (2026-11-01 13:35 사용자 「기존 변기로 환원한 다음 높이를 높여보자」, 생성 없음)
+변기 윗부분(원본 y186~219: 좌석·몸통)을 R px 위로 올리고, 가장 가는 목(y220~224)을 R줄 더 늘여 이음. 밑동(y225~)은 그대로.
+옛 자리는 벽 색으로 메우고(밸브는 그대로), 바닥 쪽은 투명.
+사용: python3 stall_toilet_raise.py <미리보기.png> <에일린2배.png> [R=14] [full]"""
+import sys
+import numpy as np
+from PIL import Image
+from scipy import ndimage as nd
+D = 'game-src/art/objects/restroom/'
+SRC = 'game-src/art/pixellab-hq-20261031/hq_restroom_m_stalls_v2.png'
+X0 = 14
+R = int(sys.argv[3]) if len(sys.argv) > 3 else 14
+a = np.array(Image.open(SRC).convert('RGBA'))
+L = a[..., :3].astype(int).mean(2)
+box = np.zeros(L.shape, bool); box[186:244, 122:178] = True
+fg = ((L > 112) | (L < 60)) & box
+lab, n = nd.label(fg); sizes = nd.sum(fg, lab, range(1, n + 1)); m = lab == (1 + int(np.argmax(sizes)))
+m = nd.binary_fill_holes(m); m = nd.binary_opening(m, iterations=1) | (m & (L < 60)); m = nd.binary_fill_holes(m)
+m[226, :133] = False; m[226, 163:] = False        # 벽 밑 검은 선은 변기가 아님
+
+def raise_toilet(p_in, p_out):
+    b = np.array(Image.open(D + p_in).convert('RGBA'))
+    tp = np.zeros_like(b)                          # 변기 픽셀(캔버스 좌표), 몸통에 남은 것 기준
+    mc = np.zeros(b.shape[:2], bool); mc[:, :] = False
+    mc[:, 122 - X0:178 - X0] = m[:, 122:178]
+    tp[mc] = b[mc]
+    for y in range(186, 226):                      # 옛 자리: 벽(줄마다 양끝 벽 색 이음)
+        xs = np.nonzero(mc[y])[0]
+        if not len(xs): continue
+        l, r = b[y, xs.min() - 1, :3].astype(int), b[y, xs.max() + 1, :3].astype(int)
+        for x in xs:
+            t = (x - xs.min() + 1) / (xs.max() - xs.min() + 2)
+            b[y, x, :3] = np.round(l * (1 - t) + r * t); b[y, x, 3] = 255
+    b[226, 133 - X0:163 - X0] = [1, 1, 1, 255]
+    b[227:][mc[227:]] = 0
+    rows = list(range(186, 220)) + [220] * 0
+    out = np.zeros_like(b)
+    for y in range(186, 220): out[y - R] = tp[y]                     # 좌석·몸통 R 위로
+    neck = list(range(220, 225))
+    tgt = list(range(220 - R, 225))                                    # 늘인 목
+    for i, y in enumerate(tgt): out[y] = tp[neck[min(len(neck) - 1, i * len(neck) // len(tgt))]]
+    for y in range(225, 244): out[y] = tp[y]                         # 밑동 그대로
+    A = out[..., 3] > 0
+    b[A] = out[A]
+    Image.fromarray(b).save(D + p_out)
+
+raise_toilet('stall_body.png', 'stall_body_tall.png')
+raise_toilet('stall_body_end.png', 'stall_body_end_tall.png')
+
+body = Image.open(D + 'stall_body_tall.png'); body_end = Image.open(D + 'stall_body_end_tall.png')
+endpost = Image.open(D + 'stall_endpost.png').convert('RGBA')
+doors = [Image.open(D + f'stall_door_{i}.png').convert('RGBA') for i in range(6)]
+BG = 'game-src/art/pixellab-hq-20261031/hq_restroom_m_final_984x424.png'
+FOOT, RIGHT, PITCH, N = 368, 398, 158, 3
+xs = [RIGHT - 206 - PITCH * i for i in range(N)]
+y = FOOT - 252
+K = 334 / 234
+kyu = Image.open('game-src/action/motion3/1.6_큐라스/102/00.png').convert('RGBA')
+kyu = kyu.resize((round(kyu.width * K), round(kyu.height * K)), Image.NEAREST)
+HIP = (65 * K, 167 * K)
+SEAT = (147 - X0, 196 - R)                         # 좌석 가운데(캔버스)
+states = [0, 5, 5]
+bg = Image.open(BG).convert('RGBA')
+for i, x in enumerate(xs): bg.alpha_composite(body_end if i == 0 else body, (x, y))
+bg.alpha_composite(endpost, (xs[0], y))
+big = bg.resize((bg.width * 2, bg.height * 2), Image.NEAREST)
+big.alpha_composite(kyu, (round((xs[1] + SEAT[0]) * 2 - HIP[0]), round((y + SEAT[1]) * 2 - HIP[1])))
+front = Image.new('RGBA', bg.size, (0, 0, 0, 0))
+for i, x in enumerate(xs):
+    bb_ = body_end if i == 0 else body
+    front.alpha_composite(bb_.crop((170, 0, bb_.width, bb_.height)), (x + 170, y))
+    front.alpha_composite(bb_.crop((44, 0, 76, bb_.height)), (x + 44, y))
+front.alpha_composite(endpost, (xs[0], y))
+big.alpha_composite(front.resize((bg.width * 2, bg.height * 2), Image.NEAREST))
+dl = Image.new('RGBA', bg.size, (0, 0, 0, 0))
+for x, s in zip(xs, states): dl.alpha_composite(doors[s], (x, y))
+big.alpha_composite(dl.resize((bg.width * 2, bg.height * 2), Image.NEAREST))
+e = Image.open(sys.argv[2]); big.alpha_composite(e, (20, 840 - e.height))
+full = 'full' in sys.argv[3:]
+(big if full else big.crop((0, 0, 1100, 848))).convert('RGB').save(sys.argv[1])
+print('R', R)
