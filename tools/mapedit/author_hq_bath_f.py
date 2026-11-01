@@ -152,17 +152,20 @@ for idx, m in enumerate(sorted(masks, key=lambda m: np.nonzero(m)[1].min())):
     ys, xs = np.nonzero(m); yb = ys.max() + 1
     oid = f'obj{idx:02d}_{xs.min()}_{yb}'
     objects.append((oid, m, yb * K))
-    depth = int(min(16, max(6, (yb - ys.min()) * 0.4)))
-    for x in range(xs.min() // 2 * 2, xs.max() + 1, 2):
-        c = np.nonzero(m[:, x:x + 2].any(1))[0]
+    depth = int(min(18, max(8, (yb - ys.min()) * 0.45)))
+    # 발 자국은 사람 발 폭(±FOOT_W)만큼 옆으로 넓힌다(17:48 사용자: 대야 옆에 선 사람이 대야 속에 선 듯 보임)
+    FOOT_W = 12
+    for x in range(max(0, xs.min() - FOOT_W) // 2 * 2, min(W - 1, xs.max() + FOOT_W) + 1, 2):
+        c = np.nonzero(m[:, max(0, x - FOOT_W):x + 2 + FOOT_W].any(1))[0]
         if not len(c): continue
         b = c.max() + 1; t = max(c.min(), b - depth)
         blocks.append({'poly': [[x * K, t * K], [(x + 2) * K, t * K], [(x + 2) * K, b * K], [x * K, b * K]], 'h': 999})
 for k, m in pillar_masks.items():
     objects.append((k, m, 372 * K))
 # 기둥·칸막이 벽 막힘: 바닥선 위는 전부 못 감(바닥 다각형이 맡음). 기둥 발 아래 2px 여유 막힘만 추가
-for x0, x1 in [(116, 154), (403, 439), (710, 751)]:
-    blocks.append({'poly': [[x0 * K, 360 * K], [x1 * K, 360 * K], [x1 * K, 374 * K], [x0 * K, 374 * K]], 'h': 999})
+# 기둥 양옆 12px(사람 발 폭)는 뒷벽 밑선부터 기둥 발 아래 4px까지 못 섬(17:48: 기둥 옆에 바짝 서면 기둥 속에 파묻혀 보임)
+for x0, x1 in [(118, 152), (405, 437), (712, 749)]:
+    blocks.append({'poly': [[(x0 - 12) * K, 300 * K], [(x1 + 12) * K, 300 * K], [(x1 + 12) * K, 377 * K], [(x0 - 12) * K, 377 * K]], 'h': 999})
 
 
 def to_cover(oid, m, sy):
