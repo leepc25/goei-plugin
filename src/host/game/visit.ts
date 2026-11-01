@@ -2,7 +2,10 @@ import { uid } from './uid';
 import type { GameVisit, VisitState } from '../../game/bridge';
 import { cardSnapshot } from '../../core/gamelink';
 import { anchorOf, visitRecord, visitRoom, withoutOldLore, withVisitTurn, type VisitTurn } from '../../core/visit';
-import { agentLore, parseVisitGroup, takeFieldTags, visitPrompt, type FieldTag, type VisitAgent, type VisitLine } from '../../core/visitPrompt';
+import { agentLore, parseVisitGroup, takeCueTag, takeFieldTags, visitPrompt, type FieldTag, type VisitAgent, type VisitLine } from '../../core/visitPrompt';
+import { changeId, peopleStore, putChange, withPeople } from '../../core/people/store';
+import { peopleSettings } from '../../core/people/settings';
+import { liveSheetOf } from './people';
 import { advValue, budgetFor } from '../../core/advanced';
 import { fitPrompt } from '../../core/budget';
 import type { RefSource } from '../../core/refs';
@@ -79,9 +82,12 @@ export function createVisit(): GameVisit {
         const row = readDirectory(c.char.globalLore ?? []).agents.find(r => r.id === agentId);
         // 본편과 같은 방식: 캐릭터로 플레이면 playerSource가 페르소나 자리에 그 요원의 주인공 글(playerBlock)을 넣는다
         const src = playerSource({ char: c.char as RefSource['char'], chat: c.chat, persona: me ? '' : await readPersona() });
-        const lore = agentLore(src, row?.lore || a.name);
-        if (!lore) throw new Error('요원 설정을 찾지 못해 대화를 시작할 수 없어요.');
+        const lore0 = agentLore(src, row?.lore || a.name);
+        if (!lore0) throw new Error('요원 설정을 찾지 못해 대화를 시작할 수 없어요.');
         const visitorName = me?.name ?? (String(await risuai.parseRisuChat('{{user}}') ?? '').replace(/\{\{[^}]*\}\}/g, '').trim() || '방문자');
+        // 인물 기록이 켜져 있으면 시트 대신 살아 있는 기록(고정 절 + 지금 상태·호감·호칭)을 넣는다 (11-01, 인물기록_구현현황 2장 1번)
+        const peopleOn = peopleSettings(c.chat.scriptstate).on && !!peopleStore(c.chat).people[a.name];
+        const lore = liveSheetOf(c, a.name, lore0, visitorName) ?? lore0;
         await context();
         // 이번 막간 = 지금 마지막 메시지 뒤에서 나눈 말 (본편이 한 턴 진행되면 새 막간)
         const anchor = anchorOf(c.chat);
@@ -97,7 +103,8 @@ export function createVisit(): GameVisit {
           const b = id !== agentId && id !== me?.id ? cardSnapshot(c.char, c.chat).agents.find(x => x.id === id) : undefined;
           if (!b || visitRoom(b) !== room) continue;
           const r = readDirectory(c.char.globalLore ?? []).agents.find(x => x.id === id);
-          const bl = agentLore(src, r?.lore || b.name);
+          const bl0 = agentLore(src, r?.lore || b.name);
+          const bl = bl0 ? liveSheetOf(c, b.name, bl0, visitorName) ?? bl0 : bl0;
           if (bl) bystanders.push({ id, name: b.name, rank: r?.rank, state: b.state, situation: b.situation, room: room ?? '', lore: bl });
           if (bystanders.length >= 3) break;
         }
@@ -113,11 +120,14 @@ export function createVisit(): GameVisit {
           scene: sceneOf(c, me?.id),
           skipBooks: me ? [me.lore] : [],
           tags: (opts.tags ?? []) as FieldTag[],
+          cueTags: peopleOn,
         }, factionNamesOf(c)));
         const model = advValue(ss, 'hq', 'model') === 'main' ? 'main' : 'aux';
         void which;
         const got0 = takeFieldTags(await runModel(prompt.messages, model));
-        const raw = got0.raw;
+        const gotCue = takeCueTag(got0.raw);
+        const raw = gotCue.raw;
+        const cue = peopleOn ? gotCue.cue : null;
         const tags = got0.tags.filter(t => opts.tags?.includes(t));
         const got = parseVisitGroup(raw, a.name, prompt.bystanders, prompt.limit);
         const reply = got.line;
@@ -129,7 +139,16 @@ export function createVisit(): GameVisit {
         if (!char || char.chaId !== c.char.chaId) throw new Error('원래 카드가 바뀌어 대화를 저장하지 못했어요.');
         const saved = await updateChat(c.charIndex, c.chatIndex, chat => {
           if (chat.id !== c.chat.id) throw new Error('원래 채팅이 바뀌어 대화를 저장하지 못했어요.');
-          return withVisitTurn(chat, turn);
+          let next = withVisitTurn(chat, turn);
+          // [[관계 계기]]: 이 요원의 인물 기록에 계기 한 줄 (같은 저장). 묶음은 「anchor|대화」라 필드 행동 사건과 따로 상한을 센다
+          if (cue && peopleSettings(next.scriptstate).on) {
+            const store = peopleStore(next);
+            if (store.people[a.name]) {
+              const seq = store.log.filter(x => x.anchor === anchor).length;
+              if (putChange(store, { id: changeId(a.name, 'cue', anchor, 0, `talk:${turn.id}`), anchor, seq, src: 'field', who: a.name, kind: 'cue', cue, group: `${anchor}|talk`, quote: text.slice(0, 60), reason: `필드 대화: ${text}`.slice(0, 80) })) next = withPeople(next, store);
+            }
+          }
+          return next;
         });
         if (!saved) throw new Error('대화 기록을 저장하지 못했어요.');
         return stateOf({ ...c, chat: saved });

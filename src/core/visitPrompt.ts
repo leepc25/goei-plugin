@@ -1,6 +1,7 @@
 // 본부 방문 대화 요청문 (2026-10-22 설계 2판). 괴담톡과 같은 틀: 지침은 카드 「Visit」 로어북 @@SECTION, 자료는 JSON 하나.
 // 방문자는 지침 문장이 아니라 자료로 넣는다: 캐릭터로 플레이면 playerSource가 페르소나 자리를 주인공 글로 바꿔 둔다.
 import { applyAdvanced, advNum, advOn, genSettings, refToggles } from './advanced';
+import type { Cue } from './people/types';
 import { trimRelated, trimSecondary, trimTurns } from './budget';
 import { parseJsonPayload } from './gnet';
 import { bookText, collectRefs, factionCodesToNames, PERSONA_SOURCE, policySections, recentTurns, type RefSource } from './refs';
@@ -42,6 +43,28 @@ export function takeFieldTags(raw: string): { raw: string; tags: FieldTag[] } {
   return { raw: out, tags };
 }
 export const fieldTagName = (t: FieldTag): string => TAG_KO[t];
+
+// ── 관계 계기 표시 [[관계 <계기>]] (11-01, 인물기록_호감_통합설계 3판 199줄): 필드 대화에서 마음이 움직였으면 인물 기록에 계기로 남긴다 ──
+/** 대화로 생길 수 있는 계기 (살해·폭력 급은 행동 사건이 맡는다) */
+export const TALK_CUES = ['작은친절', '도움', '큰도움', '헌신', '실망', '무시', '배신'] as const satisfies readonly Cue[];
+const CUE_HELP: Record<(typeof TALK_CUES)[number], string> = {
+  작은친절: 'a small kindness or warm gesture toward you (+1)', 도움: 'the protagonist genuinely helped you or kept a promise (+3)', 큰도움: 'a big help, something you could not have done alone (+5)', 헌신: 'they went to great lengths or took a real risk for you (+10)',
+  실망: 'they let you down, were rude or careless with you (−2)', 무시: 'they brushed you off, threatened or belittled you (−4)', 배신: 'they betrayed your trust or lied about something that matters (−5)',
+};
+export function cueTagRules(): string {
+  return ['Relationship cue tag: if, and only if, what the protagonist said or did in this exchange genuinely changed how your character feels about them, put exactly one of these tags alone on a new line at the very end (after any field action tag). Most replies have none. Never tag ordinary small talk.', ...TALK_CUES.map((c) => `- [[관계 ${c}]] — ${CUE_HELP[c]}`)].join('\n');
+}
+/** 답에서 [[관계 …]] 를 떼어 낸다. 아는 계기가 아니면 그대로 둔다 */
+export function takeCueTag(raw: string): { raw: string; cue: Cue | null } {
+  let cue: Cue | null = null;
+  const out = String(raw ?? '').replace(/\[\[\s*관계\s*[: ]\s*([^\]\s]+)\s*\]\]/g, (m, w: string) => {
+    const c = TALK_CUES.find((k) => k === w) as Cue | undefined;
+    if (!c) return m;
+    cue ??= c;
+    return '';
+  });
+  return { raw: out, cue };
+}
 /** 이번 막간에 오간 말 (말한 사람 이름, 말) */
 export interface VisitLine { speaker: string; text: string; /** 말이 아니라 행동 */ action?: boolean }
 export interface VisitPromptInput {
@@ -63,6 +86,8 @@ export interface VisitPromptInput {
   skipBooks?: string[];
   /** 이번 답에 쓸 수 있는 필드 행동 표시 */
   tags?: FieldTag[];
+  /** 인물 기록이 켜져 있어 [[관계 계기]] 표시를 받을 수 있나 */
+  cueTags?: boolean;
 }
 export interface VisitPrompt { messages: { role: 'system' | 'user'; content: string }[]; limit: number; /** 끼어들기 형식으로 보냈으면 그 요원 이름들 */ bystanders: string[] }
 
@@ -134,7 +159,7 @@ export function visitPrompt(src: RefSource, input: VisitPromptInput, names: Reco
     limit,
     bystanders: by.map((b) => b.name),
     messages: [
-      { role: 'system', content: factionCodesToNames([rules(src, limit, by.length > 0), fieldTagRules(input.tags ?? [])].filter(Boolean).join('\n\n'), names) },
+      { role: 'system', content: factionCodesToNames([rules(src, limit, by.length > 0), fieldTagRules(input.tags ?? []), input.cueTags ? cueTagRules() : ''].filter(Boolean).join('\n\n'), names) },
       { role: 'user', content: factionCodesToNames(JSON.stringify(body), names) },
     ],
   };

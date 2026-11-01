@@ -33,6 +33,13 @@ test('표시: 답 끝 [[동행]] 등을 떼고 종류만 남긴다 (모르는 [[
   assert.match(VP.takeFieldTags('x [[호감 +1]]').raw, /\[\[호감/);
   assert.equal(VP.fieldTagRules([]), '');
   assert.match(VP.fieldTagRules(['follow']), /\[\[동행\]\]/);
+  // 관계 계기 표시 (11-01): [[관계 도움]] 을 떼어 계기로, 모르는 계기·살해 급은 그대로 둔다
+  const c1 = VP.takeCueTag('고마워.\n[[관계 도움]]');
+  assert.equal(c1.cue, '도움'); assert.equal(c1.raw.trim(), '고마워.');
+  assert.equal(VP.takeCueTag('[[관계: 실망]]').cue, '실망');
+  assert.equal(VP.takeCueTag('x [[관계 중대위반]]').cue, null);
+  assert.match(VP.takeCueTag('x [[관계 중대위반]]').raw, /\[\[관계/);
+  assert.match(VP.cueTagRules(), /\[\[관계 작은친절\]\]/);
 });
 
 test('동행: 따라 걷고, 장면을 같이 넘고, 기다려·돌아가', () => {
