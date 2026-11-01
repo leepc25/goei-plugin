@@ -84,7 +84,7 @@ def convert(scene_id: str, m: dict, files: dict) -> dict:
             im = im.resize((o['w'], o['h']), Image.NEAREST)
             if o.get('rot'): im = im.rotate(-o['rot'], resample=Image.NEAREST, expand=False)
             name = webp(im, f'me_{scene_id}_{o["id"]}'); names.append(name)
-            objects.append({'id': o['id'], 'file': name, 'x': o['x'], 'y': o['y'], 'w': o['w'], 'h': o['h'], 'sortY': o['sortY']})
+            objects.append({'id': o['id'], 'file': name, 'x': o['x'], 'y': o['y'], 'w': o['w'], 'h': o['h'], 'sortY': o['sortY'], **({'gate': True} if o.get('gate') else {})})
     doors = {}
     for did, d in (m.get('doors') or {}).items():
         # door가 있으면(그림 속 문짝 자리·여닫는 방식) 그대로, 없으면 바닥 출구 자리만

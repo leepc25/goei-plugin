@@ -32,6 +32,8 @@ export interface PaintedObject {
   solid?: { x0: number; x1: number; y0: number; y1: number; h?: number }[];
   /** 오리지 않고 가리기: 배경 그림의 이 다각형들(월드 px)을 깊이 순서에 맞춰 사람 위에 한 번 더 그린다. file은 비워 둔다 (맵 에디터 cover) */
   cover?: [number, number][][];
+  /** 코드로 열리는 칸막이 조각(사용자 11-01 1층): 사람이 다가가면 옆으로 밀려 열리고 멀어지면 닫힌다. 막지 않는다 */
+  gate?: boolean;
 }
 export interface PaintedScene {
   file: string;

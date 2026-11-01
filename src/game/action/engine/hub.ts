@@ -125,6 +125,7 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
   let near: string | null = null;
   let solids: (BlockProp & { h?: number })[] = [];
   /** 주인공이 앉아 있는 방 의자 (코어가 인물 팩 의자를 그리는 동안 방 의자 그림은 숨긴다) */
+  const gateOpen = new Map<string, number>();
   let sitChair: HqBox | null = null;
   /** 이 장면에서 걸은 거리 (px). 필드 시계가 쓴다 */
   let walked = 0;
@@ -179,7 +180,7 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
       encounters: [],
       platforms: sc.painted ? sc.boxes.filter((b) => b.solid && b.h > 0 && b.h < 400).map((b) => ({ x0: b.x - b.w / 2, x1: b.x + b.w / 2, y0: b.y - b.d, y1: b.y, h: b.h })) : undefined,
       depthLayers: sc.boxes.map((b, bi) => ({ y: b.y, occludedSilhouette: !sc.painted, x0: b.x - b.w / 2, x1: b.x + b.w / 2, draw: (c: CanvasRenderingContext2D) => {
-        if (sc.painted && hasHqField(sc.painted)) { drawHqFieldObject(c, sc.painted, b.kind); return; }
+        if (sc.painted && hasHqField(sc.painted)) { drawHqFieldObject(c, sc.painted, b.kind, gateOpen.get(b.kind) ?? 0); return; }
         // 누가 앉은 의자는 앉은 사람이 자기 맞춤값으로 그린다 (주인공 = 엔진, 이름 인물 = drawCharSeat)
         if (b === sitChair || live.some((q) => q.seat?.box === bi)) return;
         drawBox(c, b, sc.look);
@@ -343,6 +344,14 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
       return build(s.scene, s.x, s.y);
     },
     tick(a: StageApi) {
+      // 코드로 열리는 칸막이(그림 장면 gate 조각): 주인공이 앞뒤 가까이 오면 열리고 멀어지면 닫힌다
+      if (scene?.painted) for (const o of PAINTED[scene.painted]?.objects ?? []) {
+        if (!o.gate) continue;
+        const pl = a.world.player;
+        const near = Math.abs(pl.x - (o.x + o.w / 2)) < o.w / 2 + 90 && Math.abs(pl.y - o.sortY) < 140;
+        const t = gateOpen.get(o.id) ?? 0;
+        gateOpen.set(o.id, Math.max(0, Math.min(1, t + (near ? 0.12 : -0.08))));
+      }
       if (sitChair && !(a.world.player as Player).seat && !(a.world.player as { sitting?: boolean }).sitting) sitChair = null;
       if (host.life && scene) {
         host.life.tick(1 / 30, { scene: scene.id, x: a.world.player.x, y: a.world.player.y, seat: sitChair ? scene.boxes.indexOf(sitChair) : null });

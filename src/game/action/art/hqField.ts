@@ -183,7 +183,7 @@ function drawDoor(c: CanvasRenderingContext2D, im: HTMLImageElement, d: PaintedD
 }
 
 /** 오린 오브젝트 (깊이 순서 층에서 부른다) */
-export function drawHqFieldObject(c: CanvasRenderingContext2D, scene: string, id: string): void {
+export function drawHqFieldObject(c: CanvasRenderingContext2D, scene: string, id: string, open = 0): void {
   const p = PAINTED[scene];
   const o = p?.objects.find((q) => q.id === id);
   if (!o) return;
@@ -202,7 +202,12 @@ export function drawHqFieldObject(c: CanvasRenderingContext2D, scene: string, id
   const im = images?.[o.file];
   if (!im) return;
   c.save(); c.imageSmoothingEnabled = true; c.imageSmoothingQuality = 'high';
-  c.drawImage(im, o.x, o.y, o.w, o.h);
+  if (o.gate && open > 0) {
+    // 열리는 칸막이: 제 자리 안에서 오른쪽으로 밀려 들어간다
+    if (open >= 1) { c.restore(); return; }
+    c.beginPath(); c.rect(o.x, o.y, o.w, o.h); c.clip();
+    c.drawImage(im, o.x + o.w * open, o.y, o.w, o.h);
+  } else c.drawImage(im, o.x, o.y, o.w, o.h);
   c.restore();
 }
 
