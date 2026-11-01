@@ -130,8 +130,14 @@ door = {'kind': 'glass', 'x': 72 * K, 'y': 356 * K, 'locked': True, 'label': '�
         'door': {'x0': 30 * K, 'x1': 110 * K, 'y0': 120 * K, 'y1': 352 * K, 'anim': 'none', 'behind': 'dark'}}
 # 줄 맨 뒤 배율(사용자 15:03 「해봐」): 맨 앞은 게임 공통 크기 그대로, 맨 뒤(y300, 뒤 통로)에서 사람 키 ≈ 사물함(104px)보다 조금 작은 97px(1x)
 # = 194(2x) ÷ 게임 맨 앞 키 353(2x, 도트 247 × dotK 1.4292) ≈ 0.55
-FAR_HERE = 0.55
-m = {'file': 'hq_shower_m_strip', 'bgScale': K, 'far': FAR_HERE, 'w': W * K, 'h': H * K, 'under': True, 'floor': floor,
+# 15:06 사용자 「장면마다 다르게, 문 크기 기준으로」: 왼쪽 벽 유리문 문짝 높이로 사람 키를 잼(사람 ≈ 문짝의 0.8, 문 2.1m·어른 1.7m).
+# 문짝: 앞 모서리 x34 위 y133·밑 y357(224px), 뒤 모서리 x90 위 y145·밑 y343(198px) → 사람 179·158 → 사람 키(1x) = 1.49 × (발 y − 237)
+# 맨 앞(줄 끝 y418) 270(1x) = 539(2x) → dotK = 539 / 도트 키 247, 맨 뒤(y300) 94(1x) → far = 94 / 270
+SPR_DOTS, HZ, CK = 247, 237, 1.49
+lane_px = (300, 418)
+front2 = CK * (lane_px[1] - HZ) * K; back2 = CK * (lane_px[0] - HZ) * K
+DOTK_HERE, FAR_HERE = round(front2 / SPR_DOTS, 4), round(back2 / front2, 3)
+m = {'file': 'hq_shower_m_strip', 'bgScale': K, 'dotK': DOTK_HERE, 'far': FAR_HERE, 'w': W * K, 'h': H * K, 'under': True, 'floor': floor,
      'lane': [300 * K, H * K - 12], 'blocks': blocks, 'lamps': [], 'spots': [],
      'doors': {'shower': door, 'out': {'kind': 'exit', 'side': 'S', 'x': 316 * K, 'y': H * K - 12, 'label': '나가기'}},
      'objects': [to_cover(o, mm, sy) for o, mm, sy in objects]}
