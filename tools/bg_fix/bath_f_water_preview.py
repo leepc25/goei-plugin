@@ -7,7 +7,7 @@ from PIL import Image, ImageDraw
 A = 'game-src/art/pixellab-hq-20261031/'
 BG = A + 'hq_bath_f_p5_extL1_heads.png'
 NOZZLE = {2: (203, 140), 3: (244, 144), 4: (480, 137), 5: (504, 149), 6: (662, 150), 7: (690, 137)}  # 1x, 물 나오는 점
-FOOT = {2: (268, 356, 'W'), 3: (305, 314, 'W'), 4: (536, 352, 'W'), 5: (554, 314, 'W'), 6: (619, 314, 'E'), 7: (628, 352, 'E')}  # 16:58~59 사용자가 찍은 여섯 자리(2배 그림의 점을 1배로): 앞줄 2·4·7, 뒷줄 3·5·6
+FOOT = {2: (268, 356, 'W'), 3: (305, 314, 'W'), 4: (536, 352, 'W'), 5: (554, 314, 'W'), 6: (610, 314, 'E'), 7: (628, 352, 'E')}  # 16:58~59 사용자가 찍은 여섯 자리(2배 그림의 점을 1배로): 앞줄 2·4·7, 뒷줄 3·5·6
 OBJ = np.asarray(Image.open(A + 'hq_bath_f_floorobj_mask.png').convert('L')) > 0   # 바닥 물건(픽셀 마스크): 발 앞(아래)에 있으면 사람을 가린다
 CH = {2: ('1.2', 'SH_D'), 3: ('1.10', 'SH_E'), 4: ('1.9', 'SH_D'), 5: ('1.4', 'SH_E'), 6: ('1.11', 'SH_D'), 7: ('1.1', 'SH_E')}
 assert all(c != '1.12' for c, _ in CH.values())
@@ -88,7 +88,7 @@ def render(frame):
         draw_water(water, n, head_top, fx, fy, frame)
     bg.alpha_composite(water)
     return bg.convert('RGB')
-out = sys.argv[1] if len(sys.argv) > 1 else '/mnt/project-files/hq-f3/now/샤워실여_물줄기_코드_v9_2배.png'
+out = sys.argv[1] if len(sys.argv) > 1 else '/mnt/project-files/hq-f3/now/샤워실여_물줄기_코드_v10_2배.png'
 frames = [render(f).resize((924 * 2, 424 * 2), Image.NEAREST) for f in range(8)]
 frames[0].save(out)
 frames[0].save(out.replace('.png', '.gif'), save_all=True, append_images=frames[1:], duration=140, loop=0)
