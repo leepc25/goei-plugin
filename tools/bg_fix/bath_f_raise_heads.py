@@ -38,7 +38,7 @@ for y, x in zip(*np.nonzero(REG)):
     if face(x):
         t = wall_top(x)
         if t is not None and y <= t + 1: continue      # 벽 윗선 위 = 뒷벽 쪽, 아래에서 처리
-        ss = [orig[sy, x] for sy in range(y % 20, 248, 20) if (t is None or sy > t + 1) and abs(sy - y) <= 60]
+        ss = [orig[sy, x] for sy in range(y % 20, 248, 20) if (t is None or sy > t + 3) and abs(sy - y) <= 60 and L[sy, x] >= 90]
     else:
         ss = [orig[y, sx] for sx in range(x % 27, W, 27) if not face(sx) and not bad_src(y, sx) and abs(sx - x) <= 27 * 4]
     if len(ss) >= 2:
@@ -65,7 +65,31 @@ for n, (x0, y0, x1, yl, yk) in FX.items():
             for xx in (x - 1, x, x + 1):
                 if 0 <= yy < h and 0 <= xx < w and d[yy, xx] and not comp[yy, xx]: st.append((yy, xx))
     m = np.zeros((H, W), bool); m[y0:yl, x0:x1] = comp
-    e = m.copy()   # 2) 샤워기 자리(3칸 넓혀 흐린 가장자리까지)를 배경판으로 지움
+    # 호스(받침 밑~수도꼭지 위)는 검은 윤곽을 줄마다 따라 내려가며 딴다: 앞 줄 호스 가운데 ±4px 안의 어두운 픽셀 덩어리 ±1
+    EDG = (243, 500, 664, 665)
+    HOSE0 = {2: 186, 3: 230, 4: 464, 5: 493, 6: 675, 7: 702}   # 받침 바로 밑 호스 가운데 x(1x, 확대 그림에서 읽음)
+    cx = HOSE0[n]
+    m[yk:yl, :] = False
+    for y in range(yk, yl):
+        dk_ = [x for x in range(max(x0, cx - 4), min(x1, cx + 5)) if L[y, x] < 70 and x not in EDG]
+        if dk_:
+            a_, b_ = min(dk_), max(dk_)
+            if b_ - a_ <= 6:
+                m[y, a_ - 1:b_ + 2] = True; cx = (a_ + b_ + 1) // 2; continue
+            # 둘로 갈라졌으면 앞 줄 가운데에 가까운 쪽 4px 안만
+            dk_ = [x for x in dk_ if abs(x - cx) <= 3]
+            if dk_:
+                a_, b_ = min(dk_), max(dk_); m[y, a_ - 1:b_ + 2] = True; continue
+        if y > yk: m[y] = m[y - 1]   # 못 찾으면 윗줄 호스 모양 그대로
+        else: m[y, cx - 2:cx + 3] = True
+    # 옛 호스 통로(받침 밑 호스 가운데 ±9px)의 어두운 픽셀은 전부 옛 호스로 보고 지울 자리에 넣음(찌꺼기 방지)
+    cor = np.zeros((H, W), bool)
+    for y in range(yk, yl):
+        cxs = np.nonzero(m[y])[0]
+        c0 = int(cxs.mean()) if len(cxs) else HOSE0[n]
+        for x in range(max(x0, c0 - 9), min(x1, c0 + 10)):
+            if L[y, x] < 90 and x not in EDG: cor[y, x] = True
+    e = m | cor   # 2) 샤워기 자리(3칸 넓혀 흐린 가장자리까지)를 배경판으로 지움
     for _ in range(3):
         t_ = e.copy(); t_[1:] |= e[:-1]; t_[:-1] |= e[1:]; t_[:, 1:] |= e[:, :-1]; t_[:, :-1] |= e[:, 1:]; e = t_
     for y, x in zip(*np.nonzero(e)):
@@ -74,15 +98,46 @@ for n, (x0, y0, x1, yl, yk) in FX.items():
         if x in (243, 500, 664, 665) and (t is None or y > t + 1): EDGEFIX.append((y, x))  # 벽 모서리선: 같은 세로줄 깨끗한 줄(y220) 색
         else: ERASE.append((y, x))
     MS[n] = m
-for y, x in ERASE: img[y, x] = plate[y, x]
+# 2차 배경판: 샤워기(넓힌 마스크) 픽셀은 출처에서 빼고 다시 중간값 — 호스가 지나는 세로줄의 회색 얼룩 방지
+ALLM = np.zeros((H, W), bool)
+for y, x in ERASE: ALLM[y, x] = True
+for n in MS: ALLM |= MS[n]
+TAPS = np.zeros((H, W), bool)
+for x0, y0, x1, yl, yk in FX.values(): TAPS[yl - 2:yl + 45, x0:x1] = True   # 수도꼭지도 출처에서 뺌
+for y, x in ERASE:
+    if face(x):
+        t = wall_top(x)
+        cand = sorted([(abs(sy - y), sy) for sy in range(y % 20, 248, 20) if (t is None or sy > t + 3) and not ALLM[sy, x] and not TAPS[sy, x] and L[sy, x] >= 90])  # 벽 윗선·어두운 물건 픽셀은 출처 아님
+        if len(cand) >= 1:
+            near = [orig[sy, x] for _, sy in cand[:3]]
+            img[y, x] = np.median(np.array(near), axis=0).astype(np.uint8); continue
+    img[y, x] = plate[y, x]
 for y, x in EDGEFIX: img[y, x] = orig[220, x]
+def spans_only(m, x0, x1, y0, y1):
+    """줄마다 샤워기 검은 윤곽(밝기<70) 덩어리 사이(±1)만 남김 — 붙어 딸려 온 타일 얼룩 점은 옮기지 않음"""
+    r = np.zeros_like(m)
+    for y in range(y0, y1):
+        xs_ = [x for x in range(x0, x1) if m[y, x] and L[y, x] < 70]
+        if not xs_: continue
+        runs = []; st_ = xs_[0]; pv = xs_[0]
+        for xx in xs_[1:] + [10**6]:
+            if xx - pv > 7: runs.append((st_, pv)); st_ = xx
+            pv = xx
+        for a_, b_ in runs:
+            r[y, a_ - 1:b_ + 2] = True   # 윤곽 사이는 안쪽(밝은 헤드 몸통)까지 전부
+    d1 = r.copy()
+    for _ in range(2):
+        t_ = d1.copy(); t_[1:] |= d1[:-1]; t_[:-1] |= d1[1:]; t_[:, 1:] |= d1[:, :-1]; t_[:, :-1] |= d1[:, 1:]; d1 = t_
+    return r | (m & d1)   # 원래 마스크도 윤곽 가까이(2칸)만 살림
 for n, (x0, y0, x1, yl, yk) in FX.items():
-    m = MS[n]
+    m = MS[n].copy(); m[y0:yk] = spans_only(MS[n], x0, x1, y0, yk)[y0:yk]
     for y, x in zip(*np.nonzero(m)):
         if y < yk: img[y - DY, x] = orig[y, x]
     Lh = yl - yk
     for y in range(yk - DY, yl):
         sy = min(max(int(round(yl - (yl - y) * Lh / (Lh + DY))), yk), yl - 1)
+        for dd in (0, 1, -1, 2, -2):   # 그 줄에 호스가 안 잡혔으면 바로 옆 줄 호스로(호스 끊김 방지)
+            if yk <= sy + dd < yl and m[sy + dd, x0:x1].any(): sy = sy + dd; break
         for x in range(x0, x1):
             if m[sy, x]: img[y, x] = orig[sy, x]
 Image.fromarray(img).save(out)
