@@ -1,0 +1,32 @@
+window sent {"usage": null, "background_job_id": "3beaee8d-8657-4f39-8135-5697302aa513", "ui_asset_id": "0000e062-9b95-4a51-b4ac-1d1dd81428f6", "status": "processing"}
+card sent {"usage": null, "background_job_id": "d07f0203-81ac-4884-953d-26d2735a0554", "status": "processing"}
+rim sent {"usage": null, "background_job_id": "3a9c350d-cab2-485c-85d2-2fe91e03b401", "status": "processing"}
+card DONE completed images 4 usage {"type": "generations", "generations": 10.0}
+Exception in thread Thread-1 (run):
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.13/threading.py", line 1044, in _bootstrap_inner
+    self.run()
+    ~~~~~~~~^^
+  File "/usr/local/lib/python3.13/threading.py", line 995, in run
+    self._target(*self._args, **self._kwargs)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/goei-plugin/game-src/art/ui/window_frames/gen_frames.py", line 61, in run
+    open(f"{OUT}/{k}_0.png", "wb").write(urllib.request.urlopen(url, timeout=60).read()); n = 1
+                                         ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.13/urllib/request.py", line 189, in urlopen
+    return opener.open(url, data, timeout)
+           ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.13/urllib/request.py", line 495, in open
+    response = meth(req, response)
+  File "/usr/local/lib/python3.13/urllib/request.py", line 604, in http_response
+    response = self.parent.error(
+        'http', request, response, code, msg, hdrs)
+  File "/usr/local/lib/python3.13/urllib/request.py", line 533, in error
+    return self._call_chain(*args)
+           ~~~~~~~~~~~~~~~~^^^^^^^
+  File "/usr/local/lib/python3.13/urllib/request.py", line 466, in _call_chain
+    result = func(*args)
+  File "/usr/local/lib/python3.13/urllib/request.py", line 613, in http_error_default
+    raise HTTPError(req.full_url, code, msg, hdrs, fp)
+urllib.error.HTTPError: HTTP Error 403: Forbidden
+rim DONE completed images 64 usage {"type": "generations", "generations": 10.0}
