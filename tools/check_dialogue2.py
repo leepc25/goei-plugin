@@ -1,6 +1,7 @@
 """새 대사 자료 검사 (game-src/dialogue2/characters/*.json, 10-31).
 한 줄 = 한 문장(말풍선 하나), 같은 줄 돌려 쓰기 금지(인물 파일 안), 칸마다 후보 6줄, 다나까체 인물은 반말 끝 금지(--danakka 인물 이름).
-사용법: python3 tools/check_dialogue2.py [--danakka 쟈알디,...] [--n 3] [인물파일.json ...]
+사용법: python3 tools/check_dialogue2.py [--danakka 쟈알디,...] [--n 3] [--commas 1] [인물파일.json ...]
+--commas: 한 줄 쉼표 최대 개수(기본 1, 11-01 사용자 쉼표 증식 금지). -1이면 검사 안 함.
 --n: 칸마다 후보 줄 수(기본 6). 파일을 주면 그 파일만, 안 주면 characters/*.json 전부.
 """
 import json, re, sys
@@ -14,6 +15,7 @@ def opt(name, default):
     return default
 danakka = set(opt('--danakka', '').split(',')) - {''}
 N = int(opt('--n', '6'))
+COMMAS = int(opt('--commas', '1'))  # 11-01 사용자: 쉼표 증식 금지, 한 줄에 많아야 하나
 files = [Path(a) for a in args] or sorted((ROOT / 'game-src/dialogue2/characters').glob('*.json'))
 bad = 0
 for f in files:
@@ -33,6 +35,8 @@ for f in files:
     probs += [f'겹침: {s}' for s, n in Counter(s for _, s in L).items() if n > 1]
     probs += [f'여러 문장 {p}: {s}' for p, s in L if re.findall(r'[.?!]', s.rstrip('.?!…'))]
     probs += [f'후보 {len(x)}줄 {p}' for p, x in pools if len(x) != N]
+    if COMMAS >= 0:
+        probs += [f'쉼표 {s.count(",")}개 {p}: {s}' for p, s in L if s.count(',') > COMMAS]
     if d.get('name') in danakka:
         probs += [f'반말 {p}: {s}' for p, s in L if re.search(r'(해|야|어|줘|봐|거야|게|래|니|렴|자)[.?!]?$', s) and not re.search(r'(해라|봐라|하자)[.?]?$', s)]
     size = len(json.dumps(d, ensure_ascii=False, separators=(',', ':')).encode())
