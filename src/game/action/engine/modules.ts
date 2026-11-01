@@ -261,6 +261,16 @@ function hqAdapter(bridge: Partial<GameBridge> | undefined, ui: { chooseFloor: H
         void b?.field?.record({ kind: 'act', text: `${hm()}A ${enName(e.by)} told {user} to leave, and {user} left.`, ko: `${hm()}{user}: ${e.by}의 경고를 받고 쫓겨남`, scene: fieldClock.place || undefined, weight: 2, visit: visitId }).catch(() => {});
         continue;
       }
+      // 대화에서 허락받아 이번 방문 출입증 · 경고 무시·위협으로 경비가 덤빔 (11-01)
+      if (e.kind === 'pass') {
+        const fn = factionBy.get(e.faction)?.name ?? FACTION_NAMES[e.faction] ?? e.faction;
+        void b?.field?.record({ kind: 'act', text: `${hm()}{user} was given a one-time visitor pass for the ${fn} site.`, ko: `${hm()}{user}: ${fn} 일회용 출입증 받음`, scene: sceneNameOf(e.scene), weight: 1, visit: visitId }).catch(() => {});
+        continue;
+      }
+      if (e.kind === 'guardAttack') {
+        void b?.field?.record({ kind: 'act', text: `${hm()}{user} ignored a ${enName(e.by)}'s warning, and the guard moved to stop {user} by force.`, ko: `${hm()}{user}: 경고를 무시해 ${e.by}이(가) 덤빔`, scene: sceneNameOf(e.scene), weight: 2, visit: visitId }).catch(() => {});
+        continue;
+      }
       if ((e.kind === 'brawl' || e.kind === 'brawlEnd' || e.kind === 'expel') && e.scene === lifeScene) {
         const fn = (c: string) => factionBy.get(c)?.name ?? FACTION_NAMES[c] ?? c;
         const line = e.kind === 'brawl'
@@ -274,7 +284,7 @@ function hqAdapter(bridge: Partial<GameBridge> | undefined, ui: { chooseFloor: H
       // 거점 경보 켜짐·꺼짐 (10-31 필드 기능 9번)
       if (e.kind === 'alarm') {
         const fn = factionBy.get(e.faction)?.name ?? FACTION_NAMES[e.faction] ?? e.faction;
-        const why = ({ intruder: ['an intruder', '침입자'], assault: ['an assault', '폭행'], murder: ['a killing', '살인'], trespass: ['a trespasser refusing to leave', '퇴거 거부'], threat: ['a threat', '위협'] } as Record<string, [string, string]>)[e.why] ?? [e.why, e.why];
+        const why = ({ intruder: ['an intruder', '침입자'], assault: ['an assault', '폭행'], knockout: ['someone being knocked out', '기절시킴'], murder: ['a killing', '살인'], trespass: ['a trespasser refusing to leave', '퇴거 거부'], threat: ['a threat', '위협'] } as Record<string, [string, string]>)[e.why] ?? [e.why, e.why];
         const line = e.on
           ? { text: `${hm()}The ${fn} base alarm went off over ${why[0]} (${e.threat === '{user}' ? '{user}' : enName(e.threat)}). Guards and agents converged.`, ko: `${hm()}${fn} 거점 경보 (${why[1]}, ${e.threat === '{user}' ? '{user}' : e.threat})` }
           : { text: `${hm()}The ${fn} base alarm was lifted.`, ko: `${hm()}${fn} 거점 경보 해제` };
@@ -417,7 +427,8 @@ function hqAdapter(bridge: Partial<GameBridge> | undefined, ui: { chooseFloor: H
   fieldLink.talkOpts = (name) => {
     const a = sim?.findActor(name);
     const doing = a && !a.following && !['idle', 'walk'].includes(a.act) ? a.doing : undefined;
-    return { ...(doing ? { doing } : {}), tags: ['follow', 'wait', 'return'] };
+    // 그 거점 캐릭터는 대화에서 출입을 허락할 수 있다(이번 방문 출입증, 11-01 사용자: 허가·동행은 대화로만)
+    return { ...(doing ? { doing } : {}), tags: a && sim?.canPermit(a.def.id) ? ['follow', 'wait', 'return', 'permit'] : ['follow', 'wait', 'return'] };
   };
   fieldLink.onTags = (key, name, tags) => {
     const w = sim;

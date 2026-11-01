@@ -246,6 +246,8 @@ export type SimEvent =
   | { kind: 'warn'; scene: string; who: string; by: string }
   /** 경고를 무시하고 안쪽으로 들어가 경비가 덤빔 (11-01) */
   | { kind: 'guardAttack'; scene: string; who: string; by: string }
+  /** 대화에서 허락받아 이번 방문 출입증이 생김 (11-01) */
+  | { kind: 'pass'; scene: string; faction: string }
   /** 말풍선 칸 하나 (speech.ts speakCell). cell = game-src/dialogue2 칸 열쇠, ctx = 그 순간 정보(say = 대사 자료가 없을 때 쓸 글) */
   | { kind: 'cue'; scene: string; who: string; id: string; cell: string; ctx?: Record<string, string> }
   /** 동행 시작·끝 (follow·wait·return·hit = 맞아서 그만둠) */
@@ -1188,20 +1190,57 @@ export class WorldSim {
     const v = this.playerVisit;
     return !!v && !v.permit && v.guard === id;
   }
-  /** 경비가 허락함: 이번 방문은 머물게 둔다 */
-  permitPlayer(): void {
-    if (!this.playerVisit) return;
-    this.playerVisit.permit = true;
-    const g = this.actors.find((q) => q.def.id === this.playerVisit!.guard);
-    if (g) { g.escort = undefined; this.resume(g); }
+  /** 이번 방문 출입증 (11-01 사용자): 경비나 그 거점 캐릭터가 대화에서 허락([[허가]])하면 생긴다. 있는 동안 어느 경비도 막지 않고, 거점을 나가면 사라진다 */
+  hasPass(): string | null {
+    const v = this.playerVisit;
+    return v?.permit ? v.fac : null;
   }
-  /** 경비가 위협받음: 시간이 남아 있어도 바로 경보 */
+  /** 이 사람이 대화에서 출입을 허락할 수 있나: 주인공이 경계·적대 거점에 있고, 그 거점 경비(경고 중) 또는 그 거점 캐릭터 */
+  canPermit(id: string): boolean {
+    const p = this.player;
+    const fac = p ? this.sceneFaction(p.scene) : null;
+    if (!p || !fac || this.hasPass() === fac) return false;
+    const st = this.stance(fac);
+    if (st !== 'wary' && st !== 'hostile') return false;
+    if (this.guardingPlayer(id)) return true;
+    const a = this.actors.find((q) => q.def.id === id || q.def.name === id);
+    return !!a && a.def.kind === 'named' && this.factionOf(a) === fac;
+  }
+  /** 허락받음: 이번 방문 출입증 */
+  permitPlayer(): void {
+    const p = this.player;
+    const fac = p ? this.sceneFaction(p.scene) : null;
+    if (!p || !fac) return;
+    this.playerVisit ??= { fac, spotted: false, scene: p.scene, cost: this.exitCost(p.scene, p.x, fac), permit: false, attacked: false };
+    if (this.playerVisit.permit) return;
+    this.playerVisit.permit = true;
+    this.events.push({ kind: 'pass', scene: p.scene, faction: fac });
+    const g = this.actors.find((q) => q.def.id === this.playerVisit!.guard);
+    if (g?.escort === 'player') { g.escort = undefined; this.resume(g); }
+  }
+  /** 경고 중인 경비가 대화에서 위협받음([[경보]]): 그 경비가 덤빈다. 거점 경보는 아님(경보는 기절·사망 목격으로만) */
   threatAlarm(id?: string): void {
     const p = this.player;
-    if (!p || !this.sceneFaction(p.scene)) return;
-    const g = id ? this.actors.find((q) => q.def.id === id) : undefined;
-    if (g) { g.escort = undefined; }
-    this.raiseAlarm(p.scene, p.x, 'player', 'threat');
+    const v = this.playerVisit;
+    if (!p || !v) return;
+    const g = this.actors.find((q) => q.def.id === (id ?? v.guard));
+    if (g) this.guardAttack(g, p, '위협');
+  }
+  /** 경비가 주인공에게 덤빈다 (경고 무시·무기·대화 중 위협) */
+  private guardAttack(g: Actor, p: { scene: string; x: number; y: number }, why: '경고 무시' | '무기' | '위협'): void {
+    if (this.playerVisit) this.playerVisit.attacked = true;
+    g.escort = undefined;
+    g.task = undefined;
+    g.seatPick = undefined;
+    g.target = undefined;
+    g.run = 1.5;
+    const path = g.scene !== p.scene ? this.graph.route(g.scene, p.scene) : null;
+    const d = path && this.graph.doorSpot(g.scene, path[0].exit);
+    if (path && d) { g.route = path; this.walkTo(g, d, `${why}: 쫓아감`, 'chase'); }
+    else this.walkTo(g, { x: p.x, y: p.y || g.y }, `${why}: 덤빔`, 'chase');
+    this.iconOn(g, '#', 2);
+    this.say(g, why === '무기' ? '무기 내려!' : why === '위협' ? '그 말, 후회하게 될 겁니다.' : '경고했습니다!', 2);
+    this.events.push({ kind: 'guardAttack', scene: p.scene, who: '{user}', by: g.def.name });
   }
   /** 장면 → 거점 밖까지 남은 길 (문 수 × 1만 + 다음 문까지 가로 거리). 거점 밖이면 0 */
   private exitCost(scene: string, x: number, fac: string): number {
@@ -1263,26 +1302,16 @@ export class WorldSim {
     }
     const g = guardOf();
     if (!g) { pv.spotted = false; pv.guard = undefined; return; }   // 경비가 쓰러짐·떠남: 다른 경비가 다시 볼 때까지
+    // 위협은 행동으로만 본다 (11-01 사용자: 필드 동작은 모델 없이): 경고 중인 경비 앞에서 무기를 꺼내면 덤빈다. 때리면 원래대로 범죄 → 맞섬
+    const threat = !!p.armed && g.scene === p.scene && Math.abs(g.x - p.x) < WorldSim.SPOT_PX;
     // 장면을 옮김: 출구 쪽(남은 문 수가 줄어듦)이면 괜찮고, 안쪽 다른 방·층이면 경고 무시 → 경비가 공격
-    if (p.scene !== pv.scene) {
+    if (p.scene !== pv.scene || threat) {
       const cost = this.exitCost(p.scene, p.x, fac);
-      const outward = Math.floor(cost / 10000) < Math.floor(pv.cost / 10000);
+      const outward = !threat && Math.floor(cost / 10000) < Math.floor(pv.cost / 10000);
       pv.scene = p.scene;
       pv.cost = cost;
-      if (!outward && g.doing !== '주인공과 대화') {
-        pv.attacked = true;
-        g.escort = undefined;
-        g.task = undefined;
-        g.seatPick = undefined;
-        g.target = undefined;
-        g.run = 1.5;
-        const path = g.scene !== p.scene ? this.graph.route(g.scene, p.scene) : null;
-        const d = path && this.graph.doorSpot(g.scene, path[0].exit);
-        if (path && d) { g.route = path; this.walkTo(g, d, '경고 무시: 쫓아감', 'chase'); }
-        else this.walkTo(g, { x: p.x, y: p.y || g.y }, '경고 무시: 덤빔', 'chase');
-        this.iconOn(g, '#', 2);
-        this.say(g, '경고했습니다!', 2);
-        this.events.push({ kind: 'guardAttack', scene: p.scene, who: '{user}', by: g.def.name });
+      if (!outward) {
+        this.guardAttack(g, p, threat ? '무기' : '경고 무시');
         return;
       }
     }

@@ -174,7 +174,7 @@ test('쫓아냄: 그 거점 인물과 동행 중이면 경비가 보내 줌 (11-
   assert.ok(!w.events.some((x) => x.kind === 'guardAttack'));
 });
 
-test('쫓아냄: 경비가 [[허가]]면 머물고, [[경보]]면 바로 경보', () => {
+test('쫓아냄: [[허가]]면 이번 방문 출입증, [[경보]]·무기면 경비가 덤빔 (11-01)', () => {
   const w = sim({ stance: (f) => (f === 'A00' ? 'wary' : null) });
   const g = guardAt(w, 'lobby', 1200);
   run(w, 3, { scene: 'lobby', x: 1000, y: 560 });
@@ -185,7 +185,27 @@ test('쫓아냄: 경비가 [[허가]]면 머물고, [[경보]]면 바로 경보'
   const g2 = guardAt(w2, 'lobby', 1200);
   run(w2, 3, { scene: 'lobby', x: 1000, y: 560 });
   w2.threatAlarm(g2.def.id);
-  assert.ok(w2.alarmIn('lobby'));
+  assert.ok(!w2.alarmIn('lobby'), '대화 위협은 경보가 아니라');
+  assert.ok(w2.events.some((e) => e.kind === 'guardAttack'), '그 경비가 덤빔');
+  // 무기를 꺼내도 덤빔
+  const w3 = sim({ stance: (f) => (f === 'A00' ? 'wary' : null) });
+  const g3 = guardAt(w3, 'lobby', 1200);
+  run(w3, 3, { scene: 'lobby', x: 1000, y: 560 });
+  run(w3, 0.2, { scene: 'lobby', x: 1000, y: 560, armed: true, face: 1 });
+  assert.equal(g3.plan, 'chase');
+  // 그 거점 캐릭터도 허락할 수 있다 → 출입증, 다른 경비도 안 막음, 나가면 사라짐
+  const w4 = sim({ stance: (f) => (f === 'A00' ? 'hostile' : null) });
+  const c = named(w4, '에일린', 'lobby', 600);
+  c.def.faction = 'A00';
+  guardAt(w4, 'f3', 1900);
+  run(w4, 0.5, { scene: 'lobby', x: 650, y: 560 });
+  assert.ok(w4.canPermit(c.def.id));
+  w4.permitPlayer();
+  assert.equal(w4.hasPass(), 'A00');
+  run(w4, 3, { scene: 'f3', x: 1800, y: 560 });
+  assert.ok(!w4.events.some((e) => e.kind === 'warn'), '출입증 있으면 경고 없음');
+  run(w4, 0.5, { scene: 'street', x: 640, y: 560 });
+  assert.equal(w4.hasPass(), null, '나가면 사라짐');
   void g;
 });
 

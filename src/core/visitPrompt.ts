@@ -22,8 +22,8 @@ const TAG_HELP: Record<FieldTag, string> = {
   follow: '[[동행]] — you agree, in this reply, to come along with the protagonist right now (you will walk with them)',
   wait: '[[기다림]] — you agree to stay right here and wait for the protagonist',
   return: '[[복귀]] — you stop accompanying the protagonist and go back to your own work',
-  permit: '[[허가]] — you allow the protagonist to stay in this restricted area after all',
-  alarm: '[[경보]] — the protagonist threatened you or forced the issue, and you raise the alarm',
+  permit: '[[허가]] — you let the protagonist into this restricted site for this visit (they get a one-time visitor pass)',
+  alarm: '[[경보]] — the protagonist threatened you or tried to force their way in, and you move to stop them by force',
 };
 /** 표시 규칙 (system 끝에 붙인다) */
 export function fieldTagRules(tags: readonly FieldTag[]): string {
