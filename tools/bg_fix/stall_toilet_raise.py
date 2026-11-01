@@ -48,7 +48,24 @@ def raise_toilet(p_in, p_out):
     for y in range(144, 244): out[y - R] = tp[y]                     # 13:37 사용자: 늘이지 말고 변기 통째로 R 위로
     # 13:40 사용자 「뒤 벽을 땡겨 올리고 바닥 처리」: 칸 안 뒷벽(원본 x121~181)을 캔버스 y에서 끊어
     # 아래는 투명 → 배경의 벽 밑 띠(배경 y326~332)·바닥이 그대로 보임
-    b[WALL:227, 121 - X0:182 - X0, 3] = 0
+    # 13:42 사용자 「휴지통 윤곽선 날라갔다」「옆도 맞춰야지」: 휴지통(캔버스 x89~107)은 남기고,
+    # 왼쪽 칸막이 옆판(x73~88)은 아래 끝을 (73,226)→(88,WALL) 사선으로 다시 자르고 검은 선을 긋고,
+    # 오른쪽 구석 솔(x166~172, y212~232)은 변기처럼 위로 옮김
+    keep = np.zeros(b.shape[:2], bool); keep[205:238, 89:108] = b[205:238, 89:108, 3] > 0
+    brush = b[212:233, 166:173].copy()
+    b[212:233, 166:173, 3] = 0
+    for yy in range(WALL, 227):
+        for xx in range(73, 173):
+            if keep[yy, xx]: continue
+            if xx < 89:                                     # 옆판: 사선 아래만 지움
+                edge = 226 - (xx - 73) * (226 - WALL) / (88 - 73)
+                if yy > edge + 0.5: b[yy, xx, 3] = 0
+                elif yy > edge - 0.5: b[yy, xx] = [1, 1, 1, 255]
+            else:
+                b[yy, xx, 3] = 0
+    bm = brush[..., 3] > 0
+    sub = b[212 - (226 - WALL):233 - (226 - WALL), 166:173]
+    sub[bm] = brush[bm]
     A = out[..., 3] > 0
     b[A] = out[A]
     Image.fromarray(b).save(D + p_out)
@@ -59,7 +76,7 @@ raise_toilet('stall_body_end.png', 'stall_body_end_tall.png')
 body = Image.open(D + 'stall_body_tall.png'); body_end = Image.open(D + 'stall_body_end_tall.png')
 endpost = Image.open(D + 'stall_endpost.png').convert('RGBA')
 doors = [Image.open(D + f'stall_door_{i}.png').convert('RGBA') for i in range(6)]
-BG = 'game-src/art/pixellab-hq-20261031/hq_restroom_m_final_984x424.png'
+BG = 'game-src/art/pixellab-hq-20261031/hq_restroom_m_final_v2_984x424.png'   # 13:41 소변기 칸막이 손질판
 FOOT, RIGHT, PITCH, N = 368, 398, 158, 3
 xs = [RIGHT - 206 - PITCH * i for i in range(N)]
 y = FOOT - 252
