@@ -83,8 +83,16 @@ def convert(scene_id: str, m: dict, files: dict) -> dict:
             if o.get('flip'): im = im.transpose(Image.FLIP_LEFT_RIGHT)
             im = im.resize((o['w'], o['h']), Image.NEAREST)
             if o.get('rot'): im = im.rotate(-o['rot'], resample=Image.NEAREST, expand=False)
-            name = webp(im, f'me_{scene_id}_{o["id"]}'); names.append(name)
-            objects.append({'id': o['id'], 'file': name, 'x': o['x'], 'y': o['y'], 'w': o['w'], 'h': o['h'], 'sortY': o['sortY'], **({'gate': True} if o.get('gate') else {})})
+            extra = {'gate': True} if o.get('gate') else {}
+            if not o.get('frames'): name = webp(im, f'me_{scene_id}_{o["id"]}'); names.append(name)
+            # 여러 장면 그림(화장실 칸 문 0닫힘~5열림): 같은 크기 그림을 차례로 굽는다. file = 첫 장면
+            if o.get('frames'):
+                fr = []
+                for j, f in enumerate(o['frames']):
+                    fi = Image.open(io.BytesIO(files[find(files, f)])).convert('RGBA').resize((o['w'], o['h']), Image.NEAREST)
+                    fn = webp(fi, f'me_{scene_id}_{o["id"]}_{j}'); names.append(fn); fr.append(fn)
+                extra['frames'] = fr; name = fr[0]
+            objects.append({'id': o['id'], 'file': name, 'x': o['x'], 'y': o['y'], 'w': o['w'], 'h': o['h'], 'sortY': o['sortY'], **extra})
     doors = {}
     for did, d in (m.get('doors') or {}).items():
         # door가 있으면(그림 속 문짝 자리·여닫는 방식) 그대로, 없으면 바닥 출구 자리만
@@ -96,7 +104,7 @@ def convert(scene_id: str, m: dict, files: dict) -> dict:
     # 사람 배율 dotK: map.json에 있으면 그것(사용자 10-31 중림 지상: 배경 2배·사람 0.85), 없으면 장면 세로로 계산
     lane = m.get('lane') or [min(p[1] for p in m['floor']), max(p[1] for p in m['floor']) - 12]
     scene = {'file': file, 'w': W, 'h': H, 'under': True, 'lane': lane, 'floor': m.get('floor'), 'holes': holes,
-             'dotK': m.get('dotK') or round(1.5 * H / 890, 4), 'blocks': [], 'doors': doors, 'lamps': m.get('lamps', []), 'windows': [], 'objects': objects, **({'posts': m['posts']} if m.get('posts') else {})}
+             'dotK': m.get('dotK') or round(1.5 * H / 890, 4), 'blocks': [], 'doors': doors, 'lamps': m.get('lamps', []), 'windows': [], 'objects': objects, **({'posts': m['posts']} if m.get('posts') else {}), **({'toilets': m['toilets']} if m.get('toilets') else {})}
     return {'scene': scene, 'spots': spots, 'files': names}
 
 
