@@ -5,7 +5,8 @@
 import json
 from PIL import Image
 A = 'game-src/art/pixellab-hq-20261031/'
-bg = Image.open(A + 'hq_bath_f_p5_extL1.png').convert('RGBA')
+import sys as _s
+bg = Image.open(A + (_s.argv[1] if len(_s.argv) > 1 else 'hq_bath_f_p5_extL1.png')).convert('RGBA')
 FOOT = {2: (240, 340, 'W'), 3: (290, 312, 'W'), 4: (528, 338, 'W'), 5: (545, 305, 'W'), 6: (614, 316, 'E'), 7: (640, 348, 'E')}  # 바구니·대야 피해서 벽 면 앞 빈 바닥, 샤워기 쪽을 봄
 CH = {2: '1.2', 3: '1.10', 4: '1.9', 6: '1.1'}  # 스팡달·게슈간·데드폴·쟈알디
 assert '1.12' not in CH.values()
@@ -22,4 +23,4 @@ for n in sorted(CH, key=lambda n: FOOT[n][1]):
     if face == 'W':  # 그림은 모두 오른쪽(동)을 봄(cfg.dir과 무관, 확인 15:5x)
         fr = fr.transpose(Image.FLIP_LEFT_RIGHT); cx = fr.width - cx
     bg.alpha_composite(fr, (fx - cx, fy - round(a['floor'] * k)))
-bg.resize((bg.width * 2, bg.height * 2), Image.NEAREST).save('/mnt/project-files/hq-f3/now/샤워실여_샤워캐릭터_2배.png')
+bg.resize((bg.width * 2, bg.height * 2), Image.NEAREST).save((_s.argv[2] if len(_s.argv) > 2 else '/mnt/project-files/hq-f3/now/샤워실여_샤워캐릭터_2배.png'))
