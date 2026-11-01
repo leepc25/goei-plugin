@@ -280,3 +280,39 @@ test('퇴근·출근: 근무가 끝나면 거점 밖으로 나가 없어지고, 
   assert.ok(w.events.some((e) => e.kind === 'shift' && e.who === '에일린' && e.on));
 });
 
+
+test('맨몸(11-01): nude 켜면 클립이 맨몸으로 바뀌고, 맞으면 배·가슴 → 쓰러지면 H3 → 누운 채 H4 → 깨면 H5', () => {
+  const nudeOk = ['idle', 'walk', 'run', 'down', 'getup', 'angry', 'nude_idle', 'nude_walk', 'nude_run', 'nude_hit', 'nude_hit2', 'nude_down', 'nude_lie_hit', 'nude_getup', 'nude_flee'];
+  const w = sim({ has: (_l, c) => nudeOk.includes(c) });
+  const a = named(w, '에일린');
+  run(w, 0.5, { scene: 'street', x: 100, y: 560 });
+  assert.ok(!a.clip.startsWith('nude_'), '옷 입은 채');
+  assert.ok(w.setNude('npc:에일린', true));
+  assert.equal(a.clip, 'nude_idle');
+  // 걸으면 맨몸 걷기
+  run(w, 8, { scene: 'street', x: 100, y: 560 });
+  assert.ok(['nude_idle', 'nude_walk', 'nude_run'].includes(a.clip), `걷기 ${a.clip}`);
+  // 서서 맞기: 배(H1) → 다음은 가슴(H2)
+  a.hp = 100; a.hpMax = 100;
+  assert.ok(w.hitActor('npc:에일린', 1, 1));
+  assert.equal(a.clip, 'nude_hit');
+  run(w, 4, { scene: 'street', x: 100, y: 560 });
+  assert.ok(w.hitActor('npc:에일린', 1, 2));
+  assert.equal(a.clip, 'nude_hit2');
+  // 쓰러짐(체력 0) → nude_down, 누운 채 또 맞으면 nude_lie_hit
+  run(w, 4, { scene: 'street', x: 100, y: 560 });
+  a.hp = 0;
+  assert.ok(w.hitActor('npc:에일린', 1, 3));
+  assert.equal(a.clip, 'nude_down');
+  assert.equal(a.act, 'down');
+  assert.ok(w.hitActor('npc:에일린', 1, 4));
+  assert.equal(a.clip, 'nude_lie_hit');
+  // 깰 때 일어나기(H5) 한 번 → 그 뒤 맨몸 자세
+  run(w, 6.5, { scene: 'street', x: 100, y: 560 });
+  assert.equal(a.clip, 'nude_getup');
+  run(w, 2, { scene: 'street', x: 100, y: 560 });
+  assert.ok(a.clip.startsWith('nude_') && a.clip !== 'nude_getup', `깬 뒤 ${a.clip}`);
+  // 옷 입으면 다시 보통 클립
+  assert.ok(w.setNude('npc:에일린', false));
+  assert.ok(!a.clip.startsWith('nude_'));
+});

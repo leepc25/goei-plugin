@@ -132,6 +132,11 @@ export const FIELD_CLIP: Record<string, { ids: string[]; fps?: number; loop?: bo
   smoke: { ids: ['145', '90'], fps: 5 }, browse: { ids: ['168'], fps: 4 }, snack: { ids: ['157'], fps: 6 }, front: { ids: ['50'], fps: 1 / 0.6 }, back: { ids: ['57'], fps: 1 / 0.6 }, spot: { ids: ['33'], fps: 8, loop: false },
   down: { ids: ['19'], fps: 10, loop: false }, die: { ids: ['44'], fps: 9, loop: false }, dieLie: { ids: ['45'], fps: 6, loop: false }, getup: { ids: ['20'], fps: 9, loop: false },
   sit: { ids: ['60', '96', '61'], fps: 1 / 0.6 }, lie: { ids: ['76', '75'], fps: 4 },
+  // 맨몸(샤워 중 피격, 11-01): 샤워 기능이 nude 를 켠 인물만. 경계 자세(SH_G, 팩 loops 로 2~8장 반복)·맨몸 걷기(SH_B)·배/가슴 맞기(H1/H2)·쓰러짐(H3)·누운 채 맞기(H4)·일어나기(H5)·가린 채 도망(H6)
+  nude_idle: { ids: ['SH_G'], fps: 7 }, nude_walk: { ids: ['SH_B'], fps: 11 }, nude_run: { ids: ['SH_B'], fps: 15 },
+  nude_hit: { ids: ['SH_H1'], fps: 10, loop: false }, nude_hit2: { ids: ['SH_H2'], fps: 10, loop: false },
+  nude_down: { ids: ['SH_H3'], fps: 10, loop: false }, nude_lie_hit: { ids: ['SH_H4'], fps: 9, loop: false }, nude_getup: { ids: ['SH_H5'], fps: 9, loop: false },
+  nude_flee: { ids: ['SH_H6'], fps: 12 },
 };
 /** 그 인물에게 그 클립 그림이 있나 (받아 둔 인물만 참). 필드 세계는 그림 있는 행동만 켠다 */
 export function hasCharClip(nameOrKey: string, clip: string): boolean {

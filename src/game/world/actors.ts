@@ -12,6 +12,12 @@ import type { Hop, PlaceGraph } from './places';
 import { pick, range, type Rng } from './rng';
 import { reactCell, type ReactCell, type ReactSituation } from './namedReact';
 
+/** 옷 입은 클립 → 맨몸 클립 (art/charPacks.ts FIELD_CLIP 의 nude_*). 표에 없는 활동은 nude_idle(가린 채 경계). 샤워 기능이 Actor.nude 를 켠 인물만 */
+export const NUDE_CLIP: Record<string, string> = {
+  idle: 'nude_idle', walk: 'nude_walk', run: 'nude_run', down: 'nude_down', getup: 'nude_getup', flee: 'nude_flee', crawl: 'nude_flee', scramble: 'nude_flee',
+  'line:43': 'nude_lie_hit', lie: 'nude_lie_hit', scared: 'nude_idle', cower: 'nude_idle', backoff: 'nude_idle',
+};
+
 export type ActorKind = 'named' | 'mob';
 /** 장면 의자의 앉는 방향 (N = 등, E·W = 옆, 없으면 정면) */
 const seatDir = (face?: 'E' | 'W' | 'N'): 'front' | 'side' | 'back' => (face === 'N' ? 'back' : face ? 'side' : 'front');
@@ -158,6 +164,10 @@ export interface Actor {
   sawBodies?: string[];
   /** 무기 든 주인공을 마지막으로 본 때 (11-01 사용자 10번: 무기를 든 동안 계속 반응, 넣으면 그만) */
   armedSeen?: number;
+  /** 맨몸(샤워 중, 11-01): 샤워 기능이 켠다. 켜진 동안 setClip 이 옷 입은 클립을 맨몸 클립(NUDE_CLIP)으로 바꿔 끼운다 */
+  nude?: boolean;
+  /** 맨몸 서서 맞기 마지막에 튼 줄 (배·가슴 번갈아) */
+  nudeHit?: string;
   /** 무기 반응으로 버티는 중 (노려봄·맞섬 등) */
   weaponHold?: boolean;
   reactClip?: string;
@@ -545,11 +555,16 @@ export class WorldSim {
     // 서서 소변(100)은 앉은 게 아니라 그냥 피격 자세로 (10-31 사용자)
     const seated = !!a.seat || (a.act === 'do' && (a.clip === 'poo' || (a.clip === 'pee' && !this.canClip(a, 'line:100'))));
     const lying = a.clip === 'lie' || a.clip === 'treat';
+    // 맨몸(11-01): 쓰러진 채 또 맞으면 누운 채 맞기(SH_H4)만 틀고 그 마지막 장에 머문다
+    const nudeLying = !!a.nude && a.act === 'down' && (a.hp ?? 1) <= 0;
     this.struckCore(a, dir, hostile);
     const react = a.clip;
     const seq: { clip: string; sec: number }[] = [];
+    if (nudeLying && this.canClip(a, 'nude_lie_hit')) { this.setClip(a, 'nude_lie_hit'); return; }
     if (seated && this.canClip(a, 'line:169')) seq.push({ clip: 'line:169', sec: 1.6 }, ...(this.canClip(a, 'getup') ? [{ clip: 'getup', sec: 1 }] : []));
     else if (lying && this.canClip(a, 'line:43')) seq.push({ clip: 'line:43', sec: 0.9 });
+    // 맨몸 서서 맞기: 배(H1)·가슴(H2)을 번갈아 한 번 틀고 반응으로 (쓰러지는 때는 struckCore 가 nude_down 으로 바꿔 끼움)
+    else if (a.nude && react !== 'nude_down') { const h = a.nudeHit === 'nude_hit' ? 'nude_hit2' : 'nude_hit'; if (this.canClip(a, h)) { a.nudeHit = h; seq.push({ clip: h, sec: 0.6 }); } }
     if (!seq.length) return;
     this.setClip(a, seq[0].clip);
     a.clipQ = [...seq.slice(1), { clip: react, sec: 0 }];
@@ -592,6 +607,15 @@ export class WorldSim {
     this.iconOn(a, '!', 1.5);
   }
 
+  /** 맨몸 켜기/끄기 (샤워 기능이 부른다: 옷 벗으면 on, 옷 입으면 off). 쓰러진 채면 자세만 바꾸고, 아니면 서 있는 자세로 */
+  setNude(id: string, on: boolean): boolean {
+    const a = this.actors.find((q) => q.def.id === id) ?? this.findActor(id);
+    if (!a || !!a.nude === on) return false;
+    a.nude = on;
+    if (a.act === 'dead' || a.act === 'gone') return true;
+    this.setClip(a, a.act === 'down' && (a.hp ?? 1) <= 0 ? 'down' : 'idle');
+    return true;
+  }
   /** 행위자 말풍선 (대사 연결이 부른다) */
   /** 머리 위 작은 말풍선 기호 (인물끼리 상호작용) */
   emote(a: Actor, icon: string, sec = 2): void {
@@ -1495,6 +1519,11 @@ export class WorldSim {
 
   private setClip(a: Actor, clip: string, fromQ = false): void {
     if (!fromQ) a.clipQ = undefined;
+    // 맨몸이면 맨몸 클립으로 바꿔 끼운다 (그 인물에게 그림이 있을 때만; 없으면 가린 채 경계, 그것도 없으면 옷 입은 그림 그대로)
+    if (a.nude && !clip.startsWith('nude_')) {
+      const n = NUDE_CLIP[clip] ?? 'nude_idle';
+      clip = this.canClip(a, n) ? n : this.canClip(a, 'nude_idle') ? 'nude_idle' : clip;
+    }
     // 의자에서 하는 일이 아니면 일어선다
     if (!clip.startsWith('seat:')) a.seat = undefined;
     if (a.clip !== clip) {
@@ -1600,6 +1629,8 @@ export class WorldSim {
       case 'down':
         a.wait -= dt;
         if (a.wait > 0) return;
+        // 맨몸(11-01): 기절에서 깨기 전에 일어나기(SH_H5)를 한 번 틀고 나서 다음으로
+        if (a.nude && (a.hp ?? 1) <= 0 && a.clip !== 'nude_getup' && this.canClip(a, 'nude_getup')) { this.setClip(a, 'nude_getup'); a.wait = 0.9; return; }
         // 기절에서 깨면 체력 조금 돌아오고 (근무형이 아니면) 무조건 자리를 뜬다
         if (a.def.kind === 'mob' && (a.hp ?? 1) <= 0) {
           a.hp = Math.round((a.hpMax ?? 50) * 0.3);
