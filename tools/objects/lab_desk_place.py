@@ -6,7 +6,7 @@ import numpy as np
 D='game-src/action/objects/'
 FOOT=int(os.environ.get('FOOT',332))   # 발끝 y(1배). 벽 밑선 ≈299
 FOOTS=[int(v) for v in os.environ.get('FOOTS',f'{FOOT},{FOOT},{FOOT-12}').split(',')]  # 거치대는 책상보다 벽 쪽(사용자 10:36)
-XS=[int(v) for v in os.environ.get('XS','665,938,312').split(',')]  # 캔버스 왼쪽 x
+XS=[int(v) for v in os.environ.get('XS','526,938,312').split(',')]  # 캔버스 왼쪽 x
 SHC,SHA,SD=(20,26,38),120,14           # 사무실 책상 그림자 값 그대로
 bg=Image.open('game-src/art/pixellab-hq-20261031/hq_b2_lab_p20_1703x424.png').convert('RGBA')
 items=[]
