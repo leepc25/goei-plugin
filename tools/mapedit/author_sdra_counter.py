@@ -59,33 +59,44 @@ counter_block = {'poly': [[x * K, y * K] for x, y in CB], 'h': 999}
 # 손으로 읽은 상자 안에서 검은 윤곽선을 따라 딴다(상자 가장자리에서 윤곽을 못 넘고 번지는 곳 = 뒤 배경).
 import io, base64
 import numpy as np
-from scipy import ndimage as nd
 A = np.array(im).astype(int); IH, IW = A.shape[:2]
-wall2 = nd.binary_dilation(A.max(2) <= 60, structure=np.ones((2, 2)))
-def trace_in_box(x0, y0, x1, y1):
-    box = np.zeros((IH, IW), bool); box[y0:y1 + 1, x0:x1 + 1] = True
-    free = box & ~wall2; lab, _ = nd.label(free)
-    e = np.zeros_like(box); e[y0, x0:x1 + 1] = e[y1, x0:x1 + 1] = True; e[y0:y1 + 1, x0] = True
-    if x1 < IW - 1: e[y0:y1 + 1, x1] = True
-    bg = set(np.unique(lab[e & free])) - {0}
-    return nd.binary_fill_holes(box & ~np.isin(lab, list(bg)))
-ITEMS = [('끝판', 270, 188, 332, 231), ('책꽂이1', 293, 203, 338, 231), ('가림판', 369, 193, 403, 231), ('스테이플러', 455, 220, 480, 231),
-         ('프린터', 477, 218, 522, 231), ('칸막이A', 516, 180, 546, 231), ('책A', 534, 198, 572, 231), ('펜꽂이', 573, 212, 589, 231),
-         ('도장', 585, 214, 606, 231), ('모니터1', 664, 192, 712, 231), ('서랍', 707, 206, 745, 231), ('칸막이B', 727, 180, 756, 231),
-         ('책B', 749, 203, 777, 231), ('도장2', 793, 218, 806, 231), ('모니터2', 874, 192, 924, 231), ('칸막이R', 917, 180, 951, 231)]
-cmask = np.zeros((IH, IW), bool)
-for _, *b in ITEMS: cmask |= trace_in_box(*b)
+# 11-02 14:16 사용자 「이거 제대로 안따냐」(가림판·끝판·서랍장): 자동 번짐 따기(trace_in_box)가 물건 속으로 새어 뒤 사람 다리가 앞에 나옴.
+# → 창구 위 물건은 전부 검은 윤곽선 꼭짓점을 6~12배 격자에서 손으로 읽은 다각형(1배)으로 딴다. y229 = 창구 윗면 뒤 윤곽선.
+HAND = {
+ '끝판': [(272, 207), (276, 203), (288, 200), (300, 196), (316, 193), (326, 190), (328, 190), (328, 212), (332, 216), (336, 221), (339, 226), (340, 230), (272, 230)],
+ '가림판': [(371, 207), (375, 203), (385, 199), (395, 196), (401, 194), (403, 196), (403, 230), (371, 230)],
+ '스테이플러': [(462, 224), (465, 219), (470, 219), (472, 224), (474, 230), (460, 230)],
+ '프린터': [(478, 230), (483, 224), (497, 223), (497, 207), (500, 204), (513, 203), (516, 206), (516, 223), (521, 223), (521, 230)],
+ '칸막이A': [(516, 198), (522, 191), (530, 186), (538, 183), (542, 183), (542, 230), (516, 230)],
+ '책A': [(542, 207), (552, 205), (556, 202), (570, 201), (572, 204), (572, 230), (542, 230)],
+ '펜꽂이': [(574, 219), (578, 213), (586, 213), (589, 219), (590, 230), (573, 230)],
+ '도장': [(592, 224), (596, 217), (601, 217), (603, 224), (604, 230), (592, 230)],
+ '모니터1': [(664, 197), (668, 194), (706, 193), (709, 196), (709, 230), (664, 230)],
+ '서랍': [(710, 215), (714, 212), (740, 211), (740, 230), (710, 230)],
+ '칸막이B': [(729, 186), (731, 184), (735, 184), (745, 191), (750, 195), (750, 230), (729, 230)],
+ '책B': [(751, 212), (756, 208), (764, 208), (770, 212), (771, 230), (751, 230)],
+ '도장2': [(793, 222), (796, 219), (800, 219), (802, 222), (803, 230), (793, 230)],
+ '모니터2': [(877, 198), (882, 196), (918, 196), (921, 199), (921, 230), (877, 230)],
+ '칸막이R': [(921, 186), (924, 183), (935, 185), (950, 188), (952, 189), (952, 230), (921, 230)],
+}
+def hand_mask(polys):
+    mi = Image.new('L', (IW, IH), 0); dm = ImageDraw.Draw(mi)
+    for pts in polys: dm.polygon(pts, fill=255, outline=255)
+    return np.array(mi) > 0
+cmask = hand_mask(HAND.values())
 for x in range(272, IW):
     bot = 324 if x <= 284 else 324 - (x - 284) if x <= 292 else 328 if (519 <= x <= 529 or 743 <= x <= 753) else 316
-    cmask[229:bot + 1, x] = True
+    cmask[229:bot + 1, x] = True   # 창구 몸체(윗면 뒤 윤곽 y229 ~ 밑선)
 Image.fromarray((cmask * 255).astype('uint8')).save(OUT / 'counter_cover_mask_1x.png')
 big = Image.fromarray((cmask * 255).astype('uint8')).resize((W, H), Image.NEAREST); bb = big.getbbox()
 buf = io.BytesIO(); big.crop(bb).save(buf, 'PNG')
-cab = trace_in_box(210, 195, 268, 271)   # 통로 옆 파란 서랍장: 통로 뒤쪽(y<269)에 선 사람을 가림
+# 통로 옆 파란 서랍장(+위 종이 더미): 손으로 읽은 검은 윤곽. 오른쪽 옆면 밑 모서리 (242,268)→(265,256).
+CAB = [(216, 174), (221, 172), (244, 172), (249, 176), (250, 179), (260, 179), (261, 199), (266, 200), (266, 256), (242, 268), (226, 268), (226, 246), (212, 244), (212, 205), (216, 205)]
+cab = hand_mask([CAB])
 Image.fromarray((cab * 255).astype('uint8')).save(OUT / 'cabinet_cover_mask_1x.png')
 cbig = Image.fromarray((cab * 255).astype('uint8')).resize((W, H), Image.NEAREST); cbb = cbig.getbbox()
 cbuf = io.BytesIO(); cbig.crop(cbb).save(cbuf, 'PNG')
-cabinet_cover = {'id': 'cabinet_cover', 'x': cbb[0], 'y': cbb[1], 'w': cbb[2] - cbb[0], 'h': cbb[3] - cbb[1], 'sortY': 270 * K,
+cabinet_cover = {'id': 'cabinet_cover', 'x': cbb[0], 'y': cbb[1], 'w': cbb[2] - cbb[0], 'h': cbb[3] - cbb[1], 'sortY': 262 * K,
                  'coverMask': 'data:image/png;base64,' + base64.b64encode(cbuf.getvalue()).decode()}
 counter_cover = {'id': 'counter_cover', 'x': bb[0], 'y': bb[1], 'w': bb[2] - bb[0], 'h': bb[3] - bb[1], 'sortY': 316 * K,
                  'coverMask': 'data:image/png;base64,' + base64.b64encode(buf.getvalue()).decode()}
