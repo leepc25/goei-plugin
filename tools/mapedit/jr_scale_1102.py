@@ -28,6 +28,8 @@ REFS = {
     'jr_op':         [(335, 85 * MAN / 0.9, '수술대 윗면 250~335, 0.9m'), (412, 107 * MAN / 0.88, '드럼통 305~412, 0.88m')],
 }
 
+EXTEND = {'jr_songil'}
+
 
 def main():
     for sid, refs in REFS.items():
@@ -40,9 +42,12 @@ def main():
             dotK = round(2 * h1 / SPR, 4)
             m['dotK'] = dotK
             m['sizes'] = [[y0 * 2, round(h0 / h1, 3)], [y1 * 2, 1.0]]
+            if sid in EXTEND:   # 앞 기준점 아래(화면 앞쪽)로도 같은 기울기로 계속 커짐 (사용자 13:32 「의자가 작은 거 아니냐 원근이」)
+                slope = (1 - h0 / h1) / (y1 * 2 - y0 * 2)
+                m['sizes'].append([848, round(1 + slope * (848 - y1 * 2), 3)])
             def k_at(y2):
                 if y2 <= y0 * 2: return h0 / h1
-                if y2 >= y1 * 2: return 1.0
+                if y2 >= y1 * 2: return m['sizes'][-1][1] if sid in EXTEND else 1.0
                 return h0 / h1 + (1 - h0 / h1) * (y2 - y0 * 2) / (y1 * 2 - y0 * 2)
         else:
             (y1, h1, _), = refs
