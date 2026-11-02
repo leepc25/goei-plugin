@@ -1,0 +1,287 @@
+{
+ "frames": [
+  {
+   "filename": "fx-buff 0.png",
+   "frame": {
+    "x": 0,
+    "y": 0,
+    "w": 25,
+    "h": 83
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 25,
+    "h": 83
+   },
+   "sourceSize": {
+    "w": 25,
+    "h": 83
+   },
+   "pivot": {
+    "x": 0.48,
+    "y": 0.891566265060241
+   },
+   "duration": 67
+  },
+  {
+   "filename": "fx-buff 1.png",
+   "frame": {
+    "x": 25,
+    "y": 0,
+    "w": 25,
+    "h": 83
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 25,
+    "h": 83
+   },
+   "sourceSize": {
+    "w": 25,
+    "h": 83
+   },
+   "pivot": {
+    "x": 0.48,
+    "y": 0.891566265060241
+   },
+   "duration": 67
+  },
+  {
+   "filename": "fx-buff 2.png",
+   "frame": {
+    "x": 50,
+    "y": 0,
+    "w": 25,
+    "h": 83
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 25,
+    "h": 83
+   },
+   "sourceSize": {
+    "w": 25,
+    "h": 83
+   },
+   "pivot": {
+    "x": 0.48,
+    "y": 0.891566265060241
+   },
+   "duration": 67
+  },
+  {
+   "filename": "fx-buff 3.png",
+   "frame": {
+    "x": 75,
+    "y": 0,
+    "w": 25,
+    "h": 83
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 25,
+    "h": 83
+   },
+   "sourceSize": {
+    "w": 25,
+    "h": 83
+   },
+   "pivot": {
+    "x": 0.48,
+    "y": 0.891566265060241
+   },
+   "duration": 67
+  },
+  {
+   "filename": "fx-buff 4.png",
+   "frame": {
+    "x": 0,
+    "y": 83,
+    "w": 25,
+    "h": 83
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 25,
+    "h": 83
+   },
+   "sourceSize": {
+    "w": 25,
+    "h": 83
+   },
+   "pivot": {
+    "x": 0.48,
+    "y": 0.891566265060241
+   },
+   "duration": 67
+  },
+  {
+   "filename": "fx-buff 5.png",
+   "frame": {
+    "x": 25,
+    "y": 83,
+    "w": 25,
+    "h": 83
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 25,
+    "h": 83
+   },
+   "sourceSize": {
+    "w": 25,
+    "h": 83
+   },
+   "pivot": {
+    "x": 0.48,
+    "y": 0.891566265060241
+   },
+   "duration": 67
+  },
+  {
+   "filename": "fx-buff 6.png",
+   "frame": {
+    "x": 50,
+    "y": 83,
+    "w": 25,
+    "h": 83
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 25,
+    "h": 83
+   },
+   "sourceSize": {
+    "w": 25,
+    "h": 83
+   },
+   "pivot": {
+    "x": 0.48,
+    "y": 0.891566265060241
+   },
+   "duration": 67
+  },
+  {
+   "filename": "fx-buff 7.png",
+   "frame": {
+    "x": 75,
+    "y": 83,
+    "w": 25,
+    "h": 83
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 25,
+    "h": 83
+   },
+   "sourceSize": {
+    "w": 25,
+    "h": 83
+   },
+   "pivot": {
+    "x": 0.48,
+    "y": 0.891566265060241
+   },
+   "duration": 67
+  },
+  {
+   "filename": "fx-buff 8.png",
+   "frame": {
+    "x": 0,
+    "y": 166,
+    "w": 25,
+    "h": 83
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 25,
+    "h": 83
+   },
+   "sourceSize": {
+    "w": 25,
+    "h": 83
+   },
+   "pivot": {
+    "x": 0.48,
+    "y": 0.891566265060241
+   },
+   "duration": 67
+  },
+  {
+   "filename": "fx-buff 9.png",
+   "frame": {
+    "x": 25,
+    "y": 166,
+    "w": 25,
+    "h": 83
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 25,
+    "h": 83
+   },
+   "sourceSize": {
+    "w": 25,
+    "h": 83
+   },
+   "pivot": {
+    "x": 0.48,
+    "y": 0.891566265060241
+   },
+   "duration": 67
+  }
+ ],
+ "meta": {
+  "app": "PixelLab VFX Creator",
+  "image": "fx-buff.png",
+  "format": "RGBA8888",
+  "size": {
+   "w": 100,
+   "h": 249
+  },
+  "scale": "1",
+  "anchor": {
+   "kind": "origin",
+   "x": 12,
+   "y": 74
+  },
+  "frameTags": [
+   {
+    "name": "fx-buff",
+    "from": 0,
+    "to": 9,
+    "direction": "forward"
+   }
+  ]
+ }
+}

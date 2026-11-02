@@ -1,3 +1,4 @@
+import { onBeforeSend } from './send';
 // 플러그인 쪽 게임 다리: 저장 칸·자산 팩·본편 스냅숏·결과 받기·화면을 하나로 묶어 게임 코드에 넘긴다.
 import { createUiPrefs } from './uiprefs';
 import type { GameBridge, SlotId } from '../../game/bridge';
@@ -7,10 +8,14 @@ import { gameAssets } from './packs';
 import { gameSaves } from './saves';
 import { gameTalk } from './talk';
 import { createVisit } from './visit';
-import { createField } from './field';
+import { createField, releaseField } from './field';
 import { createPeople } from './people';
 import { createWallet } from './wallet';
+import { createFieldState } from './fieldstate';
 import type { ViewportCtl } from './viewport';
+
+/** 게임을 닫을 때 다리가 호스트에 남긴 것을 푼다 */
+export function releaseBridge(b: GameBridge): void { if (b.field) releaseField(b.field); }
 
 export function makeBridge(viewport: ViewportCtl, slot: SlotId, close: () => void, onHidden?: GameBridge['onHidden']): GameBridge {
   return {
@@ -20,6 +25,7 @@ export function makeBridge(viewport: ViewportCtl, slot: SlotId, close: () => voi
     field: createField(),
     people: createPeople(),
     wallet: createWallet(),
+    fieldState: createFieldState(),
     slot,
     saves: gameSaves,
     assets: gameAssets,
@@ -33,5 +39,6 @@ export function makeBridge(viewport: ViewportCtl, slot: SlotId, close: () => voi
     narrow: () => matchMedia('(max-width: 760px)').matches,
     close,
     onHidden,
+    onBeforeSend,
   };
 }

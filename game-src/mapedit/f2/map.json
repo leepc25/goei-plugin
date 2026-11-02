@@ -1,0 +1,81 @@
+{
+ "file": "hq_f2_strip",
+ "bgScale": 2,
+ "w": 2348,
+ "h": 848,
+ "under": false,
+ "floor": [
+  [
+   140,
+   676
+  ],
+  [
+   2336,
+   676
+  ],
+  [
+   2336,
+   848
+  ],
+  [
+   140,
+   848
+  ]
+ ],
+ "lane": [
+  676,
+  836
+ ],
+ "blocks": [],
+ "doors": {
+  "swat": {
+   "kind": "steel",
+   "x": 764,
+   "y": 686,
+   "to": "swat",
+   "toDoor": "out",
+   "label": "진압팀",
+   "door": {
+    "x0": 610,
+    "x1": 918,
+    "y0": 292,
+    "y1": 652,
+    "anim": "none",
+    "behind": "dark"
+   }
+  },
+  "elev": {
+   "kind": "elevator",
+   "x": 1130,
+   "y": 686,
+   "label": "엘리베이터",
+   "door": {
+    "x0": 1016,
+    "x1": 1244,
+    "y0": 256,
+    "y1": 652,
+    "anim": "none",
+    "behind": "dark"
+   }
+  },
+  "wc": {
+   "kind": "door",
+   "x": 2128,
+   "y": 686,
+   "to": "wc",
+   "toDoor": "out",
+   "label": "화장실(남)",
+   "door": {
+    "x0": 2050,
+    "x1": 2206,
+    "y0": 346,
+    "y1": 652,
+    "anim": "none",
+    "behind": "dark"
+   }
+  }
+ },
+ "lamps": [],
+ "spots": [],
+ "objects": []
+}

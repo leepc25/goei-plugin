@@ -36,6 +36,10 @@ export interface Hit extends WBox {
   /** 히트스톱 틱 (기본 flinch 2, stagger 3, launch·down 5) */
   stop?: number;
   low?: boolean;
+  /** 크게 날리는 한 방(테스트룸 blow): 맞은 쪽은 크게 밀려나기(18_2) */
+  blow?: boolean;
+  /** 무기 쪽 공격(칼·총·투척·이능·기술·폭발, 무기 든 근접): 살해 허용일 때 기절한 몸을 죽일 수 있다. 맨손은 기절까지만 */
+  lethal?: boolean;
   grab?: boolean;
   armorBreak?: boolean;
   /** 강도 1·2·3 (효과음·충격파 크기) */
@@ -85,7 +89,7 @@ export type GameEvent =
   | { type: 'combat:start' | 'combat:boss' | 'combat:clear'; index: number }
   | { type: 'enter:floor'; floor: FloorPlan }
   | { type: 'hp:low' }
-  | { type: 'run:end'; how: 'return' | 'withdraw' | 'evac' }
+  | { type: 'run:end'; how: 'return' | 'withdraw' | 'evac' | 'death' }
   | { type: 'custom'; name: string; data?: unknown };
 
 /** 적·층·아이템이 보는 세계 */
@@ -172,7 +176,8 @@ export interface StageApi {
   readonly world: WorldView;
   spawn(s: SpawnSpec): void;
   setProp(id: string, patch: Partial<PropSpec> | null): void;
-  hurtPlayer(dmg: number, stagger?: boolean): void;
+  /** false = 무적·회피로 안 맞음 */
+  hurtPlayer(dmg: number, stagger?: boolean): boolean;
   heal(n: number): void;
   note(key: string, value: unknown): void;
   finish(how: 'next' | 'withdraw' | 'return'): void;
@@ -205,7 +210,7 @@ export interface RunConfigCore {
 
 /** 엔진이 채우는 결과. 본부의 RunResult가 이것을 포함하고 나머지는 notes(층·아이템 모듈 기록)에서 꺼낸다 */
 export interface RunResultCore {
-  how: 'return' | 'withdraw' | 'evac';
+  how: 'return' | 'withdraw' | 'evac' | 'death';
   floors: number;
   kills: number;
   maxCombo: number;

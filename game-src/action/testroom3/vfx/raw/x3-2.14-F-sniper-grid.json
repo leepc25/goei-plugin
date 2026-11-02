@@ -1,0 +1,287 @@
+{
+ "frames": [
+  {
+   "filename": "x3-2-14-f-sniper-grid 0.png",
+   "frame": {
+    "x": 0,
+    "y": 0,
+    "w": 1024,
+    "h": 380
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 1024,
+    "h": 380
+   },
+   "sourceSize": {
+    "w": 1024,
+    "h": 380
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.5
+   },
+   "duration": 71
+  },
+  {
+   "filename": "x3-2-14-f-sniper-grid 1.png",
+   "frame": {
+    "x": 1024,
+    "y": 0,
+    "w": 1024,
+    "h": 380
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 1024,
+    "h": 380
+   },
+   "sourceSize": {
+    "w": 1024,
+    "h": 380
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.5
+   },
+   "duration": 71
+  },
+  {
+   "filename": "x3-2-14-f-sniper-grid 2.png",
+   "frame": {
+    "x": 2048,
+    "y": 0,
+    "w": 1024,
+    "h": 380
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 1024,
+    "h": 380
+   },
+   "sourceSize": {
+    "w": 1024,
+    "h": 380
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.5
+   },
+   "duration": 71
+  },
+  {
+   "filename": "x3-2-14-f-sniper-grid 3.png",
+   "frame": {
+    "x": 3072,
+    "y": 0,
+    "w": 1024,
+    "h": 380
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 1024,
+    "h": 380
+   },
+   "sourceSize": {
+    "w": 1024,
+    "h": 380
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.5
+   },
+   "duration": 71
+  },
+  {
+   "filename": "x3-2-14-f-sniper-grid 4.png",
+   "frame": {
+    "x": 0,
+    "y": 380,
+    "w": 1024,
+    "h": 380
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 1024,
+    "h": 380
+   },
+   "sourceSize": {
+    "w": 1024,
+    "h": 380
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.5
+   },
+   "duration": 71
+  },
+  {
+   "filename": "x3-2-14-f-sniper-grid 5.png",
+   "frame": {
+    "x": 1024,
+    "y": 380,
+    "w": 1024,
+    "h": 380
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 1024,
+    "h": 380
+   },
+   "sourceSize": {
+    "w": 1024,
+    "h": 380
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.5
+   },
+   "duration": 71
+  },
+  {
+   "filename": "x3-2-14-f-sniper-grid 6.png",
+   "frame": {
+    "x": 2048,
+    "y": 380,
+    "w": 1024,
+    "h": 380
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 1024,
+    "h": 380
+   },
+   "sourceSize": {
+    "w": 1024,
+    "h": 380
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.5
+   },
+   "duration": 71
+  },
+  {
+   "filename": "x3-2-14-f-sniper-grid 7.png",
+   "frame": {
+    "x": 3072,
+    "y": 380,
+    "w": 1024,
+    "h": 380
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 1024,
+    "h": 380
+   },
+   "sourceSize": {
+    "w": 1024,
+    "h": 380
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.5
+   },
+   "duration": 71
+  },
+  {
+   "filename": "x3-2-14-f-sniper-grid 8.png",
+   "frame": {
+    "x": 0,
+    "y": 760,
+    "w": 1024,
+    "h": 380
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 1024,
+    "h": 380
+   },
+   "sourceSize": {
+    "w": 1024,
+    "h": 380
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.5
+   },
+   "duration": 71
+  },
+  {
+   "filename": "x3-2-14-f-sniper-grid 9.png",
+   "frame": {
+    "x": 1024,
+    "y": 760,
+    "w": 1024,
+    "h": 380
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 1024,
+    "h": 380
+   },
+   "sourceSize": {
+    "w": 1024,
+    "h": 380
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.5
+   },
+   "duration": 71
+  }
+ ],
+ "meta": {
+  "app": "PixelLab VFX Creator",
+  "image": "x3-2-14-f-sniper-grid.png",
+  "format": "RGBA8888",
+  "size": {
+   "w": 4096,
+   "h": 1140
+  },
+  "scale": "1",
+  "anchor": {
+   "kind": "origin",
+   "x": 512,
+   "y": 190
+  },
+  "frameTags": [
+   {
+    "name": "x3-2-14-f-sniper-grid",
+    "from": 0,
+    "to": 9,
+    "direction": "forward"
+   }
+  ]
+ }
+}

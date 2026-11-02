@@ -127,7 +127,7 @@ export const liveUrls = () => [...urls.values()].reduce((n, m) => n + m.size, 0)
 async function fileUrl(id: string, file: string): Promise<string> {
   const have = urls.get(id)?.get(file);
   if (have) return have;
-  const s = await stored(id);
+  const s = await ensure(id);
   const row = s?.files[file] ?? s?.files[`${file}.png`];
   if (!row) return '';
   const u = URL.createObjectURL(new Blob([unbase64(row[1]) as BlobPart], { type: row[0] }));
@@ -137,12 +137,38 @@ async function fileUrl(id: string, file: string): Promise<string> {
   return u;
 }
 
+// ── 필요할 때 받기 (11-02) ──
+// 「받기」는 required 팩만 받는다. 인물 팩(char-*)·공용 이펙트(action-fx)·뱃지 같은 선택 팩은 게임이 처음 쓰려 할 때 목록(index.json)에서 찾아 그때 받아 둔다
+// (src/game/action/art/charPacks.ts: 「인물은 고를 때 받는다」). 받는 중이면 같은 약속을 돌려주고, 못 받으면 없는 것으로 친다.
+const fetching = new Map<string, Promise<Stored | null>>();
+async function ensure(id: string): Promise<Stored | null> {
+  const have = await stored(id);
+  if (have) return have;
+  let p = fetching.get(id);
+  if (!p) {
+    p = (async () => {
+      try {
+        const entry = (await gameIndex()).packs.find((e) => e.id === id);
+        if (!entry) return null;
+        await downloadGamePack(entry);
+        return await stored(id);
+      } catch {
+        return null;
+      } finally {
+        fetching.delete(id);
+      }
+    })();
+    fetching.set(id, p);
+  }
+  return p;
+}
+
 export const gameAssets: GameAssets = {
-  ready: async (id) => !!(await stored(id)),
+  ready: async (id) => !!(await ensure(id)),
   url: fileUrl,
-  atlas: async (id) => (await stored(id))?.atlas ?? null,
+  atlas: async (id) => (await ensure(id))?.atlas ?? null,
   bytes: async (id, file) => {
-    const row = (await stored(id))?.files[file];
+    const row = (await ensure(id))?.files[file];
     return row ? unbase64(row[1]) : null;
   },
   list: async () => {

@@ -88,9 +88,8 @@ export class World implements WorldView {
   kills = 0;
   floors = 0;
   notes: Record<string, unknown> = {};
-  ended: 'next' | 'withdraw' | 'return' | 'evac' | null = null;
+  ended: 'next' | 'withdraw' | 'return' | 'evac' | 'death' | null = null;
   itemState?: { snapshot(): unknown; restore(v: unknown): void };
-  recovery?: WorldView['recovery'];
   /** 전투·공중·투사체가 없는 안정된 시점만 저장한다. */
   canCheckpoint() {
     return !this.ended && this.player.hp > 0 && this.player.phase === 'free' && !this.player.move && !this.player.airborne && !this.player.grabbed
@@ -100,16 +99,18 @@ export class World implements WorldView {
   snapshot(): string {
     const keys = ['x', 'y', 'dir', 'hp', 'hpMax', 'ammo', 'mag', 'reserve', 'gauge', 'guardMeter', 'skillCd', 'maxCombo', 'ward', 'dmgMul'] as const;
     return encodeState({ tick: this.tick, kills: this.kills, floors: this.floors, notes: this.notes, rng: this.rand.state(),
-      player: Object.fromEntries(keys.map(k => [k, this.player[k]])), items: this.itemState?.snapshot() });
+      player: Object.fromEntries(keys.map(k => [k, this.player[k]])), items: this.itemState?.snapshot(), perks: (this.player as { perks?: { snapshot(): unknown } }).perks?.snapshot() });
   }
   restore(state: string) {
-    const s = decodeState<{ tick: number; kills: number; floors: number; notes: Record<string, unknown>; rng: number; player: Partial<Player>; items: unknown }>(state);
+    const s = decodeState<{ tick: number; kills: number; floors: number; notes: Record<string, unknown>; rng: number; player: Partial<Player>; items: unknown; perks?: unknown }>(state);
     if (!s.player || !(Number(s.player.hp) > 0)) throw new Error('손상된 출동 상태');
     this.tick = s.tick; this.kills = s.kills; this.floors = s.floors; this.notes = s.notes;
     Object.assign(this.player, s.player);
     this.player.px = this.player.x; this.player.py = this.player.y;
     this.player.resetLocomotion();
     this.itemState?.restore(s.items);
+    // 임시 퍽(괴이 한 판): 퍽·등급·쌓임·깬 방 수 (src/game/perks/runtime.ts)
+    (this.player as { perks?: { restore(v: unknown): void } }).perks?.restore(s.perks);
     this.rand.restore(s.rng);
     this.camera();
     this.prevCamX = this.camX;
@@ -170,8 +171,9 @@ export class World implements WorldView {
       },
       hurtPlayer: (dmg, stagger = true) => {
         const p = this.player;
-        if (stagger) p.applyHit({ x0: 0, x1: 0, z0: 0, z1: 0, y: p.y, attackId: newAttackId(), dmg, react: 'flinch', dir: (-p.dir) as 1 | -1, push: 2 }, this);
-        else p.hp = Math.max(0, p.hp - dmg);
+        if (stagger) return p.applyHit({ x0: 0, x1: 0, z0: 0, z1: 0, y: p.y, attackId: newAttackId(), dmg, react: 'flinch', dir: (-p.dir) as 1 | -1, push: 2 }, this).kind !== 'immune';
+        p.hp = Math.max(0, p.hp - dmg);
+        return true;
       },
       heal: (n) => {
         this.player.hp = Math.min(this.player.hpMax, this.player.hp + n);
@@ -340,9 +342,9 @@ export class World implements WorldView {
     if (this.stage?.tick) this.stage.tick(this.stageApi, this.floor);
     const exitX = this.floor.exitX ?? this.floor.length - 80;
     if (this.encActive < 0 && p.x >= exitX && !this.ended) this.ended = 'next';
-    // 플레이어 쓰러짐 → 후송
+    // 플레이어 쓰러짐 → 후송. 영구 사망으로 죽었으면(killed) 사망
     if (p.phase === 'dead' || (p.hp <= 0 && p.phase === 'down')) {
-      if (++this.deadT > 75 && !this.ended) this.ended = 'evac';
+      if (++this.deadT > 75 && !this.ended) this.ended = (p as { killed?: unknown }).killed ? 'death' : 'evac';
     }
     this.camera();
     p.finishLocomotion();

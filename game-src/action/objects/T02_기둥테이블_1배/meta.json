@@ -1,0 +1,87 @@
+{
+ "object_id": "e48d04b0-47aa-43c6-b29c-70a34ecf0e29",
+ "job": {
+  "usage": {
+   "type": "generations",
+   "generations": 9.0
+  },
+  "id": "ce820c07-6eaf-400f-bca5-191a2739e303",
+  "status": "completed",
+  "created_at": "2026-11-01T17:38:56.075067+00:00",
+  "last_response": {
+   "status": "completed",
+   "progress": 1,
+   "object_id": "e48d04b0-47aa-43c6-b29c-70a34ecf0e29",
+   "image_size": {
+    "width": 256,
+    "height": 256
+   },
+   "frame_count": 1,
+   "single_frame": true,
+   "storage_urls": {
+    "unknown": "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/e48d04b0-47aa-43c6-b29c-70a34ecf0e29/rotations/unknown.png"
+   },
+   "billing_usage": {
+    "type": "generations",
+    "generations": 9.0
+   },
+   "generation_id": "274aa7cb-4574-4540-aeae-aba9e2a4c1a2",
+   "billing_stages": [
+    {
+     "stage": "first_direction",
+     "usage": {
+      "usd": 0.0,
+      "type": "generations",
+      "generations": 9
+     },
+     "generation_id": "274aa7cb-4574-4540-aeae-aba9e2a4c1a2"
+    }
+   ],
+   "billing_charged": true,
+   "generation_mode": "pro_flash",
+   "source_image_id": "2d16973e-a83d-5ab4-9760-1d78da6e44b2",
+   "directions_count": 1,
+   "first_direction_generated": true
+  }
+ },
+ "object": {
+  "id": "e48d04b0-47aa-43c6-b29c-70a34ecf0e29",
+  "name": "T02_기둥테이블_1배",
+  "state_name": "base",
+  "prompt": "A plain square break-room table on a single thick central column with a wide flat round base, no legs at the corners: light wood square top, dark gray metal column and base. Seen from the front and only slightly from above, so the top surface shows as a shallow band and the front edge of the top is clearly visible. The table is much wider than it is tall and fills almost the whole width of the canvas. Only the table, centered, nothing else.",
+  "size": {
+   "width": 256,
+   "height": 256
+  },
+  "directions": 1,
+  "created_at": "2026-11-01T17:38:56.103257+00:00",
+  "view": "low top-down",
+  "rotation_urls": {
+   "south": null,
+   "west": null,
+   "east": null,
+   "north": null,
+   "south-east": null,
+   "south-west": null,
+   "north-east": null,
+   "north-west": null
+  },
+  "storage_urls": {
+   "unknown": "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/e48d04b0-47aa-43c6-b29c-70a34ecf0e29/rotations/unknown.png"
+  },
+  "frame_urls": null,
+  "style_settings": {
+   "version": "v2.0.0+api",
+   "no_background": true,
+   "generation_mode": "pro_flash",
+   "source_image_id": "2d16973e-a83d-5ab4-9760-1d78da6e44b2",
+   "first_frame_direction": "south"
+  },
+  "tags": [],
+  "status": "completed",
+  "group_id": "bf204d00-73c5-4f41-ab5e-026bb2025dfd",
+  "progress_percent": null,
+  "eta_seconds": null,
+  "animations": []
+ }
+}

@@ -490,6 +490,23 @@ const heartbeat: Recipe = (o, t, p) => {
   return 0.5;
 };
 
+/** 거점 경보 사이렌 한 바퀴 (10-31 필드 기능 9번): 오르내리는 두 음 울림. 경보 중 1.6초마다 다시 튼다 */
+const siren: Recipe = (o, t, p) => {
+  const v = voice(o, p.dest, t, p.vol * 0.55, p.pan, 0.25);
+  const lp = filt(o, 'lowpass', 2600, 0.8, v);
+  const g = gainNode(o, 0, lp);
+  g.gain.setValueAtTime(0, t);
+  g.gain.linearRampToValueAtTime(0.5, t + 0.08);
+  g.gain.setValueAtTime(0.5, t + 1.35);
+  g.gain.linearRampToValueAtTime(0, t + 1.55);
+  for (const [type, k] of [['sawtooth', 1], ['square', 1.5]] as const) {
+    const n = osc(o, type, 620 * k, t, 1.55, g);
+    n.frequency.linearRampToValueAtTime(980 * k, t + 0.75);
+    n.frequency.linearRampToValueAtTime(620 * k, t + 1.5);
+  }
+  return 1.6;
+};
+
 const enemyStep: Recipe = (o, t, p) => {
   // 어둠의 층: 보이지 않는 것의 발소리. 몸이 없는 듯 축축하고 무겁게
   const v = voice(o, p.dest, t, p.vol, p.pan, 0.3);
@@ -1036,6 +1053,7 @@ export const SFX = {
   save: d('저장', 'ui', save, 'ui'),
   coin: d('보상', 'ui', coin, 'ui'),
   levelUp: d('강화', 'ui', levelUp, 'ui'),
+  siren: d('거점 경보 사이렌', 'world', siren),
 } satisfies Record<string, SfxDef>;
 
 export type SfxId = keyof typeof SFX;

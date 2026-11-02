@@ -487,7 +487,7 @@ export class Game {
         c.fillText('ANOMALY SIMULATION', SCREEN_W / 2, 120);
         c.font = pfont(58).f;
         c.fillStyle = '#e8eef0';
-        c.fillText('관리국 · 차원 승강기', SCREEN_W / 2, 190);
+        c.fillText('괴이 ː ANOMALY', SCREEN_W / 2, 190);
         this.drawMenu('', this.titleItems, false);
         c.fillStyle = '#8e9aa1';
         c.font = pfont(20).f;
@@ -511,7 +511,7 @@ export class Game {
   private resultScene(r: RunResultCore): Scene {
     this.menuIndex = 0;
     this.menuItems = [];
-    const how = { return: '귀환', withdraw: '철수', evac: '후송' }[r.how];
+    const how = { return: '귀환', withdraw: '철수', evac: '후송', death: '사망' }[r.how];
     let t = 0;
     return {
       name: 'result',
@@ -523,7 +523,7 @@ export class Game {
         c.fillStyle = '#0d1114';
         c.fillRect(0, 0, SCREEN_W, SCREEN_H);
         c.textAlign = 'center';
-        c.fillStyle = r.how === 'evac' ? '#ff6a5a' : '#7fe0a0';
+        c.fillStyle = r.how === 'death' ? '#c23030' : r.how === 'evac' ? '#ff6a5a' : '#7fe0a0';
         c.font = pfont(64).f;
         c.fillText(how, SCREEN_W / 2, 200);
         c.fillStyle = '#e8eef0';

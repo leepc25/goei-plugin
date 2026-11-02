@@ -390,3 +390,8 @@ export function drawGuardBar(c: CanvasRenderingContext2D, x: number, y: number, 
   if (broken) { c.fillStyle = INK; c.fillRect(x0 + 1 + Math.round((W - 2) * 0.4), y0, 1, H); }
   c.restore();
 }
+
+/* 통합창(charWindow.ts)이 같은 틀·글자·아이콘을 쓰도록 내보낸다 */
+export const hudArtImage = (k: Key) => img(k);
+export const pixelIcon = icon;
+export const putText = put;

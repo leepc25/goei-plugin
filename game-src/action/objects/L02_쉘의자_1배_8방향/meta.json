@@ -1,0 +1,102 @@
+{
+ "object_id": "44404329-2e25-49ab-9ef8-ed163584cfb4",
+ "job": {
+  "usage": {
+   "type": "generations",
+   "generations": 5.0
+  },
+  "id": "302ed8a1-bfaf-4507-82ff-c72e4a0e84ae",
+  "status": "completed",
+  "created_at": "2026-11-01T17:32:58.649205+00:00",
+  "last_response": {
+   "status": "completed",
+   "progress": 1,
+   "object_id": "44404329-2e25-49ab-9ef8-ed163584cfb4",
+   "image_size": {
+    "width": 200,
+    "height": 200
+   },
+   "frame_count": 8,
+   "single_frame": false,
+   "storage_urls": {
+    "east": "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/44404329-2e25-49ab-9ef8-ed163584cfb4/rotations/east.png",
+    "west": "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/44404329-2e25-49ab-9ef8-ed163584cfb4/rotations/west.png",
+    "north": "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/44404329-2e25-49ab-9ef8-ed163584cfb4/rotations/north.png",
+    "south": "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/44404329-2e25-49ab-9ef8-ed163584cfb4/rotations/south.png",
+    "north-east": "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/44404329-2e25-49ab-9ef8-ed163584cfb4/rotations/north-east.png",
+    "north-west": "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/44404329-2e25-49ab-9ef8-ed163584cfb4/rotations/north-west.png",
+    "south-east": "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/44404329-2e25-49ab-9ef8-ed163584cfb4/rotations/south-east.png",
+    "south-west": "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/44404329-2e25-49ab-9ef8-ed163584cfb4/rotations/south-west.png"
+   },
+   "billing_usage": {
+    "type": "generations",
+    "generations": 5.0
+   },
+   "generation_id": "5a34e7ff-4c96-43bf-869e-721d13169c5b",
+   "billing_stages": [
+    {
+     "stage": "rotations",
+     "usage": {
+      "usd": 0.0,
+      "type": "generations",
+      "generations": 5,
+      "cost_if_paid": 0.02674298255311118
+     },
+     "generation_id": "5a34e7ff-4c96-43bf-869e-721d13169c5b"
+    }
+   ],
+   "billing_charged": true,
+   "generation_mode": "pro_flash",
+   "source_image_id": null,
+   "directions_count": 8,
+   "first_direction_generated": false
+  }
+ },
+ "object": {
+  "id": "44404329-2e25-49ab-9ef8-ed163584cfb4",
+  "name": "L02_쉘의자_1배_8방향",
+  "state_name": "base",
+  "prompt": "A plain modern plastic shell chair for an office break room: the seat and backrest are one smooth molded plastic shell with no gap, the back fully closed, light gray shell, four thin straight black metal legs, no armrests. Same size in every direction: about 135 pixels tall, seat about 64 pixels above the floor. Only the chair, centered, nothing else.",
+  "size": {
+   "width": 200,
+   "height": 200
+  },
+  "directions": 8,
+  "created_at": "2026-11-01T17:32:58.681261+00:00",
+  "view": "low top-down",
+  "rotation_urls": {
+   "south": "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/44404329-2e25-49ab-9ef8-ed163584cfb4/rotations/south.png",
+   "west": "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/44404329-2e25-49ab-9ef8-ed163584cfb4/rotations/west.png",
+   "east": "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/44404329-2e25-49ab-9ef8-ed163584cfb4/rotations/east.png",
+   "north": "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/44404329-2e25-49ab-9ef8-ed163584cfb4/rotations/north.png",
+   "south-east": "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/44404329-2e25-49ab-9ef8-ed163584cfb4/rotations/south-east.png",
+   "south-west": "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/44404329-2e25-49ab-9ef8-ed163584cfb4/rotations/south-west.png",
+   "north-east": "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/44404329-2e25-49ab-9ef8-ed163584cfb4/rotations/north-east.png",
+   "north-west": "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/44404329-2e25-49ab-9ef8-ed163584cfb4/rotations/north-west.png"
+  },
+  "storage_urls": {
+   "east": "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/44404329-2e25-49ab-9ef8-ed163584cfb4/rotations/east.png",
+   "west": "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/44404329-2e25-49ab-9ef8-ed163584cfb4/rotations/west.png",
+   "north": "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/44404329-2e25-49ab-9ef8-ed163584cfb4/rotations/north.png",
+   "south": "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/44404329-2e25-49ab-9ef8-ed163584cfb4/rotations/south.png",
+   "north-east": "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/44404329-2e25-49ab-9ef8-ed163584cfb4/rotations/north-east.png",
+   "north-west": "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/44404329-2e25-49ab-9ef8-ed163584cfb4/rotations/north-west.png",
+   "south-east": "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/44404329-2e25-49ab-9ef8-ed163584cfb4/rotations/south-east.png",
+   "south-west": "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/44404329-2e25-49ab-9ef8-ed163584cfb4/rotations/south-west.png"
+  },
+  "frame_urls": null,
+  "style_settings": {
+   "version": "v2.0.0+api",
+   "no_background": true,
+   "generation_mode": "pro_flash",
+   "source_image_id": null,
+   "first_frame_direction": "south"
+  },
+  "tags": [],
+  "status": "completed",
+  "group_id": "0c971dd9-45b4-4306-8d27-3fa0f2e5045a",
+  "progress_percent": null,
+  "eta_seconds": null,
+  "animations": []
+ }
+}

@@ -1,0 +1,3 @@
+Copy only the camera angle, the low viewing height, the perspective, the pixel density and the level of detail and shading of this image. Do not copy any of its objects, furniture, layout, room shape or colors.
+
+Layout guide. Follow exactly the positions, sizes and shapes of these blocks: the left side wall, the reception counter along it, the two doors on the back wall and every object at its marked place. The grey human shapes only show the size of a person, do not draw them. Do not copy the flat colours or the plain style of this guide.

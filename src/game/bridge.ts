@@ -98,7 +98,7 @@ export interface GameReport {
   /** 같은 출동을 두 번 넘겨도 한 번만 받도록 (예: 출동 시드) */
   id?: string;
   mission: string;
-  outcome: 'return' | 'evac' | 'withdraw';
+  outcome: 'return' | 'evac' | 'withdraw' | 'death';
   /** 예: B-12 */
   depth: string;
   agents: { id: string; name: string; hp?: number; injured?: boolean }[];
@@ -137,19 +137,27 @@ export interface VisitState {
   /** 본부에 온 사람: 상황판 주인공(캐릭터로 플레이)이면 그 요원, 아니면 유저 페르소나(agentId '') */
   visitor: { agentId: string; name: string };
   agents: { id: string; name: string; state: string; situation: string; room: string | null }[];
-  turns: { id: string; at: number; agentId: string; name: string; user: string; reply: string; visitor?: string; act?: boolean; extra?: { agentId: string; name: string; line: string }[] }[];
+  turns: { id: string; at: number; agentId: string; name: string; user: string; reply: string; visitor?: string; act?: boolean; extra?: { agentId: string; name: string; line: string }[]; /** 답 끝의 필드 행동 표시 (follow·wait·return·permit·alarm) */ tags?: string[] }[];
 }
+/** 필드에서 말을 걸 때 게임이 알려 주는 것: 하던 일, 이번 답에 쓸 수 있는 행동 표시 */
+export interface TalkOpts { doing?: string; tags?: ('follow' | 'wait' | 'return' | 'permit' | 'alarm')[] }
 export interface GameVisit {
   state(): Promise<VisitState>;
   /** nearby = 같은 방 가까이 있어 끼어들 수 있는 요원 id */
-  send(agentId: string, text: string, which: 'main' | 'aux', nearby?: string[]): Promise<VisitState>;
+  send(agentId: string, text: string, which: 'main' | 'aux', nearby?: string[], opts?: TalkOpts): Promise<VisitState>;
+  /** 몹(이름 없는 사람)에게 말 걸기 (10-31 사용자: 이름 인물과 같이 모델 호출). 주고받은 말은 이름 인물 대화와 같이 원문 그대로 본편 요청에 들어간다 */
+  sendMob?(mob: MobTalk, text: string): Promise<VisitState>;
 }
+/** 말을 거는 몹: id(이번 필드 동안 같은 사람), 이름표(「행인(여·60대 후반)」), 모델에 줄 인물 글(그림 신상·말투·성격·태도), 장소, 하던 일 */
+export interface MobTalk { id: string; name: string; lore: string; place: string; doing: string; /** 이번 답에 쓸 수 있는 행동 표시 (경고 중인 경비 = permit·alarm) */ tags?: TalkOpts['tags'] }
 
 /** 필드 장부에 남길 사건 (게임 코드가 만든다). 본편 응답을 요청할 때 정제돼 들어간다 (docs/필드_기능_설계.md 8장) */
 export interface GameFieldEvent {
   kind: string;
-  /** 사람이 읽는 한 줄 */
+  /** 모델에게 가는 한 줄 = 활동 결과 (영어 짧은 문장, 주인공 {user}) */
   text: string;
+  /** 사람이 읽는 한 줄 = 기록 메뉴 보고서 (한글). 빈 글 = 보고서에 안 넣음, 없으면 text */
+  ko?: string;
   scene?: string;
   who?: string[];
   weight?: 1 | 2 | 3;
@@ -220,6 +228,9 @@ export interface GamePeople {
   sheet(name: string): Promise<string | null>;
   /** 세력 평판 전부 (아는 세력 모두, 장부가 없으면 시작값). 기능이 꺼져 있으면 빈 목록 */
   factions(): Promise<FactionView[]>;
+  /** 세력끼리 관계 (설정 → 세력 관계, 카드에서 고친 값 또는 기본 표). 열쇠 「보는 쪽 코드>대상 코드」(예: A00>B00), 중립은 빠짐.
+   *  세력 평판 기능이 꺼져 있으면 null → 게임은 자기 기본값(world/factions.ts, 10-31 사용자) */
+  relations?(): Promise<Record<string, FactionView['stage']> | null>;
   /** 기록이 갱신될 때 (갱신기가 끝났을 때) */
   onChange(cb: () => void): () => void;
 }
@@ -230,6 +241,12 @@ export interface GameWallet {
   balance(): Promise<number | null>;
   /** 필드 거래 한 줄: 들어오면 +, 나가면 −. 모자라도 적는다(마이너스 = 빚, 막는 건 게임이). where = 필드 장면 이름·필드 시각(가계부 줄에 보임). 적은 뒤 잔고, 못 적으면 null */
   add(amount: number, memo: string, where?: { place?: string; time?: string }): Promise<number | null>;
+}
+
+/** 필드 가방·가게 재고 (채팅 변수 $fd_state, JSON). 없으면 게임은 이번 방문 동안만 기억한다 */
+export interface GameFieldState {
+  load(): Promise<string | null>;
+  save(text: string): Promise<void>;
 }
 
 export interface GameUiPrefs {
@@ -248,6 +265,8 @@ export interface GameBridge {
   people?: GamePeople;
   /** 가계부 (없으면 옛 플러그인: 게임은 돈을 쓰지 않는다) */
   wallet?: GameWallet;
+  /** 필드 가방·가게 재고 */
+  fieldState?: GameFieldState;
   readonly api: 1;
   /** NPC 자유 대화. 없으면 게임은 미리 쓴 대사로만 답한다 */
   talk?: GameTalk;
@@ -271,6 +290,8 @@ export interface GameBridge {
   close(): void;
   /** 창의 다른 탭으로 가서 게임이 안 보이게 됐다/다시 보인다. 게임은 멈추고 소리를 끈다 (2026-10-23) */
   onHidden?(cb: (hidden: boolean) => void): () => void;
+  /** 본편 응답을 보내기 직전에 부른다 (10-31: 응답을 보내면 필드 마감). 콜백이 끝날 때까지(최대 3초) 요청이 기다린다 */
+  onBeforeSend?(cb: () => Promise<void>): () => void;
 }
 
 /** 코드 팩이 남기는 것 */

@@ -33,7 +33,7 @@ test('본부: 방은 아래 출구로 복도에 연결', () => {
     const isHall = HALLS.includes(sc.id);
     for (const d of sc.doors) {
       if (isHall) assert.ok(d.side !== 'S', `${sc.id}.${d.id} 복도 남쪽 문`);
-      else if (d.to) assert.equal(d.side, 'S', `${sc.id}.${d.id} 방 출구 방향`);
+      else if (d.to && !(sc.painted && d.kind === 'exit' && M.PAINTED_DOORS(sc.painted)[d.id])) assert.equal(d.side, 'S', `${sc.id}.${d.id} 방 출구 방향`);   // 맵 에디터 방(샤워실)은 그림 속 옆벽 문으로 나간다
     }
   }
 });
@@ -44,7 +44,8 @@ test('본부: 층마다 엘리베이터, 계단은 3층~B1 위아래 층의 계�
     assert.ok(sc.doors.some((d) => d.kind === 'elevator'), `${id} 엘리베이터`);
     assert.ok(M.ELEVATOR.some((e) => e.scene === id), `${id} 엘리베이터 단추`);
     const st = sc.doors.find((d) => d.kind === 'stairs');
-    if (id === 'b2' || id === 'b3') { assert.ok(!st, `${id} 계단 없음`); continue; }
+    // 본부는 새 그림(11-01, 엘리베이터만)이라 1층 포함 모든 층 계단 없음
+    if (['b2', 'b3', 'f3', 'f2', 'b1', 'lobby'].includes(id)) { assert.ok(!st, `${id} 계단 없음`); continue; }
     assert.ok(st, `${id} 계단`);
     for (const to of [st.up, st.down].filter(Boolean)) {
       const back = byId[to].doors.find((d) => d.kind === 'stairs');

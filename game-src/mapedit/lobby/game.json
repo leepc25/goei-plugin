@@ -1,0 +1,531 @@
+{
+ "scene": {
+  "file": "me_lobby",
+  "w": 1888,
+  "h": 848,
+  "under": true,
+  "lane": [
+   600,
+   836
+  ],
+  "floor": [
+   [
+    0,
+    762
+   ],
+   [
+    24,
+    760
+   ],
+   [
+    40,
+    752
+   ],
+   [
+    52,
+    742
+   ],
+   [
+    54,
+    732
+   ],
+   [
+    76,
+    732
+   ],
+   [
+    110,
+    716
+   ],
+   [
+    112,
+    692
+   ],
+   [
+    120,
+    686
+   ],
+   [
+    300,
+    594
+   ],
+   [
+    308,
+    604
+   ],
+   [
+    352,
+    604
+   ],
+   [
+    354,
+    594
+   ],
+   [
+    410,
+    594
+   ],
+   [
+    410,
+    614
+   ],
+   [
+    796,
+    614
+   ],
+   [
+    796,
+    588
+   ],
+   [
+    936,
+    588
+   ],
+   [
+    936,
+    576
+   ],
+   [
+    1320,
+    576
+   ],
+   [
+    1440,
+    586
+   ],
+   [
+    1520,
+    604
+   ],
+   [
+    1596,
+    622
+   ],
+   [
+    1636,
+    628
+   ],
+   [
+    1700,
+    640
+   ],
+   [
+    1776,
+    662
+   ],
+   [
+    1794,
+    666
+   ],
+   [
+    1888,
+    686
+   ],
+   [
+    1888,
+    836
+   ],
+   [
+    0,
+    836
+   ]
+  ],
+  "holes": [
+   [
+    [
+     936,
+     576
+    ],
+    [
+     1256,
+     576
+    ],
+    [
+     1256,
+     670
+    ],
+    [
+     1078,
+     670
+    ],
+    [
+     1078,
+     706
+    ],
+    [
+     1050,
+     706
+    ],
+    [
+     1050,
+     652
+    ],
+    [
+     982,
+     652
+    ],
+    [
+     982,
+     614
+    ],
+    [
+     936,
+     614
+    ]
+   ],
+   [
+    [
+     1148,
+     698
+    ],
+    [
+     1172,
+     698
+    ],
+    [
+     1172,
+     688
+    ],
+    [
+     1236,
+     728
+    ],
+    [
+     1256,
+     728
+    ],
+    [
+     1256,
+     736
+    ],
+    [
+     1328,
+     786
+    ],
+    [
+     1328,
+     800
+    ],
+    [
+     1360,
+     800
+    ],
+    [
+     1360,
+     860
+    ],
+    [
+     1320,
+     860
+    ],
+    [
+     1320,
+     798
+    ],
+    [
+     1256,
+     752
+    ],
+    [
+     1256,
+     768
+    ],
+    [
+     1230,
+     768
+    ],
+    [
+     1230,
+     738
+    ],
+    [
+     1174,
+     706
+    ],
+    [
+     1174,
+     712
+    ],
+    [
+     1148,
+     712
+    ]
+   ]
+  ],
+  "dotK": 1.4292,
+  "blocks": [],
+  "doors": {
+   "main": {
+    "x0": 120,
+    "x1": 300,
+    "y0": 240,
+    "y1": 660,
+    "anim": "none",
+    "behind": "dark"
+   },
+   "elev": {
+    "x0": 1600,
+    "x1": 1794,
+    "y0": 290,
+    "y1": 654,
+    "anim": "none",
+    "behind": "dark"
+   }
+  },
+  "lamps": [],
+  "windows": [],
+  "objects": [
+   {
+    "id": "gate_flaps",
+    "file": "me_lobby_gate_flaps",
+    "x": 1078,
+    "y": 554,
+    "w": 72,
+    "h": 114,
+    "sortY": 704,
+    "gate": true
+   },
+   {
+    "id": "gate_back",
+    "file": "me_lobby_gate_back",
+    "x": 982,
+    "y": 510,
+    "w": 172,
+    "h": 142,
+    "sortY": 650
+   },
+   {
+    "id": "gate_front",
+    "file": "me_lobby_gate_front",
+    "x": 1050,
+    "y": 530,
+    "w": 210,
+    "h": 180,
+    "sortY": 704
+   },
+   {
+    "id": "post_mid",
+    "file": "me_lobby_post_mid",
+    "x": 1230,
+    "y": 584,
+    "w": 26,
+    "h": 182,
+    "sortY": 764
+   },
+   {
+    "id": "post_end",
+    "file": "me_lobby_post_end",
+    "x": 1322,
+    "y": 608,
+    "w": 36,
+    "h": 226,
+    "sortY": 832
+   },
+   {
+    "id": "glass1_0",
+    "file": "me_lobby_glass1_0",
+    "x": 1174,
+    "y": 572,
+    "w": 8,
+    "h": 130,
+    "sortY": 700
+   },
+   {
+    "id": "glass1_1",
+    "file": "me_lobby_glass1_1",
+    "x": 1182,
+    "y": 574,
+    "w": 8,
+    "h": 134,
+    "sortY": 706
+   },
+   {
+    "id": "glass1_2",
+    "file": "me_lobby_glass1_2",
+    "x": 1190,
+    "y": 578,
+    "w": 8,
+    "h": 136,
+    "sortY": 712
+   },
+   {
+    "id": "glass1_3",
+    "file": "me_lobby_glass1_3",
+    "x": 1198,
+    "y": 580,
+    "w": 8,
+    "h": 138,
+    "sortY": 716
+   },
+   {
+    "id": "glass1_4",
+    "file": "me_lobby_glass1_4",
+    "x": 1206,
+    "y": 584,
+    "w": 8,
+    "h": 140,
+    "sortY": 722
+   },
+   {
+    "id": "glass1_5",
+    "file": "me_lobby_glass1_5",
+    "x": 1214,
+    "y": 586,
+    "w": 8,
+    "h": 144,
+    "sortY": 728
+   },
+   {
+    "id": "glass1_6",
+    "file": "me_lobby_glass1_6",
+    "x": 1222,
+    "y": 588,
+    "w": 8,
+    "h": 148,
+    "sortY": 734
+   },
+   {
+    "id": "glass1_7",
+    "file": "me_lobby_glass1_7",
+    "x": 1230,
+    "y": 592,
+    "w": 4,
+    "h": 146,
+    "sortY": 736
+   },
+   {
+    "id": "glass2_0",
+    "file": "me_lobby_glass2_0",
+    "x": 1254,
+    "y": 600,
+    "w": 8,
+    "h": 146,
+    "sortY": 744
+   },
+   {
+    "id": "glass2_1",
+    "file": "me_lobby_glass2_1",
+    "x": 1262,
+    "y": 602,
+    "w": 8,
+    "h": 150,
+    "sortY": 750
+   },
+   {
+    "id": "glass2_2",
+    "file": "me_lobby_glass2_2",
+    "x": 1270,
+    "y": 604,
+    "w": 8,
+    "h": 154,
+    "sortY": 756
+   },
+   {
+    "id": "glass2_3",
+    "file": "me_lobby_glass2_3",
+    "x": 1278,
+    "y": 608,
+    "w": 8,
+    "h": 156,
+    "sortY": 762
+   },
+   {
+    "id": "glass2_4",
+    "file": "me_lobby_glass2_4",
+    "x": 1286,
+    "y": 610,
+    "w": 8,
+    "h": 160,
+    "sortY": 768
+   },
+   {
+    "id": "glass2_5",
+    "file": "me_lobby_glass2_5",
+    "x": 1294,
+    "y": 612,
+    "w": 8,
+    "h": 164,
+    "sortY": 774
+   },
+   {
+    "id": "glass2_6",
+    "file": "me_lobby_glass2_6",
+    "x": 1302,
+    "y": 614,
+    "w": 8,
+    "h": 168,
+    "sortY": 780
+   },
+   {
+    "id": "glass2_7",
+    "file": "me_lobby_glass2_7",
+    "x": 1310,
+    "y": 618,
+    "w": 8,
+    "h": 170,
+    "sortY": 786
+   },
+   {
+    "id": "glass2_8",
+    "file": "me_lobby_glass2_8",
+    "x": 1318,
+    "y": 620,
+    "w": 8,
+    "h": 174,
+    "sortY": 792
+   },
+   {
+    "id": "glass2_9",
+    "file": "me_lobby_glass2_9",
+    "x": 1326,
+    "y": 622,
+    "w": 2,
+    "h": 174,
+    "sortY": 794
+   },
+   {
+    "id": "post_c",
+    "file": "me_lobby_post_c",
+    "x": 938,
+    "y": 488,
+    "w": 46,
+    "h": 126,
+    "sortY": 612
+   }
+  ],
+  "posts": {
+   "desk": [
+    600,
+    632
+   ]
+  }
+ },
+ "spots": [],
+ "files": [
+  "me_lobby",
+  "me_lobby_gate_flaps",
+  "me_lobby_gate_back",
+  "me_lobby_gate_front",
+  "me_lobby_post_mid",
+  "me_lobby_post_end",
+  "me_lobby_glass1_0",
+  "me_lobby_glass1_1",
+  "me_lobby_glass1_2",
+  "me_lobby_glass1_3",
+  "me_lobby_glass1_4",
+  "me_lobby_glass1_5",
+  "me_lobby_glass1_6",
+  "me_lobby_glass1_7",
+  "me_lobby_glass2_0",
+  "me_lobby_glass2_1",
+  "me_lobby_glass2_2",
+  "me_lobby_glass2_3",
+  "me_lobby_glass2_4",
+  "me_lobby_glass2_5",
+  "me_lobby_glass2_6",
+  "me_lobby_glass2_7",
+  "me_lobby_glass2_8",
+  "me_lobby_glass2_9",
+  "me_lobby_post_c"
+ ]
+}

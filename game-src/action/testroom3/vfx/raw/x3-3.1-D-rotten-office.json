@@ -1,0 +1,235 @@
+{
+ "frames": [
+  {
+   "filename": "x3-3-1-d-rotten-office 0.png",
+   "frame": {
+    "x": 0,
+    "y": 0,
+    "w": 172,
+    "h": 216
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 172,
+    "h": 216
+   },
+   "sourceSize": {
+    "w": 172,
+    "h": 216
+   },
+   "pivot": {
+    "x": 0.5174418604651163,
+    "y": 0.5046296296296297
+   },
+   "duration": 83
+  },
+  {
+   "filename": "x3-3-1-d-rotten-office 1.png",
+   "frame": {
+    "x": 172,
+    "y": 0,
+    "w": 172,
+    "h": 216
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 172,
+    "h": 216
+   },
+   "sourceSize": {
+    "w": 172,
+    "h": 216
+   },
+   "pivot": {
+    "x": 0.5174418604651163,
+    "y": 0.5046296296296297
+   },
+   "duration": 83
+  },
+  {
+   "filename": "x3-3-1-d-rotten-office 2.png",
+   "frame": {
+    "x": 344,
+    "y": 0,
+    "w": 172,
+    "h": 216
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 172,
+    "h": 216
+   },
+   "sourceSize": {
+    "w": 172,
+    "h": 216
+   },
+   "pivot": {
+    "x": 0.5174418604651163,
+    "y": 0.5046296296296297
+   },
+   "duration": 83
+  },
+  {
+   "filename": "x3-3-1-d-rotten-office 3.png",
+   "frame": {
+    "x": 0,
+    "y": 216,
+    "w": 172,
+    "h": 216
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 172,
+    "h": 216
+   },
+   "sourceSize": {
+    "w": 172,
+    "h": 216
+   },
+   "pivot": {
+    "x": 0.5174418604651163,
+    "y": 0.5046296296296297
+   },
+   "duration": 83
+  },
+  {
+   "filename": "x3-3-1-d-rotten-office 4.png",
+   "frame": {
+    "x": 172,
+    "y": 216,
+    "w": 172,
+    "h": 216
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 172,
+    "h": 216
+   },
+   "sourceSize": {
+    "w": 172,
+    "h": 216
+   },
+   "pivot": {
+    "x": 0.5174418604651163,
+    "y": 0.5046296296296297
+   },
+   "duration": 83
+  },
+  {
+   "filename": "x3-3-1-d-rotten-office 5.png",
+   "frame": {
+    "x": 344,
+    "y": 216,
+    "w": 172,
+    "h": 216
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 172,
+    "h": 216
+   },
+   "sourceSize": {
+    "w": 172,
+    "h": 216
+   },
+   "pivot": {
+    "x": 0.5174418604651163,
+    "y": 0.5046296296296297
+   },
+   "duration": 83
+  },
+  {
+   "filename": "x3-3-1-d-rotten-office 6.png",
+   "frame": {
+    "x": 0,
+    "y": 432,
+    "w": 172,
+    "h": 216
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 172,
+    "h": 216
+   },
+   "sourceSize": {
+    "w": 172,
+    "h": 216
+   },
+   "pivot": {
+    "x": 0.5174418604651163,
+    "y": 0.5046296296296297
+   },
+   "duration": 83
+  },
+  {
+   "filename": "x3-3-1-d-rotten-office 7.png",
+   "frame": {
+    "x": 172,
+    "y": 432,
+    "w": 172,
+    "h": 216
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 172,
+    "h": 216
+   },
+   "sourceSize": {
+    "w": 172,
+    "h": 216
+   },
+   "pivot": {
+    "x": 0.5174418604651163,
+    "y": 0.5046296296296297
+   },
+   "duration": 83
+  }
+ ],
+ "meta": {
+  "app": "PixelLab VFX Creator",
+  "image": "x3-3-1-d-rotten-office.png",
+  "format": "RGBA8888",
+  "size": {
+   "w": 516,
+   "h": 648
+  },
+  "scale": "1",
+  "anchor": {
+   "kind": "origin",
+   "x": 89,
+   "y": 109
+  },
+  "frameTags": [
+   {
+    "name": "x3-3-1-d-rotten-office",
+    "from": 0,
+    "to": 7,
+    "direction": "forward"
+   }
+  ]
+ }
+}

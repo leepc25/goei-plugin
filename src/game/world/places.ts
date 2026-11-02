@@ -21,14 +21,41 @@ export interface PlaceScene {
   lane?: [number, number];
   legacy?: boolean;
   doors: PlaceDoor[];
+  /** 지도 의자 (box = 장면 상자 번호, face = 앉은 사람이 보는 쪽). 이름 인물이 일·식사·휴식을 앉아서 할 자리 */
+  seats?: { x: number; y: number; face?: 'E' | 'W' | 'N'; box: number; set?: string }[];
+  /** 화장실 쓰는 자리: stall = 대변기 칸(x·y = 문 앞, seat = 좌석), urinal = 소변기, sink = 세면대 (x·y = 서는 발 자리) */
+  toilets?: { id: string; kind: 'stall' | 'urinal' | 'sink'; x: number; y: number; door?: string; seat?: { x: number; y: number; k?: number } }[];
+  /** 샤워 자리 (11-02 NPC 샤워): x·y = 서는 발 자리, face = 보는 쪽 */
+  showers?: { id: string; x: number; y: number; face: 1 | -1 }[];
+  /** 탈의실 캐비닛 앞 자리 (11-02): 옷 벗기·입기. x·y = 서는 발 자리, face = 캐비닛 쪽 */
+  lockers?: { id: string; x: number; y: number; face: 1 | -1 }[];
+  /** 남녀 구분 화장실 */
+  sex?: '남' | '여';
+  /** NPC 생활 동작 자리(11-02 휴게실): 발 x·y, 그 자리에서 차례로 트는 줄(마지막 줄은 일하는 동안 반복) */
+  stations?: { id: string; x: number; y: number; lines: string[] }[];
 }
+/**
+ * 방 이름 → 장소 종류 (10-31 사용자: 층 배치가 바뀌어도 고칠 곳이 없게, 방 종류를 따로 적지 않고 이름 낱말로).
+ * 위에서부터 먼저 맞는 것. 바깥(floor 'out')은 가게 이름이 아니면 거리. 맞는 게 없으면 'room'
+ */
+const NAME_KINDS: [RegExp, PlaceKind][] = [
+  [/탈의/, 'locker'], [/샤워/, 'bathroom'], [/화장실/, 'restroom'], [/휴게/, 'lounge'], [/격리실|유치장|감금/, 'cell'], [/의무|의원|진료|수술|연구/, 'clinic'], [/훈련/, 'training'],
+  [/교육|면담|회의/, 'room'], [/팀$|사무|행정/, 'office'], [/로비/, 'lobby'], [/주차|차고/, 'garage'],
+  [/집$|식당|카페|편의점|가게|상점|매입|알선|컨설팅/, 'shop'], [/층|구역|복도|입구|골목|통로|승강장/, 'corridor'],
+];
+export function kindFromName(s: { name: string; floor?: string }): PlaceKind {
+  const hit = NAME_KINDS.find(([re]) => re.test(s.name))?.[1];
+  if (s.floor === 'out') return hit === 'shop' ? 'shop' : 'street';
+  return hit ?? 'room';
+}
+
 export interface ElevatorStop {
   scene: string;
   door: string;
   open?: boolean;
 }
 /** 장면 종류 꼬리표 (인구·직무 규칙이 쓴다). 표에 없으면 kindOf가 이름으로 짐작 */
-export type PlaceKind = 'office' | 'corridor' | 'lobby' | 'lounge' | 'clinic' | 'restroom' | 'training' | 'garage' | 'cell' | 'street' | 'shop' | 'room';
+export type PlaceKind = 'office' | 'corridor' | 'lobby' | 'lounge' | 'clinic' | 'restroom' | 'bathroom' | 'locker' | 'training' | 'garage' | 'cell' | 'street' | 'shop' | 'room';
 
 export interface Hop {
   /** 이 장면에서 */
@@ -72,8 +99,13 @@ export class PlaceGraph {
   lane(id: string): [number, number] {
     return this.scenes.get(id)?.lane ?? DEFAULT_LANE;
   }
+  /** 모든 장면 id */
+  ids(): string[] {
+    return [...this.scenes.keys()];
+  }
   kind(id: string): PlaceKind {
-    return this.kinds[id] ?? 'room';
+    const sc = this.scenes.get(id);
+    return this.kinds[id] ?? (sc ? kindFromName(sc) : 'room');
   }
   neighbors(id: string): Hop[] {
     return this.edges.get(id) ?? [];

@@ -1,0 +1,287 @@
+{
+ "frames": [
+  {
+   "filename": "x3-3-12-f-ground-fan 0.png",
+   "frame": {
+    "x": 0,
+    "y": 0,
+    "w": 1024,
+    "h": 650
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 1024,
+    "h": 650
+   },
+   "sourceSize": {
+    "w": 1024,
+    "h": 650
+   },
+   "pivot": {
+    "x": 0.478515625,
+    "y": 0.8461538461538461
+   },
+   "duration": 83
+  },
+  {
+   "filename": "x3-3-12-f-ground-fan 1.png",
+   "frame": {
+    "x": 1024,
+    "y": 0,
+    "w": 1024,
+    "h": 650
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 1024,
+    "h": 650
+   },
+   "sourceSize": {
+    "w": 1024,
+    "h": 650
+   },
+   "pivot": {
+    "x": 0.478515625,
+    "y": 0.8461538461538461
+   },
+   "duration": 83
+  },
+  {
+   "filename": "x3-3-12-f-ground-fan 2.png",
+   "frame": {
+    "x": 2048,
+    "y": 0,
+    "w": 1024,
+    "h": 650
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 1024,
+    "h": 650
+   },
+   "sourceSize": {
+    "w": 1024,
+    "h": 650
+   },
+   "pivot": {
+    "x": 0.478515625,
+    "y": 0.8461538461538461
+   },
+   "duration": 83
+  },
+  {
+   "filename": "x3-3-12-f-ground-fan 3.png",
+   "frame": {
+    "x": 3072,
+    "y": 0,
+    "w": 1024,
+    "h": 650
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 1024,
+    "h": 650
+   },
+   "sourceSize": {
+    "w": 1024,
+    "h": 650
+   },
+   "pivot": {
+    "x": 0.478515625,
+    "y": 0.8461538461538461
+   },
+   "duration": 83
+  },
+  {
+   "filename": "x3-3-12-f-ground-fan 4.png",
+   "frame": {
+    "x": 0,
+    "y": 650,
+    "w": 1024,
+    "h": 650
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 1024,
+    "h": 650
+   },
+   "sourceSize": {
+    "w": 1024,
+    "h": 650
+   },
+   "pivot": {
+    "x": 0.478515625,
+    "y": 0.8461538461538461
+   },
+   "duration": 83
+  },
+  {
+   "filename": "x3-3-12-f-ground-fan 5.png",
+   "frame": {
+    "x": 1024,
+    "y": 650,
+    "w": 1024,
+    "h": 650
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 1024,
+    "h": 650
+   },
+   "sourceSize": {
+    "w": 1024,
+    "h": 650
+   },
+   "pivot": {
+    "x": 0.478515625,
+    "y": 0.8461538461538461
+   },
+   "duration": 83
+  },
+  {
+   "filename": "x3-3-12-f-ground-fan 6.png",
+   "frame": {
+    "x": 2048,
+    "y": 650,
+    "w": 1024,
+    "h": 650
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 1024,
+    "h": 650
+   },
+   "sourceSize": {
+    "w": 1024,
+    "h": 650
+   },
+   "pivot": {
+    "x": 0.478515625,
+    "y": 0.8461538461538461
+   },
+   "duration": 83
+  },
+  {
+   "filename": "x3-3-12-f-ground-fan 7.png",
+   "frame": {
+    "x": 3072,
+    "y": 650,
+    "w": 1024,
+    "h": 650
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 1024,
+    "h": 650
+   },
+   "sourceSize": {
+    "w": 1024,
+    "h": 650
+   },
+   "pivot": {
+    "x": 0.478515625,
+    "y": 0.8461538461538461
+   },
+   "duration": 83
+  },
+  {
+   "filename": "x3-3-12-f-ground-fan 8.png",
+   "frame": {
+    "x": 0,
+    "y": 1300,
+    "w": 1024,
+    "h": 650
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 1024,
+    "h": 650
+   },
+   "sourceSize": {
+    "w": 1024,
+    "h": 650
+   },
+   "pivot": {
+    "x": 0.478515625,
+    "y": 0.8461538461538461
+   },
+   "duration": 83
+  },
+  {
+   "filename": "x3-3-12-f-ground-fan 9.png",
+   "frame": {
+    "x": 1024,
+    "y": 1300,
+    "w": 1024,
+    "h": 650
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 1024,
+    "h": 650
+   },
+   "sourceSize": {
+    "w": 1024,
+    "h": 650
+   },
+   "pivot": {
+    "x": 0.478515625,
+    "y": 0.8461538461538461
+   },
+   "duration": 83
+  }
+ ],
+ "meta": {
+  "app": "PixelLab VFX Creator",
+  "image": "x3-3-12-f-ground-fan.png",
+  "format": "RGBA8888",
+  "size": {
+   "w": 4096,
+   "h": 1950
+  },
+  "scale": "1",
+  "anchor": {
+   "kind": "origin",
+   "x": 490,
+   "y": 550
+  },
+  "frameTags": [
+   {
+    "name": "x3-3-12-f-ground-fan",
+    "from": 0,
+    "to": 9,
+    "direction": "forward"
+   }
+  ]
+ }
+}

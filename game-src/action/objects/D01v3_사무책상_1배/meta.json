@@ -1,0 +1,86 @@
+{
+ "object_id": "01a9a649-fa90-4a3e-a028-a1780544c059",
+ "job": {
+  "usage": {
+   "type": "usd",
+   "usd": 0.04109407393095228
+  },
+  "id": "6349e223-9d12-4bff-b0da-5d751567c4da",
+  "status": "completed",
+  "created_at": "2026-11-02T06:31:01.274811+00:00",
+  "last_response": {
+   "status": "completed",
+   "progress": 1,
+   "object_id": "01a9a649-fa90-4a3e-a028-a1780544c059",
+   "image_size": {
+    "width": 256,
+    "height": 256
+   },
+   "frame_count": 1,
+   "single_frame": true,
+   "storage_urls": {
+    "unknown": "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/01a9a649-fa90-4a3e-a028-a1780544c059/rotations/unknown.png"
+   },
+   "billing_usage": {
+    "usd": 0.04109407393095228,
+    "type": "usd"
+   },
+   "generation_id": "34b540cf-e930-430e-8a6a-b8b2e1c97208",
+   "billing_stages": [
+    {
+     "stage": "first_direction",
+     "usage": {
+      "usd": 0.04109407393095228,
+      "type": "usd"
+     },
+     "generation_id": "34b540cf-e930-430e-8a6a-b8b2e1c97208"
+    }
+   ],
+   "billing_charged": true,
+   "generation_mode": "pro_flash",
+   "source_image_id": "5ed711b9-2745-5ad9-abca-fe911a2eb934",
+   "directions_count": 1,
+   "first_direction_generated": true
+  }
+ },
+ "object": {
+  "id": "01a9a649-fa90-4a3e-a028-a1780544c059",
+  "name": "D01v3_사무책상_1배",
+  "state_name": "base",
+  "prompt": "An office work desk with things on it: a computer monitor that is switched on with a bright lit screen, a computer tower, a keyboard, a mouse, and piles of papers and document folders. A plain rectangular desk with a flat top and a drawer unit under one side. The monitor faces the viewer, its lit screen fully visible. Seen almost straight from the front, from the eye height of a standing adult, looking only a little down: the desk top shows as a thin band, much thinner than the front of the desk. The desk is much wider than it is tall and fills almost the whole width of the canvas. Only the desk with the things on it, centered, nothing else.",
+  "size": {
+   "width": 256,
+   "height": 256
+  },
+  "directions": 1,
+  "created_at": "2026-11-02T06:31:01.302919+00:00",
+  "view": "low top-down",
+  "rotation_urls": {
+   "south": null,
+   "west": null,
+   "east": null,
+   "north": null,
+   "south-east": null,
+   "south-west": null,
+   "north-east": null,
+   "north-west": null
+  },
+  "storage_urls": {
+   "unknown": "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/01a9a649-fa90-4a3e-a028-a1780544c059/rotations/unknown.png"
+  },
+  "frame_urls": null,
+  "style_settings": {
+   "version": "v2.0.0+api",
+   "no_background": true,
+   "generation_mode": "pro_flash",
+   "source_image_id": "5ed711b9-2745-5ad9-abca-fe911a2eb934",
+   "first_frame_direction": "south"
+  },
+  "tags": [],
+  "status": "completed",
+  "group_id": "eeb5e6a5-d424-4b69-8902-06a90abe6d96",
+  "progress_percent": null,
+  "eta_seconds": null,
+  "animations": []
+ }
+}

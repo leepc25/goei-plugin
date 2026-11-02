@@ -1,0 +1,287 @@
+{
+ "frames": [
+  {
+   "filename": "x3-4-9-s2-rising-line 0.png",
+   "frame": {
+    "x": 0,
+    "y": 0,
+    "w": 1024,
+    "h": 296
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 1024,
+    "h": 296
+   },
+   "sourceSize": {
+    "w": 1024,
+    "h": 296
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.8851351351351351
+   },
+   "duration": 83
+  },
+  {
+   "filename": "x3-4-9-s2-rising-line 1.png",
+   "frame": {
+    "x": 1024,
+    "y": 0,
+    "w": 1024,
+    "h": 296
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 1024,
+    "h": 296
+   },
+   "sourceSize": {
+    "w": 1024,
+    "h": 296
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.8851351351351351
+   },
+   "duration": 83
+  },
+  {
+   "filename": "x3-4-9-s2-rising-line 2.png",
+   "frame": {
+    "x": 2048,
+    "y": 0,
+    "w": 1024,
+    "h": 296
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 1024,
+    "h": 296
+   },
+   "sourceSize": {
+    "w": 1024,
+    "h": 296
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.8851351351351351
+   },
+   "duration": 83
+  },
+  {
+   "filename": "x3-4-9-s2-rising-line 3.png",
+   "frame": {
+    "x": 3072,
+    "y": 0,
+    "w": 1024,
+    "h": 296
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 1024,
+    "h": 296
+   },
+   "sourceSize": {
+    "w": 1024,
+    "h": 296
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.8851351351351351
+   },
+   "duration": 83
+  },
+  {
+   "filename": "x3-4-9-s2-rising-line 4.png",
+   "frame": {
+    "x": 0,
+    "y": 296,
+    "w": 1024,
+    "h": 296
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 1024,
+    "h": 296
+   },
+   "sourceSize": {
+    "w": 1024,
+    "h": 296
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.8851351351351351
+   },
+   "duration": 83
+  },
+  {
+   "filename": "x3-4-9-s2-rising-line 5.png",
+   "frame": {
+    "x": 1024,
+    "y": 296,
+    "w": 1024,
+    "h": 296
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 1024,
+    "h": 296
+   },
+   "sourceSize": {
+    "w": 1024,
+    "h": 296
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.8851351351351351
+   },
+   "duration": 83
+  },
+  {
+   "filename": "x3-4-9-s2-rising-line 6.png",
+   "frame": {
+    "x": 2048,
+    "y": 296,
+    "w": 1024,
+    "h": 296
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 1024,
+    "h": 296
+   },
+   "sourceSize": {
+    "w": 1024,
+    "h": 296
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.8851351351351351
+   },
+   "duration": 83
+  },
+  {
+   "filename": "x3-4-9-s2-rising-line 7.png",
+   "frame": {
+    "x": 3072,
+    "y": 296,
+    "w": 1024,
+    "h": 296
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 1024,
+    "h": 296
+   },
+   "sourceSize": {
+    "w": 1024,
+    "h": 296
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.8851351351351351
+   },
+   "duration": 83
+  },
+  {
+   "filename": "x3-4-9-s2-rising-line 8.png",
+   "frame": {
+    "x": 0,
+    "y": 592,
+    "w": 1024,
+    "h": 296
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 1024,
+    "h": 296
+   },
+   "sourceSize": {
+    "w": 1024,
+    "h": 296
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.8851351351351351
+   },
+   "duration": 83
+  },
+  {
+   "filename": "x3-4-9-s2-rising-line 9.png",
+   "frame": {
+    "x": 1024,
+    "y": 592,
+    "w": 1024,
+    "h": 296
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 1024,
+    "h": 296
+   },
+   "sourceSize": {
+    "w": 1024,
+    "h": 296
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.8851351351351351
+   },
+   "duration": 83
+  }
+ ],
+ "meta": {
+  "app": "PixelLab VFX Creator",
+  "image": "x3-4-9-s2-rising-line.png",
+  "format": "RGBA8888",
+  "size": {
+   "w": 4096,
+   "h": 888
+  },
+  "scale": "1",
+  "anchor": {
+   "kind": "origin",
+   "x": 512,
+   "y": 262
+  },
+  "frameTags": [
+   {
+    "name": "x3-4-9-s2-rising-line",
+    "from": 0,
+    "to": 9,
+    "direction": "forward"
+   }
+  ]
+ }
+}

@@ -1,0 +1,455 @@
+e = w.player instanceof FighterPlayer ? charFace(w.player.art.key, 64, w.player.dir < 0) : null;
+          shell.hud.drawFieldCard(ctx, { name, face, hp: w.player.hp, maxHp: w.player.hpMax, gauge: w.player.gauge, compact: hs.compact, top: true, items: hs.items, device: hs.device, status: hs.status }, dt);
+          if (!observerOn()) shell.hud.drawFieldCorner(ctx, hs.field, hs.compact);
+        }
+        const core = w.player.core;
+        if (core && !shell.touchShown && !mods.blocking?.() && !shell.paused) {
+          const P2 = core.P, clip = P2.clip?.id, off2 = ["down", "belly", "stun"].includes(P2.mode);
+          const lv = P2.charge >= 2 ? 3 : P2.charge > 1.3 ? 2 : P2.charge > 0.5 ? 1 : 0;
+          const key = (b) => {
+            const c = Object.keys(KEYMAP).find((k) => KEYMAP[k] === b);
+            return c ? c.replace(/^Key/, "") : "?";
+          };
+          const sk = core.CH.skills ?? {};
+          const cdOf = (k) => {
+            const left = Math.max(0, (P2.cd?.[k] ?? 0) - P2.t), base2 = core.CH.bal?.cd?.[k] ?? 0;
+            return { left, frac: base2 > 0 ? left / base2 : left > 0 ? 1 : 0 };
+          };
+          const shotCd = cdOf("shot"), shotBase = core.CH.bal?.cd?.shot ?? 0;
+          const skCd = cdOf("skill"), skMax = P2.skillMax ?? 1;
+          const skillActive = !!sk.skill?.anim && clip === sk.skill.anim, superActive = !!sk.super?.anim && clip === sk.super.anim;
+          const slots = [
+            { key: key("light"), icon: "punch", name: "약공", cd: 0, off: off2, active: ["9", "10", "11"].includes(clip ?? "") },
+            { key: key("heavy"), icon: "kick", name: "강공", cd: 0, off: off2, active: clip === "12" }
+          ];
+          if (core.has("15") && !P2.noShoot) slots.push({ key: key("shoot"), icon: "gun", name: "사격", cd: P2.overT > 0 ? P2.overT / 2.6 : shotBase >= 1 ? shotCd.frac : 0, cdText: P2.overT > 0 ? P2.overT.toFixed(1) : shotBase >= 1 && shotCd.left > 0 ? shotCd.left.toFixed(1) : void 0, off: off2, active: clip === "15", bar: P2.heat / 100, hot: P2.overT > 0 || P2.heat > 70 });
+          if (sk.charge) slots.push({ key: key("charge"), icon: "bolt", name: "충전", cd: 0, off: off2, active: P2.mode === "charge", bar: P2.mode === "charge" ? P2.charge / 2.2 : void 0, badge: P2.mode === "charge" && lv ? ["", "1", "2", "MAX"][lv] : void 0 });
+          if (sk.skill) slots.push({ key: key("skill"), icon: "wave", name: "기술", cd: skMax > 1 ? P2.skillN >= 1 ? 0 : skCd.frac : skCd.frac, cdText: (skMax > 1 ? P2.skillN < 1 : true) && skCd.left > 0 ? skCd.left.toFixed(1) : void 0, off: off2, active: skillActive, badge: skMax > 1 ? `${P2.skillN}/${skMax}` : void 0 });
+          slots.push({ key: key("super"), icon: "star", name: "필살", cd: 0, off: off2 || P2.sp < 100, full: P2.sp >= 100, bar: P2.sp / 100 });
+          const caption = skillActive ? sk.skill?.name : superActive ? sk.super?.name : P2.mode === "charge" ? sk.charge?.name : void 0;
+          cardEnd = shell.hud.drawSkillBox(ctx, { compact: hs.compact, slots, ...caption ? { caption } : {} }, dt);
+        }
+        if (!game?.inHub) shell.hud.draw(ctx, { ...hs, messageLeft: cardEnd }, dt);
+        else if (!mods.blocking?.() && !shell.paused) {
+          const z = view.zoom, toX = (x) => (x - w.drawCamX - view.crop) * z, toY = (y) => (y - view.cropY) * z;
+          const sp = w.stage.speech?.();
+          if (sp) shell.hud.drawSpeech(ctx, { x: toX(sp.x), y: toY(sp.y + sp.top) - 6, who: sp.who, text: sp.text, compact: hs.compact });
+          else if (hs.message) {
+            const p = w.player, head = heroTop(p) * persp(p.y);
+            shell.hud.drawSpeech(ctx, { x: toX(p.x), y: toY(p.y - p.z + head) - 10, who: "", text: hs.message, compact: hs.compact });
+          }
+        }
+        const ep = w.player instanceof FighterPlayer ? w.player : null;
+        if (ep && !mods.blocking?.() && !shell.paused) {
+          const show = ep.guard < 99.5 || ep.core.P.mode === "block";
+          guardA = show ? Math.min(1, guardA + dt * 8) : Math.max(0, guardA - dt * 2.5);
+          const z = view.zoom, head = heroTop(ep) * persp(ep.y);
+          const gx = (ep.x - w.drawCamX - view.crop) * z, gy = (ep.y - ep.z + head * 0.92 - view.cropY) * z - 12;
+          drawGuardBar(ctx, gx + 5, gy, ep.guard / 100, ep.guardBroken, guardA, performance.now() / 1e3);
+        }
+        const tg = game?.inHub && !mods.blocking?.() && !shell.paused ? w.stage.nearInfo?.() : null;
+        if (tg) {
+          const p = w.player, z = view.zoom;
+          const head = heroTop(p) * persp(p.y);
+          const sx = (p.x - w.drawCamX - view.crop) * z, sy = (p.y - p.z + head * 0.72 - view.cropY) * z;
+          const half = 46 * persp(p.y) * 1.15 * z;
+          const side = sx > ctx.canvas.width - 320 ? -1 : 1;
+          const key = hs.device === "pad" ? "B" : hs.device === "touch" || hs.compact ? "조" : "E";
+          shell.hud.drawPrompt(ctx, { x: sx + side * (half + 18), y: sy, side, key, text: tg.locked ? `${tg.text} · 잠김` : tg.text, locked: tg.locked, compact: hs.compact });
+        }
+        ffx.drawScreen(ctx);
+        if (charWin.open) {
+          const me = Object.values(AGENT_NPCS).find((n) => n.name === w.player.label);
+          charWin.draw(ctx, charWindowData(w, hs, me?.role.split(".")[0].replace(/ 선임.*$/, " 선임") ?? "", fieldShop?.state().bag ?? {}));
+        }
+        syncNavigationButton(shell.canvas, hs.navigation);
+        shell.touch.setGauge(w.player.gauge / 100);
+        shell.fx.drawTransition(ctx);
+      },
+      onScene: (name) => {
+        if (name === "title" || name === "hq") audio.floor(name);
+        if (name === "hq") shell.play();
+      },
+      onPause: (p) => {
+        storyRoot.style.visibility = p ? "hidden" : "";
+        if (world) world.paused = p;
+      },
+      onWorld: (w, run) => {
+        cancelStoryForScene();
+        world = w;
+        runAgent = run.agent;
+        w.hitFx = false;
+        if (run.stageId === "hq") return void npc.attach(w, { hub: hq2.hub?.() ?? null, hq: true });
+        w.threat = (b) => DEF_BY_KIND[b.kind] ? isThreat(b) : true;
+        w.on((e) => {
+          if (w.player instanceof FighterPlayer && e.type === "enter:floor") {
+            if (w.player.reward) w.player.takeReward();
+            w.player.perks.roomEnter();
+          }
+          if (w.player instanceof FighterPlayer && e.type === "combat:clear") {
+            w.player.perks.roomClear();
+            w.player.dropReward();
+          }
+          if (e.type !== "custom") return;
+          const d3 = e.data ?? {};
+          const st = w.player.status;
+          const dur = (w.player.stat?.statusDur ?? 1) * (w.player instanceof FighterPlayer ? w.player.perks.inDur() : 1);
+          const put2 = (k, ticks) => {
+            if (st && k && k in STATUS) st.apply(k, ticks ? ticks / 30 * dur : void 0);
+          };
+          if (e.name === "hurtPlayer") {
+            if (w.api.hurtPlayer(d3.dmg ?? 10) !== false) put2(d3.debuff?.kind, d3.debuff?.ticks);
+          } else if (e.name === "debuff") {
+            put2(d3.kind, d3.ticks);
+            if (d3.text) w.say(d3.text, 1.5);
+          }
+        });
+        const items = linkItems(w, run);
+        npc.attach(w, { items, hq: false });
+        if (run.stageId === "itemroom") items.showcase();
+        w.hooks.push(() => items.tick());
+        w.underlays.push((c, camX) => items.draw(c, camX));
+      },
+      drawIdle: (name, ctx, t) => {
+        if (name === "title") drawTitleBg(ctx, t, VISIT_TITLE.title, VISIT_TITLE.sub);
+      },
+      boot: (g) => {
+        void hq2.visitReady.then(() => {
+          if (bridge?.visit || !bootFromUrl(g)) g.toTitle();
+        });
+        return true;
+      },
+      dispose: () => {
+        offHidden?.();
+        hq2.dispose();
+        npc.dispose();
+        fieldShop?.dispose();
+        fieldShop = null;
+        const g = globalThis;
+        delete g.__goeiStory;
+        delete g.__goeiNpc;
+        delete g.__goeiStoryStart;
+        world = null;
+        game = null;
+        window.removeEventListener("keydown", storyKeys, true);
+        window.removeEventListener("pointerdown", charWinTap, true);
+        window.removeEventListener("keydown", floorKeys, true);
+        saveFlags();
+        storyRoot.removeEventListener(VIDEO_AUDIO_EVENT, attachVideoAudio);
+        story.dispose();
+        visit?.dispose();
+        setPixelScale(2.75);
+        audio.dispose();
+        shell.dispose();
+      }
+    };
+    return {
+      mods,
+      box: shell.stage.root,
+      bind: (g) => {
+        game = g;
+      }
+    };
+  }
+  function bootFromUrl(g) {
+    let q;
+    try {
+      q = new URLSearchParams(location.search);
+    } catch {
+      return false;
+    }
+    const start = q.get("start");
+    if (!start) return false;
+    const [k, v] = start.split("=");
+    if (k === "hq") g.start_new();
+    else if (k === "stage") g.start_new(v || void 0);
+    else if (k === "arena") g.start_new("arena");
+    else if (k === "items") g.start_new("itemroom");
+    else if (k === "story") {
+      g.start_new("dummy");
+      if (v) globalThis.__goeiStoryStart?.(v);
+    } else return false;
+    return true;
+  }
+  function bubbleGap(world, gx) {
+    const cam = world.camX;
+    const solid = (world.floor.keepOut ?? []).filter(([a, b]) => b - a >= 60).map(([a, b]) => [a - cam, b - cam]);
+    for (const pr of world.floor.props ?? []) {
+      if (!/door|elevator|exit|panel|shutter|mirror|goalwall/.test(pr.kind)) continue;
+      const h = Math.max(pr.w, 200) / 2 + 20;
+      solid.push([pr.x - h - cam, pr.x + h - cam]);
+    }
+    solid.sort((a, b) => a[0] - b[0]);
+    const gaps = [];
+    let at2 = Math.max(0, gx - 520);
+    const end = Math.min(1280, gx + 520);
+    for (const [a, b] of solid) {
+      if (b <= at2) continue;
+      if (a >= end) break;
+      if (a - at2 >= 300) gaps.push([at2, a]);
+      at2 = Math.max(at2, b);
+    }
+    if (end - at2 >= 300) gaps.push([at2, end]);
+    if (!gaps.length) return null;
+    const dist = (g) => gx < g[0] ? g[0] - gx : gx > g[1] ? gx - g[1] : 0;
+    gaps.sort((a, b) => dist(a) - dist(b));
+    return dist(gaps[0]) < 360 ? gaps[0] : null;
+  }
+  async function loadFieldFx(assets2, ffx, cutins) {
+    try {
+      if (!await assets2.ready("field-fx")) return;
+      const list = await assets2.bytes("field-fx", "fx/fx_목록.txt");
+      const img6 = async (file) => {
+        const u = await assets2.url("field-fx", file);
+        if (!u) return null;
+        const im = new Image();
+        im.src = u;
+        await im.decode();
+        return im;
+      };
+      for (const d3 of list ? parseFxList(new TextDecoder().decode(list)) : []) {
+        const im = await img6(`fx/${d3.name}.png`).catch(() => null);
+        if (im) ffx.register(d3, im);
+      }
+      for (const name of Object.keys(SUPER_TEXT)) {
+        for (const k of [name, `${name}_2`]) {
+          const im = await img6(`cutin/${k}.png`).catch(() => null);
+          if (im) cutins.set(k, im);
+        }
+      }
+    } catch {
+    }
+  }
+
+  // src/game/action/engine/touch.ts
+  var CSS3 = `
+.gt-wrap{position:absolute;inset:0;pointer-events:none;user-select:none;-webkit-user-select:none;touch-action:none;z-index:5}
+.gt-stick{position:absolute;left:0;top:0;bottom:0;width:42%;pointer-events:auto;touch-action:none}
+.gt-ring{position:absolute;width:120px;height:120px;margin:-60px 0 0 -60px;border-radius:50%;border:2px solid rgba(255,255,255,.35);background:rgba(255,255,255,.06);display:none}
+.gt-knob{position:absolute;width:52px;height:52px;margin:-26px 0 0 -26px;border-radius:50%;background:rgba(255,255,255,.4);display:none}
+.gt-btns{position:absolute;right:10px;bottom:10px;display:grid;grid-template-columns:repeat(4,52px);gap:6px;pointer-events:auto}
+.gt-b{width:52px;height:52px;border-radius:12px;background:rgba(20,26,30,.6);border:2px solid rgba(255,255,255,.3);color:#e8eef0;font:600 14px sans-serif;display:flex;align-items:center;justify-content:center;touch-action:none}
+.gt-b.on{background:rgba(255,211,106,.6);color:#111}
+.gt-b.big{background:rgba(180,60,50,.6)}
+.gt-top{position:absolute;right:10px;top:10px;display:flex;gap:8px;pointer-events:auto}
+`;
+  var BTNS = [
+    ["super", "필살"],
+    ["guard", "가드"],
+    ["reload", "장전"],
+    ["item1", "1"],
+    ["skill", "폭파"],
+    ["shoot", "사격"],
+    ["shift", "회피"],
+    ["item2", "2"],
+    ["jump", "점프"],
+    ["attack", "공격", "big"],
+    ["interact", "E"],
+    ["hitbox", "판정"]
+  ];
+  function mountTouch(root, input) {
+    const st = document.createElement("style");
+    st.textContent = CSS3;
+    const wrap2 = document.createElement("div");
+    wrap2.className = "gt-wrap";
+    wrap2.innerHTML = `<div class="gt-stick"><div class="gt-ring"></div><div class="gt-knob"></div></div><div class="gt-btns"></div><div class="gt-top"><div class="gt-b" data-b="pause">메뉴</div></div>`;
+    root.append(st, wrap2);
+    const grid = wrap2.querySelector(".gt-btns");
+    for (const [b, label2, cls] of BTNS) {
+      const d3 = document.createElement("div");
+      d3.className = "gt-b" + (cls ? " " + cls : "");
+      d3.dataset.b = b;
+      d3.textContent = label2;
+      grid.appendChild(d3);
+    }
+    wrap2.querySelectorAll(".gt-b").forEach((el) => {
+      const b = el.dataset.b;
+      const on = (e) => {
+        e.preventDefault();
+        el.setPointerCapture(e.pointerId);
+        el.classList.add("on");
+        input.press(b);
+      };
+      const off2 = () => {
+        el.classList.remove("on");
+        input.release(b);
+      };
+      el.addEventListener("pointerdown", on);
+      el.addEventListener("pointerup", off2);
+      el.addEventListener("pointercancel", off2);
+    });
+    const stick = wrap2.querySelector(".gt-stick");
+    const ring = wrap2.querySelector(".gt-ring");
+    const knob = wrap2.querySelector(".gt-knob");
+    let id = -1;
+    let ox = 0;
+    let oy = 0;
+    const held = /* @__PURE__ */ new Set();
+    const set = (b, v) => {
+      if (v && !held.has(b)) held.add(b), input.press(b);
+      if (!v && held.has(b)) held.delete(b), input.release(b);
+    };
+    const move2 = (x, y) => {
+      const dx = x - ox;
+      const dy = y - oy;
+      const r = Math.min(50, Math.hypot(dx, dy));
+      const a = Math.atan2(dy, dx);
+      knob.style.left = ox + Math.cos(a) * r + "px";
+      knob.style.top = oy + Math.sin(a) * r + "px";
+      const T2 = 18;
+      set("left", dx < -T2);
+      set("right", dx > T2);
+      set("up", dy < -T2);
+      set("down", dy > T2);
+    };
+    stick.addEventListener("pointerdown", (e) => {
+      if (id >= 0) return;
+      e.preventDefault();
+      id = e.pointerId;
+      stick.setPointerCapture(id);
+      const r = stick.getBoundingClientRect();
+      ox = e.clientX - r.left;
+      oy = e.clientY - r.top;
+      ring.style.display = knob.style.display = "block";
+      ring.style.left = ox + "px";
+      ring.style.top = oy + "px";
+      move2(ox, oy);
+    });
+    stick.addEventListener("pointermove", (e) => {
+      if (e.pointerId !== id) return;
+      const r = stick.getBoundingClientRect();
+      move2(e.clientX - r.left, e.clientY - r.top);
+    });
+    const end = (e) => {
+      if (e.pointerId !== id) return;
+      id = -1;
+      ring.style.display = knob.style.display = "none";
+      for (const b of [...held]) set(b, false);
+    };
+    stick.addEventListener("pointerup", end);
+    stick.addEventListener("pointercancel", end);
+    return () => {
+      wrap2.remove();
+      st.remove();
+    };
+  }
+
+  // src/game/action/main.ts
+  var CSS4 = `
+.goei-engine{position:relative;width:100%;height:100%;background:#000;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.goei-engine-canvas{display:block;max-width:100%;max-height:100%;aspect-ratio:16/9;width:100%;height:auto;image-rendering:pixelated;touch-action:none}
+.goei-engine-stage{position:relative;width:min(100%, calc(100dvh * 16 / 9));aspect-ratio:16/9;max-height:100%}
+.goei-engine-hq{position:absolute;inset:0;overflow:auto;z-index:20;background:#0b0f12}
+.goei-engine-hq.goei-engine-hq-panel{background:rgba(5,8,10,.72)}
+.goei-engine-hq-close{position:sticky;top:8px;float:right;margin:8px;z-index:2;padding:8px 14px;border-radius:8px;border:1px solid #5b6a72;background:#1a2226;color:#ece6d4;font:15px sans-serif}
+.goei-engine-elev{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);display:flex;flex-direction:column;gap:6px;padding:10px;max-height:94%;overflow:hidden;box-sizing:border-box;pointer-events:auto;z-index:20;image-rendering:pixelated;border:16px solid transparent;border-image:var(--goei-btn) 8 fill / 16px stretch}
+.goei-engine-elev[hidden]{display:none}
+.goei-engine-elev button{width:112px;height:72px;flex:0 1 72px;min-height:40px;border:16px solid transparent;border-radius:0;background:none;border-image:var(--goei-btn) 8 fill / 16px stretch;color:#e6e4dc;font:700 33px "GoeiPixel","Galmuri11",monospace;cursor:pointer;image-rendering:pixelated;-webkit-font-smoothing:none;text-shadow:3px 3px 0 #07090b;padding:0;line-height:1}
+.goei-engine-elev button.here{color:#ffb34a}
+.goei-engine-elev button:disabled{opacity:.4;cursor:default}
+.goei-engine-elev button.sel{filter:brightness(1.45);color:#ffe9a0}
+.goei-engine-loading{color:#8e9aa1;font:16px sans-serif}
+`;
+  function mountGame(box2, bridge) {
+    const st = document.createElement("style");
+    st.textContent = CSS4 + `.goei-engine-elev{--goei-btn:url(${HUD_ART.btn.src})}`;
+    const root = document.createElement("div");
+    root.className = "goei-engine";
+    const stage = document.createElement("div");
+    stage.className = "goei-engine-stage";
+    stage.innerHTML = '<div class="goei-engine-loading">불러오는 중…</div>';
+    root.appendChild(stage);
+    box2.append(st, root);
+    let game = null;
+    let offTouch = null;
+    let dead = false;
+    const urlOf = bridge?.assets ? (f) => bridge.assets.url("jyaldi", f) : void 0;
+    const releaseHqArt = prepareHqTextures(bridge?.assets ? (f) => bridge.assets.url("hq-textures", f) : void 0);
+    const releaseDoorArt = prepareHqDoorRound2(bridge?.assets ? (f) => bridge.assets.url("hq-door-round2", f) : void 0);
+    const releaseField = prepareHqField(bridge?.assets ? (pack2, f) => bridge.assets.url(pack2, f) : void 0);
+    const charPacks = prepareCharPacks(bridge?.assets);
+    const heroArt = charPacks.ready.then(async () => {
+      const asked = (() => {
+        try {
+          return new URLSearchParams(location.search).get("char") ?? "";
+        } catch {
+          return "";
+        }
+      })();
+      const who = await bridge?.visit?.state().then((v) => v.visitor.name).catch(() => "") || asked;
+      return who && await loadChar(who) || loadChar("에일린");
+    }).catch(() => null);
+    void Promise.all([loadArt(urlOf, bridge?.assets ? (f) => bridge.assets.bytes("jyaldi", f) : void 0), heroArt]).then(([art4, hero]) => {
+      if (dead) return;
+      stage.remove();
+      root.style.display = "block";
+      if (hero) {
+        playerFactory.make = (clips) => new FighterPlayer(clips, hero);
+        useEileenKeys();
+        useEileenControls();
+      }
+      const wiring = engineModules(root, bridge);
+      game = new Game(wiring.box, art4, wiring.mods);
+      wiring.bind(game);
+      if (!wiring.mods.surface) offTouch = mountTouch(stage, game.input);
+      game.start();
+      globalThis.__goeiEngine = game;
+    }).catch((e) => {
+      console.error("[goei] 게임 시작 실패", e);
+      if (dead) return;
+      stage.textContent = `게임을 시작하지 못했어요: ${e instanceof Error ? e.message : String(e)}`;
+      if (!stage.isConnected) {
+        root.style.display = "";
+        root.appendChild(stage);
+      }
+    });
+    return () => {
+      dead = true;
+      endFieldVisit();
+      releaseDoorArt();
+      releaseField();
+      releaseHqArt();
+      charPacks.dispose();
+      offTouch?.();
+      game?.destroy();
+      const g = globalThis;
+      if (g.__goeiEngine === game) delete g.__goeiEngine;
+      game = null;
+      root.remove();
+      st.remove();
+    };
+  }
+
+  // src/game/play.ts
+  var mountPlay = (box2, bridge) => mountGame(box2, bridge);
+
+  // src/game/entry.ts
+  function memoryStorage() {
+    const m = /* @__PURE__ */ new Map();
+    return {
+      get length() {
+        return m.size;
+      },
+      key: (i) => [...m.keys()][i] ?? null,
+      getItem: (k) => m.get(String(k)) ?? null,
+      setItem: (k, v) => void m.set(String(k), String(v)),
+      removeItem: (k) => void m.delete(String(k)),
+      clear: () => m.clear()
+    };
+  }
+  try {
+    void globalThis.localStorage?.length;
+  } catch {
+    for (const name of ["localStorage", "sessionStorage"]) {
+      try {
+        Object.defineProperty(globalThis, name, { value: memoryStorage(), configurable: true });
+      } catch {
+      }
+    }
+  }
+  var mod = {
+    version: "0.19.0",
+    mount: (box2, bridge) => mountPlay(box2, bridge)
+  };
+  globalThis.__goeiGame = mod;
+})();

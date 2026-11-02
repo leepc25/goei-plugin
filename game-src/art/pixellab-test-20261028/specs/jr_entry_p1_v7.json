@@ -1,0 +1,197 @@
+{
+ "name": "jr_entry_p1_v7",
+ "room": "corridor",
+ "mood": "worn",
+ "mode": "loose",
+ "view": "street",
+ "sides": "open",
+ "floor_share": "the lower 30 percent, all sidewalk, with only a very thin curb and road line at the bottom edge",
+ "density": "packed",
+ "place": "the ground floor shop fronts of a run-down 1990s Seoul shopping street, seen up close from the sidewalk, the image top right above the shop signs",
+ "time": "late morning daylight",
+ "light": "plain daylight, no lamps lit",
+ "floor": "smooth grey concrete sidewalk like one sheet, litter",
+ "walls": "grimy concrete and old tile, peeling paint, rust",
+ "shadow": "soft daylight shadows under objects and the canopy, dark stairwell",
+ "palette": "faded grey, beige, dull blue, rust, soft daylight",
+ "doors": 0,
+ "no": [
+  "cars"
+ ],
+ "sized": [],
+ "items": [
+  {
+   "full": "right 30 percent: only the front end of a freestanding arcade entrance on the sidewalk like a Seoul subway exit, the rest continuing past the right edge, open end facing left, stairs going down to the right into darkness, waist-high railings on both sides, a glass canopy over it",
+   "text": "right 35 percent: the front end of a big freestanding arcade entrance on the sidewalk like a subway exit, the rest past the right edge, open end facing left, stairs going down to the right into darkness, waist-high railings, a glass canopy as high as the shutters behind",
+   "why": "사용자: 오른쪽에 지하철 출입구 같은 지하상가 입구",
+   "keep": []
+  },
+  {
+   "full": "on top of the canopy, right above the entrance: a sign board reading \"중림지하상가\"",
+   "text": "on top of the canopy: a sign board reading \"중림지하상가\"",
+   "why": "사용자: 간판은 입구 위",
+   "keep": []
+  },
+  {
+   "full": "clear sidewalk at the entrance",
+   "text": "clear sidewalk at the entrance",
+   "why": "출입구 앞 비움",
+   "keep": []
+  },
+  {
+   "full": "back: old low-rise shop buildings along the whole width, ground floor and part of the second floor, tops cut off",
+   "text": "back: old shop fronts along the whole width, no upper floors",
+   "why": "거리 뒤 건물",
+   "keep": []
+  },
+  {
+   "full": "on the building fronts: faded blank signs, closed shutters, a small open shop, a note reading \"임대\" on an empty window",
+   "text": "on the building fronts: faded blank signs, closed shutters, a small open shop, a note reading \"임대\" on a window",
+   "why": "낡은 상가 거리",
+   "keep": []
+  },
+  {
+   "full": "against the buildings: a vending machine, a parked motorbike, potted plants, trash bags and boxes",
+   "text": "against the buildings: a vending machine nearly as tall as the shutters, a motorbike, potted plants, trash bags, boxes",
+   "why": "거리 소품(인도 뒤쪽, 걷는 길 비움)",
+   "keep": []
+  },
+  {
+   "full": "a utility pole with tangled wires",
+   "text": "a utility pole cut off at the top",
+   "why": "전봇대·전선",
+   "keep": []
+  },
+  {
+   "full": "an old public phone",
+   "text": "an old phone booth nearly as tall as the shutters",
+   "why": "공중전화",
+   "keep": []
+  },
+  {
+   "full": "a torn redevelopment banner, no letters",
+   "text": "a torn banner on a shutter",
+   "why": "재개발 현수막",
+   "keep": []
+  },
+  {
+   "full": "bottom 8 percent: a curb and an asphalt strip, no cars, no markings",
+   "text": "bottom edge: a very thin curb and road line",
+   "why": "사용자: 차도는 맨 아래 띠, 걷지 않음",
+   "keep": []
+  },
+  {
+   "full": "left 10 percent: only building fronts and sidewalk, continuing past the edge",
+   "text": "left 10 percent: a bare wall, continuing past the edge",
+   "why": "왼쪽으로 이어 그리기 자리",
+   "keep": []
+  }
+ ],
+ "must": [
+  {
+   "kw": "reading \"중림지하상가\"",
+   "from": "간판"
+  },
+  {
+   "kw": "like one sheet",
+   "from": "사용자 바닥 선 금지"
+  }
+ ],
+ "brief": {
+  "wiki": "중림 지하상가(회색 시장)",
+  "design": "설계안 폐기(사용자 10-31)",
+  "user": [
+   "사용자 10-31: 지상은 이어 붙이기·기둥 말고, 오른쪽 지하상가 입구 첫 장 + 왼쪽으로 이어 그리기",
+   "낮만(10-24 결정), 간판은 입구 위, 지하상가는 도로 밑이라 입구는 인도 위",
+   "차도는 맨 아래 띠로만, 캐릭터는 인도만(턱 오르내림 없음)",
+   "v1 건물 2층까지 넣어 전체가 작아짐 → 1층 가게 앞면만(사용자)",
+   "v2 작음·입구가 건물에 붙음 → 가이드 맨 위 선(가게 앞면 윗선), 입구는 건물과 떨어져 인도 위(사용자 「그래」)",
+   "v3 작음 → 첫 줄에 높이 한계, 바닥 30%, 전선 뺌·현수막 낮춤(사용자 「그런거 빼고 낮춰봐」)",
+   "v4 인도 얕음 → 바닥 30%는 인도만, 차도는 그 아래 아주 얇게, 입구는 v1 문장(사용자 「그래 한번 뽑아봐」)",
+   "사용자 「D로 뽑아」: v5 + 간판 이름(중림슈퍼·제일수선·영진철물) + 자판기·공중전화 셔터 높이 가깝게 + 입구 크게·간판 지붕 위, 묘사는 v5 그대로"
+  ],
+  "items": [
+   {
+    "src": "0번 줄 근거",
+    "by": [
+     0
+    ]
+   },
+   {
+    "src": "1번 줄 근거",
+    "by": [
+     1
+    ]
+   },
+   {
+    "src": "2번 줄 근거",
+    "by": [
+     2
+    ]
+   },
+   {
+    "src": "3번 줄 근거",
+    "by": [
+     3
+    ]
+   },
+   {
+    "src": "4번 줄 근거",
+    "by": [
+     4
+    ]
+   },
+   {
+    "src": "5번 줄 근거",
+    "by": [
+     5
+    ]
+   },
+   {
+    "src": "6번 줄 근거",
+    "by": [
+     6
+    ]
+   },
+   {
+    "src": "7번 줄 근거",
+    "by": [
+     7
+    ]
+   },
+   {
+    "src": "8번 줄 근거",
+    "by": [
+     8
+    ]
+   },
+   {
+    "src": "9번 줄 근거",
+    "by": [
+     9
+    ]
+   },
+   {
+    "src": "10번 줄 근거",
+    "by": [
+     10
+    ]
+   }
+  ]
+ },
+ "review": {
+  "fit": "낡은 상가 거리 낮, 사람·차 없음",
+  "place": "입구 오른쪽, 소품은 건물 앞(인도 뒤쪽), 걷는 길·입구 앞 비움",
+  "size": "자판기·공중전화 셔터 높이 가깝게, 입구 지붕 = 뒤 셔터 높이, 가이드 v4",
+  "brief": "사용자 결정 모두 대응",
+  "meaning": "1차=2차(느슨한 틀)",
+  "over": "같은 물건 두 번 없음, packed+",
+  "frame": "카메라·원근 문장 지하와 같음, 첫 줄 높이 한계(v4), 바닥 30% 인도만, 가이드 v3"
+ },
+ "removed_by_user": [
+  {
+   "full": "tangled wires",
+   "by": "사용자 10-31 「그래 그런거 빼고 낮춰봐 좀」 — 전선은 위층을 불러 뺌"
+  }
+ ]
+}

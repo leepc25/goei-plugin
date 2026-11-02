@@ -303,7 +303,7 @@ export function createGameAudio(opts: GameAudioOptions = {}) {
         if (song?.id === 'boss') jingle('clear', scene ? SCENE_SONG[scene] : null);
         return true;
       case 'run:end':
-        jingle(e.how === 'evac' ? 'gameover' : 'clear', null);
+        jingle(e.how === 'evac' || e.how === 'death' ? 'gameover' : 'clear', null);
         return true;
     }
     const id = pickSfx(e, scene);

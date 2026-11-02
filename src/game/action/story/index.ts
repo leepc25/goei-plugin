@@ -7,21 +7,20 @@ import { StoryRunner, ScriptLibrary } from './script';
 import { buildLibrary } from './library';
 import { castOf, MALE_AGENTS } from './cast';
 import { lookupLine } from './lines';
-import { AGENTS, EVAC_PAIRS } from './lines/agents';
+import { AGENTS } from './lines/agents';
 import { BarkPicker } from './director';
-import { Cutscene, type CutsceneIO } from './cutscene';
+import { Cutscene, type CutsceneDef, type CutsceneIO } from './cutscene';
 import { VideoPlayer, listed, repoRoot } from './video';
 import { VIDEOS, VIDEO_DIR } from './scripts/videos';
-import { CUTSCENES } from './scripts/cutscenes';
 import { FreeTalk, type TalkModel, type TalkNpcId } from './ai';
 import { StoryUI, TalkPanel, type Anchor } from './ui';
 
 export type { AgentId, Flags, StoryEvent } from './types';
 export type { TalkModel, TalkNpcId } from './ai';
-export { CUTSCENES } from './scripts/cutscenes';
 export { VIDEOS } from './scripts/videos';
+/** 대본 컷신 목록. 옛 출동 컷신은 2026-10-28에 지웠다. 새 컷신이 생기면 여기에 */
+export const CUTSCENES: Record<string, CutsceneDef> = {};
 export { AGENTS, AGENT_LINES, agentLine } from './lines/agents';
-export { hqLines, stageHooks } from './hooks';
 
 /** 엔진이 채우는 쪽. 없는 기능은 건너뛴다. */
 export interface StoryHost {
@@ -162,24 +161,11 @@ export function mountStory(root: HTMLElement, host: StoryHost, opts: StoryOption
   const video = new VideoPlayer(root);
   const refresh = () => setBlocking(ui.boxOpen || !!scene || panel.isOpen || video.open);
 
-  /** 후송 깨어남: 옆에 있던 동료의 주고받기를 앞에 붙인 임시 대본 */
-  const evacWrap = (id: string) => {
-    const pairs = EVAC_PAIRS[agent()] ?? [];
-    if (!pairs.length) return id;
-    const p = pairs[Math.floor(rng() * pairs.length) % pairs.length];
-    host.emit?.('buddy', p.by);
-    host.actor?.('buddy', { anim: p.by, show: true }, 0);
-    const tmp = `__evac_${id}`;
-    lib.scripts.delete(tmp);
-    lib.add(`=== ${tmp}\n${p.by}: ${p.lines[0]}\nagent: ${p.lines[1]}\n> call ${id}\n`, 'evac');
-    return tmp;
-  };
-
   const say = (id: string, vars?: Flags, onDone?: () => void) => {
     syncAgent();
     if (vars) Object.assign(flags, vars);
     doneCb = onDone;
-    show(runner.start(id === 'evac_wake' || id === 'cs_evac' ? evacWrap(id) : id));
+    show(runner.start(id));
   };
 
   const advance = () => {
@@ -261,7 +247,7 @@ export function mountStory(root: HTMLElement, host: StoryHost, opts: StoryOption
         return;
       }
       syncAgent();
-      const subs = v.subs.map((s) => (s.text.includes('{call}') ? { ...s, text: s.text.replace('{call}', lookupLine(agent(), 'el:call', flags, rng) ?? '…') } : s));
+      const subs = v.subs;
       const base = host.videoUrl ? host.videoUrl(id) : `${repoRoot()}${VIDEO_DIR}${id}/`;
       if (!base) {
         onDone?.();
@@ -307,7 +293,6 @@ export function mountStory(root: HTMLElement, host: StoryHost, opts: StoryOption
     dejure: '네, 네…? 저, 저한테요…?',
     konjyuce: '네! 뭐든 물어보세요!',
     madeokhee: '어머, 자기야. 뭐 팔 거 있어요?',
-    elevator: '…듣고 있어요.',
   };
   panel.onClose = () => {
     panel.close();
@@ -357,12 +342,6 @@ export function mountStory(root: HTMLElement, host: StoryHost, opts: StoryOption
       if (f.depth !== undefined) flags.depth = Number(f.depth);
       if (f.type !== undefined) flags.ftype = String(f.type);
       if (Number(flags.depth) >= 15) flags.reached_b12 = 1;
-      // 승강기 대본(board)이 이미 안내한 층이면 다시 말하지 않는다
-      if (opts.announce && Number(flags.announced) !== Number(flags.depth)) {
-        const t = lookupLine(agent(), 'el:announce', flags, rng);
-        if (t) bark('elevator', t, 2400);
-      }
-      flags.announced = Number(flags.depth);
     }
     if (name === 'find:rule' || name === 'ruleFound') {
       const id = String(data.id ?? data.rule ?? '');

@@ -71,7 +71,7 @@ try {
   assert.equal((await ei(page)).mode, 'charge', '충전');
   await page.keyboard.up('KeyS'); await page.waitForTimeout(250);
   await S(page, 'pc-blast');
-  // 메뉴 → 타이틀로 → 새로 시작(본부) → 잼트리 → 임무 → 출동
+  // 메뉴 → 타이틀로 → 새로 시작(본부 걷기). 옛 임무 창구·출동은 2026-10-28에 지웠다
   await page.waitForTimeout(600);
   await page.keyboard.press('Escape');
   await page.waitForTimeout(200);
@@ -84,48 +84,8 @@ try {
   await page.waitForFunction(() => window.__goeiEngine.inHub && window.__goeiEngine.world);
   await page.waitForTimeout(300);
   await S(page, 'pc-hq');
-  // 자리 소품은 손이 닿을 때만 생긴다: 지도의 자리 좌표로 옮긴다
-  await page.evaluate(() => { const w = window.__goeiEngine.world; const sp = w.stage.current().spots.find((q) => q.id === 'jaemtri'); w.player.x = sp.x; w.player.y = sp.y; });
-  await page.waitForTimeout(100);
-  await page.keyboard.press('KeyE');
-  // 자리 주인과 대화창이 먼저 열린다 (NPC 자유 대화). E 한 번 더 = 원래 창구
-  // (본편 연결이 있으면 자리 주인 대화창이 먼저 뜬다: 그때만 E 한 번 더)
-  await page.waitForSelector('.gnp:not([hidden]), [data-mission]', { state: 'visible' });
-  if (await page.locator('.gnp:not([hidden])').count()) await page.keyboard.press('KeyE');
-  await page.waitForSelector('[data-mission]', { state: 'visible' });
-  await S(page, 'pc-hq-panel');
-  await page.click('[data-mission]');
-  await page.click('[data-act=brief]');
-  await page.waitForSelector('[data-act=deploy]');
-  await page.click('[data-act=deploy]');
-  // 출동 준비 → B3 주차장 승합차 앞에서 E (사용자 2026-10-25)
-  await page.waitForFunction(() => !document.querySelector('[data-act=deploy]'));
-  await page.evaluate(() => window.__goeiEngine.world.stage.jump('b3', 370, 470));
-  await page.waitForFunction(() => window.__goeiEngine.world?.floor?.id === 'hq:b3' && window.__goeiEngine.world.props.some((q) => q.id === 'spot:van'));
-  await page.waitForTimeout(300);
-  await page.keyboard.press('KeyE');
-  await page.waitForFunction(() => window.__goeiEngine.world);
-  await page.waitForTimeout(300);
-  // 자동 진행: 오른쪽으로 걸으며 계속 때림 (훈련장 끝까지)
-  const t0 = Date.now();
-  let last;
-  await page.keyboard.down('ArrowRight');
-  while (Date.now() - t0 < 60000) {
-    last = await st(page);
-    if (!last || last.ended || last.hp <= 0) break;
-    await page.keyboard.press('KeyA');
-    await page.waitForTimeout(90);
-    if (Math.random() < 0.15) { await page.keyboard.press('KeyD'); }
-  }
-  await page.keyboard.up('ArrowRight');
-  await S(page, 'pc-late');
-  console.log('진행', last);
-  await page.waitForTimeout(800);
-  await S(page, 'pc-end');
-  if (last && last.ended) {
-    await page.waitForTimeout(1500);
-    await S(page, 'pc-settle');
-  }
+  // 옛 임무 창구 자리(잼트리 책상)는 닫혀 있다
+  assert.equal(await page.evaluate(() => window.__goeiEngine.world.stage.current().spots.find((q) => q.id === 'jaemtri')?.open), false, '임무 창구 자리 닫힘');
   // 모바일 가로
   const m = await browser.newPage({ viewport: { width: 844, height: 390 }, hasTouch: true, isMobile: true });
   m.on('pageerror', (e) => errors.push(String(e)));

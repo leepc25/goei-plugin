@@ -132,7 +132,7 @@ for (const [W, H, name, noFs] of vps) {
 
   // (c) 버튼 9개 + 메뉴, 배치안대로
   const ids = await shownIds(page);
-  const want = ['light', 'heavy', 'dodge', 'block', 'jump', 'unique', 'ult', 'interact', 'auto', 'menu'];
+  const want = ['light', 'heavy', 'dodge', 'block', 'jump', 'unique', 'ult', 'interact', 'auto', 'menu', 'char'];
   assert.deepEqual([...ids].sort(), [...want].sort(), `버튼 ${ids}`);
   const R = await rects(page);
   const corner = (id) => Math.hypot(sz.w - R[id].x, sz.h - R[id].y);

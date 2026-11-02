@@ -1,0 +1,58 @@
+{
+ "scene": {
+  "file": "me_jr_entry",
+  "w": 2836,
+  "h": 848,
+  "under": true,
+  "lane": [
+   600,
+   700
+  ],
+  "floor": [
+   [
+    250,
+    600
+   ],
+   [
+    2390,
+    600
+   ],
+   [
+    2390,
+    712
+   ],
+   [
+    250,
+    712
+   ]
+  ],
+  "holes": [],
+  "dotK": 0.85,
+  "blocks": [],
+  "doors": {
+   "west": {
+    "x0": 220,
+    "x1": 340,
+    "y0": 400,
+    "y1": 600,
+    "anim": "none",
+    "behind": "dark"
+   },
+   "down": {
+    "x0": 2390,
+    "x1": 2470,
+    "y0": 500,
+    "y1": 690,
+    "anim": "none",
+    "behind": "dark"
+   }
+  },
+  "lamps": [],
+  "windows": [],
+  "objects": []
+ },
+ "spots": [],
+ "files": [
+  "me_jr_entry"
+ ]
+}

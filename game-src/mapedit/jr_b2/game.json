@@ -1,0 +1,99 @@
+{
+ "scene": {
+  "file": "me_jr_b2",
+  "w": 6320,
+  "h": 848,
+  "under": true,
+  "lane": [
+   690,
+   836
+  ],
+  "floor": [
+   [
+    300,
+    690
+   ],
+   [
+    6296,
+    690
+   ],
+   [
+    6296,
+    848
+   ],
+   [
+    300,
+    848
+   ]
+  ],
+  "holes": [],
+  "dotK": 1.4292,
+  "blocks": [],
+  "doors": {
+   "youngchang": {
+    "x0": 544,
+    "x1": 716,
+    "y0": 290,
+    "y1": 614,
+    "anim": "none",
+    "behind": "dark"
+   },
+   "up": {
+    "x0": 6146,
+    "x1": 6320,
+    "y0": 160,
+    "y1": 660,
+    "anim": "none",
+    "behind": "dark"
+   }
+  },
+  "lamps": [],
+  "windows": [],
+  "objects": [
+   {
+    "id": "pillar1",
+    "file": "me_jr_b2_pillar1",
+    "x": 1206,
+    "y": 0,
+    "w": 116,
+    "h": 848,
+    "sortY": 9999
+   },
+   {
+    "id": "pillar2",
+    "file": "me_jr_b2_pillar2",
+    "x": 2470,
+    "y": 0,
+    "w": 116,
+    "h": 848,
+    "sortY": 9999
+   },
+   {
+    "id": "pillar3",
+    "file": "me_jr_b2_pillar3",
+    "x": 3734,
+    "y": 0,
+    "w": 116,
+    "h": 848,
+    "sortY": 9999
+   },
+   {
+    "id": "pillar4",
+    "file": "me_jr_b2_pillar4",
+    "x": 4996,
+    "y": 0,
+    "w": 120,
+    "h": 848,
+    "sortY": 9999
+   }
+  ]
+ },
+ "spots": [],
+ "files": [
+  "me_jr_b2",
+  "me_jr_b2_pillar1",
+  "me_jr_b2_pillar2",
+  "me_jr_b2_pillar3",
+  "me_jr_b2_pillar4"
+ ]
+}

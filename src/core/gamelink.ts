@@ -66,7 +66,8 @@ export function cardSnapshot(char: { name?: string; globalLore?: LoreEntry[] }, 
 
 // ── 쓰기 ──
 
-const OUTCOME: Record<GameReport['outcome'], string> = { return: '귀환', evac: '후송', withdraw: '자발 철수' };
+// 사망 처리 옵션(docs/설계_출동루프_3판.md 2-8): 영구 사망 = 「사망」, 패퇴 = 「부상·후송」. 태그는 모델이 바꾼다
+const OUTCOME: Record<GameReport['outcome'], string> = { return: '귀환', evac: '부상·후송', withdraw: '자발 철수', death: '사망' };
 
 const clean = (s: unknown, max = 200) =>
   String(s ?? '')
@@ -78,7 +79,7 @@ const clean = (s: unknown, max = 200) =>
 /** 들어온 결과를 믿지 않고 모양을 맞춘다 (게임 코드는 따로 받은 코드다) */
 export function normReport(r: Partial<GameReport> | null | undefined): GameReport | null {
   if (!r || typeof r !== 'object') return null;
-  const outcome = r.outcome === 'evac' || r.outcome === 'withdraw' ? r.outcome : 'return';
+  const outcome = r.outcome === 'evac' || r.outcome === 'withdraw' || r.outcome === 'death' ? r.outcome : 'return';
   const list = (v: unknown, n: number) => (Array.isArray(v) ? v.map((x) => clean(x, 120)).filter(Boolean).slice(0, n) : []);
   const agents = Array.isArray(r.agents)
     ? r.agents.slice(0, 8).map((a) => ({ id: clean(a?.id, 40), name: clean(a?.name, 40), ...(typeof a?.hp === 'number' ? { hp: a.hp } : {}), ...(a?.injured ? { injured: true } : {}) }))

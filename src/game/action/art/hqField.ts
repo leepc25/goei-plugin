@@ -5,9 +5,10 @@ import { PAINTED, type PaintedDoor, type PaintedScene } from '../hq/painted';
 import { view } from '../engine/view';
 import { JR_ROOM_FILES } from '../hq/jrRooms.gen';
 import { JR_CUT_FILES } from '../hq/jrCuts.gen';
+import { MAPEDIT_FILES } from '../hq/mapedit.gen';
 
 const FILES = ['lobby', 'f2', 'f3', 'b1', 'b2', 'b3', 'desk'];
-const JR_FILES = ['jr_entry', 'jr_b1', 'jr_alley', 'jr_b2', ...JR_ROOM_FILES, ...JR_CUT_FILES];
+const JR_FILES = ['jr_entry', 'jr_b1', 'jr_alley', 'jr_b2', ...JR_ROOM_FILES, ...JR_CUT_FILES, ...MAPEDIT_FILES];
 let images: Record<string, HTMLImageElement> | null = null;
 let revision = 0;
 declare global { interface Window { __GOEI_HQ_FIELD__?: Record<string, string> } }
@@ -182,12 +183,36 @@ function drawDoor(c: CanvasRenderingContext2D, im: HTMLImageElement, d: PaintedD
 }
 
 /** 오린 오브젝트 (깊이 순서 층에서 부른다) */
-export function drawHqFieldObject(c: CanvasRenderingContext2D, scene: string, id: string): void {
-  const o = PAINTED[scene]?.objects.find((q) => q.id === id);
-  const im = o && images?.[o.file];
-  if (!o || !im) return;
+export function drawHqFieldObject(c: CanvasRenderingContext2D, scene: string, id: string, open = 0, busy = false): void {
+  const p = PAINTED[scene];
+  const o = p?.objects.find((q) => q.id === id);
+  if (!o) return;
+  if (o.cover) {
+    // 오리지 않은 가림: 배경 그림의 다각형 영역을 그대로 한 번 더 (사람이 뒤에 서면 가려진다)
+    const bg = images?.[p.file];
+    if (!bg) return;
+    c.save(); c.imageSmoothingEnabled = true; c.imageSmoothingQuality = 'high';
+    c.beginPath();
+    for (const poly of o.cover) { poly.forEach(([x, y], i) => (i ? c.lineTo(x, y) : c.moveTo(x, y))); c.closePath(); }
+    c.clip();
+    c.drawImage(bg, o.x, o.y, o.w, o.h, o.x, o.y, o.w, o.h);
+    c.restore();
+    return;
+  }
+  // 여러 장면 그림(화장실 칸 문): 열린 정도로 장면을 고른다
+  // 화장실 칸 문 표시등: 사람이 있으면 빨간 불 장면 (쓰지 않는 칸은 녹색 그대로·상호작용만 없음, 사용자 15:34)
+  const fr = busy && o.busy ? o.busy : o.frames;
+  const im = images?.[fr ? fr[Math.max(0, Math.min(fr.length - 1, Math.round(open * (fr.length - 1))))] : o.file];
+  if (!im) return;
   c.save(); c.imageSmoothingEnabled = true; c.imageSmoothingQuality = 'high';
-  c.drawImage(im, o.x, o.y, o.w, o.h);
+  if (o.gate && open > 0) {
+    // 열리는 게이트 유리: 가운데서 갈라져 양쪽 기둥 안으로 밀려 들어간다
+    if (open >= 1) { c.restore(); return; }
+    const hw = o.w / 2, sh = hw * open;
+    c.beginPath(); c.rect(o.x, o.y, o.w, o.h); c.clip();
+    c.drawImage(im, 0, 0, im.width / 2, im.height, o.x - sh, o.y, hw, o.h);
+    c.drawImage(im, im.width / 2, 0, im.width / 2, im.height, o.x + hw + sh, o.y, hw, o.h);
+  } else c.drawImage(im, o.x, o.y, o.w, o.h);
   c.restore();
 }
 
@@ -491,46 +516,6 @@ export function drawHqGuide(c: CanvasRenderingContext2D, scene: string, doors: L
   row(west, -1);
   row(east, 1);
   c.restore();
-}
-
-/* ───────── 출동 안내 화살표 (B3 승합차 위) ───────── */
-
-/** 도트 화살표 (아래를 가리킴, 한 칸 U px). 테두리 상자 없이 그림자와 함께 떠 있다 */
-function pixelArrow(c: CanvasRenderingContext2D, x: number, y: number, U: number, rot: number) {
-  // 7칸 폭 화살표: 몸통 3칸 × 4줄 + 머리 7·5·3·1칸
-  const rows: [number, number][] = [[-1, 3], [-1, 3], [-1, 3], [-1, 3], [-3, 7], [-2, 5], [-1, 3], [0, 1]];
-  const draw = (col: string, dx: number, dy: number) => {
-    c.fillStyle = col;
-    rows.forEach(([x0, w], i) => c.fillRect(dx + x0 * U, dy + i * U, w * U, U));
-  };
-  c.save();
-  c.translate(Math.round(x), Math.round(y));
-  c.rotate(rot);
-  const ox = 0, oy = -rows.length * U; // 끝(뾰족한 곳)이 (x, y)
-  draw('rgba(0,0,0,0.35)', ox + U, oy + U); // 그림자
-  draw('#c98a1c', ox, oy); // 어두운 바탕 = 외곽
-  c.fillStyle = '#ffd25a';
-  rows.forEach(([x0, w], i) => { if (w > 1) c.fillRect(ox + (x0 + 0.0) * U + U * 0.0, oy + i * U, (w - 1) * U, U); });
-  c.fillStyle = '#fff3c4';
-  c.fillRect(ox - U, oy, U, U * 3); // 밝은 면
-  c.restore();
-}
-
-/** 출동 준비가 됐을 때: 승합차 위에 떠 있는 화살표. 차가 화면 왼쪽 밖이면 화면 왼쪽 끝 허공에 떠서 왼쪽을 가리킨다 */
-export function drawDepartArrow(c: CanvasRenderingContext2D, camX: number, now: number): void {
-  const VAN = { x: 370, y: 128 };
-  const left = camX + 46;
-  const pinned = VAN.x < left;
-  const bob = Math.sin(now / 280) * 5;
-  const glow = 0.5 + 0.5 * Math.sin(now / 280);
-  const x = pinned ? left : VAN.x, y = VAN.y + bob;
-  c.save();
-  c.globalCompositeOperation = 'lighter';
-  const g = c.createRadialGradient(x, y - 20, 0, x, y - 20, 46);
-  g.addColorStop(0, `rgba(255,200,80,${0.25 + 0.15 * glow})`); g.addColorStop(1, 'rgba(255,200,80,0)');
-  c.fillStyle = g; c.fillRect(x - 46, y - 66, 92, 92);
-  c.restore();
-  pixelArrow(c, x, y, 6, pinned ? Math.PI / 2 : 0);
 }
 
 /* ───────── 엘리베이터 호출 단추: 층을 고르면 초록 ───────── */

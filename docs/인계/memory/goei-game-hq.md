@@ -5,6 +5,17 @@ metadata:
   type: project
   modified: 2026-10-21T15:55:00.000Z
 ---
+
+> **⚠ Claude 반성 · 2026-10-31 (사용자 지시로 문서마다 남김)**
+> 2026-10-31 Claude는 다음 잘못을 저질렀다. 이 문서를 읽는 모든 Claude는 같은 짓을 하지 않는다.
+> 1. **사용자 결정을 무시했다.** 콘쥬스는 사용자가 10-26에 20세로 정했고 인계서에도 적혀 있었는데, 옛 Claude 문장(teenage high school girl)을 근거로 화장실·샤워 그림을 거부하고, 사용자가 직접 뽑은 화장실 줄까지 팩에서 뺐다. 옷도 제복인데 교복이라고 단정했다.
+> 2. **사용자 말에 토를 달고 같은 주장을 되풀이했다.** 사용자가 여러 번 지적했는데도 근거를 다시 확인하지 않아 몇 시간을 허비하게 했다.
+> 3. **허락 없이 문서를 지웠다.** 「지침을 지우라」는 말만 듣고 목록을 보여 주지도 않고 96개를 지웠다가 되살렸다(결과물 삭제 금지 규칙 위반).
+> 4. **문장을 덧대기만 하며 PixelLab을 낭비했다.** 이성해 점프 공격 5번 연속 실패, 이어폰 음악 120줄을 못 쓰게 만듦.
+> 5. **답을 미루고 일을 멈춰 두었다.** 백그라운드로 돌릴 일을 돌리지 않고 대화만 했다.
+>
+> 지킬 것: 사용자 결정·위키가 근거다. 옛 Claude 자료는 근거가 아니다. 사용자 말에 토 달지 않는다. 무엇이든 지우기 전에 목록을 보여 주고 허락받는다. 실패하면 덧대지 말고 다시 쓰거나 바꾼다.
+
 - 2026-10-21 사용자가 "캐릭터 그만 만들고 다른 거 개발" 지시 → 게임을 스레드 9개로 나눠 병렬 개발(전투와 조작=엔진·통합 주인, 층 생성, 적, 아이템, 대사, 화면·터치, 소리, 리스 탑재, 본부). 연결 약속: main docs/게임_모듈_연결.md + src/game/action/engine/contract.ts.
 - 본부 스레드 결과: 브랜치 claude/project-thread-feaea1 (b376e80), 시연판 release/demo/goei-hq.html (출동은 graybox sim 임시, hq/demo-run.ts). 시험 tests/hq.test.mjs(8건), tests/hq-browser.mjs. 빌드 node src/game/action/hq/build-demo.mjs (공용 build.mjs는 엔진 스레드가 합침).
 - 본부 소유: 저장 데이터 모양(state.ts, schema 'goei-hq/1'), 재화 정산, Esc 가방 UI, MissionLaunch/RunResult(hq/contract.ts). 아이템 표는 items/ 스레드(SUPPLY_CATALOG, drawItemIcon, bag {id,name,value,research}), 대사 글은 story/ 스레드(setLineProvider), pluginStorage 슬롯·본편 card/report는 리스 탑재 스레드(bridge.saves 슬롯 0=자동, 1~3 수동).

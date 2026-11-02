@@ -1,0 +1,235 @@
+{
+ "frames": [
+  {
+   "filename": "fx-orb 0.png",
+   "frame": {
+    "x": 0,
+    "y": 0,
+    "w": 43,
+    "h": 25
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 43,
+    "h": 25
+   },
+   "sourceSize": {
+    "w": 43,
+    "h": 25
+   },
+   "pivot": {
+    "x": 0.6976744186046512,
+    "y": 0.48
+   },
+   "duration": 83
+  },
+  {
+   "filename": "fx-orb 1.png",
+   "frame": {
+    "x": 43,
+    "y": 0,
+    "w": 43,
+    "h": 25
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 43,
+    "h": 25
+   },
+   "sourceSize": {
+    "w": 43,
+    "h": 25
+   },
+   "pivot": {
+    "x": 0.6976744186046512,
+    "y": 0.48
+   },
+   "duration": 83
+  },
+  {
+   "filename": "fx-orb 2.png",
+   "frame": {
+    "x": 86,
+    "y": 0,
+    "w": 43,
+    "h": 25
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 43,
+    "h": 25
+   },
+   "sourceSize": {
+    "w": 43,
+    "h": 25
+   },
+   "pivot": {
+    "x": 0.6976744186046512,
+    "y": 0.48
+   },
+   "duration": 83
+  },
+  {
+   "filename": "fx-orb 3.png",
+   "frame": {
+    "x": 0,
+    "y": 25,
+    "w": 43,
+    "h": 25
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 43,
+    "h": 25
+   },
+   "sourceSize": {
+    "w": 43,
+    "h": 25
+   },
+   "pivot": {
+    "x": 0.6976744186046512,
+    "y": 0.48
+   },
+   "duration": 83
+  },
+  {
+   "filename": "fx-orb 4.png",
+   "frame": {
+    "x": 43,
+    "y": 25,
+    "w": 43,
+    "h": 25
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 43,
+    "h": 25
+   },
+   "sourceSize": {
+    "w": 43,
+    "h": 25
+   },
+   "pivot": {
+    "x": 0.6976744186046512,
+    "y": 0.48
+   },
+   "duration": 83
+  },
+  {
+   "filename": "fx-orb 5.png",
+   "frame": {
+    "x": 86,
+    "y": 25,
+    "w": 43,
+    "h": 25
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 43,
+    "h": 25
+   },
+   "sourceSize": {
+    "w": 43,
+    "h": 25
+   },
+   "pivot": {
+    "x": 0.6976744186046512,
+    "y": 0.48
+   },
+   "duration": 83
+  },
+  {
+   "filename": "fx-orb 6.png",
+   "frame": {
+    "x": 0,
+    "y": 50,
+    "w": 43,
+    "h": 25
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 43,
+    "h": 25
+   },
+   "sourceSize": {
+    "w": 43,
+    "h": 25
+   },
+   "pivot": {
+    "x": 0.6976744186046512,
+    "y": 0.48
+   },
+   "duration": 83
+  },
+  {
+   "filename": "fx-orb 7.png",
+   "frame": {
+    "x": 43,
+    "y": 50,
+    "w": 43,
+    "h": 25
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 43,
+    "h": 25
+   },
+   "sourceSize": {
+    "w": 43,
+    "h": 25
+   },
+   "pivot": {
+    "x": 0.6976744186046512,
+    "y": 0.48
+   },
+   "duration": 83
+  }
+ ],
+ "meta": {
+  "app": "PixelLab VFX Creator",
+  "image": "fx-orb.png",
+  "format": "RGBA8888",
+  "size": {
+   "w": 129,
+   "h": 75
+  },
+  "scale": "1",
+  "anchor": {
+   "kind": "origin",
+   "x": 30,
+   "y": 12
+  },
+  "frameTags": [
+   {
+    "name": "fx-orb",
+    "from": 0,
+    "to": 7,
+    "direction": "forward"
+   }
+  ]
+ }
+}

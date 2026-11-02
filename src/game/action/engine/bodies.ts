@@ -8,8 +8,8 @@ export class Dummy extends Fighter {
   readonly team = 'enemy' as const;
   readonly kind = 'dummy';
   label = '허수아비';
-  hp = 400;
-  hpMax = 400;
+  hp = 1000;
+  hpMax = 1000;
   regen = 0;
   constructor(x: number, y: number, private endless = true) {
     super();

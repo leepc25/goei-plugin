@@ -18,13 +18,22 @@ import { buildFieldReport, emitReport, fieldSummary, journalSettings, lastReport
 import { parseCatalog } from '../../core/world/catalog';
 import { userInfo } from '../user';
 
-const KINDS: FieldKind[] = ['move', 'act', 'hurt', 'down', 'kill', 'flee', 'provoke', 'gift', 'trade', 'quest', 'follow', 'unfollow', 'enter_anomaly', 'exit_anomaly', 'enter_site', 'detected', 'appoint', 'call'];
+const KINDS: FieldKind[] = ['move', 'act', 'hurt', 'down', 'kill', 'flee', 'provoke', 'gift', 'trade', 'quest', 'follow', 'unfollow', 'enter_anomaly', 'exit_anomaly', 'enter_site', 'detected', 'appoint', 'call', 'enter_field', 'exit_field'];
+
+/** 쌓는 중인 필드 사건이 다 들어갈 때까지 (응답 보내기 직전에 기다린다) */
+const tails = new Map<GameField, () => Promise<unknown>>();
+export const fieldIdle = (): Promise<unknown> => Promise.all([...tails.values()].map((t) => t()));
+/** 게임을 닫을 때: 쌓던 사건이 다 들어간 뒤 목록에서 뺀다 (11-02: 안 빼면 열 때마다 채팅 사본이 남아 메모리가 3MB씩 쌓였다) */
+export function releaseField(f: GameField): void {
+  const t = tails.get(f);
+  if (t) void t().catch(() => {}).finally(() => tails.delete(f));
+}
 
 export function createField(): GameField {
   const opening = loadContext();
   let chain: Promise<unknown> = Promise.resolve();
   let forced: 'inside' | 'outside' | null = null;
-  return {
+  const field: GameField = {
     override(v) { forced = v; },
     async entry() {
       const c = await loadContext();
@@ -44,7 +53,7 @@ export function createField(): GameField {
         const c = await loadContext();
         if (!c || c.charIndex !== origin.charIndex || c.chatIndex !== origin.chatIndex || c.char.chaId !== origin.char.chaId || c.chat.id !== origin.chat.id) return;
         if (!KINDS.includes(ev.kind as FieldKind)) return;
-        const event = { id: uid(), at: Date.now(), anchor: anchorOf(c.chat), kind: ev.kind as FieldKind, text: ev.text, scene: ev.scene, who: ev.who, weight: ev.weight, fact: ev.fact, ...(ev.witness && typeof ev.witness.faction === 'string' ? { witness: { faction: ev.witness.faction, named: !!ev.witness.named } } : {}), ...(typeof ev.visit === 'string' && ev.visit ? { visit: ev.visit } : {}) };
+        const event = { id: uid(), at: Date.now(), anchor: anchorOf(c.chat), kind: ev.kind as FieldKind, text: ev.text, ...(typeof ev.ko === 'string' ? { ko: ev.ko } : {}), scene: ev.scene, who: ev.who, weight: ev.weight, fact: ev.fact, ...(ev.witness && typeof ev.witness.faction === 'string' ? { witness: { faction: ev.witness.faction, named: !!ev.witness.named } } : {}), ...(typeof ev.visit === 'string' && ev.visit ? { visit: ev.visit } : {}) };
         let made: { id: string; title: string; summary: string } | null = null;
         await updateChat(c.charIndex, c.chatIndex, (chat) => {
           if (chat.id !== c.chat.id) return null;
@@ -55,7 +64,7 @@ export function createField(): GameField {
             if (applyFieldEvent(store, next, event, playerAgent(c.char.globalLore, next.scriptstate)?.name ?? '주인공', { mobWeight: peopleSettings(next.scriptstate).mobWeight, factionNames: factionNamesOf(c.char.globalLore) }) > 0) next = withPeople(next, store);
           }
           // 출동 종료: 같은 저장에 일지 줄·보고서 (core/journal/field). 모델 호출 없음
-          if (event.kind === 'exit_anomaly') {
+          if (event.kind === 'exit_field' || event.kind === 'exit_anomaly') {
             const snap = cardSnapshot(c.char, next);
             let catalog = null;
             try {
@@ -89,4 +98,6 @@ export function createField(): GameField {
       return n && n.cause === 'field' ? { id: n.id, title: n.title, summary: n.summary } : null;
     },
   };
+  tails.set(field, () => chain);
+  return field;
 }

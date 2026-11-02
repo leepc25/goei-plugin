@@ -1,0 +1,12 @@
+[
+ {
+  "name": "바주카 꺼내기",
+  "frames": 8,
+  "action": "starting from the fighting stance, reach down along the east side of the body and pull a bazooka up from the east hip, raise it straight up along the east side of the body and set it onto the east shoulder, the left hand catching the front of the tube, then drop the rear knee to the floor and aim east; the bazooka never passes behind her or to her west side",
+  "prompt": "Reach down to pull a bazooka from the hip, raising it vertically along the side to rest atop the shoulder. Catch the tube with the forward hand, then drop the rear knee to the floor to brace and aim the weapon.",
+  "usage": {
+   "type": "generations",
+   "generations": 0.05
+  }
+ }
+]

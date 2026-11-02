@@ -1,0 +1,192 @@
+{
+ "key": "6.31_프리랜서남2",
+ "name": "프리랜서남2",
+ "dir": "E",
+ "color": "#cfc7a6",
+ "armed": false,
+ "anims": {
+  "1": {
+   "folder": "1",
+   "mirror": false,
+   "name": "평상 대기"
+  },
+  "2": {
+   "folder": "2",
+   "mirror": false,
+   "name": "개인 대기"
+  },
+  "3_0": {
+   "folder": "3_0",
+   "mirror": false,
+   "name": "전투 자세 잡기"
+  },
+  "4": {
+   "folder": "4",
+   "mirror": false,
+   "name": "걷기"
+  },
+  "5": {
+   "folder": "5",
+   "mirror": false,
+   "name": "뛰기"
+  },
+  "21": {
+   "folder": "21",
+   "mirror": false,
+   "name": "스턴"
+  }
+ },
+ "picks": {
+  "combat": 4,
+  "weapon": 4,
+  "apex": 4,
+  "run": 2,
+  "crawl4": 6
+ },
+ "loops": {},
+ "hit": {},
+ "gun": [],
+ "kick": [
+  "11",
+  "12"
+ ],
+ "ranged": {
+  "proj": {
+   "t": "proj",
+   "kind": "orb",
+   "hit": {
+    "dmg": 7,
+    "kind": "light"
+   }
+  },
+  "heat": false
+ },
+ "skills": {
+  "skill": {
+   "name": "팔꿈치로 쳐내고 근접 사격",
+   "anim": "22",
+   "fps": 11,
+   "armed": true,
+   "events": [
+    {
+     "f": 3,
+     "fx": [
+      {
+       "t": "melee",
+       "range": 140,
+       "hit": {
+        "dmg": 98,
+        "kind": "light"
+       }
+      }
+     ]
+    },
+    {
+     "f": 5,
+     "fx": [
+      {
+       "t": "repeat",
+       "n": 2,
+       "every": 0.08,
+       "fx": [
+        {
+         "t": "proj",
+         "kind": "orb",
+         "speed": 1700,
+         "size": 0.6,
+         "life": 0.4,
+         "hit": {
+          "dmg": 85,
+          "kind": "light"
+         }
+        }
+       ]
+      }
+     ]
+    }
+   ],
+   "hitVfx": "x3-npc-heavy-impact",
+   "hitScale": 0.6
+  },
+  "charge": {
+   "name": "모은 한 방 · 정강이 돌려차기",
+   "hold": "23",
+   "release": "24",
+   "levels": [
+    0.5,
+    1.2
+   ],
+   "fire": 4,
+   "armed": false,
+   "lv": {
+    "0": [
+     {
+      "t": "melee",
+      "range": 170,
+      "hit": {
+       "dmg": 75,
+       "kind": "heavy"
+      }
+     }
+    ],
+    "1": [
+     {
+      "t": "dash",
+      "speed": 1200,
+      "time": 0.22,
+      "hit": {
+       "dmg": 150,
+       "kind": "heavy"
+      }
+     }
+    ],
+    "2": [
+     {
+      "t": "melee",
+      "range": 170,
+      "hit": {
+       "dmg": 240,
+       "kind": "launch"
+      }
+     },
+     {
+      "t": "v",
+      "vfx": "x3-c-ground-shockwave",
+      "at": "front",
+      "dx": 120,
+      "scale": 0.8,
+      "tint": "#d8cfb4"
+     }
+    ]
+   },
+   "hitVfx": {
+    "2": "x3-npc-heavy-impact",
+    "1": "x3-npc-heavy-impact"
+   },
+   "hitScale": {
+    "2": 0.9,
+    "1": 0.7
+   }
+  }
+ },
+ "_note": "자동 생성. 값을 고치면 build가 그대로 씀. 다시 자동으로: build.py --reset 6.31_프리랜서남2",
+ "bal": {
+  "role": "striker",
+  "speed": "normal",
+  "gun": "single",
+  "atk": {
+   "9": 15,
+   "10": 16,
+   "11": 19,
+   "12": 26,
+   "13": 20,
+   "14": 22
+  },
+  "cd": {
+   "skill": 5
+  },
+  "shotDmg": 9,
+  "hp": 110
+ },
+ "skills_2판": {}
+}
