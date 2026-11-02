@@ -76,11 +76,13 @@ def process(cid, anim):
             if nb.sum() == body.sum(): break
             body = nb
         water_on = water & ndimage.binary_dilation(body, iterations=3)      # 몸 위·몸 조각 사이의 물
+        body_top = int(np.nonzero(body.any(axis=1))[0].min())
         kill = np.zeros_like(on)
         for k in range(1, nc + 1):
             comp = lab == k
             if body[comp].any(): continue
             n = int(sizes[k - 1])
+            if np.nonzero(comp)[0].max() <= body_top + 4: kill |= comp; continue   # 몸 꼭대기보다 위에 떠 있는 조각 = 샤워기 헤드(6.44: 갈색 음영이 피부로 잡혀 남았음)
             if skin[comp].sum() / n > 0.3: continue          # 떨어진 손·발(6.44 손은 밝은 피부라 0.5로는 지워졌다)
             if n >= 100 and skin[comp].mean() >= 0.15 and np.nonzero(comp)[0].min() > skin_top + 10 and (comp & ndimage.binary_dilation(body, iterations=4)).any(): continue   # 몸 옆 큰 조각에 피부가 섞이고 머리 꼭대기보다 아래(6.44 손; 샤워기 헤드는 위)
             kill |= comp
