@@ -59,6 +59,10 @@ elif cmd=='apply':
         if k in SKIP: continue
         p=TR/'chairs'/f'{k}.json'; d=json.loads(p.read_text()) if p.exists() else {}
         for v in LID: d[v]={'dx':vals[v]['dx'],'dy':vals[v]['dy'],'s':1.0,'img':vals[v]['img']}
+        for lk in [x for x in d if x not in LID]: d.pop(lk)   # 옛 줄 값(옛 사무의자) 지움
+        for lk,lv in vals.get('lines',{}).items():   # 줄마다 따로 맞춘 값(73 기대 쉬기, 위로 뜬 149·148·167)
+            v,l=lk.split(':'); d[l]={'dx':lv['dx'],'dy':lv['dy'],'s':1.0,'img':vals[v]['img']}
+            if 'frame_dx' in lv: d[l]['frame_dx']=lv['frame_dx']
         p.write_text(json.dumps(d,ensure_ascii=False,indent=1)+'\n'); n+=1
     print('applied',n)
 elif cmd=='sheet' or cmd=='try':
