@@ -147,7 +147,7 @@ const exitS = (to: SceneId, toDoor: string, key: string, west = false): HqDoor =
 /** 탈의실 캐비닛 앞 서는 자리 (11-02, 그림의 캐비닛 옆면 밑선에서 땀). face = 캐비닛 쪽.
  * 여: 왼쪽 캐비닛 섬 오른쪽 면 두 자리, 오른쪽 섬 왼쪽 면 한 자리. 남: 가운데 캐비닛 오른쪽 면 두 자리, 오른쪽 벽 캐비닛 한 자리 */
 const LOCKERS: Record<'shower_f' | 'shower_m', { id: string; x: number; y: number; face: 1 | -1 }[]> = {
-  shower_f: [{ id: 'locker1', x: 560, y: 670, face: -1 }, { id: 'locker2', x: 600, y: 610, face: -1 }, { id: 'locker3', x: 700, y: 680, face: 1 }],
+  shower_f: [{ id: 'locker1', x: 560, y: 670, face: -1 }, { id: 'locker2', x: 600, y: 610, face: -1 }, { id: 'locker3', x: 700, y: 680, face: 1 }, { id: 'locker4', x: 316, y: 640, face: 1 }, { id: 'locker5', x: 885, y: 604, face: 1 }],   // 4·5: 사용자 11-02 06:28 「여기도 넣어」(빨래통 왼쪽 사물함 앞 모서리, 오른쪽 안쪽 분홍 사물함 앞)
   shower_m: [{ id: 'locker1', x: 865, y: 700, face: -1 }, { id: 'locker2', x: 935, y: 640, face: -1 }, { id: 'locker3', x: 1100, y: 690, face: 1 }],
 };
 const lockerSpots = (id: 'shower_f' | 'shower_m'): HqSpot[] => LOCKERS[id].map((l) => ({ id: `locker:${l.id}`, x: l.x, y: l.y, verb: '캐비닛', face: l.face, act: ['locker'] }));
