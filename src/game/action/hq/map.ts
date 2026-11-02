@@ -182,7 +182,7 @@ function floorHall(id: SceneId, name: string, floor: HqScene['floor'], doors: Om
   } else {
     // 의자가 오브젝트 그림 안에 있는 방(11-02 사무실 책상): 앉는 자리마다 그리지 않는 빈 상자를 두어 NPC 자리(seats)·주인공 자리 겹침 검사가 같은 번호를 쓴다.
     // owner = 평소 앉는 사람(지도 spots.owner) → NPC 책상 일은 자기 책상 먼저 (world/actors.ts)
-    const deskSpots = sc.spots.filter((s) => s.seat && s.chair === undefined);
+    const deskSpots = sc.spots.filter((s) => s.seat && s.chair === undefined && s.act?.[0]?.startsWith('sit_'));   // 의자 자리만 (의무실 침대 눕기 자리는 제외)
     if (deskSpots.length) {
       const base = sc.boxes.length;
       const faceOf = (s: HqSpot): HqBox['face'] => (s.act?.[0] === 'sit_back' ? 'N' : s.act?.[0] === 'sit_side' ? (s.face === -1 ? 'W' : 'E') : undefined);
