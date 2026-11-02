@@ -42,20 +42,37 @@ export function hqRoam(graph: PlaceGraph, home: string): string[] {
 export function hqSpawns(graph: PlaceGraph): SpawnRule[] {
   // 바깥 거리·통로는 모두 같은 인구 (승강장은 타는 곳마다 드나든다). 중림 행인 비율(프리랜서 위주)은 원형이 생기면 districts 에서
   // 중림 지하 통로·뒷골목(6,000~9,000px)은 큰길 밀도면 100명이 넘어 한산하게(0.35 = 1,000px당 3~4명, Claude 추정치)
-  const out: SpawnRule[] = streetSpawns(HQ_STREETS.filter((s) => graph.scene(s)), { street: [30, 1890] }, { jr_entry: 0.6, jr_b1: 0.35, jr_b2: 0.35, jr_alley: 0.35 });
+  const out: SpawnRule[] = streetSpawns(HQ_STREETS.filter((s) => graph.scene(s)), { street: [30, 1890] }, { jr_entry: 0.6, jr_b1: 0.35, jr_b2: 0.35, jr_alley: 0.35 })
+    .map((r) => (STREET_SWAP[r.scene] ? { ...r, swap: STREET_SWAP[r.scene] } : r));
   // 건물 로비마다 드나드는 사람: 행인 + 그 건물 직원(직원 원형이 있는 건물만)
   for (const b of BUILDINGS) {
     const lobby = b.lobby ? graph.scene(b.lobby) : null;
     const main = lobby?.doors.find((d) => d.id === 'main')?.x;
     if (!lobby || main === undefined) continue;
-    const staff = STAFF_BY_FACTION[b.faction ?? ''];
-    out.push({ scene: lobby.id, target: { day: 2, night: 0 }, refill: [6, 12], gates: [main], mix: staff ? ['행인', staff] : ['행인'] });
+    const staff = ROLES[b.id]?.staff;
+    // 협회 로비는 프리랜서(창구 손님)가 드나든다
+    out.push({ scene: lobby.id, target: { day: 2, night: 0 }, refill: [6, 12], gates: [main], mix: b.id === 'sdra' ? ['행인', '프리랜서', '프리랜서'] : staff ? ['행인', staff] : ['행인'] });
   }
   return out;
 }
 
-/** 세력별 직원 원형 (로비 드나드는 직원·사무실 책상 일). 가짜 관리국·백일몽·협회 직원 원형은 그림(인물 팩 2·3·4번대)은 있으나 원형이 아직 없어 뒤 단계에서 넣는다 */
-const STAFF_BY_FACTION: Record<string, string> = { A00: '행정 직원' };
+/** 건물별 사람 (11-02 사용자 「건물마다 옳은 사람」): 안내 데스크·경비·사무 직원·훈련하는 전투원 원형. 협회는 데스크 없음, 훈련장은 프리랜서가 쓴다 */
+const ROLES: Record<string, { desk?: string; guard: string; staff: string; fighter: string }> = {
+  hq: { desk: '안내 직원', guard: '경비', staff: '행정 직원', fighter: '관리국 요원' },
+  fb: { desk: '가짜 관리국 검사', guard: '가짜 관리국 진압', staff: '가짜 관리국 검사', fighter: '가짜 관리국 진압' },
+  by: { desk: '백일몽 직원', guard: '백일몽 경비', staff: '백일몽 직원', fighter: '백일몽 경비' },
+  sdra: { guard: '협회 경비', staff: '협회 직원', fighter: '프리랜서' },
+};
+/** 거리마다 섞이는 사람 (11-02 사용자: 중림 행인은 프리랜서 위주 + 세력 요원 드문드문, 세력 거리 앞은 살아 있게). 비율은 Claude 제안(프리랜서 6 : 시민 3 : 세력 1) — 사용자 확정 대기 */
+const 세력 = ['관리국 요원', '백일몽 직원', '가짜 관리국 검사', '협회 직원'];
+const rep = (n: number, s: string) => Array<string>(n).fill(s);
+const STREET_SWAP: Record<string, Record<string, string[]>> = {
+  street: { 행인: [...rep(8, '행인'), '행정 직원'] },
+  fb_street: { 행인: [...rep(8, '행인'), '가짜 관리국 검사'] },
+  sdra_street: { 행인: [...rep(6, '행인'), ...rep(3, '프리랜서'), '협회 직원'] },
+  // 중림: 프리랜서 24 : 시민 12 : 세력 4(네 세력 하나씩) = 6 : 3 : 1
+  ...Object.fromEntries(['jr_entry', 'jr_b1', 'jr_b2', 'jr_alley'].map((id) => [id, { 행인: [...rep(24, '프리랜서'), ...rep(12, '행인'), ...세력] }])),
+};
 
 /** 근무형 몹 (6-3장 근무표 초안, 수치는 시연판에서 조정): 건물마다 로비 근무자 + 의무실 + 방 종류별 자동 인원 */
 export function hqPosts(graph: PlaceGraph): Post[] {
@@ -80,36 +97,38 @@ function lobbyPosts(graph: PlaceGraph, b: Building): Post[] {
   const deskY = post ? post[1] : box ? Math.round(box.y - box.d - 8) : undefined;
   const halls = graph.ids().filter((id) => new RegExp(`^${b.prefix}(f\\d+|b\\d)$`).test(id));
   const scene = lobby.id;
+  const role = ROLES[b.id] ?? ROLES.hq;
   return [
-    ...(desk !== null ? [
-      { id: `${b.id}-desk`, archetype: '안내 직원', scene, how: 'fixed', spot: desk, y: deskY, shifts: [[9, 18]], count: 1, gate },
-      { id: `${b.id}-night`, archetype: '경비', scene, how: 'fixed', spot: desk, y: deskY, shifts: [[18, 9]], count: 1, gate },
+    ...(desk !== null && role.desk ? [
+      { id: `${b.id}-desk`, archetype: role.desk, scene, how: 'fixed', spot: desk, y: deskY, shifts: [[9, 18]], count: 1, gate },
+      { id: `${b.id}-night`, archetype: role.guard, scene, how: 'fixed', spot: desk, y: deskY, shifts: [[18, 9]], count: 1, gate },
     ] as Post[] : []),
-    { id: `${b.id}-guard`, archetype: '경비', scene, how: 'patrol', span: [gate + 120, Math.min(lobby.length - 120, gate + 900)], shifts: [[0, 24]], count: 1, gate },
+    { id: `${b.id}-guard`, archetype: role.guard, scene, how: 'patrol', span: [gate + 120, Math.min(lobby.length - 120, gate + 900)], shifts: [[0, 24]], count: 1, gate },
     { id: `${b.id}-cleaner`, archetype: '청소부', scene, how: 'roam', route: [scene, ...halls, scene], stay: 40, shifts: [[6, 9], [20, 23]], count: 1, gate },
   ];
 }
 
-/** 역할 표: 건물 세력 × 장소 종류 → 그 방에 상주하는 역할·인원·근무시간. 관리국: 사무실 1곳당 사무 3, 훈련장 1곳당 전투원 4.
- *  가짜 관리국 사무실은 이름 인물(검사부대·진압부대)이 책상 주인이라 자동 인원 없음. 백일몽·협회는 원형이 생기면 칸을 더한다 */
-const ROLE_BY_KIND: Record<string, Partial<Record<string, { archetype: string; how: Post['how']; per: number; shifts: [number, number][] }>>> = {
-  A00: {
-    office: { archetype: '행정 직원', how: 'desk', per: 3, shifts: [[9, 18]] },
-    training: { archetype: '관리국 요원', how: 'train', per: 4, shifts: [[9, 18]] },
-  },
+/** 장소 종류 → 그 방에 상주하는 역할(ROLES 열쇠)·인원·근무시간. 사무실 1곳당 사무 3, 훈련장 1곳당 전투원 4 (협회 훈련장은 프리랜서 3).
+ *  이름 인물이 책상 주인인 사무실(종합대응팀·가짜 관리국 검사부대·진압부대·백일몽 사무실)은 자동 인원 없음 — 그 사람들은 이름 인물로 앉힌다 */
+const ROLE_BY_KIND: Partial<Record<string, { who: 'staff' | 'fighter'; how: Post['how']; per: number; shifts: [number, number][] }>> = {
+  office: { who: 'staff', how: 'desk', per: 3, shifts: [[9, 18]] },
+  training: { who: 'fighter', how: 'train', per: 4, shifts: [[9, 18]] },
 };
 export function autoPosts(graph: PlaceGraph): Post[] {
   const out: Post[] = [];
   for (const id of graph.ids()) {
-    const fac = hqSceneFaction(id);
-    const r = fac ? ROLE_BY_KIND[fac]?.[graph.kind(id)] : undefined;
-    if (!r) continue;
+    if (!hqInside(id)) continue;
+    const b = hqBuilding(id);
+    const r = ROLE_BY_KIND[graph.kind(id)];
+    const roles = ROLES[b.id];
+    if (!r || !roles) continue;
     const name = graph.scene(id)?.name ?? '';
-    // 사무실 중 종합대응팀 = 이름 요원들 방(상태 태그) → 이름 없는 직원 안 둠. 진압팀 = 진압팀원(관리국 요원)이 책상 일 (10-31 사용자)
-    if (/종합대응/.test(name)) continue;
-    const role = /진압/.test(name) ? { ...r, archetype: '관리국 요원' } : r;
+    // 이름 인물의 방: 종합대응팀(관리국 요원들), 검사부대·진압부대(가짜 관리국 인물표), 백일몽 사무실·정예 → 이름 없는 직원 안 둠
+    if (/종합대응|검사부대|진압부대/.test(name) || (b.id === 'by' && r.who === 'staff')) continue;
+    // 관리국 진압팀 = 진압팀원(관리국 요원)이 책상 일 (10-31 사용자)
+    const archetype = /진압/.test(name) ? roles.fighter : roles[r.who];
     const gate = graph.scene(id)?.doors[0]?.x ?? 100;
-    out.push({ id: `auto-${id}`, archetype: role.archetype, scene: id, how: role.how, shifts: role.shifts, count: role.per, gate });
+    out.push({ id: `auto-${id}`, archetype, scene: id, how: r.how, shifts: r.shifts, count: b.id === 'sdra' && r.who === 'fighter' ? 3 : r.per, gate });
   }
   return out;
 }

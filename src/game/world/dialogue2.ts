@@ -50,7 +50,12 @@ export function npcFileOf(archetype: string | undefined, sex: '남' | '여' | nu
   if (archetype === '의사') return '의사_남';
   if (archetype === '간호사') return '간호사_여';
   if (archetype === '편의점 점원') return `상인_${s}`;
-  if (['행인', '학생', '불량배', '경찰', '청소부', '상인'].includes(archetype)) return `${archetype}_${s}`;
+  if (['행인', '학생', '불량배', '경찰', '청소부', '상인', '프리랜서'].includes(archetype)) return `${archetype}_${s}`;
+  // 11-02 건물별 원형: 그 세력 파일 (가짜 관리국은 남성만)
+  if (archetype === '협회 직원' || archetype === '협회 경비') return `협회 직원_${s}`;
+  if (archetype === '백일몽 직원' || archetype === '백일몽 경비') return `백일몽 직원_${s}`;
+  if (archetype === '가짜 관리국 검사') return '가짜 관리국 검사부대_남';
+  if (archetype === '가짜 관리국 진압') return '가짜 관리국 진압부대_남';
   // 세력 소속 NPC: 관리국은 직책별, 다른 세력은 그 세력 파일 (가짜 관리국은 남성만)
   if (['경비', '안내 직원', '행정 직원', '관리국 요원'].includes(archetype)) {
     if (faction === 'B00') return archetype === '경비' || archetype === '관리국 요원' ? '가짜 관리국 진압부대_남' : '가짜 관리국 검사부대_남';

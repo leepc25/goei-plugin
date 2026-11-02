@@ -49,6 +49,12 @@ const 관리국 = ['관리국남A', '관리국남B', '관리국여A', '관리국
 const 경찰 = ['경찰남1', '경찰남2', '경찰여1', '경찰여2'];
 const 상인 = ['상인남1', '상인남2', '상인남3', '상인남4', '상인여1', '상인여2', '상인여3'];
 const 청소부 = ['청소부남1', '청소부여1'];
+// 11-02 건물별 소속 분리: 다른 세력·프리랜서 그림 (mobProfiles.json 신상과 같은 이름)
+const 프리랜서 = ['프리랜서남1', '프리랜서남2', '프리랜서남3', '프리랜서남4', '프리랜서여1', '프리랜서여2', '프리랜서여3', '프리랜서여4', '프리랜서여5'];
+const 협회 = ['협회남1', '협회남2', '협회여1', '협회여2', '협회여3'];
+const 백일몽 = ['백일몽남A', '백일몽남B', '백일몽여A', '백일몽여B'];
+const 가짜검사 = ['가짜관리국검사A', '가짜관리국검사B', '가짜관리국검사C'];
+const 가짜진압 = ['가짜관리국진압A', '가짜관리국진압B', '가짜관리국진압C'];
 export const ARCHETYPES: Record<string, Archetype> = {
   // 시민 = 그냥 행인 하나 (10-31 사용자). 시민 그림 18장, 직업 없음, 성별·나이대는 그림 신상(mobProfiles)
   행인: { name: '행인', role: 'civilian', range: {}, looks: 시민 },
@@ -68,6 +74,15 @@ export const ARCHETYPES: Record<string, Archetype> = {
   간호사: { name: '간호사', role: 'staff', range: { social: [0.5, 1] }, looks: ['간호사1'] },
   // 장소 종류별 인구(6-4장)에 쓰는 원형
   상인: { name: '상인', role: 'worker', range: { social: [0.4, 1], courage: [0.3, 0.8] }, looks: 상인 },
+  // 11-02 사용자: 중림 행인은 프리랜서 위주, 협회 창구·훈련장은 프리랜서가 쓴다. 싸울 줄 아는 민간인
+  프리랜서: { name: '프리랜서', role: 'civilian', range: { courage: [0.5, 1], haste: [0.2, 0.7] }, looks: 프리랜서 },
+  // 협회(중립 사이트) 직원·경비, 백일몽 직원·경비, 가짜 관리국 검사부대(사무)·진압부대(경비·전투) — 건물마다 그 집 사람만 (world/hq.ts ROLES)
+  '협회 직원': { name: '협회 직원', role: 'staff', range: { courage: [0.2, 0.6], social: [0.3, 0.9] }, looks: 협회 },
+  '협회 경비': { name: '협회 경비', role: 'guard', range: { courage: [0.6, 1], curious: [0.4, 0.9] }, looks: ['협회남1', '협회남2'] },
+  '백일몽 직원': { name: '백일몽 직원', role: 'staff', range: { courage: [0.2, 0.7], social: [0.3, 0.9], sly: [0, 0.2] }, looks: 백일몽 },
+  '백일몽 경비': { name: '백일몽 경비', role: 'guard', range: { courage: [0.6, 1], curious: [0.4, 0.9] }, looks: ['백일몽남A', '백일몽남B'] },
+  '가짜 관리국 검사': { name: '가짜 관리국 검사', role: 'staff', range: { courage: [0.5, 1], social: [0.2, 0.7] }, looks: 가짜검사 },
+  '가짜 관리국 진압': { name: '가짜 관리국 진압', role: 'guard', range: { courage: [0.7, 1], haste: [0.4, 0.9] }, looks: 가짜진압 },
 };
 
 export function rollTemper(r: Rng, a: Archetype | undefined): Temperament {

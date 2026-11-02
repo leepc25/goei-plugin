@@ -240,6 +240,8 @@ export interface SpawnRule {
   dens?: number;
   /** 원형 이름 목록 (뽑기) */
   mix: string[];
+  /** 원형 바꿔치기 (11-02): mix·bands 의 원형 이름을 이 목록에서 다시 뽑는다 (한 번만). 중림 「행인」 → 프리랜서 위주 등, 거리마다 구성이 다를 때 */
+  swap?: Record<string, string[]>;
   /** 밤(19:30~05시) 원형 목록. 없으면 mix */
   nightMix?: string[];
   /** 시간대별 유동인구 (있으면 target·mix 대신): from~to 시(자정 넘김 가능)에 장면 1,000px당 n명, mix 에서 뽑는다 */
@@ -3367,7 +3369,9 @@ export class WorldSim {
     return { n: Math.round((b.n * (r.dens ?? 1) * (this.graph.scene(r.scene)?.length ?? 1000)) / 1000), mix: b.mix };
   }
   private mixOf(r: SpawnRule): string[] {
-    return this.bandOf(r)?.mix ?? (this.isNight() && r.nightMix?.length ? r.nightMix : r.mix);
+    const mix = this.bandOf(r)?.mix ?? (this.isNight() && r.nightMix?.length ? r.nightMix : r.mix);
+    if (!r.swap) return mix;
+    return mix.flatMap((n) => r.swap![n] ?? [n]);   // 한 번만 (목록 안 이름은 다시 바꾸지 않는다)
   }
   /** 한 명(또는 일행 둘) 들여보냄. 들어온 수 */
   private spawnOne(r: SpawnRule, playerX: number | null, anywhere: boolean, room = 1): number {
