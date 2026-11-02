@@ -867,7 +867,7 @@ function jumpAttack(heavyKind?: Json) {
 }
 function land() {
   const slam = P.airAtk && P.airHeavy;
-  sfx('land'); P.z = 0; P.vz = 0; P.airAtk = false;
+  sfx('land'); P.z = Math.max(0, P.z); P.vz = 0; P.airAtk = false;   // 발판 위(env.ground > 0)에 내리면 그 높이 그대로 (11-02 휴게실 테이블: 0으로 내리면 땅으로 꺼짐)
   env.perk?.land({ heavy: slam, jumps: P.jumps }); shake = Math.max(shake, 2); if (!vfx('land_dust', P.x, P.y, 2.2, { bottom: true })) dust(P.x, P.y, 5);
   P.mode = 'act';
   const j = jf();
@@ -1242,7 +1242,7 @@ function update(dt?: Json) {
   updateProxies(dt);
   tickClip(dt);
   // 공중에서 맞거나 다른 동작으로 넘어가도 떨어지게(10-28: 점프 중 맞으면 허공에 고정되던 버그). 점프(air) 모드는 따로 처리
-  if (P.mode !== 'air' && P.z > 0) { P.vz = Math.min(P.vz || 0, 300) - 2700 * dt; P.z = Math.max(0, P.z + P.vz * dt); if (P.z === 0) { P.vz = 0; dust(P.x, P.y, 4, 1); sfx('land'); } }
+  { const gz = env.ground(P.x, P.y); if (P.mode !== 'air' && P.z > gz) { P.vz = Math.min(P.vz || 0, 300) - 2700 * dt; P.z = Math.max(gz, P.z + P.vz * dt); if (P.z === gz) { P.vz = 0; dust(P.x, P.y, 4, 1); sfx('land'); } } }   // 발판 윗면(gz)까지만 떨어진다
   if (P.clip && (P.clip.id === 'SH_D' || P.clip.id === 'SH_E') && Math.random() < dt * 60) { const k = K(P.y); fx.push({ k: 'mote', x: P.x + (Math.random() - 0.5) * 70 * k, y: P.y - (230 + Math.random() * 40) * k, vy: 700 + Math.random() * 200, c: 'rgba(170,220,255,.8)', t: 0.3 }); }   // 샤워 물줄기(코드)
   P.inv = Math.max(0, P.inv - dt); P.wakeArmor = Math.max(0, (P.wakeArmor || 0) - dt);
   if (P.mode === 'down' && P.wakeBuf && P.t - (P.downAt ?? -9) >= P.wakeDelay + (P.wakeExtra || 0)) { const k = P.wakeBuf; P.wakeBuf = null; onPress(k); }

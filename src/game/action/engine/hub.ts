@@ -256,9 +256,10 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
       encounters: [],
       platforms: sc.painted ? sc.boxes.filter((b) => b.solid && b.h > 0 && b.h < 400).map((b) => ({ x0: b.x - b.w / 2, x1: b.x + b.w / 2, y0: b.y - b.d, y1: b.y, h: b.h })) : undefined,
       depthLayers: sc.boxes.map((b, bi) => ({ y: b.y, occludedSilhouette: !sc.painted, x0: b.x - b.w / 2, x1: b.x + b.w / 2, draw: (c: CanvasRenderingContext2D) => {
-        if (sc.painted && hasHqField(sc.painted)) { drawHqFieldObject(c, sc.painted, b.kind, gateOpen.get(b.kind) ?? 0, stallBusy(b.kind)); return; }
         // 누가 앉은 의자는 앉은 사람이 자기 맞춤값으로 그린다 (주인공 = 엔진, 이름 인물 = drawCharSeat)
         if (b === sitChair || live.some((q) => q.seat?.box === bi)) return;
+        // 그림 장면의 의자 상자(11-02 휴게실 chairs): 오브젝트 그림이 아니라 의자 묶음 그림으로
+        if (sc.painted && hasHqField(sc.painted) && b.kind !== 'chair' && b.kind !== 'armchair') { drawHqFieldObject(c, sc.painted, b.kind, gateOpen.get(b.kind) ?? 0, stallBusy(b.kind)); return; }
         drawBox(c, b, sc.look);
       } })).concat(people.map((p) => ({ y: p.y, x0: p.x - 60, x1: p.x + 60, occludedSilhouette: false, draw: (c: CanvasRenderingContext2D) => { drawCharClip(c, p.name, p.x, p.y, p.face, performance.now()); } })))
         // 샤워기(샤워실): 주인공이 그 자리에서 샤워 중이면 물줄기·김을 사람 바로 앞 깊이에 그린다 (hq/showerFx.ts)
