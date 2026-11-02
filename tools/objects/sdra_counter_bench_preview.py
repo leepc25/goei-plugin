@@ -8,11 +8,11 @@ import fit_chair as fc
 from PIL import Image
 OUT = os.environ.get('OUT', '/tmp/bench.png')
 tmp = OUT + '.staff.png'
-subprocess.run([sys.executable, str(R/'tools/objects/sdra_counter_sit_preview.py')], env={**os.environ, 'OUT': tmp}, check=True, stdout=subprocess.DEVNULL)
+subprocess.run([sys.executable, str(R/'tools/objects/sdra_counter_sit_preview.py')], env={k: v for k, v in {**os.environ, 'OUT': tmp}.items() if k not in ('SC', 'BS')}, check=True, stdout=subprocess.DEVNULL)
 out = Image.open(tmp).convert('RGBA'); os.remove(tmp)
 FIT = json.loads((R/'game-src/art/objects/chairs_office/fit_all.json').read_text())
 bench = Image.open(R/'game-src/art/pixellab-hq-20261031/sdra_counter_bench_v1_cut.png').convert('RGBA')
-SC = float(os.environ.get('SC', '0.75'))   # 의자·사람 같이 줄임(13:16 사용자 「너무 크지 않냐」), 다리 바닥 가운데 고정
+SC = float(os.environ.get('BSC', '0.75'))   # 의자·사람 같이 줄임(13:16 사용자 「너무 크지 않냐」), 다리 바닥 가운데 고정
 FOOT = (545*2 + 110.5*2, int(os.environ.get('FY', 835)))    # 다리 바닥 가운데(2배). 13:20 사용자 「더 뒤로」 → FY 줄이고 원근만큼 SC 줄임
 OX, OY = FOOT[0] - 110.5*2*SC, FOOT[1] - 124*2*SC
 SEATS_X = [40, 111.5, 183.5]; SEAT_PT_Y = 61  # 1배(잘라낸 판 기준)
