@@ -105,7 +105,9 @@ for c in chairs:
     south = c['chair'] == 'north.png'
     key = (SEAT_S if south else SEAT_N)[ci[0 if south else 1]]; ci[0 if south else 1] += 1
     x, y = round(c['cx']), round(c['foot'] * K); who = WHO.get(key)
-    spots.append({'id': f'desk:{who or key}', 'x': x, 'y': y, **({'who': who} if who else {}), 'verb': '앉기', 'face': 1,
+    # 09:05 사용자: 자리 주인(owner)은 평소 앉는 사람일 뿐 고정 아님. 모든 책상은 비어 있으면 유저·공용 NPC 누구나 앉는다(shared).
+    # (who 는 대화 상대 뜻이라 쓰지 않음)
+    spots.append({'id': f'desk{len(spots) + 1}', 'x': x, 'y': y, **({'owner': who} if who else {}), 'shared': True, 'verb': '앉기', 'face': 1,
                   'act': ['sit_back' if south else 'sit_front'], 'seat': {'x': x, 'y': y}, 'chairImg': c['chair']})
 # 배경 물건 핀(1배 가운데 x, 서는 발 y = 바닥 맨 뒤 + 10). 그림 3배로 보고 잰 물건 폭 가운데
 FOOT = BACK + 10
@@ -140,7 +142,7 @@ if len(sys.argv) > 1:
     for s in spots:
         col = (255, 220, 0) if s['verb'] == '앉기' else (0, 220, 255)
         d.ellipse([s['x'] - 9, s['y'] - 9, s['x'] + 9, s['y'] + 9], fill=col, outline=(0, 0, 0), width=2)
-        t = s.get('who') or ('빈자리' if s['verb'] == '앉기' else s['verb']); tw = d.textlength(t, font=font)
+        t = s.get('owner') or ('빈자리' if s['verb'] == '앉기' else s['verb']); tw = d.textlength(t, font=font)
         d.rectangle([s['x'] - tw / 2 - 4, s['y'] - 42, s['x'] + tw / 2 + 4, s['y'] - 14], fill=(0, 0, 0, 190))
         d.text((s['x'] - tw / 2, s['y'] - 40), t, fill=col, font=font)
     ex = m['doors']['out']; d.polygon([(ex['x'], ex['y']), (ex['x'] - 30, ex['y'] - 18), (ex['x'] - 30, ex['y'] + 18)], fill=(255, 80, 255))
