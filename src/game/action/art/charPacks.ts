@@ -159,7 +159,8 @@ export const charClips = (nameOrKey: string): string[] => Object.keys(FIELD_CLIP
 
 function shadow(c: CanvasRenderingContext2D, x: number, y: number, w: number, k: number) {
   c.fillStyle = 'rgba(0,0,0,0.36)';
-  c.beginPath(); c.ellipse(x, y - 2 * k, Math.max(16, w) * 0.58 * k, 5 * k, 0, 0, Math.PI * 2); c.fill();
+  // 11-02 사용자 「그림자 붕 떠 있다」: 앞발 끝선에 두면 큰 장면에서 뒷발이 그림자 위로 떠 보임 → 두 발 사이(발끝 6도트 위)로
+  c.beginPath(); c.ellipse(x, y - 6 * k, Math.max(16, w) * 0.58 * k, 5 * k, 0, 0, Math.PI * 2); c.fill();
 }
 
 /** 한 번만 하고 끝내는 몸짓 (10-31 사용자: 기지개·경례를 반복하면 이상하다, 한 번만) — 되풀이하지 않고 마지막 장에서 멈춘다 */
