@@ -103,6 +103,8 @@ export interface HqScene {
   /** 화장실 쓰는 자리 (칸·소변기·세면대) */
   toilets?: HqToilet[];
   /** 남녀 구분 화장실: 이 성별만 쓴다 (NPC는 다른 쪽에 들어가지 않는다) */
+  /** 샤워 자리 (11-02 NPC 샤워): 그림의 샤워기 발 자리 */
+  showers?: { id: string; x: number; y: number; face: 1 | -1 }[];
   sex?: '남' | '여';
 }
 
@@ -140,6 +142,8 @@ const room = (b: Base, key: string, west = false): HqScene => ({ ...b, ...fromRo
 /** 방에서 나가는 화면 아래 출입. west 방은 동쪽 끝 */
 const exitS = (to: SceneId, toDoor: string, key: string, west = false): HqDoor => ({ id: 'out', x: M(west ? ROOMS[key].w - 1 : 1), kind: 'exit', side: 'S', to, toDoor });
 /** 층 복도: 확정 배경 그림 한 장. 문 x는 그림의 문 가운데, 집기는 그림에서 오린 오브젝트의 바닥 상자 */
+/** 샤워실 그림의 샤워기 발 자리 → NPC가 서는 자리 (11-02 NPC 샤워) */
+const showerSpots = (id: SceneId) => (PAINTED[id]?.showers ?? []).map((s) => ({ id: s.id, x: s.foot[0], y: s.foot[1], face: s.face }));
 function floorHall(id: SceneId, name: string, floor: HqScene['floor'], doors: Omit<HqDoor, 'x'>[], extra: Partial<HqScene> = {}): HqScene {
   const p = PAINTED[id];
   // 맵 에디터로 만든 장면이면 앉는 자리도 그쪽 것
@@ -212,8 +216,8 @@ export const HQ_SCENES: HqScene[] = [
     { id: 'elev', kind: 'elevator' },
   ]),
   // 샤워실: 출입문은 오른쪽 옆벽(그림 속 문). 자리 6곳(E → 샤워 규칙 재생)은 mapedit.gen 의 MAPEDIT_SPOTS
-  floorHall('bath_f', '샤워실(여)', 'B1', [{ id: 'out', kind: 'exit', to: 'b1', toDoor: 'shower_f', label: '나가기' }], { sex: '여' }),
-  floorHall('bath_m', '샤워실(남)', 'B1', [{ id: 'out', kind: 'exit', to: 'b1', toDoor: 'shower_m', label: '나가기' }], { sex: '남' }),
+  floorHall('bath_f', '샤워실(여)', 'B1', [{ id: 'out', kind: 'exit', to: 'b1', toDoor: 'shower_f', label: '나가기' }], { sex: '여', showers: showerSpots('bath_f') }),
+  floorHall('bath_m', '샤워실(남)', 'B1', [{ id: 'out', kind: 'exit', to: 'b1', toDoor: 'shower_m', label: '나가기' }], { sex: '남', showers: showerSpots('bath_m') }),
   room({ id: 'training', name: '훈련장', floor: 'B1', look: 'lab', doors: [exitS('b1', 'training', 'training')] }, 'training'),
   // 지하 2층은 새 본부 그림(PixelLab 11-01, game-src/mapedit/b2): 서→동 격리시설 방폭문 · 격리팀 사무실(의무실·연구실) · 엘리베이터. 심문실·창고 없음(본부 최소화)
   floorHall('b2', '격리 구역', 'B2', [

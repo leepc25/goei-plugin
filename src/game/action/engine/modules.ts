@@ -547,6 +547,9 @@ function hqAdapter(bridge: Partial<GameBridge> | undefined, ui: { chooseFloor: H
     gear: (sceneId) => world()?.gear(sceneId) ?? [],
     toiletBusy: (sceneId, id) => world()?.toiletBusy(sceneId, id) ?? false,
     playerToilet: (t) => { const w = world(); if (w) w.playerToilet = t; },
+    showerBusy: (sceneId, id) => world()?.showerBusy(sceneId, id) ?? false,
+    showerUsers: (sceneId) => world()?.showerUsers(sceneId) ?? [],
+    playerShower: (t) => { const w = world(); if (w) w.playerShower = t; },
     playerPeek: (t) => world()?.peekStall(t.scene, t.id),
     hit: (sceneId, boxes, dir) => world()?.hitBoxes(sceneId, boxes, dir).length ?? 0,
     actors: (sceneId) => (world()?.inScene(sceneId) ?? []).map((a) => {

@@ -171,6 +171,8 @@ export interface Actor {
   sawBodies?: string[];
   /** 무기 든 주인공을 마지막으로 본 때 (11-01 사용자 10번: 무기를 든 동안 계속 반응, 넣으면 그만) */
   armedSeen?: number;
+  /** 샤워 자리를 쓰는 중 (11-02 NPC 샤워): 자리 id */
+  shower?: { id: string };
   /** 맨몸(샤워 중, 11-01): 샤워 기능이 켠다. 켜진 동안 setClip 이 옷 입은 클립을 맨몸 클립(NUDE_CLIP)으로 바꿔 끼운다 */
   nude?: boolean;
   /** 넉백 속도(px/s, 11-01 1-2): 맞으면 밀려나며 빠르게 줄어든다 */
@@ -632,6 +634,8 @@ export class WorldSim {
     const onToilet = a.toilet?.kind === 'stall' && a.toilet.phase === 'in';
     const seated = !!a.seat || onToilet || (a.act === 'do' && (a.clip === 'poo' || (a.clip === 'pee' && !this.canClip(a, 'line:100'))));
     if (a.toilet) { this.leaveToilet(a); a.task = undefined; }
+    // 샤워 중 맞음(11-02): 샤워를 끊고 맨몸 피격으로 (nude 는 켜진 채 → NUDE_CLIP)
+    if (a.shower) { a.shower = undefined; a.station = undefined; a.task = undefined; }
     const lying = a.clip === 'lie' || a.clip === 'treat';
     // 맨몸(11-01): 쓰러진 채 또 맞으면 누운 채 맞기(SH_H4)만 틀고 그 마지막 장에 머문다
     const nudeLying = !!a.nude && a.act === 'down' && (a.hp ?? 1) <= 0;
@@ -1625,7 +1629,7 @@ export class WorldSim {
   private setClip(a: Actor, clip: string, fromQ = false): void {
     if (!fromQ) a.clipQ = undefined;
     // 맨몸이면 맨몸 클립으로 바꿔 끼운다 (그 인물에게 그림이 있을 때만; 없으면 가린 채 경계, 그것도 없으면 옷 입은 그림 그대로)
-    if (a.nude && !clip.startsWith('nude_')) {
+    if (a.nude && !clip.startsWith('nude_') && clip !== 'shower') {
       const n = NUDE_CLIP[clip] ?? 'nude_idle';
       clip = this.canClip(a, n) ? n : this.canClip(a, 'nude_idle') ? 'nude_idle' : clip;
     }
@@ -1688,6 +1692,8 @@ export class WorldSim {
     if (a.needs) decayNeeds(a.needs, dt, TEMPER[a.def.name], onDuty(this.hour, TEMPER[a.def.name]));
     // 화장실 자리: 하던 일이 끊겼으면(맞음·겁 등) 자리를 비운다. 칸 안에서 닫힌 문 뒤에 있는 동안은 바깥 일에 반응하지 않는다
     if (a.toilet && a.act !== 'do') this.leaveToilet(a);
+    // 샤워가 끊겼으면(맞음·침입 반응 등) 자리만 비운다. 맨몸은 그대로 (샤워실을 나가면 옷 입음: door)
+    if (a.shower && a.act !== 'do') a.shower = undefined;
     if (a.toilet?.kind === 'stall' && a.act === 'do') return this.stepStall(a, dt);
     if (a.def.kind === 'mob') this.mobThink(a, dt);
     if (a.def.kind === 'named' && this.namedBlocks(a)) return;   // 호감 적대: 보자마자 막아섬 (C4 다안)
@@ -1721,6 +1727,7 @@ export class WorldSim {
         a.scene = hop.to;
         a.x = at.x;
         a.y = at.y;
+        if (a.nude && !this.graph.scene(a.scene)?.showers?.length) this.setNude(a.def.id, false);   // 샤워실을 나가면 옷 입음 (주인공과 같음)
         return this.nextLeg(a);
       }
       case 'walk':
@@ -1729,8 +1736,9 @@ export class WorldSim {
         if (a.task && a.needs) a.needs[a.task.need] = Math.min(100, a.needs[a.task.need] + a.task.fill * dt);
         a.wait -= dt;
         // 직원의 책상 일은 욕구가 차도 정한 시간만큼 (근무라서). 그 밖은 욕구가 다 차면 끝
-        if (a.wait <= 0 || (a.task && a.task.fill > 0 && a.needs && a.needs[a.task.need] >= 100 && !(a.post && (a.task.id === 'work' || a.task.id === 'train')))) {
+        if (a.wait <= 0 || (a.task && a.task.fill > 0 && a.needs && a.needs[a.task.need] >= 100 && a.task.id !== 'shower' && !(a.post && (a.task.id === 'work' || a.task.id === 'train')))) {
           a.last = a.task?.id;
+          if (a.shower) { a.shower = undefined; a.station = undefined; this.setNude(a.def.id, false); }   // 샤워 끝: 옷 입기까지 다 틀었으니 옷 입음
           const wash = !!a.toilet && a.toilet.kind !== 'sink';
           this.leaveToilet(a);
           a.task = undefined;
@@ -2161,6 +2169,7 @@ export class WorldSim {
     a.station = undefined;
     a.opt = undefined;
     if (t.id === 'train') { const st = this.trainSpot(a); if (st) return st; }
+    if (t.id === 'shower') { const st = this.showerSpot(a); if (st) return st; }
     if (t.id === 'pee' || t.id === 'poo') { const st = this.toiletSpot(a, t.id === 'pee' && this.sexOf(a) === '남' ? ['urinal', 'stall'] : ['stall']); if (st) return st; }
     // 그 인물에게 그림이 있는 줄 중에서 고른다 (10-31): 앉는 줄은 그 방향 빈 의자가 있을 때만. 바로 전에 한 줄은 덜 고른다
     const look = a.def.look ?? a.def.name;
@@ -2229,6 +2238,16 @@ export class WorldSim {
     // 화장실 자리 (칸·소변기·세면대). 화장실인데 빈 자리가 없었으면 볼일을 보지 않고 잠깐 기다렸다 다시 고른다 (아무 데서나 보지 않는다)
     const ts = this.toiletOf(a);
     if (ts) return this.startToilet(a, ts);
+    if (t.id === 'shower') {
+      const sh = this.showerOf(a);
+      if (sh) return this.startShower(a, sh);
+      // 빈 샤워 자리가 없으면 아무 데서나 씻지 않는다: 잠깐 기다렸다 다시 고른다
+      a.task = undefined;
+      a.station = undefined;
+      this.idle(a, 2, 4);
+      a.doing = '샤워 자리 기다림';
+      return;
+    }
     if ((t.id === 'pee' || t.id === 'poo' || t.id === 'wash') && this.graph.scene(a.scene)?.toilets?.length) {
       a.task = undefined;
       a.station = undefined;
@@ -2529,6 +2548,46 @@ export class WorldSim {
     if (!p?.sex || !roomSex) return;
     if (p.sex !== roomSex) { if (!a.intrude || a.intrude.stage === 'wait') this.intrudeFire(a, 0); return; }
     if (!again) this.events.push({ kind: 'cue', scene, who: a.def.name, id: a.def.id, cell: 'toilet.same_open', ctx: { target: '{user}', say: '사람 있어요! 문 닫아요!' } });
+  }
+
+  // ── 샤워 (11-02, NPC 샤워): 같은 성별 샤워실의 빈 샤워 자리에 서서 옷 벗기 → 머리감기·몸씻기 → 옷 입기 (클립 'shower', fighter/shower.ts) ──
+  /** 주인공이 쓰는 샤워 자리 (hub가 알려 준다) */
+  playerShower: { scene: string; id: string } | null = null;
+  /** 그 샤워 자리를 쓰거나 쓰러 가는 사람이 있나 (주인공 포함) */
+  showerBusy(scene: string, id: string, except?: Actor): boolean {
+    if (this.playerShower?.scene === scene && this.playerShower.id === id) return true;
+    const key = `${scene}#s:${id}`;
+    return this.actors.some((q) => q !== except && q.scene === scene && (q.shower?.id === id || (q.station === key && q.act === 'walk' && q.plan === 'do')));
+  }
+  /** 지금 샤워 중인 자리들 (hub: 물줄기·김을 그 자리에 그린다) */
+  showerUsers(scene: string): { id: string; actor: string; y: number; look: string; since: number; until: number }[] {
+    return this.actors.filter((a) => a.scene === scene && a.shower && a.act === 'do').map((a) => ({ id: a.shower!.id, actor: a.def.id, y: a.y, look: a.def.kind === 'named' ? a.def.name : a.def.look ?? a.def.name, since: a.clipAt ?? this.time, until: a.clipUntil ?? this.time }));
+  }
+  private showerSpot(a: Actor): { x: number; y: number } | null {
+    const ss = this.graph.scene(a.scene)?.showers;
+    if (!ss?.length) return null;
+    const free = ss.filter((s) => !this.showerBusy(a.scene, s.id, a));
+    if (!free.length) return null;
+    const s = free[Math.floor(this.rng() * free.length)];
+    a.station = `${a.scene}#s:${s.id}`;
+    return { x: s.x, y: s.y };
+  }
+  private showerOf(a: Actor) {
+    const m = a.station?.match(/^(.+)#s:(.+)$/);
+    if (!m || m[1] !== a.scene) return null;
+    const s = this.graph.scene(a.scene)?.showers?.find((q) => q.id === m[2]);
+    if (!s || this.showerBusy(a.scene, s.id, a)) { a.station = undefined; return null; }
+    return s;
+  }
+  private startShower(a: Actor, s: { id: string; x: number; y: number; face: 1 | -1 }): void {
+    a.x = s.x;
+    a.y = s.y;
+    a.face = s.face;
+    a.shower = { id: s.id };
+    a.doing = '샤워 중';
+    this.setNude(a.def.id, true);
+    this.setClip(a, 'shower');
+    a.clipUntil = this.time + a.wait;
   }
 
   // ── 화장실 (11-01, world/toilets.ts) ──

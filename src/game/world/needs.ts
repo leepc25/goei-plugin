@@ -4,8 +4,9 @@
 import type { PlaceGraph, PlaceKind } from './places';
 
 /** train = 단련(10-31 사용자: 전투 NPC·이름 요원은 모두 훈련장에 가서 훈련한다. 사무·안내·의료·청소 직원은 없음) */
-export type NeedId = 'work' | 'hunger' | 'energy' | 'bladder' | 'bowel' | 'social' | 'fun' | 'train';
-export const NEEDS: NeedId[] = ['work', 'hunger', 'energy', 'bladder', 'bowel', 'social', 'fun', 'train'];
+export type NeedId = 'work' | 'hunger' | 'energy' | 'bladder' | 'bowel' | 'social' | 'fun' | 'train' | 'hygiene';
+/** hygiene = 씻기 (11-02 NPC 샤워: 샤워실에서 샤워하면 찬다) */
+export const NEEDS: NeedId[] = ['work', 'hunger', 'energy', 'bladder', 'bowel', 'social', 'fun', 'train', 'hygiene'];
 export type Needs = Record<NeedId, number>;
 
 /** 활동 하나: 어느 욕구를, 어떤 클립으로, 어떤 장소 종류에서, 얼마나 */
@@ -35,6 +36,8 @@ export const ACTIVITIES: Activity[] = [
   { id: 'hobby', need: 'fun', clip: 'hobby', where: ['lounge'], sec: [30, 60], fill: 3, label: '취미' },
   // 훈련: 팔굽혀펴기·장비 점검·기지개, 그 줄이 없으면 약공 연습(모든 인물에게 있음). 싸우는 몸만 (choose fighter)
   { id: 'train', need: 'train', clip: 'train', where: ['training'], sec: [40, 90], fill: 2.5, label: '훈련' },
+  // 샤워(11-02): 같은 성별 샤워실의 빈 샤워 자리에서 옷 벗기 → 머리감기·몸씻기(문지르는 구간만 속도 차등 반복) → 옷 입기. 현실 10분 이상 (fighter/shower.ts 규칙)
+  { id: 'shower', need: 'hygiene', clip: 'shower', where: ['bathroom'], sec: [600, 780], fill: 0.2, label: '샤워 중' },
 ];
 
 /** 활동마다 실제로 할 수 있는 줄 (10-31 사용자: 앉아서 하는 것과 서서 하는 것은 다르다, 상황에 따라 다양하게).
@@ -70,7 +73,7 @@ export const ACT_OPTS: Record<string, ActOpt[]> = {
 };
 
 /** 생활 1초당 줄어드는 양 (기본). 인물 계수가 곱해진다. 대략 몇 분에 한 번씩 각 욕구가 고개를 든다 */
-export const DECAY: Needs = { work: 0.35, hunger: 0.12, energy: 0.08, bladder: 0.2, bowel: 0.05, social: 0.18, fun: 0.12, train: 0.06 };
+export const DECAY: Needs = { work: 0.35, hunger: 0.12, energy: 0.08, bladder: 0.2, bowel: 0.05, social: 0.18, fun: 0.12, train: 0.06, hygiene: 0.03 };
 
 /** 인물별 성향 (욕구 계수·취향). 없는 칸은 1. 원작 근거는 docs/본부_설계_2판.md 4장 */
 export interface Temper {

@@ -50,3 +50,31 @@ export function showerPlan(o: ShowerOpts = {}): ShowerStep[] {
   return steps;
 }
 export const planSeconds = (p: ShowerStep[]) => p.reduce((s, b) => s + total(b.seq), 0);
+
+// ── NPC 샤워 (11-02): 필드 생활 클립 'shower' 가 쓴다 (art/charPacks.ts drawCharClip) ──
+// 옷 벗기(SH_A 한 번) → 위 규칙의 계획(머리감기·몸씻기, 문지르는 구간만 속도 차등) → 옷 입기(SH_A 거꾸로 한 번). 주인공 샤워와 같은 규칙
+export const UNDRESS_D = 0.12, DRESS_D = 0.1;
+type Flat = { id: string; f: number; t: number }[];
+const flatCache = new Map<string, { flat: Flat; end: number }>();
+/** 샤워 시작부터 sec 초 지난 장 (총 길이 total 초). 그림 없는 줄은 건너뛴다. null = 그릴 줄 없음 */
+export function npcShowerFrame(key: string, seed: number, sec: number, total: number, nOf: (id: string) => number): { id: string; f: number } | null {
+  const nA = nOf('SH_A'), undress = nA * UNDRESS_D, dress = nA * DRESS_D;
+  if (nA && sec < undress) return { id: 'SH_A', f: Math.min(nA - 1, Math.floor(sec / UNDRESS_D)) };
+  if (nA && sec >= total - dress) return { id: 'SH_A', f: Math.max(0, nA - 1 - Math.floor((sec - (total - dress)) / DRESS_D)) };
+  const ck = `${key}|${seed}|${Math.round(total)}`;
+  let c = flatCache.get(ck);
+  if (!c) {
+    const plan = showerPlan({ seconds: Math.max(10, total - undress - dress), seed, has: (id) => nOf(id) > 0, nOf });
+    const flat: Flat = []; let t = 0;
+    for (const b of plan) for (const e of b.seq) { flat.push({ id: b.id, f: Math.min(e.f, nOf(b.id) - 1), t }); t += e.d; }
+    c = { flat, end: t };
+    if (flatCache.size > 64) flatCache.clear();
+    flatCache.set(ck, c);
+  }
+  if (!c.flat.length) return null;
+  const u = sec - (nA ? undress : 0);
+  if (u >= c.end) { const l = c.flat[c.flat.length - 1]; return { id: l.id, f: l.f }; }
+  let lo = 0, hi = c.flat.length - 1;
+  while (lo < hi) { const m = (lo + hi + 1) >> 1; if (c.flat[m].t <= u) lo = m; else hi = m - 1; }
+  return { id: c.flat[lo].id, f: c.flat[lo].f };
+}
