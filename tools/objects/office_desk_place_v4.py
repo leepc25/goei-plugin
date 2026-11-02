@@ -29,6 +29,16 @@ for gi, gx in enumerate((G1, G2)):
 # 쟈알디 책상 = 북쪽 책상(D02v2), 오른쪽 끝 (사용자 07:53 「쟈알디는 북쪽으로」, 핀 92%). JX=가운데 x, JF=발 y
 JX, JF = (int(a[6]) if len(a) > 6 else 1364), (int(a[7]) if len(a) > 7 else SF)
 j = load(NORTH, JF); L.append((JF, j, JX * K - j.width // 2, JF * K - j.height))
+# 바닥 그림자(코드, 책상 그림은 안 건드림, 사용자 07:53 「그림자가 없으니 이상」): 책상 발 둘레 바닥에 2단 반투명 띠, 2배 픽셀 단위
+SHC, SHA = (20, 26, 38), (70, 115)   # 색, (가장자리, 안쪽) 알파
+SD = int(a[8]) if len(a) > 8 else 12  # 그림자 깊이(1배 px, 발에서 뒤쪽으로)
+from PIL import ImageDraw
+def shadow(im, x, y):
+    lay = Image.new('RGBA', out.size, (0, 0, 0, 0)); d = ImageDraw.Draw(lay)
+    fy, l, r = y + im.height, x, x + im.width
+    d.rectangle([l - 2 * K, fy - SD * K, r + 2 * K, fy + 2 * K], fill=SHC + (SHA[0],))
+    d.rectangle([l + 2 * K, fy - (SD - 2) * K, r - 2 * K, fy], fill=SHC + (SHA[1],))
+    out.alpha_composite(lay)
 out = BG.copy()
-for _, im, x, y in sorted(L, key=lambda t: t[0]): out.alpha_composite(im, (x, y))
+for _, im, x, y in sorted(L, key=lambda t: t[0]): shadow(im, x, y); out.alpha_composite(im, (x, y))
 out.convert('RGB').save(a[1]); print('south w', [t[1].width for t in L if t[0] == SF])
