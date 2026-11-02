@@ -134,7 +134,7 @@ BEDS = [
     # id, 레일 키, 서기(x, y), 눕기(x, y = 매트리스 윗면 화면 자리), 머리
     ('bed_left',  'bed3_left',  (258, 304), (252, 257), -1),
     ('bed_back',  'bed1_back',  (628, 300), (738, 263), 1),
-    ('bed_front', 'bed2_front', (760, 370), (768, 324), 1),
+    ('bed_front', 'bed2_front', (652, 370), (768, 324), 1),
 ]
 
 
@@ -148,6 +148,10 @@ def rail_mask(key):
 for bid, key, _, (lx, ly), _ in BEDS:
     covers.append((f'rail_{bid}', rail_mask(key), BED_FOOT[bid][3] * K + 3))   # 침대 위(눕기·서기, 깊이 = 앞 모서리+2) 몸 바로 앞
 
+# 물건 상호작용 핀(사용자 12:52 「의무실 상호작용 넣은 다음에」): 사무실 핀과 같은 꼴, 서는 자리(1x) = 물건 바로 앞 바닥
+PINS = [('medcab', 470, 262, '약품장', 1, ['use']),            # 뒷벽 유리 약장(x412~590)
+        ('sink', 112, 262, '세면대', 1, ['handswork']),        # 왼쪽 조리대 가운데 수도꼭지(x110)
+        ('treat_cart', 440, 396, '처치 카트', 1, ['use'])]     # 앞줄 쟁반 탁자 카트(x403~478) 뒤
 # ── 검사
 floor_ok = np.zeros((H, W), bool)
 for x in range(W): floor_ok[top[x]:, x] = True
@@ -162,7 +166,7 @@ for gid, m, _ in covers:
         ys, xs = np.nonzero(m & floor_ok)
         if (ys >= max(b['poly'][0][1] // K for b in blocks if b.get('id') == gid)).any(): raise SystemExit(f'{gid} 발자국이 바닥에 열림 — 실패')
 DOOR_X = 233
-for nm, (sx, sy) in [('출입문', (DOOR_X, 420))] + [(f'{b[0]} 서기', b[2]) for b in BEDS]:
+for nm, (sx, sy) in [('출입문', (DOOR_X, 420))] + [(f'{b[0]} 서기', b[2]) for b in BEDS] + [(p[3], (p[1], p[2])) for p in PINS]:
     print(f'  {nm} ({sx},{sy}):', '감' if floor_ok[sy, sx] else '못 감!!')
     if not floor_ok[sy, sx]: raise SystemExit('자리 막힘 — 실패')
 print('검사 통과')
@@ -180,9 +184,10 @@ for x in range(W): step += [(x, int(top[x])), (x + 1, int(top[x]))]
 floor = [[x * K, y * K] for x, y in [(0, H)] + step + [(W, H)]]
 # 크기: 11-02 의무실 눕히기에서 정한 큐라스(가장 큰 남자) 기준 장면 배율 — 뒤 침대(y263) 0.545 · 앞 침대(y324) 0.65, 그 밖은 끝값 유지
 SIZES = [(263, 0.545), (324, 0.65)]
-door = {'kind': 'exit', 'x': DOOR_X * K, 'y': 420 * K, 'label': '나가기'}
+door = {'kind': 'exit', 'side': 'S', 'x': DOOR_X * K, 'y': 420 * K, 'label': '나가기'}
 spots = [{'id': bid, 'x': sx * K, 'y': sy * K, 'verb': '눕기', 'face': head, 'seat': {'x': lx * K, 'y': ly * K}, 'sortY': BED_FOOT[bid][3] * K + 2, 'act': ['bedlie', 'liehold']}
          for bid, _, (sx, sy), (lx, ly), head in BEDS]
+spots += [{'id': pid, 'x': px * K, 'y': py * K, 'verb': verb, 'face': face, 'act': act, 'say': ''} for pid, px, py, verb, face, act in PINS]
 m = {'file': 'hq_infirmary_strip', 'bgScale': K, 'dotK': round(SIZES[-1][1] * K, 4), 'sizes': [[y * K, round(k / SIZES[-1][1], 3)] for y, k in SIZES],
      'w': W * K, 'h': H * K, 'under': True, 'floor': floor, 'lane': [int(top.min()) * K, H * K - 4], 'blocks': [{'poly': b['poly'], 'h': b['h']} for b in blocks],
      'lamps': [], 'spots': spots, 'doors': {'out': door}, 'objects': [to_cover(o, mm, sy) for o, mm, sy in covers]}
