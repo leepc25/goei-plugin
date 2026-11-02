@@ -38,7 +38,7 @@ export const perspOf = (y: number, lane: [number, number], far: number, growTo: 
 };
 /** 원근 누르기 (사용자 11-02 15:12 「샤워장 같은 곳은 바깥쪽에 나올 때 커지는 폭을 줄이고 안쪽으로 올라갈 때는 최소한으로 줄여야」):
  *  앞/뒤 비율이 FLAT_FROM(1.4)을 넘는 급한 장면만, 줄 한가운데 크기는 그대로 두고 뒤로는 −5%까지만(FLAT_BACK), 앞으로는 +12%까지만(FLAT_FRONT) 변하게 누른다 */
-export const FLAT_FROM = 1.4, FLAT_BACK = 0.95, FLAT_FRONT = 1.12;
+export const FLAT_FROM = 1.4, FLAT_BACK = 0.98, FLAT_FRONT = 1.12;   // 11-02 15:18 사용자 「뒤쪽으로 가는 원근을 더 줄여야」 → 뒤 −5% → −2%
 export const perspFlat = (y: number, lane: [number, number], far: number, growTo: number, sizes: [number, number][]) => {
   const p = perspOf(y, lane, far, growTo, sizes);
   const pb = perspOf(lane[0], lane, far, growTo, sizes), pf = perspOf(lane[1], lane, far, growTo, sizes);
