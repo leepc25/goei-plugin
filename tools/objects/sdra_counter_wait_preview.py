@@ -26,7 +26,7 @@ C01_X, C01_FLOOR = 90.5, 172                    # C01 north 200 칸: 등받이 �
 PEOPLE = os.environ.get('WHO', '1.4_에일린,1.9_데드폴,1.12_콘쥬스').split(',')
 bx0 = BX - bench.width*BS/2; by0 = BY - BENCH_FLOOR*BS
 L = Image.new('RGBA', out.size, (0, 0, 0, 0))
-SEAT_Y = BENCH_FLOOR - (172 - 101)   # 사무의자 north 좌석 점(91,101)은 바닥 위 71 → 대기의자도 바닥 위 71 (같은 좌석 높이로 뽑음)
+SEAT_Y = BENCH_FLOOR - (172 - 101) + 14   # 사무의자 north 좌석 점(91,101). 좌석 윗면: 사무의자 바닥 위 74(98줄), 대기의자 바닥 위 60(70줄) → 14 낮춤 (12:30 사용자 「왜 이리 높아」)
 for sx, key in zip(SEATS_X, PEOPLE):
     im, (px0, py0), img = person_pt(key, 'back')
     seat = (bx0 + sx*BS, by0 + SEAT_Y*BS)
