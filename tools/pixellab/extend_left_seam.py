@@ -27,6 +27,8 @@ def b64(i):
 body={"description":open(pp,encoding="utf-8").read().strip(),
       "inpainting_image":{"image":{"type":"base64","base64":b64(win),"format":"png"},"size":{"width":w,"height":h}},
       "mask_image":{"image":{"type":"base64","base64":b64(mask),"format":"png"},"size":{"width":w,"height":h}},"no_background":False}
+if os.environ.get("CONTEXT"):   # 참고 그림(전체 방), 스키마상 deprecated — 효과 불확실(11-02)
+    _c=Image.open(os.environ["CONTEXT"]).convert("RGBA"); body["context_image"]={"image":{"type":"base64","base64":b64(_c),"format":"png"},"size":{"width":_c.width,"height":_c.height}}
 t0=time.time(); r=requests.post(API+"/inpaint-v3",json=body,timeout=60)
 if r.status_code>=300: print("error",r.status_code,r.text[:800]); sys.exit(1)
 job=r.json()["background_job_id"]
