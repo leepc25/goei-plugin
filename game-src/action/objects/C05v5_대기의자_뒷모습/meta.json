@@ -1,0 +1,86 @@
+{
+ "object_id": "87698cca-cafc-486a-9d83-d386d209a70e",
+ "job": {
+  "usage": {
+   "type": "usd",
+   "usd": 0.04272437511719597
+  },
+  "id": "14dba8f9-8bb2-4912-ac55-070a822f416a",
+  "status": "completed",
+  "created_at": "2026-11-02T12:13:04.175484+00:00",
+  "last_response": {
+   "status": "completed",
+   "progress": 1,
+   "object_id": "87698cca-cafc-486a-9d83-d386d209a70e",
+   "image_size": {
+    "width": 256,
+    "height": 160
+   },
+   "frame_count": 1,
+   "single_frame": true,
+   "storage_urls": {
+    "unknown": "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/87698cca-cafc-486a-9d83-d386d209a70e/rotations/unknown.png"
+   },
+   "billing_usage": {
+    "usd": 0.04272437511719597,
+    "type": "usd"
+   },
+   "generation_id": "fdddae81-f234-4b09-b7b2-61210801fc36",
+   "billing_stages": [
+    {
+     "stage": "first_direction",
+     "usage": {
+      "usd": 0.04272437511719597,
+      "type": "usd"
+     },
+     "generation_id": "fdddae81-f234-4b09-b7b2-61210801fc36"
+    }
+   ],
+   "billing_charged": true,
+   "generation_mode": "pro_flash",
+   "source_image_id": "8eb71082-2813-5aaf-8177-dd6f860c6d81",
+   "directions_count": 1,
+   "first_direction_generated": true
+  }
+ },
+ "object": {
+  "id": "87698cca-cafc-486a-9d83-d386d209a70e",
+  "name": "C05v5_대기의자_뒷모습",
+  "state_name": "base",
+  "prompt": "A three-seat waiting chair from the waiting area of a Korean bank: three seats with padded black faux leather cushions and padded black backrests, joined side by side on one dark metal frame that stands on slim metal legs, with the legs and the open space under the seats clearly visible; not a sofa, no armrests and no holes anywhere. Seen from directly behind: the plain black backs of the three backrests face the viewer, and the seat cushions are hidden behind them. Seen almost level, from the eye height of a standing adult, looking only a little down. Each of the three seats has exactly the same seat height, seat width and backrest height as the reference office chair, so a person sits on it the same way; the three seats side by side fill almost the whole width of the canvas. Only the chair, centered, nothing else.",
+  "size": {
+   "width": 256,
+   "height": 160
+  },
+  "directions": 1,
+  "created_at": "2026-11-02T12:13:04.202482+00:00",
+  "view": "low top-down",
+  "rotation_urls": {
+   "south": null,
+   "west": null,
+   "east": null,
+   "north": null,
+   "south-east": null,
+   "south-west": null,
+   "north-east": null,
+   "north-west": null
+  },
+  "storage_urls": {
+   "unknown": "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/87698cca-cafc-486a-9d83-d386d209a70e/rotations/unknown.png"
+  },
+  "frame_urls": null,
+  "style_settings": {
+   "version": "v2.0.0+api",
+   "no_background": true,
+   "generation_mode": "pro_flash",
+   "source_image_id": "8eb71082-2813-5aaf-8177-dd6f860c6d81",
+   "first_frame_direction": "south"
+  },
+  "tags": [],
+  "status": "completed",
+  "group_id": "64abe6a5-6d1b-42e5-afd0-68f4b3fe1f1b",
+  "progress_percent": null,
+  "eta_seconds": null,
+  "animations": []
+ }
+}
