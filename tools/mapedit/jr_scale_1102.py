@@ -29,6 +29,8 @@ REFS = {
 }
 
 EXTEND = {'jr_songil'}
+# 뒤 기준점(2배 y, 배율): 첫 기준점보다 뒤(벽 쪽)도 작아지게. 수술실 = 냉장고 몸통 2x 232~532(300px)=1.8m (사용자 14:19 「벽 쪽 에일린 왜 이리 커」)
+BACK = {'jr_op': [530, 0.686]}
 
 
 def main():
@@ -42,6 +44,7 @@ def main():
             dotK = round(2 * h1 / SPR, 4)
             m['dotK'] = dotK
             m['sizes'] = [[y0 * 2, round(h0 / h1, 3)], [y1 * 2, 1.0]]
+            if sid in BACK: m['sizes'].insert(0, BACK[sid])
             if sid in EXTEND:   # 앞 기준점 아래(화면 앞쪽)로도 같은 기울기로 계속 커짐 (사용자 13:32 「의자가 작은 거 아니냐 원근이」)
                 slope = (1 - h0 / h1) / (y1 * 2 - y0 * 2)
                 m['sizes'].append([848, round(1 + slope * (848 - y1 * 2), 3)])
