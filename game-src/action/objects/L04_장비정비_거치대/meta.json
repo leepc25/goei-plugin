@@ -1,0 +1,86 @@
+{
+ "object_id": "c78720d9-d2b2-439a-bb18-fb623d9ac9f6",
+ "job": {
+  "usage": {
+   "type": "usd",
+   "usd": 0.0411043261619144
+  },
+  "id": "f832598e-e232-4dfb-a158-1075ed8c8469",
+  "status": "completed",
+  "created_at": "2026-11-02T10:25:41.792625+00:00",
+  "last_response": {
+   "status": "completed",
+   "progress": 1,
+   "object_id": "c78720d9-d2b2-439a-bb18-fb623d9ac9f6",
+   "image_size": {
+    "width": 256,
+    "height": 256
+   },
+   "frame_count": 1,
+   "single_frame": true,
+   "storage_urls": {
+    "unknown": "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/c78720d9-d2b2-439a-bb18-fb623d9ac9f6/rotations/unknown.png"
+   },
+   "billing_usage": {
+    "usd": 0.0411043261619144,
+    "type": "usd"
+   },
+   "generation_id": "52c8369b-3353-460e-aac5-44fc5862f6c4",
+   "billing_stages": [
+    {
+     "stage": "first_direction",
+     "usage": {
+      "usd": 0.0411043261619144,
+      "type": "usd"
+     },
+     "generation_id": "52c8369b-3353-460e-aac5-44fc5862f6c4"
+    }
+   ],
+   "billing_charged": true,
+   "generation_mode": "pro_flash",
+   "source_image_id": "d12c966b-9342-5e5c-bc5a-b057c0447951",
+   "directions_count": 1,
+   "first_direction_generated": true
+  }
+ },
+ "object": {
+  "id": "c78720d9-d2b2-439a-bb18-fb623d9ac9f6",
+  "name": "L04_장비정비_거치대",
+  "state_name": "base",
+  "prompt": "An equipment maintenance station: a tall open steel rack standing upright, a little taller than an adult, holding two tactical vests, two helmets and two rifles upright in clamps, with supply boxes on the bottom shelf. In the middle of the rack at waist height, a strange glowing device held in a clamp, thin cables running from it to a small switched-on diagnostic screen built into the rack. The screen faces the viewer, its lit screen fully visible. Seen straight from the front, from the eye height of a standing adult: the front of the rack is a flat rectangle facing the viewer, its top and bottom edges are straight horizontal lines of the same length, its sides are straight vertical, nothing narrows with perspective, almost no top surface is visible. Only the rack with the things on it, centered, nothing else.",
+  "size": {
+   "width": 256,
+   "height": 256
+  },
+  "directions": 1,
+  "created_at": "2026-11-02T10:25:41.836161+00:00",
+  "view": "low top-down",
+  "rotation_urls": {
+   "south": null,
+   "west": null,
+   "east": null,
+   "north": null,
+   "south-east": null,
+   "south-west": null,
+   "north-east": null,
+   "north-west": null
+  },
+  "storage_urls": {
+   "unknown": "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/c78720d9-d2b2-439a-bb18-fb623d9ac9f6/rotations/unknown.png"
+  },
+  "frame_urls": null,
+  "style_settings": {
+   "version": "v2.0.0+api",
+   "no_background": true,
+   "generation_mode": "pro_flash",
+   "source_image_id": "d12c966b-9342-5e5c-bc5a-b057c0447951",
+   "first_frame_direction": "south"
+  },
+  "tags": [],
+  "status": "completed",
+  "group_id": "e46795e3-77db-492e-96b0-e8d3faa3e28c",
+  "progress_percent": null,
+  "eta_seconds": null,
+  "animations": []
+ }
+}
