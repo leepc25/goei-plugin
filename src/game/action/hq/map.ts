@@ -16,7 +16,7 @@ export type SceneId =
   | 'sdra_lobby' | 'sdra_f2' | 'sdra_wc_m' | 'sdra_wc_f' | 'sdra_street' | 'sdra_counter'
   | 'sdra_b1' | 'sdra_shower_f' | 'sdra_shower_m' | 'sdra_bath_f' | 'sdra_bath_m' | 'sdra_training'
   | 'jr_daebak' | 'jr_heolgap' | 'jr_youngchang' | 'jr_songil' | 'jr_jinryo' | 'jr_op'
-  | 'by_lobby' | 'by_f13' | 'by_wc_m' | 'by_wc_f' | 'by_lounge' | 'by_office'
+  | 'by_street' | 'by_lobby' | 'by_f13' | 'by_wc_m' | 'by_wc_f' | 'by_lounge' | 'by_office'
   | 'by_f15' | 'by_f17' | 'by_lab' | 'by_infirmary' | 'by_elite' | 'by_shower_m' | 'by_shower_f' | 'by_bath_m' | 'by_bath_f'
   | `fb_${FbBase}`;
 /** 가짜 관리국 본부 = 관리국 본부 장면을 그대로 복사한 것 (사용자 11-02 15:50 「관리국걸 그대로 가져다가」) */
@@ -250,6 +250,11 @@ export const HQ_SCENES: HqScene[] = [
     { id: 'bus', kind: 'exit', side: 'S', bus: '영등포', label: '버스 정류장' },
     { id: 'main', kind: 'glass', to: 'sdra_lobby', toDoor: 'main', label: '특수재난대응협회' },
   ]),
+  // 백일몽 앞 강남 거리: 그림 장면(PixelLab 11-02, tools/mapedit/author_by_street.py). 「백일몽 주식회사」 간판 아래 유리 양문 = 백일몽 1층 로비 정문, 맨 왼쪽 정류장 표지 = 버스 정류장
+  floorHall('by_street', '강남 거리', 'out', [
+    { id: 'bus', kind: 'exit', side: 'S', bus: '강남', label: '버스 정류장' },
+    { id: 'main', kind: 'glass', to: 'by_lobby', toDoor: 'main', label: '백일몽 주식회사' },
+  ]),
   // 10-31 사용자: 종로 큰길·지하철 승강장·지역 회색 장면 4곳(영등포·강남·망원·여의도)과 편의점·노점은 가설로 만든 것이라 뺐다.
   // 거리는 각 세력·중립 건물로 들어가는 길거리뿐 — 지도가 완성되면 그때 더한다
 
@@ -297,9 +302,9 @@ export const HQ_SCENES: HqScene[] = [
   // ── 백일몽 본사 (11-02 사용자 13:48 「일단 이걸로 픽스, 따고 상호작용 연결. 화장실이랑 휴게실은 관리국거 일단 쓰고」, tools/mapedit/author_by_f13.py) ──
   // 13층 복도: 서→동 화장실(남) · 화장실(여) · 일반조 사무실 유리 양문 · 엘리베이터 · 휴게실(커피잔 표지 문). 화장실·휴게실 안은 관리국 그림 그대로
   // 1층 로비(사용자 14:02 「로비 붙여 거리에서 들어가기」, tools/mapedit/author_by_lobby_f15.py): 왼쪽 유리 옆벽 정문 · 엘리베이터.
-  // 강남 거리 그림이 아직 없어(외부도로 스레드 p1 「뽑아」 대기) 정문은 임시로 종로 거리로 나간다 — 강남 거리 장면이 생기면 그쪽 정문과 잇는다
+  // 정문 → 강남 거리(by_street) 「백일몽 주식회사」 유리 양문 (사용자 11-02 16:15)
   floorHall('by_lobby', '백일몽 1층 로비', '1F', [
-    { id: 'main', kind: 'glass', to: 'street', toDoor: 'main', label: '정문' },
+    { id: 'main', kind: 'glass', to: 'by_street', toDoor: 'main', label: '정문' },
     { id: 'elev', kind: 'elevator' },
   ]),
   floorHall('by_f13', '백일몽 13층', '13F', [
