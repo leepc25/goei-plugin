@@ -33,7 +33,26 @@
  "blocks": [],
  "lamps": [],
  "spots": [],
- "objects": [],
+ "objects": [
+  {
+   "id": "bench_l05",
+   "file": "L05_west.png",
+   "x": 134,
+   "y": 504,
+   "w": 320,
+   "h": 320,
+   "sortY": 770,
+   "solid": [
+    {
+     "x0": 250,
+     "x1": 350,
+     "y0": 746,
+     "y1": 770,
+     "h": 88
+    }
+   ]
+  }
+ ],
  "doors": {
   "out": {
    "kind": "exit",

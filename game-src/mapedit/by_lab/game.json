@@ -53,10 +53,30 @@
   },
   "lamps": [],
   "windows": [],
-  "objects": []
+  "objects": [
+   {
+    "id": "bench_l05",
+    "file": "me_by_lab_bench_l05",
+    "x": 134,
+    "y": 504,
+    "w": 320,
+    "h": 320,
+    "sortY": 770,
+    "solid": [
+     {
+      "x0": 250,
+      "x1": 350,
+      "y0": 746,
+      "y1": 770,
+      "h": 88
+     }
+    ]
+   }
+  ]
  },
  "spots": [],
  "files": [
-  "me_by_lab"
+  "me_by_lab",
+  "me_by_lab_bench_l05"
  ]
 }
