@@ -1,11 +1,20 @@
 """PixelLab generate-image-v2로 배경 한 장. 인증은 프록시가 넣는다.
 사용: python3 gen_bg.py <프롬프트.txt> <화풍그림> <출력.png> <가로> <세로> [화풍그림 축소배율]"""
+# --- PixelLab 생성 승인 문 (2026-10-31 사용자: 시키지 않은 생성 금지) — 이 파일의 모든 생성 요청은 .pixellab_ok 회수가 있어야 나간다
+import sys as _gs, pathlib as _gp
+_gs.path.insert(0, str(next(p for p in _gp.Path(__file__).resolve().parents if (p / "tools" / "pixellab_gate.py").exists()) / "tools"))
+import pixellab_gate as _gate  # noqa: E402
+_gate.spend(__file__ + " 실행")
+# ---
 import base64, io, json, os, sys, time
 import requests
 from PIL import Image
 
 API = "https://api.pixellab.ai/v2"
 prompt_path, style_path, out_path, w, h = sys.argv[1], sys.argv[2], sys.argv[3], int(sys.argv[4]), int(sys.argv[5])
+# 보내기 전 3층 원본과 문장 대조 — 핵심 문장이 빠지면 보내지 않는다(2026-11-01 사용자)
+import subprocess as _sp
+if _sp.call([sys.executable, str(__import__('pathlib').Path(__file__).with_name('prompt_diff.py')), prompt_path]) != 0: sys.exit('요청문이 3층 원본 핵심 문장을 빠뜨림 — 중단')
 scale = float(sys.argv[6]) if len(sys.argv) > 6 else 0.5
 
 style = None
