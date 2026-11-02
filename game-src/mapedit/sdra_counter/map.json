@@ -1,6 +1,17 @@
 {
  "file": "sdra_counter",
  "bgScale": 2,
+ "dotK": 1.5158,
+ "sizes": [
+  [
+   555,
+   0.75
+  ],
+  [
+   835,
+   1.0
+  ]
+ ],
  "w": 1904,
  "h": 848,
  "under": false,
@@ -2531,7 +2542,7 @@
    "y": 555,
    "owner": "서윤지",
    "verb": "앉기",
-   "face": 0,
+   "face": 1,
    "act": [
     "sit_front"
    ],
@@ -2549,7 +2560,7 @@
    "y": 555,
    "owner": "차여진",
    "verb": "앉기",
-   "face": 0,
+   "face": 1,
    "act": [
     "sit_front"
    ],
@@ -2567,7 +2578,7 @@
    "y": 555,
    "owner_pool": "협회 직원",
    "verb": "앉기",
-   "face": 0,
+   "face": 1,
    "act": [
     "sit_front"
    ],

@@ -110,7 +110,8 @@ def convert(scene_id: str, m: dict, files: dict) -> dict:
     for s in m.get('spots', []):
         sp = {'id': s['id'], 'x': s['x'], 'y': s['y'], 'verb': s.get('verb', '앉기'), 'face': s.get('face', 1), 'act': s.get('act') or ACTS.get(s.get('dir', 'side'))}
         if s.get('seat'): sp['seat'] = s['seat']          # 의자 자리만. 샤워 자리(act shower)는 seat 없음 (11-01 샤워실)
-        if s.get('chair') is not None: sp['chair'] = s['chair']   # 장면 의자 번호(m['chairs'] 차례, hq/map.ts floorHall 이 상자 번호로 바꾼다; 11-02 휴게실)
+        if s.get('chair') is not None: sp['chair'] = s['chair']
+        if s.get('owner'): sp['who'] = s['owner']   # 자리 주인(협회 창구 직원, 11-02)   # 장면 의자 번호(m['chairs'] 차례, hq/map.ts floorHall 이 상자 번호로 바꾼다; 11-02 휴게실)
         spots.append(sp)
     # 사람 배율 dotK: map.json에 있으면 그것(사용자 10-31 중림 지상: 배경 2배·사람 0.85), 없으면 장면 세로로 계산
     lane = m.get('lane') or [min(p[1] for p in m['floor']), max(p[1] for p in m['floor']) - 12]

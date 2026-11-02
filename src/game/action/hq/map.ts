@@ -13,7 +13,7 @@ export type SceneId =
   | 'street' | 'pasta' | 'lobby' | 'swat' | 'f2' | 'f3' | 'office' | 'interview' | 'lounge' | 'wc' | 'wc3'
   | 'b1' | 'edu' | 'training' | 'clinic' | 'b2' | 'b3' | 'tooth' | 'bath_f' | 'bath_m' | 'shower_f' | 'shower_m'
   | 'jr_entry' | 'jr_b1' | 'jr_alley' | 'jr_b2'
-  | 'sdra_lobby' | 'sdra_f2' | 'sdra_wc_m' | 'sdra_wc_f'
+  | 'sdra_lobby' | 'sdra_f2' | 'sdra_wc_m' | 'sdra_wc_f' | 'sdra_counter'
   | 'sdra_b1' | 'sdra_shower_f' | 'sdra_shower_m' | 'sdra_bath_f' | 'sdra_bath_m' | 'sdra_training'
   | 'jr_daebak' | 'jr_heolgap' | 'jr_youngchang' | 'jr_songil' | 'jr_jinryo' | 'jr_op';
 
@@ -274,11 +274,13 @@ export const HQ_SCENES: HqScene[] = [
   ]),
   // 협회 2층 복도(11-02 사용자 「화장실만 이은걸로 이층은 마무리」, tools/mapedit/author_sdra_f2.py): 창구 유리문(안쪽 방 그림 없음 → 잠금) · 엘리베이터 · 화장실 남·여. 화장실은 관리국 그림을 그대로 쓴다
   floorHall('sdra_f2', '협회 2층', '2F', [
-    { id: 'office', kind: 'glass', locked: true, label: '협회 창구' },
+    { id: 'office', kind: 'glass', to: 'sdra_counter', toDoor: 'out', label: '협회 창구' },
     { id: 'elev', kind: 'elevator' },
     { id: 'wc_m', kind: 'door', to: 'sdra_wc_m', toDoor: 'out', label: '화장실(남)' },
     { id: 'wc_f', kind: 'door', to: 'sdra_wc_f', toDoor: 'out', label: '화장실(여)' },
   ]),
+  // 협회 창구(11-02, tools/mapedit/author_sdra_counter.py): PixelLab p7+왼쪽 잇기. 창구 직원 자리 3(서윤지·차여진·협회 직원), 대기의자 3개(C06), 왼쪽 끝 출입구 → 2층 복도
+  floorHall('sdra_counter', '협회 창구', '2F', [{ id: 'out', kind: 'exit', side: 'S', to: 'sdra_f2', toDoor: 'office', label: '복도로' }]),
   floorHall('sdra_wc_m', '화장실(남)', '2F', [{ id: 'out', kind: 'exit', side: 'S', to: 'sdra_f2', toDoor: 'wc_m', label: '나가기' }], { toilets: PAINTED.sdra_wc_m?.toilets, sex: '남' }),
   floorHall('sdra_wc_f', '화장실(여)', '2F', [{ id: 'out', kind: 'exit', side: 'S', to: 'sdra_f2', toDoor: 'wc_f', label: '나가기' }], { toilets: PAINTED.sdra_wc_f?.toilets, sex: '여' }),
   // 협회 지하 1층 복도(11-02 사용자 「지하는 저걸로 픽스」, tools/mapedit/author_sdra_b1.py): 서→동 탈의실(남) · 탈의실(여) · 훈련장 양문 · 엘리베이터.
