@@ -118,7 +118,7 @@ def convert(scene_id: str, m: dict, files: dict) -> dict:
     scene = {'file': file, 'w': W, 'h': H, 'under': True, 'lane': lane, 'floor': m.get('floor'), 'holes': holes,
              'dotK': m.get('dotK') or round(1.5 * H / 890, 4), **({'far': m['far']} if m.get('far') else {}), **({'growTo': m['growTo']} if m.get('growTo') else {}), **({'sizes': m['sizes']} if m.get('sizes') else {}), 'blocks': [], 'doors': doors, 'lamps': m.get('lamps', []), 'windows': [], 'objects': objects, **({'posts': m['posts']} if m.get('posts') else {}), **({'toilets': m['toilets']} if m.get('toilets') else {}), **({'showers': m['showers']} if m.get('showers') else {}),
              # 그림 속 의자(11-02 휴게실): 의자는 그 자리 고정, 사람을 맞춤값만큼 옮김. set = 의자 그림 묶음('L' = 휴게실 쉘 의자). stations = NPC 생활 동작 자리
-             **({'chairs': m['chairs']} if m.get('chairs') else {}), **({'gear': m['gear']} if m.get('gear') else {}), **({'stations': m['stations']} if m.get('stations') else {})}
+             **({'chairs': m['chairs']} if m.get('chairs') else {}), **({'gear': m['gear']} if 'gear' in m else {}), **({'stations': m['stations']} if m.get('stations') else {})}
     return {'scene': scene, 'spots': spots, 'files': names}
 
 

@@ -66,9 +66,8 @@ for pts in ([(0, 374), (88, 374), (88, 386), (207, 386), (207, IH + 6), (0, IH +
             [(800, 394), (905, 394), (905, IH + 6), (800, IH + 6)]):
     blocks.append({'poly': [[x * K, y * K] for x, y in pts], 'h': 999})
 doors = {'out': {'kind': 'exit', 'side': 'S', 'x': 300 * K, 'y': H - 40, 'to': 'b1', 'toDoor': 'training', 'label': '복도로'}}
-gear = [{'kind': 'sandbag', 'x': 497 * K, 'y': 346 * K}, {'kind': 'sandbag', 'x': 538 * K, 'y': 346 * K},
-        {'kind': 'dummy', 'x': 735 * K, 'y': 351 * K}, {'kind': 'dummy', 'x': 776 * K, 'y': 351 * K},
-        {'kind': 'target', 'x': 1095 * K, 'y': 356 * K}, {'kind': 'target', 'x': 1210 * K, 'y': 356 * K}]
+# 15:26 사용자 「훈련 장비는 아직 넣지 말고」: 장비 자리 비움(빈 목록 = 코드 장비도 안 그림·안 씀). 그림 속 후보: 샌드백 x497·538, 허수아비 x735·776, 과녁 x1095·1210(1x)
+gear = []
 m = {'file': 'training', 'bgScale': K, 'w': W, 'h': H, 'under': True, 'floor': floor, 'lane': LANE,
      'blocks': blocks, 'doors': doors, 'lamps': [], 'spots': [], 'objects': objects, 'gear': gear}
 (OUT / 'map.json').write_text(json.dumps(m, ensure_ascii=False, indent=1))

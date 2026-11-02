@@ -169,7 +169,7 @@ function floorHall(id: SceneId, name: string, floor: HqScene['floor'], doors: Om
   // 맵 에디터로 만든 장면이면 앉는 자리도 그쪽 것
   if (MAPEDIT_SPOTS[id]?.length) extra = { ...extra, spots: MAPEDIT_SPOTS[id] };
   if (p.stations?.length && !extra.stations) extra = { ...extra, stations: p.stations };
-  if (p.gear?.length && !extra.gear) extra = { ...extra, gear: p.gear };
+  if (p.gear && !extra.gear) extra = { ...extra, gear: p.gear };   // 빈 목록 = 장비 없음(코드 배치도 안 함)
   const sc = floorHallBase(id, name, floor, doors, p, extra);
   if (chairBoxes.length) {
     const base = sc.boxes.length;
