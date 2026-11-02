@@ -1,0 +1,477 @@
+{
+ "file": "sdra_counter",
+ "bgScale": 2,
+ "w": 1904,
+ "h": 848,
+ "under": false,
+ "floor": [
+  [
+   0,
+   848
+  ],
+  [
+   0,
+   602
+  ],
+  [
+   216,
+   602
+  ],
+  [
+   216,
+   600
+  ],
+  [
+   330,
+   600
+  ],
+  [
+   330,
+   594
+  ],
+  [
+   436,
+   594
+  ],
+  [
+   436,
+   600
+  ],
+  [
+   544,
+   600
+  ],
+  [
+   544,
+   652
+  ],
+  [
+   584,
+   652
+  ],
+  [
+   584,
+   632
+  ],
+  [
+   1038,
+   632
+  ],
+  [
+   1038,
+   656
+  ],
+  [
+   1058,
+   656
+  ],
+  [
+   1058,
+   632
+  ],
+  [
+   1486,
+   632
+  ],
+  [
+   1486,
+   656
+  ],
+  [
+   1506,
+   656
+  ],
+  [
+   1506,
+   632
+  ],
+  [
+   1904,
+   632
+  ],
+  [
+   1904,
+   848
+  ]
+ ],
+ "lane": [
+  594,
+  836
+ ],
+ "blocks": [
+  {
+   "poly": [
+    [
+     642,
+     793
+    ],
+    [
+     961,
+     793
+    ],
+    [
+     961,
+     848
+    ],
+    [
+     642,
+     848
+    ]
+   ],
+   "h": 999
+  },
+  {
+   "poly": [
+    [
+     1112,
+     793
+    ],
+    [
+     1431,
+     793
+    ],
+    [
+     1431,
+     848
+    ],
+    [
+     1112,
+     848
+    ]
+   ],
+   "h": 999
+  },
+  {
+   "poly": [
+    [
+     1542,
+     793
+    ],
+    [
+     1861,
+     793
+    ],
+    [
+     1861,
+     848
+    ],
+    [
+     1542,
+     848
+    ]
+   ],
+   "h": 999
+  }
+ ],
+ "doors": {
+  "out": {
+   "kind": "exit",
+   "side": "W",
+   "x": 24,
+   "y": 720,
+   "to": "sdra_f2",
+   "toDoor": "office",
+   "label": "복도로"
+  }
+ },
+ "lamps": [],
+ "spots": [
+  {
+   "id": "wait1_1",
+   "x": 694,
+   "y": 835,
+   "shared": true,
+   "verb": "앉기",
+   "face": 1,
+   "act": [
+    "sit_back"
+   ],
+   "seat": {
+    "x": 694,
+    "y": 835
+   },
+   "bench": "C06",
+   "seatPt": {
+    "x": 694,
+    "y": 740
+   }
+  },
+  {
+   "id": "wait1_2",
+   "x": 801,
+   "y": 835,
+   "shared": true,
+   "verb": "앉기",
+   "face": 1,
+   "act": [
+    "sit_back"
+   ],
+   "seat": {
+    "x": 801,
+    "y": 835
+   },
+   "bench": "C06",
+   "seatPt": {
+    "x": 801,
+    "y": 740
+   }
+  },
+  {
+   "id": "wait1_3",
+   "x": 909,
+   "y": 835,
+   "shared": true,
+   "verb": "앉기",
+   "face": 1,
+   "act": [
+    "sit_back"
+   ],
+   "seat": {
+    "x": 909,
+    "y": 835
+   },
+   "bench": "C06",
+   "seatPt": {
+    "x": 909,
+    "y": 740
+   }
+  },
+  {
+   "id": "wait2_1",
+   "x": 1164,
+   "y": 835,
+   "shared": true,
+   "verb": "앉기",
+   "face": 1,
+   "act": [
+    "sit_back"
+   ],
+   "seat": {
+    "x": 1164,
+    "y": 835
+   },
+   "bench": "C06",
+   "seatPt": {
+    "x": 1164,
+    "y": 740
+   }
+  },
+  {
+   "id": "wait2_2",
+   "x": 1271,
+   "y": 835,
+   "shared": true,
+   "verb": "앉기",
+   "face": 1,
+   "act": [
+    "sit_back"
+   ],
+   "seat": {
+    "x": 1271,
+    "y": 835
+   },
+   "bench": "C06",
+   "seatPt": {
+    "x": 1271,
+    "y": 740
+   }
+  },
+  {
+   "id": "wait2_3",
+   "x": 1379,
+   "y": 835,
+   "shared": true,
+   "verb": "앉기",
+   "face": 1,
+   "act": [
+    "sit_back"
+   ],
+   "seat": {
+    "x": 1379,
+    "y": 835
+   },
+   "bench": "C06",
+   "seatPt": {
+    "x": 1379,
+    "y": 740
+   }
+  },
+  {
+   "id": "wait3_1",
+   "x": 1594,
+   "y": 835,
+   "shared": true,
+   "verb": "앉기",
+   "face": 1,
+   "act": [
+    "sit_back"
+   ],
+   "seat": {
+    "x": 1594,
+    "y": 835
+   },
+   "bench": "C06",
+   "seatPt": {
+    "x": 1594,
+    "y": 740
+   }
+  },
+  {
+   "id": "wait3_2",
+   "x": 1701,
+   "y": 835,
+   "shared": true,
+   "verb": "앉기",
+   "face": 1,
+   "act": [
+    "sit_back"
+   ],
+   "seat": {
+    "x": 1701,
+    "y": 835
+   },
+   "bench": "C06",
+   "seatPt": {
+    "x": 1701,
+    "y": 740
+   }
+  },
+  {
+   "id": "wait3_3",
+   "x": 1809,
+   "y": 835,
+   "shared": true,
+   "verb": "앉기",
+   "face": 1,
+   "act": [
+    "sit_back"
+   ],
+   "seat": {
+    "x": 1809,
+    "y": 835
+   },
+   "bench": "C06",
+   "seatPt": {
+    "x": 1809,
+    "y": 740
+   }
+  },
+  {
+   "id": "clerk1",
+   "x": 914,
+   "y": 555,
+   "owner": "서윤지",
+   "verb": "앉기",
+   "face": 0,
+   "act": [
+    "sit_front"
+   ],
+   "seat": {
+    "x": 914,
+    "y": 555
+   },
+   "chairImg": "south-east.png",
+   "staffOnly": true,
+   "scale": 1.2
+  },
+  {
+   "id": "clerk2",
+   "x": 1274,
+   "y": 555,
+   "owner": "차여진",
+   "verb": "앉기",
+   "face": 0,
+   "act": [
+    "sit_front"
+   ],
+   "seat": {
+    "x": 1274,
+    "y": 555
+   },
+   "chairImg": "south-east.png",
+   "staffOnly": true,
+   "scale": 1.2
+  },
+  {
+   "id": "clerk3",
+   "x": 1704,
+   "y": 555,
+   "owner_pool": "협회 직원",
+   "verb": "앉기",
+   "face": 0,
+   "act": [
+    "sit_front"
+   ],
+   "seat": {
+    "x": 1704,
+    "y": 555
+   },
+   "chairImg": "south-east.png",
+   "staffOnly": true,
+   "scale": 1.2
+  }
+ ],
+ "objects": [
+  {
+   "id": "bench1_shadow",
+   "file": "sdra_counter_bench_shadow.png",
+   "x": 634,
+   "y": 649,
+   "w": 332,
+   "h": 202,
+   "sortY": 0,
+   "kind": "shadow"
+  },
+  {
+   "id": "bench1",
+   "file": "sdra_counter_bench.png",
+   "x": 634,
+   "y": 649,
+   "w": 332,
+   "h": 202,
+   "sortY": 835,
+   "kind": "chair"
+  },
+  {
+   "id": "bench2_shadow",
+   "file": "sdra_counter_bench_shadow.png",
+   "x": 1104,
+   "y": 649,
+   "w": 332,
+   "h": 202,
+   "sortY": 0,
+   "kind": "shadow"
+  },
+  {
+   "id": "bench2",
+   "file": "sdra_counter_bench.png",
+   "x": 1104,
+   "y": 649,
+   "w": 332,
+   "h": 202,
+   "sortY": 835,
+   "kind": "chair"
+  },
+  {
+   "id": "bench3_shadow",
+   "file": "sdra_counter_bench_shadow.png",
+   "x": 1534,
+   "y": 649,
+   "w": 332,
+   "h": 202,
+   "sortY": 0,
+   "kind": "shadow"
+  },
+  {
+   "id": "bench3",
+   "file": "sdra_counter_bench.png",
+   "x": 1534,
+   "y": 649,
+   "w": 332,
+   "h": 202,
+   "sortY": 835,
+   "kind": "chair"
+  }
+ ],
+ "note": "사람 배율: 대기의자에 앉은 사람 1.6(다리 바닥 y835), 창구 직원 1.2(바닥 555). 서 있는 사람 배율 표는 필드 연결 때 정함."
+}
