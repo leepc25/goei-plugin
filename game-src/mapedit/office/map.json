@@ -254,10 +254,11 @@
  "lamps": [],
  "spots": [
   {
-   "id": "desk:쟈알디",
+   "id": "desk1",
    "x": 323,
    "y": 800,
-   "who": "쟈알디",
+   "owner": "쟈알디",
+   "shared": true,
    "verb": "앉기",
    "face": 1,
    "act": [
@@ -270,10 +271,11 @@
    "chairImg": "north.png"
   },
   {
-   "id": "desk:데드폴",
+   "id": "desk2",
    "x": 440,
    "y": 715,
-   "who": "데드폴",
+   "owner": "데드폴",
+   "shared": true,
    "verb": "앉기",
    "face": 1,
    "act": [
@@ -286,10 +288,11 @@
    "chairImg": "south-east.png"
   },
   {
-   "id": "desk:에일린",
+   "id": "desk3",
    "x": 893,
    "y": 800,
-   "who": "에일린",
+   "owner": "에일린",
+   "shared": true,
    "verb": "앉기",
    "face": 1,
    "act": [
@@ -302,10 +305,11 @@
    "chairImg": "north.png"
   },
   {
-   "id": "desk:게슈간",
+   "id": "desk4",
    "x": 1005,
    "y": 677,
-   "who": "게슈간",
+   "owner": "게슈간",
+   "shared": true,
    "verb": "앉기",
    "face": 1,
    "act": [
@@ -318,10 +322,11 @@
    "chairImg": "south.png"
   },
   {
-   "id": "desk:스팡달",
+   "id": "desk5",
    "x": 1637,
    "y": 800,
-   "who": "스팡달",
+   "owner": "스팡달",
+   "shared": true,
    "verb": "앉기",
    "face": 1,
    "act": [
@@ -334,10 +339,11 @@
    "chairImg": "north.png"
   },
   {
-   "id": "desk:로제몬",
+   "id": "desk6",
    "x": 1754,
    "y": 715,
-   "who": "로제몬",
+   "owner": "로제몬",
+   "shared": true,
    "verb": "앉기",
    "face": 1,
    "act": [
@@ -350,10 +356,11 @@
    "chairImg": "south-west.png"
   },
   {
-   "id": "desk:잼트리",
+   "id": "desk7",
    "x": 2207,
    "y": 800,
-   "who": "잼트리",
+   "owner": "잼트리",
+   "shared": true,
    "verb": "앉기",
    "face": 1,
    "act": [
@@ -366,10 +373,11 @@
    "chairImg": "north.png"
   },
   {
-   "id": "desk:콘쥬스",
+   "id": "desk8",
    "x": 2319,
    "y": 677,
-   "who": "콘쥬스",
+   "owner": "콘쥬스",
+   "shared": true,
    "verb": "앉기",
    "face": 1,
    "act": [
