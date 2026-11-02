@@ -123,7 +123,9 @@ test('가짜 관리국: 관리국 장면 복사·문 연결·엘리베이터·�
     }
   }
   assert.equal(byId.fb_office.name, '검사부대'); assert.equal(byId.fb_swat.name, '진압부대');
-  assert.ok(byId.fb_office.spots.every((p) => !p.owner) && byId.fb_swat.spots.every((p) => !p.owner), '관리국 요원 책상 주인 비움');
+  const owners = (id) => byId[id].spots.filter((p) => p.owner).map((p) => p.owner);
+  assert.deepEqual(owners('fb_office'), ['이도형', '고영훈', '노기균', '송주익']);
+  assert.deepEqual(owners('fb_swat'), ['곽성주', '조성춘', '윤병수', '김성진', '송진섭']);
   assert.deepEqual(M.ELEVATOR.filter((e) => e.bldg === 'fb').map((e) => e.scene).sort(), ['fb_b1', 'fb_b2', 'fb_b3', 'fb_f2', 'fb_f3', 'fb_lobby']);
   assert.ok(byId.fb_street.doors.some((d) => d.bus === '종로2가'));
 });

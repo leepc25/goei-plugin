@@ -180,6 +180,9 @@ const showerSpots = (id: SceneId) => (PAINTED[id]?.showers ?? []).map((s) => ({ 
 const BY_DESK_OWNERS: Partial<Record<SceneId, Record<string, string>>> = {
   by_office: { desk1: '이자헌', desk2: '은하제', desk3: '박민성', desk4: '백사헌', desk5: '고영은', desk6: '강이학', desk7: '장허운' },
   by_elite: { desk1: '백석주', desk2: '진나솔', desk3: '이성해' },
+  // 가짜 관리국(11-02 사용자 16:00 「진압부대랑 검사부대만 각각 연결, 나머지 인원은 책상 배정 말고」, 위키 부서 기준). 책상 두 개씩 한 덩이(1·2 / 3·4 / 5·6 / 7·8)
+  fb_office: { desk1: '이도형', desk2: '고영훈', desk3: '노기균', desk4: '송주익' },   // 검사부대: 부장·차장 / 대리 둘
+  fb_swat: { desk1: '곽성주', desk2: '조성춘', desk3: '윤병수', desk4: '김성진', desk5: '송진섭' },   // 진압부대: 과장 둘 / 신입 7팀(팀장 윤병수)
 };
 function withOwners(sc: HqScene): HqScene {
   const own = BY_DESK_OWNERS[sc.id] ?? {};
@@ -415,7 +418,7 @@ const fbScene = (sc: HqScene): HqScene => {
     ...sc, id: `fb_${sc.id}` as SceneId, name: fbName(sc.name)!, painted: sc.painted,
     doors: sc.doors.map((d) => ({ ...d, ...(d.to && own.has(d.to) ? { to: `fb_${d.to}` as SceneId } : {}), ...(d.label ? { label: fbName(d.label) } : {}), ...(d.bus ? { bus: FB_BUS } : {}) })),
   };
-  return /^(office|swat)$/.test(sc.id) ? withOwners(c) : c;   // 책상 평소 주인은 관리국 요원 → 비운다 (빈 책상은 누구나)
+  return /^(office|swat)$/.test(sc.id) ? withOwners(c) : c;   // 책상 평소 주인 = 검사부대·진압부대 인원 (BY_DESK_OWNERS, 빈 책상은 누구나)
 };
 HQ_SCENES.push(...FB_IDS.map((id) => fbScene(HQ_SCENES.find((s) => s.id === id)!)));
 export const SCENE_BY_ID = Object.fromEntries(HQ_SCENES.map((s) => [s.id, s])) as Record<SceneId, HqScene>;
