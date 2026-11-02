@@ -2550,7 +2550,7 @@
     "x": 914,
     "y": 555
    },
-   "chairImg": "south-east.png",
+   "chair": 0,
    "staffOnly": true,
    "scale": 1.2
   },
@@ -2568,7 +2568,7 @@
     "x": 1274,
     "y": 555
    },
-   "chairImg": "south-east.png",
+   "chair": 1,
    "staffOnly": true,
    "scale": 1.2
   },
@@ -2586,7 +2586,7 @@
     "x": 1704,
     "y": 555
    },
-   "chairImg": "south-east.png",
+   "chair": 2,
    "staffOnly": true,
    "scale": 1.2
   }
@@ -2669,6 +2669,20 @@
    "h": 202,
    "sortY": 835,
    "kind": "chair"
+  }
+ ],
+ "chairs": [
+  {
+   "x": 914,
+   "y": 555
+  },
+  {
+   "x": 1274,
+   "y": 555
+  },
+  {
+   "x": 1704,
+   "y": 555
   }
  ],
  "note": "사람 배율: 대기의자에 앉은 사람 1.6(다리 바닥 y835), 창구 직원 1.2(바닥 555). 서 있는 사람 배율 표는 필드 연결 때 정함."

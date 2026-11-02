@@ -141,14 +141,17 @@ for i, bx in enumerate(BXS):
         spots.append({'id': f'wait{i+1}_{j+1}', 'x': x, 'y': FOOT_Y, 'shared': True, 'verb': '앉기', 'face': 1, 'act': ['sit_back'],
                       'seat': {'x': x, 'y': FOOT_Y}, 'bench': 'C06', 'seatPt': {'x': x, 'y': round(oy + sy * BSC)}})
 # 창구 직원 자리(창구 뒤, 사무의자 C01 정면, 2배 x·바닥 y, 미리보기 tools/objects/sdra_counter_sit_preview.py 값)
+# 15:05 사용자 「창구 자리 의자 3개」: 그림 속 의자 상자(chairs, face 없음 = 정면 사무의자 south-east)를 두고 자리를 그 의자에 묶는다(휴게실 방식)
+chairs = []
 for sid, x, who in [('clerk1', 914, '서윤지'), ('clerk2', 1274, '차여진'), ('clerk3', 1704, None)]:
+    chairs.append({'x': x, 'y': 555})
     spots.append({'id': sid, 'x': x, 'y': 555, **({'owner': who} if who else {'owner_pool': '협회 직원'}), 'verb': '앉기', 'face': 1,
-                  'act': ['sit_front'], 'seat': {'x': x, 'y': 555}, 'chairImg': 'south-east.png', 'staffOnly': True, 'scale': 1.2})
+                  'act': ['sit_front'], 'seat': {'x': x, 'y': 555}, 'chair': len(chairs) - 1, 'staffOnly': True, 'scale': 1.2})
 doors = {'out': {'kind': 'exit', 'side': 'W', 'x': 24, 'y': 720, 'to': 'sdra_f2', 'toDoor': 'office', 'label': '복도로'}}
 # 사람 배율(게임): 대기의자 앉은 사람 1.6(발 y835) · 창구 직원 1.2(발 y555). dotK = 맨 앞 키(2배 px)/247, sizes = dotK 대비
 DOTK = round(1.6 * 234 / 247, 4); SIZES = [[555, 0.75], [835, 1.0]]
 m = {'file': 'sdra_counter', 'bgScale': K, 'dotK': DOTK, 'sizes': SIZES, 'w': W, 'h': H, 'under': False, 'floor': floor, 'lane': [min(p[1] for p in poly), H - 12],
-     'blocks': blocks, 'doors': doors, 'lamps': [], 'spots': spots, 'objects': objects,
+     'blocks': blocks, 'doors': doors, 'lamps': [], 'spots': spots, 'objects': objects, 'chairs': chairs,
      'note': '사람 배율: 대기의자에 앉은 사람 1.6(다리 바닥 y835), 창구 직원 1.2(바닥 555). 서 있는 사람 배율 표는 필드 연결 때 정함.'}
 (OUT / 'map.json').write_text(json.dumps(m, ensure_ascii=False, indent=1))
 print(W, H, len(blocks), len(spots), len(objects))
