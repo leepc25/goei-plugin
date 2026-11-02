@@ -11,7 +11,7 @@ import json, os, subprocess, sys, tempfile
 from pathlib import Path
 from PIL import Image, ImageDraw, ImageFont
 ROOT = Path(__file__).resolve().parents[2]
-OUT = ROOT / 'game-src/mapedit' / os.environ.get('SCENE', 'office')   # 08:53 사용자 「(진압팀은) 이거 그대로 쓸 거」 → SCENE=office_riot WHO_MAP={"1.1":"고르고디오","1.4":"큐라스"} (09:10 정정: 격리팀 아니고 진압팀)
+OUT = ROOT / 'game-src/mapedit' / os.environ.get('SCENE', 'office')   # 08:53 사용자 「(진압팀은) 이거 그대로 쓸 거」 → SCENE=office_riot WHO_MAP={"1.10":"고르고디오","1.2":"큐라스"}(09:11 사용자: 고르고디오 뒷열 왼쪽 둘째, 큐라스 앞열 오른쪽 둘째) (09:10 정정: 격리팀 아니고 진압팀)
 K, W, H = 2, 1482, 424
 PLACE = ROOT / 'tools/objects/office_desk_place_v4.py'
 
