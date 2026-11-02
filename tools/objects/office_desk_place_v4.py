@@ -47,7 +47,10 @@ for gi, gx in enumerate((G1, G2)):
 NF = round(sum(NYS) / len(NYS)); print('north foot', [round(v, 1) for v in NYS])
 # 쟈알디 책상 = 북쪽 책상(D02v2), 오른쪽 끝 (사용자 07:53 「쟈알디는 북쪽으로」, 핀 92%). JX=가운데 x, JF=발 y = 북쪽 줄과 같음(사용자 07:57)
 JX, JF = (int(a[6]) if len(a) > 6 else 1364), (int(a[7]) if len(a) > 7 else NF)
-j = load(NORTH, JF); L.append((JF, j, JX * K - j.width // 2, JF * K - j.height))
+# 08:04 사용자 「쟈알디껄 따로 빼지 말자」 → 기본 끔. 다시 보려면 JALDI=1
+import os
+if os.environ.get('JALDI') == '1':
+    j = load(NORTH, JF); L.append((JF, j, JX * K - j.width // 2, JF * K - j.height))
 # 바닥 그림자(코드, 책상 그림은 안 건드림, 사용자 07:53 「그림자가 없으니 이상」): 책상 발 둘레 바닥에 2단 반투명 띠, 2배 픽셀 단위
 # 07:57 사용자 「각지고 흰줄」 → 상자 2단 폐기. 둥근 타원 마스크를 흐려 1배 격자로 맞춘 부드러운 그림자(가장자리 계단·밝은 줄 없음)
 from PIL import ImageDraw, ImageFilter
