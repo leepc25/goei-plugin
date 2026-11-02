@@ -55,6 +55,9 @@ export interface HqSpot {
   face?: 1 | -1;
   act?: string[];
   seat?: { x: number; y: number };
+  /** 평소 앉는 사람(사무실 책상, 11-02 사용자): 비어 있으면 누구나 앉는다(shared). NPC는 자기 책상을 먼저 고른다 */
+  owner?: string;
+  shared?: boolean;
   /** E를 누르면 자막 한 줄 */
   say?: string;
   /** 필드 가게 (src/game/world/fieldShop.ts SHOPS id): E로 거래 창 */
@@ -105,7 +108,7 @@ export interface HqScene {
   fixtures: { x: number; w: number; kind: RoomFix['k'] }[];
   things: HqThing[];
   /** 의자 자리 (boxes 의 의자). 주인공·이름 인물이 앉는다. set = 의자 그림 묶음(HqBox.set) */
-  seats?: { x: number; y: number; face?: 'E' | 'W' | 'N'; box: number; set?: string }[];
+  seats?: { x: number; y: number; face?: 'E' | 'W' | 'N'; box: number; set?: string; owner?: string }[];
   /** 화장실 쓰는 자리 (칸·소변기·세면대) */
   toilets?: HqToilet[];
   /** 남녀 구분 화장실: 이 성별만 쓴다 (NPC는 다른 쪽에 들어가지 않는다) */
@@ -176,6 +179,18 @@ function floorHall(id: SceneId, name: string, floor: HqScene['floor'], doors: Om
     sc.boxes = [...sc.boxes, ...chairBoxes];
     sc.spots = sc.spots.map((s) => (s.chair !== undefined ? { ...s, chair: base + s.chair } : s));
     sc.seats = chairBoxes.map((b, i) => ({ x: b.x, y: b.y, face: b.face, box: base + i, set: b.set }));
+  } else {
+    // 의자가 오브젝트 그림 안에 있는 방(11-02 사무실 책상): 앉는 자리마다 그리지 않는 빈 상자를 두어 NPC 자리(seats)·주인공 자리 겹침 검사가 같은 번호를 쓴다.
+    // owner = 평소 앉는 사람(지도 spots.owner) → NPC 책상 일은 자기 책상 먼저 (world/actors.ts)
+    const deskSpots = sc.spots.filter((s) => s.seat && s.chair === undefined);
+    if (deskSpots.length) {
+      const base = sc.boxes.length;
+      const faceOf = (s: HqSpot): HqBox['face'] => (s.act?.[0] === 'sit_back' ? 'N' : s.act?.[0] === 'sit_side' ? (s.face === -1 ? 'W' : 'E') : undefined);
+      const boxes: HqBox[] = deskSpots.map((s) => ({ kind: `seat:${s.id}`, x: s.seat!.x, w: 54, y: s.seat!.y, d: 20, h: 0, solid: false, face: faceOf(s) }));
+      sc.boxes = [...sc.boxes, ...boxes];
+      sc.spots = sc.spots.map((s) => { const i = deskSpots.indexOf(s); return i >= 0 ? { ...s, chair: base + i } : s; });
+      sc.seats = deskSpots.map((s, i) => ({ x: s.seat!.x, y: s.seat!.y, face: faceOf(s), box: base + i, ...(s.owner ? { owner: s.owner } : {}) }));
+    }
   }
   return sc;
 }

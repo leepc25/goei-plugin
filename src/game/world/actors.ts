@@ -1659,16 +1659,30 @@ export class WorldSim {
     return this.has(look, clip) || (!!SEAT_KIND[clip] && this.has(look, `seat:${SEAT_KIND[clip]}`));
   }
   /** 장면의 빈 의자 (다른 사람·주인공이 앉지 않은 것) 중 x 에 가까운 것 */
-  private freeSeat(scene: string, x: number, dir?: 'front' | 'side' | 'back'): number | null {
+  private freeSeat(scene: string, x: number, dir?: 'front' | 'side' | 'back', who?: string): number | null {
     const seats = this.graph.scene(scene)?.seats ?? [];
     let best: number | null = null;
     seats.forEach((st, i) => {
       if (dir && seatDir(st.face) !== dir) return;
-      if (this.player?.scene === scene && this.player.seat === st.box) return;
-      if (this.actors.some((q) => q.scene === scene && (q.seat?.i === i || q.seatPick === i))) return;
+      if (!this.seatFree(scene, i)) return;
+      // 자기 책상(평소 자리)이 비어 있으면 그것 (11-02 사용자: 주인은 평소 앉는 사람일 뿐, 비면 누구나)
+      if (who && st.owner === who) { best = i; return; }
+      if (best !== null && seats[best].owner === who && who) return;
       if (best === null || Math.abs(st.x - x) < Math.abs(seats[best].x - x)) best = i;
     });
     return best;
+  }
+  private seatFree(scene: string, i: number): boolean {
+    const st = this.graph.scene(scene)?.seats?.[i];
+    if (!st) return false;
+    if (this.player?.scene === scene && this.player.seat === st.box) return false;
+    return !this.actors.some((q) => q.scene === scene && (q.seat?.i === i || q.seatPick === i));
+  }
+  /** 이 사람의 평소 자리(책상 주인)가 이 장면에 있고 비어 있으면 그 번호 */
+  private ownSeat(a: Actor): number | null {
+    const seats = this.graph.scene(a.scene)?.seats ?? [];
+    const i = seats.findIndex((st) => st.owner === a.def.name);
+    return i >= 0 && this.seatFree(a.scene, i) ? i : null;
   }
 
   private stepActor(a: Actor, dt: number): void {
@@ -2191,9 +2205,16 @@ export class WorldSim {
     if (!t.partner) { const st = this.stationSpot(a, t); if (st) return st; }
     const opts = (ACT_OPTS[t.id] ?? []).filter((o) => this.has(look, `line:${o.line}`));
     if (opts.length && !t.partner) {
+      // 책상 일: 자기 책상(평소 자리)이 비어 있고 그 방향 앉는 줄이 있으면 거기 (11-02)
+      if (t.id === 'work') {
+        const own = this.ownSeat(a);
+        const st = own === null ? null : this.graph.scene(a.scene)!.seats![own];
+        const o = st ? opts.find((q) => q.seat === seatDir(st.face)) : undefined;
+        if (st && o && own !== null) { a.opt = o; a.seatPick = own; return { x: st.x, y: st.y }; }
+      }
       const cand: { o: ActOpt; seat: number | null; w: number }[] = [];
       for (const o of opts) {
-        const seat = o.seat ? this.freeSeat(a.scene, a.x, o.seat) : null;
+        const seat = o.seat ? this.freeSeat(a.scene, a.x, o.seat, a.def.name) : null;
         if (o.seat && seat === null) continue;
         cand.push({ o, seat, w: (o.line === a.lastLine ? 0.25 : 1) * (o.seat ? 1.2 : 1) * (o.once ? 0.5 : 1) });
       }
@@ -2210,7 +2231,7 @@ export class WorldSim {
       }
     }
     if (!t.partner && SEAT_KIND[t.clip] && this.has(a.def.look ?? a.def.name, `seat:${SEAT_KIND[t.clip]}`)) {
-      const i = this.freeSeat(a.scene, a.x);
+      const i = this.freeSeat(a.scene, a.x, undefined, a.def.name);
       const st = i === null ? null : this.graph.scene(a.scene)?.seats?.[i];
       if (st && i !== null) { a.seatPick = i; return { x: st.x, y: st.y }; }
     }

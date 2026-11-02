@@ -24,7 +24,7 @@ export interface PlaceScene {
   legacy?: boolean;
   doors: PlaceDoor[];
   /** 지도 의자 (box = 장면 상자 번호, face = 앉은 사람이 보는 쪽). 이름 인물이 일·식사·휴식을 앉아서 할 자리 */
-  seats?: { x: number; y: number; face?: 'E' | 'W' | 'N'; box: number; set?: string }[];
+  seats?: { x: number; y: number; face?: 'E' | 'W' | 'N'; box: number; set?: string; /** 평소 앉는 사람 (사무실 책상, 11-02) */ owner?: string }[];
   /** 화장실 쓰는 자리: stall = 대변기 칸(x·y = 문 앞, seat = 좌석), urinal = 소변기, sink = 세면대 (x·y = 서는 발 자리) */
   toilets?: { id: string; kind: 'stall' | 'urinal' | 'sink'; x: number; y: number; door?: string; seat?: { x: number; y: number; k?: number } }[];
   /** 샤워 자리 (11-02 NPC 샤워): x·y = 서는 발 자리, face = 보는 쪽 */
