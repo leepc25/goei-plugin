@@ -13,12 +13,20 @@ if subprocess.call([sys.executable, str(_gp.Path(__file__).with_name('prompt_dif
 _gate.spend(__file__ + " " + prompt_path)
 USAGE = ("Layout guide only: black lines on a transparent background. Follow these lines exactly for the ceiling line, the line where the back wall meets the floor, "
          "the right side wall with its door, and the two partition walls standing straight out from the back wall. Do not draw the lines themselves.")
+import os
+USAGE = os.environ.get("GUIDE_USAGE", USAGE)
 gw, gh = Image.open(guide_path).size
 bal = lambda: requests.get(API + "/balance", timeout=30).json()["subscription"]["generations"]
 b0 = bal()
+STY = None
+if os.environ.get("STYLE"):  # 화풍 그림(에일린 256, 색 끔) 함께 — 11-02 백일몽 로비
+    _st = open(os.environ["STYLE"], "rb").read(); _sw, _sh = Image.open(os.environ["STYLE"]).size
+    STY = {"image": {"type": "base64", "base64": base64.b64encode(_st).decode(), "format": "png"}, "size": {"width": _sw, "height": _sh}}
 body = {"description": open(prompt_path, encoding="utf-8").read().strip(), "image_size": {"width": w, "height": h}, "no_background": False,
         "reference_images": [{"image": {"type": "base64", "base64": base64.b64encode(open(guide_path, 'rb').read()).decode(), "format": "png"},
                               "size": {"width": gw, "height": gh}, "usage_description": USAGE}]}
+if STY:
+    body["style_image"] = STY; body["style_options"] = {"color_palette": False, "outline": True, "detail": True, "shading": True}
 t0 = time.time()
 r = requests.post(API + "/generate-image-v2", json=body, timeout=60)
 if r.status_code >= 300: print("error", r.status_code, r.text[:800]); sys.exit(1)
