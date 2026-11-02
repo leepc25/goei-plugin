@@ -44,6 +44,7 @@ KB_S = [81 / 198, 81 / 194]   # D01v3(키보드 51~111), D03(50~112)
 KB_N = 92 / 190
 NDX = int(os.environ.get('NDX', '40'))  # 08:27 사용자 「뒤 캐릭터가 너무 안 보임, 뒷줄 살짝 오른쪽으로」 → 08:34 「책상 말고 뒷줄 의자를」: 북쪽 의자(앉은 사람 포함)만 +40(1배), 책상은 제자리               # D02v2 뒤에서 본 키보드 60~124
 CHAIR_N = ['south-east.png', 'south.png', 'south-west.png', 'south-west.png']  # 북쪽 앉은 사람 맞춤값의 의자 방향(fit_all img)
+META = []
 def put(seat, chair, foot, cx):
     f = scale(foot) * K * CSC
     cb = Image.open(CH / chair).getbbox(); cxc = (cb[0] + cb[2]) / 2   # 의자 그림 가운데(200캔버스 x)
@@ -53,6 +54,7 @@ def put(seat, chair, foot, cx):
         im = Image.open(CH / chair).convert('RGBA'); ax, ay = cxc, 172
     im = im.resize((round(im.width * f), round(im.height * f)), Image.NEAREST)
     L.append((foot, im, round(cx - ax * f), round(foot * K - ay * f)))
+    META.append({'kind': 'chair', 'seat': seat, 'chair': chair, 'foot': foot, 'cx': cx, 'f': f})
 def loadc(p, foot):  # 원본 1배에서 한 번에 줄임(두 번 줄이면 도트 깨짐)
     im = Image.open(p).convert('RGBA'); im = im.crop(im.getbbox()); s_ = scale(foot) * K * CSC
     return im.resize((round(im.width * s_), round(im.height * s_)), Image.NEAREST)
@@ -75,6 +77,8 @@ for gi, (gx, cnt) in enumerate(GROUPS):
         NYS.append(nf)
         L.append((nf, n, x + (s.width - n.width) // 2, ny))
         L.append((SF, s, x, sy))
+        META.append({'kind': 'desk_n', 'i': gi * cnt + i, 'foot': nf, 'x': x + (s.width - n.width) // 2, 'y': ny, 'w': n.width, 'h': n.height})
+        META.append({'kind': 'desk_s', 'i': gi * cnt + i, 'foot': SF, 'x': x, 'y': sy, 'w': s.width, 'h': s.height, 'top': st})
         if CHAIRS:  # 08:09 사용자 「의자 배치해봐」: 남쪽 책상 앞 = C01 north(등 보임), 북쪽 책상 뒤 = C01 south(정면). 다리 들어갈 쪽(서랍 반대)
             ci = gi * cnt + i; cf = SF + CDY; cn_f = nf - CDY; nx = x + (s.width - n.width) // 2
             put(SEAT_S[ci] if SEATED else None, 'north.png', cf, x + round(s.width * KB_S[(gi * cnt + i) % 2]))
@@ -101,5 +105,19 @@ def shadow(im, x, y):
     lay = Image.new('RGBA', out.size, SHC + (0,)); lay.putalpha(m)
     out.alpha_composite(lay)
 out = BG.copy()
-for _, im, x, y in sorted(L, key=lambda t: t[0]): shadow(im, x, y); out.alpha_composite(im, (x, y))
-out.convert('RGB').save(a[1]); print('south w', [t[1].width for t in L if t[0] == SF])
+# EXPORT=<폴더>: 맵용 — 그림자만 구운 배경(strip.png) + 층마다 그림(layer_NN.png)과 자리(layers.json). 그림은 위 합성과 같은 픽셀
+EXP = os.environ.get('EXPORT'); LAY = []
+for n, (_, im, x, y) in enumerate(sorted(L, key=lambda t: t[0])):
+    shadow(im, x, y)
+    if EXP: LAY.append((n, im, x, y))
+    else: out.alpha_composite(im, (x, y))
+if EXP:
+    import json; E_ = Path(EXP); E_.mkdir(parents=True, exist_ok=True); out.convert('RGB').save(E_ / 'strip.png'); rows = []
+    for n, im, x, y in LAY:
+        bb = im.getbbox(); c = im.crop(bb); c.save(E_ / f'layer_{n:02d}.png')
+        rows.append({'n': n, 'file': f'layer_{n:02d}.png', 'x': x + bb[0], 'y': y + bb[1], 'w': c.width, 'h': c.height, 'bottom': y + bb[3]})
+    (E_ / 'layers.json').write_text(json.dumps(rows, indent=1))
+    for _, im, x, y in sorted(L, key=lambda t: t[0]): out.alpha_composite(im, (x, y))
+out.convert('RGB').save(a[1])
+if os.environ.get('DUMP'): import json; Path(os.environ['DUMP']).write_text(json.dumps(META, ensure_ascii=False, indent=1))
+print('south w', [t[1].width for t in L if t[0] == SF])

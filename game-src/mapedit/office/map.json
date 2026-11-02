@@ -1,0 +1,456 @@
+{
+ "file": "hq_office_strip",
+ "bgScale": 2,
+ "dotK": 2.0819,
+ "sizes": [
+  [
+   612,
+   0.641
+  ],
+  [
+   848,
+   1.0
+  ]
+ ],
+ "w": 2964,
+ "h": 848,
+ "under": false,
+ "floor": [
+  [
+   0,
+   848
+  ],
+  [
+   0,
+   612
+  ],
+  [
+   2964,
+   612
+  ],
+  [
+   2964,
+   848
+  ]
+ ],
+ "lane": [
+  612,
+  836
+ ],
+ "blocks": [],
+ "lamps": [],
+ "spots": [
+  {
+   "id": "desk:쟈알디",
+   "x": 331,
+   "y": 776,
+   "who": "쟈알디",
+   "verb": "앉기",
+   "face": 1,
+   "act": [
+    "sit_back"
+   ],
+   "seat": {
+    "x": 331,
+    "y": 776
+   },
+   "chairImg": "north.png"
+  },
+  {
+   "id": "desk:데드폴",
+   "x": 446,
+   "y": 693,
+   "who": "데드폴",
+   "verb": "앉기",
+   "face": 1,
+   "act": [
+    "sit_front"
+   ],
+   "seat": {
+    "x": 446,
+    "y": 693
+   },
+   "chairImg": "south-east.png"
+  },
+  {
+   "id": "desk:에일린",
+   "x": 897,
+   "y": 776,
+   "who": "에일린",
+   "verb": "앉기",
+   "face": 1,
+   "act": [
+    "sit_back"
+   ],
+   "seat": {
+    "x": 897,
+    "y": 776
+   },
+   "chairImg": "north.png"
+  },
+  {
+   "id": "desk:게슈간",
+   "x": 1008,
+   "y": 657,
+   "who": "게슈간",
+   "verb": "앉기",
+   "face": 1,
+   "act": [
+    "sit_front"
+   ],
+   "seat": {
+    "x": 1008,
+    "y": 657
+   },
+   "chairImg": "south.png"
+  },
+  {
+   "id": "desk:스팡달",
+   "x": 1637,
+   "y": 776,
+   "who": "스팡달",
+   "verb": "앉기",
+   "face": 1,
+   "act": [
+    "sit_back"
+   ],
+   "seat": {
+    "x": 1637,
+    "y": 776
+   },
+   "chairImg": "north.png"
+  },
+  {
+   "id": "desk:로제몬",
+   "x": 1752,
+   "y": 693,
+   "who": "로제몬",
+   "verb": "앉기",
+   "face": 1,
+   "act": [
+    "sit_front"
+   ],
+   "seat": {
+    "x": 1752,
+    "y": 693
+   },
+   "chairImg": "south-west.png"
+  },
+  {
+   "id": "desk:잼트리",
+   "x": 2203,
+   "y": 776,
+   "who": "잼트리",
+   "verb": "앉기",
+   "face": 1,
+   "act": [
+    "sit_back"
+   ],
+   "seat": {
+    "x": 2203,
+    "y": 776
+   },
+   "chairImg": "north.png"
+  },
+  {
+   "id": "desk:콘쥬스",
+   "x": 2314,
+   "y": 657,
+   "who": "콘쥬스",
+   "verb": "앉기",
+   "face": 1,
+   "act": [
+    "sit_front"
+   ],
+   "seat": {
+    "x": 2314,
+    "y": 657
+   },
+   "chairImg": "south-west.png"
+  },
+  {
+   "id": "copier1",
+   "x": 280,
+   "y": 632,
+   "verb": "복사기",
+   "face": 1,
+   "act": [
+    "use"
+   ],
+   "say": ""
+  },
+  {
+   "id": "copier2",
+   "x": 412,
+   "y": 632,
+   "verb": "복사기",
+   "face": 1,
+   "act": [
+    "use"
+   ],
+   "say": ""
+  },
+  {
+   "id": "board",
+   "x": 564,
+   "y": 632,
+   "verb": "화이트보드",
+   "face": 1,
+   "act": [
+    "use"
+   ],
+   "say": ""
+  },
+  {
+   "id": "water",
+   "x": 1144,
+   "y": 632,
+   "verb": "정수기",
+   "face": 1,
+   "act": [
+    "use"
+   ],
+   "say": ""
+  },
+  {
+   "id": "coffee",
+   "x": 1262,
+   "y": 632,
+   "verb": "커피",
+   "face": 1,
+   "act": [
+    "use"
+   ],
+   "say": ""
+  },
+  {
+   "id": "copier3",
+   "x": 2506,
+   "y": 632,
+   "verb": "복사기",
+   "face": 1,
+   "act": [
+    "use"
+   ],
+   "say": ""
+  },
+  {
+   "id": "copier4",
+   "x": 2712,
+   "y": 632,
+   "verb": "복사기",
+   "face": 1,
+   "act": [
+    "use"
+   ],
+   "say": ""
+  }
+ ],
+ "doors": {
+  "out": {
+   "kind": "exit",
+   "side": "E",
+   "x": 2944,
+   "y": 740,
+   "label": "나가기"
+  }
+ },
+ "objects": [
+  {
+   "id": "obj00",
+   "file": "office_layer_00.png",
+   "x": 949,
+   "y": 456,
+   "w": 118,
+   "h": 203,
+   "sortY": 659,
+   "kind": "chair"
+  },
+  {
+   "id": "obj01",
+   "file": "office_layer_01.png",
+   "x": 2254,
+   "y": 456,
+   "w": 121,
+   "h": 203,
+   "sortY": 659,
+   "kind": "chair"
+  },
+  {
+   "id": "obj02",
+   "file": "office_layer_02.png",
+   "x": 735,
+   "y": 420,
+   "w": 399,
+   "h": 265,
+   "sortY": 685,
+   "kind": "desk_n"
+  },
+  {
+   "id": "obj03",
+   "file": "office_layer_03.png",
+   "x": 2041,
+   "y": 420,
+   "w": 399,
+   "h": 265,
+   "sortY": 685,
+   "kind": "desk_n"
+  },
+  {
+   "id": "obj04",
+   "file": "office_layer_04.png",
+   "x": 381,
+   "y": 476,
+   "w": 130,
+   "h": 218,
+   "sortY": 694,
+   "kind": "chair"
+  },
+  {
+   "id": "obj05",
+   "file": "office_layer_05.png",
+   "x": 1687,
+   "y": 476,
+   "w": 130,
+   "h": 218,
+   "sortY": 694,
+   "kind": "chair"
+  },
+  {
+   "id": "obj06",
+   "file": "office_layer_06.png",
+   "x": 160,
+   "y": 438,
+   "w": 426,
+   "h": 283,
+   "sortY": 721,
+   "kind": "desk_n"
+  },
+  {
+   "id": "obj07",
+   "file": "office_layer_07.png",
+   "x": 1466,
+   "y": 438,
+   "w": 426,
+   "h": 283,
+   "sortY": 721,
+   "kind": "desk_n"
+  },
+  {
+   "id": "obj08",
+   "file": "office_layer_08.png",
+   "x": 140,
+   "y": 447,
+   "w": 466,
+   "h": 301,
+   "sortY": 748,
+   "solid": [
+    {
+     "x0": 116,
+     "x1": 630,
+     "y0": 697,
+     "y1": 748,
+     "h": 999
+    }
+   ],
+   "kind": "desk"
+  },
+  {
+   "id": "obj09",
+   "file": "office_layer_09.png",
+   "x": 706,
+   "y": 454,
+   "w": 457,
+   "h": 294,
+   "sortY": 748,
+   "solid": [
+    {
+     "x0": 682,
+     "x1": 1187,
+     "y0": 661,
+     "y1": 748,
+     "h": 999
+    }
+   ],
+   "kind": "desk"
+  },
+  {
+   "id": "obj10",
+   "file": "office_layer_10.png",
+   "x": 1446,
+   "y": 447,
+   "w": 466,
+   "h": 301,
+   "sortY": 748,
+   "solid": [
+    {
+     "x0": 1422,
+     "x1": 1936,
+     "y0": 697,
+     "y1": 748,
+     "h": 999
+    }
+   ],
+   "kind": "desk"
+  },
+  {
+   "id": "obj11",
+   "file": "office_layer_11.png",
+   "x": 2012,
+   "y": 454,
+   "w": 457,
+   "h": 294,
+   "sortY": 748,
+   "solid": [
+    {
+     "x0": 1988,
+     "x1": 2493,
+     "y0": 661,
+     "y1": 748,
+     "h": 999
+    }
+   ],
+   "kind": "desk"
+  },
+  {
+   "id": "obj12",
+   "file": "office_layer_12.png",
+   "x": 256,
+   "y": 533,
+   "w": 151,
+   "h": 243,
+   "sortY": 776,
+   "kind": "chair"
+  },
+  {
+   "id": "obj13",
+   "file": "office_layer_13.png",
+   "x": 822,
+   "y": 533,
+   "w": 151,
+   "h": 243,
+   "sortY": 776,
+   "kind": "chair"
+  },
+  {
+   "id": "obj14",
+   "file": "office_layer_14.png",
+   "x": 1562,
+   "y": 533,
+   "w": 151,
+   "h": 243,
+   "sortY": 776,
+   "kind": "chair"
+  },
+  {
+   "id": "obj15",
+   "file": "office_layer_15.png",
+   "x": 2128,
+   "y": 533,
+   "w": 151,
+   "h": 243,
+   "sortY": 776,
+   "kind": "chair"
+  }
+ ]
+}
