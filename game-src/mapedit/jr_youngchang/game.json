@@ -309,15 +309,14 @@
     "w": 118,
     "h": 189,
     "sortY": 640
-   },
+   }
+  ],
+  "chairs": [
    {
-    "id": "chair_guest",
-    "file": "me_jr_youngchang_chair_guest",
-    "x": 862,
-    "y": 592,
-    "w": 136,
-    "h": 216,
-    "sortY": 805
+    "x": 636,
+    "y": 694,
+    "face": "E",
+    "set": "L"
    }
   ]
  },
@@ -339,20 +338,19 @@
    "chair": "chair_boss"
   },
   {
-   "id": "seat_chair_guest",
-   "x": 940,
-   "y": 819,
+   "id": "lchair0",
+   "x": 636,
+   "y": 694,
    "verb": "앉기",
    "face": 1,
    "act": [
-    "chairsit",
-    "seatthink"
+    "sit_side"
    ],
    "seat": {
-    "x": 940,
-    "y": 805
+    "x": 636,
+    "y": 694
    },
-   "chair": "chair_guest"
+   "chair": 0
   }
  ],
  "files": [
@@ -361,7 +359,6 @@
   "me_jr_youngchang_crate_l",
   "me_jr_youngchang_crate_r",
   "me_jr_youngchang_box_r",
-  "me_jr_youngchang_chair_boss",
-  "me_jr_youngchang_chair_guest"
+  "me_jr_youngchang_chair_boss"
  ]
 }

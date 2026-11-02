@@ -229,7 +229,23 @@
    "r": 380
   }
  ],
- "spots": [],
+ "spots": [
+  {
+   "id": "optable",
+   "x": 630,
+   "y": 690,
+   "verb": "눕기",
+   "face": -1,
+   "act": [
+    "liesit",
+    "doze"
+   ],
+   "seat": {
+    "x": 630,
+    "y": 522
+   }
+  }
+ ],
  "objects": [
   {
    "id": "table",

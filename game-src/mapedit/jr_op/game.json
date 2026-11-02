@@ -288,7 +288,23 @@
    }
   ]
  },
- "spots": [],
+ "spots": [
+  {
+   "id": "optable",
+   "x": 630,
+   "y": 690,
+   "verb": "눕기",
+   "face": -1,
+   "act": [
+    "liesit",
+    "doze"
+   ],
+   "seat": {
+    "x": 630,
+    "y": 522
+   }
+  }
+ ],
  "files": [
   "me_jr_op",
   "me_jr_op_table",

@@ -349,22 +349,6 @@
     50,
     135
    ]
-  },
-  {
-   "id": "chair_guest",
-   "name": "손님 의자",
-   "file": "c01_north",
-   "x": 862,
-   "y": 592,
-   "w": 136,
-   "h": 216,
-   "rot": 0,
-   "flip": false,
-   "sortY": 805,
-   "anchor": [
-    50,
-    135
-   ]
   }
  ],
  "spots": [
@@ -386,24 +370,30 @@
    }
   },
   {
-   "id": "seat_chair_guest",
-   "x": 940,
-   "y": 819,
+   "id": "lchair0",
+   "x": 636,
+   "y": 694,
    "verb": "앉기",
    "face": 1,
-   "dir": "back",
-   "chair": "chair_guest",
    "act": [
-    "chairsit",
-    "seatthink"
+    "sit_side"
    ],
    "seat": {
-    "x": 940,
-    "y": 805
-   }
+    "x": 636,
+    "y": 694
+   },
+   "chair": 0
   }
  ],
  "dotK": 1.5779,
+ "chairs": [
+  {
+   "x": 636,
+   "y": 694,
+   "face": "E",
+   "set": "L"
+  }
+ ],
  "sizes": [
   [
    514,

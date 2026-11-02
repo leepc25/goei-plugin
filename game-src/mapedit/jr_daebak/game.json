@@ -42,11 +42,11 @@
    [
     [
      275,
-     583
+     610
     ],
     [
      660,
-     583
+     610
     ],
     [
      660,
@@ -166,14 +166,85 @@
     "w": 155,
     "h": 397,
     "sortY": 820
+   },
+   {
+    "id": "chair",
+    "file": "me_jr_daebak_chair",
+    "x": 418,
+    "y": 407,
+    "w": 124,
+    "h": 197,
+    "sortY": 602
+   }
+  ],
+  "chairs": [
+   {
+    "x": 930,
+    "y": 670,
+    "face": "E",
+    "set": "L"
+   },
+   {
+    "x": 1120,
+    "y": 796,
+    "face": "N",
+    "set": "L"
    }
   ]
  },
- "spots": [],
+ "spots": [
+  {
+   "id": "seat_chair",
+   "x": 489,
+   "y": 616,
+   "verb": "앉기",
+   "face": 1,
+   "act": [
+    "chairsit",
+    "seatthink"
+   ],
+   "seat": {
+    "x": 489,
+    "y": 602
+   },
+   "chair": "chair"
+  },
+  {
+   "id": "lchair0",
+   "x": 930,
+   "y": 670,
+   "verb": "앉기",
+   "face": 1,
+   "act": [
+    "sit_side"
+   ],
+   "seat": {
+    "x": 930,
+    "y": 670
+   },
+   "chair": 0
+  },
+  {
+   "id": "lchair1",
+   "x": 1120,
+   "y": 796,
+   "verb": "앉기",
+   "face": 1,
+   "act": [
+    "sit_back"
+   ],
+   "seat": {
+    "x": 1120,
+    "y": 796
+   },
+   "chair": 1
+  }
+ ],
  "files": [
   "me_jr_daebak",
   "me_jr_daebak_counter",
   "me_jr_daebak_table",
-  "me_jr_daebak_plant"
+  "me_jr_daebak_plant",
+  "me_jr_daebak_chair"
  ]
 }
