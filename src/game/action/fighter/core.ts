@@ -953,7 +953,7 @@ const SEAT_F = 0.133;
 const chairEdits: Record<string, Json> = {};
 const chairEdit = (): Record<string, Json> => chairEdits;
 let seatIdx = -1, showChair = true;
-function chairFit(dir?: Json, line?: Json) { return seatFit(CH, dir, line, chairEdit()); }   // 줄마다(기대 쉬기 73 등) 따로 맞춘 값이 있으면 그것 (fighter/seats.ts)
+function chairFit(dir?: Json, line?: Json, chair?: Json) { return seatFit(CH, dir, line, chairEdit(), chair ?? (P.seat && P.seat.chair)); }   // chair = 의자 종류(L02 쉘 의자, 11-02)   // 줄마다(기대 쉬기 73 등) 따로 맞춘 값이 있으면 그것 (fighter/seats.ts)
 function seatIdle() { const s = P.seat; P.mode = 'seat'; const n = nOf(s.sit); play(s.sit, { seq: [{ f: n - 1, d: 9 }], loopFrom: 0 }); P.clip!.breathe = true; }
 function sitChair() {
   const okSeat = (s?: Json) => has(s.sit) && !(CH.noBackSit && s.dir === 'back');   // 후면 앉기 그림이 실패한 인물(앉지 않고 섬)은 후면 자리를 건너뜀(10-29 아벤샤)
@@ -1031,7 +1031,7 @@ const SCENES = [
     ['사망(서서)', () => { if (P.mode === 'dead') die(); die(); }], ['사망(누워서)', () => { if (P.mode === 'dead') die(); knock(); later(1.4, () => { P.mode = 'down'; die(); }); }], ['되살리기', () => P.mode === 'dead' && die()]], () => true],
 ];
 // 그 인물에게 줄이 없어 아무것도 안 하는 버튼은 숨김(사용자 10-28: 이길환 끄덕·손 작업)
-function sitAt(dir?: Json) { if (P.seat) return; if (dir === 'back' && CH.noBackSit) dir = 'side'; seatIdx = SEATS.findIndex(s => s.dir === dir) - 1; P.scene = null; sitChair(); }
+function sitAt(dir?: Json, chair?: Json) { if (P.seat) return; if (dir === 'back' && CH.noBackSit) dir = 'side'; seatIdx = SEATS.findIndex(s => s.dir === dir) - 1; P.scene = null; sitChair(); if (P.seat && chair) P.seat.chair = chair; }
 
 // ── 생활·직무 줄: , . 로 차례로 틀기(목록 단추와 같음) ──
 let lifeI = -1;

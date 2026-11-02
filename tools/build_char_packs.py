@@ -68,8 +68,8 @@ def write_fx():
         (d / f"{name}.webp").write_bytes(webp(from_data_uri(v["src"])))
         meta[name] = {k: vv for k, vv in v.items() if k != "src"}; meta[name]["file"] = f"{name}.webp"
     (d / "vfx.json").write_text(json.dumps(meta, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
-    for prefix, folder in (("chair", "C01_사무의자_1배"), ("chair2", "C02_기댄사무의자_1배_2차")):
-        for p in (ROOT / "game-src/action/objects" / folder).glob("*.png"):
+    for prefix, folder in (("chair", "game-src/action/objects/C01_사무의자_1배"), ("chair2", "game-src/action/objects/C02_기댄사무의자_1배_2차"), ("chair3", "game-src/art/objects/chairs_shell/fit")):   # chair3 = 휴게실 쉘 의자 L02(11-02)
+        for p in (ROOT / folder).glob("*.png"):
             if p.stem in ("south", "south-east", "south-west", "east", "west", "north", "north-east", "north-west"):
                 (d / f"{prefix}-{p.stem}.webp").write_bytes(webp(Image.open(p).convert("RGBA")))
     (d / "pack.json").write_text(json.dumps({"id": "action-fx", "required": False}) + "\n", encoding="utf-8")

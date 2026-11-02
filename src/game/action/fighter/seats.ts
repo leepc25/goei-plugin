@@ -16,9 +16,15 @@ export const SEAT_LOOP = new Set(['63', '64', '66', '73', '98', '105', '69', '71
 export const SEAT_IDS = new Set(['60', '61', '96', '62', '63', '64', '65', '66', '67', '68', '69', '70', '71', '72', '73', '97', '98', '99', '105', '106', '148', '149', '167']);
 
 export interface SeatFit { dx: number; dy: number; s: number; img?: string }
-type Cfg = { chair?: Record<string, Partial<SeatFit>>; chairAuto?: Record<string, Partial<SeatFit>> };
+type Cfg = { chair?: Record<string, Partial<SeatFit>>; chairAuto?: Record<string, Partial<SeatFit>>; chairShell?: Record<string, Partial<SeatFit>> };
+/** 의자 종류: 없음 = 사무의자(C01), 'L02' = 휴게실 쉘 의자(11-02, 맞춤값 chairs_shell/fit_all.json → 팩 cfg.chairShell, 그림 CHAIR['L02:<방향>']) */
+export type ChairKind = 'L02' | undefined;
 /** 맞춤값: 줄마다 따로 맞춘 값(기대 쉬기 73 등) > 방향 손 맞춤 > 자동값. edits = 시험장에서 막 고친 값 */
-export function seatFit(cfg: Cfg, dir: string, line?: string | null, edits: Record<string, Partial<SeatFit>> = {}): SeatFit {
+export function seatFit(cfg: Cfg, dir: string, line?: string | null, edits: Record<string, Partial<SeatFit>> = {}, chair?: ChairKind): SeatFit {
+  if (chair === 'L02') {   // 쉘 의자: 인물마다 손 맞춘 방향 값 하나(줄마다 따로 없음). 값이 없는 인물은 사무의자 값으로
+    const v = cfg.chairShell?.[dir];
+    if (v) return { dx: 0, dy: 0, s: 1, ...v, img: 'L02:' + (v.img ?? (dir === 'back' ? 'north' : dir === 'side' ? 'east' : 'south')) };
+  }
   const base: SeatFit = { dx: 0, dy: 0, s: 1, ...(cfg.chairAuto?.[dir] ?? {}), ...(cfg.chair?.[dir] ?? {}), ...(edits[dir] ?? {}) };
   return line && (cfg.chair?.[line] || edits[line]) ? { ...base, ...(cfg.chair?.[line] ?? {}), ...(edits[line] ?? {}) } : base;
 }

@@ -16,7 +16,7 @@ import type { Body, Hit, HitResult, React, WBox, WorldView } from '../engine/con
 import type { Pad, Btn } from '../engine/input';
 import type { FrameInfo } from '../engine/art';
 import { createFighterCore } from './core';
-import { seatBody } from './seats';
+import { seatBody, type ChairKind } from './seats';
 import { STATUS, StatusSet } from '../../combat/status';
 import { PerkRun, perkWorld, type PerkHost } from '../../perks/runtime';
 import { draft, kitOf, type Offer } from '../../perks/rules';
@@ -434,17 +434,17 @@ export class FighterPlayer extends Player {
   get lifeSceneOn(): boolean { return (this.core.P as unknown as { mode: string }).mode === 'act'; }
   /** 코어 의자에 앉아 있나 (hub.ts: 방 의자 그림 숨김) */
   get sitting(): boolean { return !!this.coreSeat; }
-  sit(clip: string, x: number, y: number, face: 1 | -1, exit: { x: number; y: number }): boolean {
+  sit(clip: string, x: number, y: number, face: 1 | -1, exit: { x: number; y: number }, chair?: ChairKind): boolean {
     const P = this.core.P as unknown as { x: number; y: number; z: number; vx: number; face: 1 | -1; mode: string; seat: unknown };
     const can = ['60', '96', '61'].some((id) => this.core.has(id));
     if (!can || P.mode !== 'ground' || this.z > 0) return super.sit(clip, x, y, face, exit);
     P.x = x; P.y = y; P.z = 0; P.vx = 0; P.face = face;
-    this.core.sitAt(clip.includes('side') ? 'side' : clip.includes('back') ? 'back' : 'front');
+    this.core.sitAt(clip.includes('side') ? 'side' : clip.includes('back') ? 'back' : 'front', chair);
     if (!P.seat) return super.sit(clip, x, y, face, exit);
     // 지도 의자는 (x, y) 그 자리에 둔다: 사람 발을 이 인물 의자 맞춤값(chairs/<키>.json)만큼 옮긴다 (fighter/seats.ts)
     const seat = P.seat as { dir: string; cx?: number; cy?: number };
     seat.cx = x; seat.cy = y;
-    const body = seatBody(x, y, face, this.core.chairFit(seat.dir), spr(y) * CHAR_K);
+    const body = seatBody(x, y, face, this.core.chairFit(seat.dir, undefined, chair), spr(y) * CHAR_K);
     P.x = body.x; P.y = body.y;
     this.coreSeat = { exit };
     this.sync();

@@ -606,6 +606,10 @@ def payload_of(cfg, A):
     payload["seam"], payload["ret"] = seam_map(A)   # 동작 끝 → 대기 이음새(10-29)
     payload["cycle"] = cycle_map(A)   # 걷기·뛰기 반복 구간(10-29)
     payload["chairAuto"] = chair_auto(cfg)   # 의자 자동 맞춤(chairfit.py). 손으로 맞춘 값은 설정 chars/<키>.json 의 "chair"가 이김
+    sh = ROOT / "game-src/art/objects/chairs_shell/fit_all.json"   # 휴게실 쉘 의자 맞춤(11-02, tools/objects/shell_fit_all.py)
+    if sh.exists():
+        v = json.loads(sh.read_text(encoding="utf-8")).get(cfg["key"])
+        if v: payload["chairShell"] = v
     return payload
 
 

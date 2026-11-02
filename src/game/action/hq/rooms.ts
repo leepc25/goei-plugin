@@ -6,7 +6,7 @@ import type { PlaceId } from './data';
 /** 바닥에 놓인 것. h = 화면 높이 px(사람 키 256 기준). solid가 아니면 지나갈 수 있다(의자) */
 export type RoomItem =
   | { t: 'desk' | 'big' | 'wall' | 'glass'; x: number; y: number; w: number; h: number; k?: string; H?: number }
-  | { t: 'chair'; x: number; y: number; f: 'E' | 'W' | 'N'; soft?: boolean };
+  | { t: 'chair'; x: number; y: number; f: 'E' | 'W' | 'N'; soft?: boolean; k?: 'L02' };   // k = 의자 종류(L02 휴게실 쉘 의자)
 /** 북쪽 벽에 붙은 것 (창·화면·샤워기·관찰 유리) */
 export interface RoomFix { x: number; w: number; k: 'window' | 'screen' | 'shower' | 'glass' | 'blinds' | 'shelfwall' | 'elevator' | 'directory' }
 /** 쟈알디가 E로 쓰는 자리. place가 있으면 본부 메뉴 창, act는 그 자리 동작(클립 이름, 생활 클립이 들어오면 재생) */
@@ -51,8 +51,8 @@ export const ROOMS: Record<string, Room> = {
     items: [
       { t: 'wall', x: 0.05, y: 0.6, w: 0.6, h: 1.6, H: 280, k: 'vending' },
       { t: 'desk', x: 3.0, y: 1.0, w: 1.4, h: 1.6, H: 140, k: 'counter' },
-      { t: 'desk', x: 7.0, y: 1.0, w: 0.8, h: 0.8 }, { t: 'chair', x: 6.6, y: 1.4, f: 'E' }, { t: 'chair', x: 8.2, y: 1.4, f: 'W' },
-      { t: 'desk', x: 7.0, y: 3.0, w: 0.8, h: 0.8 }, { t: 'chair', x: 6.6, y: 3.4, f: 'E' }, { t: 'chair', x: 8.2, y: 3.4, f: 'W' },
+      { t: 'desk', x: 7.0, y: 1.0, w: 0.8, h: 0.8 }, { t: 'chair', x: 6.6, y: 1.4, f: 'E', k: 'L02' }, { t: 'chair', x: 8.2, y: 1.4, f: 'W', k: 'L02' },
+      { t: 'desk', x: 7.0, y: 3.0, w: 0.8, h: 0.8 }, { t: 'chair', x: 6.6, y: 3.4, f: 'E', k: 'L02' }, { t: 'chair', x: 8.2, y: 3.4, f: 'W', k: 'L02' },
       { t: 'big', x: 10.0, y: 2.0, w: 4.0, h: 0.9, H: 110, k: 'sofa' },
       { t: 'wall', x: 15.0, y: 0.3, w: 0.7, h: 0.7, H: 430, k: 'pillar' },
     ],

@@ -100,7 +100,7 @@ export class Player extends Fighter {
   itemAct: ((k: 'attack' | 'shoot') => string | null) | null = null;
   seat: { clip: string; frame: number; tick: number; rising: boolean; exit: { x: number; y: number } } | null = null;
 
-  sit(clip: string, x: number, y: number, face: 1 | -1, exit: { x: number; y: number }): boolean {
+  sit(clip: string, x: number, y: number, face: 1 | -1, exit: { x: number; y: number }, _chair?: 'L02'): boolean {   // _chair = 의자 종류(코어 인물만 씀, fighter/player.ts)
     if (!this.clips[clip]?.length || this.z > 0 || this.phase !== 'free' || (this.move && this.moveKey !== 'pickup')) return false;
     this.cancelMove(); this.buf = null;
     this.running = this.guarding = this.crouching = this.charging = false;

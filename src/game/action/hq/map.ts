@@ -69,6 +69,8 @@ export interface HqBox {
   solid: boolean;
   /** 의자: 앉은 사람이 보는 쪽 */
   face?: 'E' | 'W' | 'N';
+  /** 의자 종류: 'L02' = 휴게실 쉘 의자(그림·인물 맞춤값이 다름, fighter/seats.ts) */
+  chair?: 'L02';
 }
 /** 옛 장면(거리·파스타집)의 물건: 벽 그림 칸 방식 그대로 */
 export interface HqThing {
@@ -118,7 +120,7 @@ function fromRoom(r: Room) {
   const chairs = r.items.filter((it): it is Extract<RoomItem, { t: 'chair' }> => it.t === 'chair');
   const boxes: HqBox[] = chairs.map((it) => {
     const y = yOf(it.y);
-    return { kind: it.soft ? 'armchair' : 'chair', x: it.x * PX_M, w: it.soft ? 70 : 54, y: y + 10, d: 20, h: it.soft ? 120 : 150, solid: false, face: it.f };
+    return { kind: it.soft ? 'armchair' : 'chair', x: it.x * PX_M, w: it.soft ? 70 : 54, y: y + 10, d: 20, h: it.soft ? 120 : 150, solid: false, face: it.f, ...(it.k ? { chair: it.k } : {}) };
   });
   // 의자 자리: 앉은 사람이 보는 쪽(E/W = 옆 앉기, N = 후면 앉기). 발 자리 = 의자 바닥 선
   const spots: HqSpot[] = boxes.map((b, i): HqSpot => ({

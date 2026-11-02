@@ -57,7 +57,7 @@ export interface LiveActor { id: string; name: string; kind: 'named' | 'mob'; x:
   /** 동행(ally)·적(foe) 구분 (11-01 1-3): 이름표 색 */
   rel?: 'ally' | 'foe';
   /** 지도 의자에 앉음: 의자 번호(장면 상자 번호)·앉기 방향·하는 일·의자 자리 */
-  seat?: { box: number; dir: 'front' | 'side' | 'back'; kind: string; x: number; y: number };
+  seat?: { box: number; dir: 'front' | 'side' | 'back'; kind: string; x: number; y: number; chair?: 'L02' };
   /** 화장실 칸을 쓰는 중: 그 칸 문 오브젝트 id, 문이 열려 있어야 하나(들어가는 중·나오는 중) */
   toilet?: { door?: string; open: boolean } }
 export interface HubLife {
@@ -465,6 +465,7 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
         }
         host.life.combat?.(a, scene.id);
         live = host.life.actors(scene.id);
+        for (const q of live) if (q.seat && q.seat.chair === undefined) { const ck = scene.boxes[q.seat.box]?.chair; if (ck) q.seat.chair = ck; }   // 의자 종류(L02 쉘 의자): 그 의자 상자 값
         cords = host.life.cordons?.(scene.id) ?? [];
         gears = host.life.gear?.(scene.id) ?? [];
         // 이름 인물 대화 자리(visit:이름)를 지금 서 있는 곳으로 옮긴다 (E → npcLink 대화)
@@ -553,7 +554,7 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
         if (s.seat && s.act?.[0]) {
           if (s.chair !== undefined && live.some((q) => q.seat?.box === s.chair)) return a.world.say('누가 앉아 있다.', 1.5);
           const exit = clearSpot(s.x, s.y ?? a.world.player.y, solids, scene.lane ?? LANE);
-          if ((a.world.player as Player).sit(s.act[0], s.seat.x, s.seat.y, s.face ?? 1, exit) && s.chair !== undefined) sitChair = scene.boxes[s.chair] ?? null;
+          if ((a.world.player as Player).sit(s.act[0], s.seat.x, s.seat.y, s.face ?? 1, exit, s.chair !== undefined ? scene.boxes[s.chair]?.chair : undefined) && s.chair !== undefined) sitChair = scene.boxes[s.chair] ?? null;
           host.sat?.();
           return;
         }
@@ -1009,12 +1010,14 @@ function drawBox(c: CanvasRenderingContext2D, b: HqBox, look: string) {
 /** 의자: 인물 팩 공용 의자 그림(action-fx chair-<방향>, 테스트룸 C01·원점 (100,171))이 있으면 그걸로, 없으면 옛 코드 의자 */
 function drawChair(c: CanvasRenderingContext2D, b: HqBox) {
   const CH = charFx()?.CHAIR;
-  const im = CH?.[b.face === 'N' ? 'north' : b.face === 'W' ? 'west' : 'east'];
+  // 쉘 의자(L02)는 서쪽 그림이 없어 동쪽 그림을 뒤집는다(인물 앉기와 같은 규칙: face 로 뒤집기)
+  const shell = b.chair === 'L02';
+  const im = shell ? CH?.[b.face === 'N' ? 'L02:north' : 'L02:east'] : CH?.[b.face === 'N' ? 'north' : b.face === 'W' ? 'west' : 'east'];
   if (im?.complete && im.naturalWidth) {
     const k = persp(b.y) * CHAR_K;
     c.save();
     c.translate(Math.round(b.x), Math.round(b.y));
-    c.scale(k, k);
+    c.scale(shell && b.face === 'W' ? -k : k, k);
     c.imageSmoothingEnabled = false;
     c.drawImage(im, -100, -171);
     c.restore();
@@ -1071,7 +1074,7 @@ const namedTop = (name: string) => (charArt(name) ? charTop(name) : -230);
 function drawLiveActor(c: CanvasRenderingContext2D, a: LiveActor, life: HubLife): void {
   const t = (life.lifeTime?.() ?? performance.now() / 1000) * 1000;
   const until = a.until === undefined ? undefined : a.until * 1000;
-  if (a.seat && drawCharSeat(c, a.kind === 'named' ? a.name : a.look ?? a.name, a.seat.x, a.seat.y, a.face, t, a.seat.dir, a.seat.kind, (a.since ?? 0) * 1000, until)) return;
+  if (a.seat && drawCharSeat(c, a.kind === 'named' ? a.name : a.look ?? a.name, a.seat.x, a.seat.y, a.face, t, a.seat.dir, a.seat.kind, (a.since ?? 0) * 1000, until, a.seat.chair)) return;
   if (a.kind === 'named' && drawCharClip(c, a.name, a.x, a.y, a.face, t, a.clip, (a.since ?? 0) * 1000, until)) return;
   if (a.kind === 'mob' && life.drawMob) return life.drawMob(c, a);
   silhouette(c, a);
