@@ -27,6 +27,8 @@ def check(path):
     if os.environ.get('NO_FILL') == '1':
         must = ['Pack the walls and ceiling with detail and texture everywhere, nothing left plain' if m.startswith('Pack the whole image') else m for m in must]
     if _os.environ.get('ORIG'): must = [m.replace('the lower third', 'the lower half') for m in must]
+    # 2026-11-02 사용자 「천장을 아예 안 그려도 상관없어」: NO_CEIL=1이면 천장 낱말이 든 필수 구절을 바닥·벽만으로 바꾼 것을 허용
+    if _os.environ.get('NO_CEIL') == '1': must = [m for m in must if not m.startswith(('Pack the whole image', 'The back wall, floor and ceiling'))] + ['Pack the whole image with detail everywhere', 'The back wall and floor run straight on past the']
     for m in must:
         hit = m in new
         rows.append(('그대로' if hit else '빠짐', m[:70]))
