@@ -3,7 +3,7 @@
 // 게임과 맞닿는 곳: 표적 = env.targets()의 실제 적(T = 지금 가장 가까운 앞 상대 + 범위 검사에 든 상대 전부), 화면 = 보이는 화면(VX0~W)·게임 바닥, 키 = env.held, 소리 = env.sfx, 체력 = 게임.
 // env: { A, IMG, CH, VFX, CHAIR, held:Set, K(y), sfx(type, extra), font(n), targets():[{body,x,y,z}], hurt(T, dmg, kind, face, hitstop, o), clamp(P), ground(x,y), mod?:{speed(),sp()}, heal?(v) }
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { SEATS as SEAT_TABLE, SEAT_LOOP as SEAT_LOOP_IDS, SEAT_IDS as SEAT_ID_SET, seatFit } from './seats';
+import { SEATS as SEAT_TABLE, SEAT_LOOP as SEAT_LOOP_IDS, SEAT_IDS as SEAT_ID_SET, seatFit, seatFitAt } from './seats';
 import { showerPlan } from './shower';
 import type { PerkRun, PerkCtx, HitSrc, Boom } from '../../perks/runtime';
 /** 인물 설정(char.json cfg)·줄 측정값(A)·이펙트 정의·기술 부품은 JSON 자료라 모양이 인물·기술마다 다르다 → 자료 쪽은 느슨한 형(Json)으로 둔다 */
@@ -1387,7 +1387,7 @@ function drawPlayer() {
   else if (P.mode === 'charge') { const lv = Math.min(3, chLv()); tint = { c: CH_COL[lv], over: 0.08 + 0.08 * Math.sin(P.t * 20), noEdge: true }; }
   // 의자: C01 사무 의자 1배(판정 전). 정면·옆은 사람 뒤 층, 후면은 등받이가 몸을 가리게 사람 앞 층(seat_fit.json front=true, 10-28 사용자 지적: 등받이를 뚫고 앉음)
   // 의자 자리 고정(필드 지도 의자, P.seat.cx·cy): 의자는 그 자리에, 사람을 맞춤값(줄마다 다를 수 있음)만큼 옮겨 그린다. 없으면 사람 기준(시험장)
-  const cf0 = P.seat ? chairFit(P.seat.dir, P.clip && P.clip.id) : null;
+  const cf0 = P.seat ? seatFitAt(chairFit(P.seat.dir, P.clip && P.clip.id), f) : null;   // 장마다 다른 값(fdx/fdy, 11-02)
   const anchored = !!(P.seat && P.seat.cx != null && cf0);
   const bx = anchored ? P.seat.cx - P.face * cf0.dx * kk : P.x, by = anchored ? P.seat.cy - cf0.dy * kk : P.y;
   const chair = () => { if (!(P.seat && showChair && CHAIR[P.seat.img] && CHAIR[P.seat.img].complete)) return; const cf = cf0!, im = CHAIR[cf.img || P.seat.img] && CHAIR[cf.img || P.seat.img].complete ? CHAIR[cf.img || P.seat.img] : CHAIR[P.seat.img];

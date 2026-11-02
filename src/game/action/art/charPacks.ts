@@ -3,7 +3,7 @@
 // 인물 엔진 fighter/core.ts 가 바로 쓴다(A = 줄 측정값, IMG = 시트, CH = 설정, VFX = 이펙트, CHAIR = 의자).
 // 필드 생태계(hub.ts drawLiveActor)도 같은 그림으로 생활 클립을 그린다: 클립 이름(docs/필드_클립_이름_약속.md) ↔ 줄 번호는 아래 FIELD_CLIP.
 import { snapTo, spr } from '../engine/view';
-import { SEATS, SEAT_IDS, SEAT_LOOP, seatBody, seatFit, type SeatDir } from '../fighter/seats';
+import { SEATS, SEAT_IDS, SEAT_LOOP, seatBody, seatFit, seatFitAt, type SeatDir } from '../fighter/seats';
 
 /** 줄(동작) 측정값. 테스트룸 build.py analyze 가 잰 것 (src 대신 file) */
 export interface LineMeta {
@@ -303,7 +303,7 @@ export function drawCharSeat(c: CanvasRenderingContext2D, nameOrKey: string, cx:
     const n = Math.floor((now / 1000) * 6), L = ((a.cfg.loops ?? {})[id] ?? []).map((v) => Math.max(0, Math.min(m.n - 1, v - 1)));
     f = SEAT_LOOP.has(id) && L.length ? (n < L[0] ? n % m.n : L[(n - L[0]) % L.length]) : n % m.n;
   }
-  const fit = seatFit(a.cfg as never, row.dir, id, {}, set);
+  const fit = seatFitAt(seatFit(a.cfg as never, row.dir, id, {}, set), sitF !== null ? 0 : f);   // 장마다 다른 값(11-02)
   const k = spr(cy) * CHAR_K;
   const body = seatBody(cx, cy, face, fit, k);
   const im = charFx()?.CHAIR[fit.img || row.img] ?? charFx()?.CHAIR[row.img];

@@ -41,7 +41,11 @@ def chair_l(key):
     out = {}
     for k, v in d.items():
         if k == "lines" and isinstance(v, dict):
-            for lk, lv in v.items(): out[lk.split(":", 1)[-1]] = {kk: vv for kk, vv in lv.items() if kk in ("dx", "dy")}
+            for lk, lv in v.items():   # 장마다 다른 값(frame_dx/frame_dy, 기대 쉬기 73 등, 11-02) → fdx/fdy 로 같이 담는다
+                e = {kk: vv for kk, vv in lv.items() if kk in ("dx", "dy")}
+                if isinstance(lv.get("frame_dx"), list): e["fdx"] = lv["frame_dx"]
+                if isinstance(lv.get("frame_dy"), list): e["fdy"] = lv["frame_dy"]
+                out[lk.split(":", 1)[-1]] = e
             continue
         if not isinstance(v, dict): continue
         out[k] = {kk: vv for kk, vv in v.items() if kk in ("dx", "dy", "s")}
