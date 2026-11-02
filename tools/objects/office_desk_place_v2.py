@@ -19,8 +19,8 @@ def desk(d,cx,foot):
     return (foot,im,round(cx*K-im.width/2),round(foot*K-im.height))
 L=[]
 XS=[230]
-for x in XS: L.append(desk('north',x,332))
-for x in XS: L.append(desk('south',x,356))
+L.append(desk('north',150,332))
+L.append(desk('south',390,385))
 L.append(desk('east',560,346))
 out=BG.copy()
 for _,im,x,y in sorted(L,key=lambda t:t[0]): out.alpha_composite(im,(x,y))
