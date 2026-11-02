@@ -21,3 +21,4 @@
 11-02 12:36 C05v6_대기의자_뒷모습 256x160 1방향 src=None object_id=ac33bcd4-7acb-4624-a9e5-9637aa2aa14b completed usage={"type": "usd", "usd": 0.04148893159823948}
 11-02 12:40 C05v6_대기의자_8방향 256x160 8방향 src=/home/user/goei-plugin/game-src/action/objects/C05v6_대기의자_뒷모습/unknown.png object_id=b87e5741-dae1-4054-8b6f-ce92aade9415 completed usage={"type": "usd", "usd": 0.02567261862092548}
 11-02 12:46 C05v7_대기의자_앞모습 256x128 1방향 src=None object_id=75afc16a-4d90-4623-b711-28ab95229efa completed usage={"type": "usd", "usd": 0.04102751858562893}
+11-02 13:34 C06_대기의자_돌리기 256x160 8방향 src=/home/user/goei-plugin/game-src/action/objects/C06_대기의자_3인/as_south_256x160.png object_id=3c328bbb-1a02-4b8f-a3cb-a25ce947ad9f completed usage={"type": "usd", "usd": 0.042364195393191445}
