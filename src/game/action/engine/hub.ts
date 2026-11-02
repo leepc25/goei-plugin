@@ -80,6 +80,13 @@ export interface HubLife {
   gear?(sceneId: string): { kind: 'sandbag' | 'dummy' | 'target'; x: number; y: number; busy: boolean }[];
   /** 화장실(11-01): 그 자리를 누가 쓰거나 쓰러 가나 / 주인공이 쓰는 자리를 세계에 알린다 (NPC가 고르지 않게, 침입 감지가 알게) */
   toiletBusy?(sceneId: string, id: string): boolean;
+  /** 샤워 자리 (11-02 NPC 샤워): 누가 쓰나 · 지금 샤워 중인 NPC(물줄기 그릴 자리) · 주인공이 쓰는 자리 */
+  showerBusy?(sceneId: string, id: string): boolean;
+  showerUsers?(sceneId: string): { id: string; actor: string; y: number; look: string }[];
+  playerShower?(t: { scene: string; id: string } | null): void;
+  /** 탈의실 캐비닛 (11-02): 누가 옷 벗는/입는 중 · 주인공이 쓰는 캐비닛 */
+  lockerBusy?(sceneId: string, id: string): boolean;
+  playerLocker?(t: { scene: string; id: string } | null): void;
   playerToilet?(t: { scene: string; id: string; kind: 'stall' | 'urinal' | 'sink'; phase: 'open' | 'in' | 'leave' } | null): void;
   /** 주인공이 사람이 있는 칸 문을 열었다 (침입 감지·대사는 필드 쪽에서) */
   playerPeek?(t: { scene: string; id: string }): void;
@@ -144,7 +151,9 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
   /** 주인공이 쓰는 샤워 자리(spot id). 샤워가 끝나면 비운다 (물·김은 이 자리에만) */
   let showerSpot: string | null = null;
   let curWorld: WorldView | null = null;
-  type ShowerPlayer = { shower?(x: number, y: number, face: 1 | -1): boolean; showering?: boolean; nude?: boolean; dress?(): void; art?: { key: string } };
+  /** 주인공이 옷 벗거나 입는 캐비닛 (잠깐 동안 NPC가 고르지 않게) */
+  let lockerUse: { scene: string; id: string; t: number } | null = null;
+  type ShowerPlayer = { changeClothes?(x: number, y: number, face: 1 | -1): boolean; shower?(x: number, y: number, face: 1 | -1): boolean; showering?: boolean; nude?: boolean; dress?(): void; art?: { key: string } };
   /** 이 장면에서 걸은 거리 (px). 필드 시계가 쓴다 */
   let walked = 0;
   let lastX: number | null = null;
@@ -264,9 +273,15 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
       } })).concat(people.map((p) => ({ y: p.y, x0: p.x - 60, x1: p.x + 60, occludedSilhouette: false, draw: (c: CanvasRenderingContext2D) => { drawCharClip(c, p.name, p.x, p.y, p.face, performance.now()); } })))
         // 샤워기(샤워실): 주인공이 그 자리에서 샤워 중이면 물줄기·김을 사람 바로 앞 깊이에 그린다 (hq/showerFx.ts)
         .concat((sc.painted && PAINTED[sc.painted]?.showers ? PAINTED[sc.painted].showers! : []).map((sh) => ({ y: sh.foot[1] + 1, x0: sh.foot[0] - 80, x1: sh.foot[0] + 80, occludedSilhouette: false, draw: (c: CanvasRenderingContext2D) => {
-          if (showerSpot !== sh.id) return;
+          if (showerSpot !== sh.id) {
+            // NPC가 이 자리에서 샤워 중이면 그 사람 머리 높이로 (11-02)
+            const u = host.life?.showerUsers?.(sc.id).find((q) => q.id === sh.id);
+            if (!u) return;
+            drawShowerWater(c, sh, u.y + charTop(u.look) * spr(u.y), performance.now());
+            return;
+          }
           const pl = (curWorld?.player ?? null) as (WorldView['player'] & ShowerPlayer) | null;
-          const top = pl ? (pl.art ? charTop(pl.art.key) : -230) * persp(pl.y) : -230;
+          const top = pl ? (pl.art ? charTop(pl.art.key) : -230) * spr(pl.y) : -230;
           drawShowerWater(c, sh, pl ? pl.y + top : null, performance.now());
         } })))
         // 움직이는 행위자: 자리 수만큼 층을 두고 매 프레임 지금 목록의 i번째를 읽는다 (깊이 정렬은 y 게터로)
@@ -344,8 +359,8 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
         const shown = host.life ? live.filter((a) => a.kind === 'named') : people;
         // 몹 이름표: 말 걸 수 있는 몹과 적(쫓아오는·맞서는 몹, 11-01 1-3)
         const mobsShown = host.life ? live.filter((a) => a.kind === 'mob' && (a.talk || a.rel === 'foe')) : [];
-        host.overlay?.(c, [...shown.map((p) => { const rel = (p as { rel?: 'ally' | 'foe' }).rel; return { name: p.name, x: p.x * z, y: p.y * z, top: namedTop(p.name) * persp(p.y) * z, ...(rel ? { rel } : {}) }; }),
-          ...mobsShown.map((p) => ({ name: `mob:${p.id}`, label: p.name, mob: true, x: p.x * z, y: p.y * z, top: (p.look && charArt(p.look) ? charTop(p.look) : -230) * persp(p.y) * z, ...(p.rel ? { rel: p.rel } : {}) }))], { name: '', x: w.player.x * z, y: (w.player.y - w.player.z) * z, top: ((w.player as { art?: { key: string } }).art ? charTop((w.player as { art?: { key: string } }).art!.key) : -230) * persp(w.player.y) * z });
+        host.overlay?.(c, [...shown.map((p) => { const rel = (p as { rel?: 'ally' | 'foe' }).rel; return { name: p.name, x: p.x * z, y: p.y * z, top: namedTop(p.name) * spr(p.y) * z, ...(rel ? { rel } : {}) }; }),
+          ...mobsShown.map((p) => ({ name: `mob:${p.id}`, label: p.name, mob: true, x: p.x * z, y: p.y * z, top: (p.look && charArt(p.look) ? charTop(p.look) : -230) * spr(p.y) * z, ...(p.rel ? { rel: p.rel } : {}) }))], { name: '', x: w.player.x * z, y: (w.player.y - w.player.z) * z, top: ((w.player as { art?: { key: string } }).art ? charTop((w.player as { art?: { key: string } }).art!.key) : -230) * spr(w.player.y) * z });
         c.restore();
         // 행위자 머리 위 아이콘·말풍선 (화면 px)
         if (host.life) {
@@ -353,7 +368,7 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
           c.scale(1 / z, 1 / z);
           for (const a of live) {
             if (!a.icon && !a.say) continue;
-            const top = (a.kind === 'named' ? namedTop(a.name) : a.look && charArt(a.look) ? charTop(a.look) : -230) * persp(a.y);
+            const top = (a.kind === 'named' ? namedTop(a.name) : a.look && charArt(a.look) ? charTop(a.look) : -230) * spr(a.y);   // 11-02: 장면별 사람 배율(charMul)까지 — 샤워실처럼 사람이 큰 장면에서 이름표·말풍선이 배에 뜨던 것
             drawHeadBubble(c, a.x * z, (a.y + top) * z - 8, a.say ?? a.icon!, !!a.say);
           }
           c.restore();
@@ -455,8 +470,9 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
       }
       if (sitChair && !(a.world.player as Player).seat && !(a.world.player as { sitting?: boolean }).sitting) sitChair = null;
       curWorld = a.world;
-      if (showerSpot && !(a.world.player as ShowerPlayer).showering) showerSpot = null;
-      { const pl = a.world.player as ShowerPlayer; if (pl.nude && !PAINTED[scene?.painted ?? '']?.showers) pl.dress?.(); }   // 샤워실을 나가면 옷 입음
+      if (showerSpot && !(a.world.player as ShowerPlayer).showering) { showerSpot = null; host.life?.playerShower?.(null); }
+      { const pl = a.world.player as ShowerPlayer; if (pl.nude && !(scene?.showers?.length || scene?.lockers?.length)) pl.dress?.(); }   // 탈의실·샤워실 밖으로 나가면 옷 입음
+      if (lockerUse && (lockerUse.t -= 1 / 60) <= 0) { lockerUse = null; host.life?.playerLocker?.(null); }
       if (host.life && scene) {
         host.life.tick(1 / 30, { scene: scene.id, x: a.world.player.x, y: a.world.player.y, seat: sitChair ? scene.boxes.indexOf(sitChair) : null });
         // 주인공 공격이 행위자에게 닿았나 (필드 행위자는 전투 몸이 아니라 따로 본다)
@@ -525,7 +541,7 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
           // 말하는 사람이 이 방에 서 있으면 그 머리 위, 아니면 그 자리 위
           const who = curPeople.find((q) => q.name === l.who);
           const x = who?.x ?? sp.x, y = who?.y ?? sp.y ?? p.y;
-          speech = { who: l.who, text: l.text, x, y, top: (who ? namedTop(l.who) : -200) * persp(y), until: performance.now() + 3800 };
+          speech = { who: l.who, text: l.text, x, y, top: (who ? namedTop(l.who) : -200) * spr(y), until: performance.now() + 3800 };
         }
       } else if (!sp) barked = null;
     },
@@ -543,12 +559,26 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
         if (s.id.startsWith('toilet:')) return useToilet(a, s.id.slice(7));
         if (s.place) return host.openPlace(s.place);
         if (s.say) return a.world.say(s.say, 3);
+        if (s.act?.[0] === 'locker') {
+          // 탈의실 캐비닛(11-02): 맨몸이면 옷 입기, 아니면 옷 벗기 (SH_A 한 번 / 거꾸로 한 번)
+          const pl = a.world.player as WorldView['player'] & ShowerPlayer;
+          const lid = s.id.replace(/^locker:/, '');
+          if (s.y === undefined || !pl.changeClothes) return;
+          if (host.life?.lockerBusy?.(scene.id, lid)) return a.world.say('누가 쓰고 있다.', 1.5);
+          if (!pl.changeClothes(s.x, s.y, s.face ?? 1)) return;
+          lockerUse = { scene: scene.id, id: lid, t: 2.5 };
+          host.life?.playerLocker?.({ scene: scene.id, id: lid });
+          return;
+        }
         if (s.act?.[0] === 'shower') {
           // 샤워 자리(11-01 샤워실): 그 자리에 서서 샤워 규칙 재생. 샤워 그림(SH_D·SH_E)이 없는 인물은 못 한다
           const pl = a.world.player as WorldView['player'] & ShowerPlayer;
           if (s.y === undefined || !pl.shower) return;
+          if (host.life?.showerBusy?.(scene.id, s.id)) return a.world.say('누가 쓰고 있다.', 1.5);
+          if (!pl.nude) return a.world.say('탈의실 캐비닛에서 옷을 벗고 와야 한다.', 2);
           if (!pl.shower(s.x, s.y, s.face ?? 1)) return a.world.say('샤워 동작 그림이 없다.', 1.5);
           showerSpot = s.id;
+          host.life?.playerShower?.({ scene: scene.id, id: s.id });
           host.sat?.();
           return;
         }

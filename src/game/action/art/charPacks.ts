@@ -2,6 +2,7 @@
 // tools/build_char_packs.py 가 테스트룸 빌더(game-src/action/testroom3/build.py)의 측정값·설정을 그대로 옮겨 만든 것이라,
 // 인물 엔진 fighter/core.ts 가 바로 쓴다(A = 줄 측정값, IMG = 시트, CH = 설정, VFX = 이펙트, CHAIR = 의자).
 // 필드 생태계(hub.ts drawLiveActor)도 같은 그림으로 생활 클립을 그린다: 클립 이름(docs/필드_클립_이름_약속.md) ↔ 줄 번호는 아래 FIELD_CLIP.
+import { npcShowerFrame, DRESS_D } from '../fighter/shower';
 import { snapTo, spr } from '../engine/view';
 import { SEATS, SEAT_IDS, SEAT_LOOP, seatBody, seatFit, seatFitAt, type SeatDir } from '../fighter/seats';
 
@@ -139,6 +140,10 @@ export const FIELD_CLIP: Record<string, { ids: string[]; fps?: number; loop?: bo
   nude_hit: { ids: ['SH_H1'], fps: 10, loop: false }, nude_hit2: { ids: ['SH_H2'], fps: 10, loop: false },
   nude_down: { ids: ['SH_H3'], fps: 10, loop: false }, nude_lie_hit: { ids: ['SH_H4'], fps: 9, loop: false }, nude_getup: { ids: ['SH_H5'], fps: 9, loop: false },
   nude_flee: { ids: ['SH_H6'], fps: 12 },
+  // NPC 샤워(11-02): 옷 벗기 → 머리감기·몸씻기 → 옷 입기. 그리기는 drawCharClip 의 shower 갈래 (fighter/shower.ts npcShowerFrame)
+  shower: { ids: ['SH_D', 'SH_E'], fps: 8 },
+  // 탈의실 캐비닛(11-02): 옷 벗기 = SH_A 한 번, 옷 입기 = SH_A 거꾸로 한 번 (drawCharClip 의 shower 갈래)
+  undress: { ids: ['SH_A'], fps: 1 / 0.12, loop: false }, dress: { ids: ['SH_A'], fps: 10, loop: false },
 };
 /** 그 인물에게 그 클립 그림이 있나 (받아 둔 인물만 참). 필드 세계는 그림 있는 행동만 켠다 */
 export function hasCharClip(nameOrKey: string, clip: string): boolean {
@@ -155,7 +160,8 @@ export const charClips = (nameOrKey: string): string[] => Object.keys(FIELD_CLIP
 
 function shadow(c: CanvasRenderingContext2D, x: number, y: number, w: number, k: number) {
   c.fillStyle = 'rgba(0,0,0,0.36)';
-  c.beginPath(); c.ellipse(x, y - 2 * k, Math.max(16, w) * 0.58 * k, 5 * k, 0, 0, Math.PI * 2); c.fill();
+  // 11-02 사용자 「그림자 붕 떠 있다」: 앞발 끝선에 두면 큰 장면에서 뒷발이 그림자 위로 떠 보임 → 두 발 사이(발끝 6도트 위)로
+  c.beginPath(); c.ellipse(x, y - 6 * k, Math.max(16, w) * 0.58 * k, 5 * k, 0, 0, Math.PI * 2); c.fill();
 }
 
 /** 한 번만 하고 끝내는 몸짓 (10-31 사용자: 기지개·경례를 반복하면 이상하다, 한 번만) — 되풀이하지 않고 마지막 장에서 멈춘다 */
@@ -197,6 +203,18 @@ const ENTER: Record<string, { in: string; out?: string }> = { '76': { in: '75' }
 export function drawCharClip(c: CanvasRenderingContext2D, nameOrKey: string, x: number, y: number, dir: 1 | -1, now: number, clip = 'idle', since = 0, until?: number): boolean {
   const a = charArt(nameOrKey);
   if (!a) return false;
+  if (clip === 'dress' && a.A.SH_A && a.IMG.SH_A) {
+    const n = a.A.SH_A.n;
+    drawLine(c, a, 'SH_A', Math.max(0, n - 1 - Math.floor((now - since) / 1000 / DRESS_D)), x, y, dir);
+    return true;
+  }
+  if (clip === 'shower') {
+    // 씻기만 (옷 벗기·입기는 탈의실 캐비닛에서 따로, 11-02) → SH_A 는 0장으로 넘겨 건너뛴다
+    const nOf = (i: string) => (i !== 'SH_A' && a.A[i] && a.IMG[i] ? a.A[i].n : 0);
+    const total = until === undefined ? 660 : (until - since) / 1000;
+    const fr = npcShowerFrame(a.key, Math.round(since), (now - since) / 1000, total, nOf);
+    if (fr) { drawLine(c, a, fr.id, fr.f, x, y, dir); return true; }
+  }
   const cm = clip.startsWith('line:') ? { ids: [clip.slice(5)], fps: 6, ...(ONCE_LINES.has(clip.slice(5)) ? { loop: false } : {}) } as (typeof FIELD_CLIP)[string] : FIELD_CLIP[clip] ?? FIELD_CLIP.idle;
   if (cm.seq) {
     // 이어 틀기: 있는 줄들의 장을 한 줄로 늘어놓고 차례로

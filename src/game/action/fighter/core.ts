@@ -4,7 +4,7 @@
 // env: { A, IMG, CH, VFX, CHAIR, held:Set, K(y), sfx(type, extra), font(n), targets():[{body,x,y,z}], hurt(T, dmg, kind, face, hitstop, o), clamp(P), ground(x,y), mod?:{speed(),sp()}, heal?(v) }
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { SEATS as SEAT_TABLE, SEAT_LOOP as SEAT_LOOP_IDS, SEAT_IDS as SEAT_ID_SET, seatFit, seatFitAt } from './seats';
-import { showerPlan } from './shower';
+import { showerPlan, UNDRESS_D, DRESS_D } from './shower';
 import type { PerkRun, PerkCtx, HitSrc, Boom } from '../../perks/runtime';
 /** 인물 설정(char.json cfg)·줄 측정값(A)·이펙트 정의·기술 부품은 JSON 자료라 모양이 인물·기술마다 다르다 → 자료 쪽은 느슨한 형(Json)으로 둔다 */
 type Json = any;
@@ -1680,6 +1680,18 @@ function drawCut() {
     get showering() { return P.scene === '샤워'; },
     get nude() { return !!P.nude; },
     dress() { P.nude = false; if (P.clip && typeof P.clip.id === 'string' && P.clip.id.startsWith('SH_') && P.mode === 'ground') P.clip = null; },
+    /** 탈의실 캐비닛(11-02): 옷 벗기(SH_A 한 번) → 맨몸 / 옷 입기(SH_A 거꾸로 한 번) → 옷 입음. 그림이 없으면 바로 바뀐다 */
+    get changing() { return P.scene === '탈의'; },
+    undress() {
+      if (!has('SH_A')) { P.nude = true; return; }
+      P.seat = null; P.z = 0; P.combat = false; P.armed = false; P.mode = 'act'; P.scene = '탈의';
+      play('SH_A', { seq: S(R(0, nOf('SH_A') - 1), UNDRESS_D), onEnd: () => { P.nude = true; P.scene = null; toIdle(); } });
+    },
+    dressUp() {
+      if (!has('SH_A')) { P.nude = false; return; }
+      P.seat = null; P.z = 0; P.mode = 'act'; P.scene = '탈의';
+      play('SH_A', { seq: S(R(nOf('SH_A') - 1, 0), DRESS_D), onEnd: () => { P.nude = false; P.scene = null; toIdle(); } });
+    },
     /** 퍽 손잡이 (fighter/player.ts 가 PerkHost 로 묶음) */
     perkApi: { proxies, hit: perkHit, boom: perkBoom, ghost: ghostAttack, replaySkill, reflect: reflectShot, mark: markT, bind: bindT, later: (t: number, fn: () => void) => later(t, fn), text: (x: number, y: number, v: string) => fx.push({ k: 'num', x: x - 30, y, v, t: 1.1 }), gainSp: (v: number) => { P.sp = Math.min(100, P.sp + v); }, vfx: (n: string, x: number, y: number, s: number, o: Json = {}) => vfx(n, x, y, s, o) },
     /** 시험장 전용 스위치: 필살 게이지 무시 */

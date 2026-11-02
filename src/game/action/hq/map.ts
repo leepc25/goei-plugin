@@ -11,7 +11,7 @@ import type { PaintedScene } from './painted';
 
 export type SceneId =
   | 'street' | 'pasta' | 'lobby' | 'swat' | 'f2' | 'f3' | 'office' | 'interview' | 'lounge' | 'wc' | 'wc3'
-  | 'b1' | 'edu' | 'training' | 'clinic' | 'b2' | 'b3' | 'tooth' | 'bath_f' | 'bath_m'
+  | 'b1' | 'edu' | 'training' | 'clinic' | 'b2' | 'b3' | 'tooth' | 'bath_f' | 'bath_m' | 'shower_f' | 'shower_m'
   | 'jr_entry' | 'jr_b1' | 'jr_alley' | 'jr_b2'
   | 'jr_daebak' | 'jr_heolgap' | 'jr_youngchang' | 'jr_songil' | 'jr_jinryo' | 'jr_op';
 
@@ -106,6 +106,10 @@ export interface HqScene {
   /** 화장실 쓰는 자리 (칸·소변기·세면대) */
   toilets?: HqToilet[];
   /** 남녀 구분 화장실: 이 성별만 쓴다 (NPC는 다른 쪽에 들어가지 않는다) */
+  /** 샤워 자리 (11-02 NPC 샤워): 그림의 샤워기 발 자리 */
+  showers?: { id: string; x: number; y: number; face: 1 | -1 }[];
+  /** 탈의실 캐비닛 앞 자리 (11-02) */
+  lockers?: { id: string; x: number; y: number; face: 1 | -1 }[];
   sex?: '남' | '여';
   /** NPC 생활 동작 자리(11-02 휴게실 확정): 자판기 57→27→142, 정수기·커피 57→142, 전자레인지·찬장 57→157, 게시판 57, 싱크대 104 */
   stations?: { id: string; x: number; y: number; lines: string[] }[];
@@ -145,12 +149,21 @@ const room = (b: Base, key: string, west = false): HqScene => ({ ...b, ...fromRo
 /** 방에서 나가는 화면 아래 출입. west 방은 동쪽 끝 */
 const exitS = (to: SceneId, toDoor: string, key: string, west = false): HqDoor => ({ id: 'out', x: M(west ? ROOMS[key].w - 1 : 1), kind: 'exit', side: 'S', to, toDoor });
 /** 층 복도: 확정 배경 그림 한 장. 문 x는 그림의 문 가운데, 집기는 그림에서 오린 오브젝트의 바닥 상자 */
+/** 탈의실 캐비닛 앞 서는 자리 (11-02, 그림의 캐비닛 옆면 밑선에서 땀). face = 캐비닛 쪽.
+ * 여: 왼쪽 캐비닛 섬 오른쪽 면 두 자리, 오른쪽 섬 왼쪽 면 한 자리. 남: 가운데 캐비닛 오른쪽 면 두 자리, 오른쪽 벽 캐비닛 한 자리 */
+const LOCKERS: Record<'shower_f' | 'shower_m', { id: string; x: number; y: number; face: 1 | -1 }[]> = {
+  shower_f: [{ id: 'locker1', x: 560, y: 670, face: -1 }, { id: 'locker2', x: 600, y: 610, face: -1 }, { id: 'locker3', x: 700, y: 680, face: 1 }, { id: 'locker4', x: 316, y: 640, face: 1 }, { id: 'locker5', x: 885, y: 604, face: 1 }],   // 4·5: 사용자 11-02 06:28 「여기도 넣어」(빨래통 왼쪽 사물함 앞 모서리, 오른쪽 안쪽 분홍 사물함 앞)
+  shower_m: [{ id: 'locker1', x: 865, y: 700, face: -1 }, { id: 'locker2', x: 935, y: 640, face: -1 }, { id: 'locker3', x: 1100, y: 690, face: 1 }],
+};
+const lockerSpots = (id: 'shower_f' | 'shower_m'): HqSpot[] => LOCKERS[id].map((l) => ({ id: `locker:${l.id}`, x: l.x, y: l.y, verb: '캐비닛', face: l.face, act: ['locker'] }));
+/** 샤워실 그림의 샤워기 발 자리 → NPC가 서는 자리 (11-02 NPC 샤워) */
+const showerSpots = (id: SceneId) => (PAINTED[id]?.showers ?? []).map((s) => ({ id: s.id, x: s.foot[0], y: s.foot[1], face: s.face }));
 function floorHall(id: SceneId, name: string, floor: HqScene['floor'], doors: Omit<HqDoor, 'x'>[], extra: Partial<HqScene> = {}): HqScene {
   const p = PAINTED[id];
   // 그림 속 의자(11-02 휴게실): 상자(kind chair, 그림은 drawChair가 set 그림으로)·앉는 자리·NPC 자리. 자리의 chair 번호는 의자 차례 → 상자 번호
   const chairBoxes: HqBox[] = (p.chairs ?? []).map((ch) => ({ kind: 'chair', x: ch.x, w: 54, y: ch.y, d: 20, h: 150, solid: false, face: ch.face, set: ch.set }));
   // 맵 에디터로 만든 장면이면 앉는 자리도 그쪽 것
-  if (MAPEDIT_SPOTS[id]) extra = { ...extra, spots: MAPEDIT_SPOTS[id] };
+  if (MAPEDIT_SPOTS[id]?.length) extra = { ...extra, spots: MAPEDIT_SPOTS[id] };
   if (p.stations?.length && !extra.stations) extra = { ...extra, stations: p.stations };
   const sc = floorHallBase(id, name, floor, doors, p, extra);
   if (chairBoxes.length) {
@@ -169,8 +182,8 @@ function floorHallBase(id: SceneId, name: string, floor: HqScene['floor'], doors
     // 막는 상자는 그림을 그리지 않는다 (오브젝트 그림은 첫 상자 자리에서 한 번만, 깊이 순서는 sortY)
     boxes: [
       ...p.objects.flatMap((o) => (o.solid ?? []).map((b, i) => ({ kind: i ? `${o.id}:${i}` : o.id, x: (b.x0 + b.x1) / 2, w: b.x1 - b.x0, y: i ? b.y1 : o.sortY, d: b.y1 - b.y0, h: b.h ?? o.sortY - o.y, solid: true }))),
-      // 막지 않는 오브젝트(가림만): 그림 자리용 빈 상자
-      ...p.objects.filter((o) => !o.solid?.length).map((o) => ({ kind: o.id, x: o.x + o.w / 2, w: o.w, y: o.sortY, d: 1, h: 0, solid: false })),
+      // 막지 않는 오브젝트(가림만): 그림 자리용 빈 상자 (깊이는 걷는 띠 안으로 자름: 탈의실(여) 맨 앞 빨래 바구니 sortY 848, 탈의실(남) 오른쪽 벽 캐비닛 조각 sortY 594 — 사람과 앞뒤는 그대로, 11-02)
+      ...p.objects.filter((o) => !o.solid?.length).map((o) => ({ kind: o.id, x: o.x + o.w / 2, w: o.w, y: Math.max((p.lane ?? PAINTED_LANE)[0], Math.min(o.sortY, (p.lane ?? PAINTED_LANE)[1])), d: 1, h: 0, solid: false })),
       // 그림 속 화분·벤치: 바닥 상자만 (그림은 배경에 이미 있다)
       ...(p.blocks ?? []).map(([x0, x1, y1, h]) => ({ kind: 'block', x: (x0 + x1) / 2, w: x1 - x0, y: y1, d: y1 - (p.lane ?? PAINTED_LANE)[0], h: h ?? 999, solid: true })),
     ],
@@ -225,14 +238,17 @@ export const HQ_SCENES: HqScene[] = [
   // 지하 1층은 새 본부 그림(PixelLab 11-01, game-src/mapedit/b1): 서→동 샤워실(여) · 샤워실(남) · 훈련장 양문 · 엘리베이터. 교육장·계단 없음(본부 최소화)
   floorHall('b1', '지하 1층', 'B1', [
     // 샤워실 두 곳(11-01): 여자 = 확정 그림 bath_f, 남자 = 같은 그림 색 바꾼 bath_m (game-src/mapedit/bath_*)
-    { id: 'shower_f', kind: 'door', to: 'bath_f', toDoor: 'out', label: '샤워실(여)' },
-    { id: 'shower_m', kind: 'door', to: 'bath_m', toDoor: 'out', label: '샤워실(남)' },
+    { id: 'shower_f', kind: 'door', to: 'shower_f', toDoor: 'out', label: '탈의실(여)' },
+    { id: 'shower_m', kind: 'door', to: 'shower_m', toDoor: 'out', label: '탈의실(남)' },
     { id: 'training', kind: 'steel', to: 'training', toDoor: 'out', needs: 'training', label: '훈련장' },
     { id: 'elev', kind: 'elevator' },
   ]),
   // 샤워실: 출입문은 오른쪽 옆벽(그림 속 문). 자리 6곳(E → 샤워 규칙 재생)은 mapedit.gen 의 MAPEDIT_SPOTS
-  floorHall('bath_f', '샤워실(여)', 'B1', [{ id: 'out', kind: 'exit', to: 'b1', toDoor: 'shower_f', label: '나가기' }], { sex: '여' }),
-  floorHall('bath_m', '샤워실(남)', 'B1', [{ id: 'out', kind: 'exit', to: 'b1', toDoor: 'shower_m', label: '나가기' }], { sex: '남' }),
+  // 탈의실(11-02 사용자 「탈의실에서 옷을 벗고 샤워실로」): 지하 1층 → 탈의실(아래 출구) → 샤워실(왼쪽 벽 문). 캐비닛 앞 자리에서 옷 벗기·입기
+  floorHall('shower_f', '탈의실(여)', 'B1', [{ id: 'out', kind: 'exit', side: 'S', to: 'b1', toDoor: 'shower_f', label: '나가기' }, { id: 'bath', kind: 'exit', to: 'bath_f', toDoor: 'out', label: '샤워실' }], { sex: '여', lockers: LOCKERS.shower_f, spots: lockerSpots('shower_f') }),
+  floorHall('shower_m', '탈의실(남)', 'B1', [{ id: 'out', kind: 'exit', side: 'S', to: 'b1', toDoor: 'shower_m', label: '나가기' }, { id: 'shower', kind: 'exit', to: 'bath_m', toDoor: 'out', label: '샤워실' }], { sex: '남', lockers: LOCKERS.shower_m, spots: lockerSpots('shower_m') }),
+  floorHall('bath_f', '샤워실(여)', 'B1', [{ id: 'out', kind: 'exit', to: 'shower_f', toDoor: 'bath', label: '탈의실' }], { sex: '여', showers: showerSpots('bath_f') }),
+  floorHall('bath_m', '샤워실(남)', 'B1', [{ id: 'out', kind: 'exit', to: 'shower_m', toDoor: 'shower', label: '탈의실' }], { sex: '남', showers: showerSpots('bath_m') }),
   room({ id: 'training', name: '훈련장', floor: 'B1', look: 'lab', doors: [exitS('b1', 'training', 'training')] }, 'training'),
   // 지하 2층은 새 본부 그림(PixelLab 11-01, game-src/mapedit/b2): 서→동 격리시설 방폭문 · 격리팀 사무실(의무실·연구실) · 엘리베이터. 심문실·창고 없음(본부 최소화)
   floorHall('b2', '격리 구역', 'B2', [
