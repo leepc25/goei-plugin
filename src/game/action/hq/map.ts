@@ -13,7 +13,7 @@ export type SceneId =
   | 'street' | 'pasta' | 'lobby' | 'swat' | 'f2' | 'f3' | 'office' | 'interview' | 'lounge' | 'wc' | 'wc3'
   | 'b1' | 'edu' | 'training' | 'clinic' | 'b2' | 'b3' | 'tooth' | 'bath_f' | 'bath_m' | 'shower_f' | 'shower_m'
   | 'jr_entry' | 'jr_b1' | 'jr_alley' | 'jr_b2'
-  | 'sdra_lobby' | 'sdra_f2' | 'sdra_wc_m' | 'sdra_wc_f'
+  | 'sdra_lobby' | 'sdra_f2' | 'sdra_wc_m' | 'sdra_wc_f' | 'sdra_street'
   | 'jr_daebak' | 'jr_heolgap' | 'jr_youngchang' | 'jr_songil' | 'jr_jinryo' | 'jr_op';
 
 export type DoorKind = 'main' | 'door' | 'glass' | 'steel' | 'security' | 'elevator' | 'stairs_up' | 'stairs_down' | 'stairs' | 'shop' | 'slide' | 'cell' | 'exit';
@@ -35,6 +35,8 @@ export interface HqDoor {
   locked?: boolean;
   /** 방 이름: 지상 표찰·엘리베이터 앞 화살표 안내 */
   label?: string;
+  /** 버스 정류장: 정류장 이름(노선 고르기 단추). bus가 있는 문끼리 서로 오간다 (11-02 사용자 「버스정류장 상호작용 연결」) */
+  bus?: string;
   /** 계단 문: 위층·아래층 장면 (같은 장면의 stairs 문으로 나온다) */
   up?: SceneId;
   down?: SceneId;
@@ -197,8 +199,13 @@ export const HQ_SCENES: HqScene[] = [
   // 관리국 앞 종로 거리: 그림 장면(PixelLab 11-02, tools/mapedit/author_hq_street.py). 「청진빌딩」 간판 아래 유리문 = 관리국 현관, 맨 왼쪽 정류장 표지 = 버스 정류장(임시로 중림 지하상가 입구).
   // 파스타집은 뺐다(사용자 11-02 12:35 「파스타집은 뺄거야」)
   floorHall('street', '종로 거리', 'out', [
-    { id: 'jr', kind: 'exit', side: 'S', to: 'jr_entry', toDoor: 'west', label: '버스 정류장' },
+    { id: 'jr', kind: 'exit', side: 'S', bus: '종로', label: '버스 정류장' },
     { id: 'main', kind: 'glass', to: 'lobby', toDoor: 'main', label: '관리국 현관' },
+  ]),
+  // 협회 앞 영등포 거리: 그림 장면(PixelLab 11-02, tools/mapedit/author_sdra_street.py). 「특수재난대응협회」 간판 아래 유리문 = 협회 1층 정문, 맨 왼쪽 정류장 표지 = 버스 정류장
+  floorHall('sdra_street', '영등포 거리', 'out', [
+    { id: 'bus', kind: 'exit', side: 'S', bus: '영등포', label: '버스 정류장' },
+    { id: 'main', kind: 'glass', to: 'sdra_lobby', toDoor: 'main', label: '특수재난대응협회' },
   ]),
   // 10-31 사용자: 종로 큰길·지하철 승강장·지역 회색 장면 4곳(영등포·강남·망원·여의도)과 편의점·노점은 가설로 만든 것이라 뺐다.
   // 거리는 각 세력·중립 건물로 들어가는 길거리뿐 — 지도가 완성되면 그때 더한다
@@ -258,7 +265,7 @@ export const HQ_SCENES: HqScene[] = [
   ]),
   // ── 특수재난대응협회 (중립, 11-02 사용자: 관리국 본부 배경을 그대로 쓰고 1층·복도만 새로). 1층 = PixelLab p4(tools/mapedit/author_sdra_lobby.py): 왼쪽 옆벽 정문 · 뒷벽 가운데 엘리베이터. 안내 데스크 없음 ──
   floorHall('sdra_lobby', '협회 1층', '1F', [
-    { id: 'main', kind: 'glass', to: 'street', toDoor: 'sdra', label: '정문' },
+    { id: 'main', kind: 'glass', to: 'sdra_street', toDoor: 'main', label: '정문' },
     { id: 'elev', kind: 'elevator' },
   ]),
   // 협회 2층 복도(11-02 사용자 「화장실만 이은걸로 이층은 마무리」, tools/mapedit/author_sdra_f2.py): 창구 유리문(안쪽 방 그림 없음 → 잠금) · 엘리베이터 · 화장실 남·여. 화장실은 관리국 그림을 그대로 쓴다
@@ -272,7 +279,7 @@ export const HQ_SCENES: HqScene[] = [
   floorHall('sdra_wc_f', '화장실(여)', '2F', [{ id: 'out', kind: 'exit', side: 'S', to: 'sdra_f2', toDoor: 'wc_f', label: '나가기' }], { toilets: PAINTED.sdra_wc_f?.toilets, sex: '여' }),
   // ── 중림 지하상가 (중립지역, 그림 4장). 지상 입구 → 지하 1층 앞골목 → (가운데 통로) 뒷골목 / (동쪽 계단) 지하 2층 ──
   floorHall('jr_entry', '중림 지하상가 입구', 'out', [
-    { id: 'west', kind: 'exit', side: 'S', to: 'street', toDoor: 'jr', label: '버스 정류장' },
+    { id: 'west', kind: 'exit', side: 'S', bus: '중림', label: '버스 정류장' },
     { id: 'down', kind: 'door', to: 'jr_b1', toDoor: 'up', label: '지하상가로 내려가기' },
   ]),
   floorHall('jr_b1', '중림 지하상가 지하 1층', 'B1', [
