@@ -48,6 +48,9 @@ if PROT:
     pb = (max(PROT[0] - off, 0), PROT[1], min(PROT[2] - off, keep), PROT[3])
     win.paste(im.crop((pb[0] + off, pb[1], pb[2] + off, pb[3])), (pb[0], pb[1]))
     mask.paste((0, 0, 0), pb)
+# GUIDE=<png>: 승인한 배치 안내선(투명 바탕, 창 크기)을 지운 칸 위에 얹어 보낸다(extend_left와 같음, 11-02 백일몽 17층 오른쪽 옆벽)
+if os.environ.get("GUIDE"):
+    _g = Image.open(os.environ["GUIDE"]).convert("RGBA"); assert _g.size == (w, h); win.alpha_composite(_g)
 # PREVIEW=<png>: 창·마스크만 저장하고 보내지 않는다
 if os.environ.get("PREVIEW"):
     sh = Image.new("RGB", (w, h * 2 + 8), (255, 0, 255)); sh.paste(win.convert("RGB"), (0, 0)); sh.paste(mask, (0, h + 8))
