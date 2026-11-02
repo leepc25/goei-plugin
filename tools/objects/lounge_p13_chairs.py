@@ -24,7 +24,7 @@ def chair(d,y):
 # 테이블별(1배): 뒤 의자 x(뒤다리 가운데), 앞 의자 x(앞다리 가운데), 왼·오른 끝(깊이 가운데)
 # 옆 의자는 테이블(상판·다리) 바깥에: 왼쪽 의자 오른끝 = 상판 왼끝-2, 오른쪽 의자 왼끝 = 상판 오른끝+2 (사용자 05:34 「다리가 의자 위로」)
 TAB={'table1':(162,134,80,207),'table2':(462,434,381,508),'table3':(713,740,667,795)}
-FB,FF,FS=float(os.environ.get('FB',340)),float(os.environ.get('FF',395)),float(os.environ.get('FS',362))
+FB,FF,FS=float(os.environ.get('FB',340)),float(os.environ.get('FF',395)),float(os.environ.get('FS',375))
 layers=[]   # (그리는 순서 키, img, x, y)
 for n,(xb,xf,xl,xr) in TAB.items():
     im,s=chair('south',FB); layers.append((0,im,round(xb*K-100*s),round(FB*K-172*s)))   # 테이블 뒤, 정면 보는 의자
