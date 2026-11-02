@@ -19,12 +19,13 @@ def S(im,s): return im.resize((max(1,round(im.width*s)),max(1,round(im.height*s)
 FIT=json.loads((R/'game-src/art/objects/chairs_shell/fit_all.json').read_text())
 TD=R/'game-src/art/objects/lounge_tables'; TM=json.loads((TD/'tables.json').read_text())
 TAB={'table1':(162,134,82,205),'table2':(462,434,383,506),'table3':(713,740,669,793)}   # 뒤x, 앞x, 상판 왼끝, 오른끝
-FB,FF,FS=340,395,float(os.environ.get('FS',378))   # 옆 의자: 앞다리 바닥선(377)보다 앞으로 내리고(05:52) 책상 쪽으로 붙임(05:52 「내림과 동시에 더 붙여야」)
+FB,FF,FS=340,395,float(os.environ.get('FS',376))   # 옆 의자: 앞다리 바닥선(377)보다 앞으로 내리고(05:52) 책상 쪽으로 붙임(05:52 「내림과 동시에 더 붙여야」)
 TUCK=float(os.environ.get('TUCK',12))   # 옆 의자 안쪽 끝이 상판 바깥 끝보다 안으로 들어가는 양(1배 px)
 # 뒷다리 중 상판·옆면 밑으로 따로 드러난 부분(1배, x0,x1,y0,y1) — lounge_p13_tables.py 다리 값과 윤곽 읽은 줄
 BACKLEG={'table1':[(120,128,308,348),(197,203,296,348)],'table2':[(420,427,308,348),(498,504,295,348)],
          'table3':[(671,677,294,348),(748,755,308,348)]}
 LID={'front':'60','side':'96','back':'61'}
+CLIP=302   # 테이블 상판 앞 끝선(1배)
 layers=[]
 def seat(key,view,X,fy,order,flip=False):
     """X = 의자 기준점 x(2배 화면 px), fy = 의자 발 y(1배). 의자는 이 점에 고정, 사람은 -dx,-dy."""
@@ -38,6 +39,12 @@ def seat(key,view,X,fy,order,flip=False):
     cx,cy=round(X-100*s),round(Y-171*s)
     if view=='back': layers.append((order,0,ps,px,py)); layers.append((order,1,cs,cx,cy))
     else: layers.append((order,0,cs,cx,cy)); layers.append((order,1,ps,px,py))
+    if view=='side':
+        # 상판 앞 끝선(1배 y302) 위로 올라온 의자·몸은 테이블 위에 다시 그림(사용자 05:57 「이거 뭔데」: 상판이 얼굴을 덮음)
+        clip=CLIP*K
+        for o2,im,x,y in ((0,cs,cx,cy),(1,ps,px,py)):
+            h=clip-y
+            if h>0: layers.append((2.6,o2,im.crop((0,0,im.width,min(h,im.height))),x,y))
 east=Image.open(R/'game-src/art/objects/chairs_shell/fit/east.png').convert('RGBA').crop((0,0,200,172)).getbbox()
 WHO=['1.1_쟈알디','1.4_에일린','1.2_스팡달','1.3_잼트리','1.9_데드폴','1.10_게슈간','1.11_로제몬','1.12_콘쥬스',
      '1.7_고르고디오','1.6_큐라스','1.5_고그니쟈','1.8_데쥬레']
