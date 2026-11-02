@@ -221,16 +221,16 @@
   },
   {
    "id": "chair0",
-   "x": 400,
-   "y": 722,
+   "x": 484,
+   "y": 684,
    "verb": "앉기",
-   "face": 1,
+   "face": -1,
    "act": [
-    "sit_back"
+    "sit_side"
    ],
    "seat": {
-    "x": 400,
-    "y": 722
+    "x": 484,
+    "y": 684
    },
    "chair": 0
   }
@@ -314,12 +314,12 @@
    "coverMask": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAALoAAAD6CAIAAACZNMrKAAADe0lEQVR4nO3c0Y6TUABFUZnM//8yPlSTJo0jGwpc6FpvEx1T4/Z4gdrpFwea5/mHH52m6bBXss7X2S+AK5HLQOZ5/nl+TicXgtH/sbyNOhtjnmOsC4FcCORC8H32C2ClFddQ289D1uWSzrreti6XsT2Rx6+wZWOsC4FcLmOaptNvxsiFwNnlYp4H5vgDr3UhGPHBxM1s2YAlh5Ujn0ZZFwJnl12861Sx/U7Je1kXAutyAf/aGFdGDO1PsIO/RZSd1FORdSGY7ArLN8a6EMiFQC4E7rvs6Nynx3uwLgRhXcZ5cjG+1y3Z49ny8awLgVwIn/wgF4JwdnkO0DnmTtzVZRcr77uM8w6M/VjQV9aFYNNd3TttyavPOastf0ewdSHwzGiR0d6Rv4cla2pdCKxL8GmnmYfn3+nXCB8DwVWE/wlwv3dvvMuS+0+eSPNxVq7Ls/H/ThzjE9bXuhC4Mnqbuy7KM+tCIBcCuRD4BAYC60IgFwK5EMiFQC4EciGQC4FcCORCIBcCuRDIhUAuBHIhkAuBXAjkQiAXArkQyIVALgRyIZALgVwI5EIgFwK5EMiFQC4EciGQC4FcCORCIBcCuRDIhUAuBHIhkAuBXAjkQiAXArkQyIVALgRyIZALgVwI5EIgFwK5EMiFQC4EciGQC4FcCORCIBcCuRDIhUAuBHIhkAuBXAjkQiAXArkQyIVALgRyIZALgVwI5EIgFwK5EMiFQC4EciGQC4FcCORCIBcCuRDIhUAuBHIhkAuBXAjkQiAXArkQyIVALgRyIZALgVwI5EIgFwK5EMiFQC4EciGQC4FcCORCIBcCuRDIhUAuBHIhkAuBXAjkQiAXArkQyIVALgRyIZALgVwI5EIgFwK5EMiFQC4EciGQC4FcCORCIBcCuRDIhUAuBHIhkAuBXAjkQiAXArkQyIVALgRyIZALgVwI5EIgFwK5EMiFQC4EciGQC4FcCORCIBcCuRDIhUAuBHIhkAuBXAjkQiAXArkQyIVALgRyIZALgVwI5EIgFwK5EMiFQC4EciGQC8H0/MU8z2e9Di7BuhDIhUAuBNP/f8pfTjZYF4KwLg+PjZmm/I0r2LPRHPGnvppcRjN0Lg+iGYezC4FcCORC8H32C2CRd12KbjwIWheCW10ZHXM36JNZFwK5EMiFQC4EciGQC8Flrjx/vpx2CX2M3/NHl9ve6X2IAAAAAElFTkSuQmCC"
   }
  ],
- "dotK": 1.5768,
+ "dotK": 1.7623,
  "chairs": [
   {
-   "x": 400,
-   "y": 722,
-   "face": "N"
+   "x": 484,
+   "y": 684,
+   "face": "W"
   }
  ]
 }
