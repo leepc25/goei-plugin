@@ -7,6 +7,7 @@
 막힘: 그 물건들 밑동(밑 8px, 옆 ±4px, 1x).
 문: 관리국 출입구 = 「청진빌딩」 간판 아래 유리문(1x x774~876, y143~280) → 1층 로비 현관. 버스 정류장 = 표지 기둥(임시로 중림 지하상가 입구로, 예전 거리 동쪽 끝 연결을 옮김).
 사람 배율 고침(사용자 13:59 「문에 비해 너무 작아」, 13:56 「앞으로 나와도 급격히 커지면 안 돼」): 문 앞 맨 뒤 245px(문 274의 0.89), 맨 앞 +6% 260px → dotK 1.11, far 0.94.
+14:00 사용자 「6%는 너무 적지 않냐」 → 앞 +12%: 맨 뒤 245, 맨 앞 274 (dotK 1.17, far 0.895).
 출력: game-src/mapedit/street/ → python3 tools/mapedit/import.py game-src/mapedit/street street"""
 import json
 from pathlib import Path
@@ -61,7 +62,7 @@ doors = {
     'main': {'kind': 'glass', 'x': 825 * K, 'y': Y0 * K + 10, 'to': 'lobby', 'toDoor': 'main', 'label': '관리국 현관', 'door': door(774, 876, 143, 280)},
     'jr': {'kind': 'door', 'x': 64 * K, 'y': Y0 * K + 10, 'to': 'jr_entry', 'toDoor': 'west', 'label': '버스 정류장', 'door': door(47, 86, 160, 300)},
 }
-m = {'file': 'hq_street', 'bgScale': K, 'dotK': 1.11, 'far': 0.94, 'w': W, 'h': H, 'under': True,
+m = {'file': 'hq_street', 'bgScale': K, 'dotK': 1.17, 'far': 0.895, 'w': W, 'h': H, 'under': True,
      'floor': [[0, Y0 * K], [W, Y0 * K], [W, Y1 * K + 12], [0, Y1 * K + 12]], 'lane': [Y0 * K, Y1 * K],
      'blocks': holes, 'doors': doors, 'lamps': [], 'spots': [], 'objects': objects}
 (OUT / 'map.json').write_text(json.dumps(m, ensure_ascii=False, indent=1))

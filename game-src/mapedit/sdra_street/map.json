@@ -1,8 +1,8 @@
 {
  "file": "sdra_street",
  "bgScale": 2,
- "dotK": 0.97,
- "far": 0.94,
+ "dotK": 1.025,
+ "far": 0.895,
  "w": 2464,
  "h": 848,
  "under": true,
