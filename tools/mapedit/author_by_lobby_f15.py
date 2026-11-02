@@ -5,7 +5,8 @@
   사람 배율: 엘리베이터 문짝 242px(2배) → 맨 뒤 사람 약 0.85배 문 높이 = 배율 0.88, 앞으로 크게(far 0.75 → dotK 1.17).
 - 15층(사용자 14:05 「휴게실이 13층에 있으니까 15층은 필요 없잖아 적당이 잘라야해」): 13층 확정 그림을 휴게실 문틀 바로 앞 x1246에서 자름
   (엘리베이터 오른쪽 기둥 + 벽등 판넬까지 남김). 문 4개(남·여 = 샤워실, 유리 양문 = 정예팀, 엘리베이터).
-출력: game-src/mapedit/by_lobby/, game-src/mapedit/by_f15/ → python3 tools/mapedit/import.py game-src/mapedit/<id> <id>"""
+- 17층(사용자 14:22 「17층에는 연구팀만」): 13층 그림 x452~1246(여자 화장실 문틀 오른쪽 판넬부터 엘리베이터 오른쪽 벽등 판넬까지) = 유리 양문(연구1팀) + 엘리베이터.
+출력: game-src/mapedit/by_lobby/, by_f15/, by_f17/ → python3 tools/mapedit/import.py game-src/mapedit/<id> <id>"""
 import json
 from pathlib import Path
 from PIL import Image
@@ -39,4 +40,15 @@ save('by_f15', im, {'file': 'by_f15', 'bgScale': K, 'w': W, 'h': H, 'under': Fal
         'wc_f': {'kind': 'door', 'x': 400 * K, 'y': FY + 10, 'label': '샤워실(여)', 'door': door(357, 443, 120, 328, anim='none')},
         'office': {'kind': 'glass', 'x': 721 * K, 'y': FY + 10, 'label': '정예팀 사무실', 'door': door(639, 802, 118, 327, anim='none')},
         'elev': {'kind': 'elevator', 'x': 1059 * K, 'y': FY + 10, 'label': '엘리베이터', 'door': door(1000, 1118, 127, 327, anim='slide2', seam=1059 * K, behind='car')},
+    }})
+
+# 17층
+X0 = 452
+im = Image.open(ART / 'by_f13_hall_g4_full_fix.png').convert('RGB').crop((X0, 0, CUT, 424)); W, H = im.width * K, im.height * K
+sh = lambda x: x - X0
+save('by_f17', im, {'file': 'by_f17', 'bgScale': K, 'w': W, 'h': H, 'under': False,
+    'floor': [[0, FY], [W, FY], [W, H], [0, H]], 'lane': [FY, H - 12], 'blocks': [], 'lamps': [], 'spots': [], 'objects': [],
+    'doors': {
+        'office': {'kind': 'glass', 'x': sh(721) * K, 'y': FY + 10, 'label': '연구1팀', 'door': door(sh(639), sh(802), 118, 327, anim='none')},
+        'elev': {'kind': 'elevator', 'x': sh(1059) * K, 'y': FY + 10, 'label': '엘리베이터', 'door': door(sh(1000), sh(1118), 127, 327, anim='slide2', seam=sh(1059) * K, behind='car')},
     }})

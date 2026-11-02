@@ -97,7 +97,7 @@ test('백일몽: 13·15층 문 연결과 엘리베이터 건물 구분', () => {
   }
   assert.equal(byId.by_f13.painted, 'by_f13'); assert.ok(byId.by_f15.length < byId.by_f13.length);   // 15층 = 휴게실 앞에서 자름
   const by = M.ELEVATOR.filter((e) => e.bldg === 'by').map((e) => e.scene).sort();
-  assert.deepEqual(by, ['by_f13', 'by_f15', 'by_lobby']);
+  assert.deepEqual(by, ['by_f13', 'by_f15', 'by_f17', 'by_lobby']);
   assert.ok(!byId.by_f15.doors.find((d) => d.id === 'rest'));
   assert.equal(byId.by_office.painted, 'office');
   const owners = (id) => byId[id].spots.filter((p) => p.owner).map((p) => p.owner);
