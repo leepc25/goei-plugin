@@ -12,16 +12,18 @@ subprocess.run([sys.executable, str(R/'tools/objects/sdra_counter_sit_preview.py
 out = Image.open(tmp).convert('RGBA'); os.remove(tmp)
 FIT = json.loads((R/'game-src/art/objects/chairs_office/fit_all.json').read_text())
 bench = Image.open(R/'game-src/art/pixellab-hq-20261031/sdra_counter_bench_v1_cut.png').convert('RGBA')
-OX, OY = 545*2, 276*2                      # 2배 캔버스 위치(배경 그대로)
+SC = float(os.environ.get('SC', '0.85'))   # 의자·사람 같이 줄임(13:16 사용자 「너무 크지 않냐」), 다리 바닥 가운데 고정
+FOOT = (545*2 + 110.5*2, 276*2 + 124*2)    # 다리 바닥 가운데(2배)
+OX, OY = FOOT[0] - 110.5*2*SC, FOOT[1] - 124*2*SC
 SEATS_X = [40, 111.5, 183.5]; SEAT_PT_Y = 61  # 1배(잘라낸 판 기준)
-BS = float(os.environ.get('BS', '2.14'))    # 사람 배율: 좌석 폭(62px×2) = 사무의자 등받이 폭(58)×BS
+BS = float(os.environ.get('BS', '2.14')) * SC    # 사람 배율: 좌석 폭(62px×2) = 사무의자 등받이 폭(58)×BS
 PEOPLE = os.environ.get('WHO', '1.4_에일린,1.9_데드폴,1.12_콘쥬스').split(',')
 L = Image.new('RGBA', out.size, (0, 0, 0, 0))
 for sx, key in zip(SEATS_X, PEOPLE):
     cfg, _ = fc.load(key); im = fc.last(cfg, '61'); q = FIT[key]['back']
     bot = min(im.size[1]-4, im.getbbox()[3])
     px, py = q['dx'] - 100 + 91 + im.size[0]/2, q['dy'] - 171 + 101 + bot   # 사람 그림 속 엉덩이 점
-    seat = (OX + sx*2, OY + SEAT_PT_Y*2)
+    seat = (OX + sx*2*SC, OY + SEAT_PT_Y*2*SC)
     L.alpha_composite(im.resize((round(im.size[0]*BS), round(im.size[1]*BS)), Image.NEAREST), (round(seat[0]-px*BS), round(seat[1]-py*BS)))
-L.alpha_composite(bench.resize((bench.width*2, bench.height*2), Image.NEAREST), (OX, OY))
+L.alpha_composite(bench.resize((round(bench.width*2*SC), round(bench.height*2*SC)), Image.NEAREST), (round(OX), round(OY)))
 out.alpha_composite(L); out.convert('RGB').save(OUT); print(OUT)
