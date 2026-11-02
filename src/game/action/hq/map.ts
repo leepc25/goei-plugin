@@ -17,7 +17,10 @@ export type SceneId =
   | 'sdra_b1' | 'sdra_shower_f' | 'sdra_shower_m' | 'sdra_bath_f' | 'sdra_bath_m' | 'sdra_training'
   | 'jr_daebak' | 'jr_heolgap' | 'jr_youngchang' | 'jr_songil' | 'jr_jinryo' | 'jr_op'
   | 'by_lobby' | 'by_f13' | 'by_wc_m' | 'by_wc_f' | 'by_lounge' | 'by_office'
-  | 'by_f15' | 'by_elite' | 'by_shower_m' | 'by_shower_f' | 'by_bath_m' | 'by_bath_f';
+  | 'by_f15' | 'by_elite' | 'by_shower_m' | 'by_shower_f' | 'by_bath_m' | 'by_bath_f'
+  | `fb_${FbBase}`;
+/** 가짜 관리국 본부 = 관리국 본부 장면을 그대로 복사한 것 (사용자 11-02 15:50 「관리국걸 그대로 가져다가」) */
+type FbBase = 'street' | 'lobby' | 'f2' | 'wc' | 'swat' | 'f3' | 'wc3' | 'lounge' | 'office' | 'b1' | 'shower_f' | 'shower_m' | 'bath_f' | 'bath_m' | 'training' | 'b2' | 'clinic' | 'tooth' | 'infirmary' | 'b3';
 
 export type DoorKind = 'main' | 'door' | 'glass' | 'steel' | 'security' | 'elevator' | 'stairs_up' | 'stairs_down' | 'stairs' | 'shop' | 'slide' | 'cell' | 'exit';
 export interface HqDoor {
@@ -401,6 +404,20 @@ export const HQ_SCENES: HqScene[] = [
   floorHall('jr_jinryo', '진료실', 'B1', [{ id: 'out', kind: 'exit', side: 'S', to: 'jr_songil', toDoor: 'jinryo', label: '대기실로' }], { spots: JR_ROOM_SPOTS.jr_jinryo }),
   floorHall('jr_op', '수술실', 'B1', [{ id: 'out', kind: 'exit', side: 'S', to: 'jr_songil', toDoor: 'op', label: '대기실로' }], { spots: JR_ROOM_SPOTS.jr_op }),
 ];
+// ── 가짜 관리국 본부 (B00, 11-02 사용자 15:50~15:51): 관리국 본부 장면·그림·자리를 그대로 복사하고 이름만 종합대응팀 → 검사부대, 진압팀 → 진압부대.
+// 장면 id = 'fb_' + 관리국 장면 id (건물 소속 판정은 접두어, world/hq.ts). 문은 같은 건물 안으로만 잇고, 버스 정류장은 따로 이름을 둔다
+const FB_IDS: FbBase[] = ['street', 'lobby', 'f2', 'wc', 'swat', 'f3', 'wc3', 'lounge', 'office', 'b1', 'shower_f', 'shower_m', 'bath_f', 'bath_m', 'training', 'b2', 'clinic', 'tooth', 'infirmary', 'b3'];
+const FB_BUS = '종로2가';
+const fbName = (s?: string) => s?.replace(/종합대응팀/g, '검사부대').replace(/진압팀/g, '진압부대');
+const fbScene = (sc: HqScene): HqScene => {
+  const own = new Set<string>(FB_IDS);
+  const c: HqScene = {
+    ...sc, id: `fb_${sc.id}` as SceneId, name: fbName(sc.name)!, painted: sc.painted,
+    doors: sc.doors.map((d) => ({ ...d, ...(d.to && own.has(d.to) ? { to: `fb_${d.to}` as SceneId } : {}), ...(d.label ? { label: fbName(d.label) } : {}), ...(d.bus ? { bus: FB_BUS } : {}) })),
+  };
+  return /^(office|swat)$/.test(sc.id) ? withOwners(c) : c;   // 책상 평소 주인은 관리국 요원 → 비운다 (빈 책상은 누구나)
+};
+HQ_SCENES.push(...FB_IDS.map((id) => fbScene(HQ_SCENES.find((s) => s.id === id)!)));
 export const SCENE_BY_ID = Object.fromEntries(HQ_SCENES.map((s) => [s.id, s])) as Record<SceneId, HqScene>;
 
 /** 엘리베이터 층 단추 (위에서 아래로) */
@@ -420,6 +437,13 @@ export const ELEVATOR: { floor: HqScene['floor']; label: string; scene: SceneId;
   { floor: '13F', label: '13', scene: 'by_f13', door: 'elev', bldg: 'by' },
   { floor: '1F', label: '1', scene: 'by_lobby', door: 'elev', bldg: 'by' },
   { floor: 'B1', label: 'B1', scene: 'sdra_b1', door: 'elev', bldg: 'sdra' },
+  // 가짜 관리국 본부: 관리국과 같은 층
+  { floor: '3F', label: '3', scene: 'fb_f3', door: 'elev', bldg: 'fb' },
+  { floor: '2F', label: '2', scene: 'fb_f2', door: 'elev', bldg: 'fb' },
+  { floor: '1F', label: '1', scene: 'fb_lobby', door: 'elev', bldg: 'fb' },
+  { floor: 'B1', label: 'B1', scene: 'fb_b1', door: 'elev', bldg: 'fb' },
+  { floor: 'B2', label: 'B2', scene: 'fb_b2', door: 'elev', bldg: 'fb' },
+  { floor: 'B3', label: 'B3', scene: 'fb_b3', door: 'elev', bldg: 'fb' },
 ];
 
 /** 메뉴 「장소로 가기」·장소 id → 그 장면과 서 있을 자리 */
