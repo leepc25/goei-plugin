@@ -1,0 +1,108 @@
+{
+ "object_id": "ff2527e7-afb1-4edc-afdc-73345ca7928f",
+ "job": {
+  "usage": {
+   "type": "usd",
+   "usd": 0.07967939538595412
+  },
+  "id": "816d96c1-64d3-4e80-b4f7-405051bb97cd",
+  "status": "completed",
+  "created_at": "2026-11-02T16:01:29.598533+00:00",
+  "last_response": {
+   "status": "completed",
+   "progress": 1,
+   "object_id": "ff2527e7-afb1-4edc-afdc-73345ca7928f",
+   "image_size": {
+    "width": 256,
+    "height": 256
+   },
+   "frame_count": 8,
+   "single_frame": false,
+   "storage_urls": {
+    "east": "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/ff2527e7-afb1-4edc-afdc-73345ca7928f/rotations/east.png",
+    "west": "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/ff2527e7-afb1-4edc-afdc-73345ca7928f/rotations/west.png",
+    "north": "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/ff2527e7-afb1-4edc-afdc-73345ca7928f/rotations/north.png",
+    "south": "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/ff2527e7-afb1-4edc-afdc-73345ca7928f/rotations/south.png",
+    "north-east": "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/ff2527e7-afb1-4edc-afdc-73345ca7928f/rotations/north-east.png",
+    "north-west": "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/ff2527e7-afb1-4edc-afdc-73345ca7928f/rotations/north-west.png",
+    "south-east": "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/ff2527e7-afb1-4edc-afdc-73345ca7928f/rotations/south-east.png",
+    "south-west": "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/ff2527e7-afb1-4edc-afdc-73345ca7928f/rotations/south-west.png"
+   },
+   "billing_usage": {
+    "usd": 0.07967939538595412,
+    "type": "usd"
+   },
+   "generation_id": "25b98c6c-973c-4dea-9ce9-3fbcbb401328",
+   "billing_stages": [
+    {
+     "stage": "first_direction",
+     "usage": {
+      "usd": 0.043582941586812335,
+      "type": "usd"
+     },
+     "generation_id": "4889105e-41db-4e92-9793-85c75f06415c"
+    },
+    {
+     "stage": "rotations",
+     "usage": {
+      "usd": 0.036096453799141774,
+      "type": "usd"
+     },
+     "generation_id": "25b98c6c-973c-4dea-9ce9-3fbcbb401328"
+    }
+   ],
+   "billing_charged": true,
+   "generation_mode": "pro_flash",
+   "source_image_id": "47727df8-6b70-56cc-bb94-7ee9bd62f331",
+   "directions_count": 8,
+   "first_direction_generated": true
+  }
+ },
+ "object": {
+  "id": "ff2527e7-afb1-4edc-afdc-73345ca7928f",
+  "name": "L05_백일몽_제약실험대_8방향",
+  "state_name": "base",
+  "prompt": "A pharmaceutical laboratory work bench used as a desk, with things on it: a switched-on monitor with a bright lit screen, a keyboard, a rack of test tubes with colored liquid, a few glass flasks and beakers, a small analysis instrument, and stacked sample vials. A plain rectangular lab bench with a flat light grey top, a steel frame and a drawer cabinet under one side. The monitor faces the viewer, its lit screen fully visible. Seen almost straight from the front, from the eye height of a standing adult, looking only a little down: the bench top shows as a thin band, much thinner than the front of the bench. The bench is much wider than it is tall and fills almost the whole width of the canvas. Only the bench with the things on it, centered, nothing else.",
+  "size": {
+   "width": 256,
+   "height": 256
+  },
+  "directions": 8,
+  "created_at": "2026-11-02T16:01:29.630739+00:00",
+  "view": "low top-down",
+  "rotation_urls": {
+   "south": "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/ff2527e7-afb1-4edc-afdc-73345ca7928f/rotations/south.png",
+   "west": "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/ff2527e7-afb1-4edc-afdc-73345ca7928f/rotations/west.png",
+   "east": "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/ff2527e7-afb1-4edc-afdc-73345ca7928f/rotations/east.png",
+   "north": "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/ff2527e7-afb1-4edc-afdc-73345ca7928f/rotations/north.png",
+   "south-east": "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/ff2527e7-afb1-4edc-afdc-73345ca7928f/rotations/south-east.png",
+   "south-west": "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/ff2527e7-afb1-4edc-afdc-73345ca7928f/rotations/south-west.png",
+   "north-east": "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/ff2527e7-afb1-4edc-afdc-73345ca7928f/rotations/north-east.png",
+   "north-west": "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/ff2527e7-afb1-4edc-afdc-73345ca7928f/rotations/north-west.png"
+  },
+  "storage_urls": {
+   "east": "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/ff2527e7-afb1-4edc-afdc-73345ca7928f/rotations/east.png",
+   "west": "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/ff2527e7-afb1-4edc-afdc-73345ca7928f/rotations/west.png",
+   "north": "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/ff2527e7-afb1-4edc-afdc-73345ca7928f/rotations/north.png",
+   "south": "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/ff2527e7-afb1-4edc-afdc-73345ca7928f/rotations/south.png",
+   "north-east": "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/ff2527e7-afb1-4edc-afdc-73345ca7928f/rotations/north-east.png",
+   "north-west": "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/ff2527e7-afb1-4edc-afdc-73345ca7928f/rotations/north-west.png",
+   "south-east": "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/ff2527e7-afb1-4edc-afdc-73345ca7928f/rotations/south-east.png",
+   "south-west": "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/ff2527e7-afb1-4edc-afdc-73345ca7928f/rotations/south-west.png"
+  },
+  "frame_urls": null,
+  "style_settings": {
+   "version": "v2.0.0+api",
+   "no_background": true,
+   "generation_mode": "pro_flash",
+   "source_image_id": "47727df8-6b70-56cc-bb94-7ee9bd62f331",
+   "first_frame_direction": "south"
+  },
+  "tags": [],
+  "status": "completed",
+  "group_id": "2184b84b-d0e7-4b65-805e-f6c4a10c7106",
+  "progress_percent": null,
+  "eta_seconds": null,
+  "animations": []
+ }
+}
