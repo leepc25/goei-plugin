@@ -7,6 +7,8 @@
 export const view = { crop: 0, cropY: 0, zoom: 1, lane: [440, 690] as [number, number], worldH: 720, w: 1280, hub: false,
   /** 사람 그림 배율에 더 곱할 값. 장면에 dotK(앞줄 도트 배율)가 있으면 dotK / CHAR_K, 아니면 1 (hub.ts가 장면에 들어갈 때 정한다) */
   charMul: 1,
+  /** 장면 전체(배경·사람·물건) 확대율. 사람 크기는 모든 장면에서 STD_DOTK로 같게 두고, 그림 규격(dotK)이 다른 장면은 화면 전체를 STD_DOTK/dotK 배로 보여 준다 (사용자 11-02 「화면마다 사람 크기가 들쑥날쑥」→ 통일) */
+  sceneZoom: 1,
   /** 이 장면의 줄 맨 뒤 배율(장면에 far가 있으면 그 값, 없으면 FAR). hub.ts가 장면에 들어갈 때 정한다 */
   far: 0.85,
   /** 이 y(월드)보다 앞에서는 사람을 더 키우지 않는다(장면 grow 값, 없으면 줄 맨 앞까지 키움). 사용자 11-01 15:07 「제일 앞에서 너무 급격하게 커진다」 */
@@ -17,8 +19,11 @@ export const view = { crop: 0, cropY: 0, zoom: 1, lane: [440, 690] as [number, n
 
 /** 필드 원근 기본값: 줄 맨 뒤 0.85배 ~ 맨 앞 1배 (장면마다 view.far로 바꿀 수 있음) */
 export const FAR = 0.85;
-export const persp = (y: number) => {
-  const sz = view.sizes;
+/** 모든 장면의 사람 앞줄 도트 배율 기준값 (맵 에디터 장면 기본 dotK). 장면 dotK가 이와 다르면 sceneZoom으로 화면 전체를 맞춘다 */
+export const STD_DOTK = 1.4292;
+/** 원근 배율 계산(순수 함수): sizes 표가 있으면 표로, 없으면 lane 뒤 far ~ 앞(growTo 또는 lane 앞) 1 */
+export const perspOf = (y: number, lane: [number, number], far: number, growTo: number, sizes: [number, number][]) => {
+  const sz = sizes;
   if (sz.length) {
     if (y <= sz[0][0]) return sz[0][1];
     for (let i = 1; i < sz.length; i++) if (y <= sz[i][0]) {
@@ -27,10 +32,13 @@ export const persp = (y: number) => {
     }
     return sz[sz.length - 1][1];
   }
-  const a = view.lane[0], b = view.growTo > a ? view.growTo : view.lane[1];
+  const a = lane[0], b = growTo > a ? growTo : lane[1];
   const t = b > a ? Math.max(0, Math.min(1, (y - a) / (b - a))) : 1;
-  return view.far + (1 - view.far) * t;
+  return far + (1 - far) * t;
 };
+export const persp = (y: number) => perspOf(y, view.lane, view.far, view.growTo, view.sizes);
+/** 사람 크기 기준: 기본 장면(dotK STD_DOTK, 원근 far 0.85)의 줄 한가운데 크기. 모든 장면은 줄 한가운데 사람이 이 크기가 되게 sceneZoom을 맞춘다 (앞뒤 원근 차이는 장면 그림대로 둔다) */
+export const STD_MID = STD_DOTK * (FAR + 1) / 2;
 /** 발 y에 선 사람 그림의 배율 (월드 좌표 기준). 배경과 같이 커지고 작아진다 (사용자 2026-10-25: 캐릭터만 작아지면 안 됨) */
 export const spr = (y: number) => persp(y) * view.charMul;
 /** 사람 그림 원점을 (x, y)로 옮기되 화면 픽셀 정수에 붙인다 (필드는 월드를 zoom배로 그려서 월드 정수 좌표가 화면 소수 px이 된다) */

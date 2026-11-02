@@ -148,7 +148,7 @@ export class Game {
         const H = this.inHub ? view.worldH : SCREEN_H;
         const cssH = this.canvas.getBoundingClientRect().height;
         const fixed = this.inHub && cssH >= 600;
-        view.zoom = (fixed ? BASE_ZOOM * (this.canvas.height / cssH) : this.canvas.height / H) * Math.max(1, charSize.k);
+        view.zoom = (fixed ? BASE_ZOOM * (this.canvas.height / cssH) : this.canvas.height / H) * Math.max(1, charSize.k) * (this.inHub ? view.sceneZoom : 1);
         if (w) view.lane = w.lane;
         const vw = this.canvas.width / view.zoom;
         view.w = this.inHub ? Math.max(SCREEN_W, vw) : SCREEN_W;

@@ -12,7 +12,7 @@ import { HQ_PLACE, drawFloor, drawHqWall, drawPropArt, drawHqTextureWall } from 
 import { drawHqDoorRound2 } from '../art/hqDoorRound2';
 import { drawCallLit, drawHqField, drawHqFieldLight, drawHqFieldObject, drawHqSigns, hasHqField } from '../art/hqField';
 import { charTop, drawCharClip, drawCharSeat, charArt, charFx, CHAR_K } from '../art/charPacks';
-import { FAR, persp, spr, view as fieldView } from './view';
+import { FAR, STD_MID, persp, perspOf, spr, view as fieldView } from './view';
 import { blockByProps, clearSpot, type BlockProp } from './propBlock';
 import { PAINTED, clampPainted, doorReachY } from '../hq/painted';
 import { STALL_DOOR_SEC, seatFeet } from '../../world/toilets';
@@ -389,11 +389,18 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
   const go = (sceneId: string, x: number, y?: number) => {
     fieldView.worldH = sceneOf(sceneId).painted ? PAINTED[sceneOf(sceneId).painted!]?.h ?? 700 : SCREEN_H;
     // 맵 에디터 장면(dotK)이면 사람 배율을 그 장면 규격으로 (중림 브랜치 10-29, 11-01 옮김)
-    fieldView.charMul = sceneOf(sceneId).painted && PAINTED[sceneOf(sceneId).painted!]?.dotK ? PAINTED[sceneOf(sceneId).painted!].dotK! / CHAR_K : 1;
+    // 11-02 사용자 「화면마다 사람 크기가 들쑥날쑥」: 사람 배율은 모든 장면에서 STD_DOTK로 같게, 그림 규격(dotK)이 다른 장면은 화면 전체를 STD_DOTK/dotK 배로
+    const pt = sceneOf(sceneId).painted ? PAINTED[sceneOf(sceneId).painted!] : undefined;
+    const dotK = pt?.dotK || CHAR_K;   // dotK 없는 장면은 예전처럼 CHAR_K 규격
     // 줄 맨 뒤 배율: 장면 그림 원근에 맞춘 값(없으면 0.85, 사용자 11-01 15:03 「장면마다 변하게」)
-    fieldView.far = (sceneOf(sceneId).painted && PAINTED[sceneOf(sceneId).painted!]?.far) || FAR;
-    fieldView.growTo = (sceneOf(sceneId).painted && PAINTED[sceneOf(sceneId).painted!]?.growTo) || 0;
-    fieldView.sizes = (sceneOf(sceneId).painted && PAINTED[sceneOf(sceneId).painted!]?.sizes) || [];
+    fieldView.far = pt?.far || FAR;
+    fieldView.growTo = pt?.growTo || 0;
+    fieldView.sizes = pt?.sizes || [];
+    // 줄 한가운데 사람 크기 = 장면 규격 × 그 자리 원근. 이것이 기준 크기(STD_MID)가 되게 화면 전체를 확대한다
+    const lane = sceneOf(sceneId).lane ?? LANE;
+    const mid = perspOf((lane[0] + lane[1]) / 2, lane, fieldView.far, fieldView.growTo, fieldView.sizes) * dotK;
+    fieldView.charMul = dotK / CHAR_K;
+    fieldView.sceneZoom = STD_MID / mid;
     pending = { scene: sceneId, x, y };
     fadeOut = FADE;
   };
