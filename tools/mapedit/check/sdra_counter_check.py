@@ -28,15 +28,20 @@ out.paste(Image.alpha_composite(bg2,Image.new('RGBA',bg2.size,(0,255,80,150))),(
 for o in m['objects']:
     if o.get('file'): out.alpha_composite(Image.open(D+o['file']).convert('RGBA'),(o['x'],o['y']))
 base=out.copy()
-P=[(450,650),(538,520),(620,580),(800,560),(1300,575),(1600,600),(1035,700)]
+clean=bg2.copy()
+for o in m['objects']:
+    if o.get('file'): clean.alpha_composite(Image.open(D+o['file']).convert('RGBA'),(o['x'],o['y']))
+# 가림은 사람 상자 안에서만, 초록 칠 없는 원본(clean)으로 덮는다(14:44 사용자 「다리에 녹색선」)
+P=[(450,650),(538,514),(620,580),(800,560),(1300,575),(1600,600),(1035,700)]
 for x,y in sorted(P,key=lambda p:p[1]):
     s=scale(y); e=ei.resize((round(ei.width*s),round(ei.height*s)),Image.NEAREST)
     L=Image.new('RGBA',out.size,(0,0,0,0)); L.alpha_composite(e,(round(x-e.width/2),round(y-e.height))); out.alpha_composite(L)
+    bx0,by0=round(x-e.width/2),round(y-e.height); box=(bx0,by0,bx0+e.width,by0+e.height)
     for sy,cm in covers:
-        if y<sy: out.paste(base,(0,0),cm)
+        if y<sy: out.paste(clean.crop(box),(bx0,by0),cm.crop(box))
 dd=ImageDraw.Draw(out)
 path=[(470,700),(510,640),(536,590),(538,520),(560,560),(620,575),(900,575)]
 dd.line(path,fill=(255,0,0),width=3); dd.polygon([(900,567),(900,583),(914,575)],fill=(255,0,0))
 for x,y in P: dd.ellipse((x-4,y-4,x+4,y+4),fill=(255,255,0))
-out.convert('RGB').save('/mnt/project-files/sdra/sdra_counter_map_check_v11_x2.png')
-z=out.crop((380,300,1000,720)); z.resize((z.width*2,z.height*2),Image.NEAREST).convert('RGB').save('/mnt/project-files/sdra/sdra_counter_map_check_v11_zoom_x4.png')
+out.convert('RGB').save('/mnt/project-files/sdra/sdra_counter_map_check_v12_x2.png')
+z=out.crop((380,300,1000,720)); z.resize((z.width*2,z.height*2),Image.NEAREST).convert('RGB').save('/mnt/project-files/sdra/sdra_counter_map_check_v12_zoom_x4.png')

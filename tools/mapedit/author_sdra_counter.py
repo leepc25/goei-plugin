@@ -117,7 +117,7 @@ cab = hand_mask([CAB])
 Image.fromarray((cab * 255).astype('uint8')).save(OUT / 'cabinet_cover_mask_1x.png')
 cbig = Image.fromarray((cab * 255).astype('uint8')).resize((W, H), Image.NEAREST); cbb = cbig.getbbox()
 cbuf = io.BytesIO(); cbig.crop(cbb).save(cbuf, 'PNG')
-cabinet_cover = {'id': 'cabinet_cover', 'x': cbb[0], 'y': cbb[1], 'w': cbb[2] - cbb[0], 'h': cbb[3] - cbb[1], 'sortY': 262 * K,
+cabinet_cover = {'id': 'cabinet_cover', 'x': cbb[0], 'y': cbb[1], 'w': cbb[2] - cbb[0], 'h': cbb[3] - cbb[1], 'sortY': 256 * K,   # 서랍장 앞 밑선(통로 쪽 x266 y256): 이보다 발이 아래면 서랍장 앞 → 안 가림(14:44)
                  'coverMask': 'data:image/png;base64,' + base64.b64encode(cbuf.getvalue()).decode()}
 counter_cover = {'id': 'counter_cover', 'x': bb[0], 'y': bb[1], 'w': bb[2] - bb[0], 'h': bb[3] - bb[1], 'sortY': 316 * K,
                  'coverMask': 'data:image/png;base64,' + base64.b64encode(buf.getvalue()).decode()}
