@@ -107,24 +107,6 @@
    ],
    [
     [
-     915,
-     770
-    ],
-    [
-     1002,
-     770
-    ],
-    [
-     1002,
-     848
-    ],
-    [
-     915,
-     848
-    ]
-   ],
-   [
-    [
      1040,
      812
     ],
@@ -157,6 +139,32 @@
     [
      1160,
      849
+    ]
+   ],
+   [
+    [
+     882,
+     724
+    ],
+    [
+     956,
+     724
+    ],
+    [
+     985,
+     757
+    ],
+    [
+     985,
+     763
+    ],
+    [
+     854,
+     763
+    ],
+    [
+     854,
+     756
     ]
    ]
   ],
@@ -264,15 +272,6 @@
     "sortY": 608
    },
    {
-    "id": "plant",
-    "file": "me_jr_songil_plant",
-    "x": 890,
-    "y": 616,
-    "w": 128,
-    "h": 232,
-    "sortY": 848
-   },
-   {
     "id": "fan",
     "file": "me_jr_songil_fan",
     "x": 1022,
@@ -298,10 +297,62 @@
     "w": 198,
     "h": 340,
     "sortY": 722
+   },
+   {
+    "id": "bench",
+    "file": "me_jr_songil_bench",
+    "x": 742,
+    "y": 473,
+    "w": 339,
+    "h": 339,
+    "sortY": 759
    }
   ]
  },
- "spots": [],
+ "spots": [
+  {
+   "id": "wait1",
+   "x": 850,
+   "y": 709,
+   "verb": "앉기",
+   "face": -1,
+   "act": [
+    "sit_side"
+   ],
+   "seat": {
+    "x": 887,
+    "y": 709
+   }
+  },
+  {
+   "id": "wait2",
+   "x": 850,
+   "y": 739,
+   "verb": "앉기",
+   "face": -1,
+   "act": [
+    "sit_side"
+   ],
+   "seat": {
+    "x": 903,
+    "y": 739
+   }
+  },
+  {
+   "id": "wait3",
+   "x": 850,
+   "y": 771,
+   "verb": "앉기",
+   "face": -1,
+   "act": [
+    "sit_side"
+   ],
+   "seat": {
+    "x": 918,
+    "y": 771
+   }
+  }
+ ],
  "files": [
   "me_jr_songil",
   "me_jr_songil_counter0",
@@ -309,9 +360,9 @@
   "me_jr_songil_counter2",
   "me_jr_songil_counter3",
   "me_jr_songil_counter4",
-  "me_jr_songil_plant",
   "me_jr_songil_fan",
   "me_jr_songil_trash",
-  "me_jr_songil_rack"
+  "me_jr_songil_rack",
+  "me_jr_songil_bench"
  ]
 }
