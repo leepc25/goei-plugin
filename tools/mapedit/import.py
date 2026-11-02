@@ -110,7 +110,7 @@ def convert(scene_id: str, m: dict, files: dict) -> dict:
     for s in m.get('spots', []):
         sp = {'id': s['id'], 'x': s['x'], 'y': s['y'], 'verb': s.get('verb', '앉기'), 'face': s.get('face', 1), 'act': s.get('act') or ACTS.get(s.get('dir', 'side'))}
         if s.get('seat'): sp['seat'] = s['seat']          # 의자 자리만. 샤워 자리(act shower)는 seat 없음 (11-01 샤워실)
-        if s.get('chair') is not None: sp['chair'] = s['chair']
+        if isinstance(s.get('chair'), int): sp['chair'] = s['chair']   # 장면 의자 번호(정수)만. 중림 대박·헐값의 'chair' 글자값은 그림 소품 이름이라 게임이 못 씀(11-02 가구 스레드 남은 일 ②) → 넘기지 않음
         if s.get('owner'): sp['owner'] = s['owner']            # 평소 앉는 사람 (사무실 책상, 11-02 사용자: 주인은 평소 자리일 뿐, 비면 누구나)
         if s.get('shared') is not None: sp['shared'] = bool(s['shared'])   # 장면 의자 번호(m['chairs'] 차례, hq/map.ts floorHall 이 상자 번호로 바꾼다; 11-02 휴게실)
         spots.append(sp)
