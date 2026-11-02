@@ -42,7 +42,7 @@ SEAT_N = ['1.9_front', '1.10_front', '1.11_front', '1.12_front']  # 북쪽 뒤(�
 # 08:21 사용자 「의자 위치가 키보드랑 어긋난다, 키보드 중앙에 의자」: 키보드 가운데 x(책상 그림 잘린 폭 대비, 4배로 눈으로 잼)
 KB_S = [81 / 198, 81 / 194]   # D01v3(키보드 51~111), D03(50~112)
 KB_N = 92 / 190
-NDX = int(os.environ.get('NDX', '40'))  # 08:27 사용자 「뒤 캐릭터가 너무 안 보임, 뒷줄 살짝 오른쪽으로」 북쪽 책상·의자·사람 함께 +40(1배)               # D02v2 뒤에서 본 키보드 60~124
+NDX = int(os.environ.get('NDX', '40'))  # 08:27 사용자 「뒤 캐릭터가 너무 안 보임, 뒷줄 살짝 오른쪽으로」 → 08:34 「책상 말고 뒷줄 의자를」: 북쪽 의자(앉은 사람 포함)만 +40(1배), 책상은 제자리               # D02v2 뒤에서 본 키보드 60~124
 CHAIR_N = ['south-east.png', 'south.png', 'south-west.png', 'south-west.png']  # 북쪽 앉은 사람 맞춤값의 의자 방향(fit_all img)
 def put(seat, chair, foot, cx):
     f = scale(foot) * K * CSC
@@ -73,12 +73,12 @@ for gi, (gx, cnt) in enumerate(GROUPS):
         for _ in range(3):
             n = load(NORTH, nf); ny = st - wood(n)[1]; nf = (ny + n.height) / K
         NYS.append(nf)
-        L.append((nf, n, x + (s.width - n.width) // 2 + NDX * K, ny))
+        L.append((nf, n, x + (s.width - n.width) // 2, ny))
         L.append((SF, s, x, sy))
         if CHAIRS:  # 08:09 사용자 「의자 배치해봐」: 남쪽 책상 앞 = C01 north(등 보임), 북쪽 책상 뒤 = C01 south(정면). 다리 들어갈 쪽(서랍 반대)
-            ci = gi * cnt + i; cf = SF + CDY; cn_f = nf - CDY; nx = x + (s.width - n.width) // 2 + NDX * K
+            ci = gi * cnt + i; cf = SF + CDY; cn_f = nf - CDY; nx = x + (s.width - n.width) // 2
             put(SEAT_S[ci] if SEATED else None, 'north.png', cf, x + round(s.width * KB_S[(gi * cnt + i) % 2]))
-            put(SEAT_N[ci] if SEATED else None, CHAIR_N[ci], cn_f, nx + round(n.width * KB_N))
+            put(SEAT_N[ci] if SEATED else None, CHAIR_N[ci], cn_f, nx + round(n.width * KB_N) + NDX * K)
         x += s.width
 NF = round(sum(NYS) / len(NYS)); print('north foot', [round(v, 1) for v in NYS])
 # 쟈알디 책상 = 북쪽 책상(D02v2), 오른쪽 끝 (사용자 07:53 「쟈알디는 북쪽으로」, 핀 92%). JX=가운데 x, JF=발 y = 북쪽 줄과 같음(사용자 07:57)
