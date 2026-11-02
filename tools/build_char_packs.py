@@ -64,6 +64,9 @@ def write_char(cfg):
         if lost: raise SystemExit(f"{key}: 원본이 없어 줄 {len(lost)}개가 빠짐({sorted(lost)[:6]}…) — 팩을 덮어쓰지 않음")
     payload = build.payload_of(cfg, A)
     payload["chairL"] = chair_l(key)   # 휴게실 쉘 의자 맞춤값(11-02)
+    # 사무 의자(C01) 손 맞춤(testroom3/chairs/<키>.json, 11-02 재맞춤): 줄마다 장별 값 frame_dx/frame_dy 는 게임 키 fdx/fdy 로 (fighter/seats.ts seatFitAt)
+    if isinstance(payload.get("chair"), dict):
+        payload["chair"] = {k: ({**{kk: vv for kk, vv in v.items() if kk not in ("frame_dx", "frame_dy")}, **({"fdx": v["frame_dx"]} if isinstance(v.get("frame_dx"), list) else {}), **({"fdy": v["frame_dy"]} if isinstance(v.get("frame_dy"), list) else {})} if isinstance(v, dict) else v) for k, v in payload["chair"].items()}
     d.mkdir(parents=True, exist_ok=True)
     keep = {"pack.json", "char.json"}
     lines = {}
