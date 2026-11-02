@@ -108,7 +108,17 @@
     ]
    ]
   ],
-  "dotK": 1.4292,
+  "dotK": 1.6591,
+  "sizes": [
+   [
+    510,
+    0.838
+   ],
+   [
+    704,
+    1.0
+   ]
+  ],
   "blocks": [],
   "doors": {
    "out": {
@@ -190,19 +200,28 @@
    {
     "id": "chair",
     "file": "me_jr_heolgap_chair",
-    "x": 903,
-    "y": 428,
-    "w": 109,
-    "h": 174,
+    "x": 892,
+    "y": 394,
+    "w": 131,
+    "h": 208,
     "sortY": 600
+   },
+   {
+    "id": "fan",
+    "file": "me_jr_heolgap_fan",
+    "x": 50,
+    "y": 570,
+    "w": 101,
+    "h": 253,
+    "sortY": 822
    }
   ]
  },
  "spots": [
   {
    "id": "seat_chair",
-   "x": 967,
-   "y": 614,
+   "x": 968,
+   "y": 613,
    "verb": "앉기",
    "face": 1,
    "act": [
@@ -210,9 +229,10 @@
     "seatthink"
    ],
    "seat": {
-    "x": 967,
-    "y": 600
-   }
+    "x": 968,
+    "y": 599
+   },
+   "chair": "chair"
   }
  ],
  "files": [
@@ -220,6 +240,7 @@
   "me_jr_heolgap_counter",
   "me_jr_heolgap_boxes_l",
   "me_jr_heolgap_boxes_r",
-  "me_jr_heolgap_chair"
+  "me_jr_heolgap_chair",
+  "me_jr_heolgap_fan"
  ]
 }

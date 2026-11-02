@@ -1,5 +1,5 @@
 {
- "file": "songil_v8_632x424",
+ "file": "songil_v8_noplant_632x424",
  "bgScale": 2,
  "w": 1264,
  "h": 848,
@@ -117,27 +117,6 @@
   {
    "poly": [
     [
-     915,
-     770
-    ],
-    [
-     1002,
-     770
-    ],
-    [
-     1002,
-     848
-    ],
-    [
-     915,
-     848
-    ]
-   ],
-   "h": 999
-  },
-  {
-   "poly": [
-    [
      1040,
      812
     ],
@@ -173,6 +152,36 @@
     [
      1160,
      849
+    ]
+   ],
+   "h": 999
+  },
+  {
+   "id": "bench",
+   "poly": [
+    [
+     882,
+     724
+    ],
+    [
+     956,
+     724
+    ],
+    [
+     985,
+     757
+    ],
+    [
+     985,
+     763
+    ],
+    [
+     854,
+     763
+    ],
+    [
+     854,
+     756
     ]
    ],
    "h": 999
@@ -235,7 +244,68 @@
    "r": 420
   }
  ],
- "spots": [],
+ "spots": [
+  {
+   "id": "wait1",
+   "x": 850,
+   "y": 709,
+   "shared": true,
+   "verb": "앉기",
+   "face": -1,
+   "act": [
+    "sit_side"
+   ],
+   "seat": {
+    "x": 887,
+    "y": 709
+   },
+   "bench": "C06",
+   "seatPt": {
+    "x": 911,
+    "y": 604
+   }
+  },
+  {
+   "id": "wait2",
+   "x": 850,
+   "y": 739,
+   "shared": true,
+   "verb": "앉기",
+   "face": -1,
+   "act": [
+    "sit_side"
+   ],
+   "seat": {
+    "x": 903,
+    "y": 739
+   },
+   "bench": "C06",
+   "seatPt": {
+    "x": 927,
+    "y": 634
+   }
+  },
+  {
+   "id": "wait3",
+   "x": 850,
+   "y": 771,
+   "shared": true,
+   "verb": "앉기",
+   "face": -1,
+   "act": [
+    "sit_side"
+   ],
+   "seat": {
+    "x": 918,
+    "y": 771
+   },
+   "bench": "C06",
+   "seatPt": {
+    "x": 942,
+    "y": 666
+   }
+  }
+ ],
  "objects": [
   {
    "id": "counter0",
@@ -293,17 +363,6 @@
    "coverMask": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACcAAAC/CAIAAADy9FJMAAABSElEQVR4nO3cyxKCQAxEUeL///O4oLQUgXl1BpncrC1O9aTAhdKWUlqKx8zKP3wyD8lVUFFR/0+teqTIVNWgourGVDdDEfb6eg5wwu9zDZA1mLquNkbWy9SUUpisqKioqKioo8bMwmRFRUVFRUVFRUVFRUWdSl1/XImRFRUVFRUVFRUVFRUVdSo10r/lUFFRUVFRUVFRUVFRp1I/306ePSsqKioqajh1U8IxQv3t/Zj0hHcLTnzVo04VR/WkxmWuvZ731bio2YocvVrSyjPFXgvrh5RqeeORTK0qWbrzXmvbpARqQ4FVr9rWmXXDvTaXg7WrPX1kjWpnBdp99trf9VatSurl6tQwjXaqoBWqkCxVtWSpKp+8Kg+aVz3IjOpEZlS/OVT9gh6qruS+6k3uqwNmqw4IulXHkF/qMHK5eK8jgy6LrkCzap7CYBbbU/AdGwAAAABJRU5ErkJggg=="
   },
   {
-   "id": "plant",
-   "name": "화분",
-   "file": "",
-   "x": 890,
-   "y": 616,
-   "w": 128,
-   "h": 232,
-   "sortY": 848,
-   "coverMask": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAADoCAIAAACo+3urAAAEYUlEQVR4nO3d3XLbIBRF4arT939l9cKZjlIHGQGHdZDWd+1p3Gy20B9k+xVg3/ePn9m2LeJHL+c3/QWebvAwrBn7P3yJB7fBBsAGDL22Uf/umT2wAbDGQTdq1Jc8pw02AJY0gH3fo0uWRNIAnuPyoZYamHedFWwAzABgBgC7cGCdee5f+ln3mwlsAOxPzYfudN2brVs2APYh9vljP+5pWs7ndDYAVjUHRMhw3C99cuZ3swGwYgPm3/N5yO3P/9gAGDAH9B9ho4/UM2cCGwCb2oDSmIo7+uefV2wADLsOeMk8QufMBDYANqkBEePofIRm7taRDYBhc8AqIzR6JrABsPAGtN3xfw4bALvQgJq3FkqfV4kNgIXMAY79ejYAVtWA+hE9f+zPuWMT91NsAOxDA2oy94jfwwbAig04H9eZR/1aV9o2AGYAMAOAwc+E87h6p2sUGwC7SQPWOvM5sgEwA/jBtm3TLnQMAGYARXN6YAAwIICZR9j8bACs6zrg/Oz7TsPcN+Nua5kds6K5V8RDXZgD7jr2WTYAVnXgu3q2s1ZX6o/+EW/E2gBYor0icrr6e3j//HknbADsh3D6j3R52nP+pHfm7FX6jdkA2Lc5oD//PGP/quhvXnq/2gbAbvJWRJurs11ES2wA7KsB9dmuuzcD9e7b0ftMYANgjeuEj/KP/cxsAGzwKsn8MvT1OBPYANjW9mZDhnFUY9SZT9wZlA2ANa6S1Cg2APbDHFAz9leZA/KzAbBvc4DH/flsAMwAYAYA+5oDPPq36b9CtgGwxoHvdcBL/5tFNgBmADADgA04+XE+6JkJbADMAGAGADOAEPX7YRgAzAAG2Pe9+VTQAGCPXh8QreZeqQ2AGQDMAGAGADMAmHdDB6vfQ8D1ASkMfhnCNrhf0GIMYLCr94UMAGYAMAOAGQDMAGDDngd4BdDGBsAMAGYAMAOAGQDMAGAGADMAmAHABlwJew3cwwbADABmADADgPl6eq9/76G0nYwEbpLyhLOj/l1mPATBDABmADAD6NKzPvLFAGAGADMAWMh1wBOuAN61XRPYAJgrZAZzhcxiDABmADADgBkAzABgBgAzAJgBwAwAZgAwA4AZAMwAYAYAMwCYAcB8JjyMz4SXZAAwA4AZAMwAYK6QGaBnnYwNgIX/Ie1798A1YsszAJgBwAwAZgAwA4AZAMwAYAYACw+g/m9LP5MNgLlhU6NRtbYBMAOAGQDMAGAGADOARv17Zb0YAMwAYAYAMwCYAcC8F9TIe0E3YQMuG/t4Y0YD7v12YqfwAPztn3MOgBkAzABgBgAzAFjgdYDnPzVsAMw1YuHOr5xtAMwGTPXeBhsAM4Cp3t+lMACYc8AFNU8C6v+/r38t/IHM8UvfKYxRfCI2WKklx8F3/IxzAMwGTFJqhg2AYesX15qQ4xZ62gCYAcAMAOZZ0AfRy/xtACzFLg45z4jmbHFhA2ApGvCSpwczt3exAbBEDTia3wZqUyMbAPsLxa1F/GrqXDYAAAAASUVORK5CYII="
-  },
-  {
    "id": "fan",
    "name": "선풍기",
    "file": "",
@@ -335,6 +394,31 @@
    "h": 340,
    "sortY": 722,
    "coverMask": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMYAAAFUCAIAAADwINT2AAAFEUlEQVR4nO3dwXLaSABF0dGU//+XmcWkxvLICDV9MQKfs0xlQZLrFyHh9vLXaVwul//9yrIsT3klzPj72S+AdyMpYpIiJilikiL28ewX8J62717P6RHvqa0UMSuVeZVlWnvEvUArRcxKBV5xn675988ys1VWipiVmvJO+7Q2s1VWipikiEmKmKSISYqYpIhJipj7Und61ztS86wUMUkRkxQx11J8wycROBFJEZMUMUkRkxQxSRGTFDFJEZMUMUkRkxQxSRGTFDFJEZMUMUkRkxQxSRGTFDFJ8Y3L5XL3NypKipikiEmKmKSISYqYpIhJipikiEmKmKSISYqY86X4hvOlOBFJ3cNxwjskRUxSxCRFTFLEJEVMUsQkRUxSxCRF7IWf8e3fwp55SsUMK0XsJVfqyCO27e+xWz/DShF7mZWaf/hf7ZaPIeyzUmP0dNOJLi/8a52HT3VyIpIiJilirqW4YfS6ykoRkxQ3jJ7bKSlikiImKWKSIiYpYpIiJilikiImKWLZMz5P6H6DI8/7rBQxSRGTFDFJEZMUMUkRkxQxSRGTFDFJEZMUMUkx4Mh3y0iKmKSISYqYpIhJipikiEmKmKSISYqYpIhJipikiEmKmKSISYqYpIhJipikiEmKmPOlmLI9ccpKEZMUU7bfMyMpYpIisN4qSRHzjo+YlSImKWKSIhZcS7mKYs1KEZtaKfvElpUiJilikiImKWKSInbnOz7v9bjGShEbXin7xD4rRUxSxCRFbOBaylUUR1gpYodWyj5xnJUiJilikiJ241rKVRSjrBQxSRGTFDFJEZMUsavv+LzX4z5Witg3K7W/T+sTZC0ZW1aK2MezX8AZWeIZVorYl5XyFck8K0Vs+FrKkrHPShGTFDFJEZMUMUkRO/SOz91kjrNSxIaTWpZl++Ns4T9WipikiEmKmKSISYqYpIhJipikiEmKmKSISYqYpIhJipikiEmKmKSISYqYpIhJipikiEmKmKSISYqYpIhJitjnmQg7hx04B4HjrBSxz6ScdEDCShGTFDFJEfty/eSdHfOsFDFJEZMUMUkRkxQxSRGTFDFJEZMUMUkRkxQxSRGTFDFJEZMUMUkRkxQxSRGTFDFJEZMUMUkRkxQxSRGTFLHFdxjTslLE/pyJYKuoWClikiImKWLe8RGzUsRunCJswxhlpYhJipikiB36iQyuqDjOShEb+LkxtoojrBQxSRGTFLHhn8Hniop9VoqYpIhJipikiEmKmKSISYqYpIhJipikiEmK2MezX8BRy/L5ONJzxjOzUsQkRUxSxHxeipiVIiYpYpIiJilikiImKWKSIjac1PpZG2zds1KqYof/+IhJipikiEmK2AMvtH1m4XeyUsR+9HaA3foNrBSxJ9+0tFvvx0oRO8WjFVv1TqwUsVOs1Jbdel1WithJV2rt0YvltIWWlfpiWRafBpv0kn99+1sy34StmvGSSa2t//mrgZHUDP/xEZMUMUkRkxQxSRGTFDFJEZMUMUkRkxQxSRGTFDFJEZMUMUkRkxQxSRGTFLGX/6DwI/ig8AwrRUxSxCRFTFLEJEVMUsQkRUxSxCRFzN3zq+bvoW+P/fgN9+WtFDErdcPorhw5kOi9t8pKEbNShxzZldED0x6xVfcd2ta+EitFzEoNu/Y1PXms482p+MlzaWd2y0oRs1LcMLpYVoqYlWLAkcWyUsQkRUxSxFxLcadr11VWipiVIrBeLCtF7B84g/4KGZfXxwAAAABJRU5ErkJggg=="
+  },
+  {
+   "id": "bench",
+   "name": "대기 의자(C06 서향)",
+   "file": "c06_west",
+   "x": 742,
+   "y": 473,
+   "w": 339,
+   "h": 339,
+   "sortY": 759
   }
+ ],
+ "dotK": 1.3482,
+ "sizes": [
+  [
+   584,
+   0.847
+  ],
+  [
+   716,
+   1.0
+  ],
+  [
+   848,
+   1.153
+  ]
  ]
 }

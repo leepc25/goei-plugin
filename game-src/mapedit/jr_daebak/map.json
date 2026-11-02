@@ -43,11 +43,11 @@
    "poly": [
     [
      275,
-     583
+     610
     ],
     [
      660,
-     583
+     610
     ],
     [
      660,
@@ -84,20 +84,20 @@
   {
    "poly": [
     [
-     990,
-     640
+     0,
+     700
     ],
     [
-     1264,
-     640
+     165,
+     700
     ],
     [
-     1264,
-     760
+     165,
+     810
     ],
     [
-     990,
-     760
+     0,
+     810
     ]
    ],
    "h": 999
@@ -105,20 +105,48 @@
   {
    "poly": [
     [
-     0,
-     700
+     960,
+     592
     ],
     [
-     165,
-     700
+     1264,
+     592
     ],
     [
-     165,
-     810
+     1264,
+     768
     ],
     [
-     0,
-     810
+     1112,
+     766
+    ],
+    [
+     1075,
+     758
+    ],
+    [
+     1040,
+     742
+    ],
+    [
+     1010,
+     720
+    ],
+    [
+     990,
+     695
+    ],
+    [
+     982,
+     668
+    ],
+    [
+     976,
+     650
+    ],
+    [
+     960,
+     650
     ]
    ],
    "h": 999
@@ -156,7 +184,25 @@
    "r": 420
   }
  ],
- "spots": [],
+ "spots": [
+  {
+   "id": "seat_chair",
+   "x": 490,
+   "y": 615,
+   "verb": "앉기",
+   "face": 1,
+   "dir": "front",
+   "chair": "chair",
+   "act": [
+    "chairsit",
+    "seatthink"
+   ],
+   "seat": {
+    "x": 490,
+    "y": 601
+   }
+  }
+ ],
  "objects": [
   {
    "id": "counter",
@@ -170,26 +216,127 @@
    "coverMask": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAYwAAADVCAIAAADLrVCWAAADJElEQVR4nO3bsWrEMBAAUSv//89OEQgHgWsS4tHqvdbNuhlWIK3rDPd9Pz3CM9ZaT48Av/Lx9AAA7xwRqWPXKBjgiEgB+5ofqcPXqMN/nwHmRwrY2vBI2SNgd8MjBexOpIC0yZFy1oMBJkcKGGBspKxRMMOfPewShTIv+NjX2E0KmEGkgDSRAtJECkgTKSBNpIA0kTqCCyLsS6SANJEC0paDAFBmkwLSRApIEykgTaSANJEC0kQKSBMpIE2kgDSRAtJECkgTKSBNpIA0kQLSRApIEykgTaSANJEC0kQKSBMpIE2kgDSRAtJECkgTKSBNpIA0kQLSRApIEykgTaSANJEC0kQKSBMpIE2kgDSRAtJECkgTKSBNpIA0kQLSRApIEykgTaSANJEC0kQKSBMpIG29+Xbf97/NAfDTWssmBUSttS7HPaDpq1CXSAFB34W6RAqoeS3UJVJAnEgBaSIFpIkUkCZSQJpIAWkiBaSJFJAmUkCaSAFpIgWkiRSQJlJAmkgBaSIFpIkUkCZSQJpIAWkiBaSJFJAmUkCaSAFpIgWkiRSQJlJAmkgBaSIFpIkUkCZSQJpIAWkiBaSJFJAmUkCaSAFpIgWkiRSQJlJAmkgBaSIFpIkUkCZSQJpIAWkiBaSJFJAmUkCaSAFpIgWkiRSQJlJAmkgBaSIFpIkUkCZSQJpIAWkiBaSJFJAmUkCaSAFpIgWkiRSQJlJAmkgBaSIFpIkUkCZSQJpIAWkiBaSJFJAmUkCaSAFpIgWkiRSQJlJAmkgBaSIFpIkUkCZSQJpIAWkiBaSJFJAmUkCaSAFpIgWkiRSQJlJAmkgBaSIFpIkUkCZSQJpIAWkiBaSJFJAmUkCaSAFpIgWkiRSQJlJAmkgBaSIFpIkUkCZSQJpIAWkiBaSJFJAmUkCaSAFpIgWkiRSQJlJAmkgBaSIFpIkUkCZSQJpIAWkiBaSJFJAmUkCaSAFpIgWkiRSQJlJAmkgBaSIFpIkUkCZSQJpIAWkiBaSJFJAmUkCaSAFpIgWkiRSQJlJAmkgBaSIFpIkUkCZSQJpIAWkiBaSJFJAmUkCaSAFpn0zCIpvnv8lcAAAAAElFTkSuQmCC"
   },
   {
-   "id": "table",
+   "id": "table0",
    "name": "포커 테이블",
    "file": "",
    "x": 962,
    "y": 490,
-   "w": 302,
+   "w": 20,
+   "h": 263,
+   "sortY": 600,
+   "coverMask": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAEHCAAAAACL1zlQAAAAeklEQVR4nO3RMRKAIBBD0cj97xwbgQUyDpUgk18+ERcEDotJGEYkBEIgBVKspHidYk+KD2WLWCxgtYrBCkbL2Njb2SmQYmVvSMKQhCEJm/wdG+C130gHorjl1SP9G8cLXT7SJD6TU2H7oDsjFY5bOeecc84555xz33cDNAQYflKfeD8AAAAASUVORK5CYII="
+  },
+  {
+   "id": "table1",
+   "name": "포커 테이블",
+   "file": "",
+   "x": 982,
+   "y": 490,
+   "w": 20,
+   "h": 263,
+   "sortY": 668,
+   "coverMask": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAEHCAAAAACL1zlQAAAAUElEQVR4nO3VMQoAMAhD0ej979wOdrGEjsXhuwgvgjgpfaqQtG5MY0pjSmNKtwgEQRAEHxju9US15bAH0UZOcGHxwNtBEARBEARBEATBCbgBquwK9vkNEukAAAAASUVORK5CYII="
+  },
+  {
+   "id": "table2",
+   "name": "포커 테이블",
+   "file": "",
+   "x": 1002,
+   "y": 490,
+   "w": 20,
+   "h": 263,
+   "sortY": 710,
+   "coverMask": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAEHCAAAAACL1zlQAAAAQUlEQVR4nO3OMQoAIRADwKz4/y97nYhYChY3W4UhgU3uXy15TByHZjvNIYQQQngXq5Kk7616+BKEEEIIIYQQ/hY/+IsECD6wDfYAAAAASUVORK5CYII="
+  },
+  {
+   "id": "table3",
+   "name": "포커 테이블",
+   "file": "",
+   "x": 1022,
+   "y": 490,
+   "w": 20,
+   "h": 263,
+   "sortY": 729,
+   "coverMask": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAEHCAAAAACL1zlQAAAAPklEQVR4nO3VIQ7AMAwEwUv//2cXlEWnoKhoBq5t7OS+NSU+bVMURVEUxf/iKvFr0+I22a/buz8PAAAASPICbN0Fuzb1EM0AAAAASUVORK5CYII="
+  },
+  {
+   "id": "table4",
+   "name": "포커 테이블",
+   "file": "",
+   "x": 1042,
+   "y": 490,
+   "w": 20,
+   "h": 263,
+   "sortY": 743,
+   "coverMask": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAEHCAAAAACL1zlQAAAAQElEQVR4nO3WMQ7AIAwEwTP//zPpImS5pEk0U1lri5rkvtpDXNOlKIqiKIr/i5Uk/TdQ77SneGxanB4DAAD4sAeLwwXDPOhmuwAAAABJRU5ErkJggg=="
+  },
+  {
+   "id": "table5",
+   "name": "포커 테이블",
+   "file": "",
+   "x": 1062,
+   "y": 490,
+   "w": 20,
+   "h": 263,
+   "sortY": 752,
+   "coverMask": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAEHCAAAAACL1zlQAAAARElEQVR4nO3WMQrAMAhAUe3972yWdog4BAKd3lsCX90TcSXft7ZYw+YznYuiKIqiKJ7EjPbd+GJEm+S2UlPsJwAAAH9a9Z8GywvhtY8AAAAASUVORK5CYII="
+  },
+  {
+   "id": "table6",
+   "name": "포커 테이블",
+   "file": "",
+   "x": 1082,
+   "y": 490,
+   "w": 20,
    "h": 263,
    "sortY": 760,
-   "coverMask": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAS4AAAEHCAIAAACfgTzqAAAEE0lEQVR4nO3d3a6aQBhAUTV9/1e2F23SU3J+FAbYwFoPQLiYnQ9lRu834E3P53P4Ne/DrwizrbHEj0KKV3HlVX4IUlzKEmeIboqWOJcyJkXZwEKP5ZfQISy3NEUdwhCLUtQhjDI/RR3CQDNT1CGMNSdFHcJwA75BBZZ7O0UjEdbwXoo6hJW8kaIOYT2vpqhDWNVLKeoQ1vZzijqEDfyQog5hG9+lqEPYzJcp6hC29HmKOoSNfZKiDmF79qBCwjRFIxF28V+KOoS9/EtRh7CjvynqEPb1uOkQAh46hAIvMyBBipAgRUiQIiRIERKkCAlShAQpQsLjfu/+Bzhch6kICVKEBClCghQhQYqQIEVIkCIkSBESpAgJUoQEKUKCFCFBipAgRUiQIiRIERIet9vN6WHYnakICVKEBClCghQhQYqQIEVIkCIkSBESpAgJUoQEKUKCFCFBipAgRUiQIiT8TdGRRdiXqQgJUoQEKUKCFCFBipAgRUiQIiRIERI+ebP/fD63vw+4uB822cgStvHGfjdZwnpmbj2VJYw1YBe4LGG5wQcyZAnzrHg2Spbwuo2OKcoSvrfpiWFBwlfstoEEKUKCFCFBipAgRUiQIiQcIMX7/e5nWjm9X3vfwKsmNXpFyckcJsWJj2XKkhM4aoofGZicwBlSnFAmR3TCFCc8ynII50/xIwOTrGulOKFMOi6d4oQy2ZEUv+RDJluS4ksMTNYmxTmUyXBSHECZLCfF8XzIZOKV8wxSXJeBeQLbHAyS4qaUubEDHa+T4p48yn7jQBUNIcWKkw3Mq4W0nBSj/izlbJBKG+4AP6gBVyBFSJAiJEgREqQICVKEBClCghQhQYqQIEVIkCIkSBESpAgJUoQEKUKCFCFBipAgRUiQIiRIERKkCAlShAQpQoIUIUGKkCBFSJAiJEgREqQICVKEBClCghQhQYqQIEVIkCIkSBESpAgJUoQEKUKCFCFBipAgRUiQIiRIERKkCAlShAQpQoIUIUGKkCBFSJAiJEgREqQICVKEBClCghQhQYqQIEVIkCIkSBESpAgJUoQEKUKCFCFBipAgRUiQIiRIERKkCAlShAQpQoIUIUGKkCBFSJAiJEgREqQICVKEBClCghQhQYqQIEVIkCIkSBESpAgJUoQEKUKCFCFBipAgRUiQIiRIERKkCAlShAQpQoIUIUGKkCBFSJAiJEgREqQICVKEBClCghQhQYqQIEVIkCIkSBESpAgJUoQEKUKCFCFBipAgRUiQIiRIERKkCAlShAQpQoIUIUGKkCBFSJAiJEgREqQICVKEBClCghQhQYqQIEVIkCIkSBESpAgJUoQEKUKCFCFBipAgRUiQIiRIERKkCAlShAQpQoIUIUGKkCBFSJAiJEgREn4D7OSp0+YWG38AAAAASUVORK5CYII="
+   "coverMask": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAEHCAAAAACL1zlQAAAASElEQVR4nO3WMQ6AQAgEwMX//xkbYzRHZ+EVQ0Myuw0dyaepHvCYmhBCCCGEW2El6yNT1+4JX8ET72TBpHe8HUIIIYQQQvgjnjsFB/1OLngpAAAAAElFTkSuQmCC"
+  },
+  {
+   "id": "table7",
+   "name": "포커 테이블",
+   "file": "",
+   "x": 1102,
+   "y": 490,
+   "w": 10,
+   "h": 263,
+   "sortY": 764,
+   "coverMask": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAEHCAAAAACysIgLAAAAI0lEQVR4nO3GoQEAAAgDoOn/P2uz+gAkkkfNtaOqqqqqqmcBhRwDB2tdd5QAAAAASUVORK5CYII="
+  },
+  {
+   "id": "table8",
+   "name": "포커 테이블",
+   "file": "",
+   "x": 1112,
+   "y": 490,
+   "w": 152,
+   "h": 263,
+   "sortY": 766,
+   "coverMask": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAJgAAAEHCAAAAAB37tDfAAABTUlEQVR4nO3cOw7CMBRFQYLY/5ahNRK/sRKc4pzWxZvK5d0uC7t/eNuOPjDbM+yIC5NtJ7I8dV0NeFcwLZgWTAumBdOCacG0YFowLZgWTAumBdOCacG0YFowLZgWTAumBdOCacG0YFowLZgWTAumBdOCacG0YFowLZgWTAumBdOCacG0YFowLZgWTAumBdOCacG0YFowLZgWTAum3VYDxsb9gUWw79sMR8Om1yF2g+2yTzE0Adub8LpfYf/RDJ32uwimBdOCacG0YFowLZgWTAumBdOCacG0YFowLZgWTAumBdOCacG0YFowLZgWTAumBdOCacG0YFowLZgWTAumBdOCacG0YFowLZgWTAumBdOCacG0YFowLZgWTAumBdOCacG0YFowLZgWTAumBdOCacG0YFowLZgWTAumBdOCacG0YFowLZgWTAumnRb2ALMfBhkj3xLwAAAAAElFTkSuQmCC"
   },
   {
    "id": "plant",
    "name": "화분·우산꽂이",
    "file": "",
-   "x": 0,
-   "y": 450,
-   "w": 163,
-   "h": 359,
-   "sortY": 810,
-   "coverMask": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKMAAAFnCAIAAABFAG7BAAADwElEQVR4nO3bO44bQRAFwaLuf+eRsYCw0GfFJWeAns5Iq6znhF2P4zhGC/R4PC7d/3HputaJdCXSlUhXIl2JdCXSlUhXIl2JdCXSlUhXIl2JdCXSlUhXIl2JdCXSlUhXIl2JdCXSlUhXIl2JdCXSlUhXIl2JdCXSlUhXIl2JdCXSlUhXIl2JdCXSlUhXIl2JdCXSlUhXIl2JdCXSlUhXIl2JdCXSlUhXIl2JdCXSlUhXIl2JdCXSlUhXIl2JdCXSlUhXIl2JdCXSlUhXIl2JdCXSlUhXIl2JdCXSlUhXIl2JdCXSlUhXIl2JdCXSlUhXIl2JdCXSlUhXIl2JdCXSlUhXIl2JdCXSlUhXIl2JdCXSlUhXIl2JdCXSlUhXIl2JdCXSlUhXIl2JdCXSlUhXIl2JdCXSlUhXIl2JdCXSlUhv3nEcHwfpnfvFPKQ37jPzkN6135iH9Jb9yTyk9+uvzEN6s/7FPKR36gvmIb1NXzMP6T36L/OQ3qBnmIf03XuSeUjfuueZh/R9+xbzkL5p32Ue0nfsBeYhfbteYx7S9+pl5iF9o95hHtJ36U3mIX2L3mce0ut3CvOQXryzmIf0yp3IPKSX7VzmIb1mpzMP6QW7gnlIr9ZFzEN6qa5jHtLrdCnzkO5EuhLpSqQrka5EuhLpSqQrka5EuhLpSqQrka5EuhLpSqQrka5EuhLpSqQrka5EuhLpSqQrka5EuhLpSqQrka5EuhLp/fv41yVdiXQl0pVIVyJdiXQl0pVIVyJdiXQl0pVIVyJdiXQl0pVIVyJdiXQl0pVIVyJdiXQl0pVIVyJdiXQl0pVIVyJdiXQl0pVIVyJdiXQl0pVIVyJdiXQl0pVIVyJdiXQl0pVIVyJdiXQl0pVIVyJdiXQl0pVIVyJdiXQl0pVIVyJdiXQl0pVIVyJdiXQl0pVIVyJdiXQl0pVIVyJdiXQl0pVIVyJdiXQl0pVIVyJdiXQl0pVIVyJdiXQl0pVIVyJdiXQl0pVIVyJdiXQl0pVIVyJdiXQl0pVIVyJdiXQl0pVIVyJdiXQl0pVIVyJdiXQl0pVIVyJdiXQl0pVIVyJdiXQl0pVIVyJdiXQl0omO4yBdiXQl0pVIVyJdiXQl0pVIVyJdiXQl0pVIVyJdiXQl0pVIVyJdiXQl0pVIVyJdiXQl0pVIVyJdiXQl0pVIVyJdiXQl0pVIVyJdiXQl0pVIVyJdiXQl0pVIVyJdiXQl0pVIVyJdiXQl0pVIVyJdiXQl0pVIVyJdiXQl0pVIVyJdiXQl0pV+Ain3ZW5JaRU/AAAAAElFTkSuQmCC"
+   "x": 6,
+   "y": 448,
+   "w": 156,
+   "h": 398,
+   "sortY": 820,
+   "coverMask": "data:image/png;base64,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"
+  },
+  {
+   "id": "chair",
+   "name": "접수대 의자",
+   "file": "c01_south",
+   "x": 418,
+   "y": 407,
+   "w": 124,
+   "h": 197,
+   "flip": false,
+   "sortY": 602
   }
- ]
+ ],
+ "dotK": 1.6725,
+ "chairs": []
 }

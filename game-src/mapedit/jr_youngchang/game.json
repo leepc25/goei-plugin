@@ -220,7 +220,17 @@
     ]
    ]
   ],
-  "dotK": 1.4292,
+  "dotK": 1.5779,
+  "sizes": [
+   [
+    514,
+    0.724
+   ],
+   [
+    754,
+    1.0
+   ]
+  ],
   "blocks": [],
   "doors": {
    "out": {
@@ -294,27 +304,19 @@
    {
     "id": "chair_boss",
     "file": "me_jr_youngchang_chair_boss",
-    "x": 875,
-    "y": 465,
-    "w": 112,
-    "h": 178,
+    "x": 872,
+    "y": 454,
+    "w": 118,
+    "h": 189,
     "sortY": 640
-   },
-   {
-    "id": "chair_guest",
-    "file": "me_jr_youngchang_chair_guest",
-    "x": 870,
-    "y": 615,
-    "w": 121,
-    "h": 193,
-    "sortY": 805
    }
-  ]
+  ],
+  "chairs": []
  },
  "spots": [
   {
    "id": "seat_chair_boss",
-   "x": 940,
+   "x": 941,
    "y": 654,
    "verb": "앉기",
    "face": 1,
@@ -323,24 +325,10 @@
     "seatthink"
    ],
    "seat": {
-    "x": 940,
+    "x": 941,
     "y": 640
-   }
-  },
-  {
-   "id": "seat_chair_guest",
-   "x": 940,
-   "y": 819,
-   "verb": "앉기",
-   "face": 1,
-   "act": [
-    "chairsit",
-    "seatthink"
-   ],
-   "seat": {
-    "x": 940,
-    "y": 805
-   }
+   },
+   "chair": "chair_boss"
   }
  ],
  "files": [
@@ -349,7 +337,6 @@
   "me_jr_youngchang_crate_l",
   "me_jr_youngchang_crate_r",
   "me_jr_youngchang_box_r",
-  "me_jr_youngchang_chair_boss",
-  "me_jr_youngchang_chair_guest"
+  "me_jr_youngchang_chair_boss"
  ]
 }

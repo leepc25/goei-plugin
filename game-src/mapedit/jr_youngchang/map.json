@@ -338,29 +338,13 @@
    "id": "chair_boss",
    "name": "사장 의자",
    "file": "c01_south",
-   "x": 875,
-   "y": 465,
-   "w": 112,
-   "h": 178,
+   "x": 872,
+   "y": 454,
+   "w": 118,
+   "h": 189,
    "rot": 0,
    "flip": false,
    "sortY": 640,
-   "anchor": [
-    50,
-    135
-   ]
-  },
-  {
-   "id": "chair_guest",
-   "name": "손님 의자",
-   "file": "c01_north",
-   "x": 870,
-   "y": 615,
-   "w": 121,
-   "h": 193,
-   "rot": 0,
-   "flip": false,
-   "sortY": 805,
    "anchor": [
     50,
     135
@@ -370,7 +354,7 @@
  "spots": [
   {
    "id": "seat_chair_boss",
-   "x": 940,
+   "x": 941,
    "y": 654,
    "verb": "앉기",
    "face": 1,
@@ -381,26 +365,21 @@
     "seatthink"
    ],
    "seat": {
-    "x": 940,
+    "x": 941,
     "y": 640
    }
-  },
-  {
-   "id": "seat_chair_guest",
-   "x": 940,
-   "y": 819,
-   "verb": "앉기",
-   "face": 1,
-   "dir": "back",
-   "chair": "chair_guest",
-   "act": [
-    "chairsit",
-    "seatthink"
-   ],
-   "seat": {
-    "x": 940,
-    "y": 805
-   }
   }
+ ],
+ "dotK": 1.5779,
+ "chairs": [],
+ "sizes": [
+  [
+   514,
+   0.724
+  ],
+  [
+   754,
+   1.0
+  ]
  ]
 }

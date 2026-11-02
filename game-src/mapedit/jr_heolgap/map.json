@@ -210,10 +210,10 @@
    "id": "chair",
    "name": "c01_south",
    "file": "c01_south",
-   "x": 903,
-   "y": 428,
-   "w": 109,
-   "h": 174,
+   "x": 892,
+   "y": 394,
+   "w": 131,
+   "h": 208,
    "rot": 0,
    "flip": false,
    "sortY": 600,
@@ -221,13 +221,24 @@
     50,
     135
    ]
+  },
+  {
+   "id": "fan",
+   "name": "선풍기",
+   "file": "",
+   "x": 50,
+   "y": 570,
+   "w": 102,
+   "h": 254,
+   "sortY": 822,
+   "coverMask": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGYAAAD+CAIAAABHiOcbAAAEB0lEQVR4nO3d0XKqMBRA0eD0/3/ZPrRDrQLJDiSEw96vd0ZleRLiXMemFK7n89n08aemj96nNaNpanJ1lyRDc3Q43DXI9q+1A+EGJWu0Hx0CNyJZ8/17H9xwZK295qrhxiLr5jVXATcQWX+vOQQ3CtmJXnOFcEOQjeA1l4V79HkdGw3lVdLJZAN6ZV/SmWQDepV0GtlFvdJZZIN7bb+8E8gG98rWm+zqXqkz2YW8Nl5qP7ILeW3XiSyMVzr9KDtya2+zZLgeZJFWZXLKtlt8syXDSYaTLNPn2pQM15ws2O0yOWUlvb3rkuEkw0lW1OvabEsWb+9PTllFkpU2rxjJcJLhJAP9rM2GZCFvl8kpq+hr+5+jTsqetqZMr8VWyfRaa2FhirXd+5Tple0fmV4l/ZHpVdhXEgv20Ivm6R8nGU4ynGQ4yXCS4STDSYaTDCcZTjKcZDjJcJLhJMNJhpMMJxlOMpxkuEejn8UM3CM1+zHRqP0uTNXK+9vLVCvs3/avWknvd0zVsi0cMlTbbvlcptpGq0dZ1dbaOv2rtlhDlJBfw5qmyc+YuIZkUde1U4aTDCcZTjKcZLi2ZCFvmk4ZTjKcZDjJQD9bs2S45mTxbppOGU4ynGSlzTuMZLgeZMHuAE4ZTjKcZEW97i2S4STDdSKLdNN0ynCS5XtbIpLhJMNJhutHFuam6ZRl+nynJcN1JYuxNntPWQC1Exbm1dXO2cuuorb4Ot3+cZlfYi8v5FfWF3PKVlvbPQ6bskhtb7VO2XvZW5NT9lfhfdwp+6383CNZSvCcePeFWXGoHmvKOn8qqHu6schSL7VpmqqfaDiy1F5t5+MPupeN/Ll9xCkbPMlwkuEkw0mGkwwnGU4ynGQ4yXCS4STDSYaTDCcZTjKcZDjJcJLhJMNJhpMMJxlOMpxkOMlwkuEkw0mGkwwnGU4ynGQ4yXCS4STDSYaTDCcZTjKcZDjJcJLhJMNJhpMMJxlOMpxkOMlwkuEkw0mGkwwnGU4ynGQ4yXCS4STDSYaTDCcZTjKcZDjJcJLhJMNJhpMMJxlOMtxhv3h7ub9dEuoHn/tU/R7flyzVqt2aLFWp3Z0spfR8PhHcAdv/5Tb+tQpvCLvIwmDNlajVL8x4XqnsomqmLCTWawf/ta/wXil3jWDK7oD12tqsechYbe3wIVmmTzXJ8r2pSVbUq5pkOMlwkuEkw0mGkwwnGU4ynGQ4yXCS4STDSYaTDCcZTjKcZDjJcJLhJMNJVtTrfwNLhgNk1d/HvXpvF86m7IZqn5eMF+at1BYvtmYvu5XaZ5Xb/x3Ujv+yVGy1javbdciIrbbW3nNZSLWDvytLn+ByZS/nmNN/GLW23/uveLIYHfkZ8+pqV3/94/YNUW3FI8DicFYAAAAASUVORK5CYII="
   }
  ],
  "spots": [
   {
    "id": "seat_chair",
-   "x": 967,
-   "y": 614,
+   "x": 968,
+   "y": 613,
    "verb": "앉기",
    "face": 1,
    "dir": "front",
@@ -237,9 +248,20 @@
     "seatthink"
    ],
    "seat": {
-    "x": 967,
-    "y": 600
+    "x": 968,
+    "y": 599
    }
   }
+ ],
+ "dotK": 1.6591,
+ "sizes": [
+  [
+   510,
+   0.838
+  ],
+  [
+   704,
+   1.0
+  ]
  ]
 }
