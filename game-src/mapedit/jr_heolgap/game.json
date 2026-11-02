@@ -195,6 +195,15 @@
     "w": 109,
     "h": 174,
     "sortY": 600
+   },
+   {
+    "id": "fan",
+    "file": "me_jr_heolgap_fan",
+    "x": 50,
+    "y": 570,
+    "w": 101,
+    "h": 253,
+    "sortY": 822
    }
   ]
  },
@@ -212,7 +221,8 @@
    "seat": {
     "x": 967,
     "y": 600
-   }
+   },
+   "chair": "chair"
   }
  ],
  "files": [
@@ -220,6 +230,7 @@
   "me_jr_heolgap_counter",
   "me_jr_heolgap_boxes_l",
   "me_jr_heolgap_boxes_r",
-  "me_jr_heolgap_chair"
+  "me_jr_heolgap_chair",
+  "me_jr_heolgap_fan"
  ]
 }
