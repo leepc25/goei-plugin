@@ -13,6 +13,7 @@ export type SceneId =
   | 'street' | 'pasta' | 'lobby' | 'swat' | 'f2' | 'f3' | 'office' | 'interview' | 'lounge' | 'wc' | 'wc3'
   | 'b1' | 'edu' | 'training' | 'clinic' | 'b2' | 'b3' | 'tooth' | 'bath_f' | 'bath_m' | 'shower_f' | 'shower_m'
   | 'jr_entry' | 'jr_b1' | 'jr_alley' | 'jr_b2'
+  | 'sdra_lobby'
   | 'jr_daebak' | 'jr_heolgap' | 'jr_youngchang' | 'jr_songil' | 'jr_jinryo' | 'jr_op';
 
 export type DoorKind = 'main' | 'door' | 'glass' | 'steel' | 'security' | 'elevator' | 'stairs_up' | 'stairs_down' | 'stairs' | 'shop' | 'slide' | 'cell' | 'exit';
@@ -199,6 +200,8 @@ export const HQ_SCENES: HqScene[] = [
       { id: 'main', x: 640, kind: 'main', to: 'lobby', toDoor: 'main' }, { id: 'pasta', x: 1500, kind: 'shop', to: 'pasta', toDoor: 'out', needs: 'pasta' },
       // 임시 연결: 이동수단(노선표)이 생기기 전까지 거리 동쪽 끝에서 중림으로 바로 간다
       { id: 'jr', x: 1840, kind: 'exit', side: 'S', to: 'jr_entry', toDoor: 'west', label: '중림 지하상가 (임시)' },
+      // 임시 연결(11-02): 협회 정면 거리가 생기기 전까지 이 거리에서 협회 1층으로 바로 간다
+      { id: 'sdra', x: 1100, kind: 'exit', side: 'S', to: 'sdra_lobby', toDoor: 'main', label: '특수재난대응협회 (임시)' },
     ],
     things: [{ kind: 'streetlamp', x: 300, w: 30, h: 360 }, { kind: 'streetlamp', x: 1150, w: 30, h: 360 }, { kind: 'bike', x: 860, w: 120, h: 80 }],
   },
@@ -263,6 +266,11 @@ export const HQ_SCENES: HqScene[] = [
     { id: 'supply', kind: 'steel', place: 'supply', label: '보급실' },
     { id: 'elev', kind: 'elevator' },
   ]),
+  // ── 특수재난대응협회 (중립, 11-02 사용자: 관리국 본부 배경을 그대로 쓰고 1층·복도만 새로). 1층 = PixelLab p4(tools/mapedit/author_sdra_lobby.py): 왼쪽 옆벽 정문 · 뒷벽 가운데 엘리베이터. 안내 데스크 없음 ──
+  floorHall('sdra_lobby', '협회 1층', '1F', [
+    { id: 'main', kind: 'glass', to: 'street', toDoor: 'sdra', label: '정문' },
+    { id: 'elev', kind: 'elevator' },
+  ]),
   // ── 중림 지하상가 (중립지역, 그림 4장). 지상 입구 → 지하 1층 앞골목 → (가운데 통로) 뒷골목 / (동쪽 계단) 지하 2층 ──
   floorHall('jr_entry', '중림 지하상가 입구', 'out', [
     { id: 'west', kind: 'exit', side: 'S', to: 'street', toDoor: 'jr', label: '버스 정류장' },
@@ -298,13 +306,16 @@ export const HQ_SCENES: HqScene[] = [
 export const SCENE_BY_ID = Object.fromEntries(HQ_SCENES.map((s) => [s.id, s])) as Record<SceneId, HqScene>;
 
 /** 엘리베이터 층 단추 (위에서 아래로) */
-export const ELEVATOR: { floor: HqScene['floor']; label: string; scene: SceneId; door: string; needs?: PlaceId }[] = [
+/** bldg = 건물(없으면 관리국 본부). 엘리베이터는 같은 건물 층만 고른다 (11-02 협회 추가) */
+export const ELEVATOR: { floor: HqScene['floor']; label: string; scene: SceneId; door: string; needs?: PlaceId; bldg?: string }[] = [
   { floor: '3F', label: '3', scene: 'f3', door: 'elev' },
   { floor: '2F', label: '2', scene: 'f2', door: 'elev' },
   { floor: '1F', label: '1', scene: 'lobby', door: 'elev' },
   { floor: 'B1', label: 'B1', scene: 'b1', door: 'elev' },
   { floor: 'B2', label: 'B2', scene: 'b2', door: 'elev' },
   { floor: 'B3', label: 'B3', scene: 'b3', door: 'elev' },
+  // 협회: 지금은 1층만 (2층·3층·지하 1층 복도 그림이 생기면 더한다)
+  { floor: '1F', label: '1', scene: 'sdra_lobby', door: 'elev', bldg: 'sdra' },
 ];
 
 /** 메뉴 「장소로 가기」·장소 id → 그 장면과 서 있을 자리 */
