@@ -3,7 +3,7 @@ import os
 from PIL import Image
 import numpy as np
 D='game-src/action/objects/'
-FOOT=int(os.environ.get('FOOT',312))   # 발끝 y(1배). 벽 밑선 ≈299
+FOOT=int(os.environ.get('FOOT',332))   # 발끝 y(1배). 벽 밑선 ≈299
 XS=[int(v) for v in os.environ.get('XS','665,880').split(',')]  # 캔버스 왼쪽 x
 bg=Image.open('game-src/art/pixellab-hq-20261031/hq_b2_lab_p20_1703x424.png').convert('RGBA')
 for x,p in zip(XS,['L01v4_고그니쟈_실험책상','L02v2_데쥬레_실험책상']):
