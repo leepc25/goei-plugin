@@ -49,6 +49,9 @@ export interface HqSpot {
   place?: PlaceId;
   /** 자리 주인 (대화 상대) */
   who?: string;
+  /** 책상 평소 주인 (11-02 사용자: 정해진 주인이 아니라 평소 앉는 자리, 비면 누구나 — shared) */
+  owner?: string;
+  shared?: boolean;
   /** 자리 앞에 뜨는 짧은 동사 */
   verb: string;
   face?: 1 | -1;
@@ -160,6 +163,18 @@ const LOCKERS: Record<'shower_f' | 'shower_m', { id: string; x: number; y: numbe
 const lockerSpots = (id: 'shower_f' | 'shower_m'): HqSpot[] => LOCKERS[id].map((l) => ({ id: `locker:${l.id}`, x: l.x, y: l.y, verb: '캐비닛', face: l.face, act: ['locker'] }));
 /** 샤워실 그림의 샤워기 발 자리 → NPC가 서는 자리 (11-02 NPC 샤워) */
 const showerSpots = (id: SceneId) => (PAINTED[id]?.showers ?? []).map((s) => ({ id: s.id, x: s.foot[0], y: s.foot[1], face: s.face }));
+/** 백일몽 사무실 책상 평소 자리 (사용자 14:13 「그래」, 위키 소속 기준). 관리국 사무실 그림을 그대로 쓰므로 책상 번호(desk1~8)는 같고 주인만 바꾼다.
+ * 일반조(13층): D조 이자헌·은하제·박민성 한 묶음 + 백사헌(F)·고영은(R)·강이학(I)·장허운(Y), desk8 비움. 정예팀(15층): A조 백석주·진나솔, B조 이성해, 나머지 비움.
+ * 관리국과 같은 규칙: 주인은 평소 자리일 뿐, 빈 책상은 플레이어·공용 NPC 누구나(shared) */
+const BY_DESK_OWNERS: Partial<Record<SceneId, Record<string, string>>> = {
+  by_office: { desk1: '이자헌', desk2: '은하제', desk3: '박민성', desk4: '백사헌', desk5: '고영은', desk6: '강이학', desk7: '장허운' },
+  by_elite: { desk1: '백석주', desk2: '진나솔', desk3: '이성해' },
+};
+function withOwners(sc: HqScene): HqScene {
+  const own = BY_DESK_OWNERS[sc.id] ?? {};
+  sc.spots = sc.spots.map((p) => (/^desk\d+$/.test(p.id) ? { ...p, owner: own[p.id], shared: true } : p));
+  return sc;
+}
 function floorHall(id: SceneId, name: string, floor: HqScene['floor'], doors: Omit<HqDoor, 'x'>[], extra: Partial<HqScene> = {}): HqScene {
   // extra.painted: 다른 장면 그림을 쓰는 방 (11-02 진압팀 사무실 'swat' = 종합대응팀 지도 office_riot 색만 다름)
   const pid = extra.painted ?? id;
@@ -267,7 +282,7 @@ export const HQ_SCENES: HqScene[] = [
   floorHall('by_lounge', '휴게실', '13F', [{ id: 'out', kind: 'exit', to: 'by_f13', toDoor: 'rest', label: '나가기' }], { spots: MAPEDIT_SPOTS.lounge }),
   // 사무실 안은 관리국 사무실 그대로(사용자 13:50 「일반조랑 정예팀 사무실 쓰게 관리국 사무실」). 금색 톤 그림은 고른 뒤 바꾼다
   // 사용자 14:03 「정예팀이 진압팀, 일반팀이 종합대응팀거 일단 해」: 일반조 = 종합대응팀 사무실 그림, 정예팀 = 진압팀(office_riot) 그림
-  floorHall('by_office', '일반조 사무실', '13F', [{ id: 'out', kind: 'exit', side: 'S', to: 'by_f13', toDoor: 'office', label: '나가기' }], { painted: 'office' }),
+  withOwners(floorHall('by_office', '일반조 사무실', '13F', [{ id: 'out', kind: 'exit', side: 'S', to: 'by_f13', toDoor: 'office', label: '나가기' }], { painted: 'office' })),
   // 15층(사용자 13:50 「아래층거 그대로 써도」, 14:05 「15층은 휴게실 필요 없으니 적당히 잘라」): 13층 그림을 휴게실 문 앞에서 자른 by_f15. 남·여 문 = 샤워실(관리국 탈의실·샤워실), 유리 양문 = 정예팀 사무실
   floorHall('by_f15', '백일몽 15층', '15F', [
     { id: 'wc_m', kind: 'door', to: 'by_shower_m', toDoor: 'out', label: '샤워실(남)' },
@@ -275,7 +290,7 @@ export const HQ_SCENES: HqScene[] = [
     { id: 'office', kind: 'glass', to: 'by_elite', toDoor: 'out', label: '정예팀 사무실' },
     { id: 'elev', kind: 'elevator' },
   ]),
-  floorHall('by_elite', '정예팀 사무실', '15F', [{ id: 'out', kind: 'exit', side: 'S', to: 'by_f15', toDoor: 'office', label: '나가기' }], { painted: 'office_riot' }),
+  withOwners(floorHall('by_elite', '정예팀 사무실', '15F', [{ id: 'out', kind: 'exit', side: 'S', to: 'by_f15', toDoor: 'office', label: '나가기' }], { painted: 'office_riot' })),
   floorHall('by_shower_f', '탈의실(여)', '15F', [{ id: 'out', kind: 'exit', side: 'S', to: 'by_f15', toDoor: 'wc_f', label: '나가기' }, { id: 'bath', kind: 'exit', to: 'by_bath_f', toDoor: 'out', label: '샤워실' }], { sex: '여', lockers: LOCKERS.shower_f, spots: lockerSpots('shower_f') }),
   floorHall('by_shower_m', '탈의실(남)', '15F', [{ id: 'out', kind: 'exit', side: 'S', to: 'by_f15', toDoor: 'wc_m', label: '나가기' }, { id: 'shower', kind: 'exit', to: 'by_bath_m', toDoor: 'out', label: '샤워실' }], { sex: '남', lockers: LOCKERS.shower_m, spots: lockerSpots('shower_m') }),
   floorHall('by_bath_f', '샤워실(여)', '15F', [{ id: 'out', kind: 'exit', to: 'by_shower_f', toDoor: 'bath', label: '탈의실' }], { sex: '여', showers: showerSpots('by_bath_f'), spots: MAPEDIT_SPOTS.bath_f }),

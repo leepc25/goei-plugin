@@ -99,5 +99,8 @@ test('백일몽: 13·15층 문 연결과 엘리베이터 건물 구분', () => {
   const by = M.ELEVATOR.filter((e) => e.bldg === 'by').map((e) => e.scene).sort();
   assert.deepEqual(by, ['by_f13', 'by_f15', 'by_lobby']);
   assert.ok(!byId.by_f15.doors.find((d) => d.id === 'rest'));
-  assert.equal(byId.by_office.painted, 'office'); assert.equal(byId.by_elite.painted, 'office_riot');
+  assert.equal(byId.by_office.painted, 'office');
+  const owners = (id) => byId[id].spots.filter((p) => p.owner).map((p) => p.owner);
+  assert.deepEqual(owners('by_office'), ['이자헌', '은하제', '박민성', '백사헌', '고영은', '강이학', '장허운']);
+  assert.deepEqual(owners('by_elite'), ['백석주', '진나솔', '이성해']); assert.equal(byId.by_elite.painted, 'office_riot');
 });
