@@ -34,10 +34,10 @@
 같음 | STYLE:
 바뀜/빠짐 | dense, highly detailed pixel art, crisp pixel clusters, selective dark outline, rich medium-to-detailed shading, faded grey, beige, dull blue, rust, soft daylight, no dithering, no blur.
 바뀜/빠짐 | No people, chairs, sofas, benches, coffee tables, clocks or cars.
-새 문장 | Pixel art game background of a clean modern Seoul office street sidewalk, late morning daylight.
+새 문장 | Pixel art game background of a clean modern office street sidewalk in Jongno, Seoul, late morning daylight.
 새 문장 | smooth clean grey paved sidewalk like one sheet.
 새 문장 | center 50 percent:
-새 문장 | the ground floor of a plain grey stone and glass office building, tops cut off, automatic glass double doors in the middle, closed, a little taller than an adult, a blank sign board above the doors;
+새 문장 | the ground floor of a plain grey stone and glass company building, tops cut off, automatic glass double doors in the middle, closed, a little taller than an adult, a blank sign board above the doors;
 새 문장 | clear sidewalk at the doors;
 새 문장 | left 25 percent:
 새 문장 | a city bus stop on the sidewalk, a glass shelter with a roof and a blank route sign pole;
