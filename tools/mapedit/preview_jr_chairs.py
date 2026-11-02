@@ -1,9 +1,9 @@
-"""중림 의자 확인 그림(2배): 배경 + 가림·소품(깊이 차례) + 지도 의자(chairs, 게임 drawChair와 같은 그림·배율) + 큐라스 서기."""
+"""중림 의자 확인 그림(2배): 배경 + 가림·소품(깊이 차례) + 지도 의자(chairs, 게임 drawChair와 같은 그림·배율) + 에일린 서기."""
 import json, sys
 from pathlib import Path
 from PIL import Image
 ROOT = Path(__file__).resolve().parents[2]
-spr = Image.open(ROOT / 'game-src/action/motion3/1.6_큐라스/1/00.png').convert('RGBA'); spr = spr.crop(spr.getbbox())
+spr = Image.open(ROOT / 'game-pack/char-1.4/1.webp').convert('RGBA').crop((0, 0, 62, 234)); spr = spr.crop(spr.getbbox())   # 지금 게임의 에일린 평상 대기 첫 장(11-02 사용자: 옛 그림 쓰지 말 것)
 
 def persp(g, y):
     sz = g.get('sizes')
