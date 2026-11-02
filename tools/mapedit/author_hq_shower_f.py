@@ -57,7 +57,9 @@ doors = {
 # 앞쪽도 끝까지 같은 원근(고정 구간 없음).
 SPR_DOTS = 247
 KH = 0.82 * 154 / (320 - 226)
-REFS = [(BACK, KH * (BACK - 226)), (320, KH * (320 - 226)), (424, KH * (424 - 226))]   # 맨 뒤 걷기선~화면 맨 아래까지 원근 (06:17 「왜 원근이 앞쪽엔 없냐」)
+MILD = 2 / 3   # 06:19 사용자 「원근 너무 급격」 → 문 앞(y320) 크기는 그대로, 앞뒤 변화율만 그림의 2/3
+hy = lambda y: KH * (320 - 226) + MILD * KH * (y - 320)
+REFS = [(BACK, hy(BACK)), (320, hy(320)), (424, hy(424))]
 TOP = max(h for _, h in REFS)
 m = {'file': 'hq_shower_f_strip', 'bgScale': K, 'dotK': round(TOP * K / SPR_DOTS, 4), 'sizes': [[y * K, round(h / TOP, 3)] for y, h in REFS], 'w': W, 'h': H, 'under': True,
      'floor': floor, 'lane': [BACK * K, H - 12], 'blocks': blocks, 'doors': doors, 'lamps': [], 'spots': [], 'objects': objects}
