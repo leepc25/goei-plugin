@@ -39,6 +39,9 @@ if os.environ.get("ERASE") == "1":
     win.paste((255, 255, 255, 255), (new, 0, new + ov, h))
     if top_h: win.paste((255, 255, 255, 255), (new, 0, new + ov_top, top_h))
     if bot_y: win.paste((255, 255, 255, 255), (new, bot_y, new + ov_bot, h))
+# GUIDE=<png>: 사용자가 승인한 배치 안내선(투명 바탕, 창 크기)을 지운 칸 위에 얹어 보낸다(2026-11-02 격리팀 실험실 옆벽 각도)
+if os.environ.get("GUIDE"):
+    g = Image.open(os.environ["GUIDE"]).convert("RGBA"); win.alpha_composite(g)
 # PREVIEW=<png>: 창·마스크만 그려 저장하고 보내지 않는다(「뽑아」 전에 보여 주기)
 if os.environ.get("PREVIEW"):
     sh = Image.new("RGB", (w, h * 2 + 8), (255, 0, 255)); sh.paste(win.convert("RGB"), (0, 0)); sh.paste(mask, (0, h + 8))
