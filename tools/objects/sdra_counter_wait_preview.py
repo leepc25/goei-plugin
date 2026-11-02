@@ -19,13 +19,13 @@ tmp = OUT + '.staff.png'
 subprocess.run([sys.executable, str(R/'tools/objects/sdra_counter_sit_preview.py')], env={**os.environ, 'OUT': tmp}, check=True)
 out = Image.open(tmp).convert('RGBA'); os.remove(tmp)
 # 2) 대기 의자
-BX, BY, BS = int(os.environ.get('BX', '1312')), int(os.environ.get('BY', '800')), float(os.environ.get('BS', '2.0'))  # 의자 가운데 x, 다리 바닥 y(2배 캔버스), 배율
-CV = os.environ.get('CV', 'v6')
-bench = Image.open(R/f'game-src/action/objects/C05{CV}_대기의자_뒷모습/unknown.png').convert('RGBA')
+BX, BY, BS = int(os.environ.get('BX', '1312')), int(os.environ.get('BY', '800')), float(os.environ.get('BS', '1.5'))  # 의자 가운데 x, 다리 바닥 y(2배 캔버스), 배율
+CV = os.environ.get('CV', 'v6n')
+bench = Image.open(R/('game-src/action/objects/C05v6_대기의자_8방향/north.png' if CV == 'v6n' else f'game-src/action/objects/C05{CV}_대기의자_뒷모습/unknown.png')).convert('RGBA')
 # 의자별(1배): 좌석 가운데 x, 다리 바닥 y, 좌석 윗면 y. 사무의자 north 좌석 윗면 = 바닥 위 74
-GEO = {'v5': ([58.5, 125, 191], 130, 70), 'v6': ([81, 126, 171.5], 120, 74)}
+GEO = {'v5': ([58.5, 125, 191], 130, 70), 'v6': ([81, 126, 171.5], 120, 74), 'v6n': ([82, 126, 170.5], 166, 124)}   # v6n = 8방향 돌리기 북쪽(진짜 뒷모습), 좌석 윗면은 앞모습 비율로 바닥 위 42
 SEATS_X, BENCH_FLOOR, SEAT_TOP = GEO[CV]
-K = float(os.environ.get('K', 74/(BENCH_FLOOR-SEAT_TOP) if CV == 'v6' else 1.0))   # v6 은 작게 나와서 좌석 높이가 사무의자와 같게 키움   # 좌석 등받이 가운데 x, 다리 바닥 y (1배)
+K = float(os.environ.get('K', {'v6': 1.3, 'v6n': 1.45}.get(CV, 1.0)))   # v6 은 작게 나와서 좌석 높이가 사무의자와 같게 키움   # 좌석 등받이 가운데 x, 다리 바닥 y (1배)
 C01_X, C01_FLOOR = 90.5, 172                    # C01 north 200 칸: 등받이 가운데 x, 바닥 y
 PEOPLE = os.environ.get('WHO', '1.4_에일린,1.9_데드폴,1.12_콘쥬스').split(',')
 BK = BS*K; bx0 = BX - bench.width*BK/2; by0 = BY - BENCH_FLOOR*BK
