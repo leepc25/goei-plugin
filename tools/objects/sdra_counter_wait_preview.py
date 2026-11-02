@@ -6,6 +6,13 @@ R = Path('/home/user/goei-plugin'); HERE = R/'game-src/action/testroom3'
 sys.path.insert(0, str(HERE)); sys.path.insert(0, str(HERE/'qa')); sys.argv = sys.argv[:1]
 import fit_chair as fc
 from PIL import Image
+import json
+FIT = json.loads((R/'game-src/art/objects/chairs_office/fit_all.json').read_text())
+SEATPT = {'north':(91,101)}
+def person_pt(key, v):
+    cfg, _ = fc.load(key); im = fc.last(cfg, '61'); q = FIT[key][v]
+    bot = min(im.size[1]-4, im.getbbox()[3]); sx, sy = SEATPT[q['img']]
+    return im, (q['dx'] - 100 + sx + im.size[0]/2, q['dy'] - 171 + sy + bot), q['img']
 OUT = os.environ.get('OUT', '/mnt/project-files/sdra/sdra_counter_wait_v1_x2.png')
 # 1) 창구 직원 판(FC 등은 환경변수로 그대로 넘김)
 tmp = OUT + '.staff.png'
@@ -19,16 +26,11 @@ C01_X, C01_FLOOR = 90.5, 172                    # C01 north 200 칸: 등받이 �
 PEOPLE = os.environ.get('WHO', '1.4_에일린,1.9_데드폴,1.12_콘쥬스').split(',')
 bx0 = BX - bench.width*BS/2; by0 = BY - BENCH_FLOOR*BS
 L = Image.new('RGBA', out.size, (0, 0, 0, 0))
+SEAT_Y = BENCH_FLOOR - (172 - 101)   # 사무의자 north 좌석 점(91,101)은 바닥 위 71 → 대기의자도 바닥 위 71 (같은 좌석 높이로 뽑음)
 for sx, key in zip(SEATS_X, PEOPLE):
-    cfg, _ = fc.load(key); ims, vals = fc.values(cfg); im = ims['back']; p = vals['back']
-    TW, TH = 260, 300; base = TH - 10
-    ox, oy0 = TW//2 - im.size[0]//2, base - (im.size[1] - 4)
-    cx, cy = TW/2 + p['dx'] - 100, base + p['dy'] - 171   # 이 사람 기준 C01 north 칸 왼위
-    # C01 점(cx+C01_X, cy+C01_FLOOR) 이 C05 좌석 점에 오게 사람을 옮김
-    tx = bx0 + sx*BS - (cx + C01_X)*BS; ty = by0 + BENCH_FLOOR*BS - (cy + C01_FLOOR)*BS
-    T = Image.new('RGBA', (TW, TH), (0, 0, 0, 0)); T.alpha_composite(im, (ox, oy0))
-    Ts = T.resize((round(TW*BS), round(TH*BS)), Image.NEAREST)
-    L.alpha_composite(Ts, (round(tx), round(ty)))
+    im, (px0, py0), img = person_pt(key, 'back')
+    seat = (bx0 + sx*BS, by0 + SEAT_Y*BS)
+    L.alpha_composite(im.resize((round(im.size[0]*BS), round(im.size[1]*BS)), Image.NEAREST), (round(seat[0]-px0*BS), round(seat[1]-py0*BS)))
 L.alpha_composite(bench.resize((round(bench.width*BS), round(bench.height*BS)), Image.NEAREST), (round(bx0), round(by0)))
 out.alpha_composite(L)
 out.convert('RGB').save(OUT); print(OUT, out.size)

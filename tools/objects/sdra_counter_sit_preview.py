@@ -18,21 +18,26 @@ SEATS = [  # x2, floor y2, scale, view, key, occl_y2(이 줄 아래는 배경이
     (1704, int(os.environ.get('FC', '595')), float(os.environ.get('SC', '1.2')), 'front', '6.28_협회여2', int(os.environ.get('OC', '456')), (1505, 1904)),
 ]
 SEATS = [x for x in SEATS if not ('협회' in x[4] and x[1] < 500)]  # 12:19 뒷자리 협회 직원 빼기, 오른쪽 창구 돌림 자리는 둠
+import json
+FIT = json.loads((R/'game-src/art/objects/chairs_office/fit_all.json').read_text())   # 사무의자 C01 인물별 맞춤값(11-02 손으로 딴 값)
+SEATPT = {'south':(92,107),'south-east':(108,106),'south-west':(76,106),'east':(83,97),'north':(91,101),'north-east':(97,101),'north-west':(88,101),'west':(104,95)}
+LID = {'front':'60','side':'96','back':'61'}
+def person_pt(key, v):
+    """맞춤값 → 앉기 끝 장의 엉덩이·가랑이 점(1배)과 그 그림, 의자 방향"""
+    cfg, _ = fc.load(key); im = fc.last(cfg, LID[v]); q = FIT[key][v]
+    bot = min(im.size[1]-4, im.getbbox()[3]); sx, sy = SEATPT[q['img']]
+    return im, (q['dx'] - 100 + sx + im.size[0]/2, q['dy'] - 171 + sy + bot), q['img']
 out = BG2.copy()
 for x2, fy, s, v, key, oy, (xa, xb) in SEATS:
-    cfg, _ = fc.load(key); ims, vals = fc.values(cfg)
-    im = ims[v]; p = vals[v]
-    TW, TH = 260, 300; base = TH - 10
-    T = Image.new('RGBA', (TW, TH), (0, 0, 0, 0))
-    ox, oy0 = TW//2 - im.size[0]//2, base - (im.size[1] - 4)
-    cx, cy = round(TW/2 + p['dx'] - 100), round(base + p['dy'] - 171)
-    c = Image.open(fc.chair_png(p.get('img', 'south'))).convert('RGBA')
-    T.alpha_composite(c, (cx, cy)); T.alpha_composite(im, (ox, oy0))
-    Ts = T.resize((round(TW*s), round(TH*s)), Image.NEAREST)
-    px, py = round(x2 - TW/2*s), round(fy - base*s)
-    L = Image.new('RGBA', out.size, (0, 0, 0, 0)); L.alpha_composite(Ts, (max(px, 0), py) if px >= 0 else (0, py))
+    im, (px0, py0), img = person_pt(key, v)
+    c = Image.open(fc.chair_png(img)).convert('RGBA')
+    # 의자 200칸: 바닥(172) 가운데를 (x2, fy)에. 의자는 제자리, 사람은 맞춤 점을 좌석 점에
+    chx, chy = x2 - 100*s, fy - 172*s
+    seat = (chx + SEATPT[img][0]*s, chy + SEATPT[img][1]*s)
+    L = Image.new('RGBA', out.size, (0, 0, 0, 0))
+    L.alpha_composite(c.resize((round(200*s), round(200*s)), Image.NEAREST), (round(chx), round(chy)))
+    L.alpha_composite(im.resize((round(im.size[0]*s), round(im.size[1]*s)), Image.NEAREST), (round(seat[0]-px0*s), round(seat[1]-py0*s)))
     out.alpha_composite(L)
-    # 가림: oy 아래, 이 자리 x 범위만 배경을 다시 얹음
     out.alpha_composite(BG2.crop((xa, oy, xb, BG2.height)), (xa, oy))
 o = os.environ.get('OUT') or '/mnt/project-files/sdra/sdra_counter_sit_v1_x2.png'
 out.convert('RGB').save(o); print(o, out.size)
