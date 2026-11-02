@@ -13,10 +13,11 @@ export function classify(text: string): Intent {
   return null;
 }
 
-export const MAX_FOLLOWERS = 4;
+/** 동행 인원 제한 없음 (11-01 사용자) */
+export const MAX_FOLLOWERS = Infinity;
 export interface Companion { npc: string; since: number }
 
-/** 앞에서부터 4명만 필드에 나온다. 나머지는 확정 사실에만 남는다 */
+/** 동행 전원이 필드에 나온다 (11-01 사용자: 제한 없음). rest 는 늘 비어 있음 */
 export function fieldCompanions(all: string[]): { shown: string[]; rest: string[] } {
   const seen = [...new Set(all.map(s => s.trim()).filter(Boolean))];
   return { shown: seen.slice(0, MAX_FOLLOWERS), rest: seen.slice(MAX_FOLLOWERS) };

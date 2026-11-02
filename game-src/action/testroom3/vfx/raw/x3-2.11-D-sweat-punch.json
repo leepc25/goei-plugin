@@ -1,0 +1,235 @@
+{
+ "frames": [
+  {
+   "filename": "x3-2-11-d-sweat-punch 0.png",
+   "frame": {
+    "x": 0,
+    "y": 0,
+    "w": 296,
+    "h": 240
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 296,
+    "h": 240
+   },
+   "sourceSize": {
+    "w": 296,
+    "h": 240
+   },
+   "pivot": {
+    "x": 0.42567567567567566,
+    "y": 0.5
+   },
+   "duration": 63
+  },
+  {
+   "filename": "x3-2-11-d-sweat-punch 1.png",
+   "frame": {
+    "x": 296,
+    "y": 0,
+    "w": 296,
+    "h": 240
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 296,
+    "h": 240
+   },
+   "sourceSize": {
+    "w": 296,
+    "h": 240
+   },
+   "pivot": {
+    "x": 0.42567567567567566,
+    "y": 0.5
+   },
+   "duration": 63
+  },
+  {
+   "filename": "x3-2-11-d-sweat-punch 2.png",
+   "frame": {
+    "x": 592,
+    "y": 0,
+    "w": 296,
+    "h": 240
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 296,
+    "h": 240
+   },
+   "sourceSize": {
+    "w": 296,
+    "h": 240
+   },
+   "pivot": {
+    "x": 0.42567567567567566,
+    "y": 0.5
+   },
+   "duration": 63
+  },
+  {
+   "filename": "x3-2-11-d-sweat-punch 3.png",
+   "frame": {
+    "x": 0,
+    "y": 240,
+    "w": 296,
+    "h": 240
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 296,
+    "h": 240
+   },
+   "sourceSize": {
+    "w": 296,
+    "h": 240
+   },
+   "pivot": {
+    "x": 0.42567567567567566,
+    "y": 0.5
+   },
+   "duration": 63
+  },
+  {
+   "filename": "x3-2-11-d-sweat-punch 4.png",
+   "frame": {
+    "x": 296,
+    "y": 240,
+    "w": 296,
+    "h": 240
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 296,
+    "h": 240
+   },
+   "sourceSize": {
+    "w": 296,
+    "h": 240
+   },
+   "pivot": {
+    "x": 0.42567567567567566,
+    "y": 0.5
+   },
+   "duration": 63
+  },
+  {
+   "filename": "x3-2-11-d-sweat-punch 5.png",
+   "frame": {
+    "x": 592,
+    "y": 240,
+    "w": 296,
+    "h": 240
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 296,
+    "h": 240
+   },
+   "sourceSize": {
+    "w": 296,
+    "h": 240
+   },
+   "pivot": {
+    "x": 0.42567567567567566,
+    "y": 0.5
+   },
+   "duration": 63
+  },
+  {
+   "filename": "x3-2-11-d-sweat-punch 6.png",
+   "frame": {
+    "x": 0,
+    "y": 480,
+    "w": 296,
+    "h": 240
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 296,
+    "h": 240
+   },
+   "sourceSize": {
+    "w": 296,
+    "h": 240
+   },
+   "pivot": {
+    "x": 0.42567567567567566,
+    "y": 0.5
+   },
+   "duration": 63
+  },
+  {
+   "filename": "x3-2-11-d-sweat-punch 7.png",
+   "frame": {
+    "x": 296,
+    "y": 480,
+    "w": 296,
+    "h": 240
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 296,
+    "h": 240
+   },
+   "sourceSize": {
+    "w": 296,
+    "h": 240
+   },
+   "pivot": {
+    "x": 0.42567567567567566,
+    "y": 0.5
+   },
+   "duration": 63
+  }
+ ],
+ "meta": {
+  "app": "PixelLab VFX Creator",
+  "image": "x3-2-11-d-sweat-punch.png",
+  "format": "RGBA8888",
+  "size": {
+   "w": 888,
+   "h": 720
+  },
+  "scale": "1",
+  "anchor": {
+   "kind": "origin",
+   "x": 126,
+   "y": 120
+  },
+  "frameTags": [
+   {
+    "name": "x3-2-11-d-sweat-punch",
+    "from": 0,
+    "to": 7,
+    "direction": "forward"
+   }
+  ]
+ }
+}

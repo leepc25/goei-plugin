@@ -1,0 +1,72 @@
+[
+ {
+  "name": "날아가 쓰러지기 남서",
+  "frames": 8,
+  "action": "knocked off her feet backward: the face twists in pain, both feet leave the floor and the body falls backward through the air, lands flat on the back and lies still with the arms out and the legs straight. Only the character, nothing else drawn",
+  "prompt": "Twist the face into a grimace of pain and jolt the torso abruptly backward. Lift both feet off the ground as the body arcs through the air, crash flat onto the back, and settle into a motionless sprawl with limbs extended.",
+  "usage": {
+   "type": "generations",
+   "generations": 0.05
+  }
+ },
+ {
+  "name": "필살기 RPG",
+  "frames": 12,
+  "action": "super move with an RPG-7: reach behind the back and swing an RPG-7 launcher onto the right shoulder (a long thin olive tube with a pointed cone-shaped rocket warhead sticking out of the front end), drop to one knee and aim forward, fire so the shoulders jolt back from the recoil and the warhead is gone from the tube, then toss the empty tube aside and rise into the fighting stance. Only the character and the launcher, no fire, smoke or flash drawn",
+  "prompt": "Reach behind the back to swing the RPG-7 onto the shoulder, drop to one knee to aim forward, and fire to jolt the shoulders back. Toss the empty tube aside while rising to return to the fighting stance.",
+  "usage": {
+   "type": "generations",
+   "generations": 0.05
+  }
+ },
+ {
+  "name": "평상 대기",
+  "frames": 4,
+  "action": "standing idle almost perfectly still: barely visible breathing, the shoulders rise a tiny bit and the ponytail tip moves a tiny bit; the body, head, arms and feet stay where they are",
+  "prompt": "Inhale slowly to lift the shoulders and chest slightly, allowing the ponytail tip to drift upward with the subtle expansion. Exhale gently to lower the torso and let the hair weight settle back into the initial resting position.",
+  "usage": {
+   "type": "generations",
+   "generations": 0.05
+  }
+ },
+ {
+  "name": "제압사격",
+  "frames": 8,
+  "action": "suppressive fire facing east the whole time: plant the feet wide, raise the submachine gun to the shoulder and fire a long continuous burst straight ahead to the east, the muzzle moving up and down between the floor ahead and head height, the shoulders shaking with the recoil, then lower the gun to the chest. The body never turns toward the viewer. No flash or smoke drawn",
+  "prompt": "Plant the feet wide and raise the submachine gun to the shoulder. Fire a long continuous burst while shaking with recoil, dragging the muzzle between the floor and head height, then lower the weapon to the chest to settle.",
+  "usage": {
+   "type": "generations",
+   "generations": 0.05
+  }
+ },
+ {
+  "name": "주저앉아 뒤로 기어나가기",
+  "frames": 8,
+  "action": "sitting on the floor in fear, crab-crawling backward away from the enemy: hands on the floor behind and feet on the floor in front, the hips lifted a little off the floor, move the right hand and the left foot back, then the left hand and the right foot back, the body travelling backward each step, still facing the enemy",
+  "prompt": "Push backward with the hands and feet to lift the hips, sliding the body away from the threat. Alternate shifting the hands and feet in a rhythmic, retreating crawl until settling back into a seated position.",
+  "usage": {
+   "type": "generations",
+   "generations": 0.05
+  }
+ },
+ {
+  "name": "뒷걸음질 반복",
+  "frames": 8,
+  "action": "keep walking backward away from the enemy in front, still facing the enemy: lift the rear foot and set it down behind the body, then the front foot steps back past it, two full backward steps, the upper body leaning back and both open hands raised at chest height",
+  "prompt": "Step backward by lifting the rear foot to plant it behind the lead, then draw the front foot back to meet it. Maintain an upright, defensive stance with hands raised at chest height as the body recedes with steady, rhythmic momentum.",
+  "usage": {
+   "type": "generations",
+   "generations": 0.05
+  }
+ },
+ {
+  "name": "엎드려 기기 반복",
+  "frames": 8,
+  "action": "injured, crawling forward on the belly: reach one forearm ahead and dig it into the floor, drag the chest and hips forward while the opposite knee slides up and pushes, then the other forearm and knee the same way; the belly stays on the floor; two full crawl strokes",
+  "prompt": "Reach a forearm forward to dig into the floor, dragging the chest and hips ahead as the opposite knee slides up to push. Repeat the motion with the other arm and leg, pulling the torso firmly across the floor.",
+  "usage": {
+   "type": "generations",
+   "generations": 0.05
+  }
+ }
+]

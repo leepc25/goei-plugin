@@ -171,8 +171,6 @@ if (existsSync('card/원본_봇카드.jpeg')) {
   if (r.status !== 0) console.log(`실제 카드 module.json 을 풀지 못했어요 (실제 카드 시험은 건너뜀): ${(r.stderr || r.error?.message || '').trim().split('\n').pop()}`);
 }
 
-// 회색 상자 순수 시뮬레이션 (화면·조작 시연판·본부 시연판이 아직 쓴다). 시험: tests/graybox.test.mjs
-await build({ entryPoints: ['src/game/action/graybox/sim.ts'], bundle: true, format: 'esm', target: 'es2022', outfile: 'dist-test/graybox-sim.mjs' });
 
 // 게임 엔진 시연판 (전투·조작·장면 관리). 쟈알디 그림 묶음(game-pack/jyaldi)을 내장한 단일 HTML.
 await build({ ...common, entryPoints: ['src/game/action/engine/demo.ts'], format: 'esm', minify: true, write: true, outfile: 'dist-test/engine-demo.js' });
@@ -193,12 +191,6 @@ await build({ ...common, entryPoints: ['src/game/action/engine/demo.ts'], format
       if (existsSync(f)) items[id] = { src: `data:image/png;base64,${readFileSync(f).toString('base64')}`, w: e.w, h: e.h, grip: e.grip, foot: e.foot };
     }
   }
-  const testPeople = {};
-  for (const f of readdirSync('game-pack/test-people').filter((f) => /\.(png|webp)$/.test(f) && !f.startsWith('woman_'))) {
-    testPeople[f.replace(/\.(png|webp)$/, '')] = `data:image/${f.endsWith('.webp') ? 'webp' : 'png'};base64,${readFileSync(`game-pack/test-people/${f}`).toString('base64')}`;
-  }
-  testPeople.eileen = JSON.parse(readFileSync('game-pack/test-people/eileen.json', 'utf8'));
-  testPeople.eileen_vfx = JSON.parse(readFileSync('game-pack/test-people/eileen_vfx.json', 'utf8'));
   const hqDoor = {};
   for (const key of ['frame', 'aperture', 'leaf-left', 'leaf-right', 'entry-marker']) {
     hqDoor[key] = `data:image/png;base64,${readFileSync(`game-pack/hq-door-round2/${key}.png`).toString('base64')}`;
@@ -208,16 +200,34 @@ await build({ ...common, entryPoints: ['src/game/action/engine/demo.ts'], format
     hqField[f.slice(0, -5)] = `data:image/webp;base64,${readFileSync(`game-pack/${pack}/${f}`).toString('base64')}`;
   }
   const code = readFileSync('dist-test/engine-demo.js', 'utf8').replace(/<\/script/gi, '<\\/script');
-  const html = `<!doctype html><html lang="ko"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"><title>관리국 액션 · 전투 시연</title><style>html,body{margin:0;height:100%;background:#000;overflow:hidden}#box{position:fixed;inset:0}</style><div id="box"></div><script>window.__GOEI_ENGINE_ART__=${JSON.stringify(art)};window.__GOEI_BG_ART__=${JSON.stringify(bg)};window.__GOEI_ITEM_ART__=${JSON.stringify(items)};window.__GOEI_HQ_DOOR_ROUND2__=${JSON.stringify(hqDoor)};window.__GOEI_HQ_FIELD__=${JSON.stringify(hqField)};window.__GOEI_TEST_PEOPLE__=${JSON.stringify(testPeople)}</script><script type="module">${code}</script></html>`;
+  const html = `<!doctype html><html lang="ko"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"><title>관리국 액션 · 전투 시연</title><style>html,body{margin:0;height:100%;background:#000;overflow:hidden}#box{position:fixed;inset:0}</style><div id="box"></div><script>window.__GOEI_ENGINE_ART__=${JSON.stringify(art)};window.__GOEI_BG_ART__=${JSON.stringify(bg)};window.__GOEI_ITEM_ART__=${JSON.stringify(items)};window.__GOEI_HQ_DOOR_ROUND2__=${JSON.stringify(hqDoor)};window.__GOEI_HQ_FIELD__=${JSON.stringify(hqField)}</script><script type="module">${code}</script></html>`;
   writeFileSync('dist/goei-action-game.html', html);
   mkdirSync('release/demo', { recursive: true });
   writeFileSync('release/demo/goei-action-game.html', html);
+  // 필드 시연판 (11-02): 본 게임 + 가짜 다리, 팩은 저장소 game-pack/ 원본을 raw.githubusercontent 에서 받는다 (src/game/action/engine/fielddemo.ts)
+  {
+    const manifest = {};
+    for (const d of readdirSync('game-pack')) {
+      if (!existsSync(`game-pack/${d}/pack.json`)) continue;
+      const spec = JSON.parse(readFileSync(`game-pack/${d}/pack.json`, 'utf8'));
+      const names = readdirSync(`game-pack/${d}`).filter((f) => f !== 'pack.json' && f !== 'atlas.json' && !f.startsWith('.') && !f.endsWith('.md')).sort();
+      const atlas = names.length && existsSync(`game-pack/${d}/atlas.json`) ? JSON.parse(readFileSync(`game-pack/${d}/atlas.json`, 'utf8')) : null;
+      manifest[spec.id] = { dir: d, files: names, atlas };
+    }
+    const fd = await build({ ...common, entryPoints: ['src/game/action/engine/fielddemo.ts'], format: 'esm', minify: true, write: false });
+    const fdCode = fd.outputFiles[0].text.replace(/<\/script/gi, '<\\/script');
+    writeFileSync('release/demo/goei-field-demo.html', `<!doctype html><html lang="ko"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"><title>괴이 ː ANOMALY · 필드 시연판</title><style>html,body{margin:0;height:100%;background:#000;overflow:hidden}#box{position:fixed;inset:0}</style><div id="box"></div><script>window.__GOEI_ENGINE_ART__=${JSON.stringify(art)};window.__GOEI_BG_ART__=${JSON.stringify(bg)};window.__GOEI_ITEM_ART__=${JSON.stringify(items)};window.__GOEI_HQ_DOOR_ROUND2__=${JSON.stringify(hqDoor)};window.__GOEI_PACK_MANIFEST__=${JSON.stringify(manifest)}</script><script type="module">${fdCode}</script></html>`);
+  }
+  // 인물 시험장 (옛 통합 테스트룸 대신, src/game/action/fighter/testroom.ts): 게임 그대로 + 옆 판. 인물 팩은 game-pack/ 에서 받는다 (저장소 맨 위에서 정적 서버로 열기)
+  const tr = await build({ ...common, entryPoints: ['src/game/action/fighter/testroom.ts'], format: 'esm', minify: true, write: false });
+  const trCode = tr.outputFiles[0].text.replace(/<\/script/gi, '<\\/script');
+  writeFileSync('dist/goei-testroom.html', `<!doctype html><html lang="ko"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>인물 시험장</title><body><script>window.__GOEI_ENGINE_ART__=${JSON.stringify(art)};window.__GOEI_BG_ART__=${JSON.stringify(bg)};window.__GOEI_ITEM_ART__=${JSON.stringify(items)}</script><script type="module">${trCode}</script></body></html>`);
 }
 // 소리 시험실 (효과음·음악·환경음 전부 코드 합성): 단일 HTML. 순수 로직은 시험용으로 따로 묶는다.
 {
   const out = await build({ ...common, entryPoints: ['src/game/action/audio/demo.ts'], format: 'esm', minify: true });
   const code = out.outputFiles[0].text.replace(/<\/script/gi, '<\\/script');
-  const html = `<!doctype html><html lang="ko"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>소리 시험실 · 차원 승강기</title><body><script type="module">${code}</script></body></html>`;
+  const html = `<!doctype html><html lang="ko"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>소리 시험실</title><body><script type="module">${code}</script></body></html>`;
   writeFileSync('dist/goei-sound.html', html);
   mkdirSync('release/demo', { recursive: true });
   writeFileSync('release/demo/goei-sound.html', html);

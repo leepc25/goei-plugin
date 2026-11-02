@@ -1,0 +1,339 @@
+{
+ "frames": [
+  {
+   "filename": "x3-3-14-s2-reagent-rain 0.png",
+   "frame": {
+    "x": 0,
+    "y": 0,
+    "w": 394,
+    "h": 280
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 394,
+    "h": 280
+   },
+   "sourceSize": {
+    "w": 394,
+    "h": 280
+   },
+   "pivot": {
+    "x": 0.5101522842639594,
+    "y": 0.8785714285714286
+   },
+   "duration": 83
+  },
+  {
+   "filename": "x3-3-14-s2-reagent-rain 1.png",
+   "frame": {
+    "x": 394,
+    "y": 0,
+    "w": 394,
+    "h": 280
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 394,
+    "h": 280
+   },
+   "sourceSize": {
+    "w": 394,
+    "h": 280
+   },
+   "pivot": {
+    "x": 0.5101522842639594,
+    "y": 0.8785714285714286
+   },
+   "duration": 83
+  },
+  {
+   "filename": "x3-3-14-s2-reagent-rain 2.png",
+   "frame": {
+    "x": 788,
+    "y": 0,
+    "w": 394,
+    "h": 280
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 394,
+    "h": 280
+   },
+   "sourceSize": {
+    "w": 394,
+    "h": 280
+   },
+   "pivot": {
+    "x": 0.5101522842639594,
+    "y": 0.8785714285714286
+   },
+   "duration": 83
+  },
+  {
+   "filename": "x3-3-14-s2-reagent-rain 3.png",
+   "frame": {
+    "x": 1182,
+    "y": 0,
+    "w": 394,
+    "h": 280
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 394,
+    "h": 280
+   },
+   "sourceSize": {
+    "w": 394,
+    "h": 280
+   },
+   "pivot": {
+    "x": 0.5101522842639594,
+    "y": 0.8785714285714286
+   },
+   "duration": 83
+  },
+  {
+   "filename": "x3-3-14-s2-reagent-rain 4.png",
+   "frame": {
+    "x": 0,
+    "y": 280,
+    "w": 394,
+    "h": 280
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 394,
+    "h": 280
+   },
+   "sourceSize": {
+    "w": 394,
+    "h": 280
+   },
+   "pivot": {
+    "x": 0.5101522842639594,
+    "y": 0.8785714285714286
+   },
+   "duration": 83
+  },
+  {
+   "filename": "x3-3-14-s2-reagent-rain 5.png",
+   "frame": {
+    "x": 394,
+    "y": 280,
+    "w": 394,
+    "h": 280
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 394,
+    "h": 280
+   },
+   "sourceSize": {
+    "w": 394,
+    "h": 280
+   },
+   "pivot": {
+    "x": 0.5101522842639594,
+    "y": 0.8785714285714286
+   },
+   "duration": 83
+  },
+  {
+   "filename": "x3-3-14-s2-reagent-rain 6.png",
+   "frame": {
+    "x": 788,
+    "y": 280,
+    "w": 394,
+    "h": 280
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 394,
+    "h": 280
+   },
+   "sourceSize": {
+    "w": 394,
+    "h": 280
+   },
+   "pivot": {
+    "x": 0.5101522842639594,
+    "y": 0.8785714285714286
+   },
+   "duration": 83
+  },
+  {
+   "filename": "x3-3-14-s2-reagent-rain 7.png",
+   "frame": {
+    "x": 1182,
+    "y": 280,
+    "w": 394,
+    "h": 280
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 394,
+    "h": 280
+   },
+   "sourceSize": {
+    "w": 394,
+    "h": 280
+   },
+   "pivot": {
+    "x": 0.5101522842639594,
+    "y": 0.8785714285714286
+   },
+   "duration": 83
+  },
+  {
+   "filename": "x3-3-14-s2-reagent-rain 8.png",
+   "frame": {
+    "x": 0,
+    "y": 560,
+    "w": 394,
+    "h": 280
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 394,
+    "h": 280
+   },
+   "sourceSize": {
+    "w": 394,
+    "h": 280
+   },
+   "pivot": {
+    "x": 0.5101522842639594,
+    "y": 0.8785714285714286
+   },
+   "duration": 83
+  },
+  {
+   "filename": "x3-3-14-s2-reagent-rain 9.png",
+   "frame": {
+    "x": 394,
+    "y": 560,
+    "w": 394,
+    "h": 280
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 394,
+    "h": 280
+   },
+   "sourceSize": {
+    "w": 394,
+    "h": 280
+   },
+   "pivot": {
+    "x": 0.5101522842639594,
+    "y": 0.8785714285714286
+   },
+   "duration": 83
+  },
+  {
+   "filename": "x3-3-14-s2-reagent-rain 10.png",
+   "frame": {
+    "x": 788,
+    "y": 560,
+    "w": 394,
+    "h": 280
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 394,
+    "h": 280
+   },
+   "sourceSize": {
+    "w": 394,
+    "h": 280
+   },
+   "pivot": {
+    "x": 0.5101522842639594,
+    "y": 0.8785714285714286
+   },
+   "duration": 83
+  },
+  {
+   "filename": "x3-3-14-s2-reagent-rain 11.png",
+   "frame": {
+    "x": 1182,
+    "y": 560,
+    "w": 394,
+    "h": 280
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 394,
+    "h": 280
+   },
+   "sourceSize": {
+    "w": 394,
+    "h": 280
+   },
+   "pivot": {
+    "x": 0.5101522842639594,
+    "y": 0.8785714285714286
+   },
+   "duration": 83
+  }
+ ],
+ "meta": {
+  "app": "PixelLab VFX Creator",
+  "image": "x3-3-14-s2-reagent-rain.png",
+  "format": "RGBA8888",
+  "size": {
+   "w": 1576,
+   "h": 840
+  },
+  "scale": "1",
+  "anchor": {
+   "kind": "origin",
+   "x": 201,
+   "y": 246
+  },
+  "frameTags": [
+   {
+    "name": "x3-3-14-s2-reagent-rain",
+    "from": 0,
+    "to": 11,
+    "direction": "forward"
+   }
+  ]
+ }
+}

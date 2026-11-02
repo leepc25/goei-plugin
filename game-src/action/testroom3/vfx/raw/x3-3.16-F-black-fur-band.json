@@ -1,0 +1,235 @@
+{
+ "frames": [
+  {
+   "filename": "x3-3-16-f-black-fur-band 0.png",
+   "frame": {
+    "x": 0,
+    "y": 0,
+    "w": 490,
+    "h": 37
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 490,
+    "h": 37
+   },
+   "sourceSize": {
+    "w": 490,
+    "h": 37
+   },
+   "pivot": {
+    "x": 0.5163265306122449,
+    "y": 0.7297297297297297
+   },
+   "duration": 83
+  },
+  {
+   "filename": "x3-3-16-f-black-fur-band 1.png",
+   "frame": {
+    "x": 490,
+    "y": 0,
+    "w": 490,
+    "h": 37
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 490,
+    "h": 37
+   },
+   "sourceSize": {
+    "w": 490,
+    "h": 37
+   },
+   "pivot": {
+    "x": 0.5163265306122449,
+    "y": 0.7297297297297297
+   },
+   "duration": 83
+  },
+  {
+   "filename": "x3-3-16-f-black-fur-band 2.png",
+   "frame": {
+    "x": 980,
+    "y": 0,
+    "w": 490,
+    "h": 37
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 490,
+    "h": 37
+   },
+   "sourceSize": {
+    "w": 490,
+    "h": 37
+   },
+   "pivot": {
+    "x": 0.5163265306122449,
+    "y": 0.7297297297297297
+   },
+   "duration": 83
+  },
+  {
+   "filename": "x3-3-16-f-black-fur-band 3.png",
+   "frame": {
+    "x": 0,
+    "y": 37,
+    "w": 490,
+    "h": 37
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 490,
+    "h": 37
+   },
+   "sourceSize": {
+    "w": 490,
+    "h": 37
+   },
+   "pivot": {
+    "x": 0.5163265306122449,
+    "y": 0.7297297297297297
+   },
+   "duration": 83
+  },
+  {
+   "filename": "x3-3-16-f-black-fur-band 4.png",
+   "frame": {
+    "x": 490,
+    "y": 37,
+    "w": 490,
+    "h": 37
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 490,
+    "h": 37
+   },
+   "sourceSize": {
+    "w": 490,
+    "h": 37
+   },
+   "pivot": {
+    "x": 0.5163265306122449,
+    "y": 0.7297297297297297
+   },
+   "duration": 83
+  },
+  {
+   "filename": "x3-3-16-f-black-fur-band 5.png",
+   "frame": {
+    "x": 980,
+    "y": 37,
+    "w": 490,
+    "h": 37
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 490,
+    "h": 37
+   },
+   "sourceSize": {
+    "w": 490,
+    "h": 37
+   },
+   "pivot": {
+    "x": 0.5163265306122449,
+    "y": 0.7297297297297297
+   },
+   "duration": 83
+  },
+  {
+   "filename": "x3-3-16-f-black-fur-band 6.png",
+   "frame": {
+    "x": 0,
+    "y": 74,
+    "w": 490,
+    "h": 37
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 490,
+    "h": 37
+   },
+   "sourceSize": {
+    "w": 490,
+    "h": 37
+   },
+   "pivot": {
+    "x": 0.5163265306122449,
+    "y": 0.7297297297297297
+   },
+   "duration": 83
+  },
+  {
+   "filename": "x3-3-16-f-black-fur-band 7.png",
+   "frame": {
+    "x": 490,
+    "y": 74,
+    "w": 490,
+    "h": 37
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 490,
+    "h": 37
+   },
+   "sourceSize": {
+    "w": 490,
+    "h": 37
+   },
+   "pivot": {
+    "x": 0.5163265306122449,
+    "y": 0.7297297297297297
+   },
+   "duration": 83
+  }
+ ],
+ "meta": {
+  "app": "PixelLab VFX Creator",
+  "image": "x3-3-16-f-black-fur-band.png",
+  "format": "RGBA8888",
+  "size": {
+   "w": 1470,
+   "h": 111
+  },
+  "scale": "1",
+  "anchor": {
+   "kind": "origin",
+   "x": 253,
+   "y": 27
+  },
+  "frameTags": [
+   {
+    "name": "x3-3-16-f-black-fur-band",
+    "from": 0,
+    "to": 7,
+    "direction": "forward"
+   }
+  ]
+ }
+}

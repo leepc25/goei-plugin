@@ -2,12 +2,34 @@
 // 이름 인물: 욕구 + 의무 → 할 일 고르기(needs.ts). 클립이 있는 활동만 켜지고, 없으면 서성이기·장면 오가기.
 // 몹: 나올 때마다 성향을 뽑고(mobs.ts), 지나가다 자기 판단으로 사건을 일으킨다(소매치기·시비). 근무형은 근무시간에 자리를 지킨다.
 // 소란도는 장면 단위. 경찰·경비는 플레이어 범죄에만 나선다(crime). 화면 밖 장면도 같은 규칙으로 돈다. 생활은 실시간, 시계와 무관.
-import { ACTIVITIES, TEMPER, choose, decayNeeds, fullNeeds, onDuty, type Activity, type Needs } from './needs';
-import { ARCHETYPES, inShift, rollTemper, type Post, type Temperament } from './mobs';
+import { ACTIVITIES, ACT_OPTS, TEMPER, choose, decayNeeds, fullNeeds, onDuty, type ActOpt, type Activity, type Needs } from './needs';
+import { ARCHETYPES, DROPS, POCKET, inShift, rollTemper, type Post, type Temperament } from './mobs';
+import { baseOf, derive, rollBase, type BaseStats } from '../combat/stats';
+import { NAMED_MUL } from './npcperks';
+import { defaultRelation, type Stance } from './factions';
+import { applyTemper, catOf, rollNpcPerks } from './npcperks';
 import type { Hop, PlaceGraph } from './places';
 import { pick, range, type Rng } from './rng';
+import { reactCell, type ReactCell, type ReactSituation } from './namedReact';
+import { UNDRESS_D, DRESS_D } from '../action/fighter/shower';
+import { FEMALE_LOOKS, MALE_LOOKS, STALL_DOOR_SEC, WASH, seatFeet, type ToiletUse } from './toilets';
+import { temperOf } from './intrude';
+import type { FieldWorldSave } from './fieldSave';
+
+/** 옷 입은 클립 → 맨몸 클립 (art/charPacks.ts FIELD_CLIP 의 nude_*). 표에 없는 활동은 nude_idle(가린 채 경계). 샤워 기능이 Actor.nude 를 켠 인물만 */
+export const NUDE_CLIP: Record<string, string> = {
+  idle: 'nude_idle', walk: 'nude_walk', run: 'nude_run', hit: 'nude_hit', down: 'nude_down', getup: 'nude_getup', flee: 'nude_flee', crawl: 'nude_flee', scramble: 'nude_flee',
+  'line:43': 'nude_lie_hit', lie: 'nude_lie_hit', scared: 'nude_idle', cower: 'nude_idle', backoff: 'nude_idle',
+};
 
 export type ActorKind = 'named' | 'mob';
+/** 장면 의자의 앉는 방향 (N = 등, E·W = 옆, 없으면 정면) */
+const seatDir = (face?: 'E' | 'W' | 'N'): 'front' | 'side' | 'back' => (face === 'N' ? 'back' : face ? 'side' : 'front');
+/** 생활 동작 자리(11-02 휴게실): 활동 → 자리 마지막 줄. rest = 커피 142·손 씻기 104, eat = 간식 157, hobby = 게시판 보기 57 */
+const STATION_ACT: Record<string, string[]> = { rest: ['142', '104'], eat: ['157'], hobby: ['57'] };
+const STATION_LABEL: Record<string, string> = { vend_purple: '자판기', vend_white: '자판기', water: '정수기', coffee: '커피 내리는 중', microwave: '전자레인지', snack: '간식 찬장', board: '게시판 보는 중', sink: '싱크대' };
+/** 활동 클립 → 의자에서 하는 일 (fighter/seats.ts SEATS acts 이름) */
+const SEAT_KIND: Record<string, string> = { work: 'type', eat: 'eat', drink: 'drink', rest: 'doze', hobby: 'book', talk: 'talk' };
 export interface ActorDef {
   id: string;
   /** 이름표 (몹은 원형 이름) */
@@ -22,14 +44,20 @@ export interface ActorDef {
   speed?: number;
   /** 몹 원형 이름 (mobs.ts ARCHETYPES) */
   archetype?: string;
+  /** 소속 세력 코드 (다른 세력 거점에 들어온 방문자 등, 방문 대응 10-31). 없으면 장면 소속·없음 */
+  faction?: string;
 }
-export type Act = 'idle' | 'walk' | 'door' | 'do' | 'notice' | 'post' | 'watch' | 'argue' | 'down' | 'gone';
+export type Act = 'idle' | 'walk' | 'pause' | 'dead' | 'door' | 'do' | 'notice' | 'post' | 'watch' | 'argue' | 'down' | 'scared' | 'gone';
 /** 걸어서 닿은 뒤 할 일 */
-type Plan = 'none' | 'do' | 'post' | 'exit' | 'steal' | 'harass' | 'chase' | 'patrol' | 'roam-post';
+type Plan = 'none' | 'do' | 'post' | 'exit' | 'steal' | 'harass' | 'chase' | 'patrol' | 'roam-post' | 'cordon' | 'treat' | 'react';
 
 export interface Actor {
   def: ActorDef;
   scene: string;
+  /** 지도 의자에 앉아 있음 (i = 장면 의자 번호). 그림은 그 인물 의자 맞춤값으로 (fighter/seats.ts) */
+  seat?: { i: number; dir: 'front' | 'side' | 'back'; kind: string; x: number; y: number; set?: string };
+  /** 앉으러 가는 의자 번호 */
+  seatPick?: number;
   x: number;
   y: number;
   face: 1 | -1;
@@ -46,6 +74,14 @@ export interface Actor {
   /** 지금 그릴 클립과 시작 시각(생활 초) */
   clip: string;
   clipAt: number;
+  /** 이 클립(일)이 끝나는 생활 초 — 그림이 끝 구간(책 덮기·컵 내리기)을 그 직전에 튼다 */
+  clipUntil?: number;
+  /** 활동에서 고른 줄 (ACT_OPTS), 바로 전에 한 줄 (같은 것 연달아 덜 고르게) */
+  opt?: ActOpt;
+  lastLine?: string;
+  /** 이어 틀 클립 (맞고 의자에서 굴러떨어짐 → 일어나기 → 반응): 머리 클립이 끝나면 다음으로 */
+  clipQ?: { clip: string; sec: number }[];
+  clipQT?: number;
   /** 머리 위 아이콘 (! ? ♪ … #) */
   icon?: string;
   iconT: number;
@@ -68,7 +104,127 @@ export interface Actor {
   think: number;
   /** 맞은 공격 id (한 공격에 한 번) */
   hitBy?: number;
+  /** 몹 몸 (등급 체력, 설계 2-3). 0이 되면 기절 → 일어나 떠난다 */
+  hp?: number;
+  hpMax?: number;
+  /** 겁 반응 종류(sit 주저앉음·backoff 뒷걸음질)·다시 반응할 때까지 남은 초·도망 동작 */
+  scare?: 'freeze' | 'sit' | 'cower' | 'backoff' | 'run';
+  scareCd?: number;
+  fleeClip?: string;
+  /** 힘민체지정 (몹: 생겨날 때 무작위 합 25) */
+  base?: BaseStats;
+  /** 주머니 돈 (원) */
+  pocket?: number;
+  /** 그중 훔친 돈 */
+  stolen?: number;
+  /** 전투 AI 몸(ai-char)으로 싸우는 중: 시뮬이 움직이지도 그리지도 않는다 (engine/modules.ts life.combat) */
+  fighting?: boolean;
+  // 사람처럼 걷기 (10-30): 걸음 흔들림 위상 · 비켜선 깊이 · 다음 멈춤까지 초 · 장애물 우회 경유점 · 같이 걷는 일행(앞사람 id)과 나란히 선 깊이
+  phase?: number;
+  side?: number;
+  pauseCd?: number;
+  detour?: { x: number; y: number }[];
+  buddy?: string;
+  buddyDy?: number;
+  /** 겁먹은 까닭이 있는 자리 x (시체 등). 없으면 주인공 */
+  scareFrom?: number;
+  /** 시체를 이미 봤다 (한 번만 반응) */
+  sawBody?: boolean;
+  /** 죽은 게임 시각(시간 누계) */
+  diedAt?: number;
+  /** 기절한 생활 시각(초): 이 뒤 KO_GRACE 동안은 무기로 맞아도 안 죽음 */
+  downAt?: number;
+  /** NPC 전용 퍽 (world/npcperks.ts): 생겨날 때 한 번 */
+  perks?: string[];
+  /** 한 번만 쓰는 퍽을 썼나 (뒤끝·지원 요청·호출·끈질긴 추적) */
+  used?: string[];
+  /** 구경꾼: 다시 구경할 때까지 초 */
+  lookCd?: number;
+  /** 훈련 중인 동작 (전투원) */
+  trainClip?: string;
+  /** 동료와 다시 어울릴 때까지 초 (인사·대화·다툼) */
+  chatCd?: number;
+  /** 진료할 사람 id (의사) */
+  patient?: string;
+  /** 쓰는 훈련 장비 (장면#번호) · 화장실 자리 (장면#t:자리 id) */
+  station?: string;
+  /** 화장실 자리를 쓰는 중 (11-01): 칸은 문 열림(open) → 안(in) → 나옴(leave), 소변기·세면대는 in만. t = 그 단계 남은 초 */
+  toilet?: { id: string; kind: 'stall' | 'urinal' | 'sink'; phase: 'open' | 'in' | 'leave'; t: number; door?: string; /** 주인공이 밖에서 문을 연 때(sim time)까지 문이 열려 있음 (11-01) */ peek?: number };
+  /** 평소 거리 순찰 중인 경찰 (C16, 10-31) */
+  patrol?: boolean;
+  /** 이성이 화장실·샤워실에 들어온 것을 알아챔 (11-01, docs/샤워_결정.md 「2026-11-01」). wait = 남이 소리친 걸 듣고 1~3초 뒤 알아챌 차례, 0 = 들어옴 대사 함, 1 = 머묾1, 2 = 머묾2. due = 다음 단계 시각(sim time) */
+  intrude?: { stage: 'wait' | 0 | 1 | 2 | 'done'; due?: number };
+  /** 주인공이 말을 걸기 전에 하던 일 (몹 대화, 모델에 넣는다) */
+  talkFrom?: string;
+  /** 이름 인물이 맞고 화난 생활 시각 (또 맞으면 맞선다, C4) */
+  angryAt?: number;
+  /** 호감 적대 이름 인물이 마지막으로 싸움에서 돌아온 생활 시각 (1분은 다시 막지 않음) */
+  blockAt?: number;
+  /** 필드 안 NPC끼리 싸움 (방문 대응 10-31): 상대 id, 다음 타격까지 초 */
+  brawl?: { foe: string; t: number };
+  /** 이미 인사한 방문자 id */
+  greeted?: string[];
+  /** 경계: 따라붙어 지켜보는 방문자 id (경비) */
+  escort?: string;
+  /** 경보 대응 중인 거점 세력 (모이는 쪽) */
+  alarm?: string;
+  /** 퇴근 (10-31 필드 기능 8번): out = 출구로 가는 중, off = 퇴근해 필드에 없음(나간 장면) */
+  commute?: { state: 'out' | 'off'; scene?: string; x?: number };
+  /** 캐릭터 반응: 상황별 마지막 반응 시각(생활 초), 본 시체 id, 다가간 뒤 틀 동작 */
+  reactAt?: Partial<Record<ReactSituation, number>>;
+  sawBodies?: string[];
+  /** 무기 든 주인공을 마지막으로 본 때 (11-01 사용자 10번: 무기를 든 동안 계속 반응, 넣으면 그만) */
+  armedSeen?: number;
+  /** 샤워 자리를 쓰는 중 (11-02 NPC 샤워): 자리 id */
+  shower?: { step: 'start' | 'undress' | 'go' | 'wash' | 'back' | 'dress'; id?: string; locker?: { scene: string; id: string } };
+  /** 맨몸(샤워 중, 11-01): 샤워 기능이 켠다. 켜진 동안 setClip 이 옷 입은 클립을 맨몸 클립(NUDE_CLIP)으로 바꿔 끼운다 */
+  nude?: boolean;
+  /** 넉백 속도(px/s, 11-01 1-2): 맞으면 밀려나며 빠르게 줄어든다 */
+  kb?: number;
+  /** 맨몸 서서 맞기 마지막에 튼 줄 (배·가슴 번갈아) */
+  nudeHit?: string;
+  /** 무기 반응으로 버티는 중 (노려봄·맞섬 등) */
+  weaponHold?: boolean;
+  reactClip?: string;
+  /** 방문자: 경계 거점에 머문 초 (경고 → 내보냄) */
+  stay?: number;
+  /** 동행 (10-31 사용자 「전부 만들어야지」, 필드 기능 7장): 주인공을 따라 걷는 중. 욕구·할 일은 멈춘다 */
+  following?: boolean;
+  /** 「기다려」: 그 자리에 남아 기다린다 (할 일을 고르지 않음) */
+  hold?: boolean;
 }
+
+/** 훈련장 장비 하나 (10-31 사용자: 샌드백·허수아비·사격 과녁. 그림은 일단 코드, 나중에 교체) */
+export interface Gear { kind: 'sandbag' | 'dummy' | 'target'; x: number; y: number; busy: boolean }
+
+/** 길에 놓인 막힌 곳 (폴리스 라인·부서진 물건 등). wall = 길을 위아래 끝까지 막음 → 돌아섬 */
+export interface Obstacle { id: string; x0: number; x1: number; y0: number; y1: number; wall?: boolean }
+
+/** 걷다 잠깐 멈춰 하는 일: 클립 이름(charPacks FIELD_CLIP) · 관찰 창 글 · 몇 초. 그 인물에게 그 줄이 있을 때만 후보 (10-30 동작 활용표) */
+const PAUSES: { clip: string; doing: string; sec: [number, number] }[] = [
+  { clip: 'phone', doing: '폰 보는 중', sec: [4, 9] },
+  { clip: 'call', doing: '통화 중', sec: [5, 10] },
+  { clip: 'coffee', doing: '커피 마시는 중', sec: [4, 8] },
+  { clip: 'limber', doing: '기지개', sec: [2.5, 4] },
+  { clip: 'smoke', doing: '담배 피우는 중', sec: [5, 10] },
+  { clip: 'browse', doing: '뒷짐 지고 구경', sec: [4, 8] },
+  { clip: 'snack', doing: '간식 먹는 중', sec: [3, 6] },
+  { clip: 'front', doing: '잠깐 멈춤', sec: [1.5, 3.5] },
+  { clip: 'back', doing: '진열장 구경', sec: [3, 6] },
+  { clip: 'spot', doing: '뭔가 발견', sec: [1.2, 2] },
+  { clip: 'rest', doing: '잠깐 멈춤', sec: [1.5, 3.5] },
+  { clip: 'idle', doing: '두리번', sec: [2, 3.5] },
+];
+
+/** 순찰 경찰이 걷다 멈춰 하는 일 (그 줄이 있는 그림만) */
+const PATROL_PAUSES: { clip: string; doing: string; sec: [number, number] }[] = [
+  { clip: 'radio', doing: '무전 보고', sec: [3, 5] },
+  { clip: 'memo', doing: '수첩 메모', sec: [3, 5] },
+  { clip: 'idle', doing: '주위를 살핌', sec: [2, 4] },
+  { clip: 'spot', doing: '뭔가 발견', sec: [1.2, 2] },
+];
+/** 평소 거리 순찰 (C16, 10-31 사용자 「평소에도 종종 등장」): 거리 장면마다 이 초 간격으로 한 번 들어올지 굴린다 */
+export const PATROL = { every: [90, 200] as [number, number], chance: 0.5, pair: 0.6, speed: [95, 115] as [number, number] };
 
 /** 엔진 공격 판정 상자 (contract Hit의 모양만) */
 export interface HitBox { x0: number; x1: number; y: number; dy?: number; z0: number; z1: number; attackId: number }
@@ -84,6 +240,8 @@ export interface SpawnRule {
   mix: string[];
   /** 밤(19:30~05시) 원형 목록. 없으면 mix */
   nightMix?: string[];
+  /** 시간대별 유동인구 (있으면 target·mix 대신): from~to 시(자정 넘김 가능)에 장면 1,000px당 n명, mix 에서 뽑는다 */
+  bands?: { from: number; to: number; n: number; mix: string[] }[];
 }
 
 /** 바깥(대사·장부·연출)에 알릴 일 */
@@ -94,22 +252,78 @@ export type SimEvent =
   | { kind: 'notice'; scene: string; who: string }
   | { kind: 'police'; scene: string; n: number }
   | { kind: 'shift'; scene: string; who: string; on: boolean }
-  | { kind: 'hurt'; scene: string; who: string; named: boolean; faction?: string; x: number; down: boolean };
+  | { kind: 'hurt'; scene: string; who: string; id: string; named: boolean; faction?: string; x: number; down: boolean; hostile: boolean }
+  /** 기절한 몹이 떨어뜨린 돈 (불량배·소매치기) */
+  | { kind: 'drop'; scene: string; who: string; amount: number; stolen: number; x: number }
+  /** NPC 사망 (살해 허용일 때만). 시체는 장면에 남고 경찰이 1시간 뒤 수습 */
+  | { kind: 'kill'; scene: string; who: string; id: string; x: number }
+  /** 시체를 본 사람: 신고(용감) */
+  | { kind: 'report'; scene: string; who: string; x: number }
+  /** 경찰이 시체를 수습함 */
+  | { kind: 'cleared'; scene: string; n: number }
+  /** 세력끼리 싸움이 붙음 (방문 대응): a = 거점 쪽, b = 방문자 */
+  | { kind: 'brawl'; scene: string; a: string; af: string; b: string; bf: string; x: number }
+  /** 그 싸움에서 한쪽이 쓰러지거나 달아남 */
+  | { kind: 'brawlEnd'; scene: string; winner: string; loser: string; how: 'down' | 'fled' }
+  /** 경계: 방문자를 내보냄 */
+  | { kind: 'expel'; scene: string; who: string; by: string }
+  /** 경비가 주인공을 보고 경고함 (11-01) */
+  | { kind: 'warn'; scene: string; who: string; by: string }
+  /** 이성 화장실·샤워실에 들어온 주인공을 알아챔 (11-01). stage 0 = 들어옴, 1 = 머묾1, 2 = 머묾2 */
+  | { kind: 'intrude'; scene: string; who: string; id: string; stage: 0 | 1 | 2 }
+  /** 경고를 무시하고 안쪽으로 들어가 경비가 덤빔 (11-01) */
+  | { kind: 'guardAttack'; scene: string; who: string; by: string; why?: 'intrude' }
+  /** 대화에서 허락받아 이번 방문 출입증이 생김 (11-01) */
+  | { kind: 'pass'; scene: string; faction: string }
+  /** 말풍선 칸 하나 (speech.ts speakCell). cell = game-src/dialogue2 칸 열쇠, ctx = 그 순간 정보(say = 대사 자료가 없을 때 쓸 글) */
+  | { kind: 'cue'; scene: string; who: string; id: string; cell: string; ctx?: Record<string, string> }
+  /** 동행 시작·끝 (follow·wait·return·hit = 맞아서 그만둠) */
+  | { kind: 'follow'; scene: string; who: string; mode: 'follow' | 'wait' | 'return' | 'hit' }
+  /** 거점 경보 켜짐·꺼짐 (why = 까닭, threat = 위협 이름 또는 {user}) */
+  | { kind: 'alarm'; scene: string; faction: string; on: boolean; why: string; threat: string };
 
 export interface SimOptions {
   spawns?: SpawnRule[];
   posts?: Post[];
   /** 그 인물(그림 열쇠)에게 그 클립이 있나. 없으면 그 활동은 꺼진다 */
   has?: (look: string, clip: string) => boolean;
+  /** 그 인물 그림 줄의 장 수 (샤워 옷 벗기·입기 길이, 11-02). 없으면 10장으로 본다 */
+  lineN?: (look: string, id: string) => number;
   /** 장면의 소속 (거점 장면 = 그 조직 코드, 거리 = null). 경비·직원 몹의 소속이 된다 */
   sceneFaction?: (scene: string) => string | null;
   /** 세력 평판 구간 (인물 기록 factions()). 몹의 첫 반응을 정한다 (8-6장) */
   stance?: (faction: string) => 'friendly' | 'favorable' | 'neutral' | 'wary' | 'hostile' | null;
+  /** 설정 「필드에서 NPC 살해 허용」 (기본 끔: 체력 0 = 기절) */
+  killOk?: () => boolean;
+  /** 세력끼리 관계 (보는 쪽 → 대상). 없으면 기본값 (world/factions.ts) */
+  relation?: (viewer: string, target: string) => Stance;
+  /** 이름 인물의 호감이 적대 구간인가 (인물 기록). 없으면 아무도 아님 */
+  namedHostile?: (name: string) => boolean;
+  /** 그림 장면의 걸을 수 있는 바닥(바닥 다각형 안·막힘 밖). 있으면 걷는 사람이 막힌 곳을 돌아 열린 길(게이트 통로 등)로만 다닌다 */
+  nav?: { ok(scene: string, x: number, y: number): boolean; clamp(scene: string, x: number, y: number): { x: number; y: number } };
 }
 
 const WALK = 150;
+/** 동행 인원 상한 없음 (11-01 사용자: 제한 두지 말 것). core/fieldfollow 도 같음 */
+export const MAX_FOLLOW = Infinity;
+/** 동행: 주인공 뒤 첫 사람 거리, 사람마다 더 벌어지는 거리 */
+const FOLLOW_GAP = [95, 55] as const;
 const MARGIN = 60;
 const NOTICE_PX = 280;
+/** 한 장면에 남는 시체 상한 (넘치면 오래된 것부터 치움) */
+export const CORPSE_MAX = 5;
+/** 시체 수습까지 게임 시간 (시간) */
+export const CLEAR_HOURS = 1;
+/** 수습 뒤 「사건 현장」으로 사람이 덜 들어오는 게임 시간 (시간) */
+export const INCIDENT_HOURS = 24;
+/** 시체를 알아보는 거리 */
+const SEE_BODY_PX = 260;
+/** 경보 때 비전투원이 피하는 거리 (위협에서 이만큼 안이면 대피). 화면 폭(1280)의 3분의 1쯤 */
+const ALARM_EVADE_PX = 450;
+/** 기절 직후 죽지 않는 초 (연타 마지막 대에 실수로 죽지 않게) */
+export const KO_GRACE = 2;
+/** 이름 인물: 화난 뒤 이 초 안에 또 맞으면 맞서 싸운다 (C4, 10-31 사용자 가안) */
+export const NAMED_FIGHT_SEC = 6;
 /** 소란도 단계 문턱 (0~100 → 0~3) */
 export const UPROAR_STEPS = [20, 50, 80];
 let serial = 0;
@@ -118,27 +332,106 @@ export class WorldSim {
   readonly actors: Actor[] = [];
   readonly events: SimEvent[] = [];
   private spawnT = new Map<string, number>();
+  /** 거리 장면마다 다음 순찰을 굴릴 때까지 초 */
+  private patrolT = new Map<string, number>();
   private uproar = new Map<string, { v: number; x: number }>();
   /** 실제로 흐른 생활 초 */
   time = 0;
   private hour: number | null = null;
-  private player: { scene: string; x: number; y: number } | null = null;
+  private player: { scene: string; x: number; y: number; seat?: number | null; armed?: boolean; face?: number; sex?: '남' | '여' | null } | null = null;
   readonly spawns: SpawnRule[];
   readonly posts: Post[];
   private has: (look: string, clip: string) => boolean;
+  private lineN?: (look: string, id: string) => number;
   constructor(readonly graph: PlaceGraph, readonly rng: Rng, opts: SimOptions | SpawnRule[] = {}) {
     const o = Array.isArray(opts) ? { spawns: opts } : opts;
     this.spawns = o.spawns ?? [];
     this.posts = o.posts ?? [];
     this.has = o.has ?? (() => false);
+    this.lineN = o.lineN;
     this.sceneFaction = o.sceneFaction ?? (() => null);
     this.stance = o.stance ?? (() => null);
+    this.killOk = o.killOk ?? (() => false);
+    this.relation = o.relation ?? defaultRelation;
+    this.namedHostile = o.namedHostile ?? (() => false);
+    this.nav = o.nav ?? null;
   }
+  private nav: SimOptions['nav'] | null;
+  /** 가장 가까운 걸을 수 있는 바닥 점 (바닥 밖·막힘 안이면 밀어내고, 그래도 안 되면 둘레를 넓혀 가며 찾음) */
+  private navSnap(scene: string, x: number, y: number): { x: number; y: number } {
+    const nav = this.nav!;
+    if (nav.ok(scene, x, y)) return { x, y };
+    const c = nav.clamp(scene, x, y);
+    if (nav.ok(scene, c.x, c.y)) return c;
+    for (let r = 4; r <= 80; r += 4) for (let k = 0; k < 16; k++) {
+      const qx = x + Math.cos((k / 16) * Math.PI * 2) * r, qy = y + Math.sin((k / 16) * Math.PI * 2) * r;
+      if (nav.ok(scene, qx, qy)) return { x: qx, y: qy };
+    }
+    return c;
+  }
+  /** 두 점 사이 직선이 막힘 없이 걸을 수 있는 바닥 위인가 (6px 간격으로 확인) */
+  private clearLine(scene: string, ax: number, ay: number, bx: number, by: number): boolean {
+    const nav = this.nav!;
+    const n = Math.max(1, Math.ceil(Math.hypot(bx - ax, by - ay) / 6));
+    for (let i = 1; i <= n; i++) if (!nav.ok(scene, ax + ((bx - ax) * i) / n, ay + ((by - ay) * i) / n)) return false;
+    return true;
+  }
+  /** 막힌 곳을 피해 가는 길: 12px 칸 격자 너비 우선 탐색 → 보이는 점끼리 줄여 경유점. 길이 없으면 null */
+  private navPath(scene: string, from: { x: number; y: number }, to: { x: number; y: number }): { x: number; y: number }[] | null {
+    const nav = this.nav!, C = 12;
+    const len = this.graph.scene(scene)?.length ?? 1280;
+    const [top, bot] = this.graph.lane(scene);
+    const y0 = Math.min(top, from.y, to.y) - C, y1 = Math.max(bot, from.y, to.y) + C;
+    const W = Math.ceil(len / C) + 1, H = Math.ceil((y1 - y0) / C) + 1;
+    const cx = (x: number) => Math.max(0, Math.min(W - 1, Math.round(x / C))), cy = (y: number) => Math.max(0, Math.min(H - 1, Math.round((y - y0) / C)));
+    const okC = new Uint8Array(W * H);
+    for (let j = 0; j < H; j++) for (let i = 0; i < W; i++) okC[j * W + i] = nav.ok(scene, i * C, y0 + j * C) ? 1 : 0;
+    const s = cy(from.y) * W + cx(from.x), g = cy(to.y) * W + cx(to.x);
+    okC[s] = 1; okC[g] = 1;
+    const prev = new Int32Array(W * H).fill(-1); prev[s] = s;
+    const q = [s];
+    for (let h = 0; h < q.length && prev[g] < 0; h++) {
+      const k = q[h], i = k % W, j = (k - i) / W;
+      for (const [di, dj] of [[1, 0], [-1, 0], [0, 1], [0, -1], [1, 1], [1, -1], [-1, 1], [-1, -1]]) {
+        const ni = i + di, nj = j + dj;
+        if (ni < 0 || nj < 0 || ni >= W || nj >= H) continue;
+        const nk = nj * W + ni;
+        if (prev[nk] >= 0 || !okC[nk]) continue;
+        if (di && dj && (!okC[j * W + ni] || !okC[nj * W + i])) continue;   // 모서리 깎아 지나가기 금지
+        prev[nk] = k; q.push(nk);
+      }
+    }
+    if (prev[g] < 0) return null;
+    if (g === s) return [{ x: to.x, y: to.y }];
+    const cells: { x: number; y: number }[] = [];
+    for (let k = g; k !== s; k = prev[k]) cells.push({ x: (k % W) * C, y: y0 + Math.floor(k / W) * C });
+    cells.reverse();
+    cells[cells.length - 1] = { x: to.x, y: to.y };
+    // 줄이기: 지금 점에서 곧장 보이는 가장 먼 칸으로
+    const out: { x: number; y: number }[] = [];
+    let cur = from;
+    for (let i = 0; i < cells.length;) {
+      let j = cells.length - 1;
+      while (j > i && !this.clearLine(scene, cur.x, cur.y, cells[j].x, cells[j].y)) j--;
+      out.push(cells[j]); cur = cells[j]; i = j + 1;
+    }
+    return out;
+  }
+  private namedHostile: (name: string) => boolean;
+  private relation: (viewer: string, target: string) => Stance;
+  private killOk: () => boolean;
+  /** 게임 시간 누계(시간). 필드 시계가 움직인 만큼만 흐른다 (시계 없으면 실시간 3분 = 1시간) */
+  gameH = 0;
+  /** 경찰이 와서 라인을 친 장면 */
+  private cordoned = new Set<string>();
+  /** 사건 현장: 수습한 게임 시각 */
+  private sites = new Map<string, number>();
   private sceneFaction: (scene: string) => string | null;
   private stance: (faction: string) => 'friendly' | 'favorable' | 'neutral' | 'wary' | 'hostile' | null;
   /** 몹의 소속: 경비·직원(근무형·staff·guard)은 장면 소속, 나머지는 없음 */
   mobFaction(a: Actor): string | null {
     if (a.def.kind !== 'mob') return null;
+    if (a.def.faction) return a.def.faction;
     const role = ARCHETYPES[a.def.archetype ?? a.def.name]?.role;
     return a.post || role === 'guard' || role === 'staff' ? this.sceneFaction(a.scene) : null;
   }
@@ -151,12 +444,22 @@ export class WorldSim {
     const a: Actor = {
       def, scene, x: at?.x ?? p.x, y: at?.y ?? p.y, face: this.rng() < 0.5 ? 1 : -1, act: 'idle', doing: '대기', goal: null, route: [],
       wait: range(this.rng, 0.5, 4), plan: 'none', run: 1, clip: 'idle', clipAt: this.time, iconT: 0, sayT: 0, noticeCd: 0, think: range(this.rng, 1, 4),
+      phase: this.rng() * Math.PI * 2, pauseCd: range(this.rng, 4, 18),
     };
     if (def.kind === 'named' && def.brain === 'needs') a.needs = fullNeeds(this.rng);
     if (def.kind === 'mob') {
       const arch = ARCHETYPES[def.archetype ?? def.name];
       a.temper = rollTemper(this.rng, arch);
+      // NPC 퍽: 경찰은 전부, 나머지는 역할·성격으로 무작위. 성격에 얹는 퍽은 바로 (겁쟁이·깡다구·손버릇·구경꾼)
+      a.perks = rollNpcPerks(this.rng, catOf(arch?.role), a.temper);
+      applyTemper(a.perks, a.temper);
       a.drunk = !!arch?.drinks && this.isNight() && this.rng() < 0.35;
+      // 몸: 한 명마다 힘민체지정(합 25 무작위)을 굴리고 체력은 그 공식으로 (10-30 사용자). 주머니 돈 (백 원 단위)
+      a.base = rollBase(this.rng);
+      a.hpMax = a.hp = derive(a.base).hp;
+      const pk = POCKET[def.archetype ?? def.name];
+      a.pocket = pk ? Math.round(range(this.rng, pk[0], pk[1]) / 100) * 100 : 0;
+      if (a.perks.includes('주머니 두둑')) a.pocket *= 2;
     }
     this.actors.push(a);
     return a;
@@ -165,8 +468,63 @@ export class WorldSim {
     const i = this.actors.findIndex((a) => a.def.id === id);
     if (i >= 0) this.actors.splice(i, 1);
   }
+  private blocks = new Map<string, Obstacle[]>();
+  /** 막힌 곳 놓기·치우기 (box = null 이면 치움). 걷는 사람은 돌아가고, wall 이면 돌아선다 */
+  setObstacle(scene: string, box: Obstacle | null, id = box?.id ?? ''): void {
+    const list = (this.blocks.get(scene) ?? []).filter((b) => b.id !== id);
+    if (box) list.push(box);
+    if (list.length) this.blocks.set(scene, list);
+    else this.blocks.delete(scene);
+  }
+  obstacles(scene: string): readonly Obstacle[] {
+    return this.blocks.get(scene) ?? [];
+  }
   inScene(scene: string): Actor[] {
-    return this.actors.filter((a) => a.scene === scene && a.act !== 'door' && a.act !== 'gone');
+    return this.actors.filter((a) => a.scene === scene && a.act !== 'door' && a.act !== 'gone' && !a.fighting);
+  }
+  /** 전투 AI로 넘길 행위자: 주인공을 막아선 몹(적대 세력·경찰·시비 뒤 맞섬) */
+  challengers(scene: string): Actor[] {
+    return this.inScene(scene).filter((a) => (a.plan === 'chase' && !a.target && a.act === 'watch') || (a.act === 'argue' && a.doing === '맞섬'));
+  }
+  /** 전투 AI 몸으로 넘김 (돌아올 때까지 시뮬에서 뺌) */
+  toFight(id: string): Actor | null {
+    const a = this.actors.find((q) => q.def.id === id);
+    if (!a || a.fighting) return null;
+    a.fighting = true;
+    a.goal = null;
+    a.route = [];
+    // 패거리(불량배): 같은 장면 불량배 둘까지 같이 덤빈다. 호출(경비): 한 번 경비 1명을 부른다
+    if (this.perk(a, '패거리')) {
+      const mates = this.inScene(a.scene).filter((q) => q !== a && !q.fighting && ['walk', 'idle', 'pause', 'watch'].includes(q.act) && ARCHETYPES[q.def.archetype ?? '']?.role === 'thug').slice(0, 2);
+      for (const q of mates) { q.act = 'argue'; q.doing = '맞섬'; q.wait = 3; q.goal = null; this.iconOn(q, '#', 2); }
+    }
+    if (this.once(a, '호출')) this.reinforce(a.scene, '경비', this.player?.x ?? a.x);
+    return a;
+  }
+  /** 전투에서 돌아옴. down = 쓰러뜨림(기절 → 깨면 떠남), 아니면 싸움이 끊긴 것(주인공이 장면을 떠남 등) */
+  fromFight(id: string, x: number, y: number, down: boolean | 'dead' | 'deadLying'): void {
+    const a = this.actors.find((q) => q.def.id === id);
+    if (!a || !a.fighting) return;
+    a.fighting = false;
+    a.blockAt = this.time;
+    a.x = x;
+    a.y = y;
+    a.plan = 'none';
+    if (down === 'dead' || down === 'deadLying') {
+      a.hp = 0;
+      this.kill(a, down === 'deadLying', true);
+      return;
+    }
+    if (down) {
+      a.hp = 0;
+      this.struck(a, a.face, true);
+      this.crime(a.scene, a.x, 15);
+      this.playerViolence(a.scene, a.x, a, 'knockout');
+      return;
+    }
+    a.act = 'idle';
+    a.wait = 0.5;
+    this.setClip(a, 'idle');
   }
   /** 소란 (플레이어가 몹을 때림·물건 부숨 등). amount 0~100 */
   disturb(scene: string, amount: number, x: number): void {
@@ -188,11 +546,20 @@ export class WorldSim {
     const len = this.graph.scene(scene)?.length ?? 1280;
     const street = this.graph.kind(scene) === 'street';
     const n = 1 + this.uproarLevel(scene);
+    // 순찰 중인 경찰이 그 장면에 있으면 그들이 먼저 달려온다 (C16)
+    for (const p of this.actors.filter((q) => q.scene === scene && q.patrol && q.plan !== 'chase' && !q.fighting && !['down', 'dead', 'gone'].includes(q.act))) {
+      p.plan = 'chase';
+      p.run = 1.4;
+      p.buddy = undefined;
+      this.walkTo(p, { x, y: p.y }, '현장으로 달려감', 'chase');
+      this.iconOn(p, '!', 3);
+      this.say(p, '거기 멈춰!', 2);
+    }
     const have = this.actors.filter((a) => a.scene === scene && a.plan === 'chase').length;
     for (let i = have; i < n; i++) {
       const gate = Math.abs(x - 30) > Math.abs(x - (len - 30)) ? 30 : len - 30;
       const arch = street ? '경찰' : '경비';
-      const a = this.add({ id: `mob${++serial}`, name: arch, kind: 'mob', brain: 'transit', home: scene, archetype: arch, look: arch, speed: 170 }, { scene, x: gate, y: this.laneMid(scene) });
+      const a = this.add({ id: `mob${++serial}`, name: arch, kind: 'mob', brain: 'transit', home: scene, archetype: arch, look: this.lookOf(arch), speed: 170 }, { scene, x: gate, y: this.laneMid(scene) });
       a.plan = 'chase';
       a.run = 1.4;
       this.walkTo(a, { x, y: a.y }, '플레이어에게 가는 중', 'chase');
@@ -207,50 +574,169 @@ export class WorldSim {
   hitBoxes(scene: string, boxes: HitBox[], dir: 1 | -1): Actor[] {
     const out: Actor[] = [];
     for (const a of this.inScene(scene)) {
+      if (a.act === 'dead') continue;
       for (const b of boxes) {
         if (a.hitBy === b.attackId) continue;
         if (a.x + 30 < b.x0 || a.x - 30 > b.x1 || Math.abs(a.y - b.y) > (b.dy ?? 18) + 14 || b.z0 > 200) continue;
         a.hitBy = b.attackId;
         out.push(a);
-        this.struck(a, dir);
+        this.struck(a, dir, this.hostile(a));
         break;
       }
     }
     if (out.length) this.crime(scene, out[0].x, 15 * out.length);
+    for (const a of out) if ((a.hp ?? 1) <= 0) this.playerViolence(scene, a.x, a, 'knockout');
     return out;
   }
   /** 행위자 하나를 맞힘 (에일린 코어 표적 경로). 같은 틱 여러 번은 hitBy로 거른다 */
-  hitActor(id: string, dir: 1 | -1, attackId: number): boolean {
+  hitActor(id: string, dir: 1 | -1, attackId: number, dmg = 12, lethal = false): boolean {
     const a = this.actors.find((q) => q.def.id === id);
     if (!a || a.act === 'gone' || a.act === 'door' || a.hitBy === attackId) return false;
+    if (a.act === 'dead') return false;
+    // 이미 기절해 쓰러진 몹: 살해 허용이고 기절 2초 뒤 무기 쪽 공격(lethal)이면 누운 채 사망(45). 맨손·연타 중엔 기절 그대로 (10-30)
+    if (a.def.kind === 'mob' && (a.hp ?? 1) <= 0) {
+      if (!this.killOk() || !lethal || this.time - (a.downAt ?? this.time) < KO_GRACE) return false;
+      a.hitBy = attackId;
+      this.kill(a, true);
+      return true;
+    }
     a.hitBy = attackId;
-    this.struck(a, dir);
+    if (a.def.kind === 'mob' && a.hp !== undefined) a.hp = Math.max(0, a.hp - dmg);
+    this.struck(a, dir, this.hostile(a));
     this.crime(a.scene, a.x, 15);
+    if ((a.hp ?? 1) <= 0) this.playerViolence(a.scene, a.x, a, 'knockout');
     return true;
   }
-  private struck(a: Actor, dir: 1 | -1): void {
-    a.x += dir * 36;
+  private perk(a: Actor, name: string): boolean {
+    return !!a.perks?.includes(name);
+  }
+  /** 한 번만 쓰는 퍽: 처음이면 true (쓴 것으로 적는다) */
+  private once(a: Actor, name: string): boolean {
+    if (!this.perk(a, name) || a.used?.includes(name)) return false;
+    (a.used ??= []).push(name);
+    return true;
+  }
+  /** 경찰·경비 한 명을 장면 끝 출입구에서 주인공 쪽으로 (지원 요청·호출) */
+  private reinforce(scene: string, arch: '경찰' | '경비', x: number): void {
+    const len = this.graph.scene(scene)?.length ?? 1280;
+    const gate = Math.abs(x - 30) > Math.abs(x - (len - 30)) ? 30 : len - 30;
+    const c = this.add({ id: `mob${++serial}`, name: arch, kind: 'mob', brain: 'transit', home: scene, archetype: arch, look: this.lookOf(arch), speed: 170 }, { scene, x: gate, y: this.laneMid(scene) });
+    c.plan = 'chase';
+    c.run = 1.4;
+    this.walkTo(c, { x, y: c.y }, arch === '경찰' ? '지원 출동' : '호출받고 오는 중', 'chase');
+    this.iconOn(c, '!', 3);
+  }
+  /** 지원 요청(경찰 퍽): 싸우던 경찰 체력이 절반 아래 → 한 번 경찰 1명을 더 부른다 (전투 쪽에서 부름) */
+  backup(id: string): void {
+    const a = this.actors.find((q) => q.def.id === id);
+    if (a && this.once(a, '지원 요청')) this.reinforce(a.scene, '경찰', this.player?.x ?? a.x);
+  }
+  /** 맞기 전에 이미 주인공에게 맞서던 몸인가 (막아섬·시비 뒤 맞섬): 먼저 친 게 누구인지 기록용 */
+  private hostile(a: Actor): boolean {
+    return a.plan === 'chase' || (a.act === 'argue' && a.doing === '맞섬') || (a.act === 'watch' && a.doing === '막아섬');
+  }
+  /** 맞음: 앉아 있었으면(의자·화장실) 굴러떨어지기(169) → 일어나기 → 반응, 누워 있었으면 누운 채 움찔(43) → 반응 (10-31 사용자: 앉은 피격은 굴러떨어지기로 통일) */
+  private struck(a: Actor, dir: 1 | -1, hostile = false): void {
+    // 서서 소변(100)은 앉은 게 아니라 그냥 피격 자세로 (10-31 사용자)
+    // 변기에 앉아 있다가 맞음(11-01 사용자): 의자 피격과 같이 굴러떨어지기(169)로. 칸·소변기·세면대 자리는 비운다
+    const onToilet = a.toilet?.kind === 'stall' && a.toilet.phase === 'in';
+    const seated = !!a.seat || onToilet || (a.act === 'do' && (a.clip === 'poo' || (a.clip === 'pee' && !this.canClip(a, 'line:100'))));
+    if (a.toilet) { this.leaveToilet(a); a.task = undefined; }
+    // 샤워 중 맞음(11-02): 샤워를 끊고 맨몸 피격으로 (nude 는 켜진 채 → NUDE_CLIP)
+    if (a.shower) { a.shower = undefined; a.station = undefined; a.task = undefined; }
+    const lying = a.clip === 'lie' || a.clip === 'treat';
+    // 맨몸(11-01): 쓰러진 채 또 맞으면 누운 채 맞기(SH_H4)만 틀고 그 마지막 장에 머문다
+    const nudeLying = !!a.nude && a.act === 'down' && (a.hp ?? 1) <= 0;
+    this.struckCore(a, dir, hostile);
+    const react = a.clip;
+    const seq: { clip: string; sec: number }[] = [];
+    if (nudeLying && this.canClip(a, 'nude_lie_hit')) { this.setClip(a, 'nude_lie_hit'); return; }
+    if (seated && this.canClip(a, 'line:169')) seq.push({ clip: 'line:169', sec: 1.6 }, ...(this.canClip(a, 'getup') ? [{ clip: 'getup', sec: 1 }] : []));
+    else if (lying && this.canClip(a, 'line:43')) seq.push({ clip: 'line:43', sec: 0.9 });
+    // 맨몸 서서 맞기: 배(H1)·가슴(H2)을 번갈아 한 번 틀고 반응으로 (쓰러지는 때는 struckCore 가 nude_down 으로 바꿔 끼움)
+    else if (a.nude && react !== 'nude_down') { const h = a.nudeHit === 'nude_hit' ? 'nude_hit2' : 'nude_hit'; if (this.canClip(a, h)) { a.nudeHit = h; seq.push({ clip: h, sec: 0.6 }); } }
+    if (!seq.length) return;
+    this.setClip(a, seq[0].clip);
+    a.clipQ = [...seq.slice(1), { clip: react, sec: 0 }];
+    a.clipQT = seq[0].sec;
+    a.wait += seq.reduce((n, s) => n + s.sec, 0);
+  }
+  private struckCore(a: Actor, dir: 1 | -1, hostile = false): void {
+    a.seatPick = undefined;
+    // 넉백(1-2): 한 번에 옮기지 않고 밀려난다 (stepActor). 쓰러지는 맞음은 더 멀리
+    a.kb = dir * ((a.hp ?? 1) <= 0 ? 420 : 280);
     a.face = (-dir) as 1 | -1;
     a.goal = null;
     a.route = [];
-    const down = a.def.kind === 'mob' && this.rng() < 0.5;
-    this.events.push({ kind: 'hurt', scene: a.scene, who: a.def.name, named: a.def.kind === 'named', x: a.x, down });
-    if (a.def.kind === 'named') {
+    // 몹: 체력이 바닥나면 기절(쓰러져 오래 누움), 아니면 휘청. 체력 0은 살해 허용이어도 먼저 기절
+    const down = (a.hp ?? 1) <= 0;   // 몹·이름 인물(싸움에서 진 뒤)
+    if (down && a.pocket && (DROPS.has(a.def.archetype ?? '') || a.stolen)) {
+      this.events.push({ kind: 'drop', scene: a.scene, who: a.def.name, amount: a.pocket, stolen: a.stolen ?? 0, x: a.x });
+      a.pocket = 0;
+      a.stolen = 0;
+    }
+    this.events.push({ kind: 'hurt', scene: a.scene, who: a.def.name, id: a.def.id, named: a.def.kind === 'named', x: a.x, down, hostile });
+    this.witness(a, down);
+    // 이름 인물 (C4, 10-31 사용자 가안): 첫 대는 화내고, NAMED_FIGHT_SEC 안에 또 맞으면 맞서 싸운다(전투 AI 몸, 그 인물 그림·능력치 표 ×1.5).
+    // 싸움에서 체력 0이 되면 아래 몹처럼 기절
+    if (a.def.kind === 'named' && !(a.hp !== undefined && a.hp <= 0)) {
+      const again = a.angryAt !== undefined && this.time - a.angryAt < NAMED_FIGHT_SEC;
+      a.angryAt = this.time;
       a.act = 'argue';
-      a.doing = '맞고 화남';
+      a.doing = again ? '맞섬' : '맞고 화남';
       a.wait = 3;
+      if (again) a.perks ??= ['스탯 뻥튀기', '체력 뻥튀기'];
       this.setClip(a, this.canClip(a, 'angry') ? 'angry' : 'idle');
       this.iconOn(a, '#', 3);
       return;
     }
     a.act = 'down';
-    a.doing = down ? '쓰러짐' : '휘청';
-    a.wait = down ? 1.8 : 0.6;
-    this.setClip(a, down && this.canClip(a, 'down') ? 'down' : 'idle');
+    a.doing = down ? '기절' : '휘청';
+    if (down) a.downAt = this.time;
+    a.wait = down ? 6 : 0.6;
+    this.setClip(a, down ? (this.canClip(a, 'down') ? 'down' : 'idle') : this.canClip(a, 'hit') ? 'hit' : 'idle');
     this.iconOn(a, '!', 1.5);
   }
 
+  /** 맨몸 켜기/끄기 (샤워 기능이 부른다: 옷 벗으면 on, 옷 입으면 off). 쓰러진 채면 자세만 바꾸고, 아니면 서 있는 자세로 */
+  setNude(id: string, on: boolean): boolean {
+    const a = this.actors.find((q) => q.def.id === id) ?? this.findActor(id);
+    if (!a || !!a.nude === on) return false;
+    a.nude = on;
+    if (a.act === 'dead' || a.act === 'gone') return true;
+    this.setClip(a, a.act === 'down' && (a.hp ?? 1) <= 0 ? 'down' : 'idle');
+    return true;
+  }
+  /** 이어하기(11-01): 다음 방문에 되살릴 것만 (이름 인물 욕구·동행·맨몸). 시각·주인공 자리는 부르는 쪽이 채운다 */
+  snapshot(): Pick<FieldWorldSave, 'v' | 'needs' | 'follow' | 'nude'> {
+    const needs: Record<string, Needs> = {};
+    for (const a of this.actors) if (a.def.kind === 'named' && a.needs) needs[a.def.name] = { ...a.needs };
+    const follow = this.followers.map((id) => this.actors.find((q) => q.def.id === id)).filter((a): a is Actor => !!a && a.def.kind === 'named').map((a) => a.def.name);
+    const nude = this.actors.filter((a) => a.nude && a.def.kind === 'named').map((a) => a.def.name);
+    return { v: 1, needs, follow, ...(nude.length ? { nude } : {}) };
+  }
+  /** 이어하기: 저장한 욕구를 돌려 놓고 지난 필드 시간(elapsedH, 최대 하루)만큼 더 줄인 뒤, 동행·맨몸을 되살린다. 이번 방문에 없는 인물은 건너뜀 */
+  restore(s: FieldWorldSave, elapsedH = 0): void {
+    const h = Math.max(0, Math.min(24, elapsedH));
+    for (const a of this.actors) {
+      const n = a.def.kind === 'named' ? s.needs[a.def.name] : undefined;
+      if (!n || !a.needs) continue;
+      for (const k of Object.keys(a.needs) as (keyof Needs)[]) if (typeof n[k] === 'number') a.needs[k] = n[k];
+      // 생활 1시간 ≈ 실제 180초 (step: 시계가 없을 때 gameH += dt/180). 자리를 비운 사이 제 일은 알아서 챙겼다고 보고 30 아래로는 안 내려간다
+      if (h > 0) {
+        const before = { ...a.needs };
+        decayNeeds(a.needs, h * 180, TEMPER[a.def.name], onDuty(this.hour, TEMPER[a.def.name]));
+        for (const k of Object.keys(a.needs) as (keyof Needs)[]) a.needs[k] = Math.max(Math.min(30, before[k]), a.needs[k]);
+      }
+    }
+    for (const name of s.follow) this.setFollow(name, 'follow');
+    for (const name of s.nude ?? []) this.setNude(name, true);
+  }
   /** 행위자 말풍선 (대사 연결이 부른다) */
+  /** 머리 위 작은 말풍선 기호 (인물끼리 상호작용) */
+  emote(a: Actor, icon: string, sec = 2): void {
+    this.iconOn(a, icon, sec);
+  }
   say(a: Actor, text: string, sec = 3.2): void {
     a.say = text;
     a.sayT = sec;
@@ -271,26 +757,896 @@ export class WorldSim {
   }
 
   /** 생활 시간을 dt초 진행. player = 보이는 장면과 주인공 발, hour = 필드 시(모르면 null) */
-  step(dt: number, player?: { scene: string; x: number; y?: number; hour?: number | null }): void {
+  step(dt: number, player?: { scene: string; x: number; y?: number; hour?: number | null; seat?: number | null; armed?: boolean; face?: number; sex?: '남' | '여' | null }): void {
     this.time += dt;
-    this.hour = player?.hour ?? null;
-    this.player = player ? { scene: player.scene, x: player.x, y: player.y ?? 0 } : null;
+    const h = player?.hour ?? null;
+    if (h != null && this.hour != null) this.gameH += (h - this.hour + 24) % 24;
+    else if (h == null) this.gameH += dt / 180;
+    this.hour = h;
+    // 끈질긴 추적(경찰 퍽): 주인공이 장면을 옮기면 쫓던 경찰이 한 번 따라 들어온다
+    const was = this.player?.scene;
+    if (player && was && was !== player.scene) {
+      for (const a of this.actors.filter((q) => q.scene === was && q.plan === 'chase' && !q.fighting)) {
+        if (!this.once(a, '끈질긴 추적')) continue;
+        const len = this.graph.scene(player.scene)?.length ?? 1280;
+        a.scene = player.scene;
+        a.x = Math.abs(player.x - 30) > Math.abs(player.x - (len - 30)) ? 30 : len - 30;
+        a.y = player.y ?? this.laneMid(player.scene);
+        a.route = [];
+        this.walkTo(a, { x: player.x, y: a.y }, '쫓아옴', 'chase');
+        this.iconOn(a, '!', 2);
+      }
+    }
+    // 동행: 주인공이 장면을 옮기면 같이 들어온다. 발자국은 새 장면에서 다시
+    if (player && was && was !== player.scene) {
+      this.trail = [];
+      for (const id of this.followers) {
+        const a = this.actors.find((q) => q.def.id === id);
+        if (a && a.scene === was && !a.fighting && !['down', 'dead', 'gone'].includes(a.act)) this.joinScene(a, player.scene, player.x, player.y ?? 0);
+      }
+    }
+    if (player) {
+      const last = this.trail[this.trail.length - 1];
+      if (!last || Math.abs(last.x - player.x) > 4 || Math.abs(last.y - (player.y ?? 0)) > 4 || this.time - last.t > 0.5) this.trail.push({ t: this.time, x: player.x, y: player.y ?? 0 });
+      while (this.trail.length > 2 && this.time - this.trail[0].t > 6) this.trail.shift();
+    }
+    this.player = player ? { scene: player.scene, x: player.x, y: player.y ?? 0, seat: player.seat ?? null, armed: !!player.armed, face: player.face ?? 1, sex: player.sex ?? null } : null;
     for (const [s, u] of this.uproar) {
       u.v = Math.max(0, u.v - (player?.scene === s ? 1.5 : 5) * dt);
       if (u.v <= 0) this.uproar.delete(s);
     }
-    for (const a of [...this.actors]) this.stepActor(a, dt);
+    for (const a of [...this.actors]) if (!a.fighting) this.stepActor(a, dt);
     for (let i = this.actors.length - 1; i >= 0; i--) if (this.actors[i].act === 'gone') this.actors.splice(i, 1);
+    this.stepCorpses();
     for (const r of this.spawns) this.stepSpawn(r, dt);
     for (const p of this.posts) this.stepPost(p);
+    this.stepPatrol(dt);
+    if ((this.visitT -= dt) <= 0) { this.visitT = 0.5; this.stepVisitors(0.5); this.stepPlayerVisit(0.5); }
+    this.stepAlarms(dt);
+    this.stepIntrude();
+  }
+
+  // ── 방문 대응 (10-31 사용자, 살아 있는 세상 4단계): 다른 세력 사람이 세력 거점 장면에 들어오면 거점 사람들이 세력 관계대로 ──
+  // 우호·호의 = 인사, 중립 = 무시, 경계 = 경비가 따라붙어 지켜보다 경고 → 내보냄, 적대 = 경비·전투원이 막아서 싸우고 비전투원은 겁먹고 피함.
+  // 관계는 세력 평판 기능이 켜져 있으면 플러그인 세력 관계 표, 꺼져 있으면 기본값(큰 세력 셋 서로 적대). 주인공 대응은 따로(세력 평판 구간, mobThink)
+  private visitT = 0;
+  /** 그 사람의 소속: 따로 정한 세력 → 근무형·경비·직원은 장면 소속 */
+  factionOf(a: Actor): string | null {
+    return a.def.faction ?? this.mobFaction(a);
+  }
+  /** 싸울 수 있는 몸인가 (경비·경찰·불량배·관리국 요원·이름 인물·다른 세력 방문자) */
+  private combatant(a: Actor): boolean {
+    const role = ARCHETYPES[a.def.archetype ?? '']?.role;
+    return a.def.kind === 'named' || !!a.def.faction || role === 'guard' || role === 'police' || role === 'thug';
+  }
+  private free(a: Actor): boolean {
+    return !a.brawl && !a.fighting && !['down', 'dead', 'gone', 'door', 'scared'].includes(a.act) && a.plan !== 'chase' && a.plan !== 'cordon';
+  }
+  /** 다른 세력 방문자를 들여보낸다 (C15 세력 NPC 배치·시험이 부른다) */
+  spawnVisitor(scene: string, archetype: string, faction: string, x?: number): Actor {
+    const len = this.graph.scene(scene)?.length ?? 1280;
+    const arch = ARCHETYPES[archetype];
+    const a = this.add({ id: `mob${++serial}`, name: archetype, kind: 'mob', brain: 'transit', home: scene, archetype, look: arch?.looks?.length ? pick(this.rng, arch.looks) : archetype, faction }, { scene, x: x ?? 60, y: this.laneMid(scene) });
+    a.exitAt = { x: len - 60, y: a.y };
+    this.walkTo(a, a.exitAt, '둘러보는 중', 'exit');
+    return a;
+  }
+  private stepVisitors(dt: number): void {
+    // 따라붙던 방문자가 나갔거나 쫓겨 나가는 중이면 경비는 자리로
+    for (const e of this.actors) {
+      if (!e.escort || e.escort === 'player') continue;   // 주인공 경계는 stepPlayerVisit
+      const v = this.actors.find((q) => q.def.id === e.escort);
+      if (v && v.scene === e.scene && v.act !== 'gone' && !(v.plan === 'exit' && (v.stay ?? 0) < 0)) continue;
+      e.escort = undefined;
+      if (e.post) this.goPost(e);
+      else this.resume(e);
+    }
+    const scenes = new Set(this.actors.map((a) => a.scene));
+    for (const scene of scenes) {
+      const home = this.sceneFaction(scene);
+      if (!home) continue;
+      const here = this.inScene(scene).filter((a) => !a.brawl);
+      const visitors = here.filter((v) => { const f = this.factionOf(v); return !!f && f !== home && this.free(v); });
+      if (!visitors.length) continue;
+      const ours = here.filter((q) => this.factionOf(q) === home && this.free(q));
+      for (const v of visitors) {
+        const st = this.relation(home, this.factionOf(v)!);
+        const near = (ok: (q: Actor) => boolean, d = 520) => ours.filter((q) => ok(q) && Math.abs(q.x - v.x) < d).sort((p, q) => Math.abs(p.x - v.x) - Math.abs(q.x - v.x));
+        if (st === 'friendly' || st === 'favorable') {
+          const g = near((q) => !q.greeted?.includes(v.def.id) && q.act !== 'notice', 400)[0];
+          if (!g) continue;
+          (g.greeted ??= []).push(v.def.id);
+          g.act = 'notice';
+          g.doing = '방문자에게 인사';
+          g.goal = null;
+          g.face = v.x > g.x ? 1 : -1;
+          g.wait = 2.2;
+          this.setClip(g, this.canClip(g, 'greet') ? 'greet' : 'idle');
+          this.say(g, st === 'friendly' ? '오셨어요!' : '안녕하세요.', 2);
+          continue;
+        }
+        if (st === 'wary') {
+          // 경비 하나가 따라붙어 지켜보고, 오래 머물면 경고 → 내보낸다
+          let e = ours.find((q) => q.escort === v.def.id);
+          if (!e) {
+            e = near((q) => !q.escort && ARCHETYPES[q.def.archetype ?? '']?.role === 'guard', 2000)[0];
+            if (!e) continue;
+            e.escort = v.def.id;
+            this.iconOn(e, '!', 1.5);
+          }
+          if (Math.abs(e.x - v.x) > 140) {
+            this.walkTo(e, { x: v.x + (e.x < v.x ? -90 : 90), y: v.y }, '방문자를 따라감', 'none');
+          } else if (e.act !== 'watch') {
+            e.act = 'watch';
+            e.doing = '방문자 경계';
+            e.goal = null;
+            e.wait = 1;
+            e.face = v.x > e.x ? 1 : -1;
+            this.setClip(e, 'idle');
+          }
+          v.stay = (v.stay ?? 0) + dt;
+          if (v.stay >= 6 && v.stay - dt < 6) this.events.push({ kind: 'cue', scene, who: e.def.name, id: e.def.id, cell: 'expel.warn', ctx: { target: v.def.name, say: '여긴 관계자 외 출입 금지입니다.' } });
+          if (v.stay >= 14) {
+            this.events.push({ kind: 'cue', scene, who: e.def.name, id: e.def.id, cell: 'expel.attack', ctx: { target: v.def.name, say: '나가 주시죠.' } });
+            v.exitAt = this.gateFar(v, e.x);
+            this.walkTo(v, v.exitAt, '쫓겨남', 'exit');
+            v.plan = 'exit';
+            v.stay = -1e9;
+            this.events.push({ kind: 'expel', scene, who: v.def.name, by: e.def.name });
+          }
+          continue;
+        }
+        if (st !== 'hostile') continue;
+        // 적대 방문자 = 들어오자마자 거점 경보 (10-31 사용자: 싸움 전이라도). 경보가 모든 방의 전투원을 모은다
+        this.raiseAlarm(scene, v.x, v.def.id, 'intruder');
+        // 적대: 싸울 수 있는 우리 쪽이 둘까지 붙는다. 비전투원은 겁먹고 피한다
+        const fighters = near((q) => this.combatant(q), 2000).slice(0, 2);
+        for (const q of ours) if (!this.combatant(q) && Math.abs(q.x - v.x) < 500 && q.def.kind === 'mob' && !q.post) this.scareAt(q, v.x);
+        if (!fighters.length) continue;
+        for (const f of fighters) this.startBrawl(f, v);
+        // 방문자: 싸울 수 있으면 맞서고, 아니면 달아난다
+        if (this.combatant(v) && (v.temper?.courage ?? 0.7) >= 0.35) this.startBrawl(v, fighters[0]);
+        else this.flee(v, fighters[0].x);
+        this.disturb(scene, 25, v.x);
+        this.events.push({ kind: 'brawl', scene, a: fighters[0].def.name, af: home, b: v.def.name, bf: this.factionOf(v)!, x: v.x });
+      }
+    }
+  }
+  private startBrawl(a: Actor, foe: Actor): void {
+    if (a.brawl) return;
+    a.brawl = { foe: foe.def.id, t: range(this.rng, 0.4, 0.9) };
+    a.escort = undefined;
+    a.goal = null;
+    a.route = [];
+    a.seatPick = undefined;
+    a.doing = `${foe.def.name}와 싸움`;
+    this.iconOn(a, '#', 2);
+    // 이름 인물은 체력이 없으면 표(×1.5, 10-31 이름 인물 퍽)로
+    if (a.hp === undefined) { a.base ??= baseOf(a.def.look ?? a.def.name); a.hpMax = a.hp = Math.round(derive(a.base).hp * (a.def.kind === 'named' ? NAMED_MUL.hp : 1)); }
+  }
+  private endBrawl(a: Actor): void {
+    a.brawl = undefined;
+    a.run = 1;
+    if (a.post) return this.goPost(a);
+    this.resume(a);
+  }
+  /** NPC끼리 싸움 한 틱: 붙을 때까지 다가가고, 붙으면 0.9~1.4초마다 한 대 (피해 = 힘·받는 피해 공식). 체력 0 = 기절, 겁 많으면 30% 아래서 달아남 */
+  private stepBrawl(a: Actor, dt: number): void {
+    const f = this.actors.find((q) => q.def.id === a.brawl!.foe);
+    if (!f || f.scene !== a.scene || ['down', 'dead', 'gone', 'door'].includes(f.act) || f.fighting || (f.plan === 'exit' && f.act === 'walk' && !f.brawl)) return this.endBrawl(a);
+    if (a.sayT > 0 && (a.sayT -= dt) <= 0) a.say = undefined;
+    if (a.iconT > 0 && (a.iconT -= dt) <= 0) a.icon = undefined;
+    a.face = f.x > a.x ? 1 : -1;
+    const gap = Math.abs(f.x - a.x);
+    if (gap > 80 || Math.abs(f.y - a.y) > 24) {
+      const sp = (a.def.speed ?? WALK) * 1.4 * dt;
+      a.x += Math.sign(f.x - a.x) * Math.min(sp, Math.max(0, gap - 70));
+      a.y += Math.sign(f.y - a.y) * Math.min(sp * 0.5, Math.abs(f.y - a.y));
+      a.act = 'walk';
+      if (a.clip !== 'walk') this.setClip(a, 'walk');
+      return;
+    }
+    a.act = 'argue';
+    if ((a.brawl!.t -= dt) > 0) { if (a.clip === 'walk') this.setClip(a, 'idle'); return; }
+    a.brawl!.t = range(this.rng, 0.9, 1.4);
+    this.setClip(a, this.canClip(a, 'strike') ? 'strike' : 'idle');
+    const ab = a.base ?? baseOf(a.def.look), fb = f.base ?? baseOf(f.def.look);
+    const dmg = Math.round(60 * derive(ab).power * derive(fb).taken * range(this.rng, 0.8, 1.2));
+    if (f.hp === undefined) this.startBrawl(f, a);
+    f.hp = Math.max(0, (f.hp ?? 0) - dmg);
+    f.x += a.face * 10;
+    if (f.hp <= 0) {
+      f.brawl = undefined;
+      f.act = 'down';
+      f.doing = '기절';
+      f.downAt = this.time;
+      f.wait = range(this.rng, 15, 25);
+      f.goal = null;
+      this.setClip(f, this.canClip(f, 'down') ? 'down' : 'idle');
+      this.events.push({ kind: 'brawlEnd', scene: a.scene, winner: a.def.name, loser: f.def.name, how: 'down' });
+      return this.endBrawl(a);
+    }
+    if (f.hpMax && f.hp < f.hpMax * 0.3 && (f.temper?.courage ?? 0.7) < 0.5) {
+      f.brawl = undefined;
+      this.flee(f, a.x);
+      this.events.push({ kind: 'brawlEnd', scene: a.scene, winner: a.def.name, loser: f.def.name, how: 'fled' });
+      return this.endBrawl(a);
+    }
+    if (!f.brawl) this.startBrawl(f, a);
+  }
+
+  /** 평소 거리 순찰 (C16): 거리 장면마다 가끔 경찰 1~2명이 한쪽 끝에서 들어와 천천히 걸어 반대쪽으로 나간다.
+   *  걷다 무전·메모·두리번. 순찰이 있는 동안 그 장면에선 소매치기·시비를 안 벌이고, 범죄가 나면 먼저 달려온다(crime). 시체를 보면 현장을 맡는다 */
+  private stepPatrol(dt: number): void {
+    for (const r of this.spawns) {
+      const scene = r.scene;
+      if (this.graph.kind(scene) !== 'street') continue;
+      const left = (this.patrolT.get(scene) ?? range(this.rng, PATROL.every[0], PATROL.every[1]) * 0.5) - dt;
+      if (left > 0) { this.patrolT.set(scene, left); continue; }
+      this.patrolT.set(scene, range(this.rng, PATROL.every[0], PATROL.every[1]));
+      // 이미 경찰이 있거나(순찰·출동·현장) 소란이 크면 건너뜀
+      if (this.actors.some((a) => a.scene === scene && a.def.archetype === '경찰' && a.act !== 'gone') || this.uproarLevel(scene) >= 2) continue;
+      if (this.rng() >= PATROL.chance) continue;
+      this.spawnPatrol(scene, r.gates);
+    }
+  }
+  /** 순찰 경찰 한 조를 들여보낸다 (시험·개발 도구도 부른다). 들어온 사람들 */
+  spawnPatrol(scene: string, gates?: number[]): Actor[] {
+    const len = this.graph.scene(scene)?.length ?? 1280;
+    const gs = gates?.length ? gates : [30, len - 30];
+    const px = this.player?.scene === scene ? this.player.x : null;
+    // 보이는 장면이면 주인공에서 먼 쪽 출입구로 (갑자기 옆에 생기지 않게)
+    const from = px === null ? pick(this.rng, gs) : [...gs].sort((p, q) => Math.abs(q - px) - Math.abs(p - px))[0];
+    const to = gs.filter((g) => g !== from).sort((p, q) => Math.abs(q - from) - Math.abs(p - from))[0] ?? (from < len / 2 ? len - 30 : 30);
+    const [top, bot] = this.graph.lane(scene);
+    const y = range(this.rng, top + 30, bot - 30);
+    const speed = range(this.rng, PATROL.speed[0], PATROL.speed[1]);
+    const out: Actor[] = [];
+    const n = this.rng() < PATROL.pair ? 2 : 1;
+    const arch = ARCHETYPES['경찰'];
+    for (let i = 0; i < n; i++) {
+      const dy = i === 0 ? 0 : y - top > bot - y ? -26 : 26;
+      const a = this.add({ id: `mob${++serial}`, name: '경찰', kind: 'mob', brain: 'transit', home: scene, archetype: '경찰', look: arch?.looks?.length ? pick(this.rng, arch.looks) : '경찰', speed }, { scene, x: from - (i ? Math.sign(to - from) * 24 : 0), y: y + dy });
+      a.patrol = true;
+      a.exitAt = { x: to, y: y + dy };
+      if (i && out[0]) { a.buddy = out[0].def.id; a.buddyDy = dy; }
+      this.walkTo(a, a.exitAt, i ? '동료와 순찰' : '순찰 중', 'exit');
+      out.push(a);
+    }
+    return out;
+  }
+  /** 원형의 그림 하나 (원형 이름 = 실루엣이라 그림 목록에서 고른다) */
+  private lookOf(arch: string): string {
+    const l = ARCHETYPES[arch]?.looks;
+    return l?.length ? pick(this.rng, l) : arch;
+  }
+  // ── 경보 (10-31 사용자 결정 docs/필드기능_결정_1031.md 9번): 거점 전체 상태. 켜지면 경비·전투 가능한 요원이 위협에게 몰려가 공격, 비전투원은 피함 ──
+  /** 거점 세력 → 경보 (threats = 'player' 또는 행위자 id) */
+  readonly alarms = new Map<string, { scene: string; x: number; threats: string[]; quiet: number; tick: number; why: string }>();
+  /** 위협이 사라지고 이만큼(초) 지나면 해제 */
+  static ALARM_CLEAR = 15;
+  /** 그 거점 세력의 경보 (없으면 null) */
+  alarmOf(faction: string | null | undefined): { scene: string; x: number; threats: string[]; why: string } | null {
+    return faction ? this.alarms.get(faction) ?? null : null;
+  }
+  /** 장면이 경보 중인 거점인가 */
+  alarmIn(scene: string): boolean {
+    return !!this.alarmOf(this.sceneFaction(scene));
+  }
+  /** 경보를 켠다 (이미 켜져 있으면 위협만 더한다). threat = 'player' 또는 행위자 id */
+  raiseAlarm(scene: string, x: number, threat: string, why: string): void {
+    const fac = this.sceneFaction(scene);
+    if (!fac) return;
+    let al = this.alarms.get(fac);
+    if (!al) {
+      al = { scene, x, threats: [], quiet: 0, tick: 0, why };
+      this.alarms.set(fac, al);
+      const t = threat === 'player' ? '{user}' : this.actors.find((q) => q.def.id === threat)?.def.name ?? threat;
+      this.events.push({ kind: 'alarm', scene, faction: fac, on: true, why, threat: t });
+      if (threat === 'player') {
+        const g = this.actors.filter((q) => q.scene === scene && !q.fighting && !['down', 'dead', 'gone', 'door'].includes(q.act) && ARCHETYPES[q.def.archetype ?? '']?.role === 'guard').sort((a, b) => Math.abs(a.x - x) - Math.abs(b.x - x))[0];
+        if (g) this.events.push({ kind: 'cue', scene, who: g.def.name, id: g.def.id, cell: 'expel.alarm', ctx: { target: '{user}', say: '경보 울려!' } });
+      }
+    }
+    if (!al.threats.includes(threat)) { al.threats.push(threat); al.tick = 0; }   // 새 위협이면 바로 모은다
+    al.scene = scene;
+    al.x = x;
+    al.quiet = 0;
+  }
+  /** 위협이 아직 거점 안에 있나 */
+  private threatAt(fac: string, t: string): { scene: string; x: number; y: number; actor?: Actor } | null {
+    if (t === 'player') {
+      const p = this.player;
+      return p && this.sceneFaction(p.scene) === fac ? { scene: p.scene, x: p.x, y: p.y } : null;
+    }
+    const a = this.actors.find((q) => q.def.id === t);
+    if (!a || a.fighting || ['down', 'dead', 'gone'].includes(a.act) || (a.plan === 'exit' && a.doing === '쫓겨남') || this.sceneFaction(a.scene) !== fac) return null;
+    return { scene: a.scene, x: a.x, y: a.y, actor: a };
+  }
+  /** 경보에 싸우러 가는 사람: 그 거점 경비·전투 계열 이름 인물. 경찰은 아님 (11-01 사용자: 경보는 거점 안 일이라 경찰이 오는 건 이상함) */
+  private alarmFighter(a: Actor, fac: string): boolean {
+    if (a.def.kind === 'named') return !this.noAssist(a.def.name) && (!a.def.faction || a.def.faction === fac);
+    const role = ARCHETYPES[a.def.archetype ?? '']?.role;
+    return role === 'guard' && (this.mobFaction(a) === fac || !a.def.faction);
+  }
+  private stepAlarms(dt: number): void {
+    for (const [fac, al] of this.alarms) {
+      const live = al.threats.map((t) => [t, this.threatAt(fac, t)] as const).filter(([, v]) => !!v) as [string, NonNullable<ReturnType<WorldSim['threatAt']>>][];
+      if (!live.length) {
+        if ((al.quiet += dt) < WorldSim.ALARM_CLEAR) continue;
+        this.alarms.delete(fac);
+        for (const a of this.actors) {
+          if (a.alarm !== fac) continue;
+          a.alarm = undefined;
+          a.run = 1;
+          if (a.fighting || a.brawl || ['down', 'dead', 'gone'].includes(a.act)) continue;
+          a.plan = 'none';
+          a.route = [];
+          this.resume(a);
+        }
+        this.events.push({ kind: 'alarm', scene: al.scene, faction: fac, on: false, why: al.why, threat: '' });
+        continue;
+      }
+      al.quiet = 0;
+      al.scene = live[0][1].scene;
+      al.x = live[0][1].x;
+      if ((al.tick -= dt) > 0) continue;
+      al.tick = 1.5;
+      for (const a of this.actors) {
+        if (a.following || a.fighting || ['down', 'dead', 'gone', 'door'].includes(a.act) || this.sceneFaction(a.scene) !== fac) continue;
+        if (al.threats.includes(a.def.id)) continue;
+        // 가장 가까운 위협 (같은 장면 먼저)
+        const [tid, t] = live.slice().sort(([, p], [, q]) => (p.scene === a.scene ? 0 : 1) - (q.scene === a.scene ? 0 : 1) || Math.abs(p.x - a.x) - Math.abs(q.x - a.x))[0];
+        if (this.alarmFighter(a, fac)) {
+          a.alarm = fac;
+          if (a.brawl) continue;
+          a.seatPick = undefined;
+          a.task = undefined;
+          a.escort = undefined;
+          a.run = 1.6;
+          if (t.scene !== a.scene) {
+            if (a.route.length && a.plan === 'chase') continue;   // 이미 가는 중
+            const path = this.graph.route(a.scene, t.scene);
+            const d = path && this.graph.doorSpot(a.scene, path[0].exit);
+            if (!path || !d) continue;
+            a.route = path;
+            this.walkTo(a, d, '경보: 현장으로 달려감', 'chase');
+            this.iconOn(a, '!', 2);
+            continue;
+          }
+          if (tid === 'player') {
+            if (a.plan === 'chase' && !a.target) continue;
+            a.target = undefined;
+            this.walkTo(a, { x: t.x, y: t.y || a.y }, '경보: 침입자에게', 'chase');
+            this.iconOn(a, '!', 2);
+          } else if (t.actor) {
+            this.startBrawl(a, t.actor);
+            a.doing = `경보: ${t.actor.def.name}와 싸움`;
+          }
+          continue;
+        }
+        // 비전투원: 위협이 있는 장면이면 반대쪽으로 피한다 (다른 방은 그대로)
+        if (a.scene !== t.scene || a.alarm === fac || a.act === 'scared') continue;
+        if (Math.abs(a.x - t.x) > ALARM_EVADE_PX) continue;
+        a.alarm = fac;
+        this.evade(a, t.x);
+      }
+    }
+  }
+  /** 대피: 위협 반대쪽 끝으로 달려가 머문다 (사라지지 않음. 지나가던 사람은 그대로 나감) */
+  private evade(a: Actor, fromX: number): void {
+    if (a.def.kind === 'mob' && !a.post && !a.def.faction && a.def.brain === 'transit') return this.flee(a, fromX);
+    const len = this.graph.scene(a.scene)?.length ?? 1280;
+    const x = fromX < len / 2 ? len - 90 : 90;
+    a.seatPick = undefined;
+    a.task = undefined;
+    a.run = 1.6;
+    this.walkTo(a, { x, y: a.y }, '대피', 'none');
+    this.setClip(a, this.canClip(a, 'run') ? 'run' : 'walk');
+    this.iconOn(a, '!', 1.5);
+  }
+  /** 경보를 울릴 목격자로 치는 거리 (캐릭터 목격 witness 와 같음) */
+  static WITNESS_PX = 700;
+  /**
+   * 주인공이 거점 안에서 누군가를 기절시키거나 죽임 (11-01 사용자): 그걸 본 사람이 있어야 경보. 때리기만 해서는 경보가 아니다.
+   * 맞은 쪽이 이미 경보의 위협(침입자)이면 경보를 더하지 않는다
+   */
+  private playerViolence(scene: string, x: number, victim: Actor | undefined, why: string): void {
+    const fac = this.sceneFaction(scene);
+    if (!fac) return;
+    if (victim && this.alarms.get(fac)?.threats.includes(victim.def.id)) return;
+    const seen = this.actors.some((a) => a !== victim && a.scene === scene && !a.following && !a.fighting && !['down', 'dead', 'gone', 'door'].includes(a.act) && (a.hp ?? 1) > 0 && Math.abs(a.x - x) < WorldSim.WITNESS_PX);
+    if (!seen) return;
+    this.raiseAlarm(scene, x, 'player', why);
+  }
+  // ── 퇴근·출근 (10-31 사용자 결정 8번): 근무가 끝나면 거점 출구로 나가 다음 근무까지 없고, 근무 시작 때 그 입구로 들어온다. 동행·기다림 중엔 안 나간다 ──
+  /** 퇴근해 필드에 없는 사람 (관찰 창·시험용) */
+  offDuty(): Actor[] {
+    return this.actors.filter((a) => a.commute?.state === 'off');
+  }
+  /** true = 이번 틱은 퇴근·출근이 맡았다 */
+  private stepCommute(a: Actor): boolean {
+    if (a.def.kind !== 'named' || a.def.brain !== 'needs' || this.hour == null) return false;
+    const fac = this.sceneFaction(a.def.home);
+    if (!fac) return false;
+    const duty = onDuty(this.hour, TEMPER[a.def.name]);
+    const c = a.commute;
+    if (c?.state === 'off') {
+      if (!duty) return true;
+      // 출근: 나갔던 바깥 장면의 그 문으로 들어와 자기 자리로
+      a.commute = undefined;
+      a.scene = c.scene ?? a.def.home;
+      a.x = c.x ?? a.x;
+      a.act = 'idle';
+      a.wait = 0;
+      const path = this.graph.route(a.scene, a.def.home);
+      const d = path?.length ? this.graph.doorSpot(a.scene, path[0].exit) : null;
+      if (path?.length && d) { a.route = path; this.walkTo(a, d, '출근', 'none'); }
+      this.events.push({ kind: 'shift', scene: a.scene, who: a.def.name, on: true });
+      return true;
+    }
+    if (duty || a.following || a.hold || a.fighting || a.brawl || a.alarm || ['down', 'dead', 'gone', 'door', 'scared'].includes(a.act)) {
+      if (c?.state === 'out' && duty) a.commute = undefined;   // 다시 근무 시간 (가다 말고 돌아섬)
+      return false;
+    }
+    // 거점 밖에 닿음 = 퇴근 완료
+    if (this.sceneFaction(a.scene) !== fac) {
+      a.commute = { state: 'off', scene: a.scene, x: a.x };
+      a.goal = null;
+      a.route = [];
+      a.act = 'idle';
+      a.doing = '퇴근함';
+      a.scene = '';
+      this.events.push({ kind: 'shift', scene: c?.scene ?? '', who: a.def.name, on: false });
+      return true;
+    }
+    if (c?.state === 'out' && (a.act === 'walk' || a.route.length)) return false;   // 나가는 중
+    // 퇴근 시작: 가장 가까운 거점 밖 장면으로
+    let best: { path: Hop[]; d: { x: number; y: number } } | null = null;
+    for (const id of this.graph.ids()) {
+      if (this.sceneFaction(id) === fac) continue;
+      const path = this.graph.route(a.scene, id);
+      const d = path?.length ? this.graph.doorSpot(a.scene, path[0].exit) : null;
+      if (path?.length && d && (!best || path.length < best.path.length)) best = { path, d };
+    }
+    if (!best) return false;
+    a.commute = { state: 'out', scene: a.scene };
+    a.task = undefined;
+    a.seatPick = undefined;
+    a.route = best.path;
+    this.walkTo(a, best.d, '퇴근', 'none');
+    return false;
+  }
+  // ── 캐릭터 반응 (10-31 사용자 결정 3번): 캐릭터는 고정된 개성 — 반응표(namedReact.json)의 인물별 포즈·말풍선·행동 ──
+  /** 반응 가능한 캐릭터인가 (동행·싸움·경보 대응·쓰러짐 중이면 아님) */
+  private canReact(a: Actor): boolean {
+    return a.def.kind === 'named' && !a.following && !a.fighting && !a.brawl && !a.alarm && !['down', 'dead', 'gone', 'door', 'scared'].includes(a.act) && a.plan !== 'chase';
+  }
+  /** 반응표대로 한다. at = 반응할 곳(무기 든 주인공·시체·소란·맞은 동료), offender = 'player' 또는 가해 행위자, cool = 같은 상황 다시 반응까지 초 */
+  private namedReact(a: Actor, s: ReactSituation, at: { x: number; y: number }, offender?: 'player' | Actor, cool = 12): boolean {
+    const cell: ReactCell | null = reactCell(a.def.name, s);
+    if (!cell || !this.canReact(a)) return false;
+    const last = a.reactAt?.[s];
+    if (last !== undefined && this.time - last < cool) return false;
+    (a.reactAt ??= {})[s] = this.time;
+    const clip = this.canClip(a, cell.clip) ? cell.clip : 'idle';
+    if (cell.icon) this.iconOn(a, cell.icon, 2);
+    a.seatPick = undefined;
+    a.task = undefined;
+    const face = () => { a.face = at.x > a.x ? 1 : -1; };
+    const hold = (doing: string, sec = 3) => { a.act = 'watch'; a.goal = null; a.route = []; a.wait = sec; a.doing = doing; face(); this.setClip(a, clip); };
+    switch (cell.act) {
+      case 'ignore':
+        return true;
+      case 'watch':
+        hold('바라봄');
+        return true;
+      case 'confront':
+        hold('맞서 버팀', 3.5);
+        return true;
+      case 'report':
+        hold('무전·신고', 3);
+        return true;
+      case 'cower':
+        hold('웅크림', 3.5);
+        return true;
+      case 'approach':
+      case 'protect':
+        a.reactClip = clip;
+        a.run = cell.act === 'protect' ? 1.6 : 1;
+        this.walkTo(a, { x: at.x + (a.x < at.x ? -80 : 80), y: at.y || a.y }, cell.act === 'protect' ? '동료에게 달려감' : '살피러 감', 'react');
+        return true;
+      case 'avoid':
+        this.evade(a, at.x);
+        a.run = 1;
+        a.doing = '자리를 피함';
+        return true;
+      case 'flee':
+        this.evade(a, at.x);
+        a.doing = '달아남';
+        return true;
+      case 'attack':
+        if (offender === 'player') {
+          a.run = 1.5;
+          a.target = undefined;
+          this.walkTo(a, { x: at.x, y: at.y || a.y }, '주인공에게 덤빔', 'chase');
+          a.perks ??= ['스탯 뻥튀기', '체력 뻥튀기'];
+        } else if (offender && offender !== a) {
+          this.startBrawl(a, offender);
+        } else hold('맞서 버팀', 3);
+        return true;
+    }
+    return false;
+  }
+  /** 매 틱 보는 것: 무기 든 주인공, 시체, 소란 */
+  private namedSense(a: Actor): void {
+    if (!this.canReact(a)) return;
+    const p = this.player;
+    // 무기를 겨눔: 무기를 꺼낸 주인공이 이쪽을 보고 가까이 (몹 겁 반응과 같은 거리).
+    // 든 동안은 계속 반응을 이어 가고(다시 하기 간격 없음), 넣으면 그만. 다시 꺼내거나 잠시 벗어났다 다시 보이면 새로 반응 (11-01 사용자)
+    const sees = !!p?.armed && p.scene === a.scene && Math.abs(a.x - p.x) < 300 && Math.abs(a.y - p.y) < 90 && Math.sign(a.x - p.x) === Math.sign(p.face ?? 1);
+    if (sees && p) {
+      const cont = a.armedSeen !== undefined && this.time - a.armedSeen < 1.5;
+      a.armedSeen = this.time;
+      if (cont) {
+        if (a.weaponHold && a.act === 'watch') { a.wait = Math.max(a.wait, 0.5); a.face = p.x > a.x ? 1 : -1; }
+        return;
+      }
+      if (this.namedReact(a, 'weapon', p, 'player', 0)) { a.weaponHold = true; return; }
+    } else if (a.weaponHold && (!p?.armed || a.armedSeen === undefined || this.time - a.armedSeen >= 1.5)) {
+      // 무기를 넣음(또는 시야에서 벗어남): 노려보기를 끝낸다
+      a.weaponHold = false;
+      if (!p?.armed) a.armedSeen = undefined;
+      if (a.act === 'watch') a.wait = Math.min(a.wait, 0.3);
+    }
+    // 시체: 처음 보는 시체마다 한 번
+    const b = this.actors.find((q) => q.act === 'dead' && q.scene === a.scene && Math.abs(q.x - a.x) < SEE_BODY_PX && Math.abs(q.y - a.y) < 140 && !a.sawBodies?.includes(q.def.id));
+    if (b) {
+      (a.sawBodies ??= []).push(b.def.id);
+      if (this.namedReact(a, 'body', b, undefined, 0)) return;
+    }
+    // 근처 소란
+    const u = this.uproar.get(a.scene);
+    if (u && this.uproarLevel(a.scene) >= 1 && Math.abs(u.x - a.x) < 700) this.namedReact(a, 'uproar', { x: u.x, y: a.y }, undefined, 25);
+  }
+  /** 주인공이 누군가를 때림·쓰러뜨림·죽임: 근처 캐릭터가 본다. 같은 편(같은 소속·캐릭터끼리)이면 동료가 맞음·쓰러짐, 아니면 범죄 목격 */
+  private witness(victim: Actor, down: boolean): void {
+    const p = this.player;
+    const vf = this.factionOf(victim);
+    for (const a of this.actors) {
+      if (a === victim || a.def.kind !== 'named' || a.scene !== victim.scene || Math.abs(a.x - victim.x) > 700) continue;
+      const af = this.factionOf(a);
+      const ally = victim.def.kind === 'named' ? (!af || !vf || af === vf) : !!vf && vf === af;
+      const s: ReactSituation = ally ? (down ? 'allyDown' : 'allyHit') : 'crime';
+      // 쓰러진 동료는 곁으로, 맞은 동료·범죄는 가해자(주인공) 쪽으로
+      const at = s === 'allyDown' ? victim : p && p.scene === a.scene ? p : victim;
+      this.namedReact(a, s, at, 'player', s === 'crime' ? 10 : 4);
+    }
+  }
+  // ── 주인공 쫓아냄 (10-31 결정 2번 → 11-01 사용자 고침, 필드_세계_NPC_설계 8-4·8-5) ──
+  // 경계·적대 거점: 경비가 목격 거리(SPOT_PX) 안에서 주인공을 보면 따라붙어 경고한다. 시간은 재지 않는다.
+  // 경고를 무시하고 거점 안쪽 다른 방·층으로 들어가면 그 경비가 공격(전투). 출구 쪽으로 가는 건 괜찮다. 거점을 나가면 「쫓겨남」.
+  // 그 거점 인물과 동행 중이면 경비가 보내 준다. 경보는 이것과 따로: 기절·사망을 본 사람이 있을 때만(playerViolence)
+  /** 경비가 주인공을 「봤다」고 치는 거리 (px) */
+  static SPOT_PX = 400;
+  playerVisit: { fac: string; spotted: boolean; scene: string; cost: number; guard?: string; permit: boolean; attacked: boolean } | null = null;
+  /** 경비가 주인공을 경고 중인가 (그 경비에게 말을 걸면 [[허가]]·[[경보]]를 쓸 수 있다) */
+  guardingPlayer(id: string): boolean {
+    const v = this.playerVisit;
+    return !!v && !v.permit && v.guard === id;
+  }
+  /** 이번 방문 출입증 (11-01 사용자): 경비나 그 거점 캐릭터가 대화에서 허락([[허가]])하면 생긴다. 있는 동안 어느 경비도 막지 않고, 거점을 나가면 사라진다 */
+  hasPass(): string | null {
+    const v = this.playerVisit;
+    return v?.permit ? v.fac : null;
+  }
+  /** 이 사람이 대화에서 출입을 허락할 수 있나: 주인공이 경계·적대 거점에 있고, 그 거점 경비(경고 중) 또는 그 거점 캐릭터 */
+  canPermit(id: string): boolean {
+    const p = this.player;
+    const fac = p ? this.sceneFaction(p.scene) : null;
+    if (!p || !fac || this.hasPass() === fac) return false;
+    const st = this.stance(fac);
+    if (st !== 'wary' && st !== 'hostile') return false;
+    if (this.guardingPlayer(id)) return true;
+    const a = this.actors.find((q) => q.def.id === id || q.def.name === id);
+    return !!a && a.def.kind === 'named' && this.factionOf(a) === fac;
+  }
+  /** 허락받음: 이번 방문 출입증 */
+  permitPlayer(): void {
+    const p = this.player;
+    const fac = p ? this.sceneFaction(p.scene) : null;
+    if (!p || !fac) return;
+    this.playerVisit ??= { fac, spotted: false, scene: p.scene, cost: this.exitCost(p.scene, p.x, fac), permit: false, attacked: false };
+    if (this.playerVisit.permit) return;
+    this.playerVisit.permit = true;
+    this.events.push({ kind: 'pass', scene: p.scene, faction: fac });
+    const g = this.actors.find((q) => q.def.id === this.playerVisit!.guard);
+    if (g?.escort === 'player') { g.escort = undefined; this.resume(g); this.events.push({ kind: 'cue', scene: g.scene, who: g.def.name, id: g.def.id, cell: 'expel.pass_permit', ctx: { target: '{user}', say: '확인했습니다. 들어가세요.' } }); }
+  }
+  /** 경고 중인 경비가 대화에서 위협받음([[경보]]): 그 경비가 덤빈다. 거점 경보는 아님(경보는 기절·사망 목격으로만) */
+  threatAlarm(id?: string): void {
+    const p = this.player;
+    const v = this.playerVisit;
+    if (!p || !v) return;
+    const g = this.actors.find((q) => q.def.id === (id ?? v.guard));
+    if (g) this.guardAttack(g, p, '위협');
+  }
+  /** 경비가 주인공에게 덤빈다 (경고 무시·무기·대화 중 위협) */
+  private guardAttack(g: Actor, p: { scene: string; x: number; y: number }, why: '경고 무시' | '무기' | '위협', cause?: 'intrude'): void {
+    if (this.playerVisit && !cause) this.playerVisit.attacked = true;
+    g.escort = undefined;
+    g.task = undefined;
+    g.seatPick = undefined;
+    g.target = undefined;
+    g.run = 1.5;
+    const path = g.scene !== p.scene ? this.graph.route(g.scene, p.scene) : null;
+    const d = path && this.graph.doorSpot(g.scene, path[0].exit);
+    if (path && d) { g.route = path; this.walkTo(g, d, `${why}: 쫓아감`, 'chase'); }
+    else this.walkTo(g, { x: p.x, y: p.y || g.y }, `${why}: 덤빔`, 'chase');
+    this.iconOn(g, '#', 2);
+    if (!cause) this.events.push({ kind: 'cue', scene: g.scene, who: g.def.name, id: g.def.id, cell: why === '무기' ? 'expel.attack_weapon' : why === '위협' ? 'expel.attack_threat' : 'expel.attack', ctx: { target: '{user}', say: why === '무기' ? '무기 내려!' : why === '위협' ? '그 말, 후회하게 될 겁니다.' : '경고했습니다!' } });
+    this.events.push({ kind: 'guardAttack', scene: p.scene, who: '{user}', by: g.def.name, ...(cause ? { why: cause } : {}) });
+  }
+  /** 장면 → 거점 밖까지 남은 길 (문 수 × 1만 + 다음 문까지 가로 거리). 거점 밖이면 0 */
+  private exitCost(scene: string, x: number, fac: string): number {
+    if (this.sceneFaction(scene) !== fac) return 0;
+    let best = Infinity;
+    for (const id of this.graph.ids()) {
+      if (this.sceneFaction(id) === fac) continue;
+      const path = this.graph.route(scene, id);
+      if (!path?.length) continue;
+      const d = this.graph.doorSpot(scene, path[0].exit);
+      const c = path.length * 10000 + (d ? Math.abs(d.x - x) : 0);
+      if (c < best) best = c;
+    }
+    return best;
+  }
+  private stepPlayerVisit(dt: number): void {
+    const p = this.player;
+    const fac = p ? this.sceneFaction(p.scene) : null;
+    const v = this.playerVisit;
+    const release = (g: Actor | undefined) => { if (g?.escort === 'player') { g.escort = undefined; if (!g.fighting && !g.brawl && g.plan !== 'chase') this.resume(g); } };
+    // 거점 밖으로 나감: 경고를 받았으면 「쫓겨남」
+    if (!p || !fac || (v && v.fac !== fac)) {
+      if (v) {
+        const g = this.actors.find((q) => q.def.id === v.guard);
+        release(g);
+        if (v.spotted && !v.permit && !v.attacked) this.events.push({ kind: 'expel', scene: g?.scene ?? '', who: '{user}', by: g?.def.name ?? '경비' });
+      }
+      this.playerVisit = null;
+      if (!p || !fac) return;
+    }
+    const st = this.stance(fac);
+    if (st !== 'wary' && st !== 'hostile') return;
+    const pv = (this.playerVisit ??= { fac, spotted: false, scene: p.scene, cost: this.exitCost(p.scene, p.x, fac), permit: false, attacked: false });
+    if (pv.permit || pv.attacked || this.alarms.has(fac)) return;
+    const guardOf = () => this.actors.find((q) => q.def.id === pv.guard && !q.fighting && !['down', 'dead', 'gone'].includes(q.act));
+    // 그 거점 인물과 동행 중: 경비가 보내 준다
+    if (this.followers.some((id) => { const f = this.actors.find((q) => q.def.id === id); return !!f && this.factionOf(f) === fac; })) {
+      if (pv.spotted) { const g = guardOf(); release(g); if (g) this.events.push({ kind: 'cue', scene: g.scene, who: g.def.name, id: g.def.id, cell: 'expel.pass_companion', ctx: { target: '{user}', say: '아, 일행이셨군요. 지나가세요.' } }); }
+      pv.spotted = false;
+      pv.guard = undefined;
+      pv.scene = p.scene;
+      return;
+    }
+    if (!pv.spotted) {
+      pv.scene = p.scene;
+      pv.cost = this.exitCost(p.scene, p.x, fac);
+      // 목격: 같은 장면, 목격 거리 안의 그 거점 경비
+      const g = this.actors.filter((q) => q.scene === p.scene && !q.escort && !q.fighting && !q.brawl && !['down', 'dead', 'gone', 'door', 'scared'].includes(q.act) && ARCHETYPES[q.def.archetype ?? '']?.role === 'guard'
+        && (this.mobFaction(q) === fac || !q.def.faction) && Math.abs(q.x - p.x) < WorldSim.SPOT_PX && Math.abs(q.y - p.y) < 160)
+        .sort((a, b) => Math.abs(a.x - p.x) - Math.abs(b.x - p.x))[0];
+      if (!g) return;
+      pv.spotted = true;
+      pv.guard = g.def.id;
+      g.escort = 'player';
+      this.iconOn(g, '!', 1.5);
+      this.events.push({ kind: 'cue', scene: g.scene, who: g.def.name, id: g.def.id, cell: 'expel.warn', ctx: { target: '{user}', say: st === 'hostile' ? '거기 서. 여긴 당신이 올 데가 아니야. 당장 나가.' : '여긴 관계자 외 출입 금지입니다. 나가 주시죠.' } });
+      this.events.push({ kind: 'warn', scene: p.scene, who: '{user}', by: g.def.name });
+      return;
+    }
+    const g = guardOf();
+    if (!g) { pv.spotted = false; pv.guard = undefined; return; }   // 경비가 쓰러짐·떠남: 다른 경비가 다시 볼 때까지
+    // 위협은 행동으로만 본다 (11-01 사용자: 필드 동작은 모델 없이): 경고 중인 경비 앞에서 무기를 꺼내면 덤빈다. 때리면 원래대로 범죄 → 맞섬
+    const threat = !!p.armed && g.scene === p.scene && Math.abs(g.x - p.x) < WorldSim.SPOT_PX;
+    // 장면을 옮김: 출구 쪽(남은 문 수가 줄어듦)이면 괜찮고, 안쪽 다른 방·층이면 경고 무시 → 경비가 공격
+    if (p.scene !== pv.scene || threat) {
+      const cost = this.exitCost(p.scene, p.x, fac);
+      const outward = !threat && Math.floor(cost / 10000) < Math.floor(pv.cost / 10000);
+      pv.scene = p.scene;
+      pv.cost = cost;
+      if (!outward) {
+        this.guardAttack(g, p, threat ? '무기' : '경고 무시');
+        return;
+      }
+    }
+    // 따라붙어 지켜봄 (나가는 길이면 같이 감)
+    if (g.scene !== p.scene) {
+      if (!g.route.length) {
+        const path = this.graph.route(g.scene, p.scene);
+        const d = path && this.graph.doorSpot(g.scene, path[0].exit);
+        if (path && d) { g.route = path; this.walkTo(g, d, '주인공을 따라감', 'none'); }
+      }
+    } else if (g.doing === '주인공과 대화') {
+      // 말을 듣는 중: 그 자리
+    } else if (Math.abs(g.x - p.x) > 140) {
+      this.walkTo(g, { x: p.x + (g.x < p.x ? -90 : 90), y: p.y || g.y }, '주인공을 따라감', 'none');
+    } else if (g.act !== 'watch') {
+      g.act = 'watch';
+      g.doing = '주인공 경계';
+      g.goal = null;
+      g.wait = 1;
+      g.face = p.x > g.x ? 1 : -1;
+      this.setClip(g, 'idle');
+    }
+  }
+  // ── 동행 (10-31 사용자 결정 docs/필드기능_결정_1031.md 1번): 모델 답의 [[동행]]·[[기다림]]·[[복귀]] 표시로만 켜고 끈다 ──
+  /** 따라오는 사람 id (앞에서부터 주인공 뒤 순서, 인원 제한 없음) */
+  readonly followers: string[] = [];
+  /** 주인공 발자국 (최근 몇 초) */
+  private trail: { t: number; x: number; y: number }[] = [];
+  /** 싸움에서 빠지는 사람 (비전투 계열): 동행이어도 거들지 않는다 */
+  noAssist: (name: string) => boolean = () => false;
+  /** 이름(또는 id)으로 행위자 */
+  findActor(key: string): Actor | undefined {
+    return this.actors.find((q) => q.def.id === key || (q.def.kind === 'named' && q.def.name === key));
+  }
+  /** follow = 따라옴, wait = 그 자리에서 기다림, return = 일과로. 못 하면 false (인원 초과·없음·쓰러짐) */
+  setFollow(key: string, mode: 'follow' | 'wait' | 'return' | 'hit'): boolean {
+    const a = this.findActor(key);
+    if (!a || ['dead', 'gone'].includes(a.act) || a.fighting) return false;
+    const i = this.followers.indexOf(a.def.id);
+    if (mode === 'follow') {
+      if (i < 0 && this.followers.length >= MAX_FOLLOW) return false;
+      if (i < 0) this.followers.push(a.def.id);
+      a.following = true;
+      a.hold = false;
+      a.task = undefined;
+      a.goal = null;
+      a.route = [];
+      a.seatPick = undefined;
+      a.buddy = undefined;
+      a.escort = undefined;
+      if (a.act !== 'down') { a.act = 'idle'; a.wait = 0; this.setClip(a, 'idle'); }
+      a.doing = '주인공을 따라감';
+      this.iconOn(a, '!', 1.2);
+    } else {
+      if (i < 0 && !a.following && !(mode === 'return' && a.hold)) return false;
+      if (i >= 0) this.followers.splice(i, 1);
+      a.following = false;
+      a.hold = mode === 'wait';
+      if (a.act !== 'down') {
+        a.goal = null;
+        a.act = 'idle';
+        a.wait = mode === 'wait' ? 1e9 : 0.5;
+        a.doing = mode === 'wait' ? '기다리는 중' : '자리로 돌아가는 중';
+        this.setClip(a, 'idle');
+      }
+    }
+    this.events.push({ kind: 'follow', scene: a.scene, who: a.def.name, mode });
+    return true;
+  }
+  /** 동행이 주인공 편 전투 몸으로 싸우러 나감 (돌아올 때까지 시뮬에서 뺀다) */
+  toAlly(id: string): boolean {
+    const a = this.actors.find((q) => q.def.id === id);
+    if (!a?.following || a.fighting) return false;
+    a.fighting = true;
+    a.goal = null;
+    a.route = [];
+    return true;
+  }
+  /** 싸움 끝: 다시 따라 걷는다. down = 몸이 쓰러짐 → 그 자리에 기절, 동행이 풀린다 */
+  fromAlly(id: string, x: number, y: number, down: boolean, hp?: number): void {
+    const a = this.actors.find((q) => q.def.id === id);
+    if (!a || !a.fighting) return;
+    a.fighting = false;
+    if (hp !== undefined) { a.hp = hp; a.hpMax ??= hp; }
+    a.x = x;
+    a.y = y;
+    if (!down) { a.act = 'idle'; a.wait = 0.3; this.setClip(a, 'idle'); return; }
+    a.hp = 0;
+    a.act = 'down';
+    a.doing = '기절';
+    a.downAt = this.time;
+    a.wait = range(this.rng, 15, 25);
+    this.setClip(a, this.canClip(a, 'down') ? 'down' : 'idle');
+    this.setFollow(id, 'hit');
+  }
+  /** 동행 한 틱: 주인공이 지나간 자리를 조금 뒤처져 걷는다 (싸움은 주인공 편 전투 AI 몸이 한다: toAlly) */
+  private stepFollow(a: Actor, dt: number): void {
+    const p = this.player;
+    if (a.act === 'down' || a.act === 'scared') return;   // 맞아 쓰러짐·겁먹음은 그대로 (쓰러짐은 struck 에서 동행이 풀린다)
+    if (!p) { if (a.clip !== 'idle') this.setClip(a, 'idle'); return; }
+    // 장면이 다르면 (문 앞에서 늦음) 주인공 장면으로 붙는다
+    if (a.scene !== p.scene) { this.joinScene(a, p.scene, p.x, p.y); return; }
+    const order = Math.max(0, this.followers.indexOf(a.def.id));
+    const speed = (a.def.speed ?? WALK);
+    // 1초 + 사람마다 0.6초 뒤 발자국. 너무 붙으면 간격을 둔다
+    const want = this.time - (1 + order * 0.6);
+    let hit = this.trail[0] ?? { t: this.time, x: p.x, y: p.y };
+    for (const f of this.trail) { if (f.t <= want) hit = f; else break; }
+    const gapMin = FOLLOW_GAP[0] + order * FOLLOW_GAP[1];
+    let gx = hit.x;
+    if (Math.abs(p.x - gx) < gapMin) gx = p.x - Math.sign(p.x - a.x || -(p.face ?? 1)) * gapMin;
+    const gy = hit.y || a.y;
+    const dx = gx - a.x;
+    const far = Math.abs(p.x - a.x);
+    // 아주 멀어지면(막힘·끼임) 주인공 가까이 붙는다
+    if (far > 900) { a.x = p.x - (p.face ?? 1) * gapMin; a.y = p.y || a.y; return; }
+    if (Math.abs(dx) < 12 && Math.abs(gy - a.y) < 8) {
+      a.act = 'idle';
+      a.wait = 1;
+      a.doing = '주인공을 따라감';
+      a.face = p.x > a.x ? 1 : -1;
+      if (a.clip !== 'idle') this.setClip(a, 'idle');
+      return;
+    }
+    const run = far > 260 ? 1.6 : 1;
+    const step = speed * run * dt;
+    a.act = 'walk';
+    a.doing = '주인공을 따라감';
+    a.face = dx > 0 ? 1 : -1;
+    const clip = run > 1 && this.canClip(a, 'run') ? 'run' : 'walk';
+    if (a.clip !== clip) this.setClip(a, clip);
+    a.x += Math.sign(dx) * Math.min(Math.abs(dx), step);
+    const [top, bot] = this.graph.lane(a.scene);
+    a.y = Math.max(top, Math.min(bot, a.y + Math.sign(gy - a.y) * Math.min(Math.abs(gy - a.y), step * 0.5)));
+  }
+  /** 동행: 주인공이 들어간 장면으로 같이 (도착 자리 = 주인공 뒤) */
+  private joinScene(a: Actor, scene: string, x: number, y: number): void {
+    const len = this.graph.scene(scene)?.length ?? 1280;
+    const order = Math.max(0, this.followers.indexOf(a.def.id));
+    const back = x < len / 2 ? -1 : 1;   // 들어온 문 쪽(가까운 끝)으로 뒤에 선다
+    a.scene = scene;
+    a.x = Math.max(30, Math.min(len - 30, x + back * (FOLLOW_GAP[0] + order * FOLLOW_GAP[1])));
+    a.y = y || this.laneMid(scene);
+    a.route = [];
+    a.goal = null;
+    a.act = 'idle';
+    a.wait = 0.5;
+    this.setClip(a, 'idle');
+  }
+  /** 몹에게 말을 걸 수 있나 (10-31 사용자: 몹도 이름 인물처럼 대화). 싸움·기절·사망·겁먹음·쫓김·막아섬·나가는 문 앞이면 안 됨 */
+  canTalk(a: Actor): boolean {
+    return a.def.kind === 'mob' && !a.fighting && !a.brawl && !['down', 'dead', 'gone', 'door', 'scared', 'argue'].includes(a.act) && a.plan !== 'chase' && a.plan !== 'steal' && a.plan !== 'harass';
+  }
+  /** 대화 중인 몹: 그 자리에 멈춰 주인공을 본다 (매 틱 다시 부르는 동안만, 대화창을 닫으면 1초 뒤 하던 일로) */
+  holdTalk(id: string, px: number): void {
+    const a = this.actors.find((q) => q.def.id === id);
+    if (!a || !this.canTalk(a)) return;
+    if (a.act !== 'pause' || a.doing !== '주인공과 대화') {
+      a.talkFrom = a.doing;
+      a.goal = null;
+      a.route = [];
+      a.seatPick = undefined;
+      a.buddy = undefined;
+      a.act = 'pause';
+      a.doing = '주인공과 대화';
+      this.setClip(a, this.canClip(a, 'talk') ? 'talk' : 'idle');
+    }
+    a.wait = 1;
+    a.face = px > a.x ? 1 : -1;
+  }
+  /** 그 장면에 순찰 경찰이 있나 (싸움·쓰러짐·나감 제외) */
+  private patrolIn(scene: string): Actor | undefined {
+    return this.actors.find((q) => q.scene === scene && q.patrol && q.plan !== 'chase' && !q.fighting && !['down', 'dead', 'gone'].includes(q.act));
   }
 
   // ── 한 사람 ──
 
-  private setClip(a: Actor, clip: string): void {
+  private setClip(a: Actor, clip: string, fromQ = false): void {
+    if (!fromQ) a.clipQ = undefined;
+    // 맨몸이면 맨몸 클립으로 바꿔 끼운다 (그 인물에게 그림이 있을 때만; 없으면 가린 채 경계, 그것도 없으면 옷 입은 그림 그대로)
+    if (a.nude && !clip.startsWith('nude_') && clip !== 'shower' && clip !== 'dress') {
+      const n = NUDE_CLIP[clip] ?? 'nude_idle';
+      clip = this.canClip(a, n) ? n : this.canClip(a, 'nude_idle') ? 'nude_idle' : clip;
+    }
+    // 의자에서 하는 일이 아니면 일어선다
+    if (!clip.startsWith('seat:')) a.seat = undefined;
     if (a.clip !== clip) {
       a.clip = clip;
       a.clipAt = this.time;
+      a.clipUntil = undefined;
     }
   }
   private iconOn(a: Actor, icon: string, sec: number): void {
@@ -298,17 +1654,79 @@ export class WorldSim {
     a.iconT = sec;
   }
   private canClip(a: Actor, clip: string): boolean {
-    return this.has(a.def.look ?? a.def.name, clip);
+    const look = a.def.look ?? a.def.name;
+    // 앉아서 하는 일은 의자가 있어야: 서서 하는 줄이 없으면 의자 줄로 (허공에 앉지 않는다)
+    return this.has(look, clip) || (!!SEAT_KIND[clip] && this.has(look, `seat:${SEAT_KIND[clip]}`));
+  }
+  /** 장면의 빈 의자 (다른 사람·주인공이 앉지 않은 것) 중 x 에 가까운 것 */
+  private freeSeat(scene: string, x: number, dir?: 'front' | 'side' | 'back'): number | null {
+    const seats = this.graph.scene(scene)?.seats ?? [];
+    let best: number | null = null;
+    seats.forEach((st, i) => {
+      if (dir && seatDir(st.face) !== dir) return;
+      if (this.player?.scene === scene && this.player.seat === st.box) return;
+      if (this.actors.some((q) => q.scene === scene && (q.seat?.i === i || q.seatPick === i))) return;
+      if (best === null || Math.abs(st.x - x) < Math.abs(seats[best].x - x)) best = i;
+    });
+    return best;
   }
 
   private stepActor(a: Actor, dt: number): void {
+    if (a.clipQ?.length && (a.clipQT = (a.clipQT ?? 0) - dt) <= 0) {
+      const n = a.clipQ.shift()!;
+      this.setClip(a, n.clip, true);
+      a.clipQT = n.sec;
+      if (!a.clipQ.length) a.clipQ = undefined;
+    }
     if (a.iconT > 0 && (a.iconT -= dt) <= 0) a.icon = undefined;
     if (a.sayT > 0 && (a.sayT -= dt) <= 0) a.say = undefined;
+    // 넉백(1-2): 밀려나다 멎는다 (약 0.3초, 합계 ≈ 속도/8 px). 장면 끝은 넘지 않는다
+    if (a.kb) {
+      const len = this.graph.scene(a.scene)?.length ?? 1280;
+      a.x = Math.max(40, Math.min(len - 40, a.x + a.kb * dt));
+      a.kb -= a.kb * Math.min(1, dt * 8);
+      if (Math.abs(a.kb) < 8) a.kb = undefined;
+    }
+    if (a.act === 'dead') return;
+    if (a.brawl) return this.stepBrawl(a, dt);
+    // 동행: 쓰러지면 동행이 풀린다(깨면 일과로). 따라오는 동안 자기 일·응대는 멈춘다 (욕구는 그대로 준다)
+    if (a.following && a.act === 'down') this.setFollow(a.def.id, 'hit');
+    if (a.following) {
+      if (a.needs) decayNeeds(a.needs, dt, TEMPER[a.def.name], false);
+      return this.stepFollow(a, dt);
+    }
+    if (this.stepCommute(a)) return;
     if (a.noticeCd > 0) a.noticeCd -= dt;
     if (a.needs) decayNeeds(a.needs, dt, TEMPER[a.def.name], onDuty(this.hour, TEMPER[a.def.name]));
+    // 화장실 자리: 하던 일이 끊겼으면(맞음·겁 등) 자리를 비운다. 칸 안에서 닫힌 문 뒤에 있는 동안은 바깥 일에 반응하지 않는다
+    if (a.toilet && a.act !== 'do') this.leaveToilet(a);
+    // 샤워가 끊겼으면(맞음·침입 반응 등) 자리만 비운다. 맨몸은 그대로 (샤워실을 나가면 옷 입음: door)
+    if (a.shower && (a.task?.id !== 'shower' || !['do', 'walk', 'door', 'pause', 'notice', 'watch'].includes(a.act))) { a.shower = undefined; if (a.station?.match(/#[ls]:/)) a.station = undefined; }
+    if (a.toilet?.kind === 'stall' && a.act === 'do') return this.stepStall(a, dt);
     if (a.def.kind === 'mob') this.mobThink(a, dt);
-    if (a.def.kind === 'named') this.namedNotice(a);
+    if (a.def.kind === 'named' && this.namedBlocks(a)) return;   // 호감 적대: 보자마자 막아섬 (C4 다안)
+    if (a.def.kind === 'named') this.namedSense(a);   // 캐릭터 반응 (반응표)
+    if (a.def.kind === 'named' || a.post) this.namedNotice(a);   // 주인공 응대: 이름 인물·직원
+    this.socialStep(a, dt);
+    if (a.def.kind === 'mob') this.threatened(a, dt);
+    this.seeBody(a);
+    this.gawk(a, dt);
     switch (a.act) {
+      // 겁에 질림(무기를 들이밀었을 때): 주저앉아 있다가 뒤로 기거나, 뒷걸음질 친 뒤 달아난다
+      case 'scared': {
+        a.wait -= dt;
+        const src = a.scareFrom ?? this.player?.x;
+        if (a.scare === 'backoff' && src !== undefined) a.x += Math.sign(a.x - src || 1) * 55 * dt;
+        // 얼어붙음: 주인공이 무기를 거두거나 떠날 때까지 주저앉은 채 꼼짝 못 함
+        if (a.scare === 'freeze' && a.scareFrom === undefined && this.player?.armed && this.player.scene === a.scene) { a.wait = Math.max(a.wait, 0.5); return; }
+        if (a.wait > 0) return;
+        const from = src ?? a.x;
+        // 주저앉았다가 네발로 기어 달아남(42). 엎드려 기기(38)는 쓰러진 몸 전용이라 여기선 안 씀
+        if (a.scare === 'sit' && this.canClip(a, 'scramble')) { this.flee(a, from, 'scramble', 0.5); return; }
+        if (a.scare === 'cower' && this.canClip(a, 'scramble')) { this.flee(a, from, 'scramble', 0.6); return; }
+        this.flee(a, from);
+        return;
+      }
       case 'door': {
         a.wait -= dt;
         if (a.wait > 0) return;
@@ -317,6 +1735,7 @@ export class WorldSim {
         a.scene = hop.to;
         a.x = at.x;
         a.y = at.y;
+        if (a.nude && !this.washArea(a.scene)) this.setNude(a.def.id, false);   // 탈의실·샤워실 밖으로 나가면 옷 입음 (주인공과 같음)
         return this.nextLeg(a);
       }
       case 'walk':
@@ -324,9 +1743,15 @@ export class WorldSim {
       case 'do':
         if (a.task && a.needs) a.needs[a.task.need] = Math.min(100, a.needs[a.task.need] + a.task.fill * dt);
         a.wait -= dt;
-        if (a.wait <= 0 || (a.task && a.needs && a.needs[a.task.need] >= 100)) {
+        if (a.shower) { if (a.wait <= 0) this.showerDone(a); return; }
+        // 직원의 책상 일은 욕구가 차도 정한 시간만큼 (근무라서). 그 밖은 욕구가 다 차면 끝
+        if (a.wait <= 0 || (a.task && a.task.fill > 0 && a.needs && a.needs[a.task.need] >= 100 && a.task.id !== 'shower' && !(a.post && (a.task.id === 'work' || a.task.id === 'train')))) {
           a.last = a.task?.id;
+          const wash = !!a.toilet && a.toilet.kind !== 'sink';
+          this.leaveToilet(a);
           a.task = undefined;
+          // 볼일 뒤엔 손 씻기 (동작 활용표: 소변 100 → 손 씻기 104, 대변 101~103 → 104)
+          if (wash && this.goWash(a)) return;
           this.idle(a, 1, 3);
         }
         return;
@@ -339,9 +1764,21 @@ export class WorldSim {
       case 'down':
         a.wait -= dt;
         if (a.wait > 0) return;
+        // 맨몸(11-01): 기절에서 깨기 전에 일어나기(SH_H5)를 한 번 틀고 나서 다음으로
+        if (a.nude && (a.hp ?? 1) <= 0 && a.clip !== 'nude_getup' && this.canClip(a, 'nude_getup')) { this.setClip(a, 'nude_getup'); a.wait = 0.9; return; }
+        // 기절에서 깨면 체력 조금 돌아오고 (근무형이 아니면) 무조건 자리를 뜬다
+        if (a.def.kind === 'mob' && (a.hp ?? 1) <= 0) {
+          a.hp = Math.round((a.hpMax ?? 50) * 0.3);
+          // 뒤끝(불량배): 한 번은 도망 대신 다시 맞선다
+          if (this.once(a, '뒤끝')) { a.act = 'argue'; a.doing = '맞섬'; a.wait = 3; this.iconOn(a, '#', 3); this.setClip(a, this.canClip(a, 'angry') ? 'angry' : 'idle'); return; }
+          // 겁 많으면 일어나지도 못하고 엎드린 채 기어서(38) 달아난다
+          if (!a.post && (a.temper?.courage ?? 1) < 0.4 && this.canClip(a, 'crawl')) return this.flee(a, this.player?.x ?? a.x, 'crawl', 0.3);
+          if (!a.post) return this.flee(a, this.player?.x ?? a.x);
+          return this.resume(a);
+        }
         // 일어나서: 겁 많으면 도망, 배짱 있으면 맞선다 (실제 싸움은 전투 AI)
         if (a.def.kind === 'mob' && a.temper && !a.post) {
-          if (a.temper.courage > 0.75 && ARCHETYPES[a.def.archetype ?? '']?.role === 'thug') {
+          if (a.temper.courage > (this.perk(a, '싸움꾼') ? 0.55 : 0.75) && ARCHETYPES[a.def.archetype ?? '']?.role === 'thug') {
             a.act = 'argue';
             a.doing = '맞섬';
             a.wait = 3;
@@ -350,6 +1787,8 @@ export class WorldSim {
           }
           return this.flee(a, this.player?.x ?? a.x);
         }
+        // 이름 인물: 기절에서 깨면 체력 조금 돌아오고 하던 일로 (화는 그대로 남아 또 맞으면 바로 맞선다)
+        if (a.def.kind === 'named' && a.hp !== undefined && a.hp <= 0) { a.hp = Math.round((a.hpMax ?? 1000) * 0.3); a.angryAt = this.time; }
         return this.resume(a);
       case 'post':
         return this.postStand(a, dt);
@@ -357,6 +1796,18 @@ export class WorldSim {
         a.wait -= dt;
         if (a.wait <= 0) this.decide(a);
         return;
+      case 'pause': {
+        // 가다 잠깐 멈춤: 두리번(평상 대기)은 좌우로 고개를 돌리듯 몸을 돌린다. 끝나면 가던 길로
+        const t0 = this.time - a.clipAt;
+        if (a.clip === 'idle' && Math.floor(t0 / 0.9) !== Math.floor((t0 - dt) / 0.9)) a.face = (-a.face) as 1 | -1;
+        if (a.doing.startsWith('대화') && a.needs) a.needs.social = Math.min(100, a.needs.social + 6 * dt);   // 선 채 대화는 수다 욕구를 채운다
+        a.wait -= dt;
+        if (a.wait > 0) return;
+        if (!a.goal) return this.resume(a);
+        a.act = 'walk';
+        a.doing = a.def.brain === 'transit' ? '지나가는 중' : a.doing;
+        return;
+      }
     }
   }
 
@@ -369,22 +1820,180 @@ export class WorldSim {
       if (t && t.scene === a.scene) a.goal = { x: t.x - Math.sign(t.x - a.x) * 70, y: t.y };
       else if (p) a.goal = { x: p.x - Math.sign(p.x - a.x) * 110, y: p.y || a.goal.y };
     }
-    const dx = a.goal.x - a.x, dy = a.goal.y - a.y;
-    const d = Math.hypot(dx, dy);
-    const step = (a.def.speed ?? WALK) * a.run * dt;
+    // 도망 중이면 도망 동작(달아나기·기어서)을 유지 (그 인물에게 없으면 뛰기·걷기)
+    const fleeing = (a.doing === '도망' || a.doing === '기어서 도망') && a.fleeClip && this.canClip(a, a.fleeClip);
+    // 느긋한 걸음: 뛰거나 쫓거나 달아나는 중이 아님 → 흔들림·비켜 가기·멈추기
+    const casual = a.run <= 1.2 && !fleeing && a.plan !== 'chase' && a.doing !== '도망';
+    const lead = this.leaderOf(a);
+    // 그림 장면: 목표가 막힌 곳이면 가장 가까운 바닥으로, 곧장 못 가면 막힌 곳을 돌아가는 길(경유점)
+    if (this.nav && !a.detour?.length) {
+      if (!this.nav.ok(a.scene, a.goal.x, a.goal.y)) a.goal = this.navSnap(a.scene, a.goal.x, a.goal.y);
+      if (!this.nav.ok(a.scene, a.x, a.y)) { const c = this.navSnap(a.scene, a.x, a.y); a.x = c.x; a.y = c.y; }
+      if (!this.clearLine(a.scene, a.x, a.y, a.goal.x, a.goal.y)) {
+        const path = this.navPath(a.scene, a, a.goal);
+        if (!path) { a.goal = null; return this.idle(a); }
+        if (path.length) { a.detour = path.slice(0, -1); a.goal = path[path.length - 1]; }
+      }
+    }
+    // 장애물: 가는 길에 막힌 곳이 있으면 비켜 갈 경유점 (wall 이면 돌아섬)
+    if (!a.detour?.length && this.planDetour(a)) return;
+    const wp = a.detour?.[0];
+    const goal = wp ?? a.goal;
+    const dx = goal.x - a.x;
+    // 제 걸음: 사람마다 속도가 다르고(생길 때 성급함으로) 걷는 동안 조금씩 빨라졌다 느려졌다 한다. 일행은 앞사람 걸음에 맞춤
+    let speed = (lead?.def.speed ?? a.def.speed ?? WALK) * a.run;
+    if (casual) speed *= 1 + 0.07 * Math.sin(this.time * 1.9 + (a.phase ?? 0));
+    if (lead) speed *= Math.max(0.75, Math.min(1.25, 1 + ((lead.x - a.x) * Math.sign(dx || 1)) / 120));
+    const step = speed * dt;
     if (Math.abs(dx) > 1) a.face = dx > 0 ? 1 : -1;
-    this.setClip(a, a.run > 1.2 && this.canClip(a, 'run') ? 'run' : 'walk');
-    if (d <= step) {
-      a.x = a.goal.x;
-      a.y = a.goal.y;
+    this.setClip(a, fleeing ? a.fleeClip! : a.run > 1.2 && this.canClip(a, 'run') ? 'run' : 'walk');
+    if (casual && !wp) this.sidestep(a, Math.sign(dx), dt);
+    // 길 따라: 멀리 갈 땐 옆으로 걷고 깊이(줄)는 걸음의 35%만큼 천천히 옮긴다. 가까워지거나 경유점이면 곧장
+    const far = !wp && Math.abs(dx) > 60;
+    const ty = lead && far ? lead.y + (a.buddyDy ?? 0) : goal.y + (far ? (a.side ?? 0) : 0);
+    const dy = ty - a.y;
+    if (Math.abs(dx) <= step && Math.abs(goal.y - a.y) <= step) {
+      a.x = goal.x;
+      a.y = goal.y;
+      if (wp) return void a.detour!.shift();
       a.goal = null;
+      a.side = 0;
       return this.arrived(a);
     }
-    a.x += (dx / d) * step;
-    a.y += (dy / d) * step;
+    let vx: number, vy: number;
+    if (far) {
+      vy = Math.sign(dy) * Math.min(Math.abs(dy), step * 0.35);
+      vx = Math.sign(dx) * Math.min(Math.abs(dx), Math.sqrt(step * step - vy * vy));
+    } else {
+      const d = Math.hypot(dx, goal.y - a.y);
+      vx = (dx / d) * step;
+      vy = ((goal.y - a.y) / d) * step;
+    }
+    const ox = a.x, oy = a.y;
+    a.x += vx;
+    const [top, bot] = this.graph.lane(a.scene);
+    a.y = Math.max(Math.min(top, goal.y), Math.min(Math.max(bot, goal.y), a.y + vy));   // 띠 밖 목표(의자 등)면 그쪽은 열어 둠
+    // 그림 장면: 막힌 곳(게이트·기둥·물건 발자리, 벽 아래)으로는 한 발도 들어가지 않는다 → 제자리에서 길을 다시 찾음
+    if (this.nav && !this.nav.ok(a.scene, a.x, a.y)) {
+      // 모서리에 걸림(11-02 샤워실 문 앞 바구니 모서리): 비스듬히 못 가면 한 축씩(세로 먼저, 다음 가로) 미끄러져 본다
+      const ny = a.y;
+      if (Math.abs(ny - oy) > 0.01 && this.nav.ok(a.scene, ox, ny)) { a.x = ox; a.y = ny; return; }
+      if (Math.abs(a.x - ox) > 0.01 && this.nav.ok(a.scene, a.x, oy)) { a.y = oy; return; }
+      // 둘 다 막힌 오목한 구석: 아래·위로 한 걸음 비켜 서서 다음 걸음에 길을 다시 찾는다
+      for (const d of [step, -step]) if (this.nav.ok(a.scene, ox, oy + d) && this.nav.ok(a.scene, ox + vx, oy + d)) { a.x = ox; a.y = oy + d; a.detour = []; return; }
+      a.x = ox; a.y = oy;
+      if (!this.nav.ok(a.scene, ox, oy)) { const c = this.navSnap(a.scene, ox, oy); a.x = c.x; a.y = c.y; }
+      a.side = 0;
+      // 곧장 갈 수 있으면 똑바로(옆걸음·줄 옮기기 없이), 아니면 다음 걸음에 길을 다시 찾는다
+      a.detour = this.clearLine(a.scene, a.x, a.y, a.goal!.x, a.goal!.y) ? [{ x: a.goal!.x, y: a.goal!.y }] : [];
+      return;
+    }
+    if (casual && !wp && !lead) this.maybePause(a, dt);
+  }
+
+  /** 같이 걷는 일행의 앞사람 (같은 장면에서 걷거나 멈춰 있을 때만). 떨어지면 혼자 걷는다 */
+  private leaderOf(a: Actor): Actor | null {
+    if (!a.buddy) return null;
+    const l = this.actors.find((q) => q.def.id === a.buddy);
+    if (!l || l.scene !== a.scene || l.fighting || !['walk', 'pause'].includes(l.act) || l.doing === '도망') {
+      a.buddy = undefined;
+      return null;
+    }
+    return l;
+  }
+
+  /** 서로 비켜 가기: 앞쪽 같은 줄에 사람이 있으면 위·아래로 살짝 비켜선다(그 사람 반대쪽, 띠 안). 없으면 천천히 제 줄로 */
+  private sidestep(a: Actor, dir: number, dt: number): void {
+    const ahead = this.actors.find((q) => q !== a && q.scene === a.scene && !q.fighting && q.act !== 'door' && q.act !== 'gone'
+      && q.def.id !== a.buddy && q.buddy !== a.def.id && (q.x - a.x) * dir > 0 && Math.abs(q.x - a.x) < 110 && Math.abs(q.y - a.y - (a.side ?? 0)) < 22);
+    if (!ahead) {
+      if (a.side) a.side = Math.abs(a.side) < 1 ? 0 : a.side * (1 - Math.min(1, dt * 0.7));
+      return;
+    }
+    const [top, bot] = this.graph.lane(a.scene);
+    let s = Math.sign(a.y - ahead.y) || (this.rng() < 0.5 ? 1 : -1);
+    if (a.y + s * 30 < top || a.y + s * 30 > bot) s = -s;
+    a.side = (ahead.y - a.y) + s * 30;
+  }
+
+  /** 막힌 곳 우회 경유점. 앞길(가는 방향 200px 안)에 막힌 곳이 있고 지금 줄이 그 안이면 위·아래 바깥으로 돌아간다. 길을 다 막았으면 돌아섬(true) */
+  private planDetour(a: Actor): boolean {
+    const list = this.blocks.get(a.scene);
+    if (!list || !a.goal) return false;
+    const g = a.goal, dir = Math.sign(g.x - a.x);
+    if (!dir) return false;
+    const [top, bot] = this.graph.lane(a.scene);
+    for (const b of list) {
+      const near = dir > 0 ? b.x0 : b.x1, far = dir > 0 ? b.x1 : b.x0;
+      if ((near - a.x) * dir < -2 || (near - a.x) * dir > 200) continue;   // 이미 지났거나 아직 멀다
+      if ((g.x - near) * dir < 0) continue;   // 목표가 막힌 곳 앞
+      if (b.wall || (b.y0 <= top + 20 && b.y1 >= bot - 20)) {
+        // 길이 막힘: 돌아서 온 쪽으로 (지나가던 사람은 다른 출구, 아니면 이쪽 아무 데나)
+        const len = this.graph.scene(a.scene)?.length ?? 1280;
+        a.detour = [];
+        a.route = [];
+        const back = { x: Math.max(MARGIN, Math.min(len - MARGIN, near - dir * range(this.rng, 120, 400))), y: a.y };
+        if (a.exitAt) a.exitAt = { x: dir > 0 ? 30 : len - 30, y: a.y };
+        this.walkTo(a, a.exitAt ?? back, '길이 막혀 돌아감', a.exitAt ? 'exit' : 'none');
+        return true;
+      }
+      const y = a.y + (a.side ?? 0);
+      if (y < b.y0 - 14 || y > b.y1 + 14) continue;   // 그 줄은 비어 있음
+      const upY = b.y0 - 18, downY = b.y1 + 18;
+      const okUp = upY >= top, okDown = downY <= bot;
+      const yy = okUp && (!okDown || a.y - upY < downY - a.y) ? upY : okDown ? downY : upY;
+      a.detour = [{ x: near - dir * 12, y: yy }, { x: far + dir * 12, y: yy }];
+      return false;
+    }
+    return false;
+  }
+
+  /** 가다 잠깐 멈추기: 성급하면 덜, 호기심 많으면 더. 그 인물이 가진 줄만, 때·곳·성향에 맞게 고름 */
+  private maybePause(a: Actor, dt: number): void {
+    if (!['none', 'exit', 'do'].includes(a.plan) || a.route.length || a.drunk) return;
+    if ((a.pauseCd = (a.pauseCd ?? 10) - dt) > 0) return;
+    const t = a.temper ?? { courage: 0.5, social: 0.5, haste: 0.5, curious: 0.5, sly: 0 };
+    a.pauseCd = range(this.rng, 10, 26) * (0.7 + t.haste);
+    if (this.rng() > 0.25 + 0.35 * t.curious - 0.2 * t.haste) return;
+    const h = this.hour, morning = h != null && h >= 6 && h < 11, night = this.isNight();
+    const kind = this.graph.kind(a.scene), outside = kind === 'street' || kind === 'shop';
+    const role = ARCHETYPES[a.def.archetype ?? '']?.role;
+    const buddy = this.actors.find((q) => q.buddy === a.def.id && q.scene === a.scene);
+    if (a.patrol) {
+      const po = PATROL_PAUSES.filter((o) => this.canClip(a, o.clip));
+      if (!po.length) return;
+      const o = pick(this.rng, po);
+      return this.pauseAs(a, o.clip, o.doing, range(this.rng, o.sec[0], o.sec[1]), buddy);
+    }
+    const w: Record<string, number> = {
+      phone: 3, call: 1.2, coffee: morning ? 3 : 0.8, limber: morning ? 2 : 0.7, smoke: (night ? 2.5 : 1) * (role === 'thug' ? 2 : 1),
+      browse: 0.5 + 2.5 * t.curious, snack: 0.8, front: 0.8, back: outside ? 1.5 : 0.4, spot: t.curious, rest: 1, idle: 2,
+    };
+    // 일행이 있으면 서로 마주 보고 수다
+    if (buddy && this.canClip(a, 'talk') && this.canClip(buddy, 'talk')) return this.pauseAs(a, 'talk', '일행과 수다', range(this.rng, 4, 9), buddy);
+    const opts = PAUSES.filter((o) => this.canClip(a, o.clip));
+    if (!opts.length) return;
+    let r = this.rng() * opts.reduce((n, o) => n + w[o.clip], 0);
+    const o = opts.find((x) => (r -= w[x.clip]) <= 0) ?? opts[opts.length - 1];
+    this.pauseAs(a, o.clip, o.doing, range(this.rng, o.sec[0], o.sec[1]), buddy);
+  }
+  private pauseAs(a: Actor, clip: string, doing: string, sec: number, buddy?: Actor): void {
+    a.act = 'pause';
+    a.doing = doing;
+    a.wait = sec;
+    a.side = 0;
+    this.setClip(a, clip);
+    a.clipUntil = this.time + sec;
+    if (!buddy) return;
+    buddy.act = 'pause';
+    buddy.doing = doing === '일행과 수다' ? doing : '일행 기다림';
+    buddy.wait = sec;
+    if (doing === '일행과 수다') { a.face = (buddy.x >= a.x ? 1 : -1); buddy.face = (-a.face) as 1 | -1; }
+    this.setClip(buddy, doing === '일행과 수다' ? 'talk' : 'idle');
   }
 
   private idle(a: Actor, min = 2, max = 7): void {
+    a.seatPick = undefined;
     a.act = 'idle';
     a.doing = '대기';
     a.run = 1;
@@ -402,6 +2011,7 @@ export class WorldSim {
   private walkTo(a: Actor, p: { x: number; y: number }, doing: string, plan: Plan = 'none'): void {
     a.act = 'walk';
     a.goal = p;
+    a.detour = [];
     a.doing = doing;
     a.plan = plan;
   }
@@ -419,6 +2029,12 @@ export class WorldSim {
         return this.startTask(a);
       case 'post':
         a.act = 'post';
+        if (a.post?.how === 'train') {
+          a.doing = `훈련 중 (${({ pushup: '팔굽혀펴기', work: '장비 점검', limber: '기지개' } as Record<string, string>)[a.trainClip ?? ''] ?? '대기'})`;
+          a.wait = range(this.rng, 10, 25);
+          this.setClip(a, a.trainClip ?? 'idle');
+          return;
+        }
         a.doing = `근무 중 (${a.post?.archetype ?? ''})`;
         a.wait = range(this.rng, 4, 9);
         this.setClip(a, this.canClip(a, 'work') ? 'work' : 'idle');
@@ -429,10 +2045,35 @@ export class WorldSim {
       case 'exit':
         a.act = 'gone';
         return;
+      case 'cordon':
+        return this.arriveCordon(a);
+      case 'treat': {
+        // 진료: 의사는 진료 줄, 환자는 치료받기(그 줄이 있으면)
+        const pt = this.actors.find((q) => q.def.id === a.patient);
+        a.patient = undefined;
+        a.act = 'pause';
+        a.doing = '진료 중';
+        a.wait = range(this.rng, 6, 10);
+        this.setClip(a, 'exam');
+        if (pt && pt.scene === a.scene) {
+          a.face = pt.x > a.x ? 1 : -1;
+          if (pt.act !== 'do' && this.canClip(pt, 'treat')) { pt.act = 'pause'; pt.goal = null; pt.doing = '치료받는 중'; pt.wait = a.wait; pt.face = (-a.face) as 1 | -1; this.setClip(pt, 'treat'); }
+        }
+        return;
+      }
       case 'steal':
         return this.doSteal(a);
       case 'harass':
         return this.doHarass(a);
+      case 'react':
+        // 반응표 「다가감·동료 곁으로」: 닿으면 그 동작으로 잠깐
+        a.act = 'watch';
+        a.doing = a.doing === '동료에게 달려감' ? '동료 곁을 지킴' : '살핌';
+        a.wait = 3.5;
+        a.run = 1;
+        this.setClip(a, a.reactClip ?? 'idle');
+        a.reactClip = undefined;
+        return;
       case 'chase':
         // 플레이어(또는 도둑) 앞에 섰다: 경고하고 지켜본다 (전투 연결 전)
         a.act = 'watch';
@@ -463,10 +2104,24 @@ export class WorldSim {
 
   // ── 이름 인물 ──
 
+  /** 호감이 적대 구간인 이름 인물 (10-31 사용자 C4 다안): 주인공을 보면 막아서고(몹 적대 세력과 같은 길), 막아서면 전투 AI가 싸운다.
+   *  싸움이 끝난 뒤(이기든 지든) 1분은 다시 막지 않는다 */
+  private namedBlocks(a: Actor): boolean {
+    const p = this.player;
+    if (!p || p.scene !== a.scene || !this.namedHostile(a.def.name)) return false;
+    if (a.plan === 'chase' || a.fighting || ['down', 'dead', 'gone', 'door', 'argue'].includes(a.act) || a.seat) return false;
+    if (this.time < (a.blockAt ?? -1e9) + 60 || Math.abs(p.x - a.x) > 520) return false;
+    a.perks ??= ['스탯 뻥튀기', '체력 뻥튀기'];
+    a.task = undefined;
+    a.run = 1.4;
+    this.walkTo(a, { x: p.x + (a.x > p.x ? 70 : -70), y: p.y || a.y }, '주인공을 막아섬', 'chase');
+    this.iconOn(a, '!', 2);
+    return true;
+  }
   private namedNotice(a: Actor): void {
     const p = this.player;
-    if (!p || p.scene !== a.scene || a.noticeCd > 0) return;
-    if (a.act !== 'idle' && a.act !== 'walk') return;
+    if (!p || p.scene !== a.scene || a.noticeCd > 0 || a.toilet) return;   // 화장실 자리(칸·소변기·세면대)에서는 알은체하지 않는다 (11-01)
+    if (a.act !== 'idle' && a.act !== 'walk' && !(a.post && a.act === 'post')) return;
     if (a.plan === 'do' || a.route.length) return;
     if (Math.abs(p.x - a.x) > NOTICE_PX || Math.abs(p.y - a.y) > 160) return;
     a.noticeCd = range(this.rng, 20, 35);
@@ -481,14 +2136,17 @@ export class WorldSim {
   }
 
   private decide(a: Actor): void {
+    // 「기다려」: 그 자리에 남는다 (다시 「따라와」·「돌아가」 전까지)
+    if (a.hold) { a.act = 'idle'; a.wait = 5; a.doing = '기다리는 중'; return; }
+    if (a.commute?.state === 'out') { a.commute = undefined; return this.idle(a, 0.2, 0.5); }   // 길이 끊김: 다시 퇴근 길을 찾는다
     if (a.post) return this.goPost(a);
     if (a.def.brain === 'transit') return this.idle(a, 1, 3);
-    const roam = (a.def.roam ?? [a.def.home]).filter((s) => this.graph.scene(s));
+    const roam = (a.def.roam ?? [a.def.home]).filter((s) => this.graph.scene(s) && this.sexOk(a, s));
     if (a.def.brain === 'needs' && a.needs) {
       const c = choose({
         name: a.def.name, needs: a.needs, scene: a.scene, roam, graph: this.graph, has: (clip) => this.canClip(a, clip), duty: onDuty(this.hour, TEMPER[a.def.name]),
         partnerIn: (s) => this.actors.some((q) => q !== a && q.def.kind === 'named' && q.scene === s && (q.act === 'idle' || q.act === 'walk') && !q.route.length),
-        rand: this.rng, last: a.last,
+        rand: this.rng, last: a.last, fighter: true,   // 이름 요원은 모두 싸우는 몸
       });
       if (c) {
         a.task = c.act;
@@ -519,8 +2177,43 @@ export class WorldSim {
     this.walkTo(a, this.randomSpot(a.scene), '서성이는 중');
   }
 
-  /** 수다는 상대 옆으로, 나머지는 장면 안 빈 곳 */
+  /** 수다는 상대 옆으로, 앉아서 하는 일은 빈 의자로(서서 하는 줄이 없거나 의자가 있으면), 나머지는 장면 안 빈 곳 */
   private taskSpot(a: Actor, t: Activity): { x: number; y: number } {
+    a.seatPick = undefined;
+    a.station = undefined;
+    a.opt = undefined;
+    if (t.id === 'train') { const st = this.trainSpot(a); if (st) return st; }
+    if (t.id === 'shower') { const st = this.graph.scene(a.scene)?.lockers?.length ? this.lockerSpot(a) : this.showerSpot(a); if (st) return st; }
+    if (t.id === 'pee' || t.id === 'poo') { const st = this.toiletSpot(a, t.id === 'pee' && this.sexOf(a) === '남' ? ['urinal', 'stall'] : ['stall']); if (st) return st; }
+    // 그 인물에게 그림이 있는 줄 중에서 고른다 (10-31): 앉는 줄은 그 방향 빈 의자가 있을 때만. 바로 전에 한 줄은 덜 고른다
+    const look = a.def.look ?? a.def.name;
+    // 생활 동작 자리(11-02 휴게실 확정: 자판기·정수기·커피·전자레인지·찬장·게시판·싱크대): 그 활동에 맞는 빈 자리가 있으면 절반은 거기로
+    if (!t.partner) { const st = this.stationSpot(a, t); if (st) return st; }
+    const opts = (ACT_OPTS[t.id] ?? []).filter((o) => this.has(look, `line:${o.line}`));
+    if (opts.length && !t.partner) {
+      const cand: { o: ActOpt; seat: number | null; w: number }[] = [];
+      for (const o of opts) {
+        const seat = o.seat ? this.freeSeat(a.scene, a.x, o.seat) : null;
+        if (o.seat && seat === null) continue;
+        cand.push({ o, seat, w: (o.line === a.lastLine ? 0.25 : 1) * (o.seat ? 1.2 : 1) * (o.once ? 0.5 : 1) });
+      }
+      if (cand.length) {
+        let r = this.rng() * cand.reduce((n, c) => n + c.w, 0);
+        const c = cand.find((x) => (r -= x.w) <= 0) ?? cand[cand.length - 1];
+        a.opt = c.o;
+        if (c.seat !== null) {
+          const st = this.graph.scene(a.scene)!.seats![c.seat];
+          a.seatPick = c.seat;
+          return { x: st.x, y: st.y };
+        }
+        return this.randomSpot(a.scene);
+      }
+    }
+    if (!t.partner && SEAT_KIND[t.clip] && this.has(a.def.look ?? a.def.name, `seat:${SEAT_KIND[t.clip]}`)) {
+      const i = this.freeSeat(a.scene, a.x);
+      const st = i === null ? null : this.graph.scene(a.scene)?.seats?.[i];
+      if (st && i !== null) { a.seatPick = i; return { x: st.x, y: st.y }; }
+    }
     if (t.partner) {
       const q = this.actors.find((o) => o !== a && o.def.kind === 'named' && o.scene === a.scene && (o.act === 'idle' || o.act === 'walk') && !o.route.length);
       if (q) return { x: q.x + (q.x > a.x ? -90 : 90), y: q.y };
@@ -532,7 +2225,7 @@ export class WorldSim {
     const t = a.task;
     if (!t) return this.idle(a);
     if (t.partner) {
-      const q = this.actors.find((o) => o !== a && o.def.kind === 'named' && o.scene === a.scene && Math.abs(o.x - a.x) < 220 && (o.act === 'idle' || o.act === 'walk' || o.act === 'notice'));
+      const q = this.actors.find((o) => o !== a && (o.def.kind === 'named' || !!o.post) && o.scene === a.scene && Math.abs(o.x - a.x) < 220 && (o.act === 'idle' || o.act === 'walk' || o.act === 'post' || o.act === 'notice'));
       if (!q) {
         a.task = undefined;
         return this.idle(a, 1, 2);
@@ -546,24 +2239,97 @@ export class WorldSim {
         p.goal = null;
         p.route = [];
         p.plan = 'none';
-        p.doing = `${o.def.name}와 ${t.label}`;
+        p.doing = `${o.def.name}와 ${t.label}${p === a ? ' (먼저 말 걺)' : ' (말을 받음)'}`;
         p.face = o.x > p.x ? 1 : -1;
         this.setClip(p, this.canClip(p, t.clip) ? t.clip : 'idle');
       }
-      this.iconOn(a, '♪', 2);
+      // 먼저 건 쪽 머리 위 「…」 말풍선 (10-31 필드 기능 6번: 주제는 정하지 않음)
+      this.iconOn(a, '…', 2.5);
       return;
     }
     a.act = 'do';
-    a.doing = t.label;
-    a.wait = range(this.rng, t.sec[0], t.sec[1]);
+    a.doing = a.opt?.label ?? t.label;
+    a.wait = a.opt?.once ? range(this.rng, 2.5, 4) : range(this.rng, t.sec[0], t.sec[1]);
     a.plan = 'none';
+    // 화장실 자리 (칸·소변기·세면대). 화장실인데 빈 자리가 없었으면 볼일을 보지 않고 잠깐 기다렸다 다시 고른다 (아무 데서나 보지 않는다)
+    const ts = this.toiletOf(a);
+    if (ts) return this.startToilet(a, ts);
+    if (t.id === 'shower') return this.showerNext(a);
+    if ((t.id === 'pee' || t.id === 'poo' || t.id === 'wash') && this.graph.scene(a.scene)?.toilets?.length) {
+      a.task = undefined;
+      a.station = undefined;
+      this.idle(a, 2, 4);
+      a.doing = '화장실 자리 기다림';
+      return;
+    }
+    if (a.opt) a.lastLine = a.opt.line;
+    // 의자에 왔으면 앉는다 (그 의자가 아직 비었을 때)
+    const pick = a.seatPick;
+    a.seatPick = undefined;
+    const st = pick === undefined ? null : this.graph.scene(a.scene)?.seats?.[pick];
+    const taken = pick !== undefined && (this.actors.some((q) => q !== a && q.scene === a.scene && q.seat?.i === pick) || (this.player?.scene === a.scene && this.player.seat === st?.box));
+    if (st && pick !== undefined && !taken) {
+      const kind = a.opt?.seat ? a.opt.line : SEAT_KIND[t.clip];
+      this.setClip(a, `seat:${kind}`);
+      a.clipUntil = this.time + a.wait;
+      a.x = st.x;
+      a.y = st.y;
+      a.face = st.face === 'W' ? -1 : st.face === 'E' ? 1 : a.face;
+      a.seat = { i: pick, dir: st.face === 'N' ? 'back' : st.face ? 'side' : 'front', kind, x: st.x, y: st.y, ...(st.set ? { set: st.set } : {}) };
+      a.doing = `${a.opt?.label ?? t.label} (의자)`;
+      return;
+    }
+    // 고른 줄이 앉는 줄인데 의자를 놓쳤으면 그 일을 하지 않는다 (허공에 앉지 않는다)
+    if (a.opt?.seat) {
+      a.task = undefined;
+      a.opt = undefined;
+      return this.idle(a, 1, 3);
+    }
+    if (a.opt) {
+      this.setClip(a, `line:${a.opt.line}`);
+      a.clipUntil = this.time + a.wait;
+      return;
+    }
+    // 생활 동작 자리: 줄을 차례로(뒷모습 57 1.5초 · 줍기 27 한 번 · 마지막 줄은 일하는 동안 반복)
+    if (a.station?.includes('#s:')) {
+      const sid = a.station.split('#s:')[1];
+      const st = this.graph.scene(a.scene)?.stations?.find((q) => q.id === sid);
+      const busy = this.actors.some((q) => q !== a && q.scene === a.scene && q.station === a.station && (q.act === 'do' || (q.act === 'walk' && q.plan === 'do')));
+      if (!st || busy) { a.task = undefined; a.station = undefined; return this.idle(a, 1, 3); }
+      a.x = st.x; a.y = st.y;
+      const secOf = (l: string) => (l === '27' ? 1.2 : 1.5);
+      const [first, ...rest] = st.lines;
+      this.setClip(a, `line:${first}`);
+      if (rest.length) { a.clipQ = rest.map((l) => ({ clip: `line:${l}`, sec: secOf(l) })); a.clipQT = secOf(first); }
+      a.clipUntil = this.time + a.wait;
+      a.doing = `${STATION_LABEL[sid.replace(/_[LR]$/, '')] ?? sid} (${t.label})`;
+      return;
+    }
+    // 훈련 장비 앞: 과녁이면 사격, 샌드백·허수아비면 연타 (오른쪽을 보고)
+    if (t.id === 'train' && a.station) {
+      const gi = Number(a.station.split('#')[1]);
+      const g = this.gear(a.scene)[gi];
+      if (g) {
+        a.face = 1;
+        const clip = g.kind === 'target' ? 'shoot' : 'strike';
+        this.setClip(a, this.canClip(a, clip) ? clip : 'train');
+        a.doing = g.kind === 'target' ? '사격 훈련' : g.kind === 'sandbag' ? '샌드백 치기' : '허수아비 치기';
+        return;
+      }
+    }
+    // 의자를 못 잡았고 서서 하는 줄도 없으면 그 일을 하지 않는다 (없는 동작을 대기 그림으로 때우지 않는다)
+    if (!this.has(a.def.look ?? a.def.name, t.clip)) {
+      a.task = undefined;
+      return this.idle(a, 1, 3);
+    }
     this.setClip(a, t.clip);
+    a.clipUntil = this.time + a.wait;
   }
 
   // ── 몹 판단 (8-1장: 사건은 NPC 판단에서) ──
 
   private mobThink(a: Actor, dt: number): void {
-    if (a.act === 'gone' || a.act === 'door') return;
+    if (a.act === 'gone' || a.act === 'door' || a.act === 'down' || a.act === 'dead') return;   // 기절해 누운 몸은 판단하지 않는다 (깨어날 때 따로)
     const lvl = this.uproarLevel(a.scene);
     const t = a.temper;
     if (!t) return;
@@ -593,8 +2359,9 @@ export class WorldSim {
         return;
       }
     }
-    if (a.post || a.plan === 'chase' || a.plan === 'steal' || a.plan === 'harass' || a.act === 'argue') return;
-    // 소란: 겁 많은 개체는 도망, 호기심 많은 개체는 구경 (근무형·경찰 제외)
+    if (a.post || a.plan === 'chase' || a.plan === 'cordon' || a.plan === 'steal' || a.plan === 'harass' || a.act === 'argue') return;
+    // 소란: 겁 많은 개체는 도망, 호기심 많은 개체는 구경 (근무형·경찰·경비 제외)
+    if (['police', 'guard'].includes(ARCHETYPES[a.def.archetype ?? '']?.role ?? '')) return;
     const u = this.uproar.get(a.scene);
     if (lvl >= 1 && u) {
       if (t.courage < 0.25 + 0.15 * lvl && a.run < 1.5) return this.flee(a, u.x);
@@ -623,6 +2390,8 @@ export class WorldSim {
       return;
     }
     if (this.incidents(a.scene) >= 2) return;
+    // 순찰 경찰이 있는 동안은 손을 안 댄다 (C16)
+    if (this.patrolIn(a.scene)) return;
     // 소매치기: 손버릇 있는 개체가 가까운 걷는 행인을 노린다
     if (t.sly > 0.3 && this.rng() < 0.05 + t.sly * 0.1) {
       const v = this.nearMob(a, 500, (q) => q.act === 'walk' && q.plan === 'exit' && !q.post);
@@ -661,11 +2430,647 @@ export class WorldSim {
     const x = [...gates].sort((p, q) => Math.abs(q - fromX) - Math.abs(p - fromX))[0];
     return { x, y: a.y };
   }
-  private flee(a: Actor, fromX: number): void {
-    a.run = 1.8;
+  /** 무기를 들이밀면(주인공이 무기를 꺼내 3m 안에서 이쪽을 봄) 겁 반응 — 동작은 그 인물에게 있는 줄만(없으면 비슷한 줄로).
+   * 용기 낮음: 놀라 주저앉았다가 뒤로 기어 도망 · 보통: 뒷걸음질 → 달아나기 · 높음: 불량배는 맞서고, 그 밖은 화내고 비켜 감. 근무형·경찰·경비는 겁먹지 않음 */
+  // ── 사망·시체 (10-30) ──
+
+  /**
+   * 훈련장(장소 종류 training) 장비: 방 길이·걷는 띠에 비례해 놓는다(방 크기가 바뀌어도 따라감).
+   * 앞쪽 샌드백 2, 가운데 허수아비 2, 끝 사격 과녁 3(사수는 과녁 왼쪽 사대에). busy = 지금 누가 쓰는 중
+   */
+  gear(scene: string): Gear[] {
+    if (this.graph.kind(scene) !== 'training') return [];
+    const len = this.graph.scene(scene)?.length ?? 1280;
+    const [top, bot] = this.graph.lane(scene);
+    const d = bot - top;
+    const g: Omit<Gear, 'busy'>[] = [
+      { kind: 'sandbag', x: len * 0.18, y: top + d * 0.25 }, { kind: 'sandbag', x: len * 0.3, y: top + d * 0.25 },
+      { kind: 'dummy', x: len * 0.44, y: top + d * 0.45 }, { kind: 'dummy', x: len * 0.56, y: top + d * 0.45 },
+      { kind: 'target', x: len * 0.92, y: top + d * 0.15 }, { kind: 'target', x: len * 0.92, y: top + d * 0.45 }, { kind: 'target', x: len * 0.92, y: top + d * 0.75 },
+    ];
+    return g.map((q, i) => ({ ...q, x: Math.round(q.x), y: Math.round(q.y), busy: this.stationUser(scene, i) !== null }));
+  }
+  /** 그 장비를 지금 쓰는(또는 쓰러 가는) 사람 */
+  private stationUser(scene: string, i: number): Actor | null {
+    const key = `${scene}#${i}`;
+    return this.actors.find((q) => q.station === key && q.scene === scene && q.task?.id === 'train' && (q.act === 'do' || (q.act === 'walk' && q.plan === 'do'))) ?? null;
+  }
+  /** 훈련 자리: 쏠 수 있으면 사대 먼저(반반), 아니면 샌드백·허수아비. 비어 있는 것 중 가까운 것. 없으면 null */
+  // ── 이성 침입 감지 (11-01 사용자, docs/샤워_결정.md 「2026-11-01」): 남녀 구분 장면(scene.sex)에 다른 성별 주인공이 들어오면 ──
+  // 문에 들어온 것만으로는 아무도 반응하지 않는다. 사람마다 따로 감지하고, 감지한 사람만 들어옴 → 머묾1 → 머묾2 대사.
+  // NPC끼리 잘못 들어가는 일은 없다(sexOk). 그 뒤(쫓아냄·경보)는 아직 사용자 결정 전.
+  /** 감지 거리 px: 정면 700(목격 거리와 같음), 등 뒤 300, 벽 보고 하는 중(소변기·세면대·씻기) 200. 칸 안(닫힌 문)은 감지 없음 */
+  static INTRUDE_PX = { front: 700, back: 300, wall: 200 };
+  /** 뛰어 들어오면 뒤쪽 감지 거리 2배 (발소리). 뛰기 판정 = 최근 발자국 속도가 걷기의 1.3배 넘음 */
+  static INTRUDE_RUN_MULT = 2;
+  /** 들어옴 → 머묾1 → 머묾2 사이 초 (범위에서 무작위, 사람마다 다르게) */
+  static INTRUDE_STAY_SEC: [number, number] = [5, 8];
+  /** 소리친 사람 700px 안의 같은 성별이 따라 알아채는 데 걸리는 초 */
+  static INTRUDE_HEAR_SEC: [number, number] = [1, 3];
+  private playerRunning(): boolean {
+    const t = this.trail;
+    if (t.length < 2) return false;
+    const a = t[t.length - 1];
+    let b = t[0];
+    for (let i = t.length - 2; i >= 0; i--) if (a.t - t[i].t >= 0.25) { b = t[i]; break; }
+    const dt = a.t - b.t;
+    return dt > 0 && Math.hypot(a.x - b.x, a.y - b.y) / dt > WALK * 1.3;
+  }
+  private stepIntrude(): void {
+    const p = this.player;
+    const sc = p ? this.graph.scene(p.scene) : null;
+    const roomSex = sc?.sex;
+    if (!p || !sc || !roomSex || !p.sex || p.sex === roomSex) {
+      // 이성 방이 아니거나 나갔으면 처음으로 (다시 들어오면 다시 감지부터)
+      for (const a of this.actors) if (a.intrude) a.intrude = undefined;
+      return;
+    }
+    const run = this.playerRunning() ? WorldSim.INTRUDE_RUN_MULT : 1;
+    const users = sc.toilets ? this.toiletUsers(p.scene) : [];
+    for (const a of this.intrudeWitnesses(p.scene, roomSex)) {
+      const st = a.intrude;
+      if (!st) {
+        const u = users.find((x) => x.id === a.def.id);
+        const at = u?.at ?? 'walk';
+        if (at === 'stall') continue;   // 닫힌 문 뒤: 주인공이 문을 열어야 안다 (peekStall)
+        if (Math.abs(p.y - a.y) > 160) continue;
+        const dx = p.x - a.x;
+        const px = WorldSim.INTRUDE_PX;
+        const reach = at === 'urinal' || at === 'sink' ? px.wall * run : Math.sign(dx) === a.face ? px.front : px.back * run;
+        if (Math.abs(dx) < reach) this.intrudeFire(a, 0);
+        continue;
+      }
+      if (st.stage === 'done' || st.due == null || this.time < st.due) continue;
+      if (st.stage === 'wait') this.intrudeFire(a, 0);
+      else if (st.stage === 2) this.intrudeAct(a);
+      else this.intrudeFire(a, (st.stage + 1) as 1 | 2);
+    }
+  }
+  /** 그 방 성별의 사람 중 반응할 수 있는 몸 (쓰러짐·사망·싸움 중 제외) */
+  private intrudeWitnesses(scene: string, roomSex: '남' | '여'): Actor[] {
+    return this.actors.filter((a) => a.scene === scene && !a.fighting && !['down', 'dead', 'gone', 'door'].includes(a.act) && (a.hp ?? 1) > 0 && this.sexOf(a) === roomSex);
+  }
+  /** 들어옴(0)·머묾1·머묾2 대사. 성향대로 다음 단계를 잡는다: 수줍은 바로 도망, 화냄은 2~3초 뒤 덤빔, 당당·무심은 머묾1·2 */
+  private intrudeFire(a: Actor, stage: 0 | 1 | 2): void {
+    const p = this.player;
+    const sc = this.graph.scene(a.scene);
+    const grp = sc?.toilets ? 'toilet' : 'shower';
+    const temper = temperOf(a.def.name);
+    const cell = stage === 0 ? 'intrude' : `stay${stage}`;
+    const fallback = stage === 0 ? '여기 들어오면 안 돼요!' : stage === 1 ? '아직도 있어요? 나가요!' : '진짜 나가라고요!';
+    this.events.push({ kind: 'cue', scene: a.scene, who: a.def.name, id: a.def.id, cell: `${grp}.${cell}`, ctx: { target: '{user}', say: fallback } });
+    this.events.push({ kind: 'intrude', scene: a.scene, who: a.def.name, id: a.def.id, stage });
+    this.iconOn(a, '!', 1.5);
+    const wasNew = !a.intrude || a.intrude.stage === 'wait';
+    if (stage === 0 && temper === '수줍') { a.intrude = { stage: 'done' }; this.intrudeLeave(a, true); }
+    else if (stage === 0 && temper === '화냄') a.intrude = { stage: 2, due: this.time + range(this.rng, 2, 3) };
+    else if (stage === 2 && temper === '무심') a.intrude = { stage: 'done' };
+    else a.intrude = { stage, due: this.time + range(this.rng, WorldSim.INTRUDE_STAY_SEC[0], WorldSim.INTRUDE_STAY_SEC[1]) };
+    // 소리를 들은 같은 성별: 1~3초 뒤 따라 알아챈다 (10-31: 가까운 한두 명만 먼저, 나머지는 늦게). 닫힌 칸 안은 못 본다
+    if (stage === 0 && wasNew && p && sc?.sex) {
+      for (const q of this.intrudeWitnesses(a.scene, sc.sex)) {
+        if (q === a || q.intrude || Math.abs(q.x - a.x) >= WorldSim.INTRUDE_PX.front) continue;
+        if (q.toilet?.kind === 'stall' && q.toilet.phase === 'in') continue;
+        q.intrude = { stage: 'wait', due: this.time + range(this.rng, WorldSim.INTRUDE_HEAR_SEC[0], WorldSim.INTRUDE_HEAR_SEC[1]) };
+      }
+    }
+  }
+  /** 머묾2 뒤 (또는 화냄은 들어옴 뒤): 당당 = 나감, 화냄 = 덤빔, 무심 = 계속 */
+  private intrudeAct(a: Actor): void {
+    const p = this.player;
+    a.intrude = { stage: 'done' };
+    const temper = temperOf(a.def.name);
+    if (temper === '화냄' && p) {
+      this.leaveToilet(a);
+      a.task = undefined;
+      this.guardAttack(a, p, '위협', 'intrude');
+      return;
+    }
+    if (temper === '당당') this.intrudeLeave(a, false);
+  }
+  /** 하던 일을 접고 방을 나간다 (flee = 도망치듯 뛰어서) */
+  private intrudeLeave(a: Actor, flee: boolean): void {
+    this.leaveToilet(a);
+    a.task = undefined;
+    a.seatPick = undefined;
+    a.station = undefined;
+    a.run = flee ? 1.8 : 1;
+    const dest = a.def.home !== a.scene ? a.def.home : (a.def.roam ?? []).find((s) => s !== a.scene) ?? a.def.home;
+    this.travel(a, dest, 'none');
+    if (flee) { this.setClip(a, this.canClip(a, 'flee') ? 'flee' : 'run'); a.fleeClip = 'flee'; this.events.push({ kind: 'flee', scene: a.scene, who: a.def.name }); }
+  }
+  /** 주인공이 밖에서 칸 문을 열었다 (11-01 사용자: 안에 사람이 있어도 열 수 있고, 그제야 안 사람이 알아챈다). 이성이면 침입 반응, 같은 성별이면 「문 닫아」 */
+  peekStall(scene: string, id: string): void {
+    const a = this.actors.find((q) => q.scene === scene && q.toilet?.id === id && q.toilet.kind === 'stall' && q.toilet.phase === 'in');
+    if (!a?.toilet) return;
+    const again = (a.toilet.peek ?? 0) > this.time;   // 열어 둔 채 또 누름: 말은 한 번만
+    a.toilet.peek = this.time + 1.2;
+    const p = this.player;
+    const roomSex = this.graph.scene(scene)?.sex;
+    if (!p?.sex || !roomSex) return;
+    if (p.sex !== roomSex) { if (!a.intrude || a.intrude.stage === 'wait') this.intrudeFire(a, 0); return; }
+    if (!again) this.events.push({ kind: 'cue', scene, who: a.def.name, id: a.def.id, cell: 'toilet.same_open', ctx: { target: '{user}', say: '사람 있어요! 문 닫아요!' } });
+  }
+
+  // ── 샤워 (11-02, NPC 샤워. 사용자 「탈의실에서 옷을 벗고 샤워실로 이동해야지」「캐비닛·샤워기에 상호작용」) ──
+  // start: 탈의실 빈 캐비닛 앞으로 → undress: 옷 벗기(SH_A 한 번) → go: 맨몸으로 샤워실 빈 샤워기로 → wash: 머리감기·몸씻기(클립 'shower', 10~13분)
+  // → back: 맨몸으로 탈의실 캐비닛으로 → dress: 옷 입기(SH_A 거꾸로 한 번) → 끝. 자리가 다 차 있으면 그 자리에서 잠깐 기다렸다 다시 본다
+  /** 주인공이 쓰는 샤워기·캐비닛 자리 (hub가 알려 준다) */
+  playerShower: { scene: string; id: string } | null = null;
+  playerLocker: { scene: string; id: string } | null = null;
+  /** 탈의실·샤워실 (맨몸으로 있어도 되는 곳) */
+  washArea(scene: string): boolean { const sc = this.graph.scene(scene); return !!(sc?.showers?.length || sc?.lockers?.length); }
+  /** 그 샤워기를 쓰거나 쓰러 가는 사람이 있나 (주인공 포함) */
+  showerBusy(scene: string, id: string, except?: Actor): boolean {
+    if (this.playerShower?.scene === scene && this.playerShower.id === id) return true;
+    const key = `${scene}#s:${id}`;
+    return this.actors.some((q) => q !== except && q.scene === scene && q.station === key && !!q.shower);
+  }
+  /** 그 캐비닛 앞에서 옷을 벗거나 입는(또는 그러러 가는) 사람이 있나 */
+  lockerBusy(scene: string, id: string, except?: Actor): boolean {
+    if (this.playerLocker?.scene === scene && this.playerLocker.id === id) return true;
+    const key = `${scene}#l:${id}`;
+    return this.actors.some((q) => q !== except && q.scene === scene && q.station === key && !!q.shower);
+  }
+  /** 지금 씻는 중인 샤워기들 (hub: 물줄기·김을 그 자리에 그린다) */
+  showerUsers(scene: string): { id: string; actor: string; y: number; look: string }[] {
+    return this.actors.filter((a) => a.scene === scene && a.shower?.step === 'wash' && a.act === 'do').map((a) => ({ id: a.shower!.id!, actor: a.def.id, y: a.y, look: a.def.kind === 'named' ? a.def.name : a.def.look ?? a.def.name }));
+  }
+  private freeOf(a: Actor, list: { id: string; x: number; y: number }[] | undefined, busy: (id: string) => boolean, tag: 's' | 'l'): { x: number; y: number } | null {
+    const free = (list ?? []).filter((s) => !busy(s.id));
+    if (!free.length) return null;
+    const s = free[Math.floor(this.rng() * free.length)];
+    a.station = `${a.scene}#${tag}:${s.id}`;
+    return { x: s.x, y: s.y };
+  }
+  private showerSpot(a: Actor) { return this.freeOf(a, this.graph.scene(a.scene)?.showers, (id) => this.showerBusy(a.scene, id, a), 's'); }
+  private lockerSpot(a: Actor) { return this.freeOf(a, this.graph.scene(a.scene)?.lockers, (id) => this.lockerBusy(a.scene, id, a), 'l'); }
+  /** 고른 자리에 와 있나 (그 장면의 그 자리, 아직 비었을 때) */
+  private atSpot(a: Actor, tag: 's' | 'l') {
+    const m = a.station?.match(/^(.+)#([sl]):(.+)$/);
+    if (!m || m[1] !== a.scene || m[2] !== tag) return null;
+    const sc = this.graph.scene(a.scene);
+    const s = (tag === 's' ? sc?.showers : sc?.lockers)?.find((q) => q.id === m[3]);
+    if (!s || (tag === 's' ? this.showerBusy(a.scene, s.id, a) : this.lockerBusy(a.scene, s.id, a))) return null;
+    return Math.hypot(s.x - a.x, s.y - a.y) < 40 ? s : null;
+  }
+  /** 가장 가까운 같은 성별 탈의실(lockers)·샤워실(showers) */
+  private nearestWith(a: Actor, what: 'lockers' | 'showers'): string | null {
+    let best: string | null = null, bh = 1e9;
+    for (const id of this.graph.ids()) {
+      const sc = this.graph.scene(id);
+      if (!sc?.[what]?.length || !this.sexOk(a, id)) continue;
+      const h = id === a.scene ? 0 : this.graph.route(a.scene, id)?.length ?? 1e9;
+      if (h < bh) { bh = h; best = id; }
+    }
+    return best;
+  }
+  /** 자리가 다 차 있으면: 그 자리에서 잠깐 서 있다가(act do) 다시 본다 */
+  private showerWait(a: Actor, doing: string): void {
+    a.station = undefined;
+    a.act = 'do'; a.plan = 'none'; a.wait = range(this.rng, 2, 4); a.doing = doing;
+    this.setClip(a, 'idle');
+  }
+  /** 다음 걸음 (startTask·showerDone 이 부른다) */
+  private showerNext(a: Actor): void {
+    const sh = (a.shower ??= { step: 'start' });
+    const sc = this.graph.scene(a.scene);
+    if (sh.step === 'start' || sh.step === 'back') {
+      if (!sc?.lockers?.length) { const to = sh.step === 'back' && sh.locker ? sh.locker.scene : this.nearestWith(a, 'lockers'); if (!to) return this.showerAbort(a); return this.travel(a, to, 'do'); }
+      const l = this.atSpot(a, 'l');
+      if (l) {
+        a.x = l.x; a.y = l.y; a.face = l.face; a.act = 'do'; a.plan = 'none';
+        sh.locker = { scene: a.scene, id: l.id };
+        if (sh.step === 'start') { sh.step = 'undress'; a.doing = '옷 벗는 중'; this.setClip(a, 'undress'); a.wait = this.nOfLine(a, 'SH_A') * UNDRESS_D + 0.4; }
+        else { sh.step = 'dress'; a.doing = '옷 입는 중'; this.setClip(a, 'dress'); a.wait = this.nOfLine(a, 'SH_A') * DRESS_D + 0.4; }
+        a.clipUntil = this.time + a.wait;
+        return;
+      }
+      const st = this.lockerSpot(a);
+      if (st) return this.walkTo(a, st, sh.step === 'start' ? '옷 벗으러' : '옷 입으러', 'do');
+      return this.showerWait(a, '캐비닛 자리 기다림');
+    }
+    if (sh.step === 'go') {
+      if (!sc?.showers?.length) { const to = this.nearestWith(a, 'showers'); if (!to) return this.showerAbort(a); return this.travel(a, to, 'do'); }
+      const s = this.atSpot(a, 's');
+      if (s) {
+        a.x = s.x; a.y = s.y; a.face = s.face; a.act = 'do'; a.plan = 'none';
+        sh.step = 'wash'; sh.id = s.id; a.doing = '샤워 중';
+        a.wait = range(this.rng, a.task?.sec[0] ?? 600, a.task?.sec[1] ?? 780);
+        this.setClip(a, 'shower');
+        a.clipUntil = this.time + a.wait;
+        return;
+      }
+      const st = this.showerSpot(a);
+      if (st) return this.walkTo(a, st, '샤워하러', 'do');
+      return this.showerWait(a, '샤워 자리 기다림');
+    }
+  }
+  /** 한 걸음이 끝남 */
+  private showerDone(a: Actor): void {
+    const sh = a.shower!;
+    if (sh.step === 'undress') { this.setNude(a.def.id, true); sh.step = 'go'; a.station = undefined; return this.showerNext(a); }
+    if (sh.step === 'wash') { sh.step = 'back'; sh.id = undefined; a.station = undefined; return this.showerNext(a); }
+    if (sh.step === 'dress') {
+      a.shower = undefined; a.station = undefined;
+      this.setNude(a.def.id, false);
+      a.last = 'shower'; a.task = undefined;
+      return this.idle(a, 1, 3);
+    }
+    this.showerNext(a);   // 기다리던 중: 다시 본다
+  }
+  private showerAbort(a: Actor): void { a.shower = undefined; a.station = undefined; a.task = undefined; this.idle(a, 1, 3); }
+  private nOfLine(a: Actor, id: string): number { return this.lineN?.(a.def.look ?? a.def.name, id) ?? 10; }
+
+  // ── 화장실 (11-01, world/toilets.ts) ──
+  /** 성별: 남 소변(100) 줄이 있으면 남, 없고 앉아 볼일(102)이 있으면 여. 둘 다 없으면 모름(화장실을 쓰지 않는다) */
+  sexOf(a: Actor): '남' | '여' | null {
+    const look = a.def.look ?? a.def.name;
+    if (MALE_LOOKS.has(look) || MALE_LOOKS.has(a.def.name)) return '남';
+    if (FEMALE_LOOKS.has(look) || FEMALE_LOOKS.has(a.def.name)) return '여';
+    if (this.canClip(a, 'line:100')) return '남';
+    return this.canClip(a, 'line:102') || this.canClip(a, 'poo') ? '여' : null;
+  }
+  /** 남녀 구분 화장실이면 그 성별만 들어간다 (사용자 11-01: NPC끼리 잘못 들어가는 일은 없다) */
+  private sexOk(a: Actor, scene: string): boolean {
+    const x = this.graph.scene(scene)?.sex;
+    return !x || this.sexOf(a) === x;
+  }
+  /** 주인공이 쓰는 화장실 자리 (hub가 알려 준다): 그 자리는 NPC가 고르지 않는다 */
+  playerToilet: { scene: string; id: string; kind: 'stall' | 'urinal' | 'sink'; phase: 'open' | 'in' | 'leave' } | null = null;
+  /** 그 화장실 자리를 쓰거나 쓰러 가는 사람이 있나 (주인공 포함) */
+  toiletBusy(scene: string, id: string, except?: Actor): boolean {
+    if (this.playerToilet?.scene === scene && this.playerToilet.id === id) return true;
+    const key = `${scene}#t:${id}`;
+    return this.actors.some((q) => q !== except && q.scene === scene && q.station === key && (q.act === 'do' || (q.act === 'walk' && q.plan === 'do')));
+  }
+  /** 생활 동작 자리(장면 stations) 중 이 활동에 맞고(STATION_ACT: 마지막 줄) 그 인물에게 줄 그림이 다 있는 빈 자리. 의자와 번갈아 고르게 절반만. 고르면 a.station = 장면#s:id */
+  private stationSpot(a: Actor, t: Activity): { x: number; y: number } | null {
+    const sts = this.graph.scene(a.scene)?.stations;
+    if (!sts?.length || this.rng() < 0.5) return null;
+    const want = STATION_ACT[t.id];
+    if (!want) return null;
+    const look = a.def.look ?? a.def.name;
+    const free = sts.filter((s) => want.includes(s.lines[s.lines.length - 1]) && s.lines.every((l) => this.has(look, `line:${l}`))
+      && !this.actors.some((q) => q !== a && q.scene === a.scene && q.station === `${a.scene}#s:${s.id}` && (q.act === 'do' || (q.act === 'walk' && q.plan === 'do'))));
+    if (!free.length) return null;
+    const s = free[Math.floor(this.rng() * free.length)];
+    a.station = `${a.scene}#s:${s.id}`;
+    return { x: s.x, y: s.y };
+  }
+  /** 빈 자리 중 가까운 것 (kinds 앞쪽 종류부터). 고르면 a.station 에 적는다 */
+  private toiletSpot(a: Actor, kinds: ('stall' | 'urinal' | 'sink')[]): { x: number; y: number } | null {
+    const ts = this.graph.scene(a.scene)?.toilets;
+    if (!ts?.length) return null;
+    for (const k of kinds) {
+      const free = ts.filter((t) => t.kind === k && !this.toiletBusy(a.scene, t.id, a)).sort((p, q) => Math.abs(p.x - a.x) - Math.abs(q.x - a.x));
+      if (free.length) {
+        a.station = `${a.scene}#t:${free[0].id}`;
+        return { x: free[0].x, y: free[0].y };
+      }
+    }
+    return null;
+  }
+  /** 지금 와 있는 화장실 자리 (고른 자리가 이 장면이고 아직 비었을 때) */
+  private toiletOf(a: Actor) {
+    const m = a.station?.match(/^(.+)#t:(.+)$/);
+    if (!m || m[1] !== a.scene) return null;
+    const t = this.graph.scene(a.scene)?.toilets?.find((q) => q.id === m[2]);
+    if (!t || this.toiletBusy(a.scene, t.id, a)) { a.station = undefined; return null; }
+    return t;
+  }
+  private startToilet(a: Actor, t: NonNullable<ReturnType<WorldSim['toiletOf']>>): void {
+    a.x = t.x;
+    a.y = t.y;
+    if (t.kind === 'stall') {
+      // 문 앞: 문이 열린다 → (stepStall) 안으로
+      a.toilet = { id: t.id, kind: 'stall', phase: 'open', t: STALL_DOOR_SEC, door: t.door };
+      a.doing = `${a.task?.label ?? '화장실'} (칸)`;
+      a.face = 1;
+      this.setClip(a, 'idle');
+      return;
+    }
+    // 소변기·세면대: 벽(북)을 보고 선다
+    a.toilet = { id: t.id, kind: t.kind, phase: 'in', t: 0 };
+    a.face = 1;
+    if (t.kind === 'urinal') { a.doing = '소변 중'; this.setClip(a, 'line:100'); }
+    else { a.doing = '손 씻는 중'; this.setClip(a, 'line:104'); }
+    a.clipUntil = this.time + a.wait;
+  }
+  /** 칸: 문 열림 → 안에 앉음(101 → 102 → 끝에 103) → 문 열림·나옴 → 문 닫힘 */
+  private stepStall(a: Actor, dt: number): void {
+    const tl = a.toilet!;
+    const t = this.graph.scene(a.scene)?.toilets?.find((q) => q.id === tl.id);
+    if (!t?.seat) { this.leaveToilet(a); return this.idle(a, 1, 3); }
+    if (tl.phase === 'open') {
+      if ((tl.t -= dt) > 0) return;
+      const f = seatFeet(t.seat, a.def.look ?? a.def.name);
+      a.x = f.x;
+      a.y = f.y;
+      a.face = 1; // 좌석 좌우 옮김(TOILET_SEAT)은 뒤집지 않은 그림 기준
+      tl.phase = 'in';
+      this.setClip(a, 'poo');
+      a.clipUntil = this.time + a.wait;
+      return;
+    }
+    if (tl.phase === 'in') {
+      if (a.task && a.needs) a.needs[a.task.need] = Math.min(100, a.needs[a.task.need] + a.task.fill * dt);
+      if ((a.wait -= dt) > 0) return;
+      tl.phase = 'leave';
+      tl.t = STALL_DOOR_SEC;
+      a.x = t.x;
+      a.y = t.y;
+      this.setClip(a, 'idle');
+      return;
+    }
+    if ((tl.t -= dt) > 0) return;
+    a.last = a.task?.id;
+    a.task = undefined;
+    this.leaveToilet(a);
+    if (this.goWash(a)) return;
+    this.idle(a, 1, 3);
+  }
+  /** 화장실 자리를 비운다. 칸 안에 앉아 있었으면 문 앞으로 나온다 */
+  private leaveToilet(a: Actor): void {
+    const tl = a.toilet;
+    if (tl?.kind === 'stall' && tl.phase === 'in') {
+      const t = this.graph.scene(a.scene)?.toilets?.find((q) => q.id === tl.id);
+      if (t) { a.x = t.x; a.y = t.y; }
+    }
+    a.toilet = undefined;
+    if (a.station?.includes('#t:')) a.station = undefined;
+  }
+  /** 볼일 뒤 빈 세면대로 손 씻으러 (그 줄 104가 있을 때) */
+  private goWash(a: Actor): boolean {
+    if (!this.sexOf(a)) return false;
+    const st = this.toiletSpot(a, ['sink']);
+    if (!st) return false;
+    a.task = WASH;
+    this.walkTo(a, st, '손 씻으러', 'do');
+    return true;
+  }
+  /** 화장실 안 사람들 (필드 스레드: 침입 감지·대사). 주인공도 넣는다 */
+  toiletUsers(scene: string): ToiletUse[] {
+    if (!this.graph.scene(scene)?.toilets) return [];
+    const out: ToiletUse[] = [];
+    for (const a of this.actors) {
+      if (a.scene !== scene || a.act === 'dead' || a.act === 'gone') continue;
+      const tl = a.toilet;
+      const at = tl ? tl.kind : 'walk';
+      out.push({ id: a.def.id, name: a.def.name, kind: a.def.kind, sex: this.sexOf(a), at, face: at === 'stall' ? 'S' : at === 'walk' ? (a.face > 0 ? 'E' : 'W') : 'N', x: a.x, y: a.y, ...(tl ? { spot: tl.id, phase: tl.phase } : {}) });
+    }
+    const p = this.player, pt = this.playerToilet;
+    if (p && p.scene === scene) out.push({ id: 'player', name: '주인공', kind: 'player', sex: null, at: pt?.scene === scene ? pt.kind : 'walk', face: pt?.scene === scene ? (pt.kind === 'stall' ? 'S' : 'N') : (p.face ?? 1) > 0 ? 'E' : 'W', x: p.x, y: p.y, ...(pt?.scene === scene ? { spot: pt.id, phase: pt.phase } : {}) });
+    return out;
+  }
+
+  private trainSpot(a: Actor): { x: number; y: number } | null {
+    const gs = this.gear(a.scene);
+    if (!gs.length) return null;
+    const shoot = this.canClip(a, 'shoot') && this.rng() < 0.5;
+    const free = gs.map((g, i) => ({ g, i })).filter(({ g, i }) => (shoot ? g.kind === 'target' : g.kind !== 'target') && this.stationUser(a.scene, i) === null);
+    if (!free.length) return null;
+    const { g, i } = free.sort((p, q) => Math.abs(p.g.x - a.x) - Math.abs(q.g.x - a.x))[0];
+    a.station = `${a.scene}#${i}`;
+    // 사수는 과녁에서 왼쪽으로 떨어진 사대, 타격은 장비 왼쪽 바로 앞 (오른쪽을 본다)
+    return { x: g.kind === 'target' ? Math.round(g.x - (this.graph.scene(a.scene)?.length ?? 1280) * 0.26) : g.x - 118, y: g.y + 4 };
+  }
+
+  /** 장면의 시체 */
+  corpses(scene: string): Actor[] {
+    return this.actors.filter((a) => a.scene === scene && a.act === 'dead');
+  }
+  /** 사건 현장 표시 (수습 뒤 INCIDENT_HOURS 동안) */
+  incident(scene: string): boolean {
+    const t = this.sites.get(scene);
+    return t !== undefined && this.gameH - t < INCIDENT_HOURS;
+  }
+  /** 죽음: 선 채면 사망(44), 누워 있었으면 누운 채 사망(45). 시체로 남고 큰 범죄 → 경찰 출동, 한 명은 현장으로 */
+  private kill(a: Actor, lying: boolean, fromFight = false): void {
+    this.playerViolence(a.scene, a.x, a, 'murder');
+    this.witness(a, true);
+    a.seat = undefined;
+    a.seatPick = undefined;
+    a.goal = null;
+    a.route = [];
+    a.detour = [];
+    a.hp = 0;
+    a.act = 'dead';
+    a.doing = '사망';
+    a.say = undefined;
+    a.icon = undefined;
+    a.diedAt = this.gameH;
+    // 그림: 사망 줄이 없으면 쓰러진 끝 장(19)으로
+    this.setClip(a, lying ? (this.canClip(a, 'dieLie') ? 'dieLie' : 'down') : this.canClip(a, 'die') ? 'die' : 'down');
+    if (fromFight) a.clipAt = this.time - 60;   // 전투 몸이 이미 쓰러지는 걸 틀었다 → 끝 장부터
+    for (const q of this.actors) if (q.buddy === a.def.id) q.buddy = undefined;
+    if (a.pocket && (DROPS.has(a.def.archetype ?? '') || a.stolen)) {
+      this.events.push({ kind: 'drop', scene: a.scene, who: a.def.name, amount: a.pocket, stolen: a.stolen ?? 0, x: a.x });
+      a.pocket = 0;
+      a.stolen = 0;
+    }
+    this.events.push({ kind: 'kill', scene: a.scene, who: a.def.name, id: a.def.id, x: a.x });
+    // 상한: 넘치면 오래된 시체부터 치움
+    const list = this.corpses(a.scene).sort((p, q) => (p.diedAt ?? 0) - (q.diedAt ?? 0));
+    for (let i = 0; i < list.length - CORPSE_MAX; i++) list[i].act = 'gone';
+    this.crime(a.scene, a.x, 60);
+    this.dispatchCordon(a.scene, a.x, a.y);
+  }
+  /** 현장 경찰(거리)·경비(실내) 한 명: 시체로 가서 라인을 치고 수습까지 지킨다. 이미 있으면 안 부름 */
+  private dispatchCordon(scene: string, x: number, y: number): void {
+    if (this.actors.some((q) => q.scene === scene && q.plan === 'cordon')) return;
+    const len = this.graph.scene(scene)?.length ?? 1280;
+    const arch = this.graph.kind(scene) === 'street' ? '경찰' : '경비';
+    const gate = Math.abs(x - 30) > Math.abs(x - (len - 30)) ? len - 30 : 30;
+    const [top, bot] = this.graph.lane(scene);
+    const c = this.add({ id: `mob${++serial}`, name: arch, kind: 'mob', brain: 'transit', home: scene, archetype: arch, look: this.lookOf(arch), speed: 170 }, { scene, x: gate, y: this.laneMid(scene) });
+    c.run = 1.3;
+    const side = x > gate ? -1 : 1;
+    this.walkTo(c, { x: x + side * 110, y: Math.max(top + 10, Math.min(bot - 10, y + 40)) }, '현장으로 가는 중', 'cordon');
+  }
+  /** 라인 묶기: 가까운 시체끼리 하나로 (시체 둘레 앞뒤·좌우로 라바콘) */
+  private cordonBoxes(scene: string): Obstacle[] {
+    const [top, bot] = this.graph.lane(scene);
+    const boxes = this.corpses(scene).map((c) => ({ x0: c.x - 75, x1: c.x + 75, y0: Math.max(top, c.y - 30), y1: Math.min(bot, c.y + 22) }));
+    let merged = true;
+    while (merged) {
+      merged = false;
+      for (let i = 0; i < boxes.length && !merged; i++) for (let j = i + 1; j < boxes.length && !merged; j++) {
+        const p = boxes[i], q = boxes[j];
+        if (p.x0 - 20 < q.x1 && q.x0 - 20 < p.x1 && p.y0 - 20 < q.y1 && q.y0 - 20 < p.y1) {
+          boxes[i] = { x0: Math.min(p.x0, q.x0), x1: Math.max(p.x1, q.x1), y0: Math.min(p.y0, q.y0), y1: Math.max(p.y1, q.y1) };
+          boxes.splice(j, 1);
+          merged = true;
+        }
+      }
+    }
+    return boxes.map((b, i) => ({ id: `cordon${i}`, ...b }));
+  }
+  private setCordon(scene: string): void {
+    for (const b of this.obstacles(scene).filter((o) => o.id.startsWith('cordon'))) this.setObstacle(scene, null, b.id);
+    if (!this.cordoned.has(scene)) return;
+    for (const b of this.cordonBoxes(scene)) this.setObstacle(scene, b);
+  }
+  /** 매 틱: 현장 경찰 도착 → 라인, 1시간 지난 시체 수습, 다 치우면 라인 걷고 경찰 떠남, 사건 현장 표시 */
+  private stepCorpses(): void {
+    const scenes = new Set(this.actors.filter((a) => a.act === 'dead' || a.plan === 'cordon').map((a) => a.scene));
+    for (const sc of [...this.cordoned]) scenes.add(sc);
+    for (const sc of scenes) {
+      const bodies = this.corpses(sc);
+      // 시체가 있는 동안은 소란이 가라앉지 않는다
+      if (bodies.length) this.uproar.set(sc, { v: Math.max(this.uproar.get(sc)?.v ?? 0, 80), x: bodies[0].x });
+      const old = bodies.filter((b) => this.gameH - (b.diedAt ?? 0) >= CLEAR_HOURS);
+      if (old.length) {
+        for (const b of old) b.act = 'gone';
+        this.events.push({ kind: 'cleared', scene: sc, n: old.length });
+      }
+      if (this.corpses(sc).length) {
+        if (this.cordoned.has(sc) && old.length) this.setCordon(sc);
+        continue;
+      }
+      // 다 치움: 라인 걷고 현장 경찰은 떠난다
+      if (old.length || this.cordoned.has(sc)) this.sites.set(sc, this.gameH);
+      this.cordoned.delete(sc);
+      this.setCordon(sc);
+      for (const q of this.actors.filter((x) => x.scene === sc && x.plan === 'cordon')) {
+        const len = this.graph.scene(sc)?.length ?? 1280;
+        q.exitAt = { x: q.x < len / 2 ? 30 : len - 30, y: q.y };
+        q.run = 1;
+        this.walkTo(q, q.exitAt, '현장 정리 끝', 'exit');
+      }
+    }
+  }
+  /** 현장 경찰이 도착: 라인을 치고 지킨다 */
+  private arriveCordon(a: Actor): void {
+    a.act = 'watch';
+    a.doing = '현장 통제';
+    a.wait = 1e9;
+    a.run = 1;
+    a.face = (this.corpses(a.scene).some((b) => b.x > a.x) ? 1 : -1);
+    this.setClip(a, 'idle');
+    this.cordoned.add(a.scene);
+    this.setCordon(a.scene);
+  }
+  /** 구경꾼(퍽): 소란이 난 장면에서 걷다가 멈춰 구경한다 (뒷짐 구경·발견·두리번 중 가진 줄) */
+  private gawk(a: Actor, dt: number): void {
+    if (!this.perk(a, '구경꾼') || (a.lookCd = (a.lookCd ?? 0) - dt) > 0) return;
+    if (!['walk', 'idle'].includes(a.act) || a.fighting || a.plan === 'chase' || this.uproarLevel(a.scene) < 1) return;
+    a.lookCd = 25;
+    const clip = ['browse', 'spot', 'idle'].find((c) => this.canClip(a, c)) ?? 'idle';
+    const u = this.uproar.get(a.scene);
+    if (u) a.face = u.x > a.x ? 1 : -1;
+    a.act = 'pause';
+    a.doing = '구경';
+    a.wait = range(this.rng, 4, 8);
+    this.setClip(a, clip);
+  }
+  /** 시체를 봄 (경찰·경비·현장 사람 빼고, 한 번만): 겁 많으면 겁 반응·도망, 중간이면 놀라 피해 감, 용감하면 신고 */
+  private seeBody(a: Actor): void {
+    if (a.sawBody || a.fighting || a.post || a.def.kind !== 'mob' || !['walk', 'idle', 'pause'].includes(a.act) || a.plan === 'chase' || a.plan === 'cordon') return;
+    const role = ARCHETYPES[a.def.archetype ?? '']?.role;
+    // 순찰 경찰이 시체를 봄: 현장 경찰이 아직 없으면 자기가 맡는다 (라인·수습까지)
+    if (a.patrol) {
+      const body = this.actors.find((q) => q.act === 'dead' && q.scene === a.scene && Math.abs(q.x - a.x) < SEE_BODY_PX * 1.5);
+      if (!body || this.actors.some((q) => q.scene === a.scene && q.plan === 'cordon')) return;
+      a.sawBody = true;
+      a.patrol = false;
+      a.buddy = undefined;
+      const [top, bot] = this.graph.lane(a.scene);
+      this.iconOn(a, '!', 2);
+      this.say(a, '여기 현장 통제합니다.', 2.5);
+      return this.walkTo(a, { x: body.x + (a.x < body.x ? -110 : 110), y: Math.max(top + 10, Math.min(bot - 10, body.y + 40)) }, '현장으로 가는 중', 'cordon');
+    }
+    if (role === 'police' || role === 'guard') return;
+    const b = this.actors.find((q) => q.act === 'dead' && q.scene === a.scene && Math.abs(q.x - a.x) < SEE_BODY_PX && Math.abs(q.y - a.y) < 140);
+    if (!b) return;
+    a.sawBody = true;
+    a.buddy = undefined;
+    const c = a.temper?.courage ?? 0.3;
+    this.iconOn(a, '!', 2);
+    const reporter = this.perk(a, '신고 정신') && !this.cordoned.has(a.scene);   // 신고 정신(퍽): 겁먹어도 먼저 신고
+    if (c < 0.4 && !reporter) return this.scareAt(a, b.x, b.x);
+    if ((c < 0.7 && !reporter) || this.cordoned.has(a.scene)) {
+      // 놀라서 현장을 피해 돌아감
+      a.act = 'scared';
+      a.scare = 'run';
+      a.scareFrom = b.x;
+      a.goal = null;
+      a.wait = 1.2;
+      a.doing = '놀람';
+      a.face = b.x > a.x ? 1 : -1;
+      this.setClip(a, this.canClip(a, 'surprise') ? 'surprise' : 'idle');
+      return;
+    }
+    // 용감: 신고 (경찰이 아직 없으면 현장 경찰을 부른다), 그 뒤 피해 감
+    a.act = 'scared';
+    a.scare = 'run';
+    a.scareFrom = b.x;
+    a.goal = null;
+    a.wait = 3;
+    a.doing = '신고 중';
+    a.face = b.x > a.x ? 1 : -1;
+    this.setClip(a, this.canClip(a, 'call') ? 'call' : this.canClip(a, 'phone') ? 'phone' : 'surprise');
+    this.events.push({ kind: 'report', scene: a.scene, who: a.def.name, x: b.x });
+    this.dispatchCordon(a.scene, b.x, b.y);
+  }
+
+  private threatened(a: Actor, dt: number): void {
+    if (a.scareCd && (a.scareCd -= dt) > 0) return;
+    const p = this.player;
+    if (!p?.armed || p.scene !== a.scene || a.fighting || a.post || !a.temper) return;
+    if (['down', 'scared', 'gone', 'door', 'argue'].includes(a.act) || a.doing === '도망' || a.doing === '기어서 도망') return;
+    const role = ARCHETYPES[a.def.archetype ?? '']?.role;
+    if (role === 'police' || role === 'guard') return;
+    const dx = a.x - p.x;
+    if (Math.abs(dx) > 300 || Math.abs(a.y - p.y) > 90 || Math.sign(dx) !== Math.sign(p.face ?? 1)) return;
+    a.scareCd = 8;
+    a.seatPick = undefined;
+    const c = a.temper.courage;
+    this.iconOn(a, '!', 1.5);
+    if (c >= (this.perk(a, '싸움꾼') ? 0.55 : 0.7)) {
+      if (role === 'thug') { a.act = 'argue'; a.doing = '맞섬'; a.wait = 3; this.iconOn(a, '#', 3); return; }
+      a.act = 'argue'; a.doing = '화냄'; a.wait = 1.2;
+      this.setClip(a, this.canClip(a, 'angry') ? 'angry' : 'idle');
+      return;
+    }
+    this.scareAt(a, p.x);
+  }
+  /** 겁에 질림: from = 겁나게 한 것의 x (무기 든 주인공·시체) */
+  private scareAt(a: Actor, from: number, why?: number): void {
+    const c = a.temper?.courage ?? 0.3;
+    const dx = a.x - from;
+    a.scareFrom = why;
+    a.goal = null;
+    a.act = 'scared';
+    a.face = dx > 0 ? -1 : 1;
+    // 도망도 사람마다: 용기가 낮을수록 얼어붙거나 기어서, 높을수록 뒷걸음질·뛰어서. 같은 용기라도 무작위로 갈림
+    const w: [NonNullable<Actor['scare']>, number][] = [['freeze', 1 - c * 2], ['sit', 1.1 - c * 1.5], ['cower', 1 - c], ['backoff', 0.2 + c], ['run', 0.3 + c]];
+    let r = this.rng() * w.reduce((n, [, v]) => n + Math.max(0, v), 0);
+    a.scare = w.find(([, v]) => (r -= Math.max(0, v)) <= 0)?.[0] ?? 'run';
+    const clip = (...l: string[]) => l.find((x) => this.canClip(a, x)) ?? 'idle';
+    switch (a.scare) {
+      case 'freeze': a.wait = 3; a.doing = '얼어붙음'; this.setClip(a, clip('sitdown', 'cower', 'surprise')); break;
+      case 'sit': a.wait = 1.6; a.doing = '주저앉음'; this.setClip(a, clip('sitdown', 'cower', 'surprise')); break;
+      case 'cower': a.wait = 1.4; a.doing = '웅크려 떪'; this.setClip(a, clip('cower', 'sitdown', 'surprise')); break;
+      case 'backoff': a.wait = 1.3; a.doing = '뒷걸음질'; this.setClip(a, clip('backoff', 'surprise')); break;
+      case 'run': a.wait = 0.4; a.doing = '놀람'; this.setClip(a, clip('surprise', 'idle')); break;
+    }
+    this.events.push({ kind: 'flee', scene: a.scene, who: a.def.name });
+  }
+  /** 전투에서 달아남(기세가 꺾임): 전투 몸에서 돌아와 장면 밖으로 */
+  fledFight(id: string, x: number, y: number): void {
+    const a = this.actors.find((q) => q.def.id === id);
+    if (!a || !a.fighting) return;
+    a.fighting = false; a.x = x; a.y = y; a.plan = 'none';
+    this.flee(a, this.player?.x ?? x);
+  }
+  private flee(a: Actor, fromX: number, clip = 'flee', run = 1.8): void {
+    a.seatPick = undefined;
+    a.run = run * (this.perk(a, '날쌘 도망') ? 1.3 : 1);   // 날쌘 도망(퍽): 30% 빨리
     a.exitAt = this.gateFar(a, fromX);
-    this.walkTo(a, a.exitAt, '도망', 'exit');
-    this.setClip(a, this.canClip(a, 'flee') ? 'flee' : 'walk');
+    this.walkTo(a, a.exitAt, clip === 'crawl' || clip === 'scramble' ? '기어서 도망' : '도망', 'exit');
+    this.setClip(a, this.canClip(a, clip) ? clip : this.canClip(a, 'flee') ? 'flee' : 'walk');
+    a.fleeClip = clip;
     this.iconOn(a, '!', 1.5);
     this.events.push({ kind: 'flee', scene: a.scene, who: a.def.name });
   }
@@ -674,6 +3079,11 @@ export class WorldSim {
     const v = this.actors.find((q) => q.def.id === a.target);
     a.target = undefined;
     if (!v || v.scene !== a.scene) return this.resume(a);
+    // 실제로 옮긴다: 피해자 주머니에서 절반쯤 (잡으면 도둑이 떨어뜨린다)
+    const take = Math.round(((v.pocket ?? 0) * (0.3 + this.rng() * 0.5)) / 100) * 100;
+    v.pocket = (v.pocket ?? 0) - take;
+    a.pocket = (a.pocket ?? 0) + take;
+    a.stolen = (a.stolen ?? 0) + take;
     this.events.push({ kind: 'steal', scene: a.scene, thief: a.def.name, victim: v.def.name, x: v.x });
     this.disturb(a.scene, 12, v.x);
     // 도둑: 반대쪽 출입구로 뛴다
@@ -741,9 +3151,11 @@ export class WorldSim {
     const workers = this.actors.filter((a) => a.post?.id === p.id && a.plan !== 'exit');
     if (on && workers.length < p.count) {
       const [top, bot] = this.graph.lane(p.scene);
-      const a = this.add({ id: `post${++serial}`, name: p.archetype, kind: 'mob', brain: 'post', home: p.scene, archetype: p.archetype, look: p.archetype }, { scene: p.scene, x: p.gate, y: (top + bot) / 2 });
+      const a = this.add({ id: `post${++serial}`, name: p.archetype, kind: 'mob', brain: 'post', home: p.scene, archetype: p.archetype, look: ARCHETYPES[p.archetype]?.looks?.length ? pick(this.rng, ARCHETYPES[p.archetype]!.looks!) : p.archetype }, { scene: p.scene, x: p.gate, y: (top + bot) / 2 });
       a.post = p;
       a.postI = 0;
+      // 직원도 욕구가 있다 (10-31 자율 행동 1단계): 근무 중에 배고프거나 급하면 쉬러 갔다가 자리로 돌아온다
+      a.needs = fullNeeds(this.rng);
       this.goPost(a);
       this.events.push({ kind: 'shift', scene: p.scene, who: p.archetype, on: true });
     } else if (!on) {
@@ -763,12 +3175,29 @@ export class WorldSim {
     const [top, bot] = this.graph.lane(a.scene);
     if (p.how === 'fixed') {
       if (a.scene !== p.scene) return this.travel(a, p.scene, 'roam-post');
-      return this.walkTo(a, { x: p.spot ?? 400, y: top + 30 }, '자리로', 'post');
+      return this.walkTo(a, { x: p.spot ?? 400, y: p.y ?? top + 30 }, '자리로', 'post');
     }
     if (p.how === 'patrol') {
       const [l, r] = p.span ?? [100, (this.graph.scene(a.scene)?.length ?? 1280) - 100];
       const x = Math.abs(a.x - l) < Math.abs(a.x - r) ? r : l;
       return this.walkTo(a, { x, y: range(this.rng, top + 20, bot - 10) }, '순찰', 'post');
+    }
+    // 책상 일(사무): 그 방 빈 의자에 앉아 타자. 끝나면 decide → 다시 여기 (사이사이 쉬는 시간)
+    if (p.how === 'desk' || p.how === 'train') {
+      if (a.scene !== p.scene) return this.travel(a, p.scene, 'roam-post');
+      if (this.takeBreak(a)) return;
+      if (p.how === 'desk') {
+        const work = ACTIVITIES.find((t) => t.id === 'work')!;
+        a.task = work;
+        return this.walkTo(a, this.taskSpot(a, work), '책상으로', 'do');
+      }
+      // 훈련(전투원): 빈 훈련 장비가 있으면 거기서(샌드백·허수아비·사격), 없으면 장비 점검·팔굽혀펴기·기지개를 돌아가며 방 안 아무 데서나
+      const train = ACTIVITIES.find((t) => t.id === 'train')!;
+      const st = this.trainSpot(a);
+      if (st) { a.task = train; return this.walkTo(a, st, '훈련하러', 'do'); }
+      const opts = ['pushup', 'work', 'limber'].filter((c) => this.canClip(a, c) && c !== a.trainClip);
+      a.trainClip = opts.length ? pick(this.rng, opts) : 'idle';
+      return this.walkTo(a, this.randomSpot(a.scene), '훈련하러', 'post');
     }
     // 순회: 경로의 다음 장면으로, 머문 뒤 또 다음
     const route = p.route?.length ? p.route : [p.scene];
@@ -785,11 +3214,69 @@ export class WorldSim {
   private postStand(a: Actor, dt: number): void {
     a.wait -= dt;
     if (a.wait > 0) return;
-    if (a.post?.how === 'roam') return this.goPost(a);
-    if (a.post?.how === 'patrol') return this.goPost(a);
+    if (this.takeBreak(a)) return;
+    // 경비·요원: 근무 중 가끔 무전 보고·수첩 메모 (그 줄이 있는 그림만)
+    if (['guard', 'police'].includes(ARCHETYPES[a.def.archetype ?? '']?.role ?? '') && this.rng() < 0.2) {
+      const clip = ['radio', 'memo'].find((c) => this.canClip(a, c));
+      if (clip) { a.doing = clip === 'radio' ? '무전 보고' : '수첩 메모'; a.wait = range(this.rng, 3, 5); this.setClip(a, clip); return; }
+    }
+    // 의사: 의무실에 사람이 있으면 다가가 진료 (청진·맥·소독·붕대·기록 줄)
+    if (a.def.archetype === '의사' && this.canClip(a, 'exam') && this.rng() < 0.5) {
+      const pt = this.actors.find((q) => q !== a && q.scene === a.scene && q.def.kind === 'named' && !q.fighting && q.act !== 'walk');
+      if (pt) { a.patient = pt.def.id; return this.walkTo(a, { x: pt.x + (pt.x > a.x ? -80 : 80), y: pt.y }, '진료하러', 'treat'); }
+    }
+    if (a.post?.how === 'roam' || a.post?.how === 'patrol' || a.post?.how === 'train') return this.goPost(a);
     // 고정: 자리에서 조금씩 몸만 돌린다
     a.face = this.rng() < 0.5 ? 1 : -1;
     a.wait = range(this.rng, 4, 9);
+  }
+
+  /** 동료(이름 요원·직원)끼리: 지나가다 인사, 둘 다 한가하면 선 채 대화, 드물게 말다툼. 그림에 있는 줄만 */
+  private socialStep(a: Actor, dt: number): void {
+    if ((a.chatCd = (a.chatCd ?? range(this.rng, 5, 20)) - dt) > 0) return;
+    const mate = (q: Actor) => (q.def.kind === 'named' || !!q.post) && !q.fighting;
+    if (!mate(a) || !['walk', 'idle', 'post'].includes(a.act) || a.seat) { a.chatCd = range(this.rng, 3, 8); return; }
+    const q = this.actors.find((o) => o !== a && o.scene === a.scene && mate(o) && ['walk', 'idle', 'post'].includes(o.act) && !o.seat
+      && (o.chatCd ?? 0) <= 10 && Math.abs(o.x - a.x) < 110 && Math.abs(o.y - a.y) < 50);   // 상대는 방금 수다를 끝낸 게 아니면 됨 (둘 다 0초가 같은 틱에 겹쳐야 하던 탓에 거의 안 일어났다)
+    if (!q) { a.chatCd = range(this.rng, 3, 8); return; }
+    a.chatCd = q.chatCd = range(this.rng, 30, 70);
+    const both = (clipA: string, clipB: string, doing: string, sec: number) => {
+      for (const [p, o, c] of [[a, q, clipA], [q, a, clipB]] as const) {
+        p.act = 'pause'; p.doing = doing; p.wait = sec; p.face = o.x > p.x ? 1 : -1;
+        this.setClip(p, this.canClip(p, c) ? c : 'idle');
+      }
+    };
+    const soc = (x: Actor) => x.temper?.social ?? 0.5;
+    // 말다툼: 화내는 포즈 + 말풍선으로 끝 (10-31 사용자). 몹은 둘 다 사교성이 아주 낮을 때, 캐릭터끼리는 성격 수치가 없으니 낮은 확률로
+    const named2 = a.def.kind === 'named' && q.def.kind === 'named';
+    if ((named2 ? this.rng() < 0.04 : soc(a) < 0.25 && soc(q) < 0.25 && this.rng() < 0.1)) { both('angry', 'angry', '말다툼', range(this.rng, 2, 4)); this.iconOn(a, '#', 2); this.iconOn(q, '#', 2); return; }
+    // 둘 중 하나라도 걷는 중: 지나가다 인사 (먼저 본 쪽 응대, 상대 끄덕)
+    if (a.act === 'walk' || q.act === 'walk') { both('greet', 'nod', '인사', 1.4); return; }
+    // 둘 다 한가: 수다 욕구가 덜 찼으면 선 채 대화 (손짓·끄덕)
+    // 수다: 주제는 정하지 않는다(10-31 사용자). 먼저 건 쪽은 손짓 + 「…」 말풍선, 받은 쪽은 끄덕
+    if ((a.needs?.social ?? 50) < 80 || (q.needs?.social ?? 50) < 80) { const sec = range(this.rng, 6, 12); both('talk', 'nod', `대화 (${q.def.name}에게 먼저 말 걺)`, sec); q.doing = `대화 (${a.def.name}의 말을 받음)`; this.iconOn(a, '…', 2.5); }
+  }
+
+  /** 직원 쉬는 시간: 일 말고 가장 급한 욕구(배고픔·화장실·쉬기·수다)가 크면 같은 소속 건물 안에서 그 일을 할 곳으로. 끝나면 decide → 자리로 */
+  private takeBreak(a: Actor): boolean {
+    const p = a.post;
+    if (!p || !a.needs) return false;
+    const fac = this.sceneFaction(p.scene);
+    const roam = (fac ? this.graph.ids().filter((id) => this.sceneFaction(id) === fac) : [p.scene]).filter((id) => id === p.scene || this.sexOk(a, id));
+    const c = choose({
+      name: a.def.name, needs: a.needs, scene: a.scene, roam, graph: this.graph, has: (clip) => this.canClip(a, clip), duty: false,
+      partnerIn: (s) => this.actors.some((q) => q !== a && q.scene === s && (q.def.kind === 'named' || !!q.post) && ['idle', 'walk', 'post'].includes(q.act) && !q.route.length),
+      rand: this.rng, last: a.last, fighter: ['guard', 'police'].includes(ARCHETYPES[a.def.archetype ?? '']?.role ?? ''),   // 경비·요원만 훈련
+    });
+    if (!c || c.score < 30) return false;
+    a.task = c.act;
+    if (c.scene === a.scene) { this.walkTo(a, this.taskSpot(a, c.act), `${c.act.label} 하러`, 'do'); return true; }
+    const path = this.graph.route(a.scene, c.scene);
+    const d = path && this.graph.doorSpot(a.scene, path[0].exit);
+    if (!path || !d) { a.task = undefined; return false; }
+    a.route = path;
+    this.walkTo(a, d, `${c.act.label} 하러 ${this.graph.scene(c.scene)?.name ?? c.scene}(으)로`, 'do');
+    return true;
   }
 
   private travel(a: Actor, scene: string, plan: Plan): void {
@@ -805,34 +3292,67 @@ export class WorldSim {
   private stepSpawn(r: SpawnRule, dt: number): void {
     const night = this.isNight();
     const lvl = this.uproarLevel(r.scene);
-    const want = Math.max(0, (night ? r.target.night : r.target.day) - lvl); // 소란이 크면 덜 들어온다
-    const have = this.actors.filter((a) => a.def.kind === 'mob' && a.def.brain === 'transit' && a.scene === r.scene && a.plan !== 'chase').length;
+    // 소란이 크면 덜 들어온다. 시체가 있거나 사건 현장(수습 뒤 하루)이면 더 덜
+    const inc = this.sites.get(r.scene);
+    const scared = this.corpses(r.scene).length ? 2 : inc !== undefined && this.gameH - inc < INCIDENT_HOURS ? 1 : 0;
+    const band = this.bandOf(r);
+    const want = Math.max(0, (band ? band.n : night ? r.target.night : r.target.day) - lvl - scared);
+    const have = this.actors.filter((a) => a.def.kind === 'mob' && a.def.brain === 'transit' && a.scene === r.scene && a.plan !== 'chase' && a.plan !== 'cordon' && a.act !== 'dead').length;
     if (have >= want) return void this.spawnT.delete(r.scene);
     const visible = this.player?.scene === r.scene;
     if (!visible) {
-      for (let i = have; i < want; i++) this.spawnOne(r, null, true);
+      for (let i = have; i < want; ) i += this.spawnOne(r, null, true, want - i);
       return void this.spawnT.delete(r.scene);
     }
     const left = (this.spawnT.get(r.scene) ?? 0) - dt;
     if (left > 0) return void this.spawnT.set(r.scene, left);
-    this.spawnT.set(r.scene, range(this.rng, r.refill[0], r.refill[1]) * (1 + lvl));
-    this.spawnOne(r, this.player!.x, false);
+    // 붐비는 시간일수록 자주 들어온다 (사람이 지나가 나가는 만큼 채운다)
+    this.spawnT.set(r.scene, (range(this.rng, r.refill[0], r.refill[1]) * (1 + lvl)) / Math.max(1, want / 6));
+    this.spawnOne(r, this.player!.x, false, want - have);
   }
 
-  private spawnOne(r: SpawnRule, playerX: number | null, anywhere: boolean): void {
+  /** 지금 시각의 유동인구 구간 (시계 없으면 낮 12시로 본다) */
+  private bandOf(r: SpawnRule): { n: number; mix: string[] } | null {
+    if (!r.bands?.length) return null;
+    const h = this.hour ?? 12;
+    const b = r.bands.find((q) => (q.from <= q.to ? h >= q.from && h < q.to : h >= q.from || h < q.to)) ?? r.bands[0];
+    // n 은 1,000px당 인원 → 장면 길이만큼
+    return { n: Math.round((b.n * (this.graph.scene(r.scene)?.length ?? 1000)) / 1000), mix: b.mix };
+  }
+  private mixOf(r: SpawnRule): string[] {
+    return this.bandOf(r)?.mix ?? (this.isNight() && r.nightMix?.length ? r.nightMix : r.mix);
+  }
+  /** 한 명(또는 일행 둘) 들여보냄. 들어온 수 */
+  private spawnOne(r: SpawnRule, playerX: number | null, anywhere: boolean, room = 1): number {
     const len = this.graph.scene(r.scene)?.length ?? 1280;
     const gates = r.gates?.length ? r.gates : [30, len - 30];
     const from = playerX === null ? pick(this.rng, gates) : [...gates].sort((p, q) => Math.abs(q - playerX) - Math.abs(p - playerX))[0];
     const others = gates.filter((g) => g !== from);
     const to = pick(this.rng, others.length ? others : gates);
     const [top, bot] = this.graph.lane(r.scene);
-    const name = pick(this.rng, this.isNight() && r.nightMix?.length ? r.nightMix : r.mix);
+    const mix = this.mixOf(r);
+    const name = pick(this.rng, mix);
     const arch = ARCHETYPES[name];
     const look = arch?.looks?.length ? pick(this.rng, arch.looks) : name;
     const a = this.add({ id: `mob${++serial}`, name, kind: 'mob', brain: 'transit', home: r.scene, archetype: name, look, speed: range(this.rng, 110, 170) }, { scene: r.scene, x: anywhere ? range(this.rng, MARGIN, len - MARGIN) : from, y: range(this.rng, top + 20, bot - 10) });
     if (a.temper) a.def.speed = (a.def.speed ?? WALK) * (0.85 + a.temper.haste * 0.35);
     a.exitAt = { x: to, y: range(this.rng, top + 20, bot - 10) };
     this.walkTo(a, a.exitAt, a.drunk ? '비틀거리며 지나감' : '지나가는 중', 'exit');
+    // 일행: 친화가 높으면 가끔 아는 사람과 같이 들어와 나란히 걷는다 (시민·학생·직장인·불량배)
+    const role = arch?.role;
+    if (room < 2 || !a.temper || !['civilian', 'student', 'worker', 'thug'].includes(role ?? '') || this.rng() >= 0.3 * a.temper.social) return 1;
+    const mates = mix.filter((m) => ARCHETYPES[m]?.role === role);
+    const name2 = mates.length ? pick(this.rng, mates) : name;
+    const arch2 = ARCHETYPES[name2];
+    const dy = a.y - top > bot - a.y ? -26 : 26;
+    const b = this.add({ id: `mob${++serial}`, name: name2, kind: 'mob', brain: 'transit', home: r.scene, archetype: name2, look: arch2?.looks?.length ? pick(this.rng, arch2.looks) : name2, speed: a.def.speed },
+      { scene: r.scene, x: a.x - (to > a.x ? 24 : -24), y: a.y + dy });
+    b.buddy = a.def.id;
+    b.buddyDy = dy;
+    b.exitAt = { x: to, y: Math.max(top + 10, Math.min(bot - 10, a.exitAt.y + dy)) };
+    b.drunk = a.drunk;
+    this.walkTo(b, b.exitAt, '일행과 걷는 중', 'exit');
+    return 2;
   }
 }
 

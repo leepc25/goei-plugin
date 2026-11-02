@@ -1,0 +1,442 @@
+[
+ {
+  "key": "1.1_쟈알디",
+  "role": "bruiser",
+  "gun": "single",
+  "weapon": "권총",
+  "speed": "normal",
+  "why": "손바닥 폭파 근접 폭발이 주력, 권총은 보조. 큰 키 반듯한 자세의 무게감"
+ },
+ {
+  "key": "1.2_스팡달",
+  "role": "striker",
+  "gun": "none",
+  "weapon": "몸에서 나오는 검은 가시",
+  "speed": "fast",
+  "why": "그림자 이동으로 등 뒤 기습·백어택 2배. 가는 체격, 무기 없음"
+ },
+ {
+  "key": "1.3_잼트리",
+  "role": "support",
+  "gun": "thrown",
+  "weapon": "볼펜 던지기",
+  "speed": "slow",
+  "why": "커피로 회복·공속 버프, 필살기 전체 회복. 원작 전투 능력 없는 내근"
+ },
+ {
+  "key": "1.4_에일린",
+  "role": "ranged",
+  "gun": "rapid",
+  "weapon": "기관단총",
+  "speed": "normal",
+  "why": "판독 표식·관통탄·제압사격 등 사격 중심 지휘 대행. 두 손 기관단총(과열 있음)"
+ },
+ {
+  "key": "1.5_고그니쟈",
+  "role": "control",
+  "gun": "single",
+  "weapon": "리모컨(천장 설비 사격)",
+  "speed": "slow",
+  "why": "격리관 가두기·바닥 열어 떨어뜨리기·방벽. 겉보기 비전투원 연구 책임자"
+ },
+ {
+  "key": "1.6_큐라스",
+  "role": "ranged",
+  "gun": "none",
+  "weapon": "맨손 핑거 스냅(조준점 소폭발)",
+  "speed": "fast",
+  "why": "투사체 요격·지속 포격 등 원거리 폭발 화력. 마른 체격, 무기 없음"
+ },
+ {
+  "key": "1.7_고르고디오",
+  "role": "bruiser",
+  "gun": "heavy",
+  "weapon": "클리버(바닥 충격파)",
+  "speed": "slow",
+  "why": "장갑 상태 공격력 2배·잡아 내리꽂기·초음속 돌격. 2m 레슬러 체격"
+ },
+ {
+  "key": "1.8_데쥬레",
+  "role": "control",
+  "gun": "single",
+  "weapon": "레이저 스캐너",
+  "speed": "slow",
+  "why": "미끼 홀로그램·약점 노출·분류 판정. 위키 「전투: 없다」 작은 체구"
+ },
+ {
+  "key": "1.9_데드폴",
+  "role": "tank",
+  "gun": "single",
+  "weapon": "권총",
+  "speed": "fast",
+  "why": "되감기 자가 회복, 필살기로 적 공격을 자기에게 몰아 받고 되돌림. 작은 체구에 방검 장갑 맨손 근접"
+ },
+ {
+  "key": "1.10_게슈간",
+  "role": "control",
+  "gun": "none",
+  "weapon": "맨손 좌표 염동(쥐기)",
+  "speed": "fast",
+  "why": "적을 공중 고정·끌고 던지기·짓뭉개기. 운동형 체격, 두 발을 믿음"
+ },
+ {
+  "key": "1.11_로제몬",
+  "role": "control",
+  "gun": "none",
+  "weapon": "손끝 실(최면)",
+  "speed": "slow",
+  "why": "최면 퇴각·실 인형 조종으로 적끼리 싸움. 전투력 없는 작은 체구"
+ },
+ {
+  "key": "1.12_콘쥬스",
+  "role": "tank",
+  "gun": "heavy",
+  "weapon": "상자·잔해 던지기",
+  "speed": "normal",
+  "why": "물건 들어 방벽, 쓰러진 아군 업고 구조, 잔해로 적 밀어냄. 괴력 고등학생"
+ },
+ {
+  "key": "2.1_사장",
+  "role": "striker",
+  "gun": "none",
+  "weapon": "검지 지목 검은 선",
+  "speed": "fast",
+  "why": "검은 선 순간이동 베기·분신·시간 정지 몰아치기. 맨손 하나가 무기"
+ },
+ {
+  "key": "2.2_도필헌",
+  "role": "control",
+  "gun": "none",
+  "weapon": "손짓 지목(화면 밖 부하 사격)",
+  "speed": "slow",
+  "why": "손님 상태 정지·영입·적 속임수 무력화. 본인 물리 전투력 없음"
+ },
+ {
+  "key": "2.3_이길환",
+  "role": "control",
+  "gun": "none",
+  "weapon": "핸드 마이크(음파)",
+  "speed": "slow",
+  "why": "적 행동 지연·공속 감소·지침 상태, 필살기는 아군 피해 감소. 통통한 비전투 인물"
+ },
+ {
+  "key": "2.4_이기석",
+  "role": "support",
+  "gun": "none",
+  "weapon": "무대용 마이크(외침)",
+  "speed": "normal",
+  "why": "구호 제창 공격력·공속 버프, 발표로 집중 공격 유도. 마른 전직 현장 요원"
+ },
+ {
+  "key": "2.5_김조학",
+  "role": "control",
+  "gun": "thrown",
+  "weapon": "서류철 종이",
+  "speed": "slow",
+  "why": "공포 경직·방어 감소·적 기술 봉인. 직접 전투 거의 없는 심문관"
+ },
+ {
+  "key": "2.6_이도형",
+  "role": "striker",
+  "gun": "none",
+  "weapon": "닳은 일본도(검풍)",
+  "speed": "fast",
+  "why": "순보 늦은 베기·간파 반격·화면 가르기. 가짜 관리국 최강 검사"
+ },
+ {
+  "key": "2.7_고영훈",
+  "role": "striker",
+  "gun": "none",
+  "weapon": "짧은 일본도(찌르기 검풍)",
+  "speed": "normal",
+  "why": "맨손 붙잡기 후 부대원 찌르기, 가장 강한 적 정밀 3연 베기. 단단한 검사 지휘관"
+ },
+ {
+  "key": "2.8_노기균",
+  "role": "striker",
+  "gun": "none",
+  "weapon": "일본도(검기)",
+  "speed": "fast",
+  "why": "튕기듯 3번 파고드는 베기·1:1 대련 연속 베기. 다부진 검사"
+ },
+ {
+  "key": "2.9_송주익",
+  "role": "striker",
+  "gun": "none",
+  "weapon": "일본도 예카테리나(칼바람)",
+  "speed": "normal",
+  "why": "교본 3연 베기·돌진·각성 시 2배 빠른 베기. 정확한 교본형 검술"
+ },
+ {
+  "key": "2.10_곽성주",
+  "role": "tank",
+  "gun": "rapid",
+  "weapon": "미니건",
+  "speed": "slow",
+  "why": "방벽 자세 정면 피해 90% 감소·어그로, 미니건 연사(과열). 거구"
+ },
+ {
+  "key": "2.11_조성춘",
+  "role": "support",
+  "gun": "none",
+  "weapon": "고함(음파)",
+  "speed": "fast",
+  "why": "실황 중계로 적 정보·경직 면역, 침묵 필살기로 아군 공격력 +40%. 마른 맨주먹 돌격형"
+ },
+ {
+  "key": "2.12_윤병수",
+  "role": "ranged",
+  "gun": "rapid",
+  "weapon": "화염방사기",
+  "speed": "normal",
+  "why": "화염 다단히트·수류탄 투척·인형 화염 공세. 짧게 끊는 연속 방사라 연사형"
+ },
+ {
+  "key": "2.13_김성진",
+  "role": "ranged",
+  "gun": "single",
+  "weapon": "권총",
+  "speed": "normal",
+  "why": "권총 3연사·끝없는 권총 필살기. 신입 표준 사격"
+ },
+ {
+  "key": "2.14_송진섭",
+  "role": "ranged",
+  "gun": "single",
+  "weapon": "권총",
+  "speed": "normal",
+  "why": "자동 조준 권총 한 발, 레이더로 아군 약점 사격 보조. 마른 소년형"
+ },
+ {
+  "key": "3.1_청달래",
+  "role": "control",
+  "gun": "none",
+  "weapon": "이무기의 숨(입 앞 불)",
+  "speed": "normal",
+  "why": "손 뻗어 다운·역할 배정·계약으로 아군화. 정체는 이무기"
+ },
+ {
+  "key": "3.2_호유원",
+  "role": "control",
+  "gun": "none",
+  "weapon": "스마트폰 통화음",
+  "speed": "normal",
+  "why": "특수 공격 봉인 표식·여우병 상호 공격·빙의. 약속이 무기"
+ },
+ {
+  "key": "3.3_백석주",
+  "role": "support",
+  "gun": "none",
+  "weapon": "박수 장풍",
+  "speed": "normal",
+  "why": "「내 사람」 공격력 버프·피해 감소 점검표·치유 반지 회복과 부활"
+ },
+ {
+  "key": "3.4_진나솔",
+  "role": "striker",
+  "gun": "thrown",
+  "weapon": "손톱 쏘기",
+  "speed": "fast",
+  "why": "손톱 앵커 사이 실로 절단, 화면 전체 절단 필살기. 키 크고 가는 정예"
+ },
+ {
+  "key": "3.5_이성해",
+  "role": "striker",
+  "gun": "thrown",
+  "weapon": "명함 던지기",
+  "speed": "fast",
+  "why": "인사 회피 후 반격 피해 +50%, 근접은 짧고 결정적. 속도 줄이지 않음"
+ },
+ {
+  "key": "3.6_이자헌",
+  "role": "bruiser",
+  "gun": "thrown",
+  "weapon": "조각 던지기(버터나이프 보유)",
+  "speed": "slow",
+  "why": "철문 손잡이 부러뜨리는 주먹·고정물 뜯어 던지기·맨손 해체 6타. 크고 넓은 어깨"
+ },
+ {
+  "key": "3.7_은하제",
+  "role": "control",
+  "gun": "thrown",
+  "weapon": "수갑 던지기",
+  "speed": "normal",
+  "why": "수갑 사슬로 적끼리 묶기·지도·함정 해제·D조 호출"
+ },
+ {
+  "key": "3.8_박민성",
+  "role": "tank",
+  "gun": "thrown",
+  "weapon": "짐 던지기",
+  "speed": "slow",
+  "why": "몸통 박치기·아군 업고 질주하며 피해 -60% 대신 받음. 덩치 큰 근육형"
+ },
+ {
+  "key": "3.9_백사헌",
+  "role": "striker",
+  "gun": "thrown",
+  "weapon": "숨긴 물건 던지기",
+  "speed": "fast",
+  "why": "미끼·은신 후 첫 공격 2배, 자동 회피 후 뒤로 파고듦. 마른 「독사」"
+ },
+ {
+  "key": "3.10_고영은",
+  "role": "support",
+  "gun": "thrown",
+  "weapon": "예비 배터리 던지기",
+  "speed": "slow",
+  "why": "구급상자 회복·생존자 진정, 헤드램프 눈부심. 평범한 비전투 체격"
+ },
+ {
+  "key": "3.11_강이학",
+  "role": "control",
+  "gun": "thrown",
+  "weapon": "동전 던지기",
+  "speed": "normal",
+  "why": "값 매기기 표식·거래 정지·매수로 아군화"
+ },
+ {
+  "key": "3.12_장허운",
+  "role": "tank",
+  "gun": "heavy",
+  "weapon": "잔해 투포환",
+  "speed": "slow",
+  "why": "아군 앞 막아 서기로 피해 대신 받음, 필살기 아군 전원 방패. 키 크고 구부정"
+ },
+ {
+  "key": "3.13_곽제강",
+  "role": "control",
+  "gun": "thrown",
+  "weapon": "볼펜 던지기",
+  "speed": "slow",
+  "why": "연구 기록 약점 표식·채집·연구 중 둔화. 원작 전투력 전무"
+ },
+ {
+  "key": "3.14_이연화",
+  "role": "support",
+  "gun": "thrown",
+  "weapon": "포션병 액체 뿌리기",
+  "speed": "slow",
+  "why": "포션 조제 회복·면역, 아군 정지로 함정 회피. 전투 없는 연구원"
+ },
+ {
+  "key": "3.15_이병진",
+  "role": "control",
+  "gun": "thrown",
+  "weapon": "빨간 사인펜 잉크",
+  "speed": "slow",
+  "why": "적 기술 봉인·필살 게이지 지원·결계 해제. 과체중 비전투 인물"
+ },
+ {
+  "key": "3.16_제이",
+  "role": "bruiser",
+  "gun": "none",
+  "weapon": "맨손 그림자 늘이기",
+  "speed": "normal",
+  "why": "그림자 늑대 앞발 내리꽂기·삼키기·거대 늑대 변신. 마른 체격이지만 늑대 힘"
+ },
+ {
+  "key": "4.1_차여진",
+  "role": "support",
+  "gun": "thrown",
+  "weapon": "의뢰서 한 장",
+  "speed": "slow",
+  "why": "아군 피해 버프·규칙 무시·프리랜서 소환. 「싸움은 못 한다」"
+ },
+ {
+  "key": "4.2_서윤지",
+  "role": "control",
+  "gun": "thrown",
+  "weapon": "서류철 조항 글자",
+  "speed": "slow",
+  "why": "적 효과 반려·피해 되돌림·규칙 집행으로 약점 강제 개방"
+ },
+ {
+  "key": "4.3_고연지",
+  "role": "support",
+  "gun": "thrown",
+  "weapon": "메스 던지기",
+  "speed": "normal",
+  "why": "즉석 봉합 회복·오염 해제·전원 소생. 무면허 외과의"
+ },
+ {
+  "key": "4.4_윤지아",
+  "role": "support",
+  "gun": "thrown",
+  "weapon": "사탕 던지기",
+  "speed": "fast",
+  "why": "사탕 회복·적대 해제·지속 회복과 쿨감. 작고 가벼운 몸놀림"
+ },
+ {
+  "key": "4.5_마덕희",
+  "role": "control",
+  "gun": "thrown",
+  "weapon": "가격표 던지기",
+  "speed": "slow",
+  "why": "값 후려치기 방어력 감소·최대 체력 감소 디버프. 원작 전투 능력 없음"
+ },
+ {
+  "key": "4.6_문혜란",
+  "role": "control",
+  "gun": "thrown",
+  "weapon": "카드 던지기(진압봉 보유)",
+  "speed": "normal",
+  "why": "진압봉 엎어뜨려 못 일어나게, 압박 공속 감소, 고용·빚 표식"
+ },
+ {
+  "key": "4.7_신유리",
+  "role": "striker",
+  "gun": "thrown",
+  "weapon": "단검 던지기",
+  "speed": "fast",
+  "why": "단검 연속 찌르기·좁은 곳 피해 +40%·담보 표식 도망 봉쇄. 운동형"
+ },
+ {
+  "key": "4.8_블라렛",
+  "role": "bruiser",
+  "gun": "single",
+  "weapon": "은탄 쌍권총",
+  "speed": "fast",
+  "why": "성검 크게 베기 2회·은탄 6연사, 괴이 2배. 날렵한 전투 수녀"
+ },
+ {
+  "key": "4.9_살라딘",
+  "role": "bruiser",
+  "gun": "rapid",
+  "weapon": "접이식 짧은 소총(AK)",
+  "speed": "slow",
+  "why": "언월도 베기+사격 동시, 전투 함성 버프·RPG. 크고 넓은 근육형(json heat는 false)"
+ },
+ {
+  "key": "4.10_아벤샤",
+  "role": "ranged",
+  "gun": "none",
+  "weapon": "맨손 모래 탄환",
+  "speed": "slow",
+  "why": "모래 탄환 3발·모래 더미 둔화·모래 해일. 망토 마녀, 무기 없음"
+ },
+ {
+  "key": "5.1_세크리엠",
+  "role": "striker",
+  "gun": "none",
+  "weapon": "피의 칼날 던지기(손톱)",
+  "speed": "fast",
+  "why": "피 칼날 흡혈 회복, 박쥐 떼 회피·휘젓기. 진조 흡혈귀"
+ },
+ {
+  "key": "5.2_브라우니",
+  "role": "control",
+  "gun": "none",
+  "weapon": "방송 송출(TV 전파)",
+  "speed": "slow",
+  "why": "박수 유도 정지·규칙 발표 금지·퀴즈쇼 벌칙. 크고 넓은 TV 머리 체격"
+ },
+ {
+  "key": "5.3_탐미주의",
+  "role": "control",
+  "gun": "none",
+  "weapon": "물감 뿌리기",
+  "speed": "fast",
+  "why": "침묵·물감 둔화·화면 전체 조각상 굳히기. 최상위급 공격을 맨손으로 쳐냄"
+ }
+]

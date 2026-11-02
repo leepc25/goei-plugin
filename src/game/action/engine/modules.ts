@@ -1,61 +1,90 @@
 // 최종 통합: 각 스레드 모듈을 엔진에 이어 붙이는 곳.
 //   ui/    화면 틀·메뉴·HUD·터치·화면 효과 (mountGameShell)
 //   audio/ 효과음·음악 (createGameAudio)
-//   hq/    본부와 임무 흐름 (createHq)
-// 층(stage/)·적(enemy/)·아이템(items/)·대사(story/)는 들어오는 대로 여기에 잇는다. 없으면 엔진 기본(훈련장·임시 적·기본 지급품).
+//   hq/    본부·필드 건물 지도 (hqMap)
+// 적(enemy/)·아이템(items/)·대사(story/)를 여기에 잇는다. 옛 차원 승강기 출동(층·임무·정산)은 2026-10-28에 지웠다.
+import { BASE_STATS } from '../../combat/baseStats.gen';
+import { derive, rollBase } from '../../combat/stats';
 import { clockText } from '../../../core/fieldclock';
-import type { GameAssets, GameBridge } from '../../bridge';
+import type { GameAssets, GameBridge, MobTalk, TalkOpts } from '../../bridge';
 import { persp, view } from './view';
 import { KEYMAP } from './input';
-import { drawGuardBar } from '../ui/pixelHud';
-import { EileenPlayer } from '../eileen/player';
+import { drawGuardBar, type SkillIcon } from '../ui/pixelHud';
+import { CharWindowCtl } from '../ui/charWindowCtl';
+import { badgeOf, loadBadges } from '../ui/badgeArt';
+import type { CharWindowData } from '../ui/charWindow';
+import { CW_SKILLS, CW_STATS } from '../ui/charWindowTable.gen';
+import { AGENT_NPCS } from '../npc/roster';
+import { FIELD_ITEMS, BAG_SLOTS } from '../../world/fieldShop';
+import { FighterPlayer, fighterHooks } from '../fighter/player';
+import { GRADE_COLOR, PAIR_COLOR, TRAIT_COLOR, openDraft } from '../../perks/draftUi';
+import { PERK_TEXT, TRAIT_TEXT } from '../../perks/defs.gen';
+
+const PERK_KIND = new Map(PERK_TEXT.map((d) => [d.name, d.kind]));
+/** HUD 퍽 칸: 얻은 순서대로, 특성은 맨 뒤. 이름 앞 두 글자 · 등급 테두리 · 쌓임 숫자 */
+function perkChips(p: FighterPlayer): { t: string; c: string; n?: number }[] {
+  const st = new Map(p.perks.stacks().map((x) => [x.name, x.v]));
+  const two = (n: string) => n.replace(/\s/g, '').slice(0, 2);
+  return [
+    ...[...p.perks.ranks.keys()].map((n) => ({ t: two(n), c: PERK_KIND.get(n) === '쌍' ? PAIR_COLOR : GRADE_COLOR[p.perks.topGrade(n)], n: st.get(n) || undefined })),
+    ...[...p.perks.traits].map((n) => ({ t: two(n), c: TRAIT_COLOR })),
+  ];
+}
+import { FighterAi } from '../fighter/ai';
+import { charArt, charBody, charFace, charTop, drawCharClip, hasCharClip, loadChar } from '../art/charPacks';
 import { setPixelScale } from './contract';
 import { mountTalk } from '../../talk';
 import { createGameAudio } from '../audio';
 import { VIDEO_AUDIO_EVENT, type VideoTrack } from '../audio/videoTrack';
-import { createHq, idbSaves, setItemIconDrawer, setLineProvider, setSupplyCatalog, type MissionLaunch, type RunResult, type SaveSlots } from '../hq';
+import { hqMap } from '../hq';
 import { mountGameShell, type HudState, type Shell } from '../ui';
 import { localStore, type SettingsStore } from '../ui/settings';
 import { navigationFeedback } from './navigationFeedback';
 import { syncNavigationButton } from '../ui/navigationButton';
-import type { Body, GameEvent, HqModuleLike, RunConfigCore, RunResultCore, StageModule } from './contract';
+import type { Body, GameEvent, HqModuleLike, StageModule } from './contract';
 import type { EngineModules, Game } from './game';
 import { DEF_BY_KIND, arenaStage, createEnemy, isThreat } from '../enemy';
-import { bindEnemyInteractions } from './enemyInteractions';
-import { createElevatorStage } from '../stage';
-import { drawMiniMap, drawRunMap } from '../stage/runmap';
-import { CUTSCENES, VIDEOS, hqLines, mountStory, stageHooks, type AgentId, type StoryApi } from '../story';
-import { itemsBlocking, linkItems, mountItemsOverlay } from './itemsLink';
+import { CUTSCENES, VIDEOS, mountStory, type AgentId, type StoryApi } from '../story';
+import { linkItems } from './itemsLink';
 import { makeHub, silhouette, type HubHost, type HubLife } from './hub';
 import { createHqWorld, hqDistrict } from '../../world/hq';
+import { clampPainted, walkablePainted } from '../hq/painted';
 import { isRegionMove } from '../../world/districts';
+import { FACTION_NAMES, relationFrom } from '../../world/factions';
+import { STATUS, type DebuffKind, type StatusSet } from '../../combat/status';
+import { createFieldShop, type FieldShop } from './fieldShopLink';
+import type { FieldWorldSave } from '../../world/fieldSave';
 import { DEFAULT_CLOCK, clockRules, waitOptions, type ClockRules } from '../../world/clock';
 import { hashSeed } from '../../world/rng';
 import { observerLines } from '../../world/observer';
-import { Lines, NPC_TYPE, type DialogueData, type LineCtx } from '../../world/lines';
+import { NPC_TYPE } from '../../world/lines';
+import { Dialogue2, repOf, type CueCtx } from '../../world/dialogue2';
+/** NPC 대사 파일 전부 (game-pack/dialogue index.json 과 같음): 몹은 아무 때나 생기니 미리 받아 둔다 */
+const NPC_FILES = ['가짜 관리국 검사부대_남', '가짜 관리국 진압부대_남', '간호사_여', '경비_남', '경비_여', '경찰_남', '경찰_여', '관리국 요원_남', '관리국 요원_여', '백일몽 직원_남', '백일몽 직원_여', '불량배_남', '불량배_여', '상인_남', '상인_여', '안내 직원_남', '안내 직원_여', '의사_남', '청소부_남', '청소부_여', '프리랜서_남', '프리랜서_여', '학생_남', '학생_여', '행인_남', '행인_여', '행정 직원_남', '행정 직원_여', '협회 직원_남', '협회 직원_여'];
 import { Chatter } from '../../world/speech';
 import dialogueData from '../../world/dialogue.json';
 import type { Actor, SimEvent } from '../../world/actors';
+import { ARCHETYPES, profileOf } from '../../world/mobs';
+import { FightLog, enName, isLaw } from '../../world/fightlog';
+import { reactCell, reactOf } from '../../world/namedReact';
+import { drawAlarmLights } from '../../world/alarmFx';
+import { view as fieldViewport } from './view';
+import { settleLine } from '../../world/fieldmoney';
+import { NAMED_MUL, npcPerkDef, rollNpcPerks } from '../../world/npcperks';
 import type { FactionView, PersonView } from '../../bridge';
 import { FieldClock } from '../../world/clock';
 import type { WorldSim } from '../../world/actors';
 import { linkNpcTalk } from './npcLink';
 import demoPhotos from '../story/demo-photos.json';
 import { whereIs, LANE_TOP, LANE_BOT } from '../hq/map';
-import { hasVisitAgent, hasVisitClip, visitAgentFaceCanvas } from '../art/visitAgents';
-import { drawTestMan, hasTestPeople, testPlayerFace, testPlayerTop } from '../art/testPeople';
-import { eileenHooks } from '../eileen/player';
-import { AiEileen } from '../eileen/aiFighter';
-import { AutoPilot } from '../eileen/autoPilot';
-import { CODE } from '../ui/keys';
 import { Squad, DIFF, type Difficulty } from '../../combat/brain';
 import { FieldFx, parseFxList } from '../fx/fieldFx';
 import { SUPER_TEXT } from '../fx/superText';
 import { drawTitleBg, setHudItemIcon } from '../ui';
-import { SUPPLY_CATALOG, drawItemIcon } from '../items';
+import type { PixelSlot } from '../ui/pixelHud';
+import { drawItemIcon } from '../items';
 import { dummyStage, trainingStage } from './training';
 import { fallbackEnemy, type EnemyFactory, type World } from './world';
-import { SessionStore } from './sessionStore';
 
 const local = (key: string) => ({
   load: () => {
@@ -74,12 +103,6 @@ const local = (key: string) => ({
   },
 });
 
-type Launch = RunConfigCore & { launch?: MissionLaunch };
-
-const SAVED_KEY = 'goei-game-saved';
-const markSaved = () => local(SAVED_KEY).save('1');
-const hasSaved = () => local(SAVED_KEY).load() === '1';
-
 /** 본부 모듈을 엔진 모양으로 감싼다 */
 /** 필드 시각 (초). 입장할 때 본편 시각과 합치고, 걸을 때마다 늘어난다 */
 /** 필드 제목 화면 글자 (이름 「괴이 ː ANOMALY」) */
@@ -90,21 +113,19 @@ const fieldWallet: { won: number | null } = { won: null };
 /** 관찰 창(F9) 켜짐: 오른쪽 위 자리를 같이 쓴다 */
 let observing = false;
 const observerOn = () => observing;
+/** 필드 가게 창이 쓰는 돈·장부 (hqAdapter 안에서 채운다: 가계부 다리·방문 id가 거기 있다) */
+const fieldLink: { talkOpts?: (name: string) => TalkOpts; onTags?: (key: string, name: string, tags: string[]) => void; mobOf?: (key: string) => MobTalk | null; talkTarget?: () => string; pay?: (amount: number, memo: string) => Promise<number | null>; record?: (text: string, ko?: string) => void; fact?: (key: string, value: string) => void; nearPerson?: () => string | null; cueLine?: (key: string, cell: string) => string | null; busyCell?: (key: string) => string | null; gift?: (who: string, item: string, counts: boolean) => void ; endVisit?: (close: boolean) => void } = {};
 const wonText = (n: number) => `${n < 0 ? '−' : ''}₩ ${Math.abs(Math.trunc(n)).toLocaleString('en-US')}`;
 
-/** 닫은 뒤 에일린 소리 훅 자리 (게임 장면을 붙잡지 않는 모듈 수준 함수) */
-const noSfx = (): void => {};
-
-function hqAdapter(saves: SaveSlots, bridge: Partial<GameBridge> | undefined, ui: { chooseFloor: HubHost['chooseFloor']; sfx: (n: string) => void; closed?: () => void; resuming?: () => boolean; overlay?: HubHost['overlay']; rules?: () => ClockRules; choose?: (o: { title: string; lines?: string[]; options: string[]; cancel?: boolean }) => Promise<number> }): HqModuleLike & { close(): void; goto(place: string): void; state(): { day: number; rescued: string[] }; visitReady: Promise<void>; visitor(): { agentId: string; name: string }; dispose(): void } {
-  const hq = createHq();
+function hqAdapter(bridge: Partial<GameBridge> | undefined, ui: { chooseFloor: HubHost['chooseFloor']; sfx: (n: string) => void; overlay?: HubHost['overlay']; rules?: () => ClockRules; shop?: (id: string) => string | null; choose?: (o: { title: string; lines?: string[]; options: string[]; cancel?: boolean }) => Promise<number>; worldSave?: { get(): FieldWorldSave | undefined; set(w: FieldWorldSave): void } }): HqModuleLike & { goto(place: string): void; visitReady: Promise<void>; visitor(): { agentId: string; name: string }; dispose(): void } {
+  const map = hqMap();
   const b = bridge as (Partial<GameBridge> & { slot?: number; photo?: (name: string) => string | undefined }) | undefined;
-  const slot = b?.slot ?? 0;
-  // 필드 시각·장소·잔고·관찰 창은 모듈 변수라 게임을 닫았다 다시 열어도 남아 있었다 (다른 채팅의 시각이 이어지고 본편 시각을 다시 읽지 않음). 열 때마다 새로
+  // 필드 시각·장소·잔고·관찰 창은 모듈 변수라 게임을 닫았다 다시 열어도 남아 있었다 (main 10-29 고침을 옮김). 열 때마다 새로
   fieldClock.sec = null;
   fieldClock.place = '';
   fieldWallet.won = null;
   observing = false;
-  // 본부 걷기는 엔진 벨트 장면(engine/hub.ts): 건물 지도는 본부 모듈 map(), 엔진은 장면 옮기기·그리기. 메뉴 창(DOM)만 본부 모듈이 띄운다
+  // 본부 걷기는 엔진 벨트 장면(engine/hub.ts): 건물 지도는 hqMap(), 엔진은 장면 옮기기·그리기
   // 본부 방문: 상태 태그로 정한 방(사무실·휴게실·의무실)에 요원을 세운다. 들어가기 전에 한 번 읽는다
   let present: { name: string; room: string }[] = [];
   // 필드 시계 규칙 (설정 → 필드 시간, 채팅별). 바꾸면 다음 행동부터
@@ -114,9 +135,13 @@ function hqAdapter(saves: SaveSlots, bridge: Partial<GameBridge> | undefined, ui
   const visitReady = (b?.visit
     ? b.visit.state().then((v) => { visitor = v.visitor; present = v.agents.filter((a) => a.room).map((a) => ({ name: a.name, room: a.room! })); }).catch(() => {})
     // 시연판(본편 연결 없음): 생태계를 볼 수 있게 요원 몇 명을 세운다
-    : Promise.resolve().then(() => { present = [{ name: '잼트리', room: 'office' }, { name: '쟈알디', room: 'office' }, { name: '큐라스', room: 'lounge' }, { name: '고르고디오', room: 'lounge' }, { name: '데쥬레', room: 'infirmary' }]; })).then(() => { ready = true; });
+    : Promise.resolve().then(() => { present = [{ name: '잼트리', room: 'office' }, { name: '쟈알디', room: 'office' }, { name: '큐라스', room: 'lounge' }, { name: '고르고디오', room: 'lounge' }, { name: '데쥬레', room: 'infirmary' }]; }))
+    // 본부에 있는 요원의 인물 팩(생활 클립·전투)을 받아 둔다 (없는 인물은 방문 요원 그림·실루엣)
+    .then(() => Promise.all(present.map((p) => loadChar(p.name)))).then(() => { ready = true; });
   // 필드 시각은 본편 상태줄 시각에서 시작한다 (docs/필드_세계_NPC_설계.md 16-3). 유저 소속·신분도 같이
   let me: { faction: string; level: number | null } = { faction: 'A00', level: 1 };
+  /** 주인공이 플레이 중인 이름 인물 (없으면 '') → 대사 chars.<인물> 칸 */
+  let playingAs = '';
   // 시연판(본편 없음): 시계를 10시에서 시작 (?hour=숫자 로 바꿈) — 근무·시간대·시간 보내기를 볼 수 있게
   if (!b?.card && fieldClock.sec === null) {
     const h = Number(typeof location !== 'undefined' ? new URLSearchParams(location.search).get('hour') ?? 10 : 10);
@@ -124,35 +149,62 @@ function hqAdapter(saves: SaveSlots, bridge: Partial<GameBridge> | undefined, ui
   }
   void b?.card?.().then((snap) => {
     if (fieldClock.sec === null && snap?.minute != null) fieldClock.sec = snap.minute * 60;
+    // 본편에 시계가 없으면 지난 방문에 저장한 필드 시각에서 이어 간다 (1-8)
+    if (fieldClock.sec === null && ui.worldSave?.get()?.clock != null) fieldClock.sec = ui.worldSave.get()!.clock!;
     if (snap) me = { faction: snap.identity?.faction || snap.faction || 'A00', level: snap.identity?.level ?? null };
+    if (snap) playingAs = snap.player ? snap.agents.find((a) => a.id === snap.player)?.name ?? '' : '';
   }).catch(() => {});
   // 인물 기록(호감 단계·호칭)과 세력 평판: 대사 칸·몹 반응에 쓴다. 기록이 갱신되면 다시 읽는다
   const peopleBy = new Map<string, PersonView>();
   const factionBy = new Map<string, FactionView>();
+  let relation = relationFrom(null);
   const readPeople = () => {
     void b?.people?.people().then((l) => { peopleBy.clear(); for (const p of l) peopleBy.set(p.name, p); }).catch(() => {});
     void b?.people?.factions().then((l) => { factionBy.clear(); for (const f of l) factionBy.set(f.code, f); }).catch(() => {});
+    // 세력끼리 관계 (방문 대응): 세력 평판 기능이 켜져 있으면 플러그인 표, 아니면(null) 게임 기본값 (world/factions.ts)
+    void (b?.people?.relations?.() ?? Promise.resolve(null)).then((t) => { relation = relationFrom(t); }).catch(() => {});
   };
   // 잔고: 들어갈 때, 본편 갱신기가 끝날 때(거래를 적었을 수 있음) 다시 읽는다
-  const readWallet = () => void b?.wallet?.balance().then((n) => { fieldWallet.won = n; }).catch(() => {});
+  // 필드 돈(10-31 사용자, F13): 필드 안에서는 잔고만 바로 바뀌고, 가계부에는 필드를 마감할 때 합산 한 줄. 장부 잔고 + 아직 안 적은 몫
+  const purse: { amount: number; memo: string }[] = [];
+  const unsettled = () => purse.reduce((n, p) => n + p.amount, 0);
+  const readWallet = () => void b?.wallet?.balance().then((n) => { fieldWallet.won = n === null ? null : n + unsettled(); }).catch(() => {});
   readPeople();
   readWallet();
   // 끊는 함수를 들고 있다가 dispose 에서 푼다 (2026-10-28 QC: 안 풀어 필드를 열고 닫을 때마다 게임 하나(약 10MB)가 통째로 남았다)
   const offPeople = b?.people?.onChange(() => { readPeople(); readWallet(); });
   /** 필드 거래: 같은 장부에 출처 「필드」로 적는다 (+ 들어옴, − 나감). 가게·거래 화면이 이걸 부른다 */
+  /** 장부 줄 앞 필드 시각 「15:40 」 (시계가 없으면 빈칸) */
+  const hm = () => (fieldClock.sec === null ? '' : `${String(Math.floor(fieldClock.sec / 3600) % 24).padStart(2, '0')}:${String(Math.floor(fieldClock.sec / 60) % 60).padStart(2, '0')} `);
   const pay = async (amount: number, memo: string): Promise<number | null> => {
-    const after = (await b?.wallet?.add(amount, memo, { place: fieldClock.place || undefined, time: fieldClock.sec === null ? undefined : clockText(fieldClock.sec) }).catch(() => null)) ?? null;
-    if (after !== null) {
-      fieldWallet.won = after;
-      void b?.field?.record({ kind: 'trade', text: `${memo} ${amount < 0 ? '−' : '+'}${Math.abs(amount).toLocaleString('en-US')}원`, scene: fieldClock.place || undefined, weight: 1, visit: visitId }).catch(() => {});
-    }
-    return after;
+    if (fieldWallet.won === null) return null;
+    purse.push({ amount, memo });
+    fieldWallet.won += amount;
+    // 모델에게 가는 장부 글은 영어 짧은 문장(10-31). 이어진 돈 줄은 막간에서 한 줄로 묶인다 (core/interlude.ts)
+    void b?.field?.record({ kind: 'trade', text: `${hm()}Money: ${amount < 0 ? '' : '+'}${amount} ${memo}`, ko: `${hm()}${memo} ${amount < 0 ? '−' : '+'}${Math.abs(amount).toLocaleString('en-US')}원`, scene: fieldClock.place || undefined, weight: 1, visit: visitId }).catch(() => {});
+    return fieldWallet.won;
   };
+  /** 가계부 한 줄 정산: 구입·판매·주움·뜯김·그 밖을 묶어 합계로 */
+  const settle = async (): Promise<void> => {
+    if (!purse.length || !b?.wallet) return;
+    const line = settleLine(purse.splice(0));
+    if (!line) return;
+    const { net, memo } = line;
+    const after = await b.wallet.add(net, memo, { place: fieldClock.place || undefined, time: fieldClock.sec === null ? undefined : clockText(fieldClock.sec) }).catch(() => null);
+    if (after !== null && after !== undefined) fieldWallet.won = after + unsettled();
+  };
+  // 시연판(본편 없음): 가계부 대신 이번 판 동안만 쓰는 지갑 (시작 잔고 기본값과 같은 14만 원)
+  if (!b?.wallet) fieldWallet.won = 140_000;
+  fieldLink.pay = (amount, memo) => (b?.wallet ? pay(amount, memo) : Promise.resolve((fieldWallet.won = (fieldWallet.won ?? 0) + amount)));
+  fieldLink.record = (text, ko) => void b?.field?.record({ kind: 'act', text: `${hm()}${text}`, ...(ko ? { ko: `${hm()}${ko}` } : {}), scene: fieldClock.place || undefined, weight: 1, visit: visitId }).catch(() => {});
+  fieldLink.fact = (key, value) => void b?.field?.record({ kind: 'act', text: `${key}: ${value}`, ko: '', scene: fieldClock.place || undefined, weight: 1, fact: { key, value }, visit: visitId }).catch(() => {});
   // 개발 도구·브라우저 시험
   const walletHook = { pay, balance: () => fieldWallet.won };
   (globalThis as { __goeiWallet?: unknown }).__goeiWallet = walletHook;
   /** 이번 필드 방문 id (방문마다 호감·평판 상한을 따로 세게) */
   const visitId = `v${Date.now().toString(36)}`;
+  // 방문 시작 표식 (10-31 사용자: 필드 방문 한 번 = 기록 메뉴 보고서 한 장). 모델 글에는 안 들어간다 (core/interlude.ts)
+  if (b?.visit) void b.field?.record({ kind: 'enter_field', text: '{user} entered the field.', ko: '필드 입장', weight: 1, visit: visitId }).catch(() => {});
   const ROOM_SCENE: Record<string, string> = { office: 'office', lounge: 'lounge', infirmary: 'clinic' };
   // 필드 세계 (src/game/world): 요원은 처음 선 방에서 서성이고 이웃 장면을 오간다, 거리·로비는 몹이 오간다.
   // 씨앗: 주소 ?seed=숫자 가 있으면 그것 (재현), 없으면 이번 입장마다 새로
@@ -166,30 +218,68 @@ function hqAdapter(saves: SaveSlots, bridge: Partial<GameBridge> | undefined, ui
   if (typeof window !== 'undefined') window.addEventListener('keydown', onObserveKey);
   const world = () => {
     if (!sim && ready) {
-      sim = createHqWorld(hq.map(), seed, present.filter((p) => ROOM_SCENE[p.room]).map((p) => ({ name: p.name, scene: ROOM_SCENE[p.room] })), hasVisitClip, { stance: (f) => factionBy.get(f)?.stage ?? null });
-      chatter = new Chatter(sim, new Lines(dialogueData as unknown as DialogueData, sim.rng), lineCtx);
+      sim = createHqWorld(map, seed, present.filter((p) => ROOM_SCENE[p.room]).map((p) => ({ name: p.name, scene: ROOM_SCENE[p.room] })), hasCharClip, { lineN: (look, id) => charArt(look)?.A[id]?.n ?? 10, killOk: () => fighterHooks.killOk?.() ?? false, stance: (f) => factionBy.get(f)?.stage ?? null, relation: (v, t) => relation(v, t), namedHostile: (n) => peopleBy.get(n)?.affinity.cell === 'hostile', nav: { ok: walkablePainted, clamp: (sc, x, y) => clampPainted(sc, x, y) } });
+      // 새 대사 자료(game-src/dialogue2 → 대사 팩 dialogue): 인물·NPC 파일 단위로 받아 둔다. 팩이 없으면(시연판) 대사 없이 돈다
+      dlg = new Dialogue2((file) => bridge?.assets ? bridge.assets.bytes('dialogue', file).catch(() => null) : Promise.resolve(null), sim.rng);
+      chatter = new Chatter(sim, dlg, cueCtx);
+      void dlg.prefetch('named', present.map((p) => p.name));
+      void dlg.prefetch('mob', NPC_FILES);
+      // 비전투 계열 캐릭터는 동행이어도 싸움을 거들지 않는다 (반응표 combat)
+      sim.noAssist = (n) => reactOf(n)?.combat === false;
+      // 이어하기(1-8): 지난 방문의 욕구·동행·맨몸을 되살린다. 지난 필드 시각과 지금 시각의 차이만큼 욕구가 더 줄어 있다
+      const sv = ui.worldSave?.get();
+      if (sv) {
+        const elapsedH = sv.clock != null && fieldClock.sec !== null ? (((fieldClock.sec - sv.clock) / 3600) % 24 + 24) % 24 : 0;
+        sim.restore(sv, elapsedH);
+      }
     }
     // 개발 도구·브라우저 시험: 세계를 들여다본다 (관찰 창과 같은 정보)
     if (sim) (globalThis as { __goeiWorld?: WorldSim }).__goeiWorld = sim;
     return sim;
   };
   let chatter: Chatter | null = null;
-  /** 말하는 사람 기준 대사 칸: 플레이어 소속·직급, 적으로 보나 (호감 적대 구간·세력 적대·싸움 중) */
-  const lineCtx = (a: Actor): LineCtx => {
+  let dlg: Dialogue2 | null = null;
+  /** 말하는 사람 기준 대사 칸(dialogue2): 주인공 소속, 그 사람 쪽에서 본 주인공 평판(이름 인물 = 호감 구간, 몹 = 그 소속의 세력 평판), 플레이 중인 인물 */
+  const cueCtx = (a: Actor, target?: string): CueCtx => {
     const hour = fieldClock.sec === null ? null : (fieldClock.sec / 3600) % 24;
     const named = a.def.kind === 'named' ? peopleBy.get(a.def.name) : undefined;
-    const fac = a.def.kind === 'mob' ? sim?.mobFaction(a) ?? (dialogueData as unknown as DialogueData).npc[NPC_TYPE[a.def.archetype ?? a.def.name] ?? '']?.faction ?? null : named?.faction ?? null;
-    const enemy = a.act === 'argue' || a.plan === 'chase' || named?.affinity.cell === 'hostile' || (!!fac && factionBy.get(fac)?.stage === 'hostile');
-    return { hour, faction: me.faction, level: me.level, enemy };
+    const fac = a.def.kind === 'mob' ? sim?.mobFaction(a) : named?.faction ?? null;
+    const facStance = fac ? factionBy.get(fac)?.stage ?? null : null;
+    // 이름 인물: 호감 적대 → hostile, 따뜻·가까움 → friend, 기본 → 그 소속의 세력 평판. 싸우는 중이면 hostile
+    const cell = named?.affinity.cell;
+    const stance = a.act === 'argue' || a.plan === 'chase' ? 'hostile' : cell === 'hostile' ? 'hostile' : cell === 'warm' || cell === 'close' ? 'friend' : repOf(facStance);
+    return { hour, faction: me.faction, stance, player: playingAs || null, ...(target ? { target } : {}) };
   };
-  // 필드 장부: 이름 인물에게 한 일은 그때그때, 몹은 장면마다 묶어서 (몹 개인 잡담·스쳐 지나감은 넘기지 않음, 13장)
-  const mobHits = new Map<string, { n: number; witness?: { faction: string; named: boolean } }>();
-  const flushMobs = (sceneId: string) => {
-    const m = mobHits.get(sceneId);
-    if (!m || !m.n) return;
-    mobHits.delete(sceneId);
-    const name = hq.map().scenes.find((s) => s.id === sceneId)?.name ?? sceneId;
-    void b?.field?.record({ kind: 'provoke', text: `${name}에서 사람 ${m.n}명을 때렸다`, scene: name, weight: m.n >= 3 ? 2 : 1, visit: visitId, ...(m.witness ? { witness: m.witness } : {}) }).catch(() => {});
+  /** 대사 자료 한 줄 (대화창 임시 글·하던 일 첫 말풍선용). key = 인물 이름 또는 mob:<id> */
+  fieldLink.cueLine = (key, cell) => {
+    const a = key.startsWith('mob:') ? sim?.actors.find((q) => q.def.id === key.slice(4)) : sim?.findActor(key);
+    return a && chatter ? chatter.line(a, cell) : null;
+  };
+  /** 말을 걸었을 때 하던 일 → busy 칸 (하던 일 중 주인공이 말 걸 때 첫 말풍선) */
+  fieldLink.busyCell = (key) => {
+    const a = key.startsWith('mob:') ? sim?.actors.find((q) => q.def.id === key.slice(4)) : sim?.findActor(key);
+    if (!a) return null;
+    const doing = a.doing === '주인공과 대화' ? a.talkFrom ?? '' : a.doing;
+    const id = a.task?.id ?? '';
+    const tag = id === 'work' ? 'work' : id === 'eat' ? 'eat' : id === 'rest' || id === 'hobby' ? 'rest' : id === 'pee' || id === 'poo' ? 'toilet' : id === 'train' ? 'train' : /담배/.test(doing) ? 'smoke' : /먹|식사|간식/.test(doing) ? 'eat' : /훈련/.test(doing) ? 'train' : a.post ? 'work' : '';
+    return tag ? `busy.${tag}` : null;
+  };
+  // 필드 장부(10-31 사용자): 모델에게 가는 글은 영어 짧은 문장, 주인공은 {user}(끼울 때 이름으로). 싸움은 한 건 = 한 줄(world/fightlog.ts)
+  const sceneNameOf = (id: string) => map.scenes.find((q) => q.id === id)?.name ?? id;
+  /** 장면마다 마지막 목격자 (세력 평판 계기) */
+  const witnessAt = new Map<string, { faction: string; named: boolean }>();
+  /** 장면마다 마지막 범죄 (출동한 경찰이 무엇 때문에 왔나) */
+  const crimeAt = new Map<string, 'murder' | 'assault'>();
+  let fightScene = '';
+  const fightLog = new FightLog((l) => {
+    const wit = l.kind === 'provoke' || l.kind === 'kill' ? witnessAt.get(fightScene) : undefined;
+    void b?.field?.record({ kind: l.kind, text: l.text, ko: l.ko, scene: sceneNameOf(fightScene), weight: l.weight, visit: visitId, ...(l.who ? { who: l.who } : {}), ...(wit ? { witness: wit } : {}) }).catch(() => {});
+  });
+  const flushMobs = (_sceneId?: string) => fightLog.leave();
+  /** {user}가 지금 무기를 들었나 (싸움 줄의 수단) */
+  const means = (): 'weapon' | 'fists' => {
+    const pl = (globalThis as { __goeiEngine?: { world?: { player?: unknown } | null } }).__goeiEngine?.world?.player;
+    return pl instanceof FighterPlayer && pl.core.P.armed ? 'weapon' : 'fists';
   };
   /** 마지막으로 있던 지역 (승강장은 지역 없음) */
   let lastDistrict: string | null = null;
@@ -197,7 +287,87 @@ function hqAdapter(saves: SaveSlots, bridge: Partial<GameBridge> | undefined, ui
   let foughtHere = false;
   const record = (evs: SimEvent[]) => {
     for (const e of evs) {
+      // 기절한 불량배·소매치기가 떨어뜨린 돈: 줍는다 (가계부에 필드 수입). 훔친 돈이 섞였으면 그렇게 적는다
+      if (e.kind === 'drop' && e.amount > 0) {
+        const c = e.who.charCodeAt(e.who.length - 1) - 0xac00;
+        const memo = e.stolen ? '소매치기에게서 되찾은 돈' : `${e.who}${c >= 0 && c <= 11171 && c % 28 !== 0 ? '이' : '가'} 떨어뜨린 돈`;
+        void fieldLink.pay?.(e.amount, memo);
+        (globalThis as { __goeiEngine?: { world?: { say(t: string, s: number): void } } }).__goeiEngine?.world?.say(`${e.amount.toLocaleString('en-US')}원을 주웠다`, 2);
+        continue;
+      }
+      // 목격: 보이는 장면의 소매치기만 (그 밖의 잡일은 넘기지 않음)
+      if (e.kind === 'steal' && e.scene === lifeScene) {
+        void b?.field?.record({ kind: 'act', text: `${hm()}{user} saw a ${enName(e.thief)} pickpocket a ${enName(e.victim)}.`, ko: `${hm()}{user}: 소매치기 목격 (${e.thief} → ${e.victim})`, scene: sceneNameOf(e.scene), weight: 1, visit: visitId }).catch(() => {});
+        continue;
+      }
+      // 방문 대응 (세력끼리): 보이는 장면에서 일어난 것만 장부에 (주인공이 본 일)
+      // 주인공이 경고를 받고 거점에서 나감 (10-31 필드 기능 2번)
+      // 이성 화장실·샤워실 침입을 들킴: 처음 들킨 것만 장부에 (머묾은 대사로만)
+      if (e.kind === 'intrude' && e.stage === 0 && e.scene === lifeScene) {
+        void b?.field?.record({ kind: 'detected', text: `${hm()}${enName(e.who)} caught {user} in the wrong-sex restroom and told {user} to get out.`, ko: `${hm()}{user}: ${e.who}에게 이성 화장실 침입 들킴`, scene: sceneNameOf(e.scene), who: [e.who], weight: 2, visit: visitId }).catch(() => {});
+        continue;
+      }
+      if (e.kind === 'expel' && e.who === '{user}') {
+        void b?.field?.record({ kind: 'act', text: `${hm()}A ${enName(e.by)} told {user} to leave, and {user} left.`, ko: `${hm()}{user}: ${e.by}의 경고를 받고 쫓겨남`, scene: fieldClock.place || undefined, weight: 2, visit: visitId }).catch(() => {});
+        continue;
+      }
+      // 대화에서 허락받아 이번 방문 출입증 · 경고 무시·위협으로 경비가 덤빔 (11-01)
+      if (e.kind === 'pass') {
+        const fn = factionBy.get(e.faction)?.name ?? FACTION_NAMES[e.faction] ?? e.faction;
+        void b?.field?.record({ kind: 'act', text: `${hm()}{user} was given a one-time visitor pass for the ${fn} site.`, ko: `${hm()}{user}: ${fn} 일회용 출입증 받음`, scene: sceneNameOf(e.scene), weight: 1, visit: visitId }).catch(() => {});
+        continue;
+      }
+      if (e.kind === 'guardAttack' && e.why === 'intrude') {
+        void b?.field?.record({ kind: 'act', text: `${hm()}${enName(e.by)} came at {user} for barging into the wrong-sex restroom.`, ko: `${hm()}{user}: 이성 화장실에 들어가 ${e.by}이(가) 덤빔`, scene: sceneNameOf(e.scene), who: [e.by], weight: 2, visit: visitId }).catch(() => {});
+        continue;
+      }
+      if (e.kind === 'guardAttack') {
+        void b?.field?.record({ kind: 'act', text: `${hm()}{user} ignored a ${enName(e.by)}'s warning, and the guard moved to stop {user} by force.`, ko: `${hm()}{user}: 경고를 무시해 ${e.by}이(가) 덤빔`, scene: sceneNameOf(e.scene), weight: 2, visit: visitId }).catch(() => {});
+        continue;
+      }
+      if ((e.kind === 'brawl' || e.kind === 'brawlEnd' || e.kind === 'expel') && e.scene === lifeScene) {
+        const fn = (c: string) => factionBy.get(c)?.name ?? FACTION_NAMES[c] ?? c;
+        const line = e.kind === 'brawl'
+          ? { text: `${hm()}{user} saw a ${enName(e.a)} (${fn(e.af)}) fight a ${enName(e.b)} (${fn(e.bf)}).`, ko: `${hm()}{user}: ${e.a}(${fn(e.af)})와 ${e.b}(${fn(e.bf)})의 싸움을 봄`, weight: 2 as const }
+          : e.kind === 'brawlEnd'
+            ? { text: `${hm()}The ${enName(e.loser)} ${e.how === 'down' ? 'was knocked out' : 'fled'}.`, ko: `${hm()}${e.loser} ${e.how === 'down' ? '기절' : '도주'}`, weight: 1 as const }
+            : { text: `${hm()}A ${enName(e.by)} threw a ${enName(e.who)} out.`, ko: `${hm()}${e.by}이(가) ${e.who}을(를) 내보냄`, weight: 1 as const };
+        void b?.field?.record({ kind: 'act', ...line, scene: sceneNameOf(e.scene), visit: visitId }).catch(() => {});
+        continue;
+      }
+      // 거점 경보 켜짐·꺼짐 (10-31 필드 기능 9번)
+      if (e.kind === 'alarm') {
+        const fn = factionBy.get(e.faction)?.name ?? FACTION_NAMES[e.faction] ?? e.faction;
+        const why = ({ intruder: ['an intruder', '침입자'], assault: ['an assault', '폭행'], knockout: ['someone being knocked out', '기절시킴'], murder: ['a killing', '살인'], trespass: ['a trespasser refusing to leave', '퇴거 거부'], threat: ['a threat', '위협'] } as Record<string, [string, string]>)[e.why] ?? [e.why, e.why];
+        const line = e.on
+          ? { text: `${hm()}The ${fn} base alarm went off over ${why[0]} (${e.threat === '{user}' ? '{user}' : enName(e.threat)}). Guards and agents converged.`, ko: `${hm()}${fn} 거점 경보 (${why[1]}, ${e.threat === '{user}' ? '{user}' : e.threat})` }
+          : { text: `${hm()}The ${fn} base alarm was lifted.`, ko: `${hm()}${fn} 거점 경보 해제` };
+        void b?.field?.record({ kind: 'act', ...line, scene: sceneNameOf(e.scene), weight: e.on ? 2 : 1, visit: visitId }).catch(() => {});
+        continue;
+      }
+      // 동행 시작·끝 (모델 답의 [[동행]]·[[기다림]]·[[복귀]], 맞아 쓰러짐). 지금 동행 = 확정 사실
+      if (e.kind === 'follow') {
+        const w = sim;
+        const names = w ? w.followers.map((id) => w.actors.find((q) => q.def.id === id)?.def.name).filter((n): n is string => !!n) : [];
+        const line = e.mode === 'follow'
+          ? { kind: 'follow', text: `${hm()}${e.who} started following {user}.`, ko: `${hm()}${e.who} 동행 시작` }
+          : e.mode === 'wait'
+            ? { kind: 'unfollow', text: `${hm()}${e.who} stayed behind to wait.`, ko: `${hm()}${e.who} 남아서 기다림` }
+            : e.mode === 'hit'
+              ? { kind: 'unfollow', text: `${hm()}${e.who} was knocked down and stopped following {user}.`, ko: `${hm()}${e.who} 쓰러져 동행 끝` }
+              : { kind: 'unfollow', text: `${hm()}${e.who} went back to their own work.`, ko: `${hm()}${e.who} 자리로 돌아감` };
+        void b?.field?.record({ ...line, scene: sceneNameOf(e.scene), who: [e.who], weight: 2, visit: visitId, fact: { key: 'companions', value: names.join(', ') || 'none' } }).catch(() => {});
+        continue;
+      }
+      if (e.kind === 'kill') {
+        crimeAt.set(e.scene, 'murder');
+        fightScene = e.scene;
+        fightLog.killed(hm().trim(), e.scene, e.id, e.who, means());
+        continue;
+      }
       if (e.kind !== 'hurt') continue;
+      // 싸움 줄 시각 = 싸움이 시작된 때 (아래에서 시계가 싸움 시간만큼 가기 전)
+      const at = hm();
       if (!foughtHere) { foughtHere = true; if (fieldClock.sec !== null) fieldClock.sec += rules().fight * 60; }
       const w = sim;
       if (!w) return;
@@ -206,51 +376,301 @@ function hqAdapter(saves: SaveSlots, bridge: Partial<GameBridge> | undefined, ui
       const namedWit = here.find((q) => q.def.kind === 'named' && q.def.name !== e.who && peopleBy.get(q.def.name)?.faction);
       const mobWit = here.find((q) => w.mobFaction(q));
       const witness = namedWit ? { faction: peopleBy.get(namedWit.def.name)!.faction, named: true } : mobWit ? { faction: w.mobFaction(mobWit)!, named: false } : undefined;
-      const sceneName = hq.map().scenes.find((s) => s.id === e.scene)?.name ?? e.scene;
+      if (witness) witnessAt.set(e.scene, witness);
+      if (!e.hostile && crimeAt.get(e.scene) !== 'murder') crimeAt.set(e.scene, 'assault');
       if (e.named) {
-        void b?.field?.record({ kind: 'hurt', text: `${sceneName}에서 ${e.who}을(를) 때렸다`, scene: sceneName, who: [e.who], weight: 2, visit: visitId, ...(witness ? { witness } : {}) }).catch(() => {});
-      } else {
-        const m = mobHits.get(e.scene) ?? { n: 0 };
-        m.n++;
-        m.witness ??= witness;
-        mobHits.set(e.scene, m);
+        void b?.field?.record({ kind: 'hurt', text: `${at}{user} hit ${e.who}${e.hostile ? '' : ' unprovoked'}.`, ko: `${at}{user}: ${e.who} 때림${e.hostile ? '' : ' (먼저)'}`, scene: sceneNameOf(e.scene), who: [e.who], weight: 2, visit: visitId, ...(witness ? { witness } : {}) }).catch(() => {});
+        continue;
       }
+      fightScene = e.scene;
+      const a = w.actors.find((q) => q.def.id === e.id);
+      fightLog.userHit(at.trim(), e.scene, e.id, a?.def.archetype ?? e.who, means(), e.hostile);
+      if (e.down) fightLog.knockedOut(e.id);
     }
   };
+  // ── 필드 마감 (10-31 사용자: 필드 한 번 = 막간 한 번) ──
+  // 본편 응답을 보내기 직전(bridge.onBeforeSend)·쓰러짐·창 닫힘: 진행 중인 싸움 기록을 닫고, 돈을 가계부 한 줄로 정산하고, 창을 닫는다
+  let visitOver = false;
+  /** how: leave = 나가기·창 닫기, send = 나오지 않고 응답을 보내 강제 종료, down = 쓰러짐 */
+  const END_KO = { leave: '필드에서 나옴', send: '응답을 보내 필드 종료', down: '쓰러져 필드 종료' } as const;
+  const END_EN = { leave: '{user} left the field.', send: 'The field visit ended as the story went on.', down: 'The field visit ended with {user} down.' } as const;
+  /** 이어하기 저장(1-8): 세계 욕구·동행·맨몸 + 지금 시각 + 주인공 자리 (장면을 옮길 때·방문을 끝낼 때) */
+  const saveWorld = (player?: { scene: string; x: number; y?: number }) => {
+    if (!sim || !ui.worldSave) return;
+    const prev = ui.worldSave.get();
+    ui.worldSave.set({ ...sim.snapshot(), clock: fieldClock.sec, ...(player ?? prev?.player ? { player: player ?? prev!.player } : {}) });
+  };
+  const endVisit = async (close: boolean, how: keyof typeof END_KO = 'leave'): Promise<void> => {
+    if (!visitOver) {
+      visitOver = true;
+      if (lifeScene) saveWorld({ scene: lifeScene, x: lastAt.x, y: lastAt.y });
+      fightLog.leave();
+      await settle().catch(() => {});
+      // 방문 끝 표식: 플러그인이 이걸 받으면 이번 방문의 보고서를 만든다 (core/journal/field.ts)
+      if (b?.visit) await b.field?.record({ kind: 'exit_field', text: `${hm()}${END_EN[how]}`, ko: `${hm()}${END_KO[how]}`, scene: fieldClock.place || undefined, weight: 1, visit: visitId }).catch(() => {});
+    }
+    if (close) b?.close?.();
+  };
+  b?.onBeforeSend?.(() => (b?.visit ? endVisit(true, 'send') : Promise.resolve()));
+  fieldLink.endVisit = (close) => void endVisit(close);
+  // ── 필드에서 짐 (10-31 사용자: 1안 = 쓰러지면 필드 종료, 뒷이야기는 모델이. 2안 「필드 안에서 깨어남」은 보류) ──
+  // 주인공이 체력 0으로 2.5초 쓰러져 있으면: 누구에게 당했는지 장부에 한 줄, 불량배·적대 세력이면 지갑에서 돈을 뜯김(경찰·경비는 안 뜯음), 그리고 필드를 닫는다
+  let koT = 0, koDone = false;
+  const knockedOut = (dt: number, sceneId: string) => {
+    const pl = (globalThis as { __goeiEngine?: { world?: { player?: unknown } | null } }).__goeiEngine?.world?.player;
+    if (!(pl instanceof FighterPlayer) || !b?.visit || koDone) return;
+    if (pl.hp > 0 || pl.phase !== 'down') { koT = 0; return; }
+    if ((koT += dt) < 2.5) return;
+    koDone = true;
+    const w = sim;
+    // 당한 상대 = 싸우던 몸 중 가장 가까운 것
+    let foe: Actor | undefined, best = Infinity;
+    for (const [id, f] of fights) {
+      const d = Math.abs(f.body.x - pl.x) + Math.abs(f.body.y - pl.y);
+      if (d < best) { best = d; foe = w?.actors.find((q) => q.def.id === id); }
+    }
+    const who = foe?.def.name ?? '누군가';
+    const role = ARCHETYPES[foe?.def.archetype ?? '']?.role;
+    const fac = foe && w ? w.mobFaction(foe) : null;
+    const won = fieldWallet.won ?? 0;
+    const robbed = foe && !isLaw(foe.def.archetype) && (role === 'thug' || !!fac) && won > 0 ? Math.round((won * (0.2 + Math.random() * 0.3)) / 100) * 100 : 0;
+    if (robbed > 0) void fieldLink.pay?.(-robbed, `${who}에게 뜯김`);
+    fightScene = sceneId;
+    fightLog.userDown(!!pl.killed, foe?.def.id ?? null, robbed > 0 ? `${enName(foe?.def.archetype ?? who)} took ${robbed} won from {user}.` : '', robbed > 0 ? `${who}에게 ${robbed.toLocaleString('en-US')}원 뜯김` : '');
+    // 장부에 다 쌓인 뒤 마감·닫기
+    setTimeout(() => void endVisit(true, 'down'), 1200);
+  };
   let flushT = 0;
+  let sirenT = 0;
   const clockView = () => { const c = new FieldClock(fieldClock.sec === null ? null : fieldClock.sec / 60); return c; };
   // 필드 행위자를 에일린 공격 표적으로 (전투 몸이 아니므로 가짜 몸을 건넨다. 보이는 장면만)
   let lifeScene = '';
-  eileenHooks.extraTargets = () => {
+  fighterHooks.extraTargets = () => {
     const w = sim;
     if (!w || !lifeScene) return [];
-    return w.inScene(lifeScene).filter((a) => a.act !== 'down').map((a) => ({
+    // 기절해 누운 몹은 살해 허용일 때만 맞힐 수 있다. 시체는 안 맞음
+    const kill = fighterHooks.killOk?.() ?? false;
+    return w.inScene(lifeScene).filter((a) => a.act !== 'dead' && (a.act !== 'down' || kill)).map((a) => ({
       x: a.x, y: a.y, z: 0,
-      body: { id: -1, team: 'enemy', kind: 'npc', x: a.x, y: a.y, z: 0, dir: a.face, hp: 1, hpMax: 1, alive: true, stop: 0, frame: () => ({ hit: [], hurt: [] }), step: () => {},
-        applyHit: (h: { dir: 1 | -1; attackId: number }) => (w.hitActor(a.def.id, h.dir, h.attackId) ? { kind: 'hit' as const } : { kind: 'immune' as const }) } as unknown as Body,
+      body: { id: -1, team: 'enemy', kind: 'npc', x: a.x, y: a.y, z: 0, dir: a.face, hp: Math.max(1, a.hp ?? 1), hpMax: a.hpMax ?? 1, alive: true, stop: 0, frame: () => ({ hit: [], hurt: [] }), step: () => {},
+        // 몹은 등급 체력이 있다 (설계 2-3): 에일린 피해가 그대로 깎인다
+        applyHit: (h: { dir: 1 | -1; attackId: number; dmg?: number; lethal?: boolean }) => (w.hitActor(a.def.id, h.dir, h.attackId, h.dmg ?? 12, !!h.lethal) ? { kind: 'hit' as const } : { kind: 'immune' as const }) } as unknown as Body,
     }));
+  };
+  // ── 몹에게 말 걸기 (10-31 사용자: 몹도 이름 인물과 같이 모델로) ──
+  // 모델에 주는 인물 글: 그림 신상(성별·나이대·직업·인상) + 종류 말투(대사 자료 voice) + 성격 + 소속·태도 + 하던 일. 이름은 정해 두지 않는다
+  const lvl = (v: number | undefined, lo: string, hi: string) => (v === undefined ? '보통' : v < 0.35 ? lo : v > 0.65 ? hi : '보통');
+  fieldLink.mobOf = (key) => {
+    const w = sim;
+    const a = key.startsWith('mob:') ? w?.actors.find((q) => q.def.id === key.slice(4)) : undefined;
+    if (!w || !a || !w.canTalk(a)) return null;
+    const pf = profileOf(a.def.look);
+    const voice = (dialogueData as unknown as { npc: Record<string, { voice?: string }> }).npc[NPC_TYPE[a.def.archetype ?? a.def.name] ?? '']?.voice ?? '';
+    const fac = w.mobFaction(a);
+    const facName = fac ? factionBy.get(fac)?.name ?? FACTION_NAMES[fac] ?? fac : '';
+    const stance = fac ? factionBy.get(fac)?.stageLabel : undefined;
+    const t = a.temper;
+    const label = `${a.def.name}${pf ? `(${pf.sex}·${pf.age.replace(/\(.*\)/, '')})` : ''}`;
+    const lore = [
+      `이름 없는 사람(${a.def.name}). 이름은 정해져 있지 않다: 주인공이 물으면 나이·성별에 맞는 평범한 한국 이름을 하나 대고, 그 뒤로는 그 이름을 쓴다.`,
+      pf ? `성별 ${pf.sex === '여' ? '여자' : '남자'}, 나이 ${pf.age}${pf.job ? `, 직업 ${pf.job}` : ', 직업은 정해지지 않은 평범한 시민'}.` : '',
+      pf?.note ? `생김새·인상: ${pf.note}` : '',
+      voice ? `말투: ${voice}` : '',
+      t ? `성격: 용기 ${lvl(t.courage, '낮음(겁 많음)', '높음')}, 붙임성 ${lvl(t.social, '낮음', '높음')}, 성급함 ${lvl(t.haste, '느긋함', '높음')}, 호기심 ${lvl(t.curious, '낮음', '높음')}${a.drunk ? ', 지금 술에 취함' : ''}.` : '',
+      fac ? `소속: ${facName}${stance ? ` (이 소속은 주인공에게 「${stance}」)` : ''}.` : '어느 조직에도 속하지 않은 일반인. 괴이와 비밀 조직의 일은 모른다.',
+      `지금: ${sceneNameOf(a.scene)}에서 ${a.doing === '주인공과 대화' ? a.talkFrom ?? '지나가던 중' : a.doing}${a.doing === '주인공과 대화' ? ' 주인공이 말을 걸어 멈춰 섰다' : ''}.`,
+    ].filter(Boolean).join('\n');
+    // 주인공을 경고 중인 경비: 허락하거나([[허가]]) 위협받아 경보를 울릴 수 있다([[경보]])
+    const guarding = w.guardingPlayer(a.def.id);
+    return { id: `mob:${visitId}:${a.def.id}`, name: label, lore: guarding ? `${lore}\n지금 이 사람은 경비로서 주인공에게 관계자 외 출입 금지 구역에서 나가라고 경고하는 중이다.` : lore, place: sceneNameOf(a.scene), doing: a.doing === '주인공과 대화' ? a.talkFrom ?? a.doing : a.doing, ...(guarding ? { tags: ['permit', 'alarm'] as ('permit' | 'alarm')[] } : {}) };
+  };
+  // 필드 대화 ↔ 세계 (10-31 필드 기능 1·4번): 말을 걸 때 하던 일과 쓸 수 있는 표시, 답의 표시 → 동행
+  fieldLink.talkOpts = (name) => {
+    const a = sim?.findActor(name);
+    const doing = a && !a.following && !['idle', 'walk'].includes(a.act) ? a.doing : undefined;
+    // 그 거점 캐릭터는 대화에서 출입을 허락할 수 있다(이번 방문 출입증, 11-01 사용자: 허가·동행은 대화로만)
+    return { ...(doing ? { doing } : {}), tags: a && sim?.canPermit(a.def.id) ? ['follow', 'wait', 'return', 'permit'] : ['follow', 'wait', 'return'] };
+  };
+  fieldLink.onTags = (key, name, tags) => {
+    const w = sim;
+    if (!w) return;
+    const id = key.startsWith('mob:') ? key.slice(4) : name;
+    for (const t of tags) {
+      if (t === 'follow' || t === 'wait' || t === 'return') w.setFollow(id, t);
+      else if (t === 'permit') w.permitPlayer();
+      else if (t === 'alarm') w.threatAlarm(id);
+    }
+  };
+  // 선물 상대: 지금 장면에서 주인공과 가까운 이름 인물
+  let lastAt = { x: 0, y: 0 };
+  fieldLink.nearPerson = () => {
+    const w = sim;
+    if (!w || !lifeScene) return null;
+    const near = w.inScene(lifeScene).filter((a) => a.def.kind === 'named' && a.act !== 'gone' && Math.abs(a.x - lastAt.x) < 180).sort((p, q) => Math.abs(p.x - lastAt.x) - Math.abs(q.x - lastAt.x))[0];
+    return near?.def.name ?? null;
+  };
+  // 선물 사건: 오늘 처음이면 gift(인물 기록이 「작은친절」 호감 계기로), 아니면 그냥 행동
+  fieldLink.gift = (who, item, counts) => {
+    const c = item.charCodeAt(item.length - 1) - 0xac00;
+    const ko = `${hm()}{user}: ${who}에게 ${item}${c >= 0 && c <= 11171 && c % 28 !== 0 ? '을' : '를'} 선물`;
+    void b?.field?.record({ kind: counts ? 'gift' : 'act', text: `${hm()}{user} gave ${item} to ${who} as a gift.`, ko, scene: fieldClock.place || undefined, who: [who], weight: 1, visit: visitId }).catch(() => {});
   };
   const life: HubLife = {
     tick: (dt, at) => {
-      if (lifeScene && lifeScene !== at.scene) { flushMobs(lifeScene); foughtHere = false; }
+      lastAt = { x: at.x, y: (at as { y?: number }).y ?? 0 };
+      if (lifeScene && lifeScene !== at.scene) { flushMobs(lifeScene); foughtHere = false; endFights(false); }
       lifeScene = at.scene;
       const w = world();
       if (!w) return;
-      w.step(dt, { ...at, hour: fieldClock.sec === null ? null : (fieldClock.sec / 3600) % 24 });
+      // 무기를 들이민 주인공(겁 반응): 무기를 꺼낸 채 바라보는 쪽
+      const pl = (globalThis as { __goeiEngine?: { world?: { player?: unknown } | null } }).__goeiEngine?.world?.player;
+      const P = pl instanceof FighterPlayer ? pl.core.P : null;
+      // 말 거는 중인 몹은 멈춰 서서 주인공을 본다
+      const tk = fieldLink.talkTarget?.() ?? '';
+      if (tk.startsWith('mob:')) w.holdTalk(tk.slice(4), at.x);
+      // 주인공 성별(화장실·샤워실 이성 침입 감지용): 남 소변(100) 줄이 있으면 남, 앉아 볼일(102)이 있으면 여 (toilets.ts sexOf 와 같은 기준)
+      const has = pl instanceof FighterPlayer ? (pl as unknown as { core?: { has?: (id: string) => boolean } }).core?.has : undefined;
+      const sex = has ? (has('100') ? '남' : has('102') ? '여' : null) : null;
+      w.step(dt, { ...at, hour: fieldClock.sec === null ? null : (fieldClock.sec / 3600) % 24, armed: !!P?.armed, face: P?.face ?? 1, sex });
       const evs = w.events.splice(0);
       record(evs);
+      // 경보 사이렌: 경보 중인 거점 안에 있으면 1.6초마다 한 바퀴, 음악은 낮춘다
+      if (w.alarmIn(at.scene)) { if ((sirenT -= dt) <= 0) { sirenT = 1.6; ui.sfx('siren'); } } else sirenT = 0;
       chatter?.step(dt, at.scene, at.x, evs);
+      knockedOut(dt, at.scene);
+      fightScene = at.scene;
+      fightLog.tick(dt, fights.size > 0);
       if ((flushT += dt) > 20) { flushT = 0; flushMobs(at.scene); }
     },
     lifeTime: () => sim?.time ?? 0,
+    cordons: (sceneId) => (world()?.obstacles(sceneId) ?? []).filter((o) => o.id.startsWith('cordon')),
+    gear: (sceneId) => world()?.gear(sceneId) ?? [],
+    toiletBusy: (sceneId, id) => world()?.toiletBusy(sceneId, id) ?? false,
+    playerToilet: (t) => { const w = world(); if (w) w.playerToilet = t; },
+    showerBusy: (sceneId, id) => world()?.showerBusy(sceneId, id) ?? false,
+    showerUsers: (sceneId) => world()?.showerUsers(sceneId) ?? [],
+    playerShower: (t) => { const w = world(); if (w) w.playerShower = t; },
+    lockerBusy: (sceneId, id) => world()?.lockerBusy(sceneId, id) ?? false,
+    playerLocker: (t) => { const w = world(); if (w) w.playerLocker = t; },
+    playerPeek: (t) => world()?.peekStall(t.scene, t.id),
     hit: (sceneId, boxes, dir) => world()?.hitBoxes(sceneId, boxes, dir).length ?? 0,
-    actors: (sceneId) => (world()?.inScene(sceneId) ?? []).map((a) => ({ id: a.def.id, name: a.def.name, kind: a.def.kind, x: a.x, y: a.y, face: a.face, look: a.def.look, moving: a.act === 'walk', clip: a.clip, since: a.clipAt, icon: a.icon, say: a.say })),
+    actors: (sceneId) => (world()?.inScene(sceneId) ?? []).map((a) => {
+      const st = a.seat ? world()?.graph.scene(sceneId)?.seats?.[a.seat.i] : undefined;
+      // 동행·적 구분(11-01 1-3): 동행 = 따라오는 인물, 적 = 쫓아오거나 맞서거나 (동행 아닌데) 싸우는 사람
+      const rel = a.following ? 'ally' : a.plan === 'chase' || (a.act === 'argue' && a.doing === '맞섬') || (a.fighting && !a.following) ? 'foe' : undefined;
+      return { id: a.def.id, name: a.def.name, kind: a.def.kind, x: a.x, y: a.y, face: a.face, look: a.def.look, moving: a.act === 'walk', clip: a.clip, since: a.clipAt, until: a.clipUntil, icon: a.icon, say: a.say, ...(rel ? { rel } : {}), ...(a.toilet?.kind === 'stall' ? { toilet: { door: a.toilet.door, open: a.toilet.phase !== 'in' || (a.toilet.peek ?? 0) > (world()?.time ?? 0) } } : {}), ...(a.def.kind === 'mob' && b?.visit?.sendMob && world()!.canTalk(a) ? { talk: true } : {}),
+        ...(a.seat && st ? { seat: { box: st.box, dir: a.seat.dir, kind: a.seat.kind, x: a.seat.x, y: a.seat.y, ...(st.set ? { set: st.set } : {}) } } : {}) };
+    }),
     observer: (sceneId) => (observing && sim ? observerLines(sim, clockView(), sceneId, seed) : null),
-    drawMob: (c, a) => { if (!drawTestMan(c, a.x, a.y, a.face)) silhouette(c, a); },
+    // 몹: 인물 팩(look = 몹 그림 이름, src/game/world/mobs.ts looks) → 받는 동안·없으면 실루엣. 처음 보이는 그림은 그때 받는다
+    drawMob: (c, a) => {
+      if (a.look && !charArt(a.look)) void loadChar(a.look);
+      if (!(a.look && drawCharClip(c, a.look, a.x, a.y, a.face, (sim?.time ?? 0) * 1000, a.clip, (a.since ?? 0) * 1000, a.until === undefined ? undefined : a.until * 1000))) silhouette(c, a);   // 생활 시각 기준(한 번 트는 클립·시체가 since 와 맞게)
+    },
+    combat: (api, sceneId) => combatStep(api, sceneId),
   };
+  // ── 필드 전투 AI (2026-10-29 AI 세팅): 주인공을 막아선 몹(적대 세력·경찰 출동·시비 뒤 맞섬)은 그 그림의 인물 팩으로 전투 AI 몸(ai-char:<그림>)을 세워 싸운다.
+  // 몸이 쓰러지면 1.5초 뒤 행위자로 되돌려 기절(깨면 떠남)·장부 기록. 주인공이 장면을 떠나면 싸움은 끊기고 행위자는 그 자리에 선다
+  const fights = new Map<string, { body: Body & { hp: number; hpMax: number; alive: boolean; label: string }; t: number; scene: string }>();
+  /** 싸움에 나선 동행 (주인공 편 전투 AI 몸) */
+  const allies = new Map<string, { body: Body & { hp: number; hpMax: number; alive: boolean; label: string }; scene: string }>();
+  /** 지난 틱 체력 (주인공·동행): 「동료가 맞음」 판정 */
+  const allyHpSeen = new Map<string, number>();
+  const endFights = (down: boolean) => {
+    const w = sim;
+    for (const [id, f] of fights) { f.body.alive = false; w?.fromFight(id, f.body.x, f.body.y, down); }
+    fights.clear();
+    for (const [id, f] of allies) { f.body.alive = false; w?.fromAlly(id, f.body.x, f.body.y, false); }
+    allies.clear();
+  };
+  function combatStep(api: { spawn(s: { kind: string; x: number; y: number }): void; world: { bodies: readonly Body[] } }, sceneId: string) {
+    const w = sim;
+    if (!w) return;
+    // 엔진 spawn은 몸을 돌려주지 않는다 → 생긴 뒤 목록 끝의 몸
+    const spawn = (spec: { kind: string; x: number; y: number }): Body | undefined => { const n = api.world.bodies.length; api.spawn(spec); return api.world.bodies.length > n ? api.world.bodies[api.world.bodies.length - 1] : undefined; };
+    for (const [id, f] of fights) {
+      if (f.scene !== sceneId || !f.body.alive || !api.world.bodies.includes(f.body)) { f.body.alive = false; w.fromFight(id, f.body.x, f.body.y, false); fights.delete(id); continue; }
+      // 기세가 꺾여 장면 끝까지 달아났으면 싸움에서 빠져 필드의 「도망치는 사람」으로
+      const ai = f.body as unknown as FighterAi;
+      if (f.body.hp > 0 && ai.brain?.strategy === 'flee') {
+        const [b0, b1] = (api.world as unknown as { bounds: [number, number] }).bounds ?? [0, 99999];
+        if (f.body.x < b0 + 60 || f.body.x > b1 - 60) { f.body.alive = false; w.fledFight(id, f.body.x, f.body.y); fights.delete(id); fightLog.fled(id); continue; }
+      }
+      // 지원 요청(경찰 퍽): 체력 절반 아래면 한 번 경찰을 더 부른다
+      if (f.body.hp > 0 && f.body.hp < f.body.hpMax * 0.5) w.backup(id);
+      if (f.body.hp > 0) continue;
+      if ((f.t += 1 / 30) < 1.5) continue;
+      f.body.alive = false;
+      // 체력 0 = 항상 기절로 필드에 돌아감. 확인 사살(살해 허용·무기)은 필드 행위자에서 (actors.ts hitActor)
+      w.fromFight(id, f.body.x, f.body.y, true);
+      fights.delete(id);
+    }
+    // 동행 = 주인공 편 전투 AI 몸 (10-31 사용자: 동행은 그대로 적들과 싸운다). 이 장면에 싸움이 붙으면 전투 계열 동행을 몸으로 세우고,
+    // 싸움이 끝나면 다시 따라 걷는 행위자로. 몸이 쓰러지면 동행이 풀리고 그 자리에 쓰러진 채 남는다
+    const fighting = [...fights.values()].some((f) => f.scene === sceneId && f.body.alive && f.body.hp > 0);
+    for (const [id, f] of allies) {
+      if (f.scene !== sceneId || !api.world.bodies.includes(f.body) || !fighting || f.body.hp <= 0) {
+        const down = f.body.hp <= 0;
+        if (!down && fighting && f.scene === sceneId && api.world.bodies.includes(f.body)) continue;
+        f.body.alive = false;
+        w.fromAlly(id, f.body.x, f.body.y, down, f.body.hp);
+        allies.delete(id);
+      }
+    }
+    if (fighting) for (const id of [...w.followers]) {
+      const a = w.actors.find((q) => q.def.id === id);
+      if (!a || allies.has(id) || a.scene !== sceneId || a.fighting || ['down', 'dead', 'gone', 'door'].includes(a.act)) continue;
+      const look = a.def.look ?? a.def.name;
+      if (!charArt(look)) { void loadChar(look); continue; }
+      const b = spawn({ kind: `ally-char:${look}`, x: a.x, y: a.y } as { kind: string; x: number; y: number });
+      if (!(b instanceof FighterAi)) { if (b) b.alive = false; continue; }
+      if (!w.toAlly(id)) { b.alive = false; continue; }
+      b.hp = Math.max(1, Math.min(b.hpMax, a.hp && a.hp > 0 ? a.hp : b.hpMax));
+      (b as unknown as { dir: 1 | -1 }).dir = a.face;
+      // 싸움에 안 나서는 인물(반응표 combat=false, 11-01 사용자): 먼저 덤비지 않고 맞으면 반격. 그 전엔 반응표 「동료가 맞음」대로
+      if (w.noAssist(a.def.name)) {
+        const act = reactCell(a.def.name, 'allyHit')?.act;
+        b.passive = act === 'attack' ? 'attack' : act === 'avoid' || act === 'flee' || act === 'cower' ? 'keep' : 'stay';
+      }
+      allies.set(id, { body: b as typeof b & { hp: number; hpMax: number; alive: boolean; label: string }, scene: sceneId });
+    }
+    // 「동료가 맞으면 덤빔」인 인물: 주인공이나 다른 동행이 맞으면 싸우기 시작
+    if (fighting && allies.size) {
+      const pl = (api.world as unknown as { player: { hp: number } }).player;
+      const hurt = pl.hp < (allyHpSeen.get('player') ?? pl.hp) || [...allies].some(([k, f]) => f.body.hp < (allyHpSeen.get(k) ?? f.body.hp));
+      if (hurt) for (const f of allies.values()) { const fb = f.body as unknown as FighterAi; if (fb.passive === 'attack') fb.provoked = true; }
+      allyHpSeen.set('player', pl.hp);
+      for (const [k, f] of allies) allyHpSeen.set(k, f.body.hp);
+    }
+    for (const a of w.challengers(sceneId)) {
+      const look = a.def.look ?? a.def.name;
+      if (!charArt(look)) { void loadChar(look); continue; }
+      const b = spawn({ kind: `ai-char:${look}`, x: a.x, y: a.y, npcPerks: [] } as { kind: string; x: number; y: number });
+      if (!b) continue;
+      if (!(b instanceof FighterAi)) { b.alive = false; continue; }
+      if (!w.toFight(a.def.id)) { b.alive = false; continue; }
+      // 몸 = 그 몹이 생겨날 때 굴린 힘민체지정 (10-30 사용자: 등급 배수 버림). 이름표는 원형 이름
+      if (a.base) { b.base = a.base; b.stat = derive(a.base); b.baseHp = b.stat.hp; }
+      b.hp = Math.max(1, a.hp ?? b.hpMax); b.hpMax = Math.max(1, a.hpMax ?? b.hpMax);
+      b.label = a.def.name;
+      (b as unknown as { dir: 1 | -1 }).dir = a.face;
+      // 싸우다 도망: 전투 두뇌의 용기를 그 몹의 실제 성격으로 (용기가 낮을수록 체력이 덜 줄어도 꺾임)
+      if (a.temper) (b.brain.persona as { courage: number }).courage = a.temper.courage;
+      applyNpcPerks(b, a.perks ?? [], !!a.drunk);
+      // 싸움 기록: 덤벼 온 까닭 (경찰·경비 = 무슨 신고로 출동, 불량배 = 시비, 적대 세력 = 그 소속)
+      const fac = w.mobFaction(a);
+      const named = a.def.kind === 'named';
+      const grudge = named && a.doing !== '맞섬';   // 호감 적대로 막아섬 (맞받아친 게 아니라)
+      const why = grudge ? 'hostile toward {user}' : named ? 'fought back after being hit' : isLaw(a.def.archetype) ? `responding to a${crimeAt.get(sceneId) === 'murder' ? ' murder' : 'n assault'} report` : fac ? `${fac}, hostile` : 'picked a fight';
+      fightScene = sceneId;
+      const whyKo = grudge ? '{user}에게 적대' : named ? '맞고 맞받아침' : isLaw(a.def.archetype) ? `${crimeAt.get(sceneId) === 'murder' ? '살인' : '폭행'} 신고로 출동` : fac ? `${fac}, 적대` : '시비';
+      fightLog.joined(hm().trim(), sceneId, a.def.id, a.def.archetype ?? a.def.name, why, whyKo);
+      fights.set(a.def.id, { body: b as typeof b & { hp: number; hpMax: number; alive: boolean; label: string }, t: 0, scene: sceneId });
+    }
+  }
   const visitors = (sceneId: string) => {
-    const here = present.filter((p) => ROOM_SCENE[p.room] === sceneId && hasVisitAgent(p.name));
-    const sc = hq.map().scenes.find((s) => s.id === sceneId);
+    const here = present.filter((p) => ROOM_SCENE[p.room] === sceneId && !!charArt(p.name));
+    const sc = map.scenes.find((s) => s.id === sceneId);
     if (!sc || !here.length) return [];
     const [top, bot] = sc.lane ?? [LANE_TOP, LANE_BOT];
     // 방 가운데 쪽에 고르게
@@ -259,9 +679,11 @@ function hqAdapter(saves: SaveSlots, bridge: Partial<GameBridge> | undefined, ui
   };
   const hub = makeHub(
     {
-      map: () => hq.map(),
-      openPlace: (id) => hq.openPlace(id as never),
-      bark: (place) => hq.bark(place as never),
+      // 이어하기(1-8): 지난 방문에 서 있던 장면·자리에서 시작 (그 장면이 지도에 있을 때만)
+      map: () => { const p = ui.worldSave?.get()?.player; return p && map.scenes.some((q) => q.id === p.scene) ? { ...map, start: { scene: p.scene as typeof map.start.scene, x: p.x, ...(p.y !== undefined ? { y: p.y } : {}) } } : map; },
+      // 옛 본부 메뉴 자리는 닫혀 있다 (hqMap). 열린 자리는 앉기·가게·대화 자리뿐
+      openPlace: () => {},
+      bark: () => null,
       chooseFloor: (o, pick) => ui.chooseFloor(o, pick),
       sfx: (n) => ui.sfx(n),
       visitors,
@@ -269,6 +691,7 @@ function hqAdapter(saves: SaveSlots, bridge: Partial<GameBridge> | undefined, ui
       // 장면을 옮기면 장부에 이동 사건과 지금 위치(확정 사실)를 남긴다
       entered: (to, from, walkedPx) => {
         fieldClock.place = to.name;
+        saveWorld();
         // 장면 넘어가기 10분, 지하철로 다른 지역에 내리면 지역 이동 30분 (사용자 확정 2026-10-26, 설정 → 필드 시간). 걸은 거리는 시계와 무관
         void walkedPx;
         const d = hqDistrict(to.id);
@@ -276,13 +699,21 @@ function hqAdapter(saves: SaveSlots, bridge: Partial<GameBridge> | undefined, ui
         if (d) lastDistrict = d;
         const sec = (region ? rules().region : rules().scene) * 60;
         if (fieldClock.sec !== null) fieldClock.sec += sec;
-        const at = fieldClock.sec === null ? '' : ` (${clockText(fieldClock.sec)})`;
-        void b?.field?.record({ kind: 'move', text: `${from.name} → ${to.name}${at}`, scene: to.name, weight: 1, fact: { key: '주인공 위치', value: to.name } }).catch(() => {});
-        if (fieldClock.sec !== null) void b?.field?.record({ kind: 'move', text: `필드 시각 ${clockText(fieldClock.sec)}`, scene: to.name, weight: 1, fact: { key: '필드 시각', value: clockText(fieldClock.sec) } }).catch(() => {});
+        void b?.field?.record({ kind: 'move', text: `${hm()}{user} moved to ${to.name}.`, ko: `${hm()}{user}: ${to.name}(으)로 이동`, scene: to.name, weight: 1, visit: visitId, fact: { key: '{user} location', value: to.name } }).catch(() => {});   // 이어진 이동은 막간에서 한 줄로
       },
-      overlay: ui.overlay,
+      // 경보 중인 거점 장면: 경광등 빛 (그 위에 말풍선·이름표)
+      overlay: (c, people, player) => {
+        const w = sim;
+        const sc = lifeScene ? map.scenes.find((q) => q.id === lifeScene) : undefined;
+        if (w && sc && w.alarmIn(sc.id)) {
+          const z = fieldViewport.zoom;
+          const px = player.x / z;
+          drawAlarmLights(c, sc.length, (sc.lane ?? [LANE_TOP, LANE_BOT])[0], z, performance.now() / 1000, px - fieldViewport.w, px + fieldViewport.w);
+        }
+        ui.overlay?.(c, people, player);
+      },
       hour: () => (fieldClock.sec === null ? null : (fieldClock.sec / 3600) % 24),
-      depart: () => hq.depart(),
+      shop: (id) => ui.shop?.(id) ?? null,
       // 앉기·눕기 자리: 시간 보내기 (16-2장). 고른 만큼 시계가 간다
       sat: () => {
         const opts = waitOptions(rules(), fieldClock.sec === null ? null : fieldClock.sec / 60);
@@ -293,25 +724,20 @@ function hqAdapter(saves: SaveSlots, bridge: Partial<GameBridge> | undefined, ui
           if (!o) return;
           if (fieldClock.sec !== null) fieldClock.sec += o.minutes * 60;
           const at = fieldClock.sec === null ? '' : clockText(fieldClock.sec);
-          // 장부 사건 종류에 'wait'는 없다 (core/field.ts KINDS): 넣어도 버려져 시각 사실이 안 남았다 → 행동(act)으로
-          if (at) void b?.field?.record({ kind: 'act', text: `${fieldClock.place || '필드'}에서 시간을 보냈다 (${at})`, scene: fieldClock.place || undefined, weight: 1, fact: { key: '필드 시각', value: at } }).catch(() => {});
+          if (at) void b?.field?.record({ kind: 'act', text: `{user} waited until ${hm().trim()}.`, ko: `{user}: ${hm().trim()}까지 시간 보냄`, scene: fieldClock.place || undefined, weight: 1, visit: visitId, fact: { key: 'field time', value: hm().trim() } }).catch(() => {});
         }).catch(() => {});
       },
-      armed: () => hq.armed(),
       // 본부 대화창이 떠 있으면 머리 위 표시를 숨긴다 (독립 검수: 브리핑 뒤 ↓ 표시)
       busy: () => typeof document !== 'undefined' && !!document.querySelector('.hq-talk, .hq-over:not(:empty)'),
     },
     (place) => whereIs(place as never),
   );
   return {
-    ready: () => hq.ready(),
     visitReady,
     visitor: () => visitor,
     hub: () => hub,
-    state: () => hq.state,
     goto: (place: string) => hub.goto(place),
-    isOpen: () => hq.isOpen(),
-    close: () => hq.close(),
+    isOpen: () => false,
     dispose: () => {
       if (typeof window !== 'undefined') {
         window.removeEventListener('goei:talk-closed', onTalkClosed);
@@ -322,72 +748,75 @@ function hqAdapter(saves: SaveSlots, bridge: Partial<GameBridge> | undefined, ui
       const g = globalThis as { __goeiWallet?: unknown; __goeiWorld?: unknown };
       if (g.__goeiWallet === walletHook) delete g.__goeiWallet;
       if (sim && g.__goeiWorld === sim) delete g.__goeiWorld;
-      eileenHooks.extraTargets = undefined;
     },
-    mount(r, host) {
-      hq.mount(r, {
-        deploy: (l) => !bridge?.visit && host.deploy({ ...l, hpMax: l.stats?.hp, launch: l } as Launch),
-        load: () => saves.read(slot as never),
-        resuming: ui.resuming,
-        save: (d) => (markSaved(), saves.write(slot as never, d, { title: '자동 저장', summary: `${hq.state.day}일차`, schema: 'goei-hq/1' })),
-        saves,
-        link: bridge?.card
-          ? {
-              card: async () => {
-                const c = await bridge.card!();
-                return c ? { agents: c.agents.map((a) => ({ id: a.id, name: a.name, english: a.english, photo: (b?.photo && a.photo ? b.photo(a.photo) : '') ?? '' })), events: c.events.map((e) => ({ kind: e.kind, name: e.name, loc: e.loc, state: e.state })) } : null;
-              },
-              report: async (p: unknown) => {
-                bridge.report?.(p as never);
-                return '정산 결과를 넘겼습니다. 시작 화면의 본편 연동에서 보고서 붙이기·기록 로어북을 고를 수 있어요.';
-              },
-            } as never
-          : undefined,
-        closed: () => ui.closed?.(),
-        goto: (id: string) => hub.goto(id),
-      }, { walk: false });
-    },
-    onReturn(r, run) {
-      const l = (run as Launch).launch;
-      if (l) hq.onReturn({ ...(r as unknown as RunResult), runId: (r as unknown as RunResult).runId ?? l.runId } as RunResult, l);
-    },
-    unmount: () => hq.unmount(),
+    mount() {},
+    onReturn() {},
+    unmount() {},
   };
 }
 
-/** 엔진 결과 → 본부 정산 모양 */
-function toHqResult(r: RunResultCore, w: World): RunResult {
-  const n = r.notes as Partial<RunResult> & Record<string, unknown>;
+/** 주인공 머리 꼭대기 (발 기준 화면 px, 음수, 원근 미포함) */
+function heroTop(p: World['player']): number {
+  return p instanceof FighterPlayer ? charTop(p.art.key) : -230;
+}
+
+/** 통합창 자료 (11-01): 능력치·산출 = docs/퍽/능력치_55명(산출 공식 그대로), 기술 = 기술_속성표, 능력 = 지금 판의 퍽, 소지품 = 퀵슬롯(HUD 칸)·필드 가방 */
+function charWindowData(w: World, hs: HudState, team: string, bag: Record<string, number>): Parameters<CharWindowCtl['draw']>[1] {
+  const p = w.player, fp = p instanceof FighterPlayer ? p : null;
+  const name = p.label ?? '';
+  const [str, dex, con, int, wil] = CW_STATS[name] ?? [5, 5, 5, 5, 5];
+  const pct = (v: number) => `${Math.round(v)}%`;
+  const sk = CW_SKILLS[name] ?? {};
+  const key = (b: string) => { const c = Object.keys(KEYMAP).find((k) => KEYMAP[k] === b); return c ? c.replace(/^Key/, '') : '?'; };
+  const row = (label: string, icon: SkillIcon, btn: string, id: string) => ({ key: key(btn), label, icon, name: sk[id]?.[0] ?? label, id });
+  const skills = [
+    row('약공', 'punch', 'light', ''), row('강공', 'kick', 'heavy', ''),
+    ...(sk['사격'] ? [row('사격', 'gun', 'shoot', '사격')] : []),
+    ...(sk['충전0'] || sk['충전1'] ? [row('충전', 'bolt', 'charge', sk['충전1'] ? '충전1' : '충전0')] : []),
+    ...(sk['고유기'] ? [row('기술', 'wave', 'skill', '고유기')] : []),
+    ...(sk['필살'] ? [row('필살', 'star', 'super', '필살')] : []),
+  ];
+  const pr = fp?.perks;
+  const perks: CharWindowData['perks'] = pr?.active ? [
+    ...[...pr.ranks].map(([n, r]) => {
+      const t = PERK_TEXT.find((x) => x.name === n);
+      const grade = (['일반', '희귀', '특급'] as const)[pr.topGrade(n)] ?? '일반';
+      return { name: n, cat: t?.cat ?? '', effect: t?.eff ?? '', cond: t?.cond || undefined, rank: [r, t?.rank ?? r] as [number, number], grade, badge: badgeOf(n, grade) };
+    }),
+    ...[...pr.traits].map((n) => { const t = TRAIT_TEXT.find((x) => x.name === n); return { name: n, cat: '특성', effect: t?.good ?? '', cost: t?.cost, trait: true, badge: badgeOf(n) }; }),
+  ] : [];
+  const bagRows = Object.entries(bag).filter(([, c]) => c > 0).map(([id, c]) => ({ label: FIELD_ITEMS[id]?.name ?? id, count: c }));
   return {
-    how: r.how,
-    runId: (w.run as Launch).launch?.runId,
-    missionDone: (n.missionDone as boolean | undefined) ?? r.how === 'return',
-    depth: (n.depth as number | undefined) ?? Math.max(1, w.floor?.depth ?? r.floors),
-    floors: r.floors,
-    kills: r.kills,
-    cash: n.cash ?? 0,
-    shards: n.shards ?? 0,
-    debt: n.debt ?? 0,
-    budget: n.budget ?? 0,
-    teeth: n.teeth ?? 0,
-    bag: n.bag ?? [],
-    itemsLeft: n.itemsLeft ?? w.items.map((it) => (it && it.n > 0 ? { id: it.id, n: it.n } : null)),
-    found: n.found ?? [],
-    sent: n.sent ?? [],
-    rescued: n.rescued ?? [],
-    bigHit: !!n.bigHit,
-    seconds: r.timeSec,
-    notes: r.notes,
-  } as RunResult;
+    name, team, state: '필드', face: fp ? charFace(fp.art.key, 64) : null, body: fp ? charBody(fp.art.key) : null,
+    hp: Math.round(p.hp), maxHp: Math.round(p.hpMax),
+    base: [
+      { label: '힘', v: str, what: '몸으로 때리는 기술 피해' }, { label: '민', v: dex, what: '총·투척 피해, 속도' },
+      { label: '체', v: con, what: '체력, 받는 피해' }, { label: '지', v: int, what: '이능 기술 피해, 기술 쿨' },
+      { label: '정', v: wil, what: '필살 충전, 상태 이상·정신 피해' },
+    ],
+    derived: [
+      { label: '체력', v: (500 + con * 100).toLocaleString() }, { label: '근접', v: String(100 + (str - 5) * 8) },
+      { label: '사격', v: String(100 + (dex - 5) * 8) }, { label: '이능', v: String(100 + (int - 5) * 8) },
+      { label: '받는 피해', v: pct(100 - (con - 5) * 2 - (wil - 5) * 2) }, { label: '속도', v: String(100 + (dex - 5) * 3) },
+      { label: '기술 쿨', v: pct(100 - (int - 5) * 4) }, { label: '필살 충전', v: pct(100 + (wil - 5) * 6) },
+    ],
+    skills,
+    pick: (i) => {
+      const s = skills[i], t = s?.id ? sk[s.id] : undefined;
+      return { skill: i, desc: t?.[3] && t[3] !== t[0] ? [t[3]] : [], nums: t ? `판정 ${t[1]} · 속성 ${t[2]}` : '' };
+    },
+    perks, perkSlots: perks.length,
+    quick: (hs.items ?? []).map((it) => ({ label: it.label, count: it.count })), bag: bagRows, bagSlots: BAG_SLOTS,
+    money: hs.field?.wallet ?? '',
+  };
 }
 
 function hudState(w: World, shell: Shell): HudState {
   const p = w.player;
   const boss = w.boss();
   const f = w.floor;
-  const d = f.depth ?? 0;
   return {
-    agent: { name: p.label ?? '쟈알디', color: '#c0453a', portrait: (p as { core?: unknown }).core ? testPlayerFace(64, p.dir < 0) : null },
+    agent: { name: p.label ?? '쟈알디', color: p instanceof FighterPlayer ? p.art.cfg.color : '#c0453a', portrait: p instanceof FighterPlayer ? charFace(p.art.key, 64, p.dir < 0) : null },
     hp: p.hp,
     maxHp: p.hpMax,
     energy: p.skillCd > 0 ? 75 - p.skillCd : 75,
@@ -398,14 +827,18 @@ function hudState(w: World, shell: Shell): HudState {
     weapon: heldWeapon(w) ?? ((p as { core?: unknown }).core ? null : { name: '권총', mag: p.ammo, magMax: p.mag, reserve: p.reserve, reload: p.moveKey === 'reload' ? p.mf / 4 : null }),
     items: w.items.map((it) => ({ id: it?.id, label: it?.label ?? '', count: it?.n ?? 0 })),
     field: fieldClock.sec !== null || fieldClock.place || (w.stage?.id === 'hq' && fieldWallet.won !== null) ? { clock: fieldClock.sec === null ? undefined : clockText(fieldClock.sec), place: fieldClock.place || undefined, wallet: fieldWallet.won === null ? undefined : wonText(fieldWallet.won) } : undefined,
-    floor: { depth: d ? (d <= 3 ? `L${d}` : `B-${d - 3}`) : '', name: f.title },
-    favor: 0,
-    money: { cash: (w.notes.cash as number | undefined) ?? 0, budget: 0, research: 0, teeth: 0 },
+    floor: { depth: '', name: f.title },
+    perks: p instanceof FighterPlayer && p.perks.active ? perkChips(p) : undefined,
     boss: boss ? { name: boss.label, hp: boss.hp, max: boss.hpMax } : null,
     // 아래 자막은 3초까지만 (바닥 띠를 오래 가리지 않게)
     message: w.subtitle && w.tick - w.subtitleAt < 90 ? w.subtitle.text : undefined,
     // 가드 게이지는 가드 중이거나 닳았을 때만
-    meters: p.guarding || p.guardMeter < 100 ? [{ label: '가드', v: p.guardMeter, max: 100, color: '#9ad08a' }] : [],
+    meters: [
+      ...(p.guarding || p.guardMeter < 100 ? [{ label: '가드', v: p.guardMeter, max: 100, color: '#9ad08a' }] : []),
+      ...(p instanceof FighterPlayer && p.dodgeMeter < p.dodgeMax ? [{ label: '회피', v: p.dodgeMeter, max: p.dodgeMax, color: '#8fc6e8' }] : []),
+    ],
+    // 걸린 상태 효과 (출혈×2 5 · 오염×1 …)
+    status: ((p as { status?: StatusSet }).status?.view() ?? []).map((v) => ({ label: `${v.label}${v.stacks > 1 ? `×${v.stacks}` : ''}${v.t !== null ? ` ${Math.ceil(v.t)}` : ''}`, good: false })),
     compact: shell.touchShown,
     device: shell.touchShown ? 'touch' : shell.input.last,
     navigation: navigationFeedback(w),
@@ -418,6 +851,42 @@ function heldWeapon(w: World) {
   return h ? { name: h.name, mag: h.uses, magMax: h.max, reserve: 0, reload: null } : null;
 }
 
+/** 게임 창이 닫힐 때(main.ts 정리): 필드 마감(싸움 기록·돈 정산). 창은 이미 닫히는 중 */
+/**
+ * NPC 퍽을 전투 몸에 (docs/퍽/NPC_퍽_안.md). 「기존」 퍽은 주인공 퍽을 그대로 PerkRun 에,
+ * 강적 = 힘민체지정 +5(무작위 칸, 10 넘어도 됨)·정예, 방어막 = 최대 체력 10% 보호막, 자리 지킴 = 도망 안 감, 싸움꾼 = 공격성 +0.2,
+ * 술기운(취했을 때) = 받는 피해 −20%·공격 간격 +20%, 협공 = 분대가 한 번에 거는 공격 수 +1
+ */
+function applyNpcPerks(b: FighterAi, perks: readonly string[], drunk = false): void {
+  b.npcPerks = [...perks];
+  b.base = { ...b.base };   // 이 몸만 고친다 (원본 능력치 표·다른 몸과 나눠 쓰지 않게)
+  for (const n of perks) { const d = npcPerkDef(n); if (d?.reuse) b.perks.add(d.reuse); }
+  const persona = b.brain.persona as { courage: number; aggression: number };
+  if (perks.includes('강적')) {
+    const keys = ['str', 'dex', 'con', 'int', 'wil'] as const;
+    for (let i = 0; i < 5; i++) b.base[keys[Math.floor(Math.random() * keys.length)]]++;
+    b.stat = derive(b.base); b.baseHp = b.stat.hp; b.hp = b.hpMax = b.stat.hp;
+    (b as unknown as { elite: boolean }).elite = true;
+    b.label = `${b.label} (강적)`;
+  }
+  // 이름 있는 인물(NPC로 나올 때): 힘민체지정 ×1.5(분배 모양 그대로, 10 넘어도 됨) → 그 공식 체력에 ×1.5
+  if (perks.includes('스탯 뻥튀기')) {
+    for (const k of ['str', 'dex', 'con', 'int', 'wil'] as const) b.base[k] = Math.round(b.base[k] * NAMED_MUL.stat * 10) / 10;
+    b.stat = derive(b.base); b.baseHp = b.stat.hp; b.hp = b.hpMax = b.stat.hp;
+  }
+  if (perks.includes('체력 뻥튀기')) { b.baseHp = b.hpMax = Math.round(b.hpMax * NAMED_MUL.hp); b.hp = b.hpMax; }   // baseHp 도: 퍽 체력 배율을 다시 셀 때 안 풀리게
+  if (perks.includes('방어막')) b.shield = b.shieldMax = Math.round(b.hpMax * 0.1);
+  if (perks.includes('자리 지킴')) persona.courage = 1;
+  if (perks.includes('싸움꾼')) persona.aggression = Math.min(1, persona.aggression + 0.2);
+  if (perks.includes('술기운') && drunk) { b.stat = { ...b.stat, taken: b.stat.taken * 0.8 }; b.npcGap = 1.2; }
+  const sq = (b.brain as unknown as { squad?: { cap: number } }).squad;
+  if (perks.includes('협공') && sq) sq.cap += 1;
+}
+
+export function endFieldVisit(): void {
+  fieldLink.endVisit?.(false);
+}
+
 export interface Wiring {
   mods: EngineModules;
   /** 게임이 붙을 상자 (껍데기가 있으면 그 무대) */
@@ -426,11 +895,7 @@ export interface Wiring {
 }
 
 export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): Wiring {
-  const rawSaves: SaveSlots = (bridge?.saves as unknown as SaveSlots) ?? idbSaves('goei-game');
-  const session = new SessionStore(rawSaves, (bridge as { slot?: number })?.slot ?? 0, typeof localStorage === 'undefined' ? undefined : localStorage);
-  setSupplyCatalog(SUPPLY_CATALOG as never);
   setHudItemIcon(drawItemIcon as never);
-  setItemIconDrawer(drawItemIcon as never);
   const audio = createGameAudio(local('goei-game-audio'));
   let game: Game | null = null;
   /** 필드 입장 판정. 막히면 이유를 보이고 「밖에 있어요」로 고칠 수 있다. 들어가도 되면 true */
@@ -453,34 +918,26 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
     load: async () => (await uiPrefs.load().catch(() => null)) ?? localStore.load(),
     save: (t) => { uiPrefs.save(t); localStore.save(t); },
   } : undefined;
+  let fieldShop: FieldShop | null = null;
+  // 필드 NPC 살해 허용 (설정): 전투 몸·필드 행위자가 함께 본다
+  fighterHooks.killOk = () => shell.settings.npcKill;
+  fighterHooks.permaDeath = () => shell.settings.deathMode === 'perma';
+  const charWin = new CharWindowCtl();
+  if (bridge?.assets) loadBadges((f) => bridge.assets!.url('ui-badges', f));
   const shell = mountGameShell(box, {
     synth: true,
+    // 통합창: ` 로 열고 닫기 (11-01 사용자). 대화·가게·영상 등 다른 창이 떠 있으면 안 연다
+    charWindow: { isOpen: () => charWin.open, canOpen: () => !!world && !mods.blocking?.(), toggle: (on) => charWin.toggle(on), key: (c) => charWin.key(c) },
+    bag: { available: () => !!game?.inHub && !!fieldShop, open: () => fieldShop?.openBag() },
     store,
-    title: bridge?.visit ? VISIT_TITLE.title : '차원 승강기',
-    sub: bridge?.visit ? VISIT_TITLE.sub : 'ANOMALY SIMULATION · 관리국 액션',
-    pauseInfo: () => session.error ?? (game?.inHub ? '본부 자동 저장' : '안전 지점 자동 저장 · 전투 중 중단하면 직전 안전 지점부터'),
-    onNew: async () => {
-      if (bridge?.visit) { if (await gate()) game?.start_new(); return; }
-      await session.ready;
-      if (session.checkpoint) { await game?.resume(session.checkpoint); game?.endRun('withdraw'); return; }
-      // 새 저장: 영상 깃발을 지운다 (저장마다 한 번)
-      for (const k of Object.keys(story.flags)) if (k.startsWith('cut_') || k === 'told_rope') delete story.flags[k];
-      saveFlags();
-      game?.start_new();
-    },
-    onContinue: async () => {
-      if (bridge?.visit) { if (await gate()) game?.start_new(); return; }
-      await session.ready;
-      try {
-        if (session.checkpoint) await game?.resume(session.checkpoint);
-        else game?.start_new();
-      } catch {
-        // 원본은 남긴다. 저장 오류를 새 출동으로 조용히 덮어쓰지 않는다.
-        void shell.choose({ title: '출동 복원 실패', lines: ['저장 기록을 읽지 못했습니다. 원본 기록은 보존했습니다.'], options: ['닫기'] });
-      }
-    },
-    hasSave: () => session.hasSave || hasSaved(),
-    onRetreat: () => bridge?.visit ? bridge.close?.() : game?.endRun('withdraw'),
+    title: VISIT_TITLE.title,
+    sub: VISIT_TITLE.sub,
+    pauseInfo: () => '',
+    onNew: async () => { if (await gate()) game?.start_new(); },
+    onContinue: async () => { if (await gate()) game?.start_new(); },
+    // 필드는 저장 슬롯이 없다: 상태는 본편 채팅 변수(가방 $fd_state 등)에 있다
+    hasSave: () => false,
+    onRetreat: () => bridge?.visit ? (fieldLink.endVisit ? fieldLink.endVisit(true) : bridge.close?.()) : game?.endRun('withdraw'),
     onTitle: () => game?.toTitle(),
     toLocal: bridge?.viewport ? (x, y, el) => bridge.viewport!.toLocal(x, y, el) : undefined,
     field: bridge?.visit ? {
@@ -495,36 +952,17 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
   ffx.sfx = (n) => audio.event({ type: n === 'super' ? 'super' : 'hit', kind: n === 'slam' ? 'super' : undefined, strength: 3 } as never);
   const cutins = new Map<string, HTMLImageElement>();
   if (bridge?.visit && bridge.assets) void loadFieldFx(bridge.assets, ffx, cutins);
-  const stageStore = {
-    load: () => {
-      if (session.meta) return session.meta as never;
-      try {
-        const t = localStorage.getItem('goei-game-stage');
-        return t ? JSON.parse(t) : null;
-      } catch {
-        return null;
-      }
-    },
-    save: (m: unknown) => {
-      session.setMeta(m);
-      try {
-        localStorage.setItem('goei-game-stage', JSON.stringify(m));
-      } catch {
-        /* 저장 못 해도 진행 */
-      }
-    },
-  };
-  // NPC 자유 대화 (npcLink.ts): 껍데기 놀이판 층에 대화창, 승객은 층 모듈 훅으로
+  // NPC 자유 대화 (npcLink.ts): 껍데기 놀이판 층에 대화창
   // 본부 방문: 머리 위 이름표·말풍선과 아래 한 줄 입력 (talk.ts)
-  const visit = bridge?.visit ? mountTalk(shell.stage.ui, bridge.visit, bridge.field) : null;
+  const visit = bridge?.visit ? mountTalk(shell.stage.ui, bridge.visit, bridge.field, (k) => fieldLink.mobOf?.(k) ?? null, { opts: (n) => fieldLink.talkOpts?.(n) ?? {}, onTags: (k, n, t) => fieldLink.onTags?.(k, n, t), line: (k, c) => fieldLink.cueLine?.(k, c) ?? null, busyCell: (k) => fieldLink.busyCell?.(k) ?? null }) : null;
+  fieldLink.talkTarget = () => visit?.target() ?? '';
   const npc = linkNpcTalk({
     visit: visit ? name => { if (name) visit.open(name); } : undefined,
     layer: shell.stage.ui,
     bridge,
     settings: () => shell.settings,
     agent: () => runAgent,
-    day: () => hq.state().day,
-    rescued: () => hq.state().rescued,
+    day: () => (fieldClock.sec === null ? 0 : Math.floor(fieldClock.sec / 86400)),
     photo: (k) => (bridge as { photo?: (n: string) => string | undefined } | undefined)?.photo?.(k) || (demoPhotos as Record<string, string>)[k],
     sfx: (n) => audio.play(n as never),
     // 대화창이 열리면 터치판은 숨지 않고 대사창 모드 (frame 이 한 곳에서 정한다)
@@ -536,42 +974,7 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
   // 필드 요원: 지금 그림(몸 약 97도트)을 화면 약 255px로 (PixelLab 256 캔버스 몸 약 170도트 ×1.5 크기를 미리 보기). 원근은 view.persp
   setPixelScale(bridge?.visit ? 2.625 : 2.75);
   (globalThis as { __goeiSetPixel?: (p: number) => void }).__goeiSetPixel = setPixelScale; // 시험용
-  // 강화 선택(기본기획서 15.2)은 껍데기 선택 창으로: 창이 열린 동안 게임이 멈춘다
-  const elevator = createElevatorStage(stageStore, {
-    ...npc.stageHooks(stageHooks()),
-    pickUpgrade: (v, done) => {
-      void shell.choose({ title: `${v.why} · 강화 하나`, lines: ['이번 출동 동안만 남는다. 같은 계열 셋이면 완성 효과.'], options: v.options.map((o) => `[${o.set}] ${o.label} — ${o.text}`), cancel: false }).then((i) => done(Math.max(0, i)));
-      return true;
-    },
-  });
-  // 출동 지도 (Z·Tab·M, 터치 「지도」): 열린 동안 게임이 멈춘다. 구석 미니맵은 늘
-  let mapOpen = false;
-  // 자동전투 (모바일 AUTO·O 키, 세션 한정): 주인공 에일린의 입력을 대련 두뇌가 대신 만든다. 스틱을 만지면 직접 조작이 먼저
-  const pilot = new AutoPilot();
-  pilot.manual = () => {
-    const a = shell.input.axis();
-    return a.x !== 0 || a.y !== 0;
-  };
-  (globalThis as { __goeiAuto?: unknown }).__goeiAuto = pilot; // 시험용
-  const offAutoKey = shell.input.on((code, down) => {
-    if (!down || code !== CODE.auto) return;
-    // 싸움 없는 곳에서는 못 켠다 (버튼은 흐림). 켜 둔 것은 언제든 끈다
-    if (!pilot.on && !AutoPilot.fight(world)) return;
-    pilot.on = !pilot.on;
-    shell.touch.setAuto(pilot.on);
-  });
-  // 방문 대화(아래 한 줄 입력)의 터치 대사창 모드: 선택 = 입력칸 열기(키패드), 취소 = 닫기
-  const offTalkKey = shell.input.on((code, down, src) => {
-    if (!down || src !== 'touch' || !visit?.isOpen() || shell.menu.isOpen) return;
-    if (code === 'Escape') visit.close();
-    else if (code === 'Enter') shell.stage.ui.querySelector<HTMLInputElement>('.gt-in')?.focus({ preventScroll: true });
-  });
   let guardA = 0; // 방어 게이지 불투명도
-  const offMapKey = shell.input.on((code, down) => {
-    if (!down) return;
-    if ((code === 'KeyZ' || code === 'KeyM') && world && world.stage === elevator && !game?.inHub && !shell.paused && !story.isBlocking()) mapOpen = !mapOpen;
-  });
-  setLineProvider(hqLines);
   // 시연용 방: 적 시험장은 적 모듈 것(?start=arena), 아이템 진열(?start=items)
   const itemStage: StageModule = {
     id: 'itemroom',
@@ -593,16 +996,37 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
   };
   let squad = new Squad(DIFF[aiDiff].melee);
   let aiN = 0;
+  let allyN = 0;
+  const allySquad = new Squad(DIFF[aiDiff].melee);
   const unknownKinds = new Set<string>();
   const enemyFactory: EnemyFactory = (spec, w) => {
-    if (spec.kind === 'ai-eileen' && w.player instanceof EileenPlayer) {
+    // 통합 테스트룸 인물 AI: 'ai-char' = 주인공과 같은 인물, 'ai-char:<이름>' = 그 인물 팩(받아 둔 것만). 대련('ai-eileen')도 주인공이 인물 팩이면 그 인물로
+    // 주인공 편 AI (동행): 'ally-char:<이름>' = 그 인물 팩, 적 AI와 같은 두뇌로 적 편 몸과 싸운다 (필드 동행·나중에 괴이 안)
+    if (spec.kind.startsWith('ally-char:') && w.player instanceof FighterPlayer) {
+      const who = spec.kind.slice(10);
+      const art = charArt(who);
+      if (!art) { void loadChar(who); return fallbackEnemy(spec, w); }
+      const n = ++allyN;
+      const ai = new FighterAi((w.player as unknown as { clips: ConstructorParameters<typeof FighterAi>[0] }).clips, art, { id: `ally${n}`, grade: 'B', difficulty: aiDiff, persona: { aggression: 0.6, patience: 0.5, zoning: 0.3, courage: 0.85 }, seed: 5000 + n, squad: allySquad, label: art.cfg.name, side: 'ally' });
+      ai.x = spec.x; ai.y = spec.y;
+      if (!BASE_STATS[art.cfg.name]) { ai.base = rollBase(Math.random); ai.stat = derive(ai.base); ai.baseHp = ai.hp = ai.hpMax = ai.stat.hp; }
+      applyNpcPerks(ai, rollNpcPerks(Math.random, BASE_STATS[art.cfg.name] ? 'named' : 'fighter'));
+      return ai as never;
+    }
+    if ((spec.kind === 'ai-char' || spec.kind.startsWith('ai-char:') || spec.kind === 'ai-eileen') && w.player instanceof FighterPlayer) {
+      const who = spec.kind.startsWith('ai-char:') ? spec.kind.slice(8) : '';
+      const art = who ? charArt(who) : w.player.art;
+      if (!art) { void loadChar(who); return fallbackEnemy(spec, w); }
       if (aiN === 0) squad = new Squad(DIFF[aiDiff].melee);
       const n = ++aiN;
-      // 성향은 상대마다 다르게 (돌격형 / 신중형 / 견제형)
       const personas = [{ aggression: 0.75, patience: 0.35, zoning: 0.2, courage: 0.9 }, { aggression: 0.35, patience: 0.8, zoning: 0.3, courage: 0.8 }, { aggression: 0.4, patience: 0.5, zoning: 0.85, courage: 0.7 }];
-      const ai = new AiEileen((w.player as unknown as { clips: ConstructorParameters<typeof AiEileen>[0] }).clips, { id: `ai${n}`, grade: 'B', difficulty: aiDiff, persona: personas[(n - 1) % personas.length], seed: 1000 + n, squad, label: `AI 에일린 ${n}` });
+      const ai = new FighterAi((w.player as unknown as { clips: ConstructorParameters<typeof FighterAi>[0] }).clips, art, { id: `ai${n}`, grade: 'B', difficulty: aiDiff, persona: personas[(n - 1) % personas.length], seed: 1000 + n, squad, label: `AI ${art.cfg.name} ${n}` });
       ai.x = spec.x; ai.y = spec.y;
-      ai.hp = ai.hpMax = 160;
+      // 힘민체지정만으로(10-30 사용자): 이름 있는 55명은 표, 그 밖의 NPC는 한 명마다 합 25를 무작위로 나눔. 보정은 퍽
+      if (!BASE_STATS[art.cfg.name]) { ai.base = rollBase(Math.random); ai.stat = derive(ai.base); ai.baseHp = ai.hp = ai.hpMax = ai.stat.hp; }
+      // NPC 퍽: 필드 몹은 행위자의 퍽을 combatStep 이 붙인다(npcPerks 표시). 그 밖(괴이·시험장)의 이름 없는 인물은 전투 NPC 퍽을 굴림
+      // 이름 있는 인물(55명)은 스탯 뻥튀기·체력 뻥튀기 (10-31 사용자)
+      if (!(spec as { npcPerks?: string[] }).npcPerks) applyNpcPerks(ai, rollNpcPerks(Math.random, BASE_STATS[art.cfg.name] ? 'named' : 'fighter'));
       return ai as never;
     }
     if (DEF_BY_KIND[spec.kind]) {
@@ -617,17 +1041,13 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
   };
   // 대사·컷신: 말풍선은 늘, 대화창·컷신이 열리면 전투를 멈춘다
   let world: World | null = null;
-  /** 출동이 끝났다: 본부로 돌아오면 플러그인이 만든 보고서를 자막 한 줄로 알린다 (폰 전체화면에서는 플러그인 카드가 안 보인다) */
-  let reportSay = false;
   let runAgent: AgentId = 'eileen'; // 주인공은 에일린 (쟈알디는 부장 NPC)
-  let openingOn = false; // 제목 화면 오프닝 영상이 도는 중 (메뉴가 열려 있어도 영상은 멈추지 않는다)
   const storyRoot = document.createElement('div');
   // 넘치는 창(층 단추 등)이 바깥 틀에 스크롤바를 만들면 틀 크기가 바뀌어 화면을 다시 맞추고, 그게 되풀이되며 화면이 떨렸다 (리스 작은 창)
   storyRoot.style.cssText = 'position:absolute;inset:0;pointer-events:none;z-index:15;overflow:hidden';
   shell.stage.root.appendChild(storyRoot);
   const attachVideoAudio = (event: Event) => audio.attachMedia((event as CustomEvent<VideoTrack>).detail);
   storyRoot.addEventListener(VIDEO_AUDIO_EVENT, attachVideoAudio);
-  const unmountItems = mountItemsOverlay(shell.stage.root);
   const savedFlags = (() => {
     try {
       return JSON.parse(localStorage.getItem('goei-game-story') ?? 'null') ?? undefined;
@@ -706,7 +1126,7 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
         return { x: ox + gx * k, y: oy + Math.max(120, p.y - p.z - (world.hintShown ? 362 : 290)) * k, minX: lo, maxX: hi };
       },
       emit: (ev, arg) => world?.emit({ type: 'custom', name: ev, data: { arg } } as never),
-      paused: () => shell.paused && !openingOn,
+      paused: () => shell.paused,
     },
     { saved: savedFlags },
   );
@@ -728,14 +1148,14 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
     e.stopImmediatePropagation();
   };
   window.addEventListener('keydown', storyKeys, true);
-  const saves: SaveSlots = {
-    ...session.hqSaves,
-    restore: async n => {
-      const hq = await session.hqSaves.restore!(n);
-      if (hq) elevator.reloadMeta();
-      return hq;
-    },
+  // 정보 창: 폰(터치·펜)에서 탭 이름을 누르면 그 탭으로 (11-01 사용자). 마우스는 그대로 Q·E.
+  const charWinTap = (e: PointerEvent) => {
+    if (!charWin.open || e.pointerType === 'mouse') return;
+    const cv = shell.canvas, r = cv.getBoundingClientRect();
+    if (!r.width || !r.height || e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom) return;
+    if (charWin.tap(((e.clientX - r.left) * cv.width) / r.width, ((e.clientY - r.top) * cv.height) / r.height)) e.preventDefault();
   };
+  window.addEventListener('pointerdown', charWinTap, true);
   // 엘리베이터 층 단추 (본부). 1~5 숫자키·Esc, 누르면 닫힌다
   let floorPick: ((i: number | null) => void) | null = null;
   const floorBox = document.createElement('div');
@@ -792,60 +1212,30 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
     e.stopImmediatePropagation();
   };
   window.addEventListener('keydown', floorKeys, true);
-  /* 도트 영상 컷신 자리 (지휘자 결정, 검수10): 한 전환에 하나, 저장마다 한 번(이야기 깃발 cut_<id>), 늘 건너뛰기.
-     opening = 제목 화면 대기 오프닝(반복) · first_day = 새 저장 첫 본부 · first_entry = 첫 출동 · first_call = 처음 L2 이상
-     attic = 첫 로프 귀환 · exit = 출구 층 · dinner = 첫 임무 성공 정산 뒤 · evac = 첫 후송 */
-  const canFilm = () => location.protocol !== 'file:'; // file:// 시연판은 프레임 목록을 못 읽는다
-  const cutOnce = (id: string, done?: () => void): boolean => {
-    if (!VIDEOS[id] || !canFilm() || story.flags[`cut_${id}`] || story.isBlocking()) return false;
-    story.flags[`cut_${id}`] = 1;
-    saveFlags();
-    story.cutscene(id, done);
-    return true;
-  };
-  let dinnerDue = false;
-  const hq = hqAdapter(saves, bridge, {
-    resuming: () => !!session.checkpoint,
+  const hq = hqAdapter(bridge, {
     chooseFloor,
-    sfx: (n) => audio.play(n as never),
-    closed: () => {
-      if (dinnerDue) (dinnerDue = false), cutOnce('dinner');
-    },
+    // 사이렌은 음악을 낮춘다 (경보 중 1.6초마다 다시 틀므로 계속 낮게)
+    sfx: (n) => { audio.play(n as never); if (n === 'siren') audio.duck(1.7, 0.35); },
     overlay: visit ? (c, people, player) => visit.draw(c, people, player) : undefined,
     choose: (o) => shell.choose(o),
+    shop: (id) => fieldShop?.open(id) ?? null,
+    worldSave: { get: () => fieldShop?.world(), set: (w) => fieldShop?.setWorld(w) },
     rules: () => { const t = shell.settings; return clockRules({ scene: t.tScene, region: t.tRegion, talk: t.tTalk, fight: t.tFight, waitShort: t.tWaitShort, waitLong: t.tWaitLong }); },
   });
-  // 본부 메뉴 창이 열려 있으면 Esc는 창 닫기 (껍데기 일시정지보다 먼저)
-  // 본부 메뉴 창(임무 창구·정비실 등) 키보드 (사용자 2026-10-25: 키보드가 안 먹는다): 방향키로 단추를 고르고 Enter·Space·E로 누른다, Esc 닫기
-  let hqSel: HTMLElement | null = null;
-  const hqButtons = () => [...document.querySelectorAll<HTMLElement>('.goei-engine-hq button:not([disabled]), .goei-engine-hq [data-act]:not(button)')].filter((b) => b.offsetParent && !b.closest('[hidden]'));
-  const markHq = (b: HTMLElement | null) => {
-    hqSel?.classList.remove('hq-kbsel');
-    hqSel = b;
-    b?.classList.add('hq-kbsel');
-    b?.scrollIntoView?.({ block: 'nearest' });
-  };
-  const hqKeys = (e: KeyboardEvent) => {
-    if (!game?.inHub || !hq.isOpen?.() || npc.isOpen()) return;
-    const t = e.target as HTMLElement | null;
-    if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.tagName === 'SELECT')) return;
-    const list = hqButtons();
-    if (hqSel && !list.includes(hqSel)) hqSel = null;
-    const at = hqSel ? list.indexOf(hqSel) : -1;
-    const first = () => list.find((b) => b.classList.contains('primary') || b.classList.contains('on')) ?? list[0] ?? null;
-    if (e.code === 'Escape') hq.close();
-    else if (e.code === 'ArrowDown' || e.code === 'ArrowRight' || e.code === 'Tab') markHq(at < 0 ? first() : list[(at + 1) % list.length]);
-    else if (e.code === 'ArrowUp' || e.code === 'ArrowLeft') markHq(at < 0 ? first() : list[(at - 1 + list.length) % list.length]);
-    else if (e.code === 'Enter' || e.code === 'Space' || e.code === 'KeyE') {
-      if (e.repeat) return e.preventDefault();
-      const b = hqSel ?? first();
-      hqSel = null;
-      b?.click();
-    } else return;
-    e.preventDefault();
-    e.stopImmediatePropagation();
-  };
-  const saveOnHide = () => { game?.checkpoint(); void session.flush(); };
+  // 필드 가게·가방 창 (src/game/world/fieldShop.ts): 돈은 가계부, 가방·재고는 채팅 변수 $fd_state
+  fieldShop = createFieldShop({
+    root: shell.stage.ui,
+    store: bridge?.fieldState,
+    minute: () => (fieldClock.sec === null ? null : fieldClock.sec / 60),
+    balance: () => fieldWallet.won,
+    pay: (amount, memo) => fieldLink.pay?.(amount, memo) ?? Promise.resolve(null),
+    heal: (ratio) => { const p = game?.world?.player; if (p) p.hp = Math.min(p.hpMax, p.hp + p.hpMax * ratio); },
+    record: (text, ko) => fieldLink.record?.(text, ko),
+    rng: Math.random,
+    nearPerson: () => fieldLink.nearPerson?.() ?? null,
+    fact: (key, value) => fieldLink.fact?.(key, value),
+    gift: (who, item, counts) => fieldLink.gift?.(who, item, counts),
+  });
   // 창의 다른 탭으로 가면 일시정지 메뉴를 열어 둔다 (게임 멈춤·소리 끔). 돌아오면 「계속」으로 이어 간다
   let hiddenNow = false;
   const offHidden = bridge?.onHidden?.((h) => {
@@ -854,59 +1244,15 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
       visit?.close();
       if (shell.mode === 'play' && !shell.paused) shell.openPause();
       audio.setPaused(true);
-      saveOnHide();
     }
   });
-  window.addEventListener('pagehide', saveOnHide);
-  document.addEventListener('visibilitychange', saveOnHide);
-  window.addEventListener('keydown', hqKeys, true);
-  // 오락실 오프닝: 제목 화면에서 20초 가만히 있으면 opening 영상, 끝나면 다시 기다린다. 아무 입력이나 대기 시간을 처음부터
-  let openingT: ReturnType<typeof setTimeout> | null = null;
   const cancelStoryForScene = () => {
-    if (openingT) clearTimeout(openingT);
-    openingT = null;
     story.cancel();
-    openingOn = false;
-    const menuEl = shell.stage.root.querySelector<HTMLElement>('.gs-ui');
-    if (menuEl) menuEl.style.visibility = '';
-    storyRoot.style.zIndex = '15';
     storyRoot.style.visibility = shell.paused ? 'hidden' : '';
   };
-  const armOpening = () => {
-    if (openingT) clearTimeout(openingT);
-    openingT = null;
-    // 필드: 오프닝 영상은 차원 승강기 이야기라 틀지 않는다
-    if (bridge?.visit || !VIDEOS.opening || !canFilm()) return;
-    openingT = setTimeout(() => {
-      openingT = null;
-      if (shell.mode !== 'title' || story.isBlocking()) return armOpening();
-      // 제목 메뉴(DOM)가 영상 위를 덮지 않게 도는 동안 숨긴다
-      const menuEl = shell.stage.root.querySelector<HTMLElement>('.gs-ui');
-      if (menuEl) menuEl.style.visibility = 'hidden';
-      storyRoot.style.visibility = ''; // 제목 메뉴가 열려 있는 동안은 '멈춤'이라 영상 층이 숨어 있다
-      storyRoot.style.zIndex = '60'; // 제목 그림·메뉴 층 위로
-      openingOn = true;
-      story.cutscene('opening', () => {
-        openingOn = false;
-        if (menuEl) menuEl.style.visibility = '';
-        storyRoot.style.zIndex = '15';
-        if (shell.paused) storyRoot.style.visibility = 'hidden';
-        if (shell.mode === 'title') armOpening();
-      });
-    }, 20000);
-  };
-  // 오프닝 중엔 아무 입력이나 건너뛰기, 대기 중엔 대기 시간을 처음부터
-  const titleInput = (e: Event) => {
-    if (openingOn) {
-      story.skip();
-      e.preventDefault();
-      e.stopImmediatePropagation();
-    } else if (openingT && shell.mode === 'title') armOpening();
-  };
-  window.addEventListener('keydown', titleInput, true);
-  window.addEventListener('pointerdown', titleInput, true);
   // 에일린 테스트룸 전투의 소리는 화면 효과 없이 소리만
-  eileenHooks.sfx = (e) => audio.event(e as never);
+  fighterHooks.sfx = (e) => audio.event(e as never);
+  fighterHooks.openDraft = (p, offers) => openDraft(shell.canvas.parentElement ?? document.body, p, { world, offers });
   const listeners: ((e: GameEvent) => void)[] = [
     (e) => {
       audio.event(e as never);
@@ -914,49 +1260,40 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
       shell.fx.onGameEvent(e as never);
       story.event(e.type, e as never);
       if (e.type === 'run:end') saveFlags();
-      if (e.type === 'enter:floor' && world) {
-        const f = world.floor;
-        if (f.id.startsWith('ending')) cutOnce('exit');
-        else if ((f.depth ?? 0) >= 2) cutOnce('first_call');
-      }
     },
   ];
   const mods: EngineModules = {
-    saveCheckpoint: v => { markSaved(); session.setCheckpoint(v); },
     frozen: () => ffx.frozen(),
-    stages: [elevator, trainingStage, dummyStage, arenaStage, itemStage, sparStage],
+    stages: [trainingStage, dummyStage, arenaStage, itemStage, sparStage],
     enemyFactory,
     hq,
     hqLayer: () => shell.stage.ui,
     hud: false,
-    blocking: () => !!visit?.isOpen() || story.isBlocking() || itemsBlocking() || !floorBox.hidden || npc.isOpen() || mapOpen,
+    blocking: () => !!visit?.isOpen() || story.isBlocking() || !floorBox.hidden || npc.isOpen() || !!fieldShop?.isOpen(),
     covered: () => story.isVideoPlaying(),
     listeners,
     surface: { canvas: shell.canvas, ctx: shell.ctx },
     paused: () => shell.paused,
     openTitle: () => {
       cancelStoryForScene();
-      world = null; // 지난 본부 영상 예약도 다음 화면을 가리지 않게 한다.
-      mapOpen = false;
+      world = null;
       shell.openTitle();
-      armOpening();
     },
     onPlay: () => shell.play(),
     frame: (dt) => {
       // 터치판 모드를 한 곳에서 정한다 (모바일 조작 설계 2026-10-28): 본부 창(임무 창구 등)·승강기 층 단추·NPC 대화창·방문 대화·메뉴가 뜨면
       // 「대사창 모드」(선택·취소 + 스틱 ↑↓, 선택지 글자 직접 누르기도 됨). 영상이 도는 동안만 숨긴다
-      const dialogUp = (!!game?.inHub && (!!hq.isOpen?.() || !floorBox.hidden)) || npc.isOpen() || !!visit?.isOpen() || shell.menu.isOpen;
+      const dialogUp = (!!game?.inHub && (!!hq.isOpen?.() || !floorBox.hidden)) || npc.isOpen() || !!visit?.isOpen() || shell.menu.isOpen || charWin.open;
       shell.touch.setMode(dialogUp ? 'dialog' : 'play');
       shell.touch.setVisible(!story.isVideoPlaying() && (shell.mode === 'play' || shell.menu.isOpen));
       // 못 씀(흐림·자리 유지): 에일린 전투 몸이 아니면 전투 버튼, 싸움이 없으면 AUTO
       const fighter = !!(world?.player as { core?: unknown } | undefined)?.core;
       for (const id of ['light', 'heavy', 'dodge', 'block', 'unique', 'ult'] as const) shell.touch.setOff(id, !fighter);
-      shell.touch.setOff('auto', !pilot.on && !AutoPilot.fight(world));
       ffx.opt = { shake: shell.settings.shake, flash: shell.settings.flash, numbers: shell.settings.numbers };
       ffx.update(shell.paused ? 0 : dt);
       { const o = ffx.camera(); shell.canvas.style.translate = o.x || o.y ? `${o.x}px ${o.y}px` : ''; }
       syncVolume();
-      audio.setPaused(hiddenNow || (shell.paused && !openingOn));
+      audio.setPaused(hiddenNow || shell.paused);
       audio.setCutscene(story.isVideoPlaying());
       story.update(dt);
       shell.frame(dt);
@@ -980,27 +1317,35 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
       let cardEnd = 0;
       if (game?.inHub && !mods.blocking?.() && !shell.paused) {
         const me = hq.visitor();
-        const name = me.name || (testPlayerFace() ? '에일린' : '방문자');
-        const face = (me.agentId && visitAgentFaceCanvas(name, 34)) || testPlayerFace(64, w.player.dir < 0) || visitAgentFaceCanvas('쟈알디', 34);
+        const name = me.name || (w.player instanceof FighterPlayer ? w.player.label : '방문자');
+        const face = w.player instanceof FighterPlayer ? charFace(w.player.art.key, 64, w.player.dir < 0) : null;
         // 좌상단 초상화 상자 (사용자 2026-10-25: 위 목표 띠 대신)
-        shell.hud.drawFieldCard(ctx, { name, face, hp: w.player.hp, maxHp: w.player.hpMax, gauge: w.player.gauge, compact: hs.compact, top: true, items: hs.items, device: hs.device }, dt);
+        shell.hud.drawFieldCard(ctx, { name, face, hp: w.player.hp, maxHp: w.player.hpMax, gauge: w.player.gauge, compact: hs.compact, top: true, items: hs.items, device: hs.device, status: hs.status }, dt);
         // 오른쪽 위 필드 시각·장소·잔고 (관찰 창이 켜져 있으면 그 자리라 숨김)
         if (!observerOn()) shell.hud.drawFieldCorner(ctx, hs.field, hs.compact);
       }
       // 왼쪽 아래 기술 칸 줄 (에일린): 터치 버튼이 있으면 그 자리라 숨긴다. 자막은 그 오른쪽에
-      const core = (w.player as { core?: { P: Record<string, any> } }).core;
+      const core = (w.player as { core?: { P: Record<string, any>; CH: Record<string, any>; has: (id: string) => boolean } }).core;
       if (core && !shell.touchShown && !mods.blocking?.() && !shell.paused) {
         const P = core.P, clip = P.clip?.id as string | undefined, off = ['down', 'belly', 'stun'].includes(P.mode);
         const lv = P.charge >= 2 ? 3 : P.charge > 1.3 ? 2 : P.charge > 0.5 ? 1 : 0;
         const key = (b: string) => { const c = Object.keys(KEYMAP).find((k) => KEYMAP[k] === b); return c ? c.replace(/^Key/, '') : '?'; };
-        cardEnd = shell.hud.drawSkillBox(ctx, { compact: hs.compact, slots: [
+        // 11-01 고침: 그 인물 설정(CH.skills·bal.cd)대로 — 총 없는 인물은 사격 칸 없음, 기술·충전 없는 인물은 그 칸 없음, 쿨타임·남은 횟수 실제 값, 쓰는 중 판정은 그 기술의 줄
+        const sk = (core.CH.skills ?? {}) as Record<string, { name?: string; anim?: string; hold?: string; release?: string } | undefined>;
+        const cdOf = (k: string) => { const left = Math.max(0, ((P.cd?.[k] as number | undefined) ?? 0) - P.t), base = (core.CH.bal?.cd?.[k] as number | undefined) ?? 0; return { left, frac: base > 0 ? left / base : left > 0 ? 1 : 0 }; };
+        const shotCd = cdOf('shot'), shotBase = (core.CH.bal?.cd?.shot as number | undefined) ?? 0;
+        const skCd = cdOf('skill'), skMax = (P.skillMax as number | undefined) ?? 1;
+        const skillActive = !!sk.skill?.anim && clip === sk.skill.anim, superActive = !!sk.super?.anim && clip === sk.super.anim;
+        const slots: PixelSlot[] = [
           { key: key('light'), icon: 'punch', name: '약공', cd: 0, off, active: ['9', '10', '11'].includes(clip ?? '') },
           { key: key('heavy'), icon: 'kick', name: '강공', cd: 0, off, active: clip === '12' },
-          { key: key('shoot'), icon: 'gun', name: '사격', cd: P.overT > 0 ? P.overT / 2.6 : 0, cdText: P.overT > 0 ? P.overT.toFixed(1) : undefined, off, active: clip === '15', bar: P.heat / 100, hot: P.overT > 0 || P.heat > 70 },
-          { key: key('charge'), icon: 'bolt', name: '충전', cd: 0, off, active: P.mode === 'charge', bar: P.mode === 'charge' ? P.charge / 2.2 : undefined, badge: P.mode === 'charge' && lv ? ['', '1', '2', 'MAX'][lv] : undefined },
-          { key: key('skill'), icon: 'wave', name: '기술', cd: 0, off, active: clip === '22_1' },
-          { key: key('super'), icon: 'star', name: '필살', cd: 0, off: off || P.sp < 100, full: P.sp >= 100, bar: P.sp / 100 },
-        ] }, dt);
+        ];
+        if (core.has('15') && !P.noShoot) slots.push({ key: key('shoot'), icon: 'gun', name: '사격', cd: P.overT > 0 ? P.overT / 2.6 : shotBase >= 1 ? shotCd.frac : 0, cdText: P.overT > 0 ? P.overT.toFixed(1) : shotBase >= 1 && shotCd.left > 0 ? shotCd.left.toFixed(1) : undefined, off, active: clip === '15', bar: P.heat / 100, hot: P.overT > 0 || P.heat > 70 });
+        if (sk.charge) slots.push({ key: key('charge'), icon: 'bolt', name: '충전', cd: 0, off, active: P.mode === 'charge', bar: P.mode === 'charge' ? P.charge / 2.2 : undefined, badge: P.mode === 'charge' && lv ? ['', '1', '2', 'MAX'][lv] : undefined });
+        if (sk.skill) slots.push({ key: key('skill'), icon: 'wave', name: '기술', cd: skMax > 1 ? (P.skillN >= 1 ? 0 : skCd.frac) : skCd.frac, cdText: (skMax > 1 ? P.skillN < 1 : true) && skCd.left > 0 ? skCd.left.toFixed(1) : undefined, off, active: skillActive, badge: skMax > 1 ? `${P.skillN}/${skMax}` : undefined });
+        slots.push({ key: key('super'), icon: 'star', name: '필살', cd: 0, off: off || P.sp < 100, full: P.sp >= 100, bar: P.sp / 100 });
+        const caption = skillActive ? sk.skill?.name : superActive ? sk.super?.name : P.mode === 'charge' ? sk.charge?.name : undefined;
+        cardEnd = shell.hud.drawSkillBox(ctx, { compact: hs.compact, slots, ...(caption ? { caption } : {}) }, dt);
       }
       if (!game?.inHub) shell.hud.draw(ctx, { ...hs, messageLeft: cardEnd }, dt); // 본부에서는 전투 HUD 없음
       else if (!mods.blocking?.() && !shell.paused) {
@@ -1009,16 +1354,16 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
         const sp = (w.stage as { speech?: () => { who: string; text: string; x: number; y: number; top: number } | null }).speech?.();
         if (sp) shell.hud.drawSpeech(ctx, { x: toX(sp.x), y: toY(sp.y + sp.top) - 6, who: sp.who, text: sp.text, compact: hs.compact });
         else if (hs.message) {
-          const p = w.player, head = (hasTestPeople() ? testPlayerTop() : -230) * persp(p.y);
+          const p = w.player, head = heroTop(p) * persp(p.y);
           shell.hud.drawSpeech(ctx, { x: toX(p.x), y: toY(p.y - p.z + head) - 10, who: '', text: hs.message, compact: hs.compact });
         }
       }
       // 방어 게이지: 캐릭터 머리 위, 막는 중·회복 중에만 (가득 차면 천천히 사라진다)
-      const ep = w.player instanceof EileenPlayer ? w.player : null;
+      const ep = w.player instanceof FighterPlayer ? w.player : null;
       if (ep && !mods.blocking?.() && !shell.paused) {
         const show = ep.guard < 99.5 || ep.core.P.mode === 'block';
         guardA = show ? Math.min(1, guardA + dt * 8) : Math.max(0, guardA - dt * 2.5);
-        const z = view.zoom, head = testPlayerTop() * persp(ep.y);
+        const z = view.zoom, head = heroTop(ep) * persp(ep.y);
         const gx = (ep.x - w.drawCamX - view.crop) * z, gy = (ep.y - ep.z + head * 0.92 - view.cropY) * z - 12;
         drawGuardBar(ctx, gx + 5, gy, ep.guard / 100, ep.guardBroken, guardA, performance.now() / 1000);
       }
@@ -1026,7 +1371,7 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
       const tg = game?.inHub && !mods.blocking?.() && !shell.paused ? (w.stage as { nearInfo?: () => { text: string; locked: boolean } | null }).nearInfo?.() : null;
       if (tg) {
         const p = w.player, z = view.zoom;
-        const head = (hasTestPeople() ? testPlayerTop() : -230) * persp(p.y);
+        const head = heroTop(p) * persp(p.y);
         const sx = (p.x - w.drawCamX - view.crop) * z, sy = (p.y - p.z + head * 0.72 - view.cropY) * z;
         const half = 46 * persp(p.y) * 1.15 * z;
         const side: 1 | -1 = sx > ctx.canvas.width - 320 ? -1 : 1;
@@ -1034,15 +1379,10 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
         shell.hud.drawPrompt(ctx, { x: sx + side * (half + 18), y: sy, side, key, text: tg.locked ? `${tg.text} · 잠김` : tg.text, locked: tg.locked, compact: hs.compact });
       }
       ffx.drawScreen(ctx);
-      if (shell.paused) mapOpen = false;
-      if (!game?.inHub && w.stage === elevator) {
-        const m = elevator.mapView();
-        const t = performance.now() / 1000;
-        // 폰처럼 화면이 작게 줄면 지도 글자·표식을 그만큼 키운다
-        const U = Math.min(2.2, Math.max(1, 1280 / Math.max(1, shell.canvas.clientWidth || 1280)));
-        if (m && mapOpen) drawRunMap(ctx, m, w.player.x, t, U);
-        else if (m) drawMiniMap(ctx, m, w.player.x, t, U);
-      } else mapOpen = false;
+      if (charWin.open) {
+        const me = Object.values(AGENT_NPCS).find((n) => n.name === w.player.label);
+        charWin.draw(ctx, charWindowData(w, hs, me?.role.split('.')[0].replace(/ 선임.*$/, ' 선임') ?? '', fieldShop?.state().bag ?? {}));
+      }
       syncNavigationButton(shell.canvas, hs.navigation);
       shell.touch.setGauge(w.player.gauge / 100);
       shell.fx.drawTransition(ctx);
@@ -1057,59 +1397,26 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
       if (world) world.paused = p;
     },
     onWorld: (w, run) => {
-      // 괴이 안으로 들어갔다: 장부에 남긴다 (끝날 때 결과 한 줄이 더 들어간다)
-      if (bridge?.field && (run as { stageId?: string }).stageId !== 'hq') {
-        const label = String((run as { stageId?: string }).stageId ?? '괴이');
-        void bridge.field.record({ kind: 'enter_anomaly', text: `작전 투입: ${label}`, weight: 3, fact: { key: '작전', value: `투입 중 (${label})` } }).catch(() => {});
-        w.on((e) => {
-          if (e.type !== 'run:end') return;
-          const how = (e as unknown as { how: string }).how;
-          const text = `작전 종료 (${how === 'evac' ? '후송' : how === 'withdraw' ? '철수' : '귀환'}): ${label}, 처치 ${w.kills}, 부상 ${Math.max(0, Math.round(w.player.hpMax - w.player.hp))}`;
-          void bridge.field!.record({ kind: 'exit_anomaly', text, weight: 3, fact: { key: '작전', value: `종료 (${how === 'evac' ? '후송' : how === 'withdraw' ? '철수' : '귀환'})` } }).catch(() => {});
-          reportSay = !!bridge.field?.lastReport;
-        });
-      }
-      if (reportSay && (run as { stageId?: string }).stageId === 'hq' && bridge?.field?.lastReport) {
-        reportSay = false;
-        void bridge.field.lastReport().then((r) => r && world === w && w.say(`보고서가 기록에 저장됐어요: ${r.title}`, 4)).catch(() => {});
-      }
       cancelStoryForScene();
       world = w;
-      if (w.player instanceof EileenPlayer) w.player.auto = pilot;
       runAgent = run.agent as AgentId;
-      // 첫 출동: 도트 영상 first_entry, 끝나면 로프 안내 자막 한 줄 (영상을 못 틀면 자막만)
-      if (run.stageId !== 'hq' && (run as Launch).launch && !story.flags.told_rope) {
-        story.flags.told_rope = 1;
-        const rope = () => world === w && w.say('(잼트리) 타고 온 걸로는 못 돌아와요. 귀환은 다락방 로프.', 3);
-        if (!cutOnce('first_entry', () => setTimeout(rope, 1200))) setTimeout(rope, 4600);
-      }
-      // 새 저장의 첫 본부: first_day (첫 출동 영상과 사이에 본부를 한 번 걷게 된다)
-      // The rebuilt starting room is shown immediately. The old full-frame first_day
-      // film is retired until its replacement uses the new room and layered staging.
       w.hitFx = false; // 맞을 때 효과는 껍데기 fx가 그린다
       if (run.stageId === 'hq') return void npc.attach(w, { hub: (hq.hub?.() ?? null) as never, hq: true }); // 본부 걷기: 아이템·대사 안내·전투 기록 없음
-      w.notes.runId = (run as Launch).launch?.runId;
-      // 승강기 안내 방송은 층 모듈 hooks를 대사 모듈이 채우면 거기서 나온다 (여기서 따로 부르지 않음: 중복)
-      w.on((e) => {
-        if (e.type === 'hp:low') w.notes.bigHit = true;
-      });
-      // 진압 임무: 쓰러뜨린 수호자 종류를 남긴다
-      const bossesDown = new Set<number>();
-      w.hooks.push(() => {
-        for (const bd of w.bodies) {
-          if (!(bd as { boss?: boolean }).boss || bossesDown.has(bd.id) || bd.hp > 0) continue;
-          bossesDown.add(bd.id);
-          ((w.notes.bosses ??= []) as string[]).push(bd.kind);
-        }
-      });
       w.threat = (b) => (DEF_BY_KIND[b.kind] ? isThreat(b as never) : true);
-      bindEnemyInteractions(w);
       w.on((e) => {
+        // 임시 퍽(src/game/perks): 층(방)에 들어감 · 전투를 끝냄
+        // 방 보상: 전투가 끝나면 카드가 떨어지고(괴이 판 진행 중일 때만), 안 집고 다음 방으로 가면 그때 3택1 창
+        if (w.player instanceof FighterPlayer && e.type === 'enter:floor') { if (w.player.reward) w.player.takeReward(); w.player.perks.roomEnter(); }
+        if (w.player instanceof FighterPlayer && e.type === 'combat:clear') { w.player.perks.roomClear(); w.player.dropReward(); }
         if (e.type !== 'custom') return;
-        const d = (e.data ?? {}) as { dmg?: number; text?: string };
-        if (e.name === 'evac' && !w.ended) w.ended = 'evac';
-        else if (e.name === 'hurtPlayer') w.api.hurtPlayer(d.dmg ?? 10);
-        else if (e.name === 'debuff' && d.text) w.say(d.text, 1.5);
+        const d = (e.data ?? {}) as { dmg?: number; text?: string; kind?: string; ticks?: number; debuff?: { kind?: string; ticks?: number } };
+        // 디버프는 글자만이 아니라 실제로 건다 (src/game/combat/status.ts, 에일린)
+        const st = (w.player as { status?: StatusSet }).status;
+        const dur = ((w.player as { stat?: { statusDur: number } }).stat?.statusDur ?? 1) * (w.player instanceof FighterPlayer ? w.player.perks.inDur() : 1);   // 정신력(정)으로 지속이 줄어듦 · 퍽 내성
+        const put = (k?: string, ticks?: number) => { if (st && k && k in STATUS) st.apply(k as DebuffKind, ticks ? (ticks / 30) * dur : undefined); };
+        // 회피·무적으로 피했으면 디버프도 안 건다(10-30: 피해는 0인데 출혈 등이 걸리던 버그)
+        if (e.name === 'hurtPlayer') { if (w.api.hurtPlayer(d.dmg ?? 10) !== false) put(d.debuff?.kind, d.debuff?.ticks); }
+        else if (e.name === 'debuff') { put(d.kind, d.ticks); if (d.text) w.say(d.text, 1.5); }
       });
       const items = linkItems(w, run);
       npc.attach(w, { items, hq: false });
@@ -1117,54 +1424,26 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
       w.hooks.push(() => items.tick());
       w.underlays.push((c, camX) => items.draw(c, camX));
     },
-    toHqResult,
-    afterRun: (how, done) => {
-      let fired = false;
-      const once = () => (fired ? undefined : ((fired = true), done()));
-      // 첫 후송 = evac, 첫 로프 귀환(귀환·철수) = attic. 그 밖엔 영상 없이 바로 정산. 첫 임무 성공이면 정산 창을 닫은 뒤 dinner
-      if (how === 'return' && world?.notes.missionDone !== false) dinnerDue = !story.flags.cut_dinner;
-      if (!cutOnce(how === 'evac' ? 'evac' : 'attic', once)) once();
-    },
     drawIdle: (name, ctx, t) => {
-      if (name === 'title') bridge?.visit ? drawTitleBg(ctx, t, VISIT_TITLE.title, VISIT_TITLE.sub) : drawTitleBg(ctx, t);
+      if (name === 'title') drawTitleBg(ctx, t, VISIT_TITLE.title, VISIT_TITLE.sub);
     },
-    boot: (g) => { void Promise.all([session.ready, hq.visitReady]).then(() => { elevator.reloadMeta(); if (bridge?.visit || !bootFromUrl(g)) g.toTitle(); }); return true; },
+    boot: (g) => { void hq.visitReady.then(() => { if (bridge?.visit || !bootFromUrl(g)) g.toTitle(); }); return true; },
     dispose: () => {
-      window.removeEventListener('pagehide', saveOnHide);
-      document.removeEventListener('visibilitychange', saveOnHide);
       offHidden?.();
       hq.dispose();
       npc.dispose();
-      unmountItems();
-      const g = globalThis as { __goeiStory?: unknown; __goeiStoryStart?: unknown; __goeiNpc?: unknown; __goeiStage?: unknown };
-      // 시험용 손잡이도 놓는다: 남겨 두면 닫은 게임 하나(캔버스·엔진)가 다음에 열 때까지 그대로 남는다 (2026-10-28 QC)
-      if (g.__goeiStage === shell.stage) delete g.__goeiStage;
-      const gt = globalThis as { __goeiTouch?: unknown; __goeiInput?: unknown };
-      if (gt.__goeiTouch === shell.touch) delete gt.__goeiTouch;
-      if (gt.__goeiInput === shell.input) delete gt.__goeiInput;
-      eileenHooks.sfx = noSfx; // 모듈 수준 함수로: 여기서 새 화살표를 만들면 그 함수가 이 장면(shell)을 다시 붙잡는다
-      const fx = globalThis as { __goeiFieldFx?: unknown };
-      if (fx.__goeiFieldFx === ffx) delete fx.__goeiFieldFx;
+      const g = globalThis as { __goeiStory?: unknown; __goeiStoryStart?: unknown; __goeiNpc?: unknown };
       delete g.__goeiStory;
       delete g.__goeiNpc;
       delete g.__goeiStoryStart;
       world = null;
       game = null;
       window.removeEventListener('keydown', storyKeys, true);
-      offMapKey();
-      offAutoKey();
-      offTalkKey();
-      if ((globalThis as { __goeiAuto?: unknown }).__goeiAuto === pilot) delete (globalThis as { __goeiAuto?: unknown }).__goeiAuto;
-      window.removeEventListener('keydown', titleInput, true);
-      window.removeEventListener('pointerdown', titleInput, true);
-      if (openingT) clearTimeout(openingT);
-      window.removeEventListener('keydown', hqKeys, true);
+      window.removeEventListener('pointerdown', charWinTap, true);
       window.removeEventListener('keydown', floorKeys, true);
-      hq.dispose();
       saveFlags();
       storyRoot.removeEventListener(VIDEO_AUDIO_EVENT, attachVideoAudio);
       story.dispose();
-      setLineProvider(null);
       visit?.dispose();
       setPixelScale(2.75);
       audio.dispose();
@@ -1180,7 +1459,7 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
   };
 }
 
-/** 시작 꼬리표 (게임_통합_규격 1장): ?start=hq | stage=elevator|training|dummy | arena | items | story=<장면> */
+/** 시작 꼬리표 (게임_통합_규격 1장): ?start=hq | stage=training|dummy|spar | arena | items | story=<장면> */
 function bootFromUrl(g: Game): boolean {
   let q: URLSearchParams;
   try {

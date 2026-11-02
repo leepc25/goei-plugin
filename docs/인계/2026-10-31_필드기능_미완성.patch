@@ -1,0 +1,41 @@
+diff --git a/src/game/world/actors.ts b/src/game/world/actors.ts
+index 25f22a7ce..8de069a04 100644
+--- a/src/game/world/actors.ts
++++ b/src/game/world/actors.ts
+@@ -150,6 +150,12 @@ export interface Actor {
+   escort?: string;
+   /** 방문자: 경계 거점에 머문 초 (경고 → 내보냄) */
+   stay?: number;
++  /** 동행 (10-31 사용자 「전부 만들어야지」, 필드 기능 7장): 주인공을 따라 걷는 중. 욕구·할 일은 멈춘다 */
++  following?: boolean;
++  /** 「기다려」: 그 자리에 남아 기다린다 (할 일을 고르지 않음) */
++  hold?: boolean;
++  /** 동행 중 싸움 거들기: 때릴 전투 몸 자리, 다음 타격까지 초 */
++  assist?: { x: number; y: number; t: number } | null;
+ }
+ 
+ /** 훈련장 장비 하나 (10-31 사용자: 샌드백·허수아비·사격 과녁. 그림은 일단 코드, 나중에 교체) */
+@@ -224,7 +230,11 @@ export type SimEvent =
+   /** 그 싸움에서 한쪽이 쓰러지거나 달아남 */
+   | { kind: 'brawlEnd'; scene: string; winner: string; loser: string; how: 'down' | 'fled' }
+   /** 경계: 방문자를 내보냄 */
+-  | { kind: 'expel'; scene: string; who: string; by: string };
++  | { kind: 'expel'; scene: string; who: string; by: string }
++  /** 말풍선 칸 하나 (speech.ts speakCell). cell = game-src/dialogue2 칸 열쇠, ctx = 그 순간 정보(say = 대사 자료가 없을 때 쓸 글) */
++  | { kind: 'cue'; scene: string; who: string; id: string; cell: string; ctx?: Record<string, string> }
++  /** 동행 시작·끝 (follow·wait·return·hit = 맞아서 그만둠) */
++  | { kind: 'follow'; scene: string; who: string; mode: 'follow' | 'wait' | 'return' | 'hit' };
+ 
+ export interface SimOptions {
+   spawns?: SpawnRule[];
+@@ -244,6 +254,10 @@ export interface SimOptions {
+ }
+ 
+ const WALK = 150;
++/** 동행 인원 상한 (core/fieldfollow MAX_FOLLOWERS 와 같음) */
++export const MAX_FOLLOW = 4;
++/** 동행: 주인공 뒤 첫 사람 거리, 사람마다 더 벌어지는 거리 */
++const FOLLOW_GAP = [95, 55] as const;
+ const MARGIN = 60;
+ const NOTICE_PX = 280;
+ /** 한 장면에 남는 시체 상한 (넘치면 오래된 것부터 치움) */

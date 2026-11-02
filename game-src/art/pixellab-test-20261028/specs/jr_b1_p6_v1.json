@@ -1,0 +1,178 @@
+{
+ "name": "jr_b1_p6_v1",
+ "room": "corridor",
+ "mood": "worn",
+ "doors": 0,
+ "mode": "loose",
+ "view": "corridor",
+ "floor_share": "the lower 30 percent",
+ "sides": "none",
+ "density": "packed+",
+ "place": "a run-down 1990s Seoul underground arcade corridor, low ceiling right above the sign",
+ "time": "night",
+ "light": "half-dead fluorescent tubes and warm shop light",
+ "floor": "smooth dark poured concrete like one wet sheet, mottled grime, oil stains, puddles, varied litter all over the walkway, light pool, shadows under objects",
+ "walls": "grimy concrete, rust, mold, cracks; ceiling strip, tangled cables, fluorescent tubes, one dead, one flickering",
+ "shadow": "strong contrast, bright cluttered shop, dark edges, black shadow under the stand",
+ "palette": "dark grey and beige, warm yellow shop light, blue sign accent",
+ "no": [
+  "doors",
+  "stairs",
+  "side walls"
+ ],
+ "brief": {
+  "wiki": "중림 지하상가: 낡은 점포, 손님 없는 매대",
+  "design": "GPT 의뢰문 ⑥: 열린 잡화점 「금성생활」(작은 선풍기·전열기·잡동사니가 넘치게 쌓인 가게, 가게 앞 통로 바닥까지 삐져나온 매대와 쌓인 상자), 간판 둥근 판. 설계안: 임시 매대·쌓인 상자·쓰레기통·분리수거·공조·우산통",
+  "user": [
+   "②~⑤와 같은 가이드 v6(사용자 「1, 6, 7 전부 뽑아」)",
+   "사용자 10-31: 간판이 전부 똑같이 생김·색도 똑같음 → 앞으로 뽑을 것은 간판 모양·색을 칸마다 다르게"
+  ],
+  "items": [
+   {
+    "src": "GPT 의뢰문: 금성생활·선풍기·전열기·잡동사니",
+    "by": [
+     1
+    ]
+   },
+   {
+    "src": "GPT 의뢰문: 매대·쌓인 상자",
+    "by": [
+     2,
+     3
+    ]
+   },
+   {
+    "src": "설계안: 쓰레기통·분리수거·공조·우산통",
+    "by": [
+     5,
+     6,
+     7
+    ]
+   },
+   {
+    "src": "사용자: 쓰레기 제각각",
+    "by": [
+     4
+    ]
+   },
+   {
+    "src": "사용자: 이음매 비움",
+    "by": [
+     0,
+     9
+    ]
+   },
+   {
+    "src": "위키: 반쯤 꺼진 형광등",
+    "by": "칸:walls dead"
+   }
+  ]
+ },
+ "must": [
+  {
+   "kw": "reading \"금성생활\"",
+   "from": "가게 이름"
+  },
+  {
+   "kw": "one wet sheet",
+   "from": "사용자 바닥 선 금지"
+  }
+ ],
+ "sized": [],
+ "items": [
+  {
+   "full": "left 10 percent of the image: only bare back wall and floor, no side wall",
+   "text": "left 10 percent of the image: only bare back wall and floor, no side wall",
+   "why": "사용자 이음매: 앞 기둥 자리",
+   "keep": [
+    "left 10 percent"
+   ]
+  },
+  {
+   "full": "back wall, centered: a big open general store filling the middle 80 percent of the width, recessed like a deep lit room, overflowing with small electric fans, space heaters, kettles, plastic baskets and junk, a round blue sign with white letters reading \"금성생활\"",
+   "text": "back wall, centered: a big open general store filling the middle 80 percent of the width, recessed like a deep lit room, overflowing with small electric fans, space heaters, kettles, plastic baskets and junk, a round blue sign with white letters reading \"금성생활\"",
+   "why": "GPT 의뢰문 ⑥ 금성생활(작은 선풍기·전열기·잡동사니), 사용자 10-31: 간판이 전부 똑같이 생김·색도 똑같음 → 앞으로 뽑을 것은 간판 모양·색을 칸마다 다르게: 둥근 파란 판",
+   "keep": [
+    "general store",
+    "small electric fans",
+    "space heaters",
+    "round blue sign",
+    "reading \"금성생활\""
+   ]
+  },
+  {
+   "full": "a display stand jutting onto the walkway, top and front visible, piled with boxed goods",
+   "text": "a display stand jutting onto the walkway, top and front visible, piled with boxed goods",
+   "why": "GPT 의뢰문 가게 앞 통로 바닥까지 삐져나온 매대, 설계안 임시 매대",
+   "keep": [
+    "display stand"
+   ]
+  },
+  {
+   "full": "stacked boxes spilling out beside the stand",
+   "text": "stacked boxes spilling out beside the stand",
+   "why": "GPT 의뢰문 쌓인 상자",
+   "keep": [
+    "stacked boxes"
+   ]
+  },
+  {
+   "full": "wall base right beside the store: collapsed cardboard, burst trash bag, crushed cans, each a different shape",
+   "text": "wall base right beside the store: collapsed cardboard, burst trash bag, crushed cans, each a different shape",
+   "why": "사용자 쓰레기 제각각",
+   "keep": [
+    "burst trash bag",
+    "each a different shape"
+   ]
+  },
+  {
+   "full": "an overflowing dented metal trash can, a recycle bin",
+   "text": "an overflowing dented metal trash can, a recycle bin",
+   "why": "설계안 쓰레기통·분리수거",
+   "keep": [
+    "trash can"
+   ]
+  },
+  {
+   "full": "a rusty air conditioner unit, tangled cables",
+   "text": "a rusty air conditioner unit, tangled cables",
+   "why": "설계안 공조",
+   "keep": [
+    "air conditioner"
+   ]
+  },
+  {
+   "full": "an umbrella stand",
+   "text": "an umbrella stand",
+   "why": "설계안 우산통 ×3(셋째)",
+   "keep": [
+    "umbrella stand"
+   ]
+  },
+  {
+   "full": "a torn blank poster on the wall",
+   "text": "a torn blank poster on the wall",
+   "why": "사용자: 벽 종이는 몇 군데만, 글자 없이",
+   "keep": [
+    "blank poster"
+   ]
+  },
+  {
+   "full": "right 10 percent of the image: only bare back wall and floor, no side wall",
+   "text": "right 10 percent of the image: only bare back wall and floor, no side wall",
+   "why": "사용자 이음매: 앞 기둥 자리",
+   "keep": [
+    "right 10 percent"
+   ]
+  }
+ ],
+ "review": {
+  "fit": "10줄: 잡화점·매대·상자·쓰레기·쓰레기통·실외기·우산꽂이·포스터. 문·의자·사람 없음",
+  "place": "가게 가운데, 매대는 가게 앞, 양끝 10% 비움",
+  "size": "크기 숫자 없음(느슨한 틀)",
+  "brief": "의뢰문·설계안 대응",
+  "meaning": "1차=2차(느슨한 틀)",
+  "over": "같은 물건 두 번 없음, packed+",
+  "frame": "통로, 옆벽 없음, 가이드 v6, 간판 둥근 파란 판, 팔레트 가게 빛 노랑"
+ }
+}

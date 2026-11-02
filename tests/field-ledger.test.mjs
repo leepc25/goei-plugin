@@ -46,7 +46,7 @@ test('막간: 이동 사건이 있으면 그 기준 메시지 뒤에 사건 줄�
   assert.ok(text.startsWith(INTERLUDE_HEAD));
   assert.ok(text.indexOf('사무실 → 복도') < text.indexOf('복도 → 휴게실'));
   assert.ok(!text.includes('Nothing else happened'));
-  assert.ok(text.includes('[Field facts]'));
+  assert.ok(text.includes('What happened in the field'));
 });
 
 test('막간: 이동 사건이 없으면 카드 규칙문이 그대로', () => {
@@ -76,4 +76,78 @@ test('기준 메시지가 사라진 사건은 막간과 확정 사실에서 빠�
 test('사건도 대화도 없으면 아무것도 바꾸지 않는다', () => {
   const req = [{ role: 'assistant', content: '사무실이다.' }, { role: 'user', content: '다음' }];
   assert.deepEqual(withInterludes(req, base(), null, '주인공'), req);
+});
+
+test('막간 영어 짧은 문장(10-31): 장소 머리, 이어진 이동·돈은 한 줄, {user}는 주인공 이름, 사실 키도', () => {
+  let c = base();
+  const add = (id, at, kind, text, extra = {}) => (c = withFieldEvent(c, { id, at, anchor: 'c1', kind, text, ...extra }));
+  add('m1', 1, 'move', '15:10 {user} moved to 종로 거리.', { scene: '종로 거리', fact: { key: '{user} location', value: '종로 거리' } });
+  add('m2', 2, 'move', '15:20 {user} moved to 종로 골목.', { scene: '종로 골목', fact: { key: '{user} location', value: '종로 골목' } });
+  add('t1', 3, 'trade', '15:21 Money: -1500 편의점 컵라면', { scene: '종로 골목' });
+  add('t2', 4, 'trade', '15:21 Money: -4500 편의점 담배', { scene: '종로 골목' });
+  add('f1', 5, 'provoke', '15:40 {user} attacked first: pedestrian A, B (fists). A knocked out; B fled.', { scene: '종로 골목', weight: 2 });
+  const out = withFieldFacts(withInterludes([{ role: 'assistant', content: '사무실이다.' }, { role: 'user', content: '다음' }], c, null, '데드폴'), c, '데드폴');
+  const text = out.find((m) => m.content.startsWith(INTERLUDE_HEAD)).content;
+  assert.match(text, /15:20 데드폴 moved to 종로 거리 → 종로 골목\./);
+  assert.match(text, /\[종로 골목\]\n15:20 데드폴 moved to 종로 거리 → 종로 골목\.\n15:21 Money \(won\): -1500 편의점 컵라면, -4500 편의점 담배\n15:40 데드폴 attacked first/);
+  assert.ok(!text.includes('{user}'));
+  const facts = out.find((m) => m.content.startsWith(FACTS_HEAD)).content;
+  assert.match(facts, /- 데드폴 location: 종로 골목/);
+});
+
+test('지난 막간은 큰일(weight 2 이상)만', () => {
+  let c = { ...base(), message: [{ role: 'char', data: '하나', chatId: 'c1' }, { role: 'user', data: '둘', chatId: 'c2' }, { role: 'char', data: '셋', chatId: 'c3' }] };
+  c = withFieldEvent(c, { id: 'a', at: 1, anchor: 'c1', kind: 'move', text: 'small', weight: 1 });
+  c = withFieldEvent(c, { id: 'b', at: 2, anchor: 'c1', kind: 'kill', text: 'big', weight: 3 });
+  c = withFieldEvent(c, { id: 'c', at: 3, anchor: 'c3', kind: 'move', text: 'latest small', weight: 1 });
+  const g = interludes(c);
+  assert.deepEqual(g[0].events.map((e) => e.text), ['big']);
+  assert.deepEqual(g[1].events.map((e) => e.text), ['latest small']);
+});
+
+test('모델 글(활동 결과)은 영어 text 만: 한글 ko·방문 시작/끝 표식은 안 들어간다', () => {
+  let c = base();
+  c = withFieldEvent(c, { id: 's', at: 1, anchor: 'c1', kind: 'enter_field', text: '{user} entered the field.', ko: '필드 입장', visit: 'v1' });
+  c = withFieldEvent(c, { id: 'm', at: 2, anchor: 'c1', kind: 'move', text: '15:10 {user} moved to 종로.', ko: '15:10 {user}: 종로(으)로 이동', scene: '종로', visit: 'v1' });
+  c = withFieldEvent(c, { id: 'x', at: 3, anchor: 'c1', kind: 'exit_field', text: '{user} left the field.', ko: '필드에서 나옴', visit: 'v1' });
+  const out = withInterludes([{ role: 'user', content: '출근' }, { role: 'assistant', content: '사무실이다.' }, { role: 'user', content: '다음' }], c, null, '민준');
+  const block = out.find((m) => m.content.startsWith(INTERLUDE_HEAD)).content;
+  assert.match(block, /15:10 민준 moved to 종로\./);
+  assert.ok(!/이동|필드 입장|필드에서 나옴|entered the field|left the field/.test(block), block);
+});
+
+test('가방 같은 확정 사실만 담은 줄은 [Field log]에 안 넣고 [Field facts]에만', () => {
+  let c = base();
+  c = withFieldEvent(c, { id: 'm', at: 1, anchor: 'c1', kind: 'move', text: '{user} moved to 종로.', scene: '종로' });
+  c = withFieldEvent(c, { id: 'f', at: 2, anchor: 'c1', kind: 'act', text: '{user} carrying: 컵라면×1', ko: '', fact: { key: '{user} carrying', value: '컵라면×1' } });
+  assert.deepEqual(interludes(c)[0].events.map((e) => e.id), ['m']);
+  const out = withFieldFacts([{ role: 'user', content: '다음' }], c, '민준');
+  assert.match(out[0].content, /- 민준 carrying: 컵라면×1/);
+});
+
+test('몹과 나눈 말도 이름 인물 대화처럼 원문 그대로 [Field log]에 (10-31)', () => {
+  const c = { ...base(), goeiHqVisitV1: { turns: [{ id: 't1', at: 5, agentId: 'mob:v1:mob13', name: '행인(여·20대 후반)', user: '저기요, 이 근처 사세요?', reply: '네? 저요? 아니요, 출근길이에요.', anchor: 'c1', room: '종로 뒷골목' }] } };
+  const out = withInterludes([{ role: 'user', content: '출근' }, { role: 'assistant', content: '사무실이다.' }, { role: 'user', content: '다음' }], c, null, '민준');
+  const block = out.find((m) => m.content.startsWith(INTERLUDE_HEAD)).content;
+  assert.match(block, /— with 행인\(여·20대 후반\) \(종로 뒷골목\) —/);
+  assert.match(block, /민준: 저기요, 이 근처 사세요\?/);
+  assert.match(block, /행인\(여·20대 후반\): 네\? 저요\? 아니요, 출근길이에요\./);
+});
+
+test('장부 상한: 넘치면 작은 일부터 버리고 큰일·확정 사실은 남는다 (11-01 1-7)', () => {
+  let c = base();
+  for (let i = 0; i < MAX_EVENTS + 20; i++) {
+    const big = i % 50 === 0;
+    c = withFieldEvent(c, { ...ev(`e${i}`, i, 'c1'), ...(big ? { kind: 'kill', weight: 3 } : {}), ...(i === 3 ? { fact: { key: 'bag', value: 'lost' } } : {}) });
+  }
+  const list = fieldRecord(c).events;
+  assert.equal(list.length, MAX_EVENTS);
+  // 큰일 7건(0,50,…,300)과 사실 1건(3)은 전부 남는다
+  for (const i of [0, 50, 100, 150, 200, 250, 300, 3]) assert.ok(list.some((e) => e.id === `e${i}`), `e${i} 남아야`);
+  // 작은 일은 가장 오래된 것부터 빠진다 (e1, e2 는 없고 뒤쪽은 있다)
+  assert.ok(!list.some((e) => e.id === 'e1'));
+  assert.ok(list.some((e) => e.id === `e${MAX_EVENTS + 19}`));
+  // 순서는 그대로
+  const ats = list.map((e) => e.at);
+  assert.deepEqual(ats, [...ats].sort((a, b) => a - b));
 });

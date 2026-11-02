@@ -1,0 +1,235 @@
+{
+ "frames": [
+  {
+   "filename": "fx-vanish 0.png",
+   "frame": {
+    "x": 0,
+    "y": 0,
+    "w": 52,
+    "h": 53
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 52,
+    "h": 53
+   },
+   "sourceSize": {
+    "w": 52,
+    "h": 53
+   },
+   "pivot": {
+    "x": 0.46153846153846156,
+    "y": 0.4528301886792453
+   },
+   "duration": 83
+  },
+  {
+   "filename": "fx-vanish 1.png",
+   "frame": {
+    "x": 52,
+    "y": 0,
+    "w": 52,
+    "h": 53
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 52,
+    "h": 53
+   },
+   "sourceSize": {
+    "w": 52,
+    "h": 53
+   },
+   "pivot": {
+    "x": 0.46153846153846156,
+    "y": 0.4528301886792453
+   },
+   "duration": 83
+  },
+  {
+   "filename": "fx-vanish 2.png",
+   "frame": {
+    "x": 104,
+    "y": 0,
+    "w": 52,
+    "h": 53
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 52,
+    "h": 53
+   },
+   "sourceSize": {
+    "w": 52,
+    "h": 53
+   },
+   "pivot": {
+    "x": 0.46153846153846156,
+    "y": 0.4528301886792453
+   },
+   "duration": 83
+  },
+  {
+   "filename": "fx-vanish 3.png",
+   "frame": {
+    "x": 0,
+    "y": 53,
+    "w": 52,
+    "h": 53
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 52,
+    "h": 53
+   },
+   "sourceSize": {
+    "w": 52,
+    "h": 53
+   },
+   "pivot": {
+    "x": 0.46153846153846156,
+    "y": 0.4528301886792453
+   },
+   "duration": 83
+  },
+  {
+   "filename": "fx-vanish 4.png",
+   "frame": {
+    "x": 52,
+    "y": 53,
+    "w": 52,
+    "h": 53
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 52,
+    "h": 53
+   },
+   "sourceSize": {
+    "w": 52,
+    "h": 53
+   },
+   "pivot": {
+    "x": 0.46153846153846156,
+    "y": 0.4528301886792453
+   },
+   "duration": 83
+  },
+  {
+   "filename": "fx-vanish 5.png",
+   "frame": {
+    "x": 104,
+    "y": 53,
+    "w": 52,
+    "h": 53
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 52,
+    "h": 53
+   },
+   "sourceSize": {
+    "w": 52,
+    "h": 53
+   },
+   "pivot": {
+    "x": 0.46153846153846156,
+    "y": 0.4528301886792453
+   },
+   "duration": 83
+  },
+  {
+   "filename": "fx-vanish 6.png",
+   "frame": {
+    "x": 0,
+    "y": 106,
+    "w": 52,
+    "h": 53
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 52,
+    "h": 53
+   },
+   "sourceSize": {
+    "w": 52,
+    "h": 53
+   },
+   "pivot": {
+    "x": 0.46153846153846156,
+    "y": 0.4528301886792453
+   },
+   "duration": 83
+  },
+  {
+   "filename": "fx-vanish 7.png",
+   "frame": {
+    "x": 52,
+    "y": 106,
+    "w": 52,
+    "h": 53
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 52,
+    "h": 53
+   },
+   "sourceSize": {
+    "w": 52,
+    "h": 53
+   },
+   "pivot": {
+    "x": 0.46153846153846156,
+    "y": 0.4528301886792453
+   },
+   "duration": 83
+  }
+ ],
+ "meta": {
+  "app": "PixelLab VFX Creator",
+  "image": "fx-vanish.png",
+  "format": "RGBA8888",
+  "size": {
+   "w": 156,
+   "h": 159
+  },
+  "scale": "1",
+  "anchor": {
+   "kind": "origin",
+   "x": 24,
+   "y": 24
+  },
+  "frameTags": [
+   {
+    "name": "fx-vanish",
+    "from": 0,
+    "to": 7,
+    "direction": "forward"
+   }
+  ]
+ }
+}

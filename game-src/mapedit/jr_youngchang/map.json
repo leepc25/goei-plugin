@@ -1,0 +1,406 @@
+{
+ "file": "youngchang_v2_632x424",
+ "bgScale": 2,
+ "w": 1264,
+ "h": 848,
+ "under": true,
+ "floor": [
+  [
+   0,
+   645
+  ],
+  [
+   130,
+   528
+  ],
+  [
+   300,
+   515
+  ],
+  [
+   1100,
+   515
+  ],
+  [
+   1264,
+   520
+  ],
+  [
+   1264,
+   849
+  ],
+  [
+   0,
+   849
+  ]
+ ],
+ "lane": [
+  515,
+  837
+ ],
+ "blocks": [
+  {
+   "poly": [
+    [
+     120,
+     515
+    ],
+    [
+     300,
+     515
+    ],
+    [
+     300,
+     570
+    ],
+    [
+     130,
+     574
+    ]
+   ],
+   "h": 999
+  },
+  {
+   "poly": [
+    [
+     55,
+     535
+    ],
+    [
+     214,
+     535
+    ],
+    [
+     214,
+     634
+    ],
+    [
+     55,
+     634
+    ]
+   ],
+   "h": 999
+  },
+  {
+   "poly": [
+    [
+     655,
+     512
+    ],
+    [
+     852,
+     512
+    ],
+    [
+     852,
+     552
+    ],
+    [
+     655,
+     552
+    ]
+   ],
+   "h": 999
+  },
+  {
+   "poly": [
+    [
+     835,
+     512
+    ],
+    [
+     1100,
+     512
+    ],
+    [
+     1100,
+     530
+    ],
+    [
+     835,
+     530
+    ]
+   ],
+   "h": 999
+  },
+  {
+   "poly": [
+    [
+     745,
+     668
+    ],
+    [
+     1142,
+     668
+    ],
+    [
+     1142,
+     766
+    ],
+    [
+     745,
+     766
+    ]
+   ],
+   "h": 999
+  },
+  {
+   "poly": [
+    [
+     1095,
+     515
+    ],
+    [
+     1264,
+     515
+    ],
+    [
+     1264,
+     660
+    ],
+    [
+     1095,
+     660
+    ]
+   ],
+   "h": 999
+  },
+  {
+   "poly": [
+    [
+     1162,
+     655
+    ],
+    [
+     1264,
+     655
+    ],
+    [
+     1264,
+     710
+    ],
+    [
+     1162,
+     710
+    ]
+   ],
+   "h": 999
+  },
+  {
+   "poly": [
+    [
+     0,
+     700
+    ],
+    [
+     58,
+     700
+    ],
+    [
+     58,
+     752
+    ],
+    [
+     0,
+     752
+    ]
+   ],
+   "h": 999
+  },
+  {
+   "poly": [
+    [
+     0,
+     786
+    ],
+    [
+     294,
+     786
+    ],
+    [
+     294,
+     849
+    ],
+    [
+     0,
+     849
+    ]
+   ],
+   "h": 999
+  },
+  {
+   "poly": [
+    [
+     1140,
+     782
+    ],
+    [
+     1264,
+     782
+    ],
+    [
+     1264,
+     849
+    ],
+    [
+     1140,
+     849
+    ]
+   ],
+   "h": 999
+  }
+ ],
+ "doors": {
+  "out": {
+   "kind": "door",
+   "x": 430,
+   "y": 512,
+   "to": "jr_b2",
+   "toDoor": "youngchang",
+   "label": "나가기",
+   "door": {
+    "x0": 348,
+    "x1": 512,
+    "y0": 180,
+    "y1": 508,
+    "anim": "swing",
+    "hinge": "L",
+    "behind": "dark"
+   }
+  }
+ },
+ "lamps": [
+  {
+   "x": 405,
+   "y": 22,
+   "kind": "down",
+   "r": 420
+  },
+  {
+   "x": 855,
+   "y": 22,
+   "kind": "down",
+   "r": 420
+  },
+  {
+   "x": 1060,
+   "y": 500,
+   "kind": "lamp",
+   "r": 200
+  }
+ ],
+ "objects": [
+  {
+   "id": "desk",
+   "name": "책상",
+   "file": "",
+   "x": 742,
+   "y": 510,
+   "w": 402,
+   "h": 260,
+   "sortY": 668,
+   "coverMask": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAZIAAAEECAIAAACN3yXzAAAFHUlEQVR4nO3d0VLbZhhFUZTh/V9ZvaDTpGmxRWzp/7ZZ6zaZieJBm4Mk7Lc34NvY933f99VH8agfqw8AAOCm+uaytoAY2YJvqru5ZAuIeV99AMAa27atPoQ/ZG0BMbIFxMgWECNbQIxsATGyBcTIFhAjW0CMbAExnpKfK/r7Ypyn+1z7c1lbQMyna2vCt/prvrdM+J/CER9fq2efF9f8K4+wtoCY0de2zqu+hUXXlZvrw7TlZW0BMaPX1ofnVt/O4jVMXkNns7aAmMDa+pWtBP/1rPOicn5ZW0BMbG0BZ7i9s6Y9yWVtATHWFnDInHuX1hYQI1vAl639RGvZAmI+/QG18gQHsNb117msLSDmTiZtLuC4a5aXtQXEyBbwNNfcYZQtIMa1LeBEZ1ztsraAGNkCTnTG1S7ZAmJkCzjdczeXbAExsgVc5FmbS7aAGNkCLvX45pItIEa2gAUe2VyyBcTIFhAjW0CMd4AARjj+XhHWFhAjW8AIx+8tyhYQI1vAIEc2l2wBMbIFjHN7c8kWECNbQIxsATGyBcTIFhAjW0CMbAExsgXEyBYQI1tAjGwBMbIFxMgWECNbQIxsATGyBcTIFhAjW0CMbAExsgXEyBYQI1tAjGwBMbIFxMgWECNbQIxsATHvqw8A4Hfbtt34U2sLiJEtIEa2gBjZAmJkC4iRLSBGtoAY2QJiZAuIkS0gRraAGNkCYmQLiJEtYJbbb//wJltAjvfbAka4O7L+YW0BMbIFxMgWEOPaFrDY8ataH6wtIEa2gBjZAmJkC4iRLSBGtoAY2QJiZAuIkS0gRraAGNkCYmQLiJEtIEa2gBjZAmJkC4iRLSBGtoAY2QJiZAuIkS0gRraAGNkCYmQLWGzf933fj/992QJifCo1sJhPpQZenGwBMbIFxMgWECNbQIxsATGyBcTIFhAjW0CMbAExsgXEyBYQI1tAjGwBMbIFxMgWECNbQIxsATGyBcTIFhAjW0CMbAExsgXEvH/pw2ABlrO2gBjZAmJkC4iRLSBGtoAY2QJiZAuIkS0gRraAmB/btm3btvowAI6ytoAY2QJiZAuIkS0gRraAmL+z5X4iUGFtATGyBcTIFhAjW0CMbAEx/8qW+4nAfNYWECNbQIxsATGyBcTIFhAjW0CMbAExsgXEyBYQ8z/Z8qw8MJm1BcTIFhAjW0CMbAExsgXEyBYQI1tAjGwBMbIFxNx5Gn7f92uOA+Dt7e3Ir+hYW0CMbAGD7Pt+94c82QJi3lcfAMBPrm0BL8jaAhb76hv8WVtAzJ1seadTYBprC4iRLSBGtoAY2QJiZAuIkS0gRraAmEPZ8vQWMIe1BcTIFhAjW0CMbAExsgXEyBYQI1tAjGwBMbIFxHwhW56VByawtoAY2QJiZAuIkS0gRraAGNkCYmQLiJEtIEa2gJg/fOp93/fnHgfwzR3/JRxrC4h5X30AwO+u/OXf4k9O1hbM4g0L7pItGOQ7N2vf94PTT7Zgiu/crC9xJxFGmNCsOef17VfD2oL1JjQr5KEXa06boWtas+ac15+9MtYWrDStWQmyBcvMbNb8T42QLVhjeBomky1YQLOO+OxJLtmCq2nWg9xJhEu1mjXtHP949awtuE6rWWOd8iJOKzRMUGzWzHPZ2oIrFJs1lmzB6brNmvkMl2zBuQae9nWyBSd6jWZN21yyBWcZdaq/khNf1pn3IOAar92stWe3tQXP99rNWu71X1yjj4tp1tlef235GuJKvt4u8Be9JNcfAsrSaQAAAABJRU5ErkJggg=="
+  },
+  {
+   "id": "crate_l",
+   "name": "앞 나무 상자 왼쪽",
+   "file": "",
+   "x": 0,
+   "y": 726,
+   "w": 292,
+   "h": 122,
+   "sortY": 848,
+   "coverMask": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAASQAAAB6CAIAAACZaLmIAAACUUlEQVR4nO3cQVLbQABFQSvF/a+sLJxFUjiJbI+exlL3kgUlBE+fMS5utymt67qu69FXASP9OPoC4Cq+vn/o2UlZlmXQxcCZWTaI/LFs3zfNasEolg0iv5Ztqpf+proYGMWyQWTZMiNHndz2njgnUkqWDSIP/s42j72XZ9RyWki2sGwQ2XRme+LTXfIZ/9o9vOa9ujLLBpHBy/aOT3/Sb3n/jffoXJllg8hEr0Z+1unxfrV2ie0sG0QmWrax5jmL3s12PfQsG0QmejXymq556pv5Hbn7sWwQOe2ZbQ/bn7V+X3jnDpxv0+4sG0Qs2yZnfda+Zr/dPvd9tmwQsWz/8eyz9hyntf6rGLtp/77+o/bTskHEsj3w2pPPpn2Ko/7nt2WDiGUb4AprsLe/3cMznZktG0S8N/KxjQ/U9+/ePH9Z8pPwji3fR8v2mJ88hrNssLv77lk2iFg2iFg2iIgNImKDiNggIjaIiA0iYoOI2CAiNoiIDSJig4jYICI2iIgNImKDiNggIjaIiA0iYoOI2CAiNoiIDSJig4jYICI2iIgNImKDiNggIjaIiA0iYoOI2CAiNoiIDSJig4jYICI2iIgNImKDiNggIjaIiA0iYoOI2CAiNoiIDSJig4jYICI2iIgNImKDiNggIjaIiA0iYoOI2CAiNoiIDSJig4jYICI2iIgNImKDiNggIjaIiA0iYoOI2CAiNoiIDSJig4jYICI2iIgNImKDiNggIjaIfB19AXB+y7LcLBtkxAYRsUHEmQ12cT+n/c6yQURsEBEbRH4C4bxy8cYuRpYAAAAASUVORK5CYII="
+  },
+  {
+   "id": "crate_r",
+   "name": "앞 나무 상자 오른쪽",
+   "file": "",
+   "x": 1150,
+   "y": 728,
+   "w": 114,
+   "h": 120,
+   "sortY": 848,
+   "coverMask": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAHIAAAB4CAIAAAChJDFMAAABSklEQVR4nO3UQQrCUBAFwYx4/yt/FwFxrWmisWojZOPQvGS2L7bWOvuEN93OPuCaZE3Impj6D373+/gJa03Mf66pZq0JWROyJmRNyJqQNSFrQtaErAlZE7ImZE3ImpA1IWtC1oSsCVkTsiZkTciakDUha0LWhKwJWROyJmRNyJqQNSFrQtaErAlZE7ImZE3ImpA1IWtC1oSsCVkTsiZkTciakDUha0LWhKwJWROyJmRNyJqQNSFrQtaErAlZE7ImZE3ImpA1IWtC1oSsCVkTsiZkTciakDUha0LWhKwJWROyJmRNyJqQNSFrQtaErAlZE7ImZE3ImpA1IWtC1oSsCVkTsiZkTciakDUha0LWhKwJWROyJmRNyJqQNSFrQtaErInZf9Za595xMdaauJ99wNXMzGatx9qbbs+sM/N8xOesNSHrYV5fd1kTD7RyDPI/M/gbAAAAAElFTkSuQmCC"
+  },
+  {
+   "id": "box_r",
+   "name": "오른쪽 상자",
+   "file": "",
+   "x": 1172,
+   "y": 618,
+   "w": 92,
+   "h": 94,
+   "sortY": 710,
+   "coverMask": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFwAAABeCAIAAAAhReQEAAABT0lEQVR4nO3cUY6CQBAGYZt4/yuPD7xAqIkjjIF013cAsyl/cSC7G621VxYRMeV1limvkkxkWsrWldW4FJA2Smvt9IcgbZQr0l5TjsavMi4FFIoyfpUpFGVcuSgjeykXZUShb5+e47eSSwEuZWddjUsBLgW4FGAUYBRgFGAUYBRgFGAUYBRgFGAUYBRgFGAUYBRgFGAUYBRgFGAUYBRgFGAUYBRgFGAUYBRgFGAUYBRgFGAUYBRgFGAUYBRgFGAUYBTwvvsHeBZ/47rLKMAoYImIWf8iIA2XAnYb8S86Vi4FwNXEvbgU4Il2xxNtl1GAUQBE8YzrUkB3EZVPKy4FGAUYBRgFGAUYBRgFGAUYBRgFfLnxWw/72/vDCsf/n5+8HW+g82Xy4wOmPTfJtBeXAiY/YXv+XkYeKroUMDlKjue7LgX8/V09d5W5d24uBXwAem0/qnpsMfQAAAAASUVORK5CYII="
+  },
+  {
+   "id": "chair_boss",
+   "name": "사장 의자",
+   "file": "c01_south",
+   "x": 875,
+   "y": 465,
+   "w": 112,
+   "h": 178,
+   "rot": 0,
+   "flip": false,
+   "sortY": 640,
+   "anchor": [
+    50,
+    135
+   ]
+  },
+  {
+   "id": "chair_guest",
+   "name": "손님 의자",
+   "file": "c01_north",
+   "x": 870,
+   "y": 615,
+   "w": 121,
+   "h": 193,
+   "rot": 0,
+   "flip": false,
+   "sortY": 805,
+   "anchor": [
+    50,
+    135
+   ]
+  }
+ ],
+ "spots": [
+  {
+   "id": "seat_chair_boss",
+   "x": 940,
+   "y": 654,
+   "verb": "앉기",
+   "face": 1,
+   "dir": "front",
+   "chair": "chair_boss",
+   "act": [
+    "chairsit",
+    "seatthink"
+   ],
+   "seat": {
+    "x": 940,
+    "y": 640
+   }
+  },
+  {
+   "id": "seat_chair_guest",
+   "x": 940,
+   "y": 819,
+   "verb": "앉기",
+   "face": 1,
+   "dir": "back",
+   "chair": "chair_guest",
+   "act": [
+    "chairsit",
+    "seatthink"
+   ],
+   "seat": {
+    "x": 940,
+    "y": 805
+   }
+  }
+ ]
+}

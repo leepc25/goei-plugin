@@ -1,0 +1,3362 @@
+{
+"1.1_쟈알디": {
+"front": {
+"dx": -10,
+"dy": -10,
+"img": "south-east"
+},
+"side": {
+"dx": -21,
+"dy": 3,
+"img": "east"
+},
+"back": {
+"dx": 14,
+"dy": 18,
+"img": "north"
+},
+"lines": {
+"front:73": {
+"dx": -22,
+"dy": -10,
+"frame_dx": [
+-10,
+-13,
+-16,
+-19,
+-22,
+-22,
+-22,
+-22,
+-22
+]
+}
+}
+},
+"1.2_스팡달": {
+"front": {
+"dx": 8,
+"dy": -9,
+"img": "south"
+},
+"side": {
+"dx": -23,
+"dy": 6,
+"img": "east"
+},
+"back": {
+"dx": 10,
+"dy": 9,
+"img": "north"
+}
+},
+"1.3_잼트리": {
+"front": {
+"dx": 7,
+"dy": -16,
+"img": "south"
+},
+"side": {
+"dx": -47,
+"dy": 9,
+"img": "east"
+},
+"back": {
+"dx": 8,
+"dy": 15,
+"img": "north"
+}
+},
+"1.4_에일린": {
+"front": {
+"dx": -8,
+"dy": -4,
+"img": "south-east"
+},
+"side": {
+"dx": -14,
+"dy": 6,
+"img": "east"
+},
+"back": {
+"dx": 16,
+"dy": 15,
+"img": "north"
+},
+"lines": {
+"front:73": {
+"dx": -20,
+"dy": -4,
+"frame_dx": [
+-8,
+-12,
+-16,
+-20,
+-20,
+-20,
+-20,
+-20
+]
+}
+}
+},
+"1.5_고그니쟈": {
+"front": {
+"dx": 9,
+"dy": -4,
+"img": "south"
+},
+"side": {
+"dx": -11,
+"dy": 10,
+"img": "east"
+},
+"back": {
+"dx": 9,
+"dy": 12,
+"img": "north"
+},
+"lines": {
+"front:73": {
+"dx": -7,
+"dy": -4,
+"img": "south-east"
+}
+}
+},
+"1.6_큐라스": {
+"front": {
+"dx": -7,
+"dy": -3,
+"img": "south-east"
+},
+"side": {
+"dx": -33,
+"dy": 9,
+"img": "east"
+},
+"back": {
+"dx": 18,
+"dy": 10,
+"img": "north"
+},
+"lines": {
+"front:73": {
+"dx": -9,
+"dy": -3,
+"frame_dx": [
+-7,
+-8,
+-8,
+-8,
+-9,
+-9,
+-9,
+-9,
+-9
+]
+}
+}
+},
+"1.7_고르고디오": {
+"front": {
+"dx": 7,
+"dy": -4,
+"img": "south"
+},
+"side": {
+"dx": -29,
+"dy": 8,
+"img": "east"
+},
+"back": {
+"dx": 9,
+"dy": 8,
+"img": "north"
+}
+},
+"1.8_데쥬레": {
+"front": {
+"dx": 7,
+"dy": -10,
+"img": "south"
+},
+"side": {
+"dx": -26,
+"dy": 8,
+"img": "east"
+},
+"back": {
+"dx": 7,
+"dy": 34,
+"img": "north"
+}
+},
+"1.9_데드폴": {
+"front": {
+"dx": -9,
+"dy": -11,
+"img": "south-east"
+},
+"side": {
+"dx": -32,
+"dy": 1,
+"img": "east"
+},
+"back": {
+"dx": 16,
+"dy": 19,
+"img": "north"
+},
+"lines": {
+"front:73": {
+"dx": -12,
+"dy": -11,
+"frame_dx": [
+-9,
+-10,
+-10,
+-11,
+-12,
+-12,
+-12,
+-12,
+-12
+]
+}
+}
+},
+"1.10_게슈간": {
+"front": {
+"dx": 10,
+"dy": -6,
+"img": "south"
+},
+"side": {
+"dx": -23,
+"dy": 9,
+"img": "east"
+},
+"back": {
+"dx": 8,
+"dy": 8,
+"img": "north"
+}
+},
+"1.11_로제몬": {
+"front": {
+"dx": 26,
+"dy": -8,
+"img": "south-west"
+},
+"side": {
+"dx": -26,
+"dy": 4,
+"img": "east"
+},
+"back": {
+"dx": 2,
+"dy": 1,
+"img": "north"
+}
+},
+"1.12_콘쥬스": {
+"front": {
+"dx": 25,
+"dy": -10,
+"img": "south-west"
+},
+"side": {
+"dx": -24,
+"dy": 14,
+"img": "east"
+},
+"back": {
+"dx": 8,
+"dy": 14,
+"img": "north"
+}
+},
+"2.1_사장": {
+"front": {
+"dx": 4,
+"dy": -6,
+"img": "south"
+},
+"side": {
+"dx": -41,
+"dy": 7,
+"img": "east"
+},
+"back": {
+"dx": 8,
+"dy": 11,
+"img": "north"
+},
+"lines": {
+"front:149": {
+"dx": 4,
+"dy": -15
+}
+}
+},
+"2.2_도필헌": {
+"front": {
+"dx": -12,
+"dy": -7,
+"img": "south-east"
+},
+"side": {
+"dx": -41,
+"dy": 9,
+"img": "east"
+},
+"back": {
+"dx": 10,
+"dy": 12,
+"img": "north"
+},
+"lines": {
+"front:73": {
+"dx": -25,
+"dy": -7,
+"frame_dx": [
+-12,
+-15,
+-18,
+-22,
+-25,
+-25,
+-25,
+-25,
+-25
+]
+}
+}
+},
+"2.3_이길환": {
+"front": {
+"dx": 7,
+"dy": 2,
+"img": "south"
+},
+"side": {
+"dx": -39,
+"dy": 7,
+"img": "east"
+},
+"back": {
+"dx": 8,
+"dy": 23,
+"img": "north"
+}
+},
+"2.4_이기석": {
+"front": {
+"dx": 4,
+"dy": -6,
+"img": "south"
+},
+"side": {
+"dx": -31,
+"dy": 6,
+"img": "east"
+},
+"back": {
+"dx": 8,
+"dy": 12,
+"img": "north"
+}
+},
+"2.5_김조학": {
+"front": {
+"dx": -6,
+"dy": -5,
+"img": "south-east"
+},
+"side": {
+"dx": -38,
+"dy": 10,
+"img": "east"
+},
+"back": {
+"dx": 8,
+"dy": 13,
+"img": "north"
+},
+"lines": {
+"front:73": {
+"dx": -13,
+"dy": -5,
+"frame_dx": [
+-6,
+-8,
+-11,
+-13,
+-13,
+-13,
+-13,
+-13
+]
+}
+}
+},
+"2.6_이도형": {
+"front": {
+"dx": -10,
+"dy": -2,
+"img": "south-east"
+},
+"side": {
+"dx": -36,
+"dy": -5,
+"img": "east"
+},
+"back": {
+"dx": 10,
+"dy": 11,
+"img": "north"
+},
+"lines": {
+"front:73": {
+"dx": -23,
+"dy": -2,
+"frame_dx": [
+-10,
+-13,
+-16,
+-20,
+-23,
+-23,
+-23,
+-23,
+-23
+]
+}
+}
+},
+"2.7_고영훈": {
+"front": {
+"dx": 6,
+"dy": -5,
+"img": "south"
+},
+"side": {
+"dx": -31,
+"dy": 9,
+"img": "east"
+},
+"back": {
+"dx": 8,
+"dy": 8,
+"img": "north"
+},
+"lines": {
+"front:73": {
+"dx": -1,
+"dy": -5,
+"frame_dx": [
+6,
+4,
+2,
+1,
+-1,
+-1,
+-1,
+-1,
+-1
+]
+}
+}
+},
+"2.8_노기균": {
+"front": {
+"dx": -11,
+"dy": -6,
+"img": "south-east"
+},
+"side": {
+"dx": -38,
+"dy": 2,
+"img": "east"
+},
+"back": {
+"dx": 14,
+"dy": 7,
+"img": "north"
+},
+"lines": {
+"front:73": {
+"dx": -18,
+"dy": -6,
+"frame_dx": [
+-11,
+-13,
+-14,
+-16,
+-18,
+-18,
+-18,
+-18,
+-18
+]
+}
+}
+},
+"2.9_송주익": {
+"front": {
+"dx": 6,
+"dy": -12,
+"img": "south"
+},
+"side": {
+"dx": -29,
+"dy": 2,
+"img": "east"
+},
+"back": {
+"dx": 8,
+"dy": 16,
+"img": "north"
+},
+"lines": {
+"front:73": {
+"dx": 6,
+"dy": -12,
+"img": "south"
+}
+}
+},
+"2.10_곽성주": {
+"front": {
+"dx": 3,
+"dy": -11,
+"img": "south"
+},
+"side": {
+"dx": -44,
+"dy": 6,
+"img": "east"
+},
+"back": {
+"dx": 9,
+"dy": 9,
+"img": "north"
+},
+"lines": {
+"front:73": {
+"dx": -9,
+"dy": -11,
+"frame_dx": [
+3,
+0,
+-3,
+-6,
+-9,
+-9,
+-9,
+-9,
+-9
+]
+}
+}
+},
+"2.11_조성춘": {
+"front": {
+"dx": -11,
+"dy": -9,
+"img": "south-east"
+},
+"side": {
+"dx": -40,
+"dy": 6,
+"img": "east"
+},
+"back": {
+"dx": 9,
+"dy": 9,
+"img": "north"
+},
+"lines": {
+"front:73": {
+"dx": -12,
+"dy": -9,
+"frame_dx": [
+-11,
+-11,
+-12,
+-12,
+-12,
+-12,
+-12,
+-12,
+-12
+]
+}
+}
+},
+"2.12_윤병수": {
+"front": {
+"dx": -3,
+"dy": -11,
+"img": "south"
+},
+"side": {
+"dx": -29,
+"dy": 8,
+"img": "east"
+},
+"back": {
+"dx": 14,
+"dy": 6,
+"img": "north"
+},
+"lines": {
+"front:73": {
+"dx": -15,
+"dy": -11,
+"frame_dx": [
+-3,
+-6,
+-9,
+-12,
+-15,
+-15,
+-15,
+-15,
+-15
+]
+}
+}
+},
+"2.13_김성진": {
+"front": {
+"dx": -12,
+"dy": -19,
+"img": "south-east"
+},
+"side": {
+"dx": -38,
+"dy": 0,
+"img": "east"
+},
+"back": {
+"dx": 8,
+"dy": 10,
+"img": "north"
+},
+"lines": {
+"front:148": {
+"dx": -8,
+"dy": -10
+},
+"front:73": {
+"dx": -19,
+"dy": -19,
+"frame_dx": [
+-12,
+-14,
+-15,
+-17,
+-19,
+-19,
+-19,
+-19,
+-19
+]
+}
+}
+},
+"2.14_송진섭": {
+"front": {
+"dx": -9,
+"dy": -6,
+"img": "south-east"
+},
+"side": {
+"dx": -36,
+"dy": 12,
+"img": "east"
+},
+"back": {
+"dx": 10,
+"dy": 10,
+"img": "north"
+},
+"lines": {
+"front:73": {
+"dx": -21,
+"dy": -6,
+"frame_dx": [
+-9,
+-12,
+-15,
+-18,
+-21,
+-21,
+-21,
+-21,
+-21
+]
+}
+}
+},
+"3.1_청달래": {
+"front": {
+"dx": 6,
+"dy": -7,
+"img": "south"
+},
+"side": {
+"dx": -26,
+"dy": 15,
+"img": "east"
+},
+"back": {
+"dx": 8,
+"dy": 17,
+"img": "north"
+}
+},
+"3.2_호유원": {
+"front": {
+"dx": 4,
+"dy": -4,
+"img": "south"
+},
+"side": {
+"dx": -30,
+"dy": 12,
+"img": "east"
+},
+"back": {
+"dx": 8,
+"dy": 6,
+"img": "north"
+}
+},
+"3.3_백석주": {
+"front": {
+"dx": 5,
+"dy": -3,
+"img": "south"
+},
+"side": {
+"dx": -20,
+"dy": 18,
+"img": "east"
+},
+"back": {
+"dx": 8,
+"dy": 14,
+"img": "north"
+}
+},
+"3.4_진나솔": {
+"front": {
+"dx": -7,
+"dy": -2,
+"img": "south-east"
+},
+"side": {
+"dx": -27,
+"dy": 3,
+"img": "east"
+},
+"back": {
+"dx": 12,
+"dy": 15,
+"img": "north"
+},
+"lines": {
+"front:73": {
+"dx": -14,
+"dy": 6,
+"frame_dx": [
+-7,
+-9,
+-11,
+-12,
+-14,
+-14,
+-14,
+-14,
+-14
+]
+}
+}
+},
+"3.5_이성해": {
+"front": {
+"dx": 20,
+"dy": -6,
+"img": "south-west"
+},
+"side": {
+"dx": -23,
+"dy": 1,
+"img": "east"
+},
+"back": {
+"dx": 8,
+"dy": 13,
+"img": "north"
+},
+"lines": {
+"front:73": {
+"dx": 30,
+"dy": -6,
+"frame_dx": [
+20,
+22,
+25,
+28,
+30,
+30,
+30,
+30,
+30
+]
+}
+}
+},
+"3.6_이자헌": {
+"front": {
+"dx": 6,
+"dy": -2,
+"img": "south"
+},
+"side": {
+"dx": -25,
+"dy": 13,
+"img": "east"
+},
+"back": {
+"dx": 6,
+"dy": 10,
+"img": "north"
+}
+},
+"3.7_은하제": {
+"front": {
+"dx": 1,
+"dy": -6,
+"img": "south"
+},
+"side": {
+"dx": -24,
+"dy": 2,
+"img": "east"
+},
+"back": {
+"dx": 8,
+"dy": 5,
+"img": "north"
+}
+},
+"3.8_박민성": {
+"front": {
+"dx": 4,
+"dy": -3,
+"img": "south"
+},
+"side": {
+"dx": -32,
+"dy": 13,
+"img": "east"
+},
+"back": {
+"dx": 9,
+"dy": 14,
+"img": "north"
+}
+},
+"3.9_백사헌": {
+"front": {
+"dx": 28,
+"dy": -6,
+"img": "south-west"
+},
+"side": {
+"dx": -42,
+"dy": 0,
+"img": "east"
+},
+"back": {
+"dx": 4,
+"dy": 4,
+"img": "north"
+},
+"lines": {
+"front:73": {
+"dx": 38,
+"dy": -6,
+"frame_dx": [
+28,
+30,
+33,
+36,
+38,
+38,
+38,
+38,
+38
+]
+}
+}
+},
+"3.10_고영은": {
+"front": {
+"dx": 8,
+"dy": -16,
+"img": "south"
+},
+"side": {
+"dx": -28,
+"dy": 10,
+"img": "east"
+},
+"back": {
+"dx": 8,
+"dy": 14,
+"img": "north"
+}
+},
+"3.11_강이학": {
+"front": {
+"dx": 5,
+"dy": -9,
+"img": "south"
+},
+"side": {
+"dx": -22,
+"dy": 4,
+"img": "east"
+},
+"back": {
+"dx": 8,
+"dy": 13,
+"img": "north"
+}
+},
+"3.12_장허운": {
+"front": {
+"dx": 20,
+"dy": -3,
+"img": "south-west"
+},
+"side": {
+"dx": -38,
+"dy": 5,
+"img": "east"
+},
+"back": {
+"dx": 1,
+"dy": 17,
+"img": "north"
+},
+"lines": {
+"front:73": {
+"dx": 30,
+"dy": -3,
+"frame_dx": [
+20,
+22,
+25,
+28,
+30,
+30,
+30,
+30,
+30
+]
+}
+}
+},
+"3.13_곽제강": {
+"front": {
+"dx": 7,
+"dy": -2,
+"img": "south"
+},
+"side": {
+"dx": -11,
+"dy": 13,
+"img": "east"
+},
+"back": {
+"dx": 8,
+"dy": 12,
+"img": "north"
+}
+},
+"3.14_이연화": {
+"front": {
+"dx": 7,
+"dy": -7,
+"img": "south"
+},
+"side": {
+"dx": -21,
+"dy": 7,
+"img": "east"
+},
+"back": {
+"dx": 8,
+"dy": 24,
+"img": "north"
+}
+},
+"3.15_이병진": {
+"front": {
+"dx": 5,
+"dy": 0,
+"img": "south"
+},
+"side": {
+"dx": -24,
+"dy": 13,
+"img": "east"
+},
+"back": {
+"dx": 8,
+"dy": 14,
+"img": "north"
+},
+"lines": {
+"front:73": {
+"dx": -11,
+"dy": 0,
+"img": "south-east"
+}
+}
+},
+"3.16_제이": {
+"front": {
+"dx": 8,
+"dy": -8,
+"img": "south"
+},
+"side": {
+"dx": -32,
+"dy": 5,
+"img": "east"
+},
+"back": {
+"dx": 8,
+"dy": 14,
+"img": "north"
+}
+},
+"4.1_차여진": {
+"front": {
+"dx": -5,
+"dy": -7,
+"img": "south-east"
+},
+"side": {
+"dx": -35,
+"dy": 2,
+"img": "east"
+},
+"back": {
+"dx": 8,
+"dy": 11,
+"img": "north"
+},
+"lines": {
+"front:73": {
+"dx": -12,
+"dy": -3,
+"frame_dx": [
+-5,
+-7,
+-9,
+-10,
+-12,
+-12,
+-12,
+-12,
+-12
+]
+}
+}
+},
+"4.2_서윤지": {
+"front": {
+"dx": -1,
+"dy": -6,
+"img": "south-east"
+},
+"side": {
+"dx": -39,
+"dy": 5,
+"img": "east"
+},
+"back": {
+"dx": 10,
+"dy": 19,
+"img": "north"
+},
+"lines": {
+"front:149": {
+"dx": -7,
+"dy": -19
+},
+"front:73": {
+"dx": -13,
+"dy": -5,
+"frame_dx": [
+-1,
+-4,
+-7,
+-10,
+-13,
+-13,
+-13,
+-13,
+-13
+]
+}
+}
+},
+"4.3_고연지": {
+"front": {
+"dx": -2,
+"dy": -9,
+"img": "south-east"
+},
+"side": {
+"dx": -13,
+"dy": 12,
+"img": "east"
+},
+"back": {
+"dx": 14,
+"dy": 12,
+"img": "north"
+}
+},
+"4.4_윤지아": {
+"front": {
+"dx": 18,
+"dy": 3,
+"img": "south-west"
+},
+"side": {
+"dx": -14,
+"dy": 22,
+"img": "east"
+},
+"back": {
+"dx": 6,
+"dy": 24,
+"img": "north"
+}
+},
+"4.5_마덕희": {
+"front": {
+"dx": 15,
+"dy": -8,
+"img": "south-west"
+},
+"side": {
+"dx": -29,
+"dy": 2,
+"img": "east"
+},
+"back": {
+"dx": 2,
+"dy": 12,
+"img": "north"
+},
+"lines": {
+"front:73": {
+"dx": 25,
+"dy": -4,
+"frame_dx": [
+15,
+18,
+20,
+22,
+25,
+25,
+25,
+25,
+25
+]
+}
+}
+},
+"4.6_문혜란": {
+"front": {
+"dx": 5,
+"dy": -19,
+"img": "south"
+},
+"side": {
+"dx": -28,
+"dy": 13,
+"img": "east"
+},
+"back": {
+"dx": 8,
+"dy": 13,
+"img": "north"
+}
+},
+"4.7_신유리": {
+"front": {
+"dx": 6,
+"dy": -5,
+"img": "south"
+},
+"side": {
+"dx": -26,
+"dy": 5,
+"img": "east"
+},
+"back": {
+"dx": 8,
+"dy": 9,
+"img": "north"
+}
+},
+"4.8_블라렛": {
+"front": {
+"dx": 31,
+"dy": -7,
+"img": "south-west"
+},
+"side": {
+"dx": -16,
+"dy": 3,
+"img": "east"
+},
+"back": {
+"dx": 2,
+"dy": 12,
+"img": "north"
+},
+"lines": {
+"front:73": {
+"dx": 41,
+"dy": -3,
+"frame_dx": [
+31,
+34,
+36,
+38,
+41,
+41,
+41,
+41,
+41
+]
+}
+}
+},
+"4.9_살라딘": {
+"front": {
+"dx": 10,
+"dy": -18,
+"img": "south"
+},
+"side": {
+"dx": -40,
+"dy": -1,
+"img": "east"
+},
+"back": {
+"dx": 8,
+"dy": 12,
+"img": "north"
+}
+},
+"4.10_아벤샤": {
+"front": {
+"dx": -8,
+"dy": -25,
+"img": "south-east"
+},
+"side": {
+"dx": -11,
+"dy": -5,
+"img": "east"
+},
+"back": {
+"dx": 10,
+"dy": 12,
+"img": "north"
+},
+"lines": {
+"front:73": {
+"dx": -3,
+"dy": -25,
+"frame_dx": [
+-8,
+-7,
+-5,
+-4,
+-3,
+-3,
+-3,
+-3,
+-3
+]
+}
+}
+},
+"5.1_세크리엠": {
+"front": {
+"dx": 9,
+"dy": -11,
+"img": "south"
+},
+"side": {
+"dx": -16,
+"dy": 3,
+"img": "east"
+},
+"back": {
+"dx": 8,
+"dy": 12,
+"img": "north"
+}
+},
+"5.3_탐미주의": {
+"front": {
+"dx": 5,
+"dy": -14,
+"img": "south"
+},
+"side": {
+"dx": -34,
+"dy": 6,
+"img": "east"
+},
+"back": {
+"dx": 8,
+"dy": 6,
+"img": "north"
+}
+},
+"6.1_가짜관리국검사A": {
+"front": {
+"dx": -9,
+"dy": -5,
+"img": "south-east"
+},
+"side": {
+"dx": -38,
+"dy": 4,
+"img": "east"
+},
+"back": {
+"dx": 8,
+"dy": 14,
+"img": "north"
+},
+"lines": {
+"front:73": {
+"dx": -10,
+"dy": -9,
+"frame_dx": [
+-9,
+-9,
+-10,
+-10,
+-10,
+-10,
+-10,
+-10,
+-10
+]
+}
+}
+},
+"6.2_가짜관리국검사B": {
+"front": {
+"dx": -15,
+"dy": -8,
+"img": "south-east"
+},
+"side": {
+"dx": -17,
+"dy": 25,
+"img": "east"
+},
+"back": {
+"dx": 9,
+"dy": 13,
+"img": "north"
+},
+"lines": {
+"front:73": {
+"dx": -28,
+"dy": -8,
+"frame_dx": [
+-15,
+-18,
+-22,
+-25,
+-28,
+-28,
+-28,
+-28,
+-28
+]
+}
+}
+},
+"6.3_가짜관리국검사C": {
+"front": {
+"dx": -8,
+"dy": -7,
+"img": "south-east"
+},
+"side": {
+"dx": -16,
+"dy": 24,
+"img": "east"
+},
+"back": {
+"dx": 12,
+"dy": 6,
+"img": "north"
+},
+"lines": {
+"front:73": {
+"dx": -20,
+"dy": -7,
+"frame_dx": [
+-8,
+-11,
+-14,
+-17,
+-20,
+-20,
+-20,
+-20,
+-20
+]
+}
+}
+},
+"6.4_가짜관리국진압A": {
+"front": {
+"dx": -5,
+"dy": -3,
+"img": "south-east"
+},
+"side": {
+"dx": -36,
+"dy": 14,
+"img": "east"
+},
+"back": {
+"dx": 8,
+"dy": 11,
+"img": "north"
+},
+"lines": {
+"front:73": {
+"dx": -7,
+"dy": 1,
+"frame_dx": [
+-5,
+-5,
+-6,
+-7,
+-7,
+-7,
+-7,
+-7,
+-7
+]
+}
+}
+},
+"6.5_가짜관리국진압B": {
+"front": {
+"dx": -4,
+"dy": -5,
+"img": "south-east"
+},
+"side": {
+"dx": -38,
+"dy": 20,
+"img": "east"
+},
+"back": {
+"dx": 10,
+"dy": 13,
+"img": "north"
+},
+"lines": {
+"front:73": {
+"dx": -1,
+"dy": -5,
+"frame_dx": [
+-4,
+-3,
+-3,
+-2,
+-1,
+-1,
+-1,
+-1,
+-1
+]
+}
+}
+},
+"6.6_가짜관리국진압C": {
+"front": {
+"dx": 1,
+"dy": -8,
+"img": "south"
+},
+"side": {
+"dx": -38,
+"dy": -1,
+"img": "east"
+},
+"back": {
+"dx": 9,
+"dy": 17,
+"img": "north"
+}
+},
+"6.7_불량배남1": {
+"front": {
+"dx": -16,
+"dy": -3,
+"img": "south-east"
+},
+"side": {
+"dx": -26,
+"dy": 4,
+"img": "east"
+},
+"back": {
+"dx": 14,
+"dy": 17,
+"img": "north"
+},
+"lines": {
+"front:73": {
+"dx": -22,
+"dy": -3,
+"frame_dx": [
+-16,
+-18,
+-19,
+-20,
+-22,
+-22,
+-22,
+-22,
+-22
+]
+}
+}
+},
+"6.8_불량배남2": {
+"front": {
+"dx": 3,
+"dy": 0,
+"img": "south"
+},
+"side": {
+"dx": -39,
+"dy": 11,
+"img": "east"
+},
+"back": {
+"dx": 8,
+"dy": 12,
+"img": "north"
+},
+"lines": {
+"front:73": {
+"dx": -9,
+"dy": 0,
+"frame_dx": [
+3,
+0,
+-3,
+-6,
+-9,
+-9,
+-9,
+-9,
+-9
+]
+}
+}
+},
+"6.9_불량배남3": {
+"front": {
+"dx": -7,
+"dy": -3,
+"img": "south-east"
+},
+"side": {
+"dx": -8,
+"dy": 4,
+"img": "east"
+},
+"back": {
+"dx": 8,
+"dy": 16,
+"img": "north"
+},
+"lines": {
+"front:73": {
+"dx": -20,
+"dy": -3,
+"frame_dx": [
+-7,
+-10,
+-13,
+-17,
+-20,
+-20,
+-20,
+-20,
+-20
+]
+}
+}
+},
+"6.10_불량배여1": {
+"front": {
+"dx": 6,
+"dy": -3,
+"img": "south"
+},
+"side": {
+"dx": -24,
+"dy": 7,
+"img": "east"
+},
+"back": {
+"dx": 8,
+"dy": 23,
+"img": "north"
+}
+},
+"6.11_불량배여2": {
+"front": {
+"dx": 7,
+"dy": -10,
+"img": "south"
+},
+"side": {
+"dx": -31,
+"dy": 5,
+"img": "east"
+},
+"back": {
+"dx": 8,
+"dy": 23,
+"img": "north"
+}
+},
+"6.12_불량배여3": {
+"front": {
+"dx": 25,
+"dy": -7,
+"img": "south-west"
+},
+"side": {
+"dx": -22,
+"dy": -1,
+"img": "east"
+},
+"back": {
+"dx": 8,
+"dy": 12,
+"img": "north"
+}
+},
+"6.13_경찰남1": {
+"front": {
+"dx": -10,
+"dy": -6,
+"img": "south-east"
+},
+"side": {
+"dx": -34,
+"dy": 6,
+"img": "east"
+},
+"back": {
+"dx": 12,
+"dy": 16,
+"img": "north"
+},
+"lines": {
+"front:73": {
+"dx": -5,
+"dy": -6,
+"frame_dx": [
+-10,
+-9,
+-7,
+-6,
+-5,
+-5,
+-5,
+-5,
+-5
+]
+}
+}
+},
+"6.14_경찰남2": {
+"front": {
+"dx": -13,
+"dy": -2,
+"img": "south-east"
+},
+"side": {
+"dx": -36,
+"dy": 8,
+"img": "east"
+},
+"back": {
+"dx": 9,
+"dy": 18,
+"img": "north"
+},
+"lines": {
+"front:73": {
+"dx": -20,
+"dy": -2,
+"frame_dx": [
+-13,
+-15,
+-16,
+-18,
+-20,
+-20,
+-20,
+-20,
+-20
+]
+}
+}
+},
+"6.15_경찰여1": {
+"front": {
+"dx": 7,
+"dy": -10,
+"img": "south"
+},
+"side": {
+"dx": -31,
+"dy": -4,
+"img": "east"
+},
+"back": {
+"dx": 8,
+"dy": 11,
+"img": "north"
+}
+},
+"6.16_경찰여2": {
+"front": {
+"dx": 21,
+"dy": -19,
+"img": "south-west"
+},
+"side": {
+"dx": -23,
+"dy": 8,
+"img": "east"
+},
+"back": {
+"dx": 5,
+"dy": 25,
+"img": "north"
+},
+"lines": {
+"front:73": {
+"dx": 26,
+"dy": -19,
+"frame_dx": [
+21,
+22,
+24,
+25,
+26,
+26,
+26,
+26,
+26
+]
+}
+}
+},
+"6.17_관리국남A": {
+"front": {
+"dx": -6,
+"dy": -6,
+"img": "south-east"
+},
+"side": {
+"dx": -32,
+"dy": 7,
+"img": "east"
+},
+"back": {
+"dx": 12,
+"dy": 9,
+"img": "north"
+},
+"lines": {
+"front:73": {
+"dx": -14,
+"dy": -6,
+"frame_dx": [
+-6,
+-8,
+-10,
+-12,
+-14,
+-14,
+-14,
+-14,
+-14
+]
+}
+}
+},
+"6.18_관리국남B": {
+"front": {
+"dx": -7,
+"dy": -2,
+"img": "south-east"
+},
+"side": {
+"dx": -55,
+"dy": 1,
+"img": "east"
+},
+"back": {
+"dx": 8,
+"dy": 13,
+"img": "north"
+},
+"lines": {
+"front:73": {
+"dx": -4,
+"dy": -2,
+"frame_dx": [
+-7,
+-6,
+-6,
+-5,
+-4,
+-4,
+-4,
+-4,
+-4
+]
+}
+}
+},
+"6.19_관리국여A": {
+"front": {
+"dx": 12,
+"dy": -13,
+"img": "south"
+},
+"side": {
+"dx": -20,
+"dy": 9,
+"img": "east"
+},
+"back": {
+"dx": 6,
+"dy": 19,
+"img": "north"
+},
+"lines": {
+"front:73": {
+"dx": 28,
+"dy": -13,
+"img": "south-west"
+}
+}
+},
+"6.20_관리국여B": {
+"front": {
+"dx": -6,
+"dy": -9,
+"img": "south-east"
+},
+"side": {
+"dx": -29,
+"dy": -6,
+"img": "east"
+},
+"back": {
+"dx": 12,
+"dy": 10,
+"img": "north"
+},
+"lines": {
+"front:73": {
+"dx": -7,
+"dy": -5,
+"frame_dx": [
+-6,
+-6,
+-6,
+-7,
+-7,
+-7,
+-7,
+-7,
+-7
+]
+}
+}
+},
+"6.21_백일몽남A": {
+"front": {
+"dx": -8,
+"dy": -4,
+"img": "south-east"
+},
+"side": {
+"dx": -32,
+"dy": 9,
+"img": "east"
+},
+"back": {
+"dx": 18,
+"dy": 8,
+"img": "north"
+},
+"lines": {
+"front:73": {
+"dx": -15,
+"dy": -4,
+"frame_dx": [
+-8,
+-10,
+-11,
+-13,
+-15,
+-15,
+-15,
+-15,
+-15
+]
+}
+}
+},
+"6.22_백일몽남B": {
+"front": {
+"dx": 2,
+"dy": -9,
+"img": "south"
+},
+"side": {
+"dx": -51,
+"dy": 7,
+"img": "east"
+},
+"back": {
+"dx": 9,
+"dy": 19,
+"img": "north"
+}
+},
+"6.23_백일몽여A": {
+"front": {
+"dx": 28,
+"dy": -5,
+"img": "south-west"
+},
+"side": {
+"dx": -21,
+"dy": 7,
+"img": "east"
+},
+"back": {
+"dx": 9,
+"dy": 14,
+"img": "north"
+}
+},
+"6.24_백일몽여B": {
+"front": {
+"dx": 6,
+"dy": -3,
+"img": "south"
+},
+"side": {
+"dx": -22,
+"dy": 6,
+"img": "east"
+},
+"back": {
+"dx": 8,
+"dy": 17,
+"img": "north"
+}
+},
+"6.25_협회남1": {
+"front": {
+"dx": -15,
+"dy": -9,
+"img": "south-east"
+},
+"side": {
+"dx": -27,
+"dy": 2,
+"img": "east"
+},
+"back": {
+"dx": 8,
+"dy": 17,
+"img": "north"
+},
+"lines": {
+"front:73": {
+"dx": -22,
+"dy": -9,
+"frame_dx": [
+-15,
+-17,
+-18,
+-20,
+-22,
+-22,
+-22,
+-22,
+-22
+]
+}
+}
+},
+"6.26_협회남2": {
+"front": {
+"dx": 3,
+"dy": 0,
+"img": "south"
+},
+"side": {
+"dx": -36,
+"dy": 3,
+"img": "east"
+},
+"back": {
+"dx": 8,
+"dy": 3,
+"img": "north"
+}
+},
+"6.27_협회여1": {
+"front": {
+"dx": 6,
+"dy": -10,
+"img": "south"
+},
+"side": {
+"dx": -31,
+"dy": 7,
+"img": "east"
+},
+"back": {
+"dx": 8,
+"dy": 15,
+"img": "north"
+}
+},
+"6.28_협회여2": {
+"front": {
+"dx": -4,
+"dy": -11,
+"img": "south-east"
+},
+"side": {
+"dx": -23,
+"dy": 8,
+"img": "east"
+},
+"back": {
+"dx": 8,
+"dy": 22,
+"img": "north"
+},
+"lines": {
+"front:73": {
+"dx": -11,
+"dy": -15,
+"frame_dx": [
+-4,
+-6,
+-8,
+-9,
+-11,
+-11,
+-11,
+-11,
+-11
+]
+}
+}
+},
+"6.29_협회여3": {
+"front": {
+"dx": 6,
+"dy": -10,
+"img": "south"
+},
+"side": {
+"dx": -20,
+"dy": 10,
+"img": "east"
+},
+"back": {
+"dx": 8,
+"dy": 11,
+"img": "north"
+}
+},
+"6.30_프리랜서남1": {
+"front": {
+"dx": -6,
+"dy": -5,
+"img": "south-east"
+},
+"side": {
+"dx": -26,
+"dy": 0,
+"img": "east"
+},
+"back": {
+"dx": 9,
+"dy": 9,
+"img": "north"
+},
+"lines": {
+"front:73": {
+"dx": -19,
+"dy": -5,
+"frame_dx": [
+-6,
+-9,
+-12,
+-16,
+-19,
+-19,
+-19,
+-19,
+-19
+]
+}
+}
+},
+"6.31_프리랜서남2": {
+"front": {
+"dx": -14,
+"dy": -4,
+"img": "south-east"
+},
+"side": {
+"dx": -34,
+"dy": 4,
+"img": "east"
+},
+"back": {
+"dx": 18,
+"dy": 4,
+"img": "north"
+},
+"lines": {
+"front:73": {
+"dx": -15,
+"dy": 0,
+"frame_dx": [
+-14,
+-14,
+-14,
+-15,
+-15,
+-15,
+-15,
+-15,
+-15
+]
+}
+}
+},
+"6.32_프리랜서남3": {
+"front": {
+"dx": 3,
+"dy": -3,
+"img": "south"
+},
+"side": {
+"dx": -51,
+"dy": -2,
+"img": "east"
+},
+"back": {
+"dx": 8,
+"dy": 11,
+"img": "north"
+}
+},
+"6.33_프리랜서남4": {
+"front": {
+"dx": -2,
+"dy": -5,
+"img": "south"
+},
+"side": {
+"dx": -46,
+"dy": 3,
+"img": "east"
+},
+"back": {
+"dx": 10,
+"dy": 9,
+"img": "north"
+},
+"lines": {
+"front:73": {
+"dx": -9,
+"dy": -9,
+"frame_dx": [
+-2,
+-4,
+-6,
+-7,
+-9,
+-9,
+-9,
+-9,
+-9
+]
+}
+}
+},
+"6.34_프리랜서여1": {
+"front": {
+"dx": 7,
+"dy": -9,
+"img": "south"
+},
+"side": {
+"dx": -38,
+"dy": 5,
+"img": "east"
+},
+"back": {
+"dx": 9,
+"dy": 13,
+"img": "north"
+}
+},
+"6.35_프리랜서여2": {
+"front": {
+"dx": -2,
+"dy": -8,
+"img": "south-east"
+},
+"side": {
+"dx": -44,
+"dy": 2,
+"img": "east"
+},
+"back": {
+"dx": 10,
+"dy": 17,
+"img": "north"
+},
+"lines": {
+"front:73": {
+"dx": -8,
+"dy": -8,
+"frame_dx": [
+-2,
+-4,
+-5,
+-6,
+-8,
+-8,
+-8,
+-8,
+-8
+]
+}
+}
+},
+"6.36_프리랜서여3": {
+"front": {
+"dx": 6,
+"dy": -4,
+"img": "south"
+},
+"side": {
+"dx": -39,
+"dy": 7,
+"img": "east"
+},
+"back": {
+"dx": 8,
+"dy": 16,
+"img": "north"
+}
+},
+"6.37_프리랜서여4": {
+"front": {
+"dx": -9,
+"dy": -2,
+"img": "south-east"
+},
+"side": {
+"dx": -53,
+"dy": 10,
+"img": "east"
+},
+"back": {
+"dx": 11,
+"dy": 13,
+"img": "north"
+},
+"lines": {
+"front:73": {
+"dx": -10,
+"dy": -2,
+"frame_dx": [
+-9,
+-9,
+-10,
+-10,
+-10,
+-10,
+-10,
+-10,
+-10
+]
+}
+}
+},
+"6.38_프리랜서여5": {
+"front": {
+"dx": -5,
+"dy": -6,
+"img": "south-east"
+},
+"side": {
+"dx": -32,
+"dy": 7,
+"img": "east"
+},
+"back": {
+"dx": 8,
+"dy": 12,
+"img": "north"
+},
+"lines": {
+"front:73": {
+"dx": -12,
+"dy": -6,
+"frame_dx": [
+-5,
+-7,
+-8,
+-10,
+-12,
+-12,
+-12,
+-12,
+-12
+]
+}
+}
+},
+"6.39_상인남1": {
+"front": {
+"dx": 3,
+"dy": 2,
+"img": "south"
+},
+"side": {
+"dx": -33,
+"dy": 1,
+"img": "east"
+},
+"back": {
+"dx": 8,
+"dy": 16,
+"img": "north"
+}
+},
+"6.40_상인남2": {
+"front": {
+"dx": -4,
+"dy": 1,
+"img": "south"
+},
+"side": {
+"dx": -32,
+"dy": 11,
+"img": "east"
+},
+"back": {
+"dx": 8,
+"dy": 15,
+"img": "north"
+},
+"lines": {
+"front:73": {
+"dx": -10,
+"dy": 1,
+"img": "south-east"
+}
+}
+},
+"6.41_상인남3": {
+"front": {
+"dx": -1,
+"dy": -1,
+"img": "south"
+},
+"side": {
+"dx": -30,
+"dy": 7,
+"img": "east"
+},
+"back": {
+"dx": 8,
+"dy": 11,
+"img": "north"
+},
+"lines": {
+"front:73": {
+"dx": -17,
+"dy": -1,
+"img": "south-east"
+}
+}
+},
+"6.42_상인남4": {
+"front": {
+"dx": -7,
+"dy": -13,
+"img": "south-east"
+},
+"side": {
+"dx": -50,
+"dy": -2,
+"img": "east"
+},
+"back": {
+"dx": 8,
+"dy": -6,
+"img": "north"
+},
+"lines": {
+"front:73": {
+"dx": -14,
+"dy": -9,
+"frame_dx": [
+-7,
+-9,
+-11,
+-12,
+-14,
+-14,
+-14,
+-14,
+-14
+]
+}
+}
+},
+"6.43_상인여1": {
+"front": {
+"dx": 2,
+"dy": -5,
+"img": "south-east"
+},
+"side": {
+"dx": -42,
+"dy": 15,
+"img": "east"
+},
+"back": {
+"dx": 8,
+"dy": 14,
+"img": "north"
+}
+},
+"6.44_상인여2": {
+"front": {
+"dx": 5,
+"dy": -4,
+"img": "south-east"
+},
+"side": {
+"dx": -21,
+"dy": 0,
+"img": "east"
+},
+"back": {
+"dx": 10,
+"dy": 19,
+"img": "north"
+},
+"lines": {
+"front:73": {
+"dx": -2,
+"dy": -4,
+"frame_dx": [
+5,
+3,
+2,
+0,
+-2,
+-2,
+-2,
+-2,
+-2
+]
+}
+}
+},
+"6.45_상인여3": {
+"front": {
+"dx": 6,
+"dy": -2,
+"img": "south"
+},
+"side": {
+"dx": -21,
+"dy": 7,
+"img": "east"
+},
+"back": {
+"dx": 8,
+"dy": 17,
+"img": "north"
+}
+},
+"6.46_의사1": {
+"front": {
+"dx": -4,
+"dy": -4,
+"img": "south"
+},
+"side": {
+"dx": -22,
+"dy": 5,
+"img": "east"
+},
+"back": {
+"dx": 8,
+"dy": 12,
+"img": "north"
+},
+"lines": {
+"front:73": {
+"dx": -11,
+"dy": -4,
+"frame_dx": [
+-4,
+-6,
+-8,
+-9,
+-11,
+-11,
+-11,
+-11,
+-11
+]
+}
+}
+},
+"6.47_간호사1": {
+"front": {
+"dx": 6,
+"dy": -6,
+"img": "south"
+},
+"side": {
+"dx": -31,
+"dy": 0,
+"img": "east"
+},
+"back": {
+"dx": 9,
+"dy": 12,
+"img": "north"
+}
+},
+"6.48_청소부남1": {
+"front": {
+"dx": -7,
+"dy": -7,
+"img": "south-east"
+},
+"side": {
+"dx": -29,
+"dy": 4,
+"img": "east"
+},
+"back": {
+"dx": 8,
+"dy": 12,
+"img": "north"
+},
+"lines": {
+"front:73": {
+"dx": -2,
+"dy": -7,
+"frame_dx": [
+-7,
+-6,
+-5,
+-3,
+-2,
+-2,
+-2,
+-2,
+-2
+]
+}
+}
+},
+"6.49_청소부여1": {
+"front": {
+"dx": -1,
+"dy": -1,
+"img": "south-east"
+},
+"side": {
+"dx": -33,
+"dy": 11,
+"img": "east"
+},
+"back": {
+"dx": 8,
+"dy": 4,
+"img": "north"
+},
+"lines": {
+"front:73": {
+"dx": -8,
+"dy": -1,
+"frame_dx": [
+-1,
+-3,
+-5,
+-6,
+-8,
+-8,
+-8,
+-8,
+-8
+]
+}
+}
+},
+"6.50_학생남1": {
+"front": {
+"dx": -5,
+"dy": -8,
+"img": "south-east"
+},
+"side": {
+"dx": -26,
+"dy": 7,
+"img": "east"
+},
+"back": {
+"dx": 8,
+"dy": 15,
+"img": "north"
+},
+"lines": {
+"front:73": {
+"dx": -6,
+"dy": -8,
+"frame_dx": [
+-5,
+-5,
+-5,
+-6,
+-6,
+-6,
+-6,
+-6,
+-6
+]
+}
+}
+},
+"6.51_학생남2": {
+"front": {
+"dx": -9,
+"dy": -4,
+"img": "south-east"
+},
+"side": {
+"dx": -32,
+"dy": 3,
+"img": "east"
+},
+"back": {
+"dx": 10,
+"dy": 13,
+"img": "north"
+},
+"lines": {
+"front:73": {
+"dx": -22,
+"dy": -4,
+"frame_dx": [
+-9,
+-12,
+-16,
+-19,
+-22,
+-22,
+-22,
+-22,
+-22
+]
+}
+}
+},
+"6.52_학생여1": {
+"front": {
+"dx": 1,
+"dy": -1,
+"img": "south-east"
+},
+"side": {
+"dx": -33,
+"dy": 10,
+"img": "east"
+},
+"back": {
+"dx": 15,
+"dy": 20,
+"img": "north"
+},
+"lines": {
+"front:73": {
+"dx": -5,
+"dy": 3,
+"frame_dx": [
+1,
+-1,
+-2,
+-3,
+-5,
+-5,
+-5,
+-5,
+-5
+]
+}
+}
+},
+"6.53_학생여2": {
+"front": {
+"dx": 7,
+"dy": -5,
+"img": "south"
+},
+"side": {
+"dx": -29,
+"dy": 3,
+"img": "east"
+},
+"back": {
+"dx": 8,
+"dy": 34,
+"img": "north"
+},
+"lines": {
+"front:73": {
+"dx": -9,
+"dy": -5,
+"img": "south-east"
+}
+}
+},
+"6.54_시민남1": {
+"front": {
+"dx": -1,
+"dy": -2,
+"img": "south"
+},
+"side": {
+"dx": -40,
+"dy": 4,
+"img": "east"
+},
+"back": {
+"dx": 8,
+"dy": 18,
+"img": "north"
+},
+"lines": {
+"front:73": {
+"dx": -12,
+"dy": -2,
+"img": "south-east"
+}
+}
+},
+"6.55_시민남2": {
+"front": {
+"dx": 2,
+"dy": -5,
+"img": "south"
+},
+"side": {
+"dx": -30,
+"dy": 8,
+"img": "east"
+},
+"back": {
+"dx": 8,
+"dy": 20,
+"img": "north"
+},
+"lines": {
+"front:167": {
+"dx": 2,
+"dy": -9
+},
+"front:73": {
+"dx": -9,
+"dy": -5,
+"img": "south-east"
+}
+}
+},
+"6.56_시민남3": {
+"front": {
+"dx": -9,
+"dy": 1,
+"img": "south-east"
+},
+"side": {
+"dx": -29,
+"dy": 8,
+"img": "east"
+},
+"back": {
+"dx": 11,
+"dy": 18,
+"img": "north"
+},
+"lines": {
+"front:73": {
+"dx": -12,
+"dy": 1,
+"frame_dx": [
+-9,
+-10,
+-11,
+-11,
+-12,
+-12,
+-12,
+-12,
+-12
+]
+}
+}
+},
+"6.57_시민남4": {
+"front": {
+"dx": -8,
+"dy": -2,
+"img": "south-east"
+},
+"side": {
+"dx": -32,
+"dy": -7,
+"img": "east"
+},
+"back": {
+"dx": 9,
+"dy": 18,
+"img": "north"
+},
+"lines": {
+"front:73": {
+"dx": -21,
+"dy": 2,
+"frame_dx": [
+-8,
+-11,
+-14,
+-18,
+-21,
+-21,
+-21,
+-21,
+-21
+]
+}
+}
+},
+"6.58_시민남5": {
+"front": {
+"dx": -3,
+"dy": -7,
+"img": "south-east"
+},
+"side": {
+"dx": -41,
+"dy": 8,
+"img": "east"
+},
+"back": {
+"dx": 8,
+"dy": 5,
+"img": "north"
+},
+"lines": {
+"front:73": {
+"dx": -5,
+"dy": -7,
+"frame_dx": [
+-3,
+-3,
+-4,
+-5,
+-5,
+-5,
+-5,
+-5,
+-5
+]
+}
+}
+},
+"6.59_시민남6": {
+"front": {
+"dx": 4,
+"dy": -5,
+"img": "south"
+},
+"side": {
+"dx": -37,
+"dy": 0,
+"img": "east"
+},
+"back": {
+"dx": 8,
+"dy": 14,
+"img": "north"
+},
+"lines": {
+"front:149": {
+"dx": 4,
+"dy": -9
+}
+}
+},
+"6.60_시민남7": {
+"front": {
+"dx": -6,
+"dy": -2,
+"img": "south-east"
+},
+"side": {
+"dx": -29,
+"dy": 6,
+"img": "east"
+},
+"back": {
+"dx": 8,
+"dy": 13,
+"img": "north"
+},
+"lines": {
+"front:148": {
+"dx": -6,
+"dy": -6
+},
+"front:73": {
+"dx": -13,
+"dy": -2,
+"frame_dx": [
+-6,
+-8,
+-9,
+-11,
+-13,
+-13,
+-13,
+-13,
+-13
+]
+}
+}
+},
+"6.61_시민남8": {
+"front": {
+"dx": -4,
+"dy": 1,
+"img": "south-east"
+},
+"side": {
+"dx": -32,
+"dy": 13,
+"img": "east"
+},
+"back": {
+"dx": 9,
+"dy": 6,
+"img": "north"
+},
+"lines": {
+"front:167": {
+"dx": -6,
+"dy": -7
+},
+"front:73": {
+"dx": -5,
+"dy": 1,
+"frame_dx": [
+-4,
+-4,
+-5,
+-5,
+-5,
+-5,
+-5,
+-5,
+-5
+]
+}
+}
+},
+"6.62_시민남9": {
+"front": {
+"dx": -7,
+"dy": -1,
+"img": "south-east"
+},
+"side": {
+"dx": -46,
+"dy": -3,
+"img": "east"
+},
+"back": {
+"dx": 9,
+"dy": 11,
+"img": "north"
+},
+"lines": {
+"front:73": {
+"dx": -9,
+"dy": -1,
+"frame_dx": [
+-7,
+-7,
+-8,
+-9,
+-9,
+-9,
+-9,
+-9,
+-9
+]
+}
+}
+},
+"6.63_시민여1": {
+"front": {
+"dx": 6,
+"dy": -8,
+"img": "south"
+},
+"side": {
+"dx": -29,
+"dy": -1,
+"img": "east"
+},
+"back": {
+"dx": 8,
+"dy": 26,
+"img": "north"
+}
+},
+"6.64_시민여2": {
+"front": {
+"dx": 5,
+"dy": 0,
+"img": "south"
+},
+"side": {
+"dx": -39,
+"dy": 8,
+"img": "east"
+},
+"back": {
+"dx": 8,
+"dy": 17,
+"img": "north"
+},
+"lines": {
+"front:167": {
+"dx": 5,
+"dy": -7
+}
+}
+},
+"6.65_시민여3": {
+"front": {
+"dx": -4,
+"dy": -5,
+"img": "south-east"
+},
+"side": {
+"dx": -24,
+"dy": 11,
+"img": "east"
+},
+"back": {
+"dx": 13,
+"dy": 20,
+"img": "north"
+},
+"lines": {
+"front:73": {
+"dx": -11,
+"dy": -5,
+"frame_dx": [
+-4,
+-6,
+-7,
+-9,
+-11,
+-11,
+-11,
+-11,
+-11
+]
+}
+}
+},
+"6.66_시민여4": {
+"front": {
+"dx": -8,
+"dy": 0,
+"img": "south-east"
+},
+"side": {
+"dx": -28,
+"dy": -2,
+"img": "east"
+},
+"back": {
+"dx": 12,
+"dy": 16,
+"img": "north"
+},
+"lines": {
+"front:149": {
+"dx": -6,
+"dy": -3
+},
+"front:73": {
+"dx": -15,
+"dy": -6,
+"frame_dx": [
+-8,
+-10,
+-12,
+-13,
+-15,
+-15,
+-15,
+-15,
+-15
+]
+}
+}
+},
+"6.67_시민여5": {
+"front": {
+"dx": -7,
+"dy": 1,
+"img": "south-east"
+},
+"side": {
+"dx": -22,
+"dy": 5,
+"img": "east"
+},
+"back": {
+"dx": 8,
+"dy": 16,
+"img": "north"
+},
+"lines": {
+"front:73": {
+"dx": -19,
+"dy": 1,
+"frame_dx": [
+-7,
+-10,
+-13,
+-16,
+-19,
+-19,
+-19,
+-19,
+-19
+]
+}
+}
+},
+"6.68_시민여6": {
+"front": {
+"dx": 2,
+"dy": 0,
+"img": "south-east"
+},
+"side": {
+"dx": -32,
+"dy": 10,
+"img": "east"
+},
+"back": {
+"dx": 13,
+"dy": 18,
+"img": "north"
+},
+"lines": {
+"front:73": {
+"dx": -5,
+"dy": 0,
+"frame_dx": [
+2,
+0,
+-1,
+-3,
+-5,
+-5,
+-5,
+-5,
+-5
+]
+}
+}
+},
+"6.69_시민여7": {
+"front": {
+"dx": -1,
+"dy": -2,
+"img": "south-east"
+},
+"side": {
+"dx": -30,
+"dy": 9,
+"img": "east"
+},
+"back": {
+"dx": 8,
+"dy": 12,
+"img": "north"
+},
+"lines": {
+"front:73": {
+"dx": -2,
+"dy": -6,
+"frame_dx": [
+-1,
+-1,
+-1,
+-2,
+-2,
+-2,
+-2,
+-2,
+-2
+]
+}
+}
+},
+"6.70_시민여8": {
+"front": {
+"dx": 7,
+"dy": -5,
+"img": "south"
+},
+"side": {
+"dx": -32,
+"dy": 6,
+"img": "east"
+},
+"back": {
+"dx": 8,
+"dy": 13,
+"img": "north"
+},
+"lines": {
+"front:148": {
+"dx": 7,
+"dy": -21
+},
+"front:149": {
+"dx": 7,
+"dy": -21
+}
+}
+},
+"6.71_시민여9": {
+"front": {
+"dx": -4,
+"dy": -4,
+"img": "south-east"
+},
+"side": {
+"dx": -28,
+"dy": 7,
+"img": "east"
+},
+"back": {
+"dx": 16,
+"dy": 15,
+"img": "north"
+},
+"lines": {
+"front:73": {
+"dx": -17,
+"dy": 0,
+"frame_dx": [
+-4,
+-7,
+-10,
+-14,
+-17,
+-17,
+-17,
+-17,
+-17
+]
+}
+}
+}
+}

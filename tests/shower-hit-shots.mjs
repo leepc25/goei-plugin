@@ -1,0 +1,37 @@
+// 샤워 중 피격 검수(11-02): 여자 샤워실 자리 2에서 샤워 중 약공격 → 맨몸 맞기(SH_H1/H2) → 경계 자세(SH_G), 강공격 → 쓰러짐(SH_H3) → 누움(SH_H4), 방향키 → 일어나기(SH_H5), 방을 나가면 옷 입음
+import { openField, enterHub } from './field-harness.mjs';
+const out = process.argv[2] ?? '.';
+const { page, browser, errors } = await openField({ width: 1600, height: 900 });
+await enterHub(page);
+const st = () => page.evaluate(() => { const p = window.__goeiEngine.world.player; const P = p.core?.P; return { showering: p.showering, nude: p.nude, mode: P?.mode, clip: P?.clip?.id, scene: P?.scene }; });
+await page.evaluate(() => window.__goeiEngine.world.stage.jump('bath_f', 536, 712));
+for (let i = 0; i < 40 && (await page.evaluate(() => window.__goeiEngine.world?.floor?.id)) !== 'hq:bath_f'; i++) await page.waitForTimeout(250);
+await page.waitForTimeout(1200);
+await page.evaluate(() => window.__goeiEngine.world.api.movePlayer(536, 712));
+await page.waitForTimeout(400);
+await page.keyboard.press('KeyE'); await page.waitForTimeout(1200); await page.keyboard.press('Digit3'); await page.waitForTimeout(1500);
+console.log('샤워 중', JSON.stringify(await st()));
+const hit = (react, blow = false) => page.evaluate(([react, blow]) => { const w = window.__goeiEngine.world; const p = w.player; return p.applyHit({ attackId: Math.random(), dmg: 5, react, dir: 1, x0: p.x - 50, x1: p.x + 50, y: p.y, blow }, w); }, [react, blow]);
+console.log('약공격', JSON.stringify(await hit('flinch')));
+await page.waitForTimeout(150); console.log('맞는 중', JSON.stringify(await st()));
+await page.screenshot({ path: `${out}/hit_1_light.png`, clip: { x: 420, y: 250, width: 420, height: 360 } });
+await page.waitForTimeout(1500); console.log('맞고 나서', JSON.stringify(await st()));
+await page.screenshot({ path: `${out}/hit_2_guard.png`, clip: { x: 420, y: 250, width: 420, height: 360 } });
+console.log('강공격', JSON.stringify(await hit('down')));
+await page.waitForTimeout(300); console.log('쓰러지는 중', JSON.stringify(await st()));
+await page.waitForTimeout(1500); console.log('누움', JSON.stringify(await st()));
+await page.screenshot({ path: `${out}/hit_3_down.png`, clip: { x: 420, y: 250, width: 420, height: 360 } });
+console.log('누운 채 맞음', JSON.stringify(await hit('flinch')));
+await page.waitForTimeout(200); console.log('누워 맞는 중', JSON.stringify(await st()));
+await page.waitForTimeout(1500);
+await page.keyboard.down('ArrowLeft'); await page.waitForTimeout(200); await page.keyboard.up('ArrowLeft');
+await page.waitForTimeout(300); console.log('일어나는 중', JSON.stringify(await st()));
+await page.waitForTimeout(1500); console.log('일어남', JSON.stringify(await st()));
+await page.keyboard.down('ArrowLeft'); await page.waitForTimeout(600); console.log('맨몸 걷기', JSON.stringify(await st()));
+await page.screenshot({ path: `${out}/hit_4_walk.png`, clip: { x: 300, y: 250, width: 500, height: 360 } }); await page.keyboard.up('ArrowLeft');
+// 방 나가기 → 옷 입음
+await page.evaluate(() => window.__goeiEngine.world.stage.jump('b1', 600));
+for (let i = 0; i < 40 && (await page.evaluate(() => window.__goeiEngine.world?.floor?.id)) !== 'hq:b1'; i++) await page.waitForTimeout(250);
+await page.waitForTimeout(800); console.log('B1', JSON.stringify(await st()));
+console.log('errors', errors.slice(0, 8));
+await browser.close();

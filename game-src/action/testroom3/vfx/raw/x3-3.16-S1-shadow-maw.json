@@ -1,0 +1,339 @@
+{
+ "frames": [
+  {
+   "filename": "x3-3-16-s1-shadow-maw 0.png",
+   "frame": {
+    "x": 0,
+    "y": 0,
+    "w": 464,
+    "h": 192
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 464,
+    "h": 192
+   },
+   "sourceSize": {
+    "w": 464,
+    "h": 192
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.7135416666666666
+   },
+   "duration": 83
+  },
+  {
+   "filename": "x3-3-16-s1-shadow-maw 1.png",
+   "frame": {
+    "x": 464,
+    "y": 0,
+    "w": 464,
+    "h": 192
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 464,
+    "h": 192
+   },
+   "sourceSize": {
+    "w": 464,
+    "h": 192
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.7135416666666666
+   },
+   "duration": 83
+  },
+  {
+   "filename": "x3-3-16-s1-shadow-maw 2.png",
+   "frame": {
+    "x": 928,
+    "y": 0,
+    "w": 464,
+    "h": 192
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 464,
+    "h": 192
+   },
+   "sourceSize": {
+    "w": 464,
+    "h": 192
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.7135416666666666
+   },
+   "duration": 83
+  },
+  {
+   "filename": "x3-3-16-s1-shadow-maw 3.png",
+   "frame": {
+    "x": 1392,
+    "y": 0,
+    "w": 464,
+    "h": 192
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 464,
+    "h": 192
+   },
+   "sourceSize": {
+    "w": 464,
+    "h": 192
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.7135416666666666
+   },
+   "duration": 83
+  },
+  {
+   "filename": "x3-3-16-s1-shadow-maw 4.png",
+   "frame": {
+    "x": 0,
+    "y": 192,
+    "w": 464,
+    "h": 192
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 464,
+    "h": 192
+   },
+   "sourceSize": {
+    "w": 464,
+    "h": 192
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.7135416666666666
+   },
+   "duration": 83
+  },
+  {
+   "filename": "x3-3-16-s1-shadow-maw 5.png",
+   "frame": {
+    "x": 464,
+    "y": 192,
+    "w": 464,
+    "h": 192
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 464,
+    "h": 192
+   },
+   "sourceSize": {
+    "w": 464,
+    "h": 192
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.7135416666666666
+   },
+   "duration": 83
+  },
+  {
+   "filename": "x3-3-16-s1-shadow-maw 6.png",
+   "frame": {
+    "x": 928,
+    "y": 192,
+    "w": 464,
+    "h": 192
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 464,
+    "h": 192
+   },
+   "sourceSize": {
+    "w": 464,
+    "h": 192
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.7135416666666666
+   },
+   "duration": 83
+  },
+  {
+   "filename": "x3-3-16-s1-shadow-maw 7.png",
+   "frame": {
+    "x": 1392,
+    "y": 192,
+    "w": 464,
+    "h": 192
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 464,
+    "h": 192
+   },
+   "sourceSize": {
+    "w": 464,
+    "h": 192
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.7135416666666666
+   },
+   "duration": 83
+  },
+  {
+   "filename": "x3-3-16-s1-shadow-maw 8.png",
+   "frame": {
+    "x": 0,
+    "y": 384,
+    "w": 464,
+    "h": 192
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 464,
+    "h": 192
+   },
+   "sourceSize": {
+    "w": 464,
+    "h": 192
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.7135416666666666
+   },
+   "duration": 83
+  },
+  {
+   "filename": "x3-3-16-s1-shadow-maw 9.png",
+   "frame": {
+    "x": 464,
+    "y": 384,
+    "w": 464,
+    "h": 192
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 464,
+    "h": 192
+   },
+   "sourceSize": {
+    "w": 464,
+    "h": 192
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.7135416666666666
+   },
+   "duration": 83
+  },
+  {
+   "filename": "x3-3-16-s1-shadow-maw 10.png",
+   "frame": {
+    "x": 928,
+    "y": 384,
+    "w": 464,
+    "h": 192
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 464,
+    "h": 192
+   },
+   "sourceSize": {
+    "w": 464,
+    "h": 192
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.7135416666666666
+   },
+   "duration": 83
+  },
+  {
+   "filename": "x3-3-16-s1-shadow-maw 11.png",
+   "frame": {
+    "x": 1392,
+    "y": 384,
+    "w": 464,
+    "h": 192
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 464,
+    "h": 192
+   },
+   "sourceSize": {
+    "w": 464,
+    "h": 192
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.7135416666666666
+   },
+   "duration": 83
+  }
+ ],
+ "meta": {
+  "app": "PixelLab VFX Creator",
+  "image": "x3-3-16-s1-shadow-maw.png",
+  "format": "RGBA8888",
+  "size": {
+   "w": 1856,
+   "h": 576
+  },
+  "scale": "1",
+  "anchor": {
+   "kind": "origin",
+   "x": 232,
+   "y": 137
+  },
+  "frameTags": [
+   {
+    "name": "x3-3-16-s1-shadow-maw",
+    "from": 0,
+    "to": 11,
+    "direction": "forward"
+   }
+  ]
+ }
+}

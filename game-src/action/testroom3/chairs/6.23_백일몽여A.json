@@ -1,0 +1,20 @@
+{
+ "front": {
+  "dx": 28,
+  "dy": -5,
+  "s": 1.0,
+  "img": "south-west"
+ },
+ "side": {
+  "dx": -21,
+  "dy": 7,
+  "s": 1.0,
+  "img": "east"
+ },
+ "back": {
+  "dx": 9,
+  "dy": 14,
+  "s": 1.0,
+  "img": "north"
+ }
+}

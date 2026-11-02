@@ -1,0 +1,175 @@
+{
+ "room": "corridor",
+ "mood": "worn",
+ "mode": "loose",
+ "view": "corridor",
+ "floor_share": "the lower 30 percent",
+ "density": "packed+",
+ "place": "a run-down 1990s Seoul underground arcade corridor, low ceiling right above the sign",
+ "time": "night",
+ "light": "half-dead fluorescent tubes and warm shop light",
+ "palette": "near-black cold grey-green, sickly green and dim red accents",
+ "walls": "raw concrete, water stains, mold, soot, graffiti; ceiling strip, tangled cables, fluorescent tubes, nearly all dead, one flickering",
+ "floor": "smooth dark poured concrete like one wet sheet, grime, oil stains, dark puddles, varied litter all over the walkway, shadows under objects",
+ "shadow": "very dark, black shadows in corners and under objects, small light pools",
+ "name": "jr_b2_p4_v1",
+ "sides": "none",
+ "doors": 1,
+ "no": [
+  "other doors"
+ ],
+ "sized": [],
+ "items": [
+  {
+   "full": "left 10 percent of the image: only bare back wall and floor, no side wall",
+   "text": "left 10 percent of the image: only bare back wall and floor, no side wall",
+   "why": "이음매",
+   "keep": []
+  },
+  {
+   "full": "back wall, centered: a big shaman's shrine front filling the middle 80 percent of the width, recessed like a deep lit room glowing red, a wooden lattice door hung with five-color cloth strips, red candles, paper talismans and a small altar inside; right above the opening, just under the ceiling strip, a red-and-white shaman flag and a board reading \"천수보살\"",
+   "text": "back wall, centered: a big shaman's shrine front filling the middle 80 percent of the width, recessed like a deep lit room glowing red, a wooden lattice door hung with five-color cloth strips, red candles, paper talismans and a small altar inside; right above the opening, just under the ceiling strip, a red-and-white shaman flag and a board reading \"천수보살\"",
+   "why": "사용자 확정: 천수보살(무당집, 괴이 게임)",
+   "keep": []
+  },
+  {
+   "full": "clear empty floor in front of the lattice door",
+   "text": "clear empty floor in front of the lattice door",
+   "why": "출입구 앞 비움",
+   "keep": []
+  },
+  {
+   "full": "left of the shop: a stone salt bowl, a bundle of dried straw, melted candle stubs",
+   "text": "left of the shop: a stone salt bowl, a bundle of dried straw, melted candle stubs",
+   "why": "무당집 소품",
+   "keep": []
+  },
+  {
+   "full": "right of the shop: paper talismans on the wall, a fire extinguisher box",
+   "text": "right of the shop: paper talismans on the wall, a fire extinguisher box",
+   "why": "무당집·설계안 소화기함",
+   "keep": []
+  },
+  {
+   "full": "wall base: wet cardboard, bottles, each a different shape",
+   "text": "wall base: wet cardboard, bottles, each a different shape",
+   "why": "쓰레기 제각각",
+   "keep": []
+  },
+  {
+   "full": "a torn blank notice",
+   "text": "a torn blank notice",
+   "why": "벽 소품",
+   "keep": []
+  },
+  {
+   "full": "dripping pipes under the ceiling",
+   "text": "dripping pipes under the ceiling",
+   "why": "설계안 배관·물 얼룩",
+   "keep": []
+  },
+  {
+   "full": "a caged wall lamp with a dim red bulb",
+   "text": "a caged wall lamp with a dim red bulb",
+   "why": "어두운 벽 등",
+   "keep": []
+  },
+  {
+   "full": "right 10 percent of the image: only bare back wall and floor, no side wall",
+   "text": "right 10 percent of the image: only bare back wall and floor, no side wall",
+   "why": "이음매",
+   "keep": []
+  }
+ ],
+ "must": [
+  {
+   "kw": "reading \"천수보살\"",
+   "from": "가게 이름"
+  },
+  {
+   "kw": "one wet sheet",
+   "from": "사용자 바닥 선 금지"
+  }
+ ],
+ "brief": {
+  "wiki": "영창컨설팅: 지하 2층, 깜빡이는 조명·물 얼룩진 콘크리트, 철문 「창고 B-7」, 데드볼트 셋, 간판 없음",
+  "design": "필드_거점_설계안 jr_b2: 짙은 회색, 물 얼룩, 배관, 깜빡이는 조명, 소화기함, 비상구 유도등",
+  "user": [
+   "사용자 10-31: 지하 2층은 더 어둑하고 위험하게, 창고만 뽑지 말 것",
+   "사용자 10-31: 영창 컨설팅이 맨 왼쪽, 오른쪽 끝에 올라가는 계단",
+   "사용자 10-31: 「전체 한번에 뽑아」",
+   "구조 문장은 앞골목 ④ 그대로, 색·빛 상태·벽 표면·바닥 더러움·명암만 바꿈"
+  ],
+  "items": [
+   {
+    "src": "0번 줄 근거",
+    "by": [
+     0
+    ]
+   },
+   {
+    "src": "1번 줄 근거",
+    "by": [
+     1
+    ]
+   },
+   {
+    "src": "2번 줄 근거",
+    "by": [
+     2
+    ]
+   },
+   {
+    "src": "3번 줄 근거",
+    "by": [
+     3
+    ]
+   },
+   {
+    "src": "4번 줄 근거",
+    "by": [
+     4
+    ]
+   },
+   {
+    "src": "5번 줄 근거",
+    "by": [
+     5
+    ]
+   },
+   {
+    "src": "6번 줄 근거",
+    "by": [
+     6
+    ]
+   },
+   {
+    "src": "7번 줄 근거",
+    "by": [
+     7
+    ]
+   },
+   {
+    "src": "8번 줄 근거",
+    "by": [
+     8
+    ]
+   },
+   {
+    "src": "9번 줄 근거",
+    "by": [
+     9
+    ]
+   }
+  ]
+ },
+ "review": {
+  "fit": "지하 2층 이 칸의 가게·소품, 의자·사람 없음",
+  "place": "가게 가운데, 소품은 가게 왼쪽·오른쪽, 문 앞 비움",
+  "size": "크기 숫자 없음(느슨한 틀)",
+  "brief": "칸 내용 대응, 빠진 것 없음",
+  "meaning": "1차=2차(느슨한 틀)",
+  "over": "같은 물건 두 번 없음, packed+",
+  "frame": "구조 문장은 앞골목 ④와 같음(① 왼쪽 옆벽), 가이드 v6"
+ }
+}

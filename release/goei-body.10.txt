@@ -1,4 +1,259 @@
-; box-shadow: 0 -6px 0 6px var(--void); }
+오기는 글자 크기만큼, 오른쪽 끝에. 모바일만 네 칸 균등 */
+.st-barbtns { grid-column: span 2; justify-self: end; display: flex; gap: 8px; }
+@media (max-width: 760px) {
+  .st-scopebar, .st-barbtns { gap: 6px; }
+  .st-barbtns { justify-self: stretch; display: grid; grid-template-columns: 1fr 1fr; }
+  .st-act { min-width: 0; min-height: 32px; padding: 0 6px; gap: 4px; }
+  .ps-defaults .st-act { padding: 0 8px; }
+}
+.st-barconfirm { margin: 10px 0 0; padding: 12px 14px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel2); }
+.st-barconfirm p { color: var(--text); }
+.ps-save { flex: none; min-height: 34px; padding: 0 12px; border-color: var(--accent-line); color: var(--signal); }
+.ps-save:hover { background: var(--accent-bg); }
+.ph-room-head .ph-act .ps-save { margin-right: 4px; }
+.nw > .gx-toast, .gx-settings > .gx-toast { position: fixed; bottom: 96px; }
+/* 위키: 검색줄·위 줄 오른쪽 끝 설정 버튼, 설정 화면 */
+.nw-search .nw-cfg, .nw-nav .nw-cfg { width: 40px; height: 40px; border: 1px solid var(--line); border-radius: 10px; }
+.nw-nav { align-items: center; }
+.nw-nav-gap { flex: 1; }
+.nw-setpane { display: flex; flex-direction: column; gap: 14px; }
+.nw-sethead { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.nw-sethead h2 { margin: 0; font-size: 17px; }
+.nw-sethead small { color: var(--dim); font-size: 13px; }
+.nw-setpane .ps-row > .nw-reqbox { width: 100%; resize: vertical; }
+/* ── 위키 (v0.16.23): 괴담톡·괴담넷과 같은 두 칸. 왼쪽 명부·작성한 문서, 오른쪽 문서 ── */
+.nw.nw-app .nw-search { display: block; }
+.nw-status:empty { display: none; }
+.nw-status { display: flex; flex-direction: column; gap: 8px; padding: 10px 14px 0; }
+.nw-status .nw-busy, .nw-status .gx-err { margin: 0; }
+.ph-side > .nw-busy, .ph-side > .gx-err { margin: 0; }
+.nw-row .ph-who-top b { flex: 0 1 auto; }
+.nw-dot { flex: none; width: 7px; height: 7px; border-radius: 50%; background: var(--signal); }
+.nw-ava { color: var(--dim); }
+.nw-ava svg { width: 22px; height: 22px; }
+.nw-ava.k-an { color: var(--danger); background: color-mix(in srgb, var(--danger) 12%, var(--panel2)); }
+.nw-ava.k-ms { color: var(--blue); background: color-mix(in srgb, var(--blue) 12%, var(--panel2)); }
+.nw-ava.k-lm { color: var(--amber); background: var(--amber-bg); }
+.nw-ava.k-ag { color: var(--mint); }
+.nw-ava.k-org { color: var(--signal); background: var(--accent-bg); }
+.ph-avatar.xs { width: 24px; height: 24px; border-radius: 8px; font-size: 11px; }
+.ph-avatar.xs svg { width: 14px; height: 14px; }
+.ph-avatar.lg { width: 96px; height: 96px; border-radius: 26px; }
+.ph-avatar.lg svg { width: 40px; height: 40px; }
+.nw-newrow .ph-avatar { color: var(--signal); background: var(--accent-bg); }
+/* 문서 */
+.nw-pane .nw-doc { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; gap: 14px; padding: 18px 24px 28px; }
+.nw-pane .nw-dochead { flex-direction: column; align-items: flex-start; justify-content: flex-start; gap: 2px; }
+.nw-pane .nw-dochead small { color: var(--dim); font-size: 14px; }
+.nw-ibphoto { padding: 0 !important; background: var(--void) !important; }
+.nw-ibphoto img { display: block; width: 100%; aspect-ratio: 1 / 1; object-fit: cover; object-position: top; }
+.nw-ava img { object-position: top; }
+.nw-more { flex-direction: column; align-items: stretch; gap: 8px; padding-top: 12px; border-top: 1px solid var(--line); }
+.nw-more + .nw-more { border-top: 0; padding-top: 0; }
+.nw-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.nw-chip { display: inline-flex; align-items: center; gap: 6px; height: 32px; padding: 0 12px 0 4px; border: 1px solid var(--line); border-radius: 999px; background: var(--panel); color: var(--text); font: inherit; font-size: 13.5px; font-weight: 600; }
+.nw-chip:hover { border-color: var(--accent-line); }
+.nw-chip.none { opacity: .55; border-style: dashed; }
+/* 아직 없는 문서 */
+.nw.nw-app .nw-compose { align-items: center; text-align: center; gap: 8px; margin: auto 0; padding: 28px 20px; border: 0; background: none; }
+.nw-cmsg { font-size: 16px; font-weight: 600; color: var(--text); }
+.nw-creq { font-size: 13px; color: var(--sub); padding: 8px 12px; border-radius: 10px; background: var(--panel); }
+.nw.nw-app .ph-form-body:has(> .nw-compose) { justify-content: center; }
+.nw-setpane .ps-row > .nw-reqbox { margin: 0; }
+@media (max-width: 760px) {
+  .nw-pane .nw-doc { padding: 12px 14px 20px; }
+}
+/* 위키 (v0.16.23 3차, 사용자 설계): 세로바(메인·작성·설정 + 펼치기 자리) + 본문 위로 덮는 목록 서랍. PC·모바일 같은 구조 */
+.gx-body.nw-app { grid-template-columns: 60px minmax(0, 1fr); }
+.nw-edge { display: none; }
+.nw-rail { position: relative; z-index: 4; display: flex; flex-direction: column; align-items: center; gap: 6px; min-height: 0; padding: 12px 0 0; border-right: 1px solid var(--panel2); background: var(--void); }
+.nw-rail > .ph-tool { width: 44px; height: 44px; }
+.nw-rail > .ph-tool svg { width: 21px; height: 21px; }
+.nw-grab { flex: 1; align-self: stretch; display: grid; place-items: center; margin-top: 6px; padding: 0; border: 0; border-top: 1px solid var(--panel2); background: none; color: var(--dim); cursor: pointer; touch-action: pan-y; }
+.nw-grab:hover { background: var(--panel); color: var(--text); }
+.nw-grab-ico { display: grid; place-items: center; width: 28px; height: 56px; border-radius: 999px; background: var(--panel); }
+.nw-grab:hover .nw-grab-ico { background: var(--panel2); }
+.nw-grab-ico svg { width: 18px; height: 18px; }
+.nw-grab-ico.flip svg { transform: scaleX(-1); }
+.nw-panel { position: absolute; z-index: 3; top: 0; bottom: 0; left: 60px; width: 320px; max-width: calc(100% - 100px); border-right: 1px solid var(--panel2); background: var(--void); box-shadow: 10px 0 28px rgba(0, 0, 0, .32); transform: translateX(calc(-100% - 60px)); visibility: hidden; transition: transform .22s ease, visibility 0s linear .22s; }
+.list-open .nw-panel { transform: none; visibility: visible; transition: transform .22s ease; }
+/* 위키 목록 오른쪽 (설정 → 화면 → 위키 목록 위치, PC만): 세로바를 오른쪽에 두고 서랍도 오른쪽에서 */
+@media (min-width: 761px) {
+  .gx[data-wiki-side="right"] .gx-body.nw-app { grid-template-columns: minmax(0, 1fr) 60px; }
+  .gx[data-wiki-side="right"] .nw-rail { grid-column: 2; grid-row: 1; border-right: 0; border-left: 1px solid var(--panel2); }
+  .gx[data-wiki-side="right"] .nw-main { grid-column: 1; grid-row: 1; }
+  .gx[data-wiki-side="right"] .nw-grab-ico svg { transform: scaleX(-1); }
+  .gx[data-wiki-side="right"] .nw-grab-ico.flip svg { transform: none; }
+  .gx[data-wiki-side="right"] .nw-panel { left: auto; right: 60px; border-right: 0; border-left: 1px solid var(--panel2); box-shadow: -10px 0 28px rgba(0, 0, 0, .32); transform: translateX(calc(100% + 60px)); }
+  .gx[data-wiki-side="right"] .list-open .nw-panel { transform: none; }
+  .gx[data-wiki-side="right"] .list-open .nw-scrim { inset: 0 60px 0 0; }
+}
+.nw-pin { display: flex; flex-direction: column; gap: 8px; height: 100%; padding: 12px 12px 0; }
+.nw-pin .nw-search { flex: none; }
+.nw-pin .nw-list { flex: 1; min-height: 0; position: relative; display: flex; flex-direction: column; gap: 6px; overflow: hidden; margin: 0 -12px; padding: 0; }
+.nw-pin .nw-fail { margin: 0 0 12px; }
+.nw-row .ph-who b { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.nw-scrim { display: none; }
+.list-open .nw-scrim { display: block; position: absolute; z-index: 2; inset: 0 0 0 60px; border: 0; padding: 0; background: rgba(0, 0, 0, .28); }
+.nw-main { min-width: 0; }
+.nw-app > .ph-drawer { display: none; }
+.nw-nohit { flex-direction: column; gap: 14px; }
+.nw-near-lead { margin: 10px 8px 4px; font-size: 13px; color: var(--sub); line-height: 1.5; }
+.nw-hero-res:empty { display: none; }
+.nw-hero-res { margin-top: 10px; max-height: 360px; display: flex; flex-direction: column; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); overflow: hidden; }
+.nw-hero-res .nw-groups { padding: 4px 4px 8px; }
+.nw-nohit .gx-start { display: inline-flex; align-items: center; gap: 6px; width: auto; min-height: 44px; padding: 0 20px; font-size: 15px; letter-spacing: normal; }
+.nw-nohit .gx-start svg { width: 18px; height: 18px; }
+.nw-main .ph-room-head.nw-noback { padding-left: 16px; }
+.nw-main .nw-doc > * { width: 100%; max-width: 1000px; margin-left: auto; margin-right: auto; }
+/* 위키 메인 */
+.nw-home { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; display: flex; flex-direction: column; gap: 22px; padding: 22px 24px 28px; }
+.nw-home > * { width: 100%; max-width: 1000px; margin-left: auto; margin-right: auto; }
+.nw-home .nw-hero { display: flex; flex-direction: column; gap: 14px; padding: 20px; border: 1px solid var(--line); border-radius: 16px; background: linear-gradient(160deg, var(--accent-bg), var(--panel) 70%); }
+.nw-hero-top { display: flex; align-items: center; gap: 12px; }
+.nw-hero-ico { display: grid; place-items: center; width: 48px; height: 48px; color: var(--signal); }
+.nw-hero-ico svg { width: 40px; height: 40px; }
+.nw-hero-t { display: flex; flex-direction: column; gap: 2px; }
+.nw-hero-t h2 { margin: 0; font-size: 20px; }
+.nw-hero-t small { color: var(--dim); font-size: 13px; }
+.nw-hero-q { display: flex; gap: 8px; align-items: center; }
+.nw-hero-q .gx-search { flex: 1; min-width: 0; margin: 0; }
+.nw-hero-q .gx-mini { flex: none; height: 40px; padding: 0 14px; }
+.nw-home .nw-hsec { padding: 0; display: flex; flex-direction: column; gap: 10px; }
+.nw-hsec h3 { display: flex; align-items: center; gap: 6px; margin: 0; padding-bottom: 8px; border-bottom: 1px solid var(--line); font-size: 15px; }
+.nw-hsec h3 b { color: var(--dim); font-size: 13px; font-weight: 600; }
+.nw-hnone { margin: 0; padding: 18px 12px; text-align: center; color: var(--dim); font-size: 14px; }
+.nw-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 8px; }
+.nw-card { display: grid; grid-template-columns: 48px minmax(0, 1fr); grid-template-rows: auto auto; column-gap: 10px; row-gap: 2px; align-content: center; align-items: center; min-width: 0; padding: 8px 12px 8px 8px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); color: var(--text); font: inherit; text-align: left; }
+.nw-card:hover { border-color: var(--accent-line); }
+.nw-card-img { grid-row: 1 / 3; display: grid; place-items: center; width: 48px; height: 48px; border-radius: 10px; overflow: hidden; background: var(--panel2); color: var(--dim); }
+.nw-card-img img { width: 100%; height: 100%; object-fit: cover; object-position: top; }
+.nw-card-img svg { width: 22px; height: 22px; }
+.nw-card-img.k-an { color: var(--danger); background: color-mix(in srgb, var(--danger) 12%, var(--panel2)); }
+.nw-card-img.k-ms { color: var(--blue); background: color-mix(in srgb, var(--blue) 12%, var(--panel2)); }
+.nw-card-img.k-lm { color: var(--amber); background: var(--amber-bg); }
+.nw-card-img.k-org { color: var(--signal); background: var(--accent-bg); }
+.nw-card b { align-self: end; font-size: 14px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.nw-card small { align-self: start; color: var(--dim); font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.nw-chip small { color: var(--dim); font-size: 11.5px; font-weight: 600; }
+@media (max-width: 760px) {
+  /* 모바일 (v0.16.24): 세로바 없이 본문 전체 폭, 버튼은 하단 바 위 서랍 (괴담톡·괴담넷과 같음) */
+  .gx-body.nw-app { position: relative; grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(0, 1fr) auto; }
+  .nw-rail { display: none; }
+  /* 목록 서랍 손잡이: 오른쪽 아래, 도구 서랍 바로 위의 긴 책갈피 (2026-10-21 사용자: 왼쪽 가운데 작은 손잡이는 누르기 힘들었다). 목록이 펼쳐지면 숨김 */
+  .nw-edge { position: absolute; right: 0; bottom: 34px; z-index: 3; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; width: 34px; height: 116px; padding: 0 0 0 2px; border: 1px solid var(--line2); border-right: 0; border-radius: 14px 0 0 14px; background: var(--panel); color: var(--signal); font: inherit; font-size: 12.5px; font-weight: 800; line-height: 1.1; box-shadow: -3px 4px 14px -6px rgba(0, 0, 0, .5); cursor: pointer; transition: bottom .2s ease; }
+  .nw-edge svg { width: 17px; height: 17px; flex: none; }
+  .nw-edge span { writing-mode: vertical-rl; letter-spacing: .2em; color: var(--sub); }
+  .nw-app:has(> .ph-drawer.open) .nw-edge { bottom: 106px; }
+  .list-open .nw-edge { display: none; }
+  .nw-app > .ph-drawer { display: block; grid-column: 1; grid-row: 2; margin: 0; }
+  .nw-app > .ph-drawer .ph-tools { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .nw-main { grid-row: 1; }
+  /* 모바일 목록은 오른쪽에서 열린다 (손잡이가 오른쪽) */
+  .nw-panel { left: auto; right: 0; transform: translateX(100%); max-width: calc(100% - 40px); border-right: 0; border-left: 1px solid var(--panel2); box-shadow: -10px 0 28px rgba(0, 0, 0, .32); }
+  .list-open .nw-scrim { inset: 0; }
+  /* 설정 「위키 목록 위치」가 왼쪽이면 폰 책갈피·목록도 왼쪽에서 (2026-10-29 사용자: 폰도 설정을 따라간다) */
+  .gx[data-wiki-side="left"] .nw-edge { right: auto; left: 0; padding: 0 2px 0 0; border-right: 1px solid var(--line2); border-left: 0; border-radius: 0 14px 14px 0; box-shadow: 3px 4px 14px -6px rgba(0, 0, 0, .5); }
+  .gx[data-wiki-side="left"] .nw-edge svg { transform: scaleX(-1); }
+  .gx[data-wiki-side="left"] .nw-panel { right: auto; left: 0; transform: translateX(-100%); border-left: 0; border-right: 1px solid var(--panel2); box-shadow: 10px 0 28px rgba(0, 0, 0, .32); }
+  .gx[data-wiki-side="left"] .list-open .nw-panel { transform: none; }
+  .nw-main .ph-room-head.nw-noback { padding-left: 12px; }
+  .nw-home { padding: 14px 14px 22px; gap: 18px; }
+  .nw-home .nw-hero { padding: 16px; }
+  .nw-cards { grid-template-columns: minmax(0, 1fr); }
+}
+.nw-index { display: flex; flex-direction: column; }
+.nw-irow { display: flex; align-items: flex-start; gap: 12px; padding: 8px 0; border-bottom: 1px solid var(--panel2); }
+.nw-irow:last-child { border-bottom: 0; }
+.nw-ikey { flex: none; display: grid; place-items: center; width: 32px; height: 32px; border-radius: 10px; background: var(--panel2); color: var(--sub); font-size: 14px; }
+/* 위키 서랍 탭·색인, 메인 분류 (v0.16.23 4차: 기본 문서 141개) */
+.nw-tabs { flex-wrap: wrap; overflow: visible; padding: 0 12px; }
+.nw-groups { flex: 1; min-height: 0; position: relative; overflow-y: auto; overscroll-behavior: contain; padding: 0 4px 12px; }
+.nw-tabs + .nw-groups { padding-right: 26px; }
+.nw-kbtn { display: inline-flex; align-items: center; gap: 6px; min-height: 28px; padding: 0 10px; margin-left: -10px; border: 0; border-radius: 8px; background: none; color: inherit; font: inherit; cursor: pointer; }
+.nw-kbtn b { color: var(--dim); font-weight: 600; }
+.nw-kbtn::after { content: ''; width: 6px; height: 6px; margin: -3px 0 0 2px; border-right: 1.5px solid var(--dim); border-bottom: 1.5px solid var(--dim); transform: rotate(45deg); }
+.nw-kbtn:hover { background: var(--accent-bg); color: var(--signal); }
+.nw-kgrid { position: absolute; z-index: 3; inset: 0; display: grid; place-items: center; padding: 16px; background: color-mix(in srgb, var(--void) 72%, transparent); }
+.nw-kgrid[hidden] { display: none; }
+.nw-kgrid-in { display: grid; grid-template-columns: repeat(4, 56px); gap: 8px; padding: 14px; border: 1px solid var(--line); border-radius: 16px; background: var(--panel); }
+.nw-kgrid-in button { height: 52px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel2); color: var(--text); font: inherit; font-size: 18px; font-weight: 700; cursor: pointer; }
+.nw-kgrid-in button:hover:not(:disabled) { border-color: var(--signal); color: var(--signal); background: var(--accent-bg); }
+.nw-kgrid-in button:disabled { opacity: .3; cursor: default; }
+.nw-card.none { opacity: .6; border-style: dashed; }
+.nw-more-btn { align-self: center; margin-top: 2px; }
+.nw-tiles { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 8px; }
+.nw-tile { display: grid; grid-template-columns: 48px minmax(0, 1fr); grid-template-rows: auto auto; column-gap: 10px; row-gap: 2px; align-items: center; min-width: 0; padding: 8px 12px 8px 8px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); color: var(--text); font: inherit; text-align: left; }
+.nw-tile:hover { border-color: var(--accent-line); }
+.nw-tile-pics { grid-row: 1 / 3; display: grid; grid-template-columns: repeat(2, 1fr); gap: 2px; width: 48px; height: 48px; border-radius: 10px; overflow: hidden; background: var(--panel2); color: var(--dim); place-items: center; }
+.nw-tile-pics img { width: 100%; height: 100%; object-fit: cover; object-position: top; }
+.nw-tile-pics:not(:has(img)) { display: grid; grid-template-columns: 1fr; }
+.nw-tile-pics svg { width: 22px; height: 22px; }
+.nw-tile.k-an .nw-tile-pics:not(:has(img)) { color: var(--danger); background: color-mix(in srgb, var(--danger) 12%, var(--panel2)); }
+.nw-tile.k-ms .nw-tile-pics:not(:has(img)) { color: var(--blue); background: color-mix(in srgb, var(--blue) 12%, var(--panel2)); }
+.nw-tile b { align-self: end; font-size: 14px; }
+.nw-tile small { align-self: start; color: var(--dim); font-size: 12px; }
+@media (max-width: 760px) {
+  .nw-tiles { grid-template-columns: minmax(0, 1fr); }
+}
+
+/* 하단 서랍 (v0.16.24): 임무 지역·검색, 편성 작전 메모, 상황판 신분증·설정. 모바일에서만 그린다 */
+.gx-content > .ph-drawer { margin: 0; }
+.ph-dbody { padding: 0 12px; }
+.gx-bdrawer .ph-tools { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+@media (max-width: 760px) {
+  .ph-drawer .ph-dbody { max-height: 0; overflow: hidden; transition: max-height .2s ease, padding .2s ease; }
+  .ph-drawer.open .ph-dbody { max-height: 160px; padding: 2px 12px 10px; overflow: visible; }
+  .gx-mdrawer .gx-mapbar { margin: 0; }
+  .gx-mdrawer .gx-note { display: block; margin: 0; }
+  .gx-mdrawer .gx-note textarea { width: 100%; }
+  .gx-mgo { padding: 0 12px 10px; }
+  .gx-mgo .gx-start { min-height: 46px; border-radius: 12px; font-size: 16px; }
+  /* 장소 검색 제안은 서랍 위로 펼친다 */
+  .gx-mdrawer .gx-mapfind { position: relative; }
+  .gx-mdrawer .gx-mapsug { top: auto; bottom: calc(100% + 6px); }
+}
+
+/* 고급 설정 (v0.16.27): 기능 설정 맨 아래 접힌 칸. 열기 전에는 한 줄 */
+.ps-adv { border: 1px solid var(--line); border-radius: 16px; background: var(--panel); }
+.ps-adv-sum { list-style: none; display: flex; align-items: center; gap: 8px; min-height: 52px; padding: 0 14px; cursor: pointer; }
+.ps-adv-sum::-webkit-details-marker, .ps-adv-sub > summary::-webkit-details-marker { display: none; }
+.ps-adv-sum b { font-size: 15px; font-weight: 600; }
+.ps-adv-sum::after, .ps-adv-sub > summary::after { content: ''; margin-left: auto; width: 8px; height: 8px; border-right: 2px solid var(--dim); border-bottom: 2px solid var(--dim); transform: translateY(-2px) rotate(45deg); }
+.ps-adv[open] > .ps-adv-sum::after, .ps-adv-sub[open] > summary::after { transform: translateY(2px) rotate(-135deg); }
+.adv-count { padding: 2px 8px; border: 1px solid var(--accent-line); border-radius: 999px; color: var(--signal); font-size: 12px; white-space: nowrap; }
+.ps-adv-body { display: flex; flex-direction: column; gap: 16px; padding: 4px 12px 14px; border-top: 1px solid var(--line); }
+.ps-adv-body > .ps-group:first-child { margin-top: 10px; }
+.ps-adv .ps-rows { background: var(--void); }
+.adv-row .ps-ctl { align-items: center; gap: 4px; }
+.adv-reset { flex: none; width: 32px; height: 32px; }
+.adv-numrow { flex-wrap: nowrap; }
+.adv-numrow .ps-label { flex: 1 1 auto; }
+.adv-row.changed .ps-label b::before { content: ''; display: inline-block; width: 6px; height: 6px; margin-right: 7px; border-radius: 50%; background: var(--signal); vertical-align: middle; transform: translateY(-1px); }
+.adv-step { gap: 6px; }
+.adv-step input.adv-val { width: 6.2em; min-height: 32px; height: 32px; padding: 0 6px; border: 1px solid transparent; border-radius: 8px; background: transparent; color: var(--signal); font: inherit; font-size: 14px; font-weight: 700; text-align: center; font-variant-numeric: tabular-nums; }
+.adv-step input.adv-val:focus { outline: none; border-color: var(--line); background: var(--void); }
+.adv-step input.adv-val::placeholder { color: var(--dim); font-weight: 600; opacity: 1; }
+.adv-step span { font-size: 13px; color: var(--dim); white-space: nowrap; }
+.adv-step input.adv-val { -moz-appearance: textfield; appearance: textfield; }
+.adv-step input.adv-val::-webkit-inner-spin-button, .adv-step input.adv-val::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+.adv-chips .gx-chips { margin: 0; }
+.adv-chips .gx-chip { cursor: pointer; font: inherit; font-size: 13px; }
+.ps-adv-sub { border: 1px solid var(--line); border-radius: 16px; background: var(--void); }
+.ps-adv-sub > summary { list-style: none; display: flex; align-items: center; min-height: 46px; padding: 0 14px; font-size: 13px; font-weight: 700; letter-spacing: .04em; color: var(--dim); cursor: pointer; }
+.ps-adv-sub > .ps-rows { border: 0; border-top: 1px solid var(--line); border-radius: 0 0 16px 16px; }
+.adv-foot { display: flex; justify-content: flex-end; }
+.adv-foot .gx-mini { display: inline-flex; align-items: center; gap: 6px; }
+.adv-foot .gx-mini svg { width: 15px; height: 15px; }
+.adv-foot.st-confirm { justify-content: space-between; flex-wrap: wrap; gap: 8px; }
+@media (max-width: 760px) {
+  .ps-adv-body { padding: 4px 10px 12px; }
+  .adv-numrow { padding: 10px 8px 10px 12px; gap: 8px; }
+}
+/* 설정·명부 줄은 위에 고정, 명부 탭에서는 그 아래 괴이·특수·요원·조직 줄도 함께 (--stbar는 app.ts가 위 줄 높이로 채움) */
+.gx-panel .gx-content > .gx-body.gx-settings { padding-top: 0; }
+.gx-panel.has-nav .gx-content > .gx-settings > .st-scopebar, .gx-panel .gx-content > .gx-settings > .st-scopebar { position: sticky; top: 0; z-index: 4; padding: 12px 0 8px; margin-bottom: -14px; background: var(--void); }
+.gx-settings .dir-kinds { position: sticky; top: var(--stbar, 55px); z-index: 3; box-shadow: 0 -6px 0 6px var(--void); }
 
 
 /* 명부 괴이·특수 사진 고르기 */
@@ -1746,7 +2001,7 @@ button.gx-jr-row { cursor: pointer; } button.gx-jr-row:hover { border-color: var
 
   // src/host/game/code.ts
   var CODE_KEY = "goei:game:code";
-  var VERSION = true ? "0.18.2" : "";
+  var VERSION = true ? "0.19.0" : "";
   var codeVersion = (code2) => /^\/\/ goei-game (\S+)/.exec(code2)?.[1] ?? null;
   var mod = null;
   var codeStats = { readMs: 0, runMs: 0, bytes: 0, fromNet: false };
@@ -2028,20 +2283,6 @@ button.gx-jr-row { cursor: pointer; } button.gx-jr-row:hover { border-color: var
   }
   var LinkError = class extends Error {
   };
-  async function postReport(p) {
-    if (isWaiting()) throw new LinkError("응답을 받는 중이에요. 응답이 끝난 뒤 붙여 주세요.");
-    const ctx2 = await loadContext();
-    if (!ctx2) throw new LinkError("괴이 카드 채팅을 열어 주세요.");
-    const text4 = reportText(p.report);
-    await updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => {
-      const list4 = chat.message ?? [];
-      const last3 = list4[list4.length - 1];
-      if (last3?.role === "user") throw new LinkError("마지막 메시지가 아직 보내지 않은 유저 메시지예요. 먼저 보내거나 지워 주세요.");
-      chat.message = [...list4, { role: "user", data: setUnsent(text4, true) }];
-      return chat;
-    });
-    await mark2(p.at, { posted: true });
-  }
   async function recordReport(p) {
     const ctx2 = await loadContext();
     if (!ctx2) throw new LinkError("괴이 카드 채팅을 열어 주세요.");
@@ -2077,227 +2318,6 @@ button.gx-jr-row { cursor: pointer; } button.gx-jr-row:hover { border-color: var
     }
   };
 
-  // src/core/fieldgate.ts
-  var IN_STATE = /작전\s*투입/;
-  function presence(i) {
-    if (i.override === "inside") return "inside";
-    const prep = (i.target ?? "").trim() ? "prep" : "none";
-    if (i.override === "outside") return prep;
-    const deployed = i.deployed ?? null;
-    if (i.player) {
-      if (IN_STATE.test(i.state ?? "")) return "inside";
-      if (deployed === true) return "unknown";
-      return prep;
-    }
-    if (deployed === true) return "inside";
-    if (deployed === null) return prep === "prep" ? "unknown" : "none";
-    return prep;
-  }
-  function entryDecision(p) {
-    if (p === "inside") return { allow: false, presence: p, reason: "본편에서 지금 괴이 안에 있어요. 밖으로 나온 뒤에 들어갈 수 있어요." };
-    if (p === "unknown") return { allow: true, presence: p, notice: "본편 상태를 확실히 판단하지 못해 그대로 들어가요." };
-    return { allow: true, presence: p };
-  }
-
-  // src/core/fieldsites.ts
-  var SITES = [
-    { id: "hq", name: "관리국 본부", factions: [] }
-  ];
-  var FALLBACK_SITE = SITES[0];
-  function siteFor(faction) {
-    const f = faction.trim();
-    const hit3 = f ? SITES.find((s5) => s5.factions.includes(f)) : void 0;
-    return hit3 ? { site: hit3, exact: true } : { site: FALLBACK_SITE, exact: false };
-  }
-
-  // src/core/people/field.ts
-  var CUE_OF = { gift: "작은친절", quest: "도움", provoke: "무시", hurt: "파탄", down: "파탄", kill: "중대위반" };
-  function targets(store, ev, player) {
-    return (ev.who ?? []).filter((w) => w !== player && w !== "@user" && store.people[w]);
-  }
-  function applyFieldEvent(store, chat, ev, player = "주인공", o = {}) {
-    let n2 = 0;
-    const cue = CUE_OF[ev.kind];
-    const group6 = `${ev.anchor}|${ev.visit ?? ""}|${ev.scene ?? ""}`;
-    if (cue && ev.witness?.faction && (ev.witness.named || (o.mobWeight ?? "half") !== "off")) {
-      const code2 = ev.witness.faction;
-      const scale = ev.witness.named || o.mobWeight === "full" ? 1 : 0.5;
-      const fw = factionWho(code2);
-      if (!store.factions[code2]) store.factions[code2] = { code: code2, name: o.factionNames?.[code2] || ORG_NAMES[code2] || code2, seeded: { at: new Date(ev.at || Date.now()).toISOString() } };
-      const seq = store.log.filter((c) => c.anchor === ev.anchor).length;
-      if (putChange(store, { id: changeId(fw, "cue", ev.anchor, 0, `${ev.kind}:${ev.id}`), anchor: ev.anchor, seq, src: "field", who: fw, kind: "cue", cue, group: group6, ...scale !== 1 ? { scale } : {}, reason: `필드(${ev.witness.named ? "명단 인물" : "몹"} 목격): ${ev.text}`.slice(0, 80) })) n2++;
-    }
-    const who = targets(store, ev, player);
-    if (!who.length) return n2;
-    const live = liveness(chat);
-    for (const name of who) {
-      const seq = store.log.filter((c) => c.anchor === ev.anchor).length + (store.people[name].slots.state?.length ?? 0);
-      if (cue) {
-        if (putChange(store, { id: changeId(name, "cue", ev.anchor, 0, `${ev.kind}:${ev.id}`), anchor: ev.anchor, seq, src: "field", who: name, kind: "cue", cue, group: group6, reason: `필드: ${ev.text}`.slice(0, 80) })) n2++;
-      }
-      const state = liveEntries(store.people[name].slots.state, live);
-      const put = (text4, replaces) => {
-        if (putEntry(store, name, "state", { id: entryId(name, "state", ev.anchor, 0, `${ev.kind}:${ev.id}`), text: text4, src: "field", anchor: ev.anchor, seq, ...replaces ? { replaces } : {} })) n2++;
-      };
-      if (ev.kind === "hurt" || ev.kind === "down") put(`${ev.kind === "down" ? "중상" : "부상"} (필드${ev.scene ? ` · ${ev.scene}` : ""})`);
-      if (ev.kind === "kill") put("사망 (필드)");
-      if (ev.kind === "follow") put("유저와 동행 중");
-      if (ev.kind === "unfollow") {
-        const f = state.find((e) => e.text.startsWith("유저와 동행 중"));
-        if (f) put("(해소) 유저와 동행 중", f.id);
-      }
-      if (ev.kind === "appoint" && putEntry(store, name, "threads", { id: entryId(name, "threads", ev.anchor, 0, `${ev.kind}:${ev.id}`), text: `약속: ${ev.text}`.slice(0, 200), src: "field", anchor: ev.anchor, seq, target: "@user" })) n2++;
-      if (["gift", "quest", "hurt", "down", "kill", "follow", "appoint", "call"].includes(ev.kind)) {
-        if (putEntry(store, name, "history", { id: entryId(name, "history", ev.anchor, 0, `${ev.kind}:${ev.id}`), text: `(필드) ${ev.text}`.slice(0, 200), src: "field", anchor: ev.anchor, seq })) n2++;
-      }
-    }
-    return n2;
-  }
-
-  // src/host/game/field.ts
-  var KINDS4 = ["move", "act", "hurt", "down", "kill", "flee", "provoke", "gift", "trade", "quest", "follow", "unfollow", "enter_anomaly", "exit_anomaly", "enter_site", "detected", "appoint", "call"];
-  function createField() {
-    const opening = loadContext();
-    let chain2 = Promise.resolve();
-    let forced = null;
-    return {
-      override(v) {
-        forced = v;
-      },
-      async entry() {
-        const c = await loadContext();
-        if (!c) return { allow: true, presence: "unknown", site: "hq", minute: null };
-        const snap = cardSnapshot(c.char, c.chat);
-        const st = lastStatusFields((c.chat.message ?? []).filter((m) => m.role === "char").slice(-6).map((m) => String(m.data ?? "")));
-        const me = snap.agents.find((a) => a.id === snap.player);
-        const p = presence({ player: !!me, state: me?.state, target: st?.target, deployed: st?.deployed ?? null, override: forced });
-        const minute = snap.minute ?? statusClockMinute(st);
-        return { ...entryDecision(p), site: siteFor(snap.faction).site.id, minute };
-      },
-      record(ev) {
-        const run5 = async () => {
-          const origin = await opening;
-          if (!origin) return;
-          const c = await loadContext();
-          if (!c || c.charIndex !== origin.charIndex || c.chatIndex !== origin.chatIndex || c.char.chaId !== origin.char.chaId || c.chat.id !== origin.chat.id) return;
-          if (!KINDS4.includes(ev.kind)) return;
-          const event = { id: uid2(), at: Date.now(), anchor: anchorOf(c.chat), kind: ev.kind, text: ev.text, scene: ev.scene, who: ev.who, weight: ev.weight, fact: ev.fact, ...ev.witness && typeof ev.witness.faction === "string" ? { witness: { faction: ev.witness.faction, named: !!ev.witness.named } } : {}, ...typeof ev.visit === "string" && ev.visit ? { visit: ev.visit } : {} };
-          let made = null;
-          await updateChat(c.charIndex, c.chatIndex, (chat) => {
-            if (chat.id !== c.chat.id) return null;
-            let next2 = withFieldEvent(chat, event);
-            if (peopleSettings(next2.scriptstate).on) {
-              const store = peopleStore(next2);
-              if (applyFieldEvent(store, next2, event, playerAgent(c.char.globalLore, next2.scriptstate)?.name ?? "주인공", { mobWeight: peopleSettings(next2.scriptstate).mobWeight, factionNames: factionNamesOf(c.char.globalLore) }) > 0) next2 = withPeople(next2, store);
-            }
-            if (event.kind === "exit_anomaly") {
-              const snap = cardSnapshot(c.char, next2);
-              let catalog = null;
-              try {
-                catalog = parseCatalog(c.char.globalLore);
-              } catch {
-              }
-              const st = lastStatusFields((next2.message ?? []).filter((m2) => m2.role === "char").slice(-6).map((m2) => String(m2.data ?? "")));
-              const built = buildFieldReport({
-                chat: next2,
-                exit: event,
-                player: playerAgent(c.char.globalLore, next2.scriptstate)?.name || userInfo().name || "주인공",
-                site: siteFor(snap.faction).site.name,
-                catalog,
-                baseMinute: snap.minute ?? statusClockMinute(st),
-                settings: journalSettings(next2.scriptstate)
-              });
-              if (built?.added) {
-                next2 = { ...next2, scriptstate: { ...next2.scriptstate ?? {}, ...recordVars(built.journal, built.reports) } };
-                made = { id: built.report.id, title: built.report.head.name, summary: fieldSummary(built.report) };
-              }
-            }
-            return next2;
-          });
-          const m = made;
-          if (m) emitReport({ id: m.id, title: m.title, summary: m.summary, cause: "field" });
-        };
-        const next = chain2.then(run5, run5);
-        chain2 = next.catch(() => {
-        });
-        return next;
-      },
-      async lastReport() {
-        await chain2.catch(() => {
-        });
-        const n2 = lastReportNotice();
-        return n2 && n2.cause === "field" ? { id: n2.id, title: n2.title, summary: n2.summary } : null;
-      }
-    };
-  }
-
-  // src/host/game/people.ts
-  function createPeople() {
-    return {
-      async people(names4) {
-        const c = await loadContext().catch(() => null);
-        if (!c) return [];
-        const settings = peopleSettings(c.chat.scriptstate);
-        if (!settings.on) return [];
-        const store = peopleStore(c.chat);
-        const live = liveness(c.chat);
-        const changes = liveChanges(store, live);
-        const list4 = Object.values(store.people).filter((p) => !names4 || names4.includes(p.name));
-        return list4.map((p) => {
-          const aff = affinityView(p, changes, store.folded[p.name] ?? 0, { temper: temperOf(p.name), speed: settings.speed, turnCap: settings.turnCap });
-          const texts = (k) => liveEntries(p.slots[k], live).map((e) => e.text);
-          const note = settings.director === "facts" ? latestNote(store, p.name, live) : null;
-          return {
-            name: p.name,
-            faction: p.faction,
-            aliases: p.aliases,
-            affinity: { value: aff.value, stage: aff.stage.label, cell: aff.stage.cell },
-            address: addressOf(p, changes),
-            express: p.express,
-            state: texts("state"),
-            knowledge: texts("knowledge"),
-            threads: texts("threads"),
-            suspicion: liveEntries(p.slots.suspicion, live).map((e) => ({ target: e.target ?? "", kind: e.kind ?? "", text: e.text })),
-            ...note ? { note } : {}
-          };
-        });
-      },
-      async sheet(name) {
-        const c = await loadContext().catch(() => null);
-        if (!c) return null;
-        const settings = peopleSettings(c.chat.scriptstate);
-        const store = peopleStore(c.chat);
-        const p = store.people[name];
-        const sheet = bookText({ char: c.char, chat: c.chat }, name) || null;
-        if (!settings.on || !p) return sheet;
-        const live = liveness(c.chat);
-        const changes = liveChanges(store, live);
-        return personBlock(p, store, live, changes, { sheet, mode: settings.inject === "off" ? "split" : settings.inject, unknown: settings.features.has("perception") ? unknownTo(p, store, live) : [], user: "방문자", note: settings.director === "facts" ? latestNote(store, name, live) : null, temper: temperOf(name), speed: settings.speed, turnCap: settings.turnCap });
-      },
-      async factions() {
-        const c = await loadContext().catch(() => null);
-        if (!c) return [];
-        const settings = peopleSettings(c.chat.scriptstate);
-        if (!settings.on || !settings.features.has("faction_rep")) return [];
-        const store = peopleStore(c.chat);
-        const changes = liveChanges(store, liveness(c.chat));
-        const names4 = factionNamesOf(c.char.globalLore);
-        const uf = userFactionOf(store, c.chat);
-        return knownFactionCodes(store, names4).map((code2) => {
-          const f = factionNow(store, code2, changes, uf, settings, names4);
-          return { code: code2, name: f.name, value: f.value, stage: f.stage.id, stageLabel: f.stage.label, bounds: settings.factionBounds };
-        });
-      },
-      onChange(cb) {
-        let wasBusy = false;
-        return onPeopleStatus((s5) => {
-          if (wasBusy && !s5.busy) cb();
-          wasBusy = s5.busy;
-        });
-      }
-    };
-  }
-
   // src/host/game/wallet.ts
   var start = () => getPrefs().walletStart ?? WALLET_START_DEFAULT;
   var on2 = (chat) => colConfig(chat.scriptstate).wallet !== "off";
@@ -2324,7 +2344,7 @@ button.gx-jr-row { cursor: pointer; } button.gx-jr-row:hover { border-color: var
           let after = null;
           await updateChat(c.charIndex, c.chatIndex, (chat) => {
             if (chat.id !== c.chat.id) return null;
-            const w = withFieldTrade(readWallet(chat.scriptstate, start()), anchorOf(chat), amount, String(memo2 ?? ""), `f_${uid2()}`, where ?? {});
+            const w = withFieldTrade(readWallet(chat.scriptstate, start()), anchorOf(chat), amount, String(memo2 ?? ""), `f_${uid()}`, where ?? {});
             const next2 = { ...chat, scriptstate: { ...chat.scriptstate ?? {}, ...walletVars(w) } };
             after = balanceOf(next2);
             return next2;
@@ -2339,6 +2359,37 @@ button.gx-jr-row { cursor: pointer; } button.gx-jr-row:hover { border-color: var
     };
   }
 
+  // src/host/game/fieldstate.ts
+  var FD_STATE = "$fd_state";
+  function createFieldState() {
+    const opening = loadContext();
+    let chain2 = Promise.resolve();
+    const same3 = async () => {
+      const origin = await opening;
+      const c = await loadContext();
+      if (!origin || !c || c.charIndex !== origin.charIndex || c.chatIndex !== origin.chatIndex || c.char.chaId !== origin.char.chaId || c.chat.id !== origin.chat.id) return null;
+      return c;
+    };
+    return {
+      async load() {
+        const c = await same3().catch(() => null);
+        const v = c?.chat.scriptstate?.[FD_STATE];
+        return typeof v === "string" && v ? v : null;
+      },
+      save(text4) {
+        const run5 = async () => {
+          const c = await same3();
+          if (!c) return;
+          await updateChat(c.charIndex, c.chatIndex, (chat) => chat.id !== c.chat.id || chat.scriptstate?.[FD_STATE] === text4 ? null : { ...chat, scriptstate: { ...chat.scriptstate ?? {}, [FD_STATE]: text4 } });
+        };
+        const next = chain2.then(run5, run5);
+        chain2 = next.catch((e) => console.log(`[goei] 필드 가방을 저장하지 못했어요: ${String(e)}`));
+        return next.catch(() => {
+        });
+      }
+    };
+  }
+
   // src/host/game/index.ts
   function makeBridge(viewport2, slot, close3, onHidden) {
     return {
@@ -2348,6 +2399,7 @@ button.gx-jr-row { cursor: pointer; } button.gx-jr-row:hover { border-color: var
       field: createField(),
       people: createPeople(),
       wallet: createWallet(),
+      fieldState: createFieldState(),
       slot,
       saves: gameSaves,
       assets: gameAssets,
@@ -2360,7 +2412,8 @@ button.gx-jr-row { cursor: pointer; } button.gx-jr-row:hover { border-color: var
       onWaiting,
       narrow: () => matchMedia("(max-width: 760px)").matches,
       close: close3,
-      onHidden
+      onHidden,
+      onBeforeSend
     };
   }
 
@@ -2511,241 +2564,4 @@ button.gx-jr-row { cursor: pointer; } button.gx-jr-row:hover { border-color: var
     const onFocus = (e) => {
       const t = e.target;
       if (!(t instanceof HTMLInputElement || t instanceof HTMLTextAreaElement) || !layer2.contains(t) || !rotated() || box2) return;
-      src = t;
-      const b = document.createElement("div");
-      b.className = "gx-upright";
-      b.innerHTML = '<input type="text" autocomplete="off" enterkeyhint="send"><button type="button" data-up="send">보내기</button><button type="button" data-up="close">닫기</button>';
-      const inp = b.querySelector("input");
-      inp.value = t.value;
-      inp.placeholder = t.placeholder;
-      if (t.maxLength > 0) inp.maxLength = t.maxLength;
-      inp.setAttribute("aria-label", t.getAttribute("aria-label") ?? "입력");
-      const sync = () => {
-        if (!src) return;
-        src.value = inp.value;
-        src.dispatchEvent(new Event("input", { bubbles: true }));
-      };
-      const send2 = () => {
-        const s5 = src;
-        if (!s5) return;
-        sync();
-        s5.dispatchEvent(new KeyboardEvent("keydown", { key: "Enter", code: "Enter", bubbles: true, cancelable: true }));
-        close3();
-      };
-      inp.addEventListener("input", sync);
-      inp.addEventListener("keydown", (ev) => {
-        if (ev.key === "Enter" && !ev.isComposing && ev.keyCode !== 229) ev.preventDefault(), send2();
-        else if (ev.key === "Escape") close3();
-      });
-      inp.addEventListener("blur", () => setTimeout(() => box2 && !box2.contains(document.activeElement) && close3(), 120));
-      b.addEventListener("click", (ev) => {
-        const k = ev.target.closest("[data-up]")?.dataset.up;
-        if (k === "send") send2();
-        else if (k === "close") close3();
-      });
-      box2 = b;
-      document.body.append(b);
-      place2();
-      inp.focus({ preventScroll: true });
-    };
-    layer2.addEventListener("focusin", onFocus);
-    vv?.addEventListener("resize", place2);
-    vv?.addEventListener("scroll", place2);
-    return () => {
-      layer2.removeEventListener("focusin", onFocus);
-      vv?.removeEventListener("resize", place2);
-      vv?.removeEventListener("scroll", place2);
-      close3(false);
-    };
-  }
-
-  // src/ui/game.ts
-  var layer = null;
-  var viewport = null;
-  var unmount = null;
-  var view = "home";
-  var generation = 0;
-  var busy3 = "";
-  var notice = "";
-  var offReports = null;
-  var offUpright = null;
-  var gameStats = { openMs: 0, codeMs: 0, mountMs: 0, heapOpen: 0, heapAfter: 0 };
-  globalThis.__goeiGameStats = { game: gameStats, code: codeStats, fetch: fetchStats, urls: liveUrls };
-  var heap = () => performance.memory?.usedJSHeapSize ?? 0;
-  var esc30 = (s5) => String(s5 ?? "").replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`);
-  var kb2 = (n2) => n2 >= 1024 * 1024 ? `${(n2 / 1024 / 1024).toFixed(1)}MB` : `${Math.max(1, Math.round(n2 / 1024))}KB`;
-  var when3 = (t) => {
-    const d = new Date(t);
-    return `${d.getMonth() + 1}/${d.getDate()} ${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;
-  };
-  async function files() {
-    const code2 = await codeState();
-    let index2 = null;
-    try {
-      index2 = await gameIndex();
-    } catch {
-    }
-    const need = [];
-    for (const p of index2?.packs ?? []) if (p.required && await packStateOf(p) !== "ready") need.push({ id: p.id, bytes: p.bytes });
-    const bytes = (code2 === "ready" ? 0 : index2?.code.bytes ?? 0) + need.reduce((n2, p) => n2 + p.bytes, 0);
-    return { index: index2, code: code2, need, bytes };
-  }
-  var row9 = (label2, help, ctl = "") => `<div class="ps-row"><div class="ps-label"><b>${label2}</b>${help ? `<small>${help}</small>` : ""}</div>${ctl ? `<div class="ps-ctl gx-gl-ctl">${ctl}</div>` : ""}</div>`;
-  var group5 = (title2, rows2) => `<section class="ps-group"><h3>${title2}</h3><div class="ps-rows">${rows2}</div></section>`;
-  var dis = () => busy3 ? " disabled" : "";
-  var msgOf = () => busy3 || notice ? `<span role="status">${esc30(busy3 || notice)}</span>` : "";
-  var needFiles = (f) => f.code !== "ready" || f.need.length > 0;
-  function filesHtml(f) {
-    if (!needFiles(f)) return "";
-    const what = msgOf() || (f.code === "old" ? "플러그인이 바뀌어 게임 파일을 새로 받아야 해요." : "처음 한 번만 받아요. 받은 파일은 이 기기의 Risu에 저장돼요.");
-    const size = f.index ? ` (${kb2(f.bytes)})` : "";
-    return group5("게임 파일", row9("게임 파일 받기", what, `<button class="gx-mini primary" data-g="get"${dis()}>받기${size}</button><button class="gx-mini" data-g="file"${dis()}>파일로 넣기</button>`));
-  }
-  function startHtml(slots, last3, ready) {
-    const s5 = slots.find((x) => x.slot === last3) ?? slots.sort((x, y) => y.savedAt - x.savedAt)[0];
-    const help = ready && msgOf() || (s5 ? `마지막 저장 · ${when3(s5.savedAt)}${s5.summary ? ` · ${esc30(s5.summary)}` : ""}` : "요원들을 만나 대화해요. 나눈 말은 다음 본편 요청에 막간으로 들어가요.");
-    return group5("필드", row9("본부", help, `<button class="gx-mini primary" data-g="play"${ready ? "" : " disabled"}>들어가기</button>`));
-  }
-  function linkHtml(card2, reports2, record) {
-    if (!card2) return group5("본편 연동", row9("채팅 연결 안 됨", "괴이 카드 채팅을 열면 명부 요원과 상황판을 게임이 읽어요."));
-    const n2 = (k) => card2.events.filter((e) => e.kind === k).length;
-    const free = card2.agents.filter((a) => !a.locked).length;
-    const reps = reports2.map((p) => row9(
-      esc30(p.report.mission),
-      `${{ return: "귀환", evac: "후송", withdraw: "자발 철수" }[p.report.outcome]}${p.report.depth ? ` · ${esc30(p.report.depth)}` : ""} · ${when3(p.at)}${p.report.summary ? ` · ${esc30(p.report.summary)}` : ""}`,
-      `<button class="gx-mini${p.posted ? "" : " primary"}" data-g="post" data-at="${p.at}"${p.posted || busy3 ? " disabled" : ""}>${p.posted ? "채팅에 놓음" : "보고서 붙이기"}</button>
-     <button class="gx-mini" data-g="record" data-at="${p.at}"${p.recorded || busy3 ? " disabled" : ""}>${p.recorded ? "기록함" : "기록 로어북에 남기기"}</button>
-     <button class="gx-mini" data-g="drop" data-at="${p.at}" aria-label="결과 지우기">${ICONS.trash}</button>`
-    )).join("");
-    return group5("본편 연동", [
-      row9("이 채팅에서 읽은 것", `요원 ${card2.agents.length}명(편성 가능 ${free}) · 괴이 ${n2("an")} · 사건 ${n2("in")} · 특수 ${n2("ms")}`),
-      reps || "",
-      record ? row9(`「${esc30(RECORD_COMMENT)}」 로어북`, `${record}줄`, '<button class="gx-mini" data-g="unrecord">지우기</button>') : ""
-    ].join(""));
-  }
-  async function home() {
-    const box2 = layer?.querySelector(".gx-game-box");
-    if (!box2 || view !== "home") return;
-    const me = generation;
-    const [f, slots, last3, card2, reports2, ctx2] = await Promise.all([
-      files(),
-      gameSaves.list(),
-      gameSaves.last(),
-      readCard().catch(() => null),
-      pendingReports(),
-      loadContext().catch(() => null)
-    ]);
-    if (me !== generation || view !== "home" || !layer) return;
-    const record = ctx2 ? String((ctx2.chat.localLore ?? []).find((e) => e.comment === RECORD_COMMENT)?.content ?? "").split("\n").filter((l) => l.startsWith("- ")).length : 0;
-    const open3 = new Set([...box2.querySelectorAll("details[data-keep]")].filter((d) => d.open).map((d) => d.dataset.keep));
-    box2.innerHTML = `<div class="gx-gl gx-settings">
-    ${filesHtml(f)}${startHtml(slots, last3, !needFiles(f))}${linkHtml(card2, reports2, record)}
-    <input type="file" accept=".js,.pack" multiple hidden data-g-file></div>`;
-    box2.querySelectorAll("details[data-keep]").forEach((d) => d.open = open3.has(d.dataset.keep));
-  }
-  var say = (t) => {
-    notice = t;
-    void home();
-  };
-  async function getFiles() {
-    busy3 = "게임 파일을 받는 중";
-    void home();
-    try {
-      forgetIndex();
-      const idx = await gameIndex();
-      if (await codeState() !== "ready") {
-        await loadGameCode((d, t) => (busy3 = `게임 코드 받는 중 ${d}/${t}`, void home()));
-      }
-      for (const p of idx.packs) {
-        if (!p.required || await packStateOf(p) === "ready") continue;
-        await downloadGamePack(p, (d, t) => (busy3 = `그림·소리 받는 중 (${p.id}) ${d}/${t}`, void home()));
-      }
-      busy3 = "";
-      say("다 받았어요.");
-    } catch (e) {
-      busy3 = "";
-      say(`받지 못했어요: ${e instanceof Error ? e.message : String(e)} 잠시 뒤 다시 받거나 파일로 넣어 주세요.`);
-    }
-  }
-  async function putFiles(list4) {
-    busy3 = "넣는 중";
-    void home();
-    const done3 = [];
-    try {
-      for (const f of [...list4]) {
-        const bytes = new Uint8Array(await f.arrayBuffer());
-        if (f.name.endsWith(".js")) await installGameCode(new TextDecoder().decode(bytes)), done3.push("게임 코드");
-        else done3.push(`팩 ${await installGamePack(bytes)}`);
-      }
-      busy3 = "";
-      say(`넣었어요: ${done3.join(", ")}`);
-    } catch (e) {
-      busy3 = "";
-      say(e instanceof Error ? e.message : String(e));
-    }
-  }
-  var chromeHidden = null;
-  function phoneChrome(on3) {
-    if (on3 && layer) {
-      chromeHidden = layer.closest(".gx") ?? null;
-      chromeHidden?.classList.add("gx-fieldfull");
-      layer.classList.add("gx-phone");
-    } else {
-      chromeHidden?.classList.remove("gx-fieldfull");
-      chromeHidden = null;
-      layer?.classList.remove("gx-phone");
-    }
-    setFabHidden(on3);
-  }
-  async function play(slot) {
-    const box2 = layer?.querySelector(".gx-game-box");
-    if (!box2 || !viewport) return;
-    const me = ++generation;
-    const onPhone = phone2();
-    const going = onPhone ? viewport.phoneFull(true) : null;
-    if (onPhone) phoneChrome(true);
-    const t0 = performance.now();
-    gameStats.heapOpen = heap();
-    busy3 = "게임을 여는 중";
-    try {
-      const mod2 = await loadGameCode();
-      gameStats.codeMs = Math.round(performance.now() - t0);
-      if (me !== generation || !layer) return;
-      view = "play";
-      if (going) await going;
-      else viewport.fill(true);
-      setHead();
-      box2.innerHTML = "";
-      const bridge = makeBridge(viewport, slot, () => onExit ? onExit() : closeGame(), (cb) => {
-        hiddenSubs2.add(cb);
-        return () => void hiddenSubs2.delete(cb);
-      });
-      if ((await loadContext().catch(() => null))?.chat.scriptstate?.$goei_diag === "1") globalThis.__goeiBridge = bridge;
-      const t1 = performance.now();
-      unmount = mod2.mount(box2, bridge);
-      gameStats.mountMs = Math.round(performance.now() - t1);
-      gameStats.openMs = Math.round(performance.now() - t0);
-      busy3 = "";
-    } catch (e) {
-      busy3 = "";
-      view = "home";
-      phoneChrome(false);
-      if (viewport.phone) await viewport.phoneFull(false);
-      viewport.fill(false);
-      setHead();
-      say(`게임을 열지 못했어요: ${e instanceof Error ? e.message : String(e)}`);
-    }
-  }
-  function stop() {
-    generation++;
-    unmount?.();
-    unmount = null;
-    delete globalThis.__goeiBridge;
-    releaseAll();
-    gameStats.heapAfter = heap();
-  }
-  function toHome() {
-    stop();
-    view = "home";
-    phoneChrome(false);
-    if (viewport?.phon
+  

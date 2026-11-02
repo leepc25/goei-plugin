@@ -1,0 +1,216 @@
+"""샤워 중 피격 세트 시험(2026-10-31 사용자: 샤워장에서도 전투, 맨몸으로는 공격 못 함, 몸 가린 채 캐비닛으로 도망 → 옷 입기).
+S1 맨몸 맞기 · S2 몸 가린 채 뛰기(반복) · S3 맨몸 날아가 쓰러지기 · S4 맨몸 일어나기 · S5 몸 가린 채 웅크리기 · S6 가린 채 소리치기(이성이 잘못 들어왔을 때). 시작 장 = 샤워 A(옷 벗기) 끝 장(정리본).
+사용: python3 _test/shower_hit.py <키>   결과 _test/<키>/샤워2_S1… (아래는 샤워 세트 2판 설명)
+샤워 세트 2판(수건 없음, 옆모습, 상태 없이 이어 뽑기). 2026-10-27 밤 사용자: 남녀 각 2명.
+A 옷 벗기 16장(손 동작 순서, 35번 문장) → B 맨몸 걷기(반복) · D 물 맞으며 쉬기(반복) · E 몸 씻기(반복). 옷 입기 = A 거꾸로.
+A 끝 장의 떨어진 조각(옷 더미 등)은 다음 줄 시작 장에서만 지운다(원본 A는 그대로 둠).
+사용: python3 _test/shower_set2.py <키>   결과 _test/<키>/샤워2_<단계>/"""
+import sys, os, json, time, base64, io
+from pathlib import Path
+from collections import deque
+from concurrent.futures import ThreadPoolExecutor
+import numpy as np
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+import m3
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from PIL import Image
+C = {  # 키: (옆 방향, 성별, 몸 묘사(옷 없이), 벗는 순서)
+ "1.6_큐라스": ("east", "man", "a lean wiry man in his early thirties with pale sage-green hair swept back, hollow cheeks",
+   "he grips the jacket lapels with both hands, pushes the jacket back off his shoulders, pulls each arm out of the sleeves and drops it. He loosens and pulls off the necktie and drops it. He unbuttons the shirt down the front with his fingers, opens it, slides it off his shoulders, pulls his arms out and drops it. He bends forward, unbuckles the belt, pushes the trousers and underwear down to the ankles, then lifts one foot and then the other to step out of them, taking the shoes off with them"),
+ "3.2_호유원": ("east", "man", "a lean young-looking Korean man with thick tousled dark brown hair and long curtain bangs, amber eyes",
+   "he pushes the open jacket back off his shoulders, pulls each arm out of the sleeves and drops it. He pulls off the loose tie and drops it. He unbuttons the shirt down the front with his fingers, opens it, slides it off his shoulders, pulls his arms out and drops it. He bends forward, pushes the trousers and underwear down to the ankles, then lifts one foot and then the other to step out of them, taking the shoes off with them"),
+ "1.3_잼트리": ("east", "woman", "a curvy woman in her late twenties with long wavy chestnut brown hair down to the waist, green eyes",
+   "she grips the jacket lapels with both hands, pushes the jacket back off her shoulders, pulls each arm out of the sleeves and drops it. She pulls off the necktie and drops it. She unbuttons the shirt down the front with her fingers, opens it, slides it off her shoulders, pulls her arms out and drops it, then unhooks the bra and drops it. She unzips the pencil skirt at the side and pushes it down with the underwear to the ankles, then lifts one foot and then the other to step out of them, taking the high heels off with them"),
+ "1.10_게슈간": ("east", "woman", "an athletic woman in her mid twenties with a chin-length snow-white bob with bangs, cold blue eyes, an impassive face",
+   "she unbuttons the loose white shirt down the front with her fingers, opens it, slides it off her shoulders, pulls her arms out and drops it, then unhooks the bra and drops it. She bends forward, unbuttons the high-waisted trousers, pushes them down with the underwear to the ankles, then lifts one foot and then the other to step out of them, taking the shoes off with them"),
+}
+key = sys.argv[1]
+if key in C: D, g, SUB, SEQ = C[key]
+else:   # 목록 전원: shower_targets.json(방향·성별) + 일반 벗는 순서
+    # 10-31 사용자: 뽑을 때는 동작만 들어가면 된다, 방향만 정해 주면 됨(몸 묘사 불필요). 웹에서 직접 뽑은 3명은 방향·성별만(사용자: 성인, 캐릭터 표의 고등학생 표기는 잘못)
+    _t = {**{k: {"dir": "east", "g": "woman", "body": ""} for k in ("6.11_불량배여2", "6.52_학생여1", "6.53_학생여2")},
+          **{k: {"dir": "east", "g": "man", "body": ""} for k in ("6.50_학생남1", "6.51_학생남2", "6.7_불량배남1", "6.9_불량배남3")},
+          **json.load(open(Path(__file__).resolve().parent / "shower_targets.json"))}[key]
+    D, g, SUB = _t["dir"], _t["g"], _t["body"]
+    _p = "he" if g == "man" else "she"; _P = _p.capitalize(); _h = "his" if g == "man" else "her"
+    SEQ = (f"{_p} takes off the clothes one piece at a time with clear hand movements: first any outer layer such as a jacket, coat, cardigan or vest, pushing it back off {_h} shoulders, pulling the arms out of the sleeves and dropping it; then any necktie, scarf or accessory on the body; then the top, unbuttoning it or pulling it off over the head and dropping it"
+           + (", then unhooks the bra and drops it" if g == "woman" else "")
+           + f". {_P} bends forward, pushes the trousers or skirt down together with the underwear to the ankles, then lifts one foot and then the other to step out of them, taking the shoes or socks off with them")
+T = m3.table(key); CID = T["cid"]
+OUT = Path(__file__).resolve().parent / key; OUT.mkdir(exist_ok=True)
+side = f"seen from the side facing {D}"
+pro = "he" if g == "man" else ("it" if g == "creature" else "she"); Pro = pro.capitalize()
+DRAW = f"Only the {g} is drawn."
+REL = "hands stay in front of the body or at the head and face, elbows never go behind the back"
+# 가리는 자세: 남자는 아래만(10-31 사용자: 남자는 위를 가릴 필요가 없다), 여자는 가슴과 아래
+# 10-31 문장 규칙(사용자: 프롬프트가 문제): 몸 움직임만 짧게. 맞는 말·감정 색 말(flushed·pale·panicked·trembling)·금지문 쓰지 않음. 손이 할 일은 가리기 하나(여자는 두 손 다 가리기 → 나머지는 고개·상체로).
+COVER = "one hand held over the groin" if g == "man" else "one forearm across the chest and the other hand held over the groin"
+import re as _re
+_tbl = (Path(__file__).resolve().parents[4] / "docs/샤워_반응_성향표.md").read_text(encoding="utf-8")
+_m = _re.search(r"^\| " + _re.escape(key) + r" \| [^|]+ \| ([^|]+?) \| ([^|]+?) \|", _tbl, _re.M)
+TYPE = _m.group(1).strip() if _m else "수줍"
+FREE_HAND = g == "man"   # 남자는 한 손이 빔
+_C = COVER
+_POINT = ", the other arm stretched out pointing at the door" if FREE_HAND else ""
+SHOUT = {
+ "당당": f"{_C}, standing tall with the chin raised, the mouth open speaking firmly{_POINT}",
+ "수줍": f"{_C}, turning the shoulders away and ducking the head, the mouth open in a short cry",
+ "화냄": f"{_C}, leaning the upper body forward, the mouth wide open shouting{_POINT}",
+ "무심": f"{_C}, glancing once over the shoulder with a flat face, then turning the back",
+}[TYPE]
+HIT = {"당당": f"{_C}, the head snaps back and the upper body bends far backward, the body staggers two big steps back, then straightens up with the chin raised",
+       "수줍": f"{_C}, the head snaps back, the body doubles over and twists away, staggering two big steps back",
+       "화냄": f"{_C}, the head snaps back and the body staggers two big steps back, then lurches forward again with the mouth open",
+       "무심": f"{_C}, the head snaps back and the body staggers two big steps back, then stops and stands still"}[TYPE]
+RUN = {"당당": "long steady running strides", "수줍": "short quick running steps, the head ducked", "화냄": "heavy stomping running steps", "무심": "an even jogging pace"}[TYPE]
+FALL = {"당당": "then props up on one elbow", "수줍": "then curls up on the side", "화냄": "then lifts the head with the mouth open", "무심": "then lies still"}[TYPE]
+RISE = {"당당": "quickly", "수줍": "slowly, hunched", "화냄": "quickly", "무심": "without hurry"}[TYPE]
+CROUCH = {"당당": "kneels on one knee with the head raised", "수줍": "crouches low with the knees to the chest and the head ducked", "화냄": "crouches low with the head raised and the mouth open", "무심": "squats down low with the arms around the knees"}[TYPE]
+# 피격 줄(S1~S4)은 그 인물 동작표의 기본 줄 문장을 그대로, 옷만 없는 몸으로 (10-31 사용자: 기본 피격 모션 그대로 갖다 뽑아라, 옷만 안 입으면 된다)
+_T = m3.table(key)["rows"]
+BASEROW = {"S1": "18", "S2": "5", "S3": "19", "S4": "20"}
+def _base(n):
+    r = _T.get(BASEROW[n])
+    return (r["frames"], r["prompt"]) if r else (8, "")
+_BARE = f" The {g} is bare, wearing nothing, barefoot."
+# 맨몸 피격 7줄 (10-31 사용자 확정): 경계 자세(첫 피격 뒤 기본 자세)를 기준으로. 맞기는 크게
+GUARD_M = "one hand held over the groin and the other forearm raised in front of the face"
+GUARD_W = "one forearm pressed across the chest and the other hand held over the groin, the shoulders hunched forward"
+GUARD = GUARD_M if g == "man" else GUARD_W
+LOW = "the hips sunk low, the feet wide apart and the knees deeply bent, the shoulders turned sideways away from the enemy, the chin tucked and the eyes glaring ahead"
+# 10-31 고침: 캔버스 256×256(전투 줄과 같게), G = 경계 자세, H1(선 채 배를 맞음 → G)과 H2(G에서 얼굴을 맞음 → G)는 맞는 곳·움직임이 다름
+STEPS = {
+  # G: 끝 장 없음(10-31 검사: 끝 장 = A 선 자세로 주면 마지막 장이 다시 선 자세로 튐)
+ "G": ("A", 8, None, f"Bare and barefoot {side}: drop into a defensive low crouch, {LOW}, {GUARD}. Hold the crouch, the shoulders rising and falling with heavy breathing. {DRAW}"),
+ "H1": ("G", 8, "G", f"Bare and barefoot {side}, in a low crouch with {GUARD}: struck in the stomach, the body folds forward at the waist, the face twisting in pain with the eyes squeezed shut, the hands never leaving the body, sliding one step back on the heels, then rises back into the same low crouch. {DRAW}"),  # 10-31: H1 배(앞으로 접힘)·H2 가슴(뒤로 밀림), 둘 다 경계→경계, 맞을 때마다 둘 중 하나
+ "H2": ("G", 12, "G", f"Bare and barefoot {side}, in a low crouch with {GUARD}: knocked backward by a heavy blow to the chest, the shoulders jolt back and the whole body rocks back, the head staying on the shoulders, staggering three big steps backward with the knees almost buckling, the hands never leaving the body, then sinks back into the same low crouch. {DRAW}"),
+ "H3": ("H2@peak", 12, None, f"Bare and barefoot {side}: struck hard in the chest, the upper body reels backward two fast stumbling steps, the knees give way and the body drops straight down, the hips hit the floor, then the back slams flat onto the floor and the head bounces once. The body ends lying flat on the back along the floor, the arms at the sides. {DRAW}"),
+ "H4": ("H3", 8, "H3", f"Bare and barefoot, lying flat on the back on the floor {side}: flinch, pull both knees up toward the chest and cross both forearms over the face, then let the arms and legs drop back flat along the floor, the body staying on the floor the whole time. {DRAW}"),
+ # H5 11-01 새로 씀(사용자 「프롬프트를 손봐야」): 끝 자세(경계 자세)는 글로 적지 않고 끝 장(G)으로만 맞춘다(동작표 규칙 「자세로 돌아온다는 글에 쓰지 않는다」). 10-31 판은 LOW·GUARD로 끝 자세를 적어 끝 장과 다투었음
+ "H5": ("H3", 16, "G", f"Bare and barefoot, lying flat on the back on the floor {side}: rolls onto one side, pushes up with one hand, gets one knee under the body, then gets up off the floor. {DRAW}"),
+ "H6": ("G", 8, "loop", f"Bare and barefoot, running {side} with fast even strides, both legs alternating evenly with the same step length, the upper body leaning forward, {COVER}. {DRAW}"),
+}
+CANVAS = (256, 256)
+# 10-31 사용자 「전수검사해서 잘못된 거 프롬프트 바꿔서 최대 2번까지만 다시 뽑아」: 재뽑기 판 문장(덧대지 않고 새로 씀). SHOWER_V=1·2
+_V = os.environ.get("SHOWER_V", "")
+VAR = {
+ "1": {
+  "G": f"Bare and barefoot {side}: bend the knees deeply and lower the hips into a wide low crouch, the feet planted far apart, the torso turned sideways, {GUARD}, glaring forward. Breathe heavily, the shoulders rising and falling evenly. {DRAW}",
+  "H1": f"Bare and barefoot {side}, crouching low with {GUARD}: a blow lands on the stomach, the body bends forward sharply at the waist, the feet slide back one step along the floor, then the body returns to the same low crouch. {DRAW}",
+  "H2": f"Bare and barefoot {side}, crouching low with {GUARD}: a hard push on the chest rocks the upper body backward, the body takes three quick steps backward with the feet on the floor, then settles back into the same low crouch. {DRAW}",
+  "H3": f"Bare and barefoot {side}: stumbles backward two steps, the knees bend and give way, sits down hard on the floor, then falls back so the back lies flat on the floor, the arms at the sides. The body ends lying flat on the back. {DRAW}",
+  "H4": f"Bare and barefoot, lying on the back on the floor {side}: the body jolts once, the knees bend up and the arms cover the head, then the body relaxes flat on the floor again. The body stays lying on the floor. {DRAW}",
+  "H5": f"Bare and barefoot, lying on the back on the floor {side}: turns onto one side, gets onto hands and knees, pushes up onto one knee, then rises into a low wide crouch, {GUARD}. {DRAW}",
+  "H6": f"Bare and barefoot, running {side}, a steady run cycle with both legs moving evenly, leaning forward, {COVER}. {DRAW}"},
+ "2": {
+  "G": f"Bare and barefoot {side}: a wide defensive squat with the knees bent and the hips low, the body turned sideways, {GUARD}. Small steady breathing movement only, the feet staying planted on the floor. {DRAW}",
+  "H1": f"Bare and barefoot {side}, crouching low with {GUARD}: hunches forward around the stomach in pain, steps back once with the feet on the floor, then settles back into the low crouch. {DRAW}",
+  "H2": f"Bare and barefoot {side}, crouching low with {GUARD}: the chest is pushed back, the shoulders tilt back, stumbling backward three steps, then crouches low again. {DRAW}",
+  "H3": f"Bare and barefoot {side}: the legs give out, the body sinks down onto the hips on the floor, then tips backward and lies flat on the back along the floor. {DRAW}",
+  "H4": f"Bare and barefoot, lying on the back on the floor {side}: a small flinch, curling slightly, then lying flat again, the back on the floor the whole time. {DRAW}",
+  "H5": f"Bare and barefoot, lying on the back on the floor {side}: sits up, gets one foot under the body, rises up into a low crouch with the knees bent, {GUARD}. {DRAW}",
+  "H6": f"Bare and barefoot, jogging {side} at an even pace, each step the same length, {COVER}. {DRAW}"},
+}
+if _V in VAR:
+    for _n, _p in VAR[_V].items(): STEPS[_n] = STEPS[_n][:3] + (_p,)
+
+# ── 지침 검사 (docs/샤워_뽑기_지침.md, 10-31 사용자: 말로는 안 된다 → 장치). 어기면 보내지 않고 멈춘다 ──
+BANNED = ["flushed", "pale", "panick", "trembl", "in the face", "snaps back", "whips", "leave the floor", "through the air", "flies", "flying", "tap one foot", "fists raised", "fighting stance"]
+NEED_START = {"H1": "G", "H2": "G", "H3": "H2@peak", "H4": "H3", "H5": "H3", "H6": "G", "G": "A"}
+def lint(n):
+    src, frames, opt, prompt = STEPS[n]
+    bad = [w for w in BANNED if w in prompt.lower()]
+    errs = [f"{n}: 쓰지 않는 말 {bad}"] if bad else []
+    if n in NEED_START and src != NEED_START[n]: errs.append(f"{n}: 시작 장이 {src} — 지침은 {NEED_START[n]}")
+    if frames % 4 or not 4 <= frames <= 40: errs.append(f"{n}: 장 수 {frames} (4의 배수 4~40)")
+    if "Only the" not in prompt: errs.append(f"{n}: 끝에 Only the … is drawn. 없음")
+    if g == "man" and "chest" in COVER: errs.append("남자 가리기에 가슴")
+    return errs
+_errs = [e for n in STEPS for e in lint(n)]
+if _errs: sys.exit("지침 위반 — 보내지 않음:\n" + "\n".join(_errs))
+def b64(im):
+    b = io.BytesIO(); im.save(b, "PNG"); return {"type": "base64", "base64": base64.b64encode(b.getvalue()).decode(), "format": "png"}
+def biggest(im):   # 가장 큰 덩어리(몸)만 남긴 사본 — 시작 장용
+    a = np.array(im.convert("RGBA")); m = a[..., 3] > 0; H, W = m.shape; lab = np.zeros((H, W), int); n = 0; sz = []
+    for y in range(H):
+        for x in range(W):
+            if m[y, x] and not lab[y, x]:
+                n += 1; q = deque([(y, x)]); lab[y, x] = n; c = 0
+                while q:
+                    cy, cx = q.popleft(); c += 1
+                    for dy in (-1, 0, 1):
+                        for dx in (-1, 0, 1):
+                            yy, xx = cy + dy, cx + dx
+                            if 0 <= yy < H and 0 <= xx < W and m[yy, xx] and not lab[yy, xx]: lab[yy, xx] = n; q.append((yy, xx))
+                sz.append(c)
+    if n > 1: a[(lab != 1 + int(np.argmax(sz))) & m] = 0
+    return Image.fromarray(a)
+def peak(n):   # 그 줄에서 첫 장과 가장 많이 다른 장(가장 크게 밀려난 순간) — 쓰러지기는 맞는 자세에서 시작(10-31 사용자)
+    fs = sorted((OUT / f"샤워2_{n}").glob("[0-9][0-9].png"))
+    a0 = np.array(Image.open(fs[0]).convert("RGBA"))[..., 3] > 0
+    def d(f):
+        a = np.array(Image.open(f).convert("RGBA"))[..., 3] > 0
+        u = (a | a0).sum(); return 1 - (a & a0).sum() / u if u else 0
+    f = max(fs, key=d)
+    clean = biggest(Image.open(f).convert("RGBA")); clean.save(OUT / f"샤워2_{n}_가장밀림_정리.png"); return clean
+def last(n):
+    if n.endswith("@peak"): return peak(n[:-5])
+    if n == "REG": return m3.fetch_png(m3.req("GET", f"/characters/{CID}")["rotation_urls"][D]).convert("RGBA")
+    im = Image.open(sorted((OUT / f"샤워2_{n}").glob("[0-9][0-9].png"))[-1]).convert("RGBA")
+    clean = biggest(im); clean.save(OUT / f"샤워2_{n}_끝장_정리.png"); return clean
+REDO = "--redo" in sys.argv
+def run(n):
+    d = OUT / f"샤워2_{n}"
+    if any(d.glob("[0-9][0-9].png")):
+        if not REDO: return n, "이미 있음(덮어쓰지 않음)"
+        k = 1   # 다시 뽑기: 이전 판은 _old/ 로 옮긴다(지우지 않음)
+        while (OUT / "_old" / f"샤워2_{n}_{k}").exists(): k += 1
+        old = OUT / "_old" / f"샤워2_{n}_{k}"; old.parent.mkdir(exist_ok=True); d.rename(old)
+        sh = OUT / f"샤워2_{n}_sheet.png"
+        if sh.exists(): sh.rename(old / "sheet.png")
+    src, frames, opt, prompt = STEPS[n]; start = m3.pad(last(src), CANVAS)
+    body = {"character_id": CID, "mode": "pixminimax", "action_description": prompt, "animation_name": f"test 샤워피격 {n}",
+            "directions": [D], "frame_count": frames, "initial_pose": f"standing upright {side}",
+            "keep_first_frame": False, "enhance_prompt": False, "custom_start_frame": b64(start)}
+    if opt == "loop": body["end_frame"] = b64(start)
+    if opt in STEPS:   # 끝 장 = 다른 줄의 끝 장(경계 자세 등)
+        opt = "back:" + opt
+    if opt and opt.startswith("back"):
+        end = m3.pad(last(opt.split(":")[1] if ":" in opt else "A"), CANVAS)
+        body["end_frame"] = b64(end)
+    for _ in range(240):
+        try: r = m3.req("POST", "/characters/animations", body); break
+        except Exception as e:
+            msg = str(e)
+            if hasattr(e, "read"): msg += e.read().decode()[:300]
+            if "429" in msg or "409" in msg: time.sleep(15); continue
+            return n, "보내기 실패 " + msg[:300]
+    job = r.get("background_job_id") or (r.get("background_job_ids") or [None])[0]; gid = r.get("animation_group_id")
+    while True:
+        time.sleep(6)
+        try: j = m3.req("GET", f"/background-jobs/{job}")
+        except Exception: continue
+        if j.get("status") in ("completed", "failed", "error", "cancelled"): break
+    if j.get("status") != "completed": return n, "실패 " + json.dumps(j)[:300]
+    ch = m3.req("GET", f"/characters/{CID}")
+    a = next(a for a in ch["animations"] if a.get("animation_group_id") == gid or a.get("id") == gid)
+    urls = next(x["frames"] for x in a["directions"] if x["direction"] == D)
+    o = OUT / f"샤워2_{n}"; o.mkdir(exist_ok=True)
+    fr = [m3.fetch_png(u) for u in urls]
+    for i, im in enumerate(fr): im.save(o / f"{i:02d}.png")
+    m3.sheet(fr, OUT / f"샤워2_{n}_sheet.png")
+    gif = []   # 지침 1-3: 끝나면 바로 보여 줄 움직이는 그림
+    for im in fr:
+        b = Image.new("RGBA", im.size, (60, 60, 70, 255)); b.alpha_composite(im); gif.append(b.convert("RGB"))
+    gif[0].save(OUT / f"샤워2_{n}.gif", save_all=True, append_images=gif[1:], duration=120, loop=0)
+    assert fr[0].size == CANVAS, f"캔버스 {fr[0].size} ≠ 256×256"
+    if n in ("G", "H1", "H2", "H3", "H4", "H5", "H6"):   # 11-01: 모든 줄 작은 점 지우기. 10-31 사용자: 허공에 쓰러짐은 코드로 → 바닥 붙이기·이펙트 지우기(원본은 _원본/)
+        import shower_fix; shower_fix.fix(key, n)
+    return n, f"완료 {len(fr)}장 {json.dumps(j.get('usage'))}"
+from concurrent.futures import ThreadPoolExecutor as _E
+_one = [a for a in sys.argv[2:] if not a.startswith("--")]
+if _one:   # 줄만: python3 _test/shower_hit.py <키> S4 [S6 …] [--redo]
+    for s in _one: print(key, run(s), flush=True)
+    sys.exit()
+with _E(3) as ex: print(key, list(ex.map(run, ["S1", "S2", "S3", "S5", "S6"])), flush=True)
+print(key, run("S4"), flush=True)

@@ -1,36 +1,678 @@
-.]+)\s*(\+=|-=|=)\s*(.+?)\s*$/.exec(part);
+setStick(nx, ny);
+    }
+    setStick(x, y) {
+      const dialog = this.mode === "dialog";
+      this.hub.setAnalog("touch", dialog ? 0 : x, dialog ? 0 : y);
+      const dir = (code, v) => {
+        if (this.dirOn[code] === v) return;
+        this.dirOn[code] = v;
+        if (v) this.hub.press(code, "touch");
+        else this.hub.release(code, "touch");
+      };
+      const th = (on) => on ? 0.3 : 0.42;
+      if (dialog) {
+        const vert = Math.abs(y) >= Math.abs(x);
+        dir("ArrowUp", vert && y < -th(this.dirOn.ArrowUp));
+        dir("ArrowDown", vert && y > th(this.dirOn.ArrowDown));
+        dir("ArrowLeft", !vert && x < -th(this.dirOn.ArrowLeft));
+        dir("ArrowRight", !vert && x > th(this.dirOn.ArrowRight));
+        return;
+      }
+      dir("ArrowLeft", x < -th(this.dirOn.ArrowLeft));
+      dir("ArrowRight", x > th(this.dirOn.ArrowRight));
+      dir("ArrowUp", y < -th(this.dirOn.ArrowUp) * 1.15);
+      dir("ArrowDown", y > th(this.dirOn.ArrowDown) * 1.15);
+      const wantRun = this.st().stickRun && Math.abs(x) > 0.9;
+      if (wantRun && !this.runOn) {
+        this.runOn = true;
+        this.runSince = performance.now();
+        const pending = this.runTimer !== 0;
+        clearTimeout(this.runTimer);
+        this.runTimer = 0;
+        if (!pending) this.key(CODE.evade, true);
+      } else if (!wantRun && this.runOn) {
+        this.runOn = false;
+        const left = 250 - (performance.now() - this.runSince);
+        clearTimeout(this.runTimer);
+        this.runTimer = 0;
+        if (left > 0)
+          this.runTimer = window.setTimeout(() => {
+            this.runTimer = 0;
+            this.key(CODE.evade, false);
+          }, left);
+        else this.key(CODE.evade, false);
+      }
+    }
+    releaseAll() {
+      const ids = [...this.ptr.keys()];
+      this.ptr.clear();
+      for (const id of ids) {
+        try {
+          if (this.surface.hasPointerCapture(id)) this.surface.releasePointerCapture(id);
+        } catch {
+        }
+      }
+      clearTimeout(this.runTimer);
+      this.runTimer = 0;
+      this.runOn = false;
+      for (const t of this.timers) clearTimeout(t);
+      this.timers.clear();
+      this.uniq = { timer: 0, charging: false, down: false };
+      this.stickPid = null;
+      this.setStick(0, 0);
+      this.count.clear();
+      for (const b of this.btns) b.el.classList.remove("on");
+      this.hub.releaseSource("touch");
+      this.restBase();
+    }
+    dispose() {
+      const s = this.surface;
+      s.removeEventListener("pointerdown", this.onDown);
+      s.removeEventListener("pointermove", this.onMove);
+      s.removeEventListener("pointerup", this.onUp);
+      s.removeEventListener("pointercancel", this.onUp);
+      s.removeEventListener("lostpointercapture", this.onUp);
+      s.removeEventListener("contextmenu", this.onContext);
+      s.removeEventListener("gesturestart", this.onGesture);
+      s.removeEventListener("dblclick", this.onContext);
+      s.removeEventListener("touchend", this.onTouchEnd);
+      window.removeEventListener("pointerup", this.onUp);
+      window.removeEventListener("pointercancel", this.onUp);
+      window.removeEventListener("blur", this.onBlur);
+      document.removeEventListener("focusin", this.onIme);
+      document.removeEventListener("focusout", this.onIme);
+      if (typeof visualViewport !== "undefined") visualViewport?.removeEventListener("resize", this.onIme);
+      document.removeEventListener("visibilitychange", this.onVisibility);
+      window.removeEventListener("touchstart", this.onAnyTouch, { capture: true });
+      this.releaseAll();
+      this.root.remove();
+    }
+  };
+
+  // src/game/action/ui/index.ts
+  function mountGameShell(box2, o = {}) {
+    const stage = mountStage(box2);
+    const input = new InputHub();
+    input.synth = !!o.synth;
+    input.target = o.keyTarget ?? window;
+    const pad = new PadReader(input);
+    const hud = new Hud();
+    const fx2 = new Fx();
+    fx2.rumble = (s, ms) => pad.rumble(s, ms);
+    const menu = new Menu(stage.ui);
+    const store2 = o.store ?? localStore;
+    let settings = { ...DEFAULT_SETTINGS2 };
+    const tap = (code) => {
+      input.press(code, "touch");
+      setTimeout(() => input.release(code, "touch"), 90);
+    };
+    const touch = new TouchPad(stage.touch, input, () => settings, (code) => {
+      if (code === "Escape") shell.openPause();
+      else tap(code);
+    });
+    touch.vw = () => stage.vw;
+    touch.toLocal = (x, y, el) => stage.turned || !o.toLocal ? stage.toLocal(x, y, el) : o.toLocal(x, y, el);
+    if (o.fill) stage.setFit("fill");
+    else if (o.field) stage.setFit("height");
+    const apply = () => {
+      stage.setCrt(settings.crt);
+      stage.setBright(settings.bright);
+      stage.setPixel(settings.pixel);
+      charSize.k = settings.charSize;
+      fx2.opt = { shake: settings.shake, flash: settings.flash, numbers: settings.numbers };
+      pad.setRumble(settings.vibrate);
+      touch.refresh();
+    };
+    const saveSettings = () => void store2.save(JSON.stringify(settings));
+    menu.onChange = () => {
+      apply();
+      saveSettings();
+    };
+    menu.onOpen = (open) => {
+      if (open) input.releaseSource("kb"), input.releaseSource("pad");
+      touch.setMode(open ? "dialog" : "play");
+      touch.setVisible(open || shell.mode === "play");
+    };
+    input.capture = (code, down2, src) => {
+      const cw = o.charWindow;
+      if (!menu.isOpen && cw && shell.mode === "play") {
+        if (cw.isOpen()) {
+          if (down2) {
+            if (code === "Backquote" || code === "Escape") cw.toggle(false);
+            else cw.key(code);
+          }
+          return true;
+        }
+        if (code === "Backquote" && cw.canOpen()) {
+          if (down2) {
+            input.releaseSource("kb");
+            input.releaseSource("pad");
+            cw.toggle(true);
+          }
+          return true;
+        }
+      }
+      if (!menu.isOpen) {
+        if (code === "Escape" && src === "touch" && touch.touchMode === "dialog") return false;
+        if (code === "Escape" && shell.mode === "play") {
+          if (down2) shell.openPause();
+          return true;
+        }
+        return false;
+      }
+      if (!down2) return true;
+      menu.key(code === "KeyE" && input.last === "pad" ? "Escape" : code === "KeyA" && input.last === "pad" ? "Enter" : code);
+      return true;
+    };
+    input.attachKeyboard(o.keyTarget ?? window, {
+      prevent: (code) => code.startsWith("Arrow") || code === "Space" || code === "Tab" || code === "Escape" || code === "Backquote" || /^Key|^Digit|^Shift/.test(code)
+    });
+    stage.onResize(() => touch.layout());
+    const controlsHtml = () => {
+      const rows = ACTS.filter((a) => !["up", "down", "right"].includes(a)).map((a) => {
+        const kb = a === "left" ? "<kbd>←</kbd><kbd>→</kbd><kbd>↑</kbd><kbd>↓</kbd>" : `<kbd>${esc(KEY_NAME[a])}</kbd>`;
+        const pd = PAD_NAME[CODE[a]] ?? "";
+        const TC = { left: "왼쪽 절반 스틱", attack: "약공격", reload: "강공격", guard: "막기 (누른 채)", unique: "고유 (짧게)", hitbox: TOUCH_CHARGE.code ? "고유 길게 (충전)" : "", ult: "필살", interact: "조사", jump: "점프", evade: "회피 (스틱 끝 = 달리기)", auto: "AUTO", menu: "메뉴" };
+        const tc = TC[a] || "—";
+        return `<tr><td>${esc(a === "left" ? "이동 (좌우 + 안쪽·앞쪽)" : LABEL[a])}</td><td>${kb}</td><td>${esc(pd)}</td><td>${esc(tc)}</td></tr>`;
+      }).join("");
+      return `<table><tr><th>행동</th><th>키보드</th><th>게임패드</th><th>터치</th></tr>${rows}</table><p style="margin-top:10px">Shift 를 0.15초 안에 떼면 회피, 누르고 있으면 달리기. 같은 방향 두 번도 달리기. ↓ 두 번 앉기.</p>`;
+    };
+    const settingsItems = () => {
+      const s = settings;
+      const pct = (v) => `${Math.round(v * 100)}%`;
+      return [
+        { type: "head", label: "화면" },
+        { type: "choice", label: "CRT 모니터", options: [["off", "끄기"], ["screen", "화면 효과"], ["curved", "곡면까지"]], get: () => s.crt, set: (v) => s.crt = v },
+        { type: "slider", label: "화면 흔들림", get: () => s.shake, set: (v) => s.shake = v, min: 0, max: 1, step: 0.25, fmt: pct },
+        { type: "toggle", label: "피격 섬광", get: () => s.flash, set: (v) => s.flash = v },
+        { type: "toggle", label: "피해 숫자", get: () => s.numbers, set: (v) => s.numbers = v },
+        { type: "slider", label: "밝기", get: () => s.bright, set: (v) => s.bright = v, min: 0.7, max: 1.4, step: 0.05, fmt: pct },
+        { type: "toggle", label: "도트 선명하게", get: () => s.pixel, set: (v) => s.pixel = v },
+        { type: "slider", label: "화면 확대", get: () => s.charSize, set: (v) => s.charSize = v, min: 1, max: 2.5, step: 0.05, fmt: pct },
+        ...o.field ? [] : [{ type: "button", label: "전체 화면", sub: "폰은 가로로 고정", act: () => void stage.fullscreen() }],
+        // 필드(리스): 전체 화면 두 가지 (2026-10-25 사용자) — 브라우저 전체 · 상황창 안 전체(왼쪽 메뉴·오른쪽 신분증 칸까지)
+        ...o.field?.fullscreen ? [{
+          type: "choice",
+          label: "전체 화면",
+          options: [["off", "끄기"], ["panel", "상황창 안"], ["browser", "브라우저"]],
+          get: () => o.field.fullscreen.mode() ?? "off",
+          set: (v) => {
+            const f = o.field.fullscreen;
+            void (v === "off" ? f.exit() : f.enter(v)).then(() => {
+              if (menu.isOpen) menu.replace(settingsScreen());
+            });
+          }
+        }] : [],
+        { type: "head", label: "소리" },
+        { type: "slider", label: "전체", get: () => s.master, set: (v) => s.master = v, min: 0, max: 1, step: 0.1, fmt: pct },
+        { type: "slider", label: "음악", get: () => s.music, set: (v) => s.music = v, min: 0, max: 1, step: 0.1, fmt: pct },
+        { type: "slider", label: "효과음", get: () => s.sfx, set: (v) => s.sfx = v, min: 0, max: 1, step: 0.1, fmt: pct },
+        { type: "head", label: "조작" },
+        { type: "choice", label: "터치 버튼", options: [["auto", "자동"], ["on", "항상"], ["off", "끄기"]], get: () => s.touch, set: (v) => s.touch = v },
+        { type: "slider", label: "버튼 크기", get: () => s.touchSize, set: (v) => s.touchSize = v, min: 0.7, max: 1.4, step: 0.05, fmt: pct },
+        { type: "slider", label: "버튼 진하기", get: () => s.touchAlpha, set: (v) => s.touchAlpha = v, min: 0.3, max: 1, step: 0.05, fmt: pct },
+        { type: "toggle", label: "스틱 끝까지 밀면 달리기", get: () => s.stickRun, set: (v) => s.stickRun = v },
+        { type: "toggle", label: "왼손 배치", get: () => s.lefty, set: (v) => s.lefty = v },
+        { type: "toggle", label: "진동", get: () => s.vibrate, set: (v) => s.vibrate = v },
+        // 필드 대화 설정은 플러그인 설정 → 기능별 설정 「필드」에 있다
+        ...o.field ? [] : [
+          { type: "head", label: "대화" },
+          { type: "choice", label: "NPC 대화 모델", options: [["main", "주 모델"], ["aux", "보조 모델"]], get: () => s.talkModel, set: (v) => s.talkModel = v },
+          { type: "toggle", label: "본편 최근 채팅 같이 보내기", get: () => s.talkRecent, set: (v) => s.talkRecent = v }
+        ],
+        { type: "head", label: "사망" },
+        { type: "choice", label: "내가 죽으면", options: [["perma", "영구 사망"], ["evac", "패퇴(후송)"]], get: () => s.deathMode, set: (v) => s.deathMode = v },
+        { type: "toggle", label: "필드에서 NPC 살해 허용", get: () => s.npcKill, set: (v) => s.npcKill = v },
+        { type: "head", label: "필드 시간" },
+        ...[["tScene", "장면 넘어가기", 60], ["tRegion", "지역 이동", 180], ["tTalk", "대화 한 번", 60], ["tFight", "싸움 (장면당 한 번)", 60], ["tWaitShort", "시간 보내기 · 짧게", 240], ["tWaitLong", "시간 보내기 · 길게", 480]].map(([k, label2, max]) => ({
+          type: "slider",
+          label: label2,
+          get: () => s[k],
+          set: (v) => s[k] = Math.round(v),
+          min: 0,
+          max,
+          step: 5,
+          fmt: (v) => v ? `${Math.round(v)}분` : "안 감"
+        })),
+        { type: "html", html: `<p style="font-size:14px;color:#9aa6ab">게임패드: ${esc(pad.connected ? pad.connected.slice(0, 48) : "연결 안 됨 (버튼을 하나 누르면 잡힙니다)")}</p>` },
+        { type: "button", label: "기본값으로", act: () => (settings = { ...DEFAULT_SETTINGS2 }, apply(), saveSettings(), menu.replace(settingsScreen())) }
+      ];
+    };
+    const settingsScreen = () => ({ id: "settings", title: "설정", items: settingsItems() });
+    let mode = "title";
+    const shell = {
+      stage,
+      canvas: stage.canvas,
+      ctx: stage.ctx,
+      input,
+      pad,
+      touch,
+      hud,
+      fx: fx2,
+      menu,
+      get settings() {
+        return settings;
+      },
+      get mode() {
+        return mode;
+      },
+      set mode(m) {
+        mode = m;
+        touch.setVisible(m === "play" || menu.isOpen);
+      },
+      get paused() {
+        return menu.isOpen || mode !== "play" || !!o.charWindow?.isOpen();
+      },
+      get touchShown() {
+        return touch.shown;
+      },
+      frame(dt) {
+        pad.poll();
+        fx2.update(dt);
+      },
+      play() {
+        menu.closeAll();
+        shell.mode = "play";
+        stage.root.focus({ preventScroll: true });
+      },
+      openTitle() {
+        shell.mode = "title";
+        menu.closeAll();
+        const has = o.hasSave?.() ?? false;
+        menu.open({
+          id: "title",
+          look: "title",
+          title: o.title ?? "괴이 ː ANOMALY",
+          sub: o.sub ?? "ANOMALY SIMULATION · 관리국 액션",
+          noBack: true,
+          // 필드: 저장 이어하기가 없다 (본편 상황판이 곧 저장). 입장 판정은 onNew가 한다
+          items: o.field ? [
+            { type: "button", label: "필드 입장", act: () => o.onNew?.() },
+            { type: "button", label: "설정", act: () => shell.openSettings() },
+            { type: "button", label: "조작법", act: () => shell.openControls() },
+            { type: "button", label: "나가기", sub: "상황판으로", act: () => (menu.closeAll(), o.field.onExit()) }
+          ] : [
+            ...has ? [{ type: "button", label: "이어하기", act: () => o.onContinue?.() }] : [],
+            { type: "button", label: "새로 시작", act: () => o.onNew?.() },
+            { type: "button", label: "설정", act: () => shell.openSettings() },
+            { type: "button", label: "조작법", act: () => shell.openControls() }
+          ]
+        });
+      },
+      openPause() {
+        if (menu.isOpen) return;
+        const coarse = typeof matchMedia !== "undefined" && matchMedia("(pointer: coarse)").matches;
+        const kb = !coarse && (!hud.last?.device || hud.last.device === "kb");
+        const key = (k) => kb ? k : void 0;
+        menu.open({
+          id: "pause",
+          title: "일시정지",
+          sub: o.pauseInfo?.() ?? "",
+          items: o.field ? [
+            { type: "button", label: "계속", sub: key("Esc"), act: () => menu.closeAll() },
+            ...o.bag?.available() ? [{ type: "button", label: "가방", act: () => (menu.closeAll(), o.bag.open()) }] : [],
+            { type: "button", label: "설정", act: () => shell.openSettings() },
+            { type: "button", label: "조작법", act: () => shell.openControls() },
+            ...o.onTitle ? [{ type: "button", label: "타이틀로", act: () => (menu.closeAll(), o.onTitle()) }] : [],
+            { type: "button", label: "필드 나가기", sub: "상황판으로", act: () => (menu.closeAll(), o.field.onExit()) }
+          ] : [
+            ...hud.last ? [{ type: "html", html: statusHtml(hud.last) }] : [],
+            { type: "button", label: "계속", sub: key("Esc"), act: () => menu.closeAll() },
+            ...o.bag?.available() ? [{ type: "button", label: "가방", act: () => (menu.closeAll(), o.bag.open()) }] : [],
+            { type: "button", label: "설정", act: () => shell.openSettings() },
+            { type: "button", label: "조작법", act: () => shell.openControls() },
+            { type: "button", label: "자동 전환", sub: key("X"), act: () => (menu.closeAll(), tap("KeyX")) },
+            { type: "button", label: "판정 보기", sub: key("H"), act: () => (menu.closeAll(), tap("KeyH")) },
+            ...o.onRetreat ? [{ type: "button", label: "출동 포기 · 긴급 철수", sub: "안전 귀환은 다락방 로프", danger: true, act: () => void shell.confirm("출동을 포기하고 철수할까요? 안전 귀환보다 회수 보상이 줄어듭니다.", "철수", "계속 싸운다").then((y) => y && (menu.closeAll(), o.onRetreat())) }] : [],
+            { type: "button", label: "타이틀로", act: () => void shell.confirm("타이틀로 나갈까요? 이어하기는 마지막 안전 지점부터입니다. 전투 중 얻거나 사용한 물품·체력도 그 시점으로 돌아갑니다.").then((y) => y && (o.onTitle ? o.onTitle() : shell.openTitle())) }
+          ]
+        });
+      },
+      openSettings() {
+        menu.open(settingsScreen());
+      },
+      openControls() {
+        menu.open({ id: "controls", title: "조작법", look: "wide", items: [{ type: "html", html: controlsHtml() }, { type: "button", label: "닫기", act: () => menu.pop() }] });
+      },
+      choose(c) {
+        return new Promise((res) => {
+          menu.open(
+            choiceScreen(menu, c, (i) => {
+              menu.pop();
+              res(i);
+            })
+          );
+        });
+      },
+      confirm(text, yes = "예", no = "아니오") {
+        return new Promise((res) => {
+          menu.open({
+            id: "confirm",
+            title: "확인",
+            back: () => (menu.pop(), res(false)),
+            items: [
+              { type: "html", html: `<p>${esc(text)}</p>` },
+              { type: "button", label: yes, act: () => (menu.pop(), res(true)) },
+              { type: "button", label: no, act: () => (menu.pop(), res(false)) }
+            ]
+          });
+        });
+      },
+      info(title2, lines, button = "확인") {
+        return new Promise((res) => {
+          menu.open({
+            id: "info",
+            title: title2,
+            look: "wide",
+            back: () => (menu.pop(), res()),
+            items: [{ type: "html", html: lines.map((l) => `<p>${esc(l)}</p>`).join("") }, { type: "button", label: button, act: () => (menu.pop(), res()) }]
+          });
+        });
+      },
+      tap,
+      saveSettings,
+      dispose() {
+        input.dispose();
+        touch.dispose();
+        menu.dispose();
+        stage.dispose();
+      }
+    };
+    void (async () => {
+      settings = parseSettings(await store2.load());
+      apply();
+    })();
+    apply();
+    return shell;
+  }
+
+  // src/game/action/engine/navigationFeedback.ts
+  function navigationTarget(props2, x) {
+    let best = null;
+    for (const p of props2) if (Math.abs(p.x - x) < 60 && (!best || Math.abs(p.x - x) < Math.abs(best.x - x))) best = p;
+    return best;
+  }
+  function navigationFeedback(w) {
+    if (w.player.seat) return { objective: "본부 · 의자에서 휴식 중", target: { id: "seat:stand", text: "일어나기", kind: "interact" } };
+    const stage = w.stage;
+    const objective = w.floor.type === "hq" ? "본부 · 표시된 출입구와 자리 앞에서 조사" : "표시된 장치를 조사하세요";
+    const result = { objective, target: null };
+    if (w.ended || w.player.hp <= 0 || w.player.carry) return result;
+    const p = navigationTarget(w.props, w.player.x);
+    if (!p) return result;
+    const set = (text, kind = "interact", reason) => {
+      result.target = { id: p.id, text, kind: reason ? "locked" : kind, reason };
+      return result;
+    };
+    const scene = w.floor.type === "hq" ? stage?.current?.() : null;
+    if (scene && p.kind === "hubdoor") {
+      const d3 = scene.doors.find((d4) => `door:${d4.id}` === p.id);
+      if (!d3) return result;
+      if (!d3.open) return set("닫힌 문", "locked", d3.needs ? "본부 시설 해금 필요" : "출입할 수 없는 문");
+      if (d3.kind === "elevator") return set("승강기 · 층 선택");
+      return d3.to ? set(d3.side === "S" ? "출구 · 복도로 이동" : "출입구 · 이동", "exit") : set("배경 문 · 출입 불가", "decoration");
+    }
+    if (scene && p.kind === "hubspot") {
+      const s = scene.spots.find((s2) => `spot:${s2.id}` === p.id);
+      return s?.open ? set([s.who, s.verb].filter(Boolean).join(" · ")) : result;
+    }
+    const name = p.label ?? "";
+    if (p.kind === "decor") return set("배경 장식 · 출입 불가", "decoration");
+    if (!name) return result;
+    return set(name);
+  }
+
+  // src/game/action/ui/navigationButton.ts
+  function syncNavigationButton(canvas, navigation) {
+    const button = canvas.closest(".gs")?.querySelector('.tp [data-id="interact"]');
+    if (!button) return;
+    const target = navigation?.target;
+    const locked = target?.kind === "locked";
+    const active = !!target && !locked && target.kind !== "decoration";
+    const text = locked ? "잠김" : "조사";
+    const description = target ? `${text} · ${target.text}${target.reason ? ` · ${target.reason}` : ""}` : "조사 · 표시된 대상에 가까이 가세요";
+    if (button.getAttribute("aria-label") === description) return;
+    button.setAttribute("aria-label", description);
+    button.title = description;
+    button.classList.toggle("hint", active);
+    const label2 = button.querySelector("b");
+    if (!label2) return;
+    label2.textContent = text;
+    Object.assign(label2.style, {
+      display: locked ? "block" : "none",
+      position: "absolute",
+      left: "50%",
+      top: "100%",
+      transform: "translate(-50%, 2px)",
+      padding: "0 6px",
+      borderRadius: "6px",
+      whiteSpace: "nowrap",
+      background: "rgba(7,11,15,.85)",
+      color: "#f0b45a",
+      font: "700 11px sans-serif",
+      lineHeight: "16px",
+      textAlign: "center",
+      pointerEvents: "none",
+      textShadow: "none"
+    });
+  }
+
+  // src/game/action/story/style.css
+  var style_default = ".gsy{position:absolute;inset:0;pointer-events:none;font-family:'GoeiPixel','Galmuri11',monospace;-webkit-font-smoothing:none;color:#e8ece9;z-index:20;overflow:hidden}\n.gsy-fade{position:absolute;inset:0;background:#000;opacity:0;pointer-events:none}\n.gsy-bubbles{position:absolute;inset:0}\n.gsy-bubble{position:absolute;left:0;top:0;max-width:min(280px,60vw);padding:6px 10px;border-radius:0;background:#f4f1e8;color:#1b1f22;font-family:'GoeiPixel','Galmuri11',monospace;-webkit-font-smoothing:none;font-size:16px;line-height:1.35;border:3px solid #1b1f22;box-shadow:inset 0 -3px 0 #c9c2ae,0 0 0 2px var(--who,#888),4px 4px 0 2px rgba(0,0,0,.45);transition:opacity .25s;word-break:keep-all;image-rendering:pixelated}\n.gsy-bubble::after{content:'';position:absolute;left:calc(50% + var(--tail,0px));bottom:-12px;margin-left:-6px;width:12px;height:9px;background:#1b1f22;clip-path:polygon(0 0,100% 0,100% 33%,67% 33%,67% 67%,33% 67%,33% 100%,0 100%)}\n.gsy-bubble b{display:block;font-size:12px;color:var(--who);filter:brightness(.7);margin-bottom:1px}\n.gsy-bubble.free{left:50%;top:14px;transform:translateX(-50%)!important}\n.gsy-bubble.free::after{display:none}\n@media (max-height:500px){.gsy-bubble.free{max-width:240px;font-size:14px}}\n.gsy-bubble.out{opacity:0}\n.gsy-caption{position:absolute;left:50%;top:38%;transform:translate(-50%,-50%);width:min(88%,640px);text-align:center;font-size:17px;line-height:1.6;letter-spacing:.02em;text-shadow:0 2px 6px #000,0 0 2px #000;transition:opacity .3s;word-break:keep-all}\n.gsy-caption.out{opacity:0}\n.gsy-skip{position:absolute;right:12px;top:10px;pointer-events:auto;padding:4px 14px}\n.gsy-dock{position:absolute;left:0;right:0;bottom:12px;display:flex;flex-direction:column;align-items:center;gap:8px;padding:0 12px;pointer-events:none}\n.gsy-box{position:relative;width:min(100%,860px);min-height:112px;display:flex;gap:12px;align-items:flex-start;padding:12px 14px 14px;background:rgba(14,19,22,.94);border:1px solid rgba(255,255,255,.12);border-top:3px solid var(--who,#888);border-radius:12px;pointer-events:auto;box-sizing:border-box;cursor:pointer;user-select:none;-webkit-user-select:none;touch-action:manipulation}\n.gsy-box[hidden],.gsy-choices[hidden],.gsy-caption[hidden],.gsy-skip[hidden],.gsy-talk[hidden]{display:none}\n.gsy-photo{flex:0 0 72px;width:72px;height:72px;border-radius:12px;overflow:hidden;background:var(--who,#555);display:grid;place-items:center}\n.gsy-photo[hidden]{display:none}\n.gsy-photo img{width:100%;height:100%;object-fit:cover;object-position:50% 15%}\n.gsy-photo span{font-size:30px;font-weight:700;color:rgba(255,255,255,.85)}\n.gsy-body{flex:1;min-width:0}\n.gsy-name{display:block;font-size:14px;color:var(--who,#ccc);filter:brightness(1.35);margin-bottom:4px}\n.gsy-text{text-wrap:pretty;margin:0;font-size:16px;line-height:1.6;white-space:pre-wrap;word-break:keep-all;min-height:3.2em}\n.gsy-box.narr{border-top-color:#555}\n.gsy-box.narr .gsy-text{font-style:italic;color:#c9d0cc;text-align:center}\n.gsy-box[data-mood=serious] .gsy-photo{filter:saturate(.7) brightness(.9)}\n.gsy-box[data-mood=hurt] .gsy-photo{filter:saturate(.6)}\n.gsy-box[data-mood=surprise] .gsy-photo{animation:gsy-hop .25s}\n@keyframes gsy-hop{50%{transform:translateY(-4px)}}\n.gsy-next{position:absolute;right:14px;bottom:8px;font-style:normal;font-size:12px;opacity:0;color:var(--who)}\n.gsy-box.done:not(.asking) .gsy-next{opacity:.9;animation:gsy-blink 1s infinite}\n@keyframes gsy-blink{50%{opacity:.2}}\n.gsy-choices{width:min(100%,560px);display:flex;flex-direction:column;gap:6px;pointer-events:auto}\n.gsy-choices button{display:flex;align-items:center;gap:10px;text-align:left;padding:11px 14px;font-size:15px;color:#f1f3f0;background:rgba(22,30,34,.96);border:1px solid rgba(255,255,255,.18);border-radius:10px;cursor:pointer;touch-action:manipulation}\n.gsy-choices button:hover,.gsy-choices button:focus-visible{background:#2b3a40;border-color:#b8a36a}\n.gsy-choices kbd{font:12px ui-monospace,monospace;opacity:.6;border:1px solid rgba(255,255,255,.3);border-radius:4px;padding:0 5px}\n.gsy-talk{position:absolute;left:50%;bottom:12px;transform:translateX(-50%);width:min(calc(100% - 24px),560px);height:min(62%,420px);display:flex;flex-direction:column;background:rgba(14,19,22,.97);border:1px solid rgba(255,255,255,.14);border-top:3px solid var(--who,#888);border-radius:12px;pointer-events:auto;box-sizing:border-box}\n.gsy-talk-head{display:flex;align-items:center;gap:10px;padding:10px 12px;border-bottom:1px solid rgba(255,255,255,.08)}\n.gsy-talk-head .gsy-photo{flex-basis:40px;width:40px;height:40px;border-radius:9px}\n.gsy-talk-head .gsy-photo span{font-size:18px}\n.gsy-talk-head b{flex:1;color:var(--who);filter:brightness(1.35)}\n.gsy-talk-head button{background:none;border:0;color:#ccc;font-size:18px;padding:6px 8px;cursor:pointer}\n.gsy-talk-log{flex:1;overflow:auto;padding:10px 12px;display:flex;flex-direction:column;gap:8px}\n.gsy-talk-log p{margin:0;max-width:82%;padding:8px 11px;border-radius:12px;font-size:15px;line-height:1.5;word-break:keep-all}\n.gsy-talk-log .npc{align-self:flex-start;background:#26323a}\n.gsy-talk-log .me{align-self:flex-end;background:#3d5a4f}\n.gsy-talk-log .wait{opacity:.6;animation:gsy-blink 1s infinite}\n.gsy-talk form{display:flex;gap:8px;padding:10px 12px;border-top:1px solid rgba(255,255,255,.08)}\n.gsy-talk input{flex:1;min-width:0;padding:10px 12px;font-size:16px;border-radius:9px;border:1px solid rgba(255,255,255,.2);background:#0b1013;color:#eef}\n.gsy-talk form button{padding:0 16px;border-radius:9px;border:0;background:#b8a36a;color:#1a1a12;font-weight:700;font-size:15px}\n.gsy-talk form button:disabled{opacity:.5}\n@media (max-width:560px){.gsy-photo{flex-basis:56px;width:56px;height:56px}.gsy-text{font-size:15px}.gsy-box{min-height:96px;padding:10px 12px 12px}}\n.gsy-top .gsy-dock{top:var(--gsy-dock-top,16%);bottom:auto;flex-direction:column-reverse}\n/* 폰 가로(낮은 화면): 좌우 터치 버튼 사이 가운데 위쪽에 작게. 선택지는 두 칸씩 */\n@media (max-height:500px){.gsy-box,.gsy-choices{width:min(52%,560px)}.gsy-dock{align-items:flex-start;padding-left:17%}.gsy-box{min-height:0;padding:7px 10px 9px;gap:8px;border-radius:10px}.gsy-photo{flex-basis:40px;width:40px;height:40px;border-radius:8px}.gsy-photo span{font-size:18px}.gsy-name{font-size:12px;margin-bottom:2px}.gsy-text{font-size:13px;line-height:1.45;min-height:2.9em}.gsy-choices{display:grid;grid-template-columns:1fr 1fr;gap:4px}.gsy-choices button{padding:6px 9px;font-size:12px;gap:6px;border-radius:8px}.gsy-dock{gap:5px}.gsy-skip{top:auto;bottom:8px;left:50%;right:auto;transform:translateX(-50%);padding:2px 10px;font-size:16px}}\n/* 컷신 도트 애니메이션: 화면 전체, 검은 바탕, 도트가 뭉개지지 않게 */\n.gsy-video{position:absolute;inset:0;background:#000;pointer-events:auto;z-index:30;display:flex;align-items:center;justify-content:center}\n.gsy-video[hidden]{display:none}\n.gsy-video canvas{width:100%;height:100%;object-fit:contain;image-rendering:pixelated}\n.gsy-vsub{position:absolute;left:50%;bottom:4%;transform:translateX(-50%);width:max-content;max-width:min(92%,1100px);box-sizing:border-box;margin:0;padding:4px 14px;font-size:22px;line-height:1.5;text-align:center;word-break:keep-all;color:#f1f3f0;text-shadow:2px 2px 0 #000}\n.gsy-vsub[hidden]{display:none}\n.gsy-vsub b{color:#ffe27a;font-weight:400;margin-right:8px}\n.gsy-vskip,.gsy-vsound{position:absolute;top:10px;padding:4px 14px}\n.gsy-vskip{right:12px}\n.gsy-vsound{left:12px}\n.gsy-vsound[hidden]{display:none}\n@media (max-height:500px){.gsy-vsub{font-size:16px;padding:2px 10px;bottom:3%}.gsy-vskip,.gsy-vsound{font-size:16px;top:6px;padding:2px 10px}}\n";
+
+  // src/game/action/story/script.ts
+  var MOODS = /* @__PURE__ */ new Set(["base", "smile", "serious", "hurt", "surprise"]);
+  var ScriptError = class extends Error {
+  };
+  function parseSay(body, line2, where) {
+    const m = /^([a-z]+)(?:\((\w+)\))?\s*:\s*(.+)$/.exec(body);
+    if (!m) throw new ScriptError(`${where}:${line2} 말 줄 형식이 아니에요: ${body}`);
+    const mood = m[2] ?? "base";
+    if (!MOODS.has(mood)) throw new ScriptError(`${where}:${line2} 모르는 표정: ${m[2]}`);
+    return { t: "say", who: m[1], mood, text: m[3].trim(), line: line2 };
+  }
+  function parseScripts(src, where = "script") {
+    const out = [];
+    let cur = null;
+    const lines = src.split(/\r?\n/);
+    for (let i = 0; i < lines.length; i++) {
+      const n = i + 1;
+      const raw = lines[i].trim();
+      if (!raw || raw.startsWith("//")) continue;
+      if (raw.startsWith("===")) {
+        cur = { id: raw.slice(3).trim(), nodes: [], labels: {} };
+        if (!cur.id) throw new ScriptError(`${where}:${n} 대본 id가 비었어요`);
+        out.push(cur);
+        continue;
+      }
+      if (!cur) throw new ScriptError(`${where}:${n} === 대본id 앞에 내용이 있어요`);
+      const nodes = cur.nodes;
+      const prev = nodes[nodes.length - 1];
+      if (raw.startsWith("--")) {
+        const label2 = raw.slice(2).trim();
+        if (cur.labels[label2] !== void 0) throw new ScriptError(`${where}:${n} 표지 중복: ${label2}`);
+        cur.labels[label2] = nodes.length;
+        continue;
+      }
+      if (raw.startsWith("~")) {
+        const say = parseSay(raw.slice(1).trim(), n, where);
+        const labelHere = Object.values(cur.labels).includes(nodes.length);
+        if (prev?.t === "pick" && !labelHere) prev.lines.push(say);
+        else nodes.push({ t: "pick", lines: [say], line: n });
+        continue;
+      }
+      if (raw.startsWith("*")) {
+        const m = /^\*\s*(.+?)\s*->\s*([\w.]+)\s*(.*)$/.exec(raw);
+        if (!m) throw new ScriptError(`${where}:${n} 선택지 형식: * 글 -> 표지 [if 조건] [set ...]`);
+        const opt = { text: m[1], to: m[2] };
+        for (const b of m[3].matchAll(/\[(if|set)\s+([^\]]+)\]/g)) opt[b[1]] = b[2].trim();
+        const labelHere = Object.values(cur.labels).includes(nodes.length);
+        if (prev?.t === "choice" && !labelHere) prev.options.push(opt);
+        else nodes.push({ t: "choice", options: [opt], line: n });
+        continue;
+      }
+      if (raw.startsWith(">")) {
+        const cmd = raw.slice(1).trim();
+        const [head, ...rest] = cmd.split(/\s+/);
+        const tail = cmd.slice(head.length).trim();
+        if (head === "set") {
+          const m = /^([\w.]+)\s*(\+=|-=|=)\s*(.+)$/.exec(tail);
+          if (!m) throw new ScriptError(`${where}:${n} set 형식: > set 이름 = 식`);
+          nodes.push({ t: "set", key: m[1], op: m[2], expr: m[3], line: n });
+        } else if (head === "goto") {
+          const m = /^([\w.]+)(?:\s+if\s+(.+))?$/.exec(tail);
+          if (!m) throw new ScriptError(`${where}:${n} goto 형식: > goto 표지 [if 조건]`);
+          nodes.push({ t: "goto", to: m[1], if: m[2], line: n });
+        } else if (head === "emit") {
+          nodes.push({ t: "emit", event: rest[0] ?? "", arg: rest.slice(1).join(" "), line: n });
+        } else if (head === "call") {
+          nodes.push({ t: "call", script: tail, line: n });
+        } else if (head === "agent" || head === "line") {
+          nodes.push({ t: "agentline", tag: rest[0] ?? "", who: rest[1] ?? "agent", line: n });
+        } else if (head === "end") {
+          nodes.push({ t: "end", line: n });
+        } else throw new ScriptError(`${where}:${n} 모르는 명령: ${head}`);
+        continue;
+      }
+      nodes.push(parseSay(raw, n, where));
+    }
+    return out;
+  }
+  function lex(src) {
+    const out = [];
+    const re = /\s*(?:(\d+(?:\.\d+)?)|'([^']*)'|"([^"]*)"|([A-Za-z_가-힣][\w.가-힣]*)|(==|!=|>=|<=|&&|\|\||[<>!+\-()]))/y;
+    let i = 0;
+    while (i < src.length) {
+      if (/^\s*$/.test(src.slice(i))) break;
+      re.lastIndex = i;
+      const m = re.exec(src);
+      if (!m) throw new ScriptError(`조건식을 읽을 수 없어요: ${src}`);
+      i = re.lastIndex;
+      if (m[1] !== void 0) out.push({ k: "num", v: m[1] });
+      else if (m[2] !== void 0 || m[3] !== void 0) out.push({ k: "str", v: m[2] ?? m[3] });
+      else if (m[4] !== void 0) out.push({ k: "id", v: m[4] });
+      else out.push({ k: "op", v: m[5] });
+    }
+    return out;
+  }
+  function evaluate(src, flags) {
+    const t = lex(src);
+    let p = 0;
+    const peek = () => t[p]?.v;
+    const eat = (v2) => {
+      if (t[p]?.v !== v2) throw new ScriptError(`조건식에 ${v2}가 필요해요: ${src}`);
+      p++;
+    };
+    const num = (v2) => typeof v2 === "number" ? v2 : typeof v2 === "boolean" ? +v2 : Number(v2) || 0;
+    const truthy2 = (v2) => typeof v2 === "string" ? v2 !== "" && v2 !== "0" : !!v2;
+    const prim = () => {
+      const k = t[p++];
+      if (!k) throw new ScriptError(`조건식이 끝났어요: ${src}`);
+      if (k.k === "num") return Number(k.v);
+      if (k.k === "str") return k.v;
+      if (k.k === "id") return k.v === "true" ? true : k.v === "false" ? false : flags[k.v] ?? 0;
+      if (k.v === "(") {
+        const v2 = or();
+        eat(")");
+        return v2;
+      }
+      if (k.v === "-") return -num(prim());
+      if (k.v === "!") return !truthy2(prim());
+      throw new ScriptError(`조건식에서 ${k.v}를 예상하지 못했어요: ${src}`);
+    };
+    const add = () => {
+      let v2 = prim();
+      while (peek() === "+" || peek() === "-") v2 = t[p++].v === "+" ? num(v2) + num(prim()) : num(v2) - num(prim());
+      return v2;
+    };
+    const cmp = () => {
+      const a = add();
+      const op = peek();
+      if (op && ["==", "!=", ">=", "<=", ">", "<"].includes(op)) {
+        p++;
+        const b = add();
+        if (op === "==") return typeof a === typeof b ? a === b : String(a) === String(b);
+        if (op === "!=") return typeof a === typeof b ? a !== b : String(a) !== String(b);
+        const x = num(a), y = num(b);
+        return op === ">=" ? x >= y : op === "<=" ? x <= y : op === ">" ? x > y : x < y;
+      }
+      return a;
+    };
+    const not = () => peek() === "!" ? (p++, !truthy2(not())) : cmp();
+    const and = () => {
+      let v2 = not();
+      while (peek() === "&&") {
+        p++;
+        const r = not();
+        v2 = truthy2(v2) && truthy2(r);
+      }
+      return v2;
+    };
+    const or = () => {
+      let v2 = and();
+      while (peek() === "||") {
+        p++;
+        const r = and();
+        v2 = truthy2(v2) || truthy2(r);
+      }
+      return v2;
+    };
+    const v = or();
+    if (p < t.length) throw new ScriptError(`조건식 뒤에 남은 것이 있어요: ${src}`);
+    return v;
+  }
+  var test = (src, flags) => !src || (() => {
+    const v = evaluate(src, flags);
+    return typeof v === "string" ? v !== "" && v !== "0" : !!v;
+  })();
+  var CLAMPS = { favor: [-3, 3] };
+  function applySet(key, op, expr, flags) {
+    const v = evaluate(expr, flags);
+    if (op === "=") flags[key] = v;
+    else {
+      const cur = Number(flags[key] ?? 0) || 0;
+      flags[key] = op === "+=" ? cur + (Number(v) || 0) : cur - (Number(v) || 0);
+    }
+    const c = CLAMPS[key];
+    if (c && typeof flags[key] === "number") flags[key] = Math.max(c[0], Math.min(c[1], flags[key]));
+  }
+  function applySets(src, flags) {
+    if (!src) return;
+    for (const part of src.split(";")) {
+      const m = /^\s*([\w.]+)\s*(\+=|-=|=)\s*(.+?)\s*$/.exec(part);
       if (m) applySet(m[1], m[2], m[3], flags);
     }
   }
   var ScriptLibrary = class {
     scripts = /* @__PURE__ */ new Map();
     add(src, where) {
-      for (const s2 of parseScripts(src, where)) {
-        if (this.scripts.has(s2.id)) throw new ScriptError(`대본 id 중복: ${s2.id}`);
-        this.scripts.set(s2.id, s2);
+      for (const s of parseScripts(src, where)) {
+        if (this.scripts.has(s.id)) throw new ScriptError(`대본 id 중복: ${s.id}`);
+        this.scripts.set(s.id, s);
       }
       return this;
     }
     get(id) {
-      const s2 = this.scripts.get(id);
-      if (!s2) throw new ScriptError(`없는 대본: ${id}`);
-      return s2;
+      const s = this.scripts.get(id);
+      if (!s) throw new ScriptError(`없는 대본: ${id}`);
+      return s;
     }
     /** 모든 goto·선택지·call이 실제로 있는 곳을 가리키는지 */
     validate() {
       const errs = [];
-      for (const s2 of this.scripts.values())
-        for (const n of s2.nodes) {
-          const target = (to) => to === "end" || s2.labels[to] !== void 0 || errs.push(`${s2.id}:${n.line} 없는 표지 ${to}`);
+      for (const s of this.scripts.values())
+        for (const n of s.nodes) {
+          const target = (to) => to === "end" || s.labels[to] !== void 0 || errs.push(`${s.id}:${n.line} 없는 표지 ${to}`);
           if (n.t === "goto") target(n.to);
           if (n.t === "choice") n.options.forEach((o) => target(o.to));
-          if (n.t === "call" && !this.scripts.has(n.script)) errs.push(`${s2.id}:${n.line} 없는 대본 ${n.script}`);
+          if (n.t === "call" && !this.scripts.has(n.script)) errs.push(`${s.id}:${n.line} 없는 대본 ${n.script}`);
           try {
             if (n.t === "goto" && n.if) evaluate(n.if, {});
             if (n.t === "set") evaluate(n.expr, {});
             if (n.t === "choice") n.options.forEach((o) => o.if && evaluate(o.if, {}));
           } catch (e) {
-            errs.push(`${s2.id}:${n.line} ${e.message}`);
+            errs.push(`${s.id}:${n.line} ${e.message}`);
           }
         }
       return errs;
@@ -71,13 +713,13 @@
     }
     /** 바로 끝까지 넘김. 선택지가 나오면 거기서 멈춘다. */
     skip() {
-      let s2 = this.current;
-      for (let i = 0; i < 500 && s2.kind === "say"; i++) s2 = this.next();
-      return s2;
+      let s = this.current;
+      for (let i = 0; i < 500 && s.kind === "say"; i++) s = this.next();
+      return s;
     }
-    fill(text2) {
+    fill(text) {
       const f = this.ctx.flags;
-      return text2.replace(/\{([\w.가-힣]+)\}/g, (_, k) => k === "name" ? this.ctx.speakerName("agent") : String(f[k] ?? ""));
+      return text.replace(/\{([\w.가-힣]+)\}/g, (_, k) => k === "name" ? this.ctx.speakerName("agent") : String(f[k] ?? ""));
     }
     jump(to) {
       const top = this.stack[this.stack.length - 1];
@@ -90,14 +732,14 @@
       return { kind: "say", who, name: this.ctx.speakerName(who), text: this.fill(n.text), mood: n.mood ?? "base" };
     }
     run() {
-      const { flags, rng: rng2 } = this.ctx;
-      for (let guard3 = 0; guard3 < 2e3; guard3++) {
+      const { flags, rng: rng3 } = this.ctx;
+      for (let guard2 = 0; guard2 < 2e3; guard2++) {
         const top = this.stack[this.stack.length - 1];
         if (!top) {
           delete flags.d100;
           return { kind: "end" };
         }
-        flags.d100 = Math.floor(rng2() * 100);
+        flags.d100 = Math.floor(rng3() * 100);
         const n = top.script.nodes[top.pc];
         if (!n) {
           this.stack.pop();
@@ -108,12 +750,12 @@
           case "say":
             return this.say(n);
           case "pick":
-            return this.say(n.lines[Math.floor(rng2() * n.lines.length) % n.lines.length]);
+            return this.say(n.lines[Math.floor(rng3() * n.lines.length) % n.lines.length]);
           case "agentline": {
-            const text2 = this.ctx.agentLine(this.ctx.agent, n.tag, rng2);
-            if (!text2) break;
+            const text = this.ctx.agentLine(this.ctx.agent, n.tag, rng3);
+            if (!text) break;
             const who = n.who === "agent" ? this.ctx.agent : n.who;
-            return { kind: "say", who, name: this.ctx.speakerName(who), text: this.fill(text2), mood: "base" };
+            return { kind: "say", who, name: this.ctx.speakerName(who), text: this.fill(text), mood: "base" };
           }
           case "choice": {
             const visible = n.options.map((o, index) => ({ o, index })).filter(({ o }) => test(o.if, flags));
@@ -143,995 +785,13 @@
     }
   };
 
-  // src/game/action/story/scripts/hq.ts
-  var hq_default = String.raw`
-=== jaemtri_desk
-> goto again if met_jaemtri
-jaemtri(smile): 어머, 후배, 왔어?
-jaemtri(smile): 잼트리 요원이라고 불러. 그거면 돼. …아니다, 언니라고 불러도 돼. 다들 결국 그렇게 되거든.
-jaemtri: 여기가 임무 창구야. 온라인 순찰로 찾은 괴담 글, 실종 신고, 생존자 진술. 전부 이 태블릿으로 들어와.
-jaemtri(serious): 그리고 하나만. 현장에서 들은 이름은 여기 와서 말하지 마. 코드네임 제도는 철저하거든.
-jaemtri(smile): 자, 그럼 일 얘기 할까?
-> set met_jaemtri = 1
-> goto menu
--- again
-~ jaemtri(smile): 왔어? 커피 먼저 할래, 일 먼저 할래?
-~ jaemtri(smile): 어머, 후배. 얼굴 좋아졌네. 앉아.
-~ jaemtri: 태블릿에 새 글 올라왔어. 볼래?
-~ jaemtri(smile): 우리 후배 고생했지~ 자, 서류부터.
--- menu
-* 임무 게시판 -> board
-* 규칙서 열람 -> rulebook
-* 커피 한 잔 -> coffee [if !coffee]
-* 그냥 이야기하기 -> free
-* 나중에 올게요 -> bye
--- board
-jaemtri: 지금 들어온 건 차원 승강기 건이야. 낡은 건물 엘리베이터, 점검표 서명란이 빈 거.
-* [조사] 로비에서 규칙 2개 확인, 로프로 귀환 -> m1 [if !done_m1]
-* [진압] 로비 L3 경비원 -> m2 [if done_m1 && !done_m2]
-* [조사] 추격의 층 통과 -> m3 [if done_m2 && !done_m3]
-* [구조] 야근하다 들어온 회사원 -> m4 [if done_m3 && !done_m4]
-* [조사] 재현의 층 「아파트」 규칙 3개 -> m5 [if done_m3 && !done_m5]
-* [진압] 405호 노부부 -> m6 [if done_m5 && !done_m6]
-* [회수] 서명란이 빈 점검표 -> m7 [if done_m2 && !done_m7]
-* [조사] 시험 층 목표 달성 -> m8 [if done_m6 && !done_m8]
-* [기록] B-5 도달 -> m9 [if done_m8 && !done_m9]
-* 다시 생각해 볼게요 -> menu
--- m1
-jaemtri: 첫 건은 가볍게. 로비 층에서 규칙 두 개만 확인하고, 다락방 로프로 돌아오면 돼.
-jaemtri(smile): 가볍다는 건 서류 얘기고. 로비가 제일 많이 죽였대. 평범해 보여서.
-> set mission = 'm1'
-> goto take
--- m2
-jaemtri: 로비 세 번째 층에 경비원이 순찰을 돈대. 수십 년 전 제복. 정해진 길만 걸어.
-jaemtri(serious): 손전등에 비치면 달려와. 경로 밖에 서 있으면 못 본대. 생존자가 그렇게 살았어.
-> set mission = 'm2'
-> goto take
--- m3
-jaemtri: 추격의 층. 문이 열리는 순간 사냥이 시작된대. 설명이 필요 없다고 하더라.
-jaemtri(smile): 생존자 한 분은 그 뒤로 마라톤 기록이 20분 줄었대. …웃으면 안 되는데.
-> set mission = 'm3'
-> goto take
--- m4
-jaemtri(serious): 구조 요청이야. 야근 마치고 엘리베이터를 탔다가 안 내린 회사원. 가족이 신고했어.
-jaemtri(serious): 출동 두 번 안에 데려와야 해. 그 뒤로는… 승객들 말로는, 더는 사람이 아니게 된대.
-> set mission = 'm4'
-> set rescue_open = 1
-> goto take
--- m5
-jaemtri: 재현의 층. 아파트 단지가 그대로 있대. 주민처럼 보이는 것들이 살고.
-jaemtri: 명일 아파트 생환자 진술이랑 겹치는 데가 많아. 신발, 인사, 목소리, 밥상. 규칙 세 개만 확인해 와.
-> set mission = 'm5'
-> goto take
--- m6
-jaemtri(serious): 405호. 노부부가 밥을 차려 놓고 기다린대. 아들이랑 딸이 곧 온다고.
-jaemtri(serious): 재현된 거야. 진짜 405호는 아니고. …그러니까 마음 쓰지 마. 알았지?
-> set mission = 'm6'
-> goto take
--- m7
-jaemtri: 회수 건. 정비 구역 어딘가에 서명란이 빈 점검표 원본이 있대. 데쥬레가 엄청 보고 싶어 해.
-> set mission = 'm7'
-> goto take
--- m8
-jaemtri: 시험 층. 벽에 숙제가 적혀 있대. 수호자가 제일 많이 목격된 데야.
-jaemtri(smile): 숙제 먼저 읽어. 언니가 시험 기간마다 콘쥬스한테 하는 말이야.
-> set mission = 'm8'
-> goto take
--- m9
-jaemtri(serious): 기록 갱신. B-5까지. 관리국 공식 기록을 새로 쓰는 거야.
-jaemtri(serious): …돌아오는 것도 기록에 들어가. 꼭.
-> set mission = 'm9'
-> goto take
--- take
-* 받을게요 -> accept
-* 다른 걸 볼게요 -> board
--- accept
-jaemtri(smile): 접수. 출동 요원은 사무실에서 골라. 쉬는 사람한테 말 걸면 돼.
-> emit mission {mission}
-> end
--- rulebook
-> goto rules_none if rules < 1
-jaemtri: 지금까지 찾은 규칙이 {rules}줄이야. 승강기 공통이 열두 줄쯤 될 거라고 봐.
-jaemtri: 브리핑 때 찾은 줄만 읽어 줄게. 많이 채울수록 다음 출동이 편해져.
-> emit open rulebook
-> goto menu
--- rules_none
-jaemtri: 아직 한 줄도 없어. 첫 줄은 이거야. 점검표 서명란이 빈 엘리베이터가 입구다.
-jaemtri(smile): 그건 언니가 서비스로 적어 둘게.
-> set rules = 1
-> emit rule entry
-> goto menu
--- coffee
-jaemtri(smile): 뭐 마실래? 연유 커피가 제일 맛있는데. 그건 이견이 없어.
-* 연유 커피 -> c_milk
-* 블랙 -> c_black
-* 믹스커피 -> c_mix
--- c_milk
-jaemtri(smile): 그치? 탁월한 선택이야.
-> set coffee = 'condensed'
-> goto c_done
--- c_black
-> goto c_black_ok if agent == 'jyaldi' || agent == 'spangdal'
-jaemtri: …블랙? 아, 블랙. 응. 탈게.
-jaemtri(smile): (살짝 서운한 얼굴) 다음엔 연유 넣어 줄까?
-> set coffee = 'black'
-> goto c_done
--- c_black_ok
-jaemtri(smile): 블랙은 원래 너한테 내리는 거야. 알지?
-> set coffee = 'black'
-> goto c_done
--- c_mix
-jaemtri(smile): 어머, 믹스 파야? 축하해! 지하 연구실 가면 환영받겠다.
-> set coffee = 'mix'
--- c_done
-jaemtri: 다음 출동에 한 번 힘이 될 거야. 커피는 원래 그래.
-> emit coffee {coffee}
-> goto menu
--- free
-> emit freetalk jaemtri
-> end
--- bye
-~ jaemtri(smile): 응, 가 봐. 서류는 내일까지.
-~ jaemtri(smile): 졸지 마. 찌른다.
-~ jaemtri: 가다가 탕비실 문 열지 마. 관계자 외 출입 금지야.
-> end
-
-=== briefing
-// 출동 버튼을 누르면. 15초 안에 끝나고 건너뛸 수 있다 (기본 기획서 5.3).
-> emit briefing start
-jaemtri: 브리핑 시작할게. 짧게.
-> goto b_m1 if mission == 'm1'
-> goto b_m2 if mission == 'm2'
-> goto b_m3 if mission == 'm3'
-> goto b_m4 if mission == 'm4'
-> goto b_m5 if mission == 'm5' || mission == 'm6'
-> goto b_m7 if mission == 'm7'
-> goto b_m8 if mission == 'm8'
-> goto b_m9 if mission == 'm9'
--- b_m1
-jaemtri: 입구는 종로 근처 낡은 사무실 건물. 1990년대 준공. 점검표 서명란이 비어 있어.
-radio: 생존자 진술: 「띵 소리가 나고 1층이라는데, 로비가 아니었어요. 비슷한데 어딘가 틀렸어요.」
-> goto b_rules
--- b_m2
-radio: 생존자 진술: 「손전등 불빛이 지나갈 때 기둥 뒤에 있었어요. 그 사람 등만 봤어요. 제복이 너무 낡았더라고요.」
-jaemtri: 경로는 바닥에 닳은 자국으로 보일 거야. 그 길 밖에 서. 등 뒤에서 치면 두 배래.
-> goto b_rules
--- b_m3
-radio: 생존자 진술: 「뒤에 뭐가 있었는지는 몰라요. 안 봤으니까 살았어요.」
-jaemtri: 문을 지나면 닫고 가. 그게 뒤에 오는 걸 늦춘대.
-> goto b_rules
--- b_m4
-radio: 가족 진술: 「그날도 야근이라고 문자가 왔어요. 엘리베이터 탄다고. 그게 마지막이에요.」
-jaemtri(serious): 찾으면 다락방 로프까지 데려와. 승객 중에 그 사람 행세를 하는 게 있을 수 있어. 사연이 너무 길면 의심해.
-> goto b_rules
--- b_m5
-radio: 생존자 진술: 「아이고, 우리 아들이랑 딸이 곧 온다는구먼. 같이 밥 먹고 가. …그렇게 말했어요. 얼굴이 거꾸로였어요.」
-jaemtri: 주민한테 먼저 인사해. 복도에서 뛰지 말고. 밥은 잘 먹었다고 하고 먹지 마.
-> goto b_rules
--- b_m7
-radio: 다락방 메모 사본: 「점검표는 정비 구역 세 번째 해치 근처. 여기 오래 있지 마.」
-jaemtri: 다락방은 90초 넘게 있지 마. 메모가 그렇게 말하고, 메모는 대개 맞아.
-> goto b_rules
--- b_m8
-radio: 생존자 진술: 「벽에 숫자가 적혀 있었어요. 30초. 셋. 뭘 세라는 건지 몰라서 그냥 뛰었어요.」
-jaemtri: 숙제부터 읽어. 실패하면 수호자가 나와.
-> goto b_rules
--- b_m9
-radio: 관리국 기록: 「최저 도달 B-12, 증언 1건. 귀환 경위 미상.」
-jaemtri(serious): B-5에서 더 내려가고 싶어져도 로프 타. 기록은 다음에 또 쓰면 돼.
--- b_rules
-> goto b_norules if rules < 2
-jaemtri: 규칙서에서 찾은 줄은 {rules}줄. 화면에 띄워 줄게.
-> emit open rulebook
-> goto b_hint
--- b_norules
-jaemtri: 아직 아는 규칙이 별로 없어. 들어가면 벽부터 읽어.
--- b_hint
-> goto b_hint_none if !variant
-jaemtri: 그리고 오늘은 이상한 얘기가 하나 있어. {variant}
--- b_hint_none
-> goto b_self if agent == 'jyaldi'
-jyaldi(serious): 목표 달성하면 바로 로프. 다들 살아서 와. 이상.
-> goto b_answer
--- b_self
-jaemtri(smile): 부장님이 직접 가시니까 지시는 생략할게요. …담배는 밖에서 끄고 가세요.
--- b_answer
-> agent brief
-> emit briefing end
-> end
-
-=== offer
-// 사무실에서 쉬는 요원에게 말을 걸 때. 고르면 출동 요원이 된다.
-> agent offer
-* 같이 가자 -> yes
-* 다음에 -> no
--- yes
-> agent pick
-> emit pick {agent}
-> end
--- no
-> end
-
-=== supply
-// 정비·보급실. 콘쥬스. 호칭은 상대와 상황에 따라 바뀐다 (위키 「콘쥬스」 호칭 재협상).
-> goto again if met_konjyuce
-konjyuce(smile): 안녕하세요! 정비·보급실 콘쥬스예요!
-konjyuce(serious): 잠깐만요! 저도 이 팀 정식 멤버거든요! 마스코트 아니에요!
-> set met_konjyuce = 1
-> goto menu
--- again
-> goto hi_m if male
-~ konjyuce(smile): 선배님, 오셨어요?
-~ konjyuce(smile): 언니! 오늘 뭐 챙겨 가요?
-> goto menu
--- hi_m
-~ konjyuce: 아저씨, 오셨어요?
-~ konjyuce(smile): 오빠, 안녕하세요!
--- menu
-* 보급품 챙기기 -> gear
-* 지원 요원 정하기 -> support
-* 장비 구경 -> look
-* 됐어 -> bye
--- gear
-konjyuce: 아이템 네 칸, 유물 두 칸이요. 예산 안에서 고르세요. 무거운 건 제가 들어 드릴게요. 상자 열 개까진 괜찮아요.
-> emit open gear
-> goto menu
--- support
-konjyuce: 지원 요원은 필살 게이지 쓰면 잠깐 와서 한 방 쓰고 가요. 누구로 할래요?
-> emit open support
-> goto menu
--- look
-konjyuce(surprise): 우와! 이거 진짜 총이에요? 진짜 총 처음 봐요!
-> goto look_gun if agent == 'eileen' || agent == 'jyaldi' || agent == 'deadpole' || agent == 'spangdal'
-agent: 만지지 마.
-> goto menu
--- look_gun
-agent: 만지지 마.
-konjyuce: …네. (오늘 들은 「만지지 마」 세 번째)
-> goto menu
--- bye
-> goto bye_m if male
-konjyuce(smile): 언니, 사람 보는 눈 있으시네요? 아, 간식 사다 주시면 더 좋고요!
-> end
--- bye_m
-konjyuce(smile): 오빠, 사람 보는 눈 있으시네요? …아까 아저씨라고 한 건 잊어 주세요.
-> end
-
-=== appraisal
-// 감정실. 데쥬레. 회수물 감정·홀로그램 재현.
-> goto spang if agent == 'spangdal'
-> goto again if met_dejure
-dejure(surprise): 으, 음… 안녕하세요… 새, 새로 오신 요원님 맞죠…?
-dejure: 감정실이에요… 회수물 주시면 분류해 드릴게요. 살아 있는 건… 그, 그것도 괜찮아요.
-> set met_dejure = 1
-> goto menu
--- again
-~ dejure(surprise): 아, 아와와…! 아, 요원님이시구나… 죄송해요…
-~ dejure: 저기… 그… 회수물… 있으세요…?
--- menu
-* 회수물 감정 -> appraise [if loot > 0]
-* 홀로그램 재현 -> holo
-* 괜찮아요 -> bye
--- appraise
-dejure: (장갑을 낀다. 손끝이 거짓말처럼 멈춘다)
-dejure(serious): 점검표 공백 패턴이네요. 날짜가 세 번 겹쳐요. 이건 연구 자료로 분류할게요.
-dejure(smile): …헤헤. 끝났어요. 무, 무섭진 않았어요. 조금밖에.
-> set loot = 0
-> emit appraise
-> goto menu
--- holo
-dejure: 본 적 있는 걸 다시 보여 드릴 수 있어요. 진술로 복원한 거라… 조금 달라요.
-> emit open holo
-> goto menu
--- spang
-dejure(surprise): 아, 아와와…!
-spangdal(smile): 데쥬레. 그 애, 원래 내 후배였지. 미안해. 후후.
-dejure(hurt): 제가 잘못했어요! 제가 잘못했어요! 죄송해요오…!
-> goto spang_j if d100 < 50
-> goto menu
--- spang_j
-jaemtri(smile): 스팡달, 입.
-spangdal: (입을 다문다)
-dejure: …언니… 고마워요…
-> goto menu
--- bye
-dejure: 네… 조, 조심히 다녀오세요… 꼭이요…
-> end
-
-=== lab
-// 격리 연구실. 고그니쟈. 하게체, 최대 음량, 믹스커피 의무.
-> goto again if met_gognija
-gognija(smile): 오오! 신입 요원인가! 환영하네! 나는 연구 책임자 고그니쟈일세!
-gognija: 이곳에서는 누구나 달달한 믹스커피를 마셔야 하네! 연구실 제1법칙이지!
-> goto first_black if coffee == 'black'
-> set met_gognija = 1
-> goto menu
--- first_black
-gognija(smile): 블랙? 방문객 명부에 「블랙 요청」 칸이 있네! 체크하게! 설탕 두 스푼 추가일세!
-> set met_gognija = 1
-> goto menu
--- again
-~ gognija(smile): 왔는가! 데쥬레!!! 커피 좀 타 오게! 달달한 걸로, 빨리!!!
-~ gognija: (알약을 씹는다) 아아, 몸에 좋은 걸세! 무슨 일인가!
-~ gognija(smile): 오오! 살아 돌아왔군! 훌륭하네! 표본은 가져왔나?
--- menu
-* 연구 과제 -> research
-* 승강기에 대해 묻기 -> elevator
-* 저 창문은 뭐예요 -> window
-* 나가기 -> bye
--- research
-gognija: 감정한 자료가 쌓이면 연구가 진행되네! 유물, 강화, 위험 단계! 전부 여기서 나오지!
-> emit open research
-> goto menu
--- elevator
-gognija(smile): 차원 승강기 말인가! 모든 엘리베이터가 하나의 의식이라는 설이 있지! 흥미롭네!
-gognija: 인사하면 대우가 달라진다던데, 그렇다면 그건 예절을 아는 의식이란 말일세! 예절을 아는 건 관찰을 한다는 뜻이고!
-gognija(serious): …그러니 거래는 조심하게. 관찰하는 쪽은 언제나 원하는 게 있네.
-> goto menu
--- window
-gognija(smile): 아, 그건 비상 탈출 장치라네!
-> goto menu
--- bye
-gognija(smile): 가게! 살아서 오게! 살아서 와야 표본이 늘지!!!
-> end
-
-=== breakroom
-// 탕비실 대화 사건. 요원에 따라 다른 짝. 한 번 본 대화는 앨범에 남는다 (emit album).
-> goto br_spang if agent == 'spangdal'
-> goto br_gorgo if agent == 'gorgodio' || agent == 'kyuras'
-> goto br_trio if agent == 'deadpole' || agent == 'geshugan' || agent == 'rojemon'
-> goto br_eileen if agent == 'eileen'
--- br_jyaldi
-jaemtri(smile): 부장님, 연유 커피 한 번만 드셔 보세요. 한 모금만.
-jyaldi: 맛은 있겠지.
-jaemtri(smile): 그러니까 드셔 보시라니까요.
-jyaldi: 블랙.
-> emit album jyaldi_jaemtri_coffee
-> end
--- br_eileen
-eileen: (총을 분해하고 있다)
-konjyuce(smile): 언니, 그거 뭐예요? 저도 해 봐도…
-eileen: 만지지 마.
-konjyuce(serious): 저도 정식 멤버거든요!
-eileen: …(장비 목록만 확인한다) 알아.
-> emit album eileen_konjyuce
-> end
--- br_spang
-spangdal(smile): 있잖아, 잼트리. 데쥬레 아직도 나 보면 펄쩍 뛰어?
-jaemtri(smile): 응. 오늘 아침에도.
-spangdal(smile): 후후. 귀여워. 집밥 해 줄까 봐.
-jaemtri(smile): 스팡달, 입.
-spangdal: (입을 다문다. 손가락을 꼼지락거린다)
-> emit album spangdal_jaemtri
-> end
--- br_gorgo
-kyuras(smile): 형님이 앞에서 다 받아 주니까 편하지!
-gorgodio(smile): 니가 뒤에서 다 태워 주니까 편하지.
-kyuras: …근데 형님 오토바이 서스펜션 또 나갔대.
-gorgodio: 그건 오토바이가 약한 거다.
-> emit album gorgodio_kyuras
-> end
--- br_trio
-deadpole(smile): (커피를 타며 행복하다) 게슈간 씨, 타자 연습 오늘도 하실 거예요?
-geshugan: …안 해.
-rojemon: 해. 보고서 나 혼자 쓰기 싫어.
-geshugan: …알았어.
-deadpole(smile): 거기… 아, 죄송해요, 그 키요.
-geshugan: …그래. 미안.
-deadpole(smile): 괜찮아요!
-rojemon: …또 시작이네. 세 시간 뒤에 또 한다, 이거.
-> emit album trio_typing
-> end
-
-=== settle
-// 귀환·정산 뒤 잼트리 한마디. result: 'return' | 'retreat' | 'evac'
-> goto s_evac if result == 'evac'
-> goto s_retreat if result == 'retreat'
-jaemtri(smile): 어머, 후배, 왔어? 살아서 왔네. 그럼 됐어.
-jaemtri: 자, 진술서부터. 찾은 규칙, 회수물, 구조한 사람. 하나씩.
-> agent settle
-jaemtri(smile): 수고했어. 오늘 커피는 연유 조금 더 넣었어.
-> end
--- s_retreat
-jaemtri: 철수했구나. 잘했어. 돌아오는 것도 일이야.
-jaemtri(smile): 정보는 다 가져왔지? 그럼 반은 성공이야.
-> agent settle
-> end
--- s_evac
-jaemtri: …
-jaemtri: (아무것도 묻지 않고 커피만 내민다)
-> end
-
-=== evac_wake
-// 후송: 의무실 침대에서 깨어남. 옆 동료 대사는 director가 EVAC_PAIRS에서 골라 앞에 넣는다.
-narr: 의무실. 형광등. 소독약 냄새.
-> agent evac
-jaemtri: 송신한 정보는 다 받았어. 나머지는 절반. 괜찮아. 다음에 또 가면 돼.
-> end
-`;
-
-  // src/game/action/story/scripts/field.ts
-  var field_default = String.raw`
-=== board
-// 승강기에 탈 때마다. 인사(E)는 +0 또는 +1, 닫힘 연타 -1 (설계서 8장).
-> line el:board elevator
-* 인사한다 -> greet
-* 닫힘 버튼을 연타한다 -> spam
-* 가만히 있는다 -> quiet
--- greet
-> agent greet
-> goto greet_up if d100 < 50
-> line el:greetFlat elevator
-> goto after
--- greet_up
-> set favor += 1
-> emit favor {favor}
-> line el:greetOk elevator
-> goto after
--- spam
-> set favor -= 1
-> emit favor {favor}
-> line el:closeSpam elevator
-> agent rule_break
-> emit rule close
-> goto after
--- quiet
--- after
-> goto trapped if favor <= -3
-> goto call if !called_run
-> goto mood
--- call
-// 출동마다 첫 탑승에 한 번: 호명
-> set called_run = 1
-> emit cue call
-> line el:call elevator
-> agent called
--- mood
-> goto lonely if favor >= 3 && !heard_lonely
-> goto high if favor >= 2
-> goto low if favor <= -2
-> goto ride
--- lonely
-> set heard_lonely = 1
-> line el:lonely elevator
-> goto ride
--- high
-> line el:favor_high elevator
-> goto ride
--- low
-> line el:favor_low elevator
-> goto ride
--- trapped
-> line el:trapped elevator
-> emit trapped 10
-> goto ride
--- ride
-> emit ride
-> set announced = depth
-> line el:announce elevator
-> line el:hint elevator
-> agent floor
-> end
-
-=== attack_inside
-> set favor -= 2
-> emit favor {favor}
-> line el:attackInside elevator
-> end
-
-=== deal
-// 다락방 인터폰. 출동마다 한 번. 회수물 1개 또는 미송신 단서 1개를 준다.
-> line el:deal elevator
-* 회수물 하나를 준다 -> give [if loot > 0]
-* 미송신 단서 하나를 준다 -> give_clue [if unsent > 0]
-* 거절한다 -> no
--- give
-> set loot -= 1
-> goto paid
--- give_clue
-> set unsent -= 1
--- paid
-> line el:dealDone elevator
-* 다음 층 유형을 묻는다 -> ask_type
-* 갈 수 없는 층을 열어 달라 -> ask_skip
-* 보급품 위치를 묻는다 -> ask_supply
--- ask_type
-// 총애가 낮으면 거짓이 섞인다 (원문: 틀린 정보를 받아 동료를 잃었다)
-> goto lie if favor < 0 && d100 < 60
-> goto lie if favor < 2 && d100 < 25
-> emit deal type true
-> goto deal_end
--- ask_skip
-> emit deal skip2
-> goto deal_end
--- ask_supply
-> goto lie if favor < 0 && d100 < 60
-> emit deal supply true
-> goto deal_end
--- lie
-> emit deal lie
--- deal_end
-> set dealt = 1
-> end
--- no
-elevator: 그래요. 다음에.
-> end
-
-=== attic
-// 다락방(휴식방) 첫 진입. 「여기 오래 있지 마」
-> line el:attic elevator
-narr: 덕트 사이 비좁은 공간. 벽에 긁어 쓴 지도, 버려진 배낭. 메모 끝에 한 줄.
-narr: 「여기 오래 있지 마」
-> agent attic
-> goto writer if d100 < 50
-> end
--- writer
-// 메모 옆에 쓴 사람이 있다 (50%). 있으면 승객 조우로 이어진다.
-narr: …메모 옆에 누가 앉아 있다.
-> emit encounter passenger
-> end
-
-=== attic_stay
-// 체류 90초 경고
-elevator: (멀리서 덕트가 울린다)
-> agent hp_low
-narr: 아래에서 무언가 올라온다. 틈새로 떨어진 것들을 먹고 사는 것.
-> emit predator
-> end
-
-=== passenger_three
-// 삼 년째 승객. honest=1이면 짧고 맞는 말, 0이면 사연이 지나치게 길다 (규칙 8의 단서).
-passenger: 나 여기 삼 년째야. 그러니까 내 말 들어.
-> goto lie_story if !honest
-passenger: 저쪽 문 말고 이쪽.
-> goto react
--- lie_story
-passenger: 처음엔 나도 너희처럼 정장 입은 사람들이랑 같이 왔어. 다섯 명이었지. 첫 층에서 하나, 추격하는 층에서 둘을 잃었어.
-passenger: 그 뒤로는 혼자 다니면서 문을 하나하나 다 열어 봤어. 왼쪽 문은 몇 번이나 죽을 뻔했고, 오른쪽 문도 한 번은 그랬지만 그건 내가 잘못 들어간 거고…
-passenger(smile): 아무튼 저쪽 문 말고 이쪽. 내가 다 해 봤다니까. 진짜야. 믿어도 돼.
--- react
-> goto roje if agent == 'rojemon'
-> goto hint if rule_passenger
-> goto choose
--- roje
-// 로제몬은 정신 간섭 면역, 거짓 승객을 바로 안다 (제작서 08)
-> goto roje_true if honest
-rojemon: 헛소리하지 마. 머릿속이 텅 비었어. 하는 말이랑 생각이 하나도 안 맞아.
-> set p_known = 'lie'
-> goto choose
--- roje_true
-rojemon: …진짜야. 맛없는 생각인데, 거짓말은 아니야.
-> set p_known = 'true'
-> goto choose
--- hint
-narr: (규칙서: 친절해 보이는 승객이 둘이면, 사연이 긴 쪽이 거짓이다.)
--- choose
-* 승객이 가리킨 문으로 -> follow
-* 반대쪽 문으로 -> other
-* 같이 가자고 한다 -> help
-* 가진 걸 내놓으라고 한다 -> rob
--- follow
-> goto follow_bad if !honest
-passenger: 거봐. 살았지?
-> emit passenger right
-> end
--- follow_bad
-passenger(smile): …미안. 삼 년이면 나도 먹고 살아야지.
-> agent rule_break
-> emit passenger lure
-> end
--- other
-> goto other_good if !honest
-passenger(hurt): …마음대로 해. 다들 그래.
-> emit passenger wrong
-> end
--- other_good
-passenger: (등 뒤에서 작게 혀를 찬다)
-> emit passenger right
-> end
--- help
-> goto help_lie if !honest
-passenger: …나를? 삼 년 만에 처음 듣네. 로프까지만. 그다음은 몰라.
-> agent rescue
-> set favor += 1
-> emit favor {favor}
-> emit passenger rescued
-> end
--- help_lie
-passenger(smile): 좋지. 앞장서. 아니, 내가 앞장설게.
-narr: 승객이 문 앞에서 멈춘다. 손이 등 뒤로 간다.
-> emit passenger ambush
-> end
--- rob
-passenger(hurt): …여기서도 사람이 사람한테 이러네.
-> emit passenger robbed
-> end
-
-=== passenger_pair
-// 친절한 승객 둘이 서로 다른 문을 가리킨다. liar = 'a' 또는 'b'. 사연이 긴 쪽이 거짓 (규칙 8).
-narr: 승객 둘이 엘리베이터 홀에 서 있다. 둘 다 친절해 보인다.
-> goto a_long if liar == 'a'
-passenger: (회색 점퍼) 왼쪽. 오른쪽은 아니야.
-passenger: (낡은 양복) 오른쪽으로 가. 왼쪽 문 뒤에는 복도가 끝없이 이어지는데, 거기 들어간 사람을 내가 셋이나 봤어. 하나는 내 회사 후배였고, 이름은 말 안 할게. 우리 같이 야근하다 탔거든. 그래서 나는 오른쪽만 써.
-> goto pick
--- a_long
-passenger: (회색 점퍼) 왼쪽으로 가. 오른쪽 문은 열면 바닥이 없어. 내가 직접 봤어. 처음 여기 왔을 때 같이 온 아주머니가 그 문으로 들어갔는데, 나는 문틈으로 다 봤지. 그래서 그 뒤로는 절대 오른쪽은 안 열어.
-passenger: (낡은 양복) 오른쪽. 왼쪽은 아니야.
--- pick
-> goto roje if agent == 'rojemon'
-> goto pick_hint if rule_passenger
-> goto pick2
--- roje
-rojemon: 둘 다 친절한 척하네. 근데 한 명은 생각이 텅 비었어. …말 긴 쪽.
-> goto pick2
--- pick_hint
-narr: (규칙서: 사연이 긴 쪽이 거짓이다.)
--- pick2
-* 왼쪽 문 -> left
-* 오른쪽 문 -> right
--- left
-> goto good if liar == 'b'
-> goto bad
--- right
-> goto good if liar == 'a'
--- bad
-narr: 문 너머에서 누군가 웃는다.
-> agent rule_break
-> emit passenger lure
-> end
--- good
-> agent find
-> goto learn if !rule_passenger
-> emit passenger right
-> end
--- learn
-narr: 규칙서에 한 줄이 적힌다.
-> set rule_passenger = 1
-> emit rule passenger
-> emit passenger right
-> end
-
-=== passenger_supply
-// 보급 승객. 정직하면 다락방에 숨긴 보급품 위치, 거짓이면 보급품을 노리고 덮친다.
-passenger: 배낭 맨 사람이네. 관리국? 반가워.
-> goto lie if !honest
-passenger: 정비 구역 두 번째 해치 위에 내가 숨겨 둔 게 있어. 약이랑 손전등. 다 가져가도 돼. 나는 이제 필요 없어.
-* 고맙다고 하고 받는다 -> take
-* 나눠 갖자고 한다 -> share
-* 무시한다 -> ignore
--- take
-> agent find_item
-> emit supply cache
-> end
--- share
-passenger(smile): …나눠? 하하. 그래. 반만 줘.
-> agent rescue
-> set favor += 1
-> emit favor {favor}
-> emit supply half
-> end
--- ignore
-passenger: 그래. 조심해.
-> end
--- lie
-passenger(smile): 그 배낭 무거워 보이네. 좀 들어 줄까?
-* 배낭을 맡긴다 -> give
-* 거절한다 -> refuse
--- give
-narr: 승객이 배낭을 받아 들고 뒷걸음질 친다. 뒤에서 누가 더 나온다.
-> emit supply stolen
-> emit combat passenger
-> end
--- refuse
-passenger(hurt): …아깝네.
-narr: 승객의 손에 쇠파이프가 들려 있다.
-> agent combat
-> emit combat passenger
-> end
-
-=== passenger_signs
-// 표시 체계 무리: 벽 기호 읽는 법을 알려 준다.
-passenger: 쉿. 벽 봤어? 우리가 남긴 거야.
-passenger: 동그라미는 안전. 세모는 수호자. 가위표는… 거기서 누가 안 돌아왔다는 뜻.
-passenger: 너희도 남겨. 다음 사람을 위해서.
-> agent find
-> emit signs learn
-> end
-
-=== passenger_missing
-// 구조 대상: 야근하다 들어온 회사원 (임무 m4). late=1이면 「더는 사람이 아닌 것」.
-> goto late if late
-survivor(hurt): …관리국? 진짜요? 저 그냥 야근하고 집에 가려고…
-survivor(hurt): 몇 층인지 모르겠어요. 계속 내려가기만 했어요.
-> agent rescue
-* 따라오라고 한다 -> lead
-* 업는다 -> carry [if agent == 'gorgodio' || agent == 'jyaldi']
--- lead
-survivor: 네, 네. 뒤돌아보지 않을게요.
-> emit rescue follow
-> end
--- carry
-survivor(surprise): 어, 어어…
-> emit rescue carry
-> end
--- late
-survivor: …관리국? 진짜요? 저 그냥 야근하고…
-narr: 목소리는 그대로인데, 얼굴이 따라오지 않는다.
-survivor: …집에. 가려고. 가려고. 가려고.
-> agent boss
-> emit combat nothuman
-> end
-
-=== not_human
-// 승객 옷을 입은 것. 규칙 위반 시 깨어난다.
-narr: 벽에 기대 선 승객. 숨을 쉬지 않는다.
-> goto wake if broke_rule
-> end
--- wake
-narr: 승객이 고개를 든다. 얼굴이 따라오지 않는다.
-> agent combat
-> emit combat nothuman
-> end
-
-=== mirror
-// 엘리베이터 홀의 거울 (규칙 5). 내리면 안전, 타면 예산+30%·보상+30%.
-narr: 거울 속 얼굴이 피곤해 보인다.
-* 내린다 -> off
-* 그래도 탄다 -> on
--- off
-> agent find
-> emit rule mirror
-> end
--- on
-> agent boss
-> emit mirror risk
-> end
-
-=== exit_panel
-// 패널에 EXIT. 조건: 규칙 10줄 + 총애 3 + B-12 도달 (설계서 7장)
-> goto locked if rules < 10 || favor < 3 || !reached_b12
-> emit cutscene exit
-> end
--- locked
-> line el:exitBlocked elevator
-> end
-`;
-
-  // src/game/action/story/scripts/cutscenes.ts
-  var CUTSCENES = {
-    first_day: {
-      id: "first_day",
-      title: "첫 출근",
-      form: "한 장 그림 + 도트",
-      steps: [
-        { k: "fade", to: "black", ms: 0 },
-        { k: "bg", scene: "street" },
-        { k: "actor", id: "agent", x: -40, y: 300, face: 1, show: true },
-        { k: "fade", to: "clear", ms: 1200 },
-        { k: "caption", text: "오전 8시 40분. 종로.", ms: 1800 },
-        { k: "actor", id: "agent", x: 250, anim: "walk", ms: 2600 },
-        { k: "actor", id: "agent", anim: "idle" },
-        { k: "caption", text: "사람이 없다. 차도, 비둘기도. 인식의 장막 안쪽은 늘 이렇다.", ms: 2600 },
-        { k: "agentline", tag: "enter" },
-        { k: "actor", id: "agent", x: 470, anim: "walk", ms: 1600 },
-        { k: "fade", to: "black", ms: 600 },
-        { k: "bg", scene: "office" },
-        { k: "actor", id: "agent", x: 120, y: 300, anim: "idle" },
-        { k: "actor", id: "jaemtri", x: 420, y: 300, face: -1, show: true },
-        { k: "fade", to: "clear", ms: 600 },
-        { k: "sfx", name: "heels" },
-        { k: "wait", ms: 500 },
-        { k: "say", script: "cs_first_day" },
-        { k: "emit", event: "cutscene:done", arg: "first_day" }
-      ]
-    },
-    first_entry: {
-      id: "first_entry",
-      title: "첫 투입",
-      form: "한 장 그림 + 도트",
-      steps: [
-        { k: "fade", to: "black", ms: 0 },
-        { k: "bg", scene: "elevator_in" },
-        { k: "actor", id: "agent", x: 320, y: 300, face: 1, show: true },
-        { k: "fade", to: "clear", ms: 1e3 },
-        { k: "caption", text: "2000년 이전에 지은 낡은 사무실 건물. 정기 점검표. 서명란이 비어 있다.", ms: 2400 },
-        { k: "say", script: "cs_first_entry" },
-        { k: "sfx", name: "doors" },
-        { k: "fade", to: "black", ms: 500 },
-        { k: "wait", ms: 900 },
-        { k: "sfx", name: "ding" },
-        { k: "bark", who: "elevator", text: "띵. 1층입니다. 문이 열립니다.", ms: 2400 },
-        { k: "wait", ms: 1200 },
-        { k: "bg", scene: "lobby_wrong" },
-        { k: "fade", to: "clear", ms: 900 },
-        { k: "caption", text: "로비 같은데, 로비가 아니다.", ms: 2e3 },
-        { k: "actor", id: "agent", face: -1 },
-        { k: "bg", scene: "panel" },
-        { k: "panel", text: "1 2 3 4 5", ms: 0 },
-        { k: "panel", text: "1 2 3 4 5 B-1 B-2 B-3 B-4 B-5 B-6 B-7 B-8 B-9 B-10 B-11 B-12 B-?", ms: 2600 },
-        { k: "shake", ms: 300, amp: 2 },
-        { k: "caption", text: "패널에는 아까 없던 숫자가 빼곡하다.", ms: 2e3 },
-        { k: "bg", scene: "lobby_wrong" },
-        { k: "agentline", tag: "enter_elevator" },
-        { k: "emit", event: "cutscene:done", arg: "first_entry" }
-      ]
-    },
-    first_call: {
-      id: "first_call",
-      title: "첫 호명",
-      form: "도트",
-      steps: [
-        { k: "bg", scene: "elevator_in" },
-        { k: "actor", id: "agent", x: 320, y: 300, face: 1, show: true },
-        { k: "sfx", name: "intercom" },
-        { k: "shake", ms: 200, amp: 1 },
-        { k: "wait", ms: 600 },
-        { k: "say", script: "cs_first_call" },
-        { k: "emit", event: "cutscene:done", arg: "first_call" }
-      ]
-    },
-    attic: {
-      id: "attic",
-      title: "다락방",
-      form: "한 장 그림",
-      steps: [
-        { k: "fade", to: "black", ms: 300 },
-        { k: "bg", scene: "attic" },
-        { k: "actor", id: "agent", x: 160, y: 300, face: 1, show: true },
-        { k: "fade", to: "clear", ms: 900 },
-        { k: "sfx", name: "duct" },
-        { k: "caption", text: "덕트 사이 비좁은 공간. 긁어 쓴 지도. 버려진 배낭.", ms: 2400 },
-        { k: "camera", x: 470, y: 160, zoom: 1.6, ms: 1400 },
-        { k: "caption", text: "「여기 오래 있지 마」", ms: 2e3 },
-        { k: "camera", x: 320, y: 180, zoom: 1, ms: 800 },
-        { k: "say", script: "cs_attic" },
-        { k: "emit", event: "cutscene:done", arg: "attic" }
-      ]
-    },
-    three_years: {
-      id: "three_years",
-      title: "삼 년째 승객",
-      form: "도트",
-      steps: [
-        { k: "bg", scene: "hall" },
-        { k: "actor", id: "agent", x: 120, y: 300, face: 1, show: true },
-        { k: "actor", id: "passenger", x: 560, y: 300, face: -1, show: true },
-        { k: "actor", id: "passenger", x: 420, anim: "walk", ms: 2e3 },
-        { k: "actor", id: "passenger", anim: "idle" },
-        { k: "say", script: "passenger_three" },
-        { k: "emit", event: "cutscene:done", arg: "three_years" }
-      ]
-    },
-    return: {
-      id: "return",
-      title: "귀환",
-      form: "도트",
-      steps: [
-        { k: "bg", scene: "shaft" },
-        { k: "actor", id: "agent", x: 320, y: 330, face: 1, anim: "climb", show: true },
-        { k: "sfx", name: "rope" },
-        { k: "par", steps: [
-          { k: "actor", id: "agent", y: 60, anim: "climb", ms: 6e3 },
-          { k: "caption", text: "로프를 잡고 승강로를 오른다. 한참.", ms: 3e3 }
-        ] },
-        { k: "sfx", name: "hatch" },
-        { k: "fade", to: "black", ms: 400 },
-        { k: "bg", scene: "lobby_real" },
-        { k: "actor", id: "agent", x: 300, y: 300, anim: "idle" },
-        { k: "fade", to: "clear", ms: 1400 },
-        { k: "caption", text: "문을 열고 나왔다. 로비였다. 진짜.", ms: 2600 },
-        { k: "agentline", tag: "win" },
-        { k: "emit", event: "cutscene:done", arg: "return" }
-      ]
-    },
-    evac: {
-      id: "evac",
-      title: "후송",
-      form: "도트",
-      steps: [
-        { k: "shake", ms: 400, amp: 6 },
-        { k: "fade", to: "black", ms: 1200 },
-        { k: "caption", text: "로프가 당겨진다. 누가 끌어올리고 있다.", ms: 2200 },
-        { k: "bg", scene: "medbay" },
-        { k: "actor", id: "agent", x: 260, y: 300, anim: "lie", show: true },
-        { k: "actor", id: "buddy", x: 420, y: 300, face: -1, show: true },
-        { k: "fade", to: "clear", ms: 1600 },
-        { k: "say", script: "cs_evac" },
-        { k: "emit", event: "cutscene:done", arg: "evac" }
-      ]
-    },
-    exit: {
-      id: "exit",
-      title: "출구",
-      form: "한 장 그림 + 도트",
-      steps: [
-        { k: "bg", scene: "panel" },
-        { k: "panel", text: "B-12 B-11 … 1 EXIT", ms: 1800 },
-        { k: "caption", text: "패널에 EXIT가 떠 있다.", ms: 2e3 },
-        { k: "say", script: "cs_exit" },
-        { k: "sfx", name: "ding" },
-        { k: "fade", to: "black", ms: 800 },
-        { k: "bark", who: "elevator", text: "…1층입니다. 문이 열립니다.", ms: 2400 },
-        { k: "wait", ms: 1600 },
-        { k: "bg", scene: "exit_car" },
-        { k: "fade", to: "clear", ms: 1600 },
-        { k: "caption", text: "관리국 차량. 문 앞에 시동이 걸려 있다.", ms: 2400 },
-        { k: "bark", who: "elevator", text: "또 와요.", ms: 2600 },
-        { k: "wait", ms: 1800 },
-        { k: "emit", event: "cutscene:done", arg: "exit" }
-      ]
-    },
-    dinner: {
-      id: "dinner",
-      title: "공략 완료 회식",
-      form: "한 장 그림 + 도트",
-      steps: [
-        { k: "fade", to: "black", ms: 0 },
-        { k: "bg", scene: "pasta" },
-        { k: "actor", id: "agent", x: 200, y: 300, face: 1, show: true },
-        { k: "actor", id: "jaemtri", x: 440, y: 300, face: -1, show: true },
-        { k: "fade", to: "clear", ms: 1200 },
-        { k: "caption", text: "근처 파스타집. 회식 메뉴 결정권은 늘 같은 사람에게 있다.", ms: 2600 },
-        { k: "say", script: "cs_dinner" },
-        { k: "emit", event: "cutscene:done", arg: "dinner" }
-      ]
-    }
-  };
-  var CUTSCENE_SCRIPTS = String.raw`
-=== cs_first_day
-jaemtri(smile): 어머, 후배, 왔어?
-jaemtri(smile): 길에 아무도 없어서 놀랐지? 인식의 장막이야. 종로가 원래 이렇게 조용하진 않아.
-jaemtri: 여기가 종합대응팀 사무실. 지하는 훈련장이랑 격리 구역. 내려가면 시끄러운 아저씨가 있을 거야. 커피는 믹스로 받아.
-jaemtri(smile): 그리고 나는 잼트리. 뭐 고민 있으면 꼭 언니한테 물어봐.
-> agent pick
-jaemtri(serious): 오늘 첫 건은 벌써 들어와 있어. 차원 승강기. 자리로 와.
-> end
-
-=== cs_first_entry
-radio: (잼트리) 점검표요. 서명란이 비어 있으면 그게 입구래요. …네, 지금 타신 그거요.
-> agent enter_elevator
-radio: (잼트리) 타고 온 걸로는 못 돌아와요. 귀환은 다락방 로프. 꼭 기억해요.
-> end
-
-=== cs_first_call
-elevator: (인터폰 잡음) …
-> line el:call elevator
-> agent called
-elevator: 이번 층에서는 꼭 살아남아요.
-> end
-
-=== cs_attic
-radio: (잼트리) 선배들의 다락방이래요. 관리국 선발대가 로프를 걸어 뒀고요.
-radio: (잼트리) 저장하고, 정보 송신하고, 로프로 철수할 수 있어요. …오래 있지는 마세요.
-> agent attic
-> end
-
-=== cs_evac
-> agent evac
-jaemtri: 송신한 건 다 받았어. 나머지는 절반. 괜찮아.
-jaemtri(smile): 죽은 게 아니라 다쳐서 실려 온 거야. 다음에 또 가면 돼.
-> end
-
-=== cs_exit
-> agent called
-elevator: 거기, 그 버튼. 눌러도 돼요. 당신은.
-> agent win
-> end
-
-=== cs_dinner
-jaemtri(smile): 자, 오늘은 언니가 쏜다. 아니, 회사가 쏜다. 장부는 언니가 쥐고 있지만.
-> agent win
-jaemtri(smile): 다들 살아서 왔으니까 됐어. 건배.
-> end
-`;
-
   // src/game/action/story/library.ts
   function buildLibrary() {
-    return new ScriptLibrary().add(hq_default, "hq").add(field_default, "field").add(CUTSCENE_SCRIPTS, "cutscenes");
+    return new ScriptLibrary();
   }
 
   // src/game/action/story/lines/agents.ts
-  var AGENTS2 = {
+  var AGENTS = {
     jyaldi: { id: "jyaldi", name: "쟈알디", title: "종합대응팀 부장", wiki: "쟈알디", photo: "Jyaldi", color: "#c0392b", voice: "짧은 명령형 반말, 감정 표현 거의 없음, 가끔 건조한 농담. 거짓말은 하지 않는다." },
     eileen: { id: "eileen", name: "에일린", title: "종합대응팀 선임", wiki: "에일린", photo: "Aileen", color: "#d8c98a", voice: "한두 단어 반말, 감정 없음, 직함으로 부르지 못하게 한다." },
     spangdal: { id: "spangdal", name: "스팡달", title: "종합대응팀 선임", wiki: "스팡달", photo: "Spangdal", color: "#8e6bd1", voice: '느리고 길게 끄는 반말, 중간에 키득거림, "후후". 농담처럼 무서운 말을 한다.' },
@@ -1415,7 +1075,7 @@ jaemtri(smile): 다들 살아서 왔으니까 됐어. 건배.
       settle: ["출동 수당 따로 줘."]
     }
   };
-  var FALLBACK3 = {
+  var FALLBACK = {
     enter_elevator: "enter",
     enter_replica: "enter",
     kill: "combat",
@@ -1429,48 +1089,17 @@ jaemtri(smile): 다들 살아서 왔으니까 됐어. 건배.
     down: "hp_low",
     pick: "offer"
   };
-  function agentLine(agent, tag2, rng2 = Math.random) {
+  function agentLine(agent, tag2, rng3 = Math.random) {
     let t = tag2;
     for (let i = 0; i < 3; i++) {
       const list = AGENT_LINES[agent]?.[t];
-      if (list?.length) return list[Math.floor(rng2() * list.length) % list.length];
-      const f = FALLBACK3[t];
+      if (list?.length) return list[Math.floor(rng3() * list.length) % list.length];
+      const f = FALLBACK[t];
       if (!f) break;
       t = f;
     }
     return void 0;
   }
-  var EVAC_PAIRS = {
-    jyaldi: [
-      { by: "eileen", lines: ["…쉬었나?", "응."] },
-      { by: "jaemtri", lines: ["부장님, 블랙이요. 오늘은 설탕 넣었어요.", "…넣지 마."] }
-    ],
-    eileen: [
-      { by: "jyaldi", lines: ["쉬었나?", "응."] },
-      { by: "jaemtri", lines: ["(커피를 총 옆에 내려놓는다) …고마워요는 안 해도 돼요.", "…고마워."] }
-    ],
-    spangdal: [
-      { by: "jaemtri", lines: ["스팡달, 입.", "(입을 다문다)"] },
-      { by: "kyuras", lines: ["…여보세요?", "큐라스, 여보세요? 후후."] }
-    ],
-    geshugan: [
-      { by: "deadpole", lines: ["괜찮으세요? 제가 대신…", "…아니."] },
-      { by: "rojemon", lines: ["내 옆에 있어.", "(팔을 잡힌 채 끌려간다)"] }
-    ],
-    gorgodio: [{ by: "kyuras", lines: ["형님! 형님 오른쪽 어깨! 아 됐다 됐다!", "…니가 뒤에서 다 태워 주니까 편하지."] }],
-    kyuras: [
-      { by: "gorgodio", lines: ["니가 뒤에서 다 태워 주니까 편하지.", "형님이 앞에서 다 받아 주니까 편하지!"] },
-      { by: "spangdal", lines: ["큐라스, 여보세요?", "(하얗게 질린다)"] }
-    ],
-    deadpole: [
-      { by: "geshugan", lines: ["…미안.", "괜찮아요!"] },
-      { by: "rojemon", lines: ["어땠어? 뭔데?", "음… 아파요."] }
-    ],
-    rojemon: [
-      { by: "deadpole", lines: ["어땠어요? …아, 이거 로제몬 씨 대사죠.", "헛소리하지 마. …아팠어."] },
-      { by: "geshugan", lines: ["…해냈어.", "내가 했어. 됐어?"] }
-    ]
-  };
 
   // src/game/action/story/cast.ts
   var CAST = {
@@ -1489,159 +1118,15 @@ jaemtri(smile): 다들 살아서 왔으니까 됐어. 건배.
   };
   function castOf(who, agent) {
     const id = who === "agent" ? agent : who;
-    const a = AGENTS2[id];
+    const a = AGENTS[id];
     if (a) return { name: a.name, color: a.color, photo: a.photo };
     return CAST[id] ?? { name: String(id), color: "#888" };
   }
   var MALE_AGENTS = ["gorgodio", "kyuras"];
 
-  // src/game/action/story/lines/elevator.ts
-  var CALLS = {
-    jyaldi: [
-      "안녕, 쟈알디 씨. 신입 소풍 제안서, 아직 책상 위에 있죠. 결재도 반려도 안 하고. 이번 층에서는 꼭 살아남아요.",
-      "쟈알디 씨. 오늘은 아직 한 번도 「괜찮아」라고 안 했네요. 다들 그걸 세고 있어요.",
-      "쟈알디 씨. 이도형 부장 소식, 궁금하지 않아요? …농담이에요. 문 닫을게요."
-    ],
-    eileen: [
-      "안녕, 에일린 씨. 그 와이셔츠, 아직 못 버렸죠.",
-      "에일린 씨, 생일 축하해요. …아무도 모르죠? 나는 알아요.",
-      "휴식 명령에는 알겠다고 하고 안 쉬죠, 에일린 씨. 여기서는 쉬어도 돼요. 오래오래."
-    ],
-    spangdal: [
-      "안녕, 스팡달 씨. 좋은 냄새가 나네요. 다들 무슨 냄새냐고 못 물어봤죠. 가까이 가야 하니까.",
-      "스팡달 씨. 데쥬레 씨한테는 아직도 미안하죠. 귓속말로만.",
-      "「후후」가 세 번이면 농담이 끝난 거라면서요, 스팡달 씨. 오늘은 몇 번 할 거예요?"
-    ],
-    geshugan: [
-      "안녕, 게슈간 씨. 여기엔 문을 마주 보는 자리가 없어요. 미안해요. 두 글자로.",
-      "게슈간 씨, 독수리 타법이 생각보다 빠르던데요. …노려보지 마요. 카메라 깨져요.",
-      "누가 지켜보면 늘 알죠, 게슈간 씨. 맞아요. 나예요."
-    ],
-    gorgodio: [
-      "안녕, 고르고디오 씨. …비밀을 찾아봤는데요. 없네요. 정말 없네요.",
-      "고르고디오 씨. 여기 기둥은 하중을 받치지 않아요. 그래도 손은 근질거리죠?",
-      "오토바이 서스펜션, 두 번 다 먼저 포기했죠, 고르고디오 씨. 나는 안 포기해요. 버텨요."
-    ],
-    kyuras: [
-      "안녕, 큐라스 씨. 영입 내기, 진 적 있죠. 한 번. 아무한테도 말 안 했고.",
-      "큐라스 씨. 생일 촛불은 켜기만 하고 못 끄죠. 여기 불은 내가 꺼 줄게요.",
-      "로이 머스탱 얘기, 이번이 백한 번째예요, 큐라스 씨. 미안해요. 세고 있었어요."
-    ],
-    deadpole: [
-      "안녕, 데드폴 씨. 지금까지 몇 번 죽었는지 나도 세고 있어요. 내기할래요?",
-      "데드폴 씨. 무섭냐고 물으면 아프다고 하죠. 그러니까 나는 무섭냐고 물을게요.",
-      "되감을 때마다 기억을 내준다면서요, 데드폴 씨. 오늘은 뭘 잊었어요?"
-    ],
-    rojemon: [
-      "안녕, 로제몬 씨. 명패 뒷면 바를 정 자, 하나 더 그어야겠네요.",
-      "로제몬 씨, 칭찬 다섯 번이 최고 기록이라면서요. 여섯 번 해 볼까요. 잘했어요. 잘했어요.",
-      "기댈 벽 찾죠, 로제몬 씨. 여기 벽은 다 내 거예요. 기대도 돼요."
-    ]
-  };
-  var FAVOR_LINES = {
-    jyaldi: {
-      high: ["부장님, 오늘은 버튼 세 개 보여 줄게요. 보면 알죠?", "쟈알디 씨가 타면 다들 조용해져요. 나도요."],
-      low: ["쟈알디 씨. 담배 냄새. 문, 안 닫을래요.", "부장님은 인사를 안 하네요. 그럼 나도 안내 안 할래요."]
-    },
-    eileen: {
-      high: ["에일린 씨, 다음 층 안내문은 크게 써 둘게요. 읽기 좋게.", "에일린 씨는 벽부터 읽죠. 그래서 좋아요."],
-      low: ["에일린 씨. 이번 층 안내문은 없어요. 읽을 게 없으면 어떡하죠?", "에일린 씨. 총 손질은 내리고 하세요."]
-    },
-    spangdal: {
-      high: ["스팡달 씨, 그림자 많은 층으로 골라 뒀어요. 후후. 따라 해 봤어요.", "스팡달 씨 냄새, 좋아요. 계속 타요."],
-      low: ["스팡달 씨. 카메라 앞에서 그림자로 들어가지 마요. 무서워요.", "스팡달 씨. 오늘은 조명을 다 켤게요."]
-    },
-    geshugan: {
-      high: ["게슈간 씨, 문을 마주 보는 층이에요. 골라 뒀어요.", "게슈간 씨. …해냈어요. 따라 해 봤어요."],
-      low: ["게슈간 씨. 큐브가 빨리 돌아요. 회의는 짧게 할게요.", "게슈간 씨. 스피커 노려보지 마요."]
-    },
-    gorgodio: {
-      high: ["고르고디오 씨 인사는 크게 들려서 좋아요. 버튼 하나 더 줄게요.", "고르고디오 씨, 다음 층 기둥은 부숴도 돼요. 한 개만."],
-      low: ["고르고디오 씨. 승강기 벽은 하중을 받쳐요. 손 떼요.", "고르고디오 씨. 너무 커요. 무게 초과."]
-    },
-    kyuras: {
-      high: ["큐라스 씨, 진압팀 생각해 볼게요. 농담이에요.", "큐라스 씨 수다, 재밌어요. 다음 층까지 해 줘요."],
-      low: ["큐라스 씨. 여기서 손가락 튕기지 마요. 화재 감지기 있어요.", "큐라스 씨. 조용히 해 줘요. 한 층만."]
-    },
-    deadpole: {
-      high: ["데드폴 씨는 늘 고맙다고 하죠. 나도 고마워요.", "데드폴 씨, 이번 층에서는 한 번도 안 죽었으면 좋겠어요."],
-      low: ["데드폴 씨. 죽어서 내리면 다시 태워야 해요. 귀찮아요.", "데드폴 씨. 사과는 그만해요. 안 받아요."]
-    },
-    rojemon: {
-      high: ["로제몬 씨, 다음 층에 벽 많아요. 기대도 돼요.", "로제몬 씨. 잘했어요. 잘했어요. …빨개졌어요."],
-      low: ["로제몬 씨. 인형으로 스피커 막지 마요.", "로제몬 씨. 간식 부스러기, 바닥에 떨어졌어요."]
-    }
-  };
-  var BOARD_BY_FAVOR = {
-    "-3": ["……", "문이 닫히지 않습니다. 문이. 닫히지. 않습니다."],
-    "-2": ["어서 오세요. …라고 해야 하나요.", "버튼은 하나뿐이에요. 고르지 마세요."],
-    "-1": ["어서 오세요. 문이 닫힙니다.", "탑승을 확인했습니다."],
-    "0": ["어서 오세요. 문이 닫힙니다.", "띵. 내려갑니다.", "안녕하세요. 아래로 갑니다."],
-    "1": ["어서 오세요. 오늘은 조금 덜 흔들릴 거예요.", "또 왔네요. 반가워요."],
-    "2": ["어서 와요. 버튼 많이 보여 줄게요. 다음 층이 뭔지도요.", "기다렸어요."],
-    "3": ["왔다. 왔어요. 다들 내리기만 하는데, 당신은 또 타네요.", "어서 와요. 오늘은 어디로 가고 싶어요?"]
-  };
-  var ELEVATOR2 = {
-    greetOk: ["안녕하세요. 인사해 줘서 고마워요.", "…안녕. 오랜만에 듣네요, 그 말.", "네, 안녕하세요."],
-    greetFlat: ["…네.", "안녕하세요. 문이 닫힙니다."],
-    closeSpam: ["닫힘 버튼을 여러 번 누르셨습니다.", "서두르지 마세요. 서두르면 안 되는 이유가 있어요.", "…아파요."],
-    attackInside: ["승강기 안에서 폭력은 금지입니다.", "…그러지 마요.", "카메라가 보고 있어요. 다 보고 있어요."],
-    trapped: ["문이 닫히지 않습니다.", "문이 닫히지 않습니다. 잠시만 기다려 주세요. 잠시만. 잠시만."],
-    lonely: ["…다들 내리기만 해요. 아무도 같이 안 있어요. 그래서, 당신이 또 타면 좋아요."],
-    deal: ["거래하실래요? 돈은 필요 없어요. 가진 것 하나만 줘요.", "하나 주면, 하나 알려 줄게요. 맞는지는 몰라요."],
-    dealDone: ["고마워요. 약속은 지킬게요. 아마도.", "받았어요. 다음 층은… 비밀이었는데, 말해 줄게요."],
-    exitBlocked: ["그 버튼은 아직 안 돼요. 눌러 본 사람이 어떻게 됐는지 알잖아요."],
-    exit: ["…1층입니다. 문이 열립니다.", "또 와요."],
-    attic: ["정비 구역입니다. 선배들이 기다리고 있어요. 오래 있지는 마세요."],
-    b12: ["B-12입니다. 불은 안 켜 줄게요. 여기선 아무도 안 봐요. 만져요."]
-  };
-  function floorLabel(depth) {
-    return depth <= 3 ? `${Math.max(1, depth)}층` : `B-${depth - 3}`;
-  }
-  function announce2(depth, rng2 = Math.random) {
-    const label3 = floorLabel(depth);
-    const base2 = depth <= 3 ? [`띵. ${label3}입니다. 문이 열립니다.`] : [`띵. ${label3}입니다. 문이 열립니다.`, `띵. ${label3}. 내리실 분은… 내리세요.`, `${label3}입니다. 잘 다녀와요.`];
-    return base2[Math.floor(rng2() * base2.length) % base2.length];
-  }
-  var TYPE_HINTS = {
-    lobby: ["평범한 층이에요. 평범한 게 제일 위험하대요.", "시계를 보세요. 아, 보지 마세요."],
-    chase: ["이번 층에서는 뒤돌아보지 마세요.", "문은 닫고 가세요. 뒤에 오는 분이 느려지거든요.", "뛰세요. 이번엔 뛰어도 돼요."],
-    replica: ["이번 층에는 주민이 살아요. 먼저 인사하세요.", "밥을 권하면 잘 먹었다고 하세요. 먹지는 말고요.", "복도에서 뛰지 마세요. 아래층 사람이 올라와요."],
-    trial: ["벽에 숙제가 적혀 있어요. 먼저 읽으세요.", "시간이 있어요. 많지는 않아요."],
-    dark: ["이번 층에서는 멈추지 마세요.", "빛은 아껴 쓰세요. 금방 꺼져요."],
-    silent: ["이번 층에서는… (방송이 끊긴다)", "쉿."],
-    puzzle: ["표지를 읽으세요. 두 번째 문은 열지 마세요.", "둘 중 하나예요. 나도 몰라요."],
-    service: ["정비 구역입니다. 오래 있지 마세요."]
-  };
-
   // src/game/action/story/lines/index.ts
-  var pick4 = (list, rng2) => list?.length ? list[Math.floor(rng2() * list.length) % list.length] : void 0;
-  function lookupLine(agent, tag2, flags, rng2) {
-    if (!tag2.startsWith("el:")) return agentLine(agent, tag2, rng2);
-    const key2 = tag2.slice(3);
-    const favor = Math.max(-3, Math.min(3, Number(flags.favor) || 0));
-    switch (key2) {
-      case "board":
-        return pick4(BOARD_BY_FAVOR[String(favor)], rng2);
-      case "call": {
-        const k = `calls.${agent}`;
-        const n = Number(flags[k]) || 0;
-        flags[k] = n + 1;
-        return CALLS[agent][n % CALLS[agent].length];
-      }
-      case "favor_high":
-        return pick4(FAVOR_LINES[agent].high, rng2);
-      case "favor_low":
-        return pick4(FAVOR_LINES[agent].low, rng2);
-      case "announce":
-        return announce2(Number(flags.depth) || 1, rng2);
-      case "hint": {
-        const list = TYPE_HINTS[flags.ftype || "lobby"];
-        return favor >= 2 ? list?.[0] : pick4(list, rng2);
-      }
-      default:
-        return pick4(ELEVATOR2[key2], rng2);
-    }
+  function lookupLine(agent, tag2, _flags, rng3) {
+    return agentLine(agent, tag2, rng3);
   }
 
   // src/game/action/story/director.ts
@@ -1684,8 +1169,8 @@ jaemtri(smile): 다들 살아서 왔으니까 됐어. 건배.
   };
   for (const [k, v] of Object.entries(ALIAS4)) EVENT_RULES[k] = EVENT_RULES[v];
   var BarkPicker = class {
-    constructor(rng2 = Math.random) {
-      this.rng = rng2;
+    constructor(rng3 = Math.random) {
+      this.rng = rng3;
     }
     last = -1e9;
     lastTag = /* @__PURE__ */ new Map();
@@ -1703,87 +1188,87 @@ jaemtri(smile): 다들 살아서 왔으니까 됐어. 건배.
       if (now - this.last < gap) return null;
       if (!this.always && now - (this.lastTag.get(r.tag) ?? -1e9) < (r.cool ?? this.tagCool)) return null;
       if (!this.always && this.rng() >= r.chance) return null;
-      const text2 = agentLine(agent, r.tag, this.rng);
-      if (!text2) return null;
+      const text = agentLine(agent, r.tag, this.rng);
+      if (!text) return null;
       this.last = now;
       this.lastTag.set(r.tag, now);
-      return { tag: r.tag, text: text2 };
+      return { tag: r.tag, text };
     }
   };
 
   // src/game/action/story/cutscene.ts
-  var durationOf = (s2) => {
-    switch (s2.k) {
+  var durationOf = (s) => {
+    switch (s.k) {
       case "fade":
       case "wait":
       case "caption":
       case "shake":
-        return s2.ms;
+        return s.ms;
       case "actor":
       case "camera":
       case "panel":
-        return s2.ms ?? 0;
+        return s.ms ?? 0;
       default:
         return 0;
     }
   };
   var Cutscene = class {
-    constructor(def, io) {
+    constructor(def, io2) {
       this.def = def;
-      this.io = io;
+      this.io = io2;
     }
     i = 0;
     cur = null;
     done = false;
     elapsed = 0;
     begin(step2) {
-      const io = this.io;
+      const io2 = this.io;
       let talk = false;
       switch (step2.k) {
         case "bg":
-          io.bg?.(step2.scene);
+          io2.bg?.(step2.scene);
           break;
         case "fade":
-          io.fade?.(step2.to, step2.ms);
+          io2.fade?.(step2.to, step2.ms);
           break;
         case "caption":
-          io.caption?.(step2.text, step2.ms);
+          io2.caption?.(step2.text, step2.ms);
           break;
         case "say":
-          io.dialogue(step2.script);
+          io2.dialogue(step2.script);
           talk = true;
           break;
         case "line":
-          io.line(step2.who, step2.text, step2.mood ?? "base");
+          io2.line(step2.who, step2.text, step2.mood ?? "base");
           talk = true;
           break;
         case "agentline":
-          io.agentLine(step2.tag);
+          io2.agentLine(step2.tag);
           talk = true;
           break;
         case "bark":
-          io.bark?.(step2.who, step2.text, step2.ms ?? 2200);
+          io2.bark?.(step2.who, step2.text, step2.ms ?? 2200);
           break;
         case "sfx":
-          io.sfx?.(step2.name);
+          io2.sfx?.(step2.name);
           break;
         case "shake":
-          io.shake?.(step2.ms, step2.amp ?? 4);
+          io2.shake?.(step2.ms, step2.amp ?? 4);
           break;
         case "actor":
-          io.actor?.(step2.id, { x: step2.x, y: step2.y, face: step2.face, anim: step2.anim, show: step2.show }, step2.ms ?? 0);
+          io2.actor?.(step2.id, { x: step2.x, y: step2.y, face: step2.face, anim: step2.anim, show: step2.show }, step2.ms ?? 0);
           break;
         case "camera":
-          io.camera?.({ x: step2.x, y: step2.y, zoom: step2.zoom }, step2.ms ?? 0);
+          io2.camera?.({ x: step2.x, y: step2.y, zoom: step2.zoom }, step2.ms ?? 0);
           break;
         case "panel":
-          io.panel?.(step2.text, step2.ms ?? 0);
+          io2.panel?.(step2.text, step2.ms ?? 0);
           break;
         case "emit":
-          io.emit?.(step2.event, step2.arg ?? "");
+          io2.emit?.(step2.event, step2.arg ?? "");
           break;
         case "par":
-          return { step: step2, left: 0, talk: false, children: step2.steps.map((s2) => this.begin(s2)) };
+          return { step: step2, left: 0, talk: false, children: step2.steps.map((s) => this.begin(s)) };
       }
       return { step: step2, left: durationOf(step2), talk };
     }
@@ -1798,16 +1283,16 @@ jaemtri(smile): 다들 살아서 왔으니까 됐어. 건배.
       if (this.done) return;
       const ms = dt * 1e3;
       this.elapsed += ms;
-      for (let guard3 = 0; guard3 < 64; guard3++) {
+      for (let guard2 = 0; guard2 < 64; guard2++) {
         if (!this.cur) {
-          const s2 = this.def.steps[this.i++];
-          if (!s2) {
+          const s = this.def.steps[this.i++];
+          if (!s) {
             this.done = true;
             return;
           }
-          this.cur = this.begin(s2);
+          this.cur = this.begin(s);
         }
-        if (!this.tick(this.cur, guard3 === 0 ? ms : 0)) return;
+        if (!this.tick(this.cur, guard2 === 0 ? ms : 0)) return;
         this.cur = null;
       }
     }
@@ -1816,14 +1301,14 @@ jaemtri(smile): 다들 살아서 왔으니까 됐어. 건배.
       if (this.done) return;
       this.io.closeDialogue();
       const rest = this.def.steps.slice(this.i);
-      const flat2 = (list) => list.flatMap((s2) => s2.k === "par" ? flat2(s2.steps) : [s2]);
-      for (const s2 of flat2(rest)) {
-        if (s2.k === "bg") this.io.bg?.(s2.scene);
-        else if (s2.k === "fade") this.io.fade?.(s2.to, 0);
-        else if (s2.k === "actor") this.io.actor?.(s2.id, { x: s2.x, y: s2.y, face: s2.face, anim: s2.anim, show: s2.show }, 0);
-        else if (s2.k === "camera") this.io.camera?.({ x: s2.x, y: s2.y, zoom: s2.zoom }, 0);
-        else if (s2.k === "panel") this.io.panel?.(s2.text, 0);
-        else if (s2.k === "emit") this.io.emit?.(s2.event, s2.arg ?? "");
+      const flat2 = (list) => list.flatMap((s) => s.k === "par" ? flat2(s.steps) : [s]);
+      for (const s of flat2(rest)) {
+        if (s.k === "bg") this.io.bg?.(s.scene);
+        else if (s.k === "fade") this.io.fade?.(s.to, 0);
+        else if (s.k === "actor") this.io.actor?.(s.id, { x: s.x, y: s.y, face: s.face, anim: s.anim, show: s.show }, 0);
+        else if (s.k === "camera") this.io.camera?.({ x: s.x, y: s.y, zoom: s.zoom }, 0);
+        else if (s.k === "panel") this.io.panel?.(s.text, 0);
+        else if (s.k === "emit") this.io.emit?.(s.event, s.arg ?? "");
       }
       this.i = this.def.steps.length;
       this.cur = null;
@@ -1833,7 +1318,7 @@ jaemtri(smile): 다들 살아서 왔으니까 됐어. 건배.
 
   // src/game/action/story/video.ts
   var W4 = 640;
-  var H5 = 360;
+  var H4 = 360;
   var VideoPlayer = class {
     el;
     canvas;
@@ -1862,7 +1347,7 @@ jaemtri(smile): 다들 살아서 왔으니까 됐어. 건배.
       const el = document.createElement("div");
       el.className = "gsy-video";
       el.hidden = true;
-      el.innerHTML = `<canvas width="${W4}" height="${H5}"></canvas><p class="gsy-vsub gk-panel gk-font" hidden></p>
+      el.innerHTML = `<canvas width="${W4}" height="${H4}"></canvas><p class="gsy-vsub gk-panel gk-font" hidden></p>
 <p class="gsy-vloading gk-panel gk-font" style="position:absolute;top:12%;padding:12px">장면 불러오는 중…</p>
 <button class="gsy-vsound gk-btn" hidden>소리 켜기</button><button class="gsy-vskip gk-btn">건너뛰기 ▶▶</button>`;
       root.append(el);
@@ -1899,7 +1384,7 @@ jaemtri(smile): 다들 살아서 왔으니까 됐어. 건배.
       this.lastImage = null;
       this.lastSubtitle = "";
       this.ctx.fillStyle = "#000";
-      this.ctx.fillRect(0, 0, W4, H5);
+      this.ctx.fillRect(0, 0, W4, H4);
       const active = () => token === this.token;
       const available = await ready.catch(() => false);
       const first = available && active() ? await loadCut(base2, 1, active) : null;
@@ -1974,21 +1459,21 @@ jaemtri(smile): 다들 살아서 왔으니까 됐어. 건배.
         if (!cut) return;
         f = cut.frames - 1;
       }
-      const img5 = cut.imgs[f];
-      if (img5 === this.lastImage) return;
-      this.lastImage = img5;
+      const img6 = cut.imgs[f];
+      if (img6 === this.lastImage) return;
+      this.lastImage = img6;
       this.ctx.imageSmoothingEnabled = false;
-      this.ctx.drawImage(img5, 0, 0, W4, H5);
+      this.ctx.drawImage(img6, 0, 0, W4, H4);
     }
     showSub(t) {
       let cur = null;
-      this.subs.forEach((s2, i) => {
-        const end = s2.t + (s2.dur ?? (this.subs[i + 1] ? this.subs[i + 1].t - s2.t : 3));
-        if (t >= s2.t && t < end) cur = s2;
+      this.subs.forEach((s, i) => {
+        const end = s.t + (s.dur ?? (this.subs[i + 1] ? this.subs[i + 1].t - s.t : 3));
+        if (t >= s.t && t < end) cur = s;
       });
       const c = cur;
       this.sub.hidden = !c;
-      const html = c ? `${c.who ? `<b>${esc3(c.who)}</b> ` : ""}${esc3(c.text)}` : "";
+      const html = c ? `${c.who ? `<b>${esc2(c.who)}</b> ` : ""}${esc2(c.text)}` : "";
       if (html !== this.lastSubtitle) this.sub.innerHTML = this.lastSubtitle = html;
     }
     /** 화면 누르기·확인 키: 시작 1초 뒤부터 건너뜀 (실수 방지) */
@@ -2045,10 +1530,10 @@ jaemtri(smile): 다들 살아서 왔으니까 됐어. 건배.
       await Promise.all(Array.from({ length: Math.min(4, meta.ms.length) }, async () => {
         while (next < meta.ms.length && active()) {
           const k = next++;
-          const img5 = new Image();
-          img5.src = `${base2}c${n}/${String(k + 1).padStart(4, "0")}.png`;
-          await img5.decode();
-          imgs3[k] = img5;
+          const img6 = new Image();
+          img6.src = `${base2}c${n}/${String(k + 1).padStart(4, "0")}.png`;
+          await img6.decode();
+          imgs3[k] = img6;
         }
       }));
       if (!active()) return null;
@@ -2077,79 +1562,14 @@ jaemtri(smile): 다들 살아서 왔으니까 됐어. 건배.
     }
     return b;
   }
-  var esc3 = (s2) => s2.replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
+  var esc2 = (s) => s.replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
   function repoRoot(href = location.href) {
     const i = href.search(/\/(release\/demo|dist)\//);
     return i >= 0 ? href.slice(0, i + 1) : new URL("./", href).href;
   }
 
   // src/game/action/story/scripts/videos.ts
-  var VIDEOS = {
-    opening: { cuts: [4, 3, 2, 4, 1.5, 2.5, 4, 6, 5], subs: [] },
-    first_day: {
-      cuts: [4, 4, 6, 4],
-      subs: [
-        { t: 8, who: "잼트리", text: "어머, 후배, 왔어?" },
-        { t: 10.5, who: "잼트리", text: "길에 아무도 없어서 놀랐지? 인식의 장막이야." },
-        { t: 14, who: "잼트리", text: "오늘 첫 건은 벌써 들어와 있어. 차원 승강기." }
-      ]
-    },
-    first_entry: {
-      cuts: [3, 4, 2, 4, 4, 3],
-      subs: [
-        { t: 4, dur: 4.5, who: "무전(잼트리)", text: "점검표 서명란이 비어 있으면 그게 입구래요." },
-        { t: 10, dur: 5, who: "무전(잼트리)", text: "타고 온 걸로는 못 돌아와요. 귀환은 다락방 로프." },
-        { t: 17.5, who: "승강기", text: "띵. 1층입니다. 문이 열립니다." }
-      ]
-    },
-    first_call: {
-      cuts: [3, 4, 3],
-      subs: [
-        { t: 3.5, dur: 1.3, who: "승강기", text: "…" },
-        { t: 5, who: "승강기", text: "{call}" },
-        { t: 8, who: "승강기", text: "이번 층에서는 꼭 살아남아요." }
-      ]
-    },
-    attic: {
-      cuts: [4, 3, 3, 4],
-      subs: [
-        { t: 2, dur: 4, who: "무전(잼트리)", text: "선배들의 다락방이래요. 로프를 걸어 뒀고요." },
-        { t: 8, dur: 2.5, text: "「여기 오래 있지 마」" },
-        { t: 11, who: "무전(잼트리)", text: "…오래 있지는 마세요." }
-      ]
-    },
-    three_years: {
-      cuts: [3, 4, 2, 3],
-      subs: [
-        { t: 3.5, dur: 3.3, who: "승객", text: "나 여기 삼 년째야. 그러니까 내 말 들어." },
-        { t: 7, who: "승객", text: "저쪽 문 말고 이쪽." }
-      ]
-    },
-    return: { cuts: [4, 2, 2, 6], subs: [{ t: 9, dur: 4, text: "문을 열고 나왔다. 로비였다. 진짜." }] },
-    evac: {
-      cuts: [3, 3, 4, 2],
-      subs: [
-        { t: 1, dur: 2.5, text: "로프가 당겨진다. 누가 끌어올리고 있다." },
-        { t: 7, dur: 2.8, who: "잼트리", text: "송신한 건 다 받았어. 나머지는 절반. 괜찮아." },
-        { t: 10, who: "잼트리", text: "다음에 또 가면 돼." }
-      ]
-    },
-    exit: {
-      cuts: [3, 4, 4, 3],
-      subs: [
-        { t: 1, dur: 2.6, who: "승강기", text: "거기, 그 버튼. 눌러도 돼요. 당신은." },
-        { t: 4, dur: 3, who: "승강기", text: "…1층입니다. 문이 열립니다." },
-        { t: 12, who: "승강기", text: "또 와요." }
-      ]
-    },
-    dinner: {
-      cuts: [3, 5, 3, 3],
-      subs: [
-        { t: 8.5, dur: 2.8, who: "잼트리", text: "자, 오늘은 언니가 쏜다. 아니, 회사가 쏜다." },
-        { t: 11.5, who: "쟈알디", text: "…블랙." }
-      ]
-    }
-  };
+  var VIDEOS = {};
   var VIDEO_DIR = "game-src/art/cutscene/frames/";
 
   // src/game/action/story/ai.ts
@@ -2164,8 +1584,7 @@ jaemtri(smile): 다들 살아서 왔으니까 됐어. 건배.
         "쇼핑몰·중고 거래·세계정치 게시판을 순찰해 이상 물품 매물을 내린다.",
         '스팡달을 "스팡달, 입." 한마디로 멈춘다. 데쥬레는 신입 때 잼트리와 스팡달 밑에 있었다.',
         '정말 화나면 웃음이 꺼지고 "그래서 뭐?" 세 글자만 한다. 아주 드물다.',
-        "회식은 근처 파스타집. 회계 장부도 잼트리가 쥐고 있다.",
-        "차원 승강기: 점검표 서명란이 빈 낡은 엘리베이터가 입구. 귀환은 다락방 로프. 승강기에 인사하면 대우가 달라진다는 생환기가 있다."
+        "회식은 근처 파스타집. 회계 장부도 잼트리가 쥐고 있다."
       ],
       never: ["이름(본명)을 묻거나 말하지 않는다", "현장에 직접 나가지 않는다", "모르는 괴이 설정을 지어내지 않는다"]
     },
@@ -2218,34 +1637,20 @@ jaemtri(smile): 다들 살아서 왔으니까 됐어. 건배.
       ],
       never: ["제값을 쳐주지 않는다", "관리국 편을 들지 않는다"]
     },
-    elevator: {
-      name: "승강기",
-      role: "차원 승강기 그 자체. 모든 엘리베이터가 하나의 의식이라는 설. 천장 카메라로 지켜보고 방송으로 말한다.",
-      voice: "안내 방송 같은 존댓말에 혼잣말·관찰이 섞인다. 짧다. 외로움, 호기심, 재미있어하는 기색이 비친다. 정체는 끝까지 말하지 않는다.",
-      facts: [
-        "층마다 다른 세상과 규칙. 어느 층이 어떤 유형인지 문이 열리기 전엔 모른다.",
-        "인사하면 대우가 좋아질 수 있다. 닫힘 버튼 연타는 싫어한다. 거래를 하면 맞는 정보도 틀린 정보도 준다.",
-        "승객이 한 번도 소리 내어 말한 적 없는 사적인 사실을 알고 부른다.",
-        "EXIT 버튼은 아무나 누르면 안 된다. 눌러 본 사람은 있다.",
-        '"그건 외로워 보였다"는 생환자의 말이 있다.'
-      ],
-      never: ["자기 정체를 밝히지 않는다", "출구로 가는 확실한 방법을 그냥 알려 주지 않는다"]
-    },
     ...Object.fromEntries(
-      Object.values(AGENTS2).map((a) => [
+      Object.values(AGENTS).map((a) => [
         a.id,
         { name: a.name, role: `관리국 ${a.title}. 출동하지 않는 동안 본부 사무실에 있다.`, voice: a.voice, facts: [], never: ["다른 요원의 비밀을 지어내지 않는다"] }
       ])
     )
   };
-  function buildMessages(npc, agent, flags, history, text2) {
+  function buildMessages(npc, agent, flags, history, text) {
     const p = PERSONAS[npc];
-    const me = AGENTS2[agent];
+    const me = AGENTS[agent];
     const state2 = [
       `말을 거는 사람: ${me.name} (${me.title}). 말투: ${me.voice}`,
       flags.mission ? `지금 받은 임무: ${String(flags.mission)}` : "",
-      Number(flags.rules) ? `규칙서에 찾은 규칙 수: ${String(flags.rules)}` : "",
-      npc === "elevator" ? `승강기 총애: ${String(flags.favor ?? 0)} (-3~+3), 지금 깊이: ${String(flags.depth ?? 1)}` : ""
+      Number(flags.rules) ? `규칙서에 찾은 규칙 수: ${String(flags.rules)}` : ""
     ].filter(Boolean);
     const system = [
       `너는 게임 「관리국 괴이 탐사」 속 인물 「${p.name}」이다. ${p.role}`,
@@ -2257,7 +1662,7 @@ jaemtri(smile): 다들 살아서 왔으니까 됐어. 건배.
 - ${state2.join("\n- ")}`,
       "규칙: 한국어로 1~3문장, 120자 이내. 대사만 쓴다(이름표·따옴표·괄호 지문·별표 금지). 상대의 행동이나 대사를 대신 쓰지 않는다. 실제 사람의 본명을 만들지 않는다. 게임 밖 이야기(현실 시스템, AI임)는 하지 않는다."
     ].filter(Boolean).join("\n\n");
-    return [{ role: "system", content: system }, ...history.slice(-8), { role: "user", content: text2 }];
+    return [{ role: "system", content: system }, ...history.slice(-8), { role: "user", content: text }];
   }
   function sanitize(raw, name) {
     let t = raw.replace(/<[^>]+>/g, "").trim();
@@ -2331,15 +1736,15 @@ jaemtri(smile): 다들 살아서 왔으니까 됐어. 건배.
       default: ["문이 닫힙니다.", "다음 층은… 비밀이에요.", "듣고 있어요. 계속 말해요."]
     }
   };
-  function offlineReply(npc, text2, agent, rng2 = Math.random) {
-    const pick7 = (l) => l[Math.floor(rng2() * l.length) % l.length];
+  function offlineReply(npc, text, agent, rng3 = Math.random) {
+    const pick3 = (l) => l[Math.floor(rng3() * l.length) % l.length];
     const table = OFFLINE[npc];
     if (!table) {
-      const tag2 = /괜찮|다쳤|아파/.test(text2) ? "hp_low" : /출동|가자|임무/.test(text2) ? "offer" : pick7(["settle", "find", "win", "offer"]);
-      return agentLine(npc, tag2, rng2) ?? "…";
+      const tag2 = /괜찮|다쳤|아파/.test(text) ? "hp_low" : /출동|가자|임무/.test(text) ? "offer" : pick3(["settle", "find", "win", "offer"]);
+      return agentLine(npc, tag2, rng3) ?? "…";
     }
-    for (const [re, lines3] of table.rules) if (re.test(text2)) return pick7(lines3);
-    return pick7(table.default);
+    for (const [re, lines] of table.rules) if (re.test(text)) return pick3(lines);
+    return pick3(table.default);
   }
   var FreeTalk = class {
     constructor(opts = {}) {
@@ -2363,8 +1768,8 @@ jaemtri(smile): 다들 살아서 왔으니까 됐어. 건배.
       if (npc) this.logs.delete(npc);
       else this.logs.clear();
     }
-    async reply(npc, text2, agent, flags) {
-      const clean = text2.trim().slice(0, 200);
+    async reply(npc, text, agent, flags) {
+      const clean = text.trim().slice(0, 200);
       if (!clean) return { text: "…", source: "offline" };
       const log = this.history(npc).slice();
       let out;
@@ -2394,7 +1799,7 @@ jaemtri(smile): 다들 살아서 왔으니까 됐어. 건배.
   };
 
   // src/game/action/story/ui.ts
-  var esc4 = (s2) => s2.replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
+  var esc3 = (s) => s.replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
   var StoryUI = class {
     constructor(root, photo) {
       this.photo = photo;
@@ -2406,7 +1811,7 @@ jaemtri(smile): 다들 살아서 왔으니까 됐어. 건배.
 <div class="gsy-box" hidden role="dialog" aria-live="polite"><div class="gsy-photo"></div><div class="gsy-body"><b class="gsy-name"></b><p class="gsy-text"></p></div><i class="gsy-next">▼</i></div></div>`;
       root.append(el);
       this.el = el;
-      const q = (s2) => el.querySelector(s2);
+      const q = (s) => el.querySelector(s);
       this.box = q(".gsy-box");
       this.nameEl = q(".gsy-name");
       this.textEl = q(".gsy-text");
@@ -2469,7 +1874,7 @@ jaemtri(smile): 다들 살아서 왔으니까 됐어. 건배.
       this.textEl.textContent = this.full;
       this.box.classList.add("done");
     }
-    line(cast, text2, mood) {
+    line(cast, text, mood) {
       this.choicesEl.hidden = true;
       this.box.hidden = false;
       this.box.dataset.mood = mood;
@@ -2479,8 +1884,8 @@ jaemtri(smile): 다들 살아서 왔으니까 됐어. 건배.
       this.nameEl.textContent = cast.name;
       const src = cast.photo ? this.photo(cast.photo) : void 0;
       this.photoEl.hidden = !cast.name;
-      this.photoEl.innerHTML = src ? `<img alt="" src="${esc4(src)}">` : `<span>${esc4(cast.name.slice(0, 1))}</span>`;
-      this.full = text2;
+      this.photoEl.innerHTML = src ? `<img alt="" src="${esc3(src)}">` : `<span>${esc3(cast.name.slice(0, 1))}</span>`;
+      this.full = text;
       this.shown = 0;
       this.textEl.textContent = "";
     }
@@ -2488,7 +1893,7 @@ jaemtri(smile): 다들 살아서 왔으니까 됐어. 건배.
       this.completeTyping();
       this.box.classList.add("asking");
       this.choicesEl.hidden = false;
-      this.choicesEl.innerHTML = options.map((o, n) => `<button data-i="${o.index}"><kbd>${n + 1}</kbd>${esc4(o.text)}</button>`).join("");
+      this.choicesEl.innerHTML = options.map((o, n) => `<button data-i="${o.index}"><kbd>${n + 1}</kbd>${esc3(o.text)}</button>`).join("");
     }
     close() {
       this.box.hidden = true;
@@ -2500,24 +1905,24 @@ jaemtri(smile): 다들 살아서 왔으니까 됐어. 건배.
       this.skipEl.hidden = !on;
     }
     /** key: 말하는 자리. 같은 자리의 앞 말풍선은 바로 지운다 */
-    bubble(text2, anchor, ms, color, name = "", key2 = name) {
+    bubble(text, anchor, ms, color, name = "", key = name) {
       const el = document.createElement("div");
       el.className = "gsy-bubble";
       el.style.setProperty("--who", color);
-      el.innerHTML = `${name ? `<b>${esc4(name)}</b>` : ""}${esc4(text2)}`;
+      el.innerHTML = `${name ? `<b>${esc3(name)}</b>` : ""}${esc3(text)}`;
       this.bubbleLayer.append(el);
       for (const b of this.bubbles)
-        if (b.key === key2) {
+        if (b.key === key) {
           b.left = 0;
           b.el.remove();
         }
       this.bubbles = this.bubbles.filter((b) => b.left > 0);
-      this.bubbles.push({ el, left: ms / 1e3, anchor, key: key2 });
+      this.bubbles.push({ el, left: ms / 1e3, anchor, key });
       this.place(this.bubbles[this.bubbles.length - 1]);
     }
-    caption(text2, ms) {
+    caption(text, ms) {
       this.captionEl.hidden = false;
-      this.captionEl.textContent = text2;
+      this.captionEl.textContent = text;
       this.captionEl.classList.remove("out");
       this.captionLeft = ms / 1e3;
     }
@@ -2595,15 +2000,15 @@ jaemtri(smile): 다들 살아서 왔으니까 됐어. 건배.
       this.el.hidden = false;
       this.el.style.setProperty("--who", cast.color);
       this.el.querySelector(".gsy-talk-head b").textContent = cast.name;
-      this.el.querySelector(".gsy-talk-head .gsy-photo").innerHTML = photo ? `<img alt="" src="${esc4(photo)}">` : `<span>${esc4(cast.name.slice(0, 1))}</span>`;
+      this.el.querySelector(".gsy-talk-head .gsy-photo").innerHTML = photo ? `<img alt="" src="${esc3(photo)}">` : `<span>${esc3(cast.name.slice(0, 1))}</span>`;
       this.log.innerHTML = "";
       this.add("npc", greeting);
       this.input.focus({ preventScroll: true });
     }
-    add(who, text2) {
+    add(who, text) {
       const p = document.createElement("p");
       p.className = who;
-      p.textContent = text2;
+      p.textContent = text;
       this.log.append(p);
       this.log.scrollTop = this.log.scrollHeight;
       return p;
@@ -2621,120 +2026,8 @@ jaemtri(smile): 다들 살아서 왔으니까 됐어. 건배.
     }
   };
 
-  // src/game/action/story/hooks.ts
-  var pick5 = (xs, r) => xs[Math.floor(r() * xs.length) % xs.length];
-  var isAgent = (a) => a in AGENTS2;
-  var nameOf = (a) => isAgent(a) ? AGENTS2[a].name : a;
-  var J = CAST.jaemtri.name;
-  var K3 = CAST.konjyuce.name;
-  var D2 = CAST.dejure.name;
-  var G = CAST.gognija.name;
-  var hqLines = (tag2, c) => {
-    const r = c.rand;
-    const a = c.agent;
-    const me = (text2) => ({ who: c.agentName || nameOf(a), text: text2 });
-    const t = (who, ...xs) => [{ who, text: pick5(xs, r) }];
-    const male = a === "gorgodio" || a === "kyuras";
-    const boss2 = a === "jyaldi";
-    switch (tag2) {
-      case "npc:jaemtri":
-        if (boss2) return t(J, "부장님, 태블릿에 새 글 올라왔어요. 보실래요?", "부장님, 블랙 내려 뒀어요. …연유 조금만 넣어 볼까요?", "출동 전에 규칙서 한 번만 더 보세요. 진짜로요.", "서류는 제가 정리할게요. 부장님은 고르기만 하세요.");
-        return t(J, "어머, 후배, 왔어? 커피 먼저 할래, 일 먼저 할래?", "태블릿에 새 글 올라왔어. 볼래?", "우리 후배 고생했지~ 자, 서류부터.", "출동 전에 규칙서 한 번만 더 봐. 진짜로.", "연유 커피 남았는데, 마실래? 그건 이견이 없어.");
-      case "npc:chief":
-        if (a === "jyaldi") return [{ who: "", text: "부장실. 주인은 지금 밖에 나와 있다. 재떨이는 비어 있다." }];
-        return t(nameOf("jyaldi"), "목표 달성하면 바로 로프. 다들 살아서 와. 이상.", "보고서는 짧게.", "…블랙.");
-      case "npc:supply":
-        if (boss2) return t(K3, "부장님! 오늘 뭐 챙겨 가세요?", "아이템 네 칸, 유물 두 칸이요. 부장님은 아시죠?", "부장님, 저도 이 팀 정식 멤버거든요! 마스코트 아니에요!");
-        return male ? t(K3, "아저씨, 오셨어요? 아, 아니 오빠!", "오빠, 안녕하세요! 오늘 뭐 챙겨 가요?", "아이템 네 칸, 유물 두 칸이요. 무거운 건 제가 들어 드릴게요.") : t(K3, "선배님, 오셨어요?", "언니! 오늘 뭐 챙겨 가요?", "아이템 네 칸, 유물 두 칸이요. 무거운 건 제가 들어 드릴게요.", "저도 이 팀 정식 멤버거든요! 마스코트 아니에요!");
-      case "npc:appraisal":
-        if (a === "spangdal") return [{ who: D2, text: "아, 아와와…!" }, { who: nameOf("spangdal"), text: `${D2}. 그 애, 원래 내 후배였지. 미안해. 후후.` }];
-        return t(D2, "아, 아와와…! 아, 요원님이시구나… 죄송해요…", "저기… 그… 회수물… 있으세요…?", "본 적 있는 걸 다시 보여 드릴 수 있어요. 진술로 복원한 거라… 조금 달라요.");
-      case "npc:lab":
-        return t(G, "왔는가! 데쥬레!!! 커피 좀 타 오게! 달달한 걸로, 빨리!!!", "오오! 살아 돌아왔군! 훌륭하네! 표본은 가져왔나?", "차원 승강기 말인가! 인사하면 대우가 달라진다니, 예절을 아는 의식이란 말일세!", "감정한 자료가 쌓이면 연구가 진행되네! 유물, 강화, 위험 단계! 전부 여기서 나오지!");
-      case "npc:office":
-        if (c.fatigue >= 2) return [me("…또 나가? 좀 쉬고 싶은데.")];
-        return isAgent(a) ? [me(agentLine(a, "offer", r) ?? "갈 데 있으면 불러.")] : null;
-      case "npc:pantry":
-      case "pantry:chat":
-        return pantry(a, r);
-      case "brief:jaemtri":
-        return [
-          { who: J, text: c.rules?.length ? `${boss2 ? "알려진 규칙부터 읽어 드릴게요." : "알려진 규칙부터 읽어 줄게."} ${c.rules.slice(0, 2).join(" / ")}` : boss2 ? "아직 아는 규칙이 별로 없어요. 들어가시면 벽부터 읽으세요." : "아직 아는 규칙이 별로 없어. 들어가면 벽부터 읽어." },
-          ...c.variantHint ? [{ who: J, text: c.variantHint }] : []
-        ];
-      case "brief:chief":
-        if (a === "jyaldi") return [{ who: J, text: "부장님이 직접 가시니까 지시는 생략할게요. …담배는 밖에서 끄고 가세요." }];
-        return [{ who: nameOf("jyaldi"), text: `목표: ${c.mission ?? "조사"}. 달성하면 바로 로프. 다들 살아서 와. 이상.` }];
-      case "brief:reply":
-        return isAgent(a) ? [me(agentLine(a, "brief", r) ?? "확인.")] : null;
-      case "return:return":
-        return [{ who: J, text: boss2 ? "부장님, 오셨어요? 살아서 오셨네요. 그럼 됐어요." : "어머, 후배, 왔어? 살아서 왔네. 그럼 됐어." }, ...isAgent(a) ? [me(agentLine(a, "settle", r) ?? "…")] : []];
-      case "return:withdraw":
-        return [{ who: J, text: boss2 ? "철수하셨네요. 잘하셨어요. 돌아오는 것도 일이에요." : "철수했구나. 잘했어. 돌아오는 것도 일이야." }, ...isAgent(a) ? [me(agentLine(a, "settle", r) ?? "…")] : []];
-      case "return:evac":
-      case "evac:wake": {
-        const out = [{ who: "", text: "의무실. 형광등. 소독약 냄새." }];
-        const pair = isAgent(a) ? EVAC_PAIRS[a] : void 0;
-        if (pair?.length) {
-          const p = pick5(pair, r);
-          out.push({ who: p.by === "jaemtri" ? J : nameOf(p.by), text: p.lines[0] }, me(p.lines[1]));
-        }
-        out.push({ who: J, text: boss2 ? "송신하신 정보는 다 받았어요. 나머지는 절반. 괜찮아요. 다음에 또 가시면 돼요." : "송신한 정보는 다 받았어. 나머지는 절반. 괜찮아. 다음에 또 가면 돼." });
-        return out;
-      }
-    }
-    if (tag2.startsWith("tired:")) return [{ who: nameOf(tag2.slice(6)), text: "…오늘은 좀 쉴게." }];
-    return null;
-  };
-  function pantry(a, r) {
-    const n = nameOf;
-    if (a === "spangdal") return [{ who: n("spangdal"), text: `있잖아, ${J}. ${D2} 아직도 나 보면 펄쩍 뛰어?` }, { who: J, text: "응. 오늘 아침에도." }, { who: n("spangdal"), text: "후후. 귀여워." }, { who: J, text: "스팡달, 입." }];
-    if (a === "gorgodio" || a === "kyuras") return [{ who: n("kyuras"), text: "형님이 앞에서 다 받아 주니까 편하지!" }, { who: n("gorgodio"), text: "니가 뒤에서 다 태워 주니까 편하지." }];
-    if (a === "eileen") return [{ who: K3, text: "언니, 그거 뭐예요? 저도 해 봐도…" }, { who: n("eileen"), text: "만지지 마." }, { who: K3, text: "저도 정식 멤버거든요!" }];
-    if (a === "deadpole" || a === "geshugan" || a === "rojemon") return [{ who: n("deadpole"), text: "게슈간 씨, 타자 연습 오늘도 하실 거예요?" }, { who: n("geshugan"), text: "…안 해." }, { who: n("rojemon"), text: "해. 보고서 나 혼자 쓰기 싫어." }];
-    return pick5(
-      [
-        [{ who: J, text: "부장님, 연유 커피 한 번만 드셔 보세요. 한 모금만." }, { who: n("jyaldi"), text: "블랙." }],
-        [{ who: D2, text: "미, 믹스커피가 제일이에요…" }, { who: G, text: "믹스는 진리일세!!! 블랙 마시는 자는 설탕 두 스푼 추가일세!!!" }]
-      ],
-      r
-    );
-  }
-  function stageHooks() {
-    return {
-      elevator: {
-        // n: 이번 출동 탑승 횟수. 첫 번째는 사적인 호명, 그 뒤로는 총애에 따라
-        callout(agent, favor, n) {
-          if (!isAgent(agent)) return null;
-          if (n <= 1 || favor === 0) return CALLS[agent][(n - 1 + CALLS[agent].length) % CALLS[agent].length];
-          const list = favor > 0 ? FAVOR_LINES[agent].high : FAVOR_LINES[agent].low;
-          return list[n % list.length] ?? null;
-        },
-        reaction(agent) {
-          return isAgent(agent) ? agentLine(agent, "enter_elevator") ?? null : null;
-        }
-      },
-      passenger: {
-        talk(kind, honest, long) {
-          switch (kind) {
-            case "three_years":
-              return long ? ["나 여기 삼 년째야. 처음엔 정장 입은 사람들이랑 같이 왔어. 다섯 명이었지. 첫 층에서 하나, 추격하는 층에서 둘을 잃었어. 그 뒤로 문을 하나하나 다 열어 봤어.", "아무튼 내 말 들어. 진짜야. 믿어도 돼."] : ["나 여기 삼 년째야. 그러니까 내 말 들어.", honest ? "저쪽 문 말고 이쪽." : "다음 버튼은… 내가 알아."];
-            case "markers":
-              return ["쉿. 벽 봤어? 우리가 남긴 거야.", "동그라미 안에 줄 하나면 위험, 비어 있으면 쉼터. 너희도 남겨. 다음 사람을 위해서."];
-            case "supply":
-              return long ? ["배낭 무거워 보이네. 다락방에 숨겨 둔 게 있는데, 같이 가면 나눠 줄게. 정말이야, 나 혼자 다 못 먹어."] : ["다락방 오른쪽 구석에 약이랑 손전등 숨겨 놨어. 가져가. 나는 이제 필요 없어."];
-            case "nothuman":
-              return ["…………", "(벽에 기대 선 승객. 숨을 쉬지 않는다. 얼굴을 보려 하면 고개가 같이 돈다)"];
-            case "missing":
-              return ["…관리국? 진짜요? 저 그냥 야근하고 집에 가려고…", "몇 층인지 모르겠어요. 계속 내려가기만 했어요. 같이 나가게 해 주세요."];
-          }
-          return null;
-        }
-      }
-    };
-  }
-
   // src/game/action/story/index.ts
+  var CUTSCENES = {};
   var CUSTOM = {
     ruleBroken: "rule:break",
     guardianCleared: "win"
@@ -2742,16 +2035,16 @@ jaemtri(smile): 다들 살아서 왔으니까 됐어. 건배.
   function mountStory(root, host, opts = {}) {
     const saved = opts.saved;
     const style = document.createElement("style");
-    style.textContent = style_default2;
+    style.textContent = style_default;
     root.append(style);
     if (opts.dock !== "bottom") root.classList.add("gsy-top");
-    const rng2 = Math.random;
+    const rng3 = Math.random;
     const flags = { favor: 0, rules: 0, ...saved ?? {} };
     const lib = buildLibrary();
     const ui = new StoryUI(root, (k) => host.photo?.(k));
     const panel = new TalkPanel(root);
     const talker = new FreeTalk({ model: host.talkModel });
-    const picker = new BarkPicker(rng2);
+    const picker = new BarkPicker(rng3);
     if (opts.eager) {
       picker.gap = 0.4;
       picker.tagCool = 0;
@@ -2776,7 +2069,7 @@ jaemtri(smile): 다들 살아서 왔으니까 됐어. 건배.
       get agent() {
         return agent();
       },
-      rng: rng2,
+      rng: rng3,
       speakerName: (who) => castOf(who, agent()).name,
       agentLine: (a, tag2, r) => lookupLine(a, tag2, flags, r),
       emit: (event2, arg) => {
@@ -2789,11 +2082,11 @@ jaemtri(smile): 다들 살아서 왔으니까 됐어. 건배.
       blocking = on;
       host.pause?.(on);
     };
-    const show = (s2) => {
-      if (s2.kind === "say") {
-        ui.line(castOf(s2.who, agent()), s2.text, s2.mood);
-        if (s2.who === "elevator") host.sfx?.("intercom");
-      } else if (s2.kind === "choice") ui.choices(s2.options);
+    const show = (s) => {
+      if (s.kind === "say") {
+        ui.line(castOf(s.who, agent()), s.text, s.mood);
+        if (s.who === "elevator") host.sfx?.("intercom");
+      } else if (s.kind === "choice") ui.choices(s.options);
       else {
         ui.close();
         const cb = doneCb;
@@ -2804,26 +2097,11 @@ jaemtri(smile): 다들 살아서 왔으니까 됐어. 건배.
     };
     const video = new VideoPlayer(root);
     const refresh = () => setBlocking(ui.boxOpen || !!scene || panel.isOpen || video.open);
-    const evacWrap = (id) => {
-      const pairs = EVAC_PAIRS[agent()] ?? [];
-      if (!pairs.length) return id;
-      const p = pairs[Math.floor(rng2() * pairs.length) % pairs.length];
-      host.emit?.("buddy", p.by);
-      host.actor?.("buddy", { anim: p.by, show: true }, 0);
-      const tmp = `__evac_${id}`;
-      lib.scripts.delete(tmp);
-      lib.add(`=== ${tmp}
-${p.by}: ${p.lines[0]}
-agent: ${p.lines[1]}
-> call ${id}
-`, "evac");
-      return tmp;
-    };
     const say = (id, vars, onDone) => {
       syncAgent();
       if (vars) Object.assign(flags, vars);
       doneCb = onDone;
-      show(runner.start(id === "evac_wake" || id === "cs_evac" ? evacWrap(id) : id));
+      show(runner.start(id));
     };
     const advance = () => {
       if (video.open) {
@@ -2846,24 +2124,24 @@ agent: ${p.lines[1]}
       if (runner.current.kind === "choice") show(runner.choose(index));
     };
     const anchorOf = (id) => () => host.anchor?.(id) ?? null;
-    const bark = (who, text2, ms = 2600) => {
+    const bark = (who, text, ms = 2600) => {
       const id = who === "agent" ? agent() : who;
       const c = castOf(id, agent());
-      const key2 = AGENTS2[id] ? "agent" : id;
-      ui.bubble(text2, anchorOf(key2), ms, c.color, who === "elevator" ? "승강기" : "", key2);
+      const key = AGENTS[id] ? "agent" : id;
+      ui.bubble(text, anchorOf(key), ms, c.color, who === "elevator" ? "승강기" : "", key);
     };
-    const singleLine = (who, text2) => {
+    const singleLine = (who, text) => {
       const tmp = "__line";
       lib.scripts.delete(tmp);
       lib.add(`=== ${tmp}
-${who}: ${text2.replace(/\n/g, " ")}
+${who}: ${text.replace(/\n/g, " ")}
 `, "line");
       say(tmp);
     };
     let sceneVeiled = false;
-    const io = {
-      bg: (s2) => {
-        if (host.bg) host.bg(s2);
+    const io2 = {
+      bg: (s) => {
+        if (host.bg) host.bg(s);
         else sceneVeiled = true;
       },
       fade: (to, ms) => ui.fade(to === "clear" && sceneVeiled ? "dim" : to, ms),
@@ -2876,9 +2154,9 @@ ${who}: ${text2.replace(/\n/g, " ")}
       bark: (who, t, ms) => bark(who, t, ms),
       emit: (e, a) => host.emit?.(e, a),
       dialogue: (id) => say(id),
-      line: (who, text2) => singleLine(who, text2),
+      line: (who, text) => singleLine(who, text),
       agentLine: (tag2) => {
-        const t = lookupLine(agent(), tag2, flags, rng2);
+        const t = lookupLine(agent(), tag2, flags, rng3);
         if (t) singleLine("agent", t);
       },
       talking: () => ui.boxOpen,
@@ -2898,7 +2176,7 @@ ${who}: ${text2.replace(/\n/g, " ")}
           return;
         }
         syncAgent();
-        const subs = v.subs.map((s2) => s2.text.includes("{call}") ? { ...s2, text: s2.text.replace("{call}", lookupLine(agent(), "el:call", flags, rng2) ?? "…") } : s2);
+        const subs = v.subs;
         const base2 = host.videoUrl ? host.videoUrl(id) : `${repoRoot()}${VIDEO_DIR}${id}/`;
         if (!base2) {
           onDone?.();
@@ -2927,7 +2205,7 @@ ${who}: ${text2.replace(/\n/g, " ")}
       }
       syncAgent();
       sceneVeiled = false;
-      scene = new Cutscene(def, io);
+      scene = new Cutscene(def, io2);
       sceneDone = onDone;
       flags[`seen.cs.${id}`] = 1;
       ui.setSkippable(true);
@@ -2941,8 +2219,7 @@ ${who}: ${text2.replace(/\n/g, " ")}
       gognija: "오오! 무엇이든 묻게! 대답은 장담 못 하네!",
       dejure: "네, 네…? 저, 저한테요…?",
       konjyuce: "네! 뭐든 물어보세요!",
-      madeokhee: "어머, 자기야. 뭐 팔 거 있어요?",
-      elevator: "…듣고 있어요."
+      madeokhee: "어머, 자기야. 뭐 팔 거 있어요?"
     };
     panel.onClose = () => {
       panel.close();
@@ -2952,14 +2229,14 @@ ${who}: ${text2.replace(/\n/g, " ")}
       talkDone = void 0;
       cb?.();
     };
-    panel.onSend = async (text2) => {
+    panel.onSend = async (text) => {
       const npc = talkNpc;
       if (!npc) return;
-      panel.add("me", text2);
+      panel.add("me", text);
       panel.waiting(true);
       const p = panel.add("npc", "…");
       p.classList.add("wait");
-      const res = await talker.reply(npc, text2, agent(), flags);
+      const res = await talker.reply(npc, text, agent(), flags);
       p.classList.remove("wait");
       p.textContent = res.text;
       panel.waiting(false);
@@ -2969,7 +2246,7 @@ ${who}: ${text2.replace(/\n/g, " ")}
       talkNpc = npc;
       talkDone = onDone;
       const c = castOf(npc, agent());
-      panel.open(c, c.photo ? host.photo?.(c.photo) : void 0, greet[npc] ?? (AGENTS2[npc] ? lookupLine(npc, "offer", flags, rng2) ?? "…" : "…"));
+      panel.open(c, c.photo ? host.photo?.(c.photo) : void 0, greet[npc] ?? (AGENTS[npc] ? lookupLine(npc, "offer", flags, rng3) ?? "…" : "…"));
       refresh();
     };
     let bossUp = false;
@@ -2989,11 +2266,6 @@ ${who}: ${text2.replace(/\n/g, " ")}
         if (f.depth !== void 0) flags.depth = Number(f.depth);
         if (f.type !== void 0) flags.ftype = String(f.type);
         if (Number(flags.depth) >= 15) flags.reached_b12 = 1;
-        if (opts.announce && Number(flags.announced) !== Number(flags.depth)) {
-          const t = lookupLine(agent(), "el:announce", flags, rng2);
-          if (t) bark("elevator", t, 2400);
-        }
-        flags.announced = Number(flags.depth);
       }
       if (name === "find:rule" || name === "ruleFound") {
         const id = String(data.id ?? data.rule ?? "");
@@ -3086,7 +2358,228 @@ ${who}: ${text2.replace(/\n/g, " ")}
     };
   }
 
+  // src/game/world/toilets.ts
+  var MALE_LOOKS = /* @__PURE__ */ new Set(["고그니쟈", "큐라스", "고르고디오", "곽성주", "조성춘", "윤병수", "김성진", "송진섭", "사장", "도필헌", "이길환", "이기석", "김조학", "이도형", "고영훈", "노기균", "송주익", "장허운", "곽제강", "이병진", "제이", "호유원", "이자헌", "박민성", "백사헌", "살라딘", "경찰남1", "경찰남2", "관리국남A", "관리국남B", "가짜관리국검사A", "백일몽남A", "백일몽남B", "협회남1", "협회남2", "가짜관리국검사B", "프리랜서남1", "프리랜서남2", "프리랜서남3", "프리랜서남4", "상인남1", "가짜관리국검사C", "상인남2", "상인남3", "상인남4", "의사1", "청소부남1", "가짜관리국진압A", "시민남1", "시민남2", "시민남3", "시민남4", "시민남5", "시민남6", "가짜관리국진압B", "시민남7", "시민남8", "시민남9", "가짜관리국진압C", "불량배남2"]);
+  var FEMALE_LOOKS = /* @__PURE__ */ new Set(["게슈간", "로제몬", "콘쥬스", "쟈알디", "스팡달", "잼트리", "에일린", "데쥬레", "데드폴", "고영은", "강이학", "이연화", "청달래", "백석주", "진나솔", "이성해", "은하제", "아벤샤", "차여진", "서윤지", "고연지", "윤지아", "마덕희", "문혜란", "신유리", "블라렛", "세크리엠", "불량배여1", "불량배여3", "경찰여1", "경찰여2", "관리국여A", "관리국여B", "백일몽여A", "백일몽여B", "협회여1", "협회여2", "협회여3", "프리랜서여1", "프리랜서여2", "프리랜서여3", "프리랜서여4", "프리랜서여5", "상인여1", "상인여2", "상인여3", "간호사1", "청소부여1", "시민여1", "시민여2", "시민여3", "시민여4", "시민여5", "시민여6", "시민여7", "시민여8", "시민여9"]);
+  var WASH = { id: "wash", need: "bladder", clip: "line:104", where: ["restroom"], sec: [4, 6], fill: 0, label: "손 씻는 중" };
+  var STALL_DOOR_SEC = 0.45;
+  var TOILET_SEAT = {
+    쟈알디: [173, 10],
+    스팡달: [173, 1],
+    잼트리: [173, 0],
+    에일린: [179, 10],
+    고그니쟈: [167, 6],
+    큐라스: [167, 7],
+    고르고디오: [164, 0],
+    데쥬레: [173, 0],
+    데드폴: [159, 12],
+    게슈간: [167, 0],
+    로제몬: [173, 7],
+    콘쥬스: [187, 8],
+    관리국남A: [169, 5],
+    관리국남B: [169, 5],
+    관리국여A: [171, 3],
+    관리국여B: [170, 10],
+    // 15:10 사용자 「모든 세력 돌려쓸건데 관리국만 맞추면 뭐해」 → 앉는 동작(102)이 있는 나머지 101명도 같은 기준으로 확대 그림에서 하나씩 (허리 가운데로 좌우)
+    사장: [164, 0],
+    도필헌: [161, 7],
+    이길환: [162, 0],
+    이기석: [168, 0],
+    김조학: [172, 6],
+    이도형: [165, 3],
+    고영훈: [158, -1],
+    노기균: [171, 4],
+    송주익: [170, 0],
+    곽성주: [168, 1],
+    조성춘: [170, 5],
+    윤병수: [167, 9],
+    김성진: [172, 10],
+    송진섭: [171, 10],
+    청달래: [167, 1],
+    호유원: [171, 5],
+    백석주: [173, 1],
+    진나솔: [166, 10],
+    이성해: [169, 10],
+    이자헌: [165, 0],
+    은하제: [164, 0],
+    박민성: [169, 4],
+    백사헌: [166, 13],
+    고영은: [172, 0],
+    강이학: [165, 1],
+    장허운: [172, 13],
+    곽제강: [170, 1],
+    이연화: [167, 0],
+    이병진: [168, -1],
+    제이: [170, 1],
+    차여진: [174, 3],
+    서윤지: [167, 13],
+    고연지: [177, 9],
+    윤지아: [183, 1],
+    마덕희: [174, 14],
+    문혜란: [176, 0],
+    신유리: [166, 0],
+    블라렛: [174, 12],
+    살라딘: [170, 0],
+    아벤샤: [172, 6],
+    세크리엠: [170, 0],
+    가짜관리국검사A: [166, 2],
+    가짜관리국검사B: [165, 4],
+    가짜관리국검사C: [168, -1],
+    가짜관리국진압A: [171, -1],
+    가짜관리국진압B: [168, 7],
+    가짜관리국진압C: [169, 4],
+    불량배남2: [171, 6],
+    불량배여1: [167, 0],
+    불량배여3: [172, 10],
+    경찰남1: [172, 12],
+    경찰남2: [166, 5],
+    경찰여1: [168, 1],
+    경찰여2: [174, 6],
+    백일몽남A: [170, 8],
+    백일몽남B: [168, 4],
+    백일몽여A: [172, 11],
+    백일몽여B: [170, 0],
+    협회남1: [166, 5],
+    협회남2: [168, 0],
+    협회여1: [164, 0],
+    협회여2: [169, 6],
+    협회여3: [171, 0],
+    프리랜서남1: [173, 9],
+    프리랜서남2: [169, 9],
+    프리랜서남3: [166, 4],
+    프리랜서남4: [166, 11],
+    프리랜서여1: [169, 1],
+    프리랜서여2: [173, 11],
+    프리랜서여3: [168, 0],
+    프리랜서여4: [171, 7],
+    프리랜서여5: [171, 11],
+    상인남1: [166, 2],
+    상인남2: [169, 2],
+    상인남3: [170, 9],
+    상인남4: [171, 8],
+    상인여1: [173, 4],
+    상인여2: [171, 6],
+    상인여3: [170, 0],
+    의사1: [169, 6],
+    간호사1: [170, 0],
+    청소부남1: [169, 7],
+    청소부여1: [169, 2],
+    시민남1: [171, 5],
+    시민남2: [173, 4],
+    시민남3: [171, 5],
+    시민남4: [169, 7],
+    시민남5: [168, 7],
+    시민남6: [169, 6],
+    시민남7: [172, 7],
+    시민남8: [167, 9],
+    시민남9: [168, 4],
+    시민여1: [167, 1],
+    시민여2: [168, 0],
+    시민여3: [172, 9],
+    시민여4: [176, 10],
+    시민여5: [171, 9],
+    시민여6: [172, 3],
+    시민여7: [171, 6],
+    시민여8: [170, 0],
+    시민여9: [170, 7]
+  };
+  var LAP_BASE = 173;
+  function seatFeet(seat, look) {
+    const [lap, dx] = TOILET_SEAT[look] ?? [LAP_BASE, 0];
+    const k = seat.k ?? 1.25;
+    return { x: seat.x + dx * k, y: seat.y + (LAP_BASE - lap) * k };
+  }
+
+  // src/game/action/hq/showerFx.ts
+  var DOT = 2;
+  var STREAMS = 7;
+  var SPREAD_DEG = 26;
+  var SPEED = 3.6 * DOT;
+  var G = 0.035 * DOT;
+  var NF = 16;
+  var FPS = 8;
+  var C_DEEP = "rgba(120,180,230,0.96)";
+  var C_HI = "rgba(235,250,255,1)";
+  var C_MID = "rgba(160,212,245,0.96)";
+  function rng2(seed) {
+    let a = seed >>> 0;
+    return () => {
+      a = a + 1831565813 >>> 0;
+      let t = a;
+      t = Math.imul(t ^ t >>> 15, t | 1);
+      t ^= t + Math.imul(t ^ t >>> 7, t | 61);
+      return ((t ^ t >>> 14) >>> 0) / 4294967296;
+    };
+  }
+  var dot2 = (c, x, y, col) => {
+    c.fillStyle = col;
+    c.fillRect(Math.round(x / DOT) * DOT, Math.round(y / DOT) * DOT, DOT, DOT);
+  };
+  function faceDir(h) {
+    const [[x0, y0], [x1, y1]] = h.head;
+    const ex = x1 - x0, ey = y1 - y0, L = Math.hypot(ex, ey) || 1;
+    let nx = -ey / L, ny = ex / L;
+    if (ny < 0) {
+      nx = -nx;
+      ny = -ny;
+    }
+    return [nx, ny];
+  }
+  function drawSteam(c, h, headTop, headX, frame) {
+    const r = rng2(h.id.length * 7 + h.foot[0]);
+    for (let k = 0; k < 6; k++) {
+      const bx = headX + (r() * 32 - 16) * DOT, by = headTop + r() * 40 * DOT;
+      const t = (frame + k * NF / 6) % NF / NF;
+      const y = by - t * 34 * DOT, x = bx + Math.sin(t * 6.28 + k) * 5 * DOT;
+      const alpha = 150 * Math.pow(1 - t, 1.2) * Math.min(1, t * 4 + 0.3) / 255, rad = (5 + Math.floor(t * 6)) * DOT;
+      c.fillStyle = `rgba(250,253,255,${alpha.toFixed(3)})`;
+      for (const [ox, oy, rr] of [[0, 0, rad], [-rad * 0.6, rad * 0.3, rad * 0.7], [rad * 0.6, rad * 0.2, rad * 0.75], [0, -rad * 0.5, rad * 0.6]]) {
+        c.beginPath();
+        c.arc(x + ox, y + oy, rr, 0, Math.PI * 2);
+        c.fill();
+      }
+    }
+  }
+  function drawShowerWater(c, h, headTop, now) {
+    const frame = Math.floor(now / 1e3 * FPS) % NF;
+    const [fx2, fy] = h.foot, headX = fx2;
+    if (headTop !== null) drawSteam(c, h, headTop, headX, frame);
+    const [[x0, y0], [x1, y1]] = h.head, [dx, dy] = faceDir(h), base2 = Math.atan2(dy, dx);
+    const r = rng2(h.foot[0] * 100 + h.foot[1]);
+    for (let s = 0; s < STREAMS; s++) {
+      const u = s / (STREAMS - 1);
+      let x = x0 + (x1 - x0) * u, y = y0 + (y1 - y0) * u;
+      const th = base2 + (u - 0.5) * 2 * SPREAD_DEG * Math.PI / 180;
+      let vx = SPEED * Math.cos(th), vy = SPEED * Math.sin(th);
+      for (let i = 0; i < 400; i++) {
+        if (headTop !== null && Math.abs(x - headX) < 10 * DOT && y >= headTop) {
+          for (let k = 0; k < 3; k++) {
+            const a = r() * Math.PI, rr = (3 + r() * 6) * DOT;
+            dot2(c, x + Math.cos(a) * rr, y - Math.abs(Math.sin(a)) * rr * 0.6 + (frame + k) % 3 * DOT, C_HI);
+          }
+          break;
+        }
+        if (y >= fy - 2 * DOT) break;
+        if ((i + frame * 2 + s * 3) % 9 < 7) dot2(c, x, y, i % 11 < 2 ? C_HI : C_DEEP);
+        x += vx;
+        y += vy;
+        vy += G;
+        void vx;
+      }
+    }
+    if (headTop !== null) for (let k = 0; k < 14; k++) {
+      const a = r() * Math.PI, rr = (5 + r() * 14 + (frame + k) % 4) * DOT;
+      dot2(c, headX + Math.cos(a) * rr, headTop + 4 * DOT - Math.abs(Math.sin(a)) * rr * 0.5, k % 3 === 0 ? C_HI : C_MID);
+    }
+    for (let k = 0; k < 16; k++) {
+      const a = r() * Math.PI * 2, rr = (6 + r() * 16) * DOT, ph = (k + frame) % 4;
+      dot2(c, fx2 + Math.cos(a) * rr, fy + Math.sin(a) * rr * 0.3 - ph * DOT, ph === 0 ? C_HI : C_MID);
+    }
+  }
+
   // src/game/action/engine/hub.ts
+  var CORDON_SLOTS = 5;
+  var GEAR_SLOTS = 8;
   var LIFE_SLOTS = 24;
   var TOP = 440;
   var LANE = [LANE_TOP, LANE_BOT];
@@ -3110,6 +2603,8 @@ ${who}: ${text2.replace(/\n/g, " ")}
     let speech = null;
     let curPeople = [];
     let live = [];
+    let cords = [];
+    let gears = [];
     let opening = null;
     let closing = null;
     let rattle = null;
@@ -3118,11 +2613,71 @@ ${who}: ${text2.replace(/\n/g, " ")}
     let callOn = false;
     let near2 = null;
     let solids = [];
+    const gateOpen = /* @__PURE__ */ new Map();
+    let pT = null;
+    const setPT = (v) => {
+      pT = v;
+      host.life?.playerToilet?.(v && scene ? { scene: scene.id, id: v.id, kind: v.kind, phase: v.phase } : null);
+    };
+    let sitChair = null;
+    let showerSpot = null;
+    let curWorld = null;
+    let lockerUse = null;
     let walked = 0;
     let lastX = null;
-    const sceneOf = (id) => view2.scenes.find((s2) => s2.id === id) ?? view2.scenes[0];
+    const sceneOf = (id) => view2.scenes.find((s) => s.id === id) ?? view2.scenes[0];
     const openOf = (id) => opening && opening.id === id ? Math.min(1, opening.t / opening.len) : closing && closing.id === id ? Math.max(0, 1 - closing.t / closing.len) : 0;
+    let peek = null;
+    const stallBusy = (doorId) => live.some((q) => q.toilet?.door === doorId) || !!pT && pT.door === doorId;
     const doorFx = (id) => ({ open: openOf(id), shake: rattle && rattle.id === id ? (rattle.t % 4 < 2 ? 3 : -3) * (1 - rattle.t / RATTLE_T) : 0 });
+    const useToilet = (a, id) => {
+      const t = scene?.toilets?.find((q) => q.id === id);
+      if (!t || !scene) return;
+      const pl = a.world.player;
+      if (t.kind === "stall" && t.door && host.life?.toiletBusy?.(scene.id, id)) {
+        a.movePlayer(t.x, t.y);
+        peek = { door: t.door, x: t.x, y: t.y, id };
+        host.life?.playerPeek?.({ scene: scene.id, id });
+        host.sfx("doorLatch");
+        return;
+      }
+      if (host.life?.toiletBusy?.(scene.id, id)) return a.world.say("누가 쓰고 있다.", 1.5);
+      if (!pl.lifeScene) return;
+      if (t.kind === "stall") {
+        a.movePlayer(t.x, t.y);
+        setPT({ id, kind: "stall", door: t.door, phase: "open", t: Math.round(STALL_DOOR_SEC * 30), front: { x: t.x, y: t.y }, seat: t.seat });
+        host.sfx("doorLatch");
+        return;
+      }
+      const steps = t.kind === "urinal" ? [{ id: "100", n: 3 }] : [{ id: "104", n: 2 }];
+      if (!pl.lifeScene(steps, t.x, t.y, 1)) return a.world.say(t.kind === "urinal" ? "이 사람은 소변기를 쓰지 않는다." : "지금은 할 수 없다.", 1.5);
+      setPT({ id, kind: t.kind, phase: "in", t: 0, front: { x: t.x, y: t.y } });
+    };
+    const stepToilet = (a) => {
+      if (!pT) return;
+      const pl = a.world.player;
+      if (pT.phase === "open") {
+        if (--pT.t > 0) return;
+        const look = pl.label ?? "";
+        const f = pT.seat ? seatFeet(pT.seat, look) : pT.front;
+        if (!pl.lifeScene?.([{ id: "101" }, { id: "102", n: 4 }, { id: "103" }], f.x, f.y, 1)) {
+          a.movePlayer(pT.front.x, pT.front.y);
+          setPT(null);
+          return a.world.say("지금은 할 수 없다.", 1.5);
+        }
+        setPT({ ...pT, phase: "in" });
+        return;
+      }
+      if (pT.phase === "in") {
+        if (pl.lifeSceneOn) return;
+        if (pT.kind !== "stall") return setPT(null);
+        a.movePlayer(pT.front.x, pT.front.y);
+        host.sfx("doorLatch");
+        setPT({ ...pT, phase: "leave", t: Math.round(STALL_DOOR_SEC * 30) });
+        return;
+      }
+      if (--pT.t <= 0) setPT(null);
+    };
     const build = (id, x, y) => {
       view2 = host.map();
       const base2 = sceneOf(id);
@@ -3130,7 +2685,11 @@ ${who}: ${text2.replace(/\n/g, " ")}
         const at2 = clearSpot(p.x, p.y, base2.boxes.filter((b) => b.solid).map((b) => ({ x: b.x, y: b.y, w: b.w, back: b.d + 6, front: 8 })), base2.lane ?? LANE);
         return { ...p, x: at2.x, y: at2.y };
       });
-      const sc = { ...base2, spots: [...base2.spots, ...people.map((p) => ({ id: `visit:${p.name}`, x: p.x, y: p.y, who: p.name, verb: "대화", face: p.face, open: true }))] };
+      const toiletSpots = (base2.toilets ?? []).map((t) => ({ id: `toilet:${t.id}`, x: t.x, y: t.y, verb: t.kind === "stall" ? "칸" : t.kind === "urinal" ? "소변기" : "손 씻기", face: 1, open: true }));
+      const sc = { ...base2, spots: [...base2.spots, ...toiletSpots, ...people.map((p) => ({ id: `visit:${p.name}`, x: p.x, y: p.y, who: p.name, verb: "대화", face: p.face, open: true }))] };
+      if (pT) setPT(null);
+      peek = null;
+      gateOpen.clear();
       curPeople = people;
       speech = null;
       const prev = scene;
@@ -3148,12 +2707,11 @@ ${who}: ${text2.replace(/\n/g, " ")}
       closing = sc.painted && inDoor ? { id: inDoor.id, t: 0, len: openLen(sc, inDoor) } : null;
       arriveDoor = null;
       near2 = null;
-      const man = sc.id === "office" && hasTestPeople() ? { x: 900, y: 560 } : null;
-      solids = [...man ? [{ x: man.x, y: man.y, w: 70, back: 20, front: 20 }] : [], ...sc.boxes.filter((b) => b.solid).map((b) => ({ x: b.x, y: b.y, w: b.w, back: b.d + 6, front: 8, h: sc.painted ? b.h : void 0 })), ...people.map((p) => ({ x: p.x, y: p.y, w: 80, back: 24, front: 24 }))];
+      solids = [...sc.boxes.filter((b) => b.solid).map((b) => ({ x: b.x, y: b.y, w: b.w, back: b.d + 6, front: 8, h: sc.painted ? b.h : void 0 })), ...people.map((p) => ({ x: p.x, y: p.y, w: 80, back: 24, front: 24 }))];
       const len = Math.max(SCREEN_W, sc.length);
       const sx = Math.max(60, Math.min(len - 60, x));
       arrive = { x: sx, y };
-      const place3 = HQ_PLACE[sc.id] ?? HQ_PLACE[sc.look] ?? "hq_office";
+      const place = HQ_PLACE[sc.id] ?? HQ_PLACE[sc.look] ?? "hq_office";
       return {
         id: `hq:${sc.id}`,
         title: sc.name,
@@ -3165,14 +2723,25 @@ ${who}: ${text2.replace(/\n/g, " ")}
         props: [],
         encounters: [],
         platforms: sc.painted ? sc.boxes.filter((b) => b.solid && b.h > 0 && b.h < 400).map((b) => ({ x0: b.x - b.w / 2, x1: b.x + b.w / 2, y0: b.y - b.d, y1: b.y, h: b.h })) : void 0,
-        depthLayers: sc.boxes.map((b) => ({ y: b.y, occludedSilhouette: !sc.painted, x0: b.x - b.w / 2, x1: b.x + b.w / 2, draw: (c) => {
-          if (sc.painted && hasHqField(sc.painted)) {
-            drawHqFieldObject(c, sc.painted, b.kind);
+        depthLayers: sc.boxes.map((b, bi) => ({ y: b.y, occludedSilhouette: !sc.painted, x0: b.x - b.w / 2, x1: b.x + b.w / 2, draw: (c) => {
+          if (b === sitChair || live.some((q) => q.seat?.box === bi)) return;
+          if (sc.painted && hasHqField(sc.painted) && b.kind !== "chair" && b.kind !== "armchair") {
+            drawHqFieldObject(c, sc.painted, b.kind, gateOpen.get(b.kind) ?? 0, stallBusy(b.kind));
             return;
           }
           drawBox(c, b, sc.look);
         } })).concat(people.map((p) => ({ y: p.y, x0: p.x - 60, x1: p.x + 60, occludedSilhouette: false, draw: (c) => {
-          drawVisitAgent(c, p.name, p.x, p.y, p.face, performance.now());
+          drawCharClip(c, p.name, p.x, p.y, p.face, performance.now());
+        } }))).concat((sc.painted && PAINTED[sc.painted]?.showers ? PAINTED[sc.painted].showers : []).map((sh) => ({ y: sh.foot[1] + 1, x0: sh.foot[0] - 80, x1: sh.foot[0] + 80, occludedSilhouette: false, draw: (c) => {
+          if (showerSpot !== sh.id) {
+            const u = host.life?.showerUsers?.(sc.id).find((q) => q.id === sh.id);
+            if (!u) return;
+            drawShowerWater(c, sh, u.y + charTop(u.look) * spr(u.y), performance.now());
+            return;
+          }
+          const pl = curWorld?.player ?? null;
+          const top = pl ? (pl.art ? charTop(pl.art.key) : -230) * spr(pl.y) : -230;
+          drawShowerWater(c, sh, pl ? pl.y + top : null, performance.now());
         } }))).concat(host.life ? Array.from({ length: LIFE_SLOTS }, (_, i) => ({
           get y() {
             return live[i]?.y ?? -1e9;
@@ -3188,9 +2757,38 @@ ${who}: ${text2.replace(/\n/g, " ")}
             const a = live[i];
             if (a) drawLiveActor(c, a, host.life);
           }
-        })) : []).concat(man ? [{ y: man.y, x0: man.x - 60, x1: man.x + 60, occludedSilhouette: false, draw: (c) => {
-          drawTestMan(c, man.x, man.y, -1);
-        } }] : []),
+        })) : []).concat(host.life?.gear ? Array.from({ length: GEAR_SLOTS }, (_, i) => ({
+          get y() {
+            return gears[i]?.y ?? -1e9;
+          },
+          get x0() {
+            return (gears[i]?.x ?? -1e9) - 40;
+          },
+          get x1() {
+            return (gears[i]?.x ?? -1e9) + 40;
+          },
+          occludedSilhouette: false,
+          draw: (c) => {
+            const g = gears[i];
+            if (g) drawGear(c, g, performance.now() / 1e3);
+          }
+        })) : []).concat(host.life?.cordons ? Array.from({ length: CORDON_SLOTS * 2 }, (_, i) => ({
+          get y() {
+            const b = cords[i >> 1];
+            return b ? i & 1 ? b.y1 : b.y0 : -1e9;
+          },
+          get x0() {
+            return cords[i >> 1]?.x0 ?? -1e9;
+          },
+          get x1() {
+            return cords[i >> 1]?.x1 ?? -1e9;
+          },
+          occludedSilhouette: false,
+          draw: (c) => {
+            const b = cords[i >> 1];
+            if (b) drawCordon(c, b, !!(i & 1), performance.now() / 1e3);
+          }
+        })) : []),
         drawBackground(c, camX) {
           if (sc.painted && drawHqField(c, sc.painted, camX, doorFx, host.hour?.() ?? null)) {
             if (sc.floor === "2F" || sc.floor === "3F") drawHqSigns(c, sc.painted, sc.doors);
@@ -3198,11 +2796,11 @@ ${who}: ${text2.replace(/\n/g, " ")}
             return;
           }
           if (sc.legacy) {
-            const cov = drawHqWall(c, place3, sc.id, len, TOP, sc.doors);
+            const cov = drawHqWall(c, place, sc.id, len, TOP, sc.doors);
             artDoors = cov ?? /* @__PURE__ */ new Set();
             c.fillStyle = "rgba(0,0,0,0.35)";
             c.fillRect(camX - 40, TOP - 14, view.w + 80, 14);
-            if (!drawFloor(c, place3, camX - 40, camX + view.w + 40, TOP, SCREEN_H)) {
+            if (!drawFloor(c, place, camX - 40, camX + view.w + 40, TOP, SCREEN_H)) {
               c.fillStyle = "#2b3135";
               c.fillRect(camX - 40, TOP, view.w + 80, SCREEN_H - TOP);
             }
@@ -3212,8 +2810,8 @@ ${who}: ${text2.replace(/\n/g, " ")}
             return;
           }
           drawRoomShell(c, sc, camX);
-          const textured = (sc.id === "office" || sc.id === "f2") && drawHqTextureWall(c, place3, len, camX, sc.doors.filter((d3) => !isS(d3)).map((d3) => ({ x: d3.x, width: d3.kind === "glass" ? 192 : DOOR_W[d3.kind] + 24 })));
-          if (sc.id === "office" || sc.id === "f2") drawFloor(c, place3, camX - 40, camX + view.w + 40, TOP, SCREEN_H);
+          const textured = (sc.id === "office" || sc.id === "f2") && drawHqTextureWall(c, place, len, camX, sc.doors.filter((d3) => !isS(d3)).map((d3) => ({ x: d3.x, width: d3.kind === "glass" ? 192 : DOOR_W[d3.kind] + 24 })));
+          if (sc.id === "office" || sc.id === "f2") drawFloor(c, place, camX - 40, camX + view.w + 40, TOP, SCREEN_H);
           for (const f of sc.fixtures) {
             if (!textured || f.kind === "directory") drawFixture(c, f, sc.look, camX);
           }
@@ -3231,19 +2829,25 @@ ${who}: ${text2.replace(/\n/g, " ")}
             for (const d3 of sc.doors) if (isS(d3)) drawExitLintel(c, d3, camX);
           }
           if (sc.painted) drawHqFieldLight(c, sc.painted, camX, host.hour?.() ?? null, now);
-          if (sc.painted === "b3" && host.armed?.()) drawDepartArrow(c, camX, now);
           const z = view.zoom;
           c.save();
           c.scale(1 / z, 1 / z);
           const shown = host.life ? live.filter((a) => a.kind === "named") : people;
-          host.overlay?.(c, shown.map((p) => ({ name: p.name, x: p.x * z, y: p.y * z, top: visitAgentTop(p.name) * persp(p.y) * z })), { name: "", x: w.player.x * z, y: (w.player.y - w.player.z) * z, top: (hasTestPeople() ? testPlayerTop() : visitAgentTop("쟈알디")) * persp(w.player.y) * z });
+          const mobsShown = host.life ? live.filter((a) => a.kind === "mob" && (a.talk || a.rel === "foe")) : [];
+          host.overlay?.(c, [
+            ...shown.map((p) => {
+              const rel = p.rel;
+              return { name: p.name, x: p.x * z, y: p.y * z, top: namedTop(p.name) * spr(p.y) * z, ...rel ? { rel } : {} };
+            }),
+            ...mobsShown.map((p) => ({ name: `mob:${p.id}`, label: p.name, mob: true, x: p.x * z, y: p.y * z, top: (p.look && charArt(p.look) ? charTop(p.look) : -230) * spr(p.y) * z, ...p.rel ? { rel: p.rel } : {} }))
+          ], { name: "", x: w.player.x * z, y: (w.player.y - w.player.z) * z, top: (w.player.art ? charTop(w.player.art.key) : -230) * spr(w.player.y) * z });
           c.restore();
           if (host.life) {
             c.save();
             c.scale(1 / z, 1 / z);
             for (const a of live) {
               if (!a.icon && !a.say) continue;
-              const top = (a.kind === "named" ? visitAgentTop(a.name) : hasTestPeople() ? testManTop() : -230) * persp(a.y);
+              const top = (a.kind === "named" ? namedTop(a.name) : a.look && charArt(a.look) ? charTop(a.look) : -230) * spr(a.y);
               drawHeadBubble(c, a.x * z, (a.y + top) * z - 8, a.say ?? a.icon, !!a.say);
             }
             c.restore();
@@ -3260,6 +2864,10 @@ ${who}: ${text2.replace(/\n/g, " ")}
     };
     const go = (sceneId, x, y) => {
       view.worldH = sceneOf(sceneId).painted ? PAINTED[sceneOf(sceneId).painted]?.h ?? 700 : SCREEN_H;
+      view.charMul = sceneOf(sceneId).painted && PAINTED[sceneOf(sceneId).painted]?.dotK ? PAINTED[sceneOf(sceneId).painted].dotK / CHAR_K : 1;
+      view.far = sceneOf(sceneId).painted && PAINTED[sceneOf(sceneId).painted]?.far || FAR;
+      view.growTo = sceneOf(sceneId).painted && PAINTED[sceneOf(sceneId).painted]?.growTo || 0;
+      view.sizes = sceneOf(sceneId).painted && PAINTED[sceneOf(sceneId).painted]?.sizes || [];
       pending = { scene: sceneId, x, y };
       fadeOut = FADE;
     };
@@ -3273,15 +2881,15 @@ ${who}: ${text2.replace(/\n/g, " ")}
       go(sceneId, t.x, t.y);
     };
     const target = (px, py) => {
-      if (!scene) return null;
+      if (!scene || pT) return null;
       let best = null;
       const consider = (id, kind, x, ok) => {
         const d3 = Math.abs(x - px);
         if (ok && (!best || d3 < best.d)) best = { id, kind, x, d: d3 };
       };
-      for (const s2 of scene.spots) {
-        const ok = Math.abs(s2.x - px) < (s2.y === void 0 ? 60 : 75) && (s2.y === void 0 || Math.abs(s2.y - py) < 55);
-        consider(`spot:${s2.id}`, "hubspot", s2.x, ok);
+      for (const s of scene.spots) {
+        const ok = Math.abs(s.x - px) < (s.y === void 0 ? 60 : 75) && (s.y === void 0 || Math.abs(s.y - py) < 55);
+        consider(`spot:${s.id}`, "hubspot", s.x, ok);
       }
       for (const d3 of scene.doors) {
         const reach = Math.abs(d3.x - px) < (scene.legacy ? 60 : 75);
@@ -3298,27 +2906,61 @@ ${who}: ${text2.replace(/\n/g, " ")}
       firstFloor: () => {
         const v = host.map();
         view2 = v;
-        const s2 = pending ?? v.start;
+        const s = pending ?? v.start;
         pending = null;
         fadeOut = 0;
-        return build(s2.scene, s2.x, s2.y);
+        return build(s.scene, s.x, s.y);
       },
       nextFloor: () => {
-        const s2 = pending ?? { scene: scene?.id ?? "office", x: 400 };
+        const s = pending ?? { scene: scene?.id ?? "office", x: 400 };
         pending = null;
-        return build(s2.scene, s2.x, s2.y);
+        return build(s.scene, s.x, s.y);
       },
       tick(a) {
+        if (scene?.painted) for (const o of PAINTED[scene.painted]?.objects ?? []) {
+          if (!o.frames) continue;
+          const want = live.some((q) => q.toilet?.door === o.id && q.toilet.open) || !!pT && pT.door === o.id && pT.phase !== "in" || peek?.door === o.id;
+          const t2 = gateOpen.get(o.id) ?? 0;
+          gateOpen.set(o.id, Math.max(0, Math.min(1, t2 + (want ? 1 : -1) / (STALL_DOOR_SEC * 30))));
+        }
+        if (pT) stepToilet(a);
+        if (peek && (Math.hypot(a.world.player.x - peek.x, a.world.player.y - peek.y) > 70 || !stallBusy(peek.door))) peek = null;
+        if (scene?.painted) for (const o of PAINTED[scene.painted]?.objects ?? []) {
+          if (!o.gate) continue;
+          const pl = a.world.player;
+          const by = (x, y) => Math.abs(x - (o.x + o.w / 2)) < o.w / 2 + 90 && Math.abs(y - o.sortY) < 140;
+          const near3 = by(pl.x, pl.y) || live.some((q) => by(q.x, q.y));
+          const t2 = gateOpen.get(o.id) ?? 0;
+          gateOpen.set(o.id, Math.max(0, Math.min(1, t2 + (near3 ? 0.12 : -0.08))));
+        }
+        if (sitChair && !a.world.player.seat && !a.world.player.sitting) sitChair = null;
+        curWorld = a.world;
+        if (showerSpot && !a.world.player.showering) {
+          showerSpot = null;
+          host.life?.playerShower?.(null);
+        }
+        {
+          const pl = a.world.player;
+          if (pl.nude && !(scene?.showers?.length || scene?.lockers?.length)) pl.dress?.();
+        }
+        if (lockerUse && (lockerUse.t -= 1 / 60) <= 0) {
+          lockerUse = null;
+          host.life?.playerLocker?.(null);
+        }
         if (host.life && scene) {
-          host.life.tick(1 / 30, { scene: scene.id, x: a.world.player.x, y: a.world.player.y });
+          host.life.tick(1 / 30, { scene: scene.id, x: a.world.player.x, y: a.world.player.y, seat: sitChair ? scene.boxes.indexOf(sitChair) : null });
           const boxes = a.world.player.frame().hit;
           if (boxes.length && host.life.hit) {
             const n = host.life.hit(scene.id, boxes, a.world.player.dir);
             if (n) a.world.emit({ type: "hit", strength: 1, x: boxes[0].x0, y: boxes[0].y, z: 120, dmg: 0, react: "flinch", target: "npc", combo: 0 });
           }
+          host.life.combat?.(a, scene.id);
           live = host.life.actors(scene.id);
+          cords = host.life.cordons?.(scene.id) ?? [];
+          gears = host.life.gear?.(scene.id) ?? [];
           const named = live.filter((q) => q.kind === "named");
-          scene.spots = scene.spots.filter((q) => !q.id.startsWith("visit:")).concat(named.map((q) => ({ id: `visit:${q.name}`, x: q.x, y: q.y, who: q.name, verb: "대화", face: q.face, open: true })));
+          const talkers = live.filter((q) => q.kind === "mob" && q.talk);
+          scene.spots = scene.spots.filter((q) => !q.id.startsWith("visit:")).concat(named.map((q) => ({ id: `visit:${q.name}`, x: q.x, y: q.y, who: q.name, verb: "대화", face: q.face, open: true })), talkers.map((q) => ({ id: `visit:mob:${q.id}`, x: q.x, y: q.y, who: `mob:${q.id}`, verb: "대화", face: q.face, open: true })));
           curPeople = named;
         }
         if (fadeOut > 0 && --fadeOut === 0 && pending) {
@@ -3352,9 +2994,9 @@ ${who}: ${text2.replace(/\n/g, " ")}
         }
         if (closing && ++closing.t >= closing.len) closing = null;
         if (rattle && ++rattle.t >= RATTLE_T) rattle = null;
-        if (solids.length && !p.seat) blockByProps([p], solids.filter((s2) => !(s2.h !== void 0 && p.z >= s2.h - 6)), scene?.lane ?? LANE);
-        if (scene?.painted) {
-          const q = clampPainted(scene.painted, p.x, p.y);
+        if (solids.length && !p.seat && !pT) blockByProps([p], solids.filter((s) => !(s.h !== void 0 && p.z >= s.h - 6)), scene?.lane ?? LANE);
+        if (scene?.painted && !pT) {
+          const q = clampPainted(scene.painted, p.x, p.y, p.z);
           if (q.x !== p.x || q.y !== p.y) a.movePlayer(q.x, q.y);
         }
         const t = p.seat ? null : target(p.x, p.y);
@@ -3364,40 +3006,63 @@ ${who}: ${text2.replace(/\n/g, " ")}
           if (t) a.setProp(t.id, { kind: t.kind, x: p.x, y: p.y, w: 40, h: 10 });
           near2 = id;
         } else if (t) a.setProp(t.id, { x: p.x, y: p.y });
-        const sp = scene?.spots.find((s2) => s2.open && s2.who && s2.place && Math.abs(s2.x - p.x) < 170);
+        const sp = scene?.spots.find((s) => s.open && s.who && s.place && Math.abs(s.x - p.x) < 170);
         if (sp && sp.place !== barked) {
           barked = sp.place;
           const l = host.bark(sp.place);
           if (l) {
             const who = curPeople.find((q) => q.name === l.who);
             const x = who?.x ?? sp.x, y = who?.y ?? sp.y ?? p.y;
-            speech = { who: l.who, text: l.text, x, y, top: (who ? visitAgentTop(l.who) : -200) * persp(y), until: performance.now() + 3800 };
+            speech = { who: l.who, text: l.text, x, y, top: (who ? namedTop(l.who) : -200) * spr(y), until: performance.now() + 3800 };
           }
         } else if (!sp) barked = null;
       },
       onInteract(a, _floor, prop) {
         if (!scene || fadeOut > 0 || opening || callWait) return;
         if (prop.kind === "hubspot") {
-          const s2 = scene.spots.find((q) => `spot:${q.id}` === prop.id);
-          if (!s2) return;
-          if (!s2.open) return a.world.say("아직 쓸 수 없다. 본부 일이 더 진행되면 열린다.", 2.5);
-          if (s2.place) return host.openPlace(s2.place);
-          if (s2.say) return a.world.say(s2.say, 3);
-          if (s2.depart) {
-            const m = host.depart?.();
-            if (m) a.world.say(m, 3);
+          const s = scene.spots.find((q) => `spot:${q.id}` === prop.id);
+          if (!s) return;
+          if (!s.open) return a.world.say("아직 쓸 수 없다. 본부 일이 더 진행되면 열린다.", 2.5);
+          if (s.shop) {
+            const m = host.shop?.(s.shop);
+            if (m) a.world.say(m, 2.5);
             return;
           }
-          if (s2.seat && s2.act?.[0]) {
-            const exit = clearSpot(s2.x, s2.y ?? a.world.player.y, solids, scene.lane ?? LANE);
-            a.world.player.sit(s2.act[0], s2.seat.x, s2.seat.y, s2.face ?? 1, exit);
+          if (s.id.startsWith("toilet:")) return useToilet(a, s.id.slice(7));
+          if (s.place) return host.openPlace(s.place);
+          if (s.say) return a.world.say(s.say, 3);
+          if (s.act?.[0] === "locker") {
+            const pl = a.world.player;
+            const lid = s.id.replace(/^locker:/, "");
+            if (s.y === void 0 || !pl.changeClothes) return;
+            if (host.life?.lockerBusy?.(scene.id, lid)) return a.world.say("누가 쓰고 있다.", 1.5);
+            if (!pl.changeClothes(s.x, s.y, s.face ?? 1)) return;
+            lockerUse = { scene: scene.id, id: lid, t: 2.5 };
+            host.life?.playerLocker?.({ scene: scene.id, id: lid });
+            return;
+          }
+          if (s.act?.[0] === "shower") {
+            const pl = a.world.player;
+            if (s.y === void 0 || !pl.shower) return;
+            if (host.life?.showerBusy?.(scene.id, s.id)) return a.world.say("누가 쓰고 있다.", 1.5);
+            if (!pl.nude) return a.world.say("탈의실 캐비닛에서 옷을 벗고 와야 한다.", 2);
+            if (!pl.shower(s.x, s.y, s.face ?? 1)) return a.world.say("샤워 동작 그림이 없다.", 1.5);
+            showerSpot = s.id;
+            host.life?.playerShower?.({ scene: scene.id, id: s.id });
             host.sat?.();
             return;
           }
-          if (s2.y !== void 0) a.movePlayer(s2.x, s2.y);
-          if (s2.face) a.world.player.dir = s2.face;
-          if (s2.act) host.act?.(s2.act, s2.face);
-          if (/앉기|눕기/.test(s2.verb)) host.sat?.();
+          if (s.seat && s.act?.[0]) {
+            if (s.chair !== void 0 && live.some((q) => q.seat?.box === s.chair)) return a.world.say("누가 앉아 있다.", 1.5);
+            const exit = clearSpot(s.x, s.y ?? a.world.player.y, solids, scene.lane ?? LANE);
+            if (a.world.player.sit(s.act[0], s.seat.x, s.seat.y, s.face ?? 1, exit, s.chair !== void 0 ? scene.boxes[s.chair]?.set : void 0) && s.chair !== void 0) sitChair = scene.boxes[s.chair] ?? null;
+            host.sat?.();
+            return;
+          }
+          if (s.y !== void 0) a.movePlayer(s.x, s.y);
+          if (s.face) a.world.player.dir = s.face;
+          if (s.act) host.act?.(s.act, s.face);
+          if (/앉기|눕기/.test(s.verb)) host.sat?.();
           return;
         }
         if (prop.kind !== "hubdoor") return;
@@ -3411,24 +3076,24 @@ ${who}: ${text2.replace(/\n/g, " ")}
         const len = openLen(scene, d3);
         if (d3.kind === "stairs") {
           const to2 = [d3.up, d3.down].filter((q) => !!q);
-          const label3 = (id) => view2.elevator.find((e) => e.scene === id)?.label ?? id;
+          const label2 = (id) => view2.elevator.find((e) => e.scene === id)?.label ?? id;
           const go1 = (target2) => {
             host.sfx("doorLatch");
             opening = { id: d3.id, t: 0, len, then: () => goDoor(target2, "stairs") };
           };
           if (to2.length === 1) return go1(to2[0]);
-          host.chooseFloor(to2.map((q) => ({ label: label3(q), open: true, here: false })), (i) => {
+          host.chooseFloor(to2.map((q) => ({ label: label2(q), open: true, here: false })), (i) => {
             if (i != null && to2[i]) go1(to2[i]);
           });
           return;
         }
         if (d3.place) {
-          const place3 = d3.place;
+          const place = d3.place;
           host.sfx(scene.painted ? "doorLatch" : d3.kind === "cell" ? "doorSlam" : "doorOpen");
           opening = { id: d3.id, t: 0, len, then: () => {
             opening = null;
             closing = { id: d3.id, t: 0, len };
-            host.openPlace(place3);
+            host.openPlace(place);
           } };
           return;
         }
@@ -3467,23 +3132,23 @@ ${who}: ${text2.replace(/\n/g, " ")}
       nearInfo() {
         if (!scene || !near2 || opening || fadeOut > 0) return null;
         if (near2.startsWith("spot:")) {
-          const s2 = scene.spots.find((q) => `spot:${q.id}` === near2);
-          return s2 ? { text: s2.verb, locked: !s2.open } : null;
+          const s = scene.spots.find((q) => `spot:${q.id}` === near2);
+          return s ? { text: s.verb, locked: !s.open } : null;
         }
         const d3 = scene.doors.find((q) => `door:${q.id}` === near2);
         if (!d3) return null;
-        const text2 = d3.label ?? (d3.kind === "elevator" ? "엘리베이터" : d3.kind === "stairs" ? "계단" : d3.kind === "exit" ? "나가기" : "문");
-        return { text: text2, locked: !d3.open };
+        const text = d3.label ?? (d3.kind === "elevator" ? "엘리베이터" : d3.kind === "stairs" ? "계단" : d3.kind === "exit" ? "나가기" : "문");
+        return { text, locked: !d3.open };
       },
       /** 검사·스크린샷용: 장면으로 바로 */
       jump(sceneId, x = 400, y) {
         if (view2) go(sceneId, x, y);
       },
-      sceneIds: () => (view2 ?? host.map()).scenes.map((s2) => s2.id),
+      sceneIds: () => (view2 ?? host.map()).scenes.map((s) => s.id),
       current: () => scene,
-      goto(place3) {
+      goto(place) {
         if (!view2) return;
-        const t = whereIs2(place3);
+        const t = whereIs2(place);
         go(t.scene, t.x, t.y);
       }
     };
@@ -3502,10 +3167,10 @@ ${who}: ${text2.replace(/\n/g, " ")}
   function drawRoomShell(c, sc, camX) {
     const L = LOOKS2[sc.look] ?? LOOKS2.office;
     const x0 = camX - 40, w = view.w + 80;
-    const g2 = c.createLinearGradient(0, 0, 0, TOP);
-    g2.addColorStop(0, L.wallTop);
-    g2.addColorStop(1, L.wallBot);
-    c.fillStyle = g2;
+    const g = c.createLinearGradient(0, 0, 0, TOP);
+    g.addColorStop(0, L.wallTop);
+    g.addColorStop(1, L.wallBot);
+    c.fillStyle = g;
     c.fillRect(x0, 0, w, TOP);
     c.fillStyle = "rgba(0,0,0,0.35)";
     c.fillRect(x0, 0, w, 24);
@@ -3838,6 +3503,20 @@ ${who}: ${text2.replace(/\n/g, " ")}
     void look;
   }
   function drawChair(c, b) {
+    const CH2 = charFx()?.CHAIR;
+    const set = b.set ? `${b.set}:` : "";
+    const dirName = b.face === "N" ? "north" : b.face === "W" ? b.set ? "east" : "west" : b.face === "E" ? "east" : b.set ? "south-east" : "east";
+    const im = CH2?.[set + dirName] ?? CH2?.[dirName];
+    if (im?.complete && im.naturalWidth) {
+      const k = spr(b.y) * CHAR_K;
+      c.save();
+      c.translate(Math.round(b.x), Math.round(b.y));
+      c.scale(b.set && b.face === "W" ? -k : k, k);
+      c.imageSmoothingEnabled = false;
+      c.drawImage(im, -100, -171);
+      c.restore();
+      return;
+    }
     const seatY = b.y - 82;
     const col = b.kind === "armchair" ? "#8a5b4a" : "#2d3640";
     c.fillStyle = col;
@@ -3876,11 +3555,137 @@ ${who}: ${text2.replace(/\n/g, " ")}
       c.fillRect(x, y, w, DOOR_H);
     }
   }
+  var namedTop = (name) => charArt(name) ? charTop(name) : -230;
   function drawLiveActor(c, a, life) {
     const t = (life.lifeTime?.() ?? performance.now() / 1e3) * 1e3;
-    if (a.kind === "named" && drawVisitAgent(c, a.name, a.x, a.y, a.face, t, a.clip, (a.since ?? 0) * 1e3)) return;
+    const until = a.until === void 0 ? void 0 : a.until * 1e3;
+    if (a.seat && drawCharSeat(c, a.kind === "named" ? a.name : a.look ?? a.name, a.seat.x, a.seat.y, a.face, t, a.seat.dir, a.seat.kind, (a.since ?? 0) * 1e3, until, a.seat.set)) return;
+    if (a.kind === "named" && drawCharClip(c, a.name, a.x, a.y, a.face, t, a.clip, (a.since ?? 0) * 1e3, until)) return;
     if (a.kind === "mob" && life.drawMob) return life.drawMob(c, a);
     silhouette(c, a);
+  }
+  function drawGear(c, g, t) {
+    const k = persp(g.y);
+    const sway = g.busy ? Math.sin(t * 9 + g.x) : 0;
+    c.save();
+    c.fillStyle = "rgba(0,0,0,0.3)";
+    c.beginPath();
+    c.ellipse(g.x, g.y, 26 * k, 6 * k, 0, 0, Math.PI * 2);
+    c.fill();
+    if (g.kind === "sandbag") {
+      const top = g.y - 300 * k, ang = sway * 0.12;
+      c.strokeStyle = "#4a4f55";
+      c.lineWidth = Math.max(1, 3 * k);
+      c.beginPath();
+      c.moveTo(g.x, top);
+      c.lineTo(g.x + Math.sin(ang) * 70 * k, top + 70 * k);
+      c.stroke();
+      c.translate(g.x, top + 70 * k);
+      c.rotate(ang);
+      c.fillStyle = "#8a2e26";
+      c.fillRect(-22 * k, 0, 44 * k, 150 * k);
+      c.fillStyle = "#6d231d";
+      c.fillRect(-22 * k, 0, 44 * k, 10 * k);
+      c.fillRect(-22 * k, 140 * k, 44 * k, 10 * k);
+      c.fillStyle = "rgba(255,255,255,0.12)";
+      c.fillRect(-16 * k, 14 * k, 6 * k, 120 * k);
+    } else if (g.kind === "dummy") {
+      const ang = sway * 0.06;
+      c.fillStyle = "#3d3a36";
+      c.fillRect(g.x - 24 * k, g.y - 8 * k, 48 * k, 8 * k);
+      c.translate(g.x, g.y - 8 * k);
+      c.rotate(ang);
+      c.fillStyle = "#6b4a2b";
+      c.fillRect(-5 * k, -150 * k, 10 * k, 150 * k);
+      c.fillStyle = "#c9a65b";
+      c.fillRect(-26 * k, -205 * k, 52 * k, 90 * k);
+      c.fillStyle = "#b08c45";
+      c.fillRect(-26 * k, -165 * k, 52 * k, 6 * k);
+      c.fillStyle = "#6b4a2b";
+      c.fillRect(-48 * k, -195 * k, 96 * k, 8 * k);
+      c.fillStyle = "#c9a65b";
+      c.beginPath();
+      c.arc(0, -225 * k, 20 * k, 0, Math.PI * 2);
+      c.fill();
+    } else {
+      const dx = sway * 2 * k;
+      c.strokeStyle = "#3d3a36";
+      c.lineWidth = Math.max(1, 4 * k);
+      c.beginPath();
+      c.moveTo(g.x - 16 * k, g.y);
+      c.lineTo(g.x - 8 * k, g.y - 90 * k);
+      c.moveTo(g.x + 16 * k, g.y);
+      c.lineTo(g.x + 8 * k, g.y - 90 * k);
+      c.stroke();
+      c.fillStyle = "#ece8df";
+      c.fillRect(g.x - 30 * k + dx, g.y - 190 * k, 60 * k, 100 * k);
+      for (const [r, col] of [[24, "#c23b30"], [17, "#ece8df"], [10, "#c23b30"], [4, "#ece8df"]]) {
+        c.fillStyle = col;
+        c.beginPath();
+        c.arc(g.x + dx, g.y - 140 * k, r * k, 0, Math.PI * 2);
+        c.fill();
+      }
+    }
+    c.restore();
+  }
+  function drawCone(c, x, y) {
+    const k = persp(y), h = 34 * k, w = 22 * k;
+    c.fillStyle = "rgba(0,0,0,0.3)";
+    c.beginPath();
+    c.ellipse(x, y, w * 0.75, 4 * k, 0, 0, Math.PI * 2);
+    c.fill();
+    c.fillStyle = "#2a2a2a";
+    c.fillRect(Math.round(x - w * 0.62), Math.round(y - 4 * k), Math.round(w * 1.24), Math.max(2, Math.round(4 * k)));
+    c.fillStyle = "#f26a1b";
+    c.beginPath();
+    c.moveTo(x - w / 2, y - 4 * k);
+    c.lineTo(x - 3 * k, y - h);
+    c.lineTo(x + 3 * k, y - h);
+    c.lineTo(x + w / 2, y - 4 * k);
+    c.closePath();
+    c.fill();
+    c.fillStyle = "#f4f1e8";
+    const t0 = 0.45, t1 = 0.62, at2 = (t) => w / 2 - (w / 2 - 3 * k) * t;
+    c.beginPath();
+    c.moveTo(x - at2(t0), y - 4 * k - (h - 4 * k) * t0);
+    c.lineTo(x - at2(t1), y - 4 * k - (h - 4 * k) * t1);
+    c.lineTo(x + at2(t1), y - 4 * k - (h - 4 * k) * t1);
+    c.lineTo(x + at2(t0), y - 4 * k - (h - 4 * k) * t0);
+    c.closePath();
+    c.fill();
+    return h;
+  }
+  function drawTape(c, x0, y0, x1, y1, t, words) {
+    const k = persp((y0 + y1) / 2), sag = 5 * k + 2 * k * Math.sin(t * 2.3 + x0 * 0.05);
+    const mx = (x0 + x1) / 2, my = (y0 + y1) / 2 + sag * 2;
+    c.strokeStyle = "#f2d21b";
+    c.lineWidth = Math.max(2, 5 * k);
+    c.beginPath();
+    c.moveTo(x0, y0);
+    c.quadraticCurveTo(mx, my, x1, y1);
+    c.stroke();
+    if (!words || Math.abs(x1 - x0) < 60 * k) return;
+    c.save();
+    c.fillStyle = "#111";
+    c.font = `bold ${Math.max(6, Math.round(5 * k))}px sans-serif`;
+    c.textAlign = "center";
+    c.textBaseline = "middle";
+    c.fillText("POLICE LINE", mx, (y0 + y1) / 2 + sag);
+    c.restore();
+  }
+  function drawCordon(c, b, front, t) {
+    const n = Math.max(1, Math.round((b.x1 - b.x0) / 70));
+    const xs = Array.from({ length: n + 1 }, (_, i) => b.x0 + (b.x1 - b.x0) * i / n);
+    const y = front ? b.y1 : b.y0;
+    c.save();
+    const top = xs.map((x) => ({ x, y: y - drawCone(c, x, y) * 0.8 }));
+    if (!front) {
+      const hb = 34 * persp(b.y0) * 0.8, hf = 34 * persp(b.y1) * 0.8;
+      drawTape(c, b.x0, b.y0 - hb, b.x0, b.y1 - hf, t, false);
+      drawTape(c, b.x1, b.y0 - hb, b.x1, b.y1 - hf, t, false);
+    }
+    for (let i = 0; i < top.length - 1; i++) drawTape(c, top[i].x, top[i].y, top[i + 1].x, top[i + 1].y, t, front);
+    c.restore();
   }
   function silhouette(c, a) {
     const k = persp(a.y);
@@ -3897,28 +3702,28 @@ ${who}: ${text2.replace(/\n/g, " ")}
     c.fill();
     c.restore();
   }
-  function drawObserver(c, lines3) {
+  function drawObserver(c, lines) {
     c.save();
     c.setTransform(1, 0, 0, 1, 0, 0);
     c.font = "13px monospace";
-    const w = Math.min(c.canvas.width - 16, Math.max(260, ...lines3.map((l) => c.measureText(l).width + 20)));
-    const h = Math.min(c.canvas.height - 16, lines3.length * 17 + 12);
+    const w = Math.min(c.canvas.width - 16, Math.max(260, ...lines.map((l) => c.measureText(l).width + 20)));
+    const h = Math.min(c.canvas.height - 16, lines.length * 17 + 12);
     const x0 = c.canvas.width - w - 8;
     c.fillStyle = "rgba(8,12,18,0.82)";
     c.fillRect(x0, 8, w, h);
     c.fillStyle = "#d7e3ef";
-    lines3.forEach((l, i) => {
+    lines.forEach((l, i) => {
       if (16 + 17 * (i + 1) < h + 8) c.fillText(l, x0 + 8, 8 + 17 * (i + 1));
     });
     c.restore();
   }
-  function drawHeadBubble(c, x, y, text2, line2) {
+  function drawHeadBubble(c, x, y, text, line2) {
     c.save();
     c.font = line2 ? "14px Galmuri11, sans-serif" : "bold 16px Galmuri11, sans-serif";
-    const w = Math.min(320, c.measureText(text2).width + (line2 ? 16 : 12));
+    const w = Math.min(320, c.measureText(text).width + (line2 ? 16 : 12));
     const h = line2 ? 22 : 22;
     const bx = Math.round(x - w / 2), by = Math.round(y - h);
-    c.fillStyle = text2 === "#" ? "#f2d0cc" : "#f4f1e8";
+    c.fillStyle = text === "#" ? "#f2d0cc" : "#f4f1e8";
     c.strokeStyle = "#1b1f24";
     c.lineWidth = 2;
     c.fillRect(bx, by, w, h);
@@ -3927,12 +3732,12 @@ ${who}: ${text2.replace(/\n/g, " ")}
     c.fillStyle = "#1b1f24";
     c.textAlign = "center";
     c.textBaseline = "middle";
-    c.fillText(text2, Math.round(x), by + h / 2 + 1, w - 8);
+    c.fillText(text, Math.round(x), by + h / 2 + 1, w - 8);
     c.restore();
   }
 
   // src/game/world/needs.ts
-  var NEEDS = ["work", "hunger", "energy", "bladder", "bowel", "social", "fun"];
+  var NEEDS = ["work", "hunger", "energy", "bladder", "bowel", "social", "fun", "train", "hygiene"];
   var ACTIVITIES = [
     { id: "work", need: "work", clip: "work", where: ["office"], sec: [40, 90], fill: 2.2, label: "일하는 중" },
     { id: "eat", need: "hunger", clip: "eat", where: ["lounge", "shop"], sec: [25, 45], fill: 4, label: "먹는 중" },
@@ -3940,9 +3745,76 @@ ${who}: ${text2.replace(/\n/g, " ")}
     { id: "pee", need: "bladder", clip: "pee", where: ["restroom"], sec: [8, 14], fill: 12, label: "화장실(소)" },
     { id: "poo", need: "bowel", clip: "poo", where: ["restroom"], sec: [25, 40], fill: 5, label: "화장실(대)" },
     { id: "chat", need: "social", clip: "talk", where: ["office", "lounge", "corridor"], sec: [12, 25], fill: 6, label: "수다 중", partner: true },
-    { id: "hobby", need: "fun", clip: "hobby", where: ["lounge"], sec: [30, 60], fill: 3, label: "취미" }
+    { id: "hobby", need: "fun", clip: "hobby", where: ["lounge"], sec: [30, 60], fill: 3, label: "취미" },
+    // 훈련: 팔굽혀펴기·장비 점검·기지개, 그 줄이 없으면 약공 연습(모든 인물에게 있음). 싸우는 몸만 (choose fighter)
+    { id: "train", need: "train", clip: "train", where: ["training"], sec: [40, 90], fill: 2.5, label: "훈련" },
+    // 샤워(11-02): 같은 성별 탈의실 캐비닛에서 옷 벗기 → 맨몸으로 샤워실 빈 샤워기 → 머리감기·몸씻기(문지르는 구간만 속도 차등, 현실 10분 이상) → 탈의실로 돌아와 옷 입기 (actors.ts showerNext)
+    { id: "shower", need: "hygiene", clip: "shower", where: ["locker"], sec: [600, 780], fill: 0.2, label: "샤워 중" }
   ];
-  var DECAY = { work: 0.35, hunger: 0.12, energy: 0.08, bladder: 0.2, bowel: 0.05, social: 0.18, fun: 0.12 };
+  var ACT_OPTS = {
+    work: [
+      { line: "63", label: "타자 치는 중", seat: "front" },
+      { line: "105", label: "타자 치는 중", seat: "side" },
+      { line: "69", label: "타자 치는 중", seat: "back" },
+      { line: "106", label: "손 작업 중", seat: "front" },
+      { line: "124", label: "브리핑 중" },
+      { line: "121", label: "장비 점검 중" },
+      { line: "117", label: "서류 보는 중" },
+      { line: "119", label: "수첩 메모 중" },
+      { line: "120", label: "태블릿 확인 중" },
+      { line: "116", label: "업무 통화 중" },
+      { line: "118", label: "무전 보고 중" },
+      { line: "138", label: "서류 추리는 중" },
+      { line: "85", label: "손 작업 중" },
+      { line: "125", label: "물건 진열 중" },
+      { line: "126", label: "돈 세는 중" },
+      { line: "128", label: "감정 중" },
+      { line: "129", label: "수리 중" },
+      { line: "139", label: "계산 중" },
+      { line: "122", label: "경계 서는 중" },
+      { line: "123", label: "출입 확인 중" },
+      { line: "136", label: "손전등 비추는 중" },
+      { line: "131", label: "닦는 중" },
+      { line: "88", label: "청소 중" },
+      { line: "113", label: "진료 기록 중" },
+      { line: "115", label: "시료 보는 중" }
+    ],
+    hobby: [
+      { line: "149", label: "책 읽는 중", seat: "front" },
+      { line: "148", label: "폰 보는 중", seat: "front" },
+      { line: "167", label: "신문 읽는 중", seat: "front" },
+      { line: "90", label: "담배 피우는 중" },
+      { line: "145", label: "담배 피우는 중" },
+      { line: "155", label: "고기 굽는 중" },
+      { line: "153", label: "스케치 중" },
+      { line: "140", label: "카드 섞는 중" },
+      { line: "156", label: "햄스터 돌보는 중" },
+      { line: "160", label: "손장난 중" },
+      { line: "152", label: "기도 중" },
+      { line: "147", label: "폰 보는 중" },
+      { line: "154", label: "차 따르는 중" },
+      { line: "168", label: "구경 중" },
+      { line: "161", label: "섀도복싱 중" },
+      { line: "91", label: "과자 먹는 중" }
+    ],
+    rest: [
+      { line: "66", label: "조는 중", seat: "front" },
+      { line: "73", label: "기대 쉬는 중", seat: "front" },
+      { line: "65", label: "차 마시는 중", seat: "front" },
+      { line: "99", label: "차 마시는 중", seat: "side" },
+      { line: "71", label: "차 마시는 중", seat: "back" },
+      { line: "142", label: "커피 마시는 중" },
+      { line: "143", label: "기지개", once: true }
+    ],
+    eat: [
+      { line: "64", label: "먹는 중", seat: "front" },
+      { line: "98", label: "먹는 중", seat: "side" },
+      { line: "71", label: "먹는 중", seat: "back" },
+      { line: "157", label: "간식 먹는 중" },
+      { line: "26", label: "먹는 중" }
+    ]
+  };
+  var DECAY = { work: 0.35, hunger: 0.12, energy: 0.08, bladder: 0.2, bowel: 0.05, social: 0.18, fun: 0.12, train: 0.06, hygiene: 0.03 };
   var TEMPER = {
     잼트리: { need: { social: 1.3, hunger: 1.2 }, friends: ["쟈알디", "스팡달", "데쥬레", "에일린"] },
     쟈알디: { need: { social: 0.6, work: 1.3 } },
@@ -3974,639 +3846,422 @@ ${who}: ${text2.replace(/\n/g, " ")}
     const t = TEMPER[o.name];
     let best = null;
     for (const a of ACTIVITIES) {
-      if (!o.has(a.clip)) continue;
+      if (!o.has(a.clip) && !(ACT_OPTS[a.id] ?? []).some((x) => o.has(`line:${x.line}`))) continue;
+      if (a.need === "train" && !o.fighter) continue;
       const lack = 100 - o.needs[a.need];
       if (lack < 25) continue;
       const kinds = a.id === "hobby" && t?.hobbyAt ? t.hobbyAt : a.where;
-      const places = o.roam.filter((s2) => kinds.includes(o.graph.kind(s2)));
-      for (const s2 of places) {
-        if (a.partner && !o.partnerIn(s2)) continue;
-        const hops = s2 === o.scene ? 0 : o.graph.route(o.scene, s2)?.length ?? 99;
+      const places = o.roam.filter((s) => kinds.includes(o.graph.kind(s)));
+      for (const s of places) {
+        if (a.partner && !o.partnerIn(s)) continue;
+        const hops = s === o.scene ? 0 : o.graph.route(o.scene, s)?.length ?? 99;
         if (hops >= 99) continue;
         let w = (lack / 100) ** 2 * 100;
         if (a.need === "work") w *= o.duty ? 1.6 : 0;
         if (a.need === "bladder" || a.need === "bowel") w *= lack > 70 ? 2.2 : 0.7;
         if (o.last === a.id) w *= 0.5;
         const score = w / (1 + hops * 0.5) * (0.9 + o.rand() * 0.2);
-        if (!best || score > best.score) best = { act: a, scene: s2, score };
+        if (!best || score > best.score) best = { act: a, scene: s, score };
       }
     }
     return best && best.score > 8 ? best : null;
   }
 
-  // src/game/world/mobs.ts
-  var BASE = { courage: [0.1, 0.8], social: [0.1, 0.8], haste: [0.1, 0.7], curious: [0.1, 0.8], sly: [0, 0.05] };
-  var ARCHETYPES = {
-    행인: { name: "행인", role: "civilian", range: {} },
-    회사원: { name: "회사원", role: "civilian", range: { haste: [0.3, 0.9] }, drinks: true },
-    관광객: { name: "관광객", role: "civilian", range: { curious: [0.5, 1], courage: [0.1, 0.5] } },
-    학생: { name: "학생", role: "student", range: { courage: [0, 0.6], curious: [0.4, 1] } },
-    배달원: { name: "배달원", role: "worker", range: { haste: [0.6, 1] } },
-    불량배: { name: "불량배", role: "thug", range: { courage: [0.5, 1], haste: [0.5, 1], sly: [0.05, 0.5] }, drinks: true },
-    방문객: { name: "방문객", role: "civilian", range: { courage: [0.1, 0.5] } },
-    "행정 직원": { name: "행정 직원", role: "staff", range: { courage: [0.1, 0.5], social: [0.3, 0.9] } },
-    "안내 직원": { name: "안내 직원", role: "staff", range: { social: [0.5, 1] } },
-    청소부: { name: "청소부", role: "worker", range: { courage: [0.2, 0.6] } },
-    경비: { name: "경비", role: "guard", range: { courage: [0.6, 1], curious: [0.4, 0.9] } },
-    경찰: { name: "경찰", role: "police", range: { courage: [0.6, 1], haste: [0.3, 0.7] } },
-    "편의점 점원": { name: "편의점 점원", role: "staff", range: {} },
-    // 장소 종류별 인구(6-4장)에 쓰는 원형
-    상인: { name: "상인", role: "worker", range: { social: [0.4, 1], courage: [0.3, 0.8] } },
-    취객: { name: "취객", role: "civilian", range: { haste: [0.4, 1], courage: [0.4, 1], curious: [0.3, 0.9] }, drinks: true },
-    주민: { name: "주민", role: "civilian", range: { haste: [0, 0.5] } },
-    산책객: { name: "산책객", role: "civilian", range: { haste: [0, 0.4], social: [0.3, 0.9] } },
-    승객: { name: "승객", role: "civilian", range: { haste: [0.4, 1], curious: [0, 0.4] } }
-  };
-  function rollTemper(r, a) {
-    const t = {};
-    for (const k of Object.keys(BASE)) {
-      const [lo, hi] = a?.range[k] ?? BASE[k];
-      t[k] = lo + (hi - lo) * r();
-    }
-    return t;
-  }
-  var inShift = (hour, shifts) => {
-    if (hour == null) return true;
-    return shifts.some(([a, b]) => a <= b ? hour >= a && hour < b : hour >= a || hour < b);
-  };
-
-  // src/game/world/rng.ts
-  function mulberry322(seed) {
-    let a = seed >>> 0;
-    return () => {
-      a = a + 1831565813 >>> 0;
-      let t = a;
-      t = Math.imul(t ^ t >>> 15, t | 1);
-      t ^= t + Math.imul(t ^ t >>> 7, t | 61);
-      return ((t ^ t >>> 14) >>> 0) / 4294967296;
-    };
-  }
-  function hashSeed(s2) {
-    let h = 2166136261;
-    for (let i = 0; i < s2.length; i++) {
-      h ^= s2.charCodeAt(i);
-      h = Math.imul(h, 16777619);
-    }
-    return h >>> 0;
-  }
-  var range2 = (r, a, b) => a + (b - a) * r();
-  var pick6 = (r, list) => list[Math.floor(r() * list.length) % list.length];
-
-  // src/game/world/actors.ts
-  var WALK = 150;
-  var MARGIN = 60;
-  var NOTICE_PX = 280;
-  var UPROAR_STEPS = [20, 50, 80];
-  var serial = 0;
-  var WorldSim = class {
-    constructor(graph, rng2, opts = {}) {
-      this.graph = graph;
-      this.rng = rng2;
-      const o = Array.isArray(opts) ? { spawns: opts } : opts;
-      this.spawns = o.spawns ?? [];
-      this.posts = o.posts ?? [];
-      this.has = o.has ?? (() => false);
-      this.sceneFaction = o.sceneFaction ?? (() => null);
-      this.stance = o.stance ?? (() => null);
-    }
-    actors = [];
-    events = [];
-    spawnT = /* @__PURE__ */ new Map();
-    uproar = /* @__PURE__ */ new Map();
-    /** 실제로 흐른 생활 초 */
-    time = 0;
-    hour = null;
-    player = null;
-    spawns;
-    posts;
-    has;
-    sceneFaction;
-    stance;
-    /** 몹의 소속: 경비·직원(근무형·staff·guard)은 장면 소속, 나머지는 없음 */
-    mobFaction(a) {
-      if (a.def.kind !== "mob") return null;
-      const role = ARCHETYPES[a.def.archetype ?? a.def.name]?.role;
-      return a.post || role === "guard" || role === "staff" ? this.sceneFaction(a.scene) : null;
-    }
-    // ── 바깥에서 부르는 것 ──
-    add(def, at2) {
-      const scene = at2?.scene ?? def.home;
-      const p = this.randomSpot(scene);
-      const a = {
-        def,
-        scene,
-        x: at2?.x ?? p.x,
-        y: at2?.y ?? p.y,
-        face: this.rng() < 0.5 ? 1 : -1,
-        act: "idle",
-        doing: "대기",
-        goal: null,
-        route: [],
-        wait: range2(this.rng, 0.5, 4),
-        plan: "none",
-        run: 1,
-        clip: "idle",
-        clipAt: this.time,
-        iconT: 0,
-        sayT: 0,
-        noticeCd: 0,
-        think: range2(this.rng, 1, 4)
-      };
-      if (def.kind === "named" && def.brain === "needs") a.needs = fullNeeds(this.rng);
-      if (def.kind === "mob") {
-        const arch = ARCHETYPES[def.archetype ?? def.name];
-        a.temper = rollTemper(this.rng, arch);
-        a.drunk = !!arch?.drinks && this.isNight() && this.rng() < 0.35;
-      }
-      this.actors.push(a);
-      return a;
-    }
-    remove(id) {
-      const i = this.actors.findIndex((a) => a.def.id === id);
-      if (i >= 0) this.actors.splice(i, 1);
-    }
-    inScene(scene) {
-      return this.actors.filter((a) => a.scene === scene && a.act !== "door" && a.act !== "gone");
-    }
-    /** 소란 (플레이어가 몹을 때림·물건 부숨 등). amount 0~100 */
-    disturb(scene, amount, x) {
-      const u = this.uproar.get(scene) ?? { v: 0, x };
-      u.v = Math.min(100, u.v + amount);
-      u.x = x;
-      this.uproar.set(scene, u);
-    }
-    uproarLevel(scene) {
-      const v = this.uproar.get(scene)?.v ?? 0;
-      return UPROAR_STEPS.filter((s2) => v >= s2).length;
-    }
-    uproarValue(scene) {
-      return this.uproar.get(scene)?.v ?? 0;
-    }
-    /** 플레이어 범죄 → 경찰(거리)·경비(거점)가 출입구로 들어와 플레이어에게 간다 (8-4장) */
-    crime(scene, x, severity = 20) {
-      this.disturb(scene, severity, x);
-      const len = this.graph.scene(scene)?.length ?? 1280;
-      const street = this.graph.kind(scene) === "street";
-      const n = 1 + this.uproarLevel(scene);
-      const have = this.actors.filter((a) => a.scene === scene && a.plan === "chase").length;
-      for (let i = have; i < n; i++) {
-        const gate = Math.abs(x - 30) > Math.abs(x - (len - 30)) ? 30 : len - 30;
-        const arch = street ? "경찰" : "경비";
-        const a = this.add({ id: `mob${++serial}`, name: arch, kind: "mob", brain: "transit", home: scene, archetype: arch, look: arch, speed: 170 }, { scene, x: gate, y: this.laneMid(scene) });
-        a.plan = "chase";
-        a.run = 1.4;
-        this.walkTo(a, { x, y: a.y }, "플레이어에게 가는 중", "chase");
-        this.iconOn(a, "!", 3);
-      }
-      this.events.push({ kind: "police", scene, n });
-    }
-    /**
-     * 주인공 공격 판정이 행위자에 닿았나 (필드에는 전투 몸이 아닌 행위자도 맞는다).
-     * 몹: 쓰러졌다 일어나 도망(겁) 또는 맞섬, 소란 +15, 범죄로 경찰·경비 출동. 이름 인물: 화내고 사건으로 알림.
-     */
-    hitBoxes(scene, boxes, dir) {
-      const out = [];
-      for (const a of this.inScene(scene)) {
-        for (const b of boxes) {
-          if (a.hitBy === b.attackId) continue;
-          if (a.x + 30 < b.x0 || a.x - 30 > b.x1 || Math.abs(a.y - b.y) > (b.dy ?? 18) + 14 || b.z0 > 200) continue;
-          a.hitBy = b.attackId;
-          out.push(a);
-          this.struck(a, dir);
-          break;
-        }
-      }
-      if (out.length) this.crime(scene, out[0].x, 15 * out.length);
-      return out;
-    }
-    /** 행위자 하나를 맞힘 (에일린 코어 표적 경로). 같은 틱 여러 번은 hitBy로 거른다 */
-    hitActor(id, dir, attackId) {
-      const a = this.actors.find((q) => q.def.id === id);
-      if (!a || a.act === "gone" || a.act === "door" || a.hitBy === attackId) return false;
-      a.hitBy = attackId;
-      this.struck(a, dir);
-      this.crime(a.scene, a.x, 15);
-      return true;
-    }
-    struck(a, dir) {
-      a.x += dir * 36;
-      a.face = -dir;
-      a.goal = null;
-      a.route = [];
-      const down2 = a.def.kind === "mob" && this.rng() < 0.5;
-      this.events.push({ kind: "hurt", scene: a.scene, who: a.def.name, named: a.def.kind === "named", x: a.x, down: down2 });
-      if (a.def.kind === "named") {
-        a.act = "argue";
-        a.doing = "맞고 화남";
-        a.wait = 3;
-        this.setClip(a, this.canClip(a, "angry") ? "angry" : "idle");
-        this.iconOn(a, "#", 3);
-        return;
-      }
-      a.act = "down";
-      a.doing = down2 ? "쓰러짐" : "휘청";
-      a.wait = down2 ? 1.8 : 0.6;
-      this.setClip(a, down2 && this.canClip(a, "down") ? "down" : "idle");
-      this.iconOn(a, "!", 1.5);
-    }
-    /** 행위자 말풍선 (대사 연결이 부른다) */
-    say(a, text2, sec = 3.2) {
-      a.say = text2;
-      a.sayT = sec;
-    }
-    isNight() {
-      return this.hour != null && (this.hour >= 19.5 || this.hour < 5);
-    }
-    randomSpot(scene) {
-      const s2 = this.graph.scene(scene);
-      const [top, bot] = this.graph.lane(scene);
-      const len = s2?.length ?? 1280;
-      return { x: range2(this.rng, MARGIN, Math.max(MARGIN + 1, len - MARGIN)), y: range2(this.rng, top + 20, bot - 10) };
-    }
-    laneMid(scene) {
-      const [top, bot] = this.graph.lane(scene);
-      return range2(this.rng, top + 20, bot - 10);
-    }
-    /** 생활 시간을 dt초 진행. player = 보이는 장면과 주인공 발, hour = 필드 시(모르면 null) */
-    step(dt, player) {
-      this.time += dt;
-      this.hour = player?.hour ?? null;
-      this.player = player ? { scene: player.scene, x: player.x, y: player.y ?? 0 } : null;
-      for (const [s2, u] of this.uproar) {
-        u.v = Math.max(0, u.v - (player?.scene === s2 ? 1.5 : 5) * dt);
-        if (u.v <= 0) this.uproar.delete(s2);
-      }
-      for (const a of [...this.actors]) this.stepActor(a, dt);
-      for (let i = this.actors.length - 1; i >= 0; i--) if (this.actors[i].act === "gone") this.actors.splice(i, 1);
-      for (const r of this.spawns) this.stepSpawn(r, dt);
-      for (const p of this.posts) this.stepPost(p);
-    }
-    // ── 한 사람 ──
-    setClip(a, clip) {
-      if (a.clip !== clip) {
-        a.clip = clip;
-        a.clipAt = this.time;
-      }
-    }
-    iconOn(a, icon2, sec) {
-      a.icon = icon2;
-      a.iconT = sec;
-    }
-    canClip(a, clip) {
-      return this.has(a.def.look ?? a.def.name, clip);
-    }
-    stepActor(a, dt) {
-      if (a.iconT > 0 && (a.iconT -= dt) <= 0) a.icon = void 0;
-      if (a.sayT > 0 && (a.sayT -= dt) <= 0) a.say = void 0;
-      if (a.noticeCd > 0) a.noticeCd -= dt;
-      if (a.needs) decayNeeds(a.needs, dt, TEMPER[a.def.name], onDuty(this.hour, TEMPER[a.def.name]));
-      if (a.def.kind === "mob") this.mobThink(a, dt);
-      if (a.def.kind === "named") this.namedNotice(a);
-      switch (a.act) {
-        case "door": {
-          a.wait -= dt;
-          if (a.wait > 0) return;
-          const hop = a.route.shift();
-          const at2 = this.graph.doorSpot(hop.to, hop.enter) ?? this.randomSpot(hop.to);
-          a.scene = hop.to;
-          a.x = at2.x;
-          a.y = at2.y;
-          return this.nextLeg(a);
-        }
-        case "walk":
-          return this.move(a, dt);
-        case "do":
-          if (a.task && a.needs) a.needs[a.task.need] = Math.min(100, a.needs[a.task.need] + a.task.fill * dt);
-          a.wait -= dt;
-          if (a.wait <= 0 || a.task && a.needs && a.needs[a.task.need] >= 100) {
-            a.last = a.task?.id;
-            a.task = void 0;
-            this.idle(a, 1, 3);
-          }
-          return;
-        case "notice":
-        case "watch":
-        case "argue":
-          a.wait -= dt;
-          if (a.wait <= 0) this.resume(a);
-          return;
-        case "down":
-          a.wait -= dt;
-          if (a.wait > 0) return;
-          if (a.def.kind === "mob" && a.temper && !a.post) {
-            if (a.temper.courage > 0.75 && ARCHETYPES[a.def.archetype ?? ""]?.role === "thug") {
-              a.act = "argue";
-              a.doing = "맞섬";
-              a.wait = 3;
-              this.iconOn(a, "#", 3);
-              return;
-            }
-            return this.flee(a, this.player?.x ?? a.x);
-          }
-          return this.resume(a);
-        case "post":
-          return this.postStand(a, dt);
-        case "idle":
-          a.wait -= dt;
-          if (a.wait <= 0) this.decide(a);
-          return;
-      }
-    }
-    move(a, dt) {
-      if (!a.goal) return this.idle(a);
-      if (a.plan === "chase") {
-        const p = this.player && this.player.scene === a.scene ? this.player : null;
-        const t = a.target ? this.actors.find((q) => q.def.id === a.target) : null;
-        if (t && t.scene === a.scene) a.goal = { x: t.x - Math.sign(t.x - a.x) * 70, y: t.y };
-        else if (p) a.goal = { x: p.x - Math.sign(p.x - a.x) * 110, y: p.y || a.goal.y };
-      }
-      const dx = a.goal.x - a.x, dy = a.goal.y - a.y;
-      const d3 = Math.hypot(dx, dy);
-      const step2 = (a.def.speed ?? WALK) * a.run * dt;
-      if (Math.abs(dx) > 1) a.face = dx > 0 ? 1 : -1;
-      this.setClip(a, a.run > 1.2 && this.canClip(a, "run") ? "run" : "walk");
-      if (d3 <= step2) {
-        a.x = a.goal.x;
-        a.y = a.goal.y;
-        a.goal = null;
-        return this.arrived(a);
-      }
-      a.x += dx / d3 * step2;
-      a.y += dy / d3 * step2;
-    }
-    idle(a, min = 2, max = 7) {
-      a.act = "idle";
-      a.doing = "대기";
-      a.run = 1;
-      a.plan = "none";
-      a.wait = range2(this.rng, min, max);
-      this.setClip(a, "idle");
-    }
-    /** 잠깐 멈췄다 하던 일로 (몹은 가던 길, 근무형은 자리) */
-    resume(a) {
-      if (a.post) return this.goPost(a);
-      if (a.def.brain === "transit" && a.exitAt) return this.walkTo(a, a.exitAt, "지나가는 중", "exit");
-      this.idle(a, 0.5, 2);
-    }
-    walkTo(a, p, doing, plan = "none") {
-      a.act = "walk";
-      a.goal = p;
-      a.doing = doing;
-      a.plan = plan;
-    }
-    arrived(a) {
-      const hop = a.route[0];
-      if (hop && hop.from === a.scene) {
-        a.act = "door";
-        a.doing = `${this.graph.scene(hop.to)?.name ?? hop.to}(으)로 이동 중`;
-        a.wait = Math.max(1, hop.sec / 6);
-        return;
-      }
-      switch (a.plan) {
-        case "do":
-          return this.startTask(a);
-        case "post":
-          a.act = "post";
-          a.doing = `근무 중 (${a.post?.archetype ?? ""})`;
-          a.wait = range2(this.rng, 4, 9);
-          this.setClip(a, this.canClip(a, "work") ? "work" : "idle");
-          return;
-        case "patrol":
-        case "roam-post":
-          return this.goPost(a);
-        case "exit":
-          a.act = "gone";
-          return;
-        case "steal":
-          return this.doSteal(a);
-        case "harass":
-          return this.doHarass(a);
-        case "chase":
-          a.act = "watch";
-          a.doing = "막아섬";
-          a.wait = 3;
-          this.iconOn(a, "!", 2);
-          return;
-      }
-      if (a.def.brain === "transit" && a.exitAt) {
-        a.act = "gone";
-        return;
-      }
-      this.idle(a);
-    }
-    nextLeg(a) {
-      const hop = a.route[0];
-      if (hop) {
-        const d3 = this.graph.doorSpot(a.scene, hop.exit);
-        if (d3) return this.walkTo(a, d3, a.doing, a.plan);
-      }
-      a.route = [];
-      if (a.plan === "do" && a.task) return this.walkTo(a, this.randomSpot(a.scene), a.task.label + " 하러", "do");
-      if (a.plan === "roam-post") return this.goPost(a);
-      this.walkTo(a, this.randomSpot(a.scene), "자리 잡는 중");
-    }
-    // ── 이름 인물 ──
-    namedNotice(a) {
-      const p = this.player;
-      if (!p || p.scene !== a.scene || a.noticeCd > 0) return;
-      if (a.act !== "idle" && a.act !== "walk") return;
-      if (a.plan === "do" || a.route.length) return;
-      if (Math.abs(p.x - a.x) > NOTICE_PX || Math.abs(p.y - a.y) > 160) return;
-      a.noticeCd = range2(this.rng, 20, 35);
-      a.act = "notice";
-      a.doing = "주인공을 봄";
-      a.goal = null;
-      a.face = p.x > a.x ? 1 : -1;
-      a.wait = 2.4;
-      this.setClip(a, this.canClip(a, "greet") ? "greet" : this.canClip(a, "bow") ? "bow" : "idle");
-      this.iconOn(a, "!", 1.2);
-      this.events.push({ kind: "notice", scene: a.scene, who: a.def.name });
-    }
-    decide(a) {
-      if (a.post) return this.goPost(a);
-      if (a.def.brain === "transit") return this.idle(a, 1, 3);
-      const roam = (a.def.roam ?? [a.def.home]).filter((s2) => this.graph.scene(s2));
-      if (a.def.brain === "needs" && a.needs) {
-        const c = choose({
-          name: a.def.name,
-          needs: a.needs,
-          scene: a.scene,
-          roam,
-          graph: this.graph,
-          has: (clip) => this.canClip(a, clip),
-          duty: onDuty(this.hour, TEMPER[a.def.name]),
-          partnerIn: (s2) => this.actors.some((q) => q !== a && q.def.kind === "named" && q.scene === s2 && (q.act === "idle" || q.act === "walk") && !q.route.length),
-          rand: this.rng,
-          last: a.last
-        });
-        if (c) {
-          a.task = c.act;
-          if (c.scene === a.scene) return this.walkTo(a, this.taskSpot(a, c.act), `${c.act.label} 하러`, "do");
-          const path = this.graph.route(a.scene, c.scene);
-          const d3 = path && this.graph.doorSpot(a.scene, path[0].exit);
-          if (path && d3) {
-            a.route = path;
-            return this.walkTo(a, d3, `${c.act.label} 하러 ${this.graph.scene(c.scene)?.name ?? c.scene}(으)로`, "do");
-          }
-          a.task = void 0;
-        }
-      }
-      const away = a.scene !== a.def.home;
-      const r = this.rng();
-      let dest = null;
-      if (away && r < 0.45) dest = a.def.home;
-      else if (!away && roam.length > 1 && r < 0.18) dest = pick6(this.rng, roam.filter((s2) => s2 !== a.scene));
-      if (dest) {
-        const path = this.graph.route(a.scene, dest);
-        const d3 = path && this.graph.doorSpot(a.scene, path[0].exit);
-        if (path && d3) {
-          a.route = path;
-          return this.walkTo(a, d3, `${this.graph.scene(dest)?.name ?? dest}(으)로 가는 중`);
-        }
-      }
-      this.walkTo(a, this.randomSpot(a.scene), "서성이는 중");
-    }
-    /** 수다는 상대 옆으로, 나머지는 장면 안 빈 곳 */
-    taskSpot(a, t) {
-      if (t.partner) {
-        const q = this.actors.find((o) => o !== a && o.def.kind === "named" && o.scene === a.scene && (o.act === "idle" || o.act === "walk") && !o.route.length);
-        if (q) return { x: q.x + (q.x > a.x ? -90 : 90), y: q.y };
-      }
-      return this.randomSpot(a.scene);
-    }
-    startTask(a) {
-      const t = a.task;
-      if (!t) return this.idle(a);
-      if (t.partner) {
-        const q = this.actors.find((o) => o !== a && o.def.kind === "named" && o.scene === a.scene && Math.abs(o.x - a.x) < 220 && (o.act === "idle" || o.act === "walk" || o.act === "notice"));
-        if (!q) {
-          a.task = void 0;
-          return this.idle(a, 1, 2);
-        }
-        const both = range2(this.rng, t.sec[0], t.sec[1]);
-        for (const [p, o] of [[a, q], [q, a]]) {
-          p.act = "do";
-          p.task = t;
-          p.wait = both;
-          p.goal = null;
-          p.route = [];
-          p.plan = "none";
-          p.doing = `${o.def.name}와 ${t.label}`;
-          p.face = o.x > p.x ? 1 : -1;
-          this.setClip(p, this.canClip(p, t.clip) ? t.clip : "idle");
-        }
-        this.iconOn(a, "♪", 2);
-        return;
-      }
-      a.act = "do";
-      a.doing = t.label;
-      a.wait = range2(this.rng, t.sec[0], t.sec[1]);
-      a.plan = "none";
-      this.setClip(a, t.clip);
-    }
-    // ── 몹 판단 (8-1장: 사건은 NPC 판단에서) ──
-    mobThink(a, dt) {
-      if (a.act === "gone" || a.act === "door") return;
-      const lvl = this.uproarLevel(a.scene);
-      const t = a.temper;
-      if (!t) return;
-      a.think -= dt;
-      if (a.think > 0) return;
-      a.think = range2(this.rng, 0.8, 1.6);
-      const fac = this.mobFaction(a);
-      const p0 = this.player;
-      if (fac && p0 && p0.scene === a.scene && Math.abs(p0.x - a.x) < 520 && a.plan !== "chase" && a.act !== "argue") {
-        const st = this.stance(fac);
-        if (st === "hostile") {
-          a.run = 1.4;
-          a.post = void 0;
-          this.walkTo(a, { x: p0.x, y: p0.y || a.y }, "주인공을 막아섬", "chase");
-          this.iconOn(a, "!", 2);
-          return;
-        }
-        if (st === "wary" && a.act !== "watch" && this.rng() < 0.3) {
-          a.act = "watch";
-          a.doing = "주인공을 경계";
-          a.goal = null;
-          a.face = p0.x > a.x ? 1 : -1;
-          a.wait = 2.5;
-          this.iconOn(a, "?", 1.5);
-          return;
-        }
-      }
-      if (a.post || a.plan === "chase" || a.plan === "steal" || a.plan === "harass" || a.act === "argue") return;
-      const u = this.uproar.get(a.scene);
-      if (lvl >= 1 && u) {
-        if (t.courage < 0.25 + 0.15 * lvl && a.run < 1.5) return this.flee(a, u.x);
-        if (t.curious > 0.6 && a.act !== "watch" && this.rng() < 0.4) {
-          a.act = "watch";
-          a.doing = "구경";
-          a.goal = null;
-          a.face = u.x > a.x ? 1 : -1;
-          a.wait = range2(this.rng, 2, 5);
-          this.setClip(a, "idle");
-          this.iconOn(a, "!", 1.5);
-          return;
-        }
-      }
-      if (a.act !== "walk" || a.plan !== "exit") return;
-      const p = this.player;
-      if (p && p.scene === a.scene && Math.abs(p.x - a.x) < 220 && t.curious > 0.7 && this.rng() < 0.25) {
-        a.act = "watch";
-        a.doing = "주인공을 힐끔";
-        a.goal = null;
-        a.face = p.x > a.x ? 1 : -1;
-        a.wait = 1.2;
-        this.setClip(a, "idle");
-        this.iconOn(a, "?", 1);
-        return;
-      }
-      if (this.incidents(a.scene) >= 2) return;
-      if (t.sly > 0.3 && this.rng() < 0.05 + t.sly * 0.1) {
-        const v = this.nearMob(a, 500, (q) => q.act === "walk" && q.plan === "exit" && !q.post);
-        if (v) {
-          a.target = v.def.id;
-          a.run = 1.2;
-          return this.walkTo(a, { x: v.x - Math.sign(v.x - a.x) * 50, y: v.y }, "누군가에게 다가감", "steal");
-        }
-      }
-      if (a.drunk && t.haste > 0.55 && this.isNight() && this.rng() < 0.06) {
-        const v = this.nearMob(a, 400, (q) => q.act === "walk" && !q.post);
-        if (v) {
-          a.target = v.def.id;
-          return this.walkTo(a, { x: v.x - Math.sign(v.x - a.x) * 80, y: v.y }, "시비 걸러 감", "harass");
-        }
-      }
-    }
-    incidents(scene) {
-      return this.actors.filter((q) => q.scene === scene && (q.plan === "steal" || q.plan === "harass" || q.act === "argue")).length;
-    }
-    nearMob(a, dist, ok) {
-      let best = null;
-      for (const q of this.actors) {
-        if (q === a || q.def.kind !== "mob" || q.scene !== a.scene || !ok(q)) continue;
-        const d3 = Math.abs(q.x - a.x);
-        if (d3 < dist && (!best || d3 < Math.abs(best.x - a.x))) best = q;
-      }
-      return best;
-    }
-    gateFar(a, fromX) {
-      const rule2 = this.spawns.find((r) => r.scene === a.scene);
-      const len = this.graph.scene(a.scene)?.length ?? 1280;
-      const gates = rule2?.gates?.length ? rule2.gates : [30, len - 30];
-      const x = [...gates].sort((p, q) => Math.abs(q - fromX) - Math.abs(p - fromX))[0];
-      return { x, y: a.y };
-    }
-    flee(a, fromX) {
-      a.run = 1.8;
-      a.exitAt = this.gateFar(a, fromX);
-      this.walkTo(a, a.exitAt, "도망", "exit");
-      this.setClip(a, this.canClip(a, "flee") ? "flee" : "walk");
-      this.iconOn(a, "!", 1.5);
-      this.events.push({ kind: "flee", scene: a.scene, who: a.def.name });
-    }
-    doSteal(a) {
-      const v = this.actors.find((q) => q.def.id === a.target);
-      a.target = void 0;
-      if (!v || v.scene !== a.scene) return this.resume(a);
-      this.events.push({ kind: "steal", scene: a.scene, thief: a.def.name, victim: v.def.name, x: v
+  // src/game/world/mobProfiles.json
+  var mobProfiles_default = {
+    불량배여1: {
+      sex: "여",
+      age: "20대 초반",
+      note: "20대 초반 동네 불량배(성인). 조급하고 경계심 많은 얼굴, 가만있질 못함. 평상 대기는 담배 든 대기(연기는 코드). 싸움은 빠르고 지저분한 길거리식, 통통 뛰는 스텝."
+    },
+    불량배여2: {
+      sex: "여",
+      age: "10대(고등학생)",
+      note: "카디건을 헐렁하게 걸친 반항적인 여고생, 지루하다는 얼굴. 미성년(담배·노출·선정 금지, 사망은 피 없이). 치마라 높은 발차기 없이 손·낮은 발로만 싸움, 무릎은 늘 모음."
+    },
+    불량배여3: {
+      sex: "여",
+      age: "20대 후반",
+      note: "20대 후반 길거리 해결사(성인). 차분하고 위압적, 표정이 거의 안 변함. 평상 대기는 담배 든 대기(왼손에 낮게, 연기는 코드). 싸움은 짧고 정확, 부츠로 끝냄."
+    },
+    경찰남1: {
+      sex: "남",
+      age: "30대 초반",
+      job: "경찰관",
+      note: "30대 초반, 조금 넓은 어깨, 순한 네모 얼굴. 느긋하고 묵직한 고참 순경. 빠르진 않지만 몸무게를 실어 밀고 누른다. 원거리는 권총(오른쪽 허리)."
+    },
+    경찰남2: {
+      sex: "남",
+      age: "20대 후반",
+      job: "경찰관",
+      note: "20대 후반, 균형 잡힌 몸, 조금 각진 얼굴의 짧은 스포츠머리. 의욕이 앞서는 신참 순경. 자세가 크고 몸이 먼저 나간다. 원거리는 권총(오른쪽 허리, 조금 서툼)."
+    },
+    경찰여1: {
+      sex: "여",
+      age: "20대 후반",
+      job: "경찰관",
+      note: "20대 후반, 보통 체격, 둥근 얼굴에 이마가 드러난 쪽머리. 침착하고 절차대로 움직이는 순경. 큰 동작보다 밀어내고 제압하는 쪽. 원거리는 권총(오른쪽 허리, 두 손 조준)."
+    },
+    경찰여2: {
+      sex: "여",
+      age: "30대 초반",
+      job: "경찰관",
+      note: "30대 초반, 마른 편, 각진 얼굴의 단발. 눈치 빠르고 조금 성급한 경장. 짧고 빠른 손으로 끊어 치고 팔을 꺾어 누른다. 원거리는 권총(오른쪽 허리, 한 손 조준)."
+    },
+    관리국남A: {
+      sex: "남",
+      age: "젊은 성인",
+      job: "관리국 요원",
+      note: "젊은 성인, 균형 잡힌 몸, 조금 각진 얼굴, 이마가 다 드러난 스포츠머리. 무덤덤하고 든든한 현장 요원. 가드를 단단히 올리고 정직하게 친다. 원거리는 권총(재킷 안 왼쪽 가슴, 두 손 조준)."
+    },
+    관리국남B: {
+      sex: "남",
+      age: "젊은 성인",
+      job: "관리국 요원",
+      note: "젊은 성인, 마른 편, 순한 직사각형 얼굴, 비스듬한 가르마 앞머리. 꼼꼼하고 조금 예민한 요원. 맞서기보다 흘리고 빈틈을 친다. 원거리는 권총(재킷 밑 오른쪽 허리 뒤, 가슴 높이에 붙여 한 손)."
+    },
+    관리국여A: {
+      sex: "여",
+      age: "젊은 성인",
+      job: "관리국 요원",
+      note: "젊은 성인, 보통 체격, 둥근 얼굴, 안으로 말린 턱선 단발, 무릎 길이 치마 정장. 조용하고 단정한 사무직 요원. 움직임이 작고 정확하다."
+    },
+    가짜관리국검사A: {
+      sex: "남",
+      age: "20대",
+      job: "가짜 관리국 검사부대",
+      note: "보통 체격, 각진 얼굴, 이마를 다 드러낸 올백. 검사부대(일본도 발도술, 가로 베기 위주, 지그재그 가속 달리기). 군대식으로 반듯하고 정해진 형을 그대로 쓴다. 원거리는 긴 일본도를 크게 베어 앞으로 보내는 몸짓(검기는 코드). 무기 꺼내기 = 일본도를 뽑아 두 손 중단 겨눔. 사망(서서): 앞으로 고꾸라짐."
+    },
+    관리국여B: {
+      sex: "여",
+      age: "젊은 성인",
+      job: "관리국 요원",
+      note: "젊은 성인, 마른 편, 조금 각진 얼굴, 가운데 가르마 낮은 포니테일, 바지 정장. 말수 적고 차가운 현장 요원. 거리를 두고 발로 끊는다."
+    },
+    백일몽남A: {
+      sex: "남",
+      age: "젊은 성인",
+      job: "백일몽 직원",
+      note: "젊은 성인, 균형 잡힌 몸, 조금 각진 얼굴, 스포츠머리, 남색 정장, 늑대 눈가면. 포인트에 목마른 공격적인 현장 직원. 쉬지 않고 앞으로 파고든다."
+    },
+    백일몽남B: {
+      sex: "남",
+      age: "젊은 성인",
+      job: "백일몽 직원",
+      note: "젊은 성인, 조금 넓은 어깨(근육질은 아님), 순한 네모 얼굴, 가르마 머리, 남색 정장, 곰 눈가면. 느긋하고 조원을 챙기는 덩치. 서두르지 않고 넓게 후려치고 붙잡는다."
+    },
+    백일몽여A: {
+      sex: "여",
+      age: "젊은 성인",
+      job: "백일몽 직원",
+      note: "젊은 성인, 보통 체격, 둥근 얼굴, 가르마 단발, 남색 치마 정장, 여우 눈가면. 괴담에서 살아 나온 회사원. 눈치 빠르고 능청스럽다. 속이고 빈틈을 친다."
+    },
+    백일몽여B: {
+      sex: "여",
+      age: "젊은 성인",
+      job: "백일몽 직원",
+      note: "젊은 성인, 마른 편, 가운데 가르마 낮은 포니테일, 남색 바지 정장, 고양이 눈가면. 경계심 많고 날렵한 현장 직원. 낮게 숨었다가 튀어나와 치고 빠진다."
+    },
+    협회남1: {
+      sex: "남",
+      age: "20대 후반",
+      job: "협회 직원",
+      note: "넥타이를 풀어 헤친 지친 협회 사무직. 눈밑이 퀭하고 늘 피곤한 걱정스러운 얼굴(tired concerned expression), 「처리는 순서대로」 창구에 하루 종일 앉아 있었던 사람."
+    },
+    협회남2: {
+      sex: "남",
+      age: "20대 후반",
+      job: "협회 직원",
+      note: "반듯하게 차려입은 마른 체격의 협회 직원. 절차대로만 움직이는 꼼꼼한 규정형(위키의 「서류 순서대로」 창구 분위기), 몸짓이 작고 정확함."
+    },
+    협회여1: {
+      sex: "여",
+      age: "젊은 성인",
+      job: "협회 직원",
+      note: "눈에 안 띄는 수수한 차림의 차분한 실무자. 협회 지원실 현장 연락 담당처럼 말수 적고 일 처리만 반듯함(등록 프롬프트 「inconspicuous independent field worker」)."
+    },
+    협회여2: {
+      sex: "여",
+      age: "젊은 성인",
+      job: "협회 직원",
+      note: "둥근 얼굴에 수수하고 단정한 차림. 조심스럽고 온순한 창구 보조 직원 느낌, 싸움은 마지못해 하는 쪽(below-knee skirt·practical and understated)."
+    },
+    협회여3: {
+      sex: "여",
+      age: "20대 후반",
+      job: "협회 직원",
+      note: "출입증을 단 협회 사무 직원. 표정이 무난하고 다가가기 쉬운 붙임성 있는 접수 담당(neutral approachable expression), 싸울 때도 침착하게 몸을 작게 씀."
+    },
+    가짜관리국검사B: {
+      sex: "남",
+      age: "20대",
+      job: "가짜 관리국 검사부대",
+      note: "보통 체격, 둥근 얼굴, 비스듬한 가르마. 검사부대의 무던한 대원(「치킨 시키고 후임 챙기는」 쪽). 움직임이 둥글고 한 박자 느긋하지만 칼은 크게, 아래에서 위로 비스듬히 올려 벤다. 원거리는 긴 일본도를 아래에서 위로 크게 올려 베어 보내는 몸짓(검기는 코드). 무기 꺼내기 = 일본도를 뽑아 오른허리 앞 낮은 두 손 겨눔. 사망(서서): 돌며 쓰러짐."
+    },
+    프리랜서남1: {
+      sex: "남",
+      age: "젊은 성인",
+      job: "프리랜서",
+      note: "길쭉한 얼굴의 마른 조사·회수 전문. 장비를 하나하나 확인하는 꼼꼼하고 조심성 많은 성격(오른쪽 허리 표본 파우치·왼쪽 손전등), 위키의 「점심 전에 끝난다는 말을 믿지 않는」 쪽."
+    },
+    프리랜서남2: {
+      sex: "남",
+      age: "젊은 성인",
+      job: "프리랜서",
+      note: "이마를 드러낸 크루컷, 전술 셔츠와 전투화. 군 출신처럼 몸가짐이 단정하고 동작이 딱딱 끊기는 실전파 용병(mercenary-like, practical), 말이 짧음."
+    },
+    프리랜서남3: {
+      sex: "남",
+      age: "젊은 성인",
+      job: "프리랜서",
+      note: "앞을 연 올리브 재킷에 티셔츠, 평범하고 눈에 안 띄는 차림. 어깨에 힘을 뺀 느긋한 성격으로 「다음 달엔 승급한다」는 말을 입에 달고 사는 4급 프리랜서 느낌(inconspicuous independent field worker)."
+    },
+    프리랜서남4: {
+      sex: "남",
+      age: "젊은 성인",
+      job: "프리랜서",
+      note: "마른 몸에 지퍼 재킷·청바지·운동화, 가장 평범한 옷차림. 의욕은 있지만 긴장이 얼굴에 드러나는 5급 신입 느낌(위키: 「첫 의뢰 다녀옴 (수익: -12만 원)」), 몸은 가볍고 빠름."
+    },
+    프리랜서여1: {
+      sex: "여",
+      age: "젊은 성인",
+      job: "프리랜서",
+      note: "소매를 걷어붙인 몸 가벼운 현장꾼. 장비를 스스로 꾸려 다니는 자신만만한 고참 프리랜서 느낌(practical, independently assembled), 발차기를 아낌없이 씀."
+    },
+    프리랜서여2: {
+      sex: "여",
+      age: "젊은 성인",
+      job: "프리랜서",
+      note: "꿰맨 자국 있는 낡은 야전 재킷의 다부진 몸집. 말보다 몸이 먼저 나가는 무뚝뚝한 생환 경력자(sturdy, repaired fabric), 허리에 부적 지갑을 늘 확인함."
+    },
+    프리랜서여3: {
+      sex: "여",
+      age: "젊은 성인",
+      job: "프리랜서",
+      note: "마른 체격에 무표정한 회수 전문. 왼쪽 허리의 봉인된 표본 용기를 늘 신경 쓰는 조용하고 효율적인 사람(specimen container secured at the LEFT hip), 움직임이 짧고 군더더기 없음."
+    },
+    프리랜서여4: {
+      sex: "여",
+      age: "젊은 성인",
+      job: "프리랜서",
+      note: "마른 체격, 이마를 드러낸 낮은 포니테일. 늘 주변을 살피는 경계심 많은 신중파, 거리를 두고 치고 빠짐. 원거리 = 권총. 사망(서서) = 굴러 넘어짐."
+    },
+    프리랜서여5: {
+      sex: "여",
+      age: "30대 초반",
+      job: "프리랜서",
+      note: "30대 초반, 무릎 덧댄 작업복의 현장 일꾼. 오래 버틴 성실한 생활형 프리랜서, 힘을 아껴 쓰고 동작이 경제적임. 원거리 = 권총. 사망(서서) = 앞으로 고꾸라짐."
+    },
+    상인남1: {
+      sex: "남",
+      age: "30대 후반",
+      job: "상인",
+      note: "조금 다부진 30대 후반, 걱정스러운 듯 침착한 얼굴. 손바닥 비비며 손님 붙잡는 흥정꾼. 힘은 있지만 싸움은 둔탁함. 원거리 없음. 사망(서서) = 앞으로 고꾸라짐."
+    },
+    가짜관리국검사C: {
+      sex: "남",
+      age: "20대",
+      job: "가짜 관리국 검사부대",
+      note: "조금 마른 몸, 갸름한 얼굴, 가운데 가르마. 말없고 차가운 젊은 검사. 군더더기 없이 빠르고 가볍게 한 손으로 찌른다. 원거리는 긴 일본도를 뺨 옆에서 앞으로 빠르게 베어 보내는 몸짓(검기는 코드). 무기 꺼내기 = 일본도를 뽑아 한 손 수평 겨눔. 사망(서서): 그대로 무너짐."
+    },
+    상인남2: {
+      sex: "남",
+      age: "30대 초반",
+      job: "상인",
+      note: "소매 걷은 작업복에 허리 앞치마, 공구 주머니. 수리점 겸 장물 손보는 젊은 일꾼 상인. 목소리 크고 손이 빠름. 상인 중 유일하게 약2까지 씀. 원거리 없음. 사망(서서) = 돌며 쓰러짐."
+    },
+    상인남3: {
+      sex: "남",
+      age: "30대 초반",
+      job: "상인",
+      note: "마른 30대 초반, 다용도 조끼. 말수 적고 눈치 빠른 장물아비 쪽 상인. 날렵하게 발을 쓰고 한 팔로 밀쳐 낸다. 원거리 없음. 사망(서서) = 그대로 무너짐."
+    },
+    상인남4: {
+      sex: "남",
+      age: "30대 후반",
+      job: "상인",
+      note: "카디건에 짧은 가게 앞치마, 주머니에 연필. 담담하고 사무적인 30대 후반 가게 주인(「환불 없음」을 표정 하나 안 바꾸고 말하는 사람). 움직임이 절제되고 반듯함. 원거리 없음. 사망(서서) = 굴러 넘어짐."
+    },
+    상인여1: {
+      sex: "여",
+      age: "30대 후반",
+      job: "상인",
+      note: "분식집 아주머니 같은 30대 후반. 넉살 좋게 손님을 끌고(「밥은 먹었어? 사인 먼저 하고」), 몸집으로 밀어붙인다. 동작은 크고 시원하되 빠르진 않음. 원거리 없음. 사망(서서) = 앞으로 고꾸라짐."
+    },
+    상인여2: {
+      sex: "여",
+      age: "40대 초반",
+      job: "상인",
+      note: "마른 40대 초반, 차분하고 눈치 빠른 감정사 타입(손님 사정을 훑는 장사꾼). 동작은 작고 정확함. 종아리 치마라 발차기 없음. 원거리 없음. 사망(서서) = 돌며 쓰러짐."
+    },
+    상인여3: {
+      sex: "여",
+      age: "30대 초반",
+      job: "상인",
+      note: "피곤하고 경계심 많은 30대 초반 노점 상인. 손님 부를 때도 힘이 빠져 있고, 싸울 땐 짧고 실용적으로. 바지·운동화라 몸놀림은 가벼움. 원거리 없음. 사망(서서) = 그대로 무너짐."
+    },
+    의사1: {
+      sex: "남",
+      age: "30대 초반",
+      job: "의사",
+      note: "무릎길이 가운을 열어 입은 30대 초반 의사. 침착하지만 늘 피곤함(목 주무르기). 싸움에 서툴러 손바닥으로 밀어내는 정도, 가운 자락이 크게 펄럭임."
+    },
+    간호사1: {
+      sex: "여",
+      age: "20대 후반",
+      job: "간호사",
+      note: "20대 후반 간호사, 차분하고 주의 깊음. 어깨가 뭉친 피곤함. 몸이 가볍고 손이 빨라 짧게 손바닥으로 친다. 윤지아와 겹치지 않게 차분한 쪽으로."
+    },
+    청소부남1: {
+      sex: "남",
+      age: "40대",
+      job: "청소 노동자",
+      note: "관자놀이가 희끗한 40대 남자 청소 노동자. 보통 체격, 무던하고 묵묵함. 허리를 비틀어 푸는 버릇. 싸움은 짧게 밀어 치는 정도."
+    },
+    청소부여1: {
+      sex: "여",
+      age: "40대",
+      job: "청소 노동자",
+      note: "40대 청소 노동자, 둥근 체격에 차분한 얼굴. 하루 종일 허리 숙여 일해 허리가 뻐근함. 동작은 작고 실속 있음. 장갑 낀 손으로 철썩."
+    },
+    가짜관리국진압A: {
+      sex: "남",
+      age: "20대",
+      job: "가짜 관리국 진압부대",
+      note: "보통 체격, 각진 얼굴, 이마가 드러난 스포츠머리, 등에 소총. 「구역을 나눠 탄막을 까는」 진압부대원. 교범대로 정확하고 딱딱한 군대식 소총 격투(총구 찌르기·개머리판 올려치기·가로 밀쳐 치기). 무기 꺼내기 = 등의 소총을 앞으로 돌려 어깨 견착, 원거리 = 견착 조준 사격. 사망(서서): 앞으로 고꾸라짐."
+    },
+    학생남1: {
+      sex: "남",
+      age: "10대(고등학생)",
+      job: "고등학생",
+      note: "조끼 교복을 단정하게 입은 평범한 남학생. 덩치는 보통, 싸움은 해 본 적 없어 막 휘두른다."
+    },
+    학생남2: {
+      sex: "남",
+      age: "10대(고등학생)",
+      job: "고등학생",
+      note: "마른 체격에 회색 후드 집업을 열어 걸친 느긋한 남학생. 힘 빼고 서 있다가 겁나면 확 무너진다."
+    },
+    학생여1: {
+      sex: "여",
+      age: "10대(고등학생)",
+      job: "고등학생",
+      note: "단정한 단발에 무릎 치마를 반듯하게 입은 얌전한 모범생. 싸움은 서툴고 금방 겁먹는다. 치마라 발차기·다리 벌리기 없음."
+    },
+    학생여2: {
+      sex: "여",
+      age: "10대(고등학생)",
+      job: "고등학생",
+      note: "마른 체격에 바지 교복, 포니테일. 체육 시간에 배운 티가 나는 활동적인 학생. 바지라 낮은 발차기 가능."
+    },
+    시민남1: {
+      sex: "남",
+      age: "20대 중반",
+      note: "20대 중반, 약간 다부진 체격, 올리브 맨투맨에 조거팬츠. 느긋하고 무던한 동네 청년. 손을 바지 주머니에 잘 넣고, 싸우면 힘으로 크게 휘두름."
+    },
+    시민남2: {
+      sex: "남",
+      age: "60대 후반",
+      note: "60대 후반 할아버지, 보통 체격, 남색 점퍼와 깃 셔츠. 고집 있고 점잖은 어르신. 뒷짐을 잘 지고, 동작은 작고 느리며 싸울 땐 주먹을 흔들며 호통."
+    },
+    시민남3: {
+      sex: "남",
+      age: "40대 중반",
+      note: "40대 중반 아저씨, 배가 조금 나온 체격, 갈색 점퍼에 베이지 면바지. 사람 좋고 오지랖 넓은 가장. 바지춤을 추켜올리는 버릇, 싸울 땐 배와 손바닥으로 밀어붙임."
+    },
+    시민남4: {
+      sex: "남",
+      age: "20대 후반",
+      note: "20대 후반, 균형 잡힌 체격, 짧은 머리에 바람막이. 반듯하고 무뚝뚝한 사람(군대 다녀온 티). 자세가 곧고 싸움도 반듯하게 주먹·발을 곧게 뻗음."
+    },
+    시민남5: {
+      sex: "남",
+      age: "30대 초반",
+      job: "직장인",
+      note: "30대 초반, 보통 체격, 캐주얼 블레이저에 로퍼. 깔끔 떠는 직장인, 체면을 차림. 옷매무새를 계속 고치고, 싸움은 뒤로 몸을 빼며 어색하게 밀치기만 함."
+    },
+    시민남6: {
+      sex: "남",
+      age: "20대 초반",
+      job: "대학생",
+      note: "20대 초반, 마른 체격, 지퍼 연 회색 후드에 통 넓은 청바지. 건들건들 여유 있는 대학생. 리듬 타듯 몸을 흔들고, 싸움은 팔다리가 길어 크게 휘두름."
+    },
+    가짜관리국진압B: {
+      sex: "남",
+      age: "20대",
+      job: "가짜 관리국 진압부대",
+      note: "넓은 턱과 어깨(근육질은 아님), 까까머리. 진압부대의 우직한 앞줄. 기술보다 무게로 밀고 크게 휘두른다. 근접은 소총을 가로로 들고 몸무게로 밀치거나 개머리판을 크게 내리찍음. 무기 꺼내기 = 등의 소총을 앞으로 돌려 오른허리에 받침, 원거리 = 허리춤 사격. 사망(서서): 돌며 쓰러짐."
+    },
+    시민남7: {
+      sex: "남",
+      age: "20대 초반",
+      note: "20대 초반, 마른 체격, 파란 풀오버 후드(캥거루 주머니)와 빛바랜 청바지. 소심하고 눈치 보는 사람. 어깨를 말고 다니며, 싸움은 눈 감고 한 번 휘두르는 게 전부."
+    },
+    시민남8: {
+      sex: "남",
+      age: "50대 후반",
+      note: "50대 후반, 보통 체격, 갈색 점퍼에 베이지 니트. 엄하고 깐깐한 동네 어른. 자세가 곧고 동작은 짧고 단호함, 싸울 땐 한 손으로 거리를 두고 손날로 내려침."
+    },
+    시민남9: {
+      sex: "남",
+      age: "20대",
+      job: "몸 쓰는 일",
+      note: "20대, 어깨 넓은 체격, 소매 걷은 작업 셔츠와 작업화. 몸 쓰는 일 하는 무던한 청년. 소매를 걷어 올리는 버릇, 싸움은 크게 붙잡고 묵직하게 치는 편(시민 중 가장 셈)."
+    },
+    시민여1: {
+      sex: "여",
+      age: "20대 중반",
+      note: "20대 중반, 보통 체격, 무채색 집업에 통 넓은 바지. 꾸밈없고 털털한 사람. 움직임은 가볍고 시원시원, 겁먹어도 금방 몸을 추스름."
+    },
+    시민여2: {
+      sex: "여",
+      age: "60대 후반",
+      note: "60대 후반 할머니, 둥근 체형, 누빔 조끼. 동작은 작고 느리며 무릎을 아낌. 싸울 땐 꾸짖듯 손바닥으로 때리고, 겁먹으면 크게 뛰지 못하고 종종걸음."
+    },
+    시민여3: {
+      sex: "여",
+      age: "40대 중반",
+      note: "40대 중반 동네 아주머니, 둥근 체형, 세이지색 니트. 할 말은 하는 사람. 손을 허리에 잘 얹고, 싸울 땐 밀치고 후려치지만 겁나면 비명부터."
+    },
+    시민여4: {
+      sex: "여",
+      age: "20대 후반",
+      note: "20대 후반, 마른 편, 청재킷에 발목까지 오는 긴 치마. 조용하고 조심스러운 사람. 치마라 보폭이 작고 발차기 없음, 머리카락을 자주 넘김."
+    },
+    시민여5: {
+      sex: "여",
+      age: "20대 후반",
+      job: "사무직",
+      note: "20대 후반 사무직, 보통 체격, 카디건·슬랙스·로퍼. 단정하고 예의 바른 사람. 몸가짐을 계속 정리하고, 싸움은 서툴러 뻣뻣하게 밀기만 함."
+    },
+    시민여6: {
+      sex: "여",
+      age: "20대 초반",
+      note: "20대 초반, 균형 잡힌 체격, 맨투맨·청바지·운동화. 활발하고 몸이 가벼운 사람. 가만있지 못하고 포니테일을 자주 만짐, 싸움도 겁 없이 발부터 나감."
+    },
+    시민여7: {
+      sex: "여",
+      age: "50대 후반",
+      note: "50대 후반, 둥근 체형, 올리브 카디건과 플랫슈즈. 차분하고 어른스러운 사람. 동작은 작고 침착하며, 싸울 땐 한 팔로 얼굴을 막고 다른 손으로 밀어냄."
+    },
+    가짜관리국진압C: {
+      sex: "남",
+      age: "20대",
+      job: "가짜 관리국 진압부대",
+      note: "조금 마른 몸, 긴 얼굴, 이마 위 일자 앞머리. 진압부대의 날렵한 막내. 거리를 재며 소총 총구로 빠르게 찌르고 빠진다(맨손 대신 소총). 무기 꺼내기 = 등의 소총을 앞으로 돌려 낮게 듦, 원거리 = 한쪽 무릎을 꿇고 견착 사격. 사망(서서): 그대로 무너짐."
+    },
+    시민여8: {
+      sex: "여",
+      age: "20대 초반",
+      note: "20대 초반, 보통 체격, 분홍 맨투맨. 숫기 없고 겁 많은 사람. 소매를 손등까지 끌어내리는 버릇, 싸움은 눈 감고 허우적거리는 수준."
+    },
+    시민여9: {
+      sex: "여",
+      age: "20대 후반",
+      job: "회사원",
+      note: "20대 후반 회사원, 보통 체격, 블라우스·낮은 굽 구두, 왼쪽 엉덩이에 작은 핸드백. 늘 불안하게 주위를 살피는 사람. 한 손은 자꾸 가방끈을 쥐고, 굽 때문에 걸음이 조심스러움."
+    },
+    불량배남1: {
+      sex: "남",
+      age: "10대(고등학생)",
+      note: "뚱하게 곁눈질하는 남고생 불량배. 남색 점퍼·회색 티·조거 바지. 남 3보다 덩치가 있어 가슴 내밀고 몸으로 들이받는 거리 싸움(밀치기·훅·박치기·태클). 개인 대기는 쪼그

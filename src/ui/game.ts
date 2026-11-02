@@ -8,7 +8,7 @@ import { codeState, codeStats, installGameCode, loadGameCode } from '../host/gam
 import { fetchStats, forgetIndex, gameIndex, type GameIndex } from '../host/game/fetch';
 import { downloadGamePack, installGamePack, liveUrls, packStateOf, releaseAll } from '../host/game/packs';
 import { gameSaves } from '../host/game/saves';
-import { clearRecord, dropReport, onReports, pendingReports, postReport, readCard, recordReport, type PendingReport } from '../host/game/card';
+import { clearRecord, dropReport, onReports, pendingReports, readCard, recordReport, type PendingReport } from '../host/game/card';
 import { makeBridge } from '../host/game';
 import { makeViewport, phone, type ViewportCtl } from '../host/game/viewport';
 import { setFabHidden } from '../host/overlay';
@@ -92,9 +92,8 @@ function linkHtml(card: CardSnapshot | null, reports: PendingReport[], record: n
   const free = card.agents.filter((a) => !a.locked).length;
   const reps = reports.map((p) => row(
     esc(p.report.mission),
-    `${{ return: '귀환', evac: '후송', withdraw: '자발 철수' }[p.report.outcome]}${p.report.depth ? ` · ${esc(p.report.depth)}` : ''} · ${when(p.at)}${p.report.summary ? ` · ${esc(p.report.summary)}` : ''}`,
-    `<button class="gx-mini${p.posted ? '' : ' primary'}" data-g="post" data-at="${p.at}"${p.posted || busy ? ' disabled' : ''}>${p.posted ? '채팅에 놓음' : '보고서 붙이기'}</button>
-     <button class="gx-mini" data-g="record" data-at="${p.at}"${p.recorded || busy ? ' disabled' : ''}>${p.recorded ? '기록함' : '기록 로어북에 남기기'}</button>
+    `${{ return: '귀환', evac: '부상·후송', withdraw: '자발 철수', death: '사망' }[p.report.outcome]}${p.report.depth ? ` · ${esc(p.report.depth)}` : ''} · ${when(p.at)}${p.report.summary ? ` · ${esc(p.report.summary)}` : ''}`,
+    `<button class="gx-mini primary" data-g="record" data-at="${p.at}"${p.recorded || busy ? ' disabled' : ''}>${p.recorded ? '기록함' : '기록 로어북에 남기기'}</button>
      <button class="gx-mini" data-g="drop" data-at="${p.at}" aria-label="결과 지우기">${ICONS.trash}</button>`,
   )).join('');
   return group('본편 연동', [
@@ -282,15 +281,6 @@ async function onClick(e: MouseEvent): Promise<void> {
         else await viewport?.enter();
         if (view !== 'home') viewport?.fill(true);
         return setHead();
-      case 'post': {
-        const p = await find();
-        if (!p) return;
-        busy = '채팅에 놓는 중';
-        void home();
-        await postReport(p);
-        busy = '';
-        return say('보고서를 채팅에 놓았어요. 보내려면 채팅창의 전송 버튼을, 그만두려면 메시지의 취소를 눌러 주세요.');
-      }
       case 'record': {
         const p = await find();
         if (!p) return;

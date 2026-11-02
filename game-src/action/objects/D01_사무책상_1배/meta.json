@@ -1,0 +1,86 @@
+{
+ "object_id": "51c8b253-f745-43c5-8ff8-f4e20ad493ed",
+ "job": {
+  "usage": {
+   "type": "usd",
+   "usd": 0.04109424938583374
+  },
+  "id": "88eba1a8-d87d-4521-90c4-8c5ce578778a",
+  "status": "completed",
+  "created_at": "2026-11-02T06:26:34.085473+00:00",
+  "last_response": {
+   "status": "completed",
+   "progress": 1,
+   "object_id": "51c8b253-f745-43c5-8ff8-f4e20ad493ed",
+   "image_size": {
+    "width": 256,
+    "height": 256
+   },
+   "frame_count": 1,
+   "single_frame": true,
+   "storage_urls": {
+    "unknown": "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/51c8b253-f745-43c5-8ff8-f4e20ad493ed/rotations/unknown.png"
+   },
+   "billing_usage": {
+    "usd": 0.04109424938583374,
+    "type": "usd"
+   },
+   "generation_id": "67c054d3-c81f-4160-a465-1d90b36d16c0",
+   "billing_stages": [
+    {
+     "stage": "first_direction",
+     "usage": {
+      "usd": 0.04109424938583374,
+      "type": "usd"
+     },
+     "generation_id": "67c054d3-c81f-4160-a465-1d90b36d16c0"
+    }
+   ],
+   "billing_charged": true,
+   "generation_mode": "pro_flash",
+   "source_image_id": "6bfb8432-63bc-531b-b445-8328ea46fc42",
+   "directions_count": 1,
+   "first_direction_generated": true
+  }
+ },
+ "object": {
+  "id": "51c8b253-f745-43c5-8ff8-f4e20ad493ed",
+  "name": "D01_사무책상_1배",
+  "state_name": "base",
+  "prompt": "An office work desk with things on it: a computer monitor that is switched on with a bright lit screen, a computer tower, a keyboard, a mouse, and piles of papers and document folders. A plain rectangular desk with a flat top and a drawer unit under one side. The monitor faces the viewer, its lit screen fully visible. Seen from the front and only slightly from above, so the top surface shows as a shallow band and the front edge of the top is clearly visible. The desk is much wider than it is tall and fills almost the whole width of the canvas. Only the desk with the things on it, centered, nothing else.",
+  "size": {
+   "width": 256,
+   "height": 256
+  },
+  "directions": 1,
+  "created_at": "2026-11-02T06:26:34.133344+00:00",
+  "view": "low top-down",
+  "rotation_urls": {
+   "south": null,
+   "west": null,
+   "east": null,
+   "north": null,
+   "south-east": null,
+   "south-west": null,
+   "north-east": null,
+   "north-west": null
+  },
+  "storage_urls": {
+   "unknown": "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/51c8b253-f745-43c5-8ff8-f4e20ad493ed/rotations/unknown.png"
+  },
+  "frame_urls": null,
+  "style_settings": {
+   "version": "v2.0.0+api",
+   "no_background": true,
+   "generation_mode": "pro_flash",
+   "source_image_id": "6bfb8432-63bc-531b-b445-8328ea46fc42",
+   "first_frame_direction": "south"
+  },
+  "tags": [],
+  "status": "completed",
+  "group_id": "28ea17a8-569f-4cec-ab34-defded9fff85",
+  "progress_percent": null,
+  "eta_seconds": null,
+  "animations": []
+ }
+}

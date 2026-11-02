@@ -1,0 +1,984 @@
+{
+ "key": "1.7_고르고디오",
+ "name": "고르고디오",
+ "dir": "E",
+ "color": "#2F6BFF",
+ "armed": true,
+ "anims": {
+  "1": {
+   "folder": "1",
+   "mirror": false,
+   "name": "평상 대기"
+  },
+  "2": {
+   "folder": "2",
+   "mirror": false,
+   "name": "개인 대기"
+  },
+  "3_0": {
+   "folder": "3_0",
+   "mirror": false,
+   "name": "전투 자세 잡기"
+  },
+  "3": {
+   "folder": "3",
+   "mirror": false,
+   "name": "전투 대기"
+  },
+  "W": {
+   "folder": "W",
+   "mirror": false,
+   "name": "무기 꺼내기"
+  },
+  "W_1": {
+   "folder": "W_1",
+   "mirror": false,
+   "name": "무기 대기"
+  },
+  "4": {
+   "folder": "4",
+   "mirror": false,
+   "name": "걷기"
+  },
+  "5": {
+   "folder": "5",
+   "mirror": false,
+   "name": "뛰기"
+  },
+  "6": {
+   "folder": "6",
+   "mirror": false,
+   "name": "제자리 점프"
+  },
+  "7": {
+   "folder": "7",
+   "mirror": false,
+   "name": "방향 점프"
+  },
+  "8": {
+   "folder": "8",
+   "mirror": false,
+   "name": "달리다 점프"
+  },
+  "9": {
+   "folder": "9",
+   "mirror": false,
+   "name": "약1 손바닥 밀어치기"
+  },
+  "10": {
+   "folder": "10",
+   "mirror": false,
+   "name": "약2 팔뚝 래리엇"
+  },
+  "11": {
+   "folder": "11",
+   "mirror": false,
+   "name": "약3 멱살 박치기"
+  },
+  "12": {
+   "folder": "12",
+   "mirror": false,
+   "name": "강 기둥 부수기 어퍼컷"
+  },
+  "13": {
+   "folder": "13",
+   "mirror": false,
+   "name": "돌진 공격 러닝 빅 부트"
+  },
+  "14": {
+   "folder": "14",
+   "mirror": false,
+   "name": "점프 공격 쌍주먹 내려치기"
+  },
+  "15": {
+   "folder": "15",
+   "mirror": false,
+   "name": "원거리 공격 칼 바닥 올려베기"
+  },
+  "16": {
+   "folder": "16",
+   "mirror": false,
+   "name": "뒤 회피 팔뚝 가드 뒷뜀"
+  },
+  "16_1": {
+   "folder": "16_1",
+   "mirror": false,
+   "name": "앞 회피 태클 파고들기"
+  },
+  "17": {
+   "folder": "17",
+   "mirror": false,
+   "name": "막기 어깨 방패"
+  },
+  "18": {
+   "folder": "18",
+   "mirror": false,
+   "name": "맞기"
+  },
+  "19": {
+   "folder": "19",
+   "mirror": false,
+   "name": "날아가 쓰러지기"
+  },
+  "20": {
+   "folder": "20",
+   "mirror": false,
+   "name": "일어나기 킵업"
+  },
+  "21": {
+   "folder": "21",
+   "mirror": false,
+   "name": "스턴"
+  },
+  "22": {
+   "folder": "22",
+   "mirror": false,
+   "name": "고유기술 「승인 요청」"
+  },
+  "23": {
+   "folder": "23",
+   "mirror": false,
+   "name": "충전 「내려치기」 모으기"
+  },
+  "24": {
+   "folder": "24",
+   "mirror": false,
+   "name": "충전 방출"
+  },
+  "25": {
+   "folder": "25",
+   "mirror": false,
+   "name": "필살기 「붕괴 돌파」"
+  },
+  "26": {
+   "folder": "26",
+   "mirror": false,
+   "name": "섭취"
+  },
+  "27": {
+   "folder": "27",
+   "mirror": false,
+   "name": "줍기"
+  },
+  "28": {
+   "folder": "28",
+   "mirror": false,
+   "name": "응대"
+  },
+  "29": {
+   "folder": "29",
+   "mirror": false,
+   "name": "말하며 손짓"
+  },
+  "30": {
+   "folder": "30",
+   "mirror": false,
+   "name": "끄덕이기"
+  },
+  "31": {
+   "folder": "31",
+   "mirror": false,
+   "name": "고개 젓기"
+  },
+  "32": {
+   "folder": "32",
+   "mirror": false,
+   "name": "화내기 호통"
+  },
+  "33": {
+   "folder": "33",
+   "mirror": false,
+   "name": "발견 반응"
+  },
+  "34": {
+   "folder": "34",
+   "mirror": false,
+   "name": "놀라기"
+  },
+  "35": {
+   "folder": "35",
+   "mirror": false,
+   "name": "기뻐하기"
+  },
+  "36": {
+   "folder": "36",
+   "mirror": false,
+   "name": "도망"
+  },
+  "37": {
+   "folder": "37",
+   "mirror": false,
+   "name": "뒷걸음질 (움츠리기)"
+  },
+  "37_1": {
+   "folder": "37_1",
+   "mirror": false,
+   "name": "뒷걸음질 반복"
+  },
+  "38": {
+   "folder": "38",
+   "mirror": false,
+   "name": "엎드려 기기"
+  },
+  "38_1": {
+   "folder": "38_1",
+   "mirror": false,
+   "name": "엎드려 기기 반복"
+  },
+  "39": {
+   "folder": "39",
+   "mirror": false,
+   "name": "주저앉기"
+  },
+  "41": {
+   "folder": "41",
+   "mirror": false,
+   "name": "웅크려 떨기"
+  },
+  "42": {
+   "folder": "42",
+   "mirror": false,
+   "name": "네발로 기기"
+  },
+  "42_1": {
+   "folder": "42_1",
+   "mirror": false,
+   "name": "네발로 기기 반복"
+  },
+  "22_1": {
+   "folder": "22_1",
+   "mirror": false,
+   "name": "고유기술 「초음속 돌격」"
+  }
+ },
+ "picks": {
+  "combat": 3,
+  "weapon": 4,
+  "apex": 5,
+  "run": 2,
+  "crawl4": 6
+ },
+ "loops": {
+  "1": [
+   1,
+   2,
+   3,
+   4
+  ],
+  "3": [
+   1,
+   2,
+   3,
+   4
+  ],
+  "W_1": [
+   1,
+   2,
+   3,
+   4
+  ],
+  "4": [
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7,
+   8
+  ],
+  "5": [
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7,
+   8
+  ],
+  "21": [
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7,
+   8
+  ],
+  "29": [
+   1,
+   2,
+   3,
+   4
+  ],
+  "36": [
+   2,
+   3,
+   4,
+   5,
+   6,
+   7,
+   8
+  ],
+  "37_1": [
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7,
+   8,
+   9
+  ],
+  "38": [
+   6,
+   7,
+   8,
+   9,
+   10,
+   11,
+   12
+  ],
+  "38_1": [
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7,
+   8
+  ],
+  "39": [
+   9,
+   10,
+   11,
+   12
+  ],
+  "41": [
+   3,
+   4,
+   5,
+   6,
+   7,
+   8
+  ],
+  "42": [
+   6,
+   7,
+   8,
+   9,
+   10,
+   11,
+   12
+  ],
+  "42_1": [
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7,
+   8,
+   9
+  ],
+  "19": [
+   8,
+   9,
+   10,
+   11,
+   12
+  ]
+ },
+ "hit": {
+  "9": 4,
+  "10": 6,
+  "11": 4,
+  "12": 4,
+  "13": 3,
+  "14": 3,
+  "15": 6
+ },
+ "gun": [
+  "W",
+  "W_1",
+  "15"
+ ],
+ "kick": [],
+ "ranged": {
+  "proj": {
+   "t": "proj",
+   "kind": "orb",
+   "at": "front",
+   "dx": 70,
+   "h": 24,
+   "speed": 1300,
+   "size": 1.8,
+   "color": "#9fd0ff",
+   "hit": {
+    "dmg": 14,
+    "kind": "heavy"
+   }
+  },
+  "heat": false,
+  "_note": "칼을 올려 드는 6장에 바닥을 타는 충격파"
+ },
+ "skills": {
+  "skill": {
+   "name": "초음속 돌격",
+   "anim": "22_1",
+   "fps": 10,
+   "armorAll": true,
+   "events": [
+    {
+     "f": 4,
+     "hold": 0.5,
+     "fx": [
+      {
+       "t": "v",
+       "vfx": "x3-1.7-D-back-booster",
+       "at": "body",
+       "dx": -60,
+       "scale": 1.6
+      },
+      {
+       "t": "dash",
+       "speed": 1700,
+       "time": 0.5,
+       "hit": {
+        "dmg": 270,
+        "kind": "blow",
+        "stop": 0.16,
+        "shake": 14,
+        "vfx": "x3-c-hit-spark-heavy",
+        "tint": "#8FB4FF"
+       }
+      }
+     ]
+    },
+    {
+     "f": 6,
+     "fx": [
+      {
+       "t": "v",
+       "vfx": "x3-c-dust-cloud-large",
+       "at": "front",
+       "dx": 90,
+       "scale": 0.5,
+       "tint": "#8FB4FF",
+       "under": true
+      },
+      {
+       "t": "v",
+       "vfx": "x3-c-dust-puff",
+       "at": "self",
+       "scale": 1.5,
+       "tint": "#c8c0b0"
+      }
+     ]
+    }
+   ]
+  },
+  "charge": {
+   "name": "식칼 내려치기",
+   "hold": "23",
+   "release": "24",
+   "armed": true,
+   "levels": [
+    0.5,
+    1.2
+   ],
+   "fire": 4,
+   "lv": {
+    "0": [
+     {
+      "t": "v",
+      "vfx": "x3-c-ground-crack",
+      "at": "front",
+      "dx": 155,
+      "scale": 0.6,
+      "under": true,
+      "r": 100,
+      "hit": {
+       "dmg": 75,
+       "kind": "down",
+       "stop": 0.14,
+       "shake": 10
+      }
+     },
+     {
+      "t": "shake",
+      "v": 8
+     }
+    ],
+    "1": [
+     {
+      "t": "v",
+      "vfx": "x3-c-ground-crack",
+      "at": "front",
+      "dx": 110,
+      "scale": 0.5,
+      "under": true
+     },
+     {
+      "t": "v",
+      "vfx": "x3-1.7-S1-running-crack",
+      "at": "front",
+      "dx": 330,
+      "r": 230,
+      "delay": 0.2,
+      "under": true,
+      "hit": {
+       "dmg": 150,
+       "kind": "launch",
+       "stop": 0.16,
+       "shake": 12
+      }
+     }
+    ],
+    "2": [
+     {
+      "t": "v",
+      "vfx": "x3-1.7-S2-floor-collapse",
+      "at": "front",
+      "dx": 120,
+      "scale": 1.25,
+      "r": 300,
+      "depth": 110,
+      "under": true,
+      "boom": 2,
+      "hit": {
+       "dmg": 240,
+       "kind": "down",
+       "n": 2,
+       "mid": "light",
+       "every": 0.45,
+       "stop": 0.18,
+       "shake": 14
+      }
+     },
+     {
+      "t": "later",
+      "in": 0.25,
+      "fx": [
+       {
+        "t": "v",
+        "vfx": "x3-c-debris-rain",
+        "at": "front",
+        "dx": 120,
+        "h": 230,
+        "scale": 1.2
+       },
+       {
+        "t": "v",
+        "vfx": "x3-c-dust-cloud-large",
+        "at": "front",
+        "dx": 120,
+        "scale": 0.8,
+        "tint": "#a89c88"
+       }
+      ]
+     },
+     {
+      "t": "shake",
+      "v": 12
+     }
+    ]
+   }
+  },
+  "super": {
+   "name": "붕괴 돌파",
+   "sub": "「꽉 잡아. 벽은 내가 맞을게.」",
+   "steps": [
+    {
+     "anim": "22",
+     "fps": 9,
+     "events": [
+      {
+       "f": 4,
+       "hold": 0.3,
+       "fx": [
+        {
+         "t": "v",
+         "vfx": "x3-1.7-F-wall-breach",
+         "at": "screen",
+         "w": 1.05,
+         "dy": -90
+        },
+        {
+         "t": "flash",
+         "v": 0.06
+        },
+        {
+         "t": "shake",
+         "v": 4
+        },
+        {
+         "t": "v",
+         "vfx": "x3-o-1.7-armor-plate",
+         "at": "body",
+         "dx": -40,
+         "dy": -60,
+         "scale": 1.6,
+         "rot": 8
+        },
+        {
+         "t": "v",
+         "vfx": "x3-o-1.7-armor-plate",
+         "at": "body",
+         "dx": 30,
+         "dy": -20,
+         "scale": 1.6,
+         "rot": 8
+        },
+        {
+         "t": "v",
+         "vfx": "x3-o-1.7-armor-plate",
+         "at": "body",
+         "dx": -20,
+         "dy": 30,
+         "scale": 1.6,
+         "rot": 8
+        },
+        {
+         "t": "v",
+         "vfx": "x3-o-1.7-armor-plate",
+         "at": "body",
+         "dx": 40,
+         "dy": 60,
+         "scale": 1.6,
+         "rot": 8
+        },
+        {
+         "t": "v",
+         "vfx": "x3-o-1.7-armor-plate",
+         "at": "body",
+         "dx": 0,
+         "dy": -100,
+         "scale": 1.6,
+         "rot": 8
+        },
+        {
+         "t": "v",
+         "vfx": "x3-o-1.7-armor-plate",
+         "at": "body",
+         "dx": -50,
+         "dy": 80,
+         "scale": 1.6,
+         "rot": 8
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "anim": "25",
+     "fps": 9,
+     "events": [
+      {
+       "f": 2,
+       "hold": 0.55,
+       "fx": [
+        {
+         "t": "v",
+         "vfx": "x3-1.7-D-back-booster",
+         "at": "body",
+         "dx": -60,
+         "scale": 2
+        },
+        {
+         "t": "dash",
+         "speed": 1600,
+         "time": 0.55,
+         "hit": {
+          "dmg": 243,
+          "kind": "launch",
+          "stop": 0.14,
+          "shake": 12,
+          "vfx": "x3-c-hit-spark-heavy",
+          "tint": "#8FB4FF"
+         }
+        }
+       ]
+      },
+      {
+       "f": 6,
+       "hold": 0.25,
+       "fx": [
+        {
+         "t": "v",
+         "vfx": "x3-c-wall-crack",
+         "at": "front",
+         "dx": 90,
+         "h": 180,
+         "scale": 2.4,
+         "boom": 3,
+         "r": 160,
+         "hit": {
+          "dmg": 205,
+          "kind": "blow",
+          "stop": 0.2,
+          "shake": 16
+         }
+        },
+        {
+         "t": "shake",
+         "v": 16
+        }
+       ]
+      },
+      {
+       "f": 8,
+       "hold": 0.3,
+       "fx": [
+        {
+         "t": "screen",
+         "spots": 6,
+         "every": 0.08,
+         "each": [
+          {
+           "t": "v",
+           "vfx": "x3-c-debris-rain",
+           "h": 260,
+           "scale": 1.3,
+           "r": 90,
+           "delay": 0.4,
+           "hit": {
+            "dmg": 137,
+            "kind": "down",
+            "stop": 0.12,
+            "shake": 12
+           }
+          }
+         ]
+        },
+        {
+         "t": "later",
+         "in": 0.4,
+         "fx": [
+          {
+           "t": "v",
+           "vfx": "x3-c-dust-cloud-large",
+           "at": "screen",
+           "w": 1.05,
+           "tint": "#a89c88"
+          },
+          {
+           "t": "shake",
+           "v": 14
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "f": 12,
+       "hold": 0.5,
+       "fx": []
+      }
+     ]
+    }
+   ]
+  }
+ },
+ "skills_2판": {
+  "skill": {
+   "name": "승인 요청",
+   "anim": "22",
+   "fps": 9,
+   "alt": "dash",
+   "events": [
+    {
+     "f": 1,
+     "fx": [
+      {
+       "t": "text",
+       "v": "승인 요청!"
+      }
+     ]
+    },
+    {
+     "f": 4,
+     "fx": [
+      {
+       "t": "flash",
+       "v": 0.06
+      },
+      {
+       "t": "shake",
+       "v": 4
+      },
+      {
+       "t": "buff",
+       "time": 12,
+       "label": "장갑 상태(S = 초음속 돌격)",
+       "edge": false,
+       "color": "#5a8cff"
+      }
+     ]
+    }
+   ]
+  },
+  "dash": {
+   "name": "초음속 돌격",
+   "anim": "22_1",
+   "fps": 10,
+   "armorAll": true,
+   "events": [
+    {
+     "f": 4,
+     "hold": 0.5,
+     "fx": [
+      {
+       "t": "dash",
+       "speed": 1700,
+       "time": 0.5,
+       "hit": {
+        "dmg": 60,
+        "kind": "blow",
+        "stop": 0.16,
+        "shake": 14
+       }
+      }
+     ]
+    }
+   ]
+  },
+  "charge": {
+   "name": "건틀릿 해체(맨몸 = 내려치기)",
+   "hold": "23",
+   "release": "24",
+   "armed": true,
+   "levels": [
+    0.5,
+    1.2
+   ],
+   "fire": 4,
+   "lv": {
+    "0": [
+     {
+      "t": "shock",
+      "r": 140,
+      "hit": {
+       "dmg": 50,
+       "kind": "heavy"
+      }
+     }
+    ],
+    "1": [
+     {
+      "t": "shock",
+      "r": 200,
+      "hit": {
+       "dmg": 84,
+       "kind": "down",
+       "stop": 0.16
+      }
+     }
+    ],
+    "2": [
+     {
+      "t": "shock",
+      "r": 300,
+      "hit": {
+       "dmg": 67,
+       "kind": "launch",
+       "n": 2,
+       "mid": "heavy",
+       "stop": 0.2,
+       "shake": 14
+      }
+     }
+    ]
+   }
+  },
+  "super": {
+   "name": "붕괴 돌파",
+   "sub": "「꽉 잡아. 벽은 내가 맞을게.」",
+   "anim": "25",
+   "fps": 9,
+   "events": [
+    {
+     "f": 2,
+     "hold": 0.55,
+     "fx": [
+      {
+       "t": "dash",
+       "speed": 1400,
+       "time": 0.55,
+       "hit": {
+        "dmg": 72,
+        "kind": "launch"
+       }
+      },
+      {
+       "t": "big",
+       "vfx": "sup-1.7"
+      }
+     ]
+    },
+    {
+     "f": 6,
+     "hold": 0.2,
+     "fx": [
+      {
+       "t": "blast",
+       "at": "front",
+       "dx": 90,
+       "scale": 2.0,
+       "r": 160,
+       "hit": {
+        "dmg": 108,
+        "kind": "blow",
+        "stop": 0.2,
+        "shake": 16
+       }
+      }
+     ]
+    },
+    {
+     "f": 12,
+     "hold": 0.5,
+     "fx": [
+      {
+       "t": "text",
+       "v": "꽉 잡아. 벽은 내가 맞을게."
+      }
+     ]
+    }
+   ]
+  }
+ },
+ "_note": "손으로 다듬음(표 「테스트룸」 절·기술안). 그림 값은 자동. 다시 자동으로: build.py --reset 1.7_고르고디오",
+ "clean": {
+  "38_1": [
+   [
+    6,
+    70
+   ]
+  ]
+ },
+ "bal": {
+  "role": "bruiser",
+  "speed": "slow",
+  "gun": "heavy",
+  "atk": {
+   "9": 17,
+   "10": 18,
+   "11": 22,
+   "12": 29,
+   "13": 23,
+   "14": 25
+  },
+  "cd": {
+   "shot": 2.5,
+   "skill": 5
+  },
+  "shotDmg": 30,
+  "superType": "aoe"
+ }
+}

@@ -1,0 +1,287 @@
+{
+ "frames": [
+  {
+   "filename": "x3-2-5-f-video-slam 0.png",
+   "frame": {
+    "x": 0,
+    "y": 0,
+    "w": 800,
+    "h": 480
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 800,
+    "h": 480
+   },
+   "sourceSize": {
+    "w": 800,
+    "h": 480
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.75
+   },
+   "duration": 71
+  },
+  {
+   "filename": "x3-2-5-f-video-slam 1.png",
+   "frame": {
+    "x": 800,
+    "y": 0,
+    "w": 800,
+    "h": 480
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 800,
+    "h": 480
+   },
+   "sourceSize": {
+    "w": 800,
+    "h": 480
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.75
+   },
+   "duration": 71
+  },
+  {
+   "filename": "x3-2-5-f-video-slam 2.png",
+   "frame": {
+    "x": 1600,
+    "y": 0,
+    "w": 800,
+    "h": 480
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 800,
+    "h": 480
+   },
+   "sourceSize": {
+    "w": 800,
+    "h": 480
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.75
+   },
+   "duration": 71
+  },
+  {
+   "filename": "x3-2-5-f-video-slam 3.png",
+   "frame": {
+    "x": 2400,
+    "y": 0,
+    "w": 800,
+    "h": 480
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 800,
+    "h": 480
+   },
+   "sourceSize": {
+    "w": 800,
+    "h": 480
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.75
+   },
+   "duration": 71
+  },
+  {
+   "filename": "x3-2-5-f-video-slam 4.png",
+   "frame": {
+    "x": 0,
+    "y": 480,
+    "w": 800,
+    "h": 480
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 800,
+    "h": 480
+   },
+   "sourceSize": {
+    "w": 800,
+    "h": 480
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.75
+   },
+   "duration": 71
+  },
+  {
+   "filename": "x3-2-5-f-video-slam 5.png",
+   "frame": {
+    "x": 800,
+    "y": 480,
+    "w": 800,
+    "h": 480
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 800,
+    "h": 480
+   },
+   "sourceSize": {
+    "w": 800,
+    "h": 480
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.75
+   },
+   "duration": 71
+  },
+  {
+   "filename": "x3-2-5-f-video-slam 6.png",
+   "frame": {
+    "x": 1600,
+    "y": 480,
+    "w": 800,
+    "h": 480
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 800,
+    "h": 480
+   },
+   "sourceSize": {
+    "w": 800,
+    "h": 480
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.75
+   },
+   "duration": 71
+  },
+  {
+   "filename": "x3-2-5-f-video-slam 7.png",
+   "frame": {
+    "x": 2400,
+    "y": 480,
+    "w": 800,
+    "h": 480
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 800,
+    "h": 480
+   },
+   "sourceSize": {
+    "w": 800,
+    "h": 480
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.75
+   },
+   "duration": 71
+  },
+  {
+   "filename": "x3-2-5-f-video-slam 8.png",
+   "frame": {
+    "x": 0,
+    "y": 960,
+    "w": 800,
+    "h": 480
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 800,
+    "h": 480
+   },
+   "sourceSize": {
+    "w": 800,
+    "h": 480
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.75
+   },
+   "duration": 71
+  },
+  {
+   "filename": "x3-2-5-f-video-slam 9.png",
+   "frame": {
+    "x": 800,
+    "y": 960,
+    "w": 800,
+    "h": 480
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 800,
+    "h": 480
+   },
+   "sourceSize": {
+    "w": 800,
+    "h": 480
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.75
+   },
+   "duration": 71
+  }
+ ],
+ "meta": {
+  "app": "PixelLab VFX Creator",
+  "image": "x3-2-5-f-video-slam.png",
+  "format": "RGBA8888",
+  "size": {
+   "w": 3200,
+   "h": 1440
+  },
+  "scale": "1",
+  "anchor": {
+   "kind": "origin",
+   "x": 400,
+   "y": 360
+  },
+  "frameTags": [
+   {
+    "name": "x3-2-5-f-video-slam",
+    "from": 0,
+    "to": 9,
+    "direction": "forward"
+   }
+  ]
+ }
+}

@@ -1,0 +1,87 @@
+{
+ "object_id": "690cbc10-d605-4f9b-ac89-c0b44e5be945",
+ "job": {
+  "usage": {
+   "type": "generations",
+   "generations": 6.0
+  },
+  "id": "e6bd50c7-47fe-4197-bb33-bb03b95bc791",
+  "status": "completed",
+  "created_at": "2026-11-01T17:27:05.306400+00:00",
+  "last_response": {
+   "status": "completed",
+   "progress": 1,
+   "object_id": "690cbc10-d605-4f9b-ac89-c0b44e5be945",
+   "image_size": {
+    "width": 200,
+    "height": 200
+   },
+   "frame_count": 1,
+   "single_frame": true,
+   "storage_urls": {
+    "unknown": "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/690cbc10-d605-4f9b-ac89-c0b44e5be945/rotations/unknown.png"
+   },
+   "billing_usage": {
+    "type": "generations",
+    "generations": 6.0
+   },
+   "generation_id": "3d09f4f1-84e0-446f-b0fe-a595d439e68e",
+   "billing_stages": [
+    {
+     "stage": "first_direction",
+     "usage": {
+      "usd": 0.0,
+      "type": "generations",
+      "generations": 6
+     },
+     "generation_id": "3d09f4f1-84e0-446f-b0fe-a595d439e68e"
+    }
+   ],
+   "billing_charged": true,
+   "generation_mode": "pro_flash",
+   "source_image_id": "40a57658-48d1-5809-b0d9-89d0d19d0825",
+   "directions_count": 1,
+   "first_direction_generated": true
+  }
+ },
+ "object": {
+  "id": "690cbc10-d605-4f9b-ac89-c0b44e5be945",
+  "name": "L02_쉘의자_1배",
+  "state_name": "base",
+  "prompt": "A plain modern plastic shell chair for an office break room: the seat and backrest are one smooth molded plastic shell with no gap, the back fully closed, light gray shell, four thin straight black metal legs, no armrests. Same size in every direction: about 135 pixels tall, seat about 64 pixels above the floor. Only the chair, centered, nothing else.",
+  "size": {
+   "width": 200,
+   "height": 200
+  },
+  "directions": 1,
+  "created_at": "2026-11-01T17:27:05.351309+00:00",
+  "view": "low top-down",
+  "rotation_urls": {
+   "south": null,
+   "west": null,
+   "east": null,
+   "north": null,
+   "south-east": null,
+   "south-west": null,
+   "north-east": null,
+   "north-west": null
+  },
+  "storage_urls": {
+   "unknown": "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/690cbc10-d605-4f9b-ac89-c0b44e5be945/rotations/unknown.png"
+  },
+  "frame_urls": null,
+  "style_settings": {
+   "version": "v2.0.0+api",
+   "no_background": true,
+   "generation_mode": "pro_flash",
+   "source_image_id": "40a57658-48d1-5809-b0d9-89d0d19d0825",
+   "first_frame_direction": "south"
+  },
+  "tags": [],
+  "status": "completed",
+  "group_id": "2328443e-9177-4fca-a5a9-62c1040560b1",
+  "progress_percent": null,
+  "eta_seconds": null,
+  "animations": []
+ }
+}

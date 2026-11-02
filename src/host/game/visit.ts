@@ -2,7 +2,10 @@ import { uid } from './uid';
 import type { GameVisit, VisitState } from '../../game/bridge';
 import { cardSnapshot } from '../../core/gamelink';
 import { anchorOf, visitRecord, visitRoom, withoutOldLore, withVisitTurn, type VisitTurn } from '../../core/visit';
-import { agentLore, parseVisitGroup, visitPrompt, type VisitAgent, type VisitLine } from '../../core/visitPrompt';
+import { agentLore, parseVisitGroup, takeCueTag, takeFieldTags, visitPrompt, type FieldTag, type VisitAgent, type VisitLine } from '../../core/visitPrompt';
+import { changeId, peopleStore, putChange, withPeople } from '../../core/people/store';
+import { peopleSettings } from '../../core/people/settings';
+import { liveSheetOf } from './people';
 import { advValue, budgetFor } from '../../core/advanced';
 import { fitPrompt } from '../../core/budget';
 import type { RefSource } from '../../core/refs';
@@ -63,7 +66,7 @@ export function createVisit(): GameVisit {
       if (clean !== c.chat) await updateChat(c.charIndex, c.chatIndex, chat => chat.id === c.chat.id ? withoutOldLore(chat) : null).catch(() => null);
       return stateOf(c);
     },
-    async send(agentId, input, which, nearby = []) {
+    async send(agentId, input, which, nearby = [], opts = {}) {
       if (busy || isWaiting()) throw new Error('진행 중인 응답이 끝난 뒤 보내 주세요.');
       // *…*로 감싸면 말이 아니라 행동 (2026-10-23 사용자: 행동 지시를 대사로 받아들임)
       const acted = /^\*([^*]+)\*?$/.exec(input.trim());
@@ -79,9 +82,12 @@ export function createVisit(): GameVisit {
         const row = readDirectory(c.char.globalLore ?? []).agents.find(r => r.id === agentId);
         // 본편과 같은 방식: 캐릭터로 플레이면 playerSource가 페르소나 자리에 그 요원의 주인공 글(playerBlock)을 넣는다
         const src = playerSource({ char: c.char as RefSource['char'], chat: c.chat, persona: me ? '' : await readPersona() });
-        const lore = agentLore(src, row?.lore || a.name);
-        if (!lore) throw new Error('요원 설정을 찾지 못해 대화를 시작할 수 없어요.');
+        const lore0 = agentLore(src, row?.lore || a.name);
+        if (!lore0) throw new Error('요원 설정을 찾지 못해 대화를 시작할 수 없어요.');
         const visitorName = me?.name ?? (String(await risuai.parseRisuChat('{{user}}') ?? '').replace(/\{\{[^}]*\}\}/g, '').trim() || '방문자');
+        // 인물 기록이 켜져 있으면 시트 대신 살아 있는 기록(고정 절 + 지금 상태·호감·호칭)을 넣는다 (11-01, 인물기록_구현현황 2장 1번)
+        const peopleOn = peopleSettings(c.chat.scriptstate).on && !!peopleStore(c.chat).people[a.name];
+        const lore = liveSheetOf(c, a.name, lore0, visitorName) ?? lore0;
         await context();
         // 이번 막간 = 지금 마지막 메시지 뒤에서 나눈 말 (본편이 한 턴 진행되면 새 막간)
         const anchor = anchorOf(c.chat);
@@ -97,13 +103,14 @@ export function createVisit(): GameVisit {
           const b = id !== agentId && id !== me?.id ? cardSnapshot(c.char, c.chat).agents.find(x => x.id === id) : undefined;
           if (!b || visitRoom(b) !== room) continue;
           const r = readDirectory(c.char.globalLore ?? []).agents.find(x => x.id === id);
-          const bl = agentLore(src, r?.lore || b.name);
+          const bl0 = agentLore(src, r?.lore || b.name);
+          const bl = bl0 ? liveSheetOf(c, b.name, bl0, visitorName) ?? bl0 : bl0;
           if (bl) bystanders.push({ id, name: b.name, rank: r?.rank, state: b.state, situation: b.situation, room: room ?? '', lore: bl });
           if (bystanders.length >= 3) break;
         }
         const ss = c.chat.scriptstate;
         const prompt = fitPrompt(budgetFor(ss, 'hq'), () => visitPrompt(src, {
-          agent: { id: a.id, name: a.name, rank: row?.rank, state: a.state, situation: a.situation, room: visitRoom(a) ?? '', lore },
+          agent: { id: a.id, name: a.name, rank: row?.rank, state: a.state, situation: a.situation, room: visitRoom(a) ?? '', lore, ...(opts.doing ? { doing: opts.doing } : {}) },
           visitor: visitorName,
           conversation: lines(now.filter(withHim)),
           elsewhere: others.map(n => ({ agent: n, lines: lines(now.filter(t => t.name === n && !withHim(t))) })),
@@ -112,16 +119,78 @@ export function createVisit(): GameVisit {
           act,
           scene: sceneOf(c, me?.id),
           skipBooks: me ? [me.lore] : [],
+          tags: (opts.tags ?? []) as FieldTag[],
+          cueTags: peopleOn,
         }, factionNamesOf(c)));
         const model = advValue(ss, 'hq', 'model') === 'main' ? 'main' : 'aux';
         void which;
-        const raw = await runModel(prompt.messages, model);
+        const got0 = takeFieldTags(await runModel(prompt.messages, model));
+        const gotCue = takeCueTag(got0.raw);
+        const raw = gotCue.raw;
+        const cue = peopleOn ? gotCue.cue : null;
+        const tags = got0.tags.filter(t => opts.tags?.includes(t));
         const got = parseVisitGroup(raw, a.name, prompt.bystanders, prompt.limit);
         const reply = got.line;
         const extra = got.extra.map(e => ({ agentId: bystanders.find(b => b.name === e.speaker)!.id, name: e.speaker, line: e.line }));
         lastExchange = { at: Date.now(), model, messages: prompt.messages, raw, reply: [reply, ...extra.map(e => `${e.name}: ${e.line}`)].join('\n') };
         // If the active chat changes during inference, save only to the captured origin.
-        const turn: VisitTurn = { id: uid(), at: Date.now(), agentId, name: a.name, user: text, reply, anchor, room: visitRoom(a) ?? undefined, ...(me ? { visitor: me.name } : {}), ...(act ? { act } : {}), ...(extra.length ? { extra } : {}) };
+        const turn: VisitTurn = { id: uid(), at: Date.now(), agentId, name: a.name, user: text, reply, anchor, room: visitRoom(a) ?? undefined, ...(me ? { visitor: me.name } : {}), ...(act ? { act } : {}), ...(extra.length ? { extra } : {}), ...(tags.length ? { tags } : {}) };
+        const char = await risuai.getCharacterFromIndex(c.charIndex) as { chaId?: string } | null;
+        if (!char || char.chaId !== c.char.chaId) throw new Error('원래 카드가 바뀌어 대화를 저장하지 못했어요.');
+        const saved = await updateChat(c.charIndex, c.chatIndex, chat => {
+          if (chat.id !== c.chat.id) throw new Error('원래 채팅이 바뀌어 대화를 저장하지 못했어요.');
+          let next = withVisitTurn(chat, turn);
+          // [[관계 계기]]: 이 요원의 인물 기록에 계기 한 줄 (같은 저장). 묶음은 「anchor|대화」라 필드 행동 사건과 따로 상한을 센다
+          if (cue && peopleSettings(next.scriptstate).on) {
+            const store = peopleStore(next);
+            if (store.people[a.name]) {
+              const seq = store.log.filter(x => x.anchor === anchor).length;
+              if (putChange(store, { id: changeId(a.name, 'cue', anchor, 0, `talk:${turn.id}`), anchor, seq, src: 'field', who: a.name, kind: 'cue', cue, group: `${anchor}|talk`, quote: text.slice(0, 60), reason: `필드 대화: ${text}`.slice(0, 80) })) next = withPeople(next, store);
+            }
+          }
+          return next;
+        });
+        if (!saved) throw new Error('대화 기록을 저장하지 못했어요.');
+        return stateOf({ ...c, chat: saved });
+      } finally { busy = false; }
+    },
+    // 몹에게 말 걸기 (10-31 사용자): 이름 인물과 같은 프롬프트·모델·저장. 인물 글은 로어북 대신 게임이 그림 신상·말투·성격으로 만들어 준다
+    async sendMob(mob, input) {
+      if (busy || isWaiting()) throw new Error('진행 중인 응답이 끝난 뒤 보내 주세요.');
+      const acted = /^\*([^*]+)\*?$/.exec(input.trim());
+      const act = !!acted;
+      const text = (acted ? acted[1] : input).trim();
+      if (!text || text.length > 2000) throw new Error('대화는 1~2000자로 입력해 주세요.');
+      if (!mob?.id || !mob.name || !mob.lore) throw new Error('말을 걸 수 없는 사람이에요.');
+      busy = true;
+      try {
+        const c = await context();
+        const me = playerAgent(c.char.globalLore, c.chat.scriptstate);
+        const src = playerSource({ char: c.char as RefSource['char'], chat: c.chat, persona: me ? '' : await readPersona() });
+        const visitorName = me?.name ?? (String(await risuai.parseRisuChat('{{user}}') ?? '').replace(/\{\{[^}]*\}\}/g, '').trim() || '방문자');
+        const anchor = anchorOf(c.chat);
+        const now = visitRecord(c.chat).turns.filter(t => (t.anchor ?? '') === anchor);
+        const lines = (ts: VisitTurn[]): VisitLine[] => ts.flatMap(t => [{ speaker: t.visitor || visitorName, text: t.user, ...(t.act ? { action: true } : {}) }, { speaker: t.name, text: t.reply }]);
+        const ss = c.chat.scriptstate;
+        const prompt = fitPrompt(budgetFor(ss, 'hq'), () => visitPrompt(src, {
+          agent: { id: mob.id, name: mob.name, state: '', situation: mob.doing, room: mob.place, lore: mob.lore },
+          visitor: visitorName,
+          conversation: lines(now.filter(t => t.agentId === mob.id)),
+          elsewhere: [],
+          bystanders: [],
+          said: text,
+          act,
+          scene: sceneOf(c, me?.id),
+          skipBooks: me ? [me.lore] : [],
+          tags: (mob.tags ?? []) as FieldTag[],
+        }, factionNamesOf(c)));
+        const model = advValue(ss, 'hq', 'model') === 'main' ? 'main' : 'aux';
+        const got0 = takeFieldTags(await runModel(prompt.messages, model));
+        const raw = got0.raw;
+        const tags = got0.tags.filter(t => mob.tags?.includes(t));
+        const reply = parseVisitGroup(raw, mob.name, [], prompt.limit).line;
+        lastExchange = { at: Date.now(), model, messages: prompt.messages, raw, reply };
+        const turn: VisitTurn = { id: uid(), at: Date.now(), agentId: mob.id, name: mob.name, user: text, reply, anchor, room: mob.place, ...(me ? { visitor: me.name } : {}), ...(act ? { act } : {}), ...(tags.length ? { tags } : {}) };
         const char = await risuai.getCharacterFromIndex(c.charIndex) as { chaId?: string } | null;
         if (!char || char.chaId !== c.char.chaId) throw new Error('원래 카드가 바뀌어 대화를 저장하지 못했어요.');
         const saved = await updateChat(c.charIndex, c.chatIndex, chat => {
