@@ -39,6 +39,9 @@ if os.environ.get("ERASE") == "1":
     win.paste((255, 255, 255, 255), (new, 0, new + ov, h))
     if top_h: win.paste((255, 255, 255, 255), (new, 0, new + ov_top, top_h))
     if bot_y: win.paste((255, 255, 255, 255), (new, bot_y, new + ov_bot, h))
+# SKETCH=<png>: 다시 그릴 칸에 밑그림(벽·바닥 단색 + 문 자리)을 그려 둔 창을 그대로 보낸다(11-02 백일몽 복도: 말로 문 위치를 못 잡음)
+if os.environ.get("SKETCH"):
+    win = Image.open(os.environ["SKETCH"]).convert("RGBA"); assert win.size == (w, h)
 # PREVIEW=<png>: 창·마스크만 그려 저장하고 보내지 않는다(「뽑아」 전에 보여 주기)
 if os.environ.get("PREVIEW"):
     sh = Image.new("RGB", (w, h * 2 + 8), (255, 0, 255)); sh.paste(win.convert("RGB"), (0, 0)); sh.paste(mask, (0, h + 8))
