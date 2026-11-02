@@ -476,3 +476,42 @@ test('변기에 앉아 있다가 맞으면 굴러떨어지기(169)로 이어지�
   assert.equal(a.clip, 'line:169');
   assert.equal(a.toilet, undefined);
 });
+
+// 휴게실 생활 동작 자리 (11-02 사용자 확정): 자판기 57→27→142, 싱크대 104, 전자레인지 57→157. 활동(rest/eat)에 맞는 빈 자리를 고르면 줄을 차례로 재생
+const lgScenes = [
+  { id: 'lounge', name: '휴게실', length: 1792, lane: [560, 848], doors: [{ id: 'out', x: 1100, kind: 'exit', side: 'S', to: 'lounge', toDoor: 'out' }],
+    stations: [{ id: 'vend_purple', x: 530, y: 636, lines: ['57', '27', '142'] }, { id: 'sink', x: 1456, y: 624, lines: ['104'] }, { id: 'microwave_L', x: 210, y: 624, lines: ['57', '157'] }] },
+];
+const lgHas = (_l, c) => ['idle', 'walk', 'run', 'line:57', 'line:27', 'line:142', 'line:104', 'line:157'].includes(c);
+test('휴게실 자리: 쉬기(rest)는 자판기(57→27→142)·싱크대(104)로, 먹기(eat)는 전자레인지(57→157)로 가서 줄을 차례로 한다', () => {
+  let picked = { rest: new Set(), eat: new Set() }, seqs = [];
+  for (let seed = 1; seed <= 12; seed++) {
+    const w = new A.WorldSim(new P.PlaceGraph(lgScenes, [], { lounge: 'lounge' }), R.mulberry32(seed), { sceneFaction: () => 'A00', has: lgHas });
+    const a = w.add({ id: 'npc:에일린', name: '에일린', kind: 'named', brain: 'needs', home: 'lounge', roam: ['lounge'], look: '에일린' }, { scene: 'lounge', x: 900, y: 700 });
+    for (const k of ['work', 'bladder', 'bowel', 'social', 'fun', 'train']) a.needs[k] = 100;
+    a.needs.energy = 20; a.needs.hunger = 20;
+    let seen = [];
+    for (let t = 0; t < 40; t += 1 / 30) {
+      w.step(1 / 30, { scene: 'f3', x: 0, y: 0 });
+      if (a.act === 'do' && a.station?.includes('#s:')) {
+        const sid = a.station.split('#s:')[1];
+        if (seen.at(-1)?.[0] !== sid || seen.at(-1)?.[1] !== a.clip) seen.push([sid, a.clip]);
+        if (a.task) picked[a.task.id]?.add(sid);
+      }
+    }
+    seqs.push(seen);
+  }
+  const all = new Set([...picked.rest, ...picked.eat]);
+  assert.ok(all.size >= 2, `자리를 골라 간다 ${[...all]}`);
+  for (const s of picked.rest) assert.ok(['vend_purple', 'sink'].includes(s), `rest 자리 ${s}`);
+  for (const s of picked.eat) assert.ok(['microwave_L'].includes(s), `eat 자리 ${s}`);
+  // 자판기: 57 → 27 → 142 순서, 자리에 선 채
+  const vend = seqs.find((s) => s.some(([id]) => id === 'vend_purple'));
+  if (vend) {
+    const clips = vend.filter(([id]) => id === 'vend_purple').map(([, c]) => c);
+    assert.deepEqual(clips.slice(0, 3), ['line:57', 'line:27', 'line:142'], `자판기 순서 ${clips}`);
+  }
+  const mw = seqs.find((s) => s.some(([id]) => id === 'microwave_L'));
+  if (mw) assert.deepEqual(mw.filter(([id]) => id === 'microwave_L').map(([, c]) => c).slice(0, 2), ['line:57', 'line:157']);
+  assert.ok(vend || mw, '자판기나 전자레인지에 한 번은 간다');
+});

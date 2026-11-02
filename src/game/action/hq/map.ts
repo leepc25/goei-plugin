@@ -107,6 +107,8 @@ export interface HqScene {
   toilets?: HqToilet[];
   /** 남녀 구분 화장실: 이 성별만 쓴다 (NPC는 다른 쪽에 들어가지 않는다) */
   sex?: '남' | '여';
+  /** NPC 생활 동작 자리(11-02 휴게실 확정): 자판기 57→27→142, 정수기·커피 57→142, 전자레인지·찬장 57→157, 게시판 57, 싱크대 104 */
+  stations?: { id: string; x: number; y: number; lines: string[] }[];
 }
 
 /** 화면 px (docs/필드_그림_통합_지침.md): 맨 뒤 줄에서 1 m = 142 px (키 1.65 m = 235 px), 벽·바닥 선 y420, 걷는 띠 y420–669, 배경 세로 700 */
@@ -149,6 +151,7 @@ function floorHall(id: SceneId, name: string, floor: HqScene['floor'], doors: Om
   const chairBoxes: HqBox[] = (p.chairs ?? []).map((ch) => ({ kind: 'chair', x: ch.x, w: 54, y: ch.y, d: 20, h: 150, solid: false, face: ch.face, set: ch.set }));
   // 맵 에디터로 만든 장면이면 앉는 자리도 그쪽 것
   if (MAPEDIT_SPOTS[id]) extra = { ...extra, spots: MAPEDIT_SPOTS[id] };
+  if (p.stations?.length && !extra.stations) extra = { ...extra, stations: p.stations };
   const sc = floorHallBase(id, name, floor, doors, p, extra);
   if (chairBoxes.length) {
     const base = sc.boxes.length;

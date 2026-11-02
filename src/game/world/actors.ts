@@ -24,6 +24,9 @@ export const NUDE_CLIP: Record<string, string> = {
 export type ActorKind = 'named' | 'mob';
 /** 장면 의자의 앉는 방향 (N = 등, E·W = 옆, 없으면 정면) */
 const seatDir = (face?: 'E' | 'W' | 'N'): 'front' | 'side' | 'back' => (face === 'N' ? 'back' : face ? 'side' : 'front');
+/** 생활 동작 자리(11-02 휴게실): 활동 → 자리 마지막 줄. rest = 커피 142·손 씻기 104, eat = 간식 157, hobby = 게시판 보기 57 */
+const STATION_ACT: Record<string, string[]> = { rest: ['142', '104'], eat: ['157'], hobby: ['57'] };
+const STATION_LABEL: Record<string, string> = { vend_purple: '자판기', vend_white: '자판기', water: '정수기', coffee: '커피 내리는 중', microwave: '전자레인지', snack: '간식 찬장', board: '게시판 보는 중', sink: '싱크대' };
 /** 활동 클립 → 의자에서 하는 일 (fighter/seats.ts SEATS acts 이름) */
 const SEAT_KIND: Record<string, string> = { work: 'type', eat: 'eat', drink: 'drink', rest: 'doze', hobby: 'book', talk: 'talk' };
 export interface ActorDef {
@@ -2164,6 +2167,8 @@ export class WorldSim {
     if (t.id === 'pee' || t.id === 'poo') { const st = this.toiletSpot(a, t.id === 'pee' && this.sexOf(a) === '남' ? ['urinal', 'stall'] : ['stall']); if (st) return st; }
     // 그 인물에게 그림이 있는 줄 중에서 고른다 (10-31): 앉는 줄은 그 방향 빈 의자가 있을 때만. 바로 전에 한 줄은 덜 고른다
     const look = a.def.look ?? a.def.name;
+    // 생활 동작 자리(11-02 휴게실 확정: 자판기·정수기·커피·전자레인지·찬장·게시판·싱크대): 그 활동에 맞는 빈 자리가 있으면 절반은 거기로
+    if (!t.partner) { const st = this.stationSpot(a, t); if (st) return st; }
     const opts = (ACT_OPTS[t.id] ?? []).filter((o) => this.has(look, `line:${o.line}`));
     if (opts.length && !t.partner) {
       const cand: { o: ActOpt; seat: number | null; w: number }[] = [];
@@ -2262,6 +2267,21 @@ export class WorldSim {
     if (a.opt) {
       this.setClip(a, `line:${a.opt.line}`);
       a.clipUntil = this.time + a.wait;
+      return;
+    }
+    // 생활 동작 자리: 줄을 차례로(뒷모습 57 1.5초 · 줍기 27 한 번 · 마지막 줄은 일하는 동안 반복)
+    if (a.station?.includes('#s:')) {
+      const sid = a.station.split('#s:')[1];
+      const st = this.graph.scene(a.scene)?.stations?.find((q) => q.id === sid);
+      const busy = this.actors.some((q) => q !== a && q.scene === a.scene && q.station === a.station && (q.act === 'do' || (q.act === 'walk' && q.plan === 'do')));
+      if (!st || busy) { a.task = undefined; a.station = undefined; return this.idle(a, 1, 3); }
+      a.x = st.x; a.y = st.y;
+      const secOf = (l: string) => (l === '27' ? 1.2 : 1.5);
+      const [first, ...rest] = st.lines;
+      this.setClip(a, `line:${first}`);
+      if (rest.length) { a.clipQ = rest.map((l) => ({ clip: `line:${l}`, sec: secOf(l) })); a.clipQT = secOf(first); }
+      a.clipUntil = this.time + a.wait;
+      a.doing = `${STATION_LABEL[sid.replace(/_[LR]$/, '')] ?? sid} (${t.label})`;
       return;
     }
     // 훈련 장비 앞: 과녁이면 사격, 샌드백·허수아비면 연타 (오른쪽을 보고)
@@ -2552,6 +2572,20 @@ export class WorldSim {
     if (this.playerToilet?.scene === scene && this.playerToilet.id === id) return true;
     const key = `${scene}#t:${id}`;
     return this.actors.some((q) => q !== except && q.scene === scene && q.station === key && (q.act === 'do' || (q.act === 'walk' && q.plan === 'do')));
+  }
+  /** 생활 동작 자리(장면 stations) 중 이 활동에 맞고(STATION_ACT: 마지막 줄) 그 인물에게 줄 그림이 다 있는 빈 자리. 의자와 번갈아 고르게 절반만. 고르면 a.station = 장면#s:id */
+  private stationSpot(a: Actor, t: Activity): { x: number; y: number } | null {
+    const sts = this.graph.scene(a.scene)?.stations;
+    if (!sts?.length || this.rng() < 0.5) return null;
+    const want = STATION_ACT[t.id];
+    if (!want) return null;
+    const look = a.def.look ?? a.def.name;
+    const free = sts.filter((s) => want.includes(s.lines[s.lines.length - 1]) && s.lines.every((l) => this.has(look, `line:${l}`))
+      && !this.actors.some((q) => q !== a && q.scene === a.scene && q.station === `${a.scene}#s:${s.id}` && (q.act === 'do' || (q.act === 'walk' && q.plan === 'do'))));
+    if (!free.length) return null;
+    const s = free[Math.floor(this.rng() * free.length)];
+    a.station = `${a.scene}#s:${s.id}`;
+    return { x: s.x, y: s.y };
   }
   /** 빈 자리 중 가까운 것 (kinds 앞쪽 종류부터). 고르면 a.station 에 적는다 */
   private toiletSpot(a: Actor, kinds: ('stall' | 'urinal' | 'sink')[]): { x: number; y: number } | null {

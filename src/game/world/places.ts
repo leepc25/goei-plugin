@@ -27,6 +27,8 @@ export interface PlaceScene {
   toilets?: { id: string; kind: 'stall' | 'urinal' | 'sink'; x: number; y: number; door?: string; seat?: { x: number; y: number; k?: number } }[];
   /** 남녀 구분 화장실 */
   sex?: '남' | '여';
+  /** NPC 생활 동작 자리(11-02 휴게실): 발 x·y, 그 자리에서 차례로 트는 줄(마지막 줄은 일하는 동안 반복) */
+  stations?: { id: string; x: number; y: number; lines: string[] }[];
 }
 /**
  * 방 이름 → 장소 종류 (10-31 사용자: 층 배치가 바뀌어도 고칠 곳이 없게, 방 종류를 따로 적지 않고 이름 낱말로).
