@@ -11,7 +11,7 @@
 ### Appearance
 - Age: 24, Korean adult man
 - Height / Weight: 178cm / 68kg
-- Hair: Short black two-block cut; sides and back closely trimmed, top about 6cm, front swept to his right, forehead partly visible.
+- Hair: Natural black pixie cut.
 - Eyes: Sharp, narrow monolid dark brown eyes under thick straight eyebrows.
 - Face: Slim V-shaped jaw, straight nose, calm expressionless look.
 - Build: Lean and toned, broad shoulders, flat stomach, long straight legs.
