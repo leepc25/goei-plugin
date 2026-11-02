@@ -1,0 +1,26 @@
+같음 | Pixel art game background of a clean modern office street sidewalk in Seoul, seen up close from the sidewalk, the image top cuts just above the ground floor entrance doors, late morning daylight.
+같음 | Camera at standing eye height, about 20 degrees above the floor, looking slightly down.
+같음 | The building fronts behind the sidewalk run straight and level across the full width, close to the viewer.
+같음 | The floor fills the lower 38 percent:
+같음 | sidewalk, a road strip at the very bottom of the image.
+같음 | Nothing closes the sides:
+같음 | the street keeps going past both image edges.
+같음 | FLOOR:
+같음 | smooth clean grey paved sidewalk like one sheet.
+같음 | In the center:
+바뀜/빠짐 | the ground floor of a plain grey stone and glass company building, automatic glass double doors flush with the building front, right at the back edge of the sidewalk, closed, a little taller than an adult, filling most of the height between the image top and the sidewalk;
+같음 | clear sidewalk at the doors.
+같음 | Pack the whole image with detail everywhere:
+같음 | walls, floor and corners all full of objects and texture;
+같음 | a busy, lived-in modern street with real depth, clean, bright and newly renovated.
+바뀜/빠짐 | The sign board above the doors reads exactly "특수재난대응협회".
+같음 | Everything else is up to you.
+같음 | WALL:
+같음 | grey stone, glass and clean concrete building fronts.
+같음 | LIGHT:
+같음 | Rich lighting with clear shadows.
+같음 | STYLE:
+같음 | dense, highly detailed pixel art, crisp pixel clusters, selective dark outline, rich medium-to-detailed shading, grey, beige, dull blue, soft daylight, no dithering, no blur.
+같음 | No people, no chairs, no sofas, no benches, no plants, no cars.
+새 문장 | the ground floor of a large glass-walled high-rise company building, automatic glass double doors flush with the building front, right at the back edge of the sidewalk, closed, a little taller than an adult, filling most of the height between the image top and the sidewalk;
+새 문장 | The sign board above the doors reads exactly "백일몽".
