@@ -302,7 +302,7 @@ export function drawCharSeat(c: CanvasRenderingContext2D, nameOrKey: string, cx:
     const n = Math.floor((now / 1000) * 6), L = ((a.cfg.loops ?? {})[id] ?? []).map((v) => Math.max(0, Math.min(m.n - 1, v - 1)));
     f = SEAT_LOOP.has(id) && L.length ? (n < L[0] ? n % m.n : L[(n - L[0]) % L.length]) : n % m.n;
   }
-  const fit = seatFit(a.cfg as never, row.dir, id, {}, chairKind);
+  const fit = seatFit(a.cfg as never, row.dir, sitF !== null ? row.sit : id, {}, chairKind);   // 앉는 중엔 앉기 줄 값, 동작 중엔 그 줄 값(11-02)
   const k = spr(cy) * CHAR_K;
   const body = seatBody(cx, cy, face, fit, k);
   const im = charFx()?.CHAIR[fit.img || row.img] ?? charFx()?.CHAIR[row.img];

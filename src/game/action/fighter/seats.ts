@@ -21,8 +21,8 @@ type Cfg = { chair?: Record<string, Partial<SeatFit>>; chairAuto?: Record<string
 export type ChairKind = 'L02' | undefined;
 /** 맞춤값: 줄마다 따로 맞춘 값(기대 쉬기 73 등) > 방향 손 맞춤 > 자동값. edits = 시험장에서 막 고친 값 */
 export function seatFit(cfg: Cfg, dir: string, line?: string | null, edits: Record<string, Partial<SeatFit>> = {}, chair?: ChairKind): SeatFit {
-  if (chair === 'L02') {   // 쉘 의자: 인물마다 손 맞춘 방향 값 하나(줄마다 따로 없음). 값이 없는 인물은 사무의자 값으로
-    const v = cfg.chairShell?.[dir];
+  if (chair === 'L02') {   // 쉘 의자: 인물마다 손 맞춘 방향 값, 앉기 끝 장과 자리가 다른 동작 줄은 그 줄 값(11-02). 값이 없는 인물은 사무의자 값으로
+    const v = (line ? cfg.chairShell?.[line] : undefined) ?? cfg.chairShell?.[dir];
     if (v) return { dx: 0, dy: 0, s: 1, ...v, img: 'L02:' + (v.img ?? (dir === 'back' ? 'north' : dir === 'side' ? 'east' : 'south')) };
   }
   const base: SeatFit = { dx: 0, dy: 0, s: 1, ...(cfg.chairAuto?.[dir] ?? {}), ...(cfg.chair?.[dir] ?? {}), ...(edits[dir] ?? {}) };
