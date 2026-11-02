@@ -145,7 +145,7 @@ export function hasCharClip(nameOrKey: string, clip: string): boolean {
   const a = charArt(nameOrKey);
   if (!a) return false;
   // 의자에서 하는 일 (seat:<일>): 앉는 줄이 하나라도 있으면 앉을 수 있다 (그 일 줄이 없으면 앉아 숨쉬기)
-  if (clip.startsWith('seat:')) return SEATS.some((s) => !!a.A[s.sit]);
+  if (clip.startsWith('seat:')) return !a.cfg.noSit && SEATS.some((s) => !!a.A[s.sit]);   // noSit = 의자 앉기 전부 뺀 인물(사용자 11-02 06:44 브라우니 「의자에 앉는 동작을 빼」)
   // 줄 번호로 바로 (line:<줄>): 활동이 고른 그 줄 (10-31 앉아서·서서 하는 일 나누기)
   if (clip.startsWith('line:')) return !!a.A[clip.slice(5)];
   const m = FIELD_CLIP[clip];
@@ -277,6 +277,7 @@ function drawLine(c: CanvasRenderingContext2D, a: CharArt, id: string, f: number
 export function drawCharSeat(c: CanvasRenderingContext2D, nameOrKey: string, cx: number, cy: number, face: 1 | -1, now: number, dir: SeatDir, kind = '', since = 0, until?: number, set?: string): boolean {
   const a = charArt(nameOrKey);
   if (!a) return false;
+  if (a.cfg.noSit) return false;
   let row = SEATS.find((s) => s.dir === dir && a.A[s.sit] && !(dir === 'back' && a.cfg.noBackSit));
   if (!row) row = SEATS.find((s) => a.A[s.sit] && !(s.dir === 'back' && a.cfg.noBackSit));
   if (!row) return false;

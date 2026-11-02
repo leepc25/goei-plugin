@@ -436,7 +436,7 @@ export class FighterPlayer extends Player {
   get sitting(): boolean { return !!this.coreSeat; }
   sit(clip: string, x: number, y: number, face: 1 | -1, exit: { x: number; y: number }, set?: string): boolean {
     const P = this.core.P as unknown as { x: number; y: number; z: number; vx: number; face: 1 | -1; mode: string; seat: unknown };
-    const can = ['60', '96', '61'].some((id) => this.core.has(id));
+    const can = !this.core.CH?.noSit && ['60', '96', '61'].some((id) => this.core.has(id));   // noSit 인물(브라우니, 11-02)은 코어 앉기 없음
     if (!can || P.mode !== 'ground' || this.z > 0) return super.sit(clip, x, y, face, exit);
     P.x = x; P.y = y; P.z = 0; P.vx = 0; P.face = face;
     this.core.sitAt(clip.includes('side') ? 'side' : clip.includes('back') ? 'back' : 'front', set);

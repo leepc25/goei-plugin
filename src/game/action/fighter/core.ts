@@ -1046,7 +1046,7 @@ const SCENES = [
     ['사망(서서)', () => { if (P.mode === 'dead') die(); die(); }], ['사망(누워서)', () => { if (P.mode === 'dead') die(); knock(); later(1.4, () => { P.mode = 'down'; die(); }); }], ['되살리기', () => P.mode === 'dead' && die()]], () => true],
 ];
 // 그 인물에게 줄이 없어 아무것도 안 하는 버튼은 숨김(사용자 10-28: 이길환 끄덕·손 작업)
-function sitAt(dir?: Json, set?: Json) { if (P.seat) return; if (dir === 'back' && CH.noBackSit) dir = 'side'; seatIdx = SEATS.findIndex(s => s.dir === dir) - 1; P.scene = null; seatSet = set; sitChair(); seatSet = undefined; }
+function sitAt(dir?: Json, set?: Json) { if (P.seat || CH.noSit) return; if (dir === 'back' && CH.noBackSit) dir = 'side'; seatIdx = SEATS.findIndex(s => s.dir === dir) - 1; P.scene = null; seatSet = set; sitChair(); seatSet = undefined; }
 
 // ── 생활·직무 줄: , . 로 차례로 틀기(목록 단추와 같음) ──
 let lifeI = -1;
