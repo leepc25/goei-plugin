@@ -7,7 +7,7 @@ import { build } from 'esbuild';
 const out = await build({ stdin: { contents: `export * from './src/game/action/hq/map'; export { insideProp } from './src/game/action/engine/propBlock'; import { PAINTED } from './src/game/action/hq/painted'; export const PAINTED_DOORS = (id) => PAINTED[id].doors;`, resolveDir: '.', loader: 'ts' }, bundle: true, format: 'esm', target: 'es2022', write: false });
 const M = await import(`data:text/javascript;base64,${Buffer.from(out.outputFiles[0].text).toString('base64')}`);
 const byId = M.SCENE_BY_ID;
-const fresh = M.HQ_SCENES.filter((s) => !s.legacy && !s.id.startsWith('jr_'));
+const fresh = M.HQ_SCENES.filter((s) => !s.legacy && !s.id.startsWith('jr_') && s.id !== 'street');   // 바깥 거리(11-02 그림 장면)는 본부 건물 밖
 const JR = ['jr_entry', 'jr_b1', 'jr_alley', 'jr_b2', 'jr_daebak', 'jr_heolgap', 'jr_youngchang', 'jr_songil', 'jr_jinryo', 'jr_op'];
 const solid = (sc) => sc.boxes.filter((b) => b.solid).map((b) => ({ x: b.x, y: b.y, w: b.w, back: b.d + 6, front: 8 }));
 
