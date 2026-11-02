@@ -1,6 +1,12 @@
 """오른쪽 연장 + 끝 옆벽 고정: 앞 그림을 cut까지 자르고, 창 = [기존 keep px | 새 영역 | 왼쪽 옆벽 거울상(side px)].
 옆벽은 보존(검은 마스크)하되 옆벽의 문 칸만 다시 그리게 한다.
 사용: python3 extend_custom.py <앞 그림> <프롬프트> <출력> <cut> <keep> <new> <side> <문x0> <문x1> <문y0> <문y1>"""
+# --- PixelLab 생성 승인 문 (2026-10-31 사용자: 시키지 않은 생성 금지) — 이 파일의 모든 생성 요청은 .pixellab_ok 회수가 있어야 나간다
+import sys as _gs, pathlib as _gp
+_gs.path.insert(0, str(next(p for p in _gp.Path(__file__).resolve().parents if (p / "tools" / "pixellab_gate.py").exists()) / "tools"))
+import pixellab_gate as _gate  # noqa: E402
+_gate.spend(__file__ + " 실행")
+# ---
 import base64, io, json, sys, time
 import requests
 from PIL import Image, ImageOps

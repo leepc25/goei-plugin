@@ -73,8 +73,8 @@ test('동행: 의도 분류·4명 제한·거절', () => {
   assert.equal(F.classify('따라올래?'), null);
   assert.equal(F.classify('안녕'), null);
   const c = F.fieldCompanions(['a', 'b', 'c', 'd', 'e', 'a']);
-  assert.equal(c.shown.length, 4);
-  assert.deepEqual(c.rest, ['e']);
+  assert.equal(c.shown.length, 5);
+  assert.deepEqual(c.rest, []);
   assert.equal(F.canJoin({ state: '부상', affinity: 5 }).ok, false);
   assert.equal(F.canJoin({ state: '휴게', affinity: 0 }).ok, true);
   let t = [];

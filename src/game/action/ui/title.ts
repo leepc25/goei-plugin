@@ -78,7 +78,7 @@ function blit(c: CanvasRenderingContext2D, im: HTMLCanvasElement, cx: number, y:
 }
 
 /** 타이틀 뒤 배경 + 로고. title·sub 는 메뉴 대신 여기서 도트 글자로 그린다 */
-export function drawTitleBg(c: CanvasRenderingContext2D, t: number, title = '차원 승강기', sub = 'ANOMALY SIMULATION · 관리국 액션') {
+export function drawTitleBg(c: CanvasRenderingContext2D, t: number, title = '괴이 ː ANOMALY', sub = '필드') {
   c.save();
   c.setTransform(1, 0, 0, 1, 0, 0);
   c.imageSmoothingEnabled = false;

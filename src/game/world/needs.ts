@@ -3,8 +3,9 @@
 // 활동은 그 인물에게 클립이 있을 때만 켜진다 — 없는 동작을 대기 그림으로 때우지 않는다. 켜진 활동이 없으면 서성이기.
 import type { PlaceGraph, PlaceKind } from './places';
 
-export type NeedId = 'work' | 'hunger' | 'energy' | 'bladder' | 'bowel' | 'social' | 'fun';
-export const NEEDS: NeedId[] = ['work', 'hunger', 'energy', 'bladder', 'bowel', 'social', 'fun'];
+/** train = 단련(10-31 사용자: 전투 NPC·이름 요원은 모두 훈련장에 가서 훈련한다. 사무·안내·의료·청소 직원은 없음) */
+export type NeedId = 'work' | 'hunger' | 'energy' | 'bladder' | 'bowel' | 'social' | 'fun' | 'train';
+export const NEEDS: NeedId[] = ['work', 'hunger', 'energy', 'bladder', 'bowel', 'social', 'fun', 'train'];
 export type Needs = Record<NeedId, number>;
 
 /** 활동 하나: 어느 욕구를, 어떤 클립으로, 어떤 장소 종류에서, 얼마나 */
@@ -32,10 +33,44 @@ export const ACTIVITIES: Activity[] = [
   { id: 'poo', need: 'bowel', clip: 'poo', where: ['restroom'], sec: [25, 40], fill: 5, label: '화장실(대)' },
   { id: 'chat', need: 'social', clip: 'talk', where: ['office', 'lounge', 'corridor'], sec: [12, 25], fill: 6, label: '수다 중', partner: true },
   { id: 'hobby', need: 'fun', clip: 'hobby', where: ['lounge'], sec: [30, 60], fill: 3, label: '취미' },
+  // 훈련: 팔굽혀펴기·장비 점검·기지개, 그 줄이 없으면 약공 연습(모든 인물에게 있음). 싸우는 몸만 (choose fighter)
+  { id: 'train', need: 'train', clip: 'train', where: ['training'], sec: [40, 90], fill: 2.5, label: '훈련' },
 ];
 
+/** 활동마다 실제로 할 수 있는 줄 (10-31 사용자: 앉아서 하는 것과 서서 하는 것은 다르다, 상황에 따라 다양하게).
+ * line = 인물 팩 줄 번호, seat = 의자 방향(그 방향 의자에 앉아서), 없으면 서서. 인물에게 그 줄 그림이 있을 때만 후보.
+ * 고를 때: 빈 의자가 있으면 앉는 쪽도 후보, 바로 전에 한 줄은 덜 고른다(actors.ts taskSpot) */
+export interface ActOpt { line: string; label: string; seat?: 'front' | 'side' | 'back'; /** 한 번만 하고 끝나는 몸짓 (기지개 등): 몇 초만 */ once?: boolean }
+export const ACT_OPTS: Record<string, ActOpt[]> = {
+  work: [
+    { line: '63', label: '타자 치는 중', seat: 'front' }, { line: '105', label: '타자 치는 중', seat: 'side' }, { line: '69', label: '타자 치는 중', seat: 'back' },
+    { line: '106', label: '손 작업 중', seat: 'front' },
+    { line: '124', label: '브리핑 중' }, { line: '121', label: '장비 점검 중' }, { line: '117', label: '서류 보는 중' }, { line: '119', label: '수첩 메모 중' },
+    { line: '120', label: '태블릿 확인 중' }, { line: '116', label: '업무 통화 중' }, { line: '118', label: '무전 보고 중' }, { line: '138', label: '서류 추리는 중' },
+    { line: '85', label: '손 작업 중' }, { line: '125', label: '물건 진열 중' }, { line: '126', label: '돈 세는 중' }, { line: '128', label: '감정 중' },
+    { line: '129', label: '수리 중' }, { line: '139', label: '계산 중' }, { line: '122', label: '경계 서는 중' }, { line: '123', label: '출입 확인 중' },
+    { line: '136', label: '손전등 비추는 중' }, { line: '131', label: '닦는 중' }, { line: '88', label: '청소 중' }, { line: '113', label: '진료 기록 중' }, { line: '115', label: '시료 보는 중' },
+  ],
+  hobby: [
+    { line: '149', label: '책 읽는 중', seat: 'front' }, { line: '148', label: '폰 보는 중', seat: 'front' }, { line: '167', label: '신문 읽는 중', seat: 'front' },
+    { line: '90', label: '담배 피우는 중' }, { line: '145', label: '담배 피우는 중' }, { line: '155', label: '고기 굽는 중' }, { line: '153', label: '스케치 중' },
+    { line: '140', label: '카드 섞는 중' }, { line: '156', label: '햄스터 돌보는 중' }, { line: '160', label: '손장난 중' }, { line: '152', label: '기도 중' },
+    { line: '147', label: '폰 보는 중' }, { line: '154', label: '차 따르는 중' }, { line: '168', label: '구경 중' },
+    { line: '161', label: '섀도복싱 중' }, { line: '91', label: '과자 먹는 중' },
+  ],
+  rest: [
+    { line: '66', label: '조는 중', seat: 'front' }, { line: '73', label: '기대 쉬는 중', seat: 'front' },
+    { line: '65', label: '차 마시는 중', seat: 'front' }, { line: '99', label: '차 마시는 중', seat: 'side' }, { line: '71', label: '차 마시는 중', seat: 'back' },
+    { line: '142', label: '커피 마시는 중' }, { line: '143', label: '기지개', once: true },
+  ],
+  eat: [
+    { line: '64', label: '먹는 중', seat: 'front' }, { line: '98', label: '먹는 중', seat: 'side' }, { line: '71', label: '먹는 중', seat: 'back' },
+    { line: '157', label: '간식 먹는 중' }, { line: '26', label: '먹는 중' },
+  ],
+};
+
 /** 생활 1초당 줄어드는 양 (기본). 인물 계수가 곱해진다. 대략 몇 분에 한 번씩 각 욕구가 고개를 든다 */
-export const DECAY: Needs = { work: 0.35, hunger: 0.12, energy: 0.08, bladder: 0.2, bowel: 0.05, social: 0.18, fun: 0.12 };
+export const DECAY: Needs = { work: 0.35, hunger: 0.12, energy: 0.08, bladder: 0.2, bowel: 0.05, social: 0.18, fun: 0.12, train: 0.06 };
 
 /** 인물별 성향 (욕구 계수·취향). 없는 칸은 1. 원작 근거는 docs/본부_설계_2판.md 4장 */
 export interface Temper {
@@ -102,11 +137,14 @@ export function choose(o: {
   partnerIn: (scene: string) => boolean;
   rand: () => number;
   last?: string;
+  /** 싸우는 몸(이름 요원·전투 NPC)인가: 훈련은 이 몸만 */
+  fighter?: boolean;
 }): Choice | null {
   const t = TEMPER[o.name];
   let best: Choice | null = null;
   for (const a of ACTIVITIES) {
-    if (!o.has(a.clip)) continue;
+    if (!o.has(a.clip) && !(ACT_OPTS[a.id] ?? []).some((x) => o.has(`line:${x.line}`))) continue;
+    if (a.need === 'train' && !o.fighter) continue;
     const lack = 100 - o.needs[a.need];
     if (lack < 25) continue;
     const kinds = a.id === 'hobby' && t?.hobbyAt ? t.hobbyAt : a.where;

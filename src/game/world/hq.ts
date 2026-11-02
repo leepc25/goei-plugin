@@ -2,41 +2,34 @@
 // 장소가 늘면 꼬리표·오가는 범위·보충 규칙을 여기(나중엔 게임 팩 JSON)에 더한다.
 import { WorldSim, type SimOptions, type SpawnRule } from './actors';
 import type { Post } from './mobs';
-import { PlaceGraph, type ElevatorStop, type PlaceKind, type PlaceScene } from './places';
+import { PlaceGraph, type ElevatorStop, type PlaceScene } from './places';
 import { mulberry32 } from './rng';
-import { areaSpawns, type AreaKind } from './districts';
+import { streetSpawns } from './districts';
 
-export const HQ_KINDS: Record<string, PlaceKind> = {
-  street: 'street', jongno: 'street', pasta: 'shop', metro: 'street', yeongdeungpo: 'street', gangnam: 'street', mangwon: 'street', yeouido: 'street', lobby: 'lobby', f2: 'corridor', f3: 'corridor', b1: 'corridor', b2: 'corridor', b3: 'garage',
-  office: 'office', swat: 'office', interview: 'room', edu: 'room', lounge: 'lounge', wc: 'restroom', wc3: 'restroom', training: 'training', clinic: 'clinic', tooth: 'cell',
-};
+/** 장소 종류는 방 이름 낱말로 정한다(world/places.ts kindFromName, 10-31): 층 배치·방이 바뀌어도 여기 고칠 것 없음 */
 
-/** 바깥 장면 꼬리표 (6-4장 인구) */
-export const HQ_AREAS: Record<string, AreaKind> = {
-  street: 'alley', jongno: 'downtown', metro: 'subway', yeongdeungpo: 'market', gangnam: 'nightlife', mangwon: 'residential', yeouido: 'park',
-};
+/** 바깥 거리 장면 (모두 같은 거리 유동인구, 10-31). 지금은 관리국 정문 앞 거리뿐 — 다른 세력·중립 건물 길거리가 생기면 여기 */
+export const HQ_STREETS = ['street'];
 /** 지역: 바뀌면 시계 「지역 이동」. 승강장은 지역 없음(타고 내릴 때 정해진다). 본부 안은 종로 */
-const HQ_DISTRICT: Record<string, string> = { yeongdeungpo: 'yeongdeungpo', gangnam: 'gangnam', mangwon: 'mangwon', yeouido: 'yeouido' };
-export const hqDistrict = (scene: string): string | null => (scene === 'metro' ? null : HQ_DISTRICT[scene] ?? 'jongno');
+const HQ_DISTRICT: Record<string, string> = {};   // 다른 지역 장면이 생기면 장면 → 지역 (10-31: 가설 지역 장면은 뺐다)
+export const hqDistrict = (scene: string): string | null => HQ_DISTRICT[scene] ?? 'jongno';
 
 /** 장면 소속: 본부 안은 관리국(A00). 바깥 거리·가게·중림 지하상가(jr_*, 민간 상가)는 없음 */
-export const hqSceneFaction = (scene: string): string | null => (scene === 'pasta' || scene.startsWith('jr_') || HQ_AREAS[scene] ? null : 'A00');
+export const hqSceneFaction = (scene: string): string | null => (scene === 'pasta' || scene.startsWith('jr_') || HQ_STREETS.includes(scene) ? null : 'A00');
 
-/** 이름 인물이 오가는 장면: 처음 선 장면(본편 상태로 정한 방) → 범위. 부상은 의무실에 묶인다 */
-export const HQ_ROAM: Record<string, string[]> = {
-  office: ['office', 'f3', 'lounge', 'wc3'],
-  lounge: ['lounge', 'f3', 'office', 'wc3'],
-  clinic: ['clinic'],
-};
+/** 이름 인물이 오가는 장면 (10-31 사용자: 정해진 곳이 아니라 건물 전체). 관리국 건물 안 장면 전부, 다친 사람(의무실에서 시작)만 의무실에 묶인다 */
+export function hqRoam(graph: PlaceGraph, home: string): string[] {
+  if (home === 'clinic') return ['clinic'];
+  return graph.ids().filter((id) => hqSceneFaction(id) === 'A00');
+}
 
 /** 몹 보충 (6-2장). 수치는 시연판에서 조정 */
 export function hqSpawns(graph: PlaceGraph): SpawnRule[] {
   const lobbyMain = graph.scene('lobby')?.doors.find((d) => d.id === 'main')?.x;
-  // 바깥은 꼬리표로 (승강장은 타는 곳마다 드나든다)
-  const metroGates = graph.scene('metro')?.doors.map((d) => d.x);
+  // 바깥 거리는 모두 같은 인구 (승강장은 타는 곳마다 드나든다)
   return [
-    ...areaSpawns(Object.fromEntries(Object.entries(HQ_AREAS).filter(([s]) => graph.scene(s))), { street: [30, 1890], ...(metroGates?.length ? { metro: metroGates } : {}) }),
-    ...(lobbyMain !== undefined ? [{ scene: 'lobby', target: { day: 2, night: 0 }, refill: [6, 12], gates: [lobbyMain], mix: ['방문객', '행정 직원'] } as SpawnRule] : []),
+    ...streetSpawns(HQ_STREETS.filter((s) => graph.scene(s)), { street: [30, 1890] }),
+    ...(lobbyMain !== undefined ? [{ scene: 'lobby', target: { day: 2, night: 0 }, refill: [6, 12], gates: [lobbyMain], mix: ['행인', '행정 직원'] } as SpawnRule] : []),
   ];
 }
 
@@ -45,12 +38,52 @@ export function hqPosts(graph: PlaceGraph): Post[] {
   const lobby = graph.scene('lobby');
   if (!lobby) return [];
   const gate = lobby.doors.find((d) => d.id === 'main')?.x ?? 300;
-  const desk = Math.round(lobby.length * 0.55);
+  // 데스크 자리: 로비 그림의 데스크 물건(지도 boxes 'desk') 가운데 뒤에 선다. 그림이 바뀌면 따라간다 (없으면 로비 55%)
+  const box = (lobby as { boxes?: { kind: string; x: number; y: number; d: number }[] }).boxes?.find((b) => b.kind === 'desk');
+  // 그림에 근무 자리가 적혀 있으면 그 자리 (11-01 본부 1층 새 그림: 벽에 붙은 데스크 → 데스크 앞)
+  const post = (lobby as { posts?: Record<string, [number, number]> }).posts?.desk;
+  const desk = Math.round(post?.[0] ?? box?.x ?? lobby.length * 0.55);
+  const deskY = post ? post[1] : box ? Math.round(box.y - box.d - 8) : undefined;
   return [
-    { id: 'desk', archetype: '안내 직원', scene: 'lobby', how: 'fixed', spot: desk, shifts: [[9, 18]], count: 1, gate },
-    { id: 'night', archetype: '경비', scene: 'lobby', how: 'fixed', spot: desk, shifts: [[18, 9]], count: 1, gate },
+    { id: 'desk', archetype: '안내 직원', scene: 'lobby', how: 'fixed', spot: desk, y: deskY, shifts: [[9, 18]], count: 1, gate },
+    { id: 'night', archetype: '경비', scene: 'lobby', how: 'fixed', spot: desk, y: deskY, shifts: [[18, 9]], count: 1, gate },
     { id: 'guard', archetype: '경비', scene: 'lobby', how: 'patrol', span: [gate + 120, Math.min(lobby.length - 120, gate + 900)], shifts: [[0, 24]], count: 1, gate },
     { id: 'cleaner', archetype: '청소부', scene: 'lobby', how: 'roam', route: ['lobby', 'f2', 'f3', 'b1', 'lobby'], stay: 40, shifts: [[6, 9], [20, 23]], count: 1, gate },
+    // 의무실·연구실(B2): 의사·간호사 주간 근무 (문은 방 아래 출입이라 gate = 출입 x)
+    ...clinicPosts(graph),
+    // 방 종류로 인원 자동 (10-31 자율 행동 2단계): 방이 늘거나 옮겨도 여기 고칠 것 없음
+    ...autoPosts(graph),
+  ];
+}
+
+/** 역할 표: 관리국 건물 안 장소 종류 → 그 방에 상주하는 역할·인원·근무시간. 사무실 1곳당 사무 3(지금 지도엔 없음: 행정실 같은 방이 생기면 자동), 훈련장 1곳당 전투원 4 */
+const ROLE_BY_KIND: Partial<Record<string, { archetype: string; how: Post['how']; per: number; shifts: [number, number][] }>> = {
+  office: { archetype: '행정 직원', how: 'desk', per: 3, shifts: [[9, 18]] },
+  training: { archetype: '관리국 요원', how: 'train', per: 4, shifts: [[9, 18]] },
+};
+export function autoPosts(graph: PlaceGraph): Post[] {
+  const out: Post[] = [];
+  for (const id of graph.ids()) {
+    if (hqSceneFaction(id) !== 'A00') continue;
+    const r = ROLE_BY_KIND[graph.kind(id)];
+    if (!r) continue;
+    const name = graph.scene(id)?.name ?? '';
+    // 사무실 중 종합대응팀 = 이름 요원들 방(상태 태그) → 이름 없는 직원 안 둠. 진압팀 = 진압팀원(관리국 요원)이 책상 일 (10-31 사용자)
+    if (/종합대응/.test(name)) continue;
+    const role = /진압/.test(name) ? { ...r, archetype: '관리국 요원' } : r;
+    const gate = graph.scene(id)?.doors[0]?.x ?? 100;
+    out.push({ id: `auto-${id}`, archetype: role.archetype, scene: id, how: role.how, shifts: role.shifts, count: role.per, gate });
+  }
+  return out;
+}
+
+function clinicPosts(graph: PlaceGraph): Post[] {
+  const c = graph.scene('clinic');
+  if (!c) return [];
+  const gate = c.doors.find((d) => d.id === 'out')?.x ?? 100;
+  return [
+    { id: 'doctor', archetype: '의사', scene: 'clinic', how: 'fixed', spot: Math.round(c.length * 0.7), shifts: [[9, 18]], count: 1, gate },
+    { id: 'nurse', archetype: '간호사', scene: 'clinic', how: 'patrol', span: [Math.round(c.length * 0.15), Math.round(c.length * 0.6)], shifts: [[9, 18]], count: 1, gate },
   ];
 }
 
@@ -59,14 +92,14 @@ export function createHqWorld(
   seed: number,
   present: { name: string; scene: string }[],
   has: (look: string, clip: string) => boolean = () => false,
-  extra: Pick<SimOptions, 'stance'> = {},
+  extra: Pick<SimOptions, 'stance' | 'killOk' | 'relation' | 'namedHostile' | 'nav'> = {},
 ): WorldSim {
-  const graph = new PlaceGraph(map.scenes, map.elevator, HQ_KINDS);
+  const graph = new PlaceGraph(map.scenes, map.elevator);
   const sim = new WorldSim(graph, mulberry32(seed), { spawns: hqSpawns(graph), posts: hqPosts(graph), has, sceneFaction: hqSceneFaction, ...extra });
   for (const p of present) {
     if (!graph.scene(p.scene)) continue;
     // 부상(의무실)이면 침대 곁에만: 오가는 범위가 의무실 하나
-    sim.add({ id: `npc:${p.name}`, name: p.name, kind: 'named', brain: 'needs', home: p.scene, roam: HQ_ROAM[p.scene] ?? [p.scene], look: p.name });
+    sim.add({ id: `npc:${p.name}`, name: p.name, kind: 'named', brain: 'needs', home: p.scene, roam: hqRoam(graph, p.scene), look: p.name });
   }
   return sim;
 }

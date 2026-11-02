@@ -30,6 +30,25 @@ export interface PaintedObject {
   sortY: number;
   /** 막는 바닥 상자 (여럿이면 모두). h = 윗면 높이(px): 이보다 높이 뛰면 넘고, 위에 설 수 있다 */
   solid?: { x0: number; x1: number; y0: number; y1: number; h?: number }[];
+  /** 오리지 않고 가리기: 배경 그림의 이 다각형들(월드 px)을 깊이 순서에 맞춰 사람 위에 한 번 더 그린다. file은 비워 둔다 (맵 에디터 cover) */
+  cover?: [number, number][][];
+  /** 코드로 열리는 게이트 날개(사용자 11-01 1층): 사람이 다가가면 흐려져 열리고 멀어지면 닫힌다. 막지 않는다 */
+  gate?: boolean;
+  /** 여러 장면 그림(화장실 칸 문 0 닫힘 ~ 끝 열림). 열린 정도(0~1)로 장면을 고른다 (hub.ts gateOpen) */
+  frames?: string[];
+  /** 화장실 칸 문 표시등이 빨간 불(사람 있음)인 같은 장면들. locked = 쓰지 않는 칸(녹색 그대로, 상호작용 없음) */
+  busy?: string[];
+  locked?: boolean;
+}
+/** 화장실 쓰는 자리 (tools/mapedit/author_hq_wc.py). stall = 대변기 칸(문 앞 x·y에서 E → 안 좌석 seat, door = 문 오브젝트 id),
+ *  urinal = 소변기(북쪽 보고 100), sink = 세면대(북쪽 보고 104). x·y = 서는 발 자리 */
+export interface HqToilet {
+  id: string;
+  kind: 'stall' | 'urinal' | 'sink';
+  x: number; y: number;
+  door?: string;
+  /** 앉은 사람 발 자리(기준 허벅지선)와 그 깊이의 도트 배율 */
+  seat?: { x: number; y: number; k?: number };
 }
 export interface PaintedScene {
   file: string;
@@ -53,9 +72,26 @@ export interface PaintedScene {
   /** 바깥 풍경을 색으로 고르지 않고 다각형 전체를 고르게 덮는다 (유리 현관처럼 바깥이 통째로 보이는 곳). keep = 앞에 놓인 화분 등은 빼기: 'green'이면 잎(초록) 픽셀만, 'all'이면 상자 전부 */
   outsideSolid?: { keep: [number, number, number, number, 'green' | 'all'][] };
   objects: PaintedObject[];
+  /** 못 지나가는 바닥 다각형(맵 에디터 막힘, 윗면 높이 400 이상). 발이 안에 들어가면 가장 가까운 바깥으로 밀어낸다 */
+  holes?: [number, number][][];
+  /** 근무 자리(발 x·y): 그림에 맞춘 고정 근무자 자리 (예: desk = 로비 안내 직원) */
+  posts?: Record<string, [number, number]>;
+  /** 사람 앞줄 도트 배율(월드 px / 도트). 세로 890 화면 기준 앞 1.5배를 장면 세로에 맞춘 값(1.5 × h / 890). 없으면 CHAR_K */
+  dotK?: number;
+  /** 화장실 쓰는 자리 */
+  toilets?: HqToilet[];
+  /** 줄 맨 뒤 사람 배율(맨 앞 1 대비). 없으면 0.85(engine/view.ts FAR). 그림 원근이 장면마다 달라 그림에서 재서 넣는다 (사용자 2026-11-01 15:03) */
+  far?: number;
+  /** 사람이 이 y(월드)까지만 커지고 그보다 앞에서는 그 크기 그대로(맨 앞에서 급격히 커지는 것 막기, 사용자 11-01 15:07). dotK는 이 자리 크기 */
+  growTo?: number;
+  /** 기준점 크기표 [발 y(월드), 배율(맨 앞 1)] — 문·물건 높이로 잰 점 사이에서만 크기가 바뀐다(engine/view.ts sizes). 있으면 far·growTo 대신 */
+  sizes?: [number, number][];
+  /** 샤워기(샤워실): 헤드 물 나오는 면(월드 px 선)과 서는 자리(발). 자리(spot act 'shower')를 쓰면 물·김을 코드로 그린다 (hq/showerFx.ts) */
+  showers?: { id: string; head: [[number, number], [number, number]]; foot: [number, number]; face: 1 | -1 }[];
 }
 
 import { JR_ROOMS } from './jrRooms.gen';
+import { MAPEDIT_SCENES } from './mapedit.gen';
 import { JR_CUTS } from './jrCuts.gen';
 
 const downs = (xs: number[], y = 18): PaintedLamp[] => xs.map((x) => ({ x, y, kind: 'down' as const }));
@@ -227,7 +263,12 @@ export const PAINTED: Record<string, PaintedScene> = {
 };
 
 // 중림 장면에서 오린 소품(가림용): tools/jr/cuts.py
-for (const [k, cs] of Object.entries(JR_CUTS)) if (PAINTED[k]) PAINTED[k].objects = [...PAINTED[k].objects, ...cs];
+for (const [k, cs] of Object.entries(JR_CUTS)) if (PAINTED[k] && !MAPEDIT_SCENES[k]) PAINTED[k].objects = [...PAINTED[k].objects, ...cs];
+// 맵 에디터로 만든 장면(tools/mapedit/import.py → mapedit.gen.ts)이 있으면 그것으로 바꾼다. 출입구·조명을 안 찍었으면 원래 것을 쓴다 (중림 브랜치 2026-10-29, 11-01 옮김)
+for (const [k, m] of Object.entries(MAPEDIT_SCENES)) {
+  const base = PAINTED[k];
+  PAINTED[k] = { ...base, ...m, doors: Object.keys(m.doors).length || !base ? m.doors : base.doors, lamps: m.lamps.length || !base ? m.lamps : base.lamps } as PaintedScene;
+}
 
 /** 문 가운데 x */
 export const doorX = (scene: string, id: string) => {
@@ -238,12 +279,32 @@ export const doorX = (scene: string, id: string) => {
 /** 그림 층 기본 걷는 띠 */
 export const PAINTED_LANE: [number, number] = [440, 669];
 
+/** 발이 설 수 있는 바닥인가: 바닥 다각형 안이고 막힘(holes·높은 발판) 밖. 그림 장면이 아니면 늘 true (NPC 길찾기용) */
+export function walkablePainted(scene: string, x: number, y: number): boolean {
+  const p = PAINTED[scene];
+  if (!p) return true;
+  if (p.floor && !inPolygon(p.floor, x, y)) return false;
+  for (const h of p.holes ?? []) if (inPolygon(h, x, y)) return false;
+  if (p.holes) for (const o of p.objects) for (const b of o.solid ?? []) {
+    if (b.h !== undefined && x >= b.x0 && x <= b.x1 && y >= b.y0 && y <= b.y1) return false;
+  }
+  return true;
+}
+
 /** 옆벽·튀어나온 벽 바깥으로 나간 발을 바닥 안으로 되돌린다 */
-export function clampPainted(scene: string, x: number, y: number): { x: number; y: number } {
+export function clampPainted(scene: string, x: number, y: number, z = 0): { x: number; y: number } {
   const p = PAINTED[scene];
   if (!p) return { x, y };
-  if (p.floor) return inPolygon(p.floor, x, y) ? { x, y } : nearestInside(p.floor, x, y);
-  return { x, y };
+  let q = p.floor && !inPolygon(p.floor, x, y) ? nearestInside(p.floor, x, y) : { x, y };
+  for (const h of p.holes ?? []) if (inPolygon(h, q.x, q.y)) q = nearestOutside(h, q.x, q.y, p.floor);
+  // 맵 에디터 발판(윗면 높이 있는 네모): 그 높이보다 낮게 있으면 벽처럼 정확히 막는다 (위에 올라서 있거나 뛰어넘는 중이면 통과)
+  if (p.holes) for (const o of p.objects) for (const b of o.solid ?? []) {
+    if (b.h === undefined || z >= b.h - 6) continue;
+    const r: [number, number][] = [[b.x0, b.y0], [b.x1, b.y0], [b.x1, b.y1], [b.x0, b.y1]];
+    if (inPolygon(r, q.x, q.y)) q = nearestOutside(r, q.x, q.y, p.floor);
+  }
+  if (p.floor && !inPolygon(p.floor, q.x, q.y)) q = nearestInside(p.floor, q.x, q.y);
+  return q;
 }
 
 function inPolygon(poly: [number, number][], x: number, y: number): boolean {
@@ -268,6 +329,21 @@ function nearestInside(poly: [number, number][], x: number, y: number): { x: num
   const cx = poly.reduce((s, p) => s + p[0], 0) / poly.length, cy = poly.reduce((s, p) => s + p[1], 0) / poly.length;
   const k = 2 / (Math.hypot(cx - best.x, cy - best.y) || 1);
   return { x: best.x + (cx - best.x) * k, y: best.y + (cy - best.y) * k };
+}
+
+/** 막힘 다각형 안의 발을 가장 가까운 변 바깥으로 (변의 법선 쪽 중 다각형 밖이고 바닥 안인 쪽으로 2px) */
+function nearestOutside(poly: [number, number][], x: number, y: number, floor?: [number, number][]): { x: number; y: number } {
+  const cands: { x: number; y: number; d: number }[] = [];
+  for (let i = 0; i < poly.length; i++) {
+    const [ax, ay] = poly[i], [bx, by] = poly[(i + 1) % poly.length];
+    const dx = bx - ax, dy = by - ay, L = dx * dx + dy * dy || 1, n = Math.sqrt(L);
+    const t = Math.max(0, Math.min(1, ((x - ax) * dx + (y - ay) * dy) / L));
+    const qx = ax + dx * t, qy = ay + dy * t, d = (qx - x) ** 2 + (qy - y) ** 2;
+    for (const sgn of [1, -1]) cands.push({ x: qx - (dy / n) * 2 * sgn, y: qy + (dx / n) * 2 * sgn, d });
+  }
+  cands.sort((a, b) => a.d - b.d);
+  const ok = cands.find((c) => !inPolygon(poly, c.x, c.y) && (!floor || inPolygon(floor, c.x, c.y)));
+  return ok ?? cands.find((c) => !inPolygon(poly, c.x, c.y)) ?? { x, y };
 }
 
 /** 문 앞에서 E가 닿는 깊이 한계(발 y): 문 그림 아래 끝 + 75 (옆벽 문은 사다리꼴 아래 끝) */

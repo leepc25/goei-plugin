@@ -3,12 +3,14 @@
 import type { Chat } from './types';
 
 export const FIELD_KEY = 'goeiFieldV1';
-/** 장부에 남길 사건 수 (넘으면 오래된 것부터 버린다) */
+/** 장부에 남길 사건 수. 넘으면 작은 일(weight 1, 확정 사실 없음)부터 오래된 순으로 버리고, 큰일(weight 2 이상)과 확정 사실은 남긴다 (11-01 사용자: 1-7). 큰일만으로도 넘치면 그때 오래된 큰일부터 */
 export const MAX_EVENTS = 300;
 
 export type FieldKind =
   | 'move' | 'act' | 'hurt' | 'down' | 'kill' | 'flee' | 'provoke' | 'gift' | 'trade' | 'quest'
-  | 'follow' | 'unfollow' | 'enter_anomaly' | 'exit_anomaly' | 'enter_site' | 'detected' | 'appoint' | 'call';
+  | 'follow' | 'unfollow' | 'enter_anomaly' | 'exit_anomaly' | 'enter_site' | 'detected' | 'appoint' | 'call'
+  /** 필드 방문 시작·끝 (10-31 사용자: 방문 한 번 = 보고서 한 장, 출동은 그 안의 한 덩어리). 모델 글에는 안 넣는다 */
+  | 'enter_field' | 'exit_field';
 
 /** 지금 확정된 사실 하나. 같은 key는 가장 나중 것이 이긴다. permanent는 되돌릴 수 없는 일(사망 등) */
 export interface FieldFact { key: string; value: string; permanent?: boolean }
@@ -20,8 +22,10 @@ export interface FieldEvent {
   /** 그때 본편 마지막 메시지 chatId (다시 굴리기·삭제에 안전한 기준) */
   anchor: string;
   kind: FieldKind;
-  /** 사람이 읽는 한 줄 (게임이 만든다) */
+  /** 모델에게 가는 한 줄 = 활동 결과 (영어 짧은 문장, 주인공 {user}). 게임이 만든다 */
   text: string;
+  /** 사람이 읽는 한 줄 = 기록 메뉴 보고서 (한글, 주인공 {user}). 빈 글이면 보고서에 안 넣음. 빈 글 + fact = 확정 사실만 담은 줄 → [Field log]에도 안 넣고 [Field facts]에만. 없으면 text */
+  ko?: string;
   /** 장면 이름 */
   scene?: string;
   who?: string[];
@@ -35,17 +39,30 @@ export interface FieldEvent {
 }
 export interface FieldRecord { events: FieldEvent[] }
 
-const KINDS = new Set<string>(['move', 'act', 'hurt', 'down', 'kill', 'flee', 'provoke', 'gift', 'trade', 'quest', 'follow', 'unfollow', 'enter_anomaly', 'exit_anomaly', 'enter_site', 'detected', 'appoint', 'call']);
+const KINDS = new Set<string>(['move', 'act', 'hurt', 'down', 'kill', 'flee', 'provoke', 'gift', 'trade', 'quest', 'follow', 'unfollow', 'enter_anomaly', 'exit_anomaly', 'enter_site', 'detected', 'appoint', 'call', 'enter_field', 'exit_field']);
 
 /** 요청에 그대로 들어가는 글이라 템플릿 기호와 줄바꿈을 막는다 */
 export const plain = (s: unknown, max = 300) =>
   String(s ?? '').replace(/\{\{/g, '｛｛').replace(/\}\}/g, '｝｝').replace(/%%/g, '％％').replace(/\s+/g, ' ').trim().slice(0, max);
 
+/** 상한에 맞춰 자른다: 작은 일(weight 1·사실 없음)을 오래된 것부터 버리고, 그래도 넘치면 큰일을 오래된 것부터. 순서는 그대로 */
+export function trimEvents(list: FieldEvent[], max = MAX_EVENTS): FieldEvent[] {
+  if (list.length <= max) return list;
+  const big = (e: FieldEvent) => (e.weight ?? 1) >= 2 || !!e.fact;
+  let dropped = list.length - max;
+  const out: FieldEvent[] = [];
+  for (const e of list) {
+    if (!big(e) && dropped > 0) { dropped--; continue; }
+    out.push(e);
+  }
+  return out.length > max ? out.slice(-max) : out;
+}
+
 export function fieldRecord(chat: Chat): FieldRecord {
   const v = chat[FIELD_KEY] as FieldRecord | undefined;
   const list = Array.isArray(v?.events) ? v!.events : [];
   return {
-    events: list.filter((e) => e && typeof e.id === 'string' && typeof e.text === 'string' && typeof e.anchor === 'string' && typeof e.at === 'number' && KINDS.has(e.kind)).slice(-MAX_EVENTS),
+    events: trimEvents(list.filter((e) => e && typeof e.id === 'string' && typeof e.text === 'string' && typeof e.anchor === 'string' && typeof e.at === 'number' && KINDS.has(e.kind))),
   };
 }
 
@@ -56,13 +73,14 @@ export function withFieldEvent(chat: Chat, ev: FieldEvent): Chat {
   const clean: FieldEvent = {
     ...ev,
     text: plain(ev.text),
+    ...(typeof ev.ko === 'string' ? { ko: plain(ev.ko) } : {}),
     scene: ev.scene ? plain(ev.scene, 60) : undefined,
     who: ev.who?.map((w) => plain(w, 40)).slice(0, 8),
     fact: ev.fact ? { key: plain(ev.fact.key, 40), value: plain(ev.fact.value, 120), ...(ev.fact.permanent ? { permanent: true } : {}) } : undefined,
     ...(ev.witness ? { witness: { faction: plain(ev.witness.faction, 12), named: !!ev.witness.named } } : {}),
     ...(ev.visit ? { visit: plain(ev.visit, 40) } : {}),
   };
-  return { ...chat, [FIELD_KEY]: { events: [...old, clean].slice(-MAX_EVENTS) } };
+  return { ...chat, [FIELD_KEY]: { events: trimEvents([...old, clean]) } };
 }
 
 /** 확정 사실: 같은 key는 나중 것이 이긴다. 순서는 처음 나온 순서 */

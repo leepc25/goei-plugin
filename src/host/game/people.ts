@@ -2,7 +2,7 @@
 import type { FactionView, GamePeople, PersonView } from '../../game/bridge';
 import { factionNow, knownFactionCodes, userFactionOf } from '../../core/people/faction';
 import { factionNamesOf } from '../people';
-import { loadContext } from '../risu';
+import { loadContext, type ChatContext } from '../risu';
 import { bookText } from '../../core/refs';
 import { peopleStore, liveness, liveChanges, liveEntries } from '../../core/people/store';
 import { peopleSettings } from '../../core/people/settings';
@@ -11,6 +11,18 @@ import { personBlock, unknownTo } from '../../core/people/inject';
 import { latestNote } from '../../core/people/updater';
 import { temperOf } from '../../core/people/base';
 import { onPeopleStatus } from '../people';
+import { relationStage } from '../../core/world/records';
+
+/** NPC 대화 입력용 글: 시트 고정 절 + 살아 있는 기록. 기록 기능이 꺼져 있거나 기록이 없으면 시트 그대로 (11-01: 필드 대화가 시트 대신 이걸 쓴다) */
+export function liveSheetOf(c: { char: ChatContext['char']; chat: ChatContext['chat'] }, name: string, sheet: string | null, user = '방문자'): string | null {
+  const settings = peopleSettings(c.chat.scriptstate);
+  const store = peopleStore(c.chat);
+  const p = store.people[name];
+  if (!settings.on || !p) return sheet;
+  const live = liveness(c.chat);
+  const changes = liveChanges(store, live);
+  return personBlock(p, store, live, changes, { sheet, mode: settings.inject === 'off' ? 'split' : settings.inject, unknown: settings.features.has('perception') ? unknownTo(p, store, live) : [], user, note: settings.director === 'facts' ? latestNote(store, name, live) : null, temper: temperOf(name), speed: settings.speed, turnCap: settings.turnCap });
+}
 
 export function createPeople(): GamePeople {
   return {
@@ -45,14 +57,7 @@ export function createPeople(): GamePeople {
     async sheet(name) {
       const c = await loadContext().catch(() => null);
       if (!c) return null;
-      const settings = peopleSettings(c.chat.scriptstate);
-      const store = peopleStore(c.chat);
-      const p = store.people[name];
-      const sheet = bookText({ char: c.char, chat: c.chat }, name) || null;
-      if (!settings.on || !p) return sheet;
-      const live = liveness(c.chat);
-      const changes = liveChanges(store, live);
-      return personBlock(p, store, live, changes, { sheet, mode: settings.inject === 'off' ? 'split' : settings.inject, unknown: settings.features.has('perception') ? unknownTo(p, store, live) : [], user: '방문자', note: settings.director === 'facts' ? latestNote(store, name, live) : null, temper: temperOf(name), speed: settings.speed, turnCap: settings.turnCap });
+      return liveSheetOf(c, name, bookText({ char: c.char, chat: c.chat }, name) || null);
     },
     async factions() {
       const c = await loadContext().catch(() => null);
@@ -67,6 +72,20 @@ export function createPeople(): GamePeople {
         const f = factionNow(store, code, changes, uf, settings, names);
         return { code, name: f.name, value: f.value, stage: f.stage.id, stageLabel: f.stage.label, bounds: settings.factionBounds };
       });
+    },
+    async relations() {
+      const c = await loadContext().catch(() => null);
+      if (!c) return null;
+      const settings = peopleSettings(c.chat.scriptstate);
+      if (!settings.on || !settings.features.has('faction_rep')) return null;
+      const codes = knownFactionCodes(peopleStore(c.chat), factionNamesOf(c.char.globalLore));
+      const out: Record<string, FactionView['stage']> = {};
+      for (const a of codes) for (const b of codes) {
+        if (a === b) continue;
+        const st = relationStage(a, b);
+        if (st !== 'neutral') out[`${a}>${b}`] = st;
+      }
+      return out;
     },
     onChange(cb) {
       let wasBusy = false;

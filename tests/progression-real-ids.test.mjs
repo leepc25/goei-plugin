@@ -9,7 +9,7 @@ const clips=JSON.parse(readFileSync('game-pack/jyaldi/frames.json','utf8')).clip
 async function setup(name){
  const M=await import(`${url}#${name}`),run={seed:42,agent:'jyaldi'},w=new M.World(run,clips,null,(s,w)=>M.createEnemy(s.kind,s.x,s.y,w.rand));
  w.enterFloor({id:name,type:'lobby',title:'ID 회귀',length:1800,startX:400,exitX:Infinity,encounters:[],props:[]});
- const enemy=x=>{const e=w.spawn({kind:'hollow',x,y:w.player.y});e.set('idle');return e};
+ const enemy=x=>{const e=w.spawn({kind:'dd_member',x,y:w.player.y});e.set('idle');return e};
  return {M,w,run,enemy};
 }
 test('실제 잽 뒤 첫 권총탄: Enemy.hitBy가 다른 공격을 동일 타격으로 버리지 않는다',async()=>{
@@ -68,7 +68,7 @@ test('World 새로 만들기·안전 저장 복원·기존 몸 번호 예약이 
  restored.enterFloor(w.floor);restored.restore(saved);
  assert.equal(restored.player.x,725);assert.equal(restored.player.hp,w.player.hp);assert.equal(restored.rand(),expectedRandom);
  M.bumpIds(restored.player.id+1000);M.bumpIds(1);
- const enemy=M.createEnemy('hollow',900,600,w.rand),bullet=new M.Bullet(1100,600,120,1),dummy=new M.Dummy(1200,600);
+ const enemy=M.createEnemy('dd_member',900,600,w.rand),bullet=new M.Bullet(1100,600,120,1),dummy=new M.Dummy(1200,600);
  assert.ok(enemy.id>restored.player.id+1000);
  const bodies=[w.player,restored.player,enemy,bullet,dummy];
  assert.equal(new Set(bodies.map(b=>b.id)).size,bodies.length);

@@ -1,6 +1,12 @@
 """그림의 일부(창 x0..x0+w, y0..y0+h)를 잘라 마스크 영역만 PixelLab inpaint-v3로 다시 그려 되붙인다.
 마스크: 창 안 좌표 (mx0, my0, mx1, my1) 사각형. right_diag가 주어지면 x < a + (b - y)*c 인 곳만 마스크.
 사용: python3 fix_region.py <그림> <프롬프트> <출력> x0 y0 w h mx0 my0 mx1 my1 [a b c]"""
+# --- PixelLab 생성 승인 문 (2026-10-31 사용자: 시키지 않은 생성 금지) — 이 파일의 모든 생성 요청은 .pixellab_ok 회수가 있어야 나간다
+import sys as _gs, pathlib as _gp
+_gs.path.insert(0, str(next(p for p in _gp.Path(__file__).resolve().parents if (p / "tools" / "pixellab_gate.py").exists()) / "tools"))
+import pixellab_gate as _gate  # noqa: E402
+_gate.spend(__file__ + " 실행")
+# ---
 import base64, io, json, sys, time
 import requests
 from PIL import Image

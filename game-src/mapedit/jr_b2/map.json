@@ -1,0 +1,108 @@
+{
+ "file": "jr_b2_strip",
+ "bgScale": 2,
+ "w": 6320,
+ "h": 848,
+ "under": true,
+ "floor": [
+  [
+   300,
+   690
+  ],
+  [
+   6296,
+   690
+  ],
+  [
+   6296,
+   848
+  ],
+  [
+   300,
+   848
+  ]
+ ],
+ "lane": [
+  690,
+  836
+ ],
+ "blocks": [],
+ "doors": {
+  "youngchang": {
+   "kind": "steel",
+   "x": 630,
+   "y": 700,
+   "to": "jr_youngchang",
+   "toDoor": "out",
+   "label": "창고 B-7 (영창 컨설팅)",
+   "door": {
+    "x0": 544,
+    "x1": 716,
+    "y0": 290,
+    "y1": 614,
+    "anim": "none",
+    "behind": "dark"
+   }
+  },
+  "up": {
+   "kind": "door",
+   "x": 6126,
+   "y": 700,
+   "to": "jr_b1",
+   "toDoor": "down",
+   "label": "지하 1층으로",
+   "door": {
+    "x0": 6146,
+    "x1": 6320,
+    "y0": 160,
+    "y1": 660,
+    "anim": "none",
+    "behind": "dark"
+   }
+  }
+ },
+ "lamps": [],
+ "spots": [],
+ "objects": [
+  {
+   "id": "pillar1",
+   "name": "앞 기둥 1",
+   "file": "pillar1",
+   "x": 1206,
+   "y": 0,
+   "w": 116,
+   "h": 848,
+   "sortY": 9999
+  },
+  {
+   "id": "pillar2",
+   "name": "앞 기둥 2",
+   "file": "pillar2",
+   "x": 2470,
+   "y": 0,
+   "w": 116,
+   "h": 848,
+   "sortY": 9999
+  },
+  {
+   "id": "pillar3",
+   "name": "앞 기둥 3",
+   "file": "pillar3",
+   "x": 3734,
+   "y": 0,
+   "w": 116,
+   "h": 848,
+   "sortY": 9999
+  },
+  {
+   "id": "pillar4",
+   "name": "앞 기둥 4",
+   "file": "pillar4",
+   "x": 4996,
+   "y": 0,
+   "w": 120,
+   "h": 848,
+   "sortY": 9999
+  }
+ ]
+}

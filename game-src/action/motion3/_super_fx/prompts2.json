@@ -1,0 +1,62 @@
+[
+ {
+  "key": "1.11_로제몬",
+  "name": "x3-1.11-S2-thread-clash",
+  "mode": "center",
+  "desc": "Three glowing violet threads converge from three directions into one single point, pulling taut, then a violent collision burst explodes at that point: a jagged violet and white star flash, thread fragments snapping outward, a quick shock ring and falling sparkles. Medium-large: about one and a half character heights wide. Fast, 8 frames. Colors: violet, magenta, white core. A standalone effect, not attached to any hand or character. Size reference only: the given character. Pixel art effect, transparent background, crisp hard-edged pixels, no blur, no background scenery. Draw only the effect: no people, no character body or hands, no creatures, monsters, animals, faces, letters or numbers."
+ },
+ {
+  "key": "2.3_이길환",
+  "name": "x3-2.3-S2-sonic-waves",
+  "mode": "center",
+  "desc": "Three thick apricot-orange sound waves pushing forward from a single point in front of a microphone, drawn as stacked curved arcs like the right half of a speaker icon, each arc rippling with visible vibration lines and small musical distortion zigzags, growing larger as they travel to the right and fading. Large: about two character heights wide. 8 frames. Colors: apricot orange, warm yellow, white highlights. A standalone effect, not attached to any hand or character. Size reference only: the given character. Pixel art effect, transparent background, crisp hard-edged pixels, no blur, no background scenery. Draw only the effect: no people, no character body or hands, no creatures, monsters, animals, faces, letters or numbers."
+ },
+ {
+  "key": "2.7_고영훈",
+  "name": "x3-2.7-S2-cross-burst",
+  "mode": "center",
+  "desc": "Three long white sword slash lines cross through one point at three angles forming a six-pointed star, then the crossing point erupts with a blinding white flash, the slash lines flaring wide with navy-grey edges and scattering sharp splinters of light, then fading. Large: about two character heights wide. Fast, 8 frames. Colors: white, navy grey, pale blue sparks. A standalone effect, not attached to any hand or character. Size reference only: the given character. Pixel art effect, transparent background, crisp hard-edged pixels, no blur, no background scenery. Draw only the effect: no people, no character body or hands, no creatures, monsters, animals, faces, letters or numbers."
+ },
+ {
+  "key": "2.8_노기균",
+  "name": "x3-2.8-S2-crescent-wave",
+  "mode": "center",
+  "desc": "A wide horizontal crescent sword wave flying forward to the right at shoulder height: a thick white blade-shaped crescent with a sharp leading edge and a red glowing trailing rim, leaving a short red afterimage streak behind and small white sparks, growing slightly as it travels then breaking into fragments. Large: about two character heights wide, fairly low and long. Fast, 8 frames. Colors: white, deep red, crimson glow. A standalone effect, not attached to any hand or character. Size reference only: the given character. Pixel art effect, transparent background, crisp hard-edged pixels, no blur, no background scenery. Draw only the effect: no people, no character body or hands, no creatures, monsters, animals, faces, letters or numbers."
+ },
+ {
+  "key": "2.9_송주익",
+  "name": "x3-2.9-S2-textbook-cut",
+  "mode": "bottom",
+  "desc": "A perfect vertical downward sword cut: a tall straight teal-white blade line slams from top to the floor, the floor splits in a short straight crack with teal light bursting out of it, small stone chips jump up on both sides, and a thin teal afterimage line lingers then fades. Tall: about one and a half character heights tall, narrow. Fast, 8 frames. Colors: teal, cyan, white, grey stone. A standalone effect, not attached to any hand or character. Size reference only: the given character. Pixel art effect, transparent background, crisp hard-edged pixels, no blur, no background scenery. Draw only the effect: no people, no character body or hands, no creatures, monsters, animals, faces, letters or numbers."
+ },
+ {
+  "key": "3.14_이연화",
+  "name": "x3-3.14-S2-reagent-rain",
+  "mode": "bottom",
+  "desc": "A glass reagent bottle bursts high in the air with a flash, and a wide dome of glowing indigo and violet chemical droplets rains down onto a round area of floor, splashing on impact, while thick indigo-purple toxic smoke billows up from the ground and spreads in a wide low cloud, then slowly fades. Large: about two and a half character heights wide. 10 frames. Colors: indigo, violet, pale lavender smoke, white glass glints. A standalone effect, not attached to any hand or character. Size reference only: the given character. Pixel art effect, transparent background, crisp hard-edged pixels, no blur, no background scenery. Draw only the effect: no people, no character body or hands, no creatures, monsters, animals, faces, letters or numbers."
+ },
+ {
+  "key": "3.3_백석주",
+  "name": "x3-3.3-S2-v-blade",
+  "mode": "center",
+  "desc": "A sharp green hand-blade afterimage drawn as a big V shape: first a diagonal stroke slashing down and forward, then a long stroke rising steeply upward, both made of bright jade-green light with white edges, leaving a fading green V-shaped trail with small green sparks at the bottom corner. Large: about one and a half character heights tall. Fast, 8 frames. Colors: jade green, emerald, white. A standalone effect, not attached to any hand or character. Size reference only: the given character. Pixel art effect, transparent background, crisp hard-edged pixels, no blur, no background scenery. Draw only the effect: no people, no character body or hands, no creatures, monsters, animals, faces, letters or numbers."
+ },
+ {
+  "key": "4.1_차여진",
+  "name": "x3-4.1-S2-heel-stomp",
+  "mode": "bottom",
+  "desc": "Two high heels slam down side by side onto the floor: a sharp double impact point flashes, then a wide flat crimson shock ring bursts outward along the floor with a second inner ring, the floor cracks in a starburst under the impact, and red-tinted dust and small debris jump up, then fade. Large: about two and a half character heights wide, flat perspective on the ground. 8 frames. Colors: deep crimson, wine red, pale pink highlights, grey dust. A standalone effect, not attached to any hand or character. Size reference only: the given character. Pixel art effect, transparent background, crisp hard-edged pixels, no blur, no background scenery. Draw only the effect: no people, no character body or hands, no creatures, monsters, animals, faces, letters or numbers."
+ },
+ {
+  "key": "4.7_신유리",
+  "name": "x3-4.7-S2-steel-stomp",
+  "mode": "bottom",
+  "desc": "A steel-toe boot heel stomps straight down: a heavy metallic grey-blue impact flash with sharp angular spark shards, the floor buckles into a shallow cracked dent, and a low wave of grey dust and small concrete chunks bursts outward in a ring along the floor, then settles. Medium-large: about two character heights wide, flat on the ground. Heavy, 8 frames. Colors: steel grey, cold blue-white, dark grey, pale dust. A standalone effect, not attached to any hand or character. Size reference only: the given character. Pixel art effect, transparent background, crisp hard-edged pixels, no blur, no background scenery. Draw only the effect: no people, no character body or hands, no creatures, monsters, animals, faces, letters or numbers."
+ },
+ {
+  "key": "4.9_살라딘",
+  "name": "x3-4.9-S2-rising-line",
+  "mode": "bottom",
+  "desc": "A long straight line of translucent glowing blue spectral spear-like silhouettes of warriors erupts from the floor one after another, from left to right like a wave, each rising out of a blue ripple in the ground with blue mist and dust, then sinking and fading while the next one rises further right. Very long: about five character heights wide, about one character height tall. 10 frames. Colors: cobalt blue, cyan glow, white highlights, pale blue mist. A standalone effect, not attached to any hand or character. Size reference only: the given character. Pixel art effect, transparent background, crisp hard-edged pixels, no blur, no background scenery. Draw only the effect: no people, no character body or hands, no creatures, monsters, animals, faces, letters or numbers."
+ }
+]

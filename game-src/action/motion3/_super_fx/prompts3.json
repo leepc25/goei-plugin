@@ -1,0 +1,146 @@
+[
+ {
+  "key": "1.11_로제몬",
+  "name": "x3-1.11-D-coin-flash",
+  "mode": "center",
+  "desc": "A spinning silver coin flicks forward leaving a thin violet light streak, then strikes with a sharp violet flash burst and a small ring of violet sparkles, the coin bouncing away. Small-medium: about one character height wide. Fast, 8 frames. Colors: violet, magenta, silver, white. A standalone effect, not attached to any hand or character. Size reference only: the given character. Pixel art effect, transparent background, crisp hard-edged pixels, no blur, no background scenery. Draw only the effect: no people, no character body or hands, no creatures, monsters, animals, faces, letters or numbers."
+ },
+ {
+  "key": "1.3_잼트리",
+  "name": "x3-1.3-D-finger-jab",
+  "mode": "center",
+  "desc": "Two quick sharp impact bursts in olive green: a tiny piercing star flash from a two-finger jab, then a flat sideways slap burst with short speed lines and green sparks. Small: about half a character height. Very fast, 8 frames. Colors: olive green, yellow-green, white. A standalone effect, not attached to any hand or character. Size reference only: the given character. Pixel art effect, transparent background, crisp hard-edged pixels, no blur, no background scenery. Draw only the effect: no people, no character body or hands, no creatures, monsters, animals, faces, letters or numbers."
+ },
+ {
+  "key": "1.8_데쥬레",
+  "name": "x3-1.8-D-pink-push",
+  "mode": "center",
+  "desc": "A pink half-circle shock wave bursts forward from a two-handed push, a thick bright pink crescent of air expanding to the right with small pink stars and dust specks, then fading. Medium: about one character height tall. Fast, 8 frames. Colors: hot pink, light pink, white. A standalone effect, not attached to any hand or character. Size reference only: the given character. Pixel art effect, transparent background, crisp hard-edged pixels, no blur, no background scenery. Draw only the effect: no people, no character body or hands, no creatures, monsters, animals, faces, letters or numbers."
+ },
+ {
+  "key": "2.11_조성춘",
+  "name": "x3-2.11-D-sweat-punch",
+  "mode": "center",
+  "desc": "A heavy straight punch impact: a big golden-yellow jagged burst with thick spike rays, flying sweat droplets in white and pale blue spraying forward, and a quick yellow shock ring. Medium: about one character height wide. Fast, 8 frames. Colors: golden yellow, amber, white, pale blue droplets. A standalone effect, not attached to any hand or character. Size reference only: the given character. Pixel art effect, transparent background, crisp hard-edged pixels, no blur, no background scenery. Draw only the effect: no people, no character body or hands, no creatures, monsters, animals, faces, letters or numbers."
+ },
+ {
+  "key": "2.13_김성진",
+  "name": "x3-2.13-D-triple-tracer",
+  "mode": "center",
+  "desc": "Three bright green-yellow pistol tracer lines fired one after another straight to the right, each with a hot white head and fading lime tail, a muzzle flash burst at the left for each shot, and spark hits at the right end. Long: about three character heights wide, thin. Fast, 9 frames. Colors: lime green, yellow, white, orange flash. A standalone effect, not attached to any hand or character. Size reference only: the given character. Pixel art effect, transparent background, crisp hard-edged pixels, no blur, no background scenery. Draw only the effect: no people, no character body or hands, no creatures, monsters, animals, faces, letters or numbers."
+ },
+ {
+  "key": "2.14_송진섭",
+  "name": "x3-2.14-D-headshot",
+  "mode": "center",
+  "desc": "A single long sky-blue bullet tracer streaking straight right across the frame with a white-hot head, ending in a sharp blue-white impact burst with a small ring and fragments. Long: about three character heights wide, thin. Fast, 8 frames. Colors: sky blue, cyan, white. A standalone effect, not attached to any hand or character. Size reference only: the given character. Pixel art effect, transparent background, crisp hard-edged pixels, no blur, no background scenery. Draw only the effect: no people, no character body or hands, no creatures, monsters, animals, faces, letters or numbers."
+ },
+ {
+  "key": "2.2_도필헌",
+  "name": "x3-2.2-D-sweep-arc",
+  "mode": "bottom",
+  "desc": "A low sliding foot-sweep trail: a flat brass-gold arc of light skimming along the floor from left to right with a band of tan dust kicked up behind it and a small bright brass flash where it hooks at the end. Medium: about two character heights wide, low. Fast, 8 frames. Colors: brass, gold, tan dust, white. A standalone effect, not attached to any hand or character. Size reference only: the given character. Pixel art effect, transparent background, crisp hard-edged pixels, no blur, no background scenery. Draw only the effect: no people, no character body or hands, no creatures, monsters, animals, faces, letters or numbers."
+ },
+ {
+  "key": "2.6_이도형",
+  "name": "x3-2.6-D-delayed-cuts",
+  "mode": "center",
+  "desc": "Three long thin white slash lines appear crossing a horizontal path, hang still for a moment as faint glowing lines, then all three burst at once into blinding white cuts with sharp splinters and a pale shock, then fade. Long: about three character heights wide. 10 frames. Colors: white, ice blue, pale grey. A standalone effect, not attached to any hand or character. Size reference only: the given character. Pixel art effect, transparent background, crisp hard-edged pixels, no blur, no background scenery. Draw only the effect: no people, no character body or hands, no creatures, monsters, animals, faces, letters or numbers."
+ },
+ {
+  "key": "2.7_고영훈",
+  "name": "x3-2.7-D-shadow-stab",
+  "mode": "center",
+  "desc": "A black shadow blade thrusts through from behind: a dark navy-black spike of shadow piercing horizontally to the right with a cold white edge, a burst of dark smoke wisps and white sparks at the tip, then dissolving into black mist. Medium: about one and a half character heights wide. Fast, 8 frames. Colors: black, navy grey, white edge. A standalone effect, not attached to any hand or character. Size reference only: the given character. Pixel art effect, transparent background, crisp hard-edged pixels, no blur, no background scenery. Draw only the effect: no people, no character body or hands, no creatures, monsters, animals, faces, letters or numbers."
+ },
+ {
+  "key": "2.8_노기균",
+  "name": "x3-2.8-D-bounce-cut",
+  "mode": "bottom",
+  "desc": "A tall vertical rising sword slash from the floor upward: a white crescent blade line rising from ground to above head height with a red afterglow trail, small dust puff at the base, white sparks at the top. Tall: about one and a half character heights tall. Fast, 8 frames. Colors: white, crimson red, pale dust. A standalone effect, not attached to any hand or character. Size reference only: the given character. Pixel art effect, transparent background, crisp hard-edged pixels, no blur, no background scenery. Draw only the effect: no people, no character body or hands, no creatures, monsters, animals, faces, letters or numbers."
+ },
+ {
+  "key": "3.11_강이학",
+  "name": "x3-3.11-D-gold-uppercut",
+  "mode": "center",
+  "desc": "A rising uppercut sparkle burst in gold: a bright golden flash with a small spinning golden coin glint, upward speed lines and a shower of tiny gold sparkles rising. Small-medium: about one character height. Fast, 8 frames. Colors: gold, yellow, white. A standalone effect, not attached to any hand or character. Size reference only: the given character. Pixel art effect, transparent background, crisp hard-edged pixels, no blur, no background scenery. Draw only the effect: no people, no character body or hands, no creatures, monsters, animals, faces, letters or numbers."
+ },
+ {
+  "key": "3.12_장허운",
+  "name": "x3-3.12-D-landing-shove",
+  "mode": "bottom",
+  "desc": "A heavy landing shove: a brown dust half-circle bursts forward along the floor from a stomp, with a forward wall of brown air pressure and small rocks and debris thrown ahead, then settling dust. Medium: about two character heights wide, low. 8 frames. Colors: brown, tan, grey stone. A standalone effect, not attached to any hand or character. Size reference only: the given character. Pixel art effect, transparent background, crisp hard-edged pixels, no blur, no background scenery. Draw only the effect: no people, no character body or hands, no creatures, monsters, animals, faces, letters or numbers."
+ },
+ {
+  "key": "3.14_이연화",
+  "name": "x3-3.14-D-palm-ring",
+  "mode": "center",
+  "desc": "A vertical oval shock ring bursts forward from a raised open palm: an indigo-violet upright ellipse of force expanding to the right with a bright white core flash and a second thinner ring, small indigo particles flying out. Medium: about one and a half character heights tall. Fast, 8 frames. Colors: indigo, violet, white. A standalone effect, not attached to any hand or character. Size reference only: the given character. Pixel art effect, transparent background, crisp hard-edged pixels, no blur, no background scenery. Draw only the effect: no people, no character body or hands, no creatures, monsters, animals, faces, letters or numbers."
+ },
+ {
+  "key": "3.4_진나솔",
+  "name": "x3-3.4-D-thread-yank",
+  "mode": "center",
+  "desc": "A thin taut white thread line with a small violet nail fragment at its far tip snaps straight across to the right, vibrates, then yanks back toward the left with a violet flash running along the thread and small violet sparks. Long: about three character heights wide, very thin. 8 frames. Colors: white thread, violet, lavender. A standalone effect, not attached to any hand or character. Size reference only: the given character. Pixel art effect, transparent background, crisp hard-edged pixels, no blur, no background scenery. Draw only the effect: no people, no character body or hands, no creatures, monsters, animals, faces, letters or numbers."
+ },
+ {
+  "key": "3.5_이성해",
+  "name": "x3-3.5-D-chop-ripple",
+  "mode": "center",
+  "desc": "A sharp hand-chop thrust impact: a bright cyan straight streak stabbing forward at neck height, ending in a crisp cyan-white starburst with light-blue ripple lines spreading outward. Small-medium: about one character height wide. Fast, 8 frames. Colors: cyan, light blue, white. A standalone effect, not attached to any hand or character. Size reference only: the given character. Pixel art effect, transparent background, crisp hard-edged pixels, no blur, no background scenery. Draw only the effect: no people, no character body or hands, no creatures, monsters, animals, faces, letters or numbers."
+ },
+ {
+  "key": "3.8_박민성",
+  "name": "x3-3.8-D-double-palm",
+  "mode": "center",
+  "desc": "A big two-handed palm shove burst: a wide brown-orange wall of compressed air bursting forward with two palm-shaped bright cores, flying sweat drops and dust, pushing outward then fading. Medium: about one and a half character heights tall. Fast, 8 frames. Colors: warm brown, orange, tan, white droplets. A standalone effect, not attached to any hand or character. Size reference only: the given character. Pixel art effect, transparent background, crisp hard-edged pixels, no blur, no background scenery. Draw only the effect: no people, no character body or hands, no creatures, monsters, animals, faces, letters or numbers."
+ },
+ {
+  "key": "3.9_백사헌",
+  "name": "x3-3.9-D-sneak-punch",
+  "mode": "center",
+  "desc": "A sneaky straight punch impact with a violet glint: a sharp purple-white burst with a short horizontal purple afterimage streak behind it, and a second smaller burst lower down for a push kick, purple sparks. Small-medium: about one character height. Fast, 8 frames. Colors: violet, purple, white. A standalone effect, not attached to any hand or character. Size reference only: the given character. Pixel art effect, transparent background, crisp hard-edged pixels, no blur, no background scenery. Draw only the effect: no people, no character body or hands, no creatures, monsters, animals, faces, letters or numbers."
+ },
+ {
+  "key": "4.1_차여진",
+  "name": "x3-4.1-D-crimson-thrust",
+  "mode": "center",
+  "desc": "A two-finger knife-hand thrust: a single long horizontal crimson-red light line slashing straight forward at waist height with a bright white center, a sharp flash at the tip and a few dark red sparks. Medium: about one and a half character heights wide, thin. Fast, 8 frames. Colors: crimson, dark red, white. A standalone effect, not attached to any hand or character. Size reference only: the given character. Pixel art effect, transparent background, crisp hard-edged pixels, no blur, no background scenery. Draw only the effect: no people, no character body or hands, no creatures, monsters, animals, faces, letters or numbers."
+ },
+ {
+  "key": "4.4_윤지아",
+  "name": "x3-4.4-D-wrist-twist",
+  "mode": "center",
+  "desc": "A small twisting grip impact: a peach-orange circular swirl flash rotating once with short curved motion lines, a tiny grey object dropping out of it, and soft peach sparkles. Small: about half a character height. Fast, 8 frames. Colors: peach, apricot, white, grey. A standalone effect, not attached to any hand or character. Size reference only: the given character. Pixel art effect, transparent background, crisp hard-edged pixels, no blur, no background scenery. Draw only the effect: no people, no character body or hands, no creatures, monsters, animals, faces, letters or numbers."
+ },
+ {
+  "key": "4.5_마덕희",
+  "name": "x3-4.5-D-brass-slap",
+  "mode": "center",
+  "desc": "A backhand slap and finger-jab impact in brass color: a flat sideways brass-gold slap burst with short speed lines, followed by a tiny sharp brass point flash, small gold sparks. Small: about half a character height. Fast, 8 frames. Colors: brass, gold, wine red accents, white. A standalone effect, not attached to any hand or character. Size reference only: the given character. Pixel art effect, transparent background, crisp hard-edged pixels, no blur, no background scenery. Draw only the effect: no people, no character body or hands, no creatures, monsters, animals, faces, letters or numbers."
+ },
+ {
+  "key": "4.6_문혜란",
+  "name": "x3-4.6-D-baton-arcs",
+  "mode": "center",
+  "desc": "Two silver baton swing trails: a downward diagonal silver arc then an upward silver arc crossing it, each with a bright white edge and a small impact flash, then a short low sweep line near the floor. Medium: about one and a half character heights. Fast, 9 frames. Colors: silver, steel grey, white, dark wine accents. A standalone effect, not attached to any hand or character. Size reference only: the given character. Pixel art effect, transparent background, crisp hard-edged pixels, no blur, no background scenery. Draw only the effect: no people, no character body or hands, no creatures, monsters, animals, faces, letters or numbers."
+ },
+ {
+  "key": "4.7_신유리",
+  "name": "x3-4.7-D-dagger-stabs",
+  "mode": "center",
+  "desc": "Two quick dagger stab streaks: a short sharp silver-white straight thrust line at chest height then another lower at belly height, each ending in a tiny bright star glint and small grey sparks. Small-medium: about one character height wide. Very fast, 8 frames. Colors: silver, white, steel grey. A standalone effect, not attached to any hand or character. Size reference only: the given character. Pixel art effect, transparent background, crisp hard-edged pixels, no blur, no background scenery. Draw only the effect: no people, no character body or hands, no creatures, monsters, animals, faces, letters or numbers."
+ },
+ {
+  "key": "4.9_살라딘",
+  "name": "x3-4.9-D-blade-volley",
+  "mode": "center",
+  "desc": "A pair of large downward curved sword slashes in white-blue crossing in front, combined with a stream of small orange rifle muzzle flashes and short bullet tracers firing straight right below them, brass shell casings tumbling. Medium: about two character heights wide. Fast, 9 frames. Colors: white, cobalt blue, orange flash, brass. A standalone effect, not attached to any hand or character. Size reference only: the given character. Pixel art effect, transparent background, crisp hard-edged pixels, no blur, no background scenery. Draw only the effect: no people, no character body or hands, no creatures, monsters, animals, faces, letters or numbers."
+ },
+ {
+  "key": "5.2_브라우니",
+  "name": "x3-5.2-D-clap-blast",
+  "mode": "center",
+  "desc": "A double hand-clap air blast: a wide forward fan-shaped burst of mint-green air with comic-style impact lines, a bright white flash at the clap point, small pixel static squares scattering, repeated twice. Medium: about two character heights wide, fan shaped. Fast, 9 frames. Colors: mint green, white, light teal. A standalone effect, not attached to any hand or character. Size reference only: the given character. Pixel art effect, transparent background, crisp hard-edged pixels, no blur, no background scenery. Draw only the effect: no people, no character body or hands, no creatures, monsters, animals, faces, letters or numbers."
+ }
+]

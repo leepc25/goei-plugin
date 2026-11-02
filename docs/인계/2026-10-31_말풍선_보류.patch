@@ -1,0 +1,207 @@
+diff --git a/src/game/action/engine/modules.ts b/src/game/action/engine/modules.ts
+index 812caeeca..30fe1bab7 100644
+--- a/src/game/action/engine/modules.ts
++++ b/src/game/action/engine/modules.ts
+@@ -203,7 +203,7 @@ function hqAdapter(bridge: Partial<GameBridge> | undefined, ui: { chooseFloor: H
+   const world = () => {
+     if (!sim && ready) {
+       sim = createHqWorld(map, seed, present.filter((p) => ROOM_SCENE[p.room]).map((p) => ({ name: p.name, scene: ROOM_SCENE[p.room] })), hasCharClip, { killOk: () => fighterHooks.killOk?.() ?? false, stance: (f) => factionBy.get(f)?.stage ?? null, relation: (v, t) => relation(v, t), namedHostile: (n) => peopleBy.get(n)?.affinity.cell === 'hostile' });
+-      chatter = new Chatter(sim, new Lines(dialogueData as unknown as DialogueData, sim.rng), lineCtx);
++      chatter = new Chatter(sim);
+       // 비전투 계열 캐릭터는 동행이어도 싸움을 거들지 않는다 (반응표 combat)
+       sim.noAssist = (n) => reactOf(n)?.combat === false;
+     }
+diff --git a/src/game/world/actors.ts b/src/game/world/actors.ts
+index 9f697a9ce..1b1799cdb 100644
+--- a/src/game/world/actors.ts
++++ b/src/game/world/actors.ts
+@@ -448,7 +448,7 @@ export class WorldSim {
+       p.buddy = undefined;
+       this.walkTo(p, { x, y: p.y }, '현장으로 달려감', 'chase');
+       this.iconOn(p, '!', 3);
+-      this.say(p, '거기 멈춰!', 2);
++      this.iconOn(p, '!', 2);
+     }
+     const have = this.actors.filter((a) => a.scene === scene && a.plan === 'chase').length;
+     for (let i = have; i < n; i++) {
+@@ -583,6 +583,10 @@ export class WorldSim {
+   }
+ 
+   /** 행위자 말풍선 (대사 연결이 부른다) */
++  /** 머리 위 작은 말풍선 기호 (10-31 사용자: 인물끼리·혼잣말 상호작용은 전부 기호로) */
++  emote(a: Actor, icon: string, sec = 2): void {
++    this.iconOn(a, icon, sec);
++  }
+   say(a: Actor, text: string, sec = 3.2): void {
+     a.say = text;
+     a.sayT = sec;
+@@ -707,7 +711,7 @@ export class WorldSim {
+           g.face = v.x > g.x ? 1 : -1;
+           g.wait = 2.2;
+           this.setClip(g, this.canClip(g, 'greet') ? 'greet' : 'idle');
+-          this.say(g, st === 'friendly' ? '오셨어요!' : '안녕하세요.', 2);
++          this.iconOn(g, st === 'friendly' ? '♪' : '…', 2);
+           continue;
+         }
+         if (st === 'wary') {
+@@ -730,9 +734,9 @@ export class WorldSim {
+             this.setClip(e, 'idle');
+           }
+           v.stay = (v.stay ?? 0) + dt;
+-          if (v.stay >= 6 && v.stay - dt < 6) this.say(e, '여긴 관계자 외 출입 금지입니다.', 2.5);
++          if (v.stay >= 6 && v.stay - dt < 6) this.iconOn(e, '!', 2.5);
+           if (v.stay >= 14) {
+-            this.say(e, '나가 주시죠.', 2);
++            this.iconOn(e, '#', 2);
+             v.exitAt = this.gateFar(v, e.x);
+             this.walkTo(v, v.exitAt, '쫓겨남', 'exit');
+             v.plan = 'exit';
+@@ -1232,9 +1236,9 @@ export class WorldSim {
+       this.setClip(g, 'idle');
+     }
+     pv.stay += dt;
+-    if (pv.stay >= 6 && pv.stay - dt < 6) this.say(g, '여긴 관계자 외 출입 금지입니다.', 2.5);
++    if (pv.stay >= 6 && pv.stay - dt < 6) this.iconOn(g, '!', 2.5);   // 경고
+     if (pv.stay < 14) return;
+-    if (pv.out === 0) { this.say(g, '나가 주시죠.', 2.5); this.iconOn(g, '#', 2); }
++    if (pv.out === 0) this.iconOn(g, '#', 2.5);   // 「나가 주시죠」
+     pv.out += dt;
+     // 버팀 판정: 출구까지 남은 길이 줄었으면(나가는 중) 시간이 멈춘다
+     const cost = this.exitCost(p.scene, p.x, fac);
+@@ -1242,7 +1246,7 @@ export class WorldSim {
+     if (cost >= pv.last - 4 && g.doing !== '주인공과 대화') pv.left -= dt;
+     pv.last = cost;
+     if (pv.left > 0) return;
+-    this.say(g, '경보 울려!', 2);
++    this.iconOn(g, '!', 2);   // 경보
+     g.escort = undefined;
+     this.raiseAlarm(p.scene, p.x, 'player', 'trespass');
+   }
+@@ -2298,7 +2302,7 @@ export class WorldSim {
+       a.buddy = undefined;
+       const [top, bot] = this.graph.lane(a.scene);
+       this.iconOn(a, '!', 2);
+-      this.say(a, '여기 현장 통제합니다.', 2.5);
++      this.iconOn(a, '!', 2.5);
+       return this.walkTo(a, { x: body.x + (a.x < body.x ? -110 : 110), y: Math.max(top + 10, Math.min(bot - 10, body.y + 40)) }, '현장으로 가는 중', 'cordon');
+     }
+     if (role === 'police' || role === 'guard') return;
+diff --git a/src/game/world/speech.ts b/src/game/world/speech.ts
+index e16a47c25..f4a811ad2 100644
+--- a/src/game/world/speech.ts
++++ b/src/game/world/speech.ts
+@@ -1,22 +1,27 @@
+-// 필드 말풍선 연출 (5단계): 시뮬 사건(소매치기·시비·도망·맞음·경찰·주인공 알아봄)과 평소 혼잣말을 대사로.
++// 필드 말풍선 연출 (5단계): 시뮬 사건(소매치기·시비·도망·맞음·경찰·주인공 알아봄)과 평소 모습을 머리 위 작은 말풍선으로.
++// 10-31 사용자: 인물끼리·혼잣말 같은 상호작용은 전부 작은 말풍선(기호)으로. 고정 대사 글은 띄우지 않는다 (글은 주인공과 직접 나누는 대화만).
+ // 말하는 건 보이는 장면 사람만. 같은 사람은 잠깐 쉬고, 화면에 말풍선이 너무 많지 않게.
+ import type { Actor, SimEvent, WorldSim } from './actors';
+-import type { LineCtx, Lines } from './lines';
+ 
++/** 상황 → 말풍선 기호. 없는 상황은 띄우지 않는다 */
++export const EMOTE: Record<string, string> = {
++  victim: '!', thief: '…', witness: '!', harass: '#', harassed: '?', flee: '!', hit: '#', warn: '!',
++  work: '…', eat: '♪', rest: 'z', restroom: '…', chat: '…', hobby: '♪', drunk: '~', crowd: '!', idle: '…',
++};
+ const TASK_TAG: Record<string, string> = { work: 'work', eat: 'eat', rest: 'rest', pee: 'restroom', poo: 'restroom', chat: 'chat', hobby: 'hobby' };
+ 
+ export class Chatter {
+   private last = new Map<string, number>();
+   private ambientT = 3;
+-  constructor(private sim: WorldSim, private lines: Lines, private ctx: (a: Actor) => LineCtx) {}
++  constructor(private sim: WorldSim) {}
+ 
+   private can(a: Actor, gap = 14): boolean {
+     return this.sim.time - (this.last.get(a.def.id) ?? -999) > gap;
+   }
+-  private talk(a: Actor, tag: string, partner?: string): boolean {
+-    const t = this.lines.bark(a.def.kind, a.def.name, tag, this.ctx(a), { archetype: a.def.archetype, partner });
+-    if (!t) return false;
+-    this.sim.say(a, t, Math.min(4.5, 1.8 + t.length * 0.12));
++  private talk(a: Actor, tag: string): boolean {
++    const e = EMOTE[tag];
++    if (!e) return false;
++    this.sim.emote(a, e, 2);
+     this.last.set(a.def.id, this.sim.time);
+     return true;
+   }
+@@ -24,11 +29,11 @@ export class Chatter {
+     return this.sim.inScene(scene).filter((a) => a.def.name === name).sort((a, b) => Math.abs(a.x - (near ?? a.x)) - Math.abs(b.x - (near ?? b.x)))[0];
+   }
+ 
+-  /** 시뮬 사건(바깥이 비워서 건넨다)을 대사로 (보이는 장면만), 그리고 가끔 평소 혼잣말 */
++  /** 시뮬 사건(바깥이 비워서 건넨다)을 말풍선으로 (보이는 장면만), 그리고 가끔 평소 모습 */
+   step(dt: number, scene: string, px: number, evs: SimEvent[]): void {
+-    const speaking = () => this.sim.inScene(scene).filter((a) => a.say).length;
++    const speaking = () => this.sim.inScene(scene).filter((a) => a.icon || a.say).length;
+     for (const e of evs) {
+-      if (e.scene !== scene || speaking() >= 3) continue;
++      if (e.scene !== scene || speaking() >= 4) continue;
+       if (e.kind === 'steal') {
+         const v = this.find(scene, e.victim, e.x), t = this.find(scene, e.thief, e.x);
+         if (v) this.talk(v, 'victim');
+@@ -44,32 +49,25 @@ export class Chatter {
+         if (a && this.can(a, 6) && this.sim.rng() < 0.5) this.talk(a, 'flee');
+       } else if (e.kind === 'hurt') {
+         const a = this.find(scene, e.who, e.x);
+-        if (a) this.talk(a, 'hit') || this.talk(a, 'hurt');
++        if (a) this.talk(a, 'hit');
+       } else if (e.kind === 'police') {
+         const cop = this.sim.inScene(scene).find((a) => (a.def.name === '경찰' || a.def.name === '경비') && this.can(a, 6));
+         if (cop) this.talk(cop, 'warn');
+-      } else if (e.kind === 'notice') {
+-        const a = this.find(scene, e.who, px);
+-        if (a && this.can(a, 20)) this.talk(a, 'idle');
+       }
+     }
+-    // 평소 혼잣말: 몇 초마다 주인공 근처에서 한 명
++    // 평소 모습: 몇 초마다 주인공 근처에서 한 명 (하는 일에 맞는 기호)
+     this.ambientT -= dt;
+     if (this.ambientT > 0) return;
+-    this.ambientT = 3 + this.sim.rng() * 4;
++    this.ambientT = 4 + this.sim.rng() * 5;
+     if (speaking() >= 2) return;
+-    const near = this.sim.inScene(scene).filter((a) => Math.abs(a.x - px) < 700 && !a.say && this.can(a)).sort(() => this.sim.rng() - 0.5);
++    const near = this.sim.inScene(scene).filter((a) => Math.abs(a.x - px) < 700 && !a.icon && !a.say && this.can(a, 20)).sort(() => this.sim.rng() - 0.5);
+     for (const a of near) {
+-      let tag = 'idle';
+-      let partner: string | undefined;
+-      if (a.act === 'do' && a.task) {
+-        tag = TASK_TAG[a.task.id] ?? 'idle';
+-        if (a.task.id === 'chat') partner = a.doing.split('와 ')[0];
+-      } else if (a.post) tag = 'work';
++      let tag = '';
++      if (a.act === 'do' && a.task) tag = TASK_TAG[a.task.id] ?? '';
++      else if (a.post) tag = 'work';
+       else if (a.drunk) tag = 'drunk';
+       else if (a.act === 'watch' && this.sim.uproarLevel(scene) > 0) tag = 'crowd';
+-      else if (a.def.kind === 'mob' && a.act === 'walk' && this.sim.rng() < 0.5) tag = 'pass';
+-      if (this.talk(a, tag, partner) || (tag !== 'idle' && this.talk(a, 'idle'))) return;
++      if (tag && this.talk(a, tag)) return;
+     }
+   }
+ }
+diff --git a/tests/fieldworld.test.mjs b/tests/fieldworld.test.mjs
+index 9a2e0a1e1..d7db75cdc 100644
+--- a/tests/fieldworld.test.mjs
++++ b/tests/fieldworld.test.mjs
+@@ -333,14 +333,15 @@ test('대사: 같은 조직은 직급 비교 칸, 다른 조직은 소속 칸, 
+   assert.equal(L.timeKey(22), 'night');
+ });
+ 
+-test('대사 연출: 소매치기 사건이 나면 피해자가 말한다, 보이는 장면만', () => {
++test('말풍선 연출: 소매치기 사건이 나면 피해자 머리 위 작은 말풍선(기호), 보이는 장면만, 글은 안 띄움', () => {
+   const sim = new A.WorldSim(graph(), R.mulberry32(3));
+   const v = sim.add({ id: 'v', name: '행인', kind: 'mob', brain: 'transit', home: 'jongno', archetype: '행인' }, { x: 900, y: 560 });
+-  const ch = new SP.Chatter(sim, new L.Lines(dlg, sim.rng), () => ({ hour: 12, faction: 'A00', level: 1 }));
++  const ch = new SP.Chatter(sim);
+   ch.step(1 / 30, 'office', 0, [{ kind: 'steal', scene: 'jongno', thief: '불량배', victim: '행인', x: 900 }]);
+-  assert.equal(v.say, undefined, '안 보이는 장면은 말 안 함');
++  assert.equal(v.icon, undefined, '안 보이는 장면은 안 띄움');
+   ch.step(1 / 30, 'jongno', 800, [{ kind: 'steal', scene: 'jongno', thief: '불량배', victim: '행인', x: 900 }]);
+-  assert.equal(v.say, '내 지갑!');
++  assert.equal(v.icon, '!');
++  assert.equal(v.say, undefined, '글 말풍선 없음');
+ });
+ 
+ test('시간 보내기 선택지: 짧게·길게·다음 시간대·근무 끝까지', () => {

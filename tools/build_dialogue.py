@@ -40,7 +40,8 @@ def main():
         }
     for f in sorted((D / 'npc').glob('*.json')):
         d = json.loads(f.read_text())
-        npc[d['type']] = {'faction': d.get('faction'), 'persona': persona(d.get('persona')), 'time': d.get('time', {}), 'situation': d.get('situation', {}), 'eco': {}}
+        # voice = 말투 한 줄 (몹에게 말을 걸 때 모델에 넣는다, 10-31)
+        npc[d['type']] = {'faction': d.get('faction'), 'voice': d.get('voice', ''), 'persona': persona(d.get('persona')), 'time': d.get('time', {}), 'situation': d.get('situation', {}), 'eco': {}}
     for f in sorted((D / 'eco/characters').glob('*.json')):
         d = json.loads(f.read_text())
         if d['name'] in chars:

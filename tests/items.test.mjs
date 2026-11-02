@@ -55,7 +55,7 @@ test('고유 권총 탄 제한: 8발 쏘면 자동 재장전, 예비가 다 떨�
   assert.equal(I.startReload(r), true);
 });
 
-test('탄이 없는 요원은 탄 드랍 대신 현금', () => {
+test('탄이 없는 요원에게는 탄이 안 떨어진다', () => {
   const f = I.createField(9),
     r = I.createItemRun('gorgodio');
   for (let i = 0; i < 50; i++) I.rollDrops(f, r, 'midboss', 500, 600);
@@ -72,13 +72,13 @@ test('드랍은 시드가 같으면 같다', () => {
   assert.equal(run(), run());
 });
 
-test('바닥 현금은 가까이 가면 자동으로 줍고, 무기는 E', () => {
+test('바닥 회복 조각은 가까이 가면 자동으로 줍고, 무기는 E', () => {
   const f = I.createField(3),
     r = I.createItemRun('jyaldi');
-  I.spawnPickup(f, 'cash', me.x + 10, me.y, undefined, 7);
+  I.spawnPickup(f, 'heal', me.x + 10, me.y);
   I.spawnPickup(f, 'weapon', me.x, me.y, 'pipe');
   for (let i = 0; i < 60; i++) tick(f, r);
-  assert.equal(r.cash, 7);
+  assert.ok(!f.ents.some(e => e.type === 'pickup' && e.kind === 'heal'));
   assert.equal(r.held, null);
   const ev = tick(f, r, { interact: true });
   assert.ok(ev.some(e => e.t === 'equip' && e.weapon === 'pipe'));
@@ -168,37 +168,6 @@ test('소금 원 안에는 괴이가 못 들어온다(판정 함수)', () => {
   tick(f, r, { use: 0 });
   assert.ok(I.inSalt(f, me.x + 40, me.y));
   assert.ok(!I.inSalt(f, me.x + 400, me.y));
-});
-
-test('가방 6칸이 차면 회수물을 더 못 줍는다', () => {
-  const r = I.createItemRun('jyaldi');
-  for (let i = 0; i < 6; i++) assert.ok(I.addRelic(r, 'scrap'));
-  assert.equal(I.addRelic(r, 'scrap'), false);
-});
-
-test('중림: 마덕희 진열은 시드로 같고, 사고 팔고, 현금 모자라면 거절', () => {
-  const r = I.createItemRun('jyaldi');
-  r.cash = 0;
-  const a = I.openShop('madeokhee', r, 2, 77),
-    b = I.openShop('madeokhee', r, 2, 77);
-  assert.deepEqual(a.offers.map(o => o.key), b.offers.map(o => o.key));
-  assert.ok(a.offers.some(o => o.kind === 'ammo'), '탄 쓰는 요원에겐 탄을 판다');
-  assert.equal(I.buy(a, r, 'i:medkit').why, 'cash');
-  I.addRelic(r, 'rustkey');
-  const got = I.sell(a, r, 0);
-  assert.ok(got > 0 && r.cash === got);
-  const res = I.buy(a, r, 'i:medkit');
-  assert.ok(res.ok);
-  assert.ok(r.loadout.some(s => s && s.id === 'medkit'));
-});
-
-test('신유리 사채: 현금을 받고 빚이 남으며, 한 번만', () => {
-  const r = I.createItemRun('jyaldi');
-  const s = I.openShop('shinyuri', r, 1, 5);
-  assert.ok(I.buy(s, r, 'l:0').ok);
-  assert.equal(r.cash, 60);
-  assert.equal(r.debt, 90);
-  assert.equal(I.buy(s, r, 'l:1').ok, false);
 });
 
 test('엔진 연결: 날아가는 물건이 Hit 상자로 나오고, hitProp으로 끝난다', () => {

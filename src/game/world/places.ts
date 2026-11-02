@@ -21,7 +21,28 @@ export interface PlaceScene {
   lane?: [number, number];
   legacy?: boolean;
   doors: PlaceDoor[];
+  /** 지도 의자 (box = 장면 상자 번호, face = 앉은 사람이 보는 쪽). 이름 인물이 일·식사·휴식을 앉아서 할 자리 */
+  seats?: { x: number; y: number; face?: 'E' | 'W' | 'N'; box: number }[];
+  /** 화장실 쓰는 자리: stall = 대변기 칸(x·y = 문 앞, seat = 좌석), urinal = 소변기, sink = 세면대 (x·y = 서는 발 자리) */
+  toilets?: { id: string; kind: 'stall' | 'urinal' | 'sink'; x: number; y: number; door?: string; seat?: { x: number; y: number; k?: number } }[];
+  /** 남녀 구분 화장실 */
+  sex?: '남' | '여';
 }
+/**
+ * 방 이름 → 장소 종류 (10-31 사용자: 층 배치가 바뀌어도 고칠 곳이 없게, 방 종류를 따로 적지 않고 이름 낱말로).
+ * 위에서부터 먼저 맞는 것. 바깥(floor 'out')은 가게 이름이 아니면 거리. 맞는 게 없으면 'room'
+ */
+const NAME_KINDS: [RegExp, PlaceKind][] = [
+  [/화장실/, 'restroom'], [/휴게/, 'lounge'], [/격리실|유치장|감금/, 'cell'], [/의무|의원|진료|수술|연구/, 'clinic'], [/훈련/, 'training'],
+  [/교육|면담|회의/, 'room'], [/팀$|사무|행정/, 'office'], [/로비/, 'lobby'], [/주차|차고/, 'garage'],
+  [/집$|식당|카페|편의점|가게|상점|매입|알선|컨설팅/, 'shop'], [/층|구역|복도|입구|골목|통로|승강장/, 'corridor'],
+];
+export function kindFromName(s: { name: string; floor?: string }): PlaceKind {
+  const hit = NAME_KINDS.find(([re]) => re.test(s.name))?.[1];
+  if (s.floor === 'out') return hit === 'shop' ? 'shop' : 'street';
+  return hit ?? 'room';
+}
+
 export interface ElevatorStop {
   scene: string;
   door: string;
@@ -72,8 +93,13 @@ export class PlaceGraph {
   lane(id: string): [number, number] {
     return this.scenes.get(id)?.lane ?? DEFAULT_LANE;
   }
+  /** 모든 장면 id */
+  ids(): string[] {
+    return [...this.scenes.keys()];
+  }
   kind(id: string): PlaceKind {
-    return this.kinds[id] ?? 'room';
+    const sc = this.scenes.get(id);
+    return this.kinds[id] ?? (sc ? kindFromName(sc) : 'room');
   }
   neighbors(id: string): Hop[] {
     return this.edges.get(id) ?? [];

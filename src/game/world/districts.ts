@@ -1,29 +1,34 @@
-// 장소 종류별 인구 (docs/필드_세계_NPC_설계.md 6-4장). 장면에 꼬리표(area)만 붙이면 보충 규칙이 깔린다.
-// 수치는 시연판에서 조정. 지역(district)이 바뀌는 이동은 시계 「지역 이동」(16-2장)으로 센다.
+// 거리 인구와 지역 이동 판정. 지역(district)이 바뀌는 이동은 시계 「지역 이동」(16-2장)으로 센다.
 import type { SpawnRule } from './actors';
 
-export type AreaKind = 'downtown' | 'alley' | 'market' | 'nightlife' | 'residential' | 'park' | 'subway';
-
-export const POPULATION: Record<AreaKind, Omit<SpawnRule, 'scene' | 'gates'>> = {
-  // 도심: 낮 회사원·행인 많음, 밤 한산·취객
-  downtown: { target: { day: 8, night: 3 }, refill: [2, 5], mix: ['행인', '회사원', '회사원', '학생', '관광객', '배달원', '불량배'], nightMix: ['행인', '회사원', '취객', '취객', '불량배'] },
-  // 뒷골목: 지나가는 사람 적음, 밤엔 불량배
-  alley: { target: { day: 4, night: 2 }, refill: [3, 7], mix: ['행인', '회사원', '배달원', '불량배'], nightMix: ['행인', '취객', '불량배', '불량배'] },
-  // 서민 상권·시장: 낮 빽빽, 밤 폐장
-  market: { target: { day: 10, night: 1 }, refill: [1.5, 4], mix: ['상인', '상인', '주민', '주민', '행인', '배달원', '관광객'], nightMix: ['주민', '취객'] },
-  // 번화·유흥가: 낮 적음, 밤 취객·불량배
-  nightlife: { target: { day: 3, night: 9 }, refill: [2, 5], mix: ['행인', '회사원', '배달원'], nightMix: ['취객', '취객', '회사원', '불량배', '불량배', '행인'] },
-  // 주택가·학교 앞: 주민·학생, 밤 드문드문
-  residential: { target: { day: 4, night: 2 }, refill: [3, 8], mix: ['주민', '주민', '학생', '학생', '배달원', '행인'], nightMix: ['주민', '배달원'] },
-  // 공원·강변: 산책·운동
-  park: { target: { day: 5, night: 2 }, refill: [3, 7], mix: ['산책객', '산책객', '주민', '학생', '관광객'], nightMix: ['산책객', '취객'] },
-  // 지하철: 승객
-  subway: { target: { day: 9, night: 3 }, refill: [1.5, 4], mix: ['승객', '승객', '회사원', '학생', '행인'], nightMix: ['승객', '취객', '회사원'] },
+// 10-31 사용자: 장소 종류(도심·주택가·시장·유흥가 등)로 나눈 적도, 나눌 계획도 없다 → 모든 거리에 같은 규칙 하나.
+// 시민은 그냥 시민(행인). 기믹 있는 종류(학생·불량배)가 섞인다. 옛 「장소 꼬리표 인구」(10-26 Claude 안, 6-4장)는 걷어냈다
+/** 거리 유동인구 (모든 거리 장면 같음, 10-31 사용자: 시간대로 통제). 출퇴근·점심에 붐비고 새벽엔 한산하다(비지는 않음).
+ *  학생은 등하교 시간에, 불량배는 밤에 많다. n = 1,000px당 인원 (소란·시체·사건 현장이면 줄어든다). 수치는 시연판에서 조정 */
+const P = (k: number) => Array<string>(k).fill('행인');
+// n = 거리 1,000px(화면 한 장쯤)당 인원. 장면 길이에 비례해 늘어난다 (관리국 앞 거리 1,920px: 퇴근 약 26명, 새벽 약 6명)
+export const STREET_BANDS: { from: number; to: number; n: number; mix: string[] }[] = [
+  { from: 0, to: 2, n: 5, mix: [...P(4), '불량배'] },               // 자정 넘어: 술자리 귀가·야근 퇴근
+  { from: 2, to: 5, n: 3, mix: [...P(3), '불량배'] },               // 새벽: 한산하지만 비지는 않음
+  { from: 5, to: 7, n: 4, mix: P(1) },                              // 이른 아침: 첫차·새벽 출근
+  { from: 7, to: 9, n: 12.5, mix: [...P(6), '학생', '학생', '학생'] }, // 출근·등교
+  { from: 9, to: 11, n: 7, mix: P(1) },                             // 오전
+  { from: 11, to: 14, n: 11.5, mix: P(1) },                         // 점심
+  { from: 14, to: 16, n: 7, mix: [...P(6), '학생'] },                // 오후
+  { from: 16, to: 18, n: 9.5, mix: [...P(5), '학생', '학생', '학생'] }, // 하교
+  { from: 18, to: 20, n: 13.5, mix: [...P(8), '학생'] },             // 퇴근 (가장 붐빔)
+  { from: 20, to: 22, n: 9.5, mix: [...P(5), '불량배'] },             // 저녁
+  { from: 22, to: 24, n: 6, mix: [...P(3), '불량배', '불량배'] },      // 밤
+];
+/** 옛 낮·밤 두 칸 (bands 를 모르는 곳·시험용): 낮 = 점심 구간, 밤 = 밤 구간 */
+export const STREET_POP: Omit<SpawnRule, 'scene' | 'gates'> = {
+  target: { day: 11, night: 6 }, refill: [2, 5],
+  mix: STREET_BANDS[4].mix, nightMix: STREET_BANDS[9].mix, bands: STREET_BANDS,
 };
 
-/** 장면 꼬리표 → 보충 규칙 */
-export function areaSpawns(areas: Record<string, AreaKind>, gates: Record<string, number[]> = {}): SpawnRule[] {
-  return Object.entries(areas).map(([scene, area]) => ({ scene, ...POPULATION[area], ...(gates[scene] ? { gates: gates[scene] } : {}) }));
+/** 거리 장면들 → 보충 규칙 */
+export function streetSpawns(scenes: string[], gates: Record<string, number[]> = {}): SpawnRule[] {
+  return scenes.map((scene) => ({ scene, ...STREET_POP, ...(gates[scene] ? { gates: gates[scene] } : {}) }));
 }
 
 /** 두 장면 사이 이동이 지역 이동인가 (둘 다 지역을 알고 서로 다를 때) */

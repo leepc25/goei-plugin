@@ -1,0 +1,12 @@
+[
+ {
+  "name": "바주카 꺼내기",
+  "frames": 8,
+  "action": "bend down toward the front (east) side and pick up a bazooka lying on the floor in front of the front foot, lift it up in front of the body with both hands and set it on the shoulder, the tube pointing east, then drop the rear knee to the floor and aim; everything happens on the east side of her body",
+  "prompt": "Drop into a deep crouch while sweeping both hands forward to grasp the weapon from the floor. Lift the tube onto the shoulder with a swift, fluid motion, then lower the rear knee to the ground to stabilize the aim.",
+  "usage": {
+   "type": "generations",
+   "generations": 0.05
+  }
+ }
+]

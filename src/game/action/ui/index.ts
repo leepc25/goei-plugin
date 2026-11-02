@@ -13,8 +13,8 @@ import { charSize } from '../charSize';
 
 export { Fx, Hud, InputHub, Menu, PadReader, TouchPad, choiceScreen };
 export type { FxEvent, TransitionKind } from './fx';
-export type { HudState, HudItem, MapState } from './hud';
-export { drawHud, drawMap, label, plate, font, FONT, setHudItemIcon, drawHudItemIcon, statusHtml } from './hud';
+export type { HudState, HudItem } from './hud';
+export { drawHud, label, plate, font, FONT, setHudItemIcon, drawHudItemIcon, statusHtml } from './hud';
 export type { UiSettings } from './settings';
 export { W, H, mountStage } from './stage';
 export { drawTitleBg, drawGoSign } from './title';
@@ -42,6 +42,10 @@ export interface ShellOptions {
   toLocal?: (clientX: number, clientY: number, el: HTMLElement) => { x: number; y: number };
   /** 일시정지 메뉴 위쪽 한 줄 요약 */
   pauseInfo?: () => string;
+  /** 필드 가방 (일시정지 메뉴 「가방」, 필드에 있을 때만) */
+  bag?: { available(): boolean; open(): void };
+  /** 통합창(` 키): 열려 있는 동안 키는 창이 먹고 게임은 멈춘다 */
+  charWindow?: { isOpen(): boolean; canOpen(): boolean; toggle(on?: boolean): void; key(code: string): void };
   /** 필드(봇 보조): 일시정지는 계속·설정·조작법·나가기만, 설정에서 전체 화면·NPC 대화 칸을 뺀다 (2026-10-23 사용자) */
   field?: { onExit: () => void; fullscreen?: { enter(kind: 'browser' | 'panel'): Promise<void>; exit(): Promise<void>; mode(): 'browser' | 'panel' | null } };
 }
@@ -125,6 +129,15 @@ export function mountGameShell(box: HTMLElement, o: ShellOptions = {}): Shell {
   };
   // 메뉴가 열려 있으면 모든 키를 메뉴가 먹는다. 패드 B(KeyE)는 뒤로
   input.capture = (code, down, src) => {
+    const cw = o.charWindow;
+    if (!menu.isOpen && cw && shell.mode === 'play') {
+      if (cw.isOpen()) {
+        // 열려 있으면 모든 키를 창이 먹는다: ` · Esc = 닫기, 나머지 = 탭·고르기
+        if (down) { if (code === 'Backquote' || code === 'Escape') cw.toggle(false); else cw.key(code); }
+        return true;
+      }
+      if (code === 'Backquote' && cw.canOpen()) { if (down) { input.releaseSource('kb'); input.releaseSource('pad'); cw.toggle(true); } return true; }
+    }
     if (!menu.isOpen) {
       // 터치 대사창 모드의 「취소」: 본부 창·대화창이 받게 그대로 보낸다 (일시정지를 열지 않는다)
       if (code === 'Escape' && src === 'touch' && touch.touchMode === 'dialog') return false;
@@ -139,7 +152,7 @@ export function mountGameShell(box: HTMLElement, o: ShellOptions = {}): Shell {
     return true;
   };
   input.attachKeyboard(o.keyTarget ?? window, {
-    prevent: (code) => code.startsWith('Arrow') || code === 'Space' || code === 'Tab' || code === 'Escape' || /^Key|^Digit|^Shift/.test(code),
+    prevent: (code) => code.startsWith('Arrow') || code === 'Space' || code === 'Tab' || code === 'Escape' || code === 'Backquote' || /^Key|^Digit|^Shift/.test(code),
   });
   stage.onResize(() => touch.layout());
 
@@ -195,6 +208,9 @@ export function mountGameShell(box: HTMLElement, o: ShellOptions = {}): Shell {
         { type: 'choice' as const, label: 'NPC 대화 모델', options: [['main', '주 모델'], ['aux', '보조 모델']] as [string, string][], get: () => s.talkModel, set: (v: string) => (s.talkModel = v as UiSettings['talkModel']) },
         { type: 'toggle' as const, label: '본편 최근 채팅 같이 보내기', get: () => s.talkRecent, set: (v: boolean) => (s.talkRecent = v) },
       ]),
+      { type: 'head', label: '사망' },
+      { type: 'choice', label: '내가 죽으면', options: [['perma', '영구 사망'], ['evac', '패퇴(후송)']], get: () => s.deathMode, set: (v) => (s.deathMode = v as UiSettings['deathMode']) },
+      { type: 'toggle', label: '필드에서 NPC 살해 허용', get: () => s.npcKill, set: (v) => (s.npcKill = v) },
       { type: 'head', label: '필드 시간' },
       ...([['tScene', '장면 넘어가기', 60], ['tRegion', '지역 이동', 180], ['tTalk', '대화 한 번', 60], ['tFight', '싸움 (장면당 한 번)', 60], ['tWaitShort', '시간 보내기 · 짧게', 240], ['tWaitLong', '시간 보내기 · 길게', 480]] as const).map(([k, label, max]) => ({
         type: 'slider' as const, label, get: () => s[k], set: (v: number) => (s[k] = Math.round(v)), min: 0, max, step: 5, fmt: (v: number) => (v ? `${Math.round(v)}분` : '안 감'),
@@ -227,7 +243,7 @@ export function mountGameShell(box: HTMLElement, o: ShellOptions = {}): Shell {
       touch.setVisible(m === 'play' || menu.isOpen);
     },
     get paused() {
-      return menu.isOpen || mode !== 'play';
+      return menu.isOpen || mode !== 'play' || !!o.charWindow?.isOpen();
     },
     get touchShown() {
       return touch.shown;
@@ -248,7 +264,7 @@ export function mountGameShell(box: HTMLElement, o: ShellOptions = {}): Shell {
       menu.open({
         id: 'title',
         look: 'title',
-        title: o.title ?? '차원 승강기',
+        title: o.title ?? '괴이 ː ANOMALY',
         sub: o.sub ?? 'ANOMALY SIMULATION · 관리국 액션',
         noBack: true,
         // 필드: 저장 이어하기가 없다 (본편 상황판이 곧 저장). 입장 판정은 onNew가 한다
@@ -277,6 +293,7 @@ export function mountGameShell(box: HTMLElement, o: ShellOptions = {}): Shell {
         sub: o.pauseInfo?.() ?? '',
         items: o.field ? [
           { type: 'button', label: '계속', sub: key('Esc'), act: () => menu.closeAll() },
+          ...(o.bag?.available() ? [{ type: 'button' as const, label: '가방', act: () => (menu.closeAll(), o.bag!.open()) }] : []),
           { type: 'button', label: '설정', act: () => shell.openSettings() },
           { type: 'button', label: '조작법', act: () => shell.openControls() },
           ...(o.onTitle ? [{ type: 'button' as const, label: '타이틀로', act: () => (menu.closeAll(), o.onTitle!()) }] : []),
@@ -284,6 +301,7 @@ export function mountGameShell(box: HTMLElement, o: ShellOptions = {}): Shell {
         ] : [
           ...(hud.last ? [{ type: 'html' as const, html: statusHtml(hud.last) }] : []),
           { type: 'button', label: '계속', sub: key('Esc'), act: () => menu.closeAll() },
+          ...(o.bag?.available() ? [{ type: 'button' as const, label: '가방', act: () => (menu.closeAll(), o.bag!.open()) }] : []),
           { type: 'button', label: '설정', act: () => shell.openSettings() },
           { type: 'button', label: '조작법', act: () => shell.openControls() },
           { type: 'button', label: '자동 전환', sub: key('X'), act: () => (menu.closeAll(), tap('KeyX')) },

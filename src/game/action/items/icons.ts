@@ -66,6 +66,14 @@ const ICONS: Record<string, Draw> = {
     rect(g, C.white, 16, 22, 12, 5);
   },
   antidote: bottle(C.cure, C.cure),
+  painkiller: g => {
+    // 알약 두 개
+    circ(g, C.white, 11, 16, 6);
+    circ(g, C.white, 21, 16, 6);
+    rect(g, C.cure, 18, 10, 6, 12);
+    rect(g, C.dark, 10, 15, 2, 2);
+  },
+  sedative: bottle(C.cure, C.special),
   salt: g => {
     poly(g, C.white, [8, 28, 10, 8, 22, 8, 24, 28]);
     rect(g, C.special, 9, 5, 14, 4);

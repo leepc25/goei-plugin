@@ -1,0 +1,542 @@
+[
+[
+"1.10_게슈간",
+"d5d4dcc1-79d1-4d2b-9e84-9ae6f2e51db0",
+"Geshugan",
+0,
+{
+"width": 128,
+"height": 256
+}
+],
+[
+"1.11_로제몬",
+"5280b30e-3958-47bf-bd4a-3b13027a3157",
+"Rojemon",
+0,
+{
+"width": 128,
+"height": 256
+}
+],
+[
+"1.12_콘쥬스",
+"343052d4-c38d-4b79-9011-7cfa9e65a273",
+"Konjyuce",
+0,
+{
+"width": 128,
+"height": 256
+}
+],
+[
+"1.1_쟈알디",
+"5a76e1de-d1c9-4051-97c8-1deb5b58ab71",
+"Jyaldi",
+46,
+{
+"width": 128,
+"height": 256
+}
+],
+[
+"1.2_스팡달",
+"539b1802-b695-4c7a-8bb0-b541626f98c7",
+"Spangdal",
+31,
+{
+"width": 128,
+"height": 256
+}
+],
+[
+"1.3_잼트리",
+"09fd03e1-a1bf-4967-9852-2fd19989dfdd",
+"Jaemtri",
+0,
+{
+"width": 128,
+"height": 256
+}
+],
+[
+"1.5_고그니쟈",
+"e5dd3ac8-1c51-4de0-948b-dc38cfb8086e",
+"Gognija",
+0,
+{
+"width": 128,
+"height": 256
+}
+],
+[
+"1.6_큐라스",
+"40277560-f463-4c73-b9e4-951a816b4720",
+"Kyuras",
+0,
+{
+"width": 128,
+"height": 256
+}
+],
+[
+"1.7_고르고디오",
+"be841618-8b51-4e21-9c59-710f4627ad6c",
+"Gorgodio",
+0,
+{
+"width": 128,
+"height": 256
+}
+],
+[
+"1.8_데쥬레",
+"64c11248-74f1-4365-bdcb-e6c6c0c55b89",
+"Dejure",
+0,
+{
+"width": 128,
+"height": 256
+}
+],
+[
+"1.9_데드폴",
+"53f475f3-45ca-40af-b3ac-5ec5c814f103",
+"Deadpole",
+0,
+{
+"width": 128,
+"height": 256
+}
+],
+[
+"2.10_곽성주",
+"06f14deb-a519-40f1-ba50-db07e936914e",
+"Kwak Seong-ju",
+0,
+{
+"width": 128,
+"height": 256
+}
+],
+[
+"2.11_조성춘",
+"a3d458ac-e6c7-4271-ae51-2dfc3fd24140",
+"Cho Seong-choon",
+0,
+{
+"width": 128,
+"height": 256
+}
+],
+[
+"2.12_윤병수",
+"06d683ce-f6b2-4260-a879-2ec2fa36020c",
+"Yun Byeong-su",
+0,
+{
+"width": 128,
+"height": 256
+}
+],
+[
+"2.13_김성진",
+"76541d72-9533-4557-a1f8-53511907a7a6",
+"Kim Seong-jin",
+0,
+{
+"width": 128,
+"height": 256
+}
+],
+[
+"2.14_송진섭",
+"5fe95c4b-ec67-47a9-b6b9-7d20eeda1425",
+"Song Jin-seob",
+0,
+{
+"width": 128,
+"height": 256
+}
+],
+[
+"2.1_사장",
+"0c8e3448-27c0-4e86-bce7-b31c0985c1ff",
+"Sa-jang",
+0,
+{
+"width": 128,
+"height": 256
+}
+],
+[
+"2.2_도필헌",
+"d1a80ca5-d3c3-4413-b377-f0c958152fc4",
+"Do Pil-heon",
+0,
+{
+"width": 128,
+"height": 256
+}
+],
+[
+"2.3_이길환",
+"6c8ae875-4eec-4765-87a9-446882be55c1",
+"Lee Gil-hwan / 이길환. Rotate",
+0,
+{
+"width": 128,
+"height": 256
+}
+],
+[
+"2.4_이기석",
+"924578e7-9027-490a-b8d9-4cd4e6f09609",
+"Lee Gi-seok",
+0,
+{
+"width": 128,
+"height": 256
+}
+],
+[
+"2.5_김조학",
+"9ddb7e26-9242-4965-9867-6381d29a38b8",
+"Kim Jo-hak",
+0,
+{
+"width": 128,
+"height": 256
+}
+],
+[
+"2.6_이도형",
+"025083d7-b781-458a-9065-21a13cc3ab65",
+"Lee Do-hyeong",
+0,
+{
+"width": 128,
+"height": 256
+}
+],
+[
+"2.7_고영훈",
+"e6935c84-3074-4a03-903d-62ea6f7c556b",
+"Go Young-hoon",
+0,
+{
+"width": 128,
+"height": 256
+}
+],
+[
+"2.8_노기균",
+"0a6a8799-86f3-4b46-a23b-fa32a687a585",
+"No Gi-gyun",
+0,
+{
+"width": 128,
+"height": 256
+}
+],
+[
+"2.9_송주익",
+"2d73d47d-91b5-4e7f-977c-5d02b74a202b",
+"Song Ju-ik",
+0,
+{
+"width": 128,
+"height": 256
+}
+],
+[
+"3.10_고영은",
+"b1bf05d5-4a5d-4aa6-85f1-ec2ae577327c",
+"Go Young-eun",
+0,
+{
+"width": 128,
+"height": 256
+}
+],
+[
+"3.11_강이학",
+"338997c2-df3d-4a34-867d-2e418579ae6c",
+"Kang I-hak.",
+0,
+{
+"width": 128,
+"height": 256
+}
+],
+[
+"3.12_장허운",
+"a015f7d7-5a7e-451a-bc94-15ebc66f2ce8",
+"Jang Heo-un",
+0,
+{
+"width": 128,
+"height": 256
+}
+],
+[
+"3.13_곽제강",
+"93a85f97-d50f-4591-a24b-e1fa20ab810d",
+"Kwak Je-gang",
+0,
+{
+"width": 128,
+"height": 256
+}
+],
+[
+"3.14_이연화",
+"ff04c2be-6740-40a0-8229-2a5e7d693adb",
+"Lee Yeon-hwa",
+0,
+{
+"width": 128,
+"height": 256
+}
+],
+[
+"3.15_이병진",
+"7992130b-3fdc-47f3-87cc-1af9ccc21c3c",
+"Lee Byeong-jin",
+0,
+{
+"width": 128,
+"height": 256
+}
+],
+[
+"3.16_제이",
+"959560eb-79b2-431d-b8a2-f96f3e2deb6a",
+"Jay",
+0,
+{
+"width": 128,
+"height": 256
+}
+],
+[
+"3.1_청달래",
+"8c6fb13a-57df-44d3-8c0c-435dc9401e5c",
+"Cheong Dal-lae",
+0,
+{
+"width": 128,
+"height": 256
+}
+],
+[
+"3.2_호유원",
+"8c8d290c-c9f8-46ec-9ebb-2d95e373e8cb",
+"Ho Yu-won",
+0,
+{
+"width": 128,
+"height": 256
+}
+],
+[
+"3.3_백석주",
+"2d1f15de-0734-4415-aa4b-262dabed716b",
+"Baek Seok-ju",
+0,
+{
+"width": 128,
+"height": 256
+}
+],
+[
+"3.4_진나솔",
+"898fea3b-eca1-4e1e-98f6-a4457ceb9cda",
+"Jin Na-sol",
+0,
+{
+"width": 128,
+"height": 256
+}
+],
+[
+"3.5_이성해",
+"e431215f-cb6d-4169-94c2-bc77a97c4022",
+"Lee Seong-hae",
+0,
+{
+"width": 128,
+"height": 256
+}
+],
+[
+"3.6_이자헌",
+"26a6fc33-b96c-4ba6-ac7d-958b7caec1a2",
+"Lee Ja-heon",
+0,
+{
+"width": 128,
+"height": 256
+}
+],
+[
+"3.7_은하제",
+"9d3a7730-79ab-4f19-8f2e-baada2136e14",
+"Eun Ha-je",
+0,
+{
+"width": 128,
+"height": 256
+}
+],
+[
+"3.8_박민성",
+"4aacd5f4-73bf-4826-9b95-9f0b9a5a3c82",
+"Park Min-seong",
+0,
+{
+"width": 128,
+"height": 256
+}
+],
+[
+"3.9_백사헌",
+"01df548c-79e6-44a0-8876-c2433ca5b057",
+"Baek Sa-heon",
+0,
+{
+"width": 128,
+"height": 256
+}
+],
+[
+"4.10_아벤샤",
+"ceeb43e2-71fa-4d6e-82c9-b39158f2f4ef",
+"Avensha",
+0,
+{
+"width": 128,
+"height": 256
+}
+],
+[
+"4.1_차여진",
+"58ec7fb8-c89d-4d49-85e8-8fcd35a092e8",
+"Cha Yeo-jin",
+0,
+{
+"width": 128,
+"height": 256
+}
+],
+[
+"4.2_서윤지",
+"56407eff-8edf-4f26-84c8-333c61aa4d5d",
+"Seo Yun-ji",
+0,
+{
+"width": 128,
+"height": 256
+}
+],
+[
+"4.3_고연지",
+"49b79e78-c93e-40b0-bcbd-4577c8314fa5",
+"Go Yeon-ji",
+0,
+{
+"width": 128,
+"height": 256
+}
+],
+[
+"4.4_윤지아",
+"4d19deb6-9984-420f-bc23-c3faeb8bf3c5",
+"Yun Ji-a",
+0,
+{
+"width": 128,
+"height": 256
+}
+],
+[
+"4.5_마덕희",
+"372ec88f-7238-4bdf-8992-15f94a3906e8",
+"Ma Deok-hee",
+0,
+{
+"width": 128,
+"height": 256
+}
+],
+[
+"4.6_문혜란",
+"b5fdf182-22ee-4efa-955a-2181a12f0e34",
+"Mun Hye-ran",
+0,
+{
+"width": 128,
+"height": 256
+}
+],
+[
+"4.7_신유리",
+"a3841d73-ce6f-4299-8a2a-f0a68060de88",
+"Shin Yuri",
+0,
+{
+"width": 128,
+"height": 256
+}
+],
+[
+"4.8_블라렛",
+"12f77ee8-4b5a-4b52-b2b8-5c3116e0460e",
+"Blaret",
+0,
+{
+"width": 128,
+"height": 256
+}
+],
+[
+"4.9_살라딘",
+"ac193b01-7ad7-445a-9c13-8bf755457291",
+"Saladin",
+0,
+{
+"width": 128,
+"height": 256
+}
+],
+[
+"5.1_세크리엠",
+"fa9550d4-7fe3-429f-8d4d-f103071912ef",
+"Secriem",
+0,
+{
+"width": 128,
+"height": 256
+}
+],
+[
+"5.2_브라우니",
+"561088d5-180d-4030-91c5-1ddf3fda94b8",
+"Brownie",
+0,
+{
+"width": 128,
+"height": 256
+}
+],
+[
+"5.3_탐미주의",
+"06c1f601-254d-42c9-b9e6-6a5fb05cec14",
+"Aestheticism",
+0,
+{
+"width": 128,
+"height": 256
+}
+]
+]

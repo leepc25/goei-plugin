@@ -1,5 +1,20 @@
-// 본부 출동 계약의 확정된 수치만 전투에 연결한다. 출동 중 강화(dmgMul)와 별도다.
-import type { AgentStats, MissionLaunch } from '../hq/contract';
+// 요원 능력치를 전투에 연결한다. 출동 중 강화(dmgMul)와 별도다.
+// 옛 본부 출동(MissionLaunch)은 지웠다(2026-10-28). launch가 없으면 기본 수치다.
+/** 기본 능력치. 걸리는 값은 피해·속도·경직 배율 */
+export interface AgentStats {
+  hp: number;
+  /** 근접 피해 배율 */
+  power: number;
+  /** 원거리 피해 배율 */
+  aim: number;
+  /** 받는 피해 감소 (0~0.5) */
+  defense: number;
+  speed: number;
+  /** 경직 저항 0~3 */
+  poise: number;
+  /** 필살 게이지 충전 배율 */
+  charge: number;
+}
 import type { Hit, RunConfigCore } from './contract';
 import type { MoveDef } from './moves';
 
@@ -11,8 +26,8 @@ export interface RunProgression {
   readonly fromHq: boolean;
 }
 
-type ProgressionRun = RunConfigCore & { launch?: Pick<MissionLaunch, 'stats' | 'relics' | 'moves' | 'agent'> };
-const NEUTRAL: AgentStats = { hp: 220, power: 1, aim: 1, defense: 0, speed: 1, poise: 0, charge: 1 };
+type ProgressionRun = RunConfigCore & { launch?: { stats?: AgentStats; relics?: string[]; moves?: string[]; agent?: string } };
+const NEUTRAL: AgentStats = { hp: 1000, power: 1, aim: 1, defense: 0, speed: 1, poise: 0, charge: 1 };
 const positive = (value: unknown, fallback: number) => typeof value === 'number' && Number.isFinite(value) && value > 0 ? value : fallback;
 
 /** 직접 연습/시연은 기존 수치, 본부 출동은 이미 커피·유물·피로를 반영한 stats를 사용한다. */
@@ -38,7 +53,8 @@ export function progressionFor(run?: ProgressionRun): RunProgression {
 /** World 생성 때만 호출. 첫 피격 보호는 기존 ward 저장값을 쓰므로 방 이동·복원으로 재충전되지 않는다. */
 export function initializeProgression(player: { progression: RunProgression; hp: number; hpMax: number; ward: number }, run: ProgressionRun) {
   player.progression = progressionFor(run);
-  player.hp = player.hpMax = player.progression.stats.hp;
+  // 인물 능력치(힘민체지정)에서 나온 체력이 있으면 그것 (combat/stats.ts, 10-30)
+  player.hp = player.hpMax = (player as { baseHp?: number }).baseHp ?? player.progression.stats.hp;
   if (player.progression.relics.includes('first_guard')) player.ward++;
 }
 
