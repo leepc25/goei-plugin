@@ -14,7 +14,7 @@ for k in keys:
     W,H=190,300; T=Image.new('RGBA',(W,H),(92,86,78,255)); base=H-15
     ox,oy=round(W/2-im.size[0]/2-p['dx']), round(base-p['dy']-min(im.size[1]-4,im.getbbox()[3])); ch=Image.open(fc.chair_png(p['img'])).convert('RGBA'); cx,cy=round(W/2-100),base-171   # 의자 고정, 사람을 옮김(게임과 같음)
     T.alpha_composite(im,(ox,oy)); T.alpha_composite(ch,(cx,cy))
-    sx,_=bs.spine(k); top=max(0,oy+30); T=T.crop((20,top,170,H-5)); Z=3
+    sx,_=bs.spine(k); top=int(os.environ['FIXTOP']) if os.environ.get('FIXTOP') else max(0,oy+30); T=T.crop((20,top,170,H-5)); Z=3
     S=T.convert('RGB').resize((T.width*Z,T.height*Z),Image.NEAREST); d=ImageDraw.Draw(S)
     rx=(cx+100.5-20)*Z; gx=(W/2+sx-20)*Z
     d.line([(gx,0),(gx,S.height)],fill=(0,255,0),width=1); d.line([(rx,0),(rx,S.height)],fill=(255,0,0),width=1)
