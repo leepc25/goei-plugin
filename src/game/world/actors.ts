@@ -236,6 +236,8 @@ export interface SpawnRule {
   refill: [number, number];
   /** 들어오고 나가는 곳 x. 생략하면 양 끝 */
   gates?: number[];
+  /** 인구 밀도 배수 (기본 1). 긴 지하 통로·골목처럼 큰길보다 한산한 곳 (11-02) */
+  dens?: number;
   /** 원형 이름 목록 (뽑기) */
   mix: string[];
   /** 밤(19:30~05시) 원형 목록. 없으면 mix */
@@ -3352,7 +3354,7 @@ export class WorldSim {
     const h = this.hour ?? 12;
     const b = r.bands.find((q) => (q.from <= q.to ? h >= q.from && h < q.to : h >= q.from || h < q.to)) ?? r.bands[0];
     // n 은 1,000px당 인원 → 장면 길이만큼
-    return { n: Math.round((b.n * (this.graph.scene(r.scene)?.length ?? 1000)) / 1000), mix: b.mix };
+    return { n: Math.round((b.n * (r.dens ?? 1) * (this.graph.scene(r.scene)?.length ?? 1000)) / 1000), mix: b.mix };
   }
   private mixOf(r: SpawnRule): string[] {
     return this.bandOf(r)?.mix ?? (this.isNight() && r.nightMix?.length ? r.nightMix : r.mix);

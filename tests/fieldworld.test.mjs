@@ -393,7 +393,15 @@ test('거리 인구: 모든 거리에 같은 규칙 하나(시민 = 행인 + 기
   for (const gone of ['회사원', '관광객', '배달원', '취객', '주민', '산책객', '승객', '방문객']) assert.ok(!M.ARCHETYPES[gone], `옛 시민 원형 ${gone}`);
   for (const n of Object.keys(M.ARCHETYPES)) assert.ok(L.NPC_TYPE[n], `대사 연결 ${n}`);
   assert.equal(H.hqDistrict('office'), 'jongno');
-  assert.deepEqual(H.HQ_STREETS, ['street'], '거리는 관리국 정문 앞뿐 (10-31: 가설 장면 뺌)');
+  // 11-02: 건물 표(BUILDINGS)로 거리·통로가 늘었다 (관리국·가짜 관리국·백일몽·협회 앞 거리, 중림 지상·지하 통로)
+  assert.ok(H.HQ_STREETS.includes('street') && H.HQ_STREETS.includes('sdra_street') && H.HQ_STREETS.includes('jr_b1'), '모든 건물 앞 거리·통로');
+  assert.equal(H.hqSceneFaction('fb_office'), 'B00', '가짜 관리국 건물');
+  assert.equal(H.hqSceneFaction('by_office'), 'C00', '백일몽 건물');
+  assert.equal(H.hqSceneFaction('sdra_counter'), null, '협회는 중립 사이트');
+  assert.equal(H.hqSceneFaction('jr_daebak'), null, '중림 가게');
+  assert.equal(H.hqSceneFaction('fb_street'), null, '거리는 소속 없음');
+  assert.equal(H.hqDistrict('sdra_lobby'), 'yeongdeungpo');
+  assert.equal(H.hqDistrict('by_lobby'), 'gangnam');
   assert.ok(D.isRegionMove('jongno', 'gangnam'));
   assert.ok(!D.isRegionMove('jongno', 'jongno'));
   assert.ok(!D.isRegionMove('jongno', null));

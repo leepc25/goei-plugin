@@ -27,8 +27,8 @@ export const STREET_POP: Omit<SpawnRule, 'scene' | 'gates'> = {
 };
 
 /** 거리 장면들 → 보충 규칙 */
-export function streetSpawns(scenes: string[], gates: Record<string, number[]> = {}): SpawnRule[] {
-  return scenes.map((scene) => ({ scene, ...STREET_POP, ...(gates[scene] ? { gates: gates[scene] } : {}) }));
+export function streetSpawns(scenes: string[], gates: Record<string, number[]> = {}, dens: Record<string, number> = {}): SpawnRule[] {
+  return scenes.map((scene) => ({ scene, ...STREET_POP, ...(gates[scene] ? { gates: gates[scene] } : {}), ...(dens[scene] ? { dens: dens[scene] } : {}) }));
 }
 
 /** 두 장면 사이 이동이 지역 이동인가 (둘 다 지역을 알고 서로 다를 때) */
