@@ -84,20 +84,20 @@
   {
    "poly": [
     [
-     990,
-     640
+     0,
+     700
     ],
     [
-     1264,
-     640
+     165,
+     700
     ],
     [
-     1264,
-     760
+     165,
+     810
     ],
     [
-     990,
-     760
+     0,
+     810
     ]
    ],
    "h": 999
@@ -105,20 +105,48 @@
   {
    "poly": [
     [
-     0,
-     700
+     960,
+     592
     ],
     [
-     165,
-     700
+     1264,
+     592
     ],
     [
-     165,
-     810
+     1264,
+     768
     ],
     [
-     0,
-     810
+     1112,
+     766
+    ],
+    [
+     1075,
+     758
+    ],
+    [
+     1040,
+     742
+    ],
+    [
+     1010,
+     720
+    ],
+    [
+     990,
+     695
+    ],
+    [
+     982,
+     668
+    ],
+    [
+     976,
+     650
+    ],
+    [
+     960,
+     650
     ]
    ],
    "h": 999
@@ -188,15 +216,103 @@
    "coverMask": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAYwAAADVCAIAAADLrVCWAAADJElEQVR4nO3bsWrEMBAAUSv//89OEQgHgWsS4tHqvdbNuhlWIK3rDPd9Pz3CM9ZaT48Av/Lx9AAA7xwRqWPXKBjgiEgB+5ofqcPXqMN/nwHmRwrY2vBI2SNgd8MjBexOpIC0yZFy1oMBJkcKGGBspKxRMMOfPewShTIv+NjX2E0KmEGkgDSRAtJECkgTKSBNpIA0kTqCCyLsS6SANJEC0paDAFBmkwLSRApIEykgTaSANJEC0kQKSBMpIE2kgDSRAtJECkgTKSBNpIA0kQLSRApIEykgTaSANJEC0kQKSBMpIE2kgDSRAtJECkgTKSBNpIA0kQLSRApIEykgTaSANJEC0kQKSBMpIE2kgDSRAtJECkgTKSBNpIA0kQLSRApIEykgTaSANJEC0kQKSBMpIG29+Xbf97/NAfDTWssmBUSttS7HPaDpq1CXSAFB34W6RAqoeS3UJVJAnEgBaSIFpIkUkCZSQJpIAWkiBaSJFJAmUkCaSAFpIgWkiRSQJlJAmkgBaSIFpIkUkCZSQJpIAWkiBaSJFJAmUkCaSAFpIgWkiRSQJlJAmkgBaSIFpIkUkCZSQJpIAWkiBaSJFJAmUkCaSAFpIgWkiRSQJlJAmkgBaSIFpIkUkCZSQJpIAWkiBaSJFJAmUkCaSAFpIgWkiRSQJlJAmkgBaSIFpIkUkCZSQJpIAWkiBaSJFJAmUkCaSAFpIgWkiRSQJlJAmkgBaSIFpIkUkCZSQJpIAWkiBaSJFJAmUkCaSAFpIgWkiRSQJlJAmkgBaSIFpIkUkCZSQJpIAWkiBaSJFJAmUkCaSAFpIgWkiRSQJlJAmkgBaSIFpIkUkCZSQJpIAWkiBaSJFJAmUkCaSAFpIgWkiRSQJlJAmkgBaSIFpIkUkCZSQJpIAWkiBaSJFJAmUkCaSAFpIgWkiRSQJlJAmkgBaSIFpIkUkCZSQJpIAWkiBaSJFJAmUkCaSAFpIgWkiRSQJlJAmkgBaSIFpIkUkCZSQJpIAWkiBaSJFJAmUkCaSAFpIgWkiRSQJlJAmkgBaSIFpIkUkCZSQJpIAWkiBaSJFJAmUkCaSAFpn0zCIpvnv8lcAAAAAElFTkSuQmCC"
   },
   {
-   "id": "table",
+   "id": "table0",
    "name": "포커 테이블",
    "file": "",
    "x": 962,
    "y": 490,
-   "w": 302,
+   "w": 20,
+   "h": 263,
+   "sortY": 600,
+   "coverMask": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAEHCAAAAACL1zlQAAAAeklEQVR4nO3RMRKAIBBD0cj97xwbgQUyDpUgk18+ERcEDotJGEYkBEIgBVKspHidYk+KD2WLWCxgtYrBCkbL2Njb2SmQYmVvSMKQhCEJm/wdG+C130gHorjl1SP9G8cLXT7SJD6TU2H7oDsjFY5bOeecc84555xz33cDNAQYflKfeD8AAAAASUVORK5CYII="
+  },
+  {
+   "id": "table1",
+   "name": "포커 테이블",
+   "file": "",
+   "x": 982,
+   "y": 490,
+   "w": 20,
+   "h": 263,
+   "sortY": 668,
+   "coverMask": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAEHCAAAAACL1zlQAAAAUElEQVR4nO3VMQoAMAhD0ej979wOdrGEjsXhuwgvgjgpfaqQtG5MY0pjSmNKtwgEQRAEHxju9US15bAH0UZOcGHxwNtBEARBEARBEATBCbgBquwK9vkNEukAAAAASUVORK5CYII="
+  },
+  {
+   "id": "table2",
+   "name": "포커 테이블",
+   "file": "",
+   "x": 1002,
+   "y": 490,
+   "w": 20,
+   "h": 263,
+   "sortY": 710,
+   "coverMask": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAEHCAAAAACL1zlQAAAAQUlEQVR4nO3OMQoAIRADwKz4/y97nYhYChY3W4UhgU3uXy15TByHZjvNIYQQQngXq5Kk7616+BKEEEIIIYQQ/hY/+IsECD6wDfYAAAAASUVORK5CYII="
+  },
+  {
+   "id": "table3",
+   "name": "포커 테이블",
+   "file": "",
+   "x": 1022,
+   "y": 490,
+   "w": 20,
+   "h": 263,
+   "sortY": 729,
+   "coverMask": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAEHCAAAAACL1zlQAAAAPklEQVR4nO3VIQ7AMAwEwUv//2cXlEWnoKhoBq5t7OS+NSU+bVMURVEUxf/iKvFr0+I22a/buz8PAAAASPICbN0Fuzb1EM0AAAAASUVORK5CYII="
+  },
+  {
+   "id": "table4",
+   "name": "포커 테이블",
+   "file": "",
+   "x": 1042,
+   "y": 490,
+   "w": 20,
+   "h": 263,
+   "sortY": 743,
+   "coverMask": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAEHCAAAAACL1zlQAAAAQElEQVR4nO3WMQ7AIAwEwTP//zPpImS5pEk0U1lri5rkvtpDXNOlKIqiKIr/i5Uk/TdQ77SneGxanB4DAAD4sAeLwwXDPOhmuwAAAABJRU5ErkJggg=="
+  },
+  {
+   "id": "table5",
+   "name": "포커 테이블",
+   "file": "",
+   "x": 1062,
+   "y": 490,
+   "w": 20,
+   "h": 263,
+   "sortY": 752,
+   "coverMask": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAEHCAAAAACL1zlQAAAARElEQVR4nO3WMQrAMAhAUe3972yWdog4BAKd3lsCX90TcSXft7ZYw+YznYuiKIqiKJ7EjPbd+GJEm+S2UlPsJwAAAH9a9Z8GywvhtY8AAAAASUVORK5CYII="
+  },
+  {
+   "id": "table6",
+   "name": "포커 테이블",
+   "file": "",
+   "x": 1082,
+   "y": 490,
+   "w": 20,
    "h": 263,
    "sortY": 760,
-   "coverMask": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAS4AAAEHCAIAAACfgTzqAAAEE0lEQVR4nO3d3a6aQBhAUTV9/1e2F23SU3J+FAbYwFoPQLiYnQ9lRu834E3P53P4Ne/DrwizrbHEj0KKV3HlVX4IUlzKEmeIboqWOJcyJkXZwEKP5ZfQISy3NEUdwhCLUtQhjDI/RR3CQDNT1CGMNSdFHcJwA75BBZZ7O0UjEdbwXoo6hJW8kaIOYT2vpqhDWNVLKeoQ1vZzijqEDfyQog5hG9+lqEPYzJcp6hC29HmKOoSNfZKiDmF79qBCwjRFIxF28V+KOoS9/EtRh7CjvynqEPb1uOkQAh46hAIvMyBBipAgRUiQIiRIERKkCAlShAQpQsLjfu/+Bzhch6kICVKEBClCghQhQYqQIEVIkCIkSBESpAgJUoQEKUKCFCFBipAgRUiQIiRIERIet9vN6WHYnakICVKEBClCghQhQYqQIEVIkCIkSBESpAgJUoQEKUKCFCFBipAgRUiQIiT8TdGRRdiXqQgJUoQEKUKCFCFBipAgRUiQIiRIERI+ebP/fD63vw+4uB822cgStvHGfjdZwnpmbj2VJYw1YBe4LGG5wQcyZAnzrHg2Spbwuo2OKcoSvrfpiWFBwlfstoEEKUKCFCFBipAgRUiQIiQcIMX7/e5nWjm9X3vfwKsmNXpFyckcJsWJj2XKkhM4aoofGZicwBlSnFAmR3TCFCc8ynII50/xIwOTrGulOKFMOi6d4oQy2ZEUv+RDJluS4ksMTNYmxTmUyXBSHECZLCfF8XzIZOKV8wxSXJeBeQLbHAyS4qaUubEDHa+T4p48yn7jQBUNIcWKkw3Mq4W0nBSj/izlbJBKG+4AP6gBVyBFSJAiJEgREqQICVKEBClCghQhQYqQIEVIkCIkSBESpAgJUoQEKUKCFCFBipAgRUiQIiRIERKkCAlShAQpQoIUIUGKkCBFSJAiJEgREqQICVKEBClCghQhQYqQIEVIkCIkSBESpAgJUoQEKUKCFCFBipAgRUiQIiRIERKkCAlShAQpQoIUIUGKkCBFSJAiJEgREqQICVKEBClCghQhQYqQIEVIkCIkSBESpAgJUoQEKUKCFCFBipAgRUiQIiRIERKkCAlShAQpQoIUIUGKkCBFSJAiJEgREqQICVKEBClCghQhQYqQIEVIkCIkSBESpAgJUoQEKUKCFCFBipAgRUiQIiRIERKkCAlShAQpQoIUIUGKkCBFSJAiJEgREqQICVKEBClCghQhQYqQIEVIkCIkSBESpAgJUoQEKUKCFCFBipAgRUiQIiRIERKkCAlShAQpQoIUIUGKkCBFSJAiJEgREqQICVKEBClCghQhQYqQIEVIkCIkSBESpAgJUoQEKUKCFCFBipAgRUiQIiRIERKkCAlShAQpQoIUIUGKkCBFSJAiJEgREn4D7OSp0+YWG38AAAAASUVORK5CYII="
+   "coverMask": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAEHCAAAAACL1zlQAAAASElEQVR4nO3WMQ6AQAgEwMX//xkbYzRHZ+EVQ0Myuw0dyaepHvCYmhBCCCGEW2El6yNT1+4JX8ET72TBpHe8HUIIIYQQQvgjnjsFB/1OLngpAAAAAElFTkSuQmCC"
+  },
+  {
+   "id": "table7",
+   "name": "포커 테이블",
+   "file": "",
+   "x": 1102,
+   "y": 490,
+   "w": 10,
+   "h": 263,
+   "sortY": 764,
+   "coverMask": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAEHCAAAAACysIgLAAAAI0lEQVR4nO3GoQEAAAgDoOn/P2uz+gAkkkfNtaOqqqqqqmcBhRwDB2tdd5QAAAAASUVORK5CYII="
+  },
+  {
+   "id": "table8",
+   "name": "포커 테이블",
+   "file": "",
+   "x": 1112,
+   "y": 490,
+   "w": 152,
+   "h": 263,
+   "sortY": 766,
+   "coverMask": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAJgAAAEHCAAAAAB37tDfAAABTUlEQVR4nO3cOw7CMBRFQYLY/5ahNRK/sRKc4pzWxZvK5d0uC7t/eNuOPjDbM+yIC5NtJ7I8dV0NeFcwLZgWTAumBdOCacG0YFowLZgWTAumBdOCacG0YFowLZgWTAumBdOCacG0YFowLZgWTAumBdOCacG0YFowLZgWTAumBdOCacG0YFowLZgWTAumBdOCacG0YFowLZgWTAum3VYDxsb9gUWw79sMR8Om1yF2g+2yTzE0Adub8LpfYf/RDJ32uwimBdOCacG0YFowLZgWTAumBdOCacG0YFowLZgWTAumBdOCacG0YFowLZgWTAumBdOCacG0YFowLZgWTAumBdOCacG0YFowLZgWTAumBdOCacG0YFowLZgWTAumBdOCacG0YFowLZgWTAumBdOCacG0YFowLZgWTAumBdOCacG0YFowLZgWTAumnRb2ALMfBhkj3xLwAAAAAElFTkSuQmCC"
   },
   {
    "id": "plant",

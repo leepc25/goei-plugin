@@ -38,32 +38,32 @@
   {
    "poly": [
     [
-     100,
-     600
+     90,
+     738
     ],
     [
-     395,
-     570
+     390,
+     575
     ],
     [
-     490,
-     565
+     494,
+     560
     ],
     [
-     490,
-     648
+     494,
+     606
     ],
     [
-     125,
-     785
+     360,
+     782
     ],
     [
-     0,
-     790
+     108,
+     782
     ],
     [
-     0,
-     600
+     108,
+     752
     ]
    ],
    "h": 999
@@ -138,20 +138,20 @@
   {
    "poly": [
     [
-     903,
-     595
+     1075,
+     600
     ],
     [
-     1082,
-     595
+     1264,
+     600
     ],
     [
-     1082,
-     700
+     1264,
+     818
     ],
     [
-     903,
-     700
+     1075,
+     818
     ]
    ],
    "h": 999
@@ -159,23 +159,128 @@
   {
    "poly": [
     [
-     1075,
-     600
-    ],
-    [
-     1264,
-     600
-    ],
-    [
-     1264,
-     818
+     925,
+     628
     ],
     [
      1075,
-     818
+     628
+    ],
+    [
+     1075,
+     662
+    ],
+    [
+     925,
+     662
     ]
    ],
-   "h": 999
+   "h": 165
+  },
+  {
+   "poly": [
+    [
+     1032,
+     662
+    ],
+    [
+     1075,
+     662
+    ],
+    [
+     1075,
+     765
+    ],
+    [
+     1032,
+     765
+    ]
+   ],
+   "h": 165
+  },
+  {
+   "poly": [
+    [
+     1000,
+     724
+    ],
+    [
+     1032,
+     724
+    ],
+    [
+     1032,
+     765
+    ],
+    [
+     1000,
+     765
+    ]
+   ],
+   "h": 165
+  },
+  {
+   "poly": [
+    [
+     1048,
+     765
+    ],
+    [
+     1075,
+     765
+    ],
+    [
+     1075,
+     800
+    ],
+    [
+     1048,
+     800
+    ]
+   ],
+   "h": 165
+  },
+  {
+   "poly": [
+    [
+     914,
+     668
+    ],
+    [
+     965,
+     668
+    ],
+    [
+     965,
+     728
+    ],
+    [
+     914,
+     728
+    ]
+   ],
+   "h": 36
+  },
+  {
+   "poly": [
+    [
+     965,
+     662
+    ],
+    [
+     1032,
+     662
+    ],
+    [
+     1032,
+     724
+    ],
+    [
+     965,
+     724
+    ]
+   ],
+   "h": 70
   }
  ],
  "doors": {
@@ -206,8 +311,8 @@
  "spots": [
   {
    "id": "bed",
-   "x": 975,
-   "y": 715,
+   "x": 960,
+   "y": 742,
    "verb": "눕기",
    "face": -1,
    "act": [
@@ -299,7 +404,7 @@
    "y": 436,
    "w": 181,
    "h": 264,
-   "sortY": 700,
+   "sortY": 627,
    "coverMask": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAALUAAAEICAIAAACWEiLhAAADjUlEQVR4nO3d4XKaQBhA0W4m7//K9IeZTuPEi0YFdM95gTLt7cfCCow/m1iWZZs/6OWMMfY+hPKx9wFwaPrY2bIsRx6u+qD8cPI7cs6cbLZqMT8o3zI0OV7RU2eJ+UH5Ss/keHVPmiLmB8X8eEMPnCXmB0UfFH1Q9PGGHrinow/KpysXgvlB+dz7AHg89z/YiD4o+qDo4w25/8FGPsYYB38Egx2ZHxR9vK2HrEL0QdEHRR8Uz79M5BcXquYHRR8UfVD0MZFf3BHRB+VbH/ZiOGN+UPQxnZtWIfqg6IOiD8rFqxV7MTNYvVw1Pyj6oOiDsnL6sQqZQaxCzA+KPij6oOiD2pHRB0UfFH1Qrvq1mLsg8zi7F2J+UPRB0Qflhl+rW4XM498qxPyg6IOiD4o+KPqgDFclXDLGMD8o+qDog+L7UVPz/Bx30QdFHxR9UPRB0cfUVt9Fpg/K1+WvXRhO/H6dG/j+CxfZv2WFPrhoWRZ9ULz/lGJ+ULy/kGJ+UPRB0QdFHxR9UPTBRfZfWKEPij64yP4cK/RB0QdFHxR9UPRB0QdFHxR9UPRB0QdFHxR9UPRB0QdFHxR9UPRB0QdFHxR9UPRB0QdFHxR9UFbeL3XiLVPTMj8o+qDog6IPij4o+qDog6IPij4o+qDog6IPij4o+qDog6IPij4o+qDog6IPij4o+qDog6IPij4o+qB87n0AHMsY3x65NT8o+qDog6IPij4o+qDog6IPij4o+qDog6IPij4o+qDog6IPij4o+qDog6IPij4o+qDog6IPij4o+qDog6IPysrz2b58Oznzg6IPij4o+qDog6IPij4o+qDog6IPij4o+qDog6IPij4o+qDog6IPij4o+qDog+L7Ynw5+7LYiT7ex4//wHdyfqFcVZynpI7pGQPjjPlBuTlAs+Q4zA92pg+KPig39zHG2OC0x0GYH5Rf9mGKTML8oOiDog+KPij6oNz8+w/7L1MxPyg3zA+TY0LmB0UfFH1Q9EHRB0UfFH1Q9EHRB0UfFH1Q9EHRB0UfFH1Q9EHRB0UfFH1Q9EHRB0UfFH1Q9EHRB0UfFH1Q7nqHmCdy9+X9yexMHxR9UHb4ftT/Z00rmIMzPyg7f39ur5cwm1tXmnR+eD/4le6aH/6K396k84MrTd2H+bdq6j5Y5T/QRp5xxWT/hZ3pg6KPjbzoHZfXO+K3cf+KxPqDnemDog/KX/A2iQVFPOQYAAAAAElFTkSuQmCC"
   },
   {

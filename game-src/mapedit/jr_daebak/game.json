@@ -77,38 +77,66 @@
    ],
    [
     [
-     990,
-     640
+     0,
+     700
     ],
     [
-     1264,
-     640
+     165,
+     700
     ],
     [
-     1264,
-     760
+     165,
+     810
     ],
     [
-     990,
-     760
+     0,
+     810
     ]
    ],
    [
     [
-     0,
-     700
+     960,
+     592
     ],
     [
-     165,
-     700
+     1264,
+     592
     ],
     [
-     165,
-     810
+     1264,
+     768
     ],
     [
-     0,
-     810
+     1112,
+     766
+    ],
+    [
+     1075,
+     758
+    ],
+    [
+     1040,
+     742
+    ],
+    [
+     1010,
+     720
+    ],
+    [
+     990,
+     695
+    ],
+    [
+     982,
+     668
+    ],
+    [
+     976,
+     650
+    ],
+    [
+     960,
+     650
     ]
    ]
   ],
@@ -150,13 +178,85 @@
     "sortY": 644
    },
    {
-    "id": "table",
-    "file": "me_jr_daebak_table",
+    "id": "table0",
+    "file": "me_jr_daebak_table0",
     "x": 962,
-    "y": 490,
-    "w": 302,
-    "h": 263,
+    "y": 499,
+    "w": 20,
+    "h": 76,
+    "sortY": 600
+   },
+   {
+    "id": "table1",
+    "file": "me_jr_daebak_table1",
+    "x": 982,
+    "y": 495,
+    "w": 20,
+    "h": 258,
+    "sortY": 668
+   },
+   {
+    "id": "table2",
+    "file": "me_jr_daebak_table2",
+    "x": 1002,
+    "y": 494,
+    "w": 20,
+    "h": 259,
+    "sortY": 710
+   },
+   {
+    "id": "table3",
+    "file": "me_jr_daebak_table3",
+    "x": 1022,
+    "y": 494,
+    "w": 20,
+    "h": 98,
+    "sortY": 729
+   },
+   {
+    "id": "table4",
+    "file": "me_jr_daebak_table4",
+    "x": 1042,
+    "y": 494,
+    "w": 20,
+    "h": 102,
+    "sortY": 743
+   },
+   {
+    "id": "table5",
+    "file": "me_jr_daebak_table5",
+    "x": 1062,
+    "y": 493,
+    "w": 20,
+    "h": 107,
+    "sortY": 752
+   },
+   {
+    "id": "table6",
+    "file": "me_jr_daebak_table6",
+    "x": 1082,
+    "y": 493,
+    "w": 20,
+    "h": 260,
     "sortY": 760
+   },
+   {
+    "id": "table7",
+    "file": "me_jr_daebak_table7",
+    "x": 1102,
+    "y": 493,
+    "w": 10,
+    "h": 260,
+    "sortY": 764
+   },
+   {
+    "id": "table8",
+    "file": "me_jr_daebak_table8",
+    "x": 1112,
+    "y": 490,
+    "w": 152,
+    "h": 263,
+    "sortY": 766
    },
    {
     "id": "plant",
@@ -176,8 +276,7 @@
     "h": 197,
     "sortY": 602
    }
-  ],
-  "chairs": []
+  ]
  },
  "spots": [
   {
@@ -200,7 +299,15 @@
  "files": [
   "me_jr_daebak",
   "me_jr_daebak_counter",
-  "me_jr_daebak_table",
+  "me_jr_daebak_table0",
+  "me_jr_daebak_table1",
+  "me_jr_daebak_table2",
+  "me_jr_daebak_table3",
+  "me_jr_daebak_table4",
+  "me_jr_daebak_table5",
+  "me_jr_daebak_table6",
+  "me_jr_daebak_table7",
+  "me_jr_daebak_table8",
   "me_jr_daebak_plant",
   "me_jr_daebak_chair"
  ]
