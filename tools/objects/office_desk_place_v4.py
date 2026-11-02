@@ -17,7 +17,7 @@ def load(p, foot):
     return im.resize((round(im.width * s), round(im.height * s)), Image.NEAREST)
 a = sys.argv
 G1, G2 = (int(a[2]) if len(a) > 2 else 40), (int(a[3]) if len(a) > 3 else 620)
-SF, NF = (int(a[4]) if len(a) > 4 else 396), (int(a[5]) if len(a) > 5 else 383)
+SF, NF = (int(a[4]) if len(a) > 4 else 374), (int(a[5]) if len(a) > 5 else 361)
 L = []
 for gi, gx in enumerate((G1, G2)):
     x = gx * K
@@ -26,18 +26,21 @@ for gi, gx in enumerate((G1, G2)):
         L.append((NF, n, x + (s.width - n.width) // 2, NF * K - n.height))
         L.append((SF, s, x, SF * K - s.height))
         x += s.width
-# 쟈알디 책상 = 북쪽 책상(D02v2), 오른쪽 끝 (사용자 07:53 「쟈알디는 북쪽으로」, 핀 92%). JX=가운데 x, JF=발 y
-JX, JF = (int(a[6]) if len(a) > 6 else 1364), (int(a[7]) if len(a) > 7 else SF)
+# 쟈알디 책상 = 북쪽 책상(D02v2), 오른쪽 끝 (사용자 07:53 「쟈알디는 북쪽으로」, 핀 92%). JX=가운데 x, JF=발 y = 북쪽 줄과 같음(사용자 07:57)
+JX, JF = (int(a[6]) if len(a) > 6 else 1364), (int(a[7]) if len(a) > 7 else NF)
 j = load(NORTH, JF); L.append((JF, j, JX * K - j.width // 2, JF * K - j.height))
 # 바닥 그림자(코드, 책상 그림은 안 건드림, 사용자 07:53 「그림자가 없으니 이상」): 책상 발 둘레 바닥에 2단 반투명 띠, 2배 픽셀 단위
-SHC, SHA = (20, 26, 38), (70, 115)   # 색, (가장자리, 안쪽) 알파
-SD = int(a[8]) if len(a) > 8 else 12  # 그림자 깊이(1배 px, 발에서 뒤쪽으로)
-from PIL import ImageDraw
+# 07:57 사용자 「각지고 흰줄」 → 상자 2단 폐기. 둥근 타원 마스크를 흐려 1배 격자로 맞춘 부드러운 그림자(가장자리 계단·밝은 줄 없음)
+from PIL import ImageDraw, ImageFilter
+SHC, SHA = (20, 26, 38), 120          # 색, 가운데 최대 알파
+SD = int(a[8]) if len(a) > 8 else 14  # 그림자 깊이(1배 px)
 def shadow(im, x, y):
-    lay = Image.new('RGBA', out.size, (0, 0, 0, 0)); d = ImageDraw.Draw(lay)
-    fy, l, r = y + im.height, x, x + im.width
-    d.rectangle([l - 2 * K, fy - SD * K, r + 2 * K, fy + 2 * K], fill=SHC + (SHA[0],))
-    d.rectangle([l + 2 * K, fy - (SD - 2) * K, r - 2 * K, fy], fill=SHC + (SHA[1],))
+    W, H = out.width // K, out.height // K
+    m = Image.new('L', (W, H), 0); d = ImageDraw.Draw(m)
+    fy, l, r = (y + im.height) / K, x / K, (x + im.width) / K
+    d.ellipse([l - 4, fy - SD, r + 4, fy + 4], fill=SHA)
+    m = m.filter(ImageFilter.GaussianBlur(3)).resize(out.size, Image.NEAREST)
+    lay = Image.new('RGBA', out.size, SHC + (0,)); lay.putalpha(m)
     out.alpha_composite(lay)
 out = BG.copy()
 for _, im, x, y in sorted(L, key=lambda t: t[0]): shadow(im, x, y); out.alpha_composite(im, (x, y))
