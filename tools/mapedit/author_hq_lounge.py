@@ -38,8 +38,11 @@ for x in range(0, BINS[0][0] - MARGIN):
         pts.append((x, top[x])); prev = top[x]
 pts += [(x - MARGIN, y) for x, y in BINS[1:-1] if y > prev] + [(896, BINS[-1][1])]   # 조리대 선보다 높은 윤곽 점은 버림
 floor = P(pts + [(896, 424), (0, 424)])
-TLEG = {'table1': ((85, 183), (120, 203)), 'table2': ((386, 483), (420, 504)), 'table3': ((692, 789), (671, 755))}
-blocks = [{'poly': P([(fl, 377), (fr, 377), (br, 348), (bl, 348)]), 'h': 999} for (fl, fr), (bl, br) in TLEG.values()]
+# 테이블 = 올라설 수 있는 발판(사용자 06:14 「올라가게 잡아」). 바닥 자리 = 상판이 덮는 바닥(뒷다리 y348~앞다리 y377, 상판 좌우 끝),
+# 높이 = 앞다리 바닥 y377 - 상판 앞끝 윗면 y302 = 75(1x) → 150(2x). import.py가 h<400이면 발판(solid)으로 굽는다.
+TOP_H = (377 - 302) * K
+SLAB = {'table1': (82, 205), 'table2': (383, 506), 'table3': (669, 793)}
+blocks = [{'poly': P([(x0, 348), (x1, 348), (x1, 377), (x0, 377)]), 'h': TOP_H} for x0, x1 in SLAB.values()]
 TM = json.loads((TD / 'tables.json').read_text())
 BACKLEG = {'table1': [(120, 128, 308, 348), (197, 203, 296, 348)], 'table2': [(420, 427, 308, 348), (498, 504, 295, 348)],
            'table3': [(671, 677, 294, 348), (748, 755, 308, 348)]}
