@@ -1,0 +1,62 @@
+{
+ "scene": {
+  "file": "me_by_lab",
+  "w": 1832,
+  "h": 848,
+  "under": true,
+  "lane": [
+   644,
+   836
+  ],
+  "floor": [
+   [
+    0,
+    640
+   ],
+   [
+    1440,
+    640
+   ],
+   [
+    1832,
+    770
+   ],
+   [
+    1832,
+    848
+   ],
+   [
+    0,
+    848
+   ]
+  ],
+  "holes": [],
+  "dotK": 1.4292,
+  "blocks": [],
+  "doors": {
+   "out": {
+    "x0": 520,
+    "x1": 680,
+    "y0": 792,
+    "y1": 840,
+    "anim": "none",
+    "behind": "dark"
+   },
+   "infirmary": {
+    "x0": 1490,
+    "x1": 1660,
+    "y0": 250,
+    "y1": 710,
+    "anim": "none",
+    "behind": "dark"
+   }
+  },
+  "lamps": [],
+  "windows": [],
+  "objects": []
+ },
+ "spots": [],
+ "files": [
+  "me_by_lab"
+ ]
+}

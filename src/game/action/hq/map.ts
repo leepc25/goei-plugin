@@ -15,7 +15,7 @@ export type SceneId =
   | 'jr_entry' | 'jr_b1' | 'jr_alley' | 'jr_b2'
   | 'jr_daebak' | 'jr_heolgap' | 'jr_youngchang' | 'jr_songil' | 'jr_jinryo' | 'jr_op'
   | 'by_lobby' | 'by_f13' | 'by_wc_m' | 'by_wc_f' | 'by_lounge' | 'by_office'
-  | 'by_f15' | 'by_f17' | 'by_elite' | 'by_shower_m' | 'by_shower_f' | 'by_bath_m' | 'by_bath_f';
+  | 'by_f15' | 'by_f17' | 'by_lab' | 'by_infirmary' | 'by_elite' | 'by_shower_m' | 'by_shower_f' | 'by_bath_m' | 'by_bath_f';
 
 export type DoorKind = 'main' | 'door' | 'glass' | 'steel' | 'security' | 'elevator' | 'stairs_up' | 'stairs_down' | 'stairs' | 'shop' | 'slide' | 'cell' | 'exit';
 export interface HqDoor {
@@ -291,11 +291,17 @@ export const HQ_SCENES: HqScene[] = [
     { id: 'elev', kind: 'elevator' },
   ]),
   // 17층 개발본부(사용자 14:22 「17층에는 연구팀만」, 위키 본관 17층 연구1팀): 13층 그림의 유리 양문·엘리베이터 부분만 자른 by_f17.
-  // 연구1팀 사무실 안 그림은 새로 뽑는다(관리국 그림 못 씀) — 그림이 생길 때까지 문은 잠금
+  // 연구1팀 연구실 안 그림은 새로 뽑았다(by_lab_f17_ext1R_v2, 사용자 15:55 「양호」)
   floorHall('by_f17', '백일몽 17층', '17F', [
-    { id: 'office', kind: 'glass', locked: true, label: '연구1팀' },
+    { id: 'office', kind: 'glass', to: 'by_lab', toDoor: 'out', label: '연구1팀' },
     { id: 'elev', kind: 'elevator' },
   ]),
+  // 연구1팀 연구실(제약 연구실, tools/mapedit/author_by_lab_f17.py): 오른쪽 옆벽 문 = 의무실(사용자 15:55 「관리국거 그대로 쓰도록」)
+  floorHall('by_lab', '연구1팀 연구실', '17F', [
+    { id: 'out', kind: 'exit', side: 'S', to: 'by_f17', toDoor: 'office', label: '나가기' },
+    { id: 'infirmary', kind: 'exit', to: 'by_infirmary', toDoor: 'out', label: '의무실' },
+  ]),
+  floorHall('by_infirmary', '의무실', '17F', [{ id: 'out', kind: 'exit', side: 'S', to: 'by_lab', toDoor: 'infirmary', label: '나가기' }], { painted: 'infirmary' }),
   withOwners(floorHall('by_elite', '정예팀 사무실', '15F', [{ id: 'out', kind: 'exit', side: 'S', to: 'by_f15', toDoor: 'office', label: '나가기' }], { painted: 'office_riot' })),
   floorHall('by_shower_f', '탈의실(여)', '15F', [{ id: 'out', kind: 'exit', side: 'S', to: 'by_f15', toDoor: 'wc_f', label: '나가기' }, { id: 'bath', kind: 'exit', to: 'by_bath_f', toDoor: 'out', label: '샤워실' }], { sex: '여', lockers: LOCKERS.shower_f, spots: lockerSpots('shower_f') }),
   floorHall('by_shower_m', '탈의실(남)', '15F', [{ id: 'out', kind: 'exit', side: 'S', to: 'by_f15', toDoor: 'wc_m', label: '나가기' }, { id: 'shower', kind: 'exit', to: 'by_bath_m', toDoor: 'out', label: '샤워실' }], { sex: '남', lockers: LOCKERS.shower_m, spots: lockerSpots('shower_m') }),
