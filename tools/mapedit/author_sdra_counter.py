@@ -79,10 +79,30 @@ HAND = {
  '모니터2': [(877, 198), (882, 196), (918, 196), (921, 199), (921, 230), (877, 230)],
  '칸막이R': [(921, 186), (924, 183), (935, 185), (950, 188), (952, 189), (952, 230), (921, 230)],
 }
+DK = A.max(2) <= 60   # 검은 윤곽선
+def trim(m, n=4):
+    # 14:30 사용자 「윤곽선 바깥 벽 색까지 가려 사람에 세로 줄」: 다각형 가장자리를 바깥 검은 윤곽선 픽셀까지 깎는다(좌·우·위, 최대 n px)
+    m = m.copy()
+    for y in range(IH):
+        xs = np.flatnonzero(m[y])
+        if not len(xs): continue
+        for seg_l, seg_r in [(xs[0], None)] if (np.diff(xs) == 1).all() else [(xs[0], xs[-1])]:
+            x = xs[0]; k = 0
+            while k < n and m[y, x] and not DK[y, x]: m[y, x] = False; x += 1; k += 1
+            x = xs[-1]; k = 0
+            while k < n and m[y, x] and not DK[y, x]: m[y, x] = False; x -= 1; k -= -1
+    for x in range(IW):
+        ys = np.flatnonzero(m[:, x])
+        if not len(ys): continue
+        y = ys[0]; k = 0
+        while k < n and m[y, x] and not DK[y, x]: m[y, x] = False; y += 1; k += 1
+    return m
 def hand_mask(polys):
-    mi = Image.new('L', (IW, IH), 0); dm = ImageDraw.Draw(mi)
-    for pts in polys: dm.polygon(pts, fill=255, outline=255)
-    return np.array(mi) > 0
+    out = np.zeros((IH, IW), bool)
+    for pts in polys:
+        mi = Image.new('L', (IW, IH), 0); ImageDraw.Draw(mi).polygon(pts, fill=255, outline=255)
+        out |= trim(np.array(mi) > 0)
+    return out
 cmask = hand_mask(HAND.values())
 for x in range(272, IW):
     bot = 324 if x <= 284 else 324 - (x - 284) if x <= 292 else 328 if (519 <= x <= 529 or 743 <= x <= 753) else 316

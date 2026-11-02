@@ -38,5 +38,5 @@ dd=ImageDraw.Draw(out)
 path=[(470,700),(510,640),(536,590),(538,520),(560,560),(620,575),(900,575)]
 dd.line(path,fill=(255,0,0),width=3); dd.polygon([(900,567),(900,583),(914,575)],fill=(255,0,0))
 for x,y in P: dd.ellipse((x-4,y-4,x+4,y+4),fill=(255,255,0))
-out.convert('RGB').save('/mnt/project-files/sdra/sdra_counter_map_check_v9_x2.png')
-z=out.crop((380,300,1000,720)); z.resize((z.width*2,z.height*2),Image.NEAREST).convert('RGB').save('/mnt/project-files/sdra/sdra_counter_map_check_v9_zoom_x4.png')
+out.convert('RGB').save('/mnt/project-files/sdra/sdra_counter_map_check_v10_x2.png')
+z=out.crop((380,300,1000,720)); z.resize((z.width*2,z.height*2),Image.NEAREST).convert('RGB').save('/mnt/project-files/sdra/sdra_counter_map_check_v10_zoom_x4.png')
