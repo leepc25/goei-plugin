@@ -1,0 +1,86 @@
+{
+ "object_id": "d59a7249-5a20-4052-ae04-3cabe1af8f47",
+ "job": {
+  "usage": {
+   "type": "usd",
+   "usd": 0.04567081961271498
+  },
+  "id": "c8530db7-c017-4a04-8605-9257b7a1ae66",
+  "status": "completed",
+  "created_at": "2026-11-02T12:03:41.836183+00:00",
+  "last_response": {
+   "status": "completed",
+   "progress": 1,
+   "object_id": "d59a7249-5a20-4052-ae04-3cabe1af8f47",
+   "image_size": {
+    "width": 256,
+    "height": 256
+   },
+   "frame_count": 1,
+   "single_frame": true,
+   "storage_urls": {
+    "unknown": "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/d59a7249-5a20-4052-ae04-3cabe1af8f47/rotations/unknown.png"
+   },
+   "billing_usage": {
+    "usd": 0.04567081961271498,
+    "type": "usd"
+   },
+   "generation_id": "9ac16eb9-b2a9-4805-bba2-38747d95d31a",
+   "billing_stages": [
+    {
+     "stage": "first_direction",
+     "usage": {
+      "usd": 0.04567081961271498,
+      "type": "usd"
+     },
+     "generation_id": "9ac16eb9-b2a9-4805-bba2-38747d95d31a"
+    }
+   ],
+   "billing_charged": true,
+   "generation_mode": "pro_flash",
+   "source_image_id": "82571d27-7575-5e3b-9a10-27029e84b920",
+   "directions_count": 1,
+   "first_direction_generated": true
+  }
+ },
+ "object": {
+  "id": "d59a7249-5a20-4052-ae04-3cabe1af8f47",
+  "name": "C05_대기의자_뒷모습_1배",
+  "state_name": "base",
+  "prompt": "A waiting room bench of three connected seats, like in a Korean bank: three molded seats in one row, joined on one long metal beam with metal legs. The bench is seen from its back side: the backs of the three backrests face the viewer. Seen almost straight from the front, from the eye height of a standing adult, looking only a little down. The bench is much wider than it is tall and fills almost the whole width of the canvas. Only the bench, centered, nothing else.",
+  "size": {
+   "width": 256,
+   "height": 256
+  },
+  "directions": 1,
+  "created_at": "2026-11-02T12:03:41.861826+00:00",
+  "view": "low top-down",
+  "rotation_urls": {
+   "south": null,
+   "west": null,
+   "east": null,
+   "north": null,
+   "south-east": null,
+   "south-west": null,
+   "north-east": null,
+   "north-west": null
+  },
+  "storage_urls": {
+   "unknown": "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/d59a7249-5a20-4052-ae04-3cabe1af8f47/rotations/unknown.png"
+  },
+  "frame_urls": null,
+  "style_settings": {
+   "version": "v2.0.0+api",
+   "no_background": true,
+   "generation_mode": "pro_flash",
+   "source_image_id": "82571d27-7575-5e3b-9a10-27029e84b920",
+   "first_frame_direction": "south"
+  },
+  "tags": [],
+  "status": "completed",
+  "group_id": "cd07725d-f145-475b-8fa7-cb607d128089",
+  "progress_percent": null,
+  "eta_seconds": null,
+  "animations": []
+ }
+}
