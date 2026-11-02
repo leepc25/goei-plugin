@@ -1,19 +1,19 @@
 {
  "front": {
-  "dx": -4,
-  "dy": -4,
+  "dx": 0,
+  "dy": 1,
   "s": 1.0,
   "img": "south-east"
  },
  "side": {
-  "dx": -26,
-  "dy": -3,
+  "dx": -36,
+  "dy": -5,
   "s": 1.0,
   "img": "east"
  },
  "back": {
-  "dx": 8,
-  "dy": 9,
+  "dx": 10,
+  "dy": 11,
   "s": 1.0,
   "img": "north"
  },

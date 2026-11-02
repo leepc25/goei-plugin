@@ -21,6 +21,8 @@ LID={'front':'60','side':'96','back':'61'}
 SKIP={'5.2_브라우니'}   # 11-02 사용자: 브라우니는 의자 앉기 전부 뺌
 # 좌석 가운데 차(C01 - 쉘, 1배, 96~112줄 무게중심) → 사람도 같은 만큼 옮김. 옆은 등받이가 두꺼워 사람을 앞(오른쪽)으로 10
 SEAT={'south':-8,'south-east':-3,'south-west':-12,'north':-8,'north-east':-1,'north-west':-14,'east':10}
+# 좌석 윗면 가운데 점(의자 그림 1배 좌표, 11-02 줄마다 잰 값): 정면은 좌석 윗면 띠(97~105)의 가운데, 옆은 좌판 윗면(94)과 뒤쪽 좌판 가운데
+SEATPT={'south':(92,101),'south-east':(98,100),'south-west':(86,100),'east':(83,97),'north':(91,101),'north-east':(97,101),'north-west':(88,101),'west':(104,95)}
 def keys():
     ks=[p.stem for p in (TR/'chars').glob('*.json')]
     ks=sorted(ks,key=lambda s:[int(x) for x in re.findall(r'\d+',s.split('_')[0])])
@@ -43,6 +45,14 @@ elif cmd=='set':
     k,v,dx,dy=A[1],A[2],int(A[3]),int(A[4]); J[k][v].update(dx=dx,dy=dy)
     if len(A)>5: J[k][v]['img']=A[5]
     save(); print(k,v,J[k][v])
+elif cmd=='pick':   # pick <view> 키:x:y ...  손으로 찍은 점(앉기 끝 장 1배 좌표)을 좌석 점 SEATPT 에 오게 dx,dy 계산·저장(11-02 사용자: 엉덩이·가랑이 기준)
+    v=A[1]; PF=ROOT/'game-src/art/objects/chairs_office/picks.json'; P=json.loads(PF.read_text()) if PF.exists() else {}
+    for t in A[2:]:
+        k,x,y=t.rsplit(':',2); x,y=float(x),float(y); c,_=fc.load(k); im=fc.last(c,LID[v]); bot=min(im.size[1]-4,im.getbbox()[3])
+        sx,sy=SEATPT[J[k][v]['img']]
+        J[k][v].update(dx=round(100-sx-im.size[0]/2+x), dy=round(171-sy-bot+y)); P.setdefault(k,{})[v]=[x,y]
+        print(k,v,J[k][v])
+    save(); PF.write_text(json.dumps(P,ensure_ascii=False,indent=0))
 elif cmd=='apply':
     n=0
     for k,vals in J.items():
@@ -68,7 +78,11 @@ elif cmd=='sheet' or cmd=='try':
         base=H-15
         ox,oy=round(W/2-im.size[0]/2-p['dx']), round(base-p['dy']-min(im.size[1]-4,im.getbbox()[3]))
         ch=Image.open(fc.chair_png(p['img'])).convert('RGBA'); cx,cy=round(W/2-100),base-171
-        if v!='back': T.alpha_composite(ch,(cx,cy)); T.alpha_composite(im,(ox,oy))
+        if v!='back':
+            T.alpha_composite(ch,(cx,cy)); T.alpha_composite(im,(ox,oy))
+            if os.environ.get('GHOST'):   # 확인용: 의자를 사람 위에 반투명으로 한 번 더 → 좌석 윤곽이 보임. 노란선 = 좌석 윗면 가운데, 파란선 = 좌석 가운데
+                import numpy as np; a=np.array(ch); a[:,:,3]=(a[:,:,3]*float(os.environ['GHOST'])).astype('uint8'); T.alpha_composite(Image.fromarray(a),(cx,cy))
+                sx,sy=SEATPT[p['img']]; g.line([(cx+sx,0),(cx+sx,H)],fill=(80,200,255,255)); g.line([(0,cy+sy),(W,cy+sy)],fill=(255,230,60,255)); g.line([(0,cy+sy+7),(W,cy+sy+7)],fill=(255,140,40,255))   # 주황 = 좌석 앞 모서리(무릎 자리)
         else:
             T.alpha_composite(im,(ox,oy))
             if os.environ.get('GHOST'):   # 확인용: 뒤 의자를 반투명으로 → 엉덩이·등 가운데가 보임
