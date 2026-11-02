@@ -79,42 +79,51 @@ for n, t in TM.items():
         tb.paste(src.crop(box), box[:2]); tf.paste((0, 0, 0, 0), box)
     tb.save(OUT / f'{n}_back.png'); tf.save(OUT / f'{n}_front.png')
     for part, sy in (('back', 348), ('front', 377)):
-        objects.append({'id': f'{n}_{part}', 'file': f'{n}_{part}.png', 'x': t['x'] * K, 'y': t['y'] * K,
+        objects.append({'id': f'{n}_{part}', 'file': f'{n}_{part}', 'x': t['x'] * K, 'y': t['y'] * K,
                         'w': src.width * K, 'h': src.height * K, 'sortY': sy * K, **({'solid': strips(n)} if part == 'front' else {})})
 door = lambda x0, x1, y0, y1: {'x0': x0 * K, 'x1': x1 * K, 'y0': y0 * K, 'y1': y1 * K, 'anim': 'none', 'behind': 'dark'}
 doors = {'out': {'kind': 'glass', 'x': 534 * K, 'y': 296 * K, 'to': 'f3', 'toDoor': 'lounge', 'label': '복도', 'door': door(504, 566, 131, 285)}}
-# 의자 자리 = 앉혀 보기 v8 (tools/objects/lounge_p13_people.py) 그대로: 의자 발 y와 기준점 x(1x)
+# 의자 12개 = 앉혀 보기 v8(tools/objects/lounge_p13_people.py)과 같은 자리·같은 의자 그림(chairs_shell, 게임 의자 묶음 'L').
+# 의자 상자 face: 앞줄(테이블 뒤) 정면 = 없음, 왼쪽 옆 의자 = E(오른쪽 봄), 오른쪽 옆 의자 = W, 테이블 앞 등 = N.
 TAB = {'table1': (162, 134, 82, 205), 'table2': (462, 434, 383, 506), 'table3': (713, 740, 669, 793)}
 FB, FF, FS, TUCK = 340, 395, 371, 12
-spots = []
+# 사람 배율 = lounge_p13_people.scale(y): 자판기 기준 어른 키 137(1x) at y301 + 원근 0.5 → 게임 dotK·sizes(발 y 2x, 배율은 dotK 대비)
+FOOTV = 301; ADULT = round(150 * 113 / 124); HZ = FOOTV - round(ADULT * 0.93); A = ADULT / (FOOTV - HZ); PERSP = 0.5
+def scale(y):
+    b = K * A * (FOOTV - HZ) / 247; f = K * A * (y - HZ) / 247; return b + (f - b) * PERSP
+DOTK = round(scale(FOOTV), 4)
+SIZES = [[y * K, round(scale(y) / DOTK, 4)] for y in (290, 424)]   # 선형이라 두 점이면 된다
+east = Image.open(ROOT / 'game-src/art/objects/chairs_shell/fit/east.png').convert('RGBA').crop((0, 0, 200, 172)).getbbox()
+chairs, spots = [], []
 for n, (xb, xf, xl, xr) in TAB.items():
-    spots += [{'id': f'{n}_N', 'x': xb * K, 'y': FB * K, 'dir': 'front', 'face': 1, 'verb': '앉기', 'chair': 'front'},
-              {'id': f'{n}_W', 'x': (xl + TUCK) * K, 'y': FS * K, 'dir': 'side', 'face': 1, 'verb': '앉기', 'chair': 'side', 'edge': 'inner'},
-              {'id': f'{n}_E', 'x': (xr - TUCK) * K, 'y': FS * K, 'dir': 'side', 'face': -1, 'verb': '앉기', 'chair': 'side', 'edge': 'inner'},
-              {'id': f'{n}_S', 'x': xf * K, 'y': FF * K, 'dir': 'back', 'face': 1, 'verb': '앉기', 'chair': 'back'}]
-# 생활 동작 자리(1x 발 위치, 물건 정면 앞; 테이블 뒤 의자 줄 y340보다 뒤)
-USE = [('microwave_L', 105, 312, [57, 157]), ('water', 200, 314, [57, 142]), ('vend_purple', 265, 318, [57, 27, 142]),
-       ('board', 370, 312, [57]), ('vend_white', 604, 314, [57, 27, 142]), ('coffee', 668, 312, [57, 142]),
-       ('sink', 728, 312, [104]), ('snack', 775, 312, [57, 157]), ('microwave_R', 815, 312, [57, 157])]
-for sid, x, y, seq in USE:
-    spots.append({'id': sid, 'x': x * K, 'y': y * K, 'verb': '쓰기', 'face': 1, 'act': ['npc_use'], 'motions': seq, 'faceDir': 'N'})
-m = {'file': 'hq_lounge_strip', 'bgScale': K, 'w': W, 'h': H, 'under': True, 'floor': floor, 'lane': [290 * K, H - 12],
-     'blocks': blocks, 'doors': doors, 'lamps': [], 'spots': spots, 'objects': objects}
+    s_ = scale(FS)
+    for suf, x, fy, face in (('N', xb * K, FB, None), ('W', (xl + TUCK) * K - (east[2] - 100) * s_, FS, 'E'),
+                              ('E', (xr - TUCK) * K + (east[2] - 100) * s_, FS, 'W'), ('S', xf * K, FF, 'N')):
+        i = len(chairs)
+        chairs.append({'x': round(x), 'y': fy * K, **({'face': face} if face else {}), 'set': 'L'})
+        spots.append({'id': f'{n}_{suf}', 'x': round(x), 'y': fy * K, 'verb': '앉기', 'face': -1 if face == 'W' else 1,
+                      'seat': {'x': round(x), 'y': fy * K}, 'act': ['sit_back' if face == 'N' else 'sit_side' if face else 'sit_front'], 'chair': i})
+# 생활 동작 자리(1x 발 위치, 물건 앞; NPC 전용, 사용자 06:07 확정): 줄 차례. 게임 쪽 연결은 다음 단계(stations)
+STATIONS = [('microwave_L', 105, 312, ['57', '157']), ('water', 200, 314, ['57', '142']), ('vend_purple', 265, 318, ['57', '27', '142']),
+            ('board', 370, 312, ['57']), ('vend_white', 604, 314, ['57', '27', '142']), ('coffee', 668, 312, ['57', '142']),
+            ('sink', 728, 312, ['104']), ('snack', 775, 312, ['57', '157']), ('microwave_R', 815, 312, ['57', '157'])]
+stations = [{'id': sid, 'x': x * K, 'y': y * K, 'lines': seq} for sid, x, y, seq in STATIONS]
+m = {'file': 'hq_lounge_strip', 'bgScale': K, 'dotK': DOTK, 'sizes': SIZES, 'w': W, 'h': H, 'under': True, 'floor': floor, 'lane': [290 * K, H - 12],
+     'blocks': blocks, 'doors': doors, 'lamps': [], 'spots': spots, 'objects': objects, 'chairs': chairs, 'stations': stations}
 (OUT / 'map.json').write_text(json.dumps(m, ensure_ascii=False, indent=1))
-print(W, H, len(spots), 'spots', len(objects), 'objects')
+print(W, H, len(spots), 'spots', len(objects), 'objects', 'dotK', DOTK, SIZES)
 if len(sys.argv) > 1:   # 확인 그림: 걷는 바닥(초록), 막힘(빨강), 자리(점)
     from PIL import ImageDraw
     b = im.resize((W, H), Image.NEAREST).convert('RGBA'); ov = Image.new('RGBA', b.size, (0, 0, 0, 0)); d = ImageDraw.Draw(ov)
     d.polygon([tuple(p) for p in floor], fill=(0, 200, 80, 70), outline=(0, 160, 60, 255))
     for o in objects:
         for r in o.get('solid', []): d.rectangle((r['x0'], r['y0'], r['x1'], r['y1'] - 1), fill=(230, 40, 40, 110))
-    for s in spots:
-        c = (40, 120, 255, 255) if 'chair' in s else (255, 150, 0, 255)
-        d.ellipse((s['x'] - 6, s['y'] - 6, s['x'] + 6, s['y'] + 6), fill=c, outline=(0, 0, 0, 255))
-        if 'chair' not in s: d.text((s['x'] - 20, s['y'] + 8), s['id'], fill=(0, 0, 0, 255))
+    for s in chairs: d.ellipse((s['x'] - 6, s['y'] - 6, s['x'] + 6, s['y'] + 6), fill=(40, 120, 255, 255), outline=(0, 0, 0, 255))
+    for s in stations:
+        d.ellipse((s['x'] - 6, s['y'] - 6, s['x'] + 6, s['y'] + 6), fill=(255, 150, 0, 255), outline=(0, 0, 0, 255)); d.text((s['x'] - 20, s['y'] + 8), s['id'], fill=(0, 0, 0, 255))
     d.rectangle((504 * K, 131 * K, 566 * K, 285 * K), outline=(255, 0, 255, 255), width=3)
     out = Image.alpha_composite(b, ov)
     for o in objects:   # 게임처럼 테이블 그림을 위에 다시 그려 깊이를 보이게
-        t = Image.open(OUT / o['file']).convert('RGBA'); t = t.resize((t.width * K, t.height * K), Image.NEAREST)
+        t = Image.open(OUT / (o['file'] + '.png')).convert('RGBA'); t = t.resize((t.width * K, t.height * K), Image.NEAREST)
         out.alpha_composite(t, (o['x'], o['y']))
     out.convert('RGB').save(sys.argv[1])

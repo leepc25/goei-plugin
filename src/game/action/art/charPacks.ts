@@ -60,6 +60,7 @@ export function prepareCharPacks(assets?: { ready(p: string): Promise<boolean>; 
     await Promise.all(dirs.flatMap((d) => [
       io!.urlOf('action-fx', `chair-${d}.webp`).then(img).then((im) => { CHAIR[d] = im; }, () => {}),
       io!.urlOf('action-fx', `chair2-${d}.webp`).then(img).then((im) => { CHAIR['C02:' + d] = im; }, () => {}),
+      io!.urlOf('action-fx', `chairL-${d}.webp`).then(img).then((im) => { CHAIR['L:' + d] = im; }, () => {}),   // 휴게실 쉘 의자(11-02)
     ]));
     if (revision === own) fx = { VFX, CHAIR, roster };
   })().catch((e) => { console.warn('[goei] action-fx 팩 없음', e); });
@@ -273,7 +274,7 @@ function drawLine(c: CanvasRenderingContext2D, a: CharArt, id: string, f: number
 
 /** 지도 의자 (cx, cy)에 앉은 인물: 의자는 그 자리에, 사람은 이 인물 의자 맞춤값(chairs/<키>.json)만큼 옮겨 그린다 (주인공 엔진과 같은 규칙, fighter/seats.ts).
  * dir = 앉기 방향, face = 보는 쪽, kind = 앉아서 하는 일(talk·eat·type·doze…, 그 방향에 줄이 없으면 앉아 숨쉬기). 그림 없으면 false */
-export function drawCharSeat(c: CanvasRenderingContext2D, nameOrKey: string, cx: number, cy: number, face: 1 | -1, now: number, dir: SeatDir, kind = '', since = 0, until?: number): boolean {
+export function drawCharSeat(c: CanvasRenderingContext2D, nameOrKey: string, cx: number, cy: number, face: 1 | -1, now: number, dir: SeatDir, kind = '', since = 0, until?: number, set?: string): boolean {
   const a = charArt(nameOrKey);
   if (!a) return false;
   let row = SEATS.find((s) => s.dir === dir && a.A[s.sit] && !(dir === 'back' && a.cfg.noBackSit));
@@ -301,7 +302,7 @@ export function drawCharSeat(c: CanvasRenderingContext2D, nameOrKey: string, cx:
     const n = Math.floor((now / 1000) * 6), L = ((a.cfg.loops ?? {})[id] ?? []).map((v) => Math.max(0, Math.min(m.n - 1, v - 1)));
     f = SEAT_LOOP.has(id) && L.length ? (n < L[0] ? n % m.n : L[(n - L[0]) % L.length]) : n % m.n;
   }
-  const fit = seatFit(a.cfg as never, row.dir, id);
+  const fit = seatFit(a.cfg as never, row.dir, id, {}, set);
   const k = spr(cy) * CHAR_K;
   const body = seatBody(cx, cy, face, fit, k);
   const im = charFx()?.CHAIR[fit.img || row.img] ?? charFx()?.CHAIR[row.img];

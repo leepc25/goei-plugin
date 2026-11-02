@@ -51,7 +51,7 @@ export interface Actor {
   def: ActorDef;
   scene: string;
   /** 지도 의자에 앉아 있음 (i = 장면 의자 번호). 그림은 그 인물 의자 맞춤값으로 (fighter/seats.ts) */
-  seat?: { i: number; dir: 'front' | 'side' | 'back'; kind: string; x: number; y: number };
+  seat?: { i: number; dir: 'front' | 'side' | 'back'; kind: string; x: number; y: number; set?: string };
   /** 앉으러 가는 의자 번호 */
   seatPick?: number;
   x: number;
@@ -2249,7 +2249,7 @@ export class WorldSim {
       a.x = st.x;
       a.y = st.y;
       a.face = st.face === 'W' ? -1 : st.face === 'E' ? 1 : a.face;
-      a.seat = { i: pick, dir: st.face === 'N' ? 'back' : st.face ? 'side' : 'front', kind, x: st.x, y: st.y };
+      a.seat = { i: pick, dir: st.face === 'N' ? 'back' : st.face ? 'side' : 'front', kind, x: st.x, y: st.y, ...(st.set ? { set: st.set } : {}) };
       a.doing = `${a.opt?.label ?? t.label} (의자)`;
       return;
     }

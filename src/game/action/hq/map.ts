@@ -7,6 +7,7 @@ import { ROOMS, mirror, type Room, type RoomFix, type RoomItem } from './rooms';
 import { PAINTED, PAINTED_LANE, doorX, type HqToilet } from './painted';
 import { JR_ROOM_SPOTS } from './jrRooms.gen';
 import { MAPEDIT_SPOTS } from './mapedit.gen';
+import type { PaintedScene } from './painted';
 
 export type SceneId =
   | 'street' | 'pasta' | 'lobby' | 'swat' | 'f2' | 'f3' | 'office' | 'interview' | 'lounge' | 'wc' | 'wc3'
@@ -69,6 +70,8 @@ export interface HqBox {
   solid: boolean;
   /** 의자: 앉은 사람이 보는 쪽 */
   face?: 'E' | 'W' | 'N';
+  /** 의자 그림 묶음('L' = 휴게실 쉘 의자). 없으면 C01 사무의자 */
+  set?: string;
 }
 /** 옛 장면(거리·파스타집)의 물건: 벽 그림 칸 방식 그대로 */
 export interface HqThing {
@@ -98,8 +101,8 @@ export interface HqScene {
   boxes: HqBox[];
   fixtures: { x: number; w: number; kind: RoomFix['k'] }[];
   things: HqThing[];
-  /** 의자 자리 (boxes 의 의자). 주인공·이름 인물이 앉는다 */
-  seats?: { x: number; y: number; face?: 'E' | 'W' | 'N'; box: number }[];
+  /** 의자 자리 (boxes 의 의자). 주인공·이름 인물이 앉는다. set = 의자 그림 묶음(HqBox.set) */
+  seats?: { x: number; y: number; face?: 'E' | 'W' | 'N'; box: number; set?: string }[];
   /** 화장실 쓰는 자리 (칸·소변기·세면대) */
   toilets?: HqToilet[];
   /** 남녀 구분 화장실: 이 성별만 쓴다 (NPC는 다른 쪽에 들어가지 않는다) */
@@ -142,8 +145,20 @@ const exitS = (to: SceneId, toDoor: string, key: string, west = false): HqDoor =
 /** 층 복도: 확정 배경 그림 한 장. 문 x는 그림의 문 가운데, 집기는 그림에서 오린 오브젝트의 바닥 상자 */
 function floorHall(id: SceneId, name: string, floor: HqScene['floor'], doors: Omit<HqDoor, 'x'>[], extra: Partial<HqScene> = {}): HqScene {
   const p = PAINTED[id];
+  // 그림 속 의자(11-02 휴게실): 상자(kind chair, 그림은 drawChair가 set 그림으로)·앉는 자리·NPC 자리. 자리의 chair 번호는 의자 차례 → 상자 번호
+  const chairBoxes: HqBox[] = (p.chairs ?? []).map((ch) => ({ kind: 'chair', x: ch.x, w: 54, y: ch.y, d: 20, h: 150, solid: false, face: ch.face, set: ch.set }));
   // 맵 에디터로 만든 장면이면 앉는 자리도 그쪽 것
   if (MAPEDIT_SPOTS[id]) extra = { ...extra, spots: MAPEDIT_SPOTS[id] };
+  const sc = floorHallBase(id, name, floor, doors, p, extra);
+  if (chairBoxes.length) {
+    const base = sc.boxes.length;
+    sc.boxes = [...sc.boxes, ...chairBoxes];
+    sc.spots = sc.spots.map((s) => (s.chair !== undefined ? { ...s, chair: base + s.chair } : s));
+    sc.seats = chairBoxes.map((b, i) => ({ x: b.x, y: b.y, face: b.face, box: base + i, set: b.set }));
+  }
+  return sc;
+}
+function floorHallBase(id: SceneId, name: string, floor: HqScene['floor'], doors: Omit<HqDoor, 'x'>[], p: PaintedScene, extra: Partial<HqScene>): HqScene {
   return {
     ...(p.posts ? { posts: p.posts } : {}), id, name, floor, look: id.startsWith('jr_') ? 'jr' : p.under ? 'labhall' : id === 'lobby' ? 'lobby' : 'hall', painted: id, length: p.w, lane: p.lane ?? PAINTED_LANE,
     doors: doors.map((d) => ({ ...d, x: doorX(id, d.id) })),
@@ -201,7 +216,8 @@ export const HQ_SCENES: HqScene[] = [
     { id: 'lounge', kind: 'glass', to: 'lounge', toDoor: 'out', label: '휴게실' },
   ]),
   floorHall('wc3', '화장실(여)', '3F', [{ id: 'out', kind: 'exit', side: 'S', to: 'f3', toDoor: 'wc', label: '나가기' }], { toilets: PAINTED.wc3?.toilets, sex: '여' }),
-  room({ id: 'lounge', name: '휴게실', floor: '3F', look: 'life', doors: [exitS('f3', 'lounge', 'lounge')] }, 'lounge'),
+  // 휴게실: 그림 장면(PixelLab 11-02, tools/mapedit/author_hq_lounge.py). 테이블 3개는 올라설 수 있는 발판, 의자 12개(쉘 의자 'L'), 출입문 = 비상구 표지 밑 유리문 → 3층 복도
+  floorHall('lounge', '휴게실', '3F', [{ id: 'out', kind: 'exit', to: 'f3', toDoor: 'lounge', label: '나가기' }]),
   room({ id: 'office', name: '종합대응팀', floor: '3F', look: 'office', doors: [exitS('f3', 'office', 'office')] }, 'office'),
   // 지하 1층은 새 본부 그림(PixelLab 11-01, game-src/mapedit/b1): 서→동 샤워실(여) · 샤워실(남) · 훈련장 양문 · 엘리베이터. 교육장·계단 없음(본부 최소화)
   floorHall('b1', '지하 1층', 'B1', [

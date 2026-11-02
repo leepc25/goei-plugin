@@ -967,14 +967,14 @@ const SEAT_F = 0.133;
 /** 의자 맞추기(시험장 「의자 맞추기」 칸): 방향별 { dx, dy, s } 고친 값. 비어 있으면 설정값(chairs/<키>.json → CH.chair) 그대로 */
 const chairEdits: Record<string, Json> = {};
 const chairEdit = (): Record<string, Json> => chairEdits;
-let seatIdx = -1, showChair = true;
-function chairFit(dir?: Json, line?: Json) { return seatFit(CH, dir, line, chairEdit()); }   // 줄마다(기대 쉬기 73 등) 따로 맞춘 값이 있으면 그것 (fighter/seats.ts)
+let seatIdx = -1, showChair = true, seatSet: Json = undefined;   // seatSet = 다음 앉기의 의자 묶음(sitAt 둘째 인자)
+function chairFit(dir?: Json, line?: Json) { return seatFit(CH, dir, line, chairEdit(), P.seat && P.seat.set); }   // set = 지도 의자 묶음(휴게실 'L', 11-02)   // 줄마다(기대 쉬기 73 등) 따로 맞춘 값이 있으면 그것 (fighter/seats.ts)
 function seatIdle() { const s = P.seat; P.mode = 'seat'; const n = nOf(s.sit); play(s.sit, { seq: [{ f: n - 1, d: 9 }], loopFrom: 0 }); P.clip!.breathe = true; }
 function sitChair() {
   const okSeat = (s?: Json) => has(s.sit) && !(CH.noBackSit && s.dir === 'back');   // 후면 앉기 그림이 실패한 인물(앉지 않고 섬)은 후면 자리를 건너뜀(10-29 아벤샤)
   for (let k = 1; k <= SEATS.length; k++) { const s = SEATS[(seatIdx + k) % SEATS.length]; if (okSeat(s)) { seatIdx = SEATS.indexOf(s); break; } }
   const s = SEATS[seatIdx]; if (!s || !okSeat(s)) return;
-  P.combat = false; P.armed = false; P.mode = 'seat'; P.seat = { ...s, x: P.x, y: P.y, face: P.face };
+  P.combat = false; P.armed = false; P.mode = 'seat'; P.seat = { ...s, x: P.x, y: P.y, face: P.face, set: seatSet };
   play(s.sit, { seq: S(R(0, nOf(s.sit) - 1), SEAT_F), onEnd: seatIdle });
 }
 function rise(fast?: Json) { const s = P.seat; if (!s) return toIdle(); const n = nOf(s.sit); reverseOut(s.sit, R(n - 1, 0), fast ? 0.04 : SEAT_F, () => { P.seat = null; if (fast === 'hit') hit(); else toIdle(); }); P.mode = 'seatUp'; }
@@ -982,7 +982,7 @@ function seatAct(kind?: Json) {
   const s = P.seat, id = s && s.acts[kind];
   if (!id || !has(id)) {   // 지금 방향에 없는 줄이면 그 줄이 있는 방향으로 앉은 뒤 이어서(정면 전용 줄 등)
     const t = SEATS.find(t => t.acts[kind] && has(t.acts[kind]) && has(t.sit)); if (!t) return;
-    P.seat = null; sitAt(t.dir); later(nOf(t.sit) * SEAT_F + 0.15, () => P.seat && P.seat.dir === t.dir && seatAct(kind)); return;
+    const keepSet = s.set; P.seat = null; sitAt(t.dir, keepSet); later(nOf(t.sit) * SEAT_F + 0.15, () => P.seat && P.seat.dir === t.dir && seatAct(kind)); return;
   }
   const n = nOf(id);
   if (SEAT_LOOP.has(id)) { play(id, { seq: S(R(0, n - 1), 0.16), loopFrom: 0 }); P.clip!.breathe = false; }
@@ -1046,7 +1046,7 @@ const SCENES = [
     ['사망(서서)', () => { if (P.mode === 'dead') die(); die(); }], ['사망(누워서)', () => { if (P.mode === 'dead') die(); knock(); later(1.4, () => { P.mode = 'down'; die(); }); }], ['되살리기', () => P.mode === 'dead' && die()]], () => true],
 ];
 // 그 인물에게 줄이 없어 아무것도 안 하는 버튼은 숨김(사용자 10-28: 이길환 끄덕·손 작업)
-function sitAt(dir?: Json) { if (P.seat) return; if (dir === 'back' && CH.noBackSit) dir = 'side'; seatIdx = SEATS.findIndex(s => s.dir === dir) - 1; P.scene = null; sitChair(); }
+function sitAt(dir?: Json, set?: Json) { if (P.seat) return; if (dir === 'back' && CH.noBackSit) dir = 'side'; seatIdx = SEATS.findIndex(s => s.dir === dir) - 1; P.scene = null; seatSet = set; sitChair(); seatSet = undefined; }
 
 // ── 생활·직무 줄: , . 로 차례로 틀기(목록 단추와 같음) ──
 let lifeI = -1;

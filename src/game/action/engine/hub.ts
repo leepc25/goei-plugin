@@ -12,7 +12,7 @@ import { HQ_PLACE, drawFloor, drawHqWall, drawPropArt, drawHqTextureWall } from 
 import { drawHqDoorRound2 } from '../art/hqDoorRound2';
 import { drawCallLit, drawHqField, drawHqFieldLight, drawHqFieldObject, drawHqSigns, hasHqField } from '../art/hqField';
 import { charTop, drawCharClip, drawCharSeat, charArt, charFx, CHAR_K } from '../art/charPacks';
-import { FAR, persp, view as fieldView } from './view';
+import { FAR, persp, spr, view as fieldView } from './view';
 import { blockByProps, clearSpot, type BlockProp } from './propBlock';
 import { PAINTED, clampPainted, doorReachY } from '../hq/painted';
 import { STALL_DOOR_SEC, seatFeet } from '../../world/toilets';
@@ -57,7 +57,7 @@ export interface LiveActor { id: string; name: string; kind: 'named' | 'mob'; x:
   /** 동행(ally)·적(foe) 구분 (11-01 1-3): 이름표 색 */
   rel?: 'ally' | 'foe';
   /** 지도 의자에 앉음: 의자 번호(장면 상자 번호)·앉기 방향·하는 일·의자 자리 */
-  seat?: { box: number; dir: 'front' | 'side' | 'back'; kind: string; x: number; y: number };
+  seat?: { box: number; dir: 'front' | 'side' | 'back'; kind: string; x: number; y: number; set?: string };
   /** 화장실 칸을 쓰는 중: 그 칸 문 오브젝트 id, 문이 열려 있어야 하나(들어가는 중·나오는 중) */
   toilet?: { door?: string; open: boolean } }
 export interface HubLife {
@@ -554,7 +554,7 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
         if (s.seat && s.act?.[0]) {
           if (s.chair !== undefined && live.some((q) => q.seat?.box === s.chair)) return a.world.say('누가 앉아 있다.', 1.5);
           const exit = clearSpot(s.x, s.y ?? a.world.player.y, solids, scene.lane ?? LANE);
-          if ((a.world.player as Player).sit(s.act[0], s.seat.x, s.seat.y, s.face ?? 1, exit) && s.chair !== undefined) sitChair = scene.boxes[s.chair] ?? null;
+          if ((a.world.player as Player).sit(s.act[0], s.seat.x, s.seat.y, s.face ?? 1, exit, s.chair !== undefined ? scene.boxes[s.chair]?.set : undefined) && s.chair !== undefined) sitChair = scene.boxes[s.chair] ?? null;
           host.sat?.();
           return;
         }
@@ -1010,12 +1010,15 @@ function drawBox(c: CanvasRenderingContext2D, b: HqBox, look: string) {
 /** 의자: 인물 팩 공용 의자 그림(action-fx chair-<방향>, 테스트룸 C01·원점 (100,171))이 있으면 그걸로, 없으면 옛 코드 의자 */
 function drawChair(c: CanvasRenderingContext2D, b: HqBox) {
   const CH = charFx()?.CHAIR;
-  const im = CH?.[b.face === 'N' ? 'north' : b.face === 'W' ? 'west' : 'east'];
+  // 의자 묶음(set, 11-02 휴게실 'L'): 그 묶음 그림. 정면 의자(face 없음)는 비스듬한 south-east, 서쪽 보기는 east 를 뒤집어서
+  const set = b.set ? `${b.set}:` : '';
+  const dirName = b.face === 'N' ? 'north' : b.face === 'W' ? (b.set ? 'east' : 'west') : b.face === 'E' ? 'east' : b.set ? 'south-east' : 'east';
+  const im = CH?.[set + dirName] ?? CH?.[dirName];
   if (im?.complete && im.naturalWidth) {
-    const k = persp(b.y) * CHAR_K;
+    const k = spr(b.y) * CHAR_K;   // 사람과 같은 배율(dotK 장면이면 그 장면 규격, 11-02)
     c.save();
     c.translate(Math.round(b.x), Math.round(b.y));
-    c.scale(k, k);
+    c.scale(b.set && b.face === 'W' ? -k : k, k);
     c.imageSmoothingEnabled = false;
     c.drawImage(im, -100, -171);
     c.restore();
@@ -1072,7 +1075,7 @@ const namedTop = (name: string) => (charArt(name) ? charTop(name) : -230);
 function drawLiveActor(c: CanvasRenderingContext2D, a: LiveActor, life: HubLife): void {
   const t = (life.lifeTime?.() ?? performance.now() / 1000) * 1000;
   const until = a.until === undefined ? undefined : a.until * 1000;
-  if (a.seat && drawCharSeat(c, a.kind === 'named' ? a.name : a.look ?? a.name, a.seat.x, a.seat.y, a.face, t, a.seat.dir, a.seat.kind, (a.since ?? 0) * 1000, until)) return;
+  if (a.seat && drawCharSeat(c, a.kind === 'named' ? a.name : a.look ?? a.name, a.seat.x, a.seat.y, a.face, t, a.seat.dir, a.seat.kind, (a.since ?? 0) * 1000, until, a.seat.set)) return;
   if (a.kind === 'named' && drawCharClip(c, a.name, a.x, a.y, a.face, t, a.clip, (a.since ?? 0) * 1000, until)) return;
   if (a.kind === 'mob' && life.drawMob) return life.drawMob(c, a);
   silhouette(c, a);

@@ -33,6 +33,22 @@ def from_data_uri(uri):
 def pack_id(key): return "char-" + key.split("_")[0]
 
 
+FIT_L = ROOT / "game-src/art/objects/chairs_shell/fit_all.json"
+def chair_l(key):
+    """휴게실 쉘 의자('L') 맞춤값: fit_all.json[키] = {front|side|back|<줄>: {dx, dy, img}} → img 는 'L:<방향>'. 없으면 {}"""
+    d = json.loads(FIT_L.read_text(encoding="utf-8")).get(key) if FIT_L.exists() else None
+    if not d: return {}
+    out = {}
+    for k, v in d.items():
+        if k == "lines" and isinstance(v, dict):
+            for lk, lv in v.items(): out[lk.split(":", 1)[-1]] = {kk: vv for kk, vv in lv.items() if kk in ("dx", "dy")}
+            continue
+        if not isinstance(v, dict): continue
+        out[k] = {kk: vv for kk, vv in v.items() if kk in ("dx", "dy", "s")}
+        if v.get("img"): out[k]["img"] = "L:" + v["img"]
+    return out
+
+
 def write_char(cfg):
     key = cfg["key"]; d = PACKS / pack_id(key)
     A, _ = build.analyze(cfg, force)
@@ -43,6 +59,7 @@ def write_char(cfg):
         lost = had - set(A)
         if lost: raise SystemExit(f"{key}: 원본이 없어 줄 {len(lost)}개가 빠짐({sorted(lost)[:6]}…) — 팩을 덮어쓰지 않음")
     payload = build.payload_of(cfg, A)
+    payload["chairL"] = chair_l(key)   # 휴게실 쉘 의자 맞춤값(11-02)
     d.mkdir(parents=True, exist_ok=True)
     keep = {"pack.json", "char.json"}
     lines = {}
@@ -68,8 +85,9 @@ def write_fx():
         (d / f"{name}.webp").write_bytes(webp(from_data_uri(v["src"])))
         meta[name] = {k: vv for k, vv in v.items() if k != "src"}; meta[name]["file"] = f"{name}.webp"
     (d / "vfx.json").write_text(json.dumps(meta, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
-    for prefix, folder in (("chair", "C01_사무의자_1배"), ("chair2", "C02_기댄사무의자_1배_2차")):
-        for p in (ROOT / "game-src/action/objects" / folder).glob("*.png"):
+    # chairL = 휴게실 쉘 의자(game-src/art/objects/chairs_shell/fit, 11-02): 게임 의자 묶음 'L'(hq 의자 상자 set, fighter/seats.ts)
+    for prefix, folder in (("chair", "game-src/action/objects/C01_사무의자_1배"), ("chair2", "game-src/action/objects/C02_기댄사무의자_1배_2차"), ("chairL", "game-src/art/objects/chairs_shell/fit")):
+        for p in (ROOT / folder).glob("*.png"):
             if p.stem in ("south", "south-east", "south-west", "east", "west", "north", "north-east", "north-west"):
                 (d / f"{prefix}-{p.stem}.webp").write_bytes(webp(Image.open(p).convert("RGBA")))
     (d / "pack.json").write_text(json.dumps({"id": "action-fx", "required": False}) + "\n", encoding="utf-8")

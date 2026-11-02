@@ -1,6 +1,17 @@
 {
  "file": "hq_lounge_strip",
  "bgScale": 2,
+ "dotK": 1.1093,
+ "sizes": [
+  [
+   580,
+   0.9567
+  ],
+  [
+   848,
+   1.4843
+  ]
+ ],
  "w": 1792,
  "h": 848,
  "under": true,
@@ -539,256 +550,187 @@
    "id": "table1_N",
    "x": 324,
    "y": 680,
-   "dir": "front",
-   "face": 1,
    "verb": "앉기",
-   "chair": "front"
+   "face": 1,
+   "seat": {
+    "x": 324,
+    "y": 680
+   },
+   "act": [
+    "sit_front"
+   ],
+   "chair": 0
   },
   {
    "id": "table1_W",
-   "x": 188,
+   "x": 151,
    "y": 742,
-   "dir": "side",
-   "face": 1,
    "verb": "앉기",
-   "chair": "side",
-   "edge": "inner"
+   "face": 1,
+   "seat": {
+    "x": 151,
+    "y": 742
+   },
+   "act": [
+    "sit_side"
+   ],
+   "chair": 1
   },
   {
    "id": "table1_E",
-   "x": 386,
+   "x": 423,
    "y": 742,
-   "dir": "side",
-   "face": -1,
    "verb": "앉기",
-   "chair": "side",
-   "edge": "inner"
+   "face": -1,
+   "seat": {
+    "x": 423,
+    "y": 742
+   },
+   "act": [
+    "sit_side"
+   ],
+   "chair": 2
   },
   {
    "id": "table1_S",
    "x": 268,
    "y": 790,
-   "dir": "back",
-   "face": 1,
    "verb": "앉기",
-   "chair": "back"
+   "face": 1,
+   "seat": {
+    "x": 268,
+    "y": 790
+   },
+   "act": [
+    "sit_back"
+   ],
+   "chair": 3
   },
   {
    "id": "table2_N",
    "x": 924,
    "y": 680,
-   "dir": "front",
-   "face": 1,
    "verb": "앉기",
-   "chair": "front"
+   "face": 1,
+   "seat": {
+    "x": 924,
+    "y": 680
+   },
+   "act": [
+    "sit_front"
+   ],
+   "chair": 4
   },
   {
    "id": "table2_W",
-   "x": 790,
+   "x": 753,
    "y": 742,
-   "dir": "side",
-   "face": 1,
    "verb": "앉기",
-   "chair": "side",
-   "edge": "inner"
+   "face": 1,
+   "seat": {
+    "x": 753,
+    "y": 742
+   },
+   "act": [
+    "sit_side"
+   ],
+   "chair": 5
   },
   {
    "id": "table2_E",
-   "x": 988,
+   "x": 1025,
    "y": 742,
-   "dir": "side",
-   "face": -1,
    "verb": "앉기",
-   "chair": "side",
-   "edge": "inner"
+   "face": -1,
+   "seat": {
+    "x": 1025,
+    "y": 742
+   },
+   "act": [
+    "sit_side"
+   ],
+   "chair": 6
   },
   {
    "id": "table2_S",
    "x": 868,
    "y": 790,
-   "dir": "back",
-   "face": 1,
    "verb": "앉기",
-   "chair": "back"
+   "face": 1,
+   "seat": {
+    "x": 868,
+    "y": 790
+   },
+   "act": [
+    "sit_back"
+   ],
+   "chair": 7
   },
   {
    "id": "table3_N",
    "x": 1426,
    "y": 680,
-   "dir": "front",
-   "face": 1,
    "verb": "앉기",
-   "chair": "front"
+   "face": 1,
+   "seat": {
+    "x": 1426,
+    "y": 680
+   },
+   "act": [
+    "sit_front"
+   ],
+   "chair": 8
   },
   {
    "id": "table3_W",
-   "x": 1362,
+   "x": 1325,
    "y": 742,
-   "dir": "side",
-   "face": 1,
    "verb": "앉기",
-   "chair": "side",
-   "edge": "inner"
+   "face": 1,
+   "seat": {
+    "x": 1325,
+    "y": 742
+   },
+   "act": [
+    "sit_side"
+   ],
+   "chair": 9
   },
   {
    "id": "table3_E",
-   "x": 1562,
+   "x": 1599,
    "y": 742,
-   "dir": "side",
-   "face": -1,
    "verb": "앉기",
-   "chair": "side",
-   "edge": "inner"
+   "face": -1,
+   "seat": {
+    "x": 1599,
+    "y": 742
+   },
+   "act": [
+    "sit_side"
+   ],
+   "chair": 10
   },
   {
    "id": "table3_S",
    "x": 1480,
    "y": 790,
-   "dir": "back",
-   "face": 1,
    "verb": "앉기",
-   "chair": "back"
-  },
-  {
-   "id": "microwave_L",
-   "x": 210,
-   "y": 624,
-   "verb": "쓰기",
    "face": 1,
+   "seat": {
+    "x": 1480,
+    "y": 790
+   },
    "act": [
-    "npc_use"
+    "sit_back"
    ],
-   "motions": [
-    57,
-    157
-   ],
-   "faceDir": "N"
-  },
-  {
-   "id": "water",
-   "x": 400,
-   "y": 628,
-   "verb": "쓰기",
-   "face": 1,
-   "act": [
-    "npc_use"
-   ],
-   "motions": [
-    57,
-    142
-   ],
-   "faceDir": "N"
-  },
-  {
-   "id": "vend_purple",
-   "x": 530,
-   "y": 636,
-   "verb": "쓰기",
-   "face": 1,
-   "act": [
-    "npc_use"
-   ],
-   "motions": [
-    57,
-    27,
-    142
-   ],
-   "faceDir": "N"
-  },
-  {
-   "id": "board",
-   "x": 740,
-   "y": 624,
-   "verb": "쓰기",
-   "face": 1,
-   "act": [
-    "npc_use"
-   ],
-   "motions": [
-    57
-   ],
-   "faceDir": "N"
-  },
-  {
-   "id": "vend_white",
-   "x": 1208,
-   "y": 628,
-   "verb": "쓰기",
-   "face": 1,
-   "act": [
-    "npc_use"
-   ],
-   "motions": [
-    57,
-    27,
-    142
-   ],
-   "faceDir": "N"
-  },
-  {
-   "id": "coffee",
-   "x": 1336,
-   "y": 624,
-   "verb": "쓰기",
-   "face": 1,
-   "act": [
-    "npc_use"
-   ],
-   "motions": [
-    57,
-    142
-   ],
-   "faceDir": "N"
-  },
-  {
-   "id": "sink",
-   "x": 1456,
-   "y": 624,
-   "verb": "쓰기",
-   "face": 1,
-   "act": [
-    "npc_use"
-   ],
-   "motions": [
-    104
-   ],
-   "faceDir": "N"
-  },
-  {
-   "id": "snack",
-   "x": 1550,
-   "y": 624,
-   "verb": "쓰기",
-   "face": 1,
-   "act": [
-    "npc_use"
-   ],
-   "motions": [
-    57,
-    157
-   ],
-   "faceDir": "N"
-  },
-  {
-   "id": "microwave_R",
-   "x": 1630,
-   "y": 624,
-   "verb": "쓰기",
-   "face": 1,
-   "act": [
-    "npc_use"
-   ],
-   "motions": [
-    57,
-    157
-   ],
-   "faceDir": "N"
+   "chair": 11
   }
  ],
  "objects": [
   {
    "id": "table1_back",
-   "file": "table1_back.png",
+   "file": "table1_back",
    "x": 164,
    "y": 544,
    "w": 248,
@@ -797,7 +739,7 @@
   },
   {
    "id": "table1_front",
-   "file": "table1_front.png",
+   "file": "table1_front",
    "x": 164,
    "y": 544,
    "w": 248,
@@ -1011,7 +953,7 @@
   },
   {
    "id": "table2_back",
-   "file": "table2_back.png",
+   "file": "table2_back",
    "x": 766,
    "y": 542,
    "w": 248,
@@ -1020,7 +962,7 @@
   },
   {
    "id": "table2_front",
-   "file": "table2_front.png",
+   "file": "table2_front",
    "x": 766,
    "y": 542,
    "w": 248,
@@ -1234,7 +1176,7 @@
   },
   {
    "id": "table3_back",
-   "file": "table3_back.png",
+   "file": "table3_back",
    "x": 1338,
    "y": 540,
    "w": 250,
@@ -1243,7 +1185,7 @@
   },
   {
    "id": "table3_front",
-   "file": "table3_front.png",
+   "file": "table3_front",
    "x": 1338,
    "y": 540,
    "w": 250,
@@ -1453,6 +1395,160 @@
      "y1": 754,
      "h": 150
     }
+   ]
+  }
+ ],
+ "chairs": [
+  {
+   "x": 324,
+   "y": 680,
+   "set": "L"
+  },
+  {
+   "x": 151,
+   "y": 742,
+   "face": "E",
+   "set": "L"
+  },
+  {
+   "x": 423,
+   "y": 742,
+   "face": "W",
+   "set": "L"
+  },
+  {
+   "x": 268,
+   "y": 790,
+   "face": "N",
+   "set": "L"
+  },
+  {
+   "x": 924,
+   "y": 680,
+   "set": "L"
+  },
+  {
+   "x": 753,
+   "y": 742,
+   "face": "E",
+   "set": "L"
+  },
+  {
+   "x": 1025,
+   "y": 742,
+   "face": "W",
+   "set": "L"
+  },
+  {
+   "x": 868,
+   "y": 790,
+   "face": "N",
+   "set": "L"
+  },
+  {
+   "x": 1426,
+   "y": 680,
+   "set": "L"
+  },
+  {
+   "x": 1325,
+   "y": 742,
+   "face": "E",
+   "set": "L"
+  },
+  {
+   "x": 1599,
+   "y": 742,
+   "face": "W",
+   "set": "L"
+  },
+  {
+   "x": 1480,
+   "y": 790,
+   "face": "N",
+   "set": "L"
+  }
+ ],
+ "stations": [
+  {
+   "id": "microwave_L",
+   "x": 210,
+   "y": 624,
+   "lines": [
+    "57",
+    "157"
+   ]
+  },
+  {
+   "id": "water",
+   "x": 400,
+   "y": 628,
+   "lines": [
+    "57",
+    "142"
+   ]
+  },
+  {
+   "id": "vend_purple",
+   "x": 530,
+   "y": 636,
+   "lines": [
+    "57",
+    "27",
+    "142"
+   ]
+  },
+  {
+   "id": "board",
+   "x": 740,
+   "y": 624,
+   "lines": [
+    "57"
+   ]
+  },
+  {
+   "id": "vend_white",
+   "x": 1208,
+   "y": 628,
+   "lines": [
+    "57",
+    "27",
+    "142"
+   ]
+  },
+  {
+   "id": "coffee",
+   "x": 1336,
+   "y": 624,
+   "lines": [
+    "57",
+    "142"
+   ]
+  },
+  {
+   "id": "sink",
+   "x": 1456,
+   "y": 624,
+   "lines": [
+    "104"
+   ]
+  },
+  {
+   "id": "snack",
+   "x": 1550,
+   "y": 624,
+   "lines": [
+    "57",
+    "157"
+   ]
+  },
+  {
+   "id": "microwave_R",
+   "x": 1630,
+   "y": 624,
+   "lines": [
+    "57",
+    "157"
    ]
   }
  ]

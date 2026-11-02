@@ -84,6 +84,7 @@ def convert(scene_id: str, m: dict, files: dict) -> dict:
             im = im.resize((o['w'], o['h']), Image.NEAREST)
             if o.get('rot'): im = im.rotate(-o['rot'], resample=Image.NEAREST, expand=False)
             extra = {'gate': True} if o.get('gate') else {}
+            if o.get('solid'): extra['solid'] = o['solid']   # 발판 네모 목록(11-02 휴게실 테이블: 올라설 수 있음)
             if not o.get('frames'): name = webp(im, f'me_{scene_id}_{o["id"]}'); names.append(name)
             # 여러 장면 그림(화장실 칸 문 0닫힘~5열림): 같은 크기 그림을 차례로 굽는다. file = 첫 장면
             if o.get('frames'):
@@ -109,11 +110,14 @@ def convert(scene_id: str, m: dict, files: dict) -> dict:
     for s in m.get('spots', []):
         sp = {'id': s['id'], 'x': s['x'], 'y': s['y'], 'verb': s.get('verb', '앉기'), 'face': s.get('face', 1), 'act': s.get('act') or ACTS.get(s.get('dir', 'side'))}
         if s.get('seat'): sp['seat'] = s['seat']          # 의자 자리만. 샤워 자리(act shower)는 seat 없음 (11-01 샤워실)
+        if s.get('chair') is not None: sp['chair'] = s['chair']   # 장면 의자 번호(m['chairs'] 차례, hq/map.ts floorHall 이 상자 번호로 바꾼다; 11-02 휴게실)
         spots.append(sp)
     # 사람 배율 dotK: map.json에 있으면 그것(사용자 10-31 중림 지상: 배경 2배·사람 0.85), 없으면 장면 세로로 계산
     lane = m.get('lane') or [min(p[1] for p in m['floor']), max(p[1] for p in m['floor']) - 12]
     scene = {'file': file, 'w': W, 'h': H, 'under': True, 'lane': lane, 'floor': m.get('floor'), 'holes': holes,
-             'dotK': m.get('dotK') or round(1.5 * H / 890, 4), **({'far': m['far']} if m.get('far') else {}), **({'growTo': m['growTo']} if m.get('growTo') else {}), **({'sizes': m['sizes']} if m.get('sizes') else {}), 'blocks': [], 'doors': doors, 'lamps': m.get('lamps', []), 'windows': [], 'objects': objects, **({'posts': m['posts']} if m.get('posts') else {}), **({'toilets': m['toilets']} if m.get('toilets') else {}), **({'showers': m['showers']} if m.get('showers') else {})}
+             'dotK': m.get('dotK') or round(1.5 * H / 890, 4), **({'far': m['far']} if m.get('far') else {}), **({'growTo': m['growTo']} if m.get('growTo') else {}), **({'sizes': m['sizes']} if m.get('sizes') else {}), 'blocks': [], 'doors': doors, 'lamps': m.get('lamps', []), 'windows': [], 'objects': objects, **({'posts': m['posts']} if m.get('posts') else {}), **({'toilets': m['toilets']} if m.get('toilets') else {}), **({'showers': m['showers']} if m.get('showers') else {}),
+             # 그림 속 의자(11-02 휴게실): 의자는 그 자리 고정, 사람을 맞춤값만큼 옮김. set = 의자 그림 묶음('L' = 휴게실 쉘 의자). stations = NPC 생활 동작 자리
+             **({'chairs': m['chairs']} if m.get('chairs') else {}), **({'stations': m['stations']} if m.get('stations') else {})}
     return {'scene': scene, 'spots': spots, 'files': names}
 
 

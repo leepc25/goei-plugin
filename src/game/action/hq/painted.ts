@@ -88,6 +88,10 @@ export interface PaintedScene {
   sizes?: [number, number][];
   /** 샤워기(샤워실): 헤드 물 나오는 면(월드 px 선)과 서는 자리(발). 자리(spot act 'shower')를 쓰면 물·김을 코드로 그린다 (hq/showerFx.ts) */
   showers?: { id: string; head: [[number, number], [number, number]]; foot: [number, number]; face: 1 | -1 }[];
+  /** 그림 속 의자(11-02 휴게실, tools/mapedit/author_hq_lounge.py): 의자는 그 자리에 고정, 사람을 맞춤값만큼 옮긴다. set = 의자 그림 묶음('L' = 휴게실 쉘 의자, 없으면 C01 사무의자) */
+  chairs?: { x: number; y: number; face?: 'E' | 'W' | 'N'; set?: string }[];
+  /** NPC 생활 동작 자리(발 x·y, 그 자리에서 차례로 트는 줄 번호). 사용자 11-02 06:07 확정: 자판기 57→27→142, 싱크대 104 등 */
+  stations?: { id: string; x: number; y: number; lines: string[] }[];
 }
 
 import { JR_ROOMS } from './jrRooms.gen';
