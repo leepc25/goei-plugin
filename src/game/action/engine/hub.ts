@@ -653,6 +653,18 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
         opening = { id: d.id, t: 0, len, then: () => { opening = null; closing = { id: d.id, t: 0, len }; host.openPlace(place); } };
         return;
       }
+      if (d.bus) {
+        // 버스 정류장: 다른 정류장 중 고른다 (bus가 있는 문끼리, 11-02 30f2b67 — 이후 합치기에서 빠져 되살림, 11-02 강남 거리)
+        const here = scene.id;
+        const stops = view!.scenes.flatMap((sc) => sc.doors.filter((q) => q.bus).map((q) => ({ scene: sc.id, door: q.id, label: q.bus! })));
+        host.chooseFloor(stops.map((e) => ({ label: e.label, open: true, here: e.scene === here })), (i) => {
+          const e = i == null ? null : stops[i];
+          if (!e || e.scene === here) return;
+          host.sfx('stepConcrete');
+          goDoor(e.scene, e.door);
+        });
+        return;
+      }
       if (d.kind === 'elevator') {
         const here = scene.id;
         // 같은 건물 층만 (관리국 본부·협회·백일몽, 11-02)

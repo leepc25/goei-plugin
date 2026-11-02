@@ -64,7 +64,7 @@ test('중림: 그림 4장, 문은 그림 문 자리에 있고 서로 이어진�
     }
   }
   // 버스 정류장(11-02): 종로·영등포·중림 정류장 문끼리 노선 고르기로 오간다
-  for (const id of ['street', 'sdra_street', 'jr_entry']) assert.ok(byId[id].doors.some((d) => d.bus && M.PAINTED_DOORS(id)[d.id]), `${id} 버스 정류장`);
+  for (const id of ['street', 'sdra_street', 'by_street', 'jr_entry']) assert.ok(byId[id].doors.some((d) => d.bus && M.PAINTED_DOORS(id)[d.id]), `${id} 버스 정류장`);
 });
 
 test('본부: 그림 문 좌표 안에 문이 있다', () => {
