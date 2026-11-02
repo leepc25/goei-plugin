@@ -5,7 +5,14 @@ from PIL import Image
 R=Path(__file__).resolve().parents[2]
 bg=Image.open(R/'game-src/art/pixellab-hq-20261031/hq_lounge_p12s.png').convert('RGBA')
 CH=R/'game-src/art/objects/chairs_shell/fit'
-def ch(d): return Image.open(CH/f'{d}.png').convert('RGBA')
+import os
+SC=float(os.environ.get('SC','1'))  # 1배 원본에서 바로 줄임(확대 거치지 않음)
+def ch(d):
+    im=Image.open(CH/f'{d}.png').convert('RGBA')
+    if SC!=1:
+        n=Image.new('RGBA',(200,200),(0,0,0,0)); s=im.resize((round(200*SC),round(200*SC)),Image.NEAREST)
+        n.alpha_composite(s,(100-round(100*SC),171-round(171*SC))); im=n   # 가운데 x100·바닥 y171 유지
+    return im
 # 테이블(1배 잰 값): 상판 x범위, 가운데
 TABLES=[(39,159),(260,370),(472,592)]
 FOOT_BACK, FOOT_FRONT, FOOT_SIDE = 352, 402, 378   # 의자 발 y
@@ -14,8 +21,8 @@ for x0,x1 in TABLES:
     cx=(x0+x1)//2
     items.append((FOOT_BACK, ch('south'), cx-100, FOOT_BACK-171))     # 테이블 뒤, 보는 사람 쪽을 봄
     items.append((FOOT_FRONT, ch('north'), cx-100, FOOT_FRONT-171))   # 테이블 앞, 등이 보임
-    items.append((FOOT_SIDE, ch('east'), x0-89+20, FOOT_SIDE-171))    # 왼쪽, 테이블 쪽(오른쪽)을 봄
-    items.append((FOOT_SIDE, ch('west'), x1-111-20+3, FOOT_SIDE-171)) # 오른쪽, 왼쪽을 봄
+    e=ch('east'); b=e.getbbox(); items.append((FOOT_SIDE, e, x0+8-b[2], FOOT_SIDE-171))    # 왼쪽, 테이블 쪽을 봄(좌판 앞끝이 테이블 밑으로 8px)
+    w=ch('west'); b=w.getbbox(); items.append((FOOT_SIDE, w, x1-8-b[0], FOOT_SIDE-171))  # 오른쪽
 # 테이블 앞부분(앞다리)은 뒤 의자보다 앞, 앞 의자보다 뒤 → 배경 그대로 두고, 뒤 의자는 테이블 픽셀 뒤로 숨김
 tab_mask=Image.new('L',bg.size,0)
 out=bg.copy()
@@ -31,4 +38,4 @@ for y,img,x,yy in sorted(items,key=lambda t:t[0]):
         for x0,x1 in TABLES:
             # 테이블 픽셀(상판 띠 + 다리) 다시 그리기: 상판 y296~321 전체, 다리는 어두운 세로줄만
             box=(x0-2,296,x1+3,322); out.paste(bg.crop(box),box[:2])
-out.resize((out.width*2,out.height*2),Image.NEAREST).save(sys.argv[1])
+out.save(sys.argv[1])  # 1배 그대로 저장(사용자 04:32 「2배 적용 안 하고」)
