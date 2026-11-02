@@ -21,11 +21,23 @@ K = 2
 im = Image.open(SRC).convert('RGB'); im.save(OUT / 'hq_lounge_strip.png')
 W, H = im.width * K, im.height * K
 P = lambda pts: [[x * K, y * K] for x, y in pts]
-# 바닥: 왼쪽부터 벽 물건 밑선을 따라감
-floor = P([(0, 290), (68, 290), (68, 298), (143, 298), (143, 301), (221, 301), (221, 303), (318, 303), (318, 290),
-           (398, 290), (398, 292), (500, 292), (500, 290), (563, 290), (563, 300), (645, 300), (645, 295), (835, 295),
-           (838, 310), (841, 316), (846, 320), (851, 324), (856, 327), (862, 330), (866, 336), (872, 339), (877, 340),
-           (880, 343), (885, 348), (890, 351), (896, 352), (896, 424), (0, 424)])
+# 바닥: 벽 물건 밑선(검은 윤곽 줄)+2px, 옆으로 몸 반폭 여유 12px (11-01 마스크 규칙).
+# 06:13 사용자 「높이 올라 탔잖아 싱크대」: 조리대 밑선은 y299(8배로 다시 읽음) — 처음 295는 조리대 위를 걷게 했다.
+WALL = 291   # 걸레받이 밑 y289 + 2
+SEG = [(68, 143, 298), (143, 221, 301), (221, 318, 303), (398, 500, 292), (563, 645, 299), (645, 835, 299)]   # x0, x1, 밑선 y
+MARGIN = 12
+top = [WALL] * 896
+for x0, x1, yb in SEG:
+    for x in range(max(0, x0 - MARGIN), min(896, x1 + MARGIN)): top[x] = max(top[x], yb + 2)
+BINS = [(835, 297), (838, 312), (841, 318), (846, 322), (851, 326), (856, 329), (862, 332), (866, 338), (872, 341), (877, 342),
+        (880, 345), (885, 350), (890, 353), (896, 354)]   # 분리수거함 앞 밑 윤곽(6배로 읽음) +2
+pts, prev = [], None
+for x in range(0, BINS[0][0] - MARGIN):
+    if top[x] != prev:
+        if prev is not None: pts.append((x, prev))
+        pts.append((x, top[x])); prev = top[x]
+pts += [(x - MARGIN, y) for x, y in BINS[1:-1] if y > prev] + [(896, BINS[-1][1])]   # 조리대 선보다 높은 윤곽 점은 버림
+floor = P(pts + [(896, 424), (0, 424)])
 TLEG = {'table1': ((85, 183), (120, 203)), 'table2': ((386, 483), (420, 504)), 'table3': ((692, 789), (671, 755))}
 blocks = [{'poly': P([(fl, 377), (fr, 377), (br, 348), (bl, 348)]), 'h': 999} for (fl, fr), (bl, br) in TLEG.values()]
 TM = json.loads((TD / 'tables.json').read_text())
@@ -72,4 +84,8 @@ if len(sys.argv) > 1:   # 확인 그림: 걷는 바닥(초록), 막힘(빨강), 
         d.ellipse((s['x'] - 6, s['y'] - 6, s['x'] + 6, s['y'] + 6), fill=c, outline=(0, 0, 0, 255))
         if 'chair' not in s: d.text((s['x'] - 20, s['y'] + 8), s['id'], fill=(0, 0, 0, 255))
     d.rectangle((504 * K, 131 * K, 566 * K, 285 * K), outline=(255, 0, 255, 255), width=3)
-    Image.alpha_composite(b, ov).convert('RGB').save(sys.argv[1])
+    out = Image.alpha_composite(b, ov)
+    for o in objects:   # 게임처럼 테이블 그림을 위에 다시 그려 깊이를 보이게
+        t = Image.open(OUT / o['file']).convert('RGBA'); t = t.resize((t.width * K, t.height * K), Image.NEAREST)
+        out.alpha_composite(t, (o['x'], o['y']))
+    out.convert('RGB').save(sys.argv[1])
