@@ -115,7 +115,7 @@ function atkSeq(id?: Json, heavy?: Json) {
 const P0 = () => ({ x: 420, y: 580, z: 0, vz: 0, face: 1, mode: 'ground', combat: false, armed: false, clip: null, pvx: 0, pvy: 0, pdec: 0,
             jumps: 0, airAtk: false, airVX: 230, takeoff: 0, spin: 0, buf: null, chainT: 0, combo: 0, stunT: 0, idleT: 0, lastTap: {}, runLatch: false,
             hp: 100, sp: 0, heat: 0, overT: 0, lastShot: 0, chargeShown: 0, armorT: 0, inv: 0, charge: 0,
-            dodgeN: 2, dodgeMax: 2, dodgeCd: 0.8, dodgeT: 0, maxJumps: 2, skillN: 1, wakeDelay: 0.6, downAt: -9, wakeBuf: null, ghostT: 0, dying: false, t: 0, buffT: 0, vanish: null, cd: {}, seat: null });
+            dodgeN: 2, dodgeMax: 2, dodgeCd: 0.8, dodgeT: 0, maxJumps: 2, skillN: 1, wakeDelay: 0.6, downAt: -9, wakeBuf: null, ghostT: 0, dying: false, t: 0, buffT: 0, vanish: null, cd: {}, seat: null, nude: false });
 let P: PState = P0() as PState;
 let zoom = 0;
 let paused = false, hitstop = 0, shake = 0, flash = 0, dark = 0, cut = 0;
@@ -878,7 +878,9 @@ function land() {
 function takeHit(kind?: Json) {
   if (P.mode === 'dead') return;
   if (P.mode === 'air') { P.airAtk = false; P.spin = 0; }
+  if (P.scene === '샤워') P.scene = null;   // 샤워 중 맞음(11-02): 샤워 규칙 재생을 끊고 맨몸 피격으로
   if (P.inv > 0) { fx.push({ k: 'num', x: P.x, y: P.y - 230, v: '회피', t: 0.6 }); if (P.dodging) env.perk?.evaded(); return; }
+  if (P.nude && has('SH_G')) return nudeHit(kind);   // 맨몸(샤워 뒤 옷 입기 전): SH_H1~H5
   if (P.mode === 'down' || P.mode === 'belly') return flinch();   // 누운 채 맞음 → 움찔(43)
   if (P.mode === 'block') { sfx('guard'); shake = 4; if (!vfx('guard_block', P.x + P.face * 50 * K(P.y), P.y - 140 * K(P.y), 2.2, { flip: P.face < 0 })) sparks(P.x + P.face * 50, P.y - 140, 8, false, '#9fd0ff'); pushP(-200, 1200); return; }
   if (armored()) { gainSp(5 * (P.hurtSp || 1)); sfx('armor'); P.armorT = 0.28; P.armorC = ''; hitstop = 0.06; shake = 6; return; }
@@ -905,6 +907,17 @@ function flinch() {   // 누운 채 맞음: 움찔했다 다시 누워 숨쉬기
   const crawling = P.mode === 'belly';
   play('43', { seq: S(R(0, nOf('43') - 1), 0.07), onEnd: () => { if (P.mode === 'down' || P.mode === 'belly') { if (crawling) belly(); else lieLoop(); } } });
 }
+// 맨몸 피격(11-02, 샤워 중 맞음): 약 = 배/가슴 맞기(SH_H1/H2) → 경계 자세(SH_G) · 강 = 쓰러짐(SH_H3) → 누움(SH_H4 끝 장) · 누운 채 = 누워 맞기(SH_H4) · 일어나기 = SH_H5
+function nudeHit(kind?: Json) {
+  const heavy = kind === 'knock' || kind === 'push' || kind === 'launch';
+  flash = 0.05; P.combat = true; P.combo = 0; P.armed = false;
+  if (P.mode === 'down' || P.mode === 'belly') { shake = Math.max(shake, 4); sfx('hurt'); if (!has('SH_H4')) return; P.mode = 'down'; play('SH_H4', { seq: S(R(0, nOf('SH_H4') - 1), 0.08), onEnd: nudeLie }); return; }
+  gainSp(10 * (P.hurtSp || 1)); sfx('hurt', { strength: heavy ? 2 : 1 }); shake = Math.max(shake, heavy ? 8 : 6);
+  if (heavy && has('SH_H3')) { pushP(-480, 700); P.mode = 'act'; P.knockT = 0; play('SH_H3', { seq: S(R(0, nOf('SH_H3') - 1), 0.08), onEnd: () => { dust(P.x, P.y, 6, 1.2); sfx('down'); nudeLie(); } }); return; }
+  const id = has('SH_H2') && Math.random() < 0.5 ? 'SH_H2' : 'SH_H1';
+  pushP(-280, 1400); act(id, { seq: [{ f: 0, d: 0.02 }, ...S(R(1, nOf(id) - 1), 0.06)] });
+}
+function nudeLie() { const id = has('SH_H4') ? 'SH_H4' : '19'; if (P.mode !== 'down') P.downAt = P.t; P.mode = 'down'; play(id, { seq: [{ f: nOf(id) - 1, d: 9 }], loopFrom: 0 }); }
 function die() {
   if (P.mode === 'dead') { P.mode = 'ground'; P.hp = 100; P.dying = false; return toIdle(); }   // 테스트룸: 다시 누르면 되살림
   const lying = P.mode === 'down' || P.mode === 'belly', id = lying ? '45' : '44';
@@ -923,7 +936,9 @@ function knock() {
   play('19', { seq: [...S(fall, 0.07).map((e?: Json, i?: Json) => i === dustAt ? { ...e, ev: 'dust' } : e), ...lp.map((f?: Json) => ({ f, d: lp.length <= 2 ? 0.6 : 0.3 }))], loopFrom: fall.length });
   P.knockT = fall.length * 0.07;
 }
-function getUp() { if (!has('20')) return toIdle(); sfx('wakeup'); P.knockT = 0; P.wakeExtra = 0; act('20', { seq: S(R(0, nOf('20') - 1), 0.06), onEnd: () => { P.wakeArmor = 0.6; afterBuf(toIdle); } }); }
+function getUp() {
+  if (P.nude && has('SH_H5')) { sfx('wakeup'); P.knockT = 0; P.wakeExtra = 0; act('SH_H5', { seq: S(R(0, nOf('SH_H5') - 1), 0.07), onEnd: () => { P.wakeArmor = 0.6; afterBuf(toIdle); } }); return; }
+  if (!has('20')) return toIdle(); sfx('wakeup'); P.knockT = 0; P.wakeExtra = 0; act('20', { seq: S(R(0, nOf('20') - 1), 0.06), onEnd: () => { P.wakeArmor = 0.6; afterBuf(toIdle); } }); }
 function belly() {
   if (!has('38')) return;
   if (P.mode === 'down' && (CH.turn19 || []).includes('38')) P.face = -P.face;   // 기기 첫 장이 누운 장과 좌우 반대로 그려짐 → 몸을 돌려 머리 자리 유지(10-28 이기석)
@@ -1001,7 +1016,7 @@ function runScene(steps?: Json, label?: Json) {
 function runShower(seconds?: Json, quiet?: Json) {   // quiet = 필드(본부 샤워실): 「머리감기」 글자 안 띄움
   const steps = showerPlan({ seconds: seconds || 600, seed: (Math.random() * 1e9) | 0, has });
   if (!steps.length) return;
-  P.seat = null; P.z = 0; P.combat = false; P.armed = false; P.mode = 'act'; P.scene = '샤워'; let i = 0;
+  P.seat = null; P.z = 0; P.combat = false; P.armed = false; P.mode = 'act'; P.scene = '샤워'; P.nude = true; let i = 0;
   const next = () => {
     if (P.scene !== '샤워') return;
     if (i >= steps.length) { P.scene = null; return toIdle(); }
@@ -1104,7 +1119,7 @@ function onPress(a?: Json) {
   }
   // 기상 지연: 바닥에 닿고 wakeDelay(0.6초) 동안은 못 일어난다. 그동안 누른 키는 기억했다가 끝나면 일어난다(10-30 사용자 「벌떡벌떡 일어나면 되냐」). 누운 동안 무적은 그대로
   if (m === 'down' && P.t - (P.downAt ?? -9) < P.wakeDelay + (P.wakeExtra || 0)) { if (a !== 'hit') P.wakeBuf = a; return; }
-  if (m === 'down') { if (a === 'crawl' || a === 'left' || a === 'right') return belly(); if (['jump', 'up', 'light', 'left', 'right', 'down', 'run'].includes(a)) return getUp(); return; }   // 누운 채 방향키·달리기도 일어나기(10-28: 쓰러진 뒤 「달리기가 안 됨」으로 보였음)
+  if (m === 'down') { if (a === 'crawl' || a === 'left' || a === 'right') return P.nude ? getUp() : belly(); if (['jump', 'up', 'light', 'left', 'right', 'down', 'run'].includes(a)) return getUp(); return; }   // 누운 채 방향키·달리기도 일어나기(10-28: 쓰러진 뒤 「달리기가 안 됨」으로 보였음)
   if (m === 'belly') { if (a === 'jump' || a === 'crawl' || a === 'up') return getUp(); return; }
   if (m === 'stun') { P.stunT -= 0.18; return; }
   if (m === 'sit' || m === 'scoot') { if (['sit', 'jump', 'left', 'right', 'up', 'run'].includes(a)) reverseOut('39', R(Math.max(0, sitLp()[0] - 1), 0), 0.05); return; }   // 주저앉은 채 방향키·점프도 일어나기
@@ -1254,15 +1269,15 @@ function update(dt?: Json) {
         const sp = (running ? 430 * (P.runMul || 1) : 230) * (P.dying ? 0.6 : 1) * (env.mod ? env.mod.speed() : 1);
         P.runT = running ? (P.runT || 0) + dt : 0;
         P.x += dx * sp * dt; P.y += dy * sp * 0.55 * dt;
-        const id = running && !P.dying && has('5') ? (has('5_1') ? '5_1' : '5') : '4';   // 5_1: 끝 장이 첫 장으로 닫힌 뛰기 반복(끝 장은 첫 장과 같아 뺌)
+        const id = P.nude && has('SH_B') ? 'SH_B' : running && !P.dying && has('5') ? (has('5_1') ? '5_1' : '5') : '4';   // 맨몸이면 맨몸 걷기(SH_B) · 5_1: 끝 장이 첫 장으로 닫힌 뛰기 반복(끝 장은 첫 장과 같아 뺌)
         const cyc = CH.cycle && CH.cycle[id];   // 끝→첫 장이 튀는 인물은 잘 이어지는 구간만 되풀이(10-29: 걷기·뛰기 뚝뚝 끊김)
-        if (!P.clip || P.clip.id !== id) id === '5_1' ? play(id, { seq: S(R(0, nOf(id) - 2), 1 / 15), loopFrom: 0 }) : cyc ? play(id, { seq: S(R(cyc[0] - 1, cyc[1] - 1), 1 / (id === '5' ? 15 : P.dying ? 7 : 11)), loopFrom: 0 }) : play(id, { fps: id === '5' ? 15 : P.dying ? 7 : 11, loopFrom: 0 });
+        if (!P.clip || P.clip.id !== id) id === 'SH_B' ? play(id, { fps: running ? 15 : 11, loopFrom: 0 }) : id === '5_1' ? play(id, { seq: S(R(0, nOf(id) - 2), 1 / 15), loopFrom: 0 }) : cyc ? play(id, { seq: S(R(cyc[0] - 1, cyc[1] - 1), 1 / (id === '5' ? 15 : P.dying ? 7 : 11)), loopFrom: 0 }) : play(id, { fps: id === '5' ? 15 : P.dying ? 7 : 11, loopFrom: 0 });
         if (id[0] === '5' && Math.random() < dt * 4) { if (!vfx('run_dust', P.x - P.face * 24, P.y + 2, 2 * K(P.y), { flip: P.face < 0, bottom: true }))   // 먼지 밑동을 발 높이에(10-28: 발보다 한참 밑에 생김)
            dust(P.x - P.face * 20, P.y, 1, 0.6); }
         const sf = curF(), n = nOf(id); if (sf !== P.stepF && (sf === 1 || sf === (n >> 1) + 1)) sfx('step'); P.stepF = sf;
         P.idleT = 0;
       } else {
-        const id = P.armed ? restId() : P.combat ? idleId() : '1';
+        const id = P.nude && has('SH_G') ? 'SH_G' : P.armed ? restId() : P.combat ? idleId() : '1';
         if (!P.clip || P.clip.id !== id) {
           if (id === 'W') play('W', { seq: [{ f: PK('weapon', 'W'), d: 9 }], loopFrom: 0 });
           else { const lp = LP(id) || R(0, nOf(id) - 1); const d = id === '1' ? Math.max(0.25, Math.min(0.6, 1.2 / lp.length)) * (P.dying ? 0.75 : 1) : id === 'W_1' ? 0.2 : 1 / 7; play(id, { seq: S(lp, d), loopFrom: 0 }); }
@@ -1663,6 +1678,8 @@ function drawCut() {
     knock, hit, stun, die, sitAt, rise, seatAct, runScene, runShower, playLife, lifeIds, emote, act, toIdle, has, nOf, SCENES,
     /** 샤워 규칙 재생 중인가 (fighter/player.ts 샤워 자리) */
     get showering() { return P.scene === '샤워'; },
+    get nude() { return !!P.nude; },
+    dress() { P.nude = false; if (P.clip && typeof P.clip.id === 'string' && P.clip.id.startsWith('SH_') && P.mode === 'ground') P.clip = null; },
     /** 퍽 손잡이 (fighter/player.ts 가 PerkHost 로 묶음) */
     perkApi: { proxies, hit: perkHit, boom: perkBoom, ghost: ghostAttack, replaySkill, reflect: reflectShot, mark: markT, bind: bindT, later: (t: number, fn: () => void) => later(t, fn), text: (x: number, y: number, v: string) => fx.push({ k: 'num', x: x - 30, y, v, t: 1.1 }), gainSp: (v: number) => { P.sp = Math.min(100, P.sp + v); }, vfx: (n: string, x: number, y: number, s: number, o: Json = {}) => vfx(n, x, y, s, o) },
     /** 시험장 전용 스위치: 필살 게이지 무시 */

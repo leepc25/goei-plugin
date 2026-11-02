@@ -144,7 +144,7 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
   /** 주인공이 쓰는 샤워 자리(spot id). 샤워가 끝나면 비운다 (물·김은 이 자리에만) */
   let showerSpot: string | null = null;
   let curWorld: WorldView | null = null;
-  type ShowerPlayer = { shower?(x: number, y: number, face: 1 | -1): boolean; showering?: boolean; art?: { key: string } };
+  type ShowerPlayer = { shower?(x: number, y: number, face: 1 | -1): boolean; showering?: boolean; nude?: boolean; dress?(): void; art?: { key: string } };
   /** 이 장면에서 걸은 거리 (px). 필드 시계가 쓴다 */
   let walked = 0;
   let lastX: number | null = null;
@@ -455,6 +455,7 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
       if (sitChair && !(a.world.player as Player).seat && !(a.world.player as { sitting?: boolean }).sitting) sitChair = null;
       curWorld = a.world;
       if (showerSpot && !(a.world.player as ShowerPlayer).showering) showerSpot = null;
+      { const pl = a.world.player as ShowerPlayer; if (pl.nude && !PAINTED[scene?.painted ?? '']?.showers) pl.dress?.(); }   // 샤워실을 나가면 옷 입음
       if (host.life && scene) {
         host.life.tick(1 / 30, { scene: scene.id, x: a.world.player.x, y: a.world.player.y, seat: sitChair ? scene.boxes.indexOf(sitChair) : null });
         // 주인공 공격이 행위자에게 닿았나 (필드 행위자는 전투 몸이 아니라 따로 본다)
