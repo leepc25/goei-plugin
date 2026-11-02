@@ -732,6 +732,18 @@ export class WorldSim {
     for (const name of s.follow) this.setFollow(name, 'follow');
     for (const name of s.nude ?? []) this.setNude(name, true);
   }
+  /** 입장 예열 (11-02 사용자 「입장하는 순간 옳은 자리에 있어야지, 한 번에 생겨서 우르르 가는 게 아니라」):
+   *  주인공 없이 세계를 sec초만큼 조용히 돌려 근무형은 자리에, 요원은 제 일 하는 자리에 가 있게 한다. 그동안 생긴 사건·말풍선은 버린다 */
+  warmup(sec: number, hour: number | null): void {
+    const dt = 0.25;
+    // 시각을 매 틱 넘겨야 근무표(주간·야간)가 맞게 돈다. 보이는 장면은 없음(scene '') → 거리·로비는 즉시 채워진다
+    for (let t = 0; t < sec; t += dt) this.step(dt, hour == null ? undefined : { scene: '', x: 0, hour });
+    this.player = null;
+    this.events.length = 0;
+    for (const a of this.actors) { a.say = undefined; a.sayT = 0; a.iconT = 0; }
+    this.time = 0;
+    this.trail = [];
+  }
   /** 행위자 말풍선 (대사 연결이 부른다) */
   /** 머리 위 작은 말풍선 기호 (인물끼리 상호작용) */
   emote(a: Actor, icon: string, sec = 2): void {

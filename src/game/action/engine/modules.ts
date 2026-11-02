@@ -234,6 +234,8 @@ function hqAdapter(bridge: Partial<GameBridge> | undefined, ui: { chooseFloor: H
         const elapsedH = sv.clock != null && fieldClock.sec !== null ? (((fieldClock.sec - sv.clock) / 3600) % 24 + 24) % 24 : 0;
         sim.restore(sv, elapsedH);
       }
+      // 입장 예열(11-02): 보이기 전에 생활 3분치를 돌려 모두 제자리에 (근무형은 자리에, 요원은 하던 일에)
+      sim.warmup(180, fieldClock.sec === null ? null : (fieldClock.sec / 3600) % 24);
     }
     // 개발 도구·브라우저 시험: 세계를 들여다본다 (관찰 창과 같은 정보)
     if (sim) (globalThis as { __goeiWorld?: WorldSim }).__goeiWorld = sim;
