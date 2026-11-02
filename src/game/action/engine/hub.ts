@@ -629,10 +629,13 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
       }
       if (d.kind === 'elevator') {
         const here = scene.id;
-        const opts = view!.elevator.map((e) => ({ label: e.label, open: e.open, here: e.scene === here }));
+        // 같은 건물 층만 (관리국 본부·협회·백일몽, 11-02)
+        const bldg = view!.elevator.find((e) => e.scene === here)?.bldg;
+        const stops = view!.elevator.filter((e) => e.bldg === bldg);
+        const opts = stops.map((e) => ({ label: e.label, open: e.open, here: e.scene === here }));
         host.chooseFloor(opts, (i) => {
           if (i == null) return;
-          const e = view!.elevator[i];
+          const e = stops[i];
           if (!e?.open || e.scene === here) return;
           if (!scene?.painted) {
             host.sfx('ding');

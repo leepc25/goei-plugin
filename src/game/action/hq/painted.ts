@@ -274,6 +274,16 @@ for (const [k, m] of Object.entries(MAPEDIT_SCENES)) {
   PAINTED[k] = { ...base, ...m, doors: Object.keys(m.doors).length || !base ? m.doors : base.doors, lamps: m.lamps.length || !base ? m.lamps : base.lamps } as PaintedScene;
 }
 
+// 백일몽 본사(11-02): 15층 복도 = 13층 그림 그대로, 화장실·휴게실·탈의실·샤워실 = 관리국 그림·자리 그대로 (나가는 문만 map.ts에서 백일몽 쪽으로)
+PAINTED.by_f15 = PAINTED.by_f13;
+PAINTED.by_wc_m = PAINTED.wc;
+PAINTED.by_wc_f = PAINTED.wc3;
+PAINTED.by_lounge = PAINTED.lounge;
+PAINTED.by_shower_m = PAINTED.shower_m;
+PAINTED.by_shower_f = PAINTED.shower_f;
+PAINTED.by_bath_m = PAINTED.bath_m;
+PAINTED.by_bath_f = PAINTED.bath_f;
+
 /** 문 가운데 x */
 export const doorX = (scene: string, id: string) => {
   const d = PAINTED[scene].doors[id];

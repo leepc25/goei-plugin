@@ -53,6 +53,8 @@ export interface ElevatorStop {
   scene: string;
   door: string;
   open?: boolean;
+  /** 건물 (없으면 관리국 본부). 엘리베이터는 같은 건물 층끼리만 잇는다 */
+  bldg?: string;
 }
 /** 장면 종류 꼬리표 (인구·직무 규칙이 쓴다). 표에 없으면 kindOf가 이름으로 짐작 */
 export type PlaceKind = 'office' | 'corridor' | 'lobby' | 'lounge' | 'clinic' | 'restroom' | 'bathroom' | 'locker' | 'training' | 'garage' | 'cell' | 'street' | 'shop' | 'room';
@@ -85,7 +87,8 @@ export class PlaceGraph {
         if (d.to && this.scenes.has(d.to)) add({ from: s.id, exit: d.id, to: d.to, enter: d.toDoor ?? d.id, sec: 3 });
         for (const t of [d.up, d.down]) if (t && this.scenes.has(t)) add({ from: s.id, exit: d.id, to: t, enter: this.stairDoor(t) ?? d.id, sec: 20 });
         if (d.kind === 'elevator') {
-          for (const e of elevator) if (e.scene !== s.id && e.open !== false && this.scenes.has(e.scene)) add({ from: s.id, exit: d.id, to: e.scene, enter: e.door, sec: 30 });
+          const bldg = elevator.find((e) => e.scene === s.id)?.bldg;
+          for (const e of elevator) if (e.scene !== s.id && e.bldg === bldg && e.open !== false && this.scenes.has(e.scene)) add({ from: s.id, exit: d.id, to: e.scene, enter: e.door, sec: 30 });
         }
       }
     }

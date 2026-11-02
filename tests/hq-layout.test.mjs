@@ -7,7 +7,7 @@ import { build } from 'esbuild';
 const out = await build({ stdin: { contents: `export * from './src/game/action/hq/map'; export { insideProp } from './src/game/action/engine/propBlock'; import { PAINTED } from './src/game/action/hq/painted'; export const PAINTED_DOORS = (id) => PAINTED[id].doors;`, resolveDir: '.', loader: 'ts' }, bundle: true, format: 'esm', target: 'es2022', write: false });
 const M = await import(`data:text/javascript;base64,${Buffer.from(out.outputFiles[0].text).toString('base64')}`);
 const byId = M.SCENE_BY_ID;
-const fresh = M.HQ_SCENES.filter((s) => !s.legacy && !s.id.startsWith('jr_') && s.id !== 'street');   // 바깥 거리(11-02 그림 장면)는 본부 건물 밖
+const fresh = M.HQ_SCENES.filter((s) => !s.legacy && !s.id.startsWith('jr_') && !s.id.startsWith('by_') && s.id !== 'street');   // by_ = 백일몽 본사(11-02)   // 바깥 거리(11-02 그림 장면)는 본부 건물 밖
 const JR = ['jr_entry', 'jr_b1', 'jr_alley', 'jr_b2', 'jr_daebak', 'jr_heolgap', 'jr_youngchang', 'jr_songil', 'jr_jinryo', 'jr_op'];
 const solid = (sc) => sc.boxes.filter((b) => b.solid).map((b) => ({ x: b.x, y: b.y, w: b.w, back: b.d + 6, front: 8 }));
 
@@ -82,4 +82,21 @@ test('본부: 집기는 걷는 띠 안, 들어오는 자리·쓰는 자리는 �
       assert.ok(d.x > 0 && d.x < sc.length, `${sc.id} 문 ${d.id} 장면 밖`);
     }
   }
+});
+
+// 백일몽 본사(11-02): 13층·15층 복도는 같은 그림, 문은 서로 이어지고 엘리베이터는 백일몽 층끼리만
+test('백일몽: 13·15층 문 연결과 엘리베이터 건물 구분', () => {
+  const BY = M.HQ_SCENES.filter((s) => s.id.startsWith('by_'));
+  assert.ok(BY.length >= 11);
+  for (const sc of BY) for (const d of sc.doors) {
+    if (!d.to) continue;
+    const to = byId[d.to]; assert.ok(to, `${sc.id}.${d.id} → ${d.to}`);
+    assert.ok(to.doors.some((x) => x.id === d.toDoor), `${sc.id}.${d.id} → ${d.to}.${d.toDoor}`);
+    const back = to.doors.find((x) => x.id === d.toDoor);
+    if (back.to) assert.equal(back.to, sc.id, `${d.to}.${d.toDoor} 돌아오기`);
+  }
+  assert.equal(byId.by_f13.painted, 'by_f13'); assert.equal(byId.by_f15.length, byId.by_f13.length);
+  const by = M.ELEVATOR.filter((e) => e.bldg === 'by').map((e) => e.scene).sort();
+  assert.deepEqual(by, ['by_f13', 'by_f15']);
+  assert.ok(byId.by_f15.doors.find((d) => d.id === 'rest').locked);
 });

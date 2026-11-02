@@ -13,7 +13,9 @@ export type SceneId =
   | 'street' | 'pasta' | 'lobby' | 'swat' | 'f2' | 'f3' | 'office' | 'interview' | 'lounge' | 'wc' | 'wc3'
   | 'b1' | 'edu' | 'training' | 'clinic' | 'b2' | 'b3' | 'tooth' | 'bath_f' | 'bath_m' | 'shower_f' | 'shower_m'
   | 'jr_entry' | 'jr_b1' | 'jr_alley' | 'jr_b2'
-  | 'jr_daebak' | 'jr_heolgap' | 'jr_youngchang' | 'jr_songil' | 'jr_jinryo' | 'jr_op';
+  | 'jr_daebak' | 'jr_heolgap' | 'jr_youngchang' | 'jr_songil' | 'jr_jinryo' | 'jr_op'
+  | 'by_f13' | 'by_wc_m' | 'by_wc_f' | 'by_lounge' | 'by_office'
+  | 'by_f15' | 'by_elite' | 'by_shower_m' | 'by_shower_f' | 'by_bath_m' | 'by_bath_f';
 
 export type DoorKind = 'main' | 'door' | 'glass' | 'steel' | 'security' | 'elevator' | 'stairs_up' | 'stairs_down' | 'stairs' | 'shop' | 'slide' | 'cell' | 'exit';
 export interface HqDoor {
@@ -86,7 +88,7 @@ export interface HqScene {
   id: SceneId;
   /** 들어갈 때 잠깐 뜨는 제목 */
   name: string;
-  floor: 'out' | '1F' | '2F' | '3F' | 'B1' | 'B2' | 'B3';
+  floor: 'out' | '1F' | '2F' | '3F' | 'B1' | 'B2' | 'B3' | '13F' | '15F';
   /** 층 배경 그림 (hq/painted.ts 열쇠). 그림이 있으면 색 상자 대신 그림으로 그린다 */
   painted?: string;
   length: number;
@@ -241,6 +243,33 @@ export const HQ_SCENES: HqScene[] = [
   floorHall('shower_m', '탈의실(남)', 'B1', [{ id: 'out', kind: 'exit', side: 'S', to: 'b1', toDoor: 'shower_m', label: '나가기' }, { id: 'shower', kind: 'exit', to: 'bath_m', toDoor: 'out', label: '샤워실' }], { sex: '남', lockers: LOCKERS.shower_m, spots: lockerSpots('shower_m') }),
   floorHall('bath_f', '샤워실(여)', 'B1', [{ id: 'out', kind: 'exit', to: 'shower_f', toDoor: 'bath', label: '탈의실' }], { sex: '여', showers: showerSpots('bath_f') }),
   floorHall('bath_m', '샤워실(남)', 'B1', [{ id: 'out', kind: 'exit', to: 'shower_m', toDoor: 'shower', label: '탈의실' }], { sex: '남', showers: showerSpots('bath_m') }),
+  // ── 백일몽 본사 (11-02 사용자 13:48 「일단 이걸로 픽스, 따고 상호작용 연결. 화장실이랑 휴게실은 관리국거 일단 쓰고」, tools/mapedit/author_by_f13.py) ──
+  // 13층 복도: 서→동 화장실(남) · 화장실(여) · 일반조 사무실 유리 양문 · 엘리베이터 · 휴게실(커피잔 표지 문). 화장실·휴게실 안은 관리국 그림 그대로
+  floorHall('by_f13', '백일몽 13층', '13F', [
+    { id: 'wc_m', kind: 'door', to: 'by_wc_m', toDoor: 'out', label: '화장실(남)' },
+    { id: 'wc_f', kind: 'door', to: 'by_wc_f', toDoor: 'out', label: '화장실(여)' },
+    { id: 'office', kind: 'glass', to: 'by_office', toDoor: 'out', label: '일반조 사무실' },
+    { id: 'elev', kind: 'elevator' },
+    { id: 'rest', kind: 'door', to: 'by_lounge', toDoor: 'out', label: '휴게실' },
+  ]),
+  floorHall('by_wc_m', '화장실(남)', '13F', [{ id: 'out', kind: 'exit', side: 'S', to: 'by_f13', toDoor: 'wc_m', label: '나가기' }], { toilets: PAINTED.by_wc_m?.toilets, sex: '남' }),
+  floorHall('by_wc_f', '화장실(여)', '13F', [{ id: 'out', kind: 'exit', side: 'S', to: 'by_f13', toDoor: 'wc_f', label: '나가기' }], { toilets: PAINTED.by_wc_f?.toilets, sex: '여' }),
+  floorHall('by_lounge', '휴게실', '13F', [{ id: 'out', kind: 'exit', to: 'by_f13', toDoor: 'rest', label: '나가기' }], { spots: MAPEDIT_SPOTS.lounge }),
+  // 사무실 안은 관리국 사무실 그대로(사용자 13:50 「일반조랑 정예팀 사무실 쓰게 관리국 사무실」). 금색 톤 그림은 고른 뒤 바꾼다
+  room({ id: 'by_office', name: '일반조 사무실', floor: '13F', look: 'office', doors: [exitS('by_f13', 'office', 'office')] }, 'office'),
+  // 15층(사용자 13:50 「아래층거 그대로 써도」): 13층 복도 그림 그대로. 남·여 문 = 샤워실(관리국 탈의실·샤워실), 유리 양문 = 정예팀 사무실, 커피잔 문은 잠금
+  floorHall('by_f15', '백일몽 15층', '15F', [
+    { id: 'wc_m', kind: 'door', to: 'by_shower_m', toDoor: 'out', label: '샤워실(남)' },
+    { id: 'wc_f', kind: 'door', to: 'by_shower_f', toDoor: 'out', label: '샤워실(여)' },
+    { id: 'office', kind: 'glass', to: 'by_elite', toDoor: 'out', label: '정예팀 사무실' },
+    { id: 'elev', kind: 'elevator' },
+    { id: 'rest', kind: 'door', locked: true, label: '잠긴 문' },
+  ]),
+  room({ id: 'by_elite', name: '정예팀 사무실', floor: '15F', look: 'office', doors: [exitS('by_f15', 'office', 'office')] }, 'office'),
+  floorHall('by_shower_f', '탈의실(여)', '15F', [{ id: 'out', kind: 'exit', side: 'S', to: 'by_f15', toDoor: 'wc_f', label: '나가기' }, { id: 'bath', kind: 'exit', to: 'by_bath_f', toDoor: 'out', label: '샤워실' }], { sex: '여', lockers: LOCKERS.shower_f, spots: lockerSpots('shower_f') }),
+  floorHall('by_shower_m', '탈의실(남)', '15F', [{ id: 'out', kind: 'exit', side: 'S', to: 'by_f15', toDoor: 'wc_m', label: '나가기' }, { id: 'shower', kind: 'exit', to: 'by_bath_m', toDoor: 'out', label: '샤워실' }], { sex: '남', lockers: LOCKERS.shower_m, spots: lockerSpots('shower_m') }),
+  floorHall('by_bath_f', '샤워실(여)', '15F', [{ id: 'out', kind: 'exit', to: 'by_shower_f', toDoor: 'bath', label: '탈의실' }], { sex: '여', showers: showerSpots('by_bath_f'), spots: MAPEDIT_SPOTS.bath_f }),
+  floorHall('by_bath_m', '샤워실(남)', '15F', [{ id: 'out', kind: 'exit', to: 'by_shower_m', toDoor: 'shower', label: '탈의실' }], { sex: '남', showers: showerSpots('by_bath_m'), spots: MAPEDIT_SPOTS.bath_m }),
   room({ id: 'training', name: '훈련장', floor: 'B1', look: 'lab', doors: [exitS('b1', 'training', 'training')] }, 'training'),
   // 지하 2층은 새 본부 그림(PixelLab 11-01, game-src/mapedit/b2): 서→동 격리시설 방폭문 · 격리팀 사무실(의무실·연구실) · 엘리베이터. 심문실·창고 없음(본부 최소화)
   floorHall('b2', '격리 구역', 'B2', [
@@ -290,13 +319,17 @@ export const HQ_SCENES: HqScene[] = [
 export const SCENE_BY_ID = Object.fromEntries(HQ_SCENES.map((s) => [s.id, s])) as Record<SceneId, HqScene>;
 
 /** 엘리베이터 층 단추 (위에서 아래로) */
-export const ELEVATOR: { floor: HqScene['floor']; label: string; scene: SceneId; door: string; needs?: PlaceId }[] = [
+/** bldg = 건물(없으면 관리국 본부). 엘리베이터는 같은 건물 층만 고른다 (11-02 협회·백일몽) */
+export const ELEVATOR: { floor: HqScene['floor']; label: string; scene: SceneId; door: string; needs?: PlaceId; bldg?: string }[] = [
   { floor: '3F', label: '3', scene: 'f3', door: 'elev' },
   { floor: '2F', label: '2', scene: 'f2', door: 'elev' },
   { floor: '1F', label: '1', scene: 'lobby', door: 'elev' },
   { floor: 'B1', label: 'B1', scene: 'b1', door: 'elev' },
   { floor: 'B2', label: 'B2', scene: 'b2', door: 'elev' },
   { floor: 'B3', label: 'B3', scene: 'b3', door: 'elev' },
+  // 백일몽 본사: 13층·15층 (1층 로비 그림은 아직 장면 없음)
+  { floor: '15F', label: '15', scene: 'by_f15', door: 'elev', bldg: 'by' },
+  { floor: '13F', label: '13', scene: 'by_f13', door: 'elev', bldg: 'by' },
 ];
 
 /** 메뉴 「장소로 가기」·장소 id → 그 장면과 서 있을 자리 */

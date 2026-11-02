@@ -1,0 +1,106 @@
+{
+ "file": "by_f13",
+ "bgScale": 2,
+ "w": 2896,
+ "h": 848,
+ "under": false,
+ "floor": [
+  [
+   0,
+   660
+  ],
+  [
+   2896,
+   660
+  ],
+  [
+   2896,
+   848
+  ],
+  [
+   0,
+   848
+  ]
+ ],
+ "lane": [
+  660,
+  836
+ ],
+ "blocks": [],
+ "doors": {
+  "wc_m": {
+   "kind": "door",
+   "x": 252,
+   "y": 670,
+   "label": "화장실(남)",
+   "door": {
+    "x0": 166,
+    "x1": 340,
+    "y0": 244,
+    "y1": 656,
+    "behind": "dark",
+    "anim": "none"
+   }
+  },
+  "wc_f": {
+   "kind": "door",
+   "x": 800,
+   "y": 670,
+   "label": "화장실(여)",
+   "door": {
+    "x0": 714,
+    "x1": 886,
+    "y0": 240,
+    "y1": 656,
+    "behind": "dark",
+    "anim": "none"
+   }
+  },
+  "office": {
+   "kind": "glass",
+   "x": 1442,
+   "y": 670,
+   "label": "일반조 사무실",
+   "door": {
+    "x0": 1278,
+    "x1": 1604,
+    "y0": 236,
+    "y1": 654,
+    "behind": "dark",
+    "anim": "none"
+   }
+  },
+  "elev": {
+   "kind": "elevator",
+   "x": 2118,
+   "y": 670,
+   "label": "엘리베이터",
+   "door": {
+    "x0": 2000,
+    "x1": 2236,
+    "y0": 254,
+    "y1": 654,
+    "behind": "car",
+    "anim": "slide2",
+    "seam": 2118
+   }
+  },
+  "rest": {
+   "kind": "door",
+   "x": 2636,
+   "y": 670,
+   "label": "휴게실",
+   "door": {
+    "x0": 2546,
+    "x1": 2726,
+    "y0": 236,
+    "y1": 656,
+    "behind": "dark",
+    "anim": "none"
+   }
+  }
+ },
+ "lamps": [],
+ "spots": [],
+ "objects": []
+}
