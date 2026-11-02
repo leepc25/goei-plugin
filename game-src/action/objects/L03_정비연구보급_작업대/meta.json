@@ -1,0 +1,86 @@
+{
+ "object_id": "4c9e28b5-985a-4eaa-a54b-15d201baa435",
+ "job": {
+  "usage": {
+   "type": "usd",
+   "usd": 0.041626971049414735
+  },
+  "id": "e0b3e919-844b-489d-9cbe-c8e5db4d0c95",
+  "status": "completed",
+  "created_at": "2026-11-02T10:22:40.103804+00:00",
+  "last_response": {
+   "status": "completed",
+   "progress": 1,
+   "object_id": "4c9e28b5-985a-4eaa-a54b-15d201baa435",
+   "image_size": {
+    "width": 256,
+    "height": 256
+   },
+   "frame_count": 1,
+   "single_frame": true,
+   "storage_urls": {
+    "unknown": "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4c9e28b5-985a-4eaa-a54b-15d201baa435/rotations/unknown.png"
+   },
+   "billing_usage": {
+    "usd": 0.041626971049414735,
+    "type": "usd"
+   },
+   "generation_id": "d49cdb9c-50c1-452c-bc4b-ecf0fa5825f3",
+   "billing_stages": [
+    {
+     "stage": "first_direction",
+     "usage": {
+      "usd": 0.041626971049414735,
+      "type": "usd"
+     },
+     "generation_id": "d49cdb9c-50c1-452c-bc4b-ecf0fa5825f3"
+    }
+   ],
+   "billing_charged": true,
+   "generation_mode": "pro_flash",
+   "source_image_id": "5fb65c45-bbf4-5694-b3f6-57f9e7d5b8b4",
+   "directions_count": 1,
+   "first_direction_generated": true
+  }
+ },
+ "object": {
+  "id": "4c9e28b5-985a-4eaa-a54b-15d201baa435",
+  "name": "L03_정비연구보급_작업대",
+  "state_name": "base",
+  "prompt": "An equipment research and maintenance workbench with supply crates: a plain rectangular steel workbench with a flat steel top, on it a half-taken-apart rifle, a strange glowing device opened up under a magnifying lamp, thin cables running from the device to a small switched-on diagnostic monitor, a toolbox and a few hand tools. Behind the workbench stands a steel pegboard panel with hanging tools and a rack holding two rifles upright. Beside one end of the workbench, a neat stack of olive-green supply crates and two small ammunition boxes. The monitor faces the viewer, its lit screen fully visible. Seen almost straight from the front, from the eye height of a standing adult, looking only a little down: the workbench top shows as a thin band, much thinner than the front of the workbench. The workbench is much wider than it is tall and fills almost the whole width of the canvas. Only the workbench with the things on it, the pegboard and the crates, centered, nothing else.",
+  "size": {
+   "width": 256,
+   "height": 256
+  },
+  "directions": 1,
+  "created_at": "2026-11-02T10:22:40.128870+00:00",
+  "view": "low top-down",
+  "rotation_urls": {
+   "south": null,
+   "west": null,
+   "east": null,
+   "north": null,
+   "south-east": null,
+   "south-west": null,
+   "north-east": null,
+   "north-west": null
+  },
+  "storage_urls": {
+   "unknown": "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/4c9e28b5-985a-4eaa-a54b-15d201baa435/rotations/unknown.png"
+  },
+  "frame_urls": null,
+  "style_settings": {
+   "version": "v2.0.0+api",
+   "no_background": true,
+   "generation_mode": "pro_flash",
+   "source_image_id": "5fb65c45-bbf4-5694-b3f6-57f9e7d5b8b4",
+   "first_frame_direction": "south"
+  },
+  "tags": [],
+  "status": "completed",
+  "group_id": "ae025dd1-1c6b-44b7-9ed6-06c8a14aaead",
+  "progress_percent": null,
+  "eta_seconds": null,
+  "animations": []
+ }
+}

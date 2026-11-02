@@ -5,11 +5,11 @@ from PIL import Image, ImageDraw, ImageFilter
 import numpy as np
 D='game-src/action/objects/'
 FOOT=int(os.environ.get('FOOT',332))   # 발끝 y(1배). 벽 밑선 ≈299
-XS=[int(v) for v in os.environ.get('XS','665,880').split(',')]  # 캔버스 왼쪽 x
+XS=[int(v) for v in os.environ.get('XS','665,880,440').split(',')]  # 캔버스 왼쪽 x
 SHC,SHA,SD=(20,26,38),120,14           # 사무실 책상 그림자 값 그대로
 bg=Image.open('game-src/art/pixellab-hq-20261031/hq_b2_lab_p20_1703x424.png').convert('RGBA')
 items=[]
-for x,p in zip(XS,['L01v4_고그니쟈_실험책상','L02v2_데쥬레_실험책상']):
+for x,p in zip(XS,['L01v4_고그니쟈_실험책상','L02v2_데쥬레_실험책상','L03_정비연구보급_작업대']):
     im=Image.open(D+p+'/unknown.png').convert('RGBA'); a=np.array(im)[:,:,3]>0
     f=np.where(a.any(1))[0][-1]; items.append((im,x,FOOT-f))
 if os.environ.get('SHADOW','1')=='1':
@@ -19,4 +19,4 @@ if os.environ.get('SHADOW','1')=='1':
         m=m.filter(ImageFilter.GaussianBlur(3)); lay=Image.new('RGBA',bg.size,SHC+(0,)); lay.putalpha(m); bg.alpha_composite(lay)
 for im,x,y in items: bg.alpha_composite(im,(x,y))
 bg.save('/tmp/lab_place.png')
-bg.crop((560,100,1240,424)).resize((1360,648),Image.NEAREST).save(os.environ.get('OUT','/mnt/project-files/hq-b2/lab_desks_place_v3_shadow_x2.png'))
+bg.crop((340,100,1240,424)).resize((1800,648),Image.NEAREST).save(os.environ.get('OUT','/mnt/project-files/hq-b2/lab_desks_place_v3_shadow_x2.png'))
