@@ -20,17 +20,21 @@ subprocess.run([sys.executable, str(R/'tools/objects/sdra_counter_sit_preview.py
 out = Image.open(tmp).convert('RGBA'); os.remove(tmp)
 # 2) 대기 의자
 BX, BY, BS = int(os.environ.get('BX', '1312')), int(os.environ.get('BY', '800')), float(os.environ.get('BS', '2.0'))  # 의자 가운데 x, 다리 바닥 y(2배 캔버스), 배율
-bench = Image.open(R/'game-src/action/objects/C05v5_대기의자_뒷모습/unknown.png').convert('RGBA')
-SEATS_X = [58.5, 125, 191]; BENCH_FLOOR = 130   # 좌석 등받이 가운데 x, 다리 바닥 y (1배)
+CV = os.environ.get('CV', 'v6')
+bench = Image.open(R/f'game-src/action/objects/C05{CV}_대기의자_뒷모습/unknown.png').convert('RGBA')
+# 의자별(1배): 좌석 가운데 x, 다리 바닥 y, 좌석 윗면 y. 사무의자 north 좌석 윗면 = 바닥 위 74
+GEO = {'v5': ([58.5, 125, 191], 130, 70), 'v6': ([81, 126, 171.5], 120, 74)}
+SEATS_X, BENCH_FLOOR, SEAT_TOP = GEO[CV]
+K = float(os.environ.get('K', 74/(BENCH_FLOOR-SEAT_TOP) if CV == 'v6' else 1.0))   # v6 은 작게 나와서 좌석 높이가 사무의자와 같게 키움   # 좌석 등받이 가운데 x, 다리 바닥 y (1배)
 C01_X, C01_FLOOR = 90.5, 172                    # C01 north 200 칸: 등받이 가운데 x, 바닥 y
 PEOPLE = os.environ.get('WHO', '1.4_에일린,1.9_데드폴,1.12_콘쥬스').split(',')
-bx0 = BX - bench.width*BS/2; by0 = BY - BENCH_FLOOR*BS
+BK = BS*K; bx0 = BX - bench.width*BK/2; by0 = BY - BENCH_FLOOR*BK
 L = Image.new('RGBA', out.size, (0, 0, 0, 0))
-SEAT_Y = BENCH_FLOOR - (172 - 101) + 14   # 사무의자 north 좌석 점(91,101). 좌석 윗면: 사무의자 바닥 위 74(98줄), 대기의자 바닥 위 60(70줄) → 14 낮춤 (12:30 사용자 「왜 이리 높아」)
+
 for sx, key in zip(SEATS_X, PEOPLE):
     im, (px0, py0), img = person_pt(key, 'back')
-    seat = (bx0 + sx*BS, by0 + SEAT_Y*BS)
+    seat = (bx0 + sx*BK, by0 + (SEAT_TOP + 3)*BK)   # 사무의자 좌석 점(91,101)은 좌석 윗면(98) 3 아래 → 이 의자도 좌석 윗면 3 아래
     L.alpha_composite(im.resize((round(im.size[0]*BS), round(im.size[1]*BS)), Image.NEAREST), (round(seat[0]-px0*BS), round(seat[1]-py0*BS)))
-L.alpha_composite(bench.resize((round(bench.width*BS), round(bench.height*BS)), Image.NEAREST), (round(bx0), round(by0)))
+L.alpha_composite(bench.resize((round(bench.width*BK), round(bench.height*BK)), Image.NEAREST), (round(bx0), round(by0)))
 out.alpha_composite(L)
 out.convert('RGB').save(OUT); print(OUT, out.size)
