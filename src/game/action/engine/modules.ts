@@ -49,7 +49,7 @@ import { DEF_BY_KIND, arenaStage, createEnemy, isThreat } from '../enemy';
 import { CUTSCENES, VIDEOS, mountStory, type AgentId, type StoryApi } from '../story';
 import { linkItems } from './itemsLink';
 import { makeHub, silhouette, type HubHost, type HubLife } from './hub';
-import { createHqWorld, hqDistrict } from '../../world/hq';
+import { createHqWorld, hqDistrict, RESIDENTS } from '../../world/hq';
 import { clampPainted, walkablePainted } from '../hq/painted';
 import { isRegionMove } from '../../world/districts';
 import { FACTION_NAMES, relationFrom } from '../../world/factions';
@@ -224,7 +224,7 @@ function hqAdapter(bridge: Partial<GameBridge> | undefined, ui: { chooseFloor: H
       // 새 대사 자료(game-src/dialogue2 → 대사 팩 dialogue): 인물·NPC 파일 단위로 받아 둔다. 팩이 없으면(시연판) 대사 없이 돈다
       dlg = new Dialogue2((file) => bridge?.assets ? bridge.assets.bytes('dialogue', file).catch(() => null) : Promise.resolve(null), sim.rng);
       chatter = new Chatter(sim, dlg, cueCtx);
-      void dlg.prefetch('named', present.map((p) => p.name));
+      void dlg.prefetch('named', [...present.map((p) => p.name), ...RESIDENTS.map((r) => r.name)]);
       void dlg.prefetch('mob', NPC_FILES);
       // 비전투 계열 캐릭터는 동행이어도 싸움을 거들지 않는다 (반응표 combat)
       sim.noAssist = (n) => reactOf(n)?.combat === false;

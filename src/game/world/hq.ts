@@ -2,7 +2,7 @@
 // 장소가 늘면 꼬리표·오가는 범위·보충 규칙을 여기(나중엔 게임 팩 JSON)에 더한다.
 import { WorldSim, type SimOptions, type SpawnRule } from './actors';
 import type { Post } from './mobs';
-import { PlaceGraph, type ElevatorStop, type PlaceScene } from './places';
+import { PlaceGraph, type ElevatorStop, type PlaceKind, type PlaceScene } from './places';
 import { mulberry32 } from './rng';
 import { streetSpawns } from './districts';
 
@@ -31,8 +31,32 @@ export const hqDistrict = (scene: string): string | null => hqBuilding(scene).di
 /** 장면 소속: 건물 안 = 그 건물 세력(관리국 A00·가짜 관리국 B00·백일몽 C00). 협회·중림·거리·가게는 없음 */
 export const hqSceneFaction = (scene: string): string | null => (hqInside(scene) ? hqBuilding(scene).faction : null);
 
+/** 상주 인물 (11-02 사용자 「건물마다 옳은 사람」): 카드 요원이 아닌 이름 인물이 사는 곳. 책상 주인은 장면 자리(owner/who)로 앉는다.
+ *  중림 가게 주인(위키·roster 역할), 협회 창구 직원, 가짜 관리국 검사부대·진압부대(책상 BY_DESK_OWNERS), 백일몽 일반팀·정예팀 */
+export const RESIDENTS: { name: string; scene: string; roam?: string[] }[] = [
+  { name: '문혜란', scene: 'jr_daebak' }, { name: '마덕희', scene: 'jr_heolgap' }, { name: '신유리', scene: 'jr_youngchang' },
+  { name: '고연지', scene: 'jr_jinryo', roam: ['jr_jinryo', 'jr_op'] }, { name: '윤지아', scene: 'jr_songil', roam: ['jr_songil', 'jr_jinryo'] },
+  { name: '서윤지', scene: 'sdra_counter' }, { name: '차여진', scene: 'sdra_counter' },
+  ...['이도형', '고영훈', '노기균', '송주익'].map((name) => ({ name, scene: 'fb_office' })),
+  ...['곽성주', '조성춘', '윤병수', '김성진', '송진섭'].map((name) => ({ name, scene: 'fb_swat' })),
+  ...['이자헌', '은하제', '박민성', '백사헌', '고영은', '강이학', '장허운'].map((name) => ({ name, scene: 'by_office' })),
+  ...['백석주', '진나솔', '이성해'].map((name) => ({ name, scene: 'by_elite' })),
+];
+/** 장면 종류 덮어쓰기: 가게 주인·창구 직원이 자기 자리에서 「일」을 하도록 사무실로 본다 (이름으로는 shop·room) */
+export const HQ_KINDS: Record<string, PlaceKind> = { sdra_counter: 'office', jr_daebak: 'office', jr_heolgap: 'office', jr_youngchang: 'office' };
+/** 손님 (11-02 사용자: 가게 4곳·협회 창구를 NPC가 실제로 이용): 들어와 빈 자리에 앉아 머물다 나간다 */
+const VISITS: { scene: string; n: number; mix: string[]; stay: [number, number] }[] = [
+  { scene: 'sdra_counter', n: 3, mix: ['프리랜서', '프리랜서', '행인'], stay: [40, 90] },
+  { scene: 'jr_songil', n: 2, mix: ['행인', '프리랜서'], stay: [60, 120] },
+  { scene: 'jr_daebak', n: 1, mix: ['프리랜서'], stay: [30, 70] },
+  { scene: 'jr_heolgap', n: 1, mix: ['프리랜서', '행인'], stay: [30, 70] },
+  { scene: 'jr_youngchang', n: 1, mix: ['프리랜서'], stay: [30, 70] },
+];
+
 /** 이름 인물이 오가는 장면 (10-31 사용자: 정해진 곳이 아니라 건물 전체). 자기 건물 안 장면 전부. 다친 사람(의무실에서 시작)·중림 가게 주인은 그 방에 묶인다 */
-export function hqRoam(graph: PlaceGraph, home: string): string[] {
+export function hqRoam(graph: PlaceGraph, home: string, name?: string): string[] {
+  const r = name ? RESIDENTS.find((q) => q.name === name)?.roam : undefined;
+  if (r) return r.filter((id) => graph.scene(id));
   if (/(^|_)(clinic|infirmary)$/.test(home) || home.startsWith('jr_')) return [home];
   const b = hqBuilding(home);
   return graph.ids().filter((id) => hqBuilding(id) === b && hqInside(id));
@@ -52,6 +76,11 @@ export function hqSpawns(graph: PlaceGraph): SpawnRule[] {
     const staff = ROLES[b.id]?.staff;
     // 협회 로비는 프리랜서(창구 손님)가 드나든다
     out.push({ scene: lobby.id, target: { day: 2, night: 0 }, refill: [6, 12], gates: [main], mix: b.id === 'sdra' ? ['행인', '프리랜서', '프리랜서'] : staff ? ['행인', staff] : ['행인'] });
+  }
+  for (const v of VISITS) {
+    const sc = graph.scene(v.scene);
+    if (!sc) continue;
+    out.push({ scene: v.scene, target: { day: v.n, night: 0 }, refill: [20, 45], gates: [sc.doors[0]?.x ?? 100], mix: v.mix, visit: v.stay });
   }
   return out;
 }
@@ -128,7 +157,9 @@ export function autoPosts(graph: PlaceGraph): Post[] {
     // 관리국 진압팀 = 진압팀원(관리국 요원)이 책상 일 (10-31 사용자)
     const archetype = /진압/.test(name) ? roles.fighter : roles[r.who];
     const gate = graph.scene(id)?.doors[0]?.x ?? 100;
-    out.push({ id: `auto-${id}`, archetype, scene: id, how: r.how, shifts: r.shifts, count: b.id === 'sdra' && r.who === 'fighter' ? 3 : r.per, gate });
+    // 협회 창구: 이름 직원 둘(서윤지·차여진) + 이름 없는 협회 직원 1 (clerk3). 협회 훈련장: 프리랜서 3
+    const count = id === 'sdra_counter' ? 1 : b.id === 'sdra' && r.who === 'fighter' ? 3 : r.per;
+    out.push({ id: `auto-${id}`, archetype, scene: id, how: r.how, shifts: r.shifts, count, gate });
   }
   return out;
 }
@@ -150,12 +181,14 @@ export function createHqWorld(
   has: (look: string, clip: string) => boolean = () => false,
   extra: Pick<SimOptions, 'stance' | 'playerFaction' | 'killOk' | 'relation' | 'namedHostile' | 'nav' | 'lineN'> = {},
 ): WorldSim {
-  const graph = new PlaceGraph(map.scenes, map.elevator);
+  const graph = new PlaceGraph(map.scenes, map.elevator, HQ_KINDS);
   const sim = new WorldSim(graph, mulberry32(seed), { spawns: hqSpawns(graph), posts: hqPosts(graph), has, sceneFaction: hqSceneFaction, ...extra });
-  for (const p of present) {
-    if (!graph.scene(p.scene)) continue;
-    // 부상(의무실)이면 침대 곁에만: 오가는 범위가 의무실 하나
-    sim.add({ id: `npc:${p.name}`, name: p.name, kind: 'named', brain: 'needs', home: p.scene, roam: hqRoam(graph, p.scene), look: p.name });
+  const names = new Set<string>();
+  for (const p of [...present, ...RESIDENTS.filter((r) => !present.some((q) => q.name === r.name))]) {
+    if (!graph.scene(p.scene) || names.has(p.name)) continue;
+    names.add(p.name);
+    // 부상(의무실)이면 침대 곁에만: 오가는 범위가 의무실 하나. 상주 인물은 자기 건물(가게 주인은 가게)
+    sim.add({ id: `npc:${p.name}`, name: p.name, kind: 'named', brain: 'needs', home: p.scene, roam: hqRoam(graph, p.scene, p.name), look: p.name });
   }
   return sim;
 }

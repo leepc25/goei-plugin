@@ -240,6 +240,8 @@ export interface SpawnRule {
   dens?: number;
   /** 원형 이름 목록 (뽑기) */
   mix: string[];
+  /** 손님(11-02 사용자: 중림 가게·협회 창구를 NPC가 실제로 이용): 들어와 빈 자리에 앉아 [최소, 최대]초 머문 뒤 나간다. 빈 자리가 없으면 지나간다 */
+  visit?: [number, number];
   /** 원형 바꿔치기 (11-02): mix·bands 의 원형 이름을 이 목록에서 다시 뽑는다 (한 번만). 중림 「행인」 → 프리랜서 위주 등, 거리마다 구성이 다를 때 */
   swap?: Record<string, string[]>;
   /** 밤(19:30~05시) 원형 목록. 없으면 mix */
@@ -3373,6 +3375,17 @@ export class WorldSim {
     if (!r.swap) return mix;
     return mix.flatMap((n) => r.swap![n] ?? [n]);   // 한 번만 (목록 안 이름은 다시 바꾸지 않는다)
   }
+  /** 손님: 빈 의자(대기 의자·손님 의자)로 가서 앉아 머문다. 끝나면 idle → 지나가는 이는 출구로 */
+  private visitSeat(a: Actor, stay: [number, number]): boolean {
+    const i = this.freeSeat(a.scene, a.x);
+    const st = i === null ? null : this.graph.scene(a.scene)?.seats?.[i];
+    if (i === null || !st) return false;
+    a.seatPick = i;
+    a.task = ACTIVITIES.find((t) => t.id === 'rest');
+    a.wait = range(this.rng, stay[0], stay[1]);
+    this.walkTo(a, { x: st.x, y: st.y }, '자리로', 'do');
+    return true;
+  }
   /** 한 명(또는 일행 둘) 들여보냄. 들어온 수 */
   private spawnOne(r: SpawnRule, playerX: number | null, anywhere: boolean, room = 1): number {
     const len = this.graph.scene(r.scene)?.length ?? 1280;
@@ -3388,6 +3401,7 @@ export class WorldSim {
     const a = this.add({ id: `mob${++serial}`, name, kind: 'mob', brain: 'transit', home: r.scene, archetype: name, look, speed: range(this.rng, 110, 170) }, { scene: r.scene, x: anywhere ? range(this.rng, MARGIN, len - MARGIN) : from, y: range(this.rng, top + 20, bot - 10) });
     if (a.temper) a.def.speed = (a.def.speed ?? WALK) * (0.85 + a.temper.haste * 0.35);
     a.exitAt = { x: to, y: range(this.rng, top + 20, bot - 10) };
+    if (r.visit && !anywhere && this.visitSeat(a, r.visit)) return 1;
     this.walkTo(a, a.exitAt, a.drunk ? '비틀거리며 지나감' : '지나가는 중', 'exit');
     // 일행: 친화가 높으면 가끔 아는 사람과 같이 들어와 나란히 걷는다 (시민·학생·직장인·불량배)
     const role = arch?.role;

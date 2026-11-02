@@ -205,6 +205,21 @@ function floorHall(id: SceneId, name: string, floor: HqScene['floor'], doors: Om
     sc.boxes = [...sc.boxes, ...chairBoxes];
     sc.spots = sc.spots.map((s) => (s.chair !== undefined ? { ...s, chair: base + s.chair } : s));
     sc.seats = chairBoxes.map((b, i) => ({ x: b.x, y: b.y, face: b.face, box: base + i, set: b.set }));
+    // 자리 주인(협회 창구 clerk1·2 = 서윤지·차여진, 11-02): 그 의자 자리에 owner → NPC 책상 일은 자기 자리 먼저
+    for (const s of sc.spots) {
+      const own = s.owner ?? s.who;
+      const st = s.chair !== undefined ? sc.seats.find((q) => q.box === s.chair) : undefined;
+      if (own && st) st.owner = own;
+    }
+    // 그림 의자가 없는 앉는 자리(대기 의자·손님 의자, 11-02): 빈 상자를 두어 NPC 손님 자리(seats)로도 쓴다
+    const extraSeats = sc.spots.filter((s) => s.seat && s.chair === undefined && s.act?.[0]?.startsWith('sit_'));
+    for (const s of extraSeats) {
+      const face: HqBox['face'] = s.act?.[0] === 'sit_back' ? 'N' : s.act?.[0] === 'sit_side' ? (s.face === -1 ? 'W' : 'E') : undefined;
+      sc.boxes.push({ kind: `seat:${s.id}`, x: s.seat!.x, w: 54, y: s.seat!.y, d: 20, h: 0, solid: false, face });
+      const box = sc.boxes.length - 1;
+      sc.spots = sc.spots.map((q) => (q === s ? { ...q, chair: box } : q));
+      sc.seats.push({ x: s.seat!.x, y: s.seat!.y, face, box, ...(s.owner ?? s.who ? { owner: s.owner ?? s.who } : {}) });
+    }
   } else {
     // 의자가 오브젝트 그림 안에 있는 방(11-02 사무실 책상): 앉는 자리마다 그리지 않는 빈 상자를 두어 NPC 자리(seats)·주인공 자리 겹침 검사가 같은 번호를 쓴다.
     // owner = 평소 앉는 사람(지도 spots.owner) → NPC 책상 일은 자기 책상 먼저 (world/actors.ts)
@@ -215,7 +230,7 @@ function floorHall(id: SceneId, name: string, floor: HqScene['floor'], doors: Om
       const chairOf = (s: HqSpot) => sc.boxes.findIndex((b) => !b.solid && Math.abs(b.x - s.seat!.x) < 30 && Math.abs(b.y - s.seat!.y) < 30);
       const boxIdx = deskSpots.map((s) => { const i = chairOf(s); if (i >= 0) { sc.boxes[i] = { ...sc.boxes[i], face: faceOf(s) }; return i; } sc.boxes.push({ kind: `seat:${s.id}`, x: s.seat!.x, w: 54, y: s.seat!.y, d: 20, h: 0, solid: false, face: faceOf(s) }); return sc.boxes.length - 1; });
       sc.spots = sc.spots.map((s) => { const i = deskSpots.indexOf(s); return i >= 0 ? { ...s, chair: boxIdx[i] } : s; });
-      sc.seats = deskSpots.map((s, i) => ({ x: s.seat!.x, y: s.seat!.y, face: faceOf(s), box: boxIdx[i], ...(s.owner ? { owner: s.owner } : {}) }));
+      sc.seats = deskSpots.map((s, i) => ({ x: s.seat!.x, y: s.seat!.y, face: faceOf(s), box: boxIdx[i], ...(s.owner ?? s.who ? { owner: s.owner ?? s.who } : {}) }));
     }
   }
   return sc;

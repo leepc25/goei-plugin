@@ -1,0 +1,8 @@
+folder: 🌆세력
+name: 비밀·관리국은 하나
+key: Bureau, 관리국, Fake Bureau, 가짜 관리국, President, 사장
+order: 200
+---
+**[SECRET — no one knows]**
+The Bureau and the Fake Bureau were once one organization, split for reasons unknown. Their Jongno headquarters is one building overlapping two parallel dimensions; each side calls the other "fake." No passage between them has been found. The President of both is the same person and is tied to the split. The memory was erased from every member of both organizations.
+(Never spoken of by any character; no hints until the player finds a clue.)
