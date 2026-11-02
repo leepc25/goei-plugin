@@ -105,3 +105,27 @@ test('백일몽: 13·15층 문 연결과 엘리베이터 건물 구분', () => {
   assert.deepEqual(owners('by_office'), ['이자헌', '은하제', '박민성', '백사헌', '고영은', '강이학', '장허운']);
   assert.deepEqual(owners('by_elite'), ['백석주', '진나솔', '이성해']); assert.equal(byId.by_elite.painted, 'office_riot');
 });
+
+// 가짜 관리국 본부(11-02 사용자 15:50): 관리국 본부 장면을 fb_ 로 그대로 복사, 이름만 종합대응팀 → 검사부대, 진압팀 → 진압부대
+test('가짜 관리국: 관리국 장면 복사·문 연결·엘리베이터·이름', () => {
+  const FB = M.HQ_SCENES.filter((s) => s.id.startsWith('fb_'));
+  assert.equal(FB.length, 20);
+  for (const sc of FB) {
+    const src = byId[sc.id.slice(3)];
+    assert.equal(sc.painted, src.painted, `${sc.id} 그림 = 관리국 그림`);
+    assert.ok(!/종합대응팀|진압팀/.test(sc.name + sc.doors.map((d) => d.label ?? '').join()), `${sc.id} 이름`);
+    for (const d of sc.doors) {
+      if (!d.to) continue;
+      assert.ok(d.to.startsWith('fb_'), `${sc.id}.${d.id} → ${d.to} 같은 건물`);
+      const back = byId[d.to].doors.find((x) => x.id === d.toDoor);
+      assert.ok(back, `${sc.id}.${d.id} → ${d.to}.${d.toDoor}`);
+      if (back.to) assert.equal(back.to, sc.id, `${d.to}.${d.toDoor} 돌아오기`);
+    }
+  }
+  assert.equal(byId.fb_office.name, '검사부대'); assert.equal(byId.fb_swat.name, '진압부대');
+  const owners = (id) => byId[id].spots.filter((p) => p.owner).map((p) => p.owner);
+  assert.deepEqual(owners('fb_office'), ['이도형', '고영훈', '노기균', '송주익']);
+  assert.deepEqual(owners('fb_swat'), ['곽성주', '조성춘', '윤병수', '김성진', '송진섭']);
+  assert.deepEqual(M.ELEVATOR.filter((e) => e.bldg === 'fb').map((e) => e.scene).sort(), ['fb_b1', 'fb_b2', 'fb_b3', 'fb_f2', 'fb_f3', 'fb_lobby']);
+  assert.ok(byId.fb_street.doors.some((d) => d.bus === '종로2가'));
+});
