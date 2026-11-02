@@ -224,6 +224,8 @@ export class FighterPlayer extends Player {
   skillMul = 1;
   /** 주인공 편 AI 몸 (동행, fighter/ai.ts side 'ally'): 주인공 전용 처리(영구 사망·보호막 퍽)를 받지 않는다 */
   allySide = false;
+  /** 자동전투(fighter/autoPilot.ts): 있으면 틱마다 사람 입력에 두뇌 입력을 섞는다 (엔진 modules 가 붙인다) */
+  auto: { apply(self: FighterPlayer, w: WorldView, pad: Pad): Pad } | null = null;
   get sortY() {
     // 지도 의자에 앉은 동안은 의자 발점(seat.cy)이 깊이: 맞춤값으로 몸이 위로 옮겨져도(사무실 뒷면 앉기 dy -29) 앞의 책상 그림 뒤로 숨지 않게 (11-02)
     const seat = this.coreSeat ? (this.core.P.seat as { cy?: number } | null) : null;
@@ -538,6 +540,7 @@ export class FighterPlayer extends Player {
     this.coreShowerStep(p);
     if (this.coreShower) { this.heldNames.clear(); this.core.frameView({ x0: w.camX, lane: w.lane }); this.sync(); return; } // 샤워 중엔 그만두기만
     if (this.coreSeat) { this.heldNames.clear(); this.core.frameView({ x0: w.camX, lane: w.lane }); this.sync(); return; } // 앉아 있는 동안은 일어나기만
+    if (this.auto) p = this.auto.apply(this, world, p);   // 자동전투: 앉기·샤워 중(위에서 돌아감)에는 안 섞는다
     if (this.phase !== 'down') this.input(p); // 쓰러지면 후송을 기다린다
     this.core.frameView({ x0: w.camX, lane: w.lane });
     this.sync();

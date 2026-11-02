@@ -268,8 +268,36 @@ for (const [W, H, name, noFs] of vps) {
   assert.ok(await page.evaluate(() => !document.querySelector('.tp').classList.contains('hide') && !document.querySelector('.gx-upright')), '초점이 빠지면 복귀');
   ok('(h) 키패드 모드', JSON.stringify(kp));
 
-  // (i) AUTO(자동전투) 절은 뺌 (11-02): 10-29 mobile 의 자동전투 두뇌(src/game/action/eileen/autoPilot.ts, window.__goeiAuto)가 지금 merge-1101 소스에 없다.
-  // 터치 AUTO 단추는 남아 있지만 아무도 setAuto 를 부르지 않는다. 되살릴지는 사용자 결정.
+  // (i) AUTO (11-02 되살림: src/game/action/fighter/autoPilot.ts, window.__goeiAuto)
+  // (i) AUTO: 본부(싸움 없음)에서는 흐림 → 대련 무대에서 적이 있으면 주인공이 스스로 싸운다, 스틱을 만지면 멈춤
+  assert.ok((await rects(page)).auto.off, '본부에서 AUTO 흐림');
+  await page.evaluate(() => window.__goeiEngine.start_new('spar'));
+  await page.waitForFunction(() => window.__goeiEngine.world?.stage?.id === 'spar' && !window.__goeiTouch.rects().auto.off, null, { timeout: 15000 });
+  await wait(800);
+  const A = await btnAt(page, 'auto');
+  await page.touchscreen.tap(A.x, A.y);
+  await wait(100);
+  assert.ok(await page.evaluate(() => window.__goeiAuto.on && document.querySelector('.tp').classList.contains('tp-auto-on')), 'AUTO 켜짐 (안이 청록)');
+  const p0 = await page.evaluate(() => ({ x: window.__goeiEngine.world.player.x, n: window.__goeiAuto.last.presses }));
+  // 틱 수십 번 뒤 두뇌가 공격 버튼(약·강·기술·사격·충전)을 누른다
+  await page.waitForFunction(() => { const c = window.__goeiAuto.last.counts; return (c.light ?? 0) + (c.heavy ?? 0) + (c.skill ?? 0) + (c.shoot ?? 0) + (c.charge ?? 0) > 0; }, null, { timeout: 20000 });
+  const p1 = await page.evaluate(() => ({ x: window.__goeiEngine.world.player.x, n: window.__goeiAuto.last.presses, t: window.__goeiAuto.last.tactic, c: JSON.stringify(window.__goeiAuto.last.counts) }));
+  // 스틱을 만지는 동안 자동은 멈춘다
+  const m0 = await toScreen(page, sz.w * 0.2, sz.h * 0.7);
+  const m1 = await toScreen(page, sz.w * 0.2 - 60, sz.h * 0.7);
+  await touch(cdp, 'touchStart', [m0]);
+  await touch(cdp, 'touchMove', [m1]);
+  await wait(200);
+  const h0 = await page.evaluate(() => window.__goeiAuto.last.presses);
+  await wait(900);
+  const hm = await page.evaluate(() => ({ manual: window.__goeiAuto.last.manual, n: window.__goeiAuto.last.presses }));
+  await touch(cdp, 'touchEnd', []);
+  assert.ok(hm.manual && hm.n === h0, `스틱을 만지면 자동 멈춤 ${JSON.stringify({ h0, ...hm })}`);
+  await page.waitForFunction(() => !window.__goeiAuto.last.manual, null, { timeout: 4000 });
+  ok('(i) AUTO (대련)', `누름 ${p0.n}→${p1.n} ${p1.c} · 전술 ${p1.t} · x ${Math.round(p0.x)}→${Math.round(p1.x)} · 스틱 중 멈춤`);
+  await page.touchscreen.tap(A.x, A.y);
+  await wait(100);
+  assert.equal(await page.evaluate(() => window.__goeiAuto.on), false, 'AUTO 끔');
 
   // (j) 필드 나가기 → 머리·메뉴·유령 버튼 복귀, 전체화면 해제
   await exitField(page);

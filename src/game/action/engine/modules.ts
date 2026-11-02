@@ -17,6 +17,8 @@ import { CW_SKILLS, CW_STATS } from '../ui/charWindowTable.gen';
 import { AGENT_NPCS } from '../npc/roster';
 import { FIELD_ITEMS, BAG_SLOTS } from '../../world/fieldShop';
 import { FighterPlayer, fighterHooks } from '../fighter/player';
+import { AutoPilot } from '../fighter/autoPilot';
+import { CODE } from '../ui/keys';
 import { GRADE_COLOR, PAIR_COLOR, TRAIT_COLOR, openDraft } from '../../perks/draftUi';
 import { PERK_TEXT, TRAIT_TEXT } from '../../perks/defs.gen';
 
@@ -973,6 +975,17 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
   (globalThis as { __goeiNpc?: unknown }).__goeiNpc = npc; // 시험용
   (globalThis as { __goeiStage?: unknown }).__goeiStage = shell.stage; // 시험용
   Object.assign(globalThis as object, { __goeiTouch: shell.touch, __goeiInput: shell.input }); // 시험용 (모바일 조작)
+  // 자동전투 (모바일 AUTO·O 키, 세션 한정): 주인공 입력을 대련 두뇌가 대신 만든다. 스틱을 만지면 직접 조작이 먼저 (fighter/autoPilot.ts 규칙)
+  const pilot = new AutoPilot();
+  pilot.manual = () => { const a = shell.input.axis(); return a.x !== 0 || a.y !== 0; };
+  (globalThis as { __goeiAuto?: unknown }).__goeiAuto = pilot; // 시험용
+  const offAutoKey = shell.input.on((code, down) => {
+    if (!down || code !== CODE.auto) return;
+    // 싸움 없는 곳에서는 못 켠다 (버튼은 흐림). 켜 둔 것은 언제든 끈다
+    if (!pilot.on && !AutoPilot.fight(world)) return;
+    pilot.setOn(!pilot.on);
+    shell.touch.setAuto(pilot.on);
+  });
   // 필드 요원: 지금 그림(몸 약 97도트)을 화면 약 255px로 (PixelLab 256 캔버스 몸 약 170도트 ×1.5 크기를 미리 보기). 원근은 view.persp
   setPixelScale(bridge?.visit ? 2.625 : 2.75);
   (globalThis as { __goeiSetPixel?: (p: number) => void }).__goeiSetPixel = setPixelScale; // 시험용
@@ -1291,6 +1304,10 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
       // 못 씀(흐림·자리 유지): 에일린 전투 몸이 아니면 전투 버튼, 싸움이 없으면 AUTO
       const fighter = !!(world?.player as { core?: unknown } | undefined)?.core;
       for (const id of ['light', 'heavy', 'dodge', 'block', 'unique', 'ult'] as const) shell.touch.setOff(id, !fighter);
+      // AUTO: 싸울 상대가 없으면 흐림. 켜 둔 채 상대가 다 사라지면 끈다(쥔 버튼 놓음). 주인공 몸에 두뇌를 붙인다
+      if (pilot.on && !AutoPilot.fight(world)) { pilot.setOn(false); shell.touch.setAuto(false); }
+      shell.touch.setOff('auto', !pilot.on && !AutoPilot.fight(world));
+      if (world?.player instanceof FighterPlayer && world.player.auto !== pilot) world.player.auto = pilot;
       ffx.opt = { shake: shell.settings.shake, flash: shell.settings.flash, numbers: shell.settings.numbers };
       ffx.update(shell.paused ? 0 : dt);
       { const o = ffx.camera(); shell.canvas.style.translate = o.x || o.y ? `${o.x}px ${o.y}px` : ''; }
@@ -1437,6 +1454,9 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
       npc.dispose();
       fieldShop?.dispose();
       fieldShop = null;
+      offAutoKey();
+      pilot.setOn(false);
+      if ((globalThis as { __goeiAuto?: unknown }).__goeiAuto === pilot) delete (globalThis as { __goeiAuto?: unknown }).__goeiAuto;
       const g = globalThis as { __goeiStory?: unknown; __goeiStoryStart?: unknown; __goeiNpc?: unknown };
       delete g.__goeiStory;
       delete g.__goeiNpc;
