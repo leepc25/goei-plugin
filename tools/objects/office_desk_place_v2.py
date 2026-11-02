@@ -19,7 +19,7 @@ def desk(d,cx,foot):
     return (foot,im,round(cx*K-im.width/2),round(foot*K-im.height))
 L=[]
 XS=[230]
-L.append(desk('north',150,332))
+L.append(desk('north',390,394))
 L.append(desk('south',390,410))
 L.append(desk('east',560,346))
 out=BG.copy()
