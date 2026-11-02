@@ -1,5 +1,5 @@
 {
- "version": "0.18.2",
+ "version": "0.19.0",
  "code": {
   "parts": [
    "goei-game.1.txt",
@@ -13,12 +13,1529 @@
    "goei-game.9.txt",
    "goei-game.10.txt",
    "goei-game.11.txt",
-   "goei-game.12.txt"
+   "goei-game.12.txt",
+   "goei-game.13.txt",
+   "goei-game.14.txt"
   ],
-  "length": 2187964,
-  "bytes": 2389983
+  "length": 2393854,
+  "bytes": 2620764
  },
  "packs": [
+  {
+   "id": "action-fx",
+   "hash": "cfcec2f8e0720561",
+   "bytes": 4654372,
+   "parts": [
+    "action-fx.1.bin",
+    "action-fx.2.bin",
+    "action-fx.3.bin",
+    "action-fx.4.bin",
+    "action-fx.5.bin",
+    "action-fx.6.bin",
+    "action-fx.7.bin",
+    "action-fx.8.bin",
+    "action-fx.9.bin"
+   ],
+   "required": false
+  },
+  {
+   "id": "char-1.1",
+   "hash": "e1baa89e60c54f89",
+   "bytes": 1765372,
+   "parts": [
+    "char-1.1.1.bin",
+    "char-1.1.2.bin",
+    "char-1.1.3.bin",
+    "char-1.1.4.bin"
+   ],
+   "required": false
+  },
+  {
+   "id": "char-1.10",
+   "hash": "83c69611be6c493e",
+   "bytes": 1987727,
+   "parts": [
+    "char-1.10.1.bin",
+    "char-1.10.2.bin",
+    "char-1.10.3.bin",
+    "char-1.10.4.bin"
+   ],
+   "required": false
+  },
+  {
+   "id": "char-1.11",
+   "hash": "83577165e53d43fc",
+   "bytes": 1910412,
+   "parts": [
+    "char-1.11.1.bin",
+    "char-1.11.2.bin",
+    "char-1.11.3.bin",
+    "char-1.11.4.bin"
+   ],
+   "required": false
+  },
+  {
+   "id": "char-1.12",
+   "hash": "48e5eb3ba12b9f64",
+   "bytes": 2091085,
+   "parts": [
+    "char-1.12.1.bin",
+    "char-1.12.2.bin",
+    "char-1.12.3.bin",
+    "char-1.12.4.bin"
+   ],
+   "required": false
+  },
+  {
+   "id": "char-1.2",
+   "hash": "2679d78be6ec7a08",
+   "bytes": 1591460,
+   "parts": [
+    "char-1.2.1.bin",
+    "char-1.2.2.bin",
+    "char-1.2.3.bin",
+    "char-1.2.4.bin"
+   ],
+   "required": false
+  },
+  {
+   "id": "char-1.3",
+   "hash": "d475ec037b8506ec",
+   "bytes": 2051890,
+   "parts": [
+    "char-1.3.1.bin",
+    "char-1.3.2.bin",
+    "char-1.3.3.bin",
+    "char-1.3.4.bin"
+   ],
+   "required": false
+  },
+  {
+   "id": "char-1.4",
+   "hash": "85a6673e6907c698",
+   "bytes": 2086702,
+   "parts": [
+    "char-1.4.1.bin",
+    "char-1.4.2.bin",
+    "char-1.4.3.bin",
+    "char-1.4.4.bin"
+   ],
+   "required": false
+  },
+  {
+   "id": "char-1.5",
+   "hash": "f9ea7b3088939242",
+   "bytes": 2828392,
+   "parts": [
+    "char-1.5.1.bin",
+    "char-1.5.2.bin",
+    "char-1.5.3.bin",
+    "char-1.5.4.bin",
+    "char-1.5.5.bin",
+    "char-1.5.6.bin"
+   ],
+   "required": false
+  },
+  {
+   "id": "char-1.6",
+   "hash": "75695df3a703ef7c",
+   "bytes": 1848925,
+   "parts": [
+    "char-1.6.1.bin",
+    "char-1.6.2.bin",
+    "char-1.6.3.bin",
+    "char-1.6.4.bin"
+   ],
+   "required": false
+  },
+  {
+   "id": "char-1.7",
+   "hash": "720f698b21c6d77e",
+   "bytes": 2434955,
+   "parts": [
+    "char-1.7.1.bin",
+    "char-1.7.2.bin",
+    "char-1.7.3.bin",
+    "char-1.7.4.bin",
+    "char-1.7.5.bin"
+   ],
+   "required": false
+  },
+  {
+   "id": "char-1.8",
+   "hash": "f0308c81531dacfa",
+   "bytes": 1739294,
+   "parts": [
+    "char-1.8.1.bin",
+    "char-1.8.2.bin",
+    "char-1.8.3.bin",
+    "char-1.8.4.bin"
+   ],
+   "required": false
+  },
+  {
+   "id": "char-1.9",
+   "hash": "fbd4abe7ad43ff85",
+   "bytes": 1803196,
+   "parts": [
+    "char-1.9.1.bin",
+    "char-1.9.2.bin",
+    "char-1.9.3.bin",
+    "char-1.9.4.bin"
+   ],
+   "required": false
+  },
+  {
+   "id": "char-2.1",
+   "hash": "5c2ea8053d24fc2b",
+   "bytes": 1758949,
+   "parts": [
+    "char-2.1.1.bin",
+    "char-2.1.2.bin",
+    "char-2.1.3.bin",
+    "char-2.1.4.bin"
+   ],
+   "required": false
+  },
+  {
+   "id": "char-2.10",
+   "hash": "a02f2160daa8fe4d",
+   "bytes": 2607275,
+   "parts": [
+    "char-2.10.1.bin",
+    "char-2.10.2.bin",
+    "char-2.10.3.bin",
+    "char-2.10.4.bin",
+    "char-2.10.5.bin"
+   ],
+   "required": false
+  },
+  {
+   "id": "char-2.11",
+   "hash": "7e1681956656b2f5",
+   "bytes": 2241500,
+   "parts": [
+    "char-2.11.1.bin",
+    "char-2.11.2.bin",
+    "char-2.11.3.bin",
+    "char-2.11.4.bin",
+    "char-2.11.5.bin"
+   ],
+   "required": false
+  },
+  {
+   "id": "char-2.12",
+   "hash": "ce77b1ea06929659",
+   "bytes": 1789580,
+   "parts": [
+    "char-2.12.1.bin",
+    "char-2.12.2.bin",
+    "char-2.12.3.bin",
+    "char-2.12.4.bin"
+   ],
+   "required": false
+  },
+  {
+   "id": "char-2.13",
+   "hash": "0807a938e476885c",
+   "bytes": 2059235,
+   "parts": [
+    "char-2.13.1.bin",
+    "char-2.13.2.bin",
+    "char-2.13.3.bin",
+    "char-2.13.4.bin"
+   ],
+   "required": false
+  },
+  {
+   "id": "char-2.14",
+   "hash": "5a593b454176e600",
+   "bytes": 1983663,
+   "parts": [
+    "char-2.14.1.bin",
+    "char-2.14.2.bin",
+    "char-2.14.3.bin",
+    "char-2.14.4.bin"
+   ],
+   "required": false
+  },
+  {
+   "id": "char-2.2",
+   "hash": "efe0eaa10d50fa57",
+   "bytes": 1926542,
+   "parts": [
+    "char-2.2.1.bin",
+    "char-2.2.2.bin",
+    "char-2.2.3.bin",
+    "char-2.2.4.bin"
+   ],
+   "required": false
+  },
+  {
+   "id": "char-2.3",
+   "hash": "270607725d1e5977",
+   "bytes": 1849124,
+   "parts": [
+    "char-2.3.1.bin",
+    "char-2.3.2.bin",
+    "char-2.3.3.bin",
+    "char-2.3.4.bin"
+   ],
+   "required": false
+  },
+  {
+   "id": "char-2.4",
+   "hash": "4e04d36d4ffaa25d",
+   "bytes": 1892139,
+   "parts": [
+    "char-2.4.1.bin",
+    "char-2.4.2.bin",
+    "char-2.4.3.bin",
+    "char-2.4.4.bin"
+   ],
+   "required": false
+  },
+  {
+   "id": "char-2.5",
+   "hash": "c413931fd8060cfd",
+   "bytes": 2098100,
+   "parts": [
+    "char-2.5.1.bin",
+    "char-2.5.2.bin",
+    "char-2.5.3.bin",
+    "char-2.5.4.bin",
+    "char-2.5.5.bin"
+   ],
+   "required": false
+  },
+  {
+   "id": "char-2.6",
+   "hash": "babd2d2a32c7327b",
+   "bytes": 2610547,
+   "parts": [
+    "char-2.6.1.bin",
+    "char-2.6.2.bin",
+    "char-2.6.3.bin",
+    "char-2.6.4.bin",
+    "char-2.6.5.bin"
+   ],
+   "required": false
+  },
+  {
+   "id": "char-2.7",
+   "hash": "962db0def130e1a5",
+   "bytes": 1606919,
+   "parts": [
+    "char-2.7.1.bin",
+    "char-2.7.2.bin",
+    "char-2.7.3.bin",
+    "char-2.7.4.bin"
+   ],
+   "required": false
+  },
+  {
+   "id": "char-2.8",
+   "hash": "b7b9478999f291ec",
+   "bytes": 2120055,
+   "parts": [
+    "char-2.8.1.bin",
+    "char-2.8.2.bin",
+    "char-2.8.3.bin",
+    "char-2.8.4.bin",
+    "char-2.8.5.bin"
+   ],
+   "required": false
+  },
+  {
+   "id": "char-2.9",
+   "hash": "8b49540bf2ef0008",
+   "bytes": 1924132,
+   "parts": [
+    "char-2.9.1.bin",
+    "char-2.9.2.bin",
+    "char-2.9.3.bin",
+    "char-2.9.4.bin"
+   ],
+   "required": false
+  },
+  {
+   "id": "char-3.1",
+   "hash": "c180fd53364156e2",
+   "bytes": 1512856,
+   "parts": [
+    "char-3.1.1.bin",
+    "char-3.1.2.bin",
+    "char-3.1.3.bin"
+   ],
+   "required": false
+  },
+  {
+   "id": "char-3.10",
+   "hash": "6141189244610cda",
+   "bytes": 1545232,
+   "parts": [
+    "char-3.10.1.bin",
+    "char-3.10.2.bin",
+    "char-3.10.3.bin"
+   ],
+   "required": false
+  },
+  {
+   "id": "char-3.11",
+   "hash": "652e703243aa48c6",
+   "bytes": 1536549,
+   "parts": [
+    "char-3.11.1.bin",
+    "char-3.11.2.bin",
+    "char-3.11.3.bin"
+   ],
+   "required": false
+  },
+  {
+   "id": "char-3.12",
+   "hash": "bfd1919404a469cb",
+   "bytes": 2199947,
+   "parts": [
+    "char-3.12.1.bin",
+    "char-3.12.2.bin",
+    "char-3.12.3.bin",
+    "char-3.12.4.bin",
+    "char-3.12.5.bin"
+   ],
+   "required": false
+  },
+  {
+   "id": "char-3.13",
+   "hash": "9b5bda3ee60ae326",
+   "bytes": 2365787,
+   "parts": [
+    "char-3.13.1.bin",
+    "char-3.13.2.bin",
+    "char-3.13.3.bin",
+    "char-3.13.4.bin",
+    "char-3.13.5.bin"
+   ],
+   "required": false
+  },
+  {
+   "id": "char-3.14",
+   "hash": "bc43e00c154b13c3",
+   "bytes": 2148580,
+   "parts": [
+    "char-3.14.1.bin",
+    "char-3.14.2.bin",
+    "char-3.14.3.bin",
+    "char-3.14.4.bin",
+    "char-3.14.5.bin"
+   ],
+   "required": false
+  },
+  {
+   "id": "char-3.15",
+   "hash": "2eccb4d698422cdb",
+   "bytes": 2347361,
+   "parts": [
+    "char-3.15.1.bin",
+    "char-3.15.2.bin",
+    "char-3.15.3.bin",
+    "char-3.15.4.bin",
+    "char-3.15.5.bin"
+   ],
+   "required": false
+  },
+  {
+   "id": "char-3.16",
+   "hash": "7f854ded89c06022",
+   "bytes": 1858727,
+   "parts": [
+    "char-3.16.1.bin",
+    "char-3.16.2.bin",
+    "char-3.16.3.bin",
+    "char-3.16.4.bin"
+   ],
+   "required": false
+  },
+  {
+   "id": "char-3.2",
+   "hash": "9342361a228d54bd",
+   "bytes": 2315186,
+   "parts": [
+    "char-3.2.1.bin",
+    "char-3.2.2.bin",
+    "char-3.2.3.bin",
+    "char-3.2.4.bin",
+    "char-3.2.5.bin"
+   ],
+   "required": false
+  },
+  {
+   "id": "char-3.3",
+   "hash": "bf7d86937ef23822",
+   "bytes": 1665873,
+   "parts": [
+    "char-3.3.1.bin",
+    "char-3.3.2.bin",
+    "char-3.3.3.bin",
+    "char-3.3.4.bin"
+   ],
+   "required": false
+  },
+  {
+   "id": "char-3.4",
+   "hash": "e5f389b8b7f3efdc",
+   "bytes": 1602049,
+   "parts": [
+    "char-3.4.1.bin",
+    "char-3.4.2.bin",
+    "char-3.4.3.bin",
+    "char-3.4.4.bin"
+   ],
+   "required": false
+  },
+  {
+   "id": "char-3.5",
+   "hash": "8c943e718e7e0fc0",
+   "bytes": 1874043,
+   "parts": [
+    "char-3.5.1.bin",
+    "char-3.5.2.bin",
+    "char-3.5.3.bin",
+    "char-3.5.4.bin"
+   ],
+   "required": false
+  },
+  {
+   "id": "char-3.6",
+   "hash": "f4987e4ed336ecae",
+   "bytes": 1925883,
+   "parts": [
+    "char-3.6.1.bin",
+    "char-3.6.2.bin",
+    "char-3.6.3.bin",
+    "char-3.6.4.bin"
+   ],
+   "required": false
+  },
+  {
+   "id": "char-3.7",
+   "hash": "958e5a692328742f",
+   "bytes": 1621049,
+   "parts": [
+    "char-3.7.1.bin",
+    "char-3.7.2.bin",
+    "char-3.7.3.bin",
+    "char-3.7.4.bin"
+   ],
+   "required": false
+  },
+  {
+   "id": "char-3.8",
+   "hash": "876d0a05ad3c468b",
+   "bytes": 2286430,
+   "parts": [
+    "char-3.8.1.bin",
+    "char-3.8.2.bin",
+    "char-3.8.3.bin",
+    "char-3.8.4.bin",
+    "char-3.8.5.bin"
+   ],
+   "required": false
+  },
+  {
+   "id": "char-3.9",
+   "hash": "ad95ec7aa9f50afc",
+   "bytes": 1913251,
+   "parts": [
+    "char-3.9.1.bin",
+    "char-3.9.2.bin",
+    "char-3.9.3.bin",
+    "char-3.9.4.bin"
+   ],
+   "required": false
+  },
+  {
+   "id": "char-4.1",
+   "hash": "f31b0623f91b343d",
+   "bytes": 2107253,
+   "parts": [
+    "char-4.1.1.bin",
+    "char-4.1.2.bin",
+    "char-4.1.3.bin",
+    "char-4.1.4.bin",
+    "char-4.1.5.bin"
+   ],
+   "required": false
+  },
+  {
+   "id": "char-4.10",
+   "hash": "46164c3c12eeadc4",
+   "bytes": 2047631,
+   "parts": [
+    "char-4.10.1.bin",
+    "char-4.10.2.bin",
+    "char-4.10.3.bin",
+    "char-4.10.4.bin"
+   ],
+   "required": false
+  },
+  {
+   "id": "char-4.2",
+   "hash": "45e3be12c9e02308",
+   "bytes": 1613298,
+   "parts": [
+    "char-4.2.1.bin",
+    "char-4.2.2.bin",
+    "char-4.2.3.bin",
+    "char-4.2.4.bin"
+   ],
+   "required": false
+  },
+  {
+   "id": "char-4.3",
+   "hash": "5f928c81fc0157f8",
+   "bytes": 2172489,
+   "parts": [
+    "char-4.3.1.bin",
+    "char-4.3.2.bin",
+    "char-4.3.3.bin",
+    "char-4.3.4.bin",
+    "char-4.3.5.bin"
+   ],
+   "required": false
+  },
+  {
+   "id": "char-4.4",
+   "hash": "468268bfdd724db3",
+   "bytes": 1818666,
+   "parts": [
+    "char-4.4.1.bin",
+    "char-4.4.2.bin",
+    "char-4.4.3.bin",
+    "char-4.4.4.bin"
+   ],
+   "required": false
+  },
+  {
+   "id": "char-4.5",
+   "hash": "95147238b45fd301",
+   "bytes": 1554810,
+   "parts": [
+    "char-4.5.1.bin",
+    "char-4.5.2.bin",
+    "char-4.5.3.bin"
+   ],
+   "required": false
+  },
+  {
+   "id": "char-4.6",
+   "hash": "df4a0628695b2313",
+   "bytes": 1708830,
+   "parts": [
+    "char-4.6.1.bin",
+    "char-4.6.2.bin",
+    "char-4.6.3.bin",
+    "char-4.6.4.bin"
+   ],
+   "required": false
+  },
+  {
+   "id": "char-4.7",
+   "hash": "e913f9b6475d7443",
+   "bytes": 1955340,
+   "parts": [
+    "char-4.7.1.bin",
+    "char-4.7.2.bin",
+    "char-4.7.3.bin",
+    "char-4.7.4.bin"
+   ],
+   "required": false
+  },
+  {
+   "id": "char-4.8",
+   "hash": "00cf85834cd1aa84",
+   "bytes": 1954831,
+   "parts": [
+    "char-4.8.1.bin",
+    "char-4.8.2.bin",
+    "char-4.8.3.bin",
+    "char-4.8.4.bin"
+   ],
+   "required": false
+  },
+  {
+   "id": "char-4.9",
+   "hash": "c81c6f82f7dfb921",
+   "bytes": 1939559,
+   "parts": [
+    "char-4.9.1.bin",
+    "char-4.9.2.bin",
+    "char-4.9.3.bin",
+    "char-4.9.4.bin"
+   ],
+   "required": false
+  },
+  {
+   "id": "char-5.1",
+   "hash": "4d2e78737a534c82",
+   "bytes": 2105765,
+   "parts": [
+    "char-5.1.1.bin",
+    "char-5.1.2.bin",
+    "char-5.1.3.bin",
+    "char-5.1.4.bin",
+    "char-5.1.5.bin"
+   ],
+   "required": false
+  },
+  {
+   "id": "char-5.2",
+   "hash": "2c57fa9dfbe80b67",
+   "bytes": 2445439,
+   "parts": [
+    "char-5.2.1.bin",
+    "char-5.2.2.bin",
+    "char-5.2.3.bin",
+    "char-5.2.4.bin",
+    "char-5.2.5.bin"
+   ],
+   "required": false
+  },
+  {
+   "id": "char-5.3",
+   "hash": "3f2a9276a6bb074f",
+   "bytes": 1895994,
+   "parts": [
+    "char-5.3.1.bin",
+    "char-5.3.2.bin",
+    "char-5.3.3.bin",
+    "char-5.3.4.bin"
+   ],
+   "required": false
+  },
+  {
+   "id": "char-6.1",
+   "hash": "ac1fe45f90ce1fe6",
+   "bytes": 1846132,
+   "parts": [
+    "char-6.1.1.bin",
+    "char-6.1.2.bin",
+    "char-6.1.3.bin",
+    "char-6.1.4.bin"
+   ],
+   "required": false
+  },
+  {
+   "id": "char-6.10",
+   "hash": "1634f09c371a0b69",
+   "bytes": 1624838,
+   "parts": [
+    "char-6.10.1.bin",
+    "char-6.10.2.bin",
+    "char-6.10.3.bin",
+    "char-6.10.4.bin"
+   ],
+   "required": false
+  },
+  {
+   "id": "char-6.11",
+   "hash": "52bf25333b7fd588",
+   "bytes": 1388175,
+   "parts": [
+    "char-6.11.1.bin",
+    "char-6.11.2.bin",
+    "char-6.11.3.bin"
+   ],
+   "required": false
+  },
+  {
+   "id": "char-6.12",
+   "hash": "3591feb398784509",
+   "bytes": 1206040,
+   "parts": [
+    "char-6.12.1.bin",
+    "char-6.12.2.bin",
+    "char-6.12.3.bin"
+   ],
+   "required": false
+  },
+  {
+   "id": "char-6.13",
+   "hash": "0f93d54265e89506",
+   "bytes": 1522796,
+   "parts": [
+    "char-6.13.1.bin",
+    "char-6.13.2.bin",
+    "char-6.13.3.bin"
+   ],
+   "required": false
+  },
+  {
+   "id": "char-6.14",
+   "hash": "1be7920f5228dd7d",
+   "bytes": 1601882,
+   "parts": [
+    "char-6.14.1.bin",
+    "char-6.14.2.bin",
+    "char-6.14.3.bin",
+    "char-6.14.4.bin"
+   ],
+   "required": false
+  },
+  {
+   "id": "char-6.15",
+   "hash": "79672c9f68d3c626",
+   "bytes": 1275238,
+   "parts": [
+    "char-6.15.1.bin",
+    "char-6.15.2.bin",
+    "char-6.15.3.bin"
+   ],
+   "required": false
+  },
+  {
+   "id": "char-6.16",
+   "hash": "12c68dfb065c5d2d",
+   "bytes": 1294766,
+   "parts": [
+    "char-6.16.1.bin",
+    "char-6.16.2.bin",
+    "char-6.16.3.bin"
+   ],
+   "required": false
+  },
+  {
+   "id": "char-6.17",
+   "hash": "d79e394a7e624a1d",
+   "bytes": 1659482,
+   "parts": [
+    "char-6.17.1.bin",
+    "char-6.17.2.bin",
+    "char-6.17.3.bin",
+    "char-6.17.4.bin"
+   ],
+   "required": false
+  },
+  {
+   "id": "char-6.18",
+   "hash": "fad0069eeea64372",
+   "bytes": 1599875,
+   "parts": [
+    "char-6.18.1.bin",
+    "char-6.18.2.bin",
+    "char-6.18.3.bin",
+    "char-6.18.4.bin"
+   ],
+   "required": false
+  },
+  {
+   "id": "char-6.19",
+   "hash": "876322b7d3030af2",
+   "bytes": 1199809,
+   "parts": [
+    "char-6.19.1.bin",
+    "char-6.19.2.bin",
+    "char-6.19.3.bin"
+   ],
+   "required": false
+  },
+  {
+   "id": "char-6.2",
+   "hash": "8969705d121e1352",
+   "bytes": 2003981,
+   "parts": [
+    "char-6.2.1.bin",
+    "char-6.2.2.bin",
+    "char-6.2.3.bin",
+    "char-6.2.4.bin"
+   ],
+   "required": false
+  },
+  {
+   "id": "char-6.20",
+   "hash": "be2a12fb0f803928",
+   "bytes": 1453964,
+   "parts": [
+    "char-6.20.1.bin",
+    "char-6.20.2.bin",
+    "char-6.20.3.bin"
+   ],
+   "required": false
+  },
+  {
+   "id": "char-6.21",
+   "hash": "ae5d6fa6914727bc",
+   "bytes": 1496776,
+   "parts": [
+    "char-6.21.1.bin",
+    "char-6.21.2.bin",
+    "char-6.21.3.bin"
+   ],
+   "required": false
+  },
+  {
+   "id": "char-6.22",
+   "hash": "288db83a70d2790e",
+   "bytes": 1629680,
+   "parts": [
+    "char-6.22.1.bin",
+    "char-6.22.2.bin",
+    "char-6.22.3.bin",
+    "char-6.22.4.bin"
+   ],
+   "required": false
+  },
+  {
+   "id": "char-6.23",
+   "hash": "a445c3db5f3114ef",
+   "bytes": 1291960,
+   "parts": [
+    "char-6.23.1.bin",
+    "char-6.23.2.bin",
+    "char-6.23.3.bin"
+   ],
+   "required": false
+  },
+  {
+   "id": "char-6.24",
+   "hash": "e8fc5332827ded5f",
+   "bytes": 1441005,
+   "parts": [
+    "char-6.24.1.bin",
+    "char-6.24.2.bin",
+    "char-6.24.3.bin"
+   ],
+   "required": false
+  },
+  {
+   "id": "char-6.25",
+   "hash": "ab3005633805cd76",
+   "bytes": 1883381,
+   "parts": [
+    "char-6.25.1.bin",
+    "char-6.25.2.bin",
+    "char-6.25.3.bin",
+    "char-6.25.4.bin"
+   ],
+   "required": false
+  },
+  {
+   "id": "char-6.26",
+   "hash": "3131cdeb2aa9e728",
+   "bytes": 1485405,
+   "parts": [
+    "char-6.26.1.bin",
+    "char-6.26.2.bin",
+    "char-6.26.3.bin"
+   ],
+   "required": false
+  },
+  {
+   "id": "char-6.27",
+   "hash": "f3cfc9fd831f642a",
+   "bytes": 1346288,
+   "parts": [
+    "char-6.27.1.bin",
+    "char-6.27.2.bin",
+    "char-6.27.3.bin"
+   ],
+   "required": false
+  },
+  {
+   "id": "char-6.28",
+   "hash": "7dccd9d5e426052d",
+   "bytes": 1212327,
+   "parts": [
+    "char-6.28.1.bin",
+    "char-6.28.2.bin",
+    "char-6.28.3.bin"
+   ],
+   "required": false
+  },
+  {
+   "id": "char-6.29",
+   "hash": "484ad5fa7bdf56ef",
+   "bytes": 1299166,
+   "parts": [
+    "char-6.29.1.bin",
+    "char-6.29.2.bin",
+    "char-6.29.3.bin"
+   ],
+   "required": false
+  },
+  {
+   "id": "char-6.3",
+   "hash": "0cf1c00e314bce19",
+   "bytes": 1904057,
+   "parts": [
+    "char-6.3.1.bin",
+    "char-6.3.2.bin",
+    "char-6.3.3.bin",
+    "char-6.3.4.bin"
+   ],
+   "required": false
+  },
+  {
+   "id": "char-6.30",
+   "hash": "0767628b1b9fe9ed",
+   "bytes": 2119559,
+   "parts": [
+    "char-6.30.1.bin",
+    "char-6.30.2.bin",
+    "char-6.30.3.bin",
+    "char-6.30.4.bin",
+    "char-6.30.5.bin"
+   ],
+   "required": false
+  },
+  {
+   "id": "char-6.31",
+   "hash": "00f73e3cd09f272f",
+   "bytes": 1831712,
+   "parts": [
+    "char-6.31.1.bin",
+    "char-6.31.2.bin",
+    "char-6.31.3.bin",
+    "char-6.31.4.bin"
+   ],
+   "required": false
+  },
+  {
+   "id": "char-6.32",
+   "hash": "484a6fb537fdf70c",
+   "bytes": 1735371,
+   "parts": [
+    "char-6.32.1.bin",
+    "char-6.32.2.bin",
+    "char-6.32.3.bin",
+    "char-6.32.4.bin"
+   ],
+   "required": false
+  },
+  {
+   "id": "char-6.33",
+   "hash": "e1c1cf3b7d368032",
+   "bytes": 1846049,
+   "parts": [
+    "char-6.33.1.bin",
+    "char-6.33.2.bin",
+    "char-6.33.3.bin",
+    "char-6.33.4.bin"
+   ],
+   "required": false
+  },
+  {
+   "id": "char-6.34",
+   "hash": "63690063b074ee45",
+   "bytes": 1744035,
+   "parts": [
+    "char-6.34.1.bin",
+    "char-6.34.2.bin",
+    "char-6.34.3.bin",
+    "char-6.34.4.bin"
+   ],
+   "required": false
+  },
+  {
+   "id": "char-6.35",
+   "hash": "aa2b0f2a4051663c",
+   "bytes": 1952754,
+   "parts": [
+    "char-6.35.1.bin",
+    "char-6.35.2.bin",
+    "char-6.35.3.bin",
+    "char-6.35.4.bin"
+   ],
+   "required": false
+  },
+  {
+   "id": "char-6.36",
+   "hash": "26240130e70c7d0a",
+   "bytes": 1463600,
+   "parts": [
+    "char-6.36.1.bin",
+    "char-6.36.2.bin",
+    "char-6.36.3.bin"
+   ],
+   "required": false
+  },
+  {
+   "id": "char-6.37",
+   "hash": "fa49267267fa6b46",
+   "bytes": 1592405,
+   "parts": [
+    "char-6.37.1.bin",
+    "char-6.37.2.bin",
+    "char-6.37.3.bin",
+    "char-6.37.4.bin"
+   ],
+   "required": false
+  },
+  {
+   "id": "char-6.38",
+   "hash": "ffe90d0c35654e4c",
+   "bytes": 1535432,
+   "parts": [
+    "char-6.38.1.bin",
+    "char-6.38.2.bin",
+    "char-6.38.3.bin"
+   ],
+   "required": false
+  },
+  {
+   "id": "char-6.39",
+   "hash": "8fc299f58241a49b",
+   "bytes": 1622944,
+   "parts": [
+    "char-6.39.1.bin",
+    "char-6.39.2.bin",
+    "char-6.39.3.bin",
+    "char-6.39.4.bin"
+   ],
+   "required": false
+  },
+  {
+   "id": "char-6.4",
+   "hash": "68bcdce4f980ed2b",
+   "bytes": 1861203,
+   "parts": [
+    "char-6.4.1.bin",
+    "char-6.4.2.bin",
+    "char-6.4.3.bin",
+    "char-6.4.4.bin"
+   ],
+   "required": false
+  },
+  {
+   "id": "char-6.40",
+   "hash": "a4db8cc742e21021",
+   "bytes": 1870108,
+   "parts": [
+    "char-6.40.1.bin",
+    "char-6.40.2.bin",
+    "char-6.40.3.bin",
+    "char-6.40.4.bin"
+   ],
+   "required": false
+  },
+  {
+   "id": "char-6.41",
+   "hash": "61c5fe04df045fc7",
+   "bytes": 1530725,
+   "parts": [
+    "char-6.41.1.bin",
+    "char-6.41.2.bin",
+    "char-6.41.3.bin"
+   ],
+   "required": false
+  },
+  {
+   "id": "char-6.42",
+   "hash": "c083c9e0a5da77e1",
+   "bytes": 1521999,
+   "parts": [
+    "char-6.42.1.bin",
+    "char-6.42.2.bin",
+    "char-6.42.3.bin"
+   ],
+   "required": false
+  },
+  {
+   "id": "char-6.43",
+   "hash": "e98153088f264c11",
+   "bytes": 1436872,
+   "parts": [
+    "char-6.43.1.bin",
+    "char-6.43.2.bin",
+    "char-6.43.3.bin"
+   ],
+   "required": false
+  },
+  {
+   "id": "char-6.44",
+   "hash": "a22726c692fa845b",
+   "bytes": 1095208,
+   "parts": [
+    "char-6.44.1.bin",
+    "char-6.44.2.bin",
+    "char-6.44.3.bin"
+   ],
+   "required": false
+  },
+  {
+   "id": "char-6.45",
+   "hash": "2b03c904a4255deb",
+   "bytes": 1320218,
+   "parts": [
+    "char-6.45.1.bin",
+    "char-6.45.2.bin",
+    "char-6.45.3.bin"
+   ],
+   "required": false
+  },
+  {
+   "id": "char-6.46",
+   "hash": "68084f9a8b2822fd",
+   "bytes": 1763303,
+   "parts": [
+    "char-6.46.1.bin",
+    "char-6.46.2.bin",
+    "char-6.46.3.bin",
+    "char-6.46.4.bin"
+   ],
+   "required": false
+  },
+  {
+   "id": "char-6.47",
+   "hash": "23f121de4d73f7bb",
+   "bytes": 1307755,
+   "parts": [
+    "char-6.47.1.bin",
+    "char-6.47.2.bin",
+    "char-6.47.3.bin"
+   ],
+   "required": false
+  },
+  {
+   "id": "char-6.48",
+   "hash": "c6f3f2005ca4faae",
+   "bytes": 1677374,
+   "parts": [
+    "char-6.48.1.bin",
+    "char-6.48.2.bin",
+    "char-6.48.3.bin",
+    "char-6.48.4.bin"
+   ],
+   "required": false
+  },
+  {
+   "id": "char-6.49",
+   "hash": "49f02f3ead784413",
+   "bytes": 1359443,
+   "parts": [
+    "char-6.49.1.bin",
+    "char-6.49.2.bin",
+    "char-6.49.3.bin"
+   ],
+   "required": false
+  },
+  {
+   "id": "char-6.5",
+   "hash": "849c4b806253f601",
+   "bytes": 2015627,
+   "parts": [
+    "char-6.5.1.bin",
+    "char-6.5.2.bin",
+    "char-6.5.3.bin",
+    "char-6.5.4.bin"
+   ],
+   "required": false
+  },
+  {
+   "id": "char-6.50",
+   "hash": "22f90fb0244e19e6",
+   "bytes": 1355631,
+   "parts": [
+    "char-6.50.1.bin",
+    "char-6.50.2.bin",
+    "char-6.50.3.bin"
+   ],
+   "required": false
+  },
+  {
+   "id": "char-6.51",
+   "hash": "bc737ad64600ef9a",
+   "bytes": 1537282,
+   "parts": [
+    "char-6.51.1.bin",
+    "char-6.51.2.bin",
+    "char-6.51.3.bin"
+   ],
+   "required": false
+  },
+  {
+   "id": "char-6.52",
+   "hash": "a605ad4f12081425",
+   "bytes": 1384469,
+   "parts": [
+    "char-6.52.1.bin",
+    "char-6.52.2.bin",
+    "char-6.52.3.bin"
+   ],
+   "required": false
+  },
+  {
+   "id": "char-6.53",
+   "hash": "388d17f451f935f4",
+   "bytes": 1351577,
+   "parts": [
+    "char-6.53.1.bin",
+    "char-6.53.2.bin",
+    "char-6.53.3.bin"
+   ],
+   "required": false
+  },
+  {
+   "id": "char-6.54",
+   "hash": "edffda55e69638d2",
+   "bytes": 1462332,
+   "parts": [
+    "char-6.54.1.bin",
+    "char-6.54.2.bin",
+    "char-6.54.3.bin"
+   ],
+   "required": false
+  },
+  {
+   "id": "char-6.55",
+   "hash": "bd0eec28020d91e0",
+   "bytes": 1475332,
+   "parts": [
+    "char-6.55.1.bin",
+    "char-6.55.2.bin",
+    "char-6.55.3.bin"
+   ],
+   "required": false
+  },
+  {
+   "id": "char-6.56",
+   "hash": "937ba007b5a67f87",
+   "bytes": 1512615,
+   "parts": [
+    "char-6.56.1.bin",
+    "char-6.56.2.bin",
+    "char-6.56.3.bin"
+   ],
+   "required": false
+  },
+  {
+   "id": "char-6.57",
+   "hash": "41bb17a56de57e00",
+   "bytes": 1524518,
+   "parts": [
+    "char-6.57.1.bin",
+    "char-6.57.2.bin",
+    "char-6.57.3.bin"
+   ],
+   "required": false
+  },
+  {
+   "id": "char-6.58",
+   "hash": "2ce80cf1e2976cd2",
+   "bytes": 1423157,
+   "parts": [
+    "char-6.58.1.bin",
+    "char-6.58.2.bin",
+    "char-6.58.3.bin"
+   ],
+   "required": false
+  },
+  {
+   "id": "char-6.59",
+   "hash": "25f0362677ee73cc",
+   "bytes": 1740881,
+   "parts": [
+    "char-6.59.1.bin",
+    "char-6.59.2.bin",
+    "char-6.59.3.bin",
+    "char-6.59.4.bin"
+   ],
+   "required": false
+  },
+  {
+   "id": "char-6.6",
+   "hash": "a46f41017ff6a8de",
+   "bytes": 2104970,
+   "parts": [
+    "char-6.6.1.bin",
+    "char-6.6.2.bin",
+    "char-6.6.3.bin",
+    "char-6.6.4.bin",
+    "char-6.6.5.bin"
+   ],
+   "required": false
+  },
+  {
+   "id": "char-6.60",
+   "hash": "b414e7aa551f1760",
+   "bytes": 1705013,
+   "parts": [
+    "char-6.60.1.bin",
+    "char-6.60.2.bin",
+    "char-6.60.3.bin",
+    "char-6.60.4.bin"
+   ],
+   "required": false
+  },
+  {
+   "id": "char-6.61",
+   "hash": "c3220348defb638a",
+   "bytes": 1565827,
+   "parts": [
+    "char-6.61.1.bin",
+    "char-6.61.2.bin",
+    "char-6.61.3.bin"
+   ],
+   "required": false
+  },
+  {
+   "id": "char-6.62",
+   "hash": "6d79fd591ce766e4",
+   "bytes": 1463880,
+   "parts": [
+    "char-6.62.1.bin",
+    "char-6.62.2.bin",
+    "char-6.62.3.bin"
+   ],
+   "required": false
+  },
+  {
+   "id": "char-6.63",
+   "hash": "3766127655368b1b",
+   "bytes": 1145193,
+   "parts": [
+    "char-6.63.1.bin",
+    "char-6.63.2.bin",
+    "char-6.63.3.bin"
+   ],
+   "required": false
+  },
+  {
+   "id": "char-6.64",
+   "hash": "cfb9147db68c976b",
+   "bytes": 1322337,
+   "parts": [
+    "char-6.64.1.bin",
+    "char-6.64.2.bin",
+    "char-6.64.3.bin"
+   ],
+   "required": false
+  },
+  {
+   "id": "char-6.65",
+   "hash": "5434317cae1b4501",
+   "bytes": 1192668,
+   "parts": [
+    "char-6.65.1.bin",
+    "char-6.65.2.bin",
+    "char-6.65.3.bin"
+   ],
+   "required": false
+  },
+  {
+   "id": "char-6.66",
+   "hash": "32d5b3aacb2cdde1",
+   "bytes": 1177974,
+   "parts": [
+    "char-6.66.1.bin",
+    "char-6.66.2.bin",
+    "char-6.66.3.bin"
+   ],
+   "required": false
+  },
+  {
+   "id": "char-6.67",
+   "hash": "9d58aff222f8ae1c",
+   "bytes": 1235956,
+   "parts": [
+    "char-6.67.1.bin",
+    "char-6.67.2.bin",
+    "char-6.67.3.bin"
+   ],
+   "required": false
+  },
+  {
+   "id": "char-6.68",
+   "hash": "a505dc872692e529",
+   "bytes": 1473529,
+   "parts": [
+    "char-6.68.1.bin",
+    "char-6.68.2.bin",
+    "char-6.68.3.bin"
+   ],
+   "required": false
+  },
+  {
+   "id": "char-6.69",
+   "hash": "e88d4aa7960fbca2",
+   "bytes": 1394870,
+   "parts": [
+    "char-6.69.1.bin",
+    "char-6.69.2.bin",
+    "char-6.69.3.bin"
+   ],
+   "required": false
+  },
+  {
+   "id": "char-6.7",
+   "hash": "0fd408bd536b1fca",
+   "bytes": 1411394,
+   "parts": [
+    "char-6.7.1.bin",
+    "char-6.7.2.bin",
+    "char-6.7.3.bin"
+   ],
+   "required": false
+  },
+  {
+   "id": "char-6.70",
+   "hash": "cbe932bf625dba5b",
+   "bytes": 1135649,
+   "parts": [
+    "char-6.70.1.bin",
+    "char-6.70.2.bin",
+    "char-6.70.3.bin"
+   ],
+   "required": false
+  },
+  {
+   "id": "char-6.71",
+   "hash": "ff45e2550e7ad90a",
+   "bytes": 1310325,
+   "parts": [
+    "char-6.71.1.bin",
+    "char-6.71.2.bin",
+    "char-6.71.3.bin"
+   ],
+   "required": false
+  },
+  {
+   "id": "char-6.8",
+   "hash": "7ac082e8e8864e17",
+   "bytes": 1502269,
+   "parts": [
+    "char-6.8.1.bin",
+    "char-6.8.2.bin",
+    "char-6.8.3.bin"
+   ],
+   "required": false
+  },
+  {
+   "id": "char-6.9",
+   "hash": "8b3f6a31924dfaa6",
+   "bytes": 1710883,
+   "parts": [
+    "char-6.9.1.bin",
+    "char-6.9.2.bin",
+    "char-6.9.3.bin",
+    "char-6.9.4.bin"
+   ],
+   "required": false
+  },
+  {
+   "id": "dialogue",
+   "hash": "0969882c14397de9",
+   "bytes": 3553991,
+   "parts": [
+    "dialogue.1.bin",
+    "dialogue.2.bin",
+    "dialogue.3.bin",
+    "dialogue.4.bin",
+    "dialogue.5.bin",
+    "dialogue.6.bin",
+    "dialogue.7.bin"
+   ],
+   "required": true
+  },
   {
    "id": "hq-door-round2",
    "hash": "f994ddb735d5a20e",
@@ -50,8 +1567,8 @@
   },
   {
    "id": "jr-field",
-   "hash": "efc3738877bfedb1",
-   "bytes": 4353587,
+   "hash": "079b827a0f2b81e5",
+   "bytes": 7534062,
    "parts": [
     "jr-field.1.bin",
     "jr-field.2.bin",
@@ -61,7 +1578,13 @@
     "jr-field.6.bin",
     "jr-field.7.bin",
     "jr-field.8.bin",
-    "jr-field.9.bin"
+    "jr-field.9.bin",
+    "jr-field.10.bin",
+    "jr-field.11.bin",
+    "jr-field.12.bin",
+    "jr-field.13.bin",
+    "jr-field.14.bin",
+    "jr-field.15.bin"
    ],
    "required": true
   },
@@ -75,24 +1598,14 @@
    "required": true
   },
   {
-   "id": "test-people",
-   "hash": "c677942e2c209bcc",
-   "bytes": 1228145,
+   "id": "ui-badges",
+   "hash": "5a1a2749209ca4b3",
+   "bytes": 625405,
    "parts": [
-    "test-people.1.bin",
-    "test-people.2.bin",
-    "test-people.3.bin"
+    "ui-badges.1.bin",
+    "ui-badges.2.bin"
    ],
-   "required": true
-  },
-  {
-   "id": "visit-agents",
-   "hash": "055f4d0f5ff02f3a",
-   "bytes": 78691,
-   "parts": [
-    "visit-agents.1.bin"
-   ],
-   "required": true
+   "required": false
   }
  ]
 }

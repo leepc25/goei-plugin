@@ -1,4 +1,240 @@
-e) void viewport.phoneFull(false);
+    src = t;
+      const b = document.createElement("div");
+      b.className = "gx-upright";
+      b.innerHTML = '<input type="text" autocomplete="off" enterkeyhint="send"><button type="button" data-up="send">보내기</button><button type="button" data-up="close">닫기</button>';
+      const inp = b.querySelector("input");
+      inp.value = t.value;
+      inp.placeholder = t.placeholder;
+      if (t.maxLength > 0) inp.maxLength = t.maxLength;
+      inp.setAttribute("aria-label", t.getAttribute("aria-label") ?? "입력");
+      const sync = () => {
+        if (!src) return;
+        src.value = inp.value;
+        src.dispatchEvent(new Event("input", { bubbles: true }));
+      };
+      const send2 = () => {
+        const s5 = src;
+        if (!s5) return;
+        sync();
+        s5.dispatchEvent(new KeyboardEvent("keydown", { key: "Enter", code: "Enter", bubbles: true, cancelable: true }));
+        close3();
+      };
+      inp.addEventListener("input", sync);
+      inp.addEventListener("keydown", (ev) => {
+        if (ev.key === "Enter" && !ev.isComposing && ev.keyCode !== 229) ev.preventDefault(), send2();
+        else if (ev.key === "Escape") close3();
+      });
+      inp.addEventListener("blur", () => setTimeout(() => box2 && !box2.contains(document.activeElement) && close3(), 120));
+      b.addEventListener("click", (ev) => {
+        const k = ev.target.closest("[data-up]")?.dataset.up;
+        if (k === "send") send2();
+        else if (k === "close") close3();
+      });
+      box2 = b;
+      document.body.append(b);
+      place2();
+      inp.focus({ preventScroll: true });
+    };
+    layer2.addEventListener("focusin", onFocus);
+    vv?.addEventListener("resize", place2);
+    vv?.addEventListener("scroll", place2);
+    return () => {
+      layer2.removeEventListener("focusin", onFocus);
+      vv?.removeEventListener("resize", place2);
+      vv?.removeEventListener("scroll", place2);
+      close3(false);
+    };
+  }
+
+  // src/ui/game.ts
+  var layer = null;
+  var viewport = null;
+  var unmount = null;
+  var view = "home";
+  var generation = 0;
+  var busy3 = "";
+  var notice = "";
+  var offReports = null;
+  var offUpright = null;
+  var gameStats = { openMs: 0, codeMs: 0, mountMs: 0, heapOpen: 0, heapAfter: 0 };
+  globalThis.__goeiGameStats = { game: gameStats, code: codeStats, fetch: fetchStats, urls: liveUrls };
+  var heap = () => performance.memory?.usedJSHeapSize ?? 0;
+  var esc30 = (s5) => String(s5 ?? "").replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`);
+  var kb2 = (n2) => n2 >= 1024 * 1024 ? `${(n2 / 1024 / 1024).toFixed(1)}MB` : `${Math.max(1, Math.round(n2 / 1024))}KB`;
+  var when3 = (t) => {
+    const d = new Date(t);
+    return `${d.getMonth() + 1}/${d.getDate()} ${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;
+  };
+  async function files() {
+    const code2 = await codeState();
+    let index2 = null;
+    try {
+      index2 = await gameIndex();
+    } catch {
+    }
+    const need = [];
+    for (const p of index2?.packs ?? []) if (p.required && await packStateOf(p) !== "ready") need.push({ id: p.id, bytes: p.bytes });
+    const bytes = (code2 === "ready" ? 0 : index2?.code.bytes ?? 0) + need.reduce((n2, p) => n2 + p.bytes, 0);
+    return { index: index2, code: code2, need, bytes };
+  }
+  var row9 = (label2, help, ctl = "") => `<div class="ps-row"><div class="ps-label"><b>${label2}</b>${help ? `<small>${help}</small>` : ""}</div>${ctl ? `<div class="ps-ctl gx-gl-ctl">${ctl}</div>` : ""}</div>`;
+  var group5 = (title2, rows2) => `<section class="ps-group"><h3>${title2}</h3><div class="ps-rows">${rows2}</div></section>`;
+  var dis = () => busy3 ? " disabled" : "";
+  var msgOf = () => busy3 || notice ? `<span role="status">${esc30(busy3 || notice)}</span>` : "";
+  var needFiles = (f) => f.code !== "ready" || f.need.length > 0;
+  function filesHtml(f) {
+    if (!needFiles(f)) return "";
+    const what = msgOf() || (f.code === "old" ? "플러그인이 바뀌어 게임 파일을 새로 받아야 해요." : "처음 한 번만 받아요. 받은 파일은 이 기기의 Risu에 저장돼요.");
+    const size = f.index ? ` (${kb2(f.bytes)})` : "";
+    return group5("게임 파일", row9("게임 파일 받기", what, `<button class="gx-mini primary" data-g="get"${dis()}>받기${size}</button><button class="gx-mini" data-g="file"${dis()}>파일로 넣기</button>`));
+  }
+  function startHtml(slots, last3, ready) {
+    const s5 = slots.find((x) => x.slot === last3) ?? slots.sort((x, y) => y.savedAt - x.savedAt)[0];
+    const help = ready && msgOf() || (s5 ? `마지막 저장 · ${when3(s5.savedAt)}${s5.summary ? ` · ${esc30(s5.summary)}` : ""}` : "요원들을 만나 대화해요. 나눈 말은 다음 본편 요청에 막간으로 들어가요.");
+    return group5("필드", row9("본부", help, `<button class="gx-mini primary" data-g="play"${ready ? "" : " disabled"}>들어가기</button>`));
+  }
+  function linkHtml(card2, reports2, record) {
+    if (!card2) return group5("본편 연동", row9("채팅 연결 안 됨", "괴이 카드 채팅을 열면 명부 요원과 상황판을 게임이 읽어요."));
+    const n2 = (k) => card2.events.filter((e) => e.kind === k).length;
+    const free = card2.agents.filter((a) => !a.locked).length;
+    const reps = reports2.map((p) => row9(
+      esc30(p.report.mission),
+      `${{ return: "귀환", evac: "부상·후송", withdraw: "자발 철수", death: "사망" }[p.report.outcome]}${p.report.depth ? ` · ${esc30(p.report.depth)}` : ""} · ${when3(p.at)}${p.report.summary ? ` · ${esc30(p.report.summary)}` : ""}`,
+      `<button class="gx-mini primary" data-g="record" data-at="${p.at}"${p.recorded || busy3 ? " disabled" : ""}>${p.recorded ? "기록함" : "기록 로어북에 남기기"}</button>
+     <button class="gx-mini" data-g="drop" data-at="${p.at}" aria-label="결과 지우기">${ICONS.trash}</button>`
+    )).join("");
+    return group5("본편 연동", [
+      row9("이 채팅에서 읽은 것", `요원 ${card2.agents.length}명(편성 가능 ${free}) · 괴이 ${n2("an")} · 사건 ${n2("in")} · 특수 ${n2("ms")}`),
+      reps || "",
+      record ? row9(`「${esc30(RECORD_COMMENT)}」 로어북`, `${record}줄`, '<button class="gx-mini" data-g="unrecord">지우기</button>') : ""
+    ].join(""));
+  }
+  async function home() {
+    const box2 = layer?.querySelector(".gx-game-box");
+    if (!box2 || view !== "home") return;
+    const me = generation;
+    const [f, slots, last3, card2, reports2, ctx2] = await Promise.all([
+      files(),
+      gameSaves.list(),
+      gameSaves.last(),
+      readCard().catch(() => null),
+      pendingReports(),
+      loadContext().catch(() => null)
+    ]);
+    if (me !== generation || view !== "home" || !layer) return;
+    const record = ctx2 ? String((ctx2.chat.localLore ?? []).find((e) => e.comment === RECORD_COMMENT)?.content ?? "").split("\n").filter((l) => l.startsWith("- ")).length : 0;
+    const open3 = new Set([...box2.querySelectorAll("details[data-keep]")].filter((d) => d.open).map((d) => d.dataset.keep));
+    box2.innerHTML = `<div class="gx-gl gx-settings">
+    ${filesHtml(f)}${startHtml(slots, last3, !needFiles(f))}${linkHtml(card2, reports2, record)}
+    <input type="file" accept=".js,.pack" multiple hidden data-g-file></div>`;
+    box2.querySelectorAll("details[data-keep]").forEach((d) => d.open = open3.has(d.dataset.keep));
+  }
+  var say = (t) => {
+    notice = t;
+    void home();
+  };
+  async function getFiles() {
+    busy3 = "게임 파일을 받는 중";
+    void home();
+    try {
+      forgetIndex();
+      const idx = await gameIndex();
+      if (await codeState() !== "ready") {
+        await loadGameCode((d, t) => (busy3 = `게임 코드 받는 중 ${d}/${t}`, void home()));
+      }
+      for (const p of idx.packs) {
+        if (!p.required || await packStateOf(p) === "ready") continue;
+        await downloadGamePack(p, (d, t) => (busy3 = `그림·소리 받는 중 (${p.id}) ${d}/${t}`, void home()));
+      }
+      busy3 = "";
+      say("다 받았어요.");
+    } catch (e) {
+      busy3 = "";
+      say(`받지 못했어요: ${e instanceof Error ? e.message : String(e)} 잠시 뒤 다시 받거나 파일로 넣어 주세요.`);
+    }
+  }
+  async function putFiles(list4) {
+    busy3 = "넣는 중";
+    void home();
+    const done3 = [];
+    try {
+      for (const f of [...list4]) {
+        const bytes = new Uint8Array(await f.arrayBuffer());
+        if (f.name.endsWith(".js")) await installGameCode(new TextDecoder().decode(bytes)), done3.push("게임 코드");
+        else done3.push(`팩 ${await installGamePack(bytes)}`);
+      }
+      busy3 = "";
+      say(`넣었어요: ${done3.join(", ")}`);
+    } catch (e) {
+      busy3 = "";
+      say(e instanceof Error ? e.message : String(e));
+    }
+  }
+  var chromeHidden = null;
+  function phoneChrome(on3) {
+    if (on3 && layer) {
+      chromeHidden = layer.closest(".gx") ?? null;
+      chromeHidden?.classList.add("gx-fieldfull");
+      layer.classList.add("gx-phone");
+    } else {
+      chromeHidden?.classList.remove("gx-fieldfull");
+      chromeHidden = null;
+      layer?.classList.remove("gx-phone");
+    }
+    setFabHidden(on3);
+  }
+  async function play(slot) {
+    const box2 = layer?.querySelector(".gx-game-box");
+    if (!box2 || !viewport) return;
+    const me = ++generation;
+    const onPhone = phone2();
+    const going = onPhone ? viewport.phoneFull(true) : null;
+    if (onPhone) phoneChrome(true);
+    const t0 = performance.now();
+    gameStats.heapOpen = heap();
+    busy3 = "게임을 여는 중";
+    try {
+      const mod2 = await loadGameCode();
+      gameStats.codeMs = Math.round(performance.now() - t0);
+      if (me !== generation || !layer) return;
+      view = "play";
+      if (going) await going;
+      else viewport.fill(true);
+      setHead();
+      box2.innerHTML = "";
+      const bridge = makeBridge(viewport, slot, () => onExit ? onExit() : closeGame(), (cb) => {
+        hiddenSubs2.add(cb);
+        return () => void hiddenSubs2.delete(cb);
+      });
+      if ((await loadContext().catch(() => null))?.chat.scriptstate?.$goei_diag === "1") globalThis.__goeiBridge = bridge;
+      const t1 = performance.now();
+      unmount = mod2.mount(box2, bridge);
+      gameStats.mountMs = Math.round(performance.now() - t1);
+      gameStats.openMs = Math.round(performance.now() - t0);
+      busy3 = "";
+    } catch (e) {
+      busy3 = "";
+      view = "home";
+      phoneChrome(false);
+      if (viewport.phone) await viewport.phoneFull(false);
+      viewport.fill(false);
+      setHead();
+      say(`게임을 열지 못했어요: ${e instanceof Error ? e.message : String(e)}`);
+    }
+  }
+  function stop() {
+    generation++;
+    unmount?.();
+    unmount = null;
+    delete globalThis.__goeiBridge;
+    releaseAll();
+    gameStats.heapAfter = heap();
+  }
+  function toHome() {
+    stop();
+    view = "home";
+    phoneChrome(false);
+    if (viewport?.phone) void viewport.phoneFull(false);
     viewport?.fill(false);
     notice = "";
     setHead();
@@ -35,15 +271,6 @@ e) void viewport.phoneFull(false);
           else await viewport?.enter();
           if (view !== "home") viewport?.fill(true);
           return setHead();
-        case "post": {
-          const p = await find();
-          if (!p) return;
-          busy3 = "채팅에 놓는 중";
-          void home();
-          await postReport(p);
-          busy3 = "";
-          return say("보고서를 채팅에 놓았어요. 보내려면 채팅창의 전송 버튼을, 그만두려면 메시지의 취소를 눌러 주세요.");
-        }
         case "record": {
           const p = await find();
           if (!p) return;
@@ -244,7 +471,7 @@ e) void viewport.phoneFull(false);
   };
   var mapUrls = {};
   var esc31 = (s5) => String(s5 ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
-  var KIND_LABEL5 = { an: "괴이", in: "사건", ms: "특수" };
+  var KIND_LABEL4 = { an: "괴이", in: "사건", ms: "특수" };
   var MISSION_LABEL = { an: "괴이", ms: "특수", lm: "거점" };
   function resetField(all = false) {
     field3.target = null;
@@ -446,7 +673,7 @@ e) void viewport.phoneFull(false);
   function situations(x, events) {
     const counts = { all: events.length, an: 0, in: 0, ms: 0 };
     for (const e of events) counts[e.kind]++;
-    const chips3 = ["all", "an", "in", "ms"].map((f) => `<button class="gx-chip${field3.filter === f ? " on" : ""}" data-action="map-filter" data-value="${f}">${f === "all" ? "전체" : KIND_LABEL5[f]}<b>${counts[f]}</b></button>`).join("");
+    const chips3 = ["all", "an", "in", "ms"].map((f) => `<button class="gx-chip${field3.filter === f ? " on" : ""}" data-action="map-filter" data-value="${f}">${f === "all" ? "전체" : KIND_LABEL4[f]}<b>${counts[f]}</b></button>`).join("");
     const agents = new Map(rosterFor(x.world, x.catalog, x.faction, x.settings.agent_limit).map((p) => [p.name, p]));
     const shown2 = events.filter((e) => (field3.filter === "all" || e.kind === field3.filter) && (!field3.place || placeKey(e, x.catalog) === field3.place));
     const place2 = field3.place ? placeCard(field3.place, x.catalog, sameTarget(field3.target, field3.place)) : "";
@@ -2694,6 +2921,10 @@ ${fields3}${NOTE}`;
   var reason = (e) => e instanceof Error ? e.message : String(e);
   async function onBeforeRequest(messages, type) {
     if (type !== "model" || !Array.isArray(messages)) return messages;
+    await flushGamesBeforeSend().catch(() => {
+    });
+    await fieldIdle().catch(() => {
+    });
     if (faultOn("beforeRequest")) throw new Error("시험용 예외 주입(beforeRequest)");
     const failed = [];
     const step = (name, run5, fallback) => {
@@ -2893,7 +3124,8 @@ ${texts.anomaly}`;
   function withVisit(messages, { char, chat }) {
     if (!visitRecord(chat).turns.length && !fieldRecord(chat).events.length) return messages;
     const me = playerAgent(char.globalLore, chat.scriptstate);
-    return withFieldFacts(withInterludes(messages, chat, visitContextRules({ char }), me?.name || userInfo().name || "주인공"), chat);
+    const visitor = me?.name || userInfo().name || "주인공";
+    return withFieldFacts(withInterludes(messages, chat, visitContextRules({ char }), visitor), chat, visitor);
   }
   function moduleContext(scene, { char, chat }) {
     const ss = chat.scriptstate;
@@ -2909,13 +3141,13 @@ ${texts.anomaly}`;
     if (wantGnet && rules3.gnet) {
       const st = readGnet(chat);
       const own = CONTEXT.tokens;
-      if (st.posts.length || st.dms.length) parts.push({ cap: own, build: (cap) => withCap(CONTEXT, "tokens", cap, () => mainContext(st, userNick(ss), rules3.gnet, focus)) });
+      if (st.posts.length || st.dms.length) parts.push({ cap: own, build: (cap) => withCap(CONTEXT, "tokens", cap, () => mainContext2(st, userNick(ss), rules3.gnet, focus)) });
     }
     if (wantPhone && rules3.phone) {
       try {
         const st = readPhone(chat);
         const notices = readBulletins(chat);
-        parts.push({ cap: HISTORY2.contextTokens, build: (cap) => withCap(HISTORY2, "contextTokens", cap, () => mainContext2(st, notices, phoneSettings(ss), rules3.phone, focus)) });
+        parts.push({ cap: HISTORY.contextTokens, build: (cap) => withCap(HISTORY, "contextTokens", cap, () => mainContext(st, notices, phoneSettings(ss), rules3.phone, focus)) });
       } catch (error) {
         console.log(`[goei] 괴담톡 기록을 읽지 못했어요: ${error instanceof Error ? error.message : String(error)}`);
       }
@@ -3223,5 +3455,5 @@ ${texts.anomaly}`;
   }
 
   // src/body-entry.ts
-  globalThis.__goeiBody = { version: "0.18.2", start: start3 };
+  globalThis.__goeiBody = { version: "0.19.0", start: start3 };
 })();
