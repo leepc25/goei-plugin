@@ -386,6 +386,18 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
     };
   };
 
+  /** 모든 맵 에디터 장면 중 줄 한가운데 사람 크기(dotK × 그 자리 원근)의 최댓값 — 사람 크기 기준 */
+  let maxMidCache = 0;
+  const maxMid = () => {
+    if (maxMidCache) return maxMidCache;
+    let m = STD_MID;
+    for (const pt of Object.values(PAINTED)) {
+      if (!pt?.dotK || !pt.lane) continue;
+      const v = perspOf((pt.lane[0] + pt.lane[1]) / 2, pt.lane, pt.far || FAR, pt.growTo || 0, pt.sizes || []) * pt.dotK;
+      if (v > m) m = v;
+    }
+    return (maxMidCache = m);
+  };
   const go = (sceneId: string, x: number, y?: number) => {
     fieldView.worldH = sceneOf(sceneId).painted ? PAINTED[sceneOf(sceneId).painted!]?.h ?? 700 : SCREEN_H;
     // 맵 에디터 장면(dotK)이면 사람 배율을 그 장면 규격으로 (중림 브랜치 10-29, 11-01 옮김)
@@ -397,10 +409,11 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
     fieldView.growTo = pt?.growTo || 0;
     fieldView.sizes = pt?.sizes || [];
     // 줄 한가운데 사람 크기 = 장면 규격 × 그 자리 원근. 이것이 기준 크기(STD_MID)가 되게 화면 전체를 확대한다
+    // 기준 = 사람이 가장 크게 그려진 장면(사무실)이 창 세로를 꽉 채울 때의 크기. 다른 장면은 그 크기까지 키우므로 확대율은 늘 1 이상 → 검은 띠 없음, 위아래는 주인공을 따라 움직임 (사용자 11-02 15:09)
     const lane = sceneOf(sceneId).lane ?? LANE;
     const mid = perspOf((lane[0] + lane[1]) / 2, lane, fieldView.far, fieldView.growTo, fieldView.sizes) * dotK;
     fieldView.charMul = dotK / CHAR_K;
-    fieldView.sceneZoom = STD_MID / mid;
+    fieldView.sceneZoom = Math.max(1, maxMid() / mid);
     pending = { scene: sceneId, x, y };
     fadeOut = FADE;
   };

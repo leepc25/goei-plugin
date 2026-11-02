@@ -145,10 +145,9 @@ export class Game {
         // 필드(PC): 100% = 월드 1px를 화면 BASE_ZOOM px로 고정 (사용자 2026-10-27: 그림·창 높이에 따라 확대율이 바뀌면 방마다 사람 크기가 달라진다).
         //   창이 크면 더 넓게 보이고, 장면이 화면보다 짧으면 위아래는 검게, 길면 주인공을 따라 위아래로 움직인다.
         // 폰처럼 낮은 창(CSS 600px 미만)과 필드 밖은 예전처럼 장면 세로가 창에 꽉 (그림 700, 그 밖 720)
+        // 11-02 사용자: 필드는 장면 세로를 창에 꽉 채우고(검은 띠 없음), 사람이 가장 큰 장면 기준으로 다른 장면은 더 키운다(view.sceneZoom ≥ 1, 위아래는 주인공을 따라 움직임). 10-27의 PC 1배 고정은 폐기.
         const H = this.inHub ? view.worldH : SCREEN_H;
-        const cssH = this.canvas.getBoundingClientRect().height;
-        const fixed = this.inHub && cssH >= 600;
-        view.zoom = (fixed ? BASE_ZOOM * (this.canvas.height / cssH) : this.canvas.height / H) * Math.max(1, charSize.k) * (this.inHub ? view.sceneZoom : 1);
+        view.zoom = (this.canvas.height / H) * Math.max(1, charSize.k) * (this.inHub ? view.sceneZoom : 1);
         if (w) view.lane = w.lane;
         const vw = this.canvas.width / view.zoom;
         view.w = this.inHub ? Math.max(SCREEN_W, vw) : SCREEN_W;
