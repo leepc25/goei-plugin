@@ -30,7 +30,7 @@ for it in ARGV[1:]:
         dx,dy=map(int,cd.split(',')); pl=dict(pv,dx=dx,dy=dy)
         W,H=200,300; base=H-15
         T=Image.new('RGBA',(W,H),(92,86,78,255))
-        ch=Image.open(fc.chair_png(pv['img'])).convert('RGBA'); cx,cy=round(W/2-100),base-171
+        ch=Image.open(fc.chair_png(os.environ.get('CHAIR_IMG') or pv['img'])).convert('RGBA'); cx,cy=round(W/2-100),base-171
         if v!='back': T.alpha_composite(ch,(cx,cy)); T.alpha_composite(f,pos(f,pl,W,base))
         else: T.alpha_composite(f,pos(f,pl,W,base)); T.alpha_composite(ch,(cx,cy))
         T.alpha_composite(olim,pos(s,pv,W,base))
