@@ -29,7 +29,7 @@ buf=io.BytesIO(); ref.save(buf,"PNG")
 body={"description":desc,"name":name,"view":"low top-down","image_size":{"width":w,"height":h},"n_directions":ndir,
       "style_image":{"image":{"type":"base64","base64":base64.b64encode(buf.getvalue()).decode(),"format":"png"},"size":{"width":ref.width,"height":ref.height},
                      "usage_description":"style reference only: copy the pixel density, outline and shading of this character sprite; do not draw the character"},
-      "style_options":{"color_palette":False,"outline":True,"detail":True,"shading":True}}
+      "style_options":{"color_palette":os.environ.get("STYLE_COLOR")=="1","outline":True,"detail":True,"shading":True}}
 if src:   # 정면 재사용 시 크기·화풍 설정은 넣으면 422
     body["first_frame"]={"type":"base64","base64":base64.b64encode(Path(src).read_bytes()).decode(),"format":"png"}
     for k in ("image_size","style_image","style_options"): body.pop(k)

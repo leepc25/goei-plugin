@@ -1,0 +1,86 @@
+{
+ "object_id": "0d6cdae6-907d-4366-908e-ca0de91b303b",
+ "job": {
+  "usage": {
+   "type": "usd",
+   "usd": 0.04118098374006483
+  },
+  "id": "a480520d-75e3-4044-8116-630a20b24240",
+  "status": "completed",
+  "created_at": "2026-11-02T06:50:40.960767+00:00",
+  "last_response": {
+   "status": "completed",
+   "progress": 1,
+   "object_id": "0d6cdae6-907d-4366-908e-ca0de91b303b",
+   "image_size": {
+    "width": 256,
+    "height": 256
+   },
+   "frame_count": 1,
+   "single_frame": true,
+   "storage_urls": {
+    "unknown": "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/0d6cdae6-907d-4366-908e-ca0de91b303b/rotations/unknown.png"
+   },
+   "billing_usage": {
+    "usd": 0.04118098374006483,
+    "type": "usd"
+   },
+   "generation_id": "d8f88f6c-6606-455a-a9ed-a46b1be15f8d",
+   "billing_stages": [
+    {
+     "stage": "first_direction",
+     "usage": {
+      "usd": 0.04118098374006483,
+      "type": "usd"
+     },
+     "generation_id": "d8f88f6c-6606-455a-a9ed-a46b1be15f8d"
+    }
+   ],
+   "billing_charged": true,
+   "generation_mode": "pro_flash",
+   "source_image_id": "898016a3-52e0-5c01-b75b-aa4d05a367bb",
+   "directions_count": 1,
+   "first_direction_generated": true
+  }
+ },
+ "object": {
+  "id": "0d6cdae6-907d-4366-908e-ca0de91b303b",
+  "name": "D02_사무책상_북쪽_1배",
+  "state_name": "base",
+  "prompt": "An office work desk with only a computer monitor, a keyboard and a mouse on it, nothing else on the top. A plain rectangular desk with a flat top and a drawer unit under one side. The desk is seen from its back side: the back of the monitor faces the viewer, and the keyboard and mouse are on the far side of the desk, behind the monitor. Seen almost straight from the front, from the eye height of a standing adult, looking only a little down: the desk top shows as a thin band, much thinner than the front of the desk. The desk is much wider than it is tall and fills almost the whole width of the canvas. Only the desk with the things on it, centered, nothing else.",
+  "size": {
+   "width": 256,
+   "height": 256
+  },
+  "directions": 1,
+  "created_at": "2026-11-02T06:50:40.993567+00:00",
+  "view": "low top-down",
+  "rotation_urls": {
+   "south": null,
+   "west": null,
+   "east": null,
+   "north": null,
+   "south-east": null,
+   "south-west": null,
+   "north-east": null,
+   "north-west": null
+  },
+  "storage_urls": {
+   "unknown": "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/0d6cdae6-907d-4366-908e-ca0de91b303b/rotations/unknown.png"
+  },
+  "frame_urls": null,
+  "style_settings": {
+   "version": "v2.0.0+api",
+   "no_background": true,
+   "generation_mode": "pro_flash",
+   "source_image_id": "898016a3-52e0-5c01-b75b-aa4d05a367bb",
+   "first_frame_direction": "south"
+  },
+  "tags": [],
+  "status": "completed",
+  "group_id": "7077c4cd-38dd-4ad8-9463-ead99f1137f9",
+  "progress_percent": null,
+  "eta_seconds": null,
+  "animations": []
+ }
+}
