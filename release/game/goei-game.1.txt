@@ -1,4 +1,4 @@
-// goei-game 0.20.0
+// goei-game 0.20.1
 "use strict";
 (() => {
   // src/game/action/hq/jrRooms.gen.ts

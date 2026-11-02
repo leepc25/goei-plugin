@@ -1,4 +1,4 @@
-// goei-game 0.20.0
+// goei-game 0.20.1
 "use strict";
 (() => {
   // src/game/action/hq/jrRooms.gen.ts
@@ -37803,7 +37803,7 @@ ${t.secret}` : "",
     }).catch(() => {
     }) : Promise.resolve().then(() => {
       present = [{ name: "잼트리", room: "office" }, { name: "쟈알디", room: "office" }, { name: "큐라스", room: "lounge" }, { name: "고르고디오", room: "lounge" }, { name: "데쥬레", room: "infirmary" }];
-    })).then(() => Promise.all([...present.map((p) => p.name), ...RESIDENTS.map((r) => r.name)].map((n) => loadChar(n)))).then(() => {
+    })).then(() => Promise.all(present.map((p) => loadChar(p.name)))).then(() => {
       ready = true;
     });
     let me = { faction: "A00", level: 1 };
@@ -39556,7 +39556,7 @@ ${t.secret}` : "",
     }
   }
   var mod = {
-    version: "0.20.0",
+    version: "0.20.1",
     mount: (box2, bridge) => mountPlay(box2, bridge)
   };
   globalThis.__goeiGame = mod;

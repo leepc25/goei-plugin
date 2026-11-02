@@ -139,8 +139,10 @@ function hqAdapter(bridge: Partial<GameBridge> | undefined, ui: { chooseFloor: H
     // 시연판(본편 연결 없음): 생태계를 볼 수 있게 요원 몇 명을 세운다
     : Promise.resolve().then(() => { present = [{ name: '잼트리', room: 'office' }, { name: '쟈알디', room: 'office' }, { name: '큐라스', room: 'lounge' }, { name: '고르고디오', room: 'lounge' }, { name: '데쥬레', room: 'infirmary' }]; }))
     // 본부에 있는 요원의 인물 팩(생활 클립·전투)을 받아 둔다 (없는 인물은 방문 요원 그림·실루엣)
-    // 상주 인물(중림 가게 주인·협회 창구·가짜 관리국·백일몽, world/hq.ts RESIDENTS)도 미리: 그림이 없으면 생활 AI가 할 수 있는 일이 없어 서 있기만 한다 (11-02)
-    .then(() => Promise.all([...present.map((p) => p.name), ...RESIDENTS.map((r) => r.name)].map((n) => loadChar(n)))).then(() => { ready = true; });
+    // 상주 인물(중림 가게 주인·협회 창구·가짜 관리국·백일몽, world/hq.ts RESIDENTS) 그림은 미리 받지 않는다:
+    // v0.20.0에서 29명(팩마다 그림 100장 넘음)을 입장 때 한꺼번에 받아 멈추고 기기가 풀로드(사용자 11-02 17:35).
+    // 그 방에 들어가 화면에 보일 때 받는다(아래 loadChar(a.look)). 그 전까지는 제자리에 서 있다
+    .then(() => Promise.all(present.map((p) => loadChar(p.name)))).then(() => { ready = true; });
   // 필드 시각은 본편 상태줄 시각에서 시작한다 (docs/필드_세계_NPC_설계.md 16-3). 유저 소속·신분도 같이
   let me: { faction: string; level: number | null } = { faction: 'A00', level: 1 };
   /** 주인공이 플레이 중인 이름 인물 (없으면 '') → 대사 chars.<인물> 칸 */
