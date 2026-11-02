@@ -33,20 +33,17 @@
 바뀜/빠짐 | soft daylight shadows under objects and the canopy, dark stairwell.
 같음 | STYLE:
 바뀜/빠짐 | dense, highly detailed pixel art, crisp pixel clusters, selective dark outline, rich medium-to-detailed shading, faded grey, beige, dull blue, rust, soft daylight, no dithering, no blur.
-바뀜/빠짐 | No people, chairs, sofas, benches, coffee tables, clocks or cars.
-새 문장 | Pixel art game background of a clean modern office street sidewalk in Jongno, Seoul, late morning daylight.
+같음 | No people, chairs, sofas, benches, coffee tables, clocks or cars.
+새 문장 | Pixel art game background of a clean modern office street sidewalk in Jongno, Seoul, seen up close from the sidewalk, the image top cuts just above the ground floor entrance doors, late morning daylight.
 새 문장 | smooth clean grey paved sidewalk like one sheet.
 새 문장 | center 50 percent:
-새 문장 | the ground floor of a plain grey stone and glass company building, tops cut off, automatic glass double doors in the middle, closed, a little taller than an adult, a blank sign board above the doors;
+새 문장 | the ground floor of a plain grey stone and glass company building, automatic glass double doors in the middle, closed, a little taller than an adult;
 새 문장 | clear sidewalk at the doors;
-새 문장 | left 25 percent:
-새 문장 | a city bus stop on the sidewalk, a glass shelter with a roof and a blank route sign pole;
-새 문장 | other building fronts along the whole width, ground floor and part of the second floor, tops cut off;
-새 문장 | blank signs, glass shop windows;
+새 문장 | building fronts along the whole width, ground floor only, upper floors out of view;
+새 문장 | glass shop windows;
 새 문장 | potted plants, a bicycle rack, a post box, a trash bin;
 새 문장 | street trees and a streetlight;
-새 문장 | right 25 percent:
+새 문장 | left 25 percent and right 25 percent:
 새 문장 | grey stone, glass and clean concrete building fronts.
-새 문장 | soft daylight shadows under objects and the shelter roof.
+새 문장 | soft daylight shadows under objects.
 새 문장 | dense, highly detailed pixel art, crisp pixel clusters, selective dark outline, rich medium-to-detailed shading, grey, beige, dull blue, soft daylight, no dithering, no blur.
-새 문장 | No people, sofas, coffee tables, clocks or cars.
