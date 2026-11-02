@@ -38,6 +38,13 @@ if os.environ.get("ERASE") == "1":
     win.paste((255, 255, 255, 255), (keep - ov, 0, keep, h))
     if top_h: win.paste((255, 255, 255, 255), (keep - ov_top, 0, keep, top_h))
     if bot_y: win.paste((255, 255, 255, 255), (keep - ov_bot, bot_y, keep, h))
+# PROTECT="x0,y0,x1,y1" (앞 그림 좌표): 이 칸의 옛 그림은 지우지도 다시 그리지도 않고 그대로 둔다(사용자 11-02 11:48 「관철빌딩 글자 부분만」 지우지 못하게)
+PROT = [int(v) for v in os.environ["PROTECT"].split(",")] if os.environ.get("PROTECT") else None
+if PROT:
+    off = im.width - keep
+    pb = (max(PROT[0] - off, 0), PROT[1], min(PROT[2] - off, keep), PROT[3])
+    win.paste(im.crop((pb[0] + off, pb[1], pb[2] + off, pb[3])), (pb[0], pb[1]))
+    mask.paste((0, 0, 0), pb)
 # PREVIEW=<png>: 창·마스크만 저장하고 보내지 않는다
 if os.environ.get("PREVIEW"):
     sh = Image.new("RGB", (w, h * 2 + 8), (255, 0, 255)); sh.paste(win.convert("RGB"), (0, 0)); sh.paste(mask, (0, h + 8))
@@ -103,6 +110,7 @@ newpart = res.convert("RGBA"); base = im.width - keep
 for y in range(h):
     s = seam[y] if not (top_h and y < top_h) else max(seam[y], 0)
     out.paste(newpart.crop((s, y, w, y + 1)), (base + s, y))
+if PROT: out.paste(im.crop((PROT[0], PROT[1], PROT[2], PROT[3])), (PROT[0], PROT[1]))
 print("seam x(창 기준)", min(seam), max(seam))
 out.save(out_path)
 print(json.dumps({"seconds": round(time.time() - t0, 1), "window": res.size, "out": out.size, "usage": j.get("usage") or lr.get("usage")}))
