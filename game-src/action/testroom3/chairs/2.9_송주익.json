@@ -18,9 +18,9 @@
   "img": "north"
  },
  "73": {
-  "dx": -10,
-  "dy": -14,
+  "dx": 6,
+  "dy": -15,
   "s": 1.0,
-  "img": "south-east"
+  "img": "south"
  }
 }
