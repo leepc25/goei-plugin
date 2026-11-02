@@ -293,6 +293,8 @@ export interface SimOptions {
   lineN?: (look: string, id: string) => number;
   /** 장면의 소속 (거점 장면 = 그 조직 코드, 거리 = null). 경비·직원 몹의 소속이 된다 */
   sceneFaction?: (scene: string) => string | null;
+  /** 주인공의 소속 세력 코드 (없으면 null). 거점 경고는 그 거점 세력 소속이 아닌 주인공에게 평판과 무관하게 (11-02 사용자) */
+  playerFaction?: () => string | null;
   /** 세력 평판 구간 (인물 기록 factions()). 몹의 첫 반응을 정한다 (8-6장) */
   stance?: (faction: string) => 'friendly' | 'favorable' | 'neutral' | 'wary' | 'hostile' | null;
   /** 설정 「필드에서 NPC 살해 허용」 (기본 끔: 체력 0 = 기절) */
@@ -353,6 +355,7 @@ export class WorldSim {
     this.lineN = o.lineN;
     this.sceneFaction = o.sceneFaction ?? (() => null);
     this.stance = o.stance ?? (() => null);
+    this.playerFaction = o.playerFaction ?? (() => null);
     this.killOk = o.killOk ?? (() => false);
     this.relation = o.relation ?? defaultRelation;
     this.namedHostile = o.namedHostile ?? (() => false);
@@ -430,6 +433,11 @@ export class WorldSim {
   private sites = new Map<string, number>();
   private sceneFaction: (scene: string) => string | null;
   private stance: (faction: string) => 'friendly' | 'favorable' | 'neutral' | 'wary' | 'hostile' | null;
+  private playerFaction: () => string | null;
+  /** 이 거점이 주인공을 외부인으로 보나: 주인공 소속이 그 거점 세력이 아니면 (평판 단계와 무관, 11-02 사용자 15:49) */
+  private outsiderAt(fac: string): boolean {
+    return this.playerFaction() !== fac;
+  }
   /** 몹의 소속: 경비·직원(근무형·staff·guard)은 장면 소속, 나머지는 없음 */
   mobFaction(a: Actor): string | null {
     if (a.def.kind !== 'mob') return null;
@@ -1359,8 +1367,7 @@ export class WorldSim {
     const p = this.player;
     const fac = p ? this.sceneFaction(p.scene) : null;
     if (!p || !fac || this.hasPass() === fac) return false;
-    const st = this.stance(fac);
-    if (st !== 'wary' && st !== 'hostile') return false;
+    if (!this.outsiderAt(fac)) return false;
     if (this.guardingPlayer(id)) return true;
     const a = this.actors.find((q) => q.def.id === id || q.def.name === id);
     return !!a && a.def.kind === 'named' && this.factionOf(a) === fac;
@@ -1398,6 +1405,8 @@ export class WorldSim {
     if (path && d) { g.route = path; this.walkTo(g, d, `${why}: 쫓아감`, 'chase'); }
     else this.walkTo(g, { x: p.x, y: p.y || g.y }, `${why}: 덤빔`, 'chase');
     this.iconOn(g, '#', 2);
+    // 경고를 무시하고 안쪽으로 들어가면 거점 경보 (11-02 사용자 15:49 「무시하면 층 넘어 추적 + 경보」): 경보가 그 건물 경비·전투원을 주인공이 있는 층으로 계속 보낸다(층을 옮겨도 다시 길을 찾는다)
+    if (!cause) this.raiseAlarm(p.scene, p.x, 'player', why === '경고 무시' ? 'trespass' : why === '무기' ? 'threat' : 'threat');
     if (!cause) this.events.push({ kind: 'cue', scene: g.scene, who: g.def.name, id: g.def.id, cell: why === '무기' ? 'expel.attack_weapon' : why === '위협' ? 'expel.attack_threat' : 'expel.attack', ctx: { target: '{user}', say: why === '무기' ? '무기 내려!' : why === '위협' ? '그 말, 후회하게 될 겁니다.' : '경고했습니다!' } });
     this.events.push({ kind: 'guardAttack', scene: p.scene, who: '{user}', by: g.def.name, ...(cause ? { why: cause } : {}) });
   }
@@ -1430,8 +1439,9 @@ export class WorldSim {
       this.playerVisit = null;
       if (!p || !fac) return;
     }
+    // 경고는 모든 세력 거점(관리국·가짜 관리국·백일몽)에서, 그 세력 소속이 아닌 주인공에게 평판 단계와 무관하게 (11-02 사용자 15:49). 말투만 평판대로
+    if (!this.outsiderAt(fac)) return;
     const st = this.stance(fac);
-    if (st !== 'wary' && st !== 'hostile') return;
     const pv = (this.playerVisit ??= { fac, spotted: false, scene: p.scene, cost: this.exitCost(p.scene, p.x, fac), permit: false, attacked: false });
     if (pv.permit || pv.attacked || this.alarms.has(fac)) return;
     const guardOf = () => this.actors.find((q) => q.def.id === pv.guard && !q.fighting && !['down', 'dead', 'gone'].includes(q.act));

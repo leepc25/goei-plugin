@@ -220,7 +220,7 @@ function hqAdapter(bridge: Partial<GameBridge> | undefined, ui: { chooseFloor: H
   if (typeof window !== 'undefined') window.addEventListener('keydown', onObserveKey);
   const world = () => {
     if (!sim && ready) {
-      sim = createHqWorld(map, seed, present.filter((p) => ROOM_SCENE[p.room]).map((p) => ({ name: p.name, scene: ROOM_SCENE[p.room] })), hasCharClip, { lineN: (look, id) => charArt(look)?.A[id]?.n ?? 10, killOk: () => fighterHooks.killOk?.() ?? false, stance: (f) => factionBy.get(f)?.stage ?? null, relation: (v, t) => relation(v, t), namedHostile: (n) => peopleBy.get(n)?.affinity.cell === 'hostile', nav: { ok: walkablePainted, clamp: (sc, x, y) => clampPainted(sc, x, y) } });
+      sim = createHqWorld(map, seed, present.filter((p) => ROOM_SCENE[p.room]).map((p) => ({ name: p.name, scene: ROOM_SCENE[p.room] })), hasCharClip, { lineN: (look, id) => charArt(look)?.A[id]?.n ?? 10, killOk: () => fighterHooks.killOk?.() ?? false, stance: (f) => factionBy.get(f)?.stage ?? null, playerFaction: () => me.faction || null, relation: (v, t) => relation(v, t), namedHostile: (n) => peopleBy.get(n)?.affinity.cell === 'hostile', nav: { ok: walkablePainted, clamp: (sc, x, y) => clampPainted(sc, x, y) } });
       // 새 대사 자료(game-src/dialogue2 → 대사 팩 dialogue): 인물·NPC 파일 단위로 받아 둔다. 팩이 없으면(시연판) 대사 없이 돈다
       dlg = new Dialogue2((file) => bridge?.assets ? bridge.assets.bytes('dialogue', file).catch(() => null) : Promise.resolve(null), sim.rng);
       chatter = new Chatter(sim, dlg, cueCtx);
