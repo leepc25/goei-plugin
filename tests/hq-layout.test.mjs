@@ -20,7 +20,7 @@ test('본부: 층은 3F·2F·1F·B1·B2·B3 (배경 그림 6장)', () => {
 test('본부: 문은 서로 이어진다 (A→B 문이면 B에 A로 돌아오는 문)', () => {
   for (const sc of M.HQ_SCENES) {
     for (const d of sc.doors) {
-      if (!d.to) continue;
+      if (!d.to || (sc.id === 'by_lobby' && d.id === 'main')) continue;   // 백일몽 로비 정문: 강남 거리 생길 때까지 종로 거리로 한쪽만 (11-02)
       const back = byId[d.to]?.doors.find((q) => q.id === d.toDoor);
       assert.ok(back, `${sc.id}.${d.id} → ${d.to}.${d.toDoor} 없음`);
       assert.equal(back.to, sc.id, `${d.to}.${d.toDoor}가 ${sc.id}로 돌아오지 않음`);
@@ -93,10 +93,11 @@ test('백일몽: 13·15층 문 연결과 엘리베이터 건물 구분', () => {
     const to = byId[d.to]; assert.ok(to, `${sc.id}.${d.id} → ${d.to}`);
     assert.ok(to.doors.some((x) => x.id === d.toDoor), `${sc.id}.${d.id} → ${d.to}.${d.toDoor}`);
     const back = to.doors.find((x) => x.id === d.toDoor);
-    if (back.to) assert.equal(back.to, sc.id, `${d.to}.${d.toDoor} 돌아오기`);
+    if (back.to && !(sc.id === 'by_lobby' && d.id === 'main')) assert.equal(back.to, sc.id, `${d.to}.${d.toDoor} 돌아오기`);   // 로비 정문은 강남 거리 생길 때까지 종로 거리로 한쪽만
   }
-  assert.equal(byId.by_f13.painted, 'by_f13'); assert.equal(byId.by_f15.length, byId.by_f13.length);
+  assert.equal(byId.by_f13.painted, 'by_f13'); assert.ok(byId.by_f15.length < byId.by_f13.length);   // 15층 = 휴게실 앞에서 자름
   const by = M.ELEVATOR.filter((e) => e.bldg === 'by').map((e) => e.scene).sort();
-  assert.deepEqual(by, ['by_f13', 'by_f15']);
-  assert.ok(byId.by_f15.doors.find((d) => d.id === 'rest').locked);
+  assert.deepEqual(by, ['by_f13', 'by_f15', 'by_lobby']);
+  assert.ok(!byId.by_f15.doors.find((d) => d.id === 'rest'));
+  assert.equal(byId.by_office.painted, 'office'); assert.equal(byId.by_elite.painted, 'office_riot');
 });
