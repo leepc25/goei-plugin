@@ -74,6 +74,18 @@ if __name__=='__main__':
         x0,y0,x1,y1=min(xs),min(ys),max(xs),max(ys)
         im=Image.new('RGBA',(x1-x0+1,y1-y0+1),(0,0,0,0)); src=bg.load(); d=im.load()
         for x,y in pts: d[x-x0,y-y0]=src[x,y]
+        # 메움(사용자 05:38 「다 깨지잖아」): 가운데 테이블 왼쪽 뒷모서리는 원본에서 뒤 소화기가 가려 비어 있음.
+        # 원본 왼쪽 윤곽선(기울기 2: 395@291 ~ 421@278)을 그대로 이어 윤곽 2점 + 안쪽은 상판색(진짜 상판색 점은 그대로 둠).
+        if name=='table2':
+            TOP={(0xbb,0xa4,0x8f),(0xbf,0x93,0x6f),(0xa5,0x8c,0x7a),(0x7e,0x5a,0x4f)}
+            for y in range(283,290):
+                xe=421-2*(y-278)
+                for x in range(xe,413):
+                    c=src[x,y]
+                    if x<xe+2: d[x-x0,y-y0]=(6,6,9,255)
+                    elif c[:3] in TOP: d[x-x0,y-y0]=c
+                    else: d[x-x0,y-y0]=(0xbb,0xa4,0x8f,255)
+                for x in range(x0,xe): d[x-x0,y-y0]=(0,0,0,0)
         im.save(OUT/f'{name}.png')
         meta[name]=dict(x=x0,y=y0,w=x1-x0+1,h=y1-y0+1,foot_front=377,foot_back=348,
                         note='배경 1배 좌표. 그릴 때 배경과 같은 2배. 뒤에 앉은 사람 위에 덮어 그림')
