@@ -10,7 +10,11 @@ bg=Image.open(R/'game-src/art/pixellab-hq-20261031/hq_lounge_p12s.png').convert(
 BG=bg.resize((bg.width*K,bg.height*K),Image.NEAREST)
 CH=R/'game-src/art/objects/chairs_shell/fit'
 ADULT, FOOTV = 113, 289; HZ=FOOTV-round(ADULT*0.93); A=ADULT/(FOOTV-HZ)
-def scale(y): return K*A*(y-HZ)/247
+import os
+P=float(os.environ.get('PERSP','1'))   # 원근 세기: 1 = 그대로, 0.5 = 뒤에서 앞으로 커지는 양 절반
+def scale(y):
+    b=K*A*(FOOTV-HZ)/247; f=K*A*(y-HZ)/247
+    return b+(f-b)*P
 def chair(d,y):
     im=Image.open(CH/f'{d}.png').convert('RGBA').crop((0,0,200,172))
     s=scale(y); return im.resize((round(200*s),round(172*s)),Image.NEAREST), s
