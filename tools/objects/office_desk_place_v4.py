@@ -38,7 +38,8 @@ import os
 NCL = int(os.environ.get('CLUSTERS', '4'))
 if NCL == 4:
     dw = load(SOUTH[0], SF).width / K; gap = (bg.width - 4 * dw) / 5
-    GROUPS = [(round(gap + i * (dw + gap)), 1) for i in range(4)]
+    DX = [40, 0, 40, 0]  # 덩이별 손 조정(1배 px). 08:06 사용자 「3번째·1번째를 오른쪽으로 조금 붙여」 +40
+    GROUPS = [(round(gap + i * (dw + gap)) + DX[i], 1) for i in range(4)]
 else:
     GROUPS = [(G1, 2), (G2, 2)]
 for gi, (gx, cnt) in enumerate(GROUPS):
