@@ -1,0 +1,18 @@
+그대로	Pixel art game background of a clean modern office street sidewalk in 
+그대로	Camera at standing eye height, about 20 degrees above the floor, looki
+그대로	The building fronts behind the sidewalk run straight and level across 
+그대로	The floor fills the lower 38 percent: sidewalk, a road strip at the ve
+그대로	Nothing closes the sides: the street keeps going past both image edges
+그대로	FLOOR: smooth clean grey paved sidewalk like one sheet.
+빠짐	In the center: the ground floor of a plain grey stone and glass compan
+그대로	Pack the whole image with detail everywhere: walls, floor and corners 
+빠짐	The sign board above the doors reads exactly "특수재난대응협회".
+그대로	Everything else is up to you.
+그대로	WALL: grey stone, glass and clean concrete building fronts.
+그대로	LIGHT: Rich lighting with clear shadows.
+그대로	STYLE: dense, highly detailed pixel art, crisp pixel clusters, selecti
+그대로	No people, no chairs, no sofas, no benches, no plants, no cars.
+새 문장	The building fronts continue across the whole image to the left, no entrance.
+새 문장	On the sidewalk in the left half, near the curb: one standing bus stop sign pole.
+새 문장	The building fronts run straight and flat across the whole image at the same distance from
+실패: 원본 핵심 문장이 빠짐 — 보내지 않는다

@@ -1,7 +1,8 @@
 {
  "file": "hq_street",
  "bgScale": 2,
- "dotK": 1.12,
+ "dotK": 1.11,
+ "far": 0.94,
  "w": 2544,
  "h": 848,
  "under": true,

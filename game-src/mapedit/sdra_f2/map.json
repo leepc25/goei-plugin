@@ -1,0 +1,96 @@
+{
+ "file": "sdra_f2",
+ "bgScale": 2,
+ "w": 1904,
+ "h": 848,
+ "under": false,
+ "floor": [
+  [
+   0,
+   630
+  ],
+  [
+   1904,
+   630
+  ],
+  [
+   1904,
+   848
+  ],
+  [
+   0,
+   848
+  ]
+ ],
+ "lane": [
+  630,
+  836
+ ],
+ "blocks": [],
+ "doors": {
+  "office": {
+   "kind": "glass",
+   "x": 226,
+   "y": 640,
+   "label": "협회 창구",
+   "door": {
+    "x0": 62,
+    "x1": 388,
+    "y0": 122,
+    "y1": 610,
+    "behind": "dark",
+    "anim": "none"
+   }
+  },
+  "elev": {
+   "kind": "elevator",
+   "x": 636,
+   "y": 640,
+   "label": "엘리베이터",
+   "door": {
+    "x0": 520,
+    "x1": 750,
+    "y0": 258,
+    "y1": 606,
+    "behind": "car",
+    "anim": "slide2",
+    "seam": 636
+   }
+  },
+  "wc_m": {
+   "kind": "door",
+   "x": 1426,
+   "y": 640,
+   "to": "sdra_wc_m",
+   "toDoor": "out",
+   "label": "화장실(남)",
+   "door": {
+    "x0": 1364,
+    "x1": 1486,
+    "y0": 296,
+    "y1": 610,
+    "behind": "dark",
+    "anim": "none"
+   }
+  },
+  "wc_f": {
+   "kind": "door",
+   "x": 1760,
+   "y": 640,
+   "to": "sdra_wc_f",
+   "toDoor": "out",
+   "label": "화장실(여)",
+   "door": {
+    "x0": 1698,
+    "x1": 1820,
+    "y0": 296,
+    "y1": 610,
+    "behind": "dark",
+    "anim": "none"
+   }
+  }
+ },
+ "lamps": [],
+ "spots": [],
+ "objects": []
+}
