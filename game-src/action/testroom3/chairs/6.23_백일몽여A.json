@@ -1,26 +1,20 @@
 {
  "front": {
-  "dx": -5.5,
-  "dy": -12,
+  "dx": 28,
+  "dy": -5,
   "s": 1.0,
-  "img": "south-east"
+  "img": "south-west"
  },
  "side": {
-  "dx": -19.0,
-  "dy": 10,
+  "dx": -21,
+  "dy": 7,
   "s": 1.0,
   "img": "east"
  },
  "back": {
-  "dx": 6.5,
-  "dy": 12,
+  "dx": 9,
+  "dy": 14,
   "s": 1.0,
   "img": "north"
- },
- "73": {
-  "dx": -14.0,
-  "dy": -8.0,
-  "s": 1.0,
-  "img": "C02:south-east"
  }
 }
