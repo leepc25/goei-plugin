@@ -24,5 +24,5 @@ for (sx,sy),key in zip(seats,who):
     img.alpha_composite(s,(round(bx-s.width/2),round(by-sb*kp)))
 img.alpha_composite(chs,(ox,oy))
 for o in g['objects']:
-    if o.get('file') and o['sortY']>FY: img.alpha_composite(Image.open(ROOT/f"game-pack/jr-field/{o['file']}.webp").convert('RGBA'),(o['x'],o['y']))
+    if o.get('file') and o['sortY']>FY and o['id'] not in __import__('os').environ.get('PREVIEW_SKIP','').split(','): img.alpha_composite(Image.open(ROOT/f"game-pack/jr-field/{o['file']}.webp").convert('RGBA'),(o['x'],o['y']))
 img.convert('RGB').save(out); print('kp',round(kp,3),'kc',round(kc,3),'chair',cw,chh,'at',ox,oy)

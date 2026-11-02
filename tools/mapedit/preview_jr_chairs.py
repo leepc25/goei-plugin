@@ -18,8 +18,10 @@ def render(sid, men, out):
     g = json.loads((ROOT / f'game-src/mapedit/{sid}/game.json').read_text())['scene']
     m = json.loads((ROOT / f'game-src/mapedit/{sid}/map.json').read_text())
     P = ROOT / 'game-pack/jr-field'
-    img = Image.open(P / f"{g['file']}.webp").convert('RGBA')
-    layers = [(o['sortY'], Image.open(P / f"{o['file']}.webp").convert('RGBA'), (o['x'], o['y'])) for o in g['objects'] if o.get('file')]
+    import os
+    img = Image.open(os.environ['PREVIEW_BG']).convert('RGBA').resize((g['w'] if 'w' in g else 1264, 848), Image.NEAREST) if os.environ.get('PREVIEW_BG') else Image.open(P / f"{g['file']}.webp").convert('RGBA')
+    skip = set(os.environ.get('PREVIEW_SKIP', '').split(','))   # 시험: 지운 물건의 가림은 빼고 그림
+    layers = [(o['sortY'], Image.open(P / f"{o['file']}.webp").convert('RGBA'), (o['x'], o['y'])) for o in g['objects'] if o.get('file') and o['id'] not in skip]
     for ch in m.get('chairs', []):
         face = ch.get('face'); st = ch.get('set')
         d = 'north' if face == 'N' else ('east' if st else 'west') if face == 'W' else 'east' if face == 'E' else ('south-east' if st else 'east')
