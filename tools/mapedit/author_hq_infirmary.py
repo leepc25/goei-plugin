@@ -36,6 +36,7 @@ for name, x0, x1, y in AGAINST:
     a, b = max(0, x0 - FOOT_W), min(W, x1 + FOOT_W + 1)
     top[a:b] = np.maximum(top[a:b], y + 2)
 def _f(a, f): p = np.pad(a, 5, mode='edge'); return np.array([f(p[i:i + 11]) for i in range(len(a))])
+top[166:341] = np.maximum(top[166:341], 278)   # 왼쪽 침대 뒤는 못 감(사용자 12:30 「이 침대 뒤로까지 가게 할 필욘 없어」) — 바닥선 = 침대 발자국 뒤 끝
 top = _f(_f(top, np.max), np.min)   # 몸 반폭보다 좁은 홈만 메움
 
 # ── 1b) 침대 3개 = 올라설 수 있는 물건(점프 높이 185 > 침대 높이). 윤곽은 5~6배 격자 그림을 보고 손으로 찍은 꼭짓점,
