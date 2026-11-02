@@ -106,3 +106,19 @@ test('NPC 샤워 장: 옷 벗기(SH_A) 한 번 → 머리감기·몸씻기 → �
   assert.deepEqual(S.npcShowerFrame('k', 1, T - 0.01, T, nOf), { id: 'SH_A', f: 0 });
   assert.equal(S.npcShowerFrame('k', 1, T - 1, T, nOf).id, 'SH_A');
 });
+
+test('이성이 탈의실에 들어오면 샤워실과 같은 반응(들어옴 → 머묾1 → 머묾2, shower.* 대사) — 사용자 11-02 06:32', () => {
+  const w = sim();
+  const a = w.add({ id: 'npc:쟈알디', name: '쟈알디', kind: 'named', brain: 'needs', home: 'shower_f', roam: ['shower_f'], look: '쟈알디' }, { scene: 'shower_f', x: 400, y: 700 });
+  a.face = 1; a.plan = 'stay'; a.act = 'idle'; for (const k of Object.keys(a.needs)) a.needs[k] = 100;
+  const male = { scene: 'shower_f', x: 900, y: 700, sex: '남', face: -1 };
+  for (let t = 0; t < 30; t += 0.1) w.step(0.1, male);
+  const ev = w.events.filter((e) => e.kind === 'intrude' && e.who === '쟈알디');
+  assert.deepEqual(ev.map((e) => e.stage), [0, 1, 2]);
+  assert.ok(w.events.some((e) => e.kind === 'cue' && e.cell === 'shower.intrude'));
+  const w2 = sim();
+  const b = w2.add({ id: 'npc:쟈알디', name: '쟈알디', kind: 'named', brain: 'needs', home: 'shower_f', roam: ['shower_f'], look: '쟈알디' }, { scene: 'shower_f', x: 400, y: 700 });
+  b.face = 1; b.plan = 'stay'; b.act = 'idle'; for (const k of Object.keys(b.needs)) b.needs[k] = 100;
+  for (let t = 0; t < 5; t += 0.1) w2.step(0.1, { ...male, sex: '여' });
+  assert.equal(w2.events.filter((e) => e.kind === 'intrude').length, 0, '같은 성별은 반응 없음');
+});
