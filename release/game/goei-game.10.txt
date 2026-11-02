@@ -1,4 +1,81 @@
-ispose();
+w = String(data.result ?? data.how ?? "return");
+        flags.result = how === "withdraw" ? "retreat" : how;
+        flags.called_run = 0;
+      }
+      if (name === "combat:clear" && data.final) name = "win";
+      if (name === "enter:floor" || name === "floor:enter") return;
+      const b = picker.pick(name, agent(), now);
+      if (b) bark("agent", b.text, b.tag === "ult" || b.tag === "boss" ? 2e3 : 2600);
+    };
+    const keys2 = (e) => {
+      if (panel.isOpen) return;
+      if (scene && e.key === "Escape") {
+        scene.skip();
+        e.preventDefault();
+        return;
+      }
+      if (!ui.boxOpen) return;
+      if (runner.current.kind === "choice" && /^[1-9]$/.test(e.key)) {
+        choose2(Number(e.key) - 1);
+        e.preventDefault();
+      } else if ([" ", "Enter", "e", "E", "z", "Z"].includes(e.key)) {
+        advance();
+        e.preventDefault();
+      }
+    };
+    root.addEventListener("keydown", keys2);
+    const cancel = () => {
+      doneCb = sceneDone = talkDone = void 0;
+      scene = null;
+      talkNpc = null;
+      runner.current = { kind: "end" };
+      video.cancel();
+      ui.close();
+      ui.setSkippable(false);
+      ui.fade("clear", 0);
+      panel.close();
+      refresh();
+    };
+    return {
+      flags,
+      library: lib,
+      say,
+      event,
+      bark,
+      cutscene,
+      talk,
+      advance,
+      choose: choose2,
+      skip: () => video.open ? video.finish() : scene?.skip(),
+      cancel,
+      isBlocking: () => blocking,
+      isVideoPlaying: () => video.open,
+      update(dt) {
+        now += dt;
+        const p = !!host.paused?.();
+        video.setPaused(p);
+        if (ui.bubbleLayer.hidden !== p) ui.bubbleLayer.hidden = p;
+        ui.update(dt);
+        if (scene) {
+          scene.update(dt);
+          if (scene.done) {
+            scene = null;
+            ui.setSkippable(false);
+            ui.fade("clear", 300);
+            refresh();
+            const cb = sceneDone;
+            sceneDone = void 0;
+            cb?.();
+          }
+        }
+      },
+      dispose() {
+        if (disposed) return;
+        disposed = true;
+        root.removeEventListener("keydown", keys2);
+        cancel();
+        video.el.remove();
+        ui.dispose();
         panel.el.remove();
         style.remove();
       }
@@ -5271,48 +5348,4 @@ ispose();
       const pv = this.playerVisit ??= { fac, spotted: false, scene: p.scene, cost: this.exitCost(p.scene, p.x, fac), permit: false, attacked: false };
       if (pv.permit || pv.attacked || this.alarms.has(fac)) return;
       const guardOf = () => this.actors.find((q) => q.def.id === pv.guard && !q.fighting && !["down", "dead", "gone"].includes(q.act));
-      if (this.followers.some((id) => {
-        const f = this.actors.find((q) => q.def.id === id);
-        return !!f && this.factionOf(f) === fac;
-      })) {
-        if (pv.spotted) {
-          const g2 = guardOf();
-          release(g2);
-          if (g2) this.events.push({ kind: "cue", scene: g2.scene, who: g2.def.name, id: g2.def.id, cell: "expel.pass_companion", ctx: { target: "{user}", say: "아, 일행이셨군요. 지나가세요." } });
-        }
-        pv.spotted = false;
-        pv.guard = void 0;
-        pv.scene = p.scene;
-        return;
-      }
-      if (!pv.spotted) {
-        pv.scene = p.scene;
-        pv.cost = this.exitCost(p.scene, p.x, fac);
-        const g2 = this.actors.filter((q) => q.scene === p.scene && !q.escort && !q.fighting && !q.brawl && !["down", "dead", "gone", "door", "scared"].includes(q.act) && ARCHETYPES[q.def.archetype ?? ""]?.role === "guard" && (this.mobFaction(q) === fac || !q.def.faction) && Math.abs(q.x - p.x) < _WorldSim.SPOT_PX && Math.abs(q.y - p.y) < 160).sort((a, b) => Math.abs(a.x - p.x) - Math.abs(b.x - p.x))[0];
-        if (!g2) return;
-        pv.spotted = true;
-        pv.guard = g2.def.id;
-        g2.escort = "player";
-        this.iconOn(g2, "!", 1.5);
-        this.events.push({ kind: "cue", scene: g2.scene, who: g2.def.name, id: g2.def.id, cell: "expel.warn", ctx: { target: "{user}", say: st === "hostile" ? "거기 서. 여긴 당신이 올 데가 아니야. 당장 나가." : "여긴 관계자 외 출입 금지입니다. 나가 주시죠." } });
-        this.events.push({ kind: "warn", scene: p.scene, who: "{user}", by: g2.def.name });
-        return;
-      }
-      const g = guardOf();
-      if (!g) {
-        pv.spotted = false;
-        pv.guard = void 0;
-        return;
-      }
-      const threat = !!p.armed && g.scene === p.scene && Math.abs(g.x - p.x) < _WorldSim.SPOT_PX;
-      if (p.scene !== pv.scene || threat) {
-        const cost = this.exitCost(p.scene, p.x, fac);
-        const outward = !threat && Math.floor(cost / 1e4) < Math.floor(pv.cost / 1e4);
-        pv.scene = p.scene;
-        pv.cost = cost;
-        if (!outward) {
-          this.guardAttack(g, p, threat ? "무기" : "경고 무시");
-          return;
-        }
-      }
-      
+      if (this.

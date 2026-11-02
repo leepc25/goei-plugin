@@ -315,15 +315,65 @@ export const doorX = (scene: string, id: string) => {
 export const PAINTED_LANE: [number, number] = [440, 669];
 
 /** 발이 설 수 있는 바닥인가: 바닥 다각형 안이고 막힘(holes·높은 발판) 밖. 그림 장면이 아니면 늘 true (NPC 길찾기용) */
-export function walkablePainted(scene: string, x: number, y: number): boolean {
-  const p = PAINTED[scene];
-  if (!p) return true;
+function walkablePoly(p: PaintedScene, x: number, y: number): boolean {
   if (p.floor && !inPolygon(p.floor, x, y)) return false;
   for (const h of p.holes ?? []) if (inPolygon(h, x, y)) return false;
   if (p.holes) for (const o of p.objects) for (const b of o.solid ?? []) {
     if (b.h !== undefined && x >= b.x0 && x <= b.x1 && y >= b.y0 && y <= b.y1) return false;
   }
   return true;
+}
+/** 장면별 걷기 비트맵(1px). 바닥·막힘 윤곽은 손으로 픽셀 단위로 딴 다각형이라 점이 수천 개 → 매 틱 300명이 다각형 검사를 하면
+ *  한 틱 100ms(v0.20.0 필드 멈춤, 11-02). 처음 물을 때 한 번 주사선으로 채워 두고 O(1)로 본다. 격자 밖은 다각형으로 그대로 */
+type WalkGrid = { x0: number; y0: number; w: number; h: number; bits: Uint8Array };
+const WALK_GRID = new Map<string, WalkGrid>();
+function fillPoly(g: WalkGrid, poly: [number, number][], val: 0 | 1): void {
+  const xs: number[] = [];
+  for (let j = 0; j < g.h; j++) {
+    const y = g.y0 + j;
+    xs.length = 0;
+    for (let i = 0, k = poly.length - 1; i < poly.length; k = i++) {
+      const [xi, yi] = poly[i], [xk, yk] = poly[k];
+      if (yi > y !== yk > y) xs.push(((xk - xi) * (y - yi)) / (yk - yi) + xi);
+    }
+    xs.sort((a, b) => a - b);
+    // inPolygon: x < 교차점 인 교차점 수가 홀수 → [xs[2m], xs[2m+1]) 구간이 안쪽
+    for (let m = 0; m + 1 < xs.length; m += 2) {
+      const a = Math.max(0, Math.ceil(xs[m]) - g.x0), b = Math.min(g.w, Math.ceil(xs[m + 1]) - g.x0);
+      if (a < b) g.bits.fill(val, j * g.w + a, j * g.w + b);
+    }
+  }
+}
+function walkGrid(scene: string, p: PaintedScene): WalkGrid | null {
+  const hit = WALK_GRID.get(scene);
+  if (hit) return hit;
+  const polys = [...(p.floor ? [p.floor] : []), ...(p.holes ?? [])];
+  if (!polys.length) return null;
+  let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+  for (const poly of polys) for (const [x, y] of poly) { x0 = Math.min(x0, x); y0 = Math.min(y0, y); x1 = Math.max(x1, x); y1 = Math.max(y1, y); }
+  x0 = Math.floor(x0) - 1; y0 = Math.floor(y0) - 1;
+  const g: WalkGrid = { x0, y0, w: Math.ceil(x1) + 2 - x0, h: Math.ceil(y1) + 2 - y0, bits: new Uint8Array(0) };
+  g.bits = new Uint8Array(g.w * g.h);
+  if (p.floor) fillPoly(g, p.floor, 1); else g.bits.fill(1);
+  for (const h of p.holes ?? []) fillPoly(g, h, 0);
+  if (p.holes) for (const o of p.objects) for (const b of o.solid ?? []) {
+    if (b.h === undefined) continue;
+    for (let y = Math.max(g.y0, Math.ceil(b.y0)); y <= Math.min(g.y0 + g.h - 1, Math.floor(b.y1)); y++) {
+      const a = Math.max(0, Math.ceil(b.x0) - g.x0), c = Math.min(g.w, Math.floor(b.x1) + 1 - g.x0);
+      if (a < c) g.bits.fill(0, (y - g.y0) * g.w + a, (y - g.y0) * g.w + c);
+    }
+  }
+  WALK_GRID.set(scene, g);
+  return g;
+}
+export function walkablePainted(scene: string, x: number, y: number): boolean {
+  const p = PAINTED[scene];
+  if (!p) return true;
+  const g = walkGrid(scene, p);
+  if (!g) return walkablePoly(p, x, y);
+  const gx = Math.round(x) - g.x0, gy = Math.round(y) - g.y0;
+  if (gx < 0 || gy < 0 || gx >= g.w || gy >= g.h) return p.floor ? false : walkablePoly(p, x, y);
+  return g.bits[gy * g.w + gx] === 1;
 }
 
 /** 옆벽·튀어나온 벽 바깥으로 나간 발을 바닥 안으로 되돌린다 */

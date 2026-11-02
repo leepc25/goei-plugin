@@ -1,4 +1,40 @@
-pt && c.pt.onT } }));
+nt(흰 공용 그림에 색) · under · hold · loop(초) · fade · rot · back
+      // 맞음: hit + r(기본 그림 폭 40%) + depth + delay. after: [부품] 그림이 끝난 뒤
+      v(s, c) {
+        const meta = VFX[s.vfx];
+        if (!meta) return;
+        const fw = meta.frames[0][2], fh = meta.frames[0][3], md = s.mode || meta.mode || "center";
+        let p;
+        if (s.at === "screen") p = { x: W5 / 2 + P2.face * (s.dx || 0), gy: (FLOOR0 + FLOOR1) / 2 + 40 + (s.dy || 0), hy: H5 / 2 + (s.dy || 0), k: 1 };
+        else if (s.at === "body") {
+          const k = K3(P2.y);
+          p = { x: P2.x + P2.face * (s.dx || 0) * k, gy: P2.y, hy: P2.y - P2.z - (s.h ?? 110) * k + (s.dy || 0) * k, k };
+        } else {
+          p = posOf({ at: "front", ...s }, c);
+          if (s.dy) {
+            p.gy += s.dy * p.k;
+            p.hy += s.dy * p.k;
+          }
+        }
+        let sc = (s.scale || 1) * (s.at === "screen" ? 1 : p.k);
+        if (s.w) sc = W5 * s.w / fw;
+        const flip = s.flip === false ? false : P2.face < 0;
+        const o = { [md === "bottom" ? "bottom" : "center"]: true, flip };
+        for (const [k, v] of Object.entries({ under: s.under, back: s.back, tint: s.tint, hold: s.hold, loop: s.loop ? true : void 0, t: s.loop || void 0, fade: s.fade, rot: s.rot ? s.rot * (flip ? -1 : 1) : void 0 })) if (v !== void 0) o[k] = v;
+        vfx(s.vfx, p.x, md === "bottom" ? p.gy : p.hy, sc, o);
+        if (s.boom) boomSnd(s.boom, p.x);
+        if (s.hit) {
+          const r = (s.r ?? fw * 0.4) * sc, hy = md === "bottom" ? p.gy - Math.min(fh * sc * 0.5, 110 * p.k) : p.hy;
+          const hitAt = (t) => later(t, () => {
+            if (s.at === "screen" ? allT() : near2(p.x, p.gy, r + 20, (s.depth || 75) * (p.k || 1))) strike2(t > (s.delay || 0) ? s.tickHit || s.hit : s.hit, hy);
+          });
+          hitAt(s.delay || 0);
+          if (s.loop || s.tick) {
+            const every = s.tick || vfxDur(s.vfx), end = (s.loop || 0) + (s.hold || 0);
+            for (let t = (s.delay || 0) + every; t < end - 0.05; t += every) hitAt(t);
+          }
+        }
+        if (s.after) later(vfxDur(s.vfx) + (s.hold || 0), () => runFx(s.after, { ...c, pt: { x: p.x, y: p.gy, z: 0, onT: c.pt && c.pt.onT } }));
       },
       repeat(s, c) {
         for (let i = 0; i < (s.n || 3); i++) later(i * (s.every || 0.1), () => runFx(s.fx || [], c));
@@ -4017,38 +4053,4 @@ pt && c.pt.onT } }));
     started = false;
     lastTickAt = 0;
     lastFrameAt = 0;
-    /** 「조준경 덮개」 유물: 이번 출동 첫 사격을 썼나 */
-    firstShotUsed = false;
-    /** 마지막으로 코어에서 받아 온 게이지 (바깥에서 바뀌었는지 보려고) */
-    gaugeSeen = 0;
-    /** 방어 게이지 0..100 (사용자 2026-10-25: 방어를 무제한으로 못 하게). 막아낸 공격만큼만 깎이고, 안 맞으면 다시 찬다
-     * (막고만 있으면 줄지 않는다). 맞아서 바닥나면 가드가 깨져 잠깐 휘청이고, 40까지 차오를 때까지 다시 못 막는다 */
-    guard = 100;
-    guardBroken = false;
-    /** 마지막으로 게이지가 줄어든 뒤 지난 초 (화면 표시가 이걸 보고 사라진다) */
-    guardIdle = 99;
-    guardWait = 0;
-    underFn = (ctx, camX) => this.drawUnder(ctx, camX);
-    /** 임시 퍽 (괴이 안에서만, src/game/perks). 인물 AI 는 빈 묶음 */
-    perks = new PerkRun();
-    /** 방 보상: 전투가 끝나면 마지막 적 자리에 떨어지는 카드(후보는 떨어질 때 미리 굴림). 다가가 E로 집으면 3택1 창. 안 집고 다음 방으로 가면 그때 창 */
-    reward = null;
-    /** 전투 끝(괴이 판 진행 중일 때만): 보상 카드를 떨어뜨린다 */
-    dropReward(at2) {
-      if (!this.perks.active || this.reward) return;
-      const kit = kitOf(this.art.cfg, (id) => this.core.has(id), this.base.str);
-      const offers = draft(kit, { ranks: this.perks.ranks, traits: this.perks.traits }, Math.random, this.perks.depth);
-      if (!offers.length) return;
-      const pair = offers.some((f) => f.type === "perk" && f.def.kind === "쌍");
-      const top = Math.max(...offers.map((f) => f.type === "perk" ? f.grade : 0));
-      const p = at2 ?? this.perks.lastKill ?? { x: this.x + this.dir * 160, y: this.y };
-      const [b0, b1] = this.world?.bounds ?? [0, 99999];
-      this.reward = { x: Math.max(b0 + 60, Math.min(b1 - 60, p.x)), y: p.y, t: 0, offers, color: pair ? PAIR_COLOR : offers.every((f) => f.type === "trait") ? TRAIT_COLOR : GRADE_COLOR[top] };
-      fighterHooks.sfx({ type: "pickup", x: p.x });
-    }
-    /** 보상을 집음 → 3택1 창 */
-    takeReward() {
-      const r = this.reward;
-      if (!r) return;
-      this.reward = null;
-   
+    /** 「

@@ -57,9 +57,10 @@ for (const [seed, hour] of [[1, 0], [7, 6], [42, 10], [1, 14], [7, 18], [42, 22]
   // 근무형: 안내 직원 9~18시, 야간 경비 18~9시, 경비 순찰 늘
   const posts = await page.evaluate(() => window.__goeiWorld.actors.filter((a) => a.post).map((a) => `${a.post.id}:${a.def.name}`));
   const onDuty = hour >= 9 && hour < 18;
-  assert.ok(posts.some((p) => p.startsWith('guard:')), `경비 순찰 ${posts}`);
-  assert.equal(posts.some((p) => p.startsWith('desk:')), onDuty, `${hour}시 안내 직원 ${posts}`);
-  assert.equal(posts.some((p) => p.startsWith('night:')), !onDuty, `${hour}시 야간 경비 ${posts}`);
+  // 근무 자리 id는 건물별 접두(hq-guard·fb-guard·by-guard…) (world/hq.ts lobbyPosts, 11-02)
+  assert.ok(posts.some((p) => p.startsWith('hq-guard:')), `경비 순찰 ${posts}`);
+  assert.equal(posts.some((p) => p.startsWith('hq-desk:')), onDuty, `${hour}시 안내 직원 ${posts}`);
+  assert.equal(posts.some((p) => p.startsWith('hq-night:')), !onDuty, `${hour}시 야간 경비 ${posts}`);
   assert.equal(total.night, hour >= 19.5 || hour < 5, `밤 판정 ${hour}시`);
   // 관찰 창 글이 그려진다 (오른쪽 위 자리는 관찰 창이 차지)
   const obs = await page.evaluate(() => { const w = window.__goeiEngine.world; return !!w.stage; });

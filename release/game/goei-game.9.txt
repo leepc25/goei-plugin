@@ -1,4 +1,71 @@
-45);
+w(s);
+      s.setTransform(1, 0, 0, 1, 0, 0);
+      fit(r, ww, hh);
+      r.drawImage(s.canvas, 0, 0, ww, hh, 0, 0, ww, hh);
+      r.globalCompositeOperation = "source-in";
+      r.fillStyle = color;
+      r.fillRect(0, 0, ww, hh);
+      const cx = x + w / 2, cy = y + h / 2;
+      const d3 = Math.hypot(lx - cx, ly - cy) || 1;
+      const dx = (lx - cx) / d3 * thick, dy = (ly - cy) / d3 * thick;
+      r.globalCompositeOperation = "destination-out";
+      r.drawImage(s.canvas, 0, 0, ww, hh, -dx, -dy, ww, hh);
+      c.save();
+      c.globalAlpha *= a;
+      c.globalCompositeOperation = "lighter";
+      c.drawImage(r.canvas, 0, 0, ww, hh, x - pad, y - pad, ww, hh);
+      c.restore();
+    }
+  };
+  var easeOut = (k) => 1 - (1 - k) * (1 - k);
+  var easeInOut = (k) => k < 0.5 ? 2 * k * k : 1 - Math.pow(-2 * k + 2, 2) / 2;
+
+  // src/game/action/ui/gamepad.ts
+  var DEAD = 0.3;
+  var PadReader = class {
+    constructor(hub) {
+      this.hub = hub;
+    }
+    connected = "";
+    prev = /* @__PURE__ */ new Map();
+    rumbleOn = true;
+    index = null;
+    setRumble(on) {
+      this.rumbleOn = on;
+    }
+    pad() {
+      if (typeof navigator === "undefined" || !navigator.getGamepads) return null;
+      for (const p of navigator.getGamepads()) if (p && p.connected) return p;
+      return null;
+    }
+    poll() {
+      const p = this.pad();
+      if (!p) {
+        this.connected = "";
+        this.index = null;
+        this.hub.releaseSource("pad");
+        this.prev.clear();
+        return;
+      }
+      const idx = p.index ?? 0;
+      if (this.index !== idx || this.connected !== p.id) {
+        this.hub.releaseSource("pad");
+        this.prev.clear();
+      }
+      this.index = idx;
+      this.connected = p.id;
+      const want = /* @__PURE__ */ new Map();
+      const set = (code, on) => want.set(code, (want.get(code) ?? false) || on);
+      p.buttons.forEach((b, i) => {
+        const code = PAD_BUTTON[i];
+        if (code) set(code, b.pressed || b.value > 0.5);
+      });
+      let x = p.axes[0] ?? 0, y = p.axes[1] ?? 0;
+      if (Math.hypot(x, y) < DEAD) x = y = 0;
+      this.hub.setAnalog("pad", x, y);
+      set("ArrowLeft", x < -0.45);
+      set("ArrowRight", x > 0.45);
+      set("ArrowUp", y < -0.45);
       set("ArrowDown", y > 0.45);
       for (const code of this.prev.keys()) if (!want.has(code)) want.set(code, false);
       for (const [code, on] of want) {
@@ -3602,81 +3669,4 @@ ${who}: ${text.replace(/\n/g, " ")}
       }
       if (name === "rule:break") flags.broke_rule = 1;
       if (name === "run:end") {
-        const how = String(data.result ?? data.how ?? "return");
-        flags.result = how === "withdraw" ? "retreat" : how;
-        flags.called_run = 0;
-      }
-      if (name === "combat:clear" && data.final) name = "win";
-      if (name === "enter:floor" || name === "floor:enter") return;
-      const b = picker.pick(name, agent(), now);
-      if (b) bark("agent", b.text, b.tag === "ult" || b.tag === "boss" ? 2e3 : 2600);
-    };
-    const keys2 = (e) => {
-      if (panel.isOpen) return;
-      if (scene && e.key === "Escape") {
-        scene.skip();
-        e.preventDefault();
-        return;
-      }
-      if (!ui.boxOpen) return;
-      if (runner.current.kind === "choice" && /^[1-9]$/.test(e.key)) {
-        choose2(Number(e.key) - 1);
-        e.preventDefault();
-      } else if ([" ", "Enter", "e", "E", "z", "Z"].includes(e.key)) {
-        advance();
-        e.preventDefault();
-      }
-    };
-    root.addEventListener("keydown", keys2);
-    const cancel = () => {
-      doneCb = sceneDone = talkDone = void 0;
-      scene = null;
-      talkNpc = null;
-      runner.current = { kind: "end" };
-      video.cancel();
-      ui.close();
-      ui.setSkippable(false);
-      ui.fade("clear", 0);
-      panel.close();
-      refresh();
-    };
-    return {
-      flags,
-      library: lib,
-      say,
-      event,
-      bark,
-      cutscene,
-      talk,
-      advance,
-      choose: choose2,
-      skip: () => video.open ? video.finish() : scene?.skip(),
-      cancel,
-      isBlocking: () => blocking,
-      isVideoPlaying: () => video.open,
-      update(dt) {
-        now += dt;
-        const p = !!host.paused?.();
-        video.setPaused(p);
-        if (ui.bubbleLayer.hidden !== p) ui.bubbleLayer.hidden = p;
-        ui.update(dt);
-        if (scene) {
-          scene.update(dt);
-          if (scene.done) {
-            scene = null;
-            ui.setSkippable(false);
-            ui.fade("clear", 300);
-            refresh();
-            const cb = sceneDone;
-            sceneDone = void 0;
-            cb?.();
-          }
-        }
-      },
-      dispose() {
-        if (disposed) return;
-        disposed = true;
-        root.removeEventListener("keydown", keys2);
-        cancel();
-        video.el.remove();
-        ui.d
+        const ho
