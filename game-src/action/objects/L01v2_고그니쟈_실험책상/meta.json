@@ -1,0 +1,86 @@
+{
+ "object_id": "c87b1e44-728d-40e0-b384-c42d6c2cf6e7",
+ "job": {
+  "usage": {
+   "type": "usd",
+   "usd": 0.04080495728874206
+  },
+  "id": "ca025711-45b7-44f2-bc43-60e2c631995a",
+  "status": "completed",
+  "created_at": "2026-11-02T09:25:07.819605+00:00",
+  "last_response": {
+   "status": "completed",
+   "progress": 1,
+   "object_id": "c87b1e44-728d-40e0-b384-c42d6c2cf6e7",
+   "image_size": {
+    "width": 256,
+    "height": 256
+   },
+   "frame_count": 1,
+   "single_frame": true,
+   "storage_urls": {
+    "unknown": "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/c87b1e44-728d-40e0-b384-c42d6c2cf6e7/rotations/unknown.png"
+   },
+   "billing_usage": {
+    "usd": 0.04080495728874206,
+    "type": "usd"
+   },
+   "generation_id": "9538194f-d838-42e9-bea4-7aa93bfed8b5",
+   "billing_stages": [
+    {
+     "stage": "first_direction",
+     "usage": {
+      "usd": 0.04080495728874206,
+      "type": "usd"
+     },
+     "generation_id": "9538194f-d838-42e9-bea4-7aa93bfed8b5"
+    }
+   ],
+   "billing_charged": true,
+   "generation_mode": "pro_flash",
+   "source_image_id": "9a437b4e-e7e5-5f71-94c2-5b112a32daa8",
+   "directions_count": 1,
+   "first_direction_generated": true
+  }
+ },
+ "object": {
+  "id": "c87b1e44-728d-40e0-b384-c42d6c2cf6e7",
+  "name": "L01v2_고그니쟈_실험책상",
+  "state_name": "base",
+  "prompt": "A laboratory work desk with things on it: two switched-on monitors with bright lit screens showing graphs and readings, a keyboard, a small control box with a black remote control, a coffee mug, and stacks of research papers. A plain rectangular steel lab desk with a flat steel top and a steel cabinet under one side. The monitors face the viewer, their lit screens fully visible. Seen almost straight from the front, from the eye height of a standing adult, looking only a little down: the desk top shows as a thin band, much thinner than the front of the desk. The desk is much wider than it is tall and fills almost the whole width of the canvas. Only the desk with the things on it, centered, nothing else.",
+  "size": {
+   "width": 256,
+   "height": 256
+  },
+  "directions": 1,
+  "created_at": "2026-11-02T09:25:07.852181+00:00",
+  "view": "low top-down",
+  "rotation_urls": {
+   "south": null,
+   "west": null,
+   "east": null,
+   "north": null,
+   "south-east": null,
+   "south-west": null,
+   "north-east": null,
+   "north-west": null
+  },
+  "storage_urls": {
+   "unknown": "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/c87b1e44-728d-40e0-b384-c42d6c2cf6e7/rotations/unknown.png"
+  },
+  "frame_urls": null,
+  "style_settings": {
+   "version": "v2.0.0+api",
+   "no_background": true,
+   "generation_mode": "pro_flash",
+   "source_image_id": "9a437b4e-e7e5-5f71-94c2-5b112a32daa8",
+   "first_frame_direction": "south"
+  },
+  "tags": [],
+  "status": "completed",
+  "group_id": "1016d84c-972a-4cac-8308-122fa47d8cea",
+  "progress_percent": null,
+  "eta_seconds": null,
+  "animations": []
+ }
+}
