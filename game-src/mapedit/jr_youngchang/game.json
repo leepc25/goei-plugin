@@ -220,7 +220,17 @@
     ]
    ]
   ],
-  "dotK": 1.4292,
+  "dotK": 1.5779,
+  "sizes": [
+   [
+    514,
+    0.724
+   ],
+   [
+    754,
+    1.0
+   ]
+  ],
   "blocks": [],
   "doors": {
    "out": {
@@ -294,19 +304,19 @@
    {
     "id": "chair_boss",
     "file": "me_jr_youngchang_chair_boss",
-    "x": 875,
-    "y": 465,
-    "w": 112,
-    "h": 178,
+    "x": 872,
+    "y": 454,
+    "w": 118,
+    "h": 189,
     "sortY": 640
    },
    {
     "id": "chair_guest",
     "file": "me_jr_youngchang_chair_guest",
-    "x": 870,
-    "y": 615,
-    "w": 121,
-    "h": 193,
+    "x": 862,
+    "y": 592,
+    "w": 136,
+    "h": 216,
     "sortY": 805
    }
   ]
@@ -325,7 +335,8 @@
    "seat": {
     "x": 940,
     "y": 640
-   }
+   },
+   "chair": "chair_boss"
   },
   {
    "id": "seat_chair_guest",
@@ -340,7 +351,8 @@
    "seat": {
     "x": 940,
     "y": 805
-   }
+   },
+   "chair": "chair_guest"
   }
  ],
  "files": [
