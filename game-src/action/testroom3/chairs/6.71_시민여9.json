@@ -1,7 +1,7 @@
 {
  "front": {
   "dx": -4,
-  "dy": -7,
+  "dy": -4,
   "s": 1.0,
   "img": "south-east"
  },
@@ -19,7 +19,7 @@
  },
  "73": {
   "dx": -17,
-  "dy": -3,
+  "dy": 0,
   "s": 1.0,
   "img": "south-east",
   "frame_dx": [
