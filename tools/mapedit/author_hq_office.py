@@ -11,7 +11,7 @@ import json, os, subprocess, sys, tempfile
 from pathlib import Path
 from PIL import Image, ImageDraw, ImageFont
 ROOT = Path(__file__).resolve().parents[2]
-OUT = ROOT / 'game-src/mapedit/office'
+OUT = ROOT / 'game-src/mapedit' / os.environ.get('SCENE', 'office')   # 08:53 사용자 「격리팀은 이거 그대로 쓸 거」 → SCENE=office_iso WHO_MAP='{"1.1":"고그니쟈",...}'
 K, W, H = 2, 1482, 424
 PLACE = ROOT / 'tools/objects/office_desk_place_v4.py'
 
@@ -96,14 +96,16 @@ for r in layers:
 
 # 자리 8: 의자 가운데·의자 발. 남쪽(앞줄) = 등 보이고 앉기(sit_back), 북쪽(뒷줄) = 정면 앉기(sit_front)
 WHO = {'1.1': '쟈알디', '1.4': '에일린', '1.2': '스팡달', '1.3': '잼트리', '1.9': '데드폴', '1.10': '게슈간', '1.11': '로제몬', '1.12': '콘쥬스'}
+if os.environ.get('WHO_MAP'):   # 다른 팀이 같은 방을 쓸 때 자리 주인만 바꿈. 목록에 없는 자리 = 주인 없는 빈자리
+    WHO = json.loads(os.environ['WHO_MAP'])
 SEAT_S = ['1.1', '1.4', '1.2', '1.3']; SEAT_N = ['1.9', '1.10', '1.11', '1.12']
 spots = []
 ci = [0, 0]
 for c in chairs:
     south = c['chair'] == 'north.png'
     key = (SEAT_S if south else SEAT_N)[ci[0 if south else 1]]; ci[0 if south else 1] += 1
-    x, y = round(c['cx']), round(c['foot'] * K)
-    spots.append({'id': f'desk:{WHO[key]}', 'x': x, 'y': y, 'who': WHO[key], 'verb': '앉기', 'face': 1,
+    x, y = round(c['cx']), round(c['foot'] * K); who = WHO.get(key)
+    spots.append({'id': f'desk:{who or key}', 'x': x, 'y': y, **({'who': who} if who else {}), 'verb': '앉기', 'face': 1,
                   'act': ['sit_back' if south else 'sit_front'], 'seat': {'x': x, 'y': y}, 'chairImg': c['chair']})
 # 배경 물건 핀(1배 가운데 x, 서는 발 y = 바닥 맨 뒤 + 10). 그림 3배로 보고 잰 물건 폭 가운데
 FOOT = BACK + 10
@@ -138,7 +140,7 @@ if len(sys.argv) > 1:
     for s in spots:
         col = (255, 220, 0) if s['verb'] == '앉기' else (0, 220, 255)
         d.ellipse([s['x'] - 9, s['y'] - 9, s['x'] + 9, s['y'] + 9], fill=col, outline=(0, 0, 0), width=2)
-        t = s.get('who') or s['verb']; tw = d.textlength(t, font=font)
+        t = s.get('who') or ('빈자리' if s['verb'] == '앉기' else s['verb']); tw = d.textlength(t, font=font)
         d.rectangle([s['x'] - tw / 2 - 4, s['y'] - 42, s['x'] + tw / 2 + 4, s['y'] - 14], fill=(0, 0, 0, 190))
         d.text((s['x'] - tw / 2, s['y'] - 40), t, fill=col, font=font)
     ex = m['doors']['out']; d.polygon([(ex['x'], ex['y']), (ex['x'] - 30, ex['y'] - 18), (ex['x'] - 30, ex['y'] + 18)], fill=(255, 80, 255))
