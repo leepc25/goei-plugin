@@ -225,7 +225,7 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
       return { ...p, x: at.x, y: at.y };
     });
     // 화장실 자리 (칸 문 앞·소변기·세면대): E로 쓴다
-    const toiletSpots = (base.toilets ?? []).map((t) => ({ id: `toilet:${t.id}`, x: t.x, y: t.y, verb: t.kind === 'stall' ? '칸' : t.kind === 'urinal' ? '소변기' : '손 씻기', face: 1 as const, open: true }));
+    const toiletSpots = (base.toilets ?? []).map((t) => ({ id: `toilet:${t.id}`, x: t.x, y: t.y, verb: t.kind === 'stall' ? '문 열기' : t.kind === 'urinal' ? '소변기' : '손 씻기', face: 1 as const, open: true }));
     const sc: Scene = { ...base, spots: [...base.spots, ...toiletSpots, ...people.map((p) => ({ id: `visit:${p.name}`, x: p.x, y: p.y, who: p.name, verb: '대화', face: p.face, open: true }))] };
     if (pT) setPT(null);
     peek = null;
@@ -249,6 +249,12 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
     arriveDoor = null;
     near = null;
     solids = [...sc.boxes.filter((b) => b.solid).map((b) => ({ x: b.x, y: b.y, w: b.w, back: b.d + 6, front: 8, h: sc.painted ? b.h : undefined })), ...people.map((p) => ({ x: p.x, y: p.y, w: 80, back: 24, front: 24 }))];
+    // 화장실 칸 몸통·문(11-02 사용자 「닫힌 문을 뚫고 들어감」): 칸을 쓰는 중(pT)이 아니면 못 들어간다. 문 앞 E(「문 열기」)로만 들어간다
+    if (sc.painted && sc.toilets?.some((t) => t.kind === 'stall')) for (const o of PAINTED[sc.painted]?.objects ?? []) {
+      if (!/^(front|door)\d+$/.test(o.id)) continue;
+      const foot = o.sortY ?? o.y + o.h;
+      solids.push({ x: o.x + o.w / 2, y: foot, w: o.w - 30, back: foot - (sc.lane ?? LANE)[0] + 40, front: 6 });
+    }
     const len = Math.max(SCREEN_W, sc.length);
     const sx = Math.max(60, Math.min(len - 60, x));
     arrive = { x: sx, y };

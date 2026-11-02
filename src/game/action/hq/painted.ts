@@ -276,6 +276,17 @@ for (const [k, m] of Object.entries(MAPEDIT_SCENES)) {
   PAINTED[k] = { ...base, ...m, doors: Object.keys(m.doors).length || !base ? m.doors : base.doors, lamps: m.lamps.length || !base ? m.lamps : base.lamps } as PaintedScene;
 }
 
+// 화장실 칸(11-02 사용자 「닫힌 문을 뚫고 들어감」): 칸 몸통·문 조각(front*/door*)을 걷는 띠 위쪽에서 발치선까지 막힘(holes)으로.
+// NPC는 칸 앞(toilets 자리, 발치선 아래)에서 문이 열리면 좌석으로 옮겨 앉으므로(actors.ts stepStall) 막힘에 걸리지 않는다. 주인공은 hub.ts가 같은 조각을 solids로 막는다
+for (const p of Object.values(PAINTED)) {
+  if (!p.toilets?.some((t) => t.kind === 'stall')) continue;
+  const top = (p.lane?.[0] ?? 440) - 40;
+  for (const o of p.objects) {
+    if (!/^(front|door)\d+$/.test(o.id)) continue;
+    const y1 = o.sortY ?? o.y + o.h;
+    (p.holes ??= []).push([[o.x, top], [o.x + o.w, top], [o.x + o.w, y1], [o.x, y1]]);
+  }
+}
 // 협회 화장실(11-02): 관리국 화장실 그림·칸·자리를 그대로 쓴다 (나가는 문만 map.ts에서 협회 2층으로)
 PAINTED.sdra_wc_m = PAINTED.wc;
 PAINTED.sdra_wc_f = PAINTED.wc3;
