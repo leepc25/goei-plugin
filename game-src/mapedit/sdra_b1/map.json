@@ -1,0 +1,138 @@
+{
+ "file": "sdra_b1",
+ "bgScale": 2,
+ "w": 2304,
+ "h": 848,
+ "under": false,
+ "floor": [
+  [
+   0,
+   684
+  ],
+  [
+   2304,
+   684
+  ],
+  [
+   2304,
+   848
+  ],
+  [
+   0,
+   848
+  ]
+ ],
+ "lane": [
+  684,
+  836
+ ],
+ "blocks": [
+  {
+   "poly": [
+    [
+     1980,
+     860
+    ],
+    [
+     1980,
+     790
+    ],
+    [
+     2180,
+     790
+    ],
+    [
+     2180,
+     768
+    ],
+    [
+     2304,
+     768
+    ],
+    [
+     2304,
+     860
+    ]
+   ],
+   "h": 999
+  }
+ ],
+ "doors": {
+  "shower_m": {
+   "kind": "door",
+   "x": 240,
+   "y": 694,
+   "to": "sdra_shower_m",
+   "toDoor": "out",
+   "label": "탈의실(남)",
+   "door": {
+    "x0": 164,
+    "x1": 314,
+    "y0": 304,
+    "y1": 650,
+    "behind": "dark",
+    "anim": "none"
+   }
+  },
+  "shower_f": {
+   "kind": "door",
+   "x": 554,
+   "y": 694,
+   "to": "sdra_shower_f",
+   "toDoor": "out",
+   "label": "탈의실(여)",
+   "door": {
+    "x0": 480,
+    "x1": 628,
+    "y0": 304,
+    "y1": 650,
+    "behind": "dark",
+    "anim": "none"
+   }
+  },
+  "training": {
+   "kind": "steel",
+   "x": 1202,
+   "y": 694,
+   "to": "sdra_training",
+   "toDoor": "out",
+   "label": "훈련장",
+   "door": {
+    "x0": 1078,
+    "x1": 1326,
+    "y0": 308,
+    "y1": 652,
+    "behind": "dark",
+    "anim": "none"
+   }
+  },
+  "elev": {
+   "kind": "elevator",
+   "x": 1670,
+   "y": 694,
+   "label": "엘리베이터",
+   "door": {
+    "x0": 1558,
+    "x1": 1792,
+    "y0": 306,
+    "y1": 650,
+    "behind": "car",
+    "anim": "slide2",
+    "seam": 1670
+   }
+  }
+ },
+ "lamps": [],
+ "spots": [],
+ "objects": [
+  {
+   "id": "crates",
+   "file": "part_crates",
+   "x": 2004,
+   "y": 732,
+   "w": 300,
+   "h": 116,
+   "sortY": 836
+  }
+ ]
+}

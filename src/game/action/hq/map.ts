@@ -14,6 +14,7 @@ export type SceneId =
   | 'b1' | 'edu' | 'training' | 'clinic' | 'b2' | 'b3' | 'tooth' | 'bath_f' | 'bath_m' | 'shower_f' | 'shower_m'
   | 'jr_entry' | 'jr_b1' | 'jr_alley' | 'jr_b2'
   | 'sdra_lobby' | 'sdra_f2' | 'sdra_wc_m' | 'sdra_wc_f'
+  | 'sdra_b1' | 'sdra_shower_f' | 'sdra_shower_m' | 'sdra_bath_f' | 'sdra_bath_m' | 'sdra_training'
   | 'jr_daebak' | 'jr_heolgap' | 'jr_youngchang' | 'jr_songil' | 'jr_jinryo' | 'jr_op';
 
 export type DoorKind = 'main' | 'door' | 'glass' | 'steel' | 'security' | 'elevator' | 'stairs_up' | 'stairs_down' | 'stairs' | 'shop' | 'slide' | 'cell' | 'exit';
@@ -280,6 +281,19 @@ export const HQ_SCENES: HqScene[] = [
   ]),
   floorHall('sdra_wc_m', '화장실(남)', '2F', [{ id: 'out', kind: 'exit', side: 'S', to: 'sdra_f2', toDoor: 'wc_m', label: '나가기' }], { toilets: PAINTED.sdra_wc_m?.toilets, sex: '남' }),
   floorHall('sdra_wc_f', '화장실(여)', '2F', [{ id: 'out', kind: 'exit', side: 'S', to: 'sdra_f2', toDoor: 'wc_f', label: '나가기' }], { toilets: PAINTED.sdra_wc_f?.toilets, sex: '여' }),
+  // 협회 지하 1층 복도(11-02 사용자 「지하는 저걸로 픽스」, tools/mapedit/author_sdra_b1.py): 서→동 탈의실(남) · 탈의실(여) · 훈련장 양문 · 엘리베이터.
+  // 방 안은 관리국 그림·자리를 그대로 쓴다(사용자 11:02 「협회 방 내부는 전부 관리국걸」) — 나가는 문만 협회 지하 1층으로
+  floorHall('sdra_b1', '협회 지하 1층', 'B1', [
+    { id: 'shower_m', kind: 'door', to: 'sdra_shower_m', toDoor: 'out', label: '탈의실(남)' },
+    { id: 'shower_f', kind: 'door', to: 'sdra_shower_f', toDoor: 'out', label: '탈의실(여)' },
+    { id: 'training', kind: 'steel', to: 'sdra_training', toDoor: 'out', label: '훈련장' },
+    { id: 'elev', kind: 'elevator' },
+  ]),
+  floorHall('sdra_shower_f', '탈의실(여)', 'B1', [{ id: 'out', kind: 'exit', side: 'S', to: 'sdra_b1', toDoor: 'shower_f', label: '나가기' }, { id: 'bath', kind: 'exit', to: 'sdra_bath_f', toDoor: 'out', label: '샤워실' }], { sex: '여', lockers: LOCKERS.shower_f, spots: lockerSpots('shower_f') }),
+  floorHall('sdra_shower_m', '탈의실(남)', 'B1', [{ id: 'out', kind: 'exit', side: 'S', to: 'sdra_b1', toDoor: 'shower_m', label: '나가기' }, { id: 'shower', kind: 'exit', to: 'sdra_bath_m', toDoor: 'out', label: '샤워실' }], { sex: '남', lockers: LOCKERS.shower_m, spots: lockerSpots('shower_m') }),
+  floorHall('sdra_bath_f', '샤워실(여)', 'B1', [{ id: 'out', kind: 'exit', to: 'sdra_shower_f', toDoor: 'bath', label: '탈의실' }], { sex: '여', showers: showerSpots('bath_f'), spots: MAPEDIT_SPOTS.bath_f ?? [] }),
+  floorHall('sdra_bath_m', '샤워실(남)', 'B1', [{ id: 'out', kind: 'exit', to: 'sdra_shower_m', toDoor: 'shower', label: '탈의실' }], { sex: '남', showers: showerSpots('bath_m'), spots: MAPEDIT_SPOTS.bath_m ?? [] }),
+  room({ id: 'sdra_training', name: '훈련장', floor: 'B1', look: 'lab', doors: [exitS('sdra_b1', 'training', 'training')] }, 'training'),
   // ── 중림 지하상가 (중립지역, 그림 4장). 지상 입구 → 지하 1층 앞골목 → (가운데 통로) 뒷골목 / (동쪽 계단) 지하 2층 ──
   floorHall('jr_entry', '중림 지하상가 입구', 'out', [
     { id: 'west', kind: 'exit', side: 'S', to: 'street', toDoor: 'jr', label: '버스 정류장' },
@@ -323,9 +337,10 @@ export const ELEVATOR: { floor: HqScene['floor']; label: string; scene: SceneId;
   { floor: 'B1', label: 'B1', scene: 'b1', door: 'elev' },
   { floor: 'B2', label: 'B2', scene: 'b2', door: 'elev' },
   { floor: 'B3', label: 'B3', scene: 'b3', door: 'elev' },
-  // 협회: 1층·2층 (지하 1층 복도 그림이 생기면 더한다)
+  // 협회: 2층·1층·지하 1층
   { floor: '2F', label: '2', scene: 'sdra_f2', door: 'elev', bldg: 'sdra' },
   { floor: '1F', label: '1', scene: 'sdra_lobby', door: 'elev', bldg: 'sdra' },
+  { floor: 'B1', label: 'B1', scene: 'sdra_b1', door: 'elev', bldg: 'sdra' },
 ];
 
 /** 메뉴 「장소로 가기」·장소 id → 그 장면과 서 있을 자리 */

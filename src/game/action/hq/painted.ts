@@ -277,6 +277,11 @@ for (const [k, m] of Object.entries(MAPEDIT_SCENES)) {
 // 협회 화장실(11-02): 관리국 화장실 그림·칸·자리를 그대로 쓴다 (나가는 문만 map.ts에서 협회 2층으로)
 PAINTED.sdra_wc_m = PAINTED.wc;
 PAINTED.sdra_wc_f = PAINTED.wc3;
+// 협회 지하 1층 방(11-02): 관리국 탈의실·샤워실 그림·자리를 그대로
+PAINTED.sdra_shower_f = PAINTED.shower_f;
+PAINTED.sdra_shower_m = PAINTED.shower_m;
+PAINTED.sdra_bath_f = PAINTED.bath_f;
+PAINTED.sdra_bath_m = PAINTED.bath_m;
 
 /** 문 가운데 x */
 export const doorX = (scene: string, id: string) => {
