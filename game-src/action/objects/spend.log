@@ -28,3 +28,9 @@
 11-02 10:26 L04_장비정비_거치대 256x256 1방향 src=None object_id=c78720d9-d2b2-439a-bb18-fb623d9ac9f6 completed usage={"type": "usd", "usd": 0.0411043261619144}
 11-02 10:42 L04v3_장비정비_거치대 256x256 1방향 src=None object_id=513485cf-d627-4d0c-8e7f-09d50fa123d7 completed usage={"type": "usd", "usd": 0.04373564902475145}
 11-02 10:45 L04v5_장비정비_거치대 256x256 1방향 src=None object_id=76121533-da7b-45e6-8554-ae96c31f01e9 completed usage={"type": "usd", "usd": 0.04123075886472066}
+11-02 12:05 C05_대기의자_뒷모습_1배 256x256 1방향 src=None object_id=d59a7249-5a20-4052-ae04-3cabe1af8f47 completed usage={"type": "usd", "usd": 0.04567081961271498}
+11-02 12:13 C05v5_대기의자_뒷모습 256x160 1방향 src=None object_id=87698cca-cafc-486a-9d83-d386d209a70e completed usage={"type": "usd", "usd": 0.04272437511719597}
+11-02 12:36 C05v6_대기의자_뒷모습 256x160 1방향 src=None object_id=ac33bcd4-7acb-4624-a9e5-9637aa2aa14b completed usage={"type": "usd", "usd": 0.04148893159823948}
+11-02 12:40 C05v6_대기의자_8방향 256x160 8방향 src=/home/user/goei-plugin/game-src/action/objects/C05v6_대기의자_뒷모습/unknown.png object_id=b87e5741-dae1-4054-8b6f-ce92aade9415 completed usage={"type": "usd", "usd": 0.02567261862092548}
+11-02 12:46 C05v7_대기의자_앞모습 256x128 1방향 src=None object_id=75afc16a-4d90-4623-b711-28ab95229efa completed usage={"type": "usd", "usd": 0.04102751858562893}
+11-02 13:34 C06_대기의자_돌리기 256x160 8방향 src=/home/user/goei-plugin/game-src/action/objects/C06_대기의자_3인/as_south_256x160.png object_id=3c328bbb-1a02-4b8f-a3cb-a25ce947ad9f completed usage={"type": "usd", "usd": 0.042364195393191445}

@@ -50,6 +50,8 @@ def check(path):
     if _os.environ.get('NO_CEIL') == '1': must = [m for m in must if not m.startswith(('Pack the whole image', 'The back wall, floor and ceiling'))] + ['Pack the whole image with detail everywhere', 'The back wall and floor run straight on past the']
     # 2026-11-02 12:51 사용자 「벽이라고 지정하지 마, 채우기는 필요하되 벽만 채울 필요 없음」: PACK_FREE=1이면 꽉 채우기 구절은 'Pack the whole image with' 로 시작만 하면 됨
     if _os.environ.get('PACK_FREE') == '1': must = [('Pack the whole image with' if m.startswith('Pack the whole image') else m) for m in must]
+    # 2026-11-02 08:58 사용자 「양호」(협회 1층 p4): 바닥 40%·벽 60% 문장 허용 (FLOOR_40=1일 때만)
+    if _os.environ.get('FLOOR_40') == '1': must = [m.replace('the lower third of the image.', 'the lower 40% of the image') for m in must]
     for m in must:
         hit = m in new
         rows.append(('그대로' if hit else '빠짐', m[:70]))

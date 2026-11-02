@@ -11,7 +11,7 @@ const fresh = M.HQ_SCENES.filter((s) => !s.legacy && !s.id.startsWith('jr_') && 
 const JR = ['jr_entry', 'jr_b1', 'jr_alley', 'jr_b2', 'jr_daebak', 'jr_heolgap', 'jr_youngchang', 'jr_songil', 'jr_jinryo', 'jr_op'];
 const solid = (sc) => sc.boxes.filter((b) => b.solid).map((b) => ({ x: b.x, y: b.y, w: b.w, back: b.d + 6, front: 8 }));
 
-const HALLS = ['lobby', 'f2', 'f3', 'b1', 'b2', 'b3', 'sdra_lobby', 'sdra_f2'];  // sdra_lobby·sdra_f2 = 협회 1·2층 (11-02)
+const HALLS = ['lobby', 'f2', 'f3', 'b1', 'b2', 'b3', 'sdra_lobby', 'sdra_f2', 'sdra_b1'];  // sdra_lobby·sdra_f2·sdra_b1 = 협회 1·2·지하1층 (11-02)
 test('본부: 층은 3F·2F·1F·B1·B2·B3 (배경 그림 6장)', () => {
   assert.deepEqual([...new Set(fresh.map((s) => s.floor))].sort(), ['1F', '2F', '3F', 'B1', 'B2', 'B3']);
   for (const id of HALLS) assert.equal(byId[id].painted, id, `${id} 그림`);
@@ -45,7 +45,7 @@ test('본부: 층마다 엘리베이터, 계단은 3층~B1 위아래 층의 계�
     assert.ok(M.ELEVATOR.some((e) => e.scene === id), `${id} 엘리베이터 단추`);
     const st = sc.doors.find((d) => d.kind === 'stairs');
     // 본부는 새 그림(11-01, 엘리베이터만)이라 1층 포함 모든 층 계단 없음
-    if (['b2', 'b3', 'f3', 'f2', 'b1', 'lobby', 'sdra_lobby', 'sdra_f2'].includes(id)) { assert.ok(!st, `${id} 계단 없음`); continue; }
+    if (['b2', 'b3', 'f3', 'f2', 'b1', 'lobby', 'sdra_lobby', 'sdra_f2', 'sdra_b1'].includes(id)) { assert.ok(!st, `${id} 계단 없음`); continue; }
     assert.ok(st, `${id} 계단`);
     for (const to of [st.up, st.down].filter(Boolean)) {
       const back = byId[to].doors.find((d) => d.kind === 'stairs');

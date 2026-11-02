@@ -1,0 +1,100 @@
+{
+ "object_id": "3c328bbb-1a02-4b8f-a3cb-a25ce947ad9f",
+ "job": {
+  "usage": {
+   "type": "usd",
+   "usd": 0.042364195393191445
+  },
+  "id": "c57fb238-92c1-48e0-933d-446ba686ada1",
+  "status": "completed",
+  "created_at": "2026-11-02T13:31:06.969927+00:00",
+  "last_response": {
+   "status": "completed",
+   "progress": 1,
+   "object_id": "3c328bbb-1a02-4b8f-a3cb-a25ce947ad9f",
+   "image_size": {
+    "width": 256,
+    "height": 256
+   },
+   "frame_count": 8,
+   "single_frame": false,
+   "storage_urls": {
+    "east": "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/3c328bbb-1a02-4b8f-a3cb-a25ce947ad9f/rotations/east.png",
+    "west": "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/3c328bbb-1a02-4b8f-a3cb-a25ce947ad9f/rotations/west.png",
+    "north": "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/3c328bbb-1a02-4b8f-a3cb-a25ce947ad9f/rotations/north.png",
+    "south": "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/3c328bbb-1a02-4b8f-a3cb-a25ce947ad9f/rotations/south.png",
+    "north-east": "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/3c328bbb-1a02-4b8f-a3cb-a25ce947ad9f/rotations/north-east.png",
+    "north-west": "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/3c328bbb-1a02-4b8f-a3cb-a25ce947ad9f/rotations/north-west.png",
+    "south-east": "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/3c328bbb-1a02-4b8f-a3cb-a25ce947ad9f/rotations/south-east.png",
+    "south-west": "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/3c328bbb-1a02-4b8f-a3cb-a25ce947ad9f/rotations/south-west.png"
+   },
+   "billing_usage": {
+    "usd": 0.042364195393191445,
+    "type": "usd"
+   },
+   "generation_id": "4d78af36-65d0-4dbb-97c1-7214a0e876f7",
+   "billing_stages": [
+    {
+     "stage": "rotations",
+     "usage": {
+      "usd": 0.042364195393191445,
+      "type": "usd"
+     },
+     "generation_id": "4d78af36-65d0-4dbb-97c1-7214a0e876f7"
+    }
+   ],
+   "billing_charged": true,
+   "generation_mode": "pro_flash",
+   "source_image_id": null,
+   "directions_count": 8,
+   "first_direction_generated": false
+  }
+ },
+ "object": {
+  "id": "3c328bbb-1a02-4b8f-a3cb-a25ce947ad9f",
+  "name": "C06_대기의자_돌리기",
+  "state_name": "base",
+  "prompt": "A three-seat black waiting chair from a Korean bank: padded backrests on one dark metal frame with slim metal legs.",
+  "size": {
+   "width": 256,
+   "height": 256
+  },
+  "directions": 8,
+  "created_at": "2026-11-02T13:31:07.000535+00:00",
+  "view": "low top-down",
+  "rotation_urls": {
+   "south": "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/3c328bbb-1a02-4b8f-a3cb-a25ce947ad9f/rotations/south.png",
+   "west": "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/3c328bbb-1a02-4b8f-a3cb-a25ce947ad9f/rotations/west.png",
+   "east": "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/3c328bbb-1a02-4b8f-a3cb-a25ce947ad9f/rotations/east.png",
+   "north": "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/3c328bbb-1a02-4b8f-a3cb-a25ce947ad9f/rotations/north.png",
+   "south-east": "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/3c328bbb-1a02-4b8f-a3cb-a25ce947ad9f/rotations/south-east.png",
+   "south-west": "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/3c328bbb-1a02-4b8f-a3cb-a25ce947ad9f/rotations/south-west.png",
+   "north-east": "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/3c328bbb-1a02-4b8f-a3cb-a25ce947ad9f/rotations/north-east.png",
+   "north-west": "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/3c328bbb-1a02-4b8f-a3cb-a25ce947ad9f/rotations/north-west.png"
+  },
+  "storage_urls": {
+   "east": "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/3c328bbb-1a02-4b8f-a3cb-a25ce947ad9f/rotations/east.png",
+   "west": "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/3c328bbb-1a02-4b8f-a3cb-a25ce947ad9f/rotations/west.png",
+   "north": "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/3c328bbb-1a02-4b8f-a3cb-a25ce947ad9f/rotations/north.png",
+   "south": "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/3c328bbb-1a02-4b8f-a3cb-a25ce947ad9f/rotations/south.png",
+   "north-east": "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/3c328bbb-1a02-4b8f-a3cb-a25ce947ad9f/rotations/north-east.png",
+   "north-west": "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/3c328bbb-1a02-4b8f-a3cb-a25ce947ad9f/rotations/north-west.png",
+   "south-east": "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/3c328bbb-1a02-4b8f-a3cb-a25ce947ad9f/rotations/south-east.png",
+   "south-west": "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/3c328bbb-1a02-4b8f-a3cb-a25ce947ad9f/rotations/south-west.png"
+  },
+  "frame_urls": null,
+  "style_settings": {
+   "version": "v2.0.0+api",
+   "no_background": true,
+   "generation_mode": "pro_flash",
+   "source_image_id": null,
+   "first_frame_direction": "south"
+  },
+  "tags": [],
+  "status": "completed",
+  "group_id": "4f4b10a6-6571-4455-954c-a93f3e3d1ee2",
+  "progress_percent": null,
+  "eta_seconds": null,
+  "animations": []
+ }
+}

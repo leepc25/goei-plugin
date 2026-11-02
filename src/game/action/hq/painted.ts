@@ -90,6 +90,8 @@ export interface PaintedScene {
   showers?: { id: string; head: [[number, number], [number, number]]; foot: [number, number]; face: 1 | -1 }[];
   /** 그림 속 의자(11-02 휴게실, tools/mapedit/author_hq_lounge.py): 의자는 그 자리에 고정, 사람을 맞춤값만큼 옮긴다. set = 의자 그림 묶음('L' = 휴게실 쉘 의자, 없으면 C01 사무의자) */
   chairs?: { x: number; y: number; face?: 'E' | 'W' | 'N'; set?: string }[];
+  /** 훈련장 그림 속 장비 자리(11-02): 있으면 코드 장비(drawGear)를 그리지 않고 이 자리를 쓴다 */
+  gear?: { kind: 'sandbag' | 'dummy' | 'target'; x: number; y: number }[];
   /** NPC 생활 동작 자리(발 x·y, 그 자리에서 차례로 트는 줄 번호). 사용자 11-02 06:07 확정: 자판기 57→27→142, 싱크대 104 등 */
   stations?: { id: string; x: number; y: number; lines: string[] }[];
 }
@@ -285,6 +287,12 @@ PAINTED.by_shower_m = PAINTED.shower_m;
 PAINTED.by_shower_f = PAINTED.shower_f;
 PAINTED.by_bath_m = PAINTED.bath_m;
 PAINTED.by_bath_f = PAINTED.bath_f;
+// 협회 지하 1층 방(11-02): 관리국 탈의실·샤워실 그림·자리를 그대로
+PAINTED.sdra_shower_f = PAINTED.shower_f;
+PAINTED.sdra_shower_m = PAINTED.shower_m;
+PAINTED.sdra_bath_f = PAINTED.bath_f;
+PAINTED.sdra_bath_m = PAINTED.bath_m;
+PAINTED.sdra_training = PAINTED.training;   // 협회 훈련장 = 관리국 훈련장 그림 (11-02 사용자)
 
 /** 문 가운데 x */
 export const doorX = (scene: string, id: string) => {

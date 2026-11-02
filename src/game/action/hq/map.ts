@@ -13,7 +13,8 @@ export type SceneId =
   | 'street' | 'pasta' | 'lobby' | 'swat' | 'f2' | 'f3' | 'office' | 'interview' | 'lounge' | 'wc' | 'wc3'
   | 'b1' | 'edu' | 'training' | 'clinic' | 'infirmary' | 'b2' | 'b3' | 'tooth' | 'bath_f' | 'bath_m' | 'shower_f' | 'shower_m'
   | 'jr_entry' | 'jr_b1' | 'jr_alley' | 'jr_b2'
-  | 'sdra_lobby' | 'sdra_f2' | 'sdra_wc_m' | 'sdra_wc_f' | 'sdra_street'
+  | 'sdra_lobby' | 'sdra_f2' | 'sdra_wc_m' | 'sdra_wc_f' | 'sdra_street' | 'sdra_counter'
+  | 'sdra_b1' | 'sdra_shower_f' | 'sdra_shower_m' | 'sdra_bath_f' | 'sdra_bath_m' | 'sdra_training'
   | 'jr_daebak' | 'jr_heolgap' | 'jr_youngchang' | 'jr_songil' | 'jr_jinryo' | 'jr_op'
   | 'by_lobby' | 'by_f13' | 'by_wc_m' | 'by_wc_f' | 'by_lounge' | 'by_office'
   | 'by_f15' | 'by_elite' | 'by_shower_m' | 'by_shower_f' | 'by_bath_m' | 'by_bath_f';
@@ -66,6 +67,8 @@ export interface HqSpot {
   shop?: string;
   /** 의자 자리: 그 장면 boxes의 의자 번호 (앉아 있는 동안 방 의자 그림은 숨기고 인물 팩 의자를 그린다) */
   chair?: number;
+  /** 그림 소품 의자 이름(맵 에디터 chair 글자값, 중림 대박·헐값·영창). 아직 게임이 쓰지 않음 (11-02) */
+  chairObj?: string;
 }
 /** 바닥 위 상자 (집기). x = 가운데, y = 앞 모서리(바닥에 닿는 선), d = 뒤로 깊이, h = 높이. 모두 화면 px */
 export interface HqBox {
@@ -121,6 +124,8 @@ export interface HqScene {
   sex?: '남' | '여';
   /** NPC 생활 동작 자리(11-02 휴게실 확정): 자판기 57→27→142, 정수기·커피 57→142, 전자레인지·찬장 57→157, 게시판 57, 싱크대 104 */
   stations?: { id: string; x: number; y: number; lines: string[] }[];
+  /** 훈련장 그림 속 장비 자리(11-02). 없으면 방 길이 비례 코드 배치 */
+  gear?: { kind: 'sandbag' | 'dummy' | 'target'; x: number; y: number }[];
 }
 
 /** 화면 px (docs/필드_그림_통합_지침.md): 맨 뒤 줄에서 1 m = 142 px (키 1.65 m = 235 px), 벽·바닥 선 y420, 걷는 띠 y420–669, 배경 세로 700 */
@@ -187,6 +192,7 @@ function floorHall(id: SceneId, name: string, floor: HqScene['floor'], doors: Om
   // 맵 에디터로 만든 장면이면 앉는 자리도 그쪽 것
   if (MAPEDIT_SPOTS[pid]?.length) extra = { ...extra, spots: MAPEDIT_SPOTS[pid] };
   if (p.stations?.length && !extra.stations) extra = { ...extra, stations: p.stations };
+  if (p.gear && !extra.gear) extra = { ...extra, gear: p.gear };   // 빈 목록 = 장비 없음(코드 배치도 안 함)
   const sc = floorHallBase(id, name, floor, doors, p, extra);
   if (chairBoxes.length) {
     const base = sc.boxes.length;
@@ -315,7 +321,8 @@ export const HQ_SCENES: HqScene[] = [
   floorHall('by_shower_m', '탈의실(남)', '15F', [{ id: 'out', kind: 'exit', side: 'S', to: 'by_f15', toDoor: 'wc_m', label: '나가기' }, { id: 'shower', kind: 'exit', to: 'by_bath_m', toDoor: 'out', label: '샤워실' }], { sex: '남', lockers: LOCKERS.shower_m, spots: lockerSpots('shower_m') }),
   floorHall('by_bath_f', '샤워실(여)', '15F', [{ id: 'out', kind: 'exit', to: 'by_shower_f', toDoor: 'bath', label: '탈의실' }], { sex: '여', showers: showerSpots('by_bath_f'), spots: MAPEDIT_SPOTS.bath_f }),
   floorHall('by_bath_m', '샤워실(남)', '15F', [{ id: 'out', kind: 'exit', to: 'by_shower_m', toDoor: 'shower', label: '탈의실' }], { sex: '남', showers: showerSpots('by_bath_m'), spots: MAPEDIT_SPOTS.bath_m }),
-  room({ id: 'training', name: '훈련장', floor: 'B1', look: 'lab', doors: [exitS('b1', 'training', 'training')] }, 'training'),
+  // 훈련장: 그림 장면(PixelLab 11-01 확정 hq_b1_training_ext2R, tools/mapedit/author_hq_training.py). 장비 자리는 그림 속 샌드백·허수아비·과녁
+  floorHall('training', '훈련장', 'B1', [{ id: 'out', kind: 'exit', side: 'S', to: 'b1', toDoor: 'training', label: '복도로' }]),
   // 지하 2층은 새 본부 그림(PixelLab 11-01, game-src/mapedit/b2): 서→동 격리시설 방폭문 · 격리팀 사무실(의무실·연구실) · 엘리베이터. 심문실·창고 없음(본부 최소화)
   floorHall('b2', '격리 구역', 'B2', [
     { id: 'isolation', kind: 'cell', to: 'tooth', toDoor: 'out', needs: 'tooth', label: '격리시설' },
@@ -340,13 +347,28 @@ export const HQ_SCENES: HqScene[] = [
   ]),
   // 협회 2층 복도(11-02 사용자 「화장실만 이은걸로 이층은 마무리」, tools/mapedit/author_sdra_f2.py): 창구 유리문(안쪽 방 그림 없음 → 잠금) · 엘리베이터 · 화장실 남·여. 화장실은 관리국 그림을 그대로 쓴다
   floorHall('sdra_f2', '협회 2층', '2F', [
-    { id: 'office', kind: 'glass', locked: true, label: '협회 창구' },
+    { id: 'office', kind: 'glass', to: 'sdra_counter', toDoor: 'out', label: '협회 창구' },
     { id: 'elev', kind: 'elevator' },
     { id: 'wc_m', kind: 'door', to: 'sdra_wc_m', toDoor: 'out', label: '화장실(남)' },
     { id: 'wc_f', kind: 'door', to: 'sdra_wc_f', toDoor: 'out', label: '화장실(여)' },
   ]),
+  // 협회 창구(11-02, tools/mapedit/author_sdra_counter.py): PixelLab p7+왼쪽 잇기. 창구 직원 자리 3(서윤지·차여진·협회 직원), 대기의자 3개(C06), 왼쪽 끝 출입구 → 2층 복도
+  floorHall('sdra_counter', '협회 창구', '2F', [{ id: 'out', kind: 'exit', side: 'S', to: 'sdra_f2', toDoor: 'office', label: '복도로' }]),
   floorHall('sdra_wc_m', '화장실(남)', '2F', [{ id: 'out', kind: 'exit', side: 'S', to: 'sdra_f2', toDoor: 'wc_m', label: '나가기' }], { toilets: PAINTED.sdra_wc_m?.toilets, sex: '남' }),
   floorHall('sdra_wc_f', '화장실(여)', '2F', [{ id: 'out', kind: 'exit', side: 'S', to: 'sdra_f2', toDoor: 'wc_f', label: '나가기' }], { toilets: PAINTED.sdra_wc_f?.toilets, sex: '여' }),
+  // 협회 지하 1층 복도(11-02 사용자 「지하는 저걸로 픽스」, tools/mapedit/author_sdra_b1.py): 서→동 탈의실(남) · 탈의실(여) · 훈련장 양문 · 엘리베이터.
+  // 방 안은 관리국 그림·자리를 그대로 쓴다(사용자 11:02 「협회 방 내부는 전부 관리국걸」) — 나가는 문만 협회 지하 1층으로
+  floorHall('sdra_b1', '협회 지하 1층', 'B1', [
+    { id: 'shower_m', kind: 'door', to: 'sdra_shower_m', toDoor: 'out', label: '탈의실(남)' },
+    { id: 'shower_f', kind: 'door', to: 'sdra_shower_f', toDoor: 'out', label: '탈의실(여)' },
+    { id: 'training', kind: 'steel', to: 'sdra_training', toDoor: 'out', label: '훈련장' },
+    { id: 'elev', kind: 'elevator' },
+  ]),
+  floorHall('sdra_shower_f', '탈의실(여)', 'B1', [{ id: 'out', kind: 'exit', side: 'S', to: 'sdra_b1', toDoor: 'shower_f', label: '나가기' }, { id: 'bath', kind: 'exit', to: 'sdra_bath_f', toDoor: 'out', label: '샤워실' }], { sex: '여', lockers: LOCKERS.shower_f, spots: lockerSpots('shower_f') }),
+  floorHall('sdra_shower_m', '탈의실(남)', 'B1', [{ id: 'out', kind: 'exit', side: 'S', to: 'sdra_b1', toDoor: 'shower_m', label: '나가기' }, { id: 'shower', kind: 'exit', to: 'sdra_bath_m', toDoor: 'out', label: '샤워실' }], { sex: '남', lockers: LOCKERS.shower_m, spots: lockerSpots('shower_m') }),
+  floorHall('sdra_bath_f', '샤워실(여)', 'B1', [{ id: 'out', kind: 'exit', to: 'sdra_shower_f', toDoor: 'bath', label: '탈의실' }], { sex: '여', showers: showerSpots('bath_f'), spots: MAPEDIT_SPOTS.bath_f ?? [] }),
+  floorHall('sdra_bath_m', '샤워실(남)', 'B1', [{ id: 'out', kind: 'exit', to: 'sdra_shower_m', toDoor: 'shower', label: '탈의실' }], { sex: '남', showers: showerSpots('bath_m'), spots: MAPEDIT_SPOTS.bath_m ?? [] }),
+  floorHall('sdra_training', '훈련장', 'B1', [{ id: 'out', kind: 'exit', side: 'S', to: 'sdra_b1', toDoor: 'training', label: '복도로' }]),   // 관리국 훈련장 그림 그대로 (11-02 사용자)
   // ── 중림 지하상가 (중립지역, 그림 4장). 지상 입구 → 지하 1층 앞골목 → (가운데 통로) 뒷골목 / (동쪽 계단) 지하 2층 ──
   floorHall('jr_entry', '중림 지하상가 입구', 'out', [
     { id: 'west', kind: 'exit', side: 'S', bus: '중림', label: '버스 정류장' },
@@ -390,13 +412,14 @@ export const ELEVATOR: { floor: HqScene['floor']; label: string; scene: SceneId;
   { floor: 'B1', label: 'B1', scene: 'b1', door: 'elev' },
   { floor: 'B2', label: 'B2', scene: 'b2', door: 'elev' },
   { floor: 'B3', label: 'B3', scene: 'b3', door: 'elev' },
-  // 협회: 1층·2층 (지하 1층 복도 그림이 생기면 더한다)
+  // 협회: 2층·1층·지하 1층
   { floor: '2F', label: '2', scene: 'sdra_f2', door: 'elev', bldg: 'sdra' },
   { floor: '1F', label: '1', scene: 'sdra_lobby', door: 'elev', bldg: 'sdra' },
   // 백일몽 본사: 15층·13층·1층 로비
   { floor: '15F', label: '15', scene: 'by_f15', door: 'elev', bldg: 'by' },
   { floor: '13F', label: '13', scene: 'by_f13', door: 'elev', bldg: 'by' },
   { floor: '1F', label: '1', scene: 'by_lobby', door: 'elev', bldg: 'by' },
+  { floor: 'B1', label: 'B1', scene: 'sdra_b1', door: 'elev', bldg: 'sdra' },
 ];
 
 /** 메뉴 「장소로 가기」·장소 id → 그 장면과 서 있을 자리 */

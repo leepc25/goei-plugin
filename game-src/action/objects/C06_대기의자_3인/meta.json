@@ -1,0 +1,12 @@
+{
+ "name": "C06 3인 대기의자(은행 창구식)",
+ "made": "2026-11-02 협회 창구 배경(sdra_counter_p7_ext1L_v2)에 inpaint-v3로 그린 뒤 손 다각형으로 오림 (tools/objects/sdra_bench_cut.py)",
+ "source": "game-src/art/pixellab-hq-20261031/sdra_counter_bench_v1.png (1배 545,276 에서 221x135 잘라냄)",
+ "pixel_scale": "배경 1배 화소와 같음 → 게임(배경 2배 고정)에서는 2배 × 장면 배율",
+ "directions": {"north": "north.png (뒷모습, 사람이 화면 안쪽을 보고 앉음)"},
+ "foot_center": [110.5, 124],
+ "seats_north": [{"x": 40, "y": 61}, {"x": 111.5, "y": 61}, {"x": 183.5, "y": 61}],
+ "seat_rule": "사람 = 사무의자 C01 맞춤값(game-src/art/objects/chairs_office/fit_all.json) back 값, C01 north 좌석 점(91,101)을 seats_north 점에 맞춤. 좌석 폭 기준 사람 배율 = 의자 배율 × 1.07 (협회 창구: 의자 2배×0.85, 사람 2.14×0.85)",
+ "shadow": "오릴 때 바닥 그림자 빠짐 → 코드로 넣을 것",
+ "sit": "앉기 가능, 3자리"
+}

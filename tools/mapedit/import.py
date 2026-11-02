@@ -110,16 +110,18 @@ def convert(scene_id: str, m: dict, files: dict) -> dict:
     for s in m.get('spots', []):
         sp = {'id': s['id'], 'x': s['x'], 'y': s['y'], 'verb': s.get('verb', '앉기'), 'face': s.get('face', 1), 'act': s.get('act') or ACTS.get(s.get('dir', 'side'))}
         if s.get('seat'): sp['seat'] = s['seat']          # 의자 자리만. 샤워 자리(act shower)는 seat 없음 (11-01 샤워실)
-        if isinstance(s.get('chair'), int): sp['chair'] = s['chair']   # 장면 의자 번호(정수)만. 중림 대박·헐값의 'chair' 글자값은 그림 소품 이름이라 게임이 못 씀(11-02 가구 스레드 남은 일 ②) → 넘기지 않음
+        if isinstance(s.get('chair'), int): sp['chair'] = s['chair']   # 장면 의자 번호(정수)
+        elif s.get('chair'): sp['chairObj'] = s['chair']              # 글자값 = 그림 소품 의자 이름(중림 대박·헐값·영창, 11-02 가구 스레드 남은 일 ②: 아직 게임이 안 씀)
         if s.get('owner'): sp['owner'] = s['owner']            # 평소 앉는 사람 (사무실 책상, 11-02 사용자: 주인은 평소 자리일 뿐, 비면 누구나)
         if s.get('shared') is not None: sp['shared'] = bool(s['shared'])   # 장면 의자 번호(m['chairs'] 차례, hq/map.ts floorHall 이 상자 번호로 바꾼다; 11-02 휴게실)
+        if s.get('owner'): sp['who'] = s['owner']   # 자리 주인(협회 창구 직원, 11-02)
         spots.append(sp)
     # 사람 배율 dotK: map.json에 있으면 그것(사용자 10-31 중림 지상: 배경 2배·사람 0.85), 없으면 장면 세로로 계산
     lane = m.get('lane') or [min(p[1] for p in m['floor']), max(p[1] for p in m['floor']) - 12]
     scene = {'file': file, 'w': W, 'h': H, 'under': True, 'lane': lane, 'floor': m.get('floor'), 'holes': holes,
              'dotK': m.get('dotK') or round(1.5 * H / 890, 4), **({'far': m['far']} if m.get('far') else {}), **({'growTo': m['growTo']} if m.get('growTo') else {}), **({'sizes': m['sizes']} if m.get('sizes') else {}), 'blocks': [], 'doors': doors, 'lamps': m.get('lamps', []), 'windows': [], 'objects': objects, **({'posts': m['posts']} if m.get('posts') else {}), **({'toilets': m['toilets']} if m.get('toilets') else {}), **({'showers': m['showers']} if m.get('showers') else {}),
              # 그림 속 의자(11-02 휴게실): 의자는 그 자리 고정, 사람을 맞춤값만큼 옮김. set = 의자 그림 묶음('L' = 휴게실 쉘 의자). stations = NPC 생활 동작 자리
-             **({'chairs': m['chairs']} if m.get('chairs') else {}), **({'stations': m['stations']} if m.get('stations') else {})}
+             **({'chairs': m['chairs']} if m.get('chairs') else {}), **({'gear': m['gear']} if 'gear' in m else {}), **({'stations': m['stations']} if m.get('stations') else {})}
     return {'scene': scene, 'spots': spots, 'files': names}
 
 
@@ -127,7 +129,11 @@ def rebuild():
     scenes, spots, names = {}, {}, []
     for g in sorted(SRC.glob('*/game.json')):
         d = json.loads(g.read_text()); sid = g.parent.name
-        scenes[sid] = d['scene']; spots[sid] = d['spots']; names += d['files']
+        scenes[sid] = d['scene']; names += d['files']
+        # 옛 game.json의 글자값 chair(그림 소품 이름)는 chairObj로 (타입: chair는 의자 번호 정수)
+        spots[sid] = [({**sp, 'chairObj': sp['chair'], 'chair': None} if isinstance(sp.get('chair'), str) else sp) for sp in d['spots']]
+        for sp in spots[sid]:
+            if sp.get('chair') is None: sp.pop('chair', None)
     j = lambda v: json.dumps(v, ensure_ascii=False, separators=(',', ':'))
     GEN.write_text('// tools/mapedit/import.py가 만든다. 손으로 고치지 않는다.\n'
                    "import type { PaintedScene } from './painted';\nimport type { HqSpot } from './map';\n"

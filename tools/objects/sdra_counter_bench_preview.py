@@ -1,0 +1,43 @@
+"""창구 장면: 직원(사무의자) + 배경에서 그려 오린 대기의자(sdra_counter_bench_v1_cut.png)에 세 명 뒷모습 앉히기 (2026-11-02).
+의자는 그려진 그 자리(1배 545,276) 고정, 사람만 옮긴다. 사람 = 사무의자 맞춤값(fit_all.json) 뒤 앉기, 사무의자 north 좌석 점(91,101) = 좌석 띠 윗면(98) 3 아래 → 이 의자도 좌석 띠 윗면(58) 3 아래."""
+import sys, os, json, subprocess
+from pathlib import Path
+R = Path('/home/user/goei-plugin'); HERE = R/'game-src/action/testroom3'
+sys.path.insert(0, str(HERE)); sys.path.insert(0, str(HERE/'qa')); sys.argv = sys.argv[:1]
+import fit_chair as fc
+from PIL import Image
+OUT = os.environ.get('OUT', '/tmp/bench.png')
+tmp = OUT + '.staff.png'
+subprocess.run([sys.executable, str(R/'tools/objects/sdra_counter_sit_preview.py')], env={k: v for k, v in {**os.environ, 'OUT': tmp}.items() if k not in ('SC', 'BS')}, check=True, stdout=subprocess.DEVNULL)
+out = Image.open(tmp).convert('RGBA'); os.remove(tmp)
+FIT = json.loads((R/'game-src/art/objects/chairs_office/fit_all.json').read_text())
+bench = Image.open(R/'game-src/art/pixellab-hq-20261031/sdra_counter_bench_v1_cut.png').convert('RGBA')
+SC = float(os.environ.get('BSC', '0.75'))   # 의자·사람 같이 줄임(13:16 사용자 「너무 크지 않냐」), 다리 바닥 가운데 고정
+FOOT = (545*2 + 110.5*2, int(os.environ.get('FY', 835)))    # 다리 바닥 가운데(2배). 13:20 사용자 「더 뒤로」 → FY 줄이고 원근만큼 SC 줄임
+OX, OY = FOOT[0] - 110.5*2*SC, FOOT[1] - 124*2*SC
+SEATS_X = [40, 111.5, 183.5]; SEAT_PT_Y = 61  # 1배(잘라낸 판 기준)
+BS = float(os.environ.get('BS', '2.14')) * SC    # 사람 배율: 좌석 폭(62px×2) = 사무의자 등받이 폭(58)×BS
+PEOPLE = os.environ.get('WHO', '1.4_에일린,1.9_데드폴,1.12_콘쥬스').split(',')
+L = Image.new('RGBA', out.size, (0, 0, 0, 0))
+BXS = [int(x) for x in os.environ.get('BXS', '800,1270,1700').split(',')]   # 13:25 사용자 「의자 3개 배치」: 창구 세 칸 앞 가운데(2배 x)
+SIT = int(os.environ.get('SIT', '1'))   # 사람 앉힐 의자 번호(가운데)
+from PIL import ImageDraw, ImageFilter
+# 그림자(13:25 사용자 「그림자도 적용」): inpaint 원본에 있던 그림자 자리(잘라낸 판 1배 x 8~214, y 96~126)를 둥근 네모로, 1배 격자에서 흐리게 → 같은 배율로 키움
+SHA = float(os.environ.get('SHA', '0.45'))
+sm = Image.new('L', (bench.width, bench.height), 0); ImageDraw.Draw(sm).rounded_rectangle((10, 98, 212, 125), radius=10, fill=int(255*SHA))
+sm = sm.filter(ImageFilter.GaussianBlur(3))
+shadow = Image.new('RGBA', bench.size, (40, 32, 26, 0)); shadow.putalpha(sm)
+shadow = shadow.resize((round(bench.width*2*SC), round(bench.height*2*SC)), Image.NEAREST)
+for bx in BXS: out.alpha_composite(shadow, (round(bx - 110.5*2*SC), round(OY)))
+bw = round(bench.width*2*SC); bh = round(bench.height*2*SC); bimg = bench.resize((bw, bh), Image.NEAREST)
+for i, bx in enumerate(BXS):
+    OX = bx - 110.5*2*SC
+    if i == SIT:
+        for sx, key in zip(SEATS_X, PEOPLE):
+            cfg, _ = fc.load(key); im = fc.last(cfg, '61'); q = FIT[key]['back']
+            bot = min(im.size[1]-4, im.getbbox()[3])
+            px, py = q['dx'] - 100 + 91 + im.size[0]/2, q['dy'] - 171 + 101 + bot
+            seat = (OX + sx*2*SC, OY + SEAT_PT_Y*2*SC)
+            L.alpha_composite(im.resize((round(im.size[0]*BS), round(im.size[1]*BS)), Image.NEAREST), (round(seat[0]-px*BS), round(seat[1]-py*BS)))
+    L.alpha_composite(bimg, (round(OX), round(OY)))
+out.alpha_composite(L); out.convert('RGB').save(OUT); print(OUT)

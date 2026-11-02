@@ -2461,6 +2461,8 @@ export class WorldSim {
    */
   gear(scene: string): Gear[] {
     if (this.graph.kind(scene) !== 'training') return [];
+    const pic = this.graph.scene(scene)?.gear;   // 그림 장면(11-02): 그림 속 장비 자리 그대로
+    if (pic) return pic.map((q, i) => ({ ...q, busy: this.stationUser(scene, i) !== null }));   // 빈 목록이면 장비 없음(11-02 사용자 「아직 넣지 말고」)
     const len = this.graph.scene(scene)?.length ?? 1280;
     const [top, bot] = this.graph.lane(scene);
     const d = bot - top;
