@@ -21,6 +21,14 @@ PEOPLE = os.environ.get('WHO', '1.4_에일린,1.9_데드폴,1.12_콘쥬스').spl
 L = Image.new('RGBA', out.size, (0, 0, 0, 0))
 BXS = [int(x) for x in os.environ.get('BXS', '800,1270,1700').split(',')]   # 13:25 사용자 「의자 3개 배치」: 창구 세 칸 앞 가운데(2배 x)
 SIT = int(os.environ.get('SIT', '1'))   # 사람 앉힐 의자 번호(가운데)
+from PIL import ImageDraw, ImageFilter
+# 그림자(13:25 사용자 「그림자도 적용」): inpaint 원본에 있던 그림자 자리(잘라낸 판 1배 x 8~214, y 96~126)를 둥근 네모로, 1배 격자에서 흐리게 → 같은 배율로 키움
+SHA = float(os.environ.get('SHA', '0.45'))
+sm = Image.new('L', (bench.width, bench.height), 0); ImageDraw.Draw(sm).rounded_rectangle((10, 98, 212, 125), radius=10, fill=int(255*SHA))
+sm = sm.filter(ImageFilter.GaussianBlur(3))
+shadow = Image.new('RGBA', bench.size, (40, 32, 26, 0)); shadow.putalpha(sm)
+shadow = shadow.resize((round(bench.width*2*SC), round(bench.height*2*SC)), Image.NEAREST)
+for bx in BXS: out.alpha_composite(shadow, (round(bx - 110.5*2*SC), round(OY)))
 bw = round(bench.width*2*SC); bh = round(bench.height*2*SC); bimg = bench.resize((bw, bh), Image.NEAREST)
 for i, bx in enumerate(BXS):
     OX = bx - 110.5*2*SC
