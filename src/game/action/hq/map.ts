@@ -14,7 +14,9 @@ export type SceneId =
   | 'b1' | 'edu' | 'training' | 'clinic' | 'infirmary' | 'b2' | 'b3' | 'tooth' | 'bath_f' | 'bath_m' | 'shower_f' | 'shower_m'
   | 'jr_entry' | 'jr_b1' | 'jr_alley' | 'jr_b2'
   | 'sdra_lobby' | 'sdra_f2' | 'sdra_wc_m' | 'sdra_wc_f' | 'sdra_street'
-  | 'jr_daebak' | 'jr_heolgap' | 'jr_youngchang' | 'jr_songil' | 'jr_jinryo' | 'jr_op';
+  | 'jr_daebak' | 'jr_heolgap' | 'jr_youngchang' | 'jr_songil' | 'jr_jinryo' | 'jr_op'
+  | 'by_lobby' | 'by_f13' | 'by_wc_m' | 'by_wc_f' | 'by_lounge' | 'by_office'
+  | 'by_f15' | 'by_elite' | 'by_shower_m' | 'by_shower_f' | 'by_bath_m' | 'by_bath_f';
 
 export type DoorKind = 'main' | 'door' | 'glass' | 'steel' | 'security' | 'elevator' | 'stairs_up' | 'stairs_down' | 'stairs' | 'shop' | 'slide' | 'cell' | 'exit';
 export interface HqDoor {
@@ -50,14 +52,14 @@ export interface HqSpot {
   place?: PlaceId;
   /** 자리 주인 (대화 상대) */
   who?: string;
+  /** 책상 평소 주인 (11-02 사용자: 정해진 주인이 아니라 평소 앉는 자리, 비면 누구나 — shared) */
+  owner?: string;
+  shared?: boolean;
   /** 자리 앞에 뜨는 짧은 동사 */
   verb: string;
   face?: 1 | -1;
   act?: string[];
   seat?: { x: number; y: number };
-  /** 평소 앉는 사람(사무실 책상, 11-02 사용자): 비어 있으면 누구나 앉는다(shared). NPC는 자기 책상을 먼저 고른다 */
-  owner?: string;
-  shared?: boolean;
   /** E를 누르면 자막 한 줄 */
   say?: string;
   /** 필드 가게 (src/game/world/fieldShop.ts SHOPS id): E로 거래 창 */
@@ -92,7 +94,7 @@ export interface HqScene {
   id: SceneId;
   /** 들어갈 때 잠깐 뜨는 제목 */
   name: string;
-  floor: 'out' | '1F' | '2F' | '3F' | 'B1' | 'B2' | 'B3';
+  floor: 'out' | '1F' | '2F' | '3F' | 'B1' | 'B2' | 'B3' | '13F' | '15F';
   /** 층 배경 그림 (hq/painted.ts 열쇠). 그림이 있으면 색 상자 대신 그림으로 그린다 */
   painted?: string;
   length: number;
@@ -164,6 +166,18 @@ const LOCKERS: Record<'shower_f' | 'shower_m', { id: string; x: number; y: numbe
 const lockerSpots = (id: 'shower_f' | 'shower_m'): HqSpot[] => LOCKERS[id].map((l) => ({ id: `locker:${l.id}`, x: l.x, y: l.y, verb: '캐비닛', face: l.face, act: ['locker'] }));
 /** 샤워실 그림의 샤워기 발 자리 → NPC가 서는 자리 (11-02 NPC 샤워) */
 const showerSpots = (id: SceneId) => (PAINTED[id]?.showers ?? []).map((s) => ({ id: s.id, x: s.foot[0], y: s.foot[1], face: s.face }));
+/** 백일몽 사무실 책상 평소 자리 (사용자 14:13 「그래」, 위키 소속 기준). 관리국 사무실 그림을 그대로 쓰므로 책상 번호(desk1~8)는 같고 주인만 바꾼다.
+ * 일반조(13층): D조 이자헌·은하제·박민성 한 묶음 + 백사헌(F)·고영은(R)·강이학(I)·장허운(Y), desk8 비움. 정예팀(15층): A조 백석주·진나솔, B조 이성해, 나머지 비움.
+ * 관리국과 같은 규칙: 주인은 평소 자리일 뿐, 빈 책상은 플레이어·공용 NPC 누구나(shared) */
+const BY_DESK_OWNERS: Partial<Record<SceneId, Record<string, string>>> = {
+  by_office: { desk1: '이자헌', desk2: '은하제', desk3: '박민성', desk4: '백사헌', desk5: '고영은', desk6: '강이학', desk7: '장허운' },
+  by_elite: { desk1: '백석주', desk2: '진나솔', desk3: '이성해' },
+};
+function withOwners(sc: HqScene): HqScene {
+  const own = BY_DESK_OWNERS[sc.id] ?? {};
+  sc.spots = sc.spots.map((p) => (/^desk\d+$/.test(p.id) ? { ...p, owner: own[p.id], shared: true } : p));
+  return sc;
+}
 function floorHall(id: SceneId, name: string, floor: HqScene['floor'], doors: Omit<HqDoor, 'x'>[], extra: Partial<HqScene> = {}): HqScene {
   // extra.painted: 다른 장면 그림을 쓰는 방 (11-02 진압팀 사무실 'swat' = 종합대응팀 지도 office_riot 색만 다름)
   const pid = extra.painted ?? id;
@@ -268,6 +282,39 @@ export const HQ_SCENES: HqScene[] = [
   floorHall('shower_m', '탈의실(남)', 'B1', [{ id: 'out', kind: 'exit', side: 'S', to: 'b1', toDoor: 'shower_m', label: '나가기' }, { id: 'shower', kind: 'exit', to: 'bath_m', toDoor: 'out', label: '샤워실' }], { sex: '남', lockers: LOCKERS.shower_m, spots: lockerSpots('shower_m') }),
   floorHall('bath_f', '샤워실(여)', 'B1', [{ id: 'out', kind: 'exit', to: 'shower_f', toDoor: 'bath', label: '탈의실' }], { sex: '여', showers: showerSpots('bath_f') }),
   floorHall('bath_m', '샤워실(남)', 'B1', [{ id: 'out', kind: 'exit', to: 'shower_m', toDoor: 'shower', label: '탈의실' }], { sex: '남', showers: showerSpots('bath_m') }),
+  // ── 백일몽 본사 (11-02 사용자 13:48 「일단 이걸로 픽스, 따고 상호작용 연결. 화장실이랑 휴게실은 관리국거 일단 쓰고」, tools/mapedit/author_by_f13.py) ──
+  // 13층 복도: 서→동 화장실(남) · 화장실(여) · 일반조 사무실 유리 양문 · 엘리베이터 · 휴게실(커피잔 표지 문). 화장실·휴게실 안은 관리국 그림 그대로
+  // 1층 로비(사용자 14:02 「로비 붙여 거리에서 들어가기」, tools/mapedit/author_by_lobby_f15.py): 왼쪽 유리 옆벽 정문 · 엘리베이터.
+  // 강남 거리 그림이 아직 없어(외부도로 스레드 p1 「뽑아」 대기) 정문은 임시로 종로 거리로 나간다 — 강남 거리 장면이 생기면 그쪽 정문과 잇는다
+  floorHall('by_lobby', '백일몽 1층 로비', '1F', [
+    { id: 'main', kind: 'glass', to: 'street', toDoor: 'main', label: '정문' },
+    { id: 'elev', kind: 'elevator' },
+  ]),
+  floorHall('by_f13', '백일몽 13층', '13F', [
+    { id: 'wc_m', kind: 'door', to: 'by_wc_m', toDoor: 'out', label: '화장실(남)' },
+    { id: 'wc_f', kind: 'door', to: 'by_wc_f', toDoor: 'out', label: '화장실(여)' },
+    { id: 'office', kind: 'glass', to: 'by_office', toDoor: 'out', label: '일반조 사무실' },
+    { id: 'elev', kind: 'elevator' },
+    { id: 'rest', kind: 'door', to: 'by_lounge', toDoor: 'out', label: '휴게실' },
+  ]),
+  floorHall('by_wc_m', '화장실(남)', '13F', [{ id: 'out', kind: 'exit', side: 'S', to: 'by_f13', toDoor: 'wc_m', label: '나가기' }], { toilets: PAINTED.by_wc_m?.toilets, sex: '남' }),
+  floorHall('by_wc_f', '화장실(여)', '13F', [{ id: 'out', kind: 'exit', side: 'S', to: 'by_f13', toDoor: 'wc_f', label: '나가기' }], { toilets: PAINTED.by_wc_f?.toilets, sex: '여' }),
+  floorHall('by_lounge', '휴게실', '13F', [{ id: 'out', kind: 'exit', to: 'by_f13', toDoor: 'rest', label: '나가기' }], { spots: MAPEDIT_SPOTS.lounge }),
+  // 사무실 안은 관리국 사무실 그대로(사용자 13:50 「일반조랑 정예팀 사무실 쓰게 관리국 사무실」). 금색 톤 그림은 고른 뒤 바꾼다
+  // 사용자 14:03 「정예팀이 진압팀, 일반팀이 종합대응팀거 일단 해」: 일반조 = 종합대응팀 사무실 그림, 정예팀 = 진압팀(office_riot) 그림
+  withOwners(floorHall('by_office', '일반조 사무실', '13F', [{ id: 'out', kind: 'exit', side: 'S', to: 'by_f13', toDoor: 'office', label: '나가기' }], { painted: 'office' })),
+  // 15층(사용자 13:50 「아래층거 그대로 써도」, 14:05 「15층은 휴게실 필요 없으니 적당히 잘라」): 13층 그림을 휴게실 문 앞에서 자른 by_f15. 남·여 문 = 샤워실(관리국 탈의실·샤워실), 유리 양문 = 정예팀 사무실
+  floorHall('by_f15', '백일몽 15층', '15F', [
+    { id: 'wc_m', kind: 'door', to: 'by_shower_m', toDoor: 'out', label: '샤워실(남)' },
+    { id: 'wc_f', kind: 'door', to: 'by_shower_f', toDoor: 'out', label: '샤워실(여)' },
+    { id: 'office', kind: 'glass', to: 'by_elite', toDoor: 'out', label: '정예팀 사무실' },
+    { id: 'elev', kind: 'elevator' },
+  ]),
+  withOwners(floorHall('by_elite', '정예팀 사무실', '15F', [{ id: 'out', kind: 'exit', side: 'S', to: 'by_f15', toDoor: 'office', label: '나가기' }], { painted: 'office_riot' })),
+  floorHall('by_shower_f', '탈의실(여)', '15F', [{ id: 'out', kind: 'exit', side: 'S', to: 'by_f15', toDoor: 'wc_f', label: '나가기' }, { id: 'bath', kind: 'exit', to: 'by_bath_f', toDoor: 'out', label: '샤워실' }], { sex: '여', lockers: LOCKERS.shower_f, spots: lockerSpots('shower_f') }),
+  floorHall('by_shower_m', '탈의실(남)', '15F', [{ id: 'out', kind: 'exit', side: 'S', to: 'by_f15', toDoor: 'wc_m', label: '나가기' }, { id: 'shower', kind: 'exit', to: 'by_bath_m', toDoor: 'out', label: '샤워실' }], { sex: '남', lockers: LOCKERS.shower_m, spots: lockerSpots('shower_m') }),
+  floorHall('by_bath_f', '샤워실(여)', '15F', [{ id: 'out', kind: 'exit', to: 'by_shower_f', toDoor: 'bath', label: '탈의실' }], { sex: '여', showers: showerSpots('by_bath_f'), spots: MAPEDIT_SPOTS.bath_f }),
+  floorHall('by_bath_m', '샤워실(남)', '15F', [{ id: 'out', kind: 'exit', to: 'by_shower_m', toDoor: 'shower', label: '탈의실' }], { sex: '남', showers: showerSpots('by_bath_m'), spots: MAPEDIT_SPOTS.bath_m }),
   room({ id: 'training', name: '훈련장', floor: 'B1', look: 'lab', doors: [exitS('b1', 'training', 'training')] }, 'training'),
   // 지하 2층은 새 본부 그림(PixelLab 11-01, game-src/mapedit/b2): 서→동 격리시설 방폭문 · 격리팀 사무실(의무실·연구실) · 엘리베이터. 심문실·창고 없음(본부 최소화)
   floorHall('b2', '격리 구역', 'B2', [
@@ -335,7 +382,7 @@ export const HQ_SCENES: HqScene[] = [
 export const SCENE_BY_ID = Object.fromEntries(HQ_SCENES.map((s) => [s.id, s])) as Record<SceneId, HqScene>;
 
 /** 엘리베이터 층 단추 (위에서 아래로) */
-/** bldg = 건물(없으면 관리국 본부). 엘리베이터는 같은 건물 층만 고른다 (11-02 협회 추가) */
+/** bldg = 건물(없으면 관리국 본부). 엘리베이터는 같은 건물 층만 고른다 (11-02 협회·백일몽) */
 export const ELEVATOR: { floor: HqScene['floor']; label: string; scene: SceneId; door: string; needs?: PlaceId; bldg?: string }[] = [
   { floor: '3F', label: '3', scene: 'f3', door: 'elev' },
   { floor: '2F', label: '2', scene: 'f2', door: 'elev' },
@@ -346,6 +393,10 @@ export const ELEVATOR: { floor: HqScene['floor']; label: string; scene: SceneId;
   // 협회: 1층·2층 (지하 1층 복도 그림이 생기면 더한다)
   { floor: '2F', label: '2', scene: 'sdra_f2', door: 'elev', bldg: 'sdra' },
   { floor: '1F', label: '1', scene: 'sdra_lobby', door: 'elev', bldg: 'sdra' },
+  // 백일몽 본사: 15층·13층·1층 로비
+  { floor: '15F', label: '15', scene: 'by_f15', door: 'elev', bldg: 'by' },
+  { floor: '13F', label: '13', scene: 'by_f13', door: 'elev', bldg: 'by' },
+  { floor: '1F', label: '1', scene: 'by_lobby', door: 'elev', bldg: 'by' },
 ];
 
 /** 메뉴 「장소로 가기」·장소 id → 그 장면과 서 있을 자리 */

@@ -1,0 +1,75 @@
+{
+ "scene": {
+  "file": "me_by_f15",
+  "w": 2492,
+  "h": 848,
+  "under": true,
+  "lane": [
+   660,
+   836
+  ],
+  "floor": [
+   [
+    0,
+    660
+   ],
+   [
+    2492,
+    660
+   ],
+   [
+    2492,
+    848
+   ],
+   [
+    0,
+    848
+   ]
+  ],
+  "holes": [],
+  "dotK": 1.4292,
+  "blocks": [],
+  "doors": {
+   "wc_m": {
+    "x0": 166,
+    "x1": 340,
+    "y0": 244,
+    "y1": 656,
+    "behind": "dark",
+    "anim": "none"
+   },
+   "wc_f": {
+    "x0": 714,
+    "x1": 886,
+    "y0": 240,
+    "y1": 656,
+    "behind": "dark",
+    "anim": "none"
+   },
+   "office": {
+    "x0": 1278,
+    "x1": 1604,
+    "y0": 236,
+    "y1": 654,
+    "behind": "dark",
+    "anim": "none"
+   },
+   "elev": {
+    "x0": 2000,
+    "x1": 2236,
+    "y0": 254,
+    "y1": 654,
+    "behind": "car",
+    "anim": "slide2",
+    "seam": 2118
+   }
+  },
+  "lamps": [],
+  "windows": [],
+  "objects": []
+ },
+ "spots": [],
+ "files": [
+  "me_by_f15"
+ ]
+}

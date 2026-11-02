@@ -39,6 +39,9 @@ if os.environ.get("ERASE") == "1":
     win.paste((255, 255, 255, 255), (new, 0, new + ov, h))
     if top_h: win.paste((255, 255, 255, 255), (new, 0, new + ov_top, top_h))
     if bot_y: win.paste((255, 255, 255, 255), (new, bot_y, new + ov_bot, h))
+# SKETCH=<png>: 다시 그릴 칸에 밑그림(벽·바닥 단색 + 문 자리)을 그려 둔 창을 그대로 보낸다(11-02 백일몽 복도: 말로 문 위치를 못 잡음)
+if os.environ.get("SKETCH"):
+    win = Image.open(os.environ["SKETCH"]).convert("RGBA"); assert win.size == (w, h)
 # GUIDE=<png>: 사용자가 승인한 배치 안내선(투명 바탕, 창 크기)을 지운 칸 위에 얹어 보낸다(2026-11-02 격리팀 실험실 옆벽 각도)
 if os.environ.get("GUIDE"):
     g = Image.open(os.environ["GUIDE"]).convert("RGBA"); win.alpha_composite(g)

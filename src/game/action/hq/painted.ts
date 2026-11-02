@@ -277,6 +277,14 @@ for (const [k, m] of Object.entries(MAPEDIT_SCENES)) {
 // 협회 화장실(11-02): 관리국 화장실 그림·칸·자리를 그대로 쓴다 (나가는 문만 map.ts에서 협회 2층으로)
 PAINTED.sdra_wc_m = PAINTED.wc;
 PAINTED.sdra_wc_f = PAINTED.wc3;
+// 백일몽 본사(11-02): 15층 복도 = 13층 그림 자른 by_f15(맵 에디터 장면), 화장실·휴게실·탈의실·샤워실 = 관리국 그림·자리 그대로 (나가는 문만 map.ts에서 백일몽 쪽으로)
+PAINTED.by_wc_m = PAINTED.wc;
+PAINTED.by_wc_f = PAINTED.wc3;
+PAINTED.by_lounge = PAINTED.lounge;
+PAINTED.by_shower_m = PAINTED.shower_m;
+PAINTED.by_shower_f = PAINTED.shower_f;
+PAINTED.by_bath_m = PAINTED.bath_m;
+PAINTED.by_bath_f = PAINTED.bath_f;
 
 /** 문 가운데 x */
 export const doorX = (scene: string, id: string) => {

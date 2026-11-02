@@ -38,6 +38,9 @@ if os.environ.get("ERASE") == "1":
     win.paste((255, 255, 255, 255), (keep - ov, 0, keep, h))
     if top_h: win.paste((255, 255, 255, 255), (keep - ov_top, 0, keep, top_h))
     if bot_y: win.paste((255, 255, 255, 255), (keep - ov_bot, bot_y, keep, h))
+# SKETCH=<png>: 다시 그릴 칸에 밑그림(벽·바닥 단색 + 문 자리)을 그려 둔 창을 그대로 보낸다(extend_left와 같음, 11-02 백일몽 복도 오른쪽)
+if os.environ.get("SKETCH"):
+    win = Image.open(os.environ["SKETCH"]).convert("RGBA"); assert win.size == (w, h)
 # PROTECT="x0,y0,x1,y1" (앞 그림 좌표): 이 칸의 옛 그림은 지우지도 다시 그리지도 않고 그대로 둔다(사용자 11-02 11:48 「관철빌딩 글자 부분만」 지우지 못하게)
 PROT = [int(v) for v in os.environ["PROTECT"].split(",")] if os.environ.get("PROTECT") else None
 if PROT:
