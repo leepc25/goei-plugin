@@ -6,7 +6,7 @@ HERE = Path(__file__).resolve().parent; ROOT = HERE.parents[1]
 sys.path.insert(0, str(ROOT / "tools")); import pixellab_gate
 API = "https://api.pixellab.ai/v2"
 P = json.loads((HERE / "prompts_v2.json").read_text())
-STYLE = base64.b64encode((HERE / "style_eileen_south.png").read_bytes()).decode()
+STYLE = base64.b64encode((HERE / "style_eileen_256_crop128.png").read_bytes()).decode()
 def call(m, path, body=None):
     r = urllib.request.Request(API + path, data=json.dumps(body).encode() if body else None, method=m, headers={"Content-Type": "application/json"})
     with urllib.request.urlopen(r, timeout=120) as f: return json.loads(f.read())
