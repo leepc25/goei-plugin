@@ -274,6 +274,10 @@ for (const [k, m] of Object.entries(MAPEDIT_SCENES)) {
   PAINTED[k] = { ...base, ...m, doors: Object.keys(m.doors).length || !base ? m.doors : base.doors, lamps: m.lamps.length || !base ? m.lamps : base.lamps } as PaintedScene;
 }
 
+// 협회 화장실(11-02): 관리국 화장실 그림·칸·자리를 그대로 쓴다 (나가는 문만 map.ts에서 협회 2층으로)
+PAINTED.sdra_wc_m = PAINTED.wc;
+PAINTED.sdra_wc_f = PAINTED.wc3;
+
 /** 문 가운데 x */
 export const doorX = (scene: string, id: string) => {
   const d = PAINTED[scene].doors[id];

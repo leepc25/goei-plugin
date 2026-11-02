@@ -13,6 +13,7 @@ export type SceneId =
   | 'street' | 'pasta' | 'lobby' | 'swat' | 'f2' | 'f3' | 'office' | 'interview' | 'lounge' | 'wc' | 'wc3'
   | 'b1' | 'edu' | 'training' | 'clinic' | 'b2' | 'b3' | 'tooth' | 'bath_f' | 'bath_m' | 'shower_f' | 'shower_m'
   | 'jr_entry' | 'jr_b1' | 'jr_alley' | 'jr_b2'
+  | 'sdra_lobby' | 'sdra_f2' | 'sdra_wc_m' | 'sdra_wc_f'
   | 'jr_daebak' | 'jr_heolgap' | 'jr_youngchang' | 'jr_songil' | 'jr_jinryo' | 'jr_op';
 
 export type DoorKind = 'main' | 'door' | 'glass' | 'steel' | 'security' | 'elevator' | 'stairs_up' | 'stairs_down' | 'stairs' | 'shop' | 'slide' | 'cell' | 'exit';
@@ -255,6 +256,20 @@ export const HQ_SCENES: HqScene[] = [
     { id: 'supply', kind: 'steel', place: 'supply', label: '보급실' },
     { id: 'elev', kind: 'elevator' },
   ]),
+  // ── 특수재난대응협회 (중립, 11-02 사용자: 관리국 본부 배경을 그대로 쓰고 1층·복도만 새로). 1층 = PixelLab p4(tools/mapedit/author_sdra_lobby.py): 왼쪽 옆벽 정문 · 뒷벽 가운데 엘리베이터. 안내 데스크 없음 ──
+  floorHall('sdra_lobby', '협회 1층', '1F', [
+    { id: 'main', kind: 'glass', to: 'street', toDoor: 'sdra', label: '정문' },
+    { id: 'elev', kind: 'elevator' },
+  ]),
+  // 협회 2층 복도(11-02 사용자 「화장실만 이은걸로 이층은 마무리」, tools/mapedit/author_sdra_f2.py): 창구 유리문(안쪽 방 그림 없음 → 잠금) · 엘리베이터 · 화장실 남·여. 화장실은 관리국 그림을 그대로 쓴다
+  floorHall('sdra_f2', '협회 2층', '2F', [
+    { id: 'office', kind: 'glass', locked: true, label: '협회 창구' },
+    { id: 'elev', kind: 'elevator' },
+    { id: 'wc_m', kind: 'door', to: 'sdra_wc_m', toDoor: 'out', label: '화장실(남)' },
+    { id: 'wc_f', kind: 'door', to: 'sdra_wc_f', toDoor: 'out', label: '화장실(여)' },
+  ]),
+  floorHall('sdra_wc_m', '화장실(남)', '2F', [{ id: 'out', kind: 'exit', side: 'S', to: 'sdra_f2', toDoor: 'wc_m', label: '나가기' }], { toilets: PAINTED.sdra_wc_m?.toilets, sex: '남' }),
+  floorHall('sdra_wc_f', '화장실(여)', '2F', [{ id: 'out', kind: 'exit', side: 'S', to: 'sdra_f2', toDoor: 'wc_f', label: '나가기' }], { toilets: PAINTED.sdra_wc_f?.toilets, sex: '여' }),
   // ── 중림 지하상가 (중립지역, 그림 4장). 지상 입구 → 지하 1층 앞골목 → (가운데 통로) 뒷골목 / (동쪽 계단) 지하 2층 ──
   floorHall('jr_entry', '중림 지하상가 입구', 'out', [
     { id: 'west', kind: 'exit', side: 'S', to: 'street', toDoor: 'jr', label: '버스 정류장' },
@@ -290,13 +305,17 @@ export const HQ_SCENES: HqScene[] = [
 export const SCENE_BY_ID = Object.fromEntries(HQ_SCENES.map((s) => [s.id, s])) as Record<SceneId, HqScene>;
 
 /** 엘리베이터 층 단추 (위에서 아래로) */
-export const ELEVATOR: { floor: HqScene['floor']; label: string; scene: SceneId; door: string; needs?: PlaceId }[] = [
+/** bldg = 건물(없으면 관리국 본부). 엘리베이터는 같은 건물 층만 고른다 (11-02 협회 추가) */
+export const ELEVATOR: { floor: HqScene['floor']; label: string; scene: SceneId; door: string; needs?: PlaceId; bldg?: string }[] = [
   { floor: '3F', label: '3', scene: 'f3', door: 'elev' },
   { floor: '2F', label: '2', scene: 'f2', door: 'elev' },
   { floor: '1F', label: '1', scene: 'lobby', door: 'elev' },
   { floor: 'B1', label: 'B1', scene: 'b1', door: 'elev' },
   { floor: 'B2', label: 'B2', scene: 'b2', door: 'elev' },
   { floor: 'B3', label: 'B3', scene: 'b3', door: 'elev' },
+  // 협회: 1층·2층 (지하 1층 복도 그림이 생기면 더한다)
+  { floor: '2F', label: '2', scene: 'sdra_f2', door: 'elev', bldg: 'sdra' },
+  { floor: '1F', label: '1', scene: 'sdra_lobby', door: 'elev', bldg: 'sdra' },
 ];
 
 /** 메뉴 「장소로 가기」·장소 id → 그 장면과 서 있을 자리 */
