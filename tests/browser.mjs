@@ -3,6 +3,7 @@
 // 사용법: node tests/browser.mjs <fixture.json> [screenshot-dir]
 import { createRequire } from 'node:module';
 import { distPackFiles, distWorldPack } from './data-init.mjs';
+import { gameFiles as pickGameFiles } from './qc-game-host.mjs';
 import { execSync } from 'node:child_process';
 import { readFileSync, readdirSync, mkdirSync, writeFileSync } from 'node:fs';
 import { createHash } from 'node:crypto';
@@ -2380,8 +2381,7 @@ if (fixture.globalLore.some(packed)) {
   await page.click('[data-g="get"]');
   await page.waitForSelector('.gx-settings [role=status]');
   assert.match(await page.textContent('.gx-settings [role=status]'), /받지 못했어요/);
-  const gdir = new URL('../dist/game/', import.meta.url);
-  const gameFiles = Object.fromEntries(readdirSync(gdir).map((n) => [n, readFileSync(new URL(n, gdir)).toString('base64')]));
+  const gameFiles = pickGameFiles();   // 11-02: 인물 팩 126명(450MB)을 다 넘기면 렌더러가 죽는다 → 목록·코드·required 팩만 (tests/qc-game-host.mjs)
   await page.evaluate((files) => {
     const bytes = Object.fromEntries(Object.entries(files).map(([k, v]) => [k, Uint8Array.from(atob(v), (c) => c.charCodeAt(0))]));
     window.__fetch = (u) => bytes[u.split('?')[0].split('/').pop()] ?? null;
@@ -2422,24 +2422,7 @@ if (fixture.globalLore.some(packed)) {
     assert.ok(r.scroll <= 0, `페이지 스크롤 ${r.scroll}`);
   }
   console.log('FIT 게임 캔버스', fit.join(' · '));
-  // 정산 결과가 쌓였을 때 (엔진은 본부 정산에서 bridge.report를 부른다. 여기서는 결과를 직접 넣는다)
-  const before = await page.evaluate(() => window.__calls.setChat.length);
-  await page.evaluate(() => (window.__store['p:goei:game:reports'] = JSON.stringify([{ at: 1, report: { id: 't1', mission: '조사: 로비 규칙', outcome: 'return', depth: 'L2', agents: [{ id: 'jyaldi', name: '쟈알디' }], rules: ['인사는 두 번'], loot: [], summary: '로프로 귀환' } }])));
-  assert.equal(await page.evaluate(() => window.__calls.setChat.length), before, '결과만으로는 채팅을 바꾸지 않음');
-  // 시작 화면(정산 결과)은 필드를 나왔다 다시 들어가면 보인다 (게임 머리의 「시작 화면」 단추는 필드 탭에서 숨김)
-  await leaveField(page);
-  await page.click(FIELD);
-  await page.waitForSelector('[data-g="post"]');
-  if (shots) await page.screenshot({ path: `${shots}/game-report.png` });
-  await page.click('[data-g="post"]');
-  await page.waitForSelector('[data-g="post"][disabled]');
-  const last = await page.evaluate(() => window.__chat.message.at(-1));
-  assert.equal(last.role, 'user');
-  assert.match(last.data, /^\[관리국 출동 보고서\]/);
-  assert.match(last.data, /%%GOEI_UNSENT%%/, '전송 대기로 놓음');
-  await page.click('[data-g="record"]');
-  await page.waitForSelector('[data-g="unrecord"]');
-  assert.equal(await page.evaluate(() => window.__chat.localLore.filter((e) => e.comment === '관리국 훈련 기록').length), 1);
+  // (정산 결과·「보고서 붙이기」·훈련 기록 로어북 절은 10-29 출동 삭제·11-01 「보고서는 기록 탭에만」 결정으로 기능이 없어져 11-02 뺌)
   // 닫았다 다시 열면 저장 칸이 남아 있고, 코드는 다시 받지 않는다
   await page.evaluate(() => (window.__calls.fetch = []));
   await leaveField(page);
@@ -2474,8 +2457,7 @@ if (fixture.globalLore.some(packed)) {
   };
   await startedWithReply(page);
   await page.click('[x-goei-fab] button');
-  const gdir = new URL('../dist/game/', import.meta.url);
-  const gameFiles = Object.fromEntries(readdirSync(gdir).map((n) => [n, readFileSync(new URL(n, gdir)).toString('base64')]));
+  const gameFiles = pickGameFiles();   // 11-02: 인물 팩 126명(450MB)을 다 넘기면 렌더러가 죽는다 → 목록·코드·required 팩만 (tests/qc-game-host.mjs)
   await page.evaluate((files) => {
     const bytes = Object.fromEntries(Object.entries(files).map(([k, v]) => [k, Uint8Array.from(atob(v), (c) => c.charCodeAt(0))]));
     // 받기마다 40ms (느린 망 흉내는 아님, 요청 수만큼 지연)

@@ -36,7 +36,7 @@ def read_source(src: Path):
 
 def find(files, stem):
     for n in files:
-        if n.rsplit('.', 1)[0] == stem: return n
+        if n == stem or n.rsplit('.', 1)[0] == stem: return n   # 11-02 사무실: 확장자까지 적은 이름도
     raise SystemExit(f'그림이 없다: {stem}')
 
 

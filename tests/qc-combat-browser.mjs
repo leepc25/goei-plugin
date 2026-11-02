@@ -11,14 +11,16 @@ const require = createRequire(execSync('npm root -g').toString().trim() + '/');
 const { chromium } = require('playwright');
 const shots = process.argv[2];
 if (shots) mkdirSync(shots, { recursive: true });
-const base = pathToFileURL(resolve('dist/goei-action-game.html')).href;
+// 11-02: 옛 시연판에는 인물 팩이 없어 에일린 코어가 안 선다 → 필드 시연판을 공용 http 서버로 (GAME_URL, tests/browser-suite.json)
+const base = process.env.GAME_URL || pathToFileURL(resolve('dist/goei-action-game.html')).href;
+const withQ = (q) => base + (base.includes('?') ? '&' : '?') + q;
 const browser = await chromium.launch({ args: ['--allow-file-access-from-files'] });
 const results = [];
 const ok = (name, detail = '') => { results.push(`${name} · 통과${detail ? ` · ${detail}` : ''}`); console.log('PASS', name, detail); };
 const st = (page) => page.evaluate(() => {
   const w = window.__goeiEngine.world, p = w.player, P = p.core?.P;
   const ai = w.bodies.filter((b) => b.team === 'enemy' && b.alive).map((b) => ({ id: b.id, label: b.label, hp: b.hp, x: Math.round(b.x), y: Math.round(b.y), stop: b.stop }));
-  return { x: Math.round(p.x), y: Math.round(p.y), z: Math.round(p.z), hp: p.hp, hpMax: p.hpMax, mode: P?.mode, clip: P?.clip?.id, sp: P?.sp, combo: P?.combo, lastHeavy: P?.lastHeavy, shake: p.core?.shake, len: w.floor.length, lane: w.lane, ai, tick: w.tick, ended: w.ended };
+  return { x: Math.round(p.x), y: Math.round(p.y), z: Math.round(p.z), hp: p.hp, hpMax: p.hpMax, mode: P?.mode, clip: P?.clip?.id, sp: P?.sp, combo: P?.combo, shake: p.core?.shake, len: w.floor.length, lane: w.lane, ai, tick: w.tick, ended: w.ended };
 });
 const hold = async (page, code, ms) => { await page.keyboard.down(code); await page.waitForTimeout(ms); await page.keyboard.up(code); };
 
@@ -26,7 +28,7 @@ for (const diff of ['easy', 'normal', 'hard', 'nightmare']) {
   const page = await browser.newPage({ viewport: { width: 1280, height: 720 } });
   const errors = [];
   page.on('pageerror', (e) => errors.push(e.message));
-  await page.goto(`${base}?start=stage=spar&ai=${diff}`);
+  await page.goto(withQ(`start=stage=spar&ai=${diff}`));
   await page.waitForFunction(() => window.__goeiEngine?.world && !window.__goeiEngine.inHub, null, { timeout: 30000 });
   await page.waitForFunction(() => window.__goeiEngine.world.bodies.some((b) => b.team === 'enemy' && b.alive), null, { timeout: 15000 });
   await page.waitForTimeout(500);
@@ -43,13 +45,16 @@ for (const diff of ['easy', 'normal', 'hard', 'nightmare']) {
     const w = window.__goeiEngine.world; const e = w.bodies.find((b) => b.team === 'enemy' && b.alive);
     e.__tick = e.brain.tick; e.brain.tick = () => ({ hold: new Set(), press: new Set(), release: new Set() });
     window.__max = { hs: 0, sh: 0 }; window.__clips = new Set();
-    window.__sampler = setInterval(() => { const c = w.player.core; window.__max.hs = Math.max(window.__max.hs, c.hitstop); window.__max.sh = Math.max(window.__max.sh, c.shake); if (c.P.clip) window.__clips.add(c.P.clip.id); }, 5);
+    // 마무리 종류는 강공격 클립('12')의 타격 사건에 박힌 kind(core.ts heavy) 로 읽고, 적 몸에 들어오는 판정(hurtTarget → Body.applyHit 의 hit.react/blow)으로도 읽는다. 코어 안의 표적 대리(stunT·launched)는 밖에서 못 본다 (11-02)
+    window.__kind = null;
+    if (!e.__applyHit) { e.__applyHit = e.applyHit; e.applyHit = function (h, ww) { if (!window.__kind) window.__kind = h.blow ? 'blow' : h.react === 'launch' ? 'launch' : h.react === 'stagger' ? 'stun' : null; return e.__applyHit(h, ww); }; }
+    window.__sampler = setInterval(() => { const c = w.player.core; window.__max.hs = Math.max(window.__max.hs, c.hitstop); window.__max.sh = Math.max(window.__max.sh, c.shake); if (c.P.clip) window.__clips.add(c.P.clip.id); if (!window.__kind && c.P.clip?.id === '12') { const k = (c.P.clip.seq ?? []).find((q) => q && q.kind)?.kind; if (k) window.__kind = k; } }, 5);
   });
   const ground = () => page.waitForFunction(() => { const P = window.__goeiEngine.world.player.core.P; return P.mode === 'ground'; }, null, { timeout: 8000 });
   const kinds = {};
   let hsMax = 0, shMax = 0, dmgTotal = 0;
   for (const [name, seq] of [['stun', ['KeyW']], ['launch', ['KeyQ', 'KeyQ', 'KeyW']], ['blow', ['KeyQ', 'KeyQ', 'KeyQ', 'KeyW']]]) {
-    await page.evaluate(() => { const w = window.__goeiEngine.world; const p = w.player; p.hp = p.hpMax; p.core.P.lastHeavy = null; const e = w.bodies.find((b) => b.team === 'enemy' && b.alive); e.hp = e.hpMax; p.x = e.x - 110; p.y = e.y; p.dir = 1; if (p.core) p.core.P.face = 1; window.__max = { hs: 0, sh: 0 }; window.__clips = new Set(); });
+    await page.evaluate(() => { const w = window.__goeiEngine.world; const p = w.player; p.hp = p.hpMax; window.__kind = null; const e = w.bodies.find((b) => b.team === 'enemy' && b.alive); e.hp = e.hpMax; p.x = e.x - 110; p.y = e.y; p.dir = 1; if (p.core) p.core.P.face = 1; window.__max = { hs: 0, sh: 0 }; window.__clips = new Set(); });
     // 앞서 AI 에 맞아 넘어져 있으면 첫 키가 일어나기에 쓰인다(마무리가 한 칸씩 밀림): 서서 자유로울 때까지
     await ground();
     await page.waitForTimeout(300);
@@ -65,18 +70,18 @@ for (const diff of ['easy', 'normal', 'hard', 'nightmare']) {
       } else await page.waitForTimeout(330);
     }
     await page.waitForTimeout(900);
-    const r = await page.evaluate(() => { const w = window.__goeiEngine.world; const e = w.bodies.find((b) => b.team === 'enemy' && b.alive); return { lastHeavy: w.player.core.P.lastHeavy, dmg: e.hpMax - e.hp, max: window.__max, clips: [...window.__clips] }; });
-    kinds[name] = r.lastHeavy;
+    const r = await page.evaluate(() => { const w = window.__goeiEngine.world; const e = w.bodies.find((b) => b.team === 'enemy' && b.alive); return { kind: window.__kind, dmg: e.hpMax - e.hp, max: window.__max, clips: [...window.__clips] }; });
+    kinds[name] = r.kind;
     hsMax = Math.max(hsMax, r.max.hs); shMax = Math.max(shMax, r.max.sh); dmgTotal += r.dmg;
   }
   assert.deepEqual(kinds, { stun: 'stun', launch: 'launch', blow: 'blow' }, `강공격 마무리 3종 ${JSON.stringify(kinds)}`);
   // 빠른 연타 (2026-10-29 사용자: 선입력 2칸): 약·약·약·강을 120ms 간격으로 눌러도 세 번째 약이 안 사라지고 날리기
-  await page.evaluate(() => { const w = window.__goeiEngine.world; const p = w.player; p.core.P.lastHeavy = null; const e = w.bodies.find((b) => b.team === 'enemy' && b.alive); e.hp = e.hpMax; p.x = e.x - 110; p.y = e.y; p.dir = 1; if (p.core) p.core.P.face = 1; });
+  await page.evaluate(() => { const w = window.__goeiEngine.world; const p = w.player; window.__kind = null; const e = w.bodies.find((b) => b.team === 'enemy' && b.alive); e.hp = e.hpMax; p.x = e.x - 110; p.y = e.y; p.dir = 1; if (p.core) p.core.P.face = 1; });
   await ground();
   await page.waitForTimeout(300);
   for (const k of ['KeyQ', 'KeyQ', 'KeyQ', 'KeyW']) { await page.keyboard.press(k); await page.waitForTimeout(120); }
-  await page.waitForFunction(() => window.__goeiEngine.world.player.core.P.lastHeavy !== null, null, { timeout: 4000 }).catch(() => {});
-  const fast = await page.evaluate(() => window.__goeiEngine.world.player.core.P.lastHeavy);
+  await page.waitForFunction(() => window.__kind !== null, null, { timeout: 4000 }).catch(() => {});
+  const fast = await page.evaluate(() => window.__kind);
   assert.equal(fast, 'blow', `빠른 연타 약3+강 = 날리기 (${fast})`);
   assert.ok(hsMax > 0, `히트스톱 ${hsMax}`);
   assert.ok(shMax > 6, `흔들림 ${shMax}`);
