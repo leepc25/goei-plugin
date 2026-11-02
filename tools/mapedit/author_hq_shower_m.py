@@ -73,6 +73,8 @@ def snap(rough):
     return out
 
 
+# 벽·뒷벽에 붙은 물건은 가림 없음 — 바닥선만으로 막는다 (규칙 11-01 18:0x, 11-02 06:3x 점검에서 고침)
+WALL_ATTACHED = {'sink', 'bench', 'hamperL', 'umbrellaL', 'binB', 'boxB', 'umbB'}
 masks = {}
 for oid, (polys, _, _) in ROUGH.items():
     m = np.zeros((H, W), bool)
@@ -90,7 +92,7 @@ for oid, (polys, sy, depth) in ROUGH.items():
             if not sub.any(): continue
             objects.append((f'{oid}_{x0}', sub, round(f(x0 + 2)) * K))
     else:
-        objects.append((oid, m, sy * K))
+        if oid not in WALL_ATTACHED: objects.append((oid, m, sy * K))
         if depth:   # 바닥 자국: 2px 기둥마다 물건 밑 윤곽선(그 기둥의 가장 아래)에서 depth 위까지
             for x in range(0, W, 2):
                 c = np.nonzero(m[:, x:x + 2].any(1))[0]
@@ -98,8 +100,9 @@ for oid, (polys, sy, depth) in ROUGH.items():
                 yb = c.max() + 1; yt = max(c.min(), yb - depth)
                 blocks.append({'poly': [[x * K, yt * K], [(x + 2) * K, yt * K], [(x + 2) * K, yb * K], [x * K, yb * K]], 'h': 999})
 # 사물함 줄 막힘(바닥 자국 = 앞 바닥선부터 뒷벽까지)
-blocks.append({'poly': [[x * K, y * K] for x, y in [(285, 296), (467, 296), (467, 300), (379, 375), (285, 375)]], 'h': 999})
-blocks.append({'poly': [[x * K, y * K] for x, y in [(551, 296), (632, 296), (632, 425), (600, 387), (551, 301)]], 'h': 999})
+# 옆면에서 몸 반폭 10px 띄움 (11-02 06:3x: 여자 탈의실 「파묻혔냐」와 같은 문제)
+blocks.append({'poly': [[x * K, y * K] for x, y in [(285, 296), (477, 296), (477, 300), (389, 375), (285, 375)]], 'h': 999})
+blocks.append({'poly': [[x * K, y * K] for x, y in [(541, 296), (632, 296), (632, 425), (590, 387), (541, 301)]], 'h': 999})
 
 
 def to_cover(oid, m, sy):
@@ -121,6 +124,9 @@ for x in range(W):
     y = s
     while y > s - 16 and not dark[y, x]: y -= 1
     top.append(y + 1 if dark[y, x] else s - 3)   # 16px 안에 윤곽선이 없으면(밝은 선) 시작선 3px 위
+# 맨 뒤는 y314(2배 628)까지만 걷기 (11-02 06:35 사용자 「여기까지만 들어가게 하면 돼」)
+BACK = 314
+top = [max(t, BACK) for t in top]
 fl = [(0, H)] + [(x, top[x]) for x in range(W)] + [(W, H)]
 step = []
 for i, (x, y) in enumerate(fl[1:-1]):
@@ -137,12 +143,18 @@ door = {'kind': 'glass', 'x': 72 * K, 'y': 356 * K, 'locked': True, 'label': '�
 # - 문: 왼쪽 유리문 문틀 앞 모서리 x30 위 y110 ~ 밑 y358 (248px) → 사람 203, 발 y358
 # - 앞 캐비닛: 가운데 줄 끝판 x300 위 y150 ~ 밑 y374 (224px) → 사람 204, 발 y374
 SPR_DOTS = 247
-REFS = [(300, 0.91 * 110), (358, 0.82 * 248), (374, 0.91 * 224)]
+# 11-02 06:35 사용자 「원근이 이상」 → 여자 탈의실과 같은 방식(06:22 확정): 문 앞 사람 = 문틀 248px의 0.82(발 y358),
+# 지평선 y228.6(가운데 줄 사물함 뒤 110px@300·앞 224px@374로 역산), 변화율은 그림의 2/3, 맨 뒤(y300)~화면 맨 아래(y424)까지 이어짐.
+HOR = 228.6
+KH = 0.82 * 248 / (358 - HOR)
+MILD = 2 / 3
+hy = lambda y: KH * (358 - HOR) + MILD * KH * (y - 358)
+REFS = [(BACK, hy(BACK)), (358, hy(358)), (424, hy(424))]
 TOP = max(h for _, h in REFS)
 DOTK_HERE = round(TOP * K / SPR_DOTS, 4)
 SIZES = [[y * K, round(h / TOP, 3)] for y, h in REFS]
 m = {'file': 'hq_shower_m_strip', 'bgScale': K, 'dotK': DOTK_HERE, 'sizes': SIZES, 'w': W * K, 'h': H * K, 'under': True, 'floor': floor,
-     'lane': [300 * K, H * K - 12], 'blocks': blocks, 'lamps': [], 'spots': [],
+     'lane': [BACK * K, H * K - 12], 'blocks': blocks, 'lamps': [], 'spots': [],
      'doors': {'shower': door, 'out': {'kind': 'exit', 'side': 'S', 'x': 316 * K, 'y': H * K - 12, 'label': '나가기'}},
      'objects': [to_cover(o, mm, sy) for o, mm, sy in objects]}
 OUT.mkdir(parents=True, exist_ok=True)
