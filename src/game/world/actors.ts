@@ -1406,7 +1406,7 @@ export class WorldSim {
     else this.walkTo(g, { x: p.x, y: p.y || g.y }, `${why}: 덤빔`, 'chase');
     this.iconOn(g, '#', 2);
     // 경고를 무시하고 안쪽으로 들어가면 거점 경보 (11-02 사용자 15:49 「무시하면 층 넘어 추적 + 경보」): 경보가 그 건물 경비·전투원을 주인공이 있는 층으로 계속 보낸다(층을 옮겨도 다시 길을 찾는다)
-    if (!cause) this.raiseAlarm(p.scene, p.x, 'player', why === '경고 무시' ? 'trespass' : why === '무기' ? 'threat' : 'threat');
+    if (!cause && why !== '위협') this.raiseAlarm(p.scene, p.x, 'player', why === '경고 무시' ? 'trespass' : 'threat');   // 대화 위협은 그 경비만 덤빈다 (11-01)
     if (!cause) this.events.push({ kind: 'cue', scene: g.scene, who: g.def.name, id: g.def.id, cell: why === '무기' ? 'expel.attack_weapon' : why === '위협' ? 'expel.attack_threat' : 'expel.attack', ctx: { target: '{user}', say: why === '무기' ? '무기 내려!' : why === '위협' ? '그 말, 후회하게 될 겁니다.' : '경고했습니다!' } });
     this.events.push({ kind: 'guardAttack', scene: p.scene, who: '{user}', by: g.def.name, ...(cause ? { why: cause } : {}) });
   }

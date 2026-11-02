@@ -154,7 +154,7 @@ test('쫓아냄: 경비가 목격 거리 안에서 봐야 따라붙음, 제자�
   run(w, 0.5, { scene: 'f3', x: 2000, y: 560 });
   assert.ok(w.events.some((e) => e.kind === 'guardAttack'));
   assert.equal(g.plan, 'chase');
-  assert.ok(!w.alarmIn('lobby'), '덤비는 건 경보가 아님');
+  assert.ok(w.alarmIn('lobby'), '경고 무시 = 거점 경보 (11-02 사용자: 층 넘어 추적 + 경보)');
 
   const w2 = sim({ stance: (f) => (f === 'A00' ? 'hostile' : null) });
   guardAt(w2, 'f3', 1900);
