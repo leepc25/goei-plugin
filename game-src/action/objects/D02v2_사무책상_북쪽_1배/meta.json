@@ -1,0 +1,86 @@
+{
+ "object_id": "20c91fca-1a19-4d8b-946b-559e8ce19698",
+ "job": {
+  "usage": {
+   "type": "usd",
+   "usd": 0.04084289211124844
+  },
+  "id": "481c948f-72f2-430b-9982-03ee353ccdac",
+  "status": "completed",
+  "created_at": "2026-11-02T06:53:53.949191+00:00",
+  "last_response": {
+   "status": "completed",
+   "progress": 1,
+   "object_id": "20c91fca-1a19-4d8b-946b-559e8ce19698",
+   "image_size": {
+    "width": 256,
+    "height": 256
+   },
+   "frame_count": 1,
+   "single_frame": true,
+   "storage_urls": {
+    "unknown": "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/20c91fca-1a19-4d8b-946b-559e8ce19698/rotations/unknown.png"
+   },
+   "billing_usage": {
+    "usd": 0.04084289211124844,
+    "type": "usd"
+   },
+   "generation_id": "8bf8471a-2d6e-4c7c-a8e1-c234d76e9633",
+   "billing_stages": [
+    {
+     "stage": "first_direction",
+     "usage": {
+      "usd": 0.04084289211124844,
+      "type": "usd"
+     },
+     "generation_id": "8bf8471a-2d6e-4c7c-a8e1-c234d76e9633"
+    }
+   ],
+   "billing_charged": true,
+   "generation_mode": "pro_flash",
+   "source_image_id": "ea7d8ca5-fb6b-5e48-9008-49c04fb1a16b",
+   "directions_count": 1,
+   "first_direction_generated": true
+  }
+ },
+ "object": {
+  "id": "20c91fca-1a19-4d8b-946b-559e8ce19698",
+  "name": "D02v2_사무책상_북쪽_1배",
+  "state_name": "base",
+  "prompt": "An office work desk with only a computer monitor, a keyboard and a mouse on it, nothing else on the top. A plain rectangular desk with a light wood flat top and dark charcoal gray legs; from this side the space under the top is closed by one plain flat dark charcoal gray back panel. The desk is seen from its back side: the back of the monitor faces the viewer, and the keyboard and mouse are on the far side of the desk, behind the monitor. Seen almost straight from the front, from the eye height of a standing adult, looking only a little down: the desk top shows as a thin band, much thinner than the front of the desk. The desk is much wider than it is tall and fills almost the whole width of the canvas. Only the desk with the things on it, centered, nothing else.",
+  "size": {
+   "width": 256,
+   "height": 256
+  },
+  "directions": 1,
+  "created_at": "2026-11-02T06:53:54.019132+00:00",
+  "view": "low top-down",
+  "rotation_urls": {
+   "south": null,
+   "west": null,
+   "east": null,
+   "north": null,
+   "south-east": null,
+   "south-west": null,
+   "north-east": null,
+   "north-west": null
+  },
+  "storage_urls": {
+   "unknown": "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/20c91fca-1a19-4d8b-946b-559e8ce19698/rotations/unknown.png"
+  },
+  "frame_urls": null,
+  "style_settings": {
+   "version": "v2.0.0+api",
+   "no_background": true,
+   "generation_mode": "pro_flash",
+   "source_image_id": "ea7d8ca5-fb6b-5e48-9008-49c04fb1a16b",
+   "first_frame_direction": "south"
+  },
+  "tags": [],
+  "status": "completed",
+  "group_id": "d9614f44-1b10-45e9-9254-82648139b44e",
+  "progress_percent": null,
+  "eta_seconds": null,
+  "animations": []
+ }
+}
