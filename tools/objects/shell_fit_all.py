@@ -52,7 +52,7 @@ elif cmd=='sheet':
         T=Image.new('RGBA',(W,H),(92,86,78,255)); g=ImageDraw.Draw(T)
         for y in range(0,H,10): g.line([(0,y),(W,y)],fill=(100,94,86,255))
         base=H-15   # 11-02 사용자: 게임처럼 의자는 제자리(바닥선)에 고정, 사람을 맞춤값만큼 옮겨 그림
-        ox,oy=round(W/2-im.size[0]/2-p['dx']), round(base-p['dy']-(im.size[1]-4))
+        ox,oy=round(W/2-im.size[0]/2-p['dx']), round(base-p['dy']-min(im.size[1]-4,im.getbbox()[3]))
         ch=Image.open(fc.chair_png(p['img'])).convert('RGBA'); cx,cy=round(W/2-100),base-171
         if v!='back': T.alpha_composite(ch,(cx,cy)); T.alpha_composite(im,(ox,oy))
         else: T.alpha_composite(im,(ox,oy)); T.alpha_composite(ch,(cx,cy))
