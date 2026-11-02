@@ -13,9 +13,9 @@ SEATS = [  # x2, floor y2, scale, view, key, occl_y2(이 줄 아래는 배경이
     (1352, 452, float(os.environ.get('SB', '0.6')), 'front', '6.25_협회남1', int(os.environ.get('OB', '386')), (1300, 1410)),
     (1110, 452, float(os.environ.get('SB', '0.6')), 'front', '6.27_협회여1', int(os.environ.get('OB', '386')), (1055, 1165)),
     (860, 456, float(os.environ.get('SB', '0.6')), 'side', '6.26_협회남2', int(os.environ.get('OE', '396')), (790, 930)),
-    (int(os.environ.get('XS','914')), int(os.environ.get('FC', '555')), float(os.environ.get('SC', '1.2')), 'front', '4.2_서윤지', int(os.environ.get('OC', '456')), (580, 1040)),
-    (1274, int(os.environ.get('FC', '555')), float(os.environ.get('SC', '1.2')), 'front', '4.1_차여진', int(os.environ.get('OC', '456')), (1065, 1480)),
-    (1704, int(os.environ.get('FC', '555')), float(os.environ.get('SC', '1.2')), 'front', '6.28_협회여2', int(os.environ.get('OC', '456')), (1505, 1904)),
+    (int(os.environ.get('XS','914')), int(os.environ.get('FC', '595')), float(os.environ.get('SC', '1.2')), 'front', '4.2_서윤지', int(os.environ.get('OC', '456')), (580, 1040)),
+    (1274, int(os.environ.get('FC', '595')), float(os.environ.get('SC', '1.2')), 'front', '4.1_차여진', int(os.environ.get('OC', '456')), (1065, 1480)),
+    (1704, int(os.environ.get('FC', '595')), float(os.environ.get('SC', '1.2')), 'front', '6.28_협회여2', int(os.environ.get('OC', '456')), (1505, 1904)),
 ]
 SEATS = [x for x in SEATS if not ('협회' in x[4] and x[1] < 500)]  # 12:19 뒷자리 협회 직원 빼기, 오른쪽 창구 돌림 자리는 둠
 out = BG2.copy()
