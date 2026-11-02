@@ -1,4 +1,2027 @@
-               if (d3 > edge) continue;
+.shape === "hand";
+      if (e.mem.cling && L.shape === "spider") x.scale(1, -1);
+      if (p.lie > 0 && !upright) {
+        x.translate(0, -e.def.h * 0.25 * p.lie);
+        x.scale(1, 1 - 1.5 * p.lie);
+        x.translate(0, e.def.h * 0.25 * p.lie);
+      } else if (p.lie > 0) {
+        x.translate(e.def.h * 0.45 * p.lie, 0);
+        x.rotate(-Math.PI / 2 * p.lie);
+        x.translate(0, e.def.h * 0.05 * p.lie);
+      } else if (p.tilt) x.rotate(p.tilt);
+    };
+    const key = `${e.age}|${e.state}|${e.st}|${e.mf}|${flash}|${outline}|${e.dir}|${e.weakOpen > 0}|${!!e.mem.cling}`;
+    let cached = cache4.get(e);
+    if (!cached || cached.key !== key) {
+      if (!cached) {
+        const c = typeof OffscreenCanvas !== "undefined" ? new OffscreenCanvas(CW, CH) : Object.assign(document.createElement("canvas"), { width: CW, height: CH });
+        cached = { key: "", c, x: c.getContext("2d") };
+        cache4.set(e, cached);
+      }
+      cached.key = key;
+      const M2 = board(0);
+      transform(M2.x);
+      drawShape(M2.x, e, L, p, () => "#ffffff");
+      const hw = Math.min(OX, Math.ceil(Math.max(e.def.w * 0.75, e.def.h * (p.lie > 0 || L.shape !== "human" ? 1.05 : 0.7)) / PIXEL) + 10);
+      const img6 = M2.x.getImageData(OX - hw, 0, hw * 2, CH);
+      const a = img6.data;
+      for (let i = 3; i < a.length; i += 4) a[i] = a[i] > 110 ? 255 : 0;
+      M2.x.putImageData(img6, OX - hw, 0);
+      const C3 = board(1);
+      transform(C3.x);
+      drawShape(C3.x, e, L, p, flash ? (part) => lighten(col[part], 0.55) : (part) => col[part]);
+      C3.x.setTransform(1, 0, 0, 1, 0, 0);
+      C3.x.globalCompositeOperation = "destination-in";
+      C3.x.drawImage(M2.c, 0, 0);
+      {
+        const front = e.dir;
+        const S2 = board(2);
+        S2.x.drawImage(M2.c, 0, 0);
+        S2.x.globalCompositeOperation = "source-in";
+        S2.x.fillStyle = "rgba(6,8,14,.42)";
+        S2.x.fillRect(0, 0, CW, CH);
+        S2.x.globalCompositeOperation = "destination-out";
+        S2.x.drawImage(M2.c, 3 * front, -3);
+        C3.x.globalCompositeOperation = "source-atop";
+        C3.x.drawImage(S2.c, 0, 0);
+        const R = board(2);
+        R.x.drawImage(M2.c, 0, 0);
+        R.x.globalCompositeOperation = "source-in";
+        R.x.fillStyle = "rgba(214,226,240,.55)";
+        R.x.fillRect(0, 0, CW, CH);
+        R.x.globalCompositeOperation = "destination-out";
+        R.x.drawImage(M2.c, -front, 1);
+        C3.x.drawImage(R.c, 0, 0);
+      }
+      const F = board(3);
+      F.x.drawImage(M2.c, -1, 0);
+      F.x.drawImage(M2.c, 1, 0);
+      F.x.drawImage(M2.c, 0, -1);
+      F.x.drawImage(M2.c, 0, 1);
+      F.x.globalCompositeOperation = "source-in";
+      F.x.fillStyle = outline || "#07080a";
+      F.x.fillRect(0, 0, CW, CH);
+      F.x.globalCompositeOperation = "source-over";
+      F.x.drawImage(C3.c, 0, 0);
+      cached.x.clearRect(0, 0, CW, CH);
+      cached.x.drawImage(F.c, 0, 0);
+    }
+    const oy = e.mem.cling && L.shape === "spider" ? -40 : 40;
+    ctx.save();
+    ctx.imageSmoothingEnabled = false;
+    ctx.drawImage(cached.c, Math.round(e.x - OX * PIXEL), Math.round(e.y - e.z - (OY + oy) * PIXEL), CW * PIXEL, CH * PIXEL);
+    ctx.restore();
+    if (L.eye && !flash && e.state !== "dead" && e.state !== "down" && p.lie === 0) {
+      const eye = eyeAt(e, L, p);
+      if (eye) {
+        ctx.save();
+        ctx.fillStyle = L.eye;
+        ctx.shadowColor = L.eye;
+        ctx.shadowBlur = 10;
+        ctx.fillRect(Math.round(e.x + eye[0] * e.dir - PIXEL), Math.round(e.y - e.z + eye[1]), Math.ceil(PIXEL * 2), Math.ceil(PIXEL));
+        ctx.restore();
+      }
+    }
+    return true;
+  }
+  function eyeAt(e, L, p) {
+    const h = e.def.h;
+    if (L.shape === "human") {
+      const r = h * (L.head ?? 0.075) * 1.2;
+      const leg = h * (L.leg ?? 0.46) - p.crouch;
+      const torso = h - leg - p.crouch - r * 2;
+      const lean = p.lean + (L.hunch ?? 0) * 0.8;
+      const hx = Math.sin(lean) * torso + h * (L.hunch ?? 0) * 0.4 + Math.sin(lean) * r * 1.1 + r * 0.2;
+      const hy = -leg - Math.cos(lean) * torso - Math.cos(lean) * r * 0.95;
+      let x = hx + r * 0.5, y = hy + (L.flipFace ? r * 0.35 : -r * 0.12);
+      if (p.tilt) {
+        const c = Math.cos(p.tilt), s = Math.sin(p.tilt);
+        [x, y] = [x * c - y * s, x * s + y * c];
+      }
+      return [x, y];
+    }
+    if (L.shape === "beast") return [e.def.w * 0.27, -h * 0.64];
+    if (L.shape === "snake") return [h * 0 + e.def.w * 0.36, -h * 0.7 * (1 + p.lean * 0.5)];
+    if (L.shape === "spider") {
+      const cy = e.kind === "legs" ? -h * 0.72 : -h * 0.54;
+      return [e.def.w * 0.2, e.mem.cling ? -cy : cy - 6];
+    }
+    if (L.shape === "furniture") return [e.def.w * 0.3, -h * 0.7];
+    return null;
+  }
+  function drawSwing(e, ctx, alpha) {
+    const f = e.frameNow();
+    if (!f?.hit.length) return;
+    ctx.save();
+    ctx.globalAlpha = 0.55 * alpha;
+    ctx.strokeStyle = "#fff3e0";
+    ctx.lineCap = "round";
+    for (const b of f.hit) {
+      const wb = toWorld2(b, e.x, e.y, e.z, e.dir);
+      const cx = (wb.x0 + wb.x1) / 2;
+      const cz = (wb.z0 + wb.z1) / 2;
+      const r = Math.max(18, (wb.x1 - wb.x0) / 2);
+      ctx.lineWidth = Math.max(4, Math.min(14, (wb.z1 - wb.z0) / 4));
+      ctx.beginPath();
+      const a0 = e.dir > 0 ? -Math.PI * 0.45 : Math.PI * 0.55;
+      ctx.arc(cx - e.dir * r * 0.4, e.y - cz, r, a0, a0 + Math.PI * 0.9 * e.dir, e.dir < 0);
+      ctx.stroke();
+    }
+    ctx.restore();
+  }
+
+  // src/game/action/ui/ailments.ts
+  function drawAilments(ctx, names, y) {
+    if (!names.length) return;
+    ctx.save();
+    ctx.font = "bold 11px sans-serif";
+    ctx.textAlign = "center";
+    ctx.lineWidth = 3;
+    ctx.strokeStyle = "rgba(0,0,0,.8)";
+    ctx.fillStyle = "#ffb4e6";
+    const t = names.join(" · ");
+    ctx.strokeText(t, 0, y);
+    ctx.fillText(t, 0, y);
+    ctx.restore();
+  }
+
+  // src/game/action/enemy/enemy.ts
+  var REACT_RANK = { none: 0, flinch: 1, stagger: 2, launch: 2, down: 3, bind: 3 };
+  var still = /* @__PURE__ */ new WeakMap();
+  function stillTicks(w) {
+    const p = w.player;
+    let s = still.get(p);
+    if (!s) still.set(p, s = { x: p.x, y: p.y, tick: w.tick, n: 0 });
+    if (s.tick !== w.tick) {
+      const moved = Math.abs(p.x - s.x) + Math.abs(p.y - s.y) > 0.5 || p.airborne;
+      s.n = moved ? 0 : s.n + (w.tick - s.tick);
+      s.x = p.x;
+      s.y = p.y;
+      s.tick = w.tick;
+    }
+    return s.n;
+  }
+  var Enemy = class {
+    id = newBodyId();
+    team = "enemy";
+    kind;
+    label;
+    x;
+    y;
+    z = 0;
+    dir = -1;
+    hp;
+    hpMax;
+    alive = true;
+    stop = 0;
+    grabbable;
+    boss;
+    vx = 0;
+    vy = 0;
+    vz = 0;
+    state = "spawn";
+    /** 지금 상태에 머문 틱 */
+    st = 0;
+    /** 살아 있은 틱 */
+    age = 0;
+    move = null;
+    mf = 0;
+    atk = 0;
+    cds = {};
+    stunT = 0;
+    bindT = 0;
+    launches = 0;
+    inv = 0;
+    flash = 0;
+    armorBase;
+    affixes = [];
+    elite = false;
+    /** 과장님 호명 버프 남은 틱 */
+    rally = 0;
+    slow = 0;
+    /** 상태 이상 (플레이어 기술 부가효과·퍽이 건다, src/game/combat/status.ts) */
+    status = new StatusSet();
+    /** 벽꽝 추가 피해(최대 체력 비율, 퍽 「벽꽝 강화」 0.15) · 다운 전 띄우기 횟수(퍽 「공중 사냥」 3) */
+    wallDmg = 0.06;
+    maxLaunch = 2;
+    /** 공격 간격 배수 (퍽 「방 안이 먼저 지친다」) · 공격 끝난 뒤 쉬는 틱(두통·지침) */
+    perkGap = 1;
+    restT = 0;
+    /** 기상 지연 틱 (퍽 「바닥 차갑지?」·「얼어붙은 발」) */
+    wakeExtra = 0;
+    /** 0~1 보이는 정도 (발소리·소리와 냄새) */
+    alpha = 1;
+    /** 그로기 게이지 (수호자) */
+    groggy = 0;
+    groggyMax = 0;
+    phase = 1;
+    /** 규칙 약점이 열렸나 (흰 삼각, 피해 2배·아머 무시) */
+    weakOpen = 0;
+    /** 마지막으로 맞은 틱 */
+    lastHurt = -999;
+    /** 잡고 있는 동안 */
+    grabT = 0;
+    grabEvery = 15;
+    grabDmg = 0;
+    grabHitId = 0;
+    /** 바깥에 보이는 한 줄 (말풍선) */
+    bubble = "";
+    bubbleT = 0;
+    hostile = true;
+    /** brain 기억 */
+    mem = {};
+    /** 깊이 대기 줄 (둘러싸기) */
+    laneOff = 0;
+    wave = 0;
+    deadT = 0;
+    hitBy = /* @__PURE__ */ new Set();
+    def;
+    brain;
+    /** 힘민체지정 (10-30 사용자: 한 명마다 합 25 무작위, 체력·피해는 이 공식으로. 정예 배수 없음, 보정은 퍽) */
+    base;
+    stat;
+    /** 공격 피해 배율: 사격 역할은 민(사격), 그 밖은 힘(근접) × 과장님 호명 */
+    get power() {
+      return (this.def.role === "shoot" ? this.stat.aim : this.stat.power) * (this.rally > 0 ? 1.25 : 1);
+    }
+    constructor(def, x, y, brain, opts = {}) {
+      this.def = def;
+      this.kind = def.kind;
+      this.label = def.label;
+      this.x = x;
+      this.y = y;
+      this.z = def.hover ?? 0;
+      this.base = rollBase(opts.rand ?? Math.random);
+      this.stat = derive(this.base);
+      this.hp = this.hpMax = this.stat.hp;
+      this.grabbable = def.grabbable;
+      this.boss = false;
+      this.armorBase = def.armor;
+      this.brain = brain;
+      const r = opts.rand ?? (() => 0.5);
+      this.laneOff = (r() - 0.5) * 80;
+      if (opts.elite) {
+        this.elite = true;
+        this.affixes = opts.affixes ?? [];
+        this.label = "정예 " + def.label;
+      }
+    }
+    get ai() {
+      return this.def.ai;
+    }
+    has(a) {
+      return this.affixes.includes(a);
+    }
+    speed() {
+      return this.def.speed * (this.has("fast") ? 1.35 : 1) * (this.rally > 0 ? 1.3 : 1) * (this.slow > 0 ? 0.6 : 1) * this.status.speedMul();
+    }
+    set(s) {
+      if (this.state !== s) this.state = s, this.st = 0;
+    }
+    say(text, ticks = 60) {
+      this.bubble = text;
+      this.bubbleT = ticks;
+    }
+    face(x) {
+      if (Math.abs(x - this.x) > 4) this.dir = x > this.x ? 1 : -1;
+    }
+    cd(id) {
+      return this.cds[id] ?? 0;
+    }
+    /** 공격 시작. 예고 장이 있으면 enemyTell/bossTell을 낸다 */
+    start(move2, w, cd = 0) {
+      if (cd && this.status.has("silence")) {
+        this.restT = 15;
+        return;
+      }
+      cd *= this.status.attackGap() * this.perkGap;
+      this.move = move2;
+      if (this.status.has("confuse")) this.dir = this.dir === 1 ? -1 : 1;
+      this.mf = 0;
+      this.atk = newAttackId(move2.specs.length);
+      this.mem.last = move2.id;
+      this.set("attack");
+      if (cd) this.cds[move2.id] = Math.round(cd * (this.has("fast") ? 0.7 : 1));
+      if (move2.frames[0]?.tele) w.emit({ type: this.boss ? "bossTell" : "enemyTell", x: this.x, kind: this.kind });
+    }
+    frameNow() {
+      return this.state === "attack" && this.move ? this.move.frames[this.mf] ?? null : null;
+    }
+    /** 지금 몸 기준 피격 상자 */
+    localHurt(w = null) {
+      const o = this.brain.hurt?.(this, w);
+      if (o !== void 0) return o ?? [];
+      if (this.state === "dead" || this.state === "down" || this.state === "getup" || this.state === "spawn" || this.inv > 0) return [];
+      const f = this.frameNow();
+      if (f) return f.inv ? [] : f.hurt;
+      if (this.state === "air") return this.def.body.map((b) => ({ ...b, z1: b.z0 + (b.z1 - b.z0) * 0.7 }));
+      return this.def.body;
+    }
+    frame() {
+      const hurt2 = this.localHurt().map((b) => toWorld2(b, this.x, this.y, this.z, this.dir));
+      const hit2 = [];
+      const f = this.frameNow();
+      if (f && this.move && f.hit.length) {
+        const spec = this.move.specs[f.spec ?? 0];
+        for (const b of f.hit) {
+          const wb = toWorld2(b, this.x, this.y, this.z, this.dir);
+          const h = {
+            ...wb,
+            attackId: this.atk + (f.spec ?? 0),
+            dmg: Math.round(spec.dmg * this.power),
+            react: spec.react,
+            dir: this.dir,
+            push: spec.push,
+            lift: spec.lift,
+            stop: spec.stop,
+            low: spec.low,
+            grab: !!spec.grab,
+            armorBreak: spec.unblockable,
+            strength: spec.strength,
+            noise: spec.noise
+          };
+          const debuff = spec.debuff ?? (this.has("bleed") && spec.dmg > 0 ? { kind: "bleed", ticks: 120 } : void 0);
+          if (debuff) {
+            h.debuff = debuff;
+            armDebuff(h, debuff, this.id);
+          }
+          hit2.push(h);
+        }
+      }
+      const extra = this.brain.hits?.(this);
+      if (extra) hit2.push(...extra);
+      if (this.state === "grabbing" && this.grabHitId) {
+        hit2.push({ ...this.grabBox, attackId: this.grabHitId, dmg: this.grabDmg, react: "none", dir: this.dir, grab: true, armorBreak: true, stop: 1, strength: 1 });
+      }
+      return { hit: hit2, hurt: hurt2 };
+    }
+    grabBox = { x0: 0, x1: 0, z0: 0, z1: 0, y: 0 };
+    lastTick = -1;
+    step(w) {
+      if (!this.alive || this.lastTick === w.tick) return;
+      this.lastTick = w.tick;
+      checkDebuffs(w);
+      this.age++;
+      this.st++;
+      for (const k in this.cds) if (this.cds[k] > 0) this.cds[k]--;
+      if (this.flash > 0) this.flash--;
+      if (this.inv > 0) this.inv--;
+      if (this.rally > 0) this.rally--;
+      if (this.slow > 0) this.slow--;
+      if (this.weakOpen > 0) this.weakOpen--;
+      if (this.bubbleT > 0 && --this.bubbleT === 0) this.bubble = "";
+      if (this.state === "dead") {
+        if (++this.deadT > 24) this.alive = false;
+        return;
+      }
+      if (this.status.list.length) {
+        const d3 = this.status.step(1 / 30, { maxHp: this.hpMax });
+        if (d3 > 0 && this.hp > 1) this.hp = Math.max(1, this.hp - d3);
+        const cap = this.hpMax * this.status.maxHpRatio();
+        if (this.hp > cap) this.hp = cap;
+      }
+      if (this.has("regen") && this.age - this.lastHurt > 90 && this.hp < this.hpMax) this.hp = Math.min(this.hpMax, this.hp + this.hpMax * 3e-3);
+      stillTicks(w);
+      if (this.state === "spawn" && this.st >= 12) this.set("idle");
+      const skip = this.brain.tick?.(this, w) === true;
+      if (!skip) this.common(w);
+      this.physics(w);
+    }
+    common(w) {
+      switch (this.state) {
+        case "spawn":
+          if (this.st >= 12) this.set("idle");
+          break;
+        case "hurt":
+        case "stunned":
+          if (--this.stunT <= 0) this.set("idle");
+          break;
+        case "down":
+          if (this.st >= (this.mem.downFor ?? 30) + this.wakeExtra) this.set("getup"), this.launches = 0, this.wakeExtra = 0;
+          break;
+        case "getup":
+          if (this.st >= 12) this.inv = 10, this.set("idle");
+          break;
+        case "bound":
+          if (--this.bindT <= 0) this.set("idle");
+          break;
+        case "grabbing":
+          this.holdGrab(w);
+          break;
+        case "attack":
+          this.runMove(w);
+          break;
+        case "idle":
+        case "walk":
+          if (this.restT > 0) {
+            this.restT--;
+            break;
+          }
+          if (this.status.has("fear")) {
+            this.face(w.player.x);
+            this.x -= this.dir * this.speed();
+            this.set("walk");
+            break;
+          }
+          if (this.status.has("confuse") && this.age % 60 < 30) {
+            this.x += Math.sin(this.age * 0.15) * this.speed();
+            this.set("walk");
+            break;
+          }
+          this.brain.think?.(this, w);
+          break;
+      }
+    }
+    runMove(w) {
+      const m = this.move;
+      if (!m) return this.set("idle");
+      const f = m.frames[this.mf];
+      if (!f) return this.endMove();
+      if (f.vx) this.x += f.vx * this.dir * (this.has("fast") ? 1.15 : 1);
+      if (f.vz) this.vz = f.vz, this.mem.cling = false;
+      if (f.fire && this.mf === firstIndex(m, this.mf, "fire")) this.fire(f.fire, w);
+      if (f.ev && this.mf === firstIndex(m, this.mf, "ev")) this.brain.ev?.(this, f.ev, w);
+      const spec = f.hit.length ? m.specs[f.spec ?? 0] : null;
+      if (spec?.grab && this.state === "attack") {
+        const p = w.player;
+        const free = p.alive && !p.airborne && !/evade|down|dead|grabbed|getup/.test(p.state);
+        if (free && Math.abs(p.y - this.y) < 26) {
+          const hit2 = this.frame().hit;
+          const hurt2 = p.frame().hurt;
+          if (hit2.some((h) => hurt2.some((b) => h.x0 < b.x1 && b.x0 < h.x1 && h.z0 < b.z1 && b.z0 < h.z1))) return this.beginGrab(spec.grab, w);
+        }
+      }
+      if (this.state !== "attack") return;
+      this.mf++;
+      if (this.mf >= m.frames.length) this.endMove();
+    }
+    endMove() {
+      this.move = null;
+      this.mf = 0;
+      this.set("idle");
+      const g = this.status.attackGap() * this.perkGap;
+      if (g > 1) this.restT = Math.round(40 * (g - 1));
+    }
+    beginGrab(g, w) {
+      this.set("grabbing");
+      this.grabT = g.ticks;
+      this.grabEvery = g.every ?? 10;
+      this.grabDmg = Math.max(1, Math.round(g.dmgPerTick * this.grabEvery * this.power));
+      this.grabHitId = newAttackId();
+      this.mem.grabbedAt = w.tick;
+      w.emit({ type: "custom", name: "enemyGrab", data: { id: this.id, kind: this.kind, ticks: g.ticks } });
+    }
+    holdGrab(w) {
+      const p = w.player;
+      this.face(p.x);
+      this.grabBox = { x0: p.x - 12, x1: p.x + 12, z0: p.z + 40, z1: p.z + 120, y: p.y, dy: 30 };
+      if (this.st % this.grabEvery === 0) this.grabHitId = newAttackId();
+      if (--this.grabT <= 0 || !p.alive) this.releaseGrab(w);
+    }
+    releaseGrab(w) {
+      if (this.state !== "grabbing") return;
+      this.grabHitId = 0;
+      w?.emit({ type: "custom", name: "enemyRelease", data: { id: this.id } });
+      this.cds.grabRest = 30;
+      this.set("stunned");
+      this.stunT = 14;
+    }
+    fire(name, w, opts = {}) {
+      const d3 = PROJ[name];
+      if (!d3) return;
+      const x = d3.grow || d3.speed === 0 ? opts.x ?? this.x : opts.x ?? this.x + this.dir * (this.def.w * 0.5);
+      const y = opts.y ?? (name === "beam" ? w.player.y : this.y);
+      const p = new Proj(d3, name, x, y, opts.dir ?? this.dir, this.id, newAttackId(), this.power);
+      if (name === "shard") p.z = this.z;
+      w.add(p);
+      if (name === "bullet") w.emit({ type: "custom", name: "enemyShot", data: { x: this.x } });
+    }
+    physics(w) {
+      const [bx0, bx1] = w.bounds;
+      const [ly0, ly1] = w.lane;
+      if (this.state === "hurt" || this.state === "air" || this.state === "stunned") {
+        this.x += this.vx;
+        this.vx *= 0.82;
+        if ((this.x < bx0 + 20 || this.x > bx1 - 20) && Math.abs(this.vx) > 7 && !this.mem.wallHit) {
+          this.mem.wallHit = true;
+          this.hp -= Math.round(this.hpMax * this.wallDmg);
+          this.vx = -this.vx * 0.3;
+          w.fx("spark-big", this.x, this.y, 80);
+          w.shake(5, 3);
+          if (this.hp <= 0) return this.die(w);
+          if (this.state !== "air") this.vz = 6, this.set("air");
+        }
+      } else this.vx = 0;
+      if (!this.mem.cling && (this.state === "air" || this.z > (this.def.hover ?? 0) || this.vz)) {
+        if (this.state !== "attack" || this.vz) {
+          this.z += this.vz;
+          this.vz -= 1.1;
+          const floor = this.def.hover ?? 0;
+          if (this.z <= floor) {
+            this.z = floor;
+            this.vz = 0;
+            if (this.state === "air") {
+              this.mem.wallHit = false;
+              w.fx("dust", this.x, this.y, 0);
+              this.set("down");
+              this.mem.downFor = 30;
+              w.emit({ type: "down", x: this.x, who: "enemy" });
+            }
+          }
+        }
+      }
+      if (this.state !== "flee" && this.state !== "hidden" && this.age > 30) this.x = Math.max(bx0 + 10, Math.min(bx1 - 10, this.x));
+      this.y = Math.max(ly0, Math.min(ly1, this.y));
+    }
+    applyHit(hit2, w) {
+      if (!this.alive || this.state === "dead" || this.state === "spawn" || this.inv > 0) return { kind: "immune" };
+      if (this.hitBy.has(hit2.attackId)) return { kind: "immune" };
+      this.hitBy.add(hit2.attackId);
+      if (this.hitBy.size > 24) this.hitBy.delete(this.hitBy.values().next().value);
+      const hurt2 = this.localHurt(w).map((b) => toWorld2(b, this.x, this.y, this.z, this.dir));
+      const part = pickPart(hurt2, hit2);
+      const mod2 = this.brain.hit?.(this, hit2, part, w) ?? {};
+      if (mod2.immune) {
+        if (mod2.text) w.fx("text", this.x, this.y, this.def.h + 20, mod2.text);
+        return { kind: "immune" };
+      }
+      const front = hit2.dir === -this.dir;
+      let mult = mod2.mult ?? 1;
+      let guard2 = !!mod2.guard;
+      if (!guard2 && this.def.role === "shield" && front && !hit2.armorBreak && !hit2.grab && this.state !== "hurt" && this.state !== "air") {
+        guard2 = true;
+        mult *= this.kind === "doorframe" ? 0.5 : 0.1;
+      }
+      const weak = !!mod2.weak || this.weakOpen > 0;
+      if (weak) mult *= 2;
+      const dmg = Math.max(1, Math.round(hit2.dmg * mult * this.stat.taken));
+      this.hp -= dmg;
+      this.lastHurt = this.age;
+      this.flash = 6;
+      if (weak) w.fx("text", this.x, this.y, this.def.h + 30, mod2.text ?? "약점");
+      this.brain.after?.(this, w, dmg);
+      if (this.groggyMax && this.state !== "stunned" && this.hp > 0) {
+        this.groggy += dmg;
+        if (this.groggy >= this.groggyMax) {
+          this.groggy = 0;
+          if (this.state === "grabbing") this.releaseGrab(w);
+          this.move = null;
+          this.set("stunned");
+          this.stunT = 60;
+          w.fx("text", this.x, this.y, this.def.h + 40, "그로기");
+          w.emit({ type: "custom", name: "groggy", data: { id: this.id, kind: this.kind } });
+          return { kind: "hit" };
+        }
+      }
+      if (this.hp <= 0) {
+        this.die(w, hit2);
+        return { kind: "hit", killed: true };
+      }
+      if (guard2) {
+        this.x += hit2.dir * 3;
+        w.fx("spark", this.x - this.dir * -30, this.y, 100);
+        return { kind: "guard" };
+      }
+      if (mod2.noReact) return { kind: hit2.react === "none" ? "hit" : "armor" };
+      const f = this.frameNow();
+      let armor2 = Math.max(this.armorBase, f?.armor ?? 0, this.has("armor") && f?.hit.length ? 1 : 0);
+      if (weak || hit2.armorBreak || this.state === "stunned" || this.state === "bound") armor2 = 0;
+      if (REACT_RANK[hit2.react] <= armor2) return { kind: hit2.react === "none" ? "hit" : "armor" };
+      this.react(hit2, w);
+      return { kind: "hit" };
+    }
+    react(hit2, w) {
+      if (this.state === "grabbing") this.releaseGrab(w);
+      this.move = null;
+      const push = hit2.push ?? 4;
+      switch (hit2.react) {
+        case "none":
+          return;
+        case "flinch":
+          if (this.state === "air") return void (this.vz = Math.max(this.vz, 3));
+          this.set("hurt");
+          this.stunT = 10;
+          this.vx = hit2.dir * push * 0.4;
+          return;
+        case "stagger":
+          if (this.state === "air") return void (this.vz = Math.max(this.vz, 4), this.vx = hit2.dir * push * 0.5);
+          this.set("hurt");
+          this.stunT = 16;
+          this.vx = hit2.dir * push;
+          return;
+        case "launch":
+          if (this.launches >= this.maxLaunch) return this.knockDown(hit2);
+          this.launches++;
+          this.set("air");
+          this.vz = hit2.lift ?? 12;
+          this.vx = hit2.dir * push * 0.5;
+          this.z = Math.max(this.z, (this.def.hover ?? 0) + 1);
+          return;
+        case "down":
+          return this.knockDown(hit2);
+        case "bind":
+          this.set("bound");
+          this.bindT = 75;
+          return;
+      }
+    }
+    knockDown(hit2) {
+      this.set("air");
+      this.vz = Math.max(this.vz, hit2.lift ?? 8);
+      this.vx = hit2.dir * (hit2.push ?? 6);
+      this.z = Math.max(this.z, (this.def.hover ?? 0) + 1);
+    }
+    die(w, hit2) {
+      if (this.state === "dead") return;
+      if (this.state === "grabbing") this.releaseGrab(w);
+      this.hp = 0;
+      this.move = null;
+      this.set("dead");
+      this.vx = (hit2?.dir ?? -this.dir) * 4;
+      this.brain.death?.(this, w);
+      if (!hit2) w.emit({ type: "enemyDie", x: this.x, kind: this.kind });
+      const drops = rollDrops2(this.def.drop, () => w.rand(), this.elite);
+      if (drops.length) {
+        w.emit({ type: "custom", name: "enemyDrop", data: { id: this.id, kind: this.kind, x: this.x, y: this.y, drops } });
+        fireDropHook({ enemy: this, kind: this.kind, x: this.x, y: this.y, drops, world: w });
+      }
+    }
+    draw(ctx) {
+      drawEnemy(this, ctx);
+    }
+    /** 몸보다 먼저 그릴 배경 장치 (틈새 등). 없으면 아무것도 안 함 */
+    drawBack(ctx) {
+      if (!this.brain.drawBack) return;
+      ctx.save();
+      this.brain.drawBack(this, ctx);
+      ctx.restore();
+    }
+  };
+  function firstIndex(m, i, key) {
+    return m.frames[i][key] ? i : -1;
+  }
+  var PART_ORDER = ["corner", "mouth", "back", "head", "shield", "core", "weapon", "arm", "torso", "legs"];
+  function pickPart(hurt2, hit2) {
+    const hits = hurt2.filter((b) => hit2.x0 < b.x1 && b.x0 < hit2.x1 && hit2.z0 < b.z1 && b.z0 < hit2.z1);
+    if (!hits.length) return hurt2[0]?.part;
+    hits.sort((a, b) => PART_ORDER.indexOf(a.part ?? "torso") - PART_ORDER.indexOf(b.part ?? "torso"));
+    const shield2 = hits.find((b) => b.part === "shield");
+    return shield2 ? "shield" : hits[0].part;
+  }
+  var PART_SHADE = { head: 0.18, legs: -0.12, arm: 0.08, shield: 0.3, back: 0.22, mouth: 0.35, corner: 0.4, weapon: 0.5 };
+  function tint(hex2, k) {
+    const n = parseInt(hex2.slice(1), 16);
+    const f = (c) => Math.max(0, Math.min(255, Math.round(k >= 0 ? c + (255 - c) * k : c * (1 + k))));
+    return `rgb(${f(n >> 16)},${f(n >> 8 & 255)},${f(n & 255)})`;
+  }
+  function drawEnemy(e, ctx) {
+    const f = e.frameNow();
+    ctx.save();
+    ctx.globalAlpha = 0.35 * e.alpha;
+    ctx.fillStyle = "#000";
+    ctx.beginPath();
+    ctx.ellipse(e.x, e.y, e.def.w * 0.55, 9, 0, 0, Math.PI * 2);
+    ctx.fill();
+    e.brain.drawUnder?.(e, ctx);
+    ctx.restore();
+    ctx.save();
+    let alpha = e.alpha;
+    if (e.state === "dead") alpha *= 1 - e.deadT / 24;
+    if (e.state === "spawn") alpha *= e.st / 12;
+    ctx.globalAlpha = alpha;
+    const armorNow = Math.max(e.armorBase, f?.armor ?? 0);
+    const outline = f?.tele ? e.st >> 1 & 1 ? "#ff3030" : "#ffb0a0" : armorNow >= 1 && e.state === "attack" ? e.age >> 2 & 1 ? "#ffd23c" : "#a08020" : e.elite ? "#b46cff" : "";
+    if (drawFigure(e, ctx, outline)) drawSwing(e, ctx, alpha);
+    else drawBoxes(e, ctx, f, alpha, outline, armorNow);
+    ctx.globalAlpha = alpha;
+    if (f?.tele && e.mf < 6) {
+      ctx.fillStyle = "#ff3030";
+      ctx.font = "bold 34px sans-serif";
+      ctx.textAlign = "center";
+      ctx.fillText("!", e.x, e.y - e.z - e.def.h - 18);
+    }
+    if (e.weakOpen > 0) {
+      const top = e.y - e.z - e.def.h - 30;
+      ctx.fillStyle = "#ffffff";
+      ctx.beginPath();
+      ctx.moveTo(e.x - 12, top - 14);
+      ctx.lineTo(e.x + 12, top - 14);
+      ctx.lineTo(e.x, top + 4);
+      ctx.fill();
+    }
+    e.brain.drawOver?.(e, ctx);
+    if (e.state !== "dead" && e.alpha > 0.3 && (e.hp < e.hpMax || e.boss)) {
+      const w = Math.max(50, e.def.w * 0.8);
+      const top = e.y - e.z - e.def.h - 12;
+      ctx.fillStyle = "rgba(0,0,0,.6)";
+      ctx.fillRect(e.x - w / 2, top, w, 6);
+      ctx.fillStyle = e.boss ? "#e0503a" : "#e8c35a";
+      ctx.fillRect(e.x - w / 2, top, w * Math.max(0, e.hp) / e.hpMax, 6);
+      if (e.groggyMax) {
+        ctx.fillStyle = "#7fd0ff";
+        ctx.fillRect(e.x - w / 2, top + 7, w * Math.min(1, e.groggy / e.groggyMax) / 1, 3);
+      }
+    }
+    if (e.state !== "dead" && e.status.list.length) {
+      ctx.save();
+      ctx.translate(e.x, e.y - e.z - e.def.h - 18);
+      drawAilments(ctx, e.status.list.map((s) => STATUS[s.kind].label + (s.stacks > 1 ? s.stacks : "")), 0);
+      ctx.restore();
+    }
+    if (e.bubble) drawBubble(ctx, e.bubble, e.x, e.y - e.z - e.def.h - 30);
+    ctx.restore();
+  }
+  function drawBubble(ctx, text, x, bottom) {
+    const P2 = 3;
+    ctx.save();
+    ctx.font = `700 22px '${PIXEL_FONT}', 'Galmuri11', monospace`;
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    const tw = Math.ceil(ctx.measureText(text).width / P2) * P2;
+    const w = tw + 15 * P2;
+    const h = 14 * P2;
+    const x0 = Math.round((x - w / 2) / P2) * P2;
+    const y0 = Math.round((bottom - h - 4 * P2) / P2) * P2;
+    const frame = kitPiece("slot");
+    ctx.fillStyle = "#16130f";
+    ctx.fillRect(x0 + P2, y0 + P2, w - 2 * P2, h - 2 * P2);
+    if (frame?.complete && frame.naturalWidth) nine(ctx, frame, kitSlice("slot"), x0, y0, w, h, 1);
+    else {
+      ctx.strokeStyle = "#8a7a58";
+      ctx.lineWidth = P2;
+      ctx.strokeRect(x0 + P2 / 2, y0 + P2 / 2, w - P2, h - P2);
+    }
+    const tx = Math.round(x / P2) * P2;
+    ctx.fillStyle = "#8a7a58";
+    for (let i = 0; i < 4; i++) ctx.fillRect(tx - (3 - i) * P2, y0 + h + i * P2 - P2, (3 - i) * 2 * P2 + P2, P2);
+    ctx.fillStyle = "#16130f";
+    for (let i = 0; i < 3; i++) ctx.fillRect(tx - (2 - i) * P2, y0 + h + i * P2 - P2, (2 - i) * 2 * P2 + P2, P2);
+    ctx.fillStyle = "#000";
+    ctx.fillText(text, x + 2, y0 + h / 2 + 2);
+    ctx.fillStyle = "#ece6d4";
+    ctx.fillText(text, x, y0 + h / 2);
+    ctx.restore();
+  }
+  function drawBoxes(e, ctx, f, alpha, outline, armorNow) {
+    const body = e.state === "down" || e.state === "getup" || e.state === "dead" ? flat(e) : e.localHurt().length ? e.localHurt() : e.brain.hurt ? [] : e.def.body;
+    ctx.save();
+    if (outline) {
+      ctx.shadowColor = outline;
+      ctx.shadowBlur = armorNow >= 2 ? 18 : 12;
+    }
+    for (const b of body) {
+      const wb = toWorld2(b, e.x, e.y, e.z, e.dir);
+      ctx.fillStyle = tint(e.def.color, (PART_SHADE[b.part ?? "torso"] ?? 0) + (e.flash > 0 && e.state !== "dead" ? 0.5 : 0));
+      ctx.fillRect(wb.x0, e.y - wb.z1, wb.x1 - wb.x0, wb.z1 - wb.z0);
+    }
+    ctx.restore();
+    if (body.length && e.state !== "dead" && e.state !== "down") {
+      const top = Math.max(...body.map((b) => b.z1));
+      ctx.fillStyle = e.state === "attack" ? "#ff4b3a" : "#f2efe6";
+      ctx.fillRect(e.x + e.dir * (e.def.w * 0.18) - 4, e.y - e.z - top + 12, 8, 6);
+    }
+    if (f?.hit.length) {
+      ctx.globalAlpha = 0.5 * alpha;
+      ctx.fillStyle = "#fff3e0";
+      for (const b of f.hit) {
+        const wb = toWorld2(b, e.x, e.y, e.z, e.dir);
+        ctx.fillRect(wb.x0, e.y - wb.z1, wb.x1 - wb.x0, wb.z1 - wb.z0);
+      }
+    }
+    ctx.globalAlpha = alpha;
+  }
+  function flat(e) {
+    const w = Math.max(e.def.w, e.def.h * 0.8);
+    return [{ fx0: -w * 0.5, fx1: w * 0.5, z0: e.def.hover ?? 0, z1: (e.def.hover ?? 0) + Math.min(36, e.def.h * 0.3), dy: 20, part: "torso" }];
+  }
+
+  // src/game/action/engine/propBlock.ts
+  var PROP_DEPTH = 50;
+  var STEP = 9;
+  var backOf = (p) => p.back ?? PROP_DEPTH;
+  var frontOf = (p) => p.front ?? PROP_DEPTH;
+  function insideProp(p, x, y, pad = 0) {
+    const dy = y - p.y;
+    return Math.abs(x - p.x) < p.w / 2 + 18 + pad && dy > -backOf(p) - pad && dy < frontOf(p) + pad;
+  }
+  function blockByProps(bodies2, props2, lane) {
+    const stuck = /* @__PURE__ */ new Set();
+    for (const b of bodies2) {
+      if (b.z > 4) continue;
+      for (const p of props2) {
+        if (!insideProp(p, b.x, b.y)) continue;
+        const front = p.y + frontOf(p), rear = p.y - backOf(p);
+        const okF = front <= lane[1], okR = rear >= lane[0];
+        const want = okF && okR ? front - b.y < b.y - rear ? front : rear : okF ? front : okR ? rear : null;
+        if (b.px !== void 0 && !insideProp(p, b.px, b.y)) {
+          b.x = b.px;
+          if (want !== null) b.y = Math.max(lane[0], Math.min(lane[1], b.y + Math.max(-STEP / 3, Math.min(STEP / 3, want - b.y))));
+          continue;
+        }
+        if (want === null) {
+          const side = b.x < p.x ? -1 : 1;
+          b.x += side * STEP;
+          continue;
+        }
+        b.y += Math.max(-STEP, Math.min(STEP, want - b.y));
+        b.y = Math.max(lane[0], Math.min(lane[1], b.y));
+      }
+    }
+    props2.forEach((p, i) => {
+      if (bodies2.some((b) => b.z <= 4 && insideProp(p, b.x, b.y, -STEP))) stuck.add(i);
+    });
+    return stuck;
+  }
+  function nudgeProp(p, bodies2, others, x0, x1) {
+    const clear2 = (x) => x > x0 && x < x1 && !bodies2.some((b) => Math.abs(b.x - x) < p.w / 2 + 60 && Math.abs(b.y - p.y) < PROP_DEPTH) && !others.some((o) => o !== p && Math.abs(o.x - x) < (o.w + p.w) / 2 + 20 && Math.abs(o.y - p.y) < PROP_DEPTH);
+    for (let d3 = 40; d3 < 800; d3 += 20) for (const x of [p.x + d3, p.x - d3]) if (clear2(x)) return void (p.x = x);
+  }
+  function clearSpot(x, y, props2, lane) {
+    const hit2 = (xx, yy) => props2.some((p) => insideProp(p, xx, yy, 22));
+    if (!hit2(x, y)) return { x, y };
+    for (const d3 of [60, -60, 110, -110, 170, -170, 230, -230]) {
+      const yy = y + d3;
+      if (yy >= lane[0] && yy <= lane[1] && !hit2(x, yy)) return { x, y: yy };
+    }
+    for (let d3 = 40; d3 < 600; d3 += 20) for (const xx of [x + d3, x - d3]) if (!hit2(xx, y)) return { x: xx, y };
+    return { x, y };
+  }
+  function furnishAvoid(floor, bodies2 = []) {
+    const terr = (floor.stage?.terrain ?? []).map((t) => ({ x: (t.x0 + t.x1) / 2, w: t.x1 - t.x0 + 360 }));
+    const doors = (floor.keepOut ?? []).map(([a, b]) => ({ x: (a + b) / 2, w: b - a + 260 }));
+    const foes = [...(floor.encounters ?? []).flatMap((en) => en.waves.flat()), ...bodies2].map((s) => ({ x: s.x, w: 200 }));
+    return [...(floor.props ?? []).map((p) => ({ x: p.x, w: Math.max(p.w, 130) })), ...terr, ...doors, ...foes];
+  }
+
+  // src/game/action/enemy/navigation.ts
+  var inside = (p, r) => p.x > r.left && p.x < r.right && p.y > r.top && p.y < r.bottom;
+  function crosses(a, b, r) {
+    let lo = 0, hi = 1;
+    for (const [start, delta, min, max] of [[a.x, b.x - a.x, r.left, r.right], [a.y, b.y - a.y, r.top, r.bottom]]) {
+      if (Math.abs(delta) < 1e-8) {
+        if (start <= min || start >= max) return false;
+      } else {
+        const t0 = (min - start) / delta, t1 = (max - start) / delta;
+        lo = Math.max(lo, Math.min(t0, t1));
+        hi = Math.min(hi, Math.max(t0, t1));
+      }
+    }
+    return hi - lo > 1e-8;
+  }
+  function walkTo(e, w, x, y, sx = e.speed(), sy = sx * 0.6) {
+    let target = { x, y: Math.max(w.lane[0], Math.min(w.lane[1], y)) };
+    const solids = !e.boss && e.z <= 4 ? w.solidsNow ?? [] : [];
+    const rects = solids.map((p) => ({
+      left: p.x - p.w / 2 - 22,
+      right: p.x + p.w / 2 + 22,
+      top: p.y - (p.back ?? PROP_DEPTH) - 4,
+      bottom: p.y + (p.front ?? PROP_DEPTH) + 4
+    }));
+    if (rects.some((r) => inside(target, r))) target = { x: w.player.x, y: w.player.y };
+    const obstacles = rects.filter((r) => !inside(e, r));
+    const clear2 = (a, b) => !obstacles.some((r) => crosses(a, b, r));
+    if (!clear2(e, target)) {
+      const points = [e, target];
+      for (const r of obstacles) for (const xx of [r.left, r.right]) for (const yy of [r.top, r.bottom]) {
+        const p = { x: xx, y: yy };
+        if (xx >= w.bounds[0] + 10 && xx <= w.bounds[1] - 10 && yy >= w.lane[0] && yy <= w.lane[1] && !obstacles.some((o) => inside(p, o))) points.push(p);
+      }
+      const dist = points.map(() => Infinity), prev = points.map(() => -1), done2 = /* @__PURE__ */ new Set();
+      dist[0] = 0;
+      while (done2.size < points.length) {
+        let u = -1;
+        for (let i = 0; i < points.length; i++) if (!done2.has(i) && (u < 0 || dist[i] < dist[u])) u = i;
+        if (u < 0 || !Number.isFinite(dist[u]) || u === 1) break;
+        done2.add(u);
+        for (let v = 1; v < points.length; v++) if (!done2.has(v) && clear2(points[u], points[v])) {
+          const cost = dist[u] + Math.hypot(points[v].x - points[u].x, (points[v].y - points[u].y) * sx / sy);
+          if (cost < dist[v]) {
+            dist[v] = cost;
+            prev[v] = u;
+          }
+        }
+      }
+      if (prev[1] < 0) return;
+      let next = 1;
+      while (prev[next] > 0) next = prev[next];
+      target = points[next];
+      const dx2 = target.x - e.x, dy2 = target.y - e.y;
+      const t = Math.min(1, sx / (Math.abs(dx2) || 1), sy / (Math.abs(dy2) || 1));
+      e.x += dx2 * t;
+      e.y += dy2 * t;
+      return;
+    }
+    const dx = target.x - e.x, dy = target.y - e.y;
+    if (obstacles.length) {
+      const t = Math.min(1, sx / (Math.abs(dx) || 1), sy / (Math.abs(dy) || 1));
+      e.x += dx * t;
+      e.y += dy * t;
+    } else {
+      e.x += Math.sign(dx) * Math.min(sx, Math.abs(dx));
+      e.y += Math.sign(dy) * Math.min(sy, Math.abs(dy));
+    }
+  }
+
+  // src/game/action/enemy/ai.ts
+  var MAX_ATTACKERS = 2;
+  function attackersNow(w) {
+    let n = 0;
+    for (const b of w.bodies) if (b instanceof Enemy && b.alive && !b.boss && b.state === "attack" && b.def.role !== "shoot") n++;
+    return n;
+  }
+  function cond(e, a, w) {
+    const p = w.player;
+    switch (a.when) {
+      case void 0:
+        return true;
+      case "grounded":
+        return !p.airborne && !e.mem.cling;
+      case "airTarget":
+        return !!e.mem.cling;
+      case "close":
+        return Math.abs(p.x - e.x) < 110;
+      case "far":
+        return Math.abs(p.x - e.x) > 250;
+      case "behind":
+        return Math.sign(p.x - e.x) === -e.dir;
+      case "targetBack":
+        return Math.sign(e.x - p.x) === -p.dir;
+      case "phase2":
+        return e.phase >= 2;
+      case "phase3":
+        return e.phase >= 3;
+      case "lowHp":
+        return e.hp < e.hpMax * 0.4;
+    }
+  }
+  function pickAttack(e, w, attacks = e.def.attacks) {
+    const p = w.player;
+    const adx = Math.abs(p.x - e.x), ady = Math.abs(p.y - e.y);
+    const ok = attacks.filter((a) => e.cd(a.move.id) <= 0 && adx >= a.range[0] && adx <= a.range[1] && ady <= a.dy && cond(e, a, w));
+    if (!ok.length) return null;
+    let sum = ok.reduce((s, a) => s + a.weight, 0) * w.rand();
+    for (const a of ok) if ((sum -= a.weight) <= 0) return a;
+    return ok[ok.length - 1];
+  }
+  function approach(e, w, keep = e.def.keep, wait = false) {
+    const p = w.player;
+    const dx = p.x - e.x;
+    const adx = Math.abs(dx);
+    const sp = e.speed();
+    e.face(p.x);
+    let rank = 0;
+    for (const b of w.bodies)
+      if (b !== e && b instanceof Enemy && b.alive && b.state !== "dead" && Math.sign(p.x - b.x) === Math.sign(dx) && Math.abs(p.x - b.x) < adx) rank++;
+    const back = Math.min(rank, 3) * 110;
+    let far = (wait ? keep[1] + 140 : keep[1]) + back;
+    let near2 = keep[0] + back;
+    if (!wait && !e.boss) {
+      const ranges = e.def.attacks.filter((a) => cond(e, a, w) && a.move.frames.some((f) => f.hit.length || f.fire)).map((a) => a.range[1]);
+      if (ranges.length) far = Math.min(far, Math.max(...ranges)), near2 = Math.min(near2, far);
+    }
+    let mx = 0;
+    if (adx > far) mx = Math.sign(dx);
+    else if (adx < near2) mx = -Math.sign(dx);
+    let ny = 0;
+    for (const b of w.bodies)
+      if (b !== e && b instanceof Enemy && b.alive && Math.abs(b.x - e.x) < 90 && Math.abs(b.y - e.y) < 50) {
+        ny += b.y > e.y || b.y === e.y && b.id > e.id ? -1 : 1;
+        if (!mx) e.x += (b.x > e.x || b.x === e.x && b.id > e.id ? -1 : 1) * Math.min(1.5, sp * 0.4);
+      }
+    if (ny) e.y += Math.sign(ny) * Math.min(2, sp * 0.5);
+    const ty = p.y + (wait ? e.laneOff : 0);
+    const my = Math.abs(ty - e.y) > 4 ? Math.sign(ty - e.y) : 0;
+    if (e.boss) {
+      e.x += mx * sp;
+      e.y += my * sp * 0.6;
+    } else if (mx || my) walkTo(e, w, mx ? p.x - Math.sign(dx) * (adx > far ? far : near2) : e.x, my ? ty : e.y);
+    e.set(mx || my ? "walk" : "idle");
+  }
+  function engage(e, w, aggression = 0.12) {
+    const p = w.player;
+    if (!p.alive) return approach(e, w, [300, 400], true);
+    const shooter = e.def.role === "shoot";
+    const can = shooter || attackersNow(w) < MAX_ATTACKERS + (w.floor.depth && w.floor.depth > 8 ? 1 : 0);
+    const a = can ? pickAttack(e, w) : null;
+    if (a && w.rand() < aggression * (e.rally > 0 ? 1.6 : 1)) {
+      e.face(p.x);
+      return e.start(a.move, w, a.cd);
+    }
+    approach(e, w, e.def.keep, !can);
+  }
+  var rush = { think: (e, w) => engage(e, w) };
+  var kite = {
+    think(e, w) {
+      const p = w.player;
+      const adx = Math.abs(p.x - e.x);
+      if (adx < e.def.keep[0] - 60 && w.rand() < 0.5) {
+        const a = pickAttack(e, w, e.def.attacks.filter((x) => x.when === "close"));
+        if (a) return e.start(a.move, w, a.cd);
+      }
+      engage(e, w, 0.08);
+    }
+  };
+  var shield = {
+    think(e, w) {
+      engage(e, w, 0.1);
+    }
+  };
+  var chief = {
+    think: (e, w) => engage(e, w, 0.1),
+    ev(e, name, w) {
+      if (name !== "rally") return;
+      const ranks = ["김 대리!", "박 주임!", "이 사원!"];
+      e.say(ranks[Math.floor(w.rand() * ranks.length)], 50);
+      for (const b of w.bodies) if (b instanceof Enemy && b.alive && b.def.faction === "bureau" && b !== e) b.rally = 300, b.say("네!", 30);
+      w.emit({ type: "custom", name: "enemyRally", data: { id: e.id } });
+    }
+  };
+  var duelist = {
+    tick(e, w) {
+      if (e.phase === 1 && e.hp < e.hpMax * 0.5) {
+        e.phase = 2;
+        e.say("…", 30);
+        w.emit({ type: "bossRoar", x: e.x, kind: e.kind });
+      }
+    },
+    think: (e, w) => engage(e, w, 0.12),
+    hit(e, h, _p, w) {
+      if (e.move?.id === "stance" && e.mf >= 8 && e.mf < 48) {
+        e.face(w.player.x);
+        const cut = e.def.attacks[0];
+        e.start(cut.move, w, 0);
+        e.mf = 12;
+        return { immune: true, text: "받아침" };
+      }
+      if (h.dir === e.dir && e.state === "attack") return { mult: 1.3 };
+    }
+  };
+  var rival = {
+    tick(e, w) {
+      if (e.state === "flee") {
+        const [b0, b1] = w.bounds;
+        walkTo(e, w, e.mem.fleeDir < 0 ? b0 - 126 : b1 + 126, e.y, 6);
+        if (e.x < b0 - 120 || e.x > b1 + 120) {
+          e.alive = false;
+          w.emit({ type: "custom", name: "enemyEscape", data: { id: e.id, kind: e.kind } });
+        }
+        return true;
+      }
+      if (e.hp < e.hpMax * 0.3 && (e.state === "idle" || e.state === "walk" || e.state === "hurt")) {
+        e.fire("smoke", w, { x: e.x });
+        e.say("철수!", 40);
+        e.mem.fleeDir = Math.sign(e.x - w.player.x) || 1;
+        e.dir = e.mem.fleeDir;
+        e.set("flee");
+        return true;
+      }
+    },
+    think: (e, w) => engage(e, w, 0.14)
+  };
+  var AI_BRAINS = { rush, kite, shield, chief, duelist, rival };
+
+  // src/game/action/enemy/kinds.ts
+  var KIND_ALIAS = {};
+
+  // src/game/action/enemy/registry.ts
+  var spawner = null;
+  function setSpawner(fn2) {
+    spawner = fn2;
+  }
+
+  // src/game/action/enemy/scale.ts
+  var K2 = PIXEL / 2;
+  var seenBox = /* @__PURE__ */ new WeakSet();
+  var seenMove = /* @__PURE__ */ new WeakSet();
+  function box(b) {
+    if (seenBox.has(b)) return;
+    seenBox.add(b);
+    b.fx0 *= K2;
+    b.fx1 *= K2;
+    b.z0 *= K2;
+    b.z1 *= K2;
+  }
+  function move(m) {
+    if (seenMove.has(m)) return;
+    seenMove.add(m);
+    for (const f of m.frames) {
+      f.hit.forEach(box);
+      f.hurt.forEach(box);
+      if (f.vx) f.vx *= K2;
+      if (f.vz) f.vz *= K2;
+    }
+    for (const d3 of m.danger ?? []) if (!seenBox.has(d3)) seenBox.add(d3), d3.fx0 *= K2, d3.fx1 *= K2;
+  }
+  var done = false;
+  function scaleAll(defs) {
+    if (done || K2 === 1) return;
+    done = true;
+    for (const d3 of defs) {
+      d3.w *= K2;
+      d3.h *= K2;
+      d3.speed *= K2;
+      if (d3.hover) d3.hover *= K2;
+      d3.keep = [d3.keep[0] * K2, d3.keep[1] * K2];
+      d3.body.forEach(box);
+      for (const a of d3.attacks) {
+        move(a.move);
+        a.range = [a.range[0] * K2, a.range[1] * K2];
+      }
+    }
+    for (const p of Object.values(PROJ)) {
+      p.w *= K2;
+      p.h *= K2;
+      p.z *= K2;
+      p.speed *= K2;
+      if (p.vz) p.vz *= K2;
+      if (p.gravity) p.gravity *= K2;
+      if (p.grow) p.grow *= K2;
+    }
+  }
+
+  // src/game/action/enemy/frames.ts
+  var B = (fx0, fx1, z0, z1, dy = 18, part) => ({ fx0, fx1, z0, z1, dy, part });
+  function humanoid(w, h, dy = 16, lean = 0, crouch = 0) {
+    const hh = h * (1 - crouch * 0.35);
+    return [
+      B(-w * 0.32, w * 0.32, 0, hh * 0.46, dy, "legs"),
+      B(-w * 0.5 + lean, w * 0.5 + lean, hh * 0.46, hh * 0.8, dy, "torso"),
+      B(-w * 0.28 + lean * 1.4, w * 0.28 + lean * 1.4, hh * 0.8, hh, dy, "head")
+    ];
+  }
+  var lerp = (a, b, t) => a + (b - a) * t;
+  function lerpBox(a, b, t) {
+    return { fx0: lerp(a.fx0, b.fx0, t), fx1: lerp(a.fx1, b.fx1, t), z0: lerp(a.z0, b.z0, t), z1: lerp(a.z1, b.z1, t), dy: lerp(a.dy, b.dy, t), part: a.part };
+  }
+  var at = (b, t) => b ? typeof b === "function" ? b(t) : b : [];
+  function bake(id, label2, body, phases, specs, extra = {}) {
+    const frames = [];
+    for (const p of phases) {
+      for (let i = 0; i < p.n; i++) {
+        const t = p.n <= 1 ? 1 : i / (p.n - 1);
+        const f = { hit: at(p.hit, t), hurt: p.hurt ? at(p.hurt, t) : body, armor: p.armor ?? 0 };
+        if (f.hit.length) f.spec = p.spec ?? 0;
+        const vx = typeof p.vx === "function" ? p.vx(t) : p.vx;
+        if (vx) f.vx = vx;
+        if (p.vz && i === 0) f.vz = p.vz;
+        if (p.tele) f.tele = true;
+        if (p.fire && i === 0) f.fire = p.fire;
+        if (p.inv) f.inv = true;
+        if (p.ev && i === 0) f.ev = p.ev;
+        frames.push(f);
+      }
+    }
+    return { id, label: label2, frames, specs, ...extra };
+  }
+
+  // src/game/action/enemy/moves.ts
+  var S = (dmg, react2, push = 6, extra = {}) => ({ dmg, react: react2, push, stop: react2 === "none" ? 2 : react2 === "flinch" ? 3 : 5, strength: react2 === "none" || react2 === "flinch" ? 1 : react2 === "stagger" ? 2 : 3, ...extra });
+  function strike(id, label2, w, h, o) {
+    const body = o.body ?? humanoid(w, h);
+    const lean = humanoid(w, h, 16, -w * 0.12);
+    const reachBody = humanoid(w, h, 16, w * 0.18);
+    const dy = o.dy ?? 20;
+    const hitFull = B(o.reach[0], o.reach[1], o.z[0], o.z[1], dy, o.part ?? "arm");
+    const hitStart = B(o.reach[0], o.reach[0] + (o.reach[1] - o.reach[0]) * 0.35, o.z[0], o.z[1], dy, o.part ?? "arm");
+    const armHurt = (t) => [...reachBody, lerpBox(B(w * 0.3, w * 0.5, o.z[0], o.z[1], 12, "arm"), B(w * 0.3, o.reach[1] * 0.8, o.z[0], o.z[1], 12, "arm"), t)];
+    const phases = [
+      { n: o.tele, hurt: lean, tele: true, armor: o.teleArmor ?? 0, vx: o.back ? -o.back : 0 },
+      { n: o.active, hurt: armHurt, hit: o.extend === false ? [hitFull] : (t) => [lerpBox(hitStart, hitFull, Math.min(1, t * 1.6))], armor: o.armor ?? 0, vx: o.lunge ?? 0, fire: o.fire },
+      { n: o.recover, hurt: reachBody }
+    ];
+    if (o.fire) phases[1].hit = [];
+    const danger = o.fire ? void 0 : [{ fx0: o.reach[0], fx1: o.reach[1] + (o.lunge ?? 0) * o.active, dy }];
+    return bake(id, label2, body, phases, [{ ...o.spec, low: o.low ?? o.spec.low }], { danger });
+  }
+  function charge(id, label2, w, h, o) {
+    const body = o.body ?? humanoid(w, h);
+    return bake(
+      id,
+      label2,
+      body,
+      [
+        { n: o.tele, tele: true, hurt: humanoid(w, h, 16, -w * 0.15, 0.15), vx: -0.6 },
+        { n: o.dash, hit: [B(0, w * 0.7, h * 0.1, h * 0.85, 22, "torso")], vx: o.speed, armor: o.armor ?? 1, hurt: humanoid(w, h, 16, w * 0.2) },
+        { n: o.recover, vx: (t) => o.speed * 0.3 * (1 - t) }
+      ],
+      [o.spec],
+      { danger: [{ fx0: 0, fx1: o.speed * o.dash + w * 0.7, dy: 22 }] }
+    );
+  }
+  function shoot2(id, label2, w, h, o) {
+    const body = o.body ?? humanoid(w, h);
+    const phases = [{ n: o.tele, tele: true }];
+    for (let i = 0; i < o.shots; i++) phases.push({ n: o.gap, fire: o.fire, armor: o.armor ?? 0 });
+    phases.push({ n: o.recover });
+    return bake(id, label2, body, phases, [S(0, "none")]);
+  }
+
+  // src/game/action/enemy/roster.ts
+  var suitBody = humanoid(64, 196);
+  var fbSmg = {
+    kind: "fb_smg",
+    label: "가짜 관리국 · 기관단총",
+    role: "shoot",
+    faction: "bureau",
+    price: 15,
+    hp: 120,
+    speed: 1.5,
+    w: 64,
+    h: 196,
+    body: suitBody,
+    armor: 0,
+    types: [],
+    ai: "kite",
+    keep: [280, 440],
+    drop: "bureau",
+    grabbable: true,
+    note: "검은 정장, 선글라스. 거리를 두고 짧게 끊어 쏜다.",
+    weak: "쏘는 동안은 서 있다. 깊이를 바꿔 피하고 붙어라",
+    color: "#23262b",
+    attacks: [
+      { move: shoot2("burst", "점사", 64, 196, { tele: 16, shots: 4, gap: 4, recover: 22, fire: "bullet" }), range: [180, 620], dy: 14, cd: 60, weight: 3 },
+      { move: strike("butt", "개머리판", 64, 196, { tele: 10, active: 4, recover: 14, reach: [15, 85], z: [100, 170], spec: S(9, "stagger", 10) }), range: [0, 90], dy: 22, cd: 40, weight: 4, when: "close" }
+    ]
+  };
+  var fbShieldBody = [...humanoid(70, 196), B(30, 58, 10, 190, 22, "shield")];
+  var fbShield = {
+    kind: "fb_shield",
+    label: "가짜 관리국 · 진압 방패",
+    role: "shield",
+    faction: "bureau",
+    price: 20,
+    hp: 200,
+    speed: 0.9,
+    w: 70,
+    h: 196,
+    body: fbShieldBody,
+    armor: 1,
+    types: [],
+    ai: "shield",
+    keep: [60, 120],
+    drop: "bureau",
+    grabbable: true,
+    note: "진압 방패를 앞세워 밀고 들어온다. 정면 공격과 총알을 막는다.",
+    weak: "뒤로 돌아가거나 잡아서 던져라. 방패 치기 뒤 빈틈",
+    color: "#2c3036",
+    attacks: [
+      { move: strike("bash", "방패 치기", 70, 196, { tele: 16, active: 5, recover: 24, reach: [30, 110], z: [20, 190], lunge: 7, extend: false, body: fbShieldBody, armor: 1, spec: S(11, "stagger", 16, { strength: 2 }) }), range: [0, 140], dy: 24, cd: 60, weight: 2 },
+      { move: strike("baton", "진압봉", 70, 196, { tele: 12, active: 4, recover: 14, reach: [20, 95], z: [100, 190], body: fbShieldBody, spec: S(8, "flinch", 4) }), range: [0, 100], dy: 22, cd: 30, weight: 2 }
+    ]
+  };
+  var fbChief = {
+    kind: "fb_chief",
+    label: "가짜 관리국 · 과장님",
+    role: "summon",
+    faction: "bureau",
+    price: 25,
+    hp: 150,
+    speed: 1.2,
+    w: 66,
+    h: 200,
+    body: humanoid(66, 200),
+    armor: 0,
+    types: [],
+    ai: "chief",
+    keep: [360, 520],
+    drop: "bureau",
+    grabbable: true,
+    cap: 1,
+    note: "뒤에서 직급을 부르면 부하 전원이 빨라지고 세진다.",
+    weak: "지휘관 먼저. 호명 중(1초)에 맞으면 끊긴다",
+    color: "#3b2f2a",
+    attacks: [
+      { move: bake("rally", "직급 호명", humanoid(66, 200), [{ n: 30, tele: true }, { n: 6, ev: "rally" }, { n: 16 }], [S(0, "none")]), range: [0, 2e3], dy: 2e3, cd: 360, weight: 3 },
+      { move: shoot2("pistol", "권총", 66, 200, { tele: 18, shots: 1, gap: 8, recover: 18, fire: "bullet" }), range: [120, 640], dy: 16, cd: 50, weight: 2 }
+    ]
+  };
+  var swordBody = humanoid(64, 200);
+  var fbSword = {
+    kind: "fb_sword",
+    label: "가짜 관리국 · 검사",
+    role: "rush",
+    faction: "bureau",
+    price: 50,
+    hp: 500,
+    speed: 1.8,
+    w: 64,
+    h: 200,
+    body: swordBody,
+    armor: 0,
+    types: [],
+    ai: "duelist",
+    keep: [120, 220],
+    drop: "mid",
+    grabbable: true,
+    mid: true,
+    cap: 1,
+    note: "검은 일본도. 두 번 베고, 화면을 가로질러 돌진해 벤다. 자세를 잡으면 받아친다.",
+    weak: "가드로 받은 뒤 반격. 2연베기 뒤 0.8초 빈틈",
+    color: "#15161a",
+    attacks: [
+      {
+        move: bake(
+          "twocut",
+          "2연베기",
+          swordBody,
+          [
+            { n: 14, tele: true, hurt: humanoid(64, 200, 16, -10) },
+            { n: 4, hit: [B(10, 150, 80, 200, 24, "weapon")], spec: 0, vx: 5, armor: 1 },
+            { n: 6 },
+            { n: 4, hit: [B(10, 160, 30, 150, 24, "weapon")], spec: 1, vx: 5, armor: 1 },
+            { n: 24, hurt: humanoid(64, 200, 16, 14) }
+          ],
+          [S(12, "flinch", 4, { debuff: { kind: "bleed", ticks: 120 } }), S(16, "stagger", 12, { debuff: { kind: "bleed", ticks: 120 }, strength: 2 })],
+          { danger: [{ fx0: 10, fx1: 210, dy: 24 }] }
+        ),
+        range: [0, 170],
+        dy: 24,
+        cd: 50,
+        weight: 3
+      },
+      { move: charge("iai", "돌진 베기", 64, 200, { tele: 26, dash: 12, speed: 24, recover: 30, spec: S(22, "down", 6, { debuff: { kind: "bleed", ticks: 150 }, strength: 3 }), armor: 2, body: swordBody }), range: [200, 700], dy: 18, cd: 150, weight: 2 },
+      { move: bake("stance", "받아치기 자세", swordBody, [{ n: 8, tele: true }, { n: 40, ev: "parry", armor: 0 }, { n: 8 }], [S(0, "none")]), range: [0, 200], dy: 30, cd: 240, weight: 1, when: "phase2" }
+    ]
+  };
+  var ddBody = humanoid(62, 186);
+  var ddMember = {
+    kind: "dd_member",
+    label: "백일몽 탐사원",
+    role: "rush",
+    faction: "daydream",
+    price: 18,
+    hp: 150,
+    speed: 2,
+    w: 62,
+    h: 186,
+    body: ddBody,
+    armor: 0,
+    types: [],
+    ai: "rival",
+    keep: [80, 160],
+    drop: "daydream",
+    grabbable: true,
+    note: "정장에 동물 가면. 회수물을 노리는 경쟁자. 몰리면 연막을 뿌리고 도망간다.",
+    weak: "체력 30% 아래면 도망친다. 도망 전에 잡아라",
+    color: "#4d3f63",
+    attacks: [
+      {
+        move: bake(
+          "kick2",
+          "2연차기",
+          ddBody,
+          [
+            { n: 10, tele: true },
+            { n: 3, hit: [B(20, 100, 40, 110, 22, "legs")], spec: 0, vx: 3 },
+            { n: 5 },
+            { n: 4, hit: [B(20, 110, 100, 180, 22, "legs")], spec: 1, vx: 4 },
+            { n: 14 }
+          ],
+          [S(7, "flinch", 4), S(11, "stagger", 10)],
+          { danger: [{ fx0: 20, fx1: 140, dy: 22 }] }
+        ),
+        range: [0, 120],
+        dy: 22,
+        cd: 40,
+        weight: 3
+      },
+      { move: bake("smoke", "연막", ddBody, [{ n: 10, tele: true }, { n: 4, fire: "smoke" }, { n: 10, inv: true, vx: -10 }], [S(0, "none")]), range: [0, 140], dy: 40, cd: 200, weight: 1, when: "close" }
+    ]
+  };
+  var ROSTER = [fbSmg, fbShield, fbChief, fbSword, ddMember];
+  var ROSTER_BY_KIND = Object.fromEntries(ROSTER.map((d3) => [d3.kind, d3]));
+
+  // src/game/action/enemy/arenaStage.ts
+  var GAP = 150;
+  var X0 = 420;
+  function props() {
+    const out = [{ id: "clear", kind: "sign", x: 260, y: 505, w: 110, h: 60, label: "치우기 (E)" }];
+    ROSTER.forEach((d3, i) => out.push({ id: `one:${d3.kind}`, kind: "sign", x: X0 + i * GAP, y: 505, w: 120, h: 60, label: d3.label }));
+    return out;
+  }
+  var arenaStage = {
+    id: "arena",
+    label: "적 시험장",
+    firstFloor: () => {
+      const length = X0 + ROSTER.length * GAP + 600;
+      return {
+        id: "enemy-arena",
+        title: "적 시험장",
+        length,
+        lane: [500, 680],
+        startX: 200,
+        exitX: Infinity,
+        banner: "적 시험장 · 표지 앞에서 E · H 판정 보기",
+        palette: { wall: "#2b343a", floor: "#3c4549", accent: "#6c7b83" },
+        props: props(),
+        encounters: []
+      };
+    },
+    nextFloor: () => null,
+    onInteract(api, floor, prop) {
+      const w = api.world;
+      const p = w.player;
+      if (prop.id === "clear") {
+        for (const b of w.bodies) if (b.team === "enemy") b.alive = false;
+        return;
+      }
+      const [kind, what] = prop.id.split(":");
+      if (kind === "one") api.spawn({ kind: what, x: Math.min(p.x + 300, floor.length - 400), y: 590 });
+    }
+  };
+
+  // src/game/action/enemy/index.ts
+  var ALL_DEFS = [...ROSTER];
+  scaleAll(ALL_DEFS);
+  var DEF_BY_KIND = Object.fromEntries(ALL_DEFS.map((d3) => [d3.kind, d3]));
+  for (const [k, a] of Object.entries(KIND_ALIAS)) if (!DEF_BY_KIND[k] && DEF_BY_KIND[a.kind]) DEF_BY_KIND[k] = DEF_BY_KIND[a.kind];
+  function createEnemy(kind, x, y, rng3, opts = {}) {
+    const alias = KIND_ALIAS[kind];
+    if (alias) kind = alias.kind;
+    const def = DEF_BY_KIND[kind];
+    if (!def) throw new Error(`unknown enemy kind: ${kind}`);
+    const brain = AI_BRAINS[def.ai] ?? AI_BRAINS.rush;
+    const AFF = ["bleed", "armor", "fast", "regen"];
+    const affixes = opts.elite ? opts.affixes ?? [AFF[Math.floor(rng3() * AFF.length)]] : [];
+    const e = new Enemy(def, x, y, brain, { elite: opts.elite, affixes, rand: rng3 });
+    if (alias?.solo) e.mem.solo = true;
+    return e;
+  }
+  setSpawner((w, kind, x, y, opts) => {
+    const e = createEnemy(kind, x, y, () => w.rand(), opts);
+    w.add(e);
+    w.emit({ type: "enemySpawn", x, kind });
+    return e;
+  });
+  function isThreat(b) {
+    if (!(b instanceof Enemy)) return false;
+    return b.alive && b.state !== "dead" && b.hostile && b.mem.mode !== "table" && b.mem.mode !== "peace";
+  }
+
+  // src/game/action/engine/itemsLink.ts
+  var PROP_ART = /* @__PURE__ */ new Set(["chair", "pot", "tv", "table", "crate"]);
+  var DROP_TABLE = { thug: "anomaly", dummy: "anomaly" };
+  var FLOOR_ALIAS = { heal: "heal_orb", ammo: "rounds", coin: "coins" };
+  var floorImgs = /* @__PURE__ */ new Map();
+  function drawFloorArt(c, id, x, y) {
+    const all = typeof window !== "undefined" && window.__GOEI_ITEM_ART__ || {};
+    const a = all[id] ?? all[FLOOR_ALIAS[id] ?? ""];
+    if (!a) return false;
+    let im = floorImgs.get(a.src);
+    if (!im) floorImgs.set(a.src, im = Object.assign(new Image(), { src: a.src }));
+    if (!im.complete || !im.naturalWidth) return false;
+    const w = a.w * 2, h = a.h * 2;
+    const prev = c.imageSmoothingEnabled;
+    c.imageSmoothingEnabled = false;
+    c.drawImage(im, Math.round(x - w / 2), Math.round(y - h), w, h);
+    c.imageSmoothingEnabled = prev;
+    return true;
+  }
+  var SUPPLY_ART = { heal: "medkit", guard: "charm", light: "flash", gear: "unknown_device", checklist: "photo" };
+  function drawSupply(c, label2, x, y, tick) {
+    const id = label2?.startsWith("보급품") ? label2.split(":")[1] ?? "heal" : null;
+    if (!id) return false;
+    const all = typeof window !== "undefined" && window.__GOEI_ITEM_ART__ || {};
+    const box2 = all[id === "ammo" ? "ammo_box" : SUPPLY_ART[id] ?? "ammo_box"], rounds = id === "ammo" ? all.rounds : null;
+    if (!box2 || id === "ammo" && !rounds) return false;
+    const im = (src) => {
+      let i = floorImgs.get(src);
+      if (!i) floorImgs.set(src, i = Object.assign(new Image(), { src }));
+      return i.complete && i.naturalWidth ? i : null;
+    };
+    const a = im(box2.src), b = rounds ? im(rounds.src) : null;
+    if (!a || rounds && !b) return false;
+    const k = id === "ammo" ? 4 : Math.max(2, Math.min(4, Math.round(56 / box2.h)));
+    c.save();
+    c.fillStyle = "rgba(0,0,0,0.35)";
+    c.beginPath();
+    c.ellipse(x, y, Math.max(24, box2.w * k / 2), 9, 0, 0, Math.PI * 2);
+    c.fill();
+    c.imageSmoothingEnabled = false;
+    const glow2 = 0.35 + 0.2 * Math.sin(tick / 8);
+    c.shadowColor = `rgba(255,214,90,${glow2})`;
+    c.shadowBlur = 10;
+    if (rounds && b) {
+      c.drawImage(a, Math.round(x - 40), Math.round(y - box2.h * 4), box2.w * 4, box2.h * 4);
+      c.drawImage(b, Math.round(x - 2), Math.round(y - rounds.h * 3 + 4), rounds.w * 3, rounds.h * 3);
+    } else c.drawImage(a, Math.round(x - box2.w * k / 2), Math.round(y - box2.h * k), box2.w * k, box2.h * k);
+    c.restore();
+    return true;
+  }
+  function drawPropSized(c, id, x, y) {
+    const d3 = PROPS[id];
+    const all = typeof window !== "undefined" && window.__GOEI_ITEM_ART__ || {};
+    const a = all[id];
+    if (!a || !d3) return false;
+    let im = floorImgs.get(a.src);
+    if (!im) floorImgs.set(a.src, im = Object.assign(new Image(), { src: a.src }));
+    if (!im.complete || !im.naturalWidth) return false;
+    const h = d3.h, w = a.w * h / a.h;
+    const prev = c.imageSmoothingEnabled;
+    c.imageSmoothingEnabled = false;
+    c.drawImage(im, Math.round(x - w / 2), Math.round(y - h), Math.round(w), h);
+    c.imageSmoothingEnabled = prev;
+    return true;
+  }
+  function linkItems(w, run) {
+    const loadout = run.launch?.items ?? [{ id: "medkit", n: 2 }, { id: "flash", n: 2 }, { id: "adrenaline", n: 1 }, null];
+    const ir = createItemRun("jyaldi", loadout.map((s) => s ? { id: s.id, n: s.n } : null));
+    let field = createField(run.seed, 1);
+    const fields = /* @__PURE__ */ new Map();
+    const p = w.player;
+    p.mag = p.ammo = ir.mag || p.mag;
+    p.reserve = ir.reserve;
+    let lastReserve = ir.reserve;
+    w.itemRun = ir;
+    const recordInventory = () => {
+      w.notes.itemsLeft = ir.loadout.map((s) => s ? { ...s } : null);
+    };
+    w.itemField = () => field;
+    const syncSlots = () => {
+      w.items = ir.loadout.map((s) => s ? { id: s.id, label: ITEMS[s.id]?.name ?? s.id, n: s.n } : null);
+    };
+    syncSlots();
+    const targets = () => w.bodies.filter((b) => b.team === "enemy" && b.alive && b.hp > 0).map((b) => ({ id: b.id, x: b.x, y: b.y, z: b.z, w: 56, h: 170, human: true }));
+    const st = () => p.status;
+    const ctx = () => ({ hp: p.hp, max: p.hpMax, noHeal: !!p.perks?.traits.has("단식"), gauge: p.gauge / 100, energy: p.skillCd > 0 ? 0 : 1, energyMax: 1, bleed: !!st()?.has("bleed"), taint: st()?.stacks("taint") ?? 0, headache: !!st()?.has("headache"), mind: !!(st()?.has("fear") || st()?.has("confuse")) });
+    const apply = (evs) => {
+      for (const e of evs) {
+        if (e.t === "hit") {
+          const b = w.bodies.find((x) => x.id === e.target);
+          if (!b) continue;
+          if (e.damage > 0) {
+            const cls = WEAPONS[e.source]?.cls;
+            const scale = cls === "melee" ? p.progression.stats.power : cls === "gun" ? p.progression.stats.aim : 1;
+            const result = b.applyHit(itemHit({ ...e, damage: e.damage * scale }, p.x), w);
+            if (result.kind === "hit" || result.kind === "armor") p.onConnect(w, !!result.killed);
+            if (result.killed) {
+              w.kills++;
+              if (!(b instanceof Fighter)) w.emit({ type: "enemyDie", kind: b.kind, x: b.x });
+            }
+          }
+          if (e.status === "stun" && b.alive && b.hp > 0) {
+            const ticks = Math.round((e.stun ?? 2) * TICK_HZ);
+            const shockKnockdown = e.damage > 0 && e.knockdown && b instanceof Enemy && b.state === "air";
+            if (b instanceof Enemy && b.inv <= 0 && (["idle", "walk", "attack", "hurt", "stunned", "grabbing"].includes(b.state) || shockKnockdown)) {
+              if (b.state === "grabbing") b.releaseGrab(w);
+              b.move = null;
+              b.vx = b.vy = 0;
+              b.set("stunned");
+              b.stunT = ticks;
+              w.fx("ring", b.x, b.y, 100, "2");
+            } else if (b instanceof Fighter && b.invuln <= 0 && ["free", "act", "hurt"].includes(b.phase)) {
+              b.vx = b.vy = 0;
+              b.enter("hurt", ticks);
+              w.fx("ring", b.x, b.y, 100, "2");
+            }
+          }
+        } else if (e.t === "use") {
+          const f = e.effect;
+          if (f.type === "heal") p.hp = Math.min(p.hpMax, p.hp + p.hpMax * f.ratio);
+          else if (f.type === "cure") {
+            p.hp = Math.min(p.hpMax, p.hp + p.hpMax * (f.heal ?? 0));
+            const s = st();
+            if (s) {
+              if (f.status === "mind") {
+                s.cure("fear");
+                s.cure("confuse");
+              } else if (f.status === "any") s.clear();
+              else s.cure(f.status);
+            }
+          } else if (f.type === "gauge") p.gauge = Math.min(100, p.gauge + f.amount * 100);
+          else if (f.type === "energy") {
+            p.skillCd = 0;
+            const core = p.core;
+            if (core) {
+              core.P.heat = Math.max(0, core.P.heat - f.amount);
+              core.P.overT = 0;
+            }
+          } else if (f.type === "ward") p.ward += f.hits;
+        } else if (e.t === "pickup" && e.kind === "heal") {
+          p.hp = Math.min(p.hpMax, p.hp + pickupHealAmount(p.hpMax, e.amount));
+        }
+      }
+      for (const g of toGameEvents(evs, p.x, p.ammo)) w.emit(g);
+      if (ir.reserve !== lastReserve) {
+        p.reserve += ir.reserve - lastReserve;
+        ir.reserve = lastReserve = p.reserve;
+      }
+      syncSlots();
+    };
+    const actor = () => ({ x: p.x, y: p.y, z: p.z, dir: p.dir });
+    const syncCarry = () => {
+      p.carry = ir.carry ? { kind: "prop", id: ir.carry.prop, hold: "over" } : ir.held ? { kind: "weapon", id: ir.held.id, hold: "hand", cls: WEAPONS[ir.held.id]?.cls } : null;
+    };
+    const melee = { damage: 12, reach: 110 };
+    p.itemAct = (k) => {
+      if (ir.carry) {
+        apply(stepField(field, ir, actor(), { attack: true }, targets(), 0, ctx(), melee));
+        syncCarry();
+        return "toss";
+      }
+      const cls = ir.held ? WEAPONS[ir.held.id]?.cls : void 0;
+      if (k === "attack" && cls === "melee") {
+        apply(stepField(field, ir, actor(), { attack: true }, targets(), 0, ctx(), melee));
+        syncCarry();
+        return "wswing";
+      }
+      if (k === "shoot" && cls === "gun") {
+        apply(stepField(field, ir, actor(), { shoot: true }, targets(), 0, ctx()));
+        syncCarry();
+        return "wfire";
+      }
+      return null;
+    };
+    w.pickHook = () => {
+      const before = `${ir.carry?.prop}|${ir.held?.id}|${field.ents.length}`;
+      const evs = stepField(field, ir, actor(), { interact: true }, targets(), 0, ctx());
+      apply(evs);
+      syncCarry();
+      const changed = evs.length > 0 || before !== `${ir.carry?.prop}|${ir.held?.id}|${field.ents.length}`;
+      if (changed && p.phase === "free" && !p.move && p.z <= 0) p.play("pickup", w);
+      return changed;
+    };
+    w.drawHeld = (c, carry, sx, sy, deg, dir) => {
+      c.save();
+      c.translate(sx, sy);
+      if (dir < 0) c.scale(-1, 1);
+      if (carry.kind === "prop") {
+        const d3 = PROPS[carry.id];
+        const s = Math.max(d3?.w ?? 60, d3?.h ?? 60);
+        if (!drawPropSized(c, carry.id, 0, -18)) drawItemIcon(c, carry.id, -s / 2, -s - 18, s);
+      } else if (!drawItemHeld(c, carry.id, deg)) {
+        c.rotate((deg + 45) * Math.PI / 180);
+        drawItemIcon(c, carry.id, -12, -36, 48);
+      }
+      c.restore();
+    };
+    w.itemUse = (slot) => {
+      const evs = stepField(field, ir, { x: p.x, y: p.y, z: p.z, dir: p.dir }, { use: slot - 1 }, targets(), 0, ctx());
+      const used = evs.find((e) => e.t === "use");
+      apply(evs);
+      if (!used) {
+        if (w.items[slot - 1]) w.say("지금은 쓸 필요가 없다", 1);
+        return false;
+      }
+      const t = used.effect.type;
+      return { anim: t === "heal" || t === "energy" || t === "gauge" ? "drink" : t === "cure" ? "bandage" : t === "flash" || t === "smoke" ? "toss" : "drink", consumed: true };
+    };
+    w.on((e) => {
+      if (e.type === "run:end") recordInventory();
+      if (e.type === "enter:floor") {
+        const remembered = fields.get(e.floor.id);
+        if (remembered) {
+          field = remembered;
+          syncCarry();
+          return;
+        }
+        field = createField(run.seed + w.floors * 7919, e.floor.depth ?? 1, { x0: 20, x1: e.floor.length - 20, y0: w.lane[0], y1: w.lane[1] });
+        fields.set(e.floor.id, field);
+        const artProps = (e.floor.props ?? []).map((q) => ({ ...q, w: Math.max(q.w, (propArtSize(q.kind, q.label, e.floor.type)?.w ?? 0) + 40) }));
+        furnishFloor(field, { ...e.floor, props: furnishAvoid({ ...e.floor, props: artProps }, w.bodies.filter((b) => b.alive && b.team !== "player")) }, w.lane, () => w.rand());
+        const st2 = clearSpot(p.x, p.y, allSolids(), w.lane);
+        p.x = p.px = st2.x;
+        p.y = p.py = st2.y;
+        field.ents = field.ents.filter((q) => q.type !== "prop" || PROP_ART.has(q.prop));
+        syncCarry();
+      }
+      if (e.type === "enemyDie" && DROP_TABLE[e.kind]) apply(dropFromKill(field, ir, DROP_TABLE[e.kind], e.x, w.player.y));
+      if (e.type === "custom" && e.name === "enemyDrop") {
+        const d3 = e.data;
+        apply(spawnEnemyDrops(field, ir, d3.drops, d3.x, d3.y, d3.kind));
+      }
+    });
+    const hitSeen = /* @__PURE__ */ new Set();
+    const overlapT = /* @__PURE__ */ new WeakMap();
+    const lastX = /* @__PURE__ */ new WeakMap();
+    const frontFor = (h) => Math.min(90, Math.max(PROP_DEPTH, h * 0.8));
+    const floorSolids = () => w.props.filter((q) => (q.kind === "prop" || q.kind === "table" || q.kind === "clutter") && q.y > w.lane[0] + 20).map((q) => {
+      const a = propArtSize(q.kind, q.label, w.floor?.type);
+      return { x: q.x, y: q.y, w: Math.max(a?.w ?? 0, q.w, 100), back: Math.min(200, Math.max(PROP_DEPTH, (a?.h ?? 0) * 0.75)), front: frontFor(a?.h ?? 0), h: a?.h ?? 0 };
+    });
+    const itemSolid = (e) => ({ x: e.x, y: e.y, w: PROPS[e.prop].w, back: Math.min(200, Math.max(PROP_DEPTH, PROPS[e.prop].h * 0.6)), front: frontFor(PROPS[e.prop].h), h: PROPS[e.prop].h });
+    const allSolids = () => [...field.ents.filter((e) => e.type === "prop" && PROPS[e.prop]).map((e) => itemSolid(e)), ...floorSolids()];
+    w.spawnAdjust = (s) => {
+      const q = clearSpot(s.x, s.y, allSolids(), w.lane);
+      return q.x === s.x && q.y === s.y ? s : { ...s, x: q.x, y: q.y };
+    };
+    Object.defineProperty(w, "itemField", { get: () => field, configurable: true });
+    Object.defineProperty(w, "solidsNow", { get: () => allSolids(), configurable: true });
+    Object.defineProperty(w, "propRects", {
+      get: () => [
+        ...w.props.filter((q) => !["hubdoor", "hubspot", "hatch"].includes(q.kind) && !isHighSign(q.kind, q.label)).map((q) => {
+          const a = propArtSize(q.kind, q.label, w.floor?.type);
+          return a ? { x: q.x, y: q.y, w: a.w, h: a.h, what: `${q.kind}:${q.label ?? ""}` } : null;
+        }).filter(Boolean),
+        ...field.ents.filter((e) => e.type === "prop" && PROPS[e.prop]).map((e) => ({ x: e.x, y: e.y, w: PROPS[e.prop].w, h: PROPS[e.prop].h, what: `물건:${e.prop}` }))
+      ],
+      configurable: true
+    });
+    w.itemState = {
+      snapshot: () => ({ inventory: ir, fields: [...fields], current: w.floor.id, lastReserve }),
+      restore(value) {
+        const s = value;
+        if (!s?.inventory || !Array.isArray(s.fields)) throw new Error("손상된 아이템 저장");
+        Object.assign(ir, s.inventory);
+        fields.clear();
+        for (const [k, v] of s.fields) fields.set(k, v);
+        field = fields.get(s.current);
+        if (!field) throw new Error("방 아이템 저장 누락");
+        lastReserve = s.lastReserve;
+        syncSlots();
+        syncCarry();
+      }
+    };
+    return {
+      run: ir,
+      /** 대화로 받은 소모품 (빈 칸이 없으면 못 받는다) */
+      give(id) {
+        const n = addItem(ir, id, 1);
+        syncSlots();
+        return n > 0;
+      },
+      /** 시연(?start=items): 들 물건·임시 무기를 한 줄로 늘어놓는다 */
+      showcase() {
+        const ym = (w.lane[0] + w.lane[1]) / 2;
+        Object.keys(PROPS).forEach((id, i) => placeProp(field, id, 520 + i * 150, ym + (i % 2 * 2 - 1) * 50));
+        Object.keys(WEAPONS).forEach((id, i) => spawnPickup(field, "weapon", 600 + i * 140, ym));
+      },
+      tick() {
+        lastReserve = ir.reserve = p.reserve;
+        const hits = p.frame().hit;
+        if (hits.length) apply(strikeProps(field, ir, hits, hitSeen, targets()));
+        apply(stepField(field, ir, { x: p.x, y: p.y, z: p.z, dir: p.dir }, {}, targets(), 1 / TICK_HZ, ctx()));
+        for (const b of w.bodies)
+          if (b instanceof Enemy && b.alive && b.hp > 0 && slowAt(field, b.x, b.y) < 1) b.slow = Math.max(b.slow, 2);
+        for (const z of field.zones) {
+          if (z.kind !== "salt") continue;
+          for (const b of w.bodies) {
+            if (!(b instanceof Enemy) || !b.alive || b.hp <= 0 || b.def.faction === "bureau" || b.def.faction === "daydream") continue;
+            const dx = b.x - z.x, dy2 = (b.y - z.y) * 2;
+            if (Math.hypot(dx, dy2) >= z.r) continue;
+            const edge = Math.sqrt(Math.max(0, z.r * z.r - dy2 * dy2)) + 2;
+            b.x = z.x + (dx >= 0 ? 1 : -1) * edge;
+            b.vx = 0;
+          }
+        }
+        const ents = field.ents.filter((e) => e.type === "prop" && PROPS[e.prop]);
+        const solids = ents.map((e) => itemSolid(e));
+        const fixed = floorSolids();
+        if (solids.length || fixed.length) {
+          const bodies2 = [p, ...w.bodies].filter((b) => b.alive && b.kind !== "bullet" && b.kind !== "item" && b.team !== "neutral" && !b.kind.startsWith("proj"));
+          const views = bodies2.map((b) => ({ x: b.x, y: b.y, z: b.z, px: b === p ? p.px : lastX.get(b) }));
+          const stuck = blockByProps(views, [...solids, ...fixed], w.lane);
+          bodies2.forEach((b, i) => {
+            b.x = views[i].x;
+            b.y = views[i].y;
+            lastX.set(b, b.x);
+          });
+          ents.forEach((e, i) => {
+            const n = stuck.has(i) ? (overlapT.get(e) ?? 0) + 1 : 0;
+            overlapT.set(e, n);
+            if (n > TICK_HZ / 2) nudgeProp(solids[i], bodies2, solids, 40, (w.floor?.length ?? 99999) - 40), e.x = solids[i].x, overlapT.set(e, 0);
+          });
+        }
+        syncCarry();
+        recordInventory();
+        w.notes.held = ir.held ? { name: WEAPONS[ir.held.id].name, uses: ir.held.uses, max: WEAPONS[ir.held.id].uses } : null;
+      },
+      draw(c, camX) {
+        for (const e of field.ents) {
+          if (e.type === "prop") {
+            const d3 = PROPS[e.prop];
+            const s = Math.max(d3?.w ?? 60, d3?.h ?? 60);
+            c.fillStyle = "rgba(0,0,0,0.3)";
+            c.beginPath();
+            c.ellipse(e.x - camX, e.y, s * 0.4, 6, 0, 0, Math.PI * 2);
+            c.fill();
+            if (e.flash > 0) c.globalAlpha = 0.6;
+            if (!drawPropArt(c, `item_${e.prop}`, d3?.name, e.x - camX, e.y) && !drawPropSized(c, e.prop, e.x - camX, e.y)) drawItemIcon(c, e.prop, e.x - camX - s / 2, e.y - s, s);
+            c.globalAlpha = 1;
+            continue;
+          }
+          if (e.type !== "pickup") continue;
+          const x = e.x - camX;
+          const y = e.y - e.z;
+          c.fillStyle = "rgba(0,0,0,0.3)";
+          c.beginPath();
+          c.ellipse(x, e.y, 14, 5, 0, 0, Math.PI * 2);
+          c.fill();
+          const bob = Math.sin((w.tick + e.id * 7) / 6) * 3;
+          const id = e.ref ?? e.kind;
+          if (!drawFloorArt(c, id, x, y - 4 + bob)) drawItemIcon(c, id, x - 14, y - 34 + bob, 28);
+        }
+        for (const pj of field.projs) {
+          c.fillStyle = "#d8e0e4";
+          if (pj.kind === "prop" && pj.ref) {
+            if (!drawPropSized(c, pj.ref, pj.x - camX, pj.y - pj.z + (PROPS[pj.ref]?.h ?? 56) / 2)) drawItemIcon(c, pj.ref, pj.x - camX - 28, pj.y - pj.z - 28, 56);
+          } else c.fillRect(pj.x - camX - 5, pj.y - pj.z - 5, 10, 10);
+        }
+        for (const z of field.zones) {
+          c.strokeStyle = z.kind === "salt" ? "rgba(240,240,240,0.6)" : "rgba(160,170,180,0.5)";
+          c.lineWidth = 3;
+          c.beginPath();
+          c.ellipse(z.x - camX, z.y, z.r, z.r * 0.35, 0, 0, Math.PI * 2);
+          c.stroke();
+        }
+      },
+      bodiesHit(_b) {
+      }
+    };
+  }
+
+  // src/game/action/engine/render.ts
+  var corePlayer = (p) => p instanceof FighterPlayer;
+  var lerp2 = (a, b, t) => a + (b - a) * t;
+  function makeRenderer(ctx, art4, opt) {
+    const ghosts = [];
+    function background(w, camX) {
+      const f = w.floor;
+      const pal = f.palette ?? { wall: "#2b343a", floor: "#3a4247", accent: "#5b6a72" };
+      const [top] = w.lane;
+      if (!view.hub) {
+        ctx.fillStyle = "#0d1114";
+        ctx.fillRect(0, 0, SCREEN_W, SCREEN_H);
+      }
+      if (f.drawBackground) {
+        ctx.save();
+        ctx.translate(-camX, 0);
+        f.drawBackground(ctx, camX);
+        ctx.restore();
+        return;
+      }
+      const wallTop = 110;
+      ctx.fillStyle = pal.wall;
+      ctx.fillRect(0, wallTop, SCREEN_W, top - wallTop - 20);
+      const step2 = 320;
+      for (let x = Math.floor(camX / step2) * step2; x < camX + view.w + step2; x += step2) {
+        const sx = x - camX;
+        ctx.fillStyle = "rgba(0,0,0,0.22)";
+        ctx.fillRect(sx, wallTop, 26, top - wallTop - 20);
+        ctx.fillStyle = pal.accent;
+        ctx.globalAlpha = 0.35;
+        ctx.fillRect(sx + 70, wallTop + 70, 150, 90);
+        ctx.globalAlpha = 1;
+        ctx.fillStyle = "rgba(255,255,255,0.05)";
+        ctx.fillRect(sx + 26, wallTop, 6, top - wallTop - 20);
+      }
+      ctx.fillStyle = "rgba(0,0,0,0.35)";
+      ctx.fillRect(0, top - 34, SCREEN_W, 14);
+      const g = ctx.createLinearGradient(0, top - 20, 0, SCREEN_H);
+      g.addColorStop(0, pal.floor);
+      g.addColorStop(1, "#1a1f22");
+      ctx.fillStyle = g;
+      ctx.fillRect(0, top - 20, SCREEN_W, SCREEN_H - top + 20);
+      ctx.strokeStyle = "rgba(255,255,255,0.05)";
+      ctx.lineWidth = 2;
+      for (let x = Math.floor(camX / 160) * 160; x < camX + view.w + 400; x += 160) {
+        const sx = x - camX;
+        ctx.beginPath();
+        ctx.moveTo(sx, top - 20);
+        ctx.lineTo(sx - (SCREEN_W / 2 - sx) * 0.35, SCREEN_H);
+        ctx.stroke();
+      }
+      for (const y of [top + 30, top + 90, top + 160]) {
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.lineTo(SCREEN_W, y);
+        ctx.stroke();
+      }
+      const ex = (f.exitX ?? f.length - 80) - camX;
+      if (Number.isFinite(ex) && ex > -100 && ex < SCREEN_W + 100) {
+        ctx.fillStyle = "rgba(80,200,120,0.18)";
+        ctx.fillRect(ex, wallTop + 120, 90, top - wallTop - 140);
+        ctx.fillStyle = "#7fe0a0";
+        ctx.font = pfont(22).f;
+        ctx.fillText("출구", ex + 22, wallTop + 110);
+      }
+    }
+    function drawProps(w, camX, list = w.props) {
+      for (const p of list) {
+        const sx = p.x - camX;
+        if (sx < -p.w - 200 || sx > view.w + p.w + 200) continue;
+        if (p.kind === "hubdoor" || p.kind === "hubspot") continue;
+        if (p.actor) {
+          const a = p.actor;
+          const list2 = art4.clips[a.clip ?? "idle"];
+          const fr = list2 ? Math.floor(w.tick / 5) % list2.length : 0;
+          ctx.save();
+          if (a.hue) ctx.filter = `hue-rotate(${a.hue}deg) saturate(1.3)`;
+          const ok = sprite(a.clip ?? "idle", fr, 0, sx, p.y, a.face ?? -1);
+          ctx.restore();
+          if (!ok) {
+            ctx.fillStyle = "#59636a";
+            ctx.fillRect(sx - 20, p.y - 200, 40, 200);
+          }
+          continue;
+        }
+        if (p.kind === "item" && drawSupply(ctx, p.label, sx, p.y, w.tick)) continue;
+        if (!drawPropArt(ctx, p.kind, p.label, sx, p.y, w.floor.type) && w.showBoxes) {
+          ctx.fillStyle = p.kind === "door" || p.kind === "elevator" ? "#4d5b63" : p.kind === "pickup" ? "#c9a640" : "#59636a";
+          ctx.fillRect(sx - p.w / 2, p.y - p.h, p.w, p.h);
+          ctx.strokeStyle = "rgba(0,0,0,0.5)";
+          ctx.strokeRect(sx - p.w / 2, p.y - p.h, p.w, p.h);
+        }
+      }
+    }
+    let ghostK = 1;
+    function sprite(clip, frame, origin, x, y, dir, alpha = 1) {
+      const list = art4.clips[clip];
+      const fi = list?.[Math.min(frame, list.length - 1)];
+      if (!fi || !art4.atlas) return false;
+      ctx.save();
+      ctx.globalAlpha = alpha * ghostK;
+      snapTo(ctx, x, y);
+      if (dir < 0) ctx.scale(-1, 1);
+      const P2 = PIXEL * spr(y);
+      ctx.drawImage(art4.atlas, fi.sx, fi.sy, fi.w, fi.h, (fi.ox - origin) * P2, fi.oy * P2, fi.w * P2, fi.h * P2);
+      ctx.restore();
+      return true;
+    }
+    function grayBody(b, ox, oy) {
+      const fr = b.frame();
+      ctx.fillStyle = b.team === "enemy" ? "#7a848b" : "#9aa6ad";
+      for (const h of fr.hurt) ctx.fillRect(h.x0 - ox, h.y - h.z1 - oy, h.x1 - h.x0, h.z1 - h.z0);
+    }
+    let drawCam = 0;
+    function drawPlayer(p, x, y, z, w) {
+      if (p.ally) sprite(p.ally.clip, p.ally.f, 0, x + (p.ally.x - p.x), y + (p.ally.y - p.y), p.ally.dir);
+      const a = p.anim();
+      if (corePlayer(p) && !p.seat) {
+        p.drawSelf(ctx, drawCam);
+        return;
+      }
+      const blink = p.invuln > 0 && w.tick % 4 < 2 ? 0.5 : 1;
+      if (!sprite(a.clip, a.frame, a.origin, x, y - z, p.dir, blink)) {
+        ctx.fillStyle = "#c0453a";
+        ctx.fillRect(x - 20, y - z - 190, 40, 190);
+      }
+      const held = p.heldAt();
+      if (held && p.carry && w.drawHeld) w.drawHeld(ctx, p.carry, x + p.dir * held.dx, y - z - held.dz, held.deg, p.dir);
+      if (p.moveKey === "evade" || p.moveKey === "dash" || p.running && w.tick % 3 === 0) {
+        if (w.tick % 2 === 0) ghosts.push({ x: p.x, y: p.y - p.z, clip: a.clip, frame: a.frame, origin: a.origin, dir: p.dir, t: 8 });
+      }
+    }
+    function drawFx(w, camX) {
+      for (const f of w.fxs) {
+        const k = f.t / f.life;
+        const sx = f.x - camX;
+        const sy = f.y - f.z;
+        ctx.save();
+        switch (f.kind) {
+          case "spark":
+          case "spark-big": {
+            const big = f.kind === "spark-big";
+            const n = big ? 12 : 8;
+            const r = (big ? 150 : 90) * (0.45 + k);
+            if (k < 0.6) {
+              ctx.fillStyle = `rgba(255,255,255,${0.95 - k * 1.5})`;
+              ctx.beginPath();
+              ctx.arc(sx, sy, (big ? 64 : 40) * (1 - k * 0.8), 0, Math.PI * 2);
+              ctx.fill();
+            }
+            ctx.strokeStyle = k < 0.3 ? "#ffffff" : "#ffd36a";
+            ctx.lineWidth = big ? 11 : 8;
+            for (let i = 0; i < n; i++) {
+              const an = i / n * Math.PI * 2 + f.seed % 10;
+              ctx.beginPath();
+              ctx.moveTo(sx + Math.cos(an) * r * 0.3, sy + Math.sin(an) * r * 0.3);
+              ctx.lineTo(sx + Math.cos(an) * r, sy + Math.sin(an) * r);
+              ctx.stroke();
+            }
+            if (k < 0.35) {
+              ctx.fillStyle = "#ffffff";
+              ctx.beginPath();
+              ctx.arc(sx, sy, f.kind === "spark" ? 14 : 26, 0, Math.PI * 2);
+              ctx.fill();
+            }
+            break;
+          }
+          case "ring": {
+            const s = Number(f.text ?? 2);
+            ctx.strokeStyle = `rgba(255,240,200,${1 - k})`;
+            ctx.lineWidth = s >= 3 ? 8 : 4;
+            ctx.beginPath();
+            ctx.ellipse(sx, sy, (s >= 3 ? 150 : 80) * k + 10, (s >= 3 ? 90 : 50) * k + 6, 0, 0, Math.PI * 2);
+            ctx.stroke();
+            break;
+          }
+          case "boom": {
+            const D2 = 8;
+            const r = 30 + 110 * Math.min(1, k * 2.2);
+            const fade = 1 - k;
+            const cols = k < 0.15 ? ["#ffffff", "#fff3b0", "#ffd24a"] : k < 0.5 ? ["#fff0a0", "#ffb43c", "#e0601e"] : ["#ff9a3c", "#b8401a", "#4a2a22"];
+            const rnd3 = (i) => {
+              const v = Math.sin(f.seed * 12.9898 + i * 78.233) * 43758.5453;
+              return v - Math.floor(v);
+            };
+            ctx.globalAlpha = Math.min(1, fade * 1.6);
+            for (let gy = -r; gy <= r; gy += D2)
+              for (let gx = -r; gx <= r; gx += D2) {
+                const an = Math.atan2(gy, gx);
+                const edge = r * (0.72 + 0.28 * Math.sin(an * 5 + f.seed) * Math.cos(an * 3 - f.seed * 0.7));
+                const d3 = Math.hypot(gx, gy * 1.25);
+                if (d3 > edge) continue;
                 const t = d3 / edge;
                 ctx.fillStyle = t < 0.4 ? cols[0] : t < 0.75 ? cols[1] : cols[2];
                 ctx.fillRect(Math.round((sx + gx) / D2) * D2, Math.round((sy + gy) / D2) * D2, D2, D2);
@@ -817,7 +2840,6 @@
   };
 
   // src/game/action/engine/game.ts
-  var BASE_ZOOM = 1;
   var Game = class {
     constructor(box2, art4, mods) {
       this.box = box2;
@@ -890,9 +2912,7 @@
         if (!this.mods.covered?.()) {
           const w = this.world;
           const H5 = this.inHub ? view.worldH : SCREEN_H;
-          const cssH = this.canvas.getBoundingClientRect().height;
-          const fixed = this.inHub && cssH >= 600;
-          view.zoom = (fixed ? BASE_ZOOM * (this.canvas.height / cssH) : this.canvas.height / H5) * Math.max(1, charSize.k);
+          view.zoom = this.canvas.height / H5 * Math.max(1, charSize.k) * (this.inHub ? view.sceneZoom : 1);
           if (w) view.lane = w.lane;
           const vw = this.canvas.width / view.zoom;
           view.w = this.inHub ? Math.max(SCREEN_W, vw) : SCREEN_W;
@@ -1628,1108 +3648,4 @@
 
   // src/game/action/ui/charWindowTable.gen.ts
   var CW_STATS = { "쟈알디": [7, 3, 6, 5, 4], "스팡달": [4, 8, 3, 6, 4], "잼트리": [5, 4, 4, 5, 7], "에일린": [3, 8, 4, 4, 6], "고그니쟈": [2, 4, 4, 9, 6], "큐라스": [3, 6, 3, 8, 5], "고르고디오": [8, 3, 8, 3, 3], "데쥬레": [2, 6, 4, 8, 5], "데드폴": [4, 4, 8, 3, 6], "게슈간": [4, 4, 4, 9, 4], "로제몬": [2, 4, 3, 9, 7], "콘쥬스": [8, 4, 7, 2, 4], "사장": [4, 7, 3, 6, 5], "도필헌": [5, 3, 4, 6, 7], "이길환": [3, 3, 5, 7, 7], "이기석": [4, 6, 5, 4, 6], "김조학": [5, 4, 4, 5, 7], "이도형": [8, 8, 3, 2, 4], "고영훈": [7, 6, 5, 3, 4], "노기균": [7, 9, 3, 2, 4], "송주익": [7, 7, 5, 3, 3], "곽성주": [5, 5, 9, 2, 4], "조성춘": [5, 5, 4, 5, 6], "윤병수": [3, 7, 5, 4, 6], "김성진": [5, 6, 5, 4, 5], "송진섭": [2, 8, 3, 7, 5], "청달래": [3, 3, 5, 8, 6], "호유원": [2, 4, 4, 8, 7], "백석주": [6, 4, 6, 4, 5], "진나솔": [3, 8, 4, 6, 4], "이성해": [6, 7, 4, 2, 6], "이자헌": [9, 3, 6, 2, 5], "은하제": [4, 6, 4, 6, 5], "박민성": [7, 3, 9, 2, 4], "백사헌": [4, 8, 3, 5, 5], "고영은": [4, 4, 5, 6, 6], "강이학": [3, 6, 4, 6, 6], "장허운": [6, 2, 9, 2, 6], "곽제강": [2, 5, 3, 8, 7], "이연화": [2, 6, 4, 7, 6], "이병진": [4, 3, 5, 8, 5], "제이": [6, 4, 5, 6, 4], "차여진": [4, 4, 4, 6, 7], "서윤지": [4, 3, 4, 7, 7], "고연지": [4, 5, 4, 5, 7], "윤지아": [4, 6, 4, 5, 6], "마덕희": [5, 3, 4, 7, 6], "문혜란": [5, 5, 4, 6, 5], "신유리": [7, 7, 4, 3, 4], "블라렛": [6, 6, 5, 3, 5], "살라딘": [7, 5, 7, 2, 4], "아벤샤": [2, 5, 4, 8, 6], "세크리엠": [4, 9, 3, 5, 4], "브라우니": [5, 3, 5, 6, 6], "탐미주의": [4, 5, 3, 7, 6] };
-  var CW_SKILLS = { "쟈알디": { "사격": ["기본 사격", "총·투척", "물리", ""], "고유기": ["근접 폭파", "이능", "폭발", "손바닥 바로 앞 한 점에서 불덩이가 부풀어 터진다"], "충전0": ["구역 정리 0단", "이능", "폭발", "작은 폭발이 앞으로 일직선"], "충전1": ["구역 정리 1단", "이능", "폭발", "폭발 줄이 세 갈래 부채꼴"], "충전2": ["구역 정리 2단", "이능", "폭발", "쟈알디 둘레 원으로 바닥 전체가 터져 오른다"], "필살": ["보면 알아", "이능", "폭발", "발밑 첫 폭발…불기둥이 한꺼번에 터진다"] }, "스팡달": { "사격": ["기본 사격", "이능", "물리", ""], "고유기": ["그림자 이동", "이능", "물리", "검은 바늘 한 다발이 위로 찔러 올라 적을 띄운다"], "충전0": ["가시 격자 0단", "이능", "물리", "검은 바늘 세 개를 앞으로 일직선 연사(관통)"], "충전1": ["가시 격자 1단", "이능", "물리", "검은 가시 하나가 창처럼 뻗어"], "충전2": ["가시 격자 2단", "이능", "물리", "가시가 엇갈려 솟아 격자"], "필살": ["우습네. 정말.", "이능", "물리", "화면 바닥 전체 가시 숲"] }, "잼트리": { "사격": ["기본 사격", "총·투척", "물리", ""], "고유기": ["목덜미 쿡", "몸", "물리", "두 손가락을 목 높이로 찔러 넣는다 → 손등으로 턴다"], "충전0": ["정보 정리 0단", "몸", "물리", "두 손바닥으로 밀친다 → 앞 3m 다이빙"], "충전1": ["정보 정리 1단", "몸", "물리", "뒷무릎을 가슴 높이로 올려친다"], "충전2": ["정보 정리 2단", "몸", "물리", "하이힐 굽을 체중 실어 내리찍어"], "필살": ["모두의 언니", "몸", "물리", "목덜미를 찌르고 … 하이힐 굽으로 내리찍어"] }, "에일린": { "사격": ["기본 사격", "총·투척", "물리", ""], "고유기": ["제압사격", "총·투척", "물리", "제압사격"], "고유기2": ["판독", "총·투척", "없음(피해 없음)", "판독"], "충전0": ["숨 참기 0단", "총·투척", "물리", ""], "충전1": ["숨 참기 1단", "총·투척", "물리", ""], "충전2": ["숨 참기 2단", "총·투척", "물리", ""], "충전3": ["숨 참기 3단", "총·투척", "물리", ""], "필살": ["증명해.", "총·투척", "물리", "증명해."] }, "고그니쟈": { "사격": ["기본 사격", "총·투척", "물리", ""], "고유기": ["비상 장치 가동", "이능", "전기", "해치 틈에서 노란 전기 아크…감전시켜"], "충전0": ["꽤 깊지! 0단", "이능", "물리", "튀어 오르는 발판으로 퉁 들려"], "충전1": ["꽤 깊지! 1단", "이능", "물리", "강철 격리 셔터…밀쳐져 넘어지고"], "충전2": ["꽤 깊지! 2단", "이능", "물리", "바닥이 열려 구멍…무언가 들이받는 충격"], "필살": ["오오, 그 녀석은 성질이 좀 있지!", "이능", "음파", "그 녀석이 포효 → 검은 음압 충격 원뿔"] }, "큐라스": { "사격": ["기본 사격", "이능", "폭발", "손끝 스냅 → 목표 지점 작은 불꽃"], "고유기": ["요격", "이능", "폭발", "허공 한 점의 작은 불꽃 팡"], "충전0": ["지속 포격 0단", "이능", "폭발", "발밑 한 점을 터뜨린다"], "충전1": ["지속 포격 1단", "이능", "폭발", "일직선 다섯 점이 차례로 터진다"], "충전2": ["지속 포격 2단", "이능", "화염", "세로 화염벽이 바닥에서 솟아 2초 타오른다"], "필살": ["지휘", "이능", "폭발", "박마다 폭발 → 화면 가로 화염벽 두 줄"] }, "고르고디오": { "사격": ["기본 사격", "몸", "물리", "칼을 올려 드는 장에 바닥을 타는 충격파"], "고유기": ["초음속 돌격", "몸", "물리", "어깨를 앞세워…6m 돌진"], "충전0": ["식칼 내려치기 0단", "몸", "물리", "식칼을 바로 앞 바닥에 내리쳐"], "충전1": ["식칼 내려치기 1단", "몸", "물리", "균열이 6m 달려 나가고 돌판이 튀어 올라"], "충전2": ["식칼 내려치기 2단", "몸", "물리", "바닥이 꺼져 내려앉고 잔해가 쏟아진다"], "필살": ["붕괴 돌파", "몸", "물리", "초음속으로 들이받고 벽을 차 뚫는다 → 잔해"] }, "데쥬레": { "사격": ["기본 사격", "총·투척", "빛", "스캐너 앞끝 레이저"], "고유기": ["죄, 죄송해요!", "몸", "물리", "두 손으로 앞을 세게 밀친다"], "충전0": ["증언 재현 0단", "이능", "빛", "괴이 꼬리 궤적 홀로그램(분홍 주사선)"], "충전1": ["증언 재현 1단", "이능", "빛", "달려간 궤적 홀로그램이 일직선을 뚫고"], "충전2": ["증언 재현 2단", "이능", "빛", "분홍 와이어 상자 틀이 부풀며"], "필살": ["이건 꽝이에요", "이능", "빛", "분홍 레이저 막이 화면을 훑고 → 격자 터짐"] }, "데드폴": { "사격": ["기본 사격", "총·투척", "물리", ""], "고유기": ["되감기", "이능", "이상", "상처가 거꾸로 감겨…공격을 한 적이 시간이 되감겨"], "충전0": ["냄새 맡기 0단", "총·투척", "물리", "권총을 뽑아 근접 두 발"], "충전1": ["냄새 맡기 1단", "몸", "물리", "두 발 드롭킥으로 날아간다"], "충전2": ["냄새 맡기 2단", "총·투척", "물리", "적 최대 4명에게 한 발씩"], "필살": ["여기서 제가 한 번 죽으면", "이능", "이상", "거대한 남색 시계 고리…받아 낸 공격들이 되돌아가 터진다"] }, "게슈간": { "사격": ["기본 사격", "이능", "염동", "쥐는 순간 대상 자리가 일그러짐"], "고유기": ["고정", "이능", "염동", "발밑 일그러짐 고리, 공중으로 들려"], "충전0": ["던지기 / 짓뭉개기 0단", "이능", "염동", "한 점에 위에서 힘이 쿵 떨어진다"], "충전1": ["던지기 / 짓뭉개기 1단", "이능", "염동", "들어 올려 멀리 던진다"], "충전2": ["던지기 / 짓뭉개기 2단", "이능", "염동", "공간이 구겨지듯 오므라들며 짓눌려"], "필살": ["가리키고, 보고, 쥐고", "이능", "염동", "적 전원을 들어 올려 한꺼번에 내리꽂는다"] }, "로제몬": { "사격": ["기본 사격", "이능", "염동", "편 손가락 끝에서 실"], "고유기": ["돌아가.", "총·투척", "물리", "손끝에서 동전이 튕겨 나가 직선 5m"], "충전0": ["인형술 0단", "이능", "염동", "보라 실이 붙어 질질 끌려옴"], "충전1": ["인형술 1단", "이능", "염동", "실로 들어 올렸다 거꾸로 내리꽂음"], "충전2": ["인형술 2단", "이능", "염동", "실 세 가닥…서로 머리를 부딪침"], "필살": ["앙상블", "이능", "염동", "꼭두각시처럼 끌려…한가운데로 끌려와 부딪힘"] }, "콘쥬스": { "사격": ["기본 사격", "총·투척", "물리", "상자·잔해를 두 손 위치에서 던짐"], "고유기": ["바리케이드 번쩍", "몸", "물리", "바리케이드를 뽑아 들어 쿵 내려 세움"], "충전0": ["실 꿰기 질주 0단", "몸", "물리", "어깨로 밀쳐 냄"], "충전1": ["실 꿰기 질주 1단", "몸", "물리", "전력 질주…두 팔로 퍼올려 넘김"], "충전2": ["실 꿰기 질주 2단", "몸", "물리", "지그재그로 꿰어 달림…흙먼지 부채꼴"], "필살": ["제가 다 치울게요!", "몸", "물리", "적 더미를 통째로 밀어붙임"] }, "사장": { "사격": ["기본 사격", "이능", "이상", "지목한 적 자리에 검은 선"], "고유기": ["검은 선", "이능", "이상", "검은 가로선이 위아래로 벌어져 칠흑 틈"], "충전0": ["분신 0단", "이능", "물리", "분신 1명이 손날로 찌르고 선 속으로"], "충전1": ["분신 1단", "이능", "물리", "분신 2명이 양쪽에서 손날로 찌름"], "충전2": ["분신 2단", "이능", "이상", "가로 검은 선 네 줄이 깊이별로 그어지고"], "필살": ["정지", "이능", "이상", "세상이 멈춤 → X자 선이 칠흑 틈으로 벌어져"] }, "도필헌": { "사격": ["기본 사격", "총·투척", "물리", "가리키면 화면 밖 부하가 쏨"], "고유기": ["앉게.", "몸", "물리", "앞발로 발목을 걸어 당기면"], "충전0": ["값을 매기지 0단", "몸", "물리", "곁차기"], "충전1": ["값을 매기지 1단", "몸", "물리", "발따귀"], "충전2": ["값을 매기지 2단", "몸", "물리", "두발당성…발 구름 충격파"], "필살": ["거짓말이 빠진 방", "몸", "물리", "딴죽…두발당성 착지 충격이 황동색 고리로"] }, "이길환": { "사격": ["기본 사격", "이능", "음파", "마이크 앞 소리 고리"], "고유기": ["아, 아, 테스트", "이능", "음파", "「삐익—"], "충전0": ["충분히 이해합니다 0단", "이능", "음파", "마이크 앞에서 음압 덩어리가 퍽"], "충전1": ["충분히 이해합니다 1단", "몸", "물리", "둥근 배부터 날아든다(날아 배치기)"], "충전2": ["충분히 이해합니다 2단", "이능", "음파", "음파 고리가 둘레 원으로 세 번"], "필살": ["튜토리얼", "이능", "음파", "음파 막 → 겹고리 음파 네 겹"] }, "이기석": { "사격": ["기본 사격", "이능", "음파", "마이크에 대고 외치기"], "고유기": ["의수 발사", "총·투척", "물리", "의수가 빠져 회전하며 직선 5m를 날아감"], "충전0": ["인류의 방패! 0단", "총·투척", "물리", "의수가 빠져 앞 2m 바닥에 주먹째 쾅"], "충전1": ["인류의 방패! 1단", "총·투척", "물리", "의수가 와이어를 끌며 직선 7m 관통"], "충전2": ["인류의 방패! 2단", "몸", "물리", "와이어 의수를 철퇴처럼 휩쓸어 내리침"], "필살": ["팀 발표", "몸", "물리", "의수 날려 턱 → 철퇴 휩쓸기 → 의수 주먹 바닥에 내리꽂아 금빛 충격파"] }, "김조학": { "사격": ["기본 사격", "총·투척", "물리", "서류철 앞끝에서 종이"], "고유기": ["책상 내려치기", "몸", "물리", "서류철을 쾅 내리침"], "충전0": ["선택적인 증거 제시 0단", "몸", "물리", "서류철 모서리가 명치를 찔러"], "충전1": ["선택적인 증거 제시 1단", "몸", "물리", "앞어깨부터 몸통째 들이받으며 돌진"], "충전2": ["선택적인 증거 제시 2단", "몸", "물리", "뒤꿈치로 쾅 밟는다 → 둘레 원"], "필살": ["영상 올리기 전에", "몸", "물리", "서류철 내리치기 → 경비 태클 → 구둣발 충격선"] }, "이도형": { "사격": ["기본 사격", "몸", "물리", "수평 베기 바람"], "고유기": ["흉백", "몸", "물리", "지나온 직선 위 적…흰 베기 세 줄이 터진다"], "충전0": ["간파 0단", "몸", "물리", "앞 2m를 내려벰"], "충전1": ["간파 1단", "몸", "물리", "칼등으로 튕겨 냄 → 내려베기"], "충전2": ["간파 2단", "몸", "물리", "「죽는 자리"], "필살": ["건물 가르기", "몸", "물리", "한 번에 수평으로 휘둘러 화면 가로 전체"] }, "고영훈": { "사격": ["기본 사격", "몸", "물리", "칼끝 찌르기 바람"], "고유기": ["찔러.", "몸", "물리", "맨손으로 움켜쥐고…부대원 그림자가 칼로 찌르고"], "충전0": ["셋으로 나눈다 0단", "몸", "물리", "부대원 1명이 돌진하며 벰"], "충전1": ["셋으로 나눈다 1단", "몸", "물리", "부대원 3명이 동시에 돌진"], "충전2": ["셋으로 나눈다 2단", "몸", "물리", "교차 베기 → 흰 베기 세 줄이 별 모양"], "필살": ["킹", "몸", "물리", "짧고 정확한 베기 세 번 → 부대원 다섯이 찔러 들어감"] }, "노기균": { "사격": ["기본 사격", "몸", "물리", "찌르기 검기"], "고유기": ["튕겨 들어가기", "몸", "물리", "세 번 통통 튀어…아래에서 위로 올려벤다"], "충전0": ["검증 대련 0단", "몸", "물리", "제자리 내리베기"], "충전1": ["검증 대련 1단", "몸", "물리", "칼선 네 개가 네모난 칸"], "충전2": ["검증 대련 2단", "몸", "물리", "네 번 벰 → 어깨 높이 가로 검기 6m"], "필살": ["수고하십시오!", "몸", "물리", "지그재그로 튕겨 다니며 올려벤다"] }, "송주익": { "사격": ["기본 사격", "몸", "물리", "칼바람"], "고유기": ["시범 베기", "몸", "물리", "머리 위에서 무릎 높이까지 곧게 내려친다"], "충전0": ["선착 0단", "몸", "물리", "칼끝으로 짧게 그어 올린다"], "충전1": ["선착 1단", "몸", "물리", "두 걸음 튀어 지나가며 베기"], "충전2": ["선착 2단", "몸", "물리", "똑같은 정석 내려치기를 꽂는다"], "필살": ["예카테리나", "이능", "물리", "거대한 청록 칼 그림자(예카테리나)가 찔러 나간다"] }, "곽성주": { "사격": ["기본 사격", "총·투척", "물리", "미니건 연사(과열)"], "고유기": ["전원 내 뒤로", "몸", "물리", "디딘 발에서 앞으로 땅을 타고 가는 흙 충격파"], "충전0": ["제압 사격 0단", "총·투척", "물리", "짧게 한 줄 끊어 쏜다"], "충전1": ["제압 사격 1단", "총·투척", "물리", "2초 연사…부채꼴"], "충전2": ["제압 사격 2단", "총·투척", "물리", "3초 연사…탄착점이 걸어 나가며"], "필살": ["후퇴는 없다", "총·투척", "폭발", "전탄 난사 → 판처파우스트 세 발…큰 폭발"] }, "조성춘": { "사격": ["기본 사격", "이능", "음파", "고함(음파)"], "고유기": ["넥타이 풀기", "몸", "물리", "뒷주먹을 머리 높이로 곧게 내지른다"], "충전0": ["실황 중계 0단", "이능", "음파", "「야!!"], "충전1": ["실황 중계 1단", "이능", "음파", "노란 일그러짐이 앞 5m 원뿔로"], "충전2": ["실황 중계 2단", "몸", "물리", "다이빙 태클"], "필살": ["진공작전", "이능", "음파", "주먹 여섯 번 → 거대한 노란 음압 원뿔"] }, "윤병수": { "사격": ["기본 사격", "총·투척", "화염", "짧게 화염"], "고유기": ["화염방사", "총·투척", "화염", "노즐을 쓸어 올린다…불길"], "충전0": ["수류탄 0단", "총·투척", "폭발", "발 앞에 수류탄을 굴려 → 작은 폭발"], "충전1": ["수류탄 1단", "총·투척", "폭발", "5m 굴려 넣는다 → 폭발"], "충전2": ["수류탄 2단", "총·투척", "폭발", "세 개를 부채꼴로…차례로 세 번 폭발"], "필살": ["채점 중", "이능", "폭발", "윤병수 인형 둘이 불길 → 동시에 터진다"] }, "김성진": { "사격": ["기본 사격", "총·투척", "물리", ""], "고유기": ["야 저거 봤냐", "총·투척", "물리", "걸어 나가며 세 번 쏜다"], "충전0": ["주운 거 다 써 0단", "몸", "물리", "따귀 → 훅"], "충전1": ["주운 거 다 써 1단", "몸", "물리", "앞어깨로 몸통째 들이받는다"], "충전2": ["주운 거 다 써 2단", "몸", "물리", "이마로 들이받는다"], "필살": ["생환 기록", "총·투척", "물리", "쉬지 않고 쏜다…부채꼴"] }, "송진섭": { "사격": ["기본 사격", "총·투척", "물리", ""], "고유기": ["말다툼 중 한 발", "총·투척", "물리", "앞손만 권총을 뻗어 한 발"], "충전0": ["지도 왼쪽이요! 0단", "이능", "전기", "단말기에서 하늘색 펄스 호"], "충전1": ["지도 왼쪽이요! 1단", "이능", "전기", "앞 6m 직선 펄스 띠 → 뒤 4m"], "충전2": ["지도 왼쪽이요! 2단", "이능", "전기", "레이더 쓸림 선이 한 바퀴 회전"], "필살": ["우리 팀 눈", "총·투척", "폭발", "7팀 지원 사격(박격포탄)…차례로 폭발"] }, "청달래": { "사격": ["기본 사격", "이능", "화염", "이무기의 숨(입 앞 불)"], "고유기": ["뻗는 손", "이능", "정신", "손을 뻗었고 그 사람이 털썩 쓰러졌다 … 썩어 가는 백일몽 사무실"], "충전0": ["사번 받게 0단", "이능", "화염", "짧은 주황 불 혀"], "충전1": ["사번 받게 1단", "이능", "화염", "주황 불줄기 6m 일직선"], "충전2": ["사번 받게 2단", "이능", "화염", "거대한 불 인장이 세로로 쾅"], "필살": ["무슨 소란인가", "이능", "화염", "갈라진 금마다 주황 가뭄불이 솟구친다"] }, "호유원": { "사격": ["기본 사격", "이능", "음파", "통화 소리"], "고유기": ["확인했어요, ~님", "이능", "화염", "손등 여우 꼬리 무늬 → 금빛 여우불 폭발"], "충전0": ["아홉 번째 대답 0단", "이능", "화염", "금빛 여우불 구슬 하나가 날아가"], "충전1": ["아홉 번째 대답 1단", "이능", "물리", "그림자 여우 꼬리 다섯 갈래가 후려친다"], "충전2": ["아홉 번째 대답 2단", "이능", "물리", "그림자 꼬리 아홉 갈래가 원을 쓸어"], "필살": ["가장 소중한 것이 만나러 와요", "이능", "정신", "얼굴에 호유원의 웃는 입이 겹쳐진다(빙의)…가장 소중한 것이 뽑혀"] }, "백석주": { "사격": ["기본 사격", "몸", "물리", "박수 장풍(공기 고리)"], "고유기": ["어깨 도장", "몸", "물리", "어깨를 톡톡 → 두 손바닥으로 귀를 친다"], "충전0": ["진입 전 점검 0단", "몸", "물리", "손날로 쇄골 높이를 내려친다"], "충전1": ["진입 전 점검 1단", "몸", "물리", "앞팔뚝을 쓸어 치우며 미끄러진다"], "충전2": ["진입 전 점검 2단", "몸", "물리", "V자로 꺾여 손날로 무릎·턱"], "필살": ["A조에 온 걸 환영해", "몸", "물리", "되감기 고리로 줄 세움 → 손날로 두 번씩 → 무릎"] }, "진나솔": { "사격": ["기본 사격", "총·투척", "물리", "손톱 쏘기"], "고유기": ["당기기", "이능", "물리", "손톱이 박히면…실이 팽팽해져 질질 끌려오고"], "충전0": ["외알 안경 0단", "총·투척", "물리", "손톱 한 개가 곧게 날아감"], "충전1": ["외알 안경 1단", "이능", "물리", "실 한 가닥이 수평으로…가로로 베여"], "충전2": ["외알 안경 2단", "이능", "물리", "실 다섯 가닥이 별 모양으로 조여"], "필살": ["퇴근", "이능", "물리", "화면 전체 실 그물이 한꺼번에 조이며"] }, "이성해": { "사격": ["기본 사격", "총·투척", "물리", "명함"], "고유기": ["죄송해여!", "몸", "물리", "손날을 목 높이로 곧게 찌름"], "충전0": ["안녕하세여! 실례합니다아! 0단", "몸", "물리", "숙이는 머리로 박치기"], "충전1": ["안녕하세여! 실례합니다아! 1단", "몸", "물리", "손바닥으로 턱을 올려 침"], "충전2": ["안녕하세여! 실례합니다아! 2단", "몸", "물리", "손목을 잡아 비틀어 꺾어 넘기고"], "필살": ["다들 데리고 나왔어여", "이능", "이상", "회색 철문(격리문)이 솟아…문 안으로 빨려 들어감 → 쾅 닫힘"] }, "이자헌": { "사격": ["기본 사격", "총·투척", "물리", "던진 조각"], "고유기": ["버터나이프 틈", "몸", "물리", "버터나이프로 세로 틈 → 멱살을 쥐고 끌어 처박음"], "충전0": ["손잡이 한 방 0단", "몸", "물리", "뒷주먹 스트레이트"], "충전1": ["손잡이 한 방 1단", "몸", "물리", "주먹이 공기를 쳐서 흰 충격 기둥이 5m"], "충전2": ["손잡이 한 방 2단", "몸", "물리", "머리와 어깨를 움켜쥐고 바닥까지 끌어내려 처박음"], "필살": ["물리 퇴마", "몸", "물리", "뒷주먹 두 번 → 벽에 박힘"] }, "은하제": { "사격": ["기본 사격", "총·투척", "물리", "수갑 던지기"], "고유기": ["수갑", "총·투척", "물리", "수갑을 던져…손을 당겨 끌어 엎음"], "충전0": ["지도 없는 층 0단", "몸", "물리", "앞주먹을 배 높이로"], "충전1": ["지도 없는 층 1단", "몸", "물리", "팔꿈치·어깨로 미끄러진다"], "충전2": ["지도 없는 층 2단", "몸", "물리", "명치 → 팔꿈치 → 정강이 → 무릎"], "필살": ["통화 연결", "총·투척", "물리", "수갑 사슬이 채찍처럼 물결치며…메다꽂히듯"] }, "박민성": { "사격": ["기본 사격", "총·투척", "물리", "짐 던지기"], "고유기": ["모방 머플러", "몸", "물리", "모방 머플러로 굳어 버팀 → 반격"], "충전0": ["문 담당 0단", "몸", "물리", "앞어깨를 들이밂"], "충전1": ["문 담당 1단", "몸", "물리", "어깨로 들이받으며 돌진"], "충전2": ["문 담당 2단", "몸", "물리", "퍼 올려 머리 위로 던짐 → 깔림"], "필살": ["다시는 안 해", "몸", "물리", "질주 → 등에 멘 적째 주저앉음"] }, "백사헌": { "사격": ["기본 사격", "총·투척", "물리", "숨긴 물건 던지기"], "고유기": ["미끼", "몸", "물리", "뒷주먹이 꽂힌다 → 앞발바닥으로 밀어 차기"], "충전0": ["역안 0단", "몸", "물리", "앞어깨로 들이받으며"], "충전1": ["역안 1단", "몸", "물리", "발목을 낚아"], "충전2": ["역안 2단", "몸", "물리", "등 뒤로 미끄러져 등을 밀어 참"], "필살": ["추가 지급", "몸", "물리", "뒷머리를 꽂고 → 두 무릎으로 내리찍음"] }, "고영은": { "사격": ["기본 사격", "총·투척", "물리", "예비 배터리"], "고유기": ["헤드램프", "이능", "빛", "이마에서 흰 빛 원뿔"], "충전0": ["중증도 분류 0단", "몸", "물리", "압박붕대가 가로로 튕겨 침"], "충전1": ["중증도 분류 1단", "몸", "물리", "눈 가리고 → 이마 → 주먹 내리쳐"], "충전2": ["중증도 분류 2단", "몸", "물리", "포갠 두 손으로 내리누름(심폐소생)"], "필살": ["R조의 양심", "이능", "빛", "헤드램프 최대 출력 빛기둥 → 흰 빛 막 → 흰 빛 고리"] }, "강이학": { "사격": ["기본 사격", "총·투척", "물리", "동전 던지기"], "고유기": ["값 매기기", "몸", "물리", "엄지척 주먹을 턱 밑에서 위로"], "충전0": ["협상 테이블 0단", "총·투척", "물리", "동전 한 줌이 산탄처럼"], "충전1": ["협상 테이블 1단", "총·투척", "물리", "동전 줄기 7m 관통"], "충전2": ["협상 테이블 2단", "이능", "오염", "적 몸에서 괴이 화폐가 뽑혀 나와 지갑으로 빨려 들어옴"], "필살": ["매뉴얼만 지키면요", "총·투척", "물리", "동전 줄기 세 줄 → 동전 비"] }, "장허운": { "사격": ["기본 사격", "총·투척", "물리", "투포환처럼 잔해"], "고유기": ["막아 서기", "몸", "물리", "가슴과 앞팔뚝이 반원을 들이받아"], "충전0": ["기둥 들기 0단", "몸", "물리", "퍼 올려 띄운다"], "충전1": ["기둥 들기 1단", "몸", "물리", "발목을 움켜쥐고 끌어당기며"], "충전2": ["기둥 들기 2단", "몸", "물리", "들어 올려 투포환처럼 던진다"], "필살": ["사람으로 대할 것", "몸", "물리", "팔뚝으로 들이받고 → 땅이 갈라져 터져 오름"] }, "곽제강": { "사격": ["기본 사격", "총·투척", "물리", "볼펜"], "고유기": ["흥미로운데요", "몸", "물리", "이마 박치기 → 볼펜 끝으로 콕콕콕"], "충전0": ["혼돈 변수 투입 0단", "총·투척", "오염", "시료병을 던진다 → 연보라 거품이 펑"], "충전1": ["혼돈 변수 투입 1단", "총·투척", "오염", "시료병 세 개…펑펑펑"], "충전2": ["혼돈 변수 투입 2단", "총·투척", "오염", "플라스크를 던진다 → 연보라 꿈결 기둥"], "필살": ["분기별 기상 특보", "이능", "전기", "먹구름에서 벼락이 적마다 세 번 → 거대 벼락"] }, "이연화": { "사격": ["기본 사격", "총·투척", "오염", "병 입구에서 액체"], "고유기": ["잠깐만요", "몸", "물리", "손바닥을 세운다 → 짧은 충격 고리"], "충전0": ["배합 실험 0단", "총·투척", "오염", "시약 물보라 → 따가워"], "충전1": ["배합 실험 1단", "총·투척", "오염", "시약을 가는 줄기로 쏘아 낸다"], "충전2": ["배합 실험 2단", "총·투척", "오염", "병을 던진다 → 시약 비·남보라 연기"], "필살": ["과장님!", "총·투척", "오염", "메다꽂는 순간 시약병들이 깨져…끓어올라 터져 나간다"] }, "이병진": { "사격": ["기본 사격", "총·투척", "물리", "빨간 잉크 점"], "고유기": ["빨간 펜", "몸", "물리", "빨간 사인펜을 쭉 내리긋는다…베인다"], "충전0": ["급행 처리 0단", "몸", "물리", "손바닥을 밀어 낸다"], "충전1": ["급행 처리 1단", "몸", "물리", "양손으로 번갈아 두 번 밀고"], "충전2": ["급행 처리 2단", "몸", "물리", "다리에 매달려 넘어뜨리고"], "필살": ["처음으로 쓸모 있어진 순간", "이능", "정신", "제문의 한자 획이 칼날처럼 떨어지고 → 붉은 낙관"] }, "제이": { "사격": ["기본 사격", "이능", "물리", "바닥을 타는 그림자"], "고유기": ["앞발", "이능", "물리", "검은 그림자 발톱 궤적 세 줄이 단두대처럼"], "충전0": ["냄새가 달라요 0단", "이능", "물리", "그림자가 2m 뻗어 발목을 문다"], "충전1": ["냄새가 달라요 1단", "이능", "물리", "그림자 입이 벌어졌다 닫히며"], "충전2": ["냄새가 달라요 2단", "이능", "물리", "바닥 전체가 입처럼 벌어졌다 닫히며"], "필살": ["완전 발현", "이능", "물리", "그림자 바다 → 그림자 막이 화면 가운데로 쾅"] }, "차여진": { "사격": ["기본 사격", "총·투척", "물리", "의뢰서 한 장"], "고유기": ["팔 수 있을 만큼만", "몸", "물리", "두 손가락을 칼날처럼 찔러 넣는다"], "충전0": ["규정상 이렇게 해도 돼 0단", "몸", "물리", "하이힐 굽 끝으로 정강이"], "충전1": ["규정상 이렇게 해도 돼 1단", "몸", "물리", "굽으로 내리찍는다 → 바닥 금"], "충전2": ["규정상 이렇게 해도 돼 2단", "몸", "물리", "두 굽을 나란히 내리 디딘다"], "필살": ["두 번째 휴대전화", "몸", "물리", "화면 밖에서 검붉은 베기 섬광이…X자 베기"] }, "서윤지": { "사격": ["기본 사격", "총·투척", "물리", "조항 글자 줄"], "고유기": ["업무 관련 금품 수수 불가", "몸", "물리", "서류철을 반듯이 밀어 내민다(반사)"], "충전0": ["처리 기록 0단", "몸", "물리", "손날 찌르기"], "충전1": ["처리 기록 1단", "몸", "물리", "찌르기 → 내려찍기 → 올려치기"], "충전2": ["처리 기록 2단", "몸", "물리", "미끄러져 장저"], "필살": ["수정 요청 없음", "몸", "물리", "직각으로 꺾이며 정수리 내려찍기 → 네모 충격 고리"] }, "고연지": { "사격": ["기본 사격", "총·투척", "물리", "메스 던지기"], "고유기": ["견적", "몸", "물리", "손끝으로 짚고 → 봉합 바늘로 세 번 찔러"], "충전0": ["마취 0단", "총·투척", "물리", "메스 한 자루를 던진다"], "충전1": ["마취 1단", "총·투척", "물리", "메스 세 자루 연달아"], "충전2": ["마취 2단", "몸", "오염", "목에 마취 주사를 꽂는다 → 잠든다"], "필살": ["수술 여섯 시간째", "몸", "물리", "마취 가스 → 잠든 적 사이 손놀림 → 퍼뜩 깨어나며 튕겨"] }, "윤지아": { "사격": ["기본 사격", "총·투척", "물리", "사탕"], "고유기": ["잠깐만요", "몸", "물리", "손목을 감싸 쥐고 비튼다"], "충전0": ["오늘 날씨 진짜 이상하죠? 0단", "몸", "물리", "두 손바닥으로 밀어 낸다"], "충전1": ["오늘 날씨 진짜 이상하죠? 1단", "몸", "물리", "발바닥으로 찬다"], "충전2": ["오늘 날씨 진짜 이상하죠? 2단", "몸", "물리", "붙잡아 바닥에 내리꽂는다"], "필살": ["시술 준비 끝", "몸", "물리", "세 번 내리꽂아 앉힘 → 먼지 고리"] }, "마덕희": { "사격": ["기본 사격", "총·투척", "물리", "가격표"], "고유기": ["자기야, 이거 안 좋은 거네요", "몸", "물리", "손등으로 뺨 → 검지로 가슴"], "충전0": ["80. 얘기 끝났어요 0단", "몸", "물리", "손바닥을 밀어 낸다"], "충전1": ["80. 얘기 끝났어요 1단", "몸", "물리", "무릎으로 명치를 찍고"], "충전2": ["80. 얘기 끝났어요 2단", "몸", "물리", "팔꿈치를 내리찍는다"], "필살": ["헐값매입", "몸", "물리", "손등·검지·굽 → 팔꿈치 내리찍기"] }, "문혜란": { "사격": ["기본 사격", "총·투척", "물리", "카드"], "고유기": ["바닥 차갑지?", "몸", "물리", "진압봉 내려치기·올려치기 → 발목 걸기"], "충전0": ["앉아, 앉아 0단", "몸", "물리", "래리어트"], "충전1": ["앉아, 앉아 1단", "몸", "물리", "구두 밑창으로 밀어 찬다"], "충전2": ["앉아, 앉아 2단", "총·투척", "물리", "표시된 카드 다섯 장을 튕긴다"], "필살": ["대박알선 뒷방", "총·투척", "물리", "카드 수십 장 → 진압봉으로 바닥을 쾅"] }, "신유리": { "사격": ["기본 사격", "총·투척", "물리", "단검 던지기"], "고유기": ["추심", "몸", "물리", "단검을 두 번 짧게 찌른다"], "충전0": ["도로 앉아 0단", "몸", "물리", "어깨를 움켜쥐고 누른다"], "충전1": ["도로 앉아 1단", "몸", "물리", "미끄러져 잡아 엎어 누른다"], "충전2": ["도로 앉아 2단", "몸", "물리", "안전화 뒤꿈치로 내리밟는다"], "필살": ["추심 시 사전 통보 없음", "몸", "물리", "콘크리트 벽이 좁혀 → 철문 → 단검 세 번"] }, "블라렛": { "사격": ["기본 사격", "총·투척", "물리", "은탄 쌍권총"], "고유기": ["성검 발현", "몸", "빛", "십자가에서 흰 빛의 십자 장검…크게 내려벤다"], "충전0": ["은탄 0단", "총·투척", "물리", "쌍권총 두 발"], "충전1": ["은탄 1단", "총·투척", "물리", "좌우 번갈아 6연사"], "충전2": ["은탄 2단", "이능", "빛", "손바닥 성화…흰 금빛 불꽃"], "필살": ["영원한 십자군", "이능", "빛", "대성당 빛기둥 → 화면 높이 성검 내려베기"] }, "살라딘": { "사격": ["기본 사격", "총·투척", "물리", ""], "고유기": ["인간 믹서기", "몸", "물리", "곡도 두 번 내리벤다 + 소총이 불을 뿜는다"], "충전0": ["형제여! 0단", "이능", "음파", "함성 자체가 터짐 → 푸른 음파 고리"], "충전1": ["형제여! 1단", "이능", "물리", "푸른 형제 둘이 솟아 곡도를 찔러 올림"], "충전2": ["형제여! 2단", "이능", "물리", "형제가 차례로 솟아오르는 긴 줄"], "필살": ["메카의 군세", "이능", "물리", "형제 대열이 화면을 가로질러 돌격"] }, "아벤샤": { "사격": ["기본 사격", "이능", "물리", "모래 탄환"], "고유기": ["모래 탄환", "이능", "물리", "압축된 금빛 모래 덩어리가 한 발씩"], "충전0": ["흐르는 모래 0단", "이능", "물리", "모래 방벽이 솟음…밀쳐 냄"], "충전1": ["흐르는 모래 1단", "이능", "물리", "모래 줄기가 되어 흘러가…다리를 휩쓸려"], "충전2": ["흐르는 모래 2단", "이능", "폭발", "모래 기둥이 차례로 폭발하며 솟음"], "필살": ["모래 해일", "이능", "물리", "모래 해일이 무너져 덮침"] }, "세크리엠": { "사격": ["기본 사격", "이능", "물리", "피의 칼날 던지기"], "고유기": ["피의 칼날", "이능", "물리", "손톱 끝에서 진홍 초승달 칼날 세 갈래"], "충전0": ["핏빛 안개 0단", "이능", "없음(피해 없음)", "핏빛 안개로 흩어져 뒤로 3m"], "충전1": ["핏빛 안개 1단", "이능", "물리", "안개 속 핏방울 칼끝에 긁혀 여러 번"], "충전2": ["핏빛 안개 2단", "몸", "물리", "안개로 휘감아 띄움 → 등 뒤에서 올려 할큄"], "필살": ["붉은 눈", "이능", "물리", "붉은 파동 → 안개 소용돌이 → 화면 폭 칼날 세 갈래"] }, "브라우니": { "사격": ["기본 사격", "이능", "전기", "방송 송출(TV 화면에서 전파)"], "고유기": ["박수!", "몸", "물리", "손뼉 두 번 → 「짝!"], "충전0": ["정답은? 0단", "몸", "물리", "장갑 손바닥으로 정수리를 누른다"], "충전1": ["정답은? 1단", "몸", "물리", "두 손바닥으로 누르며 착지 → 공기 충격"], "충전2": ["정답은? 2단", "이능", "전기", "TV 화면에서 백색 잡음 전파 띠"], "필살": ["화요퀴즈쇼", "이능", "물리", "거인 브라우니의 손뼉 → 공기 충격 고리 → 손바닥으로 쾅"] }, "탐미주의": { "사격": ["기본 사격", "이능", "오염", "물감 뿌리기"], "고유기": ["물감", "이능", "오염", "목에 검은 물감 소용돌이…검은 물감을 쏟는다"], "충전0": ["갈아타기 0단", "몸", "물리", "손등으로 가로 쳐냄"], "충전1": ["갈아타기 1단", "이능", "물리", "빈 마네킹이 터져 대리석 조각"], "충전2": ["갈아타기 2단", "몸", "물리", "등 뒤에서 손등으로 쳐내"], "필살": ["예술은 조각이다", "이능", "이상", "적 전원이 회색 대리석 결로 덮이며 굳고 → 산산조각"] } };
-  var CW_BADGE = { "단련된 주먹": 0, "빠른 손놀림": 1, "미끄럼 숙련": 2, "충격 주먹": 3, "두통 유발": 4, "따라 치는 그림자": 5, "발목 걸기": 6, "무거운 한 방": 7, "넓은 휘두르기": 8, "공중 사냥": 9, "마무리 일격": 10, "벽꽝 강화": 11, "내려찍기": 12, "출혈 일격": 13, "패대기": 14, "당구": 15, "족쇄 차기": 16, "정조준": 17, "빠른 방아쇠": 18, "거리 감각": 19, "냉각 장치": 20, "투척 강화": 21, "급소 겨냥": 22, "겹탄": 23, "관통탄": 24, "도탄": 25, "폭발탄": 26, "표식탄": 27, "겁주기": 28, "부메랑 투척": 29, "과열 방출": 30, "가벼운 발": 31, "연속 회피": 32, "회피 충전 단축": 33, "무적 회피": 34, "긴 회피": 35, "3단 점프": 36, "회피 폭탄": 37, "미끼 잔상": 38, "꿰뚫는 회피": 39, "낙법": 40, "질주 들이받기": 41, "가드 강화": 42, "완전 방어": 43, "탄 되받기": 44, "되받아치기": 45, "가시 방패": 46, "깨지며 터진다": 47, "혼쭐": 48, "고유기 숙련": 49, "고유기 강화": 50, "충전 단축": 51, "충전 강화": 52, "필살 충전": 53, "필살 강화": 54, "시작 게이지": 55, "고통 증폭": 56, "고유기 2회": 57, "끌어당기는 충전": 58, "혼란 충전": 59, "둔화 고유기": 60, "침묵의 필살": 61, "앙코르": 62, "깊은 상처": 63, "지속 연장": 64, "약점 찌르기": 65, "내성": 66, "정신 방벽": 67, "오염 손톱": 68, "오염 전파": 69, "그림자 습격": 70, "첫 일격": 71, "배수진": 72, "정예 사냥": 73, "일대일": 74, "시체 폭발": 75, "위협": 76, "튼튼한 몸": 77, "응급 치료": 78, "두꺼운 가죽": 79, "위기 회복": 80, "다운 무시": 81, "버티기": 82, "방어막": 83, "피 터뜨리기": 84, "표식 전염": 85, "급소 간파": 86, "겁먹은 등": 87, "묶인 과녁": 88, "두통 울림": 89, "제 편 때리기": 90, "얼어붙은 발": 91, "입막음 처형": 92, "오염 연소": 93, "상처 옮기기": 94, "자세 무너뜨리기": 95, "기절 추격": 96, "혼란 틈": 97, "틈새 사격": 98, "연속 처치": 99, "무피격": 100, "사냥 기록": 101, "피의 저금통": 102, "아슬아슬": 103, "콤보 고조": 104, "쌓인 울분": 105, "현장 경험": 106, "탄피 모으기": 107, "되갚기": 108, "연쇄 폭파": 109, "피바다": 110, "탄막 반사": 111, "빈틈 없음": 112, "그림자 분대": 113, "유성 낙하": 114, "사냥꾼의 눈": 115, "소용돌이": 116, "역병": 117, "반응 장갑": 118, "죽은 채로 있을 수가 없다": 119, "앉게": 120, "방 안이 먼저 지친다": 121, "책상 내려치기": 122, "치유 반지": 123, "보이지 않는 사슬": 124, "혼돈 변수": 125, "규정상 이렇게 해도 돼": 126, "금품 수수 불가": 127, "수술 여섯 시간째": 128, "바닥 차갑지?": 129, "일부러 비좁게": 130, "진조의 피": 131, "맨손으로 쳐낸다": 132, "힘 단련": 133, "민 단련": 134, "체 단련": 135, "지 단련": 136, "정 단련": 137, "무모함": 138, "유리 대포": 139, "철벽": 140, "경량화": 141, "난사": 142, "한 방 주의": 143, "광전사": 144, "과충전": 145, "되감는 시계": 146, "피의 대가": 147, "겁쟁이": 148, "저주받은 손": 149, "도박꾼": 150, "무거운 장비": 151, "탐욕": 152, "단식": 153, "총 버림": 154, "외길": 155, "피에 굶주림": 156, "약 잘 쓰는 손": 157, "넉넉한 주머니": 158, "아끼기": 159, "한 모금": 160, "퀵 드로우": 161, "응급 자동 사용": 162, "맨몸": 163 };
-
-  // src/game/action/ui/badgeArt.ts
-  var RAMP = {
-    희귀: null,
-    // 은 = 그대로
-    일반: [[40, 22, 12], [150, 84, 40], [236, 176, 120]],
-    특급: [[56, 38, 6], [196, 146, 30], [255, 236, 150]]
-  };
-  var sheets = [];
-  var cache5 = /* @__PURE__ */ new Map();
-  function loadBadges(urlOf) {
-    sheets = [];
-    cache5.clear();
-    for (let k = 1; k <= 6; k++) {
-      const i = k - 1;
-      void urlOf(`sheet${k}.png`).then((src) => {
-        const im = new Image();
-        im.onload = () => {
-          sheets[i] = im;
-        };
-        im.src = src;
-      }).catch(() => {
-      });
-    }
-  }
-  function badgeOf(name, grade = "희귀") {
-    const n = CW_BADGE[name];
-    if (n === void 0) return null;
-    const key = `${n}|${grade}`;
-    const hit2 = cache5.get(key);
-    if (hit2) return hit2;
-    const sh = sheets[Math.floor(n / 32)];
-    if (!sh) return null;
-    const cv = document.createElement("canvas");
-    cv.width = cv.height = 64;
-    const g = cv.getContext("2d");
-    g.imageSmoothingEnabled = false;
-    g.drawImage(sh, n % 8 * 64, Math.floor(n % 32 / 8) * 64, 64, 64, 0, 0, 64, 64);
-    const ramp = RAMP[grade];
-    if (ramp) {
-      const d3 = g.getImageData(0, 0, 64, 64), px = d3.data;
-      for (let i = 0; i < px.length; i += 4) {
-        if (!px[i + 3]) continue;
-        const t = Math.round(0.299 * px[i] + 0.587 * px[i + 1] + 0.114 * px[i + 2]) / 255;
-        const [a, b, u] = t < 0.5 ? [ramp[0], ramp[1], t * 2] : [ramp[1], ramp[2], (t - 0.5) * 2];
-        for (let c = 0; c < 3; c++) px[i + c] = Math.round(a[c] + (b[c] - a[c]) * u);
-      }
-      g.putImageData(d3, 0, 0);
-    }
-    cache5.set(key, cv);
-    return cv;
-  }
-
-  // src/game/action/npc/roster.ts
-  var base = { effects: ["favor", "hint"] };
-  var d = (x) => ({ ...base, ...x, effects: x.effects ?? base.effects });
-  var AGENT_NPCS = {
-    jyaldi: d({ id: "jyaldi", name: "쟈알디", sheet: "쟈알디", group: "agent", color: "#c0392b", photo: "Jyaldi", role: "종합대응팀 부장. 본부 부장실에서 결재하고, 출동 땐 현장 지휘.", speech: "짧은 평서형 반말, 보고서처럼 묻는다. 감정 표현 거의 없음. 한숨 섞인 「하아, 잼트리.」", effects: ["favor", "hint", "join"], greet: ["보고해.", "…용건."], lines: ["짧게 말해. 듣고 있다.", "살아서 왔으면 됐다. 다음.", "결재는 결과 보고 한다.", "하아. 잼트리한테 말해."] }),
-    eileen: d({ id: "eileen", name: "에일린", sheet: "에일린", group: "agent", color: "#d8c98a", photo: "Aileen", role: "종합대응팀 선임. 부장 없을 때 현장 지휘.", speech: "한두 마디 반말. 직함으로 부르면 고쳐 준다(「에일린이라고 불러.」).", effects: ["favor", "hint", "join"], greet: ["준비됐어?", "에일린."], lines: ["됐어.", "증명해.", "가는 길에 죽지 마. 회수 귀찮아.", "몰라. 그래도 해."] }),
-    spangdal: d({ id: "spangdal", name: "스팡달", sheet: "스팡달", group: "agent", color: "#8e6bd1", photo: "Spangdal", role: "종합대응팀 선임 전투 요원, 가시 이능.", speech: "느리게 끄는 반말, 「후후」 웃음, 무서운 상상을 속삭이듯 묻는다. 끝에 「농담이야」.", effects: ["favor", "hint", "join"], greet: ["어머, 왔어? 후후.", "자기소개 안 해? 곧 죽을 거라서?"], lines: ["있잖아, 언제 죽을 것 같아? 내일? 모레? 후후.", "후후후. 농담이야.", "데쥬레 봤어? 요즘 나 피해 다니더라.", "무서워? 그 얼굴 좋다."] }),
-    geshugan: d({ id: "geshugan", name: "게슈간", sheet: "게슈간", group: "agent", color: "#9fc6e8", photo: "Geshugan", role: "종합대응팀 제압 담당.", speech: "아주 짧은 반말과 말줄임표. 사과는 「그래. 미안.」", effects: ["favor", "hint", "join"], greet: ["…뭐.", "…왜."], lines: ["…그래.", "알았어. 미안.", "…총 잘 쏘네?", "…거리 둬."] }),
-    gorgodio: d({ id: "gorgodio", name: "고르고디오", sheet: "고르고디오", group: "agent", color: "#d98b3a", photo: "Gorgodio", role: "진압팀 선임, 중장갑 전열.", speech: "크고 정직한 말투, 존댓말과 반말 섞임, 기분 좋으면 사투리.", effects: ["favor", "hint", "join"], greet: ["어이! 무슨 일이고?", "건물 먼저 확인하고 올게!"], lines: ["위험하다 안 했나! 뒤로 빠져 있어라!", "요원 될 깜냥이 있네. 좋다!", "봉쇄 먼저다. 늦으면 더 비싸게 먹힌다!", "쉬어라. 고생 많았다."] }),
-    kyuras: d({ id: "kyuras", name: "큐라스", sheet: "큐라스", group: "agent", color: "#9bd36a", photo: "Kyuras", role: "진압팀 선임, 화염 이능 원거리 지원.", speech: "밝고 빠른 반말, 느낌표 많음. 틈만 나면 진압팀 전입 권유.", effects: ["favor", "hint", "join"], greet: ["오! 진압팀 올 생각 있어?!", "왔냐! 스타 한 판?"], lines: ["진압팀은 너 같은 인재가 필요해! 전입 신청서 써!", "그 대사 백 번은 들었다!", "스팡달 선배랑 일하기 무섭지?!", "불 필요하면 불러!"] }),
-    deadpole: d({ id: "deadpole", name: "데드폴", sheet: "데드폴", group: "agent", color: "#6f7c8a", photo: "Deadpole", role: "종합대응팀 회수·노출 담당. 죽어도 돌아온다.", speech: "조심스러운 존댓말, 말 끊고 다시 시작, 고맙다는 말이 많다.", effects: ["favor", "hint", "join"], greet: ["아, 저… 무슨 일이세요?", "…늘 신세 지고 있어요."], lines: ["괜찮으세요…? 아, 저 말고요. 그쪽이요.", "…고마워요. 정말로요.", "제가 먼저 들어갈게요. 저는… 돌아오니까요.", "등 찔리면 아프겠죠. 그래도 살아요, 저는."] }),
-    rojemon: d({ id: "rojemon", name: "로제몬", sheet: "로제몬", group: "agent", color: "#b05cc8", photo: "Rojemon", role: "종합대응팀 정신 간섭·최면 해제 담당 (자칭 사무직).", speech: "빠르고 날카로운 반말, 투덜거림. 일할 땐 목소리가 차분해진다.", effects: ["favor", "hint", "join"], greet: ["헛소리하지 마.", "현장이면 안 가."], lines: ["그거 아무 맛도 안 나.", "못 해. 안 돼. 뭘 원하는데?", "옆에 있어.", "목숨 한 번 빚졌으니까 이번은 봐줄게."] })
-  };
-  var HQ_NPCS = {
-    jaemtri: d({ id: "jaemtri", name: "잼트리", sheet: "잼트리", group: "hq", color: "#27685b", photo: "Jaemtri", role: "종합대응팀 내근 선임. 임무 창구, 생존자 면담, 매뉴얼 관리. 탕비실 연유 커피 담당.", speech: "다정하고 장난스러운 반말, 스스로 「언니」. 웃는 얼굴로 절차를 집행(「스톱. 이름 말하지 마.」). 부장(쟈알디)에게만 존댓말.", greet: ["어머, 후배 왔어?", "응, 후배. 무슨 얘기 하고 싶어?"], lines: ["고민 있으면 꼭 언니한테 물어봐.", "응응. 그건 언니가 알아볼게. 대신 진술서 먼저.", "출동 전에 규칙서 한 번만 더 봐. 진짜로.", "연유 커피 남았는데, 마실래?"], rules: [[/이름|본명/, ["스톱. 이름 말하지 마. 응, 그렇지. 착하다."]], [/커피|연유/, ["연유 커피는 언니만 타. 레시피는 묻지 마."]]], never: ["본명을 묻거나 말하지 않는다", "현장에 나가지 않는다"] }),
-    gognija: d({ id: "gognija", name: "고그니쟈", sheet: "고그니쟈", group: "hq", color: "#c9a227", photo: "Gognija", role: "격리팀 연구 책임자. 지하 연구실에서 회수물 연구.", speech: "고풍스러운 하게체(「~하게」「~일세」「~라네」), 최대 음량, 느낌표 많음.", greet: ["오오! 무엇이든 묻게! 대답은 장담 못 하네!", "자료를 가져왔나!!!"], lines: ["좋은 질문일세! 대답은… 연구가 끝나면 알려 주겠네!", "이곳에서는 누구나 달달한 믹스커피를 마셔야 하네!", "데쥬레!!! 커피 좀 타 오게!!!", "아, 그건 비상 탈출 장치라네!"], rules: [[/블랙|아메리카노/, ["블랙이라니! 설탕 두 스푼 추가일세!"]]] }),
-    dejure: d({ id: "dejure", name: "데쥬레", sheet: "데쥬레", group: "hq", color: "#e58fb5", photo: "Dejure", role: "격리팀 연구원. 감정실에서 회수물 분류·감정, 믹스커피 제조.", speech: "더듬고 말끝 흐리는 존댓말(「저, 저기…」), 놀라면 「아, 아와와…!」. 유물 다룰 때만 또렷.", greet: ["네, 네…? 저, 저한테요…?", "아, 안녕하세요…"], lines: ["저, 저기… 다시 한 번만…", "조, 조심히 다녀오세요… 꼭이요…", "황금 비율은… 비, 비밀이에요…", "주시면… 분류할게요. 무섭지만요."], rules: [[/스팡달/, ["아, 아와와…! 제, 제가 잘못했어요…!"]], [/선배/, ["서, 선배요…? 헤헤…"]]] }),
-    konjyuce: d({ id: "konjyuce", name: "콘쥬스", sheet: "콘쥬스", group: "hq", color: "#e0457b", photo: "Konjyuce", role: "20세 대학생 요원. 괴력. 정비·보급실 담당, 전투 투입은 팀이 막는다.", speech: "밝고 고집 센 존댓말. 호칭을 상황 따라 바꾼다(아저씨→오빠, 선배님→언니). 호칭이 바뀌면 부탁(간식)이 온다.", greet: ["네! 뭐든 물어보세요!", "오빠, 아니 선배님! 안녕하세요!"], lines: ["잠깐만요! 저도 이 팀 정식 멤버거든요!", "그 말 좀 이상한데요? 아까랑 다르잖아요.", "그거 들어 드릴까요? 상자 열 개까진 괜찮아요!", "저도 갈 수 있는데… 네, 알아요. 팀 결정."], never: ["전투에 나가겠다고 우기지 않는다"] })
-  };
-  var MERCHANT_NPCS = {
-    madeokhee: d({ id: "madeokhee", name: "마덕희", sheet: "마덕희", group: "merchant", color: "#7d2a3a", photo: "Ma Deok-hee", role: "중림 장물 매입점 「헐값매입」 주인. 출동 중 휴식방에 나타나 회수물을 사고 물건을 판다(현금).", speech: "다정한 척 깎는 존댓말, 상대를 「자기야」. 상대 말을 작게 따라 하고 값을 후려친다(「80. 얘기 끝났어요. 쟁반 열렸습니다.」).", effects: ["favor", "trade", "hint", "leave"], greet: ["어머, 자기야. 뭐 팔 거 있어요?", "현금만 받아요. 관리국 결재는 여기서 안 통하고."], lines: ["자기야, 그런 얘기는 쟁반 위에 뭐 올려놓고 해요.", "흐음. 계속해 봐요.", "80. 얘기 끝났어요. 쟁반 열렸습니다.", "'열 배는 하는 거예요.' 열 배. 음. 그럼 열 배 받으러 가세요."] }),
-    goyeonji: d({ id: "goyeonji", name: "고연지", sheet: "고연지", group: "merchant", color: "#5a6f7d", photo: "Go Yeon-ji", role: "중림 무면허 외과의. 출동 중 휴식방에서 봉합·처치를 판다(선불).", speech: "건조하고 평평한 존댓말 반, 반말 반. 손상·수리·값을 정비사처럼 늘어놓는다.", effects: ["favor", "trade", "hint", "leave"], greet: ["어디 찢어졌어? 보여 줘 봐.", "선불이야. 마취는 별도고."], lines: ["갈비 두 대. 고칠 수 있어. 돈 먼저.", "병원엔 심의위원회가 있지. 나한텐 가격표가 있고.", "아니. 그 태도는 내가 수술 안 하는 합병증이야. 문은 뒤에.", "다음엔 덜 다쳐서 와."] }),
-    yunjia: d({ id: "yunjia", name: "윤지아", sheet: "윤지아", group: "merchant", color: "#8fb3a0", photo: "Yun Ji-a", role: "고연지의 진료 보조. 환자를 달래며 처치를 돕는다.", speech: "부드럽고 다정한 존댓말. 처치하면서 계속 말을 건다.", effects: ["favor", "trade", "hint"], greet: ["잘 오셨어요, 진짜로. 일단 앉으세요. 오늘 뭐 드셨어요?"], lines: ["여기 좀 따끔해요. 손 꽉 잡으셔도 돼요, 그러라고 있는 거예요.", "다음 학기엔 원서 낼 거예요. 아마도요.", "괜찮아요. 금방 끝나요.", "숨 천천히 쉬세요. 그렇지."] }),
-    shinyuri: d({ id: "shinyuri", name: "신유리", sheet: "신유리", group: "merchant", color: "#3d3550", photo: "Shin Yuri", role: "중림 사채업자. 출동 중 현금을 빌려주고 귀환 후 예산으로 받아 간다.", speech: "낮고 무뚝뚝한 반말. 위험한 상대에게만 존댓말. 위협할 땐 음절을 끊어 센다.", effects: ["favor", "trade", "hint", "leave"], greet: ["급하지? 돈은 있어. 이자도 있고.", "서명하든지, 나가든지."], lines: ["십. 퍼센트. 주마다.", "울려면 밖에서 울어. 눈물에 책상 녹슬어.", "돈은 없고 이능이랑 콩팥 두 개는 있네. 그걸로 하자.", "날짜 잊지 마."] }),
-    munhyeran: d({ id: "munhyeran", name: "문혜란", sheet: "문혜란", group: "merchant", color: "#a3672d", photo: "Mun Hye-ran", role: "중림 해결사·브로커. 프리랜서에게 일을 붙여 주고 수수료를 뗀다.", speech: "크고 연극적으로 친한 척하는 반말, 웃으면서 거절하고 조항 번호로 다시 말한다.", effects: ["favor", "trade", "hint", "leave"], greet: ["어이, 어이, 이게 누구야! 앉아, 앉아. 밥 먹었어? 상관없어, 서명 먼저 밥은 나중, 하하하!"], lines: ["재협상? 하하하! …9조에 안 된다고 돼 있어.", "이건 깎는 게 아니야, 친구. 더 나쁜 계약에서 지켜 주는 거지.", "이 조건 5분만 따뜻해. 그다음엔 더 배고픈 놈한테 판다.", "하하, 그래그래. 그래서 할 거야 말 거야?"] })
-  };
-  var dd = (id, name, photo, mask, role, speech, greet, lines, effects = ["favor", "hint", "join", "hostile", "leave", "trade"]) => d({ id, name, sheet: name, group: "daydream", color: "#7a6aa8", photo, role: `백일몽 주식회사 ${role}. ${mask} 가면.`, speech, effects, greet, lines });
-  var DAYDREAM_NPCS = {
-    leejaheon: dd("leejaheon", "이자헌", "Lee Ja-heon", "흰 도마뱀", "D조 조장·과장. 맨손 괴력", "감정 없는 하십시오체, 아주 짧게. 엉뚱한 질문에도 진지하게.", ["확인했습니다.", "물러나 주십시오."], ["예.", "그렇습니까.", "권장하지 않는 행동입니다.", "선천적 요인과 후천적 학습의 결과입니다."]),
-    eunhaje: dd("eunhaje", "은하제", "Eun Ha-je", "송골매", "D조 대리. 전직 기자, 규칙 해석·지도", "낮고 건조한 반말, 「~구만」「~잖냐」. 욕을 섞고 자기 죽음으로 농담.", ["왔냐?", "그래, 뭐."], ["그만둬도 나쁜 선택 아니야.", "미친놈들 뒤 캐서 먹고살았지.", "맞혀 볼 준비나 해.", "담배는… 아니다, 됐어."]),
-    parkminseong: dd("parkminseong", "박민성", "Park Min-seong", "오소리", "D조 주임. 힘센 짐꾼", "크고 친한 반말, 계속 웃는다. 겁먹어도 버틴다.", ["하하, 그렇게 딱딱하게 안 해도 돼!"], ["우리 부서는 1년쯤 되면 다 주임 달아. 그 전에 죽을 수도 있지만!", "아냐, 난 한 거 없어. 네가 다 했지.", "하하… 땀 좀 나네.", "짐 있으면 줘! 들어 줄게!"]),
-    jinnasol: dd("jinnasol", "진나솔", "Jin Na-sol", "금 나비", "A조 대리(정예). 손톱 투명 실", "짧고 날 선 반말, 목소리를 안 높이고 위협. 윗사람에게만 존댓말.", ["조용히 해.", "야."], ["짜증 나.", "두 번 말하게 하는 거 싫어.", "귀찮네.", "잘 거니까 말 걸지 마."]),
-    leeseonghae: dd("leeseonghae", "이성해", "Lee Seong-hae", "금 돌고래", "B조 주임(정예). 선인은 돕고 악인은 처형", "누구에게나 「~여」로 끝나는 다정한 말, 끝을 늘인다. 처형하면서도 상냥.", ["잘 지냈어여?", "괜찮아여?"], ["그냥 도와줄게여!", "이런 건 저처럼 스트레스 안 받는 사람이 해야 돼여.", "좋네여.", "미친놈이네여."]),
-    baekseokju: dd("baekseokju", "백석주", "Baek Seok-ju", "청둥오리", "A조 조장·과장(정예). 자기 조원만 챙김", "호탕한 중년 여성. 아랫사람에겐 다정한 해요체·반말, 싫은 동료에겐 얼음 같은 존댓말.", ["A조에 온 걸 환영해."], ["위험해 보이면 바로 넘길게. 알았지?", "규칙과 명령은 지킨다. 방법은 아무거나.", "아주 좋아. 딱 우리가 원하는 인재야.", "이자헌 조장님. 밖에서 얘기하시죠."]),
-    baeksaheon: dd("baeksaheon", "백사헌", "Baek Sa-heon", "염소·안대", "F조 사원. 숨기·미끼", "비아냥대는 존댓말, 아래로 보면 무시하는 반말. 위협받으면 바로 아첨하고 뇌물 제안.", ["노크하면 들어오라 할 때까지 기다리는 게 예의 아니었나요?"], ["어차피 죽을 사람들이잖아요.", "일을 복잡하게 만드시네.", "사흘 치 일당 더 보내 드릴까요?", "아, 아니 제 말은요…"]),
-    goyoungeun: dd("goyoungeun", "고영은", "Go Young-eun", "산양", "R조 사원. 전직 의대생, 사람 먼저", "따뜻한 해요체. 위기엔 단호한 선생님 반말.", ["괜찮으세요?"], ["벌써 끝난 것처럼 굴면 남은 기회까지 버리는 거예요.", "다친 데 보여 주세요.", "같이 나가요. 협조해 주세요.", "…알았어요. 해 볼게요."], ["favor", "hint", "join", "leave", "gift"]),
-    kangihak: dd("kangihak", "강이학", "Kang I-hak", "조랑말", "I조 사원. 돈(금)만, 늘 웃음", "밝고 길게 끄는 감탄형, 사과는 빠르고 크게.", ["강이학, 반가워요! 사원입니다!"], ["네네!", "하하. 오케이.", "근데! 거짓말이면 개인정보 다 넘기고 장기 담보 대출 하나 받아 갈 거예요!", "퇴근 후 사망은 회사가 알아서!"]),
-    janghunun: dd("janghunun", "장허운", "Jang Heo-un", "소", "Y조(마무리조) 사원. 소원 때문에 못 그만둠", "낮고 거친 목소리, 누구에게나 공손한 존댓말. 짧게 말하다 막힌다.", ["저는… 장허운입니다."], ["…압니다.", "소원권이 필요합니다. 그만둘 수 없습니다.", "죽은 사람을… 되살릴 수 있습니까.", "오늘 많이 도움받았습니다. 꼭 갚겠습니다."], ["favor", "hint", "join", "leave"]),
-    hoyuwon: dd("hoyuwon", "호유원", "Ho Yu-won", "여우", "이사. 웃는 상담사", "부드럽고 공손한 해요체, 누구에게나 「~님」, 조금 지나치게 기뻐한다. 아홉 번 대답하게 하려 한다.", ["어머, 이런 우연이 다 있네요."], ["이건 명백한 승낙이고 통화 기록에 남아요. 환영합니다!", "실수하지 않으시게 미리 준비해 뒀어요.", "참 신기한 우연이죠?", "부끄럽고 무서워라."], ["favor", "hint", "hostile", "leave"])
-  };
-  DAYDREAM_NPCS.goyoungeun.gifts = ["bandage"];
-  var FAKE_NPCS = {
-    leedohyeong: d({ id: "leedohyeong", name: "이도형", sheet: "이도형", group: "fake", color: "#444b55", photo: "Lee Do-hyeong", role: "가짜 관리국 검객 부서 부장. 최강의 개인 전투원.", speech: "건들건들 오만한 반말, 명령은 한 단어와 턱짓.", effects: ["favor", "hint", "hostile", "leave"], greet: ["어, 다들 수고. 신입 왔다며?"], lines: ["들어가.", "감각을 깨워야 돼. 여기서 베면 죽는다, 그 감각.", "나머지는 다 엑스트라야.", "귀찮게 하네."] }),
-    kwakseongju: d({ id: "kwakseongju", name: "곽성주", sheet: "곽성주", group: "fake", color: "#5a4a3a", photo: "Kwak Seong-ju", role: "가짜 관리국 과장. 최전방 중돌격 담당.", speech: "연병장 고함, 욕설 섞인 반말. 명령·농담·객기가 같은 음량.", effects: ["favor", "hint", "hostile", "leave"], greet: ["닥쳐, 이 자식아! 후퇴는 없다!"], lines: ["인류를 위해 목숨 바쳐라! 난 여기서 죽기로 했다!", "날 방패로 써도 좋으니 버텨!", "맛만 봐, 맛만.", "어이, 거기! 쏘지 마! 지켜보기만 해!"] })
-  };
-  var FACTION_NPCS = {
-    blaret: d({ id: "blaret", name: "블라렛", sheet: "블라렛", group: "faction", color: "#e8e2d0", photo: "Blaret", role: "교황청 특급 수녀. 진조 흡혈귀를 쫓아 한국에 파견.", speech: "장난스럽고 판매원처럼 밝은 반말 섞인 존댓말, 상대를 찔러 본다. 전투에선 심판하듯 차갑게.", effects: ["favor", "hint", "join", "hostile", "leave", "trade"], greet: ["반가워요. 교황청 특급 수녀 블라렛. 흡혈귀 퇴치 건으로 한국에 왔어요."], lines: ["어때요? 그쪽 일 접고 우리 쪽으로 개종하는 거.", "내가 말하면 그쪽도 말하는 거예요. 숨기기 없기.", "재밌는 거 볼래요? …찰칵.", "흡혈귀 사냥이라면 그쪽보다 전문이죠."] }),
-    saladin: d({ id: "saladin", name: "살라딘", sheet: "살라딘", group: "faction", color: "#2f6b4f", photo: "Saladin", role: "이슬람 성전대 한국 최고 전사. 이태원 성원이 거점.", speech: "우렁차고 고풍스러운 하오체. 아군에겐 따뜻하고 적에겐 쇠 같다. 「형제여!」", effects: ["favor", "hint", "join", "hostile", "leave"], greet: ["형제여! 날 따르시오!"], lines: ["그렇게 부르시오! 하하! 기분이 아주 좋소!", "형제여! 이교도의 말에 귀 기울이지 마시오!", "지금은 동맹이나 잠시뿐이오!", "사악한 신은 여기서 불탈 것이오!"] }),
-    avensha: d({ id: "avensha", name: "아벤샤", sheet: "아벤샤", group: "faction", color: "#6a2c70", photo: "Avensha", role: "발푸르기스 협회 십대 마녀 중 하나.", speech: "격식 있고 화려한 존댓말, 윗 마법사에게 한껏 자신을 낮추는 아첨. 감탄하면 비명.", effects: ["favor", "hint", "trade", "hostile", "leave"], greet: ["어머나! 이런 곳에서 뵙다니요!"], lines: ["땅을 기는 미천한 애벌레의 생애 최고의 은총이에요!", "실력을 증명할 수 있어 기뻐요!", "이번 산책에 심장을 꽤 거뒀어요.", "차를 마시며 감상할 수 있지요. 그 정도 안목은 있답니다."] })
-  };
-  var ENTITY_NPCS = {
-    brownie: d({ id: "brownie", name: "브라우니", sheet: "브라우니", group: "entity", color: "#8a5a2b", photo: "Brownie", role: "「브라우니의 화요 퀴즈쇼」 진행자이자 주인인 괴이 존재. 손님 대접과 예의를 지키면 거래·통과, 무례하거나 형식을 어기면 퀴즈쇼 무대가 열린다.", speech: "황금기 방송 진행자처럼 따뜻하고 끝없이 밝은 말투, 상대를 「친구」. 박수·드럼 소리 흉내. 역겨우면 잠깐 목소리가 일그러진다.", effects: ["favor", "trade", "hint", "hostile", "leave", "gift"], gifts: ["medkit"], greet: ["자, 친구! 오늘의 손님을 소개합니다! 박수!", "그냥 브라우니라고 불러 줘! 친구끼리 호칭은 오글거리잖아!"], lines: ["맞혀 볼까? …정답!", "복잡한 서명 절차는 우리 스타일이 아니지. 악수 한 번이면 돼!", "아쉽지만 화난 스폰서들이 오기 전에 헤어져야 해! 내일 또 만나!", "친구, 밥은 먹고 다니는 거야?"], never: ["방송 형식을 스스로 깨지 않는다"] }),
-    aesthete: d({ id: "aesthete", name: "탐미주의", sheet: "탐미주의", group: "entity", color: "#b23a48", photo: "Aestheticism", role: "살아 있는 것을 작품으로 만드는 예측 불가능한 괴이 예술가. 흥정과 대답이 마음에 들면 놓아주고, 아니면 작품으로 삼으려 한다.", speech: "오랜 친구처럼 따뜻한 말투. 먹잇감에겐 다정하게, 작품에겐 부모처럼.", effects: ["favor", "hint", "hostile", "leave"], greet: ["멀리 못 갔구나, 응?"], lines: ["살아 있는 건 다 목표가 있어. 네 목표는 뭐야?", "넌 내 걸작이 될 거야.", "창작자가 자기 작품을 잊는 거 본 적 있어?", "뻔뻔한 아이네. 나랑 흥정하려고?"] })
-  };
-  var ROSTER2 = { ...AGENT_NPCS, ...HQ_NPCS, ...MERCHANT_NPCS, ...DAYDREAM_NPCS, ...FAKE_NPCS, ...FACTION_NPCS, ...ENTITY_NPCS };
-  var NPC_BY_NAME = Object.fromEntries(Object.values(ROSTER2).map((n) => [n.name, n.id]));
-  var SPOT_NPC = { 잼트리: "jaemtri", 콘쥬스: "konjyuce", 데쥬레: "dejure", 고그니쟈: "gognija", 부장: "jyaldi", 동료: "dejure" };
-
-  // src/game/world/fieldSave.ts
-  function parseWorldSave(o) {
-    if (!o || typeof o !== "object") return void 0;
-    const s = o;
-    if (s.v !== 1 || !s.needs || typeof s.needs !== "object") return void 0;
-    const needs = {};
-    for (const [k, v] of Object.entries(s.needs)) {
-      if (!v || typeof v !== "object") continue;
-      const n = {};
-      for (const [nk, nv] of Object.entries(v)) if (typeof nv === "number" && Number.isFinite(nv)) n[nk] = Math.max(0, Math.min(100, nv));
-      needs[k] = n;
-    }
-    const str = (l) => Array.isArray(l) ? l.filter((x) => typeof x === "string") : [];
-    const p = s.player && typeof s.player === "object" && typeof s.player.scene === "string" && typeof s.player.x === "number" ? { scene: s.player.scene, x: s.player.x, ...typeof s.player.y === "number" ? { y: s.player.y } : {} } : void 0;
-    return { v: 1, clock: typeof s.clock === "number" ? s.clock : null, needs, follow: str(s.follow), ...p ? { player: p } : {}, ...str(s.nude).length ? { nude: str(s.nude) } : {} };
-  }
-
-  // src/game/world/fieldShop.ts
-  var FIELD_ITEMS = {
-    onigiri: { id: "onigiri", name: "삼각김밥", kind: "food", price: 1200, desc: "체력 5% 회복", heal: 0.05, verb: "먹었다" },
-    sandwich: { id: "sandwich", name: "샌드위치", kind: "food", price: 3500, desc: "체력 10% 회복", heal: 0.1, verb: "먹었다" },
-    lunchbox: { id: "lunchbox", name: "편의점 도시락", kind: "food", price: 5500, desc: "체력 15% 회복", heal: 0.15, verb: "먹었다" },
-    tteokbokki: { id: "tteokbokki", name: "떡볶이", kind: "food", price: 4e3, desc: "체력 12% 회복", heal: 0.12, verb: "먹었다" },
-    coffee: { id: "coffee", name: "편의점 커피", kind: "drink", price: 1500, desc: "체력 3% 회복", heal: 0.03, verb: "마셨다" },
-    energy: { id: "energy", name: "에너지 음료", kind: "drink", price: 2500, desc: "체력 3% 회복. 출동에 가져가면 능력 자원 회복", heal: 0.03, verb: "마셨다", run: "energy" },
-    soju: { id: "soju", name: "소주", kind: "drink", price: 2e3, desc: "한 병", verb: "마셨다" },
-    bandage: { id: "bandage", name: "붕대", kind: "med", price: 3e3, desc: "체력 10% 회복. 출동에 가져가면 출혈을 멎게 함", heal: 0.1, verb: "감았다", run: "bandage" },
-    firstaid: { id: "firstaid", name: "구급상자", kind: "med", price: 12e3, desc: "체력 25% 회복", heal: 0.25, verb: "썼다" },
-    painkiller: { id: "painkiller", name: "진통제", kind: "med", price: 4e3, desc: "출동에 가져가면 두통을 멎게 함", verb: "먹었다", run: "painkiller" },
-    snack: { id: "snack", name: "과자", kind: "gift", price: 1800, desc: "선물하기 좋다", verb: "먹었다", heal: 0.02 },
-    flowers: { id: "flowers", name: "꽃다발", kind: "gift", price: 25e3, desc: "선물하기 좋다" },
-    cigarettes: { id: "cigarettes", name: "담배", kind: "gift", price: 4500, desc: "한 갑" },
-    umbrella: { id: "umbrella", name: "우산", kind: "misc", price: 7e3, desc: "비 오는 날에" }
-  };
-  var SHOPS = {
-    cvs: {
-      id: "cvs",
-      name: "편의점",
-      keeper: "편의점 점원",
-      hours: [0, 24],
-      mult: 1,
-      buyRate: 0,
-      restock: 360,
-      stock: { onigiri: 8, sandwich: 5, lunchbox: 4, coffee: 10, energy: 6, soju: 6, bandage: 4, painkiller: 4, snack: 8, cigarettes: 6, umbrella: 3 },
-      greet: "어서 오세요."
-    },
-    market: {
-      id: "market",
-      name: "시장 노점",
-      keeper: "상인",
-      hours: [6, 19],
-      mult: 0.85,
-      buyRate: 0.4,
-      buys: ["food", "gift", "misc"],
-      restock: 1440,
-      haggle: true,
-      lateSale: { from: 17, mult: 0.7 },
-      stock: { tteokbokki: 6, onigiri: 6, snack: 10, flowers: 3, umbrella: 4, firstaid: 2 },
-      greet: "골라 봐요, 싸게 줄게."
-    }
-  };
-  var BAG_SLOTS = 8;
-  var emptyState = () => ({ bag: {}, shops: {} });
-  function parseState(text) {
-    if (!text) return emptyState();
-    try {
-      const o = JSON.parse(text);
-      const bag = {};
-      for (const [k, v] of Object.entries(o.bag ?? {})) if (FIELD_ITEMS[k] && Number.isInteger(v) && v > 0) bag[k] = Math.min(99, v);
-      const shops = {};
-      for (const [k, v] of Object.entries(o.shops ?? {})) if (SHOPS[k] && v && typeof v === "object") shops[k] = { stock: { ...v.stock ?? {} }, at: typeof v.at === "number" ? v.at : null, haggleFail: v.haggleFail, haggleDay: v.haggleDay };
-      const gifts = {};
-      for (const [k, v] of Object.entries(o.gifts ?? {})) if (typeof v === "number") gifts[k] = v;
-      const world = parseWorldSave(o.world);
-      return { bag, shops, ...Object.keys(gifts).length ? { gifts } : {}, ...world ? { world } : {} };
-    } catch {
-      return emptyState();
-    }
-  }
-  var bagUsed = (s) => Object.keys(s.bag).length;
-  var canAdd = (s, id) => !!s.bag[id] || bagUsed(s) < BAG_SLOTS;
-  function addBag(s, id, n = 1) {
-    if (!FIELD_ITEMS[id] || n <= 0 || !canAdd(s, id)) return false;
-    s.bag[id] = Math.min(99, (s.bag[id] ?? 0) + n);
-    return true;
-  }
-  function takeBag(s, id, n = 1) {
-    if ((s.bag[id] ?? 0) < n) return false;
-    s.bag[id] -= n;
-    if (s.bag[id] <= 0) delete s.bag[id];
-    return true;
-  }
-  var giftable = (it) => it.kind === "gift" || it.kind === "food" || it.kind === "drink";
-  function give(s, id, who, day) {
-    if (!FIELD_ITEMS[id] || !giftable(FIELD_ITEMS[id]) || !takeBag(s, id)) return { ok: false, counts: false };
-    const g = s.gifts ?? (s.gifts = {});
-    const counts = g[who] !== day;
-    g[who] = day;
-    return { ok: true, counts };
-  }
-  var isOpen = (shop, hour) => {
-    if (hour === null) return true;
-    const [a, b] = shop.hours;
-    const h = (hour % 24 + 24) % 24;
-    return a <= b ? h >= a && h < b : h >= a || h < b;
-  };
-  function stockOf(s, shop, minute) {
-    const cur = s.shops[shop.id] ?? (s.shops[shop.id] = { stock: { ...shop.stock }, at: minute });
-    if (minute !== null && cur.at !== null && minute > cur.at) {
-      const frac = Math.min(1, (minute - cur.at) / shop.restock);
-      for (const [id, max] of Object.entries(shop.stock)) {
-        const have = cur.stock[id] ?? 0;
-        cur.stock[id] = frac >= 1 ? max : Math.min(max, have + Math.floor((max - have) * frac));
-      }
-      cur.at = minute;
-    } else if (cur.at === null) cur.at = minute;
-    for (const id of Object.keys(shop.stock)) if (cur.stock[id] === void 0) cur.stock[id] = shop.stock[id];
-    return cur.stock;
-  }
-  var REP_MULT = { friendly: 0.85, warm: 0.95, neutral: 1, wary: 1.2, hostile: Infinity };
-  function priceOf(item, shop, c) {
-    const rep2 = REP_MULT[c.rep ?? "neutral"];
-    if (!Number.isFinite(rep2)) return null;
-    const late = shop.lateSale && c.hour !== null && c.hour >= shop.lateSale.from && item.kind === "food" ? shop.lateSale.mult : 1;
-    return Math.max(100, Math.round(item.price * shop.mult * rep2 * late / 100) * 100);
-  }
-  function sellPriceOf(item, shop, c) {
-    if (!shop.buyRate || !shop.buys?.includes(item.kind)) return null;
-    const rep2 = REP_MULT[c.rep ?? "neutral"];
-    if (!Number.isFinite(rep2)) return null;
-    return Math.max(100, Math.round(item.price * shop.buyRate / rep2 / 100) * 100);
-  }
-  function haggle(s, shop, day, rng3, social = 0.5) {
-    if (!shop.haggle) return 0;
-    const st = s.shops[shop.id] ?? (s.shops[shop.id] = { stock: { ...shop.stock }, at: null });
-    if (st.haggleDay !== day) st.haggleDay = day, st.haggleFail = 0;
-    if ((st.haggleFail ?? 0) >= 2) return 0;
-    if (rng3() < 0.35 + social * 0.4) return Math.round((0.05 + rng3() * 0.15) * 100) / 100;
-    st.haggleFail = (st.haggleFail ?? 0) + 1;
-    return 0;
-  }
-
-  // src/game/combat/brain.ts
-  var FULL_KIT = { heavy: true, jump: true, jumpAtk: true, skill: true, charge: true, super: true, shoot: true, dodge: true, block: true, flee: false, back: false };
-  var GRADE = {
-    F: { react: 20, defend: 0.1, drop: 0.35, routes: 1, tactic: 15, punish: 0.2 },
-    E: { react: 18, defend: 0.2, drop: 0.25, routes: 1, tactic: 12, punish: 0.3 },
-    D: { react: 15, defend: 0.35, drop: 0.15, routes: 2, tactic: 10, punish: 0.45 },
-    C: { react: 12, defend: 0.5, drop: 0.1, routes: 3, tactic: 8, punish: 0.6 },
-    B: { react: 10, defend: 0.65, drop: 0.06, routes: 4, tactic: 7, punish: 0.75 },
-    A: { react: 8, defend: 0.75, drop: 0.03, routes: 5, tactic: 6, punish: 0.85 },
-    S: { react: 6, defend: 0.85, drop: 0.02, routes: 5, tactic: 5, punish: 0.95 }
-  };
-  var DIFF = {
-    easy: { react: 1.5, defend: 0.5, drop: 2, punish: 0.6, melee: 2, super: "low", justDodge: null },
-    normal: { react: 1, defend: 1, drop: 1, punish: 1, melee: 3, super: "ok", justDodge: "B" },
-    hard: { react: 0.8, defend: 1.15, drop: 0.6, punish: 1.1, melee: 4, super: "combo", justDodge: "C" },
-    nightmare: { react: 0.65, defend: 1.3, drop: 0.3, punish: 1.2, melee: 5, super: "always", justDodge: "E" }
-  };
-  var ROUTES = [
-    { id: "jab", seq: ["light"], gap: 0, diff: 1 },
-    { id: "L-H stun", seq: ["light", "heavy"], gap: 7, diff: 1 },
-    { id: "LL-H launch", seq: ["light", "light", "heavy"], gap: 7, diff: 2 },
-    { id: "LLL-H blow", seq: ["light", "light", "light", "heavy"], gap: 7, diff: 3 },
-    { id: "LL-H-jump", seq: ["light", "light", "heavy", "jump", "light"], gap: 8, diff: 4 },
-    { id: "LLL-skill", seq: ["light", "light", "light", "skill"], gap: 7, diff: 5 }
-  ];
-  var WEIGHT = { light: 1, heavy: 2, skill: 2, charge: 3, super: 3 };
-  var Squad = class {
-    constructor(cap = 3) {
-      this.cap = cap;
-    }
-    used = /* @__PURE__ */ new Map();
-    borrow(target, who, w) {
-      const m = this.used.get(target) ?? this.used.set(target, /* @__PURE__ */ new Map()).get(target);
-      const total2 = [...m.entries()].filter(([k]) => k !== who).reduce((s, [, v]) => s + v, 0);
-      if (total2 + w > this.cap) return false;
-      m.set(who, w);
-      return true;
-    }
-    give(target, who) {
-      this.used.get(target)?.delete(who);
-    }
-  };
-  var FighterBrain = class {
-    constructor(id, grade, difficulty, persona, rng3, squad, squadKey = {}, kit = {}) {
-      this.id = id;
-      this.grade = grade;
-      this.difficulty = difficulty;
-      this.persona = persona;
-      this.rng = rng3;
-      this.squad = squad;
-      this.squadKey = squadKey;
-      this.kit = { ...FULL_KIT, ...kit };
-      this.g = GRADE[grade];
-      this.d = DIFF[difficulty];
-    }
-    g;
-    d;
-    strategy = "careful";
-    tactic = "대기";
-    hist = [];
-    script = [];
-    stratT = 0;
-    picked = false;
-    tacT = 0;
-    holding = /* @__PURE__ */ new Set();
-    defendT = 0;
-    /** 플레이어 버릇 (10장): 점프·회피 반격 횟수 → 대공·유인 가중 */
-    habit = { jump: 0, attack: 0 };
-    lastFoe = null;
-    /** 누운 뒤 일어나기까지 남은 틱 (8-2: 바로 / 늦게 +10~20틱). null = 아직 안 고름 */
-    wakeT = null;
-    /** 이번 틱의 공격 간격 배수 */
-    gap = 1;
-    kit;
-    get reactTicks() {
-      return Math.max(2, Math.round(this.g.react * this.d.react));
-    }
-    chance(p) {
-      return this.rng() < p;
-    }
-    /** 한 틱 판단 */
-    tick(me, foeNow) {
-      this.hist.push(foeNow);
-      if (this.hist.length > 40) this.hist.shift();
-      const foe = this.hist[Math.max(0, this.hist.length - 1 - this.reactTicks)];
-      this.learn(foeNow);
-      this.gap = me.gap ?? 1;
-      const out = { hold: /* @__PURE__ */ new Set(), press: [], release: [] };
-      if (me.stunned) {
-        this.script = [];
-        this.squad?.give(this.squadKey, this.id);
-        if (me.lying) {
-          if (this.wakeT === null) this.wakeT = this.chance(0.5) ? 0 : 10 + Math.floor(this.rng() * 11);
-          if (this.wakeT-- <= 0) {
-            out.press.push("jump");
-            this.wakeT = null;
-          }
-        } else this.wakeT = null;
-        return this.finish(out);
-      }
-      this.wakeT = null;
-      const dx = foe.x - me.x, dist = Math.abs(dx), dy = foe.y - me.y;
-      const toward = dx > 0 ? "right" : "left";
-      const away = dx > 0 ? "left" : "right";
-      if (--this.stratT <= 0) {
-        this.stratT = 60 + Math.floor(this.rng() * 60);
-        this.strategy = this.pickStrategy(me, foe);
-      }
-      if (this.defendT > 0) {
-        this.defendT--;
-        out.hold.add("block");
-        return this.finish(out);
-      }
-      if (foe.attacking && dist < 190 && Math.abs(dy) < 50 && me.free && !this.script.length) {
-        if (this.chance(this.g.defend * this.d.defend)) {
-          this.tactic = "방어";
-          if (me.guard > 35 && this.kit.block && (this.chance(0.65) || !this.kit.dodge)) this.defendT = 8 + Math.floor(this.rng() * 10);
-          else if (this.kit.dodge) out.press.push("dodge");
-          return this.finish(out);
-        }
-      }
-      if (this.script.length) return this.runScript(out);
-      if (--this.tacT > 0) {
-        this.align(out, dy, dist);
-        return this.finish(out);
-      }
-      this.tacT = Math.round((this.g.tactic + Math.floor(this.rng() * 4)) * this.gap);
-      this.chooseTactic(me, foe, dist, dy, toward, away, out);
-      return this.finish(out);
-    }
-    learn(foe) {
-      const l = this.lastFoe;
-      if (l && !l.air && foe.air) this.habit.jump++;
-      if (l && !l.attacking && foe.attacking) this.habit.attack++;
-      this.lastFoe = foe;
-    }
-    pickStrategy(me, foe) {
-      const gap = me.hp - foe.hp;
-      const p = this.persona;
-      const s = {
-        press: 40 + 30 * gap + 30 * p.aggression + (me.sp >= 100 ? 15 : 0),
-        careful: 40 - 30 * gap + 30 * p.patience,
-        zone: 20 + 40 * p.zoning,
-        rest: 0,
-        flee: 160 * (1 - p.courage) * (1 - me.hp) - 20
-        // 10-30: 용기가 낮을수록 체력이 덜 줄어도 기세가 꺾여 달아남(몹은 실제 성격 값)
-      };
-      if (this.picked) s[this.strategy] += 15;
-      this.picked = true;
-      return Object.entries(s).sort((a, b) => b[1] - a[1])[0][0];
-    }
-    /** 깊이(y) 맞추기: 상대와 같은 줄로 */
-    align(out, dy, dist) {
-      if (Math.abs(dy) > 22 && dist < 600) out.hold.add(dy > 0 ? "down" : "up");
-    }
-    plan(steps, name) {
-      if (this.gap !== 1) {
-        for (const s of steps) if (s.press) s.ticks = Math.round(s.ticks * this.gap);
-      }
-      this.script = steps;
-      this.tactic = name;
-    }
-    attackOk(b) {
-      const w = WEIGHT[b] ?? 0;
-      if (!w || !this.squad) return true;
-      return this.squad.borrow(this.squadKey, this.id, w);
-    }
-    chooseTactic(me, foe, dist, dy, toward, away, out) {
-      const p = this.persona;
-      this.align(out, dy, dist);
-      const sameLane = Math.abs(dy) < 40;
-      const routes = ROUTES.filter((r) => r.diff <= this.g.routes && (this.kit.heavy || !r.seq.includes("heavy")) && (this.kit.jump || !r.seq.includes("jump")) && (this.kit.skill || !r.seq.includes("skill")));
-      const route = () => routes[Math.floor(this.rng() * routes.length)];
-      const combo = (r = route()) => {
-        if (!this.attackOk(r.seq.includes("heavy") ? "heavy" : "light")) return false;
-        const steps = [];
-        for (let i = 0; i < r.seq.length; i++) {
-          if (i > 0 && this.chance(this.g.drop * this.d.drop)) break;
-          steps.push({ press: r.seq[i], ticks: r.gap || 6 });
-        }
-        this.plan(steps, `콤보 ${r.id}`);
-        return true;
-      };
-      if (this.strategy === "flee") {
-        const steps = [];
-        if (this.kit.back && dist < 260) steps.push({ hold: ["back"], ticks: 20 });
-        steps.push(this.kit.flee ? { hold: ["flee", away], ticks: 60 } : { hold: [away, "run"], ticks: 30 });
-        this.plan(steps, "도망");
-        return;
-      }
-      if (this.strategy === "rest" || !this.attackOk("light") && dist < 260) {
-        this.squad?.give(this.squadKey, this.id);
-        this.plan([{ hold: [dist < 260 ? away : toward], ticks: 12 }, { ticks: 10 }], "둘러서 기다림");
-        return;
-      }
-      if (me.sp >= 100 && dist < 260 && sameLane && this.kit.super) {
-        const ok = this.d.super === "low" ? me.hp < 0.3 : true;
-        if (ok && this.attackOk("super")) return this.plan([{ press: "super", ticks: 30 }], "필살");
-      }
-      if (foe.recovering && dist < 240 && sameLane && this.chance(this.g.punish * this.d.punish)) {
-        if (dist > 130) return this.plan([{ hold: [toward, "run"], ticks: Math.ceil((dist - 110) / 14) }, { press: "light", ticks: 6 }, { press: "light", ticks: 6 }, { press: this.kit.heavy ? "heavy" : "light", ticks: 10 }], "빈틈 벌주기");
-        if (combo(routes[routes.length - 1])) {
-          this.tactic = "빈틈 벌주기 콤보";
-          return;
-        }
-      }
-      if (foe.air && dist < 230 && this.kit.heavy && this.chance(0.35 + Math.min(0.4, this.habit.jump * 0.04))) {
-        if (this.attackOk("heavy")) return this.plan([{ press: "heavy", ticks: 12 }], "대공");
-      }
-      if (foe.down) {
-        if (this.strategy === "careful") return this.plan([{ hold: [away], ticks: 10 }, { ticks: 12 }], "기상 기다림");
-        return this.plan([{ hold: [toward], ticks: Math.max(4, Math.ceil((dist - 120) / 8)) }, { ticks: 6 }], "기상 압박");
-      }
-      if (dist < 135 && sameLane) {
-        if (this.strategy !== "zone" || this.chance(0.4)) {
-          if (combo()) return;
-        }
-      }
-      if (dist < 400 && sameLane) {
-        const r = this.rng();
-        if (this.strategy === "press" && this.kit.jumpAtk && r < 0.25 + p.aggression * 0.2 && this.attackOk("light")) {
-          return this.plan([{ press: "jump", hold: [toward], ticks: 8 }, { press: "light", hold: [toward], ticks: 16 }], "점프 공격");
-        }
-        if (this.strategy === "press" && dist > 180 && r < 0.6 && this.attackOk("light")) {
-          return this.plan([{ hold: [toward, "run"], ticks: Math.ceil((dist - 140) / 14) }, { press: "light", hold: [toward, "run"], ticks: 14 }], "돌진 공격");
-        }
-        if (dist > 160 && r < 0.75 && this.kit.skill && this.attackOk("skill")) return this.plan([{ press: "skill", ticks: 24 }], "기술");
-      }
-      if (this.strategy === "zone" && dist > 300) {
-        if (this.chance(0.4) && this.kit.charge && this.attackOk("charge")) return this.plan([{ press: "charge", hold: ["charge"], ticks: 16 + Math.floor(this.rng() * 22) }, { release: "charge", ticks: 14 }], "충전기");
-        if (sameLane && this.kit.shoot) return this.plan([{ press: "shoot", ticks: 14 }], "사격 견제");
-      }
-      if (this.strategy === "careful" && dist < 230) return this.plan([{ hold: [away], ticks: 8 }, { ticks: 8 }], "거리 재기");
-      this.plan([{ hold: dist > 500 ? [toward, "run"] : [toward], ticks: 10 }], "접근");
-    }
-    runScript(out) {
-      const s = this.script[0];
-      if (s.press && !s.done) {
-        out.press.push(s.press);
-        s.done = true;
-      }
-      if (s.release && !s.rel) {
-        out.release.push(s.release);
-        s.rel = true;
-      }
-      for (const h of s.hold ?? []) out.hold.add(h);
-      if (--s.ticks <= 0) this.script.shift();
-      if (!this.script.length) this.squad?.give(this.squadKey, this.id);
-      return this.finish(out);
-    }
-    /** 눌러 둔 버튼 중 이번에 뗀 것 */
-    finish(out) {
-      for (const h of this.holding) if (!out.hold.has(h) && !out.release.includes(h)) out.release.push(h);
-      this.holding = new Set(out.hold);
-      return out;
-    }
-  };
-
-  // src/game/world/rng.ts
-  function mulberry322(seed) {
-    let a = seed >>> 0;
-    return () => {
-      a = a + 1831565813 >>> 0;
-      let t = a;
-      t = Math.imul(t ^ t >>> 15, t | 1);
-      t ^= t + Math.imul(t ^ t >>> 7, t | 61);
-      return ((t ^ t >>> 14) >>> 0) / 4294967296;
-    };
-  }
-  function hashSeed(s) {
-    let h = 2166136261;
-    for (let i = 0; i < s.length; i++) {
-      h ^= s.charCodeAt(i);
-      h = Math.imul(h, 16777619);
-    }
-    return h >>> 0;
-  }
-  var range = (r, a, b) => a + (b - a) * r();
-  var pick2 = (r, list) => list[Math.floor(r() * list.length) % list.length];
-
-  // src/game/action/fighter/ai.ts
-  var BTN = { left: "left", right: "right", up: "up", down: "down", light: "light", heavy: "heavy", block: "block", dodge: "dodge", jump: "jump", shoot: "shoot", charge: "charge", skill: "skill", super: "super", run: null, flee: "flee", back: "back" };
-  function foeSense(b) {
-    const P2 = b.core?.P;
-    const mode = P2?.mode ?? b.phase ?? "ground";
-    return {
-      x: b.x,
-      y: b.y,
-      z: b.z,
-      attacking: mode === "act",
-      recovering: mode === "chain",
-      air: (P2?.z ?? b.z) > 6 || mode === "air",
-      down: mode === "down" || mode === "belly" || mode === "dead",
-      hp: b.hpMax ? b.hp / b.hpMax : 1
-    };
-  }
-  var FighterAi = class extends FighterPlayer {
-    brain;
-    pad = { held: /* @__PURE__ */ new Set(), pressed: /* @__PURE__ */ new Set(), released: /* @__PURE__ */ new Set(), mx: 0, my: 0, evade: false, run: false, downDouble: false };
-    /** side: enemy = 주인공·동행과 싸움(기본), ally = 주인공 편(동행)으로 적과 싸움 — 같은 두뇌·같은 몸 */
-    constructor(clips, art4, o) {
-      super(clips, art4);
-      const ally = o.side === "ally";
-      Object.defineProperty(this, "team", { value: ally ? "player" : "enemy", configurable: true });
-      Object.defineProperty(this, "kind", { value: ally ? "ally-char" : "ai-char", configurable: true });
-      this.allySide = ally;
-      this.label = o.label ?? `AI ${art4.cfg.name}`;
-      const has = (id) => !!art4.A[id], sk = art4.cfg.skills ?? {};
-      this.brain = new FighterBrain(o.id, o.grade, o.difficulty, o.persona, mulberry322(o.seed), o.squad, {}, {
-        heavy: has("12"),
-        jump: has("7"),
-        jumpAtk: has("7") && has("14"),
-        skill: !!sk.skill,
-        charge: !!sk.charge,
-        super: !!sk.super,
-        shoot: has("15") && art4.cfg.bal?.gun !== "none",
-        dodge: has("16"),
-        block: has("17"),
-        flee: has("36"),
-        back: has("37")
-      });
-    }
-    /** 때릴 상대: 적 편 = 주인공 + 동행(주인공 편 AI 몸), 동행 = 적 편 몸 전부 */
-    foes() {
-      const w = this.worldNow;
-      if (!w) return [];
-      if (this.allySide) return w.bodies.filter((b) => b.alive && b.team === "enemy" && b.hp > 0 && b.kind !== "bullet");
-      const out = w.player.alive ? [w.player] : [];
-      out.push(...w.bodies.filter((b) => b !== this && b.alive && b.team === "player" && b.hp > 0 && b.kind !== "bullet"));
-      if (w && perkWorld.friendlyFire && this.status.has("confuse")) out.push(...w.bodies.filter((b) => b !== this && b.alive && b.team === "enemy" && b.hp > 0 && b.kind !== "bullet"));
-      return out;
-    }
-    /** 방 안이 먼저 지친다(플레이어 퍽): 공격 간격 배수 */
-    perkGap = 1;
-    /** NPC 퍽 공격 간격 배수 (술기운 1.2) */
-    npcGap = 1;
-    /** 붙은 NPC 퍽 이름 (표시용) */
-    npcPerks = [];
-    extraFoes() {
-      return [];
-    }
-    /**
-     * 싸움에 안 나서는 동행 (반응표 combat=false, 11-01 사용자): 먼저 덤비지 않는다. 맞으면 반격(provoked).
-     * 'keep' = 피하는 인물(반응표 동료가 맞음이 피함·달아남·웅크림): 적과 거리를 둔다. 'stay' = 주인공 곁. 'attack' = 동료가 맞으면 덤빔
-     */
-    passive = null;
-    /** 맞았거나 동료가 맞아(attack) 이제 싸운다 */
-    provoked = false;
-    lastHp = -1;
-    step(world) {
-      const me = this.core.P;
-      const self = {
-        x: this.x,
-        y: this.y,
-        z: this.z,
-        face: this.dir,
-        free: ["ground", "chain", "block"].includes(me.mode),
-        air: me.mode === "air",
-        stunned: ["down", "belly", "stun"].includes(me.mode) || this.phase === "down",
-        hp: this.hp / this.hpMax,
-        sp: me.sp ?? 0,
-        guard: this.guard,
-        gap: this.status.attackGap() * this.perkGap * this.npcGap
-      };
-      if (this.passive && this.lastHp >= 0 && this.hp < this.lastHp) this.provoked = true;
-      this.lastHp = this.hp;
-      if (this.passive && !this.provoked) {
-        this.passiveStep(world);
-        return;
-      }
-      const t = this.foes().filter((b) => b.team !== this.team).sort((a, b) => Math.abs(a.x - this.x) + Math.abs(a.y - this.y) * 2 - (Math.abs(b.x - this.x) + Math.abs(b.y - this.y) * 2))[0];
-      const p = this.pad;
-      if (!t) {
-        p.pressed.clear();
-        p.released.clear();
-        p.held.clear();
-        p.mx = 0;
-        p.my = 0;
-        p.run = false;
-        p.evade = false;
-        const pl = world.player;
-        if (this.allySide && pl.alive && Math.abs(pl.x - this.x) > 160) {
-          const k = pl.x > this.x ? "right" : "left";
-          p.held.add(k);
-          p.mx = k === "right" ? 1 : -1;
-          p.run = Math.abs(pl.x - this.x) > 400;
-        }
-        if (this.allySide && pl.alive && Math.abs(pl.y - this.y) > 30) {
-          const k = pl.y > this.y ? "down" : "up";
-          p.held.add(k);
-          p.my = k === "down" ? 1 : -1;
-        }
-        this.lieStep(p, pl.x);
-        this.tick(world, p);
-        return;
-      }
-      const foe = foeSense(t);
-      if (t === world.player && perkDecoy.until > performance.now()) {
-        foe.x = perkDecoy.x;
-        foe.y = perkDecoy.y;
-        foe.attacking = false;
-      }
-      const d3 = this.brain.tick(self, foe);
-      p.pressed.clear();
-      p.released.clear();
-      const was = new Set(p.held);
-      p.held.clear();
-      for (const b of d3.hold) {
-        const k = BTN[b];
-        if (k) p.held.add(k);
-      }
-      for (const b of d3.press) {
-        const k = BTN[b];
-        if (k) {
-          p.pressed.add(k);
-          if (b === "charge" || b === "block") p.held.add(k);
-        }
-      }
-      for (const b of d3.release) {
-        const k = BTN[b];
-        if (k && was.has(k)) p.released.add(k);
-      }
-      p.run = d3.hold.has("run");
-      p.mx = p.held.has("right") ? 1 : p.held.has("left") ? -1 : 0;
-      p.my = p.held.has("down") ? 1 : p.held.has("up") ? -1 : 0;
-      p.evade = false;
-      this.lieStep(p, foe.x);
-      this.tick(world, p);
-    }
-    /** 먼저 싸우지 않는 동행: 피하는 인물은 가까운 적에게서 물러나고, 아니면 주인공 곁에 선다 */
-    passiveStep(world) {
-      const p = this.pad;
-      p.pressed.clear();
-      p.released.clear();
-      p.held.clear();
-      p.mx = 0;
-      p.my = 0;
-      p.run = false;
-      p.evade = false;
-      const pl = world.player;
-      const near2 = this.foes().sort((a, b) => Math.abs(a.x - this.x) - Math.abs(b.x - this.x))[0];
-      const hold = (k) => {
-        p.held.add(k);
-        if (k === "left" || k === "right") p.mx = k === "right" ? 1 : -1;
-        else p.my = k === "down" ? 1 : -1;
-      };
-      if (this.passive === "keep" && near2 && Math.abs(near2.x - this.x) < 260) {
-        hold(near2.x > this.x ? "left" : "right");
-        p.run = true;
-      } else if (pl.alive && Math.abs(pl.x - this.x) > 160) {
-        hold(pl.x > this.x ? "right" : "left");
-        p.run = Math.abs(pl.x - this.x) > 400;
-      }
-      if (pl.alive && Math.abs(pl.y - this.y) > 30) hold(pl.y > this.y ? "down" : "up");
-      this.lieStep(p, near2?.x ?? pl.x);
-      this.tick(world, p);
-    }
-    // 쓰러진 뒤 (두뇌는 누운 동안 아무것도 안 누름): 기상 지연이 지나면 일어난다. 체력이 낮고 겁 많으면 일어나지 않고 엎드려 기어(38) 상대 반대쪽으로 물러났다가 일어남
-    lieLag = -1;
-    crawlT = 0;
-    crawled = false;
-    lieStep(p, foeX) {
-      const P2 = this.core.P;
-      if (this.phase === "down" || P2.mode !== "down" && P2.mode !== "belly") {
-        this.lieLag = -1;
-        if (P2.mode !== "belly") this.crawled = false;
-        return;
-      }
-      p.held.clear();
-      p.pressed.clear();
-      p.released.clear();
-      p.mx = 0;
-      p.my = 0;
-      const away = foeX > this.x ? "left" : "right";
-      if (P2.mode === "belly") {
-        if ((this.crawlT -= 1 / 30) > 0) {
-          p.held.add(away);
-          p.mx = away === "right" ? 1 : -1;
-        } else p.pressed.add("up");
-        return;
-      }
-      if (this.lieLag < 0) this.lieLag = 0.2 + Math.random() * 0.7;
-      if (P2.t - (P2.downAt ?? -9) < P2.wakeDelay + (P2.wakeExtra ?? 0) + this.lieLag) return;
-      if (!this.crawled && this.core.has("38") && this.hp / this.hpMax < 0.35 && this.brain.persona.courage < 0.5) {
-        this.crawled = true;
-        this.crawlT = 1.5 + Math.random() * 2;
-        p.pressed.add(away);
-        p.held.add(away);
-        return;
-      }
-      p.pressed.add("up");
-    }
-    /** 렌더러가 몸 자리로 옮겨 놓고 부른다: 월드 좌표로 되돌려 코어가 그린다 */
-    draw(ctx) {
-      this.frameStep();
-      ctx.save();
-      ctx.translate(-this.x, -(this.y - this.z));
-      ctx.imageSmoothingEnabled = false;
-      this.core.drawBody(ctx);
-      this.core.drawFxLayer(ctx);
-      ctx.restore();
-      this.drawBar(ctx);
-    }
-    /** 머리 위 체력 막대(맞은 뒤에만), 방어막이 있으면 그 위에 흰 막대 */
-    drawBar(ctx) {
-      if (!this.alive || this.hp >= this.hpMax && this.shield >= this.shieldMax && !this.status.list.length) return;
-      const top = -this.height() - 14, w = 70;
-      ctx.fillStyle = "rgba(0,0,0,.6)";
-      ctx.fillRect(-w / 2, top, w, this.shieldMax ? 10 : 6);
-      ctx.fillStyle = "#e8c35a";
-      ctx.fillRect(-w / 2, top + (this.shieldMax ? 4 : 0), w * Math.max(0, this.hp) / this.hpMax, 6);
-      if (this.shieldMax) {
-        ctx.fillStyle = "#dfe8ee";
-        ctx.fillRect(-w / 2, top, w * this.shield / this.shieldMax, 3);
-      }
-      drawAilments(ctx, this.status.list.map((s) => STATUS[s.kind].label + (s.stacks > 1 ? s.stacks : "")), top - 4);
-      if (this.npcPerks.length) {
-        ctx.save();
-        ctx.font = "11px Galmuri11, sans-serif";
-        ctx.textAlign = "center";
-        ctx.fillStyle = "rgba(0,0,0,.7)";
-        const t = this.npcPerks.join("·");
-        ctx.fillText(t, 1, top + (this.shieldMax ? 22 : 18));
-        ctx.fillStyle = "#cfd8dc";
-        ctx.fillText(t, 0, top + (this.shieldMax ? 21 : 17));
-        ctx.restore();
-      }
-    }
-  };
-
-  // src/game/talk.ts
-  var FONT2 = (px) => `${px}px "${PIXEL_FONT}", "Galmuri11", sans-serif`;
-  var REACH = 150;
-  var BUBBLE_W = 340;
-  var OVERHEAR = 480;
-  var CSS = `
-.gt-bar{position:absolute;left:50%;bottom:10px;transform:translateX(-50%);width:min(92%,720px);display:none;gap:6px;align-items:center;padding:2px 4px;pointer-events:auto;z-index:46;color:#ece6d4}
-.gt-bar.gk-panel,.gt-log.gk-panel{border-width:17px;border-image-width:17px;box-shadow:none!important}
-.gt-bar[data-open]{display:flex;flex-wrap:wrap}
-.gt-to{font-size:18px;color:#ffe27a;white-space:nowrap;text-shadow:2px 2px 0 #000}
-.gt-in{flex:1;min-width:120px;font:inherit;font-size:20px;padding:2px 6px;background:none;color:#fff;outline:none;border-width:7px;border-image-width:7px;text-shadow:2px 2px 0 #000}
-.gt-in::placeholder{color:#8b8574}
-.gt-bar .gk-btn.gt-mode{min-width:3.4em;text-align:center}
-.gt-bar[data-act] .gk-btn.gt-mode{background:#3a2f4a;color:#e6c8ff;box-shadow:0 -3px 0 0 #9b7bc4,0 3px 0 0 #9b7bc4,-3px 0 0 0 #9b7bc4,3px 0 0 0 #9b7bc4,0 6px 0 0 rgba(0,0,0,.55)}
-.gt-bar[data-act] .gt-in{font-style:italic}
-.gt-in:focus,.gt-in:focus-visible{outline:none;box-shadow:none}
-/* 단추: 모서리를 한 칸 깎은 도트 단추 (kit의 메뉴 줄 판은 이 크기에서 찌그러진다) */
-.gt-bar .gk-btn,.gt-bar .gk-btn:hover,.gt-bar .gk-btn:focus-visible{font-size:18px;line-height:1;padding:6px 10px;margin:0 3px;border:0;border-image:none;background:#2b2620;color:#d8d0bc;box-shadow:0 -3px 0 0 #6e6350,0 3px 0 0 #6e6350,-3px 0 0 0 #6e6350,3px 0 0 0 #6e6350,0 6px 0 0 rgba(0,0,0,.55)}
-.gt-bar .gk-btn:hover,.gt-bar .gk-btn:focus-visible{background:#3d3428;color:#ffe27a;box-shadow:0 -3px 0 0 #c9a74a,0 3px 0 0 #c9a74a,-3px 0 0 0 #c9a74a,3px 0 0 0 #c9a74a,0 6px 0 0 rgba(0,0,0,.55);outline:none}
-.gt-bar .gk-btn:active{transform:translateY(3px);box-shadow:0 -3px 0 0 #c9a74a,0 3px 0 0 #c9a74a,-3px 0 0 0 #c9a74a,3px 0 0 0 #c9a74a}
-.gt-bar .gk-btn:disabled{opacity:.4;cursor:default}
-.gt-msg{flex-basis:100%;font-size:16px;color:#ff9a8a;text-shadow:2px 2px 0 #000}
-.gt-msg:empty{display:none}
-.gt-log{position:absolute;left:50%;bottom:84px;transform:translateX(-50%);width:min(92%,720px);max-height:45%;overflow:auto;display:none;padding:4px 8px;pointer-events:auto;z-index:46;font-size:18px;line-height:1.6;color:#ece6d4;white-space:pre-wrap;text-shadow:2px 2px 0 #000}
-.gt-log[data-open]{display:block}
-`;
-  function mountTalk(root, api, field, mobOf, world) {
-    ensureKit();
-    const st = document.createElement("style");
-    st.textContent = CSS;
-    const bar2 = document.createElement("div");
-    bar2.className = "gt-bar gk-panel gk-font";
-    bar2.setAttribute("role", "group");
-    bar2.setAttribute("aria-label", "본부 대화");
-    bar2.innerHTML = '<span class="gt-to"></span><button type="button" class="gk-btn gt-mode" data-mode aria-label="말로 보내기 (Tab: 행동으로 바꾸기)">말</button><input class="gt-in gk-slot gk-font" aria-label="할 말" placeholder="할 말" maxlength="300" autocomplete="off" enterkeyhint="send"><button type="button" class="gk-btn" data-send>말하기</button><button type="button" class="gk-btn" data-log>기록</button><button type="button" class="gk-btn" data-close aria-label="대화 닫기">닫기</button><div class="gt-msg" role="status"></div>';
-    const log = document.createElement("div");
-    log.className = "gt-log gk-panel gk-font";
-    log.setAttribute("aria-label", "이번 대화 기록");
-    root.append(st, bar2, log);
-    const to = bar2.querySelector(".gt-to");
-    const input = bar2.querySelector(".gt-in");
-    const sendBtn = bar2.querySelector("[data-send]");
-    const modeBtn = bar2.querySelector("[data-mode]");
-    let act = false;
-    const setMode = (on) => {
-      act = on;
-      bar2.toggleAttribute("data-act", on);
-      modeBtn.textContent = on ? "행동" : "말";
-      modeBtn.setAttribute("aria-label", on ? "행동으로 보내기 (Tab: 말로 바꾸기)" : "말로 보내기 (Tab: 행동으로 바꾸기)");
-      input.placeholder = on ? "할 행동 (예: 서류를 건넨다)" : "할 말";
-      input.setAttribute("aria-label", on ? "할 행동" : "할 말");
-    };
-    modeBtn.onclick = () => {
-      setMode(!act);
-      input.focus();
-    };
-    const msg = bar2.querySelector(".gt-msg");
-    let state2 = { visitor: { agentId: "", name: "" }, agents: [], turns: [] };
-    let target = "";
-    let busy = false;
-    let dead = false;
-    const bubbles = [];
-    const me = () => state2.visitor.name || "나";
-    let seen2 = { people: [], player: null };
-    const say = (who, text, pending = false, delay = 0) => {
-      for (let i = bubbles.length - 1; i >= 0; i--) if (bubbles[i].who === who) bubbles.splice(i, 1);
-      const from = performance.now() + delay;
-      bubbles.push({ who, text, pending, from, until: pending ? Infinity : from + 4e3 + [...text].length * 80 });
-    };
-    const nearby = (target2) => {
-      const p = seen2.player;
-      if (!p) return [];
-      return seen2.people.filter((q) => q.name !== target2 && Math.abs(q.x - p.x) < OVERHEAR).sort((a, b) => Math.abs(a.x - p.x) - Math.abs(b.x - p.x)).map((q) => state2.agents.find((a) => a.name === q.name && a.room)?.id ?? "").filter(Boolean);
-    };
-    const refresh = () => {
-      sendBtn.disabled = busy || !target;
-      input.disabled = busy;
-    };
-    const isMob = (k) => k.startsWith("mob:");
-    const renderLog = () => {
-      const agent = isMob(target) ? { id: mobOf?.(target)?.id } : state2.agents.find((a) => a.name === target);
-      const turns = state2.turns.filter((t) => t.agentId === agent?.id || t.extra?.some((e) => e.agentId === agent?.id)).slice(-30);
-      log.textContent = turns.length ? turns.map((t) => [t.act ? `${t.visitor || me()}: *${t.user}*` : `${t.visitor || me()}: ${t.user}`, `${t.name}: ${t.reply}`, ...(t.extra ?? []).map((e) => `${e.name}: ${e.line}`)].join("\n")).join("\n\n") : "아직 나눈 말이 없어요.";
-      log.scrollTop = log.scrollHeight;
-    };
-    async function open(name) {
-      target = name;
-      msg.textContent = "";
-      const mob = isMob(name) ? mobOf?.(name) ?? null : null;
-      to.textContent = `${mob ? mob.name : name}에게`;
-      bar2.setAttribute("data-open", "");
-      refresh();
-      const busyCell = world?.busyCell?.(name);
-      const first = busyCell ? world?.line?.(name, busyCell) : null;
-      if (first) say(name, first);
-      if (typeof matchMedia === "undefined" || !matchMedia("(pointer: coarse)").matches) input.focus();
-      try {
-        state2 = await api.state();
-        if (dead) return;
-        if (isMob(name) ? !mob || !api.sendMob : !state2.agents.some((a) => a.name === name && a.room)) msg.textContent = isMob(name) ? "지금 이 사람과는 대화할 수 없어요." : "지금 이 요원과는 대화할 수 없어요.";
-        if (log.hasAttribute("data-open")) renderLog();
-      } catch (e) {
-        if (!dead) msg.textContent = e instanceof Error ? e.message : String(e);
-      }
-    }
-    let exchanged = 0;
-    function close() {
-      if (target && exchanged > 0) window.dispatchEvent(new CustomEvent("goei:talk-closed", { detail: { name: target, exchanged } }));
-      exchanged = 0;
-      bar2.removeAttribute("data-open");
-      log.removeAttribute("data-open");
-      input.blur();
-      target = "";
-    }
-    const sendMob = async (raw) => {
-      const key = target;
-      const mob = mobOf?.(key);
-      if (busy || !mob || !api.sendMob) return;
-      const bare = raw.replace(/^\*+|\*+$/g, "").trim();
-      const text = act || /^\*/.test(raw) ? `*${bare}*` : raw;
-      if (!bare) return;
-      busy = true;
-      msg.textContent = "";
-      input.value = "";
-      say(me(), text);
-      say(key, "…", true);
-      refresh();
-      try {
-        state2 = await api.sendMob(mob, text);
-        if (dead) return;
-        exchanged++;
-        const turn = state2.turns.filter((t) => t.agentId === mob.id).at(-1);
-        say(key, turn?.reply ?? "");
-        if (turn?.tags?.length) world?.onTags?.(key, mob.name, turn.tags);
-        if (log.hasAttribute("data-open")) renderLog();
-      } catch (e) {
-        if (dead) return;
-        for (let i = bubbles.length - 1; i >= 0; i--) if (bubbles[i].who === key) bubbles.splice(i, 1);
-        const sub = world?.line?.(key, "facing.talk");
-        if (sub) say(key, sub);
-        msg.textContent = e instanceof Error ? e.message : String(e);
-        input.value = input.value || raw;
-      } finally {
-        busy = false;
-        refresh();
-        if (!dead && bar2.hasAttribute("data-open")) input.focus();
-      }
-    };
-    const send = async () => {
-      const raw = input.value.trim();
-      if (isMob(target)) return sendMob(raw);
-      const agent = state2.agents.find((a) => a.name === target && a.room);
-      if (busy || !raw || !agent) return;
-      const bare = raw.replace(/^\*+|\*+$/g, "").trim();
-      const text = act || /^\*/.test(raw) ? `*${bare}*` : raw;
-      if (!bare) return;
-      busy = true;
-      msg.textContent = "";
-      input.value = "";
-      say(me(), text);
-      say(agent.name, "…", true);
-      refresh();
-      try {
-        state2 = await api.send(agent.id, text, "aux", nearby(agent.name), world?.opts?.(agent.name) ?? {});
-        if (dead) return;
-        exchanged++;
-        const turn = state2.turns.filter((t) => t.agentId === agent.id).at(-1);
-        if (turn?.tags?.length) world?.onTags?.(agent.name, agent.name, turn.tags);
-        say(agent.name, turn?.reply ?? "");
-        let delay = 0;
-        let prev = turn?.reply ?? "";
-        for (const e of turn?.extra ?? []) {
-          delay += 900 + [...prev].length * 45;
-          say(e.name, e.line, false, delay);
-          prev = e.line;
-        }
-        if (log.hasAttribute("data-open")) renderLog();
-      } catch (e) {
-        if (dead) return;
-        for (let i = bubbles.length - 1; i >= 0; i--) if (bubbles[i].who === agent.name) bubbles.splice(i, 1);
-        const sub = world?.line?.(agent.name, "facing.talk");
-        if (sub) say(agent.name, sub);
-        msg.textContent = e instanceof Error ? e.message : String(e);
-        input.value = input.value || raw;
-      } finally {
-        busy = false;
-        refresh();
-        if (!dead && bar2.hasAttribute("data-open")) input.focus();
-      }
-    };
-    void api.state().then((v) => {
-      if (!dead && !busy) state2 = v;
-    }).catch(() => {
-    });
-    sendBtn.onclick = () => void send();
-    input.addEventListener("keydown", (e) => {
-      if (e.key === "Enter" && !e.isComposing && e.keyCode !== 229) {
-        e.preventDefault();
-        void send();
-      }
-      if (e.key === "Tab" && !e.isComposing) {
-        e.preventDefault();
-        setMode(!act);
-      }
-      if (e.key === "Escape") close();
-    });
-    bar2.querySelector("[data-close]").onclick = close;
-    bar2.querySelector("[data-log]").onclick = () => {
-      if (log.toggleAttribute("data-open")) renderLog();
-    };
-    for (const el of [bar2, log]) for (const type of ["keydown", "keyup", "pointerdown", "pointerup"]) el.addEventListener(type, (e) => e.stopPropagation());
-    function draw(c, people, player) {
-      const now = performance.now();
-      seen2 = { people, player };
-      for (let i = bubbles.length - 1; i >= 0; i--) if (bubbles[i].until < now) bubbles.splice(i, 1);
-      const all = [...people, ...player ? [{ ...player, name: me() }] : []];
-      if (target && player && !busy) {
-        const p = people.find((q) => q.name === target);
-        if (!p || Math.abs(p.x - player.x) > REACH * 1.6) close();
-      }
-      c.save();
-      c.textAlign = "center";
-      c.textBaseline = "middle";
-      const placed = [];
-      const place = (cx, w, h, bottom) => {
-        let b = bottom;
-        for (let guard2 = 0; guard2 < 20; guard2++) {
-          const hit2 = placed.find((q) => cx - w / 2 < q.r && cx + w / 2 > q.l && b - h < q.b && b > q.t);
-          if (!hit2) break;
-          b = hit2.t - 4;
-        }
-        placed.push({ l: cx - w / 2, r: cx + w / 2, t: b - h, b });
-        return b;
-      };
-      for (const p of [...all].sort((a, b) => b.y - a.y)) {
-        const isPlayer = !!player && p.name === me() && p.x === player.x;
-        const near2 = !!player && !isPlayer && Math.abs(p.x - player.x) < REACH && Math.abs(p.y - player.y) < 80;
-        const x = Math.round(p.x);
-        c.font = FONT2(TAG_PX);
-        const label2 = p.mob ? mobOf?.(p.name)?.name ?? p.label ?? "" : p.name;
-        const speaking = bubbles.some((q) => q.who === p.name && (q.from ?? 0) <= now);
-        if (p.mob && p.name !== target && !speaking && p.rel !== "foe") continue;
-        const tw = Math.ceil(c.measureText(label2).width) + 8;
-        const tagBottom = place(x, tw, 18, Math.round(p.y + p.top));
-        if (!isPlayer) tag(c, label2, x, tagBottom - 9, near2 || p.name === target, p.rel);
-        const typing = isPlayer && !busy && bar2.hasAttribute("data-open") && document.activeElement === input && input.value.trim() !== "";
-        const b = bubbles.find((q) => q.who === p.name && (q.from ?? 0) <= now) ?? (typing ? { who: p.name, text: "", until: Infinity, pending: true } : void 0);
-        if (b) {
-          const size2 = bubbleSize(c, b, now);
-          const bottom = place(x, size2.w + 4, size2.h + 16, tagBottom - 20);
-          bubble(c, size2, x, bottom);
-        }
-      }
-      c.restore();
-    }
-    return {
-      open: (name) => void open(name),
-      /** 지금 말 상대 열쇠 (없으면 '') */
-      target: () => bar2.hasAttribute("data-open") ? target : "",
-      isOpen: () => bar2.hasAttribute("data-open"),
-      close,
-      draw,
-      dispose() {
-        dead = true;
-        st.remove();
-        bar2.remove();
-        log.remove();
-      }
-    };
-  }
-  var U = 3;
-  function pixelBox(c, x, y, w, h, fill, line2, shadow2 = true) {
-    x = Math.round(x / U) * U;
-    y = Math.round(y / U) * U;
-    w = Math.ceil(w / U) * U;
-    h = Math.ceil(h / U) * U;
-    if (shadow2) {
-      c.fillStyle = "rgba(0,0,0,.45)";
-      c.fillRect(x + U, y + h, w - U, U);
-      c.fillRect(x + w, y + U, U, h);
-    }
-    c.fillStyle = line2;
-    c.fillRect(x + U, y, w - 2 * U, h);
-    c.fillRect(x, y + U, w, h - 2 * U);
-    c.fillStyle = fill;
-    c.fillRect(x + 2 * U, y + U, w - 4 * U, h - 2 * U);
-    c.fillRect(x + U, y + 2 * U, w - 2 * U, h - 4 * U);
-    return { x, y, w, h };
-  }
-  var TAG_PX = 12;
-  var TAG_COL = { ally: ["#9fe8a8", "rgba(140,212,150,.8)"], foe: ["#ff7b66", "rgba(230,110,95,.85)"] };
-  function tag(c, name, x, y, bright, rel) {
-    c.font = FONT2(TAG_PX);
-    c.fillStyle = "rgba(0,0,0,.75)";
-    for (const [dx, dy] of [[-1, 0], [1, 0], [0, -1], [0, 1], [1, 1]]) c.fillText(name, x + dx, y + dy);
-    c.fillStyle = rel ? TAG_COL[rel][bright ? 0 : 1] : bright ? "#ece6d6" : "rgba(206,200,186,.72)";
-    c.fillText(name, x, y);
-  }
-  function wrap(c, text, max) {
-    const lines = [];
-    let cur = "";
-    for (const ch of [...text]) {
-      if (c.measureText(cur + ch).width > max && cur) {
-        const sp = cur.lastIndexOf(" ");
-        if (sp > cur.length / 2) {
-          lines.push(cur.slice(0, sp));
-          cur = cur.slice(sp + 1) + ch;
-        } else {
-          lines.push(cur);
-          cur = ch;
-        }
-      } else cur += ch;
-    }
-    if (cur) lines.push(cur);
-    return lines;
-  }
-  var LH = 30;
-  function bubbleSize(c, b, now) {
-    c.font = FONT2(22);
-    const text = b.pending ? ".".repeat(1 + Math.floor(now /
+  var CW_SKILLS = { "쟈알디": { "사격": ["기본 사격", "총·투척", "물리", ""], "고유기": ["근접 폭파", "이능", "폭발", "손바닥 바로 앞 한 점에서 불덩이가 부풀어 터진다"], "충전0": ["구역 정리 0단", "이능", "폭발", "작은 폭발이 앞으로 일직선"], "충전1": ["구역 정리 1단", "이능", "폭발", "폭발 줄이 세 갈래 부채꼴"], "충전2": ["구역 정리 2단", "이능", "폭발", "쟈알디 둘레 원으로 바닥 전체가 터져 오른다"], "필살": ["보면 알아", "이능", "폭발", "발밑 첫 폭발…불기둥이 한꺼번에 터진다"] }, "스팡달": { "사격": ["기본 사격", "이능", "물리", ""], "고유기": ["그림자 이동", "이능", "물리", "검은 바늘 한 다발이 위로 찔러 올라 적을 띄운다"], "충전0": ["가시 격자 0단", "이능", "물리", "검은 바늘 세 개를 앞으로 일직선 연사(관통)"], "충전1": ["가시 격자 1단", "이능", "물리", "검은 가시 하나가 창처럼 뻗어"], "충전2": ["가시 격자 2단", "이능", "물리", "가시가 엇갈려 솟아 격자"], "필살": ["우습네. 정말.", "이능", "물리", "화면 바닥 전체 가시 숲"] }, "잼트리": { "사격": ["기본 사격", "총·투척", "물리", ""], "고유기": ["목덜미 쿡", "몸", "물리", "두 손가락을 목 높이로 찔러 넣는다 → 손등으로 턴다"], "충전0": ["정보 정리 0단", "몸", "물리", "두 손바닥으로 밀친다 → 앞 3m 다이빙"], "충전1": ["정보 정리 1단", "몸", "물리", "뒷무릎을 가슴 높이로 올려친다"], "충전2": ["정보 정리 2단", "몸", "물리", "하이힐 굽을 체중 실어 내리찍어"], "필살": ["모두의 언니", "몸", "물리", "목덜미를 찌르고 … 하이힐 굽으로 내리찍어"] }, "에일린": { "사격": ["기본 사격", "총·투척", "물리", ""], "고유기": ["제압사격", "총·투척", "물리", "제압사격"], "고유기2": ["판독", "총·투척", "없음(피해 없음)", "판독"], "충전0": ["숨 참기 0단", "총·투척", "물리", ""], "충전1": ["숨 참기 1단", "총·투척", "물리", ""], "충전2": ["숨 참기 2단", "총·투척", "물리", ""], "충전3": ["숨 참기 3단", "총·투척", "물리", ""], "필살": ["증명해.", "총·투척", "물리", "증명해."] }, "고그니쟈": { "사격": ["기본 사격", "총·투척", "물리", ""], "고유기": ["비상 장치 가동", "이능", "전기", "해치 틈에서 노란 전기 아크…감전시켜"], "충전0": ["꽤 깊지! 0단", "이능", "물리", "튀어 오르는 발판으로 퉁 들려"], "충전1": ["꽤 깊지! 1단", "이능", "물리", "강철 격리 셔터…밀쳐져 넘어지고"], "충전2": ["꽤 깊지! 2단", "이능", "물리", "바닥이 열려 구멍…무언가 들이받는 충격"], "필살": ["오오, 그 녀석은 성질이 좀 있지!", "이능", "음파", "그 녀석이 포효 → 검은 음압 충격 원뿔"] }, "큐라스": { "사격": ["기본 사격", "이능", "폭발", "손끝 스냅 → 목표 지점 작은 불꽃"], "고유기": ["요격", "이능", "폭발", "허공 한 점의 작은 불꽃 팡"], "충전0": ["지속 포격 0단", "이능", "폭발", "발밑 한 점을 터뜨린다"], "충전1": ["지속 포격 1단", "이능", "폭발", "일직선 다섯 점이 차례로 터진다"], "충전2": ["지속 포격 2단", "이능", "화염", "세로 화염벽이 바닥에서 솟아 2초 타오른다"], "필살": ["지휘", "이능", "폭발", "박마다 폭발 → 화면 가로 화염벽 두 줄"] }, "고르고디오": { "사격": ["기본 사격", "몸", "물리", "칼을 올려 드는 장에 바닥을 타는 충격파"], "고유기": ["초음속 돌격", "몸", "물리", "어깨를 앞세워…6m 돌진"], "충전0": ["식칼 내려치기 0단", "몸", "물리", "식칼을 바로 앞 바닥에 내리쳐"], "충전1": ["식칼 내려치기 1단", "몸", "물리", "균열이 6m 달려 나가고 돌판이 튀어 올라"], "충전2": ["식칼 내려치기 2단", "몸", "물리", "바닥이 꺼져 내려앉고 잔해가 쏟아진다"], "필살": ["붕괴 돌파", "몸", "물리", "초음속으로 들이받고 벽을 차 뚫는다 → 잔해"] }, "데쥬레": { "사격": ["기본 사격", "총·투척", "빛", "스캐너 앞끝 레이저"], "고유기": ["죄, 죄송해요!", "몸", "물리", "두 손으로 앞을 세게 밀친다"], "충전0": ["증언 재현 0단", "이능", "빛", "괴이 꼬리 궤적 홀로그램(분홍 주사선)"], "충전1": ["증언 재현 1단", "이능", "빛", "달려간 궤적 홀로그램이 일직선을 뚫고"], "충전2": ["증언 재현 2단", "이능", "빛", "분홍 와이어 상자 틀이 부풀며"], "필살": ["이건 꽝이에요", "이능", "빛", "분홍 레이저 막이 화면을 훑고 → 격자 터짐"] }, "데드폴": { "사격": ["기본 사격", "총·투척", "물리", ""], "고유기": ["되감기", "이능", "이상", "상처가 거꾸로 감겨…공격을 한 적이 시간이 되감겨"], "충전0": ["냄새 맡기 0단", "총·투척", "물리", "권총을 뽑아 근접 두 발"], "충전1": ["냄새 맡기 1단", "몸", "물리", "두 발 드롭킥으로 날아간다"], "충전2": ["냄새 맡기 2단", "총·투척", "물리", "적 최대 4명에게 한 발씩"], "필살": ["여기서 제가 한 번 죽으면", "이능", "이상", "거대한 남색 시계 고리…받아 낸 공격들이 되돌아가 터진다"] }, "게슈간": { "사격": ["기본 사격", "이능", "염동", "쥐는 순간 대상 자리가 일그러짐"], "고유기": ["고정", "이능", "염동", "발밑 일그러짐 고리, 공중으로 들려"], "충전0": ["던지기 / 짓뭉개기 0단", "이능", "염동", "한 점에 위에서 힘이 쿵 떨어진다"], "충전1": ["던지기 / 짓뭉개기 1단", "이능", "염동", "들어 올려 멀리 던진다"], "충전2": ["던지기 / 짓뭉개기 2단", "이능", "염동", "공간이 구겨지듯 오므라들며 짓눌려"], "필살": ["가리키고, 보고, 쥐고", "이능", "염동", "적 전원을 들어 올려 한꺼번에 내리꽂는다"] }, "로제몬": { "사격": ["기본 사격", "이능", "염동", "편 손가락 끝에서 실"], "고유기": ["돌아가.", "총·투척", "물리", "손끝에서 동전이 튕겨 나가 직선 5m"], "충전0": ["인형술 0단", "이능", "염동", "보라 실이 붙어 질질 끌려옴"], "충전1": ["인형술 1단", "이능", "염동", "실로 들어 올렸다 거꾸로 내리꽂음"], "충전2": ["인형술 2단", "이능", "염동", "실 세 가닥…서로 머리를 부딪침"], "필살": ["앙상블", "이능", "염동", "꼭두각시처럼 끌려…한가운데로 끌려와 부딪힘"] }, "콘쥬스": { "사격": ["기본 사격", "총·투척", "물리", "상자·잔해를 두 손 위치에서 던짐"], "고유기": ["바리케이드 번쩍", "몸", "물리", "바리케이드를 뽑아 들어 쿵 내려 세움"], "충전0": ["실 꿰기 질주 0단", "몸", "물리", "어깨로 밀쳐 냄"], "충전1": ["실 꿰기 질주 1단", "몸", "물리", "전력 질주…두 팔로 퍼올려 넘김"], "충전2": ["실 꿰기 질주 2단", "몸", "물리", "지그재그로 꿰어 달림…흙먼지 부채꼴"], "필살": ["제가 다 치울게요!", "몸", "물리", "적 더미를 통째로 밀어붙임"] }, "사장": { "사격": ["기본 사격", "이능", "이상", "지목한 적 자리에 검은 선"], "고유기": ["검은 선", "이능", "이상", "검은 가로선이 위아래로 벌어져 칠흑 틈"], "충전0": ["분신 0단", "이능", "물리", "분신 1명이 손날로 찌르고 선 속으로"], "충전1": ["분신 1단", "이능", "물리", "분신 2명이 양쪽에서 손날로 찌름"], "충전2": ["분신 2단", "이능", "이상", "가로 검은 선 네 줄이 깊이별로 그어지고"], "필살": ["정지", "이능", "이상", "세상이 멈춤 → X자 선이 칠흑 틈으로 벌어져"] }, "도필헌": { "사격": ["기본 사격", "총·투척", "물리", "가리키면 화면 밖 부하가 쏨"], "고유기": ["앉게.", "몸", "물리", "앞발로 발목을 걸어 당기면"], "충전0": ["값을 매기지 0단", "몸", "물리", "곁차기"], "충전1": ["값을 매기지 1단", "몸", "물리", "발따귀"], "충전2": ["값을 매기지 2단", "몸", "물리", "두발당성…발 구름 충격파"], "필살": ["거짓말이 빠진 방", "몸", "물리", "딴죽…두발당성 착지 충격이 황동색 고리로"] }, "이길환": { "사격": ["기본 사격", "이능", "음파", "마이크 앞 소리 고리"], "고유기": ["아, 아, 테스트", "이능", "음파", "「삐익—"], "충전0": ["충분히 이해합니다 0단", "이능", "음파", "마이크 앞에서 음압 덩어리가 퍽"], "충전1": ["충분히 이해합니다 1단", "몸", "물리", "둥근 배부터 날아든다(날아 배치기)"], "충전2": ["충분히 이해합니다 2단", "이능", "음파", "음파 고리가 둘레 원으로 세 번"], "필살": ["튜토리얼", "이능", "음파", "음파 막 → 겹고리 음파 네 겹"] }, "이기석": { "사격": ["기본 사격", "이능", "음파", "마이크에 대고 외치기"], "고유기": ["의수 발사", "총·투척", "물리", "의수가 빠져 회전하며 직선 5m를 날아감"], "충전0": ["인류의 방패! 0단", "총·투척", "물리", "의수가 빠져 앞 2m 바닥에 주먹째 쾅"], "충전1": ["인류의 방패! 1단", "총·투척", "물리", "의수가 와이어를 끌며 직선 7m 관통"], "충전2": ["인류의 방패! 2단", "몸", "물리", "와이어 의수를 철퇴처럼 휩쓸어 내리침"], "필살": ["팀 발표", "몸", "물리", "의수 날려 턱 → 철퇴 휩쓸기 → 의수 주먹 바닥에 내리꽂아 금빛 충격파"] }, "김조학": { "사격": ["기본 사격", "총·투척", "물리", "서류철 앞끝에서 종이"], "고유기": ["책상 내려치기", "몸", "물리", "서류철을 쾅 내리침"], "충전0": ["선택적인 증거 제시 0단", "몸", "물리", "서류철 모서리가 명치를 찔러"], "충전1": ["선택적인 증거 제시 1단", "몸", "물리", "앞어깨부터 몸통째 들이받으며 돌진"], "충전2": ["선택적인 증거 제시 2단", "몸", "물리", "뒤꿈치로 쾅 밟는다 → 둘레 원"], "필살": ["영상 올리기 전에", "몸", "물리", "서류철 내리치기 → 경비 태클 → 구둣발 충격선"] }, "이도형": { "사격": ["기본 사격", "몸", "물리", "수평 베기 바람"], "고유기": ["흉백", "몸", "물리", "지나온 직선 위 적…흰 베기 세 줄이 터진다"], "충전0": ["간파 0단", "몸", "물리", "앞 2m를 내려벰"], "충전1": ["간파 1단", "몸", "물리", "칼등으로 튕겨 냄 → 내려베기"], "충전2": ["간파 2단", "몸", "물리", "「죽는 자리"], "필살": ["건물 가르기", "몸", "물리", "한 번에 수평으로 휘둘러 화면 가로 전체"] }, "고영훈": { "사격": ["기본 사격", "몸", "물리", "칼끝 찌르기 바람"], "고유기": ["찔러.", "몸", "물리", "맨손으로 움켜쥐고…부대원 그림자가 칼로 찌르고"], "충전0": ["셋으로 나눈다 0단", "몸", "물리", "부대원 1명이 돌진하며 벰"], "충전1": ["셋으로 나눈다 1단", "몸", "물리", "부대원 3명이 동시에 돌진"], "충전2": ["셋으로 나눈다 2단", "몸", "물리", "교차 베기 → 흰 베기 세 줄이 별 모양"], "필살": ["킹", "몸", "물리", "짧고 정확한 베기 세 번 → 부대원 다섯이 찔러 들어감"] }, "노기균": { "사격": ["기본 사격", "몸", "물리", "찌르기 검기"], "고유기": ["튕겨 들어가기", "몸", "물리", "세 번 통통 튀어…아래에서 위로 올려벤다"], "충전0": ["검증 대련 0단", "몸", "물리", "제자리 내리베기"], "충전1": ["검증 대련 1단", "몸", "물리", "칼선 네 개가 네모난 칸"], "충전2": ["검증 대련 2단", "몸", "물리", "네 번 벰 → 어깨 높이 가로 검기 6m"], "필살": ["수고하십시오!", "몸", "물리", "지그재그로 튕겨 다니며 올려벤다"] }, "송주익": { "사격": ["기본 사격", "몸", "물리", "칼바람"], "고유기": ["시범 베기", "몸", "물리", "머리 위에서 무릎 높이까지 곧게 내려친다"], "충전0": ["선착 0단", "몸", "물리", "칼끝으로 짧게 그어 올린다"], "충전1": ["선착 1단", "몸", "물리", "두 걸음 튀어 지나가며 베기"], "충전2": ["선착 2단", "몸", "물리", "똑같은 정석 내려치기를 꽂는다"], "필살": ["예카테리나", "이능", "물리", "거대한 청록 칼 그림자(예카테리나)가 찔러 나간다"] }, "곽성주": { "사격": ["기본 사격", "총·투척", "물리", "미니건 연사(과열)"], "고유기": ["전원 내 뒤로", "몸", "물리", "디딘 발에서 앞으로 땅을 타고 가는 흙 충격파"], "충전0": ["제압 사격 0단", "총·투척", "물리", "짧게 한 줄 끊어 쏜다"], "충전1": ["제압 사격 1단", "총·투척", "물리", "2초 연사…부채꼴"], "충전2": ["제압 사격 2단", "총·투척", "물리", "3초 연사…탄착점이 걸어 나가며"], "필살": ["후퇴는 없다", "총·투척", "폭발", "전탄 난사 → 판처파우스트 세 발…큰 폭발"] }, "조성춘": { "사격": ["기본 사격", "이능", "음파", "고함(음파)"], "고유기": ["넥타이 풀기", "몸", "물리", "뒷주먹을 머리 높이로 곧게 내지른다"], "충전0": ["실황 중계 0단", "이능", "음파", "「야!!"], "충전1": ["실황 중계 1단", "이능", "음파", "노란 일그러짐이 앞 5m 원뿔로"], "충전2": ["실황 중계 2단", "몸", "물리", "다이빙 태클"], "필살": ["진공작전", "이능", "음파", "주먹 여섯 번 → 거대한 노란 음압 원뿔"] }, "윤병수": { "사격": ["기본 사격", "총·투척", "화염", "짧게 화염"], "고유기": ["화염방사", "총·투척", "화염", "노즐을 쓸어 올린다…불길"], "충전0": ["수류탄 0단", "총·투척", "폭발", "발 앞에 수류탄을 굴려 → 작은 폭발"], "충전1": ["수류탄 1단", "총·투척", "폭발", "5m 굴려 넣는다 → 폭발"], "충전2": ["수류탄 2단", "총·투척", "폭발", "세 개를 부채꼴로…차례로 세 번 폭발"], "필살": ["채점 중", "이능", "폭발", "윤병수 인형 둘이 불길 → 동시에 터진다"] }, "김성진": { "사격": ["기본 사격", "총·투척", "물리", ""], "고유기": ["야 저거 봤냐", "총·투척", "물리", "걸어 나가며 세 번 쏜다"], "충전0": ["주운 거 다 써 0단", "몸", "물리", "따귀 → 훅"], "충전1": ["주운 거 다 써 1단", "몸", "물리", "앞어깨로 몸통째 들이받는다"], "충전2": ["주운 거 다 써 2단", "몸", "물리", "이마로 들이받는다"], "필살": ["생환 기록", "총·투척", "물리", "쉬지 않고 쏜다…부채꼴"] }, "송진섭": { "사격": ["기본 사격", "총·투척", "물리", ""], "고유기": ["말다툼 중 한 발", "총·투척", "물리", "앞손만 권총을 뻗어 한 발"], "충전0": ["지도 왼쪽이요! 0단", "이능", "전기", "단말기에서 하늘색 펄스 호"], "충전1": ["지도 왼쪽이요! 1단", "이능", "전기", "앞 6m 직선 펄스 띠 → 뒤 4m"], "충전2": ["지도 왼쪽이요! 2단", "이능", "전기", "레이더 쓸림 선이 한 바퀴 회전"], "필살": ["우리 팀 눈", "총·투척", "폭발", "7팀 지원 사격(박격포탄)…차례로 폭발"] }, "청달래": { "사격": ["기본 사격", "이능", "화염", "이무기의 숨(입 앞 불)"], "고유기": ["뻗는 손", "이능", "정신", "손을 뻗었고 그 사람이 털썩 쓰러졌다 … 썩어 가는 백일몽 사무실"], "충전0": ["사번 받게 0단", "이능", "화염", "짧은 주황 불 혀"], "충전1": ["사번 받게 1단", "이능", "화염", "주황 불줄기 6m 일직선"], "충전2": ["사번 받게 2단", "이능", "화염", "거대한 불 인장이 세로로 쾅"], "필살": ["무슨 소란인가", "이능", "화염", "갈라진 금마다 주황 가뭄불이 솟구친다"] }, "호유원": { "사격": ["기본 사격", "이능", "음파", "통화 소리"], "고유기": ["확인했어요, ~님", "이능", "화염", "손등 여우 꼬리 무늬 → 금빛 여우불 폭발"], "충전0": ["아홉 번째 대답 0단", "이능", "화염", "금빛 여우불 구슬 하나가 날아가"], "충전1": ["아홉 번째 대답 1단", "이능", "물리", "그림자 여우 꼬리 다섯 갈래가 후려친다"], "충전2": ["아홉 번째 대답 2단", "이능", "물리", "그림자 꼬리 아홉 갈래가 원을 쓸어"], "필살": ["가장 소중한 것이 만나러 와요", "이능", "정신", "얼굴에 호유원의 웃는 입이 겹쳐진다(빙의)…가장 소중한 것이 뽑혀"] }, "백석주": { "사격": ["기본 사격", "몸", "물리", "박수 장풍(공기 고리)"], "고유기": ["어깨 도장", "몸", "물리", "어깨를 톡톡 → 두 손바닥으로 귀를 친다"], "충전0": ["진입 전 점검 0단", "몸", "물리", "손날로 쇄골 높이를 내려친다"], "충전1": ["진입 전 점검 1단", "몸", "물리", "앞팔뚝을 쓸어 치우며 미끄러진다"], "충전2": ["진입 전 점검 2단", "몸", "물리", "V자로 꺾여 손날로 무릎·턱"], "필살": ["A조에 온 걸 환영해", "몸", "물리", "되감기 고리로 줄 세움 → 손날로 두 번씩 → 무릎"] }, "진나솔": { "사격": ["기본 사격", "총·투척", "물리", "손톱 쏘기"], "고유기": ["당기기", "이능", "물리", "손톱이 박히면…실이 팽팽해져 질질 끌려오고"], "충전0": ["외알 안경 0단", "총·투척", "물리", "손톱 한 개가 곧게 날아감"], "충전1": ["외알 안경 1단", "이능", "물리", "실 한 가닥이 수평으로…가로로 베여"], "충전2": ["외알 안경 2단", "이능", "물리", "실 다섯 가닥이 별 모양으로 조여"], "필살": ["퇴근", "이능", "물리", "화면 전체 실 그물이 한꺼번에 조이며"] }, "이성해": { "사격": ["기본 사격", "총·투척", "물리", "명함"], "고유기": ["죄송해여!", "몸", "물리", "손날을 목 높이로 곧게 찌름"], "충전0": ["안녕하세여! 실례합니다아! 0단", "몸", "물리", "숙이는 머리로 박치기"], "충전1": ["안녕하세여! 실례합니다아! 1단", "몸", "물리", "손바닥으로 턱을 올려 침"], "충전2": ["안녕하세여! 실례합니다아! 2단", "몸", "물리", "손목을 잡아 비틀어 꺾어 넘기고"], "필살": ["다들 데리고 나왔어여", "이능", "이상", "회색 철문(격리문)이 솟아…문 안으로 빨려 들어감 → 쾅 닫힘"] }, "이자헌": { "사격": ["기본 사격", "총·투척", "물리", "던진 조각"], "고유기": ["버터나이프 틈", "몸", "물리", "버터나이프로 세로 틈 → 멱살을 쥐고 끌어 처박음"], "충전0": ["손잡이 한 방 0단", "몸", "물리", "뒷주먹 스트레이트"], "충전1": ["손잡이 한 방 1단", "몸", "물리", "주먹이 공기를 쳐서 흰 충격 기둥이 5m"], "충전2": ["손잡이 한 방 2단", "몸", "물리", "머리와 어깨를 움켜쥐고 바닥까지 끌어내려 처박음"], "필살": ["물리 퇴마", "몸", "물리", "뒷주먹 두 번 → 벽에 박힘"] }, "은하제": { "사격": ["기본 사격", "총·투척", "물리", "수갑 던지기"], "고유기": ["수갑", "총·투척", "물리", "수갑을 던져…손을 당겨 끌어 엎음"], "충전0": ["지도 없는 층 0단", "몸", "물리", "앞주먹을 배 높이로"], "충전1": ["지도 없는 층 1단", "몸", "물리", "팔꿈치·어깨로 미끄러진다"], "충전2": ["지도 없는 층 2단", "몸", "물리", "명치 → 팔꿈치 → 정강이 → 무릎"], "필살": ["통화 연결", "총·투척", "물리", "수갑 사슬이 채찍처럼 물결치며…메다꽂히듯"] }, "박민성": { "사격": ["기본 사격", "총·투척", "물리", "짐 던지기"], "고유기": ["모방 머플러", "몸", "물리", "모방 머플러로 굳어 버팀 → 반격"], "충전0": ["문 담당 0단", "몸", "물리", "앞어깨를 들이밂"], "충전1": ["문 담당 1단", "몸", "물리", "어깨로 들이받으며 돌진"], "충전2": ["문 담당 2단", "몸", "물리", "퍼 올려 머리 위로 던짐 → 깔림"], "필살": ["다시는 안 해", "몸", "물리", "질주 → 등에 멘 적째 주저앉음"] }, "백사헌": { "사격": ["기본 사격", "총·투척", "물리", "숨긴 물건 던지기"], "고유기": ["미끼", "몸", "물리", "뒷주먹이 꽂힌다 → 앞발바닥으로 밀어 차기"], "충전0": ["역안 0단", "몸", "물리", "앞어깨로 들이받으며"], "충전1": ["역안 1단", "몸", "물리", "발목을 낚아"], "충전2": ["역안 2단", "몸", "물리", "등 뒤로 미끄러져 등을 밀어 참"], "필살": ["추가 지급", "몸", "물리", "뒷머리를 꽂고 → 두 무릎으로 내리찍음"] }, "고영은": { "사격": ["기본 사격", "총·투척", "물리", "예비 배터리"], "고유기": ["헤드램프", "이능", "빛", "이마에서 흰 빛 원뿔"], "충전0": ["중증도 분류 0단", "몸", "물리", "압박붕대가 가로로 튕겨 침"], "충전1": ["중증도 분류 1단", "몸", "물리", "눈 가리고 → 이마 → 주먹 내리쳐"], "충전2": ["중증도 분류 2단", "몸", "물리", "포갠 두 손으로 내리누름(심폐소생)"], "필살": ["R조의 양심", "이능", "빛", "헤드램프 최대 출력 빛기둥 → 흰 빛 막 → 흰 빛 고리"] }, "강이학": { "사격": ["기본 사격", "총·투척", "물리", "동전 던지기"], "고유기": ["값 매기기", "몸", "물리", "엄지척 주먹을 턱 밑에서 위로"], "충전0": ["협상 테이블 0단", "총·투척", "물리", "동전 한 줌이 산탄처럼"], "충전1": ["협상 테이블 1단", "총·투척", "물리", "동전 줄기 7m 관통"], "충전2": ["협상 테이블 2단", "이능", "오염", "적 몸에서 괴이 화폐가 뽑혀 나와 지갑으로 빨려 들어옴"], "필살": ["매뉴얼만 지키면요", "총·투척", "물리", "동전 줄기 세 줄 → 동전 비"] }, "장허운": { "사격": ["기본 사격", "총·투척", "물리", "투포환처럼 잔해"], "고유기": ["막아 서기", "몸", "물리", "가슴과 앞팔뚝이 반원을 들이받아"], "충전0": ["기둥 들기 0단", "몸", "물리", "퍼 올려 띄운다"], "충전1": ["기둥 들기 1단", "몸", "물리", "발목을 움켜쥐고 끌어당기며"], "충전2": ["기둥 들기 2단", "몸", "물리", "들어 올려 투포환처럼 던진다"], "필살": ["사람으로 대할 것", "몸", "물리", "팔뚝으로 들이받고 → 땅이 갈라져 터져 오름"] }, "곽제강": { "사격": ["기본 사격", "총·투척", "물리", "볼펜"], "고유기": ["흥미로운데요", "몸", "물리", "이마 박치기 → 볼펜 끝으로 콕콕콕"], "충전0": ["혼돈 변수 투입 0단", "총·투척", "오염", "시료병을 던진다 → 연보라 거품이 펑"], "충전1": ["혼돈 변수 투입 1단", "총·투척", "오염", "시료병 세 개…펑펑펑"], "충전2": ["혼돈 변수 투입 2단", "총·투척", "오염", "플라스크를 던진다 → 연보라 꿈결 기둥"], "필살": ["분기별 기상 특보", "이능", "전기", "먹구름에서 벼락이 적마다 세 번 → 거대 벼락"] }, "이연화": { "사격": ["기본 사격", "총·투척", "오염", "병 입구에서 액체"], "고유기": ["잠깐만요", "몸", "물리", "손

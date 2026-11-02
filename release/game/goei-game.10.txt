@@ -1,4 +1,1953 @@
-려 앉기. 사망(서서): 앞으로 고꾸라짐."
+ispose();
+        panel.el.remove();
+        style.remove();
+      }
+    };
+  }
+
+  // src/game/world/toilets.ts
+  var MALE_LOOKS = /* @__PURE__ */ new Set(["고그니쟈", "큐라스", "고르고디오", "곽성주", "조성춘", "윤병수", "김성진", "송진섭", "사장", "도필헌", "이길환", "이기석", "김조학", "이도형", "고영훈", "노기균", "송주익", "장허운", "곽제강", "이병진", "제이", "호유원", "이자헌", "박민성", "백사헌", "살라딘", "경찰남1", "경찰남2", "관리국남A", "관리국남B", "가짜관리국검사A", "백일몽남A", "백일몽남B", "협회남1", "협회남2", "가짜관리국검사B", "프리랜서남1", "프리랜서남2", "프리랜서남3", "프리랜서남4", "상인남1", "가짜관리국검사C", "상인남2", "상인남3", "상인남4", "의사1", "청소부남1", "가짜관리국진압A", "시민남1", "시민남2", "시민남3", "시민남4", "시민남5", "시민남6", "가짜관리국진압B", "시민남7", "시민남8", "시민남9", "가짜관리국진압C", "불량배남2"]);
+  var FEMALE_LOOKS = /* @__PURE__ */ new Set(["게슈간", "로제몬", "콘쥬스", "쟈알디", "스팡달", "잼트리", "에일린", "데쥬레", "데드폴", "고영은", "강이학", "이연화", "청달래", "백석주", "진나솔", "이성해", "은하제", "아벤샤", "차여진", "서윤지", "고연지", "윤지아", "마덕희", "문혜란", "신유리", "블라렛", "세크리엠", "불량배여1", "불량배여3", "경찰여1", "경찰여2", "관리국여A", "관리국여B", "백일몽여A", "백일몽여B", "협회여1", "협회여2", "협회여3", "프리랜서여1", "프리랜서여2", "프리랜서여3", "프리랜서여4", "프리랜서여5", "상인여1", "상인여2", "상인여3", "간호사1", "청소부여1", "시민여1", "시민여2", "시민여3", "시민여4", "시민여5", "시민여6", "시민여7", "시민여8", "시민여9"]);
+  var WASH = { id: "wash", need: "bladder", clip: "line:104", where: ["restroom"], sec: [4, 6], fill: 0, label: "손 씻는 중" };
+  var STALL_DOOR_SEC = 0.45;
+  var TOILET_SEAT = {
+    쟈알디: [173, 10],
+    스팡달: [173, 1],
+    잼트리: [173, 0],
+    에일린: [179, 10],
+    고그니쟈: [167, 6],
+    큐라스: [167, 7],
+    고르고디오: [164, 0],
+    데쥬레: [173, 0],
+    데드폴: [159, 12],
+    게슈간: [167, 0],
+    로제몬: [173, 7],
+    콘쥬스: [187, 8],
+    관리국남A: [169, 5],
+    관리국남B: [169, 5],
+    관리국여A: [171, 3],
+    관리국여B: [170, 10],
+    // 15:10 사용자 「모든 세력 돌려쓸건데 관리국만 맞추면 뭐해」 → 앉는 동작(102)이 있는 나머지 101명도 같은 기준으로 확대 그림에서 하나씩 (허리 가운데로 좌우)
+    사장: [164, 0],
+    도필헌: [161, 7],
+    이길환: [162, 0],
+    이기석: [168, 0],
+    김조학: [172, 6],
+    이도형: [165, 3],
+    고영훈: [158, -1],
+    노기균: [171, 4],
+    송주익: [170, 0],
+    곽성주: [168, 1],
+    조성춘: [170, 5],
+    윤병수: [167, 9],
+    김성진: [172, 10],
+    송진섭: [171, 10],
+    청달래: [167, 1],
+    호유원: [171, 5],
+    백석주: [173, 1],
+    진나솔: [166, 10],
+    이성해: [169, 10],
+    이자헌: [165, 0],
+    은하제: [164, 0],
+    박민성: [169, 4],
+    백사헌: [166, 13],
+    고영은: [172, 0],
+    강이학: [165, 1],
+    장허운: [172, 13],
+    곽제강: [170, 1],
+    이연화: [167, 0],
+    이병진: [168, -1],
+    제이: [170, 1],
+    차여진: [174, 3],
+    서윤지: [167, 13],
+    고연지: [177, 9],
+    윤지아: [183, 1],
+    마덕희: [174, 14],
+    문혜란: [176, 0],
+    신유리: [166, 0],
+    블라렛: [174, 12],
+    살라딘: [170, 0],
+    아벤샤: [172, 6],
+    세크리엠: [170, 0],
+    가짜관리국검사A: [166, 2],
+    가짜관리국검사B: [165, 4],
+    가짜관리국검사C: [168, -1],
+    가짜관리국진압A: [171, -1],
+    가짜관리국진압B: [168, 7],
+    가짜관리국진압C: [169, 4],
+    불량배남2: [171, 6],
+    불량배여1: [167, 0],
+    불량배여3: [172, 10],
+    경찰남1: [172, 12],
+    경찰남2: [166, 5],
+    경찰여1: [168, 1],
+    경찰여2: [174, 6],
+    백일몽남A: [170, 8],
+    백일몽남B: [168, 4],
+    백일몽여A: [172, 11],
+    백일몽여B: [170, 0],
+    협회남1: [166, 5],
+    협회남2: [168, 0],
+    협회여1: [164, 0],
+    협회여2: [169, 6],
+    협회여3: [171, 0],
+    프리랜서남1: [173, 9],
+    프리랜서남2: [169, 9],
+    프리랜서남3: [166, 4],
+    프리랜서남4: [166, 11],
+    프리랜서여1: [169, 1],
+    프리랜서여2: [173, 11],
+    프리랜서여3: [168, 0],
+    프리랜서여4: [171, 7],
+    프리랜서여5: [171, 11],
+    상인남1: [166, 2],
+    상인남2: [169, 2],
+    상인남3: [170, 9],
+    상인남4: [171, 8],
+    상인여1: [173, 4],
+    상인여2: [171, 6],
+    상인여3: [170, 0],
+    의사1: [169, 6],
+    간호사1: [170, 0],
+    청소부남1: [169, 7],
+    청소부여1: [169, 2],
+    시민남1: [171, 5],
+    시민남2: [173, 4],
+    시민남3: [171, 5],
+    시민남4: [169, 7],
+    시민남5: [168, 7],
+    시민남6: [169, 6],
+    시민남7: [172, 7],
+    시민남8: [167, 9],
+    시민남9: [168, 4],
+    시민여1: [167, 1],
+    시민여2: [168, 0],
+    시민여3: [172, 9],
+    시민여4: [176, 10],
+    시민여5: [171, 9],
+    시민여6: [172, 3],
+    시민여7: [171, 6],
+    시민여8: [170, 0],
+    시민여9: [170, 7]
+  };
+  var LAP_BASE = 173;
+  function seatFeet(seat, look) {
+    const [lap, dx] = TOILET_SEAT[look] ?? [LAP_BASE, 0];
+    const k = seat.k ?? 1.25;
+    return { x: seat.x + dx * k, y: seat.y + (LAP_BASE - lap) * k };
+  }
+
+  // src/game/action/hq/showerFx.ts
+  var DOT = 2;
+  var STREAMS = 7;
+  var SPREAD_DEG = 26;
+  var SPEED = 3.6 * DOT;
+  var G = 0.035 * DOT;
+  var NF = 16;
+  var FPS = 8;
+  var C_DEEP = "rgba(120,180,230,0.96)";
+  var C_HI = "rgba(235,250,255,1)";
+  var C_MID = "rgba(160,212,245,0.96)";
+  function rng2(seed) {
+    let a = seed >>> 0;
+    return () => {
+      a = a + 1831565813 >>> 0;
+      let t = a;
+      t = Math.imul(t ^ t >>> 15, t | 1);
+      t ^= t + Math.imul(t ^ t >>> 7, t | 61);
+      return ((t ^ t >>> 14) >>> 0) / 4294967296;
+    };
+  }
+  var dot2 = (c, x, y, col) => {
+    c.fillStyle = col;
+    c.fillRect(Math.round(x / DOT) * DOT, Math.round(y / DOT) * DOT, DOT, DOT);
+  };
+  function faceDir(h) {
+    const [[x0, y0], [x1, y1]] = h.head;
+    const ex = x1 - x0, ey = y1 - y0, L = Math.hypot(ex, ey) || 1;
+    let nx = -ey / L, ny = ex / L;
+    if (ny < 0) {
+      nx = -nx;
+      ny = -ny;
+    }
+    return [nx, ny];
+  }
+  function drawSteam(c, h, headTop, headX, frame) {
+    const r = rng2(h.id.length * 7 + h.foot[0]);
+    for (let k = 0; k < 6; k++) {
+      const bx = headX + (r() * 32 - 16) * DOT, by = headTop + r() * 40 * DOT;
+      const t = (frame + k * NF / 6) % NF / NF;
+      const y = by - t * 34 * DOT, x = bx + Math.sin(t * 6.28 + k) * 5 * DOT;
+      const alpha = 150 * Math.pow(1 - t, 1.2) * Math.min(1, t * 4 + 0.3) / 255, rad = (5 + Math.floor(t * 6)) * DOT;
+      c.fillStyle = `rgba(250,253,255,${alpha.toFixed(3)})`;
+      for (const [ox, oy, rr] of [[0, 0, rad], [-rad * 0.6, rad * 0.3, rad * 0.7], [rad * 0.6, rad * 0.2, rad * 0.75], [0, -rad * 0.5, rad * 0.6]]) {
+        c.beginPath();
+        c.arc(x + ox, y + oy, rr, 0, Math.PI * 2);
+        c.fill();
+      }
+    }
+  }
+  function drawShowerWater(c, h, headTop, now) {
+    const frame = Math.floor(now / 1e3 * FPS) % NF;
+    const [fx2, fy] = h.foot, headX = fx2;
+    if (headTop !== null) drawSteam(c, h, headTop, headX, frame);
+    const [[x0, y0], [x1, y1]] = h.head, [dx, dy] = faceDir(h), base2 = Math.atan2(dy, dx);
+    const r = rng2(h.foot[0] * 100 + h.foot[1]);
+    for (let s = 0; s < STREAMS; s++) {
+      const u = s / (STREAMS - 1);
+      let x = x0 + (x1 - x0) * u, y = y0 + (y1 - y0) * u;
+      const th = base2 + (u - 0.5) * 2 * SPREAD_DEG * Math.PI / 180;
+      let vx = SPEED * Math.cos(th), vy = SPEED * Math.sin(th);
+      for (let i = 0; i < 400; i++) {
+        if (headTop !== null && Math.abs(x - headX) < 10 * DOT && y >= headTop) {
+          for (let k = 0; k < 3; k++) {
+            const a = r() * Math.PI, rr = (3 + r() * 6) * DOT;
+            dot2(c, x + Math.cos(a) * rr, y - Math.abs(Math.sin(a)) * rr * 0.6 + (frame + k) % 3 * DOT, C_HI);
+          }
+          break;
+        }
+        if (y >= fy - 2 * DOT) break;
+        if ((i + frame * 2 + s * 3) % 9 < 7) dot2(c, x, y, i % 11 < 2 ? C_HI : C_DEEP);
+        x += vx;
+        y += vy;
+        vy += G;
+        void vx;
+      }
+    }
+    if (headTop !== null) for (let k = 0; k < 14; k++) {
+      const a = r() * Math.PI, rr = (5 + r() * 14 + (frame + k) % 4) * DOT;
+      dot2(c, headX + Math.cos(a) * rr, headTop + 4 * DOT - Math.abs(Math.sin(a)) * rr * 0.5, k % 3 === 0 ? C_HI : C_MID);
+    }
+    for (let k = 0; k < 16; k++) {
+      const a = r() * Math.PI * 2, rr = (6 + r() * 16) * DOT, ph = (k + frame) % 4;
+      dot2(c, fx2 + Math.cos(a) * rr, fy + Math.sin(a) * rr * 0.3 - ph * DOT, ph === 0 ? C_HI : C_MID);
+    }
+  }
+
+  // src/game/action/engine/hub.ts
+  var CORDON_SLOTS = 5;
+  var GEAR_SLOTS = 8;
+  var LIFE_SLOTS = 24;
+  var TOP = 440;
+  var LANE = [LANE_TOP, LANE_BOT];
+  var DOOR_H = 250;
+  var FADE = 8;
+  var OPEN_T = 9;
+  var openLen = (sc, d3) => !sc?.painted ? OPEN_T : d3.kind === "elevator" ? 22 : d3.kind === "cell" ? 26 : 12;
+  var RATTLE_T = 10;
+  var DOOR_W = { main: 190, door: 120, stairs: 120, glass: 160, steel: 120, security: 120, elevator: 160, stairs_up: 120, stairs_down: 120, shop: 130, slide: 170, cell: 150, exit: 150 };
+  var isS = (d3) => d3.side === "S";
+  var doorY = (d3, lane = LANE) => isS(d3) ? lane[1] - 14 : lane[0] + 16;
+  function makeHub(host, whereIs2) {
+    let view2 = null;
+    let scene = null;
+    let artDoors = /* @__PURE__ */ new Set();
+    let pending = null;
+    let arrive = null;
+    let enterTick = -1;
+    let fadeOut = 0;
+    let barked = null;
+    let speech = null;
+    let curPeople = [];
+    let live = [];
+    let cords = [];
+    let gears = [];
+    let opening = null;
+    let closing = null;
+    let rattle = null;
+    let arriveDoor = null;
+    let callWait = null;
+    let callOn = false;
+    let near2 = null;
+    let solids = [];
+    const gateOpen = /* @__PURE__ */ new Map();
+    let pT = null;
+    const setPT = (v) => {
+      pT = v;
+      host.life?.playerToilet?.(v && scene ? { scene: scene.id, id: v.id, kind: v.kind, phase: v.phase } : null);
+    };
+    let sitChair = null;
+    let showerSpot = null;
+    let curWorld = null;
+    let lockerUse = null;
+    let walked = 0;
+    let lastX = null;
+    const sceneOf = (id) => view2.scenes.find((s) => s.id === id) ?? view2.scenes[0];
+    const openOf = (id) => opening && opening.id === id ? Math.min(1, opening.t / opening.len) : closing && closing.id === id ? Math.max(0, 1 - closing.t / closing.len) : 0;
+    let peek = null;
+    const stallBusy = (doorId) => live.some((q) => q.toilet?.door === doorId) || !!pT && pT.door === doorId;
+    const doorFx = (id) => ({ open: openOf(id), shake: rattle && rattle.id === id ? (rattle.t % 4 < 2 ? 3 : -3) * (1 - rattle.t / RATTLE_T) : 0 });
+    const useToilet = (a, id) => {
+      const t = scene?.toilets?.find((q) => q.id === id);
+      if (!t || !scene) return;
+      const pl = a.world.player;
+      if (t.kind === "stall" && t.door && host.life?.toiletBusy?.(scene.id, id)) {
+        a.movePlayer(t.x, t.y);
+        peek = { door: t.door, x: t.x, y: t.y, id };
+        host.life?.playerPeek?.({ scene: scene.id, id });
+        host.sfx("doorLatch");
+        return;
+      }
+      if (host.life?.toiletBusy?.(scene.id, id)) return a.world.say("누가 쓰고 있다.", 1.5);
+      if (!pl.lifeScene) return;
+      if (t.kind === "stall") {
+        a.movePlayer(t.x, t.y);
+        setPT({ id, kind: "stall", door: t.door, phase: "open", t: Math.round(STALL_DOOR_SEC * 30), front: { x: t.x, y: t.y }, seat: t.seat });
+        host.sfx("doorLatch");
+        return;
+      }
+      const steps = t.kind === "urinal" ? [{ id: "100", n: 3 }] : [{ id: "104", n: 2 }];
+      if (!pl.lifeScene(steps, t.x, t.y, 1)) return a.world.say(t.kind === "urinal" ? "이 사람은 소변기를 쓰지 않는다." : "지금은 할 수 없다.", 1.5);
+      setPT({ id, kind: t.kind, phase: "in", t: 0, front: { x: t.x, y: t.y } });
+    };
+    const stepToilet = (a) => {
+      if (!pT) return;
+      const pl = a.world.player;
+      if (pT.phase === "open") {
+        if (--pT.t > 0) return;
+        const look = pl.label ?? "";
+        const f = pT.seat ? seatFeet(pT.seat, look) : pT.front;
+        if (!pl.lifeScene?.([{ id: "101" }, { id: "102", n: 4 }, { id: "103" }], f.x, f.y, 1)) {
+          a.movePlayer(pT.front.x, pT.front.y);
+          setPT(null);
+          return a.world.say("지금은 할 수 없다.", 1.5);
+        }
+        setPT({ ...pT, phase: "in" });
+        return;
+      }
+      if (pT.phase === "in") {
+        if (pl.lifeSceneOn) return;
+        if (pT.kind !== "stall") return setPT(null);
+        a.movePlayer(pT.front.x, pT.front.y);
+        host.sfx("doorLatch");
+        setPT({ ...pT, phase: "leave", t: Math.round(STALL_DOOR_SEC * 30) });
+        return;
+      }
+      if (--pT.t <= 0) setPT(null);
+    };
+    const build = (id, x, y) => {
+      view2 = host.map();
+      const base2 = sceneOf(id);
+      const people = (host.life ? [] : host.visitors?.(base2.id) ?? []).map((p) => {
+        const at2 = clearSpot(p.x, p.y, base2.boxes.filter((b) => b.solid).map((b) => ({ x: b.x, y: b.y, w: b.w, back: b.d + 6, front: 8 })), base2.lane ?? LANE);
+        return { ...p, x: at2.x, y: at2.y };
+      });
+      const toiletSpots = (base2.toilets ?? []).map((t) => ({ id: `toilet:${t.id}`, x: t.x, y: t.y, verb: t.kind === "stall" ? "문 열기" : t.kind === "urinal" ? "소변기" : "손 씻기", face: 1, open: true }));
+      const sc = { ...base2, spots: [...base2.spots, ...toiletSpots, ...people.map((p) => ({ id: `visit:${p.name}`, x: p.x, y: p.y, who: p.name, verb: "대화", face: p.face, open: true }))] };
+      if (pT) setPT(null);
+      peek = null;
+      gateOpen.clear();
+      curPeople = people;
+      speech = null;
+      const prev = scene;
+      scene = sc;
+      if (prev && prev.id !== sc.id) host.entered?.({ id: sc.id, name: sc.name, floor: sc.floor }, { id: prev.id, name: prev.name, floor: prev.floor }, walked);
+      walked = 0;
+      lastX = null;
+      barked = null;
+      enterTick = -1;
+      opening = null;
+      rattle = null;
+      callWait = null;
+      callOn = false;
+      const inDoor = arriveDoor ? sc.doors.find((d3) => d3.id === arriveDoor) : void 0;
+      closing = sc.painted && inDoor ? { id: inDoor.id, t: 0, len: openLen(sc, inDoor) } : null;
+      arriveDoor = null;
+      near2 = null;
+      solids = [...sc.boxes.filter((b) => b.solid).map((b) => ({ x: b.x, y: b.y, w: b.w, back: b.d + 6, front: 8, h: sc.painted ? b.h : void 0 })), ...people.map((p) => ({ x: p.x, y: p.y, w: 80, back: 24, front: 24 }))];
+      if (sc.painted && sc.toilets?.some((t) => t.kind === "stall")) for (const o of PAINTED[sc.painted]?.objects ?? []) {
+        if (!/^(front|door)\d+$/.test(o.id)) continue;
+        const foot = o.sortY ?? o.y + o.h;
+        solids.push({ x: o.x + o.w / 2, y: foot, w: o.w - 30, back: foot - (sc.lane ?? LANE)[0] + 40, front: 6 });
+      }
+      const len = Math.max(SCREEN_W, sc.length);
+      const sx = Math.max(60, Math.min(len - 60, x));
+      arrive = { x: sx, y };
+      const place = HQ_PLACE[sc.id] ?? HQ_PLACE[sc.look] ?? "hq_office";
+      return {
+        id: `hq:${sc.id}`,
+        title: sc.name,
+        type: "hq",
+        length: len,
+        lane: sc.lane ?? LANE,
+        startX: sx,
+        exitX: Infinity,
+        props: [],
+        encounters: [],
+        platforms: sc.painted ? sc.boxes.filter((b) => b.solid && b.h > 0 && b.h < 400).map((b) => ({ x0: b.x - b.w / 2, x1: b.x + b.w / 2, y0: b.y - b.d, y1: b.y, h: b.h })) : void 0,
+        depthLayers: sc.boxes.map((b, bi) => ({ y: b.y, occludedSilhouette: !sc.painted, x0: b.x - b.w / 2, x1: b.x + b.w / 2, draw: (c) => {
+          if (b === sitChair || live.some((q) => q.seat?.box === bi)) return;
+          if (sc.painted && hasHqField(sc.painted) && b.kind !== "chair" && b.kind !== "armchair") {
+            drawHqFieldObject(c, sc.painted, b.kind, gateOpen.get(b.kind) ?? 0, stallBusy(b.kind));
+            return;
+          }
+          drawBox(c, b, sc.look);
+        } })).concat(people.map((p) => ({ y: p.y, x0: p.x - 60, x1: p.x + 60, occludedSilhouette: false, draw: (c) => {
+          drawCharClip(c, p.name, p.x, p.y, p.face, performance.now());
+        } }))).concat((sc.painted && PAINTED[sc.painted]?.showers ? PAINTED[sc.painted].showers : []).map((sh) => ({ y: sh.foot[1] + 1, x0: sh.foot[0] - 80, x1: sh.foot[0] + 80, occludedSilhouette: false, draw: (c) => {
+          if (showerSpot !== sh.id) {
+            const u = host.life?.showerUsers?.(sc.id).find((q) => q.id === sh.id);
+            if (!u) return;
+            drawShowerWater(c, sh, u.y + charTop(u.look) * spr(u.y), performance.now());
+            return;
+          }
+          const pl = curWorld?.player ?? null;
+          const top = pl ? (pl.art ? charTop(pl.art.key) : -230) * spr(pl.y) : -230;
+          drawShowerWater(c, sh, pl ? pl.y + top : null, performance.now());
+        } }))).concat(host.life ? Array.from({ length: LIFE_SLOTS }, (_, i) => ({
+          get y() {
+            return live[i]?.y ?? -1e9;
+          },
+          get x0() {
+            return (live[i]?.x ?? -1e9) - 60;
+          },
+          get x1() {
+            return (live[i]?.x ?? -1e9) + 60;
+          },
+          occludedSilhouette: false,
+          draw: (c) => {
+            const a = live[i];
+            if (a) drawLiveActor(c, a, host.life);
+          }
+        })) : []).concat(host.life?.gear ? Array.from({ length: GEAR_SLOTS }, (_, i) => ({
+          get y() {
+            return gears[i]?.y ?? -1e9;
+          },
+          get x0() {
+            return (gears[i]?.x ?? -1e9) - 40;
+          },
+          get x1() {
+            return (gears[i]?.x ?? -1e9) + 40;
+          },
+          occludedSilhouette: false,
+          draw: (c) => {
+            const g = gears[i];
+            if (g && !(sc.painted && PAINTED[sc.painted]?.gear)) drawGear(c, g, performance.now() / 1e3);
+          }
+          // 그림 장면은 장비가 그림에 있다(11-02)
+        })) : []).concat(host.life?.cordons ? Array.from({ length: CORDON_SLOTS * 2 }, (_, i) => ({
+          get y() {
+            const b = cords[i >> 1];
+            return b ? i & 1 ? b.y1 : b.y0 : -1e9;
+          },
+          get x0() {
+            return cords[i >> 1]?.x0 ?? -1e9;
+          },
+          get x1() {
+            return cords[i >> 1]?.x1 ?? -1e9;
+          },
+          occludedSilhouette: false,
+          draw: (c) => {
+            const b = cords[i >> 1];
+            if (b) drawCordon(c, b, !!(i & 1), performance.now() / 1e3);
+          }
+        })) : []),
+        drawBackground(c, camX) {
+          if (sc.painted && drawHqField(c, sc.painted, camX, doorFx, host.hour?.() ?? null)) {
+            if (sc.floor === "2F" || sc.floor === "3F") drawHqSigns(c, sc.painted, sc.doors);
+            if (callOn) drawCallLit(c, sc.painted, performance.now());
+            return;
+          }
+          if (sc.legacy) {
+            const cov = drawHqWall(c, place, sc.id, len, TOP, sc.doors);
+            artDoors = cov ?? /* @__PURE__ */ new Set();
+            c.fillStyle = "rgba(0,0,0,0.35)";
+            c.fillRect(camX - 40, TOP - 14, view.w + 80, 14);
+            if (!drawFloor(c, place, camX - 40, camX + view.w + 40, TOP, SCREEN_H)) {
+              c.fillStyle = "#2b3135";
+              c.fillRect(camX - 40, TOP, view.w + 80, SCREEN_H - TOP);
+            }
+            for (const t of sc.things) if (t.wall) legacyThing(c, t, camX);
+            for (const d3 of sc.doors) if (!artDoors.has(d3.id)) legacyDoor(c, d3, camX);
+            for (const t of sc.things) if (!t.wall) legacyThing(c, t, camX);
+            return;
+          }
+          drawRoomShell(c, sc, camX);
+          const textured = (sc.id === "office" || sc.id === "f2") && drawHqTextureWall(c, place, len, camX, sc.doors.filter((d3) => !isS(d3)).map((d3) => ({ x: d3.x, width: d3.kind === "glass" ? 192 : DOOR_W[d3.kind] + 24 })));
+          if (sc.id === "office" || sc.id === "f2") drawFloor(c, place, camX - 40, camX + view.w + 40, TOP, SCREEN_H);
+          for (const f of sc.fixtures) {
+            if (!textured || f.kind === "directory") drawFixture(c, f, sc.look, camX);
+          }
+          for (const d3 of sc.doors) if (!isS(d3)) {
+            if (sc.id === "f2" && d3.id === "office" && d3.kind === "glass" && drawHqDoorRound2(c, d3.x, openOf(d3.id), d3.open)) continue;
+            drawDoorN(c, d3, sc.look, openOf(d3.id), camX);
+          }
+          for (const d3 of sc.doors) if (isS(d3)) drawFloorExit(c, d3, openOf(d3.id), camX);
+        },
+        drawForeground(c, camX, w) {
+          const now = performance.now();
+          if (enterTick < 0) enterTick = now;
+          const age = (now - enterTick) / (1e3 / 30);
+          if (!sc.legacy) {
+            for (const d3 of sc.doors) if (isS(d3)) drawExitLintel(c, d3, camX);
+          }
+          if (sc.painted) drawHqFieldLight(c, sc.painted, camX, host.hour?.() ?? null, now);
+          const z = view.zoom;
+          c.save();
+          c.scale(1 / z, 1 / z);
+          const shown = host.life ? live.filter((a) => a.kind === "named") : people;
+          const mobsShown = host.life ? live.filter((a) => a.kind === "mob" && (a.talk || a.rel === "foe")) : [];
+          host.overlay?.(c, [
+            ...shown.map((p) => {
+              const rel = p.rel;
+              return { name: p.name, x: p.x * z, y: p.y * z, top: namedTop(p.name) * spr(p.y) * z, ...rel ? { rel } : {} };
+            }),
+            ...mobsShown.map((p) => ({ name: `mob:${p.id}`, label: p.name, mob: true, x: p.x * z, y: p.y * z, top: (p.look && charArt(p.look) ? charTop(p.look) : -230) * spr(p.y) * z, ...p.rel ? { rel: p.rel } : {} }))
+          ], { name: "", x: w.player.x * z, y: (w.player.y - w.player.z) * z, top: (w.player.art ? charTop(w.player.art.key) : -230) * spr(w.player.y) * z });
+          c.restore();
+          if (host.life) {
+            c.save();
+            c.scale(1 / z, 1 / z);
+            for (const a of live) {
+              if (!a.icon && !a.say) continue;
+              const top = (a.kind === "named" ? namedTop(a.name) : a.look && charArt(a.look) ? charTop(a.look) : -230) * spr(a.y);
+              drawHeadBubble(c, a.x * z, (a.y + top) * z - 8, a.say ?? a.icon, !!a.say);
+            }
+            c.restore();
+          }
+          const obs = host.life?.observer(sc.id);
+          if (obs) drawObserver(c, obs);
+          const dark2 = fadeOut > 0 ? 1 - fadeOut / FADE : age < FADE ? 1 - age / FADE : 0;
+          if (dark2 > 0) {
+            c.fillStyle = `rgba(0,0,0,${dark2})`;
+            c.fillRect(camX - 40, 0, view.w + 80, SCREEN_H);
+          }
+        }
+      };
+    };
+    let maxMidCache = 0;
+    const maxMid = () => {
+      if (maxMidCache) return maxMidCache;
+      let m = STD_MID;
+      for (const pt of Object.values(PAINTED)) {
+        if (!pt?.dotK || !pt.lane) continue;
+        const v = perspOf((pt.lane[0] + pt.lane[1]) / 2, pt.lane, pt.far || FAR, pt.growTo || 0, pt.sizes || []) * pt.dotK;
+        if (v > m) m = v;
+      }
+      return maxMidCache = m;
+    };
+    const go = (sceneId, x, y) => {
+      view.worldH = sceneOf(sceneId).painted ? PAINTED[sceneOf(sceneId).painted]?.h ?? 700 : SCREEN_H;
+      const pt = sceneOf(sceneId).painted ? PAINTED[sceneOf(sceneId).painted] : void 0;
+      const dotK = pt?.dotK || CHAR_K;
+      view.far = pt?.far || FAR;
+      view.growTo = pt?.growTo || 0;
+      view.sizes = pt?.sizes || [];
+      const lane = sceneOf(sceneId).lane ?? LANE;
+      const mid = perspOf((lane[0] + lane[1]) / 2, lane, view.far, view.growTo, view.sizes) * dotK;
+      view.charMul = dotK / CHAR_K;
+      view.sceneZoom = Math.max(1, maxMid() / mid);
+      pending = { scene: sceneId, x, y };
+      fadeOut = FADE;
+    };
+    const arriveAt = (sceneId, doorId) => {
+      const d3 = sceneOf(sceneId).doors.find((q) => q.id === doorId);
+      return d3 ? { x: d3.x, y: sceneOf(sceneId).legacy ? void 0 : doorY(d3, sceneOf(sceneId).lane ?? LANE) } : { x: 200, y: void 0 };
+    };
+    const goDoor = (sceneId, doorId) => {
+      arriveDoor = doorId ?? null;
+      const t = arriveAt(sceneId, doorId);
+      go(sceneId, t.x, t.y);
+    };
+    const target = (px, py) => {
+      if (!scene || pT) return null;
+      let best = null;
+      const consider = (id, kind, x, ok) => {
+        const d3 = Math.abs(x - px);
+        if (ok && (!best || d3 < best.d)) best = { id, kind, x, d: d3 };
+      };
+      for (const s of scene.spots) {
+        const ok = Math.abs(s.x - px) < (s.y === void 0 ? 60 : 75) && (s.y === void 0 || Math.abs(s.y - py) < 55);
+        consider(`spot:${s.id}`, "hubspot", s.x, ok);
+      }
+      for (const d3 of scene.doors) {
+        const reach = Math.abs(d3.x - px) < (scene.legacy ? 60 : 75);
+        const lane = scene.lane ?? LANE;
+        const reachY = scene.painted ? doorReachY(scene.painted, d3.id) : null;
+        const depth = scene.legacy || (isS(d3) ? py > lane[1] - 60 : py < Math.max(lane[0] + 75, reachY ?? 0));
+        consider(`door:${d3.id}`, "hubdoor", d3.x, reach && depth);
+      }
+      return best;
+    };
+    return {
+      id: "hq",
+      label: "본부",
+      firstFloor: () => {
+        const v = host.map();
+        view2 = v;
+        const s = pending ?? v.start;
+        pending = null;
+        fadeOut = 0;
+        return build(s.scene, s.x, s.y);
+      },
+      nextFloor: () => {
+        const s = pending ?? { scene: scene?.id ?? "office", x: 400 };
+        pending = null;
+        return build(s.scene, s.x, s.y);
+      },
+      tick(a) {
+        if (scene?.painted) for (const o of PAINTED[scene.painted]?.objects ?? []) {
+          if (!o.frames) continue;
+          const want = live.some((q) => q.toilet?.door === o.id && q.toilet.open) || !!pT && pT.door === o.id && pT.phase !== "in" || peek?.door === o.id;
+          const t2 = gateOpen.get(o.id) ?? 0;
+          gateOpen.set(o.id, Math.max(0, Math.min(1, t2 + (want ? 1 : -1) / (STALL_DOOR_SEC * 30))));
+        }
+        if (pT) stepToilet(a);
+        if (peek && (Math.hypot(a.world.player.x - peek.x, a.world.player.y - peek.y) > 70 || !stallBusy(peek.door))) peek = null;
+        if (scene?.painted) for (const o of PAINTED[scene.painted]?.objects ?? []) {
+          if (!o.gate) continue;
+          const pl = a.world.player;
+          const by = (x, y) => Math.abs(x - (o.x + o.w / 2)) < o.w / 2 + 90 && Math.abs(y - o.sortY) < 140;
+          const near3 = by(pl.x, pl.y) || live.some((q) => by(q.x, q.y));
+          const t2 = gateOpen.get(o.id) ?? 0;
+          gateOpen.set(o.id, Math.max(0, Math.min(1, t2 + (near3 ? 0.12 : -0.08))));
+        }
+        if (sitChair && !a.world.player.seat && !a.world.player.sitting) sitChair = null;
+        curWorld = a.world;
+        if (showerSpot && !a.world.player.showering) {
+          showerSpot = null;
+          host.life?.playerShower?.(null);
+        }
+        {
+          const pl = a.world.player;
+          if (pl.nude && !(scene?.showers?.length || scene?.lockers?.length)) pl.dress?.();
+        }
+        if (lockerUse && (lockerUse.t -= 1 / 60) <= 0) {
+          lockerUse = null;
+          host.life?.playerLocker?.(null);
+        }
+        if (host.life && scene) {
+          host.life.tick(1 / 30, { scene: scene.id, x: a.world.player.x, y: a.world.player.y, seat: sitChair ? scene.boxes.indexOf(sitChair) : null });
+          const boxes = a.world.player.frame().hit;
+          if (boxes.length && host.life.hit) {
+            const n = host.life.hit(scene.id, boxes, a.world.player.dir);
+            if (n) a.world.emit({ type: "hit", strength: 1, x: boxes[0].x0, y: boxes[0].y, z: 120, dmg: 0, react: "flinch", target: "npc", combo: 0 });
+          }
+          host.life.combat?.(a, scene.id);
+          live = host.life.actors(scene.id);
+          cords = host.life.cordons?.(scene.id) ?? [];
+          gears = host.life.gear?.(scene.id) ?? [];
+          const named = live.filter((q) => q.kind === "named");
+          const talkers = live.filter((q) => q.kind === "mob" && q.talk);
+          scene.spots = scene.spots.filter((q) => !q.id.startsWith("visit:")).concat(named.map((q) => ({ id: `visit:${q.name}`, x: q.x, y: q.y, who: q.name, verb: "대화", face: q.face, open: true })), talkers.map((q) => ({ id: `visit:mob:${q.id}`, x: q.x, y: q.y, who: `mob:${q.id}`, verb: "대화", face: q.face, open: true })));
+          curPeople = named;
+        }
+        if (fadeOut > 0 && --fadeOut === 0 && pending) {
+          if (pending.scene === scene?.id) {
+            arrive = { x: pending.x, y: pending.y };
+            pending = null;
+            enterTick = -1;
+          } else return a.finish("next");
+        }
+        const p = a.world.player;
+        if (arrive) {
+          const y = arrive.y ?? p.y;
+          const at2 = clearSpot(arrive.x, y, solids, scene?.lane ?? LANE);
+          a.movePlayer(at2.x, at2.y);
+          arrive = null;
+          lastX = null;
+        }
+        if (lastX !== null) {
+          const d3 = Math.abs(p.x - lastX);
+          if (d3 < 60) walked += d3;
+        }
+        lastX = p.x;
+        if (opening && opening.t < opening.len && ++opening.t === opening.len) {
+          const then = opening.then;
+          then();
+        }
+        if (callWait && --callWait.t <= 0) {
+          const f = callWait.then;
+          callWait = null;
+          f();
+        }
+        if (closing && ++closing.t >= closing.len) closing = null;
+        if (rattle && ++rattle.t >= RATTLE_T) rattle = null;
+        if (solids.length && !p.seat && !pT) blockByProps([p], solids.filter((s) => !(s.h !== void 0 && p.z >= s.h - 6)), scene?.lane ?? LANE);
+        if (scene?.painted && !pT) {
+          const q = clampPainted(scene.painted, p.x, p.y, p.z);
+          if (q.x !== p.x || q.y !== p.y) a.movePlayer(q.x, q.y);
+        }
+        const t = p.seat ? null : target(p.x, p.y);
+        const id = t?.id ?? null;
+        if (id !== near2) {
+          if (near2) a.setProp(near2, null);
+          if (t) a.setProp(t.id, { kind: t.kind, x: p.x, y: p.y, w: 40, h: 10 });
+          near2 = id;
+        } else if (t) a.setProp(t.id, { x: p.x, y: p.y });
+        const sp = scene?.spots.find((s) => s.open && s.who && s.place && Math.abs(s.x - p.x) < 170);
+        if (sp && sp.place !== barked) {
+          barked = sp.place;
+          const l = host.bark(sp.place);
+          if (l) {
+            const who = curPeople.find((q) => q.name === l.who);
+            const x = who?.x ?? sp.x, y = who?.y ?? sp.y ?? p.y;
+            speech = { who: l.who, text: l.text, x, y, top: (who ? namedTop(l.who) : -200) * spr(y), until: performance.now() + 3800 };
+          }
+        } else if (!sp) barked = null;
+      },
+      onInteract(a, _floor, prop) {
+        if (!scene || fadeOut > 0 || opening || callWait) return;
+        if (prop.kind === "hubspot") {
+          const s = scene.spots.find((q) => `spot:${q.id}` === prop.id);
+          if (!s) return;
+          if (!s.open) return a.world.say("아직 쓸 수 없다. 본부 일이 더 진행되면 열린다.", 2.5);
+          if (s.shop) {
+            const m = host.shop?.(s.shop);
+            if (m) a.world.say(m, 2.5);
+            return;
+          }
+          if (s.id.startsWith("toilet:")) return useToilet(a, s.id.slice(7));
+          if (s.place) return host.openPlace(s.place);
+          if (s.say) return a.world.say(s.say, 3);
+          if (s.act?.[0] === "locker") {
+            const pl = a.world.player;
+            const lid = s.id.replace(/^locker:/, "");
+            if (s.y === void 0 || !pl.changeClothes) return;
+            if (host.life?.lockerBusy?.(scene.id, lid)) return a.world.say("누가 쓰고 있다.", 1.5);
+            if (!pl.changeClothes(s.x, s.y, s.face ?? 1)) return;
+            lockerUse = { scene: scene.id, id: lid, t: 2.5 };
+            host.life?.playerLocker?.({ scene: scene.id, id: lid });
+            return;
+          }
+          if (s.act?.[0] === "shower") {
+            const pl = a.world.player;
+            if (s.y === void 0 || !pl.shower) return;
+            if (host.life?.showerBusy?.(scene.id, s.id)) return a.world.say("누가 쓰고 있다.", 1.5);
+            if (!pl.nude) return a.world.say("탈의실 캐비닛에서 옷을 벗고 와야 한다.", 2);
+            if (!pl.shower(s.x, s.y, s.face ?? 1)) return a.world.say("샤워 동작 그림이 없다.", 1.5);
+            showerSpot = s.id;
+            host.life?.playerShower?.({ scene: scene.id, id: s.id });
+            host.sat?.();
+            return;
+          }
+          if (s.seat && s.act?.[0]) {
+            if (s.chair !== void 0 && live.some((q) => q.seat?.box === s.chair)) return a.world.say("누가 앉아 있다.", 1.5);
+            const exit = clearSpot(s.x, s.y ?? a.world.player.y, solids, scene.lane ?? LANE);
+            if (a.world.player.sit(s.act[0], s.seat.x, s.seat.y, s.face ?? 1, exit, s.chair !== void 0 ? scene.boxes[s.chair]?.set : void 0) && s.chair !== void 0) sitChair = scene.boxes[s.chair] ?? null;
+            host.sat?.();
+            return;
+          }
+          if (s.y !== void 0) a.movePlayer(s.x, s.y);
+          if (s.face) a.world.player.dir = s.face;
+          if (s.act) host.act?.(s.act, s.face);
+          if (/앉기|눕기/.test(s.verb)) host.sat?.();
+          return;
+        }
+        if (prop.kind !== "hubdoor") return;
+        const d3 = scene.doors.find((q) => `door:${q.id}` === prop.id);
+        if (!d3) return;
+        if (!d3.open) {
+          if (scene.painted) rattle = { id: d3.id, t: 0 };
+          if (d3.locked) a.world.say("잠겨 있다", 1.5);
+          return host.sfx("knock");
+        }
+        const len = openLen(scene, d3);
+        if (d3.kind === "stairs") {
+          const to2 = [d3.up, d3.down].filter((q) => !!q);
+          const label2 = (id) => view2.elevator.find((e) => e.scene === id)?.label ?? id;
+          const go1 = (target2) => {
+            host.sfx("doorLatch");
+            opening = { id: d3.id, t: 0, len, then: () => goDoor(target2, "stairs") };
+          };
+          if (to2.length === 1) return go1(to2[0]);
+          host.chooseFloor(to2.map((q) => ({ label: label2(q), open: true, here: false })), (i) => {
+            if (i != null && to2[i]) go1(to2[i]);
+          });
+          return;
+        }
+        if (d3.place) {
+          const place = d3.place;
+          host.sfx(scene.painted ? "doorLatch" : d3.kind === "cell" ? "doorSlam" : "doorOpen");
+          opening = { id: d3.id, t: 0, len, then: () => {
+            opening = null;
+            closing = { id: d3.id, t: 0, len };
+            host.openPlace(place);
+          } };
+          return;
+        }
+        if (d3.bus) {
+          const here = scene.id;
+          const side = host.homeSide?.() ?? "hq";
+          const stops = view2.scenes.filter((sc) => sc.id !== (side === "fb" ? "street" : "fb_street")).flatMap((sc) => sc.doors.filter((q) => q.bus).map((q) => ({ scene: sc.id, door: q.id, label: q.bus })));
+          host.chooseFloor(stops.map((e) => ({ label: e.label, open: true, here: e.scene === here })), (i) => {
+            const e = i == null ? null : stops[i];
+            if (!e || e.scene === here) return;
+            host.sfx("stepConcrete");
+            goDoor(e.scene, e.door);
+          });
+          return;
+        }
+        if (d3.kind === "elevator") {
+          const here = scene.id;
+          const bldg = view2.elevator.find((e) => e.scene === here)?.bldg;
+          const stops = view2.elevator.filter((e) => e.bldg === bldg);
+          const opts = stops.map((e) => ({ label: e.label, open: e.open, here: e.scene === here }));
+          host.chooseFloor(opts, (i) => {
+            if (i == null) return;
+            const e = stops[i];
+            if (!e?.open || e.scene === here) return;
+            if (!scene?.painted) {
+              host.sfx("ding");
+              opening = { id: d3.id, t: 0, len, then: () => goDoor(e.scene, e.door) };
+              return;
+            }
+            host.sfx("panelButton");
+            callOn = true;
+            callWait = { t: 14, then: () => {
+              host.sfx("elevChime");
+              opening = { id: d3.id, t: 0, len, then: () => goDoor(e.scene, e.door) };
+            } };
+          });
+          return;
+        }
+        if (!d3.to) return;
+        const to = d3.to, toDoor = d3.toDoor;
+        host.sfx(scene.painted ? "doorLatch" : d3.kind === "steel" || d3.kind === "security" || d3.kind === "cell" ? "doorSlam" : d3.kind.startsWith("stairs") ? "stepConcrete" : "doorOpen");
+        if (scene.legacy) return goDoor(to, toDoor);
+        opening = { id: d3.id, t: 0, len, then: () => goDoor(to, toDoor) };
+      },
+      /** 지금 손이 닿는 문·자리의 짧은 이름 (캐릭터 옆 말풍선) */
+      speech() {
+        if (!speech || performance.now() > speech.until || fadeOut > 0) return null;
+        return speech;
+      },
+      nearInfo() {
+        if (!scene || !near2 || opening || fadeOut > 0) return null;
+        if (near2.startsWith("spot:")) {
+          const s = scene.spots.find((q) => `spot:${q.id}` === near2);
+          return s ? { text: s.verb, locked: !s.open } : null;
+        }
+        const d3 = scene.doors.find((q) => `door:${q.id}` === near2);
+        if (!d3) return null;
+        const text = d3.label ?? (d3.kind === "elevator" ? "엘리베이터" : d3.kind === "stairs" ? "계단" : d3.kind === "exit" ? "나가기" : "문");
+        return { text, locked: !d3.open };
+      },
+      /** 검사·스크린샷용: 장면으로 바로 */
+      jump(sceneId, x = 400, y) {
+        if (view2) go(sceneId, x, y);
+      },
+      sceneIds: () => (view2 ?? host.map()).scenes.map((s) => s.id),
+      current: () => scene,
+      goto(place) {
+        if (!view2) return;
+        const t = whereIs2(place);
+        go(t.scene, t.x, t.y);
+      }
+    };
+  }
+  var LOOKS2 = {
+    // 지상: 짙은 남색·숯색 벽, 호두나무 판, 천장 간접 조명, 밝은 회색 바닥
+    office: { wallTop: "#1f2836", wallBot: "#2c3a4d", band: "#5e4330", light: "#cfe4ff", floorA: "#8f99a5", floorB: "#848e9a" },
+    hall: { wallTop: "#1f2733", wallBot: "#2a3544", band: "#4d3a2c", light: "#cfe4ff", floorA: "#7f8994", floorB: "#76808b" },
+    lobby: { wallTop: "#24262b", wallBot: "#34373e", band: "#6a5644", light: "#ffe9c4", floorA: "#8d8a84", floorB: "#83807a" },
+    life: { wallTop: "#2a3039", wallBot: "#3b4450", band: "#6a5240", light: "#ffe6c2", floorA: "#9a8a74", floorB: "#8f7f69" },
+    bath: { wallTop: "#7f919b", wallBot: "#9fb1ba", band: "#3f5260", light: "#fff4dc", floorA: "#b2bcc1", floorB: "#a6b0b5", tiles: true },
+    // 지하: 흰 패널, 청록 빛줄 (복도는 반쯤만 불)
+    lab: { wallTop: "#aab4bb", wallBot: "#c3cbd0", band: "#2f3a42", light: "#45d6de", floorA: "#9aa3a9", floorB: "#8f989e", panels: true },
+    labhall: { wallTop: "#aab4bb", wallBot: "#c3cbd0", band: "#2f3a42", light: "#45d6de", floorA: "#9aa3a9", floorB: "#8f989e", panels: true, dim: 0.5 }
+  };
+  function drawRoomShell(c, sc, camX) {
+    const L = LOOKS2[sc.look] ?? LOOKS2.office;
+    const x0 = camX - 40, w = view.w + 80;
+    const g = c.createLinearGradient(0, 0, 0, TOP);
+    g.addColorStop(0, L.wallTop);
+    g.addColorStop(1, L.wallBot);
+    c.fillStyle = g;
+    c.fillRect(x0, 0, w, TOP);
+    c.fillStyle = "rgba(0,0,0,0.35)";
+    c.fillRect(x0, 0, w, 24);
+    c.fillStyle = L.light;
+    c.globalAlpha = 0.55;
+    c.fillRect(x0, 24, w, 4);
+    c.globalAlpha = 1;
+    if (L.tiles) {
+      c.strokeStyle = "rgba(40,60,70,0.25)";
+      c.lineWidth = 1;
+      for (let y = 60; y < TOP - 50; y += 36) {
+        c.beginPath();
+        c.moveTo(x0, y);
+        c.lineTo(x0 + w, y);
+        c.stroke();
+      }
+      for (let x = Math.floor(x0 / 36) * 36; x < x0 + w; x += 36) {
+        c.beginPath();
+        c.moveTo(x, 40);
+        c.lineTo(x, TOP - 50);
+        c.stroke();
+      }
+    }
+    if (L.panels) {
+      c.fillStyle = "rgba(30,40,48,0.18)";
+      for (let x = Math.floor(x0 / 240) * 240; x < x0 + w; x += 240) c.fillRect(x, 28, 3, TOP - 28);
+      c.fillStyle = L.light;
+      c.globalAlpha = 0.8;
+      c.fillRect(x0, TOP - 92, w, 5);
+      c.globalAlpha = 1;
+    }
+    c.fillStyle = L.band;
+    c.fillRect(x0, TOP - 44, w, 44);
+    c.fillStyle = "rgba(255,255,255,0.08)";
+    c.fillRect(x0, TOP - 44, w, 3);
+    c.fillStyle = L.floorA;
+    c.fillRect(x0, TOP, w, SCREEN_H - TOP);
+    c.fillStyle = L.floorB;
+    for (let i = 0, y = TOP; y < SCREEN_H; i++) {
+      const hgt = 18 + i * 6;
+      if (i % 2) c.fillRect(x0, y, w, hgt);
+      y += hgt;
+    }
+    c.fillStyle = "rgba(0,0,0,0.28)";
+    c.fillRect(x0, TOP, w, 10);
+    if (L.dim) {
+      c.fillStyle = `rgba(6,10,16,${L.dim})`;
+      c.fillRect(x0, 0, w, SCREEN_H);
+    }
+  }
+  function drawFixture(c, f, look, camX) {
+    const x = f.x - f.w / 2;
+    if (x > camX + view.w + 40 || x + f.w < camX - 40) return;
+    switch (f.kind) {
+      case "window": {
+        const y = 70, h = TOP - 150;
+        c.fillStyle = "#0d1522";
+        c.fillRect(x, y, f.w, h);
+        c.fillStyle = "#1a2638";
+        for (let i = 0; i * 70 < f.w; i++) {
+          const bh = 90 + i * 53 % 110;
+          c.fillRect(x + i * 70 + 8, y + h - bh, 52, bh);
+        }
+        c.fillStyle = "rgba(255,214,140,0.35)";
+        for (let i = 0; i * 70 < f.w; i++) if (i % 3 === 1) c.fillRect(x + i * 70 + 22, y + h - 60, 10, 12);
+        c.strokeStyle = "#8193a8";
+        c.lineWidth = 6;
+        c.strokeRect(x, y, f.w, h);
+        c.lineWidth = 3;
+        for (let i = 1; i * 230 < f.w; i++) {
+          c.beginPath();
+          c.moveTo(x + i * 230, y);
+          c.lineTo(x + i * 230, y + h);
+          c.stroke();
+        }
+        break;
+      }
+      case "screen": {
+        const y = 90, h = 190;
+        c.fillStyle = "#0e2a3a";
+        c.fillRect(x, y, f.w, h);
+        c.strokeStyle = "#24465a";
+        c.lineWidth = 8;
+        c.strokeRect(x, y, f.w, h);
+        c.strokeStyle = "#4fd1e0";
+        c.lineWidth = 3;
+        c.beginPath();
+        for (let i = 0; i <= 12; i++) c[i ? "lineTo" : "moveTo"](x + 30 + i * (f.w - 60) / 12, y + h - 50 - Math.abs(Math.sin(i * 1.7)) * (h - 100));
+        c.stroke();
+        c.fillStyle = "#ff9b52";
+        for (let i = 1; i < 4; i++) c.fillRect(x + i * f.w / 4 - 7, y + 60 + i * 37 % 70, 14, 14);
+        break;
+      }
+      case "shower": {
+        c.fillStyle = "#c9d2d8";
+        c.fillRect(f.x - 4, 100, 8, TOP - 200);
+        c.fillRect(f.x - 4, 100, 46, 8);
+        c.fillStyle = "#e8edf0";
+        c.fillRect(f.x + 26, 104, 34, 14);
+        c.fillStyle = "#9aa6ad";
+        c.fillRect(f.x - 14, TOP - 160, 28, 10);
+        break;
+      }
+      case "glass": {
+        const y = 80, h = TOP - 170;
+        c.fillStyle = look === "bath" ? "rgba(235,242,246,0.75)" : "#11202a";
+        c.fillRect(x, y, f.w, h);
+        if (look !== "bath") {
+          c.fillStyle = "rgba(69,214,222,0.18)";
+          c.fillRect(x, y, f.w, h);
+          c.fillStyle = "rgba(0,0,0,0.55)";
+          c.beginPath();
+          c.ellipse(f.x, y + h - 40, 60, 110, 0, 0, Math.PI * 2);
+          c.fill();
+        }
+        c.strokeStyle = look === "bath" ? "#8fa1ab" : "#d6dde2";
+        c.lineWidth = 8;
+        c.strokeRect(x, y, f.w, h);
+        break;
+      }
+      case "blinds": {
+        const y = 80, h = TOP - 170;
+        c.fillStyle = "#d9c9a8";
+        c.fillRect(x, y, f.w, h);
+        c.fillStyle = "rgba(90,70,50,0.25)";
+        for (let yy = y + 8; yy < y + h; yy += 14) c.fillRect(x, yy, f.w, 3);
+        c.fillStyle = "rgba(255,214,150,0.35)";
+        c.beginPath();
+        c.ellipse(f.x + f.w / 3, TOP - 40, 120, 30, 0, 0, Math.PI * 2);
+        c.fill();
+        break;
+      }
+      case "shelfwall": {
+        const y = 60, h = TOP - 104;
+        c.fillStyle = "#3a3026";
+        c.fillRect(x, y, f.w, h);
+        c.fillStyle = "rgba(160,200,215,0.25)";
+        for (let i = 0; i * 120 < f.w; i++) c.fillRect(x + i * 120 + 8, y + 8, 104, h - 16);
+        c.fillStyle = "#d8d0bd";
+        for (let i = 0; i * 120 < f.w; i++) for (let r = 0; r < 4; r++) c.fillRect(x + i * 120 + 16, y + 20 + r * ((h - 40) / 4), 88, 14);
+        break;
+      }
+      case "directory": {
+        const y = 150, h = 220;
+        c.fillStyle = "#14191f";
+        c.fillRect(x, y, f.w, h);
+        const cols = ["#4f8fd6", "#d9a441", "#3cc596", "#9a6be0"];
+        cols.forEach((col, i) => {
+          c.fillStyle = col;
+          c.fillRect(x + 10, y + 12 + i * 51, f.w - 20, 40);
+          c.fillStyle = "rgba(0,0,0,0.45)";
+          c.fillRect(x + 20, y + 22 + i * 51, 20, 20);
+        });
+        c.strokeStyle = "#9aa6b0";
+        c.lineWidth = 4;
+        c.strokeRect(x, y, f.w, h);
+        break;
+      }
+      default:
+        break;
+    }
+  }
+  function drawDoorN(c, d3, look, open, camX) {
+    const w = DOOR_W[d3.kind];
+    const x = d3.x - w / 2, y = TOP - DOOR_H;
+    if (x > camX + view.w + 40 || x + w < camX - 40) return;
+    c.fillStyle = "#12161b";
+    c.fillRect(x - 10, y - 12, w + 20, DOOR_H + 12);
+    c.fillStyle = "#05070a";
+    c.fillRect(x, y, w, DOOR_H);
+    const panels = (col, hl) => {
+      const off2 = w / 2 * open;
+      c.fillStyle = col;
+      c.fillRect(x - off2, y, w / 2, DOOR_H);
+      c.fillRect(x + w / 2 + off2, y, w / 2, DOOR_H);
+      c.fillStyle = hl;
+      c.fillRect(x - off2 + 8, y + 10, 5, DOOR_H - 20);
+      c.fillRect(x + w / 2 + off2 + 8, y + 10, 5, DOOR_H - 20);
+    };
+    c.save();
+    c.beginPath();
+    c.rect(x, y, w, DOOR_H);
+    c.clip();
+    switch (d3.kind) {
+      case "stairs_up":
+      case "stairs_down": {
+        c.fillStyle = "#2c333a";
+        const up = d3.kind === "stairs_up";
+        for (let i = 0; i < 8; i++) {
+          const sy = up ? TOP - 18 - i * 28 : y + 30 + i * 28;
+          c.fillRect(x + (up ? i * 8 : 0), sy, w - (up ? i * 8 : 0), 8);
+        }
+        break;
+      }
+      case "elevator":
+        panels("#9aa5ac", "rgba(255,255,255,0.25)");
+        break;
+      case "glass":
+        panels("rgba(150,190,210,0.45)", "rgba(255,255,255,0.35)");
+        c.fillStyle = "rgba(255,255,255,0.22)";
+        c.fillRect(x, y + 110, w, 26);
+        break;
+      case "slide":
+        panels("#d9e0e4", "rgba(69,214,222,0.6)");
+        break;
+      case "cell":
+        panels("#59626a", "rgba(0,0,0,0.2)");
+        break;
+      default:
+        panels("#6e7a83", "rgba(255,255,255,0.15)");
+    }
+    c.restore();
+    if (d3.kind === "elevator") {
+      c.fillStyle = "#ffb34a";
+      c.fillRect(d3.x - 16, y - 34, 32, 12);
+    }
+    if (d3.kind === "slide" || d3.kind === "cell") {
+      c.fillStyle = d3.kind === "cell" ? "#e0b43a" : d3.open ? "#45d6de" : "#e0443a";
+      c.fillRect(x + w + 14, y + 100, 12, 12);
+    }
+    if (!d3.open && d3.kind !== "cell") {
+      c.fillStyle = "rgba(0,0,0,0.35)";
+      c.fillRect(x, y, w, DOOR_H);
+    }
+    void look;
+  }
+  function drawFloorExit(c, d3, open, camX) {
+    const w = DOOR_W.exit;
+    if (d3.x + w < camX - 40 || d3.x - w > camX + view.w + 40) return;
+    const col = d3.kind === "cell" ? "#7d4a3a" : d3.open ? "#3cc596" : "#6b7480";
+    c.fillStyle = "rgba(0,0,0,0.3)";
+    c.fillRect(d3.x - w / 2 - 10, SCREEN_H - 36, w + 20, 36);
+    c.fillStyle = col;
+    c.globalAlpha = 0.55 + 0.45 * open;
+    c.fillRect(d3.x - w / 2, SCREEN_H - 14, w, 8);
+    c.globalAlpha = 1;
+  }
+  function drawExitLintel(c, d3, camX) {
+    if (d3.kind === "cell") return;
+    if (d3.x < camX - 200 || d3.x > camX + view.w + 200) return;
+    const col = d3.open ? "#3cc596" : "#6b7480";
+    const y = SCREEN_H - 30;
+    c.fillStyle = col;
+    c.beginPath();
+    c.moveTo(d3.x - 16, y - 8);
+    c.lineTo(d3.x + 16, y - 8);
+    c.lineTo(d3.x, y + 10);
+    c.closePath();
+    c.fill();
+    c.strokeStyle = "rgba(0,0,0,0.5)";
+    c.lineWidth = 2;
+    c.stroke();
+  }
+  var BOX_COL = {
+    desk: ["#b48a64", "#7a5539"],
+    opdesk: ["#b48a64", "#6a4a33"],
+    chiefdesk: ["#8a6448", "#4f3624"],
+    labbench: ["#e4e9ec", "#a9b4bb"],
+    counter: ["#c9b39a", "#6a5240"],
+    sink: ["#e8edf0", "#9fb0b8"],
+    big: ["#8ea2b6", "#5d7083"],
+    sofa: ["#6d7f93", "#46566a"],
+    bed: ["#f0f2f3", "#8d9aa4"],
+    tub: ["#5fb8cf", "#e8eef0"],
+    bench: ["#9b7a5a", "#6b5038"],
+    wall: ["#5a6571", "#3a434d"],
+    cabinet: ["#5e4a3a", "#3e3126"],
+    vending: ["#c64a3a", "#7d2c22"],
+    pillar: ["#9aa1a6", "#6f767b"],
+    locker: ["#7f8b95", "#56616b"],
+    stall: ["#8a97a1", "#5f6b75"],
+    shelf: ["#6c7781", "#48525b"],
+    cart: ["#b9c2c8", "#7d878e"],
+    lowwall: ["#c2862f", "#8a5d1f"],
+    range: ["#3b434b", "#262c32"],
+    target: ["#f2f2f2", "#c9c9c9"],
+    sandbag: ["#7a2e26", "#561f19"],
+    gate: ["#b8c0c6", "#7c868d"],
+    slot: ["#3a3f45", "#23272b"],
+    glass: ["rgba(140,205,225,0.35)", "rgba(110,180,205,0.3)"]
+  };
+  function drawBox(c, b, look) {
+    if (b.kind === "chair" || b.kind === "armchair") return drawChair(c, b);
+    const [top, front] = BOX_COL[b.kind] ?? BOX_COL.wall;
+    const x = b.x - b.w / 2;
+    c.fillStyle = top;
+    c.fillRect(x, b.y - b.h - b.d, b.w, b.d);
+    c.fillStyle = front;
+    c.fillRect(x, b.y - b.h, b.w, b.h);
+    c.strokeStyle = "rgba(15,20,26,0.75)";
+    c.lineWidth = 3;
+    c.strokeRect(x, b.y - b.h - b.d, b.w, b.d + b.h);
+    c.beginPath();
+    c.moveTo(x, b.y - b.h);
+    c.lineTo(x + b.w, b.y - b.h);
+    c.stroke();
+    if (b.kind === "desk" || b.kind === "opdesk" || b.kind === "chiefdesk") {
+      const n = b.kind === "opdesk" ? 3 : Math.max(1, Math.round(b.w / 120));
+      for (let i = 0; i < n; i++) {
+        const mx = x + (i + 0.5) * b.w / n;
+        c.fillStyle = "#121a22";
+        c.fillRect(mx - 22, b.y - b.h - b.d / 2 - 46, 44, 34);
+        c.fillStyle = "#3a6d8a";
+        c.fillRect(mx - 18, b.y - b.h - b.d / 2 - 42, 36, 26);
+      }
+      c.fillStyle = "#efe6d2";
+      c.fillRect(x + b.w - 20, b.y - b.h - 18, 10, 14);
+    }
+    if (b.kind === "bed") {
+      c.fillStyle = "#ffffff";
+      c.fillRect(x + 8, b.y - b.h - b.d + 6, 46, b.d - 12);
+    }
+    if (b.kind === "tub") {
+      c.fillStyle = "rgba(255,255,255,0.35)";
+      c.fillRect(x + 10, b.y - b.h - b.d + 8, b.w - 20, 6);
+    }
+    if (b.kind === "target") {
+      c.fillStyle = "#d0443a";
+      for (const r of [26, 14]) {
+        c.beginPath();
+        c.arc(b.x, b.y - b.h / 2, r, 0, Math.PI * 2);
+        c.fill();
+        c.fillStyle = "#f2f2f2";
+      }
+    }
+    if (b.kind === "gate") {
+      c.fillStyle = "#57d27a";
+      c.fillRect(b.x - 6, b.y - b.h - b.d + 4, 12, 6);
+    }
+    void look;
+  }
+  function drawChair(c, b) {
+    const CH2 = charFx()?.CHAIR;
+    const set = b.set ? `${b.set}:` : "";
+    const dirName = b.face === "N" ? "north" : b.face === "W" ? b.set ? "east" : "west" : b.face === "E" ? "east" : b.set ? "south-east" : "east";
+    const im = CH2?.[set + dirName] ?? CH2?.[dirName];
+    if (im?.complete && im.naturalWidth) {
+      const k = spr(b.y) * CHAR_K;
+      c.save();
+      c.translate(Math.round(b.x), Math.round(b.y));
+      c.scale(b.set && b.face === "W" ? -k : k, k);
+      c.imageSmoothingEnabled = false;
+      c.drawImage(im, -100, -171);
+      c.restore();
+      return;
+    }
+    const seatY = b.y - 82;
+    const col = b.kind === "armchair" ? "#8a5b4a" : "#2d3640";
+    c.fillStyle = col;
+    if (b.face === "N") {
+      c.fillRect(b.x - 22, b.y - 34, 44, 10);
+      c.fillRect(b.x - 18, b.y - 24, 6, 24);
+      c.fillRect(b.x + 12, b.y - 24, 6, 24);
+      return;
+    }
+    const back = b.face === "E" ? -1 : 1;
+    c.fillRect(b.x - b.w / 2, seatY, b.w, b.kind === "armchair" ? 26 : 12);
+    c.fillRect(b.x + back * (b.w / 2) - (back > 0 ? 12 : 0), seatY - (b.h - 82), 12, b.h - 82 + 12);
+    c.fillRect(b.x - 4, seatY + 12, 8, 70);
+    c.fillRect(b.x - 24, b.y - 8, 48, 6);
+  }
+  function legacyThing(c, t, camX) {
+    const sx = t.x - camX;
+    if (sx < -t.w - 100 || sx > view.w + t.w + 100) return;
+    const base2 = t.wall ? TOP - 70 : TOP + 26;
+    if (drawPropArt(c, t.kind, void 0, t.x, base2)) return;
+    c.fillStyle = "#4a4f55";
+    c.fillRect(t.x - t.w / 2, base2 - t.h, t.w, t.h);
+  }
+  function legacyDoor(c, d3, camX) {
+    const w = DOOR_W[d3.kind];
+    const sx = d3.x - camX;
+    if (sx < -w - 40 || sx > view.w + w + 40) return;
+    if (drawPropArt(c, `hq_${d3.kind}`, void 0, d3.x, TOP)) return;
+    const x = d3.x - w / 2, y = TOP - DOOR_H;
+    c.fillStyle = "#1b2023";
+    c.fillRect(x - 8, y - 8, w + 16, DOOR_H + 8);
+    c.fillStyle = d3.kind === "shop" ? "#6b4a2e" : "rgba(150,190,205,0.35)";
+    c.fillRect(x, y, w, DOOR_H);
+    if (!d3.open) {
+      c.fillStyle = "rgba(0,0,0,0.35)";
+      c.fillRect(x, y, w, DOOR_H);
+    }
+  }
+  var namedTop = (name) => charArt(name) ? charTop(name) : -230;
+  function drawLiveActor(c, a, life) {
+    const t = (life.lifeTime?.() ?? performance.now() / 1e3) * 1e3;
+    const until = a.until === void 0 ? void 0 : a.until * 1e3;
+    if (a.seat && drawCharSeat(c, a.kind === "named" ? a.name : a.look ?? a.name, a.seat.x, a.seat.y, a.face, t, a.seat.dir, a.seat.kind, (a.since ?? 0) * 1e3, until, a.seat.set)) return;
+    if (a.kind === "named" && drawCharClip(c, a.name, a.x, a.y, a.face, t, a.clip, (a.since ?? 0) * 1e3, until)) return;
+    if (a.kind === "mob" && life.drawMob) return life.drawMob(c, a);
+    silhouette(c, a);
+  }
+  function drawGear(c, g, t) {
+    const k = persp(g.y);
+    const sway = g.busy ? Math.sin(t * 9 + g.x) : 0;
+    c.save();
+    c.fillStyle = "rgba(0,0,0,0.3)";
+    c.beginPath();
+    c.ellipse(g.x, g.y, 26 * k, 6 * k, 0, 0, Math.PI * 2);
+    c.fill();
+    if (g.kind === "sandbag") {
+      const top = g.y - 300 * k, ang = sway * 0.12;
+      c.strokeStyle = "#4a4f55";
+      c.lineWidth = Math.max(1, 3 * k);
+      c.beginPath();
+      c.moveTo(g.x, top);
+      c.lineTo(g.x + Math.sin(ang) * 70 * k, top + 70 * k);
+      c.stroke();
+      c.translate(g.x, top + 70 * k);
+      c.rotate(ang);
+      c.fillStyle = "#8a2e26";
+      c.fillRect(-22 * k, 0, 44 * k, 150 * k);
+      c.fillStyle = "#6d231d";
+      c.fillRect(-22 * k, 0, 44 * k, 10 * k);
+      c.fillRect(-22 * k, 140 * k, 44 * k, 10 * k);
+      c.fillStyle = "rgba(255,255,255,0.12)";
+      c.fillRect(-16 * k, 14 * k, 6 * k, 120 * k);
+    } else if (g.kind === "dummy") {
+      const ang = sway * 0.06;
+      c.fillStyle = "#3d3a36";
+      c.fillRect(g.x - 24 * k, g.y - 8 * k, 48 * k, 8 * k);
+      c.translate(g.x, g.y - 8 * k);
+      c.rotate(ang);
+      c.fillStyle = "#6b4a2b";
+      c.fillRect(-5 * k, -150 * k, 10 * k, 150 * k);
+      c.fillStyle = "#c9a65b";
+      c.fillRect(-26 * k, -205 * k, 52 * k, 90 * k);
+      c.fillStyle = "#b08c45";
+      c.fillRect(-26 * k, -165 * k, 52 * k, 6 * k);
+      c.fillStyle = "#6b4a2b";
+      c.fillRect(-48 * k, -195 * k, 96 * k, 8 * k);
+      c.fillStyle = "#c9a65b";
+      c.beginPath();
+      c.arc(0, -225 * k, 20 * k, 0, Math.PI * 2);
+      c.fill();
+    } else {
+      const dx = sway * 2 * k;
+      c.strokeStyle = "#3d3a36";
+      c.lineWidth = Math.max(1, 4 * k);
+      c.beginPath();
+      c.moveTo(g.x - 16 * k, g.y);
+      c.lineTo(g.x - 8 * k, g.y - 90 * k);
+      c.moveTo(g.x + 16 * k, g.y);
+      c.lineTo(g.x + 8 * k, g.y - 90 * k);
+      c.stroke();
+      c.fillStyle = "#ece8df";
+      c.fillRect(g.x - 30 * k + dx, g.y - 190 * k, 60 * k, 100 * k);
+      for (const [r, col] of [[24, "#c23b30"], [17, "#ece8df"], [10, "#c23b30"], [4, "#ece8df"]]) {
+        c.fillStyle = col;
+        c.beginPath();
+        c.arc(g.x + dx, g.y - 140 * k, r * k, 0, Math.PI * 2);
+        c.fill();
+      }
+    }
+    c.restore();
+  }
+  function drawCone(c, x, y) {
+    const k = persp(y), h = 34 * k, w = 22 * k;
+    c.fillStyle = "rgba(0,0,0,0.3)";
+    c.beginPath();
+    c.ellipse(x, y, w * 0.75, 4 * k, 0, 0, Math.PI * 2);
+    c.fill();
+    c.fillStyle = "#2a2a2a";
+    c.fillRect(Math.round(x - w * 0.62), Math.round(y - 4 * k), Math.round(w * 1.24), Math.max(2, Math.round(4 * k)));
+    c.fillStyle = "#f26a1b";
+    c.beginPath();
+    c.moveTo(x - w / 2, y - 4 * k);
+    c.lineTo(x - 3 * k, y - h);
+    c.lineTo(x + 3 * k, y - h);
+    c.lineTo(x + w / 2, y - 4 * k);
+    c.closePath();
+    c.fill();
+    c.fillStyle = "#f4f1e8";
+    const t0 = 0.45, t1 = 0.62, at2 = (t) => w / 2 - (w / 2 - 3 * k) * t;
+    c.beginPath();
+    c.moveTo(x - at2(t0), y - 4 * k - (h - 4 * k) * t0);
+    c.lineTo(x - at2(t1), y - 4 * k - (h - 4 * k) * t1);
+    c.lineTo(x + at2(t1), y - 4 * k - (h - 4 * k) * t1);
+    c.lineTo(x + at2(t0), y - 4 * k - (h - 4 * k) * t0);
+    c.closePath();
+    c.fill();
+    return h;
+  }
+  function drawTape(c, x0, y0, x1, y1, t, words) {
+    const k = persp((y0 + y1) / 2), sag = 5 * k + 2 * k * Math.sin(t * 2.3 + x0 * 0.05);
+    const mx = (x0 + x1) / 2, my = (y0 + y1) / 2 + sag * 2;
+    c.strokeStyle = "#f2d21b";
+    c.lineWidth = Math.max(2, 5 * k);
+    c.beginPath();
+    c.moveTo(x0, y0);
+    c.quadraticCurveTo(mx, my, x1, y1);
+    c.stroke();
+    if (!words || Math.abs(x1 - x0) < 60 * k) return;
+    c.save();
+    c.fillStyle = "#111";
+    c.font = `bold ${Math.max(6, Math.round(5 * k))}px sans-serif`;
+    c.textAlign = "center";
+    c.textBaseline = "middle";
+    c.fillText("POLICE LINE", mx, (y0 + y1) / 2 + sag);
+    c.restore();
+  }
+  function drawCordon(c, b, front, t) {
+    const n = Math.max(1, Math.round((b.x1 - b.x0) / 70));
+    const xs = Array.from({ length: n + 1 }, (_, i) => b.x0 + (b.x1 - b.x0) * i / n);
+    const y = front ? b.y1 : b.y0;
+    c.save();
+    const top = xs.map((x) => ({ x, y: y - drawCone(c, x, y) * 0.8 }));
+    if (!front) {
+      const hb = 34 * persp(b.y0) * 0.8, hf = 34 * persp(b.y1) * 0.8;
+      drawTape(c, b.x0, b.y0 - hb, b.x0, b.y1 - hf, t, false);
+      drawTape(c, b.x1, b.y0 - hb, b.x1, b.y1 - hf, t, false);
+    }
+    for (let i = 0; i < top.length - 1; i++) drawTape(c, top[i].x, top[i].y, top[i + 1].x, top[i + 1].y, t, front);
+    c.restore();
+  }
+  function silhouette(c, a) {
+    const k = persp(a.y);
+    const h = 230 * k, w = 64 * k;
+    c.save();
+    c.fillStyle = "rgba(0,0,0,0.28)";
+    c.beginPath();
+    c.ellipse(a.x, a.y, w * 0.6, 9 * k, 0, 0, Math.PI * 2);
+    c.fill();
+    c.fillStyle = a.kind === "named" ? "#6d7f94" : "#7b7f86";
+    c.fillRect(a.x - w / 2, a.y - h, w, h * 0.78);
+    c.beginPath();
+    c.arc(a.x, a.y - h - w * 0.05, w * 0.36, 0, Math.PI * 2);
+    c.fill();
+    c.restore();
+  }
+  function drawObserver(c, lines) {
+    c.save();
+    c.setTransform(1, 0, 0, 1, 0, 0);
+    c.font = "13px monospace";
+    const w = Math.min(c.canvas.width - 16, Math.max(260, ...lines.map((l) => c.measureText(l).width + 20)));
+    const h = Math.min(c.canvas.height - 16, lines.length * 17 + 12);
+    const x0 = c.canvas.width - w - 8;
+    c.fillStyle = "rgba(8,12,18,0.82)";
+    c.fillRect(x0, 8, w, h);
+    c.fillStyle = "#d7e3ef";
+    lines.forEach((l, i) => {
+      if (16 + 17 * (i + 1) < h + 8) c.fillText(l, x0 + 8, 8 + 17 * (i + 1));
+    });
+    c.restore();
+  }
+  function drawHeadBubble(c, x, y, text, line2) {
+    c.save();
+    c.font = line2 ? "14px Galmuri11, sans-serif" : "bold 16px Galmuri11, sans-serif";
+    const w = Math.min(320, c.measureText(text).width + (line2 ? 16 : 12));
+    const h = line2 ? 22 : 22;
+    const bx = Math.round(x - w / 2), by = Math.round(y - h);
+    c.fillStyle = text === "#" ? "#f2d0cc" : "#f4f1e8";
+    c.strokeStyle = "#1b1f24";
+    c.lineWidth = 2;
+    c.fillRect(bx, by, w, h);
+    c.strokeRect(bx, by, w, h);
+    c.fillRect(Math.round(x) - 3, by + h, 6, 4);
+    c.fillStyle = "#1b1f24";
+    c.textAlign = "center";
+    c.textBaseline = "middle";
+    c.fillText(text, Math.round(x), by + h / 2 + 1, w - 8);
+    c.restore();
+  }
+
+  // src/game/world/needs.ts
+  var NEEDS = ["work", "hunger", "energy", "bladder", "bowel", "social", "fun", "train", "hygiene"];
+  var ACTIVITIES = [
+    { id: "work", need: "work", clip: "work", where: ["office"], sec: [40, 90], fill: 2.2, label: "일하는 중" },
+    { id: "eat", need: "hunger", clip: "eat", where: ["lounge", "shop"], sec: [25, 45], fill: 4, label: "먹는 중" },
+    { id: "rest", need: "energy", clip: "rest", where: ["lounge"], sec: [30, 60], fill: 3, label: "쉬는 중" },
+    { id: "pee", need: "bladder", clip: "pee", where: ["restroom"], sec: [8, 14], fill: 12, label: "화장실(소)" },
+    { id: "poo", need: "bowel", clip: "poo", where: ["restroom"], sec: [25, 40], fill: 5, label: "화장실(대)" },
+    { id: "chat", need: "social", clip: "talk", where: ["office", "lounge", "corridor"], sec: [12, 25], fill: 6, label: "수다 중", partner: true },
+    { id: "hobby", need: "fun", clip: "hobby", where: ["lounge"], sec: [30, 60], fill: 3, label: "취미" },
+    // 훈련: 팔굽혀펴기·장비 점검·기지개, 그 줄이 없으면 약공 연습(모든 인물에게 있음). 싸우는 몸만 (choose fighter)
+    { id: "train", need: "train", clip: "train", where: ["training"], sec: [40, 90], fill: 2.5, label: "훈련" },
+    // 샤워(11-02): 같은 성별 탈의실 캐비닛에서 옷 벗기 → 맨몸으로 샤워실 빈 샤워기 → 머리감기·몸씻기(문지르는 구간만 속도 차등, 현실 10분 이상) → 탈의실로 돌아와 옷 입기 (actors.ts showerNext)
+    { id: "shower", need: "hygiene", clip: "shower", where: ["locker"], sec: [600, 780], fill: 0.2, label: "샤워 중" }
+  ];
+  var ACT_OPTS = {
+    work: [
+      { line: "63", label: "타자 치는 중", seat: "front" },
+      { line: "105", label: "타자 치는 중", seat: "side" },
+      { line: "69", label: "타자 치는 중", seat: "back" },
+      { line: "106", label: "손 작업 중", seat: "front" },
+      { line: "124", label: "브리핑 중" },
+      { line: "121", label: "장비 점검 중" },
+      { line: "117", label: "서류 보는 중" },
+      { line: "119", label: "수첩 메모 중" },
+      { line: "120", label: "태블릿 확인 중" },
+      { line: "116", label: "업무 통화 중" },
+      { line: "118", label: "무전 보고 중" },
+      { line: "138", label: "서류 추리는 중" },
+      { line: "85", label: "손 작업 중" },
+      { line: "125", label: "물건 진열 중" },
+      { line: "126", label: "돈 세는 중" },
+      { line: "128", label: "감정 중" },
+      { line: "129", label: "수리 중" },
+      { line: "139", label: "계산 중" },
+      { line: "122", label: "경계 서는 중" },
+      { line: "123", label: "출입 확인 중" },
+      { line: "136", label: "손전등 비추는 중" },
+      { line: "131", label: "닦는 중" },
+      { line: "88", label: "청소 중" },
+      { line: "113", label: "진료 기록 중" },
+      { line: "115", label: "시료 보는 중" }
+    ],
+    hobby: [
+      { line: "149", label: "책 읽는 중", seat: "front" },
+      { line: "148", label: "폰 보는 중", seat: "front" },
+      { line: "167", label: "신문 읽는 중", seat: "front" },
+      { line: "90", label: "담배 피우는 중" },
+      { line: "145", label: "담배 피우는 중" },
+      { line: "155", label: "고기 굽는 중" },
+      { line: "153", label: "스케치 중" },
+      { line: "140", label: "카드 섞는 중" },
+      { line: "156", label: "햄스터 돌보는 중" },
+      { line: "160", label: "손장난 중" },
+      { line: "152", label: "기도 중" },
+      { line: "147", label: "폰 보는 중" },
+      { line: "154", label: "차 따르는 중" },
+      { line: "168", label: "구경 중" },
+      { line: "161", label: "섀도복싱 중" },
+      { line: "91", label: "과자 먹는 중" }
+    ],
+    rest: [
+      { line: "66", label: "조는 중", seat: "front" },
+      { line: "73", label: "기대 쉬는 중", seat: "front" },
+      { line: "65", label: "차 마시는 중", seat: "front" },
+      { line: "99", label: "차 마시는 중", seat: "side" },
+      { line: "71", label: "차 마시는 중", seat: "back" },
+      { line: "142", label: "커피 마시는 중" },
+      { line: "143", label: "기지개", once: true }
+    ],
+    eat: [
+      { line: "64", label: "먹는 중", seat: "front" },
+      { line: "98", label: "먹는 중", seat: "side" },
+      { line: "71", label: "먹는 중", seat: "back" },
+      { line: "157", label: "간식 먹는 중" },
+      { line: "26", label: "먹는 중" }
+    ]
+  };
+  var DECAY = { work: 0.35, hunger: 0.12, energy: 0.08, bladder: 0.2, bowel: 0.05, social: 0.18, fun: 0.12, train: 0.06, hygiene: 0.03 };
+  var TEMPER = {
+    잼트리: { need: { social: 1.3, hunger: 1.2 }, friends: ["쟈알디", "스팡달", "데쥬레", "에일린"] },
+    쟈알디: { need: { social: 0.6, work: 1.3 } },
+    에일린: { need: { social: 0.4 }, hobbyAt: ["lounge"] },
+    큐라스: { need: { social: 1.5, fun: 1.3 }, hobbyAt: ["office"] },
+    고르고디오: { need: { fun: 1.3, hunger: 1.3 }, hobbyAt: ["training"] },
+    게슈간: { need: { social: 0.3 } },
+    로제몬: { need: { hunger: 1.4, fun: 1.2 }, hobbyAt: ["lounge"] },
+    데쥬레: { need: { work: 1.2 }, friends: ["잼트리"] },
+    고그니쟈: { need: { work: 1.2, social: 1.2 } },
+    콘쥬스: { need: { energy: 1.3, fun: 1.3 } }
+  };
+  var fullNeeds = (r) => Object.fromEntries(NEEDS.map((n) => [n, 55 + r() * 45]));
+  function decayNeeds(n, dt, t, onDuty2) {
+    for (const k of NEEDS) {
+      if (k === "work" && !onDuty2) {
+        n.work = 100;
+        continue;
+      }
+      n[k] = Math.max(0, n[k] - DECAY[k] * (t?.need?.[k] ?? 1) * dt);
+    }
+  }
+  var onDuty = (hour, t) => {
+    if (hour == null) return true;
+    const [a, b] = t?.shift ?? [9, 18];
+    return a <= b ? hour >= a && hour < b : hour >= a || hour < b;
+  };
+  function choose(o) {
+    const t = TEMPER[o.name];
+    let best = null;
+    for (const a of ACTIVITIES) {
+      if (!o.has(a.clip) && !(ACT_OPTS[a.id] ?? []).some((x) => o.has(`line:${x.line}`))) continue;
+      if (a.need === "train" && !o.fighter) continue;
+      const lack = 100 - o.needs[a.need];
+      if (lack < 25) continue;
+      const kinds = a.id === "hobby" && t?.hobbyAt ? t.hobbyAt : a.where;
+      const places = o.roam.filter((s) => kinds.includes(o.graph.kind(s)));
+      for (const s of places) {
+        if (a.partner && !o.partnerIn(s)) continue;
+        const hops = s === o.scene ? 0 : o.graph.route(o.scene, s)?.length ?? 99;
+        if (hops >= 99) continue;
+        let w = (lack / 100) ** 2 * 100;
+        if (a.need === "work") w *= o.duty ? 1.6 : 0;
+        if (a.need === "bladder" || a.need === "bowel") w *= lack > 70 ? 2.2 : 0.7;
+        if (o.last === a.id) w *= 0.5;
+        const score = w / (1 + hops * 0.5) * (0.9 + o.rand() * 0.2);
+        if (!best || score > best.score) best = { act: a, scene: s, score };
+      }
+    }
+    return best && best.score > 8 ? best : null;
+  }
+
+  // src/game/world/mobProfiles.json
+  var mobProfiles_default = {
+    불량배여1: {
+      sex: "여",
+      age: "20대 초반",
+      note: "20대 초반 동네 불량배(성인). 조급하고 경계심 많은 얼굴, 가만있질 못함. 평상 대기는 담배 든 대기(연기는 코드). 싸움은 빠르고 지저분한 길거리식, 통통 뛰는 스텝."
+    },
+    불량배여2: {
+      sex: "여",
+      age: "10대(고등학생)",
+      note: "카디건을 헐렁하게 걸친 반항적인 여고생, 지루하다는 얼굴. 미성년(담배·노출·선정 금지, 사망은 피 없이). 치마라 높은 발차기 없이 손·낮은 발로만 싸움, 무릎은 늘 모음."
+    },
+    불량배여3: {
+      sex: "여",
+      age: "20대 후반",
+      note: "20대 후반 길거리 해결사(성인). 차분하고 위압적, 표정이 거의 안 변함. 평상 대기는 담배 든 대기(왼손에 낮게, 연기는 코드). 싸움은 짧고 정확, 부츠로 끝냄."
+    },
+    경찰남1: {
+      sex: "남",
+      age: "30대 초반",
+      job: "경찰관",
+      note: "30대 초반, 조금 넓은 어깨, 순한 네모 얼굴. 느긋하고 묵직한 고참 순경. 빠르진 않지만 몸무게를 실어 밀고 누른다. 원거리는 권총(오른쪽 허리)."
+    },
+    경찰남2: {
+      sex: "남",
+      age: "20대 후반",
+      job: "경찰관",
+      note: "20대 후반, 균형 잡힌 몸, 조금 각진 얼굴의 짧은 스포츠머리. 의욕이 앞서는 신참 순경. 자세가 크고 몸이 먼저 나간다. 원거리는 권총(오른쪽 허리, 조금 서툼)."
+    },
+    경찰여1: {
+      sex: "여",
+      age: "20대 후반",
+      job: "경찰관",
+      note: "20대 후반, 보통 체격, 둥근 얼굴에 이마가 드러난 쪽머리. 침착하고 절차대로 움직이는 순경. 큰 동작보다 밀어내고 제압하는 쪽. 원거리는 권총(오른쪽 허리, 두 손 조준)."
+    },
+    경찰여2: {
+      sex: "여",
+      age: "30대 초반",
+      job: "경찰관",
+      note: "30대 초반, 마른 편, 각진 얼굴의 단발. 눈치 빠르고 조금 성급한 경장. 짧고 빠른 손으로 끊어 치고 팔을 꺾어 누른다. 원거리는 권총(오른쪽 허리, 한 손 조준)."
+    },
+    관리국남A: {
+      sex: "남",
+      age: "젊은 성인",
+      job: "관리국 요원",
+      note: "젊은 성인, 균형 잡힌 몸, 조금 각진 얼굴, 이마가 다 드러난 스포츠머리. 무덤덤하고 든든한 현장 요원. 가드를 단단히 올리고 정직하게 친다. 원거리는 권총(재킷 안 왼쪽 가슴, 두 손 조준)."
+    },
+    관리국남B: {
+      sex: "남",
+      age: "젊은 성인",
+      job: "관리국 요원",
+      note: "젊은 성인, 마른 편, 순한 직사각형 얼굴, 비스듬한 가르마 앞머리. 꼼꼼하고 조금 예민한 요원. 맞서기보다 흘리고 빈틈을 친다. 원거리는 권총(재킷 밑 오른쪽 허리 뒤, 가슴 높이에 붙여 한 손)."
+    },
+    관리국여A: {
+      sex: "여",
+      age: "젊은 성인",
+      job: "관리국 요원",
+      note: "젊은 성인, 보통 체격, 둥근 얼굴, 안으로 말린 턱선 단발, 무릎 길이 치마 정장. 조용하고 단정한 사무직 요원. 움직임이 작고 정확하다."
+    },
+    가짜관리국검사A: {
+      sex: "남",
+      age: "20대",
+      job: "가짜 관리국 검사부대",
+      note: "보통 체격, 각진 얼굴, 이마를 다 드러낸 올백. 검사부대(일본도 발도술, 가로 베기 위주, 지그재그 가속 달리기). 군대식으로 반듯하고 정해진 형을 그대로 쓴다. 원거리는 긴 일본도를 크게 베어 앞으로 보내는 몸짓(검기는 코드). 무기 꺼내기 = 일본도를 뽑아 두 손 중단 겨눔. 사망(서서): 앞으로 고꾸라짐."
+    },
+    관리국여B: {
+      sex: "여",
+      age: "젊은 성인",
+      job: "관리국 요원",
+      note: "젊은 성인, 마른 편, 조금 각진 얼굴, 가운데 가르마 낮은 포니테일, 바지 정장. 말수 적고 차가운 현장 요원. 거리를 두고 발로 끊는다."
+    },
+    백일몽남A: {
+      sex: "남",
+      age: "젊은 성인",
+      job: "백일몽 직원",
+      note: "젊은 성인, 균형 잡힌 몸, 조금 각진 얼굴, 스포츠머리, 남색 정장, 늑대 눈가면. 포인트에 목마른 공격적인 현장 직원. 쉬지 않고 앞으로 파고든다."
+    },
+    백일몽남B: {
+      sex: "남",
+      age: "젊은 성인",
+      job: "백일몽 직원",
+      note: "젊은 성인, 조금 넓은 어깨(근육질은 아님), 순한 네모 얼굴, 가르마 머리, 남색 정장, 곰 눈가면. 느긋하고 조원을 챙기는 덩치. 서두르지 않고 넓게 후려치고 붙잡는다."
+    },
+    백일몽여A: {
+      sex: "여",
+      age: "젊은 성인",
+      job: "백일몽 직원",
+      note: "젊은 성인, 보통 체격, 둥근 얼굴, 가르마 단발, 남색 치마 정장, 여우 눈가면. 괴담에서 살아 나온 회사원. 눈치 빠르고 능청스럽다. 속이고 빈틈을 친다."
+    },
+    백일몽여B: {
+      sex: "여",
+      age: "젊은 성인",
+      job: "백일몽 직원",
+      note: "젊은 성인, 마른 편, 가운데 가르마 낮은 포니테일, 남색 바지 정장, 고양이 눈가면. 경계심 많고 날렵한 현장 직원. 낮게 숨었다가 튀어나와 치고 빠진다."
+    },
+    협회남1: {
+      sex: "남",
+      age: "20대 후반",
+      job: "협회 직원",
+      note: "넥타이를 풀어 헤친 지친 협회 사무직. 눈밑이 퀭하고 늘 피곤한 걱정스러운 얼굴(tired concerned expression), 「처리는 순서대로」 창구에 하루 종일 앉아 있었던 사람."
+    },
+    협회남2: {
+      sex: "남",
+      age: "20대 후반",
+      job: "협회 직원",
+      note: "반듯하게 차려입은 마른 체격의 협회 직원. 절차대로만 움직이는 꼼꼼한 규정형(위키의 「서류 순서대로」 창구 분위기), 몸짓이 작고 정확함."
+    },
+    협회여1: {
+      sex: "여",
+      age: "젊은 성인",
+      job: "협회 직원",
+      note: "눈에 안 띄는 수수한 차림의 차분한 실무자. 협회 지원실 현장 연락 담당처럼 말수 적고 일 처리만 반듯함(등록 프롬프트 「inconspicuous independent field worker」)."
+    },
+    협회여2: {
+      sex: "여",
+      age: "젊은 성인",
+      job: "협회 직원",
+      note: "둥근 얼굴에 수수하고 단정한 차림. 조심스럽고 온순한 창구 보조 직원 느낌, 싸움은 마지못해 하는 쪽(below-knee skirt·practical and understated)."
+    },
+    협회여3: {
+      sex: "여",
+      age: "20대 후반",
+      job: "협회 직원",
+      note: "출입증을 단 협회 사무 직원. 표정이 무난하고 다가가기 쉬운 붙임성 있는 접수 담당(neutral approachable expression), 싸울 때도 침착하게 몸을 작게 씀."
+    },
+    가짜관리국검사B: {
+      sex: "남",
+      age: "20대",
+      job: "가짜 관리국 검사부대",
+      note: "보통 체격, 둥근 얼굴, 비스듬한 가르마. 검사부대의 무던한 대원(「치킨 시키고 후임 챙기는」 쪽). 움직임이 둥글고 한 박자 느긋하지만 칼은 크게, 아래에서 위로 비스듬히 올려 벤다. 원거리는 긴 일본도를 아래에서 위로 크게 올려 베어 보내는 몸짓(검기는 코드). 무기 꺼내기 = 일본도를 뽑아 오른허리 앞 낮은 두 손 겨눔. 사망(서서): 돌며 쓰러짐."
+    },
+    프리랜서남1: {
+      sex: "남",
+      age: "젊은 성인",
+      job: "프리랜서",
+      note: "길쭉한 얼굴의 마른 조사·회수 전문. 장비를 하나하나 확인하는 꼼꼼하고 조심성 많은 성격(오른쪽 허리 표본 파우치·왼쪽 손전등), 위키의 「점심 전에 끝난다는 말을 믿지 않는」 쪽."
+    },
+    프리랜서남2: {
+      sex: "남",
+      age: "젊은 성인",
+      job: "프리랜서",
+      note: "이마를 드러낸 크루컷, 전술 셔츠와 전투화. 군 출신처럼 몸가짐이 단정하고 동작이 딱딱 끊기는 실전파 용병(mercenary-like, practical), 말이 짧음."
+    },
+    프리랜서남3: {
+      sex: "남",
+      age: "젊은 성인",
+      job: "프리랜서",
+      note: "앞을 연 올리브 재킷에 티셔츠, 평범하고 눈에 안 띄는 차림. 어깨에 힘을 뺀 느긋한 성격으로 「다음 달엔 승급한다」는 말을 입에 달고 사는 4급 프리랜서 느낌(inconspicuous independent field worker)."
+    },
+    프리랜서남4: {
+      sex: "남",
+      age: "젊은 성인",
+      job: "프리랜서",
+      note: "마른 몸에 지퍼 재킷·청바지·운동화, 가장 평범한 옷차림. 의욕은 있지만 긴장이 얼굴에 드러나는 5급 신입 느낌(위키: 「첫 의뢰 다녀옴 (수익: -12만 원)」), 몸은 가볍고 빠름."
+    },
+    프리랜서여1: {
+      sex: "여",
+      age: "젊은 성인",
+      job: "프리랜서",
+      note: "소매를 걷어붙인 몸 가벼운 현장꾼. 장비를 스스로 꾸려 다니는 자신만만한 고참 프리랜서 느낌(practical, independently assembled), 발차기를 아낌없이 씀."
+    },
+    프리랜서여2: {
+      sex: "여",
+      age: "젊은 성인",
+      job: "프리랜서",
+      note: "꿰맨 자국 있는 낡은 야전 재킷의 다부진 몸집. 말보다 몸이 먼저 나가는 무뚝뚝한 생환 경력자(sturdy, repaired fabric), 허리에 부적 지갑을 늘 확인함."
+    },
+    프리랜서여3: {
+      sex: "여",
+      age: "젊은 성인",
+      job: "프리랜서",
+      note: "마른 체격에 무표정한 회수 전문. 왼쪽 허리의 봉인된 표본 용기를 늘 신경 쓰는 조용하고 효율적인 사람(specimen container secured at the LEFT hip), 움직임이 짧고 군더더기 없음."
+    },
+    프리랜서여4: {
+      sex: "여",
+      age: "젊은 성인",
+      job: "프리랜서",
+      note: "마른 체격, 이마를 드러낸 낮은 포니테일. 늘 주변을 살피는 경계심 많은 신중파, 거리를 두고 치고 빠짐. 원거리 = 권총. 사망(서서) = 굴러 넘어짐."
+    },
+    프리랜서여5: {
+      sex: "여",
+      age: "30대 초반",
+      job: "프리랜서",
+      note: "30대 초반, 무릎 덧댄 작업복의 현장 일꾼. 오래 버틴 성실한 생활형 프리랜서, 힘을 아껴 쓰고 동작이 경제적임. 원거리 = 권총. 사망(서서) = 앞으로 고꾸라짐."
+    },
+    상인남1: {
+      sex: "남",
+      age: "30대 후반",
+      job: "상인",
+      note: "조금 다부진 30대 후반, 걱정스러운 듯 침착한 얼굴. 손바닥 비비며 손님 붙잡는 흥정꾼. 힘은 있지만 싸움은 둔탁함. 원거리 없음. 사망(서서) = 앞으로 고꾸라짐."
+    },
+    가짜관리국검사C: {
+      sex: "남",
+      age: "20대",
+      job: "가짜 관리국 검사부대",
+      note: "조금 마른 몸, 갸름한 얼굴, 가운데 가르마. 말없고 차가운 젊은 검사. 군더더기 없이 빠르고 가볍게 한 손으로 찌른다. 원거리는 긴 일본도를 뺨 옆에서 앞으로 빠르게 베어 보내는 몸짓(검기는 코드). 무기 꺼내기 = 일본도를 뽑아 한 손 수평 겨눔. 사망(서서): 그대로 무너짐."
+    },
+    상인남2: {
+      sex: "남",
+      age: "30대 초반",
+      job: "상인",
+      note: "소매 걷은 작업복에 허리 앞치마, 공구 주머니. 수리점 겸 장물 손보는 젊은 일꾼 상인. 목소리 크고 손이 빠름. 상인 중 유일하게 약2까지 씀. 원거리 없음. 사망(서서) = 돌며 쓰러짐."
+    },
+    상인남3: {
+      sex: "남",
+      age: "30대 초반",
+      job: "상인",
+      note: "마른 30대 초반, 다용도 조끼. 말수 적고 눈치 빠른 장물아비 쪽 상인. 날렵하게 발을 쓰고 한 팔로 밀쳐 낸다. 원거리 없음. 사망(서서) = 그대로 무너짐."
+    },
+    상인남4: {
+      sex: "남",
+      age: "30대 후반",
+      job: "상인",
+      note: "카디건에 짧은 가게 앞치마, 주머니에 연필. 담담하고 사무적인 30대 후반 가게 주인(「환불 없음」을 표정 하나 안 바꾸고 말하는 사람). 움직임이 절제되고 반듯함. 원거리 없음. 사망(서서) = 굴러 넘어짐."
+    },
+    상인여1: {
+      sex: "여",
+      age: "30대 후반",
+      job: "상인",
+      note: "분식집 아주머니 같은 30대 후반. 넉살 좋게 손님을 끌고(「밥은 먹었어? 사인 먼저 하고」), 몸집으로 밀어붙인다. 동작은 크고 시원하되 빠르진 않음. 원거리 없음. 사망(서서) = 앞으로 고꾸라짐."
+    },
+    상인여2: {
+      sex: "여",
+      age: "40대 초반",
+      job: "상인",
+      note: "마른 40대 초반, 차분하고 눈치 빠른 감정사 타입(손님 사정을 훑는 장사꾼). 동작은 작고 정확함. 종아리 치마라 발차기 없음. 원거리 없음. 사망(서서) = 돌며 쓰러짐."
+    },
+    상인여3: {
+      sex: "여",
+      age: "30대 초반",
+      job: "상인",
+      note: "피곤하고 경계심 많은 30대 초반 노점 상인. 손님 부를 때도 힘이 빠져 있고, 싸울 땐 짧고 실용적으로. 바지·운동화라 몸놀림은 가벼움. 원거리 없음. 사망(서서) = 그대로 무너짐."
+    },
+    의사1: {
+      sex: "남",
+      age: "30대 초반",
+      job: "의사",
+      note: "무릎길이 가운을 열어 입은 30대 초반 의사. 침착하지만 늘 피곤함(목 주무르기). 싸움에 서툴러 손바닥으로 밀어내는 정도, 가운 자락이 크게 펄럭임."
+    },
+    간호사1: {
+      sex: "여",
+      age: "20대 후반",
+      job: "간호사",
+      note: "20대 후반 간호사, 차분하고 주의 깊음. 어깨가 뭉친 피곤함. 몸이 가볍고 손이 빨라 짧게 손바닥으로 친다. 윤지아와 겹치지 않게 차분한 쪽으로."
+    },
+    청소부남1: {
+      sex: "남",
+      age: "40대",
+      job: "청소 노동자",
+      note: "관자놀이가 희끗한 40대 남자 청소 노동자. 보통 체격, 무던하고 묵묵함. 허리를 비틀어 푸는 버릇. 싸움은 짧게 밀어 치는 정도."
+    },
+    청소부여1: {
+      sex: "여",
+      age: "40대",
+      job: "청소 노동자",
+      note: "40대 청소 노동자, 둥근 체격에 차분한 얼굴. 하루 종일 허리 숙여 일해 허리가 뻐근함. 동작은 작고 실속 있음. 장갑 낀 손으로 철썩."
+    },
+    가짜관리국진압A: {
+      sex: "남",
+      age: "20대",
+      job: "가짜 관리국 진압부대",
+      note: "보통 체격, 각진 얼굴, 이마가 드러난 스포츠머리, 등에 소총. 「구역을 나눠 탄막을 까는」 진압부대원. 교범대로 정확하고 딱딱한 군대식 소총 격투(총구 찌르기·개머리판 올려치기·가로 밀쳐 치기). 무기 꺼내기 = 등의 소총을 앞으로 돌려 어깨 견착, 원거리 = 견착 조준 사격. 사망(서서): 앞으로 고꾸라짐."
+    },
+    학생남1: {
+      sex: "남",
+      age: "10대(고등학생)",
+      job: "고등학생",
+      note: "조끼 교복을 단정하게 입은 평범한 남학생. 덩치는 보통, 싸움은 해 본 적 없어 막 휘두른다."
+    },
+    학생남2: {
+      sex: "남",
+      age: "10대(고등학생)",
+      job: "고등학생",
+      note: "마른 체격에 회색 후드 집업을 열어 걸친 느긋한 남학생. 힘 빼고 서 있다가 겁나면 확 무너진다."
+    },
+    학생여1: {
+      sex: "여",
+      age: "10대(고등학생)",
+      job: "고등학생",
+      note: "단정한 단발에 무릎 치마를 반듯하게 입은 얌전한 모범생. 싸움은 서툴고 금방 겁먹는다. 치마라 발차기·다리 벌리기 없음."
+    },
+    학생여2: {
+      sex: "여",
+      age: "10대(고등학생)",
+      job: "고등학생",
+      note: "마른 체격에 바지 교복, 포니테일. 체육 시간에 배운 티가 나는 활동적인 학생. 바지라 낮은 발차기 가능."
+    },
+    시민남1: {
+      sex: "남",
+      age: "20대 중반",
+      note: "20대 중반, 약간 다부진 체격, 올리브 맨투맨에 조거팬츠. 느긋하고 무던한 동네 청년. 손을 바지 주머니에 잘 넣고, 싸우면 힘으로 크게 휘두름."
+    },
+    시민남2: {
+      sex: "남",
+      age: "60대 후반",
+      note: "60대 후반 할아버지, 보통 체격, 남색 점퍼와 깃 셔츠. 고집 있고 점잖은 어르신. 뒷짐을 잘 지고, 동작은 작고 느리며 싸울 땐 주먹을 흔들며 호통."
+    },
+    시민남3: {
+      sex: "남",
+      age: "40대 중반",
+      note: "40대 중반 아저씨, 배가 조금 나온 체격, 갈색 점퍼에 베이지 면바지. 사람 좋고 오지랖 넓은 가장. 바지춤을 추켜올리는 버릇, 싸울 땐 배와 손바닥으로 밀어붙임."
+    },
+    시민남4: {
+      sex: "남",
+      age: "20대 후반",
+      note: "20대 후반, 균형 잡힌 체격, 짧은 머리에 바람막이. 반듯하고 무뚝뚝한 사람(군대 다녀온 티). 자세가 곧고 싸움도 반듯하게 주먹·발을 곧게 뻗음."
+    },
+    시민남5: {
+      sex: "남",
+      age: "30대 초반",
+      job: "직장인",
+      note: "30대 초반, 보통 체격, 캐주얼 블레이저에 로퍼. 깔끔 떠는 직장인, 체면을 차림. 옷매무새를 계속 고치고, 싸움은 뒤로 몸을 빼며 어색하게 밀치기만 함."
+    },
+    시민남6: {
+      sex: "남",
+      age: "20대 초반",
+      job: "대학생",
+      note: "20대 초반, 마른 체격, 지퍼 연 회색 후드에 통 넓은 청바지. 건들건들 여유 있는 대학생. 리듬 타듯 몸을 흔들고, 싸움은 팔다리가 길어 크게 휘두름."
+    },
+    가짜관리국진압B: {
+      sex: "남",
+      age: "20대",
+      job: "가짜 관리국 진압부대",
+      note: "넓은 턱과 어깨(근육질은 아님), 까까머리. 진압부대의 우직한 앞줄. 기술보다 무게로 밀고 크게 휘두른다. 근접은 소총을 가로로 들고 몸무게로 밀치거나 개머리판을 크게 내리찍음. 무기 꺼내기 = 등의 소총을 앞으로 돌려 오른허리에 받침, 원거리 = 허리춤 사격. 사망(서서): 돌며 쓰러짐."
+    },
+    시민남7: {
+      sex: "남",
+      age: "20대 초반",
+      note: "20대 초반, 마른 체격, 파란 풀오버 후드(캥거루 주머니)와 빛바랜 청바지. 소심하고 눈치 보는 사람. 어깨를 말고 다니며, 싸움은 눈 감고 한 번 휘두르는 게 전부."
+    },
+    시민남8: {
+      sex: "남",
+      age: "50대 후반",
+      note: "50대 후반, 보통 체격, 갈색 점퍼에 베이지 니트. 엄하고 깐깐한 동네 어른. 자세가 곧고 동작은 짧고 단호함, 싸울 땐 한 손으로 거리를 두고 손날로 내려침."
+    },
+    시민남9: {
+      sex: "남",
+      age: "20대",
+      job: "몸 쓰는 일",
+      note: "20대, 어깨 넓은 체격, 소매 걷은 작업 셔츠와 작업화. 몸 쓰는 일 하는 무던한 청년. 소매를 걷어 올리는 버릇, 싸움은 크게 붙잡고 묵직하게 치는 편(시민 중 가장 셈)."
+    },
+    시민여1: {
+      sex: "여",
+      age: "20대 중반",
+      note: "20대 중반, 보통 체격, 무채색 집업에 통 넓은 바지. 꾸밈없고 털털한 사람. 움직임은 가볍고 시원시원, 겁먹어도 금방 몸을 추스름."
+    },
+    시민여2: {
+      sex: "여",
+      age: "60대 후반",
+      note: "60대 후반 할머니, 둥근 체형, 누빔 조끼. 동작은 작고 느리며 무릎을 아낌. 싸울 땐 꾸짖듯 손바닥으로 때리고, 겁먹으면 크게 뛰지 못하고 종종걸음."
+    },
+    시민여3: {
+      sex: "여",
+      age: "40대 중반",
+      note: "40대 중반 동네 아주머니, 둥근 체형, 세이지색 니트. 할 말은 하는 사람. 손을 허리에 잘 얹고, 싸울 땐 밀치고 후려치지만 겁나면 비명부터."
+    },
+    시민여4: {
+      sex: "여",
+      age: "20대 후반",
+      note: "20대 후반, 마른 편, 청재킷에 발목까지 오는 긴 치마. 조용하고 조심스러운 사람. 치마라 보폭이 작고 발차기 없음, 머리카락을 자주 넘김."
+    },
+    시민여5: {
+      sex: "여",
+      age: "20대 후반",
+      job: "사무직",
+      note: "20대 후반 사무직, 보통 체격, 카디건·슬랙스·로퍼. 단정하고 예의 바른 사람. 몸가짐을 계속 정리하고, 싸움은 서툴러 뻣뻣하게 밀기만 함."
+    },
+    시민여6: {
+      sex: "여",
+      age: "20대 초반",
+      note: "20대 초반, 균형 잡힌 체격, 맨투맨·청바지·운동화. 활발하고 몸이 가벼운 사람. 가만있지 못하고 포니테일을 자주 만짐, 싸움도 겁 없이 발부터 나감."
+    },
+    시민여7: {
+      sex: "여",
+      age: "50대 후반",
+      note: "50대 후반, 둥근 체형, 올리브 카디건과 플랫슈즈. 차분하고 어른스러운 사람. 동작은 작고 침착하며, 싸울 땐 한 팔로 얼굴을 막고 다른 손으로 밀어냄."
+    },
+    가짜관리국진압C: {
+      sex: "남",
+      age: "20대",
+      job: "가짜 관리국 진압부대",
+      note: "조금 마른 몸, 긴 얼굴, 이마 위 일자 앞머리. 진압부대의 날렵한 막내. 거리를 재며 소총 총구로 빠르게 찌르고 빠진다(맨손 대신 소총). 무기 꺼내기 = 등의 소총을 앞으로 돌려 낮게 듦, 원거리 = 한쪽 무릎을 꿇고 견착 사격. 사망(서서): 그대로 무너짐."
+    },
+    시민여8: {
+      sex: "여",
+      age: "20대 초반",
+      note: "20대 초반, 보통 체격, 분홍 맨투맨. 숫기 없고 겁 많은 사람. 소매를 손등까지 끌어내리는 버릇, 싸움은 눈 감고 허우적거리는 수준."
+    },
+    시민여9: {
+      sex: "여",
+      age: "20대 후반",
+      job: "회사원",
+      note: "20대 후반 회사원, 보통 체격, 블라우스·낮은 굽 구두, 왼쪽 엉덩이에 작은 핸드백. 늘 불안하게 주위를 살피는 사람. 한 손은 자꾸 가방끈을 쥐고, 굽 때문에 걸음이 조심스러움."
+    },
+    불량배남1: {
+      sex: "남",
+      age: "10대(고등학생)",
+      note: "뚱하게 곁눈질하는 남고생 불량배. 남색 점퍼·회색 티·조거 바지. 남 3보다 덩치가 있어 가슴 내밀고 몸으로 들이받는 거리 싸움(밀치기·훅·박치기·태클). 개인 대기는 쪼그려 앉기. 사망(서서): 앞으로 고꾸라짐."
     },
     불량배남2: {
       sex: "남",
@@ -28,6 +1977,11 @@
   var 경찰 = ["경찰남1", "경찰남2", "경찰여1", "경찰여2"];
   var 상인 = ["상인남1", "상인남2", "상인남3", "상인남4", "상인여1", "상인여2", "상인여3"];
   var 청소부 = ["청소부남1", "청소부여1"];
+  var 프리랜서 = ["프리랜서남1", "프리랜서남2", "프리랜서남3", "프리랜서남4", "프리랜서여1", "프리랜서여2", "프리랜서여3", "프리랜서여4", "프리랜서여5"];
+  var 협회 = ["협회남1", "협회남2", "협회여1", "협회여2", "협회여3"];
+  var 백일몽 = ["백일몽남A", "백일몽남B", "백일몽여A", "백일몽여B"];
+  var 가짜검사 = ["가짜관리국검사A", "가짜관리국검사B", "가짜관리국검사C"];
+  var 가짜진압 = ["가짜관리국진압A", "가짜관리국진압B", "가짜관리국진압C"];
   var ARCHETYPES = {
     // 시민 = 그냥 행인 하나 (10-31 사용자). 시민 그림 18장, 직업 없음, 성별·나이대는 그림 신상(mobProfiles)
     행인: { name: "행인", role: "civilian", range: {}, looks: 시민 },
@@ -46,7 +2000,16 @@
     의사: { name: "의사", role: "staff", range: { courage: [0.2, 0.6], social: [0.3, 0.8] }, looks: ["의사1"] },
     간호사: { name: "간호사", role: "staff", range: { social: [0.5, 1] }, looks: ["간호사1"] },
     // 장소 종류별 인구(6-4장)에 쓰는 원형
-    상인: { name: "상인", role: "worker", range: { social: [0.4, 1], courage: [0.3, 0.8] }, looks: 상인 }
+    상인: { name: "상인", role: "worker", range: { social: [0.4, 1], courage: [0.3, 0.8] }, looks: 상인 },
+    // 11-02 사용자: 중림 행인은 프리랜서 위주, 협회 창구·훈련장은 프리랜서가 쓴다. 싸울 줄 아는 민간인
+    프리랜서: { name: "프리랜서", role: "civilian", range: { courage: [0.5, 1], haste: [0.2, 0.7] }, looks: 프리랜서 },
+    // 협회(중립 사이트) 직원·경비, 백일몽 직원·경비, 가짜 관리국 검사부대(사무)·진압부대(경비·전투) — 건물마다 그 집 사람만 (world/hq.ts ROLES)
+    "협회 직원": { name: "협회 직원", role: "staff", range: { courage: [0.2, 0.6], social: [0.3, 0.9] }, looks: 협회 },
+    "협회 경비": { name: "협회 경비", role: "guard", range: { courage: [0.6, 1], curious: [0.4, 0.9] }, looks: ["협회남1", "협회남2"] },
+    "백일몽 직원": { name: "백일몽 직원", role: "staff", range: { courage: [0.2, 0.7], social: [0.3, 0.9], sly: [0, 0.2] }, looks: 백일몽 },
+    "백일몽 경비": { name: "백일몽 경비", role: "guard", range: { courage: [0.6, 1], curious: [0.4, 0.9] }, looks: ["백일몽남A", "백일몽남B"] },
+    "가짜 관리국 검사": { name: "가짜 관리국 검사", role: "staff", range: { courage: [0.5, 1], social: [0.2, 0.7] }, looks: 가짜검사 },
+    "가짜 관리국 진압": { name: "가짜 관리국 진압", role: "guard", range: { courage: [0.7, 1], haste: [0.4, 0.9] }, looks: 가짜진압 }
   };
   function rollTemper(r, a) {
     const t = {};
@@ -2152,6 +4115,7 @@
       this.lineN = o.lineN;
       this.sceneFaction = o.sceneFaction ?? (() => null);
       this.stance = o.stance ?? (() => null);
+      this.playerFaction = o.playerFaction ?? (() => null);
       this.killOk = o.killOk ?? (() => false);
       this.relation = o.relation ?? defaultRelation;
       this.namedHostile = o.namedHostile ?? (() => false);
@@ -2247,6 +4211,11 @@
     sites = /* @__PURE__ */ new Map();
     sceneFaction;
     stance;
+    playerFaction;
+    /** 이 거점이 주인공을 외부인으로 보나: 주인공 소속이 그 거점 세력이 아니면 (평판 단계와 무관, 11-02 사용자 15:49) */
+    outsiderAt(fac) {
+      return this.playerFaction() !== fac;
+    }
     /** 몹의 소속: 경비·직원(근무형·staff·guard)은 장면 소속, 나머지는 없음 */
     mobFaction(a) {
       if (a.def.kind !== "mob") return null;
@@ -2571,6 +4540,21 @@
       }
       for (const name of s.follow) this.setFollow(name, "follow");
       for (const name of s.nude ?? []) this.setNude(name, true);
+    }
+    /** 입장 예열 (11-02 사용자 「입장하는 순간 옳은 자리에 있어야지, 한 번에 생겨서 우르르 가는 게 아니라」):
+     *  주인공 없이 세계를 sec초만큼 조용히 돌려 근무형은 자리에, 요원은 제 일 하는 자리에 가 있게 한다. 그동안 생긴 사건·말풍선은 버린다 */
+    warmup(sec, hour) {
+      const dt = 0.25;
+      for (let t = 0; t < sec; t += dt) this.step(dt, hour == null ? void 0 : { scene: "", x: 0, hour });
+      this.player = null;
+      this.events.length = 0;
+      for (const a of this.actors) {
+        a.say = void 0;
+        a.sayT = 0;
+        a.iconT = 0;
+      }
+      this.time = 0;
+      this.trail = [];
     }
     /** 행위자 말풍선 (대사 연결이 부른다) */
     /** 머리 위 작은 말풍선 기호 (인물끼리 상호작용) */
@@ -3201,8 +5185,7 @@
       const p = this.player;
       const fac = p ? this.sceneFaction(p.scene) : null;
       if (!p || !fac || this.hasPass() === fac) return false;
-      const st = this.stance(fac);
-      if (st !== "wary" && st !== "hostile") return false;
+      if (!this.outsiderAt(fac)) return false;
       if (this.guardingPlayer(id)) return true;
       const a = this.actors.find((q) => q.def.id === id || q.def.name === id);
       return !!a && a.def.kind === "named" && this.factionOf(a) === fac;
@@ -3246,6 +5229,7 @@
         this.walkTo(g, d3, `${why}: 쫓아감`, "chase");
       } else this.walkTo(g, { x: p.x, y: p.y || g.y }, `${why}: 덤빔`, "chase");
       this.iconOn(g, "#", 2);
+      if (!cause && why !== "위협") this.raiseAlarm(p.scene, p.x, "player", why === "경고 무시" ? "trespass" : "threat");
       if (!cause) this.events.push({ kind: "cue", scene: g.scene, who: g.def.name, id: g.def.id, cell: why === "무기" ? "expel.attack_weapon" : why === "위협" ? "expel.attack_threat" : "expel.attack", ctx: { target: "{user}", say: why === "무기" ? "무기 내려!" : why === "위협" ? "그 말, 후회하게 될 겁니다." : "경고했습니다!" } });
       this.events.push({ kind: "guardAttack", scene: p.scene, who: "{user}", by: g.def.name, ...cause ? { why: cause } : {} });
     }
@@ -3282,8 +5266,8 @@
         this.playerVisit = null;
         if (!p || !fac) return;
       }
+      if (!this.outsiderAt(fac)) return;
       const st = this.stance(fac);
-      if (st !== "wary" && st !== "hostile") return;
       const pv = this.playerVisit ??= { fac, spotted: false, scene: p.scene, cost: this.exitCost(p.scene, p.x, fac), permit: false, attacked: false };
       if (pv.permit || pv.attacked || this.alarms.has(fac)) return;
       const guardOf = () => this.actors.find((q) => q.def.id === pv.guard && !q.fighting && !["down", "dead", "gone"].includes(q.act));
@@ -3331,2064 +5315,4 @@
           return;
         }
       }
-      if (g.scene !== p.scene) {
-        if (!g.route.length) {
-          const path = this.graph.route(g.scene, p.scene);
-          const d3 = path && this.graph.doorSpot(g.scene, path[0].exit);
-          if (path && d3) {
-            g.route = path;
-            this.walkTo(g, d3, "주인공을 따라감", "none");
-          }
-        }
-      } else if (g.doing === "주인공과 대화") {
-      } else if (Math.abs(g.x - p.x) > 140) {
-        this.walkTo(g, { x: p.x + (g.x < p.x ? -90 : 90), y: p.y || g.y }, "주인공을 따라감", "none");
-      } else if (g.act !== "watch") {
-        g.act = "watch";
-        g.doing = "주인공 경계";
-        g.goal = null;
-        g.wait = 1;
-        g.face = p.x > g.x ? 1 : -1;
-        this.setClip(g, "idle");
-      }
-    }
-    // ── 동행 (10-31 사용자 결정 docs/필드기능_결정_1031.md 1번): 모델 답의 [[동행]]·[[기다림]]·[[복귀]] 표시로만 켜고 끈다 ──
-    /** 따라오는 사람 id (앞에서부터 주인공 뒤 순서, 인원 제한 없음) */
-    followers = [];
-    /** 주인공 발자국 (최근 몇 초) */
-    trail = [];
-    /** 싸움에서 빠지는 사람 (비전투 계열): 동행이어도 거들지 않는다 */
-    noAssist = () => false;
-    /** 이름(또는 id)으로 행위자 */
-    findActor(key) {
-      return this.actors.find((q) => q.def.id === key || q.def.kind === "named" && q.def.name === key);
-    }
-    /** follow = 따라옴, wait = 그 자리에서 기다림, return = 일과로. 못 하면 false (인원 초과·없음·쓰러짐) */
-    setFollow(key, mode) {
-      const a = this.findActor(key);
-      if (!a || ["dead", "gone"].includes(a.act) || a.fighting) return false;
-      const i = this.followers.indexOf(a.def.id);
-      if (mode === "follow") {
-        if (i < 0 && this.followers.length >= MAX_FOLLOW) return false;
-        if (i < 0) this.followers.push(a.def.id);
-        a.following = true;
-        a.hold = false;
-        a.task = void 0;
-        a.goal = null;
-        a.route = [];
-        a.seatPick = void 0;
-        a.buddy = void 0;
-        a.escort = void 0;
-        if (a.act !== "down") {
-          a.act = "idle";
-          a.wait = 0;
-          this.setClip(a, "idle");
-        }
-        a.doing = "주인공을 따라감";
-        this.iconOn(a, "!", 1.2);
-      } else {
-        if (i < 0 && !a.following && !(mode === "return" && a.hold)) return false;
-        if (i >= 0) this.followers.splice(i, 1);
-        a.following = false;
-        a.hold = mode === "wait";
-        if (a.act !== "down") {
-          a.goal = null;
-          a.act = "idle";
-          a.wait = mode === "wait" ? 1e9 : 0.5;
-          a.doing = mode === "wait" ? "기다리는 중" : "자리로 돌아가는 중";
-          this.setClip(a, "idle");
-        }
-      }
-      this.events.push({ kind: "follow", scene: a.scene, who: a.def.name, mode });
-      return true;
-    }
-    /** 동행이 주인공 편 전투 몸으로 싸우러 나감 (돌아올 때까지 시뮬에서 뺀다) */
-    toAlly(id) {
-      const a = this.actors.find((q) => q.def.id === id);
-      if (!a?.following || a.fighting) return false;
-      a.fighting = true;
-      a.goal = null;
-      a.route = [];
-      return true;
-    }
-    /** 싸움 끝: 다시 따라 걷는다. down = 몸이 쓰러짐 → 그 자리에 기절, 동행이 풀린다 */
-    fromAlly(id, x, y, down2, hp) {
-      const a = this.actors.find((q) => q.def.id === id);
-      if (!a || !a.fighting) return;
-      a.fighting = false;
-      if (hp !== void 0) {
-        a.hp = hp;
-        a.hpMax ??= hp;
-      }
-      a.x = x;
-      a.y = y;
-      if (!down2) {
-        a.act = "idle";
-        a.wait = 0.3;
-        this.setClip(a, "idle");
-        return;
-      }
-      a.hp = 0;
-      a.act = "down";
-      a.doing = "기절";
-      a.downAt = this.time;
-      a.wait = range(this.rng, 15, 25);
-      this.setClip(a, this.canClip(a, "down") ? "down" : "idle");
-      this.setFollow(id, "hit");
-    }
-    /** 동행 한 틱: 주인공이 지나간 자리를 조금 뒤처져 걷는다 (싸움은 주인공 편 전투 AI 몸이 한다: toAlly) */
-    stepFollow(a, dt) {
-      const p = this.player;
-      if (a.act === "down" || a.act === "scared") return;
-      if (!p) {
-        if (a.clip !== "idle") this.setClip(a, "idle");
-        return;
-      }
-      if (a.scene !== p.scene) {
-        this.joinScene(a, p.scene, p.x, p.y);
-        return;
-      }
-      const order = Math.max(0, this.followers.indexOf(a.def.id));
-      const speed = a.def.speed ?? WALK;
-      const want = this.time - (1 + order * 0.6);
-      let hit2 = this.trail[0] ?? { t: this.time, x: p.x, y: p.y };
-      for (const f of this.trail) {
-        if (f.t <= want) hit2 = f;
-        else break;
-      }
-      const gapMin = FOLLOW_GAP[0] + order * FOLLOW_GAP[1];
-      let gx = hit2.x;
-      if (Math.abs(p.x - gx) < gapMin) gx = p.x - Math.sign(p.x - a.x || -(p.face ?? 1)) * gapMin;
-      const gy = hit2.y || a.y;
-      const dx = gx - a.x;
-      const far = Math.abs(p.x - a.x);
-      if (far > 900) {
-        a.x = p.x - (p.face ?? 1) * gapMin;
-        a.y = p.y || a.y;
-        return;
-      }
-      if (Math.abs(dx) < 12 && Math.abs(gy - a.y) < 8) {
-        a.act = "idle";
-        a.wait = 1;
-        a.doing = "주인공을 따라감";
-        a.face = p.x > a.x ? 1 : -1;
-        if (a.clip !== "idle") this.setClip(a, "idle");
-        return;
-      }
-      const run = far > 260 ? 1.6 : 1;
-      const step2 = speed * run * dt;
-      a.act = "walk";
-      a.doing = "주인공을 따라감";
-      a.face = dx > 0 ? 1 : -1;
-      const clip = run > 1 && this.canClip(a, "run") ? "run" : "walk";
-      if (a.clip !== clip) this.setClip(a, clip);
-      a.x += Math.sign(dx) * Math.min(Math.abs(dx), step2);
-      const [top, bot] = this.graph.lane(a.scene);
-      a.y = Math.max(top, Math.min(bot, a.y + Math.sign(gy - a.y) * Math.min(Math.abs(gy - a.y), step2 * 0.5)));
-    }
-    /** 동행: 주인공이 들어간 장면으로 같이 (도착 자리 = 주인공 뒤) */
-    joinScene(a, scene, x, y) {
-      const len = this.graph.scene(scene)?.length ?? 1280;
-      const order = Math.max(0, this.followers.indexOf(a.def.id));
-      const back = x < len / 2 ? -1 : 1;
-      a.scene = scene;
-      a.x = Math.max(30, Math.min(len - 30, x + back * (FOLLOW_GAP[0] + order * FOLLOW_GAP[1])));
-      a.y = y || this.laneMid(scene);
-      a.route = [];
-      a.goal = null;
-      a.act = "idle";
-      a.wait = 0.5;
-      this.setClip(a, "idle");
-    }
-    /** 몹에게 말을 걸 수 있나 (10-31 사용자: 몹도 이름 인물처럼 대화). 싸움·기절·사망·겁먹음·쫓김·막아섬·나가는 문 앞이면 안 됨 */
-    canTalk(a) {
-      return a.def.kind === "mob" && !a.fighting && !a.brawl && !["down", "dead", "gone", "door", "scared", "argue"].includes(a.act) && a.plan !== "chase" && a.plan !== "steal" && a.plan !== "harass";
-    }
-    /** 대화 중인 몹: 그 자리에 멈춰 주인공을 본다 (매 틱 다시 부르는 동안만, 대화창을 닫으면 1초 뒤 하던 일로) */
-    holdTalk(id, px) {
-      const a = this.actors.find((q) => q.def.id === id);
-      if (!a || !this.canTalk(a)) return;
-      if (a.act !== "pause" || a.doing !== "주인공과 대화") {
-        a.talkFrom = a.doing;
-        a.goal = null;
-        a.route = [];
-        a.seatPick = void 0;
-        a.buddy = void 0;
-        a.act = "pause";
-        a.doing = "주인공과 대화";
-        this.setClip(a, this.canClip(a, "talk") ? "talk" : "idle");
-      }
-      a.wait = 1;
-      a.face = px > a.x ? 1 : -1;
-    }
-    /** 그 장면에 순찰 경찰이 있나 (싸움·쓰러짐·나감 제외) */
-    patrolIn(scene) {
-      return this.actors.find((q) => q.scene === scene && q.patrol && q.plan !== "chase" && !q.fighting && !["down", "dead", "gone"].includes(q.act));
-    }
-    // ── 한 사람 ──
-    setClip(a, clip, fromQ = false) {
-      if (!fromQ) a.clipQ = void 0;
-      if (a.nude && !clip.startsWith("nude_") && clip !== "shower" && clip !== "dress") {
-        const n = NUDE_CLIP[clip] ?? "nude_idle";
-        clip = this.canClip(a, n) ? n : this.canClip(a, "nude_idle") ? "nude_idle" : clip;
-      }
-      if (!clip.startsWith("seat:")) a.seat = void 0;
-      if (a.clip !== clip) {
-        a.clip = clip;
-        a.clipAt = this.time;
-        a.clipUntil = void 0;
-      }
-    }
-    iconOn(a, icon2, sec) {
-      a.icon = icon2;
-      a.iconT = sec;
-    }
-    canClip(a, clip) {
-      const look = a.def.look ?? a.def.name;
-      return this.has(look, clip) || !!SEAT_KIND[clip] && this.has(look, `seat:${SEAT_KIND[clip]}`);
-    }
-    /** 장면의 빈 의자 (다른 사람·주인공이 앉지 않은 것) 중 x 에 가까운 것 */
-    freeSeat(scene, x, dir) {
-      const seats = this.graph.scene(scene)?.seats ?? [];
-      let best = null;
-      seats.forEach((st, i) => {
-        if (dir && seatDir(st.face) !== dir) return;
-        if (this.player?.scene === scene && this.player.seat === st.box) return;
-        if (this.actors.some((q) => q.scene === scene && (q.seat?.i === i || q.seatPick === i))) return;
-        if (best === null || Math.abs(st.x - x) < Math.abs(seats[best].x - x)) best = i;
-      });
-      return best;
-    }
-    stepActor(a, dt) {
-      if (a.clipQ?.length && (a.clipQT = (a.clipQT ?? 0) - dt) <= 0) {
-        const n = a.clipQ.shift();
-        this.setClip(a, n.clip, true);
-        a.clipQT = n.sec;
-        if (!a.clipQ.length) a.clipQ = void 0;
-      }
-      if (a.iconT > 0 && (a.iconT -= dt) <= 0) a.icon = void 0;
-      if (a.sayT > 0 && (a.sayT -= dt) <= 0) a.say = void 0;
-      if (a.kb) {
-        const len = this.graph.scene(a.scene)?.length ?? 1280;
-        a.x = Math.max(40, Math.min(len - 40, a.x + a.kb * dt));
-        a.kb -= a.kb * Math.min(1, dt * 8);
-        if (Math.abs(a.kb) < 8) a.kb = void 0;
-      }
-      if (a.act === "dead") return;
-      if (a.brawl) return this.stepBrawl(a, dt);
-      if (a.following && a.act === "down") this.setFollow(a.def.id, "hit");
-      if (a.following) {
-        if (a.needs) decayNeeds(a.needs, dt, TEMPER[a.def.name], false);
-        return this.stepFollow(a, dt);
-      }
-      if (this.stepCommute(a)) return;
-      if (a.noticeCd > 0) a.noticeCd -= dt;
-      if (a.needs) decayNeeds(a.needs, dt, TEMPER[a.def.name], onDuty(this.hour, TEMPER[a.def.name]));
-      if (a.toilet && a.act !== "do") this.leaveToilet(a);
-      if (a.shower && (a.task?.id !== "shower" || !["do", "walk", "door", "pause", "notice", "watch"].includes(a.act))) {
-        a.shower = void 0;
-        if (a.station?.match(/#[ls]:/)) a.station = void 0;
-      }
-      if (a.toilet?.kind === "stall" && a.act === "do") return this.stepStall(a, dt);
-      if (a.def.kind === "mob") this.mobThink(a, dt);
-      if (a.def.kind === "named" && this.namedBlocks(a)) return;
-      if (a.def.kind === "named") this.namedSense(a);
-      if (a.def.kind === "named" || a.post) this.namedNotice(a);
-      this.socialStep(a, dt);
-      if (a.def.kind === "mob") this.threatened(a, dt);
-      this.seeBody(a);
-      this.gawk(a, dt);
-      switch (a.act) {
-        // 겁에 질림(무기를 들이밀었을 때): 주저앉아 있다가 뒤로 기거나, 뒷걸음질 친 뒤 달아난다
-        case "scared": {
-          a.wait -= dt;
-          const src = a.scareFrom ?? this.player?.x;
-          if (a.scare === "backoff" && src !== void 0) a.x += Math.sign(a.x - src || 1) * 55 * dt;
-          if (a.scare === "freeze" && a.scareFrom === void 0 && this.player?.armed && this.player.scene === a.scene) {
-            a.wait = Math.max(a.wait, 0.5);
-            return;
-          }
-          if (a.wait > 0) return;
-          const from = src ?? a.x;
-          if (a.scare === "sit" && this.canClip(a, "scramble")) {
-            this.flee(a, from, "scramble", 0.5);
-            return;
-          }
-          if (a.scare === "cower" && this.canClip(a, "scramble")) {
-            this.flee(a, from, "scramble", 0.6);
-            return;
-          }
-          this.flee(a, from);
-          return;
-        }
-        case "door": {
-          a.wait -= dt;
-          if (a.wait > 0) return;
-          const hop = a.route.shift();
-          const at2 = this.graph.doorSpot(hop.to, hop.enter) ?? this.randomSpot(hop.to);
-          a.scene = hop.to;
-          a.x = at2.x;
-          a.y = at2.y;
-          if (a.nude && !this.washArea(a.scene)) this.setNude(a.def.id, false);
-          return this.nextLeg(a);
-        }
-        case "walk":
-          return this.move(a, dt);
-        case "do":
-          if (a.task && a.needs) a.needs[a.task.need] = Math.min(100, a.needs[a.task.need] + a.task.fill * dt);
-          a.wait -= dt;
-          if (a.shower) {
-            if (a.wait <= 0) this.showerDone(a);
-            return;
-          }
-          if (a.wait <= 0 || a.task && a.task.fill > 0 && a.needs && a.needs[a.task.need] >= 100 && a.task.id !== "shower" && !(a.post && (a.task.id === "work" || a.task.id === "train"))) {
-            a.last = a.task?.id;
-            const wash = !!a.toilet && a.toilet.kind !== "sink";
-            this.leaveToilet(a);
-            a.task = void 0;
-            if (wash && this.goWash(a)) return;
-            this.idle(a, 1, 3);
-          }
-          return;
-        case "notice":
-        case "watch":
-        case "argue":
-          a.wait -= dt;
-          if (a.wait <= 0) this.resume(a);
-          return;
-        case "down":
-          a.wait -= dt;
-          if (a.wait > 0) return;
-          if (a.nude && (a.hp ?? 1) <= 0 && a.clip !== "nude_getup" && this.canClip(a, "nude_getup")) {
-            this.setClip(a, "nude_getup");
-            a.wait = 0.9;
-            return;
-          }
-          if (a.def.kind === "mob" && (a.hp ?? 1) <= 0) {
-            a.hp = Math.round((a.hpMax ?? 50) * 0.3);
-            if (this.once(a, "뒤끝")) {
-              a.act = "argue";
-              a.doing = "맞섬";
-              a.wait = 3;
-              this.iconOn(a, "#", 3);
-              this.setClip(a, this.canClip(a, "angry") ? "angry" : "idle");
-              return;
-            }
-            if (!a.post && (a.temper?.courage ?? 1) < 0.4 && this.canClip(a, "crawl")) return this.flee(a, this.player?.x ?? a.x, "crawl", 0.3);
-            if (!a.post) return this.flee(a, this.player?.x ?? a.x);
-            return this.resume(a);
-          }
-          if (a.def.kind === "mob" && a.temper && !a.post) {
-            if (a.temper.courage > (this.perk(a, "싸움꾼") ? 0.55 : 0.75) && ARCHETYPES[a.def.archetype ?? ""]?.role === "thug") {
-              a.act = "argue";
-              a.doing = "맞섬";
-              a.wait = 3;
-              this.iconOn(a, "#", 3);
-              return;
-            }
-            return this.flee(a, this.player?.x ?? a.x);
-          }
-          if (a.def.kind === "named" && a.hp !== void 0 && a.hp <= 0) {
-            a.hp = Math.round((a.hpMax ?? 1e3) * 0.3);
-            a.angryAt = this.time;
-          }
-          return this.resume(a);
-        case "post":
-          return this.postStand(a, dt);
-        case "idle":
-          a.wait -= dt;
-          if (a.wait <= 0) this.decide(a);
-          return;
-        case "pause": {
-          const t0 = this.time - a.clipAt;
-          if (a.clip === "idle" && Math.floor(t0 / 0.9) !== Math.floor((t0 - dt) / 0.9)) a.face = -a.face;
-          if (a.doing.startsWith("대화") && a.needs) a.needs.social = Math.min(100, a.needs.social + 6 * dt);
-          a.wait -= dt;
-          if (a.wait > 0) return;
-          if (!a.goal) return this.resume(a);
-          a.act = "walk";
-          a.doing = a.def.brain === "transit" ? "지나가는 중" : a.doing;
-          return;
-        }
-      }
-    }
-    move(a, dt) {
-      if (!a.goal) return this.idle(a);
-      if (a.plan === "chase") {
-        const p = this.player && this.player.scene === a.scene ? this.player : null;
-        const t = a.target ? this.actors.find((q) => q.def.id === a.target) : null;
-        if (t && t.scene === a.scene) a.goal = { x: t.x - Math.sign(t.x - a.x) * 70, y: t.y };
-        else if (p) a.goal = { x: p.x - Math.sign(p.x - a.x) * 110, y: p.y || a.goal.y };
-      }
-      const fleeing = (a.doing === "도망" || a.doing === "기어서 도망") && a.fleeClip && this.canClip(a, a.fleeClip);
-      const casual = a.run <= 1.2 && !fleeing && a.plan !== "chase" && a.doing !== "도망";
-      const lead = this.leaderOf(a);
-      if (this.nav && !a.detour?.length) {
-        if (!this.nav.ok(a.scene, a.goal.x, a.goal.y)) a.goal = this.navSnap(a.scene, a.goal.x, a.goal.y);
-        if (!this.nav.ok(a.scene, a.x, a.y)) {
-          const c = this.navSnap(a.scene, a.x, a.y);
-          a.x = c.x;
-          a.y = c.y;
-        }
-        if (!this.clearLine(a.scene, a.x, a.y, a.goal.x, a.goal.y)) {
-          const path = this.navPath(a.scene, a, a.goal);
-          if (!path) {
-            a.goal = null;
-            return this.idle(a);
-          }
-          if (path.length) {
-            a.detour = path.slice(0, -1);
-            a.goal = path[path.length - 1];
-          }
-        }
-      }
-      if (!a.detour?.length && this.planDetour(a)) return;
-      const wp = a.detour?.[0];
-      const goal = wp ?? a.goal;
-      const dx = goal.x - a.x;
-      let speed = (lead?.def.speed ?? a.def.speed ?? WALK) * a.run;
-      if (casual) speed *= 1 + 0.07 * Math.sin(this.time * 1.9 + (a.phase ?? 0));
-      if (lead) speed *= Math.max(0.75, Math.min(1.25, 1 + (lead.x - a.x) * Math.sign(dx || 1) / 120));
-      const step2 = speed * dt;
-      if (Math.abs(dx) > 1) a.face = dx > 0 ? 1 : -1;
-      this.setClip(a, fleeing ? a.fleeClip : a.run > 1.2 && this.canClip(a, "run") ? "run" : "walk");
-      if (casual && !wp) this.sidestep(a, Math.sign(dx), dt);
-      const far = !wp && Math.abs(dx) > 60;
-      const ty = lead && far ? lead.y + (a.buddyDy ?? 0) : goal.y + (far ? a.side ?? 0 : 0);
-      const dy = ty - a.y;
-      if (Math.abs(dx) <= step2 && Math.abs(goal.y - a.y) <= step2) {
-        a.x = goal.x;
-        a.y = goal.y;
-        if (wp) return void a.detour.shift();
-        a.goal = null;
-        a.side = 0;
-        return this.arrived(a);
-      }
-      let vx, vy;
-      if (far) {
-        vy = Math.sign(dy) * Math.min(Math.abs(dy), step2 * 0.35);
-        vx = Math.sign(dx) * Math.min(Math.abs(dx), Math.sqrt(step2 * step2 - vy * vy));
-      } else {
-        const d3 = Math.hypot(dx, goal.y - a.y);
-        vx = dx / d3 * step2;
-        vy = (goal.y - a.y) / d3 * step2;
-      }
-      const ox = a.x, oy = a.y;
-      a.x += vx;
-      const [top, bot] = this.graph.lane(a.scene);
-      a.y = Math.max(Math.min(top, goal.y), Math.min(Math.max(bot, goal.y), a.y + vy));
-      if (this.nav && !this.nav.ok(a.scene, a.x, a.y)) {
-        const ny = a.y;
-        if (Math.abs(ny - oy) > 0.01 && this.nav.ok(a.scene, ox, ny)) {
-          a.x = ox;
-          a.y = ny;
-          return;
-        }
-        if (Math.abs(a.x - ox) > 0.01 && this.nav.ok(a.scene, a.x, oy)) {
-          a.y = oy;
-          return;
-        }
-        for (const d3 of [step2, -step2]) if (this.nav.ok(a.scene, ox, oy + d3) && this.nav.ok(a.scene, ox + vx, oy + d3)) {
-          a.x = ox;
-          a.y = oy + d3;
-          a.detour = [];
-          return;
-        }
-        a.x = ox;
-        a.y = oy;
-        if (!this.nav.ok(a.scene, ox, oy)) {
-          const c = this.navSnap(a.scene, ox, oy);
-          a.x = c.x;
-          a.y = c.y;
-        }
-        a.side = 0;
-        a.detour = this.clearLine(a.scene, a.x, a.y, a.goal.x, a.goal.y) ? [{ x: a.goal.x, y: a.goal.y }] : [];
-        return;
-      }
-      if (casual && !wp && !lead) this.maybePause(a, dt);
-    }
-    /** 같이 걷는 일행의 앞사람 (같은 장면에서 걷거나 멈춰 있을 때만). 떨어지면 혼자 걷는다 */
-    leaderOf(a) {
-      if (!a.buddy) return null;
-      const l = this.actors.find((q) => q.def.id === a.buddy);
-      if (!l || l.scene !== a.scene || l.fighting || !["walk", "pause"].includes(l.act) || l.doing === "도망") {
-        a.buddy = void 0;
-        return null;
-      }
-      return l;
-    }
-    /** 서로 비켜 가기: 앞쪽 같은 줄에 사람이 있으면 위·아래로 살짝 비켜선다(그 사람 반대쪽, 띠 안). 없으면 천천히 제 줄로 */
-    sidestep(a, dir, dt) {
-      const ahead = this.actors.find((q) => q !== a && q.scene === a.scene && !q.fighting && q.act !== "door" && q.act !== "gone" && q.def.id !== a.buddy && q.buddy !== a.def.id && (q.x - a.x) * dir > 0 && Math.abs(q.x - a.x) < 110 && Math.abs(q.y - a.y - (a.side ?? 0)) < 22);
-      if (!ahead) {
-        if (a.side) a.side = Math.abs(a.side) < 1 ? 0 : a.side * (1 - Math.min(1, dt * 0.7));
-        return;
-      }
-      const [top, bot] = this.graph.lane(a.scene);
-      let s = Math.sign(a.y - ahead.y) || (this.rng() < 0.5 ? 1 : -1);
-      if (a.y + s * 30 < top || a.y + s * 30 > bot) s = -s;
-      a.side = ahead.y - a.y + s * 30;
-    }
-    /** 막힌 곳 우회 경유점. 앞길(가는 방향 200px 안)에 막힌 곳이 있고 지금 줄이 그 안이면 위·아래 바깥으로 돌아간다. 길을 다 막았으면 돌아섬(true) */
-    planDetour(a) {
-      const list = this.blocks.get(a.scene);
-      if (!list || !a.goal) return false;
-      const g = a.goal, dir = Math.sign(g.x - a.x);
-      if (!dir) return false;
-      const [top, bot] = this.graph.lane(a.scene);
-      for (const b of list) {
-        const near2 = dir > 0 ? b.x0 : b.x1, far = dir > 0 ? b.x1 : b.x0;
-        if ((near2 - a.x) * dir < -2 || (near2 - a.x) * dir > 200) continue;
-        if ((g.x - near2) * dir < 0) continue;
-        if (b.wall || b.y0 <= top + 20 && b.y1 >= bot - 20) {
-          const len = this.graph.scene(a.scene)?.length ?? 1280;
-          a.detour = [];
-          a.route = [];
-          const back = { x: Math.max(MARGIN, Math.min(len - MARGIN, near2 - dir * range(this.rng, 120, 400))), y: a.y };
-          if (a.exitAt) a.exitAt = { x: dir > 0 ? 30 : len - 30, y: a.y };
-          this.walkTo(a, a.exitAt ?? back, "길이 막혀 돌아감", a.exitAt ? "exit" : "none");
-          return true;
-        }
-        const y = a.y + (a.side ?? 0);
-        if (y < b.y0 - 14 || y > b.y1 + 14) continue;
-        const upY = b.y0 - 18, downY = b.y1 + 18;
-        const okUp = upY >= top, okDown = downY <= bot;
-        const yy = okUp && (!okDown || a.y - upY < downY - a.y) ? upY : okDown ? downY : upY;
-        a.detour = [{ x: near2 - dir * 12, y: yy }, { x: far + dir * 12, y: yy }];
-        return false;
-      }
-      return false;
-    }
-    /** 가다 잠깐 멈추기: 성급하면 덜, 호기심 많으면 더. 그 인물이 가진 줄만, 때·곳·성향에 맞게 고름 */
-    maybePause(a, dt) {
-      if (!["none", "exit", "do"].includes(a.plan) || a.route.length || a.drunk) return;
-      if ((a.pauseCd = (a.pauseCd ?? 10) - dt) > 0) return;
-      const t = a.temper ?? { courage: 0.5, social: 0.5, haste: 0.5, curious: 0.5, sly: 0 };
-      a.pauseCd = range(this.rng, 10, 26) * (0.7 + t.haste);
-      if (this.rng() > 0.25 + 0.35 * t.curious - 0.2 * t.haste) return;
-      const h = this.hour, morning = h != null && h >= 6 && h < 11, night = this.isNight();
-      const kind = this.graph.kind(a.scene), outside = kind === "street" || kind === "shop";
-      const role = ARCHETYPES[a.def.archetype ?? ""]?.role;
-      const buddy = this.actors.find((q) => q.buddy === a.def.id && q.scene === a.scene);
-      if (a.patrol) {
-        const po = PATROL_PAUSES.filter((o3) => this.canClip(a, o3.clip));
-        if (!po.length) return;
-        const o2 = pick2(this.rng, po);
-        return this.pauseAs(a, o2.clip, o2.doing, range(this.rng, o2.sec[0], o2.sec[1]), buddy);
-      }
-      const w = {
-        phone: 3,
-        call: 1.2,
-        coffee: morning ? 3 : 0.8,
-        limber: morning ? 2 : 0.7,
-        smoke: (night ? 2.5 : 1) * (role === "thug" ? 2 : 1),
-        browse: 0.5 + 2.5 * t.curious,
-        snack: 0.8,
-        front: 0.8,
-        back: outside ? 1.5 : 0.4,
-        spot: t.curious,
-        rest: 1,
-        idle: 2
-      };
-      if (buddy && this.canClip(a, "talk") && this.canClip(buddy, "talk")) return this.pauseAs(a, "talk", "일행과 수다", range(this.rng, 4, 9), buddy);
-      const opts = PAUSES.filter((o2) => this.canClip(a, o2.clip));
-      if (!opts.length) return;
-      let r = this.rng() * opts.reduce((n, o2) => n + w[o2.clip], 0);
-      const o = opts.find((x) => (r -= w[x.clip]) <= 0) ?? opts[opts.length - 1];
-      this.pauseAs(a, o.clip, o.doing, range(this.rng, o.sec[0], o.sec[1]), buddy);
-    }
-    pauseAs(a, clip, doing, sec, buddy) {
-      a.act = "pause";
-      a.doing = doing;
-      a.wait = sec;
-      a.side = 0;
-      this.setClip(a, clip);
-      a.clipUntil = this.time + sec;
-      if (!buddy) return;
-      buddy.act = "pause";
-      buddy.doing = doing === "일행과 수다" ? doing : "일행 기다림";
-      buddy.wait = sec;
-      if (doing === "일행과 수다") {
-        a.face = buddy.x >= a.x ? 1 : -1;
-        buddy.face = -a.face;
-      }
-      this.setClip(buddy, doing === "일행과 수다" ? "talk" : "idle");
-    }
-    idle(a, min = 2, max = 7) {
-      a.seatPick = void 0;
-      a.act = "idle";
-      a.doing = "대기";
-      a.run = 1;
-      a.plan = "none";
-      a.wait = range(this.rng, min, max);
-      this.setClip(a, "idle");
-    }
-    /** 잠깐 멈췄다 하던 일로 (몹은 가던 길, 근무형은 자리) */
-    resume(a) {
-      if (a.post) return this.goPost(a);
-      if (a.def.brain === "transit" && a.exitAt) return this.walkTo(a, a.exitAt, "지나가는 중", "exit");
-      this.idle(a, 0.5, 2);
-    }
-    walkTo(a, p, doing, plan = "none") {
-      a.act = "walk";
-      a.goal = p;
-      a.detour = [];
-      a.doing = doing;
-      a.plan = plan;
-    }
-    arrived(a) {
-      const hop = a.route[0];
-      if (hop && hop.from === a.scene) {
-        a.act = "door";
-        a.doing = `${this.graph.scene(hop.to)?.name ?? hop.to}(으)로 이동 중`;
-        a.wait = Math.max(1, hop.sec / 6);
-        return;
-      }
-      switch (a.plan) {
-        case "do":
-          return this.startTask(a);
-        case "post":
-          a.act = "post";
-          if (a.post?.how === "train") {
-            a.doing = `훈련 중 (${{ pushup: "팔굽혀펴기", work: "장비 점검", limber: "기지개" }[a.trainClip ?? ""] ?? "대기"})`;
-            a.wait = range(this.rng, 10, 25);
-            this.setClip(a, a.trainClip ?? "idle");
-            return;
-          }
-          a.doing = `근무 중 (${a.post?.archetype ?? ""})`;
-          a.wait = range(this.rng, 4, 9);
-          this.setClip(a, this.canClip(a, "work") ? "work" : "idle");
-          return;
-        case "patrol":
-        case "roam-post":
-          return this.goPost(a);
-        case "exit":
-          a.act = "gone";
-          return;
-        case "cordon":
-          return this.arriveCordon(a);
-        case "treat": {
-          const pt = this.actors.find((q) => q.def.id === a.patient);
-          a.patient = void 0;
-          a.act = "pause";
-          a.doing = "진료 중";
-          a.wait = range(this.rng, 6, 10);
-          this.setClip(a, "exam");
-          if (pt && pt.scene === a.scene) {
-            a.face = pt.x > a.x ? 1 : -1;
-            if (pt.act !== "do" && this.canClip(pt, "treat")) {
-              pt.act = "pause";
-              pt.goal = null;
-              pt.doing = "치료받는 중";
-              pt.wait = a.wait;
-              pt.face = -a.face;
-              this.setClip(pt, "treat");
-            }
-          }
-          return;
-        }
-        case "steal":
-          return this.doSteal(a);
-        case "harass":
-          return this.doHarass(a);
-        case "react":
-          a.act = "watch";
-          a.doing = a.doing === "동료에게 달려감" ? "동료 곁을 지킴" : "살핌";
-          a.wait = 3.5;
-          a.run = 1;
-          this.setClip(a, a.reactClip ?? "idle");
-          a.reactClip = void 0;
-          return;
-        case "chase":
-          a.act = "watch";
-          a.doing = "막아섬";
-          a.wait = 3;
-          this.iconOn(a, "!", 2);
-          return;
-      }
-      if (a.def.brain === "transit" && a.exitAt) {
-        a.act = "gone";
-        return;
-      }
-      this.idle(a);
-    }
-    nextLeg(a) {
-      const hop = a.route[0];
-      if (hop) {
-        const d3 = this.graph.doorSpot(a.scene, hop.exit);
-        if (d3) return this.walkTo(a, d3, a.doing, a.plan);
-      }
-      a.route = [];
-      if (a.plan === "do" && a.task) return this.walkTo(a, this.randomSpot(a.scene), a.task.label + " 하러", "do");
-      if (a.plan === "roam-post") return this.goPost(a);
-      this.walkTo(a, this.randomSpot(a.scene), "자리 잡는 중");
-    }
-    // ── 이름 인물 ──
-    /** 호감이 적대 구간인 이름 인물 (10-31 사용자 C4 다안): 주인공을 보면 막아서고(몹 적대 세력과 같은 길), 막아서면 전투 AI가 싸운다.
-     *  싸움이 끝난 뒤(이기든 지든) 1분은 다시 막지 않는다 */
-    namedBlocks(a) {
-      const p = this.player;
-      if (!p || p.scene !== a.scene || !this.namedHostile(a.def.name)) return false;
-      if (a.plan === "chase" || a.fighting || ["down", "dead", "gone", "door", "argue"].includes(a.act) || a.seat) return false;
-      if (this.time < (a.blockAt ?? -1e9) + 60 || Math.abs(p.x - a.x) > 520) return false;
-      a.perks ??= ["스탯 뻥튀기", "체력 뻥튀기"];
-      a.task = void 0;
-      a.run = 1.4;
-      this.walkTo(a, { x: p.x + (a.x > p.x ? 70 : -70), y: p.y || a.y }, "주인공을 막아섬", "chase");
-      this.iconOn(a, "!", 2);
-      return true;
-    }
-    namedNotice(a) {
-      const p = this.player;
-      if (!p || p.scene !== a.scene || a.noticeCd > 0 || a.toilet) return;
-      if (a.act !== "idle" && a.act !== "walk" && !(a.post && a.act === "post")) return;
-      if (a.plan === "do" || a.route.length) return;
-      if (Math.abs(p.x - a.x) > NOTICE_PX || Math.abs(p.y - a.y) > 160) return;
-      a.noticeCd = range(this.rng, 20, 35);
-      a.act = "notice";
-      a.doing = "주인공을 봄";
-      a.goal = null;
-      a.face = p.x > a.x ? 1 : -1;
-      a.wait = 2.4;
-      this.setClip(a, this.canClip(a, "greet") ? "greet" : this.canClip(a, "bow") ? "bow" : "idle");
-      this.iconOn(a, "!", 1.2);
-      this.events.push({ kind: "notice", scene: a.scene, who: a.def.name });
-    }
-    decide(a) {
-      if (a.hold) {
-        a.act = "idle";
-        a.wait = 5;
-        a.doing = "기다리는 중";
-        return;
-      }
-      if (a.commute?.state === "out") {
-        a.commute = void 0;
-        return this.idle(a, 0.2, 0.5);
-      }
-      if (a.post) return this.goPost(a);
-      if (a.def.brain === "transit") return this.idle(a, 1, 3);
-      const roam = (a.def.roam ?? [a.def.home]).filter((s) => this.graph.scene(s) && this.sexOk(a, s));
-      if (a.def.brain === "needs" && a.needs) {
-        const c = choose({
-          name: a.def.name,
-          needs: a.needs,
-          scene: a.scene,
-          roam,
-          graph: this.graph,
-          has: (clip) => this.canClip(a, clip),
-          duty: onDuty(this.hour, TEMPER[a.def.name]),
-          partnerIn: (s) => this.actors.some((q) => q !== a && q.def.kind === "named" && q.scene === s && (q.act === "idle" || q.act === "walk") && !q.route.length),
-          rand: this.rng,
-          last: a.last,
-          fighter: true
-          // 이름 요원은 모두 싸우는 몸
-        });
-        if (c) {
-          a.task = c.act;
-          if (c.scene === a.scene) return this.walkTo(a, this.taskSpot(a, c.act), `${c.act.label} 하러`, "do");
-          const path = this.graph.route(a.scene, c.scene);
-          const d3 = path && this.graph.doorSpot(a.scene, path[0].exit);
-          if (path && d3) {
-            a.route = path;
-            return this.walkTo(a, d3, `${c.act.label} 하러 ${this.graph.scene(c.scene)?.name ?? c.scene}(으)로`, "do");
-          }
-          a.task = void 0;
-        }
-      }
-      const away = a.scene !== a.def.home;
-      const r = this.rng();
-      let dest = null;
-      if (away && r < 0.45) dest = a.def.home;
-      else if (!away && roam.length > 1 && r < 0.18) dest = pick2(this.rng, roam.filter((s) => s !== a.scene));
-      if (dest) {
-        const path = this.graph.route(a.scene, dest);
-        const d3 = path && this.graph.doorSpot(a.scene, path[0].exit);
-        if (path && d3) {
-          a.route = path;
-          return this.walkTo(a, d3, `${this.graph.scene(dest)?.name ?? dest}(으)로 가는 중`);
-        }
-      }
-      this.walkTo(a, this.randomSpot(a.scene), "서성이는 중");
-    }
-    /** 수다는 상대 옆으로, 앉아서 하는 일은 빈 의자로(서서 하는 줄이 없거나 의자가 있으면), 나머지는 장면 안 빈 곳 */
-    taskSpot(a, t) {
-      a.seatPick = void 0;
-      a.station = void 0;
-      a.opt = void 0;
-      if (t.id === "train") {
-        const st = this.trainSpot(a);
-        if (st) return st;
-      }
-      if (t.id === "shower") {
-        const st = this.graph.scene(a.scene)?.lockers?.length ? this.lockerSpot(a) : this.showerSpot(a);
-        if (st) return st;
-      }
-      if (t.id === "pee" || t.id === "poo") {
-        const st = this.toiletSpot(a, t.id === "pee" && this.sexOf(a) === "남" ? ["urinal", "stall"] : ["stall"]);
-        if (st) return st;
-      }
-      const look = a.def.look ?? a.def.name;
-      if (!t.partner) {
-        const st = this.stationSpot(a, t);
-        if (st) return st;
-      }
-      const opts = (ACT_OPTS[t.id] ?? []).filter((o) => this.has(look, `line:${o.line}`));
-      if (opts.length && !t.partner) {
-        const cand = [];
-        for (const o of opts) {
-          const seat = o.seat ? this.freeSeat(a.scene, a.x, o.seat) : null;
-          if (o.seat && seat === null) continue;
-          cand.push({ o, seat, w: (o.line === a.lastLine ? 0.25 : 1) * (o.seat ? 1.2 : 1) * (o.once ? 0.5 : 1) });
-        }
-        if (cand.length) {
-          let r = this.rng() * cand.reduce((n, c2) => n + c2.w, 0);
-          const c = cand.find((x) => (r -= x.w) <= 0) ?? cand[cand.length - 1];
-          a.opt = c.o;
-          if (c.seat !== null) {
-            const st = this.graph.scene(a.scene).seats[c.seat];
-            a.seatPick = c.seat;
-            return { x: st.x, y: st.y };
-          }
-          return this.randomSpot(a.scene);
-        }
-      }
-      if (!t.partner && SEAT_KIND[t.clip] && this.has(a.def.look ?? a.def.name, `seat:${SEAT_KIND[t.clip]}`)) {
-        const i = this.freeSeat(a.scene, a.x);
-        const st = i === null ? null : this.graph.scene(a.scene)?.seats?.[i];
-        if (st && i !== null) {
-          a.seatPick = i;
-          return { x: st.x, y: st.y };
-        }
-      }
-      if (t.partner) {
-        const q = this.actors.find((o) => o !== a && o.def.kind === "named" && o.scene === a.scene && (o.act === "idle" || o.act === "walk") && !o.route.length);
-        if (q) return { x: q.x + (q.x > a.x ? -90 : 90), y: q.y };
-      }
-      return this.randomSpot(a.scene);
-    }
-    startTask(a) {
-      const t = a.task;
-      if (!t) return this.idle(a);
-      if (t.partner) {
-        const q = this.actors.find((o) => o !== a && (o.def.kind === "named" || !!o.post) && o.scene === a.scene && Math.abs(o.x - a.x) < 220 && (o.act === "idle" || o.act === "walk" || o.act === "post" || o.act === "notice"));
-        if (!q) {
-          a.task = void 0;
-          return this.idle(a, 1, 2);
-        }
-        const both = range(this.rng, t.sec[0], t.sec[1]);
-        for (const [p, o] of [[a, q], [q, a]]) {
-          p.act = "do";
-          p.task = t;
-          p.wait = both;
-          p.goal = null;
-          p.route = [];
-          p.plan = "none";
-          p.doing = `${o.def.name}와 ${t.label}${p === a ? " (먼저 말 걺)" : " (말을 받음)"}`;
-          p.face = o.x > p.x ? 1 : -1;
-          this.setClip(p, this.canClip(p, t.clip) ? t.clip : "idle");
-        }
-        this.iconOn(a, "…", 2.5);
-        return;
-      }
-      a.act = "do";
-      a.doing = a.opt?.label ?? t.label;
-      a.wait = a.opt?.once ? range(this.rng, 2.5, 4) : range(this.rng, t.sec[0], t.sec[1]);
-      a.plan = "none";
-      const ts = this.toiletOf(a);
-      if (ts) return this.startToilet(a, ts);
-      if (t.id === "shower") return this.showerNext(a);
-      if ((t.id === "pee" || t.id === "poo" || t.id === "wash") && this.graph.scene(a.scene)?.toilets?.length) {
-        a.task = void 0;
-        a.station = void 0;
-        this.idle(a, 2, 4);
-        a.doing = "화장실 자리 기다림";
-        return;
-      }
-      if (a.opt) a.lastLine = a.opt.line;
-      const pick3 = a.seatPick;
-      a.seatPick = void 0;
-      const st = pick3 === void 0 ? null : this.graph.scene(a.scene)?.seats?.[pick3];
-      const taken = pick3 !== void 0 && (this.actors.some((q) => q !== a && q.scene === a.scene && q.seat?.i === pick3) || this.player?.scene === a.scene && this.player.seat === st?.box);
-      if (st && pick3 !== void 0 && !taken) {
-        const kind = a.opt?.seat ? a.opt.line : SEAT_KIND[t.clip];
-        this.setClip(a, `seat:${kind}`);
-        a.clipUntil = this.time + a.wait;
-        a.x = st.x;
-        a.y = st.y;
-        a.face = st.face === "W" ? -1 : st.face === "E" ? 1 : a.face;
-        a.seat = { i: pick3, dir: st.face === "N" ? "back" : st.face ? "side" : "front", kind, x: st.x, y: st.y, ...st.set ? { set: st.set } : {} };
-        a.doing = `${a.opt?.label ?? t.label} (의자)`;
-        return;
-      }
-      if (a.opt?.seat) {
-        a.task = void 0;
-        a.opt = void 0;
-        return this.idle(a, 1, 3);
-      }
-      if (a.opt) {
-        this.setClip(a, `line:${a.opt.line}`);
-        a.clipUntil = this.time + a.wait;
-        return;
-      }
-      if (a.station?.includes("#s:")) {
-        const sid = a.station.split("#s:")[1];
-        const st2 = this.graph.scene(a.scene)?.stations?.find((q) => q.id === sid);
-        const busy = this.actors.some((q) => q !== a && q.scene === a.scene && q.station === a.station && (q.act === "do" || q.act === "walk" && q.plan === "do"));
-        if (!st2 || busy) {
-          a.task = void 0;
-          a.station = void 0;
-          return this.idle(a, 1, 3);
-        }
-        a.x = st2.x;
-        a.y = st2.y;
-        const secOf = (l) => l === "27" ? 1.2 : 1.5;
-        const [first, ...rest] = st2.lines;
-        this.setClip(a, `line:${first}`);
-        if (rest.length) {
-          a.clipQ = rest.map((l) => ({ clip: `line:${l}`, sec: secOf(l) }));
-          a.clipQT = secOf(first);
-        }
-        a.clipUntil = this.time + a.wait;
-        a.doing = `${STATION_LABEL[sid.replace(/_[LR]$/, "")] ?? sid} (${t.label})`;
-        return;
-      }
-      if (t.id === "train" && a.station) {
-        const gi = Number(a.station.split("#")[1]);
-        const g = this.gear(a.scene)[gi];
-        if (g) {
-          a.face = 1;
-          const clip = g.kind === "target" ? "shoot" : "strike";
-          this.setClip(a, this.canClip(a, clip) ? clip : "train");
-          a.doing = g.kind === "target" ? "사격 훈련" : g.kind === "sandbag" ? "샌드백 치기" : "허수아비 치기";
-          return;
-        }
-      }
-      if (!this.has(a.def.look ?? a.def.name, t.clip)) {
-        a.task = void 0;
-        return this.idle(a, 1, 3);
-      }
-      this.setClip(a, t.clip);
-      a.clipUntil = this.time + a.wait;
-    }
-    // ── 몹 판단 (8-1장: 사건은 NPC 판단에서) ──
-    mobThink(a, dt) {
-      if (a.act === "gone" || a.act === "door" || a.act === "down" || a.act === "dead") return;
-      const lvl = this.uproarLevel(a.scene);
-      const t = a.temper;
-      if (!t) return;
-      a.think -= dt;
-      if (a.think > 0) return;
-      a.think = range(this.rng, 0.8, 1.6);
-      const fac = this.mobFaction(a);
-      const p0 = this.player;
-      if (fac && p0 && p0.scene === a.scene && Math.abs(p0.x - a.x) < 520 && a.plan !== "chase" && a.act !== "argue") {
-        const st = this.stance(fac);
-        if (st === "hostile") {
-          a.run = 1.4;
-          a.post = void 0;
-          this.walkTo(a, { x: p0.x, y: p0.y || a.y }, "주인공을 막아섬", "chase");
-          this.iconOn(a, "!", 2);
-          return;
-        }
-        if (st === "wary" && a.act !== "watch" && this.rng() < 0.3) {
-          a.act = "watch";
-          a.doing = "주인공을 경계";
-          a.goal = null;
-          a.face = p0.x > a.x ? 1 : -1;
-          a.wait = 2.5;
-          this.iconOn(a, "?", 1.5);
-          return;
-        }
-      }
-      if (a.post || a.plan === "chase" || a.plan === "cordon" || a.plan === "steal" || a.plan === "harass" || a.act === "argue") return;
-      if (["police", "guard"].includes(ARCHETYPES[a.def.archetype ?? ""]?.role ?? "")) return;
-      const u = this.uproar.get(a.scene);
-      if (lvl >= 1 && u) {
-        if (t.courage < 0.25 + 0.15 * lvl && a.run < 1.5) return this.flee(a, u.x);
-        if (t.curious > 0.6 && a.act !== "watch" && this.rng() < 0.4) {
-          a.act = "watch";
-          a.doing = "구경";
-          a.goal = null;
-          a.face = u.x > a.x ? 1 : -1;
-          a.wait = range(this.rng, 2, 5);
-          this.setClip(a, "idle");
-          this.iconOn(a, "!", 1.5);
-          return;
-        }
-      }
-      if (a.act !== "walk" || a.plan !== "exit") return;
-      const p = this.player;
-      if (p && p.scene === a.scene && Math.abs(p.x - a.x) < 220 && t.curious > 0.7 && this.rng() < 0.25) {
-        a.act = "watch";
-        a.doing = "주인공을 힐끔";
-        a.goal = null;
-        a.face = p.x > a.x ? 1 : -1;
-        a.wait = 1.2;
-        this.setClip(a, "idle");
-        this.iconOn(a, "?", 1);
-        return;
-      }
-      if (this.incidents(a.scene) >= 2) return;
-      if (this.patrolIn(a.scene)) return;
-      if (t.sly > 0.3 && this.rng() < 0.05 + t.sly * 0.1) {
-        const v = this.nearMob(a, 500, (q) => q.act === "walk" && q.plan === "exit" && !q.post);
-        if (v) {
-          a.target = v.def.id;
-          a.run = 1.2;
-          return this.walkTo(a, { x: v.x - Math.sign(v.x - a.x) * 50, y: v.y }, "누군가에게 다가감", "steal");
-        }
-      }
-      if (a.drunk && t.haste > 0.55 && this.isNight() && this.rng() < 0.06) {
-        const v = this.nearMob(a, 400, (q) => q.act === "walk" && !q.post);
-        if (v) {
-          a.target = v.def.id;
-          return this.walkTo(a, { x: v.x - Math.sign(v.x - a.x) * 80, y: v.y }, "시비 걸러 감", "harass");
-        }
-      }
-    }
-    incidents(scene) {
-      return this.actors.filter((q) => q.scene === scene && (q.plan === "steal" || q.plan === "harass" || q.act === "argue")).length;
-    }
-    nearMob(a, dist, ok) {
-      let best = null;
-      for (const q of this.actors) {
-        if (q === a || q.def.kind !== "mob" || q.scene !== a.scene || !ok(q)) continue;
-        const d3 = Math.abs(q.x - a.x);
-        if (d3 < dist && (!best || d3 < Math.abs(best.x - a.x))) best = q;
-      }
-      return best;
-    }
-    gateFar(a, fromX) {
-      const rule = this.spawns.find((r) => r.scene === a.scene);
-      const len = this.graph.scene(a.scene)?.length ?? 1280;
-      const gates = rule?.gates?.length ? rule.gates : [30, len - 30];
-      const x = [...gates].sort((p, q) => Math.abs(q - fromX) - Math.abs(p - fromX))[0];
-      return { x, y: a.y };
-    }
-    /** 무기를 들이밀면(주인공이 무기를 꺼내 3m 안에서 이쪽을 봄) 겁 반응 — 동작은 그 인물에게 있는 줄만(없으면 비슷한 줄로).
-     * 용기 낮음: 놀라 주저앉았다가 뒤로 기어 도망 · 보통: 뒷걸음질 → 달아나기 · 높음: 불량배는 맞서고, 그 밖은 화내고 비켜 감. 근무형·경찰·경비는 겁먹지 않음 */
-    // ── 사망·시체 (10-30) ──
-    /**
-     * 훈련장(장소 종류 training) 장비: 방 길이·걷는 띠에 비례해 놓는다(방 크기가 바뀌어도 따라감).
-     * 앞쪽 샌드백 2, 가운데 허수아비 2, 끝 사격 과녁 3(사수는 과녁 왼쪽 사대에). busy = 지금 누가 쓰는 중
-     */
-    gear(scene) {
-      if (this.graph.kind(scene) !== "training") return [];
-      const len = this.graph.scene(scene)?.length ?? 1280;
-      const [top, bot] = this.graph.lane(scene);
-      const d3 = bot - top;
-      const g = [
-        { kind: "sandbag", x: len * 0.18, y: top + d3 * 0.25 },
-        { kind: "sandbag", x: len * 0.3, y: top + d3 * 0.25 },
-        { kind: "dummy", x: len * 0.44, y: top + d3 * 0.45 },
-        { kind: "dummy", x: len * 0.56, y: top + d3 * 0.45 },
-        { kind: "target", x: len * 0.92, y: top + d3 * 0.15 },
-        { kind: "target", x: len * 0.92, y: top + d3 * 0.45 },
-        { kind: "target", x: len * 0.92, y: top + d3 * 0.75 }
-      ];
-      return g.map((q, i) => ({ ...q, x: Math.round(q.x), y: Math.round(q.y), busy: this.stationUser(scene, i) !== null }));
-    }
-    /** 그 장비를 지금 쓰는(또는 쓰러 가는) 사람 */
-    stationUser(scene, i) {
-      const key = `${scene}#${i}`;
-      return this.actors.find((q) => q.station === key && q.scene === scene && q.task?.id === "train" && (q.act === "do" || q.act === "walk" && q.plan === "do")) ?? null;
-    }
-    /** 훈련 자리: 쏠 수 있으면 사대 먼저(반반), 아니면 샌드백·허수아비. 비어 있는 것 중 가까운 것. 없으면 null */
-    // ── 이성 침입 감지 (11-01 사용자, docs/샤워_결정.md 「2026-11-01」): 남녀 구분 장면(scene.sex)에 다른 성별 주인공이 들어오면 ──
-    // 문에 들어온 것만으로는 아무도 반응하지 않는다. 사람마다 따로 감지하고, 감지한 사람만 들어옴 → 머묾1 → 머묾2 대사.
-    // NPC끼리 잘못 들어가는 일은 없다(sexOk). 그 뒤(쫓아냄·경보)는 아직 사용자 결정 전.
-    /** 감지 거리 px: 정면 700(목격 거리와 같음), 등 뒤 300, 벽 보고 하는 중(소변기·세면대·씻기) 200. 칸 안(닫힌 문)은 감지 없음 */
-    static INTRUDE_PX = { front: 700, back: 300, wall: 200 };
-    /** 뛰어 들어오면 뒤쪽 감지 거리 2배 (발소리). 뛰기 판정 = 최근 발자국 속도가 걷기의 1.3배 넘음 */
-    static INTRUDE_RUN_MULT = 2;
-    /** 들어옴 → 머묾1 → 머묾2 사이 초 (범위에서 무작위, 사람마다 다르게) */
-    static INTRUDE_STAY_SEC = [5, 8];
-    /** 소리친 사람 700px 안의 같은 성별이 따라 알아채는 데 걸리는 초 */
-    static INTRUDE_HEAR_SEC = [1, 3];
-    playerRunning() {
-      const t = this.trail;
-      if (t.length < 2) return false;
-      const a = t[t.length - 1];
-      let b = t[0];
-      for (let i = t.length - 2; i >= 0; i--) if (a.t - t[i].t >= 0.25) {
-        b = t[i];
-        break;
-      }
-      const dt = a.t - b.t;
-      return dt > 0 && Math.hypot(a.x - b.x, a.y - b.y) / dt > WALK * 1.3;
-    }
-    stepIntrude() {
-      const p = this.player;
-      const sc = p ? this.graph.scene(p.scene) : null;
-      const roomSex = sc?.sex;
-      if (!p || !sc || !roomSex || !p.sex || p.sex === roomSex) {
-        for (const a of this.actors) if (a.intrude) a.intrude = void 0;
-        return;
-      }
-      const run = this.playerRunning() ? _WorldSim.INTRUDE_RUN_MULT : 1;
-      const users = sc.toilets ? this.toiletUsers(p.scene) : [];
-      for (const a of this.intrudeWitnesses(p.scene, roomSex)) {
-        const st = a.intrude;
-        if (!st) {
-          const u = users.find((x) => x.id === a.def.id);
-          const at2 = u?.at ?? "walk";
-          if (at2 === "stall") continue;
-          if (Math.abs(p.y - a.y) > 160) continue;
-          const dx = p.x - a.x;
-          const px = _WorldSim.INTRUDE_PX;
-          const reach = at2 === "urinal" || at2 === "sink" ? px.wall * run : Math.sign(dx) === a.face ? px.front : px.back * run;
-          if (Math.abs(dx) < reach) this.intrudeFire(a, 0);
-          continue;
-        }
-        if (st.stage === "done" || st.due == null || this.time < st.due) continue;
-        if (st.stage === "wait") this.intrudeFire(a, 0);
-        else if (st.stage === 2) this.intrudeAct(a);
-        else this.intrudeFire(a, st.stage + 1);
-      }
-    }
-    /** 그 방 성별의 사람 중 반응할 수 있는 몸 (쓰러짐·사망·싸움 중 제외) */
-    intrudeWitnesses(scene, roomSex) {
-      return this.actors.filter((a) => a.scene === scene && !a.fighting && !["down", "dead", "gone", "door"].includes(a.act) && (a.hp ?? 1) > 0 && this.sexOf(a) === roomSex);
-    }
-    /** 들어옴(0)·머묾1·머묾2 대사. 성향대로 다음 단계를 잡는다: 수줍은 바로 도망, 화냄은 2~3초 뒤 덤빔, 당당·무심은 머묾1·2 */
-    intrudeFire(a, stage) {
-      const p = this.player;
-      const sc = this.graph.scene(a.scene);
-      const grp = sc?.toilets ? "toilet" : "shower";
-      const temper = temperOf(a.def.name);
-      const cell = stage === 0 ? "intrude" : `stay${stage}`;
-      const fallback = stage === 0 ? "여기 들어오면 안 돼요!" : stage === 1 ? "아직도 있어요? 나가요!" : "진짜 나가라고요!";
-      this.events.push({ kind: "cue", scene: a.scene, who: a.def.name, id: a.def.id, cell: `${grp}.${cell}`, ctx: { target: "{user}", say: fallback } });
-      this.events.push({ kind: "intrude", scene: a.scene, who: a.def.name, id: a.def.id, stage });
-      this.iconOn(a, "!", 1.5);
-      const wasNew = !a.intrude || a.intrude.stage === "wait";
-      if (stage === 0 && temper === "수줍") {
-        a.intrude = { stage: "done" };
-        this.intrudeLeave(a, true);
-      } else if (stage === 0 && temper === "화냄") a.intrude = { stage: 2, due: this.time + range(this.rng, 2, 3) };
-      else if (stage === 2 && temper === "무심") a.intrude = { stage: "done" };
-      else a.intrude = { stage, due: this.time + range(this.rng, _WorldSim.INTRUDE_STAY_SEC[0], _WorldSim.INTRUDE_STAY_SEC[1]) };
-      if (stage === 0 && wasNew && p && sc?.sex) {
-        for (const q of this.intrudeWitnesses(a.scene, sc.sex)) {
-          if (q === a || q.intrude || Math.abs(q.x - a.x) >= _WorldSim.INTRUDE_PX.front) continue;
-          if (q.toilet?.kind === "stall" && q.toilet.phase === "in") continue;
-          q.intrude = { stage: "wait", due: this.time + range(this.rng, _WorldSim.INTRUDE_HEAR_SEC[0], _WorldSim.INTRUDE_HEAR_SEC[1]) };
-        }
-      }
-    }
-    /** 머묾2 뒤 (또는 화냄은 들어옴 뒤): 당당 = 나감, 화냄 = 덤빔, 무심 = 계속 */
-    intrudeAct(a) {
-      const p = this.player;
-      a.intrude = { stage: "done" };
-      const temper = temperOf(a.def.name);
-      if (temper === "화냄" && p) {
-        this.leaveToilet(a);
-        a.task = void 0;
-        this.guardAttack(a, p, "위협", "intrude");
-        return;
-      }
-      if (temper === "당당") this.intrudeLeave(a, false);
-    }
-    /** 하던 일을 접고 방을 나간다 (flee = 도망치듯 뛰어서) */
-    intrudeLeave(a, flee) {
-      this.leaveToilet(a);
-      a.task = void 0;
-      a.seatPick = void 0;
-      a.station = void 0;
-      a.run = flee ? 1.8 : 1;
-      const dest = a.def.home !== a.scene ? a.def.home : (a.def.roam ?? []).find((s) => s !== a.scene) ?? a.def.home;
-      this.travel(a, dest, "none");
-      if (flee) {
-        this.setClip(a, this.canClip(a, "flee") ? "flee" : "run");
-        a.fleeClip = "flee";
-        this.events.push({ kind: "flee", scene: a.scene, who: a.def.name });
-      }
-    }
-    /** 주인공이 밖에서 칸 문을 열었다 (11-01 사용자: 안에 사람이 있어도 열 수 있고, 그제야 안 사람이 알아챈다). 이성이면 침입 반응, 같은 성별이면 「문 닫아」 */
-    peekStall(scene, id) {
-      const a = this.actors.find((q) => q.scene === scene && q.toilet?.id === id && q.toilet.kind === "stall" && q.toilet.phase === "in");
-      if (!a?.toilet) return;
-      const again = (a.toilet.peek ?? 0) > this.time;
-      a.toilet.peek = this.time + 1.2;
-      const p = this.player;
-      const roomSex = this.graph.scene(scene)?.sex;
-      if (!p?.sex || !roomSex) return;
-      if (p.sex !== roomSex) {
-        if (!a.intrude || a.intrude.stage === "wait") this.intrudeFire(a, 0);
-        return;
-      }
-      if (!again) this.events.push({ kind: "cue", scene, who: a.def.name, id: a.def.id, cell: "toilet.same_open", ctx: { target: "{user}", say: "사람 있어요! 문 닫아요!" } });
-    }
-    // ── 샤워 (11-02, NPC 샤워. 사용자 「탈의실에서 옷을 벗고 샤워실로 이동해야지」「캐비닛·샤워기에 상호작용」) ──
-    // start: 탈의실 빈 캐비닛 앞으로 → undress: 옷 벗기(SH_A 한 번) → go: 맨몸으로 샤워실 빈 샤워기로 → wash: 머리감기·몸씻기(클립 'shower', 10~13분)
-    // → back: 맨몸으로 탈의실 캐비닛으로 → dress: 옷 입기(SH_A 거꾸로 한 번) → 끝. 자리가 다 차 있으면 그 자리에서 잠깐 기다렸다 다시 본다
-    /** 주인공이 쓰는 샤워기·캐비닛 자리 (hub가 알려 준다) */
-    playerShower = null;
-    playerLocker = null;
-    /** 탈의실·샤워실 (맨몸으로 있어도 되는 곳) */
-    washArea(scene) {
-      const sc = this.graph.scene(scene);
-      return !!(sc?.showers?.length || sc?.lockers?.length);
-    }
-    /** 그 샤워기를 쓰거나 쓰러 가는 사람이 있나 (주인공 포함) */
-    showerBusy(scene, id, except) {
-      if (this.playerShower?.scene === scene && this.playerShower.id === id) return true;
-      const key = `${scene}#s:${id}`;
-      return this.actors.some((q) => q !== except && q.scene === scene && q.station === key && !!q.shower);
-    }
-    /** 그 캐비닛 앞에서 옷을 벗거나 입는(또는 그러러 가는) 사람이 있나 */
-    lockerBusy(scene, id, except) {
-      if (this.playerLocker?.scene === scene && this.playerLocker.id === id) return true;
-      const key = `${scene}#l:${id}`;
-      return this.actors.some((q) => q !== except && q.scene === scene && q.station === key && !!q.shower);
-    }
-    /** 지금 씻는 중인 샤워기들 (hub: 물줄기·김을 그 자리에 그린다) */
-    showerUsers(scene) {
-      return this.actors.filter((a) => a.scene === scene && a.shower?.step === "wash" && a.act === "do").map((a) => ({ id: a.shower.id, actor: a.def.id, y: a.y, look: a.def.kind === "named" ? a.def.name : a.def.look ?? a.def.name }));
-    }
-    freeOf(a, list, busy, tag2) {
-      const free = (list ?? []).filter((s2) => !busy(s2.id));
-      if (!free.length) return null;
-      const s = free[Math.floor(this.rng() * free.length)];
-      a.station = `${a.scene}#${tag2}:${s.id}`;
-      return { x: s.x, y: s.y };
-    }
-    showerSpot(a) {
-      return this.freeOf(a, this.graph.scene(a.scene)?.showers, (id) => this.showerBusy(a.scene, id, a), "s");
-    }
-    lockerSpot(a) {
-      return this.freeOf(a, this.graph.scene(a.scene)?.lockers, (id) => this.lockerBusy(a.scene, id, a), "l");
-    }
-    /** 고른 자리에 와 있나 (그 장면의 그 자리, 아직 비었을 때) */
-    atSpot(a, tag2) {
-      const m = a.station?.match(/^(.+)#([sl]):(.+)$/);
-      if (!m || m[1] !== a.scene || m[2] !== tag2) return null;
-      const sc = this.graph.scene(a.scene);
-      const s = (tag2 === "s" ? sc?.showers : sc?.lockers)?.find((q) => q.id === m[3]);
-      if (!s || (tag2 === "s" ? this.showerBusy(a.scene, s.id, a) : this.lockerBusy(a.scene, s.id, a))) return null;
-      return Math.hypot(s.x - a.x, s.y - a.y) < 40 ? s : null;
-    }
-    /** 가장 가까운 같은 성별 탈의실(lockers)·샤워실(showers) */
-    nearestWith(a, what) {
-      let best = null, bh = 1e9;
-      for (const id of this.graph.ids()) {
-        const sc = this.graph.scene(id);
-        if (!sc?.[what]?.length || !this.sexOk(a, id)) continue;
-        const h = id === a.scene ? 0 : this.graph.route(a.scene, id)?.length ?? 1e9;
-        if (h < bh) {
-          bh = h;
-          best = id;
-        }
-      }
-      return best;
-    }
-    /** 자리가 다 차 있으면: 그 자리에서 잠깐 서 있다가(act do) 다시 본다 */
-    showerWait(a, doing) {
-      a.station = void 0;
-      a.act = "do";
-      a.plan = "none";
-      a.wait = range(this.rng, 2, 4);
-      a.doing = doing;
-      this.setClip(a, "idle");
-    }
-    /** 다음 걸음 (startTask·showerDone 이 부른다) */
-    showerNext(a) {
-      const sh = a.shower ??= { step: "start" };
-      const sc = this.graph.scene(a.scene);
-      if (sh.step === "start" || sh.step === "back") {
-        if (!sc?.lockers?.length) {
-          const to = sh.step === "back" && sh.locker ? sh.locker.scene : this.nearestWith(a, "lockers");
-          if (!to) return this.showerAbort(a);
-          return this.travel(a, to, "do");
-        }
-        const l = this.atSpot(a, "l");
-        if (l) {
-          a.x = l.x;
-          a.y = l.y;
-          a.face = l.face;
-          a.act = "do";
-          a.plan = "none";
-          sh.locker = { scene: a.scene, id: l.id };
-          if (sh.step === "start") {
-            sh.step = "undress";
-            a.doing = "옷 벗는 중";
-            this.setClip(a, "undress");
-            a.wait = this.nOfLine(a, "SH_A") * UNDRESS_D + 0.4;
-          } else {
-            sh.step = "dress";
-            a.doing = "옷 입는 중";
-            this.setClip(a, "dress");
-            a.wait = this.nOfLine(a, "SH_A") * DRESS_D + 0.4;
-          }
-          a.clipUntil = this.time + a.wait;
-          return;
-        }
-        const st = this.lockerSpot(a);
-        if (st) return this.walkTo(a, st, sh.step === "start" ? "옷 벗으러" : "옷 입으러", "do");
-        return this.showerWait(a, "캐비닛 자리 기다림");
-      }
-      if (sh.step === "go") {
-        if (!sc?.showers?.length) {
-          const to = this.nearestWith(a, "showers");
-          if (!to) return this.showerAbort(a);
-          return this.travel(a, to, "do");
-        }
-        const s = this.atSpot(a, "s");
-        if (s) {
-          a.x = s.x;
-          a.y = s.y;
-          a.face = s.face;
-          a.act = "do";
-          a.plan = "none";
-          sh.step = "wash";
-          sh.id = s.id;
-          a.doing = "샤워 중";
-          a.wait = range(this.rng, a.task?.sec[0] ?? 600, a.task?.sec[1] ?? 780);
-          this.setClip(a, "shower");
-          a.clipUntil = this.time + a.wait;
-          return;
-        }
-        const st = this.showerSpot(a);
-        if (st) return this.walkTo(a, st, "샤워하러", "do");
-        return this.showerWait(a, "샤워 자리 기다림");
-      }
-    }
-    /** 한 걸음이 끝남 */
-    showerDone(a) {
-      const sh = a.shower;
-      if (sh.step === "undress") {
-        this.setNude(a.def.id, true);
-        sh.step = "go";
-        a.station = void 0;
-        return this.showerNext(a);
-      }
-      if (sh.step === "wash") {
-        sh.step = "back";
-        sh.id = void 0;
-        a.station = void 0;
-        return this.showerNext(a);
-      }
-      if (sh.step === "dress") {
-        a.shower = void 0;
-        a.station = void 0;
-        this.setNude(a.def.id, false);
-        a.last = "shower";
-        a.task = void 0;
-        return this.idle(a, 1, 3);
-      }
-      this.showerNext(a);
-    }
-    showerAbort(a) {
-      a.shower = void 0;
-      a.station = void 0;
-      a.task = void 0;
-      this.idle(a, 1, 3);
-    }
-    nOfLine(a, id) {
-      return this.lineN?.(a.def.look ?? a.def.name, id) ?? 10;
-    }
-    // ── 화장실 (11-01, world/toilets.ts) ──
-    /** 성별: 남 소변(100) 줄이 있으면 남, 없고 앉아 볼일(102)이 있으면 여. 둘 다 없으면 모름(화장실을 쓰지 않는다) */
-    sexOf(a) {
-      const look = a.def.look ?? a.def.name;
-      if (MALE_LOOKS.has(look) || MALE_LOOKS.has(a.def.name)) return "남";
-      if (FEMALE_LOOKS.has(look) || FEMALE_LOOKS.has(a.def.name)) return "여";
-      if (this.canClip(a, "line:100")) return "남";
-      return this.canClip(a, "line:102") || this.canClip(a, "poo") ? "여" : null;
-    }
-    /** 남녀 구분 화장실이면 그 성별만 들어간다 (사용자 11-01: NPC끼리 잘못 들어가는 일은 없다) */
-    sexOk(a, scene) {
-      const x = this.graph.scene(scene)?.sex;
-      return !x || this.sexOf(a) === x;
-    }
-    /** 주인공이 쓰는 화장실 자리 (hub가 알려 준다): 그 자리는 NPC가 고르지 않는다 */
-    playerToilet = null;
-    /** 그 화장실 자리를 쓰거나 쓰러 가는 사람이 있나 (주인공 포함) */
-    toiletBusy(scene, id, except) {
-      if (this.playerToilet?.scene === scene && this.playerToilet.id === id) return true;
-      const key = `${scene}#t:${id}`;
-      return this.actors.some((q) => q !== except && q.scene === scene && q.station === key && (q.act === "do" || q.act === "walk" && q.plan === "do"));
-    }
-    /** 생활 동작 자리(장면 stations) 중 이 활동에 맞고(STATION_ACT: 마지막 줄) 그 인물에게 줄 그림이 다 있는 빈 자리. 의자와 번갈아 고르게 절반만. 고르면 a.station = 장면#s:id */
-    stationSpot(a, t) {
-      const sts = this.graph.scene(a.scene)?.stations;
-      if (!sts?.length || this.rng() < 0.5) return null;
-      const want = STATION_ACT[t.id];
-      if (!want) return null;
-      const look = a.def.look ?? a.def.name;
-      const free = sts.filter((s2) => want.includes(s2.lines[s2.lines.length - 1]) && s2.lines.every((l) => this.has(look, `line:${l}`)) && !this.actors.some((q) => q !== a && q.scene === a.scene && q.station === `${a.scene}#s:${s2.id}` && (q.act === "do" || q.act === "walk" && q.plan === "do")));
-      if (!free.length) return null;
-      const s = free[Math.floor(this.rng() * free.length)];
-      a.station = `${a.scene}#s:${s.id}`;
-      return { x: s.x, y: s.y };
-    }
-    /** 빈 자리 중 가까운 것 (kinds 앞쪽 종류부터). 고르면 a.station 에 적는다 */
-    toiletSpot(a, kinds) {
-      const ts = this.graph.scene(a.scene)?.toilets;
-      if (!ts?.length) return null;
-      for (const k of kinds) {
-        const free = ts.filter((t) => t.kind === k && !this.toiletBusy(a.scene, t.id, a)).sort((p, q) => Math.abs(p.x - a.x) - Math.abs(q.x - a.x));
-        if (free.length) {
-          a.station = `${a.scene}#t:${free[0].id}`;
-          return { x: free[0].x, y: free[0].y };
-        }
-      }
-      return null;
-    }
-    /** 지금 와 있는 화장실 자리 (고른 자리가 이 장면이고 아직 비었을 때) */
-    toiletOf(a) {
-      const m = a.station?.match(/^(.+)#t:(.+)$/);
-      if (!m || m[1] !== a.scene) return null;
-      const t = this.graph.scene(a.scene)?.toilets?.find((q) => q.id === m[2]);
-      if (!t || this.toiletBusy(a.scene, t.id, a)) {
-        a.station = void 0;
-        return null;
-      }
-      return t;
-    }
-    startToilet(a, t) {
-      a.x = t.x;
-      a.y = t.y;
-      if (t.kind === "stall") {
-        a.toilet = { id: t.id, kind: "stall", phase: "open", t: STALL_DOOR_SEC, door: t.door };
-        a.doing = `${a.task?.label ?? "화장실"} (칸)`;
-        a.face = 1;
-        this.setClip(a, "idle");
-        return;
-      }
-      a.toilet = { id: t.id, kind: t.kind, phase: "in", t: 0 };
-      a.face = 1;
-      if (t.kind === "urinal") {
-        a.doing = "소변 중";
-        this.setClip(a, "line:100");
-      } else {
-        a.doing = "손 씻는 중";
-        this.setClip(a, "line:104");
-      }
-      a.clipUntil = this.time + a.wait;
-    }
-    /** 칸: 문 열림 → 안에 앉음(101 → 102 → 끝에 103) → 문 열림·나옴 → 문 닫힘 */
-    stepStall(a, dt) {
-      const tl = a.toilet;
-      const t = this.graph.scene(a.scene)?.toilets?.find((q) => q.id === tl.id);
-      if (!t?.seat) {
-        this.leaveToilet(a);
-        return this.idle(a, 1, 3);
-      }
-      if (tl.phase === "open") {
-        if ((tl.t -= dt) > 0) return;
-        const f = seatFeet(t.seat, a.def.look ?? a.def.name);
-        a.x = f.x;
-        a.y = f.y;
-        a.face = 1;
-        tl.phase = "in";
-        this.setClip(a, "poo");
-        a.clipUntil = this.time + a.wait;
-        return;
-      }
-      if (tl.phase === "in") {
-        if (a.task && a.needs) a.needs[a.task.need] = Math.min(100, a.needs[a.task.need] + a.task.fill * dt);
-        if ((a.wait -= dt) > 0) return;
-        tl.phase = "leave";
-        tl.t = STALL_DOOR_SEC;
-        a.x = t.x;
-        a.y = t.y;
-        this.setClip(a, "idle");
-        return;
-      }
-      if ((tl.t -= dt) > 0) return;
-      a.last = a.task?.id;
-      a.task = void 0;
-      this.leaveToilet(a);
-      if (this.goWash(a)) return;
-      this.idle(a, 1, 3);
-    }
-    /** 화장실 자리를 비운다. 칸 안에 앉아 있었으면 문 앞으로 나온다 */
-    leaveToilet(a) {
-      const tl = a.toilet;
-      if (tl?.kind === "stall" && tl.phase === "in") {
-        const t = this.graph.scene(a.scene)?.toilets?.find((q) => q.id === tl.id);
-        if (t) {
-          a.x = t.x;
-          a.y = t.y;
-        }
-      }
-      a.toilet = void 0;
-      if (a.station?.includes("#t:")) a.station = void 0;
-    }
-    /** 볼일 뒤 빈 세면대로 손 씻으러 (그 줄 104가 있을 때) */
-    goWash(a) {
-      if (!this.sexOf(a)) return false;
-      const st = this.toiletSpot(a, ["sink"]);
-      if (!st) return false;
-      a.task = WASH;
-      this.walkTo(a, st, "손 씻으러", "do");
-      return true;
-    }
-    /** 화장실 안 사람들 (필드 스레드: 침입 감지·대사). 주인공도 넣는다 */
-    toiletUsers(scene) {
-      if (!this.graph.scene(scene)?.toilets) return [];
-      const out = [];
-      for (const a of this.actors) {
-        if (a.scene !== scene || a.act === "dead" || a.act === "gone") continue;
-        const tl = a.toilet;
-        const at2 = tl ? tl.kind : "walk";
-        out.push({ id: a.def.id, name: a.def.name, kind: a.def.kind, sex: this.sexOf(a), at: at2, face: at2 === "stall" ? "S" : at2 === "walk" ? a.face > 0 ? "E" : "W" : "N", x: a.x, y: a.y, ...tl ? { spot: tl.id, phase: tl.phase } : {} });
-      }
-      const p = this.player, pt = this.playerToilet;
-      if (p && p.scene === scene) out.push({ id: "player", name: "주인공", kind: "player", sex: null, at: pt?.scene === scene ? pt.kind : "walk", face: pt?.scene === scene ? pt.kind === "stall" ? "S" : "N" : (p.face ?? 1) > 0 ? "E" : "W", x: p.x, y: p.y, ...pt?.scene === scene ? { spot: pt.id, phase: pt.phase } : {} });
-      return out;
-    }
-    trainSpot(a) {
-      const gs = this.gear(a.scene);
-      if (!gs.length) return null;
-      const shoot3 = this.canClip(a, "shoot") && this.rng() < 0.5;
-      const free = gs.map((g2, i2) => ({ g: g2, i: i2 })).filter(({ g: g2, i: i2 }) => (shoot3 ? g2.kind === "target" : g2.kind !== "target") && this.stationUser(a.scene, i2) === null);
-      if (!free.length) return null;
-      const { g, i } = free.sort((p, q) => Math.abs(p.g.x - a.x) - Math.abs(q.g.x - a.x))[0];
-      a.station = `${a.scene}#${i}`;
-      return { x: g.kind === "target" ? Math.round(g.x - (this.graph.scene(a.scene)?.length ?? 1280) * 0.26) : g.x - 118, y: g.y + 4 };
-    }
-    /** 장면의 시체 */
-    corpses(scene) {
-      return this.actors.filter((a) => a.scene === scene && a.act === "dead");
-    }
-    /** 사건 현장 표시 (수습 뒤 INCIDENT_HOURS 동안) */
-    incident(scene) {
-      const t = this.sites.get(scene);
-      return t !== void 0 && this.gameH - t < INCIDENT_HOURS;
-    }
-    /** 죽음: 선 채면 사망(44), 누워 있었으면 누운 채 사망(45). 시체로 남고 큰 범죄 → 경찰 출동, 한 명은 현장으로 */
-    kill(a, lying, fromFight = false) {
-      this.playerViolence(a.scene, a.x, a, "murder");
-      this.witness(a, true);
-      a.seat = void 0;
-      a.seatPick = void 0;
-      a.goal = null;
-      a.route = [];
-      a.detour = [];
-      a.hp = 0;
-      a.act = "dead";
-      a.doing = "사망";
-      a.say = void 0;
-      a.icon = void 0;
-      a.diedAt = this.gameH;
-      this.setClip(a, lying ? this.canClip(a, "dieLie") ? "dieLie" : "down" : this.canClip(a, "die") ? "die" : "down");
-      if (fromFight) a.clipAt = this.time - 60;
-      for (const q of this.actors) if (q.buddy === a.def.id) q.buddy = void 0;
-      if (a.pocket && (DROPS.has(a.def.archetype ?? "") || a.stolen)) {
-        this.events.push({ kind: "drop", scene: a.scene, who: a.def.name, amount: a.pocket, stolen: a.stolen ?? 0, x: a.x });
-        a.pocket = 0;
-        a.stolen = 0;
-      }
-      this.events.push({ kind: "kill", scene: a.scene, who: a.def.name, id: a.def.id, x: a.x });
-      const list = this.corpses(a.scene).sort((p, q) => (p.diedAt ?? 0) - (q.diedAt ?? 0));
-      for (let i = 0; i < list.length - CORPSE_MAX; i++) list[i].act = "gone";
-      this.crime(a.scene, a.x, 60);
-      this.dispatchCordon(a.scene, a.x, a.y);
-    }
-    /** 현장 경찰(거리)·경비(실내) 한 명: 시체로 가서 라인을 치고 수습까지 지킨다. 이미 있으면 안 부름 */
-    dispatchCordon(scene, x, y) {
-      if (this.actors.some((q) => q.scene === scene && q.plan === "cordon")) return;
-      const len = this.graph.scene(scene)?.length ?? 1280;
-      const arch = this.graph.kind(scene) === "street" ? "경찰" : "경비";
-      const gate = Math.abs(x - 30) > Math.abs(x - (len - 30)) ? len - 30 : 30;
-      const [top, bot] = this.graph.lane(scene);
-      const c = this.add({ id: `mob${++serial}`, name: arch, kind: "mob", brain: "transit", home: scene, archetype: arch, look: this.lookOf(arch), speed: 170 }, { scene, x: gate, y: this.laneMid(scene) });
-      c.run = 1.3;
-      const side = x > gate ? -1 : 1;
-      this.walkTo(c, { x: x + side * 110, y: Math.max(top + 10, Math.min(bot - 10, y + 40)) }, "현장으로 가는 중", "cordon");
-    }
-    /** 라인 묶기: 가까운 시체끼리 하나로 (시체 둘레 앞뒤·좌우로 라바콘) */
-    cordonBoxes(scene) {
-      const [top, bot] = this.graph.lane(scene);
-      const boxes = this.corpses(scene).map((c) => ({ x0: c.x - 75, x1: c.x + 75, y0: Math.max(top, c.y - 30), y1: Math.min(bot, c.y + 22) }));
-      let merged = true;
-      while (merged) {
-        merged = false;
-        for (let i = 0; i < boxes.length && !merged; i++) for (let j = i + 1; j < boxes.length && !merged; j++) {
-          const p = boxes[i], q = boxes[j];
-          if (p.x0 - 20 < q.x1 && q.x0 - 20 < p.x1 && p.y0 - 20 < q.y1 && q.y0 - 20 < p.y1) {
-            boxes[i] = { x0: Math.min(p.x0, q.x0), x1: Math.max(p.x1, q.x1), y0: Math.min(p.y0, q.y0), y1: Math.max(p.y1, q.y1) };
-            boxes.splice(j, 1);
-            merged = true;
-          }
-        }
-      }
-      return boxes.map((b, i) => ({ id: `cordon${i}`, ...b }));
-    }
-    setCordon(scene) {
-      for (const b of this.obstacles(scene).filter((o) => o.id.startsWith("cordon"))) this.setObstacle(scene, null, b.id);
-      if (!this.cordoned.has(scene)) return;
-      for (const b of this.cordonBoxes(scene)) this.setObstacle(scene, b);
-    }
-    /** 매 틱: 현장 경찰 도착 → 라인, 1시간 지난 시체 수습, 다 치우면 라인 걷고 경찰 떠남, 사건 현장 표시 */
-    stepCorpses() {
-      const scenes = new Set(this.actors.filter((a) => a.act === "dead" || a.plan === "cordon").map((a) => a.scene));
-      for (const sc of [...this.cordoned]) scenes.add(sc);
-      for (const sc of scenes) {
-        const bodies2 = this.corpses(sc);
-        if (bodies2.length) this.uproar.set(sc, { v: Math.max(this.uproar.get(sc)?.v ?? 0, 80), x: bodies2[0].x });
-        const old = bodies2.filter((b) => this.gameH - (b.diedAt ?? 0) >= CLEAR_HOURS);
-        if (old.length) {
-          for (const b of old) b.act = "gone";
-          this.events.push({ kind: "cleared", scene: sc, n: old.length });
-        }
-        if (this.corpses(sc).length) {
-          if (this.cordoned.has(sc) && old.length) this.setCordon(sc);
-          continue;
-        }
-        if (old.length || this.cordoned.has(sc)) this.sites.set(sc, this.gameH);
-        this.cordoned.delete(sc);
-        this.setCordon(sc);
-        for (const q of this.actors.filter((x) => x.scene === sc && x.plan === "cordon")) {
-          const len = this.graph.scene(sc)?.length ?? 1280;
-          q.exitAt = { x: q.x < len / 2 ? 30 : len - 30, y: q.y };
-          q.run = 1;
-          this.walkTo(q, q.exitAt, "현장 정리 끝", "exit");
-        }
-      }
-    }
-    /** 현장 경찰이 도착: 라인을 치고 지킨다 */
-    arriveCordon(a) {
-      a.act = "watch";
-      a.doing = "현장 통제";
-      a.wait = 1e9;
-      a.run = 1;
-      a.face = this.corpses(a.scene).some((b) => b.x > a.x) ? 1 : -1;
-      this.setClip(a, "idle");
-      this.cordoned.add(a.scene);
-      this.setCordon(a.scene);
-    }
-    /** 구경꾼(퍽): 소란이 난 장면에서 걷다가 멈춰 구경한다 (뒷짐 구경·발견·두리번 중 가진 줄) */
-    gawk(a, dt) {
-      if (!this.perk(a, "구경꾼") || (a.lookCd = (a.lookCd ?? 0) - dt) > 0) return;
-      if (!["walk", "idle"].includes(a.act) || a.fighting || a.plan === "chase" || this.uproarLevel(a.scene) < 1) return;
-      a.lookCd = 25;
-      const clip = ["browse", "spot", "idle"].find((c) => this.canClip(a, c)) ?? "idle";
-      const u = this.uproar.get(a.scene);
-      if (u) a.face = u.x > a.x ? 1 : -1;
-      a.act = "pause";
-      a.doing = "구경";
-      a.wait = range(this.rng, 4, 8);
-      this.setClip(a, clip);
-    }
-    /** 시체를 봄 (경찰·경비·현장 사람 빼고, 한 번만): 겁 많으면 겁 반응·도망, 중간이면 놀라 피해 감, 용감하면 신고 */
-    seeBody(a) {
-      if (a.sawBody || a.fighting || a.post || a.def.kind !== "mob" || !["walk", "idle", "pause"].includes(a.act) || a.plan === "chase" || a.plan === "cordon") return;
-      const role = ARCHETYPES[a.def.archetype ?? ""]?.role;
-      if (a.patrol) {
-        const body = this.actors.find((q) => q.act === "dead" && q.scene === a.scene && Math.abs(q.x - a.x) < SEE_BODY_PX * 1.5);
-        if (!body || this.actors.some((q) => q.scene === a.scene && q.plan === "cordon")) return;
-        a.sawBody = true;
-        a.patrol = false;
-        a.buddy = void 0;
-        const [top, bot] = this.graph.lane(a.scene);
-        this.iconOn(a, "!", 2);
-        this.say(a, "여기 현장 통제합니다.", 2.5);
-        return this.walkTo(a, { x: body.x + (a.x < body.x ? -110 : 110), y: Math.max(top + 10, Math.min(bot - 10, body.y + 40)) }, "현장으로 가는 중", "cordon");
-      }
-      if (role === "police" || role === "guard") return;
-      const b = this.actors.find((q) => q.act === "dead" && q.scene === a.scene && Math.abs(q.x - a.x) < SEE_BODY_PX && Math.abs(q.y - a.y) < 140);
-      if (!b) return;
-      a.sawBody = true;
-      a.buddy = void 0;
-      const c = a.temper?.courage ?? 0.3;
-      this.iconOn(a, "!", 2);
-      const reporter = this.perk(a, "신고 정신") && !this.cordoned.has(a.scene);
-      if (c < 0.4 && !reporter) return this.scareAt(a, b.x, b.x);
-      if (c < 0.7 && !reporter || this.cordoned.has(a.scene)) {
-        a.act = "scared";
-        a.scare = "run";
-        a.scareFrom = b.x;
-        a.goal = null;
-        a.wait = 1.2;
-        a.doing = "놀람";
-        a.face = b.x > a.x ? 1 : -1;
-        this.setClip(a, this.canClip(a, "surprise") ? "surprise" : "idle");
-        return;
-      }
-      a.act = "scared";
-      a.scare = "run";
-      a.scareFrom = b.x;
-      a.goal = null;
-      a.wait = 3;
-      a.doing = "신고 중";
-      a.face = b.x > a.x ? 1 : -1;
-      this.setClip(a, this.canClip(a, "call") ? "call" : this.canClip(a, "phone") ? "phone" : "surprise");
-      this.events.push({ kind: "report", scene: a.scene, who: a.def.name, x: b.x });
-      this.dispatchCordon(a.scene, b.x, b.y);
-    }
-    threatened(a, dt) {
-      if (a.scareCd && (a.scareCd -= dt) > 0) return;
-      const p = this.player;
-      if (!p?.armed || p.scene !== a.scene || a.fighting || a.post || !a.temper) return;
-      if (["down", "scared", "gone", "door", "argue"].includes(a.act) || a.doing === "도망" || a.doing === "기어서 도망") return;
-      const role = ARCHETYPES[a.def.archetype ?? ""]?.role;
-      if (role === "police" || role === "guard") return;
-      const dx = a.x - p.x;
-      if (Math.abs(dx) > 300 || Math.abs(a.y - p.y) > 90 || Math.sign(dx) !== Math.sign(p.face ?? 1)) return;
-      a.scareCd = 8;
-      a.seatPick = void 0;
-      const c = a.temper.courage;
-      this.iconOn(a, "!", 1.5);
-      if (c >= (this.perk(a, "싸움꾼") ? 0.55 : 0.7)) {
-        if (role === "thug") {
-          a.act = "argue";
-          a.doing = "맞섬";
-          a.wait = 3;
-          this.iconOn(a, "#", 3);
-          return;
-        }
-        a.act = "argue";
-        a.doing = "화냄";
-        a.wait = 1.2;
-        this.setClip(a, this.canClip(a, "angry") ? "angry" : "idle");
-        return;
-      }
-      this.scareAt(a, p.x);
-    }
-    /** 겁에 질림: from = 겁나게 한 것의 x (무기 든 주인공·시체) */
-    scareAt(a, from, why) {
-      const c = a.temper?.courage ?? 0.3;
-      const dx = a.x - from;
-      a.scareFrom = why;
-      a.goal = null;
-      a.act = "scared";
-      a.face = dx > 0 ? -1 : 1;
-      const w = [["freeze", 1 - c * 2], ["sit", 1.1 - c * 1.5], ["cower", 1 - c], ["backoff", 0.2 + c], ["run", 0.3 + c]];
-      let r = this.rng() * w.reduce((n, [, v]) => n + Math.max(0, v), 0);
-      a.scare = w.find(([, v]) => (r -= Math.max(0, v)) <= 0)?.[0] ?? "run";
-      const clip = (...l) => l.find((x) => this.canClip(a, x)) ?? "idle";
-      switch (a.scare) {
-        case "freeze":
-          a.wait = 3;
-          a.doing = "얼어붙음";
-          this.setClip(a, clip("sitdown", "cower", "surprise"));
-          break;
-        case "sit":
-          a.wait = 1.6;
-          a.doing = "주저앉음";
-          this.setClip(a, clip("sitdown", "cower", "surprise"));
-          break;
-        case "cower":
-          a.wait = 1.4;
-          a.doing = "웅크려 떪";
-          this.setClip(a, clip("cower", "sitdown", "surprise"));
-          break;
-        case "backoff":
-          a.wait = 1.3;
-          a.doing = "뒷걸음질";
-          this.setClip(a, clip("backoff", "surprise"));
-          break;
-        case "run":
-          a.wait = 0.4;
-          a.doing = "놀람";
-          this.setClip(a, clip("surprise", "idle"));
-          break;
-      }
-      this.events.push({ kind: "flee", scene: a.scene, who: a.def.name });
-    }
-    /** 전투에서 달아남(기세가 꺾임): 전투 몸에서 돌아와 장면 밖으로 */
-    fledFight(id, x, y) {
-      const a = this.actors.find((q) => q.def.id === id);
-      if (!a || !a.fighting) return;
-      a.fighting = false;
-      a.x = x;
-      a.y = y;
-      a.plan = "none";
-      this.flee(a, this.player?.x ?? x);
-    }
-    flee(a, fromX, clip = "flee", run = 1.8) {
-      a.seatPick = void 0;
-      a.run = run * (this.perk(a, "날쌘 도망") ? 1.3 : 1);
-      a.exitAt = this.gateFar(a, fromX);
-      this.walkTo(a, a.exitAt, clip === "crawl" || clip === "scramble" ? "기어서 도망" : "도망", "exit");
-      this.setClip(a, this.canClip(a, clip) ? clip : this.canClip(a, "flee") ? "flee" : "walk");
-      a.fleeClip = clip;
-      this.iconOn(a, "!", 1.5);
-      this.events.push({ kind: "flee", scene: a.scene, who: a.def.name });
-    }
-    doSteal(a) {
-      const v = this.actors.find((q) => q.def.id === a.target);
-      a.target = void 0;
-      if (!v || v.scene !== a.scene) return this.resume(a);
-      const take2 = Math.round((v.pocket ?? 0) * (0.3 + this.rng() * 0.5) / 100) * 100;
-      v.pocket = (v.pocket ?? 0) - take2;
-      a.pocket = (a.pocket ?? 0) + take2;
-      a.stolen = (a.stolen ?? 0) + take2;
-      this.events.push({ kind: "steal", scene: a.scene, thief: a.def.name, victim: v.def.name, x: v.x });
-      this.disturb(a.scene, 12, v.x);
-      a.run = 1.9;
-      a.exitAt = this.gateFar(a, v.x);
-      this.walkTo(a, a.exitAt, "훔치고 달아남", "exit");
-      this.iconOn(v, "!", 2.5);
-      if ((v.temper?.courage ?? 0) > 0.6) {
-        v.target = a.def.id;
-        v.run = 1.6;
-        this.walkTo(v, { x: a.x, y: a.y }, "도둑을 쫓음", "chase");
-        v.wait = 0;
-      } else {
-        v.act = "watch";
-        v.doing = "털림";
-        v.goal = null;
-        v.wait = 3;
-      }
-      for (const q of this.actors) {
-        if (q === a || q === v || q.scene !== a.scene || q.def.kind !== "mob" || q.post || Math.abs(q.x - v.x) > 450) continue;
-        const t = q.temper;
-        if (t.courage > 0.85 && this.rng() < 0.5) {
-          q.target = a.def.id;
-          q.run = 1.6;
-          this.walkTo(q, { x: a.x, y: a.y }, "도둑을 쫓음", "chase");
-        } else if (t.curious > 0.5) {
-          q.act = "watch";
-          q.doing = "구경";
-          q.goal = null;
-          q.face = v.x > q.x ? 1 : -1;
-          q.wait = range(this.rng, 2, 4);
-        }
-      }
-    }
-    doHarass(a) {
-      const v = this.actors.find((q) => q.def.id === a.target);
-      a.target = void 0;
-      if (!v || v.scene !== a.scene) return this.resume(a);
-      this.events.push({ kind: "harass", scene: a.scene, who: a.def.name, target: v.def.name, x: v.x });
-      this.disturb(a.scene, 8, v.x);
-      a.act = "argue";
-      a.doing = "시비 거는 중";
-      a.goal = null;
-      a.face = v.x > a.x ? 1 : -1;
-      a.wait = range(this.rng, 4, 7);
-      this.setClip(a, this.canClip(a, "angry") ? "angry" : "idle");
-      this.iconOn(a, "#", 3);
-      if ((v.temper?.courage ?? 0) < 0.4) return this.flee(v, a.x);
-      v.act = "argue";
-      v.doing = "맞받아침";
-      v.goal = null;
-      v.face = a.x > v.x ? 1 : -1;
-      v.wait = a.wait;
-      this.iconOn(v, "#", 3);
-    }
-    // ── 근무형 (6-3장) ──
-    stepPost(p) {
-      const on = inShift(this.hour, p.shifts) && (p.uproar === void 0 || this.uproarLevel(p.scene) >= p.uproar);
-      const workers = this.actors.filter((a) => a.post?.id === p.id && a.plan !== "exit");
-      if (on && workers.length < p.count) {
-        const [top, bot] = this.graph.lane(p.scene);
-        const a = this.add({ id: `post${++serial}`, name: p.archetype, kind: "mob", brain: "post", home: p.scene, archetype: p.archetype, look: ARCHETYPES[p.archetype]?.looks?.length ? pick2(this.rng, ARCHETYPES[p.archetype].looks) : p.archetype }, { scene: p.scene, x: p.gate, y: (top + bot) / 2 });
-        a.post = p;
-        a.postI = 0;
-        a.needs = fullNeeds(this.rng);
-        this.goPost(a);
-        this.events.push({ kind: "shift", scene: p.scene, who: p.archetype, on: true });
-      } else if (!on) {
-        for (const a of workers) {
-          a.post = void 0;
-          a.route = [];
-          a.exitAt = a.scene === p.scene ? { x: p.gate, y: a.y } : this.gateFar(a, a.x);
-          this.walkTo(a, a.exitAt, "퇴근", "exit");
-          this.events.push({ kind: "shift", scene: p.scene, who: p.archetype, on: false });
-        }
-      }
-    }
-    goPost(a) {
-      const p = a.post;
-      const [top, bot] = this.graph.lane(a.scene);
-      if (p.how === "fixed") {
-        if (a.scene !== p.scene) return this.travel(a, p.scene, "roam-post");
-        return this.walkTo(a, { x: p.spot ?? 400, y: p.y ?? top + 30 }, "자리로", "post");
-      }
-      if (p.how === "patrol") {
-        const [l, r] = p.span ?? [100, (this.graph.scene(a.scene)?.length ?? 1280) - 100];
-        const x = Math.abs(a.x - l) < Math.abs(a.x - r) ? r : l;
-        return this.walkTo(a, { x, y: range(this.rng, top + 20, bot - 10) }, "순찰", "post");
-      }
-      if (p.how === "desk" || p.how === "train") {
-        if (a.scene !== p.scene) return this.travel(a, p.scene, "roam-post");
-        if (this.takeBreak(a)) return;
-        if (p.how === "desk") {
-          const work = ACTIVITIES.find((t) => t.id === "work");
-          a.task = work;
-          return this.walkTo(a, this.taskSpot(a, work), "책상으로", "do");
-        }
-        const train = ACTIVITIES.find((t) => t.id === "train");
-        const st = this.trainSpot(a);
-        if (st) {
-          a.task = train;
-          return this.walkTo(a, st, "훈련하러", "do");
-        }
-        const opts = ["pushup", "work", "limber"].filter((c) => this.canClip(a, c) && c !== a.trainClip);
-        a.trainClip = opts.length ? pick2(this.rng, opts) : "idle";
-        return this.walkTo(a, this.randomSpot(a.scene), "훈련하러", "post");
-      }
-      const route = p.route?.length ? p.route : [p.scene];
-      const want = route[(a.postI ?? 0) % route.length];
-      if (a.scene !== want) return this.travel(a, want, "roam-post");
-      a.postI = (a.postI ?? 0) + 1;
-      a.act = "post";
-      a.doing = `순회 중 (${this.graph.scene(a.scene)?.name ?? a.scene})`;
-      a.wait = p.stay ?? 30;
-      a.plan = "roam-post";
-      this.setClip(a, this.canClip(a, "work") ? "work" : "idle");
-    }
-    postStand(a, dt) {
-      a.wait -= dt;
-      if (a.wait > 0) return;
-      if (this.takeBreak(a)) return;
-      if (["guard", "police"].includes(ARCHETYPES[a.def.archetype ?? ""]?.role ?? "") && this.rng() < 0.2) {
-        const clip = ["radio", "memo"].find((c) => this.canClip(a, c));
-        if (clip) {
-          a.doing = clip === "radio" ? "무전 보고" : "수첩 메모";
-          a.wait = range(this.rng, 3, 5);
-          this.setClip(a, clip);
-          return;
-        }
-      }
-      if (a.def.archetype === "의사" && this.canClip(a, "exam") && this.rng() < 0.5) {
-        const pt = this.actors.find((q) => q !== a && q.scene === a.scene && q.def.kind === "named" && !q.fighting && q.act !== "walk");
-        if (pt) {
-          a.patient = pt.def.id;
-          return this.walkTo(a, { x: pt.x + (pt.x > a.x ? -80 : 80), y: pt.y }, "진료하러", "treat");
-        }
-      }
-      if (a.post?.how === "roam" || a.post?.how === "patrol" || a.post?.how === "train") return this.goPost(a);
-      a.face = this.rng() < 0.5 ? 1 : -1;
-      a.wait = range(this.rng, 4, 9);
-    }
-    /** 동료(이름 요원·직원)끼리: 지나가다 인사, 둘 다 한가하면 선 채 대화, 드물게 말다툼. 그림에 있는 줄만 */
-    socialStep(a, dt) {
-      if ((a.chatCd = (a.chatCd ?? range(this.rng, 5, 20)) - dt) > 0) return;
-      const mate = (q2) => (q2.def.kind === "named" || !!q2.post) && !q2.fighting;
-      if (!mate(a) || !["walk", "idle", "post"].includes(a.act) || a.seat) {
-        a.chatCd = range(this.rng, 3, 8);
-        return;
-      }
-      const q = this.actors.find((o) => o !== a && o.scene === a.scene && mate(o) && ["walk", "idle", "post"].includes(o.act) && !o.seat && (o.chatCd ?? 0) <= 10 && Math.abs(o.x - a.x) < 110 && Math.abs(o.y - a.y) < 50);
-      if (!q) {
-        a.chatCd = range(this.rng, 3, 8);
-        return;
-      }
-      a.chatCd = q.chatCd = range(this.rng, 30, 70);
-      const both = (clipA, clipB, doing, sec) => {
-        for (const [p, o, c] of [[a, q, clipA], [q, a, clipB]]) {
-          p.act = "pause";
-          p.doing = doing;
-          p.wait = sec;
-          p.face = o.x > p.x ? 1 : -1;
-          this.setClip(p, this.canClip(p, c) ? c : "idle");
-        }
-      };
-      const soc = (x) => x.temper?.social ?? 0.5;
-      const named2 = a.def.kind === "named" && q.def.kind === "named";
-      if (named2 ? this.rng() < 0.04 : soc(a) < 0.25 && soc(q) < 0.25 && this.rng() < 0.1) {
-        both("angry", "angry", "말다툼", range(this.rng, 2, 4));
-        this.iconOn(a, "#", 2);
-        this.iconOn(q, "#", 2);
-        return;
-      }
-      if (a.act === "walk" || q.act === "walk") {
-        both("greet", "nod", "인사", 1.4);
-        return;
-      }
-      if ((a.needs?.social ?? 50) < 80 || (q.needs?.social ?? 50) < 80) {
-        const sec = range(this.rng, 6, 12);
-        both("talk", "nod", `대화 (${q.def.name}에게 먼저 말 걺)`, sec);
-        q.doing = `대화 (${a.def.name}의 말을 받음)`;
-        this.iconOn(a, "…", 2.5);
-      }
-    }
-    /** 직원 쉬는 시간: 일 말고 가장 급한 욕구(배고픔·화장실·쉬기·수다)가 크면 같은 소속 건물 안에서 그 일을 할 곳으로. 끝나면 decide → 자리로 */
-    takeBreak(a) {
-      const p = a.post;
-      if (!p || !a.needs) return false;
-      const fac = this.sceneFaction(p.scene);
-      const roam = (fac ? this.graph.ids().filter((id) => this.sceneFaction(id) === fac) : [p.scene]).filter((id) => id === p.scene || this.sexOk(a, id));
-      const c = choose({
-        name: a.def.name,
-        needs: a.needs,
-        scene: a.scene,
-        roam,
-        graph: this.graph,
-        has: (clip) => this.canClip(a, clip),
-        duty: false,
-        partnerIn: (s) => this.actors.some((q) => q !== a && q.scene === s && (q.def.kind === "named" || !!q.post) && ["idle", "walk", "post"].includes(q.act) && !q.route.length),
-        rand: this.rng,
-        last: a.last,
-        fighter: ["guard", "police"].includes(ARCHETYPES[a.def.archetype ?? ""]?.role ?? "")
-        // 경비·요원만 훈련
-      });
-      if (!c || c.score < 30) return false;
-      a.task = c.act;
-      if (c.scene === a.scene) {
-        this.walkTo(a, this.taskSpot(a, c.act), `${c.act.label} 하러`, "do");
-        return true;
-      }
-      const path = this.graph.route(a.scene, c.scene);
-      const d3 = path && this.graph.doorSpot(a.scene, path[0].exit);
-      if (!path || !d3) {
-        a.task = void 0;
-        return false;
-      }
-      a.route = path;
-      this.walkTo(a, d3, `${c.act.label} 하러 ${this.graph.scene(c.scene)?.name ?? c.scene}(으)로`, "do");
-      return true;
-    }
-    travel(a, scene, plan) {
-      const path = this.graph.route(a.scene, scene);
-      const d3 = path && this.graph.doorSpot(a.scene, path[0].exit);
-      if (!path || !d3) return this.idle(a);
-      a.route = path;
-      this.walkTo(a, d3, `${this.graph.scene(scene)?.name ?? scene}(으)로`, plan);
-    }
-    // ── 몹 보충 (6-2장) ──
-    stepSpawn(r, dt) {
-      const night = this.isNight();
-      const lvl = this.uproarLevel(r.scene);
-      const inc = this.sites.get(r.scene);
-      const scared = this.corpses(r.scene).length ? 2 : inc !== void 0 && this.gameH - inc < INCIDENT_HOURS ? 1 : 0;
-      const band = this.bandOf(r);
-      const want = Math.max(0, (band ? band.n : night ? r.target.night : r.target.day) - lvl - scared);
-      const have = this.actors.filter((a) => a.def.kind === "mob" && a.def.brain === "transit" && a.scene === r.scene && a.plan !== "chase" && a.plan !== "cordon" && a.act !== "dead").length;
-      if (have >= want) return void this.spawnT.delete(r.scene);
-      const visible = this.player?.scene === r.scene;
-      if (!visible) {
-        for (let i = have; i < want; ) i += this.spawnOne(r, null, true, want - i);
-        return void this.spawnT.delete(r.scene);
-      }
-      const left = (this.spawnT.get(r.scene) ?? 0) - dt;
-      if (left > 0) return void this.spawnT.set(r.scene, left);
-      this.spawnT.set(r.scene, range(this.rng, r.refill[0], r.refill[1]) * (1 + lvl) / Math.max(1, want / 6));
-      this.spawnOne(r, this.player.x, false, want - have);
-    }
-    /** 지금 시각의 유동인구 구간 (시계 없으면 낮 12시로 본다) */
-    bandOf(r) {
-      if (!r.bands?.length) return null;
-      const h = this.hour ?? 12;
-      const b = r.bands.find((q) => q.from <= q.to ? h >= q.from && h < q.to : h >= q.from || h < q.to) ?? r.bands[0];
-      return { n: Math.round(b.n * (this.graph.scene(r.scene)?.length ?? 1e3) / 1e3), mix: b.mix };
-    }
-    mixOf(r) {
-      return this.bandOf(r)?.mix ?? (this.isNight() && r.nightMix?.length ? r.nightMix : r.mix);
-    }
-    /** 한 명(또는 일행 둘) 들여보냄. 들어온 수 */
-    spawnOne(r, playerX, anywhere, room2 = 1) {
-      const len = this.graph.scene(r.scene)?.length ?? 1280;
-      const gates = r.gates?.length ? r.gates : [30, len - 30];
-      const from = playerX === null ? pick2(this.rng, gates) : [...gates].sort((p, q) => Math.abs(q - playerX) - Math.abs(p - playerX))[0];
-      const others = gates.filter((g) => g !== from);
-      const to = pick2(this.rng, others.length ? others : gates);
-      const [top, bot] = this.graph.lane(r.scene);
-      const mix2 = this.mixOf(r);
-      const name = pick2(this.rng, mix2);
-      const arch = ARCHETYPES[name];
-      const look = arch?.looks?.length ? pick2(this.rng, arch.looks) : name;
-      const a = this.add({ id: `mob${++serial}`, name, kind: "mob", brain: "transit", home: r.scene, archetype: name, look, speed: range(this.rng, 110, 170) }, { scene: r.scene, x: anywhere ? range(this.rng, MARGIN, len - MARGIN) : from, y: range(this.rng, top + 20, bot - 10) });
-      if (a.temper) a.def.speed = (a.def.speed ?? WALK) * (0.85 + a.temper.haste * 0.35);
-      a.exitAt = { x: to, y: range(this.rng, top + 20, bot - 10) };
-      this.walkTo(a, a.exitAt, a.drunk ? "비틀거리며 지나감" : "지나가는 중", "exit");
-      const role = arch?.role;
-      if (room2 < 2 || !a.temper || !["civilian", "student", "worker", "thug"].includes(role ?? "") || this.rng() >= 0.3 * a.temper.social) return 1;
-      const mates = mix2.filter((m) => ARCHETYPES[m]?.role === role);
-      const name2 =
+      

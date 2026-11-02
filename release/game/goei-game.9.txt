@@ -1,4 +1,1332 @@
-setStick(nx, ny);
+45);
+      set("ArrowDown", y > 0.45);
+      for (const code of this.prev.keys()) if (!want.has(code)) want.set(code, false);
+      for (const [code, on] of want) {
+        if (on && !this.prev.get(code)) this.hub.press(code, "pad");
+        else if (!on && this.prev.get(code)) this.hub.release(code, "pad");
+        this.prev.set(code, on);
+      }
+    }
+    /** 진동 0~1, ms */
+    rumble(strength, ms) {
+      if (!this.rumbleOn) return;
+      const p = this.pad();
+      p?.vibrationActuator?.playEffect?.("dual-rumble", { duration: ms, strongMagnitude: strength, weakMagnitude: Math.min(1, strength * 1.4) })?.catch?.(() => {
+      });
+    }
+  };
+
+  // src/game/action/ui/input.ts
+  var MARK = "__goeiSynth";
+  var InputHub = class {
+    bySrc = /* @__PURE__ */ new Map([
+      ["kb", /* @__PURE__ */ new Set()],
+      ["touch", /* @__PURE__ */ new Set()],
+      ["pad", /* @__PURE__ */ new Set()]
+    ]);
+    down = /* @__PURE__ */ new Set();
+    edgeDown = /* @__PURE__ */ new Set();
+    edgeUp = /* @__PURE__ */ new Set();
+    since = /* @__PURE__ */ new Map();
+    analog = /* @__PURE__ */ new Map();
+    /** 마지막으로 쓴 입력 장치 (안내 글자 고르기용) */
+    last = "kb";
+    /** 켜면 장치별 입력을 합친 KeyboardEvent만 target에 보낸다 (키보드 원본은 차단). */
+    synth = false;
+    target = null;
+    /** 메뉴가 열려 있으면 게임 입력을 막고 메뉴가 받는다 */
+    capture = null;
+    listeners = [];
+    detach = null;
+    now = () => typeof performance !== "undefined" ? performance.now() : Date.now();
+    on(fn2) {
+      this.listeners.push(fn2);
+      return () => this.listeners = this.listeners.filter((f) => f !== fn2);
+    }
+    press(code, src) {
+      code = ALIAS[code] ?? code;
+      this.last = src;
+      if (this.capture?.(code, true, src)) return;
+      const set = this.bySrc.get(src);
+      if (set.has(code)) return;
+      set.add(code);
+      if (!this.down.has(code)) {
+        this.down.add(code);
+        this.edgeDown.add(code);
+        this.since.set(code, this.now());
+        this.emit(code, true);
+        for (const f of this.listeners) f(code, true, src);
+      }
+    }
+    release(code, src) {
+      code = ALIAS[code] ?? code;
+      const set = this.bySrc.get(src);
+      if (!set.delete(code)) {
+        this.capture?.(code, false, src);
+        return;
+      }
+      for (const s of this.bySrc.values()) if (s.has(code)) return;
+      this.down.delete(code);
+      this.edgeUp.add(code);
+      this.emit(code, false);
+      for (const f of this.listeners) f(code, false, src);
+    }
+    releaseSource(src) {
+      for (const c of [...this.bySrc.get(src)]) this.release(c, src);
+      this.analog.delete(src);
+    }
+    releaseAll() {
+      for (const s of ["kb", "touch", "pad"]) this.releaseSource(s);
+    }
+    held(code) {
+      return this.down.has(code);
+    }
+    /** 누르고 있던 시간(초). 안 누르면 0 */
+    heldFor(code) {
+      return this.down.has(code) ? (this.now() - (this.since.get(code) ?? this.now())) / 1e3 : 0;
+    }
+    pressed(code) {
+      return this.edgeDown.has(code);
+    }
+    released(code) {
+      return this.edgeUp.has(code);
+    }
+    /** 매 프레임(엔진 틱) 끝에 부른다 */
+    endFrame() {
+      this.edgeDown.clear();
+      this.edgeUp.clear();
+    }
+    setAnalog(src, x, y) {
+      if (x === 0 && y === 0) this.analog.delete(src);
+      else this.analog.set(src, { x, y });
+    }
+    /** 이동 방향 -1~1. 아날로그(스틱)가 있으면 그 값, 없으면 방향키 */
+    axis() {
+      let x = 0, y = 0;
+      for (const a of this.analog.values()) x += a.x, y += a.y;
+      if (x === 0 && y === 0) {
+        x = (this.held("ArrowRight") ? 1 : 0) - (this.held("ArrowLeft") ? 1 : 0);
+        y = (this.held("ArrowDown") ? 1 : 0) - (this.held("ArrowUp") ? 1 : 0);
+      }
+      return { x: Math.max(-1, Math.min(1, x)), y: Math.max(-1, Math.min(1, y)) };
+    }
+    emit(code, down2) {
+      if (!this.synth || !this.target || typeof KeyboardEvent === "undefined") return;
+      const ev = new KeyboardEvent(down2 ? "keydown" : "keyup", { code, key: KEY_OF[code] ?? code, bubbles: true, cancelable: true });
+      ev[MARK] = true;
+      this.target.dispatchEvent(ev);
+    }
+    /** 키보드 받기. 글 입력칸에 초점이 있으면 무시한다 */
+    attachKeyboard(el, opts = {}) {
+      this.detach?.();
+      const physical = /* @__PURE__ */ new Set();
+      const onKey = (e) => {
+        const ev = e;
+        if (ev[MARK]) return;
+        const t = ev.target;
+        const editing = t && (t.tagName === "INPUT" || t.tagName === "TEXTAREA" || t.tagName === "SELECT" || t.isContentEditable);
+        if (editing && ev.type === "keydown") return;
+        if (this.synth) ev.stopImmediatePropagation();
+        if (ev.type === "keydown") {
+          if (opts.prevent?.(ev.code) ?? true) ev.preventDefault();
+          if (ev.repeat) return;
+          physical.add(ev.code);
+          this.press(ev.code, "kb");
+        } else {
+          physical.delete(ev.code);
+          const code = ALIAS[ev.code] ?? ev.code;
+          if (![...physical].some((c) => (ALIAS[c] ?? c) === code)) this.release(code, "kb");
+        }
+      };
+      const blur = () => {
+        physical.clear();
+        this.releaseAll();
+      };
+      const vis = () => document.hidden && blur();
+      el.addEventListener("keydown", onKey);
+      el.addEventListener("keyup", onKey);
+      window.addEventListener("blur", blur);
+      document.addEventListener("visibilitychange", vis);
+      this.detach = () => {
+        el.removeEventListener("keydown", onKey);
+        el.removeEventListener("keyup", onKey);
+        window.removeEventListener("blur", blur);
+        document.removeEventListener("visibilitychange", vis);
+      };
+    }
+    dispose() {
+      this.detach?.();
+      this.releaseAll();
+    }
+  };
+
+  // src/game/action/ui/menu.ts
+  var esc = (s) => s.replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
+  var focusable = (it) => it.type !== "head" && it.type !== "html" && !(it.type === "button" && it.disabled);
+  var Menu = class {
+    constructor(layer) {
+      this.layer = layer;
+      this.el = document.createElement("div");
+      this.el.className = "mn";
+      layer.append(this.el);
+      this.el.addEventListener("click", (e) => this.click(e));
+      this.el.addEventListener("pointermove", (e) => {
+        const row = e.target.closest("[data-i]");
+        if (row && e.pointerType === "mouse") this.setFocus(Number(row.dataset.i), false);
+      });
+    }
+    stack = [];
+    focus = 0;
+    el;
+    onChange = null;
+    /** 메뉴가 열리고 닫힐 때 (터치 버튼 숨기기 등) */
+    onOpen = null;
+    /** 소리 스레드가 메뉴 이동·결정 소리를 붙일 자리 */
+    onSound = null;
+    get isOpen() {
+      return this.stack.length > 0;
+    }
+    get top() {
+      return this.stack[this.stack.length - 1] ?? null;
+    }
+    open(s) {
+      this.stack.push(s);
+      this.focus = this.first();
+      this.render();
+    }
+    replace(s) {
+      this.stack.pop();
+      this.open(s);
+    }
+    back() {
+      const s = this.top;
+      if (!s || s.noBack) return;
+      this.onSound?.("back");
+      if (s.back) s.back();
+      else this.pop();
+    }
+    pop() {
+      this.stack.pop();
+      this.focus = this.first();
+      this.render();
+    }
+    closeAll() {
+      this.stack = [];
+      this.render();
+    }
+    /** 화면 내용이 바뀌면 다시 그린다 (초점 유지) */
+    refresh() {
+      this.render();
+    }
+    first() {
+      const s = this.top;
+      if (!s) return 0;
+      const i = s.items.findIndex(focusable);
+      return Math.max(0, i);
+    }
+    setFocus(i, sound = true) {
+      if (i === this.focus) return;
+      this.focus = i;
+      if (sound) this.onSound?.("move");
+      this.el.querySelectorAll("[data-i]").forEach((r) => r.classList.toggle("f", Number(r.dataset.i) === i));
+      this.el.querySelector(`[data-i="${i}"]`)?.scrollIntoView({ block: "nearest" });
+    }
+    moveFocus(d3) {
+      const s = this.top;
+      if (!s) return;
+      const n = s.items.length;
+      let i = this.focus;
+      for (let k = 0; k < n; k++) {
+        i = (i + d3 + n) % n;
+        if (focusable(s.items[i])) return this.setFocus(i);
+      }
+    }
+    /** 키 하나를 메뉴가 먹으면 true */
+    key(code) {
+      const s = this.top;
+      if (!s) return false;
+      const it = s.items[this.focus];
+      switch (code) {
+        case "ArrowUp":
+          this.moveFocus(-1);
+          return true;
+        case "ArrowDown":
+          this.moveFocus(1);
+          return true;
+        case "ArrowLeft":
+        case "ArrowRight":
+          if (it) this.adjust(it, code === "ArrowLeft" ? -1 : 1);
+          return true;
+        case "Enter":
+        case "Space":
+        case "NumpadEnter":
+          if (it) this.activate(it);
+          return true;
+        case "Escape":
+        case "Backspace":
+          this.back();
+          return true;
+      }
+      if (s.numbered && /^Digit[1-9]$/.test(code)) {
+        const n = Number(code.slice(5)) - 1;
+        const btns = s.items.map((x, i) => [x, i]).filter(([x]) => x.type === "button");
+        const pick3 = btns[n];
+        if (pick3) this.focus = pick3[1], this.activate(pick3[0]);
+        return true;
+      }
+      return true;
+    }
+    adjust(it, d3) {
+      if (it.type === "slider") {
+        const v = Math.max(it.min, Math.min(it.max, Math.round((it.get() + d3 * it.step) / it.step) * it.step));
+        it.set(Number(v.toFixed(3)));
+      } else if (it.type === "toggle") it.set(!it.get());
+      else if (it.type === "choice") {
+        const i = it.options.findIndex(([v]) => v === it.get());
+        it.set(it.options[(i + d3 + it.options.length) % it.options.length][0]);
+      } else return;
+      this.onSound?.("move");
+      this.render();
+      this.onChange?.();
+    }
+    activate(it) {
+      if (it.type === "button") {
+        if (it.disabled) return;
+        this.onSound?.("ok");
+        it.act();
+      } else this.adjust(it, 1);
+    }
+    click(e) {
+      const t = e.target;
+      const row = t.closest("[data-i]");
+      if (t.closest("[data-back]")) return this.back();
+      if (!row) return;
+      const i = Number(row.dataset.i);
+      const it = this.top?.items[i];
+      if (!it) return;
+      this.setFocus(i, false);
+      const step2 = t.closest("[data-step]");
+      if (step2) return this.adjust(it, Number(step2.dataset.step));
+      if (it.type === "slider") {
+        const bar2 = row.querySelector(".mn-bar");
+        if (bar2 && t.closest(".mn-bar")) {
+          const r = bar2.getBoundingClientRect();
+          const k = Math.max(0, Math.min(1, (e.clientX - r.left) / r.width));
+          it.set(Number((it.min + Math.round(k * (it.max - it.min) / it.step) * it.step).toFixed(3)));
+          this.render();
+          this.onChange?.();
+        }
+        return;
+      }
+      const opt = t.closest("[data-opt]");
+      if (opt && it.type === "choice") {
+        it.set(opt.dataset.opt);
+        this.render();
+        this.onChange?.();
+        return;
+      }
+      this.activate(it);
+    }
+    render() {
+      const s = this.top;
+      this.layer.classList.toggle("menu-on", !!s);
+      this.onOpen?.(!!s);
+      if (!s) {
+        this.el.innerHTML = "";
+        this.el.className = "mn";
+        return;
+      }
+      this.el.className = `mn on gk-font mn-${s.look ?? "panel"}`;
+      let bn = 0;
+      const rows = s.items.map((it, i) => {
+        const f = i === this.focus ? " f" : "";
+        switch (it.type) {
+          case "head":
+            return `<div class="mn-head">${esc(it.label)}</div>`;
+          case "html":
+            return `<div class="mn-html">${it.html}</div>`;
+          case "button": {
+            bn++;
+            const num = s.numbered ? `<em>${bn}</em>` : "";
+            return `<button type="button" class="mn-row mn-btn gk-btn${f}${it.danger ? " danger" : ""}" data-i="${i}" ${it.disabled ? "disabled" : ""}>${num}<span>${esc(it.label)}</span>${it.sub ? `<small>${esc(it.sub)}</small>` : ""}</button>`;
+          }
+          case "toggle":
+            return `<div class="mn-row gk-btn${f}" data-i="${i}"><span>${esc(it.label)}</span><b class="mn-tog ${it.get() ? "on" : ""}"><i></i></b></div>`;
+          case "slider": {
+            const v = it.get();
+            const k = (v - it.min) / (it.max - it.min);
+            return `<div class="mn-row gk-btn${f}" data-i="${i}"><span>${esc(it.label)}</span><span class="mn-sl"><b data-step="-1">−</b><span class="mn-bar"><i style="width:${(k * 100).toFixed(1)}%"></i></span><b data-step="1">+</b><em>${esc(it.fmt ? it.fmt(v) : String(v))}</em></span></div>`;
+          }
+          case "choice":
+            return `<div class="mn-row gk-btn${f}" data-i="${i}"><span>${esc(it.label)}</span><span class="mn-ch">${it.options.map(([v, l]) => `<b data-opt="${esc(v)}" class="${v === it.get() ? "on" : ""}">${esc(l)}</b>`).join("")}</span></div>`;
+        }
+      }).join("");
+      const back = s.noBack || s.look === "title" ? "" : `<button type="button" class="mn-x" data-back aria-label="뒤로">✕</button>`;
+      const title2 = s.look === "title" ? `<div class="mn-logo"><small>관리국 괴이 탐사</small><b>${esc(s.title ?? "")}</b><span>${esc(s.sub ?? "")}</span></div>` : s.title ? `<h2>${esc(s.title)}</h2>${s.sub ? `<p class="mn-sub">${esc(s.sub)}</p>` : ""}` : "";
+      this.el.innerHTML = `<div class="mn-box${s.look === "title" ? "" : " gk-panel"}">${back}${title2}<div class="mn-list">${rows}</div></div>`;
+      this.el.querySelector(".f")?.scrollIntoView({ block: "nearest" });
+    }
+    dispose() {
+      this.el.remove();
+    }
+  };
+  function choiceScreen(menu, o, pick3) {
+    return {
+      id: "choice",
+      look: "dialog",
+      numbered: true,
+      title: o.title,
+      noBack: o.cancel === false,
+      back: () => pick3(-1),
+      items: [
+        ...o.lines?.length ? [{ type: "html", html: o.lines.map((l) => `<p>${esc(l)}</p>`).join("") }] : [],
+        ...o.options.map((label2, i) => ({ type: "button", label: label2, act: () => pick3(i) }))
+      ]
+    };
+  }
+
+  // src/game/action/ui/settings.ts
+  var DEFAULT_SETTINGS2 = {
+    crt: "off",
+    shake: 1,
+    flash: true,
+    bright: 1,
+    pixel: true,
+    charSize: 1,
+    master: 0.8,
+    music: 0.7,
+    sfx: 0.9,
+    touch: "auto",
+    touchSize: 1,
+    touchAlpha: 0.8,
+    stickRun: true,
+    lefty: false,
+    vibrate: true,
+    numbers: true,
+    talkModel: "main",
+    talkRecent: false,
+    tScene: 10,
+    tRegion: 30,
+    tTalk: 10,
+    tFight: 10,
+    tWaitShort: 30,
+    tWaitLong: 60,
+    deathMode: "perma",
+    npcKill: false
+  };
+  var KEY = "goei-game-ui:v1";
+  var localStore = {
+    load() {
+      try {
+        return localStorage.getItem(KEY);
+      } catch {
+        return null;
+      }
+    },
+    save(text) {
+      try {
+        localStorage.setItem(KEY, text);
+      } catch {
+      }
+    }
+  };
+  function parseSettings(text) {
+    const s = { ...DEFAULT_SETTINGS2 };
+    if (!text) return s;
+    try {
+      const o = JSON.parse(text);
+      if (o.crt === true) o.crt = "curved";
+      else if (o.crt === false) o.crt = "off";
+      for (const k of Object.keys(s)) {
+        const v = o[k];
+        if (v !== void 0 && typeof v === typeof s[k]) s[k] = v;
+      }
+    } catch {
+    }
+    return s;
+  }
+
+  // src/game/action/ui/mobileButtons.gen.ts
+  var BTN_SHEET = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAgAAAAEACAMAAADyTj5VAAAAq1BMVEUBAABTPSbcnDPNupxgWVWCd2f801SscyTFspKEUh770FHxsEHh0LMuMDvUjyrwrj3trj/QjiuSbkWBTRk2LRcnLTv67NIqLDwpLDgnLDwmLDvNiyp/SxlzSyMpKzsoKzomKzvsqjt8ShklKjj66c/56cy+qYa7iUCaiXZ6SRp4RxcFBgVERUkEBAQDAwMpLDsfIiv78NsCAgL0wVIBAQEAAQEAAAEAAAAAAABXCWV2AAAAOXRSTlP//////////////////////////////////////////////////////////////////////////wA6rGVAAABuaUlEQVR42u29CXvayBIurAlZcGwMhCO0mCBZAh8Dg5RoJDj//5d9tfUmicWOPfd77rVmSRw7lLrr7dq7yvvfx/P/9ON9bMEHAD6eDwB8PB8A+Hg+APDxfADg4/kAwMfzAYCP5wMAH88HAE4/Py487/rK/0eJf/k/SfxZUfliv4b54t8DQDabLRaLrPts+XnXbdhu21Q3QpZf4F2J33SXvNlaS39f6G+zc8/2XwXAbGExfLuR598BgCEpvzV/9O8BwFmwft4XAET3/w8AWMwWvSLgX9mG7SnJk/0bEqBX8Jl3eF8A9BNf0POvAmA6nU5OPtPpp3fdhk/T6ePjCdqP8GbvSnx6ZunvTvzTp0+nt33y6dM7A2CrD/gW3uTrd/18tR74Ergz4wdx+VbHfqYfIP795APfhCOR0VHZbN9M5iz4oGUZrtxerPM8Pj4ulHX0ZsJgQxvJK398bO21u3TLFHofAGhrq8WDr85rwTbgO8tOvNE2ZAuzDZcBsBAD5c2I0+ctMl75OQDQqhe0U29F3ADg0QXA134AkFp4awDwgSY996nNgK/uS+H/Hq2z8OeKEc07UnS0BY89O99mw+NikSnr8E2IE//hcz85y21TVitfvJU7RPxkFT9pc78PgMAa5D/DZfZmAMgyPM+zT1N7reGJZzSyXu7h4WFDmPxjm386tcE2Gp0k/l1tyz9IHJ4/JI6qZPqgiMOnn1n5RK37n3/+QeJvsvKHB/ucnVp5OAot7kynCIAs+/k2ABBQGe1H2+D3P2Fo4XM6ffjTk7BlZ4sBoD6aicetB//MOhcAgBeKw1MO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";
+  var BTN_CELLS = [[10, 6], [135, 6], [260, 6], [385, 6], [10, 132], [135, 132], [260, 132], [385, 132]];
+  var BTN_CELL = 118;
+  var BTN_INNER = { rx: 48, ry: 46, color: "#292c3b" };
+
+  // src/game/action/ui/touchArt.ts
+  var dpr = () => typeof devicePixelRatio === "number" && devicePixelRatio > 0 ? Math.min(4, devicePixelRatio) : 1;
+  var RING = {
+    main: { hi: "#ffe8a3", mid: "#d9a63c", lo: "#7a4c12", edge: "#3a230a" },
+    ult: { hi: "#ffe8a3", mid: "#d9a63c", lo: "#7a4c12", edge: "#3a230a" },
+    skill: { hi: "#e8edf2", mid: "#9aa5b1", lo: "#4a535c", edge: "#1b2026" },
+    guard: { hi: "#dfe9ff", mid: "#8fa6c8", lo: "#3f5473", edge: "#17202e" },
+    auto: { hi: "#c9fff5", mid: "#5ee0c8", lo: "#1f6e60", edge: "#0f2f2a" },
+    menu: { hi: "#e8edf2", mid: "#9aa5b1", lo: "#4a535c", edge: "#1b2026" },
+    plain: { hi: "#e8edf2", mid: "#9aa5b1", lo: "#4a535c", edge: "#1b2026" }
+  };
+  var sheet = null;
+  var sheetReady = false;
+  var waiters = /* @__PURE__ */ new Set();
+  function loadSheet() {
+    if (sheet || typeof Image === "undefined") return;
+    sheet = new Image();
+    sheet.onload = () => {
+      sheetReady = true;
+      for (const f of waiters) f();
+      waiters.clear();
+    };
+    sheet.src = BTN_SHEET;
+  }
+  function onSheetReady(f) {
+    if (sheetReady) return f();
+    waiters.add(f);
+    loadSheet();
+  }
+  var iconCache = /* @__PURE__ */ new Map();
+  function iconOf(cell) {
+    if (!sheet || !sheetReady) return null;
+    const hit2 = iconCache.get(cell);
+    if (hit2) return hit2;
+    const r = Math.min(BTN_INNER.rx, BTN_INNER.ry) - 2;
+    const cv = document.createElement("canvas");
+    cv.width = cv.height = r * 2;
+    const g = cv.getContext("2d");
+    if (!g) return null;
+    const [sx, sy] = BTN_CELLS[cell];
+    g.imageSmoothingEnabled = false;
+    g.beginPath();
+    g.arc(r, r, r, 0, Math.PI * 2);
+    g.clip();
+    g.drawImage(sheet, sx + BTN_CELL / 2 - r, sy + BTN_CELL / 2 - r, r * 2, r * 2, 0, 0, r * 2, r * 2);
+    const img6 = g.getImageData(0, 0, r * 2, r * 2);
+    const d3 = img6.data;
+    const [br, bg, bb] = [41, 44, 59];
+    for (let i = 0; i < d3.length; i += 4) {
+      if (d3[i + 3] && Math.abs(d3[i] - br) < 10 && Math.abs(d3[i + 1] - bg) < 10 && Math.abs(d3[i + 2] - bb) < 10) d3[i + 3] = 0;
+    }
+    g.putImageData(img6, 0, 0);
+    let x0 = r * 2, y0 = r * 2, x1 = -1, y1 = -1;
+    for (let y = 0; y < r * 2; y++) for (let x = 0; x < r * 2; x++) if (d3[(y * r * 2 + x) * 4 + 3] > 0) x0 = Math.min(x0, x), y0 = Math.min(y0, y), x1 = Math.max(x1, x), y1 = Math.max(y1, y);
+    if (x1 < 0) return cv;
+    const side = Math.max(x1 - x0, y1 - y0) + 1 + 4;
+    const cx = (x0 + x1 + 1) / 2, cy = (y0 + y1 + 1) / 2;
+    const tight = document.createElement("canvas");
+    tight.width = tight.height = side;
+    tight.getContext("2d").drawImage(cv, Math.round(cx - side / 2), Math.round(cy - side / 2), side, side, 0, 0, side, side);
+    iconCache.set(cell, tight);
+    return tight;
+  }
+  var cache6 = /* @__PURE__ */ new Map();
+  function renderButton(a) {
+    const k = dpr();
+    const key = `${a.kind}|${a.size}|${a.cell ?? ""}|${a.text ?? ""}|${a.on ? 1 : 0}|${k}|${sheetReady ? 1 : 0}`;
+    const hit2 = cache6.get(key);
+    if (hit2) return hit2;
+    const S2 = Math.round(a.size * k);
+    const cv = document.createElement("canvas");
+    cv.width = cv.height = S2;
+    const g = cv.getContext("2d");
+    const c = S2 / 2;
+    const main = a.kind === "main";
+    const ring = RING[a.kind];
+    const pad = main ? S2 * 0.085 : S2 * 0.045;
+    const R = c - pad;
+    const rw = main ? R * 0.17 : R * 0.12;
+    g.clearRect(0, 0, S2, S2);
+    g.save();
+    g.shadowColor = "rgba(0,0,0,0.55)";
+    g.shadowBlur = S2 * 0.06;
+    g.shadowOffsetY = S2 * 0.02;
+    g.fillStyle = ring.edge;
+    g.beginPath();
+    g.arc(c, c, R, 0, Math.PI * 2);
+    g.fill();
+    g.restore();
+    if (main) {
+      g.fillStyle = ring.mid;
+      g.strokeStyle = ring.edge;
+      g.lineWidth = Math.max(1, S2 * 6e-3);
+      for (let i = 0; i < 8; i++) {
+        const t = i / 8 * Math.PI * 2 - Math.PI / 2;
+        const len = i % 2 === 0 ? S2 * 0.085 : S2 * 0.05;
+        const w = S2 * 0.035;
+        g.save();
+        g.translate(c + Math.cos(t) * (R - rw * 0.3), c + Math.sin(t) * (R - rw * 0.3));
+        g.rotate(t);
+        g.beginPath();
+        g.moveTo(0, -w);
+        g.lineTo(len + rw * 0.3, 0);
+        g.lineTo(0, w);
+        g.closePath();
+        g.fill();
+        g.stroke();
+        g.restore();
+      }
+    }
+    const lg = g.createLinearGradient(c - R, c - R, c + R, c + R);
+    lg.addColorStop(0, ring.hi);
+    lg.addColorStop(0.35, ring.mid);
+    lg.addColorStop(0.65, ring.lo);
+    lg.addColorStop(1, ring.mid);
+    g.fillStyle = lg;
+    g.beginPath();
+    g.arc(c, c, R, 0, Math.PI * 2);
+    g.arc(c, c, R - rw, 0, Math.PI * 2, true);
+    g.fill();
+    g.strokeStyle = ring.edge;
+    g.lineWidth = Math.max(1, S2 * 8e-3);
+    g.beginPath();
+    g.arc(c, c, R, 0, Math.PI * 2);
+    g.stroke();
+    g.beginPath();
+    g.arc(c, c, R - rw, 0, Math.PI * 2);
+    g.stroke();
+    g.strokeStyle = "rgba(255,255,255,0.45)";
+    g.lineWidth = Math.max(1, S2 * 6e-3);
+    g.beginPath();
+    g.arc(c, c, R - rw * 0.35, Math.PI * 1.05, Math.PI * 1.75);
+    g.stroke();
+    if (main || a.kind === "ult") {
+      for (let i = 0; i < 4; i++) {
+        const t = i / 4 * Math.PI * 2 + Math.PI / 4;
+        const x = c + Math.cos(t) * (R - rw / 2), y = c + Math.sin(t) * (R - rw / 2);
+        const rg = g.createRadialGradient(x - rw * 0.1, y - rw * 0.1, 0, x, y, rw * 0.28);
+        rg.addColorStop(0, ring.hi);
+        rg.addColorStop(1, ring.lo);
+        g.fillStyle = rg;
+        g.beginPath();
+        g.arc(x, y, rw * 0.28, 0, Math.PI * 2);
+        g.fill();
+      }
+    }
+    const ir = R - rw;
+    const inner = g.createRadialGradient(c, c - ir * 0.35, ir * 0.1, c, c, ir);
+    if (a.kind === "auto" && a.on) {
+      inner.addColorStop(0, "#7df5e0");
+      inner.addColorStop(0.6, "#1f8f7d");
+      inner.addColorStop(1, "#0c3d36");
+    } else {
+      inner.addColorStop(0, "#3a4252");
+      inner.addColorStop(0.55, "#171c25");
+      inner.addColorStop(1, "#070a0f");
+    }
+    g.fillStyle = inner;
+    g.beginPath();
+    g.arc(c, c, ir, 0, Math.PI * 2);
+    g.fill();
+    const rim = g.createRadialGradient(c, c + ir * 0.9, ir * 0.2, c, c + ir * 0.5, ir * 1.1);
+    rim.addColorStop(0, "rgba(120,150,190,0.22)");
+    rim.addColorStop(1, "rgba(120,150,190,0)");
+    g.fillStyle = rim;
+    g.beginPath();
+    g.arc(c, c, ir, 0, Math.PI * 2);
+    g.fill();
+    const icon2 = a.cell !== null && a.cell !== void 0 ? iconOf(a.cell) : null;
+    if (icon2) {
+      const avail = ir * 2 * 0.72;
+      let s = avail / icon2.width;
+      const fl = Math.floor(s);
+      if (fl >= 1 && fl / s >= 0.85) s = fl;
+      const w = icon2.width * s;
+      g.save();
+      g.imageSmoothingEnabled = false;
+      g.shadowColor = "rgba(0,0,0,0.7)";
+      g.shadowBlur = S2 * 0.02;
+      g.shadowOffsetY = Math.max(1, S2 * 0.012);
+      g.drawImage(icon2, Math.round(c - w / 2), Math.round(c - w / 2), w, w);
+      g.restore();
+    } else if (a.kind === "menu") {
+      g.fillStyle = "#f2ead6";
+      const bw = ir * 0.9, bh = Math.max(2, ir * 0.16);
+      for (let i = -1; i <= 1; i++) g.fillRect(c - bw / 2, c + i * ir * 0.42 - bh / 2, bw, bh);
+    } else if (a.text) {
+      const lines = a.text.split("\n");
+      const longest = Math.max(...lines.map((l) => l.length));
+      const want = Math.min(ir * 0.62, ir * 1.7 / Math.max(2, longest), ir * 1.6 / Math.max(2, lines.length));
+      const up = Math.ceil(want / 11) * 11 <= want * 1.15;
+      const fs = 11 * Math.max(1, up ? Math.ceil(want / 11) : Math.floor(want / 11));
+      g.font = `700 ${fs}px "${PIXEL_FONT}", monospace`;
+      g.textAlign = "center";
+      g.textBaseline = "alphabetic";
+      const sh = Math.max(1, Math.round(fs / 11));
+      const ms = lines.map((ln) => g.measureText(ln));
+      const asc = Math.max(...ms.map((m) => m.actualBoundingBoxAscent || fs * 0.8));
+      const desc = Math.max(...ms.map((m) => m.actualBoundingBoxDescent || 0));
+      const gap = Math.round(fs * 0.2);
+      const lh = asc + desc + gap;
+      const block = lines.length * (asc + desc) + (lines.length - 1) * gap + sh;
+      const top = c - block / 2;
+      lines.forEach((ln, i) => {
+        const m = ms[i];
+        const off2 = ((m.actualBoundingBoxRight ?? 0) - (m.actualBoundingBoxLeft ?? 0)) / 2;
+        const x = Math.round(c - sh / 2 - off2);
+        const y = Math.round(top + i * lh + asc);
+        g.fillStyle = "rgba(0,0,0,0.85)";
+        g.fillText(ln, x + sh, y + sh);
+        g.fillStyle = a.kind === "auto" && a.on ? "#06201c" : "#fbecc9";
+        g.fillText(ln, x, y);
+      });
+    }
+    g.save();
+    g.beginPath();
+    g.arc(c, c, ir, 0, Math.PI * 2);
+    g.clip();
+    const gl = g.createLinearGradient(0, c - ir, 0, c);
+    gl.addColorStop(0, "rgba(255,255,255,0.38)");
+    gl.addColorStop(1, "rgba(255,255,255,0.0)");
+    g.fillStyle = gl;
+    g.beginPath();
+    g.ellipse(c, c - ir * 0.45, ir * 0.82, ir * 0.5, 0, 0, Math.PI * 2);
+    g.fill();
+    g.restore();
+    cache6.set(key, cv);
+    return cv;
+  }
+  function renderStickBase(size2) {
+    const k = dpr();
+    const key = `stick|${size2}|${k}`;
+    const hit2 = cache6.get(key);
+    if (hit2) return hit2;
+    const S2 = Math.round(size2 * k);
+    const cv = document.createElement("canvas");
+    cv.width = cv.height = S2;
+    const g = cv.getContext("2d");
+    const c = S2 / 2, R = c - S2 * 0.03, rw = R * 0.09;
+    g.fillStyle = "rgba(8,12,16,0.55)";
+    g.beginPath();
+    g.arc(c, c, R - rw, 0, Math.PI * 2);
+    g.fill();
+    const lg = g.createLinearGradient(c - R, c - R, c + R, c + R);
+    lg.addColorStop(0, "rgba(232,237,242,0.9)");
+    lg.addColorStop(0.5, "rgba(120,130,140,0.9)");
+    lg.addColorStop(1, "rgba(60,68,76,0.9)");
+    g.fillStyle = lg;
+    g.beginPath();
+    g.arc(c, c, R, 0, Math.PI * 2);
+    g.arc(c, c, R - rw, 0, Math.PI * 2, true);
+    g.fill();
+    g.strokeStyle = "rgba(20,24,30,0.9)";
+    g.lineWidth = Math.max(1, S2 * 6e-3);
+    g.beginPath();
+    g.arc(c, c, R, 0, Math.PI * 2);
+    g.stroke();
+    g.fillStyle = "rgba(236,230,212,0.85)";
+    for (let i = 0; i < 4; i++) {
+      const t = i / 4 * Math.PI * 2;
+      g.save();
+      g.translate(c + Math.cos(t) * (R - rw * 2.2), c + Math.sin(t) * (R - rw * 2.2));
+      g.rotate(t);
+      g.beginPath();
+      g.moveTo(rw * 0.9, 0);
+      g.lineTo(-rw * 0.3, -rw * 0.7);
+      g.lineTo(-rw * 0.3, rw * 0.7);
+      g.closePath();
+      g.fill();
+      g.restore();
+    }
+    g.strokeStyle = "rgba(236,230,212,0.25)";
+    g.lineWidth = Math.max(1, S2 * 5e-3);
+    g.beginPath();
+    g.moveTo(c - R * 0.5, c);
+    g.lineTo(c + R * 0.5, c);
+    g.moveTo(c, c - R * 0.5);
+    g.lineTo(c, c + R * 0.5);
+    g.stroke();
+    cache6.set(key, cv);
+    return cv;
+  }
+  function renderKnob(size2) {
+    const k = dpr();
+    const key = `knob|${size2}|${k}`;
+    const hit2 = cache6.get(key);
+    if (hit2) return hit2;
+    const S2 = Math.round(size2 * k);
+    const cv = document.createElement("canvas");
+    cv.width = cv.height = S2;
+    const g = cv.getContext("2d");
+    const c = S2 / 2, R = c - S2 * 0.04;
+    g.save();
+    g.shadowColor = "rgba(0,0,0,0.6)";
+    g.shadowBlur = S2 * 0.08;
+    g.shadowOffsetY = S2 * 0.03;
+    const rg = g.createRadialGradient(c - R * 0.3, c - R * 0.35, R * 0.1, c, c, R);
+    rg.addColorStop(0, "#f4f1e6");
+    rg.addColorStop(0.5, "#a9b1b8");
+    rg.addColorStop(1, "#4a535c");
+    g.fillStyle = rg;
+    g.beginPath();
+    g.arc(c, c, R, 0, Math.PI * 2);
+    g.fill();
+    g.restore();
+    g.strokeStyle = "rgba(20,24,30,0.8)";
+    g.lineWidth = Math.max(1, S2 * 0.015);
+    g.beginPath();
+    g.arc(c, c, R, 0, Math.PI * 2);
+    g.stroke();
+    cache6.set(key, cv);
+    return cv;
+  }
+  function clearArtCache() {
+    cache6.clear();
+  }
+
+  // src/game/action/ui/touch.ts
+  var DEF2 = [
+    { id: "light", cell: 0, text: "약공격", dx: 0, dy: 0, d: 1.45, play: true },
+    { id: "dodge", cell: 2, text: "회피", dx: -1.52, dy: 0.29, d: 1, play: true },
+    { id: "block", cell: 3, text: "막기", dx: -2.84, dy: 0.29, d: 0.9, play: true },
+    { id: "heavy", cell: 1, text: "강공격", dx: -1.12, dy: -0.98, d: 0.95, play: true },
+    { id: "jump", cell: 4, text: "점프", dx: 0.02, dy: -1.44, d: 0.95, play: true },
+    { id: "unique", cell: 5, text: "고유", dx: -2.42, dy: -1.23, d: 0.9, play: true },
+    { id: "ult", cell: 6, text: "필살", dx: -1.62, dy: -2.4, d: 0.95, play: true },
+    { id: "interact", cell: 7, text: "조사", dx: 0.34, dy: -2.66, d: 0.8, play: true },
+    { id: "auto", cell: null, text: "AUTO", dx: 0, dy: 0, d: 0.8, play: true },
+    { id: "menu", cell: null, text: "", dx: 0, dy: 0, d: 0.65, play: true },
+    // 정보 창(통합창, ` 키, 11-01 사용자 이름 「정보」): 메뉴 옆
+    { id: "char", cell: null, text: "정보", dx: 0, dy: 0, d: 0.8, play: true },
+    // 대사창 모드: 약공격 자리 = 선택, 점프 자리 = 취소
+    { id: "ok", cell: null, text: "선택", dx: 0, dy: 0, d: 1.45, dialog: true },
+    { id: "cancel", cell: null, text: "취소", dx: 0.02, dy: -1.44, d: 0.95, dialog: true }
+  ];
+  var DODGE_MS = 80;
+  var PC_BAR = /* @__PURE__ */ new Set(["auto", "menu", "char"]);
+  var CHARGE_MS = 300;
+  var EXEMPT = 'button, input, textarea, select, a[href], label, [contenteditable="true"], [role="button"], [data-act], [data-mission], [data-go], [data-chip], .mn-row, .mn-list, .gt-log';
+  function safeInsets(host) {
+    const probe = document.createElement("div");
+    probe.style.cssText = "position:fixed;left:0;top:0;width:0;height:0;visibility:hidden;pointer-events:none;padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)";
+    host.append(probe);
+    const cs = getComputedStyle(probe);
+    const v = { t: parseFloat(cs.paddingTop) || 0, r: parseFloat(cs.paddingRight) || 0, b: parseFloat(cs.paddingBottom) || 0, l: parseFloat(cs.paddingLeft) || 0 };
+    probe.remove();
+    return v;
+  }
+  var TouchPad = class {
+    constructor(layer, hub, st, onMenu) {
+      this.layer = layer;
+      this.hub = hub;
+      this.st = st;
+      this.onMenu = onMenu;
+      this.surface = layer.closest(".gs") ?? layer.parentElement ?? layer;
+      this.root = document.createElement("div");
+      this.root.className = "tp gk-font";
+      this.root.innerHTML = `<div class="tp-zone"></div><div class="tp-base"><div class="tp-knob"></div></div>`;
+      this.zone = this.root.querySelector(".tp-zone");
+      this.base = this.root.querySelector(".tp-base");
+      for (const d3 of DEF2) {
+        const el = document.createElement("div");
+        el.className = `tp-b ${d3.cell === null ? "tp-frame" : "tp-icon"}`;
+        el.dataset.id = d3.id;
+        el.setAttribute("aria-label", d3.text || "메뉴");
+        el.innerHTML = `<canvas class="tp-cv"></canvas><b>${d3.text}</b><i class="tp-cd"></i>${d3.id === "ult" ? '<i class="tp-ring"></i>' : ""}`;
+        this.root.append(el);
+        this.btns.push({ ...d3, el, cx: 0, cy: 0, r: 0 });
+      }
+      this.base.innerHTML = '<canvas class="tp-cv"></canvas><div class="tp-knob"><canvas class="tp-cv"></canvas></div>';
+      this.knob = this.base.querySelector(".tp-knob");
+      onSheetReady(() => this.paintAll());
+      void document.fonts?.load(`700 11px "${PIXEL_FONT}"`).then(() => {
+        clearArtCache();
+        this.paintAll();
+      }, () => {
+      });
+      layer.append(this.root);
+      const opt = { passive: false };
+      const s = this.surface;
+      s.addEventListener("pointerdown", this.onDown, opt);
+      s.addEventListener("pointermove", this.onMove, opt);
+      s.addEventListener("pointerup", this.onUp, opt);
+      s.addEventListener("pointercancel", this.onUp, opt);
+      s.addEventListener("lostpointercapture", this.onUp, opt);
+      s.addEventListener("contextmenu", this.onContext);
+      s.addEventListener("gesturestart", this.onGesture, opt);
+      s.addEventListener("dblclick", this.onContext);
+      s.addEventListener("touchend", this.onTouchEnd, opt);
+      window.addEventListener("pointerup", this.onUp);
+      window.addEventListener("pointercancel", this.onUp);
+      window.addEventListener("blur", this.onBlur);
+      document.addEventListener("visibilitychange", this.onVisibility);
+      window.addEventListener("touchstart", this.onAnyTouch, { passive: true, capture: true });
+      document.addEventListener("focusin", this.onIme);
+      document.addEventListener("focusout", this.onIme);
+      if (typeof visualViewport !== "undefined") visualViewport?.addEventListener("resize", this.onIme);
+      this.layout();
+    }
+    root;
+    /** 터치를 받는 곳 = 게임 층 루트(.gs). 터치 차단도 여기서 */
+    surface;
+    btns = [];
+    zone;
+    base;
+    knob;
+    ptr = /* @__PURE__ */ new Map();
+    /** 키 코드별로 누르고 있는 손가락 수 */
+    count = /* @__PURE__ */ new Map();
+    stickPid = null;
+    dirOn = { ArrowLeft: false, ArrowRight: false, ArrowUp: false, ArrowDown: false };
+    runOn = false;
+    runSince = 0;
+    runTimer = 0;
+    timers = /* @__PURE__ */ new Set();
+    /** 고유: 누른 시각·충전 시작 타이머·충전 중 */
+    uniq = { timer: 0, charging: false, down: false };
+    sr = 64;
+    restX = 0;
+    restY = 0;
+    /** 스틱 자리 (층 기준 px) */
+    zr = { x: 0, y: 0, w: 0, h: 0 };
+    /** 스틱이 시작되면 안 되는 곳 (아래 가운데 자동·메뉴 둘레) */
+    noStick = { x: 0, y: 0, w: 0, h: 0 };
+    /** 캔버스 논리 폭 (옛 호환) */
+    vw = () => 1280;
+    /** 화면 좌표 → 층 좌표. 플러그인 창이 게임을 90도 돌릴 때 viewport.toLocal 을 넣는다 */
+    toLocal = null;
+    visible = false;
+    seenTouch = false;
+    mode = "play";
+    /** 입력칸(키패드)에 초점: 스틱·버튼 전부 숨김 */
+    imeUp = false;
+    /** 자동전투 켜짐 (아래 가운데 버튼 안이 청록) */
+    autoOn = false;
+    /** PC: 터치판은 숨기고 아래 가운데 자동·메뉴·통합창만 마우스로 */
+    pc = false;
+    baseX = 0;
+    baseY = 0;
+    lastDpr = 0;
+    onDown = (e) => this.down(e);
+    onMove = (e) => this.move(e);
+    onUp = (e) => this.up(e);
+    onContext = (e) => {
+      if (this.active()) e.preventDefault();
+    };
+    onGesture = (e) => {
+      if (this.active()) e.preventDefault();
+    };
+    onTouchEnd = (e) => {
+      if (!this.shown) return;
+      const t = e.target;
+      if (t && (t.closest(".tp") || !t.closest(EXEMPT)) && e.cancelable) e.preventDefault();
+    };
+    onBlur = () => this.releaseAll();
+    onVisibility = () => {
+      if (document.hidden) this.releaseAll();
+    };
+    onAnyTouch = () => {
+      if (!this.seenTouch) {
+        this.seenTouch = true;
+        if (!this.shown) this.refresh();
+      }
+    };
+    /** 층이 화면에 90도 돌아 그려지는가 (플러그인 창 회전·껍데기 돌려 보기) */
+    rotated() {
+      const r = this.layer.getBoundingClientRect();
+      const w = this.layer.clientWidth, h = this.layer.clientHeight;
+      return Math.abs(w - h) > 4 && Math.abs(r.width - h) < 2 && Math.abs(r.height - w) < 2;
+    }
+    /** 설정·화면 크기가 바뀌면 다시 배치 */
+    layout() {
+      this.releaseAll();
+      const s = this.st();
+      const bw = this.layer.clientWidth || 800, bh = this.layer.clientHeight || 400;
+      const sa = typeof getComputedStyle === "undefined" ? { t: 0, r: 0, b: 0, l: 0 } : safeInsets(this.layer);
+      const ins = this.rotated() ? { t: sa.r, r: sa.b, b: sa.l, l: sa.t } : sa;
+      const portrait = bh > bw * 1.05;
+      const u = Math.max(44, Math.min(86, Math.min(bw, bh) * 0.16)) * s.touchSize;
+      const dprNow = typeof devicePixelRatio === "number" ? devicePixelRatio : 1;
+      if (dprNow !== this.lastDpr) this.lastDpr = dprNow, clearArtCache();
+      this.root.style.setProperty("--tp-u", `${u}px`);
+      this.root.style.setProperty("--tp-a", String(s.touchAlpha));
+      const flip = (x) => s.lefty ? bw - x : x;
+      const ax = bw - ins.r - u * 1.275, ay = bh - ins.b - u * 1.275;
+      const cornerBottom = bh / 720 * 112 + 6;
+      const topNeed = 2.66 * u + 0.4 * u;
+      const ky = Math.max(0.72, Math.min(1, (ay - cornerBottom) / topNeed));
+      const place = (b, cx, cy) => {
+        const r = b.d * u / 2;
+        Object.assign(b, { cx, cy, r });
+        const el = b.el;
+        el.style.width = el.style.height = `${r * 2}px`;
+        el.style.left = `${cx - r}px`;
+        el.style.top = `${cy - r}px`;
+        this.paint(b);
+      };
+      const autoR = 0.4 * u, rowY = portrait ? ins.t + 10 + autoR : bh - ins.b - 12 - autoR;
+      for (const b of this.btns) {
+        if (b.id === "auto") place(b, flip(bw / 2 - 0.92 * u), rowY);
+        else if (b.id === "menu") place(b, flip(bw / 2), rowY);
+        else if (b.id === "char") place(b, flip(bw / 2 + 0.92 * u), rowY);
+        else place(b, flip(ax + b.dx * u), ay + b.dy * u * ky);
+      }
+      const auto = this.btns.find((b) => b.id === "auto");
+      const menu = this.btns.find((b) => b.id === "menu");
+      const chr = this.btns.find((b) => b.id === "char");
+      const nl = Math.min(auto.cx - auto.r, menu.cx - menu.r, chr.cx - chr.r) - 10, nr = Math.max(auto.cx + auto.r, menu.cx + menu.r, chr.cx + chr.r) + 10;
+      this.noStick = { x: nl, y: rowY - autoR - 10, w: nr - nl, h: autoR * 2 + 20 };
+      const zt = portrait ? Math.max(bh * 0.4, rowY + autoR + 10) : bh * 0.18;
+      const zw = bw * 0.5;
+      this.zr = { x: s.lefty ? bw - zw : 0, y: zt, w: zw, h: bh - zt };
+      Object.assign(this.zone.style, { left: `${this.zr.x}px`, top: `${zt}px`, width: `${zw}px`, height: `${bh - zt}px` });
+      this.sr = u * 1.05;
+      this.root.style.setProperty("--tp-r", `${this.sr}px`);
+      this.paintStick();
+      this.restX = ins.l + 24 + this.sr * 1.1;
+      this.restY = ins.b + 24 + this.sr * 1.1;
+      this.root.classList.toggle("tp-dialog", this.mode === "dialog");
+      this.root.classList.toggle("tp-auto-on", this.autoOn);
+      for (const b of this.btns) b.el.style.display = this.usable(b) ? "" : "none";
+      this.restBase();
+    }
+    restBase() {
+      const s = this.st();
+      const zr = this.zr;
+      const x = s.lefty ? zr.w - this.restX : this.restX;
+      const y = zr.h - this.restY;
+      this.placeBase(zr.x + x, zr.y + y);
+      this.knob.style.transform = "";
+      this.base.classList.remove("on");
+    }
+    placeBase(x, y) {
+      this.base.style.transform = `translate(${x - this.sr}px, ${y - this.sr}px)`;
+      this.baseX = x;
+      this.baseY = y;
+    }
+    /** 이 모드에서 보이는 버튼인가 */
+    usable(b) {
+      if (this.pc) return PC_BAR.has(b.id);
+      if (this.mode === "dialog") return !!b.dialog;
+      if (this.root.closest(".exploration-map")) return b.id === "menu";
+      return !!b.play;
+    }
+    /** 눌러지는 버튼인가 (흐린 버튼은 자리만 지킨다) */
+    pressable(b) {
+      return this.usable(b) && !b.el.classList.contains("off");
+    }
+    /** 옛 호환: 필드 전용 「조사·메뉴만」 규칙은 없앴다 (버튼 종류는 어디서나 고정) */
+    setField(_on) {
+    }
+    /** 놀이 / 대사창 모드 */
+    setMode(m) {
+      if (this.mode === m) return;
+      this.mode = m;
+      this.releaseAll();
+      this.refresh();
+    }
+    get touchMode() {
+      return this.mode;
+    }
+    onIme = () => {
+      const vv = typeof visualViewport !== "undefined" ? visualViewport : null;
+      const a = document.activeElement;
+      const typing = /^(INPUT|TEXTAREA|SELECT)$/.test(a?.tagName ?? "") || !!a?.isContentEditable;
+      const shrunk = !!vv && vv.height < innerHeight * 0.75 && typing;
+      const up = typing || shrunk;
+      if (up === this.imeUp) return;
+      this.imeUp = up;
+      if (up) this.releaseAll();
+      this.refresh();
+    };
+    get keypad() {
+      return this.imeUp;
+    }
+    refresh() {
+      const s = this.st();
+      const coarse = typeof matchMedia !== "undefined" && matchMedia("(pointer: coarse)").matches;
+      const show = s.touch === "on" || s.touch === "auto" && (coarse || this.seenTouch);
+      this.pc = !show && this.visible && !this.imeUp && this.mode === "play";
+      this.root.classList.toggle("pc", this.pc);
+      this.root.classList.toggle("hide", !show && !this.pc || !this.visible || this.imeUp);
+      this.layout();
+    }
+    setVisible(on) {
+      if (this.visible === on) return;
+      this.visible = on;
+      if (!on) this.releaseAll();
+      this.refresh();
+    }
+    get shown() {
+      return !this.root.classList.contains("hide") && !this.pc;
+    }
+    /** 터치를 받는 중 (보이고 키패드가 아님) */
+    active() {
+      return (this.shown || this.pc) && !this.imeUp;
+    }
+    /** 버튼 종류 → 틀 모양 */
+    kindOf(b) {
+      if (b.id === "light" || b.id === "ok") return "main";
+      if (b.id === "ult") return "ult";
+      if (b.id === "block" || b.id === "dodge") return "guard";
+      if (b.id === "auto" || b.id === "char") return "auto";
+      if (b.id === "menu") return "menu";
+      return "skill";
+    }
+    /** 버튼 한 장을 지금 크기·상태로 그린다 (touchArt.ts 캐시) */
+    paint(b) {
+      const cv = b.el.querySelector(":scope > .tp-cv");
+      if (!cv || !b.r) return;
+      const size2 = Math.round(b.r * 2);
+      const art4 = renderButton({ size: size2, kind: this.kindOf(b), cell: b.cell, text: b.id === "auto" ? this.pc ? "자동" : "자동\n전투" : b.text, on: b.id === "auto" && this.autoOn });
+      if (cv.width !== art4.width || cv.height !== art4.height) cv.width = art4.width, cv.height = art4.height;
+      const g = cv.getContext("2d");
+      if (!g) return;
+      g.clearRect(0, 0, cv.width, cv.height);
+      g.drawImage(art4, 0, 0);
+    }
+    paintAll() {
+      for (const b of this.btns) this.paint(b);
+      this.paintStick();
+    }
+    paintStick() {
+      const base2 = this.base.querySelector(":scope > .tp-cv");
+      const knob = this.knob.querySelector(".tp-cv");
+      if (!base2 || !knob || !this.sr) return;
+      const b = renderStickBase(Math.round(this.sr * 2));
+      const k = renderKnob(Math.round(this.sr * 0.8));
+      for (const [cv, art4] of [[base2, b], [knob, k]]) {
+        if (cv.width !== art4.width || cv.height !== art4.height) cv.width = art4.width, cv.height = art4.height;
+        cv.getContext("2d")?.drawImage(art4, 0, 0);
+      }
+    }
+    /** 옛 호환: 아이템 칸은 모바일에서 뺐다 */
+    setItems(_items) {
+    }
+    /** 필살 게이지 0~1: 금색 테두리 게이지, 가득 차면 빛남 */
+    setGauge(v) {
+      const b = this.btns.find((x) => x.id === "ult").el;
+      const g = Math.max(0, Math.min(1, v));
+      const t = g.toFixed(3);
+      if (b.style.getPropertyValue("--g") !== t) b.style.setProperty("--g", t);
+      b.classList.toggle("full", g >= 1);
+    }
+    /** 재사용 대기: frac 0~1 (남은 비율), text = 남은 초. 0 이면 끝 */
+    setCool(id, frac, text = "") {
+      const b = this.btns.find((x) => x.id === id)?.el;
+      if (!b) return;
+      const on = frac > 0;
+      b.classList.toggle("cool", on);
+      b.style.setProperty("--cd", on ? String(Math.min(1, frac)) : "0");
+      const i = b.querySelector(".tp-cd");
+      if (i.textContent !== text) i.textContent = on ? text : "";
+    }
+    /** 못 씀: 흐리게, 자리는 그대로 */
+    setOff(id, off2) {
+      const b = this.btns.find((x) => x.id === id);
+      if (!b || b.el.classList.contains("off") === off2) return;
+      b.el.classList.toggle("off", off2);
+      if (off2) {
+        for (const [pid, st] of this.ptr) if (st.kind === "btn" && st.b === b) this.hold(b, false), st.b = null, void pid;
+      }
+    }
+    /** 자동전투 켜짐 표시 */
+    setAuto(on) {
+      if (this.autoOn === on) return;
+      this.autoOn = on;
+      this.root.classList.toggle("tp-auto-on", on);
+      const a = this.btns.find((x) => x.id === "auto");
+      if (a) this.paint(a);
+    }
+    /** 버튼 강조 (조사할 것이 있을 때 등) */
+    hint(id, on) {
+      this.btns.find((x) => x.id === id)?.el.classList.toggle("hint", on);
+    }
+    /** 시험·화면 확인용: 버튼 자리 (층 좌표) */
+    rects() {
+      return Object.fromEntries(this.btns.map((b) => [b.id, { x: b.cx, y: b.cy, r: b.r, shown: this.usable(b) && this.shown, off: b.el.classList.contains("off") }]));
+    }
+    hit(x, y) {
+      let best = null, bd = Infinity;
+      for (const b of this.btns) {
+        if (!this.pressable(b)) continue;
+        const d3 = Math.hypot(x - b.cx, y - b.cy) / b.r;
+        if (d3 < 1.15 && d3 < bd) best = b, bd = d3;
+      }
+      return best;
+    }
+    local(e) {
+      if (this.toLocal) return this.toLocal(e.clientX, e.clientY, this.layer);
+      const r = this.layer.getBoundingClientRect();
+      return { x: e.clientX - r.left, y: e.clientY - r.top };
+    }
+    /** 이 버튼이 누르는 키 */
+    codeOf(b) {
+      switch (b.id) {
+        case "light":
+          return CODE.attack;
+        case "heavy":
+          return CODE.reload;
+        case "dodge":
+          return CODE.evade;
+        case "block":
+          return CODE.guard;
+        case "jump":
+          return CODE.jump;
+        case "unique":
+          return CODE.unique;
+        case "ult":
+          return CODE.ult;
+        case "interact":
+          return CODE.interact;
+        case "auto":
+          return CODE.auto;
+        case "menu":
+          return "Escape";
+        case "char":
+          return "Backquote";
+        case "ok":
+          return "Enter";
+        case "cancel":
+          return "Escape";
+      }
+    }
+    key(code, on) {
+      const n = (this.count.get(code) ?? 0) + (on ? 1 : -1);
+      this.count.set(code, Math.max(0, n));
+      if (on && n === 1) this.hub.press(code, "touch");
+      else if (!on && n <= 0) this.hub.release(code, "touch");
+    }
+    later(fn2, ms) {
+      const t = window.setTimeout(() => {
+        this.timers.delete(t);
+        fn2();
+      }, ms);
+      this.timers.add(t);
+      return t;
+    }
+    hold(b, on) {
+      b.el.classList.toggle("on", on);
+      if (on && this.st().vibrate) navigator.vibrate?.(8);
+      if (b.id === "menu" || b.id === "char") {
+        if (on) {
+          this.releaseAll();
+          this.onMenu(b.id === "menu" ? "Escape" : "Backquote");
+        }
+        return;
+      }
+      if (b.id === "dodge") {
+        if (on) {
+          this.key(CODE.evade, true);
+          this.later(() => this.key(CODE.evade, false), DODGE_MS);
+        }
+        return;
+      }
+      if (b.id === "unique") {
+        const charge2 = TOUCH_CHARGE.code;
+        if (!charge2) {
+          this.key(CODE.unique, on);
+          return;
+        }
+        const u = this.uniq;
+        if (on) {
+          if (u.down) return;
+          u.down = true;
+          u.charging = false;
+          u.timer = this.later(() => {
+            u.timer = 0;
+            if (!u.down) return;
+            u.charging = true;
+            this.key(charge2, true);
+          }, CHARGE_MS);
+        } else {
+          if (!u.down) return;
+          u.down = false;
+          if (u.timer) clearTimeout(u.timer), this.timers.delete(u.timer), u.timer = 0;
+          if (u.charging) this.key(charge2, false);
+          else {
+            this.key(CODE.unique, true);
+            this.later(() => this.key(CODE.unique, false), DODGE_MS);
+          }
+          u.charging = false;
+        }
+        return;
+      }
+      const code = this.codeOf(b);
+      if (code) this.key(code, on);
+    }
+    down(e) {
+      if (!this.active() || e.pointerType === "mouse" && e.button !== 0) return;
+      const t = e.target;
+      const p = this.local(e);
+      if (this.pc) {
+        const pb = this.hit(p.x, p.y);
+        if (!pb) return;
+        e.preventDefault();
+        this.ptr.set(e.pointerId, { kind: "btn", b: pb });
+        this.hold(pb, true);
+        return;
+      }
+      let b = this.mode === "play" ? this.hit(p.x, p.y) : null;
+      if (!b && t && !t.closest(".tp") && t.closest(EXEMPT)) return;
+      b ??= this.hit(p.x, p.y);
+      e.preventDefault();
+      try {
+        this.surface.setPointerCapture(e.pointerId);
+      } catch {
+      }
+      if (b) {
+        this.ptr.set(e.pointerId, { kind: "btn", b });
+        this.hold(b, true);
+        return;
+      }
+      const zr = this.zr, ns = this.noStick;
+      const inZone = p.x >= zr.x && p.y >= zr.y && p.x <= zr.x + zr.w && p.y <= zr.y + zr.h;
+      const blocked = this.mode === "play" && p.x >= ns.x && p.x <= ns.x + ns.w && p.y >= ns.y && p.y <= ns.y + ns.h;
+      if (this.stickPid === null && inZone && !blocked && !this.root.closest(".exploration-map")) {
+        this.stickPid = e.pointerId;
+        this.ptr.set(e.pointerId, { kind: "stick" });
+        this.placeBase(p.x, p.y);
+        this.base.classList.add("on");
+        this.stickTo(p.x, p.y);
+        return;
+      }
+      this.ptr.set(e.pointerId, { kind: "eat" });
+    }
+    move(e) {
+      const st = this.ptr.get(e.pointerId);
+      if (!st) return;
+      e.preventDefault();
+      if (st.kind === "eat") return;
+      const p = this.local(e);
+      if (st.kind === "stick") {
+        this.stickTo(p.x, p.y);
+        return;
+      }
+      const b = this.hit(p.x, p.y);
+      if (b !== st.b) {
+        if (st.b) this.hold(st.b, false);
+        st.b = b;
+        if (b) this.hold(b, true);
+      }
+    }
+    up(e) {
+      const st = this.ptr.get(e.pointerId);
+      if (!st) return;
+      this.ptr.delete(e.pointerId);
+      try {
+        if (this.surface.hasPointerCapture(e.pointerId)) this.surface.releasePointerCapture(e.pointerId);
+      } catch {
+      }
+      if (st.kind === "btn") {
+        if (st.b) this.hold(st.b, false);
+      } else if (st.kind === "stick") {
+        this.stickPid = null;
+        this.setStick(0, 0);
+        this.restBase();
+      }
+    }
+    stickTo(x, y) {
+      const R = this.sr * 0.95;
+      let dx = x - this.baseX, dy = y - this.baseY;
+      const m = Math.hypot(dx, dy);
+      if (m > R * 1.5) {
+        const k = (m - R * 1.5) / m;
+        this.placeBase(this.baseX + dx * k, this.baseY + dy * k);
+        dx = x - this.baseX;
+        dy = y - this.baseY;
+      }
+      const mm = Math.hypot(dx, dy);
+      const cl = mm > R ? R / mm : 1;
+      this.knob.style.transform = `translate(${dx * cl}px, ${dy * cl}px)`;
+      let nx = dx * cl / R, ny = dy * cl / R;
+      if (Math.hypot(nx, ny) < 0.18) nx = ny = 0;
+      this.setStick(nx, ny);
     }
     setStick(x, y) {
       const dialog = this.mode === "dialog";
@@ -2351,1917 +3679,4 @@ ${who}: ${text.replace(/\n/g, " ")}
         root.removeEventListener("keydown", keys2);
         cancel();
         video.el.remove();
-        ui.dispose();
-        panel.el.remove();
-        style.remove();
-      }
-    };
-  }
-
-  // src/game/world/toilets.ts
-  var MALE_LOOKS = /* @__PURE__ */ new Set(["고그니쟈", "큐라스", "고르고디오", "곽성주", "조성춘", "윤병수", "김성진", "송진섭", "사장", "도필헌", "이길환", "이기석", "김조학", "이도형", "고영훈", "노기균", "송주익", "장허운", "곽제강", "이병진", "제이", "호유원", "이자헌", "박민성", "백사헌", "살라딘", "경찰남1", "경찰남2", "관리국남A", "관리국남B", "가짜관리국검사A", "백일몽남A", "백일몽남B", "협회남1", "협회남2", "가짜관리국검사B", "프리랜서남1", "프리랜서남2", "프리랜서남3", "프리랜서남4", "상인남1", "가짜관리국검사C", "상인남2", "상인남3", "상인남4", "의사1", "청소부남1", "가짜관리국진압A", "시민남1", "시민남2", "시민남3", "시민남4", "시민남5", "시민남6", "가짜관리국진압B", "시민남7", "시민남8", "시민남9", "가짜관리국진압C", "불량배남2"]);
-  var FEMALE_LOOKS = /* @__PURE__ */ new Set(["게슈간", "로제몬", "콘쥬스", "쟈알디", "스팡달", "잼트리", "에일린", "데쥬레", "데드폴", "고영은", "강이학", "이연화", "청달래", "백석주", "진나솔", "이성해", "은하제", "아벤샤", "차여진", "서윤지", "고연지", "윤지아", "마덕희", "문혜란", "신유리", "블라렛", "세크리엠", "불량배여1", "불량배여3", "경찰여1", "경찰여2", "관리국여A", "관리국여B", "백일몽여A", "백일몽여B", "협회여1", "협회여2", "협회여3", "프리랜서여1", "프리랜서여2", "프리랜서여3", "프리랜서여4", "프리랜서여5", "상인여1", "상인여2", "상인여3", "간호사1", "청소부여1", "시민여1", "시민여2", "시민여3", "시민여4", "시민여5", "시민여6", "시민여7", "시민여8", "시민여9"]);
-  var WASH = { id: "wash", need: "bladder", clip: "line:104", where: ["restroom"], sec: [4, 6], fill: 0, label: "손 씻는 중" };
-  var STALL_DOOR_SEC = 0.45;
-  var TOILET_SEAT = {
-    쟈알디: [173, 10],
-    스팡달: [173, 1],
-    잼트리: [173, 0],
-    에일린: [179, 10],
-    고그니쟈: [167, 6],
-    큐라스: [167, 7],
-    고르고디오: [164, 0],
-    데쥬레: [173, 0],
-    데드폴: [159, 12],
-    게슈간: [167, 0],
-    로제몬: [173, 7],
-    콘쥬스: [187, 8],
-    관리국남A: [169, 5],
-    관리국남B: [169, 5],
-    관리국여A: [171, 3],
-    관리국여B: [170, 10],
-    // 15:10 사용자 「모든 세력 돌려쓸건데 관리국만 맞추면 뭐해」 → 앉는 동작(102)이 있는 나머지 101명도 같은 기준으로 확대 그림에서 하나씩 (허리 가운데로 좌우)
-    사장: [164, 0],
-    도필헌: [161, 7],
-    이길환: [162, 0],
-    이기석: [168, 0],
-    김조학: [172, 6],
-    이도형: [165, 3],
-    고영훈: [158, -1],
-    노기균: [171, 4],
-    송주익: [170, 0],
-    곽성주: [168, 1],
-    조성춘: [170, 5],
-    윤병수: [167, 9],
-    김성진: [172, 10],
-    송진섭: [171, 10],
-    청달래: [167, 1],
-    호유원: [171, 5],
-    백석주: [173, 1],
-    진나솔: [166, 10],
-    이성해: [169, 10],
-    이자헌: [165, 0],
-    은하제: [164, 0],
-    박민성: [169, 4],
-    백사헌: [166, 13],
-    고영은: [172, 0],
-    강이학: [165, 1],
-    장허운: [172, 13],
-    곽제강: [170, 1],
-    이연화: [167, 0],
-    이병진: [168, -1],
-    제이: [170, 1],
-    차여진: [174, 3],
-    서윤지: [167, 13],
-    고연지: [177, 9],
-    윤지아: [183, 1],
-    마덕희: [174, 14],
-    문혜란: [176, 0],
-    신유리: [166, 0],
-    블라렛: [174, 12],
-    살라딘: [170, 0],
-    아벤샤: [172, 6],
-    세크리엠: [170, 0],
-    가짜관리국검사A: [166, 2],
-    가짜관리국검사B: [165, 4],
-    가짜관리국검사C: [168, -1],
-    가짜관리국진압A: [171, -1],
-    가짜관리국진압B: [168, 7],
-    가짜관리국진압C: [169, 4],
-    불량배남2: [171, 6],
-    불량배여1: [167, 0],
-    불량배여3: [172, 10],
-    경찰남1: [172, 12],
-    경찰남2: [166, 5],
-    경찰여1: [168, 1],
-    경찰여2: [174, 6],
-    백일몽남A: [170, 8],
-    백일몽남B: [168, 4],
-    백일몽여A: [172, 11],
-    백일몽여B: [170, 0],
-    협회남1: [166, 5],
-    협회남2: [168, 0],
-    협회여1: [164, 0],
-    협회여2: [169, 6],
-    협회여3: [171, 0],
-    프리랜서남1: [173, 9],
-    프리랜서남2: [169, 9],
-    프리랜서남3: [166, 4],
-    프리랜서남4: [166, 11],
-    프리랜서여1: [169, 1],
-    프리랜서여2: [173, 11],
-    프리랜서여3: [168, 0],
-    프리랜서여4: [171, 7],
-    프리랜서여5: [171, 11],
-    상인남1: [166, 2],
-    상인남2: [169, 2],
-    상인남3: [170, 9],
-    상인남4: [171, 8],
-    상인여1: [173, 4],
-    상인여2: [171, 6],
-    상인여3: [170, 0],
-    의사1: [169, 6],
-    간호사1: [170, 0],
-    청소부남1: [169, 7],
-    청소부여1: [169, 2],
-    시민남1: [171, 5],
-    시민남2: [173, 4],
-    시민남3: [171, 5],
-    시민남4: [169, 7],
-    시민남5: [168, 7],
-    시민남6: [169, 6],
-    시민남7: [172, 7],
-    시민남8: [167, 9],
-    시민남9: [168, 4],
-    시민여1: [167, 1],
-    시민여2: [168, 0],
-    시민여3: [172, 9],
-    시민여4: [176, 10],
-    시민여5: [171, 9],
-    시민여6: [172, 3],
-    시민여7: [171, 6],
-    시민여8: [170, 0],
-    시민여9: [170, 7]
-  };
-  var LAP_BASE = 173;
-  function seatFeet(seat, look) {
-    const [lap, dx] = TOILET_SEAT[look] ?? [LAP_BASE, 0];
-    const k = seat.k ?? 1.25;
-    return { x: seat.x + dx * k, y: seat.y + (LAP_BASE - lap) * k };
-  }
-
-  // src/game/action/hq/showerFx.ts
-  var DOT = 2;
-  var STREAMS = 7;
-  var SPREAD_DEG = 26;
-  var SPEED = 3.6 * DOT;
-  var G = 0.035 * DOT;
-  var NF = 16;
-  var FPS = 8;
-  var C_DEEP = "rgba(120,180,230,0.96)";
-  var C_HI = "rgba(235,250,255,1)";
-  var C_MID = "rgba(160,212,245,0.96)";
-  function rng2(seed) {
-    let a = seed >>> 0;
-    return () => {
-      a = a + 1831565813 >>> 0;
-      let t = a;
-      t = Math.imul(t ^ t >>> 15, t | 1);
-      t ^= t + Math.imul(t ^ t >>> 7, t | 61);
-      return ((t ^ t >>> 14) >>> 0) / 4294967296;
-    };
-  }
-  var dot2 = (c, x, y, col) => {
-    c.fillStyle = col;
-    c.fillRect(Math.round(x / DOT) * DOT, Math.round(y / DOT) * DOT, DOT, DOT);
-  };
-  function faceDir(h) {
-    const [[x0, y0], [x1, y1]] = h.head;
-    const ex = x1 - x0, ey = y1 - y0, L = Math.hypot(ex, ey) || 1;
-    let nx = -ey / L, ny = ex / L;
-    if (ny < 0) {
-      nx = -nx;
-      ny = -ny;
-    }
-    return [nx, ny];
-  }
-  function drawSteam(c, h, headTop, headX, frame) {
-    const r = rng2(h.id.length * 7 + h.foot[0]);
-    for (let k = 0; k < 6; k++) {
-      const bx = headX + (r() * 32 - 16) * DOT, by = headTop + r() * 40 * DOT;
-      const t = (frame + k * NF / 6) % NF / NF;
-      const y = by - t * 34 * DOT, x = bx + Math.sin(t * 6.28 + k) * 5 * DOT;
-      const alpha = 150 * Math.pow(1 - t, 1.2) * Math.min(1, t * 4 + 0.3) / 255, rad = (5 + Math.floor(t * 6)) * DOT;
-      c.fillStyle = `rgba(250,253,255,${alpha.toFixed(3)})`;
-      for (const [ox, oy, rr] of [[0, 0, rad], [-rad * 0.6, rad * 0.3, rad * 0.7], [rad * 0.6, rad * 0.2, rad * 0.75], [0, -rad * 0.5, rad * 0.6]]) {
-        c.beginPath();
-        c.arc(x + ox, y + oy, rr, 0, Math.PI * 2);
-        c.fill();
-      }
-    }
-  }
-  function drawShowerWater(c, h, headTop, now) {
-    const frame = Math.floor(now / 1e3 * FPS) % NF;
-    const [fx2, fy] = h.foot, headX = fx2;
-    if (headTop !== null) drawSteam(c, h, headTop, headX, frame);
-    const [[x0, y0], [x1, y1]] = h.head, [dx, dy] = faceDir(h), base2 = Math.atan2(dy, dx);
-    const r = rng2(h.foot[0] * 100 + h.foot[1]);
-    for (let s = 0; s < STREAMS; s++) {
-      const u = s / (STREAMS - 1);
-      let x = x0 + (x1 - x0) * u, y = y0 + (y1 - y0) * u;
-      const th = base2 + (u - 0.5) * 2 * SPREAD_DEG * Math.PI / 180;
-      let vx = SPEED * Math.cos(th), vy = SPEED * Math.sin(th);
-      for (let i = 0; i < 400; i++) {
-        if (headTop !== null && Math.abs(x - headX) < 10 * DOT && y >= headTop) {
-          for (let k = 0; k < 3; k++) {
-            const a = r() * Math.PI, rr = (3 + r() * 6) * DOT;
-            dot2(c, x + Math.cos(a) * rr, y - Math.abs(Math.sin(a)) * rr * 0.6 + (frame + k) % 3 * DOT, C_HI);
-          }
-          break;
-        }
-        if (y >= fy - 2 * DOT) break;
-        if ((i + frame * 2 + s * 3) % 9 < 7) dot2(c, x, y, i % 11 < 2 ? C_HI : C_DEEP);
-        x += vx;
-        y += vy;
-        vy += G;
-        void vx;
-      }
-    }
-    if (headTop !== null) for (let k = 0; k < 14; k++) {
-      const a = r() * Math.PI, rr = (5 + r() * 14 + (frame + k) % 4) * DOT;
-      dot2(c, headX + Math.cos(a) * rr, headTop + 4 * DOT - Math.abs(Math.sin(a)) * rr * 0.5, k % 3 === 0 ? C_HI : C_MID);
-    }
-    for (let k = 0; k < 16; k++) {
-      const a = r() * Math.PI * 2, rr = (6 + r() * 16) * DOT, ph = (k + frame) % 4;
-      dot2(c, fx2 + Math.cos(a) * rr, fy + Math.sin(a) * rr * 0.3 - ph * DOT, ph === 0 ? C_HI : C_MID);
-    }
-  }
-
-  // src/game/action/engine/hub.ts
-  var CORDON_SLOTS = 5;
-  var GEAR_SLOTS = 8;
-  var LIFE_SLOTS = 24;
-  var TOP = 440;
-  var LANE = [LANE_TOP, LANE_BOT];
-  var DOOR_H = 250;
-  var FADE = 8;
-  var OPEN_T = 9;
-  var openLen = (sc, d3) => !sc?.painted ? OPEN_T : d3.kind === "elevator" ? 22 : d3.kind === "cell" ? 26 : 12;
-  var RATTLE_T = 10;
-  var DOOR_W = { main: 190, door: 120, stairs: 120, glass: 160, steel: 120, security: 120, elevator: 160, stairs_up: 120, stairs_down: 120, shop: 130, slide: 170, cell: 150, exit: 150 };
-  var isS = (d3) => d3.side === "S";
-  var doorY = (d3, lane = LANE) => isS(d3) ? lane[1] - 14 : lane[0] + 16;
-  function makeHub(host, whereIs2) {
-    let view2 = null;
-    let scene = null;
-    let artDoors = /* @__PURE__ */ new Set();
-    let pending = null;
-    let arrive = null;
-    let enterTick = -1;
-    let fadeOut = 0;
-    let barked = null;
-    let speech = null;
-    let curPeople = [];
-    let live = [];
-    let cords = [];
-    let gears = [];
-    let opening = null;
-    let closing = null;
-    let rattle = null;
-    let arriveDoor = null;
-    let callWait = null;
-    let callOn = false;
-    let near2 = null;
-    let solids = [];
-    const gateOpen = /* @__PURE__ */ new Map();
-    let pT = null;
-    const setPT = (v) => {
-      pT = v;
-      host.life?.playerToilet?.(v && scene ? { scene: scene.id, id: v.id, kind: v.kind, phase: v.phase } : null);
-    };
-    let sitChair = null;
-    let showerSpot = null;
-    let curWorld = null;
-    let lockerUse = null;
-    let walked = 0;
-    let lastX = null;
-    const sceneOf = (id) => view2.scenes.find((s) => s.id === id) ?? view2.scenes[0];
-    const openOf = (id) => opening && opening.id === id ? Math.min(1, opening.t / opening.len) : closing && closing.id === id ? Math.max(0, 1 - closing.t / closing.len) : 0;
-    let peek = null;
-    const stallBusy = (doorId) => live.some((q) => q.toilet?.door === doorId) || !!pT && pT.door === doorId;
-    const doorFx = (id) => ({ open: openOf(id), shake: rattle && rattle.id === id ? (rattle.t % 4 < 2 ? 3 : -3) * (1 - rattle.t / RATTLE_T) : 0 });
-    const useToilet = (a, id) => {
-      const t = scene?.toilets?.find((q) => q.id === id);
-      if (!t || !scene) return;
-      const pl = a.world.player;
-      if (t.kind === "stall" && t.door && host.life?.toiletBusy?.(scene.id, id)) {
-        a.movePlayer(t.x, t.y);
-        peek = { door: t.door, x: t.x, y: t.y, id };
-        host.life?.playerPeek?.({ scene: scene.id, id });
-        host.sfx("doorLatch");
-        return;
-      }
-      if (host.life?.toiletBusy?.(scene.id, id)) return a.world.say("누가 쓰고 있다.", 1.5);
-      if (!pl.lifeScene) return;
-      if (t.kind === "stall") {
-        a.movePlayer(t.x, t.y);
-        setPT({ id, kind: "stall", door: t.door, phase: "open", t: Math.round(STALL_DOOR_SEC * 30), front: { x: t.x, y: t.y }, seat: t.seat });
-        host.sfx("doorLatch");
-        return;
-      }
-      const steps = t.kind === "urinal" ? [{ id: "100", n: 3 }] : [{ id: "104", n: 2 }];
-      if (!pl.lifeScene(steps, t.x, t.y, 1)) return a.world.say(t.kind === "urinal" ? "이 사람은 소변기를 쓰지 않는다." : "지금은 할 수 없다.", 1.5);
-      setPT({ id, kind: t.kind, phase: "in", t: 0, front: { x: t.x, y: t.y } });
-    };
-    const stepToilet = (a) => {
-      if (!pT) return;
-      const pl = a.world.player;
-      if (pT.phase === "open") {
-        if (--pT.t > 0) return;
-        const look = pl.label ?? "";
-        const f = pT.seat ? seatFeet(pT.seat, look) : pT.front;
-        if (!pl.lifeScene?.([{ id: "101" }, { id: "102", n: 4 }, { id: "103" }], f.x, f.y, 1)) {
-          a.movePlayer(pT.front.x, pT.front.y);
-          setPT(null);
-          return a.world.say("지금은 할 수 없다.", 1.5);
-        }
-        setPT({ ...pT, phase: "in" });
-        return;
-      }
-      if (pT.phase === "in") {
-        if (pl.lifeSceneOn) return;
-        if (pT.kind !== "stall") return setPT(null);
-        a.movePlayer(pT.front.x, pT.front.y);
-        host.sfx("doorLatch");
-        setPT({ ...pT, phase: "leave", t: Math.round(STALL_DOOR_SEC * 30) });
-        return;
-      }
-      if (--pT.t <= 0) setPT(null);
-    };
-    const build = (id, x, y) => {
-      view2 = host.map();
-      const base2 = sceneOf(id);
-      const people = (host.life ? [] : host.visitors?.(base2.id) ?? []).map((p) => {
-        const at2 = clearSpot(p.x, p.y, base2.boxes.filter((b) => b.solid).map((b) => ({ x: b.x, y: b.y, w: b.w, back: b.d + 6, front: 8 })), base2.lane ?? LANE);
-        return { ...p, x: at2.x, y: at2.y };
-      });
-      const toiletSpots = (base2.toilets ?? []).map((t) => ({ id: `toilet:${t.id}`, x: t.x, y: t.y, verb: t.kind === "stall" ? "칸" : t.kind === "urinal" ? "소변기" : "손 씻기", face: 1, open: true }));
-      const sc = { ...base2, spots: [...base2.spots, ...toiletSpots, ...people.map((p) => ({ id: `visit:${p.name}`, x: p.x, y: p.y, who: p.name, verb: "대화", face: p.face, open: true }))] };
-      if (pT) setPT(null);
-      peek = null;
-      gateOpen.clear();
-      curPeople = people;
-      speech = null;
-      const prev = scene;
-      scene = sc;
-      if (prev && prev.id !== sc.id) host.entered?.({ id: sc.id, name: sc.name, floor: sc.floor }, { id: prev.id, name: prev.name, floor: prev.floor }, walked);
-      walked = 0;
-      lastX = null;
-      barked = null;
-      enterTick = -1;
-      opening = null;
-      rattle = null;
-      callWait = null;
-      callOn = false;
-      const inDoor = arriveDoor ? sc.doors.find((d3) => d3.id === arriveDoor) : void 0;
-      closing = sc.painted && inDoor ? { id: inDoor.id, t: 0, len: openLen(sc, inDoor) } : null;
-      arriveDoor = null;
-      near2 = null;
-      solids = [...sc.boxes.filter((b) => b.solid).map((b) => ({ x: b.x, y: b.y, w: b.w, back: b.d + 6, front: 8, h: sc.painted ? b.h : void 0 })), ...people.map((p) => ({ x: p.x, y: p.y, w: 80, back: 24, front: 24 }))];
-      const len = Math.max(SCREEN_W, sc.length);
-      const sx = Math.max(60, Math.min(len - 60, x));
-      arrive = { x: sx, y };
-      const place = HQ_PLACE[sc.id] ?? HQ_PLACE[sc.look] ?? "hq_office";
-      return {
-        id: `hq:${sc.id}`,
-        title: sc.name,
-        type: "hq",
-        length: len,
-        lane: sc.lane ?? LANE,
-        startX: sx,
-        exitX: Infinity,
-        props: [],
-        encounters: [],
-        platforms: sc.painted ? sc.boxes.filter((b) => b.solid && b.h > 0 && b.h < 400).map((b) => ({ x0: b.x - b.w / 2, x1: b.x + b.w / 2, y0: b.y - b.d, y1: b.y, h: b.h })) : void 0,
-        depthLayers: sc.boxes.map((b, bi) => ({ y: b.y, occludedSilhouette: !sc.painted, x0: b.x - b.w / 2, x1: b.x + b.w / 2, draw: (c) => {
-          if (b === sitChair || live.some((q) => q.seat?.box === bi)) return;
-          if (sc.painted && hasHqField(sc.painted) && b.kind !== "chair" && b.kind !== "armchair") {
-            drawHqFieldObject(c, sc.painted, b.kind, gateOpen.get(b.kind) ?? 0, stallBusy(b.kind));
-            return;
-          }
-          drawBox(c, b, sc.look);
-        } })).concat(people.map((p) => ({ y: p.y, x0: p.x - 60, x1: p.x + 60, occludedSilhouette: false, draw: (c) => {
-          drawCharClip(c, p.name, p.x, p.y, p.face, performance.now());
-        } }))).concat((sc.painted && PAINTED[sc.painted]?.showers ? PAINTED[sc.painted].showers : []).map((sh) => ({ y: sh.foot[1] + 1, x0: sh.foot[0] - 80, x1: sh.foot[0] + 80, occludedSilhouette: false, draw: (c) => {
-          if (showerSpot !== sh.id) {
-            const u = host.life?.showerUsers?.(sc.id).find((q) => q.id === sh.id);
-            if (!u) return;
-            drawShowerWater(c, sh, u.y + charTop(u.look) * spr(u.y), performance.now());
-            return;
-          }
-          const pl = curWorld?.player ?? null;
-          const top = pl ? (pl.art ? charTop(pl.art.key) : -230) * spr(pl.y) : -230;
-          drawShowerWater(c, sh, pl ? pl.y + top : null, performance.now());
-        } }))).concat(host.life ? Array.from({ length: LIFE_SLOTS }, (_, i) => ({
-          get y() {
-            return live[i]?.y ?? -1e9;
-          },
-          get x0() {
-            return (live[i]?.x ?? -1e9) - 60;
-          },
-          get x1() {
-            return (live[i]?.x ?? -1e9) + 60;
-          },
-          occludedSilhouette: false,
-          draw: (c) => {
-            const a = live[i];
-            if (a) drawLiveActor(c, a, host.life);
-          }
-        })) : []).concat(host.life?.gear ? Array.from({ length: GEAR_SLOTS }, (_, i) => ({
-          get y() {
-            return gears[i]?.y ?? -1e9;
-          },
-          get x0() {
-            return (gears[i]?.x ?? -1e9) - 40;
-          },
-          get x1() {
-            return (gears[i]?.x ?? -1e9) + 40;
-          },
-          occludedSilhouette: false,
-          draw: (c) => {
-            const g = gears[i];
-            if (g) drawGear(c, g, performance.now() / 1e3);
-          }
-        })) : []).concat(host.life?.cordons ? Array.from({ length: CORDON_SLOTS * 2 }, (_, i) => ({
-          get y() {
-            const b = cords[i >> 1];
-            return b ? i & 1 ? b.y1 : b.y0 : -1e9;
-          },
-          get x0() {
-            return cords[i >> 1]?.x0 ?? -1e9;
-          },
-          get x1() {
-            return cords[i >> 1]?.x1 ?? -1e9;
-          },
-          occludedSilhouette: false,
-          draw: (c) => {
-            const b = cords[i >> 1];
-            if (b) drawCordon(c, b, !!(i & 1), performance.now() / 1e3);
-          }
-        })) : []),
-        drawBackground(c, camX) {
-          if (sc.painted && drawHqField(c, sc.painted, camX, doorFx, host.hour?.() ?? null)) {
-            if (sc.floor === "2F" || sc.floor === "3F") drawHqSigns(c, sc.painted, sc.doors);
-            if (callOn) drawCallLit(c, sc.painted, performance.now());
-            return;
-          }
-          if (sc.legacy) {
-            const cov = drawHqWall(c, place, sc.id, len, TOP, sc.doors);
-            artDoors = cov ?? /* @__PURE__ */ new Set();
-            c.fillStyle = "rgba(0,0,0,0.35)";
-            c.fillRect(camX - 40, TOP - 14, view.w + 80, 14);
-            if (!drawFloor(c, place, camX - 40, camX + view.w + 40, TOP, SCREEN_H)) {
-              c.fillStyle = "#2b3135";
-              c.fillRect(camX - 40, TOP, view.w + 80, SCREEN_H - TOP);
-            }
-            for (const t of sc.things) if (t.wall) legacyThing(c, t, camX);
-            for (const d3 of sc.doors) if (!artDoors.has(d3.id)) legacyDoor(c, d3, camX);
-            for (const t of sc.things) if (!t.wall) legacyThing(c, t, camX);
-            return;
-          }
-          drawRoomShell(c, sc, camX);
-          const textured = (sc.id === "office" || sc.id === "f2") && drawHqTextureWall(c, place, len, camX, sc.doors.filter((d3) => !isS(d3)).map((d3) => ({ x: d3.x, width: d3.kind === "glass" ? 192 : DOOR_W[d3.kind] + 24 })));
-          if (sc.id === "office" || sc.id === "f2") drawFloor(c, place, camX - 40, camX + view.w + 40, TOP, SCREEN_H);
-          for (const f of sc.fixtures) {
-            if (!textured || f.kind === "directory") drawFixture(c, f, sc.look, camX);
-          }
-          for (const d3 of sc.doors) if (!isS(d3)) {
-            if (sc.id === "f2" && d3.id === "office" && d3.kind === "glass" && drawHqDoorRound2(c, d3.x, openOf(d3.id), d3.open)) continue;
-            drawDoorN(c, d3, sc.look, openOf(d3.id), camX);
-          }
-          for (const d3 of sc.doors) if (isS(d3)) drawFloorExit(c, d3, openOf(d3.id), camX);
-        },
-        drawForeground(c, camX, w) {
-          const now = performance.now();
-          if (enterTick < 0) enterTick = now;
-          const age = (now - enterTick) / (1e3 / 30);
-          if (!sc.legacy) {
-            for (const d3 of sc.doors) if (isS(d3)) drawExitLintel(c, d3, camX);
-          }
-          if (sc.painted) drawHqFieldLight(c, sc.painted, camX, host.hour?.() ?? null, now);
-          const z = view.zoom;
-          c.save();
-          c.scale(1 / z, 1 / z);
-          const shown = host.life ? live.filter((a) => a.kind === "named") : people;
-          const mobsShown = host.life ? live.filter((a) => a.kind === "mob" && (a.talk || a.rel === "foe")) : [];
-          host.overlay?.(c, [
-            ...shown.map((p) => {
-              const rel = p.rel;
-              return { name: p.name, x: p.x * z, y: p.y * z, top: namedTop(p.name) * spr(p.y) * z, ...rel ? { rel } : {} };
-            }),
-            ...mobsShown.map((p) => ({ name: `mob:${p.id}`, label: p.name, mob: true, x: p.x * z, y: p.y * z, top: (p.look && charArt(p.look) ? charTop(p.look) : -230) * spr(p.y) * z, ...p.rel ? { rel: p.rel } : {} }))
-          ], { name: "", x: w.player.x * z, y: (w.player.y - w.player.z) * z, top: (w.player.art ? charTop(w.player.art.key) : -230) * spr(w.player.y) * z });
-          c.restore();
-          if (host.life) {
-            c.save();
-            c.scale(1 / z, 1 / z);
-            for (const a of live) {
-              if (!a.icon && !a.say) continue;
-              const top = (a.kind === "named" ? namedTop(a.name) : a.look && charArt(a.look) ? charTop(a.look) : -230) * spr(a.y);
-              drawHeadBubble(c, a.x * z, (a.y + top) * z - 8, a.say ?? a.icon, !!a.say);
-            }
-            c.restore();
-          }
-          const obs = host.life?.observer(sc.id);
-          if (obs) drawObserver(c, obs);
-          const dark2 = fadeOut > 0 ? 1 - fadeOut / FADE : age < FADE ? 1 - age / FADE : 0;
-          if (dark2 > 0) {
-            c.fillStyle = `rgba(0,0,0,${dark2})`;
-            c.fillRect(camX - 40, 0, view.w + 80, SCREEN_H);
-          }
-        }
-      };
-    };
-    const go = (sceneId, x, y) => {
-      view.worldH = sceneOf(sceneId).painted ? PAINTED[sceneOf(sceneId).painted]?.h ?? 700 : SCREEN_H;
-      view.charMul = sceneOf(sceneId).painted && PAINTED[sceneOf(sceneId).painted]?.dotK ? PAINTED[sceneOf(sceneId).painted].dotK / CHAR_K : 1;
-      view.far = sceneOf(sceneId).painted && PAINTED[sceneOf(sceneId).painted]?.far || FAR;
-      view.growTo = sceneOf(sceneId).painted && PAINTED[sceneOf(sceneId).painted]?.growTo || 0;
-      view.sizes = sceneOf(sceneId).painted && PAINTED[sceneOf(sceneId).painted]?.sizes || [];
-      pending = { scene: sceneId, x, y };
-      fadeOut = FADE;
-    };
-    const arriveAt = (sceneId, doorId) => {
-      const d3 = sceneOf(sceneId).doors.find((q) => q.id === doorId);
-      return d3 ? { x: d3.x, y: sceneOf(sceneId).legacy ? void 0 : doorY(d3, sceneOf(sceneId).lane ?? LANE) } : { x: 200, y: void 0 };
-    };
-    const goDoor = (sceneId, doorId) => {
-      arriveDoor = doorId ?? null;
-      const t = arriveAt(sceneId, doorId);
-      go(sceneId, t.x, t.y);
-    };
-    const target = (px, py) => {
-      if (!scene || pT) return null;
-      let best = null;
-      const consider = (id, kind, x, ok) => {
-        const d3 = Math.abs(x - px);
-        if (ok && (!best || d3 < best.d)) best = { id, kind, x, d: d3 };
-      };
-      for (const s of scene.spots) {
-        const ok = Math.abs(s.x - px) < (s.y === void 0 ? 60 : 75) && (s.y === void 0 || Math.abs(s.y - py) < 55);
-        consider(`spot:${s.id}`, "hubspot", s.x, ok);
-      }
-      for (const d3 of scene.doors) {
-        const reach = Math.abs(d3.x - px) < (scene.legacy ? 60 : 75);
-        const lane = scene.lane ?? LANE;
-        const reachY = scene.painted ? doorReachY(scene.painted, d3.id) : null;
-        const depth = scene.legacy || (isS(d3) ? py > lane[1] - 60 : py < Math.max(lane[0] + 75, reachY ?? 0));
-        consider(`door:${d3.id}`, "hubdoor", d3.x, reach && depth);
-      }
-      return best;
-    };
-    return {
-      id: "hq",
-      label: "본부",
-      firstFloor: () => {
-        const v = host.map();
-        view2 = v;
-        const s = pending ?? v.start;
-        pending = null;
-        fadeOut = 0;
-        return build(s.scene, s.x, s.y);
-      },
-      nextFloor: () => {
-        const s = pending ?? { scene: scene?.id ?? "office", x: 400 };
-        pending = null;
-        return build(s.scene, s.x, s.y);
-      },
-      tick(a) {
-        if (scene?.painted) for (const o of PAINTED[scene.painted]?.objects ?? []) {
-          if (!o.frames) continue;
-          const want = live.some((q) => q.toilet?.door === o.id && q.toilet.open) || !!pT && pT.door === o.id && pT.phase !== "in" || peek?.door === o.id;
-          const t2 = gateOpen.get(o.id) ?? 0;
-          gateOpen.set(o.id, Math.max(0, Math.min(1, t2 + (want ? 1 : -1) / (STALL_DOOR_SEC * 30))));
-        }
-        if (pT) stepToilet(a);
-        if (peek && (Math.hypot(a.world.player.x - peek.x, a.world.player.y - peek.y) > 70 || !stallBusy(peek.door))) peek = null;
-        if (scene?.painted) for (const o of PAINTED[scene.painted]?.objects ?? []) {
-          if (!o.gate) continue;
-          const pl = a.world.player;
-          const by = (x, y) => Math.abs(x - (o.x + o.w / 2)) < o.w / 2 + 90 && Math.abs(y - o.sortY) < 140;
-          const near3 = by(pl.x, pl.y) || live.some((q) => by(q.x, q.y));
-          const t2 = gateOpen.get(o.id) ?? 0;
-          gateOpen.set(o.id, Math.max(0, Math.min(1, t2 + (near3 ? 0.12 : -0.08))));
-        }
-        if (sitChair && !a.world.player.seat && !a.world.player.sitting) sitChair = null;
-        curWorld = a.world;
-        if (showerSpot && !a.world.player.showering) {
-          showerSpot = null;
-          host.life?.playerShower?.(null);
-        }
-        {
-          const pl = a.world.player;
-          if (pl.nude && !(scene?.showers?.length || scene?.lockers?.length)) pl.dress?.();
-        }
-        if (lockerUse && (lockerUse.t -= 1 / 60) <= 0) {
-          lockerUse = null;
-          host.life?.playerLocker?.(null);
-        }
-        if (host.life && scene) {
-          host.life.tick(1 / 30, { scene: scene.id, x: a.world.player.x, y: a.world.player.y, seat: sitChair ? scene.boxes.indexOf(sitChair) : null });
-          const boxes = a.world.player.frame().hit;
-          if (boxes.length && host.life.hit) {
-            const n = host.life.hit(scene.id, boxes, a.world.player.dir);
-            if (n) a.world.emit({ type: "hit", strength: 1, x: boxes[0].x0, y: boxes[0].y, z: 120, dmg: 0, react: "flinch", target: "npc", combo: 0 });
-          }
-          host.life.combat?.(a, scene.id);
-          live = host.life.actors(scene.id);
-          cords = host.life.cordons?.(scene.id) ?? [];
-          gears = host.life.gear?.(scene.id) ?? [];
-          const named = live.filter((q) => q.kind === "named");
-          const talkers = live.filter((q) => q.kind === "mob" && q.talk);
-          scene.spots = scene.spots.filter((q) => !q.id.startsWith("visit:")).concat(named.map((q) => ({ id: `visit:${q.name}`, x: q.x, y: q.y, who: q.name, verb: "대화", face: q.face, open: true })), talkers.map((q) => ({ id: `visit:mob:${q.id}`, x: q.x, y: q.y, who: `mob:${q.id}`, verb: "대화", face: q.face, open: true })));
-          curPeople = named;
-        }
-        if (fadeOut > 0 && --fadeOut === 0 && pending) {
-          if (pending.scene === scene?.id) {
-            arrive = { x: pending.x, y: pending.y };
-            pending = null;
-            enterTick = -1;
-          } else return a.finish("next");
-        }
-        const p = a.world.player;
-        if (arrive) {
-          const y = arrive.y ?? p.y;
-          const at2 = clearSpot(arrive.x, y, solids, scene?.lane ?? LANE);
-          a.movePlayer(at2.x, at2.y);
-          arrive = null;
-          lastX = null;
-        }
-        if (lastX !== null) {
-          const d3 = Math.abs(p.x - lastX);
-          if (d3 < 60) walked += d3;
-        }
-        lastX = p.x;
-        if (opening && opening.t < opening.len && ++opening.t === opening.len) {
-          const then = opening.then;
-          then();
-        }
-        if (callWait && --callWait.t <= 0) {
-          const f = callWait.then;
-          callWait = null;
-          f();
-        }
-        if (closing && ++closing.t >= closing.len) closing = null;
-        if (rattle && ++rattle.t >= RATTLE_T) rattle = null;
-        if (solids.length && !p.seat && !pT) blockByProps([p], solids.filter((s) => !(s.h !== void 0 && p.z >= s.h - 6)), scene?.lane ?? LANE);
-        if (scene?.painted && !pT) {
-          const q = clampPainted(scene.painted, p.x, p.y, p.z);
-          if (q.x !== p.x || q.y !== p.y) a.movePlayer(q.x, q.y);
-        }
-        const t = p.seat ? null : target(p.x, p.y);
-        const id = t?.id ?? null;
-        if (id !== near2) {
-          if (near2) a.setProp(near2, null);
-          if (t) a.setProp(t.id, { kind: t.kind, x: p.x, y: p.y, w: 40, h: 10 });
-          near2 = id;
-        } else if (t) a.setProp(t.id, { x: p.x, y: p.y });
-        const sp = scene?.spots.find((s) => s.open && s.who && s.place && Math.abs(s.x - p.x) < 170);
-        if (sp && sp.place !== barked) {
-          barked = sp.place;
-          const l = host.bark(sp.place);
-          if (l) {
-            const who = curPeople.find((q) => q.name === l.who);
-            const x = who?.x ?? sp.x, y = who?.y ?? sp.y ?? p.y;
-            speech = { who: l.who, text: l.text, x, y, top: (who ? namedTop(l.who) : -200) * spr(y), until: performance.now() + 3800 };
-          }
-        } else if (!sp) barked = null;
-      },
-      onInteract(a, _floor, prop) {
-        if (!scene || fadeOut > 0 || opening || callWait) return;
-        if (prop.kind === "hubspot") {
-          const s = scene.spots.find((q) => `spot:${q.id}` === prop.id);
-          if (!s) return;
-          if (!s.open) return a.world.say("아직 쓸 수 없다. 본부 일이 더 진행되면 열린다.", 2.5);
-          if (s.shop) {
-            const m = host.shop?.(s.shop);
-            if (m) a.world.say(m, 2.5);
-            return;
-          }
-          if (s.id.startsWith("toilet:")) return useToilet(a, s.id.slice(7));
-          if (s.place) return host.openPlace(s.place);
-          if (s.say) return a.world.say(s.say, 3);
-          if (s.act?.[0] === "locker") {
-            const pl = a.world.player;
-            const lid = s.id.replace(/^locker:/, "");
-            if (s.y === void 0 || !pl.changeClothes) return;
-            if (host.life?.lockerBusy?.(scene.id, lid)) return a.world.say("누가 쓰고 있다.", 1.5);
-            if (!pl.changeClothes(s.x, s.y, s.face ?? 1)) return;
-            lockerUse = { scene: scene.id, id: lid, t: 2.5 };
-            host.life?.playerLocker?.({ scene: scene.id, id: lid });
-            return;
-          }
-          if (s.act?.[0] === "shower") {
-            const pl = a.world.player;
-            if (s.y === void 0 || !pl.shower) return;
-            if (host.life?.showerBusy?.(scene.id, s.id)) return a.world.say("누가 쓰고 있다.", 1.5);
-            if (!pl.nude) return a.world.say("탈의실 캐비닛에서 옷을 벗고 와야 한다.", 2);
-            if (!pl.shower(s.x, s.y, s.face ?? 1)) return a.world.say("샤워 동작 그림이 없다.", 1.5);
-            showerSpot = s.id;
-            host.life?.playerShower?.({ scene: scene.id, id: s.id });
-            host.sat?.();
-            return;
-          }
-          if (s.seat && s.act?.[0]) {
-            if (s.chair !== void 0 && live.some((q) => q.seat?.box === s.chair)) return a.world.say("누가 앉아 있다.", 1.5);
-            const exit = clearSpot(s.x, s.y ?? a.world.player.y, solids, scene.lane ?? LANE);
-            if (a.world.player.sit(s.act[0], s.seat.x, s.seat.y, s.face ?? 1, exit, s.chair !== void 0 ? scene.boxes[s.chair]?.set : void 0) && s.chair !== void 0) sitChair = scene.boxes[s.chair] ?? null;
-            host.sat?.();
-            return;
-          }
-          if (s.y !== void 0) a.movePlayer(s.x, s.y);
-          if (s.face) a.world.player.dir = s.face;
-          if (s.act) host.act?.(s.act, s.face);
-          if (/앉기|눕기/.test(s.verb)) host.sat?.();
-          return;
-        }
-        if (prop.kind !== "hubdoor") return;
-        const d3 = scene.doors.find((q) => `door:${q.id}` === prop.id);
-        if (!d3) return;
-        if (!d3.open) {
-          if (scene.painted) rattle = { id: d3.id, t: 0 };
-          if (d3.locked) a.world.say("잠겨 있다", 1.5);
-          return host.sfx("knock");
-        }
-        const len = openLen(scene, d3);
-        if (d3.kind === "stairs") {
-          const to2 = [d3.up, d3.down].filter((q) => !!q);
-          const label2 = (id) => view2.elevator.find((e) => e.scene === id)?.label ?? id;
-          const go1 = (target2) => {
-            host.sfx("doorLatch");
-            opening = { id: d3.id, t: 0, len, then: () => goDoor(target2, "stairs") };
-          };
-          if (to2.length === 1) return go1(to2[0]);
-          host.chooseFloor(to2.map((q) => ({ label: label2(q), open: true, here: false })), (i) => {
-            if (i != null && to2[i]) go1(to2[i]);
-          });
-          return;
-        }
-        if (d3.place) {
-          const place = d3.place;
-          host.sfx(scene.painted ? "doorLatch" : d3.kind === "cell" ? "doorSlam" : "doorOpen");
-          opening = { id: d3.id, t: 0, len, then: () => {
-            opening = null;
-            closing = { id: d3.id, t: 0, len };
-            host.openPlace(place);
-          } };
-          return;
-        }
-        if (d3.kind === "elevator") {
-          const here = scene.id;
-          const opts = view2.elevator.map((e) => ({ label: e.label, open: e.open, here: e.scene === here }));
-          host.chooseFloor(opts, (i) => {
-            if (i == null) return;
-            const e = view2.elevator[i];
-            if (!e?.open || e.scene === here) return;
-            if (!scene?.painted) {
-              host.sfx("ding");
-              opening = { id: d3.id, t: 0, len, then: () => goDoor(e.scene, e.door) };
-              return;
-            }
-            host.sfx("panelButton");
-            callOn = true;
-            callWait = { t: 14, then: () => {
-              host.sfx("elevChime");
-              opening = { id: d3.id, t: 0, len, then: () => goDoor(e.scene, e.door) };
-            } };
-          });
-          return;
-        }
-        if (!d3.to) return;
-        const to = d3.to, toDoor = d3.toDoor;
-        host.sfx(scene.painted ? "doorLatch" : d3.kind === "steel" || d3.kind === "security" || d3.kind === "cell" ? "doorSlam" : d3.kind.startsWith("stairs") ? "stepConcrete" : "doorOpen");
-        if (scene.legacy) return goDoor(to, toDoor);
-        opening = { id: d3.id, t: 0, len, then: () => goDoor(to, toDoor) };
-      },
-      /** 지금 손이 닿는 문·자리의 짧은 이름 (캐릭터 옆 말풍선) */
-      speech() {
-        if (!speech || performance.now() > speech.until || fadeOut > 0) return null;
-        return speech;
-      },
-      nearInfo() {
-        if (!scene || !near2 || opening || fadeOut > 0) return null;
-        if (near2.startsWith("spot:")) {
-          const s = scene.spots.find((q) => `spot:${q.id}` === near2);
-          return s ? { text: s.verb, locked: !s.open } : null;
-        }
-        const d3 = scene.doors.find((q) => `door:${q.id}` === near2);
-        if (!d3) return null;
-        const text = d3.label ?? (d3.kind === "elevator" ? "엘리베이터" : d3.kind === "stairs" ? "계단" : d3.kind === "exit" ? "나가기" : "문");
-        return { text, locked: !d3.open };
-      },
-      /** 검사·스크린샷용: 장면으로 바로 */
-      jump(sceneId, x = 400, y) {
-        if (view2) go(sceneId, x, y);
-      },
-      sceneIds: () => (view2 ?? host.map()).scenes.map((s) => s.id),
-      current: () => scene,
-      goto(place) {
-        if (!view2) return;
-        const t = whereIs2(place);
-        go(t.scene, t.x, t.y);
-      }
-    };
-  }
-  var LOOKS2 = {
-    // 지상: 짙은 남색·숯색 벽, 호두나무 판, 천장 간접 조명, 밝은 회색 바닥
-    office: { wallTop: "#1f2836", wallBot: "#2c3a4d", band: "#5e4330", light: "#cfe4ff", floorA: "#8f99a5", floorB: "#848e9a" },
-    hall: { wallTop: "#1f2733", wallBot: "#2a3544", band: "#4d3a2c", light: "#cfe4ff", floorA: "#7f8994", floorB: "#76808b" },
-    lobby: { wallTop: "#24262b", wallBot: "#34373e", band: "#6a5644", light: "#ffe9c4", floorA: "#8d8a84", floorB: "#83807a" },
-    life: { wallTop: "#2a3039", wallBot: "#3b4450", band: "#6a5240", light: "#ffe6c2", floorA: "#9a8a74", floorB: "#8f7f69" },
-    bath: { wallTop: "#7f919b", wallBot: "#9fb1ba", band: "#3f5260", light: "#fff4dc", floorA: "#b2bcc1", floorB: "#a6b0b5", tiles: true },
-    // 지하: 흰 패널, 청록 빛줄 (복도는 반쯤만 불)
-    lab: { wallTop: "#aab4bb", wallBot: "#c3cbd0", band: "#2f3a42", light: "#45d6de", floorA: "#9aa3a9", floorB: "#8f989e", panels: true },
-    labhall: { wallTop: "#aab4bb", wallBot: "#c3cbd0", band: "#2f3a42", light: "#45d6de", floorA: "#9aa3a9", floorB: "#8f989e", panels: true, dim: 0.5 }
-  };
-  function drawRoomShell(c, sc, camX) {
-    const L = LOOKS2[sc.look] ?? LOOKS2.office;
-    const x0 = camX - 40, w = view.w + 80;
-    const g = c.createLinearGradient(0, 0, 0, TOP);
-    g.addColorStop(0, L.wallTop);
-    g.addColorStop(1, L.wallBot);
-    c.fillStyle = g;
-    c.fillRect(x0, 0, w, TOP);
-    c.fillStyle = "rgba(0,0,0,0.35)";
-    c.fillRect(x0, 0, w, 24);
-    c.fillStyle = L.light;
-    c.globalAlpha = 0.55;
-    c.fillRect(x0, 24, w, 4);
-    c.globalAlpha = 1;
-    if (L.tiles) {
-      c.strokeStyle = "rgba(40,60,70,0.25)";
-      c.lineWidth = 1;
-      for (let y = 60; y < TOP - 50; y += 36) {
-        c.beginPath();
-        c.moveTo(x0, y);
-        c.lineTo(x0 + w, y);
-        c.stroke();
-      }
-      for (let x = Math.floor(x0 / 36) * 36; x < x0 + w; x += 36) {
-        c.beginPath();
-        c.moveTo(x, 40);
-        c.lineTo(x, TOP - 50);
-        c.stroke();
-      }
-    }
-    if (L.panels) {
-      c.fillStyle = "rgba(30,40,48,0.18)";
-      for (let x = Math.floor(x0 / 240) * 240; x < x0 + w; x += 240) c.fillRect(x, 28, 3, TOP - 28);
-      c.fillStyle = L.light;
-      c.globalAlpha = 0.8;
-      c.fillRect(x0, TOP - 92, w, 5);
-      c.globalAlpha = 1;
-    }
-    c.fillStyle = L.band;
-    c.fillRect(x0, TOP - 44, w, 44);
-    c.fillStyle = "rgba(255,255,255,0.08)";
-    c.fillRect(x0, TOP - 44, w, 3);
-    c.fillStyle = L.floorA;
-    c.fillRect(x0, TOP, w, SCREEN_H - TOP);
-    c.fillStyle = L.floorB;
-    for (let i = 0, y = TOP; y < SCREEN_H; i++) {
-      const hgt = 18 + i * 6;
-      if (i % 2) c.fillRect(x0, y, w, hgt);
-      y += hgt;
-    }
-    c.fillStyle = "rgba(0,0,0,0.28)";
-    c.fillRect(x0, TOP, w, 10);
-    if (L.dim) {
-      c.fillStyle = `rgba(6,10,16,${L.dim})`;
-      c.fillRect(x0, 0, w, SCREEN_H);
-    }
-  }
-  function drawFixture(c, f, look, camX) {
-    const x = f.x - f.w / 2;
-    if (x > camX + view.w + 40 || x + f.w < camX - 40) return;
-    switch (f.kind) {
-      case "window": {
-        const y = 70, h = TOP - 150;
-        c.fillStyle = "#0d1522";
-        c.fillRect(x, y, f.w, h);
-        c.fillStyle = "#1a2638";
-        for (let i = 0; i * 70 < f.w; i++) {
-          const bh = 90 + i * 53 % 110;
-          c.fillRect(x + i * 70 + 8, y + h - bh, 52, bh);
-        }
-        c.fillStyle = "rgba(255,214,140,0.35)";
-        for (let i = 0; i * 70 < f.w; i++) if (i % 3 === 1) c.fillRect(x + i * 70 + 22, y + h - 60, 10, 12);
-        c.strokeStyle = "#8193a8";
-        c.lineWidth = 6;
-        c.strokeRect(x, y, f.w, h);
-        c.lineWidth = 3;
-        for (let i = 1; i * 230 < f.w; i++) {
-          c.beginPath();
-          c.moveTo(x + i * 230, y);
-          c.lineTo(x + i * 230, y + h);
-          c.stroke();
-        }
-        break;
-      }
-      case "screen": {
-        const y = 90, h = 190;
-        c.fillStyle = "#0e2a3a";
-        c.fillRect(x, y, f.w, h);
-        c.strokeStyle = "#24465a";
-        c.lineWidth = 8;
-        c.strokeRect(x, y, f.w, h);
-        c.strokeStyle = "#4fd1e0";
-        c.lineWidth = 3;
-        c.beginPath();
-        for (let i = 0; i <= 12; i++) c[i ? "lineTo" : "moveTo"](x + 30 + i * (f.w - 60) / 12, y + h - 50 - Math.abs(Math.sin(i * 1.7)) * (h - 100));
-        c.stroke();
-        c.fillStyle = "#ff9b52";
-        for (let i = 1; i < 4; i++) c.fillRect(x + i * f.w / 4 - 7, y + 60 + i * 37 % 70, 14, 14);
-        break;
-      }
-      case "shower": {
-        c.fillStyle = "#c9d2d8";
-        c.fillRect(f.x - 4, 100, 8, TOP - 200);
-        c.fillRect(f.x - 4, 100, 46, 8);
-        c.fillStyle = "#e8edf0";
-        c.fillRect(f.x + 26, 104, 34, 14);
-        c.fillStyle = "#9aa6ad";
-        c.fillRect(f.x - 14, TOP - 160, 28, 10);
-        break;
-      }
-      case "glass": {
-        const y = 80, h = TOP - 170;
-        c.fillStyle = look === "bath" ? "rgba(235,242,246,0.75)" : "#11202a";
-        c.fillRect(x, y, f.w, h);
-        if (look !== "bath") {
-          c.fillStyle = "rgba(69,214,222,0.18)";
-          c.fillRect(x, y, f.w, h);
-          c.fillStyle = "rgba(0,0,0,0.55)";
-          c.beginPath();
-          c.ellipse(f.x, y + h - 40, 60, 110, 0, 0, Math.PI * 2);
-          c.fill();
-        }
-        c.strokeStyle = look === "bath" ? "#8fa1ab" : "#d6dde2";
-        c.lineWidth = 8;
-        c.strokeRect(x, y, f.w, h);
-        break;
-      }
-      case "blinds": {
-        const y = 80, h = TOP - 170;
-        c.fillStyle = "#d9c9a8";
-        c.fillRect(x, y, f.w, h);
-        c.fillStyle = "rgba(90,70,50,0.25)";
-        for (let yy = y + 8; yy < y + h; yy += 14) c.fillRect(x, yy, f.w, 3);
-        c.fillStyle = "rgba(255,214,150,0.35)";
-        c.beginPath();
-        c.ellipse(f.x + f.w / 3, TOP - 40, 120, 30, 0, 0, Math.PI * 2);
-        c.fill();
-        break;
-      }
-      case "shelfwall": {
-        const y = 60, h = TOP - 104;
-        c.fillStyle = "#3a3026";
-        c.fillRect(x, y, f.w, h);
-        c.fillStyle = "rgba(160,200,215,0.25)";
-        for (let i = 0; i * 120 < f.w; i++) c.fillRect(x + i * 120 + 8, y + 8, 104, h - 16);
-        c.fillStyle = "#d8d0bd";
-        for (let i = 0; i * 120 < f.w; i++) for (let r = 0; r < 4; r++) c.fillRect(x + i * 120 + 16, y + 20 + r * ((h - 40) / 4), 88, 14);
-        break;
-      }
-      case "directory": {
-        const y = 150, h = 220;
-        c.fillStyle = "#14191f";
-        c.fillRect(x, y, f.w, h);
-        const cols = ["#4f8fd6", "#d9a441", "#3cc596", "#9a6be0"];
-        cols.forEach((col, i) => {
-          c.fillStyle = col;
-          c.fillRect(x + 10, y + 12 + i * 51, f.w - 20, 40);
-          c.fillStyle = "rgba(0,0,0,0.45)";
-          c.fillRect(x + 20, y + 22 + i * 51, 20, 20);
-        });
-        c.strokeStyle = "#9aa6b0";
-        c.lineWidth = 4;
-        c.strokeRect(x, y, f.w, h);
-        break;
-      }
-      default:
-        break;
-    }
-  }
-  function drawDoorN(c, d3, look, open, camX) {
-    const w = DOOR_W[d3.kind];
-    const x = d3.x - w / 2, y = TOP - DOOR_H;
-    if (x > camX + view.w + 40 || x + w < camX - 40) return;
-    c.fillStyle = "#12161b";
-    c.fillRect(x - 10, y - 12, w + 20, DOOR_H + 12);
-    c.fillStyle = "#05070a";
-    c.fillRect(x, y, w, DOOR_H);
-    const panels = (col, hl) => {
-      const off2 = w / 2 * open;
-      c.fillStyle = col;
-      c.fillRect(x - off2, y, w / 2, DOOR_H);
-      c.fillRect(x + w / 2 + off2, y, w / 2, DOOR_H);
-      c.fillStyle = hl;
-      c.fillRect(x - off2 + 8, y + 10, 5, DOOR_H - 20);
-      c.fillRect(x + w / 2 + off2 + 8, y + 10, 5, DOOR_H - 20);
-    };
-    c.save();
-    c.beginPath();
-    c.rect(x, y, w, DOOR_H);
-    c.clip();
-    switch (d3.kind) {
-      case "stairs_up":
-      case "stairs_down": {
-        c.fillStyle = "#2c333a";
-        const up = d3.kind === "stairs_up";
-        for (let i = 0; i < 8; i++) {
-          const sy = up ? TOP - 18 - i * 28 : y + 30 + i * 28;
-          c.fillRect(x + (up ? i * 8 : 0), sy, w - (up ? i * 8 : 0), 8);
-        }
-        break;
-      }
-      case "elevator":
-        panels("#9aa5ac", "rgba(255,255,255,0.25)");
-        break;
-      case "glass":
-        panels("rgba(150,190,210,0.45)", "rgba(255,255,255,0.35)");
-        c.fillStyle = "rgba(255,255,255,0.22)";
-        c.fillRect(x, y + 110, w, 26);
-        break;
-      case "slide":
-        panels("#d9e0e4", "rgba(69,214,222,0.6)");
-        break;
-      case "cell":
-        panels("#59626a", "rgba(0,0,0,0.2)");
-        break;
-      default:
-        panels("#6e7a83", "rgba(255,255,255,0.15)");
-    }
-    c.restore();
-    if (d3.kind === "elevator") {
-      c.fillStyle = "#ffb34a";
-      c.fillRect(d3.x - 16, y - 34, 32, 12);
-    }
-    if (d3.kind === "slide" || d3.kind === "cell") {
-      c.fillStyle = d3.kind === "cell" ? "#e0b43a" : d3.open ? "#45d6de" : "#e0443a";
-      c.fillRect(x + w + 14, y + 100, 12, 12);
-    }
-    if (!d3.open && d3.kind !== "cell") {
-      c.fillStyle = "rgba(0,0,0,0.35)";
-      c.fillRect(x, y, w, DOOR_H);
-    }
-    void look;
-  }
-  function drawFloorExit(c, d3, open, camX) {
-    const w = DOOR_W.exit;
-    if (d3.x + w < camX - 40 || d3.x - w > camX + view.w + 40) return;
-    const col = d3.kind === "cell" ? "#7d4a3a" : d3.open ? "#3cc596" : "#6b7480";
-    c.fillStyle = "rgba(0,0,0,0.3)";
-    c.fillRect(d3.x - w / 2 - 10, SCREEN_H - 36, w + 20, 36);
-    c.fillStyle = col;
-    c.globalAlpha = 0.55 + 0.45 * open;
-    c.fillRect(d3.x - w / 2, SCREEN_H - 14, w, 8);
-    c.globalAlpha = 1;
-  }
-  function drawExitLintel(c, d3, camX) {
-    if (d3.kind === "cell") return;
-    if (d3.x < camX - 200 || d3.x > camX + view.w + 200) return;
-    const col = d3.open ? "#3cc596" : "#6b7480";
-    const y = SCREEN_H - 30;
-    c.fillStyle = col;
-    c.beginPath();
-    c.moveTo(d3.x - 16, y - 8);
-    c.lineTo(d3.x + 16, y - 8);
-    c.lineTo(d3.x, y + 10);
-    c.closePath();
-    c.fill();
-    c.strokeStyle = "rgba(0,0,0,0.5)";
-    c.lineWidth = 2;
-    c.stroke();
-  }
-  var BOX_COL = {
-    desk: ["#b48a64", "#7a5539"],
-    opdesk: ["#b48a64", "#6a4a33"],
-    chiefdesk: ["#8a6448", "#4f3624"],
-    labbench: ["#e4e9ec", "#a9b4bb"],
-    counter: ["#c9b39a", "#6a5240"],
-    sink: ["#e8edf0", "#9fb0b8"],
-    big: ["#8ea2b6", "#5d7083"],
-    sofa: ["#6d7f93", "#46566a"],
-    bed: ["#f0f2f3", "#8d9aa4"],
-    tub: ["#5fb8cf", "#e8eef0"],
-    bench: ["#9b7a5a", "#6b5038"],
-    wall: ["#5a6571", "#3a434d"],
-    cabinet: ["#5e4a3a", "#3e3126"],
-    vending: ["#c64a3a", "#7d2c22"],
-    pillar: ["#9aa1a6", "#6f767b"],
-    locker: ["#7f8b95", "#56616b"],
-    stall: ["#8a97a1", "#5f6b75"],
-    shelf: ["#6c7781", "#48525b"],
-    cart: ["#b9c2c8", "#7d878e"],
-    lowwall: ["#c2862f", "#8a5d1f"],
-    range: ["#3b434b", "#262c32"],
-    target: ["#f2f2f2", "#c9c9c9"],
-    sandbag: ["#7a2e26", "#561f19"],
-    gate: ["#b8c0c6", "#7c868d"],
-    slot: ["#3a3f45", "#23272b"],
-    glass: ["rgba(140,205,225,0.35)", "rgba(110,180,205,0.3)"]
-  };
-  function drawBox(c, b, look) {
-    if (b.kind === "chair" || b.kind === "armchair") return drawChair(c, b);
-    const [top, front] = BOX_COL[b.kind] ?? BOX_COL.wall;
-    const x = b.x - b.w / 2;
-    c.fillStyle = top;
-    c.fillRect(x, b.y - b.h - b.d, b.w, b.d);
-    c.fillStyle = front;
-    c.fillRect(x, b.y - b.h, b.w, b.h);
-    c.strokeStyle = "rgba(15,20,26,0.75)";
-    c.lineWidth = 3;
-    c.strokeRect(x, b.y - b.h - b.d, b.w, b.d + b.h);
-    c.beginPath();
-    c.moveTo(x, b.y - b.h);
-    c.lineTo(x + b.w, b.y - b.h);
-    c.stroke();
-    if (b.kind === "desk" || b.kind === "opdesk" || b.kind === "chiefdesk") {
-      const n = b.kind === "opdesk" ? 3 : Math.max(1, Math.round(b.w / 120));
-      for (let i = 0; i < n; i++) {
-        const mx = x + (i + 0.5) * b.w / n;
-        c.fillStyle = "#121a22";
-        c.fillRect(mx - 22, b.y - b.h - b.d / 2 - 46, 44, 34);
-        c.fillStyle = "#3a6d8a";
-        c.fillRect(mx - 18, b.y - b.h - b.d / 2 - 42, 36, 26);
-      }
-      c.fillStyle = "#efe6d2";
-      c.fillRect(x + b.w - 20, b.y - b.h - 18, 10, 14);
-    }
-    if (b.kind === "bed") {
-      c.fillStyle = "#ffffff";
-      c.fillRect(x + 8, b.y - b.h - b.d + 6, 46, b.d - 12);
-    }
-    if (b.kind === "tub") {
-      c.fillStyle = "rgba(255,255,255,0.35)";
-      c.fillRect(x + 10, b.y - b.h - b.d + 8, b.w - 20, 6);
-    }
-    if (b.kind === "target") {
-      c.fillStyle = "#d0443a";
-      for (const r of [26, 14]) {
-        c.beginPath();
-        c.arc(b.x, b.y - b.h / 2, r, 0, Math.PI * 2);
-        c.fill();
-        c.fillStyle = "#f2f2f2";
-      }
-    }
-    if (b.kind === "gate") {
-      c.fillStyle = "#57d27a";
-      c.fillRect(b.x - 6, b.y - b.h - b.d + 4, 12, 6);
-    }
-    void look;
-  }
-  function drawChair(c, b) {
-    const CH2 = charFx()?.CHAIR;
-    const set = b.set ? `${b.set}:` : "";
-    const dirName = b.face === "N" ? "north" : b.face === "W" ? b.set ? "east" : "west" : b.face === "E" ? "east" : b.set ? "south-east" : "east";
-    const im = CH2?.[set + dirName] ?? CH2?.[dirName];
-    if (im?.complete && im.naturalWidth) {
-      const k = spr(b.y) * CHAR_K;
-      c.save();
-      c.translate(Math.round(b.x), Math.round(b.y));
-      c.scale(b.set && b.face === "W" ? -k : k, k);
-      c.imageSmoothingEnabled = false;
-      c.drawImage(im, -100, -171);
-      c.restore();
-      return;
-    }
-    const seatY = b.y - 82;
-    const col = b.kind === "armchair" ? "#8a5b4a" : "#2d3640";
-    c.fillStyle = col;
-    if (b.face === "N") {
-      c.fillRect(b.x - 22, b.y - 34, 44, 10);
-      c.fillRect(b.x - 18, b.y - 24, 6, 24);
-      c.fillRect(b.x + 12, b.y - 24, 6, 24);
-      return;
-    }
-    const back = b.face === "E" ? -1 : 1;
-    c.fillRect(b.x - b.w / 2, seatY, b.w, b.kind === "armchair" ? 26 : 12);
-    c.fillRect(b.x + back * (b.w / 2) - (back > 0 ? 12 : 0), seatY - (b.h - 82), 12, b.h - 82 + 12);
-    c.fillRect(b.x - 4, seatY + 12, 8, 70);
-    c.fillRect(b.x - 24, b.y - 8, 48, 6);
-  }
-  function legacyThing(c, t, camX) {
-    const sx = t.x - camX;
-    if (sx < -t.w - 100 || sx > view.w + t.w + 100) return;
-    const base2 = t.wall ? TOP - 70 : TOP + 26;
-    if (drawPropArt(c, t.kind, void 0, t.x, base2)) return;
-    c.fillStyle = "#4a4f55";
-    c.fillRect(t.x - t.w / 2, base2 - t.h, t.w, t.h);
-  }
-  function legacyDoor(c, d3, camX) {
-    const w = DOOR_W[d3.kind];
-    const sx = d3.x - camX;
-    if (sx < -w - 40 || sx > view.w + w + 40) return;
-    if (drawPropArt(c, `hq_${d3.kind}`, void 0, d3.x, TOP)) return;
-    const x = d3.x - w / 2, y = TOP - DOOR_H;
-    c.fillStyle = "#1b2023";
-    c.fillRect(x - 8, y - 8, w + 16, DOOR_H + 8);
-    c.fillStyle = d3.kind === "shop" ? "#6b4a2e" : "rgba(150,190,205,0.35)";
-    c.fillRect(x, y, w, DOOR_H);
-    if (!d3.open) {
-      c.fillStyle = "rgba(0,0,0,0.35)";
-      c.fillRect(x, y, w, DOOR_H);
-    }
-  }
-  var namedTop = (name) => charArt(name) ? charTop(name) : -230;
-  function drawLiveActor(c, a, life) {
-    const t = (life.lifeTime?.() ?? performance.now() / 1e3) * 1e3;
-    const until = a.until === void 0 ? void 0 : a.until * 1e3;
-    if (a.seat && drawCharSeat(c, a.kind === "named" ? a.name : a.look ?? a.name, a.seat.x, a.seat.y, a.face, t, a.seat.dir, a.seat.kind, (a.since ?? 0) * 1e3, until, a.seat.set)) return;
-    if (a.kind === "named" && drawCharClip(c, a.name, a.x, a.y, a.face, t, a.clip, (a.since ?? 0) * 1e3, until)) return;
-    if (a.kind === "mob" && life.drawMob) return life.drawMob(c, a);
-    silhouette(c, a);
-  }
-  function drawGear(c, g, t) {
-    const k = persp(g.y);
-    const sway = g.busy ? Math.sin(t * 9 + g.x) : 0;
-    c.save();
-    c.fillStyle = "rgba(0,0,0,0.3)";
-    c.beginPath();
-    c.ellipse(g.x, g.y, 26 * k, 6 * k, 0, 0, Math.PI * 2);
-    c.fill();
-    if (g.kind === "sandbag") {
-      const top = g.y - 300 * k, ang = sway * 0.12;
-      c.strokeStyle = "#4a4f55";
-      c.lineWidth = Math.max(1, 3 * k);
-      c.beginPath();
-      c.moveTo(g.x, top);
-      c.lineTo(g.x + Math.sin(ang) * 70 * k, top + 70 * k);
-      c.stroke();
-      c.translate(g.x, top + 70 * k);
-      c.rotate(ang);
-      c.fillStyle = "#8a2e26";
-      c.fillRect(-22 * k, 0, 44 * k, 150 * k);
-      c.fillStyle = "#6d231d";
-      c.fillRect(-22 * k, 0, 44 * k, 10 * k);
-      c.fillRect(-22 * k, 140 * k, 44 * k, 10 * k);
-      c.fillStyle = "rgba(255,255,255,0.12)";
-      c.fillRect(-16 * k, 14 * k, 6 * k, 120 * k);
-    } else if (g.kind === "dummy") {
-      const ang = sway * 0.06;
-      c.fillStyle = "#3d3a36";
-      c.fillRect(g.x - 24 * k, g.y - 8 * k, 48 * k, 8 * k);
-      c.translate(g.x, g.y - 8 * k);
-      c.rotate(ang);
-      c.fillStyle = "#6b4a2b";
-      c.fillRect(-5 * k, -150 * k, 10 * k, 150 * k);
-      c.fillStyle = "#c9a65b";
-      c.fillRect(-26 * k, -205 * k, 52 * k, 90 * k);
-      c.fillStyle = "#b08c45";
-      c.fillRect(-26 * k, -165 * k, 52 * k, 6 * k);
-      c.fillStyle = "#6b4a2b";
-      c.fillRect(-48 * k, -195 * k, 96 * k, 8 * k);
-      c.fillStyle = "#c9a65b";
-      c.beginPath();
-      c.arc(0, -225 * k, 20 * k, 0, Math.PI * 2);
-      c.fill();
-    } else {
-      const dx = sway * 2 * k;
-      c.strokeStyle = "#3d3a36";
-      c.lineWidth = Math.max(1, 4 * k);
-      c.beginPath();
-      c.moveTo(g.x - 16 * k, g.y);
-      c.lineTo(g.x - 8 * k, g.y - 90 * k);
-      c.moveTo(g.x + 16 * k, g.y);
-      c.lineTo(g.x + 8 * k, g.y - 90 * k);
-      c.stroke();
-      c.fillStyle = "#ece8df";
-      c.fillRect(g.x - 30 * k + dx, g.y - 190 * k, 60 * k, 100 * k);
-      for (const [r, col] of [[24, "#c23b30"], [17, "#ece8df"], [10, "#c23b30"], [4, "#ece8df"]]) {
-        c.fillStyle = col;
-        c.beginPath();
-        c.arc(g.x + dx, g.y - 140 * k, r * k, 0, Math.PI * 2);
-        c.fill();
-      }
-    }
-    c.restore();
-  }
-  function drawCone(c, x, y) {
-    const k = persp(y), h = 34 * k, w = 22 * k;
-    c.fillStyle = "rgba(0,0,0,0.3)";
-    c.beginPath();
-    c.ellipse(x, y, w * 0.75, 4 * k, 0, 0, Math.PI * 2);
-    c.fill();
-    c.fillStyle = "#2a2a2a";
-    c.fillRect(Math.round(x - w * 0.62), Math.round(y - 4 * k), Math.round(w * 1.24), Math.max(2, Math.round(4 * k)));
-    c.fillStyle = "#f26a1b";
-    c.beginPath();
-    c.moveTo(x - w / 2, y - 4 * k);
-    c.lineTo(x - 3 * k, y - h);
-    c.lineTo(x + 3 * k, y - h);
-    c.lineTo(x + w / 2, y - 4 * k);
-    c.closePath();
-    c.fill();
-    c.fillStyle = "#f4f1e8";
-    const t0 = 0.45, t1 = 0.62, at2 = (t) => w / 2 - (w / 2 - 3 * k) * t;
-    c.beginPath();
-    c.moveTo(x - at2(t0), y - 4 * k - (h - 4 * k) * t0);
-    c.lineTo(x - at2(t1), y - 4 * k - (h - 4 * k) * t1);
-    c.lineTo(x + at2(t1), y - 4 * k - (h - 4 * k) * t1);
-    c.lineTo(x + at2(t0), y - 4 * k - (h - 4 * k) * t0);
-    c.closePath();
-    c.fill();
-    return h;
-  }
-  function drawTape(c, x0, y0, x1, y1, t, words) {
-    const k = persp((y0 + y1) / 2), sag = 5 * k + 2 * k * Math.sin(t * 2.3 + x0 * 0.05);
-    const mx = (x0 + x1) / 2, my = (y0 + y1) / 2 + sag * 2;
-    c.strokeStyle = "#f2d21b";
-    c.lineWidth = Math.max(2, 5 * k);
-    c.beginPath();
-    c.moveTo(x0, y0);
-    c.quadraticCurveTo(mx, my, x1, y1);
-    c.stroke();
-    if (!words || Math.abs(x1 - x0) < 60 * k) return;
-    c.save();
-    c.fillStyle = "#111";
-    c.font = `bold ${Math.max(6, Math.round(5 * k))}px sans-serif`;
-    c.textAlign = "center";
-    c.textBaseline = "middle";
-    c.fillText("POLICE LINE", mx, (y0 + y1) / 2 + sag);
-    c.restore();
-  }
-  function drawCordon(c, b, front, t) {
-    const n = Math.max(1, Math.round((b.x1 - b.x0) / 70));
-    const xs = Array.from({ length: n + 1 }, (_, i) => b.x0 + (b.x1 - b.x0) * i / n);
-    const y = front ? b.y1 : b.y0;
-    c.save();
-    const top = xs.map((x) => ({ x, y: y - drawCone(c, x, y) * 0.8 }));
-    if (!front) {
-      const hb = 34 * persp(b.y0) * 0.8, hf = 34 * persp(b.y1) * 0.8;
-      drawTape(c, b.x0, b.y0 - hb, b.x0, b.y1 - hf, t, false);
-      drawTape(c, b.x1, b.y0 - hb, b.x1, b.y1 - hf, t, false);
-    }
-    for (let i = 0; i < top.length - 1; i++) drawTape(c, top[i].x, top[i].y, top[i + 1].x, top[i + 1].y, t, front);
-    c.restore();
-  }
-  function silhouette(c, a) {
-    const k = persp(a.y);
-    const h = 230 * k, w = 64 * k;
-    c.save();
-    c.fillStyle = "rgba(0,0,0,0.28)";
-    c.beginPath();
-    c.ellipse(a.x, a.y, w * 0.6, 9 * k, 0, 0, Math.PI * 2);
-    c.fill();
-    c.fillStyle = a.kind === "named" ? "#6d7f94" : "#7b7f86";
-    c.fillRect(a.x - w / 2, a.y - h, w, h * 0.78);
-    c.beginPath();
-    c.arc(a.x, a.y - h - w * 0.05, w * 0.36, 0, Math.PI * 2);
-    c.fill();
-    c.restore();
-  }
-  function drawObserver(c, lines) {
-    c.save();
-    c.setTransform(1, 0, 0, 1, 0, 0);
-    c.font = "13px monospace";
-    const w = Math.min(c.canvas.width - 16, Math.max(260, ...lines.map((l) => c.measureText(l).width + 20)));
-    const h = Math.min(c.canvas.height - 16, lines.length * 17 + 12);
-    const x0 = c.canvas.width - w - 8;
-    c.fillStyle = "rgba(8,12,18,0.82)";
-    c.fillRect(x0, 8, w, h);
-    c.fillStyle = "#d7e3ef";
-    lines.forEach((l, i) => {
-      if (16 + 17 * (i + 1) < h + 8) c.fillText(l, x0 + 8, 8 + 17 * (i + 1));
-    });
-    c.restore();
-  }
-  function drawHeadBubble(c, x, y, text, line2) {
-    c.save();
-    c.font = line2 ? "14px Galmuri11, sans-serif" : "bold 16px Galmuri11, sans-serif";
-    const w = Math.min(320, c.measureText(text).width + (line2 ? 16 : 12));
-    const h = line2 ? 22 : 22;
-    const bx = Math.round(x - w / 2), by = Math.round(y - h);
-    c.fillStyle = text === "#" ? "#f2d0cc" : "#f4f1e8";
-    c.strokeStyle = "#1b1f24";
-    c.lineWidth = 2;
-    c.fillRect(bx, by, w, h);
-    c.strokeRect(bx, by, w, h);
-    c.fillRect(Math.round(x) - 3, by + h, 6, 4);
-    c.fillStyle = "#1b1f24";
-    c.textAlign = "center";
-    c.textBaseline = "middle";
-    c.fillText(text, Math.round(x), by + h / 2 + 1, w - 8);
-    c.restore();
-  }
-
-  // src/game/world/needs.ts
-  var NEEDS = ["work", "hunger", "energy", "bladder", "bowel", "social", "fun", "train", "hygiene"];
-  var ACTIVITIES = [
-    { id: "work", need: "work", clip: "work", where: ["office"], sec: [40, 90], fill: 2.2, label: "일하는 중" },
-    { id: "eat", need: "hunger", clip: "eat", where: ["lounge", "shop"], sec: [25, 45], fill: 4, label: "먹는 중" },
-    { id: "rest", need: "energy", clip: "rest", where: ["lounge"], sec: [30, 60], fill: 3, label: "쉬는 중" },
-    { id: "pee", need: "bladder", clip: "pee", where: ["restroom"], sec: [8, 14], fill: 12, label: "화장실(소)" },
-    { id: "poo", need: "bowel", clip: "poo", where: ["restroom"], sec: [25, 40], fill: 5, label: "화장실(대)" },
-    { id: "chat", need: "social", clip: "talk", where: ["office", "lounge", "corridor"], sec: [12, 25], fill: 6, label: "수다 중", partner: true },
-    { id: "hobby", need: "fun", clip: "hobby", where: ["lounge"], sec: [30, 60], fill: 3, label: "취미" },
-    // 훈련: 팔굽혀펴기·장비 점검·기지개, 그 줄이 없으면 약공 연습(모든 인물에게 있음). 싸우는 몸만 (choose fighter)
-    { id: "train", need: "train", clip: "train", where: ["training"], sec: [40, 90], fill: 2.5, label: "훈련" },
-    // 샤워(11-02): 같은 성별 탈의실 캐비닛에서 옷 벗기 → 맨몸으로 샤워실 빈 샤워기 → 머리감기·몸씻기(문지르는 구간만 속도 차등, 현실 10분 이상) → 탈의실로 돌아와 옷 입기 (actors.ts showerNext)
-    { id: "shower", need: "hygiene", clip: "shower", where: ["locker"], sec: [600, 780], fill: 0.2, label: "샤워 중" }
-  ];
-  var ACT_OPTS = {
-    work: [
-      { line: "63", label: "타자 치는 중", seat: "front" },
-      { line: "105", label: "타자 치는 중", seat: "side" },
-      { line: "69", label: "타자 치는 중", seat: "back" },
-      { line: "106", label: "손 작업 중", seat: "front" },
-      { line: "124", label: "브리핑 중" },
-      { line: "121", label: "장비 점검 중" },
-      { line: "117", label: "서류 보는 중" },
-      { line: "119", label: "수첩 메모 중" },
-      { line: "120", label: "태블릿 확인 중" },
-      { line: "116", label: "업무 통화 중" },
-      { line: "118", label: "무전 보고 중" },
-      { line: "138", label: "서류 추리는 중" },
-      { line: "85", label: "손 작업 중" },
-      { line: "125", label: "물건 진열 중" },
-      { line: "126", label: "돈 세는 중" },
-      { line: "128", label: "감정 중" },
-      { line: "129", label: "수리 중" },
-      { line: "139", label: "계산 중" },
-      { line: "122", label: "경계 서는 중" },
-      { line: "123", label: "출입 확인 중" },
-      { line: "136", label: "손전등 비추는 중" },
-      { line: "131", label: "닦는 중" },
-      { line: "88", label: "청소 중" },
-      { line: "113", label: "진료 기록 중" },
-      { line: "115", label: "시료 보는 중" }
-    ],
-    hobby: [
-      { line: "149", label: "책 읽는 중", seat: "front" },
-      { line: "148", label: "폰 보는 중", seat: "front" },
-      { line: "167", label: "신문 읽는 중", seat: "front" },
-      { line: "90", label: "담배 피우는 중" },
-      { line: "145", label: "담배 피우는 중" },
-      { line: "155", label: "고기 굽는 중" },
-      { line: "153", label: "스케치 중" },
-      { line: "140", label: "카드 섞는 중" },
-      { line: "156", label: "햄스터 돌보는 중" },
-      { line: "160", label: "손장난 중" },
-      { line: "152", label: "기도 중" },
-      { line: "147", label: "폰 보는 중" },
-      { line: "154", label: "차 따르는 중" },
-      { line: "168", label: "구경 중" },
-      { line: "161", label: "섀도복싱 중" },
-      { line: "91", label: "과자 먹는 중" }
-    ],
-    rest: [
-      { line: "66", label: "조는 중", seat: "front" },
-      { line: "73", label: "기대 쉬는 중", seat: "front" },
-      { line: "65", label: "차 마시는 중", seat: "front" },
-      { line: "99", label: "차 마시는 중", seat: "side" },
-      { line: "71", label: "차 마시는 중", seat: "back" },
-      { line: "142", label: "커피 마시는 중" },
-      { line: "143", label: "기지개", once: true }
-    ],
-    eat: [
-      { line: "64", label: "먹는 중", seat: "front" },
-      { line: "98", label: "먹는 중", seat: "side" },
-      { line: "71", label: "먹는 중", seat: "back" },
-      { line: "157", label: "간식 먹는 중" },
-      { line: "26", label: "먹는 중" }
-    ]
-  };
-  var DECAY = { work: 0.35, hunger: 0.12, energy: 0.08, bladder: 0.2, bowel: 0.05, social: 0.18, fun: 0.12, train: 0.06, hygiene: 0.03 };
-  var TEMPER = {
-    잼트리: { need: { social: 1.3, hunger: 1.2 }, friends: ["쟈알디", "스팡달", "데쥬레", "에일린"] },
-    쟈알디: { need: { social: 0.6, work: 1.3 } },
-    에일린: { need: { social: 0.4 }, hobbyAt: ["lounge"] },
-    큐라스: { need: { social: 1.5, fun: 1.3 }, hobbyAt: ["office"] },
-    고르고디오: { need: { fun: 1.3, hunger: 1.3 }, hobbyAt: ["training"] },
-    게슈간: { need: { social: 0.3 } },
-    로제몬: { need: { hunger: 1.4, fun: 1.2 }, hobbyAt: ["lounge"] },
-    데쥬레: { need: { work: 1.2 }, friends: ["잼트리"] },
-    고그니쟈: { need: { work: 1.2, social: 1.2 } },
-    콘쥬스: { need: { energy: 1.3, fun: 1.3 } }
-  };
-  var fullNeeds = (r) => Object.fromEntries(NEEDS.map((n) => [n, 55 + r() * 45]));
-  function decayNeeds(n, dt, t, onDuty2) {
-    for (const k of NEEDS) {
-      if (k === "work" && !onDuty2) {
-        n.work = 100;
-        continue;
-      }
-      n[k] = Math.max(0, n[k] - DECAY[k] * (t?.need?.[k] ?? 1) * dt);
-    }
-  }
-  var onDuty = (hour, t) => {
-    if (hour == null) return true;
-    const [a, b] = t?.shift ?? [9, 18];
-    return a <= b ? hour >= a && hour < b : hour >= a || hour < b;
-  };
-  function choose(o) {
-    const t = TEMPER[o.name];
-    let best = null;
-    for (const a of ACTIVITIES) {
-      if (!o.has(a.clip) && !(ACT_OPTS[a.id] ?? []).some((x) => o.has(`line:${x.line}`))) continue;
-      if (a.need === "train" && !o.fighter) continue;
-      const lack = 100 - o.needs[a.need];
-      if (lack < 25) continue;
-      const kinds = a.id === "hobby" && t?.hobbyAt ? t.hobbyAt : a.where;
-      const places = o.roam.filter((s) => kinds.includes(o.graph.kind(s)));
-      for (const s of places) {
-        if (a.partner && !o.partnerIn(s)) continue;
-        const hops = s === o.scene ? 0 : o.graph.route(o.scene, s)?.length ?? 99;
-        if (hops >= 99) continue;
-        let w = (lack / 100) ** 2 * 100;
-        if (a.need === "work") w *= o.duty ? 1.6 : 0;
-        if (a.need === "bladder" || a.need === "bowel") w *= lack > 70 ? 2.2 : 0.7;
-        if (o.last === a.id) w *= 0.5;
-        const score = w / (1 + hops * 0.5) * (0.9 + o.rand() * 0.2);
-        if (!best || score > best.score) best = { act: a, scene: s, score };
-      }
-    }
-    return best && best.score > 8 ? best : null;
-  }
-
-  // src/game/world/mobProfiles.json
-  var mobProfiles_default = {
-    불량배여1: {
-      sex: "여",
-      age: "20대 초반",
-      note: "20대 초반 동네 불량배(성인). 조급하고 경계심 많은 얼굴, 가만있질 못함. 평상 대기는 담배 든 대기(연기는 코드). 싸움은 빠르고 지저분한 길거리식, 통통 뛰는 스텝."
-    },
-    불량배여2: {
-      sex: "여",
-      age: "10대(고등학생)",
-      note: "카디건을 헐렁하게 걸친 반항적인 여고생, 지루하다는 얼굴. 미성년(담배·노출·선정 금지, 사망은 피 없이). 치마라 높은 발차기 없이 손·낮은 발로만 싸움, 무릎은 늘 모음."
-    },
-    불량배여3: {
-      sex: "여",
-      age: "20대 후반",
-      note: "20대 후반 길거리 해결사(성인). 차분하고 위압적, 표정이 거의 안 변함. 평상 대기는 담배 든 대기(왼손에 낮게, 연기는 코드). 싸움은 짧고 정확, 부츠로 끝냄."
-    },
-    경찰남1: {
-      sex: "남",
-      age: "30대 초반",
-      job: "경찰관",
-      note: "30대 초반, 조금 넓은 어깨, 순한 네모 얼굴. 느긋하고 묵직한 고참 순경. 빠르진 않지만 몸무게를 실어 밀고 누른다. 원거리는 권총(오른쪽 허리)."
-    },
-    경찰남2: {
-      sex: "남",
-      age: "20대 후반",
-      job: "경찰관",
-      note: "20대 후반, 균형 잡힌 몸, 조금 각진 얼굴의 짧은 스포츠머리. 의욕이 앞서는 신참 순경. 자세가 크고 몸이 먼저 나간다. 원거리는 권총(오른쪽 허리, 조금 서툼)."
-    },
-    경찰여1: {
-      sex: "여",
-      age: "20대 후반",
-      job: "경찰관",
-      note: "20대 후반, 보통 체격, 둥근 얼굴에 이마가 드러난 쪽머리. 침착하고 절차대로 움직이는 순경. 큰 동작보다 밀어내고 제압하는 쪽. 원거리는 권총(오른쪽 허리, 두 손 조준)."
-    },
-    경찰여2: {
-      sex: "여",
-      age: "30대 초반",
-      job: "경찰관",
-      note: "30대 초반, 마른 편, 각진 얼굴의 단발. 눈치 빠르고 조금 성급한 경장. 짧고 빠른 손으로 끊어 치고 팔을 꺾어 누른다. 원거리는 권총(오른쪽 허리, 한 손 조준)."
-    },
-    관리국남A: {
-      sex: "남",
-      age: "젊은 성인",
-      job: "관리국 요원",
-      note: "젊은 성인, 균형 잡힌 몸, 조금 각진 얼굴, 이마가 다 드러난 스포츠머리. 무덤덤하고 든든한 현장 요원. 가드를 단단히 올리고 정직하게 친다. 원거리는 권총(재킷 안 왼쪽 가슴, 두 손 조준)."
-    },
-    관리국남B: {
-      sex: "남",
-      age: "젊은 성인",
-      job: "관리국 요원",
-      note: "젊은 성인, 마른 편, 순한 직사각형 얼굴, 비스듬한 가르마 앞머리. 꼼꼼하고 조금 예민한 요원. 맞서기보다 흘리고 빈틈을 친다. 원거리는 권총(재킷 밑 오른쪽 허리 뒤, 가슴 높이에 붙여 한 손)."
-    },
-    관리국여A: {
-      sex: "여",
-      age: "젊은 성인",
-      job: "관리국 요원",
-      note: "젊은 성인, 보통 체격, 둥근 얼굴, 안으로 말린 턱선 단발, 무릎 길이 치마 정장. 조용하고 단정한 사무직 요원. 움직임이 작고 정확하다."
-    },
-    가짜관리국검사A: {
-      sex: "남",
-      age: "20대",
-      job: "가짜 관리국 검사부대",
-      note: "보통 체격, 각진 얼굴, 이마를 다 드러낸 올백. 검사부대(일본도 발도술, 가로 베기 위주, 지그재그 가속 달리기). 군대식으로 반듯하고 정해진 형을 그대로 쓴다. 원거리는 긴 일본도를 크게 베어 앞으로 보내는 몸짓(검기는 코드). 무기 꺼내기 = 일본도를 뽑아 두 손 중단 겨눔. 사망(서서): 앞으로 고꾸라짐."
-    },
-    관리국여B: {
-      sex: "여",
-      age: "젊은 성인",
-      job: "관리국 요원",
-      note: "젊은 성인, 마른 편, 조금 각진 얼굴, 가운데 가르마 낮은 포니테일, 바지 정장. 말수 적고 차가운 현장 요원. 거리를 두고 발로 끊는다."
-    },
-    백일몽남A: {
-      sex: "남",
-      age: "젊은 성인",
-      job: "백일몽 직원",
-      note: "젊은 성인, 균형 잡힌 몸, 조금 각진 얼굴, 스포츠머리, 남색 정장, 늑대 눈가면. 포인트에 목마른 공격적인 현장 직원. 쉬지 않고 앞으로 파고든다."
-    },
-    백일몽남B: {
-      sex: "남",
-      age: "젊은 성인",
-      job: "백일몽 직원",
-      note: "젊은 성인, 조금 넓은 어깨(근육질은 아님), 순한 네모 얼굴, 가르마 머리, 남색 정장, 곰 눈가면. 느긋하고 조원을 챙기는 덩치. 서두르지 않고 넓게 후려치고 붙잡는다."
-    },
-    백일몽여A: {
-      sex: "여",
-      age: "젊은 성인",
-      job: "백일몽 직원",
-      note: "젊은 성인, 보통 체격, 둥근 얼굴, 가르마 단발, 남색 치마 정장, 여우 눈가면. 괴담에서 살아 나온 회사원. 눈치 빠르고 능청스럽다. 속이고 빈틈을 친다."
-    },
-    백일몽여B: {
-      sex: "여",
-      age: "젊은 성인",
-      job: "백일몽 직원",
-      note: "젊은 성인, 마른 편, 가운데 가르마 낮은 포니테일, 남색 바지 정장, 고양이 눈가면. 경계심 많고 날렵한 현장 직원. 낮게 숨었다가 튀어나와 치고 빠진다."
-    },
-    협회남1: {
-      sex: "남",
-      age: "20대 후반",
-      job: "협회 직원",
-      note: "넥타이를 풀어 헤친 지친 협회 사무직. 눈밑이 퀭하고 늘 피곤한 걱정스러운 얼굴(tired concerned expression), 「처리는 순서대로」 창구에 하루 종일 앉아 있었던 사람."
-    },
-    협회남2: {
-      sex: "남",
-      age: "20대 후반",
-      job: "협회 직원",
-      note: "반듯하게 차려입은 마른 체격의 협회 직원. 절차대로만 움직이는 꼼꼼한 규정형(위키의 「서류 순서대로」 창구 분위기), 몸짓이 작고 정확함."
-    },
-    협회여1: {
-      sex: "여",
-      age: "젊은 성인",
-      job: "협회 직원",
-      note: "눈에 안 띄는 수수한 차림의 차분한 실무자. 협회 지원실 현장 연락 담당처럼 말수 적고 일 처리만 반듯함(등록 프롬프트 「inconspicuous independent field worker」)."
-    },
-    협회여2: {
-      sex: "여",
-      age: "젊은 성인",
-      job: "협회 직원",
-      note: "둥근 얼굴에 수수하고 단정한 차림. 조심스럽고 온순한 창구 보조 직원 느낌, 싸움은 마지못해 하는 쪽(below-knee skirt·practical and understated)."
-    },
-    협회여3: {
-      sex: "여",
-      age: "20대 후반",
-      job: "협회 직원",
-      note: "출입증을 단 협회 사무 직원. 표정이 무난하고 다가가기 쉬운 붙임성 있는 접수 담당(neutral approachable expression), 싸울 때도 침착하게 몸을 작게 씀."
-    },
-    가짜관리국검사B: {
-      sex: "남",
-      age: "20대",
-      job: "가짜 관리국 검사부대",
-      note: "보통 체격, 둥근 얼굴, 비스듬한 가르마. 검사부대의 무던한 대원(「치킨 시키고 후임 챙기는」 쪽). 움직임이 둥글고 한 박자 느긋하지만 칼은 크게, 아래에서 위로 비스듬히 올려 벤다. 원거리는 긴 일본도를 아래에서 위로 크게 올려 베어 보내는 몸짓(검기는 코드). 무기 꺼내기 = 일본도를 뽑아 오른허리 앞 낮은 두 손 겨눔. 사망(서서): 돌며 쓰러짐."
-    },
-    프리랜서남1: {
-      sex: "남",
-      age: "젊은 성인",
-      job: "프리랜서",
-      note: "길쭉한 얼굴의 마른 조사·회수 전문. 장비를 하나하나 확인하는 꼼꼼하고 조심성 많은 성격(오른쪽 허리 표본 파우치·왼쪽 손전등), 위키의 「점심 전에 끝난다는 말을 믿지 않는」 쪽."
-    },
-    프리랜서남2: {
-      sex: "남",
-      age: "젊은 성인",
-      job: "프리랜서",
-      note: "이마를 드러낸 크루컷, 전술 셔츠와 전투화. 군 출신처럼 몸가짐이 단정하고 동작이 딱딱 끊기는 실전파 용병(mercenary-like, practical), 말이 짧음."
-    },
-    프리랜서남3: {
-      sex: "남",
-      age: "젊은 성인",
-      job: "프리랜서",
-      note: "앞을 연 올리브 재킷에 티셔츠, 평범하고 눈에 안 띄는 차림. 어깨에 힘을 뺀 느긋한 성격으로 「다음 달엔 승급한다」는 말을 입에 달고 사는 4급 프리랜서 느낌(inconspicuous independent field worker)."
-    },
-    프리랜서남4: {
-      sex: "남",
-      age: "젊은 성인",
-      job: "프리랜서",
-      note: "마른 몸에 지퍼 재킷·청바지·운동화, 가장 평범한 옷차림. 의욕은 있지만 긴장이 얼굴에 드러나는 5급 신입 느낌(위키: 「첫 의뢰 다녀옴 (수익: -12만 원)」), 몸은 가볍고 빠름."
-    },
-    프리랜서여1: {
-      sex: "여",
-      age: "젊은 성인",
-      job: "프리랜서",
-      note: "소매를 걷어붙인 몸 가벼운 현장꾼. 장비를 스스로 꾸려 다니는 자신만만한 고참 프리랜서 느낌(practical, independently assembled), 발차기를 아낌없이 씀."
-    },
-    프리랜서여2: {
-      sex: "여",
-      age: "젊은 성인",
-      job: "프리랜서",
-      note: "꿰맨 자국 있는 낡은 야전 재킷의 다부진 몸집. 말보다 몸이 먼저 나가는 무뚝뚝한 생환 경력자(sturdy, repaired fabric), 허리에 부적 지갑을 늘 확인함."
-    },
-    프리랜서여3: {
-      sex: "여",
-      age: "젊은 성인",
-      job: "프리랜서",
-      note: "마른 체격에 무표정한 회수 전문. 왼쪽 허리의 봉인된 표본 용기를 늘 신경 쓰는 조용하고 효율적인 사람(specimen container secured at the LEFT hip), 움직임이 짧고 군더더기 없음."
-    },
-    프리랜서여4: {
-      sex: "여",
-      age: "젊은 성인",
-      job: "프리랜서",
-      note: "마른 체격, 이마를 드러낸 낮은 포니테일. 늘 주변을 살피는 경계심 많은 신중파, 거리를 두고 치고 빠짐. 원거리 = 권총. 사망(서서) = 굴러 넘어짐."
-    },
-    프리랜서여5: {
-      sex: "여",
-      age: "30대 초반",
-      job: "프리랜서",
-      note: "30대 초반, 무릎 덧댄 작업복의 현장 일꾼. 오래 버틴 성실한 생활형 프리랜서, 힘을 아껴 쓰고 동작이 경제적임. 원거리 = 권총. 사망(서서) = 앞으로 고꾸라짐."
-    },
-    상인남1: {
-      sex: "남",
-      age: "30대 후반",
-      job: "상인",
-      note: "조금 다부진 30대 후반, 걱정스러운 듯 침착한 얼굴. 손바닥 비비며 손님 붙잡는 흥정꾼. 힘은 있지만 싸움은 둔탁함. 원거리 없음. 사망(서서) = 앞으로 고꾸라짐."
-    },
-    가짜관리국검사C: {
-      sex: "남",
-      age: "20대",
-      job: "가짜 관리국 검사부대",
-      note: "조금 마른 몸, 갸름한 얼굴, 가운데 가르마. 말없고 차가운 젊은 검사. 군더더기 없이 빠르고 가볍게 한 손으로 찌른다. 원거리는 긴 일본도를 뺨 옆에서 앞으로 빠르게 베어 보내는 몸짓(검기는 코드). 무기 꺼내기 = 일본도를 뽑아 한 손 수평 겨눔. 사망(서서): 그대로 무너짐."
-    },
-    상인남2: {
-      sex: "남",
-      age: "30대 초반",
-      job: "상인",
-      note: "소매 걷은 작업복에 허리 앞치마, 공구 주머니. 수리점 겸 장물 손보는 젊은 일꾼 상인. 목소리 크고 손이 빠름. 상인 중 유일하게 약2까지 씀. 원거리 없음. 사망(서서) = 돌며 쓰러짐."
-    },
-    상인남3: {
-      sex: "남",
-      age: "30대 초반",
-      job: "상인",
-      note: "마른 30대 초반, 다용도 조끼. 말수 적고 눈치 빠른 장물아비 쪽 상인. 날렵하게 발을 쓰고 한 팔로 밀쳐 낸다. 원거리 없음. 사망(서서) = 그대로 무너짐."
-    },
-    상인남4: {
-      sex: "남",
-      age: "30대 후반",
-      job: "상인",
-      note: "카디건에 짧은 가게 앞치마, 주머니에 연필. 담담하고 사무적인 30대 후반 가게 주인(「환불 없음」을 표정 하나 안 바꾸고 말하는 사람). 움직임이 절제되고 반듯함. 원거리 없음. 사망(서서) = 굴러 넘어짐."
-    },
-    상인여1: {
-      sex: "여",
-      age: "30대 후반",
-      job: "상인",
-      note: "분식집 아주머니 같은 30대 후반. 넉살 좋게 손님을 끌고(「밥은 먹었어? 사인 먼저 하고」), 몸집으로 밀어붙인다. 동작은 크고 시원하되 빠르진 않음. 원거리 없음. 사망(서서) = 앞으로 고꾸라짐."
-    },
-    상인여2: {
-      sex: "여",
-      age: "40대 초반",
-      job: "상인",
-      note: "마른 40대 초반, 차분하고 눈치 빠른 감정사 타입(손님 사정을 훑는 장사꾼). 동작은 작고 정확함. 종아리 치마라 발차기 없음. 원거리 없음. 사망(서서) = 돌며 쓰러짐."
-    },
-    상인여3: {
-      sex: "여",
-      age: "30대 초반",
-      job: "상인",
-      note: "피곤하고 경계심 많은 30대 초반 노점 상인. 손님 부를 때도 힘이 빠져 있고, 싸울 땐 짧고 실용적으로. 바지·운동화라 몸놀림은 가벼움. 원거리 없음. 사망(서서) = 그대로 무너짐."
-    },
-    의사1: {
-      sex: "남",
-      age: "30대 초반",
-      job: "의사",
-      note: "무릎길이 가운을 열어 입은 30대 초반 의사. 침착하지만 늘 피곤함(목 주무르기). 싸움에 서툴러 손바닥으로 밀어내는 정도, 가운 자락이 크게 펄럭임."
-    },
-    간호사1: {
-      sex: "여",
-      age: "20대 후반",
-      job: "간호사",
-      note: "20대 후반 간호사, 차분하고 주의 깊음. 어깨가 뭉친 피곤함. 몸이 가볍고 손이 빨라 짧게 손바닥으로 친다. 윤지아와 겹치지 않게 차분한 쪽으로."
-    },
-    청소부남1: {
-      sex: "남",
-      age: "40대",
-      job: "청소 노동자",
-      note: "관자놀이가 희끗한 40대 남자 청소 노동자. 보통 체격, 무던하고 묵묵함. 허리를 비틀어 푸는 버릇. 싸움은 짧게 밀어 치는 정도."
-    },
-    청소부여1: {
-      sex: "여",
-      age: "40대",
-      job: "청소 노동자",
-      note: "40대 청소 노동자, 둥근 체격에 차분한 얼굴. 하루 종일 허리 숙여 일해 허리가 뻐근함. 동작은 작고 실속 있음. 장갑 낀 손으로 철썩."
-    },
-    가짜관리국진압A: {
-      sex: "남",
-      age: "20대",
-      job: "가짜 관리국 진압부대",
-      note: "보통 체격, 각진 얼굴, 이마가 드러난 스포츠머리, 등에 소총. 「구역을 나눠 탄막을 까는」 진압부대원. 교범대로 정확하고 딱딱한 군대식 소총 격투(총구 찌르기·개머리판 올려치기·가로 밀쳐 치기). 무기 꺼내기 = 등의 소총을 앞으로 돌려 어깨 견착, 원거리 = 견착 조준 사격. 사망(서서): 앞으로 고꾸라짐."
-    },
-    학생남1: {
-      sex: "남",
-      age: "10대(고등학생)",
-      job: "고등학생",
-      note: "조끼 교복을 단정하게 입은 평범한 남학생. 덩치는 보통, 싸움은 해 본 적 없어 막 휘두른다."
-    },
-    학생남2: {
-      sex: "남",
-      age: "10대(고등학생)",
-      job: "고등학생",
-      note: "마른 체격에 회색 후드 집업을 열어 걸친 느긋한 남학생. 힘 빼고 서 있다가 겁나면 확 무너진다."
-    },
-    학생여1: {
-      sex: "여",
-      age: "10대(고등학생)",
-      job: "고등학생",
-      note: "단정한 단발에 무릎 치마를 반듯하게 입은 얌전한 모범생. 싸움은 서툴고 금방 겁먹는다. 치마라 발차기·다리 벌리기 없음."
-    },
-    학생여2: {
-      sex: "여",
-      age: "10대(고등학생)",
-      job: "고등학생",
-      note: "마른 체격에 바지 교복, 포니테일. 체육 시간에 배운 티가 나는 활동적인 학생. 바지라 낮은 발차기 가능."
-    },
-    시민남1: {
-      sex: "남",
-      age: "20대 중반",
-      note: "20대 중반, 약간 다부진 체격, 올리브 맨투맨에 조거팬츠. 느긋하고 무던한 동네 청년. 손을 바지 주머니에 잘 넣고, 싸우면 힘으로 크게 휘두름."
-    },
-    시민남2: {
-      sex: "남",
-      age: "60대 후반",
-      note: "60대 후반 할아버지, 보통 체격, 남색 점퍼와 깃 셔츠. 고집 있고 점잖은 어르신. 뒷짐을 잘 지고, 동작은 작고 느리며 싸울 땐 주먹을 흔들며 호통."
-    },
-    시민남3: {
-      sex: "남",
-      age: "40대 중반",
-      note: "40대 중반 아저씨, 배가 조금 나온 체격, 갈색 점퍼에 베이지 면바지. 사람 좋고 오지랖 넓은 가장. 바지춤을 추켜올리는 버릇, 싸울 땐 배와 손바닥으로 밀어붙임."
-    },
-    시민남4: {
-      sex: "남",
-      age: "20대 후반",
-      note: "20대 후반, 균형 잡힌 체격, 짧은 머리에 바람막이. 반듯하고 무뚝뚝한 사람(군대 다녀온 티). 자세가 곧고 싸움도 반듯하게 주먹·발을 곧게 뻗음."
-    },
-    시민남5: {
-      sex: "남",
-      age: "30대 초반",
-      job: "직장인",
-      note: "30대 초반, 보통 체격, 캐주얼 블레이저에 로퍼. 깔끔 떠는 직장인, 체면을 차림. 옷매무새를 계속 고치고, 싸움은 뒤로 몸을 빼며 어색하게 밀치기만 함."
-    },
-    시민남6: {
-      sex: "남",
-      age: "20대 초반",
-      job: "대학생",
-      note: "20대 초반, 마른 체격, 지퍼 연 회색 후드에 통 넓은 청바지. 건들건들 여유 있는 대학생. 리듬 타듯 몸을 흔들고, 싸움은 팔다리가 길어 크게 휘두름."
-    },
-    가짜관리국진압B: {
-      sex: "남",
-      age: "20대",
-      job: "가짜 관리국 진압부대",
-      note: "넓은 턱과 어깨(근육질은 아님), 까까머리. 진압부대의 우직한 앞줄. 기술보다 무게로 밀고 크게 휘두른다. 근접은 소총을 가로로 들고 몸무게로 밀치거나 개머리판을 크게 내리찍음. 무기 꺼내기 = 등의 소총을 앞으로 돌려 오른허리에 받침, 원거리 = 허리춤 사격. 사망(서서): 돌며 쓰러짐."
-    },
-    시민남7: {
-      sex: "남",
-      age: "20대 초반",
-      note: "20대 초반, 마른 체격, 파란 풀오버 후드(캥거루 주머니)와 빛바랜 청바지. 소심하고 눈치 보는 사람. 어깨를 말고 다니며, 싸움은 눈 감고 한 번 휘두르는 게 전부."
-    },
-    시민남8: {
-      sex: "남",
-      age: "50대 후반",
-      note: "50대 후반, 보통 체격, 갈색 점퍼에 베이지 니트. 엄하고 깐깐한 동네 어른. 자세가 곧고 동작은 짧고 단호함, 싸울 땐 한 손으로 거리를 두고 손날로 내려침."
-    },
-    시민남9: {
-      sex: "남",
-      age: "20대",
-      job: "몸 쓰는 일",
-      note: "20대, 어깨 넓은 체격, 소매 걷은 작업 셔츠와 작업화. 몸 쓰는 일 하는 무던한 청년. 소매를 걷어 올리는 버릇, 싸움은 크게 붙잡고 묵직하게 치는 편(시민 중 가장 셈)."
-    },
-    시민여1: {
-      sex: "여",
-      age: "20대 중반",
-      note: "20대 중반, 보통 체격, 무채색 집업에 통 넓은 바지. 꾸밈없고 털털한 사람. 움직임은 가볍고 시원시원, 겁먹어도 금방 몸을 추스름."
-    },
-    시민여2: {
-      sex: "여",
-      age: "60대 후반",
-      note: "60대 후반 할머니, 둥근 체형, 누빔 조끼. 동작은 작고 느리며 무릎을 아낌. 싸울 땐 꾸짖듯 손바닥으로 때리고, 겁먹으면 크게 뛰지 못하고 종종걸음."
-    },
-    시민여3: {
-      sex: "여",
-      age: "40대 중반",
-      note: "40대 중반 동네 아주머니, 둥근 체형, 세이지색 니트. 할 말은 하는 사람. 손을 허리에 잘 얹고, 싸울 땐 밀치고 후려치지만 겁나면 비명부터."
-    },
-    시민여4: {
-      sex: "여",
-      age: "20대 후반",
-      note: "20대 후반, 마른 편, 청재킷에 발목까지 오는 긴 치마. 조용하고 조심스러운 사람. 치마라 보폭이 작고 발차기 없음, 머리카락을 자주 넘김."
-    },
-    시민여5: {
-      sex: "여",
-      age: "20대 후반",
-      job: "사무직",
-      note: "20대 후반 사무직, 보통 체격, 카디건·슬랙스·로퍼. 단정하고 예의 바른 사람. 몸가짐을 계속 정리하고, 싸움은 서툴러 뻣뻣하게 밀기만 함."
-    },
-    시민여6: {
-      sex: "여",
-      age: "20대 초반",
-      note: "20대 초반, 균형 잡힌 체격, 맨투맨·청바지·운동화. 활발하고 몸이 가벼운 사람. 가만있지 못하고 포니테일을 자주 만짐, 싸움도 겁 없이 발부터 나감."
-    },
-    시민여7: {
-      sex: "여",
-      age: "50대 후반",
-      note: "50대 후반, 둥근 체형, 올리브 카디건과 플랫슈즈. 차분하고 어른스러운 사람. 동작은 작고 침착하며, 싸울 땐 한 팔로 얼굴을 막고 다른 손으로 밀어냄."
-    },
-    가짜관리국진압C: {
-      sex: "남",
-      age: "20대",
-      job: "가짜 관리국 진압부대",
-      note: "조금 마른 몸, 긴 얼굴, 이마 위 일자 앞머리. 진압부대의 날렵한 막내. 거리를 재며 소총 총구로 빠르게 찌르고 빠진다(맨손 대신 소총). 무기 꺼내기 = 등의 소총을 앞으로 돌려 낮게 듦, 원거리 = 한쪽 무릎을 꿇고 견착 사격. 사망(서서): 그대로 무너짐."
-    },
-    시민여8: {
-      sex: "여",
-      age: "20대 초반",
-      note: "20대 초반, 보통 체격, 분홍 맨투맨. 숫기 없고 겁 많은 사람. 소매를 손등까지 끌어내리는 버릇, 싸움은 눈 감고 허우적거리는 수준."
-    },
-    시민여9: {
-      sex: "여",
-      age: "20대 후반",
-      job: "회사원",
-      note: "20대 후반 회사원, 보통 체격, 블라우스·낮은 굽 구두, 왼쪽 엉덩이에 작은 핸드백. 늘 불안하게 주위를 살피는 사람. 한 손은 자꾸 가방끈을 쥐고, 굽 때문에 걸음이 조심스러움."
-    },
-    불량배남1: {
-      sex: "남",
-      age: "10대(고등학생)",
-      note: "뚱하게 곁눈질하는 남고생 불량배. 남색 점퍼·회색 티·조거 바지. 남 3보다 덩치가 있어 가슴 내밀고 몸으로 들이받는 거리 싸움(밀치기·훅·박치기·태클). 개인 대기는 쪼그
+        ui.d

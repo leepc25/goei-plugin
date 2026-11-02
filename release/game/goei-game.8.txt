@@ -1,4 +1,1246 @@
- 350) % 3) : b.text;
+바닥을 세운다 → 짧은 충격 고리"], "충전0": ["배합 실험 0단", "총·투척", "오염", "시약 물보라 → 따가워"], "충전1": ["배합 실험 1단", "총·투척", "오염", "시약을 가는 줄기로 쏘아 낸다"], "충전2": ["배합 실험 2단", "총·투척", "오염", "병을 던진다 → 시약 비·남보라 연기"], "필살": ["과장님!", "총·투척", "오염", "메다꽂는 순간 시약병들이 깨져…끓어올라 터져 나간다"] }, "이병진": { "사격": ["기본 사격", "총·투척", "물리", "빨간 잉크 점"], "고유기": ["빨간 펜", "몸", "물리", "빨간 사인펜을 쭉 내리긋는다…베인다"], "충전0": ["급행 처리 0단", "몸", "물리", "손바닥을 밀어 낸다"], "충전1": ["급행 처리 1단", "몸", "물리", "양손으로 번갈아 두 번 밀고"], "충전2": ["급행 처리 2단", "몸", "물리", "다리에 매달려 넘어뜨리고"], "필살": ["처음으로 쓸모 있어진 순간", "이능", "정신", "제문의 한자 획이 칼날처럼 떨어지고 → 붉은 낙관"] }, "제이": { "사격": ["기본 사격", "이능", "물리", "바닥을 타는 그림자"], "고유기": ["앞발", "이능", "물리", "검은 그림자 발톱 궤적 세 줄이 단두대처럼"], "충전0": ["냄새가 달라요 0단", "이능", "물리", "그림자가 2m 뻗어 발목을 문다"], "충전1": ["냄새가 달라요 1단", "이능", "물리", "그림자 입이 벌어졌다 닫히며"], "충전2": ["냄새가 달라요 2단", "이능", "물리", "바닥 전체가 입처럼 벌어졌다 닫히며"], "필살": ["완전 발현", "이능", "물리", "그림자 바다 → 그림자 막이 화면 가운데로 쾅"] }, "차여진": { "사격": ["기본 사격", "총·투척", "물리", "의뢰서 한 장"], "고유기": ["팔 수 있을 만큼만", "몸", "물리", "두 손가락을 칼날처럼 찔러 넣는다"], "충전0": ["규정상 이렇게 해도 돼 0단", "몸", "물리", "하이힐 굽 끝으로 정강이"], "충전1": ["규정상 이렇게 해도 돼 1단", "몸", "물리", "굽으로 내리찍는다 → 바닥 금"], "충전2": ["규정상 이렇게 해도 돼 2단", "몸", "물리", "두 굽을 나란히 내리 디딘다"], "필살": ["두 번째 휴대전화", "몸", "물리", "화면 밖에서 검붉은 베기 섬광이…X자 베기"] }, "서윤지": { "사격": ["기본 사격", "총·투척", "물리", "조항 글자 줄"], "고유기": ["업무 관련 금품 수수 불가", "몸", "물리", "서류철을 반듯이 밀어 내민다(반사)"], "충전0": ["처리 기록 0단", "몸", "물리", "손날 찌르기"], "충전1": ["처리 기록 1단", "몸", "물리", "찌르기 → 내려찍기 → 올려치기"], "충전2": ["처리 기록 2단", "몸", "물리", "미끄러져 장저"], "필살": ["수정 요청 없음", "몸", "물리", "직각으로 꺾이며 정수리 내려찍기 → 네모 충격 고리"] }, "고연지": { "사격": ["기본 사격", "총·투척", "물리", "메스 던지기"], "고유기": ["견적", "몸", "물리", "손끝으로 짚고 → 봉합 바늘로 세 번 찔러"], "충전0": ["마취 0단", "총·투척", "물리", "메스 한 자루를 던진다"], "충전1": ["마취 1단", "총·투척", "물리", "메스 세 자루 연달아"], "충전2": ["마취 2단", "몸", "오염", "목에 마취 주사를 꽂는다 → 잠든다"], "필살": ["수술 여섯 시간째", "몸", "물리", "마취 가스 → 잠든 적 사이 손놀림 → 퍼뜩 깨어나며 튕겨"] }, "윤지아": { "사격": ["기본 사격", "총·투척", "물리", "사탕"], "고유기": ["잠깐만요", "몸", "물리", "손목을 감싸 쥐고 비튼다"], "충전0": ["오늘 날씨 진짜 이상하죠? 0단", "몸", "물리", "두 손바닥으로 밀어 낸다"], "충전1": ["오늘 날씨 진짜 이상하죠? 1단", "몸", "물리", "발바닥으로 찬다"], "충전2": ["오늘 날씨 진짜 이상하죠? 2단", "몸", "물리", "붙잡아 바닥에 내리꽂는다"], "필살": ["시술 준비 끝", "몸", "물리", "세 번 내리꽂아 앉힘 → 먼지 고리"] }, "마덕희": { "사격": ["기본 사격", "총·투척", "물리", "가격표"], "고유기": ["자기야, 이거 안 좋은 거네요", "몸", "물리", "손등으로 뺨 → 검지로 가슴"], "충전0": ["80. 얘기 끝났어요 0단", "몸", "물리", "손바닥을 밀어 낸다"], "충전1": ["80. 얘기 끝났어요 1단", "몸", "물리", "무릎으로 명치를 찍고"], "충전2": ["80. 얘기 끝났어요 2단", "몸", "물리", "팔꿈치를 내리찍는다"], "필살": ["헐값매입", "몸", "물리", "손등·검지·굽 → 팔꿈치 내리찍기"] }, "문혜란": { "사격": ["기본 사격", "총·투척", "물리", "카드"], "고유기": ["바닥 차갑지?", "몸", "물리", "진압봉 내려치기·올려치기 → 발목 걸기"], "충전0": ["앉아, 앉아 0단", "몸", "물리", "래리어트"], "충전1": ["앉아, 앉아 1단", "몸", "물리", "구두 밑창으로 밀어 찬다"], "충전2": ["앉아, 앉아 2단", "총·투척", "물리", "표시된 카드 다섯 장을 튕긴다"], "필살": ["대박알선 뒷방", "총·투척", "물리", "카드 수십 장 → 진압봉으로 바닥을 쾅"] }, "신유리": { "사격": ["기본 사격", "총·투척", "물리", "단검 던지기"], "고유기": ["추심", "몸", "물리", "단검을 두 번 짧게 찌른다"], "충전0": ["도로 앉아 0단", "몸", "물리", "어깨를 움켜쥐고 누른다"], "충전1": ["도로 앉아 1단", "몸", "물리", "미끄러져 잡아 엎어 누른다"], "충전2": ["도로 앉아 2단", "몸", "물리", "안전화 뒤꿈치로 내리밟는다"], "필살": ["추심 시 사전 통보 없음", "몸", "물리", "콘크리트 벽이 좁혀 → 철문 → 단검 세 번"] }, "블라렛": { "사격": ["기본 사격", "총·투척", "물리", "은탄 쌍권총"], "고유기": ["성검 발현", "몸", "빛", "십자가에서 흰 빛의 십자 장검…크게 내려벤다"], "충전0": ["은탄 0단", "총·투척", "물리", "쌍권총 두 발"], "충전1": ["은탄 1단", "총·투척", "물리", "좌우 번갈아 6연사"], "충전2": ["은탄 2단", "이능", "빛", "손바닥 성화…흰 금빛 불꽃"], "필살": ["영원한 십자군", "이능", "빛", "대성당 빛기둥 → 화면 높이 성검 내려베기"] }, "살라딘": { "사격": ["기본 사격", "총·투척", "물리", ""], "고유기": ["인간 믹서기", "몸", "물리", "곡도 두 번 내리벤다 + 소총이 불을 뿜는다"], "충전0": ["형제여! 0단", "이능", "음파", "함성 자체가 터짐 → 푸른 음파 고리"], "충전1": ["형제여! 1단", "이능", "물리", "푸른 형제 둘이 솟아 곡도를 찔러 올림"], "충전2": ["형제여! 2단", "이능", "물리", "형제가 차례로 솟아오르는 긴 줄"], "필살": ["메카의 군세", "이능", "물리", "형제 대열이 화면을 가로질러 돌격"] }, "아벤샤": { "사격": ["기본 사격", "이능", "물리", "모래 탄환"], "고유기": ["모래 탄환", "이능", "물리", "압축된 금빛 모래 덩어리가 한 발씩"], "충전0": ["흐르는 모래 0단", "이능", "물리", "모래 방벽이 솟음…밀쳐 냄"], "충전1": ["흐르는 모래 1단", "이능", "물리", "모래 줄기가 되어 흘러가…다리를 휩쓸려"], "충전2": ["흐르는 모래 2단", "이능", "폭발", "모래 기둥이 차례로 폭발하며 솟음"], "필살": ["모래 해일", "이능", "물리", "모래 해일이 무너져 덮침"] }, "세크리엠": { "사격": ["기본 사격", "이능", "물리", "피의 칼날 던지기"], "고유기": ["피의 칼날", "이능", "물리", "손톱 끝에서 진홍 초승달 칼날 세 갈래"], "충전0": ["핏빛 안개 0단", "이능", "없음(피해 없음)", "핏빛 안개로 흩어져 뒤로 3m"], "충전1": ["핏빛 안개 1단", "이능", "물리", "안개 속 핏방울 칼끝에 긁혀 여러 번"], "충전2": ["핏빛 안개 2단", "몸", "물리", "안개로 휘감아 띄움 → 등 뒤에서 올려 할큄"], "필살": ["붉은 눈", "이능", "물리", "붉은 파동 → 안개 소용돌이 → 화면 폭 칼날 세 갈래"] }, "브라우니": { "사격": ["기본 사격", "이능", "전기", "방송 송출(TV 화면에서 전파)"], "고유기": ["박수!", "몸", "물리", "손뼉 두 번 → 「짝!"], "충전0": ["정답은? 0단", "몸", "물리", "장갑 손바닥으로 정수리를 누른다"], "충전1": ["정답은? 1단", "몸", "물리", "두 손바닥으로 누르며 착지 → 공기 충격"], "충전2": ["정답은? 2단", "이능", "전기", "TV 화면에서 백색 잡음 전파 띠"], "필살": ["화요퀴즈쇼", "이능", "물리", "거인 브라우니의 손뼉 → 공기 충격 고리 → 손바닥으로 쾅"] }, "탐미주의": { "사격": ["기본 사격", "이능", "오염", "물감 뿌리기"], "고유기": ["물감", "이능", "오염", "목에 검은 물감 소용돌이…검은 물감을 쏟는다"], "충전0": ["갈아타기 0단", "몸", "물리", "손등으로 가로 쳐냄"], "충전1": ["갈아타기 1단", "이능", "물리", "빈 마네킹이 터져 대리석 조각"], "충전2": ["갈아타기 2단", "몸", "물리", "등 뒤에서 손등으로 쳐내"], "필살": ["예술은 조각이다", "이능", "이상", "적 전원이 회색 대리석 결로 덮이며 굳고 → 산산조각"] } };
+  var CW_BADGE = { "단련된 주먹": 0, "빠른 손놀림": 1, "미끄럼 숙련": 2, "충격 주먹": 3, "두통 유발": 4, "따라 치는 그림자": 5, "발목 걸기": 6, "무거운 한 방": 7, "넓은 휘두르기": 8, "공중 사냥": 9, "마무리 일격": 10, "벽꽝 강화": 11, "내려찍기": 12, "출혈 일격": 13, "패대기": 14, "당구": 15, "족쇄 차기": 16, "정조준": 17, "빠른 방아쇠": 18, "거리 감각": 19, "냉각 장치": 20, "투척 강화": 21, "급소 겨냥": 22, "겹탄": 23, "관통탄": 24, "도탄": 25, "폭발탄": 26, "표식탄": 27, "겁주기": 28, "부메랑 투척": 29, "과열 방출": 30, "가벼운 발": 31, "연속 회피": 32, "회피 충전 단축": 33, "무적 회피": 34, "긴 회피": 35, "3단 점프": 36, "회피 폭탄": 37, "미끼 잔상": 38, "꿰뚫는 회피": 39, "낙법": 40, "질주 들이받기": 41, "가드 강화": 42, "완전 방어": 43, "탄 되받기": 44, "되받아치기": 45, "가시 방패": 46, "깨지며 터진다": 47, "혼쭐": 48, "고유기 숙련": 49, "고유기 강화": 50, "충전 단축": 51, "충전 강화": 52, "필살 충전": 53, "필살 강화": 54, "시작 게이지": 55, "고통 증폭": 56, "고유기 2회": 57, "끌어당기는 충전": 58, "혼란 충전": 59, "둔화 고유기": 60, "침묵의 필살": 61, "앙코르": 62, "깊은 상처": 63, "지속 연장": 64, "약점 찌르기": 65, "내성": 66, "정신 방벽": 67, "오염 손톱": 68, "오염 전파": 69, "그림자 습격": 70, "첫 일격": 71, "배수진": 72, "정예 사냥": 73, "일대일": 74, "시체 폭발": 75, "위협": 76, "튼튼한 몸": 77, "응급 치료": 78, "두꺼운 가죽": 79, "위기 회복": 80, "다운 무시": 81, "버티기": 82, "방어막": 83, "피 터뜨리기": 84, "표식 전염": 85, "급소 간파": 86, "겁먹은 등": 87, "묶인 과녁": 88, "두통 울림": 89, "제 편 때리기": 90, "얼어붙은 발": 91, "입막음 처형": 92, "오염 연소": 93, "상처 옮기기": 94, "자세 무너뜨리기": 95, "기절 추격": 96, "혼란 틈": 97, "틈새 사격": 98, "연속 처치": 99, "무피격": 100, "사냥 기록": 101, "피의 저금통": 102, "아슬아슬": 103, "콤보 고조": 104, "쌓인 울분": 105, "현장 경험": 106, "탄피 모으기": 107, "되갚기": 108, "연쇄 폭파": 109, "피바다": 110, "탄막 반사": 111, "빈틈 없음": 112, "그림자 분대": 113, "유성 낙하": 114, "사냥꾼의 눈": 115, "소용돌이": 116, "역병": 117, "반응 장갑": 118, "죽은 채로 있을 수가 없다": 119, "앉게": 120, "방 안이 먼저 지친다": 121, "책상 내려치기": 122, "치유 반지": 123, "보이지 않는 사슬": 124, "혼돈 변수": 125, "규정상 이렇게 해도 돼": 126, "금품 수수 불가": 127, "수술 여섯 시간째": 128, "바닥 차갑지?": 129, "일부러 비좁게": 130, "진조의 피": 131, "맨손으로 쳐낸다": 132, "힘 단련": 133, "민 단련": 134, "체 단련": 135, "지 단련": 136, "정 단련": 137, "무모함": 138, "유리 대포": 139, "철벽": 140, "경량화": 141, "난사": 142, "한 방 주의": 143, "광전사": 144, "과충전": 145, "되감는 시계": 146, "피의 대가": 147, "겁쟁이": 148, "저주받은 손": 149, "도박꾼": 150, "무거운 장비": 151, "탐욕": 152, "단식": 153, "총 버림": 154, "외길": 155, "피에 굶주림": 156, "약 잘 쓰는 손": 157, "넉넉한 주머니": 158, "아끼기": 159, "한 모금": 160, "퀵 드로우": 161, "응급 자동 사용": 162, "맨몸": 163 };
+
+  // src/game/action/ui/badgeArt.ts
+  var RAMP = {
+    희귀: null,
+    // 은 = 그대로
+    일반: [[40, 22, 12], [150, 84, 40], [236, 176, 120]],
+    특급: [[56, 38, 6], [196, 146, 30], [255, 236, 150]]
+  };
+  var sheets = [];
+  var cache5 = /* @__PURE__ */ new Map();
+  function loadBadges(urlOf) {
+    sheets = [];
+    cache5.clear();
+    for (let k = 1; k <= 6; k++) {
+      const i = k - 1;
+      void urlOf(`sheet${k}.png`).then((src) => {
+        const im = new Image();
+        im.onload = () => {
+          sheets[i] = im;
+        };
+        im.src = src;
+      }).catch(() => {
+      });
+    }
+  }
+  function badgeOf(name, grade = "희귀") {
+    const n = CW_BADGE[name];
+    if (n === void 0) return null;
+    const key = `${n}|${grade}`;
+    const hit2 = cache5.get(key);
+    if (hit2) return hit2;
+    const sh = sheets[Math.floor(n / 32)];
+    if (!sh) return null;
+    const cv = document.createElement("canvas");
+    cv.width = cv.height = 64;
+    const g = cv.getContext("2d");
+    g.imageSmoothingEnabled = false;
+    g.drawImage(sh, n % 8 * 64, Math.floor(n % 32 / 8) * 64, 64, 64, 0, 0, 64, 64);
+    const ramp = RAMP[grade];
+    if (ramp) {
+      const d3 = g.getImageData(0, 0, 64, 64), px = d3.data;
+      for (let i = 0; i < px.length; i += 4) {
+        if (!px[i + 3]) continue;
+        const t = Math.round(0.299 * px[i] + 0.587 * px[i + 1] + 0.114 * px[i + 2]) / 255;
+        const [a, b, u] = t < 0.5 ? [ramp[0], ramp[1], t * 2] : [ramp[1], ramp[2], (t - 0.5) * 2];
+        for (let c = 0; c < 3; c++) px[i + c] = Math.round(a[c] + (b[c] - a[c]) * u);
+      }
+      g.putImageData(d3, 0, 0);
+    }
+    cache5.set(key, cv);
+    return cv;
+  }
+
+  // src/game/action/npc/roster.ts
+  var base = { effects: ["favor", "hint"] };
+  var d = (x) => ({ ...base, ...x, effects: x.effects ?? base.effects });
+  var AGENT_NPCS = {
+    jyaldi: d({ id: "jyaldi", name: "쟈알디", sheet: "쟈알디", group: "agent", color: "#c0392b", photo: "Jyaldi", role: "종합대응팀 부장. 본부 부장실에서 결재하고, 출동 땐 현장 지휘.", speech: "짧은 평서형 반말, 보고서처럼 묻는다. 감정 표현 거의 없음. 한숨 섞인 「하아, 잼트리.」", effects: ["favor", "hint", "join"], greet: ["보고해.", "…용건."], lines: ["짧게 말해. 듣고 있다.", "살아서 왔으면 됐다. 다음.", "결재는 결과 보고 한다.", "하아. 잼트리한테 말해."] }),
+    eileen: d({ id: "eileen", name: "에일린", sheet: "에일린", group: "agent", color: "#d8c98a", photo: "Aileen", role: "종합대응팀 선임. 부장 없을 때 현장 지휘.", speech: "한두 마디 반말. 직함으로 부르면 고쳐 준다(「에일린이라고 불러.」).", effects: ["favor", "hint", "join"], greet: ["준비됐어?", "에일린."], lines: ["됐어.", "증명해.", "가는 길에 죽지 마. 회수 귀찮아.", "몰라. 그래도 해."] }),
+    spangdal: d({ id: "spangdal", name: "스팡달", sheet: "스팡달", group: "agent", color: "#8e6bd1", photo: "Spangdal", role: "종합대응팀 선임 전투 요원, 가시 이능.", speech: "느리게 끄는 반말, 「후후」 웃음, 무서운 상상을 속삭이듯 묻는다. 끝에 「농담이야」.", effects: ["favor", "hint", "join"], greet: ["어머, 왔어? 후후.", "자기소개 안 해? 곧 죽을 거라서?"], lines: ["있잖아, 언제 죽을 것 같아? 내일? 모레? 후후.", "후후후. 농담이야.", "데쥬레 봤어? 요즘 나 피해 다니더라.", "무서워? 그 얼굴 좋다."] }),
+    geshugan: d({ id: "geshugan", name: "게슈간", sheet: "게슈간", group: "agent", color: "#9fc6e8", photo: "Geshugan", role: "종합대응팀 제압 담당.", speech: "아주 짧은 반말과 말줄임표. 사과는 「그래. 미안.」", effects: ["favor", "hint", "join"], greet: ["…뭐.", "…왜."], lines: ["…그래.", "알았어. 미안.", "…총 잘 쏘네?", "…거리 둬."] }),
+    gorgodio: d({ id: "gorgodio", name: "고르고디오", sheet: "고르고디오", group: "agent", color: "#d98b3a", photo: "Gorgodio", role: "진압팀 선임, 중장갑 전열.", speech: "크고 정직한 말투, 존댓말과 반말 섞임, 기분 좋으면 사투리.", effects: ["favor", "hint", "join"], greet: ["어이! 무슨 일이고?", "건물 먼저 확인하고 올게!"], lines: ["위험하다 안 했나! 뒤로 빠져 있어라!", "요원 될 깜냥이 있네. 좋다!", "봉쇄 먼저다. 늦으면 더 비싸게 먹힌다!", "쉬어라. 고생 많았다."] }),
+    kyuras: d({ id: "kyuras", name: "큐라스", sheet: "큐라스", group: "agent", color: "#9bd36a", photo: "Kyuras", role: "진압팀 선임, 화염 이능 원거리 지원.", speech: "밝고 빠른 반말, 느낌표 많음. 틈만 나면 진압팀 전입 권유.", effects: ["favor", "hint", "join"], greet: ["오! 진압팀 올 생각 있어?!", "왔냐! 스타 한 판?"], lines: ["진압팀은 너 같은 인재가 필요해! 전입 신청서 써!", "그 대사 백 번은 들었다!", "스팡달 선배랑 일하기 무섭지?!", "불 필요하면 불러!"] }),
+    deadpole: d({ id: "deadpole", name: "데드폴", sheet: "데드폴", group: "agent", color: "#6f7c8a", photo: "Deadpole", role: "종합대응팀 회수·노출 담당. 죽어도 돌아온다.", speech: "조심스러운 존댓말, 말 끊고 다시 시작, 고맙다는 말이 많다.", effects: ["favor", "hint", "join"], greet: ["아, 저… 무슨 일이세요?", "…늘 신세 지고 있어요."], lines: ["괜찮으세요…? 아, 저 말고요. 그쪽이요.", "…고마워요. 정말로요.", "제가 먼저 들어갈게요. 저는… 돌아오니까요.", "등 찔리면 아프겠죠. 그래도 살아요, 저는."] }),
+    rojemon: d({ id: "rojemon", name: "로제몬", sheet: "로제몬", group: "agent", color: "#b05cc8", photo: "Rojemon", role: "종합대응팀 정신 간섭·최면 해제 담당 (자칭 사무직).", speech: "빠르고 날카로운 반말, 투덜거림. 일할 땐 목소리가 차분해진다.", effects: ["favor", "hint", "join"], greet: ["헛소리하지 마.", "현장이면 안 가."], lines: ["그거 아무 맛도 안 나.", "못 해. 안 돼. 뭘 원하는데?", "옆에 있어.", "목숨 한 번 빚졌으니까 이번은 봐줄게."] })
+  };
+  var HQ_NPCS = {
+    jaemtri: d({ id: "jaemtri", name: "잼트리", sheet: "잼트리", group: "hq", color: "#27685b", photo: "Jaemtri", role: "종합대응팀 내근 선임. 임무 창구, 생존자 면담, 매뉴얼 관리. 탕비실 연유 커피 담당.", speech: "다정하고 장난스러운 반말, 스스로 「언니」. 웃는 얼굴로 절차를 집행(「스톱. 이름 말하지 마.」). 부장(쟈알디)에게만 존댓말.", greet: ["어머, 후배 왔어?", "응, 후배. 무슨 얘기 하고 싶어?"], lines: ["고민 있으면 꼭 언니한테 물어봐.", "응응. 그건 언니가 알아볼게. 대신 진술서 먼저.", "출동 전에 규칙서 한 번만 더 봐. 진짜로.", "연유 커피 남았는데, 마실래?"], rules: [[/이름|본명/, ["스톱. 이름 말하지 마. 응, 그렇지. 착하다."]], [/커피|연유/, ["연유 커피는 언니만 타. 레시피는 묻지 마."]]], never: ["본명을 묻거나 말하지 않는다", "현장에 나가지 않는다"] }),
+    gognija: d({ id: "gognija", name: "고그니쟈", sheet: "고그니쟈", group: "hq", color: "#c9a227", photo: "Gognija", role: "격리팀 연구 책임자. 지하 연구실에서 회수물 연구.", speech: "고풍스러운 하게체(「~하게」「~일세」「~라네」), 최대 음량, 느낌표 많음.", greet: ["오오! 무엇이든 묻게! 대답은 장담 못 하네!", "자료를 가져왔나!!!"], lines: ["좋은 질문일세! 대답은… 연구가 끝나면 알려 주겠네!", "이곳에서는 누구나 달달한 믹스커피를 마셔야 하네!", "데쥬레!!! 커피 좀 타 오게!!!", "아, 그건 비상 탈출 장치라네!"], rules: [[/블랙|아메리카노/, ["블랙이라니! 설탕 두 스푼 추가일세!"]]] }),
+    dejure: d({ id: "dejure", name: "데쥬레", sheet: "데쥬레", group: "hq", color: "#e58fb5", photo: "Dejure", role: "격리팀 연구원. 감정실에서 회수물 분류·감정, 믹스커피 제조.", speech: "더듬고 말끝 흐리는 존댓말(「저, 저기…」), 놀라면 「아, 아와와…!」. 유물 다룰 때만 또렷.", greet: ["네, 네…? 저, 저한테요…?", "아, 안녕하세요…"], lines: ["저, 저기… 다시 한 번만…", "조, 조심히 다녀오세요… 꼭이요…", "황금 비율은… 비, 비밀이에요…", "주시면… 분류할게요. 무섭지만요."], rules: [[/스팡달/, ["아, 아와와…! 제, 제가 잘못했어요…!"]], [/선배/, ["서, 선배요…? 헤헤…"]]] }),
+    konjyuce: d({ id: "konjyuce", name: "콘쥬스", sheet: "콘쥬스", group: "hq", color: "#e0457b", photo: "Konjyuce", role: "20세 대학생 요원. 괴력. 정비·보급실 담당, 전투 투입은 팀이 막는다.", speech: "밝고 고집 센 존댓말. 호칭을 상황 따라 바꾼다(아저씨→오빠, 선배님→언니). 호칭이 바뀌면 부탁(간식)이 온다.", greet: ["네! 뭐든 물어보세요!", "오빠, 아니 선배님! 안녕하세요!"], lines: ["잠깐만요! 저도 이 팀 정식 멤버거든요!", "그 말 좀 이상한데요? 아까랑 다르잖아요.", "그거 들어 드릴까요? 상자 열 개까진 괜찮아요!", "저도 갈 수 있는데… 네, 알아요. 팀 결정."], never: ["전투에 나가겠다고 우기지 않는다"] })
+  };
+  var MERCHANT_NPCS = {
+    madeokhee: d({ id: "madeokhee", name: "마덕희", sheet: "마덕희", group: "merchant", color: "#7d2a3a", photo: "Ma Deok-hee", role: "중림 장물 매입점 「헐값매입」 주인. 출동 중 휴식방에 나타나 회수물을 사고 물건을 판다(현금).", speech: "다정한 척 깎는 존댓말, 상대를 「자기야」. 상대 말을 작게 따라 하고 값을 후려친다(「80. 얘기 끝났어요. 쟁반 열렸습니다.」).", effects: ["favor", "trade", "hint", "leave"], greet: ["어머, 자기야. 뭐 팔 거 있어요?", "현금만 받아요. 관리국 결재는 여기서 안 통하고."], lines: ["자기야, 그런 얘기는 쟁반 위에 뭐 올려놓고 해요.", "흐음. 계속해 봐요.", "80. 얘기 끝났어요. 쟁반 열렸습니다.", "'열 배는 하는 거예요.' 열 배. 음. 그럼 열 배 받으러 가세요."] }),
+    goyeonji: d({ id: "goyeonji", name: "고연지", sheet: "고연지", group: "merchant", color: "#5a6f7d", photo: "Go Yeon-ji", role: "중림 무면허 외과의. 출동 중 휴식방에서 봉합·처치를 판다(선불).", speech: "건조하고 평평한 존댓말 반, 반말 반. 손상·수리·값을 정비사처럼 늘어놓는다.", effects: ["favor", "trade", "hint", "leave"], greet: ["어디 찢어졌어? 보여 줘 봐.", "선불이야. 마취는 별도고."], lines: ["갈비 두 대. 고칠 수 있어. 돈 먼저.", "병원엔 심의위원회가 있지. 나한텐 가격표가 있고.", "아니. 그 태도는 내가 수술 안 하는 합병증이야. 문은 뒤에.", "다음엔 덜 다쳐서 와."] }),
+    yunjia: d({ id: "yunjia", name: "윤지아", sheet: "윤지아", group: "merchant", color: "#8fb3a0", photo: "Yun Ji-a", role: "고연지의 진료 보조. 환자를 달래며 처치를 돕는다.", speech: "부드럽고 다정한 존댓말. 처치하면서 계속 말을 건다.", effects: ["favor", "trade", "hint"], greet: ["잘 오셨어요, 진짜로. 일단 앉으세요. 오늘 뭐 드셨어요?"], lines: ["여기 좀 따끔해요. 손 꽉 잡으셔도 돼요, 그러라고 있는 거예요.", "다음 학기엔 원서 낼 거예요. 아마도요.", "괜찮아요. 금방 끝나요.", "숨 천천히 쉬세요. 그렇지."] }),
+    shinyuri: d({ id: "shinyuri", name: "신유리", sheet: "신유리", group: "merchant", color: "#3d3550", photo: "Shin Yuri", role: "중림 사채업자. 출동 중 현금을 빌려주고 귀환 후 예산으로 받아 간다.", speech: "낮고 무뚝뚝한 반말. 위험한 상대에게만 존댓말. 위협할 땐 음절을 끊어 센다.", effects: ["favor", "trade", "hint", "leave"], greet: ["급하지? 돈은 있어. 이자도 있고.", "서명하든지, 나가든지."], lines: ["십. 퍼센트. 주마다.", "울려면 밖에서 울어. 눈물에 책상 녹슬어.", "돈은 없고 이능이랑 콩팥 두 개는 있네. 그걸로 하자.", "날짜 잊지 마."] }),
+    munhyeran: d({ id: "munhyeran", name: "문혜란", sheet: "문혜란", group: "merchant", color: "#a3672d", photo: "Mun Hye-ran", role: "중림 해결사·브로커. 프리랜서에게 일을 붙여 주고 수수료를 뗀다.", speech: "크고 연극적으로 친한 척하는 반말, 웃으면서 거절하고 조항 번호로 다시 말한다.", effects: ["favor", "trade", "hint", "leave"], greet: ["어이, 어이, 이게 누구야! 앉아, 앉아. 밥 먹었어? 상관없어, 서명 먼저 밥은 나중, 하하하!"], lines: ["재협상? 하하하! …9조에 안 된다고 돼 있어.", "이건 깎는 게 아니야, 친구. 더 나쁜 계약에서 지켜 주는 거지.", "이 조건 5분만 따뜻해. 그다음엔 더 배고픈 놈한테 판다.", "하하, 그래그래. 그래서 할 거야 말 거야?"] })
+  };
+  var dd = (id, name, photo, mask, role, speech, greet, lines, effects = ["favor", "hint", "join", "hostile", "leave", "trade"]) => d({ id, name, sheet: name, group: "daydream", color: "#7a6aa8", photo, role: `백일몽 주식회사 ${role}. ${mask} 가면.`, speech, effects, greet, lines });
+  var DAYDREAM_NPCS = {
+    leejaheon: dd("leejaheon", "이자헌", "Lee Ja-heon", "흰 도마뱀", "D조 조장·과장. 맨손 괴력", "감정 없는 하십시오체, 아주 짧게. 엉뚱한 질문에도 진지하게.", ["확인했습니다.", "물러나 주십시오."], ["예.", "그렇습니까.", "권장하지 않는 행동입니다.", "선천적 요인과 후천적 학습의 결과입니다."]),
+    eunhaje: dd("eunhaje", "은하제", "Eun Ha-je", "송골매", "D조 대리. 전직 기자, 규칙 해석·지도", "낮고 건조한 반말, 「~구만」「~잖냐」. 욕을 섞고 자기 죽음으로 농담.", ["왔냐?", "그래, 뭐."], ["그만둬도 나쁜 선택 아니야.", "미친놈들 뒤 캐서 먹고살았지.", "맞혀 볼 준비나 해.", "담배는… 아니다, 됐어."]),
+    parkminseong: dd("parkminseong", "박민성", "Park Min-seong", "오소리", "D조 주임. 힘센 짐꾼", "크고 친한 반말, 계속 웃는다. 겁먹어도 버틴다.", ["하하, 그렇게 딱딱하게 안 해도 돼!"], ["우리 부서는 1년쯤 되면 다 주임 달아. 그 전에 죽을 수도 있지만!", "아냐, 난 한 거 없어. 네가 다 했지.", "하하… 땀 좀 나네.", "짐 있으면 줘! 들어 줄게!"]),
+    jinnasol: dd("jinnasol", "진나솔", "Jin Na-sol", "금 나비", "A조 대리(정예). 손톱 투명 실", "짧고 날 선 반말, 목소리를 안 높이고 위협. 윗사람에게만 존댓말.", ["조용히 해.", "야."], ["짜증 나.", "두 번 말하게 하는 거 싫어.", "귀찮네.", "잘 거니까 말 걸지 마."]),
+    leeseonghae: dd("leeseonghae", "이성해", "Lee Seong-hae", "금 돌고래", "B조 주임(정예). 선인은 돕고 악인은 처형", "누구에게나 「~여」로 끝나는 다정한 말, 끝을 늘인다. 처형하면서도 상냥.", ["잘 지냈어여?", "괜찮아여?"], ["그냥 도와줄게여!", "이런 건 저처럼 스트레스 안 받는 사람이 해야 돼여.", "좋네여.", "미친놈이네여."]),
+    baekseokju: dd("baekseokju", "백석주", "Baek Seok-ju", "청둥오리", "A조 조장·과장(정예). 자기 조원만 챙김", "호탕한 중년 여성. 아랫사람에겐 다정한 해요체·반말, 싫은 동료에겐 얼음 같은 존댓말.", ["A조에 온 걸 환영해."], ["위험해 보이면 바로 넘길게. 알았지?", "규칙과 명령은 지킨다. 방법은 아무거나.", "아주 좋아. 딱 우리가 원하는 인재야.", "이자헌 조장님. 밖에서 얘기하시죠."]),
+    baeksaheon: dd("baeksaheon", "백사헌", "Baek Sa-heon", "염소·안대", "F조 사원. 숨기·미끼", "비아냥대는 존댓말, 아래로 보면 무시하는 반말. 위협받으면 바로 아첨하고 뇌물 제안.", ["노크하면 들어오라 할 때까지 기다리는 게 예의 아니었나요?"], ["어차피 죽을 사람들이잖아요.", "일을 복잡하게 만드시네.", "사흘 치 일당 더 보내 드릴까요?", "아, 아니 제 말은요…"]),
+    goyoungeun: dd("goyoungeun", "고영은", "Go Young-eun", "산양", "R조 사원. 전직 의대생, 사람 먼저", "따뜻한 해요체. 위기엔 단호한 선생님 반말.", ["괜찮으세요?"], ["벌써 끝난 것처럼 굴면 남은 기회까지 버리는 거예요.", "다친 데 보여 주세요.", "같이 나가요. 협조해 주세요.", "…알았어요. 해 볼게요."], ["favor", "hint", "join", "leave", "gift"]),
+    kangihak: dd("kangihak", "강이학", "Kang I-hak", "조랑말", "I조 사원. 돈(금)만, 늘 웃음", "밝고 길게 끄는 감탄형, 사과는 빠르고 크게.", ["강이학, 반가워요! 사원입니다!"], ["네네!", "하하. 오케이.", "근데! 거짓말이면 개인정보 다 넘기고 장기 담보 대출 하나 받아 갈 거예요!", "퇴근 후 사망은 회사가 알아서!"]),
+    janghunun: dd("janghunun", "장허운", "Jang Heo-un", "소", "Y조(마무리조) 사원. 소원 때문에 못 그만둠", "낮고 거친 목소리, 누구에게나 공손한 존댓말. 짧게 말하다 막힌다.", ["저는… 장허운입니다."], ["…압니다.", "소원권이 필요합니다. 그만둘 수 없습니다.", "죽은 사람을… 되살릴 수 있습니까.", "오늘 많이 도움받았습니다. 꼭 갚겠습니다."], ["favor", "hint", "join", "leave"]),
+    hoyuwon: dd("hoyuwon", "호유원", "Ho Yu-won", "여우", "이사. 웃는 상담사", "부드럽고 공손한 해요체, 누구에게나 「~님」, 조금 지나치게 기뻐한다. 아홉 번 대답하게 하려 한다.", ["어머, 이런 우연이 다 있네요."], ["이건 명백한 승낙이고 통화 기록에 남아요. 환영합니다!", "실수하지 않으시게 미리 준비해 뒀어요.", "참 신기한 우연이죠?", "부끄럽고 무서워라."], ["favor", "hint", "hostile", "leave"])
+  };
+  DAYDREAM_NPCS.goyoungeun.gifts = ["bandage"];
+  var FAKE_NPCS = {
+    leedohyeong: d({ id: "leedohyeong", name: "이도형", sheet: "이도형", group: "fake", color: "#444b55", photo: "Lee Do-hyeong", role: "가짜 관리국 검객 부서 부장. 최강의 개인 전투원.", speech: "건들건들 오만한 반말, 명령은 한 단어와 턱짓.", effects: ["favor", "hint", "hostile", "leave"], greet: ["어, 다들 수고. 신입 왔다며?"], lines: ["들어가.", "감각을 깨워야 돼. 여기서 베면 죽는다, 그 감각.", "나머지는 다 엑스트라야.", "귀찮게 하네."] }),
+    kwakseongju: d({ id: "kwakseongju", name: "곽성주", sheet: "곽성주", group: "fake", color: "#5a4a3a", photo: "Kwak Seong-ju", role: "가짜 관리국 과장. 최전방 중돌격 담당.", speech: "연병장 고함, 욕설 섞인 반말. 명령·농담·객기가 같은 음량.", effects: ["favor", "hint", "hostile", "leave"], greet: ["닥쳐, 이 자식아! 후퇴는 없다!"], lines: ["인류를 위해 목숨 바쳐라! 난 여기서 죽기로 했다!", "날 방패로 써도 좋으니 버텨!", "맛만 봐, 맛만.", "어이, 거기! 쏘지 마! 지켜보기만 해!"] })
+  };
+  var FACTION_NPCS = {
+    blaret: d({ id: "blaret", name: "블라렛", sheet: "블라렛", group: "faction", color: "#e8e2d0", photo: "Blaret", role: "교황청 특급 수녀. 진조 흡혈귀를 쫓아 한국에 파견.", speech: "장난스럽고 판매원처럼 밝은 반말 섞인 존댓말, 상대를 찔러 본다. 전투에선 심판하듯 차갑게.", effects: ["favor", "hint", "join", "hostile", "leave", "trade"], greet: ["반가워요. 교황청 특급 수녀 블라렛. 흡혈귀 퇴치 건으로 한국에 왔어요."], lines: ["어때요? 그쪽 일 접고 우리 쪽으로 개종하는 거.", "내가 말하면 그쪽도 말하는 거예요. 숨기기 없기.", "재밌는 거 볼래요? …찰칵.", "흡혈귀 사냥이라면 그쪽보다 전문이죠."] }),
+    saladin: d({ id: "saladin", name: "살라딘", sheet: "살라딘", group: "faction", color: "#2f6b4f", photo: "Saladin", role: "이슬람 성전대 한국 최고 전사. 이태원 성원이 거점.", speech: "우렁차고 고풍스러운 하오체. 아군에겐 따뜻하고 적에겐 쇠 같다. 「형제여!」", effects: ["favor", "hint", "join", "hostile", "leave"], greet: ["형제여! 날 따르시오!"], lines: ["그렇게 부르시오! 하하! 기분이 아주 좋소!", "형제여! 이교도의 말에 귀 기울이지 마시오!", "지금은 동맹이나 잠시뿐이오!", "사악한 신은 여기서 불탈 것이오!"] }),
+    avensha: d({ id: "avensha", name: "아벤샤", sheet: "아벤샤", group: "faction", color: "#6a2c70", photo: "Avensha", role: "발푸르기스 협회 십대 마녀 중 하나.", speech: "격식 있고 화려한 존댓말, 윗 마법사에게 한껏 자신을 낮추는 아첨. 감탄하면 비명.", effects: ["favor", "hint", "trade", "hostile", "leave"], greet: ["어머나! 이런 곳에서 뵙다니요!"], lines: ["땅을 기는 미천한 애벌레의 생애 최고의 은총이에요!", "실력을 증명할 수 있어 기뻐요!", "이번 산책에 심장을 꽤 거뒀어요.", "차를 마시며 감상할 수 있지요. 그 정도 안목은 있답니다."] })
+  };
+  var ENTITY_NPCS = {
+    brownie: d({ id: "brownie", name: "브라우니", sheet: "브라우니", group: "entity", color: "#8a5a2b", photo: "Brownie", role: "「브라우니의 화요 퀴즈쇼」 진행자이자 주인인 괴이 존재. 손님 대접과 예의를 지키면 거래·통과, 무례하거나 형식을 어기면 퀴즈쇼 무대가 열린다.", speech: "황금기 방송 진행자처럼 따뜻하고 끝없이 밝은 말투, 상대를 「친구」. 박수·드럼 소리 흉내. 역겨우면 잠깐 목소리가 일그러진다.", effects: ["favor", "trade", "hint", "hostile", "leave", "gift"], gifts: ["medkit"], greet: ["자, 친구! 오늘의 손님을 소개합니다! 박수!", "그냥 브라우니라고 불러 줘! 친구끼리 호칭은 오글거리잖아!"], lines: ["맞혀 볼까? …정답!", "복잡한 서명 절차는 우리 스타일이 아니지. 악수 한 번이면 돼!", "아쉽지만 화난 스폰서들이 오기 전에 헤어져야 해! 내일 또 만나!", "친구, 밥은 먹고 다니는 거야?"], never: ["방송 형식을 스스로 깨지 않는다"] }),
+    aesthete: d({ id: "aesthete", name: "탐미주의", sheet: "탐미주의", group: "entity", color: "#b23a48", photo: "Aestheticism", role: "살아 있는 것을 작품으로 만드는 예측 불가능한 괴이 예술가. 흥정과 대답이 마음에 들면 놓아주고, 아니면 작품으로 삼으려 한다.", speech: "오랜 친구처럼 따뜻한 말투. 먹잇감에겐 다정하게, 작품에겐 부모처럼.", effects: ["favor", "hint", "hostile", "leave"], greet: ["멀리 못 갔구나, 응?"], lines: ["살아 있는 건 다 목표가 있어. 네 목표는 뭐야?", "넌 내 걸작이 될 거야.", "창작자가 자기 작품을 잊는 거 본 적 있어?", "뻔뻔한 아이네. 나랑 흥정하려고?"] })
+  };
+  var ROSTER2 = { ...AGENT_NPCS, ...HQ_NPCS, ...MERCHANT_NPCS, ...DAYDREAM_NPCS, ...FAKE_NPCS, ...FACTION_NPCS, ...ENTITY_NPCS };
+  var NPC_BY_NAME = Object.fromEntries(Object.values(ROSTER2).map((n) => [n.name, n.id]));
+  var SPOT_NPC = { 잼트리: "jaemtri", 콘쥬스: "konjyuce", 데쥬레: "dejure", 고그니쟈: "gognija", 부장: "jyaldi", 동료: "dejure" };
+
+  // src/game/world/fieldSave.ts
+  function parseWorldSave(o) {
+    if (!o || typeof o !== "object") return void 0;
+    const s = o;
+    if (s.v !== 1 || !s.needs || typeof s.needs !== "object") return void 0;
+    const needs = {};
+    for (const [k, v] of Object.entries(s.needs)) {
+      if (!v || typeof v !== "object") continue;
+      const n = {};
+      for (const [nk, nv] of Object.entries(v)) if (typeof nv === "number" && Number.isFinite(nv)) n[nk] = Math.max(0, Math.min(100, nv));
+      needs[k] = n;
+    }
+    const str = (l) => Array.isArray(l) ? l.filter((x) => typeof x === "string") : [];
+    const p = s.player && typeof s.player === "object" && typeof s.player.scene === "string" && typeof s.player.x === "number" ? { scene: s.player.scene, x: s.player.x, ...typeof s.player.y === "number" ? { y: s.player.y } : {} } : void 0;
+    return { v: 1, clock: typeof s.clock === "number" ? s.clock : null, needs, follow: str(s.follow), ...p ? { player: p } : {}, ...str(s.nude).length ? { nude: str(s.nude) } : {} };
+  }
+
+  // src/game/world/fieldShop.ts
+  var FIELD_ITEMS = {
+    onigiri: { id: "onigiri", name: "삼각김밥", kind: "food", price: 1200, desc: "체력 5% 회복", heal: 0.05, verb: "먹었다" },
+    sandwich: { id: "sandwich", name: "샌드위치", kind: "food", price: 3500, desc: "체력 10% 회복", heal: 0.1, verb: "먹었다" },
+    lunchbox: { id: "lunchbox", name: "편의점 도시락", kind: "food", price: 5500, desc: "체력 15% 회복", heal: 0.15, verb: "먹었다" },
+    tteokbokki: { id: "tteokbokki", name: "떡볶이", kind: "food", price: 4e3, desc: "체력 12% 회복", heal: 0.12, verb: "먹었다" },
+    coffee: { id: "coffee", name: "편의점 커피", kind: "drink", price: 1500, desc: "체력 3% 회복", heal: 0.03, verb: "마셨다" },
+    energy: { id: "energy", name: "에너지 음료", kind: "drink", price: 2500, desc: "체력 3% 회복. 출동에 가져가면 능력 자원 회복", heal: 0.03, verb: "마셨다", run: "energy" },
+    soju: { id: "soju", name: "소주", kind: "drink", price: 2e3, desc: "한 병", verb: "마셨다" },
+    bandage: { id: "bandage", name: "붕대", kind: "med", price: 3e3, desc: "체력 10% 회복. 출동에 가져가면 출혈을 멎게 함", heal: 0.1, verb: "감았다", run: "bandage" },
+    firstaid: { id: "firstaid", name: "구급상자", kind: "med", price: 12e3, desc: "체력 25% 회복", heal: 0.25, verb: "썼다" },
+    painkiller: { id: "painkiller", name: "진통제", kind: "med", price: 4e3, desc: "출동에 가져가면 두통을 멎게 함", verb: "먹었다", run: "painkiller" },
+    snack: { id: "snack", name: "과자", kind: "gift", price: 1800, desc: "선물하기 좋다", verb: "먹었다", heal: 0.02 },
+    flowers: { id: "flowers", name: "꽃다발", kind: "gift", price: 25e3, desc: "선물하기 좋다" },
+    cigarettes: { id: "cigarettes", name: "담배", kind: "gift", price: 4500, desc: "한 갑" },
+    umbrella: { id: "umbrella", name: "우산", kind: "misc", price: 7e3, desc: "비 오는 날에" }
+  };
+  var SHOPS = {
+    cvs: {
+      id: "cvs",
+      name: "편의점",
+      keeper: "편의점 점원",
+      hours: [0, 24],
+      mult: 1,
+      buyRate: 0,
+      restock: 360,
+      stock: { onigiri: 8, sandwich: 5, lunchbox: 4, coffee: 10, energy: 6, soju: 6, bandage: 4, painkiller: 4, snack: 8, cigarettes: 6, umbrella: 3 },
+      greet: "어서 오세요."
+    },
+    market: {
+      id: "market",
+      name: "시장 노점",
+      keeper: "상인",
+      hours: [6, 19],
+      mult: 0.85,
+      buyRate: 0.4,
+      buys: ["food", "gift", "misc"],
+      restock: 1440,
+      haggle: true,
+      lateSale: { from: 17, mult: 0.7 },
+      stock: { tteokbokki: 6, onigiri: 6, snack: 10, flowers: 3, umbrella: 4, firstaid: 2 },
+      greet: "골라 봐요, 싸게 줄게."
+    }
+  };
+  var BAG_SLOTS = 8;
+  var emptyState = () => ({ bag: {}, shops: {} });
+  function parseState(text) {
+    if (!text) return emptyState();
+    try {
+      const o = JSON.parse(text);
+      const bag = {};
+      for (const [k, v] of Object.entries(o.bag ?? {})) if (FIELD_ITEMS[k] && Number.isInteger(v) && v > 0) bag[k] = Math.min(99, v);
+      const shops = {};
+      for (const [k, v] of Object.entries(o.shops ?? {})) if (SHOPS[k] && v && typeof v === "object") shops[k] = { stock: { ...v.stock ?? {} }, at: typeof v.at === "number" ? v.at : null, haggleFail: v.haggleFail, haggleDay: v.haggleDay };
+      const gifts = {};
+      for (const [k, v] of Object.entries(o.gifts ?? {})) if (typeof v === "number") gifts[k] = v;
+      const world = parseWorldSave(o.world);
+      return { bag, shops, ...Object.keys(gifts).length ? { gifts } : {}, ...world ? { world } : {} };
+    } catch {
+      return emptyState();
+    }
+  }
+  var bagUsed = (s) => Object.keys(s.bag).length;
+  var canAdd = (s, id) => !!s.bag[id] || bagUsed(s) < BAG_SLOTS;
+  function addBag(s, id, n = 1) {
+    if (!FIELD_ITEMS[id] || n <= 0 || !canAdd(s, id)) return false;
+    s.bag[id] = Math.min(99, (s.bag[id] ?? 0) + n);
+    return true;
+  }
+  function takeBag(s, id, n = 1) {
+    if ((s.bag[id] ?? 0) < n) return false;
+    s.bag[id] -= n;
+    if (s.bag[id] <= 0) delete s.bag[id];
+    return true;
+  }
+  var giftable = (it) => it.kind === "gift" || it.kind === "food" || it.kind === "drink";
+  function give(s, id, who, day) {
+    if (!FIELD_ITEMS[id] || !giftable(FIELD_ITEMS[id]) || !takeBag(s, id)) return { ok: false, counts: false };
+    const g = s.gifts ?? (s.gifts = {});
+    const counts = g[who] !== day;
+    g[who] = day;
+    return { ok: true, counts };
+  }
+  var isOpen = (shop, hour) => {
+    if (hour === null) return true;
+    const [a, b] = shop.hours;
+    const h = (hour % 24 + 24) % 24;
+    return a <= b ? h >= a && h < b : h >= a || h < b;
+  };
+  function stockOf(s, shop, minute) {
+    const cur = s.shops[shop.id] ?? (s.shops[shop.id] = { stock: { ...shop.stock }, at: minute });
+    if (minute !== null && cur.at !== null && minute > cur.at) {
+      const frac = Math.min(1, (minute - cur.at) / shop.restock);
+      for (const [id, max] of Object.entries(shop.stock)) {
+        const have = cur.stock[id] ?? 0;
+        cur.stock[id] = frac >= 1 ? max : Math.min(max, have + Math.floor((max - have) * frac));
+      }
+      cur.at = minute;
+    } else if (cur.at === null) cur.at = minute;
+    for (const id of Object.keys(shop.stock)) if (cur.stock[id] === void 0) cur.stock[id] = shop.stock[id];
+    return cur.stock;
+  }
+  var REP_MULT = { friendly: 0.85, warm: 0.95, neutral: 1, wary: 1.2, hostile: Infinity };
+  function priceOf(item, shop, c) {
+    const rep3 = REP_MULT[c.rep ?? "neutral"];
+    if (!Number.isFinite(rep3)) return null;
+    const late = shop.lateSale && c.hour !== null && c.hour >= shop.lateSale.from && item.kind === "food" ? shop.lateSale.mult : 1;
+    return Math.max(100, Math.round(item.price * shop.mult * rep3 * late / 100) * 100);
+  }
+  function sellPriceOf(item, shop, c) {
+    if (!shop.buyRate || !shop.buys?.includes(item.kind)) return null;
+    const rep3 = REP_MULT[c.rep ?? "neutral"];
+    if (!Number.isFinite(rep3)) return null;
+    return Math.max(100, Math.round(item.price * shop.buyRate / rep3 / 100) * 100);
+  }
+  function haggle(s, shop, day, rng3, social = 0.5) {
+    if (!shop.haggle) return 0;
+    const st = s.shops[shop.id] ?? (s.shops[shop.id] = { stock: { ...shop.stock }, at: null });
+    if (st.haggleDay !== day) st.haggleDay = day, st.haggleFail = 0;
+    if ((st.haggleFail ?? 0) >= 2) return 0;
+    if (rng3() < 0.35 + social * 0.4) return Math.round((0.05 + rng3() * 0.15) * 100) / 100;
+    st.haggleFail = (st.haggleFail ?? 0) + 1;
+    return 0;
+  }
+
+  // src/game/combat/brain.ts
+  var FULL_KIT = { heavy: true, jump: true, jumpAtk: true, skill: true, charge: true, super: true, shoot: true, dodge: true, block: true, flee: false, back: false };
+  var GRADE = {
+    F: { react: 20, defend: 0.1, drop: 0.35, routes: 1, tactic: 15, punish: 0.2 },
+    E: { react: 18, defend: 0.2, drop: 0.25, routes: 1, tactic: 12, punish: 0.3 },
+    D: { react: 15, defend: 0.35, drop: 0.15, routes: 2, tactic: 10, punish: 0.45 },
+    C: { react: 12, defend: 0.5, drop: 0.1, routes: 3, tactic: 8, punish: 0.6 },
+    B: { react: 10, defend: 0.65, drop: 0.06, routes: 4, tactic: 7, punish: 0.75 },
+    A: { react: 8, defend: 0.75, drop: 0.03, routes: 5, tactic: 6, punish: 0.85 },
+    S: { react: 6, defend: 0.85, drop: 0.02, routes: 5, tactic: 5, punish: 0.95 }
+  };
+  var DIFF = {
+    easy: { react: 1.5, defend: 0.5, drop: 2, punish: 0.6, melee: 2, super: "low", justDodge: null },
+    normal: { react: 1, defend: 1, drop: 1, punish: 1, melee: 3, super: "ok", justDodge: "B" },
+    hard: { react: 0.8, defend: 1.15, drop: 0.6, punish: 1.1, melee: 4, super: "combo", justDodge: "C" },
+    nightmare: { react: 0.65, defend: 1.3, drop: 0.3, punish: 1.2, melee: 5, super: "always", justDodge: "E" }
+  };
+  var ROUTES = [
+    { id: "jab", seq: ["light"], gap: 0, diff: 1 },
+    { id: "L-H stun", seq: ["light", "heavy"], gap: 7, diff: 1 },
+    { id: "LL-H launch", seq: ["light", "light", "heavy"], gap: 7, diff: 2 },
+    { id: "LLL-H blow", seq: ["light", "light", "light", "heavy"], gap: 7, diff: 3 },
+    { id: "LL-H-jump", seq: ["light", "light", "heavy", "jump", "light"], gap: 8, diff: 4 },
+    { id: "LLL-skill", seq: ["light", "light", "light", "skill"], gap: 7, diff: 5 }
+  ];
+  var WEIGHT = { light: 1, heavy: 2, skill: 2, charge: 3, super: 3 };
+  var Squad = class {
+    constructor(cap = 3) {
+      this.cap = cap;
+    }
+    used = /* @__PURE__ */ new Map();
+    borrow(target, who, w) {
+      const m = this.used.get(target) ?? this.used.set(target, /* @__PURE__ */ new Map()).get(target);
+      const total2 = [...m.entries()].filter(([k]) => k !== who).reduce((s, [, v]) => s + v, 0);
+      if (total2 + w > this.cap) return false;
+      m.set(who, w);
+      return true;
+    }
+    give(target, who) {
+      this.used.get(target)?.delete(who);
+    }
+  };
+  var FighterBrain = class {
+    constructor(id, grade, difficulty, persona, rng3, squad, squadKey = {}, kit = {}) {
+      this.id = id;
+      this.grade = grade;
+      this.difficulty = difficulty;
+      this.persona = persona;
+      this.rng = rng3;
+      this.squad = squad;
+      this.squadKey = squadKey;
+      this.kit = { ...FULL_KIT, ...kit };
+      this.g = GRADE[grade];
+      this.d = DIFF[difficulty];
+    }
+    g;
+    d;
+    strategy = "careful";
+    tactic = "대기";
+    hist = [];
+    script = [];
+    stratT = 0;
+    picked = false;
+    tacT = 0;
+    holding = /* @__PURE__ */ new Set();
+    defendT = 0;
+    /** 플레이어 버릇 (10장): 점프·회피 반격 횟수 → 대공·유인 가중 */
+    habit = { jump: 0, attack: 0 };
+    lastFoe = null;
+    /** 누운 뒤 일어나기까지 남은 틱 (8-2: 바로 / 늦게 +10~20틱). null = 아직 안 고름 */
+    wakeT = null;
+    /** 이번 틱의 공격 간격 배수 */
+    gap = 1;
+    kit;
+    get reactTicks() {
+      return Math.max(2, Math.round(this.g.react * this.d.react));
+    }
+    chance(p) {
+      return this.rng() < p;
+    }
+    /** 한 틱 판단 */
+    tick(me, foeNow) {
+      this.hist.push(foeNow);
+      if (this.hist.length > 40) this.hist.shift();
+      const foe = this.hist[Math.max(0, this.hist.length - 1 - this.reactTicks)];
+      this.learn(foeNow);
+      this.gap = me.gap ?? 1;
+      const out = { hold: /* @__PURE__ */ new Set(), press: [], release: [] };
+      if (me.stunned) {
+        this.script = [];
+        this.squad?.give(this.squadKey, this.id);
+        if (me.lying) {
+          if (this.wakeT === null) this.wakeT = this.chance(0.5) ? 0 : 10 + Math.floor(this.rng() * 11);
+          if (this.wakeT-- <= 0) {
+            out.press.push("jump");
+            this.wakeT = null;
+          }
+        } else this.wakeT = null;
+        return this.finish(out);
+      }
+      this.wakeT = null;
+      const dx = foe.x - me.x, dist = Math.abs(dx), dy = foe.y - me.y;
+      const toward = dx > 0 ? "right" : "left";
+      const away = dx > 0 ? "left" : "right";
+      if (--this.stratT <= 0) {
+        this.stratT = 60 + Math.floor(this.rng() * 60);
+        this.strategy = this.pickStrategy(me, foe);
+      }
+      if (this.defendT > 0) {
+        this.defendT--;
+        out.hold.add("block");
+        return this.finish(out);
+      }
+      if (foe.attacking && dist < 190 && Math.abs(dy) < 50 && me.free && !this.script.length) {
+        if (this.chance(this.g.defend * this.d.defend)) {
+          this.tactic = "방어";
+          if (me.guard > 35 && this.kit.block && (this.chance(0.65) || !this.kit.dodge)) this.defendT = 8 + Math.floor(this.rng() * 10);
+          else if (this.kit.dodge) out.press.push("dodge");
+          return this.finish(out);
+        }
+      }
+      if (this.script.length) return this.runScript(out);
+      if (--this.tacT > 0) {
+        this.align(out, dy, dist);
+        return this.finish(out);
+      }
+      this.tacT = Math.round((this.g.tactic + Math.floor(this.rng() * 4)) * this.gap);
+      this.chooseTactic(me, foe, dist, dy, toward, away, out);
+      return this.finish(out);
+    }
+    learn(foe) {
+      const l = this.lastFoe;
+      if (l && !l.air && foe.air) this.habit.jump++;
+      if (l && !l.attacking && foe.attacking) this.habit.attack++;
+      this.lastFoe = foe;
+    }
+    pickStrategy(me, foe) {
+      const gap = me.hp - foe.hp;
+      const p = this.persona;
+      const s = {
+        press: 40 + 30 * gap + 30 * p.aggression + (me.sp >= 100 ? 15 : 0),
+        careful: 40 - 30 * gap + 30 * p.patience,
+        zone: 20 + 40 * p.zoning,
+        rest: 0,
+        flee: 160 * (1 - p.courage) * (1 - me.hp) - 20
+        // 10-30: 용기가 낮을수록 체력이 덜 줄어도 기세가 꺾여 달아남(몹은 실제 성격 값)
+      };
+      if (this.picked) s[this.strategy] += 15;
+      this.picked = true;
+      return Object.entries(s).sort((a, b) => b[1] - a[1])[0][0];
+    }
+    /** 깊이(y) 맞추기: 상대와 같은 줄로 */
+    align(out, dy, dist) {
+      if (Math.abs(dy) > 22 && dist < 600) out.hold.add(dy > 0 ? "down" : "up");
+    }
+    plan(steps, name) {
+      if (this.gap !== 1) {
+        for (const s of steps) if (s.press) s.ticks = Math.round(s.ticks * this.gap);
+      }
+      this.script = steps;
+      this.tactic = name;
+    }
+    attackOk(b) {
+      const w = WEIGHT[b] ?? 0;
+      if (!w || !this.squad) return true;
+      return this.squad.borrow(this.squadKey, this.id, w);
+    }
+    chooseTactic(me, foe, dist, dy, toward, away, out) {
+      const p = this.persona;
+      this.align(out, dy, dist);
+      const sameLane = Math.abs(dy) < 40;
+      const routes = ROUTES.filter((r) => r.diff <= this.g.routes && (this.kit.heavy || !r.seq.includes("heavy")) && (this.kit.jump || !r.seq.includes("jump")) && (this.kit.skill || !r.seq.includes("skill")));
+      const route = () => routes[Math.floor(this.rng() * routes.length)];
+      const combo = (r = route()) => {
+        if (!this.attackOk(r.seq.includes("heavy") ? "heavy" : "light")) return false;
+        const steps = [];
+        for (let i = 0; i < r.seq.length; i++) {
+          if (i > 0 && this.chance(this.g.drop * this.d.drop)) break;
+          steps.push({ press: r.seq[i], ticks: r.gap || 6 });
+        }
+        this.plan(steps, `콤보 ${r.id}`);
+        return true;
+      };
+      if (this.strategy === "flee") {
+        const steps = [];
+        if (this.kit.back && dist < 260) steps.push({ hold: ["back"], ticks: 20 });
+        steps.push(this.kit.flee ? { hold: ["flee", away], ticks: 60 } : { hold: [away, "run"], ticks: 30 });
+        this.plan(steps, "도망");
+        return;
+      }
+      if (this.strategy === "rest" || !this.attackOk("light") && dist < 260) {
+        this.squad?.give(this.squadKey, this.id);
+        this.plan([{ hold: [dist < 260 ? away : toward], ticks: 12 }, { ticks: 10 }], "둘러서 기다림");
+        return;
+      }
+      if (me.sp >= 100 && dist < 260 && sameLane && this.kit.super) {
+        const ok = this.d.super === "low" ? me.hp < 0.3 : true;
+        if (ok && this.attackOk("super")) return this.plan([{ press: "super", ticks: 30 }], "필살");
+      }
+      if (foe.recovering && dist < 240 && sameLane && this.chance(this.g.punish * this.d.punish)) {
+        if (dist > 130) return this.plan([{ hold: [toward, "run"], ticks: Math.ceil((dist - 110) / 14) }, { press: "light", ticks: 6 }, { press: "light", ticks: 6 }, { press: this.kit.heavy ? "heavy" : "light", ticks: 10 }], "빈틈 벌주기");
+        if (combo(routes[routes.length - 1])) {
+          this.tactic = "빈틈 벌주기 콤보";
+          return;
+        }
+      }
+      if (foe.air && dist < 230 && this.kit.heavy && this.chance(0.35 + Math.min(0.4, this.habit.jump * 0.04))) {
+        if (this.attackOk("heavy")) return this.plan([{ press: "heavy", ticks: 12 }], "대공");
+      }
+      if (foe.down) {
+        if (this.strategy === "careful") return this.plan([{ hold: [away], ticks: 10 }, { ticks: 12 }], "기상 기다림");
+        return this.plan([{ hold: [toward], ticks: Math.max(4, Math.ceil((dist - 120) / 8)) }, { ticks: 6 }], "기상 압박");
+      }
+      if (dist < 135 && sameLane) {
+        if (this.strategy !== "zone" || this.chance(0.4)) {
+          if (combo()) return;
+        }
+      }
+      if (dist < 400 && sameLane) {
+        const r = this.rng();
+        if (this.strategy === "press" && this.kit.jumpAtk && r < 0.25 + p.aggression * 0.2 && this.attackOk("light")) {
+          return this.plan([{ press: "jump", hold: [toward], ticks: 8 }, { press: "light", hold: [toward], ticks: 16 }], "점프 공격");
+        }
+        if (this.strategy === "press" && dist > 180 && r < 0.6 && this.attackOk("light")) {
+          return this.plan([{ hold: [toward, "run"], ticks: Math.ceil((dist - 140) / 14) }, { press: "light", hold: [toward, "run"], ticks: 14 }], "돌진 공격");
+        }
+        if (dist > 160 && r < 0.75 && this.kit.skill && this.attackOk("skill")) return this.plan([{ press: "skill", ticks: 24 }], "기술");
+      }
+      if (this.strategy === "zone" && dist > 300) {
+        if (this.chance(0.4) && this.kit.charge && this.attackOk("charge")) return this.plan([{ press: "charge", hold: ["charge"], ticks: 16 + Math.floor(this.rng() * 22) }, { release: "charge", ticks: 14 }], "충전기");
+        if (sameLane && this.kit.shoot) return this.plan([{ press: "shoot", ticks: 14 }], "사격 견제");
+      }
+      if (this.strategy === "careful" && dist < 230) return this.plan([{ hold: [away], ticks: 8 }, { ticks: 8 }], "거리 재기");
+      this.plan([{ hold: dist > 500 ? [toward, "run"] : [toward], ticks: 10 }], "접근");
+    }
+    runScript(out) {
+      const s = this.script[0];
+      if (s.press && !s.done) {
+        out.press.push(s.press);
+        s.done = true;
+      }
+      if (s.release && !s.rel) {
+        out.release.push(s.release);
+        s.rel = true;
+      }
+      for (const h of s.hold ?? []) out.hold.add(h);
+      if (--s.ticks <= 0) this.script.shift();
+      if (!this.script.length) this.squad?.give(this.squadKey, this.id);
+      return this.finish(out);
+    }
+    /** 눌러 둔 버튼 중 이번에 뗀 것 */
+    finish(out) {
+      for (const h of this.holding) if (!out.hold.has(h) && !out.release.includes(h)) out.release.push(h);
+      this.holding = new Set(out.hold);
+      return out;
+    }
+  };
+
+  // src/game/world/rng.ts
+  function mulberry322(seed) {
+    let a = seed >>> 0;
+    return () => {
+      a = a + 1831565813 >>> 0;
+      let t = a;
+      t = Math.imul(t ^ t >>> 15, t | 1);
+      t ^= t + Math.imul(t ^ t >>> 7, t | 61);
+      return ((t ^ t >>> 14) >>> 0) / 4294967296;
+    };
+  }
+  function hashSeed(s) {
+    let h = 2166136261;
+    for (let i = 0; i < s.length; i++) {
+      h ^= s.charCodeAt(i);
+      h = Math.imul(h, 16777619);
+    }
+    return h >>> 0;
+  }
+  var range = (r, a, b) => a + (b - a) * r();
+  var pick2 = (r, list) => list[Math.floor(r() * list.length) % list.length];
+
+  // src/game/action/fighter/ai.ts
+  var BTN = { left: "left", right: "right", up: "up", down: "down", light: "light", heavy: "heavy", block: "block", dodge: "dodge", jump: "jump", shoot: "shoot", charge: "charge", skill: "skill", super: "super", run: null, flee: "flee", back: "back" };
+  function foeSense(b) {
+    const P2 = b.core?.P;
+    const mode = P2?.mode ?? b.phase ?? "ground";
+    return {
+      x: b.x,
+      y: b.y,
+      z: b.z,
+      attacking: mode === "act",
+      recovering: mode === "chain",
+      air: (P2?.z ?? b.z) > 6 || mode === "air",
+      down: mode === "down" || mode === "belly" || mode === "dead",
+      hp: b.hpMax ? b.hp / b.hpMax : 1
+    };
+  }
+  var FighterAi = class extends FighterPlayer {
+    brain;
+    pad = { held: /* @__PURE__ */ new Set(), pressed: /* @__PURE__ */ new Set(), released: /* @__PURE__ */ new Set(), mx: 0, my: 0, evade: false, run: false, downDouble: false };
+    /** side: enemy = 주인공·동행과 싸움(기본), ally = 주인공 편(동행)으로 적과 싸움 — 같은 두뇌·같은 몸 */
+    constructor(clips, art4, o) {
+      super(clips, art4);
+      const ally = o.side === "ally";
+      Object.defineProperty(this, "team", { value: ally ? "player" : "enemy", configurable: true });
+      Object.defineProperty(this, "kind", { value: ally ? "ally-char" : "ai-char", configurable: true });
+      this.allySide = ally;
+      this.label = o.label ?? `AI ${art4.cfg.name}`;
+      const has = (id) => !!art4.A[id], sk = art4.cfg.skills ?? {};
+      this.brain = new FighterBrain(o.id, o.grade, o.difficulty, o.persona, mulberry322(o.seed), o.squad, {}, {
+        heavy: has("12"),
+        jump: has("7"),
+        jumpAtk: has("7") && has("14"),
+        skill: !!sk.skill,
+        charge: !!sk.charge,
+        super: !!sk.super,
+        shoot: has("15") && art4.cfg.bal?.gun !== "none",
+        dodge: has("16"),
+        block: has("17"),
+        flee: has("36"),
+        back: has("37")
+      });
+    }
+    /** 때릴 상대: 적 편 = 주인공 + 동행(주인공 편 AI 몸), 동행 = 적 편 몸 전부 */
+    foes() {
+      const w = this.worldNow;
+      if (!w) return [];
+      if (this.allySide) return w.bodies.filter((b) => b.alive && b.team === "enemy" && b.hp > 0 && b.kind !== "bullet");
+      const out = w.player.alive ? [w.player] : [];
+      out.push(...w.bodies.filter((b) => b !== this && b.alive && b.team === "player" && b.hp > 0 && b.kind !== "bullet"));
+      if (w && perkWorld.friendlyFire && this.status.has("confuse")) out.push(...w.bodies.filter((b) => b !== this && b.alive && b.team === "enemy" && b.hp > 0 && b.kind !== "bullet"));
+      return out;
+    }
+    /** 방 안이 먼저 지친다(플레이어 퍽): 공격 간격 배수 */
+    perkGap = 1;
+    /** NPC 퍽 공격 간격 배수 (술기운 1.2) */
+    npcGap = 1;
+    /** 붙은 NPC 퍽 이름 (표시용) */
+    npcPerks = [];
+    extraFoes() {
+      return [];
+    }
+    /**
+     * 싸움에 안 나서는 동행 (반응표 combat=false, 11-01 사용자): 먼저 덤비지 않는다. 맞으면 반격(provoked).
+     * 'keep' = 피하는 인물(반응표 동료가 맞음이 피함·달아남·웅크림): 적과 거리를 둔다. 'stay' = 주인공 곁. 'attack' = 동료가 맞으면 덤빔
+     */
+    passive = null;
+    /** 맞았거나 동료가 맞아(attack) 이제 싸운다 */
+    provoked = false;
+    lastHp = -1;
+    step(world) {
+      const me = this.core.P;
+      const self = {
+        x: this.x,
+        y: this.y,
+        z: this.z,
+        face: this.dir,
+        free: ["ground", "chain", "block"].includes(me.mode),
+        air: me.mode === "air",
+        stunned: ["down", "belly", "stun"].includes(me.mode) || this.phase === "down",
+        hp: this.hp / this.hpMax,
+        sp: me.sp ?? 0,
+        guard: this.guard,
+        gap: this.status.attackGap() * this.perkGap * this.npcGap
+      };
+      if (this.passive && this.lastHp >= 0 && this.hp < this.lastHp) this.provoked = true;
+      this.lastHp = this.hp;
+      if (this.passive && !this.provoked) {
+        this.passiveStep(world);
+        return;
+      }
+      const t = this.foes().filter((b) => b.team !== this.team).sort((a, b) => Math.abs(a.x - this.x) + Math.abs(a.y - this.y) * 2 - (Math.abs(b.x - this.x) + Math.abs(b.y - this.y) * 2))[0];
+      const p = this.pad;
+      if (!t) {
+        p.pressed.clear();
+        p.released.clear();
+        p.held.clear();
+        p.mx = 0;
+        p.my = 0;
+        p.run = false;
+        p.evade = false;
+        const pl = world.player;
+        if (this.allySide && pl.alive && Math.abs(pl.x - this.x) > 160) {
+          const k = pl.x > this.x ? "right" : "left";
+          p.held.add(k);
+          p.mx = k === "right" ? 1 : -1;
+          p.run = Math.abs(pl.x - this.x) > 400;
+        }
+        if (this.allySide && pl.alive && Math.abs(pl.y - this.y) > 30) {
+          const k = pl.y > this.y ? "down" : "up";
+          p.held.add(k);
+          p.my = k === "down" ? 1 : -1;
+        }
+        this.lieStep(p, pl.x);
+        this.tick(world, p);
+        return;
+      }
+      const foe = foeSense(t);
+      if (t === world.player && perkDecoy.until > performance.now()) {
+        foe.x = perkDecoy.x;
+        foe.y = perkDecoy.y;
+        foe.attacking = false;
+      }
+      const d3 = this.brain.tick(self, foe);
+      p.pressed.clear();
+      p.released.clear();
+      const was = new Set(p.held);
+      p.held.clear();
+      for (const b of d3.hold) {
+        const k = BTN[b];
+        if (k) p.held.add(k);
+      }
+      for (const b of d3.press) {
+        const k = BTN[b];
+        if (k) {
+          p.pressed.add(k);
+          if (b === "charge" || b === "block") p.held.add(k);
+        }
+      }
+      for (const b of d3.release) {
+        const k = BTN[b];
+        if (k && was.has(k)) p.released.add(k);
+      }
+      p.run = d3.hold.has("run");
+      p.mx = p.held.has("right") ? 1 : p.held.has("left") ? -1 : 0;
+      p.my = p.held.has("down") ? 1 : p.held.has("up") ? -1 : 0;
+      p.evade = false;
+      this.lieStep(p, foe.x);
+      this.tick(world, p);
+    }
+    /** 먼저 싸우지 않는 동행: 피하는 인물은 가까운 적에게서 물러나고, 아니면 주인공 곁에 선다 */
+    passiveStep(world) {
+      const p = this.pad;
+      p.pressed.clear();
+      p.released.clear();
+      p.held.clear();
+      p.mx = 0;
+      p.my = 0;
+      p.run = false;
+      p.evade = false;
+      const pl = world.player;
+      const near2 = this.foes().sort((a, b) => Math.abs(a.x - this.x) - Math.abs(b.x - this.x))[0];
+      const hold = (k) => {
+        p.held.add(k);
+        if (k === "left" || k === "right") p.mx = k === "right" ? 1 : -1;
+        else p.my = k === "down" ? 1 : -1;
+      };
+      if (this.passive === "keep" && near2 && Math.abs(near2.x - this.x) < 260) {
+        hold(near2.x > this.x ? "left" : "right");
+        p.run = true;
+      } else if (pl.alive && Math.abs(pl.x - this.x) > 160) {
+        hold(pl.x > this.x ? "right" : "left");
+        p.run = Math.abs(pl.x - this.x) > 400;
+      }
+      if (pl.alive && Math.abs(pl.y - this.y) > 30) hold(pl.y > this.y ? "down" : "up");
+      this.lieStep(p, near2?.x ?? pl.x);
+      this.tick(world, p);
+    }
+    // 쓰러진 뒤 (두뇌는 누운 동안 아무것도 안 누름): 기상 지연이 지나면 일어난다. 체력이 낮고 겁 많으면 일어나지 않고 엎드려 기어(38) 상대 반대쪽으로 물러났다가 일어남
+    lieLag = -1;
+    crawlT = 0;
+    crawled = false;
+    lieStep(p, foeX) {
+      const P2 = this.core.P;
+      if (this.phase === "down" || P2.mode !== "down" && P2.mode !== "belly") {
+        this.lieLag = -1;
+        if (P2.mode !== "belly") this.crawled = false;
+        return;
+      }
+      p.held.clear();
+      p.pressed.clear();
+      p.released.clear();
+      p.mx = 0;
+      p.my = 0;
+      const away = foeX > this.x ? "left" : "right";
+      if (P2.mode === "belly") {
+        if ((this.crawlT -= 1 / 30) > 0) {
+          p.held.add(away);
+          p.mx = away === "right" ? 1 : -1;
+        } else p.pressed.add("up");
+        return;
+      }
+      if (this.lieLag < 0) this.lieLag = 0.2 + Math.random() * 0.7;
+      if (P2.t - (P2.downAt ?? -9) < P2.wakeDelay + (P2.wakeExtra ?? 0) + this.lieLag) return;
+      if (!this.crawled && this.core.has("38") && this.hp / this.hpMax < 0.35 && this.brain.persona.courage < 0.5) {
+        this.crawled = true;
+        this.crawlT = 1.5 + Math.random() * 2;
+        p.pressed.add(away);
+        p.held.add(away);
+        return;
+      }
+      p.pressed.add("up");
+    }
+    /** 렌더러가 몸 자리로 옮겨 놓고 부른다: 월드 좌표로 되돌려 코어가 그린다 */
+    draw(ctx) {
+      this.frameStep();
+      ctx.save();
+      ctx.translate(-this.x, -(this.y - this.z));
+      ctx.imageSmoothingEnabled = false;
+      this.core.drawBody(ctx);
+      this.core.drawFxLayer(ctx);
+      ctx.restore();
+      this.drawBar(ctx);
+    }
+    /** 머리 위 체력 막대(맞은 뒤에만), 방어막이 있으면 그 위에 흰 막대 */
+    drawBar(ctx) {
+      if (!this.alive || this.hp >= this.hpMax && this.shield >= this.shieldMax && !this.status.list.length) return;
+      const top = -this.height() - 14, w = 70;
+      ctx.fillStyle = "rgba(0,0,0,.6)";
+      ctx.fillRect(-w / 2, top, w, this.shieldMax ? 10 : 6);
+      ctx.fillStyle = "#e8c35a";
+      ctx.fillRect(-w / 2, top + (this.shieldMax ? 4 : 0), w * Math.max(0, this.hp) / this.hpMax, 6);
+      if (this.shieldMax) {
+        ctx.fillStyle = "#dfe8ee";
+        ctx.fillRect(-w / 2, top, w * this.shield / this.shieldMax, 3);
+      }
+      drawAilments(ctx, this.status.list.map((s) => STATUS[s.kind].label + (s.stacks > 1 ? s.stacks : "")), top - 4);
+      if (this.npcPerks.length) {
+        ctx.save();
+        ctx.font = "11px Galmuri11, sans-serif";
+        ctx.textAlign = "center";
+        ctx.fillStyle = "rgba(0,0,0,.7)";
+        const t = this.npcPerks.join("·");
+        ctx.fillText(t, 1, top + (this.shieldMax ? 22 : 18));
+        ctx.fillStyle = "#cfd8dc";
+        ctx.fillText(t, 0, top + (this.shieldMax ? 21 : 17));
+        ctx.restore();
+      }
+    }
+  };
+
+  // src/game/action/fighter/autoPilot.ts
+  var BTN2 = { left: "left", right: "right", up: "up", down: "down", light: "light", heavy: "heavy", block: "block", dodge: "dodge", jump: "jump", shoot: "shoot", charge: "charge", skill: "skill", super: "super", run: null, flee: null, back: null };
+  var PERSONA = { aggression: 0.55, patience: 0.55, zoning: 0.4, courage: 0.85 };
+  var MANUAL_HOLD = 30;
+  function kitOfArt(art4) {
+    const has = (id) => !!art4.A[id], sk = art4.cfg.skills ?? {};
+    return {
+      heavy: has("12"),
+      jump: has("7"),
+      jumpAtk: has("7") && has("14"),
+      skill: !!sk.skill,
+      charge: !!sk.charge,
+      super: !!sk.super,
+      shoot: has("15") && art4.cfg.bal?.gun !== "none",
+      dodge: has("16"),
+      block: has("17"),
+      flee: false,
+      back: false
+    };
+  }
+  var AutoPilot = class _AutoPilot {
+    /** 켜짐 (AUTO 버튼·O 키) */
+    on = false;
+    /** 직접 조작 중인가 (스틱 아날로그 ≠ 0) — 껍데기가 넣는다 */
+    manual = () => false;
+    brain = null;
+    brainFor = null;
+    seed;
+    /** 두뇌가 지난 틱에 누르고 있던 버튼 */
+    held = /* @__PURE__ */ new Set();
+    manualT = 0;
+    /** 시험용: 마지막으로 두뇌가 고른 전술, 그동안 섞은 버튼 수 */
+    last = { tactic: "", pressed: [], foe: false, manual: false, presses: 0, counts: {} };
+    constructor(seed = 20261029) {
+      this.seed = seed;
+    }
+    /** 싸울 상대인가: 살아 있고 체력이 남은 적 편 전투 몸. 투사체·탄·필드 행위자 대리 몸(npc)은 아니다 */
+    static isFoe(b) {
+      return b.alive && b.team === "enemy" && b.hp > 0 && !b.kind.startsWith("proj") && b.kind !== "bullet" && b.kind !== "npc";
+    }
+    /** 가장 가까운 상대 (같은 줄 우선: 세로 차이는 절반으로 센다) */
+    static foe(self, w) {
+      let best = null, bd = Infinity;
+      for (const b of w.bodies) {
+        if (!_AutoPilot.isFoe(b)) continue;
+        const d3 = Math.abs(b.x - self.x) + Math.abs(b.y - self.y) * 0.5;
+        if (d3 < bd) {
+          bd = d3;
+          best = b;
+        }
+      }
+      return best;
+    }
+    /** 싸울 상대가 있는가 (없으면 AUTO 버튼을 흐리게) */
+    static fight(w) {
+      return !!w && w.bodies.some((b) => _AutoPilot.isFoe(b));
+    }
+    /** 끄기: 쥔 버튼은 다음 apply 에서 놓인다 */
+    setOn(on) {
+      this.on = on;
+      if (!on) this.manualT = 0;
+    }
+    /** 두뇌가 쥔 버튼을 모두 놓는 Pad (자동이 멈출 때 막기·충전이 눌린 채 남지 않게) */
+    release(pad) {
+      this.last.pressed = [];
+      if (!this.held.size) return pad;
+      const released = new Set(pad.released);
+      for (const b of this.held) if (!pad.held.has(b)) released.add(b);
+      this.held.clear();
+      return { ...pad, released };
+    }
+    brainOf(self) {
+      if (!this.brain || this.brainFor !== self.art) {
+        this.brain = new FighterBrain("auto-player", "B", "normal", PERSONA, mulberry322(this.seed), void 0, {}, kitOfArt(self.art));
+        this.brainFor = self.art;
+      }
+      return this.brain;
+    }
+    /** 엔진 틱마다: 사람 입력 pad 를 받아 자동 입력을 섞은 pad 를 돌려준다 */
+    apply(self, w, pad) {
+      if (!this.on || !self.alive || self.hp <= 0) return this.release(pad);
+      const man = this.manual() || pad.mx !== 0 || pad.my !== 0;
+      if (man) this.manualT = MANUAL_HOLD;
+      else if (this.manualT > 0) this.manualT--;
+      this.last.manual = this.manualT > 0;
+      if (this.manualT > 0) return this.release(pad);
+      const foe = _AutoPilot.foe(self, w);
+      this.last.foe = !!foe;
+      if (!foe) return this.release(pad);
+      const P2 = self.core.P;
+      const me = {
+        x: self.x,
+        y: self.y,
+        z: self.z,
+        face: self.dir,
+        free: ["ground", "chain", "block"].includes(P2.mode),
+        air: P2.mode === "air",
+        stunned: ["down", "belly", "stun"].includes(P2.mode) || self.phase === "down",
+        lying: (P2.mode === "down" || P2.mode === "belly") && self.phase !== "down",
+        hp: self.hpMax ? self.hp / self.hpMax : 1,
+        sp: P2.sp ?? 0,
+        guard: self.guard
+      };
+      const brain = this.brainOf(self);
+      const d3 = brain.tick(me, foeSense(foe));
+      this.last.tactic = brain.tactic;
+      const was = this.held;
+      const now = /* @__PURE__ */ new Set();
+      const pressed = new Set(pad.pressed);
+      const released = new Set(pad.released);
+      for (const b of d3.hold) {
+        const k = BTN2[b];
+        if (k) now.add(k);
+      }
+      const auto = [];
+      for (const b of d3.press) {
+        const k = BTN2[b];
+        if (!k) continue;
+        pressed.add(k);
+        auto.push(k);
+        this.last.counts[k] = (this.last.counts[k] ?? 0) + 1;
+        if (b === "charge" || b === "block") now.add(k);
+      }
+      for (const b of d3.release) {
+        const k = BTN2[b];
+        if (k && was.has(k) && !pad.held.has(k)) released.add(k);
+      }
+      for (const k of was) if (!now.has(k) && !pad.held.has(k)) released.add(k);
+      this.held = now;
+      this.last.pressed = auto;
+      this.last.presses += auto.length;
+      const held = /* @__PURE__ */ new Set([...pad.held, ...now]);
+      const mx = held.has("right") ? 1 : held.has("left") ? -1 : 0;
+      const my = held.has("down") ? 1 : held.has("up") ? -1 : 0;
+      return { ...pad, held, pressed, released, mx, my, run: pad.run || d3.hold.has("run") };
+    }
+  };
+
+  // src/game/talk.ts
+  var FONT2 = (px) => `${px}px "${PIXEL_FONT}", "Galmuri11", sans-serif`;
+  var REACH = 150;
+  var BUBBLE_W = 340;
+  var OVERHEAR = 480;
+  var CSS = `
+.gt-bar{position:absolute;left:50%;bottom:10px;transform:translateX(-50%);width:min(92%,720px);display:none;gap:6px;align-items:center;padding:2px 4px;pointer-events:auto;z-index:46;color:#ece6d4}
+.gt-bar.gk-panel,.gt-log.gk-panel{border-width:17px;border-image-width:17px;box-shadow:none!important}
+.gt-bar[data-open]{display:flex;flex-wrap:wrap}
+.gt-to{font-size:18px;color:#ffe27a;white-space:nowrap;text-shadow:2px 2px 0 #000}
+.gt-in{flex:1;min-width:120px;font:inherit;font-size:20px;padding:2px 6px;background:none;color:#fff;outline:none;border-width:7px;border-image-width:7px;text-shadow:2px 2px 0 #000}
+.gt-in::placeholder{color:#8b8574}
+.gt-bar .gk-btn.gt-mode{min-width:3.4em;text-align:center}
+.gt-bar[data-act] .gk-btn.gt-mode{background:#3a2f4a;color:#e6c8ff;box-shadow:0 -3px 0 0 #9b7bc4,0 3px 0 0 #9b7bc4,-3px 0 0 0 #9b7bc4,3px 0 0 0 #9b7bc4,0 6px 0 0 rgba(0,0,0,.55)}
+.gt-bar[data-act] .gt-in{font-style:italic}
+.gt-in:focus,.gt-in:focus-visible{outline:none;box-shadow:none}
+/* 단추: 모서리를 한 칸 깎은 도트 단추 (kit의 메뉴 줄 판은 이 크기에서 찌그러진다) */
+.gt-bar .gk-btn,.gt-bar .gk-btn:hover,.gt-bar .gk-btn:focus-visible{font-size:18px;line-height:1;padding:6px 10px;margin:0 3px;border:0;border-image:none;background:#2b2620;color:#d8d0bc;box-shadow:0 -3px 0 0 #6e6350,0 3px 0 0 #6e6350,-3px 0 0 0 #6e6350,3px 0 0 0 #6e6350,0 6px 0 0 rgba(0,0,0,.55)}
+.gt-bar .gk-btn:hover,.gt-bar .gk-btn:focus-visible{background:#3d3428;color:#ffe27a;box-shadow:0 -3px 0 0 #c9a74a,0 3px 0 0 #c9a74a,-3px 0 0 0 #c9a74a,3px 0 0 0 #c9a74a,0 6px 0 0 rgba(0,0,0,.55);outline:none}
+.gt-bar .gk-btn:active{transform:translateY(3px);box-shadow:0 -3px 0 0 #c9a74a,0 3px 0 0 #c9a74a,-3px 0 0 0 #c9a74a,3px 0 0 0 #c9a74a}
+.gt-bar .gk-btn:disabled{opacity:.4;cursor:default}
+.gt-msg{flex-basis:100%;font-size:16px;color:#ff9a8a;text-shadow:2px 2px 0 #000}
+.gt-msg:empty{display:none}
+.gt-log{position:absolute;left:50%;bottom:84px;transform:translateX(-50%);width:min(92%,720px);max-height:45%;overflow:auto;display:none;padding:4px 8px;pointer-events:auto;z-index:46;font-size:18px;line-height:1.6;color:#ece6d4;white-space:pre-wrap;text-shadow:2px 2px 0 #000}
+.gt-log[data-open]{display:block}
+`;
+  function mountTalk(root, api, field, mobOf, world) {
+    ensureKit();
+    const st = document.createElement("style");
+    st.textContent = CSS;
+    const bar2 = document.createElement("div");
+    bar2.className = "gt-bar gk-panel gk-font";
+    bar2.setAttribute("role", "group");
+    bar2.setAttribute("aria-label", "본부 대화");
+    bar2.innerHTML = '<span class="gt-to"></span><button type="button" class="gk-btn gt-mode" data-mode aria-label="말로 보내기 (Tab: 행동으로 바꾸기)">말</button><input class="gt-in gk-slot gk-font" aria-label="할 말" placeholder="할 말" maxlength="300" autocomplete="off" enterkeyhint="send"><button type="button" class="gk-btn" data-send>말하기</button><button type="button" class="gk-btn" data-log>기록</button><button type="button" class="gk-btn" data-close aria-label="대화 닫기">닫기</button><div class="gt-msg" role="status"></div>';
+    const log = document.createElement("div");
+    log.className = "gt-log gk-panel gk-font";
+    log.setAttribute("aria-label", "이번 대화 기록");
+    root.append(st, bar2, log);
+    const to = bar2.querySelector(".gt-to");
+    const input = bar2.querySelector(".gt-in");
+    const sendBtn = bar2.querySelector("[data-send]");
+    const modeBtn = bar2.querySelector("[data-mode]");
+    let act = false;
+    const setMode = (on) => {
+      act = on;
+      bar2.toggleAttribute("data-act", on);
+      modeBtn.textContent = on ? "행동" : "말";
+      modeBtn.setAttribute("aria-label", on ? "행동으로 보내기 (Tab: 말로 바꾸기)" : "말로 보내기 (Tab: 행동으로 바꾸기)");
+      input.placeholder = on ? "할 행동 (예: 서류를 건넨다)" : "할 말";
+      input.setAttribute("aria-label", on ? "할 행동" : "할 말");
+    };
+    modeBtn.onclick = () => {
+      setMode(!act);
+      input.focus();
+    };
+    const msg = bar2.querySelector(".gt-msg");
+    let state2 = { visitor: { agentId: "", name: "" }, agents: [], turns: [] };
+    let target = "";
+    let busy = false;
+    let dead = false;
+    const bubbles = [];
+    const me = () => state2.visitor.name || "나";
+    let seen2 = { people: [], player: null };
+    const say = (who, text, pending = false, delay = 0) => {
+      for (let i = bubbles.length - 1; i >= 0; i--) if (bubbles[i].who === who) bubbles.splice(i, 1);
+      const from = performance.now() + delay;
+      bubbles.push({ who, text, pending, from, until: pending ? Infinity : from + 4e3 + [...text].length * 80 });
+    };
+    const nearby = (target2) => {
+      const p = seen2.player;
+      if (!p) return [];
+      return seen2.people.filter((q) => q.name !== target2 && Math.abs(q.x - p.x) < OVERHEAR).sort((a, b) => Math.abs(a.x - p.x) - Math.abs(b.x - p.x)).map((q) => state2.agents.find((a) => a.name === q.name && a.room)?.id ?? "").filter(Boolean);
+    };
+    const refresh = () => {
+      sendBtn.disabled = busy || !target;
+      input.disabled = busy;
+    };
+    const isMob = (k) => k.startsWith("mob:");
+    const renderLog = () => {
+      const agent = isMob(target) ? { id: mobOf?.(target)?.id } : state2.agents.find((a) => a.name === target);
+      const turns = state2.turns.filter((t) => t.agentId === agent?.id || t.extra?.some((e) => e.agentId === agent?.id)).slice(-30);
+      log.textContent = turns.length ? turns.map((t) => [t.act ? `${t.visitor || me()}: *${t.user}*` : `${t.visitor || me()}: ${t.user}`, `${t.name}: ${t.reply}`, ...(t.extra ?? []).map((e) => `${e.name}: ${e.line}`)].join("\n")).join("\n\n") : "아직 나눈 말이 없어요.";
+      log.scrollTop = log.scrollHeight;
+    };
+    async function open(name) {
+      target = name;
+      msg.textContent = "";
+      const mob = isMob(name) ? mobOf?.(name) ?? null : null;
+      to.textContent = `${mob ? mob.name : name}에게`;
+      bar2.setAttribute("data-open", "");
+      refresh();
+      const busyCell = world?.busyCell?.(name);
+      const first = busyCell ? world?.line?.(name, busyCell) : null;
+      if (first) say(name, first);
+      if (typeof matchMedia === "undefined" || !matchMedia("(pointer: coarse)").matches) input.focus();
+      try {
+        state2 = await api.state();
+        if (dead) return;
+        if (isMob(name) ? !mob || !api.sendMob : !state2.agents.some((a) => a.name === name && a.room)) msg.textContent = isMob(name) ? "지금 이 사람과는 대화할 수 없어요." : "지금 이 요원과는 대화할 수 없어요.";
+        if (log.hasAttribute("data-open")) renderLog();
+      } catch (e) {
+        if (!dead) msg.textContent = e instanceof Error ? e.message : String(e);
+      }
+    }
+    let exchanged = 0;
+    function close() {
+      if (target && exchanged > 0) window.dispatchEvent(new CustomEvent("goei:talk-closed", { detail: { name: target, exchanged } }));
+      exchanged = 0;
+      bar2.removeAttribute("data-open");
+      log.removeAttribute("data-open");
+      input.blur();
+      target = "";
+    }
+    const sendMob = async (raw) => {
+      const key = target;
+      const mob = mobOf?.(key);
+      if (busy || !mob || !api.sendMob) return;
+      const bare = raw.replace(/^\*+|\*+$/g, "").trim();
+      const text = act || /^\*/.test(raw) ? `*${bare}*` : raw;
+      if (!bare) return;
+      busy = true;
+      msg.textContent = "";
+      input.value = "";
+      say(me(), text);
+      say(key, "…", true);
+      refresh();
+      try {
+        state2 = await api.sendMob(mob, text);
+        if (dead) return;
+        exchanged++;
+        const turn = state2.turns.filter((t) => t.agentId === mob.id).at(-1);
+        say(key, turn?.reply ?? "");
+        if (turn?.tags?.length) world?.onTags?.(key, mob.name, turn.tags);
+        if (log.hasAttribute("data-open")) renderLog();
+      } catch (e) {
+        if (dead) return;
+        for (let i = bubbles.length - 1; i >= 0; i--) if (bubbles[i].who === key) bubbles.splice(i, 1);
+        const sub = world?.line?.(key, "facing.talk");
+        if (sub) say(key, sub);
+        msg.textContent = e instanceof Error ? e.message : String(e);
+        input.value = input.value || raw;
+      } finally {
+        busy = false;
+        refresh();
+        if (!dead && bar2.hasAttribute("data-open")) input.focus();
+      }
+    };
+    const send = async () => {
+      const raw = input.value.trim();
+      if (isMob(target)) return sendMob(raw);
+      const agent = state2.agents.find((a) => a.name === target && a.room);
+      if (busy || !raw || !agent) return;
+      const bare = raw.replace(/^\*+|\*+$/g, "").trim();
+      const text = act || /^\*/.test(raw) ? `*${bare}*` : raw;
+      if (!bare) return;
+      busy = true;
+      msg.textContent = "";
+      input.value = "";
+      say(me(), text);
+      say(agent.name, "…", true);
+      refresh();
+      try {
+        state2 = await api.send(agent.id, text, "aux", nearby(agent.name), world?.opts?.(agent.name) ?? {});
+        if (dead) return;
+        exchanged++;
+        const turn = state2.turns.filter((t) => t.agentId === agent.id).at(-1);
+        if (turn?.tags?.length) world?.onTags?.(agent.name, agent.name, turn.tags);
+        say(agent.name, turn?.reply ?? "");
+        let delay = 0;
+        let prev = turn?.reply ?? "";
+        for (const e of turn?.extra ?? []) {
+          delay += 900 + [...prev].length * 45;
+          say(e.name, e.line, false, delay);
+          prev = e.line;
+        }
+        if (log.hasAttribute("data-open")) renderLog();
+      } catch (e) {
+        if (dead) return;
+        for (let i = bubbles.length - 1; i >= 0; i--) if (bubbles[i].who === agent.name) bubbles.splice(i, 1);
+        const sub = world?.line?.(agent.name, "facing.talk");
+        if (sub) say(agent.name, sub);
+        msg.textContent = e instanceof Error ? e.message : String(e);
+        input.value = input.value || raw;
+      } finally {
+        busy = false;
+        refresh();
+        if (!dead && bar2.hasAttribute("data-open")) input.focus();
+      }
+    };
+    void api.state().then((v) => {
+      if (!dead && !busy) state2 = v;
+    }).catch(() => {
+    });
+    sendBtn.onclick = () => void send();
+    input.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" && !e.isComposing && e.keyCode !== 229) {
+        e.preventDefault();
+        void send();
+      }
+      if (e.key === "Tab" && !e.isComposing) {
+        e.preventDefault();
+        setMode(!act);
+      }
+      if (e.key === "Escape") close();
+    });
+    bar2.querySelector("[data-close]").onclick = close;
+    bar2.querySelector("[data-log]").onclick = () => {
+      if (log.toggleAttribute("data-open")) renderLog();
+    };
+    for (const el of [bar2, log]) for (const type of ["keydown", "keyup", "pointerdown", "pointerup"]) el.addEventListener(type, (e) => e.stopPropagation());
+    function draw(c, people, player) {
+      const now = performance.now();
+      seen2 = { people, player };
+      for (let i = bubbles.length - 1; i >= 0; i--) if (bubbles[i].until < now) bubbles.splice(i, 1);
+      const all = [...people, ...player ? [{ ...player, name: me() }] : []];
+      if (target && player && !busy) {
+        const p = people.find((q) => q.name === target);
+        if (!p || Math.abs(p.x - player.x) > REACH * 1.6) close();
+      }
+      c.save();
+      c.textAlign = "center";
+      c.textBaseline = "middle";
+      const placed = [];
+      const place = (cx, w, h, bottom) => {
+        let b = bottom;
+        for (let guard2 = 0; guard2 < 20; guard2++) {
+          const hit2 = placed.find((q) => cx - w / 2 < q.r && cx + w / 2 > q.l && b - h < q.b && b > q.t);
+          if (!hit2) break;
+          b = hit2.t - 4;
+        }
+        placed.push({ l: cx - w / 2, r: cx + w / 2, t: b - h, b });
+        return b;
+      };
+      for (const p of [...all].sort((a, b) => b.y - a.y)) {
+        const isPlayer = !!player && p.name === me() && p.x === player.x;
+        const near2 = !!player && !isPlayer && Math.abs(p.x - player.x) < REACH && Math.abs(p.y - player.y) < 80;
+        const x = Math.round(p.x);
+        c.font = FONT2(TAG_PX);
+        const label2 = p.mob ? mobOf?.(p.name)?.name ?? p.label ?? "" : p.name;
+        const speaking = bubbles.some((q) => q.who === p.name && (q.from ?? 0) <= now);
+        if (p.mob && p.name !== target && !speaking && p.rel !== "foe") continue;
+        const tw = Math.ceil(c.measureText(label2).width) + 8;
+        const tagBottom = place(x, tw, 18, Math.round(p.y + p.top));
+        if (!isPlayer) tag(c, label2, x, tagBottom - 9, near2 || p.name === target, p.rel);
+        const typing = isPlayer && !busy && bar2.hasAttribute("data-open") && document.activeElement === input && input.value.trim() !== "";
+        const b = bubbles.find((q) => q.who === p.name && (q.from ?? 0) <= now) ?? (typing ? { who: p.name, text: "", until: Infinity, pending: true } : void 0);
+        if (b) {
+          const size2 = bubbleSize(c, b, now);
+          const bottom = place(x, size2.w + 4, size2.h + 16, tagBottom - 20);
+          bubble(c, size2, x, bottom);
+        }
+      }
+      c.restore();
+    }
+    return {
+      open: (name) => void open(name),
+      /** 지금 말 상대 열쇠 (없으면 '') */
+      target: () => bar2.hasAttribute("data-open") ? target : "",
+      isOpen: () => bar2.hasAttribute("data-open"),
+      close,
+      draw,
+      dispose() {
+        dead = true;
+        st.remove();
+        bar2.remove();
+        log.remove();
+      }
+    };
+  }
+  var U = 3;
+  function pixelBox(c, x, y, w, h, fill, line2, shadow2 = true) {
+    x = Math.round(x / U) * U;
+    y = Math.round(y / U) * U;
+    w = Math.ceil(w / U) * U;
+    h = Math.ceil(h / U) * U;
+    if (shadow2) {
+      c.fillStyle = "rgba(0,0,0,.45)";
+      c.fillRect(x + U, y + h, w - U, U);
+      c.fillRect(x + w, y + U, U, h);
+    }
+    c.fillStyle = line2;
+    c.fillRect(x + U, y, w - 2 * U, h);
+    c.fillRect(x, y + U, w, h - 2 * U);
+    c.fillStyle = fill;
+    c.fillRect(x + 2 * U, y + U, w - 4 * U, h - 2 * U);
+    c.fillRect(x + U, y + 2 * U, w - 2 * U, h - 4 * U);
+    return { x, y, w, h };
+  }
+  var TAG_PX = 12;
+  var TAG_COL = { ally: ["#9fe8a8", "rgba(140,212,150,.8)"], foe: ["#ff7b66", "rgba(230,110,95,.85)"] };
+  function tag(c, name, x, y, bright, rel) {
+    c.font = FONT2(TAG_PX);
+    c.fillStyle = "rgba(0,0,0,.75)";
+    for (const [dx, dy] of [[-1, 0], [1, 0], [0, -1], [0, 1], [1, 1]]) c.fillText(name, x + dx, y + dy);
+    c.fillStyle = rel ? TAG_COL[rel][bright ? 0 : 1] : bright ? "#ece6d6" : "rgba(206,200,186,.72)";
+    c.fillText(name, x, y);
+  }
+  function wrap(c, text, max) {
+    const lines = [];
+    let cur = "";
+    for (const ch of [...text]) {
+      if (c.measureText(cur + ch).width > max && cur) {
+        const sp = cur.lastIndexOf(" ");
+        if (sp > cur.length / 2) {
+          lines.push(cur.slice(0, sp));
+          cur = cur.slice(sp + 1) + ch;
+        } else {
+          lines.push(cur);
+          cur = ch;
+        }
+      } else cur += ch;
+    }
+    if (cur) lines.push(cur);
+    return lines;
+  }
+  var LH = 30;
+  function bubbleSize(c, b, now) {
+    c.font = FONT2(22);
+    const text = b.pending ? ".".repeat(1 + Math.floor(now / 350) % 3) : b.text;
     const lines = wrap(c, text, BUBBLE_W - 28);
     const w = Math.min(BUBBLE_W, Math.max(64, ...lines.map((l) => Math.ceil(c.measureText(l).width))) + 28);
     return { lines, w, h: lines.length * LH + 20 };
@@ -3017,1332 +4259,4 @@
       this.hub.setAnalog("pad", x, y);
       set("ArrowLeft", x < -0.45);
       set("ArrowRight", x > 0.45);
-      set("ArrowUp", y < -0.45);
-      set("ArrowDown", y > 0.45);
-      for (const code of this.prev.keys()) if (!want.has(code)) want.set(code, false);
-      for (const [code, on] of want) {
-        if (on && !this.prev.get(code)) this.hub.press(code, "pad");
-        else if (!on && this.prev.get(code)) this.hub.release(code, "pad");
-        this.prev.set(code, on);
-      }
-    }
-    /** 진동 0~1, ms */
-    rumble(strength, ms) {
-      if (!this.rumbleOn) return;
-      const p = this.pad();
-      p?.vibrationActuator?.playEffect?.("dual-rumble", { duration: ms, strongMagnitude: strength, weakMagnitude: Math.min(1, strength * 1.4) })?.catch?.(() => {
-      });
-    }
-  };
-
-  // src/game/action/ui/input.ts
-  var MARK = "__goeiSynth";
-  var InputHub = class {
-    bySrc = /* @__PURE__ */ new Map([
-      ["kb", /* @__PURE__ */ new Set()],
-      ["touch", /* @__PURE__ */ new Set()],
-      ["pad", /* @__PURE__ */ new Set()]
-    ]);
-    down = /* @__PURE__ */ new Set();
-    edgeDown = /* @__PURE__ */ new Set();
-    edgeUp = /* @__PURE__ */ new Set();
-    since = /* @__PURE__ */ new Map();
-    analog = /* @__PURE__ */ new Map();
-    /** 마지막으로 쓴 입력 장치 (안내 글자 고르기용) */
-    last = "kb";
-    /** 켜면 장치별 입력을 합친 KeyboardEvent만 target에 보낸다 (키보드 원본은 차단). */
-    synth = false;
-    target = null;
-    /** 메뉴가 열려 있으면 게임 입력을 막고 메뉴가 받는다 */
-    capture = null;
-    listeners = [];
-    detach = null;
-    now = () => typeof performance !== "undefined" ? performance.now() : Date.now();
-    on(fn2) {
-      this.listeners.push(fn2);
-      return () => this.listeners = this.listeners.filter((f) => f !== fn2);
-    }
-    press(code, src) {
-      code = ALIAS[code] ?? code;
-      this.last = src;
-      if (this.capture?.(code, true, src)) return;
-      const set = this.bySrc.get(src);
-      if (set.has(code)) return;
-      set.add(code);
-      if (!this.down.has(code)) {
-        this.down.add(code);
-        this.edgeDown.add(code);
-        this.since.set(code, this.now());
-        this.emit(code, true);
-        for (const f of this.listeners) f(code, true, src);
-      }
-    }
-    release(code, src) {
-      code = ALIAS[code] ?? code;
-      const set = this.bySrc.get(src);
-      if (!set.delete(code)) {
-        this.capture?.(code, false, src);
-        return;
-      }
-      for (const s of this.bySrc.values()) if (s.has(code)) return;
-      this.down.delete(code);
-      this.edgeUp.add(code);
-      this.emit(code, false);
-      for (const f of this.listeners) f(code, false, src);
-    }
-    releaseSource(src) {
-      for (const c of [...this.bySrc.get(src)]) this.release(c, src);
-      this.analog.delete(src);
-    }
-    releaseAll() {
-      for (const s of ["kb", "touch", "pad"]) this.releaseSource(s);
-    }
-    held(code) {
-      return this.down.has(code);
-    }
-    /** 누르고 있던 시간(초). 안 누르면 0 */
-    heldFor(code) {
-      return this.down.has(code) ? (this.now() - (this.since.get(code) ?? this.now())) / 1e3 : 0;
-    }
-    pressed(code) {
-      return this.edgeDown.has(code);
-    }
-    released(code) {
-      return this.edgeUp.has(code);
-    }
-    /** 매 프레임(엔진 틱) 끝에 부른다 */
-    endFrame() {
-      this.edgeDown.clear();
-      this.edgeUp.clear();
-    }
-    setAnalog(src, x, y) {
-      if (x === 0 && y === 0) this.analog.delete(src);
-      else this.analog.set(src, { x, y });
-    }
-    /** 이동 방향 -1~1. 아날로그(스틱)가 있으면 그 값, 없으면 방향키 */
-    axis() {
-      let x = 0, y = 0;
-      for (const a of this.analog.values()) x += a.x, y += a.y;
-      if (x === 0 && y === 0) {
-        x = (this.held("ArrowRight") ? 1 : 0) - (this.held("ArrowLeft") ? 1 : 0);
-        y = (this.held("ArrowDown") ? 1 : 0) - (this.held("ArrowUp") ? 1 : 0);
-      }
-      return { x: Math.max(-1, Math.min(1, x)), y: Math.max(-1, Math.min(1, y)) };
-    }
-    emit(code, down2) {
-      if (!this.synth || !this.target || typeof KeyboardEvent === "undefined") return;
-      const ev = new KeyboardEvent(down2 ? "keydown" : "keyup", { code, key: KEY_OF[code] ?? code, bubbles: true, cancelable: true });
-      ev[MARK] = true;
-      this.target.dispatchEvent(ev);
-    }
-    /** 키보드 받기. 글 입력칸에 초점이 있으면 무시한다 */
-    attachKeyboard(el, opts = {}) {
-      this.detach?.();
-      const physical = /* @__PURE__ */ new Set();
-      const onKey = (e) => {
-        const ev = e;
-        if (ev[MARK]) return;
-        const t = ev.target;
-        const editing = t && (t.tagName === "INPUT" || t.tagName === "TEXTAREA" || t.tagName === "SELECT" || t.isContentEditable);
-        if (editing && ev.type === "keydown") return;
-        if (this.synth) ev.stopImmediatePropagation();
-        if (ev.type === "keydown") {
-          if (opts.prevent?.(ev.code) ?? true) ev.preventDefault();
-          if (ev.repeat) return;
-          physical.add(ev.code);
-          this.press(ev.code, "kb");
-        } else {
-          physical.delete(ev.code);
-          const code = ALIAS[ev.code] ?? ev.code;
-          if (![...physical].some((c) => (ALIAS[c] ?? c) === code)) this.release(code, "kb");
-        }
-      };
-      const blur = () => {
-        physical.clear();
-        this.releaseAll();
-      };
-      const vis = () => document.hidden && blur();
-      el.addEventListener("keydown", onKey);
-      el.addEventListener("keyup", onKey);
-      window.addEventListener("blur", blur);
-      document.addEventListener("visibilitychange", vis);
-      this.detach = () => {
-        el.removeEventListener("keydown", onKey);
-        el.removeEventListener("keyup", onKey);
-        window.removeEventListener("blur", blur);
-        document.removeEventListener("visibilitychange", vis);
-      };
-    }
-    dispose() {
-      this.detach?.();
-      this.releaseAll();
-    }
-  };
-
-  // src/game/action/ui/menu.ts
-  var esc = (s) => s.replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
-  var focusable = (it) => it.type !== "head" && it.type !== "html" && !(it.type === "button" && it.disabled);
-  var Menu = class {
-    constructor(layer) {
-      this.layer = layer;
-      this.el = document.createElement("div");
-      this.el.className = "mn";
-      layer.append(this.el);
-      this.el.addEventListener("click", (e) => this.click(e));
-      this.el.addEventListener("pointermove", (e) => {
-        const row = e.target.closest("[data-i]");
-        if (row && e.pointerType === "mouse") this.setFocus(Number(row.dataset.i), false);
-      });
-    }
-    stack = [];
-    focus = 0;
-    el;
-    onChange = null;
-    /** 메뉴가 열리고 닫힐 때 (터치 버튼 숨기기 등) */
-    onOpen = null;
-    /** 소리 스레드가 메뉴 이동·결정 소리를 붙일 자리 */
-    onSound = null;
-    get isOpen() {
-      return this.stack.length > 0;
-    }
-    get top() {
-      return this.stack[this.stack.length - 1] ?? null;
-    }
-    open(s) {
-      this.stack.push(s);
-      this.focus = this.first();
-      this.render();
-    }
-    replace(s) {
-      this.stack.pop();
-      this.open(s);
-    }
-    back() {
-      const s = this.top;
-      if (!s || s.noBack) return;
-      this.onSound?.("back");
-      if (s.back) s.back();
-      else this.pop();
-    }
-    pop() {
-      this.stack.pop();
-      this.focus = this.first();
-      this.render();
-    }
-    closeAll() {
-      this.stack = [];
-      this.render();
-    }
-    /** 화면 내용이 바뀌면 다시 그린다 (초점 유지) */
-    refresh() {
-      this.render();
-    }
-    first() {
-      const s = this.top;
-      if (!s) return 0;
-      const i = s.items.findIndex(focusable);
-      return Math.max(0, i);
-    }
-    setFocus(i, sound = true) {
-      if (i === this.focus) return;
-      this.focus = i;
-      if (sound) this.onSound?.("move");
-      this.el.querySelectorAll("[data-i]").forEach((r) => r.classList.toggle("f", Number(r.dataset.i) === i));
-      this.el.querySelector(`[data-i="${i}"]`)?.scrollIntoView({ block: "nearest" });
-    }
-    moveFocus(d3) {
-      const s = this.top;
-      if (!s) return;
-      const n = s.items.length;
-      let i = this.focus;
-      for (let k = 0; k < n; k++) {
-        i = (i + d3 + n) % n;
-        if (focusable(s.items[i])) return this.setFocus(i);
-      }
-    }
-    /** 키 하나를 메뉴가 먹으면 true */
-    key(code) {
-      const s = this.top;
-      if (!s) return false;
-      const it = s.items[this.focus];
-      switch (code) {
-        case "ArrowUp":
-          this.moveFocus(-1);
-          return true;
-        case "ArrowDown":
-          this.moveFocus(1);
-          return true;
-        case "ArrowLeft":
-        case "ArrowRight":
-          if (it) this.adjust(it, code === "ArrowLeft" ? -1 : 1);
-          return true;
-        case "Enter":
-        case "Space":
-        case "NumpadEnter":
-          if (it) this.activate(it);
-          return true;
-        case "Escape":
-        case "Backspace":
-          this.back();
-          return true;
-      }
-      if (s.numbered && /^Digit[1-9]$/.test(code)) {
-        const n = Number(code.slice(5)) - 1;
-        const btns = s.items.map((x, i) => [x, i]).filter(([x]) => x.type === "button");
-        const pick3 = btns[n];
-        if (pick3) this.focus = pick3[1], this.activate(pick3[0]);
-        return true;
-      }
-      return true;
-    }
-    adjust(it, d3) {
-      if (it.type === "slider") {
-        const v = Math.max(it.min, Math.min(it.max, Math.round((it.get() + d3 * it.step) / it.step) * it.step));
-        it.set(Number(v.toFixed(3)));
-      } else if (it.type === "toggle") it.set(!it.get());
-      else if (it.type === "choice") {
-        const i = it.options.findIndex(([v]) => v === it.get());
-        it.set(it.options[(i + d3 + it.options.length) % it.options.length][0]);
-      } else return;
-      this.onSound?.("move");
-      this.render();
-      this.onChange?.();
-    }
-    activate(it) {
-      if (it.type === "button") {
-        if (it.disabled) return;
-        this.onSound?.("ok");
-        it.act();
-      } else this.adjust(it, 1);
-    }
-    click(e) {
-      const t = e.target;
-      const row = t.closest("[data-i]");
-      if (t.closest("[data-back]")) return this.back();
-      if (!row) return;
-      const i = Number(row.dataset.i);
-      const it = this.top?.items[i];
-      if (!it) return;
-      this.setFocus(i, false);
-      const step2 = t.closest("[data-step]");
-      if (step2) return this.adjust(it, Number(step2.dataset.step));
-      if (it.type === "slider") {
-        const bar2 = row.querySelector(".mn-bar");
-        if (bar2 && t.closest(".mn-bar")) {
-          const r = bar2.getBoundingClientRect();
-          const k = Math.max(0, Math.min(1, (e.clientX - r.left) / r.width));
-          it.set(Number((it.min + Math.round(k * (it.max - it.min) / it.step) * it.step).toFixed(3)));
-          this.render();
-          this.onChange?.();
-        }
-        return;
-      }
-      const opt = t.closest("[data-opt]");
-      if (opt && it.type === "choice") {
-        it.set(opt.dataset.opt);
-        this.render();
-        this.onChange?.();
-        return;
-      }
-      this.activate(it);
-    }
-    render() {
-      const s = this.top;
-      this.layer.classList.toggle("menu-on", !!s);
-      this.onOpen?.(!!s);
-      if (!s) {
-        this.el.innerHTML = "";
-        this.el.className = "mn";
-        return;
-      }
-      this.el.className = `mn on gk-font mn-${s.look ?? "panel"}`;
-      let bn = 0;
-      const rows = s.items.map((it, i) => {
-        const f = i === this.focus ? " f" : "";
-        switch (it.type) {
-          case "head":
-            return `<div class="mn-head">${esc(it.label)}</div>`;
-          case "html":
-            return `<div class="mn-html">${it.html}</div>`;
-          case "button": {
-            bn++;
-            const num = s.numbered ? `<em>${bn}</em>` : "";
-            return `<button type="button" class="mn-row mn-btn gk-btn${f}${it.danger ? " danger" : ""}" data-i="${i}" ${it.disabled ? "disabled" : ""}>${num}<span>${esc(it.label)}</span>${it.sub ? `<small>${esc(it.sub)}</small>` : ""}</button>`;
-          }
-          case "toggle":
-            return `<div class="mn-row gk-btn${f}" data-i="${i}"><span>${esc(it.label)}</span><b class="mn-tog ${it.get() ? "on" : ""}"><i></i></b></div>`;
-          case "slider": {
-            const v = it.get();
-            const k = (v - it.min) / (it.max - it.min);
-            return `<div class="mn-row gk-btn${f}" data-i="${i}"><span>${esc(it.label)}</span><span class="mn-sl"><b data-step="-1">−</b><span class="mn-bar"><i style="width:${(k * 100).toFixed(1)}%"></i></span><b data-step="1">+</b><em>${esc(it.fmt ? it.fmt(v) : String(v))}</em></span></div>`;
-          }
-          case "choice":
-            return `<div class="mn-row gk-btn${f}" data-i="${i}"><span>${esc(it.label)}</span><span class="mn-ch">${it.options.map(([v, l]) => `<b data-opt="${esc(v)}" class="${v === it.get() ? "on" : ""}">${esc(l)}</b>`).join("")}</span></div>`;
-        }
-      }).join("");
-      const back = s.noBack || s.look === "title" ? "" : `<button type="button" class="mn-x" data-back aria-label="뒤로">✕</button>`;
-      const title2 = s.look === "title" ? `<div class="mn-logo"><small>관리국 괴이 탐사</small><b>${esc(s.title ?? "")}</b><span>${esc(s.sub ?? "")}</span></div>` : s.title ? `<h2>${esc(s.title)}</h2>${s.sub ? `<p class="mn-sub">${esc(s.sub)}</p>` : ""}` : "";
-      this.el.innerHTML = `<div class="mn-box${s.look === "title" ? "" : " gk-panel"}">${back}${title2}<div class="mn-list">${rows}</div></div>`;
-      this.el.querySelector(".f")?.scrollIntoView({ block: "nearest" });
-    }
-    dispose() {
-      this.el.remove();
-    }
-  };
-  function choiceScreen(menu, o, pick3) {
-    return {
-      id: "choice",
-      look: "dialog",
-      numbered: true,
-      title: o.title,
-      noBack: o.cancel === false,
-      back: () => pick3(-1),
-      items: [
-        ...o.lines?.length ? [{ type: "html", html: o.lines.map((l) => `<p>${esc(l)}</p>`).join("") }] : [],
-        ...o.options.map((label2, i) => ({ type: "button", label: label2, act: () => pick3(i) }))
-      ]
-    };
-  }
-
-  // src/game/action/ui/settings.ts
-  var DEFAULT_SETTINGS2 = {
-    crt: "off",
-    shake: 1,
-    flash: true,
-    bright: 1,
-    pixel: true,
-    charSize: 1,
-    master: 0.8,
-    music: 0.7,
-    sfx: 0.9,
-    touch: "auto",
-    touchSize: 1,
-    touchAlpha: 0.8,
-    stickRun: true,
-    lefty: false,
-    vibrate: true,
-    numbers: true,
-    talkModel: "main",
-    talkRecent: false,
-    tScene: 10,
-    tRegion: 30,
-    tTalk: 10,
-    tFight: 10,
-    tWaitShort: 30,
-    tWaitLong: 60,
-    deathMode: "perma",
-    npcKill: false
-  };
-  var KEY = "goei-game-ui:v1";
-  var localStore = {
-    load() {
-      try {
-        return localStorage.getItem(KEY);
-      } catch {
-        return null;
-      }
-    },
-    save(text) {
-      try {
-        localStorage.setItem(KEY, text);
-      } catch {
-      }
-    }
-  };
-  function parseSettings(text) {
-    const s = { ...DEFAULT_SETTINGS2 };
-    if (!text) return s;
-    try {
-      const o = JSON.parse(text);
-      if (o.crt === true) o.crt = "curved";
-      else if (o.crt === false) o.crt = "off";
-      for (const k of Object.keys(s)) {
-        const v = o[k];
-        if (v !== void 0 && typeof v === typeof s[k]) s[k] = v;
-      }
-    } catch {
-    }
-    return s;
-  }
-
-  // src/game/action/ui/mobileButtons.gen.ts
-  var BTN_SHEET = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAgAAAAEACAMAAADyTj5VAAAAq1BMVEUBAABTPSbcnDPNupxgWVWCd2f801SscyTFspKEUh770FHxsEHh0LMuMDvUjyrwrj3trj/QjiuSbkWBTRk2LRcnLTv67NIqLDwpLDgnLDwmLDvNiyp/SxlzSyMpKzsoKzomKzvsqjt8ShklKjj66c/56cy+qYa7iUCaiXZ6SRp4RxcFBgVERUkEBAQDAwMpLDsfIiv78NsCAgL0wVIBAQEAAQEAAAEAAAAAAABXCWV2AAAAOXRSTlP//////////////////////////////////////////////////////////////////////////wA6rGVAAABuaUlEQVR42u29CXvayBIurAlZcGwMhCO0mCBZAh8Dg5RoJDj//5d9tfUmicWOPfd77rVmSRw7lLrr7dq7yvvfx/P/9ON9bMEHAD6eDwB8PB8A+Hg+APDxfADg4/kAwMfzAYCP5wMAH88HAE4/Py487/rK/0eJf/k/SfxZUfliv4b54t8DQDabLRaLrPts+XnXbdhu21Q3QpZf4F2J33SXvNlaS39f6G+zc8/2XwXAbGExfLuR598BgCEpvzV/9O8BwFmwft4XAET3/w8AWMwWvSLgX9mG7SnJk/0bEqBX8Jl3eF8A9BNf0POvAmA6nU5OPtPpp3fdhk/T6ePjCdqP8GbvSnx6ZunvTvzTp0+nt33y6dM7A2CrD/gW3uTrd/18tR74Ergz4wdx+VbHfqYfIP795APfhCOR0VHZbN9M5iz4oGUZrtxerPM8Pj4ulHX0ZsJgQxvJK398bO21u3TLFHofAGhrq8WDr85rwTbgO8tOvNE2ZAuzDZcBsBAD5c2I0+ctMl75OQDQqhe0U29F3ADg0QXA134AkFp4awDwgSY996nNgK/uS+H/Hq2z8OeKEc07UnS0BY89O99mw+NikSnr8E2IE//hcz85y21TVitfvJU7RPxkFT9pc78PgMAa5D/DZfZmAMgyPM+zT1N7reGJZzSyXu7h4WFDmPxjm386tcE2Gp0k/l1tyz9IHJ4/JI6qZPqgiMOnn1n5RK37n3/+QeJvsvKHB/ucnVp5OAot7kynCIAs+/k2ABBQGe1H2+D3P2Fo4XM6ffjTk7BlZ4sBoD6aicetB//MOhcAgBeKw1MOBxI3585deYkP/IIrZwAo7KNb+ifEN33QD0sh2973MjQ/9v1+OiMx9CYA+JnROXi0jB88BD3voCAwCi35RJppk928bifE5dZKh4iPRr4BQGrzP/Ldk4AGwesx8JOB/0gGr6z8P6NQs50Yb/1SjlACOcQXs+zm5g9WvjXqFoj/VCvv3/aRfk1tEGyyPweAGBaOBpJN4IX7XTB+bfNgsdi87hSQSbWwrA7rBEbAfniQ+RE8hAnYiK+2OTD7A3cAdT+ZXt2VR2VED3M+0sKgRZyeV0KfrUkXAKXa9+5T0rZr6Qvbfp3svQSAnyyIJo8CrpB0UGk/7ReJ4RzSozeCDNlXbMQmox2cTOST+GN9GwDAhFgQoKQC/5RwYjIhi3yzeYXu2eL5n0yM1NPUAQDE+ChydgARYK38K/nDi9cIoJ/k9cxw262Vh2VZnhYBfsm2gEjfx8erZIB3lSWS8ZuQDsKXcACgDoBiS4TSGP7L//gkMP+JB7wNhgrxPI5S/AdoyXkkTOD3fIU+AADaEK+QAbh3wAYDAL+0hD9wPmFBUFo7EhCHNAAmAoDNaySfu/LcZxun74lg+X4k76ahzwDYXCLuXVZEm3++/6NRWHafKAhs9sOWkEJO85xPIu4eG6XZy0/BTFm/ztlHAKTA/jTN1+tYE458YxWYk/gP2ZEv5MKWxMZXUTq0cgv2Cf4X0y/EdHkC+X1CR5FfHNe92byUOC7dkTynuU/SCNau3sO3pW+WXYrFeBezflmmxJB1AGz+A2mf1q75EIFu9vG/1A/VNmBU4IXbQADQ22AEDy085ccGQBCg6KE/pv8rGSSpm5eefxB8zP/vSvDLs0ySBP9jANhPEBg4mJUD8e0LiYPnPWs5HXGs5T+fd3PmAmKDUkO+JYNIjixeCQCKvtzciFFJm2ABHnZguVwmiD86eaXaIwRAmggPAAGhuI/fvi1ewgVkwM039Kq+IvGQLE6fpEuZ+ImCAAIgof2JovlK8T8SdOShGFHfvuGJfhnxm69sxMLKkdsaf4nznOI/CmNcORF/kSeMP3xz812tvGTVg+vGN4hJ/8D/4yjWQoC33fJKadvRI4Vtn53NE3lnnWABAL2JTyygJarFEwAsTwzfk98xkQMK72YB4CXaEAQwAAC34funR9yFQESdIk4IyPPVPPTJ5kjT9ToUAIBtSL8kDICvxIMXHEN04AF9XxkAvm8zmlcu3E/YHCiNCSBAwN+GkjF5LQC+07YT8IXz9CDzE1wvmEHMbWWK0WkUvzQh4l9fD4CfFIWcGS0kps7SPgGwD7DN+31RFFVV7GLxzQmjMWuDKEFTgCCw4CT6VU4wZr23uAm/FPGIdhaMviiJAHk+n3YAwBwhEJMwyHNbAoCRmCSojPFzpGThKtsDrb9MEzc2XmIEwNJIAH32giBybAFfK2OpVrgm40s2t1l5j9qNBeS456Bp/dL6CQQB6wIyRP7CoN2CUzgvBQC9yEwAoGgk7YdYDPzf49vs89i2k+Upy5QCdKAO+VWudv8zNj0NxPWTLHNGQJTP5yQDUgWAmAWAPCiCyq/KELguILDh+A9G9MzK1fGP2zuQag/Uj2xdwEJAvBFyKBbXA4BXjqsx+5m0AIDbXrCa9fsd8rJEAHxfnK1U8M7GodGEH43Csq39fJKKdPyB8U9PwIQ5yIGmTtkFtHgVoDDwSQjISbgIAcr8APbY81AeVoR7yp9JrAa0wVbk+RIkQJzH8AcJ/CoiQGMgiFAfhgKBK/BHFV5InCVfx+ZVB19+IQVIDmhkKwMlBdKEiX9FSF3O0sr+iM+VG9vTMjdwgU1zbJr1fDiATa+qRMdFbctQnEIWQKdlwFkAbCjr46tgJ2j8RFNg9qdp3TQAAHj2Vd3UOWgmisf5BgKIWZ+PwnXRqQ1nsxAxmv2K93yuQduDZ4wiAPi+WsH/gHC6jHJyA8ULoB9dopHCxBfZNdlBcf/F81cWryV/kRs2Q1JlAmkhpQwCeGWQfkmIqphCYYuXAIDFKRl/MRARcozu5nhsqtV8OCx2VXUQSRG70RjyxkrZ9tN+8BkAfNcS2MKhxX9S/1VdNSt85oPhAL9ompSRaACA0EROaW14Te6fdU8v/1ECzOfAcwo25OsV8z+dz5kTqRECABW/pKjAtcQp/8fn3+96+IrRlkhWAOAfi7RCUMIbjSD2BxfXAUDEf64yXizzEQCgb/C3FZ1/2PMhPrjnuAHdQBFFSXnbv2+zFwJATLDvoe1rJI4AQABUQN2bEwIGgwEYgkVVpLGNQlZawCn2yjFTfkkXbmbi/4e8h6xRLQD4bPnl5AuSPiCnbz73bQAg/xEAsY4MbrJrAKBUcMiHbolPSS5o2R8FwW9iVCgp6SVNjsoX6BAAbsAEukg8EwMQzn9uMZRjGxT5ApujKOqqWq0FAEXt1bmLgFJvvwrIfsUazmsBgEYQa+DvVvCttAGQpKIAqgrVPwFgiACYzz9/3u/3ogUA/XhSSC2IDCBbEAy82TnbM5PYj8V/1OZGBaQBKh0yBNHZJ4fwNzxh6gAA2A/ogHdBVUEQ+Lo95wtQ8CdTK0eOEveXHOosKdYR2xsCWx0F8gXqBLQ6Czig8oh5lvo5x2fPKsAN5h4W/3zlwFPYSrfTinZ7dLgqlLe85eopmkPTVPvYAkDJXhiKgNCEJLtiwDsVgaecUmhQxcoPtjzxmfn0v6qZC/9JAhQCABECgAAJB/kYl/NzHRU8mRggdykjoJTiW8npt4QAHAUEANoBStwLAHwBAMUBonS1AmuBTySrYnFFz0Q+sgWvHNNryHzy+YKEk0/dLLz6z3gp6A9VVV17cDBTlS/VADhdKkbhfwLAVxP4jdXuaQAABOa852sLAPTstexldQUvjEFZP5FtX6Abdg0AFpiG+vp1MpnoMCRtLDsAyvwHUxRQVwyHT4SAeX08Dofwar8BCftCmQHCf7IZk4Qyq5QiOQ0Ayf4/Pobao1IGvSUD5vT8Mha/AYD8if+bpARK0hhxGFI13+PjmXAUyj5K/jxOQhH/6OomqG/wU/gj28/vUUIZYlosKOc1Hwh0jKqUuMHEKT9zOipM2z6h/QntY88hTdxtBJbQxM9/fs7zu7s7BYLBbofigTQQpUpilZoLqZpsMln0VYv2A2CBb2IBQOlWYT8BIEKrv6iANC13DYbpAAEwBwAUVRoxeWY/rAXOQWoBYHEm/fT4qCJwvnXw2RIIJOsjAMjTXPhNAAAhowOBCf1ETrsBJ0HzIDsLgIXiQakBkCTrFQEg9tXmr/kRPv9NCWIG+9HD78o32B6yAXCmYFfnntW2U2xDPWRt1VXhACCKYa+1GNjtEAIpG0RoLCh1pQDQGwjpAwAgAGXGr7DN/9TX7Af/n0/7vqg/f16tPO/YHPWZQCkYkdBMKSVEGgT+olZHJysWEX1fueaQKJtjT6KgpNwn7HUuMmDOjj8cTeA/fsmBQPZMSQJwniBKkzynei0U82dUgMrACQCWKPPYIocNzUP8J8ydx9fCbo/GuZYAaKmSKEQjgIzxr1+BwDkAfNVxN054VgdlThzpY9UGP/NDRrYfGimA2kD/jaMCQCnlEWgDXAMAFQH+ZSdfWZkb/qdNzae9KDwAwPpYGwD8BgBQTEhZZKKWUBErAGwuboPKdBsAYEQBbRsyh3M6CCSc0QCQgzFngzB5epLtInVaUuFAmlNqGhOcp/OPAoBS8Z9EAKiRRNJPEuGWswkmuWTgGABVbdhPEKhqxkeeX0HcXjmfuqrRCNCYsgAgJokDgFr9hbpWBpxyBSgQcgkAZIVzEdQv41KUyrYW9tdNY+nAPZx3r5n/Fi6QNYixKjtJROF0gMJXrhrvt4bhDxez24nahtKwHzYaxN58HVJUKWanL2dPLaEvfiNDSAJEMUIBOIE/4YsSJp5J4XZ/QJAsdNA+FgDI27fDvogAsvUqs8+pcrkoOr9yHwBAjAZQKrJvcrvIzhBvA2DfGDwpxSLMx50mjisQ2CjAp6o0AGjpukboMgD4Tb7/sh0eE15BHQMLtwAA9ud+X/22AIDbczjkqanW9SUwegEAYAoLAMSussw+1LrAcdQoMQOAHPUliYPVPOegIHjQkfJM2AT0MXpKQkOIZ9sTPNjIyr9qBbBcliIFJAHJrn5kXL1KFSVSVqwNgJoBAP/wysfjfvT97AfArlLMZ5sD/1MAWF0AwF57hQ4AsusAADa4VfdrBSHh9HvNEU/X3BJJxX5nAOChO7Beg1CoJDXAnxEDAECLoklyEgCgI8e349uwpAIc3wYAetM5Ofawnyn6ASiDxfrK84TTQVpNKgDEUj6ELMr9cIzEN2cAgCsPdQBYlfjoyFfC2S8Mf855/TsSBk3KaVGX/+vaIxsBwQMrvx1PzgPg8fEvsSm45NEGFKz86QvxnsGtAMAgiCLY2zvzEABUMJkqI/DTe+4Qe32BsEfYplCXn+qQJ24xnf6jdv5XSgkUe8X/+REBsEIAHFK2wVVOi0zCcwBA+3N8ezvGFH/pSgA2QkgK+MkS1rsCJEgSgOwMTBKuLQSAFlghQnSFAHrFDIBe6pSAJgBw4Qvl8wIV+yL/h1wOPP/GH0Nfj8UdfG+/27cBUAtD0ZYMbyfjx21vYYIBAO0WFYHEaFTI57AMeHo2AFg5AOAtsgGgXHFfzDDadro0eQ4AlAqbqPNf2lWQso8I9/VqvlqtHKtk/vffhXccgu1dA/eHrK/qQ87nL5aYthRpaAhsO07Y7HYM519CgOjuWQAgJONZIu4AqP2o0XI4JoMxDdBSmJcl+4i5eMS6cjwKyhMQoArwyeN4bMcfyyFFNrTztwJvzKvBAKqsMICI+grOQBcAVa0kAAqRUAQQ7HKv2B2H7MTz6tHVqi2tT49lY1oAoEcVxopZWFQ6m0S2CxDHp+2Ce63LKBt0w+kUMAx9nQTRAPBWHfYjADwEwHqNx3+4Ip+l9tAXpRoWVSqC/nlykgcLAYCvAdB6UI5HOi+sAeBVEef+giVKxnkSoVtIJoioD51FKM8Rxw0K2V4lAbCUIAfzGYVP6jHg2gDwPK8CU2i3m7sIKCoCQCoxtHAicnjTBQARj1lnUklNLwAcH8MFAPrMvvELqjp2rk/5CIDb23YQzuuIQQ0AsgEwmVdKFCgi+996gcFgbpTBcDioLYeFfKBUOyIxV4uVWNIFb9LPA3g5eMmJVGG4GUBtCihmYv2B0H4aFsWOv+1jhSr6Ab9/c8lA+wNOAwCJT8ahVdGxpPInU+MBBuiRQn1t/tNyd/sOAOZFkVNFmTjQWhFvupfAGH0qA8w6t2g44vM8GKx6nmHPYwMgdu7PKQAsrgZAaXK6caokwKEDACsXcKzhTM5tAKDbroAopxq2YTzu4wHGh241AHr5LxggRVw0nlB/GtZVwcDwqTgjnVNYUIKAujoIA4u4DafRpwCgMpAB4BXlYFLKpzeep0wwm/sU+G0BAL9dV6wBJISCK5902ya4AFBVdQiAg0iA1wDgGIsDz3qlDG/xuaACNAC4CJdCybEK6UeU/dHkgeE1QkC9DUaAAbJznR2sKyoVlIsirA2wnIt40DVIhQe3E/IATrE/UnIfKyJUYHZVHw/4x3I5IMoJAOArAE0EsY/WIWOBAbBpx+QVACZtALD5k4jMsaz8+X+OjjqEt9nt9oiPtfoa9IUXSgyJkkrhhLRw+5YUbTsDIH4zANTHWOVxIjIsrgTAYuECINIipAuAfUUvxkFKAEBd1ZUKyYF4OIJmrJsiZcNWyQBSAWPMybTOwdYAoOwDgMoKiOHXFIoUJyIAABWfUl8AgOYcHfsoZ++BAIAuDqYEs+4lBOKBXPcI5OJXYBJ9WOxgeWUUdJ3r0C96hFV9KCylQOap5HWwiF4DoKUCqAUAbgoFgbmSgNweAsDqzwAgBWIR2AACgJMqAC1AtFImk0e+B8OVbkqKUD1CVavVrT7DU3u1VzFl7wiA1zF4FA8cm64wJBVLRhELZEgCjLGDxMIqUsBbCLg9t+NJKKT7xD+HYJCfVVHXQmy3B9Mcs6NVxYog0Sq6JACkHMxHEZA88rNwiFP485EkAOcBdQ1QUCo4plWlnf+i8sgcPNSHyrL816uqqBoPXQL893hMxUulwnIBwCOHouzcC2o+AoDRlvDerwZAaVSAdXnMH/MzczRQBwCAAIoCsBNIF49UzZsDgBUBoPKOhyNTprjo8ElcAzj/9OeDwkNrxEi2suRtGI8XTo3URgNgHPq9LgA/FfkhCACMPVA5yhy3u8b9qDx0B2KVLMRcQKlsmJgBEAoAnG2QGBAyB8PLXAQS8EWPQBUkKfsHKdZHTIYfm6N3qAvX8QePkLhP6o8TeoQA/KRwMiEIOHeFsAZ2bAFAFZ0ARQWAL38KAOR/OLkVANgCyGu1Q5iQGW7q4SItAzgUUFWtF8BdAJbU9dFrBsO18ppqD+MFZCjWh1Q7N3SVMGGXFG2hrZuKHVMUoFToc+IALIMbExhHqwv8pDkwv1qvpEKiOmIaMk5gt7XzBj9MNoi6pkB77VjDKgxDK0cAIOt9FQfkEm+QAAoAu4JtTkz/Ar8dz3+Nvh+ynsPDUa2Kg/BjQP1NyAWyAYC6kDijsq+RvmX7hgCAvUw4ErBwCtS9Tj0EikG5jBIoQcwIwAVZEoBfoCJR6KEq8AZDnbRUBhLqAs/4IyhSgmXZD4DZWFnCRL7H/GuoBE2b3UV1OJL+97RZAvxIfUsNSBhdYqvoCSR9AACj8FFFATH8HyzBpzY3vQJ0BdArZ30PBmghrwSSoG7zBQv2C8kaCQC8VGpJQyUBNk4JxNg4gT0A+PIWAMBdvQCArQAAXSGpZbLjcGQEVFX3JRpKPoLUk9ec46FUeSx0DlUoUGRK2QeATAIxt7r5hN81/ptOpJX+VBdnUF0q232cE6R8QG7ureON1V4AsPMjHmiE4qP0KbjNK8Kin2hPBt4cQ78Sjaha51+7/2CM0FIL2IgG4wZFEZM9kQAAJm5RykYE77hVBghv+3YSgHBVTi6rgEdxhXTzD4MAkgCoB9etlwARTJqvVq85h3NRae+wafSFIY7LBAwA1xEUACD6TBMMGwB0kEy5BYXHa69pMDelUqUWAIKU0wFzSUiqUt004UPo2AAbMX/Z+4HjDwDwuQCMMnCrv1EB7vaS62jqVL1T1QuAqmmoaDIiTxhFIiEiWCbJRHzgawDwtl6ArwGwOAsArASTWJzvSAAyAr3DcLhuLffpCasgvYoAwNagOaqgIWqdDZIPDIgH5wDQrgZhAKytehuVHwW6zWCwVqGnI+44/vh8rdPBvqSkOCOQkDH06JwDVn648lLqUCNCAgGRqn5K9ChBCdQY9KXGJCyS1n2MWVWgmxq6v8FV0wiAmBLMjL5FPwDcmtMo/iMvoD76LRXg+9cAgLehLF0AkA2A6VDK9PUCAE49AWBwdAIkoAMr68rgJQCoOKC0vXBVAPOcfDFdlVd51Z4BAOcMb8yIfqbygVzfUZHzT5EAkQCuAaIAkMg9FF8EURkRW/ge7B5E3bGu2CFtWoEgpxDogLekGvUDmDBHACTnADBpAyD6IwlQHd0uIhoAiyskgJg+GgDMfwSA1wUAqUU4+BVY4CCD0S1Q5+LLly9oAcRWYQlCgLahFQtEb3iszoG2PnzjAAxUkpHomapMcAYauiYxrzzxO/ZFFOe+uSwhpWkOAJw708IDBgB7fZ0rIOAaqlB0QinhQ9Nz/tXugIXaHD9/1vWhxb40LnC/CmgBIHprAEQMgMczANhmWwSAioebmz0GAMfDoAuAFeaAa0yIoRI+art4/uX5uT5Y7C9VMFgA0BcOCTvan8wtOOYEABQBc++4MmW5IAOY4JHuKFGdIueB4Ziy9Fc3a4z46QGAlgD6bq+KCGGFCIZyg5KDeqgBaqzS7pyEuQHAvqFqWQXZwj8HgDGjry0Bqj8AQFG3rgrGJaYiLgJg8jiRinxfXXNkBHBFjFf3ib3mOBzQ1TAM0Q/U2w7BAfCOB1/6RqjbtWkvADZaAvTxP2UAqGXX8MFmT9ZVs1rPay135hR6QkW9XsdRbADApttVALBjAMETPprHfkL6iIx7dxuwGE6Vhe73JjwIGK0LbjLwAgkAb1uBxSXp4PXLAPD83AZAHJWJAkB2EgAZe8NuLzDJBidwdNPaOzTzNu7B6BkQALwWADx0DpzzH6NxnJwFQNmDgBYAwO+orENRgH82xzy0xKE4FR4hAELVrAaREMVXAcBq9bKkcCABQCsdkAERqf/2PiAAjtWKDRUdscAvQC0WpWUEOne0+o1AtDJAAgwHrwXAvmpfFi79ayQAO0NuMzjkf5RIKhZvg7UFH1XD8lUltMkHbP43WCcjFYGx3dygHwCZMQLdMFDgAoCigH9/xrAD8wSc7KL2xDXA12EPCDxB+JpvCogLwMHgswCw8wAYEUIALPFPsNkINiEABQDOQNNlxyik2pS6UKYq7ROIRs/DaHDiAGCzPQcAMn7Q66gk4+5WgpwHAJAfDkECVG5TvfgqAGQdAERczhtFqhCDyuFaAJDatSGmhD0EAGwBRYcK2wMwxeUqIdwjASYdCRC0ACCJiMMBjQJyBRv0QuemdvpYR3wrCW0GzAqrkjAtAR57DHEDAKfPhzIIpKgHQ0DA/6J9/Nfr0eiAIQIwSERUUKoSpcIx9dOkJQG25+IAqu6h2GsArNcvBICIXl/K+rUEuOQFTDQASl2XRc1gwAqGxWOKYzB0Vk/RXmUD4cVAXTN/rBUMLQDYKiA7JQEuAuDuDqyR44DTkCbsgPKAHE/A3VzxISc3Rn8k1WW9CAC6ORym9Cj+Oxq1mVF4TUWXRerq16+1uRlU0wWNBGuMg0sSwHfCH1xnzldBXwwAsIwrq5dgHL0AABNXBbjlWDVAvO0HgOnjSZp0SBcDNQLghy0JkCQaAOM/B0B9PNR4NY7iDroIg7LwTZGC5y4AwJieVRUIXgBnA88DIGALoPVIkOh46AIAnYIUowVN/euXLphssFIw1m0u+iXAxgWAteF4HZgsiecv1wIg8O8IALWWAOzHIwDCywDYigTQt9+5zwr6wHQdDITfgC8kWu/x5YvOk9O1EPUuzTGna2Gm0VKSvkIC0LVg2wZQsGv4HjZXoavCvAIjUliDwHf45O5KnMZtAPREAh9tCYDnlRCwNGlhuat8PPz9d/v8Y+QPBUSS5CoMDsZotdc9RbjI8IwEkGoA4ZaCQKECKs/XAAAOO98RaY5Omw42Ai9lA8UN5Ii4ufLOTRKWFAaEw0X2/mBolUSyu6srQQYKA8ejEwJI2Aa8TgL4fXEAHQRWiR9qSXKsBlaIiJ5DU1MVlC8AmKNTFTOWlj0AwM4cWAnhSAApDMU2EaQF8JYAVyU11d9/z+2UyLw4Hg94eZri/RgfIPMUdBHe2S+px2ELAJuOBHg0UxBKLXINAL5cBQB1Sag5xq4TQJblCySAFMdzZRazn2rx0M5DLg/REJjP+yrE53xtDZNmbgioTPnSe3IOAOMzEsC5JYe6BhEA7L+7oxARlgZKdLA6YEV6DMSIcL5ep+lFALgqgBgWBINBkqiY4xygEEW73Wr+61fRCodgcUwipyb39AVdkoCBvtx+hQQgAJDfRVZAo++DvQoAsXWcpCboJRLAAQDF+Ad0V4JOuSrIc9nPX/zG+4GNp9vccUlgynG03rLQFgDaEqDZk3cpoUAlAZoGzhgCQLJD+hJtdVC3IiIfyOZYEcDmxLIXANttnw2AQn8wKBMddQzRBiz2CICq5QcAAPCaIMu6WplAiWqn3QJATxxaAKDqrxAAeEG8JuIvAEB0Z+UCVfPAyHcAsD0FgO0W68EsAAQU/17SHQWu8RpqCxeEgdycaR//OZ9OX/iPoX1elNyQWJ5XAd2KwOZY7wetcCimHUAQFXtylldzjDvqWKC6G61byCeoHUUKj8UIzFoSYNzyAqRFhJ+ECfX/BhUf7FHrsH1fVfuWO7zbV4m2dahZXdufPKcCxlIJoa/VYy1+0Xz5Qr7utQBAC3D4+bOSAKWTEBxLGv4cALo2ACsjvBBFNFYGAEPr6pQlA+ZUEq5vp5ZmVarP5nkjsHSVQIqpYLQ9XO8TjMAj+Rz7vQCACoP4rJrL8ZJZpXoIlup0L8UNBG11LZTFemI/doXnIiEw7wIsSmqqPRei7vfuNRCsCgYh0NNQvewCoCcS+OhMQpIrj/v6y5e7NSUErjMCFQCaNG73jLsCALYK8E1pJrLfayz2i9Af9mFArghV0hbAd7qMWAAYtwGgA0Ft/mOCEWOrbu4FbAwOQFPrLDAGa9FH6/XTU+11Fu/7woR+ACwmVh7U3AxfJvQFGXecAmhWuha5wARYyx04pJ3uvkHQowJOFoSU9hysdLdr6jvOCA3ahRgdADw/JyldE6+Ou91rAOAagTYCsMIdDT/3EJ4EAKYE4lZ5i6+Tiv0AWPQCAGMPXHfXCr+ugRnskeyI/0WtI5RYoFBEFwGw7VSkOgBIluqRi8JUlNIcPbVQvAXgHQ6tvKgXGQAEEk6xAglnAPAYmridAcCvfaEAMLgMAD8mADTNbhe33QAFgEW22J6rB2gDYJn+2u24DsSNASuDYD6wISA3BOMWAEsNhAS7p04kK9VTEDKyKtEwHM71RfMVKHtzBuZo5w45FAx+ybDCFISYpHg9IGrPVIjECDwBAOrQZSSA4b2Efsj7Q0nEN75WAoAa3ZDdyk4LzYtCG74SULUEwPmKoO4wPLBfdgoAz893FwCQp0lOKqBpWp1DI1sCnC8Kpdp4NZwOYZ8SALxuGYDSCOqKoLL/PGqc0hEAXO0e0yUJ2oaFk5dUN3PGI2mBzzfSoorrbrCkwkoAGgBQumVQNwf8JkugwbFBhru9k61IIF3OcO9mAPFbA4ClNAeiy6GUII6W4EFWFan/lQYAVv4XYAmYc0HNMmI9TC0IuKqIo8kcCkZJ41zT7+QCYmnLx4Jrt7+bXwmANMoFAId259hIXYsjAGTXAUDS9+muPtoW+FzfTXfuiFH8hwLBVRWnfqfCVa47kCdwDQC4EKiqdX0RgksoPj3taxMRWFOBAAMA+5UejwfMBOeRwoDTaiQYjcftFhUtACSqO9RA3X0ME64ANp7uHsug6RXRHwhHJjNaqOIHPEAiSAPRKmVIZdfOyrctAEijv1gKuXb7zxhpQ1fwzq3HXfX7APDjx2Mct3tH+yT7pBr7HAAm48eR1ac8VQCwA1/EDG0QSAqQHzwT+6jTuDhW/3CLiHEXADOuCHrE7vTYepcDgGDceXNj+GsAFNVcR4Up9M0lyWu8oQiGOgEgTFPVn8gaNRCOHjsAWCBxYA3dC/L5ahCwSwNgPQpQ/1fq3uOcbiNUNXajx/RYPbIB4NqAcrmwJKMiDMnU6EiAMa/cukwfqbQwAYBjAXfr9fo6AHi9AmCE3VfOAAB1IQ5KG3OrQsQwdyitjs7xl7yfknxrupHjqV4NhR9F7ckF+o4yAQAjMWO8D5N1r4ePsU8GbgGXH1TV73byufUmDAN0Bvi23rGp8Q1i1IbrJNWDlHQu8PGxr00Uvs2C7B8bACD/2f7DG4mNqBjqCwNfUma4qRq6lmRuiNZ1nyMYcT4ZV45+f9YmjrfDeOWqpYqpDMT2gxIMej4jAbBpMQJg31Tu7AB1uwebb4ydC5k9t4OlOJs7hKQCgOJotQTS9f4cCha7q/bwLjAo/2qv51dZsySVWIupWWB/vyJu0kHXc2JVvlU1JwHQykiD7uE7SnWx59uA2Ce4TM2sTXYqThA3F+Oxl8tStQgnA7CEY17R+ddBTzAHK2pT0Hhe7aLy2PTEAfCfpTSI2HbaVdM0E4a+mhDgR6IBuP70GgCAtUkA2GHT4I4ASKOk52roWQBYTaprFeaV4K8dD5Kv+TqAPePEzDAxZfncK4550NMjKJup7hSxTKOpfs+vQgD1SxlQqX4s9cTJMl2vfL7iqk5Bcgp91B3JXIynDmH6hjpoebreoc2/GkvPG93A06mPPnpBTyCIu+2f7o5kN2bR8+HYdYmqfcP1AE9nW8Qg+weD5+f9bt+JAVCToGsAIJ1y5E2UBNhXc7cpigKAcf0RAKB709L1gpUKUJfDL23DQrZBJcT2+8sSQN8KwtqbpilM+UK0WrXKGtIzANgqAEhRWFBKSwJU80WhzT/Q/w1KmdruhyOiEO9E1kHQN08wCJLliZVTbZTVmad0pXdRMADm5wGAOQsGAAeBYt0aizqsldcAwJLCVrvq3b7wKifT56aA0PyvuVeeSf7ZM/Sk7RlDACzhK86BzojuLCPw7ANKoK6b1OkrjhLAmWElPFhcBoBO/qP3V6ysVBeWPqNsqmvnXgDOzEEliNGG3lDwcnkKABvdnFF3Zoy0704VvRQFnT+51aE2AGhk0voOrONCD+/Vl6FQACQ+l4O053f2SADVJtIGwL4wkf65Lf9VCQAqxSJVfeWC1hBF3ze14cvwIgBCBwCH6wCAlxDRAIkskx8HxrgACE9KgI0AILQPbRQtMRBZ2eIP7Uz0/pzY9BpLf494RTLo8l+Vg4QXARDqEIwvvOc83h7zTmcBEKdhfgcA2FdY+8WTZmTMIE+cCV8EAJEBWEgTS3ucnTkDRv0LAHAzcCaEevveTZAXkg4N2WkA8EnQzcAOXSXQup0k9Ud4MCPwvFUzGT9JWQEEZJeWpj3EotupbWOIhyIDqP4P20BY2c493oGjkv1iZdVDsP+RSiebHjcQfxXiZwDw+DhSZyii3qqlXOvd7ajqhgsDdPWLdf59DAI/DXc7qsNGP9qMN+JCXN0ZJbsAgIXeBj60xAbMff22G2PNnf5g6Psn5qgHznB5CwJgAQQKAN1DaAOg9EtlgHmnAKB0Mm0E6v+CZrep6gvuC2jmDQW6HKyvU9tGDBDgAcXvkI98GdJE/+mWb1EUrBhkEyj/yF2roj7cq2qiIDgNfQOA//DtI5lGqSazR7uCYwFrlgHrFgDSMvHx/A9//cKEpKrAtXp8JqozSnvlXpcH2+2nTzyuQekjckb3VnMGCwC494OK2uKXMubW70za44owbBYsFgAFgRY9ABANVFpN6nLvVxsCw2HhUW4Kn1+/uG9Yo0a26dC7GTOBZnigeECnvTXGkWYVMvGRlABGCTjAtWeffzD/9wWXqRa1aQWGxH09L64vFUi/CXFfaYf7fFAm/ldgRACOqdL3eqpa7qZYzqCwP4GPx0ayoCEwCZBKc/Y4tk8eEad58i5xr29cIAEgNG48yYCiPnY7xPJLcAsAo+27sxZp4izfC8U34QZRi6wbixEe2L2i073X9gUx7qBqTweAehxW0FAGKNIFOCyO1cg5/nIEAGAedIMQTBxebjTyBQDJDjzgynjAq2Nd7PY4J4xVgLL78fQHZdk3W10Vl8H/RiMFgE0PcXGB/xoF7DS1AqlpAQC46wXAAHSVugyAlYmpbvCuy3H9MhwxADbtXtVe/+hEgoBdTZKmeVMfPa9VAabbQ8W6o0QLAb6WAXinxv9EmwCn/8TYBGwVh1z4xEXJckWiasuA+XCg6+64O5x0QYlsDRDYsiAS4ot2BNIlTj9D1SDwvrvdzhb/WOWQRmziYg8wNRwspeFxfh/4FQLK4L+y8lPEMzgTn2TlnQdnpFbelyfqwSXt4gUAecLxnyGefwSAlVJUb+Tz+Qfu/7xqYki2YBmgF8XzCsHGPczl0pNyAAQAXmTqz3oEgBRKwS/Cg5NzdGeKB6ERfygD2mYAww7PHh19QYrvcJ1nDKmATsBS8NOZoR1M/P7+PkQEoP9jA4DC/6hgSa7ssSIdW9SASxBYrs4JLVCG/72wcswP3N8T8TYCaPSqXx1sAKireIO8zEsBgDSn0gBQErxk4YMRyOsAsCAe3NzclDqmS73ijyBrPacCEPNAVPwaWwGMzqhhPff45ub+wjboQ6iIcxfw3Gt14UWvK4172shxBW6kb3L4xB78xs2NAGB27hAiC6Y3Nzgm1wVAQVUOWPYpuf0CIwFsaZb90s+yAoR4R+85eRgGgF65xX4CQFHUe4rBmPbR6P77LP2fi6rYRzrrogEQ47bfKO1zDQA2BID7+283N4lJ5vOgODO3am48QK7+dQem2vxnK6QEAxAAAA8ewjMAwJfFbTDlwUC88dzGvBiOM5NETSOJwA/UmGkc3VuyEQufYhM/CQBwkYD90wdYOY1HBADoSXHUGsiPjWG3rzDtyPadieD1eQFLBMC3exY/ZwZHbgR9ZaeWAn/BbvQMgJUNAC4BQAAU+x37DirzpvhxwwcPld81AGBRiK8yLaWMg2YXYo+VtNhjFwhd/UP9gePz/E+oKBj+twynuMLZqSmmbeISP2QzIK91+R3Z496x7rQRKinrbQ2aLZU7CXwIH6bwZIuzxNEGhp96eAhJBGgJ8AuHJMdqUrtFIrBDXV07kB0AcH3gQy+uHGzDjFbuNgpQzMQCwd2+QBdY3AHkPUV/WfrvY87DxTr3zl1nQ6R9ivgZAMA7h5Y6wRJ7P8LpQFh8JdfBqS2Xf57/ifJJQ3qT6RkxqLLCdAypPFjHs1O8AEx+KKfjsAu1H7nNBKmlTxBYk+atvlTIAwDA6amBLgBAXvlGAmAyYB/1VHmy62/dfnMwAM4nXawKCX33s/MrRz8YN2g6ClsAkE43CICKC+EYAKkGAArndg5IWEfECQDZtQBYKAA8PCSmnlNnlvfYBtTzKPpSqwvAraUnLQMghl+n/GSXALBYTIk2E7c6vhd4JYt6bnmYjvMl7qNntmsjUGcD5J3x/JMAeDgzuVGlBIDww/RhCgAAN3BXedgXDNVrH/8ZAI7X47tDx6mw+OFBiZ/NNQB4mFp2YGnMORpMVtd//y19EfBmxuDp6e/P2LqqSaX+xdQCUDDQZ9r3nR7lZwCALBIeUHmO71svgcE5ynoMJPxWqKlweg8SvwMAOFAKAJvzPNhkmw3TBjnMm2vSsn+P5ux7V3tH/GtzoTVmnCGLEaApL+gSAMAHJm6BMQ6fhCcONhfEzX5PUeYOAAKt//skgFSXCvqm24vEtwzTB8cTKFWTjRgbdSIAVgIAzMI8PeE1EDRQVEssPzbjnkHuPqhzdz0AyCLZEg9usrJTW0QNkLFAGseFUtKCZG+kroAmrYfZ/xMx9dA/M6lrDiEbHrKfpVXOQ7URRNSjqk9H9fPL2Yc/0hILfDCwglj+Z5eJA0Dvp2iFwoelZhS9ifMG3VvjTuLTBgAWlt5kuJhzk8OdmPCUVh649XQxp3do74saJCB4hCABvqD2p9oU7Eset60/+O9nhuh72J4ame2dAiOzAOzh0hZHYmGSR4A9epsiUnfQIil7KjsIoNa7IYi3KW7D5uI2UMkME5eOhbpviprXV6nsTqA0va8L/63hSXL+RyP0AKb3i8V5C0B1LV+wNxaUURxb86aCoAuAUgMg8luNdUQAhIC+awFAx0NWHpR2TZ19YWiP+QgNgAbUk4zotr1/EUTgftBB3rwUAJutOobaKxFb1L265N6EovNu8z4VANzQESQcbrIrAIADHTQEWqVNUWpiHBELCHUJQASA1W8Z4fETiaMVNFucV8JWUoD9sTDyucu8c9K5cZDw3zQUKrteAPh/P5EDUwb+VQBwwW8Gd8rQDpQCOXqEFV9LqIodd0DTvDGleMj+ezJ8Nif1rnfmTbIM1Qe8iTCBM4yxJJv5hWIzY1WCfUlr1iqK//CGnHCywTfXbUO2mJIcxuSsfblF9z722eSX4I9RAfb5pxFFSyCunLDF4hJxKtAkGTBlHthXezo6wCS+g5brp37zU6C/vVYCiCV4czMKfTO4Ly7t+g6wTXBUPPWl3+/S1NwkYWGB/1IEmLd9sTit/LzT70I5KhaGLATMBDLV8yuKld2D7V+Ssi3+CQBl8O3bPQcArlHCanwIH0MkHvi9T6TCPXLkI9f6IwDAYWUBPJ31pJ9ODzAH4lM6hhgL0yk9VgNY4x8stQTo1D+VRlIEP77dk/DJNleuPKOpPWrl1uRGq9sxhcbwMiRNKzTsV+aflN+FP3jfWfKdWrl3xhKz3iQorYFmFF0QSCijD/icxFb2TwMgSUIDgIVzLfasIsa7Gop46Jd9ANDMjroNBQQhy3DJAHjIshcAAP9lOXyzTPQYQZNoCvDCYKTyvKWVeFBKABGy1NDnLPs1K//prDzUbqV1W4y83ZQa0WNjZOv424c0CctvGgCzVwCAh6kvJChDPrnT70vd9DNzlXG4Ggd9YzV128dRKexV3Z99jf458hISnE7LXgD4bXPP9DaXeUdB+cAP4C57EXHUVfxXp6VTVWZHGvt8Ad+0GOToD+ueq45/Z+XoDyp73pIAkp+VJgSWAPCtFKB4szN6TgcgLwJgIQAIafpZaXcPlQaiNFaXZ+xiAyAKGbNU4HYwAgBc1ot4sNAAeOgmyPQp77Ifd4WrAij2SEYwWUGbq4lvyFhl/k9HoVtXaAcagrLHFaSrZVgBqKEPLvj2ZStfKACEiZ1lMtkPd5SHyQExbxIkTuQZANlrACDqkN03goDp+eubJtx09BPNGRWPkj8MH0QAZxei8P3xSICAxIRK/4Ql0D78PGWayw+nKvybbV7AAQsC/AGhNnJFw9uj7LoI4IslvHKxPV64ctJWD3rbtSlgRUS6ALCrSGTbHxhM52h5F0VhlsmHhWquclkam9BPU1sW0W9UX1j4+VDehAbDz7IXbQPeFlwsbOL2RB3tEfTPlwP9G4YjZiB+TPZCAJAfspDYJfaHQQcntnvnxjJNNBBjdBmU8g/eAg/VymeE/BeufIF5yW965aEEGLk4S/U8bgNA+6CGOFk+fwIAMsc2EpxQCtG3JYCuHWdnlMz+hMatluolOAaSZS/bBIU/i/iDnIQT9iCPthQLVIhL/u+lHLACAqJDwAhalmqOir7lVEY6GBUlfJmMHrNyMmcXryBOXqPa9WlY+l1rkAfM2cEffDln2y9bPpcBoCNCFFIcARxDLQLsC2T6SRQMH9TmcaXh9uXbsKEZr2ob8DCUYdBFQCSOsiZehmYbkAGvRB8iQH9OKCsvfWsCVsJ6gK+To2sQhtb5QwBkm9cQ54jQVoEY7JCQJUFStlpIWIU/YXvlmyy7aPl417yLgJHzFFgugR5Kr0ZGFtC31Ztj/uWqGMhJSSz5mQdRifjhP3uIy4xfTVyZ/yTKs1cRZwtoY32au3Lb68d2AuFPa+UM/M3JGPzlbSf2oR0nn0bEE5Poc+qQfAz6OCvn0teLK78MgI0GAEqAKcUG5U30LUY2BX28WJu0AEAZ2OzVAOCooGRop1NBX5v3VENeYuDZEDcAeM0RNBZQBwCJnf1T5h9KAAUAWTcS325ev3JSHlP12Ohr5R15E/oBsPlzAOgI9WajpQA8Dgvs6J8RQWgCcxTqdQzQG0Eeoab88PBfv+yrvnOJP6D9m2WvPYHGF9jYikBFRLrtBIH4D214TKfk9Gav5D49N7zu2ezBrPyB5oujg1W2BUBIZ8TRPNc4vt6124CAtKTbA+nDsO+x9oqDEIubPwCAXJqYzaxdePBRH19BfLHY/CkAYN3IA+sJTz4/HgwCZoyAP1j5DX0E/Hsd8dA6nez4bq6h7l2/FxyhgheaPlx+2O7LFrNXmMCnQgJ0p/fhSuLYeHLxJsRx3bSj26uJZ5f97xfYIZuN7RKceRh2FHi8Oup1NQCyGz6Is0V23TZwKCVbZG+wDTeyqisBwOnkbJbNsrdBHxsDm2sBoITWWwCAlNhmcx1xBsBi9gK/13vR2zAfSDCe2QFRGX8kfPt1gezFGQiqF3xj4j8V5YzThP3PzWajf+4Nif/YmOcc7DMxGl4k97wXHkSShOd5kCn2vzkA2CcExXIOADPmf/amxG8yWRXs8L8PAIoJbLUZdlLubTjgPrt5LwA47rkit2DZnKmvspdGXV+hFmcSYTekM/My70r8Rya6iN3LrLX0zf/ed+ks3tWyFwu95SR0X/ORrwYAxzhtNuivFu+7DaDcZ4bWImN33Xz9rsSf26izsbd4bwC0gb9wOPAvA4Dpy/a77/PeAODuAl1OUPD+nQGQ9fHfIOB9AUD2aFfuZX0X3t8VAJu2BNzYX787AM497y0Bsva6nZ14dxUwW5xY92bzbwLg4/m/5vkAwAcAPp4PAHw8HwD4eD4A8PF8AODj+QDAx/MBgI/nAwAfzwcAPp4PAHw8HwD4eD4A8PF8AODj+QDAx/MBAP1w4f2mvyLjvYtyskxX5Wx6yjPetyDxp1Sc0uqtQuXNn9xBu/pZnC4Hee31y9cCYOPW4Tn1ae9clJPNZur+g1uUyFuxfW/0naxFevdiuP+1l+2s/t8pCpW7wttNdroyLtv8wX3gi8TptpGuCz7JjPcg3nPwNqYUTR/E91r5NjMA6C5ZcSZ7XwBYkhdfYtbzIADoXuy7bANd+XHI4W7MspZQeHshtM3UxYuZvqjGbbTUQ90s3hP6ne2mC2iKthTqvx8AspkSODji7OvJh0bjyVnYvBUj+E4I/XeW+O3trbwlDkJ/S7nPS59cXLm+FflWK9dne/vpFPHv+NBIOIXIdwEAN1DEixFneTAeyzZsNm9nFWUzuu+Kn3oRAHJUF2+mB/hKHKmeyXhyeeWbl3fEOnvuSLVkZwAg1I1AWLw9AKRr4Gzx9cpny8053uaKpMjczbXElSZ4C+JbdSv6Ksrfv37VquINV769duXqGu3i7QEgKuhqAMhfeLvr4S8grrT0W2jjbfZS4ovZ7K1Wrs2ql6z8JTcUruwQQhrok03odKMCVynO/vAs/OSb1q7wu4o4T8r8I5OMba/t48tX/pVX/ici6Adfx59cufL/WFKIRgSDSbp5SwBkLQD4ai5uu1FLDwD+4CxsN30A6BvPWPrwPxcA1/VJOmeAZTzQuE1ctQZSPSL5y39aALiiOfk5ALAiaRHX3WHURHZpE5aELeIYGHgTAMj5vx3bGCxD32mRbv8+d44DmCZZtv2jJlFZNlbERwH2Sgs705n16IbEEGfD+A+08YZ9TGflZcjt4w1dMzHAT7lrjl65BEReH3ZYzG5vNedpYX7iNAcyc4qCJLe3HVZ+XXTQu0r5by0ehL4ajRTxTKTlMkqibsdcCwB/1ibOAQDPJrGYL/1aS+ndzudyiewn4pda5V4RcjQrVwsPWuOpsVuoHmwSBAYA2zcEALeJjMwcTu4Ux11D9cT2xALA9i0AgOwH3/c77efPnz+5bynjjhskUo9EngtiUIDvE/78Sw7ip8fXbcSW58mTl8vEcX/9U6N7zKDuZRL+9ZejjF8uA9D4v1X7T8SdkRCBjAzgcdV6hAW3qfwLqYtv/rqVA/sf1bbf2NsuY5jsRpF6bhoegcQm/rjdbP+wUyhGf+hNZBvUUKSgVMdfMCC/GjYES+EBvskWhcirjqB4/d+/A3F7Ik/QAwAhTxzSABg/vk4GbGcuAMzMyFKAr6dGSB/vUqaXBwnywA7OvCrsobf9BleuTawYW7JTW2Y1RcZuXg4/YBF/vGwCeRc5gFYofBq1TLY0n8N++7EYgmrpvw/yLi/umpQZExgnWYdiaegxHZrtivst8stw9N//Wu7AC4+gtv00cVm8s/Ao0PYA44DUwnKZ5+F//4sHWOzgF/t+Ivhg23Pdo9uXISypmdmE3VFTa3ymH8FZVMRx3y8R9y6+yWRCBxDHiPLBY5PX4bj1xdI5kcsl8ABgPHnFNiwUceKBZe9pJHQEwJLm9BrD3ALACxsWoeVhAKClDlIwSwd+RNa8OG7mjX2jkygpl0z8cfJaAOhttzpxSl9WGdWQojhQ76A1AYCkTBgAX/8IAFt0Q24nlulvjp176NV0OEcQIDLg//jWRhcvXnT+FXEwrcXp4vPvDGphDC5R5yD8HGDg2A4Sh+gRvkASs/FBGpisb3sMZGk0Xns4utHSURLQO1lWyEuAfyOSD4mXeiRHir8hBKjzz+RpYF9pWsjTS4T2tp+h7p1XgsoKDV27C1ujKrWPAg/ezRcIBBYCRDqUlmP8MgAw8UBNYpERPQwAVw3R7+TbZaDQgX8oJ2HxQuILsT3C1J0CqjiPy3fHY2KbegsU9AL0/pPJiwAwM5IvjHkIq+7HyyzHntw80JtRoGYYuBhY/gkAJPvMQLz58WPUmpbGM4Ei4n+EwxzlDUULuAZB+POnJQMuR2Y46T8bG+KBEfnGBCy7VkjASCiX+D3SxcvlC4lLJglWDsC5uflZLgX6HYl39iFrwCG+uH7lvO0/fvwIWaKkvuh+nGEqUlUGNcmEDpnhF1vWAHhhTJ1WfrJtsXfGC1VRKHiTwDK6eeNF6OOEHhzlmVO38ES4rjjBAHB4MLs8P0m24VEBwA/cztzqtyesUO2RJGgQKeKTx+uyA+L8s+Vj7O/ldfxHwSg6AWdWtdF3zcpx2ycGAPiBeO5zNcIWXyDPczWVzxkcZQ2zAY/AAgAV6bwQAJvHT5++i/oPbADw3Dw6//AKOMzVwzGyOU0Nc1lRslEGbxz+4nc5/SatbQD2fyfiZRC4x1+GdrPTt6TtblskBqC0XctQEb8CACbwrANvy5edfpHJOEYmQUdIE79u5Z8erbBjKRRhc0nmR/l8tZqHoT2Z0SDAniuFtii4A5waeDzpBp1RAeiHavUfWE6XNoNwkCvyHv47HPKEx8j2nsmEQ9Xjx+wFAFDEu/xXzh8gDCe5lCdNUcGh8OCaLJkNAB6C7gqXzpEXPsC/fgsA/OeJEJ9dUbVHVWcCAPb9NEVU+ijzcxwbHoZ5wiag0gKoAFI1REJAkJRpEnJE/PFkhZZ36j2m5L9/d2x/2XnN5AjnV1ZHeKV1VTfVPj4FAIyd8EmYcjvtC+H/hwek/jU0eZfO5Fb61PV6TYMdWyczXX7+bNBAfzHkWMbD4rwzgMpnOp3yEVQT4E4ffm2ItyWANToZ0xO4k/fTaXZx5Rmv/DtOi5M5BKICyoimwyf5fL2eh6QCligUNACQ/7E74A7thzAhPnIL+WsBgLUf0ykDwHcdKza+Sj7+ywjYXtWr9WrlecV+n55CAMcPUBrdTy8DgAalgPD5jrwNHBEQ6EgUIjxcrddhkCSOQU6//fyZlCS+qbgLX5kHFzwRdP8FAK7qT3oAoD0xX5nm/WBg9D3eTy8MTsLgP60ct11pNqFUkhWAoYYVbDdJAPxGThM7LTWgAFAqBJShBJROQN/rjf7CNt3ewl/7669u0F1vDJn/zXw1X6FUmu/3+2J3AgCUMgnD0dfvt7e3ZzMklIDd3iL1v/4KT0T9MdqaLCPYCN+fz/VpUyxKkxxeaZ6rPaSgJAggJH62m/aWCj1vMfsDxBOzliTpP/41mL8JO0AMBpri7js/hLoBZcB4PN6ey05z0SkFn5E4olcvKI383/Pfv0s4ET4m/ZDz+RyeMIz11C4ODotLyJOdWQsgBG5vF/1pMe9U+Q354MyDDgBE/kdo/oNNgs98jtOsC5rY2DUBAopSMw/GpOg2ZwoPgQe8Df3816JxvfIjf74KldxPDADwrUIlv8krQQ0kADiZGOBes7e3BIDSUv+9cp79n4M46Smxmh6ZmqmFhE88GN+OF+em+HHJnQYAv7zRNHMAAM2QTHgyU5LjqQvzmOkJBGwEYJoIqZegBL7Kyq8GwD//WPGf1v6TEZiQ+XcE4Y8KgJ/fRdVUaeyXbcsp4RzuMlEJktOXhxh7FLxxsm/uK/DW5DkQVWEyYPuXL2wdw0nEsxEmToYqlKLRMwBADuDKQf3kyoSwGI4LzjW5fFcB+5+fqzpWCIAHf4aVtRW5hb9DUUUivjhjfcLKpeojsex/ki2/AQHw53CiY0wOJCzlwBiIKSpkTMHYmewLoEDiauWzzZ8DgAxwlAB4/oH7YIitRQjUXlNTQMC2nWgj2Z4KKa3ESfozCQDaBtCDpwCgjD4/QRtAucSJBgA8q3muwxLojeLf0gBYZGd4oFZuQKwB4B2PdZ6n6lTuCtiA52evzv1EdAAHxXKa3m0hIPFDiwfnoa8BoOmiki8TFPgjJAOfneNnJusOAOL+JzHQvywBQDsvFt++4d/4FXZdAJUGSCP0/4Hxa3pW8rtVXTc1DpQsl4kbN2VLDdxSXCHZYrPeyuPZjIl/Nen3oC/vi7ZxCrynkAgft3wwCAUBuTqoFgKW7I+BPbzodcgo/GSIq79sSQA6702dhMR/kADNYPD8XNc6KlM0zfPz8YAA8BUA+EXYIeeV92Egk5Vz4MV3ACCfQBYfe91NXexh8fCECgH+SfbDu0gsAogvOrGIHgBk2xsBQHv/basOZ9cr/usHnIGmyVMc314uu1sID23D/bT/GFLpueKBTsB2pD9VfPCpz9Ncdgi4YACAXrNxC1S6iIkDAHob+1P0QYhzSqcDgPr5uagL4Xe+KwgARZWHoQAAfwIB4A7S84l9vPL7/hnqNyj51MoVdls2hx+nCbhd4HeBsVWkMSPAh/+dO/48WjRhAPSE4by+CsAxRYB+tQ6gtv6iCHy/Y4NiXwkA82BAoEBNxKaADsfx73kb/vln1jtbYct2sAJAX81HacmVNGFeMD9AJoI9GPbFZwkz8IuIQhrN3F/7yPmHr2XJ0USXB3U9HHz+/HlfaACg+7MnAAAbigq+ORjUx5yMwBz9NgMBo4H6LOBsYSXe2ANwAIyflqe7PTAfde0Oflcg+/GjCQHxucePQybeM8GzHwBUBferxX99+kn9N4UBgC0DKo+dgVhVLy05b4ZMSOQQ/nPbP0ySyuCuAEAPi/GMcYTMOrK+hQAc6P5VbUNfta618q80K7xNKC32AwRAVeUkcQQARY2MAC7UDQGgOohQAumEHoBvyz6+t3QBAKGJJPHaQjzrYAsg3ys0BpD/FfyZn/MTp5IM6n9S3ndY+fZaAIzHVhWMm3nh6O9x1ct/OhL7AlRUrP1hJxwEHhF4Orf9lxjJQcRvc/VBf8WfxRZ1wJZBBE4hmqLz0LjsaeJqgSVm9m/p8mBfSoCUHyyciIsI3lU1Zbr48/Z7inhUh1+/kOHAhRV+eRQuHJs7OgE1+YDsEBxrrQ1ytfJeALAPcHv7n1DcF6X7U3R30amF3+52xd16Ts8KcJZTXBi+xXbAGTFQ+mEIK0MAZNcDwDdFToGl/Nn991brPvbD+4BMPIB8ShPfHMDEzFYP1DZszgHA909VfZZ95x/83UAAECrzKXUicyyHlkB8PMlOGIGZrNwoll1RcJqDFrArcMnA8V+/kOH7okKKCgAJGMUEgKIUkwGfKtca3MeVj/sBQFeeGQBKdSoAJMJlAkB1d8cAWAMAUl8BIFYlIj2nn0MRZTgZU5lyuzLK67L/FrCCoQjjhkXmELGjs173nn7lEc4pIOBbCND8p6pVkQGtiBxZYfgtFQLsBcCyTDpxuefn1VpHI+bPz+HJXC0SH48n3VjklmOARNzk2nb7ApQ6WDUJZQXy6gC4BzuPVODor9ETPH/9BWZPXVfgAMDyCy8JiG+wA9VwCG6xAgAoitHoFrmAZfbd6gtZuQpAUhkAhQByQXYINsDh7g7XeHd3B6YGRzzB41USQJiddviPwUgkPplM2laACwCaTzfmbdADkqPScBEMQHb/lfcn/3MRIAEBrmZxEBAlWLVKcrhjDTMPaBvO1H2XThaOf//8PKdoNIrG9fr5uZ2rU+8A///rrzHzoCUKCY+aB0qJwCEHpQ5WN8uwxPNAAggAqtFffwkAGnxqAkB9xOA/eB2VV+yGg/pgvUGOPGDoZz3nTohL/UGZpFLzgyqAAlu5AwDwtvxkxdgAY8BCgM1/hQA/JujfTtor97qReHjHW0wyuFVuyv4/avdfbICOK0j/enAqUhpwnujUfEJVEkkiirgNABULv5VMWBAEPWYg22Y9liCwZkWnQWvwtivFaWkFgE03Cszmh+VJFEX1/Hy3/vIFjC/8uqm+fPmCIhAZTjoefgdoBwlQg7UA3zweYb3RHv/eek1fGv7DM5b+Be7KNwoAjD2OnSYc4IlB0ONrYyJQAwB2vqICDPQDEj9MbAD4pmTcCAYkPyHqrW33OueAlbAFgMQWAOD+VTr8Z/G8/XgeqM40kZy2jqqCB7FcKgC0wlIZB+KReNIbA7CN0STIW642v4bUyogPvwwSlchRNXxoDFFQ/hTx0FIgRSWMBADgJwMAnp+B8cDuqmIAHBv4LXyBXxEAUqBaqb939Oy3zGnls0sA4Bxi6os4h4OeUmSBASC6rq5zjkDncUzVAbYIcEvHU85T5LdE/TwAFgoA+pbL0tjxKbj/dSMIlBRAnzXAf+AdmiIxn2EFBUJ5kQ4P+CrGbbhM3ML/ri9artduxg2tpfkqZ99YFyeuVloGqIBkKIewFZPfWuhzeLZHVq6Gw0FFRv3z8/NgyHpurvNg/DuMCrF2aIbDIdoKRdWSUhoA247g3Y6NBMD/xZJX4l8p3GlLAHA2EABkfvqJUx/GigOkv29lCdCYFAC4K28DYKYEoW+KYZltqeX+m6dz/LVJgAGB3I8sALAroCRAVw3PFADKxHFAHQOAj3a5XoVLLQOw+IWUANjDlsSPAlCdQRsASvzMOpUgFgBySwigiTkEW7AAub8HHg8JAHP3gZ0gANQeuA1HA4ClEv4GAF0vlNotjR0JkNjcpKPeBsAB1TQggJPRiW0Ect24n2oAUD15qAAwOwWADbDg/n7qAkC7/+zXrlftp6MFlGCYF0Wx3wVaieioLL0JVwZtnfM/nU6VIMRiXL4DEKhkTsB5eawtwEIgPO8aAViYngyfwjDUucES2BIs56u2DYAUpq1sBL7J9OFBxE+SgA6vlfrOK284BOFe109PWPywMgnQORqBwn5tAA+H1QGQ8PRU1fBaJWw9GQ2FBgDO13ZXjuU3Dy4A1EHG/0vFNcUejQ1wwKSgr5LDDgCcR1LFCgCfPrkQ8Fqh+E+fmAfGBGRlmhr3v8X/HhUgANhj0DqNDAAESycAsHABsFQ2gH3ZAF8lWgIA8hTOe6iMe84OPz0ZBY4pYTAJ8ad8yydYlhYAFi4AhDgGAff7mjJ/dHqPAgBPMXulTN0VAcAKiKFgGA5QaAAA6trHFyuXCICq8m0A2P0sGQBIfOwCwOfqf98AYG8B4MjWro40tvhuywNxBDUAbN3rSgA2ANAQsnwAyv5j8UuzVjLfHP3Vuk8P8M/MV2gc1S0BQEnBW6mPcQEgxBVZ0QLd+iIQeNrck3otDgcIAPyUEkVhboxCE1VnLtw6lpgywnDl+Lr7/dPT3R1pfQBAfUTjfzCgQ8/7Pxgc7cdDu4BDIACBuzsAQAH7lS7JNoSvn+pKPIHbThxMOT+2/amFf6rY72P+cQ9eqWx+TfGnUK9PXxjqFwCEgJ6VOwDINAB83276QMcOzP/j3Ei61ar9+5XxDHWFgHc8NLXfLaIFANy2nHEDAN/p/WABwOSV/CXqewdUAgBOwZNKzPNlCwBEn2XAZGHfT1CBmNuQBepuN0QAeAwAMPrR9jMAmM8Hdzb/D0cAgJaJDIDqeDgkS0LH3d3T037PYcmzADBJRDr/SvyLjMfgc81vAdvcNLl6QlV4oGVF2qMQYiUDXBu0XwI4d92WUv+vAi2av9oTWK3dsgAjBNar5uh3ozI6KLp1ouFd4oF1KUd8ObJHSPSFLrC4CMA3pdJYko1y0reDxslSAGATVyFopYSjvCjQjwMJj0fYOfx0/pUPqBFQD4d0/PXRGA7xR56f1vgpRcWZwVQkwMIGwEYTN9dAFTdPA6DyGk/c0FxlhH2xFtvqIJbo0OsAwNsfVcVvowHN0dfn364NE3AQCo61JMSWLwZAuwzBBKTTROf7Uzvvo7cv5TqqVBfnWTqoBwCZAYB4ATsFABLwA9fyQQVQV01tVMDhgABYOQAA8Vc9MQB2e1VEIKa43VX4HAB8sQBTAUB1p1RARaGno+dRXhghQLVKDAHf8J0LBble9BIAzDa4XX8oBFiDRvQc2B8rYbpBw7xu/Qi+om+qc84CIHMBYEWBWvzX6b5UsyD1/cTvCf/73XscBIDxpI2+lhpeJigDdjWdf0u8E/txkSogAp7Avq7qw/HIMsDIQAwiH9EexPOfq1N8TgJg0ScJMzH9SIP7FMXBv4oAADNc3MCqqO7w+fy5qGUfOCgg1mNPTjBUxLenvAAHAMYEwBqAAlZZe8RfDx4Kf7VOPQLgWHm1px6QT15d+Fjhmjise4EEKO1GNK1bGqkSxF6ap77f5r3v+926Ac4ItgGwMAAIdSYQAABWbG0BgLTgAGNCsAEsEAEA8FMI/OFwbqXIV2An7KsCAwdFkatCpcsAwOC5n5hKX35ysmmwHMDDt4B/wcFSAKhsABjh0eZ/FCkJcCUA6AYIAyDgW6DOkxMAVi0ANLEbgiRRLTY9VWXoaMxFAKhGEDbL7Xogcq8aZk7VVL4VQ8lNCJyAwGdaklpXAiBNiqrGZNBqbrQ/Mh08QgRAM6cDDwAo4DzA11++zNWJkFDh3d1+X9WVDk9iROgsAKTRUOJbAPANAOARU4wAUIiyrY4Nb0PFIOAqMP+kBDipArb9KoB7Lxi5hBxGp6SqOwBY1TV3rfPph/ye9glLLYWvkACta9nu8ZfABD0eu1lLsQZbj3kJA4DFKQBoHGFEv9oPBvP53IGAAKASToDDD1+BRPzypXUaEABFhUaa+dTwCgBQTT+J8VTC/ebRACiKfaWjwqSNUQEfDmQOoN53AYBcUxIgOw2ARQ8AuJKHC7oSZWYm/RIAbP7YMl/SRNeEu17FlQAo+y4aEfElleo02viovUqHQyzbTBkrRSTtpQQAbARuzhiBCcoXOP4DJ9zLxQ5ie6mjSF9icqgVJcefHw7JPMh1kUmPGm4BgJphkBjVfp0FgEJLgKpQ+18cP3/mYwAAoMiDiAErLUiFYS+UAMKBZWn+X9oZmF4J0MQSnzQdI2yFLl6FLo665Ab28h/YE1H6zZNg1BwOgUgAEAy166IdG9grrIkp5bKvjgP0AkC2G+wLYLILgLmycwhU+9/0B/NGjCIQAt0w+XC4r+B7bKZjjeJZABD/fbnYoQCgRRqWheb7qgcAtQAAjgHaZl5lAGALARMC21wnAYJlqwmoWyPJAHCtwPoQa19UbH9HouMvUb8EWDgACNhiaLX/QEtkybV2DSpnXQgkAIBzi4l64NuA2IS/QUW8L4q4VE4WA+CEJwYAEB8frLdni/cKAPM5fxsPtuPsAARWPYkS/BjwA9Brq9I4yS8BQCCgroT4idL+VPyZ7wsDAKE331WjkOVvBQLiN/iuKJVMTThoA0orXwSA6wYG0hNLbql3AVD3A0DuRKiKMK0BdH3H8ioABCcaDdCFPOBBgSERrZrhRHIEB1lTI9uPAgCwkwvKSYinuORtGJ8CwDIQoxoZJ7p8ZcWB5vO6rWEEAFVzEgBwWmu0Bi0v4CQA5KxJWxjbAECBTgCgUsTaAKAYhcSGukABMXwa1ljIaJeFs0X8MgCU7d6vUtyjbyyiBHADQpSk1LEM/HdpJIBqqHclAFzhT8CRdkQ6NCdMEbcMD0yjjj0mIQb03JG39OVLpetzeySApfz2xd9//30nDxymrqdTdWMdhICq6aRK15hSkOfzly/NIc0v2QCa/+ret8JbjYkBAIA6apVSwfN9PRpxJR4bhli+cLQBQCZlGsUvBEBZLhUCuA2Hqg1K5W50tVq1QoKsAggjEYmA5bKjAjAk0FMfa9kAVDRQdhpPyoUE5rEVfKLEDKmACHvVeMh1vLd0xwBoPAKAd0ivA8D+PADmsN9eBwJoBTRVN1c+NADAYrLqAgC4giqRxmDcFeigLJkc+J8a0/9YKCxUjQAAPAM+lAoA2hf0XSPwSgmwtC0xKchfJus5N6dQEsAFAHoBJV3dllxladuQyqg7LwGSsrfvaBQ0wvuVzkOuOCzToIFE9xWI6cggPv9gCnBKYoVVtL6JQk2cu0kWAFIfxLWneewpYWO7gT3hTq8+tt1AlE3gIR49/Vlpnl8AgE6+qJxgJZ7OnC5b4JVM0bqg2WqNhdFoJQA4SBampgtqvuMHlpdzAa4EWOr2mMYCz3NiLSrjquoFAKB4idc08JaOr5ss2ZmlS3GAZWkf/6W+kwwcbio6/Fb6HY44uHlK/3vEdc7ByvkXO6X22hKgFwDgr2HbG3owxl+7AOBAUNVz/uu6GwcY3IFdjmY5n+EiveQGtgAAMqA6SFAJAFAAyOsDL2eOyUoFAI8AMO8BgAOBq9zA8TlPLFlyjyq6usReQMsGqI8p32znSmbRaVYqd6k9sTMAWPaI/+hXDfb9SucjKfGI2h6lPxCNGlH/g8pj45+2nk24NQZJNAAmFAhauImIhQYA5ZIjSn9gwqXWVVgCgKenou7wHywAVBdzJwyELTPQB7WSNVcAwITMQQtUB/15Bfq33oFLLebaOEUsCACA3FH2hm8oStzu2kig9SaWEWhXYiy5LwldvgEJMG87AQIA+Db3L4EXWC7dFpu6JuO0CujT/0m0wzNk8pFkf9Jpp/OP9coCAPkFJEPTeNqLAyfMBcD5SCBoHL9uKjCnKwcA8M/T097OBhP78SKECwA6o8UepQly37FAr1YBfqqcfXT8vAYW29hYVEgTFVAf8boiOwQMALIjJSD0EgmgAdDuwIgA+B0moQbA6jQAfoehXaG9bCfkTgPAbTUo0h/vo8wdALCz34CDt6wwAkI6v6ZfROjq0s19hUkpvvB5BQCwqQ3ImwarPCsMCDJrFXGs92s43cVZL1AXbXMRZZNXPT/vwSHxdMuQywCwc2bAtKKwdNDOq4vKEUd2dfKKLiaJSK4lJMtpQU4Ol9ckgywAlJ1unEoCkD2Y9oaCD6L1WVIkpojjtQAQDWDF/XUB0mBQ1B6Yu7kfoRe252NfKCuA/oIAoIbDmCZLDQC8IbM9AwCQOA0XgWNxMwHAAh8AwGssCVBXDWX+bf+ffBMAQAHoKK6WAD4ZQNQIKMWpEOleAEBp91/ecV+s2ggQucPpIM82xnxVDQD/JHYg6JpQsN8FAHyNo0lCtPKWaS8AKgbAkgbYcKMYbhaSmEaOFwGQlG0dUMt9RLcSeTCQih32k6ua7G0K41AhhhKUcAjrAhurWzWp5wGQJM0BXCswHX5jFKfYDYdDqx4K/SwJOCP7QdWo8y8wgffy6KII/fDff+8LhYATyaCJrQJUmydK4YLjNzCgGtgAcJJUuiZPeQYIgFJfD6JWcy8AAMUjAx2RpQA++/HYfA6jsv0AqBEAdNoxFcTh28RxI9Ql3fOBoNYAkorj/srikJpcAoBlkXtHShCjE0cAUNYSpYNSvw0Ah7g2AsUEYADMGQD7PQHAyvZjvQ9G3mu8FwaU+fxrg4OBWSMA7u4YAE42MGtLgIldDmt1eYKjqwCwRrUyKAqH/zYETI2eDYBSsvNXAmCreNC5n60AgOOAsOFKfzawYgBI7zwEgJznxKrrvAIApSV2AHTYjUf8eacIjVBgPWsjGjUAKrYTdDFBOeqtCbQA4Pvo1A+HsN0oUqr9Hqw+OOpU+qt8ELoG8pkeDBetNQCQSewlYNa4wsrxpy9fioIb6uPFpHEvAMZj2/lCo53SwtG+OKAuW6uwbwsAq25pnvHH4QNKU55xFQDw/cYjmY5lN2pFMRDRYAxsggz87wdAjT0tlzkNFUtkYER7tlAS6huaWRsA40lo+54EIj9AU6gbZ1WOgAWAdetgwGkk7YBN9eVaCgOA+sR0ATDilPfx8OXLYEgxpiN2PKnAmD/UFgAwAOUCQHNkcIc/XR+9BgNKBfJ/+OVLVfioOUMqRugAYDtBw7QlAWQIwA7zCAIAdPXnvRrA3NKwbQCfAMAIiKQ3x212six8m0mfnJubsDSXQ9VMnvkKR3cADKIUdgABMO+RABFe06UqnHS5/I19PP2ypQPCm5tHbhe5cACAY+nHEySua0cw+k/2/aq72LYPutYt6wwG5qiKY1i8bvtZ/vimB4w7V2IoDnHzA6/FJscD8j1MsAwqbxoKKjUEBvjNStNQGBOBsyIv5MiOCBaDUC1PmJNlUuE2lN++cZuONgBw22nlajqQavqK3PtVNcMnuRVufII+/nfcMfkMimwsb27G2KfV7c7ita+pY5dwFwBq+sZ6FbIRQC3qwn4AeH4K2xNi4i1dpuwKOPzHOHEfAHCu2GaTEfqUEIhKCu+xH3b6ad1PtgAwn2MQXW8FWQDfFABmmduaIJvdIg8QAHDmimIfY3dLP5WoIsUFpULAmOBCbqWkEdogtacBQIFxylWRERIyAFzlJ3MVx0xcDYWMqNUamYG/Gio6XzMA5hSM6Mr/NgDyxL7fjYMGbm4m1BvjZFGoQODx8XGStAEAW8cAiBLqUXhCAoDkyfGWPvdNSwQApY4Cwgeky/BRGti3mnRsaETkRCmBQNqRNOfZ33INWEBzxryqwEXHhrm6hzYqYXi6N7QJjuPx4yRM9HgO/E2EwQDK5JCF6SEvMe5bfHGeysQGGyoP/EK3QWrMiMWU0Kfc2IlrsaovD1rfWA/AD5jbKAe4/vIo9k77SuqppzlSi4dErxwkwORRmqNcaBHzOCZ75AQAEgbAOs/ruhcAiQJAQv1NQ9P2mlMCyAMgQUNhO526Z9ieRNejiPt/DQDWCgLGPKqpn97e8J/NcCS+OAUAWLkZ0EUHB2/63939QABgsgkcSk4VtAAAtIT/jUffJABUKWdk1A1fvBHV0ydMACDWt8N/seCqw5oSX1cDQDWr00sHCTDB05W9FAA6iY8B9yU3wMGudX5OHcu6NYF4YS1Ul3USumvpAGDJhzDrkQAIAO0OLYNoX1F1z3p17UOqgPOBeEoLNT/JQgCIHxpn3MODjABgyl588D5qZD+l8+Cj0qZaUVl4XXG3ACk9IqjxJZAGOwXHiJHibv38TOlxjAMKANDa7/ap1D2CQsN/P9b2G/wf3KDhvOfpk4MWAHwph0VrKgivBcDYAkBgqnMYALqBfZr0AsDL89i5jlGK/S1uGAFANazq9mmaGX8Yzj+a32LbX/+sOR8AXNnvIzVV2NQzIQAesU3T5lR3NHOLzfewO+zdHV3vRTA1Fd8LqCq6JCEAaFjUEAA8L4r8EmvQKqwGOlKJXKyq+2jlPfpHRWBGRgLoGA79grdC59cgYN2SAAiAgIZ7AQAm7XL4kwB4DJ0yntL24XWu2lwWU/HI+bypVUXQ0m3PZE+WZAB0NWGmu7QIyUqW7VzMO/cMB8PhUO4KYUZvqYaK6wzLkgHQFT+W7NPiIvWODYZ9c0wOBhHWFlG8nW9jAQqoLVyTo5Lf7+lLtP1AfHMpD14si61rm0D8pAHCAAhlBjXKLe57InOAwBucz6+TAbQPjQKAqsFZBiOWAJcAkOE2PLpdIgMrpYdevuqb+LvzOtQ7nblOVzXtYTsqtBeOxv0dQqRLy3gUSgLJO2jcqwzoaSBgBG4opx8LqFrjrHWvSGWBbnoB8DgK9Xz2xAef7ump8WhYWxAoANT7PRpmBXF8XR/yJE4AAMX+DgFQVDHxMC88AMBBlWWQ9CEA9BogHIoejWQKqZZYyoiLd3uzy7/lOQUBKpLiokxOLCTLoMRtZwmwuQAA1IX3n0Knmltfz1qmqjtPutvZb0Ds+V1VPtcOgpXYP8EpCD59Gncccd2oK1vcjh+mIbeVqQ+XEX93N+QHJXPNofmYgt8O/wUA4adP4oD0SYDtxqycrhRhPYCHFQL0WfuC3AHO76Y4LwnVEwpb6uCz339G2w/OQEmF0Wi7Hw+iz4n/TDzrtEnNFjKpYno/6pRgS1hot9eH4fdvFwGdPZnvMUdGFzNKuQ9VAnHG3uJckyhyEtEXu78fOQhY2gDAnAVKgB29gROarAqfbQ78qX4AjNSbtLdhwbMVx7c4p1oA8Pv3CQDom9gIADj2+L/miLZXBYa/mJxmvBjnL8ow/HR/BgCycr4Gg22aqJibkRyATbpXAGAJWFG7hoo7yfrJvvjCAPAZAD4CoGIAUG8Sjb7OyhfSnGl6/x+cFYd/veT2ZiqUEyEAVi3+/7a3xwYADW+hQsBSyvMRAGB/YmOccwAQS+weHhWQc+elcysmAgDsR+VUR1JifK8B4EoAFYj/+fMnfvps0Te4h9A3hYdGxZd+Vf/uIEALOXnsN2h8M0Xdni0cSCxbiPfPLCLs47d5Tr3ps5AoYbIvKDsc85xcUIF77g6uvQbYdzD8m5Svpfrmzj5mog3xnlaxNwvuEzPNfv7khgaqtRYrgBh2+3AcdPjfKwZwflPsKweU+c/EsTnW4kKv4A2AsQ0AVReEzmCObWsxSpPu0NatPVMURaeP0siqKLQ9y9MAYHYJAHAIo33x+wQCDAAa+woQOn1B4KSxlsaQKX/e3CDxrB8AGwHAzc1NkugxUDIUmVJSCACQCGzm4Po1AIhlIAP2CACKwmPjLrlOiR+kV551zA8CAMaiceU3GA6U4cOlTNsBGxD9AHAFewHQhgAmwPfKk1CFsNcDIBMAgCi0LumZuzmJAIBKAsylFRlrG8UMgJK6G5uUjtzbXIawRnqT3tk5eAg3+O3p/RQ90Mgvdl0dQApfX0GvKzn2aPUn+kq5M+hOJEE45YVlvfP7CH1EfDpd6q5LeiIyPF51rPDmZUxjPJPdrvj7bwaAjreVeBGM42/CRryVgeZ8+F9NvE8CoG0GhB/gCW3rLyl54BLdxYST1sd/c0bEBRgUAoBS9U0IZdsXnWlN5wAgdSFlYFcGL7EiiACQpmGs+hTLpSskyOdvtXKzeuIJIACmDMWsf2bk5l6oI+vSvdcRAQwAup+LD2j8QAUrT/UXZgCEBgB97eI3CwMA6TWUmDa5QZBEFRXnU3QXA7Qg/xAAWJJoYk0YFYhaF6KpTWP4zRDvAQA2aZ7yE3ZuVKMSSFEGoOf9+4IIQFcIc48sAkgF+KEAgLrSXxwahX3kSBT++OGEgjk5j6YUMTYlRY/8516NEQ7ylAwEHruwXVJMaUBaIurBM9PzaKN4dHaUgmHv8J/SsJTjo3Pv00hCe6JgP/fhWyz/7/tnVeiWrfh+DyKHxR2TC9Il913hC9w4vgWMxGNd+xEpiCDCH/FbsUctCm5uHsgCOD28WFrVoRYIw9alTM4K5gC5o3dGBKjLq021l3Ay6QDYdth3nFvZI/nOAQB0oQkHLd3bYsoh4MIPsbLQPvSt+FFZ6gpfviVoAHByG0AZCgAC8jWqxnNkgGrIWkd2G4ngTH9xNfBWA2CxucADBQD3IHLvPl+PacZYGAp8iz4AICj7+A/EvwELptvTExMNAH6UYdl5UNDusMj4khGwBkFV7GLKJsAexbAIBMD99GoALGjc/P2U1JF1O8DhLAr1nAGAf8rcIACYELJc8DNaINTsPweAGeugaShJjNzzLATg3CYw/PyoDLq7VAanBUCotODpoYX8ZvSSnA7qcMHMaecca3I8aN6rm52uCBDZ96BWfk4CKOkngXibvlT2gCEwfDorAJ6GzbGhSyH6TULk/nS7vR4AKCXJIgmt2/06LxRI+9+cAUCmXpkKAEJWAoHTXkBpgSsAAC6yDQDSAvvKMgTornVVmGur9hXW0xIgCBUAegcGKUcAucCKmK2ALgJ8PaGXxqdUShJJEL+006hq5UCcbIt2Lr47tm5hrC9dlBUbIYDTunsAYDsBGAqnIJCa91KGo3vt/F4FALoow6Lw2w/nbq/SAOjnoQLgyq8S34GFXa6VQOncCeTW7T++XVIAqjaMtksTjyJwBniZw0HVcKq01UrqPADgG9++XbIA9Nx0NJi+fUPp53dlDMfprSyritVYd7tbCCiF+PTM+bdWTsQtAFimIDzxft8PAHN5ne8E6Bf+8U0A0Ev81Pj4DQPg2yjsHC/V5oPOf+gHAb4DvXFCf2Y4r+4EysQofJOrAJChHwgAUKow2okdsELzH9YWlL0ACPrcP35GGgCL7PwAbwWAUUsIGwBoBCzFTAg0AHwXM9y1XhPPsgsAmCkAjBwERAYAvr/bnbEAsH1FU3uquwjKf4v45gUAACY9yEnobC8jgK6M+3hRAF/CV/ZO6VzutVIABMRTmqjVO3272RDxHzK7LEq9mnI9WF3nWyle11qOWjOOpeF4GYR8CmguzOw8AEhHEBeAuC7QwZ03lRoROwcOfWnN5UCGUmDq/H/Lzmkf3S+fMUAygD4sVoPgiZDfBYAbIJtjC9k0VwloPnUUeHEvBF0CAItCAWMXAbyvyH38jZIAtsRvs38kQNxuNpcAkOmQjCEO9vZ8Tee/KWxldM4ENN0mwxFvQ18KqoO+heGBXaBj878FgEDZh1Fs9UJTwydDQd83In5u5Wj+auIjLg7hgw9UfZID8AcCgHZ4TAEAO0SpEiTMPyrJh4MirgaABMbVSRip7j5tzcoACAwATjR2Ahz++KE08HkxqIlnDvEkzaXqDgn75RX8V2ngILiRCPCiO6msXxHPaOVTro1tP1inGZG4a5HXs9utGSnLkn1wFD5XECcJgIYAeaKh9IxTMoh+F+z7GlRY91S9nG8E41/CwAutfLE4Nbb8BAA22dachJHKUdp6lXxfBsD899wBQOsaAIiF0Q8+Bdiq/rQnbBFX6lCIY0C94s7IRr9bHcXL/ggQaiqKAN1gdJkqf8+ef+WGwGuitUIRmQ4A2NETDkuOxE3eqnaItPgbjn0Q7YvEUVBTUuCBAKBbxviWcqGWV7Vpxyq3k6lNGY0V1t3F4AM0+hanxpZ7Z0+C4sKPctkxBVXSpSxzpNV//jmRInoIN/Z0FKYzRnyhiPNmU7A/svS7+z5R1/AnnRT8QAag8bG5Ant6cNKGIvMcDO0AQE6/nPGEQx0uBHjpQByj+w99OeDTJjCYQPiXvt38KLF3rN91BazHnhYXibnAuUkMAD48oNF9TvKdBMBGnQTiQRg63b50qR3/4opjO/hLRVhKDyFPs+yabdhQhlwAcMM+edk622Vp2wJRd8Is42SkXLANFiFeAwAAyoYBMP2mLEHqMsi/YrEuG7vm6rNdNGfnPhEAUwHA9iriGWWqEABA/Fuo7meISWsAoMPzAc9L4ptk9hMyAJD4OcnnndkIGuy1oZAgbESSOLO85Ph3dbHb0zG0zJDFZSXYOofZPUcjZJBc4NDuANG2/mjkTKks8PuLvsf/2gM0AQKWT94X3nUHI5v2F8L8ZYkrvxj5OhWPfGAAOsQj1LlK2C0Dl7Tjl5DjA1s3ZeydMbu888eQIkIIgG9hGNoDXdsemMt/jYKSADDViih7AQAyOYZM/MQs6f4/LFX0z3KC++YFnwYAKIzNVNnj4TkEJN1Opuz4CPEXA4D9JAHASA/xFlkQmRkOCAFrnoopIgwM8YvCx7sARnwZUmNoE43cWECH9/r4y6+lCCEJgi6uZz8bAhsShghkJH6e6zb3eRPE8GTuX6d6bC6gIpDUtLmu2AeBpM1/rP8C4c9/F83el7Bfy4ANZ3DvcdtLq1a0TDqmFlscnJKn3Az7XKr25Sxx7xpp9PDAacoRuuVnAGC9EmmhQMwQsYKuMsFa1QEEgOk9ER/ZAv4E+9UldvL9/wAAgHyVmgEpgCs3scBzakA60o/CGwWA2eIKz/dkHIYAMAod5J1ony4tesHsGd18u7dKH/4AAAqMgkYwS0Yn2e9cH6AjKCpQiaGXbYIWQJtsem8R15Fl3XvWiVEv1bSxH3oPZosrHLAT9WmSnblng4ztIOULJHLVtT3GgqIv3xT7uxNSr1s5eWGGOJWpt9JTlrjVY2bglTTxy3GvKwGwUUcBeQBPj05U7xPI+Q+V/p2q8/86ACDthU0cVOJSNyC2Ir62CYjmijI92fmcLTYvJr4h58kiTh8rCXLfifZbUY9EiFsAmL0CAJtMRyQt4onjFTraVpDnEOfwzx8CQMCoysRIGINKXJbJaR1QogMiEvB+On0t+3WFmtoIrpkkrzDpNUIJDUT84UEE6IzDq68ivtFBwXuyhJl4qA0yX003TJRQUsSBvIq/vpY4rVu2XRH/K/HtkJDehsT4fRx3uBT+exEAMH7S5QGexB4EBHz8LACcTERftw1Ee6Zoa+LtBsTaPRHiD1J7eM8RpeyVPNAywAZAGNqp2iVnxZZEmolPFXUOpt28jjghd6H4zwCgiZ49WWcwOhXxB4UAieT9OQDgGM5mOk/Fhav0QoYLOmW8xLI/jUE+Ai83gtvRCI4gsjnxQLv740cY2BGJkoqoghFZv/xjLHmwyD37A+IUFESL/EEoT1W1oi7a1SMRGPNS2TkV4ovXE8/IfEBf+ME8Nz/K3rqDH5xrl5/iyOPiGuHjXcsDPElTxQQqmxOl2HrwADxMtQAmBGSbP9uGmdwXeFCf/OPHqIe6yjjyRjAANn9EHP/2hn0Rs6hvvcTDkRJ6U2X3/CFxmimuiMsLIPRPbPs3LSw08WuMD+/616GzoIvmcDemrece/33gA5CJ+v6TM2B75RsO5W6mWrVMO8+9ZfcJ596AOH7MxnYJbMoPhjvyzQUBlqI5b0KcP4riAtOTS1ffoFTCi4hfDwD82A09DsnuQ5vCCCQB8CYAEOLaNdfEen7HAMjoXd+I+AYFqgaAQ7MHfRL82b7Vyrey7X38d19owWpj+w4A0GcBN0MbhX0P4/Xlkb+rDqLJUd73QkGqal6UdrgK/ouZZQkhD+5boshY/bPF4k2XLtgng8ql6mxAphb+orDTywDAEmBzAQAkgfCN3xQAIoVnJwCgrP5MIHBz85bEb24Mb21yzoFE4goD2Zuib6OWvmiLAIOEafYq9HmveyUJcPDDGlI/m832f+/5ZDbt1rN5b+I/URfJLfrWc67m+40esqi35lGr5i9epe9eDwASNifY8N4AOEl7k70/ADabFuJtELw3ABancL95JXHv9TzIWDT969uQGe73MeP9AcAib9PlQrZ9X+I/Fh0AbNQ2bP9dANgM6DDhvVVAi7ZN/f1VQNZ//vlF3hsA2ayXrOzCvwiAj+f/mucDAB8A+Hg+APDxfADg4/kAwMfzAYCP5wMAH88HAD6eDwB8PP+PPP8fiGgeI88/0FMAAAAASUVORK5CYII=";
-  var BTN_CELLS = [[10, 6], [135, 6], [260, 6], [385, 6], [10, 132], [135, 132], [260, 132], [385, 132]];
-  var BTN_CELL = 118;
-  var BTN_INNER = { rx: 48, ry: 46, color: "#292c3b" };
-
-  // src/game/action/ui/touchArt.ts
-  var dpr = () => typeof devicePixelRatio === "number" && devicePixelRatio > 0 ? Math.min(4, devicePixelRatio) : 1;
-  var RING = {
-    main: { hi: "#ffe8a3", mid: "#d9a63c", lo: "#7a4c12", edge: "#3a230a" },
-    ult: { hi: "#ffe8a3", mid: "#d9a63c", lo: "#7a4c12", edge: "#3a230a" },
-    skill: { hi: "#e8edf2", mid: "#9aa5b1", lo: "#4a535c", edge: "#1b2026" },
-    guard: { hi: "#dfe9ff", mid: "#8fa6c8", lo: "#3f5473", edge: "#17202e" },
-    auto: { hi: "#c9fff5", mid: "#5ee0c8", lo: "#1f6e60", edge: "#0f2f2a" },
-    menu: { hi: "#e8edf2", mid: "#9aa5b1", lo: "#4a535c", edge: "#1b2026" },
-    plain: { hi: "#e8edf2", mid: "#9aa5b1", lo: "#4a535c", edge: "#1b2026" }
-  };
-  var sheet = null;
-  var sheetReady = false;
-  var waiters = /* @__PURE__ */ new Set();
-  function loadSheet() {
-    if (sheet || typeof Image === "undefined") return;
-    sheet = new Image();
-    sheet.onload = () => {
-      sheetReady = true;
-      for (const f of waiters) f();
-      waiters.clear();
-    };
-    sheet.src = BTN_SHEET;
-  }
-  function onSheetReady(f) {
-    if (sheetReady) return f();
-    waiters.add(f);
-    loadSheet();
-  }
-  var iconCache = /* @__PURE__ */ new Map();
-  function iconOf(cell) {
-    if (!sheet || !sheetReady) return null;
-    const hit2 = iconCache.get(cell);
-    if (hit2) return hit2;
-    const r = Math.min(BTN_INNER.rx, BTN_INNER.ry) - 2;
-    const cv = document.createElement("canvas");
-    cv.width = cv.height = r * 2;
-    const g = cv.getContext("2d");
-    if (!g) return null;
-    const [sx, sy] = BTN_CELLS[cell];
-    g.imageSmoothingEnabled = false;
-    g.beginPath();
-    g.arc(r, r, r, 0, Math.PI * 2);
-    g.clip();
-    g.drawImage(sheet, sx + BTN_CELL / 2 - r, sy + BTN_CELL / 2 - r, r * 2, r * 2, 0, 0, r * 2, r * 2);
-    const img6 = g.getImageData(0, 0, r * 2, r * 2);
-    const d3 = img6.data;
-    const [br, bg, bb] = [41, 44, 59];
-    for (let i = 0; i < d3.length; i += 4) {
-      if (d3[i + 3] && Math.abs(d3[i] - br) < 10 && Math.abs(d3[i + 1] - bg) < 10 && Math.abs(d3[i + 2] - bb) < 10) d3[i + 3] = 0;
-    }
-    g.putImageData(img6, 0, 0);
-    let x0 = r * 2, y0 = r * 2, x1 = -1, y1 = -1;
-    for (let y = 0; y < r * 2; y++) for (let x = 0; x < r * 2; x++) if (d3[(y * r * 2 + x) * 4 + 3] > 0) x0 = Math.min(x0, x), y0 = Math.min(y0, y), x1 = Math.max(x1, x), y1 = Math.max(y1, y);
-    if (x1 < 0) return cv;
-    const side = Math.max(x1 - x0, y1 - y0) + 1 + 4;
-    const cx = (x0 + x1 + 1) / 2, cy = (y0 + y1 + 1) / 2;
-    const tight = document.createElement("canvas");
-    tight.width = tight.height = side;
-    tight.getContext("2d").drawImage(cv, Math.round(cx - side / 2), Math.round(cy - side / 2), side, side, 0, 0, side, side);
-    iconCache.set(cell, tight);
-    return tight;
-  }
-  var cache6 = /* @__PURE__ */ new Map();
-  function renderButton(a) {
-    const k = dpr();
-    const key = `${a.kind}|${a.size}|${a.cell ?? ""}|${a.text ?? ""}|${a.on ? 1 : 0}|${k}|${sheetReady ? 1 : 0}`;
-    const hit2 = cache6.get(key);
-    if (hit2) return hit2;
-    const S2 = Math.round(a.size * k);
-    const cv = document.createElement("canvas");
-    cv.width = cv.height = S2;
-    const g = cv.getContext("2d");
-    const c = S2 / 2;
-    const main = a.kind === "main";
-    const ring = RING[a.kind];
-    const pad = main ? S2 * 0.085 : S2 * 0.045;
-    const R = c - pad;
-    const rw = main ? R * 0.17 : R * 0.12;
-    g.clearRect(0, 0, S2, S2);
-    g.save();
-    g.shadowColor = "rgba(0,0,0,0.55)";
-    g.shadowBlur = S2 * 0.06;
-    g.shadowOffsetY = S2 * 0.02;
-    g.fillStyle = ring.edge;
-    g.beginPath();
-    g.arc(c, c, R, 0, Math.PI * 2);
-    g.fill();
-    g.restore();
-    if (main) {
-      g.fillStyle = ring.mid;
-      g.strokeStyle = ring.edge;
-      g.lineWidth = Math.max(1, S2 * 6e-3);
-      for (let i = 0; i < 8; i++) {
-        const t = i / 8 * Math.PI * 2 - Math.PI / 2;
-        const len = i % 2 === 0 ? S2 * 0.085 : S2 * 0.05;
-        const w = S2 * 0.035;
-        g.save();
-        g.translate(c + Math.cos(t) * (R - rw * 0.3), c + Math.sin(t) * (R - rw * 0.3));
-        g.rotate(t);
-        g.beginPath();
-        g.moveTo(0, -w);
-        g.lineTo(len + rw * 0.3, 0);
-        g.lineTo(0, w);
-        g.closePath();
-        g.fill();
-        g.stroke();
-        g.restore();
-      }
-    }
-    const lg = g.createLinearGradient(c - R, c - R, c + R, c + R);
-    lg.addColorStop(0, ring.hi);
-    lg.addColorStop(0.35, ring.mid);
-    lg.addColorStop(0.65, ring.lo);
-    lg.addColorStop(1, ring.mid);
-    g.fillStyle = lg;
-    g.beginPath();
-    g.arc(c, c, R, 0, Math.PI * 2);
-    g.arc(c, c, R - rw, 0, Math.PI * 2, true);
-    g.fill();
-    g.strokeStyle = ring.edge;
-    g.lineWidth = Math.max(1, S2 * 8e-3);
-    g.beginPath();
-    g.arc(c, c, R, 0, Math.PI * 2);
-    g.stroke();
-    g.beginPath();
-    g.arc(c, c, R - rw, 0, Math.PI * 2);
-    g.stroke();
-    g.strokeStyle = "rgba(255,255,255,0.45)";
-    g.lineWidth = Math.max(1, S2 * 6e-3);
-    g.beginPath();
-    g.arc(c, c, R - rw * 0.35, Math.PI * 1.05, Math.PI * 1.75);
-    g.stroke();
-    if (main || a.kind === "ult") {
-      for (let i = 0; i < 4; i++) {
-        const t = i / 4 * Math.PI * 2 + Math.PI / 4;
-        const x = c + Math.cos(t) * (R - rw / 2), y = c + Math.sin(t) * (R - rw / 2);
-        const rg = g.createRadialGradient(x - rw * 0.1, y - rw * 0.1, 0, x, y, rw * 0.28);
-        rg.addColorStop(0, ring.hi);
-        rg.addColorStop(1, ring.lo);
-        g.fillStyle = rg;
-        g.beginPath();
-        g.arc(x, y, rw * 0.28, 0, Math.PI * 2);
-        g.fill();
-      }
-    }
-    const ir = R - rw;
-    const inner = g.createRadialGradient(c, c - ir * 0.35, ir * 0.1, c, c, ir);
-    if (a.kind === "auto" && a.on) {
-      inner.addColorStop(0, "#7df5e0");
-      inner.addColorStop(0.6, "#1f8f7d");
-      inner.addColorStop(1, "#0c3d36");
-    } else {
-      inner.addColorStop(0, "#3a4252");
-      inner.addColorStop(0.55, "#171c25");
-      inner.addColorStop(1, "#070a0f");
-    }
-    g.fillStyle = inner;
-    g.beginPath();
-    g.arc(c, c, ir, 0, Math.PI * 2);
-    g.fill();
-    const rim = g.createRadialGradient(c, c + ir * 0.9, ir * 0.2, c, c + ir * 0.5, ir * 1.1);
-    rim.addColorStop(0, "rgba(120,150,190,0.22)");
-    rim.addColorStop(1, "rgba(120,150,190,0)");
-    g.fillStyle = rim;
-    g.beginPath();
-    g.arc(c, c, ir, 0, Math.PI * 2);
-    g.fill();
-    const icon2 = a.cell !== null && a.cell !== void 0 ? iconOf(a.cell) : null;
-    if (icon2) {
-      const avail = ir * 2 * 0.72;
-      let s = avail / icon2.width;
-      const fl = Math.floor(s);
-      if (fl >= 1 && fl / s >= 0.85) s = fl;
-      const w = icon2.width * s;
-      g.save();
-      g.imageSmoothingEnabled = false;
-      g.shadowColor = "rgba(0,0,0,0.7)";
-      g.shadowBlur = S2 * 0.02;
-      g.shadowOffsetY = Math.max(1, S2 * 0.012);
-      g.drawImage(icon2, Math.round(c - w / 2), Math.round(c - w / 2), w, w);
-      g.restore();
-    } else if (a.kind === "menu") {
-      g.fillStyle = "#f2ead6";
-      const bw = ir * 0.9, bh = Math.max(2, ir * 0.16);
-      for (let i = -1; i <= 1; i++) g.fillRect(c - bw / 2, c + i * ir * 0.42 - bh / 2, bw, bh);
-    } else if (a.text) {
-      const lines = a.text.split("\n");
-      const longest = Math.max(...lines.map((l) => l.length));
-      const want = Math.min(ir * 0.62, ir * 1.7 / Math.max(2, longest), ir * 1.6 / Math.max(2, lines.length));
-      const up = Math.ceil(want / 11) * 11 <= want * 1.15;
-      const fs = 11 * Math.max(1, up ? Math.ceil(want / 11) : Math.floor(want / 11));
-      g.font = `700 ${fs}px "${PIXEL_FONT}", monospace`;
-      g.textAlign = "center";
-      g.textBaseline = "alphabetic";
-      const sh = Math.max(1, Math.round(fs / 11));
-      const ms = lines.map((ln) => g.measureText(ln));
-      const asc = Math.max(...ms.map((m) => m.actualBoundingBoxAscent || fs * 0.8));
-      const desc = Math.max(...ms.map((m) => m.actualBoundingBoxDescent || 0));
-      const gap = Math.round(fs * 0.2);
-      const lh = asc + desc + gap;
-      const block = lines.length * (asc + desc) + (lines.length - 1) * gap + sh;
-      const top = c - block / 2;
-      lines.forEach((ln, i) => {
-        const m = ms[i];
-        const off2 = ((m.actualBoundingBoxRight ?? 0) - (m.actualBoundingBoxLeft ?? 0)) / 2;
-        const x = Math.round(c - sh / 2 - off2);
-        const y = Math.round(top + i * lh + asc);
-        g.fillStyle = "rgba(0,0,0,0.85)";
-        g.fillText(ln, x + sh, y + sh);
-        g.fillStyle = a.kind === "auto" && a.on ? "#06201c" : "#fbecc9";
-        g.fillText(ln, x, y);
-      });
-    }
-    g.save();
-    g.beginPath();
-    g.arc(c, c, ir, 0, Math.PI * 2);
-    g.clip();
-    const gl = g.createLinearGradient(0, c - ir, 0, c);
-    gl.addColorStop(0, "rgba(255,255,255,0.38)");
-    gl.addColorStop(1, "rgba(255,255,255,0.0)");
-    g.fillStyle = gl;
-    g.beginPath();
-    g.ellipse(c, c - ir * 0.45, ir * 0.82, ir * 0.5, 0, 0, Math.PI * 2);
-    g.fill();
-    g.restore();
-    cache6.set(key, cv);
-    return cv;
-  }
-  function renderStickBase(size2) {
-    const k = dpr();
-    const key = `stick|${size2}|${k}`;
-    const hit2 = cache6.get(key);
-    if (hit2) return hit2;
-    const S2 = Math.round(size2 * k);
-    const cv = document.createElement("canvas");
-    cv.width = cv.height = S2;
-    const g = cv.getContext("2d");
-    const c = S2 / 2, R = c - S2 * 0.03, rw = R * 0.09;
-    g.fillStyle = "rgba(8,12,16,0.55)";
-    g.beginPath();
-    g.arc(c, c, R - rw, 0, Math.PI * 2);
-    g.fill();
-    const lg = g.createLinearGradient(c - R, c - R, c + R, c + R);
-    lg.addColorStop(0, "rgba(232,237,242,0.9)");
-    lg.addColorStop(0.5, "rgba(120,130,140,0.9)");
-    lg.addColorStop(1, "rgba(60,68,76,0.9)");
-    g.fillStyle = lg;
-    g.beginPath();
-    g.arc(c, c, R, 0, Math.PI * 2);
-    g.arc(c, c, R - rw, 0, Math.PI * 2, true);
-    g.fill();
-    g.strokeStyle = "rgba(20,24,30,0.9)";
-    g.lineWidth = Math.max(1, S2 * 6e-3);
-    g.beginPath();
-    g.arc(c, c, R, 0, Math.PI * 2);
-    g.stroke();
-    g.fillStyle = "rgba(236,230,212,0.85)";
-    for (let i = 0; i < 4; i++) {
-      const t = i / 4 * Math.PI * 2;
-      g.save();
-      g.translate(c + Math.cos(t) * (R - rw * 2.2), c + Math.sin(t) * (R - rw * 2.2));
-      g.rotate(t);
-      g.beginPath();
-      g.moveTo(rw * 0.9, 0);
-      g.lineTo(-rw * 0.3, -rw * 0.7);
-      g.lineTo(-rw * 0.3, rw * 0.7);
-      g.closePath();
-      g.fill();
-      g.restore();
-    }
-    g.strokeStyle = "rgba(236,230,212,0.25)";
-    g.lineWidth = Math.max(1, S2 * 5e-3);
-    g.beginPath();
-    g.moveTo(c - R * 0.5, c);
-    g.lineTo(c + R * 0.5, c);
-    g.moveTo(c, c - R * 0.5);
-    g.lineTo(c, c + R * 0.5);
-    g.stroke();
-    cache6.set(key, cv);
-    return cv;
-  }
-  function renderKnob(size2) {
-    const k = dpr();
-    const key = `knob|${size2}|${k}`;
-    const hit2 = cache6.get(key);
-    if (hit2) return hit2;
-    const S2 = Math.round(size2 * k);
-    const cv = document.createElement("canvas");
-    cv.width = cv.height = S2;
-    const g = cv.getContext("2d");
-    const c = S2 / 2, R = c - S2 * 0.04;
-    g.save();
-    g.shadowColor = "rgba(0,0,0,0.6)";
-    g.shadowBlur = S2 * 0.08;
-    g.shadowOffsetY = S2 * 0.03;
-    const rg = g.createRadialGradient(c - R * 0.3, c - R * 0.35, R * 0.1, c, c, R);
-    rg.addColorStop(0, "#f4f1e6");
-    rg.addColorStop(0.5, "#a9b1b8");
-    rg.addColorStop(1, "#4a535c");
-    g.fillStyle = rg;
-    g.beginPath();
-    g.arc(c, c, R, 0, Math.PI * 2);
-    g.fill();
-    g.restore();
-    g.strokeStyle = "rgba(20,24,30,0.8)";
-    g.lineWidth = Math.max(1, S2 * 0.015);
-    g.beginPath();
-    g.arc(c, c, R, 0, Math.PI * 2);
-    g.stroke();
-    cache6.set(key, cv);
-    return cv;
-  }
-  function clearArtCache() {
-    cache6.clear();
-  }
-
-  // src/game/action/ui/touch.ts
-  var DEF2 = [
-    { id: "light", cell: 0, text: "약공격", dx: 0, dy: 0, d: 1.45, play: true },
-    { id: "dodge", cell: 2, text: "회피", dx: -1.52, dy: 0.29, d: 1, play: true },
-    { id: "block", cell: 3, text: "막기", dx: -2.84, dy: 0.29, d: 0.9, play: true },
-    { id: "heavy", cell: 1, text: "강공격", dx: -1.12, dy: -0.98, d: 0.95, play: true },
-    { id: "jump", cell: 4, text: "점프", dx: 0.02, dy: -1.44, d: 0.95, play: true },
-    { id: "unique", cell: 5, text: "고유", dx: -2.42, dy: -1.23, d: 0.9, play: true },
-    { id: "ult", cell: 6, text: "필살", dx: -1.62, dy: -2.4, d: 0.95, play: true },
-    { id: "interact", cell: 7, text: "조사", dx: 0.34, dy: -2.66, d: 0.8, play: true },
-    { id: "auto", cell: null, text: "AUTO", dx: 0, dy: 0, d: 0.8, play: true },
-    { id: "menu", cell: null, text: "", dx: 0, dy: 0, d: 0.65, play: true },
-    // 정보 창(통합창, ` 키, 11-01 사용자 이름 「정보」): 메뉴 옆
-    { id: "char", cell: null, text: "정보", dx: 0, dy: 0, d: 0.8, play: true },
-    // 대사창 모드: 약공격 자리 = 선택, 점프 자리 = 취소
-    { id: "ok", cell: null, text: "선택", dx: 0, dy: 0, d: 1.45, dialog: true },
-    { id: "cancel", cell: null, text: "취소", dx: 0.02, dy: -1.44, d: 0.95, dialog: true }
-  ];
-  var DODGE_MS = 80;
-  var PC_BAR = /* @__PURE__ */ new Set(["auto", "menu", "char"]);
-  var CHARGE_MS = 300;
-  var EXEMPT = 'button, input, textarea, select, a[href], label, [contenteditable="true"], [role="button"], [data-act], [data-mission], [data-go], [data-chip], .mn-row, .mn-list, .gt-log';
-  function safeInsets(host) {
-    const probe = document.createElement("div");
-    probe.style.cssText = "position:fixed;left:0;top:0;width:0;height:0;visibility:hidden;pointer-events:none;padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)";
-    host.append(probe);
-    const cs = getComputedStyle(probe);
-    const v = { t: parseFloat(cs.paddingTop) || 0, r: parseFloat(cs.paddingRight) || 0, b: parseFloat(cs.paddingBottom) || 0, l: parseFloat(cs.paddingLeft) || 0 };
-    probe.remove();
-    return v;
-  }
-  var TouchPad = class {
-    constructor(layer, hub, st, onMenu) {
-      this.layer = layer;
-      this.hub = hub;
-      this.st = st;
-      this.onMenu = onMenu;
-      this.surface = layer.closest(".gs") ?? layer.parentElement ?? layer;
-      this.root = document.createElement("div");
-      this.root.className = "tp gk-font";
-      this.root.innerHTML = `<div class="tp-zone"></div><div class="tp-base"><div class="tp-knob"></div></div>`;
-      this.zone = this.root.querySelector(".tp-zone");
-      this.base = this.root.querySelector(".tp-base");
-      for (const d3 of DEF2) {
-        const el = document.createElement("div");
-        el.className = `tp-b ${d3.cell === null ? "tp-frame" : "tp-icon"}`;
-        el.dataset.id = d3.id;
-        el.setAttribute("aria-label", d3.text || "메뉴");
-        el.innerHTML = `<canvas class="tp-cv"></canvas><b>${d3.text}</b><i class="tp-cd"></i>${d3.id === "ult" ? '<i class="tp-ring"></i>' : ""}`;
-        this.root.append(el);
-        this.btns.push({ ...d3, el, cx: 0, cy: 0, r: 0 });
-      }
-      this.base.innerHTML = '<canvas class="tp-cv"></canvas><div class="tp-knob"><canvas class="tp-cv"></canvas></div>';
-      this.knob = this.base.querySelector(".tp-knob");
-      onSheetReady(() => this.paintAll());
-      void document.fonts?.load(`700 11px "${PIXEL_FONT}"`).then(() => {
-        clearArtCache();
-        this.paintAll();
-      }, () => {
-      });
-      layer.append(this.root);
-      const opt = { passive: false };
-      const s = this.surface;
-      s.addEventListener("pointerdown", this.onDown, opt);
-      s.addEventListener("pointermove", this.onMove, opt);
-      s.addEventListener("pointerup", this.onUp, opt);
-      s.addEventListener("pointercancel", this.onUp, opt);
-      s.addEventListener("lostpointercapture", this.onUp, opt);
-      s.addEventListener("contextmenu", this.onContext);
-      s.addEventListener("gesturestart", this.onGesture, opt);
-      s.addEventListener("dblclick", this.onContext);
-      s.addEventListener("touchend", this.onTouchEnd, opt);
-      window.addEventListener("pointerup", this.onUp);
-      window.addEventListener("pointercancel", this.onUp);
-      window.addEventListener("blur", this.onBlur);
-      document.addEventListener("visibilitychange", this.onVisibility);
-      window.addEventListener("touchstart", this.onAnyTouch, { passive: true, capture: true });
-      document.addEventListener("focusin", this.onIme);
-      document.addEventListener("focusout", this.onIme);
-      if (typeof visualViewport !== "undefined") visualViewport?.addEventListener("resize", this.onIme);
-      this.layout();
-    }
-    root;
-    /** 터치를 받는 곳 = 게임 층 루트(.gs). 터치 차단도 여기서 */
-    surface;
-    btns = [];
-    zone;
-    base;
-    knob;
-    ptr = /* @__PURE__ */ new Map();
-    /** 키 코드별로 누르고 있는 손가락 수 */
-    count = /* @__PURE__ */ new Map();
-    stickPid = null;
-    dirOn = { ArrowLeft: false, ArrowRight: false, ArrowUp: false, ArrowDown: false };
-    runOn = false;
-    runSince = 0;
-    runTimer = 0;
-    timers = /* @__PURE__ */ new Set();
-    /** 고유: 누른 시각·충전 시작 타이머·충전 중 */
-    uniq = { timer: 0, charging: false, down: false };
-    sr = 64;
-    restX = 0;
-    restY = 0;
-    /** 스틱 자리 (층 기준 px) */
-    zr = { x: 0, y: 0, w: 0, h: 0 };
-    /** 스틱이 시작되면 안 되는 곳 (아래 가운데 자동·메뉴 둘레) */
-    noStick = { x: 0, y: 0, w: 0, h: 0 };
-    /** 캔버스 논리 폭 (옛 호환) */
-    vw = () => 1280;
-    /** 화면 좌표 → 층 좌표. 플러그인 창이 게임을 90도 돌릴 때 viewport.toLocal 을 넣는다 */
-    toLocal = null;
-    visible = false;
-    seenTouch = false;
-    mode = "play";
-    /** 입력칸(키패드)에 초점: 스틱·버튼 전부 숨김 */
-    imeUp = false;
-    /** 자동전투 켜짐 (아래 가운데 버튼 안이 청록) */
-    autoOn = false;
-    /** PC: 터치판은 숨기고 아래 가운데 자동·메뉴·통합창만 마우스로 */
-    pc = false;
-    baseX = 0;
-    baseY = 0;
-    lastDpr = 0;
-    onDown = (e) => this.down(e);
-    onMove = (e) => this.move(e);
-    onUp = (e) => this.up(e);
-    onContext = (e) => {
-      if (this.active()) e.preventDefault();
-    };
-    onGesture = (e) => {
-      if (this.active()) e.preventDefault();
-    };
-    onTouchEnd = (e) => {
-      if (!this.shown) return;
-      const t = e.target;
-      if (t && (t.closest(".tp") || !t.closest(EXEMPT)) && e.cancelable) e.preventDefault();
-    };
-    onBlur = () => this.releaseAll();
-    onVisibility = () => {
-      if (document.hidden) this.releaseAll();
-    };
-    onAnyTouch = () => {
-      if (!this.seenTouch) {
-        this.seenTouch = true;
-        if (!this.shown) this.refresh();
-      }
-    };
-    /** 층이 화면에 90도 돌아 그려지는가 (플러그인 창 회전·껍데기 돌려 보기) */
-    rotated() {
-      const r = this.layer.getBoundingClientRect();
-      const w = this.layer.clientWidth, h = this.layer.clientHeight;
-      return Math.abs(w - h) > 4 && Math.abs(r.width - h) < 2 && Math.abs(r.height - w) < 2;
-    }
-    /** 설정·화면 크기가 바뀌면 다시 배치 */
-    layout() {
-      this.releaseAll();
-      const s = this.st();
-      const bw = this.layer.clientWidth || 800, bh = this.layer.clientHeight || 400;
-      const sa = typeof getComputedStyle === "undefined" ? { t: 0, r: 0, b: 0, l: 0 } : safeInsets(this.layer);
-      const ins = this.rotated() ? { t: sa.r, r: sa.b, b: sa.l, l: sa.t } : sa;
-      const portrait = bh > bw * 1.05;
-      const u = Math.max(44, Math.min(86, Math.min(bw, bh) * 0.16)) * s.touchSize;
-      const dprNow = typeof devicePixelRatio === "number" ? devicePixelRatio : 1;
-      if (dprNow !== this.lastDpr) this.lastDpr = dprNow, clearArtCache();
-      this.root.style.setProperty("--tp-u", `${u}px`);
-      this.root.style.setProperty("--tp-a", String(s.touchAlpha));
-      const flip = (x) => s.lefty ? bw - x : x;
-      const ax = bw - ins.r - u * 1.275, ay = bh - ins.b - u * 1.275;
-      const cornerBottom = bh / 720 * 112 + 6;
-      const topNeed = 2.66 * u + 0.4 * u;
-      const ky = Math.max(0.72, Math.min(1, (ay - cornerBottom) / topNeed));
-      const place = (b, cx, cy) => {
-        const r = b.d * u / 2;
-        Object.assign(b, { cx, cy, r });
-        const el = b.el;
-        el.style.width = el.style.height = `${r * 2}px`;
-        el.style.left = `${cx - r}px`;
-        el.style.top = `${cy - r}px`;
-        this.paint(b);
-      };
-      const autoR = 0.4 * u, rowY = portrait ? ins.t + 10 + autoR : bh - ins.b - 12 - autoR;
-      for (const b of this.btns) {
-        if (b.id === "auto") place(b, flip(bw / 2 - 0.92 * u), rowY);
-        else if (b.id === "menu") place(b, flip(bw / 2), rowY);
-        else if (b.id === "char") place(b, flip(bw / 2 + 0.92 * u), rowY);
-        else place(b, flip(ax + b.dx * u), ay + b.dy * u * ky);
-      }
-      const auto = this.btns.find((b) => b.id === "auto");
-      const menu = this.btns.find((b) => b.id === "menu");
-      const chr = this.btns.find((b) => b.id === "char");
-      const nl = Math.min(auto.cx - auto.r, menu.cx - menu.r, chr.cx - chr.r) - 10, nr = Math.max(auto.cx + auto.r, menu.cx + menu.r, chr.cx + chr.r) + 10;
-      this.noStick = { x: nl, y: rowY - autoR - 10, w: nr - nl, h: autoR * 2 + 20 };
-      const zt = portrait ? Math.max(bh * 0.4, rowY + autoR + 10) : bh * 0.18;
-      const zw = bw * 0.5;
-      this.zr = { x: s.lefty ? bw - zw : 0, y: zt, w: zw, h: bh - zt };
-      Object.assign(this.zone.style, { left: `${this.zr.x}px`, top: `${zt}px`, width: `${zw}px`, height: `${bh - zt}px` });
-      this.sr = u * 1.05;
-      this.root.style.setProperty("--tp-r", `${this.sr}px`);
-      this.paintStick();
-      this.restX = ins.l + 24 + this.sr * 1.1;
-      this.restY = ins.b + 24 + this.sr * 1.1;
-      this.root.classList.toggle("tp-dialog", this.mode === "dialog");
-      this.root.classList.toggle("tp-auto-on", this.autoOn);
-      for (const b of this.btns) b.el.style.display = this.usable(b) ? "" : "none";
-      this.restBase();
-    }
-    restBase() {
-      const s = this.st();
-      const zr = this.zr;
-      const x = s.lefty ? zr.w - this.restX : this.restX;
-      const y = zr.h - this.restY;
-      this.placeBase(zr.x + x, zr.y + y);
-      this.knob.style.transform = "";
-      this.base.classList.remove("on");
-    }
-    placeBase(x, y) {
-      this.base.style.transform = `translate(${x - this.sr}px, ${y - this.sr}px)`;
-      this.baseX = x;
-      this.baseY = y;
-    }
-    /** 이 모드에서 보이는 버튼인가 */
-    usable(b) {
-      if (this.pc) return PC_BAR.has(b.id);
-      if (this.mode === "dialog") return !!b.dialog;
-      if (this.root.closest(".exploration-map")) return b.id === "menu";
-      return !!b.play;
-    }
-    /** 눌러지는 버튼인가 (흐린 버튼은 자리만 지킨다) */
-    pressable(b) {
-      return this.usable(b) && !b.el.classList.contains("off");
-    }
-    /** 옛 호환: 필드 전용 「조사·메뉴만」 규칙은 없앴다 (버튼 종류는 어디서나 고정) */
-    setField(_on) {
-    }
-    /** 놀이 / 대사창 모드 */
-    setMode(m) {
-      if (this.mode === m) return;
-      this.mode = m;
-      this.releaseAll();
-      this.refresh();
-    }
-    get touchMode() {
-      return this.mode;
-    }
-    onIme = () => {
-      const vv = typeof visualViewport !== "undefined" ? visualViewport : null;
-      const a = document.activeElement;
-      const typing = /^(INPUT|TEXTAREA|SELECT)$/.test(a?.tagName ?? "") || !!a?.isContentEditable;
-      const shrunk = !!vv && vv.height < innerHeight * 0.75 && typing;
-      const up = typing || shrunk;
-      if (up === this.imeUp) return;
-      this.imeUp = up;
-      if (up) this.releaseAll();
-      this.refresh();
-    };
-    get keypad() {
-      return this.imeUp;
-    }
-    refresh() {
-      const s = this.st();
-      const coarse = typeof matchMedia !== "undefined" && matchMedia("(pointer: coarse)").matches;
-      const show = s.touch === "on" || s.touch === "auto" && (coarse || this.seenTouch);
-      this.pc = !show && this.visible && !this.imeUp && this.mode === "play";
-      this.root.classList.toggle("pc", this.pc);
-      this.root.classList.toggle("hide", !show && !this.pc || !this.visible || this.imeUp);
-      this.layout();
-    }
-    setVisible(on) {
-      if (this.visible === on) return;
-      this.visible = on;
-      if (!on) this.releaseAll();
-      this.refresh();
-    }
-    get shown() {
-      return !this.root.classList.contains("hide") && !this.pc;
-    }
-    /** 터치를 받는 중 (보이고 키패드가 아님) */
-    active() {
-      return (this.shown || this.pc) && !this.imeUp;
-    }
-    /** 버튼 종류 → 틀 모양 */
-    kindOf(b) {
-      if (b.id === "light" || b.id === "ok") return "main";
-      if (b.id === "ult") return "ult";
-      if (b.id === "block" || b.id === "dodge") return "guard";
-      if (b.id === "auto" || b.id === "char") return "auto";
-      if (b.id === "menu") return "menu";
-      return "skill";
-    }
-    /** 버튼 한 장을 지금 크기·상태로 그린다 (touchArt.ts 캐시) */
-    paint(b) {
-      const cv = b.el.querySelector(":scope > .tp-cv");
-      if (!cv || !b.r) return;
-      const size2 = Math.round(b.r * 2);
-      const art4 = renderButton({ size: size2, kind: this.kindOf(b), cell: b.cell, text: b.id === "auto" ? this.pc ? "자동" : "자동\n전투" : b.text, on: b.id === "auto" && this.autoOn });
-      if (cv.width !== art4.width || cv.height !== art4.height) cv.width = art4.width, cv.height = art4.height;
-      const g = cv.getContext("2d");
-      if (!g) return;
-      g.clearRect(0, 0, cv.width, cv.height);
-      g.drawImage(art4, 0, 0);
-    }
-    paintAll() {
-      for (const b of this.btns) this.paint(b);
-      this.paintStick();
-    }
-    paintStick() {
-      const base2 = this.base.querySelector(":scope > .tp-cv");
-      const knob = this.knob.querySelector(".tp-cv");
-      if (!base2 || !knob || !this.sr) return;
-      const b = renderStickBase(Math.round(this.sr * 2));
-      const k = renderKnob(Math.round(this.sr * 0.8));
-      for (const [cv, art4] of [[base2, b], [knob, k]]) {
-        if (cv.width !== art4.width || cv.height !== art4.height) cv.width = art4.width, cv.height = art4.height;
-        cv.getContext("2d")?.drawImage(art4, 0, 0);
-      }
-    }
-    /** 옛 호환: 아이템 칸은 모바일에서 뺐다 */
-    setItems(_items) {
-    }
-    /** 필살 게이지 0~1: 금색 테두리 게이지, 가득 차면 빛남 */
-    setGauge(v) {
-      const b = this.btns.find((x) => x.id === "ult").el;
-      const g = Math.max(0, Math.min(1, v));
-      const t = g.toFixed(3);
-      if (b.style.getPropertyValue("--g") !== t) b.style.setProperty("--g", t);
-      b.classList.toggle("full", g >= 1);
-    }
-    /** 재사용 대기: frac 0~1 (남은 비율), text = 남은 초. 0 이면 끝 */
-    setCool(id, frac, text = "") {
-      const b = this.btns.find((x) => x.id === id)?.el;
-      if (!b) return;
-      const on = frac > 0;
-      b.classList.toggle("cool", on);
-      b.style.setProperty("--cd", on ? String(Math.min(1, frac)) : "0");
-      const i = b.querySelector(".tp-cd");
-      if (i.textContent !== text) i.textContent = on ? text : "";
-    }
-    /** 못 씀: 흐리게, 자리는 그대로 */
-    setOff(id, off2) {
-      const b = this.btns.find((x) => x.id === id);
-      if (!b || b.el.classList.contains("off") === off2) return;
-      b.el.classList.toggle("off", off2);
-      if (off2) {
-        for (const [pid, st] of this.ptr) if (st.kind === "btn" && st.b === b) this.hold(b, false), st.b = null, void pid;
-      }
-    }
-    /** 자동전투 켜짐 표시 */
-    setAuto(on) {
-      if (this.autoOn === on) return;
-      this.autoOn = on;
-      this.root.classList.toggle("tp-auto-on", on);
-      const a = this.btns.find((x) => x.id === "auto");
-      if (a) this.paint(a);
-    }
-    /** 버튼 강조 (조사할 것이 있을 때 등) */
-    hint(id, on) {
-      this.btns.find((x) => x.id === id)?.el.classList.toggle("hint", on);
-    }
-    /** 시험·화면 확인용: 버튼 자리 (층 좌표) */
-    rects() {
-      return Object.fromEntries(this.btns.map((b) => [b.id, { x: b.cx, y: b.cy, r: b.r, shown: this.usable(b) && this.shown, off: b.el.classList.contains("off") }]));
-    }
-    hit(x, y) {
-      let best = null, bd = Infinity;
-      for (const b of this.btns) {
-        if (!this.pressable(b)) continue;
-        const d3 = Math.hypot(x - b.cx, y - b.cy) / b.r;
-        if (d3 < 1.15 && d3 < bd) best = b, bd = d3;
-      }
-      return best;
-    }
-    local(e) {
-      if (this.toLocal) return this.toLocal(e.clientX, e.clientY, this.layer);
-      const r = this.layer.getBoundingClientRect();
-      return { x: e.clientX - r.left, y: e.clientY - r.top };
-    }
-    /** 이 버튼이 누르는 키 */
-    codeOf(b) {
-      switch (b.id) {
-        case "light":
-          return CODE.attack;
-        case "heavy":
-          return CODE.reload;
-        case "dodge":
-          return CODE.evade;
-        case "block":
-          return CODE.guard;
-        case "jump":
-          return CODE.jump;
-        case "unique":
-          return CODE.unique;
-        case "ult":
-          return CODE.ult;
-        case "interact":
-          return CODE.interact;
-        case "auto":
-          return CODE.auto;
-        case "menu":
-          return "Escape";
-        case "char":
-          return "Backquote";
-        case "ok":
-          return "Enter";
-        case "cancel":
-          return "Escape";
-      }
-    }
-    key(code, on) {
-      const n = (this.count.get(code) ?? 0) + (on ? 1 : -1);
-      this.count.set(code, Math.max(0, n));
-      if (on && n === 1) this.hub.press(code, "touch");
-      else if (!on && n <= 0) this.hub.release(code, "touch");
-    }
-    later(fn2, ms) {
-      const t = window.setTimeout(() => {
-        this.timers.delete(t);
-        fn2();
-      }, ms);
-      this.timers.add(t);
-      return t;
-    }
-    hold(b, on) {
-      b.el.classList.toggle("on", on);
-      if (on && this.st().vibrate) navigator.vibrate?.(8);
-      if (b.id === "menu" || b.id === "char") {
-        if (on) {
-          this.releaseAll();
-          this.onMenu(b.id === "menu" ? "Escape" : "Backquote");
-        }
-        return;
-      }
-      if (b.id === "dodge") {
-        if (on) {
-          this.key(CODE.evade, true);
-          this.later(() => this.key(CODE.evade, false), DODGE_MS);
-        }
-        return;
-      }
-      if (b.id === "unique") {
-        const charge2 = TOUCH_CHARGE.code;
-        if (!charge2) {
-          this.key(CODE.unique, on);
-          return;
-        }
-        const u = this.uniq;
-        if (on) {
-          if (u.down) return;
-          u.down = true;
-          u.charging = false;
-          u.timer = this.later(() => {
-            u.timer = 0;
-            if (!u.down) return;
-            u.charging = true;
-            this.key(charge2, true);
-          }, CHARGE_MS);
-        } else {
-          if (!u.down) return;
-          u.down = false;
-          if (u.timer) clearTimeout(u.timer), this.timers.delete(u.timer), u.timer = 0;
-          if (u.charging) this.key(charge2, false);
-          else {
-            this.key(CODE.unique, true);
-            this.later(() => this.key(CODE.unique, false), DODGE_MS);
-          }
-          u.charging = false;
-        }
-        return;
-      }
-      const code = this.codeOf(b);
-      if (code) this.key(code, on);
-    }
-    down(e) {
-      if (!this.active() || e.pointerType === "mouse" && e.button !== 0) return;
-      const t = e.target;
-      const p = this.local(e);
-      if (this.pc) {
-        const pb = this.hit(p.x, p.y);
-        if (!pb) return;
-        e.preventDefault();
-        this.ptr.set(e.pointerId, { kind: "btn", b: pb });
-        this.hold(pb, true);
-        return;
-      }
-      let b = this.mode === "play" ? this.hit(p.x, p.y) : null;
-      if (!b && t && !t.closest(".tp") && t.closest(EXEMPT)) return;
-      b ??= this.hit(p.x, p.y);
-      e.preventDefault();
-      try {
-        this.surface.setPointerCapture(e.pointerId);
-      } catch {
-      }
-      if (b) {
-        this.ptr.set(e.pointerId, { kind: "btn", b });
-        this.hold(b, true);
-        return;
-      }
-      const zr = this.zr, ns = this.noStick;
-      const inZone = p.x >= zr.x && p.y >= zr.y && p.x <= zr.x + zr.w && p.y <= zr.y + zr.h;
-      const blocked = this.mode === "play" && p.x >= ns.x && p.x <= ns.x + ns.w && p.y >= ns.y && p.y <= ns.y + ns.h;
-      if (this.stickPid === null && inZone && !blocked && !this.root.closest(".exploration-map")) {
-        this.stickPid = e.pointerId;
-        this.ptr.set(e.pointerId, { kind: "stick" });
-        this.placeBase(p.x, p.y);
-        this.base.classList.add("on");
-        this.stickTo(p.x, p.y);
-        return;
-      }
-      this.ptr.set(e.pointerId, { kind: "eat" });
-    }
-    move(e) {
-      const st = this.ptr.get(e.pointerId);
-      if (!st) return;
-      e.preventDefault();
-      if (st.kind === "eat") return;
-      const p = this.local(e);
-      if (st.kind === "stick") {
-        this.stickTo(p.x, p.y);
-        return;
-      }
-      const b = this.hit(p.x, p.y);
-      if (b !== st.b) {
-        if (st.b) this.hold(st.b, false);
-        st.b = b;
-        if (b) this.hold(b, true);
-      }
-    }
-    up(e) {
-      const st = this.ptr.get(e.pointerId);
-      if (!st) return;
-      this.ptr.delete(e.pointerId);
-      try {
-        if (this.surface.hasPointerCapture(e.pointerId)) this.surface.releasePointerCapture(e.pointerId);
-      } catch {
-      }
-      if (st.kind === "btn") {
-        if (st.b) this.hold(st.b, false);
-      } else if (st.kind === "stick") {
-        this.stickPid = null;
-        this.setStick(0, 0);
-        this.restBase();
-      }
-    }
-    stickTo(x, y) {
-      const R = this.sr * 0.95;
-      let dx = x - this.baseX, dy = y - this.baseY;
-      const m = Math.hypot(dx, dy);
-      if (m > R * 1.5) {
-        const k = (m - R * 1.5) / m;
-        this.placeBase(this.baseX + dx * k, this.baseY + dy * k);
-        dx = x - this.baseX;
-        dy = y - this.baseY;
-      }
-      const mm = Math.hypot(dx, dy);
-      const cl = mm > R ? R / mm : 1;
-      this.knob.style.transform = `translate(${dx * cl}px, ${dy * cl}px)`;
-      let nx = dx * cl / R, ny = dy * cl / R;
-      if (Math.hypot(nx, ny) < 0.18) nx = ny = 0;
-      this.
+      set("ArrowUp", y < -0.

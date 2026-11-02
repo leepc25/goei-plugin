@@ -1,4 +1,1609 @@
-);
+pt && c.pt.onT } }));
+      },
+      repeat(s, c) {
+        for (let i = 0; i < (s.n || 3); i++) later(i * (s.every || 0.1), () => runFx(s.fx || [], c));
+      },
+      gray(s) {
+        grayT = Math.max(grayT, s.time || 1);
+      },
+      chance(s, c) {
+        const ok = Math.random() < (s.p ?? 0.5);
+        runFx(ok ? s.yes : s.no, c);
+      },
+      // 위에서 쏟아지는 작은 것들(서류·잔·카드)
+      rain(s) {
+        for (let i = 0; i < (s.n || 40); i++) later(Math.random() * (s.time || 1.2), () => fx2.push({ k: "drop", icon: s.icon || "paper", x: Math.random() * W5, y: -20, vy: 300 + Math.random() * 300, vx: (Math.random() - 0.5) * 80, rot: Math.random() * 6, vr: (Math.random() - 0.5) * 8, g: FLOOR0 + Math.random() * (FLOOR1 - FLOOR0), c: s.color || "#f2efe6", t: 3, t0: 3 }));
+      },
+      // 훑기: 화면을 가로지르는 선(line) / 펼쳐지는 사각 격자(grid)
+      scan(s) {
+        fx2.push({ k: s.style === "grid" ? "grid" : "scan", x: P2.x, y: P2.y - 190 * K3(P2.y), dir: P2.face, c: s.color || CH2.color, t: s.time || 0.6, t0: s.time || 0.6 });
+        sfx("ability");
+      },
+      // 베기 궤적: x(엑스) | arc(초승달)
+      slash(s, c) {
+        const p = s.at === "center" ? { x: W5 / 2, gy: (FLOOR0 + FLOOR1) / 2, hy: H5 / 2, k: 1 } : posOf({ at: "front", ...s }, c);
+        fx2.push({ k: s.dark ? "slashD" : "slash", style: s.style || "arc", x: p.x, y: p.hy, r: (s.size || 160) * (s.at === "center" ? 1 : p.k), dir: P2.face, c: s.color || CH2.color, t: 0.3, t0: 0.3 });
+        sfx("whiff", { strength: 2 });
+        if (s.at === "center" ? allT() : near2(p.x, p.gy, (s.size || 160) * p.k, 70)) strike2(s.hit);
+      },
+      later(s, c) {
+        later(s.in || 0.5, () => runFx(s.fx || [], c));
+      },
+      // 에일린: 제압사격 한 발(앞 땅 부채꼴)
+      suppress(s, c) {
+        const p = c.o || muzzle();
+        sfx("shot");
+        const dir = P2.face, drop = Math.max(40, P2.y - p.y), dist = drop * (1.25 + Math.random() * 1.4);
+        const gx = p.x + dir * dist, gy = P2.y + (Math.random() - 0.5) * 18 * K3(P2.y), ang = Math.atan2(gy - p.y, dist);
+        fx2.push({ k: "shell", x: p.x - dir * 30, y: p.y, vx: -dir * (80 + Math.random() * 80), vy: -220 - Math.random() * 120, g: P2.y, t: 1.2 });
+        const gp = MZ_GAP * K3(P2.y), sx = p.x + dir * Math.cos(ang) * gp, sy = p.y + Math.sin(ang) * gp, tt = Math.hypot(gx - sx, gy - sy) / 3200;
+        if (VFX.tracer) fx2.push({ k: "bullet", x: sx, y: sy, x2: gx, y2: gy, t: tt, t0: tt });
+        later(tt, () => {
+          sparks(gx, gy - 3, 4, false, "#ffe9a0");
+          if (Math.random() < 0.4) dust(gx, gy, 1, 0.4);
+        });
+        shake = Math.max(shake, 1.5);
+        const ddx = (T2.x - p.x) * dir;
+        if (!!T2 && ddx > 30 && ddx < dist + 40 && Math.abs(T2.y - P2.y) < 90) {
+          const bulletY = p.y + ddx * Math.tan(ang), dk = K3(T2.y);
+          if (bulletY > T2.y - T2.z - 220 * dk && bulletY < T2.y - T2.z + 10) later(ddx / 3200, () => {
+            curHit = s;
+            curLast = true;
+            damageTarget(s.dmg || 7, "light");
+            curHit = null;
+            T2.vx += dir * 140;
+            T2.stag = Math.max(T2.stag, 0.45);
+            vfx("bullet_hit_body", T2.x - dir * 10, bulletY, 2);
+            hitstop = Math.max(hitstop, 0.012);
+            shake = Math.max(shake, 3);
+          });
+        }
+      },
+      // 에일린: 판독 표적 → 포격
+      artillery(s) {
+        const spots = [];
+        for (let k = 0; k < (s.n || 12); k++) spots.push({ x: 60 + Math.random() * (W5 - 120), y: FLOOR0 + 30 + Math.random() * (FLOOR1 - FLOOR0 - 30) });
+        if (!!T2) spots.splice(Math.random() * spots.length | 0, 0, { x: T2.x, y: T2.y, onT: true });
+        const marks = spots.map((sp) => ({ k: "target", x: sp.x, y: sp.y, t: 8, onT: sp.onT }));
+        [0, 1, 2].forEach((g) => later(g * 0.38, () => {
+          marks.forEach((m, n) => {
+            if (n % 3 === g) fx2.push(m);
+          });
+          sfx("ui");
+        }));
+        marks.forEach((m, i) => later(1.2 + i * 0.13 + Math.random() * 0.08, () => {
+          fx2.push({ k: "mortar", x: m.x, y: m.y, t: 0.32, t0: 0.32 });
+          sfx("whiff", { strength: 2 });
+          later(0.32, () => {
+            FX.blast({ at: "target", air: false, scale: 1.4, scorch: 2.5, hit: m.onT ? { dmg: 55, kind: "launch" } : null }, { pt: { x: m.x, y: m.y } });
+            m.t = 0;
+          });
+        }));
+      }
+    };
+    function runFx(list, c = {}) {
+      for (const s of list || []) {
+        const f = FX[s.t];
+        if (f) try {
+          const n0 = fx2.length;
+          f(s, c);
+          const cm = COMMON[s.t];
+          if (cm) cm(s, c, n0);
+        } catch (e) {
+          console.warn(s, e);
+        }
+      }
+    }
+    const colOf = (s) => s.color && !/^rgba?\(/.test(s.color) ? s.color : CH2.color;
+    const dropNew = (n0, kinds) => {
+      for (let i = fx2.length - 1; i >= n0; i--) if (kinds.includes(fx2[i].k)) fx2.splice(i, 1);
+    };
+    const COMMON = {
+      slash(s, c, n0) {
+        if (!VFX["fx-slash"]) return;
+        const e = fx2.slice(n0).find((e2) => e2.k === "slash" || e2.k === "slashD");
+        if (!e) return;
+        dropNew(n0, ["slash", "slashD"]);
+        vfx("fx-slash", e.x, e.y, e.r / 40, { center: true, flip: e.dir < 0, tint: s.dark ? "#2a1a3a" : colOf(s), t: 0.32 });
+      },
+      bind(s) {
+        if (!!!T2 || !VFX["fx-bind"]) return;
+        const k = K3(T2.y);
+        vfx("fx-bind", T2.x, T2.y - T2.z, 3.6 * k, { bottom: true, tint: colOf(s), hold: Math.max(0, (s.time || 2) - 0.6), fade: 0.4 });
+      },
+      tether(s) {
+        COMMON.bind(s);
+      },
+      mark(s) {
+        if (!!!T2 || !VFX["fx-mark"]) return;
+        dropNew(fx2.length - 1, ["ring"]);
+        vfx("fx-mark", T2.x, T2.y - T2.z - 240 * K3(T2.y), 1.8 * K3(T2.y), { center: true, tint: colOf(s) });
+      },
+      scan(s, c, n0) {
+        if (!VFX["fx-scan"]) return;
+        dropNew(n0, ["scan", "grid"]);
+        vfx("fx-scan", P2.x + P2.face * 170 * K3(P2.y), P2.y - 130 * K3(P2.y), 3 * K3(P2.y), { center: true, flip: P2.face < 0, tint: colOf(s) });
+      },
+      shock(s, c, n0) {
+        if (!VFX["fx-shockwave"]) return;
+        const p = posOf({ at: "front", dx: 60, ...s }, c);
+        dropNew(n0, ["scorch", "ring"]);
+        vfx("fx-shockwave", p.x, p.gy + 10 * p.k, (s.r || 220) * p.k / 70, { bottom: true, under: true, tint: colOf({ color: s.color || "#ffffff" }) });
+      },
+      ring(s, c, n0) {
+        if (s.air || !VFX["fx-shockwave"]) return;
+        const p = posOf({ at: "self", ...s }, c);
+        dropNew(n0, ["ring"]);
+        vfx("fx-shockwave", p.x, p.gy + 10 * p.k, (s.r || 120) * p.k / 70, { bottom: true, under: true, tint: colOf(s) });
+      },
+      waves(s) {
+        if (!VFX["fx-shockwave"]) return;
+        const m = muzzle();
+        for (let i = 0; i < (s.n || 3); i++) later(i * 0.09, () => vfx("fx-shockwave", m.x + P2.face * (40 + i * 40), m.y + 20, 1.2 + i * 0.5, { center: true, tint: colOf(s) }));
+      },
+      summon(s, c, n0) {
+        if (!VFX["fx-summon"]) return;
+        const o = fx2.slice(n0).find((e) => e.k === "obj");
+        if (!o || !o.ground) return;
+        vfx("fx-summon", o.x, o.y + 8 * o.s, 1.6 * o.s, { bottom: true, tint: colOf(s) });
+      },
+      buff(s) {
+        if (!VFX["fx-buff"]) return;
+        const k = K3(P2.y);
+        for (let i = 0; i < 3; i++) later(i * 0.06, () => vfx("fx-buff", P2.x + (i - 1) * 34 * k, P2.y - 10 * k, 3 * k, { bottom: true, tint: colOf(s) }));
+      },
+      hide(s) {
+        if (VFX["fx-vanish"]) vfx("fx-vanish", P2.x, P2.y - 110 * K3(P2.y), 3.4 * K3(P2.y), { center: true, tint: colOf({ color: s.color || "#d8d4e8" }) });
+      },
+      teleport(s) {
+        if (VFX["fx-vanish"]) vfx("fx-vanish", P2.x, P2.y - 110 * K3(P2.y), 3.4 * K3(P2.y), { center: true, tint: colOf({ color: s.color || "#d8d4e8" }) });
+      },
+      puddle(s, c) {
+        if (!VFX["fx-shadow"]) return;
+        const p = posOf({ at: "self", ...s }, c);
+        vfx("fx-shadow", p.x, p.gy + 8 * p.k, (s.r || 70) * p.k / 40, { bottom: true, under: true });
+      },
+      spikes(s, c, n0) {
+        if (!VFX["fx-shadow"]) return;
+        const p = posOf({ at: "front", ...s }, c);
+        dropNew(n0, ["spikeG"]);
+        for (let i = 0; i < 3; i++) later(i * 0.05, () => vfx("fx-shadow", p.x + (i - 1) * 60 * p.k, p.gy + 8 * p.k, 2.2 * p.k, { bottom: true }));
+      },
+      grid(s, c, n0) {
+        if (!VFX["fx-shadow"]) return;
+        const p = posOf({ at: "front", ...s }, c), w = (s.w || 300) * p.k;
+        for (let i = 0; i < 5; i++) later(i * 0.04, () => vfx("fx-shadow", p.x + (i - 2) * w / 5, p.gy + 8 * p.k, 2 * p.k, { bottom: true }));
+      },
+      firewall(s, c) {
+        if (!VFX["fx-fire"]) return;
+        const p = s.at === "screen" ? { x: W5 / 2, gy: FLOOR1 - 20, k: 1 } : posOf({ at: "target", ...s }, c);
+        const w = s.at === "screen" ? W5 : (s.w || 160) * p.k, n = Math.max(1, Math.round(w / 220));
+        for (let i = 0; i < n; i++) vfx("fx-fire", p.x + (i - (n - 1) / 2) * w / n, p.gy + 6, 1.8 * p.k, { bottom: true, t: s.time || 3, loop: true });
+      },
+      flame(s) {
+        if (!VFX["fx-fire"]) return;
+        const k = K3(P2.y), len = s.len || 300;
+        for (let i = 0; i < 3; i++) later(i * 0.08, () => {
+          const m = muzzle();
+          vfx("fx-fire", m.x + P2.face * (len * (i + 1) / 4) * k, m.y, (0.6 + i * 0.2) * k, { center: true, flip: P2.face < 0 });
+        });
+      },
+      // 총구 높이에서 사거리(len) 안에만(10-28 윤병수: 바닥에 깔리고 사거리 밖까지 보였음)
+      pillar(s, c) {
+        if (s.vfx || !VFX["fx-pillar"]) return;
+        const p = posOf({ at: "target", ...s }, c);
+        vfx("fx-pillar", p.x, p.gy + 6 * p.k, 3 * p.k, { bottom: true, tint: colOf(s) });
+      }
+    };
+    function toIdle0() {
+      P2.mode = "ground";
+      P2.clip = null;
+      P2.combo = 0;
+      P2.idleT = 0;
+      P2.inSuper = false;
+      P2.returning = false;
+      P2.useSrc = null;
+      P2.rangeMul = 1;
+    }
+    function toIdle() {
+      const prev = P2.clip && P2.clip.id;
+      if (prev && !P2.returning && !P2.buf && P2.hp > 0 && P2.z <= 0 && needReturn(prev)) {
+        P2.returning = true;
+        P2.mode = "act";
+        P2.clip = null;
+        const rs = retFrames(prev);
+        play(prev, { seq: S2(rs, 0.04), onEnd: () => {
+          P2.fadeOut = { id: prev, f: rs[rs.length - 1], until: P2.t + 0.12, d: 0.12 };
+          toIdle0();
+        } });
+        return;
+      }
+      toIdle0();
+    }
+    const needReturn = (id) => id !== "20" && !!(CH2.seam && CH2.seam[id] >= 0.35 && A[id] && A[id].n >= 4);
+    const retFrames = (id) => {
+      const r = CH2.ret && CH2.ret[id], n = A[id].n;
+      return r && r.length ? r.filter((f) => f < n) : [n - 2, Math.max(0, n - 4)];
+    };
+    function act(id, o = {}) {
+      P2.mode = o.mode || "act";
+      play(id, { ...o, onEnd: o.onEnd || (() => afterBuf(toIdle)) });
+    }
+    function reverseOut(id, frames, d3, then) {
+      P2.mode = "act";
+      play(id, { seq: S2(frames, d3), onEnd: then || (() => afterBuf(toIdle)) });
+    }
+    function ensureArmed(then) {
+      if (P2.armed) return then();
+      P2.combat = true;
+      if (!has("W")) {
+        P2.armed = true;
+        return then();
+      }
+      sfx("reload");
+      act("W", { seq: S2(R(0, PK("weapon", "W")), 0.04), onEnd: () => {
+        P2.armed = true;
+        then();
+      } });
+    }
+    function afterBuf(fallback) {
+      const b = P2.buf;
+      P2.buf = null;
+      if (b === "light") return light();
+      if (b === "heavy") return heavy();
+      if (b === "dodge") return dodge();
+      if (b === "jump") return jump2();
+      fallback();
+    }
+    const ARMOR = /* @__PURE__ */ new Set(["12", "13", "23", "24", "25"]);
+    const armored = () => P2.wakeArmor > 0 || P2.clip && (P2.clip.id === "20" || ARMOR.has(P2.clip.id) || P2.skArmor) && (P2.mode === "act" || P2.mode === "charge");
+    const comboIds = () => ["9", "10", "11"].filter(has);
+    function light() {
+      const L = comboIds();
+      if (!L.length) return;
+      P2.combat = true;
+      P2.armed = false;
+      if (P2.combo >= L.length) P2.combo = 0;
+      const id = L[P2.combo];
+      P2.combo++;
+      sfx("whiff");
+      P2.connected = false;
+      env.perk?.lightStart(id);
+      pushP(170, 900);
+      act(id, { seq: atkSeq(id, false), onEnd: () => {
+        if (P2.combo >= L.length) {
+          P2.blowWin = P2.t + 0.35;
+          P2.combo = 0;
+          return afterBuf(toIdle);
+        }
+        if (P2.buf) return afterBuf(toIdle);
+        P2.mode = "chain";
+        P2.chainT = 0.26;
+      } });
+    }
+    function heavy() {
+      if (!has("12")) return light();
+      const prev = P2.combo || (P2.t < (P2.blowWin || 0) ? 3 : 0);
+      const kind = prev === 2 ? "launch" : prev >= 3 ? "blow" : "stun";
+      sfx("whiff", { strength: 2 });
+      P2.combat = true;
+      P2.armed = false;
+      P2.combo = 0;
+      pushP(140, 700);
+      act("12", { seq: atkSeq("12", true).map((e) => e.ev ? { ...e, kind } : e) });
+    }
+    function chainExpire() {
+      const id = P2.clip.id;
+      P2.combo = 0;
+      reverseOut(id, R(A[id].n - 1, 0), 0.03);
+    }
+    function slide() {
+      if (!has("13")) return light();
+      P2.combat = true;
+      P2.combo = 0;
+      pushP(840 * (P2.slideMul || 1), 1150);
+      P2.slideHit = false;
+      act("13", { seq: atkSeq("13", false).map((e, i, all) => i === 1 ? { ...e, ev: "dust" } : i >= 2 && i <= all.length - 2 ? { ...e, ev: "slideHit" } : e) });
+    }
+    function dodge() {
+      P2.combat = true;
+      P2.combo = 0;
+      let dx = (down2("right") ? 1 : 0) - (down2("left") ? 1 : 0), dy = (down2("down") ? 1 : 0) - (down2("up") ? 1 : 0);
+      if (!dx && !dy) dx = -P2.face;
+      if (dx && dx === P2.face && P2.prevFace === -dx && P2.t - P2.faceT < 0.3) P2.face = P2.prevFace;
+      const fwd = dx * P2.face > 0, len = Math.hypot(dx, dy);
+      const id = fwd && has("16_1") ? "16_1" : has("16") ? "16" : null;
+      if (!id) return;
+      if (P2.dodgeN < 1) return;
+      P2.dodgeN--;
+      if (P2.dodgeT <= 0) P2.dodgeT = P2.dodgeCd;
+      const dl = P2.dodgeLen || 1;
+      sfx("evade");
+      P2.dodgeV = { x: dx / len * 780 * dl, y: dy / len * 520 * dl };
+      P2.inv = P2.dodgeInv || 0.3;
+      P2.ghostT = 0.2;
+      P2.dodging = true;
+      env.perk?.dodge();
+      P2.pvx = 0;
+      P2.pdec = 0;
+      const n = nOf(id), d3 = 0.32 / n;
+      act(id, { seq: S2(R(0, n - 1), d3).map((e, i) => i >= n - 2 ? { ...e, cancel: true } : e), onEnd: () => {
+        P2.dodgeV = null;
+        P2.dodging = false;
+        env.perk?.dodgeEnd();
+        afterBuf(toIdle);
+      } });
+    }
+    function shoot3() {
+      if (!has("15") || P2.noShoot) return;
+      if ((BAL().cd || {}).shot) {
+        if ((P2.cd.shot || 0) > P2.t) {
+          if (BAL().cd.shot >= 1) cdReady("shot");
+          return;
+        }
+        setCd("shot");
+      }
+      const a = A["15"];
+      if (P2.overT > 0) return ensureArmed(() => act("15", { seq: [...S2(R(0, Math.min(3, a.n - 1)), 0.035), { f: Math.min(3, a.n - 1), d: 0.25, fn: () => {
+        sfx("empty");
+        const p = muzzle();
+        steam(p.x, p.y, 1);
+      } }, ...S2(R(Math.min(4, a.n - 1), a.n - 1), 0.05)] }));
+      ensureArmed(() => {
+        const lp = LP("15"), s = [];
+        if (lp) {
+          const a0 = lp[0], a1 = lp[lp.length - 1];
+          for (let f = 0; f < a0; f++) s.push({ f, d: 0.035 });
+          const to = s.length;
+          const fl = R(a0, a1).filter((f) => a.flash[f]), fire = fl.length ? fl : [a0];
+          for (let f = a0; f <= a1; f++) s.push({ f, d: 0.06 * (P2.shotMul || 1), ev: fire.includes(f) ? "shot" : void 0 });
+          if (isHot()) s[s.length - 1].rep = { key: "shoot", to };
+          for (let f = a1 + 1; f < a.n; f++) s.push({ f, d: 0.05 });
+        } else {
+          const fire = a.flash.some(Boolean) ? a.flash.map((v, i) => v ? i : -1).filter((i) => i >= 0) : [impactOf("15")];
+          for (let f = 0; f < a.n; f++) s.push({ f, d: fire.includes(f) ? 0.08 : 0.045, ev: fire.includes(f) ? "shot" : void 0 });
+        }
+        act("15", { seq: s });
+      });
+    }
+    function skillSeq(sp) {
+      const id = has(sp.anim) ? sp.anim : idleId(), a = A[id], d0 = 1 / (sp.fps || 10), s = [];
+      const evs = (sp.events || []).map((e) => ({ ...e, f0: cf(id, e.f - 1), to0: e.to ? cf(id, e.to - 1) : null }));
+      const arm = sp.armor ? [sp.armor[0] - 1, sp.armor[1] - 1] : null;
+      for (let f = 0; f < a.n; f++) {
+        const e = evs.find((e2) => f === e2.f0 || e2.to0 != null && f >= e2.f0 && f <= e2.to0);
+        if (e && e.loop && e.to0 != null) {
+          if (f === e.f0) for (let k = 0; k < e.loop; k++) for (let g = e.f0; g <= e.to0; g++) s.push({ f: g, d: e.d || d0, ev: g === e.f0 ? "run" : void 0, list: e.fx });
+          else if (f <= e.to0) continue;
+        } else if (e && e.alt && e.to0 != null) {
+          if (f === e.f0) for (let k = 0; k < (e.rep || 4) * 2; k++) s.push({ f: k % 2 ? e.to0 : e.f0, d: e.d || 0.055, ev: "run", list: e.fx });
+          else if (f <= e.to0) continue;
+        } else if (e) {
+          for (let k = 0; k < (e.rep || 1); k++) s.push({ f, d: e.d || (e.hold ? e.hold : d0), ev: "run", list: e.fx });
+        } else s.push({ f, d: d0 });
+        if (arm) s[s.length - 1].armor = f >= arm[0] && f <= arm[1];
+      }
+      if (sp.rev) s.reverse();
+      if (sp.upto) s.splice(sp.upto);
+      return { id, s };
+    }
+    function doSkill(sp, then) {
+      if (!sp) return;
+      const go = () => {
+        P2.combo = 0;
+        P2.combat = true;
+        const { id, s } = skillSeq(sp);
+        s.forEach((e) => {
+          const fn2 = e.fn;
+          e.fn = () => {
+            P2.skArmor = !!e.armor || !!sp.armorAll;
+            fn2 && fn2();
+          };
+        });
+        if (sp.push) pushP(sp.push, 900);
+        act(id, { seq: s, onEnd: () => {
+          P2.skArmor = false;
+          if (then) return then();
+          if (!(CH2.armed && sp.armed)) P2.armed = false;
+          afterBuf(toIdle);
+        } });
+      };
+      if (sp.armed) ensureArmed(go);
+      else {
+        P2.armed = false;
+        go();
+      }
+    }
+    function runSkill(sp, then) {
+      if (!sp) return;
+      P2.hitVfx = sp.hitVfx ? { n: sp.hitVfx, s: sp.hitScale || 1, until: P2.t + (sp.hitFor || 2.5), last: -9 } : null;
+      const steps = sp.steps || [sp];
+      const go = (i) => i >= steps.length ? then ? then() : (P2.skArmor = false, CH2.armed && sp.armed || (P2.armed = false), afterBuf(toIdle)) : doSkill({ ...steps[i], armed: steps[i].armed ?? sp.armed, armor: steps[i].armor ?? (i ? void 0 : sp.armor) }, () => go(i + 1));
+      go(0);
+    }
+    function skill() {
+      if ((P2.skillMax || 1) > 1) {
+        if (P2.skillN < 1) return void cdReady("skill");
+        P2.skillN--;
+        if ((P2.cd.skill || 0) <= P2.t) setCd("skill");
+      } else {
+        if (!cdReady("skill")) return;
+        setCd("skill");
+      }
+      P2.useSrc = "skill";
+      env.perk?.skillUse();
+      const sp = CH2.skills.skill;
+      const use = sp && sp.alt && P2.buffT > 0 && CH2.skills[sp.alt] ? CH2.skills[sp.alt] : sp;
+      P2.lastSkillAnim = use && (use.anim || use.steps && use.steps[0] && use.steps[0].anim);
+      runSkill(use);
+    }
+    function skill2() {
+      if (!CH2.skills.skill2 || !cdReady("skill2")) return;
+      setCd("skill2");
+      P2.useSrc = "skill";
+      env.perk?.skillUse();
+      runSkill(CH2.skills.skill2);
+    }
+    function superMove() {
+      const sp = CH2.skills.super;
+      if (!sp) return;
+      if (!spReady()) return;
+      P2.inSuper = true;
+      P2.noGain = P2.t + 8;
+      P2.hitVfx = null;
+      env.perk?.superUse();
+      sfx("super");
+      cut = 1.1;
+      dark2 = 1.6;
+      flash = 0.12;
+      hitstop = 0.9;
+      const steps = sp.steps || [sp];
+      const run = (i) => {
+        if (i >= steps.length) {
+          P2.inSuper = false;
+          P2.inv = 0;
+          env.perk?.superEnd();
+          return afterBuf(toIdle);
+        }
+        doSkill({ armorAll: true, ...steps[i], armed: steps[i].armed ?? sp.armed }, () => run(i + 1));
+      };
+      P2.inv = 30;
+      later(0.85, () => run(0));
+    }
+    const CH_COL = ["rgba(255,255,255,.8)", "#fff6c0", "#8fdcff", "#c89bff"];
+    const chLevels = () => (CH2.skills.charge && CH2.skills.charge.levels || [0.5, 1.2]).map((t) => t * (P2.chargeMul || 1));
+    const chLv = () => chLevels().filter((t) => P2.charge >= t).length;
+    function charge2() {
+      const sp = CH2.skills.charge;
+      if (!sp) return;
+      const go = () => {
+        P2.mode = "charge";
+        P2.charge = 0;
+        P2.chargeShown = 0;
+        const id = has(sp.hold) ? sp.hold : idleId(), lp = LP(id) || R(Math.min(3, nOf(id) - 1), nOf(id) - 1), s = [];
+        for (let f = 0; f < lp[0]; f++) s.push({ f, d: 0.055 });
+        const from = s.length;
+        for (const f of lp) s.push({ f, d: 0.11 });
+        play(id, { seq: s, loopFrom: from });
+      };
+      if (sp.armed) ensureArmed(go);
+      else {
+        P2.armed = false;
+        P2.combat = true;
+        go();
+      }
+    }
+    function release() {
+      const sp = CH2.skills.charge, lv = chLv(), list = (sp.lv || {})[lv] || [];
+      P2.useSrc = "charge";
+      env.perk?.chargeUse();
+      if (lv >= chLevels().length && P2.chargeBig) P2.rangeMul = 1.25;
+      {
+        const hv = (sp.hitVfx || {})[lv];
+        P2.hitVfx = hv ? { n: hv, s: (sp.hitScale || {})[lv] || 1, until: P2.t + 2.5, last: -9 } : null;
+      }
+      P2.chargeLv = lv;
+      P2.relMz = muzzle();
+      const rl = sp.releaseLv && sp.releaseLv[lv] || sp.release, rid = has(rl) ? rl : idleId(), n = nOf(rid);
+      if (sp.fireOnRelease) {
+        runFx(list, { o: P2.relMz, lv });
+        P2.skArmor = true;
+        return act(rid, { seq: S2(R(Math.min(1, n - 1), n - 1), 0.06), onEnd: () => {
+          P2.skArmor = false;
+          afterBuf(toIdle);
+        } });
+      }
+      doSkill({ anim: rid, fps: sp.fps || 12, armed: sp.armed, armorAll: true, events: [{ f: sp.fireLv && sp.fireLv[lv] || sp.fire || 2, fx: list }] });
+    }
+    const jf = () => {
+      const n = nOf("7"), ap = PK("apex", "7");
+      return { up: [0, Math.min(1, n - 1)], rise: Math.max(1, ap - 1), top: ap, fall: Math.max(ap, Math.min(ap + 1, n - 3)), fall2: Math.max(ap, Math.min(ap + 2, n - 3)), land: [Math.max(0, n - 2), n - 1] };
+    };
+    function jump2() {
+      if (!has("7")) return;
+      P2.mode = "air";
+      P2.z = 0;
+      P2.vz = 0;
+      P2.jumps = 1;
+      P2.airAtk = false;
+      P2.spin = 0;
+      P2.airVX = (down2("run") || P2.runLatch ? 430 : 250) * (P2.airMul || 1);
+      P2.takeoff = 0.06;
+      sfx("jump");
+      play("7", { seq: S2(jf().up, 0.03) });
+    }
+    function doubleJump() {
+      const j = jf();
+      sfx("jump", { pitch: 1.35 });
+      P2.jumps++;
+      P2.vz = 1040;
+      const up = R(Math.min(1, j.top), j.top);
+      P2.spin = up.length * 0.045;
+      play("7", { seq: S2(up, 0.045) });
+      if (!vfx("double_jump", P2.x, P2.y - P2.z + 2, 2.2)) fx2.push({ k: "burst", x: P2.x, y: P2.y - P2.z + 4, t: 0.3, t0: 0.3 });
+      ring(P2.x, P2.y - P2.z + 4, 70, 0.25, "rgba(220,240,255,.9)", 4, 0.35);
+    }
+    function jumpAttack(heavyKind) {
+      if (!has("14")) return;
+      P2.airAtk = true;
+      P2.airHit = false;
+      P2.airHeavy = !!heavyKind;
+      play("14", { seq: atkSeq("14", heavyKind).map((e, i, s) => {
+        const { ev, ...r } = e;
+        return { ...r, d: i === s.length - 1 ? 9 : e.d };
+      }) });
+    }
+    function land2() {
+      const slam = P2.airAtk && P2.airHeavy;
+      sfx("land");
+      P2.z = Math.max(0, P2.z);
+      P2.vz = 0;
+      P2.airAtk = false;
+      env.perk?.land({ heavy: slam, jumps: P2.jumps });
+      shake = Math.max(shake, 2);
+      if (!vfx("land_dust", P2.x, P2.y, 2.2, { bottom: true })) dust(P2.x, P2.y, 5);
+      P2.mode = "act";
+      const j = jf();
+      play("7", { seq: [{ f: j.land[0], d: 0.045, cancel: true }, { f: j.land[1], d: 0.05, cancel: true }], onEnd: toIdle });
+    }
+    function takeHit(kind) {
+      if (P2.mode === "dead") return;
+      if (P2.mode === "air") {
+        P2.airAtk = false;
+        P2.spin = 0;
+      }
+      if (P2.scene === "샤워") P2.scene = null;
+      if (P2.inv > 0) {
+        fx2.push({ k: "num", x: P2.x, y: P2.y - 230, v: "회피", t: 0.6 });
+        if (P2.dodging) env.perk?.evaded();
+        return;
+      }
+      if (P2.nude && has("SH_G")) return nudeHit(kind);
+      if (P2.mode === "down" || P2.mode === "belly") return flinch();
+      if (P2.mode === "block") {
+        sfx("guard");
+        shake = 4;
+        if (!vfx("guard_block", P2.x + P2.face * 50 * K3(P2.y), P2.y - 140 * K3(P2.y), 2.2, { flip: P2.face < 0 })) sparks(P2.x + P2.face * 50, P2.y - 140, 8, false, "#9fd0ff");
+        pushP(-200, 1200);
+        return;
+      }
+      if (armored()) {
+        gainSp(5 * (P2.hurtSp || 1));
+        sfx("armor");
+        P2.armorT = 0.28;
+        P2.armorC = "";
+        hitstop = 0.06;
+        shake = 6;
+        return;
+      }
+      if (P2.mode === "charge") P2.charge = 0;
+      if (P2.seat && (P2.mode === "seat" || P2.mode === "seatUp")) return seatHit(kind === "knock" || kind === "push" || kind === "launch");
+      if (kind === "knock") return knock2();
+      if (kind === "low") return hitAs("18_1", -300, 12, 0.09);
+      if (kind === "push") return hitAs("18_2", -620, 16, 0.06);
+      if (kind === "launch") return launched();
+      hit2();
+    }
+    function hitAs(id, push, dmg, d3 = 0.055) {
+      if (!has(id)) return hit2();
+      gainSp(10 * (P2.hurtSp || 1));
+      sfx("hurt", { strength: 2 });
+      P2.combat = true;
+      P2.combo = 0;
+      P2.armed = false;
+      pushP(push, 1100);
+      flash = 0.05;
+      shake = Math.max(shake, 6);
+      P2.hp = Math.max(1, P2.hp - dmg);
+      act(id, { seq: [{ f: 0, d: 0.02 }, ...S2(R(1, nOf(id) - 1), d3)] });
+    }
+    const LIE19 = () => CH2.lie19 && CH2.lie19.length ? CH2.lie19.map((f) => cf("19", f - 1)) : LP("19");
+    function lieLoop() {
+      const n = nOf("19"), lp = LIE19() || [n - 1];
+      if (P2.mode !== "down") P2.downAt = P2.t;
+      P2.mode = "down";
+      play("19", { seq: lp.map((f) => ({ f, d: lp.length <= 2 ? 0.6 : 0.3 })), loopFrom: 0 });
+    }
+    function launched() {
+      if (!has("18_3")) return knock2();
+      gainSp(20 * (P2.hurtSp || 1));
+      sfx("hurt", { strength: 2 });
+      P2.combat = true;
+      P2.combo = 0;
+      P2.armed = false;
+      pushP(-380, 700);
+      shake = 8;
+      P2.mode = "act";
+      P2.knockT = 0;
+      play("18_3", { seq: S2(R(0, nOf("18_3") - 1), 0.07), onEnd: () => {
+        dust(P2.x, P2.y, 6, 1.2);
+        sfx("down");
+        lieLoop();
+      } });
+    }
+    function flinch() {
+      flash = 0.05;
+      shake = Math.max(shake, 4);
+      sfx("hurt");
+      if (!has("43")) return;
+      const crawling = P2.mode === "belly";
+      play("43", { seq: S2(R(0, nOf("43") - 1), 0.07), onEnd: () => {
+        if (P2.mode === "down" || P2.mode === "belly") {
+          if (crawling) belly();
+          else lieLoop();
+        }
+      } });
+    }
+    function nudeHit(kind) {
+      const heavy2 = kind === "knock" || kind === "push" || kind === "launch";
+      flash = 0.05;
+      P2.combat = true;
+      P2.combo = 0;
+      P2.armed = false;
+      if (P2.mode === "down" || P2.mode === "belly") {
+        shake = Math.max(shake, 4);
+        sfx("hurt");
+        if (!has("SH_H4")) return;
+        P2.mode = "down";
+        play("SH_H4", { seq: S2(R(0, nOf("SH_H4") - 1), 0.08), onEnd: nudeLie });
+        return;
+      }
+      gainSp(10 * (P2.hurtSp || 1));
+      sfx("hurt", { strength: heavy2 ? 2 : 1 });
+      shake = Math.max(shake, heavy2 ? 8 : 6);
+      if (heavy2 && has("SH_H3")) {
+        pushP(-480, 700);
+        P2.mode = "act";
+        P2.knockT = 0;
+        play("SH_H3", { seq: S2(R(0, nOf("SH_H3") - 1), 0.08), onEnd: () => {
+          dust(P2.x, P2.y, 6, 1.2);
+          sfx("down");
+          nudeLie();
+        } });
+        return;
+      }
+      const id = has("SH_H2") && Math.random() < 0.5 ? "SH_H2" : "SH_H1";
+      pushP(-280, 1400);
+      act(id, { seq: [{ f: 0, d: 0.02 }, ...S2(R(1, nOf(id) - 1), 0.06)] });
+    }
+    function nudeLie() {
+      const id = has("SH_H4") ? "SH_H4" : "19";
+      if (P2.mode !== "down") P2.downAt = P2.t;
+      P2.mode = "down";
+      play(id, { seq: [{ f: nOf(id) - 1, d: 9 }], loopFrom: 0 });
+    }
+    function die() {
+      if (P2.mode === "dead") {
+        P2.mode = "ground";
+        P2.hp = 100;
+        P2.dying = false;
+        return toIdle();
+      }
+      const lying = P2.mode === "down" || P2.mode === "belly", id = lying ? "45" : "44";
+      if (!has(id)) return;
+      sfx("hurt", { strength: 3 });
+      P2.hp = 0;
+      P2.combat = false;
+      P2.armed = false;
+      P2.knockT = 0;
+      P2.mode = "dead";
+      play(id, { seq: S2(R(0, nOf(id) - 1), lying ? 0.12 : 0.08), onEnd: () => fx2.push({ k: "num", x: P2.x - 24, y: P2.y - 60, v: "사망", t: 1.5 }) });
+    }
+    function hit2() {
+      if (!has("18")) return;
+      gainSp(10 * (P2.hurtSp || 1));
+      sfx("hurt");
+      P2.combat = true;
+      P2.combo = 0;
+      P2.armed = false;
+      pushP(-280, 1400);
+      flash = 0.05;
+      act("18", { seq: [{ f: 0, d: 0.02 }, ...S2(R(1, A["18"].n - 1), 0.055)] });
+    }
+    function knock2() {
+      if (!has("19")) return hit2();
+      gainSp(20 * (P2.hurtSp || 1));
+      sfx("hurt", { strength: 2 });
+      P2.combat = true;
+      P2.combo = 0;
+      P2.armed = false;
+      if (CH2.fallRev) P2.face = -P2.face;
+      pushP(CH2.fallRev ? 560 : -560, 650);
+      const n = nOf("19"), lp = LIE19() || [n - 1], fall = R(0, Math.max(0, lp[0] - 1));
+      P2.mode = "act";
+      const dustAt = Math.max(1, Math.round(fall.length * 0.65));
+      play("19", { seq: [...S2(fall, 0.07).map((e, i) => i === dustAt ? { ...e, ev: "dust" } : e), ...lp.map((f) => ({ f, d: lp.length <= 2 ? 0.6 : 0.3 }))], loopFrom: fall.length });
+      P2.knockT = fall.length * 0.07;
+    }
+    function getUp() {
+      if (P2.nude && has("SH_H5")) {
+        sfx("wakeup");
+        P2.knockT = 0;
+        P2.wakeExtra = 0;
+        act("SH_H5", { seq: S2(R(0, nOf("SH_H5") - 1), 0.07), onEnd: () => {
+          P2.wakeArmor = 0.6;
+          afterBuf(toIdle);
+        } });
+        return;
+      }
+      if (!has("20")) return toIdle();
+      sfx("wakeup");
+      P2.knockT = 0;
+      P2.wakeExtra = 0;
+      act("20", { seq: S2(R(0, nOf("20") - 1), 0.06), onEnd: () => {
+        P2.wakeArmor = 0.6;
+        afterBuf(toIdle);
+      } });
+    }
+    function belly() {
+      if (!has("38")) return;
+      if (P2.mode === "down" && (CH2.turn19 || []).includes("38")) P2.face = -P2.face;
+      P2.mode = "belly";
+      if (has("38_1")) return play("38", { seq: S2(R(0, Math.min(4, nOf("38") - 1)), 0.1), onEnd: () => {
+        if (P2.mode === "belly") play("38_1", { seq: S2(R(0, nOf("38_1") - 2), 0.12), loopFrom: 0 });
+      } });
+      const lp = LP("38") || R(Math.min(4, nOf("38") - 1), nOf("38") - 1);
+      play("38", { seq: [...S2(R(0, lp[0] - 1), 0.11), ...S2(lp, 0.1)], loopFrom: lp[0] });
+    }
+    function stun() {
+      if (!has("21")) return;
+      P2.combat = true;
+      P2.combo = 0;
+      P2.armed = false;
+      P2.mode = "stun";
+      P2.stunT = 2.6;
+      const lp = LP("21") || R(1, nOf("21") - 1);
+      play("21", { seq: [...S2(R(0, lp[0] - 1), 0.05), ...S2(lp, 0.1)], loopFrom: lp[0] });
+    }
+    function emote(id, fps, o = {}) {
+      if (!has(id)) return;
+      act(id, { seq: S2(R(0, A[id].n - 1), 1 / fps), ...o });
+    }
+    const sitLp = () => LP("39") || R(Math.max(0, nOf("39") - 5), nOf("39") - 1);
+    function sit() {
+      if (!has("39")) return;
+      P2.mode = "sit";
+      const lp = sitLp();
+      play("39", { seq: [...S2(R(0, lp[0] - 1), 0.05), ...S2(lp, 0.13)], loopFrom: lp[0] });
+    }
+    const crLp = () => LP("41") || R(Math.min(4, nOf("41") - 1), nOf("41") - 1);
+    function crouch() {
+      if (!has("41")) return;
+      P2.mode = "crouch";
+      const lp = crLp();
+      play("41", { seq: [...S2(R(0, lp[0] - 1), 0.08), ...S2(lp, 0.11)], loopFrom: lp[0] });
+    }
+    const SEATS2 = SEATS;
+    const SEAT_LOOP2 = SEAT_LOOP;
+    const SEAT_F = 0.133;
+    const chairEdits = {};
+    const chairEdit = () => chairEdits;
+    let seatIdx = -1, showChair = true, seatSet = void 0;
+    function chairFit(dir, line2) {
+      return seatFit(CH2, dir, line2, chairEdit(), P2.seat && P2.seat.set);
+    }
+    function seatIdle() {
+      const s = P2.seat;
+      P2.mode = "seat";
+      const n = nOf(s.sit);
+      play(s.sit, { seq: [{ f: n - 1, d: 9 }], loopFrom: 0 });
+      P2.clip.breathe = true;
+    }
+    function sitChair() {
+      const okSeat = (s2) => has(s2.sit) && !(CH2.noBackSit && s2.dir === "back");
+      for (let k = 1; k <= SEATS2.length; k++) {
+        const s2 = SEATS2[(seatIdx + k) % SEATS2.length];
+        if (okSeat(s2)) {
+          seatIdx = SEATS2.indexOf(s2);
+          break;
+        }
+      }
+      const s = SEATS2[seatIdx];
+      if (!s || !okSeat(s)) return;
+      P2.combat = false;
+      P2.armed = false;
+      P2.mode = "seat";
+      P2.seat = { ...s, x: P2.x, y: P2.y, face: P2.face, set: seatSet };
+      play(s.sit, { seq: S2(R(0, nOf(s.sit) - 1), SEAT_F), onEnd: seatIdle });
+    }
+    function rise(fast) {
+      const s = P2.seat;
+      if (!s) return toIdle();
+      const n = nOf(s.sit);
+      reverseOut(s.sit, R(n - 1, 0), fast ? 0.04 : SEAT_F, () => {
+        P2.seat = null;
+        if (fast === "hit") hit2();
+        else toIdle();
+      });
+      P2.mode = "seatUp";
+    }
+    function seatAct(kind) {
+      const s = P2.seat, id = s && s.acts[kind];
+      if (!id || !has(id)) {
+        const t = SEATS2.find((t2) => t2.acts[kind] && has(t2.acts[kind]) && has(t2.sit));
+        if (!t) return;
+        const keepSet = s.set;
+        P2.seat = null;
+        sitAt(t.dir, keepSet);
+        later(nOf(t.sit) * SEAT_F + 0.15, () => P2.seat && P2.seat.dir === t.dir && seatAct(kind));
+        return;
+      }
+      const n = nOf(id);
+      if (SEAT_LOOP2.has(id)) {
+        play(id, { seq: S2(R(0, n - 1), 0.16), loopFrom: 0 });
+        P2.clip.breathe = false;
+      } else play(id, { seq: S2(R(0, n - 1), 0.14), onEnd: seatIdle });
+      P2.mode = "seat";
+    }
+    function seatHit(strong) {
+      const s = P2.seat;
+      if (!strong) return rise("hit");
+      P2.seat = null;
+      if (s.dir === "side" && has("169")) {
+        sfx("hurt", { strength: 2 });
+        shake = 8;
+        P2.mode = "act";
+        play("169", { seq: S2(R(0, nOf("169") - 1), 0.08), onEnd: () => {
+          dust(P2.x, P2.y, 6, 1.2);
+          sfx("down");
+          lieLoop();
+        } });
+        return;
+      }
+      P2.mode = "ground";
+      knock2();
+    }
+    function runScene(steps, label2) {
+      P2.seat = null;
+      P2.z = 0;
+      P2.combat = false;
+      P2.armed = false;
+      P2.mode = "act";
+      P2.scene = label2;
+      let i = 0;
+      const next = () => {
+        if (P2.scene !== label2) return;
+        while (i < steps.length && !has(steps[i].id)) i++;
+        if (i >= steps.length) {
+          P2.scene = null;
+          return toIdle();
+        }
+        const st = steps[i++], n = nOf(st.id), fr = st.rev ? R(n - 1, 0) : R(st.from || 0, n - 1), seq = [];
+        for (let k = 0; k < (st.n || 1); k++) seq.push(...S2(fr, st.d || 0.13));
+        if (st.hold) seq.push({ f: fr[fr.length - 1], d: st.hold });
+        P2.mode = "act";
+        play(st.id, { seq, onEnd: next });
+      };
+      if (label2) fx2.push({ k: "num", x: P2.x - 60, y: P2.y - 280 * K3(P2.y), v: label2, t: 1.4 });
+      next();
+    }
+    function runShower(seconds, quiet) {
+      const steps = showerPlan({ seconds: seconds || 600, seed: Math.random() * 1e9 | 0, has });
+      if (!steps.length) return;
+      P2.seat = null;
+      P2.z = 0;
+      P2.combat = false;
+      P2.armed = false;
+      P2.mode = "act";
+      P2.scene = "샤워";
+      P2.nude = true;
+      let i = 0;
+      const next = () => {
+        if (P2.scene !== "샤워") return;
+        if (i >= steps.length) {
+          P2.scene = null;
+          return toIdle();
+        }
+        const st = steps[i++];
+        P2.mode = "act";
+        if (!quiet) fx2.push({ k: "num", x: P2.x - 60, y: P2.y - 280 * K3(P2.y), v: st.label, t: 1.2 });
+        play(st.id, { seq: st.seq.map((e) => ({ ...e })), onEnd: next });
+      };
+      next();
+    }
+    const SCENES2 = [
+      ["의자", [
+        ["정면 앉기", () => sitAt("front")],
+        ["옆 앉기", () => sitAt("side")],
+        ["후면 앉기", () => sitAt("back")],
+        ["앉아 수다", () => seatAct("talk")],
+        ["앉아 먹기", () => seatAct("eat")],
+        ["앉아 마시기", () => seatAct("drink")],
+        ["앉아 타자", () => seatAct("type")],
+        ["앉아 졸기", () => seatAct("doze")],
+        ["기대 쉬기", () => seatAct("lean")],
+        ["앉아 일하다 고개 들어 끄덕(정면)", () => seatAct("nod")],
+        ["앉아 손 작업(정면)", () => seatAct("craft")],
+        ["앉아 폰 보기(정면)", () => seatAct("phone")],
+        ["앉아 책 읽기(정면)", () => seatAct("book")],
+        ["앉아 신문 읽기(정면)", () => seatAct("paper")],
+        ["앉아 통화(정면)", () => seatAct("call")],
+        ["앉은 채 돌아보기(후면)", () => seatAct("look")],
+        ["일어나기", () => P2.seat && rise()],
+        ["앉은 채 맞기(약)", () => P2.seat && seatHit(false)],
+        ["앉은 채 맞기(강) · 옆 = 굴러떨어지기", () => P2.seat && seatHit(true)]
+      ], () => has("60") || has("96")],
+      ["샤워", [
+        ["한 번에(벗기→걷기→물→씻기→입기)", () => runScene([{ id: "SH_A", d: 0.12 }, { id: "SH_B", n: 2 }, { id: "SH_D", n: 3 }, { id: "SH_E", n: 3 }, { id: "SH_A", rev: true, d: 0.1 }], "샤워")],
+        ["옷 벗기", () => runScene([{ id: "SH_A", d: 0.12, hold: 0.6 }], "옷 벗기")],
+        ["맨몸 걷기", () => runScene([{ id: "SH_B", n: 4 }])],
+        ["물 맞으며 쉬기", () => runScene([{ id: "SH_D", n: 4 }])],
+        ["몸 씻기", () => runScene([{ id: "SH_E", n: 4 }])],
+        ["샤워 규칙 재생 10분(구간 반복·속도 차등)", () => runShower(600)],
+        ["샤워 규칙 재생 1분(맛보기)", () => runShower(60)],
+        ["옷 입기(벗기 거꾸로)", () => runScene([{ id: "SH_A", rev: true, d: 0.1 }], "옷 입기")]
+      ], () => has("SH_A")],
+      // 맨몸 피격(10-31 사용자: 샤워장에서도 전투, 맨몸으로는 공격 못 함 → 11-01 125명 연결): G 경계 자세(2번 장부터 반복) · H1 배 · H2 가슴 · H3 쓰러짐 → H4 누운 채 맞기 → H5 일어나기 · H6 가린 채 도망
+      ["맨몸 피격", [
+        ["한 번에(벗기→경계→배→가슴→쓰러짐→누워 맞기→일어나기→도망)", () => runScene([{ id: "SH_A", d: 0.12 }, { id: "SH_G", from: 1, n: 2 }, { id: "SH_H1" }, { id: "SH_G", from: 1 }, { id: "SH_H2" }, { id: "SH_H3", hold: 0.4 }, { id: "SH_H4" }, { id: "SH_H4" }, { id: "SH_H5" }, { id: "SH_G", from: 1 }, { id: "SH_H6", n: 3 }], "맨몸 피격")],
+        ["경계 자세(반복)", () => runScene([{ id: "SH_G", from: 1, n: 4 }])],
+        ["배 맞기", () => runScene([{ id: "SH_G", from: 1 }, { id: "SH_H1" }, { id: "SH_G", from: 1 }])],
+        ["가슴 맞기", () => runScene([{ id: "SH_G", from: 1 }, { id: "SH_H2" }, { id: "SH_G", from: 1 }])],
+        ["쓰러짐→누워 맞기→일어나기", () => runScene([{ id: "SH_G", from: 1 }, { id: "SH_H3", hold: 0.4 }, { id: "SH_H4" }, { id: "SH_H5" }, { id: "SH_G", from: 1 }])],
+        ["가린 채 도망(반복)", () => runScene([{ id: "SH_H6", n: 4 }])]
+      ], () => has("SH_G")],
+      ["화장실", [
+        ["남 소변(서서)", () => runScene([{ id: "57", hold: 0.4 }, { id: "100", n: 2 }, { id: "57", hold: 0.4 }], "소변")],
+        ["앉아 볼일", () => runScene([{ id: "101" }, { id: "102", n: 4 }, { id: "103" }], "볼일")],
+        ["손 씻기", () => runScene([{ id: "57", hold: 1 }, { id: "104" }], "손 씻기")]
+      ], () => has("101") || has("100")],
+      ["눕기", [["눕기 → 쉬기·졸기", () => runScene([{ id: "75" }, { id: "76", n: 4, d: 0.2 }, { id: "75", rev: true }])], ["눕기 → 아파하기", () => runScene([{ id: "75" }, { id: "77", n: 2 }, { id: "75", rev: true }])]], () => has("75")],
+      ["피격·사망", [
+        ["맞기", () => takeHit("hit")],
+        ["맞기 하단", () => takeHit("low")],
+        ["크게 밀려나기", () => takeHit("push")],
+        ["띄워지기", () => takeHit("launch")],
+        ["날아가 쓰러지기", () => takeHit("knock")],
+        ["누운 채 움찔", () => P2.mode === "down" ? flinch() : (knock2(), later(1.2, flinch))],
+        ["일어나기", () => P2.mode === "down" && getUp()],
+        ["스턴", () => stun()],
+        ["사망(서서)", () => {
+          if (P2.mode === "dead") die();
+          die();
+        }],
+        ["사망(누워서)", () => {
+          if (P2.mode === "dead") die();
+          knock2();
+          later(1.4, () => {
+            P2.mode = "down";
+            die();
+          });
+        }],
+        ["되살리기", () => P2.mode === "dead" && die()]
+      ], () => true]
+    ];
+    function sitAt(dir, set) {
+      if (P2.seat || CH2.noSit) return;
+      if (dir === "back" && CH2.noBackSit) dir = "side";
+      seatIdx = SEATS2.findIndex((s) => s.dir === dir) - 1;
+      P2.scene = null;
+      seatSet = set;
+      sitChair();
+      seatSet = void 0;
+    }
+    let lifeI = -1;
+    const lifeIds = () => Object.keys(A).filter((id) => /^\d+/.test(id) && parseInt(id) >= 50 && id !== "169").sort((a, b) => parseFloat(a.replace("_", ".")) - parseFloat(b.replace("_", ".")));
+    function playLife(id) {
+      if (!A[id]) return;
+      P2.seat = null;
+      P2.z = 0;
+      P2.combat = false;
+      P2.armed = false;
+      const n = nOf(id);
+      const lp = LP(id);
+      act(id, { seq: lp ? [...S2(R(0, Math.max(0, lp[0] - 1)), 0.13), ...S2(lp, 0.13), ...S2(lp, 0.13), ...S2(lp, 0.13)] : S2(R(0, n - 1), 0.13) });
+      fx2.push({ k: "num", x: P2.x - 60, y: P2.y - 270 * K3(P2.y), v: `${id} ${A[id].name}`, t: 1.6 });
+    }
+    function stepLife(d3) {
+      const L = lifeIds();
+      if (!L.length) return;
+      lifeI = (lifeI + d3 + L.length) % L.length;
+      playLife(L[lifeI]);
+    }
+    function onPress(a) {
+      if (a === "run") {
+        runT = performance.now();
+        return;
+      }
+      if (!CK) return;
+      if (a === "pause") {
+        paused = !paused;
+        return;
+      }
+      if (a === "lifePrev" || a === "lifeNext") {
+        if (P2.mode !== "dead") stepLife(a === "lifeNext" ? 1 : -1);
+        return;
+      }
+      let dbl = false;
+      if (a === "left" || a === "right" || a === "down") {
+        const now = performance.now();
+        dbl = now - (P2.lastTap[a] || 0) < 260;
+        if (dbl && a !== "down") P2.runLatch = true;
+        P2.lastTap[a] = now;
+      }
+      if (P2.mode === "seat" || P2.mode === "seatUp") {
+        if (P2.mode === "seatUp") return;
+        if (["seat", "pick", "up", "jump"].includes(a)) return rise();
+        if (a === "hit") return seatHit(false);
+        if (["hitLow", "push", "launch", "knock"].includes(a)) return seatHit(true);
+        const SA = { respond: "talk", talk: "eat", nod: "drink", shake: "type", angry: "doze", happy: "lean" };
+        if (SA[a]) return seatAct(SA[a]);
+        if (a !== "die") return;
+      }
+      if (a === "heal" && P2.mode === "ground") {
+        emote("26", 7);
+        later(0.5, () => FX.heal({ v: 40 }));
+        return;
+      }
+      if (a === "drop") {
+        items.push({ x: P2.x + P2.face * 120, y: P2.y, t0: P2.t });
+        return;
+      }
+      if (a === "status") {
+        P2.status = [null, "status_poison", "status_burn", "status_shock"][([null, "status_poison", "status_burn", "status_shock"].indexOf(P2.status || null) + 1) % 4];
+        return;
+      }
+      if (a === "dying") {
+        P2.dying = !P2.dying;
+        P2.hp = P2.dying ? 18 : 100;
+        if (P2.dying) sfx("hp:low");
+        return;
+      }
+      if (a === "die") return die();
+      if (P2.mode === "dead") return;
+      if (a === "hit" && P2.mode === "down") return flinch();
+      if (["hit", "knock", "hitLow", "push", "launch"].includes(a)) {
+        if (P2.mode !== "down" && P2.mode !== "belly") return takeHit({ hit: "hit", knock: "knock", hitLow: "low", push: "push", launch: "launch" }[a]);
+      }
+      if ((P2.mode === "flee" || P2.mode === "back") && !["left", "right", "up", "down", "run"].includes(a)) toIdle();
+      if (P2.scene && ["left", "right", "up", "down"].includes(a)) {
+        P2.scene = null;
+        return toIdle();
+      }
+      const m = P2.mode;
+      if (a === "dodge" && P2.ukemi && P2.dodgeN >= 1 && (m === "act" && P2.knockT > 0 || m === "down" && P2.t - (P2.downAt ?? -9) < 0.3)) {
+        P2.knockT = 0;
+        P2.wakeBuf = null;
+        toIdle0();
+        P2.wakeArmor = 0.2;
+        return dodge();
+      }
+      if (m === "air") {
+        if (a === "jump" && P2.jumps < (P2.maxJumps || 2)) doubleJump();
+        else if ((a === "light" || a === "heavy") && !P2.airAtk) jumpAttack(a === "heavy");
+        return;
+      }
+      if (m === "chain") {
+        if (a === "light") return light();
+        if (a === "heavy") return heavy();
+        if (a === "dodge") return dodge();
+        if (a === "jump") return jump2();
+        if (a === "skill") return skillPress();
+      }
+      if (m === "act") {
+        const CANCEL_INTO = { skill: skillPress, super: superMove, shoot: shoot3, charge: charge2, skill2 };
+        if (CANCEL_INTO[a] && canCancel() && P2.clip && ["9", "10", "11", "12", "13", "16", "16_1"].includes(P2.clip.id)) {
+          P2.buf = null;
+          return CANCEL_INTO[a]();
+        }
+        if (["light", "heavy", "dodge", "jump"].includes(a)) {
+          const id = P2.clip ? P2.clip.id : "";
+          if (canCancel() && ["9", "10", "11", "12", "13", "16", "16_1", "7"].includes(id)) {
+            if (id === "7") {
+              if (a === "jump") return jump2();
+            } else if (id === "9" || id === "10") {
+              P2.buf = a;
+              return;
+            } else {
+              P2.buf = null;
+              return a === "light" ? light() : a === "heavy" ? heavy() : a === "dodge" ? dodge() : jump2();
+            }
+          }
+          P2.buf = a;
+        }
+        return;
+      }
+      if (m === "down" && P2.t - (P2.downAt ?? -9) < P2.wakeDelay + (P2.wakeExtra || 0)) {
+        if (a !== "hit") P2.wakeBuf = a;
+        return;
+      }
+      if (m === "down") {
+        if (a === "crawl" || a === "left" || a === "right") return P2.nude ? getUp() : belly();
+        if (["jump", "up", "light", "left", "right", "down", "run"].includes(a)) return getUp();
+        return;
+      }
+      if (m === "belly") {
+        if (a === "jump" || a === "crawl" || a === "up") return getUp();
+        return;
+      }
+      if (m === "stun") {
+        P2.stunT -= 0.18;
+        return;
+      }
+      if (m === "sit" || m === "scoot") {
+        if (["sit", "jump", "left", "right", "up", "run"].includes(a)) reverseOut("39", R(Math.max(0, sitLp()[0] - 1), 0), 0.05);
+        return;
+      }
+      if (m === "crouch" || m === "crawl4") {
+        if (a === "crouch") {
+          if (m === "crawl4") toIdle();
+          else reverseOut("41", R(Math.max(0, crLp()[0] - 1), 0), 0.06);
+        }
+        return;
+      }
+      if (m !== "ground") return;
+      const running = down2("run") || P2.runLatch;
+      const moving = down2("left") || down2("right") || down2("up") || down2("down");
+      switch (a) {
+        case "jump":
+          return jump2();
+        case "light":
+          return running && moving ? slide() : light();
+        case "heavy":
+          return running && moving ? slide() : heavy();
+        // 뛰다 강공격도 돌진 공격(사용자 2026-10-25)
+        case "dodge":
+          return dodge();
+        case "block":
+          if (!has("17")) return;
+          P2.combat = true;
+          P2.armed = false;
+          P2.mode = "block";
+          env.perk?.blockPressed();
+          return play("17", { seq: S2(R(0, nOf("17") - 1), 0.03) });
+        case "shoot":
+          return shoot3();
+        case "skill":
+          return skillPress();
+        case "skill2":
+          return skill2();
+        case "charge":
+          return charge2();
+        case "super":
+          return superMove();
+        case "combat":
+          if (P2.armed) return;
+          if (!has("3_0")) {
+            P2.combat = !P2.combat;
+            return toIdle();
+          }
+          if (!P2.combat) return act("3_0", { seq: S2(R(0, PK("combat", "3_0")), 0.055), onEnd: () => {
+            P2.combat = true;
+            toIdle();
+          } });
+          return reverseOut("3_0", R(PK("combat", "3_0"), 0), 0.055, () => {
+            P2.combat = false;
+            toIdle();
+          });
+        case "weapon":
+          if (!P2.armed) return ensureArmed(toIdle);
+          if (!has("W")) {
+            P2.armed = false;
+            return toIdle();
+          }
+          return reverseOut("W", R(PK("weapon", "W"), 0), 0.05, () => {
+            P2.armed = false;
+            toIdle();
+          });
+        case "stun":
+          return stun();
+        case "eat":
+          return emote("26", 7);
+        case "respond": {
+          const n = nOf("28");
+          return emote("28", 7, { seq: [...S2(R(0, n - 2), 0.1), { f: n - 1, d: 0.6 }, ...S2(R(n - 2, 0), 0.1)] });
+        }
+        case "talk": {
+          const lp = LP("29") || R(0, nOf("29") - 1);
+          return emote("29", 7, { seq: [...S2(lp, 0.16), ...S2(lp, 0.16), { f: 0, d: 0.3 }] });
+        }
+        case "nod":
+          return emote("30", 8, { seq: S2([...R(0, nOf("30") - 1), ...R(0, nOf("30") - 1)], 1 / 8) });
+        case "shake":
+          return emote("31", 8, { seq: S2([...R(0, nOf("31") - 1), ...R(0, nOf("31") - 1)], 1 / 8) });
+        case "angry":
+          return emote("32", 9);
+        case "happy":
+          return emote("35", 8);
+        case "surprise": {
+          const n = nOf("34");
+          return emote("34", 8, { seq: [...S2(R(0, Math.min(1, n - 1)), 0.06), { f: Math.min(2, n - 1), d: 0.35 }, ...S2(R(Math.min(3, n - 1), n - 1), 0.12)] });
+        }
+        case "pick": {
+          const it = items.findIndex((it2) => Math.abs(it2.x - P2.x) < 110 && Math.abs(it2.y - P2.y) < 40);
+          if (it >= 0) {
+            items.splice(it, 1);
+            later(0.45, () => {
+              sfx("pickup");
+              FX.heal({ v: 20 });
+            });
+          }
+          return emote("27", 8);
+        }
+        case "personal":
+          return emote("2", 7);
+        case "notice": {
+          const n = nOf("33"), top = Math.min(4, n - 1);
+          fx2.push({ k: "icon", v: "!", t: 1 });
+          return act("33", { seq: [...S2(R(0, top - 1), 0.07), { f: top, d: 0.45 }, ...S2(R(top - 1, 0), 0.04)] });
+        }
+        case "sit":
+          return sit();
+        case "crouch":
+          return crouch();
+        case "seat":
+          return sitChair();
+      }
+    }
+    function skillPress() {
+      return skill();
+    }
+    function onRelease(a) {
+      if (a === "run" && performance.now() - runT <= 180) return onPress("dodge");
+      if (a === "left" || a === "right") {
+        if (!down2("left") && !down2("right")) P2.runLatch = false;
+      }
+      if (a === "block" && P2.mode === "block") reverseOut("17", R(curF(), 0), 0.025);
+      if ((a === "charge" || a === "skill") && P2.mode === "charge") return release();
+    }
+    function updateFx(dt) {
+      for (const e of fx2) {
+        e.t -= dt;
+        if (e.k === "spark") {
+          e.x += e.vx * dt;
+          e.y += e.vy * dt;
+          e.vy += 1100 * dt;
+        } else if (e.k === "dust") {
+          e.x += e.vx * dt;
+          e.y += e.vy * dt;
+          e.vx *= 0.92;
+        } else if (e.k === "num") e.y -= 60 * dt;
+        else if (e.k === "blood") {
+          if (!e.landed) {
+            e.x += e.vx * dt;
+            e.y += e.vy * dt;
+            e.vy += 1300 * dt;
+            if (e.y >= e.g) {
+              e.y = e.g;
+              e.landed = true;
+              e.t = Math.min(e.t, 2.2);
+            }
+          }
+        } else if (e.k === "steam" || e.k === "smoke") {
+          e.x += e.vx * dt;
+          e.y += e.vy * dt;
+          e.r += (e.k === "smoke" ? 26 : 4) * dt;
+          e.vx *= 0.97;
+        } else if (e.k === "mote") e.y += e.vy * dt;
+        else if (e.k === "bubble") {
+          e.y += e.vy * dt;
+          e.x += Math.sin(e.t * 9) * 12 * dt;
+        } else if (e.k === "fire") {
+          e.x += e.vx * dt;
+          e.y += e.vy * dt;
+          e.vx *= 0.9;
+          e.vy *= 0.9;
+          e.r += 60 * dt;
+        } else if (e.k === "drop") {
+          if (e.y < e.g) {
+            e.x += e.vx * dt;
+            e.y += e.vy * dt;
+            e.rot += e.vr * dt;
+          } else e.y = e.g;
+        } else if (e.k === "proj") {
+          e.x += e.dir * e.v * dt;
+          if (e.fancy) {
+            e.trail.push([e.x, e.y]);
+            if (e.trail.length > 9) e.trail.shift();
+          }
+          const q = proxies().find((q2) => {
+            const dk = K3(q2.y);
+            return !e.done.has(q2.body) && Math.abs(q2.y - e.gy) < 60 && Math.abs(q2.x - e.x) < 34 * dk && e.y > q2.y - q2.z - 240 * dk && e.y < q2.y - q2.z + 10;
+          });
+          if (q) {
+            e.done.add(q.body);
+            const t0 = T2, s0 = curSrc, u0 = curUse;
+            T2 = q;
+            hitList = [q];
+            curSrc = e.src;
+            curUse = e.use;
+            const h0 = e.hit || { dmg: 8, kind: "light" }, km = (e.mul ?? 1) * (e.back ? e.boomer ? 0.6 : 0.7 : 1) * (e.nHit++ ? 0.7 : 1);
+            strike2(km !== 1 ? { ...h0, dmg: Math.round((h0.dmg || 8) * km) } : h0, e.y);
+            curSrc = s0;
+            curUse = u0;
+            if (e.fancy) {
+              vfx("x3-c-hit-spark-heavy", q.x, e.y, 1.1 * e.size, { center: true, flip: e.dir < 0, tint: e.c });
+              ring(q.x, e.y, 60 * e.size, 0.3, e.c, 4, 1);
+              sparks(q.x, e.y, 12, true, e.c);
+              shake = Math.max(shake, 7);
+            }
+            if (e.end) runFx(e.end, { pt: { x: q.x, y: q.y, z: q.z }, o: { x: e.x, y: e.y } });
+            T2 = t0 || T2;
+            if (!e.pierce && !e.back && !e.boomer) e.t = 0;
+          }
+          if (e.boomer && !e.back && Math.abs(e.x - e.x0) > 520) {
+            e.back = true;
+            e.dir = -e.dir;
+            e.done = /* @__PURE__ */ new Set();
+            e.t = 1.2;
+          }
+          if (e.boomer && e.back && Math.abs(e.x - P2.x) < 30) e.t = 0;
+          if (e.bounce && !e.back && !e.nHit && (e.x < VX0 + 10 || e.x > W5 - 10)) {
+            e.back = true;
+            e.dir = -e.dir;
+            e.done = /* @__PURE__ */ new Set();
+            e.t = 1.4;
+            sparks(e.x, e.y, 6, false, "#fff6d0");
+            if (e.split) fx2.push({ ...e, y: e.y + 30, gy: e.gy + 40, done: /* @__PURE__ */ new Set(), trail: [] });
+          }
+          if (e.x < VX0 - 40 || e.x > W5 + 40) e.t = 0;
+        } else if (e.k === "wave") {
+          e.x += e.dir * e.v * dt;
+          if (Math.random() < dt * 30) dust(e.x, e.y + (Math.random() - 0.5) * 120, 1, 1.4);
+          if (!e.done && !!T2 && (T2.x - e.x) * e.dir < 20 && (T2.x - e.x) * e.dir > -60) {
+            e.done = true;
+            strike2(e.hit || { dmg: 15, kind: "blow" });
+            T2.vx = e.dir * 1500;
+          }
+          if (e.x < VX0 - 300 || e.x > W5 + 300) e.t = 0;
+        } else if (e.k === "lob") {
+        } else if (e.k === "firewall" && Math.random() < dt * 40) fx2.push({ k: "fire", x: e.x + (Math.random() - 0.5) * e.w, y: e.y - Math.random() * 10, vx: (Math.random() - 0.5) * 30, vy: -250 - Math.random() * 300, r: 6 + Math.random() * 8, t: 0.5, t0: 0.6 });
+        else if (e.k === "carry") {
+          if (P2.clip !== e.clip) e.t = 0;
+        } else if (e.k === "toss") {
+          if (e.t - dt <= 0 && e.then) {
+            const pt = { x: e.x1, y: e.gy, z: 0 };
+            runFx(e.then, { pt });
+            e.then = null;
+          }
+        } else if (e.k === "shell" || e.k === "coin") {
+          e.x += e.vx * dt;
+          e.y += e.vy * dt;
+          e.vy += 1400 * dt;
+          if (e.y > e.g) {
+            e.y = e.g;
+            e.vy *= -0.35;
+            e.vx *= 0.6;
+          }
+        }
+      }
+      for (const e of fx2) if (e.k === "timer" && e.t <= 0 && !e.done) {
+        e.done = true;
+        e.fn();
+      }
+      fx2 = fx2.filter((e) => e.t > 0);
+    }
+    function update(dt) {
+      P2.t += dt;
+      updateFx(dt);
+      grayT = Math.max(0, grayT - dt);
+      shake = Math.max(0, shake - 70 * dt);
+      zoom = Math.max(0, zoom - 0.5 * dt);
+      flash = Math.max(0, flash - dt);
+      cut = Math.max(0, cut - dt);
+      dark2 = Math.max(0, dark2 - dt);
+      P2.armorT = Math.max(0, P2.armorT - dt);
+      P2.healT = Math.max(0, (P2.healT || 0) - dt);
+      P2.buffT = Math.max(0, P2.buffT - dt);
+      if (P2.vanish) {
+        P2.vanish.t += dt;
+        if (P2.vanish.mode === "in" && P2.vanish.t >= P2.vanish.dur) P2.vanish = null;
+      }
+      if (!CK) return;
+      if (P2.status === "status_poison" && Math.random() < dt * 7) {
+        const a = A[P2.clip ? P2.clip.id : idleId()] || A[idleId()], k = K3(P2.y);
+        fx2.push({ k: "bubble", x: P2.x + (Math.random() - 0.5) * 26 * k, y: P2.y - P2.z - (BASE2(a) - a.top[curF()]) * k + 6, vy: -40 - Math.random() * 30, r: 2 + Math.random() * 2.5, t: 0.9 + Math.random() * 0.4, t0: 1.3 });
+      }
+      if (P2.hp <= 25 && P2.mode !== "dead" && Math.random() < dt * 0.6) vfx("blood_splat", P2.x + (Math.random() - 0.5) * 30, P2.y - (60 + Math.random() * 80) * K3(P2.y), 1.8, { flip: Math.random() < 0.5 });
+      if (P2.hp <= 25 && P2.mode !== "dead" && Math.random() < dt * 3.5) {
+        const a = A[P2.clip ? P2.clip.id : idleId()] || A[idleId()], f = curF(), k = K3(P2.y);
+        const top = P2.y - P2.z - (BASE2(a) - a.top[Math.min(f, a.n - 1)]) * k, bot = P2.y - P2.z;
+        const y = top + (bot - top) * (0.25 + Math.random() * 0.4);
+        for (let i = 0; i < 2 + (Math.random() * 3 | 0); i++) fx2.push({ k: "blood", x: P2.x + (Math.random() - 0.5) * 30 * k, y, vx: (Math.random() - 0.5) * 120, vy: -60 - Math.random() * 120, g: P2.y + (Math.random() - 0.5) * 6, t: 3, s: 2 + Math.random() * 2.5 });
+      }
+      if (hitstop > 0) {
+        hitstop -= dt;
+        return;
+      }
+      updateProxies(dt);
+      tickClip(dt);
+      {
+        const gz = env.ground(P2.x, P2.y);
+        if (P2.mode !== "air" && P2.z > gz) {
+          P2.vz = Math.min(P2.vz || 0, 300) - 2700 * dt;
+          P2.z = Math.max(gz, P2.z + P2.vz * dt);
+          if (P2.z === gz) {
+            P2.vz = 0;
+            dust(P2.x, P2.y, 4, 1);
+            sfx("land");
+          }
+        }
+      }
+      if (P2.clip && (P2.clip.id === "SH_D" || P2.clip.id === "SH_E") && Math.random() < dt * 60) {
+        const k = K3(P2.y);
+        fx2.push({ k: "mote", x: P2.x + (Math.random() - 0.5) * 70 * k, y: P2.y - (230 + Math.random() * 40) * k, vy: 700 + Math.random() * 200, c: "rgba(170,220,255,.8)", t: 0.3 });
+      }
+      P2.inv = Math.max(0, P2.inv - dt);
+      P2.wakeArmor = Math.max(0, (P2.wakeArmor || 0) - dt);
+      if (P2.mode === "down" && P2.wakeBuf && P2.t - (P2.downAt ?? -9) >= P2.wakeDelay + (P2.wakeExtra || 0)) {
+        const k = P2.wakeBuf;
+        P2.wakeBuf = null;
+        onPress(k);
+      } else if (P2.mode !== "down") P2.wakeBuf = null;
+      if ((P2.skillMax || 1) > 1 && P2.skillN < P2.skillMax && (P2.cd.skill || 0) <= P2.t) {
+        P2.skillN++;
+        if (P2.skillN < P2.skillMax) setCd("skill");
+      }
+      if (P2.dodgeN < P2.dodgeMax) {
+        P2.dodgeT -= dt;
+        if (P2.dodgeT <= 0) {
+          P2.dodgeN++;
+          P2.dodgeT = P2.dodgeN < P2.dodgeMax ? P2.dodgeCd : 0;
+        }
+      }
+      if (P2.overT > 0) {
+        P2.overT -= dt;
+        P2.heat = 100 * Math.max(0, P2.overT) / 2.6;
+        if (Math.random() < dt * 6) {
+          const p = P2.armed ? muzzle() : { x: P2.x + P2.face * 30 * K3(P2.y), y: P2.y - 150 * K3(P2.y) };
+          steam(p.x, p.y, 1.2);
+        }
+      } else if (P2.t - P2.lastShot > 0.35) P2.heat = Math.max(0, P2.heat - 30 * dt);
+      if (P2.ghostT > 0) {
+        P2.ghostT -= dt;
+        P2.ghostN = (P2.ghostN || 0) + dt;
+        if (P2.clip && P2.ghostN > 0.05 && !(P2.ghostN = 0)) fx2.push({ k: "ghost", id: P2.clip.id, f: curF(), x: P2.x, y: P2.y, z: P2.z, face: P2.face, t: 0.18, t0: 0.18 });
+      }
+      if (P2.dash) {
+        const d3 = P2.dash;
+        P2.x += P2.face * d3.v * dt;
+        d3.t -= dt;
+        if (!d3.done && !!T2 && Math.abs(T2.y - P2.y) < 70 && Math.abs(T2.x - P2.x) < 70 * K3(P2.y)) {
+          d3.done = true;
+          if (d3.hit !== null) {
+            const h = d3.hit || { dmg: 40, kind: "blow" };
+            d3.delay ? later(d3.delay, () => strike2(h)) : strike2(h);
+          }
+          if (d3.stop) d3.t = Math.min(d3.t, d3.stop);
+        }
+        if (d3.t <= 0 || P2.x < 75 || P2.x > W5 - 75) P2.dash = null;
+      }
+      if (P2.dodgeV && P2.dodging) env.perk?.dodgeTick();
+      if (P2.dodgeV) {
+        P2.x += P2.dodgeV.x * dt;
+        P2.y += P2.dodgeV.y * dt;
+        P2.dodgeV.x *= Math.pow(4e-3, dt);
+        P2.dodgeV.y *= Math.pow(4e-3, dt);
+      }
+      if (P2.pvx) {
+        P2.x += P2.face * P2.pvx * dt;
+        const s = Math.sign(P2.pvx);
+        P2.pvx -= s * P2.pdec * dt;
+        if (Math.sign(P2.pvx) !== s) P2.pvx = 0;
+      }
+      const dx = (down2("right") ? 1 : 0) - (down2("left") ? 1 : 0), dy = (down2("down") ? 1 : 0) - (down2("up") ? 1 : 0);
+      const running = down2("run") || P2.runLatch;
+      switch (P2.mode) {
+        case "ground": {
+          if (down2("flee") && has("36")) {
+            P2.mode = "flee";
+            play("36", { fps: 14, loopFrom: 0 });
+            break;
+          }
+          if (down2("back") && has("37")) {
+            P2.mode = "back";
+            play("37", { fps: 10, onEnd: () => {
+              if (P2.mode !== "back") return;
+              if (has("37_1")) {
+                const n = nOf("37_1"), lp = LP("37_1") || R(Math.min(1, n - 1), n - 1);
+                play("37_1", { seq: S2(lp, 0.11), loopFrom: 0 });
+              } else {
+                const n = nOf("37");
+                play("37", { seq: [{ f: n - 2, d: 0.17 }, { f: n - 1, d: 0.17 }], loopFrom: 0 });
+              }
+            } });
+            break;
+          }
+          if (!(dx || dy)) P2.runT = 0;
+          if (dx || dy) {
+            if (P2.armed) P2.armed = false;
+            if (dx && dx !== P2.face) {
+              P2.prevFace = P2.face;
+              P2.faceT = P2.t;
+              P2.face = dx;
+            }
+            const sp = (running ? 430 * (P2.runMul || 1) : 230) * (P2.dying ? 0.6 : 1) * (env.mod ? env.mod.speed() : 1);
+            P2.runT = running ? (P2.runT || 0) + dt : 0;
+            P2.x += dx * sp * dt;
+            P2.y += dy * sp * 0.55 * dt;
+            const id = P2.nude && has("SH_B") ? "SH_B" : running && !P2.dying && has("5") ? has("5_1") ? "5_1" : "5" : "4";
+            const cyc = CH2.cycle && CH2.cycle[id];
+            if (!P2.clip || P2.clip.id !== id) id === "SH_B" ? play(id, { fps: running ? 15 : 11, loopFrom: 0 }) : id === "5_1" ? play(id, { seq: S2(R(0, nOf(id) - 2), 1 / 15), loopFrom: 0 }) : cyc ? play(id, { seq: S2(R(cyc[0] - 1, cyc[1] - 1), 1 / (id === "5" ? 15 : P2.dying ? 7 : 11)), loopFrom: 0 }) : play(id, { fps: id === "5" ? 15 : P2.dying ? 7 : 11, loopFrom: 0 });
+            if (id[0] === "5" && Math.random() < dt * 4) {
+              if (!vfx("run_dust", P2.x - P2.face * 24, P2.y + 2, 2 * K3(P2.y), { flip: P2.face < 0, bottom: true }))
+                dust(P2.x - P2.face * 20, P2.y, 1, 0.6);
+            }
+            const sf = curF(), n = nOf(id);
+            if (sf !== P2.stepF && (sf === 1 || sf === (n >> 1) + 1)) sfx("step");
+            P2.stepF = sf;
+            P2.idleT = 0;
+          } else {
+            const id = P2.nude && has("SH_G") ? "SH_G" : P2.armed ? restId() : P2.combat ? idleId() : "1";
+            if (!P2.clip || P2.clip.id !== id) {
+              if (id === "W") play("W", { seq: [{ f: PK("weapon", "W"), d: 9 }], loopFrom: 0 });
+              else {
+                const lp = LP(id) || R(0, nOf(id) - 1);
+                const d3 = id === "1" ? Math.max(0.25, Math.min(0.6, 1.2 / lp.length)) * (P2.dying ? 0.75 : 1) : id === "W_1" ? 0.2 : 1 / 7;
+                play(id, { seq: S2(lp, d3), loopFrom: 0 });
+              }
+            }
+            P2.idleT += dt;
+            if (!P2.combat && !P2.armed && !P2.dying && P2.idleT > 9) {
+              P2.idleT = 0;
+              emote("2", 7);
+            }
+          }
+          break;
+        }
+        case "act":
+          if (P2.knockT > 0) {
+            P2.knockT -= dt;
+            if (P2.knockT <= 0) {
+              P2.mode = "down";
+              P2.downAt = P2.t;
+            }
+          }
+          break;
+        case "chain":
+          P2.chainT -= dt;
+          if (P2.chainT <= 0) chainExpire();
+          break;
+        case "air": {
+          if (P2.takeoff > 0) {
+            P2.takeoff -= dt;
+            if (P2.takeoff <= 0) {
+              P2.vz = 1180;
+              dust(P2.x, P2.y, 3, 0.7);
+            } else break;
+          }
+          if (dx) {
+            P2.x += dx * P2.airVX * dt;
+            if (!P2.airAtk) P2.face = dx;
+          }
+          P2.y += dy * 140 * dt;
+          P2.z += P2.vz * dt;
+          P2.vz -= 2700 * dt;
+          P2.spin = Math.max(0, P2.spin - dt);
+          if (P2.airAtk && !P2.airHit && P2.clip && P2.clip.id === "14" && curF() >= impactOf("14")) {
+            const was = T2.hits;
+            fireEv({ f: curF(), ev: P2.airHeavy ? "hitH" : "hit", kind: P2.airHeavy ? "spike" : void 0 });
+            if (T2.hits !== was) P2.airHit = true;
+          }
+          {
+            const gz = env.ground(P2.x, P2.y);
+            if (P2.z <= gz && P2.vz < 0) {
+              P2.z = gz;
+              land2();
               break;
             }
           }
@@ -2446,1605 +4051,4 @@
       const r = this.reward;
       if (!r) return;
       this.reward = null;
-      fighterHooks.openDraft?.(this, r.offers);
-    }
-    rewardNear() {
-      const r = this.reward;
-      return !!r && Math.abs(r.x - this.x) < 80 && Math.abs(r.y - this.y) < 50;
-    }
-    /** 방어막 (NPC 등급, combat/grades.ts): 체력보다 먼저 깎이고, 남은 동안 경직·밀림 없음. 깨지면 잠깐 휘청. 다시 차지 않는다 */
-    shield = 0;
-    shieldMax = 0;
-    /** 인물 팩 (그림·설정) */
-    art;
-    /** 기본 능력치(힘민체지정)와 산출 전투 수치 (combat/stats.ts) */
-    base;
-    stat;
-    /** 능력치에서 나온 최대 체력 (출동 시작 때 progression 이 이 값을 쓴다) */
-    baseHp;
-    constructor(clips, art4) {
-      super(clips);
-      this.art = art4;
-      this.label = art4.cfg.name;
-      this.base = baseOf(art4.cfg.name);
-      this.stat = derive(this.base);
-      this.baseHp = this.hp = this.hpMax = this.stat.hp;
-      Object.defineProperty(this, "stop", { get: () => 0, set: () => {
-      }, configurable: true });
-      const fx2 = charFx();
-      this.core = createFighterCore({
-        A: art4.A,
-        IMG: art4.IMG,
-        CH: art4.cfg,
-        VFX: fx2?.VFX ?? {},
-        CHAIR: fx2?.CHAIR ?? {},
-        held: this.heldNames,
-        K: (y) => spr(y) * CHAR_K,
-        sfx: (type, extra) => fighterHooks.sfx({ type, ...extra }),
-        font: (n) => pfont(n).f,
-        targets: () => this.targets(),
-        // 능력치(본부 출동 stats)·상태 효과 배율 (docs/게임_성장_경제_설계.md 2-2·6장)
-        mod: { speed: () => this.speedMul(), sp: () => this.spMul(), cd: () => this.stat.cd },
-        // 치명: 플레이어·NPC·적 모두 같은 확률 (10-30)
-        crit: () => Math.random() < this.stat.crit,
-        critDmg: () => this.stat.critDmg,
-        critP: () => this.stat.crit,
-        perk: this.perks,
-        bind: (t, sec) => this.bindBody(t.body, sec),
-        // 물건 윗면은 이미 그 높이에 있을 때만 땅이다 (아래에서 걸어 들어가면 올라서지 않고 막힌다)
-        ground: (x, y) => {
-          const p = this.platformAt(x, y);
-          return p && this.core.P.z >= p.h - 10 ? p.h : 0;
-        },
-        hurt: (t, dmg, kind, face, hitstop, o) => this.hurtTarget(t.body, dmg, kind, face, hitstop, o),
-        clamp: (P2) => {
-          const w = this.world;
-          if (!w) return;
-          P2.y = Math.max(w.lane[0], Math.min(w.lane[1], P2.y));
-          P2.x = Math.max(w.bounds[0] + 30, Math.min(w.bounds[1] - 30, P2.x));
-        }
-      });
-      this.perks.host = this.perkHost();
-    }
-    /** 퍽이 엔진을 만지는 손잡이 (src/game/perks/runtime.ts PerkHost) */
-    perkHost() {
-      const api = this.core.perkApi;
-      const me = this;
-      return {
-        kit: kitOf(this.art.cfg, (id) => this.core.has(id), this.base.str),
-        get P() {
-          return me.core.P;
-        },
-        me: {
-          get hp() {
-            return me.hp;
-          },
-          set hp(v) {
-            me.hp = Math.max(0, Math.min(me.hpMax, v));
-          },
-          get hpMax() {
-            return me.hpMax;
-          },
-          set hpMax(v) {
-            me.hpMax = v;
-          },
-          get baseHp() {
-            return me.baseHp;
-          },
-          set baseHp(v) {
-            me.baseHp = v;
-          },
-          get shield() {
-            return me.shield;
-          },
-          set shield(v) {
-            me.shield = v;
-          },
-          get shieldMax() {
-            return me.shieldMax;
-          },
-          set shieldMax(v) {
-            me.shieldMax = v;
-          },
-          get x() {
-            return me.x;
-          },
-          set x(v) {
-            me.x = v;
-          },
-          get y() {
-            return me.y;
-          },
-          set y(v) {
-            me.y = v;
-          }
-        },
-        foes: () => api.proxies(),
-        hit: (t, dmg, kind, tag2, depth) => api.hit(t, dmg, kind, tag2, depth),
-        boom: (b) => api.boom(b),
-        status: (body, k, s, mul) => this.putStatus(body, k, s, mul),
-        statusOf: (body) => body.status instanceof StatusSet ? body.status : null,
-        mark: (t, s) => api.mark(t, s),
-        bind: (t, s) => api.bind(t, s),
-        stun: (t, s) => this.stunBody(t.body, s),
-        later: (s, fn2) => api.later(s, fn2),
-        text: (x, y, v) => api.text(x, y, v),
-        ghost: (ids, mul) => api.ghost(ids, mul),
-        replaySkill: (mul) => api.replaySkill(mul),
-        moveBody: (body, dx) => {
-          body.x += dx;
-          if (body.core?.P) body.core.P.x += dx;
-        },
-        bounds: () => this.world?.bounds ?? [0, 1280],
-        isDown: (body) => body.core?.P ? ["down", "belly"].includes(body.core.P.mode) : body.state === "down" || body.state === "getup",
-        isStunned: (t) => t.stunT > 0 || t.body.state === "stunned" || t.body.core?.P?.mode === "stun",
-        isElite: (body) => !!body.elite || !!body.boss || (body.shieldMax ?? 0) > 0,
-        setHpMax: (v) => {
-          this.hpMax = v;
-        },
-        applyStats: (bn) => {
-          if (this.team !== "player") return;
-          const b = this.base;
-          this.stat = derive({ str: b.str + bn.str, dex: b.dex + bn.dex, con: b.con + bn.con, int: b.int + bn.int, wil: b.wil + bn.wil });
-          this.baseHp = this.stat.hp;
-        },
-        addSp: (v) => api.gainSp(v),
-        gainDodge: () => {
-          this.core.P.dodgeN = Math.min(this.core.P.dodgeMax, this.core.P.dodgeN + 1);
-        },
-        resetSkillCd: () => {
-          this.core.P.cd.skill = 0;
-          this.core.P.skillN = this.core.P.skillMax || 1;
-        }
-      };
-    }
-    /** 상대에게 상태 이상 (퍽): 상대 정신력으로 지속 감소. 새로 걸리면 머리 위에 이름 */
-    putStatus(body, k, s, mul) {
-      const st = body.status;
-      if (!(st instanceof StatusSet) || !body.alive || body.hp <= 0) return;
-      if (st.apply(k, k === "taint" ? void 0 : s * (body.stat?.statusDur ?? 1), mul)) this.core.perkApi.text(body.x, body.y - (body.z || 0) - 250, STATUS[k].label);
-    }
-    /** 기절: 엔진 적은 stunned, 인물은 스턴 동작 */
-    stunBody(body, s) {
-      if (!body.alive || body.hp <= 0) return;
-      if (body.core?.P) {
-        if (!["down", "belly", "dead"].includes(body.core.P.mode)) {
-          body.core.stun();
-          body.core.P.stunT = s;
-        }
-        return;
-      }
-      if (typeof body.set === "function" && body.state !== "dead" && body.state !== "spawn") {
-        body.move = null;
-        body.set("stunned");
-        body.stunT = Math.round(s * 30);
-      }
-    }
-    /** 묶기: 엔진 적은 bound(못 움직임), 인물은 스턴 */
-    bindBody(body, s) {
-      if (!body.alive || body.hp <= 0) return;
-      if (body.core?.P) return this.stunBody(body, s);
-      if (typeof body.set === "function" && body.state !== "dead" && body.state !== "spawn" && body.state !== "air") {
-        body.move = null;
-        body.set("bound");
-        body.bindT = Math.round(s * 30);
-      }
-    }
-    /** 발 자리 아래 올라설 물건 (데스크 등) */
-    platformAt(x, y) {
-      const ps = this.world?.floor?.platforms;
-      let best = null;
-      for (const p of ps ?? []) if (x >= p.x0 && x <= p.x1 && y >= p.y0 - 4 && y <= p.y1 + 4 && (!best || p.h > best.h)) best = p;
-      return best;
-    }
-    /** 그리는 순서용 깊이: 물건 위에 서 있으면 그 물건 앞 모서리보다 앞으로 */
-    /** 회피 충전: 쓸 수 있는 회피 수 + 다음 하나가 찬 만큼(0~1) */
-    get dodgeMeter() {
-      const P2 = this.core.P;
-      return P2.dodgeN + (P2.dodgeN < P2.dodgeMax && P2.dodgeCd > 0 ? 1 - Math.max(0, P2.dodgeT) / P2.dodgeCd : 0);
-    }
-    get dodgeMax() {
-      return this.core.P.dodgeMax;
-    }
-    /** 아이템 쓸 때 몸짓(엔진은 옛 동작 이름 drink·eat·bandage·toss 를 부름): 인물 팩 공통 줄 「26 섭취」로. 던지는 동작은 공통 줄에 없어서 몸짓 없이 효과만(10-30 동작 대조) */
-    play(key, world) {
-      if (key === "drink" || key === "eat" || key === "bandage") {
-        if (this.core.has("26")) this.core.emote("26", 7);
-        return;
-      }
-      if (key === "toss") return;
-      super.play(key, world);
-    }
-    /** 고유기·충전·필살 피해 배율: NPC만 0.5 (docs/설계_기본피해_표준.md 3장) */
-    skillMul = 1;
-    /** 주인공 편 AI 몸 (동행, fighter/ai.ts side 'ally'): 주인공 전용 처리(영구 사망·보호막 퍽)를 받지 않는다 */
-    allySide = false;
-    get sortY() {
-      const p = this.z > 4 ? this.platformAt(this.x, this.y) : null;
-      return p && this.z >= p.h - 8 ? p.y1 + 2 : this.y;
-    }
-    targets() {
-      return this.foes().map((b) => ({ body: b, x: b.x, y: b.y, z: b.z })).concat(this.extraFoes());
-    }
-    /** 때릴 상대 (주인공: 적 편 몸 전부. AI 대련 상대(src/game/combat)는 주인공 쪽으로 바꾼다) */
-    foes() {
-      const w = this.world;
-      if (!w) return [];
-      return w.bodies.filter((b) => b.alive && b.team === "enemy" && b.hp > 0 && b.kind !== "bullet");
-    }
-    /** 전투 몸이 아닌 필드 행위자 (주인공만) */
-    extraFoes() {
-      return fighterHooks.extraTargets?.() ?? [];
-    }
-    /** AI 쪽에서 쓰는 지금 월드 */
-    get worldNow() {
-      return this.world;
-    }
-    /** 이동·회피·점프 속도 배율: 능력치 speed × 상태 효과 */
-    speedMul() {
-      return this.stat.speed * (this.progression?.stats.speed ?? 1) * (this.statusMod?.speed() ?? 1) * this.perks.walkMul();
-    }
-    /** 필살 게이지 차는 배율: 능력치 charge × 상태 효과 */
-    spMul() {
-      return this.stat.sp * (this.progression?.stats.charge ?? 1) * (this.statusMod?.sp() ?? 1) * this.perks.spMul();
-    }
-    /** 상태 효과 (출혈·오염·두통·혼란·공포·둔화·침묵, src/game/combat/status.ts). 적 공격의 debuff 이벤트가 건다 */
-    status = new StatusSet();
-    /** 상태 효과가 거는 배율 */
-    statusMod = { speed: () => this.status.speedMul(), sp: () => this.status.spMul() };
-    hurtTarget(t, dmg, kind, face, hitstop, o) {
-      const w = this.world;
-      if (!w || !t.alive) return;
-      const r = REACT[kind] ?? REACT.light;
-      const st = this.progression?.stats;
-      const form = o.form ?? (o.src === "ranged" ? "gun" : "body");
-      let scale = form === "gun" ? this.stat.aim * (st?.aim ?? 1) : form === "psi" ? this.stat.psi : this.stat.power * (st?.power ?? 1);
-      if (o.src === "blast" && !o.form) scale = 1;
-      if (o.src === "ranged" && !this.firstShotUsed && this.label === "에일린" && this.progression?.relics.includes("own_eileen")) {
-        this.firstShotUsed = true;
-        scale *= 2;
-        w.say("치명!", 0.8);
-      }
-      const hit2 = { x0: t.x - 1, x1: t.x + 1, z0: 0, z1: 400, y: t.y, dy: 999, attackId: newAttackId(), dmg: dmg * this.dmgMul * scale * (o.src === "skill" ? this.skillMul : 1), react: r.react, dir: face, push: o.push ?? r.push, lift: r.lift, stop: 0, strength: r.strength, blow: kind === "blow", lethal: !!o.src && ["skill", "ranged", "blast"].includes(o.src) || form !== "body" || !!this.core.P.armed };
-      const res = t.applyHit(hit2, w);
-      if (res.kind === "immune") return;
-      if (o.debuff && res.kind !== "guard") this.putStatus(t, o.debuff.k, (o.debuff.s > 0 ? o.debuff.s : STATUS[o.debuff.k].sec) * this.perks.outDur(o.debuff.k), o.debuff.k === "bleed" ? this.perks.bleedMul() : void 0);
-      t.stop = Math.max(t.stop, Math.round(Math.max(hitstop, kind === "light" ? 0.085 : 0.16) * 30));
-      this.combo = this.comboClock > 0 ? this.combo + 1 : 1;
-      this.comboClock = 40;
-      this.maxCombo = Math.max(this.maxCombo, this.combo);
-      if (res.killed) {
-        w.kills++;
-        if (t.team === "enemy" && !(t instanceof Fighter)) w.emit({ type: "enemyDie", x: t.x, kind: t.kind });
-      }
-      return { killed: !!res.killed, guard: res.kind === "guard" };
-    }
-    /* ───────── 엔진 쪽 ───────── */
-    frame() {
-      const k = spr(this.y) * CHAR_K;
-      return { hit: [], hurt: this.alive ? [{ x0: this.x - 26 * k, x1: this.x + 26 * k, z0: this.z, z1: this.z + this.height(), y: this.y, dy: 16 }] : [] };
-    }
-    /** 화면 위 키(서 있는 그림 기준) */
-    height() {
-      const m = this.art.A["1"];
-      return (m ? Math.min(m.h - 4, m.floor) - (m.top[0] ?? 14) : 210) * spr(this.y) * CHAR_K;
-    }
-    applyHit(hit2, world) {
-      const P2 = this.core.P;
-      if (P2.inv > 0 || this.invuln > 0) {
-        this.core.takeHit("hit");
-        if (P2.dodging && this.perks.reflectOnDodge() && !this.attackerOf(hit2)) this.core.perkApi.reflect(hit2.dmg, this.perks.reflectSplit());
-        return { kind: "immune" };
-      }
-      if (this.phase === "down") return { kind: "immune" };
-      const lying = P2.mode === "down" || P2.mode === "belly";
-      const front = hit2.dir === -P2.face;
-      if (P2.mode === "block" && front) {
-        const attacker = this.attackerOf(hit2);
-        const pr = this.perks.blocked({ melee: !!attacker, attacker, dmg: hit2.dmg });
-        if (!pr.noDrain) this.spendGuard((14 + hit2.dmg * 0.6) / this.perks.guardMul());
-        if (pr.reflect) this.core.perkApi.reflect(hit2.dmg, this.perks.reflectSplit());
-        if (this.guardBroken && this.perks.guardBreak()) {
-          this.core.onRelease("block");
-          world.emit({ type: "guard", x: this.x });
-          return { kind: "guard" };
-        }
-        if (this.guardBroken) {
-          this.core.onRelease("block");
-          this.core.stun();
-          P2.stunT = 1.1;
-          world.emit({ type: "guard", x: this.x });
-          return { kind: "hit" };
-        }
-        this.core.takeHit("hit");
-        this.hp = Math.max(1, this.hp - Math.round(hit2.dmg * this.perks.blockChip()));
-        world.emit({ type: "guard", x: this.x });
-        return { kind: "guard" };
-      }
-      if (this.ward > 0 && hit2.dmg > 0) {
-        this.ward--;
-        this.invuln = 20;
-        world.say("부적이 대신 맞았다", 1);
-        return { kind: "immune" };
-      }
-      const strength = hit2.strength ?? (hit2.react === "down" || hit2.react === "launch" ? 3 : hit2.react === "stagger" ? 2 : 1);
-      const armored = this.core.armored() || strength <= (this.progression?.stats.poise ?? 0) || P2.mode === "charge" && this.perks.keepCharge();
-      let taken = hit2.dmg * this.stat.taken * (1 - (this.progression?.stats.defense ?? 0)) * (this.core.armored() ? 0.5 : 1) * this.perks.takenMul();
-      if (this.shield > 0) {
-        const cut = Math.min(this.shield, Math.round(taken));
-        this.shield -= cut;
-        taken -= cut;
-        world.emit({ type: "hurt", x: this.x, dmg: cut, hp: this.hp });
-        if (this.shield > 0) {
-          P2.armorT = 0.28;
-          P2.armorC = "#5ab8ff";
-          return { kind: "armor" };
-        }
-        world.emit({ type: "guard", x: this.x });
-        if (this.team === "player" && !this.allySide) {
-          this.perks.shieldBroke();
-          this.shieldMax = 0;
-        } else {
-          this.core.stun();
-          P2.stunT = 0.8;
-        }
-        this.hp = Math.max(0, this.hp - Math.round(taken));
-        return { kind: "hit" };
-      }
-      if (this.hp - Math.round(taken) <= 0) {
-        const r = this.perks.lethal();
-        if (r === "hold") {
-          world.emit({ type: "hurt", x: this.x, dmg: taken, hp: this.hp });
-          this.core.takeHit("hit");
-          return { kind: "hit" };
-        }
-        if (r === "revive") {
-          world.emit({ type: "hurt", x: this.x, dmg: taken, hp: this.hp });
-          this.core.knock();
-          return { kind: "hit" };
-        }
-      }
-      this.hp = Math.max(0, this.hp - Math.round(taken));
-      this.perks.hurt(taken);
-      world.emit({ type: "hurt", x: this.x, dmg: taken, hp: this.hp });
-      if (!this.lowWarned && this.hp < this.hpMax * 0.3) {
-        this.lowWarned = true;
-        world.emit({ type: "hp:low" });
-      }
-      if (this.hp <= 0 && this.team === "player" && !this.allySide && (fighterHooks.permaDeath?.() ?? false)) {
-        this.dieNow(lying);
-        return { kind: "hit", killed: true };
-      }
-      if (this.hp <= 0) {
-        if (lying) this.core.takeHit("hit");
-        else this.core.knock();
-        this.phase = "down";
-        return { kind: "hit", killed: true };
-      }
-      this.status.onHit();
-      if (lying) {
-        this.core.takeHit("hit");
-        return { kind: "hit" };
-      }
-      if (armored) {
-        this.core.takeHit("hit");
-        return { kind: "armor" };
-      }
-      P2.face = Math.sign(hit2.dir) === 1 ? -1 : 1;
-      const noKnock = this.perks.noKnock();
-      const kind = hit2.blow ? "push" : hit2.react === "launch" ? noKnock ? "low" : "launch" : hit2.react === "down" ? noKnock ? "low" : "knock" : hit2.react === "stagger" ? "low" : "hit";
-      this.core.takeHit(kind);
-      return { kind: "hit" };
-    }
-    /** 영구 사망(주인공): 선 채 44 · 누워서 45, 그 줄이 없으면 쓰러지기. NPC는 체력 0이면 항상 기절(필드에서 무기로 확인 사살 → 시체) */
-    killed = null;
-    dieNow(lying) {
-      this.hp = 0;
-      this.phase = "down";
-      this.killed = lying ? "deadLying" : "dead";
-      if (this.core.has(lying ? "45" : "44")) {
-        if (lying) this.core.P.mode = "down";
-        this.core.die();
-      } else if (!lying) this.core.knock();
-    }
-    /** 이 공격을 한 근접 상대 (앞 220px 안, 같은 줄). 없으면 투사체로 본다 */
-    attackerOf(hit2) {
-      const P2 = this.core.P;
-      return this.core.perkApi.proxies().filter((q) => Math.abs(q.y - P2.y) < 70 && Math.abs(q.x - P2.x) < 220 && Math.sign(q.x - P2.x) === -Math.sign(hit2.dir || -P2.face)).sort((a, b) => Math.abs(a.x - P2.x) - Math.abs(b.x - P2.x))[0] ?? null;
-    }
-    listen(p) {
-      this.input(p);
-    }
-    /** 본부 의자 자리(hub.ts seat): 엔진 앉기 클립 대신 테스트룸 앉기(코어 sitAt, 의자 그림·맞춤 chairs/<키>.json 그대로). 조사 키로 일어나 exit 자리로 */
-    coreSeat = null;
-    /** 화장실(11-01, hub.ts): 테스트룸 장면 줄을 (x, y)에서 튼다 — 칸 101 → 102 → 103, 소변 100, 손 씻기 104. 그 인물에게 없는 줄은 건너뛴다. 하나도 없거나 움직일 수 없는 때면 false */
-    lifeScene(steps, x, y, face) {
-      const P2 = this.core.P;
-      if (!steps.some((st) => this.core.has(st.id)) || P2.mode !== "ground" || this.z > 0) return false;
-      P2.x = x;
-      P2.y = y;
-      P2.z = 0;
-      P2.vx = 0;
-      P2.face = face;
-      this.core.runScene(steps);
-      this.sync();
-      return true;
-    }
-    /** lifeScene 이 아직 도는 중인가 */
-    get lifeSceneOn() {
-      return this.core.P.mode === "act";
-    }
-    /** 코어 의자에 앉아 있나 (hub.ts: 방 의자 그림 숨김) */
-    get sitting() {
-      return !!this.coreSeat;
-    }
-    sit(clip, x, y, face, exit, set) {
-      const P2 = this.core.P;
-      const can = !this.core.CH?.noSit && ["60", "96", "61"].some((id) => this.core.has(id));
-      if (!can || P2.mode !== "ground" || this.z > 0) return super.sit(clip, x, y, face, exit);
-      P2.x = x;
-      P2.y = y;
-      P2.z = 0;
-      P2.vx = 0;
-      P2.face = face;
-      this.core.sitAt(clip.includes("side") ? "side" : clip.includes("back") ? "back" : "front", set);
-      if (!P2.seat) return super.sit(clip, x, y, face, exit);
-      const seat = P2.seat;
-      seat.cx = x;
-      seat.cy = y;
-      const body = seatBody(x, y, face, this.core.chairFit(seat.dir), spr(y) * CHAR_K);
-      P2.x = body.x;
-      P2.y = body.y;
-      this.coreSeat = { exit };
-      this.sync();
-      return true;
-    }
-    /** 샤워 자리(hub.ts spot act 'shower'): 그 자리에 서서 샤워 규칙 재생(fighter/shower.ts, 현실 10분). 방향키·조사 키로 그만둔다 */
-    coreShower = null;
-    get showering() {
-      return !!this.coreShower && this.core.showering;
-    }
-    /** 맨몸(샤워 중 맞아 끊김). 샤워실을 나가면 hub 가 dress() */
-    get nude() {
-      return this.core.nude;
-    }
-    dress() {
-      this.core.dress();
-    }
-    /** 탈의실 캐비닛(11-02): 맨몸이면 옷 입기, 아니면 옷 벗기. 바닥에 서 있을 때만 */
-    changeClothes(x, y, face) {
-      const P2 = this.core.P;
-      if (P2.mode !== "ground" || this.z > 0 || this.core.changing) return false;
-      P2.x = x;
-      P2.y = y;
-      P2.z = 0;
-      P2.vx = 0;
-      P2.face = face;
-      if (this.core.nude) this.core.dressUp();
-      else this.core.undress();
-      this.sync();
-      return true;
-    }
-    shower(x, y, face, seconds = 600) {
-      const P2 = this.core.P;
-      if (!(this.core.has("SH_D") || this.core.has("SH_E")) || P2.mode !== "ground" || this.z > 0) return false;
-      P2.x = x;
-      P2.y = y;
-      P2.z = 0;
-      P2.vx = 0;
-      P2.face = face;
-      this.core.runShower(seconds, true);
-      if (!this.core.showering) return false;
-      this.coreShower = { exit: { x, y } };
-      this.sync();
-      return true;
-    }
-    coreShowerStep(p) {
-      if (!this.coreShower) return;
-      const P2 = this.core.P;
-      const quit = p.pressed.has("interact") || p.pressed.has("jump") || p.mx !== 0 || p.my !== 0;
-      if (quit && this.core.showering) {
-        P2.scene = null;
-        this.core.toIdle();
-      }
-      if (!this.core.showering) {
-        const e = this.coreShower.exit;
-        this.coreShower = null;
-        if (P2.mode === "ground") {
-          P2.x = e.x;
-          P2.y = e.y;
-          this.sync();
-        }
-      }
-    }
-    coreSeatStep(p) {
-      const P2 = this.core.P;
-      if (!this.coreSeat) return;
-      if (P2.mode === "seat" && (p.pressed.has("interact") || p.pressed.has("sit") || p.pressed.has("jump"))) this.core.rise(false);
-      if (!P2.seat && P2.mode !== "seatUp") {
-        const e = this.coreSeat.exit;
-        this.coreSeat = null;
-        if (P2.mode === "act" || P2.mode === "down") return;
-        P2.x = e.x;
-        P2.y = e.y;
-        this.sync();
-      }
-    }
-    input(p) {
-      const names = this.heldNames;
-      names.clear();
-      const flip = this.status.flipped();
-      const nameOf = (n) => flip && n === "left" ? "right" : flip && n === "right" ? "left" : n;
-      for (const [b, n] of PRESS) if (p.held.has(b)) names.add(nameOf(n));
-      if (p.run) names.add("run");
-      if (!this.status.canBlock()) names.delete("block");
-      const silenced = !this.status.canSkill();
-      if (silenced) {
-        names.delete("skill");
-        names.delete("super");
-      }
-      if (this.guardBroken || this.guard < 8) names.delete("block");
-      const lying = ["down", "belly", "sit", "scoot", "crouch", "crawl4"].includes(this.core.P.mode);
-      for (const [b, n0] of PRESS) {
-        const n = nameOf(n0);
-        if (!p.pressed.has(b) || silenced && (n === "skill" || n === "super")) continue;
-        if ((lying || !["left", "right", "up", "down"].includes(n)) && (n !== "block" || names.has("block"))) this.core.onPress(n);
-      }
-      if (p.evade) this.core.onPress("dodge");
-      for (const b of ["block", "charge"]) if (p.released.has(b)) this.core.onRelease(b);
-    }
-    tick(world, p) {
-      this.world = world;
-      const w = world;
-      if (!w.underlays.includes(this.underFn)) w.underlays.push(this.underFn);
-      if (this.seat) return super.tick(world, p);
-      const P2 = this.core.P;
-      if (!this.started) {
-        this.started = true;
-        P2.x = this.x;
-        P2.y = this.y;
-      } else {
-        P2.x += this.x - this.synced.x;
-        P2.y += this.y - this.synced.y;
-      }
-      P2.hp = Math.round(this.hp / this.hpMax * 100);
-      this.lastTickAt = performance.now();
-      this.wantInteract = p.pressed.has("interact");
-      if (this.wantInteract && this.rewardNear()) {
-        this.wantInteract = false;
-        this.takeReward();
-      }
-      this.wantItem = p.pressed.has("item1") ? 1 : p.pressed.has("item2") ? 2 : p.pressed.has("item3") ? 3 : p.pressed.has("item4") ? 4 : 0;
-      if (this.comboClock > 0 && --this.comboClock === 0) this.combo = 0;
-      this.statusStep(world, 1 / 30);
-      this.coreSeatStep(p);
-      this.coreShowerStep(p);
-      if (this.coreShower) {
-        this.heldNames.clear();
-        this.core.frameView({ x0: w.camX, lane: w.lane });
-        this.sync();
-        return;
-      }
-      if (this.coreSeat) {
-        this.heldNames.clear();
-        this.core.frameView({ x0: w.camX, lane: w.lane });
-        this.sync();
-        return;
-      }
-      if (this.phase !== "down") this.input(p);
-      this.core.frameView({ x0: w.camX, lane: w.lane });
-      this.sync();
-    }
-    /** 그림 장마다 (render.ts): 테스트룸처럼 실제 시간으로 움직이고 동작을 넘긴다.
-     * 엔진 틱(30Hz)에서 1/30초씩 돌리면 0.04초짜리 장이 0.067초로 늘고 움직임이 30장으로 끊긴다 (사용자: 테스트룸보다 프레임이 떨어져 보임) */
-    frameStep() {
-      const now = performance.now();
-      const dt = Math.min(0.05, (now - (this.lastFrameAt || now)) / 1e3);
-      this.lastFrameAt = now;
-      if (!this.world || this.seat || now - this.lastTickAt > 120 || dt <= 0) return;
-      const w = this.world;
-      const P2 = this.core.P;
-      P2.x += this.x - this.synced.x;
-      P2.y += this.y - this.synced.y;
-      this.core.frameView({ x0: w.camX, lane: w.lane });
-      this.perkSync(dt);
-      this.core.update(dt);
-      this.guardStep(dt);
-      this.calmStep(dt);
-      const s = this.core.shake;
-      if (s > 6) w.shake(2, Math.min(4, s / 6));
-      this.sync();
-    }
-    /** 퍽 수치를 코어 상태에 넘기고(장마다), 퍽 시계를 돌린다 */
-    perkSync(dt) {
-      const k = this.perks, P2 = this.core.P;
-      if (!k.ranks.size && !k.traits.size && !k.host) return;
-      P2.atkSpd = k.atkSpd();
-      P2.slideMul = k.slideMul();
-      P2.heavyRange = k.heavyRange();
-      P2.dodgeMax = k.dodgeMax();
-      P2.dodgeCd = k.dodgeCd();
-      P2.dodgeInv = k.dodgeInv();
-      P2.dodgeLen = k.dodgeLen();
-      P2.maxJumps = k.maxJumps();
-      P2.airMul = k.airMul();
-      P2.runMul = k.runMul();
-      P2.shotMul = k.shotCdMul();
-      P2.heatMul = k.heatMul();
-      P2.overCut = k.overCut();
-      P2.noShoot = k.noShoot();
-      P2.skillCdMul = k.skillCdMul();
-      P2.chargeMul = k.chargeMul();
-      P2.chargeBig = k.count("충전 강화") >= 3;
-      P2.hurtSp = k.hurtSp();
-      P2.ukemi = k.ukemi();
-      const sm = k.skillCharges();
-      if (sm !== (P2.skillMax || 1)) {
-        P2.skillMax = sm;
-        P2.skillN = Math.min(sm, Math.max(1, P2.skillN || 1));
-      }
-      this.status.immune = k.mindGuard() ? /* @__PURE__ */ new Set(["fear", "confuse"]) : void 0;
-      this.status.taintPer = k.taintPer();
-      if (this.team !== "player") return k.tickNpc(dt);
-      k.tick(dt);
-      const w = this.world;
-      if (!w) return;
-      const gap = k.enemyGap();
-      const foes = w.bodies.filter((b) => b.alive && b.team === "enemy" && b.hp > 0 && b.kind !== "bullet");
-      for (const e of foes) e.perkGap = gap;
-      if (perkWorld.friendlyFire) for (const e of foes) {
-        if (e.core || !e.status?.has?.("confuse") || e.state !== "attack" || typeof e.frame !== "function") continue;
-        const hits = e.frame().hit;
-        for (const o of foes) if (o !== e) {
-          for (const b of o.frame().hurt) for (const h of hits) if (h.x0 < b.x1 && b.x0 < h.x1 && (h.z0 ?? 0) < b.z1 && b.z0 < (h.z1 ?? 999) && Math.abs(h.y - b.y) <= (h.dy ?? 20) + (b.dy ?? 0)) o.applyHit(h, w);
-        }
-      }
-      if (k.has("당구")) for (const e of foes) {
-        if (e.core || !e.mem) continue;
-        if (!e.mem.wallHit) {
-          e.mem.billiard = false;
-          continue;
-        }
-        if (e.mem.billiard || e.state !== "air") continue;
-        const o = foes.find((o2) => o2 !== e && Math.abs(o2.x - e.x) < 46 && Math.abs(o2.y - e.y) < 30);
-        if (!o) continue;
-        e.mem.billiard = true;
-        const pain = (b) => Math.round((b.hpMax ?? 300) * (b.wallDmg ?? 0.06) * 0.5);
-        for (const b of [e, o]) b.applyHit({ x0: b.x - 1, x1: b.x + 1, z0: 0, z1: 400, y: b.y, dy: 999, attackId: newAttackId(), dmg: pain(b), react: "down", dir: b.x >= e.x ? 1 : -1, push: 8, lift: 8, stop: 4, strength: 3 }, w);
-        w.shake(4, 3);
-      }
-    }
-    /** 전투 자세(무기 꺼냄 포함)로 있다가 가까이(700px) 적이 없고 공격·방어 키를 안 누른 채 5초가 지나면
-     * 평상 대기로 돌아온다: 무기부터 넣고, 1.5초 뒤 자세를 푼다 (사용자 2026-10-25). 걷기는 상관없다 */
-    calmT = 0;
-    calmHold = false;
-    calmStep(dt) {
-      const P2 = this.core.P;
-      const acting = [...this.heldNames].some((n) => !["left", "right", "up", "down", "run"].includes(n));
-      const near2 = this.targets().some((t) => Math.abs(t.x - this.x) < 700);
-      if (acting || near2 || !(P2.combat || P2.armed)) {
-        this.calmT = 0;
-        this.calmHold = false;
-        return;
-      }
-      if (P2.mode !== "ground") {
-        if (!this.calmHold) this.calmT = 0;
-        return;
-      }
-      this.calmT += dt;
-      if (this.calmT < 5) return;
-      if (P2.armed) {
-        this.core.onPress("weapon");
-        this.calmT = 3.5;
-        this.calmHold = true;
-        return;
-      }
-      this.calmT = 0;
-      this.calmHold = false;
-      this.core.onPress("combat");
-    }
-    /** 상태 효과 시간·피해 (엔진 틱마다). 지속 피해로는 쓰러지지 않는다(1 남김). 오염은 최대 체력을 줄인다 */
-    statusStep(world, dt) {
-      if (!this.status.list.length) return;
-      const P2 = this.core.P;
-      const dmg = this.status.step(dt, { maxHp: this.hpMax, running: this.running, blocking: P2.mode === "block" });
-      if (dmg > 0 && this.hp > 1) this.hp = Math.max(1, this.hp - dmg);
-      const cap = this.hpMax * this.status.maxHpRatio();
-      if (this.hp > cap) this.hp = cap;
-      void world;
-    }
-    spendGuard(n) {
-      this.guard = Math.max(0, this.guard - n);
-      this.guardWait = 0.8;
-      this.guardIdle = 0;
-      if (this.guard <= 0) this.guardBroken = true;
-    }
-    /** 마지막으로 막아낸 뒤 0.8초가 지나면 초당 35씩 찬다 (막는 중이어도) */
-    guardStep(dt) {
-      this.guardIdle += dt;
-      if (this.guardWait > 0) {
-        this.guardWait -= dt;
-        return;
-      }
-      this.guard = Math.min(100, this.guard + 35 * dt);
-      if (this.guardBroken && this.guard >= 40) this.guardBroken = false;
-    }
-    sync() {
-      const P2 = this.core.P;
-      this.x = P2.x;
-      this.y = P2.y;
-      this.z = P2.z;
-      this.px = this.x;
-      this.py = this.y;
-      this.pz = this.z;
-      this.synced.x = this.x;
-      this.synced.y = this.y;
-      this.dir = P2.face > 0 ? 1 : -1;
-      if (this.gauge !== this.gaugeSeen) P2.sp = Math.max(0, Math.min(100, this.gauge));
-      this.gauge = this.gaugeSeen = P2.sp;
-      this.running = this.core.P.mode === "ground" && this.heldNames.has("run");
-    }
-    /* ───────── 그리기 (render.ts가 부른다) ───────── */
-    drawUnder(ctx, camX) {
-      this.core.frameView({ x0: camX, lane: this.world?.lane ?? [440, 669] });
-      ctx.save();
-      ctx.translate(-camX, 0);
-      this.core.drawUnder(ctx);
-      this.drawReward(ctx);
-      ctx.restore();
-    }
-    /** 바닥 보상 카드 (코드 그림: 도트 카드 + 테두리 등급 색 + 빛, 반짝임은 공용 이펙트 item_sparkle). PixelLab 카드 그림이 생기면 여기만 바꾼다 */
-    drawReward(ctx) {
-      const r = this.reward;
-      if (!r) return;
-      if (!this.perks.active) {
-        this.reward = null;
-        return;
-      }
-      r.t += 1 / 60;
-      const k = spr(r.y) * CHAR_K, drop = Math.max(0, 1 - r.t * 3), bob = Math.sin(r.t * 3) * 4 * k;
-      const cx = Math.round(r.x), cy = Math.round(r.y - (46 + drop * 60) * k - bob);
-      ctx.save();
-      ctx.fillStyle = "rgba(0,0,0,.35)";
-      ctx.beginPath();
-      ctx.ellipse(cx, r.y, 22 * k, 6 * k, 0, 0, Math.PI * 2);
-      ctx.fill();
-      const g = ctx.createRadialGradient(cx, cy, 0, cx, cy, 46 * k);
-      g.addColorStop(0, r.color + "aa");
-      g.addColorStop(1, r.color + "00");
-      ctx.fillStyle = g;
-      ctx.fillRect(cx - 46 * k, cy - 46 * k, 92 * k, 92 * k);
-      const w = Math.round(22 * k), h = Math.round(30 * k), b = Math.max(2, Math.round(3 * k));
-      ctx.fillStyle = "#000";
-      ctx.fillRect(cx - w / 2 - 1, cy - h / 2 - 1, w + 2, h + 2);
-      ctx.fillStyle = r.color;
-      ctx.fillRect(cx - w / 2, cy - h / 2, w, h);
-      ctx.fillStyle = "#16181c";
-      ctx.fillRect(cx - w / 2 + b, cy - h / 2 + b, w - b * 2, h - b * 2);
-      ctx.fillStyle = r.color;
-      ctx.fillRect(cx - 2 * k, cy - 6 * k, 4 * k, 8 * k);
-      ctx.fillRect(cx - 2 * k, cy + 4 * k, 4 * k, 3 * k);
-      if (this.rewardNear()) {
-        ctx.font = pfont(16).f;
-        ctx.textAlign = "center";
-        ctx.lineWidth = 4;
-        ctx.strokeStyle = "#000";
-        ctx.fillStyle = "#f2e3b0";
-        ctx.strokeText("E 보상", cx, cy - h / 2 - 10);
-        ctx.fillText("E 보상", cx, cy - h / 2 - 10);
-      }
-      ctx.restore();
-      if (Math.floor(r.t * 2) !== Math.floor((r.t - 1 / 60) * 2)) this.core.perkApi.vfx("item_sparkle", cx + (Math.random() - 0.5) * 20, cy, 2 * k);
-    }
-    /** 몸 (x,y = 화면 좌표 발 자리: 보간된 값이라 테스트룸 P 대신 이것을 쓴다) */
-    drawSelf(ctx, camX) {
-      ctx.save();
-      ctx.translate(-camX, 0);
-      ctx.imageSmoothingEnabled = false;
-      this.core.drawBody(ctx);
-      ctx.restore();
-    }
-    drawFxLayer(ctx, camX) {
-      this.core.frameView({ x0: camX, lane: this.world?.lane ?? [440, 669] });
-      ctx.save();
-      ctx.translate(-camX, 0);
-      ctx.imageSmoothingEnabled = false;
-      this.core.drawFxLayer(ctx);
-      ctx.restore();
-    }
-    drawScreen(ctx) {
-      this.core.drawScreen(ctx);
-    }
-  };
-
-  // src/game/action/engine/input.ts
-  var KEYMAP = {
-    ArrowLeft: "left",
-    ArrowRight: "right",
-    ArrowUp: "up",
-    ArrowDown: "down",
-    KeyA: "attack",
-    KeyS: "shoot",
-    KeyD: "skill",
-    KeyQ: "guard",
-    KeyW: "super",
-    KeyE: "interact",
-    KeyF: "chain",
-    KeyG: "wall",
-    KeyC: "ally",
-    Space: "jump",
-    ShiftLeft: "shift",
-    ShiftRight: "shift",
-    KeyR: "reload",
-    Digit1: "item1",
-    Digit2: "item2",
-    Digit3: "item3",
-    Digit4: "item4",
-    KeyZ: "map",
-    Tab: "map",
-    KeyX: "auto",
-    Escape: "pause",
-    KeyH: "hitbox"
-  };
-  function useEileenKeys() {
-    for (const k of ["KeyQ", "KeyW", "KeyG", "KeyR", "KeyF", "KeyC", "KeyZ", "KeyX", "KeyV", "KeyA", "KeyS", "KeyD", "Tab", "KeyR"]) delete KEYMAP[k];
-    Object.assign(KEYMAP, { KeyQ: "light", KeyW: "heavy", KeyC: "block", KeyA: "shoot", KeyS: "charge", KeyD: "skill", KeyF: "super", Tab: "weapon", KeyR: "combat", KeyZ: "sit", KeyX: "crouch", KeyV: "flee", KeyB: "back", KeyM: "map", KeyO: "auto" });
-  }
-  var SHIFT_TAP = 5;
-  var DOUBLE_TAP = 8;
-  var Input = class {
-    down = /* @__PURE__ */ new Set();
-    edgesDown = /* @__PURE__ */ new Set();
-    edgesUp = /* @__PURE__ */ new Set();
-    shiftTicks = -1;
-    lastTap = {};
-    dashDir = 0;
-    tick = 0;
-    off = [];
-    /** 자동 진행 등 코드가 누르는 것 */
-    virtual = /* @__PURE__ */ new Set();
-    attach(target = window) {
-      const kd = (e) => {
-        const b = KEYMAP[e.code];
-        if (!b) return;
-        const t = e.target;
-        if (t && (t.tagName === "INPUT" || t.tagName === "TEXTAREA" || t.isContentEditable)) return;
-        e.preventDefault();
-        if (e.repeat) return;
-        this.press(b);
-      };
-      const ku = (e) => {
-        const b = KEYMAP[e.code];
-        if (b) this.release(b);
-      };
-      const blur = () => this.clear();
-      target.addEventListener("keydown", kd);
-      target.addEventListener("keyup", ku);
-      target.addEventListener("blur", blur);
-      this.off.push(() => target.removeEventListener("keydown", kd), () => target.removeEventListener("keyup", ku), () => target.removeEventListener("blur", blur));
-    }
-    detach() {
-      this.off.forEach((f) => f());
-      this.off = [];
-    }
-    press(b) {
-      if (this.down.has(b)) return;
-      this.down.add(b);
-      this.edgesDown.add(b);
-    }
-    release(b) {
-      if (!this.down.has(b)) return;
-      this.down.delete(b);
-      this.edgesUp.add(b);
-    }
-    clear() {
-      this.edgesDown.clear();
-      this.edgesUp.clear();
-      this.lastTap = {};
-      this.down.clear();
-      this.dashDir = 0;
-      this.shiftTicks = -1;
-    }
-    /** 틱마다 한 번 */
-    sample() {
-      this.tick++;
-      const held = /* @__PURE__ */ new Set([...this.down, ...this.virtual]);
-      const pressed = new Set(this.edgesDown);
-      const released = new Set(this.edgesUp);
-      this.edgesDown.clear();
-      this.edgesUp.clear();
-      const mx = (held.has("right") ? 1 : 0) - (held.has("left") ? 1 : 0);
-      const my = (held.has("down") ? 1 : 0) - (held.has("up") ? 1 : 0);
-      let evade2 = false;
-      if (pressed.has("shift")) this.shiftTicks = 0;
-      else if (this.shiftTicks >= 0 && held.has("shift")) this.shiftTicks++;
-      if (released.has("shift")) {
-        if (this.shiftTicks >= 0 && this.shiftTicks < SHIFT_TAP) evade2 = true;
-        this.shiftTicks = -1;
-      }
-      for (const d3 of ["left", "right"]) {
-        if (pressed.has(d3)) {
-          const dir = d3 === "right" ? 1 : -1;
-          if (this.tick - (this.lastTap[d3] ?? -99) <= DOUBLE_TAP) this.dashDir = dir;
-          this.lastTap[d3] = this.tick;
-        }
-      }
-      if (mx === 0 || mx !== this.dashDir) this.dashDir = mx !== 0 && mx === this.dashDir ? this.dashDir : 0;
-      let downDouble = false;
-      if (pressed.has("down")) {
-        downDouble = this.tick - (this.lastTap.down ?? -99) <= DOUBLE_TAP;
-        this.lastTap.down = this.tick;
-      }
-      const run = held.has("shift") && this.shiftTicks >= SHIFT_TAP && mx !== 0 || this.dashDir !== 0 && mx === this.dashDir;
-      return { held, pressed, released, mx, my, evade: evade2, run, downDouble };
-    }
-  };
-
-  // src/game/action/ui/keys.ts
-  var CODE = {
-    left: "ArrowLeft",
-    right: "ArrowRight",
-    up: "ArrowUp",
-    down: "ArrowDown",
-    attack: "KeyA",
-    shoot: "KeyS",
-    unique: "KeyD",
-    guard: "KeyQ",
-    ult: "KeyW",
-    interact: "KeyE",
-    jump: "Space",
-    evade: "ShiftLeft",
-    item1: "Digit1",
-    item2: "Digit2",
-    item3: "Digit3",
-    item4: "Digit4",
-    support: "KeyC",
-    map: "KeyZ",
-    auto: "KeyX",
-    menu: "Escape",
-    reload: "KeyR",
-    hitbox: "KeyH"
-  };
-  var ALIAS = { ShiftRight: "ShiftLeft", Tab: "KeyZ", Numpad1: "Digit1", Numpad2: "Digit2", Numpad3: "Digit3", Numpad4: "Digit4" };
-  var KEY_OF = {
-    ArrowLeft: "ArrowLeft",
-    ArrowRight: "ArrowRight",
-    ArrowUp: "ArrowUp",
-    ArrowDown: "ArrowDown",
-    KeyA: "a",
-    KeyS: "s",
-    KeyD: "d",
-    KeyQ: "q",
-    KeyW: "w",
-    KeyE: "e",
-    KeyC: "c",
-    KeyZ: "z",
-    KeyX: "x",
-    KeyR: "r",
-    KeyH: "h",
-    Space: " ",
-    ShiftLeft: "Shift",
-    Digit1: "1",
-    Digit2: "2",
-    Digit3: "3",
-    Digit4: "4",
-    Escape: "Escape",
-    Tab: "Tab",
-    Enter: "Enter"
-  };
-  var LABEL = {
-    left: "왼쪽",
-    right: "오른쪽",
-    up: "위(안쪽)",
-    down: "아래(앞쪽)·두 번 앉기",
-    attack: "근접 (연타 3타)",
-    shoot: "원거리",
-    unique: "고유기 (짧게·길게)",
-    guard: "가드 (누른 채)",
-    ult: "필살기 (게이지 가득)",
-    interact: "상호작용·줍기",
-    jump: "점프",
-    evade: "짧게 회피 · 누른 채 달리기",
-    item1: "아이템 1",
-    item2: "아이템 2",
-    item3: "아이템 3",
-    item4: "아이템 4",
-    support: "지원 요원 호출",
-    map: "지도",
-    auto: "자동 전환",
-    menu: "메뉴",
-    reload: "재장전",
-    hitbox: "판정 보기"
-  };
-  var KEY_NAME = {
-    left: "←",
-    right: "→",
-    up: "↑",
-    down: "↓",
-    attack: "A",
-    shoot: "S",
-    unique: "D",
-    guard: "Q",
-    ult: "W",
-    interact: "E",
-    jump: "Space",
-    evade: "Shift",
-    item1: "1",
-    item2: "2",
-    item3: "3",
-    item4: "4",
-    support: "C",
-    map: "Z",
-    auto: "X",
-    menu: "Esc",
-    reload: "R",
-    hitbox: "H"
-  };
-  var PAD_BUTTON = {
-    0: "Space",
-    // A 점프
-    1: "KeyE",
-    // B 상호작용
-    2: "KeyA",
-    // X 근접
-    3: "KeyS",
-    // Y 원거리
-    4: "KeyQ",
-    // LB 가드
-    5: "ShiftLeft",
-    // RB 회피·달리기
-    6: "KeyD",
-    // LT 고유기
-    7: "KeyW",
-    // RT 필살기
-    8: "KeyZ",
-    // Back 지도
-    9: "Escape",
-    // Start 메뉴
-    10: "KeyC",
-    // L3 지원
-    11: "KeyR",
-    // R3 재장전 (자동 전환·판정 보기는 메뉴에)
-    12: "Digit1",
-    // 십자 위 아이템 1
-    15: "Digit2",
-    // 십자 오른쪽 아이템 2
-    13: "Digit3",
-    // 십자 아래 아이템 3
-    14: "Digit4"
-    // 십자 왼쪽 아이템 4
-  };
-  var PAD_NAME = {
-    Space: "A",
-    KeyE: "B",
-    KeyA: "X",
-    KeyS: "Y",
-    KeyQ: "LB",
-    ShiftLeft: "RB",
-    KeyD: "LT",
-    KeyW: "RT",
-    KeyZ: "Back",
-    Escape: "Start",
-    KeyC: "L3",
-    KeyR: "R3",
-    KeyX: "메뉴",
-    KeyH: "메뉴",
-    Digit1: "십자↑",
-    Digit2: "십자→",
-    Digit3: "십자↓",
-    Digit4: "십자←",
-    ArrowLeft: "왼쪽 스틱",
-    ArrowRight: "왼쪽 스틱",
-    ArrowUp: "왼쪽 스틱",
-    ArrowDown: "왼쪽 스틱"
-  };
-  var TOUCH_CHARGE = { code: null };
-  var ACTS = Object.keys(CODE);
-  var ACT_OF_CODE = Object.fromEntries(ACTS.map((a) => [CODE[a], a]));
-  function useEileenControls() {
-    Object.assign(CODE, { attack: "KeyQ", reload: "KeyW", support: "Tab", guard: "KeyC", shoot: "KeyA", unique: "KeyD", hitbox: "KeyS", ult: "KeyF", map: "KeyM", auto: "KeyO" });
-    Object.assign(KEY_NAME, { attack: "Q", reload: "W", support: "Tab", guard: "C", shoot: "A", unique: "D", hitbox: "S", ult: "F", map: "M", auto: "O" });
-    Object.assign(LABEL, {
-      attack: "약 공격 (연타 3타) · 뛰며 = 슬라이딩 · 공중 = 점프 공격",
-      reload: "강 공격 (콤보 마무리)",
-      support: "무기 꺼내기·넣기",
-      guard: "방어 (누른 채 · 방어 게이지가 닳는다)",
-      shoot: "원거리 (누른 채 연사 · 과열 주의)",
-      unique: "기술 제압사격",
-      hitbox: "충전 (누른 채 → 떼면 광선)",
-      ult: "필살기 「증명해.」",
-      evade: "짧게 회피 · 누른 채 달리기"
-    });
-    delete ALIAS.Tab;
-    TOUCH_CHARGE.code = "KeyS";
-    Object.assign(KEY_OF, { KeyF: "f", KeyM: "m", KeyO: "o" });
-    Object.assign(PAD_BUTTON, { 2: "KeyQ", 3: "KeyA", 4: "KeyC", 6: "KeyS", 7: "KeyF", 8: "KeyM", 10: "Tab", 11: "KeyW" });
-    Object.assign(PAD_NAME, { KeyQ: "X", KeyA: "Y", KeyC: "LB", KeyS: "LT", KeyF: "RT", KeyM: "Back", Tab: "L3", KeyW: "R3", KeyD: "메뉴" });
-    for (const a of ACTS) ACT_OF_CODE[CODE[a]] = a;
-    for (const k of Object.keys(ACT_OF_CODE)) if (CODE[ACT_OF_CODE[k]] !== k) delete ACT_OF_CODE[k];
-  }
-
-  // src/game/action/art/hqTextures.ts
-  var assets = [["hq_office", "hq_office_wall_1", "hq_office__hq_office_wall_1.png"], ["hq_office", "hq_office_wall_2", "hq_office__hq_office_wall_2.png"], ["hq_office", "hq_office_wall_4", "hq_office__hq_office_wall_4.png"], ["hq_office", "hq_office_wall_6", "hq_office__hq_office_wall_6.png"], ["hq_office", "hq_office_floor", "hq_office__hq_office_floor.png"], ["hq_office", "objects/hq_office_objects_1", "hq_office__objects_hq_office_objects_1.png"], ["hq_office", "objects/hq_office_objects_3", "hq_office__objects_hq_office_objects_3.png"], ["hq_office", "objects/hq_office_objects_4", "hq_office__objects_hq_office_objects_4.png"], ["hq_corridor", "hq_corridor_wall_2", "hq_corridor__hq_corridor_wall_2.png"], ["hq_corridor", "hq_corridor_floor", "hq_corridor__hq_corridor_floor.png"], ["hq_jaemtri", "objects/hq_jaemtri_objects_1", "hq_jaemtri__objects_hq_jaemtri_objects_1.png"], ["hq_chief", "objects/hq_chief_objects_1", "hq_chief__objects_hq_chief_objects_1.png"]];
-  function prepareHqTextures(urlOf) {
-    let alive = true;
-    const inserted = [];
-    if (urlOf) void Promise.all(assets.map(async ([place, name, file]) => {
-      if (window.__GOEI_BG_ART__?.[place]?.[name]) return;
-      try {
-        const src = await urlOf(file);
-        const im = new Image();
-        im.src = src;
-        await im.decode();
-        if (!alive) return;
-        const pack2 = window.__GOEI_BG_ART__ ??= {};
-        const group = pack2[place] ??= {};
-        if (!group[name]) {
-          group[name] = src;
-          inserted.push([place, name, src]);
-        }
-      } catch {
-      }
-    }));
-    return () => {
-      alive = false;
-      for (const [place, name, src] of inserted) {
-        if (window.__GOEI_BG_ART__?.[place]?.[name] === src) delete window.__GOEI_BG_ART__[place][name];
-      }
-    };
-  }
-
-  // src/game/action/art/hqDoorRound2.ts
-  var keys = ["frame", "aperture", "leaf-left", "leaf-right", "entry-marker"];
-  var images2 = null;
-  var revision3 = 0;
-  function prepareHqDoorRound2(urlOf) {
-    const own = ++revision3;
-    images2 = null;
-    void Promise.all(keys.map(async (key) => {
-      const src = window.__GOEI_HQ_DOOR_ROUND2__?.[key] || (urlOf ? await urlOf(key + ".png") : "");
-      if (!src) throw new Error("Optional door art unavailable");
-      const im = new Image();
-      im.src = src;
-      await im.decode();
-      const dims = key === "entry-marker" ? [48, 16] : key.startsWith("leaf-") ? [40, 125] : [96, 144];
-      if (im.naturalWidth !== dims[0] || im.naturalHeight !== dims[1]) throw new Error("Door art size mismatch");
-      return [key, im];
-    })).then((rows) => {
-      if (revision3 === own) images2 = Object.fromEntries(rows);
-    }).catch(() => {
-    });
-    return () => {
-      if (revision3 === own) {
-        revision3++;
-        images2 = null;
-      }
-    };
-  }
-  function drawHqDoorRound2(c, x, open, unlocked) {
-    if (!images2) return false;
-    const a = images2, ox = x - 96, oy = 168;
-    const off2 = Math.round(40 * Math.max(0, Math.min(1, Number.isFinite(open) ? open : 0))) * 2;
-    c.save();
-    c.imageSmoothingEnabled = false;
-    c.drawImage(a.aperture, ox, oy, 192, 288);
-    c.save();
-    c.beginPath();
-    c.rect(x - 80, 190, 160, 250);
-    c.clip();
-    c.drawImage(a["leaf-left"], x - 80 - off2, 190, 80, 250);
-    c.drawImage(a["leaf-right"], x + off2, 190, 80, 250);
-    if (!unlocked) {
-      c.fillStyle = "rgba(0,0,0,0.35)";
-      c.fillRect(x - 80, 190, 160, 250);
-    }
-    c.restore();
-    c.drawImage(a.frame, ox, oy, 192, 288);
-    if (unlocked) c.drawImage(a["entry-marker"], x - 48, 448, 96, 32);
-    c.restore();
-    return true;
-  }
-
-  // src/game/action/engine/art.ts
-  var EMPTY_ART = { atlas: null, cutin: null, clips: {} };
-  function img2(src) {
-    if (!src) return Promise.resolve(null);
-    return new Promise((res) => {
-      const i = new Image();
-      i.onload = () => res(i);
-      i.onerror = () => res(null);
-      i.src = src;
-    });
-  }
-  async function loadArt(urlOf, bytesOf) {
-    const inline = typeof window !== "undefined" ? window.__GOEI_ENGINE_ART__ : void 0;
-    if (inline) {
-      const [atlas, cutin] = await Promise.all([img2(inline.atlas), img2(inline.cutin)]);
-      return { atlas, cutin, clips: inline.frames.clips };
-    }
-    if (urlOf) {
-      try {
-        const [a, c] = await Promise.all([urlOf("atlas.png").catch(() => ""), urlOf("cutin.png").catch(() => "")]);
-        let frames = null;
-        if (bytesOf) {
-          const b = await bytesOf("frames.json");
-          frames = b ? JSON.parse(new TextDecoder().decode(b)) : null;
-        } else {
-          const f = await urlOf("frames.json");
-          frames = f ? await (await fetch(f)).json() : null;
-        }
-        const [atlas, cutin] = await Promise.all([img2(a), img2(c)]);
-        if (frames) return { atlas, cutin, clips: frames.clips };
-      } catch {
-      }
-    }
-    return EMPTY_ART;
-  }
-
-  // src/game/action/charSize.ts
-  var charSize = { k: 1 };
-
-  // src/game/action/hq/rooms.ts
-  var seats4 = (xw, xe, y1, y2) => [
-    { t: "chair", x: xw, y: y1, f: "E" },
-    { t: "chair", x: xw, y: y2, f: "E" },
-    { t: "chair", x: xe, y: y1, f: "W" },
-    { t: "chair", x: xe, y: y2, f: "W" }
-  ];
-  var ROOMS = {
-    office: {
-      w: 22,
-      d: 5,
-      fix: [{ x: 0.5, w: 6, k: "window" }, { x: 7.5, w: 7, k: "screen" }, { x: 15.5, w: 6, k: "window" }],
-      items: [
-        { t: "desk", x: 1, y: 1, w: 0.8, h: 1.6, k: "opdesk" },
-        { t: "chair", x: 2.2, y: 1.8, f: "W" },
-        { t: "desk", x: 6, y: 1, w: 1.6, h: 2 },
-        ...seats4(5.6, 8, 1.5, 2.5),
-        { t: "desk", x: 11, y: 1, w: 1.6, h: 2 },
-        ...seats4(10.6, 13, 1.5, 2.5),
-        { t: "desk", x: 14.2, y: 3.3, w: 1.4, h: 1.2 },
-        ...seats4(13.8, 16, 3.6, 4.3),
-        { t: "glass", x: 16.9, y: 3, w: 0.1, h: 2 },
-        { t: "glass", x: 16.9, y: 3, w: 2.6, h: 0.1 },
-        { t: "desk", x: 17.8, y: 3.7, w: 0.6, h: 0.6, H: 70 },
-        { t: "chair", x: 17.45, y: 4, f: "E", soft: true },
-        { t: "chair", x: 18.75, y: 4, f: "W", soft: true },
-        { t: "desk", x: 19.6, y: 1, w: 0.9, h: 1.8, k: "chiefdesk" },
-        { t: "chair", x: 20.9, y: 1.9, f: "W" },
-        { t: "wall", x: 21.6, y: 0.8, w: 0.3, h: 2.2, H: 150, k: "cabinet" }
-      ],
-      use: [
-        { id: "jaemtri", x: 0.55, y: 1.8, verb: "임무", place: "jaemtri", who: "잼트리", face: 1 },
-        { id: "agents", x: 9.3, y: 3.6, verb: "요원", place: "office", who: "요원들" },
-        { id: "chief", x: 20.9, y: 3, verb: "결재", place: "chief", face: -1, act: ["chairsit", "typing"] },
-        { id: "seat", x: 13, y: 3.3, verb: "앉기", face: -1, act: ["chairsit", "seatthink"] }
-      ]
-    },
-    lounge: {
-      w: 16,
-      d: 5,
-      fix: [{ x: 1, w: 13, k: "window" }],
-      items: [
-        { t: "wall", x: 0.05, y: 0.6, w: 0.6, h: 1.6, H: 280, k: "vending" },
-        { t: "desk", x: 3, y: 1, w: 1.4, h: 1.6, H: 140, k: "counter" },
-        { t: "desk", x: 7, y: 1, w: 0.8, h: 0.8 },
-        { t: "chair", x: 6.6, y: 1.4, f: "E" },
-        { t: "chair", x: 8.2, y: 1.4, f: "W" },
-        { t: "desk", x: 7, y: 3, w: 0.8, h: 0.8 },
-        { t: "chair", x: 6.6, y: 3.4, f: "E" },
-        { t: "chair", x: 8.2, y: 3.4, f: "W" },
-        { t: "big", x: 10, y: 2, w: 4, h: 0.9, H: 110, k: "sofa" },
-        { t: "wall", x: 15, y: 0.3, w: 0.7, h: 0.7, H: 430, k: "pillar" }
-      ],
-      use: [
-        { id: "coffee", x: 2.6, y: 2.6, verb: "커피", place: "pantry", who: "동료", face: 1, act: ["handswork", "drink"] },
-        { id: "table", x: 6.6, y: 3.9, verb: "앉기", face: 1, act: ["chairsit", "eat"] },
-        { id: "sofa", x: 12, y: 3.4, verb: "눕기", act: ["liesit", "doze"] }
-      ]
-    },
-    swat: {
-      w: 20,
-      d: 5,
-      fix: [{ x: 4, w: 6, k: "screen" }, { x: 11, w: 8, k: "window" }],
-      items: [
-        { t: "desk", x: 3, y: 2, w: 1.6, h: 2 },
-        ...seats4(2.6, 5, 2.5, 3.5),
-        { t: "desk", x: 7.5, y: 2, w: 1.6, h: 2 },
-        ...seats4(7.1, 9.5, 2.5, 3.5),
-        { t: "desk", x: 12, y: 2, w: 1.6, h: 2 },
-        ...seats4(11.6, 14, 2.5, 3.5),
-        { t: "desk", x: 15.4, y: 2, w: 0.9, h: 1.8, k: "chiefdesk" },
-        { t: "chair", x: 16.7, y: 2.9, f: "W" },
-        { t: "desk", x: 18, y: 2, w: 1, h: 1.6, H: 150, k: "bench" },
-        { t: "wall", x: 19.6, y: 0.4, w: 0.3, h: 4.2, H: 300, k: "locker" }
-      ],
-      use: [{ id: "gear", x: 17.6, y: 4.2, verb: "점검", face: 1, act: ["gearcheck", "glove", "reload"] }]
-    },
-    wc: {
-      w: 8,
-      d: 5,
-      fix: [],
-      items: [
-        { t: "desk", x: 3.4, y: 1.5, w: 0.6, h: 1.6, H: 130, k: "sink" },
-        { t: "wall", x: 6, y: 0.3, w: 1.9, h: 4.4, H: 300, k: "stall" }
-      ],
-      use: [
-        { id: "sink", x: 3, y: 2.3, verb: "씻기", face: 1, act: ["handswork", "brushteeth"] },
-        { id: "stall", x: 5.6, y: 2.5, verb: "칸", face: 1 }
-      ]
-    },
-    interview: {
-      w: 9,
-      d: 5,
-      fix: [{ x: 1, w: 7, k: "blinds" }],
-      items: [
-        { t: "desk", x: 3.6, y: 1.5, w: 0.8, h: 0.7, H: 70 },
-        { t: "chair", x: 3.1, y: 1.85, f: "E", soft: true },
-        { t: "chair", x: 4.9, y: 1.85, f: "W", soft: true },
-        { t: "wall", x: 7.3, y: 2.6, w: 0.8, h: 0.6, H: 110, k: "cart" }
-      ],
-      use: [{ id: "table", x: 4.9, y: 2.9, verb: "면담", place: "interview", who: "구조된 생존자", face: -1, act: ["chairsit", "seatmouth"] }]
-    },
-    admin: {
-      w: 12,
-      d: 5,
-      fix: [{ x: 0.5, w: 5.5, k: "shelfwall" }, { x: 7, w: 4.5, k: "screen" }],
-      items: [
-        { t: "desk", x: 1.3, y: 0.8, w: 0.6, h: 2.2, H: 170, k: "counter" },
-        { t: "chair", x: 2.3, y: 1.9, f: "W" },
-        { t: "desk", x: 4.6, y: 1, w: 0.8, h: 2 },
-        ...seats4(4.2, 5.8, 1.5, 2.5),
-        { t: "desk", x: 8.2, y: 1, w: 0.8, h: 2 },
-        ...seats4(7.8, 9.4, 1.5, 2.5),
-        { t: "wall", x: 11.4, y: 0.4, w: 0.5, h: 3, H: 250, k: "shelf" }
-      ],
-      use: [{ id: "counter", x: 0.75, y: 1.9, verb: "정산", face: 1, act: ["handswork"] }]
-    },
-    bath: {
-      w: 24,
-      d: 5,
-      fix: [...[6, 7.5, 9, 10.5, 12].map((x) => ({ x: x - 0.3, w: 0.6, k: "shower" })), { x: 15, w: 8, k: "glass" }],
-      items: [
-        { t: "wall", x: 0.05, y: 0.3, w: 0.5, h: 3.2, H: 295, k: "locker" },
-        { t: "big", x: 2, y: 2, w: 0.5, h: 1.5, H: 70, k: "bench" },
-        { t: "glass", x: 4.5, y: 0, w: 0.12, h: 3, H: 200 },
-        ...[6, 7.5, 9, 10.5, 12].map((x) => ({ t: "chair", x, y: 0.75, f: "N" })),
-        { t: "big", x: 14.5, y: 1, w: 9, h: 3, H: 85, k: "tub" }
-      ],
-      use: [
-        { id: "locker", x: 0.95, y: 1.6, verb: "탈의", face: -1, act: ["undress"] },
-        { id: "shower", x: 9, y: 1, verb: "샤워", act: ["showerturn", "shower"] },
-        { id: "tub", x: 14.1, y: 2.5, verb: "입욕", face: 1, act: ["stepover", "bath"] }
-      ]
-    },
-    clinic: {
-      w: 16,
-      d: 5,
-      fix: [],
-      items: [
-        { t: "big", x: 2.4, y: 1.8, w: 2, h: 0.9, H: 95, k: "bed" },
-        { t: "chair", x: 4.8, y: 2.25, f: "W" },
-        { t: "big", x: 7, y: 1.8, w: 2, h: 0.9, H: 95, k: "bed" },
-        { t: "chair", x: 9.4, y: 2.25, f: "W" },
-        { t: "desk", x: 13, y: 1, w: 0.8, h: 1.6 },
-        { t: "chair", x: 14.2, y: 1.8, f: "W" },
-        { t: "wall", x: 15.6, y: 0.4, w: 0.3, h: 2.6, H: 260, k: "cabinet" }
-      ],
-      use: [{ id: "bed", x: 3.4, y: 3.2, verb: "쉬기", place: "clinic", act: ["bedlie", "liehold"] }]
-    },
-    // 교육장 (B1): 앞벽 화면, 줄지은 책상 (사용자 배치 2026-10-25)
-    edu: {
-      w: 12,
-      d: 5,
-      fix: [{ x: 3, w: 6, k: "screen" }],
-      items: [
-        { t: "desk", x: 1, y: 0.6, w: 0.8, h: 0.6, H: 110, k: "lectern" },
-        ...[3, 5.4, 7.8].flatMap((x) => [
-          { t: "desk", x, y: 2, w: 1.6, h: 0.6 },
-          { t: "chair", x: x + 0.8, y: 2.9, f: "N" },
-          { t: "desk", x, y: 3.6, w: 1.6, h: 0.6 },
-          { t: "chair", x: x + 0.8, y: 4.5, f: "N" }
-        ])
-      ],
-      use: [{ id: "lectern", x: 1.4, y: 1.6, verb: "교단", face: 1, act: ["handswork"] }]
-    },
-    training: {
-      w: 44,
-      d: 6,
-      fix: [{ x: 4, w: 8, k: "screen" }],
-      items: [
-        ...[[3, 1.4], [5.5, 3.4], [8, 1.4], [10.5, 3.4]].map(([x, y]) => ({ t: "big", x, y, w: 0.7, h: 0.7, H: 260, k: "sandbag" })),
-        { t: "big", x: 12.5, y: 4.2, w: 1.6, h: 0.6, H: 60, k: "bench" },
-        { t: "wall", x: 16, y: 0.8, w: 0.35, h: 5.1, H: 140, k: "lowwall" },
-        { t: "wall", x: 18.5, y: 0.8, w: 0.35, h: 5.1, H: 140, k: "lowwall" },
-        { t: "wall", x: 21, y: 0.8, w: 0.35, h: 5.1, H: 140, k: "lowwall" },
-        { t: "wall", x: 26, y: 0.8, w: 0.4, h: 5.1, H: 170, k: "range" },
-        ...[1.4, 2.6, 3.8, 5].map((y) => ({ t: "wall", x: 43, y: y - 0.3, w: 0.5, h: 0.6, H: 200, k: "target" }))
-      ],
-      use: [
-        { id: "bag", x: 2.4, y: 2.6, verb: "훈련", place: "training", face: 1, act: ["jab", "cross"] },
-        { id: "bag2", x: 9.9, y: 4.6, verb: "샌드백", face: 1, act: ["jab", "cross"] },
-        { id: "photo", x: 24, y: 0.55, verb: "올려다보기", act: ["holdlook"] },
-        { id: "range", x: 25.6, y: 3.8, verb: "사격", face: 1, act: ["fire", "reload"] }
-      ]
-    },
-    lab: {
-      w: 22,
-      d: 5,
-      fix: [{ x: 5, w: 9, k: "glass" }],
-      items: [
-        { t: "desk", x: 1.8, y: 0.8, w: 0.6, h: 2.2, H: 160, k: "counter" },
-        { t: "wall", x: 3.8, y: 0.3, w: 0.3, h: 3, H: 290, k: "shelf" },
-        { t: "desk", x: 8, y: 1, w: 2, h: 1.6, k: "labbench" },
-        { t: "chair", x: 7.6, y: 1.8, f: "E" },
-        { t: "chair", x: 10.4, y: 1.8, f: "W" },
-        { t: "desk", x: 15, y: 1, w: 1.4, h: 1.6, k: "labbench" },
-        { t: "chair", x: 16.8, y: 1.8, f: "W" },
-        { t: "wall", x: 18.8, y: 3.4, w: 0.9, h: 0.6, H: 110, k: "cart" },
-        { t: "wall", x: 21.6, y: 0.4, w: 0.3, h: 3.6, H: 290, k: "shelf" }
-      ],
-      use: [
-        { id: "supply", x: 1.25, y: 1.9, verb: "장비", place: "supply", who: "고그니쟈", face: 1 },
-        { id: "research", x: 7.6, y: 3, verb: "연구", place: "lab", face: 1 },
-        { id: "appraisal", x: 14.6, y: 1.8, verb: "감정", place: "appraisal", who: "데쥬레", face: 1 }
-      ]
-    },
-    tooth: {
-      w: 9,
-      d: 5,
-      fix: [{ x: 2, w: 5, k: "glass" }],
-      items: [{ t: "wall", x: 4, y: 1, w: 1, h: 1.2, H: 120, k: "slot" }],
-      use: [{ id: "slot", x: 3.4, y: 2.6, verb: "이빨", place: "tooth", face: 1 }]
-    }
-  };
-  ROOMS.medlab = (() => {
-    const a = ROOMS.clinic, b = ROOMS.lab, dx = a.w;
-    const sh = (o) => ({ ...o, x: o.x + dx });
-    return {
-      w: a.w + b.w,
-      d: 5,
-      fix: [...a.fix, ...b.fix.map(sh)],
-      items: [...a.items, ...b.items.map(sh)],
-      use: [...a.use, ...b.use.filter((u) => u.place !== "supply").map(sh)]
-    };
-  })();
-  function mirror(r) {
-    const flip = (f) => f === "E" ? "W" : f === "W" ? "E" : f;
-    return {
-      ...r,
-      items: r.items.map((it) => it.t === "chair" ? { ...it, x: r.w - it.x, f: flip(it.f) } : { ...it, x: r.w - it.x - it.w }),
-      fix: r.fix.map((f) => ({ ...f, x: r.w - f.x - f.w })),
-      use: r.use.map((u) => ({ ...u, x: r.w - u.x, face: u.face ? -u.face : void 0 }))
-    };
-  }
-
-  // src/game/action/hq/map.ts
-  var PX_M = 142;
-  var LANE_TOP = 420;
-  var LANE_BOT = 669;
-  function fromRoom(r) {
-    const yOf = (m) => LANE_TOP + m / r.d * (LANE_BOT - LANE_TOP);
-    const chairs = r.items.filter((it) => it.t === "chair");
-    const boxes = chairs.map((it) => {
-      const y = yOf(it.y);
-      return { kind: it.soft ? "armchair" : "chair", x: it.x * PX_M, w: it.soft ? 70 : 54, y: y + 10, d: 20, h: it.soft ? 120 : 150, solid: false, face: it.f };
-    });
-    const spots = boxes.map((b, i) => ({
-      id: `chair${i}`,
-      x: b.x,
-      y: b.y,
-      verb: "앉기",
-      face: b.face === "W" ? -1 : 1,
-      seat: { x: b.x, y: b.y },
-      act: [b.face === "N" ? "sit_back" : "sit_side"],
-      chair: i
-    }));
-    return {
-      length: Math.max(1280, r.w * PX_M),
-      boxes,
-      fixtures: [],
-      spots,
-      seats: boxes.map((b, i) => ({ x: b.x, y: b.y, face: b.face, box: i }))
-    };
-  }
-  var M = (m) => Math.round(m * PX_M);
-  var room = (b, key, west = false) => ({ ...b, ...fromRoom(west ? mirror(ROOMS[key]) : ROOMS[key]), things: [] });
-  var exitS = (to, toDoor, key, west = false) => ({ id: "out", x: M(west ? ROOMS[key].w - 1 : 1), kind: "exit", side: "S", to, toDoor });
-  var LOCKERS = {
-    shower_f: [{ id: "locker1", x: 560, y: 670, face: -1 }, { id: "locker2", x: 600, y: 610, face: -1 }, { id: "locker3", x: 700, y: 680, face: 1 }, { id: "locker4", x: 316, y: 640, face: 1 }, { id: "locker5", x: 885, y: 604, face: 1 }],
-    // 4·5: 사용자 11-02 06:28 「여기도 넣어」(빨래통 왼쪽 사물함 앞 모서리, 오른쪽 안쪽 분홍 사물함 앞)
-    shower_m: [{ id: "locker1", x: 865, y: 700, face: -1 }, { id: "locker2", x: 935, y: 640, face: -1 }, { id: "locker3", x: 1100, y: 690, face: 1 }, { id: "locker4", x: 544, y: 646, face: 1 }, { id: "locker5", x: 1072, y: 636, face: 1 }]
-    // 4·5: 사용자 11-02 07:01 「여기도 하나 넣어야지」「여기도 넣고」(가운데 사물함 왼쪽 옆면 앞 벤치 끝, 오른쪽 사물함 줄 안쪽 앞)
-  };
-  var lockerSpots = (id) => LOCKERS[id].map((l) => ({ id: `locker:${l.id}`, x: l.x, y: l.y, verb: "캐비닛", face: l.face, act: ["locker"] }));
-  var showerSpots = (id) => (PAINTED[id]?.showers ?? []).map((s) => ({ id: s.id, x: s.foot[0], y: s.foot[1], face: s.face }));
-  function floorHall(id, name, floor, doors, extra = {}) {
-    const p = PAINTED[id];
-    const chairBoxes = (p.chairs ?? []).map((ch) => ({ kind: "chair", x: ch.x, w: 54, y: ch.y, d: 20, h: 150, solid: false, face: ch.face, set: ch.set }));
-    if (MAPEDIT_SPOTS[id]?.length) extra = { ...extra, spots: MAPEDIT_SPOTS[id] };
-    if (p.stations?.length && !extra.stations) extra = { ...extra, stations: p.stations };
-    const sc = floorHallBase(id, name, floor, doors, p, extra);
-    if (chairBoxes.length) {
-      const base2 = sc.boxes.length;
-      sc.boxes = [...sc.boxes, ...chairBoxes];
-      sc.spots = sc.spots.map((s) => s.chair !== void 0 ? { ...s, chair: base2 + s.chair } : s);
-      sc.seats = chairBoxes.map((b, i) => ({ x: b.x, y: b.y, face: b.face, box: base2 + i, set: b.set }));
-    }
-    return sc;
-  }
-  function floorHallBase(id, name, floor, doors, p, extra) {
-    return {
-      ...p.posts ? { posts: p.posts } : {},
-      id,
-      name,
-      floor,
-      look: id.startsWith("jr_") ? "jr" : p.under ? "labhall" : id === "lobby" ? "lobby" : "hall",
-      painted: id,
-      length: p.w,
-      lane: p.lane ?? PAINTED_LANE,
-      doors: doors.map((d3) => ({ ...d3, x: doorX(id, d3.id) })),
-      spots: [],
-      fixtures: [],
-      things: [],
-      // 막는 상자는 그림을 그리지 않는다 (오브젝트 그림은 첫 상자 자리에서 한 번만, 깊이 순서는 sortY)
-      boxes: [
-        ...p.objects.flatMap((o) => (o.solid ?? []).map((b, i) => ({ kind: i ? `${o.id}:${i}` : o.id, x: (b.x0 + b.x1) / 2, w: b.x1 - b.x0, y: i ? b.y1 : o.sortY, d: b.y1 - b.y0, h: b.h ?? o.sortY - o.y, solid: true }))),
-        // 막지 않는 오브젝트(가림만): 그림 자리용 빈 상자 (깊이는 걷는 띠 안으로 자름: 탈의실(여) 맨 앞 빨래 바구니 sortY 848, 탈의실(남) 오른쪽 벽 캐비닛 조각 sortY 594 — 사람과 앞뒤는 그대로, 11-02)
-        ...p.objects.filter((o) => !o.solid?.length).map((o) => ({ kind: o.id, x: o.x + o.w / 2, w: o.w, y: Math.max((p.lane ?? PAINTED_LANE)[0], Math.min(o.sortY, (p.lane ?? PAINTED_LANE)[1])), d: 1, h: 0, solid: false })),
-        // 그림 속 화분·벤치: 바닥 상자만 (그림은 배경에 이미 있다)
-        ...(p.blocks ?? []).map(([x0, x1, y1, h]) => ({ kind: "block", x: (x0 + x1) / 2, w: x1 - x0, y: y1, d: y1 - (p.lane ?? PAINTED_LANE)[0], h: h ?? 999, solid: true }))
-      ],
-      ...extra
-    };
-  }
-  var HQ_SCENES = [
-    // ── 바깥 (그대로 둠) ──
-    {
-      id: "street",
-      name: "종로 뒷골목",
-      floor: "out",
-      length: 1920,
-      look: "street",
-      legacy: true,
-      boxes: [],
-      fixtures: [],
-      spots: [],
-      doors: [
-        { id: "main", x: 640, kind: "main", to: "lobby", toDoor: "main" },
-        { id: "pasta", x: 1500, kind: "shop", to: "pasta", toDoor: "out", needs: "pasta" },
-        // 임시 연결: 이동수단(노선표)이 생기기 전까지 거리 동쪽 끝에서 중림으로 바로 간다
-        { id: "jr", x: 1840, kind: "exit", side: "S", to: "jr_entry", toDoor: "west", label: "중림 지하상가 (임시)" }
-      ],
-      things: [{ kind: "streetlamp", x: 300, w: 30, h: 360 }, { kind: "streetlamp", x: 1150, w: 30, h: 360 }, { kind: "bike", x: 860, w: 120, h: 80 }]
-    },
-    // 10-31 사용자: 종로 큰길·지하철 승강장·지역 회색 장면 4곳(영등포·강남·망원·여의도)과 편의점·노점은 가설로 만든 것이라 뺐다.
-    // 거리는 각 세력·중립 건물로 들어가는 길거리뿐 — 지도가 완성되면 그때 더한다
-    {
-      id: "pasta",
-      name: "파스타집",
-      floor: "out",
-      length: 1280,
-      look: "pasta",
-      legacy: true,
-      boxes: [],
-      fixtures: [],
-      doors: [{ id: "out", x: 110, kind: "shop", to: "street", toDoor: "pasta" }],
-      spots: [{ id: "table", x: 680, place: "pasta", who: "전원", verb: "회식" }],
-      things: [{ kind: "long_table", x: 680, w: 520, h: 90 }, { kind: "kitchen_window", x: 1050, w: 220, h: 120, wall: true }]
-    },
-    // ── 층 복도는 확정 배경 그림 6장 (hq/painted.ts). 문은 그림의 문 순서대로 (서→동). 사용자 배치 2026-10-25 ──
-    floorHall("lobby", "1층 로비", "1F", [
-      { id: "main", kind: "glass", to: "street", toDoor: "main", label: "현관" },
-      { id: "elev", kind: "elevator" }
-    ]),
-    // 2층은 새 본부 그림(PixelLab 11-01, game-src/mapedit/f2): 서→동 진압팀 철제문 · 엘리베이터 · 화장실(남). 계단·회의실·면담실 없음(본부 최소화)
-    floorHall("f2", "2층", "2F", [
-      { id: "swat", kind: "steel", to: "swat", toDoor: "out", label: "진압팀" },
-      { id: "elev", kind: "elevator" },
-      { id: "wc", kind: "door", to: "wc", toDoor: "out", label: "화장실(남)" }
-    ]),
-    // 화장실은 그림 장면(PixelLab 11-01, tools/mapedit/author_hq_wc.py): 대변기 칸·소변기·세면대 자리(toilets). 나가는 곳은 화면 아래 오른쪽
-    floorHall("wc", "화장실(남)", "2F", [{ id: "out", kind: "exit", side: "S", to: "f2", toDoor: "wc", label: "나가기" }], { toilets: PAINTED.wc?.toilets, sex: "남" }),
-    room({ id: "swat", name: "진압팀", floor: "2F", look: "office", doors: [exitS("f2", "swat", "swat", true)] }, "swat", true),
-    // 3층은 새 본부 그림(PixelLab 2026-10-
+   

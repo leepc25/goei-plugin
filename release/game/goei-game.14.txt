@@ -1,4 +1,1861 @@
-e = w.player instanceof FighterPlayer ? charFace(w.player.art.key, 64, w.player.dir < 0) : null;
+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", Konjyuce: "data:image/webp;base64,UklGRu4HAABXRUJQVlA4IOIHAADwJQCdASqQAJAAPpVIn0slpCKhpZN6KLASiWUA09CljIDBpYdVZ5+u4mW3wh04WgJ+ffRO0F/WHsJdLNboZWzKD1bTaVqLs/Ih9c9TNtnqO1kOAkZHdizo71GDnkF9VXJO0EP8zvPJ6zADxNrVwRz5+CoMEiGODgmJTyLAa20GQDraaBGWjcy7vDoXl39pFPEbr60GphuOOXSzeBAMBnfWfdVQqUaoBwK7Jx6y6PPYDg0VhB3ffTDNlJc/dK6fH+8wtt286dei5Z4td0FoWFHS/99gpwkst96QgiRZ8NqjJwFDiW17yeGJ19/XKXlq4afE8RVkXJ/U4dY+6gnm+4Slf5e7JJU1icFV3xCqlC5d0kY4fGGnoctqsycCtZiv7JpUf8E/qQr+NWOu25mLQH0XZUAceidVHgAA/vm98ptSUD3wJX3b5yMWuvFJ0hyshBgnuPay9IPYPJeTAjZ2gpk+0IaPRn+ndlC71Z92cadMNEq4UPJylVCofGOOLHFWljP+vWlzKe3O0HSyZgvXeyXZQnenKSRIAF+jYZk10PP8UwLhrBhRnhwuMrnsu3YSzGZ/gZqNwg3O6ddcBic1DIfv/J68qCZM5zuZbTbDNyLhSE1cIyyE8JVjnxctNc8c6dvc2VgUpzlnfZe8e9PPKIUZVIAcb+cgdsfuadNoRMizIW41V+CQ5fSeVpCrZgBqSoIoOgoh0OTUrxUi8ezGIzdLK6QtY714cI9kd8420NxZObMS7F3VcTqefrkigCFPFbHjuntdET2gpTzOVcB7jRr0v8xdcS4z7Hi+JrrsaKa+Tn1Fop3YXF91EfCQ+9s+WPj2jet/ULxwaqLG2W3u5BVdAsxI+4JZ7moFwfrLukA9+7mxBCEwC39zfZeV7zF2G5gB+ctPqhCI8ivVBQLqGmTZPGlsg843H3ZO0TvPYgChV+M5+yUjUh1iYxfUWFNyJxohXXmkURFMP5Rv/0QqFWVTOCdG8Mf7VyclYH8ZM0zfEucL/uenfGySquKcU2v3wDFdDCalTd7xxw2RrOkUtKfOz1vOVOIlysiCbxpPvtbD4eCoafi8/zp6/quD1uK6OVTgloKBoN768jFvjg8A0GmLGEaJVYdtNrscWLxyX+WTa/IFeGAOVxNIVwLOgHePlblzNqnJ7K9RNZKqH4MREh9NweI1P3/tdfY6MVWWlqOP2YBnU0MS7ea4Q+JzvzkJzMT+SkGo6r+9fRli/3ea/b6oITu61eOsJDOXPzZsB4PluuLAfj6qR1c4Xq56pmIpJbesJ3GFvc2VaJpstKJQhZw/L5IlrOw4V2GNGGtIU3WSUhEHmAMuIP6YEBnNByR17XUWOuKtJN6sZatYaXsKK8FJoN/WmA2AeiwsQKL7uE6vhNxpNBPZqrVaP1zI3BfCpJiLUxj4OwgrgWH1A45b/0otAkTb7rzvJVA6KkzjGKqc/kz7bwD9PMax41muWxExlsWuKyWZ3AxMZTgtgYkFmgykUI65D0fsPfHYWiNBHLy2PPBnT1NzWSQhbmMwgVG5Pkqqr919TF/lBg175POlphisYcLhw5fNDHVJL60f6rQghrZowrd3LtD/fcHNwCn4fcXwCTFuvDSdz3G57hzgd25JgVMRxYoUePli96HXM1Qz1r/oawqxmG9Qp7gW46XQeQ9a29PxBr24x92i3sU66Uf7rRMvVFeFy/IMeHaeD3NzK0gjqaNnBksWhqSyxFZ1wgpM8LJaqk4OGatM88GNi3J14KlEZCgIvrRCPGd8piSucmJCk++vScXIpuujWH/0CIeocP2U4no4rSJ7TQUOKh80vCWWVv7iJleVKSgEuyGTHyHNLySV9erkz1yWOQWbkyw8XeTk2CB92i8uxMo7eW1ptmHxcnM2QPjWiaYc2VAgMgyi172xPcR8BhzGiCibcnddZWnx4uFapPqGPxOokxMqopGf+z6BEcg9ZDSpgCCMNmki6fVUs6y4SvRYdOU2BCMfLk1NmOus2hXDv7rYgf+oZChsg0PEb/2ug6tuI9lshawF6Z4xFwJN4Zg1gnZJQOULODI4+rAofXL/dfTlSJx9pfrEgWxa3ycdOf63KEYYQR/rIyRtLElD3AJwOMO5H4Gxoi4TNMI/XyoVfljEQbbbKMZO6gvJX11T/wPDMIPaEhKTNBxKeWSPU+YzSNS4eQLajb2hS2CynDBV2/MwOJA7wtNa4mLrkAz3jgVUwSifG/N9Ofo/DDUDmjs1JM1b7Pj0axc95/fsse2XH/xwIZBFTAoRaSofcK0O15ockrZWddenc1tS59asRsveP82I+M5Wnig/sNwIhIdAyuaBwq5svdQ5vpMuhMgW7CiKsQj2f0zapqJAMu99rSubL12zJ/tFJx03FDyCPpUIVYhFSj+IbdfZEId0IoOyAhET2cq/JWutvfdBaeqeSskCUItYWQjLK6GjI7wgk4J60pgiKvTzBvA/OTgroCeenylnwhO2Je3Y9YGxUuHVSnwJzE9/Wn3UISh6Tlto7tOYgKnEn5kEk724A43o2THPha7m6ZYgWz6HcwJrOH1/QYJJ/TKtoHFGAraZtkt952eaaa4r/nWwrdu8lhIxkXvX8N4qPkSnbH1H8R/u2PcPa1pPpYjrUS7nrMViKVQ1ZQ4Ghk8TLQU5BFROsruFTcbmAXUsg/WbdZOcxihxnbr05kLUvvibcQAAAA==", "Ma Deok-hee": "data:image/webp;base64,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" };
+
+  // src/game/action/fx/fieldFx.ts
+  var HITSTOP = { light: 3, mid: 5, heavy: 8, super: 12 };
+  var SHAKE = { light: 2, mid: 5, heavy: 9, super: 14 };
+  var DOT2 = 1.5;
+  var snap = (v) => Math.round(v / DOT2) * DOT2;
+  function parseFxList(text) {
+    const out = [];
+    for (const line2 of text.split(/\r?\n/)) {
+      const cols = line2.split("|").map((s) => s.trim());
+      if (cols.length < 3 || !cols[0] || cols[0].startsWith("#")) continue;
+      const m = /(\d+)\s*[×x*]\s*(\d+)/.exec(cols[1]);
+      const n = parseInt(cols[2], 10);
+      if (!m || !(n > 0)) continue;
+      out.push({ name: cols[0].replace(/\.png$/, ""), w: +m[1], h: +m[2], n, loop: /반복|loop|예|yes|o\b/i.test(cols[3] ?? "") });
+    }
+    return out;
+  }
+  var CUT = { total: 1.4, bandIn: [0.05, 0.17], artIn: [0.1, 0.25], slam: 0.25, typed: 0.3, out: [0.95, 1.1] };
+  var FieldFx = class {
+    opt = { shake: 1, flash: true, numbers: true };
+    /** 효과음 자리 ('쿵' 'slam' 등). 엔진이 소리 모듈을 꽂는다 */
+    sfx = null;
+    stop = 0;
+    shakeT = 0;
+    shakeDur = 0;
+    shakePow = 0;
+    flashT = 0;
+    flashA = 0;
+    flashColor = "#fff";
+    sparks = [];
+    rings = [];
+    nums = [];
+    totals = /* @__PURE__ */ new Map();
+    ghosts = [];
+    plays = [];
+    marks = [];
+    sheets = /* @__PURE__ */ new Map();
+    bodyFlash = /* @__PURE__ */ new Map();
+    cut = null;
+    time = 0;
+    /* ── 상태 ── */
+    /** 히트스톱·필살 컷인 중이면 true: 엔진은 이 동안 월드를 진행하지 않는다 */
+    frozen() {
+      return this.stop > 0 || !!this.cut;
+    }
+    /** 필살 컷인이 도는 중인가 */
+    inSuper() {
+      return !!this.cut;
+    }
+    /** 화면 흔들림 오프셋 (카메라에 더한다) */
+    camera() {
+      if (this.shakeT <= 0 || this.opt.shake <= 0) return { x: 0, y: 0 };
+      const k = this.shakeT / this.shakeDur * this.shakePow * this.opt.shake;
+      return { x: Math.round((Math.random() * 2 - 1) * k), y: Math.round((Math.random() * 2 - 1) * k) };
+    }
+    /** 맞은 몸 번쩍: 'white' 1장 → 'color' 1장 → null (id = 맞은 몸) */
+    flashOf(id) {
+      const f = this.bodyFlash.get(id);
+      return f === void 0 ? null : f >= 1 ? "white" : "color";
+    }
+    /* ── 하나씩 ── */
+    hitstop(frames) {
+      this.stop = Math.max(this.stop, frames);
+    }
+    shake(px, dur = 0.25) {
+      if (px >= this.shakePow * (this.shakeT / (this.shakeDur || 1))) this.shakePow = px, this.shakeT = this.shakeDur = dur;
+    }
+    flash(color = "#fff", dur = 0.1, a = 0.6) {
+      if (!this.opt.flash) return;
+      this.flashColor = color;
+      this.flashT = dur;
+      this.flashA = a;
+    }
+    /** 정사각 도트 파편 (1.5px 격자) */
+    sparks_(x, y, n, color, speed = 4, lift = 0) {
+      for (let i = 0; i < n; i++) {
+        const a = Math.random() * Math.PI * 2, v = speed * (0.4 + Math.random());
+        this.sparks.push({ x, y, vx: Math.cos(a) * v * 60, vy: (Math.sin(a) * v + lift) * 60, t: 0, life: 0.25 + Math.random() * 0.25, color, size: Math.random() < 0.3 ? 3 * DOT2 : 2 * DOT2 });
+      }
+    }
+    /** 바닥에 눕힌 타원 고리 (원근: 세로 = 가로 × 0.28) */
+    ring(x, y, r0, r1, color, life = 0.3) {
+      this.rings.push({ x, y, r0, r1, color, t: 0, life });
+    }
+    /** 잔상: 몸 그리기 함수를 요원 색으로 남긴다 (빠른 이동·돌진 때 3장) */
+    ghost(draw, color, life = 0.22) {
+      this.ghosts.push({ draw, color, t: 0, life });
+      if (this.ghosts.length > 6) this.ghosts.shift();
+    }
+    /** 피해 숫자: 같은 key(맞은 몸)에 이어 맞으면 위로 쌓이고, 0.5초 쉬면 합계 */
+    number(key, x, y, dmg, color = "#fff", big = false) {
+      if (!this.opt.numbers || !(dmg > 0)) return;
+      const tot = this.totals.get(key);
+      const live = tot && this.time - tot.last < 0.5;
+      const row = live ? tot.rows : 0;
+      this.nums.push({ key, x: snap(x), y: snap(y), text: String(Math.round(dmg)), color, t: 0, big, row });
+      this.totals.set(key, { sum: (live ? tot.sum : 0) + dmg, last: this.time, x, y, rows: row + 1 });
+    }
+    /** 바닥 그을음 같은 자국 (기본 3초) */
+    scorch(x, y, w = 120, life = 3) {
+      this.marks.push({ x, y, w, t: 0, life });
+    }
+    /** 도트 시트 등록 (fx_목록.txt 한 줄 + 그림) */
+    register(def, img6) {
+      this.sheets.set(def.name, { def, img: img6 });
+    }
+    hasSheet(name) {
+      return this.sheets.has(name);
+    }
+    /** 시트 재생: x,y = 기준점(칸 아래 가운데). flip = 왼쪽 보기. 없는 시트면 false (코드 효과만 쓴다) */
+    play(name, x, y, o = {}) {
+      const s = this.sheets.get(name);
+      if (!s) return false;
+      this.plays.push({ def: s.def, img: s.img, x, y, t: 0, fps: o.fps ?? 20, flip: !!o.flip, scale: o.scale ?? DOT2, tint: o.tint, until: s.def.loop ? o.seconds ?? 1 : void 0 });
+      return true;
+    }
+    /* ── 묶음: 한 번 맞을 때 ── */
+    /** 공통 타격감: 히트스톱 + 흔들림 + 몸 번쩍 + 스파크 + 고리 + 숫자 (+ 시트가 있으면 공용 타격 시트) */
+    hit(o) {
+      const t = o.tier, n = t === "light" ? 1 : t === "mid" ? 2 : t === "heavy" ? 3 : 4;
+      this.hitstop(HITSTOP[t]);
+      this.shake(SHAKE[t], 0.12 + n * 0.06);
+      this.bodyFlash.set(o.target, 2);
+      this.sparks_(o.x, o.y, 6 + n * 5, o.color ?? "#ffe0a0", 2.5 + n);
+      if (o.ground !== void 0 && n >= 3) this.ring(o.x, o.ground, 12, 50 + n * 30, o.color ?? "#ffd890", 0.3);
+      if (o.dmg !== void 0) this.number(o.target, o.x, o.y - 40, o.dmg, t === "super" ? "#ffe070" : "#fff", n >= 3);
+      if (t === "super") this.flash("#fff", 0.1, 0.7);
+      this.play(n >= 3 ? "fx_공용_타격_강" : "fx_공용_타격_약", o.x, o.y + 20, { flip: o.flip });
+    }
+    /** 필살 컷인 (약 1.4초, 그동안 frozen). 끝나면 resolve */
+    super_(c) {
+      return new Promise((done2) => {
+        this.cut?.done();
+        this.cut = { ...c, t: 0, done: done2 };
+        this.sfx?.("super");
+      });
+    }
+    /* ── 흐름 ── */
+    /** 실제 시간 dt(초). 히트스톱은 장 단위로 줄인다 */
+    update(dt) {
+      this.time += dt;
+      if (this.stop > 0) this.stop = Math.max(0, this.stop - dt * 60);
+      this.shakeT = Math.max(0, this.shakeT - dt);
+      this.flashT = Math.max(0, this.flashT - dt);
+      for (const [k, v] of this.bodyFlash) v - 1 <= 0 ? this.bodyFlash.delete(k) : this.bodyFlash.set(k, v - dt * 60);
+      if (this.cut) {
+        const before = this.cut.t;
+        this.cut.t += dt;
+        if (before < CUT.slam && this.cut.t >= CUT.slam) this.shake(SHAKE.light, 0.12), this.sfx?.("slam");
+        if (this.cut.t >= CUT.total) {
+          const d3 = this.cut.done;
+          this.cut = null;
+          d3();
+        }
+      }
+      if (this.frozen() && !this.cut) return;
+      const g = 900;
+      this.sparks = this.sparks.filter((s) => (s.t += dt, s.x += s.vx * dt, s.y += s.vy * dt, s.vy += g * dt * 0.5, s.t < s.life));
+      this.rings = this.rings.filter((r) => (r.t += dt) < r.life);
+      this.nums = this.nums.filter((n) => (n.t += dt) < 0.9);
+      this.ghosts = this.ghosts.filter((h) => (h.t += dt) < h.life);
+      this.marks = this.marks.filter((m) => (m.t += dt) < m.life);
+      this.plays = this.plays.filter((p) => {
+        p.t += dt;
+        const f = Math.floor(p.t * p.fps);
+        return p.until !== void 0 ? p.t < p.until : f < p.def.n;
+      });
+      for (const [k, v] of this.totals) {
+        if (this.time - v.last > 0.5 && v.rows > 1) {
+          this.nums.push({ key: k, x: snap(v.x), y: snap(v.y - 40), text: `${Math.round(v.sum)}`, color: "#ffd23a", t: 0, big: true, row: v.rows });
+          this.totals.delete(k);
+        } else if (this.time - v.last > 0.5) this.totals.delete(k);
+      }
+    }
+    /** 월드 좌표(카메라 적용된 c)에: 자국 · 잔상 · 고리 · 시트 · 파편 · 숫자 */
+    drawWorld(c) {
+      c.save();
+      c.imageSmoothingEnabled = false;
+      for (const m of this.marks) {
+        c.globalAlpha = 0.45 * (1 - m.t / m.life);
+        c.fillStyle = "#120c08";
+        c.beginPath();
+        c.ellipse(m.x, m.y, m.w / 2, m.w * 0.14, 0, 0, Math.PI * 2);
+        c.fill();
+      }
+      for (const h of this.ghosts) {
+        c.globalAlpha = 0.5 * (1 - h.t / h.life);
+        tinted2(c, h.draw, h.color);
+      }
+      c.globalAlpha = 1;
+      for (const r of this.rings) {
+        const k = r.t / r.life, rr = r.r0 + (r.r1 - r.r0) * (1 - (1 - k) * (1 - k));
+        c.globalAlpha = 1 - k;
+        c.strokeStyle = r.color;
+        c.lineWidth = 3 * DOT2 * (1 - k) + DOT2;
+        c.beginPath();
+        c.ellipse(r.x, r.y, rr, rr * 0.28, 0, 0, Math.PI * 2);
+        c.stroke();
+      }
+      c.globalAlpha = 1;
+      for (const p of this.plays) {
+        const f = Math.floor(p.t * p.fps) % p.def.n, w = p.def.w * p.scale, h = p.def.h * p.scale;
+        c.save();
+        c.translate(Math.round(p.x), Math.round(p.y));
+        if (p.flip) c.scale(-1, 1);
+        if (p.tint) tinted2(c, (o) => o.drawImage(p.img, f * p.def.w, 0, p.def.w, p.def.h, -w / 2, -h, w, h), p.tint, 0.5);
+        else c.drawImage(p.img, f * p.def.w, 0, p.def.w, p.def.h, -w / 2, -h, w, h);
+        c.restore();
+      }
+      for (const s of this.sparks) {
+        c.globalAlpha = 1 - s.t / s.life;
+        c.fillStyle = s.color;
+        c.fillRect(snap(s.x), snap(s.y), s.size, s.size);
+      }
+      c.globalAlpha = 1;
+      for (const n of this.nums) {
+        const rise = Math.min(1, n.t / 0.25);
+        const y = n.y - n.row * 28 - rise * 24;
+        c.globalAlpha = n.t > 0.6 ? 1 - (n.t - 0.6) / 0.3 : 1;
+        const pop = n.t < 0.08 ? 1.5 - n.t * 6 : 1;
+        dotText(c, n.text, n.x, y, (n.big ? 26 : 18) * pop, n.color, "#000", "center");
+      }
+      c.restore();
+    }
+    /** 화면 좌표에: 번쩍 · 필살 컷인 (맨 위) */
+    drawScreen(c) {
+      if (this.flashT > 0) {
+        c.save();
+        c.setTransform(1, 0, 0, 1, 0, 0);
+        c.globalAlpha = this.flashA * Math.min(1, this.flashT / 0.05);
+        c.fillStyle = this.flashColor;
+        c.fillRect(0, 0, c.canvas.width, c.canvas.height);
+        c.restore();
+      }
+      if (this.cut) this.drawCut(c, this.cut);
+    }
+    drawCut(c, k) {
+      const t = k.t;
+      c.save();
+      c.setTransform(1, 0, 0, 1, 0, 0);
+      c.scale(c.canvas.width / 1280, c.canvas.height / 720);
+      c.imageSmoothingEnabled = false;
+      const dark2 = t > CUT.out[1] ? 0.7 * (1 - (t - CUT.out[1]) / (CUT.total - CUT.out[1])) : 0.7;
+      c.fillStyle = `rgba(0,0,0,${dark2})`;
+      c.fillRect(0, 0, 1280, 720);
+      const open = t < CUT.bandIn[0] ? 0 : t < CUT.bandIn[1] ? (t - CUT.bandIn[0]) / (CUT.bandIn[1] - CUT.bandIn[0]) : t < CUT.out[0] ? 1 : Math.max(0, 1 - (t - CUT.out[0]) / (CUT.out[1] - CUT.out[0]));
+      const bandH = 260 * (t < CUT.out[0] ? 1 : open);
+      if (open > 0 && bandH > 1) {
+        c.save();
+        c.translate(640, 380);
+        c.rotate(-12 * Math.PI / 180);
+        const bw = 1700 * (t < CUT.out[0] ? open : 1);
+        c.beginPath();
+        c.rect(-850, -bandH / 2, bw, bandH);
+        c.clip();
+        c.fillStyle = k.color;
+        c.fillRect(-850, -bandH / 2, bw, bandH);
+        c.fillStyle = "#000";
+        c.fillRect(-850, -bandH / 2, bw, 6);
+        c.fillRect(-850, bandH / 2 - 6, bw, 6);
+        c.fillStyle = "rgba(255,255,255,0.35)";
+        c.fillRect(-850, -bandH / 2 + 6, bw, 3);
+        c.fillStyle = "rgba(255,255,255,0.55)";
+        for (let i = 0; i < 18; i++) {
+          const ly = -bandH / 2 + 16 + i * 53 % Math.max(1, bandH - 32);
+          const len = 80 + i * 97 % 160;
+          const lx = -850 + (i * 211 + t * 2600) % 1900 - 100;
+          c.fillRect(Math.round(lx / 3) * 3, Math.round(ly / 3) * 3, len, 3);
+        }
+        const art4 = k.art ?? k.fallback;
+        if (art4) {
+          const fromFallback = !k.art;
+          const aw = fromFallback ? 400 : 800, ah = fromFallback ? 400 : 400;
+          const stopX = 1700 * 0.6 - 850 - aw;
+          let x;
+          if (t < CUT.artIn[0]) x = -850 - aw;
+          else if (t < CUT.artIn[1]) {
+            const q = (t - CUT.artIn[0]) / (CUT.artIn[1] - CUT.artIn[0]);
+            x = -850 - aw + (stopX + 850 + aw) * (1 - (1 - q) ** 3);
+          } else if (t < CUT.artIn[1] + 0.06) x = stopX + 4 * Math.sin((t - CUT.artIn[1]) / 0.06 * Math.PI);
+          else if (t < CUT.out[0]) x = stopX;
+          else x = stopX + (t - CUT.out[0]) / (CUT.out[1] - CUT.out[0]) * 1800;
+          const blink = k.art2 && t > CUT.slam && t < CUT.out[0] && Math.floor((t - CUT.slam) / 0.1) % 2 === 1;
+          const im = blink ? k.art2 : art4;
+          c.drawImage(im, Math.round(x), Math.round(-ah / 2 - (fromFallback ? 40 : 0)), aw, ah);
+          if (!k.art2 && k.eye && t > CUT.slam && t < CUT.out[0]) {
+            const ex = Math.round(x + k.eye.x * aw), ey = Math.round(-ah / 2 - (fromFallback ? 40 : 0) + k.eye.y * ah);
+            const s = Math.floor(t * 12) % 2 ? 6 : 9;
+            c.fillStyle = "#fff";
+            c.fillRect(ex - 1, ey - s, 3, s * 2 + 1);
+            c.fillRect(ex - s, ey - 1, s * 2 + 1, 3);
+          }
+        }
+        c.restore();
+      }
+      if (t >= CUT.slam) {
+        const out = t > CUT.out[0] ? (t - CUT.out[0]) / (CUT.out[1] - CUT.out[0]) * 900 : 0;
+        const sc = t < CUT.slam + 0.08 ? 1.6 - (t - CUT.slam) / 0.08 * 0.6 : 1;
+        c.save();
+        c.translate(1e3 + out, 330);
+        c.rotate(-12 * Math.PI / 180);
+        c.scale(sc, sc);
+        nameText(c, k.name, 0, 0, k.color);
+        c.restore();
+        if (k.sub) {
+          const n = Math.min(k.sub.length, Math.floor((t - CUT.slam) / CUT.typed * k.sub.length));
+          c.save();
+          c.translate(1e3 + out, 390);
+          c.rotate(-12 * Math.PI / 180);
+          dotText(c, k.sub.slice(0, n), 0, 0, 22, "#d8dde0", "#000", "center");
+          c.restore();
+        }
+      }
+      c.restore();
+    }
+  };
+  var textCache3 = /* @__PURE__ */ new Map();
+  function crisp(text, size2, fill, edge, edgeW, shadow2) {
+    const ready = typeof document !== "undefined" && document.fonts?.check?.(`11px "${PIXEL_FONT}"`);
+    const key = `${text}|${size2}|${fill}|${edge}|${edgeW}|${shadow2}|${ready}`;
+    const hit2 = textCache3.get(key);
+    if (hit2) return hit2;
+    const pad = edgeW + shadow2 + 2;
+    const m = document.createElement("canvas").getContext("2d");
+    m.font = `${size2}px "${PIXEL_FONT}", sans-serif`;
+    const w = Math.ceil(m.measureText(text).width) + pad * 2, h = Math.ceil(size2 * 1.25) + pad * 2;
+    const mask = document.createElement("canvas");
+    mask.width = w;
+    mask.height = h;
+    const g = mask.getContext("2d");
+    g.font = m.font;
+    g.textBaseline = "top";
+    g.fillStyle = "#fff";
+    g.fillText(text, pad, pad);
+    const d3 = g.getImageData(0, 0, w, h);
+    for (let i = 3; i < d3.data.length; i += 4) d3.data[i] = d3.data[i] > 110 ? 255 : 0;
+    g.putImageData(d3, 0, 0);
+    const solid = (color) => {
+      const cv = document.createElement("canvas");
+      cv.width = w;
+      cv.height = h;
+      const o2 = cv.getContext("2d");
+      o2.drawImage(mask, 0, 0);
+      o2.globalCompositeOperation = "source-in";
+      o2.fillStyle = color;
+      o2.fillRect(0, 0, w, h);
+      return cv;
+    };
+    const out = document.createElement("canvas");
+    out.width = w;
+    out.height = h;
+    const o = out.getContext("2d");
+    if (shadow2) {
+      const b = solid("#000");
+      for (let dy = 1; dy <= shadow2; dy++) o.drawImage(b, dy, dy);
+    }
+    if (edgeW) {
+      const e = solid(edge);
+      for (let dx = -edgeW; dx <= edgeW; dx++) for (let dy = -edgeW; dy <= edgeW; dy++) if (dx || dy) o.drawImage(e, dx, dy);
+    }
+    o.drawImage(solid(fill), 0, 0);
+    textCache3.set(key, out);
+    return out;
+  }
+  function dotText(c, text, x, y, size2, fill, edge = "#000", align = "left") {
+    if (!text) return;
+    const im = crisp(text, Math.round(size2), fill, edge, 2, 2);
+    c.drawImage(im, Math.round(align === "center" ? x - im.width / 2 : x), Math.round(y - im.height / 2));
+  }
+  function nameText(c, text, x, y, color) {
+    const im = crisp(text, 44, "#ffffff", color, 2, 4);
+    c.drawImage(im, Math.round(x - im.width / 2), Math.round(y - im.height / 2));
+  }
+  var tintCv = null;
+  function tinted2(c, draw, color, a = 1) {
+    const W5 = c.canvas.width, H5 = c.canvas.height;
+    if (!tintCv) tintCv = document.createElement("canvas");
+    if (tintCv.width !== W5 || tintCv.height !== H5) tintCv.width = W5, tintCv.height = H5;
+    const o = tintCv.getContext("2d");
+    o.setTransform(1, 0, 0, 1, 0, 0);
+    o.globalCompositeOperation = "source-over";
+    o.clearRect(0, 0, W5, H5);
+    o.setTransform(c.getTransform());
+    o.imageSmoothingEnabled = false;
+    draw(o);
+    if (a < 1) {
+      c.save();
+      c.setTransform(1, 0, 0, 1, 0, 0);
+      c.drawImage(tintCv, 0, 0);
+      c.restore();
+    }
+    o.setTransform(1, 0, 0, 1, 0, 0);
+    o.globalCompositeOperation = "source-in";
+    o.globalAlpha = a;
+    o.fillStyle = color;
+    o.fillRect(0, 0, W5, H5);
+    o.globalAlpha = 1;
+    c.save();
+    c.setTransform(1, 0, 0, 1, 0, 0);
+    c.drawImage(tintCv, 0, 0);
+    c.restore();
+  }
+
+  // src/game/action/fx/superText.ts
+  var SUPER_TEXT = {
+    "쟈알디": { color: "#C8283C", name: "보면 알아", sub: "설명하기 어려워. 보면 알아." },
+    "스팡달": { color: "#7A3FB0", name: "우습네. 정말.", sub: "뒤를 보는 버릇을 들여." },
+    "잼트리": { color: "#6E9A3C", name: "모두의 언니", sub: "반박 시 커피 없음~" },
+    "에일린": { color: "#CFC7A6", name: "증명해.", sub: "규칙은 읽었어?" },
+    "고그니쟈": { color: "#E8D23A", name: "성질이 좀 있지!", sub: "자네, 커피는 다 마셨나!" },
+    "큐라스": { color: "#8FE36A", name: "지휘", sub: "왼쪽 괜찮아? 형님 괜찮아?" },
+    "고르고디오": { color: "#2F6BFF", name: "붕괴 돌파", sub: "꽉 잡아. 벽은 내가 맞을게." },
+    "데쥬레": { color: "#FF7EB6", name: "이건 꽝이에요", sub: "주, 죽는 거 아니죠…?" },
+    "데드폴": { color: "#3A4C8C", name: "한 번 죽으면", sub: "시간이 벌리니까요." },
+    "게슈간": { color: "#6EC6FF", name: "가리키고, 보고, 쥐고", sub: "…끝." },
+    "로제몬": { color: "#B04FD0", name: "앙상블", sub: "나 사무직이라니까?!" },
+    "콘쥬스": { color: "#FF5FA2", name: "제가 다 치울게요!", sub: "아저씨들은 뒤에 계세요!" },
+    "사장": { color: "#8A8A96", name: "정지", sub: "……" },
+    "도필헌": { color: "#B08A4E", name: "거짓말이 빠진 방", sub: "자네 정도라면 당연히 알 줄 알았네." },
+    "이길환": { color: "#E8955A", name: "튜토리얼", sub: "아, 아, 테스트, 테스트." },
+    "이기석": { color: "#E6C14A", name: "팀 발표", sub: "다음 팀은…… 바로 여러분입니다!" },
+    "김조학": { color: "#5E7C8C", name: "영상 올리기 전에", sub: "뭘 올렸는지는 다 압니다." },
+    "이도형": { color: "#E9EEF2", name: "건물 가르기", sub: "연필심만 남아도 충분해." },
+    "고영훈": { color: "#4F5D70", name: "킹", sub: "요점." },
+    "노기균": { color: "#D2453C", name: "수고하십시오!", sub: "이 녀석은 된다!" },
+    "송주익": { color: "#2E9C9A", name: "예카테리나", sub: "예카테리나니까요." },
+    "곽성주": { color: "#7D8793", name: "후퇴는 없다", sub: "전원 내 뒤로!" },
+    "조성춘": { color: "#D9A82E", name: "진공작전", sub: "……조용히. 지금부터 진짜다." },
+    "윤병수": { color: "#F07A22", name: "채점 중", sub: "칭찬은 끝까지 듣고 해." },
+    "김성진": { color: "#6BD45A", name: "생환 기록", sub: "나 방금 멋있지 않았냐?" },
+    "송진섭": { color: "#4FA6E6", name: "우리 팀 눈", sub: "지도 왼쪽이요, 지도 왼쪽!" },
+    "청달래": { color: "#1F6E6A", name: "무슨 소란인가", sub: "참으로 지저분한 꼴이군." },
+    "호유원": { color: "#E0A43A", name: "소중한 것이 만나러 와요", sub: "잘 보살펴 드릴게요, ~님." },
+    "백석주": { color: "#2E8B57", name: "A조에 온 걸 환영해", sub: "환영은 입구까지만." },
+    "진나솔": { color: "#8E5CC9", name: "퇴근", sub: "그럴 시간에 퇴근해." },
+    "이성해": { color: "#5EC4D6", name: "다들 데리고 나왔어여", sub: "늦어서 죄송해여!" },
+    "이자헌": { color: "#E6E2D3", name: "물리 퇴마", sub: "괴담입니다. 그런데 됩니다." },
+    "은하제": { color: "#3D6FD9", name: "통화 연결", sub: "응, 그래. 됐고. 빨리 와." },
+    "박민성": { color: "#8A6A4A", name: "다시는 안 해", sub: "……다음 주에 또 함." },
+    "백사헌": { color: "#9B4DD6", name: "추가 지급", sub: "어차피 죽을 사람들인데요." },
+    "고영은": { color: "#F2F0D8", name: "R조의 양심", sub: "그냥 조명이에요." },
+    "강이학": { color: "#F2C230", name: "매뉴얼만 지키면요", sub: "평사원 둘이어도 괜찮아요!" },
+    "장허운": { color: "#7A5233", name: "사람으로 대할 것", sub: "…도망, 안 갑니다." },
+    "곽제강": { color: "#B79CF0", name: "분기별 기상 특보", sub: "와, 이거 정말 흥미로운데요!" },
+    "이연화": { color: "#5B5D8F", name: "과장님!", sub: "……잠깐만요. 여기 멈추세요." },
+    "이병진": { color: "#D23C3C", name: "처음으로 쓸모 있어진 순간", sub: "……이건 내가 읽지." },
+    "제이": { color: "#E2C23A", name: "완전 발현", sub: "…냄새가 달라요……" },
+    "차여진": { color: "#8C1F2E", name: "두 번째 휴대전화", sub: "이건 사적인 용도라서요~" },
+    "서윤지": { color: "#9CB89A", name: "수정 요청 없음", sub: "적힌 것은 하나도 봐주지 않습니다." },
+    "고연지": { color: "#2C3E66", name: "수술 여섯 시간째", sub: "네, 그래서 견적이 이 정도입니다." },
+    "윤지아": { color: "#F4A97A", name: "시술 준비 끝", sub: "사탕 하나 드실래요?" },
+    "마덕희": { color: "#7A1E34", name: "헐값매입", sub: "자기 얼굴에 다 쓰여 있어요~" },
+    "문혜란": { color: "#6B1F3A", name: "대박알선 뒷방", sub: "친구, 사인부터 하자." },
+    "신유리": { color: "#B8BEC6", name: "사전 통보 없음", sub: "친구 아니야. 채무자지." },
+    "블라렛": { color: "#FFF4D6", name: "영원한 십자군", sub: "서울은 교회가 많아서 좋아!" },
+    "살라딘": { color: "#3A8FE0", name: "메카의 군세", sub: "형제여! 바다의 물고기처럼 끝이 없다!" },
+    "아벤샤": { color: "#2FB37A", name: "모래 해일", sub: "어머, 이건 꼭 갖고 싶다!" },
+    "세크리엠": { color: "#B0102A", name: "붉은 눈", sub: "눈을 마주쳤구나." },
+    "브라우니": { color: "#7FE0A0", name: "화요퀴즈쇼", sub: "친구! 다음 문제 나갑니다!" },
+    "탐미주의": { color: "#E0402A", name: "예술은 조각이다", sub: "가만히 있어. 지금 너는 작품이야." }
+  };
+
+  // src/game/action/engine/training.ts
+  function trainingFloor() {
+    const L = 4200;
+    return {
+      id: "training-1",
+      title: "관리국 지하 훈련장",
+      type: "lobby",
+      depth: 0,
+      length: L,
+      lane: [440, 690],
+      startX: 200,
+      exitX: L - 120,
+      banner: "관리국 지하 훈련장 · 조작 연습",
+      palette: { wall: "#2b343a", floor: "#3c4549", accent: "#6c7b83" },
+      props: [
+        { id: "sign1", kind: "sign", x: 420, y: 445, w: 140, h: 60, label: "A 연타 · ↓↓ 앉기 · Shift 회피/달리기" }
+      ],
+      encounters: [
+        { triggerX: 500, lockFrom: 0, lockTo: 1400, waves: [[{ kind: "dummy-once", x: 1e3, y: 590 }], [{ kind: "thug", x: 1300, y: 560 }, { kind: "thug", x: 1350, y: 650 }]] },
+        { triggerX: 1800, lockFrom: 1500, lockTo: 2800, waves: [[{ kind: "thug", x: 2700, y: 540 }, { kind: "thug", x: 2750, y: 620 }, { kind: "thug", x: 1520, y: 670 }], [{ kind: "thug", x: 2750, y: 560, elite: true }, { kind: "thug", x: 1530, y: 600 }]] },
+        { triggerX: 3e3, lockFrom: 2900, lockTo: 4200, waves: [[{ kind: "thug", x: 4100, y: 590, boss: true }, { kind: "thug", x: 2950, y: 560 }, { kind: "thug", x: 4150, y: 660 }]] }
+      ]
+    };
+  }
+  var trainingStage = {
+    id: "training",
+    label: "훈련장",
+    firstFloor: () => trainingFloor(),
+    nextFloor: () => null
+  };
+  var dummyStage = {
+    id: "dummy",
+    label: "허수아비 연습",
+    firstFloor: () => ({
+      id: "dummy-room",
+      title: "허수아비 연습",
+      length: 1280,
+      startX: 360,
+      exitX: Infinity,
+      banner: "허수아비 연습 · H 판정 보기 · Esc 메뉴",
+      encounters: [{ triggerX: 0, lockFrom: 0, lockTo: 1280, waves: [[{ kind: "dummy", x: 760, y: 565 }, { kind: "dummy", x: 980, y: 540 }], [{ kind: "dummy", x: 900, y: 590 }]] }]
+    }),
+    nextFloor: () => null
+  };
+
+  // src/game/action/engine/modules.ts
+  var PERK_KIND = new Map(PERK_TEXT.map((d3) => [d3.name, d3.kind]));
+  function perkChips(p) {
+    const st = new Map(p.perks.stacks().map((x) => [x.name, x.v]));
+    const two = (n) => n.replace(/\s/g, "").slice(0, 2);
+    return [
+      ...[...p.perks.ranks.keys()].map((n) => ({ t: two(n), c: PERK_KIND.get(n) === "쌍" ? PAIR_COLOR : GRADE_COLOR[p.perks.topGrade(n)], n: st.get(n) || void 0 })),
+      ...[...p.perks.traits].map((n) => ({ t: two(n), c: TRAIT_COLOR }))
+    ];
+  }
+  var NPC_FILES = ["가짜 관리국 검사부대_남", "가짜 관리국 진압부대_남", "간호사_여", "경비_남", "경비_여", "경찰_남", "경찰_여", "관리국 요원_남", "관리국 요원_여", "백일몽 직원_남", "백일몽 직원_여", "불량배_남", "불량배_여", "상인_남", "상인_여", "안내 직원_남", "안내 직원_여", "의사_남", "청소부_남", "청소부_여", "프리랜서_남", "프리랜서_여", "학생_남", "학생_여", "행인_남", "행인_여", "행정 직원_남", "행정 직원_여", "협회 직원_남", "협회 직원_여"];
+  var local = (key) => ({
+    load: () => {
+      try {
+        return localStorage.getItem(key);
+      } catch {
+        return null;
+      }
+    },
+    save: (v) => {
+      try {
+        localStorage.setItem(key, v);
+      } catch {
+      }
+    }
+  });
+  var VISIT_TITLE = { title: "괴이 ː ANOMALY", sub: "필드 · 요원들을 만나고 본편 대화를 이어갑니다" };
+  var fieldClock = { sec: null, place: "" };
+  var fieldWallet = { won: null };
+  var observing = false;
+  var observerOn = () => observing;
+  var fieldLink = {};
+  var wonText = (n) => `${n < 0 ? "−" : ""}₩ ${Math.abs(Math.trunc(n)).toLocaleString("en-US")}`;
+  function hqAdapter(bridge, ui) {
+    const map = hqMap();
+    const b = bridge;
+    fieldClock.sec = null;
+    fieldClock.place = "";
+    fieldWallet.won = null;
+    observing = false;
+    let present = [];
+    const rules = () => ui.rules?.() ?? DEFAULT_CLOCK;
+    let visitor = { agentId: "", name: "" };
+    let ready = false;
+    const visitReady = (b?.visit ? b.visit.state().then((v) => {
+      visitor = v.visitor;
+      present = v.agents.filter((a) => a.room).map((a) => ({ name: a.name, room: a.room }));
+    }).catch(() => {
+    }) : Promise.resolve().then(() => {
+      present = [{ name: "잼트리", room: "office" }, { name: "쟈알디", room: "office" }, { name: "큐라스", room: "lounge" }, { name: "고르고디오", room: "lounge" }, { name: "데쥬레", room: "infirmary" }];
+    })).then(() => Promise.all([...present.map((p) => p.name), ...RESIDENTS.map((r) => r.name)].map((n) => loadChar(n)))).then(() => {
+      ready = true;
+    });
+    let me = { faction: "A00", level: 1 };
+    let playingAs = "";
+    if (!b?.card && fieldClock.sec === null) {
+      const h = Number(typeof location !== "undefined" ? new URLSearchParams(location.search).get("hour") ?? 10 : 10);
+      fieldClock.sec = (Number.isFinite(h) ? (h % 24 + 24) % 24 : 10) * 3600;
+    }
+    void b?.card?.().then((snap2) => {
+      if (fieldClock.sec === null && snap2?.minute != null) fieldClock.sec = snap2.minute * 60;
+      if (fieldClock.sec === null && ui.worldSave?.get()?.clock != null) fieldClock.sec = ui.worldSave.get().clock;
+      if (snap2) me = { faction: snap2.identity?.faction || snap2.faction || "A00", level: snap2.identity?.level ?? null };
+      if (snap2) playingAs = snap2.player ? snap2.agents.find((a) => a.id === snap2.player)?.name ?? "" : "";
+    }).catch(() => {
+    });
+    const peopleBy = /* @__PURE__ */ new Map();
+    const factionBy = /* @__PURE__ */ new Map();
+    let relation = relationFrom(null);
+    const readPeople = () => {
+      void b?.people?.people().then((l) => {
+        peopleBy.clear();
+        for (const p of l) peopleBy.set(p.name, p);
+      }).catch(() => {
+      });
+      void b?.people?.factions().then((l) => {
+        factionBy.clear();
+        for (const f of l) factionBy.set(f.code, f);
+      }).catch(() => {
+      });
+      void (b?.people?.relations?.() ?? Promise.resolve(null)).then((t) => {
+        relation = relationFrom(t);
+      }).catch(() => {
+      });
+    };
+    const purse = [];
+    const unsettled = () => purse.reduce((n, p) => n + p.amount, 0);
+    const readWallet = () => void b?.wallet?.balance().then((n) => {
+      fieldWallet.won = n === null ? null : n + unsettled();
+    }).catch(() => {
+    });
+    readPeople();
+    readWallet();
+    const offPeople = b?.people?.onChange(() => {
+      readPeople();
+      readWallet();
+    });
+    const hm2 = () => fieldClock.sec === null ? "" : `${String(Math.floor(fieldClock.sec / 3600) % 24).padStart(2, "0")}:${String(Math.floor(fieldClock.sec / 60) % 60).padStart(2, "0")} `;
+    const pay = async (amount, memo) => {
+      if (fieldWallet.won === null) return null;
+      purse.push({ amount, memo });
+      fieldWallet.won += amount;
+      void b?.field?.record({ kind: "trade", text: `${hm2()}Money: ${amount < 0 ? "" : "+"}${amount} ${memo}`, ko: `${hm2()}${memo} ${amount < 0 ? "−" : "+"}${Math.abs(amount).toLocaleString("en-US")}원`, scene: fieldClock.place || void 0, weight: 1, visit: visitId }).catch(() => {
+      });
+      return fieldWallet.won;
+    };
+    const settle = async () => {
+      if (!purse.length || !b?.wallet) return;
+      const line2 = settleLine(purse.splice(0));
+      if (!line2) return;
+      const { net, memo } = line2;
+      const after = await b.wallet.add(net, memo, { place: fieldClock.place || void 0, time: fieldClock.sec === null ? void 0 : clockText(fieldClock.sec) }).catch(() => null);
+      if (after !== null && after !== void 0) fieldWallet.won = after + unsettled();
+    };
+    if (!b?.wallet) fieldWallet.won = 14e4;
+    fieldLink.pay = (amount, memo) => b?.wallet ? pay(amount, memo) : Promise.resolve(fieldWallet.won = (fieldWallet.won ?? 0) + amount);
+    fieldLink.record = (text, ko) => void b?.field?.record({ kind: "act", text: `${hm2()}${text}`, ...ko ? { ko: `${hm2()}${ko}` } : {}, scene: fieldClock.place || void 0, weight: 1, visit: visitId }).catch(() => {
+    });
+    fieldLink.fact = (key, value) => void b?.field?.record({ kind: "act", text: `${key}: ${value}`, ko: "", scene: fieldClock.place || void 0, weight: 1, fact: { key, value }, visit: visitId }).catch(() => {
+    });
+    const walletHook = { pay, balance: () => fieldWallet.won };
+    globalThis.__goeiWallet = walletHook;
+    const visitId = `v${Date.now().toString(36)}`;
+    if (b?.visit) void b.field?.record({ kind: "enter_field", text: "{user} entered the field.", ko: "필드 입장", weight: 1, visit: visitId }).catch(() => {
+    });
+    const ROOM_SCENE = { office: "office", lounge: "lounge", infirmary: "clinic" };
+    const seedParam = typeof location !== "undefined" ? new URLSearchParams(location.search).get("seed") : null;
+    const seed = seedParam ? Number(seedParam) >>> 0 || hashSeed(seedParam) : Date.now() >>> 0;
+    let sim = null;
+    const onTalkClosed = () => {
+      if (fieldClock.sec !== null) fieldClock.sec += rules().talk * 60;
+    };
+    const onObserveKey = (e) => {
+      if (e.key === "F9" || e.key === "`") {
+        observing = !observing;
+        e.preventDefault();
+      }
+    };
+    if (typeof window !== "undefined") window.addEventListener("goei:talk-closed", onTalkClosed);
+    if (typeof window !== "undefined") window.addEventListener("keydown", onObserveKey);
+    const world = () => {
+      if (!sim && ready) {
+        sim = createHqWorld(map, seed, present.filter((p) => ROOM_SCENE[p.room]).map((p) => ({ name: p.name, scene: ROOM_SCENE[p.room] })), hasCharClip, { lineN: (look, id) => charArt(look)?.A[id]?.n ?? 10, killOk: () => fighterHooks.killOk?.() ?? false, stance: (f) => factionBy.get(f)?.stage ?? null, playerFaction: () => me.faction || null, relation: (v, t) => relation(v, t), namedHostile: (n) => peopleBy.get(n)?.affinity.cell === "hostile", nav: { ok: walkablePainted, clamp: (sc, x, y) => clampPainted(sc, x, y) } });
+        dlg = new Dialogue2((file) => bridge?.assets ? bridge.assets.bytes("dialogue", file).catch(() => null) : Promise.resolve(null), sim.rng);
+        chatter = new Chatter(sim, dlg, cueCtx);
+        void dlg.prefetch("named", [...present.map((p) => p.name), ...RESIDENTS.map((r) => r.name)]);
+        void dlg.prefetch("mob", NPC_FILES);
+        sim.noAssist = (n) => reactOf(n)?.combat === false;
+        const sv = ui.worldSave?.get();
+        if (sv) {
+          const elapsedH = sv.clock != null && fieldClock.sec !== null ? ((fieldClock.sec - sv.clock) / 3600 % 24 + 24) % 24 : 0;
+          sim.restore(sv, elapsedH);
+        }
+        sim.warmup(180, fieldClock.sec === null ? null : fieldClock.sec / 3600 % 24);
+      }
+      if (sim) globalThis.__goeiWorld = sim;
+      return sim;
+    };
+    let chatter = null;
+    let dlg = null;
+    const cueCtx = (a, target) => {
+      const hour = fieldClock.sec === null ? null : fieldClock.sec / 3600 % 24;
+      const named = a.def.kind === "named" ? peopleBy.get(a.def.name) : void 0;
+      const fac = a.def.kind === "mob" ? sim?.mobFaction(a) : named?.faction ?? null;
+      const facStance = fac ? factionBy.get(fac)?.stage ?? null : null;
+      const cell = named?.affinity.cell;
+      const stance = a.act === "argue" || a.plan === "chase" ? "hostile" : cell === "hostile" ? "hostile" : cell === "warm" || cell === "close" ? "friend" : repOf(facStance);
+      return { hour, faction: me.faction, stance, player: playingAs || null, ...target ? { target } : {} };
+    };
+    fieldLink.cueLine = (key, cell) => {
+      const a = key.startsWith("mob:") ? sim?.actors.find((q) => q.def.id === key.slice(4)) : sim?.findActor(key);
+      return a && chatter ? chatter.line(a, cell) : null;
+    };
+    fieldLink.busyCell = (key) => {
+      const a = key.startsWith("mob:") ? sim?.actors.find((q) => q.def.id === key.slice(4)) : sim?.findActor(key);
+      if (!a) return null;
+      const doing = a.doing === "주인공과 대화" ? a.talkFrom ?? "" : a.doing;
+      const id = a.task?.id ?? "";
+      const tag2 = id === "work" ? "work" : id === "eat" ? "eat" : id === "rest" || id === "hobby" ? "rest" : id === "pee" || id === "poo" ? "toilet" : id === "train" ? "train" : /담배/.test(doing) ? "smoke" : /먹|식사|간식/.test(doing) ? "eat" : /훈련/.test(doing) ? "train" : a.post ? "work" : "";
+      return tag2 ? `busy.${tag2}` : null;
+    };
+    const sceneNameOf = (id) => map.scenes.find((q) => q.id === id)?.name ?? id;
+    const witnessAt = /* @__PURE__ */ new Map();
+    const crimeAt = /* @__PURE__ */ new Map();
+    let fightScene = "";
+    const fightLog = new FightLog((l) => {
+      const wit = l.kind === "provoke" || l.kind === "kill" ? witnessAt.get(fightScene) : void 0;
+      void b?.field?.record({ kind: l.kind, text: l.text, ko: l.ko, scene: sceneNameOf(fightScene), weight: l.weight, visit: visitId, ...l.who ? { who: l.who } : {}, ...wit ? { witness: wit } : {} }).catch(() => {
+      });
+    });
+    const flushMobs = (_sceneId) => fightLog.leave();
+    const means = () => {
+      const pl = globalThis.__goeiEngine?.world?.player;
+      return pl instanceof FighterPlayer && pl.core.P.armed ? "weapon" : "fists";
+    };
+    let lastDistrict = null;
+    let foughtHere = false;
+    const record = (evs) => {
+      for (const e of evs) {
+        if (e.kind === "drop" && e.amount > 0) {
+          const c = e.who.charCodeAt(e.who.length - 1) - 44032;
+          const memo = e.stolen ? "소매치기에게서 되찾은 돈" : `${e.who}${c >= 0 && c <= 11171 && c % 28 !== 0 ? "이" : "가"} 떨어뜨린 돈`;
+          void fieldLink.pay?.(e.amount, memo);
+          globalThis.__goeiEngine?.world?.say(`${e.amount.toLocaleString("en-US")}원을 주웠다`, 2);
+          continue;
+        }
+        if (e.kind === "steal" && e.scene === lifeScene) {
+          void b?.field?.record({ kind: "act", text: `${hm2()}{user} saw a ${enName(e.thief)} pickpocket a ${enName(e.victim)}.`, ko: `${hm2()}{user}: 소매치기 목격 (${e.thief} → ${e.victim})`, scene: sceneNameOf(e.scene), weight: 1, visit: visitId }).catch(() => {
+          });
+          continue;
+        }
+        if (e.kind === "intrude" && e.stage === 0 && e.scene === lifeScene) {
+          void b?.field?.record({ kind: "detected", text: `${hm2()}${enName(e.who)} caught {user} in the wrong-sex restroom and told {user} to get out.`, ko: `${hm2()}{user}: ${e.who}에게 이성 화장실 침입 들킴`, scene: sceneNameOf(e.scene), who: [e.who], weight: 2, visit: visitId }).catch(() => {
+          });
+          continue;
+        }
+        if (e.kind === "expel" && e.who === "{user}") {
+          void b?.field?.record({ kind: "act", text: `${hm2()}A ${enName(e.by)} told {user} to leave, and {user} left.`, ko: `${hm2()}{user}: ${e.by}의 경고를 받고 쫓겨남`, scene: fieldClock.place || void 0, weight: 2, visit: visitId }).catch(() => {
+          });
+          continue;
+        }
+        if (e.kind === "pass") {
+          const fn2 = factionBy.get(e.faction)?.name ?? FACTION_NAMES[e.faction] ?? e.faction;
+          void b?.field?.record({ kind: "act", text: `${hm2()}{user} was given a one-time visitor pass for the ${fn2} site.`, ko: `${hm2()}{user}: ${fn2} 일회용 출입증 받음`, scene: sceneNameOf(e.scene), weight: 1, visit: visitId }).catch(() => {
+          });
+          continue;
+        }
+        if (e.kind === "guardAttack" && e.why === "intrude") {
+          void b?.field?.record({ kind: "act", text: `${hm2()}${enName(e.by)} came at {user} for barging into the wrong-sex restroom.`, ko: `${hm2()}{user}: 이성 화장실에 들어가 ${e.by}이(가) 덤빔`, scene: sceneNameOf(e.scene), who: [e.by], weight: 2, visit: visitId }).catch(() => {
+          });
+          continue;
+        }
+        if (e.kind === "guardAttack") {
+          void b?.field?.record({ kind: "act", text: `${hm2()}{user} ignored a ${enName(e.by)}'s warning, and the guard moved to stop {user} by force.`, ko: `${hm2()}{user}: 경고를 무시해 ${e.by}이(가) 덤빔`, scene: sceneNameOf(e.scene), weight: 2, visit: visitId }).catch(() => {
+          });
+          continue;
+        }
+        if ((e.kind === "brawl" || e.kind === "brawlEnd" || e.kind === "expel") && e.scene === lifeScene) {
+          const fn2 = (c) => factionBy.get(c)?.name ?? FACTION_NAMES[c] ?? c;
+          const line2 = e.kind === "brawl" ? { text: `${hm2()}{user} saw a ${enName(e.a)} (${fn2(e.af)}) fight a ${enName(e.b)} (${fn2(e.bf)}).`, ko: `${hm2()}{user}: ${e.a}(${fn2(e.af)})와 ${e.b}(${fn2(e.bf)})의 싸움을 봄`, weight: 2 } : e.kind === "brawlEnd" ? { text: `${hm2()}The ${enName(e.loser)} ${e.how === "down" ? "was knocked out" : "fled"}.`, ko: `${hm2()}${e.loser} ${e.how === "down" ? "기절" : "도주"}`, weight: 1 } : { text: `${hm2()}A ${enName(e.by)} threw a ${enName(e.who)} out.`, ko: `${hm2()}${e.by}이(가) ${e.who}을(를) 내보냄`, weight: 1 };
+          void b?.field?.record({ kind: "act", ...line2, scene: sceneNameOf(e.scene), visit: visitId }).catch(() => {
+          });
+          continue;
+        }
+        if (e.kind === "alarm") {
+          const fn2 = factionBy.get(e.faction)?.name ?? FACTION_NAMES[e.faction] ?? e.faction;
+          const why = { intruder: ["an intruder", "침입자"], assault: ["an assault", "폭행"], knockout: ["someone being knocked out", "기절시킴"], murder: ["a killing", "살인"], trespass: ["a trespasser refusing to leave", "퇴거 거부"], threat: ["a threat", "위협"] }[e.why] ?? [e.why, e.why];
+          const line2 = e.on ? { text: `${hm2()}The ${fn2} base alarm went off over ${why[0]} (${e.threat === "{user}" ? "{user}" : enName(e.threat)}). Guards and agents converged.`, ko: `${hm2()}${fn2} 거점 경보 (${why[1]}, ${e.threat === "{user}" ? "{user}" : e.threat})` } : { text: `${hm2()}The ${fn2} base alarm was lifted.`, ko: `${hm2()}${fn2} 거점 경보 해제` };
+          void b?.field?.record({ kind: "act", ...line2, scene: sceneNameOf(e.scene), weight: e.on ? 2 : 1, visit: visitId }).catch(() => {
+          });
+          continue;
+        }
+        if (e.kind === "follow") {
+          const w2 = sim;
+          const names = w2 ? w2.followers.map((id) => w2.actors.find((q) => q.def.id === id)?.def.name).filter((n) => !!n) : [];
+          const line2 = e.mode === "follow" ? { kind: "follow", text: `${hm2()}${e.who} started following {user}.`, ko: `${hm2()}${e.who} 동행 시작` } : e.mode === "wait" ? { kind: "unfollow", text: `${hm2()}${e.who} stayed behind to wait.`, ko: `${hm2()}${e.who} 남아서 기다림` } : e.mode === "hit" ? { kind: "unfollow", text: `${hm2()}${e.who} was knocked down and stopped following {user}.`, ko: `${hm2()}${e.who} 쓰러져 동행 끝` } : { kind: "unfollow", text: `${hm2()}${e.who} went back to their own work.`, ko: `${hm2()}${e.who} 자리로 돌아감` };
+          void b?.field?.record({ ...line2, scene: sceneNameOf(e.scene), who: [e.who], weight: 2, visit: visitId, fact: { key: "companions", value: names.join(", ") || "none" } }).catch(() => {
+          });
+          continue;
+        }
+        if (e.kind === "kill") {
+          crimeAt.set(e.scene, "murder");
+          fightScene = e.scene;
+          fightLog.killed(hm2().trim(), e.scene, e.id, e.who, means());
+          continue;
+        }
+        if (e.kind !== "hurt") continue;
+        const at2 = hm2();
+        if (!foughtHere) {
+          foughtHere = true;
+          if (fieldClock.sec !== null) fieldClock.sec += rules().fight * 60;
+        }
+        const w = sim;
+        if (!w) return;
+        const here = w.inScene(e.scene);
+        const namedWit = here.find((q) => q.def.kind === "named" && q.def.name !== e.who && peopleBy.get(q.def.name)?.faction);
+        const mobWit = here.find((q) => w.mobFaction(q));
+        const witness = namedWit ? { faction: peopleBy.get(namedWit.def.name).faction, named: true } : mobWit ? { faction: w.mobFaction(mobWit), named: false } : void 0;
+        if (witness) witnessAt.set(e.scene, witness);
+        if (!e.hostile && crimeAt.get(e.scene) !== "murder") crimeAt.set(e.scene, "assault");
+        if (e.named) {
+          void b?.field?.record({ kind: "hurt", text: `${at2}{user} hit ${e.who}${e.hostile ? "" : " unprovoked"}.`, ko: `${at2}{user}: ${e.who} 때림${e.hostile ? "" : " (먼저)"}`, scene: sceneNameOf(e.scene), who: [e.who], weight: 2, visit: visitId, ...witness ? { witness } : {} }).catch(() => {
+          });
+          continue;
+        }
+        fightScene = e.scene;
+        const a = w.actors.find((q) => q.def.id === e.id);
+        fightLog.userHit(at2.trim(), e.scene, e.id, a?.def.archetype ?? e.who, means(), e.hostile);
+        if (e.down) fightLog.knockedOut(e.id);
+      }
+    };
+    let visitOver = false;
+    const END_KO = { leave: "필드에서 나옴", send: "응답을 보내 필드 종료", down: "쓰러져 필드 종료" };
+    const END_EN = { leave: "{user} left the field.", send: "The field visit ended as the story went on.", down: "The field visit ended with {user} down." };
+    const saveWorld = (player) => {
+      if (!sim || !ui.worldSave) return;
+      const prev = ui.worldSave.get();
+      ui.worldSave.set({ ...sim.snapshot(), clock: fieldClock.sec, ...player ?? prev?.player ? { player: player ?? prev.player } : {} });
+    };
+    const endVisit = async (close, how = "leave") => {
+      if (!visitOver) {
+        visitOver = true;
+        if (lifeScene) saveWorld({ scene: lifeScene, x: lastAt.x, y: lastAt.y });
+        fightLog.leave();
+        await settle().catch(() => {
+        });
+        if (b?.visit) await b.field?.record({ kind: "exit_field", text: `${hm2()}${END_EN[how]}`, ko: `${hm2()}${END_KO[how]}`, scene: fieldClock.place || void 0, weight: 1, visit: visitId }).catch(() => {
+        });
+      }
+      if (close) b?.close?.();
+    };
+    const offBeforeSend = b?.onBeforeSend?.(() => b?.visit ? endVisit(true, "send") : Promise.resolve());
+    fieldLink.endVisit = (close) => void endVisit(close);
+    let koT = 0, koDone = false;
+    const knockedOut = (dt, sceneId) => {
+      const pl = globalThis.__goeiEngine?.world?.player;
+      if (!(pl instanceof FighterPlayer) || !b?.visit || koDone) return;
+      if (pl.hp > 0 || pl.phase !== "down") {
+        koT = 0;
+        return;
+      }
+      if ((koT += dt) < 2.5) return;
+      koDone = true;
+      const w = sim;
+      let foe, best = Infinity;
+      for (const [id, f] of fights) {
+        const d3 = Math.abs(f.body.x - pl.x) + Math.abs(f.body.y - pl.y);
+        if (d3 < best) {
+          best = d3;
+          foe = w?.actors.find((q) => q.def.id === id);
+        }
+      }
+      const who = foe?.def.name ?? "누군가";
+      const role = ARCHETYPES[foe?.def.archetype ?? ""]?.role;
+      const fac = foe && w ? w.mobFaction(foe) : null;
+      const won2 = fieldWallet.won ?? 0;
+      const robbed = foe && !isLaw(foe.def.archetype) && (role === "thug" || !!fac) && won2 > 0 ? Math.round(won2 * (0.2 + Math.random() * 0.3) / 100) * 100 : 0;
+      if (robbed > 0) void fieldLink.pay?.(-robbed, `${who}에게 뜯김`);
+      fightScene = sceneId;
+      fightLog.userDown(!!pl.killed, foe?.def.id ?? null, robbed > 0 ? `${enName(foe?.def.archetype ?? who)} took ${robbed} won from {user}.` : "", robbed > 0 ? `${who}에게 ${robbed.toLocaleString("en-US")}원 뜯김` : "");
+      setTimeout(() => void endVisit(true, "down"), 1200);
+    };
+    let flushT = 0;
+    let sirenT = 0;
+    const clockView = () => {
+      const c = new FieldClock(fieldClock.sec === null ? null : fieldClock.sec / 60);
+      return c;
+    };
+    let lifeScene = "";
+    fighterHooks.extraTargets = () => {
+      const w = sim;
+      if (!w || !lifeScene) return [];
+      const kill = fighterHooks.killOk?.() ?? false;
+      return w.inScene(lifeScene).filter((a) => a.act !== "dead" && (a.act !== "down" || kill)).map((a) => ({
+        x: a.x,
+        y: a.y,
+        z: 0,
+        body: {
+          id: -1,
+          team: "enemy",
+          kind: "npc",
+          x: a.x,
+          y: a.y,
+          z: 0,
+          dir: a.face,
+          hp: Math.max(1, a.hp ?? 1),
+          hpMax: a.hpMax ?? 1,
+          alive: true,
+          stop: 0,
+          frame: () => ({ hit: [], hurt: [] }),
+          step: () => {
+          },
+          // 몹은 등급 체력이 있다 (설계 2-3): 에일린 피해가 그대로 깎인다
+          applyHit: (h) => w.hitActor(a.def.id, h.dir, h.attackId, h.dmg ?? 12, !!h.lethal) ? { kind: "hit" } : { kind: "immune" }
+        }
+      }));
+    };
+    const lvl = (v, lo, hi) => v === void 0 ? "보통" : v < 0.35 ? lo : v > 0.65 ? hi : "보통";
+    fieldLink.mobOf = (key) => {
+      const w = sim;
+      const a = key.startsWith("mob:") ? w?.actors.find((q) => q.def.id === key.slice(4)) : void 0;
+      if (!w || !a || !w.canTalk(a)) return null;
+      const pf = profileOf(a.def.look);
+      const voice2 = dialogue_default.npc[NPC_TYPE[a.def.archetype ?? a.def.name] ?? ""]?.voice ?? "";
+      const fac = w.mobFaction(a);
+      const facName = fac ? factionBy.get(fac)?.name ?? FACTION_NAMES[fac] ?? fac : "";
+      const stance = fac ? factionBy.get(fac)?.stageLabel : void 0;
+      const t = a.temper;
+      const label2 = `${a.def.name}${pf ? `(${pf.sex}·${pf.age.replace(/\(.*\)/, "")})` : ""}`;
+      const lore = [
+        `이름 없는 사람(${a.def.name}). 이름은 정해져 있지 않다: 주인공이 물으면 나이·성별에 맞는 평범한 한국 이름을 하나 대고, 그 뒤로는 그 이름을 쓴다.`,
+        pf ? `성별 ${pf.sex === "여" ? "여자" : "남자"}, 나이 ${pf.age}${pf.job ? `, 직업 ${pf.job}` : ", 직업은 정해지지 않은 평범한 시민"}.` : "",
+        pf?.note ? `생김새·인상: ${pf.note}` : "",
+        voice2 ? `말투: ${voice2}` : "",
+        t ? `성격: 용기 ${lvl(t.courage, "낮음(겁 많음)", "높음")}, 붙임성 ${lvl(t.social, "낮음", "높음")}, 성급함 ${lvl(t.haste, "느긋함", "높음")}, 호기심 ${lvl(t.curious, "낮음", "높음")}${a.drunk ? ", 지금 술에 취함" : ""}.` : "",
+        fac ? `소속: ${facName}${stance ? ` (이 소속은 주인공에게 「${stance}」)` : ""}.` : "어느 조직에도 속하지 않은 일반인. 괴이와 비밀 조직의 일은 모른다.",
+        `지금: ${sceneNameOf(a.scene)}에서 ${a.doing === "주인공과 대화" ? a.talkFrom ?? "지나가던 중" : a.doing}${a.doing === "주인공과 대화" ? " 주인공이 말을 걸어 멈춰 섰다" : ""}.`
+      ].filter(Boolean).join("\n");
+      const guarding = w.guardingPlayer(a.def.id);
+      return { id: `mob:${visitId}:${a.def.id}`, name: label2, lore: guarding ? `${lore}
+지금 이 사람은 경비로서 주인공에게 관계자 외 출입 금지 구역에서 나가라고 경고하는 중이다.` : lore, place: sceneNameOf(a.scene), doing: a.doing === "주인공과 대화" ? a.talkFrom ?? a.doing : a.doing, ...guarding ? { tags: ["permit", "alarm"] } : {} };
+    };
+    fieldLink.talkOpts = (name) => {
+      const a = sim?.findActor(name);
+      const doing = a && !a.following && !["idle", "walk"].includes(a.act) ? a.doing : void 0;
+      return { ...doing ? { doing } : {}, tags: a && sim?.canPermit(a.def.id) ? ["follow", "wait", "return", "permit"] : ["follow", "wait", "return"] };
+    };
+    fieldLink.onTags = (key, name, tags) => {
+      const w = sim;
+      if (!w) return;
+      const id = key.startsWith("mob:") ? key.slice(4) : name;
+      for (const t of tags) {
+        if (t === "follow" || t === "wait" || t === "return") w.setFollow(id, t);
+        else if (t === "permit") w.permitPlayer();
+        else if (t === "alarm") w.threatAlarm(id);
+      }
+    };
+    let lastAt = { x: 0, y: 0 };
+    fieldLink.nearPerson = () => {
+      const w = sim;
+      if (!w || !lifeScene) return null;
+      const near2 = w.inScene(lifeScene).filter((a) => a.def.kind === "named" && a.act !== "gone" && Math.abs(a.x - lastAt.x) < 180).sort((p, q) => Math.abs(p.x - lastAt.x) - Math.abs(q.x - lastAt.x))[0];
+      return near2?.def.name ?? null;
+    };
+    fieldLink.gift = (who, item, counts) => {
+      const c = item.charCodeAt(item.length - 1) - 44032;
+      const ko = `${hm2()}{user}: ${who}에게 ${item}${c >= 0 && c <= 11171 && c % 28 !== 0 ? "을" : "를"} 선물`;
+      void b?.field?.record({ kind: counts ? "gift" : "act", text: `${hm2()}{user} gave ${item} to ${who} as a gift.`, ko, scene: fieldClock.place || void 0, who: [who], weight: 1, visit: visitId }).catch(() => {
+      });
+    };
+    const life = {
+      tick: (dt, at2) => {
+        lastAt = { x: at2.x, y: at2.y ?? 0 };
+        if (lifeScene && lifeScene !== at2.scene) {
+          flushMobs(lifeScene);
+          foughtHere = false;
+          endFights(false);
+        }
+        lifeScene = at2.scene;
+        const w = world();
+        if (!w) return;
+        const pl = globalThis.__goeiEngine?.world?.player;
+        const P2 = pl instanceof FighterPlayer ? pl.core.P : null;
+        const tk = fieldLink.talkTarget?.() ?? "";
+        if (tk.startsWith("mob:")) w.holdTalk(tk.slice(4), at2.x);
+        const has = pl instanceof FighterPlayer ? pl.core?.has : void 0;
+        const sex = has ? has("100") ? "남" : has("102") ? "여" : null : null;
+        w.step(dt, { ...at2, hour: fieldClock.sec === null ? null : fieldClock.sec / 3600 % 24, armed: !!P2?.armed, face: P2?.face ?? 1, sex });
+        const evs = w.events.splice(0);
+        record(evs);
+        if (w.alarmIn(at2.scene)) {
+          if ((sirenT -= dt) <= 0) {
+            sirenT = 1.6;
+            ui.sfx("siren");
+          }
+        } else sirenT = 0;
+        chatter?.step(dt, at2.scene, at2.x, evs);
+        knockedOut(dt, at2.scene);
+        fightScene = at2.scene;
+        fightLog.tick(dt, fights.size > 0);
+        if ((flushT += dt) > 20) {
+          flushT = 0;
+          flushMobs(at2.scene);
+        }
+      },
+      lifeTime: () => sim?.time ?? 0,
+      cordons: (sceneId) => (world()?.obstacles(sceneId) ?? []).filter((o) => o.id.startsWith("cordon")),
+      gear: (sceneId) => world()?.gear(sceneId) ?? [],
+      toiletBusy: (sceneId, id) => world()?.toiletBusy(sceneId, id) ?? false,
+      playerToilet: (t) => {
+        const w = world();
+        if (w) w.playerToilet = t;
+      },
+      showerBusy: (sceneId, id) => world()?.showerBusy(sceneId, id) ?? false,
+      showerUsers: (sceneId) => world()?.showerUsers(sceneId) ?? [],
+      playerShower: (t) => {
+        const w = world();
+        if (w) w.playerShower = t;
+      },
+      lockerBusy: (sceneId, id) => world()?.lockerBusy(sceneId, id) ?? false,
+      playerLocker: (t) => {
+        const w = world();
+        if (w) w.playerLocker = t;
+      },
+      playerPeek: (t) => world()?.peekStall(t.scene, t.id),
+      hit: (sceneId, boxes, dir) => world()?.hitBoxes(sceneId, boxes, dir).length ?? 0,
+      actors: (sceneId) => (world()?.inScene(sceneId) ?? []).map((a) => {
+        const st = a.seat ? world()?.graph.scene(sceneId)?.seats?.[a.seat.i] : void 0;
+        const rel = a.following ? "ally" : a.plan === "chase" || a.act === "argue" && a.doing === "맞섬" || a.fighting && !a.following ? "foe" : void 0;
+        return {
+          id: a.def.id,
+          name: a.def.name,
+          kind: a.def.kind,
+          x: a.x,
+          y: a.y,
+          face: a.face,
+          look: a.def.look,
+          moving: a.act === "walk",
+          clip: a.clip,
+          since: a.clipAt,
+          until: a.clipUntil,
+          icon: a.icon,
+          say: a.say,
+          ...rel ? { rel } : {},
+          ...a.toilet?.kind === "stall" ? { toilet: { door: a.toilet.door, open: a.toilet.phase !== "in" || (a.toilet.peek ?? 0) > (world()?.time ?? 0) } } : {},
+          ...a.def.kind === "mob" && b?.visit?.sendMob && world().canTalk(a) ? { talk: true } : {},
+          ...a.seat && st ? { seat: { box: st.box, dir: a.seat.dir, kind: a.seat.kind, x: a.seat.x, y: a.seat.y, ...st.set ? { set: st.set } : {} } } : {}
+        };
+      }),
+      observer: (sceneId) => observing && sim ? observerLines(sim, clockView(), sceneId, seed) : null,
+      // 몹: 인물 팩(look = 몹 그림 이름, src/game/world/mobs.ts looks) → 받는 동안·없으면 실루엣. 처음 보이는 그림은 그때 받는다
+      drawMob: (c, a) => {
+        if (a.look && !charArt(a.look)) void loadChar(a.look);
+        if (!(a.look && drawCharClip(c, a.look, a.x, a.y, a.face, (sim?.time ?? 0) * 1e3, a.clip, (a.since ?? 0) * 1e3, a.until === void 0 ? void 0 : a.until * 1e3))) silhouette(c, a);
+      },
+      combat: (api, sceneId) => combatStep(api, sceneId)
+    };
+    const fights = /* @__PURE__ */ new Map();
+    const allies = /* @__PURE__ */ new Map();
+    const allyHpSeen = /* @__PURE__ */ new Map();
+    const endFights = (down2) => {
+      const w = sim;
+      for (const [id, f] of fights) {
+        f.body.alive = false;
+        w?.fromFight(id, f.body.x, f.body.y, down2);
+      }
+      fights.clear();
+      for (const [id, f] of allies) {
+        f.body.alive = false;
+        w?.fromAlly(id, f.body.x, f.body.y, false);
+      }
+      allies.clear();
+    };
+    function combatStep(api, sceneId) {
+      const w = sim;
+      if (!w) return;
+      const spawn = (spec) => {
+        const n = api.world.bodies.length;
+        api.spawn(spec);
+        return api.world.bodies.length > n ? api.world.bodies[api.world.bodies.length - 1] : void 0;
+      };
+      for (const [id, f] of fights) {
+        if (f.scene !== sceneId || !f.body.alive || !api.world.bodies.includes(f.body)) {
+          f.body.alive = false;
+          w.fromFight(id, f.body.x, f.body.y, false);
+          fights.delete(id);
+          continue;
+        }
+        const ai = f.body;
+        if (f.body.hp > 0 && ai.brain?.strategy === "flee") {
+          const [b0, b1] = api.world.bounds ?? [0, 99999];
+          if (f.body.x < b0 + 60 || f.body.x > b1 - 60) {
+            f.body.alive = false;
+            w.fledFight(id, f.body.x, f.body.y);
+            fights.delete(id);
+            fightLog.fled(id);
+            continue;
+          }
+        }
+        if (f.body.hp > 0 && f.body.hp < f.body.hpMax * 0.5) w.backup(id);
+        if (f.body.hp > 0) continue;
+        if ((f.t += 1 / 30) < 1.5) continue;
+        f.body.alive = false;
+        w.fromFight(id, f.body.x, f.body.y, true);
+        fights.delete(id);
+      }
+      const fighting = [...fights.values()].some((f) => f.scene === sceneId && f.body.alive && f.body.hp > 0);
+      for (const [id, f] of allies) {
+        if (f.scene !== sceneId || !api.world.bodies.includes(f.body) || !fighting || f.body.hp <= 0) {
+          const down2 = f.body.hp <= 0;
+          if (!down2 && fighting && f.scene === sceneId && api.world.bodies.includes(f.body)) continue;
+          f.body.alive = false;
+          w.fromAlly(id, f.body.x, f.body.y, down2, f.body.hp);
+          allies.delete(id);
+        }
+      }
+      if (fighting) for (const id of [...w.followers]) {
+        const a = w.actors.find((q) => q.def.id === id);
+        if (!a || allies.has(id) || a.scene !== sceneId || a.fighting || ["down", "dead", "gone", "door"].includes(a.act)) continue;
+        const look = a.def.look ?? a.def.name;
+        if (!charArt(look)) {
+          void loadChar(look);
+          continue;
+        }
+        const b2 = spawn({ kind: `ally-char:${look}`, x: a.x, y: a.y });
+        if (!(b2 instanceof FighterAi)) {
+          if (b2) b2.alive = false;
+          continue;
+        }
+        if (!w.toAlly(id)) {
+          b2.alive = false;
+          continue;
+        }
+        b2.hp = Math.max(1, Math.min(b2.hpMax, a.hp && a.hp > 0 ? a.hp : b2.hpMax));
+        b2.dir = a.face;
+        if (w.noAssist(a.def.name)) {
+          const act = reactCell(a.def.name, "allyHit")?.act;
+          b2.passive = act === "attack" ? "attack" : act === "avoid" || act === "flee" || act === "cower" ? "keep" : "stay";
+        }
+        allies.set(id, { body: b2, scene: sceneId });
+      }
+      if (fighting && allies.size) {
+        const pl = api.world.player;
+        const hurt2 = pl.hp < (allyHpSeen.get("player") ?? pl.hp) || [...allies].some(([k, f]) => f.body.hp < (allyHpSeen.get(k) ?? f.body.hp));
+        if (hurt2) for (const f of allies.values()) {
+          const fb = f.body;
+          if (fb.passive === "attack") fb.provoked = true;
+        }
+        allyHpSeen.set("player", pl.hp);
+        for (const [k, f] of allies) allyHpSeen.set(k, f.body.hp);
+      }
+      for (const a of w.challengers(sceneId)) {
+        const look = a.def.look ?? a.def.name;
+        if (!charArt(look)) {
+          void loadChar(look);
+          continue;
+        }
+        const b2 = spawn({ kind: `ai-char:${look}`, x: a.x, y: a.y, npcPerks: [] });
+        if (!b2) continue;
+        if (!(b2 instanceof FighterAi)) {
+          b2.alive = false;
+          continue;
+        }
+        if (!w.toFight(a.def.id)) {
+          b2.alive = false;
+          continue;
+        }
+        if (a.base) {
+          b2.base = a.base;
+          b2.stat = derive(a.base);
+          b2.baseHp = b2.stat.hp;
+        }
+        b2.hp = Math.max(1, a.hp ?? b2.hpMax);
+        b2.hpMax = Math.max(1, a.hpMax ?? b2.hpMax);
+        b2.label = a.def.name;
+        b2.dir = a.face;
+        if (a.temper) b2.brain.persona.courage = a.temper.courage;
+        applyNpcPerks(b2, a.perks ?? [], !!a.drunk);
+        const fac = w.mobFaction(a);
+        const named = a.def.kind === "named";
+        const grudge = named && a.doing !== "맞섬";
+        const why = grudge ? "hostile toward {user}" : named ? "fought back after being hit" : isLaw(a.def.archetype) ? `responding to a${crimeAt.get(sceneId) === "murder" ? " murder" : "n assault"} report` : fac ? `${fac}, hostile` : "picked a fight";
+        fightScene = sceneId;
+        const whyKo = grudge ? "{user}에게 적대" : named ? "맞고 맞받아침" : isLaw(a.def.archetype) ? `${crimeAt.get(sceneId) === "murder" ? "살인" : "폭행"} 신고로 출동` : fac ? `${fac}, 적대` : "시비";
+        fightLog.joined(hm2().trim(), sceneId, a.def.id, a.def.archetype ?? a.def.name, why, whyKo);
+        fights.set(a.def.id, { body: b2, t: 0, scene: sceneId });
+      }
+    }
+    const visitors = (sceneId) => {
+      const here = present.filter((p) => ROOM_SCENE[p.room] === sceneId && !!charArt(p.name));
+      const sc = map.scenes.find((s) => s.id === sceneId);
+      if (!sc || !here.length) return [];
+      const [top, bot] = sc.lane ?? [LANE_TOP, LANE_BOT];
+      const slots = [[0.36, 0.55], [0.5, 0.35], [0.62, 0.75], [0.44, 0.9], [0.72, 0.45], [0.28, 0.8]].map(([fx2, fy]) => [sc.length * fx2, fy]);
+      return here.slice(0, slots.length).map((p, i) => ({ name: p.name, x: slots[i][0], y: top + (bot - top) * slots[i][1], face: slots[i][0] > sc.length / 2 ? -1 : 1 }));
+    };
+    const hub = makeHub(
+      {
+        // 이어하기(1-8): 지난 방문에 서 있던 장면·자리에서 시작 (그 장면이 지도에 있을 때만)
+        map: () => {
+          const p = ui.worldSave?.get()?.player;
+          if (p && map.scenes.some((q) => q.id === p.scene)) return { ...map, start: { scene: p.scene, x: p.x, ...p.y !== void 0 ? { y: p.y } : {} } };
+          const fb = `fb_${map.start.scene}`;
+          return me.faction === "B00" && map.scenes.some((q) => q.id === fb) ? { ...map, start: { ...map.start, scene: fb } } : map;
+        },
+        homeSide: () => me.faction === "B00" ? "fb" : "hq",
+        // 옛 본부 메뉴 자리는 닫혀 있다 (hqMap). 열린 자리는 앉기·가게·대화 자리뿐
+        openPlace: () => {
+        },
+        bark: () => null,
+        chooseFloor: (o, pick3) => ui.chooseFloor(o, pick3),
+        sfx: (n) => ui.sfx(n),
+        visitors,
+        life,
+        // 장면을 옮기면 장부에 이동 사건과 지금 위치(확정 사실)를 남긴다
+        entered: (to, from, walkedPx) => {
+          fieldClock.place = to.name;
+          saveWorld();
+          void walkedPx;
+          const d3 = hqDistrict(to.id);
+          const region = isRegionMove(lastDistrict ?? hqDistrict(from.id), d3);
+          if (d3) lastDistrict = d3;
+          const sec = (region ? rules().region : rules().scene) * 60;
+          if (fieldClock.sec !== null) fieldClock.sec += sec;
+          void b?.field?.record({ kind: "move", text: `${hm2()}{user} moved to ${to.name}.`, ko: `${hm2()}{user}: ${to.name}(으)로 이동`, scene: to.name, weight: 1, visit: visitId, fact: { key: "{user} location", value: to.name } }).catch(() => {
+          });
+        },
+        // 경보 중인 거점 장면: 경광등 빛 (그 위에 말풍선·이름표)
+        overlay: (c, people, player) => {
+          const w = sim;
+          const sc = lifeScene ? map.scenes.find((q) => q.id === lifeScene) : void 0;
+          if (w && sc && w.alarmIn(sc.id)) {
+            const z = view.zoom;
+            const px = player.x / z;
+            drawAlarmLights(c, sc.length, (sc.lane ?? [LANE_TOP, LANE_BOT])[0], z, performance.now() / 1e3, px - view.w, px + view.w);
+          }
+          ui.overlay?.(c, people, player);
+        },
+        hour: () => fieldClock.sec === null ? null : fieldClock.sec / 3600 % 24,
+        shop: (id) => ui.shop?.(id) ?? null,
+        // 앉기·눕기 자리: 시간 보내기 (16-2장). 고른 만큼 시계가 간다
+        sat: () => {
+          const opts = waitOptions(rules(), fieldClock.sec === null ? null : fieldClock.sec / 60);
+          if (!opts.length || !ui.choose) return;
+          const now = fieldClock.sec === null ? null : clockText(fieldClock.sec);
+          void ui.choose({ title: "시간 보내기", lines: now ? [`지금 ${now}`] : [], options: [...opts.map((o) => o.label), "그냥 있기"], cancel: true }).then((i) => {
+            const o = i >= 0 ? opts[i] : void 0;
+            if (!o) return;
+            if (fieldClock.sec !== null) fieldClock.sec += o.minutes * 60;
+            const at2 = fieldClock.sec === null ? "" : clockText(fieldClock.sec);
+            if (at2) void b?.field?.record({ kind: "act", text: `{user} waited until ${hm2().trim()}.`, ko: `{user}: ${hm2().trim()}까지 시간 보냄`, scene: fieldClock.place || void 0, weight: 1, visit: visitId, fact: { key: "field time", value: hm2().trim() } }).catch(() => {
+            });
+          }).catch(() => {
+          });
+        },
+        // 본부 대화창이 떠 있으면 머리 위 표시를 숨긴다 (독립 검수: 브리핑 뒤 ↓ 표시)
+        busy: () => typeof document !== "undefined" && !!document.querySelector(".hq-talk, .hq-over:not(:empty)")
+      },
+      (place) => whereIs(place)
+    );
+    return {
+      visitReady,
+      visitor: () => visitor,
+      hub: () => hub,
+      goto: (place) => hub.goto(place),
+      isOpen: () => false,
+      dispose: () => {
+        if (typeof window !== "undefined") {
+          window.removeEventListener("goei:talk-closed", onTalkClosed);
+          window.removeEventListener("keydown", onObserveKey);
+        }
+        offPeople?.();
+        offBeforeSend?.();
+        const g = globalThis;
+        if (g.__goeiWallet === walletHook) delete g.__goeiWallet;
+        if (sim && g.__goeiWorld === sim) delete g.__goeiWorld;
+      },
+      mount() {
+      },
+      onReturn() {
+      },
+      unmount() {
+      }
+    };
+  }
+  function heroTop(p) {
+    return p instanceof FighterPlayer ? charTop(p.art.key) : -230;
+  }
+  function charWindowData(w, hs, team, bag) {
+    const p = w.player, fp = p instanceof FighterPlayer ? p : null;
+    const name = p.label ?? "";
+    const [str, dex, con, int, wil] = CW_STATS[name] ?? [5, 5, 5, 5, 5];
+    const pct = (v) => `${Math.round(v)}%`;
+    const sk = CW_SKILLS[name] ?? {};
+    const key = (b) => {
+      const c = Object.keys(KEYMAP).find((k) => KEYMAP[k] === b);
+      return c ? c.replace(/^Key/, "") : "?";
+    };
+    const row = (label2, icon2, btn, id) => ({ key: key(btn), label: label2, icon: icon2, name: sk[id]?.[0] ?? label2, id });
+    const skills = [
+      row("약공", "punch", "light", ""),
+      row("강공", "kick", "heavy", ""),
+      ...sk["사격"] ? [row("사격", "gun", "shoot", "사격")] : [],
+      ...sk["충전0"] || sk["충전1"] ? [row("충전", "bolt", "charge", sk["충전1"] ? "충전1" : "충전0")] : [],
+      ...sk["고유기"] ? [row("기술", "wave", "skill", "고유기")] : [],
+      ...sk["필살"] ? [row("필살", "star", "super", "필살")] : []
+    ];
+    const pr = fp?.perks;
+    const perks = pr?.active ? [
+      ...[...pr.ranks].map(([n, r]) => {
+        const t = PERK_TEXT.find((x) => x.name === n);
+        const grade = ["일반", "희귀", "특급"][pr.topGrade(n)] ?? "일반";
+        return { name: n, cat: t?.cat ?? "", effect: t?.eff ?? "", cond: t?.cond || void 0, rank: [r, t?.rank ?? r], grade, badge: badgeOf(n, grade) };
+      }),
+      ...[...pr.traits].map((n) => {
+        const t = TRAIT_TEXT.find((x) => x.name === n);
+        return { name: n, cat: "특성", effect: t?.good ?? "", cost: t?.cost, trait: true, badge: badgeOf(n) };
+      })
+    ] : [];
+    const bagRows = Object.entries(bag).filter(([, c]) => c > 0).map(([id, c]) => ({ label: FIELD_ITEMS[id]?.name ?? id, count: c }));
+    return {
+      name,
+      team,
+      state: "필드",
+      face: fp ? charFace(fp.art.key, 64) : null,
+      body: fp ? charBody(fp.art.key) : null,
+      hp: Math.round(p.hp),
+      maxHp: Math.round(p.hpMax),
+      base: [
+        { label: "힘", v: str, what: "몸으로 때리는 기술 피해" },
+        { label: "민", v: dex, what: "총·투척 피해, 속도" },
+        { label: "체", v: con, what: "체력, 받는 피해" },
+        { label: "지", v: int, what: "이능 기술 피해, 기술 쿨" },
+        { label: "정", v: wil, what: "필살 충전, 상태 이상·정신 피해" }
+      ],
+      derived: [
+        { label: "체력", v: (500 + con * 100).toLocaleString() },
+        { label: "근접", v: String(100 + (str - 5) * 8) },
+        { label: "사격", v: String(100 + (dex - 5) * 8) },
+        { label: "이능", v: String(100 + (int - 5) * 8) },
+        { label: "받는 피해", v: pct(100 - (con - 5) * 2 - (wil - 5) * 2) },
+        { label: "속도", v: String(100 + (dex - 5) * 3) },
+        { label: "기술 쿨", v: pct(100 - (int - 5) * 4) },
+        { label: "필살 충전", v: pct(100 + (wil - 5) * 6) }
+      ],
+      skills,
+      pick: (i) => {
+        const s = skills[i], t = s?.id ? sk[s.id] : void 0;
+        return { skill: i, desc: t?.[3] && t[3] !== t[0] ? [t[3]] : [], nums: t ? `판정 ${t[1]} · 속성 ${t[2]}` : "" };
+      },
+      perks,
+      perkSlots: perks.length,
+      quick: (hs.items ?? []).map((it) => ({ label: it.label, count: it.count })),
+      bag: bagRows,
+      bagSlots: BAG_SLOTS,
+      money: hs.field?.wallet ?? ""
+    };
+  }
+  function hudState(w, shell) {
+    const p = w.player;
+    const boss2 = w.boss();
+    const f = w.floor;
+    return {
+      agent: { name: p.label ?? "쟈알디", color: p instanceof FighterPlayer ? p.art.cfg.color : "#c0453a", portrait: p instanceof FighterPlayer ? charFace(p.art.key, 64, p.dir < 0) : null },
+      hp: p.hp,
+      maxHp: p.hpMax,
+      energy: p.skillCd > 0 ? 75 - p.skillCd : 75,
+      maxEnergy: 75,
+      gauge: p.gauge,
+      armor: p.armor,
+      // 에일린은 탄창 대신 우하단 기술 상자에 총열 열을 보인다
+      weapon: heldWeapon(w) ?? (p.core ? null : { name: "권총", mag: p.ammo, magMax: p.mag, reserve: p.reserve, reload: p.moveKey === "reload" ? p.mf / 4 : null }),
+      items: w.items.map((it) => ({ id: it?.id, label: it?.label ?? "", count: it?.n ?? 0 })),
+      field: fieldClock.sec !== null || fieldClock.place || w.stage?.id === "hq" && fieldWallet.won !== null ? { clock: fieldClock.sec === null ? void 0 : clockText(fieldClock.sec), place: fieldClock.place || void 0, wallet: fieldWallet.won === null ? void 0 : wonText(fieldWallet.won) } : void 0,
+      floor: { depth: "", name: f.title },
+      perks: p instanceof FighterPlayer && p.perks.active ? perkChips(p) : void 0,
+      boss: boss2 ? { name: boss2.label, hp: boss2.hp, max: boss2.hpMax } : null,
+      // 아래 자막은 3초까지만 (바닥 띠를 오래 가리지 않게)
+      message: w.subtitle && w.tick - w.subtitleAt < 90 ? w.subtitle.text : void 0,
+      // 가드 게이지는 가드 중이거나 닳았을 때만
+      meters: [
+        ...p.guarding || p.guardMeter < 100 ? [{ label: "가드", v: p.guardMeter, max: 100, color: "#9ad08a" }] : [],
+        ...p instanceof FighterPlayer && p.dodgeMeter < p.dodgeMax ? [{ label: "회피", v: p.dodgeMeter, max: p.dodgeMax, color: "#8fc6e8" }] : []
+      ],
+      // 걸린 상태 효과 (출혈×2 5 · 오염×1 …)
+      status: (p.status?.view() ?? []).map((v) => ({ label: `${v.label}${v.stacks > 1 ? `×${v.stacks}` : ""}${v.t !== null ? ` ${Math.ceil(v.t)}` : ""}`, good: false })),
+      compact: shell.touchShown,
+      device: shell.touchShown ? "touch" : shell.input.last,
+      navigation: navigationFeedback(w)
+    };
+  }
+  function heldWeapon(w) {
+    const h = w.notes.held;
+    return h ? { name: h.name, mag: h.uses, magMax: h.max, reserve: 0, reload: null } : null;
+  }
+  function applyNpcPerks(b, perks, drunk = false) {
+    b.npcPerks = [...perks];
+    b.base = { ...b.base };
+    for (const n of perks) {
+      const d3 = npcPerkDef(n);
+      if (d3?.reuse) b.perks.add(d3.reuse);
+    }
+    const persona = b.brain.persona;
+    if (perks.includes("강적")) {
+      const keys2 = ["str", "dex", "con", "int", "wil"];
+      for (let i = 0; i < 5; i++) b.base[keys2[Math.floor(Math.random() * keys2.length)]]++;
+      b.stat = derive(b.base);
+      b.baseHp = b.stat.hp;
+      b.hp = b.hpMax = b.stat.hp;
+      b.elite = true;
+      b.label = `${b.label} (강적)`;
+    }
+    if (perks.includes("스탯 뻥튀기")) {
+      for (const k of ["str", "dex", "con", "int", "wil"]) b.base[k] = Math.round(b.base[k] * NAMED_MUL.stat * 10) / 10;
+      b.stat = derive(b.base);
+      b.baseHp = b.stat.hp;
+      b.hp = b.hpMax = b.stat.hp;
+    }
+    if (perks.includes("체력 뻥튀기")) {
+      b.baseHp = b.hpMax = Math.round(b.hpMax * NAMED_MUL.hp);
+      b.hp = b.hpMax;
+    }
+    if (perks.includes("방어막")) b.shield = b.shieldMax = Math.round(b.hpMax * 0.1);
+    if (perks.includes("자리 지킴")) persona.courage = 1;
+    if (perks.includes("싸움꾼")) persona.aggression = Math.min(1, persona.aggression + 0.2);
+    if (perks.includes("술기운") && drunk) {
+      b.stat = { ...b.stat, taken: b.stat.taken * 0.8 };
+      b.npcGap = 1.2;
+    }
+    const sq = b.brain.squad;
+    if (perks.includes("협공") && sq) sq.cap += 1;
+  }
+  function endFieldVisit() {
+    fieldLink.endVisit?.(false);
+  }
+  function engineModules(box2, bridge) {
+    setHudItemIcon(drawItemIcon);
+    const audio = createGameAudio(local("goei-game-audio"));
+    let game = null;
+    async function gate() {
+      const f = bridge?.field;
+      if (!f?.entry) return true;
+      let info = await f.entry().catch(() => null);
+      while (info && !info.allow) {
+        const i = await shell.choose({ title: "지금은 들어갈 수 없어요", lines: [info.reason ?? ""], options: ["닫기", "밖에 있어요"] });
+        if (i !== 1) return false;
+        f.override?.("outside");
+        info = await f.entry().catch(() => null);
+      }
+      if (info?.notice) await shell.choose({ title: "알림", lines: [info.notice], options: ["확인"] });
+      return true;
+    }
+    const uiPrefs = bridge?.uiPrefs;
+    const store2 = uiPrefs ? {
+      load: async () => await uiPrefs.load().catch(() => null) ?? localStore.load(),
+      save: (t) => {
+        uiPrefs.save(t);
+        localStore.save(t);
+      }
+    } : void 0;
+    let fieldShop = null;
+    fighterHooks.killOk = () => shell.settings.npcKill;
+    fighterHooks.permaDeath = () => shell.settings.deathMode === "perma";
+    const charWin = new CharWindowCtl();
+    if (bridge?.assets) loadBadges((f) => bridge.assets.url("ui-badges", f));
+    const shell = mountGameShell(box2, {
+      synth: true,
+      // 통합창: ` 로 열고 닫기 (11-01 사용자). 대화·가게·영상 등 다른 창이 떠 있으면 안 연다
+      charWindow: { isOpen: () => charWin.open, canOpen: () => !!world && !mods.blocking?.(), toggle: (on) => charWin.toggle(on), key: (c) => charWin.key(c) },
+      bag: { available: () => !!game?.inHub && !!fieldShop, open: () => fieldShop?.openBag() },
+      store: store2,
+      title: VISIT_TITLE.title,
+      sub: VISIT_TITLE.sub,
+      pauseInfo: () => "",
+      onNew: async () => {
+        if (await gate()) game?.start_new();
+      },
+      onContinue: async () => {
+        if (await gate()) game?.start_new();
+      },
+      // 필드는 저장 슬롯이 없다: 상태는 본편 채팅 변수(가방 $fd_state 등)에 있다
+      hasSave: () => false,
+      onRetreat: () => bridge?.visit ? fieldLink.endVisit ? fieldLink.endVisit(true) : bridge.close?.() : game?.endRun("withdraw"),
+      onTitle: () => game?.toTitle(),
+      toLocal: bridge?.viewport ? (x, y, el) => bridge.viewport.toLocal(x, y, el) : void 0,
+      field: bridge?.visit ? {
+        onExit: () => bridge.close?.(),
+        // 옛 플러그인(mode 없음)은 전체 화면 칸을 숨긴다
+        fullscreen: bridge.viewport && "mode" in bridge.viewport ? { enter: (k) => bridge.viewport.enter(k), exit: () => bridge.viewport.exit(), mode: () => bridge.viewport.mode ?? null } : void 0
+      } : void 0
+    });
+    const ffx = new FieldFx();
+    globalThis.__goeiFieldFx = ffx;
+    ffx.sfx = (n) => audio.event({ type: n === "super" ? "super" : "hit", kind: n === "slam" ? "super" : void 0, strength: 3 });
+    const cutins = /* @__PURE__ */ new Map();
+    if (bridge?.visit && bridge.assets) void loadFieldFx(bridge.assets, ffx, cutins);
+    const visit = bridge?.visit ? mountTalk(shell.stage.ui, bridge.visit, bridge.field, (k) => fieldLink.mobOf?.(k) ?? null, { opts: (n) => fieldLink.talkOpts?.(n) ?? {}, onTags: (k, n, t) => fieldLink.onTags?.(k, n, t), line: (k, c) => fieldLink.cueLine?.(k, c) ?? null, busyCell: (k) => fieldLink.busyCell?.(k) ?? null }) : null;
+    fieldLink.talkTarget = () => visit?.target() ?? "";
+    const npc = linkNpcTalk({
+      visit: visit ? (name) => {
+        if (name) visit.open(name);
+      } : void 0,
+      layer: shell.stage.ui,
+      bridge,
+      settings: () => shell.settings,
+      agent: () => runAgent,
+      day: () => fieldClock.sec === null ? 0 : Math.floor(fieldClock.sec / 86400),
+      photo: (k) => bridge?.photo?.(k) || demo_photos_default[k],
+      sfx: (n) => audio.play(n),
+      // 대화창이 열리면 터치판은 숨지 않고 대사창 모드 (frame 이 한 곳에서 정한다)
+      onOpen: () => {
+      }
+    });
+    globalThis.__goeiNpc = npc;
+    globalThis.__goeiStage = shell.stage;
+    Object.assign(globalThis, { __goeiTouch: shell.touch, __goeiInput: shell.input });
+    const pilot = new AutoPilot();
+    pilot.manual = () => {
+      const a = shell.input.axis();
+      return a.x !== 0 || a.y !== 0;
+    };
+    globalThis.__goeiAuto = pilot;
+    const offAutoKey = shell.input.on((code, down2) => {
+      if (!down2 || code !== CODE.auto) return;
+      if (!pilot.on && !AutoPilot.fight(world)) return;
+      pilot.setOn(!pilot.on);
+      shell.touch.setAuto(pilot.on);
+    });
+    setPixelScale(bridge?.visit ? 2.625 : 2.75);
+    globalThis.__goeiSetPixel = setPixelScale;
+    let guardA = 0;
+    const itemStage = {
+      id: "itemroom",
+      label: "아이템 진열실",
+      firstFloor: () => ({ id: "itemroom", title: "아이템 진열실", length: 3200, startX: 300, exitX: Infinity, banner: "아이템 진열실 · E 줍기·들기 · A 던지기·휘두르기", encounters: [{ triggerX: 0, lockFrom: 0, lockTo: 3200, waves: [[{ kind: "dummy", x: 1600, y: 560 }, { kind: "dummy", x: 2400, y: 620 }]] }] }),
+      nextFloor: () => null
+    };
+    const aiDiff = (() => {
+      try {
+        const v = new URLSearchParams(location.search).get("ai");
+        return v && v in DIFF ? v : "normal";
+      } catch {
+        return "normal";
+      }
+    })();
+    const sparStage = {
+      id: "spar",
+      label: "대련",
+      firstFloor: () => ({
+        id: "spar-room",
+        title: "대련",
+        length: 2400,
+        startX: 500,
+        exitX: Infinity,
+        banner: `대련 · 전투 AI (${aiDiff}) · 1:1 뒤 1:2`,
+        encounters: [{ triggerX: 0, lockFrom: 0, lockTo: 2400, waves: [[{ kind: "ai-eileen", x: 1100, y: 580 }], [{ kind: "ai-eileen", x: 1300, y: 540 }, { kind: "ai-eileen", x: 200, y: 640 }]] }]
+      }),
+      nextFloor: () => null
+    };
+    let squad = new Squad(DIFF[aiDiff].melee);
+    let aiN = 0;
+    let allyN = 0;
+    const allySquad = new Squad(DIFF[aiDiff].melee);
+    const unknownKinds = /* @__PURE__ */ new Set();
+    const enemyFactory = (spec, w) => {
+      if (spec.kind.startsWith("ally-char:") && w.player instanceof FighterPlayer) {
+        const who = spec.kind.slice(10);
+        const art4 = charArt(who);
+        if (!art4) {
+          void loadChar(who);
+          return fallbackEnemy(spec, w);
+        }
+        const n = ++allyN;
+        const ai = new FighterAi(w.player.clips, art4, { id: `ally${n}`, grade: "B", difficulty: aiDiff, persona: { aggression: 0.6, patience: 0.5, zoning: 0.3, courage: 0.85 }, seed: 5e3 + n, squad: allySquad, label: art4.cfg.name, side: "ally" });
+        ai.x = spec.x;
+        ai.y = spec.y;
+        if (!BASE_STATS[art4.cfg.name]) {
+          ai.base = rollBase(Math.random);
+          ai.stat = derive(ai.base);
+          ai.baseHp = ai.hp = ai.hpMax = ai.stat.hp;
+        }
+        applyNpcPerks(ai, rollNpcPerks(Math.random, BASE_STATS[art4.cfg.name] ? "named" : "fighter"));
+        return ai;
+      }
+      if ((spec.kind === "ai-char" || spec.kind.startsWith("ai-char:") || spec.kind === "ai-eileen") && w.player instanceof FighterPlayer) {
+        const who = spec.kind.startsWith("ai-char:") ? spec.kind.slice(8) : "";
+        const art4 = who ? charArt(who) : w.player.art;
+        if (!art4) {
+          void loadChar(who);
+          return fallbackEnemy(spec, w);
+        }
+        if (aiN === 0) squad = new Squad(DIFF[aiDiff].melee);
+        const n = ++aiN;
+        const personas = [{ aggression: 0.75, patience: 0.35, zoning: 0.2, courage: 0.9 }, { aggression: 0.35, patience: 0.8, zoning: 0.3, courage: 0.8 }, { aggression: 0.4, patience: 0.5, zoning: 0.85, courage: 0.7 }];
+        const ai = new FighterAi(w.player.clips, art4, { id: `ai${n}`, grade: "B", difficulty: aiDiff, persona: personas[(n - 1) % personas.length], seed: 1e3 + n, squad, label: `AI ${art4.cfg.name} ${n}` });
+        ai.x = spec.x;
+        ai.y = spec.y;
+        if (!BASE_STATS[art4.cfg.name]) {
+          ai.base = rollBase(Math.random);
+          ai.stat = derive(ai.base);
+          ai.baseHp = ai.hp = ai.hpMax = ai.stat.hp;
+        }
+        if (!spec.npcPerks) applyNpcPerks(ai, rollNpcPerks(Math.random, BASE_STATS[art4.cfg.name] ? "named" : "fighter"));
+        return ai;
+      }
+      if (DEF_BY_KIND[spec.kind]) {
+        const sp = spec;
+        return createEnemy(spec.kind, spec.x, spec.y, () => w.rand(), { elite: spec.elite, affixes: sp.affixes });
+      }
+      if (!spec.kind.startsWith("dummy") && !unknownKinds.has(spec.kind)) {
+        unknownKinds.add(spec.kind);
+        console.warn("[goei] 적 모듈에 없는 종류 → 임시 적:", spec.kind);
+      }
+      return fallbackEnemy(spec, w);
+    };
+    let world = null;
+    let runAgent = "eileen";
+    const storyRoot = document.createElement("div");
+    storyRoot.style.cssText = "position:absolute;inset:0;pointer-events:none;z-index:15;overflow:hidden";
+    shell.stage.root.appendChild(storyRoot);
+    const attachVideoAudio = (event) => audio.attachMedia(event.detail);
+    storyRoot.addEventListener(VIDEO_AUDIO_EVENT, attachVideoAudio);
+    const savedFlags = (() => {
+      try {
+        return JSON.parse(localStorage.getItem("goei-game-story") ?? "null") ?? void 0;
+      } catch {
+        return void 0;
+      }
+    })();
+    shell.menu.onSound = (k) => audio.play(k === "move" ? "uiMove" : k === "ok" ? "uiOk" : "uiBack");
+    let vol = "";
+    const syncVolume = () => {
+      const s = shell.settings;
+      const key = `${s.master}/${s.music}/${s.sfx}`;
+      if (key === vol) return;
+      vol = key;
+      audio.setVolume("master", s.master);
+      audio.setVolume("music", s.music);
+      audio.setVolume("sfx", s.sfx);
+      audio.setVolume("amb", s.sfx * 0.8);
+      audio.setVolume("ui", s.sfx * 0.7);
+    };
+    let foot = { x: 0, y: 0, d: 0, w: null };
+    const footsteps = (w) => {
+      const p = w.player;
+      if (foot.w !== w) foot = { x: p.x, y: p.y, d: 0, w };
+      const moved = Math.hypot(p.x - foot.x, (p.y - foot.y) * 1.5);
+      foot.x = p.x;
+      foot.y = p.y;
+      if (p.airborne || moved > 60) return void (foot.d = 0);
+      foot.d += moved;
+      if (foot.d >= (p.running ? 75 : 55)) {
+        foot.d = 0;
+        audio.event({ type: "step", x: p.x, vol: p.running ? 0.9 : 0.6 });
+      }
+    };
+    globalThis.__goeiStoryStart = (id) => CUTSCENES[id] || VIDEOS[id] ? story.cutscene(id) : story.say(id);
+    const story = mountStory(
+      storyRoot,
+      {
+        getAgent: () => runAgent,
+        sfx: (n) => audio.event({ type: "custom", name: n }),
+        shake: (ms, amp) => shell.fx.onGameEvent({ type: "shake", ms, amp }),
+        anchor: (id) => {
+          if (id !== "agent" || !world) return null;
+          const st = shell.canvas.parentElement;
+          const m = /translate\(([-\d.]+)px, ([-\d.]+)px\)/.exec(st.style.transform);
+          const k = shell.stage.scale || 1;
+          const ox = st.offsetLeft + (m ? +m[1] : 0) - storyRoot.offsetLeft, oy = st.offsetTop + (m ? +m[2] : 0) - storyRoot.offsetTop;
+          const p = world.player;
+          const gx = Math.max(200, Math.min(1e3, p.x - world.camX));
+          let maxX;
+          const tp = storyRoot.ownerDocument.querySelector(".tp");
+          if (tp && tp.offsetParent) {
+            let tx = 0;
+            for (let n = tp; n && n !== storyRoot.offsetParent; n = n.offsetParent) tx += n.offsetLeft;
+            for (const b of tp.querySelectorAll(".tp-b:not(.item):not(.top)")) {
+              if (!b.offsetWidth || getComputedStyle(b).display === "none") continue;
+              const left = tx - storyRoot.offsetLeft + new DOMMatrix(getComputedStyle(b).transform).m41;
+              if (left > storyRoot.clientWidth / 2) maxX = Math.min(maxX ?? Infinity, left);
+            }
+          }
+          let lo = ox, hi = Math.min(maxX ?? Infinity, ox + 1280 * k);
+          const gap = bubbleGap(world, gx);
+          if (gap) {
+            lo = Math.max(lo, ox + gap[0] * k);
+            hi = Math.min(hi, ox + gap[1] * k);
+          }
+          return { x: ox + gx * k, y: oy + Math.max(120, p.y - p.z - (world.hintShown ? 362 : 290)) * k, minX: lo, maxX: hi };
+        },
+        emit: (ev, arg) => world?.emit({ type: "custom", name: ev, data: { arg } }),
+        paused: () => shell.paused
+      },
+      { saved: savedFlags }
+    );
+    globalThis.__goeiStory = story;
+    const saveFlags = () => {
+      try {
+        localStorage.setItem("goei-game-story", JSON.stringify(story.flags));
+      } catch {
+      }
+    };
+    const storyKeys = (e) => {
+      if (!story.isBlocking()) return;
+      if (e.code === "Escape") story.skip();
+      else if (/^Digit[1-9]$/.test(e.code)) story.choose(Number(e.code.slice(5)) - 1);
+      else if (["Space", "Enter", "KeyE", "KeyZ", "KeyA"].includes(e.code)) story.advance();
+      else return;
+      e.preventDefault();
+      e.stopImmediatePropagation();
+    };
+    window.addEventListener("keydown", storyKeys, true);
+    const charWinTap = (e) => {
+      if (!charWin.open || e.pointerType === "mouse") return;
+      const cv = shell.canvas, r = cv.getBoundingClientRect();
+      if (!r.width || !r.height || e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom) return;
+      if (charWin.tap((e.clientX - r.left) * cv.width / r.width, (e.clientY - r.top) * cv.height / r.height)) e.preventDefault();
+    };
+    window.addEventListener("pointerdown", charWinTap, true);
+    let floorPick = null;
+    const floorBox = document.createElement("div");
+    floorBox.className = "goei-engine-elev";
+    floorBox.hidden = true;
+    storyRoot.appendChild(floorBox);
+    const closeFloors = (i) => {
+      floorBox.hidden = true;
+      const f = floorPick;
+      floorPick = null;
+      f?.(i);
+    };
+    let floorSel = -1;
+    const floorBtns = () => [...floorBox.querySelectorAll("button")];
+    const markFloor = (i) => {
+      floorSel = i;
+      floorBtns().forEach((b, k) => b.classList.toggle("sel", k === i));
+    };
+    const stepFloor = (d3) => {
+      const bs = floorBtns();
+      for (let k = 1; k <= bs.length; k++) {
+        const j = (floorSel + d3 * k + bs.length * 2) % bs.length;
+        if (!bs[j].disabled) return markFloor(j);
+      }
+    };
+    const chooseFloor = (opts, pick3) => {
+      floorPick = pick3;
+      floorBox.innerHTML = opts.map((o, i) => `<button type="button" data-i="${i}"${o.open && !o.here ? "" : " disabled"}${o.here ? ' class="here"' : ""}>${o.label}</button>`).join("");
+      floorBox.hidden = false;
+      markFloor(floorBtns().findIndex((b) => !b.disabled));
+      audio.play("panelButton");
+    };
+    floorBox.addEventListener("click", (e) => {
+      const b = e.target.closest("button");
+      if (b && !b.disabled) closeFloors(Number(b.dataset.i));
+    });
+    const floorKeys = (e) => {
+      if (floorBox.hidden) return;
+      if (e.code === "Escape") closeFloors(null);
+      else if (e.code === "ArrowUp" || e.code === "ArrowLeft") stepFloor(-1);
+      else if (e.code === "ArrowDown" || e.code === "ArrowRight") stepFloor(1);
+      else if (e.code === "Enter" || e.code === "Space" || e.code === "KeyE") {
+        if (!e.repeat && floorSel >= 0 && !floorBtns()[floorSel]?.disabled) closeFloors(floorSel);
+      } else if (/^Digit[1-9]$/.test(e.code)) {
+        const n = e.code.slice(5);
+        const want = n === "4" ? "B1" : n === "5" ? "B2" : n === "6" ? "B3" : n;
+        const b = [...floorBox.querySelectorAll("button")].find((q) => q.textContent === want);
+        if (b && !b.disabled) closeFloors(Number(b.dataset.i));
+      } else return;
+      e.preventDefault();
+      e.stopImmediatePropagation();
+    };
+    window.addEventListener("keydown", floorKeys, true);
+    const hq2 = hqAdapter(bridge, {
+      chooseFloor,
+      // 사이렌은 음악을 낮춘다 (경보 중 1.6초마다 다시 틀므로 계속 낮게)
+      sfx: (n) => {
+        audio.play(n);
+        if (n === "siren") audio.duck(1.7, 0.35);
+      },
+      overlay: visit ? (c, people, player) => visit.draw(c, people, player) : void 0,
+      choose: (o) => shell.choose(o),
+      shop: (id) => fieldShop?.open(id) ?? null,
+      worldSave: { get: () => fieldShop?.world(), set: (w) => fieldShop?.setWorld(w) },
+      rules: () => {
+        const t = shell.settings;
+        return clockRules({ scene: t.tScene, region: t.tRegion, talk: t.tTalk, fight: t.tFight, waitShort: t.tWaitShort, waitLong: t.tWaitLong });
+      }
+    });
+    fieldShop = createFieldShop({
+      root: shell.stage.ui,
+      store: bridge?.fieldState,
+      minute: () => fieldClock.sec === null ? null : fieldClock.sec / 60,
+      balance: () => fieldWallet.won,
+      pay: (amount, memo) => fieldLink.pay?.(amount, memo) ?? Promise.resolve(null),
+      heal: (ratio) => {
+        const p = game?.world?.player;
+        if (p) p.hp = Math.min(p.hpMax, p.hp + p.hpMax * ratio);
+      },
+      record: (text, ko) => fieldLink.record?.(text, ko),
+      rng: Math.random,
+      nearPerson: () => fieldLink.nearPerson?.() ?? null,
+      fact: (key, value) => fieldLink.fact?.(key, value),
+      gift: (who, item, counts) => fieldLink.gift?.(who, item, counts)
+    });
+    let hiddenNow = false;
+    const offHidden = bridge?.onHidden?.((h) => {
+      hiddenNow = h;
+      if (h) {
+        visit?.close();
+        if (shell.mode === "play" && !shell.paused) shell.openPause();
+        audio.setPaused(true);
+      }
+    });
+    const cancelStoryForScene = () => {
+      story.cancel();
+      storyRoot.style.visibility = shell.paused ? "hidden" : "";
+    };
+    fighterHooks.sfx = (e) => audio.event(e);
+    fighterHooks.openDraft = (p, offers) => openDraft(shell.canvas.parentElement ?? document.body, p, { world, offers });
+    const listeners = [
+      (e) => {
+        audio.event(e);
+        if (game?.inHub && (e.type === "enter:floor" || e.type === "custom")) return;
+        shell.fx.onGameEvent(e);
+        story.event(e.type, e);
+        if (e.type === "run:end") saveFlags();
+      }
+    ];
+    const mods = {
+      frozen: () => ffx.frozen(),
+      stages: [trainingStage, dummyStage, arenaStage, itemStage, sparStage],
+      enemyFactory,
+      hq: hq2,
+      hqLayer: () => shell.stage.ui,
+      hud: false,
+      blocking: () => !!visit?.isOpen() || story.isBlocking() || !floorBox.hidden || npc.isOpen() || !!fieldShop?.isOpen(),
+      covered: () => story.isVideoPlaying(),
+      listeners,
+      surface: { canvas: shell.canvas, ctx: shell.ctx },
+      paused: () => shell.paused,
+      openTitle: () => {
+        cancelStoryForScene();
+        world = null;
+        shell.openTitle();
+      },
+      onPlay: () => shell.play(),
+      frame: (dt) => {
+        const dialogUp = !!game?.inHub && (!!hq2.isOpen?.() || !floorBox.hidden) || npc.isOpen() || !!visit?.isOpen() || shell.menu.isOpen || charWin.open;
+        shell.touch.setMode(dialogUp ? "dialog" : "play");
+        shell.touch.setVisible(!story.isVideoPlaying() && (shell.mode === "play" || shell.menu.isOpen));
+        const fighter = !!world?.player?.core;
+        for (const id of ["light", "heavy", "dodge", "block", "unique", "ult"]) shell.touch.setOff(id, !fighter);
+        if (pilot.on && !AutoPilot.fight(world)) {
+          pilot.setOn(false);
+          shell.touch.setAuto(false);
+        }
+        shell.touch.setOff("auto", !pilot.on && !AutoPilot.fight(world));
+        if (world?.player instanceof FighterPlayer && world.player.auto !== pilot) world.player.auto = pilot;
+        ffx.opt = { shake: shell.settings.shake, flash: shell.settings.flash, numbers: shell.settings.numbers };
+        ffx.update(shell.paused ? 0 : dt);
+        {
+          const o = ffx.camera();
+          shell.canvas.style.translate = o.x || o.y ? `${o.x}px ${o.y}px` : "";
+        }
+        syncVolume();
+        audio.setPaused(hiddenNow || shell.paused);
+        audio.setCutscene(story.isVideoPlaying());
+        story.update(dt);
+        shell.frame(dt);
+        shell.input.endFrame();
+      },
+      overlay: (ctx, w, dt) => {
+        if (!w) return;
+        audio.setListener(w.camX + 640, 640);
+        footsteps(w);
+        ctx.save();
+        ctx.scale(view.zoom, view.zoom);
+        ctx.translate(-w.drawCamX - view.crop, -view.cropY);
+        shell.fx.drawWorld(ctx);
+        ffx.drawWorld(ctx);
+        ctx.restore();
+        shell.fx.drawScreen(ctx, w.player.hp / w.player.hpMax);
+        const hs = hudState(w, shell);
+        if (npc.isOpen()) hs.message = void 0;
+        if (mods.blocking?.() || shell.paused) hs.navigation = void 0;
+        let cardEnd = 0;
+        if (game?.inHub && !mods.blocking?.() && !shell.paused) {
+          const me = hq2.visitor();
+          const name = me.name || (w.player instanceof FighterPlayer ? w.player.label : "방문자");
+          const face = w.player instanceof FighterPlayer ? charFace(w.player.art.key, 64, w.player.dir < 0) : null;
           shell.hud.drawFieldCard(ctx, { name, face, hp: w.player.hp, maxHp: w.player.hpMax, gauge: w.player.gauge, compact: hs.compact, top: true, items: hs.items, device: hs.device, status: hs.status }, dt);
           if (!observerOn()) shell.hud.drawFieldCorner(ctx, hs.field, hs.compact);
         }
@@ -113,8 +1970,10 @@ e = w.player instanceof FighterPlayer ? charFace(w.player.art.key, 64, w.player.
       drawIdle: (name, ctx, t) => {
         if (name === "title") drawTitleBg(ctx, t, VISIT_TITLE.title, VISIT_TITLE.sub);
       },
+      // 11-02: 인물 팩을 필요할 때 받게 되면서(packs ensure) visitReady 가 몇 초 뒤에 풀린다. 그새 제목에서 본부로 들어갔으면 다시 제목으로 보내지 않는다
       boot: (g) => {
         void hq2.visitReady.then(() => {
+          if (g.world || g.inHub) return;
           if (bridge?.visit || !bootFromUrl(g)) g.toTitle();
         });
         return true;
@@ -125,6 +1984,9 @@ e = w.player instanceof FighterPlayer ? charFace(w.player.art.key, 64, w.player.
         npc.dispose();
         fieldShop?.dispose();
         fieldShop = null;
+        offAutoKey();
+        pilot.setOn(false);
+        if (globalThis.__goeiAuto === pilot) delete globalThis.__goeiAuto;
         const g = globalThis;
         delete g.__goeiStory;
         delete g.__goeiNpc;
@@ -344,7 +2206,7 @@ e = w.player instanceof FighterPlayer ? charFace(w.player.art.key, 64, w.player.
 .goei-engine-hq-close{position:sticky;top:8px;float:right;margin:8px;z-index:2;padding:8px 14px;border-radius:8px;border:1px solid #5b6a72;background:#1a2226;color:#ece6d4;font:15px sans-serif}
 .goei-engine-elev{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);display:flex;flex-direction:column;gap:6px;padding:10px;max-height:94%;overflow:hidden;box-sizing:border-box;pointer-events:auto;z-index:20;image-rendering:pixelated;border:16px solid transparent;border-image:var(--goei-btn) 8 fill / 16px stretch}
 .goei-engine-elev[hidden]{display:none}
-.goei-engine-elev button{width:112px;height:72px;flex:0 1 72px;min-height:40px;border:16px solid transparent;border-radius:0;background:none;border-image:var(--goei-btn) 8 fill / 16px stretch;color:#e6e4dc;font:700 33px "GoeiPixel","Galmuri11",monospace;cursor:pointer;image-rendering:pixelated;-webkit-font-smoothing:none;text-shadow:3px 3px 0 #07090b;padding:0;line-height:1}
+.goei-engine-elev button{width:auto;min-width:112px;padding:0 6px;white-space:nowrap;height:72px;flex:0 1 72px;min-height:40px;border:16px solid transparent;border-radius:0;background:none;border-image:var(--goei-btn) 8 fill / 16px stretch;color:#e6e4dc;font:700 33px "GoeiPixel","Galmuri11",monospace;cursor:pointer;image-rendering:pixelated;-webkit-font-smoothing:none;text-shadow:3px 3px 0 #07090b;line-height:1}
 .goei-engine-elev button.here{color:#ffb34a}
 .goei-engine-elev button:disabled{opacity:.4;cursor:default}
 .goei-engine-elev button.sel{filter:brightness(1.45);color:#ffe9a0}
@@ -448,7 +2310,7 @@ e = w.player instanceof FighterPlayer ? charFace(w.player.art.key, 64, w.player.
     }
   }
   var mod = {
-    version: "0.19.0",
+    version: "0.20.0",
     mount: (box2, bridge) => mountPlay(box2, bridge)
   };
   globalThis.__goeiGame = mod;
