@@ -13,3 +13,11 @@ for i in range(0,len(a),4):
     bg.alpha_composite(sp,(rx-sp.width,by-sp.height)); print(a[i].split('/')[-1],k,sp.size)
 bg.resize((1264,848),Image.NEAREST).save(S+'/lie_x2.png')
 bg.crop((390,200,632,360)).resize((968,640),Image.NEAREST).save(S+'/lie_x4.png')
+# 침대 앞 난간을 몸 위에 다시 덮는다(infirmary_bed_front.py 손으로 딴 칸)
+sys.path.insert(0,'tools/objects')
+from infirmary_bed_front import mask
+orig=Image.open('game-src/art/pixellab-hq-20261031/hq_b2_infirmary_p6_632x424.png').convert('RGBA')
+bg.paste(orig,(0,0),mask())
+bg.save(S+'/lie_full.png')
+bg.resize((1264,848),Image.NEAREST).save(S+'/lie_x2.png')
+bg.crop((390,200,632,360)).resize((968,640),Image.NEAREST).save(S+'/lie_x4.png')
