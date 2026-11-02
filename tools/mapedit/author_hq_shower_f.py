@@ -20,23 +20,44 @@ W, H = im.width * K, im.height * K
 P = lambda pts: [[x * K, y * K] for x, y in pts]
 floor = P([(0, 337), (140, 286), (455, 286), (455, 290), (632, 402), (632, 424), (0, 424)])
 blocks = [
-    {'poly': P([(175, 343), (235, 343), (279, 299), (241, 299)]), 'h': 999},          # 사물함 왼쪽 줄
-    {'poly': P([(375, 348), (427, 348), (395, 303), (356, 303)]), 'h': 999},          # 사물함 오른쪽 줄
+    {'poly': P([(175, 344), (236, 344), (279, 295), (241, 295)]), 'h': 999},          # 사물함 왼쪽 줄
+    {'poly': P([(376, 347), (427, 347), (395, 299), (357, 299)]), 'h': 999},          # 사물함 오른쪽 줄
     {'poly': P([(172, 342), (223, 342), (223, 356), (172, 356)]), 'h': 999},          # 빨래통
     {'poly': P([(0, 360), (53, 360), (53, 424), (0, 424)]), 'h': 999},                # 왼쪽 아래 바구니
 ]
 objects = [   # 가림: 사람보다 앞에 다시 그릴 그림 자리(다각형), sortY = 앞 발 y
-    {'id': 'lockL', 'cover': [P([(175, 166), (235, 166), (279, 187), (279, 299), (235, 343), (175, 343)])], 'sortY': 343 * K},
-    {'id': 'lockR', 'cover': [P([(356, 184), (374, 163), (427, 163), (427, 348), (375, 348), (356, 303)])], 'sortY': 348 * K},
+    # 사물함 앞면: 한 장, sortY = 앞면 밑 윤곽선(1x 픽셀로 읽음: 왼쪽 y344, 오른쪽 y347)
+    {'id': 'lockL', 'cover': [P([(174, 166), (236, 166), (236, 345), (174, 345)])], 'sortY': 344 * K},
+    {'id': 'lockR', 'cover': [P([(376, 163), (428, 163), (428, 348), (376, 348)])], 'sortY': 347 * K},
     {'id': 'hamper', 'cover': [P([(172, 292), (223, 292), (223, 356), (172, 356)])], 'sortY': 356 * K},
     {'id': 'basket', 'cover': [P([(0, 345), (53, 345), (53, 424), (0, 424)])], 'sortY': 424 * K},
 ]
+# 사물함 옆면(비스듬히 뒤로 가는 면) = 1x 2px 세로 띠, 띠마다 sortY = 그 x의 밑 윤곽선 y (11-02 사용자 「해」, 남자 탈의실 lockC 방식).
+# 윤곽선은 그림 픽셀을 한 줄씩 읽음(검은 선 y): 왼쪽 옆면 밑 x236→344·x250→328·x265→311·x278→296, 위 (235,167)→(280,191)
+#   오른쪽 옆면 밑 x357→299·x365→320·x374→342, 위 (356,191)→(375,165)
+SIDES = {
+    'lockL_side': (236, 280, lambda x: 167 + (x - 235) * 24 / 45, lambda x: 344 - (x - 236) * 48 / 42),
+    'lockR_side': (356, 376, lambda x: 191 - (x - 356) * 26 / 19, lambda x: 299 + (x - 357) * 43 / 17.6),
+}
+for oid, (xa, xb, top, bot) in SIDES.items():
+    for x in range(xa, xb, 2):
+        xm = x + 1
+        objects.append({'id': f'{oid}{x}', 'cover': [P([(x, int(top(xm)) - 1), (x + 2, int(top(xm)) - 1), (x + 2, int(bot(xm)) + 2), (x, int(bot(xm)) + 2)])],
+                        'sortY': round(bot(xm)) * K})
 door = lambda q: {'x0': min(p[0] for p in q), 'x1': max(p[0] for p in q), 'y0': min(p[1] for p in q), 'y1': max(p[1] for p in q), 'anim': 'none', 'quad': q, 'behind': 'dark'}
 doors = {
     'bath': {'kind': 'glass', 'x': 70 * K, 'y': 326 * K, 'locked': True, 'label': '목욕탕', 'door': door(P([(0, 112), (118, 140), (118, 300), (0, 335)]))},
     'out': {'kind': 'exit', 'side': 'S', 'x': 316 * K, 'y': H - 12, 'label': '나가기'},
 }
-m = {'file': 'hq_shower_f_strip', 'bgScale': K, 'w': W, 'h': H, 'under': True,
+# 사람 크기(남자 탈의실과 같은 방식, 사용자 15:03·15:21): 사람 = 문틀 0.82 = 사물함 0.91. 1x로 잰 값:
+# - 뒷벽 문: 문틀 위 y177 ~ 밑 y281 (104px) → 사람 85, 발 y286
+# - 왼쪽 사물함 뒤 끝: x279 위 y191 ~ 밑 y295 (104px) → 사람 95, 발 y295
+# - 오른쪽 사물함 앞면: 위 y163 ~ 밑 y347 (184px) → 사람 167, 발 y347 (왼쪽 앞면 178px→162 @y344 와 맞음)
+# 기준점 사이에서만 바뀌고 그 밖은 끝값 그대로.
+SPR_DOTS = 247
+REFS = [(286, 0.82 * 104), (295, 0.91 * 104), (347, 0.91 * 184)]
+TOP = max(h for _, h in REFS)
+m = {'file': 'hq_shower_f_strip', 'bgScale': K, 'dotK': round(TOP * K / SPR_DOTS, 4), 'sizes': [[y * K, round(h / TOP, 3)] for y, h in REFS], 'w': W, 'h': H, 'under': True,
      'floor': floor, 'lane': [286 * K, H - 12], 'blocks': blocks, 'doors': doors, 'lamps': [], 'spots': [], 'objects': objects}
 (OUT / 'map.json').write_text(json.dumps(m, ensure_ascii=False, indent=1))
 print(W, H, list(doors))
