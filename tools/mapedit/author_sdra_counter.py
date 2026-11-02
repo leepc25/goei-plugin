@@ -20,9 +20,35 @@ W, H = im.width * K, im.height * K
 # 바닥 윗선 (1배 x0, x1, y). 11-02 13:45 사용자 「저 안으로 어떻게 들어가냐」 → 창구 안쪽(직원 자리)도 바닥.
 # 왼쪽 통로(파란 서랍장 오른쪽 x266~창구 끝판 x272)로 끝판 뒤를 돌아 창구 안쪽 띠(뒤 책상 밑 y227 아래 ~ 창구 뒷면)로 들어간다.
 # 서랍장 밑 검은 윤곽 y268 → 270. 창구 안쪽 띠 윗선 = y266(13:53 사용자 「얜 왜 이렇게 높이 올라가냐」: 뒤 책상 밑 y232까지 열었더니 뒤 사무공간에 선 것처럼 보임 → 직원 자리 바닥 277 바로 뒤까지만).
-TOP = [(0, 108, 301), (108, 165, 300), (165, 218, 297), (218, 266, 270), (266, 952, 288)]
+# 13:54 사용자 「이런 거 모서리」: 왼쪽(x0~271)은 계단 네모 말고 열마다 물건 밑 검은 윤곽선(맨 아래 어두운 점, max≤60)을 읽어
+# +2 → 상자·서랍장 비스듬한 밑 모서리를 그대로 따라감. 윤곽이 흐린 외톨이 열은 둘레 5열 중간값으로 메움.
+# x267~271(서랍장~끝판 사이 5px 틈)은 사람 폭보다 좁아 서랍장 밑선 끝값을 이어 씀. x272~ = 창구 안쪽 띠 윗선 288.
+import numpy as _np
+_A = _np.array(im).astype(int); _dk = _A.max(2) <= 60
+_raw = []
+for x in range(272):
+    y = 335
+    while y > 150 and not _dk[y, x]: y -= 1
+    _raw.append(y)
+# 물건 속 세로 윤곽(상자 접힌 면 등)에 걸린 열은 버리고 양옆 값으로 잇는다: 책장·상자 줄(x<218)은 밑선이 y280 아래,
+# 서랍장(218~266)은 y245 아래에만 있음(4배로 확인).
+_ok = [(_raw[x] >= 280) if x < 218 else (_raw[x] >= 245) for x in range(272)]
+_fix = list(_raw)
+for x in range(272):
+    if not _ok[x]:
+        l = next((i for i in range(x - 1, -1, -1) if _ok[i]), None); r = next((i for i in range(x + 1, 272) if _ok[i]), None)
+        _fix[x] = max(_raw[l] if l is not None else 0, _raw[r] if r is not None else 0)
+for a, b in [(0, 218), (218, 267)]:   # 외톨이 한두 열 튐(쓰레기통·서랍장 모서리의 세로 윤곽) → 같은 물건 줄 안에서만 양옆 큰 값
+    snap = list(_fix)
+    for x in range(a + 2, b - 2):
+        nb = max(snap[x - 2], snap[x + 2])
+        if snap[x] < nb - 6 and snap[x] < min(snap[x - 2], snap[x + 2]): _fix[x] = nb
+_med = _fix
+LEFT = [m + 2 for m in _med]
+for x in range(267, 272): LEFT[x] = LEFT[266]
 poly = []
-for x0, x1, y in TOP: poly += [[x0 * K, y * K], [x1 * K, y * K]]
+for x in range(272): poly += [[x * K, LEFT[x] * K], [(x + 1) * K, LEFT[x] * K]]
+poly += [[272 * K, 288 * K], [952 * K, 288 * K]]
 floor = [[0, H]] + poly + [[W, H]]
 # 창구 몸체 막힘(구멍): 앞 밑선은 앞 판과 같음(창구 밑 316, 칸막이 기둥 519~529·743~753 밑 328, 끝판 밑 324→대각선 292,316),
 # 뒷면은 끝판 뒤끝 깊이로 y300. 끝판 왼쪽 x270에서 y312까지만 막아 그 뒤(y<312)로 돌아 들어갈 수 있게.
