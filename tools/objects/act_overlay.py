@@ -23,6 +23,7 @@ for it in ARGV[1:]:
     a=np.array(s)[:,:,3]>40; edge=a & ~(np.array(Image.fromarray(a.astype(np.uint8)*255).filter(ImageFilter.MinFilter(3)))>0)
     ol=np.zeros(a.shape+(4,),np.uint8); ol[edge]=(255,40,40,255); olim=Image.fromarray(ol)
     lp=J[k].get('lines',{}).get(f'{v}:{l}',pv)
+    if lp.get('flip') or os.environ.get('FLIP')==k: f=f.transpose(Image.FLIP_LEFT_RIGHT)   # 줄 좌우 뒤집기(방향 반대로 뽑힌 줄)
     fdx=lp.get('frame_dx',[lp['dx']]*99)[int(fi)-1]   # 장마다 x 가 다르면(기대 쉬기 등) frame_dx
     fdy=lp.get('frame_dy',[lp['dy']]*99)[int(fi)-1]
     for cd in cands or [f"{fdx},{fdy}"]:
