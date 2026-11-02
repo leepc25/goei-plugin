@@ -19,8 +19,8 @@ def S(im,s): return im.resize((max(1,round(im.width*s)),max(1,round(im.height*s)
 FIT=json.loads((R/'game-src/art/objects/chairs_shell/fit_all.json').read_text())
 TD=R/'game-src/art/objects/lounge_tables'; TM=json.loads((TD/'tables.json').read_text())
 TAB={'table1':(162,134,82,205),'table2':(462,434,383,506),'table3':(713,740,669,793)}   # 뒤x, 앞x, 상판 왼끝, 오른끝
-FB,FF,FS=340,395,384   # 옆 의자: 앞다리 바닥선(377)보다 앞으로 내리고(05:52) 책상 쪽으로 붙임(05:52 「내림과 동시에 더 붙여야」)
-TUCK=8   # 옆 의자 안쪽 끝이 상판 바깥 끝보다 안으로 들어가는 양(1배 px)
+FB,FF,FS=340,395,float(os.environ.get('FS',378))   # 옆 의자: 앞다리 바닥선(377)보다 앞으로 내리고(05:52) 책상 쪽으로 붙임(05:52 「내림과 동시에 더 붙여야」)
+TUCK=float(os.environ.get('TUCK',12))   # 옆 의자 안쪽 끝이 상판 바깥 끝보다 안으로 들어가는 양(1배 px)
 # 뒷다리 중 상판·옆면 밑으로 따로 드러난 부분(1배, x0,x1,y0,y1) — lounge_p13_tables.py 다리 값과 윤곽 읽은 줄
 BACKLEG={'table1':[(120,128,308,348),(197,203,296,348)],'table2':[(420,427,308,348),(498,504,295,348)],
          'table3':[(671,677,294,348),(748,755,308,348)]}
@@ -45,8 +45,8 @@ i=0
 for n,(xb,xf,xl,xr) in TAB.items():
     seat(WHO[i],'front',xb*K,FB,0); i+=1                                   # 테이블 뒤, 정면
     s=scale(FS)
-    seat(WHO[i],'side',(xl+TUCK)*K-(east[2]-100)*s,FS,2.5); i+=1                    # 왼쪽, 테이블 쪽(오른쪽) 봄
-    seat(WHO[i],'side',(xr-TUCK)*K+(east[2]-100)*s,FS,2.5,flip=True); i+=1          # 오른쪽, 왼쪽 봄
+    seat(WHO[i],'side',(xl+TUCK)*K-(east[2]-100)*s,FS,float(os.environ.get('SIDE_ORD',1))); i+=1                    # 왼쪽, 테이블 쪽(오른쪽) 봄
+    seat(WHO[i],'side',(xr-TUCK)*K+(east[2]-100)*s,FS,float(os.environ.get('SIDE_ORD',1)),flip=True); i+=1          # 오른쪽, 왼쪽 봄
     # 테이블을 둘로: 뒷다리(상판·옆면 아래로 드러난 부분)는 옆에 앉은 사람 뒤, 나머지는 앞 (사용자 05:51 「기둥」)
     t=Image.open(TD/f'{n}.png').convert('RGBA'); tb=Image.new('RGBA',t.size,(0,0,0,0)); tf=t.copy()
     for x0,x1,y0,y1 in BACKLEG[n]:
