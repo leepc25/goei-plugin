@@ -22,7 +22,7 @@ SKIP={'5.2_브라우니'}   # 11-02 사용자: 브라우니는 의자 앉기 전
 # 좌석 가운데 차(C01 - 쉘, 1배, 96~112줄 무게중심) → 사람도 같은 만큼 옮김. 옆은 등받이가 두꺼워 사람을 앞(오른쪽)으로 10
 SEAT={'south':-8,'south-east':-3,'south-west':-12,'north':-8,'north-east':-1,'north-west':-14,'east':10}
 # 좌석 윗면 가운데 점(의자 그림 1배 좌표, 11-02 줄마다 잰 값): 정면은 좌석 윗면 띠(97~105)의 가운데, 옆은 좌판 윗면(94)과 뒤쪽 좌판 가운데
-SEATPT={'south':(92,101),'south-east':(98,100),'south-west':(86,100),'east':(83,97),'north':(91,101),'north-east':(97,101),'north-west':(88,101),'west':(104,95)}
+SEATPT={'south':(92,107),'south-east':(108,106),'south-west':(76,106),'east':(83,97),'north':(91,101),'north-east':(97,101),'north-west':(88,101),'west':(104,95)}
 def keys():
     ks=[p.stem for p in (TR/'chars').glob('*.json')]
     ks=sorted(ks,key=lambda s:[int(x) for x in re.findall(r'\d+',s.split('_')[0])])

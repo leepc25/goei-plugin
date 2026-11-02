@@ -1,7 +1,7 @@
 {
  "front": {
-  "dx": 2,
-  "dy": -2,
+  "dx": -8,
+  "dy": -8,
   "s": 1.0,
   "img": "south-east"
  },
