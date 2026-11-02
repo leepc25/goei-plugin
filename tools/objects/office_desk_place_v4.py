@@ -19,6 +19,8 @@ a = sys.argv
 G1, G2 = (int(a[2]) if len(a) > 2 else 40), (int(a[3]) if len(a) > 3 else 620)
 SF, NF = (int(a[4]) if len(a) > 4 else 374), (int(a[5]) if len(a) > 5 else 345)
 L = []
+import os
+CH = O / 'C01_사무의자_1배'; CHAIRS = os.environ.get('CHAIRS', '1') == '1'; CDY = int(os.environ.get('CDY', '14')); CSC = float(os.environ.get('CSC', '0.75'))  # 의자 따로 배율(좌판이 책상 상판보다 낮게)  # 의자 발 = 책상 발 ± CDY(1배)
 # 08:02 사용자 「딱 북쪽 책상이 남쪽 책상 뒤에서 이어지게 붙여」: 북쪽 상판 앞끝(넓은 나무색 마지막 줄) = 남쪽 상판 뒤끝(첫 줄). NF 인자는 안 씀.
 import colorsys
 def wood(im):
@@ -33,6 +35,9 @@ def wood(im):
         rows.append(n)
     ys = [y for y in range(im.height) if rows[y] > w * 0.5]; return ys[0], ys[-1]
 NYS = []
+def loadc(p, foot):  # 원본 1배에서 한 번에 줄임(두 번 줄이면 도트 깨짐)
+    im = Image.open(p).convert('RGBA'); im = im.crop(im.getbbox()); s_ = scale(foot) * K * CSC
+    return im.resize((round(im.width * s_), round(im.height * s_)), Image.NEAREST)
 # 08:05 사용자 「공간 낭비, 책상은 4덩이로 분리」 → 덩이 = 남 1 + 북 1, 4덩이를 방 너비에 고르게. CLUSTERS=4 기본(2면 옛 v4 묶음)
 import os
 NCL = int(os.environ.get('CLUSTERS', '4'))
@@ -52,6 +57,11 @@ for gi, (gx, cnt) in enumerate(GROUPS):
         NYS.append(nf)
         L.append((nf, n, x + (s.width - n.width) // 2, ny))
         L.append((SF, s, x, sy))
+        if CHAIRS:  # 08:09 사용자 「의자 배치해봐」: 남쪽 책상 앞 = C01 north(등 보임), 북쪽 책상 뒤 = C01 south(정면). 다리 들어갈 쪽(서랍 반대)
+            cs = loadc(CH / 'north.png', SF + CDY); cf = SF + CDY
+            L.append((cf, cs, x + round(s.width * 0.36) - cs.width // 2, cf * K - cs.height))
+            cn_f = nf - CDY; cn = loadc(CH / 'south.png', cn_f); nx = x + (s.width - n.width) // 2
+            L.append((cn_f, cn, nx + round(n.width * 0.64) - cn.width // 2, round(cn_f * K) - cn.height))
         x += s.width
 NF = round(sum(NYS) / len(NYS)); print('north foot', [round(v, 1) for v in NYS])
 # 쟈알디 책상 = 북쪽 책상(D02v2), 오른쪽 끝 (사용자 07:53 「쟈알디는 북쪽으로」, 핀 92%). JX=가운데 x, JF=발 y = 북쪽 줄과 같음(사용자 07:57)
