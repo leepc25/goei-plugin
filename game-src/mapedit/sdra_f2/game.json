@@ -1,0 +1,75 @@
+{
+ "scene": {
+  "file": "me_sdra_f2",
+  "w": 1904,
+  "h": 848,
+  "under": true,
+  "lane": [
+   630,
+   836
+  ],
+  "floor": [
+   [
+    0,
+    630
+   ],
+   [
+    1904,
+    630
+   ],
+   [
+    1904,
+    848
+   ],
+   [
+    0,
+    848
+   ]
+  ],
+  "holes": [],
+  "dotK": 1.4292,
+  "blocks": [],
+  "doors": {
+   "office": {
+    "x0": 62,
+    "x1": 388,
+    "y0": 122,
+    "y1": 610,
+    "behind": "dark",
+    "anim": "none"
+   },
+   "elev": {
+    "x0": 520,
+    "x1": 750,
+    "y0": 258,
+    "y1": 606,
+    "behind": "car",
+    "anim": "slide2",
+    "seam": 636
+   },
+   "wc_m": {
+    "x0": 1364,
+    "x1": 1486,
+    "y0": 296,
+    "y1": 610,
+    "behind": "dark",
+    "anim": "none"
+   },
+   "wc_f": {
+    "x0": 1698,
+    "x1": 1820,
+    "y0": 296,
+    "y1": 610,
+    "behind": "dark",
+    "anim": "none"
+   }
+  },
+  "lamps": [],
+  "windows": [],
+  "objects": []
+ },
+ "spots": [],
+ "files": [
+  "me_sdra_f2"
+ ]
+}
