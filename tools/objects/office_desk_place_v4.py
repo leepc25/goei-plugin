@@ -16,7 +16,7 @@ def load(p, foot):
     im = Image.open(p).convert('RGBA'); im = im.crop(im.getbbox()); s = scale(foot) * K
     return im.resize((round(im.width * s), round(im.height * s)), Image.NEAREST)
 a = sys.argv
-G1, G2 = (int(a[2]) if len(a) > 2 else 40), (int(a[3]) if len(a) > 3 else 700)
+G1, G2 = (int(a[2]) if len(a) > 2 else 40), (int(a[3]) if len(a) > 3 else 620)
 SF, NF = (int(a[4]) if len(a) > 4 else 396), (int(a[5]) if len(a) > 5 else 383)
 L = []
 for gi, gx in enumerate((G1, G2)):
