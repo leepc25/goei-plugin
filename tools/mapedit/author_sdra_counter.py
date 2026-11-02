@@ -132,8 +132,8 @@ objects, blocks, spots = [counter_cover, cabinet_cover], [counter_block], []
 SEATS = [(40, 61), (111.5, 61), (183.5, 61)]   # 잘라낸 판 1배: 좌석 점(사무의자 north 좌석 점과 같은 뜻)
 for i, bx in enumerate(BXS):
     ox, oy = round(bx - 110.5 * BSC), round(FOOT_Y - 124 * BSC)
-    objects.append({'id': f'bench{i+1}_shadow', 'file': 'sdra_counter_bench_shadow.png', 'x': ox, 'y': oy, 'w': bw, 'h': bh, 'sortY': 0, 'kind': 'shadow'})
-    objects.append({'id': f'bench{i+1}', 'file': 'sdra_counter_bench.png', 'x': ox, 'y': oy, 'w': bw, 'h': bh, 'sortY': FOOT_Y, 'kind': 'chair'})
+    objects.append({'id': f'bench{i+1}_shadow', 'file': 'sdra_counter_bench_shadow', 'x': ox, 'y': oy, 'w': bw, 'h': bh, 'sortY': 0, 'kind': 'shadow'})
+    objects.append({'id': f'bench{i+1}', 'file': 'sdra_counter_bench', 'x': ox, 'y': oy, 'w': bw, 'h': bh, 'sortY': FOOT_Y, 'kind': 'chair'})
     x0, x1 = round(ox + 13 * BSC) - 12, round(ox + 210 * BSC) + 12; y0 = round(oy + 96 * BSC)
     blocks.append({'poly': [[x0, y0], [x1, y0], [x1, H], [x0, H]], 'h': 999})
     for j, (sx, sy) in enumerate(SEATS):

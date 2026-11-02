@@ -2601,7 +2601,7 @@
   },
   {
    "id": "bench1_shadow",
-   "file": "sdra_counter_bench_shadow.png",
+   "file": "sdra_counter_bench_shadow",
    "x": 634,
    "y": 649,
    "w": 332,
@@ -2611,7 +2611,7 @@
   },
   {
    "id": "bench1",
-   "file": "sdra_counter_bench.png",
+   "file": "sdra_counter_bench",
    "x": 634,
    "y": 649,
    "w": 332,
@@ -2621,7 +2621,7 @@
   },
   {
    "id": "bench2_shadow",
-   "file": "sdra_counter_bench_shadow.png",
+   "file": "sdra_counter_bench_shadow",
    "x": 1104,
    "y": 649,
    "w": 332,
@@ -2631,7 +2631,7 @@
   },
   {
    "id": "bench2",
-   "file": "sdra_counter_bench.png",
+   "file": "sdra_counter_bench",
    "x": 1104,
    "y": 649,
    "w": 332,
@@ -2641,7 +2641,7 @@
   },
   {
    "id": "bench3_shadow",
-   "file": "sdra_counter_bench_shadow.png",
+   "file": "sdra_counter_bench_shadow",
    "x": 1534,
    "y": 649,
    "w": 332,
@@ -2651,7 +2651,7 @@
   },
   {
    "id": "bench3",
-   "file": "sdra_counter_bench.png",
+   "file": "sdra_counter_bench",
    "x": 1534,
    "y": 649,
    "w": 332,
