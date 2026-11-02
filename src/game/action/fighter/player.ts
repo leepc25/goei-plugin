@@ -225,6 +225,9 @@ export class FighterPlayer extends Player {
   /** 주인공 편 AI 몸 (동행, fighter/ai.ts side 'ally'): 주인공 전용 처리(영구 사망·보호막 퍽)를 받지 않는다 */
   allySide = false;
   get sortY() {
+    // 지도 의자에 앉은 동안은 의자 발점(seat.cy)이 깊이: 맞춤값으로 몸이 위로 옮겨져도(사무실 뒷면 앉기 dy -29) 앞의 책상 그림 뒤로 숨지 않게 (11-02)
+    const seat = this.coreSeat ? (this.core.P.seat as { cy?: number } | null) : null;
+    if (seat?.cy !== undefined) return seat.cy;
     const p = this.z > 4 ? this.platformAt(this.x, this.y) : null;
     return p && this.z >= p.h - 8 ? p.y1 + 2 : this.y;
   }

@@ -198,12 +198,12 @@ function floorHall(id: SceneId, name: string, floor: HqScene['floor'], doors: Om
     // owner = 평소 앉는 사람(지도 spots.owner) → NPC 책상 일은 자기 책상 먼저 (world/actors.ts)
     const deskSpots = sc.spots.filter((s) => s.seat && s.chair === undefined && s.act?.[0]?.startsWith('sit_'));   // 의자 자리만 (의무실 침대 눕기 자리는 제외)
     if (deskSpots.length) {
-      const base = sc.boxes.length;
       const faceOf = (s: HqSpot): HqBox['face'] => (s.act?.[0] === 'sit_back' ? 'N' : s.act?.[0] === 'sit_side' ? (s.face === -1 ? 'W' : 'E') : undefined);
-      const boxes: HqBox[] = deskSpots.map((s) => ({ kind: `seat:${s.id}`, x: s.seat!.x, w: 54, y: s.seat!.y, d: 20, h: 0, solid: false, face: faceOf(s) }));
-      sc.boxes = [...sc.boxes, ...boxes];
-      sc.spots = sc.spots.map((s) => { const i = deskSpots.indexOf(s); return i >= 0 ? { ...s, chair: base + i } : s; });
-      sc.seats = deskSpots.map((s, i) => ({ x: s.seat!.x, y: s.seat!.y, face: faceOf(s), box: base + i, ...(s.owner ? { owner: s.owner } : {}) }));
+      // 자리의 의자 = 그 자리 발점에 선 오린 의자 오브젝트(가운데·밑선이 같은 것). 누가 앉으면 그 오브젝트는 안 그리고 앉은 사람이 자기 맞춤값으로 의자(C01)와 함께 그린다 (휴게실 chairs 와 같은 규칙)
+      const chairOf = (s: HqSpot) => sc.boxes.findIndex((b) => !b.solid && Math.abs(b.x - s.seat!.x) < 30 && Math.abs(b.y - s.seat!.y) < 30);
+      const boxIdx = deskSpots.map((s) => { const i = chairOf(s); if (i >= 0) { sc.boxes[i] = { ...sc.boxes[i], face: faceOf(s) }; return i; } sc.boxes.push({ kind: `seat:${s.id}`, x: s.seat!.x, w: 54, y: s.seat!.y, d: 20, h: 0, solid: false, face: faceOf(s) }); return sc.boxes.length - 1; });
+      sc.spots = sc.spots.map((s) => { const i = deskSpots.indexOf(s); return i >= 0 ? { ...s, chair: boxIdx[i] } : s; });
+      sc.seats = deskSpots.map((s, i) => ({ x: s.seat!.x, y: s.seat!.y, face: faceOf(s), box: boxIdx[i], ...(s.owner ? { owner: s.owner } : {}) }));
     }
   }
   return sc;
