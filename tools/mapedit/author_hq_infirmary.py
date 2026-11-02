@@ -21,28 +21,44 @@ OUT = ROOT / 'game-src/mapedit/infirmary'
 K = 2
 im = Image.open(SRC).convert('RGB'); A = np.array(im); W, H = im.size
 
-# ── 1) 바닥선: 벽 밑선 + 벽 앞 물건 (이름, x0, x1, 밑 윤곽선 y) — 1x
-WALL = [(0, 84, 254), (84, 150, 254), (150, 412, 256), (412, 593, 256), (593, 640, 256), (640, W, 256)]
+# ── 1) 바닥선: 벽 밑선 + 벽 바로 앞 물건 (이름, x0, x1, 밑 윤곽선 y) — 1x. 침대는 여기 넣지 않는다(사용자 12:23 「침대에 접근을 못하게 하면」).
+WALL = [(0, 84, 254), (84, 150, 254), (150, 412, 256), (412, 593, 256), (593, 640, 256), (640, 805, 252), (805, W, 303)]
 AGAINST = [
     ('왼쪽 바퀴 카트',        0,  36, 320),
     ('왼쪽 바닥 상자',       36,  81, 305),
     ('작은 상자(조리대 앞)', 124, 165, 277),
-    ('링거대·혈압계 받침',  150, 210, 311),
-    ('왼쪽 침대',           165, 340, 300),
     ('모니터 카트',          343, 392, 289),
-    ('쓰레기통',            593, 620, 255),
-    ('오른쪽 뒤 침대',       643, 805, 297),
-    ('오른쪽 앞 침대',       662, 852, 366),
 ]
-FOOT_W = 20
+FOOT_W = 4
 top = np.zeros(W, int)
 for x0, x1, y in WALL: top[x0:x1] = y + 2
 for name, x0, x1, y in AGAINST:
     a, b = max(0, x0 - FOOT_W), min(W, x1 + FOOT_W + 1)
     top[a:b] = np.maximum(top[a:b], y + 2)
-top[852:] = np.maximum(top[852:], 368)       # 앞 침대 오른쪽 = 오른벽·콘솔
-def _f(a, f): p = np.pad(a, 10, mode='edge'); return np.array([f(p[i:i + 21]) for i in range(len(a))])
-top = _f(_f(top, np.max), np.min)   # 사람 폭보다 좁은 홈 메움
+def _f(a, f): p = np.pad(a, 5, mode='edge'); return np.array([f(p[i:i + 11]) for i in range(len(a))])
+top = _f(_f(top, np.max), np.min)   # 몸 반폭보다 좁은 홈만 메움
+
+# ── 1b) 침대 3개 = 올라설 수 있는 물건(점프 높이 185 > 침대 높이). 윤곽은 5~6배 격자 그림을 보고 손으로 찍은 꼭짓점,
+#      다리 사이 바닥이 보이는 곳은 뺐다. 발자국 = 바퀴가 바닥에 닿는 뒤·앞 y, h = 바닥 → 매트리스 윗면(2배 px).
+BED_POLY = {
+    'bed_left': [(166, 234), (199, 218), (203, 219), (203, 229), (215, 230), (222, 236), (238, 236), (238, 229), (300, 229), (300, 236), (302, 234),
+                 (317, 233), (337, 218), (340, 220), (340, 252), (330, 270), (333, 272), (332, 278), (322, 279), (312, 280), (313, 300), (303, 300),
+                 (303, 287), (201, 287), (200, 300), (210, 305), (210, 311), (163, 311), (163, 300), (172, 292), (170, 285), (166, 270)],
+    'bed_back': [(645, 229), (649, 228), (658, 243), (691, 244), (691, 235), (750, 235), (750, 244), (756, 239), (766, 230), (778, 231), (778, 219),
+                 (784, 219), (803, 233), (804, 240), (804, 270), (800, 282), (800, 297), (793, 297), (793, 282), (664, 282), (662, 297), (655, 297),
+                 (655, 289), (652, 281), (645, 281)],
+    'bed_front': [(663, 279), (667, 278), (680, 297), (720, 297), (720, 287), (792, 287), (792, 297), (802, 295), (820, 282), (826, 280), (828, 268),
+                  (834, 268), (855, 283), (858, 290), (858, 312), (830, 313), (822, 330), (822, 346), (688, 346), (687, 366), (675, 366), (675, 352),
+                  (681, 346), (670, 340), (663, 340)],
+}
+# id: (발자국 x0, x1, 뒤 y0, 앞 y1, 높이 h(2배))  — 올라서는 칸은 매트리스 길이만
+BED_FOOT = {'bed_left': (175, 330, 278, 300, 80), 'bed_back': (650, 800, 280, 297, 68), 'bed_front': (668, 850, 340, 366, 80)}
+
+
+def poly_mask(poly):
+    pm = Image.new('L', (W, H), 0); ImageDraw.Draw(pm).polygon(poly, fill=255, outline=255)
+    return np.array(pm) > 0
+
 
 # ── 2) 앞줄 물건 가림: 줄 y → [(x0, x1), ...] (1x, 양끝 포함). 줄마다 검은 윤곽 목록을 읽고 적음.
 def R(y0, y1, *spans): return {y: list(spans) for y in range(y0, y1 + 1)}
@@ -81,16 +97,16 @@ MO = {y: (MOL[y], MOR[y]) for y in range(350, 424)}
 
 # 물건 단위로 묶음: (id, 줄표, 발자국 막힘 시작 y(뒤 바닥 닿는 곳, 눈대중), 막힘 x 범위)
 def one(d): return {y: [v] for y, v in d.items()}
-GROUPS = [
-    ('F_left_boxes', L, 395, (0, 161)),
-    ('F_box_mid', one(M1), 405, (308, 339)),
-    ('F_equip', one(E), 385, (344, 396)),
-    ('F_table_cart', T, 390, (403, 478)),
-    ('F_scale', one(S), 400, (485, 507)),
-    ('F_tray_cart', TC, 395, (601, 717)),
-    ('F_monitor', one(MO), 395, (722, 783)),
+GROUPS = [   # 막힘 = 물건이 바닥에 닿는 자리만(사용자 12:24 「이 빨간상자는 뭔데」 → 둘레 여유 없앰)
+    ('F_left_boxes', L, 400, (0, 161)),
+    ('F_box_mid', one(M1), 408, (308, 339)),
+    ('F_equip', one(E), 398, (344, 396)),
+    ('F_table_cart', T, 400, (403, 478)),
+    ('F_scale', one(S), 412, (485, 500)),
+    ('F_tray_cart', TC, 402, (601, 717)),
+    ('F_monitor', one(MO), 405, (722, 783)),
 ]
-MID_W = 12
+MID_W = 0
 CONSOLE_X = 795          # 오른쪽 아래 콘솔(810~)과 모니터 사이 좁은 틈(783~810)까지 바닥에서 뺌
 
 
@@ -106,14 +122,18 @@ blocks = []
 for gid, rows, yb, (bx0, bx1) in GROUPS:
     x0, x1 = max(0, bx0 - MID_W), min(W, bx1 + MID_W)
     blocks.append({'id': gid, 'poly': [[x0 * K, yb * K], [x1 * K, yb * K], [x1 * K, H * K], [x0 * K, H * K]], 'h': 999})
-blocks.append({'id': 'console', 'poly': [[CONSOLE_X * K, 368 * K], [W * K, 368 * K], [W * K, H * K], [CONSOLE_X * K, H * K]], 'h': 999})
+blocks.append({'id': 'console', 'poly': [[810 * K, 375 * K], [W * K, 375 * K], [W * K, H * K], [810 * K, H * K]], 'h': 999})
+blocks.append({'id': 'iv_pole', 'poly': [[178 * K, 298 * K], [196 * K, 298 * K], [196 * K, 309 * K], [178 * K, 309 * K]], 'h': 999})
+for bid, (x0, x1, y0, y1, h) in BED_FOOT.items():
+    blocks.append({'id': bid, 'poly': [[x0 * K, y0 * K], [x1 * K, y0 * K], [x1 * K, y1 * K], [x0 * K, y1 * K]], 'h': h})
+    covers.append((f'body_{bid}', poly_mask(BED_POLY[bid]), y1 * K))
 
 # ── 3) 눕기: 서는 자리(발), 눕는 자리(몸 밑 가운데), 머리 쪽(-1 왼쪽 / 1 오른쪽), 난간 가림
 BEDS = [
-    # id, 레일 키, 서기(x, y), 눕기(x, y), 머리
-    ('bed_left',  'bed3_left',  (258, 308), (252, 257), -1),
-    ('bed_back',  'bed1_back',  (628, 304), (738, 263), 1),
-    ('bed_front', 'bed2_front', (760, 374), (768, 324), 1),
+    # id, 레일 키, 서기(x, y), 눕기(x, y = 매트리스 윗면 화면 자리), 머리
+    ('bed_left',  'bed3_left',  (258, 304), (252, 257), -1),
+    ('bed_back',  'bed1_back',  (628, 300), (738, 263), 1),
+    ('bed_front', 'bed2_front', (760, 370), (768, 324), 1),
 ]
 
 
@@ -125,14 +145,14 @@ def rail_mask(key):
 
 
 for bid, key, _, (lx, ly), _ in BEDS:
-    covers.append((f'rail_{bid}', rail_mask(key), ly * K + 1))   # 누운 몸(깊이 = 눕는 자리 y) 바로 앞
+    covers.append((f'rail_{bid}', rail_mask(key), BED_FOOT[bid][3] * K + 3))   # 침대 위(눕기·서기, 깊이 = 앞 모서리+2) 몸 바로 앞
 
 # ── 검사
 floor_ok = np.zeros((H, W), bool)
 for x in range(W): floor_ok[top[x]:, x] = True
 for b in blocks:
     (x0, y0), (x1, _), (_, y1) = b['poly'][0], b['poly'][1], b['poly'][2]
-    floor_ok[y0 // K:y1 // K, x0 // K:x1 // K] = False
+    floor_ok[y0 // K:y1 // K + 1, x0 // K:x1 // K + 1] = False
 for name, x0, x1, y in AGAINST:
     bad = [x for x in range(x0, min(x1, W - 1) + 1) if top[x] <= y]
     if bad: raise SystemExit(f'바닥선이 {name} 안으로 {len(bad)}열 들어감 — 실패')
@@ -160,7 +180,7 @@ floor = [[x * K, y * K] for x, y in [(0, H)] + step + [(W, H)]]
 # 크기: 11-02 의무실 눕히기에서 정한 큐라스(가장 큰 남자) 기준 장면 배율 — 뒤 침대(y263) 0.545 · 앞 침대(y324) 0.65, 그 밖은 끝값 유지
 SIZES = [(263, 0.545), (324, 0.65)]
 door = {'kind': 'exit', 'x': DOOR_X * K, 'y': 420 * K, 'label': '나가기'}
-spots = [{'id': bid, 'x': sx * K, 'y': sy * K, 'verb': '눕기', 'face': head, 'seat': {'x': lx * K, 'y': ly * K}, 'act': ['bedlie', 'liehold']}
+spots = [{'id': bid, 'x': sx * K, 'y': sy * K, 'verb': '눕기', 'face': head, 'seat': {'x': lx * K, 'y': ly * K}, 'sortY': BED_FOOT[bid][3] * K + 2, 'act': ['bedlie', 'liehold']}
          for bid, _, (sx, sy), (lx, ly), head in BEDS]
 m = {'file': 'hq_infirmary_strip', 'bgScale': K, 'dotK': round(SIZES[-1][1] * K, 4), 'sizes': [[y * K, round(k / SIZES[-1][1], 3)] for y, k in SIZES],
      'w': W * K, 'h': H * K, 'under': True, 'floor': floor, 'lane': [int(top.min()) * K, H * K - 4], 'blocks': [{'poly': b['poly'], 'h': b['h']} for b in blocks],
