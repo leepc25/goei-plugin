@@ -37,7 +37,7 @@ for a in args:
     s = STAND; h = round(s.height * m['dotK'] * k_at(Y)); s = s.resize((round(s.width * h / s.height), h), Image.NEAREST)
     layers.append((sy, 1, (s, X - s.width // 2, Y - z - s.height)))
 import os
-for sp in ([] if os.environ.get('NOLIE') else m['spots']):   # 눕기: 몸 밑 가운데 = seat, 머리 = face 쪽 (원본 그림 머리 왼쪽)
+for sp in ([] if os.environ.get('NOLIE') else [x for x in m['spots'] if 'seat' in x]):   # 눕기: 몸 밑 가운데 = seat, 머리 = face 쪽 (원본 그림 머리 왼쪽)
     X, Y = sp['seat']['x'], sp['seat']['y']; s = LIE if sp['face'] < 0 else ImageOps.mirror(LIE)
     k = m['dotK'] * k_at(Y); s = s.resize((round(s.width * k), round(s.height * k)), Image.NEAREST)
     layers.append((sp['sortY'], 1, (s, X - s.width // 2, Y - s.height)))
@@ -53,4 +53,7 @@ for fx, fy in feet:
     ok = inside((X, Y), m['floor']) and not any(inside((X, Y), b['poly']) for b in m['blocks'] if b['h'] >= 400) and not any(inside((X, Y), b['poly']) for b in plats)
     print(fx, fy, '걷기 가능' if ok else '못 감')
     if not ok: d.line([(X - 8, Y - 8), (X + 8, Y + 8)], fill=(255, 0, 0), width=3); d.line([(X - 8, Y + 8), (X + 8, Y - 8)], fill=(255, 0, 0), width=3)
+for sp in m['spots']:   # 상호작용 자리: 노란 고리 + 이름
+    X, Y = sp['x'], sp['y']; d.ellipse([X - 10, Y - 6, X + 10, Y + 6], outline=(255, 220, 0), width=3); d.text((X + 12, Y - 8), sp['id'], fill=(255, 220, 0))
+dd = m['doors']['out']; d.ellipse([dd['x'] - 10, dd['y'] - 6, dd['x'] + 10, dd['y'] + 6], outline=(255, 120, 0), width=3); d.text((dd['x'] + 12, dd['y'] - 10), 'out', fill=(255, 120, 0))
 img.convert('RGB').save(sys.argv[1])

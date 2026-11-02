@@ -374,9 +374,9 @@ const unresolved = (t) => [...new Set((t.match(/\{\{[^}]*\}\}/g) ?? []))].filter
       window.__chat.goeiFieldV1 = { events: [{ id: 'f1', at: 2, anchor: 'c1', kind: 'move', text: '휴게실로 이동', fact: { key: '위치', value: '본부 휴게실' } }, { id: 'f2', at: 3, anchor: 'gone', kind: 'kill', text: '사라진 메시지', fact: { key: '사망', value: '누군가', permanent: true } }] };
     });
     const out = await request(page, [sys('S'), bot(greeting), usr('쟈알디와 인사한다.'), bot('쟈알디가 손을 흔들었다.'), usr('본부로 돌아간다.')]);
-    const il = out.findIndex((m) => m.content.startsWith('[필드 막간]'));
+    const il = out.findIndex((m) => m.content.startsWith('[Field log]'));   // 10-31 [Field log] 형식(영어 짧은 문장, 사건은 글만)
     assert.ok(il > 0 && out[il - 1].content === '쟈알디가 손을 흔들었다.', '막간은 대화가 일어난 메시지 바로 뒤');
-    assert.ok(out[il].content.includes('스팡달: 어, 왔어?') && out[il].content.includes('(이동) 휴게실로 이동'));
+    assert.ok(out[il].content.includes('스팡달: 어, 왔어?') && out[il].content.includes('휴게실로 이동'));
     const ff = out.findIndex((m) => m.content.startsWith('[Field facts]'));
     const lastUser = out.map((m) => m.role).lastIndexOf('user');
     assert.ok(ff > il && ff < lastUser && out[lastUser].content === '본부로 돌아간다.' && out.slice(ff + 1, lastUser).every((m) => m.role === 'system'), `사실 블록은 막간 뒤·마지막 사용자 앞: ${JSON.stringify(out.map((m) => [m.role, m.content.slice(0, 20)]))}`);

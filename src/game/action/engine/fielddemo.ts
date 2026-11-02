@@ -36,14 +36,16 @@ const state = () => ({ visitor: { agentId: '', name: q.get('char') || '에일린
 const saves = new Map<string, unknown>();
 let won = 140000; let fd: unknown = null; let prefs: unknown = null;
 const vp = { full: false, rotated: false, mode: null as string | null, async enter(k = 'browser') { this.mode = k; }, async exit() { this.mode = null; }, toLocal: (x: number, y: number, el: Element) => { const r = el.getBoundingClientRect(); return { x: x - r.left, y: y - r.top }; }, onChange: () => () => {} };
-const bridge = {
-  api: 1, slot: 0,
-  uiPrefs: { load: async () => prefs, save: (t: unknown) => { prefs = t; } },
-  visit: {
+// ?start=stage=... (시험 tests/engine·qc-combat): modules.ts boot 은 visit 이 있으면 늘 제목 화면이라, 그때는 visit 없이 연다
+const visit = {
     state: async () => state(),
     send: async (id: string, text: string) => { turns.push({ id: String(turns.length), at: Date.now(), agentId: id, name: id, user: text, reply: '(시연판: 모델 없음) 응, 알았어.' }); return state(); },
     sendMob: async (mob: { id: string; name: string; place?: string }, text: string) => { turns.push({ id: String(turns.length), at: Date.now(), agentId: mob.id, name: mob.name, user: text, reply: '(시연판: 모델 없음) 네? 저요?', room: mob.place }); return state(); },
-  },
+};
+const bridge = {
+  api: 1, slot: 0,
+  uiPrefs: { load: async () => prefs, save: (t: unknown) => { prefs = t; } },
+  ...(q.has('start') ? {} : { visit }),
   wallet: { balance: async () => won, add: async (n: number) => (won += n) },
   fieldState: { load: async () => fd, save: async (t: unknown) => void (fd = t) },
   field: { record: async () => {}, entry: async () => ({ allow: true, presence: 'none', site: 'hq', minute }) },

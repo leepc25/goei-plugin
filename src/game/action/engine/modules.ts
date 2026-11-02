@@ -1429,7 +1429,8 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
     drawIdle: (name, ctx, t) => {
       if (name === 'title') drawTitleBg(ctx, t, VISIT_TITLE.title, VISIT_TITLE.sub);
     },
-    boot: (g) => { void hq.visitReady.then(() => { if (bridge?.visit || !bootFromUrl(g)) g.toTitle(); }); return true; },
+    // 11-02: 인물 팩을 필요할 때 받게 되면서(packs ensure) visitReady 가 몇 초 뒤에 풀린다. 그새 제목에서 본부로 들어갔으면 다시 제목으로 보내지 않는다
+    boot: (g) => { void hq.visitReady.then(() => { if (g.world || g.inHub) return; if (bridge?.visit || !bootFromUrl(g)) g.toTitle(); }); return true; },
     dispose: () => {
       offHidden?.();
       hq.dispose();

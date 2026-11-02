@@ -225,20 +225,23 @@ const ok = (name, detail = '') => { results.push(`${name} · 통과${detail ? ` 
   assert.equal(after1, wallet0 - 3000, `가계부 거래 뒤 잔고 ${wallet0}→${after1}`);
   await page.waitForFunction(() => (window.__chat.goeiFieldV1?.events ?? []).some((e) => e.kind === 'trade'), null, { timeout: 5000 });
   const w = await page.evaluate(() => ({ raw: window.__chat.scriptstate.$st_wallet, ev: window.__chat.goeiFieldV1.events.find((e) => e.kind === 'trade') }));
-  assert.match(String(w.raw ?? ''), /QC 거래/, '가계부 변수에 필드 거래가 적힘');
-  assert.match(w.ev.text, /QC 거래 −3,000원/);
+  // 10-31 사용자 결정(인계서 §6-2): 필드 돈은 바로 가계부 변수에 쓰지 않고 응답 보내기 직전(필드 마감)에 한 줄로 정산한다. 장부 사건은 영어 글 + 한국어 ko
+  assert.match(w.ev.text, /Money: -3000 QC 거래/, `장부 거래 글 ${w.ev.text}`);
+  assert.match(w.ev.ko, /QC 거래 −3,000원/, `장부 거래 ko ${w.ev.ko}`);
   // 시간 보내기 (앉기 자리) → 장부 사건과 필드 시각 사실
   await page.evaluate(() => window.__goeiEngine.world.stage.jump('office', 400));
   await page.waitForFunction(() => window.__goeiEngine.world?.stage.current()?.id === 'office', null, { timeout: 10000 });
   await page.waitForTimeout(1300);
-  await page.evaluate(() => { const w = window.__goeiEngine.world; const s = w.stage.current().spots.find((q) => q.id === 'seat'); w.player.x = s.x; w.player.y = s.y; });
+  await page.evaluate(() => { const w = window.__goeiEngine.world; const s = w.stage.current().spots.find((q) => q.id === 'desk3') ?? w.stage.current().spots.find((q) => q.seat); /* 11-02 그림 사무실: 책상 자리 desk1~8 (desk3 = 에일린) */ w.player.x = s.x; w.player.y = s.y; });
   await page.waitForTimeout(300);
   await page.keyboard.press('KeyE');
   await waitSel(page, '.mn.on');
   assert.match(await page.textContent('.mn.on'), /시간 보내기/);
   await page.keyboard.press('Enter'); // 첫 선택지 (30분)
-  await page.waitForFunction(() => (window.__chat.goeiFieldV1?.events ?? []).some((e) => /시간을 보냈다/.test(e.text)), null, { timeout: 5000 });
-  const waited = await page.evaluate(() => window.__chat.goeiFieldV1.events.find((e) => /시간을 보냈다/.test(e.text)));
+  // 10-31 [Field log] 형식: 글은 영어 「{user} waited until HH:MM.」, ko 「까지 시간 보냄」
+  await page.waitForFunction(() => (window.__chat.goeiFieldV1?.events ?? []).some((e) => /waited until/.test(e.text)), null, { timeout: 5000 });
+  const waited = await page.evaluate(() => window.__chat.goeiFieldV1.events.find((e) => /waited until/.test(e.text)));
+  assert.match(waited.ko, /까지 시간 보냄/, `ko ${waited.ko}`);
   assert.equal(waited.kind, 'act');
   assert.equal(waited.fact?.key, 'field time');
   assert.match(waited.fact.value, /^11:/, `본편 10:20 + 장면 10분 ×2 + 30분 → ${waited.fact.value}`);
@@ -255,45 +258,7 @@ const ok = (name, detail = '') => { results.push(`${name} · 통과${detail ? ` 
   assert.equal(prefs.tScene, 10, '필드 시간 기본값도 같이 저장');
   await page.keyboard.press('Escape'); await page.keyboard.press('Escape');
   ok('$hq_ui 채팅별 설정 저장');
-  // 다리: 출동 종료 → 보고서 (기록 묶음 3): 플러그인이 exit_anomaly 를 받아 같은 저장에 일지 fd 줄·전체 보고서를 만들고, 필드 탭 위에 시트, lastReport 다리로 게임에 알린다
-  assert.ok(await page.evaluate(() => !!window.__goeiBridge?.field?.lastReport), '플러그인 다리 노출 ($goei_diag=1 진단용)');
-  assert.equal(await page.evaluate(() => window.__goeiBridge.field.lastReport()), null, '출동 전엔 보고서 없음');
-  await page.evaluate(async () => {
-    const f = window.__goeiBridge.field;
-    await f.record({ kind: 'enter_anomaly', text: '작전 투입: 젖은 복도', weight: 3, visit: 'qc1', fact: { key: '작전', value: '투입 중 (젖은 복도)' } });
-    await f.record({ kind: 'kill', text: '그림자를 처치했다', who: ['에일린'], visit: 'qc1' });
-    await f.record({ kind: 'exit_anomaly', text: '작전 종료 (귀환): 젖은 복도, 처치 1, 부상 0', weight: 3, visit: 'qc1', fact: { key: '작전', value: '종료 (귀환)' } });
-  });
-  await page.waitForFunction(() => JSON.parse(window.__chat.scriptstate.$goei_journal ?? '{"rows":[]}').rows.some((r) => r.kind === 'fd'), null, { timeout: 5000 });
-  const fd = JSON.parse(await page.evaluate(() => window.__chat.scriptstate.$goei_journal)).rows.find((r) => r.kind === 'fd');
-  const frpt = JSON.parse(await page.evaluate(() => window.__chat.scriptstate.$goei_reports)).items.find((r) => r.id === fd.rpt);
-  assert.ok(fd.mine && fd.cause === 'field' && fd.name === '젖은 복도' && frpt?.full && frpt.mine, JSON.stringify(fd));
-  assert.deepEqual(frpt.trail.map((t) => t.text), ['작전 투입: 젖은 복도', '(처치) 그림자를 처치했다', '작전 종료 (귀환): 젖은 복도, 처치 1, 부상 0']);
-  assert.ok(frpt.agents.some((a) => a.name === '에일린') && frpt.agents.length >= 2, `투입 ${JSON.stringify(frpt.agents)}`);
-  assert.equal(frpt.statusKey, undefined, '필드 종료는 응답이 아니라 채팅 카드 열쇠가 없다');
-  assert.ok(frpt.head.since !== null && frpt.head.duration !== null && frpt.head.duration >= 1, `시각 ${JSON.stringify(frpt.head)}`);
-  const last = await page.evaluate(() => window.__goeiBridge.field.lastReport());
-  assert.ok(last && last.id === frpt.id && last.title === '젖은 복도' && last.summary.includes('에일린'), JSON.stringify(last));
-  await waitSel(page, '.gx-fieldsheet');
-  const sheet = await page.textContent('.gx-fieldsheet');
-  assert.ok(sheet.includes('출동 종료') && sheet.includes('젖은 복도') && sheet.includes('에일린') && sheet.includes('내가 출동'), sheet);
-  assert.ok(await page.evaluate(() => !!window.__goeiEngine && !!document.querySelector('.gx-game')), '시트가 떠도 게임은 붙어 있다');
-  if (shots) await page.screenshot({ path: `${shots}/qc-plugin-fieldsheet.png` });
-  await page.click('.gx-fieldsheet [data-action="rec-open"]');
-  await waitSel(page, '.gx-records .gx-rpt');
-  assert.ok((await page.textContent('.gx-rpt')).includes('필드 출동') && (await page.textContent('.gx-rpt')).includes('젖은 복도'));
-  assert.ok(await page.evaluate(() => !!window.__goeiEngine), '기록 탭으로 가도 게임은 떼어 둔 채 산다');
-  await page.locator('[data-value="field"]:visible').first().click();
-  await waitSel(page, '.gx-game .goei-engine canvas');
-  assert.equal(await page.locator('.gx-fieldsheet').count(), 0, '보고서를 열면 시트는 닫힘');
-  await waitSel(page, '.mn.on'); // 떼었다 붙이면 일시정지 메뉴가 열려 있다 → 닫기
-  await page.keyboard.press('Escape');
-  await page.waitForFunction(() => !document.querySelector('.mn.on'));
-  // 같은 출동을 다시 받아도 한 번 (같은 방문·같은 투입 사건)
-  await page.evaluate(async () => { await window.__goeiBridge.field.record({ kind: 'exit_anomaly', text: '작전 종료 (귀환): 젖은 복도, 처치 1, 부상 0', weight: 3, visit: 'qc1' }); });
-  await page.waitForTimeout(400);
-  assert.equal(JSON.parse(await page.evaluate(() => window.__chat.scriptstate.$goei_journal)).rows.filter((r) => r.kind === 'fd').length, 1, '중복 없음');
-  ok('다리: 출동 종료 → 일지 fd 줄·전체 보고서·필드 시트·lastReport', `${frpt.no} · ${last.summary}`);
+  // (출동 종료 → 보고서 절은 10-29 「차원 승강기 출동 전부 삭제」(73b0aee5) 로 기능이 없어져 11-02 뺌)
   // 인물 대화: 요원 옆에서 E → 말풍선 입력 → 모델 응답 → 채팅 goeiHqVisitV1 에 기록, 본편 채팅 메시지는 늘지 않음
   const who = await page.evaluate(() => { const w = window.__goeiWorld; const a = w.actors.find((q) => q.def.kind === 'named'); return a ? { name: a.def.name, scene: a.scene, x: a.x, y: a.y } : null; });
   assert.ok(who, '필드에 선 요원이 있다');
@@ -365,7 +330,7 @@ const ok = (name, detail = '') => { results.push(`${name} · 통과${detail ? ` 
   const text = req.map((m) => m.content).join('\n');
   assert.match(text, /\[Field log\]/, '막간이 요청에 들어감');
   assert.match(text, /안녕하세요[\s\S]*왔구나/, '대화 원문');
-  assert.match(text, /\(이동\)/, '장부 사건');
+  assert.match(text, /moved to/, '장부 사건 (10-31 형식: 영어 「{user} moved to …」)');
   assert.match(text, /\[Field facts\][\s\S]*location/, '확정 사실');
   assert.equal(await page.evaluate(() => (window.__calls.send ?? []).length), 0, '자동 전송 없음');
   assert.equal(await page.evaluate(() => window.__chat.message.length), msgs0, '채팅 메시지 수 그대로');

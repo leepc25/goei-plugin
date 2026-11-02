@@ -11,7 +11,7 @@ import type { PaintedScene } from './painted';
 
 export type SceneId =
   | 'street' | 'pasta' | 'lobby' | 'swat' | 'f2' | 'f3' | 'office' | 'interview' | 'lounge' | 'wc' | 'wc3'
-  | 'b1' | 'edu' | 'training' | 'clinic' | 'b2' | 'b3' | 'tooth' | 'bath_f' | 'bath_m' | 'shower_f' | 'shower_m'
+  | 'b1' | 'edu' | 'training' | 'clinic' | 'infirmary' | 'b2' | 'b3' | 'tooth' | 'bath_f' | 'bath_m' | 'shower_f' | 'shower_m'
   | 'jr_entry' | 'jr_b1' | 'jr_alley' | 'jr_b2'
   | 'jr_daebak' | 'jr_heolgap' | 'jr_youngchang' | 'jr_songil' | 'jr_jinryo' | 'jr_op'
   | 'by_f13' | 'by_wc_m' | 'by_wc_f' | 'by_lounge' | 'by_office'
@@ -161,11 +161,13 @@ const lockerSpots = (id: 'shower_f' | 'shower_m'): HqSpot[] => LOCKERS[id].map((
 /** 샤워실 그림의 샤워기 발 자리 → NPC가 서는 자리 (11-02 NPC 샤워) */
 const showerSpots = (id: SceneId) => (PAINTED[id]?.showers ?? []).map((s) => ({ id: s.id, x: s.foot[0], y: s.foot[1], face: s.face }));
 function floorHall(id: SceneId, name: string, floor: HqScene['floor'], doors: Omit<HqDoor, 'x'>[], extra: Partial<HqScene> = {}): HqScene {
-  const p = PAINTED[id];
+  // extra.painted: 다른 장면 그림을 쓰는 방 (11-02 진압팀 사무실 'swat' = 종합대응팀 지도 office_riot 색만 다름)
+  const pid = extra.painted ?? id;
+  const p = PAINTED[pid];
   // 그림 속 의자(11-02 휴게실): 상자(kind chair, 그림은 drawChair가 set 그림으로)·앉는 자리·NPC 자리. 자리의 chair 번호는 의자 차례 → 상자 번호
   const chairBoxes: HqBox[] = (p.chairs ?? []).map((ch) => ({ kind: 'chair', x: ch.x, w: 54, y: ch.y, d: 20, h: 150, solid: false, face: ch.face, set: ch.set }));
   // 맵 에디터로 만든 장면이면 앉는 자리도 그쪽 것
-  if (MAPEDIT_SPOTS[id]?.length) extra = { ...extra, spots: MAPEDIT_SPOTS[id] };
+  if (MAPEDIT_SPOTS[pid]?.length) extra = { ...extra, spots: MAPEDIT_SPOTS[pid] };
   if (p.stations?.length && !extra.stations) extra = { ...extra, stations: p.stations };
   const sc = floorHallBase(id, name, floor, doors, p, extra);
   if (chairBoxes.length) {
@@ -179,7 +181,7 @@ function floorHall(id: SceneId, name: string, floor: HqScene['floor'], doors: Om
 function floorHallBase(id: SceneId, name: string, floor: HqScene['floor'], doors: Omit<HqDoor, 'x'>[], p: PaintedScene, extra: Partial<HqScene>): HqScene {
   return {
     ...(p.posts ? { posts: p.posts } : {}), id, name, floor, look: id.startsWith('jr_') ? 'jr' : p.under ? 'labhall' : id === 'lobby' ? 'lobby' : 'hall', painted: id, length: p.w, lane: p.lane ?? PAINTED_LANE,
-    doors: doors.map((d) => ({ ...d, x: doorX(id, d.id) })),
+    doors: doors.map((d) => ({ ...d, x: doorX(extra.painted ?? id, d.id) })),
     spots: [], fixtures: [], things: [],
     // 막는 상자는 그림을 그리지 않는다 (오브젝트 그림은 첫 상자 자리에서 한 번만, 깊이 순서는 sortY)
     boxes: [
@@ -217,7 +219,8 @@ export const HQ_SCENES: HqScene[] = [
   ]),
   // 화장실은 그림 장면(PixelLab 11-01, tools/mapedit/author_hq_wc.py): 대변기 칸·소변기·세면대 자리(toilets). 나가는 곳은 화면 아래 오른쪽
   floorHall('wc', '화장실(남)', '2F', [{ id: 'out', kind: 'exit', side: 'S', to: 'f2', toDoor: 'wc', label: '나가기' }], { toilets: PAINTED.wc?.toilets, sex: '남' }),
-  room({ id: 'swat', name: '진압팀', floor: '2F', look: 'office', doors: [exitS('f2', 'swat', 'swat', true)] }, 'swat', true),
+  // 진압팀 사무실(2F): 종합대응팀 사무실 지도(game-src/mapedit/office_riot, 배경 색만 B안)를 그대로 씀 (사용자 11-02 09:10·12:52). 책상 8개 = 주인 자리 + 빈 책상은 누구나(사용자 09:05)
+  floorHall('swat', '진압팀', '2F', [{ id: 'out', kind: 'exit', side: 'S', to: 'f2', toDoor: 'swat', label: '나가기' }], { painted: 'office_riot' }),
   // 3층은 새 본부 그림(PixelLab 2026-10-31~11-01, game-src/mapedit/hq_f3): 서→동 종합대응팀 유리문 · 엘리베이터 · 화장실(여) · 휴게실. 계단·탕비실 없음(본부 최소화, 사용자 10-31)
   floorHall('f3', '3층', '3F', [
     { id: 'office', kind: 'glass', to: 'office', toDoor: 'out', label: '종합대응팀' },
@@ -228,7 +231,8 @@ export const HQ_SCENES: HqScene[] = [
   floorHall('wc3', '화장실(여)', '3F', [{ id: 'out', kind: 'exit', side: 'S', to: 'f3', toDoor: 'wc', label: '나가기' }], { toilets: PAINTED.wc3?.toilets, sex: '여' }),
   // 휴게실: 그림 장면(PixelLab 11-02, tools/mapedit/author_hq_lounge.py). 테이블 3개는 올라설 수 있는 발판, 의자 12개(쉘 의자 'L'), 출입문 = 비상구 표지 밑 유리문 → 3층 복도
   floorHall('lounge', '휴게실', '3F', [{ id: 'out', kind: 'exit', to: 'f3', toDoor: 'lounge', label: '나가기' }]),
-  room({ id: 'office', name: '종합대응팀', floor: '3F', look: 'office', doors: [exitS('f3', 'office', 'office')] }, 'office'),
+  // 종합대응팀 사무실(3F): 그림 장면(PixelLab, game-src/mapedit/office, 지도 v2 확정 11-02 08:52). 책상 8개(주인 자리·빈 책상은 누구나)·복사기·화이트보드·정수기·커피
+  floorHall('office', '종합대응팀', '3F', [{ id: 'out', kind: 'exit', side: 'S', to: 'f3', toDoor: 'office', label: '나가기' }]),
   // 지하 1층은 새 본부 그림(PixelLab 11-01, game-src/mapedit/b1): 서→동 샤워실(여) · 샤워실(남) · 훈련장 양문 · 엘리베이터. 교육장·계단 없음(본부 최소화)
   floorHall('b1', '지하 1층', 'B1', [
     // 샤워실 두 곳(11-01): 여자 = 확정 그림 bath_f, 남자 = 같은 그림 색 바꾼 bath_m (game-src/mapedit/bath_*)
@@ -278,8 +282,12 @@ export const HQ_SCENES: HqScene[] = [
     { id: 'elev', kind: 'elevator' },
   ]),
   // 의무실 겸 실험실: 의무실(침대) + 격리 연구실(연구·감정)을 한 방으로. 장비 보급은 B3 보급실로 옮김
-  { ...room({ id: 'clinic', name: '의무실·연구실', floor: 'B2', look: 'lab', doors: [] }, 'medlab'), doors: [exitS('b2', 'clinic', 'medlab')] },
+  // 격리팀 사무실(연구실): 그림 장면은 아직(격리팀 연구실 스레드, hq_b2_lab p20까지). 옛 방 그대로 두고 의무실 문만 북쪽 벽에 둔다 (사용자 11-02 13:11 「의무실은 격리팀 사무실 통해서 들어간다」)
+  { ...room({ id: 'clinic', name: '격리팀 사무실', floor: 'B2', look: 'lab', doors: [] }, 'medlab'), doors: [exitS('b2', 'clinic', 'medlab'), { id: 'infirmary', x: M(6), kind: 'door', to: 'infirmary', toDoor: 'out', label: '의무실' }] },
   room({ id: 'tooth', name: '격리실', floor: 'B2', look: 'lab', doors: [exitS('b2', 'isolation', 'tooth')] }, 'tooth'),
+  // 의무실(B2, PixelLab 11-02 hq_b2_infirmary_p9_fix2, tools/mapedit/author_hq_infirmary.py): 침대 3(눕기)·약품장·세면대·처치 카트.
+  // 들어가는 길: 지하 2층 복도 → 격리팀 사무실(연구실) → 북쪽 벽 「의무실」 문 (사용자 11-02 13:11). 나가면 격리팀 사무실 그 문 앞
+  floorHall('infirmary', '의무실', 'B2', [{ id: 'out', kind: 'exit', side: 'S', to: 'clinic', toDoor: 'infirmary', label: '나가기' }]),
   floorHall('b3', '지하 주차장', 'B3', [
     { id: 'supply', kind: 'steel', place: 'supply', label: '보급실' },
     { id: 'elev', kind: 'elevator' },

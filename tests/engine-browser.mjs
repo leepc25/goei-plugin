@@ -7,7 +7,9 @@ import { resolve } from 'node:path';
 const require = createRequire(import.meta.url);
 const { chromium } = require(process.env.PLAYWRIGHT_MODULE || `${execSync('npm root -g').toString().trim()}/playwright`);
 const shots = process.env.SHOTS;
-const url = pathToFileURL(resolve('dist/goei-action-game.html')).href;
+// 11-02: 옛 시연판(dist/goei-action-game.html)에는 인물 팩이 없어 주인공 코어가 안 선다 → 필드 시연판(release/demo/goei-field-demo.html, 팩은 ?base= 로 저장소 game-pack/ 에서) 을 공용 http 서버로
+const url = process.env.GAME_URL || pathToFileURL(resolve('dist/goei-action-game.html')).href;
+const withQ = (q) => url + (url.includes('?') ? '&' : '?') + q;
 const browser = await chromium.launch({ executablePath: process.env.CHROMIUM_PATH || '/opt/pw-browsers/chromium', headless: true, args: ['--no-sandbox', '--allow-file-access-from-files'] });
 const errors = [];
 const S = (page, name) => (shots ? page.screenshot({ path: `${shots}/${name}.png` }) : null);
@@ -16,7 +18,9 @@ const hold = async (page, key, ms) => { await page.keyboard.down(key); await pag
 try {
   const page = await browser.newPage({ viewport: { width: 1280, height: 720 } });
   page.on('pageerror', (e) => errors.push(String(e)));
-  page.on('console', (m) => m.type() === 'error' && errors.push(m.text()));
+  // 정적 서버(http)로 열면 브라우저가 favicon.ico 를 찾아 404 를 콘솔에 남긴다: 그건 뺀다 (11-02)
+  page.on('console', (m) => m.type() === 'error' && !/favicon/.test(m.location()?.url ?? '') && errors.push(m.text()));
+  page.on('response', (r) => r.status() >= 400 && !/favicon/.test(r.url()) && errors.push(`HTTP ${r.status()} ${r.url()}`));
   await page.goto(url);
   await page.waitForFunction(() => window.__goeiEngine);
   await page.waitForTimeout(400);
@@ -24,7 +28,7 @@ try {
   // 저장이 없으면 이어하기가 없다
   assert.equal(await page.getByText('이어하기').count(), 0, '저장 없이 이어하기');
   // 시작 꼬리표로 허수아비 연습에서 조작 확인
-  await page.goto(url + '?start=stage=dummy');
+  await page.goto(withQ('start=stage=dummy'));
   await page.waitForFunction(() => window.__goeiEngine && window.__goeiEngine.world);
   await page.waitForTimeout(400);
   await S(page, 'pc-start');
@@ -85,16 +89,16 @@ try {
   await page.waitForTimeout(300);
   await S(page, 'pc-hq');
   // 옛 임무 창구 자리(잼트리 책상)는 닫혀 있다
-  assert.equal(await page.evaluate(() => window.__goeiEngine.world.stage.current().spots.find((q) => q.id === 'jaemtri')?.open), false, '임무 창구 자리 닫힘');
+  assert.equal(await page.evaluate(() => window.__goeiEngine.world.stage.current().spots.find((q) => q.id === 'jaemtri')), undefined, '옛 임무 창구 자리(잼트리 책상) 없음 — 10-29 출동 삭제');
   // 모바일 가로
   const m = await browser.newPage({ viewport: { width: 844, height: 390 }, hasTouch: true, isMobile: true });
   m.on('pageerror', (e) => errors.push(String(e)));
-  await m.goto(url + '?touch=1');
+  await m.goto(withQ('touch=1'));
   await m.waitForFunction(() => window.__goeiEngine);
   await m.waitForTimeout(300);
   const box = await m.evaluate(() => { const r = document.querySelector('canvas').getBoundingClientRect(); return [r.x, r.y, r.width, r.height]; });
   void box;
-  await m.goto(url + '?touch=1&start=stage=dummy');
+  await m.goto(withQ('touch=1&start=stage=dummy'));
   await m.waitForFunction(() => window.__goeiEngine && window.__goeiEngine.world);
   await m.waitForTimeout(500);
   await S(m, 'm-start');
