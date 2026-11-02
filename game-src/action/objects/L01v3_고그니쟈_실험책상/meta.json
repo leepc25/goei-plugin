@@ -1,0 +1,86 @@
+{
+ "object_id": "1ee73832-a69f-4dbd-957f-6dc306b23d1b",
+ "job": {
+  "usage": {
+   "type": "usd",
+   "usd": 0.0409668917810652
+  },
+  "id": "d32b0281-4243-4ba5-857e-eb898093b8db",
+  "status": "completed",
+  "created_at": "2026-11-02T09:28:03.051523+00:00",
+  "last_response": {
+   "status": "completed",
+   "progress": 1,
+   "object_id": "1ee73832-a69f-4dbd-957f-6dc306b23d1b",
+   "image_size": {
+    "width": 256,
+    "height": 256
+   },
+   "frame_count": 1,
+   "single_frame": true,
+   "storage_urls": {
+    "unknown": "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/1ee73832-a69f-4dbd-957f-6dc306b23d1b/rotations/unknown.png"
+   },
+   "billing_usage": {
+    "usd": 0.0409668917810652,
+    "type": "usd"
+   },
+   "generation_id": "d21d37b7-6139-4456-82c8-67527370b44e",
+   "billing_stages": [
+    {
+     "stage": "first_direction",
+     "usage": {
+      "usd": 0.0409668917810652,
+      "type": "usd"
+     },
+     "generation_id": "d21d37b7-6139-4456-82c8-67527370b44e"
+    }
+   ],
+   "billing_charged": true,
+   "generation_mode": "pro_flash",
+   "source_image_id": "14744745-4fae-5dc8-ad67-45e6187a9e0d",
+   "directions_count": 1,
+   "first_direction_generated": true
+  }
+ },
+ "object": {
+  "id": "1ee73832-a69f-4dbd-957f-6dc306b23d1b",
+  "name": "L01v3_고그니쟈_실험책상",
+  "state_name": "base",
+  "prompt": "A laboratory work desk with things on it: two switched-on monitors with bright lit screens showing graphs and readings, a keyboard, a small control box with a black remote control, a coffee mug, and stacks of research papers. A plain rectangular steel lab desk with a flat steel top and a steel cabinet under one side. The monitors face the viewer, their lit screens fully visible. Seen almost straight from the front, from the eye height of a standing adult, looking only a little down: the desk top shows as a thin band, much thinner than the front of the desk; the front and back edges of the top are straight horizontal lines of the same length, and the desk sides are straight vertical, with no perspective narrowing. The desk is much wider than it is tall and fills almost the whole width of the canvas. Only the desk with the things on it, centered, nothing else.",
+  "size": {
+   "width": 256,
+   "height": 256
+  },
+  "directions": 1,
+  "created_at": "2026-11-02T09:28:03.083549+00:00",
+  "view": "low top-down",
+  "rotation_urls": {
+   "south": null,
+   "west": null,
+   "east": null,
+   "north": null,
+   "south-east": null,
+   "south-west": null,
+   "north-east": null,
+   "north-west": null
+  },
+  "storage_urls": {
+   "unknown": "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/1ee73832-a69f-4dbd-957f-6dc306b23d1b/rotations/unknown.png"
+  },
+  "frame_urls": null,
+  "style_settings": {
+   "version": "v2.0.0+api",
+   "no_background": true,
+   "generation_mode": "pro_flash",
+   "source_image_id": "14744745-4fae-5dc8-ad67-45e6187a9e0d",
+   "first_frame_direction": "south"
+  },
+  "tags": [],
+  "status": "completed",
+  "group_id": "247e77a6-cec6-48bc-ac1e-604ea49ab98d",
+  "progress_percent": null,
+  "eta_seconds": null,
+  "animations": []
+ }
+}

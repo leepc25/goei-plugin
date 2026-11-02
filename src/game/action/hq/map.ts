@@ -192,24 +192,16 @@ function floorHallBase(id: SceneId, name: string, floor: HqScene['floor'], doors
 }
 
 export const HQ_SCENES: HqScene[] = [
-  // ── 바깥 (그대로 둠) ──
-  {
-    id: 'street', name: '종로 뒷골목', floor: 'out', length: 1920, look: 'street', legacy: true, boxes: [], fixtures: [], spots: [],
-    doors: [
-      { id: 'main', x: 640, kind: 'main', to: 'lobby', toDoor: 'main' }, { id: 'pasta', x: 1500, kind: 'shop', to: 'pasta', toDoor: 'out', needs: 'pasta' },
-      // 임시 연결: 이동수단(노선표)이 생기기 전까지 거리 동쪽 끝에서 중림으로 바로 간다
-      { id: 'jr', x: 1840, kind: 'exit', side: 'S', to: 'jr_entry', toDoor: 'west', label: '중림 지하상가 (임시)' },
-    ],
-    things: [{ kind: 'streetlamp', x: 300, w: 30, h: 360 }, { kind: 'streetlamp', x: 1150, w: 30, h: 360 }, { kind: 'bike', x: 860, w: 120, h: 80 }],
-  },
+  // ── 바깥 ──
+  // 관리국 앞 종로 거리: 그림 장면(PixelLab 11-02, tools/mapedit/author_hq_street.py). 「청진빌딩」 간판 아래 유리문 = 관리국 현관, 맨 왼쪽 정류장 표지 = 버스 정류장(임시로 중림 지하상가 입구).
+  // 파스타집은 뺐다(사용자 11-02 12:35 「파스타집은 뺄거야」)
+  floorHall('street', '종로 거리', 'out', [
+    { id: 'jr', kind: 'exit', side: 'S', to: 'jr_entry', toDoor: 'west', label: '버스 정류장' },
+    { id: 'main', kind: 'glass', to: 'lobby', toDoor: 'main', label: '관리국 현관' },
+  ]),
   // 10-31 사용자: 종로 큰길·지하철 승강장·지역 회색 장면 4곳(영등포·강남·망원·여의도)과 편의점·노점은 가설로 만든 것이라 뺐다.
   // 거리는 각 세력·중립 건물로 들어가는 길거리뿐 — 지도가 완성되면 그때 더한다
-  {
-    id: 'pasta', name: '파스타집', floor: 'out', length: 1280, look: 'pasta', legacy: true, boxes: [], fixtures: [],
-    doors: [{ id: 'out', x: 110, kind: 'shop', to: 'street', toDoor: 'pasta' }],
-    spots: [{ id: 'table', x: 680, place: 'pasta', who: '전원', verb: '회식' }],
-    things: [{ kind: 'long_table', x: 680, w: 520, h: 90 }, { kind: 'kitchen_window', x: 1050, w: 220, h: 120, wall: true }],
-  },
+
   // ── 층 복도는 확정 배경 그림 6장 (hq/painted.ts). 문은 그림의 문 순서대로 (서→동). 사용자 배치 2026-10-25 ──
   floorHall('lobby', '1층 로비', '1F', [
     { id: 'main', kind: 'glass', to: 'street', toDoor: 'main', label: '현관' },

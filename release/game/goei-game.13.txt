@@ -1835,7 +1835,7 @@ ness aloud, concealing none of her calculation.
       }
       if (close) b?.close?.();
     };
-    b?.onBeforeSend?.(() => b?.visit ? endVisit(true, "send") : Promise.resolve());
+    const offBeforeSend = b?.onBeforeSend?.(() => b?.visit ? endVisit(true, "send") : Promise.resolve());
     fieldLink.endVisit = (close) => void endVisit(close);
     let koT = 0, koDone = false;
     const knockedOut = (dt, sceneId) => {
@@ -2253,6 +2253,7 @@ ness aloud, concealing none of her calculation.
           window.removeEventListener("keydown", onObserveKey);
         }
         offPeople?.();
+        offBeforeSend?.();
         const g = globalThis;
         if (g.__goeiWallet === walletHook) delete g.__goeiWallet;
         if (sim && g.__goeiWorld === sim) delete g.__goeiWorld;
@@ -2850,4 +2851,4 @@ ness aloud, concealing none of her calculation.
         if (game?.inHub && !mods.blocking?.() && !shell.paused) {
           const me = hq2.visitor();
           const name = me.name || (w.player instanceof FighterPlayer ? w.player.label : "방문자");
-          const face = w.player instanceof FighterPlayer ? charFace(
+          const fac

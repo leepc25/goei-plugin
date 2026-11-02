@@ -615,14 +615,18 @@ Return the JSON object.` }
 
   // src/host/game/field.ts
   var KINDS3 = ["move", "act", "hurt", "down", "kill", "flee", "provoke", "gift", "trade", "quest", "follow", "unfollow", "enter_anomaly", "exit_anomaly", "enter_site", "detected", "appoint", "call", "enter_field", "exit_field"];
-  var tails = /* @__PURE__ */ new Set();
-  var fieldIdle = () => Promise.all([...tails].map((t) => t()));
+  var tails = /* @__PURE__ */ new Map();
+  var fieldIdle = () => Promise.all([...tails.values()].map((t) => t()));
+  function releaseField(f) {
+    const t = tails.get(f);
+    if (t) void t().catch(() => {
+    }).finally(() => tails.delete(f));
+  }
   function createField() {
     const opening = loadContext();
     let chain2 = Promise.resolve();
-    tails.add(() => chain2);
     let forced = null;
-    return {
+    const field4 = {
       override(v) {
         forced = v;
       },
@@ -691,6 +695,8 @@ Return the JSON object.` }
         return n2 && n2.cause === "field" ? { id: n2.id, title: n2.title, summary: n2.summary } : null;
       }
     };
+    tails.set(field4, () => chain2);
+    return field4;
   }
 
   // src/core/fab.ts
@@ -3657,8 +3663,4 @@ The previous response was rejected and nothing was saved. Recreate the complete 
         const cur = readPhone(chat);
         const room = cur.rooms[rid];
         if (!room?.pending || room.pending.request !== req) {
-          note = "대화 상태가 바뀌어서 답장을 저장하지 않았어요.";
-          return null;
-        }
-        const events = keepValid(result.events, room);
-     
+  

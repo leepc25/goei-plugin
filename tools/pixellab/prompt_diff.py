@@ -24,8 +24,13 @@ def check(path):
     # 잇기(EXTEND)는 원본 = 이어 그릴 그림의 요청문(사용자 11-01 11:47). PROMPT_ORIG=<그 요청문> 이면 그 문장과만 대조, 빠짐 하나라도 있으면 실패
     if os.environ.get('PROMPT_ORIG'):
         orig = Path(os.environ['PROMPT_ORIG']).read_text(encoding='utf-8')
+        # PROMPT_ALLOW='앞머리1|앞머리2': 사용자에게 보여 준 바뀐 문장(장소 줄·분위기 구절)만 「바뀜 허용」 (2026-11-02 격리팀 실험실)
+        allow = tuple(a for a in os.environ.get('PROMPT_ALLOW', '').split('|') if a)
         for s in sents(orig):
-            hit = s in new; rows.append(('그대로' if hit else '빠짐', s[:70])); ok &= hit
+            hit = s in new
+            if not hit and allow and s.startswith(allow) and any(n.startswith(s[:40]) for n in sents(new)):
+                rows.append(('바뀜 허용', s[:70])); continue
+            rows.append(('그대로' if hit else '빠짐', s[:70])); ok &= hit
         for s in sents(new):
             if s not in orig: rows.append(('새 문장', s[:90]))
         return ok, rows

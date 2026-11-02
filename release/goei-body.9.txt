@@ -1,4 +1,8 @@
-heme":
+imit + (v.endsWith("+") ? 1 : -1)));
+          if (next !== d.basic.agentLimit) await basicPatch(env3, { agentLimit: next });
+          return true;
+        }
+        case "set-theme":
           if (v === "light" || v === "dark" || v === "paper") await saveDefaults(env3, (p) => ({ ...p, theme: v }));
           return true;
         case "set-support":
@@ -2732,6 +2736,4 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
 .ps-defconfirm { margin: 12px 16px 0; }
 /* 네 칸 균등 (PC는 아래 괴이·특수·요원·조직 탭과 같은 폭) */
 .st-scopebar { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; margin-bottom: -6px; }
-.st-scopebar .st-scope { grid-column: span 2; display: flex; }
-.st-scopebar .st-scope .gx-seg { flex: 1; min-width: 0; padding: 0 6px; white-space: nowrap; }
-/* PC: 덮어쓰기·불러
+.st-scop

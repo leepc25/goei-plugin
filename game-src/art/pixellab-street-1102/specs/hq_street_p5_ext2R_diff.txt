@@ -1,0 +1,17 @@
+그대로	Pixel art game background of a clean modern office street sidewalk in 
+그대로	Camera at standing eye height, about 20 degrees above the floor, looki
+그대로	The building fronts behind the sidewalk run straight and level across 
+그대로	The floor fills the lower 38 percent: sidewalk, a road strip at the ve
+그대로	Nothing closes the sides: the street keeps going past both image edges
+그대로	FLOOR: smooth clean grey paved sidewalk like one sheet.
+그대로	At the left edge: the ground floor entrance of a large grey stone and 
+그대로	The same large building front continues across the whole image to the 
+그대로	The building fronts run straight and flat across the whole image at th
+그대로	Pack the whole image with detail everywhere: walls, floor and corners 
+빠짐	The board on the dark canopy reads exactly "관철빌딩".
+그대로	Everything else is up to you.
+그대로	WALL: grey stone, glass and clean concrete building fronts.
+그대로	LIGHT: Rich lighting with clear shadows.
+그대로	STYLE: dense, highly detailed pixel art, crisp pixel clusters, selecti
+그대로	No people, no chairs, no sofas, no benches, no plants, no cars.
+실패: 원본 핵심 문장이 빠짐 — 보내지 않는다

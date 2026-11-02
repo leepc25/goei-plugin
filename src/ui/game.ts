@@ -9,7 +9,7 @@ import { fetchStats, forgetIndex, gameIndex, type GameIndex } from '../host/game
 import { downloadGamePack, installGamePack, liveUrls, packStateOf, releaseAll } from '../host/game/packs';
 import { gameSaves } from '../host/game/saves';
 import { clearRecord, dropReport, onReports, pendingReports, readCard, recordReport, type PendingReport } from '../host/game/card';
-import { makeBridge } from '../host/game';
+import { makeBridge, releaseBridge } from '../host/game';
 import { makeViewport, phone, type ViewportCtl } from '../host/game/viewport';
 import { setFabHidden } from '../host/overlay';
 import { uprightInput } from './uprightInput';
@@ -21,6 +21,7 @@ type View = 'home' | 'play';
 let layer: HTMLElement | null = null;
 let viewport: ViewportCtl | null = null;
 let unmount: (() => void) | null = null;
+let liveBridge: ReturnType<typeof makeBridge> | null = null;
 let view: View = 'home';
 let generation = 0;
 let busy = '';
@@ -213,6 +214,7 @@ async function play(slot: SlotId): Promise<void> {
     // 다리는 채팅 저장(필드 장부·일지·보고서)을 열어 주므로 평소엔 노출하지 않는다 (2026-10-29 검토). 닫으면 지운다
     if ((await loadContext().catch(() => null))?.chat.scriptstate?.$goei_diag === '1') (globalThis as { __goeiBridge?: unknown }).__goeiBridge = bridge;
     const t1 = performance.now();
+    liveBridge = bridge;
     unmount = mod.mount(box, bridge);
     gameStats.mountMs = Math.round(performance.now() - t1);
     gameStats.openMs = Math.round(performance.now() - t0);
@@ -232,6 +234,8 @@ function stop(): void {
   generation++;
   unmount?.();
   unmount = null;
+  if (liveBridge) releaseBridge(liveBridge);
+  liveBridge = null;
   delete (globalThis as { __goeiBridge?: unknown }).__goeiBridge;
   releaseAll();
   gameStats.heapAfter = heap();

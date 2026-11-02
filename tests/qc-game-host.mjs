@@ -133,8 +133,14 @@ export async function startWorldChat(page) {
 
 /** dist/game/ 파일 이름 → 바이트(base64) */
 export function gameFiles() {
+  // 11-02: 인물 팩 126명(약 450MB)을 base64 로 한꺼번에 page.evaluate 에 넘기면 렌더러가 죽는다(「Execution context was destroyed」).
+  // 받기는 required 팩만 먼저 받고 나머지는 필요할 때 받으므로, 시험에는 목록·코드·required 팩 조각만 준다 (없는 팩은 404 → 그림 없이 진행).
   const gdir = new URL('game/', DIST);
-  return Object.fromEntries(readdirSync(gdir).map((n) => [n, readFileSync(new URL(n, gdir)).toString('base64')]));
+  const idx = JSON.parse(readFileSync(new URL('index.json', gdir), 'utf8'));
+  const keep = new Set(['index.json', ...idx.code.parts, 'goei-game.js']);
+  // + 공용 이펙트·주인공(에일린) 팩: 필드 조작 시험이 실제 인물 플레이어(키 배치)를 쓰도록
+  for (const p of idx.packs) if (p.required || (process.env.GOEI_QC_PACKS ?? 'action-fx,char-1.4,ui-badges,hq-textures').split(',').includes(p.id)) { for (const n of p.parts) keep.add(n); keep.add(`${p.id}.pack`); }
+  return Object.fromEntries(readdirSync(gdir).filter((n) => keep.has(n)).map((n) => [n, readFileSync(new URL(n, gdir)).toString('base64')]));
 }
 
 /** 페이지의 window.__fetch 가 dist/game/ 을 주게 한다 (fail 에 이름 정규식을 주면 그 파일은 404) */

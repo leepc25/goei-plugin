@@ -1,4 +1,8 @@
-   const unsolicitedRefresh = room.pending.action.type === "refresh" && unsolicited(room);
+        note = "대화 상태가 바뀌어서 답장을 저장하지 않았어요.";
+          return null;
+        }
+        const events = keepValid(result.events, room);
+        const unsolicitedRefresh = room.pending.action.type === "refresh" && unsolicited(room);
         const added = applyEvents(cur, room, events, phoneTime(chat));
         room.pending = void 0;
         if (viewingRoom(env3) === rid) readRoom(room);
@@ -3722,5 +3726,4 @@ Next Paragraph Text
     const play2 = o.faction || o.spec.playable && o.spec.code;
     return `<div class="dir-row${open3 ? " open" : ""}">
     <button class="dir-head" data-action="dir-open" data-value="${esc11(o.name)}" aria-expanded="${open3}">
-      <span class="dir-name"><b>${esc11(o.name)}</b><small>${esc11(sub)}</small></span>
-      ${play2 ? `<span class="gx-badge live">플레이 ${esc11(o.faction || o.spec.code)}</span>` : ""}${o.spec.hidden ? '<span class="gx-ba
+      <span class="dir-name"><b>${esc11(o.name)}</

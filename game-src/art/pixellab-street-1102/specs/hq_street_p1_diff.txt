@@ -1,0 +1,49 @@
+바뀜/빠짐 | Pixel art game background of a run-down 1990s Seoul shopping street sidewalk, late morning daylight.
+같음 | Camera at standing eye height, about 20 degrees above the floor, looking slightly down.
+같음 | One-point depth, but the building fronts behind the sidewalk run straight and level across the full width.
+같음 | The floor fills the lower 38 percent:
+같음 | sidewalk, a road strip at the very bottom of the image.
+같음 | Nothing closes the sides:
+같음 | the street keeps going past both image edges.
+같음 | FLOOR:
+바뀜/빠짐 | smooth worn grey concrete sidewalk like one sheet, stains, scattered litter.
+같음 | VERY CLUTTERED:
+같음 | every wall, shelf and corner packed with small props:
+바뀜/빠짐 | right 30 percent:
+바뀜/빠짐 | only the front end of a freestanding arcade entrance on the sidewalk like a Seoul subway exit, the rest continuing past the right edge, open end facing left, stairs going down to the right into darkness, waist-high railings on both sides, a glass canopy over it;
+바뀜/빠짐 | on top of the canopy, right above the entrance:
+바뀜/빠짐 | a sign board reading "중림지하상가";
+바뀜/빠짐 | clear sidewalk at the entrance;
+같음 | back:
+바뀜/빠짐 | old low-rise shop buildings along the whole width, ground floor and part of the second floor, tops cut off;
+같음 | on the building fronts:
+바뀜/빠짐 | faded blank signs, closed shutters, a small open shop, a note reading "임대" on an empty window;
+같음 | against the buildings:
+바뀜/빠짐 | a vending machine, a parked motorbike, potted plants, trash bags and boxes;
+바뀜/빠짐 | a utility pole with tangled wires;
+바뀜/빠짐 | an old public phone;
+바뀜/빠짐 | a torn redevelopment banner, no letters;
+같음 | bottom 8 percent:
+같음 | a curb and an asphalt strip, no cars, no markings;
+바뀜/빠짐 | left 10 percent:
+같음 | only building fronts and sidewalk, continuing past the edge.
+같음 | WALL:
+바뀜/빠짐 | grimy concrete and old tile building fronts, peeling paint, rust streaks.
+같음 | LIGHT:
+바뀜/빠짐 | soft daylight shadows under objects and the canopy, dark stairwell.
+같음 | STYLE:
+바뀜/빠짐 | dense, highly detailed pixel art, crisp pixel clusters, selective dark outline, rich medium-to-detailed shading, faded grey, beige, dull blue, rust, soft daylight, no dithering, no blur.
+같음 | No people, chairs, sofas, benches, coffee tables, clocks or cars.
+새 문장 | Pixel art game background of a clean modern office street sidewalk in Jongno, Seoul, seen up close from the sidewalk, the image top cuts just above the ground floor entrance doors, late morning daylight.
+새 문장 | smooth clean grey paved sidewalk like one sheet.
+새 문장 | center 50 percent:
+새 문장 | the ground floor of a plain grey stone and glass company building, automatic glass double doors in the middle, closed, a little taller than an adult;
+새 문장 | clear sidewalk at the doors;
+새 문장 | building fronts along the whole width, ground floor only, upper floors out of view;
+새 문장 | glass shop windows;
+새 문장 | potted plants, a bicycle rack, a post box, a trash bin;
+새 문장 | street trees and a streetlight;
+새 문장 | left 25 percent and right 25 percent:
+새 문장 | grey stone, glass and clean concrete building fronts.
+새 문장 | soft daylight shadows under objects.
+새 문장 | dense, highly detailed pixel art, crisp pixel clusters, selective dark outline, rich medium-to-detailed shading, grey, beige, dull blue, soft daylight, no dithering, no blur.

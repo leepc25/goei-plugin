@@ -411,7 +411,8 @@ function hqAdapter(bridge: Partial<GameBridge> | undefined, ui: { chooseFloor: H
     }
     if (close) b?.close?.();
   };
-  b?.onBeforeSend?.(() => (b?.visit ? endVisit(true, 'send') : Promise.resolve()));
+  // 닫을 때 등록을 푼다 (11-02: 안 풀면 열 때마다 게임 전체가 호스트에 남아 메모리가 12MB씩 쌓였다)
+  const offBeforeSend = b?.onBeforeSend?.(() => (b?.visit ? endVisit(true, 'send') : Promise.resolve()));
   fieldLink.endVisit = (close) => void endVisit(close);
   // ── 필드에서 짐 (10-31 사용자: 1안 = 쓰러지면 필드 종료, 뒷이야기는 모델이. 2안 「필드 안에서 깨어남」은 보류) ──
   // 주인공이 체력 0으로 2.5초 쓰러져 있으면: 누구에게 당했는지 장부에 한 줄, 불량배·적대 세력이면 지갑에서 돈을 뜯김(경찰·경비는 안 뜯음), 그리고 필드를 닫는다
@@ -744,6 +745,7 @@ function hqAdapter(bridge: Partial<GameBridge> | undefined, ui: { chooseFloor: H
         window.removeEventListener('keydown', onObserveKey);
       }
       offPeople?.();
+      offBeforeSend?.();
       // 개발 도구·시험 손잡이: 이 게임 것이면 놓는다 (닫은 게임이 남지 않게)
       const g = globalThis as { __goeiWallet?: unknown; __goeiWorld?: unknown };
       if (g.__goeiWallet === walletHook) delete g.__goeiWallet;
@@ -1432,6 +1434,8 @@ export function engineModules(box: HTMLElement, bridge?: Partial<GameBridge>): W
       offHidden?.();
       hq.dispose();
       npc.dispose();
+      fieldShop?.dispose();
+      fieldShop = null;
       const g = globalThis as { __goeiStory?: unknown; __goeiStoryStart?: unknown; __goeiNpc?: unknown };
       delete g.__goeiStory;
       delete g.__goeiNpc;
