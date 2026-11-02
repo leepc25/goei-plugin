@@ -1,4 +1,5 @@
-dge">시작 화면 숨김</span>' : ""}<span class="gx-badge">${n2}명</span>
+b><small>${esc11(sub)}</small></span>
+      ${play2 ? `<span class="gx-badge live">플레이 ${esc11(o.faction || o.spec.code)}</span>` : ""}${o.spec.hidden ? '<span class="gx-badge">시작 화면 숨김</span>' : ""}<span class="gx-badge">${n2}명</span>
     </button>${open3 ? orgPanel(o, ctx2, d) : ""}</div>`;
   }
   var REGIONS = MAP_CODES.filter((c) => c !== "01");
@@ -3114,6 +3115,4 @@ ${esc15(p.body)}</textarea></div>`).join("");
     if (force) updateUi.notice = "", env3.render();
     try {
       if (!force) skipped = String(await risuai.pluginStorage.getItem(SKIP_KEY).catch(() => "") ?? "");
-      const v = await getJson("version.json");
-      if (typeof v.card !== "string" || typeof v.plugin !== "string") throw new Error("업데이트 정보 형식이 달라요.");
-      updateUi.latest = { ca
+      const v = await getJso

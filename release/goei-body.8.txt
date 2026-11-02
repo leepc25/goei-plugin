@@ -1,4 +1,6 @@
-rd: v.card, plugin: v.plugin, minPlugin: v.minPlugin ?? v.plugin };
+n("version.json");
+      if (typeof v.card !== "string" || typeof v.plugin !== "string") throw new Error("업데이트 정보 형식이 달라요.");
+      updateUi.latest = { card: v.card, plugin: v.plugin, minPlugin: v.minPlugin ?? v.plugin };
     } catch (error) {
       if (force) updateUi.notice = error instanceof Error ? error.message : String(error);
     }
@@ -3019,8 +3021,4 @@ ${prettyJson2(r.data ?? "")}`)}</textarea>` : ""}
           if (v === "1" || v === "0") await saveDefaults(env3, (p) => ({ ...p, vars: { ...p.vars ?? {}, [WALLET_EDIT_VAR]: v } }));
           return true;
         case "set-agent": {
-          const next = Math.min(AGENT_MAX, Math.max(0, d.basic.agentLimit + (v.endsWith("+") ? 1 : -1)));
-          if (next !== d.basic.agentLimit) await basicPatch(env3, { agentLimit: next });
-          return true;
-        }
-        case "set-t
+          const next = Math.min(AGENT_MAX, Math.max(0, d.basic.agentL

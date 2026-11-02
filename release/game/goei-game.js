@@ -37537,7 +37537,7 @@ ${t.secret}` : "",
       }
       if (close) b?.close?.();
     };
-    b?.onBeforeSend?.(() => b?.visit ? endVisit(true, "send") : Promise.resolve());
+    const offBeforeSend = b?.onBeforeSend?.(() => b?.visit ? endVisit(true, "send") : Promise.resolve());
     fieldLink.endVisit = (close) => void endVisit(close);
     let koT = 0, koDone = false;
     const knockedOut = (dt, sceneId) => {
@@ -37955,6 +37955,7 @@ ${t.secret}` : "",
           window.removeEventListener("keydown", onObserveKey);
         }
         offPeople?.();
+        offBeforeSend?.();
         const g = globalThis;
         if (g.__goeiWallet === walletHook) delete g.__goeiWallet;
         if (sim && g.__goeiWorld === sim) delete g.__goeiWorld;
@@ -38677,6 +38678,8 @@ ${t.secret}` : "",
         offHidden?.();
         hq2.dispose();
         npc.dispose();
+        fieldShop?.dispose();
+        fieldShop = null;
         const g = globalThis;
         delete g.__goeiStory;
         delete g.__goeiNpc;

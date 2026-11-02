@@ -1,4 +1,4 @@
-w.player.art.key, 64, w.player.dir < 0) : null;
+e = w.player instanceof FighterPlayer ? charFace(w.player.art.key, 64, w.player.dir < 0) : null;
           shell.hud.drawFieldCard(ctx, { name, face, hp: w.player.hp, maxHp: w.player.hpMax, gauge: w.player.gauge, compact: hs.compact, top: true, items: hs.items, device: hs.device, status: hs.status }, dt);
           if (!observerOn()) shell.hud.drawFieldCorner(ctx, hs.field, hs.compact);
         }
@@ -123,6 +123,8 @@ w.player.art.key, 64, w.player.dir < 0) : null;
         offHidden?.();
         hq2.dispose();
         npc.dispose();
+        fieldShop?.dispose();
+        fieldShop = null;
         const g = globalThis;
         delete g.__goeiStory;
         delete g.__goeiNpc;

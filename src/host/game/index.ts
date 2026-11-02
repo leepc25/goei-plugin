@@ -8,11 +8,14 @@ import { gameAssets } from './packs';
 import { gameSaves } from './saves';
 import { gameTalk } from './talk';
 import { createVisit } from './visit';
-import { createField } from './field';
+import { createField, releaseField } from './field';
 import { createPeople } from './people';
 import { createWallet } from './wallet';
 import { createFieldState } from './fieldstate';
 import type { ViewportCtl } from './viewport';
+
+/** 게임을 닫을 때 다리가 호스트에 남긴 것을 푼다 */
+export function releaseBridge(b: GameBridge): void { if (b.field) releaseField(b.field); }
 
 export function makeBridge(viewport: ViewportCtl, slot: SlotId, close: () => void, onHidden?: GameBridge['onHidden']): GameBridge {
   return {

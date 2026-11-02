@@ -21,15 +21,19 @@ import { userInfo } from '../user';
 const KINDS: FieldKind[] = ['move', 'act', 'hurt', 'down', 'kill', 'flee', 'provoke', 'gift', 'trade', 'quest', 'follow', 'unfollow', 'enter_anomaly', 'exit_anomaly', 'enter_site', 'detected', 'appoint', 'call', 'enter_field', 'exit_field'];
 
 /** 쌓는 중인 필드 사건이 다 들어갈 때까지 (응답 보내기 직전에 기다린다) */
-const tails = new Set<() => Promise<unknown>>();
-export const fieldIdle = (): Promise<unknown> => Promise.all([...tails].map((t) => t()));
+const tails = new Map<GameField, () => Promise<unknown>>();
+export const fieldIdle = (): Promise<unknown> => Promise.all([...tails.values()].map((t) => t()));
+/** 게임을 닫을 때: 쌓던 사건이 다 들어간 뒤 목록에서 뺀다 (11-02: 안 빼면 열 때마다 채팅 사본이 남아 메모리가 3MB씩 쌓였다) */
+export function releaseField(f: GameField): void {
+  const t = tails.get(f);
+  if (t) void t().catch(() => {}).finally(() => tails.delete(f));
+}
 
 export function createField(): GameField {
   const opening = loadContext();
   let chain: Promise<unknown> = Promise.resolve();
-  tails.add(() => chain);
   let forced: 'inside' | 'outside' | null = null;
-  return {
+  const field: GameField = {
     override(v) { forced = v; },
     async entry() {
       const c = await loadContext();
@@ -94,4 +98,6 @@ export function createField(): GameField {
       return n && n.cause === 'field' ? { id: n.id, title: n.title, summary: n.summary } : null;
     },
   };
+  tails.set(field, () => chain);
+  return field;
 }

@@ -1,4 +1,6 @@
-오기는 글자 크기만큼, 오른쪽 끝에. 모바일만 네 칸 균등 */
+ebar .st-scope { grid-column: span 2; display: flex; }
+.st-scopebar .st-scope .gx-seg { flex: 1; min-width: 0; padding: 0 6px; white-space: nowrap; }
+/* PC: 덮어쓰기·불러오기는 글자 크기만큼, 오른쪽 끝에. 모바일만 네 칸 균등 */
 .st-barbtns { grid-column: span 2; justify-self: end; display: flex; gap: 8px; }
 @media (max-width: 760px) {
   .st-scopebar, .st-barbtns { gap: 6px; }
@@ -2151,7 +2153,7 @@ button.gx-jr-row { cursor: pointer; } button.gx-jr-row:hover { border-color: var
   async function fileUrl(id, file) {
     const have = urls2.get(id)?.get(file);
     if (have) return have;
-    const s5 = await stored2(id);
+    const s5 = await ensure(id);
     const row10 = s5?.files[file] ?? s5?.files[`${file}.png`];
     if (!row10) return "";
     const u = URL.createObjectURL(new Blob([unbase64(row10[1])], { type: row10[0] }));
@@ -2160,12 +2162,34 @@ button.gx-jr-row { cursor: pointer; } button.gx-jr-row:hover { border-color: var
     m.set(file, u);
     return u;
   }
+  var fetching = /* @__PURE__ */ new Map();
+  async function ensure(id) {
+    const have = await stored2(id);
+    if (have) return have;
+    let p = fetching.get(id);
+    if (!p) {
+      p = (async () => {
+        try {
+          const entry3 = (await gameIndex()).packs.find((e) => e.id === id);
+          if (!entry3) return null;
+          await downloadGamePack(entry3);
+          return await stored2(id);
+        } catch {
+          return null;
+        } finally {
+          fetching.delete(id);
+        }
+      })();
+      fetching.set(id, p);
+    }
+    return p;
+  }
   var gameAssets = {
-    ready: async (id) => !!await stored2(id),
+    ready: async (id) => !!await ensure(id),
     url: fileUrl,
-    atlas: async (id) => (await stored2(id))?.atlas ?? null,
+    atlas: async (id) => (await ensure(id))?.atlas ?? null,
     bytes: async (id, file) => {
-      const row10 = (await stored2(id))?.files[file];
+      const row10 = (await ensure(id))?.files[file];
       return row10 ? unbase64(row10[1]) : null;
     },
     list: async () => {
@@ -2391,6 +2415,9 @@ button.gx-jr-row { cursor: pointer; } button.gx-jr-row:hover { border-color: var
   }
 
   // src/host/game/index.ts
+  function releaseBridge(b) {
+    if (b.field) releaseField(b.field);
+  }
   function makeBridge(viewport2, slot, close3, onHidden) {
     return {
       api: 1,
@@ -2537,31 +2564,4 @@ button.gx-jr-row { cursor: pointer; } button.gx-jr-row:hover { border-color: var
         document.removeEventListener("fullscreenchange", onFs);
         mq.removeEventListener?.("change", onResize);
         subs4.clear();
-        if (document.fullscreenElement === layer2) void document.exitFullscreen().catch(() => {
-        });
-      }
-    };
-    return vp;
-  }
-
-  // src/ui/uprightInput.ts
-  function uprightInput(layer2, rotated) {
-    let box2 = null;
-    let src = null;
-    const vv = typeof visualViewport !== "undefined" ? visualViewport : null;
-    const place2 = () => {
-      if (!box2) return;
-      const bottom = vv ? Math.max(0, innerHeight - vv.height - vv.offsetTop) : 0;
-      box2.style.bottom = `${bottom}px`;
-    };
-    const close3 = (blurSrc = true) => {
-      const s5 = src;
-      box2?.remove();
-      box2 = null;
-      src = null;
-      if (blurSrc) s5?.blur();
-    };
-    const onFocus = (e) => {
-      const t = e.target;
-      if (!(t instanceof HTMLInputElement || t instanceof HTMLTextAreaElement) || !layer2.contains(t) || !rotated() || box2) return;
-  
+        if (document.fullscreenElement === 
