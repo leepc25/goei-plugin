@@ -115,6 +115,8 @@ export interface HqScene {
   sex?: '남' | '여';
   /** NPC 생활 동작 자리(11-02 휴게실 확정): 자판기 57→27→142, 정수기·커피 57→142, 전자레인지·찬장 57→157, 게시판 57, 싱크대 104 */
   stations?: { id: string; x: number; y: number; lines: string[] }[];
+  /** 훈련장 그림 속 장비 자리(11-02). 없으면 방 길이 비례 코드 배치 */
+  gear?: { kind: 'sandbag' | 'dummy' | 'target'; x: number; y: number }[];
 }
 
 /** 화면 px (docs/필드_그림_통합_지침.md): 맨 뒤 줄에서 1 m = 142 px (키 1.65 m = 235 px), 벽·바닥 선 y420, 걷는 띠 y420–669, 배경 세로 700 */
@@ -167,6 +169,7 @@ function floorHall(id: SceneId, name: string, floor: HqScene['floor'], doors: Om
   // 맵 에디터로 만든 장면이면 앉는 자리도 그쪽 것
   if (MAPEDIT_SPOTS[id]?.length) extra = { ...extra, spots: MAPEDIT_SPOTS[id] };
   if (p.stations?.length && !extra.stations) extra = { ...extra, stations: p.stations };
+  if (p.gear?.length && !extra.gear) extra = { ...extra, gear: p.gear };
   const sc = floorHallBase(id, name, floor, doors, p, extra);
   if (chairBoxes.length) {
     const base = sc.boxes.length;
@@ -253,7 +256,8 @@ export const HQ_SCENES: HqScene[] = [
   floorHall('shower_m', '탈의실(남)', 'B1', [{ id: 'out', kind: 'exit', side: 'S', to: 'b1', toDoor: 'shower_m', label: '나가기' }, { id: 'shower', kind: 'exit', to: 'bath_m', toDoor: 'out', label: '샤워실' }], { sex: '남', lockers: LOCKERS.shower_m, spots: lockerSpots('shower_m') }),
   floorHall('bath_f', '샤워실(여)', 'B1', [{ id: 'out', kind: 'exit', to: 'shower_f', toDoor: 'bath', label: '탈의실' }], { sex: '여', showers: showerSpots('bath_f') }),
   floorHall('bath_m', '샤워실(남)', 'B1', [{ id: 'out', kind: 'exit', to: 'shower_m', toDoor: 'shower', label: '탈의실' }], { sex: '남', showers: showerSpots('bath_m') }),
-  room({ id: 'training', name: '훈련장', floor: 'B1', look: 'lab', doors: [exitS('b1', 'training', 'training')] }, 'training'),
+  // 훈련장: 그림 장면(PixelLab 11-01 확정 hq_b1_training_ext2R, tools/mapedit/author_hq_training.py). 장비 자리는 그림 속 샌드백·허수아비·과녁
+  floorHall('training', '훈련장', 'B1', [{ id: 'out', kind: 'exit', side: 'S', to: 'b1', toDoor: 'training', label: '복도로' }]),
   // 지하 2층은 새 본부 그림(PixelLab 11-01, game-src/mapedit/b2): 서→동 격리시설 방폭문 · 격리팀 사무실(의무실·연구실) · 엘리베이터. 심문실·창고 없음(본부 최소화)
   floorHall('b2', '격리 구역', 'B2', [
     { id: 'isolation', kind: 'cell', to: 'tooth', toDoor: 'out', needs: 'tooth', label: '격리시설' },
@@ -295,7 +299,7 @@ export const HQ_SCENES: HqScene[] = [
   floorHall('sdra_shower_m', '탈의실(남)', 'B1', [{ id: 'out', kind: 'exit', side: 'S', to: 'sdra_b1', toDoor: 'shower_m', label: '나가기' }, { id: 'shower', kind: 'exit', to: 'sdra_bath_m', toDoor: 'out', label: '샤워실' }], { sex: '남', lockers: LOCKERS.shower_m, spots: lockerSpots('shower_m') }),
   floorHall('sdra_bath_f', '샤워실(여)', 'B1', [{ id: 'out', kind: 'exit', to: 'sdra_shower_f', toDoor: 'bath', label: '탈의실' }], { sex: '여', showers: showerSpots('bath_f'), spots: MAPEDIT_SPOTS.bath_f ?? [] }),
   floorHall('sdra_bath_m', '샤워실(남)', 'B1', [{ id: 'out', kind: 'exit', to: 'sdra_shower_m', toDoor: 'shower', label: '탈의실' }], { sex: '남', showers: showerSpots('bath_m'), spots: MAPEDIT_SPOTS.bath_m ?? [] }),
-  room({ id: 'sdra_training', name: '훈련장', floor: 'B1', look: 'lab', doors: [exitS('sdra_b1', 'training', 'training')] }, 'training'),
+  floorHall('sdra_training', '훈련장', 'B1', [{ id: 'out', kind: 'exit', side: 'S', to: 'sdra_b1', toDoor: 'training', label: '복도로' }]),   // 관리국 훈련장 그림 그대로 (11-02 사용자)
   // ── 중림 지하상가 (중립지역, 그림 4장). 지상 입구 → 지하 1층 앞골목 → (가운데 통로) 뒷골목 / (동쪽 계단) 지하 2층 ──
   floorHall('jr_entry', '중림 지하상가 입구', 'out', [
     { id: 'west', kind: 'exit', side: 'S', to: 'street', toDoor: 'jr', label: '버스 정류장' },

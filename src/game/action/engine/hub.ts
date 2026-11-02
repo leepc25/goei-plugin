@@ -298,7 +298,7 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
           get x0() { return (gears[i]?.x ?? -1e9) - 40; },
           get x1() { return (gears[i]?.x ?? -1e9) + 40; },
           occludedSilhouette: false,
-          draw: (c: CanvasRenderingContext2D) => { const g = gears[i]; if (g) drawGear(c, g, performance.now() / 1000); },
+          draw: (c: CanvasRenderingContext2D) => { const g = gears[i]; if (g && !(sc.painted && PAINTED[sc.painted]?.gear)) drawGear(c, g, performance.now() / 1000); },   // 그림 장면은 장비가 그림에 있다(11-02)
         })) : [])
         // 폴리스 라인: 라인마다 뒤쪽(뒷줄 라바콘·옆 테이프)과 앞쪽(앞줄 라바콘·테이프) 두 층 → 시체·사람과 깊이로 겹친다
         .concat(host.life?.cordons ? Array.from({ length: CORDON_SLOTS * 2 }, (_, i) => ({
