@@ -17,15 +17,34 @@ def load(p, foot):
     return im.resize((round(im.width * s), round(im.height * s)), Image.NEAREST)
 a = sys.argv
 G1, G2 = (int(a[2]) if len(a) > 2 else 40), (int(a[3]) if len(a) > 3 else 620)
-SF, NF = (int(a[4]) if len(a) > 4 else 374), (int(a[5]) if len(a) > 5 else 320)
+SF, NF = (int(a[4]) if len(a) > 4 else 374), (int(a[5]) if len(a) > 5 else 345)
 L = []
+# 08:02 사용자 「딱 북쪽 책상이 남쪽 책상 뒤에서 이어지게 붙여」: 북쪽 상판 앞끝(넓은 나무색 마지막 줄) = 남쪽 상판 뒤끝(첫 줄). NF 인자는 안 씀.
+import colorsys
+def wood(im):
+    w = im.width; rows = []
+    for y in range(im.height):
+        n = 0
+        for x in range(w):
+            r, g, b, al = im.getpixel((x, y))
+            if al > 200:
+                h, sa, v = colorsys.rgb_to_hsv(r / 255, g / 255, b / 255)
+                if 0.04 < h < 0.12 and sa > 0.3 and v > 0.55: n += 1
+        rows.append(n)
+    ys = [y for y in range(im.height) if rows[y] > w * 0.5]; return ys[0], ys[-1]
+NYS = []
 for gi, gx in enumerate((G1, G2)):
     x = gx * K
     for i in range(2):
-        s = load(SOUTH[(gi * 2 + i) % 2], SF); n = load(NORTH, NF)
-        L.append((NF, n, x + (s.width - n.width) // 2, NF * K - n.height))
-        L.append((SF, s, x, SF * K - s.height))
+        s = load(SOUTH[(gi * 2 + i) % 2], SF); sy = SF * K - s.height; st = sy + wood(s)[0]
+        nf = SF - 8
+        for _ in range(3):
+            n = load(NORTH, nf); ny = st - wood(n)[1]; nf = (ny + n.height) / K
+        NYS.append(nf)
+        L.append((nf, n, x + (s.width - n.width) // 2, ny))
+        L.append((SF, s, x, sy))
         x += s.width
+NF = round(sum(NYS) / len(NYS)); print('north foot', [round(v, 1) for v in NYS])
 # 쟈알디 책상 = 북쪽 책상(D02v2), 오른쪽 끝 (사용자 07:53 「쟈알디는 북쪽으로」, 핀 92%). JX=가운데 x, JF=발 y = 북쪽 줄과 같음(사용자 07:57)
 JX, JF = (int(a[6]) if len(a) > 6 else 1364), (int(a[7]) if len(a) > 7 else NF)
 j = load(NORTH, JF); L.append((JF, j, JX * K - j.width // 2, JF * K - j.height))
