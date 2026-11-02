@@ -33,10 +33,18 @@ def wood(im):
         rows.append(n)
     ys = [y for y in range(im.height) if rows[y] > w * 0.5]; return ys[0], ys[-1]
 NYS = []
-for gi, gx in enumerate((G1, G2)):
+# 08:05 사용자 「공간 낭비, 책상은 4덩이로 분리」 → 덩이 = 남 1 + 북 1, 4덩이를 방 너비에 고르게. CLUSTERS=4 기본(2면 옛 v4 묶음)
+import os
+NCL = int(os.environ.get('CLUSTERS', '4'))
+if NCL == 4:
+    dw = load(SOUTH[0], SF).width / K; gap = (bg.width - 4 * dw) / 5
+    GROUPS = [(round(gap + i * (dw + gap)), 1) for i in range(4)]
+else:
+    GROUPS = [(G1, 2), (G2, 2)]
+for gi, (gx, cnt) in enumerate(GROUPS):
     x = gx * K
-    for i in range(2):
-        s = load(SOUTH[(gi * 2 + i) % 2], SF); sy = SF * K - s.height; st = sy + wood(s)[0]
+    for i in range(cnt):
+        s = load(SOUTH[(gi * cnt + i) % 2], SF); sy = SF * K - s.height; st = sy + wood(s)[0]
         nf = SF - 8
         for _ in range(3):
             n = load(NORTH, nf); ny = st - wood(n)[1]; nf = (ny + n.height) / K
