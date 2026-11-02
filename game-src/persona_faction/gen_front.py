@@ -14,7 +14,9 @@ for k in sys.argv[1:]:
     pixellab_gate.check("POST", "/create-image-pro-flash", f"persona {k}")
     body = {"description": P[k]["prompt"], "image_size": {"width": 128, "height": 256}, "no_background": True,
             "style_image": {"image": {"type": "base64", "base64": base64.b64encode((HERE / P[k].get("style", "style_eileen_256_crop128.png")).read_bytes()).decode(), "format": "png"}, "size": {"width": 128, "height": 256}, "usage_description": P[k].get("usage", "Style reference only: match its pixel density, outlines and shading. Do not copy this person, hair, face or clothing.")},
-            "style_options": {"color_palette": False, "outline": True, "detail": True, "shading": True}}
+            "style_options": P[k].get("opts", {"color_palette": False, "outline": True, "detail": True, "shading": True})}
+    if P[k].get("max_colors"): body["target_palette"] = {"max_colors": P[k]["max_colors"]}
+    if P[k].get("seed") is not None: body["seed"] = P[k]["seed"]
     try: j = call("POST", "/create-image-pro-flash", body)
     except urllib.error.HTTPError as e: print(k, "HTTP", e.code, e.read().decode()[:1500]); continue
     pixellab_gate.guard("POST", "/create-image-pro-flash", f"persona {k}")
