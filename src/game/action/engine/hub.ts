@@ -42,6 +42,8 @@ export interface HubHost {
   overlay?(c: CanvasRenderingContext2D, people: { name: string; x: number; y: number; top: number; label?: string; mob?: boolean; rel?: 'ally' | 'foe' }[], player: { name: string; x: number; y: number; top: number }): void;
   /** 필드 시각 (시, 0~24). 없으면 시간대 조명은 기기 시계 */
   hour?(): number | null;
+  /** 주인공이 내리는 종로 쪽 (11-02 사용자 16:46): 가짜 관리국 소속이면 뒷면(fb_street), 관리국·제3세력은 관리국 거리(street). 정류장은 「종로」 하나 */
+  homeSide?(): 'hq' | 'fb';
   /** 앉기·눕기 자리에 앉았다 (시간 보내기 고르기) */
   sat?(): void;
   /** 필드 가게 자리: 거래 창을 연다. 못 열면(문 닫음 등) 자막 한 줄 */
@@ -656,7 +658,8 @@ export function makeHub(host: HubHost, whereIs: (place: string) => { scene: stri
       if (d.bus) {
         // 버스 정류장: 다른 정류장 중 고른다 (bus가 있는 문끼리, 11-02 30f2b67 — 이후 합치기에서 빠져 되살림, 11-02 강남 거리)
         const here = scene.id;
-        const stops = view!.scenes.flatMap((sc) => sc.doors.filter((q) => q.bus).map((q) => ({ scene: sc.id, door: q.id, label: q.bus! })));
+        const side = host.homeSide?.() ?? 'hq';
+        const stops = view!.scenes.filter((sc) => sc.id !== (side === 'fb' ? 'street' : 'fb_street')).flatMap((sc) => sc.doors.filter((q) => q.bus).map((q) => ({ scene: sc.id, door: q.id, label: q.bus! })));
         host.chooseFloor(stops.map((e) => ({ label: e.label, open: true, here: e.scene === here })), (i) => {
           const e = i == null ? null : stops[i];
           if (!e || e.scene === here) return;

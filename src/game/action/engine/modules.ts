@@ -139,7 +139,8 @@ function hqAdapter(bridge: Partial<GameBridge> | undefined, ui: { chooseFloor: H
     // 시연판(본편 연결 없음): 생태계를 볼 수 있게 요원 몇 명을 세운다
     : Promise.resolve().then(() => { present = [{ name: '잼트리', room: 'office' }, { name: '쟈알디', room: 'office' }, { name: '큐라스', room: 'lounge' }, { name: '고르고디오', room: 'lounge' }, { name: '데쥬레', room: 'infirmary' }]; }))
     // 본부에 있는 요원의 인물 팩(생활 클립·전투)을 받아 둔다 (없는 인물은 방문 요원 그림·실루엣)
-    .then(() => Promise.all(present.map((p) => loadChar(p.name)))).then(() => { ready = true; });
+    // 상주 인물(중림 가게 주인·협회 창구·가짜 관리국·백일몽, world/hq.ts RESIDENTS)도 미리: 그림이 없으면 생활 AI가 할 수 있는 일이 없어 서 있기만 한다 (11-02)
+    .then(() => Promise.all([...present.map((p) => p.name), ...RESIDENTS.map((r) => r.name)].map((n) => loadChar(n)))).then(() => { ready = true; });
   // 필드 시각은 본편 상태줄 시각에서 시작한다 (docs/필드_세계_NPC_설계.md 16-3). 유저 소속·신분도 같이
   let me: { faction: string; level: number | null } = { faction: 'A00', level: 1 };
   /** 주인공이 플레이 중인 이름 인물 (없으면 '') → 대사 chars.<인물> 칸 */
@@ -685,7 +686,14 @@ function hqAdapter(bridge: Partial<GameBridge> | undefined, ui: { chooseFloor: H
   const hub = makeHub(
     {
       // 이어하기(1-8): 지난 방문에 서 있던 장면·자리에서 시작 (그 장면이 지도에 있을 때만)
-      map: () => { const p = ui.worldSave?.get()?.player; return p && map.scenes.some((q) => q.id === p.scene) ? { ...map, start: { scene: p.scene as typeof map.start.scene, x: p.x, ...(p.y !== undefined ? { y: p.y } : {}) } } : map; },
+      map: () => {
+        const p = ui.worldSave?.get()?.player;
+        if (p && map.scenes.some((q) => q.id === p.scene)) return { ...map, start: { scene: p.scene as typeof map.start.scene, x: p.x, ...(p.y !== undefined ? { y: p.y } : {}) } };
+        // 가짜 관리국 소속은 같은 건물의 뒷면(fb_)에서 시작 (11-02 사용자: 관리국·제3세력은 쟈알디 쪽 관리국)
+        const fb = `fb_${map.start.scene}`;
+        return me.faction === 'B00' && map.scenes.some((q) => q.id === fb) ? { ...map, start: { ...map.start, scene: fb as typeof map.start.scene } } : map;
+      },
+      homeSide: () => (me.faction === 'B00' ? 'fb' : 'hq'),
       // 옛 본부 메뉴 자리는 닫혀 있다 (hqMap). 열린 자리는 앉기·가게·대화 자리뿐
       openPlace: () => {},
       bark: () => null,

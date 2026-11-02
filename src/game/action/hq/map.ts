@@ -442,7 +442,8 @@ export const HQ_SCENES: HqScene[] = [
 // ── 가짜 관리국 본부 (B00, 11-02 사용자 15:50~15:51): 관리국 본부 장면·그림·자리를 그대로 복사하고 이름만 종합대응팀 → 검사부대, 진압팀 → 진압부대.
 // 장면 id = 'fb_' + 관리국 장면 id (건물 소속 판정은 접두어, world/hq.ts). 문은 같은 건물 안으로만 잇고, 버스 정류장은 따로 이름을 둔다
 const FB_IDS: FbBase[] = ['street', 'lobby', 'f2', 'wc', 'swat', 'f3', 'wc3', 'lounge', 'office', 'b1', 'shower_f', 'shower_m', 'bath_f', 'bath_m', 'training', 'b2', 'clinic', 'tooth', 'infirmary', 'b3'];
-const FB_BUS = '종로2가';
+// 정류장은 종로 하나 (사용자 11-02 16:46): 가짜 관리국 소속만 뒷면 거리(fb_street)로 내리고, 관리국·제3세력은 쟈알디 쪽 관리국 거리로. 고르기는 engine/hub.ts homeSide
+const FB_BUS = '종로';
 const fbName = (s?: string) => s?.replace(/종합대응팀/g, '검사부대').replace(/진압팀/g, '진압부대');
 const fbScene = (sc: HqScene): HqScene => {
   const own = new Set<string>(FB_IDS);

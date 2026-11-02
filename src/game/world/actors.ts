@@ -3401,7 +3401,7 @@ export class WorldSim {
     const a = this.add({ id: `mob${++serial}`, name, kind: 'mob', brain: 'transit', home: r.scene, archetype: name, look, speed: range(this.rng, 110, 170) }, { scene: r.scene, x: anywhere ? range(this.rng, MARGIN, len - MARGIN) : from, y: range(this.rng, top + 20, bot - 10) });
     if (a.temper) a.def.speed = (a.def.speed ?? WALK) * (0.85 + a.temper.haste * 0.35);
     a.exitAt = { x: to, y: range(this.rng, top + 20, bot - 10) };
-    if (r.visit && !anywhere && this.visitSeat(a, r.visit)) return 1;
+    if (r.visit && this.visitSeat(a, r.visit)) return 1;
     this.walkTo(a, a.exitAt, a.drunk ? '비틀거리며 지나감' : '지나가는 중', 'exit');
     // 일행: 친화가 높으면 가끔 아는 사람과 같이 들어와 나란히 걷는다 (시민·학생·직장인·불량배)
     const role = arch?.role;

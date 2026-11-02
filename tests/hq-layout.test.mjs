@@ -132,5 +132,5 @@ test('가짜 관리국: 관리국 장면 복사·문 연결·엘리베이터·�
   assert.deepEqual(owners('fb_office'), ['이도형', '고영훈', '노기균', '송주익']);
   assert.deepEqual(owners('fb_swat'), ['곽성주', '조성춘', '윤병수', '김성진', '송진섭']);
   assert.deepEqual(M.ELEVATOR.filter((e) => e.bldg === 'fb').map((e) => e.scene).sort(), ['fb_b1', 'fb_b2', 'fb_b3', 'fb_f2', 'fb_f3', 'fb_lobby']);
-  assert.ok(byId.fb_street.doors.some((d) => d.bus === '종로2가'));
+  assert.ok(byId.fb_street.doors.some((d) => d.bus === '종로'), '정류장은 종로 하나 (11-02 사용자 16:46): 소속으로 앞면·뒷면을 고른다');
 });
