@@ -29,15 +29,15 @@ out.paste(Image.alpha_composite(bg2,Image.new('RGBA',bg2.size,(0,255,80,150))),(
 for o in m['objects']:
     if o.get('file'): out.alpha_composite(Image.open(D+o['file']).convert('RGBA'),(o['x'],o['y']))
 base=out.copy()
-P=[(500,620),(538,520),(800,500),(1300,480),(1600,570),(1035,700)]
+P=[(500,620),(538,520),(620,580),(800,560),(1300,575),(1600,600),(1035,700)]
 for x,y in sorted(P,key=lambda p:p[1]):
     s=scale(y); e=ei.resize((round(ei.width*s),round(ei.height*s)),Image.NEAREST)
     L=Image.new('RGBA',out.size,(0,0,0,0)); L.alpha_composite(e,(round(x-e.width/2),round(y-e.height))); out.alpha_composite(L)
     for sy,cm in covers:
         if y<sy: out.paste(base,(0,0),cm)
 dd=ImageDraw.Draw(out)
-path=[(470,700),(510,630),(538,560),(538,476),(620,476),(900,476)]
-dd.line(path,fill=(255,0,0),width=3); dd.polygon([(900,468),(900,484),(914,476)],fill=(255,0,0))
+path=[(470,700),(510,640),(536,590),(538,520),(560,560),(620,575),(900,575)]
+dd.line(path,fill=(255,0,0),width=3); dd.polygon([(900,567),(900,583),(914,575)],fill=(255,0,0))
 for x,y in P: dd.ellipse((x-4,y-4,x+4,y+4),fill=(255,255,0))
-out.convert('RGB').save('/mnt/project-files/sdra/sdra_counter_map_check_v7_x2.png')
-z=out.crop((380,300,1000,720)); z.resize((z.width*2,z.height*2),Image.NEAREST).convert('RGB').save('/mnt/project-files/sdra/sdra_counter_map_check_v7_zoom_x4.png')
+out.convert('RGB').save('/mnt/project-files/sdra/sdra_counter_map_check_v8_x2.png')
+z=out.crop((380,300,1000,720)); z.resize((z.width*2,z.height*2),Image.NEAREST).convert('RGB').save('/mnt/project-files/sdra/sdra_counter_map_check_v8_zoom_x4.png')
