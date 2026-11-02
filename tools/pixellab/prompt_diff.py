@@ -21,6 +21,14 @@ def check(path):
     new = Path(path).read_text(encoding='utf-8')
     ok = True; rows = []
     import os
+    # 잇기(EXTEND)는 원본 = 이어 그릴 그림의 요청문(사용자 11-01 11:47). PROMPT_ORIG=<그 요청문> 이면 그 문장과만 대조, 빠짐 하나라도 있으면 실패
+    if os.environ.get('PROMPT_ORIG'):
+        orig = Path(os.environ['PROMPT_ORIG']).read_text(encoding='utf-8')
+        for s in sents(orig):
+            hit = s in new; rows.append(('그대로' if hit else '빠짐', s[:70])); ok &= hit
+        for s in sents(new):
+            if s not in orig: rows.append(('새 문장', s[:90]))
+        return ok, rows
     # 2026-11-01 14:29 사용자 「그래」: 샤워실은 양옆 벽에 샤워기를 달아야 해서 「옆벽 없음·양 끝 트임」 문장을 뺀다 (SIDE_WALLS=1일 때만)
     must = [m for m in MUST if not (os.environ.get('SIDE_WALLS') == '1' and m.startswith('The back wall, floor and ceiling run straight on past'))]
     # 2026-11-01 화장실·휴게실(설비·가구는 오브젝트, 바닥 비움): 사용자 확정 화장실 p1 문장 「Pack the walls and ceiling with detail and texture everywhere, nothing left plain」로 꽉 채우기 문장을 대신한다 (NO_FILL=1일 때만)

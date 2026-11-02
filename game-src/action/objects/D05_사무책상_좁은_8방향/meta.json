@@ -1,0 +1,108 @@
+{
+ "object_id": "24f1b062-cb2e-4897-ac54-b6e9636c59c1",
+ "job": {
+  "usage": {
+   "type": "usd",
+   "usd": 0.06844561125077142
+  },
+  "id": "939fa07c-86ca-404e-a6d9-2a330c2f67bd",
+  "status": "completed",
+  "created_at": "2026-11-02T07:39:49.676647+00:00",
+  "last_response": {
+   "status": "completed",
+   "progress": 1,
+   "object_id": "24f1b062-cb2e-4897-ac54-b6e9636c59c1",
+   "image_size": {
+    "width": 256,
+    "height": 256
+   },
+   "frame_count": 8,
+   "single_frame": false,
+   "storage_urls": {
+    "east": "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/24f1b062-cb2e-4897-ac54-b6e9636c59c1/rotations/east.png",
+    "west": "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/24f1b062-cb2e-4897-ac54-b6e9636c59c1/rotations/west.png",
+    "north": "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/24f1b062-cb2e-4897-ac54-b6e9636c59c1/rotations/north.png",
+    "south": "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/24f1b062-cb2e-4897-ac54-b6e9636c59c1/rotations/south.png",
+    "north-east": "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/24f1b062-cb2e-4897-ac54-b6e9636c59c1/rotations/north-east.png",
+    "north-west": "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/24f1b062-cb2e-4897-ac54-b6e9636c59c1/rotations/north-west.png",
+    "south-east": "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/24f1b062-cb2e-4897-ac54-b6e9636c59c1/rotations/south-east.png",
+    "south-west": "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/24f1b062-cb2e-4897-ac54-b6e9636c59c1/rotations/south-west.png"
+   },
+   "billing_usage": {
+    "usd": 0.06844561125077142,
+    "type": "usd"
+   },
+   "generation_id": "2952ef90-a497-419f-a46a-31494f30e470",
+   "billing_stages": [
+    {
+     "stage": "first_direction",
+     "usage": {
+      "usd": 0.041671519980536566,
+      "type": "usd"
+     },
+     "generation_id": "ff091072-9599-48cf-b22c-5cb2e2c5cea6"
+    },
+    {
+     "stage": "rotations",
+     "usage": {
+      "usd": 0.026774091270234848,
+      "type": "usd"
+     },
+     "generation_id": "2952ef90-a497-419f-a46a-31494f30e470"
+    }
+   ],
+   "billing_charged": true,
+   "generation_mode": "pro_flash",
+   "source_image_id": "376b5014-91e0-560c-923e-b4290c982c2a",
+   "directions_count": 8,
+   "first_direction_generated": true
+  }
+ },
+ "object": {
+  "id": "24f1b062-cb2e-4897-ac54-b6e9636c59c1",
+  "name": "D05_사무책상_좁은_8방향",
+  "state_name": "base",
+  "prompt": "An office work desk with things on it: a computer monitor that is switched on with a bright lit screen, a computer tower, a keyboard, a mouse, and piles of papers and document folders. A small plain square desk for one person with a light wood flat top and four dark charcoal gray legs, about as wide as it is deep. The monitor faces the viewer, its lit screen fully visible. Seen almost straight from the front, from the eye height of a standing adult, looking only a little down: the desk top shows as a thin band, much thinner than the front of the desk. The desk fills almost the whole width of the canvas. Only the desk with the things on it, centered, nothing else.",
+  "size": {
+   "width": 256,
+   "height": 256
+  },
+  "directions": 8,
+  "created_at": "2026-11-02T07:39:49.702951+00:00",
+  "view": "low top-down",
+  "rotation_urls": {
+   "south": "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/24f1b062-cb2e-4897-ac54-b6e9636c59c1/rotations/south.png",
+   "west": "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/24f1b062-cb2e-4897-ac54-b6e9636c59c1/rotations/west.png",
+   "east": "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/24f1b062-cb2e-4897-ac54-b6e9636c59c1/rotations/east.png",
+   "north": "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/24f1b062-cb2e-4897-ac54-b6e9636c59c1/rotations/north.png",
+   "south-east": "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/24f1b062-cb2e-4897-ac54-b6e9636c59c1/rotations/south-east.png",
+   "south-west": "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/24f1b062-cb2e-4897-ac54-b6e9636c59c1/rotations/south-west.png",
+   "north-east": "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/24f1b062-cb2e-4897-ac54-b6e9636c59c1/rotations/north-east.png",
+   "north-west": "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/24f1b062-cb2e-4897-ac54-b6e9636c59c1/rotations/north-west.png"
+  },
+  "storage_urls": {
+   "east": "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/24f1b062-cb2e-4897-ac54-b6e9636c59c1/rotations/east.png",
+   "west": "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/24f1b062-cb2e-4897-ac54-b6e9636c59c1/rotations/west.png",
+   "north": "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/24f1b062-cb2e-4897-ac54-b6e9636c59c1/rotations/north.png",
+   "south": "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/24f1b062-cb2e-4897-ac54-b6e9636c59c1/rotations/south.png",
+   "north-east": "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/24f1b062-cb2e-4897-ac54-b6e9636c59c1/rotations/north-east.png",
+   "north-west": "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/24f1b062-cb2e-4897-ac54-b6e9636c59c1/rotations/north-west.png",
+   "south-east": "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/24f1b062-cb2e-4897-ac54-b6e9636c59c1/rotations/south-east.png",
+   "south-west": "https://backblaze.pixellab.ai/file/pixellab-characters/objects/1f24ffe4-de73-4438-bfba-c9d0cd6e12d1/24f1b062-cb2e-4897-ac54-b6e9636c59c1/rotations/south-west.png"
+  },
+  "frame_urls": null,
+  "style_settings": {
+   "version": "v2.0.0+api",
+   "no_background": true,
+   "generation_mode": "pro_flash",
+   "source_image_id": "376b5014-91e0-560c-923e-b4290c982c2a",
+   "first_frame_direction": "south"
+  },
+  "tags": [],
+  "status": "completed",
+  "group_id": "bbe1e760-e64a-49c9-822f-188e957a3af5",
+  "progress_percent": null,
+  "eta_seconds": null,
+  "animations": []
+ }
+}

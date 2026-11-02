@@ -16,3 +16,7 @@
 11-02 06:41 D01v3_사무책상_1배_8방향 256x256 8방향 src=D01v3_사무책상_1배/unknown.png object_id=d061e70f-1157-4a7a-99f8-92433ff4bdca completed usage={"type": "usd", "usd": 0.043331388851006826}
 11-02 06:51 D02_사무책상_북쪽_1배 256x256 1방향 src=None object_id=0d6cdae6-907d-4366-908e-ca0de91b303b completed usage={"type": "usd", "usd": 0.04118098374006483}
 11-02 06:54 D02v2_사무책상_북쪽_1배 256x256 1방향 src=None object_id=20c91fca-1a19-4d8b-946b-559e8ce19698 completed usage={"type": "usd", "usd": 0.04084289211124844}
+11-02 07:03 D03_사무책상_옆면_1배 256x256 1방향 src=None object_id=31d143bc-4dd3-4d6a-8fff-6196c9363431 completed usage={"type": "usd", "usd": 0.04121768085861206}
+11-02 07:05 D03b_사무책상_옆면_1배 256x256 1방향 src=None object_id=aab7e8a0-d3a2-4e9a-96ad-ce20953f0f01 completed usage={"type": "usd", "usd": 0.04283495769246419}
+11-02 07:16 D04_사무책상_좁은_8방향 256x256 8방향 src=None object_id=7e286792-5475-4990-afe2-6c21e4cea07c completed usage={"type": "usd", "usd": 0.07435673862044016}
+11-02 07:42 D05_사무책상_좁은_8방향 128x256 8방향 src=None object_id=24f1b062-cb2e-4897-ac54-b6e9636c59c1 completed usage={"type": "usd", "usd": 0.06844561125077142}

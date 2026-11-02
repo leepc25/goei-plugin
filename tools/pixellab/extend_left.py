@@ -6,7 +6,8 @@
 import sys as _gs, pathlib as _gp
 _gs.path.insert(0, str(next(p for p in _gp.Path(__file__).resolve().parents if (p / "tools" / "pixellab_gate.py").exists()) / "tools"))
 import pixellab_gate as _gate  # noqa: E402
-_gate.spend(__file__ + " 실행")
+import os as _os
+if not _os.environ.get("PREVIEW"): _gate.spend(__file__ + " 실행")
 # ---
 import os, base64, io, json, sys, time
 import requests
@@ -36,6 +37,12 @@ if bot_y: mask.paste((255, 255, 255), (0, bot_y, new + ov_bot, h))
 # ERASE=1: 다시 그릴 칸 안의 옛 그림을 흰색으로 지우고 보낸다(extend_right와 같음, 사용자 11-01)
 if os.environ.get("ERASE") == "1":
     win.paste((255, 255, 255, 255), (new, 0, new + ov, h))
+    if top_h: win.paste((255, 255, 255, 255), (new, 0, new + ov_top, top_h))
+    if bot_y: win.paste((255, 255, 255, 255), (new, bot_y, new + ov_bot, h))
+# PREVIEW=<png>: 창·마스크만 그려 저장하고 보내지 않는다(「뽑아」 전에 보여 주기)
+if os.environ.get("PREVIEW"):
+    sh = Image.new("RGB", (w, h * 2 + 8), (255, 0, 255)); sh.paste(win.convert("RGB"), (0, 0)); sh.paste(mask, (0, h + 8))
+    sh.resize((w * 2, sh.height * 2), Image.NEAREST).save(os.environ["PREVIEW"]); sys.exit(0)
 def soft_mask(mask, side):
     """붙일 때 이음 자리를 칼로 자르지 않고 서서히 섞는다(사용자 2026-11-01: 끝나는 지점부터 이어서 찐빠). 각 줄의 흰 칸 끝(옛 그림 쪽) FEATHER px를 0으로 가늘게 줄인다."""
     m = mask.convert("L"); px = m.load(); W, H = m.size
