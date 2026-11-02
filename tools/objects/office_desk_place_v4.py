@@ -1,6 +1,6 @@
 """종합대응팀 사무실 확정 배경(hq_office_final 1482x424) 책상 8개 배치 시안 v4 — 사용자 11-02 07:47 「총 8개, 남쪽4 북쪽4, 각각 2개씩 띄워서」.
 묶음 2개: 묶음마다 남쪽 2(나란히) + 바로 뒤 북쪽 2. 남쪽은 D01v3 / D03 섞음(사용자 07:04). 북쪽 D02v2. 배율 v2와 같음(벽선 0.873, 변화율 2/3). 배경 2배 고정.
-python3 tools/objects/office_desk_place_v4.py <out.png> [묶음1 왼쪽 x] [묶음2 왼쪽 x] [남쪽 발 y] [북쪽 발 y]"""
+python3 tools/objects/office_desk_place_v4.py <out.png> [묶음1 왼쪽 x] [묶음2 왼쪽 x] [남쪽 발 y] [북쪽 발 y] [쟈알디 가운데 x] [쟈알디 발 y]"""
 import sys
 from pathlib import Path
 from PIL import Image
@@ -26,6 +26,9 @@ for gi, gx in enumerate((G1, G2)):
         L.append((NF, n, x + (s.width - n.width) // 2, NF * K - n.height))
         L.append((SF, s, x, SF * K - s.height))
         x += s.width
+# 쟈알디 책상 = 북쪽 책상(D02v2), 오른쪽 끝 (사용자 07:53 「쟈알디는 북쪽으로」, 핀 92%). JX=가운데 x, JF=발 y
+JX, JF = (int(a[6]) if len(a) > 6 else 1364), (int(a[7]) if len(a) > 7 else SF)
+j = load(NORTH, JF); L.append((JF, j, JX * K - j.width // 2, JF * K - j.height))
 out = BG.copy()
 for _, im, x, y in sorted(L, key=lambda t: t[0]): out.alpha_composite(im, (x, y))
 out.convert('RGB').save(a[1]); print('south w', [t[1].width for t in L if t[0] == SF])
