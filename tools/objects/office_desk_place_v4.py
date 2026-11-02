@@ -39,12 +39,17 @@ NYS = []
 SEATED = os.environ.get('SEATED', '1') == '1'; SD_DIR = R / 'game-src/art/objects/chairs_office/office_seated'
 SEAT_S = ['1.1_back', '1.4_back', '1.2_back', '1.3_back']      # 남쪽 앞(등 보임): 쟈알디·에일린·스팡달·잼트리
 SEAT_N = ['1.9_front', '1.10_front', '1.11_front', '1.12_front']  # 북쪽 뒤(정면): 데드폴·게슈간·로제몬·콘쥬스
+# 08:21 사용자 「의자 위치가 키보드랑 어긋난다, 키보드 중앙에 의자」: 키보드 가운데 x(책상 그림 잘린 폭 대비, 4배로 눈으로 잼)
+KB_S = [81 / 198, 81 / 194]   # D01v3(키보드 51~111), D03(50~112)
+KB_N = 92 / 190               # D02v2 뒤에서 본 키보드 60~124
+CHAIR_N = ['south-east.png', 'south.png', 'south-west.png', 'south-west.png']  # 북쪽 앉은 사람 맞춤값의 의자 방향(fit_all img)
 def put(seat, chair, foot, cx):
     f = scale(foot) * K * CSC
+    cb = Image.open(CH / chair).getbbox(); cxc = (cb[0] + cb[2]) / 2   # 의자 그림 가운데(200캔버스 x)
     if seat:
-        im = Image.open(SD_DIR / f'{seat}.png').convert('RGBA'); ax, ay = 100, 160 + 172
+        im = Image.open(SD_DIR / f'{seat}.png').convert('RGBA'); ax, ay = cxc, 160 + 172
     else:
-        im = Image.open(CH / chair).convert('RGBA'); ax, ay = 100, 172
+        im = Image.open(CH / chair).convert('RGBA'); ax, ay = cxc, 172
     im = im.resize((round(im.width * f), round(im.height * f)), Image.NEAREST)
     L.append((foot, im, round(cx - ax * f), round(foot * K - ay * f)))
 def loadc(p, foot):  # 원본 1배에서 한 번에 줄임(두 번 줄이면 도트 깨짐)
@@ -71,8 +76,8 @@ for gi, (gx, cnt) in enumerate(GROUPS):
         L.append((SF, s, x, sy))
         if CHAIRS:  # 08:09 사용자 「의자 배치해봐」: 남쪽 책상 앞 = C01 north(등 보임), 북쪽 책상 뒤 = C01 south(정면). 다리 들어갈 쪽(서랍 반대)
             ci = gi * cnt + i; cf = SF + CDY; cn_f = nf - CDY; nx = x + (s.width - n.width) // 2
-            put(SEAT_S[ci] if SEATED else None, 'north.png', cf, x + round(s.width * 0.36))
-            put(SEAT_N[ci] if SEATED else None, 'south.png', cn_f, nx + round(n.width * 0.64))
+            put(SEAT_S[ci] if SEATED else None, 'north.png', cf, x + round(s.width * KB_S[(gi * cnt + i) % 2]))
+            put(SEAT_N[ci] if SEATED else None, CHAIR_N[ci], cn_f, nx + round(n.width * KB_N))
         x += s.width
 NF = round(sum(NYS) / len(NYS)); print('north foot', [round(v, 1) for v in NYS])
 # 쟈알디 책상 = 북쪽 책상(D02v2), 오른쪽 끝 (사용자 07:53 「쟈알디는 북쪽으로」, 핀 92%). JX=가운데 x, JF=발 y = 북쪽 줄과 같음(사용자 07:57)
