@@ -311,14 +311,7 @@
     "sortY": 640
    }
   ],
-  "chairs": [
-   {
-    "x": 636,
-    "y": 694,
-    "face": "E",
-    "set": "L"
-   }
-  ]
+  "chairs": []
  },
  "spots": [
   {
@@ -336,21 +329,6 @@
     "y": 640
    },
    "chair": "chair_boss"
-  },
-  {
-   "id": "lchair0",
-   "x": 636,
-   "y": 694,
-   "verb": "앉기",
-   "face": 1,
-   "act": [
-    "sit_side"
-   ],
-   "seat": {
-    "x": 636,
-    "y": 694
-   },
-   "chair": 0
   }
  ],
  "files": [
