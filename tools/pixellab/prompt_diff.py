@@ -38,6 +38,9 @@ def check(path):
     # 2026-11-02 04:09 사용자 「바닥 50%로 해」: 휴게실은 바닥 문장만 lower half 허용 (FLOOR_HALF=1일 때만)
     if _os.environ.get('FLOOR_HALF') == '1':
         must = [m.replace('lower third', 'lower half') for m in must]
+    # 2026-11-02 08:58 사용자 협회 1층 p4 「양호」: 바닥 아래 40%·뒷벽 위 60% 문장 허용 (FLOOR_40=1일 때만)
+    if _os.environ.get('FLOOR_40') == '1':
+        must = [('Seen from the front at standing eye height, slightly from above; the walkable floor fills the lower 40% of the image' if m.startswith('Seen from the front') else m) for m in must]
     # 2026-11-02 사용자 「천장을 아예 안 그려도 상관없어」: NO_CEIL=1이면 천장 낱말이 든 필수 구절을 바닥·벽만으로 바꾼 것을 허용
     if _os.environ.get('NO_CEIL') == '1': must = [m for m in must if not m.startswith(('Pack the whole image', 'The back wall, floor and ceiling'))] + ['Pack the whole image with detail everywhere', 'The back wall and floor run straight on past the']
     for m in must:
