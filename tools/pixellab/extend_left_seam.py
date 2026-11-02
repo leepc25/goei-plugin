@@ -14,7 +14,9 @@ im=Image.open(src).convert("RGBA"); h=im.height; w=new+ov+keep
 win=Image.new("RGBA",(w,h),(255,255,255,255))
 old=im.crop((0,0,ov+keep,h)); win.paste(old,(new,0))
 a=np.array(win); med=np.median(np.array(im.crop((0,0,ov,h)).convert('RGB')),axis=1).astype('uint8')
-for y in range(h): a[y,new:new+ov,:3]=med[y]; a[y,new:new+ov,3]=255
+import os
+edge=np.array(im.convert('RGB'))[:,ov,:]   # FILL=edge: 줄마다 지운 칸 바로 오른쪽 옛 픽셀 색으로(벽·바닥 띠 이어짐)
+for y in range(h): a[y,new:new+ov,:3]=(edge[y] if os.environ.get('FILL')=='edge' else med[y]); a[y,new:new+ov,3]=255
 win=Image.fromarray(a)
 mask=Image.new("RGB",(w,h),(0,0,0)); mask.paste((255,255,255),(0,0,new+ov,h))
 win.save(outp.replace('.png','_sent_window.png')); mask.save(outp.replace('.png','_sent_mask.png'))
