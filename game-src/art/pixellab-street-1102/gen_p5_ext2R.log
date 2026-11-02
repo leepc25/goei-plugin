@@ -1,3 +1,3 @@
-seam x(창 기준) 134 181
-{"seconds": 67.7, "window": [512, 424], "out": [1592, 424], "usage": {"type": "usd", "usd": 0.15}}
+seam x(창 기준) 139 189
+{"seconds": 92.5, "window": [512, 424], "out": [1592, 424], "usage": {"type": "usd", "usd": 0.15}}
 EXIT 0
