@@ -1,9 +1,9 @@
 {
  "front": {
-  "dx": -8,
-  "dy": -15,
+  "dx": 2,
+  "dy": -16,
   "s": 1.0,
-  "img": "south-east"
+  "img": "south"
  },
  "side": {
   "dx": -20,
