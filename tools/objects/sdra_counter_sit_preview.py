@@ -34,5 +34,5 @@ for x2, fy, s, v, key, oy, (xa, xb) in SEATS:
     out.alpha_composite(L)
     # 가림: oy 아래, 이 자리 x 범위만 배경을 다시 얹음
     out.alpha_composite(BG2.crop((xa, oy, xb, BG2.height)), (xa, oy))
-o = sys.argv[1] if len(sys.argv) > 1 else '/mnt/project-files/sdra/sdra_counter_sit_v1_x2.png'
+o = os.environ.get('OUT') or '/mnt/project-files/sdra/sdra_counter_sit_v1_x2.png'
 out.convert('RGB').save(o); print(o, out.size)
