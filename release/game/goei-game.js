@@ -1,4 +1,4 @@
-// goei-game 0.20.1
+// goei-game 0.20.2
 "use strict";
 (() => {
   // src/game/action/hq/jrRooms.gen.ts
@@ -265,15 +265,68 @@
     return Math.round((d3.x0 + d3.x1) / 2);
   };
   var PAINTED_LANE = [440, 669];
-  function walkablePainted(scene, x, y) {
-    const p = PAINTED[scene];
-    if (!p) return true;
+  function walkablePoly(p, x, y) {
     if (p.floor && !inPolygon(p.floor, x, y)) return false;
     for (const h of p.holes ?? []) if (inPolygon(h, x, y)) return false;
     if (p.holes) for (const o of p.objects) for (const b of o.solid ?? []) {
       if (b.h !== void 0 && x >= b.x0 && x <= b.x1 && y >= b.y0 && y <= b.y1) return false;
     }
     return true;
+  }
+  var WALK_GRID = /* @__PURE__ */ new Map();
+  function fillPoly(g, poly2, val) {
+    const xs = [];
+    for (let j = 0; j < g.h; j++) {
+      const y = g.y0 + j;
+      xs.length = 0;
+      for (let i = 0, k = poly2.length - 1; i < poly2.length; k = i++) {
+        const [xi, yi] = poly2[i], [xk, yk] = poly2[k];
+        if (yi > y !== yk > y) xs.push((xk - xi) * (y - yi) / (yk - yi) + xi);
+      }
+      xs.sort((a, b) => a - b);
+      for (let m = 0; m + 1 < xs.length; m += 2) {
+        const a = Math.max(0, Math.ceil(xs[m]) - g.x0), b = Math.min(g.w, Math.ceil(xs[m + 1]) - g.x0);
+        if (a < b) g.bits.fill(val, j * g.w + a, j * g.w + b);
+      }
+    }
+  }
+  function walkGrid(scene, p) {
+    const hit2 = WALK_GRID.get(scene);
+    if (hit2) return hit2;
+    const polys = [...p.floor ? [p.floor] : [], ...p.holes ?? []];
+    if (!polys.length) return null;
+    let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+    for (const poly2 of polys) for (const [x, y] of poly2) {
+      x0 = Math.min(x0, x);
+      y0 = Math.min(y0, y);
+      x1 = Math.max(x1, x);
+      y1 = Math.max(y1, y);
+    }
+    x0 = Math.floor(x0) - 1;
+    y0 = Math.floor(y0) - 1;
+    const g = { x0, y0, w: Math.ceil(x1) + 2 - x0, h: Math.ceil(y1) + 2 - y0, bits: new Uint8Array(0) };
+    g.bits = new Uint8Array(g.w * g.h);
+    if (p.floor) fillPoly(g, p.floor, 1);
+    else g.bits.fill(1);
+    for (const h of p.holes ?? []) fillPoly(g, h, 0);
+    if (p.holes) for (const o of p.objects) for (const b of o.solid ?? []) {
+      if (b.h === void 0) continue;
+      for (let y = Math.max(g.y0, Math.ceil(b.y0)); y <= Math.min(g.y0 + g.h - 1, Math.floor(b.y1)); y++) {
+        const a = Math.max(0, Math.ceil(b.x0) - g.x0), c = Math.min(g.w, Math.floor(b.x1) + 1 - g.x0);
+        if (a < c) g.bits.fill(0, (y - g.y0) * g.w + a, (y - g.y0) * g.w + c);
+      }
+    }
+    WALK_GRID.set(scene, g);
+    return g;
+  }
+  function walkablePainted(scene, x, y) {
+    const p = PAINTED[scene];
+    if (!p) return true;
+    const g = walkGrid(scene, p);
+    if (!g) return walkablePoly(p, x, y);
+    const gx = Math.round(x) - g.x0, gy = Math.round(y) - g.y0;
+    if (gx < 0 || gy < 0 || gx >= g.w || gy >= g.h) return p.floor ? false : walkablePoly(p, x, y);
+    return g.bits[gy * g.w + gx] === 1;
   }
   function clampPainted(scene, x, y, z = 0) {
     const p = PAINTED[scene];
@@ -39556,7 +39609,7 @@ ${t.secret}` : "",
     }
   }
   var mod = {
-    version: "0.20.1",
+    version: "0.20.2",
     mount: (box2, bridge) => mountPlay(box2, bridge)
   };
   globalThis.__goeiGame = mod;

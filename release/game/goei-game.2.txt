@@ -256,15 +256,68 @@
     return Math.round((d3.x0 + d3.x1) / 2);
   };
   var PAINTED_LANE = [440, 669];
-  function walkablePainted(scene, x, y) {
-    const p = PAINTED[scene];
-    if (!p) return true;
+  function walkablePoly(p, x, y) {
     if (p.floor && !inPolygon(p.floor, x, y)) return false;
     for (const h of p.holes ?? []) if (inPolygon(h, x, y)) return false;
     if (p.holes) for (const o of p.objects) for (const b of o.solid ?? []) {
       if (b.h !== void 0 && x >= b.x0 && x <= b.x1 && y >= b.y0 && y <= b.y1) return false;
     }
     return true;
+  }
+  var WALK_GRID = /* @__PURE__ */ new Map();
+  function fillPoly(g, poly2, val) {
+    const xs = [];
+    for (let j = 0; j < g.h; j++) {
+      const y = g.y0 + j;
+      xs.length = 0;
+      for (let i = 0, k = poly2.length - 1; i < poly2.length; k = i++) {
+        const [xi, yi] = poly2[i], [xk, yk] = poly2[k];
+        if (yi > y !== yk > y) xs.push((xk - xi) * (y - yi) / (yk - yi) + xi);
+      }
+      xs.sort((a, b) => a - b);
+      for (let m = 0; m + 1 < xs.length; m += 2) {
+        const a = Math.max(0, Math.ceil(xs[m]) - g.x0), b = Math.min(g.w, Math.ceil(xs[m + 1]) - g.x0);
+        if (a < b) g.bits.fill(val, j * g.w + a, j * g.w + b);
+      }
+    }
+  }
+  function walkGrid(scene, p) {
+    const hit2 = WALK_GRID.get(scene);
+    if (hit2) return hit2;
+    const polys = [...p.floor ? [p.floor] : [], ...p.holes ?? []];
+    if (!polys.length) return null;
+    let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+    for (const poly2 of polys) for (const [x, y] of poly2) {
+      x0 = Math.min(x0, x);
+      y0 = Math.min(y0, y);
+      x1 = Math.max(x1, x);
+      y1 = Math.max(y1, y);
+    }
+    x0 = Math.floor(x0) - 1;
+    y0 = Math.floor(y0) - 1;
+    const g = { x0, y0, w: Math.ceil(x1) + 2 - x0, h: Math.ceil(y1) + 2 - y0, bits: new Uint8Array(0) };
+    g.bits = new Uint8Array(g.w * g.h);
+    if (p.floor) fillPoly(g, p.floor, 1);
+    else g.bits.fill(1);
+    for (const h of p.holes ?? []) fillPoly(g, h, 0);
+    if (p.holes) for (const o of p.objects) for (const b of o.solid ?? []) {
+      if (b.h === void 0) continue;
+      for (let y = Math.max(g.y0, Math.ceil(b.y0)); y <= Math.min(g.y0 + g.h - 1, Math.floor(b.y1)); y++) {
+        const a = Math.max(0, Math.ceil(b.x0) - g.x0), c = Math.min(g.w, Math.floor(b.x1) + 1 - g.x0);
+        if (a < c) g.bits.fill(0, (y - g.y0) * g.w + a, (y - g.y0) * g.w + c);
+      }
+    }
+    WALK_GRID.set(scene, g);
+    return g;
+  }
+  function walkablePainted(scene, x, y) {
+    const p = PAINTED[scene];
+    if (!p) return true;
+    const g = walkGrid(scene, p);
+    if (!g) return walkablePoly(p, x, y);
+    const gx = Math.round(x) - g.x0, gy = Math.round(y) - g.y0;
+    if (gx < 0 || gy < 0 || gx >= g.w || gy >= g.h) return p.floor ? false : walkablePoly(p, x, y);
+    return g.bits[gy * g.w + gx] === 1;
   }
   function clampPainted(scene, x, y, z = 0) {
     const p = PAINTED[scene];
@@ -3811,40 +3864,4 @@
       // 그림 없이 맞음만(화면 전체 기술의 표적 자리)
       // 3판 이펙트 그림(x3-*) 한 장. 기준 배율 1 = 인물과 같은 화소 크기(인물 그림을 크기 기준으로 뽑음). mode(bottom·center)는 빌드가 목록에서 넣음
       // at: hand | front(dx) | self | body(몸 가운데) | target(표적·화면 전체 각 자리) | screen(화면 가운데)
-      // scale · w(화면 폭에 대한 비율로 맞춤) · dx·dy(그림 화소, dy 아래로 +) · flip:false · tint(흰 공용 그림에 색) · under · hold · loop(초) · fade · rot · back
-      // 맞음: hit + r(기본 그림 폭 40%) + depth + delay. after: [부품] 그림이 끝난 뒤
-      v(s, c) {
-        const meta = VFX[s.vfx];
-        if (!meta) return;
-        const fw = meta.frames[0][2], fh = meta.frames[0][3], md = s.mode || meta.mode || "center";
-        let p;
-        if (s.at === "screen") p = { x: W5 / 2 + P2.face * (s.dx || 0), gy: (FLOOR0 + FLOOR1) / 2 + 40 + (s.dy || 0), hy: H5 / 2 + (s.dy || 0), k: 1 };
-        else if (s.at === "body") {
-          const k = K3(P2.y);
-          p = { x: P2.x + P2.face * (s.dx || 0) * k, gy: P2.y, hy: P2.y - P2.z - (s.h ?? 110) * k + (s.dy || 0) * k, k };
-        } else {
-          p = posOf({ at: "front", ...s }, c);
-          if (s.dy) {
-            p.gy += s.dy * p.k;
-            p.hy += s.dy * p.k;
-          }
-        }
-        let sc = (s.scale || 1) * (s.at === "screen" ? 1 : p.k);
-        if (s.w) sc = W5 * s.w / fw;
-        const flip = s.flip === false ? false : P2.face < 0;
-        const o = { [md === "bottom" ? "bottom" : "center"]: true, flip };
-        for (const [k, v] of Object.entries({ under: s.under, back: s.back, tint: s.tint, hold: s.hold, loop: s.loop ? true : void 0, t: s.loop || void 0, fade: s.fade, rot: s.rot ? s.rot * (flip ? -1 : 1) : void 0 })) if (v !== void 0) o[k] = v;
-        vfx(s.vfx, p.x, md === "bottom" ? p.gy : p.hy, sc, o);
-        if (s.boom) boomSnd(s.boom, p.x);
-        if (s.hit) {
-          const r = (s.r ?? fw * 0.4) * sc, hy = md === "bottom" ? p.gy - Math.min(fh * sc * 0.5, 110 * p.k) : p.hy;
-          const hitAt = (t) => later(t, () => {
-            if (s.at === "screen" ? allT() : near2(p.x, p.gy, r + 20, (s.depth || 75) * (p.k || 1))) strike2(t > (s.delay || 0) ? s.tickHit || s.hit : s.hit, hy);
-          });
-          hitAt(s.delay || 0);
-          if (s.loop || s.tick) {
-            const every = s.tick || vfxDur(s.vfx), end = (s.loop || 0) + (s.hold || 0);
-            for (let t = (s.delay || 0) + every; t < end - 0.05; t += every) hitAt(t);
-          }
-        }
-        if (s.after) later(vfxDur(s.vfx) + (s.hold || 0), () => runFx(s.after, { ...c, pt: { x: p.x, y: p.gy, z: 0, onT: c.
+      // scale · w(화면 폭에 대한 비율로 맞춤) · dx·dy(그림 화소, dy 아래로 +) · flip:false · ti
