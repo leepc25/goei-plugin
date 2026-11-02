@@ -6,7 +6,6 @@ HERE = Path(__file__).resolve().parent; ROOT = HERE.parents[1]
 sys.path.insert(0, str(ROOT / "tools")); import pixellab_gate
 API = "https://api.pixellab.ai/v2"
 P = json.loads((HERE / "prompts_v2.json").read_text())
-STYLE = base64.b64encode((HERE / "style_eileen_256_crop128.png").read_bytes()).decode()
 def call(m, path, body=None):
     r = urllib.request.Request(API + path, data=json.dumps(body).encode() if body else None, method=m, headers={"Content-Type": "application/json"})
     with urllib.request.urlopen(r, timeout=120) as f: return json.loads(f.read())
@@ -14,7 +13,7 @@ def call(m, path, body=None):
 for k in sys.argv[1:]:
     pixellab_gate.check("POST", "/create-image-pro-flash", f"persona {k}")
     body = {"description": P[k]["prompt"], "image_size": {"width": 128, "height": 256}, "no_background": True,
-            "style_image": {"image": {"type": "base64", "base64": STYLE, "format": "png"}, "size": {"width": 128, "height": 256}, "usage_description": "Style reference only: match its pixel density, outlines and shading. Do not copy this person, hair, face or clothing."},
+            "style_image": {"image": {"type": "base64", "base64": base64.b64encode((HERE / P[k].get("style", "style_eileen_256_crop128.png")).read_bytes()).decode(), "format": "png"}, "size": {"width": 128, "height": 256}, "usage_description": P[k].get("usage", "Style reference only: match its pixel density, outlines and shading. Do not copy this person, hair, face or clothing.")},
             "style_options": {"color_palette": False, "outline": True, "detail": True, "shading": True}}
     try: j = call("POST", "/create-image-pro-flash", body)
     except urllib.error.HTTPError as e: print(k, "HTTP", e.code, e.read().decode()[:1500]); continue
