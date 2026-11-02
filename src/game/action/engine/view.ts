@@ -36,7 +36,18 @@ export const perspOf = (y: number, lane: [number, number], far: number, growTo: 
   const t = b > a ? Math.max(0, Math.min(1, (y - a) / (b - a))) : 1;
   return far + (1 - far) * t;
 };
-export const persp = (y: number) => perspOf(y, view.lane, view.far, view.growTo, view.sizes);
+/** 원근 누르기 (사용자 11-02 15:12 「샤워장 같은 곳은 바깥쪽에 나올 때 커지는 폭을 줄이고 안쪽으로 올라갈 때는 최소한으로 줄여야」):
+ *  앞/뒤 비율이 FLAT_FROM(1.4)을 넘는 급한 장면만, 줄 한가운데 크기는 그대로 두고 뒤로는 −5%까지만(FLAT_BACK), 앞으로는 +12%까지만(FLAT_FRONT) 변하게 누른다 */
+export const FLAT_FROM = 1.4, FLAT_BACK = 0.95, FLAT_FRONT = 1.12;
+export const perspFlat = (y: number, lane: [number, number], far: number, growTo: number, sizes: [number, number][]) => {
+  const p = perspOf(y, lane, far, growTo, sizes);
+  const pb = perspOf(lane[0], lane, far, growTo, sizes), pf = perspOf(lane[1], lane, far, growTo, sizes);
+  if (!(pb > 0) || pf / pb <= FLAT_FROM) return p;
+  const pm = perspOf((lane[0] + lane[1]) / 2, lane, far, growTo, sizes);
+  if (p >= pm) return pf > pm ? pm * Math.pow(p / pm, Math.log(FLAT_FRONT) / Math.log(pf / pm)) : p;
+  return pb < pm ? pm * Math.pow(p / pm, Math.log(FLAT_BACK) / Math.log(pb / pm)) : p;
+};
+export const persp = (y: number) => perspFlat(y, view.lane, view.far, view.growTo, view.sizes);
 /** 사람 크기 기준: 기본 장면(dotK STD_DOTK, 원근 far 0.85)의 줄 한가운데 크기. 모든 장면은 줄 한가운데 사람이 이 크기가 되게 sceneZoom을 맞춘다 (앞뒤 원근 차이는 장면 그림대로 둔다) */
 export const STD_MID = STD_DOTK * (FAR + 1) / 2;
 /** 발 y에 선 사람 그림의 배율 (월드 좌표 기준). 배경과 같이 커지고 작아진다 (사용자 2026-10-25: 캐릭터만 작아지면 안 됨) */
