@@ -8,14 +8,25 @@
 - 첨부한 「기존 세력 NPC」 그림과 얼굴·머리가 겹치지 않게.
 
 [남자 아바타 · 1~5번 공통 생김새]
-- 24세 한국인, 키 178cm, 어깨가 넓은 단단한 마른 근육형.
-- 얼굴: 갸름한 턱, 짙고 곧은 눈썹, 쌍꺼풀 없는 날카로운 눈, 차분한 무표정.
-- 머리: 흑발. 앞머리를 이마 오른쪽으로 쓸어 넘긴 짧은 투블럭(옆·뒤는 짧게 밀고 윗머리 6cm).
+### Appearance
+- Age: 24, Korean adult man
+- Height / Weight: 178cm / 68kg
+- Hair: Short black two-block cut; sides and back closely trimmed, top about 6cm, front swept to his right, forehead partly visible.
+- Eyes: Sharp, narrow monolid dark brown eyes under thick straight eyebrows.
+- Face: Slim V-shaped jaw, straight nose, calm expressionless look.
+- Build: Lean and toned, broad shoulders, flat stomach, long straight legs.
+- Skin: Light warm complexion.
 
-[여자 아바타 · 6~10번 공통 생김새]
-- 23세 한국인, 키 166cm, 마른 보통 체형.
-- 얼굴: 둥근 계란형, 또렷한 쌍꺼풀 큰 눈, 옅은 화장, 침착한 표정.
-- 머리: 흑갈색. 턱선 아래로 떨어지는 어깨 위 길이 레이어드 단발, 왼쪽 가르마, 오른쪽 옆머리를 귀 뒤로 넘김.
+[여자 아바타 · 6~10번 공통 생김새 · 첨부한 얼굴 참고 그림(예나)과 같은 사람]
+### Appearance
+- Age: 23, Korean adult woman
+- Height / Weight: 158cm / 42kg
+- Hair: Long, straight black hair tied in a high ponytail, with soft see-through bangs and a few loose strands framing the face.
+- Eyes: Large, round, dark brown eyes.
+- Face: Small oval face, gentle calm expression.
+- Build: Slim with soft curves, a slender waist, moderately proportioned hips, and slim thighs with a slight gap between the legs.
+- Skin: Fair complexion.
+- Breasts: C cup with moderate volume
 
 [복장]
 1. 남 · 관리국 (persona_01_bureau_m): 몸에 맞는 검은 싱글 정장(재킷 단추 1개 잠금), 흰 셔츠, 짙은 청록색(#1f5f5b) 넥타이, 검은 정장 바지, 검은 더비 구두. 왼손목 은색 손목시계, 목에 건 짙은 청록색 출입증 줄(카드는 재킷 안으로). 선글라스 없음.
