@@ -24,7 +24,8 @@ for it in ARGV[1:]:
     ol=np.zeros(a.shape+(4,),np.uint8); ol[edge]=(255,40,40,255); olim=Image.fromarray(ol)
     lp=J[k].get('lines',{}).get(f'{v}:{l}',pv)
     fdx=lp.get('frame_dx',[lp['dx']]*99)[int(fi)-1]   # 장마다 x 가 다르면(기대 쉬기 등) frame_dx
-    for cd in cands or [f"{fdx},{lp['dy']}"]:
+    fdy=lp.get('frame_dy',[lp['dy']]*99)[int(fi)-1]
+    for cd in cands or [f"{fdx},{fdy}"]:
         dx,dy=map(int,cd.split(',')); pl=dict(pv,dx=dx,dy=dy)
         W,H=200,300; base=H-15
         T=Image.new('RGBA',(W,H),(92,86,78,255))
