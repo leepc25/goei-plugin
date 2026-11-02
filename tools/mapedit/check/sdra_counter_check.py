@@ -31,7 +31,8 @@ base=out.copy()
 clean=bg2.copy()
 for o in m['objects']:
     if o.get('file'): clean.alpha_composite(Image.open(D+o['file']).convert('RGBA'),(o['x'],o['y']))
-# 가림은 사람 상자 안에서만, 초록 칠 없는 원본(clean)으로 덮는다(14:44 사용자 「다리에 녹색선」)
+clean.paste(Image.alpha_composite(bg2,Image.new('RGBA',bg2.size,(0,255,80,150))),(0,0),hat)   # 빗금은 남김(14:53)
+# 가림은 사람 상자 안에서만, 초록 전면 칠 없는 원본(clean)으로 덮는다(14:44 사용자 「다리에 녹색선」)
 P=[(450,650),(538,514),(620,580),(800,560),(1300,575),(1600,600),(1035,700)]
 for x,y in sorted(P,key=lambda p:p[1]):
     s=scale(y); e=ei.resize((round(ei.width*s),round(ei.height*s)),Image.NEAREST)
