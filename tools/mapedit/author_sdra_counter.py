@@ -5,7 +5,7 @@
 종이 상자 165~218 y295→297, 서랍장 앞 218~272 → 300. 왼쪽 끝 = 출입구(사용자 13:? 핀 「출입구는 이쪽」).
 대기의자 C06 셋(오브젝트, game-src/action/objects/C06_대기의자_3인): 창구 세 칸 앞 x 800/1270/1700(2배), 다리 바닥 y835, 그림 1배×1.5.
 의자는 바닥 한가운데 물건 → 그림(오브젝트, sortY=다리 바닥)으로 앞뒤 가림, 막힘 = 다리 자국(뒷다리 y96~앞다리 y124) ±12.
-창구 직원 자리 3(창구 뒤, 걷기 불가 구역 — 앉은 채로만): 서윤지·차여진 고정, 오른쪽 = 협회 직원 돌림.
+창구 직원 자리 3(창구 안쪽 띠, 왼쪽 통로로 드나듦): 서윤지·차여진 고정, 오른쪽 = 협회 직원 돌림.
 출력: game-src/mapedit/sdra_counter/ → python3 tools/mapedit/import.py game-src/mapedit/sdra_counter sdra_counter"""
 import json
 from pathlib import Path
@@ -17,12 +17,46 @@ OUT = ROOT / 'game-src/mapedit/sdra_counter'; OUT.mkdir(parents=True, exist_ok=T
 K = 2
 im = Image.open(SRC).convert('RGB'); im.save(OUT / 'sdra_counter.png')
 W, H = im.width * K, im.height * K
-# 바닥 윗선 (1배 x0, x1, y)
-TOP = [(0, 108, 301), (108, 165, 300), (165, 218, 297), (218, 272, 300), (272, 292, 326), (292, 519, 316),
-       (519, 529, 328), (529, 743, 316), (743, 753, 328), (753, 952, 316)]
+# 바닥 윗선 (1배 x0, x1, y). 11-02 13:45 사용자 「저 안으로 어떻게 들어가냐」 → 창구 안쪽(직원 자리)도 바닥.
+# 왼쪽 통로(파란 서랍장 오른쪽 x266~창구 끝판 x272)로 끝판 뒤를 돌아 창구 안쪽 띠(뒤 책상 밑 y227 아래 ~ 창구 뒷면)로 들어간다.
+# 서랍장 밑 검은 윤곽 y268 → 270. 창구 안쪽 띠 윗선 = 뒤 책상 서랍 밑 윤곽 y227(4배로 읽음) → 232.
+TOP = [(0, 108, 301), (108, 165, 300), (165, 218, 297), (218, 266, 270), (266, 952, 232)]
 poly = []
 for x0, x1, y in TOP: poly += [[x0 * K, y * K], [x1 * K, y * K]]
 floor = [[0, H]] + poly + [[W, H]]
+# 창구 몸체 막힘(구멍): 앞 밑선은 앞 판과 같음(창구 밑 316, 칸막이 기둥 519~529·743~753 밑 328, 끝판 밑 324→대각선 292,316),
+# 뒷면은 끝판 뒤끝 깊이로 y300. 끝판 왼쪽 x270에서 y312까지만 막아 그 뒤(y<312)로 돌아 들어갈 수 있게.
+CB = [(270, 326), (284, 326), (293, 317), (519, 317), (519, 329), (529, 329), (529, 317), (743, 317), (743, 329), (753, 329),
+      (753, 317), (952, 317), (952, 300), (286, 300), (270, 312)]
+counter_block = {'poly': [[x * K, y * K] for x, y in CB], 'h': 999}
+# 창구 가림(안쪽 사람 앞에 그림): 창구 윗면 뒤 윤곽 y229 아래 몸체 전부 + 그 위로 솟은 물건·칸막이·끝판은
+# 손으로 읽은 상자 안에서 검은 윤곽선을 따라 딴다(상자 가장자리에서 윤곽을 못 넘고 번지는 곳 = 뒤 배경).
+import io, base64
+import numpy as np
+from scipy import ndimage as nd
+A = np.array(im).astype(int); IH, IW = A.shape[:2]
+wall2 = nd.binary_dilation(A.max(2) <= 60, structure=np.ones((2, 2)))
+def trace_in_box(x0, y0, x1, y1):
+    box = np.zeros((IH, IW), bool); box[y0:y1 + 1, x0:x1 + 1] = True
+    free = box & ~wall2; lab, _ = nd.label(free)
+    e = np.zeros_like(box); e[y0, x0:x1 + 1] = e[y1, x0:x1 + 1] = True; e[y0:y1 + 1, x0] = True
+    if x1 < IW - 1: e[y0:y1 + 1, x1] = True
+    bg = set(np.unique(lab[e & free])) - {0}
+    return nd.binary_fill_holes(box & ~np.isin(lab, list(bg)))
+ITEMS = [('끝판', 270, 188, 332, 231), ('책꽂이1', 293, 203, 338, 231), ('가림판', 369, 193, 403, 231), ('스테이플러', 455, 220, 480, 231),
+         ('프린터', 477, 218, 522, 231), ('칸막이A', 516, 180, 546, 231), ('책A', 534, 198, 572, 231), ('펜꽂이', 573, 212, 589, 231),
+         ('도장', 585, 214, 606, 231), ('모니터1', 664, 192, 712, 231), ('서랍', 707, 206, 745, 231), ('칸막이B', 727, 180, 756, 231),
+         ('책B', 749, 203, 777, 231), ('도장2', 793, 218, 806, 231), ('모니터2', 874, 192, 924, 231), ('칸막이R', 917, 180, 951, 231)]
+cmask = np.zeros((IH, IW), bool)
+for _, *b in ITEMS: cmask |= trace_in_box(*b)
+for x in range(272, IW):
+    bot = 324 if x <= 284 else 324 - (x - 284) if x <= 292 else 328 if (519 <= x <= 529 or 743 <= x <= 753) else 316
+    cmask[229:bot + 1, x] = True
+Image.fromarray((cmask * 255).astype('uint8')).save(OUT / 'counter_cover_mask_1x.png')
+big = Image.fromarray((cmask * 255).astype('uint8')).resize((W, H), Image.NEAREST); bb = big.getbbox()
+buf = io.BytesIO(); big.crop(bb).save(buf, 'PNG')
+counter_cover = {'id': 'counter_cover', 'x': bb[0], 'y': bb[1], 'w': bb[2] - bb[0], 'h': bb[3] - bb[1], 'sortY': 316 * K,
+                 'coverMask': 'data:image/png;base64,' + base64.b64encode(buf.getvalue()).decode()}
 # 대기의자
 BSC = 1.5; BXS = [800, 1270, 1700]; FOOT_Y = 835
 b = Image.open(BENCH).convert('RGBA'); bw, bh = round(b.width * BSC), round(b.height * BSC)
@@ -30,7 +64,7 @@ bimg = b.resize((bw, bh), Image.NEAREST); bimg.save(OUT / 'sdra_counter_bench.pn
 sm = Image.new('L', b.size, 0); ImageDraw.Draw(sm).rounded_rectangle((10, 98, 212, 125), radius=10, fill=int(255 * 0.45))
 sh = Image.new('RGBA', b.size, (40, 32, 26, 0)); sh.putalpha(sm.filter(ImageFilter.GaussianBlur(3)))
 sh.resize((bw, bh), Image.NEAREST).save(OUT / 'sdra_counter_bench_shadow.png')
-objects, blocks, spots = [], [], []
+objects, blocks, spots = [counter_cover], [counter_block], []
 SEATS = [(40, 61), (111.5, 61), (183.5, 61)]   # 잘라낸 판 1배: 좌석 점(사무의자 north 좌석 점과 같은 뜻)
 for i, bx in enumerate(BXS):
     ox, oy = round(bx - 110.5 * BSC), round(FOOT_Y - 124 * BSC)
