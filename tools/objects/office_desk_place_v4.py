@@ -35,6 +35,18 @@ def wood(im):
         rows.append(n)
     ys = [y for y in range(im.height) if rows[y] > w * 0.5]; return ys[0], ys[-1]
 NYS = []
+# 08:14 사용자 「요원 앉혀봐 전부」: 의자 + 앉은 요원 합성(tools/objects/office_seat_export.py, 의자 1배 좌표 200캔버스 위 PAD 160). 사람 배율 = 의자 배율.
+SEATED = os.environ.get('SEATED', '1') == '1'; SD_DIR = R / 'game-src/art/objects/chairs_office/office_seated'
+SEAT_S = ['1.1_back', '1.4_back', '1.2_back', '1.3_back']      # 남쪽 앞(등 보임): 쟈알디·에일린·스팡달·잼트리
+SEAT_N = ['1.9_front', '1.10_front', '1.11_front', '1.12_front']  # 북쪽 뒤(정면): 데드폴·게슈간·로제몬·콘쥬스
+def put(seat, chair, foot, cx):
+    f = scale(foot) * K * CSC
+    if seat:
+        im = Image.open(SD_DIR / f'{seat}.png').convert('RGBA'); ax, ay = 100, 160 + 172
+    else:
+        im = Image.open(CH / chair).convert('RGBA'); ax, ay = 100, 172
+    im = im.resize((round(im.width * f), round(im.height * f)), Image.NEAREST)
+    L.append((foot, im, round(cx - ax * f), round(foot * K - ay * f)))
 def loadc(p, foot):  # 원본 1배에서 한 번에 줄임(두 번 줄이면 도트 깨짐)
     im = Image.open(p).convert('RGBA'); im = im.crop(im.getbbox()); s_ = scale(foot) * K * CSC
     return im.resize((round(im.width * s_), round(im.height * s_)), Image.NEAREST)
@@ -58,10 +70,9 @@ for gi, (gx, cnt) in enumerate(GROUPS):
         L.append((nf, n, x + (s.width - n.width) // 2, ny))
         L.append((SF, s, x, sy))
         if CHAIRS:  # 08:09 사용자 「의자 배치해봐」: 남쪽 책상 앞 = C01 north(등 보임), 북쪽 책상 뒤 = C01 south(정면). 다리 들어갈 쪽(서랍 반대)
-            cs = loadc(CH / 'north.png', SF + CDY); cf = SF + CDY
-            L.append((cf, cs, x + round(s.width * 0.36) - cs.width // 2, cf * K - cs.height))
-            cn_f = nf - CDY; cn = loadc(CH / 'south.png', cn_f); nx = x + (s.width - n.width) // 2
-            L.append((cn_f, cn, nx + round(n.width * 0.64) - cn.width // 2, round(cn_f * K) - cn.height))
+            ci = gi * cnt + i; cf = SF + CDY; cn_f = nf - CDY; nx = x + (s.width - n.width) // 2
+            put(SEAT_S[ci] if SEATED else None, 'north.png', cf, x + round(s.width * 0.36))
+            put(SEAT_N[ci] if SEATED else None, 'south.png', cn_f, nx + round(n.width * 0.64))
         x += s.width
 NF = round(sum(NYS) / len(NYS)); print('north foot', [round(v, 1) for v in NYS])
 # 쟈알디 책상 = 북쪽 책상(D02v2), 오른쪽 끝 (사용자 07:53 「쟈알디는 북쪽으로」, 핀 92%). JX=가운데 x, JF=발 y = 북쪽 줄과 같음(사용자 07:57)
@@ -78,7 +89,7 @@ SD = int(a[8]) if len(a) > 8 else 14  # 그림자 깊이(1배 px)
 def shadow(im, x, y):
     W, H = out.width // K, out.height // K
     m = Image.new('L', (W, H), 0); d = ImageDraw.Draw(m)
-    fy, l, r = (y + im.height) / K, x / K, (x + im.width) / K
+    bb = im.getbbox(); fy, l, r = (y + bb[3]) / K, (x + bb[0]) / K, (x + bb[2]) / K  # 투명 여백 빼고
     d.ellipse([l - 4, fy - SD, r + 4, fy + 4], fill=SHA)
     m = m.filter(ImageFilter.GaussianBlur(3)).resize(out.size, Image.NEAREST)
     lay = Image.new('RGBA', out.size, SHC + (0,)); lay.putalpha(m)
