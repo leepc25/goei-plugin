@@ -20,8 +20,10 @@ REFS = {
     'jr_heolgap':    [(255, 0.82 * 187, '구슬발 문틀 68~255'), (352, 89 * MAN / 0.9, '감정대 앞 263~352, 0.9m')],
     'jr_songil':     [(292, 0.82 * 172, '진료실 문 틀 120~292'), (358, 90 * MAN / 1.0, '접수대 앞 268~358, 1.0m')],
     'jr_daebak':     [(381, 80 * MAN / 0.75, '포커 테이블 앞 301~381, 0.75m')],
-    'jr_jinryo':     [(282, 170 * MAN / 1.9, '유리 약장 112~282, 1.9m'), (387, 94 * MAN / 0.75, '의사 책상 앞 293~387, 0.75m')],
-    'jr_op':         [(335, 73 * MAN / 0.9, '수술대 262~335, 0.9m')],
+    # 진료실: 책상이 크게 그려져 책상 기준이면 사람이 너무 큼(사용자 11:42) → 약장만
+    'jr_jinryo':     [(282, 170 * MAN / 1.9, '유리 약장 112~282, 1.9m')],
+    # 수술실: 수술대 윗면(250)~받침(335) 0.9m + 드럼통 앞 테(305)~바닥(412) 0.88m (사용자 11:42 「사람 사이즈가 이게 맞냐」)
+    'jr_op':         [(335, 85 * MAN / 0.9, '수술대 윗면 250~335, 0.9m'), (412, 107 * MAN / 0.88, '드럼통 305~412, 0.88m')],
 }
 
 
@@ -58,6 +60,11 @@ def main():
             s = dotK * k_at(foot)
             w, h = round(im.width * s), round(im.height * s)
             o.update(x=round(cx - w / 2), y=foot - h, w=w, h=h)
+            # 앉는 자리 = 의자 원점(원본 200×200의 (100,171) → 잘린 그림의 (50,135))
+            for sp in m.get('spots', []):
+                if sp.get('chair') == o['id']:
+                    sx, sy = round(o['x'] + 50 * s), round(o['y'] + 135 * s)
+                    sp['seat'] = {'x': sx, 'y': sy}; sp['x'] = sx; sp['y'] = sy + 14
             print(' ', sid, o['id'], '의자', w, h)
         p.write_text(json.dumps(m, ensure_ascii=False, indent=1))
         print(sid, 'dotK', m['dotK'], 'sizes', m.get('sizes'), [(y, round(h), why) for y, h, why in refs])

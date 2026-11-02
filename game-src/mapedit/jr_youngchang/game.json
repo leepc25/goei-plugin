@@ -323,7 +323,7 @@
  "spots": [
   {
    "id": "seat_chair_boss",
-   "x": 940,
+   "x": 941,
    "y": 654,
    "verb": "앉기",
    "face": 1,
@@ -332,7 +332,7 @@
     "seatthink"
    ],
    "seat": {
-    "x": 940,
+    "x": 941,
     "y": 640
    },
    "chair": "chair_boss"
