@@ -19,11 +19,17 @@ SEATS_X = [40, 111.5, 183.5]; SEAT_PT_Y = 61  # 1배(잘라낸 판 기준)
 BS = float(os.environ.get('BS', '2.14')) * SC    # 사람 배율: 좌석 폭(62px×2) = 사무의자 등받이 폭(58)×BS
 PEOPLE = os.environ.get('WHO', '1.4_에일린,1.9_데드폴,1.12_콘쥬스').split(',')
 L = Image.new('RGBA', out.size, (0, 0, 0, 0))
-for sx, key in zip(SEATS_X, PEOPLE):
-    cfg, _ = fc.load(key); im = fc.last(cfg, '61'); q = FIT[key]['back']
-    bot = min(im.size[1]-4, im.getbbox()[3])
-    px, py = q['dx'] - 100 + 91 + im.size[0]/2, q['dy'] - 171 + 101 + bot   # 사람 그림 속 엉덩이 점
-    seat = (OX + sx*2*SC, OY + SEAT_PT_Y*2*SC)
-    L.alpha_composite(im.resize((round(im.size[0]*BS), round(im.size[1]*BS)), Image.NEAREST), (round(seat[0]-px*BS), round(seat[1]-py*BS)))
-L.alpha_composite(bench.resize((round(bench.width*2*SC), round(bench.height*2*SC)), Image.NEAREST), (round(OX), round(OY)))
+BXS = [int(x) for x in os.environ.get('BXS', '800,1270,1700').split(',')]   # 13:25 사용자 「의자 3개 배치」: 창구 세 칸 앞 가운데(2배 x)
+SIT = int(os.environ.get('SIT', '1'))   # 사람 앉힐 의자 번호(가운데)
+bw = round(bench.width*2*SC); bh = round(bench.height*2*SC); bimg = bench.resize((bw, bh), Image.NEAREST)
+for i, bx in enumerate(BXS):
+    OX = bx - 110.5*2*SC
+    if i == SIT:
+        for sx, key in zip(SEATS_X, PEOPLE):
+            cfg, _ = fc.load(key); im = fc.last(cfg, '61'); q = FIT[key]['back']
+            bot = min(im.size[1]-4, im.getbbox()[3])
+            px, py = q['dx'] - 100 + 91 + im.size[0]/2, q['dy'] - 171 + 101 + bot
+            seat = (OX + sx*2*SC, OY + SEAT_PT_Y*2*SC)
+            L.alpha_composite(im.resize((round(im.size[0]*BS), round(im.size[1]*BS)), Image.NEAREST), (round(seat[0]-px*BS), round(seat[1]-py*BS)))
+    L.alpha_composite(bimg, (round(OX), round(OY)))
 out.alpha_composite(L); out.convert('RGB').save(OUT); print(OUT)
