@@ -9,7 +9,7 @@ XS=[int(v) for v in os.environ.get('XS','665,880,470').split(',')]  # 캔버스 
 SHC,SHA,SD=(20,26,38),120,14           # 사무실 책상 그림자 값 그대로
 bg=Image.open('game-src/art/pixellab-hq-20261031/hq_b2_lab_p20_1703x424.png').convert('RGBA')
 items=[]
-for x,p in zip(XS,['L01v4_고그니쟈_실험책상','L02v2_데쥬레_실험책상','L04_장비정비_거치대']):
+for x,p in zip(XS,['L01v4_고그니쟈_실험책상','L02v2_데쥬레_실험책상','L04v2_장비정비_거치대']):
     im=Image.open(D+p+'/unknown.png').convert('RGBA'); a=np.array(im)[:,:,3]>0
     f=np.where(a.any(1))[0][-1]; items.append((im,x,FOOT-f))
 if os.environ.get('SHADOW','1')=='1':
