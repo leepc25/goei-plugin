@@ -456,6 +456,15 @@ export class FighterPlayer extends Player {
   /** 맨몸(샤워 중 맞아 끊김). 샤워실을 나가면 hub 가 dress() */
   get nude(): boolean { return this.core.nude; }
   dress(): void { this.core.dress(); }
+  /** 탈의실 캐비닛(11-02): 맨몸이면 옷 입기, 아니면 옷 벗기. 바닥에 서 있을 때만 */
+  changeClothes(x: number, y: number, face: 1 | -1): boolean {
+    const P = this.core.P as unknown as { x: number; y: number; z: number; vx: number; face: 1 | -1; mode: string };
+    if (P.mode !== 'ground' || this.z > 0 || this.core.changing) return false;
+    P.x = x; P.y = y; P.z = 0; P.vx = 0; P.face = face;
+    if (this.core.nude) this.core.dressUp(); else this.core.undress();
+    this.sync();
+    return true;
+  }
   shower(x: number, y: number, face: 1 | -1, seconds = 600): boolean {
     const P = this.core.P as unknown as { x: number; y: number; z: number; vx: number; face: 1 | -1; mode: string };
     if (!(this.core.has('SH_D') || this.core.has('SH_E')) || P.mode !== 'ground' || this.z > 0) return false;
@@ -471,7 +480,7 @@ export class FighterPlayer extends Player {
     const P = this.core.P as unknown as { x: number; y: number; mode: string; scene: unknown };
     const quit = p.pressed.has('interact') || p.pressed.has('jump') || p.mx !== 0 || p.my !== 0;
     if (quit && this.core.showering) { P.scene = null; this.core.toIdle(); }
-    if (!this.core.showering) { const e = this.coreShower.exit; this.coreShower = null; if (P.mode === 'ground') { this.core.dress(); P.x = e.x; P.y = e.y; this.sync(); } }   // 스스로 그만둠 = 옷 입고 제자리. 맞아서 끊기면 맨몸(nude)인 채 그 자리
+    if (!this.core.showering) { const e = this.coreShower.exit; this.coreShower = null; if (P.mode === 'ground') { P.x = e.x; P.y = e.y; this.sync(); } }   // 11-02: 샤워를 그만둬도 맨몸 그대로 — 옷은 탈의실 캐비닛에서 입는다   // 스스로 그만둠 = 옷 입고 제자리. 맞아서 끊기면 맨몸(nude)인 채 그 자리
   }
   private coreSeatStep(p: Pad) {
     const P = this.core.P as unknown as { x: number; y: number; mode: string; seat: unknown };

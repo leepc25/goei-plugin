@@ -92,7 +92,7 @@ export function createHqWorld(
   seed: number,
   present: { name: string; scene: string }[],
   has: (look: string, clip: string) => boolean = () => false,
-  extra: Pick<SimOptions, 'stance' | 'killOk' | 'relation' | 'namedHostile' | 'nav'> = {},
+  extra: Pick<SimOptions, 'stance' | 'killOk' | 'relation' | 'namedHostile' | 'nav' | 'lineN'> = {},
 ): WorldSim {
   const graph = new PlaceGraph(map.scenes, map.elevator);
   const sim = new WorldSim(graph, mulberry32(seed), { spawns: hqSpawns(graph), posts: hqPosts(graph), has, sceneFaction: hqSceneFaction, ...extra });

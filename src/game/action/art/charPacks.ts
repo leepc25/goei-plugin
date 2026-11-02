@@ -2,7 +2,7 @@
 // tools/build_char_packs.py 가 테스트룸 빌더(game-src/action/testroom3/build.py)의 측정값·설정을 그대로 옮겨 만든 것이라,
 // 인물 엔진 fighter/core.ts 가 바로 쓴다(A = 줄 측정값, IMG = 시트, CH = 설정, VFX = 이펙트, CHAIR = 의자).
 // 필드 생태계(hub.ts drawLiveActor)도 같은 그림으로 생활 클립을 그린다: 클립 이름(docs/필드_클립_이름_약속.md) ↔ 줄 번호는 아래 FIELD_CLIP.
-import { npcShowerFrame } from '../fighter/shower';
+import { npcShowerFrame, DRESS_D } from '../fighter/shower';
 import { snapTo, spr } from '../engine/view';
 import { SEATS, SEAT_IDS, SEAT_LOOP, seatBody, seatFit, type SeatDir } from '../fighter/seats';
 
@@ -141,6 +141,8 @@ export const FIELD_CLIP: Record<string, { ids: string[]; fps?: number; loop?: bo
   nude_flee: { ids: ['SH_H6'], fps: 12 },
   // NPC 샤워(11-02): 옷 벗기 → 머리감기·몸씻기 → 옷 입기. 그리기는 drawCharClip 의 shower 갈래 (fighter/shower.ts npcShowerFrame)
   shower: { ids: ['SH_D', 'SH_E'], fps: 8 },
+  // 탈의실 캐비닛(11-02): 옷 벗기 = SH_A 한 번, 옷 입기 = SH_A 거꾸로 한 번 (drawCharClip 의 shower 갈래)
+  undress: { ids: ['SH_A'], fps: 1 / 0.12, loop: false }, dress: { ids: ['SH_A'], fps: 10, loop: false },
 };
 /** 그 인물에게 그 클립 그림이 있나 (받아 둔 인물만 참). 필드 세계는 그림 있는 행동만 켠다 */
 export function hasCharClip(nameOrKey: string, clip: string): boolean {
@@ -199,8 +201,14 @@ const ENTER: Record<string, { in: string; out?: string }> = { '76': { in: '75' }
 export function drawCharClip(c: CanvasRenderingContext2D, nameOrKey: string, x: number, y: number, dir: 1 | -1, now: number, clip = 'idle', since = 0, until?: number): boolean {
   const a = charArt(nameOrKey);
   if (!a) return false;
+  if (clip === 'dress' && a.A.SH_A && a.IMG.SH_A) {
+    const n = a.A.SH_A.n;
+    drawLine(c, a, 'SH_A', Math.max(0, n - 1 - Math.floor((now - since) / 1000 / DRESS_D)), x, y, dir);
+    return true;
+  }
   if (clip === 'shower') {
-    const nOf = (i: string) => (a.A[i] && a.IMG[i] ? a.A[i].n : 0);
+    // 씻기만 (옷 벗기·입기는 탈의실 캐비닛에서 따로, 11-02) → SH_A 는 0장으로 넘겨 건너뛴다
+    const nOf = (i: string) => (i !== 'SH_A' && a.A[i] && a.IMG[i] ? a.A[i].n : 0);
     const total = until === undefined ? 660 : (until - since) / 1000;
     const fr = npcShowerFrame(a.key, Math.round(since), (now - since) / 1000, total, nOf);
     if (fr) { drawLine(c, a, fr.id, fr.f, x, y, dir); return true; }

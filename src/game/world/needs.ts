@@ -36,8 +36,8 @@ export const ACTIVITIES: Activity[] = [
   { id: 'hobby', need: 'fun', clip: 'hobby', where: ['lounge'], sec: [30, 60], fill: 3, label: '취미' },
   // 훈련: 팔굽혀펴기·장비 점검·기지개, 그 줄이 없으면 약공 연습(모든 인물에게 있음). 싸우는 몸만 (choose fighter)
   { id: 'train', need: 'train', clip: 'train', where: ['training'], sec: [40, 90], fill: 2.5, label: '훈련' },
-  // 샤워(11-02): 같은 성별 샤워실의 빈 샤워 자리에서 옷 벗기 → 머리감기·몸씻기(문지르는 구간만 속도 차등 반복) → 옷 입기. 현실 10분 이상 (fighter/shower.ts 규칙)
-  { id: 'shower', need: 'hygiene', clip: 'shower', where: ['bathroom'], sec: [600, 780], fill: 0.2, label: '샤워 중' },
+  // 샤워(11-02): 같은 성별 탈의실 캐비닛에서 옷 벗기 → 맨몸으로 샤워실 빈 샤워기 → 머리감기·몸씻기(문지르는 구간만 속도 차등, 현실 10분 이상) → 탈의실로 돌아와 옷 입기 (actors.ts showerNext)
+  { id: 'shower', need: 'hygiene', clip: 'shower', where: ['locker'], sec: [600, 780], fill: 0.2, label: '샤워 중' },
 ];
 
 /** 활동마다 실제로 할 수 있는 줄 (10-31 사용자: 앉아서 하는 것과 서서 하는 것은 다르다, 상황에 따라 다양하게).
