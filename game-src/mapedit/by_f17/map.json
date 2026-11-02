@@ -1,0 +1,64 @@
+{
+ "file": "by_f17",
+ "bgScale": 2,
+ "w": 1588,
+ "h": 848,
+ "under": false,
+ "floor": [
+  [
+   0,
+   660
+  ],
+  [
+   1588,
+   660
+  ],
+  [
+   1588,
+   848
+  ],
+  [
+   0,
+   848
+  ]
+ ],
+ "lane": [
+  660,
+  836
+ ],
+ "blocks": [],
+ "lamps": [],
+ "spots": [],
+ "objects": [],
+ "doors": {
+  "office": {
+   "kind": "glass",
+   "x": 538,
+   "y": 670,
+   "label": "연구1팀",
+   "door": {
+    "x0": 374,
+    "x1": 700,
+    "y0": 236,
+    "y1": 654,
+    "behind": "dark",
+    "anim": "none"
+   }
+  },
+  "elev": {
+   "kind": "elevator",
+   "x": 1214,
+   "y": 670,
+   "label": "엘리베이터",
+   "door": {
+    "x0": 1096,
+    "x1": 1332,
+    "y0": 254,
+    "y1": 654,
+    "behind": "car",
+    "anim": "slide2",
+    "seam": 1214
+   }
+  }
+ }
+}
