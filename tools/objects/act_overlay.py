@@ -23,7 +23,8 @@ for it in ARGV[1:]:
     a=np.array(s)[:,:,3]>40; edge=a & ~(np.array(Image.fromarray(a.astype(np.uint8)*255).filter(ImageFilter.MinFilter(3)))>0)
     ol=np.zeros(a.shape+(4,),np.uint8); ol[edge]=(255,40,40,255); olim=Image.fromarray(ol)
     lp=J[k].get('lines',{}).get(f'{v}:{l}',pv)
-    for cd in cands or [f"{lp['dx']},{lp['dy']}"]:
+    fdx=lp.get('frame_dx',[lp['dx']]*99)[int(fi)-1]   # 장마다 x 가 다르면(기대 쉬기 등) frame_dx
+    for cd in cands or [f"{fdx},{lp['dy']}"]:
         dx,dy=map(int,cd.split(',')); pl=dict(pv,dx=dx,dy=dy)
         W,H=200,300; base=H-15
         T=Image.new('RGBA',(W,H),(92,86,78,255))
