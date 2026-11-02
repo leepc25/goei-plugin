@@ -16,7 +16,8 @@ K, W, H = 2, 1482, 424
 PLACE = ROOT / 'tools/objects/office_desk_place_v4.py'
 
 tmp = Path(tempfile.mkdtemp())
-env = dict(os.environ, SEATED='0', EXPORT=str(tmp / 'exp'), DUMP=str(tmp / 'meta.json'))
+SHIFT = os.environ.get('SOUTH_SHIFT', '12')   # 08:47 사용자 「책상이랑 의자 전반적으로 남쪽으로」 → 1배 12px 아래
+env = dict(os.environ, SOUTH_SHIFT=SHIFT, SEATED='0', EXPORT=str(tmp / 'exp'), DUMP=str(tmp / 'meta.json'))
 subprocess.run([sys.executable, str(PLACE), str(tmp / 'empty.png')], check=True, env=env, stdout=subprocess.DEVNULL)
 meta = json.loads((tmp / 'meta.json').read_text()); layers = json.loads((tmp / 'exp/layers.json').read_text())
 OUT.mkdir(parents=True, exist_ok=True)
@@ -31,20 +32,62 @@ floor = [[0, H * K], [0, BACK * K], [W * K, BACK * K], [W * K, H * K]]
 desks_s = [m for m in meta if m['kind'] == 'desk_s']; desks_n = [m for m in meta if m['kind'] == 'desk_n']
 chairs = [m for m in meta if m['kind'] == 'chair']
 objects, blocks = [], []
+import numpy as np, colorsys
+def alpha_of(r): return np.array(Image.open(tmp / 'exp' / r['file']).convert('RGBA'))
+def wood_rows(arr):
+    rows = []
+    for y in range(arr.shape[0]):
+        n = 0
+        for x in range(arr.shape[1]):
+            rr, g, b, al = arr[y, x] / 255
+            if al > 0.8:
+                h_, s_, v_ = colorsys.rgb_to_hsv(rr, g, b)
+                if 0.04 < h_ < 0.12 and s_ > 0.3 and v_ > 0.55: n += 1
+        rows.append(n)
+    ys = [y for y in range(len(rows)) if rows[y] > arr.shape[1] * 0.5]; return ys[0], ys[-1]
+def lay_of(d): return next(r for r in layers if r['bottom'] == d['y'] + d['h'] and abs(r['x'] - d['x']) < 40 and abs(r['w'] - d['w']) < 40)
+def legs(arr, x_off, y_off):
+    # 맨 아래 30줄에서 불투명 열 = 다리·서랍. 열마다 맨 아래 불투명 픽셀 +1 = 바닥 닿는 선
+    a = arr[..., 3] > 0; h = a.shape[0]; cols = {}
+    for x in range(a.shape[1]):
+        c = np.nonzero(a[h - 30:, x])[0]
+        if len(c): cols[x + x_off] = h - 30 + c.max() + 1 + y_off
+    return cols
+def desk_poly(s, n):
+    rs, rn = lay_of(s), lay_of(n); As, An = alpha_of(rs), alpha_of(rn)
+    ws, wn = wood_rows(As), wood_rows(An)
+    ls, ln = legs(As, rs['x'], rs['y']), legs(An, rn['x'], rn['y'])
+    xs0, xs1 = min(ls), max(ls); xn0, xn1 = min(ln), max(ln)
+    hs = rs['bottom'] - (rs['y'] + ws[1]); hn = rn['bottom'] - (rn['y'] + wn[1])
+    back_s = rs['y'] + ws[0] + hs          # 앞 책상 뒤끝 바닥
+    back_n = rn['y'] + wn[0] + hn          # 뒤 책상 뒤끝 바닥
+    front_n = rn['bottom']
+    # 앞선: 다리 사이 빈 곳(의자 들어가는 곳)도 못 지나감 → 왼쪽 다리 맨 앞 밑과 서랍 맨 앞 밑을 잇는 선.
+    # 다리 판 안쪽 비스듬한 밑선(뒤로 들어가는 옆판)은 그 선보다 위라서 버리고, 선보다 아래로 나온 픽셀(바퀴·다리 끝)만 따른다.
+    mid = (xs0 + xs1) // 2
+    yl = max(y for x, y in ls.items() if x < mid); yr = max(y for x, y in ls.items() if x >= mid)
+    xl = min(x for x, y in ls.items() if x < mid and y == yl); xr = max(x for x, y in ls.items() if x >= mid and y == yr)
+    line = lambda x: yl + (yr - yl) * (x - xl) / max(1, xr - xl) if xl <= x <= xr else (yl if x < xl else yr)
+    poly = []
+    for x in range(xs0, xs1 + 1):
+        y = max(ls.get(x, 0), round(line(x)))
+        if not poly or poly[-1][1] != y: poly += ([(x, poly[-1][1])] if poly else []) + [(x, y)]
+    poly.append((xs1 + 1, poly[-1][1]))
+    poly += [(xs1 + 1, min(back_s, front_n)), (xn1 + 1, min(back_s, front_n)), (xn1 + 1, back_n), (xn0, back_n), (xn0, min(back_s, front_n)), (xs0, min(back_s, front_n))]
+    print('desk', s['i'], 'front y', ls[xs0], ls[xs1], 'back_s', back_s, 'front_n', front_n, 'back_n', back_n, 'x', xs0, xs1, xn0, xn1)
+    return [[int(x), int(y)] for x, y in poly]
 for r in layers:
     (OUT / f"office_{r['file']}").write_bytes((tmp / 'exp' / r['file']).read_bytes())
     o = {'id': f"obj{r['n']:02d}", 'file': f"office_{r['file']}", 'x': r['x'], 'y': r['y'], 'w': r['w'], 'h': r['h'], 'sortY': r['bottom']}
     s = next((d for d in desks_s if d['x'] <= r['x'] < d['x'] + d['w'] and r['bottom'] == d['y'] + d['h'] and abs(r['w'] - d['w']) < 4), None)
     if s:
         n = desks_n[desks_s.index(s)]
-        x0, x1 = min(s['x'], n['x']) - WIDE * K, max(s['x'] + s['w'], n['x'] + n['w']) + WIDE * K
-        # 북쪽 의자는 북쪽 책상 밑에 반쯤 들어가 있음 → 막힘은 그 의자 발 바로 앞(+4)부터 (자리에 들어갈 수 있게)
-        cn = [c for c in chairs if c['chair'] != 'north.png' and n['x'] <= c['cx'] < n['x'] + n['w'] + 200]
-        y0 = max(n['y'] + n['h'] - DEPTH_N * K, round(cn[0]['foot'] * K) + 4) if cn else n['y'] + n['h'] - DEPTH_N * K
-        y1 = s['y'] + s['h']
-        o['solid'] = [{'x0': x0, 'x1': x1, 'y0': y0, 'y1': y1, 'h': 999}]
+        # 08:46~47 사용자 「성의없이 딴다」「뒤쪽 책상은 무시야?」: 네모·여유폭 버림. 앞(남)·뒤(북) 책상 둘 다 그림 픽셀로 딴다.
+        # 바닥 자국 = 상판(나무색 줄) 모양을 다리 길이(그림 밑선 − 상판 앞끝 줄)만큼 바닥으로 내린 것. 옆선 = 다리 바깥 픽셀,
+        # 앞선 = 다리·서랍 밑 윤곽(열마다 맨 아래 불투명 픽셀), 다리 사이 빈 곳은 양쪽 다리 밑을 잇는 선.
+        poly = desk_poly(s, n)
         o['kind'] = 'desk'
-        blocks.append([x0, x1, y0, y1])
+        blocks.append({'poly': poly, 'h': 999})
     elif any(abs(r['bottom'] - (n['y'] + n['h'])) < 2 and n['x'] <= r['x'] < n['x'] + n['w'] for n in desks_n):
         o['kind'] = 'desk_n'
     else:
@@ -76,7 +119,7 @@ dotK = round(scale(H) * K * CSC, 4)
 sizes = [[BACK * K, round(scale(BACK) / scale(H), 3)], [H * K, 1.0]]
 
 m = {'file': 'hq_office_strip', 'bgScale': K, 'dotK': dotK, 'sizes': sizes, 'w': W * K, 'h': H * K, 'under': False,
-     'floor': floor, 'lane': [BACK * K, H * K - 12], 'blocks': [], 'lamps': [], 'spots': spots,
+     'floor': floor, 'lane': [BACK * K, H * K - 12], 'blocks': blocks, 'lamps': [], 'spots': spots,
      'doors': {'out': {'kind': 'exit', 'side': 'E', 'x': W * K - 20, 'y': 740, 'label': '나가기'}},
      'objects': objects}
 (OUT / 'map.json').write_text(json.dumps(m, ensure_ascii=False, indent=1))
@@ -90,7 +133,7 @@ if len(sys.argv) > 1:
     except OSError: font = ImageFont.load_default()
     d.line([(x, y) for x, y in floor[1:3]], fill=(40, 255, 40), width=3)
     ov = Image.new('RGBA', full.size, (0, 0, 0, 0)); od = ImageDraw.Draw(ov)
-    for x0, x1, y0, y1 in blocks: od.rectangle([x0, y0, x1, y1], outline=(255, 40, 40, 255), width=3, fill=(255, 40, 40, 70))
+    for b in blocks: od.polygon([tuple(p) for p in b['poly']], outline=(255, 40, 40, 255), fill=(255, 40, 40, 70))
     full.alpha_composite(ov); d = ImageDraw.Draw(full, 'RGBA')
     for s in spots:
         col = (255, 220, 0) if s['verb'] == '앉기' else (0, 220, 255)

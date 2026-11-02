@@ -18,6 +18,7 @@ def load(p, foot):
 a = sys.argv
 G1, G2 = (int(a[2]) if len(a) > 2 else 40), (int(a[3]) if len(a) > 3 else 620)
 SF, NF = (int(a[4]) if len(a) > 4 else 374), (int(a[5]) if len(a) > 5 else 345)
+import os as _os; SF += int(_os.environ.get('SOUTH_SHIFT', '0'))  # 08:47 사용자 「뒤를 막으면 뒤로 이동이 안 됨, 책상이랑 의자 전반적으로 남쪽으로」 → 전체 아래로
 L = []
 import os
 CH = O / 'C01_사무의자_1배'; CHAIRS = os.environ.get('CHAIRS', '1') == '1'; CDY = int(os.environ.get('CDY', '14')); CSC = float(os.environ.get('CSC', '0.75'))  # 의자 따로 배율(좌판이 책상 상판보다 낮게)  # 의자 발 = 책상 발 ± CDY(1배)
