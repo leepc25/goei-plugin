@@ -25,9 +25,12 @@ def main():
     m = json.loads((ROOT / f'game-src/mapedit/{sid}/map.json').read_text())
     P = ROOT / 'game-pack/jr-field'
     img = Image.open(P / f"{g['file']}.webp").convert('RGBA')
-    layers = [(o['sortY'], 0, Image.open(P / f"{o['file']}.webp").convert('RGBA'), (o['x'], o['y'])) for o in g['objects'] if o.get('file')]
+    taken = {sp['chair'] for sp in m['spots'] if who.get(sp['id']) and 'chair' in sp}
+    # 게임: 앉은 사람은 자기 맞춤값 의자 그림(fit.img)을 직접 그리고, 지도 의자는 그동안 감춘다(hub.ts 269·charPacks.ts drawSeat)
+    layers = [(o['sortY'], 0, Image.open(P / f"{o['file']}.webp").convert('RGBA'), (o['x'], o['y'])) for o in g['objects'] if o.get('file') and o['id'] not in taken]
     chairs = m.get('chairs', [])
-    for ch in chairs:
+    for ci, ch in enumerate(chairs):
+        if ci in taken: continue
         face, st = ch.get('face'), ch.get('set')
         d = 'north' if face == 'N' else ('east' if st else 'west') if face == 'W' else 'east' if face == 'E' else ('south-east' if st else 'east')
         im = Image.open(ROOT / ('game-src/art/objects/chairs_shell/fit/%s.png' % d if st else 'game-src/art/objects/chairs/raw/c01_%s.png' % d)).convert('RGBA')
@@ -56,6 +59,14 @@ def main():
         bx, by = cx - fsgn * fit['dx'] * k, cy - fit['dy'] * k
         w, h = round(im.width * k), round(im.height * k)
         s = im.resize((w, h), Image.NEAREST)
+        cimg = fit.get('img') or {'front': 'south', 'side': 'east', 'back': 'north'}[dir_]
+        if st == 'L': cp = ROOT / f"game-src/art/objects/chairs_shell/fit/{cimg.split(':')[-1]}.png"
+        elif cimg.startswith('C02:'): cp = ROOT / f"game-src/action/objects/C02_기댄사무의자_1배_2차/{cimg[4:]}.png"
+        else: cp = ROOT / f"game-src/art/objects/chairs/raw/c01_{cimg}.png"
+        cim = Image.open(cp).convert('RGBA')
+        if fsgn < 0: cim = cim.transpose(Image.FLIP_LEFT_RIGHT)
+        cim = cim.resize((round(200 * k), round(200 * k)), Image.NEAREST)
+        layers.append((by + (0.5 if dir_ == 'back' else -0.5), 0, cim, (round(cx - 100 * k), round(cy - 171 * k))))
         # 후면 앉기는 의자가 몸 앞(의자 깊이 +1), 나머지는 몸이 의자 앞
         layers.append((by, 1, s, (round(bx - w / 2), round(by - sb * k))))
         print(sp['id'], key, dir_, 'set', st, 'fit', fit.get('dx'), fit.get('dy'), 'k %.3f' % k)
