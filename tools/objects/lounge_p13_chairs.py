@@ -11,7 +11,11 @@ bg=Image.open(R/'game-src/art/pixellab-hq-20261031/hq_lounge_p13s_extL5_fix.png'
 BG=bg.resize((bg.width*K,bg.height*K),Image.NEAREST)
 CH=R/'game-src/art/objects/chairs_shell/fit'
 TD=R/'game-src/art/objects/lounge_tables'; TM=json.loads((TD/'tables.json').read_text())
-VEND,FOOTV=150,301; ADULT=round(VEND*113/124); HZ=FOOTV-round(ADULT*0.93); A=ADULT/(FOOTV-HZ)
+if os.environ.get('SCALE','p12')=='p12':   # 04:45 사용자 승인값(p12s 「이정도면 쓸 수 있어」)을 그대로: 어른 113@y289, HZ 184
+    ADULT,FOOTV=113,289
+else:                                        # v1: 이 그림 자판기 150에서 추정(쓰지 말 것)
+    FOOTV=301; ADULT=round(150*113/124)
+HZ=FOOTV-round(ADULT*0.93); A=ADULT/(FOOTV-HZ)
 def scale(y):
     b=K*A*(FOOTV-HZ)/247; f=K*A*(y-HZ)/247; return b+(f-b)*P
 def chair(d,y):
