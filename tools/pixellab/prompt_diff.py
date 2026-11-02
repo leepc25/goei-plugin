@@ -24,6 +24,9 @@ def check(path):
     # 2026-11-01 화장실·휴게실(설비·가구는 오브젝트, 바닥 비움): 사용자 확정 화장실 p1 문장 「Pack the walls and ceiling with detail and texture everywhere, nothing left plain」로 꽉 채우기 문장을 대신한다 (NO_FILL=1일 때만)
     if os.environ.get('NO_FILL') == '1':
         must = ['Pack the walls and ceiling with detail and texture everywhere, nothing left plain' if m.startswith('Pack the whole image') else m for m in must]
+    # 2026-11-02 04:09 사용자 「바닥 50%로 해」: 휴게실은 바닥 문장만 lower half 허용 (FLOOR_HALF=1일 때만)
+    if os.environ.get('FLOOR_HALF') == '1':
+        must = [m.replace('lower third', 'lower half') for m in must]
     for m in must:
         hit = m in new
         rows.append(('그대로' if hit else '빠짐', m[:70]))
