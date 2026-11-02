@@ -21,28 +21,53 @@ K = 2
 im = Image.open(SRC).convert('RGB'); im.save(OUT / 'hq_lounge_strip.png')
 W, H = im.width * K, im.height * K
 P = lambda pts: [[x * K, y * K] for x, y in pts]
-# 바닥: 벽 물건 밑선(검은 윤곽 줄)+2px, 옆으로 몸 반폭 여유 12px (11-01 마스크 규칙).
-# 06:13 사용자 「높이 올라 탔잖아 싱크대」: 조리대 밑선은 y299(8배로 다시 읽음) — 처음 295는 조리대 위를 걷게 했다.
-WALL = 291   # 걸레받이 밑 y289 + 2
-SEG = [(68, 143, 298), (143, 221, 301), (221, 318, 303), (398, 500, 292), (563, 645, 299), (645, 835, 299)]   # x0, x1, 밑선 y
-MARGIN = 12
-top = [WALL] * 896
-for x0, x1, yb in SEG:
-    for x in range(max(0, x0 - MARGIN), min(896, x1 + MARGIN)): top[x] = max(top[x], yb + 2)
-BINS = [(835, 297), (838, 312), (841, 318), (846, 322), (851, 326), (856, 329), (862, 332), (866, 338), (872, 341), (877, 342),
-        (880, 345), (885, 350), (890, 353), (896, 354)]   # 분리수거함 앞 밑 윤곽(6배로 읽음) +2
+# 바닥 윗선(1x): 06:19 사용자 「픽셀 단위로 정교하게」 → 8배 격자 crop(f00~f12, zE)을 열마다 눈으로 읽고 V<70 윤곽 검사로 맞춘 값.
+# 값 = 그 열의 가장 아래 검은 윤곽 y + 1 (발이 윤곽 바로 밑). 구간 (x0, x1, y) 또는 열별 목록.
+SEG = [(0, 68, 293),            # 걸레받이 밑 검은 줄 y292
+       (69, 142, 301),          # 전자레인지 장 밑 y300(테이블1 뒤까지 같은 선)
+       (143, 219, 303),         # 정수기 2대 밑 y302
+       (220, 223, 293),         # 정수기·자판기 사이 벽
+       (224, 224, 302), (225, 226, 303), (227, 227, 305), (228, 234, 306), (235, 235, 305),   # 보라 자판기 왼발
+       (236, 298, 303),         # 자판기 밑판 y302
+       (299, 299, 305), (300, 305, 306), (306, 306, 305),                                      # 오른발
+       (307, 307, 303), (308, 308, 302), (309, 309, 301), (310, 310, 300), (311, 311, 299), (312, 312, 298),
+       (313, 313, 297), (314, 314, 296), (315, 315, 294),                                      # 오른쪽 비스듬한 모서리
+       (316, 394, 292),         # 벽 y291
+       (395, 504, 293),         # 소화기·쓰레기통(테이블2 뒤) 밑 y292
+       (505, 564, 292),         # 출입문 문턱 y290~291
+       (565, 644, 300),         # 흰 자판기 밑 y299
+       (645, 646, 297),         # 자판기·조리대 사이 모서리
+       (647, 816, 300),         # 조리대 밑 y299
+       (817, 835, 299), (836, 837, 298)]
+BINS = [308, 314, 315, 316, 317, 317, 317, 320, 321, 322, 322, 323, 324, 324, 325, 326, 327, 327, 327, 327, 327, 327, 330, 331, 332, 333,
+        333, 334, 335, 335, 336, 336, 337, 338, 338, 338, 338, 338, 338, 338, 342, 343, 344, 345, 346, 346, 347, 348, 348, 349, 350, 350,
+        351, 351, 351, 351, 351, 351]   # x838~895 분리수거함 앞 밑 윤곽 y (zE 6배 눈 읽기 + 검사 일치)
+top = [None] * 896
+for x0, x1, y in SEG:
+    for x in range(x0, x1 + 1): top[x] = y
+for i, y in enumerate(BINS): top[838 + i] = y + 1
+assert None not in top, [i for i, v in enumerate(top) if v is None]
 pts, prev = [], None
-for x in range(0, BINS[0][0] - MARGIN):
+for x in range(896):
     if top[x] != prev:
         if prev is not None: pts.append((x, prev))
         pts.append((x, top[x])); prev = top[x]
-pts += [(x - MARGIN, y) for x, y in BINS[1:-1] if y > prev] + [(896, BINS[-1][1])]   # 조리대 선보다 높은 윤곽 점은 버림
+pts.append((896, prev))
 floor = P(pts + [(896, 424), (0, 424)])
 # 테이블 = 올라설 수 있는 발판(사용자 06:14 「올라가게 잡아」). 바닥 자리 = 상판이 덮는 바닥(뒷다리 y348~앞다리 y377, 상판 좌우 끝),
 # 높이 = 앞다리 바닥 y377 - 상판 앞끝 윗면 y302 = 75(1x) → 150(2x). import.py가 h<400이면 발판(solid)으로 굽는다.
 TOP_H = (377 - 302) * K
-SLAB = {'table1': (82, 205), 'table2': (383, 506), 'table3': (669, 793)}
-blocks = [{'poly': P([(x0, 348), (x1, 348), (x1, 377), (x0, 377)]), 'h': TOP_H} for x0, x1 in SLAB.values()]
+# 06:18 사용자 「왜 갑자기 이렇게 바뀌었어」: 네모 하나로 잡아 다리 밖까지 번짐 → 다리 바닥 사다리꼴(뒤 y348, 앞 y377)을
+# 얇은 띠 6줄로 쌓아 비스듬함을 따름. 띠는 테이블 앞쪽 그림(object)의 solid로 넣는다(게임 solid = 네모 목록).
+LEGS = {'table1': ((120, 203), (85, 183)), 'table2': ((420, 504), (386, 483)), 'table3': ((671, 755), (692, 789))}   # (뒤 좌우), (앞 좌우)
+NSTRIP = 29   # 뒤 y348~앞 y377 한 줄씩(픽셀 단위)
+def strips(n):
+    (bl, br), (fl, fr) = LEGS[n]; out = []
+    for i in range(NSTRIP):
+        y0 = 348 + (377 - 348) * i / NSTRIP; y1 = 348 + (377 - 348) * (i + 1) / NSTRIP; t = (i + 0.5) / NSTRIP
+        out.append({'x0': round((bl + (fl - bl) * t) * K), 'x1': round((br + (fr - br) * t) * K), 'y0': round(y0 * K), 'y1': round(y1 * K), 'h': TOP_H})
+    return out
+blocks = []
 TM = json.loads((TD / 'tables.json').read_text())
 BACKLEG = {'table1': [(120, 128, 308, 348), (197, 203, 296, 348)], 'table2': [(420, 427, 308, 348), (498, 504, 295, 348)],
            'table3': [(671, 677, 294, 348), (748, 755, 308, 348)]}
@@ -55,7 +80,7 @@ for n, t in TM.items():
     tb.save(OUT / f'{n}_back.png'); tf.save(OUT / f'{n}_front.png')
     for part, sy in (('back', 348), ('front', 377)):
         objects.append({'id': f'{n}_{part}', 'file': f'{n}_{part}.png', 'x': t['x'] * K, 'y': t['y'] * K,
-                        'w': src.width * K, 'h': src.height * K, 'sortY': sy * K})
+                        'w': src.width * K, 'h': src.height * K, 'sortY': sy * K, **({'solid': strips(n)} if part == 'front' else {})})
 door = lambda x0, x1, y0, y1: {'x0': x0 * K, 'x1': x1 * K, 'y0': y0 * K, 'y1': y1 * K, 'anim': 'none', 'behind': 'dark'}
 doors = {'out': {'kind': 'glass', 'x': 534 * K, 'y': 296 * K, 'to': 'f3', 'toDoor': 'lounge', 'label': '복도', 'door': door(504, 566, 131, 285)}}
 # 의자 자리 = 앉혀 보기 v8 (tools/objects/lounge_p13_people.py) 그대로: 의자 발 y와 기준점 x(1x)
@@ -81,7 +106,8 @@ if len(sys.argv) > 1:   # 확인 그림: 걷는 바닥(초록), 막힘(빨강), 
     from PIL import ImageDraw
     b = im.resize((W, H), Image.NEAREST).convert('RGBA'); ov = Image.new('RGBA', b.size, (0, 0, 0, 0)); d = ImageDraw.Draw(ov)
     d.polygon([tuple(p) for p in floor], fill=(0, 200, 80, 70), outline=(0, 160, 60, 255))
-    for bl in blocks: d.polygon([tuple(p) for p in bl['poly']], fill=(230, 40, 40, 110), outline=(200, 0, 0, 255))
+    for o in objects:
+        for r in o.get('solid', []): d.rectangle((r['x0'], r['y0'], r['x1'], r['y1'] - 1), fill=(230, 40, 40, 110))
     for s in spots:
         c = (40, 120, 255, 255) if 'chair' in s else (255, 150, 0, 255)
         d.ellipse((s['x'] - 6, s['y'] - 6, s['x'] + 6, s['y'] + 6), fill=c, outline=(0, 0, 0, 255))
