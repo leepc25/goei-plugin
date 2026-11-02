@@ -17,6 +17,7 @@ SEATS = [  # x2, floor y2, scale, view, key, occl_y2(이 줄 아래는 배경이
     (1274, int(os.environ.get('FC', '555')), float(os.environ.get('SC', '1.0')), 'front', '4.1_차여진', int(os.environ.get('OC', '456')), (1065, 1480)),
     (1704, int(os.environ.get('FC', '555')), float(os.environ.get('SC', '1.0')), 'front', '6.28_협회여2', int(os.environ.get('OC', '456')), (1505, 1904)),
 ]
+SEATS = [x for x in SEATS if '협회' not in x[4]]  # 12:19 사용자 「협회 직원 배치하지마」
 out = BG2.copy()
 for x2, fy, s, v, key, oy, (xa, xb) in SEATS:
     cfg, _ = fc.load(key); ims, vals = fc.values(cfg)
