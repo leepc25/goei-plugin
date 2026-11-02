@@ -100,9 +100,9 @@ for oid, (polys, sy, depth) in ROUGH.items():
                 yb = c.max() + 1; yt = max(c.min(), yb - depth)
                 blocks.append({'poly': [[x * K, yt * K], [(x + 2) * K, yt * K], [(x + 2) * K, yb * K], [x * K, yb * K]], 'h': 999})
 # 사물함 줄 막힘(바닥 자국 = 앞 바닥선부터 뒷벽까지)
-# 옆면에서 몸 반폭 10px 띄움 (11-02 06:3x: 여자 탈의실 「파묻혔냐」와 같은 문제)
-blocks.append({'poly': [[x * K, y * K] for x, y in [(285, 296), (477, 296), (477, 300), (389, 375), (285, 375)]], 'h': 999})
-blocks.append({'poly': [[x * K, y * K] for x, y in [(541, 296), (632, 296), (632, 425), (590, 387), (541, 301)]], 'h': 999})
+# 옆면에서 몸 반폭 18px 띄움 (11-02 06:3x 「파묻혔냐」, 06:45 「왜 캐비닛이랑 겹치냐」: 이 방은 사람이 커서 10px로 모자람)
+blocks.append({'poly': [[x * K, y * K] for x, y in [(285, 296), (485, 296), (485, 300), (397, 375), (285, 375)]], 'h': 999})
+blocks.append({'poly': [[x * K, y * K] for x, y in [(533, 296), (632, 296), (632, 425), (582, 387), (533, 301)]], 'h': 999})
 
 
 def to_cover(oid, m, sy):
