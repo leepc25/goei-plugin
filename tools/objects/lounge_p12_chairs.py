@@ -3,7 +3,10 @@ import sys
 from pathlib import Path
 from PIL import Image
 R=Path(__file__).resolve().parents[2]
+import os
+BK=float(os.environ.get('BK','1'))  # 배경 확대 배율(의자는 1배 원본 그대로)
 bg=Image.open(R/'game-src/art/pixellab-hq-20261031/hq_lounge_p12s.png').convert('RGBA')
+if BK!=1: bg=bg.resize((round(bg.width*BK),round(bg.height*BK)),Image.NEAREST)
 CH=R/'game-src/art/objects/chairs_shell/fit'
 import os
 SC=float(os.environ.get('SC','1'))  # 1배 원본에서 바로 줄임(확대 거치지 않음)
@@ -14,8 +17,8 @@ def ch(d):
         n.alpha_composite(s,(100-round(100*SC),171-round(171*SC))); im=n   # 가운데 x100·바닥 y171 유지
     return im
 # 테이블(1배 잰 값): 상판 x범위, 가운데
-TABLES=[(39,159),(260,370),(472,592)]
-FOOT_BACK, FOOT_FRONT, FOOT_SIDE = 352, 402, 378   # 의자 발 y
+TABLES=[(round(a*BK),round(b*BK)) for a,b in [(39,159),(260,370),(472,592)]]
+FOOT_BACK, FOOT_FRONT, FOOT_SIDE = [round(v*BK) for v in (352, 402, 378)]   # 의자 발 y
 items=[]  # (그리는 순서 y, img, x, y)
 for x0,x1 in TABLES:
     cx=(x0+x1)//2
@@ -31,11 +34,11 @@ for y,img,x,yy in sorted(items,key=lambda t:t[0]):
     if y==FOOT_BACK:
         # 테이블 상판·다리 영역(사각) 뒤로: 그 영역에선 배경을 다시 위에
         for x0,x1 in TABLES:
-            box=(x0,296,x1+1,388)
+            box=(x0,round(296*BK),x1+1,round(388*BK))
             layer.paste((0,0,0,0),box,bg.crop(box).split()[3].point(lambda a:0) if False else None) if False else None
     out.alpha_composite(layer)
     if y==FOOT_BACK:
         for x0,x1 in TABLES:
             # 테이블 픽셀(상판 띠 + 다리) 다시 그리기: 상판 y296~321 전체, 다리는 어두운 세로줄만
-            box=(x0-2,296,x1+3,322); out.paste(bg.crop(box),box[:2])
+            box=(x0-2,round(296*BK),x1+3,round(322*BK)); out.paste(bg.crop(box),box[:2])
 out.save(sys.argv[1])  # 1배 그대로 저장(사용자 04:32 「2배 적용 안 하고」)
