@@ -58,8 +58,6 @@ for oid, polys, base, (bx0, bx1) in PARTS:
 def door(x0, x1, y0, y1): return {'x0': x0 * K, 'x1': x1 * K, 'y0': y0 * K, 'y1': y1 * K, 'anim': 'none', 'behind': 'dark'}
 doors = {
     'main': {'kind': 'glass', 'x': 825 * K, 'y': Y0 * K + 10, 'to': 'lobby', 'toDoor': 'main', 'label': '관리국 현관', 'door': door(774, 876, 143, 280)},
-    # 파스타집(예전 뒷골목 가게)은 이 그림에 없어 오른쪽 끝(관철빌딩 모퉁이)으로 나가는 임시 출구 — 사용자 결정 전까지
-    'pasta': {'kind': 'exit', 'x': 1262 * K, 'y': Y0 * K + 10, 'to': 'pasta', 'toDoor': 'out', 'label': '파스타집 (임시)', 'door': door(1252, 1272, 280, 364)},
     'jr': {'kind': 'door', 'x': 64 * K, 'y': Y0 * K + 10, 'to': 'jr_entry', 'toDoor': 'west', 'label': '버스 정류장', 'door': door(47, 86, 160, 300)},
 }
 m = {'file': 'hq_street', 'bgScale': K, 'dotK': 1.12, 'w': W, 'h': H, 'under': True,

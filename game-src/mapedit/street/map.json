@@ -214,22 +214,6 @@
     "behind": "dark"
    }
   },
-  "pasta": {
-   "kind": "exit",
-   "x": 2524,
-   "y": 610,
-   "to": "pasta",
-   "toDoor": "out",
-   "label": "파스타집 (임시)",
-   "door": {
-    "x0": 2504,
-    "x1": 2544,
-    "y0": 560,
-    "y1": 728,
-    "anim": "none",
-    "behind": "dark"
-   }
-  },
   "jr": {
    "kind": "door",
    "x": 128,
