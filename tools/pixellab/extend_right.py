@@ -52,6 +52,11 @@ if PROT:
 if os.environ.get("GUIDE"):
     _g = Image.open(os.environ["GUIDE"]).convert("RGBA"); assert _g.size == (w, h); win.alpha_composite(_g)
 # PREVIEW=<png>: 창·마스크만 저장하고 보내지 않는다
+# GUIDE=<png>: 창 크기 투명 바탕 선 밑그림을 지운 칸 위에 얹어 보낸다(백일몽 거리 11-02: 잇기가 비스듬히 꺾여 수평·수직선을 못 박음)
+if os.environ.get("GUIDE"):
+    _g = Image.open(os.environ["GUIDE"]).convert("RGBA"); assert _g.size == win.size
+    _m = Image.new("L", win.size, 0); _m.paste(mask.convert("L"))
+    win.paste(_g, (0, 0), Image.composite(_g.getchannel("A"), Image.new("L", win.size, 0), _m))
 if os.environ.get("PREVIEW"):
     sh = Image.new("RGB", (w, h * 2 + 8), (255, 0, 255)); sh.paste(win.convert("RGB"), (0, 0)); sh.paste(mask, (0, h + 8))
     sh.resize((w * 2, sh.height * 2), Image.NEAREST).save(os.environ["PREVIEW"]); sys.exit(0)
