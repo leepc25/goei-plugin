@@ -1,0 +1,75 @@
+"""본부 3층 휴게실(lounge) 장면 원본 (사용자 11-02 06:07 「이대로 확정한다」).
+그림: game-src/art/pixellab-hq-20261031/hq_lounge_p13s_extL5_fix.png (896×424, 배경 2배 = 1792×848).
+좌표(1x)는 4~6배 확대 + 5px 격자로 윤곽선을 직접 읽었다(scratchpad zA~zF).
+- 뒷벽 밑(바닥 시작): 걸레받이 아래 y290. 벽 물건 밑: 전자레인지 장 x68~143 y298, 정수기 2대 x143~221 y301,
+  보라 자판기 x221~318 y303(다리), 소화기·쓰레기통 x398~500 y292, 출입문(비상구 표지 밑 유리문) 틀 x501~568 y98~287,
+  흰 자판기 x563~645 y300, 싱크대 조리대 x647~835 y295, 오른쪽 분리수거함 앞 윤곽 (835,295)→(896,353).
+- 테이블 3개는 배경에 그려져 있고, 오려 낸 그림(game-src/art/objects/lounge_tables)을 가림으로 다시 그린다.
+  뒷다리 부분은 뒷다리 바닥(y348)에서, 나머지는 앞다리 바닥(y377)에서 정렬(앉혀 보기 v8과 같은 나눔).
+- 벽에 붙은 물건은 가림 없음(사용자 규칙). 분리수거함도 벽에 붙어 뒤로 못 감 → 막힘만.
+- 상호작용(사용자 06:07 확정, NPC 생활 동작): 싱크대 104 / 자판기 57→27→142 / 정수기·커피메이커 57→142 /
+  전자레인지·간식 찬장 57→157 / 게시판 57 / 출입문 걸어 나감. 의자 12개 = 앉혀 보기 v8 자리.
+출력: game-src/mapedit/lounge/ (map.json + 그림) → python3 tools/mapedit/import.py game-src/mapedit/lounge lounge"""
+import json, os, shutil, sys
+from pathlib import Path
+from PIL import Image
+ROOT = Path(__file__).resolve().parents[2]
+SRC = ROOT / 'game-src/art/pixellab-hq-20261031/hq_lounge_p13s_extL5_fix.png'
+TD = ROOT / 'game-src/art/objects/lounge_tables'
+OUT = ROOT / 'game-src/mapedit/lounge'; OUT.mkdir(parents=True, exist_ok=True)
+K = 2
+im = Image.open(SRC).convert('RGB'); im.save(OUT / 'hq_lounge_strip.png')
+W, H = im.width * K, im.height * K
+P = lambda pts: [[x * K, y * K] for x, y in pts]
+# 바닥: 왼쪽부터 벽 물건 밑선을 따라감
+floor = P([(0, 290), (68, 290), (68, 298), (143, 298), (143, 301), (221, 301), (221, 303), (318, 303), (318, 290),
+           (398, 290), (398, 292), (500, 292), (500, 290), (563, 290), (563, 300), (645, 300), (645, 295), (835, 295),
+           (838, 310), (841, 316), (846, 320), (851, 324), (856, 327), (862, 330), (866, 336), (872, 339), (877, 340),
+           (880, 343), (885, 348), (890, 351), (896, 352), (896, 424), (0, 424)])
+TLEG = {'table1': ((85, 183), (120, 203)), 'table2': ((386, 483), (420, 504)), 'table3': ((692, 789), (671, 755))}
+blocks = [{'poly': P([(fl, 377), (fr, 377), (br, 348), (bl, 348)]), 'h': 999} for (fl, fr), (bl, br) in TLEG.values()]
+TM = json.loads((TD / 'tables.json').read_text())
+BACKLEG = {'table1': [(120, 128, 308, 348), (197, 203, 296, 348)], 'table2': [(420, 427, 308, 348), (498, 504, 295, 348)],
+           'table3': [(671, 677, 294, 348), (748, 755, 308, 348)]}
+objects = []
+for n, t in TM.items():
+    src = Image.open(TD / f'{n}.png').convert('RGBA'); tb = Image.new('RGBA', src.size, (0, 0, 0, 0)); tf = src.copy()
+    for x0, x1, y0, y1 in BACKLEG[n]:
+        box = (x0 - t['x'], y0 - t['y'], x1 - t['x'] + 1, y1 - t['y'] + 1)
+        tb.paste(src.crop(box), box[:2]); tf.paste((0, 0, 0, 0), box)
+    tb.save(OUT / f'{n}_back.png'); tf.save(OUT / f'{n}_front.png')
+    for part, sy in (('back', 348), ('front', 377)):
+        objects.append({'id': f'{n}_{part}', 'file': f'{n}_{part}.png', 'x': t['x'] * K, 'y': t['y'] * K,
+                        'w': src.width * K, 'h': src.height * K, 'sortY': sy * K})
+door = lambda x0, x1, y0, y1: {'x0': x0 * K, 'x1': x1 * K, 'y0': y0 * K, 'y1': y1 * K, 'anim': 'none', 'behind': 'dark'}
+doors = {'out': {'kind': 'glass', 'x': 534 * K, 'y': 296 * K, 'to': 'f3', 'toDoor': 'lounge', 'label': '복도', 'door': door(504, 566, 131, 285)}}
+# 의자 자리 = 앉혀 보기 v8 (tools/objects/lounge_p13_people.py) 그대로: 의자 발 y와 기준점 x(1x)
+TAB = {'table1': (162, 134, 82, 205), 'table2': (462, 434, 383, 506), 'table3': (713, 740, 669, 793)}
+FB, FF, FS, TUCK = 340, 395, 371, 12
+spots = []
+for n, (xb, xf, xl, xr) in TAB.items():
+    spots += [{'id': f'{n}_N', 'x': xb * K, 'y': FB * K, 'dir': 'front', 'face': 1, 'verb': '앉기', 'chair': 'front'},
+              {'id': f'{n}_W', 'x': (xl + TUCK) * K, 'y': FS * K, 'dir': 'side', 'face': 1, 'verb': '앉기', 'chair': 'side', 'edge': 'inner'},
+              {'id': f'{n}_E', 'x': (xr - TUCK) * K, 'y': FS * K, 'dir': 'side', 'face': -1, 'verb': '앉기', 'chair': 'side', 'edge': 'inner'},
+              {'id': f'{n}_S', 'x': xf * K, 'y': FF * K, 'dir': 'back', 'face': 1, 'verb': '앉기', 'chair': 'back'}]
+# 생활 동작 자리(1x 발 위치, 물건 정면 앞; 테이블 뒤 의자 줄 y340보다 뒤)
+USE = [('microwave_L', 105, 312, [57, 157]), ('water', 200, 314, [57, 142]), ('vend_purple', 265, 318, [57, 27, 142]),
+       ('board', 370, 312, [57]), ('vend_white', 604, 314, [57, 27, 142]), ('coffee', 668, 312, [57, 142]),
+       ('sink', 728, 312, [104]), ('snack', 775, 312, [57, 157]), ('microwave_R', 815, 312, [57, 157])]
+for sid, x, y, seq in USE:
+    spots.append({'id': sid, 'x': x * K, 'y': y * K, 'verb': '쓰기', 'face': 1, 'act': ['npc_use'], 'motions': seq, 'faceDir': 'N'})
+m = {'file': 'hq_lounge_strip', 'bgScale': K, 'w': W, 'h': H, 'under': True, 'floor': floor, 'lane': [290 * K, H - 12],
+     'blocks': blocks, 'doors': doors, 'lamps': [], 'spots': spots, 'objects': objects}
+(OUT / 'map.json').write_text(json.dumps(m, ensure_ascii=False, indent=1))
+print(W, H, len(spots), 'spots', len(objects), 'objects')
+if len(sys.argv) > 1:   # 확인 그림: 걷는 바닥(초록), 막힘(빨강), 자리(점)
+    from PIL import ImageDraw
+    b = im.resize((W, H), Image.NEAREST).convert('RGBA'); ov = Image.new('RGBA', b.size, (0, 0, 0, 0)); d = ImageDraw.Draw(ov)
+    d.polygon([tuple(p) for p in floor], fill=(0, 200, 80, 70), outline=(0, 160, 60, 255))
+    for bl in blocks: d.polygon([tuple(p) for p in bl['poly']], fill=(230, 40, 40, 110), outline=(200, 0, 0, 255))
+    for s in spots:
+        c = (40, 120, 255, 255) if 'chair' in s else (255, 150, 0, 255)
+        d.ellipse((s['x'] - 6, s['y'] - 6, s['x'] + 6, s['y'] + 6), fill=c, outline=(0, 0, 0, 255))
+        if 'chair' not in s: d.text((s['x'] - 20, s['y'] + 8), s['id'], fill=(0, 0, 0, 255))
+    d.rectangle((504 * K, 131 * K, 566 * K, 285 * K), outline=(255, 0, 255, 255), width=3)
+    Image.alpha_composite(b, ov).convert('RGB').save(sys.argv[1])

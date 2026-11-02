@@ -1,0 +1,536 @@
+{
+ "file": "hq_lounge_strip",
+ "bgScale": 2,
+ "w": 1792,
+ "h": 848,
+ "under": true,
+ "floor": [
+  [
+   0,
+   580
+  ],
+  [
+   136,
+   580
+  ],
+  [
+   136,
+   596
+  ],
+  [
+   286,
+   596
+  ],
+  [
+   286,
+   602
+  ],
+  [
+   442,
+   602
+  ],
+  [
+   442,
+   606
+  ],
+  [
+   636,
+   606
+  ],
+  [
+   636,
+   580
+  ],
+  [
+   796,
+   580
+  ],
+  [
+   796,
+   584
+  ],
+  [
+   1000,
+   584
+  ],
+  [
+   1000,
+   580
+  ],
+  [
+   1126,
+   580
+  ],
+  [
+   1126,
+   600
+  ],
+  [
+   1290,
+   600
+  ],
+  [
+   1290,
+   590
+  ],
+  [
+   1670,
+   590
+  ],
+  [
+   1676,
+   620
+  ],
+  [
+   1682,
+   632
+  ],
+  [
+   1692,
+   640
+  ],
+  [
+   1702,
+   648
+  ],
+  [
+   1712,
+   654
+  ],
+  [
+   1724,
+   660
+  ],
+  [
+   1732,
+   672
+  ],
+  [
+   1744,
+   678
+  ],
+  [
+   1754,
+   680
+  ],
+  [
+   1760,
+   686
+  ],
+  [
+   1770,
+   696
+  ],
+  [
+   1780,
+   702
+  ],
+  [
+   1792,
+   704
+  ],
+  [
+   1792,
+   848
+  ],
+  [
+   0,
+   848
+  ]
+ ],
+ "lane": [
+  580,
+  836
+ ],
+ "blocks": [
+  {
+   "poly": [
+    [
+     170,
+     754
+    ],
+    [
+     366,
+     754
+    ],
+    [
+     406,
+     696
+    ],
+    [
+     240,
+     696
+    ]
+   ],
+   "h": 999
+  },
+  {
+   "poly": [
+    [
+     772,
+     754
+    ],
+    [
+     966,
+     754
+    ],
+    [
+     1008,
+     696
+    ],
+    [
+     840,
+     696
+    ]
+   ],
+   "h": 999
+  },
+  {
+   "poly": [
+    [
+     1384,
+     754
+    ],
+    [
+     1578,
+     754
+    ],
+    [
+     1510,
+     696
+    ],
+    [
+     1342,
+     696
+    ]
+   ],
+   "h": 999
+  }
+ ],
+ "doors": {
+  "out": {
+   "kind": "glass",
+   "x": 1068,
+   "y": 592,
+   "to": "f3",
+   "toDoor": "lounge",
+   "label": "복도",
+   "door": {
+    "x0": 1008,
+    "x1": 1132,
+    "y0": 262,
+    "y1": 570,
+    "anim": "none",
+    "behind": "dark"
+   }
+  }
+ },
+ "lamps": [],
+ "spots": [
+  {
+   "id": "table1_N",
+   "x": 324,
+   "y": 680,
+   "dir": "front",
+   "face": 1,
+   "verb": "앉기",
+   "chair": "front"
+  },
+  {
+   "id": "table1_W",
+   "x": 188,
+   "y": 742,
+   "dir": "side",
+   "face": 1,
+   "verb": "앉기",
+   "chair": "side",
+   "edge": "inner"
+  },
+  {
+   "id": "table1_E",
+   "x": 386,
+   "y": 742,
+   "dir": "side",
+   "face": -1,
+   "verb": "앉기",
+   "chair": "side",
+   "edge": "inner"
+  },
+  {
+   "id": "table1_S",
+   "x": 268,
+   "y": 790,
+   "dir": "back",
+   "face": 1,
+   "verb": "앉기",
+   "chair": "back"
+  },
+  {
+   "id": "table2_N",
+   "x": 924,
+   "y": 680,
+   "dir": "front",
+   "face": 1,
+   "verb": "앉기",
+   "chair": "front"
+  },
+  {
+   "id": "table2_W",
+   "x": 790,
+   "y": 742,
+   "dir": "side",
+   "face": 1,
+   "verb": "앉기",
+   "chair": "side",
+   "edge": "inner"
+  },
+  {
+   "id": "table2_E",
+   "x": 988,
+   "y": 742,
+   "dir": "side",
+   "face": -1,
+   "verb": "앉기",
+   "chair": "side",
+   "edge": "inner"
+  },
+  {
+   "id": "table2_S",
+   "x": 868,
+   "y": 790,
+   "dir": "back",
+   "face": 1,
+   "verb": "앉기",
+   "chair": "back"
+  },
+  {
+   "id": "table3_N",
+   "x": 1426,
+   "y": 680,
+   "dir": "front",
+   "face": 1,
+   "verb": "앉기",
+   "chair": "front"
+  },
+  {
+   "id": "table3_W",
+   "x": 1362,
+   "y": 742,
+   "dir": "side",
+   "face": 1,
+   "verb": "앉기",
+   "chair": "side",
+   "edge": "inner"
+  },
+  {
+   "id": "table3_E",
+   "x": 1562,
+   "y": 742,
+   "dir": "side",
+   "face": -1,
+   "verb": "앉기",
+   "chair": "side",
+   "edge": "inner"
+  },
+  {
+   "id": "table3_S",
+   "x": 1480,
+   "y": 790,
+   "dir": "back",
+   "face": 1,
+   "verb": "앉기",
+   "chair": "back"
+  },
+  {
+   "id": "microwave_L",
+   "x": 210,
+   "y": 624,
+   "verb": "쓰기",
+   "face": 1,
+   "act": [
+    "npc_use"
+   ],
+   "motions": [
+    57,
+    157
+   ],
+   "faceDir": "N"
+  },
+  {
+   "id": "water",
+   "x": 400,
+   "y": 628,
+   "verb": "쓰기",
+   "face": 1,
+   "act": [
+    "npc_use"
+   ],
+   "motions": [
+    57,
+    142
+   ],
+   "faceDir": "N"
+  },
+  {
+   "id": "vend_purple",
+   "x": 530,
+   "y": 636,
+   "verb": "쓰기",
+   "face": 1,
+   "act": [
+    "npc_use"
+   ],
+   "motions": [
+    57,
+    27,
+    142
+   ],
+   "faceDir": "N"
+  },
+  {
+   "id": "board",
+   "x": 740,
+   "y": 624,
+   "verb": "쓰기",
+   "face": 1,
+   "act": [
+    "npc_use"
+   ],
+   "motions": [
+    57
+   ],
+   "faceDir": "N"
+  },
+  {
+   "id": "vend_white",
+   "x": 1208,
+   "y": 628,
+   "verb": "쓰기",
+   "face": 1,
+   "act": [
+    "npc_use"
+   ],
+   "motions": [
+    57,
+    27,
+    142
+   ],
+   "faceDir": "N"
+  },
+  {
+   "id": "coffee",
+   "x": 1336,
+   "y": 624,
+   "verb": "쓰기",
+   "face": 1,
+   "act": [
+    "npc_use"
+   ],
+   "motions": [
+    57,
+    142
+   ],
+   "faceDir": "N"
+  },
+  {
+   "id": "sink",
+   "x": 1456,
+   "y": 624,
+   "verb": "쓰기",
+   "face": 1,
+   "act": [
+    "npc_use"
+   ],
+   "motions": [
+    104
+   ],
+   "faceDir": "N"
+  },
+  {
+   "id": "snack",
+   "x": 1550,
+   "y": 624,
+   "verb": "쓰기",
+   "face": 1,
+   "act": [
+    "npc_use"
+   ],
+   "motions": [
+    57,
+    157
+   ],
+   "faceDir": "N"
+  },
+  {
+   "id": "microwave_R",
+   "x": 1630,
+   "y": 624,
+   "verb": "쓰기",
+   "face": 1,
+   "act": [
+    "npc_use"
+   ],
+   "motions": [
+    57,
+    157
+   ],
+   "faceDir": "N"
+  }
+ ],
+ "objects": [
+  {
+   "id": "table1_back",
+   "file": "table1_back.png",
+   "x": 164,
+   "y": 544,
+   "w": 248,
+   "h": 212,
+   "sortY": 696
+  },
+  {
+   "id": "table1_front",
+   "file": "table1_front.png",
+   "x": 164,
+   "y": 544,
+   "w": 248,
+   "h": 212,
+   "sortY": 754
+  },
+  {
+   "id": "table2_back",
+   "file": "table2_back.png",
+   "x": 766,
+   "y": 542,
+   "w": 248,
+   "h": 214,
+   "sortY": 696
+  },
+  {
+   "id": "table2_front",
+   "file": "table2_front.png",
+   "x": 766,
+   "y": 542,
+   "w": 248,
+   "h": 214,
+   "sortY": 754
+  },
+  {
+   "id": "table3_back",
+   "file": "table3_back.png",
+   "x": 1338,
+   "y": 540,
+   "w": 250,
+   "h": 216,
+   "sortY": 696
+  },
+  {
+   "id": "table3_front",
+   "file": "table3_front.png",
+   "x": 1338,
+   "y": 540,
+   "w": 250,
+   "h": 216,
+   "sortY": 754
+  }
+ ]
+}
