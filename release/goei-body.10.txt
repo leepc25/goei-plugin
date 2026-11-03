@@ -2003,7 +2003,7 @@ button.gx-jr-row { cursor: pointer; } button.gx-jr-row:hover { border-color: var
 
   // src/host/game/code.ts
   var CODE_KEY = "goei:game:code";
-  var VERSION = true ? "0.20.2" : "";
+  var VERSION = true ? "0.20.3" : "";
   var codeVersion = (code2) => /^\/\/ goei-game (\S+)/.exec(code2)?.[1] ?? null;
   var mod = null;
   var codeStats = { readMs: 0, runMs: 0, bytes: 0, fromNet: false };
