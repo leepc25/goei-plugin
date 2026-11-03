@@ -1,4 +1,12 @@
-nt(흰 공용 그림에 색) · under · hold · loop(초) · fade · rot · back
+ }, c);
+      },
+      hit(s) {
+        if (s.hit) strike2(s.hit);
+      },
+      // 그림 없이 맞음만(화면 전체 기술의 표적 자리)
+      // 3판 이펙트 그림(x3-*) 한 장. 기준 배율 1 = 인물과 같은 화소 크기(인물 그림을 크기 기준으로 뽑음). mode(bottom·center)는 빌드가 목록에서 넣음
+      // at: hand | front(dx) | self | body(몸 가운데) | target(표적·화면 전체 각 자리) | screen(화면 가운데)
+      // scale · w(화면 폭에 대한 비율로 맞춤) · dx·dy(그림 화소, dy 아래로 +) · flip:false · tint(흰 공용 그림에 색) · under · hold · loop(초) · fade · rot · back
       // 맞음: hit + r(기본 그림 폭 40%) + depth + delay. after: [부품] 그림이 끝난 뒤
       v(s, c) {
         const meta = VFX[s.vfx];
@@ -4036,21 +4044,4 @@ nt(흰 공용 그림에 색) · under · hold · loop(초) · fade · rot · bac
     light: { react: "flinch", push: 2, lift: 0, strength: 1 },
     heavy: { react: "stagger", push: 9, lift: 0, strength: 2 },
     stun: { react: "stagger", push: 5, lift: 0, strength: 2 },
-    launch: { react: "launch", push: 3, lift: 24, strength: 3 },
-    blow: { react: "down", push: 26, lift: 12, strength: 3 },
-    down: { react: "down", push: 12, lift: 6, strength: 3 },
-    spike: { react: "down", push: 4, lift: 0, strength: 3 },
-    pull: { react: "stagger", push: -14, lift: 0, strength: 2 },
-    turn: { react: "stagger", push: 6, lift: 0, strength: 2 }
-  };
-  var fighterHooks = { sfx: () => {
-  } };
-  var FighterPlayer = class extends Player {
-    core;
-    world = null;
-    heldNames = /* @__PURE__ */ new Set();
-    synced = { x: 0, y: 0 };
-    started = false;
-    lastTickAt = 0;
-    lastFrameAt = 0;
-    /** 「
+    launch: { react: "launch", push: 3, lift: 24, s

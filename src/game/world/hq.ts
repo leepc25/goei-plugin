@@ -188,7 +188,9 @@ export function createHqWorld(
     if (!graph.scene(p.scene) || names.has(p.name)) continue;
     names.add(p.name);
     // 부상(의무실)이면 침대 곁에만: 오가는 범위가 의무실 하나. 상주 인물은 자기 건물(가게 주인은 가게)
-    sim.add({ id: `npc:${p.name}`, name: p.name, kind: 'named', brain: 'needs', home: p.scene, roam: hqRoam(graph, p.scene, p.name), look: p.name });
+    // 본편 카드가 그 방에 있다고 한 요원(present)은 퇴근하지 않는다 (11-02 사용자: 밤에 들어가니 요원이 하나도 없음 → 카드 상태 우선). 상주 인물(RESIDENTS)은 근무표대로
+    const card = present.some((q) => q.name === p.name);
+    sim.add({ id: `npc:${p.name}`, name: p.name, kind: 'named', brain: 'needs', home: p.scene, roam: hqRoam(graph, p.scene, p.name), look: p.name, ...(card ? { card: true } : {}) });
   }
   return sim;
 }

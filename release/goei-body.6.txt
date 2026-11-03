@@ -2577,7 +2577,7 @@ Next Paragraph Text
     }
     return { next, lore: lore.count, scripts: scripts.count, fields: fields3 };
   }
-  var PLUGIN_VERSION = true ? "0.20.2" : "0";
+  var PLUGIN_VERSION = true ? "0.20.3" : "0";
 
   // src/core/pictures.ts
   function pictures(m) {

@@ -3486,5 +3486,5 @@ ${texts.anomaly}`;
   }
 
   // src/body-entry.ts
-  globalThis.__goeiBody = { version: "0.20.2", start: start3 };
+  globalThis.__goeiBody = { version: "0.20.3", start: start3 };
 })();

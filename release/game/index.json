@@ -1,5 +1,5 @@
 {
- "version": "0.20.2",
+ "version": "0.20.3",
  "code": {
   "parts": [
    "goei-game.1.txt",
@@ -17,8 +17,8 @@
    "goei-game.13.txt",
    "goei-game.14.txt"
   ],
-  "length": 2492408,
-  "bytes": 2725505
+  "length": 2493143,
+  "bytes": 2726240
  },
  "packs": [
   {
@@ -1567,8 +1567,8 @@
   },
   {
    "id": "jr-field",
-   "hash": "4ecb2893cfcf71e2",
-   "bytes": 9521551,
+   "hash": "d5fe75f04b0a0ba8",
+   "bytes": 9729381,
    "parts": [
     "jr-field.1.bin",
     "jr-field.2.bin",

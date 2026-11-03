@@ -46,6 +46,8 @@ export interface ActorDef {
   archetype?: string;
   /** 소속 세력 코드 (다른 세력 거점에 들어온 방문자 등, 방문 대응 10-31). 없으면 장면 소속·없음 */
   faction?: string;
+  /** 본편 카드 상태가 「그 방에 있다」고 한 요원 (11-02 사용자): 근무 시간과 무관하게 거점에 있고 퇴근하지 않는다 */
+  card?: boolean;
 }
 export type Act = 'idle' | 'walk' | 'pause' | 'dead' | 'door' | 'do' | 'notice' | 'post' | 'watch' | 'argue' | 'down' | 'scared' | 'gone';
 /** 걸어서 닿은 뒤 할 일 */
@@ -1192,7 +1194,7 @@ export class WorldSim {
   }
   /** true = 이번 틱은 퇴근·출근이 맡았다 */
   private stepCommute(a: Actor): boolean {
-    if (a.def.kind !== 'named' || a.def.brain !== 'needs' || this.hour == null) return false;
+    if (a.def.kind !== 'named' || a.def.brain !== 'needs' || this.hour == null || a.def.card) return false;
     const fac = this.sceneFaction(a.def.home);
     if (!fac) return false;
     const duty = onDuty(this.hour, TEMPER[a.def.name]);

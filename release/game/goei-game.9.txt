@@ -1,4 +1,21 @@
-w(s);
+ h);
+      draw(m);
+      m.globalCompositeOperation = "source-in";
+      m.fillStyle = color;
+      m.fillRect(0, 0, w, h);
+      c.save();
+      c.globalAlpha *= a;
+      c.drawImage(m.canvas, 0, 0, w, h, x, y, w, h);
+      c.restore();
+    }
+    /** 림라이트: 빛을 향한 가장자리만 밝게. 어두운 층에서 캐릭터가 배경과 갈라져 보이게 한다 */
+    rim(c, x, y, w, h, draw, lx, ly, color = "#ffd9a0", a = 0.9, thick = 3) {
+      const pad = thick + 1;
+      const ww = w + pad * 2, hh = h + pad * 2;
+      const s = this.m2, r = this.m1;
+      fit(s, ww, hh);
+      s.translate(pad, pad);
+      draw(s);
       s.setTransform(1, 0, 0, 1, 0, 0);
       fit(r, ww, hh);
       r.drawImage(s.canvas, 0, 0, ww, hh, 0, 0, ww, hh);
@@ -3656,17 +3673,4 @@ ${who}: ${text.replace(/\n/g, " ")}
       if (name === "combat:boss") bossUp = true;
       if (name === "combat:clear" && bossUp) bossUp = false, name = "win";
       if (name === "enter:floor") bossUp = false;
-      if (name === "enter:floor" || name === "floor:enter") {
-        const f = data.floor ?? data;
-        if (f.depth !== void 0) flags.depth = Number(f.depth);
-        if (f.type !== void 0) flags.ftype = String(f.type);
-        if (Number(flags.depth) >= 15) flags.reached_b12 = 1;
-      }
-      if (name === "find:rule" || name === "ruleFound") {
-        const id = String(data.id ?? data.rule ?? "");
-        if (!id || !flags[`rule_${id}`]) flags.rules = (Number(flags.rules) || 0) + 1;
-        if (id) flags[`rule_${id}`] = 1;
-      }
-      if (name === "rule:break") flags.broke_rule = 1;
-      if (name === "run:end") {
-        const ho
+      if (name 

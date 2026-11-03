@@ -368,8 +368,11 @@ export const HQ_SCENES: HqScene[] = [
     { id: 'elev', kind: 'elevator' },
   ]),
   // 의무실 겸 실험실: 의무실(침대) + 격리 연구실(연구·감정)을 한 방으로. 장비 보급은 B3 보급실로 옮김
-  // 격리팀 사무실(연구실): 그림 장면은 아직(격리팀 연구실 스레드, hq_b2_lab p20까지). 옛 방 그대로 두고 의무실 문만 북쪽 벽에 둔다 (사용자 11-02 13:11 「의무실은 격리팀 사무실 통해서 들어간다」)
-  { ...room({ id: 'clinic', name: '격리팀 사무실', floor: 'B2', look: 'lab', doors: [] }, 'medlab'), doors: [exitS('b2', 'clinic', 'medlab'), { id: 'infirmary', x: M(6), kind: 'door', to: 'infirmary', toDoor: 'out', label: '의무실' }] },
+  // 격리팀 사무실(연구실): 그림 장면(PixelLab 11-02 격리팀 연구실 스레드 hq_b2_lab_p20 1703px, tools/mapedit/author_hq_lab.py). 왼쪽 옆벽 문 = 지하 2층 복도, 오른쪽 옆벽 끝 문 = 의무실 (사용자 11-02 13:11 「의무실은 격리팀 사무실 통해서 들어간다」)
+  floorHall('clinic', '격리팀 사무실', 'B2', [
+    { id: 'out', kind: 'exit', to: 'b2', toDoor: 'clinic', label: '나가기' },
+    { id: 'infirmary', kind: 'exit', to: 'infirmary', toDoor: 'out', label: '의무실' },
+  ]),
   room({ id: 'tooth', name: '격리실', floor: 'B2', look: 'lab', doors: [exitS('b2', 'isolation', 'tooth')] }, 'tooth'),
   // 의무실(B2, PixelLab 11-02 hq_b2_infirmary_p9_fix2, tools/mapedit/author_hq_infirmary.py): 침대 3(눕기)·약품장·세면대·처치 카트.
   // 들어가는 길: 지하 2층 복도 → 격리팀 사무실(연구실) → 북쪽 벽 「의무실」 문 (사용자 11-02 13:11). 나가면 격리팀 사무실 그 문 앞

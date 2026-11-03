@@ -1,4 +1,17 @@
-w = String(data.result ?? data.how ?? "return");
+=== "enter:floor" || name === "floor:enter") {
+        const f = data.floor ?? data;
+        if (f.depth !== void 0) flags.depth = Number(f.depth);
+        if (f.type !== void 0) flags.ftype = String(f.type);
+        if (Number(flags.depth) >= 15) flags.reached_b12 = 1;
+      }
+      if (name === "find:rule" || name === "ruleFound") {
+        const id = String(data.id ?? data.rule ?? "");
+        if (!id || !flags[`rule_${id}`]) flags.rules = (Number(flags.rules) || 0) + 1;
+        if (id) flags[`rule_${id}`] = 1;
+      }
+      if (name === "rule:break") flags.broke_rule = 1;
+      if (name === "run:end") {
+        const how = String(data.result ?? data.how ?? "return");
         flags.result = how === "withdraw" ? "retreat" : how;
         flags.called_run = 0;
       }
@@ -5073,7 +5086,7 @@ w = String(data.result ?? data.how ?? "return");
     }
     /** true = 이번 틱은 퇴근·출근이 맡았다 */
     stepCommute(a) {
-      if (a.def.kind !== "named" || a.def.brain !== "needs" || this.hour == null) return false;
+      if (a.def.kind !== "named" || a.def.brain !== "needs" || this.hour == null || a.def.card) return false;
       const fac = this.sceneFaction(a.def.home);
       if (!fac) return false;
       const duty = onDuty(this.hour, TEMPER[a.def.name]);
@@ -5338,14 +5351,4 @@ w = String(data.result ?? data.how ?? "return");
         if (v) {
           const g2 = this.actors.find((q) => q.def.id === v.guard);
           release(g2);
-          if (v.spotted && !v.permit && !v.attacked) this.events.push({ kind: "expel", scene: g2?.scene ?? "", who: "{user}", by: g2?.def.name ?? "경비" });
-        }
-        this.playerVisit = null;
-        if (!p || !fac) return;
-      }
-      if (!this.outsiderAt(fac)) return;
-      const st = this.stance(fac);
-      const pv = this.playerVisit ??= { fac, spotted: false, scene: p.scene, cost: this.exitCost(p.scene, p.x, fac), permit: false, attacked: false };
-      if (pv.permit || pv.attacked || this.alarms.has(fac)) return;
-      const guardOf = () => this.actors.find((q) => q.def.id === pv.guard && !q.fighting && !["down", "dead", "gone"].includes(q.act));
-      if (this.
+          if (v.spotted && !v.permit && !v.
