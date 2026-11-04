@@ -178,7 +178,6 @@ const stepShown = (page, action, key) => page.evaluate(([a, k]) => document.quer
 
 // 필드(게임)에서 나오기: 필드 탭 안에서는 게임 머리(닫기·시작 화면 단추)를 숨기고(style.css .gx-fieldhost .gx-game .gx-head) 게임 안 「필드 나가기」
 // ·모바일 뒤로 쓸기가 같은 game-close 를 부른다(app.ts openGame 의 exit, navStep). 시험은 숨은 닫기 단추를 DOM 에서 눌러 그 길을 탄다
-const FIELD = '.gx-nav .gx-nb:not(.mob)[data-value="field"]';
 async function leaveField(page) {
   await page.evaluate(() => document.querySelector('.gx-game [data-action="game-close"]').click());
   await page.waitForFunction(() => !document.querySelector('.gx-game'));
@@ -2369,193 +2368,16 @@ if (fixture.globalLore.some(packed)) {
   await page.close();
 }
 
-// 게임 창 (ui/game.ts): 머리 게임 버튼 → 시작 화면. (2026-10-23 시작 화면을 설정 틀로 바꾸며 「이어하기」(.gx-gl-cont)는 「들어가기」([data-g=play])가 됨. v0.17.7: 게임은 「필드」 탭. 메뉴의 「필드」(.gx-nav [data-value=field])로 연다 — 옛 game-open 단추 자리) 게임 파일(코드 팩)이 없으면 받기, 받은 뒤 저장 칸에서 시작.
-// 정산 결과는 쌓아 두고 버튼을 눌러야만 채팅(전송 대기)과 기록 로어북에 쓴다.
+// 필드(게임)는 2026-11-04 플러그인에서 뺐다: 메뉴·머리에 필드(게임) 버튼이 없고, 게임 파일을 받으러 가지 않는다
 {
   const { page, errors } = await boot(fixture, { message: [], scriptstate: {} });
   await startedWithReply(page);
   await page.click('[x-goei-fab] button');
-  await page.click(FIELD);
-  await page.waitForSelector('.gx-gl [data-g="get"]');
-  assert.equal(await page.locator('.gx-gl [data-g="play"]:not([disabled])').count(), 0, '파일 받기 전에는 시작 못 함');
-  await page.click('[data-g="get"]');
-  await page.waitForSelector('.gx-settings [role=status]');
-  assert.match(await page.textContent('.gx-settings [role=status]'), /받지 못했어요/);
-  const gameFiles = pickGameFiles();   // 11-02: 인물 팩 126명(450MB)을 다 넘기면 렌더러가 죽는다 → 목록·코드·required 팩만 (tests/qc-game-host.mjs)
-  await page.evaluate((files) => {
-    const bytes = Object.fromEntries(Object.entries(files).map(([k, v]) => [k, Uint8Array.from(atob(v), (c) => c.charCodeAt(0))]));
-    window.__fetch = (u) => bytes[u.split('?')[0].split('/').pop()] ?? null;
-  }, gameFiles);
-  await page.click('[data-g="get"]');
-  await page.waitForSelector('.gx-gl [data-g="play"]:not([disabled])');
-  assert.match(await page.evaluate(() => window.__store['p:goei:game:code'].slice(0, 30)), /^\/\/ goei-game /);
-  if (shots) {
-    await page.screenshot({ path: `${shots}/game-home.png` });
-    await page.setViewportSize({ width: 390, height: 800 });
-    await page.waitForTimeout(200);
-    await page.screenshot({ path: `${shots}/game-home-m.png` });
-    await page.setViewportSize({ width: 1100, height: 900 });
-  }
-  assert.match(await page.textContent('.gx-gl'), /요원 \d+명/, '본편 명부를 읽음');
-  await page.click('.gx-gl [data-g="play"]');
-  await page.waitForSelector('.gx-game-box .goei-engine canvas');
-  // 쟈알디 그림 팩을 받아 두었고, 엔진이 그 그림(blob 주소)을 쓴다
-  assert.match(await page.evaluate(() => window.__store['p:goei:game:pack:jyaldi'].slice(0, 20)), /"hash"/);
-  await page.waitForFunction(() => window.__goeiGameStats.urls() >= 2);
-  // 통합 규격 3장: 게임 중에는 캔버스가 칸을 채운다. 2026-10-23 사용자 결정으로 게임은 창(상황창) 틀 안 필드 칸에서만 돈다
-  // (src/ui/game.ts openGame 주석, host/game/viewport.ts inFrame: 돌려 보기 없음). 그래서 「창 전체의 절반 이상·폰 세로 돌려 채움·PC 1280 폭」 대신
-  // 「필드 칸 안에 들어가고, 칸의 가로나 세로 한쪽을 꽉 채우고, 페이지가 스크롤되지 않음」을 본다
-  const fit = [];
-  for (const [w, h] of [[844, 390], [390, 844], [1280, 950], [1100, 900]]) {
-    await page.setViewportSize({ width: w, height: h });
-    await page.waitForTimeout(400);
-    const r = await page.evaluate(() => {
-      const b = document.querySelector('.goei-engine canvas').getBoundingClientRect();
-      const f = document.querySelector('.gx-fieldhost').getBoundingClientRect();
-      return { w: Math.round(b.width), h: Math.round(b.height), fw: Math.round(f.width), fh: Math.round(f.height), inside: b.left >= f.left - 1 && b.top >= f.top - 1 && b.right <= f.right + 1 && b.bottom <= f.bottom + 1, rot: !!document.querySelector('.gx-game.gx-rot'), scroll: document.scrollingElement.scrollHeight - innerHeight };
-    });
-    fit.push(`${w}×${h} → ${r.w}×${r.h} / 칸 ${r.fw}×${r.fh}`);
-    if (shots) await page.screenshot({ path: `${shots}/game-engine-${w}x${h}.png` });
-    assert.ok(r.inside, `캔버스가 필드 칸 밖으로 ${w}×${h} → ${JSON.stringify(r)}`);
-    assert.ok(r.w >= r.fw - 2 || r.h >= r.fh - 2, `캔버스가 필드 칸을 한쪽도 못 채움 ${w}×${h} → ${JSON.stringify(r)}`);
-    assert.equal(r.rot, false, '틀 안에서는 돌려 보이지 않음');
-    assert.ok(r.scroll <= 0, `페이지 스크롤 ${r.scroll}`);
-  }
-  console.log('FIT 게임 캔버스', fit.join(' · '));
-  // (정산 결과·「보고서 붙이기」·훈련 기록 로어북 절은 10-29 출동 삭제·11-01 「보고서는 기록 탭에만」 결정으로 기능이 없어져 11-02 뺌)
-  // 닫았다 다시 열면 저장 칸이 남아 있고, 코드는 다시 받지 않는다
-  await page.evaluate(() => (window.__calls.fetch = []));
-  await leaveField(page);
-  assert.equal(await page.locator('.gx-game').count(), 0);
-  await page.click(FIELD);
-  await page.waitForSelector('.gx-gl [data-g="play"]');
-  await page.click('.gx-gl [data-g="play"]');
-  await page.waitForSelector('.gx-game-box .goei-engine canvas');
-  assert.equal(await page.evaluate(() => (window.__calls.fetch ?? []).filter((u) => /goei-game\.\d/.test(u)).length), 0, '코드는 저장해 둔 것');
-  // 게임 중에는 필드 칸 전체(gx-full). 2026-10-23 사용자: 게임은 창 틀 안에서만 돈다(전체화면이면 Risu 경고·메뉴·뒤로가기가 가려짐) →
-  // 틀 안(inFrame)에서는 세로로 든 폰이라도 돌려 보이지 않는다 (host/game/viewport.ts apply). 그래서 「돌려 보기」 단언을 「안 돌림」으로 바꿈
-  await page.setViewportSize({ width: 390, height: 800 });
-  await page.waitForTimeout(300);
-  await page.waitForSelector('.gx-game.gx-full:not(.gx-rot)');
-  await page.setViewportSize({ width: 1100, height: 900 });
-  await page.waitForSelector('.gx-game.gx-full:not(.gx-rot)');
-  await leaveField(page);
+  await page.waitForSelector('.gx-nav');
+  assert.equal(await page.locator('[data-value="field"], .gx-fieldbtn, .gx-game').count(), 0, '필드 버튼·게임 창 없음');
   assert.deepEqual(errors, []);
-  console.log('PASS 게임 창: 파일 받기 실패 안내 → 받기(코드·쟈알디 팩) → 통합 엔진 시작 → 결과는 버튼으로만 채팅·로어북 → 다시 열면 이어하기 → 돌려 보기');
+  console.log('PASS 필드 없음: 메뉴·머리에 필드 버튼이 없다');
   await page.close();
-}
-
-// 게임 창 측정: 처음 받기·저장해 둔 코드로 열기·열고 닫기 반복 힙·큰 자산 팩 넣기 (CPU 4배 느리게 = 중급 폰 흉내)
-{
-  const { page, errors } = await boot(fixture, { message: [], scriptstate: {} });
-  const cdp = await page.context().newCDPSession(page);
-  await cdp.send('Performance.enable');
-  const heapMB = async () => {
-    await cdp.send('HeapProfiler.collectGarbage');
-    const m = (await cdp.send('Performance.getMetrics')).metrics.find((x) => x.name === 'JSHeapUsedSize');
-    return +(m.value / 1048576).toFixed(1);
-  };
-  await startedWithReply(page);
-  await page.click('[x-goei-fab] button');
-  const gameFiles = pickGameFiles();   // 11-02: 인물 팩 126명(450MB)을 다 넘기면 렌더러가 죽는다 → 목록·코드·required 팩만 (tests/qc-game-host.mjs)
-  await page.evaluate((files) => {
-    const bytes = Object.fromEntries(Object.entries(files).map(([k, v]) => [k, Uint8Array.from(atob(v), (c) => c.charCodeAt(0))]));
-    // 받기마다 40ms (느린 망 흉내는 아님, 요청 수만큼 지연)
-    window.__fetch = (u) => bytes[u.split('?')[0].split('/').pop()] ?? null;
-  }, gameFiles);
-  await cdp.send('Emulation.setCPUThrottlingRate', { rate: 4 });
-  const base = await heapMB();
-  const t0 = Date.now();
-  await page.click(FIELD);
-  await page.waitForSelector('[data-g="get"]');
-  const homeMs = Date.now() - t0;
-  const t1 = Date.now();
-  await page.click('[data-g="get"]');
-  await page.waitForSelector('.gx-gl [data-g="play"]:not([disabled])');
-  const getMs = Date.now() - t1;
-  const t2 = Date.now();
-  await page.click('.gx-gl [data-g="play"]');
-  await page.locator('.gx-game-box .goei-engine canvas').first().waitFor(); // waitForSelector 는 요소 손잡이를 돌려줘 닫은 캔버스(게임)를 붙잡아 힙 측정을 흐린다
-  const playMs = Date.now() - t2;
-  await page.waitForTimeout(3000);
-  const playing = await heapMB();
-  const cycles = [];
-  for (let i = 0; i < 5; i++) {
-    await leaveField(page);
-    await page.waitForTimeout(100);
-    cycles.push(await heapMB());
-    await page.click(FIELD);
-    await page.waitForSelector('.gx-gl [data-g="play"]');
-    await page.click('.gx-gl [data-g="play"]');
-    await page.locator('.gx-game-box .goei-engine canvas').first().waitFor(); // waitForSelector 는 요소 손잡이를 돌려줘 닫은 캔버스(게임)를 붙잡아 힙 측정을 흐린다
-    await page.waitForTimeout(500);
-  }
-  await leaveField(page);
-  const closed = await heapMB();
-  const st = await page.evaluate(() => ({ code: { ...window.__goeiGameStats.code }, fetch: { ...window.__goeiGameStats.fetch }, urls: window.__goeiGameStats.urls() }));
-  // 저장해 둔 코드를 새 페이지에서 꺼내 실행하는 시간 (본체의 메모리 캐시 없이)
-  const stored = await page.evaluate(() => window.__store['p:goei:game:code']);
-  const page2 = (await boot(fixture, { message: [], scriptstate: {} })).page;
-  await page2.evaluate((code) => (window.__store['p:goei:game:code'] = code), stored);
-  const cdp2 = await page2.context().newCDPSession(page2);
-  await cdp2.send('Emulation.setCPUThrottlingRate', { rate: 4 });
-  await startedWithReply(page2);
-  await page2.click('[x-goei-fab] button');
-  await page2.click(FIELD);
-  await page2.waitForSelector('.gx-gl [data-g="play"]:not([disabled])');
-  const t3 = Date.now();
-  await page2.click('.gx-gl [data-g="play"]');
-  await page2.waitForSelector('.gx-game-box .goei-engine canvas');
-  const warmMs = Date.now() - t3;
-  const warm = await page2.evaluate(() => ({ ...window.__goeiGameStats.code, ...window.__goeiGameStats.game }));
-  // 큰 자산 팩 (그림 200장 × 40KB = 8MB) 넣기·꺼내기
-  const big = await page2.evaluate(async () => {
-    const n = 200, size = 40 * 1024;
-    const files = [];
-    let at = 0;
-    for (let i = 0; i < n; i++) (files.push([`f${i}.png`, at, size]), (at += size));
-    const head = new TextEncoder().encode(JSON.stringify({ id: 'bigtest', version: 1, hash: 'h1', atlas: { n }, files }));
-    const out = new Uint8Array(12 + head.length + at);
-    out.set(new TextEncoder().encode('GOEIPACK'));
-    new DataView(out.buffer).setUint32(8, head.length, true);
-    out.set(head, 12);
-    for (let i = 12 + head.length; i < out.length; i += 1) out[i] = (i * 2654435761) >>> 24;
-    window.__bigPack = out;
-    return out.length;
-  });
-  await leaveField(page2);
-  await page2.click(FIELD);
-  await page2.waitForSelector('.gx-gl [data-g-file]', { state: 'attached' });
-  const tb = Date.now();
-  await page2.evaluate(async () => {
-    const dt = new DataTransfer();
-    dt.items.add(new File([window.__bigPack], 'bigtest.pack'));
-    const input = document.querySelector('[data-g-file]');
-    input.files = dt.files;
-    input.dispatchEvent(new Event('change', { bubbles: true }));
-  });
-  await page2.waitForFunction(() => /넣었어요: 팩 bigtest/.test(document.querySelector('.gx-settings [role=status]')?.textContent ?? ''), null, { timeout: 120000 });
-  const installMs = Date.now() - tb;
-  const storedLen = await page2.evaluate(() => window.__store['p:goei:game:pack:bigtest'].length);
-  assert.deepEqual(errors, []);
-  const report = {
-    bodyKB: Math.round(readFileSync(new URL('../dist/goei-body.js', import.meta.url)).length / 1024),
-    gameCodeKB: Math.round(st.code.bytes / 1024),
-    cpu: '4x 느리게',
-    homeMs, getMs, getRequests: st.fetch.requests, getKB: Math.round(st.fetch.bytes / 1024), playMs,
-    warm: { clickToCanvasMs: warmMs, readMs: warm.readMs, runMs: warm.runMs, mountMs: warm.mountMs },
-    heapMB: { base, playing, afterClose: cycles, final: closed }, liveUrlsAfterClose: st.urls,
-    bigPack: { MB: +(big / 1048576).toFixed(1), installMs, storedMB: +(storedLen / 1048576).toFixed(1) },
-  };
-  console.log('MEASURE 게임 창', JSON.stringify(report));
-  writeFileSync(new URL('../dist-test/game-measure.json', import.meta.url), JSON.stringify(report, null, 1));
-  // 기준: 처음 닫은 뒤(게임 코드 실행·받은 파일이 가짜 저장소 window.__store 에 문자열로 남은 뒤). 예전 기준(게임을 받기 전 base)은
-  // 받은 양(지금 약 9MB, 시험 가짜 저장소의 문자열)과 실행한 게임 코드까지 「남은 힙」으로 세어 누수와 섞였다 (2026-10-28 QC: 진짜 누수는 열고 닫을 때마다 ~10MB 씩 늘던 것, 고침)
-  assert.ok(closed - cycles[0] < 8, `열고 닫기를 되풀이하면 힙이 늘어남 ${cycles.join(' → ')} → ${closed}`);
-  assert.ok(Math.max(...cycles) - cycles[0] < 4, `닫을 때마다 힙이 쌓임 ${cycles.join(' → ')}`);
-  console.log('PASS 게임 창 측정');
-  await page.close();
-  await page2.close();
 }
 
 // 17b) 설정 창 머리 고정 · 화면 설정(메뉴 위치·창 바깥 불투명도) · 기능별 설정 페이지 · 거점 목록

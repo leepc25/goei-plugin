@@ -1,12 +1,11 @@
 // 「내가 출동」 판정과 사건 기간 (docs/설계안_기록_보고서.md 2-3절). 사용자 결정 「출동·동행·방문 기록이 있는 것」 — 이름 매칭이 아니라 이미 있는 구조를 근거로 한다:
 // 출동 = (a) 상태창 투입 칸 ON + 목표 일치 ∨ (b) 출동 지시문(SCENE_CARD)의 목표 ∨ (c) 필드 작전 기록(enter/exit_anomaly)의 이름
 // 동행 = (d) 상태창 동행 칸에 그 사건 투입 요원 · 방문 = (e) 본부 방문 대화(core/visit.ts)에 그 사건 이름.
+// (2026-11-04 필드를 플러그인에서 빼면서 (c) 필드 작전 기록·(e) 본부 방문 대화 근거는 더 보지 않는다)
 // 상태창 목표 칸만 그 사건인 것(엔진 touched)은 투입 칸이 없는 상태창(옛 6칸·투입 칸을 끈 채팅)에서만 출동으로 본다 — 투입 칸이 있으면 OFF 는 출동이 아니다.
 import { readScene } from '../dispatch';
-import { fieldRecord } from '../field';
 import { anchorPositions } from '../people/store';
 import type { Chat, ChatMessage } from '../types';
-import { visitRecord } from '../visit';
 import { findStatusTags, statusMinute } from '../world/status';
 
 export interface MineSubject {
@@ -31,7 +30,6 @@ export function mineReasons(chat: Chat, from: number, to: number, s: MineSubject
   const out = new Set<MineReason>();
   const names = [s.name, s.presetName ?? ''].filter(Boolean);
   const hit = (t: string) => names.some((n) => same(t, n));
-  const mention = (t: string) => names.some((n) => t.includes(n));
   const list = msgs(chat);
   const lo = Math.max(0, Math.min(from, to));
   const hi = Math.min(list.length - 1, Math.max(from, to));
@@ -55,22 +53,6 @@ export function mineReasons(chat: Chat, from: number, to: number, s: MineSubject
     }
   }
   if (s.touched && !hasDeployCol) out.add('touched');
-  const at = anchorPositions(chat);
-  const inSpan = (anchor: string | undefined) => {
-    const pos = anchor ? at.get(anchor) : undefined;
-    return pos !== undefined && pos >= lo && pos <= hi;
-  };
-  const events = fieldRecord(chat).events;
-  for (const ev of events) {
-    if (ev.kind !== 'enter_anomaly' && ev.kind !== 'exit_anomaly') continue;
-    if (!inSpan(ev.anchor)) continue;
-    if (mention(ev.text) || mention(ev.scene ?? '')) out.add('field');
-  }
-  // 본부 방문 대화: 그 자리(anchor)가 기간 안이고 오간 말에 사건 이름이 있으면
-  for (const turn of visitRecord(chat).turns) {
-    if (!inSpan(turn.anchor)) continue;
-    if (mention(turn.user) || mention(turn.reply) || (turn.extra ?? []).some((x) => mention(x.line))) out.add('visit');
-  }
   return [...out];
 }
 

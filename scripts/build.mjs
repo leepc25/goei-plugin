@@ -98,6 +98,13 @@ writeFileSync(
   JSON.stringify({ version: pkg.version, parts: partNames, length: bodyCode.length, hash: textHash(bodyCode), sha256: createHash('sha256').update(bodyCode).digest('hex') }) + '\n',
 );
 
+// 필드(게임)는 2026-11-04 사용자 지시로 플러그인에서 뺐다. 게임 코드 팩·자산 팩·시연판은 GOEI_GAME=1 일 때만 만든다 (원본 src/game·game-pack 은 그대로 둔다)
+const GAME = process.env.GOEI_GAME === '1';
+rmSync('dist/game', { recursive: true, force: true });
+let gameCode = '';
+let gameParts = [];
+let gamePacks = [];
+if (GAME) {
 // 게임 코드 팩: 게임 코드는 본체에 넣지 않고 따로 받는다 (src/host/game/code.ts, src/game/entry.ts).
 // 자산 팩: game-pack/<폴더>/pack.json이 있는 폴더마다 하나 (src/host/game/packs.ts). 둘 다 dist/game/ → 릴리스 때 release/game/
 const split = (str, max) => {
@@ -116,14 +123,14 @@ const split = (str, max) => {
 rmSync('dist/game', { recursive: true, force: true });
 mkdirSync('dist/game', { recursive: true });
 const gameOut = await build({ ...common, entryPoints: ['src/game/entry.ts'], format: 'iife' });
-const gameCode = `// goei-game ${pkg.version}\n` + gameOut.outputFiles[0].text;
+gameCode = `// goei-game ${pkg.version}\n` + gameOut.outputFiles[0].text;
 writeFileSync('dist/game/goei-game.js', gameCode);
-const gameParts = split(gameCode, 200_000).map((p, i) => {
+gameParts = split(gameCode, 200_000).map((p, i) => {
   const name = `goei-game.${i + 1}.txt`;
   writeFileSync(`dist/game/${name}`, p);
   return name;
 });
-const gamePacks = [];
+gamePacks = [];
 for (const d of existsSync('game-pack') ? readdirSync('game-pack') : []) {
   if (!existsSync(`game-pack/${d}/pack.json`)) continue;
   const p = buildGamePack(`game-pack/${d}`);
@@ -140,6 +147,7 @@ writeFileSync(
   'dist/game/index.json',
   JSON.stringify({ version: pkg.version, code: { parts: gameParts, length: gameCode.length, bytes: Buffer.byteLength(gameCode) }, packs: gamePacks }, null, 1) + '\n',
 );
+}
 
 // 테스트용: 순수 로직만 묶은 모듈. 세계·설치 자료는 본체처럼 묶음에 없으므로 입구(core.mjs)가 tests/data-init.mjs 로 파일에서 읽어 넣은 뒤 내보낸다
 await build({
@@ -172,6 +180,7 @@ if (existsSync('card/원본_봇카드.jpeg')) {
 }
 
 
+if (GAME) {
 // 게임 엔진 시연판 (전투·조작·장면 관리). 쟈알디 그림 묶음(game-pack/jyaldi)을 내장한 단일 HTML.
 await build({ ...common, entryPoints: ['src/game/action/engine/demo.ts'], format: 'esm', minify: true, write: true, outfile: 'dist-test/engine-demo.js' });
 {
@@ -235,6 +244,7 @@ await build({ ...common, entryPoints: ['src/game/action/engine/demo.ts'], format
   console.log(`소리 모듈 ${(lib.outputFiles[0].contents.length / 1024).toFixed(1)}KB (압축 전 최소화)`);
 }
 await build({ entryPoints: ['src/game/action/audio/music.ts', 'src/game/action/audio/songs.ts', 'src/game/action/audio/index.ts'], bundle: true, format: 'esm', target: 'es2022', outdir: 'dist-test/audio' });
+}
 
 // 토크나이저 순위표 (o200k_base, js-tiktoken MIT): 플러그인이 설치·점검에서 받아 저장소에 둔다 (core/tokenizer.ts). 200KB 조각 + 목록
 {

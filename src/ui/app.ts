@@ -1,5 +1,4 @@
 import { findFaction, findScenario, defaultScenario, SCENARIOS } from '../core/scenarios';
-import { anchorOf } from '../core/visit';
 import { showWindow } from '../host/container';
 import { factionList } from '../core/factions';
 import { setOpeningHint } from '../host/openinghint';
@@ -28,7 +27,6 @@ import { addMark, markCandidates, markPop, marks, markSlots, markUi, navHistBar,
 import { bindSwipeBack } from './swipeback';
 import { avatar, factionPic, imageUrl, picAvatar, setImageRedraw, showIdCard, stLabel } from './images';
 import { bindMapZoom } from './mapzoom';
-import { closeGame, gameOpen, hideGame, openGame, reattachGame } from './game';
 import { BRAND, brandHtml } from './brand';
 import { checkLatest, handleUpdate, hasUpdate, updateBanner } from './update';
 import { setCurrentTheme, themeName } from './theme';
@@ -59,8 +57,7 @@ import { basicDefaults, basicVars, DIM_DEFAULT, getPrefs, worldDefaults, worldSe
 import { colConfig } from '../core/world/statuscols';
 import { adjustWallet, walletEditable, aliveAnchors, formatWon, parseWon, readWallet, removeWalletEntry, walletBalance, walletVars, WALLET_START_DEFAULT } from '../core/wallet';
 import { walletHeadButton, walletList, walletTab, walletUi as walletTabUi } from './wallet';
-import { applyRecordsNav, closeToastHtml, endedReport, holdToast, releaseToast, syncCloseToast, fieldSheet, handleRecords, journalList, rec, recordsInput, recordsMarkName, recordsNav, recordsTab, resetRecords, type RecordsEnv } from './records';
-import { onReport } from '../core/journal';
+import { applyRecordsNav, closeToastHtml, endedReport, holdToast, releaseToast, syncCloseToast, handleRecords, journalList, rec, recordsInput, recordsMarkName, recordsNav, recordsTab, resetRecords, type RecordsEnv } from './records';
 
 /** ID카드 잔고 칩 → 장부 창 (열림·입력 알림) */
 
@@ -98,8 +95,8 @@ let notice = '';
 /** 괴담넷 탭 (완성 전까지 숨김) */
 const GNET_ON = true;
 /** records = 「기록」(일지·보고서·인물·세력, 2026-10-29 가계부 메뉴 자리). wallet 은 메뉴에서 빠졌지만 사원증 잔고 줄·폰 머리 칩이 연다 */
-type Tab = 'board' | 'map' | 'mission' | 'gnet' | 'phone' | 'wiki' | 'field' | 'records' | 'wallet' | 'settings';
-const TABS: Tab[] = ['board', 'map', 'mission', ...(GNET_ON ? (['gnet'] as Tab[]) : []), 'phone', 'wiki', 'field', 'records', 'wallet'];
+type Tab = 'board' | 'map' | 'mission' | 'gnet' | 'phone' | 'wiki' | 'records' | 'wallet' | 'settings';
+const TABS: Tab[] = ['board', 'map', 'mission', ...(GNET_ON ? (['gnet'] as Tab[]) : []), 'phone', 'wiki', 'records', 'wallet'];
 let tab: Tab = 'board';
 /** 커스텀 임무 시작 화면에서 "다시 고르기"를 눌렀을 때 */
 let repick = false;
@@ -362,8 +359,6 @@ function ensureRoot(): HTMLElement {
     if (ev.key !== 'Escape') return;
     // 설정·세계 편집 창이 떠 있으면 그 창이 닫힌다 (editor/index.ts). 뒤의 패널까지 같이 닫지 않는다
     if (editorOpen()) return;
-    // 필드에서 Esc는 게임 일시정지 메뉴 (창을 닫지 않는다, 2026-10-23 사용자)
-    if (tab === 'field' && view.kind === 'started') return;
     if (evUi.pop || agUi.pop) {
       evUi.pop = agUi.pop = '';
       render();
@@ -587,13 +582,6 @@ export async function openRecords(id: string): Promise<void> {
   if (view.kind === 'started') await handle('rec-open', id);
 }
 
-// 필드 출동이 끝나 보고서가 생기면 (host/game/field.ts → core/journal/notify) 필드 탭 위에 시트를 띄운다. 창이 닫혀 있으면 다음에 열 때 보인다
-onReport((n) => {
-  if (n.cause !== 'field') return;
-  rec.fieldReport = n.id;
-  if (shown && view.kind === 'started') void refresh();
-});
-
 async function refresh(): Promise<void> {
   try {
     const ctx = await loadContext();
@@ -643,9 +631,6 @@ async function refresh(): Promise<void> {
 async function close(): Promise<void> {
   shown = false;
   stopCctvFx();
-  // 창을 닫아도 필드는 유지한다 (멈추고 떼어 둠). 끝나는 때는 「필드 나가기」·채팅 전송(본편이 한 턴 진행)·채팅 바꿈뿐 (2026-10-23 사용자)
-  fieldShown = false;
-  hideGame();
   await risuai.hideContainer();
 }
 
@@ -792,13 +777,6 @@ async function handle(action: string, value?: string): Promise<void> {
   switch (action) {
     case 'close':
       return close();
-    case 'game-open':
-      return handle('tab', 'field');
-    case 'game-close':
-      // 필드에서 나눈 대화가 상황판·설정(필드)에 바로 보이게 채팅을 다시 읽는다
-      closeGame();
-      if (tab === 'field') tab = 'board';
-      return refresh();
     case 'faction': {
       const facs = view.kind === 'picker' ? factionList(view.ctx.char.globalLore) : SCENARIOS.factions;
       const f = findFaction(value ?? '', facs);
@@ -859,7 +837,6 @@ async function handle(action: string, value?: string): Promise<void> {
       if (!m || view.kind !== 'started') return;
       markUi.pop = false;
       closeDrawer();
-      if (gameOpen()) closeGame();
       // 「설정」 즐겨찾기는 설정 창을 연다 (판 안 설정 화면은 안 쓴다, 2026-10-29)
       if (m.s.tab === 'settings') return handle('ed-open', 'set:screen');
       return applyNav(openable(view.ctx, m.s as unknown as NavState));
@@ -876,7 +853,7 @@ async function handle(action: string, value?: string): Promise<void> {
       return render();
     case 'feature-set':
       // 기능 설정은 설정 창의 그 페이지로 (2026-10-27)
-      if (value === 'phone' || value === 'wiki' || value === 'visit' || value === 'people' || value === 'image' || (value === 'gnet' && GNET_ON)) return handle('ed-open', `set:${value}`);
+      if (value === 'phone' || value === 'wiki' || value === 'people' || value === 'image' || (value === 'gnet' && GNET_ON)) return handle('ed-open', `set:${value}`);
       return;
     case 'ops-sel':
       // 관제실 상황판: 일지 줄·지도 표시 → 왼쪽 큰 보기가 그 상황으로. 보던 화면(CCTV·위성)은 그대로 (2026-10-21 사용자). 모바일은 큰 보기로 올라간다
@@ -1074,7 +1051,7 @@ async function turnWorldOn(): Promise<void> {
 }
 
 const TAB_TITLE: Record<Tab, string> = {
-  board: '상황판', map: '임무', mission: '커스텀', gnet: '괴담넷', phone: '괴담톡', wiki: '위키', field: '필드', records: '기록', wallet: '가계부', settings: '설정',
+  board: '상황판', map: '임무', mission: '커스텀', gnet: '괴담넷', phone: '괴담톡', wiki: '위키', records: '기록', wallet: '가계부', settings: '설정',
 };
 
 function header(sub: string, extra = ''): string {
@@ -1084,16 +1061,12 @@ function header(sub: string, extra = ''): string {
   </header>`;
 }
 
-// 필드: PC는 옆 메뉴, 모바일은 머리 버튼 (2026-10-23 사용자)
-const gameShown = (): boolean => true;
-
 /** 진행 중 화면의 머리: 지금 탭 이름 (위협도는 기준이 헷갈리기만 해서 아예 뺐다, 사용자 결정) */
 function startedHeader(ctx: ChatContext): string {
   return `<header class="gx-head">
-    <div class="gx-brand gx-tabhead"><span class="gx-hmark"><span class="gx-logo">${GHOST_ICON}</span><span class="gx-mark-txt"><b aria-label="${BRAND.name}">${brandHtml('var(--text)', 'var(--signal)')}</b></span></span><span class="gx-hsep" aria-hidden="true">›</span><span class="gx-tabicon">${tab === 'field' ? ICONS.game : ICONS[tab]}</span><div><b>${tab === 'gnet' ? gnetLabel(ctx.chat.scriptstate) : TAB_TITLE[tab]}</b></div></div>
+    <div class="gx-brand gx-tabhead"><span class="gx-hmark"><span class="gx-logo">${GHOST_ICON}</span><span class="gx-mark-txt"><b aria-label="${BRAND.name}">${brandHtml('var(--text)', 'var(--signal)')}</b></span></span><span class="gx-hsep" aria-hidden="true">›</span><span class="gx-tabicon">${ICONS[tab]}</span><div><b>${tab === 'gnet' ? gnetLabel(ctx.chat.scriptstate) : TAB_TITLE[tab]}</b></div></div>
     <div class="gx-head-act">
       ${walletHeadButton(ctx, tab === 'wallet')}
-      ${gameShown() ? `<button class="gx-x gx-fieldbtn${tab === 'field' ? ' on' : ''}" data-action="tab" data-value="field" aria-label="필드" title="필드">${ICONS.game}</button>` : ''}
       <button class="gx-x gx-recbtn${tab === 'records' ? ' on' : ''}" data-action="tab" data-value="records" aria-label="기록" title="기록">${ICONS.records}</button>
       <button class="gx-x gx-idbtn" data-action="id-card" aria-label="내 ID카드">${userInfo().photo ? `<img src="${esc(userInfo().photo!)}" alt="">` : ICONS.idcard}</button>
       <button class="gx-x" data-action="ed-open" data-value="set:screen" aria-label="설정">${ICONS.settings}${hasUpdate(ctx) ? '<span class="gx-xdot" aria-label="새 버전"></span>' : ''}</button>
@@ -1197,7 +1170,6 @@ function render(): void {
       if (caret) try { el.setSelectionRange(caret[0], caret[1]); } catch { /* 커서를 못 두는 칸 */ }
     }
   }
-  syncField();
   const next = root.querySelector('.gx-body');
   if (next && keep) next.scrollTop = keep;
   if (inner.length) root.querySelectorAll<HTMLElement>(INNER_SCROLL).forEach((el, i) => inner[i] && (el.scrollTop = inner[i]));
@@ -1335,37 +1307,12 @@ function applyNav(s: NavState): void {
   render();
 }
 
-let fieldShown = false;
-let fieldAnchor = '';
-/** 필드 탭이면 게임을 본문 자리에 붙이고(없으면 연다), 다른 탭이면 닫는다 */
-function syncField(): void {
-  const host = view.kind === 'started' && tab === 'field' ? root?.querySelector('.gx-fieldhost') ?? null : null;
-  if (!host) {
-    // 다른 탭: 게임은 닫지 않고 떼어 둔다(멈춤·소리 끔). 창을 닫거나 「필드 나가기」 때만 끝난다
-    if (gameOpen() && fieldShown) {
-      fieldShown = false;
-      hideGame();
-      // 필드에서 나눈 대화가 바로 보이게
-      void refresh();
-    }
-    return;
-  }
-  fieldShown = true;
-  // 본편이 한 턴 진행됐으면(마지막 메시지가 바뀜) 요원 배치·막간이 새로 정해지니 처음부터
-  const anchor = view.kind === 'started' ? `${view.ctx.chat.id ?? ''}:${anchorOf(view.ctx.chat)}` : '';
-  if (gameOpen() && anchor !== fieldAnchor) closeGame();
-  fieldAnchor = anchor;
-  if (gameOpen()) reattachGame(host);
-  else openGame(host, () => void run('game-close'));
-}
-
 /** 모바일 쓸기가 할 일 (브라우저 ←·→ 처럼): dir -1 뒤로, 1 앞으로. 갈 곳이 없으면 null */
 function navStep(dir: -1 | 1): (() => void) | null {
   const go = (action: string, value?: string) => () => void run(action, value);
   if (view.kind === 'picker') return dir < 0 && pickerPrefs ? go('prefs-close') : null;
   if (view.kind === 'opening') return dir < 0 ? go('repick') : null;
   if (view.kind !== 'started') return null;
-  if (gameOpen()) return dir < 0 ? () => void run('game-close') : null;
   if (evUi.pop && dir < 0) return () => void run('ev-pop', evUi.pop);
   if (agUi.pop && dir < 0) return () => void run('agent-info', agUi.pop);
   if (!navHist.can(dir)) return null;
@@ -1401,9 +1348,6 @@ function startedBody(ctx: ChatContext): string {
     case 'records':
       // 폰: 기록 탭의 서랍엔 하위 탭 넷(ui/records.ts), 필드 탭은 상황판처럼 즐겨찾기 서랍 (2026-10-29 사용자)
       return recordsTab(ctx);
-    case 'field':
-      // 게임은 그린 뒤 이 자리에 붙인다 (afterRender → syncField). 출동이 막 끝났으면 그 위에 보고서 시트 (ui/records fieldSheet)
-      return `<main class="gx-body gx-fieldhost">${fieldSheet(ctx)}</main>${boardDrawer()}`;
     case 'settings':
     {
       // 설정은 상황판 위에서 여는 화면이라 상황판 서랍(즐겨찾기)도 그대로 둔다 (2026-10-20 사용자: 설정을 열면 서랍이 가려진 것처럼 보임).
@@ -1515,7 +1459,6 @@ function tabs(): string {
     ${item('phone', '괴담톡', ICONS.phone, '', unreadPhone ? '<span class="gx-nbadge dot" aria-label="새 메시지"></span>' : '')}
     ${GNET_ON ? item('gnet', gnetLabel(ctx?.chat.scriptstate), ICONS.gnet) : ''}
     ${item('wiki', '위키', ICONS.wiki)}
-    ${gameShown() ? item('field', '필드', ICONS.game, 'desk') : ''}
     ${item('records', '기록', ICONS.records, 'desk')}
     <button class="gx-nb desk" data-action="ed-open" data-value="set:screen">${ICONS.settings}<span>설정</span>${ctx && hasUpdate(ctx) ? '<span class="gx-nbadge dot" aria-label="새 버전"></span>' : ''}</button>
     <span class="gx-nav-gap"></span>
