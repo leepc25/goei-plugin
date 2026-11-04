@@ -367,20 +367,14 @@ const unresolved = (t) => [...new Set((t.match(/\{\{[^}]*\}\}/g) ?? []))].filter
     await page.evaluate(() => { delete window.__chat.scriptstate.$gn_raw; delete window.__chat.scriptstate.$ph_state; window.__chat.localLore = []; });
   });
 
-  await R.section('3-6 방문 기록·필드 사실: 기준 메시지 뒤에 막간, 사실은 마지막 사용자 앞', async () => {
+  await R.section('3-6 필드를 뺀 뒤(2026-11-04): 채팅에 남은 방문 기록·필드 사건은 본편 요청에 안 들어간다', async () => {
     await page.evaluate(() => {
       window.__chat.message.push({ role: 'char', data: '쟈알디가 손을 흔들었다.', chatId: 'c1' }, { role: 'user', data: '본부로 돌아간다.', chatId: 'u2' });
       window.__chat.goeiHqVisitV1 = { turns: [{ id: 't1', at: 1, agentId: 'P002', name: '스팡달', user: '안녕하세요', reply: '어, 왔어?', anchor: 'c1', room: 'office' }] };
-      window.__chat.goeiFieldV1 = { events: [{ id: 'f1', at: 2, anchor: 'c1', kind: 'move', text: '휴게실로 이동', fact: { key: '위치', value: '본부 휴게실' } }, { id: 'f2', at: 3, anchor: 'gone', kind: 'kill', text: '사라진 메시지', fact: { key: '사망', value: '누군가', permanent: true } }] };
+      window.__chat.goeiFieldV1 = { events: [{ id: 'f1', at: 2, anchor: 'c1', kind: 'move', text: '휴게실로 이동', fact: { key: '위치', value: '본부 휴게실' } }] };
     });
     const out = await request(page, [sys('S'), bot(greeting), usr('쟈알디와 인사한다.'), bot('쟈알디가 손을 흔들었다.'), usr('본부로 돌아간다.')]);
-    const il = out.findIndex((m) => m.content.startsWith('[Field log]'));   // 10-31 [Field log] 형식(영어 짧은 문장, 사건은 글만)
-    assert.ok(il > 0 && out[il - 1].content === '쟈알디가 손을 흔들었다.', '막간은 대화가 일어난 메시지 바로 뒤');
-    assert.ok(out[il].content.includes('스팡달: 어, 왔어?') && out[il].content.includes('휴게실로 이동'));
-    const ff = out.findIndex((m) => m.content.startsWith('[Field facts]'));
-    const lastUser = out.map((m) => m.role).lastIndexOf('user');
-    assert.ok(ff > il && ff < lastUser && out[lastUser].content === '본부로 돌아간다.' && out.slice(ff + 1, lastUser).every((m) => m.role === 'system'), `사실 블록은 막간 뒤·마지막 사용자 앞: ${JSON.stringify(out.map((m) => [m.role, m.content.slice(0, 20)]))}`);
-    assert.ok(out[ff].content.includes('- 위치: 본부 휴게실') && !out[ff].content.includes('사망'), '사라진 기준의 사실은 빠짐');
+    assert.ok(!out.some((m) => /\[Field (log|facts)\]|어, 왔어\?|휴게실로 이동/.test(String(m.content))), `필드 글이 없어야 함: ${JSON.stringify(out.map((m) => [m.role, String(m.content).slice(0, 20)]))}`);
     await page.evaluate(() => { delete window.__chat.goeiHqVisitV1; delete window.__chat.goeiFieldV1; window.__chat.message.splice(-2); });
   });
 
@@ -600,7 +594,7 @@ for (const [send, show, keepTags, when] of [[0, 0, 4, false], [2, 1, 1, true]]) 
 
   // 단계 이름은 src/body.ts onBeforeRequest 의 step()/stepAsync() 이름. 「시드 채팅 읽기」는 채팅 읽기가 실패했고 요청에 시드 표식이 있을 때만 돈다
   // (채팅을 못 읽으면 로어 단계가 시드를 끼우지 않으니, 원문에 시드 표식이 있는 경우로 — 옛 카드의 📕Start Lore 자리 항목 모양)
-  const STEPS = [['지시문·전화 풀기'], ['시작 카드 표식'], ['옛 이미지 태그'], ['채팅 읽기'], ['유저 이름'], ['기록 태그 정리'], ['로어'], ['주인공'], ['막간'], ['명부 다듬기'], ['참고 기록'], ['신분'], ['상태창 모양'], ['상태창'], ['인물 기록'], ['이미지 지침'], ['시드'], ['채팅 읽기', '시드 채팅 읽기']];
+  const STEPS = [['지시문·전화 풀기'], ['시작 카드 표식'], ['옛 이미지 태그'], ['채팅 읽기'], ['유저 이름'], ['기록 태그 정리'], ['로어'], ['주인공'], ['명부 다듬기'], ['참고 기록'], ['신분'], ['상태창 모양'], ['상태창'], ['인물 기록'], ['이미지 지침'], ['시드'], ['채팅 읽기', '시드 채팅 읽기']];
   for (const names of STEPS) {
     await R.section(`8-단계 「${names.join('·')}」 가 던져도 요청은 나가고 표식은 없다`, async () => {
       await setFault(names);
