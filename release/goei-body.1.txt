@@ -1,4 +1,4 @@
-// goei-body 0.20.3
+// goei-body 0.20.4
 "use strict";
 (() => {
   var __create = Object.create;
@@ -7,8 +7,8 @@
   var __getOwnPropNames = Object.getOwnPropertyNames;
   var __getProtoOf = Object.getPrototypeOf;
   var __hasOwnProp = Object.prototype.hasOwnProperty;
-  var __commonJS = (cb, mod2) => function __require() {
-    return mod2 || (0, cb[__getOwnPropNames(cb)[0]])((mod2 = { exports: {} }).exports, mod2), mod2.exports;
+  var __commonJS = (cb, mod) => function __require() {
+    return mod || (0, cb[__getOwnPropNames(cb)[0]])((mod = { exports: {} }).exports, mod), mod.exports;
   };
   var __copyProps = (to, from, except, desc) => {
     if (from && typeof from === "object" || typeof from === "function") {
@@ -18,13 +18,13 @@
     }
     return to;
   };
-  var __toESM = (mod2, isNodeMode, target) => (target = mod2 != null ? __create(__getProtoOf(mod2)) : {}, __copyProps(
+  var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__getProtoOf(mod)) : {}, __copyProps(
     // If the importer is in node compatibility mode or this is not an ESM
     // file that has been converted to a CommonJS file using a Babel-
     // compatible transform (i.e. "__esModule" has not been set), then set
     // "default" to the CommonJS "module.exports" for node compatibility.
-    isNodeMode || !mod2 || !mod2.__esModule ? __defProp(target, "default", { value: mod2, enumerable: true }) : target,
-    mod2
+    isNodeMode || !mod || !mod.__esModule ? __defProp(target, "default", { value: mod, enumerable: true }) : target,
+    mod
   ));
 
   // node_modules/base64-js/index.js
@@ -94,10 +94,10 @@
       function tripletToBase64(num4) {
         return lookup[num4 >> 18 & 63] + lookup[num4 >> 12 & 63] + lookup[num4 >> 6 & 63] + lookup[num4 & 63];
       }
-      function encodeChunk(uint8, start4, end) {
+      function encodeChunk(uint8, start3, end) {
         var tmp;
         var output = [];
-        for (var i2 = start4; i2 < end; i2 += 3) {
+        for (var i2 = start3; i2 < end; i2 += 3) {
           tmp = (uint8[i2] << 16 & 16711680) + (uint8[i2 + 1] << 8 & 65280) + (uint8[i2 + 2] & 255);
           output.push(tripletToBase64(tmp));
         }
@@ -127,128 +127,6 @@
       }
     }
   });
-
-  // src/host/game/send.ts
-  var hooks = /* @__PURE__ */ new Set();
-  function onBeforeSend(cb) {
-    hooks.add(cb);
-    return () => void hooks.delete(cb);
-  }
-  async function flushGamesBeforeSend(ms = 3e3) {
-    if (!hooks.size) return;
-    const all = Promise.all([...hooks].map((cb) => cb().catch(() => {
-    })));
-    await Promise.race([all, new Promise((r) => setTimeout(r, ms))]);
-  }
-
-  // src/host/game/uid.ts
-  var uid = () => typeof crypto !== "undefined" && typeof crypto.randomUUID === "function" ? crypto.randomUUID() : `${Date.now().toString(36)}-${Math.random().toString(36).slice(2)}${Math.random().toString(36).slice(2)}`;
-
-  // src/core/visit.ts
-  var VISIT_KEY = "goeiHqVisitV1";
-  var VISIT_LORE = "본부 방문 대화 기록";
-  function visitRoom(a) {
-    if (a.locked) return null;
-    if (/외근|비번|격리|작전투입|실종|사망|미정/.test(a.state)) return null;
-    if (/부상|치료/.test(a.state)) return "infirmary";
-    if (/수면|취침/.test(a.state)) return "quarters";
-    if (/휴게|휴식/.test(a.state)) return "lounge";
-    return !a.locked && /내근|대기/.test(a.state) ? "office" : null;
-  }
-  function anchorOf(chat) {
-    const msgs4 = Array.isArray(chat.message) ? chat.message : [];
-    const last3 = msgs4[msgs4.length - 1];
-    return last3?.chatId ? String(last3.chatId) : `#${msgs4.length}`;
-  }
-  function visitRecord(chat) {
-    const v = chat[VISIT_KEY];
-    return { turns: Array.isArray(v?.turns) ? v.turns.filter((t) => t && typeof t.id === "string" && typeof t.reply === "string" && typeof t.user === "string" && typeof t.agentId === "string").slice(-100).map((t) => t.extra === void 0 ? t : { ...t, extra: Array.isArray(t.extra) ? t.extra.filter((e) => e && typeof e.name === "string" && typeof e.line === "string") : [] }) : [] };
-  }
-  function withVisitTurn(chat, turn) {
-    const old = visitRecord(chat).turns;
-    if (old.some((t) => t.id === turn.id)) return chat;
-    const turns2 = [...old, turn].slice(-100);
-    return withoutOldLore({ ...chat, [VISIT_KEY]: { turns: turns2 } });
-  }
-  function withoutOldLore(chat) {
-    const local = Array.isArray(chat.localLore) ? chat.localLore : [];
-    return local.some((l) => l.comment === VISIT_LORE) ? { ...chat, localLore: local.filter((l) => l.comment !== VISIT_LORE) } : chat;
-  }
-
-  // src/core/field.ts
-  var FIELD_KEY = "goeiFieldV1";
-  var MAX_EVENTS = 300;
-  var KINDS = /* @__PURE__ */ new Set(["move", "act", "hurt", "down", "kill", "flee", "provoke", "gift", "trade", "quest", "follow", "unfollow", "enter_anomaly", "exit_anomaly", "enter_site", "detected", "appoint", "call", "enter_field", "exit_field"]);
-  var plain = (s5, max = 300) => String(s5 ?? "").replace(/\{\{/g, "｛｛").replace(/\}\}/g, "｝｝").replace(/%%/g, "％％").replace(/\s+/g, " ").trim().slice(0, max);
-  function trimEvents(list4, max = MAX_EVENTS) {
-    if (list4.length <= max) return list4;
-    const big = (e) => (e.weight ?? 1) >= 2 || !!e.fact;
-    let dropped = list4.length - max;
-    const out = [];
-    for (const e of list4) {
-      if (!big(e) && dropped > 0) {
-        dropped--;
-        continue;
-      }
-      out.push(e);
-    }
-    return out.length > max ? out.slice(-max) : out;
-  }
-  function fieldRecord(chat) {
-    const v = chat[FIELD_KEY];
-    const list4 = Array.isArray(v?.events) ? v.events : [];
-    return {
-      events: trimEvents(list4.filter((e) => e && typeof e.id === "string" && typeof e.text === "string" && typeof e.anchor === "string" && typeof e.at === "number" && KINDS.has(e.kind)))
-    };
-  }
-  function withFieldEvent(chat, ev) {
-    const old = fieldRecord(chat).events;
-    if (old.some((e) => e.id === ev.id)) return chat;
-    const clean3 = {
-      ...ev,
-      text: plain(ev.text),
-      ...typeof ev.ko === "string" ? { ko: plain(ev.ko) } : {},
-      scene: ev.scene ? plain(ev.scene, 60) : void 0,
-      who: ev.who?.map((w) => plain(w, 40)).slice(0, 8),
-      fact: ev.fact ? { key: plain(ev.fact.key, 40), value: plain(ev.fact.value, 120), ...ev.fact.permanent ? { permanent: true } : {} } : void 0,
-      ...ev.witness ? { witness: { faction: plain(ev.witness.faction, 12), named: !!ev.witness.named } } : {},
-      ...ev.visit ? { visit: plain(ev.visit, 40) } : {}
-    };
-    return { ...chat, [FIELD_KEY]: { events: trimEvents([...old, clean3]) } };
-  }
-  function currentFacts(events) {
-    const by = /* @__PURE__ */ new Map();
-    for (const e of [...events].sort((a, b) => a.at - b.at)) if (e.fact?.key) by.set(e.fact.key, e.fact);
-    return [...by.values()];
-  }
-
-  // src/core/lorebooks.ts
-  var DIRECTORY_COMMENT = "Directory";
-  var MANIFEST_COMMENT = "Plugin manifest";
-  var OLD_DIRECTORY = "괴이봇 명부";
-  var OLD_MANIFEST = "괴이봇 플러그인 매니페스트";
-  var LEGACY_DATA = ["World catalog", "Agent roster", "Faction display", "Phone tabs", "Start trigger"];
-  var RETIRED = ["LB Backend", OLD_MANIFEST];
-  var isDirectory = (comment) => comment === DIRECTORY_COMMENT || comment === OLD_DIRECTORY;
-  function named(lore, name, old) {
-    const list4 = lore ?? [];
-    const hit3 = list4.filter((e) => e.comment === name);
-    return hit3.length ? hit3 : list4.filter((e) => e.comment === old);
-  }
-  var directoryEntries = (lore) => named(lore, DIRECTORY_COMMENT, OLD_DIRECTORY);
-  var manifestEntry = (lore) => named(lore, MANIFEST_COMMENT, OLD_MANIFEST)[0];
-  function parseSeedManifest(raw) {
-    const map = /* @__PURE__ */ new Map();
-    for (const line2 of raw.split("\n")) {
-      const t = line2.replace(/\r/g, "").trim();
-      if (!t || t.startsWith("#")) continue;
-      const m = /^([\w-]+)\s*:\s*(.*)$/.exec(t);
-      if (!m) continue;
-      const names4 = m[2].split("|").map((s5) => s5.trim()).filter(Boolean);
-      if (names4.length) map.set(m[1], names4);
-    }
-    return map;
-  }
 
   // src/data/guides/gnet.txt
   var gnet_default = `<!-- GNet: 괴담넷 생성 지침. 플러그인이 요청마다 필요한 섹션만 골라 씁니다. 자동 활성화 OFF / 키워드 비움. 섹션 구분 줄은 그대로 두세요. -->
@@ -855,13 +733,13 @@ ${visit_guide_default.replace(/\r/g, "").trim()}
     const hits = [...text4.matchAll(re)];
     if (!hits.length) return [{ title: "전체", head: "", body: text4.replace(/\s+$/, ""), tail: text4.match(/\s+$/)?.[0] ?? "" }];
     const out = [];
-    const pre2 = text4.slice(0, hits[0].index);
-    if (pre2.trim()) out.push({ title: "머리", head: "", body: pre2.replace(/\s+$/, ""), tail: pre2.match(/\s+$/)?.[0] ?? "" });
-    else if (pre2) out.push({ title: "머리", head: pre2, body: "", tail: "" });
+    const pre = text4.slice(0, hits[0].index);
+    if (pre.trim()) out.push({ title: "머리", head: "", body: pre.replace(/\s+$/, ""), tail: pre.match(/\s+$/)?.[0] ?? "" });
+    else if (pre) out.push({ title: "머리", head: pre, body: "", tail: "" });
     hits.forEach((m, i) => {
-      const start4 = m.index + m[0].length;
+      const start3 = m.index + m[0].length;
       const end = i + 1 < hits.length ? hits[i + 1].index : text4.length;
-      const raw = text4.slice(start4, end);
+      const raw = text4.slice(start3, end);
       const tail2 = raw.match(/\s+$/)?.[0] ?? "";
       out.push({ ...headOf(m), body: raw.slice(0, raw.length - tail2.length), tail: tail2 });
     });
@@ -872,9 +750,9 @@ ${visit_guide_default.replace(/\r/g, "").trim()}
       const re = /@@SECTION ([^\n]+)\n([\s\S]*?)\n@@END/g;
       const hits = [...text4.matchAll(re)];
       const out = [];
-      const pre2 = text4.slice(0, hits[0]?.index ?? 0);
-      if (pre2.trim()) out.push({ title: "머리", head: "", body: pre2.replace(/\s+$/, ""), tail: pre2.match(/\s+$/)?.[0] ?? "" });
-      else if (pre2) out.push({ title: "머리", head: pre2, body: "", tail: "" });
+      const pre = text4.slice(0, hits[0]?.index ?? 0);
+      if (pre.trim()) out.push({ title: "머리", head: "", body: pre.replace(/\s+$/, ""), tail: pre.match(/\s+$/)?.[0] ?? "" });
+      else if (pre) out.push({ title: "머리", head: pre, body: "", tail: "" });
       hits.forEach((m, i) => {
         const end = m.index + m[0].length;
         const gap = text4.slice(end, i + 1 < hits.length ? hits[i + 1].index : text4.length);
@@ -893,8 +771,8 @@ ${visit_guide_default.replace(/\r/g, "").trim()}
   var RULE_TARGET_LABEL = { RP: "본편", Directive: "이동·임무", GNet: "괴담넷", Phone: "괴담톡", Wiki: "위키", Visit: "필드" };
   var RULE_SECTION = { RP: null, Directive: "COMMON", GNet: "LB", Phone: "COMMON", Wiki: "NW.GUIDE", Visit: "COMMON" };
   var userRules = [];
-  function setUserRules(rules3) {
-    userRules = Array.isArray(rules3) ? rules3.filter((r) => r && typeof r.id === "string") : [];
+  function setUserRules(rules2) {
+    userRules = Array.isArray(rules2) ? rules2.filter((r) => r && typeof r.id === "string") : [];
   }
   var getUserRules = () => userRules;
   function rulesFor(name) {
@@ -907,20 +785,438 @@ ${r.text.trim()}`).join("\n\n")}`;
   }
   function guidePrompt(name) {
     const base = guideText(name);
-    const rules3 = rulesFor(name);
-    if (!rules3) return base;
+    const rules2 = rulesFor(name);
+    if (!rules2) return base;
     const at = RULE_SECTION[name];
     if (!at) return `${base.replace(/\s+$/, "")}
 
-${rules3}
+${rules2}
 `;
     const parts = splitGuide(base);
     const i = parts.findIndex((p) => p.title === at);
     if (i < 0) return base;
     parts[i] = { ...parts[i], body: `${parts[i].body}
 
-${rules3}` };
+${rules2}` };
     return joinGuide(parts);
+  }
+
+  // src/core/dispatch.ts
+  var DirectiveError = class extends Error {
+  };
+  var REQUIRED = ["COMMON", "OPENING", "CONTINUATION", "CONTEXT"];
+  function parseDirective(_lore) {
+    const raw = guidePrompt("Directive");
+    if (typeof raw !== "string" || !raw.trim()) throw new DirectiveError("Directive 지침을 읽지 못했어요.");
+    const sections3 = {};
+    const heads = [...raw.matchAll(/===([A-Z][A-Z0-9_]*)===/g)];
+    heads.forEach((h, i) => {
+      const name = h[1];
+      if (name in sections3) throw new DirectiveError(`Directive 섹션이 중복됐어요: ${name}`);
+      const start3 = h.index + h[0].length;
+      const end = i + 1 < heads.length ? heads[i + 1].index : raw.length;
+      sections3[name] = raw.slice(start3, end).trim();
+    });
+    let format;
+    try {
+      format = JSON.parse(sections3.FORMAT ?? "");
+    } catch {
+      throw new DirectiveError("Directive의 FORMAT 섹션은 올바른 JSON이어야 해요.");
+    }
+    const keys = {
+      destination: ["name", "located"],
+      party: ["solo", "group", "support_one", "support_many", "separator", "pair_separator", "last_separator"]
+    };
+    for (const [group5, list4] of Object.entries(keys)) {
+      const obj5 = format?.[group5];
+      if (!obj5 || typeof obj5 !== "object") throw new DirectiveError(`Directive FORMAT.${group5}가 없어요.`);
+      for (const k of list4) if (typeof obj5[k] !== "string") throw new DirectiveError(`Directive FORMAT.${group5}.${k}는 문자열이어야 해요.`);
+    }
+    if (typeof format.user_input !== "string") throw new DirectiveError("Directive FORMAT.user_input은 문자열이어야 해요.");
+    for (const name of REQUIRED) if (!sections3[name]) throw new DirectiveError(`Directive의 ${name} 섹션을 확인하세요.`);
+    return { sections: sections3, format };
+  }
+  function fill(template, values) {
+    return template.replace(/\[\[(\w+)\]\]/g, (_, key2) => {
+      if (!(key2 in values)) throw new DirectiveError(`Directive에서 쓸 수 없는 치환 항목이에요: [[${key2}]]`);
+      return String(values[key2]);
+    });
+  }
+  function destination(d, name, location) {
+    return fill(location?.trim() ? d.format.destination.located : d.format.destination.name, { NAME: name, LOCATION: location ?? "" });
+  }
+  function joinNames(d, list4) {
+    const f = d.format.party;
+    if (list4.length <= 1) return list4[0] ?? "";
+    if (list4.length === 2) return list4[0] + f.pair_separator + list4[1];
+    return list4.slice(0, -1).join(f.separator) + f.last_separator + list4[list4.length - 1];
+  }
+  function partyClause(d, names4, support) {
+    const f = d.format.party;
+    const members = [...names4];
+    if (support > 0) members.push(fill(support === 1 ? f.support_one : f.support_many, { COUNT: support }));
+    if (!members.length) return fill(f.solo, {});
+    return fill(f.group, { MEMBERS: joinNames(d, members) });
+  }
+  function sceneDirective(d, dest, names4, support, opening) {
+    const values = { DEST: dest, PARTY: partyClause(d, names4, support) };
+    return [d.sections.COMMON, d.sections[opening ? "OPENING" : "CONTINUATION"], d.sections.CONTEXT].map((t) => fill(t, values)).join("\n\n");
+  }
+  var TEAM_MAX = 3;
+  function validTeam(named2, support) {
+    return Number.isInteger(support) && support >= 0 && named2 >= 0 && named2 + support <= TEAM_MAX;
+  }
+  var OPEN_RE = /%%SCENE_CARD:([0-9a-f]+)%%\r?\n/;
+  var CARD_RE = /%%SCENE_CARD:([0-9a-f]+)%%\r?\n([\s\S]*?)\r?\n%%\/SCENE_CARD%%/g;
+  function toHex(s5) {
+    return Array.from(new TextEncoder().encode(s5), (b) => b.toString(16).padStart(2, "0")).join("");
+  }
+  function fromHex(hex3) {
+    const bytes = new Uint8Array((hex3.match(/../g) ?? []).map((h) => parseInt(h, 16)));
+    return new TextDecoder().decode(bytes);
+  }
+  function sceneRecord(summary, body5) {
+    return `%%SCENE_CARD:${toHex(JSON.stringify(summary))}%%
+${body5}
+%%/SCENE_CARD%%`;
+  }
+  function hasSceneCard(text4) {
+    return typeof text4 === "string" && text4.includes("%%SCENE_CARD:");
+  }
+  function readScene(text4) {
+    const m = OPEN_RE.exec(text4);
+    if (!m) return null;
+    try {
+      const s5 = JSON.parse(fromHex(m[1]));
+      return { target: String(s5.target ?? ""), party: String(s5.party ?? ""), ...s5.unsent ? { unsent: true } : {} };
+    } catch {
+      return null;
+    }
+  }
+  function setSceneUnsent(text4, on2) {
+    return text4.replace(/%%SCENE_CARD:([0-9a-f]+)%%/g, (all, hex3) => {
+      try {
+        const s5 = JSON.parse(fromHex(hex3));
+        if (!!s5.unsent === on2) return all;
+        const next = { target: s5.target, party: s5.party, ...on2 ? { unsent: true } : {} };
+        return `%%SCENE_CARD:${toHex(JSON.stringify(next))}%%`;
+      } catch {
+        return all;
+      }
+    });
+  }
+  function isSceneUnsent(text4) {
+    return hasSceneCard(text4) && !!readScene(text4)?.unsent;
+  }
+  var UNSENT_MARK = "%%GOEI_UNSENT%%";
+  var UNSENT_RE = /\r?\n?%%GOEI_UNSENT%%/g;
+  function isUnsent(text4) {
+    return typeof text4 === "string" && (text4.includes(UNSENT_MARK) || isSceneUnsent(text4));
+  }
+  function setUnsent(text4, on2) {
+    if (hasSceneCard(text4)) return setSceneUnsent(text4, on2);
+    const plain3 = text4.replace(UNSENT_RE, "");
+    return on2 ? `${plain3}
+${UNSENT_MARK}` : plain3;
+  }
+  var START_RE = /%%GOEI_START%%\r?\n([\s\S]*?)\r?\n%%\/GOEI_START%%(\r?\n?%%GOEI_UNSENT%%)?/g;
+  var START_MARK = "%%GOEI_START%%";
+  function startRecord(text4) {
+    return `${START_MARK}
+${text4}
+%%/GOEI_START%%`;
+  }
+  function stripStartCard(text4) {
+    return text4.replace(/%%GOEI_START%%\r?\n/g, "").replace(/\r?\n%%\/GOEI_START%%/g, "");
+  }
+  function renderStartCards(text4, render3) {
+    return text4.replace(START_RE, (_all, body5, unsent) => render3(body5, !!unsent));
+  }
+  function stripUnsentMark(text4) {
+    return text4.replace(UNSENT_RE, "");
+  }
+  function renderUnsentMark(text4, html) {
+    return text4.replace(UNSENT_RE, () => html);
+  }
+  function stripSceneCard(text4) {
+    return text4.replace(/%%SCENE_CARD:[0-9a-f]+%%\r?\n/g, "").replace(/\r?\n%%\/SCENE_CARD%%/g, "");
+  }
+  function renderSceneCards(text4, render3) {
+    return text4.replace(CARD_RE, (all, hex3) => {
+      try {
+        const s5 = JSON.parse(fromHex(hex3));
+        return render3({ target: String(s5.target ?? ""), party: String(s5.party ?? ""), ...s5.unsent ? { unsent: true } : {} });
+      } catch {
+        return all;
+      }
+    });
+  }
+  function withUserInput(d, body5, extra) {
+    if (!extra.trim()) return body5;
+    const tpl = d?.format.user_input ?? "Situation:\n[[INPUT]]";
+    return `${body5}
+
+${tpl.replace(/\[\[INPUT\]\]/g, () => extra)}`;
+  }
+
+  // src/core/fab.ts
+  var FAB_SIZE = 48;
+  var FAB_MARGIN = 8;
+  var DEFAULT_FAB_POS = { right: 16, bottom: 96 };
+  var DRAG_THRESHOLD = 6;
+  function inside(rect, x, y) {
+    if (!rect || typeof x !== "number" || typeof y !== "number") return false;
+    return x >= rect.left && x <= rect.left + rect.width && y >= rect.top && y <= rect.top + rect.height;
+  }
+  function clampPos(pos, viewW, viewH) {
+    const maxR = Math.max(FAB_MARGIN, viewW - FAB_SIZE - FAB_MARGIN);
+    const maxB = Math.max(FAB_MARGIN, viewH - FAB_SIZE - FAB_MARGIN);
+    const r = Number.isFinite(pos.right) ? pos.right : DEFAULT_FAB_POS.right;
+    const b = Number.isFinite(pos.bottom) ? pos.bottom : DEFAULT_FAB_POS.bottom;
+    return {
+      right: Math.round(Math.min(maxR, Math.max(FAB_MARGIN, r))),
+      bottom: Math.round(Math.min(maxB, Math.max(FAB_MARGIN, b)))
+    };
+  }
+  function dragTo(start3, dx, dy, viewW, viewH) {
+    return clampPos({ right: start3.right - dx, bottom: start3.bottom - dy }, viewW, viewH);
+  }
+  function parsePos(raw) {
+    try {
+      const p = JSON.parse(raw ?? "");
+      if (p && Number.isFinite(p.right) && Number.isFinite(p.bottom)) return { right: p.right, bottom: p.bottom };
+    } catch {
+    }
+    return { ...DEFAULT_FAB_POS };
+  }
+
+  // src/ui/icons.ts
+  var GHOST_ICON = '<svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M11.5 2.5C7.8 2.5 5.5 5.2 5.5 8.8V10.3L3.9 9.1C2.2 7.9 .6 10.1 2 11.5L5.5 15C5.8 19.5 9.3 22 13.7 22C18.1 22 21 19.6 22 16.8C19.4 18.3 17.5 17.8 17.5 15.5V15L21 11.5C22.4 10.1 20.8 7.9 19.1 9.1L17.5 10.3V8.5C17.5 5 15.1 2.5 11.5 2.5ZM10.2 9A1.2 1.6 0 1 0 7.8 9A1.2 1.6 0 1 0 10.2 9ZM15.2 9A1.2 1.6 0 1 0 12.8 9A1.2 1.6 0 1 0 15.2 9ZM12.5 13A1 1.5 0 1 0 10.5 13A1 1.5 0 1 0 12.5 13Z"/></svg>';
+  var stroke = (d) => `<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${d}</svg>`;
+  var ICONS = {
+    board: stroke('<rect x="3" y="3" width="7" height="9" rx="2"/><rect x="14" y="3" width="7" height="5" rx="2"/><rect x="14" y="12" width="7" height="9" rx="2"/><rect x="3" y="16" width="7" height="5" rx="2"/>'),
+    map: stroke('<path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2-6-2Z"/><path d="M9 4v14M15 6v14"/>'),
+    mission: stroke('<circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/>'),
+    phone: stroke('<path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/>'),
+    gnet: stroke('<path d="M4 5h16v11H8l-4 4V5Z"/><path d="M8 9h8M8 12h5"/>'),
+    wiki: stroke('<path d="M4 5a2 2 0 0 1 2-2h12v18H6a2 2 0 0 1-2-2V5Z"/><path d="M8 7h6M8 11h6"/>'),
+    settings: stroke('<path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/>'),
+    swap: stroke('<path d="M7 4 3 8l4 4M3 8h14M17 20l4-4-4-4M21 16H7"/>'),
+    wallet: stroke('<path d="M4 7a2 2 0 0 1 2-2h11v4"/><rect x="3" y="8" width="18" height="12" rx="2.5"/><path d="M16 14h2"/>'),
+    idcard: stroke('<rect x="5" y="3" width="14" height="18" rx="2.5"/><circle cx="12" cy="10" r="2.6"/><path d="M8.5 16.5c.7-1.7 2-2.5 3.5-2.5s2.8.8 3.5 2.5"/>'),
+    info: stroke('<circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/>'),
+    refresh: stroke('<path d="M20 11a8 8 0 1 0-2.3 5.7"/><path d="M20 4v7h-7"/>'),
+    group: stroke('<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><path d="M16 4.5a3.5 3.5 0 0 1 0 7M18.5 14.5A6.5 6.5 0 0 1 21.5 20"/>'),
+    person: stroke('<circle cx="12" cy="8" r="3.6"/><path d="M5 20.5a7 7 0 0 1 14 0"/>'),
+    org: stroke('<rect x="4" y="3.5" width="10" height="17" rx="1.5"/><path d="M14 9.5h4.5a1.5 1.5 0 0 1 1.5 1.5v9.5H14M7.5 7.5h3M7.5 11h3M7.5 14.5h3M10 20.5v-2.5"/>'),
+    addUser: stroke('<circle cx="10" cy="8" r="3.5"/><path d="M3.5 20a6.5 6.5 0 0 1 13 0M19 8v6M16 11h6"/>'),
+    pen: stroke('<path d="M4 20h4L19 9a2.8 2.8 0 0 0-4-4L4 16v4Z"/><path d="m13.5 6.5 4 4"/>'),
+    mail: stroke('<rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="m4 7 8 6 8-6"/>'),
+    call: stroke('<path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2Z"/>'),
+    // 보내기: 굵은 위쪽 화살표 (메신저 전송 버튼)
+    send: '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5.5M5.5 12 12 5.5 18.5 12"/></svg>',
+    plus: stroke('<path d="M12 5v14M5 12h14"/>'),
+    trash: stroke('<path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/>'),
+    /** 기록 메뉴 (일지·보고서·인물·세력): 클립보드 */
+    records: stroke('<rect x="5" y="4.5" width="14" height="16.5" rx="2"/><path d="M9 4.5V3h6v1.5M8.5 10h7M8.5 13.5h7M8.5 17h4"/>'),
+    book: stroke('<path d="M4 5a2 2 0 0 1 2-2h12v18H6a2 2 0 0 1-2-2V5Z"/><path d="M8 7h6M8 11h6"/>'),
+    back: stroke('<path d="m15 5-7 7 7 7"/>'),
+    // 관찰형 게임 「관리국 순찰」: 게임패드
+    star: stroke('<path d="m12 3.5 2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.8l-5.2 2.8 1-5.8-4.3-4.1 5.9-.9Z"/>'),
+    game: stroke('<path d="M7 8h10a4 4 0 0 1 4 4.5l-.6 3.6a2.4 2.4 0 0 1-4.2 1.1L14.5 15h-5l-1.7 2.2a2.4 2.4 0 0 1-4.2-1.1L3 12.5A4 4 0 0 1 7 8Z"/><path d="M8 11v3M6.5 12.5h3M15.5 12h.01M17.5 13.5h.01"/>'),
+    search: stroke('<circle cx="11" cy="11" r="6.5"/><path d="m16 16 4.5 4.5"/>'),
+    cctv: stroke('<rect x="2.5" y="4.5" width="19" height="13" rx="2"/><path d="M8 21h8M12 17.5V21"/><circle cx="7" cy="9" r="1.5" fill="currentColor" stroke="none"/>'),
+    grid: stroke('<rect x="3.5" y="4" width="7" height="7" rx="1.5"/><rect x="13.5" y="4" width="7" height="7" rx="1.5"/><rect x="3.5" y="14" width="7" height="7" rx="1.5"/><rect x="13.5" y="14" width="7" height="7" rx="1.5"/>'),
+    list: stroke('<path d="M9 6h11M9 12h11M9 18h11"/><path d="M4.5 6h.01M4.5 12h.01M4.5 18h.01"/>'),
+    pin: stroke('<path d="M12 21s-6.5-6.2-6.5-11.2a6.5 6.5 0 0 1 13 0C18.5 14.8 12 21 12 21Z"/><circle cx="12" cy="9.8" r="2.3"/>'),
+    // 상황 딱지 (v0.16.21): 사건은 경광등, 특수는 문어 모양 유령
+    siren: stroke('<path d="M6.5 17.5V12a5.5 5.5 0 0 1 11 0v5.5"/><path d="M4 17.5h16V21H4z"/><path d="M12 2v2.5M3.5 5.5l1.8 1.8M20.5 5.5l-1.8 1.8M12 10.5v3.5"/>'),
+    spook: '<svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M12 2.5a7.5 7.5 0 0 0-7.5 7.5v10.6c0 .8.9 1.2 1.5.7l1.5-1.2 1.7 1.4c.4.3.9.3 1.3 0l1.5-1.4 1.5 1.4c.4.3.9.3 1.3 0l1.7-1.4 1.5 1.2c.6.5 1.5.1 1.5-.7V10A7.5 7.5 0 0 0 12 2.5ZM9.3 8.4a1.4 1.7 0 1 0 0 3.4a1.4 1.7 0 1 0 0-3.4Zm5.4 0a1.4 1.7 0 1 0 0 3.4a1.4 1.7 0 1 0 0-3.4Z"/></svg>',
+    expand: stroke('<path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/>'),
+    close: stroke('<path d="M6 6l12 12M18 6 6 18"/>'),
+    up: stroke('<path d="m6 15 6-6 6 6"/>'),
+    down: stroke('<path d="m6 9 6 6 6-6"/>'),
+    grip: '<svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><circle cx="9" cy="6" r="1.6"/><circle cx="15" cy="6" r="1.6"/><circle cx="9" cy="12" r="1.6"/><circle cx="15" cy="12" r="1.6"/><circle cx="9" cy="18" r="1.6"/><circle cx="15" cy="18" r="1.6"/></svg>'
+  };
+
+  // src/ui/brand.ts
+  var BRAND = {
+    /** 창 머리·표지 이름 */
+    name: "괴이 ː ANOMALY",
+    /** 떠 있는 여는 버튼에 마우스를 올렸을 때 */
+    fab: "괴이 ː ANOMALY"
+  };
+  function brandHtml(text4, signal) {
+    return `<span style="color:${text4}">괴이</span><span style="color:${signal};font-weight:300;margin:0 .3em">ː</span><span style="color:${signal}">ANOMALY</span>`;
+  }
+
+  // src/ui/landing.ts
+  var MONO = "'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, monospace";
+  function title(p) {
+    const line2 = brandHtml(p.text, p.signal);
+    const font = "font-size:2.1em;font-weight:800;letter-spacing:.08em;line-height:1.15;white-space:nowrap";
+    return `<div style="margin:6px 0 0;${font}">${line2}</div><div aria-hidden="true" style="${font};line-height:1;margin:-.06em 0 .02em;-webkit-mask-image:linear-gradient(to bottom,#000,transparent 60%);mask-image:linear-gradient(to bottom,#000,transparent 60%)"><div data-goei-part="mirror" style="transform:scaleY(-1);opacity:.3">${line2}</div></div>`;
+  }
+  function corner(pos, p) {
+    const [v, h] = pos.split(" ");
+    return `<span aria-hidden="true" style="position:absolute;${v}:10px;${h}:10px;width:14px;height:14px;border-${v}:2px solid ${p.accentLine};border-${h}:2px solid ${p.accentLine};border-${v}-${h}-radius:4px;opacity:.9"></span>`;
+  }
+  function landingHtml(p) {
+    const ghost = GHOST_ICON.replace('width="24" height="24"', 'width="92" height="92"');
+    return `<div data-goei-card="landing" style="position:relative;overflow:hidden;box-sizing:border-box;max-width:23em;margin:18px auto;padding:30px 30px 22px;border-radius:20px;background:${p.void};border:1px solid ${p.line};color:${p.text};line-height:1.6;font-size:15px;text-align:center;box-shadow:0 20px 40px -24px rgba(0,0,0,.45)"><span aria-hidden="true" data-goei-part="scan" style="position:absolute;left:0;right:0;top:0;height:40%;pointer-events:none;opacity:0;background:linear-gradient(to bottom,transparent,${p.accentBg} 70%,transparent)"></span>` + corner("top left", p) + corner("top right", p) + corner("bottom left", p) + corner("bottom right", p) + `<span style="position:absolute;top:13px;right:34px;display:inline-flex;align-items:center;gap:6px;font-family:${MONO};font-size:10px;letter-spacing:.2em;color:${p.sub}"><span data-goei-part="dot" style="width:6px;height:6px;border-radius:50%;background:${p.signal}"></span>STANDBY</span><div data-goei-part="row" style="position:relative;display:flex;flex-direction:column;align-items:center;gap:14px"><div data-goei-part="ghost" style="flex:0 0 auto;display:grid;place-items:center;width:96px;height:96px;color:${p.signal};filter:drop-shadow(0 6px 14px ${p.accentBg})">${ghost}</div><div data-goei-part="text" style="width:100%;min-width:0">` + title(p) + `<div style="display:flex;align-items:center;justify-content:center;gap:8px;margin-top:4px;padding-top:12px;border-top:1px dashed ${p.line};color:${p.sub}"><span style="font-family:${MONO};color:${p.signal}">▸</span><span data-goei-part="hint">유령 버튼을 눌러 시작하세요</span></div></div></div></div>`;
+  }
+  var LANDING_CSS = `
+[data-goei-card="landing"] { container-type: inline-size; }
+@keyframes goei-l-blink { 0%, 100% { opacity: 1; } 50% { opacity: .25; } }
+@keyframes goei-l-dot { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: .3; transform: scale(.7); } }
+@keyframes goei-l-mirror {
+  0%, 100% { transform: scaleY(-1) skewX(0deg) translateX(0); opacity: .3; }
+  25% { transform: scaleY(-1.04) skewX(5deg) translateX(-2px); opacity: .22; }
+  50% { transform: scaleY(-.97) skewX(-3deg) translateX(2px); opacity: .34; }
+  75% { transform: scaleY(-1.02) skewX(4deg) translateX(-1px); opacity: .25; }
+}
+@keyframes goei-l-label {
+  0%, 86%, 100% { opacity: .9; transform: translateX(0); }
+  88% { opacity: .3; transform: translateX(2px); }
+  90% { opacity: 1; transform: translateX(-2px); }
+  92% { opacity: .5; transform: translateX(1px); }
+  94% { opacity: .95; transform: translateX(0); }
+}
+@keyframes goei-l-float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
+@keyframes goei-l-scan { 0% { transform: translateY(-100%); opacity: 0; } 15% { opacity: .55; } 70% { opacity: .55; } 100% { transform: translateY(260%); opacity: 0; } }
+[data-goei-card="landing"] [data-goei-part="hint"] { animation: goei-l-blink 1.6s ease-in-out infinite; }
+[data-goei-card="landing"] [data-goei-part="dot"] { animation: goei-l-dot 1.6s ease-in-out infinite; }
+[data-goei-card="landing"] [data-goei-part="mirror"] { animation: goei-l-mirror 4.5s ease-in-out infinite; }
+[data-goei-card="landing"] [data-goei-part="label"] { display: inline-block; animation: goei-l-label 3.8s linear infinite; }
+[data-goei-card="landing"] [data-goei-part="ghost"] { animation: goei-l-float 3.2s ease-in-out infinite; }
+[data-goei-card="landing"] [data-goei-part="scan"] { animation: goei-l-scan 5s ease-in-out infinite; }
+/* 좁은 화면: 유령만 조금 작게 (인라인 style을 이겨야 해서 !important) */
+@container (max-width: 24em) {
+  [data-goei-card="landing"] [data-goei-part="ghost"] { width: 80px !important; height: 80px !important; }
+  [data-goei-card="landing"] [data-goei-part="ghost"] svg { width: 76px; height: 76px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-goei-card="landing"] [data-goei-part] { animation: none !important; }
+}
+`;
+
+  // src/ui/theme.ts
+  var PALETTES = {
+    dark: { void: "#1A2226", panel: "#232D32", line: "#37464D", text: "#E9F0EE", sub: "#BECBC8", signal: "#5EEAD4", accentBg: "#1D403A", accentLine: "#3F8879", scrim: "rgba(3, 7, 9, .9)" },
+    light: { void: "#F4F6F5", panel: "#FFFFFF", line: "#DCE3E1", text: "#13201D", sub: "#3B4B47", signal: "#0F8C7A", accentBg: "#DDF3EE", accentLine: "#8FCFC3", scrim: "rgba(236, 242, 240, .94)" },
+    paper: { void: "#EFE6D2", panel: "#F8F2E4", line: "#D8C9A8", text: "#2B2418", sub: "#4A3F2C", signal: "#8A4B12", accentBg: "#F1DEC2", accentLine: "#C99A63", scrim: "rgba(239, 230, 210, .94)" }
+  };
+  function themeName(v, fallback = "dark") {
+    return v === "light" || v === "paper" || v === "dark" ? v : fallback;
+  }
+  var current = "dark";
+  var listeners = /* @__PURE__ */ new Set();
+  function currentTheme() {
+    return current;
+  }
+  function setCurrentTheme(t) {
+    if (t === current) return;
+    current = t;
+    for (const f of listeners) f(t);
+  }
+  function repaintTheme() {
+    for (const f of listeners) f(current);
+  }
+  function onThemeChange(f) {
+    listeners.add(f);
+    return () => listeners.delete(f);
+  }
+  var KEYS = Object.keys(PALETTES.dark);
+  function cardPalette(t) {
+    const p = PALETTES[t];
+    return Object.fromEntries(KEYS.map((k) => [k, `var(--goei-${k}, ${p[k]})`]));
+  }
+  function cardVarsCss(t) {
+    const p = PALETTES[t];
+    return `[data-goei-card] { ${KEYS.map((k) => `--goei-${k}: ${p[k]};`).join(" ")} }`;
+  }
+
+  // src/data/geo.json
+  var geo_default = { _source: "괴이봇 2.4 Lua SIGUN/SIDONAME/DVIEW2MC/PINXY", sealedLoc: "13-6", sigun: { "02": ["도봉구", "노원구", "강북구", "은평구", "중랑구", "성북구", "종로구", "동대문구", "서대문구", "강서구", "중구", "마포구", "성동구", "강동구", "광진구", "용산구", "영등포구", "양천구", "동작구", "송파구", "강남구", "구로구", "서초구", "관악구", "금천구"], "03": ["교동도", "강화도", "석모도", "볼음도", "주문도", "장봉도", "신도", "영종도", "무의도", "백령도", "연평도", "서구", "계양구", "부평구", "남동구", "미추홀구", "연수구", "동구", "중구"], "04": ["대덕구", "유성구", "서구", "중구", "동구"], "05": ["중구", "동구", "서구", "남구", "북구", "수성구", "달서구", "달성군", "군위군"], "06": ["광산구", "북구", "남구", "서구", "동구"], "07": ["기장군", "금정구", "북구", "동래구", "해운대구", "연제구", "부산진구", "수영구", "사상구", "강서구", "동구", "남구", "서구", "중구", "사하구", "영도구"], "08": ["울주군", "북구", "동구", "남구", "중구"], "09": ["파주시", "연천군", "동두천시", "양주시", "의정부시", "고양시", "포천시", "가평군", "남양주시", "구리시"], "10": ["김포시", "부천시", "광명시", "시흥시", "안산시", "군포시", "안양시", "의왕시", "과천시", "성남시", "하남시", "광주시", "양평군", "수원시", "용인시", "이천시", "여주시", "화성시", "오산시", "평택시", "안성시"], "11": ["고성군", "철원군", "화천군", "양구군", "속초시", "인제군", "양양군", "춘천시", "홍천군", "강릉시", "평창군", "횡성군", "동해시", "정선군", "원주시", "삼척시", "영월군", "태백시"], "12": ["청주시", "충주시", "제천시", "진천군", "음성군", "증평군", "괴산군", "단양군", "보은군", "옥천군", "영동군"], "13": ["당진시", "서산시", "태안군", "천안시", "아산시", "예산군", "세광특별시", "홍성군", "청양군", "공주시", "보령시", "계룡시", "부여군", "논산시", "금산군", "서천군"], "14": ["익산시", "완주군", "군산시", "무주군", "진안군", "전주시", "김제시", "부안군", "장수군", "정읍시", "임실군", "고창군", "남원시", "순창군"], "15": ["장성군", "담양군", "영광군", "구례군", "곡성군", "함평군", "광양시", "화순군", "나주시", "순천시", "무안군", "보성군", "목포시", "영암군", "여수시", "장흥군", "신안군", "강진군", "고흥군", "해남군", "진도군", "완도군"], "16": ["봉화군", "울진군", "영주시", "영양군", "문경시", "예천군", "안동시", "영덕군", "상주시", "청송군", "의성군", "구미시", "포항시", "김천시", "영천시", "칠곡군", "성주군", "경주시", "경산시", "고령군", "청도군", "울릉군", "독도"], "17": ["거창군", "함양군", "합천군", "창녕군", "밀양시", "의령군", "양산시", "산청군", "함안군", "김해시", "창원시", "진주시", "하동군", "사천시", "고성군", "통영시", "거제시", "남해군"], "18": ["제주시", "서귀포시", "한림읍", "애월읍", "구좌읍", "조천읍", "한경면", "대정읍", "남원읍", "성산읍", "안덕면", "표선면", "우도면", "추자면"] }, sido: { "02": "서울특별시", "03": "인천광역시", "04": "대전광역시", "05": "대구광역시", "06": "광주광역시", "07": "부산광역시", "08": "울산광역시", "09": "경기도", "10": "경기도", "11": "강원특별자치도", "12": "충청북도", "13": "충청남도", "14": "전북특별자치도", "15": "전라남도", "16": "경상북도", "17": "경상남도", "18": "제주특별자치도" }, dviewToMap: { "02": "11", "03": "23", "04": "25", "05": "22", "06": "24", "07": "21", "08": "26", "09": "31", "10": "40", "11": "32", "12": "33", "13": "34", "14": "35", "15": "36", "16": "37", "17": "38", "18": "39" }, pins: { "02": [[62.7, 17.2], [71.3, 23.2], [59, 26.6], [39.2, 32.6], [75.1, 38.9], [59.6, 39], [49.8, 36.6], [67.5, 44], [43.1, 40.6], [18.7, 50.4], [54.2, 50.8], [36.7, 53.3], [64.7, 54.1], [86.6, 55.4], [74.5, 56.9], [48, 61.8], [35, 64.8], [25.3, 65.5], [45.6, 70.3], [80.4, 70.6], [67.5, 74.2], [21.3, 74.3], [57.4, 77.2], [44.2, 81.3], [34.4, 85.5]], "03": [[26.1, 14.8], [47.5, 29.3], [33.3, 31.1], [18.4, 34.8], [24.2, 40.1], [35, 59], [47.8, 60.4], [50, 69.1], [44, 84.7], [10.7, 65.5], [11.4, 86.3], [69.4, 55.7], [79.2, 55.9], [77.4, 65.8], [78.8, 75], [71.2, 73], [68.2, 84.4], [68.5, 68], [66.4, 72.3]], "04": [[56.9, 31.6], [35.4, 36.3], [45.5, 47.8], [51.1, 65.1], [62.4, 53.3]], "05": [[48, 62.4], [54.7, 53.6], [42.6, 60.9], [45.6, 66], [46.2, 50.9], [53.8, 66.7], [34.7, 60.3], [38.7, 79.8], [52.8, 28.2]], "06": [[31.9, 45.6], [68.1, 32.6], [57.4, 73.7], [55.5, 56.2], [79.8, 64.3]], "07": [[72.3, 26.2], [56.7, 33.9], [46.7, 41.2], [53.1, 45], [65.2, 50.4], [55.5, 51.2], [49.3, 55.2], [59.8, 56.5], [40.3, 57.2], [29.2, 58.3], [48.9, 63.3], [56.6, 64.1], [44.5, 65.4], [47.1, 69.1], [38.3, 71.3], [51.9, 74.3]], "08": [[43, 37.6], [76.3, 31.9], [81.5, 50.8], [66.8, 51.5], [64.5, 39.3]], "09": [[25.7, 55.9], [43.1, 29.3], [45.3, 48.6], [39.9, 59.6], [45.1, 69.2], [27.4, 78], [58.7, 41.4], [70.6, 59.6], [57.1, 76.8], [49.4, 84.8]], "10": [[18.5, 17.2], [29.6, 34.3], [34.6, 40.1], [29.9, 45.5], [33.1, 52.5], [37.9, 50.2], [38.5, 44], [42.5, 48.2], [43, 41.2], [50.3, 43.9], [55.9, 32.8], [61.9, 43.9], [78.6, 34.4], [43.4, 56.2], [57, 60.7], [71.4, 62.3], [82.1, 53.2], [36.2, 66.9], [46.1, 67.5], [42.3, 82.7], [60.5, 80.8]], "11": [[56.6, 19], [17.5, 25.5], [30.4, 29.1], [40.8, 29.3], [60.5, 29.3], [51.4, 35.2], [63.8, 38.8], [31.7, 46], [43.1, 53.1], [72.8, 55.2], [58, 63.5], [45.6, 66.4], [80.3, 68.1], [67.7, 75], [37.9, 78.5], [83.6, 81], [58.5, 85.7], [77.1, 88.6]], "12": [[28.2, 49.4], [46.7, 21.6], [59.1, 19.7], [25.1, 32.2], [31.9, 25.8], [32.3, 38.2], [42.8, 38.5], [69.2, 22.6], [39.2, 60.1], [34.6, 73], [42.5, 85.2]], "13": [[38.6, 17.6], [28.3, 27.9], [15.8, 27.9], [68.6, 24], [56.6, 25.8], [46.3, 35.8], [72, 45.1], [36.4, 46.6], [48.9, 57.1], [62.4, 53.5], [36.8, 65.2], [69.9, 69.9], [50.1, 73.5], [65.7, 78.7], [85.3, 84.2], [42.3, 85.7]], "14": [[39.4, 22.3], [53.7, 27.9], [24.4, 28.2], [83.8, 29.7], [65.9, 40.4], [46.3, 40.4], [33.1, 41.3], [17.9, 54.9], [74.1, 57.3], [32.9, 60.6], [53.2, 63.1], [15.1, 77.2], [66.6, 77.3], [46.9, 79.8]], "15": [[48.7, 14.4], [58, 16.6], [34.7, 18.1], [81.1, 20.2], [71, 21.1], [37.9, 28.3], [88.1, 34.6], [59.8, 36.1], [46, 36.4], [76.4, 37.3], [34.8, 41.7], [65.8, 48.7], [32.3, 48.9], [42.8, 49.1], [87.8, 50], [55.2, 52.8], [19.1, 53.9], [48.6, 57.2], [72.9, 63.1], [39.3, 66.3], [25.1, 72.2], [45.9, 81.7]], "16": [[45.5, 18.2], [60.7, 19.7], [33.3, 23.1], [53.3, 30.6], [18.7, 31], [27.9, 34], [41.3, 36.9], [60, 43.5], [15.5, 46.7], [51.1, 49.9], [34.8, 50.5], [25.4, 58.2], [60.2, 63.7], [15.7, 65.6], [46.8, 68.8], [29.5, 69], [21, 74.5], [56.6, 79], [41.6, 79.5], [22.9, 84.8], [41, 88.1], [87.4, 16.8], [88, 47.7]], "17": [[27.6, 16], [18.8, 28.4], [37.6, 29.3], [54.6, 32.3], [67.6, 34.6], [44.3, 40.3], [79.8, 40.4], [26.4, 42.4], [50.2, 48.5], [70.5, 49.2], [59.7, 52.9], [36.8, 54.1], [21.9, 59], [34.8, 64.9], [44.9, 67], [50.3, 77], [60.9, 78.7], [27.6, 82]], "18": [[48.5, 39.4], [45.1, 62.9], [21.3, 51], [32.1, 45.6], [74.4, 32.5], [63.1, 34.9], [13.7, 58.8], [17.7, 70.2], [60.9, 57.2], [82.3, 43.7], [27.1, 62.6], [72.2, 50.4], [92, 30.1], [13.5, 12.4]] }, nation: [["02", "서울", 39.2, 26.9], ["03", "인천", 33.5, 28.2], ["04", "대전", 44.6, 52.6], ["05", "대구", 61.9, 61.7], ["06", "광주", 37, 78.2], ["07", "부산", 67.5, 77.2], ["08", "울산", 70.3, 69.7], ["09", "경기북부", 42, 19.6], ["10", "경기남부", 45.8, 31.5], ["11", "강원", 57.9, 23.3], ["12", "충북", 48.9, 42.7], ["13", "충남", 37.6, 48.7], ["14", "전북", 41.2, 66.1], ["15", "전남", 43.6, 79.7], ["16", "경북", 65.5, 48.3], ["17", "경남", 55, 73.9], ["18", "제주", 10.4, 91.1]] };
+
+  // src/core/world/geo.ts
+  var SIGUN = geo_default.sigun;
+  var SIDO_NAME = geo_default.sido;
+  var SEALED_LOC = geo_default.sealedLoc;
+  var POOL = Object.entries(SIGUN).flatMap(
+    ([code2, list4]) => list4.map((_, i) => `${code2}-${i}`).filter((loc) => loc !== SEALED_LOC)
+  );
+  function locName(loc) {
+    const m = /^(\d+)-(\d+)$/.exec(loc);
+    if (!m) return loc;
+    const gu = SIGUN[m[1]]?.[Number(m[2])];
+    if (gu === "세광특별시") return gu;
+    const sido = SIDO_NAME[m[1]] ?? m[1];
+    return gu ? `${sido} ${gu}` : sido;
+  }
+  function shortName(name) {
+    return name.replace(/^(\S+?)(?:특별자치도|특별자치시|특별시|광역시|도)(\s)/, "$1$2");
+  }
+  function regionMatch(tagRegion, name) {
+    if (!tagRegion?.trim() || !name?.trim()) return false;
+    const a = tagRegion.replace(/\s+/g, "");
+    return [name, shortName(name)].some((n2) => {
+      const b = n2.replace(/\s+/g, "");
+      return a === b || a.includes(b) || b.includes(a);
+    });
+  }
+  function uniqueRegion(region2) {
+    let match = null;
+    for (const [code2, list4] of Object.entries(SIGUN)) {
+      for (let i = 0; i < list4.length; i++) {
+        const loc = `${code2}-${i}`;
+        if (loc === SEALED_LOC || !regionMatch(region2, locName(loc))) continue;
+        if (match) return null;
+        match = loc;
+      }
+    }
+    return match;
+  }
+  function landmarkLoc(sido, gu) {
+    const i = (SIGUN[sido] ?? []).indexOf(gu);
+    return i >= 0 ? `${sido}-${i}` : null;
+  }
+  var placeWhere = (sido, gu) => [SIDO_NAME[sido] ?? "", gu].filter(Boolean).join(" ");
+  var NATION_PINS = geo_default.nation;
+  var REGION_PINS = geo_default.pins;
+  var MAP_CODES = NATION_PINS.map((p) => p[0]);
+  function regionName(code2) {
+    if (code2 === "09") return "경기 북부";
+    if (code2 === "10") return "경기 남부";
+    return SIDO_NAME[code2] ?? "전국";
+  }
+
+  // src/core/lorebooks.ts
+  var DIRECTORY_COMMENT = "Directory";
+  var MANIFEST_COMMENT = "Plugin manifest";
+  var OLD_DIRECTORY = "괴이봇 명부";
+  var OLD_MANIFEST = "괴이봇 플러그인 매니페스트";
+  var LEGACY_DATA = ["World catalog", "Agent roster", "Faction display", "Phone tabs", "Start trigger"];
+  var RETIRED = ["LB Backend", OLD_MANIFEST];
+  var isDirectory = (comment) => comment === DIRECTORY_COMMENT || comment === OLD_DIRECTORY;
+  function named(lore, name, old) {
+    const list4 = lore ?? [];
+    const hit3 = list4.filter((e) => e.comment === name);
+    return hit3.length ? hit3 : list4.filter((e) => e.comment === old);
+  }
+  var directoryEntries = (lore) => named(lore, DIRECTORY_COMMENT, OLD_DIRECTORY);
+  var manifestEntry = (lore) => named(lore, MANIFEST_COMMENT, OLD_MANIFEST)[0];
+  function parseSeedManifest(raw) {
+    const map = /* @__PURE__ */ new Map();
+    for (const line2 of raw.split("\n")) {
+      const t = line2.replace(/\r/g, "").trim();
+      if (!t || t.startsWith("#")) continue;
+      const m = /^([\w-]+)\s*:\s*(.*)$/.exec(t);
+      if (!m) continue;
+      const names4 = m[2].split("|").map((s5) => s5.trim()).filter(Boolean);
+      if (names4.length) map.set(m[1], names4);
+    }
+    return map;
   }
 
   // src/data/scenarios.json
@@ -1179,7 +1475,7 @@ ${TYPE_GM[f.type ?? "org"]}`).join("")
   }
   var AC_CODES = /(code = A00 \| B00 \| C00 \| D00 \| E00)(?!\{\{getvar::fac_codes\}\})/;
   var AC_LAST = /(\n[ \t]*- E00 = [^\n]*)(?!\{\{getvar::fac_ac\}\})/;
-  var POOL = /(\n[ \t]*- Faction pool:[^\n]*?)( \| etc\.)?(\n)/;
+  var POOL2 = /(\n[ \t]*- Faction pool:[^\n]*?)( \| etc\.)?(\n)/;
   var EXTRA = "{{getvar::fac_extra}}";
   function placeFactionExtra(text4) {
     const bare = text4.split(EXTRA).join("");
@@ -1213,7 +1509,7 @@ ${body5.slice(at).replace(/^\s+/, "")}
         else missing.push("[AC] E00 줄");
       }
       if (!t.includes("{{getvar::fac_pool}}")) {
-        if (POOL.test(t)) t = t.replace(POOL, (_m, line2, etc, nl) => `${line2}{{getvar::fac_pool}}${etc ?? ""}${nl}`);
+        if (POOL2.test(t)) t = t.replace(POOL2, (_m, line2, etc, nl) => `${line2}{{getvar::fac_pool}}${etc ?? ""}${nl}`);
         else missing.push("Faction pool 줄");
       }
       if (t !== next[tagAt].content) {
@@ -1343,8 +1639,8 @@ ${body5.slice(at).replace(/^\s+/, "")}
   function rank(table, name, text4, seed) {
     const n2 = clean(name), t = clean(text4);
     const scored = table.map(([key2, words], i) => ({ key: key2, i, score: score(words, n2) * 2 + score(words, t) }));
-    const start4 = pick(seed, table.length);
-    const turn = (i) => (i - start4 + table.length) % table.length;
+    const start3 = pick(seed, table.length);
+    const turn = (i) => (i - start3 + table.length) % table.length;
     return scored.sort((a, b) => b.score - a.score || turn(a.i) - turn(b.i)).map((x) => x.key);
   }
   var two = (prefix, seed) => pick(seed, 2) ? [`${prefix} 2`, `${prefix} 1`] : [`${prefix} 1`, `${prefix} 2`];
@@ -1530,9 +1826,9 @@ ${body5.slice(at).replace(/^\s+/, "")}
   function guessEnglish(e) {
     return keysOf(e).find(ascii) ?? "";
   }
-  function legacyPlaces(lore, group6) {
+  function legacyPlaces(lore, group5) {
     const world2 = obj2(book(lore, "World catalog"));
-    const rows2 = Array.isArray(world2[group6]) ? world2[group6] : [];
+    const rows2 = Array.isArray(world2[group5]) ? world2[group5] : [];
     const out = [];
     for (const r of rows2) {
       if (!Array.isArray(r) || r.length !== 5) continue;
@@ -1651,12 +1947,12 @@ ${body5.slice(at).replace(/^\s+/, "")}
     for (const f of FACTIONS) if (s2(m[f])) out[f] = s2(m[f]);
     return { ...extraNames(lore), ...out };
   }
-  function groupFaction(group6, names4) {
+  function groupFaction(group5, names4) {
     let best = "";
     let len = 0;
     for (const f of FACTIONS) {
       const n2 = names4[f];
-      if (n2 && group6.includes(n2) && n2.length > len) {
+      if (n2 && group5.includes(n2) && n2.length > len) {
         best = f;
         len = n2.length;
       }
@@ -1746,11 +2042,11 @@ ${body5.slice(at).replace(/^\s+/, "")}
     }
     return out;
   }
-  function orgHint(group6, orgs, lore) {
-    if (!group6) return void 0;
-    const code2 = groupFaction(group6, factionDisplayNames(lore));
+  function orgHint(group5, orgs, lore) {
+    if (!group5) return void 0;
+    const code2 = groupFaction(group5, factionDisplayNames(lore));
     if (code2) return orgs.find((o) => o.faction === code2);
-    return orgs.find((o) => o.name === group6) ?? [...orgs].sort((x, y) => y.name.length - x.name.length).find((o) => !o.faction && group6.includes(o.name));
+    return orgs.find((o) => o.name === group5) ?? [...orgs].sort((x, y) => y.name.length - x.name.length).find((o) => !o.faction && group5.includes(o.name));
   }
   function assignOrg(a, o) {
     a.affiliation = o ? orgAffiliation(o) : "";
@@ -1783,9 +2079,9 @@ ${body5.slice(at).replace(/^\s+/, "")}
     const exists = new Set(books.filter((e) => !isFolder(e)).map((e) => s2(e.comment)));
     const byLore = new Map(books.filter((e) => !isFolder(e)).map((e) => [s2(e.comment), e]));
     const places = (kind) => {
-      const group6 = kind === "anomaly" ? "괴이" : "미스틱 사이트";
-      const legacy = legacyPlaces(books, group6);
-      const saved = obj2(data3?.[group6]);
+      const group5 = kind === "anomaly" ? "괴이" : "미스틱 사이트";
+      const legacy = legacyPlaces(books, group5);
+      const saved = obj2(data3?.[group5]);
       const folder = members?.[kind] ?? [];
       const used = /* @__PURE__ */ new Set();
       const legacyLore = /* @__PURE__ */ new Map();
@@ -1849,13 +2145,13 @@ ${body5.slice(at).replace(/^\s+/, "")}
         rosterFor: Array.isArray(d.roster_for) ? list2(d.roster_for) : base.rosterFor,
         phoneTabs: Array.isArray(d.phone_tabs) ? list2(d.phone_tabs) : base.phoneTabs
       });
-      let group6 = "";
+      let group5 = "";
       for (const e of members?.agent ?? []) {
         const name = s2(e.comment);
         const sep = SEPARATOR.exec(name);
         if (sep) {
-          group6 = sep[1].trim();
-          if (group6 && !groups.includes(group6)) groups.push(group6);
+          group5 = sep[1].trim();
+          if (group5 && !groups.includes(group5)) groups.push(group5);
           continue;
         }
         if (seen2.has(name)) continue;
@@ -1866,11 +2162,11 @@ ${body5.slice(at).replace(/^\s+/, "")}
           legacyLore.set(name, old.lore);
         }
         let base;
-        if (old) base = { ...old, lore: name, group: group6, inFolder: true };
-        else base = { lore: name, id: "", name, english: guessEnglish(e), aliases: [], legacyEnglish: [], affiliation: "", rosterFor: [], phoneTabs: [], rank: "", department: "", group: group6, inFolder: true };
-        const row10 = merge(base, obj2(saved[name]));
-        if (!old && !saved[name]) fresh.add(row10);
-        out.push(row10);
+        if (old) base = { ...old, lore: name, group: group5, inFolder: true };
+        else base = { lore: name, id: "", name, english: guessEnglish(e), aliases: [], legacyEnglish: [], affiliation: "", rosterFor: [], phoneTabs: [], rank: "", department: "", group: group5, inFolder: true };
+        const row9 = merge(base, obj2(saved[name]));
+        if (!old && !saved[name]) fresh.add(row9);
+        out.push(row9);
       }
       for (const [name, d] of Object.entries(saved)) {
         if (seen2.has(name) || !exists.has(name)) continue;
@@ -2035,9 +2331,9 @@ ${body5.slice(at).replace(/^\s+/, "")}
     const members = folderMembers(lore);
     const inside2 = new Set([...members?.anomaly ?? [], ...members?.site ?? []].map((e) => s2(e.comment)));
     let hit3 = false;
-    const strip = (group6) => {
-      if (!group6) return group6;
-      const next2 = { ...group6 };
+    const strip = (group5) => {
+      if (!group5) return group5;
+      const next2 = { ...group5 };
       for (const name of OLD_OUTSIDE_PLACES) if (name in next2 && !inside2.has(name)) delete next2[name], hit3 = true;
       return next2;
     };
@@ -2060,9 +2356,9 @@ ${body5.slice(at).replace(/^\s+/, "")}
     }
     const to = d.agents.findIndex((a) => a.lore === target);
     if (to < 0 || to === from || agentGroup(d.agents[to]) !== g2) return false;
-    const [row10] = d.agents.splice(from, 1);
+    const [row9] = d.agents.splice(from, 1);
     const at = (to > from ? to - 1 : to) + (how === "after" ? 1 : 0);
-    d.agents.splice(at, 0, row10);
+    d.agents.splice(at, 0, row9);
     return true;
   }
   function loreGender(lore, name) {
@@ -2076,528 +2372,84 @@ ${body5.slice(at).replace(/^\s+/, "")}
   }
   var agentGender = (a, lore) => a.gender === "X" ? "" : a.gender || loreGender(lore, a.lore);
 
-  // src/core/world/schema.ts
-  var WORLD_KIND_LABEL = { agent: "요원", org: "조직", anomaly: "괴이", site: "파밍", appendix: "부록" };
-  var AGENT_FIELDS = [
-    { id: "age", label: "나이", title: "Age", type: "line", sec: "identity" },
-    { id: "gender", label: "성별", title: "Gender", type: "line", sec: "identity", hint: "로어 글의 Gender 줄. 명부 성별 칸과 별개로 모델에게 보이는 표기" },
-    { id: "organization", label: "소속 표기", title: "Organization", type: "line", sec: "identity", hint: "비우면 명부 소속·호칭 표로 자동. 「Walpurgis Society, the Ten Witches」처럼 다르게 쓰고 싶을 때만" },
-    { id: "department_en", label: "부서 표기", title: "Department", type: "line", sec: "identity", hint: "모델에게 보이는 부서 이름(영문). 명부 부서 칸은 묶는 데 쓰고 이 칸이 글에 들어감" },
-    { id: "role", label: "역할", title: "Role", type: "line", sec: "identity" },
-    { id: "physique", label: "체격", title: "Physique", type: "line", sec: "appearance" },
-    { id: "appearance", label: "외모", title: "Appearance", type: "line", sec: "appearance" },
-    { id: "outfit", label: "복장", title: "Outfit", type: "line", sec: "appearance" },
-    { id: "character", label: "성격", title: "Character", type: "text", hint: "글머리 그대로. 결점([Flaws])도 이 안에" },
-    { id: "voice", label: "말투", title: "Voice", type: "text" },
-    { id: "background", label: "배경", title: "Background", type: "text" },
-    { id: "abilities", label: "능력", title: "Abilities", type: "text" },
-    { id: "intro", label: "소개", title: "Roster", type: "line", hint: "Roster 지침의 한 줄. 「(나이/성별, 직급): 외모; 성격; 능력」 꼴" }
-  ];
-  var ORG_FIELDS = [
-    { id: "intro", label: "소개", title: "Identity", type: "text", hint: "첫 문단은 Faction 지침 요약에, 전체는 세력 상세 로어에" },
-    { id: "doctrine", label: "교리·방침", title: "Doctrine", type: "text" },
-    { id: "hq", label: "본부·거점", title: "Headquarters and Sites", type: "text" },
-    { id: "structure", label: "조직 구조", title: "Structure", type: "text" },
-    { id: "hierarchy", label: "계급", title: "Hierarchy", type: "text" },
-    { id: "recruitment", label: "모집·첫 접촉", title: "Recruitment", type: "text" },
-    { id: "assets", label: "핵심 자산·특성", title: "Core Assets and Traits", type: "text" },
-    { id: "personnel", label: "인원", title: "Personnel", type: "text" }
-  ];
-  var ANOMALY_FIELDS = [
-    { id: "identity", label: "정체", title: "Identity", type: "text", hint: "뭐가 어떻게 된 괴이인지, 어디에 깃드는지" },
-    { id: "entry", label: "입장 조건", title: "Entry Conditions", type: "text", hint: "들어가는 길·징후·돌아갈 수 있는 시점" },
-    { id: "space", label: "공간·구조", title: "Structure", type: "text", hint: "구역·층·동선·공간 규칙" },
-    { id: "rules", label: "규칙", title: "Rules", type: "text", hint: "안에서 지켜야 하는 것, 어기면 생기는 일" },
-    { id: "entities", label: "개체", title: "Sub-Entities", type: "text", hint: "등장하는 존재들 (여럿이면 ##### 소제목)" },
-    { id: "survival", label: "생존·탈출", title: "Survival and Clear", type: "text", hint: "클리어 조건·출구·하면 안 되는 것·약점" },
-    { id: "notes", label: "비고", title: "Notes", type: "text", hint: "등급·발생지 같은 짧은 정보, 외부 노출" }
-  ];
-  var SITE_FIELDS = [
-    { id: "identity", label: "정체", title: "Identity", type: "text" },
-    { id: "access", label: "접근", title: "Access", type: "text" },
-    { id: "location", label: "위치와 외관", title: "Location and Appearance", type: "text" },
-    { id: "environment", label: "환경", title: "Environment", type: "text" },
-    { id: "rules", label: "이용 규칙(거래·대가)", title: "Rules and Trade", type: "text" },
-    { id: "keeper", label: "주인/운영자", title: "Keeper", type: "text" }
-  ];
-  var APPENDIX_FIELDS = [
-    { id: "title", label: "제목", title: "", type: "line", hint: "「### 」 뒤에 붙는 제목 줄" },
-    { id: "body", label: "본문", title: "", type: "text" }
-  ];
-  var FIELDS = { agent: AGENT_FIELDS, org: ORG_FIELDS, anomaly: ANOMALY_FIELDS, site: SITE_FIELDS, appendix: APPENDIX_FIELDS };
-  var ANOMALY_NOTE = "[Simulation-only] This entry defines anomaly mechanics, labels, and survival guidance for simulation control, not an in-world script, briefing, or known lore. No character has prior information about it. Never have a character speak, explain, hint at, or present this entry as guidance.";
-
-  // src/core/world/records.ts
-  var RELATION_STAGES = ["hostile", "wary", "neutral", "favorable", "friendly"];
-  var RELATION_LABEL = { hostile: "적대", wary: "경계", neutral: "중립", favorable: "호의", friendly: "우호" };
-  var data = null;
-  function setWorldData(d) {
-    for (const k of ["agent", "org", "anomaly", "site", "appendix"]) {
-      if (!d[k] || typeof d[k] !== "object" || Array.isArray(d[k])) throw new Error(`세계 자료 형식이 달라요 (${k}).`);
-    }
-    if (!d.relations || typeof d.relations.pairs !== "object" || typeof d.relations.common !== "string") throw new Error("세계 자료 형식이 달라요 (relations).");
-    data = d;
-  }
-  function world() {
-    if (!data) throw new Error("세계 자료(goei-data-world)가 아직 없어요. 본체 부팅이 자료 받기를 끝내기 전에 세계 기록을 읽었어요.");
-    return data;
-  }
-  var DEFAULTS2 = (kind) => world()[kind];
-  var DEFAULT_RELATIONS = () => world().relations;
-  var worldAnomalyNote = (over) => typeof over?.anomalyNote === "string" ? over.anomalyNote : ANOMALY_NOTE;
-  var str = (v) => typeof v === "string" ? v : "";
-  var obj3 = (v) => v && typeof v === "object" && !Array.isArray(v) ? v : {};
-  function cleanExtra(v) {
-    if (!Array.isArray(v)) return [];
-    return v.map((x) => obj3(x)).filter((x) => str(x.name).trim()).map((x) => ({
-      name: str(x.name).trim(),
-      value: str(x.value),
-      kind: x.kind === "line" ? "line" : "block",
-      ...x.sec === "identity" || x.sec === "appearance" ? { sec: x.sec, at: str(x.at) } : {}
-    }));
-  }
-  function mergeRecord(base, over) {
-    if (over?.deleted) return null;
-    if (!base && !over) return null;
-    const fields3 = { ...base?.fields ?? {} };
-    for (const [k, v] of Object.entries(obj3(over?.fields))) if (typeof v === "string") fields3[k] = v;
-    const variants = {};
-    for (const [code2, vf] of Object.entries(obj3(over?.variants ?? base?.variants))) {
-      const m = {};
-      for (const [k, v] of Object.entries(obj3(vf))) if (typeof v === "string") m[k] = v;
-      if (Object.keys(m).length) variants[code2] = m;
-    }
-    const out = {
-      fields: fields3,
-      extra: over?.extra !== void 0 ? cleanExtra(over.extra) : base?.extra ?? []
-    };
-    const keys = over?.keys ?? base?.keys;
-    if (keys) out.keys = keys;
-    const title2 = over?.title ?? base?.title;
-    if (title2) out.title = title2;
-    if (over?.titleRaw ?? base?.titleRaw) out.titleRaw = true;
-    const order = over?.order ?? base?.order;
-    if (Array.isArray(order) && order.length) out.order = order.map(String);
-    if (Object.keys(variants).length) out.variants = variants;
-    const departments = over?.departments ?? base?.departments;
-    if (departments && Object.keys(departments).length) out.departments = { ...departments };
-    if (over?.summaryOnly ?? base?.summaryOnly) out.summaryOnly = true;
-    if (over?.noSummary ?? base?.noSummary) out.noSummary = true;
-    if (over?.rosterOff ?? base?.rosterOff) out.rosterOff = true;
-    if (over?.relOff ?? base?.relOff) out.relOff = true;
-    const notes = over?.roster_notes ?? base?.roster_notes;
-    if (Array.isArray(notes) && notes.length) out.roster_notes = notes.map((n2) => ({ department: String(n2.department ?? ""), label: String(n2.label ?? "") }));
-    return out;
-  }
-  function worldRecords(kind, overrides2) {
-    const base = DEFAULTS2(kind);
-    const over = overrides2?.[kind] ?? {};
-    const out = /* @__PURE__ */ new Map();
-    for (const [name, rec2] of Object.entries(base)) {
-      const m = mergeRecord(rec2, over[name]);
-      if (m) out.set(name, m);
-    }
-    for (const [name, rec2] of Object.entries(over)) {
-      if (out.has(name) || base[name]) continue;
-      const m = mergeRecord(void 0, rec2);
-      if (m) out.set(name, m);
-    }
-    return out;
-  }
-  var worldRecord = (kind, name, overrides2) => worldRecords(kind, overrides2).get(name) ?? null;
-  function worldRelations(overrides2) {
-    const pairs = { ...DEFAULT_RELATIONS().pairs };
-    for (const [k, v] of Object.entries(overrides2?.relations?.pairs ?? {})) {
-      if (v === null) delete pairs[k];
-      else if (v && RELATION_STAGES.includes(v.stage)) pairs[k] = { stage: v.stage, ...v.memo ? { memo: v.memo } : {} };
-    }
-    return { pairs, common: overrides2?.relations?.common ?? DEFAULT_RELATIONS().common };
-  }
-  var PLACEHOLDER_ORGS = /* @__PURE__ */ new Set(["미분류"]);
-  var excludedOrgs = (orgs) => /* @__PURE__ */ new Set([...[...orgs.entries()].filter(([, r]) => r.relOff).map(([n2]) => n2), ...PLACEHOLDER_ORGS]);
-  function filterRelations(rel, excluded) {
-    if (!excluded.size) return rel;
-    const pairs = {};
-    for (const [k, v] of Object.entries(rel.pairs)) {
-      const [a, b] = k.split(">");
-      if (!excluded.has(a) && !excluded.has(b)) pairs[k] = v;
-    }
-    return { ...rel, pairs };
-  }
-  var isDefaultRecord = (kind, name) => name in DEFAULTS2(kind);
-  var defaultRecord = (kind, name) => DEFAULTS2(kind)[name];
-  var BUILTIN_ORG_CODES = { A00: "관리국", B00: "가짜 관리국", C00: "백일몽", D00: "민간인", E00: "프리랜서" };
-  var active = null;
-  function setActiveWorld(relations, orgCodes, anomalyNote = ANOMALY_NOTE) {
-    active = { relations, orgCodes: { ...BUILTIN_ORG_CODES, ...orgCodes }, anomalyNote };
-  }
-  var activeRelations = () => active?.relations ?? DEFAULT_RELATIONS();
-  var activeAnomalyNote = () => active?.anomalyNote ?? ANOMALY_NOTE;
-  var activeOrgName = (codeOrName) => (active?.orgCodes ?? BUILTIN_ORG_CODES)[codeOrName] ?? codeOrName;
-  var STAGE_VALUE = { hostile: -80, wary: -40, neutral: 0, favorable: 40, friendly: 80 };
-  function relationStage(viewer, target, rel = activeRelations()) {
-    return rel.pairs[`${activeOrgName(viewer)}>${activeOrgName(target)}`]?.stage ?? "neutral";
-  }
-  function fieldOrder(kind, rec2) {
-    const base = FIELDS[kind].map((f) => f.id);
-    const extras2 = rec2.extra.map((e) => `x:${e.name}`);
-    const all = [...base, ...extras2];
-    if (!rec2.order) return all;
-    const seen2 = /* @__PURE__ */ new Set();
-    const out = [];
-    for (const id of rec2.order) if (all.includes(id) && !seen2.has(id)) seen2.add(id), out.push(id);
-    for (const id of all) if (!seen2.has(id)) out.push(id);
-    return out;
-  }
-  function fieldValue(rec2, id, faction) {
-    const v = faction ? rec2.variants?.[faction]?.[id] : void 0;
-    return (v ?? rec2.fields[id] ?? "").trim();
-  }
-
-  // src/core/world/assemble.ts
-  var VAR = "{{getvar::st_faction}}";
-  function orgNameCbs(dir2, org) {
-    const base = org.spec.english || org.name;
-    if (!org.faction) return base;
-    const byName = new Map(dir2.orgs.map((o) => [o.name, o.spec.english || o.name]));
-    const def = dir2.display.none?.[org.faction] ? byName.get(dir2.display.none[org.faction]) ?? base : base;
-    const branches = [];
-    for (const [viewer, names4] of Object.entries(dir2.display)) {
-      if (viewer === "none") continue;
-      const n2 = names4[org.faction];
-      const en2 = n2 ? byName.get(n2) ?? n2 : "";
-      if (en2 && en2 !== def) branches.push([viewer, en2]);
-    }
-    if (!branches.length) return def;
-    const others = branches.map(([v]) => `{{#if {{not_equal::${VAR}::${v}}}}}`).join("");
-    const close3 = "{{/if}}".repeat(branches.length);
-    return `${others}${def}${close3}${branches.map(([v, en2]) => `{{#if {{equal::${VAR}::${v}}}}}${en2}{{/if}}`).join("")}`;
-  }
-  var lines = (rec2, sec, fields3, values) => {
-    const out = [];
-    const extras2 = (at) => rec2.extra.filter((e) => e.kind === "line" && e.sec === sec && (e.at ?? "") === at).map((e) => `- ${e.name}: ${e.value}`);
-    out.push(...extras2(""));
-    for (const f of fields3) {
-      const v = values(f);
-      if (v) out.push(`- ${f.title}: ${v}`);
-      out.push(...extras2(f.id));
-    }
-    return out;
+  // src/core/world/catalog.ts
+  var CatalogError = class extends Error {
   };
-  var blockExtras = (rec2) => rec2.extra.filter((e) => e.kind === "block" && e.value.trim()).map((e) => `#### ${e.name}
-${e.value.trim()}`);
-  function assembleAgent(rec2, a, dir2, faction) {
-    const v = (id) => fieldValue(rec2, id, faction);
-    const org = orgOf(dir2.orgs, a.affiliation);
-    const identity = lines(rec2, "identity", AGENT_FIELDS.filter((f) => f.sec === "identity"), (f) => {
-      if (f.id === "organization") return v("organization") || (org ? orgNameCbs(dir2, org) : "");
-      return v(f.id);
-    });
-    const appearance = lines(rec2, "appearance", AGENT_FIELDS.filter((f) => f.sec === "appearance"), (f) => v(f.id));
-    const parts = [`### Character - ${a.english || a.name}`];
-    if (identity.length) parts.push(`#### Identity
-${identity.join("\n")}`);
-    if (appearance.length) parts.push(`#### Appearance
-${appearance.join("\n")}`);
-    for (const f of AGENT_FIELDS.filter((f2) => f2.type === "text")) {
-      const t = v(f.id);
-      if (t) parts.push(`#### ${f.title}
-${t}`);
-    }
-    parts.push(...blockExtras(rec2));
-    return parts.join("\n\n");
-  }
-  function sections(rec2, defs, faction, skip = []) {
-    const out = [];
-    const kind = defs === ORG_FIELDS ? "org" : defs === ANOMALY_FIELDS ? "anomaly" : "site";
-    for (const id of fieldOrder(kind, rec2)) {
-      if (id.startsWith("x:")) {
-        const e = rec2.extra.find((x) => x.kind === "block" && `x:${x.name}` === id);
-        if (e && e.value.trim()) out.push(`#### ${e.name}
-${e.value.trim()}`);
-        continue;
-      }
-      if (skip.includes(id)) continue;
-      const def = defs.find((f) => f.id === id);
-      const t = def ? fieldValue(rec2, id, faction) : "";
-      if (def && t) out.push(`#### ${def.title}
-${t}`);
-    }
-    return out;
-  }
-  function assembleAnomaly(rec2, p, faction) {
-    const title2 = rec2.title || `${p.english || p.label} (${p.label})`;
-    const head3 = rec2.titleRaw ? `### Instructions for the Implementation of ${title2}` : `### Instructions for the Implementation of the Anomaly - ${title2}`;
-    return [head3, ...sections(rec2, ANOMALY_FIELDS, faction)].join("\n\n");
-  }
-  function assembleSite(rec2, p, faction) {
-    const title2 = rec2.title || p.english || p.label;
-    return [`### ${title2}`, ...sections(rec2, SITE_FIELDS, faction)].join("\n\n");
-  }
-  function assembleOrg(rec2, org, dir2, faction) {
-    const title2 = rec2.title || `${orgNameCbs(dir2, org)} (${org.name})`;
-    const head3 = org.faction ? `### ${title2}
-
-[Affiliation code: ${org.faction}]` : `### ${title2}`;
-    return [head3, ...sections(rec2, ORG_FIELDS, faction)].join("\n\n");
-  }
-  function assembleAppendix(rec2, r, faction) {
-    const title2 = fieldValue(rec2, "title", faction) || r.lore;
-    const body5 = fieldValue(rec2, "body", faction);
-    return [`### ${title2}`, body5, ...blockExtras(rec2)].filter(Boolean).join("\n\n");
-  }
-
-  // src/core/world/faction.ts
-  var VAR2 = "{{getvar::st_faction}}";
-  var FACTION_INTRO = "This reference describes the world to the GM. Public labels, hidden affiliations, doctrine, and internal information are known to an NPC only through that NPC's actual access.";
-  var ROSTER_INTRO = "- Purpose: GM reference for consistent character introductions before individual lore is active.\n- Detail: Use active character lore for fuller characterization.";
-  var STAGE_MARK = { hostile: "H", wary: "W", neutral: "N", favorable: "F", friendly: "A" };
-  var firstParagraph = (t) => t.trim().split(/\n\s*\n/)[0]?.trim() ?? "";
-  function variantText(rec2, id, pick3 = (t) => t) {
-    const base = pick3(fieldValue(rec2, id));
-    const vs = Object.entries(rec2.variants ?? {}).filter(([, f]) => typeof f[id] === "string").map(([code2, f]) => [code2, pick3(f[id])]);
-    if (!vs.length) return base;
-    const others = vs.map(([c]) => `{{#if {{not_equal::${VAR2}::${c}}}}}`).join("");
-    return `${others}${base}${"{{/if}}".repeat(vs.length)}${vs.map(([c, t]) => `{{#if {{equal::${VAR2}::${c}}}}}${t}{{/if}}`).join("")}`;
-  }
-  function fillCodes(text4, dir2) {
-    return text4.replace(/\{([A-Z]\d\d)\}/g, (m, code2) => {
-      const org = dir2.orgs.find((o) => o.faction === code2);
-      return org ? orgNameCbs(dir2, org) : m;
-    });
-  }
-  var code = (o) => o.faction ? ` [${o.faction}]` : "";
-  function assembleFaction(dir2, orgs, rel) {
-    const parts = ["## Faction", FACTION_INTRO];
-    const named2 = (name) => {
-      const o = dir2.orgs.find((x) => x.name === name);
-      return o ? orgNameCbs(dir2, o) : name;
-    };
-    for (const o of dir2.orgs) {
-      const rec2 = orgs.get(o.name);
-      if (rec2?.noSummary) continue;
-      const intro = rec2 ? variantText(rec2, "intro", firstParagraph) : "";
-      const desc = intro || (o.spec.gm_desc ?? "").trim();
-      if (!desc) continue;
-      const title2 = o.spec.gm_name && !rec2 ? o.spec.gm_name : orgNameCbs(dir2, o);
-      parts.push(`### ${title2}${code(o)}
-${desc}`);
-    }
-    for (const [name, rec2] of orgs) {
-      if (!rec2.summaryOnly || dir2.orgs.some((o) => o.name === name)) continue;
-      const intro = variantText(rec2, "intro", firstParagraph);
-      if (intro) parts.push(`### ${rec2.title || name}
-${intro}`);
-    }
-    const excluded = excludedOrgs(orgs);
-    const members = dir2.orgs.filter((o) => !excluded.has(o.name)).map((o) => o.name);
-    const stageOf2 = (a, b) => {
-      const c = rel.pairs[`${a}>${b}`];
-      return c && RELATION_STAGES.includes(c.stage) ? c.stage : "neutral";
-    };
-    if (members.length > 1 && members.some((a) => members.some((b) => a !== b && stageOf2(a, b) !== "neutral"))) {
-      const no = new Map(members.map((n2, i) => [n2, i + 1]));
-      const legend = members.map((n2) => `${no.get(n2)} ${named2(n2)}`).join(" · ");
-      const head3 = `| viewer \\ target | ${members.map((n2) => no.get(n2)).join(" | ")} |`;
-      const sep = `|---|${members.map(() => "---").join("|")}|`;
-      const rows2 = members.map((a) => `| ${no.get(a)} ${named2(a)} | ${members.map((b) => a === b ? "-" : STAGE_MARK[stageOf2(a, b)]).join(" | ")} |`);
-      const notes = members.flatMap((a) => members.filter((b) => a !== b && rel.pairs[`${a}>${b}`]?.memo?.trim()).map((b) => `- ${no.get(a)} → ${no.get(b)}: ${fillCodes(rel.pairs[`${a}>${b}`].memo.trim().replace(/\n+/g, " "), dir2)}`));
-      parts.push(`## Faction Relations
-How the row faction regards the column faction: H hostile, W wary, N neutral, F favorable, A allied, - self. Factions not in the table regard each other neutrally.
-Factions: ${legend}
-${head3}
-${sep}
-${rows2.join("\n")}${notes.length ? `
-Notes:
-${notes.join("\n")}` : ""}`);
-    }
-    if (rel.common.trim()) parts.push(`## Faction Doctrine and Relations
-${fillCodes(rel.common.trim(), dir2)}`);
-    return parts.join("\n\n") + "\n\n---";
-  }
-  function assembleRoster(dir2, agents, orgs) {
-    const parts = [`## Roster
-${ROSTER_INTRO}`];
-    const byOrg = /* @__PURE__ */ new Map();
-    for (const a of dir2.agents) {
-      const rec2 = agents.get(a.lore);
-      if (!rec2 || !fieldValue(rec2, "intro") || rec2.rosterOff) continue;
-      const o = orgOf(dir2.orgs, a.affiliation);
-      const key2 = o?.name ?? a.affiliation ?? "";
-      (byOrg.get(key2) ?? byOrg.set(key2, []).get(key2)).push(a);
-    }
-    const orgOrder = [...dir2.orgs.map((o) => o.name), ...[...byOrg.keys()].filter((k) => !dir2.orgs.some((o) => o.name === k))];
-    for (const name of orgOrder) {
-      const rows2 = byOrg.get(name);
-      if (!rows2?.length) continue;
-      const o = dir2.orgs.find((x) => x.name === name);
-      const orec = orgs.get(name);
-      const depts = orec?.departments ?? {};
-      const notes = orec?.roster_notes ?? [];
-      const lines3 = [`### ${o ? orgNameCbs(dir2, o) : name}${o ? code(o) : ""}`];
-      const groups = /* @__PURE__ */ new Map();
-      for (const a of rows2) {
-        const en2 = a.department ? depts[a.department] ?? agents.get(a.lore)?.fields.department_en ?? a.department : "";
-        (groups.get(en2) ?? groups.set(en2, []).get(en2)).push(a);
-      }
-      for (const [en2, list4] of groups) {
-        if (en2) lines3.push(`
-#### ${en2}`);
-        let lastDept = "";
-        for (const a of list4) {
-          if (a.department !== lastDept) {
-            const note = notes.find((n2) => n2.department === a.department);
-            if (note) lines3.push(note.label);
-            lastDept = a.department;
-          }
-          lines3.push(`- ${a.english || a.name} ${fieldValue(agents.get(a.lore), "intro")}`);
-        }
-      }
-      parts.push(lines3.join("\n"));
-    }
-    return parts.join("\n\n") + "\n\n---";
-  }
-
-  // src/core/world/virtual.ts
-  var ROSTER_BOOK = "🙂Roster";
-  var ALWAYS_BOOKS = [
-    { name: TAG_BOOK, order: 100, kind: "tag" },
-    { name: FACTION_BOOK, order: 101, kind: "faction" },
-    { name: ROSTER_BOOK, order: 102, kind: "roster" }
-  ];
-  var WORLD_FOLDER_KEY = "folder:goei-world-0000-0000-0000-world0000001";
-  var VIRTUAL = "goeiVirtual";
-  var isVirtual = (e) => e[VIRTUAL] === true;
-  var stripVirtual = (lore) => lore.filter((e) => !isVirtual(e));
-  var VIRTUAL_FOLDER_KEY = {
-    org: "folder:goei-world-0000-0000-0000-org00000001",
-    agent: "folder:goei-world-0000-0000-0000-agent0000001",
-    anomaly: "folder:goei-world-0000-0000-0000-anomaly00001",
-    site: "folder:goei-world-0000-0000-0000-site00000001",
-    appendix: "folder:goei-world-0000-0000-0000-appendix0001"
+  var FALLBACK_DISPLAY = {
+    A00: "관리국",
+    B00: "가짜 관리국",
+    C00: "백일몽",
+    D00: "민간인",
+    E00: "프리랜서"
   };
-  var FOLDER_NAME = { org: "🌆세력", agent: "🙂요원", anomaly: "🚧괴이", site: "🎁파밍", appendix: "📎부록" };
-  var FOLDER_WORD = { org: "세력", agent: "요원", anomaly: "괴이", site: "파밍", appendix: "부록" };
-  var ORDER = { org: 200, agent: 600, anomaly: 500, site: 400, appendix: 0 };
-  var folderWord2 = (name) => name.replace(/[^\p{L}\p{N}]/gu, "");
-  var s3 = (v) => typeof v === "string" ? v : "";
-  function worldOverrides(lore) {
-    const d = readDirectoryData(lore ?? []);
-    return d?.세계 && typeof d.세계 === "object" ? d.세계 : void 0;
+  function loreText2(lore, comment) {
+    const parts = lore.filter((e) => e.comment === comment && typeof e.content === "string" && e.content.trim());
+    return parts.length ? parts.map((e) => e.content).join("\n") : null;
   }
-  function folderKey(lore, kind) {
-    const words = kind === "org" ? ["세력", "조직"] : [FOLDER_WORD[kind]];
-    const f = lore.find((e) => e.mode === "folder" && typeof e.key === "string" && words.includes(folderWord2(s3(e.comment))));
-    if (f) return { key: f.key, make: null };
-    return {
-      key: VIRTUAL_FOLDER_KEY[kind],
-      make: { key: VIRTUAL_FOLDER_KEY[kind], comment: FOLDER_NAME[kind], content: "", mode: "folder", insertorder: 100, alwaysActive: false, secondkey: "", selective: false, bookVersion: 2, [VIRTUAL]: true }
-    };
+  function parseJson(raw, book2) {
+    const clean2 = raw.replace(/^﻿/, "").trim().replace(/^```[\w-]*\s*\n/, "").replace(/\n\s*```\s*$/, "");
+    try {
+      return JSON.parse(clean2);
+    } catch {
+      throw new CatalogError(`${book2}: JSON 구문을 확인하세요.`);
+    }
   }
-  var keysOf2 = (rec2, fallback) => rec2.keys?.trim() ? rec2.keys.trim() : [...new Set(fallback.filter(Boolean))].join(", ");
-  function entry(kind, name, key2, content, folder, order) {
-    return {
-      key: key2,
-      secondkey: "",
-      comment: name,
-      content: `@@dont_activate
-${content}
-
----`,
-      mode: "normal",
-      insertorder: order,
-      alwaysActive: false,
-      selective: false,
-      useRegex: false,
-      bookVersion: 2,
-      folder,
-      [VIRTUAL]: true,
-      goeiKind: kind
-    };
+  function landmarksOf(bases) {
+    return bases.filter((b) => b.show && b.name && SIGUN[b.sido] && (!b.gu || SIGUN[b.sido].includes(b.gu))).map((b) => ({ name: b.name, english: b.english, aliases: b.aliases, label: b.label, org: b.org, sido: b.sido, gu: b.gu, x: b.x, y: b.y }));
   }
-  function withWorldLore(lore) {
-    const base = stripVirtual(lore ?? []);
-    const hit3 = cache3.get(base);
-    if (hit3) return hit3;
-    const overrides2 = worldOverrides(base);
-    void readDirectory(base);
-    const out = [...base];
-    const existing = new Set(base.filter((e) => e.mode !== "folder").map((e) => s3(e.comment)));
-    const names4 = { org: [], agent: [], anomaly: [], site: [], appendix: [] };
-    const recs = {
-      org: worldRecords("org", overrides2),
-      agent: worldRecords("agent", overrides2),
-      anomaly: worldRecords("anomaly", overrides2),
-      site: worldRecords("site", overrides2),
-      appendix: worldRecords("appendix", overrides2)
-    };
-    const folders = { org: "", agent: "", anomaly: "", site: "", appendix: "" };
-    for (const kind of ["org", "site", "anomaly", "agent", "appendix"]) {
-      const { key: key2, make } = folderKey(base, kind);
-      folders[kind] = key2;
-      const fresh = [...recs[kind].keys()].filter((n2) => !existing.has(n2) && !(kind === "org" && recs.org.get(n2)?.summaryOnly));
-      if (!fresh.length) continue;
-      if (make) out.push(make);
-      for (const n2 of fresh) {
-        names4[kind].push(n2);
-        out.push(entry(kind, n2, recs[kind].get(n2).keys?.trim() ?? "", "", key2, ORDER[kind]));
+  function parseCatalog(lore) {
+    const list4 = lore ?? [];
+    const dir2 = readDirectory(list4);
+    if (!dir2.folders) {
+      const worldRaw = loreText2(list4, "World catalog");
+      if (!worldRaw) throw new CatalogError("World catalog 로어북이 없어요.");
+      parseJson(worldRaw, "World catalog");
+    }
+    const place2 = (p) => ({ name: p.label, english: p.english, aliases: p.aliases });
+    const anomalies = dir2.anomalies.filter((p) => p.preset).map(place2).filter((e) => e.name);
+    const mysticSites = dir2.sites.filter((p) => p.preset).map(place2).filter((e) => e.name);
+    const landmarks = landmarksOf(dir2.bases);
+    if (!dir2.folders) {
+      const rosterRaw = loreText2(list4, "Agent roster");
+      if (!rosterRaw) throw new CatalogError("Agent roster 로어북이 없어요.");
+      const roster = parseJson(rosterRaw, "Agent roster");
+      if (roster.version !== 2 || !Array.isArray(roster.characters)) {
+        throw new CatalogError("Agent roster: version 2 인물 명부가 필요합니다.");
       }
     }
-    const dir2 = readDirectory(out);
-    const faction = void 0;
-    for (const e of out) {
-      if (!isVirtual(e) || e.mode === "folder") continue;
-      const kind = e.goeiKind;
-      const name = s3(e.comment);
-      const rec2 = recs[kind]?.get(name);
-      if (!rec2) continue;
-      let content = "";
-      let keys = "";
-      if (kind === "agent") {
-        const a = dir2.agents.find((x) => x.lore === name);
-        if (!a) continue;
-        content = assembleAgent(rec2, a, dir2, faction);
-        keys = keysOf2(rec2, [a.english, a.name, ...a.aliases]);
-      } else if (kind === "anomaly" || kind === "site") {
-        const p = (kind === "anomaly" ? dir2.anomalies : dir2.sites).find((x) => x.lore === name);
-        if (!p) continue;
-        content = kind === "anomaly" ? assembleAnomaly(rec2, p, faction) : assembleSite(rec2, p, faction);
-        keys = keysOf2(rec2, [p.english, p.label, p.lore, ...p.aliases]);
-      } else if (kind === "org") {
-        const o = dir2.orgs.find((x) => x.name === name);
-        if (!o) continue;
-        content = assembleOrg(rec2, o, dir2, faction);
-        keys = keysOf2(rec2, [o.spec.english ?? "", o.name]);
-      } else {
-        const r = dir2.appendices.find((x) => x.lore === name);
-        if (!r) continue;
-        content = assembleAppendix(rec2, r, faction);
-        keys = rec2.keys ?? "";
-      }
-      e.key = keys;
-      e.content = `@@dont_activate
-${content}
-
----`;
-    }
-    setActiveWorld(filterRelations(worldRelations(overrides2), excludedOrgs(recs.org)), Object.fromEntries(dir2.orgs.flatMap((o) => o.faction ? [[o.faction, o.name]] : [])), worldAnomalyNote(overrides2));
-    const missingAlways = ALWAYS_BOOKS.filter((b) => !existing.has(b.name));
-    if (missingAlways.length) {
-      const wf = base.find((e) => e.mode === "folder" && typeof e.key === "string" && folderWord2(s3(e.comment)) === "세계");
-      const wkey = wf?.key ?? WORLD_FOLDER_KEY;
-      if (!wf) out.push({ key: WORLD_FOLDER_KEY, comment: "🌐세계", content: "", mode: "folder", insertorder: 100, alwaysActive: false, secondkey: "", selective: false, bookVersion: 2, [VIRTUAL]: true });
-      const rel = filterRelations(worldRelations(overrides2), excludedOrgs(recs.org));
-      for (const b of missingAlways) {
-        const content = b.kind === "tag" ? guidePrompt("Tag") : b.kind === "faction" ? assembleFaction(dir2, recs.org, rel) : assembleRoster(dir2, recs.agent, recs.org);
-        out.push({ key: "", secondkey: "", comment: b.name, content, mode: "normal", insertorder: b.order, alwaysActive: true, selective: false, useRegex: false, bookVersion: 2, folder: wkey, [VIRTUAL]: true, goeiKind: b.kind });
-      }
-    }
-    const result = out.filter((e) => !isVirtual(e) || e.mode === "folder" || s3(e.content) !== "@@dont_activate\n\n\n---");
-    cache3.set(base, result);
-    return result;
+    const people = dir2.agents.map((a) => ({
+      id: a.id,
+      name: a.name,
+      english: a.english,
+      affiliation: a.affiliation,
+      rank: a.rank,
+      department: a.department,
+      rosterFor: a.rosterFor
+    })).filter((p) => /^P\d{3,}$/.test(p.id) && p.name);
+    const refill = dir2.refill;
+    const factionDisplay = displaySection(list4);
+    const affiliations = {};
+    for (const f of factionList(list4)) affiliations[f.code] = f.affiliation;
+    return { anomalies, mysticSites, landmarks, people, refill, factionDisplay, extraNames: extraNames(list4), affiliations, factionVars: factionVars(list4) };
   }
-  var cache3 = /* @__PURE__ */ new WeakMap();
-  var hasVirtual = (lore) => (lore ?? []).some(isVirtual);
+  function factionNames(catalog, viewer) {
+    const map = catalog.factionDisplay[viewer ?? ""] ?? catalog.factionDisplay.none;
+    if (map && typeof map === "object") return catalog.extraNames ? { ...catalog.extraNames, ...map } : map;
+    const m = { ...catalog.extraNames, ...FALLBACK_DISPLAY };
+    if (viewer === "B00") {
+      m.A00 = "가짜 관리국";
+      m.B00 = "관리국";
+    }
+    return m;
+  }
+  function presetCanon(catalog, name) {
+    if (!name?.trim()) return null;
+    let best = null;
+    for (const a of catalog.anomalies) {
+      if ((name === a.name || name.includes(a.name)) && (!best || a.name.length > best.length)) best = a.name;
+    }
+    return best;
+  }
 
   // src/core/world/statuscols.ts
   var STATUS_COLS = [
@@ -2646,9 +2498,9 @@ ${content}
   }
   function withColLog(vars, messageCount, cols) {
     const log = colLog(vars);
-    const last3 = log.at(-1);
-    if (last3 && last3.cols.join() === cols.join()) return JSON.stringify(log);
-    const next = last3 && last3.from === messageCount ? [...log.slice(0, -1), { from: messageCount, cols }] : [...log, { from: messageCount, cols }];
+    const last2 = log.at(-1);
+    if (last2 && last2.cols.join() === cols.join()) return JSON.stringify(log);
+    const next = last2 && last2.from === messageCount ? [...log.slice(0, -1), { from: messageCount, cols }] : [...log, { from: messageCount, cols }];
     return JSON.stringify(next.slice(-20));
   }
   var KNOWN_SHAPES = [
@@ -2657,15 +2509,15 @@ ${content}
     COL_IDS.slice(0, 9),
     COL_IDS.slice(0, 10)
   ];
-  var active2 = [];
+  var active = [];
   function setStatusColumns(vars) {
     const cur = usedCols(colConfig(vars));
     const log = colLog(vars).map((e) => e.cols).reverse();
     const seen2 = /* @__PURE__ */ new Set();
-    active2 = [cur, ...log].filter((s5) => !seen2.has(s5.join()) && seen2.add(s5.join()));
+    active = [cur, ...log].filter((s5) => !seen2.has(s5.join()) && seen2.add(s5.join()));
   }
-  function shapeFor(count2) {
-    return active2.find((s5) => s5.length === count2) ?? KNOWN_SHAPES.find((s5) => s5.length === count2) ?? null;
+  function shapeFor(count) {
+    return active.find((s5) => s5.length === count) ?? KNOWN_SHAPES.find((s5) => s5.length === count) ?? null;
   }
   var NONE = "없음";
   function formatStatusLine(values, cols) {
@@ -2698,7 +2550,7 @@ ${content}
   var EXAMPLE_B = { date: "2025.01.01", time: "10:15 PM", weather: "🌫️", temp: "9°C", place: "명일 아파트 3층 복도", target: "명일 아파트", companions: "쟈알디,에일린", deployed: "투입", identity: "관리국/요원", wallet: "1180000" };
   function statusSection(cols) {
     const fmt2 = `[▣|${cols.map((id) => colDef(id).token).join("|")}]`;
-    const rules3 = cols.map((id) => RULE[id]).filter(Boolean).map((r) => `- ${r}`);
+    const rules2 = cols.map((id) => RULE[id]).filter(Boolean).map((r) => `- ${r}`);
     const ex = (v) => `[▣|${cols.map((id) => v[id]).join("|")}]`;
     return [
       "## Status",
@@ -2706,7 +2558,7 @@ ${content}
       "",
       "- Output exactly one [▣] at the very end of every response, as the final line.",
       `- Fields in order: ${cols.map((id) => colDef(id).label).join(" | ")}. Never add, drop or reorder fields.`,
-      ...rules3,
+      ...rules2,
       "- The status line of the previous scene is provided in a `[Previous status]` block just before the latest user input. Continue from it: advance the time and update the other fields. Older responses do not carry their status lines.",
       `- Example${cols.includes("target") ? " (no current anomaly)" : ""}:`,
       ex(EXAMPLE_A),
@@ -2718,258 +2570,171 @@ ${content}
     return text4.includes(STATUS_SECTION_MARK) ? text4.split(STATUS_SECTION_MARK).join(statusSection(cols)) : text4;
   }
 
-  // node_modules/js-tiktoken/dist/chunk-VL2OQCWN.js
-  var import_base64_js = __toESM(require_base64_js(), 1);
-  var __defProp2 = Object.defineProperty;
-  var __defNormalProp = (obj5, key2, value) => key2 in obj5 ? __defProp2(obj5, key2, { enumerable: true, configurable: true, writable: true, value }) : obj5[key2] = value;
-  var __publicField = (obj5, key2, value) => {
-    __defNormalProp(obj5, typeof key2 !== "symbol" ? key2 + "" : key2, value);
-    return value;
+  // src/core/world/status.ts
+  var TAG_RE = /[[【［]\s*▣\s*[|｜]([^\]】］\r\n]*)(?:[\]】］]|(?=\r?\n|$))/g;
+  var DATE_RE = /^\d{3,4}\s*[.\-/년]\s*\d{1,2}\s*[.\-/월]\s*\d{1,2}\s*일?(?:\s*[(（]?\s*[일월화수목금토]\s*(?:요일)?\s*[)）]?)?$/;
+  var TIME_RE = /^(?:(?:오전|오후|AM|PM|am|pm)\s*)?\d{1,2}\s*[:시]\s*\d{0,2}\s*분?\s*(?:AM|PM|am|pm|a\.m\.|p\.m\.)?$/;
+  var TEMP_RE = /^[-−+]?\s*\d+(?:\.\d+)?\s*(?:°\s*[CcFf]?|℃|도)$/;
+  function hasStatusTag(text4) {
+    return typeof text4 === "string" && /[[【［]\s*▣\s*[|｜]/.test(text4);
+  }
+  var none = (t) => !t || t === "없음" || t === "-" || t === "—";
+  var splitNames = (t) => none(t) ? [] : t.split(/[,，、]/).map((n2) => n2.trim()).filter((n2) => n2 && !none(n2));
+  var walletText = (t) => {
+    const n2 = none(t) ? null : parseWalletCell(t);
+    return n2 === null ? "" : String(n2);
   };
-  function bytePairMerge(piece, ranks) {
-    let parts = Array.from(
-      { length: piece.length },
-      (_, i) => ({ start: i, end: i + 1 })
-    );
-    while (parts.length > 1) {
-      let minRank = null;
-      for (let i = 0; i < parts.length - 1; i++) {
-        const slice = piece.slice(parts[i].start, parts[i + 1].end);
-        const rank2 = ranks.get(slice.join(","));
-        if (rank2 == null)
-          continue;
-        if (minRank == null || rank2 < minRank[0]) {
-          minRank = [rank2, i];
-        }
-      }
-      if (minRank != null) {
-        const i = minRank[1];
-        parts[i] = { start: parts[i].start, end: parts[i + 1].end };
-        parts.splice(i + 1, 1);
-      } else {
-        break;
-      }
-    }
-    return parts;
+  function extras(x) {
+    const d = (x[1] ?? "").trim();
+    const id = (x[2] ?? "").trim();
+    return { companions: splitNames(x[0] ?? ""), deployed: x.length < 2 ? null : none(d) ? false : /투입|deployed/i.test(d), identity: none(id) ? "" : id, wallet: walletText(x[3] ?? "") };
   }
-  function bytePairEncode(piece, ranks) {
-    if (piece.length === 1)
-      return [ranks.get(piece.join(","))];
-    return bytePairMerge(piece, ranks).map((p) => ranks.get(piece.slice(p.start, p.end).join(","))).filter((x) => x != null);
+  function tail(rest) {
+    const clean2 = (t) => t === "없음" || t === "-" || t === "—" ? "" : t;
+    const after = rest.slice(1);
+    if (after.length <= 1) return { target: clean2(after[0] ?? ""), ...extras([]) };
+    return { target: clean2(after[0]), ...extras(after.slice(1, 5)) };
   }
-  function escapeRegex(str7) {
-    return str7.replace(/[\\^$*+?.()|[\]{}]/g, "\\$&");
-  }
-  var _Tiktoken = class {
-    /** @internal */
-    specialTokens;
-    /** @internal */
-    inverseSpecialTokens;
-    /** @internal */
-    patStr;
-    /** @internal */
-    textEncoder = new TextEncoder();
-    /** @internal */
-    textDecoder = new TextDecoder("utf-8");
-    /** @internal */
-    rankMap = /* @__PURE__ */ new Map();
-    /** @internal */
-    textMap = /* @__PURE__ */ new Map();
-    constructor(ranks, extendedSpecialTokens) {
-      this.patStr = ranks.pat_str;
-      const uncompressed = ranks.bpe_ranks.split("\n").filter(Boolean).reduce((memo2, x) => {
-        const [_, offsetStr, ...tokens2] = x.split(" ");
-        const offset = Number.parseInt(offsetStr, 10);
-        tokens2.forEach((token2, i) => memo2[token2] = offset + i);
-        return memo2;
-      }, {});
-      for (const [token2, rank2] of Object.entries(uncompressed)) {
-        const bytes = import_base64_js.default.toByteArray(token2);
-        this.rankMap.set(bytes.join(","), rank2);
-        this.textMap.set(rank2, bytes);
-      }
-      this.specialTokens = { ...ranks.special_tokens, ...extendedSpecialTokens };
-      this.inverseSpecialTokens = Object.entries(this.specialTokens).reduce((memo2, [text4, rank2]) => {
-        memo2[rank2] = this.textEncoder.encode(text4);
-        return memo2;
-      }, {});
-    }
-    encode(text4, allowedSpecial = [], disallowedSpecial = "all") {
-      const regexes = new RegExp(this.patStr, "ug");
-      const specialRegex = _Tiktoken.specialTokenRegex(
-        Object.keys(this.specialTokens)
-      );
-      const ret = [];
-      const allowedSpecialSet = new Set(
-        allowedSpecial === "all" ? Object.keys(this.specialTokens) : allowedSpecial
-      );
-      const disallowedSpecialSet = new Set(
-        disallowedSpecial === "all" ? Object.keys(this.specialTokens).filter(
-          (x) => !allowedSpecialSet.has(x)
-        ) : disallowedSpecial
-      );
-      if (disallowedSpecialSet.size > 0) {
-        const disallowedSpecialRegex = _Tiktoken.specialTokenRegex([
-          ...disallowedSpecialSet
-        ]);
-        const specialMatch = text4.match(disallowedSpecialRegex);
-        if (specialMatch != null) {
-          throw new Error(
-            `The text contains a special token that is not allowed: ${specialMatch[0]}`
-          );
-        }
-      }
-      let start4 = 0;
-      while (true) {
-        let nextSpecial = null;
-        let startFind = start4;
-        while (true) {
-          specialRegex.lastIndex = startFind;
-          nextSpecial = specialRegex.exec(text4);
-          if (nextSpecial == null || allowedSpecialSet.has(nextSpecial[0]))
-            break;
-          startFind = nextSpecial.index + 1;
-        }
-        const end = nextSpecial?.index ?? text4.length;
-        for (const match of text4.substring(start4, end).matchAll(regexes)) {
-          const piece = this.textEncoder.encode(match[0]);
-          const token22 = this.rankMap.get(piece.join(","));
-          if (token22 != null) {
-            ret.push(token22);
-            continue;
-          }
-          ret.push(...bytePairEncode(piece, this.rankMap));
-        }
-        if (nextSpecial == null)
-          break;
-        let token2 = this.specialTokens[nextSpecial[0]];
-        ret.push(token2);
-        start4 = nextSpecial.index + nextSpecial[0].length;
-      }
-      return ret;
-    }
-    decode(tokens2) {
-      const res = [];
-      let length = 0;
-      for (let i2 = 0; i2 < tokens2.length; ++i2) {
-        const token2 = tokens2[i2];
-        const bytes = this.textMap.get(token2) ?? this.inverseSpecialTokens[token2];
-        if (bytes != null) {
-          res.push(bytes);
-          length += bytes.length;
-        }
-      }
-      const mergedArray = new Uint8Array(length);
-      let i = 0;
-      for (const bytes of res) {
-        mergedArray.set(bytes, i);
-        i += bytes.length;
-      }
-      return this.textDecoder.decode(mergedArray);
-    }
-  };
-  var Tiktoken = _Tiktoken;
-  __publicField(Tiktoken, "specialTokenRegex", (tokens2) => {
-    return new RegExp(tokens2.map((i) => escapeRegex(i)).join("|"), "g");
-  });
-
-  // src/core/tokenizer.ts
-  var enc = null;
-  var label = "";
-  var cache4 = /* @__PURE__ */ new Map();
-  var CACHE_MAX = 400;
-  function setTokenizerRanks(json, name) {
-    try {
-      const r = typeof json === "string" ? JSON.parse(json) : json;
-      if (!r || typeof r.pat_str !== "string" || typeof r.bpe_ranks !== "string") return false;
-      enc = new Tiktoken({ pat_str: r.pat_str, special_tokens: r.special_tokens ?? {}, bpe_ranks: r.bpe_ranks });
-      label = name;
-      cache4.clear();
-      return true;
-    } catch {
-      enc = null;
-      label = "";
-      return false;
-    }
-  }
-  function clearTokenizer() {
-    enc = null;
-    label = "";
-    cache4.clear();
-  }
-  var tokenizerName = () => label;
-  function exactTokens(text4) {
-    if (!enc) return null;
-    const s5 = String(text4 ?? "");
-    const hit3 = cache4.get(s5);
-    if (hit3 !== void 0) return hit3;
-    let n2;
-    try {
-      n2 = enc.encode(s5, [], []).length;
-    } catch {
-      return null;
-    }
-    if (cache4.size >= CACHE_MAX) cache4.delete(cache4.keys().next().value);
-    cache4.set(s5, n2);
-    return n2;
-  }
-
-  // src/core/journal/types.ts
-  var JOURNAL_KEY = "$goei_journal";
-  var REPORTS_KEY = "$goei_reports";
-  var JOURNAL_KIND_LABEL = { an: "괴이", in: "사건", ms: "특수", fd: "필드 출동" };
-  var TRAIL_MAX = 24;
-  var RESULT_ROW_MAX = 120;
-  var RESULT_REPORT_MAX = 400;
-  var PEOPLE_MAX = 12;
-  var TRADES_MAX = 12;
-
-  // src/core/journal/settings.ts
-  var JR = (key2) => `$jr_${key2}`;
-  var JR_DEFAULTS = {
-    /** off / mine / all */
-    chat_card: "mine",
-    /** 인물 기록 갱신기 호출에 「담당 요원 소감」 칸을 얹기 */
-    debrief_auto: "1",
-    journal_cap: "500",
-    report_cap: "100"
-  };
-  var JR_JOURNAL_CAP = { min: 100, max: 2e3, step: 100 };
-  var JR_REPORT_CAP = { min: 20, max: 300, step: 10 };
-  function jrValue(state, key2) {
-    const v = state?.[JR(key2)];
-    return v === void 0 || v === null || v === "" || v === "null" ? JR_DEFAULTS[key2] ?? "" : String(v);
-  }
-  function journalSettings(state) {
-    const v = (k) => jrValue(state, k);
-    const num4 = (k, min, max) => {
-      const n2 = Math.trunc(Number(v(k)));
-      return Math.max(min, Math.min(max, Number.isFinite(n2) ? n2 : Number(JR_DEFAULTS[k])));
+  function byShape(f, shape) {
+    const clean2 = (t) => none(t) ? "" : t;
+    const get = (id) => {
+      const i = shape.indexOf(id);
+      return i < 0 ? "" : (f[i] ?? "").trim();
     };
-    const card2 = v("chat_card");
+    const d = get("deployed");
     return {
-      chatCard: card2 === "off" || card2 === "all" ? card2 : "mine",
-      debriefAuto: v("debrief_auto") !== "0",
-      journalCap: num4("journal_cap", JR_JOURNAL_CAP.min, JR_JOURNAL_CAP.max),
-      reportCap: num4("report_cap", JR_REPORT_CAP.min, JR_REPORT_CAP.max)
+      date: get("date"),
+      time: get("time"),
+      weather: clean2(get("weather")),
+      temp: clean2(get("temp")),
+      place: clean2(get("place")),
+      target: clean2(get("target")),
+      companions: splitNames(get("companions")),
+      deployed: shape.includes("deployed") ? none(d) ? false : /투입|deployed/i.test(d) : null,
+      identity: clean2(get("identity")),
+      wallet: walletText(get("wallet"))
     };
   }
-
-  // src/core/journal/store.ts
-  function journalHash(text4) {
-    let h = 2166136261;
-    for (const ch of text4) {
-      h ^= ch.codePointAt(0);
-      h = Math.imul(h, 16777619);
+  function fieldsOf(inner) {
+    const f = inner.split(/[|｜]/).map((s5) => s5.trim());
+    while (f.length && f[f.length - 1] === "") f.pop();
+    const shape = shapeFor(f.length);
+    if (shape && DATE_RE.test(f[shape.indexOf("date")] ?? "") && TIME_RE.test(f[shape.indexOf("time")] ?? "")) return byShape(f, shape);
+    const rest = [...f];
+    const take = (re) => {
+      const i = rest.findIndex((x) => re.test(x));
+      return i < 0 ? "" : rest.splice(i, 1)[0];
+    };
+    const date = take(DATE_RE);
+    const time2 = take(TIME_RE);
+    const temp = take(TEMP_RE);
+    let weather = "";
+    const wi = rest.findIndex((x) => /\p{Extended_Pictographic}/u.test(x) || /^(맑음|흐림|비|눈|안개|구름|소나기|천둥|번개|황사|바람)/.test(x));
+    if (wi >= 0 && wi <= 1) weather = rest.splice(wi, 1)[0];
+    if (!temp && weather) {
+      const m = /^(.*?)\s*([-−+]?\d+(?:\.\d+)?\s*(?:°\s*[CcFf]?|℃))$/.exec(weather);
+      if (m) return { date, time: time2, weather: m[1], temp: m[2], place: rest[0] ?? "", ...tail(rest) };
     }
-    return (h >>> 0).toString(36);
+    return { date, time: time2, weather, temp, place: rest[0] ?? "", ...tail(rest) };
   }
-  var KINDS2 = /* @__PURE__ */ new Set(["an", "in", "ms", "fd"]);
-  var CAUSES = /* @__PURE__ */ new Set(["model", "ttl", "manual", "field"]);
-  var isRow = (r) => {
-    const x = r;
-    return !!x && typeof x === "object" && typeof x.id === "string" && KINDS2.has(x.kind) && typeof x.name === "string" && typeof x.loc === "string" && typeof x.idx === "number" && typeof x.anchor === "string" && typeof x.mine === "boolean" && CAUSES.has(x.cause) && Array.isArray(x.agents) && typeof x.result === "string";
+  function findStatusTags(text4) {
+    if (!hasStatusTag(text4)) return [];
+    return [...text4.matchAll(TAG_RE)].map((m) => ({ raw: m[0], ...fieldsOf(m[1]) }));
+  }
+  function statusMinute(date, time2) {
+    const d = /(\d{3,4})\s*[.\-/년]\s*(\d{1,2})\s*[.\-/월]\s*(\d{1,2})/.exec(date ?? "");
+    if (!d) return null;
+    const t = /(\d{1,2})\s*[:시]\s*(\d{1,2})?/.exec(time2 ?? "");
+    let h = t ? Number(t[1]) : 0;
+    const min = t?.[2] ? Number(t[2]) : 0;
+    const pm = /PM|p\.m\.|오후/i.test(time2 ?? "");
+    const am = /AM|a\.m\.|오전/i.test(time2 ?? "");
+    if (pm && h < 12) h += 12;
+    if (am && h === 12) h = 0;
+    if (h > 23 || min > 59) return null;
+    const ms = Date.UTC(Number(d[1]), Number(d[2]) - 1, Number(d[3]), h, min);
+    return Number.isFinite(ms) ? Math.floor(ms / 6e4) : null;
+  }
+  var DAY_MIN = 1440;
+  function sceneLabel(prev, now) {
+    const p = new Date(prev * 6e4);
+    const h = p.getUTCHours();
+    const clock2 = `${h < 12 ? "오전" : "오후"} ${h % 12 === 0 ? 12 : h % 12}:${String(p.getUTCMinutes()).padStart(2, "0")}`;
+    const days = Math.floor(now / DAY_MIN) - Math.floor(prev / DAY_MIN);
+    const when3 = days === 0 ? "오늘" : days === 1 ? "어제" : days === 2 ? "그저께" : `${p.getUTCFullYear() !== new Date(now * 6e4).getUTCFullYear() ? `${p.getUTCFullYear()}년 ` : ""}${p.getUTCMonth() + 1}월 ${p.getUTCDate()}일`;
+    return `${when3} ${clock2}`;
+  }
+  function elapsedLabel(from, to) {
+    let m = to - from;
+    const sign = m < 0 ? "-" : "";
+    m = Math.abs(m);
+    const d = Math.floor(m / DAY_MIN);
+    const h = Math.floor(m % DAY_MIN / 60);
+    const mm = m % 60;
+    const parts = [d ? `${d}일` : "", h ? `${h}시간` : "", mm ? `${mm}분` : ""].filter(Boolean);
+    return parts.length ? sign + parts.join(" ") : "흐르지 않음";
+  }
+  function storyDay(start3, now) {
+    return Math.floor(now / DAY_MIN) - Math.floor(start3 / DAY_MIN) + 1;
+  }
+  function statusTimeline(texts) {
+    const prev = /* @__PURE__ */ new Map();
+    const prevWallet = /* @__PURE__ */ new Map();
+    const seen2 = /* @__PURE__ */ new Set();
+    let start3 = null;
+    let last2 = null;
+    let lastWallet = null;
+    for (const t of texts) {
+      for (const tag of findStatusTags(t)) {
+        const m = statusMinute(tag.date, tag.time);
+        seen2.add(tag.raw.trim());
+        const w = tag.wallet ? Number(tag.wallet) : null;
+        if (w !== null && lastWallet !== null && !prevWallet.has(tag.raw.trim())) prevWallet.set(tag.raw.trim(), lastWallet);
+        if (w !== null) lastWallet = w;
+        if (m === null) continue;
+        if (start3 === null) start3 = m;
+        if (last2 !== null && !prev.has(tag.raw.trim())) prev.set(tag.raw.trim(), last2.minute);
+        last2 = { raw: tag.raw.trim(), minute: m };
+      }
+    }
+    return { prev, start: start3, last: last2, seen: seen2, prevWallet, lastWallet };
+  }
+
+  // src/core/world/tags.ts
+  var AG_STATES = ["휴게", "내근", "외근", "작전투입", "비번", "부상", "실종", "격리", "사망"];
+  var AG_ALIAS = {
+    대기: "휴게",
+    작전중: "작전투입",
+    standby: "휴게",
+    idle: "휴게",
+    waiting: "휴게",
+    available: "휴게",
+    pending: "휴게",
+    ready: "휴게",
+    deployed: "작전투입",
+    active: "작전투입",
+    operating: "작전투입",
+    "on mission": "작전투입",
+    engaged: "작전투입",
+    "in operation": "작전투입",
+    injured: "부상",
+    wounded: "부상",
+    hurt: "부상",
+    dead: "사망",
+    kia: "사망",
+    deceased: "사망",
+    killed: "사망",
+    missing: "실종",
+    mia: "실종",
+    lost: "실종",
+    quarantine: "격리",
+    quarantined: "격리",
+    isolated: "격리",
+    contaminated: "격리",
+    "off duty": "비번",
+    offduty: "비번",
+    "on leave": "비번",
+    leave: "비번",
+    resting: "비번"
   };
-  var isReport = (r) => {
-    const x = r;
-    return !!x && typeof x === "object" && typeof x.id === "string" && typeof x.no === "string" && typeof x.full === "boolean" && typeof 
+  var AN_LABELS = ["슬롯", "지역", "발생지점", "위치", "이름", "괴이명", "괴이", "명칭", "배치", "작전현황", "작전", "상

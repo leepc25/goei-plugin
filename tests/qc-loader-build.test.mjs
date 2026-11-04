@@ -139,8 +139,8 @@ test('release 폴더: 시작기·본체 조각·version.json·card-update.json �
   assert.equal(upd.minPlugin, v.minPlugin);
   const text = upd.parts.map((n) => read(`release/${n}`)).join('');
   assert.equal(text.length, upd.length);
-  const game = JSON.parse(read('release/game/index.json'));
-  assert.equal(game.version, ver, 'release/game/index.json 판');
+  // release/game/ 은 0.20.4 부터 갱신하지 않는다 (필드(게임)를 플러그인에서 뺌, 2026-11-04). 본체가 게임 코드 팩을 받지 않는지만 본다
+  assert.ok(!body.includes('goei-game.js') && !body.includes('game/index.json'), '본체가 게임 팩을 받지 않음');
   if (body.includes('goei-data-world')) {
     for (const name of ['goei-data-world', 'goei-data-install']) {
       assert.ok(existsSync(new URL(`release/${name}.json`, root)), `release/${name}.json 이 있어야 함 (자료 팩을 쓰는 본체)`);
