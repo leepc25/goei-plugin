@@ -199,7 +199,7 @@ test('내가 출동한 사건이 종료되면 일지 줄과 전체 보고서(경
   assert.ok(!chat.scriptstate.$goei_world.includes('closed'));
 });
 
-test('출동 근거(출동·동행·방문)를 따로 판정한다: 투입 ON·지시문·필드·동행·방문 대화, 목표 칸만은 투입 칸이 없을 때만', () => {
+test('출동 근거(출동·동행)를 따로 판정한다: 투입 ON·지시문·동행, 목표 칸만은 투입 칸이 없을 때만', () => {
   const base = play(MINE_TURNS.slice(0, 6));
   const s = (o = {}) => ({ name: '관리국 본부', agentNames: ['쟈알디'], ...o });
   assert.deepEqual(mineReasons(base, 3, 5, s()).sort(), ['companion', 'deployed', 'scene']);
@@ -210,16 +210,9 @@ test('출동 근거(출동·동행·방문)를 따로 판정한다: 투입 ON·�
   assert.deepEqual(mineReasons(base, 4, 5, { name: '다른 사건', agentNames: [], touched: true }), [], '투입 칸 있음 + 목표만 → 근거 없음');
   const noDeployCol = { ...base, message: base.message.map((m) => (m.role === 'char' ? { ...m, data: m.data.replace(/\[▣\|([^\]]*)\]/g, (_, f) => `[▣|${f.split('|').slice(0, 6).join('|')}]`) } : m)) };
   assert.deepEqual(mineReasons(noDeployCol, 4, 5, { name: '다른 사건', agentNames: [], touched: true }), ['touched'], '투입 칸 없음 + 목표 → 출동');
-  const field = { ...base, goeiFieldV1: { events: [{ id: 'f1', at: 1, anchor: '#6', kind: 'enter_anomaly', text: '작전 투입: 관리국 본부' }] } };
-  assert.ok(mineReasons(field, 4, 5, { name: '관리국 본부', agentNames: [] }).includes('field'));
-  assert.ok(!mineReasons(field, 0, 1, { name: '관리국 본부', agentNames: [] }).includes('field'), '기간 밖 필드 사건은 근거가 아니다');
-  // 본부 방문 대화(core/visit.ts): 그 자리가 기간 안이고 오간 말에 사건 이름이 있으면 「방문」 근거
-  const visit = { ...base, goeiHqVisitV1: { turns: [{ id: 'v1', at: 1, agentId: 'P001', name: '쟈알디', user: '관리국 본부 쪽은 어때요?', reply: '정전이 길어지네요.', anchor: '#6' }] } };
-  assert.deepEqual(mineReasons(visit, 4, 5, { name: '관리국 본부', agentNames: [] }).sort(), ['deployed', 'visit']);
-  assert.deepEqual(mineReasons(visit, 4, 5, { name: '달빛 서점', agentNames: [] }), [], '방문 대화에 그 이름이 없으면 아니다');
-  assert.deepEqual(mineReasons({ ...visit, goeiHqVisitV1: { turns: [{ ...visit.goeiHqVisitV1.turns[0], user: '달빛 서점 다녀왔어요', reply: '네.' }] } }, 4, 5, { name: '달빛 서점', agentNames: [] }), ['visit']);
-  assert.deepEqual(mineReasons(visit, 0, 1, { name: '관리국 본부', agentNames: [] }), [], '기간 밖 방문 대화는 근거가 아니다');
-  assert.deepEqual(mineReasons({ ...visit, goeiHqVisitV1: { turns: [{ ...visit.goeiHqVisitV1.turns[0], user: '잘 지내요?', reply: '네.', extra: [{ agentId: 'P002', name: '스팡달', line: '달빛 서점 건은 제가 봤어요' }] }] } }, 4, 5, { name: '달빛 서점', agentNames: [] }), ['visit'], '옆 요원 말도');
+  // 필드(게임)는 2026-11-04 플러그인에서 뺐다: 남아 있는 필드 사건·본부 방문 대화 기록은 출동 근거가 아니다
+  const field = { ...base, goeiFieldV1: { events: [{ id: 'f1', at: 1, anchor: '#6', kind: 'enter_anomaly', text: '작전 투입: 달빛 서점' }] }, goeiHqVisitV1: { turns: [{ id: 'v1', at: 1, agentId: 'P001', name: '쟈알디', user: '달빛 서점 다녀왔어요', reply: '네.', anchor: '#6' }] } };
+  assert.deepEqual(mineReasons(field, 4, 5, { name: '달빛 서점', agentNames: [] }), []);
   // 기간: startKey 가 있으면 그 메시지, 없으면 since 분 이상인 첫 상태창 응답, 그것도 없으면 종료 메시지
   const w = readWorld(base);
   assert.equal(w.inc[0].startKey, '#4');

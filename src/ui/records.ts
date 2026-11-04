@@ -50,8 +50,6 @@ export const rec = {
   toast: null as null | { rpt: string; name: string },
   /** 「이미지로 저장」 뒤 미리보기 (내려받기가 막힌 곳은 길게 눌러 저장) */
   png: null as null | { url: string; name: string; no: string },
-  /** 필드 출동이 끝나 방금 생긴 보고서 id (필드 탭 위 시트). 닫거나 보고서를 열면 비운다 */
-  fieldReport: '',
 };
 
 function dropPng(): void {
@@ -67,7 +65,7 @@ function dropPng(): void {
 
 export function resetRecords(): void {
   dropPng();
-  Object.assign(rec, { sub: 'journal', view: 'list', id: '', filter: 'all', q: '', rfilter: 'mine', notice: '', info: '', busy: false, fieldReport: '' });
+  Object.assign(rec, { sub: 'journal', view: 'list', id: '', filter: 'all', q: '', rfilter: 'mine', notice: '', info: '', busy: false });
   closeToast();
 }
 
@@ -153,28 +151,6 @@ function pngModal(): string {
       <p class="ps-note">내려받기를 시작했어요. 저장이 안 되는 기기(아이폰 등)는 그림을 길게 눌러 저장하세요.</p>
       <span class="gx-png-acts"><button class="gx-mini primary" data-action="rec-png-dl">${ICONS.down}다시 내려받기</button><button class="gx-mini" data-action="rec-png-x">닫기</button></span>
     </div></div>`;
-}
-
-/** 필드 탭 위 시트 (시안 Field.dc.html): 출동이 끝나 보고서가 생겼을 때. 「보고서 보기」는 기록 페이지로, 「본부로」는 닫기 */
-export function fieldSheet(ctx: ChatContext): string {
-  if (!rec.fieldReport) return '';
-  const r = readReports(ctx.chat).items.find((x) => x.id === rec.fieldReport);
-  if (!r) return '';
-  const h = r.head;
-  const when = h.at !== null ? `${ymd(h.at)} ${hhmm(h.at)}` : '';
-  const who = r.agents.map((a) => a.name).filter(Boolean).join(' · ');
-  const line2 = [h.place || locName(h.loc) || h.loc, who, h.duration !== null ? longDur(h.duration) : ''].filter(Boolean).join(' · ');
-  const aff = r.people?.length ? `<span class="gx-fs-aff">호감 변화 ${r.people.map((p) => `<i class="${p.delta < 0 ? 'neg' : 'pos'}">${p.delta > 0 ? '+' : p.delta < 0 ? '−' : ''}${Math.abs(p.delta)}</i>`).join(' · ')}</span>` : '';
-  const sum = (r.wallet ?? []).reduce((a, t) => a + t.amount, 0);
-  const money = [sum ? `<span class="gx-fs-won ${sum < 0 ? 'out' : 'in'}">${sum < 0 ? '지출' : '수당'} ${esc(formatDelta(sum).replace(/^([+−-])/, '$1₩'))}</span>` : '', r.balance !== undefined ? `<span class="gx-fs-bal">잔고 ${esc(formatWon(r.balance))}</span>` : ''].filter(Boolean).join('');
-  return `<section class="gx-fieldsheet" role="status" aria-label="출동 종료">
-    <header><span class="gx-badge live">출동 종료</span><small>${esc(when)}</small></header>
-    <b class="gx-fs-title">${esc(h.name)} — ${esc(r.result.replace(/^작전 종료\s*(\([^)]*\))?:\s*[^,]*,?\s*/, '') || '귀환')}</b>
-    <p class="gx-fs-line">${esc(line2)}</p>
-    ${aff || money ? `<p class="gx-fs-sum">${aff}${money}</p>` : ''}
-    <p class="gx-fs-note">이 출동은 관리국 일지에 「내가 출동」으로 기록됐어요. 막간도 다음 본편 요청에 들어가요.</p>
-    <span class="gx-fs-acts"><button class="gx-mini" data-action="rec-field-x">본부로</button><button class="gx-mini primary" data-action="rec-open" data-value="${esc(r.id)}">보고서 보기</button></span>
-  </section>`;
 }
 
 function pane(ctx: ChatContext): string {
@@ -482,7 +458,6 @@ export async function handleRecords(action: string, value: string | undefined, c
         break;
       }
       Object.assign(rec, { sub: 'reports', view: 'report', id: v, notice: '' });
-      if (rec.fieldReport === v) rec.fieldReport = '';
       break;
     case 'rec-people':
       Object.assign(rec, { sub: 'people', view: 'list', id: '', notice: '' });
@@ -565,9 +540,6 @@ export async function handleRecords(action: string, value: string | undefined, c
       await env.refresh();
       return true;
     }
-    case 'rec-field-x':
-      rec.fieldReport = '';
-      break;
     default:
       return false;
   }

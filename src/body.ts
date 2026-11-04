@@ -1,5 +1,3 @@
-import { flushGamesBeforeSend } from './host/game/send';
-import { fieldIdle } from './host/game/field';
 import { clearUnsent, unsentShown } from './host/unsent';
 import { chatCardsAt, refreshStatusContext, renderStatus, setRecordsOpener, setWikiOpener } from './host/statusview';
 import { openingShown, refreshOpeningHint, setOpeningHint, setRepickOpener, wantsOpeningHint } from './host/openinghint';
@@ -55,15 +53,11 @@ import { syncDecorators, computeLore, hasUnlockTag, loreOptions, patchSlots, rea
 import { advValue } from './core/advanced';
 import { userInfo } from './host/user';
 import { applyPlayer, hidePlayerTag, playerAgent, playerBlock } from './core/player';
-import { withFieldFacts, withInterludes } from './core/interlude';
-import { fieldRecord } from './core/field';
 import { buildImgPrompt, imgCharacters, imgPromptConfig, stripImgLore } from './core/imgprompt';
 import { withStatusBlock, type StatusShape } from './core/statusctx';
 import { colConfig, fillStatusSection, usedCols } from './core/world/statuscols';
 import { activeAnomalyNote } from './core/world/records';
 import { aliveAnchors, readWallet, walletBalance, WALLET_START_DEFAULT } from './core/wallet';
-import { visitRecord } from './core/visit';
-import { visitContextRules } from './core/visitPrompt';
 import { withPeopleBlock, peopleBlockFor, insertBlock } from './core/people/request';
 import { peopleStore } from './core/people/store';
 import { peopleSettings } from './core/people/settings';
@@ -98,9 +92,6 @@ const reason = (e: unknown) => (e instanceof Error ? e.message : String(e));
  */
 async function onBeforeRequest<M extends PromptMessage>(messages: M[], type: string): Promise<M[]> {
   if (type !== 'model' || !Array.isArray(messages)) return messages;
-  // 열린 필드가 있으면 먼저 마감(돈 정산·싸움 기록·창 닫기)하고 그 기록이 다 쌓인 뒤 막간을 끼운다 (10-31)
-  await flushGamesBeforeSend().catch(() => {});
-  await fieldIdle().catch(() => {});
   if (faultOn('beforeRequest')) throw new Error('시험용 예외 주입(beforeRequest)');
   const failed: string[] = [];
   /** 한 단계: 던지면 이름·까닭을 모으고 fallback(= 그 단계 이전 모양) */
@@ -146,7 +137,6 @@ async function onBeforeRequest<M extends PromptMessage>(messages: M[], type: str
         const c = ctx;
         messages = step('로어', () => fixLore(messages, c), messages);
         messages = await stepAsync('주인공', () => withPlayer(messages, c), messages);
-        messages = step('막간', () => withVisit(messages, c), messages);
         messages = step('명부 다듬기', () => trimRoster(messages), messages);
         const mctx = step('참고 기록', () => moduleContext(sceneText(messages), c), [] as string[]);
         if (mctx.length) {
@@ -352,14 +342,6 @@ function withImgPrompt<M extends PromptMessage>(messages: M[], { char, chat }: C
   const names = imgCharacters(char.globalLore, cfg, { assetPlayer: s.assetPlayer, playerEnglish: me?.english || undefined, userName: userInfo().name });
   if (!names.length) return out;
   return [...out, { role: 'system', content: buildImgPrompt(cfg, names, s.assetPlayer) } as M];
-}
-
-/** 본부 막간: 대화가 일어난 메시지 바로 뒤에 끼운다 (core/interlude.ts). 채팅은 바꾸지 않는다 */
-function withVisit<M extends PromptMessage>(messages: M[], { char, chat }: ChatContext): M[] {
-  if (!visitRecord(chat).turns.length && !fieldRecord(chat).events.length) return messages;
-  const me = playerAgent(char.globalLore, chat.scriptstate);
-  const visitor = me?.name || userInfo().name || '주인공';
-  return withFieldFacts(withInterludes(messages, chat, visitContextRules({ char }), visitor), chat, visitor);
 }
 
 /** 괴담넷 글·쪽지, 괴담톡 대화·공지, 위키 문서를 본편 요청의 마지막 사용자 메시지 앞에 참고 기록으로 (원본 editRequest + RC.gnetContext·phoneContext·wikiContext). 기록이 없거나 꺼 두면 빈 목록.

@@ -14,7 +14,8 @@ import { peopleSettings } from '../../core/people/settings';
 import { applyFieldEvent } from '../../core/people/field';
 import { factionNamesOf } from '../people';
 import { playerAgent } from '../../core/player';
-import { buildFieldReport, emitReport, fieldSummary, journalSettings, lastReportNotice, recordVars } from '../../core/journal';
+import { emitReport, journalSettings, lastReportNotice, recordVars } from '../../core/journal';
+import { buildFieldReport, fieldSummary } from '../../core/journal/field';
 import { parseCatalog } from '../../core/world/catalog';
 import { userInfo } from '../user';
 

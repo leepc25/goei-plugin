@@ -3,10 +3,14 @@
 // 사라진 항목은 지우지 않는다 (화면에서 회색, 되살리기 가능).
 import type { Chat, ChatMessage } from '../types';
 import { messageText } from '../refs';
-import { anchorOf } from '../visit';
 import { PEOPLE_KEY, SLOTS, DOC_TYPES, REGISTERS, emptyStore, type Change, type Doc, type Entry, type PeopleStore, type Person, type Register, type SlotId } from './types';
 
-export { anchorOf };
+/** 채팅 마지막 메시지 chatId (없으면 #순번): 기록의 기준 자리 */
+export function anchorOf(chat: Chat): string {
+  const msgs = Array.isArray(chat.message) ? chat.message as { chatId?: string }[] : [];
+  const last = msgs[msgs.length - 1];
+  return last?.chatId ? String(last.chatId) : `#${msgs.length}`;
+}
 
 const str = (v: unknown) => (typeof v === 'string' ? v : '');
 const isEntry = (e: unknown): e is Entry => !!e && typeof (e as Entry).id === 'string' && typeof (e as Entry).text === 'string' && typeof (e as Entry).anchor === 'string';
