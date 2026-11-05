@@ -197,7 +197,7 @@ for (const vp of vps) {
   await page.waitForSelector('.gw [data-action="man-import-yes"]');
   await clickSel(page, '.gw [data-action="man-import-yes"]');
   await page.waitForFunction(() => document.querySelector('.gw .gw-head')?.textContent?.includes('가져왔어요'));
-  { const p = await prefsOf(page); assert.deepEqual([p.basic, p.world, p.marksSeeded], [{}, {}, true], '빈 설정 가져오기'); assert.deepEqual(p.marks.map((m) => m.s.tab), ['field', 'wallet', 'records', 'settings'], '빈 설정이면 기본 즐겨찾기를 채움'); }
+  { const p = await prefsOf(page); assert.deepEqual([p.basic, p.world, p.marksSeeded], [{}, {}, true], '빈 설정 가져오기'); assert.deepEqual(p.marks.map((m) => m.s.tab), ['wallet', 'records', 'settings'], '빈 설정이면 기본 즐겨찾기를 채움(필드는 2026-11-05 제거)'); }
 
   // ── 점검 탭 ──
   await goNode(page, 'manage:diag');
