@@ -7,6 +7,7 @@ import { BUILTIN, extraFactions, extraNames, extraTabId, extraTabs, type Faction
 import { DIRECTORY_COMMENT, directoryEntries, isDirectory, LEGACY_DATA, parseSeedManifest } from '../lorebooks';
 import { agentShared, orgShared } from '../sharedpics';
 import { pickScenes, type ScenesData } from '../scenes';
+import { freeGroupCode, migrateRoster, NEUTRAL_BLURB, NEUTRAL_GROUP, NEUTRAL_IDS, ROSTER_V } from './roster-v';
 import type { LoreEntry } from '../types';
 
 export { DIRECTORY_COMMENT } from '../lorebooks';
@@ -290,57 +291,7 @@ export function readDirectoryData(lore: LoreEntry[]): DirectoryData | null {
   return out;
 }
 
-export const ROSTER_V = 3;
-
-/** 시작 묶음 「중립」의 기본 인물 (2026-11-05 사용자): 세력 없는 인물로 플레이하는 칸 */
-export const NEUTRAL_GROUP = '중립';
-export const NEUTRAL_IDS = ['P043', 'P044', 'P045', 'P046', 'P047', 'P048', 'P049', 'P050', 'P051', 'P052', 'P053', 'P054', 'P055'];
-export const NEUTRAL_BLURB = '어느 조직에도 속하지 않은 사람들. 교황청 수녀, 이슬람 성전사, 마녀, 흡혈귀, 중림 상인, 그리고 사람이 아닌 것까지.';
-
-/** 판 3: 시작 묶음 「중립」이 없으면 만들고(다음 코드), 기본 인물 13명의 roster_for 에 그 코드를 켠다 */
-function migrateNeutral(d: DirectoryData): void {
-  const groups = (d['시작 묶음'] ??= {});
-  const used = new Set<string>([...(d.codes_used ?? []), ...Object.values(d.조직 ?? {}).map((o) => s(o.code)), ...Object.values(groups).map((g) => s(g.code))]);
-  let code = Object.values(groups).find((g) => s(g.code))?.code;
-  const has = Object.keys(groups).includes(NEUTRAL_GROUP);
-  if (!has) {
-    code = '';
-    for (let c = 'F'.charCodeAt(0); c <= 'Z'.charCodeAt(0); c++) {
-      const want = `${String.fromCharCode(c)}00`;
-      if (!used.has(want)) {
-        code = want;
-        break;
-      }
-    }
-    if (!code) return;
-    groups[NEUTRAL_GROUP] = { code, blurb: NEUTRAL_BLURB };
-    d.codes_used = [...new Set([...(d.codes_used ?? []), code])].sort();
-  } else code = s(groups[NEUTRAL_GROUP].code);
-  if (!code) return;
-  for (const row of Object.values(d.요원 ?? {})) {
-    const r = row as { id?: unknown; roster_for?: unknown };
-    if (!NEUTRAL_IDS.includes(s(r.id))) continue;
-    const list = Array.isArray(r.roster_for) ? (r.roster_for as unknown[]).map(s).filter(Boolean) : [];
-    if (!list.includes(code)) r.roster_for = [...list, code];
-  }
-}
-
-/** 옛 명부(roster_v 없음)는 조직·요원마다 roster_for 를 다 적어 두어서, 민간인·프리랜서 목록이 저장된 채로 남는다.
- *  2026-11-05 사용자: 민간인·프리랜서 플레이에는 내 페르소나 말고 아무도 안 붙는다 → 한 번 D00·E00 을 전부 떼고 판을 올린다 */
-function migrateRoster(d: DirectoryData): DirectoryData {
-  const v = d.roster_v ?? 1;
-  if (v >= ROSTER_V) return d;
-  if (v < 2) {
-    const strip = (rows?: Record<string, { roster_for?: unknown }>) => {
-      for (const r of Object.values(rows ?? {})) if (Array.isArray(r.roster_for)) r.roster_for = r.roster_for.filter((f) => f !== 'D00' && f !== 'E00');
-    };
-    strip(d.조직);
-    strip(d.요원);
-  }
-  if (v < 3) migrateNeutral(d);
-  d.roster_v = ROSTER_V;
-  return d;
-}
+export { ROSTER_V, NEUTRAL_GROUP, NEUTRAL_IDS, NEUTRAL_BLURB } from './roster-v';
 
 // ── 세력 호칭·괴담톡 탭·첫 턴 로어북 (명부, 없으면 옛 로어북) ──
 
@@ -778,6 +729,19 @@ function ordered<T extends { lore: string }>(rows: T[], saved: string[], legacy:
 
 const cache = new WeakMap<LoreEntry[], Directory>();
 
+/** 명부가 아직 없는 카드(경량 카드 빌드·깡통봇)에도 저장된 명부와 같은 기본값을 준다 (roster-v.ts migrateRoster 와 같은 뜻):
+ *  민간인·프리랜서 목록은 비우고, 시작 묶음 「중립」을 다음 코드로 만들어 기본 인물 13명을 넣는다. 2026-11-05 */
+function freshDefaults(dir: Directory): void {
+  for (const o of dir.orgs) o.rosterFor = o.rosterFor.filter((f) => f !== 'D00' && f !== 'E00');
+  for (const a of dir.agents) a.rosterFor = a.rosterFor.filter((f) => f !== 'D00' && f !== 'E00');
+  if (dir.startGroups.some((g) => g.name === NEUTRAL_GROUP)) return;
+  const code = freeGroupCode([...dir.usedCodes, ...dir.orgs.map((o) => o.spec.code ?? ''), ...dir.startGroups.map((g) => g.code)]);
+  if (!code) return;
+  dir.startGroups.push({ name: NEUTRAL_GROUP, code, blurb: NEUTRAL_BLURB, english: '', hidden: false });
+  dir.usedCodes = [...new Set([...dir.usedCodes, code])].sort();
+  for (const a of dir.agents) if (NEUTRAL_IDS.includes(a.id) && !a.rosterFor.includes(code)) a.rosterFor = [...a.rosterFor, code];
+}
+
 export function readDirectory(lore: LoreEntry[] | undefined): Directory {
   const books = lore ?? [];
   const hit = cache.get(books);
@@ -934,6 +898,7 @@ export function readDirectory(lore: LoreEntry[] | undefined): Directory {
     startOrder: list(data?.['시작 화면']?.order),
     scenes: pickScenes(data?.['첫 장면']),
   };
+  if (!data) freshDefaults(dir);
   cache.set(books, dir);
   return dir;
 }

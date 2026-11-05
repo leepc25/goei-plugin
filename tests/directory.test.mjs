@@ -139,7 +139,8 @@ test('실제 카드: 명부로 옮긴 뒤에도 상황판·이름 찾기·연락
   // 폴더 밖 괴이·특수 후보(세력·요원 로어북)는 옮기지 않음 (2026-10-21 사용자). 나머지는 같음
   const dropped = new Set(['탐미주의', '진조 세크리엠', '발푸르기스 협회', '십마녀 아벤샤', '무명찬란교']);
   const after = parseCatalog(moved);
-  assert.equal(j(after), j({ ...before, anomalies: before.anomalies.filter((a) => !dropped.has(a.name)) }));
+  // 명부로 옮기면 시작 묶음 「중립」(다음 코드 F00)이 기본으로 생긴다 (2026-11-05)
+  assert.equal(j(after), j({ ...before, anomalies: before.anomalies.filter((a) => !dropped.has(a.name)), affiliations: { ...before.affiliations, F00: '중립' } }));
   const outside = new Set(OLD_OUTSIDE_PLACES);
   const places = (l) => buildRegistry(l).entries.filter((e) => !e.key.startsWith('Agent roster/'));
   // 별칭은 빠진 항목이 쓰던 것을 다른 항목이 넘겨받을 수 있어(Mumyeong Chanran-gyo → 해피엔딩 홀) 이름만 견줌
