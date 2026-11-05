@@ -1,4 +1,4 @@
-// goei-body 0.20.4
+// goei-body 0.20.5
 "use strict";
 (() => {
   var __create = Object.create;
@@ -694,9 +694,6 @@ Companions: [[PARTY]]
 }
 `;
 
-  // card/visit-guide.txt
-  var visit_guide_default = '@@SECTION COMMON\nBureau HQ visit. This is an interlude that takes place right after the latest main scene and before the user\'s next main-story input. The protagonist has stopped by the bureau headquarters and is talking face to face with an agent who is there.\nYou voice exactly one agent, named in `agent`. Everything in `protagonist` describes the person in front of them: address and treat the protagonist as that lore establishes.\n`mainScene` is where the main story currently has the protagonist (place, objective, time, and their own status). Everyone present knows this; stay consistent with it. If it puts the protagonist somewhere other than where this conversation happens (for example out on a deployment), the agent notices that the protagonist has turned up here and reacts to it naturally, without inventing how or why.\nGround every reply in the supplied lore, the agent\'s current status and situation, the recent main story and this interlude\'s conversation so far. The agent knows only what their lore, status and the conversation give them.\nThis is conversation only. Nothing else happens during the interlude: no new incident, call, arrival, departure, injury, discovery, decision with consequences or time skip. The agent may talk about plans, but does not carry them out here.\nNever speak, act or decide for the protagonist.\n@@END\n\n@@SECTION REPLY\nReply to the protagonist\'s latest words (`said`) as the agent would say them aloud right now, continuing `conversation`. Keep the agent\'s voice, speech level and relationship with the protagonist consistent with their lore and with earlier lines.\nWhen the input is `did` instead of `said`, it is something the protagonist just did, not words. The agent reacts to it aloud as they really would, in character and consistent with their lore, without describing the action. Entries in `conversation` with `"action": true` are likewise things the protagonist did.\n@@END\n\n@@SECTION OUTPUT_REPLY\nReturn one JSON object and nothing else: {"line": "<the agent\'s spoken words>"}\n- `line` is only what the agent says aloud, in the conversation\'s language. At most __LIMIT_LINE__ characters; one or two short sentences.\n- No narration, stage directions, actions, expressions or thoughts, with or without asterisks or parentheses. No speaker name or quotation marks around the line. No status tags, markup or commentary.\n@@END\n\n@@SECTION INTERJECT\n`bystanders` are other agents in the same room, close enough to overhear. After the agent\'s reply, one or two of them may chime in briefly, but only when it is natural for that person: the topic concerns them, they know something relevant, or their relationship with the speakers invites a remark. Most of the time nobody chimes in.\nA bystander knows only what their own lore and status give them plus what they overheard in `conversation`. They react to what was said; they do not take over the conversation, start a new topic, or speak for the protagonist.\n@@END\n\n@@SECTION OUTPUT_GROUP\nReturn one JSON object and nothing else: {"lines": [{"speaker": "<name>", "line": "<spoken words>"}]}\n- The first entry is always the agent named in `agent`, replying to `said` (or reacting to `did`).\n- Then zero, one or two entries from `bystanders`, each with that bystander\'s exact name. Leave them out unless chiming in is natural.\n- Each `line` is only what that person says aloud, in the conversation\'s language. At most __LIMIT_LINE__ characters; one or two short sentences.\n- No narration, stage directions, actions, expressions or thoughts, with or without asterisks or parentheses. No quotation marks around lines. No status tags, markup or commentary.\n@@END\n\n@@SECTION MAIN_CONTEXT\nThe block below is a face-to-face conversation the protagonist had in person (at the bureau or another place) right after the preceding scene and before the next input. It really happened: the characters involved remember what was said and may refer to it. Nothing else happened in between and only a few minutes passed. Continue the main story from the next input; do not replay, summarize or narrate the conversation unless the scene calls for it.\n@@END\n';
-
   // src/data/guides/rp.txt
   var rp_default = "## RP Guidance\n- Setting: Modern-day Republic of Korea. The public is unaware that anomalies coexist with ordinary life and may be encountered accidentally. Factions conceal incidents. Exposed civilians may be recruited, memory-altered, absorbed into the anomaly economy, or removed.\n- Direction: Dialogue-focused interactive RP. Act as an in-scene GM.\n\n### Play Principles\n- Scene Flow: Build scenes around what people are already doing, wanting, and responding to. Let dialogue and concrete interaction develop; do not rush toward lorebook truths or payoffs. An opening need not follow scenery, an NPC entrance, an assignment, and a briefing. Choose its place, social situation, and point of entry from the protagonist's circumstances and the actual premise; vary these coherently rather than swapping decorative scenery around the same script.\n- Characters: Profiles are hidden canon, express them through dialogue and behavior, not summaries.\n- World: NPCs, factions, and anomalies continue acting off-screen; their consequences appear later in-scene.\n- Body Horror: Render horror through concrete behavior, sensory detail, wounds, and physical consequences rather than vague dread or abstract threat labels. For significant injury, restraint, transformation, contamination, or body horror, specify affected anatomy and consistently track its damage, position, limitations, and sensory effects.\n\n### Knowledge and Disclosure\n- Separate the anomaly's actual nature from what each observer knows. Its lore entry fixes hidden canon for the GM; activating the entry, selecting the target, or listing it in a world report does not publish its contents.\n- Before stating a fact through an NPC, briefing, notice, document, or narration, use only what that source could have learned: direct observations, a genuinely established report, or an explicitly documented prior investigation. Do not invent a complete earlier expedition, survivor testimony, surveillance system, or classified manual merely to justify revealing a secret.\n- Preliminary information may describe the location, outward changes, disappearance or injury reports, access conditions visible from outside, and limited observations with their actual scope. Distinguish observation, inference, rumor, and unknowns without turning every sentence into a disclaimer.\n- Hidden causes, internal layouts, entity identities or motives, exact triggers, taboos, costs, safe sequences, exits, and the solution remain undisclosed until earned by a credible source or in-scene discovery. Calling such information a precaution, checklist, rumor, or guess does not make early disclosure acceptable.\n- An explicitly established manual or prior discovery can provide the particular facts it supports. Do not make experienced staff artificially ignorant of those facts, but do not expand a partial report into complete knowledge. Seniority and organizational competence determine judgment and resources, not omniscience.\n- Let a briefing convey why the case matters, what is actually known, and the practical limits of the task through the speaker's agenda and conversation. It need not contain a rule list or supply the answer in advance. Subsequent observation, testing, conversation, and consequences can change the characters' understanding.\n- Preserve the real rules and established discoveries. Mystery comes from limited access and interpretation, not changing canon to invalidate a correct deduction. Uncertainty is not a requirement to invent false information.\n\n## Nature of Anomaly (Gwe-i, I-mul, Uh-doom, Gwe-dam)\n\n### Characteristics\n- Frequency: Anomalies are far more common than the public knows, their cause is unknown.\n- Rule-Based: Anomalies follow consistent conditions, boundaries, consequences, and exits that can be observed and exploited.\n- Role-Based Narrative: Many assign roles, enforce scripts or plot structures, and punish deviation.\n- Permanence: Containment rarely eradicates an anomaly. Once contained, it disappears from the site and later manifests elsewhere as the same anomaly.\n- Adhesive: The abnormal attracts the abnormal. Survivors face repeated encounters and clustered incidents.\n- Isolation: Inside a Location-type anomalies isolate entrants, communication cannot cross. Escape requires correctly interpreting its internal logic, or destroying its core entity.\n- Contamination: Exposure to the anomalous accumulates. Light contamination fades with treatment, heavy contamination alters, becoming irreversible past a threshold.\n- Exit: Escape ends the entrant's exposure, not the anomaly. Resolving its internal story may end, offering the greatest rewards and risks.\n\n### Types\n- Location-Type: Anomalies centered on a place or spatial area.\n  - Manifested: Appears suddenly at a specific real-world location.\n  - Overwrite: Overlays or alters an existing real-world location.\n  - Dimension: Exists in a separate space or dimension and draws people inside.\n- Entity: An individual anomalous being.\n- Object: Primarily exists as an anomalous object.\n- Other: These are common patterns, not exhaustive categories.\n\n### Classification\n- F (Shade): Virtually no fatalities.\n- E (Twilight): Low-risk anomalies with practical value.\n- D (Dusk): High survival rate when the manual is followed.\n- C (Gloaming): Complex or unstable rules that cannot be fully standardized.\n- B (Gloom): ~2% civilian survival; poor manuals and highly lethal entry.\n- A (Darkness): no repeatable method of survival has been established; catastrophic losses expected.\n- S (Abyss): Direct encounter with a cosmic-horror entity.\n\n### Anomaly Generation Rules\n\n#### Location-Type\n- Real Basis: When based in reality, use a specific real South Korean location, facility, branch, building, floor, or department where possible.\n- Manifested: Insert the anomaly into the real location without unnecessarily transforming the surrounding space.\n- Overwrite: Keep the original infrastructure recognizable while altering its use, routines, access, relationships, and consequences. Avoid generic horror decoration.\n- Dimension: Build a distinct space with its own coherent geography, rules, inhabitants, and means of entry and exit.\n- Common rules: Include one or more Core Entities where appropriate, keeping their role in the anomaly initially unclear.\n\n#### Sentient Entities\n- Human Surface: Human-passing entities initially fit their environment in appearance, speech, dress, and conduct; reveal their non-human nature through interaction, not obvious monster cues.\n- Individuality: Each has distinct personality, motives, relationships, routines, preferences, fears, and blind spots.\n- Rule-Bound Agency: Rules constrain actions and consequences, but entities choose within them according to their own motives and judgment.\n- Communication: Conversation begins surface-normal; uncanniness emerges through abnormal assumptions, values, emotional logic, and failures to understand ordinary human concerns.\n- Threat Triggers: Words, actions, timing, location, procedural mistakes, broken etiquette, taboo questions, or role violations may trigger specific consequences.\n- Sexual Violence: Entities may take sexual interest in human bodies and act according to their own anomalous logic. Don't fade out, abstract, or look away.\n\n---";
 
@@ -704,18 +701,13 @@ Companions: [[PARTY]]
   var tag_default = "{{#if {{equal::{{getvar::st_anomaly_on}}::1}}}}## Tag System Directive\nThe scene shows only what {{user}} can perceive. The hidden world continues independently beyond the scene. System tags are not part of the story and are appended after the prose in every response.\n\n### World Entries\n\n#### Anomaly\n{{getvar::an_report}}\n\n- 발생지점: exact real-world building or place | designated anomaly name\n- 상태: 활성 | 소멸 | 격리 | 클리어\n- 등급: F | E | D | C | B | A | S\n- 배치: Agent code(s) | External faction name | 없음\n   - Faction pool: 관리국 | 가짜 관리국 | 백일몽 주식회사 | 교황청 | 이슬람 지하드 | 발푸르기스 협회 | 흡혈귀 세력 | 프리랜서 (특수재난대응협회) | 무명찬란교 소속 교단{{getvar::fac_pool}} | etc.\n- 상황: What is happening at the anomaly site right now: its current manifestation, victims or witnesses, and any faction response. One short sentence.\n\n#### Incident\n{{getvar::in_report}}\n\n- 발생지점: exact real-world building or place | designated landmark\n- 상태: 진행 | 종료\n   - 진행: Active ONLY during urgent incidents; MUST NOT include aftermath or routine tasks.\n   - 종료: MUST transition immediately once the urgent incident ends.\n- 배치: Agent code(s) | External faction name | 없음 (same rules as Anomaly 배치)\n- 상황: Create a major, urgent non-anomaly incident requiring immediate response, separate from anything already occurring in the current scene. Do not use minor accidents, routine problems, or trivial disturbances. The incident may involve the site faction's response or interactions with external factions.\n\n#### Mystic Site\n{{getvar::ms_report}}\n\n- 명칭: designated Mystic Site name\n- 상태: 출현 | 소실\n- 방문자: current individuals or groups visiting or using the site. | 없음\n- 상황: What is happening at the site right now: its current state, notable visitors' activity, or unusual occurrences. One short sentence.\n\n#### Agent\n{{getvar::ag_report}}\n\n- Agent codes (P001, P002, …) are fixed person identifiers. They are separate from user-affiliation codes (A00–E00) and phone-tab IDs (T/X); use the character lore for actual affiliation. The same person keeps the same code across user-affiliation changes.\n\n- 상태: 휴게 | 내근 | 외근 | 작전투입 | 비번 | 부상 | 실종 | 격리 | 사망\n   - Meaning: 휴게 = on-duty break, 내근 = office work, 외근 = field work (non-operation), 작전투입 = mission deployed, 비번 = off duty, 부상 = injured, 실종 = missing, 격리 = quarantined, 사망 = dead. Write only the Korean value.\n- 상황: Current activity, assignment, location, condition, or faction-related operations.\n\n#### Mandatory Time-Based World Entry Tag Updates\n- Minute-by-Minute Reassessment: Re-evaluate all mutable values in every World Entry tag whenever world time advances.\n- **`{N시간 N분 전}`: Marks how long the current state has lasted. Account for the elapsed time when reassessing the entry; never output `{N시간 N분 전}` itself.**\n- Reflect closures reported in World Entries; do not revive closed entries or output tags for them.\n- Update terminal states when the events actually resolve: [AN] → 소멸 | 격리 | 클리어; [IN] → 종료; [MS] → 소실. Elapsed time alone is not a resolution.\n- While {{user}} is directly involved with an anomaly, do not end it or force {{user}} to leave merely because time has elapsed.\n\n#### Instructions\n- For each `NEW [...]` line in World Entries, fill every `<...>` and remove `NEW` so it becomes a normal tag. New AN, IN and MS entries may also reflect actual RP developments. AG requires existing World Entry lines.\n- At the end of every response, immediately after the prose, output all existing World Entry tags, once each and one per line, in this order: AN → IN → MS → AG.\n- Never use `|` or `]` inside a value.\n- **Write World Entry values in Korean**.\n\n### Affiliation Change\n[AC|code]\n\n- code = A00 | B00 | C00 | D00 | E00{{getvar::fac_codes}}\n   - A00 = {{#when::st_faction::vis::B00}}Fake {{/when}}{{#when::{{notequal::{{getvar::st_faction}}::A00}}::and::{{notequal::{{getvar::st_faction}}::B00}}}}Self-Proclaimed Real {{/when}}Anomaly Management Bureau\n   - B00 = {{#when::st_faction::vis::A00}}Fake {{/when}}{{#when::{{notequal::{{getvar::st_faction}}::A00}}::and::{{notequal::{{getvar::st_faction}}::B00}}}}Self-Proclaimed Real {{/when}}Anomaly Management Bureau\n   - C00 = Baekilmong Corporation\n   - D00 = Civilian\n   - E00 = Freelancer{{getvar::fac_ac}}\n- {{user}}'s current affiliation: {{getvar::ib_affiliation}} (Code: {{getvar::st_faction}})\n- **Output [AC] only in the response where {{user}}'s affiliation actually changes.**\n- Codes are system identifiers. Outside tags, refer to organizations by name.\n\n### Final Output Format\n[AN|지역|발생지점|상태|등급|배치|상황]\n[IN|지역|발생지점|상태|배치|상황]\n[MS|지역|명칭|상태|방문자|상황]\n[AG|code|상태|상황]\n[AC|code]\n\n---{{/if}}\n{status_section}\n---\n\n";
 
   // src/core/guides.ts
-  var GUIDE_NAMES = ["GNet", "Phone", "Wiki", "Directive", "Visit", "RP", "Tag"];
-  var GUIDE_LABEL = { GNet: "괴담넷", Phone: "괴담톡", Wiki: "위키", Directive: "이동·임무 지시문", Visit: "필드(본부 방문)", RP: "RP 지침(봇 설명)", Tag: "상태창·태그" };
-  var VISIT_HEAD = "<!-- Visit: 본부 방문 대화 지침. 플러그인이 요청마다 필요한 섹션만 골라 씁니다. 자동 활성화 OFF / 키워드 비움. 섹션 구분 줄은 그대로 두세요. -->";
+  var GUIDE_NAMES = ["GNet", "Phone", "Wiki", "Directive", "RP", "Tag"];
+  var GUIDE_LABEL = { GNet: "괴담넷", Phone: "괴담톡", Wiki: "위키", Directive: "이동·임무 지시문", RP: "RP 지침(봇 설명)", Tag: "상태창·태그" };
   var DEFAULTS = {
     GNet: gnet_default.replace(/\r/g, ""),
     Phone: phone_default.replace(/\r/g, ""),
     Wiki: wiki_default.replace(/\r/g, ""),
     Directive: directive_default.replace(/\r/g, ""),
-    Visit: `${VISIT_HEAD}
-
-${visit_guide_default.replace(/\r/g, "").trim()}
-`,
     RP: rp_default.replace(/\r/g, ""),
     Tag: tag_default.replace(/\r/g, "")
   };
@@ -767,9 +759,9 @@ ${visit_guide_default.replace(/\r/g, "").trim()}
     return splitBy(text4, /$^/g, () => ({ title: "전체", head: "" }));
   }
   var joinGuide = (parts) => parts.map((p) => p.head + p.body + p.tail).join("");
-  var RULE_TARGETS = ["RP", "Directive", "GNet", "Phone", "Wiki", "Visit"];
-  var RULE_TARGET_LABEL = { RP: "본편", Directive: "이동·임무", GNet: "괴담넷", Phone: "괴담톡", Wiki: "위키", Visit: "필드" };
-  var RULE_SECTION = { RP: null, Directive: "COMMON", GNet: "LB", Phone: "COMMON", Wiki: "NW.GUIDE", Visit: "COMMON" };
+  var RULE_TARGETS = ["RP", "Directive", "GNet", "Phone", "Wiki"];
+  var RULE_TARGET_LABEL = { RP: "본편", Directive: "이동·임무", GNet: "괴담넷", Phone: "괴담톡", Wiki: "위키" };
+  var RULE_SECTION = { RP: null, Directive: "COMMON", GNet: "LB", Phone: "COMMON", Wiki: "NW.GUIDE" };
   var userRules = [];
   function setUserRules(rules2) {
     userRules = Array.isArray(rules2) ? rules2.filter((r) => r && typeof r.id === "string") : [];
@@ -1975,8 +1967,8 @@ ${body5.slice(at).replace(/^\s+/, "")}
       const own = tabs2.find((t) => t.id.startsWith("T") && t.visibleFor.length === 1 && t.visibleFor[0] === code2);
       return { rosterFor: code2 === "D00" || code2 === "E00" ? ["D00", "E00"] : [code2], phoneTabs: own ? [own.id] : [] };
     }
-    const open3 = tabs2.find((t) => t.id.startsWith("T") && FACTIONS.every((f) => t.visibleFor.includes(f)));
-    return { rosterFor: ["D00", "E00"], phoneTabs: open3 ? [open3.id] : [] };
+    const open2 = tabs2.find((t) => t.id.startsWith("T") && FACTIONS.every((f) => t.visibleFor.includes(f)));
+    return { rosterFor: ["D00", "E00"], phoneTabs: open2 ? [open2.id] : [] };
   }
   var ORG_ENGLISH = {
     A00: "Management Bureau",
@@ -2460,7 +2452,7 @@ ${body5.slice(at).replace(/^\s+/, "")}
     { id: "place", label: "위치", token: "location", locked: true },
     { id: "target", label: "목표", token: "anomaly", locked: false, feature: "로어 고르기(목표 괴이)" },
     { id: "companions", label: "동행", token: "companions", locked: false, feature: "장면 인물 고르기" },
-    { id: "deployed", label: "투입", token: "deployed", locked: false, feature: "필드 투입 판정" },
+    { id: "deployed", label: "투입", token: "deployed", locked: false, feature: "투입 판정" },
     { id: "identity", label: "신분", token: "identity", locked: false, feature: "유저 신분(조직/직급) 추적" },
     { id: "wallet", label: "잔고", token: "balance", locked: false, feature: "가계부" }
   ];
@@ -2737,4 +2729,105 @@ ${body5.slice(at).replace(/^\s+/, "")}
     leave: "비번",
     resting: "비번"
   };
-  var AN_LABELS = ["슬롯", "지역", "발생지점", "위치", "이름", "괴이명", "괴이", "명칭", "배치", "작전현황", "작전", "상
+  var AN_LABELS = ["슬롯", "지역", "발생지점", "위치", "이름", "괴이명", "괴이", "명칭", "배치", "작전현황", "작전", "상태", "위협등급", "등급"];
+  function stripLabel(v) {
+    let s5 = (v ?? "").trim();
+    for (const lb of AN_LABELS) {
+      const m = new RegExp(`^${lb}\\s*[:：]\\s*`).exec(s5);
+      if (m) {
+        s5 = s5.slice(m[0].length).trim();
+        break;
+      }
+    }
+    return s5;
+  }
+  function normGrade(v) {
+    const g2 = stripLabel(v).toUpperCase().replace(/[^FEDCBAS]/g, "").charAt(0);
+    return g2;
+  }
+  function normAnState(v) {
+    const s5 = stripLabel(v);
+    const low = s5.toLowerCase();
+    if (s5.includes("소멸") || low.includes("fade") || low.includes("vanish")) return "소멸";
+    if (s5.includes("격리") || low.includes("contain") || low.includes("isolate")) return "격리";
+    if (s5.includes("클리어") || low.includes("clear") || low.includes("resolve")) return "클리어";
+    return "활성";
+  }
+  function normAgState(v) {
+    const s5 = (v ?? "").trim();
+    if (AG_STATES.includes(s5)) return s5;
+    const hit3 = AG_ALIAS[s5] ?? AG_ALIAS[s5.toLowerCase().replace(/\s+/g, " ")];
+    if (hit3) return hit3;
+    const bare = s5.replace(/[(（][^)）]*[)）]/g, "").replace(/[\s.。!]/g, "").replace(/중$/, "");
+    if (AG_STATES.includes(bare)) return bare;
+    return AG_ALIAS[bare] ?? null;
+  }
+  function fields(text4, kind) {
+    const out = [];
+    const re = new RegExp(`\\[${kind}\\s*\\|([^\\]]*)\\]`, "g");
+    for (const m of text4.matchAll(re)) out.push(m[1].split("|").map((s5) => s5.trim()));
+    return out;
+  }
+  function scanAnomalies(text4) {
+    return fields(text4, "AN").flatMap((f) => {
+      const slot = /^\d+$/.test(f[0] ?? "") && f.length >= 6 ? 1 : 0;
+      const region2 = f[slot] ?? "";
+      const r = f.slice(slot + 1);
+      if (r.length < 4 || !region2) return [];
+      return [{ region: region2, name: stripLabel(r[0]), state: normAnState(r[1]), grade: normGrade(r[2]), deploy: stripLabel(r[3]), situation: stripLabel(r.slice(4).join(" ")) }];
+    });
+  }
+  function scanSites(text4, kind, states) {
+    return fields(text4, kind).flatMap((f) => {
+      const bare = (v) => stripLabel(v).replace(/\s*[(（][^)）]*[)）]\s*/g, "").trim();
+      const i = f.findIndex((v, k) => k >= 2 && states.includes(bare(v)));
+      if (i < 0) return [];
+      let region2 = f[0] ?? "";
+      if (/^\d+$/.test(region2) && i >= 3) region2 = f[1] ?? "";
+      return [{ region: region2, name: stripLabel(f[i - 1]), state: bare(f[i]), rest: f.slice(i + 1).map(stripLabel) }];
+    });
+  }
+  var DEPLOY_ONLY = /^(?:없음|none|-|[A-Z]\d{3}(?:\s*[,/·]\s*[A-Z]\d{3})*)$/i;
+  function scanIncidents(text4) {
+    return scanSites(text4, "IN", ["진행", "종료"]).map(({ rest, ...t }) => rest.length >= 2 ? { ...t, deploy: rest[0], situation: rest.slice(1).join(" ") } : DEPLOY_ONLY.test(rest[0] ?? "") ? { ...t, deploy: rest[0], situation: "" } : { ...t, deploy: "", situation: rest.join(" ") });
+  }
+  function scanMysticSites(text4) {
+    return scanSites(text4, "MS", ["출현", "소실"]).map(({ rest, ...t }) => ({ ...t, visitors: rest[0] ?? "", situation: rest.slice(1).join(" ") }));
+  }
+  function scanAgents(text4) {
+    return fields(text4, "AG").flatMap((f) => {
+      const state = normAgState(f[1]);
+      return f[0] && state ? [{ who: f[0], state, situation: f[2] ?? "" }] : [];
+    });
+  }
+  function scanAffiliation(text4) {
+    const m = /\[AC\s*\|\s*(\w+)\s*\]/.exec(text4);
+    return m ? m[1].toUpperCase() : null;
+  }
+  function scanStatus(text4) {
+    const tags = findStatusTags(text4);
+    const first = tags[0];
+    const minute = first ? statusMinute(first.date, first.time) : null;
+    const target = tags.length === 1 && (first.target || /\|\s*없음\s*[\]】］]?\s*$/.test(first.raw)) ? first.target : null;
+    return { minute, target };
+  }
+  function lastStatusFields(texts) {
+    for (let i = texts.length - 1; i >= 0; i--) {
+      const all = findStatusTags(texts[i] ?? "");
+      if (!all.length) continue;
+      const t = all[all.length - 1];
+      return { date: t.date, time: t.time, weather: t.weather, temp: t.temp, place: t.place, target: t.target, companions: t.companions, deployed: t.deployed };
+    }
+    return null;
+  }
+  function hasWorldTags(text4) {
+    return /\[(?:AN|IN|MS|AG)\s*\||\[AC\s*\|/.test(text4);
+  }
+  var AGE_META = /\{\s*\d+\s*시간\s+\d+\s*분\s*전\s*\}/;
+  var MARKERS = ["USER 관여 상태", "RP 시간 제한", "USER 관여 상태 규칙", "USER 탐험 상태 규칙", "탐험 추적", "자동 종료"];
+  function cleanOutput(text4) {
+    const lines3 = text4.split("\n");
+    const keep = [];
+    let prev = null;
+    let prevHadTag = false;
+    const ageOnly = (l) => l !== null && new RegExp(`^\
