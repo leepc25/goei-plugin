@@ -143,9 +143,8 @@ export interface Mark {
   name: string;
 }
 export const MARK_MAX = 5;
-/** 즐겨찾기 기본값 (2026-10-29 사용자): 한 번도 저장한 적이 없을 때. 비우면 빈 채로 저장돼 다시 채우지 않는다 */
+/** 즐겨찾기 기본값 (2026-10-29 사용자; 2026-11-05 필드 제거로 「필드」 칸 뺌): 한 번도 저장한 적이 없을 때. 비우면 빈 채로 저장돼 다시 채우지 않는다 */
 export const DEFAULT_MARKS: Mark[] = [
-  { s: { tab: 'field' }, name: '필드' },
   { s: { tab: 'wallet' }, name: '가계부' },
   { s: { tab: 'records' }, name: '기록' },
   { s: { tab: 'settings' }, name: '설정' },

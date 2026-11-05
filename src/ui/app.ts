@@ -52,7 +52,7 @@ import { startRecord } from '../core/dispatch';
 import { handleSettings, resetSettings, settingsTab, settingsUi, type SettingsEnv } from './settings';
 import { bindPeopleHold, bindPeopleStatus, handlePeople, hasPersonRecord, peopleInput, type PeopleEnv } from './people';
 import { handleImgPrompt, imgInput } from './imgprompt';
-import { cropValue, setCrop, directoryExtList, directoryInput, directoryPhotoList, directoryList, dirUi, handleDirectory, resetDirectory } from './directory';
+import { bindCropDrag, cropValue, setCrop, directoryExtList, directoryInput, directoryPhotoList, directoryList, dirUi, handleDirectory, resetDirectory } from './directory';
 import { basicDefaults, basicVars, DIM_DEFAULT, getPrefs, worldDefaults, worldSettings, worldVarsOf, type Mark } from '../core/settings';
 import { colConfig } from '../core/world/statuscols';
 import { adjustWallet, walletEditable, aliveAnchors, formatWon, parseWon, readWallet, removeWalletEntry, walletBalance, walletVars, WALLET_START_DEFAULT } from '../core/wallet';
@@ -210,37 +210,8 @@ function ensureRoot(): HTMLElement {
     const take = !names.length ? undefined : names.length > 1 ? JSON.stringify(names.map(val)) : root?.querySelector<HTMLInputElement>(`[name="${names[0]}"]`)?.value;
     void run(el.dataset.action!, take ?? el.dataset.value);
   });
-  // 명부 얼굴 틀: 대표 사진을 누르거나 끌면 그 자리가 틀 가운데 (틀이 사진 밖으로 나가지 않게)
-  root.addEventListener('pointerdown', (ev) => {
-    const box = (ev.target as HTMLElement).closest?.<HTMLElement>('[data-crop]');
-    const img = box?.querySelector('img');
-    if (!box || !img) return;
-    ev.preventDefault();
-    const key = box.dataset.crop ?? '';
-    const frame = box.querySelector<HTMLElement>('.dir-crop-frame');
-    const move = (e: PointerEvent) => {
-      const r = img.getBoundingClientRect();
-      if (!r.width || !r.height) return;
-      const w = cropValue(key)[2];
-      const half = ((w / 100) * r.width) / 2;
-      const px = Math.max(Math.min(half, r.width / 2), Math.min(r.width - half, e.clientX - r.left));
-      const py = Math.max(Math.min(half, r.height / 2), Math.min(r.height - half, e.clientY - r.top));
-      const c: [number, number, number] = [(px / r.width) * 100, (py / r.height) * 100, w];
-      setCrop(key, c);
-      if (frame) Object.assign(frame.style, { left: `${c[0]}%`, top: `${c[1]}%` });
-    };
-    move(ev);
-    box.setPointerCapture?.(ev.pointerId);
-    const up = () => {
-      box.removeEventListener('pointermove', move);
-      box.removeEventListener('pointerup', up);
-      box.removeEventListener('pointercancel', up);
-      render();
-    };
-    box.addEventListener('pointermove', move);
-    box.addEventListener('pointerup', up);
-    box.addEventListener('pointercancel', up);
-  });
+  // 명부 얼굴 틀 끌기 (directory.ts bindCropDrag, 설정 창과 공용)
+  bindCropDrag(root, render);
   // 명부 요원 순서 (PC): 손잡이를 끌어 같은 소속 요원 위·아래에 놓는다. 놓으면 dir-move before/after
   root.addEventListener('pointerdown', (ev) => {
     const grip = (ev.target as HTMLElement).closest?.<HTMLElement>('[data-drag-agent]');
@@ -359,6 +330,9 @@ function ensureRoot(): HTMLElement {
     if (ev.key !== 'Escape') return;
     // 설정·세계 편집 창이 떠 있으면 그 창이 닫힌다 (editor/index.ts). 뒤의 패널까지 같이 닫지 않는다
     if (editorOpen()) return;
+    // 사원증·요원 정보 작은 창이 떠 있으면 그것만 닫는다 (2026-11-05: Esc가 창을 지나쳐 패널 전체를 닫던 문제)
+    const pop = document.querySelector('.gx-agpop');
+    if (pop) return void pop.remove();
     if (evUi.pop || agUi.pop) {
       evUi.pop = agUi.pop = '';
       render();
@@ -700,6 +674,7 @@ async function handle(action: string, value?: string): Promise<void> {
   if (featCtx && action.startsWith('gn-') && (await handleGnet(action, value, featCtx, gnetEnv))) return;
   if (featCtx && action.startsWith('ph-') && (await handlePhone(action, value, featCtx, phoneEnv))) return;
   if (action === 'ed-open') {
+    document.querySelectorAll('.gx-agpop').forEach((b) => b.remove()); // 사원증 창이 설정 창 위에 남지 않게 (2026-11-05)
     // 설정·세계 편집 창 (별도 창 하나, 2026-10-27: 모든 설정은 이 창). 시작 전(시작 패널)에도 열 수 있다: ctx 가 있으면
     if (!(view.kind === 'started' || view.kind === 'picker' || view.kind === 'opening')) return;
     if (view.kind === 'picker') pickerPrefs = true; // 시작 전: 설정 단추가 기본값 범위로 가게
@@ -1064,7 +1039,7 @@ function header(sub: string, extra = ''): string {
 /** 진행 중 화면의 머리: 지금 탭 이름 (위협도는 기준이 헷갈리기만 해서 아예 뺐다, 사용자 결정) */
 function startedHeader(ctx: ChatContext): string {
   return `<header class="gx-head">
-    <div class="gx-brand gx-tabhead"><span class="gx-hmark"><span class="gx-logo">${GHOST_ICON}</span><span class="gx-mark-txt"><b aria-label="${BRAND.name}">${brandHtml('var(--text)', 'var(--signal)')}</b></span></span><span class="gx-hsep" aria-hidden="true">›</span><span class="gx-tabicon">${ICONS[tab]}</span><div><b>${tab === 'gnet' ? gnetLabel(ctx.chat.scriptstate) : TAB_TITLE[tab]}</b></div></div>
+    <div class="gx-brand gx-tabhead"><span class="gx-hmark"><span class="gx-logo">${GHOST_ICON}</span><span class="gx-mark-txt"><b aria-label="${BRAND.name}">${brandHtml('var(--text)', 'var(--signal)')}</b></span></span><span class="gx-hsep" aria-hidden="true">›</span>${navHist.can(-1) ? `<button class="gx-hback" data-action="nav-back" aria-label="뒤로" title="뒤로">${ICONS.back}</button>` : ''}<span class="gx-tabicon">${ICONS[tab]}</span><div><b>${tab === 'gnet' ? gnetLabel(ctx.chat.scriptstate) : TAB_TITLE[tab]}</b></div></div>
     <div class="gx-head-act">
       ${walletHeadButton(ctx, tab === 'wallet')}
       <button class="gx-x gx-recbtn${tab === 'records' ? ' on' : ''}" data-action="tab" data-value="records" aria-label="기록" title="기록">${ICONS.records}</button>
@@ -1199,7 +1174,7 @@ function render(): void {
   bindSwipeBack(root, navStep);
   if (view.kind === 'started') navHist.record(navState());
   // PC ‹ › : 기록은 그린 뒤에 적으니 단추 상태는 여기서
-  root.querySelectorAll<HTMLButtonElement>('.gx-nh[data-action^="nav-"]').forEach((b) => (b.disabled = !navHist.can(b.dataset.action === 'nav-back' ? -1 : 1)));
+  root.querySelectorAll<HTMLButtonElement>('.gx-nh[data-action^="nav-"], .gx-hback').forEach((b) => (b.disabled = !navHist.can(b.dataset.action === 'nav-back' ? -1 : 1)));
   setCurrentTheme(themeName(root.dataset.theme));
 }
 

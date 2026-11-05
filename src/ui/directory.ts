@@ -254,6 +254,41 @@ function photoBlock(key: string, ctx: ChatContext): string {
   </div>`;
 }
 
+/** 명부 얼굴 틀 끌기: 대표 사진을 누르거나 끌면 그 자리가 틀 가운데 (틀이 사진 밖으로 나가지 않게).
+ *  본 창(app.ts)과 설정 창(editor/index.ts)이 같은 처리기를 쓴다 (2026-11-05: 설정 창엔 크기만 있고 끌기가 없어 틀을 못 옮기던 문제). done = 놓았을 때 다시 그리기 */
+export function bindCropDrag(root: HTMLElement, done: () => void): void {
+  root.addEventListener('pointerdown', (ev) => {
+    const box = (ev.target as HTMLElement).closest?.<HTMLElement>('[data-crop]');
+    const img = box?.querySelector('img');
+    if (!box || !img) return;
+    ev.preventDefault();
+    const key = box.dataset.crop ?? '';
+    const frame = box.querySelector<HTMLElement>('.dir-crop-frame');
+    const move = (e: PointerEvent) => {
+      const r = img.getBoundingClientRect();
+      if (!r.width || !r.height) return;
+      const w = cropValue(key)[2];
+      const half = ((w / 100) * r.width) / 2;
+      const px = Math.max(Math.min(half, r.width / 2), Math.min(r.width - half, e.clientX - r.left));
+      const py = Math.max(Math.min(half, r.height / 2), Math.min(r.height - half, e.clientY - r.top));
+      const c: [number, number, number] = [(px / r.width) * 100, (py / r.height) * 100, w];
+      setCrop(key, c);
+      if (frame) Object.assign(frame.style, { left: `${c[0]}%`, top: `${c[1]}%` });
+    };
+    move(ev);
+    box.setPointerCapture?.(ev.pointerId);
+    const up = () => {
+      box.removeEventListener('pointermove', move);
+      box.removeEventListener('pointerup', up);
+      box.removeEventListener('pointercancel', up);
+      done();
+    };
+    box.addEventListener('pointermove', move);
+    box.addEventListener('pointerup', up);
+    box.addEventListener('pointercancel', up);
+  });
+}
+
 /** 얼굴 틀 맞추기: 대표 사진 위 네모 틀을 끌어 옮기고, 아래 막대로 크기를 바꾼다 */
 function cropBox(ctx: ChatContext, key: string, main: string): string {
   const url = imageUrl(ctx.char, main);

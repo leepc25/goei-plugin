@@ -9,7 +9,7 @@ const fx = loadFixture(process.argv[2]);
 const which = process.argv[3] ?? 'all';
 const vps = which === 'all' ? Object.keys(VIEWPORTS) : [which];
 const browser = await launch();
-const GUIDES = ['RP', 'Directive', 'Tag', 'GNet', 'Phone', 'Wiki', 'Visit'];
+const GUIDES = ['RP', 'Directive', 'Tag', 'GNet', 'Phone', 'Wiki']; // Visit(필드)는 2026-11-04 제거
 const settle = () => sleep(150);
 // 기본 지침 원문 (플러그인에 내장된 것과 같은 파일)
 const defaults = {

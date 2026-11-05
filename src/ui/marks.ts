@@ -13,17 +13,19 @@ const icon = (m: Mark) => ICONS[m.s.tab as keyof typeof ICONS] ?? ICONS.board;
 
 export const markUi = { pop: false };
 
-export const marks = (): Mark[] => getPrefs().marks ?? [];
+/** 필드(게임)는 2026-11-04 플러그인에서 뺐다: 예전에 저장된 「필드」 즐겨찾기는 죽은 탭이므로 거른다 */
+const alive = (list: Mark[] | undefined): Mark[] => (list ?? []).filter((m) => m.s.tab !== 'field');
+export const marks = (): Mark[] => alive(getPrefs().marks);
 export const isMarked = (m: Mark) => marks().some((x) => key(x) === key(m));
 
 export async function addMark(m: Mark): Promise<boolean> {
   if (isMarked(m) || marks().length >= MARK_MAX) return false;
-  await savePrefs((p) => ({ ...p, marks: [...(p.marks ?? []), m] }));
+  await savePrefs((p) => ({ ...p, marks: [...alive(p.marks), m] }));
   return true;
 }
 
 export async function removeMarkAt(i: number): Promise<void> {
-  await savePrefs((p) => ({ ...p, marks: (p.marks ?? []).filter((_, j) => j !== i) }));
+  await savePrefs((p) => ({ ...p, marks: alive(p.marks).filter((_, j) => j !== i) }));
 }
 
 /** 즐겨찾기 창에서 넣을 수 있는 최근 화면 (mk-add의 번호가 이 목록 기준) */

@@ -25,7 +25,7 @@ export const STATUS_COLS: ColDef[] = [
   { id: 'place', label: '위치', token: 'location', locked: true },
   { id: 'target', label: '목표', token: 'anomaly', locked: false, feature: '로어 고르기(목표 괴이)' },
   { id: 'companions', label: '동행', token: 'companions', locked: false, feature: '장면 인물 고르기' },
-  { id: 'deployed', label: '투입', token: 'deployed', locked: false, feature: '필드 투입 판정' },
+  { id: 'deployed', label: '투입', token: 'deployed', locked: false, feature: '투입 판정' },
   { id: 'identity', label: '신분', token: 'identity', locked: false, feature: '유저 신분(조직/직급) 추적' },
   { id: 'wallet', label: '잔고', token: 'balance', locked: false, feature: '가계부' },
 ];

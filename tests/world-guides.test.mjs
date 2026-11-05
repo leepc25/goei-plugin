@@ -1,4 +1,4 @@
-// 지침 내장(GNet·Phone·Wiki·Directive·Visit·RP·Tag)과 Faction·Roster 조립, 요청 삽입 (docs/설계안_세계편집.md 3·4장)
+// 지침 내장(GNet·Phone·Wiki·Directive·RP·Tag — Visit(필드)는 2026-11-04 제거)과 Faction·Roster 조립, 요청 삽입 (docs/설계안_세계편집.md 3·4장)
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
@@ -18,7 +18,6 @@ test('지침은 카드 로어북 없이 플러그인 내장 글에서 읽는다'
   for (const n of GUIDE_NAMES) assert.ok(guideDefault(n).length > 100, n);
   assert.deepEqual(Object.keys(policySections([], 'GNet')).slice(0, 3), ['LB', 'LB.EXTRA', 'EXTENSION.REQUEST']);
   assert.ok(policySections([{ comment: 'GNet', content: '@@SECTION LB\n카드 글\n@@END' }], 'GNet').LB !== '카드 글', '카드 로어북이 있어도 내장 글 (우선 규칙 없음)');
-  assert.ok(policySections([], 'Visit').COMMON && policySections([], 'Visit').OUTPUT_GROUP, 'Visit 는 card/visit-guide.txt');
   assert.equal(policySections([{ comment: '다른 책', content: '@@SECTION A\nx\n@@END' }], '다른 책').A, 'x', '지침이 아닌 이름은 로어북');
   const d = parseDirective([]);
   assert.ok(d.sections.COMMON && d.format.destination.name);

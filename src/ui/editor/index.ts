@@ -9,7 +9,7 @@ import { LEGACY_DATA } from '../../core/lorebooks';
 import { getPrefs } from '../../core/settings';
 import { updateCharacterLore, type ChatContext } from '../../host/risu';
 import { savePrefs } from '../../host/prefs';
-import { cropValue, directoryDraft, directoryExtList, directoryInput, directoryPhotoList, directoryView, dirUi, dirty as dirDirty, handleDirectory, resetDirectory, setCrop } from '../directory';
+import { bindCropDrag, cropValue, directoryDraft, directoryExtList, directoryInput, directoryPhotoList, directoryView, dirUi, dirty as dirDirty, handleDirectory, resetDirectory, setCrop } from '../directory';
 import { handleImgPrompt, imgInput, imgPromptPane } from '../imgprompt';
 import { GHOST_ICON, ICONS } from '../icons';
 import { labelSwitches } from '../controls';
@@ -141,6 +141,8 @@ function ensureRoot(): HTMLElement {
   document.body.appendChild(root);
   // 접는 칸(details data-keep)의 펼침을 기억한다: 조작 뒤 창을 다시 그려도 접히지 않게 (2026-10-28 QC: 패널만 기억하고 편집 창은 안 했다)
   root.addEventListener('toggle', (ev) => rememberPanel(ev.target as HTMLDetailsElement), true);
+  // 명부 얼굴 틀 끌기: 본 창과 같은 처리기 (2026-11-05: 설정 창에선 크기만 바뀌고 위치를 못 옮기던 문제)
+  bindCropDrag(root, () => render());
   root.addEventListener('click', (ev) => {
     const t = ev.target as HTMLElement;
     if (t === root) return void run('ed-close');
