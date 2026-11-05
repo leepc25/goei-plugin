@@ -2621,9 +2621,9 @@ if (fixture.globalLore.some(packed)) {
   while (await page.$('.mk-pop [data-action="mk-del"]')) await page.click('.mk-pop [data-action="mk-del"] >> nth=0');
   assert.ok((await page.textContent('.mk-pop')).includes('위키 메인'), '최근 본 화면');
   await page.click('.mk-pop [data-action="mk-add"]');
-  await page.click('.mk-pop [data-action="mk-here"]');
+  assert.equal(await page.locator('.mk-pop [data-action="mk-here"]').count(), 0, '맨 상황판은 즐겨찾기에 못 넣음 (2026-11-05 사용자: 서랍이 상황판 안에 있다)');
   const saved = JSON.parse(await page.evaluate(() => window.__store['p:goei:prefs']));
-  assert.deepEqual(saved.marks.map((m) => m.name), ['위키 메인', '상황판']);
+  assert.deepEqual(saved.marks.map((m) => m.name), ['위키 메인']);
   if (shots) await page.screenshot({ path: `${shots}/19-marks-pop.png` });
   await page.click('.mk-pop [data-action="mk-go"][data-value="0"]');
   assert.equal(await tabNow(), 'wiki');
@@ -2631,7 +2631,6 @@ if (fixture.globalLore.some(packed)) {
   await page.click('.gx-nh[data-action="nav-back"]');
   assert.equal(await tabNow(), 'board', '‹ 는 바로 전 화면');
   await page.click('.gx-nh.mk-star');
-  await page.click('.mk-pop [data-action="mk-del"][data-value="1"]');
   assert.equal(JSON.parse(await page.evaluate(() => window.__store['p:goei:prefs'])).marks.length, 1);
   await page.click('.mk-head [data-action="mk-pop"]');
   // 모바일: 서랍에 즐겨찾기 칸, 비었으면 안내, 펼친 서랍을 좌우로 밀면 ★ 창
@@ -2647,7 +2646,8 @@ if (fixture.globalLore.some(packed)) {
   await page.click('.gx-bdrawer .ph-grip');
   await page.click('.gx-bdrawer .mk-slot.empty >> nth=0');
   await page.waitForSelector('.mk-pop');
-  await page.click('.mk-pop [data-action="mk-del"][data-value="0"]');
+  // 시험 틀에서는 유령 단추가 ★ 창의 × 위에 겹쳐 Playwright 클릭이 막힌다 (실기기에선 창이 전체 화면이라 가려짐) → 직접 click()
+  await page.evaluate(() => document.querySelector('.mk-pop [data-action="mk-del"][data-value="0"]').click());
   await page.click('.mk-head [data-action="mk-pop"]');
   await page.waitForSelector('.gx-bdrawer .mk-hint');
   if (shots) await page.screenshot({ path: `${shots}/19-marks-mobile-hint.png` });
@@ -2688,11 +2688,12 @@ if (fixture.globalLore.some(packed)) {
   // 잔고 줄 → 가계부 화면 (메뉴 없이도)
   await page.click('.gx-nav-brand .gx-wallet');
   await page.waitForSelector('.gx-wallettab');
-  assert.equal(await tabNow(), 'wallet');
+  assert.equal(await tabNow(), 'records');
+  assert.equal(await page.locator('.gx-rec-tabs .ph-sub.on').textContent(), '가계부', '가계부는 기록의 하위 탭 (2026-11-05)');
   // 기록 탭: 하위 탭 넷, 같은 너비, 빈 일지, 「오늘 일지 이미지로」 없음
   await page.click('.gx-nav .gx-nb:not(.mob)[data-value="records"]');
   await page.waitForSelector('.gx-records');
-  assert.deepEqual(await page.$$eval('.gx-rec-tabs .ph-sub', (l) => l.map((b) => b.textContent)), ['일지', '보고서', '인물', '세력']);
+  assert.deepEqual(await page.$$eval('.gx-rec-tabs .ph-sub', (l) => l.map((b) => b.textContent)), ['일지', '가계부', '인물', '세력']);
   const widths = await page.$$eval('.gx-rec-tabs .ph-sub', (l) => l.map((b) => b.getBoundingClientRect().width));
   assert.ok(Math.max(...widths) - Math.min(...widths) <= 1, `하위 탭 같은 너비 (${widths.join(',')})`);
   assert.ok((await page.textContent('.gx-records')).includes('아직 종료된 상황이 없어요'));
@@ -2825,18 +2826,17 @@ if (fixture.globalLore.some(packed)) {
   await page.waitForSelector('.gx-rpt [data-action="rec-pin"].on');
   await page.click('.gx-rpt [data-action="rec-pin"]');
   await page.waitForFunction((id) => !JSON.parse(window.__chat.scriptstate.$goei_reports).items.find((r) => r.id === id)?.pin, rpt.id);
-  // 뒤로 → 보고서 목록 (칩: 내가 출동 1 · 요원 처리 0 · 전체 1)
+  // 뒤로 → 일지 (보고서 탭은 뺐다, 2026-11-05 사용자). 줄에 「보고서 ›」·내가 출동, 「요원 처리」 필터면 없음
   await page.click('.gx-rpt [data-action="rec-back"]');
-  await page.waitForSelector('.gx-rcard');
-  assert.equal(await page.locator('.gx-rcard').count(), 1);
-  assert.ok((await page.textContent('.gx-rcard')).includes('내가 출동') && (await page.textContent('.gx-rcard')).includes(rpt.no));
-  await page.click('[data-action="rec-rfilter"][data-value="bg"]');
-  assert.equal(await page.locator('.gx-rcard').count(), 0, '요원 처리 칩: 없음');
-  assert.equal(await page.locator('[data-action="rec-rfilter"]').count(), 2, '칩은 「내가 출동」·「요원 처리」 둘뿐 (「전체」 없음)');
-  await page.click('[data-action="rec-rfilter"][data-value="mine"]');
-  assert.equal(await page.locator('.gx-rcard').count(), 1);
+  await page.waitForSelector('.gx-jr-row');
+  assert.equal(await page.locator('.gx-rec-tabs .ph-sub.on').textContent(), '일지');
+  assert.equal(await page.locator('.gx-rcard').count(), 0, '보고서 카드 목록 없음');
+  assert.equal(await page.locator('.gx-jr-row[data-action="rec-open"]').count(), 1, '일지 줄 → 보고서');
+  assert.ok((await page.textContent('.gx-jr-row.mine')).includes('내가 출동'));
+  await page.click('[data-action="rec-filter"][data-value="bg"]');
+  assert.equal(await page.locator('.gx-jr-row').count(), 0, '백그라운드 필터: 없음');
+  await page.click('[data-action="rec-filter"][data-value="all"]');
   // 일지 탭: 요약 타일·줄(노란 왼쪽 선)·필터·찾기(목록만 다시 그림, 포커스 유지)
-  await page.click('[data-action="rec-sub"][data-value="journal"]');
   await page.waitForSelector('.gx-jr-row');
   assert.equal(await page.locator('.gx-jr-row.mine').count(), 1, '내가 출동한 줄');
   assert.ok((await page.evaluate(() => getComputedStyle(document.querySelector('.gx-jr-row.mine')).boxShadow)).includes('inset'), '노란 왼쪽 선');
@@ -2954,9 +2954,9 @@ if (fixture.globalLore.some(packed)) {
   await page.waitForSelector('.gx-records .gx-rpt');
   await noOverflow('폰 보고서 페이지');
   await page.click('.gx-rpt [data-action="rec-back"]');
-  await page.waitForSelector('.gx-rcard');
-  await noOverflow('폰 보고서 목록');
-  // 폰은 하위 탭 줄 대신 아래 숨은 서랍(일지·보고서·인물·세력, 2026-10-29 사용자)
+  await page.waitForSelector('.gx-jr-row');
+  await noOverflow('폰 일지(보고서에서 뒤로)');
+  // 폰은 하위 탭 줄 대신 아래 숨은 서랍(일지·가계부·인물·세력; 2026-10-29 사용자, 11-05 보고서→가계부)
   await page.click('.gx-rdrawer .ph-grip');
   const tabW = await page.$$eval('.gx-rdrawer .ph-tool[data-action="rec-sub"]', (l) => l.map((b) => b.getBoundingClientRect().width));
   assert.ok(tabW.length === 4 && Math.max(...tabW) - Math.min(...tabW) <= 1, `폰 서랍 네 칸 같은 너비 (${tabW.join(',')})`);

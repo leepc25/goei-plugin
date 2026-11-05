@@ -13,8 +13,11 @@ const icon = (m: Mark) => ICONS[m.s.tab as keyof typeof ICONS] ?? ICONS.board;
 
 export const markUi = { pop: false };
 
-/** 필드(게임)는 2026-11-04 플러그인에서 뺐다: 예전에 저장된 「필드」 즐겨찾기는 죽은 탭이므로 거른다 */
-const alive = (list: Mark[] | undefined): Mark[] => (list ?? []).filter((m) => m.s.tab !== 'field');
+/** 저장된 즐겨찾기 손질 (2026-11-05 사용자): 「필드」(11-04 제거)와 맨 상황판(서랍이 상황판 안에 있어 의미 없음)은 거르고,
+ *  옛 「가계부」 탭은 기록 › 가계부로 옮긴다 */
+const alive = (list: Mark[] | undefined): Mark[] => (list ?? [])
+  .filter((m) => m.s.tab !== 'field' && !(m.s.tab === 'board' && !m.s.a))
+  .map((m) => (m.s.tab === 'wallet' ? { ...m, s: { tab: 'records', r: { sub: 'wallet', view: 'list', id: '' } } } : m));
 export const marks = (): Mark[] => alive(getPrefs().marks);
 export const isMarked = (m: Mark) => marks().some((x) => key(x) === key(m));
 

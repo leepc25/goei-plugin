@@ -23,7 +23,7 @@ export function balanceText(ctx: ChatContext): string {
   return formatWon(walletBalance(walletOf(ctx), aliveAnchors(ctx.chat)));
 }
 
-/** 모바일 머리 잔고 단추 → 가계부 탭 (가계부 탭 안에서는 숨김: 잔고가 탭에 크게 있고, 좁은 머리에서 제목이 밀림) */
+/** 모바일 머리 잔고 단추 → 기록 › 가계부 (가계부 화면 안에서는 숨김: 잔고가 화면에 크게 있고, 좁은 머리에서 제목이 밀림) */
 export function walletHeadButton(ctx: ChatContext, here = false): string {
   if (!walletOn(ctx) || here) return '';
   return `<button class="gx-hwallet" data-action="tab" data-value="wallet" aria-label="가계부 · 잔고 ${esc(balanceText(ctx))}">${esc(balanceText(ctx))}</button>`;
@@ -111,9 +111,10 @@ export function walletList(ctx: ChatContext): string {
   </section>`).join('');
 }
 
-export function walletTab(ctx: ChatContext): string {
+/** 가계부 화면 (2026-11-05 사용자: 따로 탭이 아니라 기록 › 가계부 하위 탭. 잔고 칩·사원증 잔고 줄은 여기로 온다) */
+export function walletPane(ctx: ChatContext): string {
   if (!walletOn(ctx)) {
-    return `<main class="gx-body gx-wallettab"><div class="gx-empty">이 채팅은 상태창 「잔고」 칸을 쓰지 않아요. 설정 → 상황판 → 상태창 칸에서 켜면 가계부가 생겨요.</div></main>`;
+    return `<div class="gx-wallettab"><div class="gx-empty">이 채팅은 상태창 「잔고」 칸을 쓰지 않아요. 설정 → 상황판 → 상태창 칸에서 켜면 가계부가 생겨요.</div></div>`;
   }
   const { rows, today, start } = rowsOf(ctx);
   const sum = (f: (r: Row) => boolean) => rows.filter(f).reduce((n, r) => n + r.e.amount, 0);
@@ -131,7 +132,7 @@ export function walletTab(ctx: ChatContext): string {
   const edit = editable && walletUi.edit
     ? `<div class="gx-wt-edit"><input type="text" name="wt-adj" inputmode="numeric" placeholder="예: 1,200,000 또는 120만" aria-label="잔고를 이 값으로" data-enter="wallet-adj"><button class="gx-mini" data-action="wallet-adj" data-take="wt-adj">저장</button><button class="gx-mini" data-action="wallet-edit">취소</button></div>`
     : '';
-  return `<main class="gx-body gx-wallettab">
+  return `<div class="gx-wallettab">
     <section class="gx-mon gx-wt-tiles">
       <div class="gx-mon-osd"><span><span class="gx-mon-tag live"><i></i>LEDGER</span><span class="gx-mon-title">가계부</span></span>${today ? `<span>${esc(today)}</span>` : ''}</div>
       <div class="gx-mon-cells">
@@ -144,5 +145,5 @@ export function walletTab(ctx: ChatContext): string {
     ${walletUi.notice ? `<div class="gx-err" role="alert">${esc(walletUi.notice)}</div>` : ''}
     <div class="gx-rec-tools">${chip('all', '전체')}${chip('in', '수입')}${chip('out', '지출')}<input class="gx-wt-q" type="search" data-input="wallet-q" value="${esc(walletUi.q)}" placeholder="찾기: 메모·근거" aria-label="거래 찾기"></div>
     <div class="gx-wt-list">${walletList(ctx)}</div>
-  </main>`;
+  </div>`;
 }

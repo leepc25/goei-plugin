@@ -56,7 +56,7 @@ import { bindCropDrag, cropValue, setCrop, directoryExtList, directoryInput, dir
 import { basicDefaults, basicVars, DIM_DEFAULT, getPrefs, worldDefaults, worldSettings, worldVarsOf, type Mark } from '../core/settings';
 import { colConfig } from '../core/world/statuscols';
 import { adjustWallet, walletEditable, aliveAnchors, formatWon, parseWon, readWallet, removeWalletEntry, walletBalance, walletVars, WALLET_START_DEFAULT } from '../core/wallet';
-import { walletHeadButton, walletList, walletTab, walletUi as walletTabUi } from './wallet';
+import { walletHeadButton, walletList, walletUi as walletTabUi } from './wallet';
 import { applyRecordsNav, closeToastHtml, endedReport, holdToast, releaseToast, syncCloseToast, handleRecords, journalList, rec, recordsInput, recordsMarkName, recordsNav, recordsTab, resetRecords, type RecordsEnv } from './records';
 
 /** ID카드 잔고 칩 → 장부 창 (열림·입력 알림) */
@@ -94,9 +94,9 @@ let busy = false;
 let notice = '';
 /** 괴담넷 탭 (완성 전까지 숨김) */
 const GNET_ON = true;
-/** records = 「기록」(일지·보고서·인물·세력, 2026-10-29 가계부 메뉴 자리). wallet 은 메뉴에서 빠졌지만 사원증 잔고 줄·폰 머리 칩이 연다 */
-type Tab = 'board' | 'map' | 'mission' | 'gnet' | 'phone' | 'wiki' | 'records' | 'wallet' | 'settings';
-const TABS: Tab[] = ['board', 'map', 'mission', ...(GNET_ON ? (['gnet'] as Tab[]) : []), 'phone', 'wiki', 'records', 'wallet'];
+/** records = 「기록」(일지·가계부·인물·세력, 2026-10-29 가계부 메뉴 자리). 가계부는 2026-11-05부터 기록의 하위 탭: 사원증 잔고 줄·폰 머리 칩·옛 「wallet」 탭 요청은 openWallet() 으로 */
+type Tab = 'board' | 'map' | 'mission' | 'gnet' | 'phone' | 'wiki' | 'records' | 'settings';
+const TABS: Tab[] = ['board', 'map', 'mission', ...(GNET_ON ? (['gnet'] as Tab[]) : []), 'phone', 'wiki', 'records'];
 let tab: Tab = 'board';
 /** 커스텀 임무 시작 화면에서 "다시 고르기"를 눌렀을 때 */
 let repick = false;
@@ -788,6 +788,7 @@ async function handle(action: string, value?: string): Promise<void> {
       // PC 왼쪽 메뉴(nav-tab): 이미 보고 있는 탭을 한 번 더 누르면 상황판으로 (2026-10-21 사용자, 모바일 아래 줄(tab)은 그대로)
       if (action === 'nav-tab' && value === tab && value !== 'board' && !matchMedia('(max-width: 760px)').matches) value = 'board';
       if (value === 'settings') return handle('ed-open', 'set:screen');
+      if (value === 'wallet') return openWallet();
       tab = TABS.includes(value as Tab) ? (value as Tab) : 'board';
       notice = '';
       // 지도·커스텀 임무에서 고른 목표·편성은 다른 탭에 다녀와도 그대로 둔다
@@ -819,7 +820,7 @@ async function handle(action: string, value?: string): Promise<void> {
     case 'mk-here':
     case 'mk-add': {
       if (view.kind !== 'started') return;
-      const m = action === 'mk-here' ? markOf(navState()) : markCandidates(recentMarks(), markOf(navState()))[Number(value)];
+      const m = action === 'mk-here' ? currentMark() : markCandidates(recentMarks(), currentMark())[Number(value)];
       if (m) await addMark(m);
       return render();
     }
@@ -1026,7 +1027,7 @@ async function turnWorldOn(): Promise<void> {
 }
 
 const TAB_TITLE: Record<Tab, string> = {
-  board: '상황판', map: '임무', mission: '커스텀', gnet: '괴담넷', phone: '괴담톡', wiki: '위키', records: '기록', wallet: '가계부', settings: '설정',
+  board: '상황판', map: '임무', mission: '커스텀', gnet: '괴담넷', phone: '괴담톡', wiki: '위키', records: '기록', settings: '설정',
 };
 
 function header(sub: string, extra = ''): string {
@@ -1041,7 +1042,7 @@ function startedHeader(ctx: ChatContext): string {
   return `<header class="gx-head">
     <div class="gx-brand gx-tabhead"><span class="gx-hmark"><span class="gx-logo">${GHOST_ICON}</span><span class="gx-mark-txt"><b aria-label="${BRAND.name}">${brandHtml('var(--text)', 'var(--signal)')}</b></span></span><span class="gx-hsep" aria-hidden="true">›</span>${navHist.can(-1) ? `<button class="gx-hback" data-action="nav-back" aria-label="뒤로" title="뒤로">${ICONS.back}</button>` : ''}<span class="gx-tabicon">${ICONS[tab]}</span><div><b>${tab === 'gnet' ? gnetLabel(ctx.chat.scriptstate) : TAB_TITLE[tab]}</b></div></div>
     <div class="gx-head-act">
-      ${walletHeadButton(ctx, tab === 'wallet')}
+      ${walletHeadButton(ctx, tab === 'records' && rec.sub === 'wallet' && rec.view === 'list')}
       <button class="gx-x gx-recbtn${tab === 'records' ? ' on' : ''}" data-action="tab" data-value="records" aria-label="기록" title="기록">${ICONS.records}</button>
       <button class="gx-x gx-idbtn" data-action="id-card" aria-label="내 ID카드">${userInfo().photo ? `<img src="${esc(userInfo().photo!)}" alt="">` : ICONS.idcard}</button>
       <button class="gx-x" data-action="ed-open" data-value="set:screen" aria-label="설정">${ICONS.settings}${hasUpdate(ctx) ? '<span class="gx-xdot" aria-label="새 버전"></span>' : ''}</button>
@@ -1199,6 +1200,16 @@ interface NavState {
 }
 const navHist = new NavHistory<NavState>();
 
+/** 잔고 칩·사원증 잔고 줄·옛 「가계부」 탭 요청 → 기록 › 가계부 (2026-11-05 사용자: 가계부는 기록의 하위 탭) */
+function openWallet(): void {
+  tab = 'records';
+  notice = '';
+  field.confirmEnd = null;
+  resetSettings();
+  applyRecordsNav({ sub: 'wallet', view: 'list', id: '' });
+  render();
+}
+
 function navState(): NavState {
   const s: NavState = { tab };
   if (tab === 'wiki') s.w = { view: wiki.view, title: wiki.title, list: wiki.listOpen };
@@ -1243,10 +1254,19 @@ function markOf(raw: NavState): Mark {
   return { s: s as unknown as Mark['s'], name };
 }
 
-/** 최근 본 화면 (설정은 빼고) */
+/** 맨 상황판(사원증 창 없이)은 즐겨찾기 대상이 아니다 — 서랍이 상황판 안에 있어 의미가 없다 (2026-11-05 사용자) */
+const plainBoard = (s: NavState) => s.tab === 'board' && !s.a;
+
+/** 지금 화면의 즐겨찾기 (없으면 null) */
+function currentMark(): Mark | null {
+  const s = navState();
+  return plainBoard(s) ? null : markOf(s);
+}
+
+/** 최근 본 화면 (설정·맨 상황판은 빼고) */
 function recentMarks(): Mark[] {
   const seen = new Set<string>();
-  return navHist.recent().filter((s) => s.tab !== 'settings').map(markOf).filter((m) => {
+  return navHist.recent().filter((s) => s.tab !== 'settings' && !plainBoard(s)).map(markOf).filter((m) => {
     const k = JSON.stringify(m.s);
     return !seen.has(k) && (seen.add(k), true);
   });
@@ -1261,6 +1281,11 @@ function openable(ctx: ChatContext, s: NavState): NavState {
     o.tab = 'records';
     o.r = legacy;
     delete o.w;
+  }
+  // 옛 즐겨찾기 「가계부」 탭 → 기록 › 가계부 (2026-11-05)
+  if ((o.tab as string) === 'wallet') {
+    o.tab = 'records';
+    o.r = { sub: 'wallet', view: 'list', id: '' };
   }
   if (!TABS.includes(o.tab)) o.tab = 'board';
   if (o.p?.room && !readPhone(ctx.chat).rooms[o.p.room]) Object.assign(o.p, { view: 'list', room: null });
@@ -1318,8 +1343,6 @@ function startedBody(ctx: ChatContext): string {
       return gnetTab(ctx, gnetEnv);
     case 'phone':
       return phoneTab(ctx, phoneEnv);
-    case 'wallet':
-      return walletTab(ctx);
     case 'records':
       // 폰: 기록 탭의 서랍엔 하위 탭 넷(ui/records.ts), 필드 탭은 상황판처럼 즐겨찾기 서랍 (2026-10-29 사용자)
       return recordsTab(ctx);
@@ -1349,7 +1372,7 @@ function body(): string {
       </div>`;
     case 'started':
       evSeenReset();
-      return `${tabs()}${startedHeader(view.ctx)}<div class="gx-content">${tab === 'settings' ? '' : updateBanner(view.ctx)}${notice && tab !== 'map' && tab !== 'mission' ? `<div class="${noticeClass(notice)} gx-notice" role="alert">${esc(notice)}</div>` : ''}${startedBody(view.ctx)}</div>${evPopup(boardClock(view.ctx))}${tab === 'board' ? agentPopup((n) => view.kind === 'started' && hasPersonRecord(view.ctx, n)) : ''}${markPop(markOf(navState()), recentMarks())}${closeToastHtml()}`;
+      return `${tabs()}${startedHeader(view.ctx)}<div class="gx-content">${tab === 'settings' ? '' : updateBanner(view.ctx)}${notice && tab !== 'map' && tab !== 'mission' ? `<div class="${noticeClass(notice)} gx-notice" role="alert">${esc(notice)}</div>` : ''}${startedBody(view.ctx)}</div>${evPopup(boardClock(view.ctx))}${tab === 'board' ? agentPopup((n) => view.kind === 'started' && hasPersonRecord(view.ctx, n)) : ''}${markPop(currentMark(), recentMarks())}${closeToastHtml()}`;
     case 'opening':
       return `${header('커스텀 임무 · 첫 장면 고르기', '<button class="gx-x" data-action="repick" aria-label="시작 설정 다시 고르기">' + ICONS.back + '</button>')}<div class="gx-content">${missionTab(view.ctx, true, notice, busy)}</div>`;
     case 'picker':
@@ -1437,7 +1460,7 @@ function tabs(): string {
     ${item('records', '기록', ICONS.records, 'desk')}
     <button class="gx-nb desk" data-action="ed-open" data-value="set:screen">${ICONS.settings}<span>설정</span>${ctx && hasUpdate(ctx) ? '<span class="gx-nbadge dot" aria-label="새 버전"></span>' : ''}</button>
     <span class="gx-nav-gap"></span>
-    ${ctx ? navHistBar(markOf(navState())) : ''}
+    ${ctx ? navHistBar(currentMark()) : ''}
     ${mobileBar(item, unreadPhone, ctx)}
   </nav>`;
 }
