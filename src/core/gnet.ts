@@ -102,7 +102,7 @@ export const QUANTITY: Record<string, { range: string; max: number; label: strin
 };
 
 export interface GnetSettings {
-  /** 괴담넷 사용 (원본 mode 0 = 끄기) */
+  /** 늘 true. 원본 mode 0(끄기)은 없앴다 (2026-11-05 사용자: 괴담톡·위키처럼 끄기 없음, 새로고침 수동이면 부르지 않는다). 옛 채팅의 mode 0 은 보조로 본다 */
   enabled: boolean;
   /** 본편 응답마다 자동 새로고침 (원본 lazy 0) */
   auto: boolean;
@@ -138,9 +138,9 @@ export function gnetSettings(state: Record<string, unknown> | undefined): GnetSe
   const q = QUANTITY[s('quantity')] ? s('quantity') : '1';
   const chance = Number(s('incoming_chance'));
   return {
-    enabled: s('mode') !== '0',
-    auto: s('mode') !== '0' && s('lazy') === '0',
-    autoOpen: s('mode') !== '0' && s('lazy') === 'open',
+    enabled: true,
+    auto: s('lazy') === '0',
+    autoOpen: s('lazy') === 'open',
     model: s('mode') === '1' ? 'main' : 'aux',
     quantity: q,
     subject: clean('subject'),

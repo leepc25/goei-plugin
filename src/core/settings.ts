@@ -111,6 +111,8 @@ export interface Prefs {
   imgFold?: number;
   /** 이미지를 접을지 (기본 켬). 끄면 늘 펼친 채 (사용자 2026-10-27) */
   imgFoldOn?: boolean;
+  /** 접힌 그림을 누르거나 마우스를 올려도 펼치지 않을지 (기본 펼침). 사용자 2026-11-05: 「접은 상태에서 펼칠지 말지」 */
+  imgFoldLock?: boolean;
   /** 이미지를 띄울 최근 메시지 수·요청에 이미지 태그를 남길 최근 메시지 수 (0이면 전부, 없으면 6) */
   imgShow?: number;
   imgSend?: number;
@@ -118,6 +120,8 @@ export interface Prefs {
   marks?: Mark[];
   /** 기본 즐겨찾기(DEFAULT_MARKS)를 이 기기에 한 번 채웠나. 채운 뒤에는 지워도 다시 넣지 않는다 (2026-10-29 사용자) */
   marksSeeded?: boolean;
+  /** 종료 알림(보고서가 기록에 저장됐어요)을 이미 띄운 보고서 id (최근 50). 2026-11-05 사용자: 한 번 본 알림이 다시 뜨지 않게 기기에 남긴다 */
+  noticedReports?: string[];
   /** 이미지 태그 지침 (core/imgprompt.ts): 틀, 끈 이름, 임의 추가 이름, 표정 세트. 없으면 기본 */
   imgPrompt?: string;
   imgNamesOff?: string[];
@@ -145,7 +149,7 @@ export interface Mark {
 export const MARK_MAX = 5;
 /** 즐겨찾기 기본값 (2026-10-29 사용자; 2026-11-05 필드 제거로 「필드」 칸 뺌): 한 번도 저장한 적이 없을 때. 비우면 빈 채로 저장돼 다시 채우지 않는다 */
 export const DEFAULT_MARKS: Mark[] = [
-  { s: { tab: 'records', r: { sub: 'wallet', view: 'list', id: '' } }, name: '가계부' },
+  // 2026-11-05 사용자: 폰 상황판 서랍은 오른쪽부터 설정·기록, 왼쪽 세 칸은 비워 둔다 (가계부 기본 칸도 뺌)
   { s: { tab: 'records' }, name: '기록' },
   { s: { tab: 'settings' }, name: '설정' },
 ];
@@ -196,6 +200,7 @@ export function setPrefs(raw: unknown): Prefs {
   const size = imgSize(o.imgSize);
   const fold = imgFold(o.imgFold);
   const imgFoldOn = o.imgFoldOn === false ? false : undefined;
+  const imgFoldLock = o.imgFoldLock === true ? true : undefined;
   const show = imgRecent(o.imgShow);
   const send = imgRecent(o.imgSend);
   const savedMarks: Mark[] = (Array.isArray(o.marks) ? o.marks : [])
@@ -230,7 +235,7 @@ export function setPrefs(raw: unknown): Prefs {
   const relationsSym = o.relationsSym === false ? false : undefined;
   const frame = o.frame === 'none' || o.frame === 'tactical' ? o.frame : undefined;
   const walletStart = int(o.walletStart, 0, 1_000_000_000_000);
-  prefs = { basic, world, ...(walletStart !== null ? { walletStart } : {}), ...(frame ? { frame } : {}), ...(editorWidth !== null ? { editorWidth } : {}), ...(Object.keys(guides).length ? { guides } : {}), ...(rules.length ? { rules } : {}), ...(relationsSym === false ? { relationsSym } : {}), ...(theme ? { theme } : {}), ...(imgPrompt ? { imgPrompt } : {}), ...(imgNamesOff.length ? { imgNamesOff } : {}), ...(imgNamesExtra.length ? { imgNamesExtra } : {}), ...(imgKeywords.length ? { imgKeywords } : {}), ...(Object.keys(vars).length ? { vars } : {}), ...(nav ? { nav } : {}), ...(wikiSide ? { wikiSide } : {}), ...(agents ? { agents } : {}), ...(dim !== null ? { dim } : {}), ...(status ? { status } : {}), ...(size !== null ? { imgSize: size } : {}), ...(fold !== null ? { imgFold: fold } : {}), ...(imgFoldOn === false ? { imgFoldOn } : {}), ...(show !== null ? { imgShow: show } : {}), ...(send !== null ? { imgSend: send } : {}), ...(marks.length ? { marks } : {}), marksSeeded: true };
+  prefs = { basic, world, ...(walletStart !== null ? { walletStart } : {}), ...(frame ? { frame } : {}), ...(editorWidth !== null ? { editorWidth } : {}), ...(Object.keys(guides).length ? { guides } : {}), ...(rules.length ? { rules } : {}), ...(relationsSym === false ? { relationsSym } : {}), ...(theme ? { theme } : {}), ...(imgPrompt ? { imgPrompt } : {}), ...(imgNamesOff.length ? { imgNamesOff } : {}), ...(imgNamesExtra.length ? { imgNamesExtra } : {}), ...(imgKeywords.length ? { imgKeywords } : {}), ...(Object.keys(vars).length ? { vars } : {}), ...(nav ? { nav } : {}), ...(wikiSide ? { wikiSide } : {}), ...(agents ? { agents } : {}), ...(dim !== null ? { dim } : {}), ...(status ? { status } : {}), ...(size !== null ? { imgSize: size } : {}), ...(fold !== null ? { imgFold: fold } : {}), ...(imgFoldOn === false ? { imgFoldOn } : {}), ...(imgFoldLock ? { imgFoldLock } : {}), ...(show !== null ? { imgShow: show } : {}), ...(send !== null ? { imgSend: send } : {}), ...(marks.length ? { marks } : {}), marksSeeded: true };
   return prefs;
 }
 

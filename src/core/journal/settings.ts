@@ -4,7 +4,7 @@
 export const JR = (key: string) => `$jr_${key}`;
 
 export const JR_DEFAULTS: Record<string, string> = {
-  /** off / mine / all */
+  /** off / mine / all. 기본 mine (2026-11-05 사용자: 그대로 둔다) */
   chat_card: 'mine',
   /** 인물 기록 갱신기 호출에 「담당 요원 소감」 칸을 얹기 */
   debrief_auto: '1',

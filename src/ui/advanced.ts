@@ -56,9 +56,9 @@ function chips(f: AdvFeature, items: AdvItem[], state: State): string {
 }
 
 /** 접지 않고 펼친 묶음들 (메인 설정의 생성 공통·로어북). extra[묶음 순서]는 그 묶음 안 맨 아래에 붙인다 */
-export function advSections(f: AdvFeature, state: State, extra: Record<number, string> = {}): string {
+export function advSections(f: AdvFeature, state: State, extra: Record<number, string> = {}, only?: number[]): string {
   return ADV[f]
-    .map((g, gi) => `<section class="ps-group"><h3>${esc(g.title)}</h3><div class="ps-rows">${g.chips?.length ? chips(f, g.chips, state) : ''}${g.items.map((i) => row(f, i, state)).join('')}</div>${extra[gi] ?? ''}</section>`)
+    .map((g, gi) => (only && !only.includes(gi) ? '' : `<section class="ps-group"><h3>${esc(g.title)}</h3><div class="ps-rows">${g.chips?.length ? chips(f, g.chips, state) : ''}${g.items.map((i) => row(f, i, state)).join('')}</div>${extra[gi] ?? ''}</section>`))
     .join('');
 }
 

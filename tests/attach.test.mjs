@@ -46,8 +46,10 @@ test('gnet power, auto refresh and DM retention', () => {
   assert.equal(gnetSettings({}).enabled, true);
   assert.equal(gnetSettings({}).auto, false);
   assert.equal(gnetSettings({ [CFG('lazy')]: '0' }).auto, true);
-  assert.equal(gnetSettings({ [CFG('mode')]: '0', [CFG('lazy')]: '0' }).auto, false);
-  assert.equal(gnetSettings({ [CFG('mode')]: '0' }).enabled, false);
+  // 끄기(mode 0)는 없앴다 (2026-11-05 사용자): 옛 값 0 도 켜진 것으로, 보조 모델로 본다
+  assert.equal(gnetSettings({ [CFG('mode')]: '0', [CFG('lazy')]: '0' }).auto, true);
+  assert.equal(gnetSettings({ [CFG('mode')]: '0' }).enabled, true);
+  assert.equal(gnetSettings({ [CFG('mode')]: '0' }).model, 'aux');
   assert.deepEqual(gnetRetention({}), { auto: true, limit: 40 });
   const st = blank();
   for (let i = 0; i < 6; i++) st.dms.push({ nick: 'a', side: 'npc', body: `m${i}`, unread: false, date: '' });

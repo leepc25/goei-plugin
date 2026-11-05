@@ -1,12 +1,13 @@
 import { findFaction, findScenario, defaultScenario, SCENARIOS } from '../core/scenarios';
 import { showWindow } from '../host/container';
-import { factionList } from '../core/factions';
+import { factionList, PLAYER_FM, playerScenario, scenesOf } from '../core/factions';
+import { agentScene } from '../core/scenes';
 import { setOpeningHint } from '../host/openinghint';
 import { legacyWikiNav, NavHistory, type RecordsNav } from '../core/navhist';
-import { applyStart, chatPhase, currentChoice, planStart, readManifest, StartError } from '../core/start';
+import { applyStart, chatPhase, currentChoice, effectiveFaction, planStart, readManifest, StartError } from '../core/start';
 import { isGoeiLore } from '../core/install';
 import { refreshInstall } from './editor/install';
-import type { FactionCode, LangCode, LoreEntry, Manifest } from '../core/types';
+import type { Faction, FactionCode, LangCode, LoreEntry, Manifest } from '../core/types';
 import {
   activeEvents, type Catalog, endedShown, codesToNames, factionNames, lastStatusFields, locName, parseCatalog, readWorld, rosterFor, startWorldVars, agentLocked, readDirectory, worldOn,
 } from '../core/world';
@@ -27,7 +28,7 @@ import { addMark, markCandidates, markPop, marks, markSlots, markUi, navHistBar,
 import { bindSwipeBack } from './swipeback';
 import { avatar, factionPic, imageUrl, picAvatar, setImageRedraw, showIdCard, stLabel } from './images';
 import { bindMapZoom } from './mapzoom';
-import { BRAND, brandHtml } from './brand';
+import { BRAND } from './brand';
 import { checkLatest, handleUpdate, hasUpdate, updateBanner } from './update';
 import { setCurrentTheme, themeName } from './theme';
 import { bindFootnotes, bindWikiSide, handleWiki, resetWiki, wiki, wikiHomeResults, wikiInput, wikiList, wikiTab, type WikiEnv } from './wiki';
@@ -42,7 +43,7 @@ import { applyAdvanced } from '../core/advanced';
 import { handleAdvanced } from './advanced';
 import { rememberPanel } from './panels';
 import { startCctvFx, stopCctvFx } from './cctvfx';
-import { elapsedText, evPopup, evSeenReset, evUi, opsBoard, opsUi, peopleChips, type EvCard, type EvKind, type OpsCard } from './evcard';
+import { elapsedText, evPopup, evSeenReset, evUi, opsBoard, opsUi, peopleChips, type EvCard, type EvKind, type OpsCard, aimFlash } from './evcard';
 import { evArt } from './evpic';
 import { agentContact, handlePhone, openAgentDm, openCheck, phone, phoneContent, phoneInput, phonePickList, phoneTab, phoneUnread, resetPhone, type PhoneEnv } from './phone';
 import { boardMapUrl, field, handleField, mapTab, mapSuggestFor, missionList, missionTab, newMessage, resetField, showOnMap, type FieldEnv } from './field';
@@ -331,6 +332,8 @@ function ensureRoot(): HTMLElement {
     // 설정·세계 편집 창이 떠 있으면 그 창이 닫힌다 (editor/index.ts). 뒤의 패널까지 같이 닫지 않는다
     if (editorOpen()) return;
     // 사원증·요원 정보 작은 창이 떠 있으면 그것만 닫는다 (2026-11-05: Esc가 창을 지나쳐 패널 전체를 닫던 문제)
+    // 보고서 팝업은 상태(rec.view)로 떠 있으니 뒤로 처리로 닫는다
+    if (document.querySelector('.gx-rptpop')) return void handle('rec-back');
     const pop = document.querySelector('.gx-agpop');
     if (pop) return void pop.remove();
     if (evUi.pop || agUi.pop) {
@@ -593,7 +596,11 @@ async function refresh(): Promise<void> {
         view = { kind: 'picker', ctx, manifest, staged: phase === 'staged' };
         draft = { faction: cur.faction ?? draft.faction, lang: cur.lang ?? draft.lang, fm: cur.fm ?? draft.fm, player: cur.player ?? draft.player ?? '' };
         if (draft.faction && !facs.some((f) => f.code === draft.faction && !f.hidden)) draft = { lang: draft.lang };
-        if (draft.faction && !findScenario(draft.faction, draft.fm ?? 0, facs)) draft.fm = defaultScenario(draft.faction, facs);
+        const fsel = draft.faction ? findFaction(draft.faction, facs) : undefined;
+        if (fsel) {
+          const list = scenariosFor(fsel, draft.player, ctx.char.globalLore);
+          if (!list.some((x) => x.fm === draft.fm)) draft.fm = list[0]?.fm ?? defaultScenario(fsel.code, facs);
+        }
       }
     }
   } catch (error) {
@@ -737,6 +744,7 @@ async function handle(action: string, value?: string): Promise<void> {
   if (action.startsWith('upd-') && (view.kind === 'started' || view.kind === 'picker') && (await handleUpdate(action, view.ctx, settingsEnv))) return;
   // 상황판(CCTV·일지·상세 창)에서 「선택」: 목표로 고르고 바로 임무 지도로, 그 자리를 고른 채로 (2026-10-21 사용자)
   if (action === 'pick-event' && view.kind === 'started' && tab !== 'map') {
+    await aimFlash(value ?? '');
     await handleField(action, value, view.ctx, env, false);
     if (field.target?.type === 'event' && field.target.key === value && showOnMap(view.ctx, value ?? '')) {
       tab = 'map';
@@ -759,6 +767,14 @@ async function handle(action: string, value?: string): Promise<void> {
       if (draft.faction !== f.code) {
         draft.fm = defaultScenario(f.code, facs);
         draft.player = '';
+        // 묶음(중립)은 내 페르소나 없이 인물로만 시작: 첫 인물을 미리 고른다
+        if (f.group && view.kind === 'picker') {
+          const first = playableAgents(view.ctx.char.globalLore, f.code)[0];
+          if (first) {
+            draft.player = first.id;
+            draft.fm = scenariosFor(f, first.id, view.ctx.char.globalLore)[0]?.fm;
+          }
+        }
       }
       draft.faction = f.code;
       notice = '';
@@ -772,11 +788,16 @@ async function handle(action: string, value?: string): Promise<void> {
       notice = '';
       return renderPicker();
     case 'player': {
+      if (view.kind !== 'picker') return;
+      const lore = view.ctx.char.globalLore;
+      const f = draft.faction ? findFaction(draft.faction, factionList(lore)) : undefined;
+      // 묶음은 내 페르소나로 시작할 수 없다
+      if (f?.group && !value) return;
       draft.player = value ?? '';
-      // 준비된 첫 장면은 신입 시점이라 캐릭터로 시작하면 직접 입력·커스텀 임무만 고를 수 있다
-      if (draft.player && draft.faction && view.kind === 'picker') {
-        const f = findFaction(draft.faction, factionList(view.ctx.char.globalLore));
-        if (f && findScenario(f.code, draft.fm ?? 0, factionList(view.ctx.char.globalLore))?.kind === 'opening') draft.fm = f.scenarios.find((x) => x.kind !== 'opening')?.fm;
+      // 공용 첫 장면은 신입 시점이라 캐릭터로 시작하면 그 인물의 첫 장면·직접 입력·커스텀 임무만. 페르소나로 돌아오면 인물 장면(0)은 못 쓴다
+      if (f) {
+        const list = scenariosFor(f, draft.player, lore);
+        if (!list.some((x) => x.fm === draft.fm)) draft.fm = list[0]?.fm;
       }
       notice = '';
       return renderPicker();
@@ -789,6 +810,8 @@ async function handle(action: string, value?: string): Promise<void> {
       if (action === 'nav-tab' && value === tab && value !== 'board' && !matchMedia('(max-width: 760px)').matches) value = 'board';
       if (value === 'settings') return handle('ed-open', 'set:screen');
       if (value === 'wallet') return openWallet();
+      // 다른 탭에서 기록으로 들어오면 일지 목록부터 (2026-11-05 사용자: 가계부를 보고 나온 뒤 기록을 누르면 가계부가 다시 열렸다)
+      if (value === 'records' && tab !== 'records') applyRecordsNav({ sub: 'journal', view: 'list', id: '' });
       tab = TABS.includes(value as Tab) ? (value as Tab) : 'board';
       notice = '';
       // 지도·커스텀 임무에서 고른 목표·편성은 다른 탭에 다녀와도 그대로 둔다
@@ -946,7 +969,7 @@ async function handle(action: string, value?: string): Promise<void> {
 }
 
 async function start(): Promise<void> {
-  if (view.kind !== 'picker' || !draft.faction || !draft.fm) return;
+  if (view.kind !== 'picker' || !draft.faction || draft.fm === undefined) return;
   const { ctx, manifest } = view;
   busy = true;
   notice = '';
@@ -957,7 +980,7 @@ async function start(): Promise<void> {
     let world = null;
     try {
       // 기본값에서 상황판을 꺼 두었으면 상황판 없이 시작 (나중에 설정 탭에서 켤 수 있음)
-      if (basicDefaults(lore).anomalyOn) world = startWorldVars(parseCatalog(lore), worldDefaults(lore), choice.faction, Math.random, draft.player ?? '');
+      if (basicDefaults(lore).anomalyOn) world = startWorldVars(parseCatalog(lore), worldDefaults(lore), effectiveFaction(lore, choice.faction, draft.player), Math.random, draft.player ?? '');
     } catch (error) {
       // 목록 로어북이 없으면 상황판 없이 시작한다 (대화는 그대로 가능)
       console.log(`[goei] 상황판 준비 실패: ${error instanceof Error ? error.message : String(error)}`);
@@ -967,7 +990,7 @@ async function start(): Promise<void> {
     const situation = plan.kind === 'direct' ? (draft.situation ?? '').trim() : '';
     if (plan.kind === 'direct' && !situation) throw new StartError('시작할 상황을 적어 주세요.');
     // 시작 메시지: 자동 전송 없이 첫 장면 아래에 「적고 전송」 안내 (Risu가 첫 장면을 다시 그리기 전에 켠다)
-    setOpeningHint(plan.kind === 'opening' ? (ctx.char.alternateGreetings?.[plan.fmIndex] ?? null) : null);
+    setOpeningHint(plan.kind === 'opening' ? (plan.scene ?? null) : null);
     const saved = await updateChat(ctx.charIndex, ctx.chatIndex, (chat) => {
       if (chatPhase(chat) === 'started') throw new StartError('그새 대화가 시작됐어요. 새 채팅에서 다시 골라 주세요.');
       const next = applyStart(chat, plan);
@@ -1030,9 +1053,10 @@ const TAB_TITLE: Record<Tab, string> = {
   board: '상황판', map: '임무', mission: '커스텀', gnet: '괴담넷', phone: '괴담톡', wiki: '위키', records: '기록', settings: '설정',
 };
 
-function header(sub: string, extra = ''): string {
+/** 시작 전 창 머리: 제목 + 작은 안내. 「괴이 ː ANOMALY」 표기는 상황판에서 뺐다 (사용자 2026-11-05) */
+function header(title: string, extra = '', sub = ''): string {
   return `<header class="gx-head">
-    <div class="gx-brand"><span class="gx-logo">${GHOST_ICON}</span><div><b aria-label="${BRAND.name}">${brandHtml('var(--text)', 'var(--signal)')}</b><small>${esc(sub)}</small></div></div>
+    <div class="gx-brand"><span class="gx-logo">${GHOST_ICON}</span><div><b>${esc(title)}</b>${sub ? `<small>${esc(sub)}</small>` : ''}</div></div>
     <div class="gx-head-act">${extra}<button class="gx-x" data-action="close" aria-label="닫기">${ICONS.close}</button></div>
   </header>`;
 }
@@ -1040,9 +1064,9 @@ function header(sub: string, extra = ''): string {
 /** 진행 중 화면의 머리: 지금 탭 이름 (위협도는 기준이 헷갈리기만 해서 아예 뺐다, 사용자 결정) */
 function startedHeader(ctx: ChatContext): string {
   return `<header class="gx-head">
-    <div class="gx-brand gx-tabhead"><span class="gx-hmark"><span class="gx-logo">${GHOST_ICON}</span><span class="gx-mark-txt"><b aria-label="${BRAND.name}">${brandHtml('var(--text)', 'var(--signal)')}</b></span></span><span class="gx-hsep" aria-hidden="true">›</span>${navHist.can(-1) ? `<button class="gx-hback" data-action="nav-back" aria-label="뒤로" title="뒤로">${ICONS.back}</button>` : ''}<span class="gx-tabicon">${ICONS[tab]}</span><div><b>${tab === 'gnet' ? gnetLabel(ctx.chat.scriptstate) : TAB_TITLE[tab]}</b></div></div>
+    <div class="gx-brand gx-tabhead"><span class="gx-logo">${GHOST_ICON}</span><div><b>${tab === 'gnet' ? gnetLabel(ctx.chat.scriptstate) : TAB_TITLE[tab]}</b></div></div>
     <div class="gx-head-act">
-      ${walletHeadButton(ctx, tab === 'records' && rec.sub === 'wallet' && rec.view === 'list')}
+      ${walletHeadButton(ctx)}
       <button class="gx-x gx-recbtn${tab === 'records' ? ' on' : ''}" data-action="tab" data-value="records" aria-label="기록" title="기록">${ICONS.records}</button>
       <button class="gx-x gx-idbtn" data-action="id-card" aria-label="내 ID카드">${userInfo().photo ? `<img src="${esc(userInfo().photo!)}" alt="">` : ICONS.idcard}</button>
       <button class="gx-x" data-action="ed-open" data-value="set:screen" aria-label="설정">${ICONS.settings}${hasUpdate(ctx) ? '<span class="gx-xdot" aria-label="새 버전"></span>' : ''}</button>
@@ -1175,7 +1199,7 @@ function render(): void {
   bindSwipeBack(root, navStep);
   if (view.kind === 'started') navHist.record(navState());
   // PC ‹ › : 기록은 그린 뒤에 적으니 단추 상태는 여기서
-  root.querySelectorAll<HTMLButtonElement>('.gx-nh[data-action^="nav-"], .gx-hback').forEach((b) => (b.disabled = !navHist.can(b.dataset.action === 'nav-back' ? -1 : 1)));
+  root.querySelectorAll<HTMLButtonElement>('.gx-nh[data-action^="nav-"]').forEach((b) => (b.disabled = !navHist.can(b.dataset.action === 'nav-back' ? -1 : 1)));
   setCurrentTheme(themeName(root.dataset.theme));
 }
 
@@ -1376,14 +1400,23 @@ function body(): string {
     case 'opening':
       return `${header('커스텀 임무 · 첫 장면 고르기', '<button class="gx-x" data-action="repick" aria-label="시작 설정 다시 고르기">' + ICONS.back + '</button>')}<div class="gx-content">${missionTab(view.ctx, true, notice, busy)}</div>`;
     case 'picker':
-      return `${header(view.staged ? '첫 전송 전까지 다시 고를 수 있어요' : '새 작전 준비', `<button class="gx-x" data-action="prefs-open" aria-label="설정">${ICONS.settings}${hasUpdate(view.ctx) ? '<span class="gx-xdot" aria-label="새 버전"></span>' : ''}</button>`)}<div class="gx-content">${updateBanner(view.ctx)}${picker()}</div>`;
+      return `${header(view.staged ? '다시 고르기' : '새 작전 준비', `<button class="gx-x" data-action="prefs-open" aria-label="설정">${ICONS.settings}${hasUpdate(view.ctx) ? '<span class="gx-xdot" aria-label="새 버전"></span>' : ''}</button>`, view.staged ? '첫 전송 전까지 다시 고를 수 있어요' : '')}<div class="gx-content">${updateBanner(view.ctx)}${picker()}</div>`;
   }
+}
+
+/** 시작 화면에 보일 상황 목록: 인물로 시작하면 그 인물의 첫 장면(있을 때, fm 0) + 직접 입력·커스텀 임무, 페르소나면 공용 장면 + 직접 입력·커스텀 임무 */
+function scenariosFor(f: Faction, player: string | undefined, lore: LoreEntry[] | undefined) {
+  if (!player) return f.scenarios;
+  const own = agentScene(player, scenesOf(lore)) ? [playerScenario(playableAgents(lore, f.code).find((a) => a.id === player)?.name ?? '이 인물')] : [];
+  return [...own, ...f.scenarios.filter((x) => x.kind !== 'opening')];
 }
 
 function picker(): string {
   const facs = view.kind === 'picker' ? factionList(view.ctx.char.globalLore) : SCENARIOS.factions;
+  const lore = view.kind === 'picker' ? view.ctx.char.globalLore : undefined;
   const f = draft.faction ? findFaction(draft.faction, facs) : undefined;
-  const sc = f && draft.fm ? findScenario(f.code, draft.fm, facs) : undefined;
+  const list = f ? scenariosFor(f, draft.player, lore) : [];
+  const sc = f && draft.fm !== undefined ? list.find((x) => x.fm === draft.fm) : undefined;
   const factions = facs
     .filter((x) => !x.hidden)
     .map(
@@ -1401,12 +1434,12 @@ function picker(): string {
     )
     .join('');
   const playing = !!draft.player;
+  // 번호는 보이는 순서대로 (장면 번호 fm 은 저장용이라 비거나 0일 수 있다)
   const scenarios = f
-    ? f.scenarios
-        .filter((s) => !playing || s.kind !== 'opening')
-        .map((s) => {
+    ? list
+        .map((s, i) => {
           return `<button class="gx-sc${s.fm === draft.fm ? ' on' : ''}" data-action="fm" data-value="${s.fm}" aria-pressed="${s.fm === draft.fm}">
-            <b>${String(s.fm).padStart(2, '0')}</b><span>${esc(s.label)}</span></button>`;
+            <b>${String(i + 1).padStart(2, '0')}</b><span>${esc(s.label)}</span></button>`;
         })
         .join('')
     : '<div class="gx-hint">소속을 고르면 상황이 표시돼요.</div>';
@@ -1418,18 +1451,19 @@ function picker(): string {
         ? '<div class="gx-hint">출발을 누르면 이어서 목표와 동행을 골라요.</div>'
         : '';
   // 직접 입력은 상황을 적어야 출발
-  const ready = !!(f && sc) && (sc.kind !== 'direct' || !!(draft.situation ?? '').trim()) && !(playing && sc.kind === 'opening');
+  const ready = !!(f && sc) && (sc.kind !== 'direct' || !!(draft.situation ?? '').trim()) && !(f?.group && !playing);
   // 주인공: 내 페르소나 또는 그 소속 명단의 요원 한 명 (캐릭터로 플레이)
   const ctxP = view.kind === 'picker' ? view.ctx : null;
   const people = f && ctxP ? playableAgents(ctxP.char.globalLore, f.code) : [];
   const me = userInfo();
+  // 묶음(중립)은 내 페르소나 칸이 없다 (2026-11-05 사용자: 그 인물로만 시작)
   const who = f
     ? `<div class="gx-who">${[
-        `<button class="gx-whoc${!playing ? ' on' : ''}" data-action="player" data-value="" aria-pressed="${!playing}">${me.photo ? `<span class="gx-ava"><img src="${esc(me.photo)}" alt=""></span>` : `<span class="gx-ava"><span>${ICONS.idcard}</span></span>`}<span class="gx-whot"><b>내 페르소나</b></span></button>`,
+        ...(f.group ? [] : [`<button class="gx-whoc${!playing ? ' on' : ''}" data-action="player" data-value="" aria-pressed="${!playing}">${me.photo ? `<span class="gx-ava"><img src="${esc(me.photo)}" alt=""></span>` : `<span class="gx-ava"><span>${ICONS.idcard}</span></span>`}<span class="gx-whot"><b>내 페르소나</b></span></button>`]),
         ...people.map((a) => `<button class="gx-whoc${draft.player === a.id ? ' on' : ''}" data-action="player" data-value="${esc(a.id)}" aria-pressed="${draft.player === a.id}">${ctxP ? picAvatar(ctxP.char, facePic(ctxP.char, a, true), a.name) : ''}<span class="gx-whot"><b>${esc(a.name)}</b>${a.rank ? `<small>${esc(a.rank)}</small>` : ''}</span></button>`),
-      ].join('')}</div>${playing ? '<div class="gx-hint">고른 요원이 주인공이 돼요. 첫 장면은 직접 입력이나 커스텀 임무로 시작해요.</div>' : ''}`
+      ].join('')}</div>${playing ? `<div class="gx-hint">고른 인물이 주인공이 돼요. ${list.some((x) => x.fm === PLAYER_FM) ? '그 인물의 첫 장면이나 ' : ''}직접 입력·커스텀 임무로 시작해요.</div>` : ''}`
     : '<div class="gx-hint">소속을 고르면 고를 수 있는 요원이 표시돼요.</div>';
-  const shown = f ? f.scenarios.filter((s) => !playing || s.kind !== 'opening').length : 0;
+  const shown = list.length;
   return `<main class="gx-body">
     <section><h2><i>1</i>어느 쪽에 설까요?</h2><div class="gx-facs">${factions}</div></section>
     <section><h2><i>2</i>주인공</h2>${who}</section>
@@ -1437,7 +1471,7 @@ function picker(): string {
     <section><h2><i>4</i>언어</h2><div class="gx-segs">${langs}</div></section>
   </main>
   <footer class="gx-foot">
-    ${f && sc ? `<div class="gx-foot-sum">${esc(f.name)}${playing ? ` · ${esc(people.find((a) => a.id === draft.player)?.name ?? '')}` : ''} · ${String(sc.fm).padStart(2, '0')} ${esc(sc.label)}</div>` : ''}
+    ${f && sc ? `<div class="gx-foot-sum">${esc(f.name)}${playing ? ` · ${esc(people.find((a) => a.id === draft.player)?.name ?? '')}` : ''} · ${String(list.indexOf(sc) + 1).padStart(2, '0')} ${esc(sc.label)}</div>` : ''}
     ${notice ? `<div class="${noticeClass(notice)}" role="alert">${esc(notice)}</div>` : ''}
     <button class="gx-start" data-action="start" ${ready && !busy ? '' : 'disabled'}>${busy ? '시작하는 중…' : '출 발'}</button>
   </footer>`;

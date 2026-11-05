@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { planPictures, pictures } from '../dist-test/core.mjs';
+import { dropAssets, planPictures, pictures } from '../dist-test/core.mjs';
 
 const m = (list) => ({ schema: 1, plugin: 'goei-plugin', greetings: {}, pictures: list });
 
@@ -22,4 +22,15 @@ test('사진 업데이트: 지문 기록이 없는 옛 카드는 카드 이름 �
   assert.equal(plan.added, 0);
   assert.deepEqual(pictures(null), []);
   assert.equal(planPictures(assets, null, null).get.length, 0);
+});
+
+test('사진 업데이트: 새 카드에서 뺀 사진(옛 요원 그림)은 drop 에, 직접 넣은 사진은 안 뺀다', () => {
+  const assets = [['Aileen', 'assets/a.avif', 'avif'], ['Aileen_default', 'assets/b.avif', 'avif'], ['MyOwn', 'assets/c.webp', 'webp']];
+  const cur = m([['Aileen', 'aaa', 'avif', 10], ['Aileen_default', 'bbb', 'avif', 20]]);
+  const next = m([['Aileen_default', 'bbb', 'avif', 20]]);
+  const plan = planPictures(assets, cur, next);
+  assert.deepEqual(plan.drop, ['Aileen']);
+  assert.equal(plan.get.length, 0);
+  assert.deepEqual(dropAssets(assets, plan.drop).map((r) => r[0]), ['Aileen_default', 'MyOwn']);
+  assert.deepEqual(planPictures(assets, cur, null).drop, []);
 });

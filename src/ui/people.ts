@@ -243,19 +243,20 @@ const when = (iso: string) => {
   return `${p(d.getMonth() + 1)}.${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}`;
 };
 
-function diagTable(ctx: ChatContext, keepRaw: boolean): string {
+/** 진단 묶음의 두 줄: 「모든 채팅 보기」 토글과 기록 표(또는 안내). 설정 줄 모양으로 넣으려고 나눠 돌려준다 (2026-11-05 사용자: 진단 구조 지저분) */
+function diagTable(ctx: ChatContext, keepRaw: boolean): { toggle: string; body: string } {
   const list = peopleUi.diag;
   if (list === null) {
     void loadDiag().then((d) => {
       peopleUi.diag = d;
       safeRender();
     });
-    return '<p class="ps-note">진단을 읽는 중…</p>';
+    return { toggle: '', body: '<p class="ps-note">진단을 읽는 중…</p>' };
   }
   const here = chatId(ctx);
   const mine = (peopleUi.diagAll ? list : list.filter((r) => r.chat === here)).slice(-40).reverse();
-  const toggle = `<label class="pp-check"><input type="checkbox" data-change="pp-diag-all" ${peopleUi.diagAll ? 'checked' : ''}> 모든 채팅 보기 (${list.length}건 중 이 채팅 ${list.filter((r) => r.chat === here).length}건)</label>`;
-  if (!mine.length) return `${toggle}<p class="ps-note">${peopleUi.diagAll ? '아직 갱신 기록이 없어요.' : '이 채팅의 갱신 기록이 아직 없어요.'}</p>`;
+  const toggle = `<label class="pp-check"><input type="checkbox" data-change="pp-diag-all" ${peopleUi.diagAll ? 'checked' : ''}> 전부 ${list.length}건 중 이 채팅 ${list.filter((r) => r.chat === here).length}건</label>`;
+  if (!mine.length) return { toggle, body: `<p class="ps-note">${peopleUi.diagAll ? '아직 갱신 기록이 없어요.' : '이 채팅의 갱신 기록이 아직 없어요.'}</p>` };
   const rows = mine.map((r) => {
     const id = `${r.at}|${r.indexes.join(',')}`;
     const open = peopleUi.diagOpen.has(id);
@@ -289,7 +290,7 @@ function diagTable(ctx: ChatContext, keepRaw: boolean): string {
         <span class="pp-diag-sub">${esc(sizes)} · 출력 ${n(r.outChars)}자 · ${n(r.ms)}ms · ${r.model === 'main' ? '메인' : '보조'} · ${esc(r.reason)}</span>
       </button>${detail}</li>`;
   });
-  return `${toggle}<ul class="pp-diags">${rows.join('')}</ul>`;
+  return { toggle, body: `<ul class="pp-diags">${rows.join('')}</ul>` };
 }
 
 function prettyJson(s: string): string {
@@ -331,23 +332,24 @@ export function peopleSettingsPane(ctx: ChatContext, canChat = true): string {
   const main = [
     row('인물 기록', onoff('on'), '끄면 응답을 읽지 않고, 본편에도 기록을 넣지 않아요. 메인 설정 「상황판 → 인물 기록」과 같은 값이에요.'),
     row('갱신 시점', seg('when', s.when, [['turn', '매 턴'], ['manual', '수동']]), '수동이면 인물 화면의 「새 응답 읽기」를 눌렀을 때만 읽어요.'),
-    row('갱신 모델', seg('model', s.model, [['aux', '보조'], ['main', '메인']])),
+    row('갱신 모델', seg('model', s.model, [['aux', '보조'], ['main', '메인']]), '응답을 읽고 기록을 쓸 모델이에요. 보조 = Risu의 보조 모델(싸고 빠름), 메인 = 본편과 같은 모델'),
     row('지침', seg('prompt', s.prompt, [['detailed', '자세히'], ['compact', '간결']]), '자세히 = 리수폿 원문 규칙+설명. 간결 = 같은 규칙·설명 축약, 토큰 약 1/3.'),
     row('기록 언어', seg('lang', s.lang, [['ko', '한국어'], ['en', '영어']]), '기록 본문(항목·이유·메모)을 쓰는 언어. 이름·인용·호칭은 늘 원문. 영어는 같은 내용이면 토큰이 절반쯤이고, 위키 화면에도 영어로 보여요.'),
     row('본편에 넣기', seg('inject', s.inject, [['split', '절 단위 혼합'], ['append', '시트 전체+기록'], ['record', '기록만'], ['off', '안 넣음']]), '절 단위 혼합: 시트의 Identity·Character 절은 기록으로 대신하고 나머지 절은 원문 그대로.'),
     row('Director', seg('director', s.director, [['off', 'OFF'], ['facts', '사실형(뒤)'], ['scene', '연출형(앞)']]), '사실형은 갱신기에 얹어 다음 턴 메모를 남기고, 연출형은 본편 요청 앞에 짧은 지시를 한 번 더 만들어요.'),
-    row('호감 변화 속도', seg('speed', String(s.speed), [['0.5', '0.5'], ['1', '1'], ['1.5', '1.5'], ['2', '2']])),
+    row('호감 변화 속도', seg('speed', String(s.speed), [['0.5', '0.5'], ['1', '1'], ['1.5', '1.5'], ['2', '2']]), '호감 계기 점수에 곱하는 배율이에요. 2면 두 배로 빨리 오르내려요'),
     row('메시지당 변화 상한', `<label class="st-range pp-range"><input type="range" min="0" max="100" step="1" value="${s.turnCap}" data-input="pp-cap" data-change="pp-cap" aria-label="메시지당 변화 상한"><output>${s.turnCap === 0 ? '한도 없음' : `±${s.turnCap}`}</output></label>`, '메시지 하나(필드는 장면 하나)에서 호감·세력 평판이 움직일 수 있는 최대. 0이면 한도 없음. 중대위반(−50)은 늘 한도 밖. 리수폿 기본 ±10.'),
   ].join('');
-  const features = FEATURES.map((f) => row(FEATURE_HELP[f][0], onoff(f), FEATURE_HELP[f][1])).join('');
+  // 세력 평판은 설정 「기록 → 세력」 페이지로 (2026-11-05 사용자)
+  const features = FEATURES.filter((f) => f !== 'faction_rep').map((f) => row(FEATURE_HELP[f][0], onoff(f), FEATURE_HELP[f][1])).join('');
   const newPeople = [
     row('새 인물', seg('newpeople', s.newPeople, [['auto', '자동'], ['confirm', '확인 뒤 등록']]), '확인 뒤 등록이면 인물 화면의 「등록 대기」에서 고를 때까지 기록을 만들지 않아요.'),
     row('2턴 규칙', onoff('twoturn'), '한 번만 나온 이름은 등록하지 않아요.'),
   ].join('');
   const director = s.director !== 'off'
     ? fold('pp-director', 'Director 세부', [
-        row('언어', seg('director_lang', s.directorLang, [['en', '영어'], ['ko', '한국어']])),
-        row('길이', seg('director_len', s.directorLen, [['short', '짧게'], ['normal', '보통']])),
+        row('언어', seg('director_lang', s.directorLang, [['en', '영어'], ['ko', '한국어']]), 'Director 메모를 쓰는 언어예요. 영어가 토큰이 적어요'),
+        row('길이', seg('director_len', s.directorLen, [['short', '짧게'], ['normal', '보통']]), 'Director 메모의 길이예요'),
         s.director === 'scene' ? row('시간 제한', seg('director_timeout', String(s.directorTimeout), [['10', '10초'], ['20', '20초'], ['40', '40초']]), '넘기면 이번 턴은 지시 없이 보내요.') : '',
         row('재사용', onoff('director_reuse'), '장면이 그대로면 지난 지시를 다시 써요.'),
       ].join(''))
@@ -362,25 +364,24 @@ export function peopleSettingsPane(ctx: ChatContext, canChat = true): string {
     row('인물당 저장 상한', seg('person_cap', String(s.personCap), [['5000', '5,000'], ['10000', '10,000'], ['20000', '20,000']]), '한 인물의 살아 있는 기록 글자 수. 넘으면 정리로 합쳐요 (항목 수 상한은 없어요). 리수폿의 절별 상한 합계가 약 10,000자예요.'),
     row('본편 기록 예산', seg('block_cap', String(s.blockCap), [['8000', '8,000'], ['16000', '16,000'], ['32000', '32,000']]), '본편 요청에 넣는 기록 블록 전체 글자 수. 장면 인물 수로 나눠 배분하고, 넘치는 인물은 지난 일부터 빼요. 리수폿 Director 참고 상한이 16,000자예요.'),
     row('정리', seg('tidy', s.tidy, [['same', '같은 호출에 얹기'], ['separate', '별도 호출']]), '저장 상한을 넘긴 인물을 합치는 방법. 같은 호출 = 그 턴의 갱신 요청에 「합쳐라」를 얹음(추가 호출 없음). 별도 = 갱신 뒤 그 인물만 정리 호출 1회.'),
-    ...(s.features.has('faction_rep') ? [
-      row('세력 평판 본편 주입', onoff('faction_inject'), '장면에 나온 세력 가운데 중립이 아닌 것만 한 줄씩 본편 요청에 넣어요.'),
-      row('세력 구간 경계', `<input class="gx-search ph-pct pp-bounds" data-change="pp-bounds" name="pp-bounds" value="${esc(v('faction_bounds'))}" placeholder="61,21,-20,-60" maxlength="24" aria-label="세력 구간 경계">`, '우호·호의·중립·경계 하한 네 수(내림차순). 그 아래는 적대. 필드 몹 반응도 같은 구간을 써요. 기본 61,21,-20,-60.'),
-      row('몹 목격 무게', seg('mob_weight', s.mobWeight, [['half', '절반'], ['full', '같음'], ['off', '안 씀']]), '필드에서 이름 없는 몹이 본 일을 세력 계기로 넣을 때의 무게. 절반은 소수점을 버려서 작은 일(작은친절 +1)은 안 쌓여요. 명단 인물이 본 일은 늘 원래 값.'),
-    ] : []),
     row('응답 접기 상한', seg('span_cap', String(s.spanCap), [['12000', '12,000'], ['20000', '20,000'], ['40000', '40,000']]), '한 번에 읽는 구간 글자 수. 넘으면 중간을 접어요.'),
     row('다른 보조 호출과 병렬', onoff('parallel'), '끄면 이미지·괴담톡 같은 다른 보조 호출 앞에 차례로 돌아요.'),
     row('원문 보관', onoff('keep_raw'), '진단에 보낸 프롬프트·응답 원문을 남겨요 (이 기기 플러그인 저장소).'),
   ].join(''));
-  const diag = `<section class="ps-group"><h3>진단</h3><p class="ps-note">최근 갱신의 입력 크기·결과·실패 이유예요 (이 기기 플러그인 저장소, 성공 10건·실패 30건까지 두고 오래된 것부터 지워요). 토큰은 한글 1자≈1, 그 외 0.3으로 어림했어요.</p>
-    ${updateBar(ctx, canChat)}
-    ${diagTable(ctx, s.keepRaw)}
-    <div class="gx-row-btns"><button class="gx-mini danger" data-action="pp-diag-clear" ${peopleUi.diag?.length ? '' : 'disabled'}>진단 지우기</button></div></section>`;
+  // 진단 묶음도 다른 묶음처럼 줄(이름 + 조작 + 설명)로 (2026-11-05 사용자)
+  const dg = diagTable(ctx, s.keepRaw);
+  const diag = group('진단', [
+    row('새 응답 읽기', updateBar(ctx, canChat), '마지막으로 읽은 응답 뒤의 새 응답을 지금 읽어요. 그 앞에 안 읽은 응답이 있으면 범위를 골라 읽을 수 있어요.'),
+    dg.toggle ? row('모든 채팅 보기', dg.toggle, '끄면 이 채팅의 갱신 기록만 보여요.') : '',
+    `<div class="ps-row wide"><div class="ps-label"><b>갱신 기록</b><small>${esc('최근 갱신의 입력 크기·결과·실패 이유예요. 이 기기 플러그인 저장소에 성공 10건·실패 30건까지 두고 오래된 것부터 지워요. 토큰은 한글 1자=1, 그 외 0.3으로 어림했어요.')}</small></div><div class="ps-ctl">${dg.body}</div></div>`,
+    row('진단 지우기', `<button class="gx-mini danger" data-action="pp-diag-clear" ${peopleUi.diag?.length ? '' : 'disabled'}>진단 지우기</button>`, '이 기기에 저장된 갱신 기록을 모두 지워요.'),
+  ].join(''));
   return `<div class="ph-form pp-set">
-    <header class="ph-room-head"><button class="ph-tool ph-back" data-action="set-feat-back" aria-label="설정으로">${ICONS.back}</button><div class="ph-room-title"><b>인물 기록 설정</b><small>${canChat ? '이 채팅' : '이 채팅 · 시작 전'}</small></div><span class="ph-act">${defaultsButtons('pp')}</span></header>${defaultsConfirm('pp')}
+    <header class="ph-room-head"><button class="ph-tool ph-back" data-action="set-feat-back" aria-label="설정으로">${ICONS.back}</button><div class="ph-room-title"><b>인물 설정</b><small>${canChat ? '이 채팅' : '이 채팅 · 시작 전'}</small></div><span class="ph-act">${defaultsButtons('pp')}</span></header>${defaultsConfirm('pp')}
     ${peopleUi.notice ? `<div class="gx-err" role="alert">${esc(peopleUi.notice)}</div>` : ''}
     <div class="ph-form-body ps">
       ${intro}
-      ${group('인물 기록', main)}
+      ${group('인물', main)}
       ${fold('pp-feat', '기능', features)}
       ${fold('pp-new', '새 인물', newPeople)}
       ${director}
@@ -388,6 +389,30 @@ export function peopleSettingsPane(ctx: ChatContext, canChat = true): string {
       ${advanced}
       ${diag}
     </div>
+    ${toast('pp', peopleUi.info, (t) => {
+      if (peopleUi.info === t) peopleUi.info = '';
+    })}
+  </div>`;
+}
+
+/** 설정 「기록 → 세력」: 세력 평판 켬·끔과 그 세부 (인물 설정에서 뺀 것, 2026-11-05 사용자) */
+export function peopleFactionPane(ctx: ChatContext, canChat = true): string {
+  const state = ctx.chat.scriptstate;
+  const v = (k: string) => ppValue(state, k);
+  const s = peopleSettings(state);
+  const onoff = (k: string) => seg(k, v(k) === '1' ? '1' : '0', [['1', 'ON'], ['0', 'OFF']]);
+  const rows = [
+    row(FEATURE_HELP.faction_rep[0], onoff('faction_rep'), `${FEATURE_HELP.faction_rep[1]} 인물 기록 갱신기가 같은 호출에서 매겨요(인물 기록이 켜져 있어야 해요).`),
+    ...(s.features.has('faction_rep') ? [
+      row('세력 평판 본편 주입', onoff('faction_inject'), '장면에 나온 세력 가운데 중립이 아닌 것만 한 줄씩 본편 요청에 넣어요.'),
+      row('세력 구간 경계', `<input class="gx-search ph-pct pp-bounds" data-change="pp-bounds" name="pp-bounds" value="${esc(v('faction_bounds'))}" placeholder="61,21,-20,-60" maxlength="24" aria-label="세력 구간 경계">`, '우호·호의·중립·경계 하한 네 수(내림차순). 그 아래는 적대. 필드 몹 반응도 같은 구간을 써요. 기본 61,21,-20,-60.'),
+      row('몹 목격 무게', seg('mob_weight', s.mobWeight, [['half', '절반'], ['full', '같음'], ['off', '안 씀']]), '필드에서 이름 없는 몹이 본 일을 세력 계기로 넣을 때의 무게. 절반은 소수점을 버려서 작은 일(작은친절 +1)은 안 쌓여요. 명단 인물이 본 일은 늘 원래 값.'),
+    ] : []),
+  ].join('');
+  return `<div class="ph-form pp-set">
+    <header class="ph-room-head"><button class="ph-tool ph-back" data-action="set-feat-back" aria-label="설정으로">${ICONS.back}</button><div class="ph-room-title"><b>세력 설정</b><small>${canChat ? '이 채팅' : '이 채팅 · 시작 전'}</small></div></header>
+    ${peopleUi.notice ? `<div class="gx-err" role="alert">${esc(peopleUi.notice)}</div>` : ''}
+    <div class="ph-form-body ps">${group('세력', rows)}</div>
     ${toast('pp', peopleUi.info, (t) => {
       if (peopleUi.info === t) peopleUi.info = '';
     })}

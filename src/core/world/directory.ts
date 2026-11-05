@@ -6,6 +6,7 @@
 import { BUILTIN, extraFactions, extraNames, extraTabId, extraTabs, type FactionSpec, pickSpec } from '../factions';
 import { DIRECTORY_COMMENT, directoryEntries, isDirectory, LEGACY_DATA, parseSeedManifest } from '../lorebooks';
 import { agentShared, orgShared } from '../sharedpics';
+import { pickScenes, type ScenesData } from '../scenes';
 import type { LoreEntry } from '../types';
 
 export { DIRECTORY_COMMENT } from '../lorebooks';
@@ -134,6 +135,24 @@ export interface Directory {
   seeds: Record<string, string[]>;
   /** 📎부록 폴더 항목 */
   appendices: AppendixRow[];
+  /** 시작 묶음 (조직 아님, 2026-11-05) */
+  startGroups: GroupRow[];
+  /** 시작 화면 칸 순서 (코드) */
+  startOrder: string[];
+  /** 첫 장면 (세력 공용 장면 덧쓰기·새 장면, 인물별 장면). 기본값은 세계 자료 팩 (core/scenes.ts) */
+  scenes: ScenesData;
+}
+
+/** 명부 저장값의 시작 묶음 줄 (core/factions.ts 도 같은 모양을 읽는다) */
+export function groupRows(saved: unknown): GroupRow[] {
+  const out: GroupRow[] = [];
+  for (const [name, raw] of Object.entries(obj(saved))) {
+    const d = obj(raw);
+    const code = s(d.code);
+    if (!s(name) || !/^[A-Z]00$/.test(code) || out.some((g) => g.code === code)) continue;
+    out.push({ name: s(name), code, blurb: s(d.blurb), english: s(d.english), hidden: d.hidden === true, ...(s(d.photo) ? { photo: s(d.photo) } : {}), ...(s(d.face) ? { face: s(d.face) } : {}), ...(s(d.crop) ? { crop: s(d.crop) } : {}) });
+  }
+  return out;
 }
 
 export interface PhoneTabData {
@@ -184,6 +203,26 @@ export interface BaseData {
   y: number;
   show?: boolean;
 }
+/** 시작 묶음 (조직 아님): 시작 화면 칸 하나. 인물은 요원의 roster_for 에 이 코드를 켜서 넣는다 */
+export interface GroupData {
+  code: string;
+  blurb?: string;
+  photo?: string;
+  face?: string;
+  crop?: string;
+  english?: string;
+  hidden?: boolean;
+}
+export interface GroupRow {
+  name: string;
+  code: string;
+  blurb: string;
+  photo?: string;
+  face?: string;
+  crop?: string;
+  english: string;
+  hidden: boolean;
+}
 export interface AppendixData {
   parent?: string;
   keys?: boolean;
@@ -196,6 +235,8 @@ export interface AppendixData {
 }
 export interface DirectoryData {
   schema: number;
+  /** 요원 목록 기본값 판 (2 = 2026-11-05: 민간인·프리랜서·그 밖 조직은 목록에 안 보임). 없거나 낮으면 읽을 때 한 번 옮긴다 */
+  roster_v?: number;
   refill?: number;
   괴이?: Record<string, PlaceData>;
   '미스틱 사이트'?: Record<string, PlaceData>;
@@ -206,7 +247,13 @@ export interface DirectoryData {
   '괴담톡 탭'?: PhoneTabsData;
   '시작 로어북'?: Record<string, string[]>;
   부록?: Record<string, AppendixData>;
-  /** 새 세력에 준 적 있는 코드 */
+  /** 시작 묶음 (이름 → 값). 2026-11-05 */
+  '시작 묶음'?: Record<string, GroupData>;
+  /** 시작 화면 칸 순서 (코드). 빠진 칸은 기본 순서로 뒤에 */
+  '시작 화면'?: { order?: string[] };
+  /** 첫 장면 저장값 (core/scenes.ts ScenesData). 2026-11-05 */
+  '첫 장면'?: ScenesData;
+  /** 새 세력·묶음에 준 적 있는 코드 */
   codes_used?: string[];
   /** 세계 데이터 덧쓰기 (core/world/records.ts WorldOverrides): 기본 세계 기록을 칸 단위로 덮거나 지우거나 더한 것 */
   세계?: Record<string, unknown>;
@@ -238,9 +285,61 @@ export function readDirectoryData(lore: LoreEntry[]): DirectoryData | null {
   if (dataCache.has(lore)) return dataCache.get(lore)!;
   const parts = directoryEntries(lore).filter((e) => typeof e.content === 'string' && e.content.trim());
   const d = obj(parts.length ? parse(parts.map((e) => e.content).join('\n')) : null);
-  const out = d.schema === DIRECTORY_SCHEMA ? (d as unknown as DirectoryData) : null;
+  const out = d.schema === DIRECTORY_SCHEMA ? migrateRoster(d as unknown as DirectoryData) : null;
   dataCache.set(lore, out);
   return out;
+}
+
+export const ROSTER_V = 3;
+
+/** 시작 묶음 「중립」의 기본 인물 (2026-11-05 사용자): 세력 없는 인물로 플레이하는 칸 */
+export const NEUTRAL_GROUP = '중립';
+export const NEUTRAL_IDS = ['P043', 'P044', 'P045', 'P046', 'P047', 'P048', 'P049', 'P050', 'P051', 'P052', 'P053', 'P054', 'P055'];
+export const NEUTRAL_BLURB = '어느 조직에도 속하지 않은 사람들. 교황청 수녀, 이슬람 성전사, 마녀, 흡혈귀, 중림 상인, 그리고 사람이 아닌 것까지.';
+
+/** 판 3: 시작 묶음 「중립」이 없으면 만들고(다음 코드), 기본 인물 13명의 roster_for 에 그 코드를 켠다 */
+function migrateNeutral(d: DirectoryData): void {
+  const groups = (d['시작 묶음'] ??= {});
+  const used = new Set<string>([...(d.codes_used ?? []), ...Object.values(d.조직 ?? {}).map((o) => s(o.code)), ...Object.values(groups).map((g) => s(g.code))]);
+  let code = Object.values(groups).find((g) => s(g.code))?.code;
+  const has = Object.keys(groups).includes(NEUTRAL_GROUP);
+  if (!has) {
+    code = '';
+    for (let c = 'F'.charCodeAt(0); c <= 'Z'.charCodeAt(0); c++) {
+      const want = `${String.fromCharCode(c)}00`;
+      if (!used.has(want)) {
+        code = want;
+        break;
+      }
+    }
+    if (!code) return;
+    groups[NEUTRAL_GROUP] = { code, blurb: NEUTRAL_BLURB };
+    d.codes_used = [...new Set([...(d.codes_used ?? []), code])].sort();
+  } else code = s(groups[NEUTRAL_GROUP].code);
+  if (!code) return;
+  for (const row of Object.values(d.요원 ?? {})) {
+    const r = row as { id?: unknown; roster_for?: unknown };
+    if (!NEUTRAL_IDS.includes(s(r.id))) continue;
+    const list = Array.isArray(r.roster_for) ? (r.roster_for as unknown[]).map(s).filter(Boolean) : [];
+    if (!list.includes(code)) r.roster_for = [...list, code];
+  }
+}
+
+/** 옛 명부(roster_v 없음)는 조직·요원마다 roster_for 를 다 적어 두어서, 민간인·프리랜서 목록이 저장된 채로 남는다.
+ *  2026-11-05 사용자: 민간인·프리랜서 플레이에는 내 페르소나 말고 아무도 안 붙는다 → 한 번 D00·E00 을 전부 떼고 판을 올린다 */
+function migrateRoster(d: DirectoryData): DirectoryData {
+  const v = d.roster_v ?? 1;
+  if (v >= ROSTER_V) return d;
+  if (v < 2) {
+    const strip = (rows?: Record<string, { roster_for?: unknown }>) => {
+      for (const r of Object.values(rows ?? {})) if (Array.isArray(r.roster_for)) r.roster_for = r.roster_for.filter((f) => f !== 'D00' && f !== 'E00');
+    };
+    strip(d.조직);
+    strip(d.요원);
+  }
+  if (v < 3) migrateNeutral(d);
+  d.roster_v = ROSTER_V;
+  return d;
 }
 
 // ── 세력 호칭·괴담톡 탭·첫 턴 로어북 (명부, 없으면 옛 로어북) ──
@@ -565,13 +664,15 @@ function mode(values: string[][]): string[] | null {
   return best === null ? null : (JSON.parse(best) as string[]);
 }
 
+// 2026-11-05 사용자: 민간인·프리랜서 플레이에는 내 페르소나 말고 아무도 안 붙는다 — 민간인·프리랜서 소속과 그 밖의 조직(중립·기타)
+// 요원은 기본으로 요원 목록(시작 화면 주인공·임무 편성·요원 칸)에 들어가지 않는다. 명부에서 「요원 목록에 보일 세력」을 켜면 그때만
 function orgDefaults(code: string, tabs: TabInfo[]): { rosterFor: string[]; phoneTabs: string[] } {
   if (code) {
     const own = tabs.find((t) => t.id.startsWith('T') && t.visibleFor.length === 1 && t.visibleFor[0] === code);
-    return { rosterFor: code === 'D00' || code === 'E00' ? ['D00', 'E00'] : [code], phoneTabs: own ? [own.id] : [] };
+    return { rosterFor: code === 'D00' || code === 'E00' ? [] : [code], phoneTabs: own ? [own.id] : [] };
   }
   const open = tabs.find((t) => t.id.startsWith('T') && FACTIONS.every((f) => t.visibleFor.includes(f)));
-  return { rosterFor: ['D00', 'E00'], phoneTabs: open ? [open.id] : [] };
+  return { rosterFor: [], phoneTabs: open ? [open.id] : [] };
 }
 
 // 조직 영문명 기본값 (📜Faction·조직 로어북에 쓰인 영어 이름). 사진은 host/assets.ts mainPic·facePic
@@ -829,6 +930,9 @@ export function readDirectory(lore: LoreEntry[] | undefined): Directory {
     phoneTabs: phoneTabsSection(books),
     seeds: seedSection(books),
     appendices: buildAppendices(books, data),
+    startGroups: groupRows(data?.['시작 묶음']),
+    startOrder: list(data?.['시작 화면']?.order),
+    scenes: pickScenes(data?.['첫 장면']),
   };
   cache.set(books, dir);
   return dir;
@@ -853,9 +957,9 @@ export function rosterOf(dir: Directory): Record<string, unknown>[] {
 /** 지금 명부 전체를 저장 형식으로 (창에서 고친 값 포함) */
 export function directoryData(dir: Directory): DirectoryData {
   const place = (p: PlaceRow): PlaceData => ({ preset: p.preset, label: p.label, english: p.english, aliases: p.aliases, ...(p.photo ? { photo: p.photo } : {}), ...(p.face ? { face: p.face } : {}), ...(p.crop ? { crop: p.crop } : {}) });
-  const out: DirectoryData = { schema: DIRECTORY_SCHEMA, refill: dir.refill, 괴이: {}, '미스틱 사이트': {}, 요원: {}, 조직: {} };
+  const out: DirectoryData = { schema: DIRECTORY_SCHEMA, roster_v: ROSTER_V, refill: dir.refill, 괴이: {}, '미스틱 사이트': {}, 요원: {}, 조직: {} };
   for (const o of dir.orgs) out.조직![o.name] = { roster_for: o.rosterFor, phone_tabs: o.phoneTabs, ...cleanSpec(o.spec) };
-  const used = [...new Set([...dir.usedCodes, ...dir.orgs.map((o) => (o.faction ? '' : o.spec.code ?? ''))])].filter((c) => c && !BUILTIN.includes(c)).sort();
+  const used = [...new Set([...dir.usedCodes, ...dir.orgs.map((o) => (o.faction ? '' : o.spec.code ?? '')), ...dir.startGroups.map((g) => g.code)])].filter((c) => c && !BUILTIN.includes(c)).sort();
   if (used.length) out.codes_used = used;
   out.거점 = {};
   for (const b of dir.bases) {
@@ -872,6 +976,22 @@ export function directoryData(dir: Directory): DirectoryData {
   if (dir.phoneTabs.tabs.length) out['괴담톡 탭'] = dir.phoneTabs;
   if (Object.keys(dir.seeds).length) out['시작 로어북'] = dir.seeds;
   if (dir.appendices.length) out.부록 = Object.fromEntries(dir.appendices.map((r) => [r.lore, appendixData(r)]));
+  if (dir.startGroups.length) {
+    out['시작 묶음'] = {};
+    for (const g of dir.startGroups) {
+      const gd: GroupData = { code: g.code };
+      if (g.blurb) gd.blurb = g.blurb;
+      if (g.english) gd.english = g.english;
+      if (g.photo) gd.photo = g.photo;
+      if (g.face) gd.face = g.face;
+      if (g.crop) gd.crop = g.crop;
+      if (g.hidden) gd.hidden = true;
+      out['시작 묶음'][g.name] = gd;
+    }
+  }
+  if (dir.startOrder.length) out['시작 화면'] = { order: [...dir.startOrder] };
+  const scenes = pickScenes(dir.scenes);
+  if (Object.keys(scenes).length) out['첫 장면'] = scenes;
   for (const p of dir.anomalies) out.괴이![p.lore] = place(p);
   for (const p of dir.sites) out['미스틱 사이트']![p.lore] = place(p);
   for (const a of dir.agents) {
@@ -905,7 +1025,7 @@ const HELP =
 
 export function directoryContent(data: DirectoryData): string {
   const world = data.세계 && typeof data.세계 === 'object' && Object.keys(data.세계).length ? { 세계: data.세계 } : {};
-  return JSON.stringify({ schema: data.schema, _help: HELP, refill: data.refill, 괴이: data.괴이, '미스틱 사이트': data['미스틱 사이트'], 요원: data.요원, 조직: data.조직, ...(data.거점 ? { 거점: data.거점 } : {}), ...(data.호칭 ? { 호칭: data.호칭 } : {}), ...(data['괴담톡 탭'] ? { '괴담톡 탭': data['괴담톡 탭'] } : {}), ...(data['시작 로어북'] ? { '시작 로어북': data['시작 로어북'] } : {}), ...(data.부록 && Object.keys(data.부록).length ? { 부록: data.부록 } : {}), ...(data.codes_used?.length ? { codes_used: data.codes_used } : {}), ...world }, null, 1);
+  return JSON.stringify({ schema: data.schema, roster_v: data.roster_v ?? ROSTER_V, _help: HELP, refill: data.refill, 괴이: data.괴이, '미스틱 사이트': data['미스틱 사이트'], 요원: data.요원, 조직: data.조직, ...(data.거점 ? { 거점: data.거점 } : {}), ...(data.호칭 ? { 호칭: data.호칭 } : {}), ...(data['괴담톡 탭'] ? { '괴담톡 탭': data['괴담톡 탭'] } : {}), ...(data['시작 로어북'] ? { '시작 로어북': data['시작 로어북'] } : {}), ...(data.부록 && Object.keys(data.부록).length ? { 부록: data.부록 } : {}), ...(data['시작 묶음'] && Object.keys(data['시작 묶음']).length ? { '시작 묶음': data['시작 묶음'] } : {}), ...(data['시작 화면']?.order?.length ? { '시작 화면': data['시작 화면'] } : {}), ...(data['첫 장면'] && Object.keys(data['첫 장면']).length ? { '첫 장면': data['첫 장면'] } : {}), ...(data.codes_used?.length ? { codes_used: data.codes_used } : {}), ...world }, null, 1);
 }
 
 /** 로어북 목록에 명부를 넣거나 바꾼 새 목록 (원래 목록은 그대로). 설정 폴더가 있으면 그 안에 둔다 */

@@ -175,7 +175,8 @@ export function hasWorldTags(text: string): boolean {
   return /\[(?:AN|IN|MS|AG)\s*\||\[AC\s*\|/.test(text);
 }
 
-const AGE_META = /\{\s*\d+\s*시간\s+\d+\s*분\s*전\s*\}/;
+// {N시간 N분 전} 경과 표시와 {유지 기한 MM.DD HH:MM} 기한 표시 (둘 다 플러그인이 요청에 붙이는 메타, 모델이 따라 적으면 지운다)
+const AGE_META = /\{\s*(?:\d+\s*시간\s+\d+\s*분\s*전|유지\s*기한[^}]*)\s*\}/;
 const MARKERS = ['USER 관여 상태', 'RP 시간 제한', 'USER 관여 상태 규칙', 'USER 탐험 상태 규칙', '탐험 추적', '자동 종료'];
 
 /**

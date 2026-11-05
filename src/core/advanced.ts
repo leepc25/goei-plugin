@@ -51,9 +51,9 @@ export const ADV: Record<AdvFeature, AdvGroup[]> = {
       ],
     },
     {
-      title: '로어북',
+      title: '로어북 호출',
       items: [
-        { key: 'lore_mode', label: '로어북 보내기', type: 'pick', def: 'plugin', opts: [['plugin', '플러그인이 고름'], ['risu', 'Risu가 직접']], hint: '세력·특수·괴이·요원 로어북을 누가 켤지 정해요. Risu가 직접 켜면 낱말 속 글자에도 걸려요' },
+        { key: 'lore_mode', label: '로어북 보내기', type: 'pick', def: 'plugin', opts: [['plugin', '플러그인이 고름'], ['risu', 'Risu가 직접']], hint: '세력·특수·괴이·요원 로어북을 요청에 넣을지 누가 정할지예요. 「플러그인이 고름」은 최근 대화에 호출 단어가 나온 것·상태창 목표·부록 조건으로 플러그인이 고르고, 「Risu가 직접」은 Risu 로어북 기능이 고르는데 낱말 속 글자에도 걸려요' },
       ],
     },
   ],

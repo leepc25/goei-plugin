@@ -23,7 +23,7 @@ export function balanceText(ctx: ChatContext): string {
   return formatWon(walletBalance(walletOf(ctx), aliveAnchors(ctx.chat)));
 }
 
-/** 모바일 머리 잔고 단추 → 기록 › 가계부 (가계부 화면 안에서는 숨김: 잔고가 화면에 크게 있고, 좁은 머리에서 제목이 밀림) */
+/** 모바일 머리 잔고 단추 → 기록 › 가계부. 어느 화면에서든 그대로 둔다 (2026-11-05 사용자: 위 단추줄은 어떤 상황에서도 유지) */
 export function walletHeadButton(ctx: ChatContext, here = false): string {
   if (!walletOn(ctx) || here) return '';
   return `<button class="gx-hwallet" data-action="tab" data-value="wallet" aria-label="가계부 · 잔고 ${esc(balanceText(ctx))}">${esc(balanceText(ctx))}</button>`;
@@ -50,7 +50,6 @@ function dayLabel(date: string): string {
   const d = new Date(Date.UTC(+m[1], +m[2] - 1, +m[3]));
   return `${m[1]}.${m[2].padStart(2, '0')}.${m[3].padStart(2, '0')} (${WEEK[d.getUTCDay()]})`;
 }
-const shortDay = (date: string) => /\d{4}\D+(\d{1,2})\D+(\d{1,2})/.exec(date)?.slice(1).map((x) => x.padStart(2, '0')).join('.') ?? '';
 
 interface Row { e: WalletEntry; after: number; date: string }
 
@@ -87,7 +86,7 @@ export function walletList(ctx: ChatContext): string {
     .filter(({ e }) => (walletUi.filter === 'in' ? e.amount > 0 : walletUi.filter === 'out' ? e.amount < 0 : true))
     .filter(({ e }) => !q || `${e.memo} ${e.quote ?? ''} ${e.place ?? ''}`.toLowerCase().includes(q))
     .reverse();
-  if (!shown.length) return `<p class="gx-wt-empty">${rows.length ? '맞는 거래가 없어요.' : '아직 거래가 없어요. 본문에 금액이 적힌 거래나 필드에서 사고판 것이 여기에 쌓여요.'}</p>`;
+  if (!shown.length) return `<p class="gx-wt-empty">${rows.length ? '맞는 거래가 없어요.' : '아직 거래가 없어요. 본문에 금액이 적힌 거래가 여기에 쌓여요.'}</p>`;
   const groups: { date: string; rows: Row[] }[] = [];
   for (const r of shown) {
     const g = groups[groups.length - 1];
@@ -140,12 +139,12 @@ export function walletPane(ctx: ChatContext): string {
     : '';
   return `<div class="gx-wallettab">
     <section class="gx-mon gx-wt-tiles">
-      <div class="gx-mon-osd"><span><span class="gx-mon-tag live"><i></i>LEDGER</span><span class="gx-mon-title">가계부</span></span>${today ? `<span>${esc(today)}</span>` : ''}</div>
+      <div class="gx-mon-osd"><span><span class="gx-mon-tag live"><i></i>가계부</span></span>${today ? `<span>${esc(today)}</span>` : ''}</div>
       <div class="gx-mon-cells">
-        <div class="gx-mon-cell gx-wt-tile bal"><small>BALANCE · 잔고</small><div class="gx-wt-balrow"><b class="mint">${esc(formatWon(balance))}</b>${editable ? `<button class="gx-wt-pen" data-action="wallet-edit" aria-label="잔고 고치기" title="잔고 고치기">${ICONS.pen}</button>` : ''}</div>${edit}<span>시작 ${esc(formatWon(start))} · 거래 ${rows.length}건</span></div>
-        <div class="gx-mon-cell gx-wt-tile"><small>INCOME · 수입</small><b class="mint">+${esc(income.toLocaleString('en-US'))}</b><span>${inN}건</span></div>
-        <div class="gx-mon-cell gx-wt-tile"><small>SPEND · 지출</small><b class="red">${spend ? `−${esc(Math.abs(spend).toLocaleString('en-US'))}` : '0'}</b><span>${outN}건</span></div>
-        <div class="gx-mon-cell gx-wt-tile"><small>TODAY${today ? ` · ${esc(shortDay(today))}` : ''}</small><b class="${todayNet < 0 ? 'red' : todayNet > 0 ? 'mint' : ''}">${esc(formatDelta(todayNet) || '0')}</b><span>${todayRows.length}건</span></div>
+        <div class="gx-mon-cell gx-wt-tile bal"><small>잔고</small><div class="gx-wt-balrow"><b class="mint">${esc(formatWon(balance))}</b>${editable ? `<button class="gx-wt-pen" data-action="wallet-edit" aria-label="잔고 고치기" title="잔고 고치기">${ICONS.pen}</button>` : ''}</div>${edit}<span>시작 ${esc(formatWon(start))} · 거래 ${rows.length}건</span></div>
+        <div class="gx-mon-cell gx-wt-tile"><small>수입</small><b class="mint">+${esc(income.toLocaleString('en-US'))}</b><span>${inN}건</span></div>
+        <div class="gx-mon-cell gx-wt-tile"><small>지출</small><b class="red">${spend ? `−${esc(Math.abs(spend).toLocaleString('en-US'))}` : '0'}</b><span>${outN}건</span></div>
+        <div class="gx-mon-cell gx-wt-tile"><small>오늘</small><b class="${todayNet < 0 ? 'red' : todayNet > 0 ? 'mint' : ''}">${esc(formatDelta(todayNet) || '0')}</b><span>${todayRows.length}건</span></div>
       </div>
     </section>
     ${walletUi.notice ? `<div class="gx-err" role="alert">${esc(walletUi.notice)}</div>` : ''}

@@ -157,7 +157,22 @@ export function aimMark(on: boolean, action: string, value: string, key = value)
   const fx = !aimHit.used && aimHit.key === key && aimHit.wasOn !== on;
   if (fx) aimHit.used = true;
   return `<button class="gx-aim${on ? ' on' : ''}${fx ? ' fx' : ''}" data-action="${action}" data-value="${esc(value)}" data-key="${esc(key)}" aria-pressed="${on}" title="${label}" aria-label="${label}">
-    <svg viewBox="0 0 100 100" aria-hidden="true"><circle class="burst" cx="50" cy="50" r="34"/><g class="rot"><circle class="orb" cx="50" cy="50" r="46"/><path class="tick" d="M50 2v5M50 93v5M2 50h5M93 50h5"/></g><circle class="ring" cx="50" cy="50" r="34"/><path class="arm" d="M50 14v14M50 72v14M14 50h14M72 50h14"/><path class="brk" d="M30 22h-8v8M70 22h8v8M30 78h-8v-8M70 78h8v-8"/><circle class="dot" cx="50" cy="50" r="1.6"/></svg></button>`;
+    <svg viewBox="0 0 100 100" aria-hidden="true"><circle class="burst" cx="50" cy="50" r="34"/><g class="rot"><circle class="orb" cx="50" cy="50" r="46"/><path class="tick" d="M50 2v5M50 93v5M2 50h5M93 50h5"/></g><circle class="ring" cx="50" cy="50" r="34"/><path class="arm" d="M50 14v14M50 72v14M14 50h14M72 50h14"/><path class="brk" d="M30 22h-8v8M70 22h8v8M30 78h-8v-8M70 78h8v-8"/><circle class="dot" cx="50" cy="50" r="1.6"/></svg><span class="gx-aim-l" aria-hidden="true">${label}</span></button>`;
+}
+
+/** 선택·해제 효과를 먼저 보여 주고(0.55초) 화면을 바꾼다 (2026-11-05 사용자: 누르자마자 닫히면 골랐는지 안 보인다).
+ *  지금 화면의 그 표식을 바로 뒤집어 잠금·해제 애니메이션을 돌리고 끝날 때까지 기다린다. 표식이 안 보이면 바로 돌아간다 */
+export async function aimFlash(key: string): Promise<void> {
+  const b = [...document.querySelectorAll<HTMLElement>('.gx-aim')].find((x) => x.dataset.key === key && x.getBoundingClientRect().width > 0);
+  if (!b || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const on = !b.classList.contains('on');
+  b.classList.toggle('on', on);
+  b.classList.add('fx');
+  b.setAttribute('aria-pressed', String(on));
+  const l = b.querySelector('.gx-aim-l');
+  if (l) l.textContent = on ? '해제' : '선택';
+  aimHit.used = true;
+  await new Promise((r) => setTimeout(r, 560));
 }
 
 /** 상세 창 (상황판·임무 탭 공통, 창 맨 위에 하나): 상황판 CCTV와 같은 화면·효과 (2026-10-21 사용자). 가로 600px, 세로는 상황판 CCTV 비율.
@@ -333,7 +348,7 @@ export function opsBoard(cards: OpsCard[], o: { mapUrl: string | null; clock: st
   const sel = cards.find((c) => c.id === opsUi.sel);
   const view = opsUi.mode === 'map' ? opsMap(cards, opsUi.sel, o.mapUrl, o.clock) : opsFeed(sel, o.clock, o.empty);
   const rows = cards.map((c) => opsRow(c, c.id === opsUi.sel)).join('');
-  // 목록 바닥 (2026-10-29 기록 메뉴): 종료 줄은 다음 응답에 빠지고, 전부는 기록 › 일지에
-  const foot = '<footer class="gx-oplog-foot"><small>종료 줄은 다음 응답에 빠져요.</small><button data-action="rec-journal">기록에서 전부 보기 ›</button></footer>';
+  // 목록 바닥: 기록 › 일지로 (2026-11-05 사용자: 안내 문구는 빼고 「기록 보기」만)
+  const foot = '<footer class="gx-oplog-foot"><button data-action="rec-journal">기록 보기 ›</button></footer>';
   return `<div class="gx-ops">${view}<section class="gx-oplog"><h2>${headSeg('ops-mode', opsUi.mode, [['feed', 'CCTV', ICONS.cctv], ['map', '위성 지도', ICONS.pin]])}<span class="gx-opcnt">${o.counts}</span></h2>${rows ? `<ul>${rows}</ul>` : `<p class="gx-none">${esc(o.empty)}</p>`}${foot}</section></div>`;
 }

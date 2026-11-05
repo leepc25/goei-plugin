@@ -66,6 +66,18 @@ export interface WorldData {
   site: Record<string, WorldRecord>;
   appendix: Record<string, WorldRecord>;
   relations: Relations;
+  /** 첫 장면 기본값 (scripts/data-pack.mjs scenesData). 세력 공용 장면(코드 → fm → 글)과 인물별 장면(요원 ID → 글). core/scenes.ts 가 읽는다 */
+  scenes?: ScenesDefaults;
+}
+
+export interface SceneDefault {
+  label?: string;
+  ko?: string;
+  en?: string;
+}
+export interface ScenesDefaults {
+  세력: Record<string, Record<string, SceneDefault>>;
+  인물: Record<string, SceneDefault>;
 }
 
 let data: WorldData | null = null;
@@ -76,8 +88,11 @@ export function setWorldData(d: WorldData): void {
     if (!d[k] || typeof d[k] !== 'object' || Array.isArray(d[k])) throw new Error(`세계 자료 형식이 달라요 (${k}).`);
   }
   if (!d.relations || typeof d.relations.pairs !== 'object' || typeof d.relations.common !== 'string') throw new Error('세계 자료 형식이 달라요 (relations).');
+  if (d.scenes && (typeof d.scenes !== 'object' || typeof d.scenes.세력 !== 'object' || typeof d.scenes.인물 !== 'object')) throw new Error('세계 자료 형식이 달라요 (scenes).');
   data = d;
 }
+/** 첫 장면 기본값. 팩에 없으면(옛 팩) 빈 값 */
+export const defaultScenes = (): ScenesDefaults => world().scenes ?? { 세력: {}, 인물: {} };
 /** 세계 자료가 들어왔나 (본체 부팅 순서 확인용) */
 export const worldDataReady = (): boolean => data !== null;
 

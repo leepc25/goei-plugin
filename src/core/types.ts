@@ -34,6 +34,9 @@ export interface Faction {
   tab?: string;
   /** 새 세력: 명부 조직 이름 */
   org?: string;
+  /** 시작 묶음 (2026-11-05 사용자 「중립」): 조직·세력이 아니라 시작 화면 칸일 뿐. 주인공은 묶음에 넣은 인물 중 하나이고 소속은 그 인물 원 소속.
+   *  세력 관계·📜Faction·[AC] 코드·괴담톡 전용 탭 어디에도 안 들어간다 */
+  group?: boolean;
 }
 
 export interface ScenarioData {

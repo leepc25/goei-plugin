@@ -2,7 +2,7 @@ import { clearUnsent, unsentShown } from './host/unsent';
 import { chatCardsAt, refreshStatusContext, renderStatus, setRecordsOpener, setWikiOpener } from './host/statusview';
 import { openingShown, refreshOpeningHint, setOpeningHint, setRepickOpener, wantsOpeningHint } from './host/openinghint';
 import { hasStatusTag } from './core/world';
-import { isUnsent, renderStartCards, renderUnsentMark, START_MARK, stripStartCard, stripUnsentMark, UNSENT_MARK } from './core/dispatch';
+import { isSceneMessage, isUnsent, renderStartCards, renderUnsentMark, SCENE_MARK, START_MARK, stripSceneMark, stripStartCard, stripUnsentMark, UNSENT_MARK } from './core/dispatch';
 import { readPersona, readUser, USER_MARK } from './host/user';
 import { hasSceneCard, renderSceneCards } from './core/dispatch';
 import { CONTEXT as GN_CONTEXT, GN_RAW, gnetSettings, mainContext, readGnet, userNick } from './core/gnet';
@@ -41,7 +41,7 @@ import { loadModuleAssets, modulePicker } from './host/assets';
 import { getPrefs } from './core/settings';
 import { openApp, openInstall, openRecords, openWiki } from './ui/app';
 import { isGoeiLore } from './core/install';
-import { loadStoredTokenizer, loadStoredWikiPack } from './host/install';
+import { dropOldGame, loadStoredTokenizer, loadStoredWikiPack } from './host/install';
 import { loadWorldData } from './host/datapack';
 import { showWorldDataPanel } from './host/datapanel';
 import { setInstalledHook } from './host/hooks';
@@ -57,7 +57,7 @@ import { buildImgPrompt, imgCharacters, imgPromptConfig, stripImgLore } from './
 import { withStatusBlock, type StatusShape } from './core/statusctx';
 import { colConfig, fillStatusSection, usedCols } from './core/world/statuscols';
 import { activeAnomalyNote } from './core/world/records';
-import { aliveAnchors, readWallet, walletBalance, WALLET_START_DEFAULT } from './core/wallet';
+import { aliveAnchors, readWallet, syncWalletToStatus, walletBalance, walletVars, WALLET_START_DEFAULT } from './core/wallet';
 import { withPeopleBlock, peopleBlockFor, insertBlock } from './core/people/request';
 import { peopleStore } from './core/people/store';
 import { peopleSettings } from './core/people/settings';
@@ -118,9 +118,9 @@ async function onBeforeRequest<M extends PromptMessage>(messages: M[], type: str
     setOpeningHint(null); // 첫 전송: 시작 메시지 안내는 이제 필요 없다
     // 지시문·전화 표식은 이 봇에만 있으니 판정과 상관없이 벗긴다 (없으면 그대로)
     messages = step('지시문·전화 풀기', () => unwrapCalls(unwrapScenes(messages).messages).messages, messages);
-    const marked = (t: unknown) => typeof t === 'string' && (t.includes(UNSENT_MARK) || t.includes(START_MARK));
+    const marked = (t: unknown) => typeof t === 'string' && (t.includes(UNSENT_MARK) || t.includes(START_MARK) || t.includes(SCENE_MARK));
     if (messages.some((m) => marked(m?.content))) {
-      messages = step('시작 카드 표식', () => messages.map((m) => (marked(m?.content) ? { ...m, content: stripStartCard(stripUnsentMark(m.content)) } : m)), messages);
+      messages = step('시작 카드 표식', () => messages.map((m) => (marked(m?.content) ? { ...m, content: stripSceneMark(stripStartCard(stripUnsentMark(m.content))) } : m)), messages);
     }
     // 오래된 메시지의 이미지 태그는 요청에서 뺀다 (원본 「🖼️에셋리퀘제거」)
     if (liteNow || messages.some((m) => typeof m?.content === 'string' && imgTagsKnown(m.content, modulePicker()))) {
@@ -226,8 +226,10 @@ async function onInput(text: string): Promise<string> {
   return text;
 }
 
-/** 이 채팅의 첫 장면(인사말) 원문. 없으면 '' */
+/** 이 채팅의 첫 장면 원문. 플러그인이 넣은 첫 장면 메시지(char, 표식)가 있으면 그것, 없으면 카드 인사말. 없으면 '' */
 function greetingOf(char: CharacterSnapshot, chat: Chat): string {
+  const first = chat.message?.[0];
+  if (first?.role === 'char' && isSceneMessage(first.data)) return stripSceneMark(String(first.data));
   const fm = Number(chat.fmIndex);
   const alt = char.alternateGreetings;
   const text = Number.isInteger(fm) && fm >= 0 ? alt?.[fm] : typeof char.firstMessage === 'string' ? char.firstMessage : undefined;
@@ -428,6 +430,15 @@ async function onOutput(arg: { char: unknown; chat: unknown; characterIndex: num
       );
     }
     if (hasUnlockTag(raw)) latest = (await applyUnlocks(char, arg.characterIndex, arg.chatIndex, arg.messageIndex).catch(() => null)) ?? latest;
+    // 가계부: 이 응답의 상태창 잔고 칸에 장부를 맞춘다 (core/wallet.ts syncWalletToStatus). 머리 잔고·가계부가 상태창과 같이 움직이게
+    // 먼저 손에 든 채팅으로 바뀔 게 있는지 보고, 있을 때만 저장한다 (응답 처리 한 번의 읽기 수를 늘리지 않게 — qc-pipeline 5-4)
+    const walletStart = getPrefs().walletStart ?? WALLET_START_DEFAULT;
+    if (colConfig(chat.scriptstate).wallet !== 'off' && syncWalletToStatus(readWallet((latest ?? chat).scriptstate, walletStart), latest ?? chat)) {
+      latest = (await updateChat(arg.characterIndex, arg.chatIndex, (cur) => {
+        const w = syncWalletToStatus(readWallet(cur.scriptstate, walletStart), cur);
+        return w ? { ...cur, scriptstate: { ...(cur.scriptstate ?? {}), ...walletVars(w) } } : null;
+      }).catch(() => null)) ?? latest;
+    }
     let now = latest ?? ((await risuai.getChatFromIndex(arg.characterIndex, arg.chatIndex)) as Chat | null);
     if (!now || chatPhase(now) !== 'started') return;
     now.message ??= [];
@@ -595,10 +606,12 @@ function displayNow(text: string): string {
   // 다른 채팅에 갔다 오면 Risu가 판정(liteNow)보다 먼저 메시지를 다시 그려서 원문이 드러난 채 남았다.
   // 이 표식은 이 봇 메시지에만 있으니 다른 봇에서는 아무것도 바뀌지 않는다.
   // 이 봇 메시지인지: Lite 판정 전에도 알아볼 수 있는 표식들 (상태창 [▣|…], 시작·지시문·전화 카드)
-  const ours = liteNow || isLanding(text) || text.includes(UNSENT_MARK) || text.includes(START_MARK) || hasStatusTag(text) || hasSceneCard(text) || hasCall(text);
+  const ours = liteNow || isLanding(text) || text.includes(UNSENT_MARK) || text.includes(START_MARK) || text.includes(SCENE_MARK) || hasStatusTag(text) || hasSceneCard(text) || hasCall(text);
   let out = text;
   if (isLanding(text)) out = landingHtml();
   else {
+    // 플러그인이 넣은 첫 장면 메시지: 표식만 뗀다 (core/dispatch SCENE_MARK)
+    if (out.includes(SCENE_MARK)) out = stripSceneMark(out);
     if (liteNow && hasWorldTags(out)) out = cleanOutput(out);
     if (liteNow && hasUnlockTag(out)) out = stripUnlockTags(out);
     if (hasSceneCard(out)) out = renderSceneCards(out, sceneCardHtml);
@@ -720,6 +733,7 @@ export interface BodyHandlers {
  * o.prompt: 카드 열기·단추처럼 사용자가 시킨 시작(시작기 main.ts 가 넘긴다). 받기 창은 prompt 거나 사용자가 닫은 적이 없을 때만 뜬다
  */
 export async function start(o: { prompt?: boolean } = {}): Promise<BodyHandlers> {
+  void dropOldGame(); // 옛 필드 게임 코드·자산 팩(최대 수백 MB)이 저장소에 남아 있으면 지운다 (2026-11-05 사용자)
   try {
     await loadWorldData();
   } catch (error) {

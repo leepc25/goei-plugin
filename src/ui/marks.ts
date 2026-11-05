@@ -13,17 +13,18 @@ const icon = (m: Mark) => ICONS[m.s.tab as keyof typeof ICONS] ?? ICONS.board;
 
 export const markUi = { pop: false };
 
-/** 저장된 즐겨찾기 손질 (2026-11-05 사용자): 「필드」(11-04 제거)와 맨 상황판(서랍이 상황판 안에 있어 의미 없음)은 거르고,
- *  옛 「가계부」 탭은 기록 › 가계부로 옮긴다 */
+/** 저장된 즐겨찾기 손질 (2026-11-05 사용자): 「필드」(11-04 제거)·맨 상황판(서랍이 상황판 안에 있어 의미 없음)·
+ *  기본으로 넣어 주던 「가계부」(옛 가계부 탭, 기록 › 가계부)는 거른다 — 왼쪽 세 칸은 비워 둔다 */
+const walletMark = (m: Mark) => m.s.tab === 'wallet' || (m.s.tab === 'records' && (m.s.r as { sub?: string } | undefined)?.sub === 'wallet' && m.name === '가계부');
 const alive = (list: Mark[] | undefined): Mark[] => (list ?? [])
-  .filter((m) => m.s.tab !== 'field' && !(m.s.tab === 'board' && !m.s.a))
-  .map((m) => (m.s.tab === 'wallet' ? { ...m, s: { tab: 'records', r: { sub: 'wallet', view: 'list', id: '' } } } : m));
+  .filter((m) => m.s.tab !== 'field' && !(m.s.tab === 'board' && !m.s.a) && !walletMark(m));
 export const marks = (): Mark[] => alive(getPrefs().marks);
 export const isMarked = (m: Mark) => marks().some((x) => key(x) === key(m));
 
 export async function addMark(m: Mark): Promise<boolean> {
   if (isMarked(m) || marks().length >= MARK_MAX) return false;
-  await savePrefs((p) => ({ ...p, marks: [...alive(p.marks), m] }));
+  // 새 칸은 앞에: 서랍이 오른쪽부터 차 있어(설정·기록) 새로 넣은 것이 그 왼쪽에 붙는다
+  await savePrefs((p) => ({ ...p, marks: [m, ...alive(p.marks)] }));
   return true;
 }
 
@@ -67,13 +68,16 @@ export function navHistBar(current: Mark | null): string {
     <button class="gx-nh fwd" data-action="nav-fwd" aria-label="앞으로" title="앞으로">${ICONS.back}</button></div>`;
 }
 
-/** 모바일 상황판 서랍: 즐겨찾기 다섯 칸. 빈 칸을 누르거나 펼친 서랍을 좌우로 밀면 ★ 창 (사용자 2026-10-20) */
+/** 모바일 상황판 서랍: 즐겨찾기 다섯 칸. 빈 칸을 누르거나 펼친 서랍을 좌우로 밀면 ★ 창 (사용자 2026-10-20).
+ *  칸은 오른쪽부터 채운다 (2026-11-05 사용자: 맨 오른쪽 설정, 그 왼쪽 기록, 왼쪽 셋은 빈 칸) */
 export function markSlots(): string {
   const list = marks();
   // 하나도 없으면 칸 대신 안내 한 줄 (사용자 2026-10-20). 눌러도 같은 창
   if (!list.length) return `<button class="mk-hint" data-action="mk-pop">${ICONS.star}<span>좌우로 밀어 즐겨찾기를 추가하세요</span></button>`;
-  return Array.from({ length: MARK_MAX }, (_, i) => {
-    const m = list[i];
+  const pad = MARK_MAX - list.length;
+  return Array.from({ length: MARK_MAX }, (_, slot) => {
+    const i = slot - pad;
+    const m = i >= 0 ? list[i] : undefined;
     return m
       ? `<button class="ph-tool mk-slot" data-action="mk-go" data-value="${i}" aria-label="${esc(m.name)}" title="${esc(m.name)}">${icon(m)}<span class="ph-tool-l">${esc(m.name)}</span></button>`
       : `<button class="ph-tool mk-slot empty" data-action="mk-pop" aria-label="즐겨찾기 추가">${ICONS.plus}</button>`;

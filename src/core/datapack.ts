@@ -61,6 +61,8 @@ export function applyWorldPack(text: string): void {
     site: j.site as never,
     appendix: j.appendix as never,
     relations: { pairs: rel.pairs as never, common: rel.common },
+    // 첫 장면 기본값 (옛 팩에는 없다)
+    ...(obj(j.scenes) && obj(j.scenes.세력) && obj(j.scenes.인물) ? { scenes: j.scenes as never } : {}),
   });
 }
 

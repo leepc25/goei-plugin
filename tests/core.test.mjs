@@ -4,6 +4,7 @@ import {
   SCENARIOS, parseSeedManifest, buildSeed, applySeedLifetime, planStart, applyStart, readManifest,
   chatPhase, currentChoice, processRequest, StartError, MANIFEST_COMMENT, userTurns, unwrapScenes,
   parseDirective, setGuideOverride, destination, sceneDirective, validTeam, sceneRecord, readScene, stripSceneCard, renderSceneCards, DirectiveError,
+  isSceneMessage, stripSceneMark,
 } from '../dist-test/core.mjs';
 
 const lore = [
@@ -103,17 +104,27 @@ test('scene records are unwrapped for the model and merged with the text typed a
 
 test('planStart builds the same chat variables as the original START', () => {
   const plan = planStart({ faction: 'A00', lang: 'ko', fm: 1 }, manifest, lore, 3);
-  assert.equal(plan.fmIndex, 0);
+  // 첫 장면 글은 플러그인이 메시지로 넣고(세계 팩 기본값), Risu 쪽 번호는 늘 카드의 빈 인사말 (2026-11-05)
+  assert.equal(plan.fmIndex, 2);
   assert.equal(plan.kind, 'opening');
+  assert.ok(plan.scene && plan.scene.length > 1000 && plan.scene.includes('{{user}}'));
   assert.equal(plan.scriptstate.$st_faction, 'A00');
   assert.equal(plan.scriptstate.$st_lang, 'ko');
   assert.equal(plan.scriptstate.$st_fm, '1');
   assert.equal(plan.scriptstate.$ib_affiliation, '관리국');
   assert.equal(plan.scriptstate.$st_anomaly_on, '0');
   assert.match(plan.scriptstate.$seed_lore, /^%%SEED%%/);
-  const chat = applyStart({ message: [], scriptstate: { $other: 'keep' } }, plan);
-  assert.equal(chat.fmIndex, 0);
+  const chat = applyStart({ message: [], scriptstate: { $other: 'keep' } }, plan, 'id1');
+  assert.equal(chat.fmIndex, 2);
   assert.equal(chat.scriptstate.$other, 'keep');
+  assert.equal(chat.message.length, 1);
+  assert.equal(chat.message[0].role, 'char');
+  assert.ok(isSceneMessage(chat.message[0].data) && stripSceneMark(chat.message[0].data) === plan.scene);
+  assert.equal(chatPhase(chat), 'staged', '첫 장면만 놓인 채팅은 다시 고를 수 있다');
+  // 다시 고르면 앞의 첫 장면은 새 것으로 바뀐다
+  const again = applyStart(chat, planStart({ faction: 'A00', lang: 'en', fm: 2 }, manifest, lore, 3), 'id2');
+  assert.equal(again.message.length, 1);
+  assert.notEqual(stripSceneMark(again.message[0].data), plan.scene);
 });
 
 test('direct input start uses the shared empty greeting', () => {
@@ -127,12 +138,13 @@ test('custom mission start reuses the direct empty greeting', () => {
   assert.equal(plan.kind, 'preset');
   assert.equal(plan.fmIndex, 2);
   assert.equal(plan.scriptstate.$st_fm, '9');
-  assert.throws(() => planStart({ faction: 'A00', lang: 'en', fm: 9 }, manifest, lore, 3), /첫 장면이 없어요/);
+  assert.equal(planStart({ faction: 'A00', lang: 'en', fm: 9 }, manifest, lore, 3).fmIndex, 2, '영어도 같은 빈 인사말');
 });
 
 test('planStart rejects missing greetings and bad input', () => {
-  assert.throws(() => planStart({ faction: 'A00', lang: 'ko', fm: 2 }, manifest, lore, 3), /첫 장면이 없어요/);
-  assert.throws(() => planStart({ faction: 'A00', lang: 'ko', fm: 1 }, manifest, lore, 0), /첫 장면이 없어요/);
+  assert.throws(() => planStart({ faction: 'A00', lang: 'ko', fm: 1 }, manifest, lore, 0), /빈 첫 장면이 없어요/);
+  assert.throws(() => planStart({ faction: 'A00', lang: 'ko', fm: 1 }, { ...manifest, greetings: { 'A00-ko-1': 0 } }, lore, 3), /빈 첫 장면이 없어요/);
+  assert.throws(() => planStart({ faction: 'A00', lang: 'ko', fm: 99 }, manifest, lore, 3), /상황을 골라/);
   assert.throws(() => planStart({ faction: 'Z00', lang: 'ko', fm: 1 }, manifest, lore, 3), StartError);
   assert.throws(() => planStart({ faction: 'A00', lang: 'jp', fm: 1 }, manifest, lore, 3), StartError);
 });

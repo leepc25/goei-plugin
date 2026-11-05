@@ -95,6 +95,19 @@ test('조직: 명부에 새 조직을 적으면 구분선 이름으로 짐작하
   const cha = d.agents.find((a) => a.name === '차여진');
   assert.deepEqual([cha.affiliation, cha.rosterFor, cha.phoneTabs], ['중립', ['D00', 'E00'], ['T04']]);
   assert.ok(d.orgs.some((o) => o.name === '중립' && !o.faction));
+  // 2026-11-05: 옛 명부(roster_v 없음)의 민간인·프리랜서 목록은 읽을 때 한 번 떼어 낸다. 기본값도 비어 있다
+  const oldLore = withDirectory(base, data).map((e) => {
+    if (e.comment !== 'Directory') return e;
+    const j = JSON.parse(e.content);
+    delete j.roster_v;
+    return { ...e, content: JSON.stringify(j) };
+  });
+  const od = readDirectory(oldLore);
+  assert.deepEqual(od.agents.find((a) => a.name === '차여진').rosterFor, []);
+  assert.deepEqual(od.orgs.find((o) => o.faction === 'D00').rosterFor, []);
+  const fresh = readDirectory(base);
+  assert.deepEqual(fresh.orgs.find((o) => o.faction === 'E00').rosterFor, []);
+  assert.ok(fresh.agents.filter((a) => a.rosterFor.includes('D00') || a.rosterFor.includes('E00')).length === 0, '민간인·프리랜서 목록은 기본으로 비어 있음');
   const brownie = structuredClone(d.agents.find((a) => a.name === '브라우니'));
   assignOrg(brownie, orgOf(d.orgs, 'A00'));
   assert.deepEqual([brownie.affiliation, brownie.rosterFor, brownie.phoneTabs], ['A00', ['A00'], ['T01']]);

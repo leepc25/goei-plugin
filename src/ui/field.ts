@@ -18,7 +18,7 @@ import { updateChat, type CharacterSnapshot, type ChatContext } from '../host/ri
 import { noticeClass, sendNow } from '../host/send';
 import { markUnsent } from '../host/unsent';
 import { ICONS } from './icons';
-import { elapsedText, endedCard, evCard, peopleChips, aimMark, } from './evcard';
+import { aimFlash, elapsedText, endedCard, evCard, peopleChips, aimMark, } from './evcard';
 import { agentInner, stLabel } from './images';
 import { agentContact } from './phone';
 import { mapZoomControls } from './mapzoom';
@@ -521,7 +521,7 @@ export function missionList(ctx: ChatContext, opening = false): string {
         ${status ? `<span class="gx-evart-top">${status}</span>` : ''}<span class="gx-evart-cap">${cap}</span></button>${wikiBtn}</li>`;
     }
     // 선택은 카드 가운데 큰 과녁 (2026-10-29 사용자, evcard aimMark). 펼친 카드에만
-    const aim = sel ? aimMark(true, 'mission-unpick', '', val) : aimMark(false, 'mission-pick', val);
+    const aim = sel ? aimMark(true, 'mission-unpick', val) : aimMark(false, 'mission-pick', val);
     return `<li class="gx-ev gx-mx open${sel ? ' sel' : ''}"><div class="gx-mx-art k-${kind}${art.pic ? '' : ' none'}" data-action="mission-open" data-value="${val}"${bg}>
       ${aim}<span class="gx-evart-top">${status}<span class="gx-evart-act"><button class="gx-evbtn" data-action="mission-open" data-value="${val}" aria-label="접기" title="접기">${ICONS.up}</button>${wikiBtn}</span></span>
       <span class="gx-evart-cap">${capOpen('')}${art.desc ? `<span class="gx-evc-desc">${esc(art.desc)}</span>` : ''}</span></div></li>`;
@@ -875,6 +875,7 @@ export async function handleField(action: string, value: string | undefined, ctx
         env.render();
         return true;
       }
+      await aimFlash(v);
       field.mname = name;
       field.mpick = kind;
       toStep('team', env);
@@ -884,6 +885,7 @@ export async function handleField(action: string, value: string | undefined, ctx
       if (v === 'an' || v === 'ms' || v === 'in') await saveWorld(ctx, env, (w) => (cancelMission(w, v), null));
       return true;
     case 'mission-unpick':
+      await aimFlash(v);
       field.mname = null;
       toStep('goal', env);
       return true;

@@ -37,6 +37,11 @@
 .gw-tab svg, .gw-tree-item svg { width: 15px; height: 15px; flex: none; opacity: .8; }
 .gw-tab:hover, .gw-tree-item:hover { background: var(--panel); border-color: var(--line); color: var(--text); }
 .gw-tab.on, .gw-tree-item.on { background: var(--accent-bg); border-color: var(--accent-line); color: var(--text); }
+/* 설정 「기록」 아래 하위 메뉴 (2026-11-05 사용자): 소제목 줄 + 들여쓴 항목 */
+.gw-tree-label { display: flex; align-items: center; gap: 10px; height: var(--h); padding: 0 12px; color: var(--sub); font-size: 14px; font-weight: 500; }
+.gw-tree-label svg { width: 15px; height: 15px; flex: none; opacity: .8; }
+.gw-tree-item.sub { padding-left: 36px; font-size: 13px; }
+.gw-tree-item.sub svg { width: 13px; height: 13px; }
 .gw-tab.on svg, .gw-tree-item.on svg { opacity: 1; }
 .gw-tree-group { display: flex; flex-direction: column; gap: 2px; }
 .gw-tree-group h4 { margin: 12px 12px 4px; font-size: 12px; font-weight: 700; letter-spacing: .06em; color: var(--dim); }
@@ -88,7 +93,8 @@
 .gw .gw-variants input { width: 200px; }
 /* 카드 */
 .gw .ps-rows, .gw .dir-panel, .gw .gw-fields, .gw .ps-adv, .gw .gw-import, .gw .gw-preview, .gw .gw-anote, .gw .gw-basepage .dir-row { display: flex; flex-direction: column; gap: 0; margin: 0; padding: 0; border: 1px solid var(--line); border-radius: 10px; background: var(--panel); overflow: hidden; box-shadow: none; }
-.gw .gw-basic .dir-panel, .gw .gw-basepage .dir-panel { border-top: 0; }
+/* 2026-11-05 사용자: 기본 정보 상자 윗선이 잘렸다 — 기본 정보 카드는 머리줄 없이 상자만 있으므로 윗선을 둔다 (거점 페이지만 머리줄 아래라 0) */
+.gw .gw-basepage .dir-panel { border-top: 0; }
 .gw .gw-basepage .dir-panel { border: 0; border-top: 1px solid var(--line); border-radius: 0; background: transparent; }
 
 /* ── 줄: [이름][조작] 격자, 설명은 조작 아래 ── */
@@ -221,7 +227,16 @@
 .gw .gw-grip svg { width: 14px; height: 14px; }
 .gw .gw-ftitle, .gw .gw-ftok { font-family: var(--mono); font-size: 12px; font-weight: 400; color: var(--dim); }
 .gw .gw-ftok { margin-left: auto; }
-.gw .gw-fhint { display: inline-grid; place-items: center; width: 16px; height: 16px; border-radius: 50%; border: 1px solid var(--line2); color: var(--dim); font-size: 10px; cursor: help; }
+.gw .gw-gtitle { flex: 1 1 200px; min-width: 0; height: 30px; padding: 0 8px; border-radius: 6px; border: 1px solid transparent; background: transparent; color: var(--text); font: inherit; font-size: 14px; font-weight: 600; }
+.gw .gw-gtitle:hover { border-color: var(--line2); }
+.gw .gw-gtitle:focus { border-color: var(--signal); outline: none; background: var(--panel); }
+.gw .gw-field.gw-sub { margin-left: 18px; }
+.gw .gw-field.gw-sub .gw-gtitle { font-weight: 500; }
+.gw .gw-fhint { display: inline-grid; place-items: center; width: 18px; height: 18px; padding: 0; border-radius: 50%; border: 1px solid var(--line2); background: transparent; color: var(--dim); font: inherit; font-size: 11px; cursor: help; }
+.gw .gw-fhint:hover, .gw .gw-fhint.open { color: var(--signal); border-color: var(--signal); }
+.gw .gw-tip { position: fixed; z-index: 60; padding: 8px 12px; border-radius: 8px; border: 1px solid var(--line); background: var(--panel); color: var(--text); box-shadow: 0 8px 24px rgba(0, 0, 0, .25); font-size: 13px; font-weight: 400; letter-spacing: 0; line-height: 1.5; white-space: pre-wrap; pointer-events: none; }
+.gw .gw-variants .gw-fhint { margin-left: 4px; }
+.gw .gw-variants select { font: inherit; }
 .gw .gw-fmove { display: inline-flex; gap: 4px; }
 .gw .gw-xname { width: 220px; font-weight: 700; }
 .gw .gw-ro { margin: 6px 2px 0; font-size: 12.5px; color: var(--dim); }
@@ -280,6 +295,17 @@
 .gw .ps-adv-sub { border: 0; border-top: 1px solid var(--line); border-radius: 0; background: transparent; }
 .gw .ps-adv-sub > summary { list-style: none; display: flex; align-items: center; min-height: 40px; padding: 0 var(--pad); font-size: 12.5px; font-weight: 700; letter-spacing: .04em; color: var(--dim); cursor: pointer; }
 .gw .ps-adv-body .ps-rows > .ps-row:first-child { border-top: 1px solid var(--hair); }
+/* 설정 본문에 바로 놓인 접힌 묶음(인물 설정의 기능·새 인물·Director 세부·고급)은 다른 묶음처럼 상자로, 제목 줄을 누르면 펼쳐짐 (2026-11-05 사용자) */
+.gw .ph-form-body > details.ps-adv-sub { margin: 0 0 20px; border: 1px solid var(--line); border-radius: 10px; background: var(--panel); overflow: hidden; }
+.gw .ph-form-body > details.ps-adv-sub > summary { min-height: 44px; padding: 0 var(--pad); font-size: 14px; font-weight: 600; letter-spacing: 0; color: var(--text); }
+.gw .ph-form-body > details.ps-adv-sub > summary:hover { background: var(--panel2); }
+.gw .ph-form-body > details.ps-adv-sub > .ps-rows { border-top: 1px solid var(--line); }
+/* 진단 묶음: 읽기 줄은 상자 없이, 기록 표는 한 줄 전체 폭 */
+.gw .pp-upbar { padding: 0; border: 0; border-radius: 0; background: transparent; justify-content: flex-start; }
+.gw .ps-row.wide { grid-template-columns: minmax(0, 1fr); grid-template-areas: 'label' 'hint' 'ctl'; }
+.gw .ps-row.wide > .ps-ctl { display: block; }
+.gw .gw-file { cursor: pointer; }
+.gw .ps-row.wide .pp-diags { width: 100%; }
 /* 작은 카드 묶음 (괴이 발생 종류별) */
 .gw .ps-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr)); gap: 10px; }
 .gw .ps-card { display: flex; flex-direction: column; gap: 0; min-width: 0; }
@@ -380,3 +406,41 @@
 .gw .gw-imgp .ip-extra { margin-top: 12px; gap: 10px; }
 .gw .gw-imgp .ip-preview { margin-top: 14px; padding: 14px 16px; }
 .gw .gw-imgp .gx-err, .gw .gw-imgp .gx-hint { margin: 0; }
+
+/* 이미지 지침 (설정 → 캐릭터 이미지 아래): 칸마다 카드 (2026-11-05 사용자: 여백·간격 없이 다닥다닥 붙음) */
+.gw .ip-pane { display: flex; flex-direction: column; gap: 16px; }
+.gw .ip-pane .ps-group { display: flex; flex-direction: column; gap: 10px; margin: 0; padding: 14px 16px 16px; border: 1px solid var(--line); border-radius: 10px; background: var(--panel); }
+.gw .ip-pane .ps-group > h3 { margin: 0; font-size: 14px; letter-spacing: 0; color: var(--text); }
+.gw .ip-pane .ps-group > h3 b { font-size: 12px; font-weight: 600; color: var(--dim); }
+.gw .ip-pane .ps-group > .ps-note { margin: 0; }
+.gw .ip-pane .pp-intro { margin: 0 2px; }
+.gw .ip-pane textarea.gx-search { padding: 10px 12px; line-height: 1.55; }
+
+/* 조직 화면 소속 요원 칸 (2026-11-05) */
+.gw .gw-member-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 8px; }
+.gw .gw-member { display: flex; align-items: center; gap: 10px; min-width: 0; padding: 8px 10px; border: 1px solid var(--line); border-radius: 10px; background: var(--panel); color: var(--text); font: inherit; text-align: left; cursor: pointer; }
+.gw .gw-member:hover { border-color: var(--signal); }
+.gw .gw-member .gx-ava { width: 34px; height: 34px; flex: none; font-size: 13px; }
+.gw .gw-member-t { display: flex; flex-direction: column; min-width: 0; }
+.gw .gw-member-t b { font-size: 14px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.gw .gw-member-t small { font-size: 12px; color: var(--dim); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* 호출 단어(검색 키) 줄 (2026-11-05) */
+.gw .gw-keys { display: flex; align-items: center; gap: 10px; margin: 0 0 10px; }
+.gw .gw-keys > span { display: inline-flex; align-items: center; gap: 6px; flex: none; font-size: 13px; font-weight: 600; color: var(--sub); }
+.gw .gw-keys input { flex: 1; min-width: 0; }
+
+/* 세계 › 시작 화면 (2026-11-05): 칸 순서 목록 + 고른 칸의 값. 거점 페이지와 같은 줄 모양 */
+.gw .gw-startpage .st-slots { display: flex; flex-direction: column; gap: 8px; margin: 0 0 12px; }
+.gw .gw-startpage .st-slots .dir-row { margin: 0; border: 1px solid var(--line); border-radius: 10px; background: var(--panel); }
+.gw .gw-startpage .st-slots .dir-row.open { border-color: var(--accent-line); }
+.gw .gw-startpage .st-slot { display: flex; align-items: center; gap: 10px; padding: 8px 12px; }
+.gw .gw-startpage .st-slot .dir-name { flex: 1; min-width: 0; }
+.gw .gw-startpage .st-slot .gx-row-btns { display: flex; gap: 4px; }
+.gw .gw-startpage .st-sel { display: flex; align-items: baseline; gap: 8px; margin: 16px 0 8px; font-size: 15px; }
+.gw .gw-startpage .st-sel small { color: var(--dim); font-weight: 400; }
+.gw .gw-startpage .st-scene, .gw .gw-startpage .st-member { padding: 8px 0 4px; border-top: 1px solid var(--line); }
+.gw .gw-startpage .st-scene.off { opacity: 0.6; }
+.gw .gw-startpage .st-member > summary { cursor: pointer; padding: 6px var(--pad); display: flex; gap: 8px; align-items: baseline; }
+.gw .gw-startpage .st-member > summary small { color: var(--dim); }
+.gw .gw-startpage .dir-chips { padding: 6px var(--pad) 10px; display: flex; flex-wrap: wrap; gap: 6px; }
