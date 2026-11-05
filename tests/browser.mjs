@@ -2847,8 +2847,9 @@ if (fixture.globalLore.some(packed)) {
   for (const t of ['04:11', preset.name, '나 · 쟈알디 · 스팡달', '보고서']) assert.ok(jr.includes(t), `일지 줄: ${t}`);
   await page.click('[data-action="rec-filter"][data-value="bg"]');
   assert.equal(await page.locator('.gx-jr-row').count(), 0, '백그라운드 칩: 없음');
-  await page.click('[data-action="rec-filter"][data-value="an"]');
-  assert.equal(await page.locator('.gx-jr-row').count(), 1, '괴이 칩');
+  await page.click('[data-action="rec-filter"][data-value="all"]');
+  assert.equal(await page.locator('.gx-jr-row').count(), 1, '전체 칩');
+  assert.equal(await page.locator('[data-action="rec-filter"]').count(), 3, '칩은 전체·내가 출동·백그라운드 셋 (괴이/사건 칩은 뺌, 2026-11-05)');
   await page.fill('[data-input="rec-q"]', '없는이름');
   assert.equal(await page.locator('.gx-jr-row').count(), 0, '찾기');
   assert.equal(await page.evaluate(() => document.activeElement?.dataset.input), 'rec-q', '찾기 칸 포커스 유지');

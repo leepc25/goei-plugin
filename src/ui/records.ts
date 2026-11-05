@@ -30,7 +30,7 @@ const esc = (s: unknown) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '
 
 export type RecSub = RecordsNav['sub'];
 export type RecView = RecordsNav['view'];
-export type JournalFilter = 'all' | 'mine' | 'bg' | 'an' | 'in';
+export type JournalFilter = 'all' | 'mine' | 'bg';
 
 export interface RecordsEnv {
   render(): void;
@@ -138,7 +138,7 @@ export function recordsTab(ctx: ChatContext): string {
   const SUB_ICON: Record<RecSub, string> = { journal: ICONS.list, wallet: ICONS.wallet, people: ICONS.group, factions: ICONS.org };
   const drawer = matchMedia('(max-width: 760px)').matches
     // 가계부 하위 탭이면 전체·수입·지출 칩과 찾기 줄을 서랍 위칸에 (2026-11-05 사용자)
-    ? drawerHtml(SUBS.map(([v, l]) => `<button class="ph-tool" data-action="rec-sub" data-value="${v}" aria-label="${l}" title="${l}" aria-pressed="${rec.sub === v}">${SUB_ICON[v]}<span class="ph-tool-l">${l}</span></button>`).join(''), rec.sub === 'wallet' && rec.view === 'list' ? walletTools(ctx) : '', 'gx-rdrawer')
+    ? drawerHtml(SUBS.map(([v, l]) => `<button class="ph-tool" data-action="rec-sub" data-value="${v}" aria-label="${l}" title="${l}" aria-pressed="${rec.sub === v}">${SUB_ICON[v]}<span class="ph-tool-l">${l}</span></button>`).join(''), rec.view !== 'list' ? '' : rec.sub === 'wallet' ? walletTools(ctx) : rec.sub === 'journal' ? journalTools() : '', 'gx-rdrawer')
     : '';
   return `<main class="gx-body gx-records">${tabs}${notice}${pane(ctx)}${note}</main>${pngModal()}${drawer}`;
 }
@@ -203,7 +203,14 @@ function faces(ctx: ChatContext, names: string[]): string {
 
 // ── 일지 ──
 
-const FILTERS: [JournalFilter, string][] = [['all', '전체'], ['mine', '내가 출동'], ['bg', '백그라운드'], ['an', '괴이'], ['in', '사건']];
+// 2026-11-05 사용자: 괴이/사건 칩은 뺌(줄마다 등급 표식이 있다). 전체·내가 출동·백그라운드 3개 + 찾기 = 가계부와 같은 모양, 폰은 기록 서랍 위칸
+const FILTERS: [JournalFilter, string][] = [['all', '전체'], ['mine', '내가 출동'], ['bg', '백그라운드']];
+
+/** 일지 칩 + 찾기 줄. PC는 목록 위, 폰은 기록 서랍 위칸 */
+function journalTools(): string {
+  const chips = FILTERS.map(([v, l]) => `<button class="gx-chip${rec.filter === v ? ' on' : ''}" data-action="rec-filter" data-value="${v}" aria-pressed="${rec.filter === v}">${l}</button>`).join('');
+  return `<div class="gx-rec-tools gx-wt-tools">${chips}<input class="gx-wt-q" type="search" data-input="rec-q" value="${esc(rec.q)}" placeholder="찾기: 이름·장소·요원" aria-label="일지 찾기"></div>`;
+}
 
 function journalPane(ctx: ChatContext): string {
   const rows = readJournal(ctx.chat).rows;
@@ -224,9 +231,8 @@ function journalPane(ctx: ChatContext): string {
     { label: 'BACKGROUND', value: String(rows.length - mineN), sub: '요원 단독 처리' },
     { label: `TODAY${now !== null ? ` · ${ymd(now)}` : ''}`, value: String(todayRows.length), sub: avg !== null ? `평균 소요 ${longDur(avg)}` : todayRows.length ? '소요 미상' : '없음' },
   ], { cls: 'gx-jr-tiles' });
-  const chips = FILTERS.map(([v, l]) => `<button class="gx-chip${rec.filter === v ? ' on' : ''}" data-action="rec-filter" data-value="${v}" aria-pressed="${rec.filter === v}">${l}</button>`).join('');
   return `${mon}
-    <div class="gx-rec-tools">${chips}<input class="gx-wt-q" type="search" data-input="rec-q" value="${esc(rec.q)}" placeholder="찾기: 이름·장소·요원" aria-label="일지 찾기"></div>
+    ${matchMedia('(max-width: 760px)').matches ? '' : journalTools()}
     <div class="gx-jr-list">${journalList(ctx)}</div>`;
 }
 
@@ -234,7 +240,7 @@ function journalPane(ctx: ChatContext): string {
 export function journalList(ctx: ChatContext): string {
   const rows = readJournal(ctx.chat).rows;
   const q = rec.q.trim().toLowerCase();
-  const pass = (r: JournalRow) => (rec.filter === 'mine' ? r.mine : rec.filter === 'bg' ? !r.mine : rec.filter === 'an' ? r.kind === 'an' : rec.filter === 'in' ? r.kind === 'in' : true)
+  const pass = (r: JournalRow) => (rec.filter === 'mine' ? r.mine : rec.filter === 'bg' ? !r.mine : true)
     && (!q || `${r.name} ${locName(r.loc)} ${r.agents.map((a) => a.name).join(' ')} ${r.result}`.toLowerCase().includes(q));
   const shown = rows.filter(pass).reverse();
   if (!shown.length) return `<p class="gx-wt-empty">${rows.length ? '맞는 줄이 없어요.' : '아직 종료된 상황이 없어요. 괴이·사건·특수가 종료되면 여기에 한 줄씩 쌓여요.'}</p>`;
