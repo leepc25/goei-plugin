@@ -2690,9 +2690,9 @@ if (fixture.globalLore.some(packed)) {
   await page.waitForSelector('.gx-wallettab');
   assert.equal(await tabNow(), 'records');
   assert.equal(await page.locator('.gx-rec-tabs .ph-sub.on').textContent(), '가계부', '가계부는 기록의 하위 탭 (2026-11-05)');
-  // 기록 탭: 하위 탭 넷, 같은 너비, 빈 일지, 「오늘 일지 이미지로」 없음
-  await page.click('.gx-nav .gx-nb:not(.mob)[data-value="records"]');
-  await page.waitForSelector('.gx-records');
+  // 기록 탭: 하위 탭 넷, 같은 너비, 빈 일지, 「오늘 일지 이미지로」 없음 (이미 기록 탭이라 메뉴를 다시 누르면 상황판으로 가니 하위 탭으로 이동)
+  await page.click('[data-action="rec-sub"][data-value="journal"]');
+  await page.waitForSelector('.gx-records .gx-jr-tiles');
   assert.deepEqual(await page.$$eval('.gx-rec-tabs .ph-sub', (l) => l.map((b) => b.textContent)), ['일지', '가계부', '인물', '세력']);
   const widths = await page.$$eval('.gx-rec-tabs .ph-sub', (l) => l.map((b) => b.getBoundingClientRect().width));
   assert.ok(Math.max(...widths) - Math.min(...widths) <= 1, `하위 탭 같은 너비 (${widths.join(',')})`);
