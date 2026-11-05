@@ -1560,6 +1560,9 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
   .ph-drawer.open { border-top-color: var(--line2); box-shadow: 0 -10px 20px -14px rgba(0, 0, 0, .55); }
   .ph-drawer:not(.open) .gn-nickform { display: none; }
   .ph-drawer .gn-nickform { margin: 0 12px 8px; }
+  /* 기록 서랍 위칸의 가계부 칩·찾기 (2026-11-05) */
+  .ph-drawer:not(.open) .gx-wt-tools { display: none; }
+  .ph-drawer .gx-wt-tools { margin: 0 12px 8px; }
   .ph-side > .gn-composer { border-bottom: 0; }
 }
 /* 잠깐 떴다 사라지는 안내: 아래쪽 가운데에 떠서 줄을 차지하지 않는다 */
@@ -1855,6 +1858,9 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
   .ph-drawer .ph-dbody { max-height: 0; overflow: hidden; transition: max-height .2s ease, padding .2s ease; }
   .ph-drawer.open .ph-dbody { max-height: 160px; padding: 2px 12px 10px; overflow: visible; }
   .gx-mdrawer .gx-mapbar { margin: 0; }
+  /* 커스텀 임무 목표 단계: 종류 칩·검색·취소 줄이 서랍 안에 (2026-11-05) */
+  .gx-custdrawer .gx-mfilter { flex-wrap: wrap; margin: 0; }
+  .gx-custdrawer .gx-mfilter .gx-search { flex: 1 1 120px; margin-left: 0; }
   .gx-mdrawer .gx-note { display: block; margin: 0; }
   .gx-mdrawer .gx-note textarea { width: 100%; }
   .gx-mgo { padding: 0 12px 10px; }

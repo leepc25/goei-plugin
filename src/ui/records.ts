@@ -18,7 +18,7 @@ import { locName, parseCatalog, readWorld, worldOn } from '../core/world';
 import { updateChat, type ChatContext } from '../host/risu';
 import { onOffSwitch } from './controls';
 import { drawerHtml } from './drawer';
-import { walletPane } from './wallet';
+import { walletPane, walletTools } from './wallet';
 import { defaultsAction, defaultsButtons, defaultsConfirm } from './defaults';
 import { ICONS } from './icons';
 import { avatar, stLabel } from './images';
@@ -137,7 +137,8 @@ export function recordsTab(ctx: ChatContext): string {
   // 폰: 하위 탭 넷은 위가 아니라 숨은 서랍(괴담톡·괴담넷처럼)에 (2026-10-29 사용자). PC 는 위 탭 줄
   const SUB_ICON: Record<RecSub, string> = { journal: ICONS.list, wallet: ICONS.wallet, people: ICONS.group, factions: ICONS.org };
   const drawer = matchMedia('(max-width: 760px)').matches
-    ? drawerHtml(SUBS.map(([v, l]) => `<button class="ph-tool" data-action="rec-sub" data-value="${v}" aria-label="${l}" title="${l}" aria-pressed="${rec.sub === v}">${SUB_ICON[v]}<span class="ph-tool-l">${l}</span></button>`).join(''), '', 'gx-rdrawer')
+    // 가계부 하위 탭이면 전체·수입·지출 칩과 찾기 줄을 서랍 위칸에 (2026-11-05 사용자)
+    ? drawerHtml(SUBS.map(([v, l]) => `<button class="ph-tool" data-action="rec-sub" data-value="${v}" aria-label="${l}" title="${l}" aria-pressed="${rec.sub === v}">${SUB_ICON[v]}<span class="ph-tool-l">${l}</span></button>`).join(''), rec.sub === 'wallet' && rec.view === 'list' ? walletTools(ctx) : '', 'gx-rdrawer')
     : '';
   return `<main class="gx-body gx-records">${tabs}${notice}${pane(ctx)}${note}</main>${pngModal()}${drawer}`;
 }

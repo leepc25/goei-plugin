@@ -417,11 +417,12 @@ function noteBox(): string {
       <textarea rows="2" aria-label="작전 메모"${field.note.trim() ? ' class="filled"' : ''} data-input="field-note" placeholder="이번 작전에서 원하는 전개나 행동이 있으면 적어 주세요.">${esc(field.note)}</textarea></label>`;
 }
 
-/** 모바일 하단 서랍: 목표 단계는 지역·검색(임무 탭만), 편성 단계는 작전 메모 */
-function fieldDrawer(x: Ctx, withMap: boolean): string {
+/** 모바일 하단 서랍: 목표 단계는 임무 탭이면 지역·검색, 커스텀이면 종류 칩·검색(2026-11-05 사용자), 편성 단계는 작전 메모 */
+function fieldDrawer(x: Ctx, withMap: boolean, custom = ''): string {
   if (!narrow()) return '';
   if (field.step === 'team') return drawerBox(noteBox(), 'gx-notedrawer', `<div class="gx-mgo">${lastGo}</div>`);
-  return withMap ? drawerBox(mapBar(x), 'gx-mapdrawer') : '';
+  if (withMap) return drawerBox(mapBar(x), 'gx-mapdrawer');
+  return custom ? drawerBox(custom, 'gx-custdrawer') : '';
 }
 
 // ── 탭 화면 ──
@@ -555,11 +556,13 @@ export function missionTab(ctx: ChatContext, opening: boolean, notice: string, b
   const intro = opening
     ? '<p class="gx-hint">커스텀 임무로 시작해요. 목표와 동행을 고르고 작전 개시를 누르면 바로 첫 장면이 시작돼요.</p>'
     : '';
+  // 종류 칩·검색·취소 줄: PC는 목록 위, 폰은 하단 서랍 (임무 탭의 지역·검색과 같은 자리, 2026-11-05 사용자)
+  const filter = `<div class="gx-mfilter">${segs}<input class="gx-search" type="search" placeholder="검색" value="${esc(field.query)}" data-input="mission-query" aria-label="검색">${cancelChip('mission-unpick', !!field.mname)}${opening ? '' : modeSwap('map')}</div>`;
   return `<main class="gx-body gx-field gx-mission" data-step="${field.step}">
     ${stepBar(field.mname, opening ? undefined : 'map')}
     <div class="gx-mapcol">
       ${intro}
-      <div class="gx-mfilter">${segs}<input class="gx-search" type="search" placeholder="검색" value="${esc(field.query)}" data-input="mission-query" aria-label="검색">${cancelChip('mission-unpick', !!field.mname)}${opening ? '' : modeSwap('map')}</div>
+      ${narrow() ? '' : filter}
       <div class="gx-mbox">${missionList(ctx, opening)}</div>
     </div>
     <div class="gx-sidecol">
@@ -568,7 +571,7 @@ export function missionTab(ctx: ChatContext, opening: boolean, notice: string, b
       ${pend}
       ${teamPanel(x, field.mname, 'mission-send', opening ? '작전 개시' : '임무 요청', busy, opening ? undefined : ctx)}
     </div>
-  </main>${fieldDrawer(x, false)}`;
+  </main>${fieldDrawer(x, false, filter)}`;
 }
 
 // ── 동작 ──
