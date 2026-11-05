@@ -333,7 +333,7 @@ INSTALL_DIR = ROOT / 'src' / 'data' / 'install'
 
 
 def write_install_data(greetings, greeting_index, pictures, lore, icon):
-    """깡통봇 설치용 플러그인 데이터 (core/install.ts 가 내장): 인사말 57개와 키→번호, 카드 사진 목록, 기본 명부(Directory), 아이콘 지문"""
+    """깡통봇 설치용 플러그인 데이터 (core/install.ts 가 내장): 빈 인사말 하나와 직접 입력 키→번호, 카드 사진 목록, 기본 명부(Directory), 아이콘 지문"""
     INSTALL_DIR.mkdir(parents=True, exist_ok=True)
     directory = json.loads(next(e for e in lore if e.get('comment') == 'Directory')['content'])
     dump = lambda name, obj: (INSTALL_DIR / name).write_text(json.dumps(obj, ensure_ascii=False, separators=(',', ':')), encoding='utf-8')
@@ -471,6 +471,12 @@ def lore_activation(entries):
 
 
 # 원본 지침 문장 고치기 (주석 이름, 옛 문장, 새 문장). 옛 문장이 없으면 빌드를 멈춘다
+LORE_DROP_BULLETS = {
+    '백사헌': ['- Selectively helps a person who has earned a place in his calculations.', '- Gratitude can disarm him more than bargaining.', '- Attachment remains selective.',
+             '- Under acute threat to an established ally, anger becomes an insistence', '- Understands bureaucratic pressure:'],
+    '진나솔': ['- Pain shortens her patience without erasing her ability to calculate', '- Practical trust grows through competent work:',
+             '- Recognizes when her own compromised judgment has become a danger', '- Helping a partner and demanding her proper share afterward'],
+}
 LORE_PATCHES = [
     # 괴담넷 성격 전환 (2026-10-26 사용자): 설정 lb_cfg_lb-gn.style = gal 괴담갤(일반) / net 괴담넷(업계, 기본) / wpf 세정게. 큰 틀은 그대로, 소개·기본 말투·기본 주제만 분기. 문안은 card/gnet-style.json
     *[('GNet', v['old'], v['new']) for v in json.loads((ROOT / 'card' / 'gnet-style.json').read_text(encoding='utf-8')).values()],
@@ -479,6 +485,11 @@ LORE_PATCHES = [
     ('콘쥬스', 'Agent. A minor attached to the team, deployed only when', 'Agent. The youngest member of the team, deployed only when'),
     ('콘쥬스', 'cover her eyes for age-inappropriate sights', 'cover her eyes for gruesome sights'),
     ('콘쥬스', "A teenager's frame that gives no warning", 'A small frame that gives no warning'),
+    # 블라렛: 하프 뱀파이어를 수치로 여겨 숨기는 설정 복구 (2026-11-05 사용자: 로어북 최적화 때 통째로 빠져 해석이 뒤집힘. 빠진 부분만 짧게)
+    ('블라렛', '- Enemy taunts of "half-blood of the Vatican" touch a wound her sincere confidence in God and habit cannot fully close.',
+     '- Her half-vampire blood is an open sore she keeps hidden: it shows only in her grace and in what vampires smell on her, and she never volunteers it. Enemy taunts of "half-blood of the Vatican" land on a wound her doctrine-grade confidence in God and habit never quite closes; her answer is scripture, not denial: "Even if I happen to be a monster, it makes no difference."'),
+    ('🙂Roster', 'playful, proud, devout half-vampire; hunts vampires, sells crosses, promotes conversion, cooperates pragmatically.',
+     'playful, proud, devout nun who hides her half-vampire blood; hunts vampires, sells crosses, promotes conversion, cooperates pragmatically.'),
     # 상태창에 동행·투입 칸 (2026-10-23 사용자 승인: 필드가 동행 인물과 괴이 안/밖을 알 수 있게). 플러그인 v0.16.54부터 읽는다. 옛 6칸도 읽힌다
     ('🏷️Tag', '[▣|YYYY.MM.DD|HH:MM AM/PM|weather|temperature|location|anomaly]\n',
      '[▣|YYYY.MM.DD|HH:MM AM/PM|weather|temperature|location|anomaly|companions|deployed]\n'),
@@ -576,6 +587,18 @@ def patch_lore(entries):
             raise SystemExit(f'로어북 고치기 실패: {comment}')
         for e in hit:
             e['content'] = e['content'].replace(old, new)
+    # 원본 2.3 카드에 없던, 인물 해석을 바꾸는 추가 불릿을 뺀다 (2026-11-05 사용자 「그래 빼고 넘겨」, /mnt/project-files/로어북점검_1105/보고서.md 3절)
+    for comment, heads in LORE_DROP_BULLETS.items():
+        e = next((x for x in entries if x.get('comment') == comment), None)
+        if not e:
+            raise SystemExit(f'로어북 불릿 빼기 실패: {comment} 없음')
+        lines = e['content'].split('\n')
+        for head in heads:
+            idx = [i for i, l in enumerate(lines) if l.startswith(head)]
+            if len(idx) != 1:
+                raise SystemExit(f'로어북 불릿 빼기 실패: {comment} 「{head}」 {len(idx)}줄')
+            del lines[idx[0]]
+        e['content'] = '\n'.join(lines)
     return entries
 
 
@@ -724,6 +747,22 @@ PORTRAIT_DIR = 'portraits'
 DROP_ASSETS = {'f01', 'f02', 'f03', 'f04', 'f05'}
 
 
+def drop_legacy_agent_pics(data, others):
+    """이름만 있는 옛 요원 그림(「Aileen」 등)을 뺀다 — 같은 이름의 「영문명_default」 가 있을 때만 (사용자 2026-11-05: 고르기 목록에 옛 그림이 떠서 지움).
+    카드 매니페스트 사진 목록에서도 빠지므로 창의 카드 업데이트가 기존 카드에서도 지운다 (src/core/pictures.ts planPictures drop)"""
+    assets = data.get('assets', [])
+    names = {str(a.get('name', '')) for a in assets}
+    defaults = {n[:-len('_default')] for n in names if n.endswith('_default')}
+    dropped = 0
+    for a in [a for a in assets if a.get('name') in defaults]:
+        assets.remove(a)
+        path = str(a.get('uri', '')).replace('embeded://', '')
+        others.pop(path, None)
+        others.pop(f"x_meta/{Path(path).stem}.json", None)
+        dropped += 1
+    return dropped
+
+
 def add_wiki_assets(data, others):
     """카드 에셋에 위키 이미지를 넣는다. 카드에 같은 이름(대소문자 무시)이 있으면 카드 것을 둔다"""
     assets = data.setdefault('assets', [])
@@ -829,13 +868,18 @@ def main(src, dst):
 
     data = card['data']
     wiki_assets = add_wiki_assets(data, others)
+    dropped_legacy = drop_legacy_agent_pics(data, others)
     maps = shrink_maps(others)
     pictures = card_pictures(data, others)
     risu = data.setdefault('extensions', {}).setdefault('risuai', {})
     lore = (module or {}).get('lorebook') or (data.get('character_book') or {}).get('entries') or []
     regex = (module or {}).get('regex') or risu.get('customScripts') or []
 
-    greetings, greeting_index = build_openings(fix_emotion_tags(data['first_mes']), scenarios)
+    # 첫 장면 글은 플러그인이 메시지로 넣는다 (2026-11-05 사용자: Risu 추가 첫 메시지를 안 씀). 카드에는 직접 입력용 빈 인사말 하나만,
+    # 글 전체는 세계 자료 팩(src/data/world/greetings.json → scripts/data-pack.mjs scenesData)으로
+    scene_texts, scene_index = build_openings(fix_emotion_tags(data['first_mes']), scenarios)
+    greetings = ['']
+    greeting_index = {k: 0 for k, n in scene_index.items() if not scene_texts[n]}
     pkg = json.loads((ROOT / 'package.json').read_text(encoding='utf-8'))
     version = pkg['version']
     min_plugin = pkg.get('goei', {}).get('minPlugin', version)
@@ -912,11 +956,12 @@ def main(src, dst):
     if icon:
         (Path(dst).parent / 'icon.png').write_bytes(icon)
     write_install_data(greetings, greeting_index, pictures, lore, icon)
+    (ROOT / 'src' / 'data' / 'world' / 'greetings.json').write_text(json.dumps({'index': scene_index, 'texts': scene_texts}, ensure_ascii=False, separators=(',', ':')), encoding='utf-8')
     # 창이 열릴 때 받는 작은 버전 정보 (플러그인·카드를 같은 버전으로 함께 낸다)
     Path(dst).with_name('version.json').write_text(json.dumps(
         {'card': version, 'plugin': version, 'minPlugin': payload['minPlugin']}), encoding='utf-8')
     print(json.dumps({
-        'output': str(dst), 'update': UPDATE_FILE, 'parts': parts, 'greetings': len(greetings), 'lore': len(lore), 'regex': len(kept_regex), 'wikiAssets': wiki_assets, 'maps': maps, 'pictures': pic_files,
+        'output': str(dst), 'update': UPDATE_FILE, 'parts': parts, 'greetings': len(greetings), 'lore': len(lore), 'regex': len(kept_regex), 'wikiAssets': wiki_assets, 'droppedLegacyPics': dropped_legacy, 'maps': maps, 'pictures': pic_files,
         'wikiParts': len(wiki_parts), 'icon': bool(icon),
         'backgroundHTML': len(risu['backgroundHTML']), 'first_mes': len(LANDING),
     }, ensure_ascii=False))

@@ -4,7 +4,7 @@
 import { readFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import assert from 'node:assert/strict';
-import { launch, boot, startChat, request, output, display, input, chat, setVars, counts, resetCounts, waitLite, runner, testBodyCode } from './qc-host.mjs';
+import { launch, boot, startChat, request, output, display, input, chat, setVars, counts, resetCounts, waitLite, runner, testBodyCode, sceneOf } from './qc-host.mjs';
 
 const fxPath = process.argv[2];
 if (!fxPath) throw new Error('사용법: node tests/qc-pipeline-browser.mjs <fixture.json>');
@@ -27,7 +27,7 @@ const unresolved = (t) => [...new Set((t.match(/\{\{[^}]*\}\}/g) ?? []))].filter
 {
   const { page, errors, logs } = await boot(browser, fixture, { message: [], scriptstate: {} }, { fixtureDir });
   const saved = await startChat(page, 'A00', 2);
-  const greeting = fixture.alternateGreetings[saved.fmIndex];
+  const greeting = sceneOf(saved);
   const first = '쟈알디 부장님께 인사하고 출동 준비를 한다.';
   await page.evaluate((t) => { window.__chat.message.push({ role: 'user', data: t, chatId: 'u1' }); }, first);
   const base = [sys('SYSTEM PROMPT'), bot(greeting), usr(first)];
@@ -256,7 +256,7 @@ const unresolved = (t) => [...new Set((t.match(/\{\{[^}]*\}\}/g) ?? []))].filter
 {
   const { page, errors } = await boot(browser, fixture, { message: [], scriptstate: {} }, { fixtureDir });
   const saved = await startChat(page, 'A00', 2);
-  const greeting = fixture.alternateGreetings[saved.fmIndex];
+  const greeting = sceneOf(saved);
   await page.evaluate(() => { window.__userName = 'Tester'; window.__persona = 'Tester is a rookie agent who loves coffee.'; window.__chat.message.push({ role: 'user', data: '쟈알디와 인사한다.', chatId: 'u1' }); });
   const base = () => [sys('SYS\nTester is a rookie agent who loves coffee.'), bot(greeting), usr('쟈알디와 인사한다.')];
   const imgPrompt = (out) => out.find((m) => m.content.startsWith('## Inserting Character Visual Images'))?.content ?? null;
@@ -438,6 +438,8 @@ const unresolved = (t) => [...new Set((t.match(/\{\{[^}]*\}\}/g) ?? []))].filter
 {
   const { page, errors } = await boot(browser, fixture, { message: [], scriptstate: {} }, { fixtureDir });
   await startChat(page, 'A00', 2);
+  // 이 절은 응답 처리만 본다: 플러그인이 넣은 첫 장면 메시지는 비우고 빈 채팅에서 시작한다 (2026-11-05)
+  await page.evaluate(() => { window.__chat.message = []; });
   await R.section('5-1 다시 굴리기(같은 messageIndex): 이전 응답 반영을 되돌리고 이번 것만', async () => {
     const before = (await chat(page)).scriptstate.$goei_world;
     await page.evaluate(() => { window.__chat.message.push({ role: 'user', data: '출동', chatId: 'u1' }, { role: 'char', data: '첫 답.\n[AN|서울특별시 종로구|QC 괴이|활성|B|없음|소란]\n[▣|2025.01.01|02:47 AM|☀️|4°C|관리국|QC 괴이]', chatId: 'c1' }); });
@@ -559,7 +561,7 @@ for (const [send, show, keepTags, when] of [[0, 0, 4, false], [2, 1, 1, true]]) 
 {
   const { page, errors, logs } = await boot(browser, fixture, { message: [], scriptstate: {} }, { fixtureDir, body: testBodyCode });
   const saved = await startChat(page, 'A00', 2);
-  const greeting = fixture.alternateGreetings[saved.fmIndex];
+  const greeting = sceneOf(saved);
   const MARKERS = ['%%SCENE_CARD:', '%%/SCENE_CARD%%', '%%PHONE_CALL:', '%%/PHONE_CALL%%', '%%GOEI_START%%', '%%/GOEI_START%%', '%%GOEI_UNSENT%%', '%%SEED%%', '%%/SEED%%'];
   // 플러그인이 채팅에 남기는 표식을 모두 담은 원문 요청 (첫 전송이라 로어 단계가 시드 표식도 끼운다)
   const raw = () => [

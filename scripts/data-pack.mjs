@@ -20,7 +20,25 @@ export function worldPackText() {
   for (const [kind, file] of Object.entries(kinds)) out[kind] = readJson(`src/data/world/${file}.json`).records;
   const rel = readJson('src/data/world/relations.json');
   out.relations = { pairs: rel.pairs, common: rel.common };
+  out.scenes = scenesData();
   return JSON.stringify(out);
+}
+
+/** 첫 장면 기본값 (2026-11-05 사용자: 첫 장면은 Risu 추가 첫 메시지가 아니라 플러그인이 넣는다).
+ *  세력 공용 장면 = scenarios.json 의 opening 칸 + src/data/world/greetings.json 글(키 A00-ko-1 …, 카드 빌드가 씀), 인물별 장면 = src/data/world/scenes.json 「인물」.
+ *  src/core/scenes.ts 가 읽는 모양: { 세력: { A00: { '1': { label, ko, en } } }, 인물: { P001: { ko, en } } } */
+export function scenesData() {
+  const sc = readJson('src/data/scenarios.json');
+  const g = readJson('src/data/world/greetings.json');
+  const text = (key) => (Number.isInteger(g.index[key]) ? g.texts[g.index[key]] ?? '' : '');
+  const 세력 = {};
+  for (const f of sc.factions) {
+    const rows = {};
+    for (const s of f.scenarios) if (s.kind === 'opening') rows[String(s.fm)] = { label: s.label, ko: text(`${f.code}-ko-${s.fm}`), en: text(`${f.code}-en-${s.fm}`) };
+    세력[f.code] = rows;
+  }
+  const own = readJson('src/data/world/scenes.json');
+  return { 세력, 인물: own.인물 ?? {} };
 }
 
 /** 설치 자료 팩 글: 인사말·카드 사진 목록·기본 명부·아이콘 정보. src/core/install.ts setInstallData 가 읽는 모양 */

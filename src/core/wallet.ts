@@ -3,6 +3,7 @@
 // 장부는 채팅 변수 `$st_wallet` (JSON): 시작 잔고 + 거래 목록. 거래는 기준 메시지(anchor)가 채팅에 남아 있을 때만 산다 (다시 굴리기·삭제 대응).
 import type { Chat } from './types';
 import { messageKey } from './people/store';
+import { findStatusTags } from './world/status';
 
 export const WALLET_VAR = '$st_wallet';
 /** 새 채팅 시작 잔고 기본값 (사용자 2026-10-27: 14만 원). 설정에서 바꾸고, 채팅마다 장부 시작값·지금 잔고도 고칠 수 있다 */
@@ -110,6 +111,39 @@ export function adjustWallet(w: Wallet, alive: Set<string>, target: number, memo
   const diff = Math.trunc(target) - walletBalance(w, alive);
   if (!diff) return w;
   return addWalletEntry(w, { anchor: '', amount: diff, memo, src: 'manual', id: `m_${Date.now().toString(36)}_${w.log.length}` });
+}
+
+/** 상태창 잔고 맞춤 거래의 메모 (아래 syncWalletToStatus) */
+export const WALLET_SYNC_MEMO = '상태창 잔고';
+const syncId = (anchor: string) => `s_${anchor}`;
+
+/** 마지막 응답의 상태창 잔고 칸에 장부를 맞춘다 (2026-11-05 사용자: 모델이 잔고 칸을 바꾸면 상태창은 바로 바뀌는데
+ * 머리 잔고·가계부는 그대로였다 — 장부는 갱신기가 금액이 적힌 문장을 읽을 때만 바뀌었기 때문).
+ * 차이를 그 응답 기준(anchor) 거래 한 줄로 적는다. 응답마다 id 가 하나라 다시 굴리기·갱신기 뒤에 다시 부르면 그 줄만 바뀌고,
+ * 갱신기가 같은 거래를 제대로 읽어 적으면 차이가 0이 되어 빠진다. 바뀐 게 없으면 null */
+export function syncWalletToStatus(w: Wallet, chat: Chat): Wallet | null {
+  const msgs = chat.message ?? [];
+  let anchor = '';
+  let target: number | null = null;
+  for (let i = msgs.length - 1; i >= 0 && target === null; i--) {
+    const m = msgs[i];
+    if (m.role === 'user') continue;
+    const tags = findStatusTags(typeof m.data === 'string' ? m.data : '');
+    for (let k = tags.length - 1; k >= 0; k--) {
+      const n = tags[k].wallet ? Number(tags[k].wallet) : NaN;
+      if (Number.isSafeInteger(n) && Math.abs(n) <= WALLET_MAX) {
+        target = n;
+        anchor = messageKey(m, i);
+        break;
+      }
+    }
+  }
+  if (target === null) return null;
+  const id = syncId(anchor);
+  const base = removeWalletEntry(w, id);
+  const diff = target - walletBalance(base, aliveAnchors(chat));
+  const next = diff === 0 ? base : addWalletEntry(base, { id, anchor, amount: diff, memo: WALLET_SYNC_MEMO, src: 'story' });
+  return JSON.stringify(next) === JSON.stringify(w) ? null : next;
 }
 
 /** 「₩ 1,230,000」. 음수는 「−₩ 5,000」 */

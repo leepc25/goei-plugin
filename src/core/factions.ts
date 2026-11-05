@@ -1,8 +1,11 @@
 // 플레이 세력 목록: 기본 다섯(A00~E00, scenarios.json) + 「괴이봇 명부」 조직 중 플레이 가능으로 켠 것(F00~).
 // 새 세력은 시작 화면에서 직접 입력·커스텀 임무로 시작하고, 태그·세력 로어북의 자리표시자 변수로 모델에게 알린다.
 import { directoryEntries } from './lorebooks';
+import { migrateRoster } from './world/roster-v';
+import type { DirectoryData } from './world/directory';
 import { guideText } from './guides';
 import { SCENARIOS } from './scenarios';
+import { factionScenes, pickScenes, type ScenesData } from './scenes';
 import type { Faction, FactionType, LoreEntry, Scenario, ScriptState } from './types';
 
 export const BUILTIN = ['A00', 'B00', 'C00', 'D00', 'E00'];
@@ -10,9 +13,10 @@ export const TAG_BOOK = '🏷️Tag';
 export const FACTION_BOOK = '📜Faction';
 
 export const FACTION_TYPES: { id: FactionType; label: string; help: string }[] = [
-  { id: 'org', label: '조직형', help: '관리국·백일몽처럼 작전과 내부 공지가 있어요' },
-  { id: 'civilian', label: '민간형', help: '민간인처럼 작전 없이 방문·이동만 하고, 공지는 시민 공개 안내예요' },
-  { id: 'freelancer', label: '프리랜서형', help: '프리랜서처럼 의뢰를 받아 움직이고, 공지는 등록 계약자 안내예요' },
+  // 유형이 바꾸는 것은 Faction 지침의 소개 끝 한 줄(TYPE_GM)과 사진 없을 때의 공용 대체 그림뿐 (2026-11-05 사용자 질문에 맞춰 설명을 사실대로)
+  { id: 'org', label: '조직형', help: '직접 추가한 조직을 플레이 세력으로 켜면 Faction 세력 목록에 붙는 소개 끝 한 줄이 「작전을 운영하고 내부 공지와 소속 요원이 있다」가 돼요. 원래 조직은 사진 없을 때의 대체 그림 종류만 달라져요' },
+  { id: 'civilian', label: '민간형', help: '직접 추가한 조직을 플레이 세력으로 켜면 Faction 세력 목록에 붙는 소개 끝 한 줄이 「작전 없음, 구성원은 방문·이동만」이 돼요. 원래 조직은 사진 없을 때의 대체 그림 종류만 달라져요' },
+  { id: 'freelancer', label: '프리랜서형', help: '직접 추가한 조직을 플레이 세력으로 켜면 Faction 세력 목록에 붙는 소개 끝 한 줄이 「구성원은 계약 임무를 받는다」가 돼요. 원래 조직은 사진 없을 때의 대체 그림 종류만 달라져요' },
 ];
 
 /** 새 세력의 첫 장면: 원본 인사말이 없어서 카드에 있는 공용 빈 첫 장면을 쓴다 */
@@ -22,6 +26,10 @@ export const EXTRA_SCENARIOS: Scenario[] = [
 ];
 
 export const isFactionCode = (v: unknown): v is string => typeof v === 'string' && /^[A-Z]00$/.test(v);
+
+/** 인물별 첫 장면의 시나리오 번호 (그 인물로 플레이할 때만 목록에 보인다. core/scenes.ts agentScene) */
+export const PLAYER_FM = 0;
+export const playerScenario = (name: string): Scenario => ({ fm: PLAYER_FM, label: `${name}의 첫 장면`, kind: 'opening' });
 
 /** 명부 조직 칸에 저장되는 세력 값 (조직 이름이 열쇠) */
 export interface FactionSpec {
@@ -70,16 +78,60 @@ function loreText(lore: LoreEntry[], comment: string): string {
     .join('\n');
 }
 
-function orgSpecs(lore: LoreEntry[]): [string, FactionSpec][] {
+function directoryRaw(lore: LoreEntry[]): Record<string, unknown> {
   const raw = directoryEntries(lore).map((e) => String(e.content ?? '')).join('\n').trim();
-  if (!raw) return [];
+  if (!raw) return {};
   try {
     const d = obj(JSON.parse(raw.replace(/^﻿/, '').replace(/^```[\w-]*\s*\n/, '').replace(/\n\s*```\s*$/, '')));
-    if (d.schema !== 1) return [];
-    return Object.entries(obj(d.조직)).map(([name, v]) => [name.trim(), pickSpec(v)] as [string, FactionSpec]).filter(([name]) => name);
+    return d.schema === 1 ? (migrateRoster(d as unknown as DirectoryData) as unknown as Record<string, unknown>) : {};
   } catch {
-    return [];
+    return {};
   }
+}
+
+/** 명부 「첫 장면」 저장값 (기본값은 core/scenes.ts 가 팩에서 읽는다) */
+export function scenesOf(lore: LoreEntry[] | undefined): ScenesData {
+  return pickScenes(directoryRaw(lore ?? [])['첫 장면']);
+}
+
+/** 시작 화면에 보일 시나리오: 공용 장면(숨긴 것 빼고) + 직접 입력·커스텀 임무. 기본 세력은 scenarios.json 의 직접 입력·커스텀 임무 번호를 그대로 */
+function scenarioList(code: string, scenes: ScenesData, tail: Scenario[]): Scenario[] {
+  const openings: Scenario[] = factionScenes(code, scenes).filter((r) => !r.hidden && (r.ko.trim() || r.en.trim())).map((r) => ({ fm: r.fm, label: r.label, kind: 'opening' }));
+  return [...openings, ...tail.filter((t) => t.kind !== 'opening')];
+}
+
+function orgSpecs(lore: LoreEntry[]): [string, FactionSpec][] {
+  return Object.entries(obj(directoryRaw(lore).조직)).map(([name, v]) => [name.trim(), pickSpec(v)] as [string, FactionSpec]).filter(([name]) => name);
+}
+
+/** 시작 묶음 (명부 「시작 묶음」): 조직이 아닌 시작 화면 칸. 2026-11-05 사용자 「중립」 */
+export interface StartGroup {
+  name: string;
+  code: string;
+  blurb: string;
+  english: string;
+  photo: string;
+  hidden: boolean;
+}
+export function startGroups(lore: LoreEntry[] | undefined): StartGroup[] {
+  const out: StartGroup[] = [];
+  for (const [name, raw] of Object.entries(obj(directoryRaw(lore ?? [])['시작 묶음']))) {
+    const d = obj(raw);
+    if (!s(name) || !isFactionCode(d.code) || BUILTIN.includes(d.code) || out.some((g) => g.code === d.code)) continue;
+    out.push({ name: s(name), code: d.code, blurb: s(d.blurb), english: s(d.english), photo: s(d.photo), hidden: d.hidden === true });
+  }
+  return out;
+}
+
+/** 시작 화면 칸 순서 (명부 「시작 화면」 order). 빠진 코드는 기본 순서대로 뒤에 */
+export function startOrder(lore: LoreEntry[] | undefined): string[] {
+  return list(obj(directoryRaw(lore ?? [])['시작 화면']).order);
+}
+
+export function sortByStart(codes: string[], list: Faction[]): Faction[] {
+  if (!codes.length) return list;
+  const at = new Map(codes.map((c, i) => [c, i]));
+  return [...list].sort((a, b) => (at.get(a.code) ?? 1e9 + list.indexOf(a)) - (at.get(b.code) ?? 1e9 + list.indexOf(b)));
 }
 
 /** 이 카드의 태그 로어북에 새 세력 자리표시자가 들어 있는지 */
@@ -110,10 +162,12 @@ export function factionList(lore: LoreEntry[] | undefined): Faction[] {
   const hit = cache.get(books);
   if (hit) return hit;
   const specs = orgSpecs(books);
+  const scenes = scenesOf(books);
   const out: Faction[] = SCENARIOS.factions.map((f, i) => {
     const spec = specs.find(([, v]) => v.code === f.code)?.[1] ?? {};
     return {
       ...f,
+      scenarios: scenarioList(f.code, scenes, f.scenarios),
       name: spec.title || f.name,
       blurb: spec.blurb || f.blurb,
       photo: spec.photo ?? '',
@@ -132,7 +186,7 @@ export function factionList(lore: LoreEntry[] | undefined): Faction[] {
         name: spec.title || name,
         affiliation: name,
         blurb: spec.blurb ?? '',
-        scenarios: EXTRA_SCENARIOS,
+        scenarios: scenarioList(spec.code, scenes, EXTRA_SCENARIOS),
         photo: spec.photo ?? '',
         english: spec.english ?? '',
         type: spec.type ?? 'org',
@@ -147,11 +201,20 @@ export function factionList(lore: LoreEntry[] | undefined): Faction[] {
     }
     out.push(...extras.sort((a, b) => a.code.localeCompare(b.code)));
   }
-  cache.set(books, out);
-  return out;
+  // 시작 묶음: 자리표시자와 무관 (모델에게 코드를 알릴 일이 없다)
+  for (const g of startGroups(books)) {
+    if (out.some((f) => f.code === g.code)) continue;
+    out.push({ code: g.code, name: g.name, affiliation: g.name, blurb: g.blurb, scenarios: scenarioList(g.code, scenes, EXTRA_SCENARIOS), photo: g.photo, english: g.english, type: 'org', builtin: false, hidden: g.hidden, group: true });
+  }
+  const sorted = sortByStart(startOrder(books), out);
+  cache.set(books, sorted);
+  return sorted;
 }
 
-export const extraFactions = (lore: LoreEntry[] | undefined) => factionList(lore).filter((f) => !f.builtin);
+/** 새 세력 (명부 조직 중 플레이로 켠 것). 시작 묶음은 세력이 아니라서 뺀다 */
+export const extraFactions = (lore: LoreEntry[] | undefined) => factionList(lore).filter((f) => !f.builtin && !f.group);
+/** 시작 묶음 코드인가 */
+export const isGroupCode = (lore: LoreEntry[] | undefined, code: string) => !!factionList(lore).find((f) => f.code === code)?.group;
 /** 요원 목록 공개 대상 등에 쓰는 코드 전체 */
 export const factionCodes = (lore: LoreEntry[] | undefined) => factionList(lore).map((f) => f.code);
 

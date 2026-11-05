@@ -943,19 +943,19 @@ function settingsView(ctx: ChatContext): string {
   return `<div class="ph-form">${paneHead('괴담톡 설정', '', `<span class="ph-act">${defaultsButtons('ph')}</span>`)}${defaultsConfirm('ph')}
     <div class="ph-form-body ps">
       ${group('답장', [
-        row('모델', seg('model', v('model') === 'main' ? 'main' : 'aux', [['main', '메인'], ['aux', '보조']])),
+        row('모델', seg('model', v('model') === 'main' ? 'main' : 'aux', [['main', '메인'], ['aux', '보조']]), '괴담톡 답장·선톡·공지를 만들 때 부를 모델이에요. 보조 = Risu의 보조 모델(싸고 빠름), 메인 = 본편과 같은 모델'),
         row('채팅에 반영', onoff('context'), '지금 장면과 관련된 대화가 채팅 요청에 참고로 붙어요'),
-        row('요원 상태 참고', onoff('status')),
+        row('요원 상태 참고', onoff('status'), '켜면 상황판의 요원 상태(출동 중·부상 등)를 답장 만들 때 참고해요. 출동 중인 요원은 그에 맞게 답해요'),
       ].join(''))}
       ${group('새 메시지', [
         row('새 메시지 확인', seg('auto', ['1', 'open'].includes(v('auto')) ? v('auto') : '0', [['0', '수동'], ['open', '창을 열 때'], ['1', '매 턴']]), AUTO_HINT[v('auto')] ?? AUTO_HINT['0']),
         row('선톡 받기', `<span class="ph-inline">${onoff('incoming')}${pct('incoming_chance')}</span>`, rest('cd_incoming')),
         row('단톡방 초대 받기', `<span class="ph-inline">${onoff('group_invites')}${pct('group_invite_chance')}</span>`, rest('cd_invite')),
-        row('소속 공지 받기', onoff('announcements')),
-        row('공지 대기 턴', num('announcement_gap', notices.gap, 1, 100, '턴')),
-        row('공지 참고 수', num('announcement_history', notices.history, 1, 50, '개')),
+        row('소속 공지 받기', onoff('announcements'), '내 소속 조직의 단체 공지(지시·안내)가 가끔 괴담톡에 와요'),
+        row('공지 대기 턴', num('announcement_gap', notices.gap, 1, 100, '턴'), '공지가 온 뒤 적어도 이만큼 턴이 지나야 다음 공지가 와요'),
+        row('공지 참고 수', num('announcement_history', notices.history, 1, 50, '개'), '새 공지를 쓸 때 지난 공지를 몇 개까지 보여 주고 겹치지 않게 할지예요'),
       ].join(''))}
-      ${group('연락처', [row('모든 연락처 공개', onoff('all_contacts'), '내 소속과 관계없이 모든 탭을 보여요'), row('괴이 연락처 공개', onoff('anomaly_contacts'))].join(''))}
+      ${group('연락처', [row('모든 연락처 공개', onoff('all_contacts'), '내 소속과 관계없이 모든 탭을 보여요'), row('괴이 연락처 공개', onoff('anomaly_contacts'), '켜면 괴이(이물) 쪽 연락처 탭도 보여요. 끄면 사람·조직 연락처만')].join(''))}
       ${group('보관', [
         keep('dm', '1:1 대화 정리'), keep('group', '단톡방 정리'), keep('notice', '공지 정리'),
         row('페이지당 공지', `<div class="gx-segs gx-segs-sm">${NOTICE_PAGE_SIZES.map((n) => `<button class="gx-seg${notices.page === n ? ' on' : ''}" data-action="ph-cfg" data-value="announcement_page_size=${n}" aria-pressed="${notices.page === n}">${n}</button>`).join('')}</div>`),

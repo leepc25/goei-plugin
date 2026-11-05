@@ -3,7 +3,7 @@ import { cardVersion, compareVersions, isPayload, planUpdate, PLUGIN_VERSION, UP
 import { readManifest } from '../core/start';
 import type { ChatContext } from '../host/risu';
 import { fetchPictures } from '../host/picpack';
-import { planPictures, type PicPlan } from '../core/pictures';
+import { dropAssets, planPictures, type PicPlan } from '../core/pictures';
 import { forgetImages } from './images';
 import type { SettingsEnv } from './settings';
 
@@ -199,7 +199,7 @@ export function updateGroup(ctx: ChatContext): string {
         <li>바뀌는 카드 칸 ${plan.fields.length}개${plan.fields.length ? ` <small>(${esc(plan.fields.map(fieldName).join(', '))})</small>` : ''}</li>
         <li>로어북: 바뀜 ${plan.lore.replaced} · 새로 ${plan.lore.added} · 직접 넣은 항목 유지 ${plan.lore.kept}${plan.lore.protected ? ` · 카드 명부 보존` : ''}</li>
         <li>정규식: 바뀜 ${plan.scripts.replaced} · 새로 ${plan.scripts.added} · 직접 넣은 항목 유지 ${plan.scripts.kept}</li>
-        ${pics?.get.length ? `<li>카드 사진: 바뀜 ${pics.replaced} · 새로 ${pics.added} <small>(약 ${mb(pics.bytes)} 받음, 직접 넣은 사진은 그대로)</small></li>` : ''}
+        ${pics?.get.length || pics?.drop.length ? `<li>카드 사진: 바뀜 ${pics.replaced} · 새로 ${pics.added}${pics.drop.length ? ` · 지움 ${pics.drop.length}` : ''} <small>(약 ${mb(pics.bytes)} 받음, 직접 넣은 사진은 그대로)</small></li>` : ''}
       </ul><p class="ps-note">적용한 뒤에는 채팅을 다시 열어야 새 첫 장면·안내가 보여요.</p>`
     : '';
   return section(rows.join('') + `<div class="upd-act">${actions}</div>${summary}`
@@ -278,9 +278,11 @@ export async function handleUpdate(action: string, ctx: ChatContext, env: Settin
         updateUi.progress = '카드에 적용 중…';
         env.render();
       }
+      // 새 카드에서 뺀 사진(옛 요원 그림 등)은 카드에서도 뺀다. 직접 넣은 사진은 매니페스트에 없어 그대로
+      if (pics.drop.length) plan.next.additionalAssets = dropAssets(plan.next.additionalAssets ?? char.additionalAssets, pics.drop) as typeof plan.next.additionalAssets;
       await risuai.setCharacterToIndex(ctx.charIndex, plan.next);
-      if (pics.get.length) forgetImages();
-      updateUi.done = `카드를 v${updateUi.payload.version}으로 바꿨어요.${pics.get.length ? ` 사진 ${pics.get.length}장도 바꿨어요.` : ''} 채팅을 다시 열면 새 내용이 보여요.`;
+      if (pics.get.length || pics.drop.length) forgetImages();
+      updateUi.done = `카드를 v${updateUi.payload.version}으로 바꿨어요.${pics.get.length ? ` 사진 ${pics.get.length}장도 바꿨어요.` : ''}${pics.drop.length ? ` 안 쓰는 사진 ${pics.drop.length}장은 뺐어요.` : ''} 채팅을 다시 열면 새 내용이 보여요.`;
       updateUi.payload = null;
       updateUi.plan = null;
       updateUi.pics = null;

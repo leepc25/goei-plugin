@@ -90,7 +90,7 @@ export async function installPictures(charIndex: number, progress: Progress): Pr
     const bytes = get.reduce((n, p) => n + (Number(p[3]) || 0), 0);
     let last = 0;
     try {
-      assets = await fetchPictures(assets, { get, replaced: 0, added: get.length, bytes }, (n, phase) => {
+      assets = await fetchPictures(assets, { get, replaced: 0, added: get.length, bytes, drop: [] }, (n, phase) => {
         if (n - last >= 10 || n === 0 || n === get.length) {
           last = n;
           progress(`사진 ${phase === 'get' ? '받는' : '저장'} 중 ${saved + n}/${all.length}`);
@@ -224,4 +224,22 @@ export async function dropTokenizer(): Promise<void> {
 export async function dropWikiPack(): Promise<void> {
   await risuai.pluginStorage.removeItem(WIKI_KEY).catch(() => {});
   setStoredWikiPack(null);
+}
+
+/** 옛 필드 게임 자료(코드·자산 팩)를 저장소에서 지운다. 2026-11-04 필드를 뺄 때 파일은 남겨 둔 실수 → 11-05 사용자: 지우기 단추 + 플러그인이 뜰 때 자동으로 */
+export async function dropOldGame(): Promise<number> {
+  let n = 0;
+  try {
+    const keys: unknown = await risuai.pluginStorage.keys();
+    for (const k of Array.isArray(keys) ? keys : []) {
+      if (typeof k === 'string' && (k === 'goei:game:code' || k.startsWith('goei:game:pack:'))) {
+        await risuai.pluginStorage.removeItem(k).catch(() => {});
+        n++;
+      }
+    }
+  } catch {
+    // 키 목록을 못 읽는 판: 코드 키만
+    await risuai.pluginStorage.removeItem('goei:game:code').catch(() => {});
+  }
+  return n;
 }

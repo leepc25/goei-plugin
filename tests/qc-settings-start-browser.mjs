@@ -1,6 +1,7 @@
 // QC 03 · 시작 화면 전수: 세력 전부 × 언어(ko/en) × 시나리오 전부(직접 입력·커스텀 임무 포함)를 세 뷰포트에서 실제로 출발시켜
 // 저장된 chat(fmIndex·scriptstate·시드·명단)을 확인한다. 캐릭터로 플레이, 재선택(staged), 시작 전/뒤 설정 창 범위, 랜딩 메시지도.
 // 사용법: node tests/qc-settings-start-browser.mjs <fixture.json> [pc|phone|land|all]
+import { sceneOf } from './qc-host.mjs';
 import assert from 'node:assert/strict';
 import { boot, chatOf, closeWin, launch, loadFixture, openEditor, closeEditor, openWin, setChat, sleep, VIEWPORTS } from './qc-settings-harness.mjs';
 
@@ -28,7 +29,8 @@ for (const vp of vps) {
   await openWin(page);
   await page.waitForSelector('.gx-fac');
   const facs = await page.$$eval('.gx-fac', (els) => els.map((e) => e.dataset.value));
-  assert.deepEqual(facs, scenarios.factions.map((f) => f.code), `${vp}: 세력 카드 다섯`);
+  // 기본 세력 다섯 + 시작 묶음 「중립」(F00, 2026-11-05). 묶음은 아래 출발 전수(세력×언어×상황)에서는 돌리지 않는다 — 인물 고르기는 qc-pipeline 쪽
+  assert.deepEqual(facs, [...scenarios.factions.map((f) => f.code), 'F00'], `${vp}: 세력 카드 다섯 + 중립`);
   assert.equal(await page.isDisabled('.gx-start'), true, '소속 전 출발 불가');
 
   const fresh = async () => {
@@ -63,7 +65,8 @@ for (const vp of vps) {
         starts++;
         const key = `${f.code}-${lang}-${sc.fm}`;
         const direct = f.scenarios.find((s) => s.kind === 'direct');
-        const expectIdx = manifest.greetings[key] ?? (sc.kind === 'preset' && direct ? manifest.greetings[`${f.code}-${lang}-${direct.fm}`] : undefined);
+        // 첫 장면 글은 플러그인이 메시지로 넣으므로 Risu 쪽 번호는 늘 그 세력의 빈(직접 입력) 인사말 (2026-11-05)
+        const expectIdx = direct ? manifest.greetings[`${f.code}-${lang}-${direct.fm}`] : undefined;
         assert.equal(saved.fmIndex, expectIdx, `${key}: fmIndex`);
         assert.ok(Number.isInteger(saved.fmIndex) && saved.fmIndex < fixture.alternateGreetings.length, `${key}: 인사말 범위`);
         const ss = saved.scriptstate;
@@ -82,15 +85,18 @@ for (const vp of vps) {
         // 기본값에서 온 변수: 괴이 생성 수치는 전부 채팅에 적힌다
         for (const k of ['preset_cap', 'random_p', 'incident_ttl', 'landmark_share', 'extra_ms_cap']) assert.ok(ss[`$wg_${k}`] !== undefined, `${key}: $wg_${k}`);
         if (sc.kind === 'opening') {
-          const text = fixture.alternateGreetings[saved.fmIndex];
+          assert.equal(fixture.alternateGreetings[saved.fmIndex], '', `${key}: 카드 쪽은 빈 인사말`);
+          assert.equal(saved.message.length, 1, `${key}: 첫 장면 메시지 하나`);
+          assert.equal(saved.message[0].role, 'char', `${key}: 첫 장면은 봇 메시지`);
+          const text = sceneOf(saved);
           assert.ok(text.length > 100, `${key}: 첫 장면 글`);
           // 언어: 영어 첫 장면은 한글이 거의 없다
           const hangul = (text.match(/[가-힣]/g) ?? []).length;
           if (lang === 'en') assert.ok(hangul < text.length * 0.05, `${key}: 영어 첫 장면 (한글 ${hangul})`);
           else assert.ok(hangul > 50, `${key}: 한국어 첫 장면`);
           await page.waitForFunction(() => document.querySelector('.gx')?.style.display === 'none');
-          assert.equal(saved.message.length, 0, `${key}: 메시지 없음`);
-          const hinted = await page.evaluate((t) => window.__calls.handlers.display(t), text);
+          const hinted = await page.evaluate((t) => window.__calls.handlers.display(t), saved.message[0].data);
+          assert.ok(!hinted.includes('%%GOEI_SCENE%%'), `${key}: 표식은 화면에 안 보임`);
           assert.ok(hinted.includes('data-goei-card="opening"') && hinted.includes('data-goei-repick'), `${key}: 첫 장면 아래 안내`);
         } else if (sc.kind === 'direct') {
           assert.equal(fixture.alternateGreetings[saved.fmIndex], '', `${key}: 빈 인사말`);
@@ -177,7 +183,8 @@ for (const vp of vps) {
   await page.waitForFunction(() => window.__calls.setChat.length >= 2);
   const again = await page.evaluate(() => window.__calls.setChat.at(-1));
   assert.equal(again.scriptstate.$st_faction, 'B00', '재선택 덮어쓰기');
-  assert.equal(again.fmIndex, manifest.greetings['B00-ko-2']);
+  assert.equal(again.fmIndex, manifest.greetings['B00-ko-8'], '카드 쪽은 빈 인사말');
+  assert.ok(sceneOf(again).length > 100 && again.message.length === 1, '첫 장면 메시지로 덮어씀');
   assert.equal(again.scriptstate.$st_fixed_theme, 'light', '시작 전에 고른 테마가 채팅에');
   // 기본값 되돌리기 (다음 뷰포트에 영향 없게 새 페이지를 쓰지만 저장소도 비운다)
   await page.evaluate(() => { delete window.__store['p:goei:prefs']; });

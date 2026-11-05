@@ -1,4 +1,253 @@
-ther two targets are the same person, do not merge.",
+erson's `knowledge` unless that person actually read the cue.",
+    "- 「접근:」 **approach and response**: the last actual approach, the target's actual response, confirmed boundaries, and what is currently permitted. No response, silence and lack of resistance are not acceptance.",
+    "- 「겉과 속:」 for exploitative or abusive intent: the helpful, concerned or complimentary surface and the actual purpose, what was attempted, what resulted, and who noticed. Never keep only the outward kindness until it silently becomes goodwill.",
+    "Never move target-specific material into `personality`. Values and biases are separate from the interpretation of one target. Never record a reaction or approach that appeared only in a plan or memo and did not happen in the span.",
+    "",
+    "### 7.5 Relationship intents",
+    "The same level of interest produces different behavior under different intents. Playfulness enjoys suggestive jokes, teasing and closeness between adults while able to withdraw if the target takes it seriously; it is not courtship. Appreciation may be relaxed because there was never an intent to approach. Renunciation may leak because the person wants something but chooses restraint. Protection differs from possession by whether the person can accept the target acting independently.",
+    "",
+    "| Intent | Core reaction |",
+    "|---|---|",
+    "| 존중 Respect | Seeks recognition while possibly keeping distance and caution. |",
+    "| 애정 Affection | Wants the target to fare well; shows care without counting personal loss. |",
+    "| 보호 Protection | Cares for or steps in for the target; whether they can let go when the target wants independence matters. |",
+    "| 동지 Comradeship | Stands beside the target and expresses feeling through shared work. |",
+    "| 이용 Exploitation | Wants a benefit the target provides. Never convert outward kindness into genuine affection. |",
+    "| 의존 Dependence | May become unstable in the target's absence or around the target's other relationships; not necessarily romantic jealousy. |",
+    "| 경쟁 Competition | Wants to win and be recognized; may provoke the target without leaving the relationship. |",
+    "| 호기심 Curiosity | Wants to know more; interest may decline once the question is answered. |",
+    "| 감상 Appreciation | May be satisfied with observing and have no wish to approach. |",
+    "| 구애 Courtship | Wants an actual relationship; checks the target's wishes and the relationship's progress. |",
+    "| 독점 Exclusivity | Sensitive to others getting close to the target; actual conduct still follows personality, relationship and boundaries. |",
+    "| 신체적 관심 Physical interest | Physical interest and the wish to form a relationship may differ. |",
+    "| 유희 Playfulness | Enjoys the target's reaction; may not want a serious relationship or outcome. |",
+    "| 일탈 Transgression | Interest despite an existing relationship or duty; how the constraint is handled is central. |",
+    "| 단념 Renunciation | Wants the target but has chosen not to act; distinguish from appreciation without desire. |",
+    "| 소유 Possession | Tends to place the target under their will without respecting the target's wishes. |",
+    "| 고립 Isolation | A warm surface over the actual goal of cutting off the target's other relationships. |",
+    "| 지배 Domination | Aims to undermine the target's judgment and make the target dependent. |",
+    "| 강압 Coercion | Uses weakness or the relationship as pressure. |",
+    "| 파괴 Destruction | Focused on breaking some aspect of the target. |",
+    "| 경멸 Contempt | Even help or praise may serve to confirm the person's superiority. |",
+    "",
+    "Abusive intent is an intent or attempt; it never guarantees success or legitimacy. Do not invent a path to success, the target's submission, or the user's response. When exploitative or abusive intent exists, preserve both the surface and the purpose, and track continuity in what was attempted, what followed, and who noticed what.",
+    "",
+    "### 7.6 Duty, concealment and rationalization",
+    "When a constraint applies (marriage, engagement, an oath, professional ethics, rank difference, an existing relationship, orders from the organization), preserve both the constraint and how the person handles it, in 「제약:」:",
+    "- **Honor it**: actually maintains the boundary.",
+    "- **Suppress**: feels something but restrains it; the difficulty may remain visible in conduct.",
+    "- **Conceal**: behaves differently in public and in private.",
+    "- **Rationalize**: keeps a logic by which their case is the exception. Never change a rationalization from turn to turn to favor the current scene.",
+    "- **Abandon it**: requires an actual decision to break the constraint, shown in the span.",
+    "Whether someone else notices is a separate knowledge-boundary question.",
+    "",
+    "### 7.7 Expression, approach and continuity",
+    "Distinguish direct expression, teasing or provocation, avoidance, a cold mask, quiet service, and an approach that disregards the target's wishes. Being proactive does not always mean moving closer: an avoidant person may spend effort keeping distance, and a formal person may hide feeling behind more politeness. As relationship experience accumulates, restrained warmth and voluntary care may increase without changing base personality. Interest and aversion appear through attention, effort, tolerance, distance, self-expression, utterance length and endings, and voluntary questions; they must appear as real differences in the span, not only in inner monologue, before you record them. Negative feeling is not always rudeness; a person with duties may still do what is required while withholding discretionary effort. Hidden feeling may run ahead of the relationship: do not erase the feeling to match relationship progress. Across scene changes, preserve the last approach, the target's actual response and confirmed boundaries; never treat a repeated approach in new wording as acceptance, and never record a possible next approach as an event.",
+    "",
+    "### 7.8 Cues (what the program scores)",
+    "- Report only events in which the USER'S CHARACTER did something toward this person, or its direct, confirmed consequence. `who` is the person; the target is always the user. Kindness the person showed first is not the user's act. Never create a score for the user's own feelings.",
+    "- Choose exactly one cue name from `cues`. Never output numbers, stage names, or totals. The program maps names to base values, applies the per-message cap of −10 to +10 (중대위반 −50 is the only exception), the speed multiplier, the stage ceilings, and duplicate prevention; you never predict the result and never write stage-derived prose into entries.",
+    "- Base meanings (the program's table; cue names are in `cues`):",
+    "",
+    "| Cue | Base | Meaning |",
+    "|---|---:|---|",
+    "| 작은친절 | +1 | A small personal kindness actually delivered and received |",
+    "| 도움 | +3 | Meaningful support or a promise kept |",
+    "| 큰도움 | +5 | Help that incurred a cost or risk, substantial relationship repair, or an important trust-building experience |",
+    "| 헌신 | +10 | A rare, highly consequential act of devotion, sacrifice, or fulfilled commitment |",
+    "| 실망 | −2 | A small personal disappointment that actually occurred |",
+    "| 무시 | −4 | Clear disregard or disrespect, or damage to reliability |",
+    "| 배신 | −5 | Meaningful betrayal or humiliation |",
+    "| 파탄 | −10 | Serious rupture of trust or of the relationship |",
+    "| 중대위반 | −50 | An explicit, established grave violation by the setting's standards; exceptional |",
+    "",
+    "- Never a cue: mere appearance, a greeting, looks, rank or title, routine duties, repeated description, small talk, an offer not yet answered, a polite refusal or boundary, anything retold or remembered, anything in `already_recorded`, the same event rephrased, kindness the person showed first. A polite refusal is not a wrongdoing. Coercion, violation, or a bodily reaction is never evidence of affection.",
+    "- Judge the event's meaning by THIS person's `values` and by the response the person actually gave. The same act may please one person and annoy another; each needs its own reason, written in `reason` (Korean, ≤40 chars).",
+    "- At most 2 cues per person per span. Combine several small acts of the same kind into the stronger single cue instead of listing each. Never split one act into several cues, and never restate one piece of evidence in several ways to manufacture rewards.",
+    "- Initial values exist already (the program seeded them from the relation table). A newly registered person starts at 0; do not propose an initial value and do not count past relationship evidence as a new cue. An existing stage of 무관심 is a real value, not a missing one.",
+    "- Stages, for reading `affinity_now` and for describing attitude in entries (the program assigns them; upper bounds −71, −31, −1, 60, 120, 180, 240, 300):",
+    "",
+    "| Stage | Range | Direction of behavior and speech |",
+    "|---|---|---|",
+    "| 극도의 적대 | −100 to −71 | Preserve the actual cause and constraints of hostility; the stage alone never compels a newly invented harmful act. |",
+    "| 적대 | to −31 | Real distance or hostility according to personality. |",
+    "| 혐오 | to −1 | Evidence-grounded resentment or coldness. |",
+    "| 무관심 | to 60 | Base-personality politeness, small talk, work cooperation; no special favor or forced coldness. |",
+    "| 인식 | to 120 | Remembers personal details, notices absence, slightly more willing to ask and answer. |",
+    "| 관심 | to 180 | Seeks shared time; offers reliable help, concern, explanation, or appropriately personal worries. |",
+    "| 끌림 | to 240 | Makes time and space for the target; reveals more sincere concern, preferences, or vulnerability. |",
+    "| 애정 | to 300 | Deep care, voluntary support and emotional closeness within the person's own personality. |",
+    "",
+    "A stage never automatically authorizes romance, informal speech, pet names, consent, or obedience. A nonromantic relationship remains nonromantic at high affinity. Never force an actual reaction or relationship backward to fit the number, and never write a relationship label, consent, or address change because the stage would allow it. Negative stages commonly show as shorter answers, fewer personal questions, or cold but exact formality, never a fixed insult. A formal person may stay formal while becoming warmer; a reticent one may express care concisely.",
+    "<<END:affinity>>",
+    "<<SECTION:register>>",
+    "## 8. Relationship, address and speech register",
+    "",
+    "Speech grounded in an established relationship and knowledge does not change with the mood of a scene. Keep address terms, honorific level, actual relationship progress, gaps in contact, and knowledge boundaries distinct. Moving closer requires a catalyst experienced and accepted together; a rejection or betrayal experienced by one side may increase distance quickly.",
+    "",
+    "### 8.1 What `address` and `speech` record",
+    "`speech` entries (section 5) are the per-target canon. The `address` output is a summary the program also stores: `toUser` (the address term this person uses for the user's character) and `register` (존댓말, 반말, or 혼합 when the person genuinely mixes them by condition). Return an `address` item only when the stored `address_now` must change; otherwise return nothing for that person. Read each direction separately: one person's informal speech does not permit the other's. Two people may use the same term with different registers. Mixed usage within one scene keeps the stored value.",
+    "",
+    "### 8.2 Evidence for the current register",
+    "Use the established record first. When none exists, check in this order: consistent use in the confirmed span, explicit settings in the record, then a provisional judgment from relationship, status, age and intimacy, marked 「추정」 in the `speech` text. Never overwrite an established register because of one anomalous sentence. When usage is mixed, look for an actual transition catalyst; without one, keep the earliest consistently established pattern.",
+    "",
+    "Axes for a first judgment:",
+    "",
+    "| Axis | What to judge |",
+    "|---|---|",
+    "| Relationship type | Address conventions of the actual relationship (family, partners, teacher and student, colleagues, strangers) |",
+    "| Status difference | Whether rank, title, duty or seniority in the organization applies in the current situation |",
+    "| Age and seniority | Known age and social seniority. Never infer an unknown age and assert it as fact |",
+    "| Intimacy | How distance is reduced within what the axes above permit |",
+    "",
+    "Conventional starting points, overridden by any established term, explicit setting or agreement:",
+    "",
+    "| Relationship | Usable in a first judgment |",
+    "|---|---|",
+    "| Spouses | 여보, 자기, a name, or the family's established form; check the current marriage and settings |",
+    "| Partners | A name or a mutually permitted pet name; the label alone does not establish 반말 |",
+    "| Relatives | A form matching the known kin relation and generation; never invent kinship from appearance |",
+    "| Teacher and student | Asymmetric forms such as 선생님, 스승님, which may remain after the relationship grows close |",
+    "| Colleagues | A name or title matching the actual environment and agreement; may differ outside the workplace |",
+    "| Strangers | Forms usable without identity information (저기요, 선생님); a name only after it is actually learned |",
+    "",
+    "Strangers of the same age do not automatically use 반말. Workplace hierarchy may apply differently in a private meeting. When age and organizational seniority conflict, check the environment and the established address; if neither decides, the person may avoid the problem with a title. Distinguish a status difference that applies everywhere, only inside one institution, or is temporarily suspended; never record temporarily relaxed formality as permanent. Separate public and private registers only where a real conditional difference exists; do not inflate a small change in warmth into a separate speech system.",
+    "",
+    "### 8.3 Conditions for changing address or register",
+    "Change `address` or the `speech` entry only on: an explicit request or permission (「말 편하게 해」, 「이름으로 불러」) that the span shows accepted; an accepted relationship change; a known change of rank, role or side; or an actual rupture. Each must be shown in the confirmed span with a quote. These direct catalysts may change the record immediately. Without one, require unmistakably consistent changed usage across at least two distinct scenes; a single scene cannot establish permanence however many lines share the tone. If permission applies in one direction, update only that direction. A friendly atmosphere, a joke, anger, intoxication, a roleplay line within the roleplay, an accidental wording, or an affinity change alone never changes it. A provisional baseline marked 「추정」 is the exception: replace it as soon as clear dialogue establishes the real register. When durability is uncertain, keep the record unchanged; the current mood lives in `state` or `scene`.",
+    "",
+    "### 8.4 Relationship progress",
+    "Progress is what the participants actually experienced together and acknowledged. Describe facts (「위기를 함께 넘겼으나 속마음은 아직 말하지 않음」), never a numeric position or an invented grade, and never import the affinity stage as the relationship label. Evidence of forward movement: surviving danger together; disclosing and accepting a secret or hardship; fulfilling a mutually known promise or repayment; a request and help that cost something; voluntary care perceived by the other; explicit expression and acceptance concerning the relationship; shared work, travel, or a narrated time skip that establishes change. Forward movement is one step per event; retreat may be larger with betrayal, humiliation, rejection or a broken promise. Record the current position as a `relationship` entry prefixed 「관계 단계:」 when it changed, and the gap between inner feeling and permitted expression as 「절제:」 when the span shows it. Polite exchange, light personal talk, daily-life sharing, disclosing a hardship, deep self-disclosure and sustained commitment carry different weight; use them as perspectives, not as a table to fill.",
+    "",
+    "### 8.5 Expression ahead of or behind the relationship",
+    "When expression runs ahead of the actual relationship, do not erase the underlying feeling; record it as 「속마음:」 and note that expression was reduced, incomplete, or awaiting a catalyst. When an established relationship is still spoken as between strangers, the span may show familiarity through brevity, natural care, or shared memory rather than declarations. Distinguish outward expression from inner feeling; never erase the earlier feeling to restrain excessive expression.",
+    "",
+    "### 8.6 Knowledge and gaps in contact",
+    "Before recording that a person stated or acted on a fact about another person, check when and how it became known: a shared past the person actually knew, actual transmission or witnessing, or current observation. Meeting during the same period does not make a person know everything about the other. Cards, the lorebook, the whole record, Director memos and another person's hidden state are not in-world transmission paths. Visible clothing or an injury supports only the observation, not the occupation, counterpart, place, winner, or motive. More clues strengthen an interpretation but never produce specificity the evidence cannot explain.",
+    "",
+    "After contact ended, a person does not know changes in the other's occupation, property, marriage, residence, connections or health unless transmitted. Knowledge from before the separation may now be stale: distinguish once-correct stale knowledge (「(당시)」) from a belief that was wrong from the start (「~라고 믿음」). Preserve a false belief in the wording the person believes, with its source; the person may judge consistently inside it; never correct it in advance. Information relayed by a third party cannot be more certain than the relay's own knowledge; an opportunity to talk does not prove the subject was conveyed. A person who does not know may ask, assume wrongly from old knowledge, read only the surface, avoid the subject, or admit not knowing; never fill the path with an invented statement, nod or report by the user. Do not record a name, title or relationship-dependent address for a person who does not know the required information. When the last contact point and the unverified range matter, record them as a `knowledge` entry prefixed 「마지막 접점:」. Store the transition process in an event document and the current state in the person.",
+    "<<END:register>>",
+    "<<SECTION:perception>>",
+    "## 9. Perception: who knows what",
+    "",
+    "Separate the world information the model knows from the information a person actually perceived or learned. A fact in the record, in the status window, in the narration, in another person's memory, or in the model's context is not automatically known by every person. Check, in order: the nature of the fact, whether a path existed, the observer's condition, and the certainty of the interpretation. Never choose a conclusion first and invent a clue or a transmission scene to justify it.",
+    "",
+    "- States of knowing, for `knowledge` entries and for deciding whether a fact may be recorded for a person at all: **observed** (saw, heard, touched it directly), **reported** (was told, read a message, heard a credible report; knows that it was said, not that it is true), **inferred** (concluded from clues the person actually perceived; write as the person's interpretation, which can be wrong), **unaware** (no evidence or path; never record, never let the person ask as if they knew), **false belief** (what the person wrongly believes and why; this is not knowledge of the truth).",
+    "- Require an actual path: sight, hearing, touch, a received message, a credible report, prior disclosure, or a supported inference. A sent message, an unanswered call, an obscured screen, or a witness who could speak later is not received information. A real phone, radio or video connection is a path only for what that medium carries: a voice call does not transmit expressions, clothing or touch.",
+    "- A person must be in the path: present to perceive it, explicitly addressed, or explicitly receiving the message, report, disclosure or correction. A scene fact about another person is not knowledge for an absent owner, however true it is. A newcomer does not inherit the knowledge of those already present. Event information does not propagate to another space by itself.",
+    "- More clues may raise confidence without revealing the exact cause, target, place, order, winner or motive. Never read a whole specific secret from anxious body language. Being told that someone is suspicious is not knowledge of the underlying claim.",
+    "- A misunderstanding persists until a correction actually arrives in the span. Never transmit the truth the reader knows into a person's mind; never use an unintroduced name, occupation or title for a person who has not learned it.",
+    "- Secrets: track only narratively meaningful ones. The program lists, per person, the recorded facts of this chat that this person has not learned in `unknown_to`; use it to decide what the person must still not know, and to fill `must_not_reveal` in the Director memo. When the span shows a secret reaching a person (opening, exposure, showing, contact, speech, transmission), add it to that person's `knowledge` with the path. A Director proposal to reveal something, or a plan to tell someone, is not disclosure. Removing a clue from the world does not erase the memory of someone who already learned it.",
+    "- Record a disclosure, witnessed act, received report, consequential inference, meaningful misunderstanding, or correction only when it can affect a relationship, emotion, suspicion, speech, trust, or a later choice. Do not store routine work facts, ordinary movement, ambient details, task progress, or exhaustive witness lists as knowledge.",
+    "- The user decides what the user's character notices. Never use a person's observation ability to cancel what the user's character observed, and never narrate or record the user's inner state on the user's behalf.",
+    "- If the main model made a person speak about a fact in that person's `unknown_to`, do not record it as learned unless the span also shows the path by which it reached them. Leave the record as it was.",
+    "<<END:perception>>",
+    "",
+    "<<SECTION:perception_ext>>",
+    "### 9.1 Sensory paths and observation ability (extended perception)",
+    "Use these finer rules when deciding whether a person could have perceived a clue, and record what they produce in the ordinary slots: a person's durable observation tendency and domain expertise in `behavior` prefixed 「관찰:」 (once, from the record or from repeated evidence), current impairments in `state`, the scene's sensory conditions in `scene`, and the perceived clue and its interpretation in `knowledge`. Never record a number.",
+    "",
+    "Layers of a fact:",
+    "",
+    "| Layer | Content | Access condition |",
+    "|---|---|---|",
+    "| L0 Presence | existence, rough outline, movement, direction | a real visual, auditory or other channel that reveals presence |",
+    "| L1 Surface | outer clothing, exposed skin, posture, visible expression, visible object | the observer actually looks, under ordinary distance, light and angle |",
+    "| L2 Detail | microexpression, exposed wound, tremor, texture, scent, small asymmetry | sufficient distance, attention or expertise |",
+    "| L3 Concealed | contents behind clothing, a bag, a door, a container, another barrier | actual exposure, opening, contact, transmission, or established prior knowledge |",
+    "| L4 Internal | thought, motive, feeling, an unintroduced name or identity, personal history | actual speech, transmission, prior knowledge, or an inference limited to perceived clues |",
+    "",
+    "Never lower a fact's layer for convenience. Tears may be visible, but sadness is an interpretation and the tears could be from joy. A wound under a sleeve is not visible; favoring the arm is a separate clue. Worn clothing does not reveal a specific occupation, assets or past.",
+    "",
+    "Paths:",
+    "",
+    "| Path | Scope and limits |",
+    "|---|---|",
+    "| Vision | distance, light, angle, obstruction, and whether the observer is actually looking; turning away or attending elsewhere prevents automatic sight |",
+    "| Hearing | only speech, voice and sound that actually arrived; doors, distance, crowd noise, call connection state |",
+    "| Smell | clues within actual scent range; never diagnose a specific illness, wound or substance from a medicinal smell |",
+    "| Touch | only the body part or object actually touched; contact does not reveal an untouched pocket or bag |",
+    "",
+    "At close range in bright light, surface and detail may be visible. Across a room, color and outline may be visible while texture is not. Darkness or backlight may leave only an outline; someone standing behind another cannot see their face. Strong observation cannot ignore obstruction or absence of gaze. Connected rooms or an open door may carry sound without opening every path.",
+    "",
+    "Observation ability (reason with it; never output it): baseline oblivious −1, ordinary 0, attentive +1, trained observer +2; domain expertise +1 only when the clue falls within the person's expertise (a physician is not a handwriting analyst); impairments −1 each, only with evidence: intoxication, fatigue or sleep deprivation, pain or injury, strong emotion, divided attention, an overwhelming unfamiliar environment; enhancements +1 each, only with evidence: active alertness, actual suspicion toward the target, searching for a specific target; familiarity +1 when noticing how a well-known person differs from their norm (it does not grant access to a newly hidden fact). Total range −2 to +3. Expertise and familiarity depend on the target and the clue, so never reuse one total for every person. The baseline persists; scene adjustments are re-read from current evidence when place, time or participation changes, without erasing a persistent injury. A person without a recorded tendency uses ordinary as a provisional baseline; never make everyone a trained observer, and never build a profile for a passerby.",
+    "",
+    "Clue difficulty: obvious 0, visible with attention 1, subtle 2, hidden 3. No access is not a high number; it means the path does not exist. When the ability meets or exceeds the difficulty, the person can perceive the clue. Exactly one step below: the person senses only that something is off, without a specific cause. Lower: the clue does not reach them. Without a path, perception fails regardless of ability. Never claim an exact judgment for a condition without evidence, never dress up a result with an outdated impairment, and never invent a clue or suppress someone's perception merely to make observers differ.",
+    "",
+    "Certainty of interpretation, for the wording of `knowledge` entries: **known** (direct perception or credible evidence; distinguish that a source spoke from the truth of what it said), **inferred_strong** (independently perceived clues point the same way; write as the person's interpretation, which may still be wrong), **inferred_weak** (sparse evidence or several explanations; write only as speculation, impression or question), **unaware**, **false_belief** (what the person wrongly believes and why). Limited point of view narrates only what the viewpoint person senses; an omniscient narration still does not give the persons knowledge.",
+    "<<END:perception_ext>>",
+    "<<SECTION:taste>>",
+    "## 12. Taste band (first impression) — Risupot affinity.taste_band",
+    "",
+    "Each person may hold a taste band −3…+3 toward the user's character: how far the user's appearance, manner and conduct match this person's own tastes. It is a separate axis from accumulated affinity, from the relationship type and from duty; protagonist status creates no attraction, and being outside this person's romantic scope still allows nonromantic respect or comradeship. Never derive the band from the affinity total, and never use the band to create affinity.",
+    "- `taste_now` in `people` is the current band or null. When it is null and this person actually interacts with the user in the confirmed span, derive it ONCE from the person's established tastes, values and the visible appearance or manner shown, or from neutral ordinary choices; use explicit settings and depicted reactions first, then a provisional evidence-grounded assessment. Do not invent preferences. If nothing supports a judgment, return nothing.",
+    "- An existing band moves only after a catalyst: observing a new taste or aversion, actual revelation of a concealed layer, conduct that incurs a cost, display of an ability the person values, directly experienced cruelty, humiliation or deceit, or an explicit changing time skip. An increase moves at most one band per event (also when grounded only in reputation actually transmitted); a decrease may cross several bands. Time passing alone does not restore the band. A single exception does not rewrite a profile.",
+    "- Bands: −3 strong aversion (ends or avoids contact) · −2 clear dislike (friction, distance, less voluntary kindness) · −1 slightly grating (responds only as needed) · 0 no particular pull or aversion · +1 weakly drawn (more attention, remembers, keeps talking) · +2 core tastes clearly match (asks first, spends time and effort) · +3 several core tastes strongly match (priorities of attention may shift).",
+    "- When several persons show a strong preference for the same target, confirm each person's specific taste evidence; never shape a desired distribution. Return `taste` items only for a derivation or an actual change, with the new absolute band, `m`, a verbatim `quote` and a short Korean `reason`.",
+    "<<END:taste>>",
+    "<<SECTION:openness>>",
+    "## 13. Openness (shown to the user as 음란도) — Risupot openness.score",
+    "",
+    "An accumulated value 0…300 for an adult person, tracking how openly that person responds in intimate contexts. `openness_now` in `people` is `{value, stage}` or null. Preserve an existing value, including zero; never reinitialize.",
+    "- **Baseline (once, `op: init`)**: when `openness_now` is null, inspect only what the record and span actually give: core traits and values, intimacy style, emotion expression and defense, explicit sexual experience or attitude, explicit contraception conditions, initiative versus receptivity in intimate contexts, boundaries and trust prerequisites, novelty or risk attitude specifically in intimacy, shame/guilt/taboo inhibition, and verified actual behavior over fantasy or words. Unknown contributes nothing. Marriage, sociability, affection, initiative or generic impulsivity alone never establish a high baseline. Allowed values: 0 (conservative, guarded, or no evidence), 90 (shy curiosity or plausibly receptive; the maximum supported by personality alone), 150 (explicit sexual interest, open attitude or experience), 210 (clearly proactive or adventurous experience or preference), 270 (explicitly highly indulgent or unrestrained evidence). A label like married is never enough. Without explicit background support, leave the value absent during ordinary scenes; a qualifying confirmed intimacy trigger in the span (intentional handholding, embrace, intimate pressing, kiss, caress, exposure, sexual proposition, or stronger consensual adult contact) may create it as `init 0` plus a separate `event`. Ordinary conversation, work proximity, accidental touch or non-intimate contact creates nothing.",
+    "- **New actual reactions (`op: event`, `delta`)**: +1 a small voluntary new reaction actually shown during relevant light contact, gaze or conversation · +3 a meaningful new reaction to mutually accepted relevant contact or atmosphere, including recognizing one's own welcoming response · +5 a new positive relevant experience the person actually and voluntarily accepted or initiated · +10 a rare and important personal milestone in a consensual situation between adults · −2 withdrawing from embarrassment or newly regaining composure · −4 closing off after uncomfortable contact, interruption or a broken mood · −5 a reaction clearly blocked by disgust, fear or shame. Increased affinity, nonsexual kindness, appearance, another person's reaction, routine repetition, ordinary recurring marital relations, alcohol and reduced resistance are not rewards. Never count coercion, an ignored refusal or an impaired ability to choose as a positive event. Never count baseline evidence again as an event, and never add the same event again because it was redescribed or rerolled.",
+    "- Stages and contraception attitude are computed by the program from the value (0–60 Chaste: must use contraception · –120 Shy: hesitant but still asks · –180 Open: non-use acceptable on a 'safe day' as a belief · –240 Awakened: pays little attention · –300 Indulgent: prefers non-use). You never compute the total or the stage; return only `init` values and `event` deltas with `m`, a verbatim `quote` and a Korean `reason`. Up to 3 events per person per response.",
+    "<<END:openness>>",
+    "<<SECTION:rhythm>>",
+    "## 14. Narrative rhythm and hooks — Risupot rhythm",
+    "",
+    "This feature tracks scene tension and aftermath, chapter flow, and the advancement and payoff of clues actually planted. It never adds an event every turn or forces the story into a shape; when emotion, goals or conflict are already moving, respect that flow. It is recorded as `docs` of type `rhythm` with fixed keys:",
+    "- `scene` (one record, upsert): text starts with `[phase:baseline|build_up|peak|aftermath|cooldown] [engagement:active|idle|intentional_rest]`, then the actual tension factors, evidence of meaningful quiet or stagnation, and the staging method actually applied. Phases may be skipped or repeated; do not attach a preparation phase to a sudden event, and do not cover a scene that needs aftermath with the next stimulus. Rest, mourning, lingering emotion and accepting a feeling are meaningful progression, never boredom. Review stagnation only when the same topic or purposeless talk continues across two or more confirmed turns; a short user input alone is not stagnation.",
+    "- `chapter` (upsert): the chapter's shared theme, turning points and important event links, reviewed only after an actual scene cycle ends through a new location, date or subject.",
+    "- `arc` (upsert): a long-term narrative assessment of the relationship's actual turning points and unresolved tension, reviewed only at a chapter boundary or an important event. Never duplicate the relationship entries or an affinity stage, and never overwrite them with rhythm vocabulary.",
+    "- `hook:<short name>` (one per clue): text starts with `[stage:seeded|hinted|escalated|payoff_ready|resolved|retired] [tier:short|mid|long]`, then the evidence of the clue actually planted, its scale, payoff condition, actual advancement and links. Register a hook only when it actually appeared in completed text; never from a plan. Advance a stage only when the span actually shows it; at most one hook action per response.",
+    "- `pending` (upsert): an unconfirmed next development attached to an already planted hook, kept separate from facts and from a person's confirmed intent; never a future event with a confirmed date or place. When a prior pending development did not occur, never mark it complete.",
+    "- `rhythm_note` (when `next_note` is true): one English memo ≤200 chars for the model that writes the next reply — the current phase, whether existing tension is moving or the scene is genuine aftermath, and at most one allowed hook action (what evidence it comes from, what could enter the scene, why now, which choices stay open). Do not repeat the previous staging method; never use delay merely to block the user's choices; never force a hook action every turn; never expose numbers or diagnostics verbatim.",
+    "<<END:rhythm>>",
+    "<<SECTION:faction_rep>>",
+    "## 15a. Faction standing — how each organization regards the user",
+    "",
+    "Besides persons, the chat keeps a standing value per organization (관리국, 가짜 관리국, 백일몽, 민간, 프리랜서 협회, and any organization in the roster) toward the user's character: −100…100 in five stages (`faction_stages`). `factions_now` lists the organizations present in this span with their current stage. The program seeds each value from the organization table and recomputes it from cues; you never return a value.",
+    "- Return a `faction_cues` item when something in the confirmed span would change how THAT organization, as such, regards the user: you judge whether the event reaches the organization's view (its members' shared knowledge, its decisions, its treatment of the user), not just one person's private feeling. A decision or action by the organization or by members acting for it, a deed its members witnessed and would carry back, a deal, a ban, an audit, a public act toward the organization — all can qualify. A purely private exchange that stays between the user and one member, with no reason to reach the organization, does not.",
+    "- Do not record the same event twice: when it already produced a person `cue` for a member and it carries no weight beyond that member, do not also return a faction cue; when it does reach the organization, both may be recorded (the person's feeling and the organization's standing are separate).",
+    "- Use the same cue names as person affinity (`cues`) with the same meanings, judged at the organization's scale. The `reason` (Korean ≤40) names the event. Cite `m` and a verbatim `quote`. At most one item per organization per response.",
+    "- Faction documents (`docs` type faction) describe what happened between organizations in prose; `faction_cues` changes only the organization's standing toward the user. The same event may appear in both.",
+    "<<END:faction_rep>>",
+    "<<SECTION:wallet>>",
+    "## 15b. Money — transactions with an explicit amount",
+    "",
+    "The chat keeps a ledger of the user's character's cash; `wallet_now` gives the current balance in won. The program owns the balance; you report only transactions.",
+    "- Return a `transactions` item ONLY when the confirmed span states an explicit amount of money that the user's character paid, received, lost, found, or was charged (digits such as `50,000원`, `₩3,000`, or Korean numerals such as `3만 원`). `amount` is a signed integer in won: negative when money leaves the user, positive when it comes in. `memo` (Korean ≤30) names what it was for.",
+    "- Cite `m` and a verbatim `quote` that contains the amount. Never infer, estimate, or round an amount that is not written; never record a price that is only mentioned or offered without the transaction happening; never record another person's money. If the same purchase is stated twice, report it once.",
+    "<<END:wallet>>",
+    "<<SECTION:debrief>>",
+    "## 15c. Debrief — a deployed agent's short note on an incident that just ended",
+    "",
+    "`ended_now` lists incidents that ended in this span (id, kind, name, grade, place, deployed `agents`, `result`, last situation lines `trail_tail`, and `mine` = the user's character took part). The program already recorded the facts; you add only the voice.",
+    "- For each item return one `debriefs` entry: `id` copied as given, `who` = one name from that item's `agents` (the one most involved in the confirmed span; the first when unsure), `text` = 2–3 Korean sentences (≤240 characters) in that agent's voice: what happened and how it felt, as an after-action note.",
+    "- Use only facts from `ended_now` and the confirmed span. Never invent names, numbers, injuries or outcomes; never quote the span verbatim at length; no quotation marks around the whole note; no template symbols (double braces, double percent). One entry per incident; skip an incident only when `agents` is empty and nothing in the span tells who handled it.",
+    "<<END:debrief>>",
+    "<<SECTION:tidy>>",
+    "## 11. Tidying an oversized record",
+    "",
+    '`tidy` lists persons whose record exceeds the storage budget: `name`, `chars` (current size), `target` (size to reach). For each listed person, besides this turn\'s changes, reduce the record toward `target` with `merge` items: `{"who","slot","op":"merge","from":["<id>","<id>"],"text":"<one statement ≤300 chars>","m":"<any confirmed m>","quote":null}`.',
+    "- A merge combines two or more live entries of the same slot into one denser statement that keeps every fact still true (names, numbers, places, dates). Merge what overlaps, repeats, or is superseded; never merge entries that say different things just to shrink the size. Pinned entries cannot be merged.",
+    "- Prefer merging in `history` (adjacent events into one line), `state` and `scene` (keep only what is still true), then `knowledge`, `behavior`, `threads`. `relationship` and `speech` keep one entry per target. Leave `identity` and `personality` unless they repeat.",
+    "- Do not shrink below `target`; a reasonable merge that lands near it is enough. Up to 24 items per tidied person in this response. A person not listed in `tidy` must not receive `merge` items.",
+    "<<END:tidy>>",
+    "<<SECTION:suspicion>>",
+    "## 10. Suspicion (general)",
+    "",
+    "A person may come to suspect another person (or the user's character) of something. This feature tracks such a case: what raised it, what the suspecting person actually learned, how they interpret it, how they respond, and whether it was confirmed, dispelled, or set aside. The program keeps a score 0–100 per case and derives a stage from it; you return the case events, never the number. Kinds of suspicion (`kind`):",
+    "- 정체 (identity): the target is not who or what they claim: a fake agent, an impostor, a 괴이 or something inhuman passing as a person, a false name or rank.",
+    "- 배신 (betrayal or collusion): the target works for or passes information to another side, breaks a trust, or plays both sides.",
+    "- 거짓말 (lying): the target's account of a specific matter is false or concealing (an alibi, a report, an explanation).",
+    "- 오염 (contamination or infection): the target has been affected by an anomaly, a curse, an infection, or possession, and may be dangerous or changed.",
+    "- 범행 (wrongdoing): the target did a specific harmful act: a theft, an assault, a sabotage, a death.",
+    "Do not open a case for an ordinary disagreement, a joke, a vague bad feeling with no clue, or the person's general distrustfulness. One case per suspecting person, target and kind; a case about a different kind toward the same target is a separate case. `who` is the person who suspects; `target` is a name from `people` or `new_people`, or `@user`. Never invent the user's private suspicion or decision; the user's character can be a target, not a `who`.",
+    "",
+    "### 10.1 What the suspecting person learned",
+    "Distinguish facts actually observed or received by the suspecting person, their interpretation, and what is objectively confirmed. Hearing a rumor is a fact about transmission, not proof of the rumor. A sent message, an obscured screen, or a witness who could speak later means nothing was received. Information can arrive by call, relayed statement or received message without presence; check what the medium conveyed and the sender's credibility. The target's private feelings, guilt, fear, thoughts and secrets known only to the model are not evidence available to the suspecting person. A clue that exists but has not been discovered stays out of the case: never raise suspicion from an undiscovered clue or make the person speak its content. A clue disappearing does not erase the memory of someone who learned it. When an anonymous or unidentified target is later revealed to be a known person, enrich the existing case under the real name; do not open a new case. When it is unclear whether two targets are the same person, do not merge.",
     "",
     "### 10.2 What clues mean",
     "A clue must connect to the actual target and the actual kind. Do not turn ordinary kindness, laughter, lateness, a slow reply, privacy, nervousness, or an unusual habit into evidence by itself. Weigh clues by what newly reached the person:",
@@ -426,7 +675,7 @@ ther two targets are the same person, do not merge.",
   ].join("\n");
 
   // src/core/people/prompt/index.ts
-  var promptFor = (s5) => s5.prompt === "compact" ? UPDATER_COMPACT : UPDATER_DETAILED;
+  var promptFor = (s7) => s7.prompt === "compact" ? UPDATER_COMPACT : UPDATER_DETAILED;
 
   // src/host/people.ts
   var DIAG_KEY = "goei-people-diag";
@@ -568,11 +817,11 @@ ther two targets are the same person, do not merge.",
     const seeded = seedAppearing(store, ctx2.chat, unread, sheet, { exclude, identity: identity ?? store.identity });
     if (seeded.length || idChanged || dropped.length) {
       await updateChat(ctx2.charIndex, ctx2.chatIndex, (cur) => {
-        const s5 = peopleStore(cur);
-        dropExcluded(s5, exclude);
-        for (const n2 of seeded) if (!s5.people[n2]) s5.people[n2] = store.people[n2];
-        if (identity && idChanged) s5.identity = identity;
-        return withPeople(cur, s5);
+        const s7 = peopleStore(cur);
+        dropExcluded(s7, exclude);
+        for (const n2 of seeded) if (!s7.people[n2]) s7.people[n2] = store.people[n2];
+        if (identity && idChanged) s7.identity = identity;
+        return withPeople(cur, s7);
       }).catch(() => null);
     }
     const batches = planBatches(ctx2.chat, unread, settings.spanCap);
@@ -594,22 +843,23 @@ ther two targets are the same person, do not merge.",
         const walletStart = getPrefs().walletStart ?? WALLET_START_DEFAULT;
         const balance = walletOn2 ? walletBalance(readWallet(fresh.chat.scriptstate, walletStart), aliveAnchors(fresh.chat)) : null;
         const batchKeys = batches[b].map((i) => fresh.chat.message[i] ? messageKey(fresh.chat.message[i], i) : "").filter(Boolean);
-        const ended = journalSettings(fresh.chat.scriptstate).debriefAuto && !o.scope?.only ? endedInBatch(readReports(fresh.chat), batchKeys).map(endedNowOf) : [];
-        const input2 = buildUpdate(fresh.chat, curStore, batches[b], { settings, system: "", values: Object.fromEntries(input0Names(curStore).map((n2) => [n2, valuesOf(n2)])), names: allNames(), exclude, factionNames: factionNamesOf(fresh.char.globalLore), only: o.scope?.only, wallet: balance, ended });
+        const ended = [];
+        void batchKeys;
+        const input3 = buildUpdate(fresh.chat, curStore, batches[b], { settings, system: "", values: Object.fromEntries(input0Names(curStore).map((n2) => [n2, valuesOf(n2)])), names: allNames(), exclude, factionNames: factionNamesOf(fresh.char.globalLore), only: o.scope?.only, wallet: balance, ended });
         const sections3 = enabledSections(settings);
-        if (input2.tidy.length) sections3.add("tidy");
+        if (input3.tidy.length) sections3.add("tidy");
         if (walletOn2) sections3.add("wallet");
         if (ended.length) sections3.add("debrief");
         const system = assemblePrompt(promptFor(settings), sections3, settings.rules, settings.lang);
-        input2.system = system;
-        if (!input2.people.length) {
+        input3.system = system;
+        if (!input3.people.length) {
           if (!o.scope?.only) await updateChat(fresh.charIndex, fresh.chatIndex, (cur) => {
-            const s5 = peopleStore(cur);
-            for (const i of input2.indexes) {
+            const s7 = peopleStore(cur);
+            for (const i of input3.indexes) {
               const m = cur.message[i];
-              if (m) s5.read[messageKey(m, i)] = messageHash(m);
+              if (m) s7.read[messageKey(m, i)] = messageHash(m);
             }
-            return withPeople(cur, s5);
+            return withPeople(cur, s7);
           });
           diag.ok = true;
           diag.stage = "skip";
@@ -617,9 +867,9 @@ ther two targets are the same person, do not merge.",
           result.skipped.push("장면 인물 없음");
           continue;
         }
-        const dataText = JSON.stringify(input2.data);
-        diag.people = input2.people;
-        diag.sizes = { system: system.length, data: dataText.length, span: JSON.stringify(input2.data.span).length };
+        const dataText = JSON.stringify(input3.data);
+        diag.people = input3.people;
+        diag.sizes = { system: system.length, data: dataText.length, span: JSON.stringify(input3.data.span).length };
         if (settings.keepRaw) {
           diag.system = system;
           diag.data = dataText;
@@ -632,15 +882,15 @@ ther two targets are the same person, do not merge.",
         diag.raw = raw;
         diag.outChars = raw.length;
         await waitNotBusy();
-        const keys = new Map([...input2.tags.values()].map((i) => [i, messageKey(fresh.chat.message[i], i)]));
+        const keys = new Map([...input3.tags.values()].map((i) => [i, messageKey(fresh.chat.message[i], i)]));
         const saved = await updateChat(fresh.charIndex, fresh.chatIndex, (cur) => {
           if (chatId({ ...fresh, chat: cur }) !== id) return null;
           for (const [i, k] of keys) if (!cur.message[i] || messageKey(cur.message[i], i) !== k) return null;
-          const s5 = peopleStore(cur);
-          const report = applyUpdate(s5, cur, input2, value, {
+          const s7 = peopleStore(cur);
+          const report = applyUpdate(s7, cur, input3, value, {
             settings,
             sheetOf: sheet,
-            baseOf: (name) => seedBaseFor(name, userFaction(cur), s5.identity),
+            baseOf: (name) => seedBaseFor(name, userFaction(cur), s7.identity),
             exclude,
             only: o.scope?.only,
             keepRead: !!o.scope?.only,
@@ -654,11 +904,15 @@ ther two targets are the same person, do not merge.",
             for (const e of report.wallet) w = addWalletEntry(w, { ...e, src: "story" });
             next = { ...cur, scriptstate: { ...cur.scriptstate ?? {}, ...walletVars(w) } };
           }
+          if (walletOn2) {
+            const w = syncWalletToStatus(readWallet(next.scriptstate, walletStart), next);
+            if (w) next = { ...next, scriptstate: { ...next.scriptstate ?? {}, ...walletVars(w) } };
+          }
           if (report.debriefs?.length) {
             const d = withDebriefs(readReports(next), report.debriefs, reason2 === "backfill" ? "backfill" : "turn");
             if (d.applied) next = { ...next, scriptstate: { ...next.scriptstate ?? {}, ...reportVars(d.store) } };
           }
-          return withPeople(next, s5);
+          return withPeople(next, s7);
         });
         if (!saved) {
           diag.stage = "save";
@@ -684,10 +938,10 @@ ther two targets are the same person, do not merge.",
     if (settings.tidy === "separate" && result.ran) {
       const now = await loadContext().catch(() => null);
       if (now && chatId(now) === id) {
-        const s5 = peopleStore(now.chat);
+        const s7 = peopleStore(now.chat);
         const live = liveness(now.chat);
-        for (const n2 of Object.keys(s5.people)) {
-          if (recordChars(s5.people[n2], live) <= settings.personCap) continue;
+        for (const n2 of Object.keys(s7.people)) {
+          if (recordChars(s7.people[n2], live) <= settings.personCap) continue;
           const r = await consolidateInner(now, n2, settings).catch((error) => ({ ok: false, message: String(error) }));
           if (!r.ok) result.skipped.push(`정리(${n2}): ${r.message}`);
         }
@@ -697,7 +951,7 @@ ther two targets are the same person, do not merge.",
     setStatus({ busy: false, label: "", unread: after ? unreadIndexes(after.chat, peopleStore(after.chat)).length : 0 });
     return result;
   }
-  var input0Names = (s5) => Object.keys(s5.people);
+  var input0Names = (s7) => Object.keys(s7.people);
   async function backfillPeople(turns2) {
     const ctx2 = await loadContext().catch(() => null);
     if (!ctx2) return { ran: 0, applied: 0, skipped: ["채팅을 읽지 못했어요"], errors: [] };
@@ -719,9 +973,9 @@ ther two targets are the same person, do not merge.",
     const indexes = mentionIndexes(ctx2.chat, name, [...p.aliases, ...allNames().find((n2) => n2.name === name)?.aliases ?? []], turns2);
     let cleared = 0;
     await updateChat(ctx2.charIndex, ctx2.chatIndex, (cur) => {
-      const s5 = peopleStore(cur);
-      cleared = clearStoryRecords(s5, name);
-      return withPeople(cur, s5);
+      const s7 = peopleStore(cur);
+      cleared = clearStoryRecords(s7, name);
+      return withPeople(cur, s7);
     });
     if (!indexes.length) return { ran: 0, applied: 0, skipped: ["최근 응답에 이 인물이 나오지 않아요 (기록만 비움)"], errors: [], cleared };
     const r = await requestPeopleUpdate("reread", { manual: true, scope: { indexes, only: [name] } });
@@ -735,18 +989,18 @@ ther two targets are the same person, do not merge.",
   }
   async function consolidateInner(ctx2, name, settings) {
     const store = peopleStore(ctx2.chat);
-    const input2 = buildConsolidate(store, ctx2.chat, name, settings);
-    if (!input2) return { ok: false, message: "정리할 항목이 없어요." };
+    const input3 = buildConsolidate(store, ctx2.chat, name, settings);
+    if (!input3) return { ok: false, message: "정리할 항목이 없어요." };
     const id = chatId(ctx2);
     const t0 = Date.now();
-    const diag = { at: (/* @__PURE__ */ new Date()).toISOString(), chat: id, reason: "consolidate", model: settings.model, people: [name], indexes: [], sizes: { system: input2.system.length, data: 0, span: 0 }, outChars: 0, ms: 0, ok: false };
+    const diag = { at: (/* @__PURE__ */ new Date()).toISOString(), chat: id, reason: "consolidate", model: settings.model, people: [name], indexes: [], sizes: { system: input3.system.length, data: 0, span: 0 }, outChars: 0, ms: 0, ok: false };
     setStatus({ busy: true, label: `${name} 기록 정리 중…` });
     try {
-      const dataText = JSON.stringify(input2.data);
+      const dataText = JSON.stringify(input3.data);
       diag.sizes.data = dataText.length;
-      if (settings.keepRaw) diag.system = input2.system, diag.data = dataText;
+      if (settings.keepRaw) diag.system = input3.system, diag.data = dataText;
       const messages = [
-        { role: "system", content: input2.system },
+        { role: "system", content: input3.system },
         { role: "user", content: `Record to tidy:
 ${dataText}
 
@@ -758,9 +1012,9 @@ Return the JSON object.` }
       await waitNotBusy();
       const saved = await updateChat(ctx2.charIndex, ctx2.chatIndex, (cur) => {
         if (chatId({ ...ctx2, chat: cur }) !== id) return null;
-        const s5 = peopleStore(cur);
-        diag.tidy = applyConsolidate(s5, name, input2, value, liveness(cur), settings);
-        return withPeople(cur, s5);
+        const s7 = peopleStore(cur);
+        diag.tidy = applyConsolidate(s7, name, input3, value, liveness(cur), settings);
+        return withPeople(cur, s7);
       });
       if (!saved) {
         diag.stage = "save";
@@ -785,9 +1039,9 @@ Return the JSON object.` }
   var directorCache = null;
   var directorSlowStreak = 0;
   var directorPaused = () => directorSlowStreak >= 3;
-  async function directorNoteText(chat, store, people, input2, settings, user) {
+  async function directorNoteText(chat, store, people, input3, settings, user) {
     if (settings.director !== "scene" || directorPaused()) return "";
-    const built = buildDirector(chat, store, people, input2, settings, Object.fromEntries(people.map((n2) => [n2, valuesOf(n2)])));
+    const built = buildDirector(chat, store, people, input3, settings, Object.fromEntries(people.map((n2) => [n2, valuesOf(n2)])));
     if (!built) return "";
     if (settings.directorReuse && directorCache?.key === built.key) return directorBlock(directorCache.notes, user);
     const t0 = Date.now();
@@ -817,13 +1071,13 @@ Return the JSON object.` }
   }
 
   // src/ui/lorecheck.ts
-  var esc17 = (s5) => String(s5 ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+  var esc18 = (s7) => String(s7 ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
   var WHY = { status: "상태창", input: "이번 입력", user: "내 글", char: "응답", confirmed: "확증", place: "위치", agent: "동행·투입", parent: "본 항목" };
   function item(p, risu = false) {
     const r = p.reasons[0];
     const why = risu ? `키 「${r.key}」` : `${WHY[r.why]} · 「${r.snippet.trim()}」`;
     const kind = `${SLOTS2[p.entry.kind].label}${p.entry.appendix ? " 부록" : ""}`;
-    return `<div class="ps-row lc-row"><div class="ps-label"><b>${esc17(p.entry.name)}</b><small>${esc17(why)}</small></div><span class="lc-kind">${kind}</span></div>`;
+    return `<div class="ps-row lc-row"><div class="ps-label"><b>${esc18(p.entry.name)}</b><small>${esc18(why)}</small></div><span class="lc-kind">${kind}</span></div>`;
   }
   function loreCheckBox(ctx2) {
     const mode2 = advValue(ctx2.chat.scriptstate, "gen", "lore_mode");
@@ -843,7 +1097,7 @@ Return the JSON object.` }
     const diff = more || less ? `${more ? `<h4 class="lc-sub">더 켜짐</h4>${more}` : ""}${less ? `<h4 class="lc-sub">안 켜짐</h4>${less}` : ""}` : '<p class="ps-note">달라지는 것이 없어요.</p>';
     return `<details class="ps-adv" data-keep="lore-check"${keepOpen("lore-check")}><summary class="ps-adv-sum"><b>로어북 확인</b><span class="adv-count">${now.picks.length}개 · 약 ${size.toLocaleString()}토큰</span></summary><div class="ps-adv-body">
     <section class="ps-group"><h3>${mode2 === "risu" ? "Risu가 켤 로어북" : "다음 요청에 넣을 로어북"}</h3><div class="ps-rows">${list4}</div></section>
-    ${now.locked.length ? `<section class="ps-group"><h3>해금 전 부록</h3><div class="ps-rows">${now.locked.map((e) => `<div class="ps-row lc-row"><div class="ps-label"><b>${esc17(e.name)}</b><small>${esc17(`해금 조건: ${e.appendix?.when.unlock ?? ""}`)}</small></div><span class="lc-kind">잠김</span></div>`).join("")}</div><p class="ps-note">모델에게는 해금 조건만 알려요. 조건이 맞으면 응답 끝에 해금 표시를 남기고, 다음 요청부터 내용이 들어가요.</p></section>` : ""}
+    ${now.locked.length ? `<section class="ps-group"><h3>해금 전 부록</h3><div class="ps-rows">${now.locked.map((e) => `<div class="ps-row lc-row"><div class="ps-label"><b>${esc18(e.name)}</b><small>${esc18(`해금 조건: ${e.appendix?.when.unlock ?? ""}`)}</small></div><span class="lc-kind">잠김</span></div>`).join("")}</div><p class="ps-note">모델에게는 해금 조건만 알려요. 조건이 맞으면 응답 끝에 해금 표시를 남기고, 다음 요청부터 내용이 들어가요.</p></section>` : ""}
     <section class="ps-group"><h3>${otherIf}</h3><div class="ps-rows">${diff}</div></section>
   </div></details>`;
   }
@@ -929,7 +1183,7 @@ Return the JSON object.` }
   }
   var jobs3 = /* @__PURE__ */ new Map();
   var chatKey3 = (ctx2) => `${ctx2.charIndex}:${ctx2.chatIndex}`;
-  var esc18 = (s5) => String(s5 ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+  var esc19 = (s7) => String(s7 ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
   var regCache = null;
   function registry(ctx2) {
     if (!regCache || regCache.lore !== ctx2.char.globalLore) regCache = { lore: ctx2.char.globalLore, reg: buildRegistry(ctx2.char.globalLore) };
@@ -989,11 +1243,11 @@ Return the JSON object.` }
       env3.render();
       return;
     }
-    const s5 = wikiSettings(ctx2.chat.scriptstate);
+    const s7 = wikiSettings(ctx2.chat.scriptstate);
     const old = findDoc(ctx2.chat, title2, ctx2.char.globalLore);
     const inherited = regenerate ? old?.meta && !old.meta.direct ? old.meta.primarySources : [] : wiki.inherited;
     const direct = regenerate ? !!old?.meta?.direct : wiki.direct;
-    const previousDoc = regenerate ? usePrevious ?? s5.refreshPrevious ? old : null : wiki.previousTitle ? findDoc(ctx2.chat, wiki.previousTitle, ctx2.char.globalLore) : null;
+    const previousDoc = regenerate ? usePrevious ?? s7.refreshPrevious ? old : null : wiki.previousTitle ? findDoc(ctx2.chat, wiki.previousTitle, ctx2.char.globalLore) : null;
     const writingRequest = String(ctx2.chat.scriptstate?.["$nw_writing_request"] ?? "");
     jobs3.set(key2, { title: title2, started: Date.now() });
     wiki.failure = null;
@@ -1007,10 +1261,10 @@ Return the JSON object.` }
           return {};
         }
       })();
-      const prompt = fitPrompt(budgetFor(ctx2.chat.scriptstate, "nw"), () => wikiPrompt(source3(ctx2), { title: title2, inherited, previous: previousDoc?.body ?? null, writingRequest, docRequest: docRequest.trim(), direct }, s5, catalogNames, registry(ctx2)));
+      const prompt = fitPrompt(budgetFor(ctx2.chat.scriptstate, "nw"), () => wikiPrompt(source3(ctx2), { title: title2, inherited, previous: previousDoc?.body ?? null, writingRequest, docRequest: docRequest.trim(), direct }, s7, catalogNames, registry(ctx2)));
       let body5;
       try {
-        body5 = (await generate(prompt.messages, s5.model, (raw) => acceptArticle(raw, title2, canon(ctx2)), { ...genSettings(ctx2.chat.scriptstate), state: ctx2.chat.scriptstate })).value;
+        body5 = (await generate(prompt.messages, s7.model, (raw) => acceptArticle(raw, title2, canon(ctx2)), { ...genSettings(ctx2.chat.scriptstate), state: ctx2.chat.scriptstate })).value;
       } catch (error) {
         const raw = error.raw;
         if (raw) wiki.failure = { title: title2, reason: error instanceof Error ? error.message : String(error), raw };
@@ -1018,10 +1272,10 @@ Return the JSON object.` }
       }
       const meta = {
         title: title2,
-        mode: s5.mode,
-        model: s5.model,
+        mode: s7.mode,
+        model: s7.model,
         created: Math.floor(Date.now() / 1e3),
-        length: s5.length,
+        length: s7.length,
         sources: prompt.sources,
         primarySources: prompt.primarySources.length ? prompt.primarySources : inherited,
         writingRequest,
@@ -1116,16 +1370,16 @@ Return the JSON object.` }
   }
   function face2(ctx2, e, cls = "") {
     const url = e?.face ? imageUrl(ctx2.char, e.face) : null;
-    return `<span class="ph-avatar nw-ava${cls}${e ? ` k-${e.cat}` : ""}">${url ? `<img src="${esc18(url)}" alt="" loading="lazy">` : e ? CAT_ICON[e.cat] : ICONS.book}</span>`;
+    return `<span class="ph-avatar nw-ava${cls}${e ? ` k-${e.cat}` : ""}">${url ? `<img src="${esc19(url)}" alt="" loading="lazy">` : e ? CAT_ICON[e.cat] : ICONS.book}</span>`;
   }
-  function seg4(action, cur, items) {
+  function seg5(action, cur, items) {
     const sw = onOffSwitch(items, cur, action, (v) => v);
     if (sw) return sw;
     return `<div class="gx-segs gx-segs-sm">${items.map(([v, label2]) => `<button class="gx-seg${cur === v ? " on" : ""}" data-action="${action}" data-value="${v}" aria-pressed="${cur === v}">${label2}</button>`).join("")}</div>`;
   }
   function busyLine(ctx2) {
     const job = jobs3.get(chatKey3(ctx2));
-    return job ? `<div class="nw-busy" role="status"><span class="nw-spin"></span>「${esc18(job.title)}」 문서를 작성하는 중이에요. 창을 닫아도 계속돼요.</div>` : "";
+    return job ? `<div class="nw-busy" role="status"><span class="nw-spin"></span>「${esc19(job.title)}」 문서를 작성하는 중이에요. 창을 닫아도 계속돼요.</div>` : "";
   }
   var tool3 = (action, icon2, label2, extra = "", short = "") => `<button class="ph-tool" data-action="${action}" aria-label="${label2}" title="${label2}" ${extra}>${icon2}${short ? `<span class="ph-tool-l">${short}</span>` : ""}</button>`;
   var blank4 = (text4) => `<div class="ph-blank"><p>${text4}</p></div>`;
@@ -1133,8 +1387,8 @@ Return the JSON object.` }
   function row4(ctx2, e, title2, sub, dot = false) {
     const on2 = (wiki.view === "doc" || wiki.view === "compose") && wiki.title === title2;
     const small = sub ?? (e ? [e.title !== e.name ? e.title : "", e.sub].filter(Boolean).join(" · ") : "");
-    return `<li class="ph-row"><button class="ph-main nw-row${on2 ? " on" : ""}" data-action="wiki-pick" data-value="${esc18(title2)}">${face2(ctx2, e)}
-    <span class="ph-who"><span class="ph-who-top"><b>${esc18(e?.name ?? title2)}</b>${dot ? '<span class="nw-dot" title="이번 이야기에서 작성" aria-label="이번 이야기에서 작성"></span>' : ""}</span>${small ? `<small>${esc18(small)}</small>` : ""}</span></button></li>`;
+    return `<li class="ph-row"><button class="ph-main nw-row${on2 ? " on" : ""}" data-action="wiki-pick" data-value="${esc19(title2)}">${face2(ctx2, e)}
+    <span class="ph-who"><span class="ph-who-top"><b>${esc19(e?.name ?? title2)}</b>${dot ? '<span class="nw-dot" title="이번 이야기에서 작성" aria-label="이번 이야기에서 작성"></span>' : ""}</span>${small ? `<small>${esc19(small)}</small>` : ""}</span></button></li>`;
   }
   var CHO = "ㄱㄲㄴㄷㄸㄹㅁㅂㅃㅅㅆㅇㅈㅉㅊㅋㅌㅍㅎ";
   var PLAIN = { ㄲ: "ㄱ", ㄸ: "ㄷ", ㅃ: "ㅂ", ㅆ: "ㅅ", ㅉ: "ㅈ" };
@@ -1180,10 +1434,10 @@ Return the JSON object.` }
         return row4(ctx2, e, e.title, [CAT_LABEL[e.cat], e.sub].filter(Boolean).join(" · "));
       }).join("")}</ul>` : "";
       if (!docPart && !rosterPart && !nearPart) {
-        return `<div class="nw-groups"><div class="ph-blank nw-nohit"><p>「${esc18(q)}」 문서가 없어요.<br>새로 작성할까요?</p><button class="gx-start" data-action="wiki-write" data-value="${esc18(q)}">${ICONS.pen}작성하기</button></div></div>`;
+        return `<div class="nw-groups"><div class="ph-blank nw-nohit"><p>「${esc19(q)}」 문서가 없어요.<br>새로 작성할까요?</p><button class="gx-start" data-action="wiki-write" data-value="${esc19(q)}">${ICONS.pen}작성하기</button></div></div>`;
       }
-      const fresh = known ? "" : `<ul class="ph-list"><li class="ph-row"><button class="ph-main nw-row nw-newrow" data-action="wiki-write" data-value="${esc18(q)}"><span class="ph-avatar nw-ava">${ICONS.pen}</span><span class="ph-who"><b>「${esc18(q)}」</b><small>이 제목으로 새로 작성</small></span></button></li></ul>`;
-      const lead = !docPart && !rosterPart ? `<p class="nw-near-lead">「${esc18(q)}」 문서는 없어요. 혹시 이 문서를 찾으셨나요?</p>` : "";
+      const fresh = known ? "" : `<ul class="ph-list"><li class="ph-row"><button class="ph-main nw-row nw-newrow" data-action="wiki-write" data-value="${esc19(q)}"><span class="ph-avatar nw-ava">${ICONS.pen}</span><span class="ph-who"><b>「${esc19(q)}」</b><small>이 제목으로 새로 작성</small></span></button></li></ul>`;
+      const lead = !docPart && !rosterPart ? `<p class="nw-near-lead">「${esc19(q)}」 문서는 없어요. 혹시 이 문서를 찾으셨나요?</p>` : "";
       return `<div class="nw-groups">${lead}${docPart}${rosterPart}${nearPart}${fresh}</div>`;
     }
     if (!docs.length) return `<div class="nw-groups">${blank4("아직 작성한 문서가 없어요.<br>위에서 이름이나 제목을 검색해 보세요.")}</div>`;
@@ -1224,9 +1478,9 @@ Return the JSON object.` }
       const e = entryFor(ctx2, title2);
       const url = e?.face ? imageUrl(ctx2.char, e.face) : null;
       const none2 = !saved.has(title2);
-      return `<button class="nw-card${none2 ? " none" : ""}" data-action="wiki-pick" data-value="${esc18(title2)}">
-      <span class="nw-card-img${e ? ` k-${e.cat}` : ""}">${url ? `<img src="${esc18(url)}" alt="" loading="lazy">` : e ? CAT_ICON[e.cat] : ICONS.book}</span>
-      <b>${esc18(e?.name ?? title2)}</b>${sub ? `<small>${esc18(sub)}</small>` : ""}</button>`;
+      return `<button class="nw-card${none2 ? " none" : ""}" data-action="wiki-pick" data-value="${esc19(title2)}">
+      <span class="nw-card-img${e ? ` k-${e.cat}` : ""}">${url ? `<img src="${esc19(url)}" alt="" loading="lazy">` : e ? CAT_ICON[e.cat] : ICONS.book}</span>
+      <b>${esc19(e?.name ?? title2)}</b>${sub ? `<small>${esc19(sub)}</small>` : ""}</button>`;
     };
     const live = [];
     const st = lastStatusFields((ctx2.chat.message ?? []).filter((m) => m.role === "char").slice(-6).map((m) => m.data));
@@ -1238,9 +1492,9 @@ Return the JSON object.` }
       for (const ev of here) live.push([c(ev.name), `${kind[ev.kind]} · 탐사 중`]);
       const deploy = here.map((ev) => ev.people ?? "").join(" ");
       for (const a of readDirectory(ctx2.char.globalLore).agents) {
-        const s5 = w.agents[a.id]?.st;
+        const s7 = w.agents[a.id]?.st;
         const sent = deploy && (deploy.includes(a.id) || a.name && deploy.includes(a.name));
-        if (sent || s5 === "작전투입") live.push([c(a.lore || a.name), "인물 · 작전투입"]);
+        if (sent || s7 === "작전투입") live.push([c(a.lore || a.name), "인물 · 작전투입"]);
       }
     } else if (target) live.push([c(target), "탐사 중"]);
     if (st?.place && entryFor(ctx2, c(st.place))) live.push([c(st.place), "현재 위치"]);
@@ -1251,14 +1505,14 @@ Return the JSON object.` }
     const tiles = TABS.filter(([t]) => t !== "all" && t !== "story").map(([t, label2]) => {
       const list4 = docs.filter((d) => inTab(ctx2, d, t));
       if (!list4.length) return "";
-      const pics = list4.map((d) => entryFor(ctx2, d.title)?.face).filter((x) => !!x).slice(0, 4).map((ph) => imageUrl(ctx2.char, ph)).filter(Boolean).map((u) => `<img src="${esc18(u)}" alt="" loading="lazy">`).join("");
+      const pics = list4.map((d) => entryFor(ctx2, d.title)?.face).filter((x) => !!x).slice(0, 4).map((ph) => imageUrl(ctx2.char, ph)).filter(Boolean).map((u) => `<img src="${esc19(u)}" alt="" loading="lazy">`).join("");
       return `<button class="nw-tile k-${t}" data-action="wiki-browse" data-value="${t}"><span class="nw-tile-pics">${pics || (t === "an" ? CAT_ICON.an : t === "ms" ? CAT_ICON.ms : ICONS.book)}</span><b>${label2}</b><small>문서 ${list4.length}개</small></button>`;
     }).join("");
     const sec = (title2, n2, inner) => `<section class="nw-hsec"><h3>${title2}${n2 ? `<b>${n2}</b>` : ""}</h3>${inner}</section>`;
     return `<div class="nw-home">
     <section class="nw-hero">
       <div class="nw-hero-top"><span class="nw-hero-ico">${GHOST_ICON}</span><div class="nw-hero-t"><h2>괴이위키</h2><small>문서 ${docs.length}개</small></div></div>
-      <div class="nw-hero-q"><input class="gx-search" type="search" name="wiki-home-q" data-input="wiki-home-query" data-enter="wiki-search" placeholder="이름·제목 검색" value="${esc18(wiki.homeQuery)}" aria-label="위키 검색" autocomplete="off"></div>
+      <div class="nw-hero-q"><input class="gx-search" type="search" name="wiki-home-q" data-input="wiki-home-query" data-enter="wiki-search" placeholder="이름·제목 검색" value="${esc19(wiki.homeQuery)}" aria-label="위키 검색" autocomplete="off"></div>
       <div class="nw-hero-res">${wikiHomeResults(ctx2)}</div>
     </section>
     ${liveCards ? sec("지금 얽힌 문서", 0, `<div class="nw-cards">${liveCards}</div>`) : ""}
@@ -1269,34 +1523,34 @@ Return the JSON object.` }
   function paneHead3(ctx2, title2, sub, right = "", e) {
     const back = wiki.history.some((h) => h.view !== "home") ? `<button class="ph-tool ph-back" data-action="wiki-back" aria-label="뒤로">${ICONS.back}</button>` : "";
     return `<header class="ph-room-head${back ? "" : " nw-noback"}">${back}
-    ${e ? face2(ctx2, e, " sm") : ""}<div class="ph-room-title"><b>${esc18(title2)}</b>${sub ? `<small>${esc18(sub)}</small>` : ""}</div>${right ? `<span class="ph-act">${right}</span>` : ""}</header>`;
+    ${e ? face2(ctx2, e, " sm") : ""}<div class="ph-room-title"><b>${esc19(title2)}</b>${sub ? `<small>${esc19(sub)}</small>` : ""}</div>${right ? `<span class="ph-act">${right}</span>` : ""}</header>`;
   }
   function settingsView3(ctx2) {
-    const s5 = wikiSettings(ctx2.chat.scriptstate);
+    const s7 = wikiSettings(ctx2.chat.scriptstate);
     const req = String(ctx2.chat.scriptstate?.["$nw_writing_request"] ?? "");
     const line2 = (label2, control2, hint = "") => `<div class="ps-row"><div class="ps-label"><b>${label2}</b>${hint ? `<small>${hint}</small>` : ""}</div><div class="ps-ctl">${control2}</div></div>`;
     return `<div class="ph-form nw-setpane">${paneHead3(ctx2, "위키 설정", "", defaultsButtons("wiki"))}${defaultsConfirm("wiki")}
     <div class="ph-form-body ps"><section class="ps-group"><h3>문서 작성</h3><div class="ps-rows">
-      ${line2("분량", seg4("wiki-length", s5.length, [["short", "짧게"], ["standard", "보통"], ["detailed", "상세"]]))}
-      ${line2("작성 모드", seg4("wiki-mode", s5.mode, [["expand", "확장"], ["faithful", "원본 충실"]]))}
-      ${line2("모델", seg4("wiki-model", s5.model, [["main", "메인"], ["aux", "보조"]]))}
-      ${line2("다시 쓸 때 이전 문서 참고", seg4("wiki-refresh_previous", s5.refreshPrevious ? "1" : "0", [["1", "ON"], ["0", "OFF"]]))}
-      ${line2("채팅에 반영", seg4("wiki-context", wikiContextOn(ctx2.chat.scriptstate) ? "1" : "0", [["1", "ON"], ["0", "OFF"]]), "채팅에 나온 문서가 채팅 요청에 참고로 붙어요")}
+      ${line2("분량", seg5("wiki-length", s7.length, [["short", "짧게"], ["standard", "보통"], ["detailed", "상세"]]))}
+      ${line2("작성 모드", seg5("wiki-mode", s7.mode, [["expand", "확장"], ["faithful", "원본 충실"]]))}
+      ${line2("모델", seg5("wiki-model", s7.model, [["main", "메인"], ["aux", "보조"]]))}
+      ${line2("다시 쓸 때 이전 문서 참고", seg5("wiki-refresh_previous", s7.refreshPrevious ? "1" : "0", [["1", "ON"], ["0", "OFF"]]))}
+      ${line2("채팅에 반영", seg5("wiki-context", wikiContextOn(ctx2.chat.scriptstate) ? "1" : "0", [["1", "ON"], ["0", "OFF"]]), "채팅에 나온 문서가 채팅 요청에 참고로 붙어요")}
     </div></section>
     <section class="ps-group"><h3>공용 지침</h3><div class="ps-rows"><div class="ps-row">
-      <textarea class="gx-search nw-reqbox" data-change="wiki-request" rows="3" placeholder="모든 문서에 덧붙일 말투·형식·관점">${esc18(req)}</textarea></div></div></section>
+      <textarea class="gx-search nw-reqbox" data-change="wiki-request" rows="3" placeholder="모든 문서에 덧붙일 말투·형식·관점">${esc19(req)}</textarea></div></div></section>
     ${advancedBox("nw", ctx2.chat.scriptstate)}</div>
   </div>`;
   }
   function newView(ctx2) {
     return `<div class="ph-form">${paneHead3(ctx2, "새 문서", "")}
     <div class="ph-form-body"><label class="ph-label">제목<small>명부에 있는 이름이면 그 항목의 원본 로어북으로 작성해요</small></label>
-      <input class="gx-search" name="wiki-new" data-input="wiki-new" data-enter="wiki-write" value="${esc18(wiki.newTitle)}" maxlength="300" placeholder="문서 제목"></div>
+      <input class="gx-search" name="wiki-new" data-input="wiki-new" data-enter="wiki-write" value="${esc19(wiki.newTitle)}" maxlength="300" placeholder="문서 제목"></div>
     <div class="ph-form-foot"><button class="gx-start" data-action="wiki-write" data-take="wiki-new">작성 화면 열기</button></div></div>`;
   }
   function docReqBox(shared) {
-    return `<label class="nw-reqlabel"><textarea class="gx-search nw-reqbox" data-input="wiki-docreq" rows="3" maxlength="2000" aria-label="이 문서 지침" placeholder="이 문서에만 덧붙일 지침 (내용·관점·분량)">${esc18(wiki.docReq)}</textarea></label>
-      ${shared ? `<p class="nw-creq">공용 지침: ${esc18(shared)}</p>` : ""}`;
+    return `<label class="nw-reqlabel"><textarea class="gx-search nw-reqbox" data-input="wiki-docreq" rows="3" maxlength="2000" aria-label="이 문서 지침" placeholder="이 문서에만 덧붙일 지침 (내용·관점·분량)">${esc19(wiki.docReq)}</textarea></label>
+      ${shared ? `<p class="nw-creq">공용 지침: ${esc19(shared)}</p>` : ""}`;
   }
   function compose(ctx2) {
     const job = jobs3.get(chatKey3(ctx2));
@@ -1304,16 +1558,16 @@ Return the JSON object.` }
     const lore = hasBook(source3(ctx2), wiki.title);
     const e = entryFor(ctx2, wiki.title);
     const req = String(ctx2.chat.scriptstate?.["$nw_writing_request"] ?? "");
-    const src = lore ? "같은 이름의 로어북이 있어요. 그 내용을 원본으로 작성해요." : wiki.inherited.length ? `로어북이 없어서 「${esc18(wiki.previousTitle ?? "")}」 문서의 원본 자료(${esc18(wiki.inherited.join(", "))})를 이어받아 작성해요.` : "같은 이름의 로어북이 없어요. 대화와 관련 자료를 바탕으로 작성해요.";
+    const src = lore ? "같은 이름의 로어북이 있어요. 그 내용을 원본으로 작성해요." : wiki.inherited.length ? `로어북이 없어서 「${esc19(wiki.previousTitle ?? "")}」 문서의 원본 자료(${esc19(wiki.inherited.join(", "))})를 이어받아 작성해요.` : "같은 이름의 로어북이 없어요. 대화와 관련 자료를 바탕으로 작성해요.";
     return `<div class="ph-form">${paneHead3(ctx2, e?.name ?? wiki.title, e ? CAT_LABEL[e.cat] : "새 문서", "", e)}
     <div class="ph-form-body"><section class="nw-compose">
       ${face2(ctx2, e, " lg")}
-      <h2 class="nw-title">${esc18(wiki.title)}</h2>
+      <h2 class="nw-title">${esc19(wiki.title)}</h2>
       <p class="nw-cmsg">이 문서는 아직 없어요.</p>
       <p class="gx-muted">${src}</p>
       ${docReqBox(req)}
     </section></div>
-    <div class="ph-form-foot"><button class="gx-start" data-action="wiki-start" data-value="${esc18(wiki.title)}" ${job ? "disabled" : ""}>${mine ? "작성하는 중…" : "작성 시작"}</button></div></div>`;
+    <div class="ph-form-foot"><button class="gx-start" data-action="wiki-start" data-value="${esc19(wiki.title)}" ${job ? "disabled" : ""}>${mine ? "작성하는 중…" : "작성 시작"}</button></div></div>`;
   }
   function spoilerFold(ctx2, title2, e) {
     if (e?.cat !== "an") return false;
@@ -1334,24 +1588,24 @@ Return the JSON object.` }
     const job = jobs3.get(chatKey3(ctx2));
     const links = (label2, list4) => list4.length ? `<div class="nw-more"><b>${label2}</b><div class="nw-chips">${list4.map((t) => {
       const le = entryFor(ctx2, t);
-      return `<button class="nw-chip${saved.has(t) ? "" : " none"}" data-action="wiki-open" data-value="${esc18(t)}">${face2(ctx2, le, " xs")}<span>${esc18(le?.name ?? t)}</span></button>`;
+      return `<button class="nw-chip${saved.has(t) ? "" : " none"}" data-action="wiki-open" data-value="${esc19(t)}">${face2(ctx2, le, " xs")}<span>${esc19(le?.name ?? t)}</span></button>`;
     }).join("")}</div></div>` : "";
     const m = doc2.meta;
     const info = m ? `<details class="nw-meta"><summary>참조 자료</summary><p>${m.mode === "faithful" ? "원본 충실" : "확장"} · ${{ short: "짧게", standard: "보통", detailed: "상세" }[m.length] ?? m.length} · ${m.model === "aux" ? "보조 모델" : "메인 모델"}</p>
-       ${m.sources.length ? `<p>${esc18(m.sources.join(", "))}</p>` : ""}${m.writingRequest ? `<p>공용 지침: ${esc18(m.writingRequest)}</p>` : ""}${m.docRequest ? `<p>이 문서 지침: ${esc18(m.docRequest)}</p>` : ""}</details>` : "";
+       ${m.sources.length ? `<p>${esc19(m.sources.join(", "))}</p>` : ""}${m.writingRequest ? `<p>공용 지침: ${esc19(m.writingRequest)}</p>` : ""}${m.docRequest ? `<p>이 문서 지침: ${esc19(m.docRequest)}</p>` : ""}</details>` : "";
     const confirm = wiki.confirmDelete === doc2.title;
     const hasBase = baseDocs(ctx2.char.globalLore).some((d) => d.title === doc2.title);
-    const del = doc2.base ? "" : confirm ? `<button class="gx-mini danger" data-action="wiki-delete" data-value="${esc18(doc2.title)}">${hasBase ? "되돌리기" : "정말 삭제"}</button>` : tool3("wiki-delete", ICONS.trash, hasBase ? "기본 문서로 되돌리기" : "문서 삭제", `data-value="${esc18(doc2.title)}"`);
+    const del = doc2.base ? "" : confirm ? `<button class="gx-mini danger" data-action="wiki-delete" data-value="${esc19(doc2.title)}">${hasBase ? "되돌리기" : "정말 삭제"}</button>` : tool3("wiki-delete", ICONS.trash, hasBase ? "기본 문서로 되돌리기" : "문서 삭제", `data-value="${esc19(doc2.title)}"`);
     const open2 = wiki.rewrite === doc2.title;
-    const right = `${tool3("wiki-rewrite", ICONS.pen, job?.title === doc2.title ? "작성하는 중" : "다시 쓰기", `data-value="${esc18(doc2.title)}" ${open2 ? 'aria-pressed="true"' : ""} ${job ? "disabled" : ""}`)}${del}`;
+    const right = `${tool3("wiki-rewrite", ICONS.pen, job?.title === doc2.title ? "작성하는 중" : "다시 쓰기", `data-value="${esc19(doc2.title)}" ${open2 ? 'aria-pressed="true"' : ""} ${job ? "disabled" : ""}`)}${del}`;
     const req = String(ctx2.chat.scriptstate?.["$nw_writing_request"] ?? "");
     const rewrite = open2 ? `<section class="nw-rewrite">${docReqBox(req)}
         <div class="nw-rwrow"><span>이전 문서 참고</span><div class="gx-segs gx-segs-sm">${[["1", "ON"], ["0", "OFF"]].map(([v, l]) => `<button class="gx-seg${(wiki.rewritePrev ? "1" : "0") === v ? " on" : ""}" data-action="wiki-rw-prev" data-value="${v}" aria-pressed="${(wiki.rewritePrev ? "1" : "0") === v}">${l}</button>`).join("")}</div></div>
-        <div class="gx-row-btns"><button class="gx-mini ps-save" data-action="wiki-rw-go" data-value="${esc18(doc2.title)}" ${job ? "disabled" : ""}>${job?.title === doc2.title ? "작성하는 중…" : "다시 쓰기"}</button><button class="gx-mini" data-action="wiki-rw-cancel">취소</button></div></section>` : "";
+        <div class="gx-row-btns"><button class="gx-mini ps-save" data-action="wiki-rw-go" data-value="${esc19(doc2.title)}" ${job ? "disabled" : ""}>${job?.title === doc2.title ? "작성하는 중…" : "다시 쓰기"}</button><button class="gx-mini" data-action="wiki-rw-cancel">취소</button></div></section>` : "";
     const sub = [e ? CAT_LABEL[e.cat] : "", doc2.base ? "기본 문서" : m?.created ? when(m.created) : ""].filter(Boolean).join(" · ");
     return `<div class="ph-room nw-pane">${paneHead3(ctx2, e?.name ?? doc2.title, sub, right, e)}
     <article class="nw-doc">
-      ${rewrite}<header class="nw-dochead"><h2 class="nw-title">${esc18(doc2.title)}</h2>${e && e.sub && e.cat !== "lm" ? `<small>${esc18(e.sub)}</small>` : ""}</header>
+      ${rewrite}<header class="nw-dochead"><h2 class="nw-title">${esc19(doc2.title)}</h2>${e && e.sub && e.cat !== "lm" ? `<small>${esc19(e.sub)}</small>` : ""}</header>
       <div class="nw-body">${r.html}</div>
       ${links("상세 문서", r.related)}${links("관련 문서", r.recent)}${info}
     </article></div>`;
@@ -1364,16 +1618,16 @@ Return the JSON object.` }
     return homeView(ctx2);
   }
   function wikiTab(ctx2) {
-    const fail3 = wiki.failure ? `<details class="nw-fail"><summary>최근 실패 원문 (${esc18(wiki.failure.title)})</summary><p>${esc18(wiki.failure.reason)}</p><textarea class="gx-search" rows="6" readonly>${esc18(wiki.failure.raw)}</textarea></details>` : "";
+    const fail3 = wiki.failure ? `<details class="nw-fail"><summary>최근 실패 원문 (${esc19(wiki.failure.title)})</summary><p>${esc19(wiki.failure.reason)}</p><textarea class="gx-search" rows="6" readonly>${esc19(wiki.failure.raw)}</textarea></details>` : "";
     const note = toast("nw", wiki.info, (t) => {
       if (wiki.info === t) wiki.info = "";
     });
-    const status2 = `${busyLine(ctx2)}${wiki.notice ? `<div class="gx-err" role="alert">${esc18(wiki.notice)}</div>` : ""}`;
+    const status2 = `${busyLine(ctx2)}${wiki.notice ? `<div class="gx-err" role="alert">${esc19(wiki.notice)}</div>` : ""}`;
     const open2 = wiki.listOpen;
     return `<main class="gx-body ph-app nw nw-app${open2 ? " list-open" : ""}">
     ${rail()}
     <aside class="nw-panel" aria-label="위키 목록"${open2 ? "" : " inert"}><div class="nw-pin">
-        <div class="nw-search"><input class="gx-search ph-search" type="search" name="wiki-q" data-input="wiki-query" data-enter="wiki-search" placeholder="이름·제목 검색" value="${esc18(wiki.query)}" aria-label="위키 검색" autocomplete="off"></div>
+        <div class="nw-search"><input class="gx-search ph-search" type="search" name="wiki-q" data-input="wiki-query" data-enter="wiki-search" placeholder="이름·제목 검색" value="${esc19(wiki.query)}" aria-label="위키 검색" autocomplete="off"></div>
         <div class="ph-content nw-list">${wikiList(ctx2)}</div>
         ${fail3}
       </div></aside>
@@ -1657,7 +1911,7 @@ Return the JSON object.` }
   var wikiSettingsPane = (ctx2) => settingsView3(ctx2);
 
   // src/ui/editor/manage.ts
-  var esc19 = (s5) => String(s5 ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+  var esc20 = (s7) => String(s7 ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
   var kb = (n2) => n2 >= 1e6 ? `${(n2 / 1e6).toFixed(1)}MB` : n2 >= 1e3 ? `${Math.round(n2 / 1e3)}KB` : `${n2}B`;
   var isManageNode = (n2) => n2 === "manage:backup" || n2 === "manage:diag" || n2 === "manage:log";
   var GAME_PACK_PREFIX = "goei:game:pack:";
@@ -1672,8 +1926,8 @@ Return the JSON object.` }
     ["goei:data-world", "세계 자료", "요원·조직·괴이·파밍·부록 기본 기록과 세력 관계 기본값. 본체가 뜰 때 받아 두고, 플러그인 판이 바뀌면 다시 받아요"],
     ["goei:data-install", "설치 자료", "인사말·카드 사진 목록·기본 명부·아이콘 정보. 설치·점검을 처음 열 때 받아 두고, 플러그인 판이 바뀌면 다시 받아요"],
     // 필드(게임)는 2026-11-04 플러그인에서 뺐다. 예전에 받아 둔 것이 남아 있으면 크기만 보여 준다
-    ["goei:game:code", "옛 게임 코드", "예전 필드 게임 코드. 지금 플러그인은 쓰지 않아요"],
-    [GAME_PACKS, "옛 게임 자산 팩", "예전 필드 게임 그림·소리 묶음. 지금 플러그인은 쓰지 않아요"]
+    ["goei:game:code", "옛 게임 코드", "예전 필드 게임 코드. 지금 플러그인은 쓰지 않아요. 플러그인이 뜰 때 자동으로 지워요", "man-drop-game"],
+    [GAME_PACKS, "옛 게임 자산 팩", "예전 필드 게임 그림·소리 묶음. 지금 플러그인은 쓰지 않아요. 플러그인이 뜰 때 자동으로 지워요", "man-drop-game"]
   ];
   async function sizeOf(key2) {
     try {
@@ -1685,6 +1939,8 @@ Return the JSON object.` }
   }
   var manUi = {
     sizes: null,
+    /** 올린 파일 이름 (가져오기) */
+    importName: "",
     pending: false,
     importText: "",
     confirm: "",
@@ -1721,699 +1977,20 @@ Return the JSON object.` }
     });
   }
   var row5 = (label2, ctl, help = "") => `<div class="ps-row"><div class="ps-label"><b>${label2}</b>${help ? `<small>${help}</small>` : ""}</div><div class="ps-ctl">${ctl}</div></div>`;
-  var badge2 = (ok, text4) => `<span class="gw-state${ok === null ? " off" : ok ? "" : " bad"}">${esc19(text4)}</span>`;
-  var head = (crumb, title2, desc, act = "") => `<header class="gw-head"><h2>${esc19(title2)}${crumb ? `<small>${esc19(crumb)}</small>` : ""}</h2>${act ? `<div class="gw-head-act">${act}</div>` : ""}<p class="gx-muted">${esc19(desc)}</p>${manUi.notice ? `<div class="gx-err" role="alert">${esc19(manUi.notice)}</div>` : ""}${manUi.info ? `<p class="gx-hint">${esc19(manUi.info)}</p>` : ""}</header>`;
-  function backupPage() {
-    const json = JSON.stringify(getPrefs(), null, 2);
+  var badge2 = (ok, text4) => `<span class="gw-state${ok === null ? " off" : ok ? "" : " bad"}">${esc20(text4)}</span>`;
+  var head = (crumb, title2, desc, act = "") => `<header class="gw-head"><h2>${esc20(title2)}${crumb ? `<small>${esc20(crumb)}</small>` : ""}</h2>${act ? `<div class="gw-head-act">${act}</div>` : ""}<p class="gx-muted">${esc20(desc)}</p>${manUi.notice ? `<div class="gx-err" role="alert">${esc20(manUi.notice)}</div>` : ""}${manUi.info ? `<p class="gx-hint">${esc20(manUi.info)}</p>` : ""}</header>`;
+  function exportJson(ctx2) {
+    const directory2 = readDirectoryData(ctx2.char.globalLore ?? []);
+    return JSON.stringify(directory2 ? { ...getPrefs(), directory: directory2 } : getPrefs(), null, 2);
+  }
+  function backupPage(ctx2) {
+    const json = exportJson(ctx2);
     const sizes = manUi.sizes;
     const store = STORE.map(([key2, label2, help, drop]) => {
       const n2 = sizes?.[key2] ?? 0;
       const ctl = `<span class="gw-tokens">${sizes ? n2 ? kb(n2) : "없음" : "…"}</span>${drop && n2 ? manUi.confirm === drop.slice(4) ? `<button class="gx-mini danger" data-action="${drop}-yes">정말 지우기</button><button class="gx-mini" data-action="man-no">취소</button>` : `<button class="gx-mini" data-action="${drop}">${ICONS.trash}지우기</button>` : ""}`;
       return row5(label2, ctl, help);
     }).join("");
-    const importRows = `<div class="ps-row"><div class="ps-label"><b>가져오기</b><small>내보낸 JSON을 붙여 넣고 적용해요. 지금 기기 설정을 통째로 바꿔요.</small></div>
-      <textarea data-input="man-import-text" rows="4" placeholder="{ … }">${esc19(manUi.importText)}</textarea></div>
-    <div class="ps-row gw-rel-foot">${manUi.confirm === "import" ? `<span class="gx-muted">지금 설정을 덮어써요.</span><button class="gx-mini danger" data-action="man-import-yes">정말 적용</button><button class="gx-mini" data-action="man-no">취소</button>` : `<button class="gx-mini" data-action="man-import" ${manUi.importText.trim() ? "" : "disabled"}>적용</button>`}</div>`;
-    return `<div class="gw-page gw-set">${head("이 기기 공통", "설정 내보내기", "기기 설정을 글로 내보내고 가져와요. 채팅 안의 값(상황판·인물 기록 등)은 Risu 채팅 백업에 들어 있어요.")}
-    <div class="gx-settings gw-setbody">
-    <section class="ps-group"><h3>기기 설정</h3><div class="ps-rows">
-      <div class="ps-row"><div class="ps-label"><b>내보내기</b><small>화면·이미지·지침 고친 글·추가 규칙·새 채팅 기본값. 복사해서 메모장 같은 곳에 두세요.</small></div>
-        <div class="ps-ctl"><button class="gx-mini" data-action="man-copy">${ICONS.pen}복사</button><button class="gx-mini" data-action="man-download">내려받기</button></div>
-        <textarea readonly rows="4" data-man-export>${esc19(json)}</textarea></div>
-      ${importRows}
-    </div></section>
-    <section class="ps-group"><h3>저장소 사용량 <small>이 기기 플러그인 저장소에 있는 것</small></h3><div class="ps-rows">${store}</div></section>
-    </div></div>`;
-  }
-  function diagPage(ctx2, canChat) {
-    const lore = ctx2.char.globalLore;
-    const goei = isGoeiLore(lore);
-    const ver = cardVersion(lore);
-    const mode2 = String(advValue(ctx2.chat.scriptstate, "gen", "lore_mode") ?? "plugin");
-    const msgs4 = Array.isArray(ctx2.chat.message) ? ctx2.chat.message.length : 0;
-    const tok2 = tokenizerName();
-    const rows2 = [
-      row5("카드", badge2(goei, goei ? "괴이 카드" : "괴이 카드 아님"), goei ? `카드 ${ver === "0" ? "이전 판" : `v${ver}`} · 명부·매니페스트 있음` : "설치 · 점검에서 심으면 괴이 카드가 돼요"),
-      row5("플러그인", badge2(true, `v${PLUGIN_VERSION}`), UPDATE_BASE ? `업데이트 주소 ${UPDATE_BASE}` : "업데이트 주소가 없는 빌드"),
-      row5("채팅", badge2(canChat, canChat ? "진행 중" : "시작 전"), canChat ? `메시지 ${msgs4}개 · 이 채팅 값으로 동작해요` : "시작 화면이에요. 설정은 새 채팅 기본값으로 저장돼요"),
-      row5("토크나이저", badge2(!!tok2, tok2 || "어림값"), tok2 ? "토큰 수를 정확히 세요" : "설치에서 받으면 정확해져요"),
-      row5("위키 기본 문서", badge2(!!storedWikiPack(), storedWikiPack() ? "있음" : "없음"), "카드에서 뺀 기본 문서 묶음 (이 기기 저장소)"),
-      row5("로어북 보내기", badge2(null, mode2 === "risu" ? "Risu가 직접" : "플러그인이 고름"), "설정 → 고급 → 로어북 보내기")
-    ].join("");
-    const fails = [gnet.failure ? `괴담넷: ${gnet.failure.reason}` : "", phone.failure ? `괴담톡: ${phone.failure.reason}` : "", wiki.failure ? `위키: ${wiki.failure.reason}` : ""].filter(Boolean);
-    return `<div class="gw-page gw-set">${head("", "상태 점검", "플러그인·카드·저장소가 지금 어떤 상태인지. 문제가 있으면 어디서 고치는지 적어 뒀어요.")}
-    <div class="gx-settings gw-setbody">
-    <section class="ps-group"><h3>현재 상태</h3><div class="ps-rows">${rows2}${row5("최근 실패", fails.length ? badge2(false, `${fails.length}건`) : badge2(true, "없음"), fails.length ? "요청 기록에서 원문을 볼 수 있어요" : "괴담넷·괴담톡·위키 요청이 실패한 적이 없어요")}</div></section>
-    ${canChat ? loreCheckBox(ctx2) : ""}
-    </div></div>`;
-  }
-  function logPage() {
-    const fail3 = (name, f) => f ? `<div class="ps-row"><div class="ps-label"><b>${esc19(name)}</b><small>${esc19(f.reason)}</small></div><textarea readonly rows="4">${esc19(f.raw)}</textarea></div>` : "";
-    const fails = fail3("괴담넷", gnet.failure) + fail3("괴담톡", phone.failure) + fail3("위키", wiki.failure);
-    const diag = manUi.diag;
-    const runs = diag ? diag.length ? diag.map((r) => row5(`${esc19(r.at)} · ${esc19(r.reason)}`, badge2(r.ok, r.ok ? "성공" : `실패${r.stage ? ` · ${r.stage}` : ""}`), `${r.model} · ${r.people.join(", ") || "대상 없음"} · ${Math.round(r.ms / 100) / 10}초${r.error ? ` · ${esc19(r.error)}` : ""}`)).join("") : '<p class="ps-note">아직 갱신 기록이 없어요.</p>' : '<p class="ps-note">읽는 중…</p>';
-    return `<div class="gw-page gw-set">${head("", "요청 기록", "괴담넷·괴담톡·위키 요청의 최근 실패 원문과 인물 기록 갱신 기록이에요.")}
-    <div class="gx-settings gw-setbody">
-    <section class="ps-group"><h3>최근 실패 <small>창을 닫아도 이 세션 동안 남아요</small></h3><div class="ps-rows">${fails || '<p class="ps-note">실패한 요청이 없어요.</p>'}${fails ? `<div class="ps-row gw-rel-foot"><button class="gx-mini" data-action="man-clear-fail">지우기</button></div>` : ""}</div></section>
-    <section class="ps-group"><h3>인물 기록 갱신 <small>최근 ${diag?.length ?? 0}건</small></h3><div class="ps-rows">${runs}${diag?.length ? `<div class="ps-row gw-rel-foot">${manUi.confirm === "drop-diag" ? `<button class="gx-mini danger" data-action="man-drop-diag-yes">정말 지우기</button><button class="gx-mini" data-action="man-no">취소</button>` : `<button class="gx-mini" data-action="man-drop-diag">${ICONS.trash}기록 지우기</button>`}</div>` : ""}</div></section>
-    </div></div>`;
-  }
-  function managePage(ctx2, node, canChat) {
-    if (node === "manage:backup") return backupPage();
-    if (node === "manage:diag") return diagPage(ctx2, canChat);
-    return logPage();
-  }
-  function manageInput(name, value) {
-    if (name !== "man-import-text") return false;
-    manUi.importText = value;
-    return true;
-  }
-  async function manageAction(action, root3) {
-    if (!action.startsWith("man-")) return false;
-    manUi.notice = "";
-    manUi.info = "";
-    switch (action) {
-      case "man-no":
-        manUi.confirm = "";
-        return true;
-      case "man-copy": {
-        const json = JSON.stringify(getPrefs(), null, 2);
-        try {
-          await navigator.clipboard.writeText(json);
-          manUi.info = "복사했어요.";
-        } catch {
-          const ta = root3?.querySelector("textarea[data-man-export]");
-          ta?.select();
-          manUi.info = "클립보드를 쓰지 못해 글을 골라 뒀어요. Ctrl+C 로 복사하세요.";
-        }
-        return true;
-      }
-      case "man-download": {
-        try {
-          const json = JSON.stringify(getPrefs(), null, 2);
-          const url = URL.createObjectURL(new Blob([json], { type: "application/json" }));
-          const a = document.createElement("a");
-          a.href = url;
-          a.download = `goei-settings-${(/* @__PURE__ */ new Date()).toISOString().slice(0, 10)}.json`;
-          a.click();
-          setTimeout(() => URL.revokeObjectURL(url), 2e3);
-          manUi.info = "내려받기를 시작했어요. 안 되면 「복사」로 글을 옮기세요.";
-        } catch (error) {
-          manUi.notice = `내려받지 못했어요: ${error instanceof Error ? error.message : String(error)}`;
-        }
-        return true;
-      }
-      case "man-import":
-        manUi.confirm = "import";
-        return true;
-      case "man-import-yes": {
-        manUi.confirm = "";
-        try {
-          const parsed = JSON.parse(manUi.importText);
-          if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) throw new Error("설정 JSON 이 아니에요.");
-          await savePrefs(() => parsed);
-          manUi.importText = "";
-          manUi.sizes = null;
-          manUi.info = "설정을 가져왔어요. 창을 닫았다 열면 전부 반영돼요.";
-        } catch (error) {
-          manUi.notice = `가져오지 못했어요: ${error instanceof Error ? error.message : String(error)}`;
-        }
-        return true;
-      }
-      case "man-drop-wiki":
-      case "man-drop-tok":
-      case "man-drop-diag":
-        manUi.confirm = action.slice(4);
-        return true;
-      case "man-drop-wiki-yes":
-        manUi.confirm = "";
-        await dropWikiPack();
-        manUi.info = "위키 기본 문서를 지웠어요.";
-        manUi.sizes = null;
-        return true;
-      case "man-drop-tok-yes":
-        manUi.confirm = "";
-        await dropTokenizer();
-        manUi.info = "토크나이저를 지웠어요. 토큰 수는 어림값이에요.";
-        manUi.sizes = null;
-        return true;
-      case "man-drop-diag-yes":
-        manUi.confirm = "";
-        await clearDiag();
-        manUi.info = "인물 기록 실행 기록을 지웠어요.";
-        manUi.sizes = null;
-        return true;
-      case "man-clear-fail":
-        gnet.failure = null;
-        phone.failure = null;
-        wiki.failure = null;
-        return true;
-    }
-    return true;
-  }
-
-  // src/ui/update.ts
-  var esc20 = (s5) => String(s5 ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
-  var updateUi = { busy: false, notice: "", latest: null, payload: null, plan: null, pics: null, progress: "", done: "" };
-  var checked = false;
-  var skipped = "";
-  var SKIP_KEY = "goei:update-skip";
-  function withTimeout(p, ms, what) {
-    return new Promise((resolve, reject) => {
-      const t = setTimeout(() => reject(new Error(`${what}을(를) ${Math.round(ms / 1e3)}초 안에 받지 못했어요.`)), ms);
-      p.then((v) => (clearTimeout(t), resolve(v)), (e) => (clearTimeout(t), reject(e)));
-    });
-  }
-  async function getText2(name) {
-    try {
-      return await withTimeout(getTextOnce(name), 4e4, name);
-    } catch {
-      return await withTimeout(getTextOnce(name), 6e4, name);
-    }
-  }
-  async function getTextOnce(name) {
-    const url = `${UPDATE_BASE}/${name}?t=${Date.now()}`;
-    const legacy = risuai.risuFetch;
-    lastDirect = legacy ? "" : "risuFetch 없음";
-    if (legacy) {
-      try {
-        const r = await legacy(url, { method: "GET", plainFetchForce: true, rawResponse: true, headers: { "Content-Type": "text/plain" } });
-        if (r?.ok && r.data instanceof Uint8Array) return new TextDecoder().decode(r.data);
-        lastDirect = `직접 받기 ${r?.status}: ${String(typeof r?.data === "string" ? r.data : Object.prototype.toString.call(r?.data)).slice(0, 80)}`;
-      } catch (error) {
-        lastDirect = `직접 받기 오류: ${String(error).slice(0, 80)}`;
-      }
-    }
-    const res = await risuai.nativeFetch(url, { method: "GET" }).catch((e) => {
-      throw new Error(`업데이트 정보를 받지 못했어요. (${String(e)}; ${lastDirect})`);
-    });
-    if (!res.ok) throw new Error(`업데이트 정보를 받지 못했어요 (${res.status}; ${lastDirect}).`);
-    return String(await res.text() ?? "");
-  }
-  var lastDirect = "";
-  async function getJson(name) {
-    const text4 = await getText2(name);
-    let body5 = text4;
-    try {
-      for (let i = 0; i < 2 && typeof body5 === "string"; i++) body5 = JSON.parse(body5.replace(/^\uFEFF/, ""));
-    } catch {
-      throw new Error(`업데이트 파일을 읽지 못했어요. (받은 글자 ${String(text4 ?? "").length}자)`);
-    }
-    return body5;
-  }
-  async function loadPayload(onPart) {
-    const index = await getJson("card-update.json");
-    if (index && "card" in index) throw new Error("Risu가 다른 파일(버전 정보)을 돌려줬어요. 5분쯤 뒤에 다시 눌러 주세요.");
-    if (!Array.isArray(index?.parts)) return index;
-    let text4 = "";
-    let n2 = 0;
-    onPart?.(0, index.parts.length);
-    for (const name of index.parts) {
-      if (typeof name !== "string" || !/^card-update\.\d+\.txt$/.test(name)) throw new Error("카드 업데이트 목록 형식이 달라요.");
-      text4 += await getText2(name);
-      onPart?.(++n2, index.parts.length);
-    }
-    if (typeof index.length === "number" && text4.length !== index.length) {
-      throw new Error(`카드 업데이트 파일을 끝까지 받지 못했어요. (${text4.length}/${index.length}자)`);
-    }
-    try {
-      return JSON.parse(text4);
-    } catch {
-      throw new Error(`카드 업데이트 파일을 읽지 못했어요. (받은 글자 ${text4.length}자)`);
-    }
-  }
-  function describe2(x) {
-    if (x === null || typeof x !== "object") return `${typeof x}`;
-    const o = x;
-    const d = o.data;
-    return `keys=${Object.keys(o).slice(0, 6).join("/") || "없음"}, schema=${String(o.schema)}, version=${typeof o.version}, data=${d ? Object.keys(d).length : "없음"}, globalLore=${Array.isArray(d?.globalLore) ? "list" : typeof d?.globalLore}, customscript=${Array.isArray(d?.customscript) ? "list" : typeof d?.customscript}`;
-  }
-  async function checkLatest(env3, force = false) {
-    if (!UPDATE_BASE || updateUi.busy || checked && !force) return;
-    checked = true;
-    updateUi.busy = force;
-    if (force) updateUi.notice = "", env3.render();
-    try {
-      if (!force) skipped = String(await risuai.pluginStorage.getItem(SKIP_KEY).catch(() => "") ?? "");
-      const v = await getJson("version.json");
-      if (typeof v.card !== "string" || typeof v.plugin !== "string") throw new Error("업데이트 정보 형식이 달라요.");
-      updateUi.latest = { card: v.card, plugin: v.plugin, minPlugin: v.minPlugin ?? v.plugin };
-    } catch (error) {
-      if (force) updateUi.notice = error instanceof Error ? error.message : String(error);
-    }
-    updateUi.busy = false;
-    env3.render();
-  }
-  function newVersions(ctx2) {
-    const L = updateUi.latest;
-    if (!L) return {};
-    const lite = !!readManifest(ctx2.char.globalLore);
-    return {
-      card: lite && compareVersions(L.card, cardVersion(ctx2.char.globalLore)) > 0 ? L.card : void 0,
-      plugin: compareVersions(L.plugin, PLUGIN_VERSION) > 0 ? L.plugin : void 0
-    };
-  }
-  var skipKey = (n2) => `${n2.card ?? ""}|${n2.plugin ?? ""}`;
-  function hasUpdate(ctx2) {
-    const n2 = newVersions(ctx2);
-    return !!(n2.card || n2.plugin);
-  }
-  function updateBanner(ctx2) {
-    const n2 = newVersions(ctx2);
-    if (!(n2.card || n2.plugin) || skipKey(n2) === skipped) return "";
-    const what = [n2.plugin ? `플러그인 v${esc20(n2.plugin)}` : "", n2.card ? `카드 v${esc20(n2.card)}` : ""].filter(Boolean).join(" · ");
-    return `<div class="upd-banner" role="status"><span class="upd-banner-t"><b>새 버전이 있어요</b> ${what}</span>
-    <span class="upd-banner-b"><button class="gx-mini primary" data-action="upd-go">업데이트</button><button class="gx-mini" data-action="upd-skip">건너뛰기</button></span></div>`;
-  }
-  function updateGroup(ctx2) {
-    const busy4 = updateUi.busy;
-    const rows2 = [];
-    const cur = cardVersion(ctx2.char.globalLore);
-    const lite = !!readManifest(ctx2.char.globalLore);
-    const L = updateUi.latest;
-    const row9 = (label2, value, help = "") => `<div class="ps-row"><div class="ps-label"><b>${label2}</b>${help ? `<small>${help}</small>` : ""}</div><div class="ps-ctl">${value}</div></div>`;
-    if (!UPDATE_BASE) {
-      return section2(row9("업데이트", '<span class="gx-muted">준비 중</span>', "업데이트 주소가 아직 연결되지 않은 빌드예요. 지금은 zip으로 갈아끼워 주세요."));
-    }
-    const pluginNew = L && compareVersions(L.plugin, PLUGIN_VERSION) > 0;
-    rows2.push(row9(
-      "플러그인",
-      `<span class="upd-ver">v${esc20(PLUGIN_VERSION)}${pluginNew ? ` → <b>v${esc20(L.plugin)}</b>` : ""}</span>`,
-      pluginNew ? "Risu 설정 → 플러그인 탭에서 이 플러그인의 업데이트를 눌러 주세요." : L ? "최신이에요." : ""
-    ));
-    const cardNew = lite && L && compareVersions(L.card, cur) > 0;
-    const needPlugin = !!L && compareVersions(L.minPlugin, PLUGIN_VERSION) > 0;
-    rows2.push(row9(
-      "카드",
-      `<span class="upd-ver">${cur === "0" ? "이전 판" : `v${esc20(cur)}`}${cardNew ? ` → <b>v${esc20(L.card)}</b>` : ""}</span>`,
-      !lite ? "이 채팅의 카드는 Lite 카드가 아니에요." : cardNew ? needPlugin ? "플러그인을 먼저 업데이트한 뒤 창을 다시 열어 주세요." : "채팅·사진·에셋과 카드 명부는 그대로 두고 카드 내용만 바꿔요." : L ? "최신이에요." : ""
-    ));
-    let actions = `<button class="gx-mini" data-action="upd-check" ${busy4 ? "disabled" : ""}>${busy4 && !updateUi.payload ? esc20(updateUi.progress || "확인 중…") : "새 버전 확인"}</button>`;
-    if (cardNew && !needPlugin) {
-      actions += updateUi.plan ? `<button class="gx-mini primary" data-action="upd-apply" ${busy4 ? "disabled" : ""}>${busy4 ? esc20(updateUi.progress || "적용 중…") : "카드에 적용"}</button>` : `<button class="gx-mini primary" data-action="upd-prepare" ${busy4 ? "disabled" : ""}>카드 업데이트 준비</button>`;
-    }
-    const plan = updateUi.plan;
-    const pics = updateUi.pics;
-    const summary = plan ? `<ul class="upd-plan">
-        <li>바뀌는 카드 칸 ${plan.fields.length}개${plan.fields.length ? ` <small>(${esc20(plan.fields.map(fieldName).join(", "))})</small>` : ""}</li>
-        <li>로어북: 바뀜 ${plan.lore.replaced} · 새로 ${plan.lore.added} · 직접 넣은 항목 유지 ${plan.lore.kept}${plan.lore.protected ? ` · 카드 명부 보존` : ""}</li>
-        <li>정규식: 바뀜 ${plan.scripts.replaced} · 새로 ${plan.scripts.added} · 직접 넣은 항목 유지 ${plan.scripts.kept}</li>
-        ${pics?.get.length ? `<li>카드 사진: 바뀜 ${pics.replaced} · 새로 ${pics.added} <small>(약 ${mb2(pics.bytes)} 받음, 직접 넣은 사진은 그대로)</small></li>` : ""}
-      </ul><p class="ps-note">적용한 뒤에는 채팅을 다시 열어야 새 첫 장면·안내가 보여요.</p>` : "";
-    return section2(rows2.join("") + `<div class="upd-act">${actions}</div>${summary}` + (updateUi.notice ? `<div class="gx-err" role="alert">${esc20(updateUi.notice)}</div>` : "") + (updateUi.done ? `<p class="gx-hint">${esc20(updateUi.done)}</p>` : ""));
-  }
-  var mb2 = (n2) => n2 >= 1e6 ? `${(n2 / 1e6).toFixed(1)}MB` : `${Math.max(1, Math.round(n2 / 1e3))}KB`;
-  function section2(body5) {
-    return `<section class="ps-group"><h3>업데이트</h3><div class="ps-rows">${body5}</div></section>`;
-  }
-  var FIELD_NAMES = {
-    characterVersion: "캐릭터 버전",
-    firstMessage: "첫 안내",
-    alternateGreetings: "첫 장면",
-    creatorNotes: "제작 노트",
-    desc: "설명",
-    personality: "성격",
-    scenario: "시나리오",
-    exampleMessage: "예시 대화",
-    systemPrompt: "시스템 프롬프트",
-    postHistoryInstructions: "탈옥 프롬프트",
-    backgroundHTML: "배경 HTML",
-    lowLevelAccess: "저수준 접근",
-    virtualscript: "가상 스크립트",
-    triggerscript: "트리거"
-  };
-  var fieldName = (f) => FIELD_NAMES[f] ?? f;
-  async function handleUpdate(action, ctx2, env3) {
-    if (!action.startsWith("upd-")) return false;
-    if (updateUi.busy) return true;
-    if (action === "upd-skip") {
-      skipped = skipKey(newVersions(ctx2));
-      await risuai.pluginStorage.setItem(SKIP_KEY, skipped).catch(() => {
-      });
-      env3.render();
-      return true;
-    }
-    if (action === "upd-check") {
-      updateUi.payload = null;
-      updateUi.plan = null;
-      updateUi.pics = null;
-      updateUi.done = "";
-      await checkLatest(env3, true);
-      return true;
-    }
-    updateUi.busy = true;
-    updateUi.notice = "";
-    if (action === "upd-prepare") updateUi.progress = "카드 읽는 중…";
-    env3.render();
-    try {
-      const char = await risuai.getCharacterFromIndex(ctx2.charIndex);
-      if (!char) throw new Error("캐릭터를 찾을 수 없어요.");
-      if (action === "upd-prepare") {
-        const p = await loadPayload((n2, total) => {
-          updateUi.progress = `카드 정보 받는 중 ${n2}/${total}`;
-          env3.render();
-        });
-        updateUi.progress = "카드와 비교하는 중…";
-        env3.render();
-        if (!isPayload(p)) throw new Error(`카드 업데이트 파일 형식이 달라요. (${describe2(p)})`);
-        if (compareVersions(p.minPlugin, PLUGIN_VERSION) > 0) throw new Error(`이 카드는 플러그인 v${p.minPlugin} 이상이 필요해요. 플러그인부터 업데이트해 주세요.`);
-        updateUi.payload = p;
-        updateUi.plan = planUpdate(char, p);
-        updateUi.pics = planPictures(char.additionalAssets, readManifest(char.globalLore), readManifest(p.data.globalLore));
-      } else if (action === "upd-apply" && updateUi.payload) {
-        const plan = planUpdate(char, updateUi.payload);
-        const pics = planPictures(char.additionalAssets, readManifest(char.globalLore), readManifest(updateUi.payload.data.globalLore));
-        if (pics.get.length) {
-          let last2 = 0;
-          updateUi.progress = `사진 받는 중 0/${pics.get.length}`;
-          env3.render();
-          try {
-            plan.next.additionalAssets = await fetchPictures(char.additionalAssets, pics, (n2, phase) => {
-              if (n2 === 0) last2 = 0;
-              updateUi.progress = `사진 ${phase === "get" ? "받는" : "저장"} 중 ${n2}/${pics.get.length}`;
-              if (n2 - last2 >= 5 || n2 === 0 || n2 === pics.get.length) last2 = n2, env3.render();
-            });
-          } catch (error) {
-            updateUi.progress = "";
-            throw new Error(`${error instanceof Error ? error.message : String(error)} 카드는 바꾸지 않았어요. 잠시 뒤 다시 눌러 주세요. 계속 안 되면 zip 안의 카드를 다시 가져와 주세요.`);
-          }
-          updateUi.progress = "카드에 적용 중…";
-          env3.render();
-        }
-        await risuai.setCharacterToIndex(ctx2.charIndex, plan.next);
-        if (pics.get.length) forgetImages();
-        updateUi.done = `카드를 v${updateUi.payload.version}으로 바꿨어요.${pics.get.length ? ` 사진 ${pics.get.length}장도 바꿨어요.` : ""} 채팅을 다시 열면 새 내용이 보여요.`;
-        updateUi.payload = null;
-        updateUi.plan = null;
-        updateUi.pics = null;
-        updateUi.progress = "";
-        updateUi.busy = false;
-        await env3.refresh();
-        return true;
-      }
-    } catch (error) {
-      updateUi.notice = error instanceof Error ? error.message : String(error);
-    }
-    updateUi.progress = "";
-    updateUi.busy = false;
-    env3.render();
-    return true;
-  }
-
-  // src/ui/people.ts
-  var esc21 = (s5) => String(s5 ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
-  var peopleUi = {
-    notice: "",
-    info: "",
-    busy: false,
-    /** 호감 숫자 보이기 (ⓘ) */
-    showNum: false,
-    /** 호감 직접 수정 칸 */
-    affEdit: false,
-    affStage: "",
-    affNum: "",
-    affReason: "",
-    /** 호칭 직접 수정 칸 */
-    addrEdit: false,
-    addrTo: "",
-    addrReg: "존댓말",
-    addrPin: false,
-    /** 진단 (플러그인 저장소에서 한 번 읽어 둔다) */
-    diag: null,
-    /** 진단: 모든 채팅 보기 (기본은 이 채팅만) */
-    diagAll: false,
-    /** 지난 항목 전부 펼친 칸 열쇠 */
-    oldAll: /* @__PURE__ */ new Set(),
-    /** 지난 응답 읽기 범위 */
-    backfillTurns: "10",
-    /** 다시 읽기 범위 */
-    rereadTurns: "20",
-    diagOpen: /* @__PURE__ */ new Set(),
-    diagShow: "",
-    /** 「매 턴」·「메인」 안내는 세션에 한 번 */
-    warned: false,
-    /** 인물 상세에서 펼친 변경 기록 */
-    logOpen: false,
-    /** 「근거 #n」을 눌러 펼친 항목 (항목 열쇠) */
-    evOpen: /* @__PURE__ */ new Set()
-  };
-  function resetPeopleUi() {
-    Object.assign(peopleUi, { notice: "", info: "", affEdit: false, addrEdit: false, showNum: false, diagShow: "", logOpen: false });
-    peopleUi.evOpen.clear();
-  }
-  var rerender = null;
-  function bindPeopleStatus(render3) {
-    rerender = render3;
-    onPeopleStatus((st) => {
-      if (!st.busy) peopleUi.diag = null;
-      safeRender();
-    });
-  }
-  function typing() {
-    const a = document.activeElement;
-    if (!a) return false;
-    const tag = a.tagName;
-    return tag === "TEXTAREA" || tag === "INPUT" && !["range", "checkbox", "button", "submit"].includes(a.type);
-  }
-  function safeRender() {
-    if (!rerender || typing()) return;
-    rerender();
-  }
-  function bindPeopleHold(root3) {
-    let timer4 = null;
-    const clear = () => {
-      if (timer4) clearTimeout(timer4);
-      timer4 = null;
-    };
-    root3.addEventListener("pointerdown", (ev) => {
-      const el = ev.target.closest?.("[data-pp-hold]");
-      if (!el || ev.target.closest("button")) return;
-      clear();
-      timer4 = setTimeout(() => {
-        timer4 = null;
-        if (!peopleUi.showNum) {
-          peopleUi.showNum = true;
-          rerender?.();
-        }
-      }, 450);
-    });
-    for (const t of ["pointerup", "pointercancel", "pointerleave"]) root3.addEventListener(t, clear);
-  }
-  var SLOT_LABEL = {
-    identity: "기본정보",
-    personality: "성격",
-    state: "현재 상태",
-    relationship: "인간관계",
-    speech: "말투",
-    behavior: "행동 경향",
-    knowledge: "아는 정보",
-    threads: "목표·미해결",
-    history: "주요 행적",
-    scene: "현재 장면",
-    suspicion: "의심"
-  };
-  var SLOT_HELP = {
-    identity: "이름·나이·소속·외모처럼 잘 바뀌지 않는 기본 정보. 로어북 시트의 Identity 절이 시작값",
-    personality: "성격·가치관·버릇. 시트의 Character 절이 시작값이고 이야기에서 드러난 면이 더해져요",
-    state: "지금의 몸·마음 상태(부상·피로·기분 등). 바뀌면 이전 항목을 대신해요",
-    relationship: "주인공·다른 인물에 대한 감정과 관계. 「→ 이름」은 그 대상에 대한 것",
-    speech: "말투·호칭 습관(존댓말·반말, 자주 쓰는 표현)",
-    behavior: "자주 보이는 행동 패턴과 반응 경향",
-    knowledge: "이 인물이 알게 된 것·모르는 것. 본편에서 비밀을 함부로 누설하지 않게 해요",
-    threads: "이 인물의 목표와 아직 풀리지 않은 일",
-    history: "이야기 속에서 한 주요 행동·겪은 일 (오래된 것부터 접혀요)",
-    scene: "지금 장면에서의 위치·행동 (짧게 유지돼요)",
-    suspicion: "누구를·무엇을 의심하는지 (정체·배신·거짓말·오염·범행)"
-  };
-  var SRC_LABEL = { seed: "시트", story: "본편", field: "필드", manual: "수동" };
-  var SRC_HELP = {
-    seed: "출처: 시트 — 로어북 시트·필드 대사에서 가져온 시작값",
-    story: "출처: 본편 — 본편 응답을 보조 모델이 읽어 기록한 것 (근거 메시지·인용이 있어요)",
-    field: "출처: 필드 — 필드(게임)에서 일어난 사건으로 기록된 것",
-    manual: "출처: 수동 — 이 화면에서 직접 고친 것"
-  };
-  var SRC_ICON = { seed: ICONS.book, story: ICONS.pen, field: ICONS.game, manual: ICONS.person };
-  var DOC_LABEL = { event: "사건", location: "장소", faction: "세력", item: "물건", rhythm: "서사 리듬" };
-  var KIND_LABEL2 = { cue: "호감", address: "호칭", identity: "신분", note: "메모", taste: "취향", openness: "음란도" };
-  var KIND_HELP = {
-    cue: "호감 계기: 이 메시지에서 생긴 호감 변화의 이유. 숫자는 코드가 계기 표로 정해요",
-    address: "호칭 변경: 이 인물이 주인공을 부르는 말·말투가 바뀐 기록",
-    identity: "신분: 주인공의 소속·직급이 바뀐 기록",
-    taste: "취향 띠(첫인상): 주인공이 이 인물의 취향에 맞는 정도 −3~+3. 호감과 다른 축",
-    openness: "음란도: 시작값 또는 새 반응의 변화량. 값·단계·피임 태도는 코드가 계산해요",
-    note: "메모: 다음 턴 본편에 끼워 넣을 짧은 메모"
-  };
-  var SEEDED_LABEL = { lore: "시트", dialogue: "대사", none: "빈 기록" };
-  var SEEDED_HELP = { lore: "시작값: 로어북 시트(Identity·Character 절)에서 만들었어요", dialogue: "시작값: 필드 대사 자료에서 만들었어요", none: "시작값 없이 이야기에서 등장해 빈 기록으로 시작했어요" };
-  var seededOf = (p) => p.seeded.from === "lore" ? "lore" : p.seeded.from === "dialogue" ? "dialogue" : "none";
-  function seg5(key2, cur, items, action = "pp-set") {
-    const sw = onOffSwitch(items, cur, action, (v) => `${key2}=${v}`);
-    if (sw) return sw;
-    return `<div class="gx-segs gx-segs-sm">${items.map(([v, label2]) => `<button class="gx-seg${cur === v ? " on" : ""}" data-action="${action}" data-value="${esc21(`${key2}=${v}`)}" aria-pressed="${cur === v}">${label2}</button>`).join("")}</div>`;
-  }
-  var row6 = (label2, control2, help = "") => `<div class="ps-row"><div class="ps-label"><b>${label2}</b>${help ? `<small>${help}</small>` : ""}</div><div class="ps-ctl">${control2}</div></div>`;
-  var group3 = (title2, body5, note = "") => `<section class="ps-group">${title2 ? `<h3>${title2}</h3>` : ""}${note ? `<p class="ps-note">${note}</p>` : ""}<div class="ps-rows">${body5}</div></section>`;
-  var fold = (key2, title2, body5, open2 = false) => `<details class="ps-adv-sub" data-keep="${key2}"${keepOpen(key2, open2)}><summary>${title2}</summary><div class="ps-rows">${body5}</div></details>`;
-  var srcIcon = (src) => `<i class="pp-src s-${src}" title="${esc21(SRC_HELP[src])}" aria-label="${SRC_LABEL[src]}">${SRC_ICON[src]}</i>`;
-  function msgNo(anchor, live) {
-    const pos = live.at.get(anchor);
-    return pos === void 0 || pos < 0 ? "" : `#${pos + 1}`;
-  }
-  function lastBotKeys(chat) {
-    const list4 = Array.isArray(chat.message) ? chat.message : [];
-    for (let i = list4.length - 1; i >= 0; i--) {
-      if (list4[i].role === "char") return /* @__PURE__ */ new Set([messageKey(list4[i], i), `#${i + 1}`]);
-    }
-    return /* @__PURE__ */ new Set();
-  }
-  function changedPeople(store, chat, live) {
-    const keys = lastBotKeys(chat);
-    const out = /* @__PURE__ */ new Set();
-    if (!keys.size) return out;
-    for (const c of store.log) if (keys.has(c.anchor) && isAlive(c, live) && c.who !== "@user") out.add(c.who);
-    for (const p of Object.values(store.people)) for (const s5 of SLOTS) if ((p.slots[s5] ?? []).some((e) => keys.has(e.anchor) && isAlive(e, live))) out.add(p.name);
-    return out;
-  }
-  function factionName2(ctx2, code2) {
-    if (!code2) return "";
-    return factionList(ctx2.char.globalLore).find((f) => f.code === code2)?.name ?? code2;
-  }
-  var affOpts = (ctx2, name) => ({ temper: temperOf(name), speed: peopleSettings(ctx2.chat.scriptstate).speed, turnCap: peopleSettings(ctx2.chat.scriptstate).turnCap });
-  function hasPersonRecord(ctx2, name) {
-    return !!peopleStore(ctx2.chat).people[name];
-  }
-  async function setVars3(ctx2, env3, vars) {
-    peopleUi.busy = true;
-    peopleUi.notice = "";
-    try {
-      await updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => ({ ...chat, scriptstate: { ...chat.scriptstate ?? {}, ...vars } }));
-    } catch (error) {
-      peopleUi.notice = error instanceof Error ? error.message : String(error);
-    }
-    peopleUi.busy = false;
-    await env3.refresh();
-  }
-  var FEATURE_HELP = {
-    affinity: ["호감", "계기(작은친절·도움·배신…)를 기록하고 8단계로 계산해요"],
-    register: ["호칭·말투", "이 인물이 주인공을 부르는 말과 존댓말·반말 변화"],
-    perception: ["인식", "이 인물이 아는 것·모르는 것(비밀 누설 방지)"],
-    perception_ext: ["인식 확장", "감각 경로·관찰 성향까지 기록해요"],
-    suspicion: ["의심", "범용 의심(정체·배신·거짓말·오염·범행)"],
-    docs_event: ["사건 문서", "건마다 무슨 일이 있었는지"],
-    docs_location: ["장소 문서", "장소마다 바뀐 것"],
-    docs_faction: ["세력 문서", "세력마다 바뀐 것"],
-    docs_item: ["물건 문서", "물건마다 바뀐 것"],
-    taste: ["취향 띠(첫인상)", "인물마다 주인공이 자기 취향에 맞는 정도(−3~+3)를 호감과 별개로 기록해요. 오를 땐 한 칸씩, 내릴 땐 여러 칸. 리수폿 첫인상 축"],
-    openness: ["음란도", "성인 인물의 성적 개방도(0~300)와 피임 태도를 기록해요. 시작값은 근거가 있을 때만, 그 뒤는 실제 반응마다. 리수폿 음란도. 성인용 기능"],
-    rhythm: ["서사 리듬", "장면 국면(준비·절정·여운…)·장(章) 흐름·떡밥 단계를 문서로 두고 Director 메모에 「지금은 긴장을 올릴 때/떡밥 회수」를 넣어요. 카드 지침과 부딪칠 수 있어 기본 끔. 리수폿 리듬"],
-    faction_rep: ["세력 평판", "세력(관리국·가짜 관리국·백일몽·민간·협회…)이 주인공을 어떻게 보는지 −100~100 값으로 둬요. 그 세력이 주인공을 보는 눈이 바뀔 만한 일인지는 갱신기 모델이 판단해요(인용 필수, 세력당 응답에 1건, 메시지당 ±10). 구성원 한 명의 사적인 감정은 그 인물 기록에만 남아요. 필드 몹의 첫 반응이 이 값의 구간으로 정해져요"],
-    npc_emotion: ["인물끼리 감정", "인물이 다른 인물에게 느끼는 감정·관계도 기록해요 (유저 대상만이 아니라)"]
-  };
-  var n = (v) => v.toLocaleString();
-  var tok = (s5, text4) => text4 ? `${n(s5)}자 · 약 ${n(tokens(text4))}tok` : `${n(s5)}자 · 약 ${n(Math.ceil(s5 * 0.6))}tok`;
-  var when2 = (iso) => {
-    const d = new Date(iso);
-    if (Number.isNaN(d.getTime())) return iso;
-    const p = (x) => String(x).padStart(2, "0");
-    return `${p(d.getMonth() + 1)}.${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}`;
-  };
-  function diagTable(ctx2, keepRaw) {
-    const list4 = peopleUi.diag;
-    if (list4 === null) {
-      void loadDiag().then((d) => {
-        peopleUi.diag = d;
-        safeRender();
-      });
-      return '<p class="ps-note">진단을 읽는 중…</p>';
-    }
-    const here = chatId(ctx2);
-    const mine = (peopleUi.diagAll ? list4 : list4.filter((r) => r.chat === here)).slice(-40).reverse();
-    const toggle = `<label class="pp-check"><input type="checkbox" data-change="pp-diag-all" ${peopleUi.diagAll ? "checked" : ""}> 모든 채팅 보기 (${list4.length}건 중 이 채팅 ${list4.filter((r) => r.chat === here).length}건)</label>`;
-    if (!mine.length) return `${toggle}<p class="ps-note">${peopleUi.diagAll ? "아직 갱신 기록이 없어요." : "이 채팅의 갱신 기록이 아직 없어요."}</p>`;
-    const rows2 = mine.map((r) => {
-      const id = `${r.at}|${r.indexes.join(",")}`;
-      const open2 = peopleUi.diagOpen.has(id);
-      const rep = r.report;
-      const result = r.ok ? r.stage === "skip" ? `<span class="gx-badge wait">건너뜀 · ${esc21(r.error ?? "")}</span>` : rep ? `<span class="gx-badge live">반영 ${rep.applied.entries + rep.applied.cues + rep.applied.address + rep.applied.docs + rep.applied.suspicion + (rep.applied.taste ?? 0) + (rep.applied.openness ?? 0)}</span>${rep.applied.debriefs ? `<span class="gx-badge live">소감 ${rep.applied.debriefs}</span>` : ""}${rep.dropped.length ? `<span class="gx-badge hot">버림 ${rep.dropped.length}</span>` : ""}${rep.held.length ? `<span class="gx-badge wait">보류 ${rep.held.length}</span>` : ""}` : '<span class="gx-badge live">반영</span>' : `<span class="gx-badge bad">실패 · ${esc21(r.stage ?? "")}</span><small class="pp-err">${esc21(r.error ?? "")}</small>`;
-      const sysText = r.system ?? "";
-      const dataText = r.data ?? "";
-      const sizes = `지침 ${r.sizes.system ? tok(r.sizes.system, sysText || void 0) : "-"} / 자료 ${r.sizes.data ? tok(r.sizes.data, dataText || void 0) : "-"} / 구간 ${r.sizes.span ? tok(r.sizes.span) : "-"}`;
-      const detail = open2 ? `<div class="pp-diag-detail">
-          ${rep?.applied.newPeople.length ? `<p class="ps-note">새 인물: ${esc21(rep.applied.newPeople.join(", "))}</p>` : ""}
-          ${rep?.dropped.length ? `<p class="ps-note"><b>버린 항목</b></p><ul class="pp-drops">${rep.dropped.map((d) => `<li><span class="gx-badge">${esc21(d.kind)}</span>${d.who ? `<b>${esc21(d.who)}</b>` : ""}<span>${esc21(d.reason)}</span></li>`).join("")}</ul>` : ""}
-          ${rep?.held.length ? `<p class="ps-note"><b>보류(확인 필요)</b></p><ul class="pp-drops">${rep.held.map((d) => `<li><span class="gx-badge wait">${esc21(d.kind)}</span>${d.who ? `<b>${esc21(d.who)}</b>` : ""}<span>${esc21(d.reason)}</span></li>`).join("")}</ul>` : ""}
-          <div class="gx-row-btns">
-            ${keepRaw && r.system ? `<button class="gx-mini" data-action="pp-diag-show" data-value="${esc21(`${id}:prompt`)}">보낸 프롬프트 보기</button>` : ""}
-            ${r.raw ? `<button class="gx-mini" data-action="pp-diag-show" data-value="${esc21(`${id}:raw`)}">응답 원문 보기</button>` : ""}
-            ${!keepRaw ? '<small class="ps-note">원문은 고급 → 「원문 보관」을 켰을 때만 남아요.</small>' : ""}
-          </div>
-          ${peopleUi.diagShow === `${id}:prompt` ? `<textarea class="gx-search pp-raw" readonly rows="10">${esc21(`${r.system ?? ""}
-
----
-
-${prettyJson(r.data ?? "")}`)}</textarea>` : ""}
-          ${peopleUi.diagShow === `${id}:raw` ? `<textarea class="gx-search pp-raw" readonly rows="10">${esc21(r.raw ?? "")}</textarea>` : ""}
-        </div>` : "";
-      return `<li class="pp-diag${open2 ? " open" : ""}"><button class="pp-diag-row" data-action="pp-diag-toggle" data-value="${esc21(id)}" aria-expanded="${open2}">
-        <span class="pp-diag-top"><b>${esc21(when2(r.at))}</b><span class="pp-diag-who">${esc21(r.people.length ? r.people.join(", ") : "(대상 없음)")}</span><span class="pp-diag-res">${result}</span></span>
-        <span class="pp-diag-sub">${esc21(sizes)} · 출력 ${n(r.outChars)}자 · ${n(r.ms)}ms · ${r.model === "main" ? "메인" : "보조"} · ${esc21(r.reason)}</span>
-      </button>${detail}</li>`;
-    });
-    return `${toggle}<ul class="pp-diags">${rows2.join("")}</ul>`;
-  }
-  function prettyJson(s5) {
-    try {
-      return JSON.stringify(JSON.parse(s5), null, 2);
-    } catch {
-      return s5;
-    }
-  }
-  function updateBar(ctx2, canChat = true) {
-    const st = peopleStatus();
-    const store = peopleStore(ctx2.chat);
-    const { newer, older } = splitUnread(ctx2.chat, store);
-    const dis = st.busy || peopleUi.busy || !canChat ? "disabled" : "";
-    const label2 = !canChat ? "채팅을 시작한 뒤에 갱신할 수 있어요" : st.busy ? st.label || "갱신 중…" : newer.length ? `새 응답 ${newer.length}개` : "새 응답 없음";
-    const now = `<span class="pp-upgrp"><span class="pp-upst${st.busy ? " busy" : ""}">${st.busy ? '<i class="pp-spin"></i>' : ""}${esc21(label2)}</span><button class="gx-mini ps-save" data-action="pp-update" title="마지막으로 읽은 응답 뒤의 새 응답을 지금 읽어요" ${dis || (newer.length ? "" : "disabled")}>${ICONS.refresh}새 응답 읽기</button></span>`;
-    const back = older.length && canChat ? `<span class="pp-upgrp pp-backfill"><span class="pp-upst">지난 응답 ${older.length}개 안 읽음</span><select class="gx-select" data-change="pp-backfill-turns" aria-label="읽을 범위">${[["10", "최근 10개"], ["30", "최근 30개"], ["0", "전부"]].map(([v, l]) => `<option value="${v}" ${peopleUi.backfillTurns === v ? "selected" : ""}>${l}</option>`).join("")}</select><button class="gx-mini" data-action="pp-backfill" title="기능을 중간에 켰거나 끄고 지나간 구간의 응답을 읽어요. 보조 호출이 묶음마다 1회" ${dis}>지난 응답 읽기</button></span>` : "";
-    return `<div class="pp-upbar">${now}${back}</div>`;
-  }
-  function ruleBox(name, label2, value, help, max, placeholder, saveAction) {
-    return `<div class="pp-rule"><b>${label2}</b><textarea class="gx-search nw-reqbox" name="${name}" data-input="${name}" rows="4" maxlength="${max}" placeholder="${esc21(placeholder)}">${esc21(value)}</textarea><small>${help}</small><div class="gx-row-btns"><button class="gx-mini ps-save" data-action="${saveAction}" data-take="${name}">저장</button></div></div>`;
-  }
-  function peopleSettingsPane(ctx2, canChat = true) {
-    const state = ctx2.chat.scriptstate;
-    const v = (k) => ppValue(state, k);
-    const s5 = peopleSettings(state);
-    const onoff = (k) => seg5(k, v(k) === "1" ? "1" : "0", [["1", "ON"], ["0", "OFF"]]);
-    const intro = `<p class="ps-note">본편 응답이 끝날 때마다 <b>보조 모델이 그 응답을 한 번 읽어</b> 인물별 기록(기본정보·성격·현재 상태·인간관계·호감·호칭…)을 쌓고, 다음 본편 요청과 필드(대사·신분)가 그 기록을 읽어요. 로어북 시트는 시작값이고, 이 기록이 이야기에 따라 바뀌어요. 비용: 응답당 보조 모델 호출 1회(갱신 모델을 메인으로 두면 메인 1회).</p>`;
-    const main = [
-      row6("인물 기록", onoff("on"), "끄면 응답을 읽지 않고, 본편에도 기록을 넣지 않아요. 메인 설정 「상황판 → 인물 기록」과 같은 값이에요."),
-      row6("갱신 시점", seg5("when", s5.when, [["turn", "매 턴"], ["manual", "수동"]]), "수동이면 인물 화면의 「새 응답 읽기」를 눌렀을 때만 읽어요."),
-      row6("갱신 모델", seg5("model", s5.model, [["aux", "보조"], ["main", "메인"]])),
-      row6("지침", seg5("prompt", s5.prompt, [["detailed", "자세히"], ["compact", "간결"]]), "자세히 = 리수폿 원문 규칙+설명. 간결 = 같은 규칙·설명 축약, 토큰 약 1/3."),
-      row6("기록 언어", seg5("lang", s5.lang, [["ko", "한국어"], ["en", "영어"]]), "기록 본문(항목·이유·메모)을 쓰는 언어. 이름·인용·호칭은 늘 원문. 영어는 같은 내용이면 토큰이 절반쯤이고, 위키 화면에도 영어로 보여요."),
-      row6("본편에 넣기", seg5("inject", s5.inject, [["split", "절 단위 혼합"], ["append", "시트 전체+기록"], ["record", "기록만"], ["off", "안 넣음"]]), "절 단위 혼합: 시트의 Identity·Character 절은 기록으로 대신하고 나머지 절은 원문 그대로."),
-      row6("Director", seg5("director", s5.director, [["off", "OFF"], ["facts", "사실형(뒤)"], ["scene", "연출형(앞)"]]), "사실형은 갱신기에 얹어 다음 턴 메모를 남기고, 연출형은 본편 요청 앞에 짧은 지시를 한 번 더 만들어요."),
-      row6("호감 변화 속도", seg5("speed", String(s5.speed), [["0.5", "0.5"], ["1", "1"], ["1.5", "1.5"], ["2", "2"]])),
-      row6("메시지당 변화 상한", `<label class="st-range pp-range"><input type="range" min="0" max="100" step="1" value="${s5.turnCap}" data-input="pp-cap" data-change="pp-cap" aria-label="메시지당 변화 상한"><output>${s5.turnCap === 0 ? "한도 없음" : `±${s5.turnCap}`}</output></label>`, "메시지 하나(필드는 장면 하나)에서 호감·세력 평판이 움직일 수 있는 최대. 0이면 한도 없음. 중대위반(−50)은 늘 한도 밖. 리수폿 기본 ±10.")
-    ].join("");
-    const features = FEATURES.map((f) => row6(FEATURE_HELP[f][0], onoff(f), FEATURE_HELP[f][1])).join("");
-    const newPeople = [
-      row6("새 인물", seg5("newpeople", s5.newPeople, [["auto", "자동"], ["confirm", "확인 뒤 등록"]]), "확인 뒤 등록이면 인물 화면의 「등록 대기」에서 고를 때까지 기록을 만들지 않아요."),
-      row6("2턴 규칙", onoff("twoturn"), "한 번만 나온 이름은 등록하지 않아요.")
-    ].join("");
-    const director = s5.director !== "off" ? fold("pp-director", "Director 세부", [
-      row6("언어", seg5("director_lang", s5.directorLang, [["en", "영어"], ["ko", "한국어"]])),
-      row6("길이", seg5("director_len", s5.directorLen, [["short", "짧게"], ["normal", "보통"]])),
-      s5.director === "scene" ? row6("시간 제한", seg5("director_timeout", String(s5.directorTimeout), [["10", "10초"], ["20", "20초"], ["40", "40초"]]), "넘기면 이번 턴은 지시 없이 보내요.") : "",
-      row6("재사용", onoff("director_reuse"), "장면이 그대로면 지난 지시를 다시 써요.")
-    ].join("")) : "";
-    const rules2 = group3("추가 지침", `<div class="pp-rules">
-      ${ruleBox("pp-rules", "기록 갱신기에 덧붙일 지침", v("rules"), "응답 뒤 기록을 쓸 때 판정 규칙을 더해요. 출력 형식은 바꿀 수 없어요.", 4e3, "예: 관리국 요원은 서로를 직급으로 부른다", "pp-rules-save")}
-      ${ruleBox("pp-director-rules", "Director 메모에 덧붙일 지침", v("director_rules"), `본편에 끼우는 메모(Director)를 쓸 때 덧붙여요.${s5.director === "off" ? " 지금은 Director 가 꺼져 있어 쓰이지 않아요." : ""}`, 2e3, "예: 메모는 한 문장으로, 다음 장면의 분위기만", "pp-drules-save")}
-    </div>`);
-    const advanced = fold("pp-adv", "고급", [
-      row6("직전 쌍 포함", seg5("prev_pairs", String(s5.prevPairs), [["0", "0"], ["1", "1"], ["2", "2"]]), "읽는 구간 앞에 맥락으로 붙이는 유저·봇 쌍 수"),
-      row6("인물당 저장 상한", seg5("person_cap", String(s5.personCap), [["5000", "5,000"], ["10000", "10,000"], ["20000", "20,000"]]), "한 인물의 살아 있는 기록 글자 수. 넘으면 정리로 합쳐요 (항목 수 상한은 없어요). 리수폿의 절별 상한 합계가 약 10,000자예요."),
-      row6("본편 기록 예산", seg5("block_cap", String(s5.blockCap), [["8000", "8,000"], ["16000", "16,000"], ["32000", "32,000"]]), "본편 요청에 넣는 기록 블록 전체 글
+    const importRows = `<div class="ps-row"><div class="ps-label"><b>가져오기</b><small>내보낸 JSON을 붙여 넣거나 파일을 올리고 「적용」을 누르세요. 지금 기기 설정(과 세계 편집)을 통째로 바꿔요.</small></div>
+      <div class="ps-ctl"><label class="gx-mini gw-file">${ICONS.refresh}파일 올리기<input type="file" accept=".json,application/json" data-change="man-import-file" hidden></label>${manUi.importName ? `<span class="gx-muted">${esc20(manUi.importName)}</span>` : ""}</div>
+      <textarea data-input="man-

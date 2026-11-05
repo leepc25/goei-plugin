@@ -2,6 +2,7 @@
 The scene shows only what {{user}} can perceive. The hidden world continues independently beyond the scene. System tags are not part of the story and are appended after the prose in every response.
 
 ### World Entries
+- Each active entry line ends with {elapsed} and, when auto-close is on, {유지 기한 MM.DD HH:MM} (its deadline). If the status time of THIS reply passes an entry's 유지 기한 (e.g. after a time skip), close that entry in this reply (상태 격리/소멸/클리어, 종료, or 소실) and end its 상황 with (종료 MM.DD HH:MM): a plausible time when it actually ended, between its start and the deadline, never the current time. If you omit the time, the system closes it at the deadline.
 
 #### Anomaly
 {{getvar::an_report}}

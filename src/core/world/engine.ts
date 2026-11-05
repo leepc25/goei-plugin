@@ -262,9 +262,9 @@ function remember(w: WorldState, kind: EndedEntry['kind'], e: { name: string; lo
   w.ended = [...(w.ended ?? []).filter((x) => !(x.kind === kind && x.name === e.name && x.loc === e.loc)), { kind, name: e.name, loc: e.loc, ...(grade ? { grade } : {}), until: w.epoch + 1 }];
 }
 /** 끝난 항목을 이번 응답의 closed 에 적는다 (remember 와 같은 규칙: 발생대기는 시작도 안 했으니 빼고). 일지·보고서 조립은 엔진 밖 */
-function close(w: WorldState, kind: ClosedEvent['kind'], e: AnEntry | InEntry | MsEntry, cause: CloseCause, cleared?: boolean) {
+function close(w: WorldState, kind: ClosedEvent['kind'], e: AnEntry | InEntry | MsEntry, cause: CloseCause, cleared?: boolean, minute: number | null = w.minute) {
   if (e.state === '발생대기') return;
-  (w.closed ??= []).push({ kind, entry: structuredClone(e), cause, minute: w.minute, epoch: w.epoch, ...(cleared ? { cleared: true } : {}) });
+  (w.closed ??= []).push({ kind, entry: structuredClone(e), cause, minute, epoch: w.epoch, ...(cleared ? { cleared: true } : {}) });
 }
 /** 상황 글이 바뀌었을 때만 경과에 한 줄 (같은 글 반복·빈 글은 안 쌓는다). 상한을 넘으면 첫 발견 글은 두고 둘째부터 지운다 */
 function pushTrail(w: WorldState, e: Tracked, text: string) {
@@ -283,23 +283,23 @@ function closingText(w: WorldState, e: Tracked & { situation?: string }, situati
   e.situation = text;
   pushTrail(w, e, text);
 }
-function endAn(w: WorldState, e: AnEntry, cause: CloseCause = 'model', cleared = false) {
+function endAn(w: WorldState, e: AnEntry, cause: CloseCause = 'model', cleared = false, minute: number | null = w.minute) {
   remember(w, 'an', e, e.grade);
-  close(w, 'an', e, cause, cleared);
+  close(w, 'an', e, cause, cleared, minute);
   block(w, 'an', e.name);
   w.skip.an = e.loc;
   w.an = w.an.filter((x) => x !== e);
 }
-function endIn(w: WorldState, e: InEntry, cause: CloseCause = 'model') {
+function endIn(w: WorldState, e: InEntry, cause: CloseCause = 'model', minute: number | null = w.minute) {
   remember(w, 'in', e);
-  close(w, 'in', e, cause);
+  close(w, 'in', e, cause, undefined, minute);
   block(w, 'in', e.name);
   w.skip.in = e.loc;
   w.inc = w.inc.filter((x) => x !== e);
 }
-function endMs(w: WorldState, e: MsEntry, cause: CloseCause = 'model') {
+function endMs(w: WorldState, e: MsEntry, cause: CloseCause = 'model', minute: number | null = w.minute) {
   remember(w, 'ms', e);
-  close(w, 'ms', e, cause);
+  close(w, 'ms', e, cause, undefined, minute);
   block(w, 'ms', e.name);
   w.skip.ms = e.loc;
   w.ms = w.ms.filter((x) => x !== e);
@@ -363,18 +363,30 @@ function spawnMystic(w: WorldState, c: Catalog, s: WorldSettings, rng: Rng) {
   w.skip.ms = undefined;
 }
 
-/** RP 유지 시간이 지난 항목을 끝낸다. 유저가 탐사 중인 괴이는 남긴다 */
+/** RP 유지 시간이 지난 항목을 끝낸다. 유저가 탐사 중인 괴이는 남긴다.
+ *  종료 시각은 유지 시간이 다한 그 시각(born + ttl)이지 지금 응답의 시각이 아니다 (2026-11-05 사용자: 일주일을 건너뛰면
+ *  모든 사건의 종료 시각·소요가 새 응답 시각으로 찍혔다). 빠진 시각 자료(born 없음)면 지금 시각 */
 export function expire(w: WorldState, s: WorldSettings) {
   const now = w.minute;
   if (now === null) return;
-  const old = (e: { born: number | null; since: number | null }, group: 'preset' | 'random' | 'incident' | 'mystic') => {
+  const due = (e: { born: number | null; since: number | null }, group: 'preset' | 'random' | 'incident' | 'mystic'): number | null => {
     if (e.born === null) e.born = e.since ?? now;
     const hours = s[`${group}_ttl`];
-    return s[`${group}_expire`] === 1 && hours > 0 && now - e.born >= hours * 60;
+    if (!(s[`${group}_expire`] === 1 && hours > 0 && now - e.born >= hours * 60)) return null;
+    return Math.min(now, e.born + hours * 60);
   };
-  for (const e of [...w.an]) if (!e.exploring && old(e, e.kind)) endAn(w, e, 'ttl');
-  for (const e of [...w.inc]) if (old(e, 'incident')) endIn(w, e, 'ttl');
-  for (const e of [...w.ms]) if (old(e, 'mystic')) endMs(w, e, 'ttl');
+  for (const e of [...w.an]) {
+    const m = e.exploring ? null : due(e, e.kind);
+    if (m !== null) endAn(w, e, 'ttl', false, m);
+  }
+  for (const e of [...w.inc]) {
+    const m = due(e, 'incident');
+    if (m !== null) endIn(w, e, 'ttl', m);
+  }
+  for (const e of [...w.ms]) {
+    const m = due(e, 'mystic');
+    if (m !== null) endMs(w, e, 'ttl', m);
+  }
 }
 
 /** 응답 한 번마다 한 번: 회차를 올리고, 오래된 항목을 끝내고, 네 그룹을 무작위 순서로 한 번씩 추첨 */
@@ -536,8 +548,9 @@ function applyAnomalies(w: WorldState, c: Catalog, s: WorldSettings, faction: st
         w.cleared = [...new Set([...(w.cleared ?? []), ...names])].slice(-200);
       }
       // 종료 태그(격리·소멸·클리어)에 적힌 상황 글은 보고서 「결과」(마지막 상황 글)가 된다 — 끝내기 전에 경과에 넣는다 (사용자 결정 2026-10-29)
-      closingText(w, e, t.situation, c, faction);
-      endAn(w, e, 'model', t.state === '클리어');
+      const end = takeEndAt(w, e, t.situation);
+      closingText(w, e, end.text, c, faction);
+      endAn(w, e, 'model', t.state === '클리어', end.minute);
       continue;
     }
     if (e.kind === 'preset' && validName(e.presetName)) e.name = e.presetName;
@@ -584,8 +597,9 @@ function applyIncidents(w: WorldState, c: Catalog, s: WorldSettings, faction: st
     }
     if (w.pending.in === t.name) w.pending.in = undefined;
     if (t.state === '종료') {
-      closingText(w, e, t.situation, c, faction);
-      endIn(w, e);
+      const end = takeEndAt(w, e, t.situation);
+      closingText(w, e, end.text, c, faction);
+      endIn(w, e, 'model', end.minute);
       continue;
     }
     e.situation = t.situation ? codesToNames(t.situation, c, faction) : '';
@@ -613,8 +627,9 @@ function applyMysticSites(w: WorldState, c: Catalog, s: WorldSettings, faction: 
     }
     if (w.pending.ms === t.name) w.pending.ms = undefined;
     if (t.state === '소실') {
-      closingText(w, e, t.situation, c, faction);
-      endMs(w, e);
+      const end = takeEndAt(w, e, t.situation);
+      closingText(w, e, end.text, c, faction);
+      endMs(w, e, 'model', end.minute);
       continue;
     }
     e.visitors = t.visitors || '없음';
@@ -680,6 +695,39 @@ export function bootstrap(c: Catalog, s: WorldSettings, rng: Rng, player = ''): 
 
 // ── 브리핑 (로어북 🏷️Tag 의 {{getvar::an_report}} 등) ──
 
+/** 절대 분 → 「MM.DD HH:MM」 (상태창과 같은 UTC 기준) */
+function clock(minute: number): string {
+  const d = new Date(minute * 60000);
+  const p2 = (n: number) => String(n).padStart(2, '0');
+  return `${p2(d.getUTCMonth() + 1)}.${p2(d.getUTCDate())} ${p2(d.getUTCHours())}:${p2(d.getUTCMinutes())}`;
+}
+/** 유지 기한(발생 + RP 유지 시간) 표시. 자동 종료가 켜진 묶음만. 모델이 이 시각을 넘기는 응답에서 스스로 끝내도록 (2026-11-05 사용자) */
+function dueMeta(e: { born: number | null }, group: 'preset' | 'random' | 'incident' | 'mystic', s: WorldSettings): string {
+  const hours = s[`${group}_ttl`];
+  if (e.born === null || s[`${group}_expire`] !== 1 || !(hours > 0)) return '';
+  return ` {유지 기한 ${clock(e.born + hours * 60)}}`;
+}
+const END_AT = /\(\s*종료\s*(\d{1,2})\s*\.\s*(\d{1,2})\s+(\d{1,2})\s*:\s*(\d{2})\s*\)/u;
+/** 종료 태그 상황 칸 끝의 「(종료 MM.DD HH:MM)」: 모델이 고른 실제 종료 시각. 발생~지금 사이면 그 시각, 아니면 지금. 글에서는 지운다 (2026-11-05 사용자: 종료 시각을 현재로 찍지 말고 합리적으로) */
+function takeEndAt(w: WorldState, e: { born: number | null; since: number | null }, situation: string | undefined): { text: string | undefined; minute: number | null } {
+  const m = situation ? END_AT.exec(situation) : null;
+  if (!m || w.minute === null) return { text: situation, minute: w.minute };
+  const text = situation!.replace(END_AT, '').replace(/\s{2,}/g, ' ').trim();
+  const now = w.minute;
+  const year = new Date(now * 60000).getUTCFullYear();
+  const lo = e.born ?? e.since;
+  let minute: number | null = null;
+  for (const y of [year, year - 1]) {
+    const ms = Date.UTC(y, Number(m[1]) - 1, Number(m[2]), Number(m[3]), Number(m[4]));
+    const cand = Math.floor(ms / 60000);
+    if (!Number.isFinite(cand) || cand > now) continue;
+    if (lo !== null && cand < lo) continue;
+    minute = cand;
+    break;
+  }
+  return { text, minute: minute ?? now };
+}
+
 function age(w: WorldState, since: number | null): string {
   if (w.minute === null || since === null) return '';
   const mins = Math.max(0, w.minute - since);
@@ -697,17 +745,17 @@ export function reports(w: WorldState, c: Catalog, s: WorldSettings, faction: st
   const an = w.an.map((e) => {
     const ln = locName(e.loc);
     if (e.state === '발생대기') return `NEW [AN|${ln}|${e.name || '<발생지점>'}|활성|<등급>|<배치>|<상황>]`;
-    return `[AN|${ln}|${e.name}|${e.state}|${e.grade}|${e.deploy || '없음'}|${e.situation || '<상황>'}]${age(w, e.since)}`;
+    return `[AN|${ln}|${e.name}|${e.state}|${e.grade}|${e.deploy || '없음'}|${e.situation || '<상황>'}]${age(w, e.since)}${dueMeta(e, e.kind, s)}`;
   });
   const inc = w.inc.map((e) => {
     const ln = locName(e.loc);
     if (e.state === '발생대기') return `NEW [IN|${ln}|${e.name || '<발생지점>'}|진행|<배치>|<상황>]`;
-    return `[IN|${ln}|${e.name}|${e.state}|${e.deploy || '없음'}|${e.situation}]${age(w, e.since)}`;
+    return `[IN|${ln}|${e.name}|${e.state}|${e.deploy || '없음'}|${e.situation}]${age(w, e.since)}${dueMeta(e, 'incident', s)}`;
   });
   const ms = w.ms.map((e) => {
     const ln = locName(e.loc);
     if (e.state === '발생대기') return `NEW [MS|${ln}|${e.name}|출현|<방문자>|<상황>]`;
-    return `[MS|${ln}|${e.name}|${e.state}|${e.visitors || '없음'}|${e.situation || '<상황>'}]${age(w, e.since)}`;
+    return `[MS|${ln}|${e.name}|${e.state}|${e.visitors || '없음'}|${e.situation || '<상황>'}]${age(w, e.since)}${dueMeta(e, 'mystic', s)}`;
   });
   if (w.pending.an && !w.an.some((e) => e.presetName === w.pending.an || e.name === w.pending.an)) {
     an.push(`NEW [AN|<발생 지역: 시도와 시군구>|${w.pending.an}|활성|<등급>|<배치>|<상황>]`);

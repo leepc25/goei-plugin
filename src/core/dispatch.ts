@@ -174,6 +174,14 @@ export function setUnsent(text: string, on: boolean): string {
   return on ? `${plain}\n${UNSENT_MARK}` : plain;
 }
 
+// 첫 장면(2026-11-05 사용자: Risu 추가 첫 메시지 대신 플러그인이 넣는 char 첫 메시지): 끝에 표식을 붙여 「아직 첫 전송 전」(다시 고를 수 있음)을 알아본다.
+// 화면에서는 표식만 지우고, 요청에서는 stripSceneMark 로 뗀다. 첫 전송 뒤에는 그대로 둬도 보이지 않는다
+export const SCENE_MARK = '%%GOEI_SCENE%%';
+const SCENE_RE = /\r?\n?%%GOEI_SCENE%%/g;
+export const sceneMessage = (text: string): string => `${text.replace(SCENE_RE, '').trimEnd()}\n${SCENE_MARK}`;
+export const isSceneMessage = (text: unknown): boolean => typeof text === 'string' && text.includes(SCENE_MARK);
+export const stripSceneMark = (text: string): string => text.replace(SCENE_RE, '');
+
 // 시작 화면 직접 입력: 적은 첫 상황을 채팅에서 카드로 보이게 표식으로 감싼다 (요청에는 글만 간다)
 const START_RE = /%%GOEI_START%%\r?\n([\s\S]*?)\r?\n%%\/GOEI_START%%(\r?\n?%%GOEI_UNSENT%%)?/g;
 export const START_MARK = '%%GOEI_START%%';

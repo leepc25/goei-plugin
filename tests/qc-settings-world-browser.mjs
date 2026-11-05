@@ -220,10 +220,10 @@ for (const vp of vps) {
   await goNode(page, 'org');
   await page.evaluate(() => { const s = document.querySelector('.gw .gw-list-pick'); s.value = '극단'; s.dispatchEvent(new Event('change', { bubbles: true })); });
   await page.waitForFunction(() => document.querySelector('.gw .gw-detail h2')?.textContent?.includes('극단'));
-  await setInput(page, '.gw [name="ed-variant-new"]', 'zzz', 'input');
+  // 2026-11-05: 코드 입력칸 대신 플레이 세력 이름 목록(값은 세력 코드)
   await clickSel(page, '.gw [data-action="ed-variant-add"]');
-  await page.waitForFunction(() => document.querySelector('.gw .gw-notice.err')?.textContent?.includes('A00 꼴'));
-  await setInput(page, '.gw [name="ed-variant-new"]', 'b00', 'input');
+  await page.waitForFunction(() => document.querySelector('.gw .gw-notice.err')?.textContent?.includes('플레이 세력을 고르세요'));
+  await page.selectOption('.gw [name="ed-variant-new"]', 'B00');
   await clickSel(page, '.gw [data-action="ed-variant-add"]');
   await page.waitForSelector('.gw [data-action="ed-variant"][data-value="B00"].on');
   await setInput(page, '.gw [data-input="ed-field"][data-key="org|극단|intro"]', 'B00 시점 소개', 'input');

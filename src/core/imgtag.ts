@@ -102,7 +102,8 @@ export const imgFold = (v: unknown) => pct(v, IMG_FOLD);
  * 본 화면 style에 넣는 그림 칸 CSS. Risu가 채팅 속 class에 붙이는 x-risu- 이름도 같이 잡는다.
  * 플러그인이 Lite 판정 전에 그려진 메시지는 카드 정규식이 그린 칸(ib-asset-hover)이라 그것도 같은 설정을 따르게 한다
  */
-export function imgCss(size = IMG_SIZE.def, fold = IMG_FOLD.def, hidden = false): string {
+/** lock: 접힌 채 두고 마우스·누름으로도 펼치지 않는다 (사용자 2026-11-05) */
+export function imgCss(size = IMG_SIZE.def, fold = IMG_FOLD.def, hidden = false, lock = false): string {
   const g = ':is(.gim,.x-risu-gim,.ib-asset-hover,.x-risu-ib-asset-hover)';
   if (hidden) return `${g}{display:none!important}`;
   const open = fold >= 100;
@@ -110,8 +111,8 @@ export function imgCss(size = IMG_SIZE.def, fold = IMG_FOLD.def, hidden = false)
   // 그림 칸에 기본 모양이 style 속성으로 들어 있어 !important로 덮는다
   return `${g}{display:block!important;box-sizing:border-box;margin:auto;width:100%;max-width:${Math.round(BASE_EM * size) / 100}em!important;aspect-ratio:${folded}!important;`
     + 'overflow:hidden;border-radius:20px;background-color:transparent;background-repeat:no-repeat;background-size:100% auto;background-position:center top;'
-    + `cursor:${open ? 'default' : 'pointer'};outline:none;transition:aspect-ratio .45s ease;-webkit-mask-image:-webkit-radial-gradient(white,black)}`
-    + (open ? '' : `${g}:hover,${g}:focus{aspect-ratio:${W}/${H}!important}`);
+    + `cursor:${open || lock ? 'default' : 'pointer'};outline:none;transition:aspect-ratio .45s ease;-webkit-mask-image:-webkit-radial-gradient(white,black)}`
+    + (open || lock ? '' : `${g}:hover,${g}:focus{aspect-ratio:${W}/${H}!important}`);
 }
 
 /** 지금 채팅의 「에셋 출력」이 꺼져 있으면 그림 칸을 숨긴다 (채팅을 바꿀 때·설정을 바꿀 때 정한다) */

@@ -8,11 +8,13 @@ const INSTALL_GREETINGS = installData().greetings;
 const INSTALL_PICTURES = installData().pictures;
 const DEFAULT_DIRECTORY = installData().directory;
 
-test('설치 자료(팩): 인사말 57 키, 사진 목록, 기본 명부, 아이콘 정보', () => {
+test('설치 자료(팩): 빈 인사말 하나와 직접 입력 키 10개, 사진 목록, 기본 명부, 아이콘 정보', () => {
   assert.equal(installData().icon.file, 'icon.png');
-  assert.equal(Object.keys(INSTALL_GREETINGS.index).length, 66, '키(세력×언어×시나리오) 66개');
-  assert.equal(INSTALL_GREETINGS.texts.length, 57);
-  assert.ok(INSTALL_PICTURES.length > 1700);
+  // 첫 장면 글은 세계 팩(scenes)으로 옮겼다 (2026-11-05). 카드에는 직접 입력용 빈 인사말 하나만
+  assert.equal(Object.keys(INSTALL_GREETINGS.index).length, 10, '키(세력×언어, 직접 입력) 10개');
+  assert.deepEqual(INSTALL_GREETINGS.texts, ['']);
+  assert.ok(Object.values(INSTALL_GREETINGS.index).every((n) => n === 0));
+  assert.ok(INSTALL_PICTURES.length > 1600, `사진 ${INSTALL_PICTURES.length}장 (옛 요원 그림 55장을 뺀 뒤 1696)`);
   assert.equal(DEFAULT_DIRECTORY.schema, 1);
   assert.equal(Object.keys(DEFAULT_DIRECTORY.요원).length, 55);
 });
@@ -24,14 +26,15 @@ test('괴이 카드 판정: 매니페스트 또는 명부', () => {
   assert.equal(isGoeiLore([{ comment: 'Plugin manifest', content: JSON.stringify({ plugin: 'goei-plugin', greetings: {} }) }]), true);
 });
 
-test('인사말 심기: 있는 것은 그대로, 같은 글은 번호 재사용, 없는 것은 뒤에', () => {
-  const user = ['사용자 인사말', INSTALL_GREETINGS.texts[1]];
+test('인사말 심기: 있는 것은 그대로, 같은 글(빈 인사말)은 번호 재사용, 없는 것은 뒤에', () => {
+  const user = ['사용자 인사말', ''];
   const r = plantGreetings(user);
   assert.equal(r.greetings[0], '사용자 인사말');
-  assert.equal(r.greetings[1], INSTALL_GREETINGS.texts[1]);
-  const keyOf1 = Object.entries(INSTALL_GREETINGS.index).find(([, n]) => n === 1)[0];
-  assert.equal(r.index[keyOf1], 1, '같은 글이 이미 있으면 그 번호');
-  assert.equal(r.greetings.length, 2 + 57 - 1);
+  assert.equal(r.greetings[1], '');
+  assert.ok(Object.values(r.index).every((n) => n === 1), '빈 인사말이 이미 있으면 그 번호');
+  assert.equal(r.greetings.length, 2);
+  const fresh = plantGreetings(['사용자 인사말']);
+  assert.deepEqual(fresh.greetings, ['사용자 인사말', '']);
   for (const [k, n] of Object.entries(INSTALL_GREETINGS.index)) assert.equal(r.greetings[r.index[k]], INSTALL_GREETINGS.texts[n]);
   const again = plantGreetings(r.greetings);
   assert.deepEqual(again.greetings, r.greetings, '두 번 심어도 늘지 않음');

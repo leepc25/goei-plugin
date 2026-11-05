@@ -10,7 +10,7 @@ const which = process.argv[3] ?? 'all';
 const vps = which === 'all' ? Object.keys(VIEWPORTS) : [which];
 const browser = await launch();
 const started = () => ({ message: [{ role: 'user', data: 'hi' }, { role: 'char', data: '본문\n[▣|2025.01.01|02:47 AM|☀️|4°C|관리국 본부|목표]' }], scriptstate: { $st_faction: 'A00', $st_lang: 'ko', $st_fm: '2', $st_fixed_theme: 'dark' } });
-const EDITOR_NODES = ['set:screen', 'set:image', 'set:board', 'set:gnet', 'set:phone', 'set:wiki', 'set:people', 'set:journal', 'set:adv', 'set:update', 'agent', 'org', 'anomaly', 'site', 'appendix', 'base', 'relations', 'guide:RP', 'guide:Image', 'rule:new', 'install', 'manage:diag', 'manage:log', 'manage:backup'];
+const EDITOR_NODES = ['set:screen', 'set:image', 'set:board', 'set:gnet', 'set:phone', 'set:wiki', 'set:journal', 'set:wallet', 'set:people', 'set:factions', 'set:lore', 'set:adv', 'set:update', 'agent', 'org', 'start', 'anomaly', 'site', 'appendix', 'base', 'relations', 'guide:RP', 'guide:Image', 'rule:new', 'install', 'manage:diag', 'manage:log', 'manage:backup'];
 const PANEL_TABS = ['board', 'map', 'mission', 'phone', 'gnet', 'wiki', 'records'];
 // 유령 버튼은 다시 보일 때 리스너를 떼고 다시 건다(떼기마다 비동기) → 그게 끝난 뒤에 잰다
 const measure = async (page) => (await sleep(400), page.evaluate(() => ({ listeners: window.__docListeners, nodes: document.querySelectorAll('*').length, styles: document.querySelectorAll('style').length })));
@@ -175,7 +175,7 @@ for (const vp of vps) {
   await page.waitForFunction(() => (JSON.parse(window.__store['p:goei:prefs'] ?? '{}').marks ?? []).length === 4);
   // 즐겨찾기로 이동
   await clickSel(page, '.gx .mk-pop [data-action="mk-go"][data-value="0"]');
-  await page.waitForFunction(() => document.querySelector('.gx')?.dataset.tab === 'phone'); // 위키(0번)를 뺐으니 다음은 괴담톡
+  await page.waitForFunction(() => document.querySelector('.gx')?.dataset.tab === 'map'); // 새 즐겨찾기는 앞에 붙는다(2026-11-05): 커스텀(0번)을 뺐으니 다음은 임무 지도
   if (narrow) {
     await goTab('board');
     // 회귀: 이 채팅은 상황판이 꺼져 있다(빈 화면). 그래도 서랍은 있어야 한다

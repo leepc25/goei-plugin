@@ -95,6 +95,19 @@ test('조직: 명부에 새 조직을 적으면 구분선 이름으로 짐작하
   const cha = d.agents.find((a) => a.name === '차여진');
   assert.deepEqual([cha.affiliation, cha.rosterFor, cha.phoneTabs], ['중립', ['D00', 'E00'], ['T04']]);
   assert.ok(d.orgs.some((o) => o.name === '중립' && !o.faction));
+  // 2026-11-05: 옛 명부(roster_v 없음)의 민간인·프리랜서 목록은 읽을 때 한 번 떼어 낸다. 기본값도 비어 있다
+  const oldLore = withDirectory(base, data).map((e) => {
+    if (e.comment !== 'Directory') return e;
+    const j = JSON.parse(e.content);
+    delete j.roster_v;
+    return { ...e, content: JSON.stringify(j) };
+  });
+  const od = readDirectory(oldLore);
+  assert.deepEqual(od.agents.find((a) => a.name === '차여진').rosterFor, []);
+  assert.deepEqual(od.orgs.find((o) => o.faction === 'D00').rosterFor, []);
+  const fresh = readDirectory(base);
+  assert.deepEqual(fresh.orgs.find((o) => o.faction === 'E00').rosterFor, []);
+  assert.ok(fresh.agents.filter((a) => a.rosterFor.includes('D00') || a.rosterFor.includes('E00')).length === 0, '민간인·프리랜서 목록은 기본으로 비어 있음');
   const brownie = structuredClone(d.agents.find((a) => a.name === '브라우니'));
   assignOrg(brownie, orgOf(d.orgs, 'A00'));
   assert.deepEqual([brownie.affiliation, brownie.rosterFor, brownie.phoneTabs], ['A00', ['A00'], ['T01']]);
@@ -126,7 +139,8 @@ test('실제 카드: 명부로 옮긴 뒤에도 상황판·이름 찾기·연락
   // 폴더 밖 괴이·특수 후보(세력·요원 로어북)는 옮기지 않음 (2026-10-21 사용자). 나머지는 같음
   const dropped = new Set(['탐미주의', '진조 세크리엠', '발푸르기스 협회', '십마녀 아벤샤', '무명찬란교']);
   const after = parseCatalog(moved);
-  assert.equal(j(after), j({ ...before, anomalies: before.anomalies.filter((a) => !dropped.has(a.name)) }));
+  // 명부로 옮기면 시작 묶음 「중립」(다음 코드 F00)이 기본으로 생긴다 (2026-11-05)
+  assert.equal(j(after), j({ ...before, anomalies: before.anomalies.filter((a) => !dropped.has(a.name)), affiliations: { ...before.affiliations, F00: '중립' } }));
   const outside = new Set(OLD_OUTSIDE_PLACES);
   const places = (l) => buildRegistry(l).entries.filter((e) => !e.key.startsWith('Agent roster/'));
   // 별칭은 빠진 항목이 쓰던 것을 다른 항목이 넘겨받을 수 있어(Mumyeong Chanran-gyo → 해피엔딩 홀) 이름만 견줌

@@ -17,7 +17,7 @@ const HELP: Record<GuideName, string> = {
   Wiki: '위키 문서 생성 지침. 절마다 플러그인이 요청에 따라 골라 써요.',
   Directive: '요원 이동·커스텀 임무 때 모델에 주는 장면 지시문. COMMON·OPENING·CONTINUATION·CONTEXT·FORMAT(JSON) 절.',
   RP: '카드 description 에 있던 RP 지침(세계 설정·진행 원칙). 요청 맨 앞 로어 덩어리에 들어가요. 카드 description 에 「## RP Guidance」가 남아 있으면 넣지 않아요.',
-  Tag: '상황판 태그 지침. 상태창 절은 `{status_section}` 자리에 설정 「상황판 → 상태창 칸」의 구성대로 자동으로 만들어져요(형식·규칙·예시). 그 자리표와 {{getvar::…}} 자리표는 그대로 두세요.',
+  Tag: '상황판 태그 지침(괴이·사건·거점 출력 규칙). 상태창 절은 `{status_section}` 자리에 설정 「상황판 → 상태창 칸」의 구성대로 자동으로 만들어져요(형식·규칙·예시). 그 자리표와 {{getvar::…}} 자리표는 그대로 두세요.',
 };
 
 export function guidePage(name: GuideName, crumb = ''): string {
@@ -26,9 +26,19 @@ export function guidePage(name: GuideName, crumb = ''): string {
   // 절 단위 글칸 (2026-10-27 사용자): 구분 줄(@@SECTION·===·##)은 플러그인이 들고, 사용자는 절 본문만 고친다
   // 글칸 첫 줄바꿈 하나는 HTML 이 떼어 버리므로(<textarea>\n…) 하나를 더 넣어 본문이 줄바꿈으로 시작해도 그대로 보이게 (2026-10-28 QC: 제목 뒤 빈 줄이 사라졌다)
   const parts = splitGuide(text);
+  // 제목 줄 (2026-11-05 사용자: 구분 표시(##·===COMMON===)는 보이지 않게, 제목은 고칠 수 있게)
+  //  - ##·### 머리글: 모델에게 가는 글의 제목이라 그대로 고칠 수 있다 (### 는 한 단 들여 보임)
+  //  - @@SECTION·=== 이름: 플러그인이 요청마다 절을 고르는 이름표라 글자를 바꾸면 못 찾는다 → 이름만 보여 주고 잠근다
   const rows = parts
-    .map((p, i) => `<div class="gw-field"><div class="gw-field-head"><b>${esc(p.title)}</b>${p.head && p.head !== '\n' ? `<small class="gw-ftitle">${esc(p.head.trim())}</small>` : ''}<span class="gw-ftok">${tokens(p.body) ? `${tokens(p.body).toLocaleString()}토큰` : ''}</span></div>
-      <textarea data-input="ed-guide-sec" data-key="${name}|${i}" rows="3" spellcheck="false">\n${esc(p.body)}</textarea></div>`)
+    .map((p, i) => {
+      const md = /^(#{2,3}) /.exec(p.head);
+      const fixed = !md && p.head.trim() !== '';
+      const head = md
+        ? `<input class="gw-gtitle" data-input="ed-guide-title" data-key="${name}|${i}" value="${esc(p.title)}" spellcheck="false" aria-label="절 제목">`
+        : `<b>${esc(p.title)}</b>${fixed ? '<button class="gw-fhint" type="button" data-action="ed-hint" data-hint="이 이름은 플러그인이 요청마다 절을 골라 쓸 때 쓰는 이름표예요. 그래서 바꿀 수 없고, 본문만 고칠 수 있어요.">?</button>' : ''}`;
+      return `<div class="gw-field${md?.[1] === '###' ? ' gw-sub' : ''}"><div class="gw-field-head">${head}<span class="gw-ftok">${tokens(p.body) ? `${tokens(p.body).toLocaleString()}토큰` : ''}</span></div>
+      <textarea data-input="ed-guide-sec" data-key="${name}|${i}" rows="${p.body.trim() ? 3 : 1}" spellcheck="false">\n${esc(p.body)}</textarea></div>`;
+    })
     .join('');
   const title = crumb
     ? `<h2>${esc(GUIDE_LABEL[name])}<small>이 기기 공통${guideOverridden(name) ? ' · 고침' : ' · 기본'} · ${parts.length}절</small></h2>`
@@ -54,6 +64,19 @@ export function guideBarSync(root: ParentNode, name: string): void {
 }
 
 export function guideInput(input: string, key: string, value: string): boolean {
+  if (input === 'ed-guide-title') {
+    const at = key.lastIndexOf('|');
+    const name = key.slice(0, at) as GuideName;
+    const i = Number(key.slice(at + 1));
+    const parts = splitGuide(guideUi.draft[name] ?? guideText(name));
+    const md = parts[i] && /^(#{2,3}) /.exec(parts[i].head);
+    if (!md) return true;
+    const title = value.replace(/[\r\n]/g, ' ').trim();
+    parts[i] = { ...parts[i], title, head: `${md[1]} ${title}\n` };
+    guideUi.draft[name] = joinGuide(parts);
+    guideUi.info = '';
+    return true;
+  }
   if (input === 'ed-guide-sec') {
     const at = key.lastIndexOf('|');
     const name = key.slice(0, at) as GuideName;

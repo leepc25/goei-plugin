@@ -374,7 +374,6 @@ async function setVars(ctx: ChatContext, env: GnetEnv, vars: Record<string, stri
   await env.refresh();
 }
 
-const MODE_PREV = '$gn_mode_prev';
 
 // ── 화면 ──
 
@@ -602,31 +601,28 @@ function settingsView(ctx: ChatContext, back = true): string {
   const v = (k: string) => String(ctx.chat.scriptstate?.[CFG(k)] ?? GN_DEFAULTS[k]);
   const text = (k: string, ph: string) => `<input class="gx-search ps-text" data-change="gn-text" data-key="${k}" value="${esc(v(k) === '-' ? '' : v(k))}" placeholder="${esc(ph)}">`;
   const keep = gnetRetention(ctx.chat.scriptstate);
-  const on = v('mode') !== '0';
-  const rows = on
-    ? `${group(gnetLabel(ctx.chat.scriptstate), [
-        row('게시판 사용', seg('power', '1', [['1', 'ON'], ['0', 'OFF']])),
-        row('모델', seg('mode', v('mode') === '1' ? '1' : '2', [['1', '메인'], ['2', '보조']])),
+  // 「게시판 사용」 켬·끔은 없다 (2026-11-05 사용자: 괴담톡·위키와 같게. 새로고침 수동이면 모델을 부르지 않는다)
+  const rows = `${group(gnetLabel(ctx.chat.scriptstate), [
+        row('모델', seg('mode', v('mode') === '1' ? '1' : '2', [['1', '메인'], ['2', '보조']]), '게시판 글·댓글·쪽지를 만들 때 부를 모델이에요. 보조 = Risu의 보조 모델(싸고 빠름), 메인 = 본편과 같은 모델'),
         row('새로고침', seg('lazy', ['0', 'open'].includes(v('lazy')) ? v('lazy') : '1', [['1', '수동'], ['open', '창을 열 때'], ['0', '매 턴']]), LAZY_HINT[v('lazy')] ?? LAZY_HINT['1']),
         row('채팅에 반영', seg('context', v('context') === '1' ? '1' : '0', [['0', '포함'], ['1', '빼기']]), '지금 장면과 관련된 글과 쪽지가 채팅 요청에 참고로 붙어요'),
-        row('다양성 강화', seg('sampling', v('sampling') === '1' ? '1' : '0', [['0', 'OFF'], ['1', 'ON']])),
+        row('다양성 강화', seg('sampling', v('sampling') === '1' ? '1' : '0', [['0', 'OFF'], ['1', 'ON']]), '켜면 모델이 한 번에 서로 다른 게시판 두 벌을 쓰고, 플러그인이 두 번째 벌을 써요(같은 토큰으로 늘 나오는 뻔한 글 대신 다른 쪽). 응답이 길어져 토큰을 더 써요'),
       ].join(''))}
       ${group('게시판', [
-        row('게시글 수', seg('quantity', v('quantity'), Object.entries(QUANTITY).map(([k, q]) => [k, q.label]))),
+        row('게시글 수', seg('quantity', v('quantity'), Object.entries(QUANTITY).map(([k, q]) => [k, q.label])), '새로고침 한 번에 새로 만드는 글 수예요. 많을수록 토큰을 더 써요'),
         row('성격', seg('style', ['gal', 'wpf'].includes(v('style')) ? v('style') : 'net', [['gal', '괴담갤'], ['net', '괴담넷'], ['wpf', '세정게']]), '괴담갤 = 일반인 괴담 커뮤니티 · 괴담넷 = 업계 관계자들이 가명으로 쓰는 곳 · 세정게 = 세계정치 게시판(음모론 속에 진짜가 섞인 곳). 이용자 구성과 기본 말투만 바뀌고 다음 새로고침부터 적용돼요. 메뉴 이름도 같이 바뀌어요.'),
-        row('사생활', seg('privacy', v('privacy'), [['0', '이목집중'], ['1', '자율'], ['2', '약보호'], ['3', '강보호'], ['4', '언급금지']])),
+        row('사생활', seg('privacy', v('privacy'), [['0', '이목집중'], ['1', '자율'], ['2', '약보호'], ['3', '강보호'], ['4', '언급금지']]), '게시판 사람들이 「보호 대상」(기본은 주인공)을 얼마나 입에 올리는지예요. 이목집중 = 목격담·소문이 자주 올라옴, 자율 = 이미 유명한 경우에만 멀리서 본 정도, 약보호 = 평범한 사람 취급(큰 사건의 여파만), 강보호 = 그보다 더 제한, 언급금지 = 본인 이야기는 전혀 없고 행동의 결과만'),
         row('주제', text('subject', '비우면 세계관에 맞는 다양한 주제')),
         row('분위기·말투', text('mood', '비우면 익명 커뮤니티 말투')),
-        row('보호 대상', text('protagonist', '비우면 주인공')),
-        row('새로고침 시 내 글', seg('keepown', v('keepown'), [['1', '유지'], ['0', '교체']])),
-        row('내 댓글 있는 글', seg('keepreplied', v('keepreplied'), [['1', '유지'], ['0', '교체']])),
+        row('보호 대상', text('protagonist', '비우면 주인공'), '위 「사생활」이 지켜 줄 사람 이름이에요. 비우면 주인공'),
+        row('새로고침 시 내 글', seg('keepown', v('keepown'), [['1', '유지'], ['0', '교체']]), '새로고침하면 옛 글이 새 글로 바뀌는데, 내가 쓴 글은 남길지예요'),
+        row('내 댓글 있는 글', seg('keepreplied', v('keepreplied'), [['1', '유지'], ['0', '교체']]), '내가 댓글을 단 남의 글도 새로고침 때 남길지예요'),
       ].join(''))}
       ${group('쪽지', [
-        row('선쪽지 받기', seg('incoming', v('incoming') === '0' ? '0' : '1', [['1', '받기'], ['0', '안 받기']])),
+        row('선쪽지 받기', seg('incoming', v('incoming') === '0' ? '0' : '1', [['1', '받기'], ['0', '안 받기']]), '게시판 사람이 먼저 나에게 쪽지를 보낼 수 있게 할지예요'),
         row('쪽지 자동 정리', `<span class="ph-inline">${seg('storage', keep.auto ? '1' : '0', [['1', 'ON'], ['0', 'OFF']])}${keep.auto ? `<input class="gx-search ph-pct" type="number" min="1" max="${STORAGE_MAX}" data-change="gn-keep" value="${keep.limit}" aria-label="상대별 쪽지 보관 상한"><span>통</span>` : ''}</span>`, `상대마다 최근 ${keep.limit}통만 남겨요`),
       ].join(''))}
-      ${advancedBox('gn', ctx.chat.scriptstate)}`
-    : group(gnetLabel(ctx.chat.scriptstate), row('게시판 사용', seg('power', '0', [['1', 'ON'], ['0', 'OFF']]), '꺼 두면 게시판 생성과 채팅 반영을 멈춰요. 저장된 글과 쪽지는 남아요'));
+      ${advancedBox('gn', ctx.chat.scriptstate)}`;
   return `<div class="ph-form">${paneHead(`${gnetLabel(ctx.chat.scriptstate)} 설정`, '', defaultsButtons('gn'), back)}${defaultsConfirm('gn')}<div class="ph-form-body ps">${rows}</div></div>`;
 }
 
@@ -640,12 +636,6 @@ function paneHtml(ctx: ChatContext, st: GState, kind: Pane, busy: boolean): stri
 
 export function gnetTab(ctx: ChatContext, env?: GnetEnv): string {
   if (env) liveEnv = env;
-  if (!gnetSettings(ctx.chat.scriptstate).enabled) {
-    const off = toast('gn', gnet.notice, (t) => {
-      if (gnet.notice === t) gnet.notice = '';
-    });
-    return `<main class="gx-body gn gn-off">${settingsView(ctx, false)}${off}</main>`;
-  }
   const st = readGnet(ctx.chat);
   const me = userNick(ctx.chat.scriptstate);
   const job = jobs.get(chatKey(ctx));
@@ -941,13 +931,6 @@ export async function handleGnet(action: string, value: string | undefined, ctx:
       return true;
     case 'gn-cfg': {
       const [k, val] = v.split('=');
-      if (k === 'power') {
-        // 끌 때 고른 모델을 기억했다가 켤 때 돌려놓는다 (원본은 mode 하나에 끄기·메인·보조가 함께 있음)
-        const cur = String(ctx.chat.scriptstate?.[CFG('mode')] ?? GN_DEFAULTS.mode);
-        if (val === '0' && cur !== '0') await setVars(ctx, env, { [CFG('mode')]: '0', [MODE_PREV]: cur === '1' ? '1' : '2' });
-        else if (val === '1' && cur === '0') await setVar(ctx, env, CFG('mode'), String(ctx.chat.scriptstate?.[MODE_PREV] ?? '') === '1' ? '1' : '2');
-        return true;
-      }
       if (k === 'storage') {
         await setVar(ctx, env, GN_STORAGE_AUTO, val === '0' ? '0' : '1');
         return true;

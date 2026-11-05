@@ -7,9 +7,10 @@ import { cardVersion, PLUGIN_VERSION, UPDATE_BASE } from '../../core/update';
 import { tokenizerName } from '../../core/tokenizer';
 import { storedWikiPack } from '../../core/wiki';
 import { advValue } from '../../core/advanced';
-import { dropTokenizer, dropWikiPack } from '../../host/install';
+import { dropOldGame, dropTokenizer, dropWikiPack } from '../../host/install';
 import { clearDiag, loadDiag, type DiagRun } from '../../host/people';
-import type { ChatContext } from '../../host/risu';
+import { updateCharacterLore, type ChatContext } from '../../host/risu';
+import { readDirectoryData, withDirectory, type DirectoryData } from '../../core/world/directory';
 import { loreCheckBox } from '../lorecheck';
 import { gnet } from '../gnet';
 import { phone } from '../phone';
@@ -37,8 +38,8 @@ const STORE: [string, string, string, string?][] = [
   ['goei:data-world', '세계 자료', '요원·조직·괴이·파밍·부록 기본 기록과 세력 관계 기본값. 본체가 뜰 때 받아 두고, 플러그인 판이 바뀌면 다시 받아요'],
   ['goei:data-install', '설치 자료', '인사말·카드 사진 목록·기본 명부·아이콘 정보. 설치·점검을 처음 열 때 받아 두고, 플러그인 판이 바뀌면 다시 받아요'],
   // 필드(게임)는 2026-11-04 플러그인에서 뺐다. 예전에 받아 둔 것이 남아 있으면 크기만 보여 준다
-  ['goei:game:code', '옛 게임 코드', '예전 필드 게임 코드. 지금 플러그인은 쓰지 않아요'],
-  [GAME_PACKS, '옛 게임 자산 팩', '예전 필드 게임 그림·소리 묶음. 지금 플러그인은 쓰지 않아요'],
+  ['goei:game:code', '옛 게임 코드', '예전 필드 게임 코드. 지금 플러그인은 쓰지 않아요. 플러그인이 뜰 때 자동으로 지워요', 'man-drop-game'],
+  [GAME_PACKS, '옛 게임 자산 팩', '예전 필드 게임 그림·소리 묶음. 지금 플러그인은 쓰지 않아요. 플러그인이 뜰 때 자동으로 지워요', 'man-drop-game'],
 ];
 
 async function sizeOf(key: string): Promise<number> {
@@ -52,9 +53,11 @@ async function sizeOf(key: string): Promise<number> {
 
 export const manUi = {
   sizes: null as Record<string, number> | null,
+  /** 올린 파일 이름 (가져오기) */
+  importName: '',
   pending: false,
   importText: '',
-  confirm: '' as '' | 'import' | 'drop-wiki' | 'drop-tok' | 'drop-diag',
+  confirm: '' as '' | 'import' | 'drop-wiki' | 'drop-tok' | 'drop-diag' | 'drop-game',
   info: '',
   notice: '',
   diag: null as DiagRun[] | null,
@@ -97,23 +100,29 @@ const badge = (ok: boolean | null, text: string) => `<span class="gw-state${ok =
 const head = (crumb: string, title: string, desc: string, act = '') =>
   `<header class="gw-head"><h2>${esc(title)}${crumb ? `<small>${esc(crumb)}</small>` : ''}</h2>${act ? `<div class="gw-head-act">${act}</div>` : ''}<p class="gx-muted">${esc(desc)}</p>${manUi.notice ? `<div class="gx-err" role="alert">${esc(manUi.notice)}</div>` : ''}${manUi.info ? `<p class="gx-hint">${esc(manUi.info)}</p>` : ''}</header>`;
 
-function backupPage(): string {
-  const json = JSON.stringify(getPrefs(), null, 2);
+/** 내보낼 글: 기기 설정 전부 + 카드 명부(세계 편집: 요원·조직·괴이·파밍·부록·세력 관계·명부)를 「directory」로 (2026-11-05 사용자) */
+function exportJson(ctx: ChatContext): string {
+  const directory = readDirectoryData(ctx.char.globalLore ?? []);
+  return JSON.stringify(directory ? { ...getPrefs(), directory } : getPrefs(), null, 2);
+}
+
+function backupPage(ctx: ChatContext): string {
+  const json = exportJson(ctx);
   const sizes = manUi.sizes;
   const store = STORE.map(([key, label, help, drop]) => {
     const n = sizes?.[key] ?? 0;
     const ctl = `<span class="gw-tokens">${sizes ? (n ? kb(n) : '없음') : '…'}</span>${drop && n ? (manUi.confirm === drop.slice(4) ? `<button class="gx-mini danger" data-action="${drop}-yes">정말 지우기</button><button class="gx-mini" data-action="man-no">취소</button>` : `<button class="gx-mini" data-action="${drop}">${ICONS.trash}지우기</button>`) : ''}`;
     return row(label, ctl, help);
   }).join('');
-  const importRows = `<div class="ps-row"><div class="ps-label"><b>가져오기</b><small>내보낸 JSON을 붙여 넣고 적용해요. 지금 기기 설정을 통째로 바꿔요.</small></div>
-      <textarea data-input="man-import-text" rows="4" placeholder="{ … }">${esc(manUi.importText)}</textarea></div>
+  const importRows = `<div class="ps-row"><div class="ps-label"><b>가져오기</b><small>내보낸 JSON을 붙여 넣거나 파일을 올리고 「적용」을 누르세요. 지금 기기 설정(과 세계 편집)을 통째로 바꿔요.</small></div>
+      <div class="ps-ctl"><label class="gx-mini gw-file">${ICONS.refresh}파일 올리기<input type="file" accept=".json,application/json" data-change="man-import-file" hidden></label>${manUi.importName ? `<span class="gx-muted">${esc(manUi.importName)}</span>` : ''}</div>
+      <textarea data-input="man-import-text" rows="4" placeholder="여기에 붙여 넣기 { … }">${esc(manUi.importText)}</textarea></div>
     <div class="ps-row gw-rel-foot">${manUi.confirm === 'import' ? `<span class="gx-muted">지금 설정을 덮어써요.</span><button class="gx-mini danger" data-action="man-import-yes">정말 적용</button><button class="gx-mini" data-action="man-no">취소</button>` : `<button class="gx-mini" data-action="man-import" ${manUi.importText.trim() ? '' : 'disabled'}>적용</button>`}</div>`;
-  return `<div class="gw-page gw-set">${head('이 기기 공통', '설정 내보내기', '기기 설정을 글로 내보내고 가져와요. 채팅 안의 값(상황판·인물 기록 등)은 Risu 채팅 백업에 들어 있어요.')}
+  return `<div class="gw-page gw-set">${head('이 기기 공통', '설정 내보내기', '설정을 글(JSON) 하나로 내보내고 가져와요. 들어가는 것: 화면·이미지 설정, 「기본값으로 저장」으로 둔 새 채팅 기본값(상황판·괴이 발생·괴담넷·괴담톡·위키·인물·일지·가계부·상태창 칸·생성 공통), 고친 지침·추가 규칙·이미지 지침·즐겨찾기, 그리고 이 카드의 세계 편집(요원·조직·괴이·파밍·부록·세력 관계·명부). 한 번도 바꾸지 않아 기본값 그대로인 항목은 적지 않아요. 채팅 안에 든 기록(상황판·인물 기록·일지)은 Risu 채팅 백업에 들어 있어요.')}
     <div class="gx-settings gw-setbody">
     <section class="ps-group"><h3>기기 설정</h3><div class="ps-rows">
-      <div class="ps-row"><div class="ps-label"><b>내보내기</b><small>화면·이미지·지침 고친 글·추가 규칙·새 채팅 기본값. 복사해서 메모장 같은 곳에 두세요.</small></div>
-        <div class="ps-ctl"><button class="gx-mini" data-action="man-copy">${ICONS.pen}복사</button><button class="gx-mini" data-action="man-download">내려받기</button></div>
-        <textarea readonly rows="4" data-man-export>${esc(json)}</textarea></div>
+      <div class="ps-row"><div class="ps-label"><b>내보내기</b><small>위 범위의 설정 전부를 JSON 글 하나로. 복사해서 메모장 같은 곳에 두세요. 바꾸지 않은 항목은 기본값이라 적히지 않아요.</small></div>
+        <div class="ps-ctl"><span class="gw-tokens">${kb(json.length)}</span><button class="gx-mini" data-action="man-copy">${ICONS.pen}복사</button><button class="gx-mini" data-action="man-download">내려받기</button></div></div>
       ${importRows}
     </div></section>
     <section class="ps-group"><h3>저장소 사용량 <small>이 기기 플러그인 저장소에 있는 것</small></h3><div class="ps-rows">${store}</div></section>
@@ -161,7 +170,7 @@ function logPage(): string {
 }
 
 export function managePage(ctx: ChatContext, node: ManageNode, canChat: boolean): string {
-  if (node === 'manage:backup') return backupPage();
+  if (node === 'manage:backup') return backupPage(ctx);
   if (node === 'manage:diag') return diagPage(ctx, canChat);
   return logPage();
 }
@@ -169,10 +178,27 @@ export function managePage(ctx: ChatContext, node: ManageNode, canChat: boolean)
 export function manageInput(name: string, value: string): boolean {
   if (name !== 'man-import-text') return false;
   manUi.importText = value;
+  manUi.importName = '';
   return true;
 }
 
-export async function manageAction(action: string, root: HTMLElement | null): Promise<boolean> {
+/** 가져오기 「파일 올리기」: 고른 JSON 파일을 읽어 붙여넣기 글칸에 넣는다 (2026-11-05 사용자: 붙여넣기와 파일 둘 다) */
+export async function manageFile(el: HTMLInputElement): Promise<boolean> {
+  if (el.dataset.change !== 'man-import-file') return false;
+  const f = el.files?.[0];
+  if (!f) return true;
+  try {
+    manUi.importText = await f.text();
+    manUi.importName = f.name;
+    manUi.notice = '';
+  } catch (error) {
+    manUi.notice = `파일을 읽지 못했어요: ${error instanceof Error ? error.message : String(error)}`;
+  }
+  el.value = '';
+  return true;
+}
+
+export async function manageAction(action: string, root: HTMLElement | null, ctx: ChatContext | null = null): Promise<boolean> {
   if (!action.startsWith('man-')) return false;
   manUi.notice = '';
   manUi.info = '';
@@ -181,20 +207,31 @@ export async function manageAction(action: string, root: HTMLElement | null): Pr
       manUi.confirm = '';
       return true;
     case 'man-copy': {
-      const json = JSON.stringify(getPrefs(), null, 2);
+      if (!ctx) return true;
+      const json = exportJson(ctx);
+      // Risu 안에서는 navigator.clipboard 가 막혀 있을 때가 있다 → 임시 글칸을 골라 execCommand('copy') 로 한 번 더 시도 (2026-11-05 사용자)
+      let ok = false;
       try {
         await navigator.clipboard.writeText(json);
-        manUi.info = '복사했어요.';
-      } catch {
-        const ta = root?.querySelector<HTMLTextAreaElement>('textarea[data-man-export]');
-        ta?.select();
-        manUi.info = '클립보드를 쓰지 못해 글을 골라 뒀어요. Ctrl+C 로 복사하세요.';
+        ok = true;
+      } catch { /* 아래 */ }
+      if (!ok && root) {
+        const ta = document.createElement('textarea');
+        ta.value = json;
+        ta.setAttribute('readonly', '');
+        ta.style.cssText = 'position:fixed;left:-9999px;top:0;opacity:0';
+        root.appendChild(ta);
+        ta.focus();
+        ta.select();
+        try { ok = document.execCommand('copy'); } catch { ok = false; }
+        ta.remove();
       }
+      manUi.info = ok ? `복사했어요 (${kb(json.length)}).` : '이 환경에서는 복사가 막혀 있어요. 「내려받기」로 파일로 받으세요.';
       return true;
     }
     case 'man-download': {
       try {
-        const json = JSON.stringify(getPrefs(), null, 2);
+        const json = ctx ? exportJson(ctx) : JSON.stringify(getPrefs(), null, 2);
         const url = URL.createObjectURL(new Blob([json], { type: 'application/json' }));
         const a = document.createElement('a');
         a.href = url;
@@ -215,10 +252,19 @@ export async function manageAction(action: string, root: HTMLElement | null): Pr
       try {
         const parsed = JSON.parse(manUi.importText) as unknown;
         if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) throw new Error('설정 JSON 이 아니에요.');
-        await savePrefs(() => parsed as ReturnType<typeof getPrefs>);
+        // 세계 편집(명부)이 들어 있으면 카드 로어북 Directory 에 적는다 (2026-11-05 사용자)
+        const { directory, ...prefs } = parsed as { directory?: unknown } & Record<string, unknown>;
+        let wrote = '';
+        if (directory && typeof directory === 'object' && !Array.isArray(directory)) {
+          if (!ctx) throw new Error('세계 편집을 적을 카드가 없어요.');
+          await updateCharacterLore(ctx.charIndex, (lore) => withDirectory(lore, directory as DirectoryData));
+          wrote = ' 세계 편집(명부)도 카드에 적었어요.';
+        }
+        await savePrefs(() => prefs as unknown as ReturnType<typeof getPrefs>);
         manUi.importText = '';
+        manUi.importName = '';
         manUi.sizes = null;
-        manUi.info = '설정을 가져왔어요. 창을 닫았다 열면 전부 반영돼요.';
+        manUi.info = `설정을 가져왔어요.${wrote} 창을 닫았다 열면 전부 반영돼요.`;
       } catch (error) {
         manUi.notice = `가져오지 못했어요: ${error instanceof Error ? error.message : String(error)}`;
       }
@@ -227,8 +273,16 @@ export async function manageAction(action: string, root: HTMLElement | null): Pr
     case 'man-drop-wiki':
     case 'man-drop-tok':
     case 'man-drop-diag':
+    case 'man-drop-game':
       manUi.confirm = action.slice(4) as typeof manUi.confirm;
       return true;
+    case 'man-drop-game-yes': {
+      manUi.confirm = '';
+      const n = await dropOldGame();
+      manUi.info = n ? `옛 게임 자료 ${n}개를 지웠어요.` : '지울 옛 게임 자료가 없어요.';
+      manUi.sizes = null;
+      return true;
+    }
     case 'man-drop-wiki-yes':
       manUi.confirm = '';
       await dropWikiPack();

@@ -71,6 +71,8 @@ const fabClick = async () => {
 const metrics = async () => {
   cdp ??= await page.context().newCDPSession(page);
   await cdp.send('Performance.enable');
+  // 두 번 돌린다: 한 번으로는 방금 떼어 낸 노드 하나가 아직 안 걷혀 455→456 처럼 보일 때가 있다 (2026-11-05, 붙은 DOM 은 그대로였음)
+  await cdp.send('HeapProfiler.collectGarbage');
   await cdp.send('HeapProfiler.collectGarbage');
   const m = Object.fromEntries((await cdp.send('Performance.getMetrics')).metrics.map((x) => [x.name, x.value]));
   return { heapMB: +(m.JSHeapUsedSize / 1048576).toFixed(1), nodes: m.Nodes, styles: await page.evaluate(() => document.querySelectorAll('style').length), listeners: m.JSEventListeners };

@@ -34,6 +34,7 @@ function withWalpurgis(lore, spec = {}) {
   data.조직['발푸르기스 협회'] = { roster_for: ['F00'], phone_tabs: [extraTabId('F00')], code: 'F00', playable: true, gm_name: 'Walpurgis Society', gm_desc: 'Sorcerers.', ...spec };
   data.요원.블라렛 = { ...data.요원.블라렛, affiliation: '발푸르기스 협회', roster_for: ['F00'], phone_tabs: [extraTabId('F00')] };
   data.codes_used = ['F00'];
+  delete data['시작 묶음']; // 새 명부 기본값인 「중립」 묶음(F00)을 빼고, 발푸르기스 협회가 F00 을 쓴다
   return withDirectory(lore, data);
 }
 

@@ -197,7 +197,7 @@ for (const vp of vps) {
   await page.waitForSelector('.gw [data-action="man-import-yes"]');
   await clickSel(page, '.gw [data-action="man-import-yes"]');
   await page.waitForFunction(() => document.querySelector('.gw .gw-head')?.textContent?.includes('가져왔어요'));
-  { const p = await prefsOf(page); assert.deepEqual([p.basic, p.world, p.marksSeeded], [{}, {}, true], '빈 설정 가져오기'); assert.deepEqual(p.marks.map((m) => m.s.tab), ['records', 'records', 'settings'], '빈 설정이면 기본 즐겨찾기를 채움(필드 제거, 가계부는 기록 하위 탭; 2026-11-05)'); }
+  { const p = await prefsOf(page); assert.deepEqual([p.basic, p.world, p.marksSeeded], [{}, {}, true], '빈 설정 가져오기'); assert.deepEqual(p.marks.map((m) => m.s.tab), ['records', 'settings'], '빈 설정이면 기본 즐겨찾기를 채움(기록·설정만; 2026-11-05 사용자)'); }
 
   // ── 점검 탭 ──
   await goNode(page, 'manage:diag');
@@ -216,8 +216,14 @@ for (const vp of vps) {
   await settle();
   await goNode(page, 'manage:backup');
   await page.waitForFunction(() => !document.querySelector('.gw .gw-setbody')?.textContent?.includes('…'));
-  const exported = await page.$eval('.gw textarea[data-man-export]', (e) => e.value);
-  assert.deepEqual(JSON.parse(exported), await prefsOf(page), '내보내기 JSON = 저장된 기기 설정');
+  // 2026-11-05 사용자: JSON 본문은 화면에 안 보인다 → 「복사」가 클립보드에 쓴 글로 확인 (기기 설정 + 카드 명부 directory)
+  await page.evaluate(() => { window.__clip = ''; Object.defineProperty(navigator, 'clipboard', { value: { writeText: async (t) => { window.__clip = t; } }, configurable: true }); });
+  await clickSel(page, '.gw [data-action="man-copy"]');
+  await page.waitForFunction(() => window.__clip);
+  const exported = JSON.parse(await page.evaluate(() => window.__clip));
+  const { directory, ...rest } = exported;
+  assert.deepEqual(rest, await prefsOf(page), '내보내기 JSON = 저장된 기기 설정');
+  assert.ok(directory === undefined || typeof directory === 'object', '세계 편집(명부)은 directory 로');
   const sizeTxt = await page.evaluate(() => [...document.querySelectorAll('.gw .ps-row')].find((r) => r.querySelector('.gw-tokens') && r.textContent.includes('기기 설정'))?.querySelector('.gw-tokens')?.textContent);
   const rawLen = await page.evaluate(() => window.__store['p:goei:prefs'].length);
   assert.equal(sizeTxt, rawLen >= 1000 ? `${Math.round(rawLen / 1000)}KB` : `${rawLen}B`, `저장소 사용량 ${sizeTxt} (실제 ${rawLen})`);

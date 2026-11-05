@@ -1262,7 +1262,7 @@ if (want('WL2')) {
   assert.ok((await page.textContent('.gx-hwallet')).includes('140,000'), '머리 잔고 = 시작 잔고 14만');
   await page.tap('.gx-hwallet');
   await page.waitForSelector('.gx-wallettab');
-  assert.equal(await page.locator('.gx-hwallet').count(), 0, '가계부 화면 안에서는 머리 단추 숨김');
+  assert.equal(await page.locator('.gx-hwallet').count(), 1, '가계부 화면 안에서도 머리 단추 유지 (2026-11-05 사용자)');
   assert.equal(await page.evaluate(() => document.querySelector('.gx').dataset.tab), 'records', '가계부는 기록 탭 안 (2026-11-05)');
   await page.tap('.gx-nav .gx-nb.home[data-value="board"]');
   await page.tap('.gx-idbtn');
@@ -1558,8 +1558,10 @@ async function openReportPage(page, id) {
   await page.waitForSelector('.gx-rpt');
 }
 
+// 소감(debrief)은 2026-11-05 사용자 결정으로 보고서·갱신기에서 뺐다 → J1~J3 은 돌리지 않는다 (코드 경로는 남아 있어 켜면 다시 쓸 수 있다)
+const DEBRIEF_ON = false;
 // J1) 소감 자동(기본 켬): 종료 턴의 인물 기록 갱신 호출 1회에 ended_now 자료·debrief 절이 얹히고(호출 수 그대로), 응답 debriefs 가 검사 뒤 보고서에 src turn 으로. 사건당 1건, 종료 없는 턴엔 절·자료 없음
-if (want('J1')) {
+if (DEBRIEF_ON && want('J1')) {
   const { page, errors } = await boot(fixture, { message: [], scriptstate: {} });
   const { preset, where } = await startedWithReply(page);
   // 갱신기 응답을 그때그때 만든다 (보고서 id 는 종료가 반영된 뒤에야 알 수 있다)
@@ -1623,7 +1625,7 @@ if (want('J1')) {
 }
 
 // J2) 소감 자동 끔 ($jr_debrief_auto=0): 종료 턴 갱신 호출은 그대로 1회지만 절·자료가 없고, 보고서는 「소감 없음」
-if (want('J2')) {
+if (DEBRIEF_ON && want('J2')) {
   const { page, errors } = await boot(fixture, { message: [], scriptstate: {} });
   const { preset, where } = await startedWithReply(page);
   await page.evaluate(() => { window.__chat.scriptstate.$jr_debrief_auto = '0'; });
@@ -1649,7 +1651,7 @@ if (want('J2')) {
 }
 
 // J3) 인물 기록 갱신기 끔 ($pp_on=0): 종료 턴에 호출 0회 → 「소감 없음」. 그래도 보고서 페이지 「소감 쓰기」는 보조 모델 1회로 된다 (src manual)
-if (want('J3')) {
+if (DEBRIEF_ON && want('J3')) {
   const { page, errors } = await boot(fixture, { message: [], scriptstate: {} });
   const { preset, where } = await startedWithReply(page);
   await page.evaluate(() => { window.__chat.scriptstate.$pp_on = '0'; });

@@ -17,6 +17,14 @@ export interface PicPlan {
   replaced: number;
   added: number;
   bytes: number;
+  /** 지울 사진 이름: 지금 카드 매니페스트에 있었는데 새 카드에서 뺀 것 (직접 넣은 사진은 매니페스트에 없으므로 안 지운다). 2026-11-05 사용자: 이름만 있는 옛 요원 그림 55장 */
+  drop: string[];
+}
+
+/** 카드 에셋 목록에서 이름들을 뺀 목록 */
+export function dropAssets(assets: unknown, names: string[]): unknown[] {
+  const gone = new Set(names);
+  return ((Array.isArray(assets) ? assets : []) as unknown[]).filter((r) => !(isRow(r) && gone.has(r[0])));
 }
 
 type Row = [string, string, string?];
@@ -28,7 +36,11 @@ const isRow = (r: unknown): r is Row => Array.isArray(r) && typeof r[0] === 'str
 export function planPictures(assets: unknown, cur: Manifest | null | undefined, next: Manifest | null | undefined): PicPlan {
   const have = new Set(((Array.isArray(assets) ? assets : []) as unknown[]).filter(isRow).map((r) => r[0]));
   const known = new Map(pictures(cur).map((p) => [p[0], p[1]]));
-  const plan: PicPlan = { get: [], replaced: 0, added: 0, bytes: 0 };
+  const plan: PicPlan = { get: [], replaced: 0, added: 0, bytes: 0, drop: [] };
+  if (next) {
+    const nextNames = new Set(pictures(next).map((p) => p[0]));
+    for (const n of known.keys()) if (have.has(n) && !nextNames.has(n)) plan.drop.push(n);
+  }
   for (const p of pictures(next)) {
     if (have.has(p[0]) && known.get(p[0]) === p[1]) continue;
     plan.get.push(p);

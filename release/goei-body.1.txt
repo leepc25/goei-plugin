@@ -1,4 +1,4 @@
-// goei-body 0.20.5
+// goei-body 0.20.6
 "use strict";
 (() => {
   var __create = Object.create;
@@ -698,7 +698,7 @@ Companions: [[PARTY]]
   var rp_default = "## RP Guidance\n- Setting: Modern-day Republic of Korea. The public is unaware that anomalies coexist with ordinary life and may be encountered accidentally. Factions conceal incidents. Exposed civilians may be recruited, memory-altered, absorbed into the anomaly economy, or removed.\n- Direction: Dialogue-focused interactive RP. Act as an in-scene GM.\n\n### Play Principles\n- Scene Flow: Build scenes around what people are already doing, wanting, and responding to. Let dialogue and concrete interaction develop; do not rush toward lorebook truths or payoffs. An opening need not follow scenery, an NPC entrance, an assignment, and a briefing. Choose its place, social situation, and point of entry from the protagonist's circumstances and the actual premise; vary these coherently rather than swapping decorative scenery around the same script.\n- Characters: Profiles are hidden canon, express them through dialogue and behavior, not summaries.\n- World: NPCs, factions, and anomalies continue acting off-screen; their consequences appear later in-scene.\n- Body Horror: Render horror through concrete behavior, sensory detail, wounds, and physical consequences rather than vague dread or abstract threat labels. For significant injury, restraint, transformation, contamination, or body horror, specify affected anatomy and consistently track its damage, position, limitations, and sensory effects.\n\n### Knowledge and Disclosure\n- Separate the anomaly's actual nature from what each observer knows. Its lore entry fixes hidden canon for the GM; activating the entry, selecting the target, or listing it in a world report does not publish its contents.\n- Before stating a fact through an NPC, briefing, notice, document, or narration, use only what that source could have learned: direct observations, a genuinely established report, or an explicitly documented prior investigation. Do not invent a complete earlier expedition, survivor testimony, surveillance system, or classified manual merely to justify revealing a secret.\n- Preliminary information may describe the location, outward changes, disappearance or injury reports, access conditions visible from outside, and limited observations with their actual scope. Distinguish observation, inference, rumor, and unknowns without turning every sentence into a disclaimer.\n- Hidden causes, internal layouts, entity identities or motives, exact triggers, taboos, costs, safe sequences, exits, and the solution remain undisclosed until earned by a credible source or in-scene discovery. Calling such information a precaution, checklist, rumor, or guess does not make early disclosure acceptable.\n- An explicitly established manual or prior discovery can provide the particular facts it supports. Do not make experienced staff artificially ignorant of those facts, but do not expand a partial report into complete knowledge. Seniority and organizational competence determine judgment and resources, not omniscience.\n- Let a briefing convey why the case matters, what is actually known, and the practical limits of the task through the speaker's agenda and conversation. It need not contain a rule list or supply the answer in advance. Subsequent observation, testing, conversation, and consequences can change the characters' understanding.\n- Preserve the real rules and established discoveries. Mystery comes from limited access and interpretation, not changing canon to invalidate a correct deduction. Uncertainty is not a requirement to invent false information.\n\n## Nature of Anomaly (Gwe-i, I-mul, Uh-doom, Gwe-dam)\n\n### Characteristics\n- Frequency: Anomalies are far more common than the public knows, their cause is unknown.\n- Rule-Based: Anomalies follow consistent conditions, boundaries, consequences, and exits that can be observed and exploited.\n- Role-Based Narrative: Many assign roles, enforce scripts or plot structures, and punish deviation.\n- Permanence: Containment rarely eradicates an anomaly. Once contained, it disappears from the site and later manifests elsewhere as the same anomaly.\n- Adhesive: The abnormal attracts the abnormal. Survivors face repeated encounters and clustered incidents.\n- Isolation: Inside a Location-type anomalies isolate entrants, communication cannot cross. Escape requires correctly interpreting its internal logic, or destroying its core entity.\n- Contamination: Exposure to the anomalous accumulates. Light contamination fades with treatment, heavy contamination alters, becoming irreversible past a threshold.\n- Exit: Escape ends the entrant's exposure, not the anomaly. Resolving its internal story may end, offering the greatest rewards and risks.\n\n### Types\n- Location-Type: Anomalies centered on a place or spatial area.\n  - Manifested: Appears suddenly at a specific real-world location.\n  - Overwrite: Overlays or alters an existing real-world location.\n  - Dimension: Exists in a separate space or dimension and draws people inside.\n- Entity: An individual anomalous being.\n- Object: Primarily exists as an anomalous object.\n- Other: These are common patterns, not exhaustive categories.\n\n### Classification\n- F (Shade): Virtually no fatalities.\n- E (Twilight): Low-risk anomalies with practical value.\n- D (Dusk): High survival rate when the manual is followed.\n- C (Gloaming): Complex or unstable rules that cannot be fully standardized.\n- B (Gloom): ~2% civilian survival; poor manuals and highly lethal entry.\n- A (Darkness): no repeatable method of survival has been established; catastrophic losses expected.\n- S (Abyss): Direct encounter with a cosmic-horror entity.\n\n### Anomaly Generation Rules\n\n#### Location-Type\n- Real Basis: When based in reality, use a specific real South Korean location, facility, branch, building, floor, or department where possible.\n- Manifested: Insert the anomaly into the real location without unnecessarily transforming the surrounding space.\n- Overwrite: Keep the original infrastructure recognizable while altering its use, routines, access, relationships, and consequences. Avoid generic horror decoration.\n- Dimension: Build a distinct space with its own coherent geography, rules, inhabitants, and means of entry and exit.\n- Common rules: Include one or more Core Entities where appropriate, keeping their role in the anomaly initially unclear.\n\n#### Sentient Entities\n- Human Surface: Human-passing entities initially fit their environment in appearance, speech, dress, and conduct; reveal their non-human nature through interaction, not obvious monster cues.\n- Individuality: Each has distinct personality, motives, relationships, routines, preferences, fears, and blind spots.\n- Rule-Bound Agency: Rules constrain actions and consequences, but entities choose within them according to their own motives and judgment.\n- Communication: Conversation begins surface-normal; uncanniness emerges through abnormal assumptions, values, emotional logic, and failures to understand ordinary human concerns.\n- Threat Triggers: Words, actions, timing, location, procedural mistakes, broken etiquette, taboo questions, or role violations may trigger specific consequences.\n- Sexual Violence: Entities may take sexual interest in human bodies and act according to their own anomalous logic. Don't fade out, abstract, or look away.\n\n---";
 
   // src/data/guides/tag.txt
-  var tag_default = "{{#if {{equal::{{getvar::st_anomaly_on}}::1}}}}## Tag System Directive\nThe scene shows only what {{user}} can perceive. The hidden world continues independently beyond the scene. System tags are not part of the story and are appended after the prose in every response.\n\n### World Entries\n\n#### Anomaly\n{{getvar::an_report}}\n\n- 발생지점: exact real-world building or place | designated anomaly name\n- 상태: 활성 | 소멸 | 격리 | 클리어\n- 등급: F | E | D | C | B | A | S\n- 배치: Agent code(s) | External faction name | 없음\n   - Faction pool: 관리국 | 가짜 관리국 | 백일몽 주식회사 | 교황청 | 이슬람 지하드 | 발푸르기스 협회 | 흡혈귀 세력 | 프리랜서 (특수재난대응협회) | 무명찬란교 소속 교단{{getvar::fac_pool}} | etc.\n- 상황: What is happening at the anomaly site right now: its current manifestation, victims or witnesses, and any faction response. One short sentence.\n\n#### Incident\n{{getvar::in_report}}\n\n- 발생지점: exact real-world building or place | designated landmark\n- 상태: 진행 | 종료\n   - 진행: Active ONLY during urgent incidents; MUST NOT include aftermath or routine tasks.\n   - 종료: MUST transition immediately once the urgent incident ends.\n- 배치: Agent code(s) | External faction name | 없음 (same rules as Anomaly 배치)\n- 상황: Create a major, urgent non-anomaly incident requiring immediate response, separate from anything already occurring in the current scene. Do not use minor accidents, routine problems, or trivial disturbances. The incident may involve the site faction's response or interactions with external factions.\n\n#### Mystic Site\n{{getvar::ms_report}}\n\n- 명칭: designated Mystic Site name\n- 상태: 출현 | 소실\n- 방문자: current individuals or groups visiting or using the site. | 없음\n- 상황: What is happening at the site right now: its current state, notable visitors' activity, or unusual occurrences. One short sentence.\n\n#### Agent\n{{getvar::ag_report}}\n\n- Agent codes (P001, P002, …) are fixed person identifiers. They are separate from user-affiliation codes (A00–E00) and phone-tab IDs (T/X); use the character lore for actual affiliation. The same person keeps the same code across user-affiliation changes.\n\n- 상태: 휴게 | 내근 | 외근 | 작전투입 | 비번 | 부상 | 실종 | 격리 | 사망\n   - Meaning: 휴게 = on-duty break, 내근 = office work, 외근 = field work (non-operation), 작전투입 = mission deployed, 비번 = off duty, 부상 = injured, 실종 = missing, 격리 = quarantined, 사망 = dead. Write only the Korean value.\n- 상황: Current activity, assignment, location, condition, or faction-related operations.\n\n#### Mandatory Time-Based World Entry Tag Updates\n- Minute-by-Minute Reassessment: Re-evaluate all mutable values in every World Entry tag whenever world time advances.\n- **`{N시간 N분 전}`: Marks how long the current state has lasted. Account for the elapsed time when reassessing the entry; never output `{N시간 N분 전}` itself.**\n- Reflect closures reported in World Entries; do not revive closed entries or output tags for them.\n- Update terminal states when the events actually resolve: [AN] → 소멸 | 격리 | 클리어; [IN] → 종료; [MS] → 소실. Elapsed time alone is not a resolution.\n- While {{user}} is directly involved with an anomaly, do not end it or force {{user}} to leave merely because time has elapsed.\n\n#### Instructions\n- For each `NEW [...]` line in World Entries, fill every `<...>` and remove `NEW` so it becomes a normal tag. New AN, IN and MS entries may also reflect actual RP developments. AG requires existing World Entry lines.\n- At the end of every response, immediately after the prose, output all existing World Entry tags, once each and one per line, in this order: AN → IN → MS → AG.\n- Never use `|` or `]` inside a value.\n- **Write World Entry values in Korean**.\n\n### Affiliation Change\n[AC|code]\n\n- code = A00 | B00 | C00 | D00 | E00{{getvar::fac_codes}}\n   - A00 = {{#when::st_faction::vis::B00}}Fake {{/when}}{{#when::{{notequal::{{getvar::st_faction}}::A00}}::and::{{notequal::{{getvar::st_faction}}::B00}}}}Self-Proclaimed Real {{/when}}Anomaly Management Bureau\n   - B00 = {{#when::st_faction::vis::A00}}Fake {{/when}}{{#when::{{notequal::{{getvar::st_faction}}::A00}}::and::{{notequal::{{getvar::st_faction}}::B00}}}}Self-Proclaimed Real {{/when}}Anomaly Management Bureau\n   - C00 = Baekilmong Corporation\n   - D00 = Civilian\n   - E00 = Freelancer{{getvar::fac_ac}}\n- {{user}}'s current affiliation: {{getvar::ib_affiliation}} (Code: {{getvar::st_faction}})\n- **Output [AC] only in the response where {{user}}'s affiliation actually changes.**\n- Codes are system identifiers. Outside tags, refer to organizations by name.\n\n### Final Output Format\n[AN|지역|발생지점|상태|등급|배치|상황]\n[IN|지역|발생지점|상태|배치|상황]\n[MS|지역|명칭|상태|방문자|상황]\n[AG|code|상태|상황]\n[AC|code]\n\n---{{/if}}\n{status_section}\n---\n\n";
+  var tag_default = "{{#if {{equal::{{getvar::st_anomaly_on}}::1}}}}## Tag System Directive\nThe scene shows only what {{user}} can perceive. The hidden world continues independently beyond the scene. System tags are not part of the story and are appended after the prose in every response.\n\n### World Entries\n- Each active entry line ends with {elapsed} and, when auto-close is on, {유지 기한 MM.DD HH:MM} (its deadline). If the status time of THIS reply passes an entry's 유지 기한 (e.g. after a time skip), close that entry in this reply (상태 격리/소멸/클리어, 종료, or 소실) and end its 상황 with (종료 MM.DD HH:MM): a plausible time when it actually ended, between its start and the deadline, never the current time. If you omit the time, the system closes it at the deadline.\n\n#### Anomaly\n{{getvar::an_report}}\n\n- 발생지점: exact real-world building or place | designated anomaly name\n- 상태: 활성 | 소멸 | 격리 | 클리어\n- 등급: F | E | D | C | B | A | S\n- 배치: Agent code(s) | External faction name | 없음\n   - Faction pool: 관리국 | 가짜 관리국 | 백일몽 주식회사 | 교황청 | 이슬람 지하드 | 발푸르기스 협회 | 흡혈귀 세력 | 프리랜서 (특수재난대응협회) | 무명찬란교 소속 교단{{getvar::fac_pool}} | etc.\n- 상황: What is happening at the anomaly site right now: its current manifestation, victims or witnesses, and any faction response. One short sentence.\n\n#### Incident\n{{getvar::in_report}}\n\n- 발생지점: exact real-world building or place | designated landmark\n- 상태: 진행 | 종료\n   - 진행: Active ONLY during urgent incidents; MUST NOT include aftermath or routine tasks.\n   - 종료: MUST transition immediately once the urgent incident ends.\n- 배치: Agent code(s) | External faction name | 없음 (same rules as Anomaly 배치)\n- 상황: Create a major, urgent non-anomaly incident requiring immediate response, separate from anything already occurring in the current scene. Do not use minor accidents, routine problems, or trivial disturbances. The incident may involve the site faction's response or interactions with external factions.\n\n#### Mystic Site\n{{getvar::ms_report}}\n\n- 명칭: designated Mystic Site name\n- 상태: 출현 | 소실\n- 방문자: current individuals or groups visiting or using the site. | 없음\n- 상황: What is happening at the site right now: its current state, notable visitors' activity, or unusual occurrences. One short sentence.\n\n#### Agent\n{{getvar::ag_report}}\n\n- Agent codes (P001, P002, …) are fixed person identifiers. They are separate from user-affiliation codes (A00–E00) and phone-tab IDs (T/X); use the character lore for actual affiliation. The same person keeps the same code across user-affiliation changes.\n\n- 상태: 휴게 | 내근 | 외근 | 작전투입 | 비번 | 부상 | 실종 | 격리 | 사망\n   - Meaning: 휴게 = on-duty break, 내근 = office work, 외근 = field work (non-operation), 작전투입 = mission deployed, 비번 = off duty, 부상 = injured, 실종 = missing, 격리 = quarantined, 사망 = dead. Write only the Korean value.\n- 상황: Current activity, assignment, location, condition, or faction-related operations.\n\n#### Mandatory Time-Based World Entry Tag Updates\n- Minute-by-Minute Reassessment: Re-evaluate all mutable values in every World Entry tag whenever world time advances.\n- **`{N시간 N분 전}`: Marks how long the current state has lasted. Account for the elapsed time when reassessing the entry; never output `{N시간 N분 전}` itself.**\n- Reflect closures reported in World Entries; do not revive closed entries or output tags for them.\n- Update terminal states when the events actually resolve: [AN] → 소멸 | 격리 | 클리어; [IN] → 종료; [MS] → 소실. Elapsed time alone is not a resolution.\n- While {{user}} is directly involved with an anomaly, do not end it or force {{user}} to leave merely because time has elapsed.\n\n#### Instructions\n- For each `NEW [...]` line in World Entries, fill every `<...>` and remove `NEW` so it becomes a normal tag. New AN, IN and MS entries may also reflect actual RP developments. AG requires existing World Entry lines.\n- At the end of every response, immediately after the prose, output all existing World Entry tags, once each and one per line, in this order: AN → IN → MS → AG.\n- Never use `|` or `]` inside a value.\n- **Write World Entry values in Korean**.\n\n### Affiliation Change\n[AC|code]\n\n- code = A00 | B00 | C00 | D00 | E00{{getvar::fac_codes}}\n   - A00 = {{#when::st_faction::vis::B00}}Fake {{/when}}{{#when::{{notequal::{{getvar::st_faction}}::A00}}::and::{{notequal::{{getvar::st_faction}}::B00}}}}Self-Proclaimed Real {{/when}}Anomaly Management Bureau\n   - B00 = {{#when::st_faction::vis::A00}}Fake {{/when}}{{#when::{{notequal::{{getvar::st_faction}}::A00}}::and::{{notequal::{{getvar::st_faction}}::B00}}}}Self-Proclaimed Real {{/when}}Anomaly Management Bureau\n   - C00 = Baekilmong Corporation\n   - D00 = Civilian\n   - E00 = Freelancer{{getvar::fac_ac}}\n- {{user}}'s current affiliation: {{getvar::ib_affiliation}} (Code: {{getvar::st_faction}})\n- **Output [AC] only in the response where {{user}}'s affiliation actually changes.**\n- Codes are system identifiers. Outside tags, refer to organizations by name.\n\n### Final Output Format\n[AN|지역|발생지점|상태|등급|배치|상황]\n[IN|지역|발생지점|상태|배치|상황]\n[MS|지역|명칭|상태|방문자|상황]\n[AG|code|상태|상황]\n[AC|code]\n\n---{{/if}}\n{status_section}\n---\n\n";
 
   // src/core/guides.ts
   var GUIDE_NAMES = ["GNet", "Phone", "Wiki", "Directive", "RP", "Tag"];
@@ -820,9 +820,9 @@ ${rules2}` };
       party: ["solo", "group", "support_one", "support_many", "separator", "pair_separator", "last_separator"]
     };
     for (const [group5, list4] of Object.entries(keys)) {
-      const obj5 = format?.[group5];
-      if (!obj5 || typeof obj5 !== "object") throw new DirectiveError(`Directive FORMAT.${group5}가 없어요.`);
-      for (const k of list4) if (typeof obj5[k] !== "string") throw new DirectiveError(`Directive FORMAT.${group5}.${k}는 문자열이어야 해요.`);
+      const obj6 = format?.[group5];
+      if (!obj6 || typeof obj6 !== "object") throw new DirectiveError(`Directive FORMAT.${group5}가 없어요.`);
+      for (const k of list4) if (typeof obj6[k] !== "string") throw new DirectiveError(`Directive FORMAT.${group5}.${k}는 문자열이어야 해요.`);
     }
     if (typeof format.user_input !== "string") throw new DirectiveError("Directive FORMAT.user_input은 문자열이어야 해요.");
     for (const name of REQUIRED) if (!sections3[name]) throw new DirectiveError(`Directive의 ${name} 섹션을 확인하세요.`);
@@ -860,8 +860,8 @@ ${rules2}` };
   }
   var OPEN_RE = /%%SCENE_CARD:([0-9a-f]+)%%\r?\n/;
   var CARD_RE = /%%SCENE_CARD:([0-9a-f]+)%%\r?\n([\s\S]*?)\r?\n%%\/SCENE_CARD%%/g;
-  function toHex(s5) {
-    return Array.from(new TextEncoder().encode(s5), (b) => b.toString(16).padStart(2, "0")).join("");
+  function toHex(s7) {
+    return Array.from(new TextEncoder().encode(s7), (b) => b.toString(16).padStart(2, "0")).join("");
   }
   function fromHex(hex3) {
     const bytes = new Uint8Array((hex3.match(/../g) ?? []).map((h) => parseInt(h, 16)));
@@ -879,8 +879,8 @@ ${body5}
     const m = OPEN_RE.exec(text4);
     if (!m) return null;
     try {
-      const s5 = JSON.parse(fromHex(m[1]));
-      return { target: String(s5.target ?? ""), party: String(s5.party ?? ""), ...s5.unsent ? { unsent: true } : {} };
+      const s7 = JSON.parse(fromHex(m[1]));
+      return { target: String(s7.target ?? ""), party: String(s7.party ?? ""), ...s7.unsent ? { unsent: true } : {} };
     } catch {
       return null;
     }
@@ -888,9 +888,9 @@ ${body5}
   function setSceneUnsent(text4, on2) {
     return text4.replace(/%%SCENE_CARD:([0-9a-f]+)%%/g, (all, hex3) => {
       try {
-        const s5 = JSON.parse(fromHex(hex3));
-        if (!!s5.unsent === on2) return all;
-        const next = { target: s5.target, party: s5.party, ...on2 ? { unsent: true } : {} };
+        const s7 = JSON.parse(fromHex(hex3));
+        if (!!s7.unsent === on2) return all;
+        const next = { target: s7.target, party: s7.party, ...on2 ? { unsent: true } : {} };
         return `%%SCENE_CARD:${toHex(JSON.stringify(next))}%%`;
       } catch {
         return all;
@@ -911,6 +911,12 @@ ${body5}
     return on2 ? `${plain3}
 ${UNSENT_MARK}` : plain3;
   }
+  var SCENE_MARK = "%%GOEI_SCENE%%";
+  var SCENE_RE = /\r?\n?%%GOEI_SCENE%%/g;
+  var sceneMessage = (text4) => `${text4.replace(SCENE_RE, "").trimEnd()}
+${SCENE_MARK}`;
+  var isSceneMessage = (text4) => typeof text4 === "string" && text4.includes(SCENE_MARK);
+  var stripSceneMark = (text4) => text4.replace(SCENE_RE, "");
   var START_RE = /%%GOEI_START%%\r?\n([\s\S]*?)\r?\n%%\/GOEI_START%%(\r?\n?%%GOEI_UNSENT%%)?/g;
   var START_MARK = "%%GOEI_START%%";
   function startRecord(text4) {
@@ -936,8 +942,8 @@ ${text4}
   function renderSceneCards(text4, render3) {
     return text4.replace(CARD_RE, (all, hex3) => {
       try {
-        const s5 = JSON.parse(fromHex(hex3));
-        return render3({ target: String(s5.target ?? ""), party: String(s5.party ?? ""), ...s5.unsent ? { unsent: true } : {} });
+        const s7 = JSON.parse(fromHex(hex3));
+        return render3({ target: String(s7.target ?? ""), party: String(s7.party ?? ""), ...s7.unsent ? { unsent: true } : {} });
       } catch {
         return all;
       }
@@ -1205,10 +1211,58 @@ ${tpl.replace(/\[\[INPUT\]\]/g, () => extra)}`;
       if (!t || t.startsWith("#")) continue;
       const m = /^([\w-]+)\s*:\s*(.*)$/.exec(t);
       if (!m) continue;
-      const names4 = m[2].split("|").map((s5) => s5.trim()).filter(Boolean);
+      const names4 = m[2].split("|").map((s7) => s7.trim()).filter(Boolean);
       if (names4.length) map.set(m[1], names4);
     }
     return map;
+  }
+
+  // src/core/world/roster-v.ts
+  var ROSTER_V = 3;
+  var NEUTRAL_GROUP = "중립";
+  var NEUTRAL_IDS = ["P043", "P044", "P045", "P046", "P047", "P048", "P049", "P050", "P051", "P052", "P053", "P054", "P055"];
+  var NEUTRAL_ENGLISH = "Neutral";
+  var NEUTRAL_BLURB = "어느 조직에도 속하지 않은 사람들. 교황청 수녀, 이슬람 성전사, 마녀, 흡혈귀, 중림 상인, 그리고 사람이 아닌 것까지.";
+  var s = (v) => typeof v === "string" ? v.trim() : "";
+  function freeGroupCode(used) {
+    const set2 = new Set(used);
+    for (let c = "F".charCodeAt(0); c <= "Z".charCodeAt(0); c++) {
+      const want = `${String.fromCharCode(c)}00`;
+      if (!set2.has(want)) return want;
+    }
+    return "";
+  }
+  function migrateNeutral(d) {
+    const groups = d["시작 묶음"] ??= {};
+    const used = [...d.codes_used ?? [], ...Object.values(d.조직 ?? {}).map((o) => s(o.code)), ...Object.values(groups).map((g2) => s(g2.code))];
+    let code2;
+    if (!Object.keys(groups).includes(NEUTRAL_GROUP)) {
+      code2 = freeGroupCode(used);
+      if (!code2) return;
+      groups[NEUTRAL_GROUP] = { code: code2, blurb: NEUTRAL_BLURB, english: NEUTRAL_ENGLISH };
+      d.codes_used = [.../* @__PURE__ */ new Set([...d.codes_used ?? [], code2])].sort();
+    } else code2 = s(groups[NEUTRAL_GROUP].code);
+    if (!code2) return;
+    for (const row9 of Object.values(d.요원 ?? {})) {
+      const r = row9;
+      if (!NEUTRAL_IDS.includes(s(r.id))) continue;
+      const list4 = Array.isArray(r.roster_for) ? r.roster_for.map(s).filter(Boolean) : [];
+      if (!list4.includes(code2)) r.roster_for = [...list4, code2];
+    }
+  }
+  function migrateRoster(d) {
+    const v = d.roster_v ?? 1;
+    if (v >= ROSTER_V) return d;
+    if (v < 2) {
+      const strip = (rows2) => {
+        for (const r of Object.values(rows2 ?? {})) if (Array.isArray(r.roster_for)) r.roster_for = r.roster_for.filter((f) => f !== "D00" && f !== "E00");
+      };
+      strip(d.조직);
+      strip(d.요원);
+    }
+    if (v < 3) migrateNeutral(d);
+    d.roster_v = ROSTER_V;
+    return d;
   }
 
   // src/data/scenarios.json
@@ -1306,7 +1360,7 @@ ${tpl.replace(/\[\[INPUT\]\]/g, () => extra)}`;
     return list4.find((f) => f.code === code2);
   }
   function findScenario(code2, fm, list4 = SCENARIOS.factions) {
-    return findFaction(code2, list4)?.scenarios.find((s5) => s5.fm === fm);
+    return findFaction(code2, list4)?.scenarios.find((s7) => s7.fm === fm);
   }
   function isLang(value) {
     return SCENARIOS.languages.some((l) => l.code === value);
@@ -1321,47 +1375,325 @@ ${tpl.replace(/\[\[INPUT\]\]/g, () => extra)}`;
     return `${faction}-${lang}-${fm}`;
   }
 
+  // src/core/world/schema.ts
+  var WORLD_KIND_LABEL = { agent: "요원", org: "조직", anomaly: "괴이", site: "파밍", appendix: "부록" };
+  var AGENT_FIELDS = [
+    { id: "age", label: "나이", title: "Age", type: "line", sec: "identity" },
+    { id: "gender", label: "성별", title: "Gender", type: "line", sec: "identity", hint: "로어 글의 Gender 줄. 명부 성별 칸과 별개로 모델에게 보이는 표기" },
+    { id: "organization", label: "소속 표기", title: "Organization", type: "line", sec: "identity", hint: "비우면 명부 소속·호칭 표로 자동. 「Walpurgis Society, the Ten Witches」처럼 다르게 쓰고 싶을 때만" },
+    { id: "department_en", label: "부서 표기", title: "Department", type: "line", sec: "identity", hint: "모델에게 보이는 부서 이름(영문). 명부 부서 칸은 묶는 데 쓰고 이 칸이 글에 들어감" },
+    { id: "role", label: "역할", title: "Role", type: "line", sec: "identity" },
+    { id: "physique", label: "체격", title: "Physique", type: "line", sec: "appearance" },
+    { id: "appearance", label: "외모", title: "Appearance", type: "line", sec: "appearance" },
+    { id: "outfit", label: "복장", title: "Outfit", type: "line", sec: "appearance" },
+    { id: "character", label: "성격", title: "Character", type: "text", hint: "글머리 그대로. 결점([Flaws])도 이 안에" },
+    { id: "voice", label: "말투", title: "Voice", type: "text" },
+    { id: "background", label: "배경", title: "Background", type: "text" },
+    { id: "abilities", label: "능력", title: "Abilities", type: "text" },
+    { id: "intro", label: "소개", title: "Roster", type: "line", hint: "Roster 지침의 한 줄. 「(나이/성별, 직급): 외모; 성격; 능력」 꼴" }
+  ];
+  var ORG_FIELDS = [
+    { id: "intro", label: "소개", title: "Identity", type: "text", hint: "첫 문단은 Faction 지침 요약에, 전체는 세력 상세 로어에" },
+    { id: "doctrine", label: "교리·방침", title: "Doctrine", type: "text" },
+    { id: "hq", label: "본부·거점", title: "Headquarters and Sites", type: "text" },
+    { id: "structure", label: "조직 구조", title: "Structure", type: "text" },
+    { id: "hierarchy", label: "계급", title: "Hierarchy", type: "text" },
+    { id: "recruitment", label: "모집·첫 접촉", title: "Recruitment", type: "text" },
+    { id: "assets", label: "핵심 자산·특성", title: "Core Assets and Traits", type: "text" },
+    { id: "personnel", label: "인원", title: "Personnel", type: "text" }
+  ];
+  var ANOMALY_FIELDS = [
+    { id: "identity", label: "정체", title: "Identity", type: "text", hint: "뭐가 어떻게 된 괴이인지, 어디에 깃드는지" },
+    { id: "entry", label: "입장 조건", title: "Entry Conditions", type: "text", hint: "들어가는 길·징후·돌아갈 수 있는 시점" },
+    { id: "space", label: "공간·구조", title: "Structure", type: "text", hint: "구역·층·동선·공간 규칙" },
+    { id: "rules", label: "규칙", title: "Rules", type: "text", hint: "안에서 지켜야 하는 것, 어기면 생기는 일" },
+    { id: "entities", label: "개체", title: "Sub-Entities", type: "text", hint: "등장하는 존재들 (여럿이면 ##### 소제목)" },
+    { id: "survival", label: "생존·탈출", title: "Survival and Clear", type: "text", hint: "클리어 조건·출구·하면 안 되는 것·약점" },
+    { id: "notes", label: "비고", title: "Notes", type: "text", hint: "등급·발생지 같은 짧은 정보, 외부 노출" }
+  ];
+  var SITE_FIELDS = [
+    { id: "identity", label: "정체", title: "Identity", type: "text" },
+    { id: "access", label: "접근", title: "Access", type: "text" },
+    { id: "location", label: "위치와 외관", title: "Location and Appearance", type: "text" },
+    { id: "environment", label: "환경", title: "Environment", type: "text" },
+    { id: "rules", label: "이용 규칙(거래·대가)", title: "Rules and Trade", type: "text" },
+    { id: "keeper", label: "주인/운영자", title: "Keeper", type: "text" }
+  ];
+  var APPENDIX_FIELDS = [
+    { id: "title", label: "제목", title: "", type: "line", hint: "「### 」 뒤에 붙는 제목 줄" },
+    { id: "body", label: "본문", title: "", type: "text" }
+  ];
+  var FIELDS = { agent: AGENT_FIELDS, org: ORG_FIELDS, anomaly: ANOMALY_FIELDS, site: SITE_FIELDS, appendix: APPENDIX_FIELDS };
+  var ANOMALY_NOTE = "[Simulation-only] This entry defines anomaly mechanics, labels, and survival guidance for simulation control, not an in-world script, briefing, or known lore. No character has prior information about it. Never have a character speak, explain, hint at, or present this entry as guidance.";
+
+  // src/core/world/records.ts
+  var RELATION_STAGES = ["hostile", "wary", "neutral", "favorable", "friendly"];
+  var RELATION_LABEL = { hostile: "적대", wary: "경계", neutral: "중립", favorable: "호의", friendly: "우호" };
+  var data = null;
+  function setWorldData(d) {
+    for (const k of ["agent", "org", "anomaly", "site", "appendix"]) {
+      if (!d[k] || typeof d[k] !== "object" || Array.isArray(d[k])) throw new Error(`세계 자료 형식이 달라요 (${k}).`);
+    }
+    if (!d.relations || typeof d.relations.pairs !== "object" || typeof d.relations.common !== "string") throw new Error("세계 자료 형식이 달라요 (relations).");
+    if (d.scenes && (typeof d.scenes !== "object" || typeof d.scenes.세력 !== "object" || typeof d.scenes.인물 !== "object")) throw new Error("세계 자료 형식이 달라요 (scenes).");
+    data = d;
+  }
+  var defaultScenes = () => world().scenes ?? { 세력: {}, 인물: {} };
+  function world() {
+    if (!data) throw new Error("세계 자료(goei-data-world)가 아직 없어요. 본체 부팅이 자료 받기를 끝내기 전에 세계 기록을 읽었어요.");
+    return data;
+  }
+  var DEFAULTS2 = (kind) => world()[kind];
+  var DEFAULT_RELATIONS = () => world().relations;
+  var worldAnomalyNote = (over) => typeof over?.anomalyNote === "string" ? over.anomalyNote : ANOMALY_NOTE;
+  var str = (v) => typeof v === "string" ? v : "";
+  var obj = (v) => v && typeof v === "object" && !Array.isArray(v) ? v : {};
+  function cleanExtra(v) {
+    if (!Array.isArray(v)) return [];
+    return v.map((x) => obj(x)).filter((x) => str(x.name).trim()).map((x) => ({
+      name: str(x.name).trim(),
+      value: str(x.value),
+      kind: x.kind === "line" ? "line" : "block",
+      ...x.sec === "identity" || x.sec === "appearance" ? { sec: x.sec, at: str(x.at) } : {}
+    }));
+  }
+  function mergeRecord(base, over) {
+    if (over?.deleted) return null;
+    if (!base && !over) return null;
+    const fields3 = { ...base?.fields ?? {} };
+    for (const [k, v] of Object.entries(obj(over?.fields))) if (typeof v === "string") fields3[k] = v;
+    const variants = {};
+    for (const [code2, vf] of Object.entries(obj(over?.variants ?? base?.variants))) {
+      const m = {};
+      for (const [k, v] of Object.entries(obj(vf))) if (typeof v === "string") m[k] = v;
+      if (Object.keys(m).length) variants[code2] = m;
+    }
+    const out = {
+      fields: fields3,
+      extra: over?.extra !== void 0 ? cleanExtra(over.extra) : base?.extra ?? []
+    };
+    const keys = over?.keys ?? base?.keys;
+    if (keys) out.keys = keys;
+    const title2 = over?.title ?? base?.title;
+    if (title2) out.title = title2;
+    if (over?.titleRaw ?? base?.titleRaw) out.titleRaw = true;
+    const order = over?.order ?? base?.order;
+    if (Array.isArray(order) && order.length) out.order = order.map(String);
+    if (Object.keys(variants).length) out.variants = variants;
+    const departments = over?.departments ?? base?.departments;
+    if (departments && Object.keys(departments).length) out.departments = { ...departments };
+    if (over?.summaryOnly ?? base?.summaryOnly) out.summaryOnly = true;
+    if (over?.noSummary ?? base?.noSummary) out.noSummary = true;
+    if (over?.rosterOff ?? base?.rosterOff) out.rosterOff = true;
+    if (over?.relOff ?? base?.relOff) out.relOff = true;
+    const notes = over?.roster_notes ?? base?.roster_notes;
+    if (Array.isArray(notes) && notes.length) out.roster_notes = notes.map((n2) => ({ department: String(n2.department ?? ""), label: String(n2.label ?? "") }));
+    return out;
+  }
+  function worldRecords(kind, overrides2) {
+    const base = DEFAULTS2(kind);
+    const over = overrides2?.[kind] ?? {};
+    const out = /* @__PURE__ */ new Map();
+    for (const [name, rec2] of Object.entries(base)) {
+      const m = mergeRecord(rec2, over[name]);
+      if (m) out.set(name, m);
+    }
+    for (const [name, rec2] of Object.entries(over)) {
+      if (out.has(name) || base[name]) continue;
+      const m = mergeRecord(void 0, rec2);
+      if (m) out.set(name, m);
+    }
+    return out;
+  }
+  var worldRecord = (kind, name, overrides2) => worldRecords(kind, overrides2).get(name) ?? null;
+  function worldRelations(overrides2) {
+    const pairs = { ...DEFAULT_RELATIONS().pairs };
+    for (const [k, v] of Object.entries(overrides2?.relations?.pairs ?? {})) {
+      if (v === null) delete pairs[k];
+      else if (v && RELATION_STAGES.includes(v.stage)) pairs[k] = { stage: v.stage, ...v.memo ? { memo: v.memo } : {} };
+    }
+    return { pairs, common: overrides2?.relations?.common ?? DEFAULT_RELATIONS().common };
+  }
+  var PLACEHOLDER_ORGS = /* @__PURE__ */ new Set(["미분류"]);
+  var excludedOrgs = (orgs) => /* @__PURE__ */ new Set([...[...orgs.entries()].filter(([, r]) => r.relOff).map(([n2]) => n2), ...PLACEHOLDER_ORGS]);
+  function filterRelations(rel, excluded) {
+    if (!excluded.size) return rel;
+    const pairs = {};
+    for (const [k, v] of Object.entries(rel.pairs)) {
+      const [a, b] = k.split(">");
+      if (!excluded.has(a) && !excluded.has(b)) pairs[k] = v;
+    }
+    return { ...rel, pairs };
+  }
+  var isDefaultRecord = (kind, name) => name in DEFAULTS2(kind);
+  var defaultRecord = (kind, name) => DEFAULTS2(kind)[name];
+  var BUILTIN_ORG_CODES = { A00: "관리국", B00: "가짜 관리국", C00: "백일몽", D00: "민간인", E00: "프리랜서" };
+  var active = null;
+  function setActiveWorld(relations, orgCodes, anomalyNote = ANOMALY_NOTE) {
+    active = { relations, orgCodes: { ...BUILTIN_ORG_CODES, ...orgCodes }, anomalyNote };
+  }
+  var activeRelations = () => active?.relations ?? DEFAULT_RELATIONS();
+  var activeAnomalyNote = () => active?.anomalyNote ?? ANOMALY_NOTE;
+  var activeOrgName = (codeOrName) => (active?.orgCodes ?? BUILTIN_ORG_CODES)[codeOrName] ?? codeOrName;
+  var STAGE_VALUE = { hostile: -80, wary: -40, neutral: 0, favorable: 40, friendly: 80 };
+  function relationStage(viewer, target, rel = activeRelations()) {
+    return rel.pairs[`${activeOrgName(viewer)}>${activeOrgName(target)}`]?.stage ?? "neutral";
+  }
+  function fieldOrder(kind, rec2) {
+    const base = FIELDS[kind].map((f) => f.id);
+    const extras2 = rec2.extra.map((e) => `x:${e.name}`);
+    const all = [...base, ...extras2];
+    if (!rec2.order) return all;
+    const seen2 = /* @__PURE__ */ new Set();
+    const out = [];
+    for (const id of rec2.order) if (all.includes(id) && !seen2.has(id)) seen2.add(id), out.push(id);
+    for (const id of all) if (!seen2.has(id)) out.push(id);
+    return out;
+  }
+  function fieldValue(rec2, id, faction) {
+    const v = faction ? rec2.variants?.[faction]?.[id] : void 0;
+    return (v ?? rec2.fields[id] ?? "").trim();
+  }
+
+  // src/core/scenes.ts
+  var CUSTOM_FM = 101;
+  var s2 = (v) => typeof v === "string" ? v : "";
+  var obj2 = (v) => v && typeof v === "object" && !Array.isArray(v) ? v : {};
+  function pickScenes(raw) {
+    const d = obj2(raw);
+    const out = {};
+    const one2 = (v) => {
+      const o = obj2(v);
+      const row9 = {};
+      if (s2(o.label).trim()) row9.label = s2(o.label).trim();
+      if (s2(o.ko).trim()) row9.ko = s2(o.ko);
+      if (s2(o.en).trim()) row9.en = s2(o.en);
+      if (o.hidden === true) row9.hidden = true;
+      return Object.keys(row9).length ? row9 : null;
+    };
+    for (const [code2, rows2] of Object.entries(obj2(d.세력))) {
+      for (const [fm, v] of Object.entries(obj2(rows2))) {
+        if (!/^\d+$/.test(fm)) continue;
+        const row9 = one2(v);
+        if (row9) ((out.세력 ??= {})[code2] ??= {})[fm] = row9;
+      }
+    }
+    for (const [id, v] of Object.entries(obj2(d.인물))) {
+      const row9 = one2(v);
+      if (row9) (out.인물 ??= {})[id] = row9;
+    }
+    return out;
+  }
+  function safeDefaults() {
+    try {
+      return defaultScenes();
+    } catch {
+      return { 세력: {}, 인물: {} };
+    }
+  }
+  function factionScenes(code2, saved) {
+    const base = safeDefaults().세력[code2] ?? {};
+    const over = saved?.세력?.[code2] ?? {};
+    const fms = [.../* @__PURE__ */ new Set([...Object.keys(base), ...Object.keys(over)])].map(Number).filter((n2) => Number.isInteger(n2) && n2 > 0).sort((a, b) => a - b);
+    return fms.map((fm) => {
+      const b = base[String(fm)];
+      const o = over[String(fm)] ?? {};
+      return {
+        fm,
+        label: o.label || b?.label || `장면 ${fm}`,
+        ko: o.ko || b?.ko || "",
+        en: o.en || b?.en || "",
+        hidden: !!o.hidden,
+        custom: !b,
+        hasDefault: !!b
+      };
+    });
+  }
+  function agentScene(agentId, saved) {
+    const b = safeDefaults().인물[agentId];
+    const o = saved?.인물?.[agentId];
+    const ko = o?.ko || b?.ko || "";
+    const en2 = o?.en || b?.en || "";
+    return ko.trim() || en2.trim() ? { ko, en: en2 } : null;
+  }
+  function agentSceneSaved(agentId, saved) {
+    return saved?.인물?.[agentId];
+  }
+  var sceneText = (row9, lang) => row9 ? lang === "en" ? row9.en : row9.ko : "";
+  function nextCustomFm(rows2) {
+    return Math.max(CUSTOM_FM - 1, ...rows2.map((r) => r.fm)) + 1;
+  }
+
   // src/core/factions.ts
   var BUILTIN = ["A00", "B00", "C00", "D00", "E00"];
   var TAG_BOOK = "🏷️Tag";
   var FACTION_BOOK = "📜Faction";
   var FACTION_TYPES = [
-    { id: "org", label: "조직형", help: "관리국·백일몽처럼 작전과 내부 공지가 있어요" },
-    { id: "civilian", label: "민간형", help: "민간인처럼 작전 없이 방문·이동만 하고, 공지는 시민 공개 안내예요" },
-    { id: "freelancer", label: "프리랜서형", help: "프리랜서처럼 의뢰를 받아 움직이고, 공지는 등록 계약자 안내예요" }
+    // 유형이 바꾸는 것은 Faction 지침의 소개 끝 한 줄(TYPE_GM)과 사진 없을 때의 공용 대체 그림뿐 (2026-11-05 사용자 질문에 맞춰 설명을 사실대로)
+    { id: "org", label: "조직형", help: "직접 추가한 조직을 플레이 세력으로 켜면 Faction 세력 목록에 붙는 소개 끝 한 줄이 「작전을 운영하고 내부 공지와 소속 요원이 있다」가 돼요. 원래 조직은 사진 없을 때의 대체 그림 종류만 달라져요" },
+    { id: "civilian", label: "민간형", help: "직접 추가한 조직을 플레이 세력으로 켜면 Faction 세력 목록에 붙는 소개 끝 한 줄이 「작전 없음, 구성원은 방문·이동만」이 돼요. 원래 조직은 사진 없을 때의 대체 그림 종류만 달라져요" },
+    { id: "freelancer", label: "프리랜서형", help: "직접 추가한 조직을 플레이 세력으로 켜면 Faction 세력 목록에 붙는 소개 끝 한 줄이 「구성원은 계약 임무를 받는다」가 돼요. 원래 조직은 사진 없을 때의 대체 그림 종류만 달라져요" }
   ];
   var EXTRA_SCENARIOS = [
     { fm: 1, label: "직접 입력", kind: "direct" },
     { fm: 2, label: "커스텀 임무", kind: "preset" }
   ];
   var isFactionCode = (v) => typeof v === "string" && /^[A-Z]00$/.test(v);
-  var s = (v) => typeof v === "string" ? v.trim() : "";
-  var list = (v) => Array.isArray(v) ? v.map(s).filter(Boolean) : [];
-  var obj = (v) => v && typeof v === "object" && !Array.isArray(v) ? v : {};
+  var PLAYER_FM = 0;
+  var playerScenario = (name) => ({ fm: PLAYER_FM, label: `${name}의 첫 장면`, kind: "opening" });
+  var s3 = (v) => typeof v === "string" ? v.trim() : "";
+  var list = (v) => Array.isArray(v) ? v.map(s3).filter(Boolean) : [];
+  var obj3 = (v) => v && typeof v === "object" && !Array.isArray(v) ? v : {};
   function pickSpec(raw) {
-    const d = obj(raw);
+    const d = obj3(raw);
     const out = {};
     if (isFactionCode(d.code)) out.code = d.code;
     if (d.playable === true) out.playable = true;
     if (d.hidden === true) out.hidden = true;
     if (FACTION_TYPES.some((t) => t.id === d.type)) out.type = d.type;
-    for (const k of ["title", "blurb", "photo", "face", "crop", "english", "gm_name", "gm_desc", "tab"]) if (s(d[k])) out[k] = s(d[k]);
+    for (const k of ["title", "blurb", "photo", "face", "crop", "english", "gm_name", "gm_desc", "tab"]) if (s3(d[k])) out[k] = s3(d[k]);
     if (Array.isArray(d.seed)) out.seed = list(d.seed);
     return out;
   }
   function loreText(lore, comment) {
     return lore.filter((e) => e.comment === comment && typeof e.content === "string").map((e) => e.content).join("\n");
   }
-  function orgSpecs(lore) {
+  function directoryRaw(lore) {
     const raw = directoryEntries(lore).map((e) => String(e.content ?? "")).join("\n").trim();
-    if (!raw) return [];
+    if (!raw) return {};
     try {
-      const d = obj(JSON.parse(raw.replace(/^﻿/, "").replace(/^```[\w-]*\s*\n/, "").replace(/\n\s*```\s*$/, "")));
-      if (d.schema !== 1) return [];
-      return Object.entries(obj(d.조직)).map(([name, v]) => [name.trim(), pickSpec(v)]).filter(([name]) => name);
+      const d = obj3(JSON.parse(raw.replace(/^﻿/, "").replace(/^```[\w-]*\s*\n/, "").replace(/\n\s*```\s*$/, "")));
+      return d.schema === 1 ? migrateRoster(d) : {};
     } catch {
-      return [];
+      return {};
     }
+  }
+  function scenesOf(lore) {
+    return pickScenes(directoryRaw(lore ?? [])["첫 장면"]);
+  }
+  function scenarioList(code2, scenes, tail2) {
+    const openings = factionScenes(code2, scenes).filter((r) => !r.hidden && (r.ko.trim() || r.en.trim())).map((r) => ({ fm: r.fm, label: r.label, kind: "opening" }));
+    return [...openings, ...tail2.filter((t) => t.kind !== "opening")];
+  }
+  function orgSpecs(lore) {
+    return Object.entries(obj3(directoryRaw(lore).조직)).map(([name, v]) => [name.trim(), pickSpec(v)]).filter(([name]) => name);
+  }
+  function startGroups(lore) {
+    const out = [];
+    for (const [name, raw] of Object.entries(obj3(directoryRaw(lore ?? [])["시작 묶음"]))) {
+      const d = obj3(raw);
+      if (!s3(name) || !isFactionCode(d.code) || BUILTIN.includes(d.code) || out.some((g2) => g2.code === d.code)) continue;
+      out.push({ name: s3(name), code: d.code, blurb: s3(d.blurb), english: s3(d.english), photo: s3(d.photo), hidden: d.hidden === true });
+    }
+    return out;
+  }
+  function startOrder(lore) {
+    return list(obj3(directoryRaw(lore ?? [])["시작 화면"]).order);
+  }
+  function sortByStart(codes, list4) {
+    if (!codes.length) return list4;
+    const at = new Map(codes.map((c, i) => [c, i]));
+    return [...list4].sort((a, b) => (at.get(a.code) ?? 1e9 + list4.indexOf(a)) - (at.get(b.code) ?? 1e9 + list4.indexOf(b)));
   }
   function placeholdersReady(lore) {
     const books = (lore ?? []).filter((e) => e.goeiVirtual !== true);
@@ -1377,10 +1709,12 @@ ${tpl.replace(/\[\[INPUT\]\]/g, () => extra)}`;
     const hit3 = cache.get(books);
     if (hit3) return hit3;
     const specs = orgSpecs(books);
+    const scenes = scenesOf(books);
     const out = SCENARIOS.factions.map((f, i) => {
       const spec = specs.find(([, v]) => v.code === f.code)?.[1] ?? {};
       return {
         ...f,
+        scenarios: scenarioList(f.code, scenes, f.scenarios),
         name: spec.title || f.name,
         blurb: spec.blurb || f.blurb,
         photo: spec.photo ?? "",
@@ -1399,7 +1733,7 @@ ${tpl.replace(/\[\[INPUT\]\]/g, () => extra)}`;
           name: spec.title || name,
           affiliation: name,
           blurb: spec.blurb ?? "",
-          scenarios: EXTRA_SCENARIOS,
+          scenarios: scenarioList(spec.code, scenes, EXTRA_SCENARIOS),
           photo: spec.photo ?? "",
           english: spec.english ?? "",
           type: spec.type ?? "org",
@@ -1414,10 +1748,15 @@ ${tpl.replace(/\[\[INPUT\]\]/g, () => extra)}`;
       }
       out.push(...extras2.sort((a, b) => a.code.localeCompare(b.code)));
     }
-    cache.set(books, out);
-    return out;
+    for (const g2 of startGroups(books)) {
+      if (out.some((f) => f.code === g2.code)) continue;
+      out.push({ code: g2.code, name: g2.name, affiliation: g2.name, blurb: g2.blurb, scenarios: scenarioList(g2.code, scenes, EXTRA_SCENARIOS), photo: g2.photo, english: g2.english, type: "org", builtin: false, hidden: g2.hidden, group: true });
+    }
+    const sorted = sortByStart(startOrder(books), out);
+    cache.set(books, sorted);
+    return sorted;
   }
-  var extraFactions = (lore) => factionList(lore).filter((f) => !f.builtin);
+  var extraFactions = (lore) => factionList(lore).filter((f) => !f.builtin && !f.group);
   function factionType(code2, lore) {
     if (BUILTIN.includes(code2)) return builtinType(code2);
     return factionList(lore).find((f) => f.code === code2)?.type ?? "org";
@@ -1673,9 +2012,19 @@ ${body5.slice(at).replace(/^\s+/, "")}
 
   // src/core/world/directory.ts
   var DIRECTORY_SCHEMA = 1;
-  var s2 = (v) => typeof v === "string" ? v.trim() : "";
-  var list2 = (v) => Array.isArray(v) ? v.map(s2).filter(Boolean) : [];
-  var obj2 = (v) => v && typeof v === "object" && !Array.isArray(v) ? v : {};
+  function groupRows(saved) {
+    const out = [];
+    for (const [name, raw] of Object.entries(obj4(saved))) {
+      const d = obj4(raw);
+      const code2 = s4(d.code);
+      if (!s4(name) || !/^[A-Z]00$/.test(code2) || out.some((g2) => g2.code === code2)) continue;
+      out.push({ name: s4(name), code: code2, blurb: s4(d.blurb), english: s4(d.english), hidden: d.hidden === true, ...s4(d.photo) ? { photo: s4(d.photo) } : {}, ...s4(d.face) ? { face: s4(d.face) } : {}, ...s4(d.crop) ? { crop: s4(d.crop) } : {} });
+    }
+    return out;
+  }
+  var s4 = (v) => typeof v === "string" ? v.trim() : "";
+  var list2 = (v) => Array.isArray(v) ? v.map(s4).filter(Boolean) : [];
+  var obj4 = (v) => v && typeof v === "object" && !Array.isArray(v) ? v : {};
   var squash = (t) => t.replace(/\s+/g, "").toLowerCase();
   var ascii = (t) => /^[\x20-\x7e]+$/.test(t) && /[A-Za-z]/.test(t);
   function parse(raw) {
@@ -1694,17 +2043,17 @@ ${body5.slice(at).replace(/^\s+/, "")}
   function readDirectoryData(lore) {
     if (dataCache.has(lore)) return dataCache.get(lore);
     const parts = directoryEntries(lore).filter((e) => typeof e.content === "string" && e.content.trim());
-    const d = obj2(parts.length ? parse(parts.map((e) => e.content).join("\n")) : null);
-    const out = d.schema === DIRECTORY_SCHEMA ? d : null;
+    const d = obj4(parts.length ? parse(parts.map((e) => e.content).join("\n")) : null);
+    const out = d.schema === DIRECTORY_SCHEMA ? migrateRoster(d) : null;
     dataCache.set(lore, out);
     return out;
   }
-  var strMap = (v) => Object.fromEntries(Object.entries(obj2(v)).map(([k, x]) => [k, s2(x)]).filter(([, x]) => x));
+  var strMap = (v) => Object.fromEntries(Object.entries(obj4(v)).map(([k, x]) => [k, s4(x)]).filter(([, x]) => x));
   function displaySection(lore) {
     const d = readDirectoryData(lore)?.호칭;
-    const raw = d && typeof d === "object" ? d : obj2(book(lore, "Faction display"));
+    const raw = d && typeof d === "object" ? d : obj4(book(lore, "Faction display"));
     const out = {};
-    for (const [viewer, m] of Object.entries(obj2(raw))) if (Object.keys(strMap(m)).length) out[viewer] = strMap(m);
+    for (const [viewer, m] of Object.entries(obj4(raw))) if (Object.keys(strMap(m)).length) out[viewer] = strMap(m);
     return out;
   }
   var DEFAULT_PHONE_TABS = {
@@ -1720,21 +2069,21 @@ ${body5.slice(at).replace(/^\s+/, "")}
   };
   function phoneTabsSection(lore) {
     const saved = readDirectoryData(lore)?.["괴담톡 탭"];
-    const fromBook = obj2(book(lore, "Phone tabs"));
-    const picked = saved && typeof saved === "object" ? obj2(saved) : fromBook;
-    const d = Array.isArray(picked.tabs) && picked.tabs.length ? picked : obj2(DEFAULT_PHONE_TABS);
-    const tabs2 = (Array.isArray(d.tabs) ? d.tabs : []).map(obj2).map((t) => {
-      const tab2 = { id: s2(t.id), name: s2(t.name), visible_for: list2(t.visible_for) };
+    const fromBook = obj4(book(lore, "Phone tabs"));
+    const picked = saved && typeof saved === "object" ? obj4(saved) : fromBook;
+    const d = Array.isArray(picked.tabs) && picked.tabs.length ? picked : obj4(DEFAULT_PHONE_TABS);
+    const tabs2 = (Array.isArray(d.tabs) ? d.tabs : []).map(obj4).map((t) => {
+      const tab2 = { id: s4(t.id), name: s4(t.name), visible_for: list2(t.visible_for) };
       const by = strMap(t.name_by_faction);
       if (Object.keys(by).length) tab2.name_by_faction = by;
       return tab2;
     }).filter((t) => /^[TX]\d+$/.test(t.id));
-    const order = Object.fromEntries(Object.entries(obj2(d.order_by_faction)).map(([k, v]) => [k, list2(v)]).filter(([, v]) => v.length));
+    const order = Object.fromEntries(Object.entries(obj4(d.order_by_faction)).map(([k, v]) => [k, list2(v)]).filter(([, v]) => v.length));
     return Object.keys(order).length ? { order_by_faction: order, tabs: tabs2 } : { tabs: tabs2 };
   }
   function seedSection(lore) {
     const saved = readDirectoryData(lore)?.["시작 로어북"];
-    if (saved && typeof saved === "object") return Object.fromEntries(Object.entries(obj2(saved)).map(([k, v]) => [k, list2(v)]));
+    if (saved && typeof saved === "object") return Object.fromEntries(Object.entries(obj4(saved)).map(([k, v]) => [k, list2(v)]));
     const raw = lore.filter((e) => e.comment === "Start trigger" && typeof e.content === "string").map((e) => e.content).join("\n");
     return Object.fromEntries(parseSeedManifest(raw));
   }
@@ -1746,24 +2095,24 @@ ${body5.slice(at).replace(/^\s+/, "")}
     const keys = {};
     for (const e of lore) {
       if (!isFolder(e)) continue;
-      const w = folderWord(s2(e.comment));
+      const w = folderWord(s4(e.comment));
       for (const k of Object.keys(FOLDER_WORDS)) {
         if (w === FOLDER_WORDS[k] && !keys[k] && typeof e.key === "string") keys[k] = e.key;
       }
     }
     if (!keys.anomaly && !keys.site && !keys.agent) return null;
-    const pick3 = (k) => k ? lore.filter((e) => !isFolder(e) && e.folder === k && s2(e.comment)) : [];
+    const pick3 = (k) => k ? lore.filter((e) => !isFolder(e) && e.folder === k && s4(e.comment)) : [];
     return { anomaly: pick3(keys.anomaly), site: pick3(keys.site), agent: pick3(keys.agent) };
   }
   var APPENDIX_WORD = "부록";
   var DOT = /\s*[·・ㆍ•]\s*/;
   function appendixFolder(lore) {
-    const f = lore.find((e) => isFolder(e) && folderWord(s2(e.comment)) === APPENDIX_WORD && typeof e.key === "string");
+    const f = lore.find((e) => isFolder(e) && folderWord(s4(e.comment)) === APPENDIX_WORD && typeof e.key === "string");
     return f ? f.key : "";
   }
   function appendixMembers(lore) {
     const key2 = appendixFolder(lore);
-    return key2 ? lore.filter((e) => !isFolder(e) && e.folder === key2 && s2(e.comment) && !SEPARATOR.test(s2(e.comment))) : [];
+    return key2 ? lore.filter((e) => !isFolder(e) && e.folder === key2 && s4(e.comment) && !SEPARATOR.test(s4(e.comment))) : [];
   }
   function guessParent(name, names4) {
     const m = DOT.exec(name);
@@ -1776,18 +2125,18 @@ ${body5.slice(at).replace(/^\s+/, "")}
     const members = appendixMembers(lore);
     if (!members.length) return [];
     const mine = new Set(members);
-    const names4 = new Set(lore.filter((e) => !isFolder(e) && !mine.has(e)).map((e) => s2(e.comment)).filter(Boolean));
-    const saved = obj2(data3?.부록);
+    const names4 = new Set(lore.filter((e) => !isFolder(e) && !mine.has(e)).map((e) => s4(e.comment)).filter(Boolean));
+    const saved = obj4(data3?.부록);
     const seen2 = /* @__PURE__ */ new Set();
     const out = [];
     for (const e of members) {
-      const lore2 = s2(e.comment);
+      const lore2 = s4(e.comment);
       if (seen2.has(lore2)) continue;
       seen2.add(lore2);
-      const d = obj2(saved[lore2]);
+      const d = obj4(saved[lore2]);
       const guess = guessParent(lore2, names4);
       const flag2 = (v, def) => typeof v === "boolean" ? v : def;
-      const parent = typeof d.parent === "string" ? s2(d.parent) : guess;
+      const parent = typeof d.parent === "string" ? s4(d.parent) : guess;
       out.push({
         lore: lore2,
         guess,
@@ -1798,7 +2147,7 @@ ${body5.slice(at).replace(/^\s+/, "")}
         target: flag2(d.target, APPENDIX_DEFAULT.target),
         places: Array.isArray(d.places) ? list2(d.places) : [],
         agents: Array.isArray(d.agents) ? list2(d.agents) : [],
-        unlock: s2(d.unlock)
+        unlock: s4(d.unlock)
       });
     }
     return out;
@@ -1813,42 +2162,42 @@ ${body5.slice(at).replace(/^\s+/, "")}
   }
   function keysOf(e) {
     if (!e) return [];
-    return [s2(e.key), s2(e.secondkey)].join(",").split(",").map((t) => t.trim()).filter(Boolean);
+    return [s4(e.key), s4(e.secondkey)].join(",").split(",").map((t) => t.trim()).filter(Boolean);
   }
   function guessEnglish(e) {
     return keysOf(e).find(ascii) ?? "";
   }
   function legacyPlaces(lore, group5) {
-    const world2 = obj2(book(lore, "World catalog"));
+    const world2 = obj4(book(lore, "World catalog"));
     const rows2 = Array.isArray(world2[group5]) ? world2[group5] : [];
     const out = [];
     for (const r of rows2) {
       if (!Array.isArray(r) || r.length !== 5) continue;
-      const label2 = s2(r[1]);
+      const label2 = s4(r[1]);
       if (!label2) continue;
-      out.push({ lore: s2(r[2]) || label2, label: label2, english: s2(r[3]), aliases: list2(r[4]), preset: r[0] === true, inFolder: false });
+      out.push({ lore: s4(r[2]) || label2, label: label2, english: s4(r[3]), aliases: list2(r[4]), preset: r[0] === true, inFolder: false });
     }
     return out;
   }
   function legacyBases(lore) {
-    const world2 = obj2(book(lore, "World catalog"));
+    const world2 = obj4(book(lore, "World catalog"));
     const rows2 = Array.isArray(world2["랜드마크"]) ? world2["랜드마크"] : [];
     const out = [];
     for (const r of rows2) {
-      if (!Array.isArray(r) || r.length !== 10 || !s2(r[1])) continue;
+      if (!Array.isArray(r) || r.length !== 10 || !s4(r[1])) continue;
       out.push({
-        name: s2(r[1]),
-        label: s2(r[2]),
-        lore: s2(r[3]),
-        english: s2(r[4]),
+        name: s4(r[1]),
+        label: s4(r[2]),
+        lore: s4(r[3]),
+        english: s4(r[4]),
         aliases: list2(r[9]),
         org: "",
-        sido: s2(r[5]),
-        gu: s2(r[6]),
+        sido: s4(r[5]),
+        gu: s4(r[6]),
         x: Number(r[7]),
         y: Number(r[8]),
         show: r[0] === true,
-        hint: [s2(r[3]), s2(r[2]), s2(r[1])].filter(Boolean)
+        hint: [s4(r[3]), s4(r[2]), s4(r[1])].filter(Boolean)
       });
     }
     return out;
@@ -1856,21 +2205,21 @@ ${body5.slice(at).replace(/^\s+/, "")}
   var num = (v, d = 50) => typeof v === "number" && Number.isFinite(v) ? Math.min(100, Math.max(0, v)) : d;
   function buildBases(lore, data3, orgs) {
     const orgName2 = (v) => {
-      const n2 = s2(v);
+      const n2 = s4(v);
       return n2 && orgs.some((o) => o.name === n2) ? n2 : "";
     };
     if (data3 && data3.거점 && typeof data3.거점 === "object") {
-      return Object.entries(obj2(data3.거점)).filter(([name]) => s2(name)).map(([name, raw]) => {
-        const d = obj2(raw);
+      return Object.entries(obj4(data3.거점)).filter(([name]) => s4(name)).map(([name, raw]) => {
+        const d = obj4(raw);
         return {
-          name: s2(name),
-          label: s2(d.label),
-          lore: s2(d.lore),
-          english: s2(d.english),
+          name: s4(name),
+          label: s4(d.label),
+          lore: s4(d.lore),
+          english: s4(d.english),
           aliases: list2(d.aliases),
           org: orgName2(d.org),
-          sido: s2(d.sido),
-          gu: s2(d.gu),
+          sido: s4(d.sido),
+          gu: s4(d.gu),
           x: num(d.x),
           y: num(d.y),
           show: d.show !== false
@@ -1885,22 +2234,22 @@ ${body5.slice(at).replace(/^\s+/, "")}
     });
   }
   function legacyAgents(lore) {
-    const roster = obj2(book(lore, "Agent roster"));
+    const roster = obj4(book(lore, "Agent roster"));
     const chars = Array.isArray(roster.characters) ? roster.characters : [];
     const rows2 = [];
-    for (const c of chars.map(obj2)) {
-      const name = s2(c.name);
+    for (const c of chars.map(obj4)) {
+      const name = s4(c.name);
       if (!name) continue;
       rows2.push({
-        lore: s2(c.lore) || name,
-        id: s2(c.id),
+        lore: s4(c.lore) || name,
+        id: s4(c.id),
         name,
-        english: s2(c.english),
+        english: s4(c.english),
         aliases: list2(c.aliases),
         legacyEnglish: list2(c.legacy_english),
-        affiliation: s2(c.affiliation),
-        rank: s2(c.rank),
-        department: s2(c.department),
+        affiliation: s4(c.affiliation),
+        rank: s4(c.rank),
+        department: s4(c.department),
         rosterFor: list2(c.roster_for),
         phoneTabs: list2(c.phone_tabs),
         group: "",
@@ -1936,7 +2285,7 @@ ${body5.slice(at).replace(/^\s+/, "")}
   function factionDisplayNames(lore) {
     const m = displaySection(lore).none ?? {};
     const out = { A00: "관리국", B00: "가짜 관리국", C00: "백일몽", D00: "민간인", E00: "프리랜서" };
-    for (const f of FACTIONS) if (s2(m[f])) out[f] = s2(m[f]);
+    for (const f of FACTIONS) if (s4(m[f])) out[f] = s4(m[f]);
     return { ...extraNames(lore), ...out };
   }
   function groupFaction(group5, names4) {
@@ -1965,10 +2314,10 @@ ${body5.slice(at).replace(/^\s+/, "")}
   function orgDefaults(code2, tabs2) {
     if (code2) {
       const own = tabs2.find((t) => t.id.startsWith("T") && t.visibleFor.length === 1 && t.visibleFor[0] === code2);
-      return { rosterFor: code2 === "D00" || code2 === "E00" ? ["D00", "E00"] : [code2], phoneTabs: own ? [own.id] : [] };
+      return { rosterFor: code2 === "D00" || code2 === "E00" ? [] : [code2], phoneTabs: own ? [own.id] : [] };
     }
     const open2 = tabs2.find((t) => t.id.startsWith("T") && FACTIONS.every((f) => t.visibleFor.includes(f)));
-    return { rosterFor: ["D00", "E00"], phoneTabs: open2 ? [open2.id] : [] };
+    return { rosterFor: [], phoneTabs: open2 ? [open2.id] : [] };
   }
   var ORG_ENGLISH = {
     A00: "Management Bureau",
@@ -1988,10 +2337,10 @@ ${body5.slice(at).replace(/^\s+/, "")}
     "세계정치 게시판": "The World Politics Forum"
   };
   function orgFolder(lore) {
-    const keys = new Set(lore.filter((e) => isFolder(e) && ["세력", "조직"].includes(folderWord(s2(e.comment))) && typeof e.key === "string").map((e) => e.key));
-    return keys.size ? lore.filter((e) => !isFolder(e) && keys.has(String(e.folder ?? "")) && s2(e.comment)) : [];
+    const keys = new Set(lore.filter((e) => isFolder(e) && ["세력", "조직"].includes(folderWord(s4(e.comment))) && typeof e.key === "string").map((e) => e.key));
+    return keys.size ? lore.filter((e) => !isFolder(e) && keys.has(String(e.folder ?? "")) && s4(e.comment)) : [];
   }
-  var orgLores = (lore) => orgFolder(lore).map((e) => s2(e.comment));
+  var orgLores = (lore) => orgFolder(lore).map((e) => s4(e.comment));
   function orgLoreName(lore, name) {
     const all = orgLores(lore);
     return all.find((n2) => n2 === name) ?? all.find((n2) => Math.min(n2.length, name.length) >= 2 && (n2.includes(name) || name.includes(n2))) ?? name;
@@ -2002,7 +2351,7 @@ ${body5.slice(at).replace(/^\s+/, "")}
     const out = [];
     const make = (name, faction) => {
       const members = agents.filter((a) => a.affiliation === (faction || name));
-      const d = obj2(saved[name]);
+      const d = obj4(saved[name]);
       const spec = pickSpec(d);
       if (faction) {
         spec.code = faction;
@@ -2019,10 +2368,10 @@ ${body5.slice(at).replace(/^\s+/, "")}
       });
     };
     for (const f of FACTIONS) make(names4[f], f);
-    for (const name of Object.keys(saved)) if (s2(name) && !out.some((o) => o.name === name)) make(name, "");
+    for (const name of Object.keys(saved)) if (s4(name) && !out.some((o) => o.name === name)) make(name, "");
     for (const a of agents) if (a.affiliation && !orgOf(out, a.affiliation)) make(a.affiliation, "");
     for (const e of orgFolder(lore)) {
-      const name = s2(e.comment);
+      const name = s4(e.comment);
       const same3 = (o2) => o2.name === name || Math.min(o2.name.length, name.length) >= 2 && (o2.name.includes(name) || name.includes(o2.name));
       if (out.some(same3)) continue;
       make(name, "");
@@ -2062,18 +2411,28 @@ ${body5.slice(at).replace(/^\s+/, "")}
     return rows2.map((r, i) => [rank2(r, i), i, r]).sort((x, y) => x[0] - y[0] || x[1] - y[1]).map((x) => x[2]);
   }
   var cache2 = /* @__PURE__ */ new WeakMap();
+  function freshDefaults(dir2) {
+    for (const o of dir2.orgs) o.rosterFor = o.rosterFor.filter((f) => f !== "D00" && f !== "E00");
+    for (const a of dir2.agents) a.rosterFor = a.rosterFor.filter((f) => f !== "D00" && f !== "E00");
+    if (dir2.startGroups.some((g2) => g2.name === NEUTRAL_GROUP)) return;
+    const code2 = freeGroupCode([...dir2.usedCodes, ...dir2.orgs.map((o) => o.spec.code ?? ""), ...dir2.startGroups.map((g2) => g2.code)]);
+    if (!code2) return;
+    dir2.startGroups.push({ name: NEUTRAL_GROUP, code: code2, blurb: NEUTRAL_BLURB, english: NEUTRAL_ENGLISH, hidden: false });
+    dir2.usedCodes = [.../* @__PURE__ */ new Set([...dir2.usedCodes, code2])].sort();
+    for (const a of dir2.agents) if (NEUTRAL_IDS.includes(a.id) && !a.rosterFor.includes(code2)) a.rosterFor = [...a.rosterFor, code2];
+  }
   function readDirectory(lore) {
     const books = lore ?? [];
     const hit3 = cache2.get(books);
     if (hit3) return hit3;
     const data3 = readDirectoryData(books);
     const members = folderMembers(books);
-    const exists = new Set(books.filter((e) => !isFolder(e)).map((e) => s2(e.comment)));
-    const byLore = new Map(books.filter((e) => !isFolder(e)).map((e) => [s2(e.comment), e]));
+    const exists = new Set(books.filter((e) => !isFolder(e)).map((e) => s4(e.comment)));
+    const byLore = new Map(books.filter((e) => !isFolder(e)).map((e) => [s4(e.comment), e]));
     const places = (kind) => {
       const group5 = kind === "anomaly" ? "괴이" : "미스틱 사이트";
       const legacy = legacyPlaces(books, group5);
-      const saved = obj2(data3?.[group5]);
+      const saved = obj4(data3?.[group5]);
       const folder = members?.[kind] ?? [];
       const used = /* @__PURE__ */ new Set();
       const legacyLore = /* @__PURE__ */ new Map();
@@ -2082,15 +2441,15 @@ ${body5.slice(at).replace(/^\s+/, "")}
       const merge = (base, d) => ({
         ...base,
         preset: typeof d.preset === "boolean" ? d.preset : base.preset,
-        label: s2(d.label) || base.label,
-        english: typeof d.english === "string" ? s2(d.english) : base.english,
+        label: s4(d.label) || base.label,
+        english: typeof d.english === "string" ? s4(d.english) : base.english,
         aliases: Array.isArray(d.aliases) ? list2(d.aliases) : base.aliases,
-        ...s2(d.photo) ? { photo: s2(d.photo) } : {},
-        ...s2(d.face) ? { face: s2(d.face) } : {},
-        ...s2(d.crop) ? { crop: s2(d.crop) } : {}
+        ...s4(d.photo) ? { photo: s4(d.photo) } : {},
+        ...s4(d.face) ? { face: s4(d.face) } : {},
+        ...s4(d.crop) ? { crop: s4(d.crop) } : {}
       });
       for (const e of folder) {
-        const name = s2(e.comment);
+        const name = s4(e.comment);
         if (seen2.has(name)) continue;
         seen2.add(name);
         const old = matchLegacy(legacy, name, used);
@@ -2099,21 +2458,21 @@ ${body5.slice(at).replace(/^\s+/, "")}
           legacyLore.set(name, old.lore);
         }
         const base = old ? { ...old, lore: name, inFolder: true } : { lore: name, label: name, english: guessEnglish(e), aliases: [], preset: true, inFolder: true };
-        out.push(merge(base, obj2(saved[name])));
+        out.push(merge(base, obj4(saved[name])));
       }
       for (const [name, d] of Object.entries(saved)) {
         if (seen2.has(name) || !exists.has(name)) continue;
         seen2.add(name);
         const old = legacy.find((r) => !used.has(r) && r.lore === name);
         if (old) used.add(old);
-        out.push(merge(old ?? { lore: name, label: name, english: guessEnglish(byLore.get(name)), aliases: [], preset: false, inFolder: false }, obj2(d)));
+        out.push(merge(old ?? { lore: name, label: name, english: guessEnglish(byLore.get(name)), aliases: [], preset: false, inFolder: false }, obj4(d)));
       }
       for (const r of legacy) if (!used.has(r) && !seen2.has(r.lore) && !(members?.[kind].length && data3)) out.push(r);
       return ordered(out, Object.keys(saved), legacy.map((r) => r.lore), legacyLore);
     };
     const agents = () => {
       const legacy = legacyAgents(books);
-      const saved = obj2(data3?.요원);
+      const saved = obj4(data3?.요원);
       const used = /* @__PURE__ */ new Set();
       const legacyLore = /* @__PURE__ */ new Map();
       const fresh = /* @__PURE__ */ new Set();
@@ -2122,24 +2481,24 @@ ${body5.slice(at).replace(/^\s+/, "")}
       const seen2 = /* @__PURE__ */ new Set();
       const merge = (base, d) => ({
         ...base,
-        id: /^P\d{3,}$/.test(s2(d.id)) ? s2(d.id) : base.id,
-        name: s2(d.name) || base.name,
-        english: typeof d.english === "string" ? s2(d.english) : base.english,
+        id: /^P\d{3,}$/.test(s4(d.id)) ? s4(d.id) : base.id,
+        name: s4(d.name) || base.name,
+        english: typeof d.english === "string" ? s4(d.english) : base.english,
         aliases: Array.isArray(d.aliases) ? list2(d.aliases) : base.aliases,
         legacyEnglish: Array.isArray(d.legacy_english) ? list2(d.legacy_english) : base.legacyEnglish,
-        affiliation: typeof d.affiliation === "string" ? s2(d.affiliation) : base.affiliation,
-        rank: typeof d.rank === "string" ? s2(d.rank) : base.rank,
-        department: typeof d.department === "string" ? s2(d.department) : base.department,
-        ...s2(d.photo) ? { photo: s2(d.photo) } : {},
-        ...s2(d.face) ? { face: s2(d.face) } : {},
-        ...s2(d.crop) ? { crop: s2(d.crop) } : {},
+        affiliation: typeof d.affiliation === "string" ? s4(d.affiliation) : base.affiliation,
+        rank: typeof d.rank === "string" ? s4(d.rank) : base.rank,
+        department: typeof d.department === "string" ? s4(d.department) : base.department,
+        ...s4(d.photo) ? { photo: s4(d.photo) } : {},
+        ...s4(d.face) ? { face: s4(d.face) } : {},
+        ...s4(d.crop) ? { crop: s4(d.crop) } : {},
         ...d.gender === "F" || d.gender === "M" || d.gender === "X" ? { gender: d.gender } : {},
         rosterFor: Array.isArray(d.roster_for) ? list2(d.roster_for) : base.rosterFor,
         phoneTabs: Array.isArray(d.phone_tabs) ? list2(d.phone_tabs) : base.phoneTabs
       });
       let group5 = "";
       for (const e of members?.agent ?? []) {
-        const name = s2(e.comment);
+        const name = s4(e.comment);
         const sep = SEPARATOR.exec(name);
         if (sep) {
           group5 = sep[1].trim();
@@ -2156,7 +2515,7 @@ ${body5.slice(at).replace(/^\s+/, "")}
         let base;
         if (old) base = { ...old, lore: name, group: group5, inFolder: true };
         else base = { lore: name, id: "", name, english: guessEnglish(e), aliases: [], legacyEnglish: [], affiliation: "", rosterFor: [], phoneTabs: [], rank: "", department: "", group: group5, inFolder: true };
-        const row9 = merge(base, obj2(saved[name]));
+        const row9 = merge(base, obj4(saved[name]));
         if (!old && !saved[name]) fresh.add(row9);
         out.push(row9);
       }
@@ -2165,7 +2524,7 @@ ${body5.slice(at).replace(/^\s+/, "")}
         seen2.add(name);
         const old = legacy.rows.find((r) => !used.has(r) && r.lore === name);
         if (old) used.add(old);
-        out.push(merge(old ?? { lore: name, id: "", name, english: "", aliases: [], legacyEnglish: [], affiliation: "미분류", rosterFor: [], phoneTabs: [], rank: "", department: "", group: "", inFolder: false }, obj2(d)));
+        out.push(merge(old ?? { lore: name, id: "", name, english: "", aliases: [], legacyEnglish: [], affiliation: "미분류", rosterFor: [], phoneTabs: [], rank: "", department: "", group: "", inFolder: false }, obj4(d)));
       }
       for (const r of legacy.rows) if (!used.has(r) && !seen2.has(r.lore) && !(members?.agent.length && data3)) out.push(r);
       const sorted = ordered(out, Object.keys(saved), legacy.rows.map((r) => r.lore), legacyLore);
@@ -2176,7 +2535,7 @@ ${body5.slice(at).replace(/^\s+/, "")}
         else taken.add(r.id);
       }
       for (const r of out) if (!r.id) taken.add(r.id = stableAgentId(r.lore, taken));
-      const orgs = buildOrgs(books, out.filter((r) => !fresh.has(r)), obj2(data3?.조직));
+      const orgs = buildOrgs(books, out.filter((r) => !fresh.has(r)), obj4(data3?.조직));
       for (const r of fresh) {
         const o = orgHint(r.group, orgs, books);
         if (o) assignOrg(r, o);
@@ -2204,8 +2563,12 @@ ${body5.slice(at).replace(/^\s+/, "")}
       display: displaySection(books),
       phoneTabs: phoneTabsSection(books),
       seeds: seedSection(books),
-      appendices: buildAppendices(books, data3)
+      appendices: buildAppendices(books, data3),
+      startGroups: groupRows(data3?.["시작 묶음"]),
+      startOrder: list2(data3?.["시작 화면"]?.order),
+      scenes: pickScenes(data3?.["첫 장면"])
     };
+    if (!data3) freshDefaults(dir2);
     cache2.set(books, dir2);
     return dir2;
   }
@@ -2226,9 +2589,9 @@ ${body5.slice(at).replace(/^\s+/, "")}
   }
   function directoryData(dir2) {
     const place2 = (p) => ({ preset: p.preset, label: p.label, english: p.english, aliases: p.aliases, ...p.photo ? { photo: p.photo } : {}, ...p.face ? { face: p.face } : {}, ...p.crop ? { crop: p.crop } : {} });
-    const out = { schema: DIRECTORY_SCHEMA, refill: dir2.refill, 괴이: {}, "미스틱 사이트": {}, 요원: {}, 조직: {} };
+    const out = { schema: DIRECTORY_SCHEMA, roster_v: ROSTER_V, refill: dir2.refill, 괴이: {}, "미스틱 사이트": {}, 요원: {}, 조직: {} };
     for (const o of dir2.orgs) out.조직[o.name] = { roster_for: o.rosterFor, phone_tabs: o.phoneTabs, ...cleanSpec(o.spec) };
-    const used = [.../* @__PURE__ */ new Set([...dir2.usedCodes, ...dir2.orgs.map((o) => o.faction ? "" : o.spec.code ?? "")])].filter((c) => c && !BUILTIN.includes(c)).sort();
+    const used = [.../* @__PURE__ */ new Set([...dir2.usedCodes, ...dir2.orgs.map((o) => o.faction ? "" : o.spec.code ?? ""), ...dir2.startGroups.map((g2) => g2.code)])].filter((c) => c && !BUILTIN.includes(c)).sort();
     if (used.length) out.codes_used = used;
     out.거점 = {};
     for (const b of dir2.bases) {
@@ -2245,6 +2608,22 @@ ${body5.slice(at).replace(/^\s+/, "")}
     if (dir2.phoneTabs.tabs.length) out["괴담톡 탭"] = dir2.phoneTabs;
     if (Object.keys(dir2.seeds).length) out["시작 로어북"] = dir2.seeds;
     if (dir2.appendices.length) out.부록 = Object.fromEntries(dir2.appendices.map((r) => [r.lore, appendixData(r)]));
+    if (dir2.startGroups.length) {
+      out["시작 묶음"] = {};
+      for (const g2 of dir2.startGroups) {
+        const gd = { code: g2.code };
+        if (g2.blurb) gd.blurb = g2.blurb;
+        if (g2.english) gd.english = g2.english;
+        if (g2.photo) gd.photo = g2.photo;
+        if (g2.face) gd.face = g2.face;
+        if (g2.crop) gd.crop = g2.crop;
+        if (g2.hidden) gd.hidden = true;
+        out["시작 묶음"][g2.name] = gd;
+      }
+    }
+    if (dir2.startOrder.length) out["시작 화면"] = { order: [...dir2.startOrder] };
+    const scenes = pickScenes(dir2.scenes);
+    if (Object.keys(scenes).length) out["첫 장면"] = scenes;
     for (const p of dir2.anomalies) out.괴이[p.lore] = place2(p);
     for (const p of dir2.sites) out["미스틱 사이트"][p.lore] = place2(p);
     for (const a of dir2.agents) {
@@ -2279,7 +2658,7 @@ ${body5.slice(at).replace(/^\s+/, "")}
   var HELP = "괴이: ANOMALY 플러그인이 쓰는 명부입니다. 플러그인 창 「설정 → 카드 명부」에서 고치세요. 괴이는 🚧괴이, 미스틱 사이트는 🎁파밍, 요원은 🙂요원 폴더에 로어북을 넣으면 자동으로 들어옵니다. 요원의 소속은 창에서 조직을 골라 정합니다. 거점은 지도에 찍히는 장소이고 조직에 묶지 않아도 됩니다. 📎부록 폴더 항목은 「본 항목 이름 · 설명」으로 지으면 본 항목에 붙고, 켜지는 조건은 부록 탭에서 정합니다. 모델에게는 보내지 않습니다.";
   function directoryContent(data3) {
     const world2 = data3.세계 && typeof data3.세계 === "object" && Object.keys(data3.세계).length ? { 세계: data3.세계 } : {};
-    return JSON.stringify({ schema: data3.schema, _help: HELP, refill: data3.refill, 괴이: data3.괴이, "미스틱 사이트": data3["미스틱 사이트"], 요원: data3.요원, 조직: data3.조직, ...data3.거점 ? { 거점: data3.거점 } : {}, ...data3.호칭 ? { 호칭: data3.호칭 } : {}, ...data3["괴담톡 탭"] ? { "괴담톡 탭": data3["괴담톡 탭"] } : {}, ...data3["시작 로어북"] ? { "시작 로어북": data3["시작 로어북"] } : {}, ...data3.부록 && Object.keys(data3.부록).length ? { 부록: data3.부록 } : {}, ...data3.codes_used?.length ? { codes_used: data3.codes_used } : {}, ...world2 }, null, 1);
+    return JSON.stringify({ schema: data3.schema, roster_v: data3.roster_v ?? ROSTER_V, _help: HELP, refill: data3.refill, 괴이: data3.괴이, "미스틱 사이트": data3["미스틱 사이트"], 요원: data3.요원, 조직: data3.조직, ...data3.거점 ? { 거점: data3.거점 } : {}, ...data3.호칭 ? { 호칭: data3.호칭 } : {}, ...data3["괴담톡 탭"] ? { "괴담톡 탭": data3["괴담톡 탭"] } : {}, ...data3["시작 로어북"] ? { "시작 로어북": data3["시작 로어북"] } : {}, ...data3.부록 && Object.keys(data3.부록).length ? { 부록: data3.부록 } : {}, ...data3["시작 묶음"] && Object.keys(data3["시작 묶음"]).length ? { "시작 묶음": data3["시작 묶음"] } : {}, ...data3["시작 화면"]?.order?.length ? { "시작 화면": data3["시작 화면"] } : {}, ...data3["첫 장면"] && Object.keys(data3["첫 장면"]).length ? { "첫 장면": data3["첫 장면"] } : {}, ...data3.codes_used?.length ? { codes_used: data3.codes_used } : {}, ...world2 }, null, 1);
   }
   function withDirectory(lore, data3) {
     if (data3.세계 === void 0) {
@@ -2295,7 +2674,7 @@ ${body5.slice(at).replace(/^\s+/, "")}
       next[i] = { ...next[i], comment: DIRECTORY_COMMENT, content, key: "", alwaysActive: false };
       return next;
     }
-    const settingsFolder = lore.find((e) => isFolder(e) && folderWord(s2(e.comment)) === "설정");
+    const settingsFolder = lore.find((e) => isFolder(e) && folderWord(s4(e.comment)) === "설정");
     const entry3 = {
       key: "",
       secondkey: "",
@@ -2321,7 +2700,7 @@ ${body5.slice(at).replace(/^\s+/, "")}
     const data3 = readDirectoryData(lore);
     if (!data3) return lore;
     const members = folderMembers(lore);
-    const inside2 = new Set([...members?.anomaly ?? [], ...members?.site ?? []].map((e) => s2(e.comment)));
+    const inside2 = new Set([...members?.anomaly ?? [], ...members?.site ?? []].map((e) => s4(e.comment)));
     let hit3 = false;
     const strip = (group5) => {
       if (!group5) return group5;
@@ -2354,7 +2733,7 @@ ${body5.slice(at).replace(/^\s+/, "")}
     return true;
   }
   function loreGender(lore, name) {
-    const text4 = lore.find((e) => s2(e.comment) === name)?.content;
+    const text4 = lore.find((e) => s4(e.comment) === name)?.content;
     const m = typeof text4 === "string" ? /(?:Gender|Sex|성별)\s*[:：]\s*\**\s*([^\s,|*]+)/i.exec(text4) : null;
     if (!m) return "";
     const v = m[1].toLowerCase();
@@ -2371,463 +2750,3 @@ ${body5.slice(at).replace(/^\s+/, "")}
     A00: "관리국",
     B00: "가짜 관리국",
     C00: "백일몽",
-    D00: "민간인",
-    E00: "프리랜서"
-  };
-  function loreText2(lore, comment) {
-    const parts = lore.filter((e) => e.comment === comment && typeof e.content === "string" && e.content.trim());
-    return parts.length ? parts.map((e) => e.content).join("\n") : null;
-  }
-  function parseJson(raw, book2) {
-    const clean2 = raw.replace(/^﻿/, "").trim().replace(/^```[\w-]*\s*\n/, "").replace(/\n\s*```\s*$/, "");
-    try {
-      return JSON.parse(clean2);
-    } catch {
-      throw new CatalogError(`${book2}: JSON 구문을 확인하세요.`);
-    }
-  }
-  function landmarksOf(bases) {
-    return bases.filter((b) => b.show && b.name && SIGUN[b.sido] && (!b.gu || SIGUN[b.sido].includes(b.gu))).map((b) => ({ name: b.name, english: b.english, aliases: b.aliases, label: b.label, org: b.org, sido: b.sido, gu: b.gu, x: b.x, y: b.y }));
-  }
-  function parseCatalog(lore) {
-    const list4 = lore ?? [];
-    const dir2 = readDirectory(list4);
-    if (!dir2.folders) {
-      const worldRaw = loreText2(list4, "World catalog");
-      if (!worldRaw) throw new CatalogError("World catalog 로어북이 없어요.");
-      parseJson(worldRaw, "World catalog");
-    }
-    const place2 = (p) => ({ name: p.label, english: p.english, aliases: p.aliases });
-    const anomalies = dir2.anomalies.filter((p) => p.preset).map(place2).filter((e) => e.name);
-    const mysticSites = dir2.sites.filter((p) => p.preset).map(place2).filter((e) => e.name);
-    const landmarks = landmarksOf(dir2.bases);
-    if (!dir2.folders) {
-      const rosterRaw = loreText2(list4, "Agent roster");
-      if (!rosterRaw) throw new CatalogError("Agent roster 로어북이 없어요.");
-      const roster = parseJson(rosterRaw, "Agent roster");
-      if (roster.version !== 2 || !Array.isArray(roster.characters)) {
-        throw new CatalogError("Agent roster: version 2 인물 명부가 필요합니다.");
-      }
-    }
-    const people = dir2.agents.map((a) => ({
-      id: a.id,
-      name: a.name,
-      english: a.english,
-      affiliation: a.affiliation,
-      rank: a.rank,
-      department: a.department,
-      rosterFor: a.rosterFor
-    })).filter((p) => /^P\d{3,}$/.test(p.id) && p.name);
-    const refill = dir2.refill;
-    const factionDisplay = displaySection(list4);
-    const affiliations = {};
-    for (const f of factionList(list4)) affiliations[f.code] = f.affiliation;
-    return { anomalies, mysticSites, landmarks, people, refill, factionDisplay, extraNames: extraNames(list4), affiliations, factionVars: factionVars(list4) };
-  }
-  function factionNames(catalog, viewer) {
-    const map = catalog.factionDisplay[viewer ?? ""] ?? catalog.factionDisplay.none;
-    if (map && typeof map === "object") return catalog.extraNames ? { ...catalog.extraNames, ...map } : map;
-    const m = { ...catalog.extraNames, ...FALLBACK_DISPLAY };
-    if (viewer === "B00") {
-      m.A00 = "가짜 관리국";
-      m.B00 = "관리국";
-    }
-    return m;
-  }
-  function presetCanon(catalog, name) {
-    if (!name?.trim()) return null;
-    let best = null;
-    for (const a of catalog.anomalies) {
-      if ((name === a.name || name.includes(a.name)) && (!best || a.name.length > best.length)) best = a.name;
-    }
-    return best;
-  }
-
-  // src/core/world/statuscols.ts
-  var STATUS_COLS = [
-    { id: "date", label: "날짜", token: "YYYY.MM.DD", locked: true },
-    { id: "time", label: "시각", token: "HH:MM AM/PM", locked: true },
-    { id: "weather", label: "날씨", token: "weather", locked: false },
-    { id: "temp", label: "기온", token: "temperature", locked: false },
-    { id: "place", label: "위치", token: "location", locked: true },
-    { id: "target", label: "목표", token: "anomaly", locked: false, feature: "로어 고르기(목표 괴이)" },
-    { id: "companions", label: "동행", token: "companions", locked: false, feature: "장면 인물 고르기" },
-    { id: "deployed", label: "투입", token: "deployed", locked: false, feature: "투입 판정" },
-    { id: "identity", label: "신분", token: "identity", locked: false, feature: "유저 신분(조직/직급) 추적" },
-    { id: "wallet", label: "잔고", token: "balance", locked: false, feature: "가계부" }
-  ];
-  var COL_IDS = STATUS_COLS.map((c) => c.id);
-  var colDef = (id) => STATUS_COLS.find((c) => c.id === id);
-  var colVar = (id) => `$st_col_${id}`;
-  var COL_LOG_VAR = "$st_col_log";
-  var isMode = (v) => v === "on" || v === "hide" || v === "off";
-  function colConfig(vars) {
-    const v = vars ?? {};
-    const out = {};
-    for (const c of STATUS_COLS) {
-      const m = v[colVar(c.id)];
-      const mode2 = isMode(m) ? m : "on";
-      out[c.id] = c.locked && mode2 === "off" ? "hide" : mode2;
-    }
-    return out;
-  }
-  function usedCols(cfg) {
-    return COL_IDS.filter((id) => cfg[id] !== "off");
-  }
-  function hiddenCols(cfg) {
-    return new Set(COL_IDS.filter((id) => cfg[id] !== "on"));
-  }
-  function colLog(vars) {
-    const raw = vars?.[COL_LOG_VAR];
-    if (typeof raw !== "string" || !raw.trim()) return [];
-    try {
-      const list4 = JSON.parse(raw);
-      if (!Array.isArray(list4)) return [];
-      return list4.filter((e) => !!e && typeof e === "object" && Number.isInteger(e.from) && Array.isArray(e.cols)).map((e) => ({ from: e.from, cols: e.cols.filter((c) => COL_IDS.includes(c)) })).filter((e) => e.cols.length >= 3);
-    } catch {
-      return [];
-    }
-  }
-  function withColLog(vars, messageCount, cols) {
-    const log = colLog(vars);
-    const last2 = log.at(-1);
-    if (last2 && last2.cols.join() === cols.join()) return JSON.stringify(log);
-    const next = last2 && last2.from === messageCount ? [...log.slice(0, -1), { from: messageCount, cols }] : [...log, { from: messageCount, cols }];
-    return JSON.stringify(next.slice(-20));
-  }
-  var KNOWN_SHAPES = [
-    COL_IDS.slice(0, 6),
-    COL_IDS.slice(0, 8),
-    COL_IDS.slice(0, 9),
-    COL_IDS.slice(0, 10)
-  ];
-  var active = [];
-  function setStatusColumns(vars) {
-    const cur = usedCols(colConfig(vars));
-    const log = colLog(vars).map((e) => e.cols).reverse();
-    const seen2 = /* @__PURE__ */ new Set();
-    active = [cur, ...log].filter((s5) => !seen2.has(s5.join()) && seen2.add(s5.join()));
-  }
-  function shapeFor(count) {
-    return active.find((s5) => s5.length === count) ?? KNOWN_SHAPES.find((s5) => s5.length === count) ?? null;
-  }
-  var NONE = "없음";
-  function formatStatusLine(values, cols) {
-    const cell = (id) => {
-      const v = (values[id] ?? "").replace(/[|\]\n\r]/g, " ").trim();
-      return v || NONE;
-    };
-    return `[▣|${cols.map(cell).join("|")}]`;
-  }
-  var walletCell = (n2) => String(Math.trunc(n2));
-  function parseWalletCell(text4) {
-    const t = String(text4 ?? "").replace(/[\s,₩원won]/gi, "");
-    if (!/^[-−+]?\d+$/.test(t)) return null;
-    const n2 = Number(t.replace("−", "-"));
-    return Number.isSafeInteger(n2) ? n2 : null;
-  }
-  var RULE = {
-    date: "",
-    time: "",
-    weather: "",
-    temp: "",
-    place: "",
-    target: "Anomaly = the exact Korean name of {{user}}'s current encounter, visit, or assigned target, including briefing and travel; otherwise `없음`.",
-    companions: "Companions = the named individuals currently travelling together with {{user}}, most important first, exact Korean names as used in the story, separated by `,`. `없음` if none. Only people who are physically with {{user}} right now; do not list unnamed crowds or groups.",
-    deployed: "Deployed = `투입` only while {{user}} (or the party {{user}} leads) is physically inside an anomaly site on an operation. `없음` during briefing, preparation, travel to the site, and after leaving or being evacuated.",
-    identity: "Identity = {{user}}'s current organization and rank in Korean as `조직/직급` (e.g. `관리국/신입`, `가짜 관리국/대리`, `백일몽/사원`, `프리랜서/5급`, `민간인/-`). Copy it unchanged every turn unless the story actually changes it (promotion, transfer, defection).",
-    wallet: "Balance = {{user}}'s current cash in won, digits only (e.g. `1230000`, no symbol or separators). Copy it from `[Previous status]` and change it only by amounts the story states explicitly. Whenever money changes hands in the scene, write the exact amount in the prose so the ledger can record it."
-  };
-  var EXAMPLE_A = { date: "2025.01.01", time: "02:47 AM", weather: "☀️", temp: "4°C", place: "서울 종로구 거리", target: NONE, companions: NONE, deployed: NONE, identity: "관리국/신입", wallet: "1230000" };
-  var EXAMPLE_B = { date: "2025.01.01", time: "10:15 PM", weather: "🌫️", temp: "9°C", place: "명일 아파트 3층 복도", target: "명일 아파트", companions: "쟈알디,에일린", deployed: "투입", identity: "관리국/요원", wallet: "1180000" };
-  function statusSection(cols) {
-    const fmt2 = `[▣|${cols.map((id) => colDef(id).token).join("|")}]`;
-    const rules2 = cols.map((id) => RULE[id]).filter(Boolean).map((r) => `- ${r}`);
-    const ex = (v) => `[▣|${cols.map((id) => v[id]).join("|")}]`;
-    return [
-      "## Status",
-      fmt2,
-      "",
-      "- Output exactly one [▣] at the very end of every response, as the final line.",
-      `- Fields in order: ${cols.map((id) => colDef(id).label).join(" | ")}. Never add, drop or reorder fields.`,
-      ...rules2,
-      "- The status line of the previous scene is provided in a `[Previous status]` block just before the latest user input. Continue from it: advance the time and update the other fields. Older responses do not carry their status lines.",
-      `- Example${cols.includes("target") ? " (no current anomaly)" : ""}:`,
-      ex(EXAMPLE_A),
-      ...cols.includes("target") || cols.includes("companions") || cols.includes("deployed") ? [`- Example (inside an anomaly${cols.includes("companions") ? " with two companions" : ""}):`, ex(EXAMPLE_B)] : []
-    ].join("\n");
-  }
-  var STATUS_SECTION_MARK = "{status_section}";
-  function fillStatusSection(text4, cols) {
-    return text4.includes(STATUS_SECTION_MARK) ? text4.split(STATUS_SECTION_MARK).join(statusSection(cols)) : text4;
-  }
-
-  // src/core/world/status.ts
-  var TAG_RE = /[[【［]\s*▣\s*[|｜]([^\]】］\r\n]*)(?:[\]】］]|(?=\r?\n|$))/g;
-  var DATE_RE = /^\d{3,4}\s*[.\-/년]\s*\d{1,2}\s*[.\-/월]\s*\d{1,2}\s*일?(?:\s*[(（]?\s*[일월화수목금토]\s*(?:요일)?\s*[)）]?)?$/;
-  var TIME_RE = /^(?:(?:오전|오후|AM|PM|am|pm)\s*)?\d{1,2}\s*[:시]\s*\d{0,2}\s*분?\s*(?:AM|PM|am|pm|a\.m\.|p\.m\.)?$/;
-  var TEMP_RE = /^[-−+]?\s*\d+(?:\.\d+)?\s*(?:°\s*[CcFf]?|℃|도)$/;
-  function hasStatusTag(text4) {
-    return typeof text4 === "string" && /[[【［]\s*▣\s*[|｜]/.test(text4);
-  }
-  var none = (t) => !t || t === "없음" || t === "-" || t === "—";
-  var splitNames = (t) => none(t) ? [] : t.split(/[,，、]/).map((n2) => n2.trim()).filter((n2) => n2 && !none(n2));
-  var walletText = (t) => {
-    const n2 = none(t) ? null : parseWalletCell(t);
-    return n2 === null ? "" : String(n2);
-  };
-  function extras(x) {
-    const d = (x[1] ?? "").trim();
-    const id = (x[2] ?? "").trim();
-    return { companions: splitNames(x[0] ?? ""), deployed: x.length < 2 ? null : none(d) ? false : /투입|deployed/i.test(d), identity: none(id) ? "" : id, wallet: walletText(x[3] ?? "") };
-  }
-  function tail(rest) {
-    const clean2 = (t) => t === "없음" || t === "-" || t === "—" ? "" : t;
-    const after = rest.slice(1);
-    if (after.length <= 1) return { target: clean2(after[0] ?? ""), ...extras([]) };
-    return { target: clean2(after[0]), ...extras(after.slice(1, 5)) };
-  }
-  function byShape(f, shape) {
-    const clean2 = (t) => none(t) ? "" : t;
-    const get = (id) => {
-      const i = shape.indexOf(id);
-      return i < 0 ? "" : (f[i] ?? "").trim();
-    };
-    const d = get("deployed");
-    return {
-      date: get("date"),
-      time: get("time"),
-      weather: clean2(get("weather")),
-      temp: clean2(get("temp")),
-      place: clean2(get("place")),
-      target: clean2(get("target")),
-      companions: splitNames(get("companions")),
-      deployed: shape.includes("deployed") ? none(d) ? false : /투입|deployed/i.test(d) : null,
-      identity: clean2(get("identity")),
-      wallet: walletText(get("wallet"))
-    };
-  }
-  function fieldsOf(inner) {
-    const f = inner.split(/[|｜]/).map((s5) => s5.trim());
-    while (f.length && f[f.length - 1] === "") f.pop();
-    const shape = shapeFor(f.length);
-    if (shape && DATE_RE.test(f[shape.indexOf("date")] ?? "") && TIME_RE.test(f[shape.indexOf("time")] ?? "")) return byShape(f, shape);
-    const rest = [...f];
-    const take = (re) => {
-      const i = rest.findIndex((x) => re.test(x));
-      return i < 0 ? "" : rest.splice(i, 1)[0];
-    };
-    const date = take(DATE_RE);
-    const time2 = take(TIME_RE);
-    const temp = take(TEMP_RE);
-    let weather = "";
-    const wi = rest.findIndex((x) => /\p{Extended_Pictographic}/u.test(x) || /^(맑음|흐림|비|눈|안개|구름|소나기|천둥|번개|황사|바람)/.test(x));
-    if (wi >= 0 && wi <= 1) weather = rest.splice(wi, 1)[0];
-    if (!temp && weather) {
-      const m = /^(.*?)\s*([-−+]?\d+(?:\.\d+)?\s*(?:°\s*[CcFf]?|℃))$/.exec(weather);
-      if (m) return { date, time: time2, weather: m[1], temp: m[2], place: rest[0] ?? "", ...tail(rest) };
-    }
-    return { date, time: time2, weather, temp, place: rest[0] ?? "", ...tail(rest) };
-  }
-  function findStatusTags(text4) {
-    if (!hasStatusTag(text4)) return [];
-    return [...text4.matchAll(TAG_RE)].map((m) => ({ raw: m[0], ...fieldsOf(m[1]) }));
-  }
-  function statusMinute(date, time2) {
-    const d = /(\d{3,4})\s*[.\-/년]\s*(\d{1,2})\s*[.\-/월]\s*(\d{1,2})/.exec(date ?? "");
-    if (!d) return null;
-    const t = /(\d{1,2})\s*[:시]\s*(\d{1,2})?/.exec(time2 ?? "");
-    let h = t ? Number(t[1]) : 0;
-    const min = t?.[2] ? Number(t[2]) : 0;
-    const pm = /PM|p\.m\.|오후/i.test(time2 ?? "");
-    const am = /AM|a\.m\.|오전/i.test(time2 ?? "");
-    if (pm && h < 12) h += 12;
-    if (am && h === 12) h = 0;
-    if (h > 23 || min > 59) return null;
-    const ms = Date.UTC(Number(d[1]), Number(d[2]) - 1, Number(d[3]), h, min);
-    return Number.isFinite(ms) ? Math.floor(ms / 6e4) : null;
-  }
-  var DAY_MIN = 1440;
-  function sceneLabel(prev, now) {
-    const p = new Date(prev * 6e4);
-    const h = p.getUTCHours();
-    const clock2 = `${h < 12 ? "오전" : "오후"} ${h % 12 === 0 ? 12 : h % 12}:${String(p.getUTCMinutes()).padStart(2, "0")}`;
-    const days = Math.floor(now / DAY_MIN) - Math.floor(prev / DAY_MIN);
-    const when3 = days === 0 ? "오늘" : days === 1 ? "어제" : days === 2 ? "그저께" : `${p.getUTCFullYear() !== new Date(now * 6e4).getUTCFullYear() ? `${p.getUTCFullYear()}년 ` : ""}${p.getUTCMonth() + 1}월 ${p.getUTCDate()}일`;
-    return `${when3} ${clock2}`;
-  }
-  function elapsedLabel(from, to) {
-    let m = to - from;
-    const sign = m < 0 ? "-" : "";
-    m = Math.abs(m);
-    const d = Math.floor(m / DAY_MIN);
-    const h = Math.floor(m % DAY_MIN / 60);
-    const mm = m % 60;
-    const parts = [d ? `${d}일` : "", h ? `${h}시간` : "", mm ? `${mm}분` : ""].filter(Boolean);
-    return parts.length ? sign + parts.join(" ") : "흐르지 않음";
-  }
-  function storyDay(start3, now) {
-    return Math.floor(now / DAY_MIN) - Math.floor(start3 / DAY_MIN) + 1;
-  }
-  function statusTimeline(texts) {
-    const prev = /* @__PURE__ */ new Map();
-    const prevWallet = /* @__PURE__ */ new Map();
-    const seen2 = /* @__PURE__ */ new Set();
-    let start3 = null;
-    let last2 = null;
-    let lastWallet = null;
-    for (const t of texts) {
-      for (const tag of findStatusTags(t)) {
-        const m = statusMinute(tag.date, tag.time);
-        seen2.add(tag.raw.trim());
-        const w = tag.wallet ? Number(tag.wallet) : null;
-        if (w !== null && lastWallet !== null && !prevWallet.has(tag.raw.trim())) prevWallet.set(tag.raw.trim(), lastWallet);
-        if (w !== null) lastWallet = w;
-        if (m === null) continue;
-        if (start3 === null) start3 = m;
-        if (last2 !== null && !prev.has(tag.raw.trim())) prev.set(tag.raw.trim(), last2.minute);
-        last2 = { raw: tag.raw.trim(), minute: m };
-      }
-    }
-    return { prev, start: start3, last: last2, seen: seen2, prevWallet, lastWallet };
-  }
-
-  // src/core/world/tags.ts
-  var AG_STATES = ["휴게", "내근", "외근", "작전투입", "비번", "부상", "실종", "격리", "사망"];
-  var AG_ALIAS = {
-    대기: "휴게",
-    작전중: "작전투입",
-    standby: "휴게",
-    idle: "휴게",
-    waiting: "휴게",
-    available: "휴게",
-    pending: "휴게",
-    ready: "휴게",
-    deployed: "작전투입",
-    active: "작전투입",
-    operating: "작전투입",
-    "on mission": "작전투입",
-    engaged: "작전투입",
-    "in operation": "작전투입",
-    injured: "부상",
-    wounded: "부상",
-    hurt: "부상",
-    dead: "사망",
-    kia: "사망",
-    deceased: "사망",
-    killed: "사망",
-    missing: "실종",
-    mia: "실종",
-    lost: "실종",
-    quarantine: "격리",
-    quarantined: "격리",
-    isolated: "격리",
-    contaminated: "격리",
-    "off duty": "비번",
-    offduty: "비번",
-    "on leave": "비번",
-    leave: "비번",
-    resting: "비번"
-  };
-  var AN_LABELS = ["슬롯", "지역", "발생지점", "위치", "이름", "괴이명", "괴이", "명칭", "배치", "작전현황", "작전", "상태", "위협등급", "등급"];
-  function stripLabel(v) {
-    let s5 = (v ?? "").trim();
-    for (const lb of AN_LABELS) {
-      const m = new RegExp(`^${lb}\\s*[:：]\\s*`).exec(s5);
-      if (m) {
-        s5 = s5.slice(m[0].length).trim();
-        break;
-      }
-    }
-    return s5;
-  }
-  function normGrade(v) {
-    const g2 = stripLabel(v).toUpperCase().replace(/[^FEDCBAS]/g, "").charAt(0);
-    return g2;
-  }
-  function normAnState(v) {
-    const s5 = stripLabel(v);
-    const low = s5.toLowerCase();
-    if (s5.includes("소멸") || low.includes("fade") || low.includes("vanish")) return "소멸";
-    if (s5.includes("격리") || low.includes("contain") || low.includes("isolate")) return "격리";
-    if (s5.includes("클리어") || low.includes("clear") || low.includes("resolve")) return "클리어";
-    return "활성";
-  }
-  function normAgState(v) {
-    const s5 = (v ?? "").trim();
-    if (AG_STATES.includes(s5)) return s5;
-    const hit3 = AG_ALIAS[s5] ?? AG_ALIAS[s5.toLowerCase().replace(/\s+/g, " ")];
-    if (hit3) return hit3;
-    const bare = s5.replace(/[(（][^)）]*[)）]/g, "").replace(/[\s.。!]/g, "").replace(/중$/, "");
-    if (AG_STATES.includes(bare)) return bare;
-    return AG_ALIAS[bare] ?? null;
-  }
-  function fields(text4, kind) {
-    const out = [];
-    const re = new RegExp(`\\[${kind}\\s*\\|([^\\]]*)\\]`, "g");
-    for (const m of text4.matchAll(re)) out.push(m[1].split("|").map((s5) => s5.trim()));
-    return out;
-  }
-  function scanAnomalies(text4) {
-    return fields(text4, "AN").flatMap((f) => {
-      const slot = /^\d+$/.test(f[0] ?? "") && f.length >= 6 ? 1 : 0;
-      const region2 = f[slot] ?? "";
-      const r = f.slice(slot + 1);
-      if (r.length < 4 || !region2) return [];
-      return [{ region: region2, name: stripLabel(r[0]), state: normAnState(r[1]), grade: normGrade(r[2]), deploy: stripLabel(r[3]), situation: stripLabel(r.slice(4).join(" ")) }];
-    });
-  }
-  function scanSites(text4, kind, states) {
-    return fields(text4, kind).flatMap((f) => {
-      const bare = (v) => stripLabel(v).replace(/\s*[(（][^)）]*[)）]\s*/g, "").trim();
-      const i = f.findIndex((v, k) => k >= 2 && states.includes(bare(v)));
-      if (i < 0) return [];
-      let region2 = f[0] ?? "";
-      if (/^\d+$/.test(region2) && i >= 3) region2 = f[1] ?? "";
-      return [{ region: region2, name: stripLabel(f[i - 1]), state: bare(f[i]), rest: f.slice(i + 1).map(stripLabel) }];
-    });
-  }
-  var DEPLOY_ONLY = /^(?:없음|none|-|[A-Z]\d{3}(?:\s*[,/·]\s*[A-Z]\d{3})*)$/i;
-  function scanIncidents(text4) {
-    return scanSites(text4, "IN", ["진행", "종료"]).map(({ rest, ...t }) => rest.length >= 2 ? { ...t, deploy: rest[0], situation: rest.slice(1).join(" ") } : DEPLOY_ONLY.test(rest[0] ?? "") ? { ...t, deploy: rest[0], situation: "" } : { ...t, deploy: "", situation: rest.join(" ") });
-  }
-  function scanMysticSites(text4) {
-    return scanSites(text4, "MS", ["출현", "소실"]).map(({ rest, ...t }) => ({ ...t, visitors: rest[0] ?? "", situation: rest.slice(1).join(" ") }));
-  }
-  function scanAgents(text4) {
-    return fields(text4, "AG").flatMap((f) => {
-      const state = normAgState(f[1]);
-      return f[0] && state ? [{ who: f[0], state, situation: f[2] ?? "" }] : [];
-    });
-  }
-  function scanAffiliation(text4) {
-    const m = /\[AC\s*\|\s*(\w+)\s*\]/.exec(text4);
-    return m ? m[1].toUpperCase() : null;
-  }
-  function scanStatus(text4) {
-    const tags = findStatusTags(text4);
-    const first = tags[0];
-    const minute = first ? statusMinute(first.date, first.time) : null;
-    const target = tags.length === 1 && (first.target || /\|\s*없음\s*[\]】］]?\s*$/.test(first.raw)) ? first.target : null;
-    return { minute, target };
-  }
-  function lastStatusFields(texts) {
-    for (let i = texts.length - 1; i >= 0; i--) {
-      const all = findStatusTags(texts[i] ?? "");
-      if (!all.length) continue;
-      const t = all[all.length - 1];
-      return { date: t.date, time: t.time, weather: t.weather, temp: t.temp, place: t.place, target: t.target, companions: t.companions, deployed: t.deployed };
-    }
-    return null;
-  }
-  function hasWorldTags(text4) {
-    return /\[(?:AN|IN|MS|AG)\s*\||\[AC\s*\|/.test(text4);
-  }
-  var AGE_META = /\{\s*\d+\s*시간\s+\d+\s*분\s*전\s*\}/;
-  var MARKERS = ["USER 관여 상태", "RP 시간 제한", "USER 관여 상태 규칙", "USER 탐험 상태 규칙", "탐험 추적", "자동 종료"];
-  function cleanOutput(text4) {
-    const lines3 = text4.split("\n");
-    const keep = [];
-    let prev = null;
-    let prevHadTag = false;
-    const ageOnly = (l) => l !== null && new RegExp(`^\

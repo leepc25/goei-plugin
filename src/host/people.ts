@@ -18,13 +18,13 @@ import { promptFor } from '../core/people/prompt';
 import { messageText } from '../core/refs';
 import { findStatusTags } from '../core/world/status';
 import { colConfig } from '../core/world/statuscols';
-import { addWalletEntry, aliveAnchors, readWallet, walletBalance, walletVars, WALLET_START_DEFAULT } from '../core/wallet';
+import { addWalletEntry, aliveAnchors, readWallet, syncWalletToStatus, walletBalance, walletVars, WALLET_START_DEFAULT } from '../core/wallet';
 import { getPrefs } from '../core/settings';
 import { parseIdentity } from '../core/people/identity';
 import type { Identity, PeopleStore } from '../core/people/types';
 import { factionList } from '../core/factions';
 import type { LoreEntry } from '../core/types';
-import { endedInBatch, endedNowOf, journalSettings, readReports, reportVars, withDebriefs } from '../core/journal';
+import { endedNowOf, readReports, reportVars, withDebriefs } from '../core/journal';
 
 // ── 진단 ──
 
@@ -259,7 +259,9 @@ async function runOnce(reason: string, o: { manual?: boolean; scope?: RunScope }
       const balance = walletOn ? walletBalance(readWallet(fresh.chat.scriptstate, walletStart), aliveAnchors(fresh.chat)) : null;
       // 소감 (core/journal/debrief): 설정 「소감 자동」이 켜져 있고 이 묶음에서 종료된 사건(보고서)이 있으면 같은 호출에 얹는다. 다시 읽기(only)는 제외
       const batchKeys = batches[b].map((i) => (fresh.chat.message[i] ? messageKey(fresh.chat.message[i], i) : '')).filter(Boolean);
-      const ended = journalSettings(fresh.chat.scriptstate).debriefAuto && !o.scope?.only ? endedInBatch(readReports(fresh.chat), batchKeys).map(endedNowOf) : [];
+      // 소감(debrief)은 2026-11-05 사용자 결정으로 뺌: 갱신기에 소감 절을 얹지 않는다 (코드 경로는 남김)
+      const ended = [] as ReturnType<typeof endedNowOf>[];
+      void batchKeys;
       const input = buildUpdate(fresh.chat, curStore, batches[b], { settings, system: '', values: Object.fromEntries(input0Names(curStore).map((n) => [n, valuesOf(n)])), names: allNames(), exclude, factionNames: factionNamesOf(fresh.char.globalLore), only: o.scope?.only, wallet: balance, ended });
       // 지침은 자료를 본 뒤 조립한다 (저장 상한을 넘긴 인물이 있으면 정리 절을 켠다)
       const sections = enabledSections(settings);
@@ -321,6 +323,11 @@ async function runOnce(reason: string, o: { manual?: boolean; scope?: RunScope }
           let w = readWallet(cur.scriptstate, walletStart);
           for (const e of report.wallet) w = addWalletEntry(w, { ...e, src: 'story' });
           next = { ...cur, scriptstate: { ...(cur.scriptstate ?? {}), ...walletVars(w) } };
+        }
+        // 거래를 적은 뒤 상태창 잔고 맞춤 줄을 다시 계산한다 (같은 거래를 두 번 세지 않게, core/wallet.ts syncWalletToStatus)
+        if (walletOn) {
+          const w = syncWalletToStatus(readWallet(next.scriptstate, walletStart), next);
+          if (w) next = { ...next, scriptstate: { ...(next.scriptstate ?? {}), ...walletVars(w) } };
         }
         // 소감은 보고서($goei_reports)에 (종료 턴이면 turn, 지난 응답 읽기면 backfill)
         if (report.debriefs?.length) {

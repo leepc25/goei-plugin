@@ -11,9 +11,11 @@ import { assetNames, assetUrl, DEFAULT_CROP, facePic, mainPic, parseCrop, person
 import { LEGACY_DATA } from '../core/lorebooks';
 import { SCENARIOS } from '../core/scenarios';
 import { BUILTIN, extraTabId, FACTION_TYPES, nextCode, placeholdersReady, staleFactionVars, withFactionPlaceholders } from '../core/factions';
+import { CUSTOM_FM, factionScenes, nextCustomFm } from '../core/scenes';
 import { updateCharacterLore, updateChat, type ChatContext } from '../host/risu';
 import { imageUrl, picAvatar } from './images';
 import { ICONS } from './icons';
+import { stUi } from './editor/start';
 
 export interface DirectoryEnv {
   render: () => void;
@@ -123,6 +125,33 @@ function namesOf(d: Directory, lore: ChatContext['char']['globalLore']): Record<
   return out;
 }
 const tabName = (o: OrgRow) => o.spec.tab || Array.from(o.name).slice(0, 2).join('');
+
+/** 시작 화면 칸 (설정 창 세계 › 시작 화면): 기본 세력 · 플레이로 켠 조직 · 묶음을 저장된 순서대로 */
+export interface StartSlot {
+  code: string;
+  name: string;
+  kind: 'builtin' | 'extra' | 'group';
+  hidden: boolean;
+  /** 그 칸으로 시작할 때 고를 수 있는 인물 수 */
+  count: number;
+  org?: OrgRow;
+}
+export function startSlots(d: Directory): StartSlot[] {
+  const out: StartSlot[] = [];
+  const count = (code: string) => d.agents.filter((a) => /^P\d{3,}$/.test(a.id) && a.name && a.rosterFor.includes(code)).length;
+  for (const code of BUILTIN) {
+    const o = d.orgs.find((x) => x.faction === code);
+    const base = SCENARIOS.factions.find((f) => f.code === code);
+    out.push({ code, name: o?.spec.title || base?.name || code, kind: 'builtin', hidden: !!o?.spec.hidden, count: count(code), ...(o ? { org: o } : {}) });
+  }
+  for (const o of draftExtras(d)) out.push({ code: o.spec.code!, name: o.spec.title || o.name, kind: 'extra', hidden: false, count: count(o.spec.code!), org: o });
+  for (const g of d.startGroups) if (!out.some((x) => x.code === g.code)) out.push({ code: g.code, name: g.name, kind: 'group', hidden: g.hidden, count: count(g.code) });
+  const at = (c: string) => {
+    const i = d.startOrder.indexOf(c);
+    return i < 0 ? Number.MAX_SAFE_INTEGER : i;
+  };
+  return out.map((x, i) => [x, i] as const).sort((a, b) => at(a[0].code) - at(b[0].code) || a[1] - b[1]).map(([x]) => x);
+}
 function tabsOf(d: Directory, lore: ChatContext['char']['globalLore']) {
   const tabs = d.phoneTabs.tabs.length
     ? d.phoneTabs.tabs.map((t) => ({ id: t.id, name: t.name, visibleFor: [...t.visible_for] }))
@@ -198,6 +227,11 @@ function picOf(d: Directory, key: string): PicOf | null {
     if (!o) return null;
     return { english: o.spec.english ?? '', photo: o.spec.photo, face: o.spec.face, crop: o.spec.crop, person: false, set: put(o.spec) };
   }
+  if (key.startsWith('group:')) {
+    const g = d.startGroups.find((x) => x.code === key.slice(6));
+    if (!g) return null;
+    return { english: g.english, photo: g.photo, face: g.face, crop: g.crop, person: false, set: put(g) };
+  }
   const r = findRow(d, key);
   if (!r) return null;
   return { english: r.english, photo: r.photo, face: r.face, crop: r.crop, person: 'rank' in r, set: put(r) };
@@ -224,7 +258,7 @@ export function setCrop(key: string, crop: [number, number, number]): void {
 }
 
 /** 사진 칸 (괴이·특수·요원·조직 공통): 대표(큰 사진)·얼굴(작은 사진) 두 줄 + 고르기 + 얼굴 틀 맞추기 */
-function photoBlock(key: string, ctx: ChatContext): string {
+export function photoBlock(key: string, ctx: ChatContext): string {
   const p = dirUi.draft ? picOf(dirUi.draft, key) : null;
   if (!p) return '';
   const main = mainPic(ctx.char, p);
@@ -361,21 +395,21 @@ export function agentPanel(a: AgentRow, ctx: ChatContext, d: Directory): string 
   </div>`;
 }
 
-/** 시작 화면에 보일 세력 값: 기본 세력은 이름·설명·사진·숨김, 다른 조직은 플레이 세력으로 켜고 끄기 */
+/** 조직 기록의 세력 값: 시작 화면 이름·설명(보임·순서·플레이 켜고 끄기는 시작 화면 페이지), 새 세력은 유형·모델용 이름·설명·로어북·톡 탭 */
 function factionBlock(o: OrgRow, ctx: ChatContext): string {
   const lore = ctx.char.globalLore ?? [];
   const k = (f: string) => `org:${f}|${o.name}`;
-  const seg = (action: string, on: boolean, a: string, b: string) =>
-    `<div class="gx-segs gx-segs-sm"><button class="gx-seg${on ? ' on' : ''}" data-action="${action}" data-value="${esc(`1|${o.name}`)}">${a}</button><button class="gx-seg${!on ? ' on' : ''}" data-action="${action}" data-value="${esc(`0|${o.name}`)}">${b}</button></div>`;
   const start = `${input(k('title'), o.spec.title ?? '', '시작 화면 이름', o.faction ? '비우면 원래 이름' : '비우면 조직 이름')}
     ${area(k('blurb'), o.spec.blurb ?? '', '시작 화면 설명')}`;
+  // 시작 화면 보임·순서·플레이 켜고 끄기·첫 장면은 세계 › 시작 화면 페이지에서 (2026-11-05 사용자)
+  const link = (what: string) => `<div class="dir-line"><span>${what}</span><button class="gx-mini" data-action="ed-node" data-value="start">시작 화면에서 고치기</button></div>`;
   if (o.faction) {
-    return `<div class="dir-fac"><div class="dir-line"><span>시작 화면에 보이기</span>${seg('dir-fac-hide', !o.spec.hidden, '보임', '숨김')}</div>${start}${builtinBlock(o.faction, dirUi.draft!)}</div>`;
+    return `<div class="dir-fac">${link(o.spec.hidden ? '시작 화면: 숨김' : '시작 화면: 보임')}${start}${builtinBlock(o.faction, dirUi.draft!)}</div>`;
   }
   const on = !!o.spec.playable;
   const ready = placeholdersReady(lore);
-  const head = `<div class="dir-line"><span>플레이 세력${on && o.spec.code ? ` <b class="dir-code">${esc(o.spec.code)}</b>` : ''}</span>${seg('dir-fac-play', on, 'ON', 'OFF')}</div>`;
-  if (!on) return `<div class="dir-fac">${head}<p class="gx-muted">켜면 이 조직으로 시작할 수 있어요. 첫 장면은 직접 입력과 커스텀 임무로 시작해요.</p></div>`;
+  const head = link(on && o.spec.code ? `플레이 조직 <b class="dir-code">${esc(o.spec.code)}</b>` : '시작 칸 아님');
+  if (!on) return `<div class="dir-fac">${head}<p class="gx-muted">시작 화면 페이지에서 이 조직을 시작 칸으로 켜면 이 조직으로 시작할 수 있어요.</p></div>`;
   const patch = ready
     ? ''
     : `<div class="gx-hint">이 카드의 🏷️Tag 로어북에 새 세력 자리가 없어서 아직 시작 화면에 안 보여요. <button class="gx-mini" data-action="dir-fac-patch">로어북에 자리 넣기</button></div>`;
@@ -584,17 +618,17 @@ export function appendixPanel(r: AppendixRow, ctx: ChatContext, d: Directory): s
   const bases = d.bases.map((b) => b.name).filter((n) => !r.places.includes(n));
   const unlocked = unlockedHere(ctx).has(r.lore);
   return `<div class="dir-panel">
-    ${input(k('parent'), r.parent, '본 항목', r.guess ? `이름 앞부분으로 찾은 본 항목: ${esc(r.guess)}` : '본 항목 로어북 이름을 그대로 적어요')}
-    <p class="${slot ? 'gx-muted' : 'gx-hint'}">${slot ? `본 항목과 같은 ${slot} 자리, 본 항목 바로 뒤에 들어가요.` : '본 항목을 찾지 못했어요. 세력 자리에 들어가요.'}</p>
-    <div class="dir-line"><span>켜지는 조건</span><div class="dir-chips">
-      ${toggle('keys', '키가 걸리면', r.keys)}${toggle('withParent', '본 항목과 같이', r.withParent)}${toggle('target', '상태창 목표가 본 항목이면', r.target)}
+    ${input(k('parent'), r.parent, '본 항목', r.guess ? `이 부록이 붙는 원래 기록(이름 앞부분으로 찾음): ${esc(r.guess)}` : '이 부록이 붙는 원래 기록(세력·괴이·파밍·요원)의 이름을 그대로 적어요')}
+    <p class="${slot ? 'gx-muted' : 'gx-hint'}">${slot ? `모델에게 보낼 때 본 항목(${slot}) 바로 뒤에 붙어요.` : '본 항목을 찾지 못했어요. 세력 기록 자리에 들어가요.'}</p>
+    <div class="dir-line"><span>모델에게 보내는 조건</span><small>아래 중 하나라도 맞으면 이 부록을 다음 요청에 넣어요</small><div class="dir-chips">
+      ${toggle('keys', '호출 단어가 대화에 나오면', r.keys)}${toggle('withParent', '본 항목을 보낼 때 같이', r.withParent)}${toggle('target', '상태창 목표가 본 항목이면', r.target)}
     </div></div>
-    <p class="gx-muted">키: ${keys.length ? esc(keys.join(', ')) : '없음'} · 키는 로어북에서 고쳐요.</p>
-    ${input(k('places'), r.places.join(', '), '위치', '상태창 위치 칸에 이 말이 들어 있으면 켜요. 쉼표로 나눠 적어요')}
-    ${bases.length ? `<div class="dir-line"><span>거점에서 넣기</span><div class="dir-chips">${bases.slice(0, 24).map((n) => chip('dir-app-place', `${n}|${r.lore}`, `＋ ${n}`, false)).join('')}</div></div>` : ''}
-    ${input(k('agents'), r.agents.join(', '), '동행·투입 요원', '이 요원이 동행하거나 작전에 투입 중이면 켜요. 쉼표로 나눠 적어요')}
-    <div class="dir-line"><span>끄는 조건</span><div class="dir-chips">${toggle('needParent', '본 항목이 꺼져 있으면 끄기', r.needParent)}</div></div>
-    ${area(k('unlock'), r.unlock, '해금 조건', '비우면 해금 없이 켜져요. 적으면 해금 전에는 어떤 조건으로도 켜지지 않고, 본 항목이 켜졌을 때 모델에게 이 조건만 알려요. 조건이 맞으면 모델이 해금 표시를 남겨요')}
+    <p class="gx-muted">호출 단어: ${keys.length ? esc(keys.join(', ')) : '없음'} · 세계 편집기의 부록 기록에서 고쳐요.</p>
+    ${input(k('places'), r.places.join(', '), '위치', '상태창의 「위치」 칸에 이 말이 들어 있으면 보내요(주인공이 그 장소에 있을 때). 쉼표로 나눠 적어요')}
+    ${bases.length ? `<div class="dir-line"><span>거점에서 넣기</span><small>등록된 거점(본부·지사 같은 장소) 이름을 위 「위치」 칸에 바로 넣는 단추예요</small><div class="dir-chips">${bases.slice(0, 24).map((n) => chip('dir-app-place', `${n}|${r.lore}`, `＋ ${n}`, false)).join('')}</div></div>` : ''}
+    ${input(k('agents'), r.agents.join(', '), '동행·투입 요원', '적은 요원이 주인공과 동행 중이거나(상태창 동행 칸) 상황판에서 작전에 투입돼 있으면 보내요. 쉼표로 나눠 적어요')}
+    <div class="dir-line"><span>보내지 않는 조건</span><div class="dir-chips">${toggle('needParent', '본 항목을 보내지 않는 요청에는 이 부록도 빼기', r.needParent)}</div></div>
+    ${area(k('unlock'), r.unlock, '해금 조건', '비우면 위 조건만 맞으면 바로 보내요. 적으면 해금 전에는 본문 대신 이 조건 한 줄만 모델에게 알리고, 이야기에서 조건이 이루어지면 모델이 응답 끝에 해금 표시를 남겨요. 그 다음 요청부터 본문이 들어가요')}
     ${r.unlock ? `<div class="dir-line"><span>이 채팅</span><div class="dir-chips">${chip('dir-app-unlock', r.lore, unlocked ? '해금됨 · 누르면 다시 잠금' : '잠김 · 누르면 해금', unlocked)}</div></div>` : ''}
     <p class="gx-muted">로어북: ${esc(r.lore)} · 약 ${tokens(String(e?.content ?? '')).toLocaleString()}토큰</p>
   </div>`;
@@ -791,6 +825,48 @@ export function directoryInput(key: string, value: string, bar: Element | null):
     if (bar) bar.innerHTML = directoryBar();
     return;
   }
+  if (key.startsWith('group:')) {
+    // group:필드|코드 (묶음은 이름을 바꿀 수 있어서 코드로 찾는다)
+    const at = key.indexOf('|');
+    const field = key.slice(6, at);
+    const g = d.startGroups.find((x) => x.code === key.slice(at + 1));
+    if (!g) return;
+    if (field === 'name') {
+      const name = value.trim();
+      if (name && !d.startGroups.some((x) => x !== g && x.name === name) && !d.orgs.some((o) => o.name === name)) g.name = name;
+    } else if (field === 'blurb' || field === 'english') g[field] = value.trim();
+    else return;
+    dirUi.done = '';
+    if (bar) bar.innerHTML = directoryBar();
+    return;
+  }
+  if (key.startsWith('scene:')) {
+    // scene:코드|fm|필드 — 공용 장면 덧쓰기 (빈 값은 지워서 기본 글로)
+    const [code, fm, field] = key.slice(6).split('|');
+    if (!code || !/^\d+$/.test(fm ?? '') || !(field === 'label' || field === 'ko' || field === 'en')) return;
+    const rows = ((d.scenes.세력 ??= {})[code] ??= {});
+    const row = (rows[fm] ??= {});
+    const v = field === 'label' ? value.trim() : value;
+    if (v.trim()) row[field] = v;
+    else delete row[field];
+    if (!Object.keys(row).length) delete rows[fm];
+    dirUi.done = '';
+    if (bar) bar.innerHTML = directoryBar();
+    return;
+  }
+  if (key.startsWith('ascene:')) {
+    // ascene:P001|ko — 인물별 첫 장면 (빈 값은 지워서 기본 글로)
+    const [id, field] = key.slice(7).split('|');
+    if (!id || !(field === 'ko' || field === 'en')) return;
+    const rows = (d.scenes.인물 ??= {});
+    const row = (rows[id] ??= {});
+    if (value.trim()) row[field] = value;
+    else delete row[field];
+    if (!Object.keys(row).length) delete rows[id];
+    dirUi.done = '';
+    if (bar) bar.innerHTML = directoryBar();
+    return;
+  }
   if (key.startsWith('org:')) {
     const at = key.indexOf('|');
     const field = key.slice(4, at);
@@ -959,7 +1035,7 @@ export async function handleDirectory(action: string, value: string | undefined,
         dirUi.notice = `「${name}」 조직이 이미 있어요.`;
         break;
       }
-      d.orgs.push({ name, faction: '', rosterFor: ['D00', 'E00'], phoneTabs: [], spec: {} });
+      d.orgs.push({ name, faction: '', rosterFor: [], phoneTabs: [], spec: {} });
       dirUi.open = name;
       dirUi.adding = false;
       dirUi.notice = '';
@@ -1071,6 +1147,98 @@ export async function handleDirectory(action: string, value: string | undefined,
       dirUi.open = '';
       dirUi.done = '';
       break;
+    // ── 시작 화면 (설정 창 세계 › 시작 화면, ui/editor/start.ts) ──
+    case 'dir-start-open':
+      stUi.sel = stUi.sel === v ? '' : v;
+      stUi.confirm = '';
+      // 펼친 칸의 상세는 목록 아래에 그려져서, 열면 그 자리로 내려간다 (안 내려가면 눌러도 바뀐 게 안 보인다)
+      if (stUi.sel) requestAnimationFrame(() => document.querySelector('.gw .st-sel')?.scrollIntoView({ block: 'start', behavior: 'smooth' }));
+      break;
+    case 'dir-start-show': {
+      const [on, code] = v.split('|');
+      const g = d.startGroups.find((x) => x.code === code);
+      const o = d.orgs.find((x) => x.faction === code);
+      if (g) g.hidden = on !== '1';
+      else if (o) o.spec.hidden = on !== '1';
+      else {
+        dirUi.notice = '플레이 조직은 「시작 칸에서 빼기」로 뺄 수 있어요.';
+        break;
+      }
+      dirUi.done = '';
+      break;
+    }
+    case 'dir-start-move': {
+      const [how, code] = v.split('|');
+      const order = startSlots(d).map((x) => x.code);
+      const i = order.indexOf(code ?? '');
+      const j = how === 'up' ? i - 1 : i + 1;
+      if (i < 0 || j < 0 || j >= order.length) break;
+      [order[i], order[j]] = [order[j], order[i]];
+      d.startOrder = order;
+      dirUi.done = '';
+      break;
+    }
+    case 'dir-group-add': {
+      const code = nextCode([...d.usedCodes, ...d.orgs.map((x) => x.spec.code ?? ''), ...d.startGroups.map((g) => g.code)]);
+      if (!code) {
+        dirUi.notice = '더 줄 수 있는 코드가 없어요 (F00~Z00).';
+        break;
+      }
+      let name = '새 묶음';
+      for (let n = 2; d.startGroups.some((g) => g.name === name) || d.orgs.some((o) => o.name === name); n++) name = `새 묶음 ${n}`;
+      d.startGroups.push({ name, code, blurb: '', english: '', hidden: false });
+      d.usedCodes = [...d.usedCodes, code];
+      stUi.sel = code;
+      dirUi.done = '';
+      break;
+    }
+    case 'dir-group-del': {
+      const [how, code] = v.split('|');
+      if (how === 'ask') stUi.confirm = code ?? '';
+      else if (how === 'no') stUi.confirm = '';
+      else if (how === 'yes') {
+        d.startGroups = d.startGroups.filter((g) => g.code !== code);
+        for (const a of d.agents) a.rosterFor = a.rosterFor.filter((c) => c !== code);
+        d.startOrder = d.startOrder.filter((c) => c !== code);
+        stUi.confirm = '';
+        if (stUi.sel === code) stUi.sel = '';
+        dirUi.done = '';
+      }
+      break;
+    }
+    case 'dir-group-member': {
+      const [code, id] = v.split('|');
+      const a = d.agents.find((x) => x.id === id);
+      if (!a || !code) break;
+      a.rosterFor = a.rosterFor.includes(code) ? a.rosterFor.filter((c) => c !== code) : [...a.rosterFor, code];
+      dirUi.done = '';
+      break;
+    }
+    case 'dir-scene-add': {
+      const rows = factionScenes(v, d.scenes);
+      const fm = nextCustomFm(rows);
+      (((d.scenes.세력 ??= {})[v] ??= {})[String(fm)] = { label: `장면 ${fm - CUSTOM_FM + 1}` });
+      dirUi.done = '';
+      break;
+    }
+    case 'dir-scene-del': {
+      const [code, fm] = v.split('|');
+      const rows = d.scenes.세력?.[code ?? ''];
+      if (rows && fm && Number(fm) >= CUSTOM_FM) delete rows[fm];
+      dirUi.done = '';
+      break;
+    }
+    case 'dir-scene-show': {
+      const [on, code, fm] = v.split('|');
+      if (!code || !fm) break;
+      const rows = ((d.scenes.세력 ??= {})[code] ??= {});
+      const row = (rows[fm] ??= {});
+      if (on === '1') delete row.hidden;
+      else row.hidden = true;
+      if (!Object.keys(row).length) delete rows[fm];
+      dirUi.done = '';
+      break;
+    }
     case 'dir-fac-play':
     case 'dir-fac-hide':
     case 'dir-fac-type': {
@@ -1080,7 +1248,12 @@ export async function handleDirectory(action: string, value: string | undefined,
       if (!o) break;
       if (action === 'dir-fac-hide') o.spec.hidden = arg === '0';
       else if (action === 'dir-fac-type') o.spec.type = arg as (typeof FACTION_TYPES)[number]['id'];
-      else if (!o.faction) setPlayable(d, o, arg === '1');
+      else if (!o.faction) {
+        setPlayable(d, o, arg === '1');
+        // 시작 화면 페이지에서 켰으면 그 칸을 바로 펼친다
+        if (arg === '1' && o.spec.playable && o.spec.code) stUi.sel = o.spec.code;
+        else if (arg === '0' && stUi.sel === o.spec.code) stUi.sel = '';
+      }
       dirUi.done = '';
       break;
     }

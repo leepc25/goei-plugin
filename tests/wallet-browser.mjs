@@ -144,7 +144,7 @@ const rows = (page) => page.locator('.gx-wt-row').count();
   const tiles = await page.locator('.gx-wt-tile').allTextContents();
   assert.match(tiles[1], /수입\s*\+30,000\s*1건/);
   assert.match(tiles[2], /지출\s*−16,200\s*2건/);
-  assert.match(tiles[3], /TODAY · 01\.02\s*−1,200\s*1건/);
+  assert.match(tiles[3], /오늘\s*−1,200\s*1건/);
   // 날짜 묶음 (최신 위) · 그 거래 뒤 잔고 · 필드 장면·시각 · 본문 근거
   assert.deepEqual(await page.locator('.gx-wt-day h3 span').allTextContents(), ['2025.01.02 (목)', '2025.01.01 (수)']);
   assert.equal(await rows(page), 3);
@@ -192,7 +192,7 @@ const rows = (page) => page.locator('.gx-wt-row').count();
   assert.match(await page.textContent('.gx-hwallet'), /153,800/);
   await page.click('.gx-hwallet');
   await page.waitForSelector('.gx-wallettab');
-  assert.equal(await page.locator('.gx-hwallet').count(), 0, '가계부 탭에서는 머리 잔고 단추 숨김');
+  assert.equal(await page.locator('.gx-hwallet').count(), 1, '가계부 안에서도 머리 잔고 단추는 그대로 (2026-11-05 사용자: 위 단추줄은 늘 유지)');
   assert.equal(await page.isVisible('.gx-wt-row:has-text("택시비") .gx-wt-del'), false);
   await page.click('.gx-wt-row:has-text("택시비") .gx-wt-main');
   assert.equal(await page.isVisible('.gx-wt-row:has-text("택시비") .gx-wt-del'), true, '누르면 ✕');
@@ -219,7 +219,7 @@ const rows = (page) => page.locator('.gx-wt-row').count();
   assert.equal(await page.locator('.gx-wt-pen').count(), 0, '꺼져 있으면 ✎ 없음');
   assert.equal(await page.locator('.gx-wt-del').count(), 0, '꺼져 있으면 ✕ 없음');
   await page.click('[data-action="ed-open"][data-value="set:screen"] >> nth=0');
-  await page.click('[data-action="ed-node"][data-value="set:status"]');
+  await page.click('[data-action="ed-node"][data-value="set:wallet"]'); // 설정 「기록 → 가계부」 (2026-11-05 사용자)
   await page.waitForSelector('[data-action="set-wallet-edit"]');
   assert.equal(await page.isDisabled('.st-won'), true, '이야기가 시작된 채팅은 시작 잔고 잠김');
   await page.click('[data-action="set-wallet-edit"][data-value="1"]');
