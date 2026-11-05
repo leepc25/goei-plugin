@@ -12,5 +12,7 @@
     "skipLibCheck": true,
     "types": []
   },
-  "include": ["src"]
+  "include": ["src"],
+  // 필드(본부 방문 대화) 코드는 2026-11-04 플러그인에서 뺐다. 파일은 지우지 않고(사용자 지시) 형 검사에서만 뺀다 — 본체 번들에는 들어가지 않는다.
+  "exclude": ["src/core/visitPrompt.ts", "src/host/game/visit.ts", "src/host/game/index.ts", "src/ui/game.ts", "src/ui/visitset.ts"]
 }

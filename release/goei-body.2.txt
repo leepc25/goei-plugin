@@ -1,105 +1,4 @@
-태", "위협등급", "등급"];
-  function stripLabel(v) {
-    let s5 = (v ?? "").trim();
-    for (const lb of AN_LABELS) {
-      const m = new RegExp(`^${lb}\\s*[:：]\\s*`).exec(s5);
-      if (m) {
-        s5 = s5.slice(m[0].length).trim();
-        break;
-      }
-    }
-    return s5;
-  }
-  function normGrade(v) {
-    const g2 = stripLabel(v).toUpperCase().replace(/[^FEDCBAS]/g, "").charAt(0);
-    return g2;
-  }
-  function normAnState(v) {
-    const s5 = stripLabel(v);
-    const low = s5.toLowerCase();
-    if (s5.includes("소멸") || low.includes("fade") || low.includes("vanish")) return "소멸";
-    if (s5.includes("격리") || low.includes("contain") || low.includes("isolate")) return "격리";
-    if (s5.includes("클리어") || low.includes("clear") || low.includes("resolve")) return "클리어";
-    return "활성";
-  }
-  function normAgState(v) {
-    const s5 = (v ?? "").trim();
-    if (AG_STATES.includes(s5)) return s5;
-    const hit3 = AG_ALIAS[s5] ?? AG_ALIAS[s5.toLowerCase().replace(/\s+/g, " ")];
-    if (hit3) return hit3;
-    const bare = s5.replace(/[(（][^)）]*[)）]/g, "").replace(/[\s.。!]/g, "").replace(/중$/, "");
-    if (AG_STATES.includes(bare)) return bare;
-    return AG_ALIAS[bare] ?? null;
-  }
-  function fields(text4, kind) {
-    const out = [];
-    const re = new RegExp(`\\[${kind}\\s*\\|([^\\]]*)\\]`, "g");
-    for (const m of text4.matchAll(re)) out.push(m[1].split("|").map((s5) => s5.trim()));
-    return out;
-  }
-  function scanAnomalies(text4) {
-    return fields(text4, "AN").flatMap((f) => {
-      const slot = /^\d+$/.test(f[0] ?? "") && f.length >= 6 ? 1 : 0;
-      const region2 = f[slot] ?? "";
-      const r = f.slice(slot + 1);
-      if (r.length < 4 || !region2) return [];
-      return [{ region: region2, name: stripLabel(r[0]), state: normAnState(r[1]), grade: normGrade(r[2]), deploy: stripLabel(r[3]), situation: stripLabel(r.slice(4).join(" ")) }];
-    });
-  }
-  function scanSites(text4, kind, states) {
-    return fields(text4, kind).flatMap((f) => {
-      const bare = (v) => stripLabel(v).replace(/\s*[(（][^)）]*[)）]\s*/g, "").trim();
-      const i = f.findIndex((v, k) => k >= 2 && states.includes(bare(v)));
-      if (i < 0) return [];
-      let region2 = f[0] ?? "";
-      if (/^\d+$/.test(region2) && i >= 3) region2 = f[1] ?? "";
-      return [{ region: region2, name: stripLabel(f[i - 1]), state: bare(f[i]), rest: f.slice(i + 1).map(stripLabel) }];
-    });
-  }
-  var DEPLOY_ONLY = /^(?:없음|none|-|[A-Z]\d{3}(?:\s*[,/·]\s*[A-Z]\d{3})*)$/i;
-  function scanIncidents(text4) {
-    return scanSites(text4, "IN", ["진행", "종료"]).map(({ rest, ...t }) => rest.length >= 2 ? { ...t, deploy: rest[0], situation: rest.slice(1).join(" ") } : DEPLOY_ONLY.test(rest[0] ?? "") ? { ...t, deploy: rest[0], situation: "" } : { ...t, deploy: "", situation: rest.join(" ") });
-  }
-  function scanMysticSites(text4) {
-    return scanSites(text4, "MS", ["출현", "소실"]).map(({ rest, ...t }) => ({ ...t, visitors: rest[0] ?? "", situation: rest.slice(1).join(" ") }));
-  }
-  function scanAgents(text4) {
-    return fields(text4, "AG").flatMap((f) => {
-      const state = normAgState(f[1]);
-      return f[0] && state ? [{ who: f[0], state, situation: f[2] ?? "" }] : [];
-    });
-  }
-  function scanAffiliation(text4) {
-    const m = /\[AC\s*\|\s*(\w+)\s*\]/.exec(text4);
-    return m ? m[1].toUpperCase() : null;
-  }
-  function scanStatus(text4) {
-    const tags = findStatusTags(text4);
-    const first = tags[0];
-    const minute = first ? statusMinute(first.date, first.time) : null;
-    const target = tags.length === 1 && (first.target || /\|\s*없음\s*[\]】］]?\s*$/.test(first.raw)) ? first.target : null;
-    return { minute, target };
-  }
-  function lastStatusFields(texts) {
-    for (let i = texts.length - 1; i >= 0; i--) {
-      const all = findStatusTags(texts[i] ?? "");
-      if (!all.length) continue;
-      const t = all[all.length - 1];
-      return { date: t.date, time: t.time, weather: t.weather, temp: t.temp, place: t.place, target: t.target, companions: t.companions, deployed: t.deployed };
-    }
-    return null;
-  }
-  function hasWorldTags(text4) {
-    return /\[(?:AN|IN|MS|AG)\s*\||\[AC\s*\|/.test(text4);
-  }
-  var AGE_META = /\{\s*\d+\s*시간\s+\d+\s*분\s*전\s*\}/;
-  var MARKERS = ["USER 관여 상태", "RP 시간 제한", "USER 관여 상태 규칙", "USER 탐험 상태 규칙", "탐험 추적", "자동 종료"];
-  function cleanOutput(text4) {
-    const lines3 = text4.split("\n");
-    const keep = [];
-    let prev = null;
-    let prevHadTag = false;
-    const ageOnly = (l) => l !== null && new RegExp(`^\\s*${AGE_META.source}\\s*$`).test(l);
+\s*${AGE_META.source}\\s*$`).test(l);
     for (const raw of lines3) {
       let line2 = raw;
       if (MARKERS.some((m) => new RegExp(`^\\s*[-*]?\\s*\\[${m}\\]`).test(line2))) line2 = "";
@@ -2249,8 +2148,8 @@
   }
   function trimBoard(st, s5) {
     const cap = postLimit(s5);
-    const open3 = () => st.posts.filter((p) => !protectedPost(s5, p)).length;
-    while (open3() > cap) {
+    const open2 = () => st.posts.filter((p) => !protectedPost(s5, p)).length;
+    while (open2() > cap) {
       let idx = -1;
       for (let i = st.posts.length - 1; i >= 0; i--) {
         if (!protectedPost(s5, st.posts[i])) {
@@ -3973,16 +3872,16 @@ ${c}`)]).join("\n\n");
   }
   function liveEntries(list4, live) {
     if (!list4?.length) return [];
-    const alive = new Set(list4.filter((e) => isAlive(e, live)).map((e) => e.id));
-    const replaced = new Set(list4.filter((e) => alive.has(e.id)).flatMap((e) => [...e.replaces ? [e.replaces] : [], ...e.from ?? []]));
-    return list4.filter((e) => alive.has(e.id) && !replaced.has(e.id));
+    const alive2 = new Set(list4.filter((e) => isAlive(e, live)).map((e) => e.id));
+    const replaced = new Set(list4.filter((e) => alive2.has(e.id)).flatMap((e) => [...e.replaces ? [e.replaces] : [], ...e.from ?? []]));
+    return list4.filter((e) => alive2.has(e.id) && !replaced.has(e.id));
   }
   function entryStates(list4, live) {
     const out = /* @__PURE__ */ new Map();
     if (!list4?.length) return out;
-    const alive = new Set(liveEntries(list4, live).map((e) => e.id));
+    const alive2 = new Set(liveEntries(list4, live).map((e) => e.id));
     const replaced = new Set(list4.filter((e) => isAlive(e, live)).flatMap((e) => [...e.replaces ? [e.replaces] : [], ...e.from ?? []]));
-    for (const e of list4) out.set(e.id, alive.has(e.id) ? "alive" : e.void ? "void" : e.folded ? "folded" : replaced.has(e.id) ? "replaced" : "gone");
+    for (const e of list4) out.set(e.id, alive2.has(e.id) ? "alive" : e.void ? "void" : e.folded ? "folded" : replaced.has(e.id) ? "replaced" : "gone");
     return out;
   }
   function liveChanges(store, live) {
@@ -4349,9 +4248,9 @@ ${recent > 0 ? `{{#when {{greater_equal::{{chat_index}}::{{? {{lastmessageid}}-$
   function imgCss(size = IMG_SIZE.def, fold2 = IMG_FOLD.def, hidden = false) {
     const g2 = ":is(.gim,.x-risu-gim,.ib-asset-hover,.x-risu-ib-asset-hover)";
     if (hidden) return `${g2}{display:none!important}`;
-    const open3 = fold2 >= 100;
-    const folded = open3 ? `${W}/${H}` : `${W}/${Math.round(H * fold2) / 100}`;
-    return `${g2}{display:block!important;box-sizing:border-box;margin:auto;width:100%;max-width:${Math.round(BASE_EM * size) / 100}em!important;aspect-ratio:${folded}!important;overflow:hidden;border-radius:20px;background-color:transparent;background-repeat:no-repeat;background-size:100% auto;background-position:center top;cursor:${open3 ? "default" : "pointer"};outline:none;transition:aspect-ratio .45s ease;-webkit-mask-image:-webkit-radial-gradient(white,black)}` + (open3 ? "" : `${g2}:hover,${g2}:focus{aspect-ratio:${W}/${H}!important}`);
+    const open2 = fold2 >= 100;
+    const folded = open2 ? `${W}/${H}` : `${W}/${Math.round(H * fold2) / 100}`;
+    return `${g2}{display:block!important;box-sizing:border-box;margin:auto;width:100%;max-width:${Math.round(BASE_EM * size) / 100}em!important;aspect-ratio:${folded}!important;overflow:hidden;border-radius:20px;background-color:transparent;background-repeat:no-repeat;background-size:100% auto;background-position:center top;cursor:${open2 ? "default" : "pointer"};outline:none;transition:aspect-ratio .45s ease;-webkit-mask-image:-webkit-radial-gradient(white,black)}` + (open2 ? "" : `${g2}:hover,${g2}:focus{aspect-ratio:${W}/${H}!important}`);
   }
   var hiddenNow = false;
   var imgHidden = () => hiddenNow;
@@ -4403,8 +4302,7 @@ ${recent > 0 ? `{{#when {{greater_equal::{{chat_index}}::{{? {{lastmessageid}}-$
   var cache4 = /* @__PURE__ */ new WeakMap();
   var MARK_MAX = 5;
   var DEFAULT_MARKS = [
-    { s: { tab: "field" }, name: "필드" },
-    { s: { tab: "wallet" }, name: "가계부" },
+    { s: { tab: "records", r: { sub: "wallet", view: "list", id: "" } }, name: "가계부" },
     { s: { tab: "records" }, name: "기록" },
     { s: { tab: "settings" }, name: "설정" }
   ];
@@ -4613,11 +4511,11 @@ ${recent > 0 ? `{{#when {{greater_equal::{{chat_index}}::{{? {{lastmessageid}}-$
   function aliveAnchors(chat) {
     return new Set((chat.message ?? []).map((m, i) => messageKey(m, i)));
   }
-  function liveWallet(w, alive) {
-    return w.log.filter((e) => !e.anchor || alive.has(e.anchor));
+  function liveWallet(w, alive2) {
+    return w.log.filter((e) => !e.anchor || alive2.has(e.anchor));
   }
-  function walletBalance(w, alive) {
-    return liveWallet(w, alive).reduce((n2, e) => n2 + e.amount, w.start);
+  function walletBalance(w, alive2) {
+    return liveWallet(w, alive2).reduce((n2, e) => n2 + e.amount, w.start);
   }
   var hash2 = (text4) => {
     let h = 2166136261;
@@ -4628,4 +4526,87 @@ ${recent > 0 ? `{{#when {{greater_equal::{{chat_index}}::{{? {{lastmessageid}}-$
     return (h >>> 0).toString(36);
   };
   var walletEntryId = (anchor, amount, memo) => `w_${hash2(`${anchor}|${amount}|${memo}`)}`;
-  function addWalletEnt
+  function addWalletEntry(w, e) {
+    if (!Number.isSafeInteger(e.amount) || e.amount === 0 || Math.abs(e.amount) > WALLET_MAX) return w;
+    const id = e.id ?? walletEntryId(e.anchor, e.amount, e.memo);
+    if (w.log.some((x) => x.id === id)) return w;
+    return { ...w, log: [...w.log, { ...e, id, memo: e.memo.slice(0, 30), at: e.at ?? (/* @__PURE__ */ new Date()).toISOString() }].slice(-400) };
+  }
+  function removeWalletEntry(w, id) {
+    return { ...w, log: w.log.filter((e) => e.id !== id) };
+  }
+  function adjustWallet(w, alive2, target, memo = "잔고 수정") {
+    const diff = Math.trunc(target) - walletBalance(w, alive2);
+    if (!diff) return w;
+    return addWalletEntry(w, { anchor: "", amount: diff, memo, src: "manual", id: `m_${Date.now().toString(36)}_${w.log.length}` });
+  }
+  function formatWon(n2) {
+    const abs = Math.abs(Math.trunc(n2)).toLocaleString("en-US");
+    return `${n2 < 0 ? "−" : ""}₩ ${abs}`;
+  }
+  function formatDelta(n2) {
+    if (!n2) return "";
+    return `${n2 > 0 ? "+" : "−"}${Math.abs(Math.trunc(n2)).toLocaleString("en-US")}`;
+  }
+  function parseWon(text4) {
+    const t = String(text4 ?? "").replace(/\s+/g, "");
+    if (!t) return null;
+    const sign = /^[-−]/.test(t) ? -1 : 1;
+    const body5 = t.replace(/^[-−+]/, "").replace(/^₩/, "").replace(/(원|won|KRW)$/i, "");
+    if (/^\d[\d,]*$/.test(body5)) {
+      const n3 = Number(body5.replace(/,/g, ""));
+      return Number.isSafeInteger(n3) ? sign * n3 : null;
+    }
+    const m = /^(?:(\d+(?:\.\d+)?)억)?(?:(\d+(?:\.\d+)?)만)?(?:(\d+)천)?(?:(\d+)백)?(\d+)?$/.exec(body5.replace(/,/g, ""));
+    if (!m || m.slice(1).every((x) => x === void 0)) return null;
+    const n2 = Math.round(Number(m[1] ?? 0) * 1e8 + Number(m[2] ?? 0) * 1e4 + Number(m[3] ?? 0) * 1e3 + Number(m[4] ?? 0) * 100 + Number(m[5] ?? 0));
+    return Number.isSafeInteger(n2) && n2 > 0 ? sign * n2 : null;
+  }
+  function mentionsAmount(text4) {
+    return /(₩\s*\d|\d[\d,]*\s*(?:원|won|KRW)|\d+\s*(?:억|만|천)\s*(?:원)?)/i.test(text4);
+  }
+
+  // src/core/journal/build.ts
+  var text2 = (m) => typeof m?.data === "string" ? m.data : "";
+  var cut2 = (s5, n2) => s5.replace(/\s+/g, " ").trim().slice(0, n2);
+  var NONE2 = /^(?:없음|none|-|—|미정|n\/a)$/i;
+  function parseAgents(deploy, world2, c, faction) {
+    const names4 = codesToNames(deploy ?? "", c, faction).split(/[,，、/·]|\s+및\s+|\s+and\s+/i).map((n2) => n2.trim()).filter((n2) => n2 && !NONE2.test(n2));
+    const out = [];
+    for (const raw of names4) {
+      const name = raw.replace(/\s*[(（][^)）]*[)）]\s*$/, "").trim() || raw;
+      if (out.some((a) => a.name === name)) continue;
+      const p = c.people.find((x) => x.name === name || !!x.english && x.english.toLowerCase() === name.toLowerCase());
+      const rec2 = p ? world2.agents[p.id] : void 0;
+      const st = rec2 && rec2.st !== "미정" ? rec2.st : "";
+      out.push({ id: p?.id ?? "", name: p?.name ?? name, st, ...rec2?.situation ? { situation: cut2(rec2.situation, 80) } : {} });
+      if (out.length >= 8) break;
+    }
+    return out;
+  }
+  var two2 = (n2) => String(n2).padStart(2, "0");
+  function mmdd(at, now) {
+    const d = at === null ? new Date(now) : new Date(at * 6e4);
+    return Number.isFinite(d.getTime()) ? `${two2(d.getUTCMonth() + 1)}${two2(d.getUTCDate())}` : "0000";
+  }
+  function peopleDelta(chat, from, to) {
+    const store = peopleStore(chat);
+    if (!store.log.length) return [];
+    const live = liveness(chat);
+    const all = liveChanges(store, live);
+    const ps = peopleSettings(chat.scriptstate);
+    const o = { speed: ps.speed, turnCap: ps.turnCap };
+    const pos = (c) => live.at.get(c.anchor) ?? -1;
+    const span = all.filter((c) => c.kind === "cue" && c.pin === void 0 && !factionOfWho(c.who) && pos(c) >= from && pos(c) <= to);
+    const byWho = /* @__PURE__ */ new Map();
+    for (const c of span) (byWho.get(c.who) ?? byWho.set(c.who, []).get(c.who)).push(c);
+    const out = [];
+    for (const [who, list4] of byWho) {
+      const delta = sumCues(who, 0, list4, 0, -1e9, 1e9, o);
+      if (!delta) continue;
+      const top = [...list4].sort((a, b) => Math.abs(cueDelta(b, o)) - Math.abs(cueDelta(a, o)))[0];
+      const person = store.people[who];
+      const stage = person ? stageOf(affinityOf(person, all.filter((c) => pos(c) <= to), store.folded[who] ?? 0, o)).label : void 0;
+      out.push({ who, delta, ...top?.cue ? { cue: top.cue } : {}, ...top?.quote || top?.reason ? { quote: cut2(top.quote || top.reason, 60) } : {}, ...stage ? { stage } : {} });
+    }
+    return out.sort((a, b) => Math.abs(b.delta) - Math.abs(a.delta)).slice(0, PEOPLE

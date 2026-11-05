@@ -1036,7 +1036,7 @@ export function phoneTab(ctx: ChatContext, env: PhoneEnv): string {
       ${detail ? '' : status}
       <div class="ph-content">${listHtml(ctx, st, d)}</div>
       ${fail}
-      ${drawerHtml(tools)}
+      ${drawerHtml(tools, '', '', 'phone')}
     </section>
     <section class="ph-pane">${detail ? status : ''}${paneHtml(ctx, st, d, busy)}</section>
     ${note}

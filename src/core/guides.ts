@@ -5,21 +5,18 @@ import gnet from '../data/guides/gnet.txt';
 import phone from '../data/guides/phone.txt';
 import wiki from '../data/guides/wiki.txt';
 import directive from '../data/guides/directive.txt';
-import visit from '../../card/visit-guide.txt';
 import rp from '../data/guides/rp.txt';
 import tag from '../data/guides/tag.txt';
 
-export type GuideName = 'GNet' | 'Phone' | 'Wiki' | 'Directive' | 'Visit' | 'RP' | 'Tag';
-export const GUIDE_NAMES: GuideName[] = ['GNet', 'Phone', 'Wiki', 'Directive', 'Visit', 'RP', 'Tag'];
-export const GUIDE_LABEL: Record<GuideName, string> = { GNet: '괴담넷', Phone: '괴담톡', Wiki: '위키', Directive: '이동·임무 지시문', Visit: '필드(본부 방문)', RP: 'RP 지침(봇 설명)', Tag: '상태창·태그' };
+export type GuideName = 'GNet' | 'Phone' | 'Wiki' | 'Directive' | 'RP' | 'Tag';
+export const GUIDE_NAMES: GuideName[] = ['GNet', 'Phone', 'Wiki', 'Directive', 'RP', 'Tag'];
+export const GUIDE_LABEL: Record<GuideName, string> = { GNet: '괴담넷', Phone: '괴담톡', Wiki: '위키', Directive: '이동·임무 지시문', RP: 'RP 지침(봇 설명)', Tag: '상태창·태그' };
 
-const VISIT_HEAD = '<!-- Visit: 본부 방문 대화 지침. 플러그인이 요청마다 필요한 섹션만 골라 씁니다. 자동 활성화 OFF / 키워드 비움. 섹션 구분 줄은 그대로 두세요. -->';
 const DEFAULTS: Record<GuideName, string> = {
   GNet: gnet.replace(/\r/g, ''),
   Phone: phone.replace(/\r/g, ''),
   Wiki: wiki.replace(/\r/g, ''),
   Directive: directive.replace(/\r/g, ''),
-  Visit: `${VISIT_HEAD}\n\n${visit.replace(/\r/g, '').trim()}\n`,
   RP: rp.replace(/\r/g, ''),
   Tag: tag.replace(/\r/g, ''),
 };
@@ -93,9 +90,9 @@ export const joinGuide = (parts: GuidePart[]): string => parts.map((p) => p.head
 
 /* ── 내가 추가한 규칙 (2026-10-27 리수폿식 「프롬프트」 탭): 기기 설정에 두고, 붙일 지침의 늘 쓰이는 절 끝에 넣는다 ──
    본편(RP): 글 끝 / 이동·임무(Directive): COMMON 절 / 괴담넷: LB 절 / 괴담톡: COMMON / 위키: NW.GUIDE / 필드: COMMON */
-export type RuleTarget = 'RP' | 'Directive' | 'GNet' | 'Phone' | 'Wiki' | 'Visit';
-export const RULE_TARGETS: RuleTarget[] = ['RP', 'Directive', 'GNet', 'Phone', 'Wiki', 'Visit'];
-export const RULE_TARGET_LABEL: Record<RuleTarget, string> = { RP: '본편', Directive: '이동·임무', GNet: '괴담넷', Phone: '괴담톡', Wiki: '위키', Visit: '필드' };
+export type RuleTarget = 'RP' | 'Directive' | 'GNet' | 'Phone' | 'Wiki';
+export const RULE_TARGETS: RuleTarget[] = ['RP', 'Directive', 'GNet', 'Phone', 'Wiki'];
+export const RULE_TARGET_LABEL: Record<RuleTarget, string> = { RP: '본편', Directive: '이동·임무', GNet: '괴담넷', Phone: '괴담톡', Wiki: '위키' };
 export interface UserRule {
   id: string;
   title: string;
@@ -103,7 +100,7 @@ export interface UserRule {
   to: RuleTarget[];
   on: boolean;
 }
-const RULE_SECTION: Record<RuleTarget, string | null> = { RP: null, Directive: 'COMMON', GNet: 'LB', Phone: 'COMMON', Wiki: 'NW.GUIDE', Visit: 'COMMON' };
+const RULE_SECTION: Record<RuleTarget, string | null> = { RP: null, Directive: 'COMMON', GNet: 'LB', Phone: 'COMMON', Wiki: 'NW.GUIDE' };
 
 let userRules: UserRule[] = [];
 export function setUserRules(rules: UserRule[] | undefined | null): void {

@@ -11,7 +11,7 @@ const vps = which === 'all' ? Object.keys(VIEWPORTS) : [which];
 const browser = await launch();
 const started = () => ({ message: [{ role: 'user', data: 'hi' }, { role: 'char', data: '본문\n[▣|2025.01.01|02:47 AM|☀️|4°C|관리국 본부|목표]' }], scriptstate: { $st_faction: 'A00', $st_lang: 'ko', $st_fm: '2', $st_fixed_theme: 'dark' } });
 const EDITOR_NODES = ['set:screen', 'set:image', 'set:board', 'set:gnet', 'set:phone', 'set:wiki', 'set:people', 'set:journal', 'set:adv', 'set:update', 'agent', 'org', 'anomaly', 'site', 'appendix', 'base', 'relations', 'guide:RP', 'guide:Image', 'rule:new', 'install', 'manage:diag', 'manage:log', 'manage:backup'];
-const PANEL_TABS = ['board', 'map', 'mission', 'phone', 'gnet', 'wiki', 'records', 'wallet'];
+const PANEL_TABS = ['board', 'map', 'mission', 'phone', 'gnet', 'wiki', 'records'];
 // 유령 버튼은 다시 보일 때 리스너를 떼고 다시 건다(떼기마다 비동기) → 그게 끝난 뒤에 잰다
 const measure = async (page) => (await sleep(400), page.evaluate(() => ({ listeners: window.__docListeners, nodes: document.querySelectorAll('*').length, styles: document.querySelectorAll('style').length })));
 
@@ -151,12 +151,13 @@ for (const vp of vps) {
   assert.equal(((await prefsOf(page)).marks ?? []).length, 0, '기본 즐겨찾기 지움');
   await page.evaluate(() => document.querySelector('.gx .mk-pop [data-action="mk-pop"]')?.click());
   await sleep(80);
-  for (const tab of ['board', 'wiki', 'phone', 'gnet', 'map', 'wallet']) {
+  // 맨 상황판은 즐겨찾기에 못 넣는다(2026-11-05) → 다섯 화면을 채운 뒤 여섯째(기록)에서 잠김
+  for (const tab of ['wiki', 'phone', 'gnet', 'map', 'mission', 'records']) {
     await goTab(tab);
     await openMarks();
     const n = ((await prefsOf(page)).marks ?? []).length;
     const here = await page.$('.gx .mk-pop [data-action="mk-here"]');
-    if (tab === 'wallet') {
+    if (tab === 'records') {
       assert.ok(!here || (await page.isDisabled('.gx .mk-pop [data-action="mk-here"]')), '5개면 「지금 화면」 잠김');
       assert.ok((await page.textContent('.gx .mk-pop')).includes('5개까지'), '상한 안내');
       assert.equal((await prefsOf(page)).marks.length, 5);
@@ -174,7 +175,7 @@ for (const vp of vps) {
   await page.waitForFunction(() => (JSON.parse(window.__store['p:goei:prefs'] ?? '{}').marks ?? []).length === 4);
   // 즐겨찾기로 이동
   await clickSel(page, '.gx .mk-pop [data-action="mk-go"][data-value="0"]');
-  await page.waitForFunction(() => document.querySelector('.gx')?.dataset.tab === 'wiki');
+  await page.waitForFunction(() => document.querySelector('.gx')?.dataset.tab === 'phone'); // 위키(0번)를 뺐으니 다음은 괴담톡
   if (narrow) {
     await goTab('board');
     // 회귀: 이 채팅은 상황판이 꺼져 있다(빈 화면). 그래도 서랍은 있어야 한다

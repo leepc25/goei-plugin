@@ -52,11 +52,11 @@ import { startRecord } from '../core/dispatch';
 import { handleSettings, resetSettings, settingsTab, settingsUi, type SettingsEnv } from './settings';
 import { bindPeopleHold, bindPeopleStatus, handlePeople, hasPersonRecord, peopleInput, type PeopleEnv } from './people';
 import { handleImgPrompt, imgInput } from './imgprompt';
-import { cropValue, setCrop, directoryExtList, directoryInput, directoryPhotoList, directoryList, dirUi, handleDirectory, resetDirectory } from './directory';
+import { bindCropDrag, cropValue, setCrop, directoryExtList, directoryInput, directoryPhotoList, directoryList, dirUi, handleDirectory, resetDirectory } from './directory';
 import { basicDefaults, basicVars, DIM_DEFAULT, getPrefs, worldDefaults, worldSettings, worldVarsOf, type Mark } from '../core/settings';
 import { colConfig } from '../core/world/statuscols';
 import { adjustWallet, walletEditable, aliveAnchors, formatWon, parseWon, readWallet, removeWalletEntry, walletBalance, walletVars, WALLET_START_DEFAULT } from '../core/wallet';
-import { walletHeadButton, walletList, walletTab, walletUi as walletTabUi } from './wallet';
+import { walletHeadButton, walletList, walletUi as walletTabUi } from './wallet';
 import { applyRecordsNav, closeToastHtml, endedReport, holdToast, releaseToast, syncCloseToast, handleRecords, journalList, rec, recordsInput, recordsMarkName, recordsNav, recordsTab, resetRecords, type RecordsEnv } from './records';
 
 /** ID카드 잔고 칩 → 장부 창 (열림·입력 알림) */
@@ -94,9 +94,9 @@ let busy = false;
 let notice = '';
 /** 괴담넷 탭 (완성 전까지 숨김) */
 const GNET_ON = true;
-/** records = 「기록」(일지·보고서·인물·세력, 2026-10-29 가계부 메뉴 자리). wallet 은 메뉴에서 빠졌지만 사원증 잔고 줄·폰 머리 칩이 연다 */
-type Tab = 'board' | 'map' | 'mission' | 'gnet' | 'phone' | 'wiki' | 'records' | 'wallet' | 'settings';
-const TABS: Tab[] = ['board', 'map', 'mission', ...(GNET_ON ? (['gnet'] as Tab[]) : []), 'phone', 'wiki', 'records', 'wallet'];
+/** records = 「기록」(일지·가계부·인물·세력, 2026-10-29 가계부 메뉴 자리). 가계부는 2026-11-05부터 기록의 하위 탭: 사원증 잔고 줄·폰 머리 칩·옛 「wallet」 탭 요청은 openWallet() 으로 */
+type Tab = 'board' | 'map' | 'mission' | 'gnet' | 'phone' | 'wiki' | 'records' | 'settings';
+const TABS: Tab[] = ['board', 'map', 'mission', ...(GNET_ON ? (['gnet'] as Tab[]) : []), 'phone', 'wiki', 'records'];
 let tab: Tab = 'board';
 /** 커스텀 임무 시작 화면에서 "다시 고르기"를 눌렀을 때 */
 let repick = false;
@@ -210,37 +210,8 @@ function ensureRoot(): HTMLElement {
     const take = !names.length ? undefined : names.length > 1 ? JSON.stringify(names.map(val)) : root?.querySelector<HTMLInputElement>(`[name="${names[0]}"]`)?.value;
     void run(el.dataset.action!, take ?? el.dataset.value);
   });
-  // 명부 얼굴 틀: 대표 사진을 누르거나 끌면 그 자리가 틀 가운데 (틀이 사진 밖으로 나가지 않게)
-  root.addEventListener('pointerdown', (ev) => {
-    const box = (ev.target as HTMLElement).closest?.<HTMLElement>('[data-crop]');
-    const img = box?.querySelector('img');
-    if (!box || !img) return;
-    ev.preventDefault();
-    const key = box.dataset.crop ?? '';
-    const frame = box.querySelector<HTMLElement>('.dir-crop-frame');
-    const move = (e: PointerEvent) => {
-      const r = img.getBoundingClientRect();
-      if (!r.width || !r.height) return;
-      const w = cropValue(key)[2];
-      const half = ((w / 100) * r.width) / 2;
-      const px = Math.max(Math.min(half, r.width / 2), Math.min(r.width - half, e.clientX - r.left));
-      const py = Math.max(Math.min(half, r.height / 2), Math.min(r.height - half, e.clientY - r.top));
-      const c: [number, number, number] = [(px / r.width) * 100, (py / r.height) * 100, w];
-      setCrop(key, c);
-      if (frame) Object.assign(frame.style, { left: `${c[0]}%`, top: `${c[1]}%` });
-    };
-    move(ev);
-    box.setPointerCapture?.(ev.pointerId);
-    const up = () => {
-      box.removeEventListener('pointermove', move);
-      box.removeEventListener('pointerup', up);
-      box.removeEventListener('pointercancel', up);
-      render();
-    };
-    box.addEventListener('pointermove', move);
-    box.addEventListener('pointerup', up);
-    box.addEventListener('pointercancel', up);
-  });
+  // 명부 얼굴 틀 끌기 (directory.ts bindCropDrag, 설정 창과 공용)
+  bindCropDrag(root, render);
   // 명부 요원 순서 (PC): 손잡이를 끌어 같은 소속 요원 위·아래에 놓는다. 놓으면 dir-move before/after
   root.addEventListener('pointerdown', (ev) => {
     const grip = (ev.target as HTMLElement).closest?.<HTMLElement>('[data-drag-agent]');
@@ -359,6 +330,9 @@ function ensureRoot(): HTMLElement {
     if (ev.key !== 'Escape') return;
     // 설정·세계 편집 창이 떠 있으면 그 창이 닫힌다 (editor/index.ts). 뒤의 패널까지 같이 닫지 않는다
     if (editorOpen()) return;
+    // 사원증·요원 정보 작은 창이 떠 있으면 그것만 닫는다 (2026-11-05: Esc가 창을 지나쳐 패널 전체를 닫던 문제)
+    const pop = document.querySelector('.gx-agpop');
+    if (pop) return void pop.remove();
     if (evUi.pop || agUi.pop) {
       evUi.pop = agUi.pop = '';
       render();
@@ -700,6 +674,7 @@ async function handle(action: string, value?: string): Promise<void> {
   if (featCtx && action.startsWith('gn-') && (await handleGnet(action, value, featCtx, gnetEnv))) return;
   if (featCtx && action.startsWith('ph-') && (await handlePhone(action, value, featCtx, phoneEnv))) return;
   if (action === 'ed-open') {
+    document.querySelectorAll('.gx-agpop').forEach((b) => b.remove()); // 사원증 창이 설정 창 위에 남지 않게 (2026-11-05)
     // 설정·세계 편집 창 (별도 창 하나, 2026-10-27: 모든 설정은 이 창). 시작 전(시작 패널)에도 열 수 있다: ctx 가 있으면
     if (!(view.kind === 'started' || view.kind === 'picker' || view.kind === 'opening')) return;
     if (view.kind === 'picker') pickerPrefs = true; // 시작 전: 설정 단추가 기본값 범위로 가게
@@ -813,6 +788,7 @@ async function handle(action: string, value?: string): Promise<void> {
       // PC 왼쪽 메뉴(nav-tab): 이미 보고 있는 탭을 한 번 더 누르면 상황판으로 (2026-10-21 사용자, 모바일 아래 줄(tab)은 그대로)
       if (action === 'nav-tab' && value === tab && value !== 'board' && !matchMedia('(max-width: 760px)').matches) value = 'board';
       if (value === 'settings') return handle('ed-open', 'set:screen');
+      if (value === 'wallet') return openWallet();
       tab = TABS.includes(value as Tab) ? (value as Tab) : 'board';
       notice = '';
       // 지도·커스텀 임무에서 고른 목표·편성은 다른 탭에 다녀와도 그대로 둔다
@@ -836,7 +812,7 @@ async function handle(action: string, value?: string): Promise<void> {
       const m = marks()[Number(value)];
       if (!m || view.kind !== 'started') return;
       markUi.pop = false;
-      closeDrawer();
+      closeDrawer('gx-bdrawer');
       // 「설정」 즐겨찾기는 설정 창을 연다 (판 안 설정 화면은 안 쓴다, 2026-10-29)
       if (m.s.tab === 'settings') return handle('ed-open', 'set:screen');
       return applyNav(openable(view.ctx, m.s as unknown as NavState));
@@ -844,7 +820,7 @@ async function handle(action: string, value?: string): Promise<void> {
     case 'mk-here':
     case 'mk-add': {
       if (view.kind !== 'started') return;
-      const m = action === 'mk-here' ? markOf(navState()) : markCandidates(recentMarks(), markOf(navState()))[Number(value)];
+      const m = action === 'mk-here' ? currentMark() : markCandidates(recentMarks(), currentMark())[Number(value)];
       if (m) await addMark(m);
       return render();
     }
@@ -1051,7 +1027,7 @@ async function turnWorldOn(): Promise<void> {
 }
 
 const TAB_TITLE: Record<Tab, string> = {
-  board: '상황판', map: '임무', mission: '커스텀', gnet: '괴담넷', phone: '괴담톡', wiki: '위키', records: '기록', wallet: '가계부', settings: '설정',
+  board: '상황판', map: '임무', mission: '커스텀', gnet: '괴담넷', phone: '괴담톡', wiki: '위키', records: '기록', settings: '설정',
 };
 
 function header(sub: string, extra = ''): string {
@@ -1064,9 +1040,9 @@ function header(sub: string, extra = ''): string {
 /** 진행 중 화면의 머리: 지금 탭 이름 (위협도는 기준이 헷갈리기만 해서 아예 뺐다, 사용자 결정) */
 function startedHeader(ctx: ChatContext): string {
   return `<header class="gx-head">
-    <div class="gx-brand gx-tabhead"><span class="gx-hmark"><span class="gx-logo">${GHOST_ICON}</span><span class="gx-mark-txt"><b aria-label="${BRAND.name}">${brandHtml('var(--text)', 'var(--signal)')}</b></span></span><span class="gx-hsep" aria-hidden="true">›</span><span class="gx-tabicon">${ICONS[tab]}</span><div><b>${tab === 'gnet' ? gnetLabel(ctx.chat.scriptstate) : TAB_TITLE[tab]}</b></div></div>
+    <div class="gx-brand gx-tabhead"><span class="gx-hmark"><span class="gx-logo">${GHOST_ICON}</span><span class="gx-mark-txt"><b aria-label="${BRAND.name}">${brandHtml('var(--text)', 'var(--signal)')}</b></span></span><span class="gx-hsep" aria-hidden="true">›</span>${navHist.can(-1) ? `<button class="gx-hback" data-action="nav-back" aria-label="뒤로" title="뒤로">${ICONS.back}</button>` : ''}<span class="gx-tabicon">${ICONS[tab]}</span><div><b>${tab === 'gnet' ? gnetLabel(ctx.chat.scriptstate) : TAB_TITLE[tab]}</b></div></div>
     <div class="gx-head-act">
-      ${walletHeadButton(ctx, tab === 'wallet')}
+      ${walletHeadButton(ctx, tab === 'records' && rec.sub === 'wallet' && rec.view === 'list')}
       <button class="gx-x gx-recbtn${tab === 'records' ? ' on' : ''}" data-action="tab" data-value="records" aria-label="기록" title="기록">${ICONS.records}</button>
       <button class="gx-x gx-idbtn" data-action="id-card" aria-label="내 ID카드">${userInfo().photo ? `<img src="${esc(userInfo().photo!)}" alt="">` : ICONS.idcard}</button>
       <button class="gx-x" data-action="ed-open" data-value="set:screen" aria-label="설정">${ICONS.settings}${hasUpdate(ctx) ? '<span class="gx-xdot" aria-label="새 버전"></span>' : ''}</button>
@@ -1199,7 +1175,7 @@ function render(): void {
   bindSwipeBack(root, navStep);
   if (view.kind === 'started') navHist.record(navState());
   // PC ‹ › : 기록은 그린 뒤에 적으니 단추 상태는 여기서
-  root.querySelectorAll<HTMLButtonElement>('.gx-nh[data-action^="nav-"]').forEach((b) => (b.disabled = !navHist.can(b.dataset.action === 'nav-back' ? -1 : 1)));
+  root.querySelectorAll<HTMLButtonElement>('.gx-nh[data-action^="nav-"], .gx-hback').forEach((b) => (b.disabled = !navHist.can(b.dataset.action === 'nav-back' ? -1 : 1)));
   setCurrentTheme(themeName(root.dataset.theme));
 }
 
@@ -1223,6 +1199,16 @@ interface NavState {
   a?: string;
 }
 const navHist = new NavHistory<NavState>();
+
+/** 잔고 칩·사원증 잔고 줄·옛 「가계부」 탭 요청 → 기록 › 가계부 (2026-11-05 사용자: 가계부는 기록의 하위 탭) */
+function openWallet(): void {
+  tab = 'records';
+  notice = '';
+  field.confirmEnd = null;
+  resetSettings();
+  applyRecordsNav({ sub: 'wallet', view: 'list', id: '' });
+  render();
+}
 
 function navState(): NavState {
   const s: NavState = { tab };
@@ -1268,10 +1254,19 @@ function markOf(raw: NavState): Mark {
   return { s: s as unknown as Mark['s'], name };
 }
 
-/** 최근 본 화면 (설정은 빼고) */
+/** 맨 상황판(사원증 창 없이)은 즐겨찾기 대상이 아니다 — 서랍이 상황판 안에 있어 의미가 없다 (2026-11-05 사용자) */
+const plainBoard = (s: NavState) => s.tab === 'board' && !s.a;
+
+/** 지금 화면의 즐겨찾기 (없으면 null) */
+function currentMark(): Mark | null {
+  const s = navState();
+  return plainBoard(s) ? null : markOf(s);
+}
+
+/** 최근 본 화면 (설정·맨 상황판은 빼고) */
 function recentMarks(): Mark[] {
   const seen = new Set<string>();
-  return navHist.recent().filter((s) => s.tab !== 'settings').map(markOf).filter((m) => {
+  return navHist.recent().filter((s) => s.tab !== 'settings' && !plainBoard(s)).map(markOf).filter((m) => {
     const k = JSON.stringify(m.s);
     return !seen.has(k) && (seen.add(k), true);
   });
@@ -1286,6 +1281,11 @@ function openable(ctx: ChatContext, s: NavState): NavState {
     o.tab = 'records';
     o.r = legacy;
     delete o.w;
+  }
+  // 옛 즐겨찾기 「가계부」 탭 → 기록 › 가계부 (2026-11-05)
+  if ((o.tab as string) === 'wallet') {
+    o.tab = 'records';
+    o.r = { sub: 'wallet', view: 'list', id: '' };
   }
   if (!TABS.includes(o.tab)) o.tab = 'board';
   if (o.p?.room && !readPhone(ctx.chat).rooms[o.p.room]) Object.assign(o.p, { view: 'list', room: null });
@@ -1343,8 +1343,6 @@ function startedBody(ctx: ChatContext): string {
       return gnetTab(ctx, gnetEnv);
     case 'phone':
       return phoneTab(ctx, phoneEnv);
-    case 'wallet':
-      return walletTab(ctx);
     case 'records':
       // 폰: 기록 탭의 서랍엔 하위 탭 넷(ui/records.ts), 필드 탭은 상황판처럼 즐겨찾기 서랍 (2026-10-29 사용자)
       return recordsTab(ctx);
@@ -1374,7 +1372,7 @@ function body(): string {
       </div>`;
     case 'started':
       evSeenReset();
-      return `${tabs()}${startedHeader(view.ctx)}<div class="gx-content">${tab === 'settings' ? '' : updateBanner(view.ctx)}${notice && tab !== 'map' && tab !== 'mission' ? `<div class="${noticeClass(notice)} gx-notice" role="alert">${esc(notice)}</div>` : ''}${startedBody(view.ctx)}</div>${evPopup(boardClock(view.ctx))}${tab === 'board' ? agentPopup((n) => view.kind === 'started' && hasPersonRecord(view.ctx, n)) : ''}${markPop(markOf(navState()), recentMarks())}${closeToastHtml()}`;
+      return `${tabs()}${startedHeader(view.ctx)}<div class="gx-content">${tab === 'settings' ? '' : updateBanner(view.ctx)}${notice && tab !== 'map' && tab !== 'mission' ? `<div class="${noticeClass(notice)} gx-notice" role="alert">${esc(notice)}</div>` : ''}${startedBody(view.ctx)}</div>${evPopup(boardClock(view.ctx))}${tab === 'board' ? agentPopup((n) => view.kind === 'started' && hasPersonRecord(view.ctx, n)) : ''}${markPop(currentMark(), recentMarks())}${closeToastHtml()}`;
     case 'opening':
       return `${header('커스텀 임무 · 첫 장면 고르기', '<button class="gx-x" data-action="repick" aria-label="시작 설정 다시 고르기">' + ICONS.back + '</button>')}<div class="gx-content">${missionTab(view.ctx, true, notice, busy)}</div>`;
     case 'picker':
@@ -1462,7 +1460,7 @@ function tabs(): string {
     ${item('records', '기록', ICONS.records, 'desk')}
     <button class="gx-nb desk" data-action="ed-open" data-value="set:screen">${ICONS.settings}<span>설정</span>${ctx && hasUpdate(ctx) ? '<span class="gx-nbadge dot" aria-label="새 버전"></span>' : ''}</button>
     <span class="gx-nav-gap"></span>
-    ${ctx ? navHistBar(markOf(navState())) : ''}
+    ${ctx ? navHistBar(currentMark()) : ''}
     ${mobileBar(item, unreadPhone, ctx)}
   </nav>`;
 }

@@ -109,8 +109,9 @@ function fieldRow(kind: WorldKind, rec: WorldRecord, def: FieldDef, name: string
   const ctl = def.type === 'line'
     ? `<input data-input="ed-field" data-key="${esc(key)}" value="${esc(v)}" autocomplete="off" placeholder="${esc(ph)}">`
     : `<textarea data-input="ed-field" data-key="${esc(key)}" rows="3" placeholder="${esc(ph)}">\n${esc(v)}</textarea>`;
-  return `<div class="gw-field" data-field-row="${esc(def.id)}" draggable="true">
-    <div class="gw-field-head"><span class="gw-grip" title="끌어서 순서 바꾸기">${ICONS.grip}</span><b>${esc(def.label)}</b><small class="gw-ftitle">${esc(def.title)}</small>${def.hint ? `<span class="gw-fhint" title="${esc(def.hint)}">?</span>` : ''}<span class="gw-ftok">${tok ? `${tok}토큰` : ''}</span>
+  // 끌기는 손잡이에만 건다: 줄 전체가 draggable 이면 글칸의 글을 긁어 고를 수 없다 (2026-11-05 사용자). 순서는 ▲▼ 단추로도 바꾼다
+  return `<div class="gw-field" data-field-row="${esc(def.id)}">
+    <div class="gw-field-head"><span class="gw-grip" draggable="true" title="끌어서 순서 바꾸기">${ICONS.grip}</span><b>${esc(def.label)}</b><small class="gw-ftitle">${esc(def.title)}</small>${def.hint ? `<span class="gw-fhint" title="${esc(def.hint)}">?</span>` : ''}<span class="gw-ftok">${tok ? `${tok}토큰` : ''}</span>
       <span class="gw-fmove"><button class="gx-mini icon" data-action="ed-field-up" data-value="${esc(def.id)}" aria-label="위로">${ICONS.up}</button><button class="gx-mini icon" data-action="ed-field-down" data-value="${esc(def.id)}" aria-label="아래로">${ICONS.down}</button></span></div>
     ${ctl}</div>`;
 }
@@ -122,8 +123,8 @@ function extraRow(kind: WorldKind, rec: WorldRecord, e: ExtraField, i: number, n
   const ctl = e.kind === 'line'
     ? `<input data-input="ed-extra" data-key="${esc(key)}" value="${esc(e.value)}" autocomplete="off">`
     : `<textarea data-input="ed-extra" data-key="${esc(key)}" rows="3">\n${esc(e.value)}</textarea>`;
-  return `<div class="gw-field extra" data-field-row="${esc(id)}" draggable="${e.kind === 'block'}">
-    <div class="gw-field-head"><span class="gw-grip">${e.kind === 'block' ? ICONS.grip : ''}</span><input class="gw-xname" data-input="ed-extra-name" data-key="${esc(key)}" value="${esc(e.name)}" aria-label="칸 이름">${place}<span class="gw-ftok">${tokens(e.value) ? `${tokens(e.value)}토큰` : ''}</span>
+  return `<div class="gw-field extra" data-field-row="${esc(id)}">
+    <div class="gw-field-head"><span class="gw-grip"${e.kind === 'block' ? ' draggable="true" title="끌어서 순서 바꾸기"' : ''}>${e.kind === 'block' ? ICONS.grip : ''}</span><input class="gw-xname" data-input="ed-extra-name" data-key="${esc(key)}" value="${esc(e.name)}" aria-label="칸 이름">${place}<span class="gw-ftok">${tokens(e.value) ? `${tokens(e.value)}토큰` : ''}</span>
       <span class="gw-fmove">${e.kind === 'block' ? `<button class="gx-mini icon" data-action="ed-field-up" data-value="${esc(id)}" aria-label="위로">${ICONS.up}</button><button class="gx-mini icon" data-action="ed-field-down" data-value="${esc(id)}" aria-label="아래로">${ICONS.down}</button>` : ''}<button class="gx-mini icon danger" data-action="ed-extra-del" data-value="${i}" aria-label="칸 지우기">${ICONS.trash}</button></span></div>
     ${ctl}</div>`;
 }

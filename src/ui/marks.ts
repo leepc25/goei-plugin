@@ -13,17 +13,22 @@ const icon = (m: Mark) => ICONS[m.s.tab as keyof typeof ICONS] ?? ICONS.board;
 
 export const markUi = { pop: false };
 
-export const marks = (): Mark[] => getPrefs().marks ?? [];
+/** 저장된 즐겨찾기 손질 (2026-11-05 사용자): 「필드」(11-04 제거)와 맨 상황판(서랍이 상황판 안에 있어 의미 없음)은 거르고,
+ *  옛 「가계부」 탭은 기록 › 가계부로 옮긴다 */
+const alive = (list: Mark[] | undefined): Mark[] => (list ?? [])
+  .filter((m) => m.s.tab !== 'field' && !(m.s.tab === 'board' && !m.s.a))
+  .map((m) => (m.s.tab === 'wallet' ? { ...m, s: { tab: 'records', r: { sub: 'wallet', view: 'list', id: '' } } } : m));
+export const marks = (): Mark[] => alive(getPrefs().marks);
 export const isMarked = (m: Mark) => marks().some((x) => key(x) === key(m));
 
 export async function addMark(m: Mark): Promise<boolean> {
   if (isMarked(m) || marks().length >= MARK_MAX) return false;
-  await savePrefs((p) => ({ ...p, marks: [...(p.marks ?? []), m] }));
+  await savePrefs((p) => ({ ...p, marks: [...alive(p.marks), m] }));
   return true;
 }
 
 export async function removeMarkAt(i: number): Promise<void> {
-  await savePrefs((p) => ({ ...p, marks: (p.marks ?? []).filter((_, j) => j !== i) }));
+  await savePrefs((p) => ({ ...p, marks: alive(p.marks).filter((_, j) => j !== i) }));
 }
 
 /** 즐겨찾기 창에서 넣을 수 있는 최근 화면 (mk-add의 번호가 이 목록 기준) */

@@ -678,7 +678,7 @@ export function wikiTab(ctx: ChatContext): string {
       tool('wiki-home', ICONS.wiki, '위키 메인', wiki.view === 'home' ? 'aria-pressed="true"' : '', '메인'),
       tool('wiki-find', ICONS.search, '위키 검색', '', '검색'),
       tool('wiki-list', ICONS.list, open ? '목록 접기' : '목록 펼치기', `aria-pressed="${open}"`, '목록'),
-    ].join(''))}
+    ].join(''), '', '', 'wiki')}
     ${note}
   </main>`;
 }

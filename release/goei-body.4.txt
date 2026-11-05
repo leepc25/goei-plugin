@@ -1,146 +1,4 @@
-"dm" && !!conv.ownerHasNotReplied;
-    conv.followupAlreadySent = conv.directReplyPending ? !!r.followupSent : false;
-    if (conv.directReplyPending) conv.defaultNextAction = "wait_for_owner";
-    return {
-      id: r.id,
-      kind: r.kind,
-      name: roomLabel(r),
-      privateDirection: r.topic ?? "",
-      activeMembers: r.members,
-      participants,
-      pov: "me",
-      messages,
-      conversationState: conv,
-      candidateOnly: !hasTalk && r.kind === "dm",
-      directoryEstablishesRelationship: false,
-      action: r.pending?.action ?? { type: "refresh" }
-    };
-  }
-  function participant(src, c, related2, status2, names4) {
-    let lore = "";
-    let title2 = "";
-    if (related2) {
-      const candidates = c.custom ? [c.name] : c.lore ? [c.lore] : [`${c.english} ${c.name}`, `${c.name} ${c.english}`, c.name, c.english ?? ""];
-      for (const n2 of candidates) {
-        const t = bookText(src, n2);
-        if (t) {
-          lore = t;
-          title2 = n2;
-          break;
-        }
-      }
-    }
-    return {
-      sender: c.id,
-      name: c.name,
-      faction: c.group,
-      factionDisplayName: names4[c.group ?? ""] ?? c.group,
-      rank: c.rank,
-      department: c.department,
-      source: title2,
-      lore,
-      hasCharacterLore: !!lore.trim(),
-      manuallySavedContact: !!c.custom,
-      contactMemo: c.custom ? c.note ?? "" : void 0,
-      narratorOnlyAgentStatus: status2 && c.agentId ? agentStatus(src.chat, c.agentId) : void 0
-    };
-  }
-  function ownerCharacter(src) {
-    const a = playerAgent(src.char.globalLore, src.chat.scriptstate);
-    return a ? { character: a.name, ...a.rank ? { rank: a.rank } : {} } : {};
-  }
-  function narrator(src, names4, related2, text4) {
-    applyAdvanced(src.chat.scriptstate);
-    const n2 = trimTurns(HISTORY2.turns);
-    const turns2 = n2 ? recentTurns(src.chat, n2) : [];
-    const recentStory = [];
-    turns2.forEach((t2, i) => {
-      if (t2.user) recentStory.push({ role: "user", text: t2.user, turn: i + 1 });
-      for (const c of t2.char) recentStory.push({ role: "char", text: c, turn: i + 1 });
-    });
-    const last2 = turns2[turns2.length - 1];
-    const faction = String(src.chat.scriptstate?.["$st_faction"] ?? "") || "none";
-    const t = refToggles(src.chat.scriptstate, "ph");
-    const rows2 = collectRefs(src, {
-      scope: "phone",
-      text: `${text4}
-${recentStory.map((m) => m.text).join("\n")}`,
-      description: t.description,
-      authors: t.authors,
-      persona: t.persona,
-      active: t.active,
-      related: related2 && !trimRelated(),
-      secondary: t.secondary && !trimSecondary()
-    });
-    const universe = { characterDescription: "", authorsNote: "", activeLoreBooks: [] };
-    for (const r of rows2) {
-      if (r.sources.includes("봇 설명") && r.kind === "base") universe.characterDescription = r.content;
-      else if (r.sources.includes("작가 노트") && r.kind === "base") universe.authorsNote = r.content;
-      else if (r.sources.includes(PERSONA_SOURCE) && r.kind === "base") universe.userPersona = r.content;
-      else universe.activeLoreBooks.push({ source: r.sources.join(" / "), content: r.content, kind: r.kind });
-    }
-    return {
-      owner: { name: "주인공", faction, factionDisplayName: names4[faction] ?? faction, ...ownerCharacter(src) },
-      recentStory,
-      currentSceneEntries: last2 ? (last2.user ? 1 : 0) + last2.char.length : 0,
-      currentSceneTime: phoneTime(src.chat),
-      factionLabels: names4,
-      universe
-    };
-  }
-  function crossRoom(body5, st) {
-    const wanted = new Set(body5.participants.map((p) => p.sender));
-    if (!wanted.size) return;
-    const covered = new Set((body5.rooms ?? (body5.room ? [body5.room] : [])).map((r) => r.id));
-    const counts = /* @__PURE__ */ new Map();
-    const candidates = [];
-    for (const [rid, r] of Object.entries(st.rooms)) {
-      if (covered.has(rid)) continue;
-      for (const m of r.messages) {
-        if (m.kind !== "message" || m.sender === "system") continue;
-        const allowed = /* @__PURE__ */ new Set();
-        if (wanted.has(m.sender)) allowed.add(m.sender);
-        for (const c of m.audience ?? []) if (wanted.has(c)) allowed.add(c);
-        if (allowed.size) candidates.push({ room: r, m, allowed });
-      }
-    }
-    candidates.sort((a, b) => b.m.id - a.m.id || a.room.id.localeCompare(b.room.id));
-    const records = [];
-    for (const e of candidates) {
-      const knownBy = [];
-      for (const c of e.allowed) {
-        const n2 = counts.get(c) ?? 0;
-        if (n2 < HISTORY2.room) {
-          counts.set(c, n2 + 1);
-          knownBy.push(c);
-        }
-      }
-      if (knownBy.length) {
-        records.push({
-          room: e.room.id,
-          roomName: e.room.kind === "group" ? roomLabel(e.room) : void 0,
-          kind: e.room.kind,
-          recordID: e.m.id,
-          sender: e.m.sender,
-          senderName: e.room.people[e.m.sender]?.name,
-          time: e.m.time,
-          content: e.m.text,
-          knownBy: knownBy.sort()
-        });
-      }
-    }
-    if (records.length) body5.crossRoomMessages = records.reverse();
-  }
-  function contactSources(body5) {
-    const out = [];
-    const add = (kind, text4, sender) => {
-      const t = String(text4 ?? "").trim();
-      if (t) out.push({ id: `s${out.length + 1}`, kind, text: t, ...sender ? { sender } : {} });
-    };
-    const u = body5.narratorOnly.universe;
-    add("world", u.characterDescription);
-    add("author_note", u.authorsNote);
-    for (const b of u.activeLoreBooks) add("world", b.content);
+ent);
     for (const m of body5.narratorOnly.recentStory) add(m.role === "user" ? "story_input" : "story", m.text);
     for (const p of body5.participants) {
       add("character", p.lore, p.sender);
@@ -739,6 +597,7 @@ The previous response was rejected and nothing was saved. Recreate the complete 
     return `<span class="gx-acard-side">${avatar(char, p.english, p.name, "sq")}${act}</span><span class="gx-acard-txt"><span class="gx-acard-top"><b>${escAttr(p.name)}</b>${stChip(st)}</span>${role ? `<small>${escAttr(role)}</small>` : ""}${situation ? `<span class="gx-acard-sit">${escAttr(situation)}</span>` : ""}</span>`;
   }
   function showIdCard(html, act) {
+    document.querySelectorAll(".gx-idpop").forEach((b) => b.remove());
     const box2 = document.createElement("div");
     box2.className = "gx gx-agpop gx-idpop";
     box2.setAttribute("role", "dialog");
@@ -808,15 +667,14 @@ The previous response was rejected and nothing was saved. Recreate the complete 
     ph: ["$ph_"],
     gn: ["$lb_cfg_lb-gn.", "$gn_storage_"],
     wiki: ["$nw_"],
-    visit: ["$hq_"],
     /** 인물 기록 (core/people/settings.ts PP). 메인 설정의 「덮어쓰기/불러오기」도 같은 접두어를 함께 다룬다 */
     pp: ["$pp_"],
     /** 기록 (core/journal/settings.ts JR): 채팅에 보고서 표시·일지 컨텍스트·소감 자동·상한 둘 */
     jr: ["$jr_"]
   };
-  var MAIN_PREFIXES = ["$gen_", "$hq_adv_", "$pp_"];
+  var MAIN_PREFIXES = ["$gen_", "$pp_"];
   var ALL_PREFIXES = [.../* @__PURE__ */ new Set([...MAIN_PREFIXES, ...Object.values(PREFIXES).flat()])];
-  var NAME = { ph: "괴담톡", gn: "괴담넷", wiki: "위키", visit: "필드", pp: "인물 기록", jr: "기록" };
+  var NAME = { ph: "괴담톡", gn: "괴담넷", wiki: "위키", pp: "인물 기록", jr: "기록" };
   var defaultsAsk = { pane: "", what: "" };
   var defaultsButtons = (pane2, off = false) => `<span class="ps-defaults"><button class="st-act save" data-action="${pane2}-def-ask" data-value="save" ${off ? "disabled" : ""}>${ICONS.pen}기본값으로 저장</button><button class="st-act" data-action="${pane2}-def-ask" data-value="load" ${off ? "disabled" : ""}>${ICONS.refresh}기본값 불러오기</button></span>`;
   function defaultsConfirm(pane2) {
@@ -876,22 +734,26 @@ The previous response was rejected and nothing was saved. Recreate the complete 
   }
 
   // src/ui/drawer.ts
-  var open = false;
-  function drawerHtml(tools, above = "", cls = "") {
-    return `<div class="ph-drawer${cls ? ` ${cls}` : ""}${open ? " open" : ""}">
-    <button class="ph-grip" type="button" aria-label="${open ? "도구 접기" : "도구 펼치기"}" aria-expanded="${open}"><i></i></button>
-    ${above}<div class="ph-tools">${tools}</div></div>`;
+  var opened = /* @__PURE__ */ new Map();
+  var isOpen = (key2) => opened.get(key2) === true;
+  function shell(key2, cls, inner) {
+    const open2 = isOpen(key2);
+    return `<div class="ph-drawer${cls ? ` ${cls}` : ""}${open2 ? " open" : ""}" data-drawer="${key2}">
+    <button class="ph-grip" type="button" aria-label="${open2 ? "도구 접기" : "도구 펼치기"}" aria-expanded="${open2}"><i></i></button>
+    ${inner}</div>`;
   }
-  function drawerBox(content, cls = "", after = "") {
-    return `<div class="ph-drawer gx-mdrawer${cls ? ` ${cls}` : ""}${open ? " open" : ""}">
-    <button class="ph-grip" type="button" aria-label="${open ? "도구 접기" : "도구 펼치기"}" aria-expanded="${open}"><i></i></button>
-    <div class="ph-dbody">${content}</div>${after}</div>`;
+  function drawerHtml(tools, above = "", cls = "", key2 = cls || "tools") {
+    return shell(key2, cls, `${above}<div class="ph-tools">${tools}</div>`);
   }
-  function closeDrawer() {
-    open = false;
+  function drawerBox(content, cls = "", after = "", key2 = cls || "box") {
+    return shell(key2, `gx-mdrawer${cls ? ` ${cls}` : ""}`, `<div class="ph-dbody">${content}</div>${after}`);
+  }
+  function closeDrawer(key2) {
+    if (key2 === void 0) opened.clear();
+    else opened.set(key2, false);
   }
   function set(box2, on2) {
-    open = on2;
+    opened.set(box2.dataset.drawer ?? "tools", on2);
     box2.classList.toggle("open", on2);
     const grip = box2.querySelector(".ph-grip");
     grip?.setAttribute("aria-expanded", String(on2));
@@ -901,7 +763,8 @@ The previous response was rejected and nothing was saved. Recreate the complete 
     const box2 = root3.querySelector(".ph-drawer");
     const grip = box2?.querySelector(".ph-grip");
     if (!box2 || !grip) return;
-    grip.addEventListener("click", () => set(box2, !open));
+    const open2 = () => box2.classList.contains("open");
+    grip.addEventListener("click", () => set(box2, !open2()));
     let y0 = null;
     let x0 = 0;
     box2.addEventListener("touchstart", (e) => {
@@ -913,9 +776,9 @@ The previous response was rejected and nothing was saved. Recreate the complete 
       const dy = (e.changedTouches[0]?.clientY ?? y0) - y0;
       const dx = (e.changedTouches[0]?.clientX ?? x0) - x0;
       y0 = null;
-      if (onSide && open && box2.classList.contains("gx-bdrawer") && Math.abs(dx) > 48 && Math.abs(dx) > Math.abs(dy) * 1.4) return onSide();
-      if (dy < -24 && !open) set(box2, true);
-      else if (dy > 24 && open) set(box2, false);
+      if (onSide && open2() && box2.classList.contains("gx-bdrawer") && Math.abs(dx) > 48 && Math.abs(dx) > Math.abs(dy) * 1.4) return onSide();
+      if (dy < -24 && !open2()) set(box2, true);
+      else if (dy > 24 && open2()) set(box2, false);
     }, { passive: true });
   }
 
@@ -1021,14 +884,14 @@ ${String(r.result ?? "").slice(0, 300)}`, String(r.result ?? ""));
   }
 
   // src/ui/panels.ts
-  var open2 = /* @__PURE__ */ new Set();
-  var keepOpen = (key2, fallback = false) => open2.has(key2) || fallback && !open2.has(`!${key2}`) ? " open" : "";
+  var open = /* @__PURE__ */ new Set();
+  var keepOpen = (key2, fallback = false) => open.has(key2) || fallback && !open.has(`!${key2}`) ? " open" : "";
   function rememberPanel(el) {
     const key2 = el.dataset.keep;
     if (!key2) return;
-    open2.delete(key2);
-    open2.delete(`!${key2}`);
-    open2.add(el.open ? key2 : `!${key2}`);
+    open.delete(key2);
+    open.delete(`!${key2}`);
+    open.add(el.open ? key2 : `!${key2}`);
   }
 
   // src/ui/advanced.ts
@@ -1079,7 +942,7 @@ ${String(r.result ?? "").slice(0, 300)}`, String(r.result ?? ""));
   }
   var blank2 = (item2) => item2.v ? String(item2.def) : "";
   function parse2(value) {
-    const m = /^(gn|ph|nw|hq|gen):([a-z_]+)=(.*)$/.exec(value);
+    const m = /^(gn|ph|nw|gen):([a-z_]+)=(.*)$/.exec(value);
     if (!m) return null;
     const f = m[1];
     const item2 = advItem(f, m[2]);
@@ -1828,12 +1691,12 @@ ${String(r.result ?? "").slice(0, 300)}`, String(r.result ?? ""));
       const on2 = phone.view === "notice" && phone.openNotice === r.id;
       const confirm = phone.confirm === `notice:${r.id}`;
       const del = confirm ? `<button class="gx-mini danger ph-ndel" data-action="ph-notice-del" data-value="${r.id}">정말 삭제</button>` : `<button class="ph-tool sm ph-ndel" data-action="ph-notice-del" data-value="${r.id}" title="삭제" aria-label="${esc8(r.title)} 삭제">${ICONS.trash}</button>`;
-      const open3 = phone.openNotice === r.id;
-      return `<li class="ph-notice${on2 ? " on" : ""}${open3 ? " open" : ""}${r.read === false ? " new" : ""}"><button class="ph-ncard" data-action="ph-notice" data-value="${r.id}" aria-pressed="${on2}" aria-expanded="${open3}">
+      const open2 = phone.openNotice === r.id;
+      return `<li class="ph-notice${on2 ? " on" : ""}${open2 ? " open" : ""}${r.read === false ? " new" : ""}"><button class="ph-ncard" data-action="ph-notice" data-value="${r.id}" aria-pressed="${on2}" aria-expanded="${open2}">
         <span class="ph-ncard-top"><span class="gx-badge">${esc8(r.category)}</span><span class="ph-nfac">${esc8(label2(r.channel, r.channelName))}</span><small>${esc8(r.issuer)}${r.time ? ` · ${esc8(r.time)}` : ""}</small></span>
         <span class="ph-ncard-title"><b>${esc8(r.title)}</b>${r.read === false ? '<span class="gn-dot" aria-label="안 읽음"></span>' : ""}</span>
 </button>${del}
-        ${open3 ? `<div class="ph-notice-body">${esc8(r.text).replace(/\n/g, "<br>")}</div>` : ""}</li>`;
+        ${open2 ? `<div class="ph-notice-body">${esc8(r.text).replace(/\n/g, "<br>")}</div>` : ""}</li>`;
     }).join("")}</ul>`;
   }
   function noticeDetail(ctx2) {
@@ -1996,7 +1859,7 @@ ${String(r.result ?? "").slice(0, 300)}`, String(r.result ?? ""));
       ${detail ? "" : status2}
       <div class="ph-content">${listHtml(ctx2, st, d)}</div>
       ${fail3}
-      ${drawerHtml(tools)}
+      ${drawerHtml(tools, "", "", "phone")}
     </section>
     <section class="ph-pane">${detail ? status2 : ""}${paneHtml(ctx2, st, d, busy4)}</section>
     ${note}
@@ -2863,7 +2726,7 @@ ${String(r.result ?? "").slice(0, 300)}`, String(r.result ?? ""));
       <div class="ph-content">${gnet.sub === "board" ? boardList(st, busy4, mobile) : dmList(st, busy4, mobile)}</div>
       ${mobile && !kind ? inlineComposer(st, busy4) : ""}
       ${fail3}
-      ${drawerHtml(tools, nick)}
+      ${drawerHtml(tools, nick, "", "gnet")}
     </section>
     <section class="ph-pane">${kind ? status2 : ""}${paneHtml2(ctx2, st, kind, busy4)}</section>
     ${note}
@@ -2881,9 +2744,9 @@ ${String(r.result ?? "").slice(0, 300)}`, String(r.result ?? ""));
       return null;
     }
   }
-  async function autoRefreshGnet(ctx2, messageIndex, open3 = false, joint) {
+  async function autoRefreshGnet(ctx2, messageIndex, open2 = false, joint) {
     const s5 = gnetSettings(ctx2.chat.scriptstate);
-    if (!s5.enabled || !(open3 ? s5.autoOpen : s5.auto) || jobs2.has(chatKey2(ctx2))) return;
+    if (!s5.enabled || !(open2 ? s5.autoOpen : s5.auto) || jobs2.has(chatKey2(ctx2))) return;
     const data3 = String(ctx2.chat.message?.[messageIndex]?.data ?? "");
     if (!data3.trim()) return;
     let hash3 = 7;
@@ -3861,7 +3724,7 @@ Next Paragraph Text
     }
     return { next, lore: lore.count, scripts: scripts.count, fields: fields3 };
   }
-  var PLUGIN_VERSION = true ? "0.20.4" : "0";
+  var PLUGIN_VERSION = true ? "0.20.5" : "0";
 
   // src/core/pictures.ts
   function pictures(m) {
@@ -3918,4 +3781,128 @@ Next Paragraph Text
     const byKey = key2 ? lore.find((e) => isFolder2(e) && e.key === key2) : void 0;
     if (byKey) return byKey;
     const name = which === "settings" ? SETTINGS_FOLDER_NAME : WIKI_FOLDER_NAME;
-    return lore.find((e) => isFolder2(e) && str5(e.comment).trim() === name) ?? (which === "wiki" ? lore.find((e) => isFolder2(e) && e.key === WIKI_FOLDER_KEY) 
+    return lore.find((e) => isFolder2(e) && str5(e.comment).trim() === name) ?? (which === "wiki" ? lore.find((e) => isFolder2(e) && e.key === WIKI_FOLDER_KEY) : void 0);
+  }
+  var isRow4 = (r) => Array.isArray(r) && typeof r[0] === "string" && typeof r[1] === "string";
+  function installCheck(i) {
+    const lore = i.lore ?? [];
+    const m = readManifest(lore);
+    const greetings = Array.isArray(i.alternateGreetings) ? i.alternateGreetings : [];
+    const idx = m?.greetings ?? {};
+    const inst = installData();
+    const missing = Object.keys(inst.greetings.index).filter((k) => {
+      const n2 = idx[k];
+      if (!Number.isInteger(n2) || n2 < 0 || n2 >= greetings.length) return true;
+      const want2 = inst.greetings.texts[inst.greetings.index[k]] ?? "";
+      return want2 ? typeof greetings[n2] !== "string" || !greetings[n2].trim() : false;
+    });
+    const have = new Set((Array.isArray(i.assets) ? i.assets : []).filter(isRow4).map((r) => r[0]));
+    const want = pictures(m).length ? pictures(m) : inst.pictures;
+    const missingPics = want.filter((p) => !have.has(p[0]));
+    let directory2 = false;
+    let directoryGaps = 0;
+    try {
+      directory2 = !!readDirectoryData(lore);
+      directoryGaps = directoryGapCount(lore ?? []);
+    } catch {
+      directory2 = false;
+    }
+    return {
+      goei: !!m || directory2,
+      manifest: !!m,
+      directory: directory2,
+      directoryGaps,
+      settingsFolder: !!findFolder(lore, "settings"),
+      wikiFolder: !!findFolder(lore, "wiki"),
+      greetings: { ok: !missing.length, missing, total: Object.keys(inst.greetings.index).length },
+      pictures: { missing: missingPics, bytes: missingPics.reduce((n2, p) => n2 + (Number(p[3]) || 0), 0), total: want.length },
+      icon: i.iconOurs,
+      wikiPack: i.wikiPack,
+      tokenizer: i.tokenizer
+    };
+  }
+  var uuid = () => typeof crypto !== "undefined" && "randomUUID" in crypto ? crypto.randomUUID() : `${Date.now().toString(16)}-${Math.random().toString(16).slice(2)}`;
+  function plantGreetings(existing) {
+    const out = (Array.isArray(existing) ? existing : []).map((g2) => typeof g2 === "string" ? g2 : "");
+    const index = {};
+    const at = /* @__PURE__ */ new Map();
+    out.forEach((g2, n2) => {
+      if (!at.has(g2)) at.set(g2, n2);
+    });
+    const inst = installData();
+    for (const [key2, n2] of Object.entries(inst.greetings.index)) {
+      const text4 = inst.greetings.texts[n2] ?? "";
+      let hit3 = at.get(text4);
+      if (hit3 === void 0) {
+        hit3 = out.length;
+        out.push(text4);
+        at.set(text4, hit3);
+      }
+      index[key2] = hit3;
+    }
+    return { greetings: out, index };
+  }
+  function buildManifest(o) {
+    const prev = o.prev ?? {};
+    return {
+      ...prev,
+      schema: 1,
+      plugin: "goei-plugin",
+      version: prev.version ?? PLUGIN_VERSION,
+      greetings: o.greetings,
+      pictures: pictures(prev).length ? pictures(prev) : installData().pictures,
+      keys: { ...prev.keys ?? {}, settings: o.settingsKey, wiki: o.wikiKey }
+    };
+  }
+  var entry2 = (comment, content, folder, extra = {}) => ({ key: "", secondkey: "", insertorder: 0, comment, content, mode: "normal", alwaysActive: false, selective: false, useRegex: false, folder, bookVersion: 2, ...extra });
+  var folderEntry = (comment, key2) => ({ key: key2, comment, content: "", mode: "folder", insertorder: 100, alwaysActive: false, secondkey: "", selective: false, bookVersion: 2 });
+  var isObj2 = (v) => !!v && typeof v === "object" && !Array.isArray(v);
+  var empty = (v) => v === void 0 || v === null || v === "" || Array.isArray(v) && !v.length || isObj2(v) && !Object.keys(v).length;
+  function fillDirectory(cur, def) {
+    const out = { ...cur };
+    let gaps = 0;
+    for (const [k, dv] of Object.entries(def)) {
+      if (k === "_help") continue;
+      const cv = out[k];
+      if (empty(cv)) {
+        if (!empty(dv)) out[k] = dv, gaps++;
+        continue;
+      }
+      if (k === "괴담톡 탭") {
+        if (isObj2(cv) && empty(cv.tabs) && isObj2(dv) && !empty(dv.tabs)) out[k] = dv, gaps++;
+        continue;
+      }
+      if (!isObj2(cv) || !isObj2(dv)) continue;
+      const sec = { ...cv };
+      for (const [name, de] of Object.entries(dv)) {
+        const ce = sec[name];
+        if (ce === void 0) {
+          sec[name] = de;
+          gaps++;
+        } else if (isObj2(ce) && isObj2(de)) {
+          const row9 = { ...ce };
+          for (const [f, fv] of Object.entries(de)) if (empty(row9[f]) && !empty(fv)) row9[f] = fv, gaps++;
+          sec[name] = row9;
+        }
+      }
+      out[k] = sec;
+    }
+    return { data: out, gaps };
+  }
+  function directoryGapCount(lore) {
+    const parts = directoryEntries(lore).filter((e) => typeof e.content === "string" && e.content.trim());
+    if (!parts.length) return 0;
+    const cur = readDirectoryData(lore);
+    if (!cur) return -1;
+    return data2 ? fillDirectory(cur, installData().directory).gaps : 0;
+  }
+  function installLore(lore, greetings) {
+    const out = [...lore ?? []];
+    let settings = findFolder(out, "settings");
+    if (!settings) {
+      settings = folderEntry(SETTINGS_FOLDER_NAME, `${FOLDER_PREFIX}${uuid()}`);
+      out.push(settings);
+    }
+    const settingsKey = str5(settings.key);
+    const dir2 = directoryEntries(out).filter((e) => typeof e.content === "string" && e.content.trim());
+    const cur = dir2.length ? readDirectoryData(out) : nul

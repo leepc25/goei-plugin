@@ -1262,7 +1262,8 @@ if (want('WL2')) {
   assert.ok((await page.textContent('.gx-hwallet')).includes('140,000'), '머리 잔고 = 시작 잔고 14만');
   await page.tap('.gx-hwallet');
   await page.waitForSelector('.gx-wallettab');
-  assert.equal(await page.locator('.gx-hwallet').count(), 0, '가계부 탭 안에서는 머리 단추 숨김');
+  assert.equal(await page.locator('.gx-hwallet').count(), 0, '가계부 화면 안에서는 머리 단추 숨김');
+  assert.equal(await page.evaluate(() => document.querySelector('.gx').dataset.tab), 'records', '가계부는 기록 탭 안 (2026-11-05)');
   await page.tap('.gx-nav .gx-nb.home[data-value="board"]');
   await page.tap('.gx-idbtn');
   await page.waitForSelector('.gx-idpop .gx-wallet');
@@ -1552,11 +1553,8 @@ async function openReportPage(page, id) {
   await open(page);
   await nav(page, 'records');
   await page.waitForSelector('.gx-records');
-  await page.click('[data-action="rec-sub"][data-value="reports"]');
-  // 칩은 「내가 출동」·「요원 처리」 둘뿐 (사용자 결정) — 보고서가 어느 쪽인지 보고 고른다
-  const mine = await page.evaluate((id) => JSON.parse(window.__chat.scriptstate.$goei_reports).items.find((r) => r.id === id)?.mine, id);
-  await page.click(`[data-action="rec-rfilter"][data-value="${mine ? 'mine' : 'bg'}"]`);
-  await page.click(`.gx-rcard[data-value="${id}"]`);
+  // 보고서 탭은 뺐다(2026-11-05): 일지 줄을 누르면 그 보고서 페이지
+  await page.click(`.gx-jr-row[data-action="rec-open"][data-value="${id}"]`);
   await page.waitForSelector('.gx-rpt');
 }
 

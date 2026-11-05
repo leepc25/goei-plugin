@@ -1,87 +1,4 @@
-ry(w, e) {
-    if (!Number.isSafeInteger(e.amount) || e.amount === 0 || Math.abs(e.amount) > WALLET_MAX) return w;
-    const id = e.id ?? walletEntryId(e.anchor, e.amount, e.memo);
-    if (w.log.some((x) => x.id === id)) return w;
-    return { ...w, log: [...w.log, { ...e, id, memo: e.memo.slice(0, 30), at: e.at ?? (/* @__PURE__ */ new Date()).toISOString() }].slice(-400) };
-  }
-  function removeWalletEntry(w, id) {
-    return { ...w, log: w.log.filter((e) => e.id !== id) };
-  }
-  function adjustWallet(w, alive, target, memo = "잔고 수정") {
-    const diff = Math.trunc(target) - walletBalance(w, alive);
-    if (!diff) return w;
-    return addWalletEntry(w, { anchor: "", amount: diff, memo, src: "manual", id: `m_${Date.now().toString(36)}_${w.log.length}` });
-  }
-  function formatWon(n2) {
-    const abs = Math.abs(Math.trunc(n2)).toLocaleString("en-US");
-    return `${n2 < 0 ? "−" : ""}₩ ${abs}`;
-  }
-  function formatDelta(n2) {
-    if (!n2) return "";
-    return `${n2 > 0 ? "+" : "−"}${Math.abs(Math.trunc(n2)).toLocaleString("en-US")}`;
-  }
-  function parseWon(text4) {
-    const t = String(text4 ?? "").replace(/\s+/g, "");
-    if (!t) return null;
-    const sign = /^[-−]/.test(t) ? -1 : 1;
-    const body5 = t.replace(/^[-−+]/, "").replace(/^₩/, "").replace(/(원|won|KRW)$/i, "");
-    if (/^\d[\d,]*$/.test(body5)) {
-      const n3 = Number(body5.replace(/,/g, ""));
-      return Number.isSafeInteger(n3) ? sign * n3 : null;
-    }
-    const m = /^(?:(\d+(?:\.\d+)?)억)?(?:(\d+(?:\.\d+)?)만)?(?:(\d+)천)?(?:(\d+)백)?(\d+)?$/.exec(body5.replace(/,/g, ""));
-    if (!m || m.slice(1).every((x) => x === void 0)) return null;
-    const n2 = Math.round(Number(m[1] ?? 0) * 1e8 + Number(m[2] ?? 0) * 1e4 + Number(m[3] ?? 0) * 1e3 + Number(m[4] ?? 0) * 100 + Number(m[5] ?? 0));
-    return Number.isSafeInteger(n2) && n2 > 0 ? sign * n2 : null;
-  }
-  function mentionsAmount(text4) {
-    return /(₩\s*\d|\d[\d,]*\s*(?:원|won|KRW)|\d+\s*(?:억|만|천)\s*(?:원)?)/i.test(text4);
-  }
-
-  // src/core/journal/build.ts
-  var text2 = (m) => typeof m?.data === "string" ? m.data : "";
-  var cut2 = (s5, n2) => s5.replace(/\s+/g, " ").trim().slice(0, n2);
-  var NONE2 = /^(?:없음|none|-|—|미정|n\/a)$/i;
-  function parseAgents(deploy, world2, c, faction) {
-    const names4 = codesToNames(deploy ?? "", c, faction).split(/[,，、/·]|\s+및\s+|\s+and\s+/i).map((n2) => n2.trim()).filter((n2) => n2 && !NONE2.test(n2));
-    const out = [];
-    for (const raw of names4) {
-      const name = raw.replace(/\s*[(（][^)）]*[)）]\s*$/, "").trim() || raw;
-      if (out.some((a) => a.name === name)) continue;
-      const p = c.people.find((x) => x.name === name || !!x.english && x.english.toLowerCase() === name.toLowerCase());
-      const rec2 = p ? world2.agents[p.id] : void 0;
-      const st = rec2 && rec2.st !== "미정" ? rec2.st : "";
-      out.push({ id: p?.id ?? "", name: p?.name ?? name, st, ...rec2?.situation ? { situation: cut2(rec2.situation, 80) } : {} });
-      if (out.length >= 8) break;
-    }
-    return out;
-  }
-  var two2 = (n2) => String(n2).padStart(2, "0");
-  function mmdd(at, now) {
-    const d = at === null ? new Date(now) : new Date(at * 6e4);
-    return Number.isFinite(d.getTime()) ? `${two2(d.getUTCMonth() + 1)}${two2(d.getUTCDate())}` : "0000";
-  }
-  function peopleDelta(chat, from, to) {
-    const store = peopleStore(chat);
-    if (!store.log.length) return [];
-    const live = liveness(chat);
-    const all = liveChanges(store, live);
-    const ps = peopleSettings(chat.scriptstate);
-    const o = { speed: ps.speed, turnCap: ps.turnCap };
-    const pos = (c) => live.at.get(c.anchor) ?? -1;
-    const span = all.filter((c) => c.kind === "cue" && c.pin === void 0 && !factionOfWho(c.who) && pos(c) >= from && pos(c) <= to);
-    const byWho = /* @__PURE__ */ new Map();
-    for (const c of span) (byWho.get(c.who) ?? byWho.set(c.who, []).get(c.who)).push(c);
-    const out = [];
-    for (const [who, list4] of byWho) {
-      const delta = sumCues(who, 0, list4, 0, -1e9, 1e9, o);
-      if (!delta) continue;
-      const top = [...list4].sort((a, b) => Math.abs(cueDelta(b, o)) - Math.abs(cueDelta(a, o)))[0];
-      const person = store.people[who];
-      const stage = person ? stageOf(affinityOf(person, all.filter((c) => pos(c) <= to), store.folded[who] ?? 0, o)).label : void 0;
-      out.push({ who, delta, ...top?.cue ? { cue: top.cue } : {}, ...top?.quote || top?.reason ? { quote: cut2(top.quote || top.reason, 60) } : {}, ...stage ? { stage } : {} });
-    }
-    return out.sort((a, b) => Math.abs(b.delta) - Math.abs(a.delta)).slice(0, PEOPLE_MAX);
+_MAX);
   }
   function walletSpan(chat, from, to, start3) {
     const w = readWallet(chat.scriptstate, start3 ?? getPrefs().walletStart ?? WALLET_START_DEFAULT);
@@ -2116,22 +2033,6 @@ ${themeVars("[x-goei-fab]")}
         ]
       }
     ],
-    // 본부 방문 대화 (2026-10-22 설계 2판): 지침은 카드 「Visit」 로어북, 여기는 보낼 자료와 길이
-    hq: [
-      {
-        title: "참고 자료",
-        chips: [chip("desc", "봇 설명", 1), chip("authors", "작가 노트", 1), chip("persona", "주인공·페르소나", 1), chip("active", "상시 로어북", 1), chip("related", "관련 로어북", 1), chip("secondary", "2차 참조", 0), chip("interlude", "같은 막간 다른 대화", 1)],
-        items: [turns(6), budget]
-      },
-      {
-        title: "대화",
-        chips: [chip("interject", "옆 요원 끼어들기", 1)],
-        items: [
-          { key: "model", label: "대화 모델", type: "pick", def: "aux", opts: [["aux", "보조"], ["main", "메인"]] },
-          num3("line_chars", "답 길이", 80, 20, 400, "자", { hint: "말풍선 한 장은 80자 안팎이에요" })
-        ]
-      }
-    ],
     nw: [
       {
         title: "참고 자료",
@@ -2145,7 +2046,7 @@ ${themeVars("[x-goei-fab]")}
       }
     ]
   };
-  var PREFIX = { gn: "$lb_cfg_lb-gn.adv_", ph: "$ph_adv_", nw: "$nw_adv_", hq: "$hq_adv_", gen: "$gen_" };
+  var PREFIX = { gn: "$lb_cfg_lb-gn.adv_", ph: "$ph_adv_", nw: "$nw_adv_", gen: "$gen_" };
   var advItems = (f) => ADV[f].flatMap((g2) => [...g2.chips ?? [], ...g2.items]);
   var advItem = (f, key2) => advItems(f).find((i) => i.key === key2);
   var advVar = (f, item2) => item2.v ?? `${PREFIX[f]}${item2.key}`;
@@ -2647,9 +2548,9 @@ ${req.docRequest.trim()}`;
   var SPOILER_HEADING = /탈출|출구|금기|공략|해법|해결|클리어|생환|대처|수칙|정답|파훼|봉인|퇴치|살아남|빠져나|규칙|격리 ?(?:방법|절차)|약점/;
   var esc2 = (s5) => s5.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
   var escText = (s5) => esc2(s5.replace(/&#12[35];/g, (m) => m === "&#123;" ? "{" : "}"));
-  function attrs(open3) {
+  function attrs(open2) {
     const out = {};
-    for (const m of open3.matchAll(/([\w]+)="([^"]*)"/g)) out[m[1]] = m[2].replace(/&quot;/g, '"');
+    for (const m of open2.matchAll(/([\w]+)="([^"]*)"/g)) out[m[1]] = m[2].replace(/&quot;/g, '"');
     return out;
   }
   function splitFields(s5, sep = "|") {
@@ -2672,8 +2573,8 @@ ${req.docRequest.trim()}`;
     return i < 0 ? ["", f.trim()] : [f.slice(0, i).trim(), f.slice(i + 1).trim()];
   }
   function renderArticle(body5, o) {
-    const open3 = /^<lightboard-namuwiki[^>]*>/.exec(body5)?.[0] ?? "";
-    const a = attrs(open3);
+    const open2 = /^<lightboard-namuwiki[^>]*>/.exec(body5)?.[0] ?? "";
+    const a = attrs(open2);
     const color = /^#[0-9a-fA-F]{3,8}$/.test(a.main_color ?? "") ? a.main_color : "#27685b";
     const notes = [];
     const inline = (s5) => escText(s5).replace(/➡️([^➡]+?)➡️/g, (_all, t) => {
@@ -2894,11 +2795,11 @@ ${JSON.stringify({ feature: "wiki", records: kept })}
     let hitTip = false;
     for (const el of tips) {
       const on2 = inside2 && await hit2(el, x, y);
-      const open3 = await el.hasClass("open").catch(() => false);
-      if (on2 && !open3) {
+      const open2 = await el.hasClass("open").catch(() => false);
+      if (on2 && !open2) {
         await el.addClass("open");
         hitTip = true;
-      } else if (open3) await el.removeClass("open");
+      } else if (open2) await el.removeClass("open");
       if (on2) hitTip = true;
     }
     if (hitTip || !inside2) return hitTip;
@@ -4196,4 +4097,146 @@ ${block2.trim()}` };
     const participants = [{ id: "me" }, ...Object.entries(r.people).map(([id, c]) => ({ id, name: c.name }))];
     const hasTalk = !!r.conversationBaseline?.lastSender || r.messages.some((m) => m.kind === "message");
     const conv = conversationState(r);
-    conv.directReplyPending = r.kind === 
+    conv.directReplyPending = r.kind === "dm" && !!conv.ownerHasNotReplied;
+    conv.followupAlreadySent = conv.directReplyPending ? !!r.followupSent : false;
+    if (conv.directReplyPending) conv.defaultNextAction = "wait_for_owner";
+    return {
+      id: r.id,
+      kind: r.kind,
+      name: roomLabel(r),
+      privateDirection: r.topic ?? "",
+      activeMembers: r.members,
+      participants,
+      pov: "me",
+      messages,
+      conversationState: conv,
+      candidateOnly: !hasTalk && r.kind === "dm",
+      directoryEstablishesRelationship: false,
+      action: r.pending?.action ?? { type: "refresh" }
+    };
+  }
+  function participant(src, c, related2, status2, names4) {
+    let lore = "";
+    let title2 = "";
+    if (related2) {
+      const candidates = c.custom ? [c.name] : c.lore ? [c.lore] : [`${c.english} ${c.name}`, `${c.name} ${c.english}`, c.name, c.english ?? ""];
+      for (const n2 of candidates) {
+        const t = bookText(src, n2);
+        if (t) {
+          lore = t;
+          title2 = n2;
+          break;
+        }
+      }
+    }
+    return {
+      sender: c.id,
+      name: c.name,
+      faction: c.group,
+      factionDisplayName: names4[c.group ?? ""] ?? c.group,
+      rank: c.rank,
+      department: c.department,
+      source: title2,
+      lore,
+      hasCharacterLore: !!lore.trim(),
+      manuallySavedContact: !!c.custom,
+      contactMemo: c.custom ? c.note ?? "" : void 0,
+      narratorOnlyAgentStatus: status2 && c.agentId ? agentStatus(src.chat, c.agentId) : void 0
+    };
+  }
+  function ownerCharacter(src) {
+    const a = playerAgent(src.char.globalLore, src.chat.scriptstate);
+    return a ? { character: a.name, ...a.rank ? { rank: a.rank } : {} } : {};
+  }
+  function narrator(src, names4, related2, text4) {
+    applyAdvanced(src.chat.scriptstate);
+    const n2 = trimTurns(HISTORY2.turns);
+    const turns2 = n2 ? recentTurns(src.chat, n2) : [];
+    const recentStory = [];
+    turns2.forEach((t2, i) => {
+      if (t2.user) recentStory.push({ role: "user", text: t2.user, turn: i + 1 });
+      for (const c of t2.char) recentStory.push({ role: "char", text: c, turn: i + 1 });
+    });
+    const last2 = turns2[turns2.length - 1];
+    const faction = String(src.chat.scriptstate?.["$st_faction"] ?? "") || "none";
+    const t = refToggles(src.chat.scriptstate, "ph");
+    const rows2 = collectRefs(src, {
+      scope: "phone",
+      text: `${text4}
+${recentStory.map((m) => m.text).join("\n")}`,
+      description: t.description,
+      authors: t.authors,
+      persona: t.persona,
+      active: t.active,
+      related: related2 && !trimRelated(),
+      secondary: t.secondary && !trimSecondary()
+    });
+    const universe = { characterDescription: "", authorsNote: "", activeLoreBooks: [] };
+    for (const r of rows2) {
+      if (r.sources.includes("봇 설명") && r.kind === "base") universe.characterDescription = r.content;
+      else if (r.sources.includes("작가 노트") && r.kind === "base") universe.authorsNote = r.content;
+      else if (r.sources.includes(PERSONA_SOURCE) && r.kind === "base") universe.userPersona = r.content;
+      else universe.activeLoreBooks.push({ source: r.sources.join(" / "), content: r.content, kind: r.kind });
+    }
+    return {
+      owner: { name: "주인공", faction, factionDisplayName: names4[faction] ?? faction, ...ownerCharacter(src) },
+      recentStory,
+      currentSceneEntries: last2 ? (last2.user ? 1 : 0) + last2.char.length : 0,
+      currentSceneTime: phoneTime(src.chat),
+      factionLabels: names4,
+      universe
+    };
+  }
+  function crossRoom(body5, st) {
+    const wanted = new Set(body5.participants.map((p) => p.sender));
+    if (!wanted.size) return;
+    const covered = new Set((body5.rooms ?? (body5.room ? [body5.room] : [])).map((r) => r.id));
+    const counts = /* @__PURE__ */ new Map();
+    const candidates = [];
+    for (const [rid, r] of Object.entries(st.rooms)) {
+      if (covered.has(rid)) continue;
+      for (const m of r.messages) {
+        if (m.kind !== "message" || m.sender === "system") continue;
+        const allowed = /* @__PURE__ */ new Set();
+        if (wanted.has(m.sender)) allowed.add(m.sender);
+        for (const c of m.audience ?? []) if (wanted.has(c)) allowed.add(c);
+        if (allowed.size) candidates.push({ room: r, m, allowed });
+      }
+    }
+    candidates.sort((a, b) => b.m.id - a.m.id || a.room.id.localeCompare(b.room.id));
+    const records = [];
+    for (const e of candidates) {
+      const knownBy = [];
+      for (const c of e.allowed) {
+        const n2 = counts.get(c) ?? 0;
+        if (n2 < HISTORY2.room) {
+          counts.set(c, n2 + 1);
+          knownBy.push(c);
+        }
+      }
+      if (knownBy.length) {
+        records.push({
+          room: e.room.id,
+          roomName: e.room.kind === "group" ? roomLabel(e.room) : void 0,
+          kind: e.room.kind,
+          recordID: e.m.id,
+          sender: e.m.sender,
+          senderName: e.room.people[e.m.sender]?.name,
+          time: e.m.time,
+          content: e.m.text,
+          knownBy: knownBy.sort()
+        });
+      }
+    }
+    if (records.length) body5.crossRoomMessages = records.reverse();
+  }
+  function contactSources(body5) {
+    const out = [];
+    const add = (kind, text4, sender) => {
+      const t = String(text4 ?? "").trim();
+      if (t) out.push({ id: `s${out.length + 1}`, kind, text: t, ...sender ? { sender } : {} });
+    };
+    const u = body5.narratorOnly.universe;
+    add("world", u.characterDescription);
+    add("author_note", u.authorsNote);
+    for (const b of u.activeLoreBooks) add("world", b.cont
