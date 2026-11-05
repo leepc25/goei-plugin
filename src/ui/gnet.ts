@@ -680,7 +680,7 @@ export function gnetTab(ctx: ChatContext, env?: GnetEnv): string {
       <div class="ph-content">${gnet.sub === 'board' ? boardList(st, busy, mobile) : dmList(st, busy, mobile)}</div>
       ${mobile && !kind ? inlineComposer(st, busy) : ''}
       ${fail}
-      ${drawerHtml(tools, nick)}
+      ${drawerHtml(tools, nick, '', 'gnet')}
     </section>
     <section class="ph-pane">${kind ? status : ''}${paneHtml(ctx, st, kind, busy)}</section>
     ${note}

@@ -811,7 +811,7 @@ async function handle(action: string, value?: string): Promise<void> {
       const m = marks()[Number(value)];
       if (!m || view.kind !== 'started') return;
       markUi.pop = false;
-      closeDrawer();
+      closeDrawer('gx-bdrawer');
       // 「설정」 즐겨찾기는 설정 창을 연다 (판 안 설정 화면은 안 쓴다, 2026-10-29)
       if (m.s.tab === 'settings') return handle('ed-open', 'set:screen');
       return applyNav(openable(view.ctx, m.s as unknown as NavState));
