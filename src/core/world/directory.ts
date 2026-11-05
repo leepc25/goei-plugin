@@ -7,7 +7,7 @@ import { BUILTIN, extraFactions, extraNames, extraTabId, extraTabs, type Faction
 import { DIRECTORY_COMMENT, directoryEntries, isDirectory, LEGACY_DATA, parseSeedManifest } from '../lorebooks';
 import { agentShared, orgShared } from '../sharedpics';
 import { pickScenes, type ScenesData } from '../scenes';
-import { freeGroupCode, migrateRoster, NEUTRAL_BLURB, NEUTRAL_GROUP, NEUTRAL_IDS, ROSTER_V } from './roster-v';
+import { freeGroupCode, migrateRoster, NEUTRAL_BLURB, NEUTRAL_ENGLISH, NEUTRAL_GROUP, NEUTRAL_IDS, ROSTER_V } from './roster-v';
 import type { LoreEntry } from '../types';
 
 export { DIRECTORY_COMMENT } from '../lorebooks';
@@ -291,7 +291,7 @@ export function readDirectoryData(lore: LoreEntry[]): DirectoryData | null {
   return out;
 }
 
-export { ROSTER_V, NEUTRAL_GROUP, NEUTRAL_IDS, NEUTRAL_BLURB } from './roster-v';
+export { ROSTER_V, NEUTRAL_GROUP, NEUTRAL_IDS, NEUTRAL_BLURB, NEUTRAL_ENGLISH } from './roster-v';
 
 // ── 세력 호칭·괴담톡 탭·첫 턴 로어북 (명부, 없으면 옛 로어북) ──
 
@@ -737,7 +737,7 @@ function freshDefaults(dir: Directory): void {
   if (dir.startGroups.some((g) => g.name === NEUTRAL_GROUP)) return;
   const code = freeGroupCode([...dir.usedCodes, ...dir.orgs.map((o) => o.spec.code ?? ''), ...dir.startGroups.map((g) => g.code)]);
   if (!code) return;
-  dir.startGroups.push({ name: NEUTRAL_GROUP, code, blurb: NEUTRAL_BLURB, english: '', hidden: false });
+  dir.startGroups.push({ name: NEUTRAL_GROUP, code, blurb: NEUTRAL_BLURB, english: NEUTRAL_ENGLISH, hidden: false });
   dir.usedCodes = [...new Set([...dir.usedCodes, code])].sort();
   for (const a of dir.agents) if (NEUTRAL_IDS.includes(a.id) && !a.rosterFor.includes(code)) a.rosterFor = [...a.rosterFor, code];
 }

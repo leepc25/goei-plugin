@@ -437,6 +437,12 @@
 .gw .gw-startpage .st-slot { display: flex; align-items: center; gap: 10px; padding: 8px 12px; }
 .gw .gw-startpage .st-slot .dir-name { flex: 1; min-width: 0; }
 .gw .gw-startpage .st-slot .gx-row-btns { display: flex; gap: 4px; }
+/* 폰: 이름 줄과 단추 줄을 나눈다 (한 줄에 다 넣으면 이름이 꺾이고 종류·코드가 잘린다, 2026-11-05 캡처) */
+@media (max-width: 760px) {
+  .gw .gw-startpage .st-slot { flex-wrap: wrap; row-gap: 6px; }
+  .gw .gw-startpage .st-slot .dir-name { flex: 1 0 100%; }
+  .gw .gw-startpage .st-slot .gx-segs { margin-right: auto; }
+}
 .gw .gw-startpage .st-sel { display: flex; align-items: baseline; gap: 8px; margin: 16px 0 8px; font-size: 15px; }
 .gw .gw-startpage .st-sel small { color: var(--dim); font-weight: 400; }
 .gw .gw-startpage .st-scene, .gw .gw-startpage .st-member { padding: 8px 0 4px; border-top: 1px solid var(--line); }

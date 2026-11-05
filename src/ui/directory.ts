@@ -1151,6 +1151,8 @@ export async function handleDirectory(action: string, value: string | undefined,
     case 'dir-start-open':
       stUi.sel = stUi.sel === v ? '' : v;
       stUi.confirm = '';
+      // 펼친 칸의 상세는 목록 아래에 그려져서, 열면 그 자리로 내려간다 (안 내려가면 눌러도 바뀐 게 안 보인다)
+      if (stUi.sel) requestAnimationFrame(() => document.querySelector('.gw .st-sel')?.scrollIntoView({ block: 'start', behavior: 'smooth' }));
       break;
     case 'dir-start-show': {
       const [on, code] = v.split('|');

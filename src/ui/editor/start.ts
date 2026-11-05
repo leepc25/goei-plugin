@@ -3,7 +3,7 @@
 // 세계 탭의 저장 줄로 저장된다. 동작은 directory.ts handleDirectory 의 dir-start-* · dir-group-* · dir-scene-*, 입력은 directoryInput 의 group: · scene: · ascene: 열쇠.
 import { BUILTIN } from '../../core/factions';
 import { SCENARIOS } from '../../core/scenarios';
-import { agentSceneSaved, factionScenes } from '../../core/scenes';
+import { agentScene, agentSceneSaved, factionScenes } from '../../core/scenes';
 import type { Directory } from '../../core/world/directory';
 import type { ChatContext } from '../../host/risu';
 import { directoryDraft, photoBlock, startSlots, type StartSlot } from '../directory';
@@ -73,10 +73,12 @@ function membersBlock(code: string, d: Directory): string {
   const scenes = members
     .map((a) => {
       const saved = agentSceneSaved(a.id, d.scenes);
+      // 기본 글(세계 자료 팩)이 없는 인물은 「없음」으로 — 11-05 캡처에서 글이 없는데도 「기본 글」이라 적혀 있었다
+      const hasDefault = !!agentScene(a.id, undefined);
       const k = (f: string) => `ascene:${a.id}|${f}`;
-      return `<details class="st-member"><summary><b>${esc(a.name)}</b><small>${esc(a.id)} · ${saved?.ko || saved?.en ? '직접 쓴 글' : '기본 글'}</small></summary>
-        ${area(k('ko'), saved?.ko ?? '', '한국어', 6, '비우면 기본 글(세계 자료)로 돌아가요')}
-        ${area(k('en'), saved?.en ?? '', 'English', 6, '비우면 기본 글로 돌아가요')}
+      return `<details class="st-member"><summary><b>${esc(a.name)}</b><small>${esc(a.id)} · ${saved?.ko || saved?.en ? '직접 쓴 글' : hasDefault ? '기본 글' : '첫 장면 없음'}</small></summary>
+        ${area(k('ko'), saved?.ko ?? '', '한국어', 6, hasDefault ? '비우면 기본 글(세계 자료)로 돌아가요' : '비우면 이 인물로 시작할 때 「○○의 첫 장면」 칸이 안 나와요')}
+        ${area(k('en'), saved?.en ?? '', 'English', 6, hasDefault ? '비우면 기본 글로 돌아가요' : '')}
       </details>`;
     })
     .join('');

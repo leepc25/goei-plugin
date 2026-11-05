@@ -7,6 +7,8 @@ export const ROSTER_V = 3;
 /** 시작 묶음 「중립」의 기본 인물 (2026-11-05 사용자): 세력 없는 인물로 플레이하는 칸 */
 export const NEUTRAL_GROUP = '중립';
 export const NEUTRAL_IDS = ['P043', 'P044', 'P045', 'P046', 'P047', 'P048', 'P049', 'P050', 'P051', 'P052', 'P053', 'P054', 'P055'];
+/** 영문명: 사진 이름(「Neutral」 이미지)과 영어 응답에서 쓴다 — 기본 세력 사진(Management Bureau.avif 등)과 같은 규칙 */
+export const NEUTRAL_ENGLISH = 'Neutral';
 export const NEUTRAL_BLURB = '어느 조직에도 속하지 않은 사람들. 교황청 수녀, 이슬람 성전사, 마녀, 흡혈귀, 중림 상인, 그리고 사람이 아닌 것까지.';
 
 const s = (v: unknown) => (typeof v === 'string' ? v.trim() : '');
@@ -29,7 +31,7 @@ function migrateNeutral(d: DirectoryData): void {
   if (!Object.keys(groups).includes(NEUTRAL_GROUP)) {
     code = freeGroupCode(used);
     if (!code) return;
-    groups[NEUTRAL_GROUP] = { code, blurb: NEUTRAL_BLURB };
+    groups[NEUTRAL_GROUP] = { code, blurb: NEUTRAL_BLURB, english: NEUTRAL_ENGLISH };
     d.codes_used = [...new Set([...(d.codes_used ?? []), code])].sort();
   } else code = s(groups[NEUTRAL_GROUP].code);
   if (!code) return;
