@@ -29,7 +29,8 @@ for (const vp of vps) {
   await openWin(page);
   await page.waitForSelector('.gx-fac');
   const facs = await page.$$eval('.gx-fac', (els) => els.map((e) => e.dataset.value));
-  assert.deepEqual(facs, scenarios.factions.map((f) => f.code), `${vp}: 세력 카드 다섯`);
+  // 기본 세력 다섯 + 시작 묶음 「중립」(F00, 2026-11-05). 묶음은 아래 출발 전수(세력×언어×상황)에서는 돌리지 않는다 — 인물 고르기는 qc-pipeline 쪽
+  assert.deepEqual(facs, [...scenarios.factions.map((f) => f.code), 'F00'], `${vp}: 세력 카드 다섯 + 중립`);
   assert.equal(await page.isDisabled('.gx-start'), true, '소속 전 출발 불가');
 
   const fresh = async () => {
