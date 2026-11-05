@@ -207,7 +207,7 @@ const setBefore = await page.evaluate(() => window.__calls.setChar);
 await page.click('[data-action="ed-inst-all"]');
 await page.waitForFunction(() => document.querySelector('.gw-install')?.textContent?.includes('끝났어요'), null, { timeout: 60000 });
 assert.ok((await page.evaluate(() => window.__calls.setChar)) >= setBefore + 1, '설치 → 캐릭터 저장');
-assert.equal(await page.evaluate(() => window.__char.alternateGreetings.length), 57, '있는 인사말은 늘지 않음');
+assert.equal(await page.evaluate(() => window.__char.alternateGreetings.length), 1, '있는 인사말(빈 것 하나)은 늘지 않음');
 assert.ok(await page.evaluate(() => JSON.parse(window.__char.globalLore.find((e) => e.comment === 'Plugin manifest').content).keys.settings.startsWith('\uf000folder:')), '매니페스트 폴더 key');
 console.log('PASS 설치 · 점검: 상태 표 → 로어북·인사말 다시 맞추기');
 console.log('PASS 세계 편집 창: 목록 → 칸 고치기 → 추가 칸·가져오기 → 세력 관계 → 지침 → 저장(Directory.세계)');

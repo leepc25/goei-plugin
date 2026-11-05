@@ -145,6 +145,8 @@ export const output = (page, messageIndex) => page.evaluate(async (i) => {
   const c = window.__chat;
   await window.__calls.listeners[0]({ char: window.__clone(window.__char), chat: window.__clone(c), characterIndex: 0, chatIndex: 0, messageIndex: i ?? c.message.length - 1 });
 }, messageIndex);
+/** 플러그인이 넣은 첫 장면 메시지(char, %%GOEI_SCENE%%)의 글. 없으면 '' (2026-11-05: 첫 장면은 카드 인사말이 아니라 플러그인 메시지) */
+export const sceneOf = (saved) => (saved?.message?.[0]?.role === 'char' && String(saved.message[0].data).includes('%%GOEI_SCENE%%') ? String(saved.message[0].data).replace(/\r?\n?%%GOEI_SCENE%%/g, '') : '');
 export const display = (page, text) => page.evaluate((t) => window.__calls.handlers.display(t), text);
 export const input = (page, text) => page.evaluate((t) => window.__calls.handlers.input(t), text);
 export const chat = (page) => page.evaluate(() => window.__clone(window.__chat));

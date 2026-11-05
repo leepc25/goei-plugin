@@ -239,8 +239,13 @@ async function leaveField(page) {
   await page.click('.gx-start');
   await page.waitForFunction(() => window.__calls.setChat.length === 1);
   const saved = await page.evaluate(() => window.__calls.setChat[0]);
-  assert.equal(saved.fmIndex, manifest.greetings['C00-en-1']);
-  assert.ok(fixture.alternateGreetings[saved.fmIndex].startsWith('The tower in Gangnam'));
+  // 첫 장면 글은 플러그인이 char 메시지로 넣고, Risu 쪽 번호는 늘 빈(직접 입력) 인사말 (2026-11-05)
+  assert.equal(saved.fmIndex, manifest.greetings['C00-en-8']);
+  assert.equal(fixture.alternateGreetings[saved.fmIndex], '');
+  const sceneText = String(saved.message[0]?.data ?? '').replace(/\r?\n?%%GOEI_SCENE%%/g, '');
+  assert.equal(saved.message.length, 1);
+  assert.equal(saved.message[0].role, 'char');
+  assert.ok(sceneText.startsWith('The tower in Gangnam'), sceneText.slice(0, 80));
   assert.equal(saved.scriptstate.$st_faction, 'C00');
   assert.equal(saved.scriptstate.$st_lang, 'en');
   assert.equal(saved.scriptstate.$st_fm, '1');
@@ -258,7 +263,7 @@ async function leaveField(page) {
   await page.waitForFunction(() => window.__calls.hide >= 1);
   // 시작 메시지: 자동 전송 없이 첫 장면 아래에 「적고 전송」 안내 + 재선택 (다른 글에는 안 붙음)
   assert.equal(await page.evaluate(() => (window.__calls.send ?? []).length), 0, '시작 메시지는 자동 전송 안 함');
-  const fmText = fixture.alternateGreetings[saved.fmIndex];
+  const fmText = saved.message[0].data;
   const hinted = await page.evaluate((t) => window.__calls.handlers.display(t), fmText);
   assert.ok(hinted.includes('data-goei-card="opening"') && hinted.includes('data-goei-repick') && hinted.includes('적고 전송'), '첫 장면 아래 안내');
   assert.ok(!(await page.evaluate(() => window.__calls.handlers.display('다른 글'))).includes('data-goei-card="opening"'), '다른 글에는 안내 없음');
@@ -589,7 +594,8 @@ if (fixture.globalLore.some((e) => String(e.comment).startsWith('📚Lore slot')
     await window.__calls.listeners[0]({ char: JSON.parse(JSON.stringify(window.__char)), chat: JSON.parse(JSON.stringify(c)), characterIndex: 0, chatIndex: 0, messageIndex: c.message.length - 1 });
   });
   const after = await page.evaluate(() => window.__chat);
-  assert.equal(after.message[1].data, '쟈알디가 무전기를 들었다.\n[▣|2025.01.01|02:47 AM|☀️|4°C|관리국 본부|없음]');
+  // 메시지 0 = 플러그인이 넣은 첫 장면, 1 = 출동, 2 = 응답 (2026-11-05)
+  assert.equal(after.message[2].data, '쟈알디가 무전기를 들었다.\n[▣|2025.01.01|02:47 AM|☀️|4°C|관리국 본부|없음]');
   assert.match(after.scriptstate.$an_report, new RegExp(`\\[AN\\|${where}\\|${preset.name}\\|활성\\|B\\|P001\\|<상황>\\] \\{0시간 0분 전\\}`));
   assert.match(after.scriptstate.$ag_report, /\[AG\|P001\|작전투입\|현장 지휘\]/);
   // 같은 응답에 다시 불려도 그대로
@@ -2164,10 +2170,16 @@ if (fixture.globalLore.some(packed)) {
   await page.waitForFunction(() => document.querySelector('.gw .gw-detail h2')?.textContent?.includes('테스트 결사'));
   await page.click('.gw [data-action="ed-save"]');
   await page.waitForFunction(() => window.__calls.setChar === 1);
+  // 플레이 켜기·기본 세력 숨기기는 세계 › 시작 화면 페이지에서 (2026-11-05)
+  await edGo(page, 'start');
   await page.waitForSelector('.gw [data-action="dir-fac-play"][data-value="1|테스트 결사"]');
   await page.click('.gw [data-action="dir-fac-play"][data-value="1|테스트 결사"]');
   await page.waitForSelector('.gw .dir-code');
   assert.equal(await page.textContent('.gw .dir-code'), 'F00');
+  assert.ok((await page.evaluate(() => [...document.querySelectorAll('.gw [data-action="dir-start-open"]')].map((b) => b.dataset.value))).includes('F00'), '시작 칸 목록에 F00');
+  await edGo(page, 'org');
+  await page.click('.gw .gw-row[data-value="테스트 결사"]');
+  await page.waitForSelector('.gw [data-action="dir-fac-type"][data-value="freelancer|테스트 결사"]');
   assert.equal(await page.locator('.gw [data-action="dir-fac-patch"]').count(), 0, '새 Lite 카드에는 자리표시자가 이미 있음');
   await page.click('.gw [data-action="dir-fac-type"][data-value="freelancer|테스트 결사"]');
   await page.fill('.gw [data-key="org:title|테스트 결사"]', '비밀 결사');
@@ -2175,9 +2187,9 @@ if (fixture.globalLore.some(packed)) {
   await page.fill('.gw [data-key="org:gm_name|테스트 결사"]', 'Test Society');
   await page.fill('.gw [data-key="org:gm_desc|테스트 결사"]', 'A secret society.');
   if (shots) await page.screenshot({ path: `${shots}/20-faction-org.png` });
-  // 기본 세력 숨기기
-  await page.click('.gw .gw-row[data-value="관리국"]');
-  await page.click('.gw [data-action="dir-fac-hide"][data-value="0|관리국"]');
+  // 기본 세력 숨기기 (시작 화면 페이지의 보임/숨김)
+  await edGo(page, 'start');
+  await page.click('.gw [data-action="dir-start-show"][data-value="0|A00"]');
   // 요원 한 명을 새 세력으로
   await edGo(page, 'agent');
   await page.fill('.gw [data-input="ed-q"]', '쟈알디');

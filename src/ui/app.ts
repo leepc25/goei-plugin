@@ -623,7 +623,7 @@ async function stagedTheme(ctx: ChatContext, value: string | undefined): Promise
   if (value !== 'light' && value !== 'dark' && value !== 'paper') return;
   try {
     const saved = await updateChat(ctx.charIndex, ctx.chatIndex, (chat) =>
-      (chat.message ?? []).length || chat.scriptstate?.['$st_fixed_theme'] === value ? null : { ...chat, scriptstate: { ...(chat.scriptstate ?? {}), $st_fixed_theme: value } },
+      chatPhase(chat) === 'started' || chat.scriptstate?.['$st_fixed_theme'] === value ? null : { ...chat, scriptstate: { ...(chat.scriptstate ?? {}), $st_fixed_theme: value } },
     );
     if (saved) ctx.chat = saved;
   } catch (error) {

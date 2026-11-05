@@ -174,7 +174,6 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
 .gx-hsep { flex: none; color: var(--dim); font-size: 20px; line-height: 1; margin: 0 2px; }
 /* 2026-11-05 사용자: 창 머리는 유령 아이콘 + 메뉴 제목만 (PC·폰 같이). 「괴이 ː ANOMALY」 표기는 뺌 */
 .gx-tabhead .gx-tabicon { display: none; }
-}
 .gx-content { grid-area: body; min-height: 0; display: flex; flex-direction: column; }
 .gx-content > .gx-body, .gx-content > main { flex: 1; min-height: 0; }
 .gx-head {

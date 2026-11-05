@@ -1246,7 +1246,12 @@ export async function handleDirectory(action: string, value: string | undefined,
       if (!o) break;
       if (action === 'dir-fac-hide') o.spec.hidden = arg === '0';
       else if (action === 'dir-fac-type') o.spec.type = arg as (typeof FACTION_TYPES)[number]['id'];
-      else if (!o.faction) setPlayable(d, o, arg === '1');
+      else if (!o.faction) {
+        setPlayable(d, o, arg === '1');
+        // 시작 화면 페이지에서 켰으면 그 칸을 바로 펼친다
+        if (arg === '1' && o.spec.playable && o.spec.code) stUi.sel = o.spec.code;
+        else if (arg === '0' && stUi.sel === o.spec.code) stUi.sel = '';
+      }
       dirUi.done = '';
       break;
     }

@@ -182,7 +182,9 @@ type LoreChar = { name?: string; globalLore?: LoreEntry[]; loreSettings?: unknow
 /** CBS 환경의 유저 이름: 아직 모르면 `{{user}}`를 그대로 둔다 (빈 이름으로 풀면 「's current …」처럼 깨진다. QC 2026-10-28) */
 const userOrTag = () => userInfo().name || undefined;
 
-function loreFor(char: LoreChar, chat: Chat, input?: string) {
+function loreFor(char: LoreChar, chat0: Chat, input?: string) {
+  // 플러그인이 넣은 첫 장면 메시지는 키워드 훑기에서 뺀다 (카드 인사말이던 때와 같게: Risu 는 인사말을 chat.message 에 두지 않았다. 2026-11-05)
+  const chat = chat0.message?.some((m) => isSceneMessage(m.data)) ? { ...chat0, message: chat0.message.filter((m) => !isSceneMessage(m.data)) } : chat0;
   const mode = advValue(chat.scriptstate, 'gen', 'lore_mode') as LoreMode;
   const player = playerAgent(char.globalLore, chat.scriptstate);
   return computeLore(char.globalLore, chat, { ...loreOptions(char, chat, mode, userOrTag()), input, ...(player ? { exclude: [player.lore] } : {}) });
