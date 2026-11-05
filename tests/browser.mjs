@@ -1037,10 +1037,13 @@ async function startedWithReply(page, { phoneAuto = false } = {}) {
   await page.waitForSelector('.gx-fac.on');
   await page.click('.gx-sc[data-value="1"]');
   await page.click('.gx-start');
-  await page.waitForFunction(() => window.__chat.message.length === 0 && window.__chat.scriptstate.$st_fm === '1');
-  // 다시 커스텀 임무로 (아래 시험을 이어가려고)
+  // 일반 첫 장면은 플러그인이 첫 장면 메시지 하나를 넣는다 (2026-11-05, 추가 인사말 대신)
+  await page.waitForFunction(() => window.__chat.message.length === 1 && window.__chat.message[0].data.includes('%%GOEI_SCENE%%') && window.__chat.scriptstate.$st_fm === '1');
+  // 다시 커스텀 임무로 (아래 시험을 이어가려고): 첫 장면이 들어간 채팅은 「다시 고르기」를 거친다
   await page.evaluate(() => { const g = document.querySelector('.gx'); if (g) g.style.display = 'none'; });
   await open(page);
+  await page.waitForSelector('[data-action="repick"], .gx-sc');
+  if (await page.locator('[data-action="repick"]').count()) await page.click('[data-action="repick"]');
   await page.waitForSelector('.gx-sc');
   await page.click('.gx-sc[data-value="9"]');
   await page.click('.gx-start');
@@ -1949,8 +1952,9 @@ if (fixture.globalLore.some(packed)) {
   const book = await page.evaluate(() => JSON.parse(window.__char.globalLore.find((e) => e.comment === 'Directory').content));
   assert.equal(book.괴이['명일 아파트'].preset, false);
   assert.equal(book.괴이[extName].preset, true, '다른 폴더 로어북을 발생 후보로 저장');
-  assert.deepEqual([book.요원.쟈알디.affiliation, book.요원.쟈알디.rank, book.요원.쟈알디.roster_for], ['테스트 조직', '국장', ['D00', 'E00', 'A00']]);
-  assert.deepEqual(book.조직['테스트 조직'].roster_for, ['D00', 'E00', 'A00']);
+  // 2026-11-05 사용자: 민간인·프리랜서(D00·E00) 플레이에는 아무도 안 붙는다 → 명부 기본값에서 D00·E00 이 빠진다 (roster-v.ts)
+  assert.deepEqual([book.요원.쟈알디.affiliation, book.요원.쟈알디.rank, book.요원.쟈알디.roster_for], ['테스트 조직', '국장', ['A00']]);
+  assert.deepEqual(book.조직['테스트 조직'].roster_for, ['A00']);
   assert.equal(book.요원.쟈알디.id, 'P001', 'ID 유지');
   assert.equal(book.호칭.B00.A00, '짝퉁 관리국');
   assert.equal(book['괴담톡 탭'].tabs.find((t) => t.id === 'T01').name, '본부');
@@ -2156,7 +2160,7 @@ if (fixture.globalLore.some(packed)) {
   await page.close();
 }
 
-// 20) 새 플레이 세력: 명부 조직을 플레이 세력으로 켜고(F00) 기본 세력 숨기기 → 시작 화면에서 그 세력으로 직접 입력 시작
+// 20) 새 플레이 세력: 명부 조직을 플레이 세력으로 켜고(G00 — F00 은 기본 시작 묶음 「중립」이 쓴다, 2026-11-05) 기본 세력 숨기기 → 시작 화면에서 그 세력으로 직접 입력 시작
 // 2026-10-27 설정 창 개편으로 옮김: 명부는 설정 창 「세계」 탭의 조직·요원 기록의 「기본 정보」. 새 조직은 세계 기록으로 만들어(ed-add)
 // 저장해야 명부 줄이 생기므로 카드 저장이 두 번 (17절과 같음)
 {
@@ -2175,8 +2179,8 @@ if (fixture.globalLore.some(packed)) {
   await page.waitForSelector('.gw [data-action="dir-fac-play"][data-value="1|테스트 결사"]');
   await page.click('.gw [data-action="dir-fac-play"][data-value="1|테스트 결사"]');
   await page.waitForSelector('.gw .dir-code');
-  assert.equal(await page.textContent('.gw .dir-code'), 'F00');
-  assert.ok((await page.evaluate(() => [...document.querySelectorAll('.gw [data-action="dir-start-open"]')].map((b) => b.dataset.value))).includes('F00'), '시작 칸 목록에 F00');
+  assert.equal(await page.textContent('.gw .dir-code'), 'G00');
+  assert.ok((await page.evaluate(() => [...document.querySelectorAll('.gw [data-action="dir-start-open"]')].map((b) => b.dataset.value))).includes('G00'), '시작 칸 목록에 G00');
   await edGo(page, 'org');
   await page.click('.gw .gw-row[data-value="테스트 결사"]');
   await page.waitForSelector('.gw [data-action="dir-fac-type"][data-value="freelancer|테스트 결사"]');
@@ -2200,25 +2204,25 @@ if (fixture.globalLore.some(packed)) {
   await page.waitForFunction(() => window.__calls.setChar === 2);
   const book = await page.evaluate(() => JSON.parse(window.__char.globalLore.find((e) => e.comment === 'Directory').content));
   const org = book.조직['테스트 결사'];
-  assert.deepEqual([org.code, org.playable, org.type, org.title, org.gm_name], ['F00', true, 'freelancer', '비밀 결사', 'Test Society']);
-  assert.deepEqual(book.codes_used, ['F00']);
+  assert.deepEqual([org.code, org.playable, org.type, org.title, org.gm_name], ['G00', true, 'freelancer', '비밀 결사', 'Test Society']);
+  assert.deepEqual(book.codes_used, ['F00', 'G00']);
   assert.equal(book.조직['관리국'].hidden, true);
-  assert.ok(book.요원.쟈알디.roster_for.includes('F00') && book.요원.쟈알디.phone_tabs.includes('T105'));
+  assert.ok(book.요원.쟈알디.roster_for.includes('G00') && book.요원.쟈알디.phone_tabs.includes('T106'));
   // 시작 화면: 관리국은 숨고 비밀 결사가 보임, 첫 장면은 직접 입력·커스텀 임무 두 개
   await page.click('.gw [data-action="ed-close"]'); // 2026-10-27: 설정은 편집 창 하나, 닫기는 ed-close
   await page.waitForSelector('.gx-facs');
   assert.equal(await page.locator('[data-action="faction"][data-value="A00"]').count(), 0, '숨긴 기본 세력');
-  await page.click('[data-action="faction"][data-value="F00"]');
-  assert.ok((await page.textContent('[data-action="faction"][data-value="F00"]')).includes('밤에만 움직이는 결사.'));
+  await page.click('[data-action="faction"][data-value="G00"]');
+  assert.ok((await page.textContent('[data-action="faction"][data-value="G00"]')).includes('밤에만 움직이는 결사.'));
   assert.equal(await page.$$eval('.gx-sc', (els) => els.length), 2);
   await page.click('[data-action="fm"][data-value="1"]');
   await page.fill('[data-input="start-note"]', '결사의 밤 모임');
   if (shots) await page.screenshot({ path: `${shots}/20-faction-picker.png` });
   await page.click('[data-action="start"]');
-  await page.waitForFunction(() => window.__chat.scriptstate?.$st_faction === 'F00');
+  await page.waitForFunction(() => window.__chat.scriptstate?.$st_faction === 'G00');
   const ss = await page.evaluate(() => window.__chat.scriptstate);
-  assert.deepEqual([ss.$ib_affiliation, ss.$fac_codes, ss.$fac_ac], ['테스트 결사', ' | F00', '\n   - F00 = Test Society']);
-  assert.match(ss.$fac_extra, /### Test Society \[F00\]\nA secret society\.\nFreelancer-type/);
+  assert.deepEqual([ss.$ib_affiliation, ss.$fac_codes, ss.$fac_ac], ['테스트 결사', ' | G00', '\n   - G00 = Test Society']);
+  assert.match(ss.$fac_extra, /### Test Society \[G00\]\nA secret society\.\nFreelancer-type/);
   assert.equal(await page.evaluate(() => window.__char.alternateGreetings[window.__chat.fmIndex]), '', '공용 빈 첫 장면');
   assert.match(ss.$ag_report ?? '', /쟈알디/, '새 세력 요원 목록');
   // 첫 응답 뒤: 상황판 변수가 그대로 유지되고 [AC|C00]로 소속을 바꿀 수 있음
@@ -2228,11 +2232,11 @@ if (fixture.globalLore.some(packed)) {
     await window.__calls.listeners[0]({ char: JSON.parse(JSON.stringify(window.__char)), chat: JSON.parse(JSON.stringify(c)), characterIndex: 0, chatIndex: 0, messageIndex: c.message.length - 1 });
   });
   await page.waitForFunction(() => window.__chat.scriptstate.$st_faction === 'C00');
-  assert.equal(await page.evaluate(() => window.__chat.scriptstate.$fac_codes), ' | F00');
+  assert.equal(await page.evaluate(() => window.__chat.scriptstate.$fac_codes), ' | G00');
   await page.setViewportSize({ width: 390, height: 844 });
   assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth), false);
   assert.deepEqual(errors, []);
-  console.log('PASS 새 플레이 세력: 명부에서 F00 켜기·기본 세력 숨기기 → 시작 화면 → 직접 입력 시작 → 소속 변경');
+  console.log('PASS 새 플레이 세력: 명부에서 G00 켜기·기본 세력 숨기기 → 시작 화면 → 직접 입력 시작 → 소속 변경');
   await page.close();
 }
 
@@ -2431,7 +2435,8 @@ for (const vp of [{ width: 1100, height: 900 }, { width: 390, height: 844 }]) {
     await page.waitForFunction(() => /rgba\(3, 7, 9, 0\)|transparent/.test(getComputedStyle(document.querySelector('.gx')).backgroundColor));
     await setDim(page, 100);
     await page.waitForFunction(() => getComputedStyle(document.querySelector('.gx')).backgroundColor === 'rgb(3, 7, 9)');
-    assert.equal(await page.evaluate(() => getComputedStyle(document.querySelector('.gx-hsep')).color === 'rgb(0, 0, 0)'), false, '글자색 변수 그대로');
+    // 머리의 꺾쇠(.gx-hsep)는 11-05 머리 정리로 없어져 제목 글자로 본다
+    assert.equal(await page.evaluate(() => getComputedStyle(document.querySelector('.gx-head .gx-brand b')).color === 'rgb(0, 0, 0)'), false, '글자색 변수 그대로');
     await setDim(page, 0);
     if (shots) await page.screenshot({ path: `${shots}/17b-nav-right.png` });
     await page.click('.gw [data-action="set-nav"][data-value="left"]');
@@ -2630,7 +2635,12 @@ if (fixture.globalLore.some(packed)) {
   await page.click('.gx-nh.mk-star');
   await page.waitForSelector('.mk-pop');
   // 기본 즐겨찾기(필드·가계부·기록·설정, 2026-10-29 사용자)를 비우고 시작
-  while (await page.$('.mk-pop [data-action="mk-del"]')) await page.click('.mk-pop [data-action="mk-del"] >> nth=0');
+  // 지우기는 DOM 에서 바로 누른다: 줄이 빠질 때마다 팝업이 다시 그려져 Playwright 클릭이 그 사이 보고서 본문에 가로채일 때가 있다 (2026-11-05)
+  while (await page.$('.mk-pop [data-action="mk-del"]')) {
+    const n = await page.locator('.mk-row').count();
+    await page.$eval('.mk-pop [data-action="mk-del"]', (b) => b.click());
+    await page.waitForFunction((c) => document.querySelectorAll('.mk-row').length < c || !document.querySelector('.mk-pop'), n);
+  }
   assert.ok((await page.textContent('.mk-pop')).includes('위키 메인'), '최근 본 화면');
   await page.click('.mk-pop [data-action="mk-add"]');
   assert.equal(await page.locator('.mk-pop [data-action="mk-here"]').count(), 0, '맨 상황판은 즐겨찾기에 못 넣음 (2026-11-05 사용자: 서랍이 상황판 안에 있다)');
@@ -2860,20 +2870,27 @@ if (fixture.globalLore.some(packed)) {
   await page.$eval('.gx-nh.mk-star', (b) => b.click());
   await page.waitForSelector('.mk-pop');
   // 기본 즐겨찾기(필드·가계부·기록·설정, 2026-10-29 사용자)를 비우고 시작
-  while (await page.$('.mk-pop [data-action="mk-del"]')) await page.click('.mk-pop [data-action="mk-del"] >> nth=0');
-  await page.click('.mk-pop [data-action="mk-here"]');
+  // 보고서 본문(.gx-rpt-sec)이 팝업 단추의 클릭 판정을 가로채서 DOM 에서 바로 누른다 (2026-11-05)
+  while (await page.$('.mk-pop [data-action="mk-del"]')) {
+    const n = await page.locator('.mk-row').count();
+    await page.$eval('.mk-pop [data-action="mk-del"]', (b) => b.click());
+    await page.waitForFunction((c) => document.querySelectorAll('.mk-row').length < c || !document.querySelector('.mk-pop'), n);
+  }
+  await page.$eval('.mk-pop [data-action="mk-here"]', (b) => b.click());
   const saved = JSON.parse(await page.evaluate(() => window.__store['p:goei:prefs'])).marks;
   const mi = saved.findIndex((m) => m.s.tab === 'records' && m.s.r?.view === 'report' && m.s.r?.id === rpt.id);
   assert.ok(mi >= 0 && saved[mi].name === `보고서 ${rpt.no}`, JSON.stringify(saved));
-  await page.click('.mk-head [data-action="mk-pop"]');
-  await page.click('.gx-nav .gx-nb:not(.mob)[data-value="board"]');
+  // 보고서 팝업(.gx-rptpop, fixed 최상위)이 떠 있는 동안은 팝업 밖 단추를 DOM 에서 누른다
+  await page.$eval('.mk-head [data-action="mk-pop"]', (b) => b.click());
+  await page.$eval('.gx-nav .gx-nb:not(.mob)[data-value="board"]', (b) => b.click());
   await page.waitForSelector('.gx-board');
   await page.click('.gx-nh.mk-star');
   await page.click(`.mk-pop [data-action="mk-go"][data-value="${mi}"]`);
   await page.waitForSelector('.gx-rptpop .gx-rpt');
-  assert.ok((await page.textContent('.gx-rpt')).includes(rpt.name), '즐겨찾기로 보고서 팝업 복원 (번호는 더 안 보인다, 2026-11-05)');
-  // PC ‹ (뒤로) = 상황판, 보고서 페이지에서 뒤로 단추 두 번 = 목록 → 이전 화면
-  await page.click('.gx-nh[data-action="nav-back"]');
+  assert.ok((await page.textContent('.gx-rptpop .gx-rpt')).includes(rpt.head.name), '즐겨찾기로 보고서 팝업 복원 (번호는 더 안 보인다, 2026-11-05)');
+  // PC ‹ (뒤로) = 상황판, 보고서 페이지에서 뒤로 단추 두 번 = 목록 → 이전 화면 (보고서 팝업이 떠 있어 DOM 에서 누른다)
+  await page.$eval('.gx-nh[data-action="nav-back"]', (b) => b.click());
+  await page.waitForFunction(() => document.querySelector('.gx')?.dataset.tab === 'board');
   assert.equal(await tabNow(), 'board');
   // 요원 격자 → 사원증 창 「기록」 → 기록 › 인물 상세 (인물 기록이 있을 때만 단추가 있다 → 기록을 하나 심는다)
   await page.evaluate(() => { window.__chat.goeiPeopleV1 = { v: 1, people: { 쟈알디: { name: '쟈알디', faction: 'A00', seeded: { from: 'none' }, slots: {}, address: {}, aff: 0 } }, pending: {}, docs: {}, log: [], folded: {} }; const g = document.querySelector('.gx'); if (g) g.style.display = 'none'; });
@@ -2963,7 +2980,8 @@ if (fixture.globalLore.some(packed)) {
   assert.equal(await page.locator('.gx-rdrawer .ph-tool[data-action="rec-sub"]').count(), 0, '서랍에 하위 탭 단추 없음');
   await page.click('.gx-rdrawer .ph-grip');
   const tops = await page.$$eval('.gx-rdrawer .gx-wt-tools > *', (l) => l.map((b) => Math.round(b.getBoundingClientRect().top)));
-  assert.ok(tops.length === 4 && new Set(tops).size === 1, `서랍 칩 셋+찾기 한 줄 (${tops.join(',')})`);
+  // 찾기 칸이 칩보다 1px 커서 가운데 정렬 때 위가 1px 올라간다 → 1px 까지는 한 줄로 본다
+  assert.ok(tops.length === 4 && Math.max(...tops) - Math.min(...tops) <= 1, `서랍 칩 셋+찾기 한 줄 (${tops.join(',')})`);
   await page.click('.gx-rec-tabs [data-action="rec-sub"][data-value="journal"]');
   await page.waitForSelector('.gx-jr-row');
   await noOverflow('폰 일지');
