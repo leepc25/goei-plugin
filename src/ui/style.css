@@ -1084,6 +1084,10 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
 .ph-content { display: flex; flex-direction: column; }
 .ph-blank { flex: 1; display: flex; align-items: center; justify-content: center; min-height: 200px; padding: 24px 20px; text-align: center; }
 .ph-blank p { margin: 0; max-width: 300px; font-size: 15px; line-height: 1.6; color: var(--dim); }
+.ph-blank-in { display: flex; flex-direction: column; align-items: center; gap: 16px; }
+.ph-blank-go { min-width: 102px; min-height: 56px; padding: 0 22px; border: 0; border-radius: 14px; background: var(--signal); color: var(--on-signal); font: inherit; font-size: 18px; font-weight: 800; letter-spacing: .08em; cursor: pointer; box-shadow: 0 6px 16px -8px color-mix(in srgb, var(--signal) 70%, transparent); }
+.ph-blank-go:hover:not(:disabled) { filter: brightness(1.06); }
+.ph-blank-go:disabled { opacity: .5; cursor: default; }
 /* 괴담톡 공지: 대화 목록과 같은 줄 (테두리 없음, 마우스 올리면 판 색, 고르면 민트) */
 .ph-notices { gap: 2px; padding: 0; }
 .ph-notice { position: relative; border-radius: 14px; background: none; overflow: hidden; }

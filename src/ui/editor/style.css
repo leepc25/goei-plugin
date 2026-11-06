@@ -452,3 +452,16 @@
 .gw .gw-startpage .st-member > summary { cursor: pointer; padding: 6px var(--pad); display: flex; gap: 8px; align-items: baseline; }
 .gw .gw-startpage .st-member > summary small { color: var(--dim); }
 .gw .gw-startpage .dir-chips { padding: 6px var(--pad) 10px; display: flex; flex-wrap: wrap; gap: 6px; }
+
+/* 설정 찾기 칸 (2026-11-06 사용자 승인, 전수점검 8-10): 기능 탭 왼쪽 목록 위. 찾은 줄은 목록 자리에, 고른 줄은 페이지에서 잠깐 비춘다 */
+.gw-find { display: block; width: 100%; height: var(--h); margin: 4px 0 2px; padding: 0 12px; border: 1px solid var(--line); border-radius: var(--r); background: var(--panel); color: var(--text); font: inherit; font-size: 14px; box-sizing: border-box; }
+.gw-find::placeholder { color: var(--dim); }
+.gw-find:focus { outline: none; border-color: var(--accent-line); }
+.gw-tree-item.gw-find-hit { height: auto; min-height: var(--h); padding-top: 6px; padding-bottom: 6px; }
+.gw-find-hit > span { display: flex; flex-direction: column; gap: 1px; white-space: normal; }
+.gw-find-hit b { font-weight: 600; color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.gw-find-hit small { font-size: 12px; color: var(--dim); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.gw-find-none { margin: 14px 12px; font-size: 13px; color: var(--dim); }
+.ps-row.gw-find-flash { animation: gw-find-flash 2.2s ease-out; }
+@keyframes gw-find-flash { 0%, 40% { background: var(--accent-bg); box-shadow: inset 3px 0 0 var(--signal); } 100% { background: transparent; box-shadow: inset 3px 0 0 transparent; } }
+@media (prefers-reduced-motion: reduce) { .ps-row.gw-find-flash { animation: none; background: var(--accent-bg); } }

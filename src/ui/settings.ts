@@ -30,7 +30,17 @@ export interface SettingsEnv {
 /** 원본 테마 변수. 카드 배경 CSS가 이 값으로 갈림 (없으면 라이트) */
 export const THEME_KEY = '$st_fixed_theme';
 
-export const settingsUi = { page: '' as '' | 'phone' | 'gnet' | 'wiki' | 'people' | 'journal' | 'factions' | 'image', confirmOff: false, busy: false, notice: '', info: '', scope: 'chat' as SettingsScope, confirm: '' as '' | 'save' | 'load' };
+export const settingsUi = {
+  page: '' as '' | 'phone' | 'gnet' | 'wiki' | 'people' | 'journal' | 'factions' | 'image',
+  confirmOff: false,
+  busy: false,
+  notice: '',
+  info: '',
+  scope: 'chat' as SettingsScope,
+  confirm: '' as '' | 'save' | 'load',
+  /** 「기본값 불러오기」 직전에 보관해 둔 이 채팅의 값 (2026-11-06 사용자 승인, 전수점검 9-7). 불러온 뒤 「되돌리기」 한 번. 없던 키는 undefined */
+  undo: null as null | { charIndex: number; chatIndex: number; before: Record<string, string | number | boolean | undefined> },
+};
 
 export function resetSettings(): void {
   settingsUi.confirmOff = false;
@@ -181,7 +191,7 @@ const CONFIRM: Record<'chat' | 'card', Record<'save' | 'load', [string, string]>
   },
 };
 
-function scopeBar(scope: SettingsScope, canChat: boolean): string {
+function scopeBar(scope: SettingsScope, canChat: boolean, ctx?: ChatContext): string {
   // 명부는 세계 편집 창으로 옮겼다 (2026-10-27). 설정 탭에는 옵션만
   const items: [SettingsScope, string][] = [[canChat ? 'chat' : 'defaults', '설정']];
   const tabs = `<div class="gx-segs st-scope">${items
@@ -194,7 +204,7 @@ function scopeBar(scope: SettingsScope, canChat: boolean): string {
   const yes = kind === 'card' ? (settingsUi.confirm === 'save' ? 'dir-save' : 'dir-reset') : 'set-bar-yes';
   const confirm = c
     ? `<div class="st-confirm st-barconfirm"><p>${c[0]}</p><div class="gx-row-btns"><button class="gx-mini${settingsUi.confirm === 'load' ? ' danger' : ' ps-save'}" data-action="${yes}" data-value="${settingsUi.confirm}">${c[1]}</button><button class="gx-mini" data-action="set-bar-no">취소</button></div></div>`
-    : '';
+    : scope === 'chat' && ctx ? undoBar(ctx) : '';
   return `<div class="st-scopebar">${tabs}${btns}</div>${confirm}`;
 }
 
@@ -205,9 +215,15 @@ export const mainDefaultsButtons = (): string => {
   const off = settingsUi.busy ? 'disabled' : '';
   return `<span class="ps-defaults"><button class="st-act save" data-action="set-bar" data-value="save" title="기본값으로 저장" aria-label="기본값으로 저장" ${off}>${ICONS.pen}<span>기본값으로 저장</span></button><button class="st-act" data-action="set-bar" data-value="load" title="기본값 불러오기" aria-label="기본값 불러오기" ${off}>${ICONS.refresh}<span>기본값 불러오기</span></button></span>`;
 };
-export function mainDefaultsConfirm(): string {
+/** 불러오기 뒤의 「되돌리기」 띠: 보관해 둔 값이 이 채팅 것일 때만 */
+export function undoBar(ctx: ChatContext): string {
+  const u = settingsUi.undo;
+  if (!u || u.charIndex !== ctx.charIndex || u.chatIndex !== ctx.chatIndex || settingsUi.confirm) return '';
+  return `<div class="st-confirm st-barconfirm ps-defconfirm st-undobar"><p>기본값을 불러오기 전 설정을 보관해 뒀어요. 되돌리면 그때 값으로 돌아가요.</p><div class="gx-row-btns"><button class="gx-mini ps-save" data-action="set-bar-undo" ${settingsUi.busy ? 'disabled' : ''}>${ICONS.back}불러오기 전으로 되돌리기</button><button class="gx-mini" data-action="set-bar-undo-drop">보관한 것 버리기</button></div></div>`;
+}
+export function mainDefaultsConfirm(ctx?: ChatContext): string {
   const c = settingsUi.confirm ? CONFIRM.chat[settingsUi.confirm] : null;
-  if (!c) return '';
+  if (!c) return ctx ? undoBar(ctx) : '';
   return `<div class="st-confirm st-barconfirm ps-defconfirm"><p>${c[0]}</p><div class="gx-row-btns"><button class="gx-mini${settingsUi.confirm === 'load' ? ' danger' : ' ps-save'}" data-action="set-bar-yes" data-value="${settingsUi.confirm}">${c[1]}</button><button class="gx-mini" data-action="set-bar-no">취소</button></div></div>`;
 }
 
@@ -261,7 +277,7 @@ export function featurePane(ctx: ChatContext, page: NonNullable<typeof settingsU
 export function settingsTab(ctx: ChatContext, scope: SettingsScope = 'chat', canChat = true, only?: SettingsSection): string {
   // 명부: 모바일은 검색을 하단 서랍에 (괴이·특수·요원·조직 탭은 위에 고정)
   if (scope === 'card') {
-    return `<main class="gx-body gx-settings">${scopeBar(scope, canChat)}${directoryView(ctx)}${toast('dir', directoryDone(), directoryDoneClear)}</main>${drawerBox(directorySearch(), 'gx-dirdrawer')}`;
+    return `<main class="gx-body gx-settings">${scopeBar(scope, canChat, ctx)}${directoryView(ctx)}${toast('dir', directoryDone(), directoryDoneClear)}</main>${drawerBox(directorySearch(), 'gx-dirdrawer')}`;
   }
   // 기능별 설정 → 본부 대화: 괴담톡·괴담넷·위키처럼 따로 된 화면 (2026-10-23 사용자)
   // 시작 전(시작 패널의 「새 채팅 기본 설정」)에도 chat 객체·scriptstate 가 있어 같은 페이지를 연다 (2026-10-26 사용자)
@@ -347,7 +363,7 @@ export function settingsTab(ctx: ChatContext, scope: SettingsScope = 'chat', can
   };
   if (only) return S[only];
   return `<main class="gx-body gx-settings">
-    ${scopeBar(scope, canChat)}
+    ${scopeBar(scope, canChat, ctx)}
     ${settingsUi.notice ? `<div class="gx-err" role="alert">${esc(settingsUi.notice)}</div>` : ''}
     ${S.screen}${S.image}${S.board}${S.lore}${S.adv}${S.update}
     ${toast('st', settingsUi.info, (t) => {
@@ -434,6 +450,34 @@ export async function handleSettings(action: string, value: string | undefined, 
     env.render();
     return true;
   }
+  if (action === 'set-bar-undo-drop') {
+    settingsUi.undo = null;
+    env.render();
+    return true;
+  }
+  if (action === 'set-bar-undo') {
+    // 불러오기 전에 보관한 값으로. 그때 없던 키는 지운다
+    const u = settingsUi.undo;
+    if (!u || u.charIndex !== ctx.charIndex || u.chatIndex !== ctx.chatIndex) return true;
+    settingsUi.undo = null;
+    await save(ctx, env, (chat) => {
+      const vars: ScriptState = {};
+      const drop: string[] = [];
+      for (const [k, val] of Object.entries(u.before)) {
+        if (val === undefined) drop.push(k);
+        else vars[k] = val;
+      }
+      if (drop.length) {
+        const ss = { ...(chat.scriptstate ?? {}) };
+        for (const k of drop) delete ss[k];
+        chat.scriptstate = ss;
+      }
+      return vars;
+    });
+    if (!settingsUi.notice) settingsUi.info = '기본값을 불러오기 전 설정으로 되돌렸어요.';
+    env.render();
+    return true;
+  }
   if (action === 'set-bar-yes') {
     const what = settingsUi.confirm;
     settingsUi.confirm = '';
@@ -447,6 +491,8 @@ export async function handleSettings(action: string, value: string | undefined, 
     } else if (what === 'load') {
       // 새 채팅 기본값을 지금 채팅에. 상황판 켜기·끄기는 상태를 비우거나 새로 만들기 때문에 그대로 둔다
       const d = current(ctx, 'defaults');
+      // 덮어쓰기 직전에 바뀔 키의 지금 값을 보관한다 (2026-11-06 사용자 승인, 전수점검 9-7): 불러온 뒤 「되돌리기」 한 번
+      let before: Record<string, string | number | boolean | undefined> | null = null;
       await save(ctx, env, (chat) => {
         const vars: ScriptState = { ...basicVars(d.basic), [THEME_KEY]: d.theme, ...loadVarDefaults(ALL_PREFIXES, chat.scriptstate) };
         for (const f of WORLD_SPEC) vars[wgKey(f.key)] = String(d.world[f.key]);
@@ -454,8 +500,11 @@ export async function handleSettings(action: string, value: string | undefined, 
           const ss = { ...(chat.scriptstate ?? {}), ...vars };
           Object.assign(vars, worldVars(readWorld(chat), parseCatalog(lore), worldSettings(lore, ss), String(ss['$st_faction'] ?? '')));
         }
+        before = {};
+        for (const k of Object.keys(vars)) before[k] = chat.scriptstate?.[k];
         return vars;
       });
+      if (!settingsUi.notice && before) settingsUi.undo = { charIndex: ctx.charIndex, chatIndex: ctx.chatIndex, before };
       if (!settingsUi.notice) settingsUi.info = '새 채팅 기본값을 지금 채팅에 불러왔어요.';
       env.render();
     } else env.render();

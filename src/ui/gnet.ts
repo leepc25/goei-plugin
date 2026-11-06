@@ -561,7 +561,8 @@ function dmPane(st: GState, nick: string, busy: boolean, inline = false): string
 
 /** 게시판 목록: 첫 줄 제목·댓글 수, 둘째 줄 닉네임·시각·조회·추천 */
 function boardList(st: GState, busy: boolean, mobile: boolean): string {
-  if (!st.posts.length) return '<div class="ph-blank"><p>게시글이 없어요.<br>새로고침을 눌러 불러오세요.</p></div>';
+  // 빈 화면에 큰 새로고침 단추 하나 (2026-11-06 사용자 승인, 전수점검 9-1). 머리의 새로고침 단추와 같은 동작
+  if (!st.posts.length) return `<div class="ph-blank"><div class="ph-blank-in"><p>게시글이 없어요.</p><button class="ph-blank-go" data-action="gn-refresh" ${busy ? 'disabled' : ''}>${busy ? '불러오는 중…' : '새로고침'}</button></div></div>`;
   return `<ul class="ph-list gn-list">${st.posts
     .map((p) => {
       const on = gnet.open === p.id && !gnet.settings;
