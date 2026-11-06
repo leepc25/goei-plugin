@@ -2,14 +2,16 @@
 // factions.ts 는 저장된 명부 글을 그대로 읽어서, 여기서 옮기지 않으면 옛 명부(roster_v 없음)를 가진 봇은 명부를 한 번 저장하기 전까지 「중립」 칸이 안 보인다.
 import type { DirectoryData } from './directory';
 
-export const ROSTER_V = 3;
+export const ROSTER_V = 4; // 4: 중립 설명 글 고침(11-06)
 
 /** 시작 묶음 「중립」의 기본 인물 (2026-11-05 사용자): 세력 없는 인물로 플레이하는 칸 */
 export const NEUTRAL_GROUP = '중립';
 export const NEUTRAL_IDS = ['P043', 'P044', 'P045', 'P046', 'P047', 'P048', 'P049', 'P050', 'P051', 'P052', 'P053', 'P054', 'P055'];
 /** 영문명: 사진 이름(「Neutral」 이미지)과 영어 응답에서 쓴다 — 기본 세력 사진(Management Bureau.avif 등)과 같은 규칙 */
 export const NEUTRAL_ENGLISH = 'Neutral';
-export const NEUTRAL_BLURB = '어느 조직에도 속하지 않은 사람들. 교황청 수녀, 이슬람 성전사, 마녀, 흡혈귀, 중림 상인, 그리고 사람이 아닌 것까지.';
+export const NEUTRAL_BLURB = '요원이 아닌 쪽에서 괴이와 얽힌 사람들. 사냥하거나, 거래하거나, 혹은 스스로 괴이다.';
+/** 11-06 이전 기본 설명(사용자: 「각자 다 조직이 있는데 왜 어느 조직에도 속하지 않았다고 하지?」) — 저장된 명부에 그대로 남은 것은 새 글로 바꾼다 */
+export const NEUTRAL_BLURB_OLD = '어느 조직에도 속하지 않은 사람들. 교황청 수녀, 이슬람 성전사, 마녀, 흡혈귀, 중림 상인, 그리고 사람이 아닌 것까지.';
 
 const s = (v: unknown) => (typeof v === 'string' ? v.trim() : '');
 
@@ -33,7 +35,10 @@ function migrateNeutral(d: DirectoryData): void {
     if (!code) return;
     groups[NEUTRAL_GROUP] = { code, blurb: NEUTRAL_BLURB, english: NEUTRAL_ENGLISH };
     d.codes_used = [...new Set([...(d.codes_used ?? []), code])].sort();
-  } else code = s(groups[NEUTRAL_GROUP].code);
+  } else {
+    code = s(groups[NEUTRAL_GROUP].code);
+    if (s(groups[NEUTRAL_GROUP].blurb) === NEUTRAL_BLURB_OLD) groups[NEUTRAL_GROUP].blurb = NEUTRAL_BLURB;
+  }
   if (!code) return;
   for (const row of Object.values(d.요원 ?? {})) {
     const r = row as { id?: unknown; roster_for?: unknown };
@@ -55,7 +60,7 @@ export function migrateRoster(d: DirectoryData): DirectoryData {
     strip(d.조직);
     strip(d.요원);
   }
-  if (v < 3) migrateNeutral(d);
+  if (v < 4) migrateNeutral(d); // 판 3→4: 중립 설명 글만 바꿈 (migrateNeutral 은 두 번 돌아도 같음)
   d.roster_v = ROSTER_V;
   return d;
 }
