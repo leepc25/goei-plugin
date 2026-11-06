@@ -51,3 +51,20 @@ test('스타일시트가 쓰는 CSS 변수는 모두 정의돼 있다 (테마 3�
   assert.deepEqual(palette.filter((v) => !light.has(v)), [], '라이트에 빠진 변수');
   assert.deepEqual(palette.filter((v) => !paper.has(v)), [], '페이퍼에 빠진 변수');
 });
+
+test('기기 설정(Prefs) 키는 설정 창 밖 어딘가에서 읽는다 (죽은 설정 방지, 2026-11-06)', () => {
+  // 원리: core/settings.ts 의 Prefs 인터페이스에서 키 이름을 뽑고, 설정을 정의·그리는 두 파일을 뺀 나머지 src 전체에서
+  // `.키` 또는 `키:`/`키,`/`키}` 꼴로 한 번이라도 쓰이는지 찾는다. 설정 창에만 있고 읽는 코드가 없으면 실패.
+  const settingsSrc = readFileSync(join(root, 'core/settings.ts'), 'utf8');
+  const start = settingsSrc.indexOf('export interface Prefs {');
+  const end = settingsSrc.indexOf('\n}', start);
+  assert.ok(start > 0 && end > start, 'Prefs 인터페이스를 찾지 못함');
+  const keys = [...settingsSrc.slice(start, end).matchAll(/^\s+(\w+)\??:/gm)].map((m) => m[1]);
+  assert.ok(keys.length >= 20, `Prefs 키가 너무 적음: ${keys.length}`);
+  // 내부 표시용 키(설정 파일 안에서만 읽고 쓰는 것)는 settings.ts 자체를 읽는 쪽으로 친다
+  const internal = new Set(['marksSeeded']);
+  const readers = walk(root).filter((p) => p.endsWith('.ts') && !p.endsWith('ui/settings.ts') && (!p.endsWith('core/settings.ts')));
+  const corpus = readers.map((p) => readFileSync(p, 'utf8')).join('\n');
+  const dead = keys.filter((k) => !internal.has(k) && !new RegExp(`\\.${k}\\b|\\b${k}\\s*[:,}]`).test(corpus));
+  assert.deepEqual(dead, [], '설정 창에만 있고 아무 데서도 읽지 않는 기기 설정 키');
+});

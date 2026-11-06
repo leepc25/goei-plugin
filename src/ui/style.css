@@ -2789,6 +2789,12 @@ button.mk-go:hover { color: var(--signal); }
 .gx-wallettab { display: flex; flex-direction: column; gap: 14px; }
 .gx-wallettab section { padding: 0; }
 .gx-wt-day + .gx-wt-day { margin-top: 10px; }
+/* 달 줄 (2026-11-06): 그달 첫 날짜 묶음 위에 수입·지출 합계 */
+.gx-wt-month { display: flex; align-items: baseline; flex-wrap: wrap; gap: 4px 14px; margin: 14px 2px 4px; padding: 8px 12px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel2); font-size: 13px; color: var(--dim); }
+.gx-wt-month:first-child { margin-top: 0; }
+.gx-wt-month b { margin-right: auto; font-family: var(--mono); font-size: 14px; font-weight: 700; color: var(--text); letter-spacing: .06em; }
+.gx-wt-month em { font-style: normal; font-weight: 700; font-variant-numeric: tabular-nums; }
+.gx-wt-month em.in { color: var(--signal); } .gx-wt-month em.out { color: var(--danger, #FF7A6B); }
 .gx-wallettab .in { color: var(--signal); }
 .gx-wallettab .out { color: var(--danger); }
 .gx-wt-balrow b { font-variant-numeric: tabular-nums; white-space: nowrap; }
@@ -2974,12 +2980,12 @@ button.gx-jr-row:hover { background: color-mix(in srgb, var(--text) 4%, transpar
 .gx-pngcard .ps-note { margin: 0; font-size: 13px; color: var(--sub); }
 .gx-png-acts { display: flex; gap: 8px; justify-content: flex-end; }
 
-/* 하위 탭: 괴담톡·괴담넷과 같은 밑줄 탭 (넷이 같은 너비) */
-.gx-rec-tabs.ph-subs { grid-template-columns: repeat(4, 1fr); }
+/* 하위 탭: 괴담톡·괴담넷과 같은 밑줄 탭 (다섯이 같은 너비, 11-06 연대기 추가) */
+.gx-rec-tabs.ph-subs { grid-template-columns: repeat(5, 1fr); }
 
 /* ── 기록·가계부: 상황판 톤 (2026-10-29 사용자 시안 docs/시안/기록_가계부_2) ── */
 .gx-records, .gx-wallettab { display: flex; flex-direction: column; gap: 14px; }
-.gx-rec-tabs.ph-subs { grid-template-columns: repeat(4, 1fr); }
+.gx-rec-tabs.ph-subs { grid-template-columns: repeat(5, 1fr); }
 /* 모니터 판: 상황판 CCTV 와 같은 어두운 화면·주사선·테두리 어둠, 고정폭 숫자에 은은한 빛 */
 .gx-mon { position: relative; flex: none; border-radius: 14px; overflow: hidden; background: #0b110f; color: #e8f3ef; border: 1px solid color-mix(in srgb, var(--text) 22%, transparent); box-shadow: inset 0 0 60px rgba(0, 0, 0, .6); }
 .gx-mon::before { content: ''; position: absolute; inset: 0; z-index: 1; pointer-events: none; background: repeating-linear-gradient(0deg, rgba(255, 255, 255, .035) 0 1px, transparent 1px 3px); }
@@ -3028,6 +3034,17 @@ button.gx-jr-row { cursor: pointer; } button.gx-jr-row:hover { border-color: var
 .gx-jr-main > small { font-size: 12.5px; color: var(--dim); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .gx-jr-who { display: flex; align-items: center; gap: 5px; min-width: 0; font-size: 12.5px; color: var(--sub); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .gx-jr-who em { font-style: normal; color: var(--dim); overflow: hidden; text-overflow: ellipsis; }
+/* 연대기 줄 (2026-11-06): 표식 · 머리/설명 · 종류. 일지 줄과 같은 카드 톤 */
+.gx-cr-row { display: grid; grid-template-columns: 34px minmax(0, 1fr) auto; gap: 12px; align-items: center; width: 100%; padding: 9px 14px 9px 10px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); color: var(--text); font: inherit; text-align: left; }
+button.gx-cr-row { cursor: pointer; } button.gx-cr-row:hover { border-color: var(--signal); }
+.gx-cr-row .gx-gmark { grid-row: auto; align-self: center; }
+.gx-cr-dot { width: 34px; height: 34px; border-radius: 10px; display: grid; place-items: center; background: var(--panel2); }
+.gx-cr-dot::after { content: ''; width: 10px; height: 10px; border-radius: 50%; background: var(--dim); }
+.gx-cr-dot.person::after { background: #F5B544; } .gx-cr-dot.faction::after { background: var(--signal); } .gx-cr-dot.rank::after { background: #5EEAD4; }
+.gx-cr-main { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.gx-cr-main b { font-size: 15px; font-weight: 800; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.gx-cr-main small { font-size: 12.5px; color: var(--dim); overflow-wrap: anywhere; }
+.gx-cr-kind { font-style: normal; font-size: 12px; color: var(--dim); white-space: nowrap; }
 .gx-face { width: 22px; height: 22px; flex: none; border: 1px solid var(--line); }
 
 /* 보고서 카드: 위에 CCTV 화면, 보고서 번호·CLOSED 도장 */

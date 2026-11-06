@@ -1,3 +1,30 @@
+true;
+    }
+    const to = d.agents.findIndex((a) => a.lore === target);
+    if (to < 0 || to === from || agentGroup(d.agents[to]) !== g2) return false;
+    const [row9] = d.agents.splice(from, 1);
+    const at = (to > from ? to - 1 : to) + (how === "after" ? 1 : 0);
+    d.agents.splice(at, 0, row9);
+    return true;
+  }
+  function loreGender(lore, name) {
+    const text4 = lore.find((e) => s4(e.comment) === name)?.content;
+    const m = typeof text4 === "string" ? /(?:Gender|Sex|성별)\s*[:：]\s*\**\s*([^\s,|*]+)/i.exec(text4) : null;
+    if (!m) return "";
+    const v = m[1].toLowerCase();
+    if (/^(female|woman|girl|f|여|여성|여자)/.test(v)) return "F";
+    if (/^(male|man|boy|m|남|남성|남자)/.test(v)) return "M";
+    return "";
+  }
+  var agentGender = (a, lore) => a.gender === "X" ? "" : a.gender || loreGender(lore, a.lore);
+
+  // src/core/world/catalog.ts
+  var CatalogError = class extends Error {
+  };
+  var FALLBACK_DISPLAY = {
+    A00: "관리국",
+    B00: "가짜 관리국",
+    C00: "백일몽",
     D00: "민간인",
     E00: "프리랜서"
   };
@@ -1509,8 +1536,8 @@
       return [ranks.get(piece.join(","))];
     return bytePairMerge(piece, ranks).map((p) => ranks.get(piece.slice(p.start, p.end).join(","))).filter((x) => x != null);
   }
-  function escapeRegex(str7) {
-    return str7.replace(/[\\^$*+?.()|[\]{}]/g, "\\$&");
+  function escapeRegex(str8) {
+    return str8.replace(/[\\^$*+?.()|[\]{}]/g, "\\$&");
   }
   var _Tiktoken = class {
     /** @internal */
@@ -4126,11 +4153,11 @@ ${body5}
       const text4 = content.trim();
       if (!text4) return;
       const rank2 = ["base", "primary", "active", "direct", "secondary"];
-      const same3 = rows2.find((r) => r.content === text4);
-      if (same3) {
-        if (!same3.sources.includes(source4)) same3.sources.push(source4);
-        if (o.scope === "wiki" && rank2.indexOf(kind) < rank2.indexOf(same3.kind)) same3.kind = kind;
-        same3.required = same3.required || required(kind);
+      const same4 = rows2.find((r) => r.content === text4);
+      if (same4) {
+        if (!same4.sources.includes(source4)) same4.sources.push(source4);
+        if (o.scope === "wiki" && rank2.indexOf(kind) < rank2.indexOf(same4.kind)) same4.kind = kind;
+        same4.required = same4.required || required(kind);
         return;
       }
       rows2.push({ kind, sources: [source4], content: text4, required: required(kind) });
@@ -4624,31 +4651,4 @@ ${c}`)]).join("\n\n");
     person_cap: "10000",
     /** 본편 요청에 넣는 기록 블록 전체 상한 (글자). 리수폿 Director 참고 상한과 같은 16,000 */
     block_cap: "16000",
-    /** 저장 상한을 넘긴 인물 정리: same = 같은 갱신 호출에 얹음(기본), separate = 별도 호출 */
-    tidy: "same",
-    span_cap: "20000",
-    rules: "",
-    director_rules: "",
-    /** 다른 보조 호출과 병렬 */
-    parallel: "0",
-    keep_raw: "1"
-  };
-  function ppValue(state, key2) {
-    const v = state?.[PP(key2)];
-    return v === void 0 || v === null || v === "" || v === "null" ? PP_DEFAULTS[key2] ?? "" : String(v);
-  }
-  function peopleSettings(state) {
-    const v = (k) => ppValue(state, k);
-    const num4 = (k, min, max) => {
-      const n2 = Number(v(k));
-      return Math.max(min, Math.min(max, Number.isFinite(n2) ? n2 : Number(PP_DEFAULTS[k])));
-    };
-    const one2 = (k, list4) => list4.includes(v(k)) ? v(k) : PP_DEFAULTS[k];
-    return {
-      on: v("on") === "1",
-      when: one2("when", ["turn", "manual"]),
-      model: v("model") === "main" ? "main" : "aux",
-      prompt: one2("prompt", ["detailed", "compact"]),
-      inject: one2("inject", ["split", "append", "record", "off"]),
-      director: one2("director", ["off", "facts", "scene"]),
-      directorLang: v("director_lang") ===
+    /** 저장 상한을 넘긴 인물 정리: same = 같은 갱신 호출에 얹음(기본), separate = 별도 

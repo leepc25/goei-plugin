@@ -132,10 +132,10 @@ export function agentInner(char: CharacterSnapshot, p: { english?: string; name:
 }
 
 /** 모바일 ID카드 창: 요원 정보 창과 같은 틀에 카드만 넣는다 */
-export function showIdCard(html: string, act?: (action: string, value?: string) => void): void {
+export function showIdCard(html: string, act?: (action: string, value?: string) => void, cls = ''): void {
   document.querySelectorAll('.gx-idpop').forEach((b) => b.remove()); // 두 번 누르면 겹치던 문제 (2026-11-05)
   const box = document.createElement('div');
-  box.className = 'gx gx-agpop gx-idpop';
+  box.className = `gx gx-agpop gx-idpop${cls ? ` ${cls}` : ''}`;
   box.setAttribute('role', 'dialog');
   box.innerHTML = `<div class="gx-idpop-card">${html}<button class="gx-agpop-x" aria-label="닫기">✕</button></div>`;
   const theme = document.querySelector('.gx')?.getAttribute('data-theme');

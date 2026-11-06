@@ -147,6 +147,9 @@ const rows = (page) => page.locator('.gx-wt-row').count();
   assert.match(tiles[3], /오늘\s*−1,200\s*1건/);
   // 날짜 묶음 (최신 위) · 그 거래 뒤 잔고 · 필드 장면·시각 · 본문 근거
   assert.deepEqual(await page.locator('.gx-wt-day h3 span').allTextContents(), ['2025.01.02 (목)', '2025.01.01 (수)']);
+  // 달 줄 (2026-11-06): 그달 첫 날짜 묶음 위에 하나, 수입·지출은 위 칸과 같은 셈
+  assert.equal(await page.locator('.gx-wt-month').count(), 1, '달 줄 하나 (1월)');
+  assert.match(await page.textContent('.gx-wt-month'), /2025\.01\s*수입 \+30,000\s*지출 −16,200/);
   assert.equal(await rows(page), 3);
   const first = await page.textContent('.gx-wt-row >> nth=0');
   assert.match(first, /삼각김밥[\s\S]*종로 큰길 09:40[\s\S]*−1,200[\s\S]*153,800/);

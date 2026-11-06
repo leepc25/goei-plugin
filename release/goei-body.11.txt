@@ -1,4 +1,56 @@
-2;
+ed && closedAt >= 0) {
+        try {
+          await refreshStatusContext(ctx2.charIndex, ctx2.chatIndex, { chat: saved, char: ctx2.char });
+          if (chatCardsAt(saved, closedAt).length) await updateChat(ctx2.charIndex, ctx2.chatIndex, (cur) => ({ ...cur }));
+        } catch {
+        }
+      }
+      env3.setBusy(false);
+      await env3.refresh();
+    } catch (error) {
+      env3.setBusy(false);
+      env3.setNotice(error instanceof Error ? error.message : String(error));
+      env3.render();
+    }
+  }
+  function showOnMap(ctx2, key2) {
+    const x = readCtx(ctx2);
+    if (typeof x === "string" || !x.on) return false;
+    const ev = activeEvents(x.world).find((e) => e.key === key2);
+    if (!ev) return false;
+    field3.region = sidoOf(ev.loc);
+    field3.place = placeKey(ev, x.catalog);
+    field3.filter = "all";
+    field3.confirmEnd = null;
+    return true;
+  }
+  async function handleField(action, value, ctx2, env3, opening) {
+    const v = value ?? "";
+    switch (action) {
+      case "map-region":
+        field3.region = v === "01" || MAP_CODES.includes(v) ? v : "01";
+        field3.place = null;
+        field3.confirmEnd = null;
+        env3.render();
+        return true;
+      case "map-jump":
+      case "map-place": {
+        let v2 = value ?? "";
+        if (action === "map-jump") {
+          const [code2, key2] = v2.split("|");
+          if (!MAP_CODES.includes(code2) || !key2) return true;
+          field3.region = code2;
+          field3.mapq = "";
+          v2 = key2;
+        }
+        field3.confirmEnd = null;
+        if (action === "map-place" && isPC() && field3.place === v2 && sameTarget(field3.target, v2)) {
+          field3.place = null;
+          field3.target = null;
+          env3.render();
+          return true;
+        }
+        field3.place = v2;
         const x = readCtx(ctx2);
         const here = typeof x === "string" || !x.on ? [] : activeEvents(x.world).filter((e) => placeKey(e, x.catalog) === v2);
         if (!here.length) field3.target = placeTarget(v2);
@@ -274,7 +326,7 @@
     const imageFiles = (list4) => [...list4 ?? []].map((x) => x instanceof File ? x : x.kind === "file" ? x.getAsFile() : null).filter((f) => !!f && f.type.startsWith("image/"));
     if (!widthWatch) {
       widthWatch = true;
-      matchMedia("(max-width: 760px)").addEventListener?.("change", () => root2 && render2());
+      matchMedia(PHONE_MQ).addEventListener?.("change", () => root2 && render2());
       const frameWatch = () => {
         if (!root2 || root2.style.display === "none") return;
         const fr = frameState(getPrefs().frame, view.kind === "started");
@@ -751,7 +803,7 @@
         return start();
       case "nav-tab":
       case "tab":
-        if (action === "nav-tab" && value === tab && value !== "board" && !matchMedia("(max-width: 760px)").matches) value = "board";
+        if (action === "nav-tab" && value === tab && value !== "board" && !isPhone()) value = "board";
         if (value === "settings") return handle2("ed-open", "set:screen");
         if (value === "wallet") return openWallet();
         if (value === "records" && tab !== "records") applyRecordsNav({ sub: "journal", view: "list", id: "" });
@@ -797,7 +849,7 @@
         opsUi.sel = value ?? "";
         field3.confirmEnd = null;
         render2();
-        if (matchMedia("(max-width: 760px)").matches) root2?.querySelector(".gx-opview")?.scrollIntoView({ block: "start", behavior: "smooth" });
+        if (isPhone()) root2?.querySelector(".gx-opview")?.scrollIntoView({ block: "start", behavior: "smooth" });
         return;
       case "ops-mode":
         opsUi.mode = value === "map" ? "map" : "feed";
@@ -1097,7 +1149,7 @@
     setCurrentTheme(themeName(root2.dataset.theme));
   }
   function boardDrawer() {
-    if (!matchMedia("(max-width: 760px)").matches) return "";
+    if (!isPhone()) return "";
     return drawerHtml(markSlots(), "", "gx-bdrawer");
   }
   var navHist = new NavHistory();
@@ -1358,9 +1410,11 @@
     const name = pa?.name || u.name || "나";
     const photoUrl2 = pa ? paPic : u.photo;
     const photo = photoUrl2 ? `<span class="gx-id-photo"><img src="${esc31(photoUrl2)}" alt=""></span>` : `<span class="gx-id-photo none">${ICONS.idcard}</span>`;
-    return `<div class="gx-id">${img ? `<span class="gx-id-bg" style="background-image:url('${esc31(img)}')"></span>` : ""}
+    const who = `<span class="gx-id-who"><b>${esc31(name)}</b><small>${esc31([f ? selfName(ctx2, f.code, f.name) : "소속 없음", pa?.rank ?? ""].filter(Boolean).join(" · "))}</small></span>`;
+    const bg = img ? `<span class="gx-id-bg" style="background-image:url('${esc31(img)}')"></span>` : "";
+    return `<div class="gx-id">${bg}
       ${photo}
-      <span class="gx-id-who"><b>${esc31(name)}</b><small>${esc31([f ? selfName(ctx2, f.code, f.name) : "소속 없음", pa?.rank ?? ""].filter(Boolean).join(" · "))}</small></span>
+      ${who}
       ${status2 || walletChip(ctx2) ? `<span class="gx-op-st">${walletChip(ctx2)}${status2}</span>` : ""}
     </div>`;
   }
@@ -2282,5 +2336,5 @@ ${texts.anomaly}`;
   }
 
   // src/body-entry.ts
-  globalThis.__goeiBody = { version: "0.20.7", start: start2 };
+  globalThis.__goeiBody = { version: "0.20.8", start: start2 };
 })();

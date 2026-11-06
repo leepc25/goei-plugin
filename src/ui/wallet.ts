@@ -54,6 +54,20 @@ function dayLabel(date: string): string {
 
 interface Row { e: WalletEntry; after: number; date: string }
 
+/** 상태창 날짜 → 「2025.01」 (못 읽으면 '') */
+function monthOf(date: string): string {
+  const m = /(\d{4})\D+(\d{1,2})/.exec(date);
+  return m ? `${m[1]}.${m[2].padStart(2, '0')}` : '';
+}
+
+/** 달 줄 (2026-11-06 사용자 「포함시켜」): 그달 수입·지출 합계. 「직접 수정」은 빼고(가계부 위 칸과 같은 셈), 거르기·찾기와 상관없이 그달 전체 */
+function monthLine(month: string, rows: Row[]): string {
+  const list = rows.filter((r) => r.e.src !== 'manual' && monthOf(r.date) === month);
+  const inc = list.filter((r) => r.e.amount > 0).reduce((n, r) => n + r.e.amount, 0);
+  const out = -list.filter((r) => r.e.amount < 0).reduce((n, r) => n + r.e.amount, 0);
+  return `<div class="gx-wt-month"><b>${esc(month)}</b><span>수입 <em class="in">+${esc(inc.toLocaleString('en-US'))}</em></span><span>지출 <em class="out">−${esc(out.toLocaleString('en-US'))}</em></span></div>`;
+}
+
 function rowsOf(ctx: ChatContext): { rows: Row[]; today: string; start: number } {
   const w = walletOf(ctx);
   const live = liveWallet(w, aliveAnchors(ctx.chat));
@@ -94,7 +108,12 @@ export function walletList(ctx: ChatContext): string {
     if (g && g.date === r.date) g.rows.push(r);
     else groups.push({ date: r.date, rows: [r] });
   }
-  return groups.map((g) => `<section class="gx-wt-day">
+  let lastMonth: string | null = null;
+  return groups.map((g) => {
+    const month = monthOf(g.date);
+    const head = month && month !== lastMonth ? monthLine(month, rows) : '';
+    lastMonth = month;
+    return `${head}<section class="gx-wt-day">
     <h3><span>${esc(dayLabel(g.date))}</span><em>${esc(formatDelta(g.rows.filter((r) => r.e.src !== 'manual').reduce((n, r) => n + r.e.amount, 0)))}</em></h3>
     <ul>${g.rows.map(({ e, after }) => {
       const open = walletUi.open === e.id;
@@ -108,7 +127,8 @@ export function walletList(ctx: ChatContext): string {
         ${editable ? `<button class="gx-wt-del" data-action="wallet-del" data-value="${esc(e.id)}" aria-label="이 거래 지우기">✕</button>` : ''}
       </li>`;
     }).join('')}</ul>
-  </section>`).join('');
+  </section>`;
+  }).join('');
 }
 
 /** 전체·수입·지출 칩 + 찾기 줄. PC는 목록 위, 폰은 기록 서랍 위칸(2026-11-05 사용자: 손이 닿는 자리) */

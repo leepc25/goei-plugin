@@ -1,4 +1,4 @@
-// goei-body 0.20.7
+// goei-body 0.20.8
 "use strict";
 (() => {
   var __create = Object.create;
@@ -1218,11 +1218,19 @@ ${tpl.replace(/\[\[INPUT\]\]/g, () => extra)}`;
   }
 
   // src/core/world/roster-v.ts
-  var ROSTER_V = 3;
-  var NEUTRAL_GROUP = "중립";
+  var ROSTER_V = 6;
+  var NEUTRAL_GROUP = "이면의 주민들";
+  var NEUTRAL_GROUP_OLD = ["중립", "다른 세력"];
   var NEUTRAL_IDS = ["P043", "P044", "P045", "P046", "P047", "P048", "P049", "P050", "P051", "P052", "P053", "P054", "P055"];
-  var NEUTRAL_ENGLISH = "Neutral";
-  var NEUTRAL_BLURB = "어느 조직에도 속하지 않은 사람들. 교황청 수녀, 이슬람 성전사, 마녀, 흡혈귀, 중림 상인, 그리고 사람이 아닌 것까지.";
+  var NEUTRAL_ENGLISH = "Residents of the Hidden World";
+  var NEUTRAL_ENGLISH_OLD = ["Neutral", "Other Factions"];
+  var NEUTRAL_BLURB = "저마다의 사정과 목적을 품고, 서울의 이면을 살아가는 이들.";
+  var NEUTRAL_BLURB_OLD = [
+    "어느 조직에도 속하지 않은 사람들. 교황청 수녀, 이슬람 성전사, 마녀, 흡혈귀, 중림 상인, 그리고 사람이 아닌 것까지.",
+    "요원이 아닌 쪽에서 괴이와 얽힌 사람들. 사냥하거나, 거래하거나, 혹은 스스로 괴이다.",
+    "제 조직과 제 목적을 따로 가진 자들. 누구의 편도 아니고, 필요하면 누구와도 손을 잡는다.",
+    "다른 세력의 인물 하나를 골라 그 사람으로 시작한다."
+  ];
   var s = (v) => typeof v === "string" ? v.trim() : "";
   function freeGroupCode(used) {
     const set2 = new Set(used);
@@ -1234,6 +1242,11 @@ ${tpl.replace(/\[\[INPUT\]\]/g, () => extra)}`;
   }
   function migrateNeutral(d) {
     const groups = d["시작 묶음"] ??= {};
+    for (const old of NEUTRAL_GROUP_OLD) {
+      if (!groups[old]) continue;
+      if (!groups[NEUTRAL_GROUP]) groups[NEUTRAL_GROUP] = groups[old];
+      delete groups[old];
+    }
     const used = [...d.codes_used ?? [], ...Object.values(d.조직 ?? {}).map((o) => s(o.code)), ...Object.values(groups).map((g2) => s(g2.code))];
     let code2;
     if (!Object.keys(groups).includes(NEUTRAL_GROUP)) {
@@ -1241,7 +1254,11 @@ ${tpl.replace(/\[\[INPUT\]\]/g, () => extra)}`;
       if (!code2) return;
       groups[NEUTRAL_GROUP] = { code: code2, blurb: NEUTRAL_BLURB, english: NEUTRAL_ENGLISH };
       d.codes_used = [.../* @__PURE__ */ new Set([...d.codes_used ?? [], code2])].sort();
-    } else code2 = s(groups[NEUTRAL_GROUP].code);
+    } else {
+      code2 = s(groups[NEUTRAL_GROUP].code);
+      if (NEUTRAL_BLURB_OLD.includes(s(groups[NEUTRAL_GROUP].blurb))) groups[NEUTRAL_GROUP].blurb = NEUTRAL_BLURB;
+      if (NEUTRAL_ENGLISH_OLD.includes(s(groups[NEUTRAL_GROUP].english))) groups[NEUTRAL_GROUP].english = NEUTRAL_ENGLISH;
+    }
     if (!code2) return;
     for (const row9 of Object.values(d.요원 ?? {})) {
       const r = row9;
@@ -1260,7 +1277,7 @@ ${tpl.replace(/\[\[INPUT\]\]/g, () => extra)}`;
       strip(d.조직);
       strip(d.요원);
     }
-    if (v < 3) migrateNeutral(d);
+    if (v < 6) migrateNeutral(d);
     d.roster_v = ROSTER_V;
     return d;
   }
@@ -2372,8 +2389,8 @@ ${body5.slice(at).replace(/^\s+/, "")}
     for (const a of agents) if (a.affiliation && !orgOf(out, a.affiliation)) make(a.affiliation, "");
     for (const e of orgFolder(lore)) {
       const name = s4(e.comment);
-      const same3 = (o2) => o2.name === name || Math.min(o2.name.length, name.length) >= 2 && (o2.name.includes(name) || name.includes(o2.name));
-      if (out.some(same3)) continue;
+      const same4 = (o2) => o2.name === name || Math.min(o2.name.length, name.length) >= 2 && (o2.name.includes(name) || name.includes(o2.name));
+      if (out.some(same4)) continue;
       make(name, "");
       const o = out[out.length - 1];
       if (!o.spec.english) {
@@ -2716,37 +2733,11 @@ ${body5.slice(at).replace(/^\s+/, "")}
     const from = d.agents.findIndex((a) => a.lore === lore);
     if (from < 0) return false;
     const g2 = agentGroup(d.agents[from]);
-    const same3 = d.agents.map((a, i) => [a, i]).filter(([a]) => agentGroup(a) === g2).map(([, i]) => i);
-    const k = same3.indexOf(from);
+    const same4 = d.agents.map((a, i) => [a, i]).filter(([a]) => agentGroup(a) === g2).map(([, i]) => i);
+    const k = same4.indexOf(from);
     if (how === "up" || how === "down") {
       const j = how === "up" ? k - 1 : k + 1;
-      if (j < 0 || j >= same3.length) return false;
-      const to2 = same3[j];
+      if (j < 0 || j >= same4.length) return false;
+      const to2 = same4[j];
       [d.agents[from], d.agents[to2]] = [d.agents[to2], d.agents[from]];
-      return true;
-    }
-    const to = d.agents.findIndex((a) => a.lore === target);
-    if (to < 0 || to === from || agentGroup(d.agents[to]) !== g2) return false;
-    const [row9] = d.agents.splice(from, 1);
-    const at = (to > from ? to - 1 : to) + (how === "after" ? 1 : 0);
-    d.agents.splice(at, 0, row9);
-    return true;
-  }
-  function loreGender(lore, name) {
-    const text4 = lore.find((e) => s4(e.comment) === name)?.content;
-    const m = typeof text4 === "string" ? /(?:Gender|Sex|성별)\s*[:：]\s*\**\s*([^\s,|*]+)/i.exec(text4) : null;
-    if (!m) return "";
-    const v = m[1].toLowerCase();
-    if (/^(female|woman|girl|f|여|여성|여자)/.test(v)) return "F";
-    if (/^(male|man|boy|m|남|남성|남자)/.test(v)) return "M";
-    return "";
-  }
-  var agentGender = (a, lore) => a.gender === "X" ? "" : a.gender || loreGender(lore, a.lore);
-
-  // src/core/world/catalog.ts
-  var CatalogError = class extends Error {
-  };
-  var FALLBACK_DISPLAY = {
-    A00: "관리국",
-    B00: "가짜 관리국",
-    C00: "백일몽",
+      return 

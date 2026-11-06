@@ -2715,7 +2715,7 @@ if (fixture.globalLore.some(packed)) {
   // 기록 탭: 하위 탭 넷, 같은 너비, 빈 일지, 「오늘 일지 이미지로」 없음 (이미 기록 탭이라 메뉴를 다시 누르면 상황판으로 가니 하위 탭으로 이동)
   await page.click('[data-action="rec-sub"][data-value="journal"]');
   await page.waitForSelector('.gx-records .gx-jr-tiles');
-  assert.deepEqual(await page.$$eval('.gx-rec-tabs .ph-sub', (l) => l.map((b) => b.textContent)), ['일지', '가계부', '인물', '세력']);
+  assert.deepEqual(await page.$$eval('.gx-rec-tabs .ph-sub', (l) => l.map((b) => b.textContent)), ['일지', '연대기', '가계부', '인물', '세력']);
   const widths = await page.$$eval('.gx-rec-tabs .ph-sub', (l) => l.map((b) => b.getBoundingClientRect().width));
   assert.ok(Math.max(...widths) - Math.min(...widths) <= 1, `하위 탭 같은 너비 (${widths.join(',')})`);
   assert.ok((await page.textContent('.gx-records')).includes('아직 종료된 상황이 없어요'));
@@ -2793,6 +2793,22 @@ if (fixture.globalLore.some(packed)) {
   await page.click('.gx-nav .gx-nb:not(.mob)[data-value="board"]');
   await page.waitForSelector('.gx-board');
   assert.equal(await page.locator('.gx-rectoast').count(), 0, '닫은 알림은 다시 안 뜸 (보고서마다 한 번)');
+  // 연대기 (2026-11-06): 내가 나간 사건의 종료 한 줄 → 누르면 보고서 팝업, 닫으면 연대기로. 종류 칩으로 끈다
+  await page.click('.gx-nav .gx-nb:not(.mob)[data-value="records"]');
+  await page.click('[data-action="rec-sub"][data-value="chronicle"]');
+  await page.waitForSelector('.gx-chron .gx-cr-row.event');
+  assert.equal(await page.locator('.gx-chron .gx-cr-row.event').count(), 1, '연대기 사건 한 줄');
+  assert.ok((await page.textContent('.gx-chron .gx-cr-row.event')).includes(preset.name), '연대기 줄 = 그 괴이');
+  await page.click('.gx-chron .gx-cr-row.event');
+  await page.waitForSelector('.gx-rptpop .gx-rpt');
+  await page.click('.gx-rptpop .gx-agpop-x');
+  await page.waitForSelector('.gx-chron');
+  assert.equal(await page.locator('.gx-rec-tabs .ph-sub.on').textContent(), '연대기', '보고서를 닫으면 연대기로');
+  await page.click('[data-action="rec-chron"][data-value="event"]');
+  assert.equal(await page.locator('.gx-chron .gx-cr-row.event').count(), 0, '사건 칩을 끄면 사건 줄 없음');
+  await page.click('[data-action="rec-chron"][data-value="event"]');
+  await page.click('.gx-nav .gx-nb:not(.mob)[data-value="board"]');
+  await page.waitForSelector('.gx-board');
   // 종료 줄 아이콘 → 보고서 페이지 (창이 아니라 기록 탭 안)
   await page.click('.gx-oprow.ended .gx-oprpt');
   await page.waitForSelector('.gx-rptpop .gx-rpt');
@@ -2974,9 +2990,9 @@ if (fixture.globalLore.some(packed)) {
   await page.click('.gx-rptpop [data-action="rec-back"]');
   await page.waitForSelector('.gx-jr-row');
   await noOverflow('폰 일지(보고서에서 뒤로)');
-  // 폰도 하위 탭 넷은 내용 위 (2026-11-05 사용자). 서랍에는 일지 칩 셋 + 찾기가 한 줄
+  // 폰도 하위 탭(11-06 연대기 더해 다섯)은 내용 위 (2026-11-05 사용자). 서랍에는 일지 칩 셋 + 찾기가 한 줄
   const tabW = await page.$$eval('.gx-rec-tabs [data-action="rec-sub"]', (l) => l.map((b) => b.getBoundingClientRect().width));
-  assert.ok(tabW.length === 4 && tabW.every((w) => w > 0) && Math.max(...tabW) - Math.min(...tabW) <= 1, `폰 하위 탭 네 칸 보임·같은 너비 (${tabW.join(',')})`);
+  assert.ok(tabW.length === 5 && tabW.every((w) => w > 0) && Math.max(...tabW) - Math.min(...tabW) <= 1, `폰 하위 탭 다섯 칸 보임·같은 너비 (${tabW.join(',')})`);
   assert.equal(await page.locator('.gx-rdrawer .ph-tool[data-action="rec-sub"]').count(), 0, '서랍에 하위 탭 단추 없음');
   await page.click('.gx-rdrawer .ph-grip');
   const tops = await page.$$eval('.gx-rdrawer .gx-wt-tools > *', (l) => l.map((b) => Math.round(b.getBoundingClientRect().top)));

@@ -255,6 +255,11 @@ for (const vp of vps) {
   assert.ok((await page.textContent('.gw .gw-setbody')).includes('실패한 요청이 없어요'));
   await page.waitForFunction(() => !document.querySelector('.gw .gw-setbody')?.textContent?.includes('읽는 중'));
   assert.ok((await page.textContent('.gw .gw-setbody')).includes('아직 갱신 기록이 없어요'));
+  // 진단 묶음 (2026-11-06): 판·설정·실패·갱신 기록을 JSON 하나로. 단추를 누르면 내려받기 안내가 머리에 뜬다
+  assert.ok((await page.textContent('.gw .gw-setbody')).includes('진단 묶음'), '진단 묶음 칸');
+  await clickSel(page, '.gw [data-action="man-diag-download"]');
+  await settle();
+  assert.ok((await page.textContent('.gw .gw-head')).includes('진단 묶음 내려받기'), '진단 묶음 내려받기 안내');
   // 설정 내보내기: JSON = prefs, 저장소 사용량 = 실제 글자 수
   await goNode(page, 'set:screen');
   await clickSel(page, '.gw [data-action="set-nav"][data-value="right"]');

@@ -1,6 +1,6 @@
 {
   "name": "goei-plugin",
-  "version": "0.20.7",
+  "version": "0.20.8",
   "private": true,
   "type": "module",
   "scripts": {
@@ -8,6 +8,7 @@
     "typecheck": "tsc --noEmit",
     "test": "node --test tests/*.test.mjs",
     "test:browser": "node scripts/test-browser.mjs",
+    "test:quick": "node scripts/test-browser.mjs --fast --no-build",
     "release:prep": "node scripts/release-prep.mjs"
   },
   "devDependencies": {

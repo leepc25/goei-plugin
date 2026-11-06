@@ -1555,9 +1555,11 @@ function idCard(ctx: ChatContext): string {
   const photo = photoUrl
     ? `<span class="gx-id-photo"><img src="${esc(photoUrl)}" alt=""></span>`
     : `<span class="gx-id-photo none">${ICONS.idcard}</span>`;
-  return `<div class="gx-id">${img ? `<span class="gx-id-bg" style="background-image:url('${esc(img)}')"></span>` : ''}
+  const who = `<span class="gx-id-who"><b>${esc(name)}</b><small>${esc([f ? selfName(ctx, f.code, f.name) : '소속 없음', pa?.rank ?? ''].filter(Boolean).join(' · '))}</small></span>`;
+  const bg = img ? `<span class="gx-id-bg" style="background-image:url('${esc(img)}')"></span>` : '';
+  return `<div class="gx-id">${bg}
       ${photo}
-      <span class="gx-id-who"><b>${esc(name)}</b><small>${esc([f ? selfName(ctx, f.code, f.name) : '소속 없음', pa?.rank ?? ''].filter(Boolean).join(' · '))}</small></span>
+      ${who}
       ${status || walletChip(ctx) ? `<span class="gx-op-st">${walletChip(ctx)}${status}</span>` : ''}
     </div>`;
 }
