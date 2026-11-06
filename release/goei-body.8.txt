@@ -1,4 +1,20 @@
-import-text" rows="4" placeholder="여기에 붙여 넣기 { … }">${esc20(manUi.importText)}</textarea></div>
+ class="gw-state${ok === null ? " off" : ok ? "" : " bad"}">${esc20(text4)}</span>`;
+  var head = (crumb, title2, desc, act = "") => `<header class="gw-head"><h2>${esc20(title2)}${crumb ? `<small>${esc20(crumb)}</small>` : ""}</h2>${act ? `<div class="gw-head-act">${act}</div>` : ""}<p class="gx-muted">${esc20(desc)}</p>${manUi.notice ? `<div class="gx-err" role="alert">${esc20(manUi.notice)}</div>` : ""}${manUi.info ? `<p class="gx-hint">${esc20(manUi.info)}</p>` : ""}</header>`;
+  function exportJson(ctx2) {
+    const directory2 = readDirectoryData(ctx2.char.globalLore ?? []);
+    return JSON.stringify(directory2 ? { ...getPrefs(), directory: directory2 } : getPrefs(), null, 2);
+  }
+  function backupPage(ctx2) {
+    const json = exportJson(ctx2);
+    const sizes = manUi.sizes;
+    const store = STORE.map(([key2, label2, help, drop]) => {
+      const n2 = sizes?.[key2] ?? 0;
+      const ctl = `<span class="gw-tokens">${sizes ? n2 ? kb(n2) : "없음" : "…"}</span>${drop && n2 ? manUi.confirm === drop.slice(4) ? `<button class="gx-mini danger" data-action="${drop}-yes">정말 지우기</button><button class="gx-mini" data-action="man-no">취소</button>` : `<button class="gx-mini" data-action="${drop}">${ICONS.trash}지우기</button>` : ""}`;
+      return row5(label2, ctl, help);
+    }).join("");
+    const importRows = `<div class="ps-row"><div class="ps-label"><b>가져오기</b><small>내보낸 JSON을 붙여 넣거나 파일을 올리고 「적용」을 누르세요. 지금 기기 설정(과 세계 편집)을 통째로 바꿔요.</small></div>
+      <div class="ps-ctl"><label class="gx-mini gw-file">${ICONS.refresh}파일 올리기<input type="file" accept=".json,application/json" data-change="man-import-file" hidden></label>${manUi.importName ? `<span class="gx-muted">${esc20(manUi.importName)}</span>` : ""}</div>
+      <textarea data-input="man-import-text" rows="4" placeholder="여기에 붙여 넣기 { … }">${esc20(manUi.importText)}</textarea></div>
     <div class="ps-row gw-rel-foot">${manUi.confirm === "import" ? `<span class="gx-muted">지금 설정을 덮어써요.</span><button class="gx-mini danger" data-action="man-import-yes">정말 적용</button><button class="gx-mini" data-action="man-no">취소</button>` : `<button class="gx-mini" data-action="man-import" ${manUi.importText.trim() ? "" : "disabled"}>적용</button>`}</div>`;
     return `<div class="gw-page gw-set">${head("이 기기 공통", "설정 내보내기", "설정을 글(JSON) 하나로 내보내고 가져와요. 들어가는 것: 화면·이미지 설정, 「기본값으로 저장」으로 둔 새 채팅 기본값(상황판·괴이 발생·괴담넷·괴담톡·위키·인물·일지·가계부·상태창 칸·생성 공통), 고친 지침·추가 규칙·이미지 지침·즐겨찾기, 그리고 이 카드의 세계 편집(요원·조직·괴이·파밍·부록·세력 관계·명부). 한 번도 바꾸지 않아 기본값 그대로인 항목은 적지 않아요. 채팅 안에 든 기록(상황판·인물 기록·일지)은 Risu 채팅 백업에 들어 있어요.")}
     <div class="gx-settings gw-setbody">
@@ -9,6 +25,11 @@ import-text" rows="4" placeholder="여기에 붙여 넣기 { … }">${esc20(manU
     </div></section>
     <section class="ps-group"><h3>저장소 사용량 <small>이 기기 플러그인 저장소에 있는 것</small></h3><div class="ps-rows">${store}</div></section>
     </div></div>`;
+  }
+  function getBtn(what, label2, has) {
+    if (has) return "";
+    if (manUi.getting === what) return `<span class="gx-muted gw-getting">${esc20(manUi.progress || "받는 중…")}</span>`;
+    return `<button class="gx-mini" data-action="man-get-${what}" ${manUi.getting ? "disabled" : ""}>${ICONS.refresh}${esc20(label2)}</button>`;
   }
   function diagPage(ctx2, canChat) {
     const lore = ctx2.char.globalLore;
@@ -21,8 +42,9 @@ import-text" rows="4" placeholder="여기에 붙여 넣기 { … }">${esc20(manU
       row5("카드", badge2(goei, goei ? "괴이 카드" : "괴이 카드 아님"), goei ? `카드 ${ver === "0" ? "이전 판" : `v${ver}`} · 명부·매니페스트 있음` : "설치 · 점검에서 심으면 괴이 카드가 돼요"),
       row5("플러그인", badge2(true, `v${PLUGIN_VERSION}`), UPDATE_BASE ? `업데이트 주소 ${UPDATE_BASE}` : "업데이트 주소가 없는 빌드"),
       row5("채팅", badge2(canChat, canChat ? "진행 중" : "시작 전"), canChat ? `메시지 ${msgs4}개 · 이 채팅 값으로 동작해요` : "시작 화면이에요. 설정은 새 채팅 기본값으로 저장돼요"),
-      row5("토크나이저", badge2(!!tok2, tok2 || "어림값"), tok2 ? "토큰 수를 정확히 세요" : "설치에서 받으면 정확해져요"),
-      row5("위키 기본 문서", badge2(!!storedWikiPack(), storedWikiPack() ? "있음" : "없음"), "카드에서 뺀 기본 문서 묶음 (이 기기 저장소)"),
+      // 없으면 빨간 배지 옆에 바로 받는 단추와, 안 받으면 뭐가 다른지 한 줄 (2026-11-06 사용자 승인, 전수점검 9-9)
+      row5("토크나이저", badge2(!!tok2, tok2 || "어림값") + getBtn("tok", "받기 (약 2MB)", !!tok2), tok2 ? "토큰 수를 정확히 세요" : "안 받으면 토큰 수를 어림으로 세요. 받으면 정확해져요. 기능 차이는 없어요."),
+      row5("위키 기본 문서", badge2(!!storedWikiPack(), storedWikiPack() ? "있음" : "없음") + getBtn("wiki", "받기 (약 1MB)", !!storedWikiPack()), storedWikiPack() ? "카드에서 뺀 기본 문서 묶음 (이 기기 저장소)" : "안 받으면 위키 기본 문서(괴이·장소 설명)가 비어 있어요. 받으면 위키 탭에서 바로 읽을 수 있어요."),
       row5("로어북 보내기", badge2(null, mode2 === "risu" ? "Risu가 직접" : "플러그인이 고름"), "설정 → 고급 → 로어북 보내기")
     ].join("");
     const fails = [gnet.failure ? `괴담넷: ${gnet.failure.reason}` : "", phone.failure ? `괴담톡: ${phone.failure.reason}` : "", wiki.failure ? `위키: ${wiki.failure.reason}` : ""].filter(Boolean);
@@ -141,6 +163,29 @@ import-text" rows="4" placeholder="여기에 붙여 넣기 { … }">${esc20(manU
         } catch (error) {
           manUi.notice = `가져오지 못했어요: ${error instanceof Error ? error.message : String(error)}`;
         }
+        return true;
+      }
+      case "man-get-tok":
+      case "man-get-wiki": {
+        if (manUi.getting) return true;
+        const what = action === "man-get-tok" ? "tok" : "wiki";
+        manUi.getting = what;
+        manUi.progress = "";
+        rerender?.();
+        const progress = (t) => {
+          manUi.progress = t;
+          rerender?.();
+        };
+        try {
+          if (what === "tok") await installTokenizer(progress);
+          else await installWikiPack(progress);
+          manUi.info = what === "tok" ? "토크나이저를 받았어요. 이제 토큰 수를 정확히 세요." : "위키 기본 문서를 받았어요. 위키 탭에서 읽을 수 있어요.";
+        } catch (error) {
+          manUi.notice = `${what === "tok" ? "토크나이저" : "위키 기본 문서"}를 받지 못했어요: ${error instanceof Error ? error.message : String(error)}`;
+        }
+        manUi.getting = "";
+        manUi.progress = "";
+        manUi.sizes = null;
         return true;
       }
       case "man-drop-wiki":
@@ -473,9 +518,9 @@ import-text" rows="4" placeholder="여기에 붙여 넣기 { … }">${esc20(manU
     Object.assign(peopleUi, { notice: "", info: "", affEdit: false, addrEdit: false, showNum: false, diagShow: "", logOpen: false });
     peopleUi.evOpen.clear();
   }
-  var rerender = null;
+  var rerender2 = null;
   function bindPeopleStatus(render3) {
-    rerender = render3;
+    rerender2 = render3;
     onPeopleStatus((st) => {
       if (!st.busy) peopleUi.diag = null;
       safeRender();
@@ -488,8 +533,8 @@ import-text" rows="4" placeholder="여기에 붙여 넣기 { … }">${esc20(manU
     return tag === "TEXTAREA" || tag === "INPUT" && !["range", "checkbox", "button", "submit"].includes(a.type);
   }
   function safeRender() {
-    if (!rerender || typing()) return;
-    rerender();
+    if (!rerender2 || typing()) return;
+    rerender2();
   }
   function bindPeopleHold(root3) {
     let timer4 = null;
@@ -505,7 +550,7 @@ import-text" rows="4" placeholder="여기에 붙여 넣기 { … }">${esc20(manU
         timer4 = null;
         if (!peopleUi.showNum) {
           peopleUi.showNum = true;
-          rerender?.();
+          rerender2?.();
         }
       }, 450);
     });
@@ -2186,7 +2231,17 @@ ${prettyJson(r.data ?? "")}`)}</textarea>` : ""}
 
   // src/ui/settings.ts
   var THEME_KEY = "$st_fixed_theme";
-  var settingsUi = { page: "", confirmOff: false, busy: false, notice: "", info: "", scope: "chat", confirm: "" };
+  var settingsUi = {
+    page: "",
+    confirmOff: false,
+    busy: false,
+    notice: "",
+    info: "",
+    scope: "chat",
+    confirm: "",
+    /** 「기본값 불러오기」 직전에 보관해 둔 이 채팅의 값 (2026-11-06 사용자 승인, 전수점검 9-7). 불러온 뒤 「되돌리기」 한 번. 없던 키는 undefined */
+    undo: null
+  };
   function resetSettings() {
     settingsUi.confirmOff = false;
     settingsUi.page = "";
@@ -2278,23 +2333,28 @@ ${prettyJson(r.data ?? "")}`)}</textarea>` : ""}
       load: ["고친 내용을 버리고 카드에 저장된 명부로 되돌릴까요?", "되돌리기"]
     }
   };
-  function scopeBar(scope, canChat) {
+  function scopeBar(scope, canChat, ctx2) {
     const items = [[canChat ? "chat" : "defaults", "설정"]];
     const tabs2 = `<div class="gx-segs st-scope">${items.map(([k, label2]) => `<button class="gx-seg${scope === k ? " on" : ""}" data-action="set-scope" data-value="${k}" aria-pressed="${scope === k}">${label2}</button>`).join("")}</div>`;
     const btns = scope === "card" ? `<span class="st-barbtns dir-bar">${directoryBar()}</span>` : scope === "chat" ? `<span class="st-barbtns">${barButtons(settingsUi.busy)}</span>` : "";
     const kind = scope === "card" ? "card" : "chat";
     const c = settingsUi.confirm && scope !== "defaults" ? CONFIRM[kind][settingsUi.confirm] : null;
     const yes = kind === "card" ? settingsUi.confirm === "save" ? "dir-save" : "dir-reset" : "set-bar-yes";
-    const confirm = c ? `<div class="st-confirm st-barconfirm"><p>${c[0]}</p><div class="gx-row-btns"><button class="gx-mini${settingsUi.confirm === "load" ? " danger" : " ps-save"}" data-action="${yes}" data-value="${settingsUi.confirm}">${c[1]}</button><button class="gx-mini" data-action="set-bar-no">취소</button></div></div>` : "";
+    const confirm = c ? `<div class="st-confirm st-barconfirm"><p>${c[0]}</p><div class="gx-row-btns"><button class="gx-mini${settingsUi.confirm === "load" ? " danger" : " ps-save"}" data-action="${yes}" data-value="${settingsUi.confirm}">${c[1]}</button><button class="gx-mini" data-action="set-bar-no">취소</button></div></div>` : scope === "chat" && ctx2 ? undoBar(ctx2) : "";
     return `<div class="st-scopebar">${tabs2}${btns}</div>${confirm}`;
   }
   var mainDefaultsButtons = () => {
     const off = settingsUi.busy ? "disabled" : "";
     return `<span class="ps-defaults"><button class="st-act save" data-action="set-bar" data-value="save" title="기본값으로 저장" aria-label="기본값으로 저장" ${off}>${ICONS.pen}<span>기본값으로 저장</span></button><button class="st-act" data-action="set-bar" data-value="load" title="기본값 불러오기" aria-label="기본값 불러오기" ${off}>${ICONS.refresh}<span>기본값 불러오기</span></button></span>`;
   };
-  function mainDefaultsConfirm() {
+  function undoBar(ctx2) {
+    const u = settingsUi.undo;
+    if (!u || u.charIndex !== ctx2.charIndex || u.chatIndex !== ctx2.chatIndex || settingsUi.confirm) return "";
+    return `<div class="st-confirm st-barconfirm ps-defconfirm st-undobar"><p>기본값을 불러오기 전 설정을 보관해 뒀어요. 되돌리면 그때 값으로 돌아가요.</p><div class="gx-row-btns"><button class="gx-mini ps-save" data-action="set-bar-undo" ${settingsUi.busy ? "disabled" : ""}>${ICONS.back}불러오기 전으로 되돌리기</button><button class="gx-mini" data-action="set-bar-undo-drop">보관한 것 버리기</button></div></div>`;
+  }
+  function mainDefaultsConfirm(ctx2) {
     const c = settingsUi.confirm ? CONFIRM.chat[settingsUi.confirm] : null;
-    if (!c) return "";
+    if (!c) return ctx2 ? undoBar(ctx2) : "";
     return `<div class="st-confirm st-barconfirm ps-defconfirm"><p>${c[0]}</p><div class="gx-row-btns"><button class="gx-mini${settingsUi.confirm === "load" ? " danger" : " ps-save"}" data-action="set-bar-yes" data-value="${settingsUi.confirm}">${c[1]}</button><button class="gx-mini" data-action="set-bar-no">취소</button></div></div>`;
   }
   var BACK = `<button class="ph-tool ph-back" data-action="set-feat-back" aria-label="설정으로">${ICONS.back}</button>`;
@@ -2327,7 +2387,7 @@ ${prettyJson(r.data ?? "")}`)}</textarea>` : ""}
   }
   function settingsTab(ctx2, scope = "chat", canChat = true, only) {
     if (scope === "card") {
-      return `<main class="gx-body gx-settings">${scopeBar(scope, canChat)}${directoryView(ctx2)}${toast("dir", directoryDone(), directoryDoneClear)}</main>${drawerBox(directorySearch(), "gx-dirdrawer")}`;
+      return `<main class="gx-body gx-settings">${scopeBar(scope, canChat, ctx2)}${directoryView(ctx2)}${toast("dir", directoryDone(), directoryDoneClear)}</main>${drawerBox(directorySearch(), "gx-dirdrawer")}`;
     }
     if (settingsUi.page && !only) return featurePage(ctx2, settingsUi.page, canChat);
     const { basic: s7, world: world2, theme } = current3(ctx2, scope);
@@ -2406,7 +2466,7 @@ ${prettyJson(r.data ?? "")}`)}</textarea>` : ""}
     };
     if (only) return S[only];
     return `<main class="gx-body gx-settings">
-    ${scopeBar(scope, canChat)}
+    ${scopeBar(scope, canChat, ctx2)}
     ${settingsUi.notice ? `<div class="gx-err" role="alert">${esc25(settingsUi.notice)}</div>` : ""}
     ${S.screen}${S.image}${S.board}${S.lore}${S.adv}${S.update}
     ${toast("st", settingsUi.info, (t) => {
@@ -2484,6 +2544,33 @@ ${prettyJson(r.data ?? "")}`)}</textarea>` : ""}
       env3.render();
       return true;
     }
+    if (action === "set-bar-undo-drop") {
+      settingsUi.undo = null;
+      env3.render();
+      return true;
+    }
+    if (action === "set-bar-undo") {
+      const u = settingsUi.undo;
+      if (!u || u.charIndex !== ctx2.charIndex || u.chatIndex !== ctx2.chatIndex) return true;
+      settingsUi.undo = null;
+      await save(ctx2, env3, (chat) => {
+        const vars = {};
+        const drop = [];
+        for (const [k, val] of Object.entries(u.before)) {
+          if (val === void 0) drop.push(k);
+          else vars[k] = val;
+        }
+        if (drop.length) {
+          const ss = { ...chat.scriptstate ?? {} };
+          for (const k of drop) delete ss[k];
+          chat.scriptstate = ss;
+        }
+        return vars;
+      });
+      if (!settingsUi.notice) settingsUi.info = "기본값을 불러오기 전 설정으로 되돌렸어요.";
+      env3.render();
+      return true;
+    }
     if (action === "set-bar-yes") {
       const what = settingsUi.confirm;
       settingsUi.confirm = "";
@@ -2495,6 +2582,7 @@ ${prettyJson(r.data ?? "")}`)}</textarea>` : ""}
         env3.render();
       } else if (what === "load") {
         const d = current3(ctx2, "defaults");
+        let before = null;
         await save(ctx2, env3, (chat) => {
           const vars = { ...basicVars(d.basic), [THEME_KEY]: d.theme, ...loadVarDefaults(ALL_PREFIXES, chat.scriptstate) };
           for (const f of WORLD_SPEC) vars[wgKey(f.key)] = String(d.world[f.key]);
@@ -2502,8 +2590,11 @@ ${prettyJson(r.data ?? "")}`)}</textarea>` : ""}
             const ss = { ...chat.scriptstate ?? {}, ...vars };
             Object.assign(vars, worldVars(readWorld(chat), parseCatalog(lore), worldSettings(lore, ss), String(ss["$st_faction"] ?? "")));
           }
+          before = {};
+          for (const k of Object.keys(vars)) before[k] = chat.scriptstate?.[k];
           return vars;
         });
+        if (!settingsUi.notice && before) settingsUi.undo = { charIndex: ctx2.charIndex, chatIndex: ctx2.chatIndex, before };
         if (!settingsUi.notice) settingsUi.info = "새 채팅 기본값을 지금 채팅에 불러왔어요.";
         env3.render();
       } else env3.render();
@@ -2746,7 +2837,9 @@ ${prettyJson(r.data ?? "")}`)}</textarea>` : ""}
     drawer: false,
     confirm: "",
     /** 탭마다 마지막으로 보던 페이지 */
-    last: {}
+    last: {},
+    /** 기능 탭 「설정 찾기」 칸에 적은 말 (2026-11-06 사용자 승인, 전수점검 8-10) */
+    sq: ""
   };
   var root = null;
   var host = null;
@@ -2772,6 +2865,7 @@ ${prettyJson(r.data ?? "")}`)}</textarea>` : ""}
     if (node) edUi.node = legacyNode(node);
     edUi.notice = "";
     manUi.sizes = null;
+    findIndex = null;
     syncSettingsPage();
     ensureRoot();
     render();
@@ -2838,6 +2932,12 @@ ${prettyJson(r.data ?? "")}`)}</textarea>` : ""}
       if (name === "dir") {
         directoryInput(el.dataset.key ?? "", el.value, null);
         touched();
+        return;
+      }
+      if (name === "ed-sq") {
+        edUi.sq = el.value;
+        const box2 = root?.querySelector(".gw-find-out");
+        if (box2) box2.innerHTML = edUi.sq.trim() ? findResults(ctx2 ?? null) : treeGroups(treeCounts(ctx2 ?? null), featureState(ctx2 ?? null));
         return;
       }
       if (name === "ed-q") {
@@ -2982,87 +3082,4 @@ ${prettyJson(r.data ?? "")}`)}</textarea>` : ""}
   }
   var FEATURE_INFO = {
     // 2026-10-29 사용자: 응답 태그 형식 같은 안쪽 사정은 예시로 보이지 않는다 (상황판·이미지는 설명만)
-    board: { desc: "응답마다 괴이·사건·특수 발생을 판정하고 상황판·지도·요원 상태를 갱신해요.", example: "", off: "끄면 괴이가 자동으로 생기지 않고 상황판이 비어요. 커스텀 임무는 계속 쓸 수 있어요." },
-    image: { desc: "본문에 등장한 캐릭터의 등록 이미지를 채팅 속에 띄워요. 이미지 목록은 봇 카드에 있어요.", example: "", off: "끄면 캐릭터 이미지를 띄우지 않고 이미지 지침도 요청에 넣지 않아요." },
-    gnet: { desc: "괴담넷 게시판 글·댓글·쪽지를 보조 모델이 만들어요. 아래 값은 이 채팅에 저장돼요.", example: "「[목격담] 중림 지하상가 3번 출구에서 또 봤음 · 댓글 7」 — 게시판 글 한 줄. 장면과 관련된 글은 본편 요청에 참고로 붙어요." },
-    phone: { desc: "괴담톡 연락처와 문자방의 답장·선톡·단톡방 초대를 보조 모델이 만들어요. 아래 값은 이 채팅에 저장돼요.", example: "「스팡달: 부장님 지금 어디세요? 본부 4층 비었어요」 — 장면과 관련된 대화는 본편 요청에 참고로 붙어요." },
-    wiki: { desc: "위키 문서를 생성·갱신해요. 채팅에 나온 문서는 본편 요청에 참고로 붙일 수 있어요.", example: "「미술관」 문서: 소재 · 접근 · 규칙 · 목격 기록 — 분량·작성 모드대로 써요." },
-    people: { desc: "본편 응답이 끝날 때마다 보조 모델이 한 번 읽어 인물별 기록(기본정보·성격·현재 상태·인간관계·호감·호칭)을 쌓고, 다음 본편 요청이 그 기록을 읽어요.", example: "「쟈알디 · 호감 +8 → 신뢰 — 함께 임무를 치른 뒤」 — 기록이 이야기에 따라 바뀌어요.", off: "끄면 응답을 읽지 않고, 본편에도 기록을 넣지 않아요." },
-    // 기록(일지·보고서)은 모델을 부르지 않아 켬/끔 배지가 없다 (featureState 에 넣지 않음)
-    journal: { desc: "사건이 끝날 때마다 일지 한 줄과 그때의 보고서를 상황판·인물·가계부 기록에서 만들어요(모델을 부르지 않아요). 채팅에 보고서 카드를 띄울지와 보관 상한을 여기서 정해요.", example: "「RPT-0510-03 · 거울 속 사람 · 내가 출동 · 1시간 24분」 — 왼쪽 메뉴 「기록 → 일지」에 쌓여요." },
-    wallet: { desc: "본문에 금액이 적힌 거래를 인물 기록 갱신기가 뽑아 가계부에 더하고 빼요. 시작 잔고와, 가계부에서 잔고를 직접 고칠 수 있게 할지를 여기서 정해요.", example: "" },
-    factions: { desc: "세력(관리국·백일몽·협회…)이 주인공을 어떻게 보는지를 인물 기록 갱신기가 −100~100 값으로 매겨요. 켤지와 본편에 넣을지를 여기서 정해요.", example: "" },
-    lore: { desc: "세력·괴이·파밍·요원·부록 로어북을 요청에 넣을지 누가 고를지 정해요. 아래 「로어북 확인」에서 다음 요청에 어떤 로어북이 들어가는지 볼 수 있어요.", example: "" },
-    adv: { desc: "괴담넷·괴담톡·위키 생성에 공통으로 쓰는 값이에요. 생성 언어, 형식이 틀렸을 때 다시 부르는 횟수, 요청 하나의 토큰 상한.", example: "" }
-  };
-  function settingsPage(ctx2, page) {
-    const canChat = host?.canChat?.() ?? true;
-    const scope = canChat ? "chat" : "defaults";
-    if (canChat) settingsUi.scope = "chat";
-    const title2 = page === "gnet" ? gnetLabel(ctx2.chat.scriptstate) : SET_LABEL[page];
-    const sec = (s7) => settingsSection(ctx2, scope, canChat, s7);
-    let body5 = "";
-    let act = "";
-    const feat = (p) => {
-      const r = featurePane(ctx2, p, canChat);
-      act = r.act;
-      return r.body;
-    };
-    switch (page) {
-      case "screen":
-        body5 = sec("screen");
-        break;
-      case "image":
-        body5 = sec("image");
-        break;
-      // 2026-11-05 사용자: 이미지 지침은 「지침 → 이미지」 한 곳에만 (여기 이중으로 띄우지 않는다)
-      case "board":
-        body5 = sec("board");
-        break;
-      case "status":
-        body5 = sec("status");
-        break;
-      case "gnet":
-        body5 = feat("gnet");
-        break;
-      case "phone":
-        body5 = feat("phone");
-        break;
-      case "wiki":
-        body5 = feat("wiki");
-        break;
-      case "people":
-        body5 = feat("people");
-        break;
-      // 기록 하위 메뉴 넷 (2026-11-05 사용자): 일지 · 가계부 · 인물 · 세력
-      case "journal":
-        body5 = feat("journal");
-        break;
-      case "wallet":
-        body5 = sec("wallet");
-        break;
-      case "factions":
-        body5 = feat("factions");
-        break;
-      case "lore":
-        body5 = sec("lore");
-        break;
-      case "adv":
-        body5 = sec("adv");
-        break;
-      case "update":
-        body5 = sec("update");
-        break;
-    }
-    const chatPage = page !== "screen" && page !== "update";
-    act = act.replace(/<span class="ps-defaults">[\s\S]*?<\/span>/, "").trim();
-    const right = chatPage && !canChat ? `<span class="gw-tokens">새 채팅 기본값 (시작 전)</span>${act}` : act;
-    const info = FEATURE_INFO[page];
-    const on2 = featureState(ctx2)[`set:${page}`];
-    const badge3 = on2 === void 0 ? "" : `<span class="gw-state${on2 ? "" : " off"}">${on2 ? "켬" : "끔"}</span>`;
-    if (info) body5 = body5.replace(/<p class="ps-note">본편 응답이 끝날 때마다[\s\S]*?<\/p>/, "").replace(/<section class="ps-group"><p class="ps-note">필드에서 만난 사람과[\s\S]*?<\/section>/, "");
-    const lead = info ? `<p class="gx-muted">${esc26(info.desc)}${info.example ? ` <span class="gw-eg">예) ${esc26(info.example)}</span>` : ""}${on2 === false && info.off ? ` <span class="gw-off-note">${esc26(info.off)}</span>` : ""}</p></header>` : "</header>";
-    return `<div class="gw-page gw-set"><header class="gw-head"><h2>${esc26(title2)}${badge3}</h2>${right ? `<div class="gw-head-act">${right}</div>` : ""}${lead}
-    ${canChat ? mainDefaultsConfirm() : ""}
-    ${settingsNotices()}
-    <div class="gx-settings gw-setbody">${body5}</div></di
+   

@@ -1,4 +1,116 @@
-전에는 한 줄 */
+인 */
+.nw-home { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; display: flex; flex-direction: column; gap: 22px; padding: 22px 24px 28px; }
+.nw-home > * { width: 100%; max-width: 1000px; margin-left: auto; margin-right: auto; }
+.nw-home .nw-hero { display: flex; flex-direction: column; gap: 14px; padding: 20px; border: 1px solid var(--line); border-radius: 16px; background: linear-gradient(160deg, var(--accent-bg), var(--panel) 70%); }
+.nw-hero-top { display: flex; align-items: center; gap: 12px; }
+.nw-hero-ico { display: grid; place-items: center; width: 48px; height: 48px; color: var(--signal); }
+.nw-hero-ico svg { width: 40px; height: 40px; }
+.nw-hero-t { display: flex; flex-direction: column; gap: 2px; }
+.nw-hero-t h2 { margin: 0; font-size: 20px; }
+.nw-hero-t small { color: var(--dim); font-size: 13px; }
+.nw-hero-q { display: flex; gap: 8px; align-items: center; }
+.nw-hero-q .gx-search { flex: 1; min-width: 0; margin: 0; }
+.nw-hero-q .gx-mini { flex: none; height: 40px; padding: 0 14px; }
+.nw-home .nw-hsec { padding: 0; display: flex; flex-direction: column; gap: 10px; }
+.nw-hsec h3 { display: flex; align-items: center; gap: 6px; margin: 0; padding-bottom: 8px; border-bottom: 1px solid var(--line); font-size: 15px; }
+.nw-hsec h3 b { color: var(--dim); font-size: 13px; font-weight: 600; }
+.nw-hnone { margin: 0; padding: 18px 12px; text-align: center; color: var(--dim); font-size: 14px; }
+.nw-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 8px; }
+.nw-card { display: grid; grid-template-columns: 48px minmax(0, 1fr); grid-template-rows: auto auto; column-gap: 10px; row-gap: 2px; align-content: center; align-items: center; min-width: 0; padding: 8px 12px 8px 8px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); color: var(--text); font: inherit; text-align: left; }
+.nw-card:hover { border-color: var(--accent-line); }
+.nw-card-img { grid-row: 1 / 3; display: grid; place-items: center; width: 48px; height: 48px; border-radius: 10px; overflow: hidden; background: var(--panel2); color: var(--dim); }
+.nw-card-img img { width: 100%; height: 100%; object-fit: cover; object-position: top; }
+.nw-card-img svg { width: 22px; height: 22px; }
+.nw-card-img.k-an { color: var(--danger); background: color-mix(in srgb, var(--danger) 12%, var(--panel2)); }
+.nw-card-img.k-ms { color: var(--blue); background: color-mix(in srgb, var(--blue) 12%, var(--panel2)); }
+.nw-card-img.k-lm { color: var(--amber); background: var(--amber-bg); }
+.nw-card-img.k-org { color: var(--signal); background: var(--accent-bg); }
+.nw-card b { align-self: end; font-size: 14px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.nw-card small { align-self: start; color: var(--dim); font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.nw-chip small { color: var(--dim); font-size: 11.5px; font-weight: 600; }
+@media (max-width: 760px) {
+  /* 모바일 (v0.16.24): 세로바 없이 본문 전체 폭, 버튼은 하단 바 위 서랍 (괴담톡·괴담넷과 같음) */
+  .gx-body.nw-app { position: relative; grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(0, 1fr) auto; }
+  .nw-rail { display: none; }
+  /* 목록 서랍 손잡이: 오른쪽 아래, 도구 서랍 바로 위의 긴 책갈피 (2026-10-21 사용자: 왼쪽 가운데 작은 손잡이는 누르기 힘들었다). 목록이 펼쳐지면 숨김 */
+  .nw-edge { position: absolute; right: 0; bottom: 34px; z-index: 3; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; width: 34px; height: 116px; padding: 0 0 0 2px; border: 1px solid var(--line2); border-right: 0; border-radius: 14px 0 0 14px; background: var(--panel); color: var(--signal); font: inherit; font-size: 12.5px; font-weight: 800; line-height: 1.1; box-shadow: -3px 4px 14px -6px rgba(0, 0, 0, .5); cursor: pointer; transition: bottom .2s ease; }
+  .nw-edge svg { width: 17px; height: 17px; flex: none; }
+  .nw-edge span { writing-mode: vertical-rl; letter-spacing: .2em; color: var(--sub); }
+  .nw-app:has(> .ph-drawer.open) .nw-edge { bottom: 106px; }
+  .list-open .nw-edge { display: none; }
+  .nw-app > .ph-drawer { display: block; grid-column: 1; grid-row: 2; margin: 0; }
+  .nw-app > .ph-drawer .ph-tools { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .nw-main { grid-row: 1; }
+  /* 모바일 목록은 오른쪽에서 열린다 (손잡이가 오른쪽) */
+  .nw-panel { left: auto; right: 0; transform: translateX(100%); max-width: calc(100% - 40px); border-right: 0; border-left: 1px solid var(--panel2); box-shadow: -10px 0 28px rgba(0, 0, 0, .32); }
+  .list-open .nw-scrim { inset: 0; }
+  /* 설정 「위키 목록 위치」가 왼쪽이면 폰 책갈피·목록도 왼쪽에서 (2026-10-29 사용자: 폰도 설정을 따라간다) */
+  .gx[data-wiki-side="left"] .nw-edge { right: auto; left: 0; padding: 0 2px 0 0; border-right: 1px solid var(--line2); border-left: 0; border-radius: 0 14px 14px 0; box-shadow: 3px 4px 14px -6px rgba(0, 0, 0, .5); }
+  .gx[data-wiki-side="left"] .nw-edge svg { transform: scaleX(-1); }
+  .gx[data-wiki-side="left"] .nw-panel { right: auto; left: 0; transform: translateX(-100%); border-left: 0; border-right: 1px solid var(--panel2); box-shadow: 10px 0 28px rgba(0, 0, 0, .32); }
+  .gx[data-wiki-side="left"] .list-open .nw-panel { transform: none; }
+  .nw-main .ph-room-head.nw-noback { padding-left: 12px; }
+  .nw-home { padding: 14px 14px 22px; gap: 18px; }
+  .nw-home .nw-hero { padding: 16px; }
+  .nw-cards { grid-template-columns: minmax(0, 1fr); }
+}
+.nw-index { display: flex; flex-direction: column; }
+.nw-irow { display: flex; align-items: flex-start; gap: 12px; padding: 8px 0; border-bottom: 1px solid var(--panel2); }
+.nw-irow:last-child { border-bottom: 0; }
+.nw-ikey { flex: none; display: grid; place-items: center; width: 32px; height: 32px; border-radius: 10px; background: var(--panel2); color: var(--sub); font-size: 14px; }
+/* 위키 서랍 탭·색인, 메인 분류 (v0.16.23 4차: 기본 문서 141개) */
+.nw-tabs { flex-wrap: wrap; overflow: visible; padding: 0 12px; }
+.nw-groups { flex: 1; min-height: 0; position: relative; overflow-y: auto; overscroll-behavior: contain; padding: 0 4px 12px; }
+.nw-tabs + .nw-groups { padding-right: 26px; }
+.nw-kbtn { display: inline-flex; align-items: center; gap: 6px; min-height: 28px; padding: 0 10px; margin-left: -10px; border: 0; border-radius: 8px; background: none; color: inherit; font: inherit; cursor: pointer; }
+.nw-kbtn b { color: var(--dim); font-weight: 600; }
+.nw-kbtn::after { content: ''; width: 6px; height: 6px; margin: -3px 0 0 2px; border-right: 1.5px solid var(--dim); border-bottom: 1.5px solid var(--dim); transform: rotate(45deg); }
+.nw-kbtn:hover { background: var(--accent-bg); color: var(--signal); }
+.nw-kgrid { position: absolute; z-index: 3; inset: 0; display: grid; place-items: center; padding: 16px; background: color-mix(in srgb, var(--void) 72%, transparent); }
+.nw-kgrid[hidden] { display: none; }
+.nw-kgrid-in { display: grid; grid-template-columns: repeat(4, 56px); gap: 8px; padding: 14px; border: 1px solid var(--line); border-radius: 16px; background: var(--panel); }
+.nw-kgrid-in button { height: 52px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel2); color: var(--text); font: inherit; font-size: 18px; font-weight: 700; cursor: pointer; }
+.nw-kgrid-in button:hover:not(:disabled) { border-color: var(--signal); color: var(--signal); background: var(--accent-bg); }
+.nw-kgrid-in button:disabled { opacity: .3; cursor: default; }
+.nw-card.none { opacity: .6; border-style: dashed; }
+.nw-more-btn { align-self: center; margin-top: 2px; }
+.nw-tiles { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 8px; }
+.nw-tile { display: grid; grid-template-columns: 48px minmax(0, 1fr); grid-template-rows: auto auto; column-gap: 10px; row-gap: 2px; align-items: center; min-width: 0; padding: 8px 12px 8px 8px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); color: var(--text); font: inherit; text-align: left; }
+.nw-tile:hover { border-color: var(--accent-line); }
+.nw-tile-pics { grid-row: 1 / 3; display: grid; grid-template-columns: repeat(2, 1fr); gap: 2px; width: 48px; height: 48px; border-radius: 10px; overflow: hidden; background: var(--panel2); color: var(--dim); place-items: center; }
+.nw-tile-pics img { width: 100%; height: 100%; object-fit: cover; object-position: top; }
+.nw-tile-pics:not(:has(img)) { display: grid; grid-template-columns: 1fr; }
+.nw-tile-pics svg { width: 22px; height: 22px; }
+.nw-tile.k-an .nw-tile-pics:not(:has(img)) { color: var(--danger); background: color-mix(in srgb, var(--danger) 12%, var(--panel2)); }
+.nw-tile.k-ms .nw-tile-pics:not(:has(img)) { color: var(--blue); background: color-mix(in srgb, var(--blue) 12%, var(--panel2)); }
+.nw-tile b { align-self: end; font-size: 14px; }
+.nw-tile small { align-self: start; color: var(--dim); font-size: 12px; }
+@media (max-width: 760px) {
+  .nw-tiles { grid-template-columns: minmax(0, 1fr); }
+}
+
+/* 하단 서랍 (v0.16.24): 임무 지역·검색, 편성 작전 메모, 상황판 신분증·설정. 모바일에서만 그린다 */
+.gx-content > .ph-drawer { margin: 0; }
+.ph-dbody { padding: 0 12px; }
+.gx-bdrawer .ph-tools { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+@media (max-width: 760px) {
+  .ph-drawer .ph-dbody { max-height: 0; overflow: hidden; transition: max-height .2s ease, padding .2s ease; }
+  .ph-drawer.open .ph-dbody { max-height: 160px; padding: 2px 12px 10px; overflow: visible; }
+  .gx-mdrawer .gx-mapbar { margin: 0; }
+  /* 커스텀 임무 목표 단계: 종류 칩·검색·취소 줄이 서랍 안에 (2026-11-05) */
+  .gx-custdrawer .gx-mfilter { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; margin: 0; }
+  .gx-custdrawer .gx-mfilter::-webkit-scrollbar { display: none; }
+  .gx-custdrawer .gx-mfilter .gx-search { flex: 1 1 100px; min-width: 90px; margin-left: 0; }
+  .gx-mdrawer .gx-note { display: block; margin: 0; }
+  .gx-mdrawer .gx-note textarea { width: 100%; }
+  .gx-mgo { padding: 0 12px 10px; }
+  .gx-mgo .gx-start { min-height: 46px; border-radius: 12px; font-size: 16px; }
+  /* 장소 검색 제안은 서랍 위로 펼친다 */
+  .gx-mdrawer .gx-mapfind { position: relative; }
+  .gx-mdrawer .gx-mapsug { top: auto; bottom: calc(100% + 6px); }
+}
+
+/* 고급 설정 (v0.16.27): 기능 설정 맨 아래 접힌 칸. 열기 전에는 한 줄 */
 .ps-adv { border: 1px solid var(--line); border-radius: 16px; background: var(--panel); }
 .ps-adv-sum { list-style: none; display: flex; align-items: center; gap: 8px; min-height: 52px; padding: 0 14px; cursor: pointer; }
 .ps-adv-sum::-webkit-details-marker, .ps-adv-sub > summary::-webkit-details-marker { display: none; }
@@ -456,7 +568,7 @@ button.mk-go:hover { color: var(--signal); }
 }
 .gx-ops .gx-gmark { font-style: normal; }
 .gx-body .gx-opcnt em i { display: inline; width: auto; height: auto; border-radius: 0; background: none; font: 700 17px/1 var(--mono); color: var(--c); }
-.gx-oppin:not(.sel) em { opacity: .85; font-size: 11px; }
+.gx-oppin:not(.sel) em { opacity: .85; font-size: 12px; }
 
 /* 2026-10-20 사용자 지적 반영: OSD 한 줄, 투입은 글자 줄(이름 바로 아래), 지도는 보기를 꽉 채우고 고른 상황을 가운데로 */
 .gx-oposd { flex-wrap: nowrap; align-items: center; gap: 10px; }
@@ -471,7 +583,7 @@ button.mk-go:hover { color: var(--signal); }
 .gx-opview.map::after { content: ''; position: absolute; inset: 0; z-index: 1; pointer-events: none; background: linear-gradient(rgba(8, 12, 14, .55), transparent 70px); }
 @media (prefers-reduced-motion: reduce) { .gx-opmapi { transition: none; } }
 .gx-oposd .rec { flex: none; white-space: nowrap; }
-@media (max-width: 760px) { .gx-oposd { font-size: 10px; letter-spacing: .04em; gap: 8px; } }
+@media (max-width: 760px) { .gx-oposd { font-size: 12px; letter-spacing: .04em; gap: 8px; } }
 /* 일지 칸: 일반 section 위 여백(14px)이 제목 위에 붙던 것 제거 */
 .gx-body .gx-oplog { padding: 0; margin: 0; }
 
@@ -680,7 +792,7 @@ button.mk-go:hover { color: var(--signal); }
 .gx-evbtn.gx-tgt svg { width: 17px; height: 17px; }
 .gx-mx.open .gx-evart-name .gx-evart-l1 > b { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .gx-opcap .gx-evart-l1 > b { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.gx-oprow-t .gx-goaltag { margin-left: 6px; padding: 1px 6px; font-size: 10.5px; }
+.gx-oprow-t .gx-goaltag { margin-left: 6px; padding: 1px 6px; font-size: 12px; }
 .gx-evart-l1 > b:has(+ .gx-tgt), .gx-evart-l1 > .gx-tgt { align-self: baseline; }
 .gx-evart-l1 > .gx-tgt { height: auto; font-size: 12px; }
 /* CCTV 잡음·위성 구름 (transform만 움직임) */
@@ -1032,9 +1144,9 @@ button.mk-go:hover { color: var(--signal); }
 .gx-chip.on { background: var(--accent-bg); border-color: var(--accent-line); color: var(--text); }
 .gx-select { padding-right: 28px; background-color: var(--panel); color: var(--text); }
 .gx-segs { padding: 2px; border-radius: 9px; gap: 2px; }
-.gx-seg { min-width: 0; height: 28px; min-height: 28px; padding: 0 12px; border: 0; border-radius: 7px; background: transparent; color: var(--dim); font-weight: 600; }
+.gx-seg { min-width: 0; height: var(--ctl-sm); min-height: var(--ctl-sm); padding: 0 12px; border: 0; border-radius: 7px; background: transparent; color: var(--dim); font-weight: 600; }
 .gx-seg.on { background: var(--accent-bg); color: var(--text); }
-.gx-step { width: 32px; padding: 0; font-size: 16px; }
+.gx-step { width: var(--ctl-sm); height: var(--ctl-sm); padding: 0; font-size: 16px; }
 .gx-x { width: 36px; height: 36px; border-radius: 8px; }
 .pp-upbar, .ph-act, .gx-row-btns { gap: 8px; }
 .gx-row-btns { display: flex; flex-wrap: wrap; align-items: center; }
@@ -1047,7 +1159,7 @@ button.mk-go:hover { color: var(--signal); }
 .gx-switch-wrap { display: inline-flex; align-items: center; gap: 8px; }
 .gx-switch-wrap small { font-size: 11.5px; color: var(--dim); white-space: nowrap; }
 /* 범위 배지: 이 줄의 값이 어디에 저장되나 (이 기기 공통) */
-.gx-scope { display: inline-block; margin-left: 6px; padding: 1px 6px; border-radius: 5px; font-style: normal; font-size: 10.5px; font-weight: 500; color: var(--dim); background: var(--panel2); vertical-align: middle; }
+.gx-scope { display: inline-block; margin-left: 6px; padding: 1px 6px; border-radius: 5px; font-style: normal; font-size: 12px; font-weight: 500; color: var(--dim); background: var(--panel2); vertical-align: middle; }
 
 /* 가계부 탭 (src/ui/wallet.ts) */
 .gx-hwallet { display: none; align-self: center; height: 34px; padding: 0 10px; border: 1px solid var(--line); border-radius: 11px; background: var(--panel2); color: var(--text); font: inherit; font-size: 13px; font-weight: 800; font-variant-numeric: tabular-nums; white-space: nowrap; cursor: pointer; }
@@ -1109,10 +1221,10 @@ button.mk-go:hover { color: var(--signal); }
 .gx-oprpt svg { width: 17px; height: 17px; }
 .gx-oprpt:hover { border-color: var(--signal); }
 .gx-oprow.ended .gx-oprpt { opacity: 1; }
-.gx-oprow .gx-minetag, .gx-opcap .gx-minetag { margin-left: 4px; padding: 2px 7px; font-size: 10.5px; }
+.gx-oprow .gx-minetag, .gx-opcap .gx-minetag { margin-left: 4px; padding: 2px 7px; font-size: 12px; }
 .gx-oplog-foot { flex: none; display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 8px 12px 8px 14px; border-top: 1px solid var(--line); font-size: 12px; color: var(--dim); }
 .gx-oplog-foot small { font-size: 12px; }
-.gx-oplog-foot button { padding: 6px 10px; border: 0; border-radius: 8px; background: transparent; color: var(--signal); font: inherit; font-size: 12.5px; font-weight: 700; white-space: nowrap; cursor: pointer; }
+.gx-oplog-foot button { min-height: var(--ctl-sm); padding: 6px 10px; border: 0; border-radius: 8px; background: transparent; color: var(--signal); font: inherit; font-size: 12.5px; font-weight: 700; white-space: nowrap; cursor: pointer; }
 .gx-oplog-foot button:hover { background: var(--accent-bg); }
 /* 종료 알림 오버레이 (2026-10-29): 창 머리 아래 가운데, 흐름 밖. 6초 뒤 사라짐·마우스 올리면 멈춤·X 닫기 (ui/records.ts 종료 알림 절) */
 .gx-rectoast { position: absolute; left: 50%; top: 74px; transform: translateX(-50%); z-index: 45; display: flex; align-items: center; gap: 10px; width: max-content; max-width: min(92%, 560px); padding: 10px 8px 10px 14px; border: 1px solid var(--accent-line); border-radius: 12px; background: var(--void); background-image: linear-gradient(var(--accent-bg), var(--accent-bg)); color: var(--text); font-size: 14px; box-shadow: var(--shadow); animation: gx-rectoast-in .22s ease-out; }
@@ -1293,7 +1405,7 @@ button.gx-jr-row:hover { background: color-mix(in srgb, var(--text) 4%, transpar
 .gx-wt-tiles .gx-mon-cells { grid-template-columns: 1.5fr 1fr 1fr 1fr; align-items: end; }
 .gx-mon-cell { min-width: 0; display: flex; flex-direction: column; gap: 2px; padding: 2px 16px; border-left: 1px solid rgba(255, 255, 255, .08); }
 .gx-mon-cell:first-child { border-left: 0; }
-.gx-mon-cell small { font-family: var(--mono); font-size: 11px; letter-spacing: .08em; color: rgba(232, 243, 239, .6); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.gx-mon-cell small { font-family: var(--mono); font-size: 12px; letter-spacing: .08em; color: rgba(232, 243, 239, .6); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .gx-mon-cell b { font-family: var(--mono); font-size: 28px; font-weight: 700; line-height: 1.2; color: #e8f3ef; text-shadow: 0 0 12px currentColor; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .gx-mon-cell > span { font-size: 12px; color: rgba(232, 243, 239, .55); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .gx-mon-cell b.mint, .gx-mon b.mint { color: #5EEAD4; } .gx-mon-cell b.amb { color: #F5B544; } .gx-mon-cell b.red, .gx-mon b.red { color: #FF7A6B; }
@@ -1320,8 +1432,8 @@ button.gx-jr-row { cursor: pointer; } button.gx-jr-row:hover { border-color: var
 .gx-shot.big::after { background: repeating-linear-gradient(0deg, rgba(255, 255, 255, .05) 0 1px, transparent 1px 3px), linear-gradient(to top, rgba(5, 9, 8, .85), transparent 60%); }
 .gx-shot-t { position: absolute; left: 7px; top: 5px; z-index: 2; font-family: var(--mono); font-size: 9.5px; letter-spacing: .1em; color: rgba(255, 255, 255, .85); }
 .gx-shot-end { position: absolute; right: 6px; bottom: 5px; z-index: 2; padding: 1px 5px; border-radius: 4px; background: rgba(0, 0, 0, .55); font-family: var(--mono); font-size: 9.5px; color: #fff; }
-.gx-shot.big .gx-shot-end { top: 8px; bottom: auto; right: 10px; background: none; font-size: 10.5px; }
-.gx-shot.big .gx-shot-t { left: 10px; top: 8px; font-size: 10.5px; }
+.gx-shot.big .gx-shot-end { top: 8px; bottom: auto; right: 10px; background: none; font-size: 12px; }
+.gx-shot.big .gx-shot-t { left: 10px; top: 8px; font-size: 12px; }
 .gx-jr-main { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
 .gx-jr-l1 { display: flex; align-items: center; gap: 8px; min-width: 0; }
 .gx-jr-l1 b { font-size: 15.5px; font-weight: 800; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -1367,8 +1479,8 @@ button.gx-jr-row { cursor: pointer; } button.gx-jr-row:hover { border-color: var
   .gx-jr-tiles .gx-mon-cell:nth-child(odd) { border-left: 1px solid rgba(255, 255, 255, .08); }
   .gx-jr-tiles .gx-mon-cell:first-child { border-left: 0; }
   .gx-jr-tiles .gx-mon-cell b { font-size: 20px; }
-  .gx-jr-tiles .gx-mon-cell small { font-size: 10.5px; letter-spacing: .04em; }
-  .gx-jr-tiles .gx-mon-cell > span { font-size: 11px; }
+  .gx-jr-tiles .gx-mon-cell small { font-size: 12px; letter-spacing: .04em; }
+  .gx-jr-tiles .gx-mon-cell > span { font-size: 12px; }
   .gx-mon-cell b { font-size: 22px; } .gx-wt-tiles .gx-wt-balrow b { font-size: 26px; }
   .gx-wt-tiles .gx-mon-cells { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   .gx-wt-tiles .gx-wt-tile.bal { grid-column: 1 / -1; }
@@ -1379,6 +1491,19 @@ button.gx-jr-row { cursor: pointer; } button.gx-jr-row:hover { border-color: var
   .gx-jr-row { grid-template-columns: 88px minmax(0, 1fr); padding: 8px; }
   .gx-jr-row .gx-shot { height: 64px; }
   .gx-jr-side { grid-column: 1 / -1; flex-direction: row; justify-content: space-between; align-items: center; }
+}
+
+/* 2026-11-06 단추·글씨 크기 맞추기 (전수점검 3-1·9-13, 사용자 승인):
+   ─ 손가락 크기 미만(32px, 폰 40px) 단추는 --ctl-sm 으로. 모양을 바꾸지 않는 스위치·단계 선택은 보이지 않는 누름 영역만 넓힌다.
+   ─ 11px 미만 글자는 12px 로, 폰에서는 11px 글자도 12px 로 (폰 최소 12px). */
+.gx-seg { position: relative; }
+.gx-seg::before { content: ''; position: absolute; inset: -3px 0; }
+.gx-switch::before { content: ''; position: absolute; inset: -10px 0; }
+button.gx-op-ln { position: relative; }
+button.gx-op-ln::before { content: ''; position: absolute; left: 0; right: 0; top: 50%; height: var(--ctl-sm); transform: translateY(-50%); }
+@media (max-width: 760px) {
+  .ph-meta-t, .gn-mynick small, .gn-dm-t, .ph-tool-l, .ph-drawer .ph-tool-l, .dir-pic small, .gx-evc-dep.none, .st-col-name small, .gx-rcard-top .gx-badge,
+  .gx-rpt-acts .gx-mini small, .gx-rpt-times i, .gx-rpt-first, .gx-stat span, .ph-notice-facs .gx-chip small, .gx-mark-txt small { font-size: 12px; }
 }
 `;
 
@@ -2335,304 +2460,4 @@ ${note.trim()}` : card2;
           return true;
         }
         field3.place = v2;
-        const x = readCtx(ctx2);
-        const here = typeof x === "string" || !x.on ? [] : activeEvents(x.world).filter((e) => placeKey(e, x.catalog) === v2);
-        if (!here.length) field3.target = placeTarget(v2);
-        env3.render();
-        return true;
-      }
-      case "map-unplace":
-        field3.place = null;
-        field3.target = null;
-        field3.confirmEnd = null;
-        toStep("goal", env3);
-        return true;
-      case "map-filter":
-        field3.filter = ["all", "an", "in", "ms"].includes(v) ? v : "all";
-        env3.render();
-        return true;
-      case "pick-place":
-        if (isPC() && sameTarget(field3.target, v)) {
-          field3.target = null;
-          env3.render();
-          return true;
-        }
-        field3.target = placeTarget(v);
-        toStep("team", env3);
-        return true;
-      case "field-step":
-        toStep(v === "team" ? "team" : "goal", env3);
-        return true;
-      case "pick-event": {
-        const x = readCtx(ctx2);
-        if (typeof x === "string") return true;
-        const ev = activeEvents(x.world).find((e) => e.key === v);
-        if (!ev) return true;
-        if (sameTarget(field3.target, ev.key)) {
-          field3.target = null;
-          field3.confirmEnd = null;
-          env3.render();
-          return true;
-        }
-        field3.target = { type: "event", key: ev.key, kind: ev.kind, name: ev.name, loc: ev.loc };
-        field3.region = sidoOf(ev.loc);
-        field3.confirmEnd = null;
-        toStep("team", env3);
-        return true;
-      }
-      case "end-event":
-        if (field3.confirmEnd !== v) {
-          field3.confirmEnd = v;
-          env3.render();
-          return true;
-        }
-        field3.confirmEnd = null;
-        if (field3.target?.type === "event" && field3.target.key === v) field3.target = null;
-        await saveWorld(ctx2, env3, (w) => endEvent(w, v) ? null : "이미 끝났거나 바뀐 상황이에요.");
-        return true;
-      case "team-toggle": {
-        const tx = readCtx(ctx2);
-        if (typeof tx !== "string" && lockedState(tx, v)) return true;
-        const i = field3.team.indexOf(v);
-        if (i >= 0) field3.team.splice(i, 1);
-        else if (field3.team.length + field3.support < TEAM_MAX) field3.team.push(v);
-        env3.render();
-        return true;
-      }
-      case "support": {
-        const next = field3.support + (Number(v) > 0 ? 1 : -1);
-        if (next >= 0 && validTeam(field3.team.length, next)) field3.support = next;
-        env3.render();
-        return true;
-      }
-      case "depart":
-        await depart(ctx2, env3);
-        return true;
-      case "mission-kind":
-        if (v === "an" || v === "ms" || v === "lm") {
-          field3.mkind = v;
-          field3.query = "";
-        }
-        env3.render();
-        return true;
-      case "mission-open":
-        field3.mopen = field3.mopen === v ? "" : v;
-        env3.render();
-        return true;
-      case "mission-pick": {
-        const m = v.match(/^(an|ms|lm):([\s\S]*)$/);
-        const kind = m?.[1] ?? field3.mkind;
-        const name = m ? m[2] : v;
-        if (isPC() && field3.mname === name && field3.mpick === kind && field3.mopen !== `${kind}:${name}`) {
-          field3.mname = null;
-          env3.render();
-          return true;
-        }
-        await aimFlash(v);
-        field3.mname = name;
-        field3.mpick = kind;
-        toStep("team", env3);
-        return true;
-      }
-      case "mission-cancel":
-        if (v === "an" || v === "ms" || v === "in") await saveWorld(ctx2, env3, (w) => (cancelMission(w, v), null));
-        return true;
-      case "mission-unpick":
-        await aimFlash(v);
-        field3.mname = null;
-        toStep("goal", env3);
-        return true;
-      case "mission-send":
-        await sendMission(ctx2, env3, opening);
-        return true;
-    }
-    return false;
-  }
-
-  // src/ui/app.ts
-  var VEIL = { dark: "3, 7, 9", light: "20, 30, 28", paper: "40, 30, 15" };
-  function paintVeil(el, dim) {
-    const veil = VEIL[el.dataset.theme] ?? VEIL.dark;
-    el.style.background = `rgba(${veil}, ${dim / 100})`;
-  }
-  var root2 = null;
-  var view = { kind: "loading" };
-  var draft = { lang: "ko" };
-  var busy3 = false;
-  var notice = "";
-  var GNET_ON = true;
-  var TABS3 = ["board", "map", "mission", ...GNET_ON ? ["gnet"] : [], "phone", "wiki", "records"];
-  var tab = "board";
-  var repick = false;
-  var pickerPrefs = false;
-  var lastChat = "";
-  var env2 = {
-    render: () => render2(),
-    refresh: () => refresh2(),
-    close: () => close2(),
-    setNotice: (text4) => {
-      notice = text4;
-    },
-    setBusy: (on2) => {
-      busy3 = on2;
-    }
-  };
-  var wikiEnv = {
-    render: () => render2(),
-    refresh: () => refresh2(),
-    current: () => view.kind === "started" ? view.ctx : null
-  };
-  var gnetEnv = wikiEnv;
-  var settingsEnv = { render: () => render2(), refresh: () => refresh2() };
-  var peopleEnv = settingsEnv;
-  var recordsEnv = settingsEnv;
-  var shown = false;
-  var phoneEnv = {
-    render: () => render2(),
-    refresh: () => refresh2(),
-    visible: () => shown && tab === "phone" && view.kind === "started",
-    current: () => view.kind === "started" ? view.ctx : null,
-    close: async () => {
-      await close2();
-      await refresh2();
-    }
-  };
-  var esc31 = (s7) => String(s7 ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
-  function ensureRoot2() {
-    if (root2) return root2;
-    setImageRedraw(() => {
-      if (view.kind === "picker") renderPicker();
-      else render2();
-      if (editorOpen()) render();
-    });
-    const style = document.createElement("style");
-    style.textContent = style_default2;
-    document.head.appendChild(style);
-    root2 = document.createElement("div");
-    root2.className = "gx";
-    document.body.appendChild(root2);
-    root2.addEventListener("toggle", (ev) => rememberPanel(ev.target), true);
-    const picker2 = document.createElement("input");
-    picker2.type = "file";
-    picker2.accept = "image/*";
-    picker2.multiple = true;
-    picker2.hidden = true;
-    document.body.appendChild(picker2);
-    let pickFor = "";
-    picker2.addEventListener("change", () => {
-      const files = [...picker2.files ?? []];
-      picker2.value = "";
-      if (files.length) void addPhotos(pickFor, files);
-    });
-    let downOutside = false;
-    root2.addEventListener("pointerdown", (ev) => downOutside = ev.target === root2);
-    root2.addEventListener("click", (ev) => {
-      const t = ev.target;
-      if (t === root2) {
-        if (downOutside) void run4("close");
-        downOutside = false;
-        return;
-      }
-      const pick3 = t.closest("[data-pick-photo]");
-      if (pick3) {
-        if (pick3.hasAttribute("disabled") || busy3) return;
-        pickFor = pick3.dataset.pickPhoto ?? "";
-        picker2.click();
-        return;
-      }
-      const zoom = t.closest("[data-zoom-photo]")?.querySelector("img");
-      if (zoom?.getAttribute("src")) return zoomPhoto(zoom.src, zoom.alt);
-      const pickMap = t.closest("[data-base-pick]");
-      if (pickMap) {
-        const img = pickMap.querySelector("img")?.getBoundingClientRect();
-        if (!img || !img.width || !img.height) return;
-        const x = (ev.clientX - img.left) / img.width * 100;
-        const y = (ev.clientY - img.top) / img.height * 100;
-        if (x < 0 || x > 100 || y < 0 || y > 100) return;
-        return void run4("dir-base-xy", `${x.toFixed(1)}|${y.toFixed(1)}|${pickMap.dataset.basePick}`);
-      }
-      const el = t.closest("[data-action]");
-      if (!el || el.hasAttribute("disabled")) return;
-      const names4 = el.dataset.take?.split(",") ?? [];
-      const val = (n2) => root2?.querySelector(`[name="${n2}"]`)?.value ?? "";
-      const take = !names4.length ? void 0 : names4.length > 1 ? JSON.stringify(names4.map(val)) : root2?.querySelector(`[name="${names4[0]}"]`)?.value;
-      void run4(el.dataset.action, take ?? el.dataset.value);
-    });
-    bindCropDrag(root2, render2);
-    root2.addEventListener("pointerdown", (ev) => {
-      const grip = ev.target.closest?.("[data-drag-agent]");
-      const row9 = grip?.closest("[data-agent-row]");
-      if (!grip || !row9 || !root2) return;
-      ev.preventDefault();
-      const box2 = root2;
-      const group5 = row9.dataset.agentGroup ?? "";
-      const rows2 = [...box2.querySelectorAll("[data-agent-row]")].filter((r) => r !== row9 && r.dataset.agentGroup === group5);
-      let drop = null;
-      const mark2 = (next) => {
-        drop?.el.classList.remove("drop-before", "drop-after");
-        drop = next;
-        drop?.el.classList.add(drop.after ? "drop-after" : "drop-before");
-      };
-      const move = (e) => {
-        let best = null;
-        let gap = Infinity;
-        for (const r of rows2) {
-          const b = r.getBoundingClientRect();
-          const d = Math.abs(e.clientY - (b.top + b.height / 2));
-          if (d < gap) [gap, best] = [d, { el: r, after: e.clientY > b.top + b.height / 2 }];
-        }
-        if (best?.el !== drop?.el || best?.after !== drop?.after) mark2(best);
-      };
-      row9.classList.add("dragging");
-      box2.classList.add("dir-dragging");
-      grip.setPointerCapture?.(ev.pointerId);
-      const up = () => {
-        grip.removeEventListener("pointermove", move);
-        grip.removeEventListener("pointerup", up);
-        grip.removeEventListener("pointercancel", up);
-        row9.classList.remove("dragging");
-        box2.classList.remove("dir-dragging");
-        const target = drop;
-        mark2(null);
-        if (target) void run4("dir-move", `${target.after ? "after" : "before"}|${grip.dataset.dragAgent}|${target.el.dataset.agentRow}`);
-      };
-      grip.addEventListener("pointermove", move);
-      grip.addEventListener("pointerup", up);
-      grip.addEventListener("pointercancel", up);
-    });
-    root2.addEventListener("change", (ev) => {
-      if (ev.target.dataset?.input === "dir-crop-size") render2();
-    });
-    const photoTarget = (el) => {
-      const box2 = el?.closest?.(".gn-pane, .gn-cpane, .gn-inline, .gn-composer, .ph-room");
-      return box2 ? box2.matches(".gn-pane, .gn-cpane, .gn-inline, .gn-composer") ? "gn" : "ph" : "";
-    };
-    const imageFiles = (list4) => [...list4 ?? []].map((x) => x instanceof File ? x : x.kind === "file" ? x.getAsFile() : null).filter((f) => !!f && f.type.startsWith("image/"));
-    if (!widthWatch) {
-      widthWatch = true;
-      matchMedia("(max-width: 760px)").addEventListener?.("change", () => root2 && render2());
-      const frameWatch = () => {
-        if (!root2 || root2.style.display === "none") return;
-        const fr = frameState(getPrefs().frame, view.kind === "started");
-        if (root2.dataset.frame !== fr.kind || root2.dataset.frameHidden === "1" !== fr.hidden) render2();
-      };
-      window.addEventListener("resize", frameWatch);
-      document.addEventListener("fullscreenchange", frameWatch);
-    }
-    root2.addEventListener("paste", (ev) => {
-      const prefix = photoTarget(ev.target);
-      const files = imageFiles(ev.clipboardData?.items);
-      if (!prefix || !files.length) return;
-      ev.preventDefault();
-      void addPhotos(prefix, files);
-    });
-    root2.addEventListener("dragover", (ev) => {
-      if (photoTarget(ev.target) && ev.dataTransfer?.types.includes("Files")) ev.preventDefault();
-    });
-    root2.addEventListener("drop", (ev) => {
-      const prefix = photoTarget(ev.target);
-      if (!prefix || !ev.dataTransfer?.files.length) return;
-      ev.preventDefault();
-      const files = imageFiles(ev.dataTransfer.files);
-      if (files.length) void addPhotos(prefix, files);
-  
+        con

@@ -1,4 +1,9 @@
-erson's `knowledge` unless that person actually read the cue.",
+es the same and feels aversion. If no usable visual evidence exists, record that the first impression is unknown. Once this entry exists, never upsert or remove it, however wrong it later proves; later understanding goes only to 「현재 평가:」.",
+    "- 「현재 평가:」 **current evaluation**: the person's present reading of the user's character, its concrete reason, and the resulting feeling, through the person's own personality. A favorable first impression may coexist with an unfavorable current evaluation. A corrected interpretation need not change the emotion, and a changed feeling need not change every judgment. Upsert the one existing entry when it changes; do not write a diary of evaluations and do not restate it when nothing changed. Distinguish 「부유해 보임」 from verified wealth; hidden wealth, background, ability, intentions and private traits are not automatically known.",
+    "- 「의도:」 **nature and intent of interest**: the primary intent and, when needed, a secondary one, from the table in 7.5. Distinguish nonromantic interest from romantic or sexual interest; strong affinity does not make everyone a romantic candidate. A real catalyst is required when the nature of interest changes.",
+    "- 「태도:」 **stance**: how the person currently interprets and treats the target, as two separate elements, with the evidence for the latest change.",
+    "- 「제약:」 **duty and how it is handled**: see 7.6.",
+    "- 「속마음:」 **unexpressed feeling**: what is felt but not shown, what limits expression, actual leaks (gaze, interrupted sentences, delays), and who perceived them. Never transfer this into another person's `knowledge` unless that person actually read the cue.",
     "- 「접근:」 **approach and response**: the last actual approach, the target's actual response, confirmed boundaries, and what is currently permitted. No response, silence and lack of resistance are not acceptance.",
     "- 「겉과 속:」 for exploitative or abusive intent: the helpful, concerned or complimentary surface and the actual purpose, what was attempted, what resulted, and who noticed. Never keep only the outward kindness until it silently becomes goodwill.",
     "Never move target-specific material into `personality`. Values and biases are separate from the interpretation of one target. Never record a reaction or approach that appeared only in a plan or memo and did not happen in the span.",
@@ -1946,8 +1951,12 @@ Return the JSON object.` }
     confirm: "",
     info: "",
     notice: "",
-    diag: null
+    diag: null,
+    /** 상태 점검의 「받기」 진행 중인 것과 진행 글 (2026-11-06 사용자 승인, 전수점검 9-9) */
+    getting: "",
+    progress: ""
   };
+  var rerender = null;
   async function refresh() {
     const sizes = {};
     for (const [key2] of STORE) {
@@ -1969,6 +1978,7 @@ Return the JSON object.` }
     }
   }
   function ensureManage(render3) {
+    rerender = render3;
     if (manUi.sizes || manUi.pending) return;
     manUi.pending = true;
     void refresh().finally(() => {
@@ -1977,20 +1987,4 @@ Return the JSON object.` }
     });
   }
   var row5 = (label2, ctl, help = "") => `<div class="ps-row"><div class="ps-label"><b>${label2}</b>${help ? `<small>${help}</small>` : ""}</div><div class="ps-ctl">${ctl}</div></div>`;
-  var badge2 = (ok, text4) => `<span class="gw-state${ok === null ? " off" : ok ? "" : " bad"}">${esc20(text4)}</span>`;
-  var head = (crumb, title2, desc, act = "") => `<header class="gw-head"><h2>${esc20(title2)}${crumb ? `<small>${esc20(crumb)}</small>` : ""}</h2>${act ? `<div class="gw-head-act">${act}</div>` : ""}<p class="gx-muted">${esc20(desc)}</p>${manUi.notice ? `<div class="gx-err" role="alert">${esc20(manUi.notice)}</div>` : ""}${manUi.info ? `<p class="gx-hint">${esc20(manUi.info)}</p>` : ""}</header>`;
-  function exportJson(ctx2) {
-    const directory2 = readDirectoryData(ctx2.char.globalLore ?? []);
-    return JSON.stringify(directory2 ? { ...getPrefs(), directory: directory2 } : getPrefs(), null, 2);
-  }
-  function backupPage(ctx2) {
-    const json = exportJson(ctx2);
-    const sizes = manUi.sizes;
-    const store = STORE.map(([key2, label2, help, drop]) => {
-      const n2 = sizes?.[key2] ?? 0;
-      const ctl = `<span class="gw-tokens">${sizes ? n2 ? kb(n2) : "없음" : "…"}</span>${drop && n2 ? manUi.confirm === drop.slice(4) ? `<button class="gx-mini danger" data-action="${drop}-yes">정말 지우기</button><button class="gx-mini" data-action="man-no">취소</button>` : `<button class="gx-mini" data-action="${drop}">${ICONS.trash}지우기</button>` : ""}`;
-      return row5(label2, ctl, help);
-    }).join("");
-    const importRows = `<div class="ps-row"><div class="ps-label"><b>가져오기</b><small>내보낸 JSON을 붙여 넣거나 파일을 올리고 「적용」을 누르세요. 지금 기기 설정(과 세계 편집)을 통째로 바꿔요.</small></div>
-      <div class="ps-ctl"><label class="gx-mini gw-file">${ICONS.refresh}파일 올리기<input type="file" accept=".json,application/json" data-change="man-import-file" hidden></label>${manUi.importName ? `<span class="gx-muted">${esc20(manUi.importName)}</span>` : ""}</div>
-      <textarea data-input="man-
+  var badge2 = (ok, text4) => `<span

@@ -1,4 +1,304 @@
-    else if (prefix === "gn") gnet.notice = "사진 파일만 끌어놓을 수 있어요.", render2();
+st x = readCtx(ctx2);
+        const here = typeof x === "string" || !x.on ? [] : activeEvents(x.world).filter((e) => placeKey(e, x.catalog) === v2);
+        if (!here.length) field3.target = placeTarget(v2);
+        env3.render();
+        return true;
+      }
+      case "map-unplace":
+        field3.place = null;
+        field3.target = null;
+        field3.confirmEnd = null;
+        toStep("goal", env3);
+        return true;
+      case "map-filter":
+        field3.filter = ["all", "an", "in", "ms"].includes(v) ? v : "all";
+        env3.render();
+        return true;
+      case "pick-place":
+        if (isPC() && sameTarget(field3.target, v)) {
+          field3.target = null;
+          env3.render();
+          return true;
+        }
+        field3.target = placeTarget(v);
+        toStep("team", env3);
+        return true;
+      case "field-step":
+        toStep(v === "team" ? "team" : "goal", env3);
+        return true;
+      case "pick-event": {
+        const x = readCtx(ctx2);
+        if (typeof x === "string") return true;
+        const ev = activeEvents(x.world).find((e) => e.key === v);
+        if (!ev) return true;
+        if (sameTarget(field3.target, ev.key)) {
+          field3.target = null;
+          field3.confirmEnd = null;
+          env3.render();
+          return true;
+        }
+        field3.target = { type: "event", key: ev.key, kind: ev.kind, name: ev.name, loc: ev.loc };
+        field3.region = sidoOf(ev.loc);
+        field3.confirmEnd = null;
+        toStep("team", env3);
+        return true;
+      }
+      case "end-event":
+        if (field3.confirmEnd !== v) {
+          field3.confirmEnd = v;
+          env3.render();
+          return true;
+        }
+        field3.confirmEnd = null;
+        if (field3.target?.type === "event" && field3.target.key === v) field3.target = null;
+        await saveWorld(ctx2, env3, (w) => endEvent(w, v) ? null : "이미 끝났거나 바뀐 상황이에요.");
+        return true;
+      case "team-toggle": {
+        const tx = readCtx(ctx2);
+        if (typeof tx !== "string" && lockedState(tx, v)) return true;
+        const i = field3.team.indexOf(v);
+        if (i >= 0) field3.team.splice(i, 1);
+        else if (field3.team.length + field3.support < TEAM_MAX) field3.team.push(v);
+        env3.render();
+        return true;
+      }
+      case "support": {
+        const next = field3.support + (Number(v) > 0 ? 1 : -1);
+        if (next >= 0 && validTeam(field3.team.length, next)) field3.support = next;
+        env3.render();
+        return true;
+      }
+      case "depart":
+        await depart(ctx2, env3);
+        return true;
+      case "mission-kind":
+        if (v === "an" || v === "ms" || v === "lm") {
+          field3.mkind = v;
+          field3.query = "";
+        }
+        env3.render();
+        return true;
+      case "mission-open":
+        field3.mopen = field3.mopen === v ? "" : v;
+        env3.render();
+        return true;
+      case "mission-pick": {
+        const m = v.match(/^(an|ms|lm):([\s\S]*)$/);
+        const kind = m?.[1] ?? field3.mkind;
+        const name = m ? m[2] : v;
+        if (isPC() && field3.mname === name && field3.mpick === kind && field3.mopen !== `${kind}:${name}`) {
+          field3.mname = null;
+          env3.render();
+          return true;
+        }
+        await aimFlash(v);
+        field3.mname = name;
+        field3.mpick = kind;
+        toStep("team", env3);
+        return true;
+      }
+      case "mission-cancel":
+        if (v === "an" || v === "ms" || v === "in") await saveWorld(ctx2, env3, (w) => (cancelMission(w, v), null));
+        return true;
+      case "mission-unpick":
+        await aimFlash(v);
+        field3.mname = null;
+        toStep("goal", env3);
+        return true;
+      case "mission-send":
+        await sendMission(ctx2, env3, opening);
+        return true;
+    }
+    return false;
+  }
+
+  // src/ui/app.ts
+  var VEIL = { dark: "3, 7, 9", light: "20, 30, 28", paper: "40, 30, 15" };
+  function paintVeil(el, dim) {
+    const veil = VEIL[el.dataset.theme] ?? VEIL.dark;
+    el.style.background = `rgba(${veil}, ${dim / 100})`;
+  }
+  var root2 = null;
+  var view = { kind: "loading" };
+  var draft = { lang: "ko" };
+  var busy3 = false;
+  var notice = "";
+  var GNET_ON = true;
+  var TABS3 = ["board", "map", "mission", ...GNET_ON ? ["gnet"] : [], "phone", "wiki", "records"];
+  var tab = "board";
+  var repick = false;
+  var pickerPrefs = false;
+  var lastChat = "";
+  var env2 = {
+    render: () => render2(),
+    refresh: () => refresh2(),
+    close: () => close2(),
+    setNotice: (text4) => {
+      notice = text4;
+    },
+    setBusy: (on2) => {
+      busy3 = on2;
+    }
+  };
+  var wikiEnv = {
+    render: () => render2(),
+    refresh: () => refresh2(),
+    current: () => view.kind === "started" ? view.ctx : null
+  };
+  var gnetEnv = wikiEnv;
+  var settingsEnv = { render: () => render2(), refresh: () => refresh2() };
+  var peopleEnv = settingsEnv;
+  var recordsEnv = settingsEnv;
+  var shown = false;
+  var phoneEnv = {
+    render: () => render2(),
+    refresh: () => refresh2(),
+    visible: () => shown && tab === "phone" && view.kind === "started",
+    current: () => view.kind === "started" ? view.ctx : null,
+    close: async () => {
+      await close2();
+      await refresh2();
+    }
+  };
+  var esc31 = (s7) => String(s7 ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+  function ensureRoot2() {
+    if (root2) return root2;
+    setImageRedraw(() => {
+      if (view.kind === "picker") renderPicker();
+      else render2();
+      if (editorOpen()) render();
+    });
+    const style = document.createElement("style");
+    style.textContent = style_default2;
+    document.head.appendChild(style);
+    root2 = document.createElement("div");
+    root2.className = "gx";
+    document.body.appendChild(root2);
+    root2.addEventListener("toggle", (ev) => rememberPanel(ev.target), true);
+    const picker2 = document.createElement("input");
+    picker2.type = "file";
+    picker2.accept = "image/*";
+    picker2.multiple = true;
+    picker2.hidden = true;
+    document.body.appendChild(picker2);
+    let pickFor = "";
+    picker2.addEventListener("change", () => {
+      const files = [...picker2.files ?? []];
+      picker2.value = "";
+      if (files.length) void addPhotos(pickFor, files);
+    });
+    let downOutside = false;
+    root2.addEventListener("pointerdown", (ev) => downOutside = ev.target === root2);
+    root2.addEventListener("click", (ev) => {
+      const t = ev.target;
+      if (t === root2) {
+        if (downOutside) void run4("close");
+        downOutside = false;
+        return;
+      }
+      const pick3 = t.closest("[data-pick-photo]");
+      if (pick3) {
+        if (pick3.hasAttribute("disabled") || busy3) return;
+        pickFor = pick3.dataset.pickPhoto ?? "";
+        picker2.click();
+        return;
+      }
+      const zoom = t.closest("[data-zoom-photo]")?.querySelector("img");
+      if (zoom?.getAttribute("src")) return zoomPhoto(zoom.src, zoom.alt);
+      const pickMap = t.closest("[data-base-pick]");
+      if (pickMap) {
+        const img = pickMap.querySelector("img")?.getBoundingClientRect();
+        if (!img || !img.width || !img.height) return;
+        const x = (ev.clientX - img.left) / img.width * 100;
+        const y = (ev.clientY - img.top) / img.height * 100;
+        if (x < 0 || x > 100 || y < 0 || y > 100) return;
+        return void run4("dir-base-xy", `${x.toFixed(1)}|${y.toFixed(1)}|${pickMap.dataset.basePick}`);
+      }
+      const el = t.closest("[data-action]");
+      if (!el || el.hasAttribute("disabled")) return;
+      const names4 = el.dataset.take?.split(",") ?? [];
+      const val = (n2) => root2?.querySelector(`[name="${n2}"]`)?.value ?? "";
+      const take = !names4.length ? void 0 : names4.length > 1 ? JSON.stringify(names4.map(val)) : root2?.querySelector(`[name="${names4[0]}"]`)?.value;
+      void run4(el.dataset.action, take ?? el.dataset.value);
+    });
+    bindCropDrag(root2, render2);
+    root2.addEventListener("pointerdown", (ev) => {
+      const grip = ev.target.closest?.("[data-drag-agent]");
+      const row9 = grip?.closest("[data-agent-row]");
+      if (!grip || !row9 || !root2) return;
+      ev.preventDefault();
+      const box2 = root2;
+      const group5 = row9.dataset.agentGroup ?? "";
+      const rows2 = [...box2.querySelectorAll("[data-agent-row]")].filter((r) => r !== row9 && r.dataset.agentGroup === group5);
+      let drop = null;
+      const mark2 = (next) => {
+        drop?.el.classList.remove("drop-before", "drop-after");
+        drop = next;
+        drop?.el.classList.add(drop.after ? "drop-after" : "drop-before");
+      };
+      const move = (e) => {
+        let best = null;
+        let gap = Infinity;
+        for (const r of rows2) {
+          const b = r.getBoundingClientRect();
+          const d = Math.abs(e.clientY - (b.top + b.height / 2));
+          if (d < gap) [gap, best] = [d, { el: r, after: e.clientY > b.top + b.height / 2 }];
+        }
+        if (best?.el !== drop?.el || best?.after !== drop?.after) mark2(best);
+      };
+      row9.classList.add("dragging");
+      box2.classList.add("dir-dragging");
+      grip.setPointerCapture?.(ev.pointerId);
+      const up = () => {
+        grip.removeEventListener("pointermove", move);
+        grip.removeEventListener("pointerup", up);
+        grip.removeEventListener("pointercancel", up);
+        row9.classList.remove("dragging");
+        box2.classList.remove("dir-dragging");
+        const target = drop;
+        mark2(null);
+        if (target) void run4("dir-move", `${target.after ? "after" : "before"}|${grip.dataset.dragAgent}|${target.el.dataset.agentRow}`);
+      };
+      grip.addEventListener("pointermove", move);
+      grip.addEventListener("pointerup", up);
+      grip.addEventListener("pointercancel", up);
+    });
+    root2.addEventListener("change", (ev) => {
+      if (ev.target.dataset?.input === "dir-crop-size") render2();
+    });
+    const photoTarget = (el) => {
+      const box2 = el?.closest?.(".gn-pane, .gn-cpane, .gn-inline, .gn-composer, .ph-room");
+      return box2 ? box2.matches(".gn-pane, .gn-cpane, .gn-inline, .gn-composer") ? "gn" : "ph" : "";
+    };
+    const imageFiles = (list4) => [...list4 ?? []].map((x) => x instanceof File ? x : x.kind === "file" ? x.getAsFile() : null).filter((f) => !!f && f.type.startsWith("image/"));
+    if (!widthWatch) {
+      widthWatch = true;
+      matchMedia("(max-width: 760px)").addEventListener?.("change", () => root2 && render2());
+      const frameWatch = () => {
+        if (!root2 || root2.style.display === "none") return;
+        const fr = frameState(getPrefs().frame, view.kind === "started");
+        if (root2.dataset.frame !== fr.kind || root2.dataset.frameHidden === "1" !== fr.hidden) render2();
+      };
+      window.addEventListener("resize", frameWatch);
+      document.addEventListener("fullscreenchange", frameWatch);
+    }
+    root2.addEventListener("paste", (ev) => {
+      const prefix = photoTarget(ev.target);
+      const files = imageFiles(ev.clipboardData?.items);
+      if (!prefix || !files.length) return;
+      ev.preventDefault();
+      void addPhotos(prefix, files);
+    });
+    root2.addEventListener("dragover", (ev) => {
+      if (photoTarget(ev.target) && ev.dataTransfer?.types.includes("Files")) ev.preventDefault();
+    });
+    root2.addEventListener("drop", (ev) => {
+      const prefix = photoTarget(ev.target);
+      if (!prefix || !ev.dataTransfer?.files.length) return;
+      ev.preventDefault();
+      const files = imageFiles(ev.dataTransfer.files);
+      if (files.length) void addPhotos(prefix, files);
+      else if (prefix === "gn") gnet.notice = "사진 파일만 끌어놓을 수 있어요.", render2();
       else phone.notice = "사진 파일만 끌어놓을 수 있어요.", render2();
     });
     root2.addEventListener("keydown", (ev) => {
@@ -1981,5 +2281,5 @@ ${texts.anomaly}`;
   }
 
   // src/body-entry.ts
-  globalThis.__goeiBody = { version: "0.20.6", start: start2 };
+  globalThis.__goeiBody = { version: "0.20.7", start: start2 };
 })();
