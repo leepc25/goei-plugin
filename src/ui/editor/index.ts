@@ -30,6 +30,7 @@ import { basicSettings } from '../../core/settings';
 import { worldOn } from '../../core/world';
 import { ppValue } from '../../core/people/settings';
 import { isPhone } from '../media';
+import { morph } from '../morph';
 
 /** 설정 페이지 (2026-10-27: 모든 설정은 이 창 하나로. 지침은 그 기능 페이지 아래에) */
 export type SetPage = 'screen' | 'image' | 'board' | 'status' | 'gnet' | 'phone' | 'wiki' | 'journal' | 'wallet' | 'people' | 'factions' | 'lore' | 'adv' | 'update';
@@ -612,17 +613,23 @@ export function render(): void {
     </header>`;
   const tabTools = TABS.map(([id, label, icon]) => `<button class="ph-tool" data-action="ed-tab" data-value="${id}" aria-pressed="${tab === id}" aria-label="${label}" title="${label}">${icon}<span class="ph-tool-l">${label}</span></button>`).join('');
   const foot = phone ? `${drawerHtml(tabTools, '', 'gw-tabdrawer')}${host.mobileNav?.() ?? ''}` : '';
-  root.innerHTML = `<div class="gw-win${edUi.drawer ? ' drawer' : ''}${phone ? ' phone' : ''}">
+  const html = `<div class="gw-win${edUi.drawer ? ' drawer' : ''}${phone ? ' phone' : ''}">
     ${top}
     <nav class="gw-tree"><div class="gw-tabs" role="tablist">${tabs}</div>${tree(ctx)}</nav>
     <main class="gw-body">${ctx ? body(ctx) : '<p class="gx-err">채팅 정보를 읽지 못했어요. 창을 닫고 다시 열어 주세요.</p>'}</main>
     ${foot}
     ${confirm}
   </div>`;
+  // 같은 화면을 다시 그릴 때는 바뀐 곳만 (2026-11-06 사용자, 전수점검 남은 것 6). 다른 화면으로 갈 때·처음 열 때는 통째로
+  if (sameNode && root.querySelector('.gw-win')) morph(root, html);
+  else root.innerHTML = html;
   labelSwitches(root);
   if (phone) {
-    bindDrawer(root);
-    bindMbar(root, () => void run('ed-close'));
+    // 바뀐 곳만 그리면 서랍·하단 바 요소가 그대로 남으니 한 번만 묶는다
+    const box = root.querySelector<HTMLElement>('.ph-drawer');
+    const bar = root.querySelector<HTMLElement>('.gx-mbar');
+    if (box && !boundOnce.has(box)) { boundOnce.add(box); bindDrawer(root); }
+    if (bar && !boundOnce.has(bar)) { boundOnce.add(bar); bindMbar(root, () => void run('ed-close')); }
   }
   if (keep.length) KEEP.forEach((q, i) => { const el = root!.querySelector<HTMLElement>(q); if (el && keep[i]) el.scrollTop = keep[i]; });
   if (focusSel) {
@@ -633,6 +640,8 @@ export function render(): void {
     }
   }
 }
+
+const boundOnce = new WeakSet<HTMLElement>();
 
 const env = { render: () => render(), refresh: async () => { await host?.refresh(); render(); } };
 
