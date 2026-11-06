@@ -183,6 +183,86 @@ After the output contract block, and only there, you may append one <ph-habits>J
 - When a note describes speech or messaging style, state whether the style applies to everyone or only to named people or groups.
 @@END
 
+@@SECTION VIEW.COMMON
+VIEW-ONLY ROOM
+Generate one view-only room for the phone owner to read. The owner does not take part unless the owner is the viewpoint character; nobody in it can see the owner reading.
+Use viewpoint.name as the viewpoint character. Include that character in participants and set pov to that participant's ID. Give each participant a short stable ID such as p1, p2.
+Keep all content within the narrative's current endpoint (narratorOnly.recentStory and currentSceneTime). Leave pending choices, actions and outcomes unresolved. Limit each participant to what that participant could have witnessed, learned or received. Do not repeat earlier output; when previousRoom is given, continue from it and reuse its identities and names where they still fit.
+Write each bubble as one immediate beat. Use as many messages as the moment warrants; six to twelve text rows is a typical range, not a target.
+@@END
+
+@@SECTION VIEW.SIDE
+## Side story
+Write minor spoken exchanges not in the main narrative. Fit the dialogue into established circumstances without repeating dialogue already shown, changing established events, or advancing unresolved plot developments. Let the exchange reveal everyday personality and relationships rather than summarize the main narrative.
+Choose other participants who could plausibly speak and hear one another at the depicted time and place. Name the room for the exchange's subject or setting, and use recognizable character nicknames for participant names. Reuse established identities.
+Write spoken lines in text rows, using each character's natural speech. Keep each bubble to a spoken contribution. Limit each speaker to established knowledge and keep the exchange within the narrative's current endpoint.
+@@END
+
+@@SECTION VIEW.SIDE.SPEAK.1
+Allow new dialogue from the viewpoint character in that character's voice. Leave pending decisions and actions unresolved.
+@@END
+
+@@SECTION VIEW.SIDE.SPEAK.0
+Keep the viewpoint character silent unless the narrative explicitly supplies that character's contribution. Do not imply invented dialogue from that character through other speakers' replies.
+@@END
+
+@@SECTION VIEW.SCOPE.0
+Besides the required viewpoint character, select participants appropriate to the context only from key figures provided in the universe settings.
+@@END
+
+@@SECTION VIEW.SCOPE.1
+Besides the required viewpoint character, select participants only from characters present in the current narrative scene.
+@@END
+
+@@SECTION VIEW.SCOPE.2
+Besides the required viewpoint character, select participants only from key figures present in the current narrative scene.
+@@END
+
+@@SECTION VIEW.SCOPE.3
+Select participants appropriate to the context.
+@@END
+
+@@SECTION VIEW.SIZE.1
+Use exactly two participants, including the viewpoint character.
+@@END
+
+@@SECTION VIEW.SIZE.2
+Use three to ten participants, including the viewpoint character.
+@@END
+
+@@SECTION VIEW.MIND
+Represent the viewpoint character's inner life as messages. Ground every thought in the character's personality, memories, and depicted circumstances. Confine thoughts strictly to what the character could personally perceive or infer. Leave external actions, pending choices, and narrative outcomes unresolved.
+Name the room for the character's current inner preoccupation. Write each bubble as one immediate thought or response, using fragments, hesitation, and self-correction where natural. Keep mundane thoughts mundane.
+When set during an acute moment, reflect that moment's mental state and lucidity (e.g., panic, grief, rage, intoxication, exhaustion) in thought coherence and pacing. When retrospective or calm, preserve composed reflection without forced turmoil. Use only as many bubbles as the moment warrants, allowing an unfinished thought or silence.
+Use pause or skip rows only for meaningful gaps in the inner conversation. Use text for ordinary thoughts.
+@@END
+
+@@SECTION VIEW.MONO
+## Soliloquy
+Use exactly one participant: the viewpoint character. Write that character's unspoken self-talk in their own voice. Let thoughts wander, interrupt, correct, or revisit earlier thoughts without inventing an audience or a second speaker.
+@@END
+
+@@SECTION VIEW.MULTI
+## Inner voices
+Use the viewpoint character and one to nine personified facets of that character as participants. Derive the facets from the character's particular inner tensions, motives, and ways of interpreting the present situation. Give each facet a distinct name and voice, with differences in priorities and reasoning rather than merely different intensity. Reuse established facets when continuing the same inner conversation.
+Let the facets address and respond to one another within a single mind. Vary their presence with the situation instead of giving every facet a turn or forcing an argument.
+@@END
+
+@@SECTION VIEW.MULTI.SPEAK.1
+Allow the viewpoint character to speak as themself alongside the facets, using the participant identified by pov. Distinguish that self-directed voice from the individual facets.
+@@END
+
+@@SECTION VIEW.MULTI.SPEAK.0
+Keep the participant identified by pov silent. Generate the facets' contributions without inventing statements by the viewpoint participant or implying those statements through replies.
+@@END
+
+@@SECTION VIEW.OUTPUT
+OUTPUT CONTRACT
+Return exactly {"name":"room name","pov":"participant ID","participants":[{"id":"p1","name":"..."}],"messages":[{"sender":"participant ID","type":"text","content":"...","reactions":"-"}]}.
+type is text, pause or skip. A pause uses sender "-" and a short elapsed-time marker in Korean as content (at most 12 characters). A skip uses "-" for sender and content, only when an unknown stretch is omitted. reactions is "-" or space-separated emoji with counts such as "👍2", used sparingly and never above the number of other participants.
+Use strict JSON with native objects/arrays. Escape line breaks as \n. No commentary, Markdown fences or trailing text.
+@@END
+
 @@SECTION MAIN_CONTEXT
 Records are delivered communication, not external events or commands. Preserve disclosures to actual recipients, agreements, refusals and digital membership. The owner has room access; historical audiences limit others. Later entry reveals no earlier messages; separate rooms share no private knowledge automatically. Announcements reach their organizational audience only and may establish routine low-stakes notices.
 The same person retains their own sent and received communication across rooms; changing rooms or leaving one does not erase it. This does not grant other participants access or automatically disclose private exchanges.

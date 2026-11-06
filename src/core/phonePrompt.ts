@@ -8,6 +8,7 @@ import {
   type PState, phoneTime, hiddenPause, cooldownReady, readHabits,
 } from './phone';
 import { applyAdvanced, genSettings, refToggles } from './advanced';
+import { previousView, viewSettings, type ViewRoom } from './phoneView';
 import { craftMessages, craftSettings, memoTexts, RETRY_ANALYZE, type CraftMessage } from './craft';
 import { trimRelated, trimSecondary, trimTurns } from './budget';
 import { playerAgent } from './player';
@@ -416,4 +417,32 @@ export function refreshRetry(prompt: PhonePrompt, reason: string): PhonePrompt['
     },
     ...rest,
   ];
+}
+
+// ── 보기 전용 방 (라이트보드 미니톡 사전설정, 2026-11-06) ──
+/** 보기 전용 방 한 개를 만드는 요청 */
+export function viewPrompt(src: RefSource, names: Record<string, string>, views: ViewRoom[]): PhonePrompt {
+  const set = viewSettings(src.chat.scriptstate);
+  const p = sections(src);
+  const opt = (k: string) => (p[k] === undefined ? '' : section(p, k));
+  const keys = ['VIEW.COMMON'];
+  if (set.preset === 'side') keys.push('VIEW.SIDE', `VIEW.SIDE.SPEAK.${set.speak ? 1 : 0}`, `VIEW.SCOPE.${set.scope}`, ...(set.size === '0' ? [] : [`VIEW.SIZE.${set.size}`]));
+  else keys.push('VIEW.MIND', set.preset === 'mono' ? 'VIEW.MONO' : 'VIEW.MULTI', ...(set.preset === 'multi' ? [`VIEW.MULTI.SPEAK.${set.speak ? 1 : 0}`] : []));
+  keys.push('VIEW.OUTPUT');
+  const system = [...keys.map(opt).filter(Boolean), genSettings(src.chat.scriptstate).language ?? LANGUAGE].join('\n\n');
+  if (!system.includes('OUTPUT CONTRACT')) throw new PhoneError('Phone 로어북에 보기 전용 방 항목이 없어요.');
+  const previousRoom = previousView(views, set.preset);
+  const owner = ownerCharacter(src).character;
+  const body = {
+    viewpoint: { name: set.pov || owner || '주인공', isPhoneOwner: !set.pov || set.pov === owner },
+    kind: set.preset,
+    ...(previousRoom ? { previousRoom } : {}),
+    narratorOnly: narrator(src, names, phoneSettings(src.chat.scriptstate).related, `${set.pov}\n${JSON.stringify(previousRoom ?? '')}`),
+  };
+  const read = (k: string) => opt(k);
+  const messages: CraftMessage[] = [
+    { role: 'system', content: factionCodesToNames(system, names) },
+    { role: 'user', content: factionCodesToNames(JSON.stringify(body), names) },
+  ];
+  return { messages: craftMessages(messages, craftSettings(src.chat.scriptstate, 'ph'), { thoughts: read('THOUGHTS'), memo: memoTexts(read) }), contactMode: false };
 }

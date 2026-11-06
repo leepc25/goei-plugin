@@ -34,6 +34,8 @@ export const PH_DEFAULTS: Record<string, string> = {
   habits: '1',
   /** 단톡 수다: 확인할 때 내 단톡방 하나에서 NPC끼리 대화 한 조각 (라이트보드 미니톡 기본 동작, 2026-11-06) */
   banter: '0', banter_chance: '30',
+  /** 보기 전용 방 (라이트보드 미니톡 사전설정, 2026-11-06). core/phoneView.ts */
+  view_preset: 'side', view_pov: '', view_speak: '0', view_scope: '0', view_size: '0', view_auto: 'manual',
 };
 
 /** 카드 Settings 로어북의 괴담톡 값과 같은 기본값 */

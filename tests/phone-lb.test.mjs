@@ -79,3 +79,29 @@ test('괴담톡: 단톡 수다를 켜면 단톡방 하나에 수다 표시가 �
   assert.equal(ob.textingHabits, undefined);
   assert.doesNotMatch(off.prompt.messages[0].content, /GROUP BANTER|TEXTING HABITS/);
 });
+
+test('괴담톡: 보기 전용 방 요청·응답 (사이드스토리·혼잣말·다중인격)', async () => {
+  const { phoneView: V } = await import('../dist-test/core.mjs');
+  const src = (v) => ({ char: { name: '괴이', desc: '', globalLore: [] }, chat: { message: [{ role: 'user', data: 'a' }, { role: 'char', data: 'b' }], scriptstate: v, localLore: [] } });
+  const side = PP.viewPrompt(src({ '$ph_view_pov': '에일린', '$ph_view_size': '1' }), {}, []);
+  assert.match(side.messages[0].content, /Side story/);
+  assert.match(side.messages[0].content, /exactly two participants/);
+  assert.match(side.messages[0].content, /Keep the viewpoint character silent/);
+  assert.equal(JSON.parse(side.messages[1].content).viewpoint.name, '에일린');
+  const multi = PP.viewPrompt(src({ '$ph_view_preset': 'multi', '$ph_view_speak': '1' }), {}, []);
+  assert.match(multi.messages[0].content, /Inner voices/);
+  assert.match(multi.messages[0].content, /speak as themself/);
+  assert.doesNotMatch(multi.messages[0].content, /Side story/);
+  const raw = JSON.stringify({ name: '퇴근길', pov: 'p1', participants: [{ id: 'p1', name: '에일린' }, { id: 'p2', name: '동료' }, { id: '-', name: 'x' }],
+    messages: [{ sender: 'p2', type: 'text', content: '오늘 뭐 먹어', reactions: '👍5' }, { sender: '-', type: 'skip', content: '-' }, { sender: 'p9', type: 'text', content: '없는 사람' }, { sender: '-', type: 'pause', content: '10분 후' }] });
+  const r = V.parseView(raw, 'side');
+  assert.equal(r.people.length, 2);
+  assert.equal(r.messages.length, 1, '끝의 생략·대기 줄은 떼고, 없는 사람 말은 뺀다');
+  assert.equal(r.messages[0].reactions, '👍1');
+  assert.throws(() => V.parseView(JSON.stringify({ name: 'x', pov: 'p1', participants: [{ id: 'p1', name: 'a' }], messages: [] }), 'mono'), /메시지가 하나도/);
+  const list = [{ ...r, id: 'v_1', time: 't', unread: true }];
+  assert.equal(V.viewUnread(list), 1);
+  const next = PP.viewPrompt(src({ '$ph_view_pov': '에일린' }), {}, list);
+  assert.equal(JSON.parse(next.messages[1].content).previousRoom.name, '퇴근길');
+  assert.equal(V.viewSettings({}).auto, 'manual');
+});
