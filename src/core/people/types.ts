@@ -188,6 +188,8 @@ export interface Person {
   patterns: string[];
   /** 성격 변화 후보: 관찰이 쌓여 검토 단계가 되면 사원증에 띄운다 */
   candidates: Record<string, Candidate>;
+  /** 관계 재검토(리수폿 G)를 마지막으로 요청한 턴. 20턴 무변화가 다시 쌓여야 또 요청 */
+  reviewTurn?: number;
 }
 
 // ── 성격 6축 (리수폿 People profile, 2026-11-06 사용자 결정 「F」) ──

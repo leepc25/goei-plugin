@@ -8,6 +8,7 @@ import { addressOf, affinityView } from './affinity';
 import { axesLinesEn } from './axes';
 import { unknownTo } from './inject';
 import { liveChanges, liveEntries, liveness, plain, hash } from './store';
+import { rhythmClock, rhythmClockLines } from './rhythm';
 import type { PeopleSettings } from './settings';
 import { SLOT_META, slotsFor, type PeopleStore, type SlotId } from './types';
 
@@ -70,7 +71,7 @@ export const FEATURE_GUIDE: Record<string, string[]> = {
   ],
   rhythm: [
     '## Narrative rhythm',
-    'Read the scene phase, tension, last advancement and active hooks from `rhythm`. Judge the natural response to the input first; when tension is moving, follow it; when the scene is genuine rest, let it stay quiet. Never add an event because the input is short. If a hook action is allowed, propose at most one, from existing evidence, saying what would enter the scene and which choices stay open to the user; a proposal is not an event. Never expose rhythm numbers in the note.',
+    'Read the scene phase, tension, last advancement and active hooks from `rhythm`, and the program-counted turn clock from `rhythm_clock` (which hooks are in their payoff window or overdue, whether a new plant is allowed). Judge the natural response to the input first; when tension is moving, follow it; when the scene is genuine rest, let it stay quiet. Never add an event because the input is short. If a hook action is allowed, propose at most one, from existing evidence, saying what would enter the scene and which choices stay open to the user; a proposal is not an event. Never expose rhythm numbers in the note.',
   ],
 };
 const GUIDE_ORDER = ['axes', 'affinity', 'register', 'perception', 'perception_ext', 'suspicion', 'openness', 'rhythm'];
@@ -117,7 +118,7 @@ export function buildDirector(chat: Chat, store: PeopleStore, people: string[], 
     .join('\n')
     .replace('{{LANG}}', s.directorLang === 'ko' ? 'Korean' : 'English')
     .replace('{{LINES}}', s.directorLen === 'normal' ? '3' : '1');
-  const data = { people: persons, ...(rhythm.length ? { rhythm } : {}), recent, input: input.slice(0, 4000) };
+  const data = { people: persons, ...(rhythm.length ? { rhythm, rhythm_clock: rhythmClockLines(rhythmClock(store, chat, live)) } : {}), recent, input: input.slice(0, 4000) };
   const key = hash(JSON.stringify({ people: persons.map((p) => [p.name, p.affinity, p.state, p.threads, p.unknown_to, p.slots]), input }));
   return { system, data, key, people, search: s.directorSearch };
 }

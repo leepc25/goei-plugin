@@ -169,9 +169,9 @@ export function peopleBlock(blocks: string[], maxChars = 16000): string {
 }
 
 /** 서사 리듬 블록 (문서 종류 rhythm + '@rhythm' 메모). 기록이 없으면 빈 문자열 */
-export function rhythmBlock(docs: { key: string; text: string }[], note: string | null | undefined): string {
+export function rhythmBlock(docs: { key: string; text: string }[], note: string | null | undefined, clock: string[] = []): string {
   if (!docs.length && !note) return '';
   const order = (k: string) => (k === 'scene' ? 0 : k === 'chapter' ? 1 : k === 'arc' ? 2 : k.startsWith('hook:') ? 3 : 4);
   const lines = [...docs].sort((a, b) => order(a.key) - order(b.key)).map((d) => `- ${d.key}: ${plain(d.text, 300)}`);
-  return ['## Scene rhythm (kept by the system; guidance, not content to narrate)', ...lines, ...(note ? [`- Direction for this reply: ${plain(note, 200)}`] : [])].join('\n');
+  return ['## Scene rhythm (kept by the system; guidance, not content to narrate)', ...lines, ...(clock.length && docs.some((d) => d.key.startsWith('hook:')) ? ['Hook clock (counted by the system; never say turn numbers in the story):', ...clock] : []), ...(note ? [`- Direction for this reply: ${plain(note, 200)}`] : [])].join('\n');
 }

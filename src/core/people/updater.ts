@@ -7,6 +7,7 @@ import { findStatusTags } from '../world/status';
 import { addressOf, affinityView, opennessOf, tasteOf } from './affinity';
 import { unknownTo } from './inject';
 import { seedPerson } from './seed';
+import { rhythmClock, rhythmClockLines, parseHookHead, turnAt, type RhythmClock } from './rhythm';
 import { axesView, ensureAxes, isAxis, isDirection, observe, readAxes, setAxes, pruneCandidates } from './axes';
 import { AXES } from './types';
 import { factionNow, knownFactionCodes, sceneFactionCodes, userFactionOf, factionName as factionNameOf } from './faction';
@@ -65,6 +66,11 @@ export interface UpdateInput {
   /** 장면 세력 코드 (세력 평판 켜짐) */
   factions: string[];
   factionNames: Record<string, string>;
+  /** 리듬 시계 (기능 rhythm). 훅 행동 상한·새 훅 허용 검사용 */
+  clock?: RhythmClock;
+  /** 관계 재검토를 요청한 인물 (리수폿 G). 반영 뒤 reviewTurn 을 적는다 */
+  review: string[];
+  turn: number;
   /** 가계부 켜짐 (상태창 잔고 칸 사용): 거래 절을 읽는다 */
   wallet: boolean;
   /** 이 묶음에서 종료된 사건 (소감 절 켜짐이면 ≥1건, 아니면 빈 목록) */
@@ -138,6 +144,8 @@ export interface BuildOpts {
   hints?: { name: string; aliases: string[]; quote: string }[];
 }
 
+/** 관계 재검토 간격 (턴). 리수폿 원문 20 */
+export const REVIEW_TURNS = 20;
 const SUSP_WEIGHT: Record<string, number> = { 약: 10, 중: 25, 강: 40, '-약': -10, '-중': -25, '-강': -40 };
 /** 의심 사례 요약: 같은 대상·종류의 살아 있는 항목을 한 사례로. score 는 코드가 단서 무게로 계산 */
 export function suspicionCases(p: Person, live: Liveness) {
@@ -227,6 +235,19 @@ export function buildUpdate(chat: Chat, store: PeopleStore, batch: number[], o: 
   // 세력 평판: 장면 세력(인물 소속 ∪ 글에 나온 세력)의 현재값
   const factionCodes = o.settings.features.has('faction_rep') ? sceneFactionCodes(store, chosen, texts, o.factionNames) : [];
   const userFaction = userFactionOf(store, chat);
+  const last = Math.max(...batch);
+  const turn = turnAt(chat, last);
+  // 리듬 시계 (리수폿 H): 코드가 턴을 세서 훅 회수 범위·새 훅 허용을 알려 준다
+  const clock = o.settings.features.has('rhythm') ? rhythmClock(store, chat, live, last) : undefined;
+  // 관계 재검토 (리수폿 G): 관계 기록이 20턴 이상 그대로인데 그 사이 겪은 일(행적·사건)이 있으면 한 번 되짚게 한다
+  const review = o.only?.length ? [] : chosen.filter((n) => {
+    const p = store.people[n];
+    const relTurn = Math.max(-1, ...['relationship', 'register.stage_assessment'].flatMap((k) => liveEntries(p.slots[k as SlotId], live).filter((e) => !e.target || e.target === '@user').map((e) => turnAt(chat, live.at.get(e.anchor) ?? 0))));
+    const since = Math.max(relTurn, p.reviewTurn ?? -1);
+    if (since < 0 || turn - since < REVIEW_TURNS) return false;
+    const after = (e: { anchor: string }) => turnAt(chat, live.at.get(e.anchor) ?? 0) > since;
+    return liveEntries(p.slots.history, live).some(after) || Object.values(store.docs).some((d) => d.type === 'event' && liveEntries(d.entries, live).some(after));
+  });
   const data = {
     request_ref: `pp_${Date.now().toString(36)}`,
     cues: o.settings.features.has('affinity') && !o.settings.qualitative.has('affinity') ? CUES.map((c) => ({ name: c, meaning: CUE_MEANING[c] })) : [],
@@ -243,6 +264,8 @@ export function buildUpdate(chat: Chat, store: PeopleStore, batch: number[], o: 
       : undefined,
     suspicion_now: o.settings.features.has('suspicion') && !o.settings.qualitative.has('suspicion') ? chosen.flatMap((n) => suspicionCases(store.people[n], live)) : undefined,
     npc_relations: o.settings.features.has('npc_emotion') ? true : undefined,
+    ...(clock ? { rhythm_clock: rhythmClockLines(clock) } : {}),
+    ...(review.length ? { relationship_review: review } : {}),
     factions_now: o.settings.features.has('faction_rep')
       ? factionCodes.map((c) => { const f = factionNow(store, c, changes, userFaction, o.settings, o.factionNames); return { code: f.code, name: f.name, value: f.value, stage: f.stage.label, stage_en: f.stage.id }; })
       : undefined,
@@ -259,7 +282,7 @@ export function buildUpdate(chat: Chat, store: PeopleStore, batch: number[], o: 
     ended_now: o.ended?.length ? o.ended : undefined,
     want: { new_people: true, next_note: wantNote, address: o.settings.features.has('register'), identity: true, transactions: typeof o.wallet === 'number', debriefs: !!o.ended?.length },
   };
-  return { system: o.system, data, indexes: batch, tags, people: chosen, confirmed: confirmedIdx, names: o.names, tidy: o.settings.tidy === 'same' ? over : [], factions: factionCodes, factionNames: o.factionNames ?? {}, wallet: typeof o.wallet === 'number', ended: o.ended ?? [] };
+  return { system: o.system, data, indexes: batch, tags, people: chosen, confirmed: confirmedIdx, names: o.names, tidy: o.settings.tidy === 'same' ? over : [], factions: factionCodes, factionNames: o.factionNames ?? {}, clock, review, turn, wallet: typeof o.wallet === 'number', ended: o.ended ?? [] };
 }
 
 // ── 지침 조립 ──
@@ -629,6 +652,9 @@ export function applyUpdate(store: PeopleStore, chat: Chat, input: UpdateInput, 
     if (putEntry(store, who, slot, { id: entryId(who, slot, ev.anchor, seq, text), text, src: 'story', anchor: ev.anchor, seq, quote: e.quote, ...(target ? { target } : {}), ...(replaces ? { replaces } : {}) })) report.applied.entries++;
   }
 
+  // 관계 재검토를 요청했으면 그 턴을 적는다 (20턴이 다시 쌓여야 또 요청)
+  for (const n of input.review ?? []) if (store.people[n]) store.people[n].reviewTurn = input.turn;
+
   // 2b. 성격 6축 (기능 axes): 시작값은 axes_init_needed 인 인물만 한 번, 관찰은 후보에 모은다 (코드가 검토로 띄움, 축은 사용자 승인 뒤에만)
   if (ctx.settings.features.has('axes')) {
     const now = ctx.now ?? new Date().toISOString();
@@ -853,11 +879,31 @@ export function applyUpdate(store: PeopleStore, chat: Chat, input: UpdateInput, 
   }
 
   // 5. 문서 (다시 읽기에서는 건너뜀)
+  let hookActions = 0;
   for (const d of ctx.only?.length ? [] : r.docs ?? []) {
     const type = d?.type as DocType;
     if (!DOC_TYPES.includes(type) || !ctx.settings.features.has(docFeature(type) as Feature)) {
       drop('doc', d, '없는 문서 종류 또는 꺼진 기능');
       continue;
+    }
+    // 리듬 시계 (리수폿 H): 훅 행동은 응답당 1개, 새 훅은 간격·동시 상한을 채울 때만
+    if (type === 'rhythm' && typeof d.key === 'string' && d.key.startsWith('hook:') && d.op !== 'remove' && input.clock) {
+      const isNew = !store.docs[`rhythm:${plain(d.key, 40)}`];
+      if (isNew && !input.clock.plantAllowed) {
+        drop('doc', d, `새 훅을 심을 수 없음 (${input.clock.plantBlocked})`, d.key);
+        continue;
+      }
+      const head = typeof d.text === 'string' ? parseHookHead(d.text) : null;
+      const prev = input.clock.hooks.find((h) => h.key === d.key);
+      const extendsNow = !!head?.ext && !prev?.extended;
+      if (extendsNow && prev?.extended) {
+        drop('doc', d, '연장은 한 번만', d.key);
+        continue;
+      }
+      if (++hookActions > 1) {
+        drop('doc', d, '응답당 훅 행동 1개', d.key);
+        continue;
+      }
     }
     const key = plain(d.key, 40);
     // 문서는 구간 전체를 요약한 것이라 인용이 없어도 받는다 (기준 메시지만 확정 구간이면). 인용이 있으면 원문에 있어야
@@ -1101,7 +1147,7 @@ export function rhythmTextOk(key: string, text: string): boolean {
     return !!m && (RHYTHM_PHASES as readonly string[]).includes(m[1]) && (RHYTHM_ENGAGEMENT as readonly string[]).includes(m[2]);
   }
   if (key.startsWith('hook:')) {
-    const m = /^\[stage:([a-z_]+)\]\s*\[tier:([a-z]+)\]/.exec(text);
+    const m = /^\[stage:([a-z_]+)\]\s*\[tier:([a-z]+)\](?:\s*\[ext\])?/.exec(text);
     return !!m && (RHYTHM_HOOK_STAGES as readonly string[]).includes(m[1]) && (RHYTHM_HOOK_TIERS as readonly string[]).includes(m[2]);
   }
   return key === 'chapter' || key === 'arc' || key === 'pending';
