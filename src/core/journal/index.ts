@@ -8,3 +8,4 @@ export * from './line';
 export * from './debrief';
 export * from './png';
 export * from './notify';
+export * from './chronicle';

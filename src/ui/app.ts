@@ -56,6 +56,7 @@ import { handleImgPrompt, imgInput } from './imgprompt';
 import { bindCropDrag, cropValue, setCrop, directoryExtList, directoryInput, directoryPhotoList, directoryList, dirUi, handleDirectory, resetDirectory } from './directory';
 import { basicDefaults, basicVars, DIM_DEFAULT, getPrefs, worldDefaults, worldSettings, worldVarsOf, type Mark } from '../core/settings';
 import { colConfig } from '../core/world/statuscols';
+import { buildPersonnel } from '../core/journal';
 import { adjustWallet, walletEditable, aliveAnchors, formatWon, parseWon, readWallet, removeWalletEntry, walletBalance, walletVars, WALLET_START_DEFAULT } from '../core/wallet';
 import { walletHeadButton, walletList, walletUi as walletTabUi } from './wallet';
 import { applyRecordsNav, closeToastHtml, endedReport, holdToast, releaseToast, syncCloseToast, handleRecords, journalList, rec, recordsInput, recordsMarkName, recordsNav, recordsTab, resetRecords, type RecordsEnv } from './records';
@@ -102,6 +103,8 @@ const TABS: Tab[] = ['board', 'map', 'mission', ...(GNET_ON ? (['gnet'] as Tab[]
 let tab: Tab = 'board';
 /** 커스텀 임무 시작 화면에서 "다시 고르기"를 눌렀을 때 */
 let repick = false;
+/** 사원증 뒷면(인사 기록부)을 보고 있나 (2026-11-06) */
+let idBack = false;
 /** 시작 화면에서 연 새 채팅 기본 설정 */
 let pickerPrefs = false;
 let lastChat = '';
@@ -881,6 +884,12 @@ async function handle(action: string, value?: string): Promise<void> {
       showIdCard(idCard(view.ctx), (a, v) => void run(a, v));
       return;
     }
+    case 'id-flip':
+      // 사원증 앞·뒷면 (뒷면 = 인사 기록부). 폰 작은 창에서 누르면 창을 다시 띄운다
+      if (view.kind !== 'started') return;
+      idBack = !idBack;
+      if (value === 'pop') showIdCard(idCard(view.ctx), (a, v) => void run(a, v));
+      return render();
     case 'wallet-pop':
       // 옛 잔고 칩 → 가계부 탭
       return handle('tab', 'wallet');
@@ -1555,11 +1564,28 @@ function idCard(ctx: ChatContext): string {
   const photo = photoUrl
     ? `<span class="gx-id-photo"><img src="${esc(photoUrl)}" alt=""></span>`
     : `<span class="gx-id-photo none">${ICONS.idcard}</span>`;
-  return `<div class="gx-id">${img ? `<span class="gx-id-bg" style="background-image:url('${esc(img)}')"></span>` : ''}
+  const who = `<span class="gx-id-who"><b>${esc(name)}</b><small>${esc([f ? selfName(ctx, f.code, f.name) : '소속 없음', pa?.rank ?? ''].filter(Boolean).join(' · '))}</small></span>`;
+  const bg = img ? `<span class="gx-id-bg" style="background-image:url('${esc(img)}')"></span>` : '';
+  const flip = `<button class="gx-id-flip" data-action="id-flip" aria-pressed="${idBack}">${idBack ? '앞면' : '인사 기록'}</button>`;
+  if (idBack) return `<div class="gx-id back">${bg}${who}${personnelRows(ctx)}${flip}</div>`;
+  return `<div class="gx-id">${bg}
       ${photo}
-      <span class="gx-id-who"><b>${esc(name)}</b><small>${esc([f ? selfName(ctx, f.code, f.name) : '소속 없음', pa?.rank ?? ''].filter(Boolean).join(' · '))}</small></span>
+      ${who}
       ${status || walletChip(ctx) ? `<span class="gx-op-st">${walletChip(ctx)}${status}</span>` : ''}
+      ${flip}
     </div>`;
+}
+
+/** 사원증 뒷면 = 인사 기록부 (2026-11-06 사용자 「진행시켜」): 이 채팅에서 내가 나간 사건 수·같이 간 요원 Top3·총 지출. 모델 호출 없음 */
+function personnelRows(ctx: ChatContext): string {
+  const p = buildPersonnel(ctx.chat, ctx.char.globalLore, getPrefs().walletStart ?? WALLET_START_DEFAULT);
+  const line = (label: string, value: string) => `<span class="gx-op-ln"><i>${label}</i><em>${esc(value)}</em></span>`;
+  const comp = p.companions.length ? p.companions.map(([n, c]) => `${n} ${c}회`).join(' · ') : '없음';
+  return `<span class="gx-op-st gx-id-rec">
+      ${line('출동·종료', `${p.closed}건${p.cleared ? ` (클리어 ${p.cleared})` : ''}`)}
+      ${line('같이 간 요원', comp)}
+      ${colConfig(ctx.chat.scriptstate).wallet === 'off' ? '' : line('총 지출', formatWon(p.spent))}
+    </span>`;
 }
 
 /** 사원증 잔고 줄 (상태창 잔고 칸을 쓸 때): 장부 잔고. 누르면 가계부 화면 (2026-10-29: 가계부가 왼쪽 메뉴에서 빠져 이 줄이 PC 의 입구) */

@@ -145,7 +145,8 @@ export function showIdCard(html: string, act?: (action: string, value?: string) 
     const btn = (e.target as HTMLElement).closest<HTMLElement>('[data-action]');
     if (btn && act && box.contains(btn)) {
       box.remove();
-      act(btn.dataset.action!, btn.dataset.value);
+      // 앞·뒷면 뒤집기는 창을 다시 띄우라는 표시(pop)를 붙인다
+      act(btn.dataset.action!, btn.dataset.action === 'id-flip' ? 'pop' : btn.dataset.value);
       return;
     }
     if ((e.target as HTMLElement).closest('.gx-idpop-card') && !(e.target as HTMLElement).closest('.gx-agpop-x')) return;

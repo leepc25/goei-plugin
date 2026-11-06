@@ -42,7 +42,7 @@ export class NavHistory<T> {
 /** 「기록」 메뉴 안 위치 (ui/records.ts 의 하위 탭·화면·대상) */
 export interface RecordsNav {
   /** 2026-11-05 사용자: 보고서 하위 탭은 뺐고(일지 줄에서 보고서 페이지로), 가계부가 하위 탭으로 들어왔다 */
-  sub: 'journal' | 'wallet' | 'people' | 'factions';
+  sub: 'journal' | 'chronicle' | 'wallet' | 'people' | 'factions';
   view: 'list' | 'report' | 'person' | 'docs' | 'faction';
   id: string;
 }

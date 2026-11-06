@@ -1238,6 +1238,10 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
 .gx-id-who b { font-size: 17px; font-weight: 800; line-height: 1.25; color: var(--text); overflow-wrap: anywhere; }
 .gx-id-who small { font-size: 12.5px; font-weight: 600; color: var(--signal); overflow-wrap: anywhere; }
 .gx-id .gx-op-st { align-self: stretch; text-align: left; margin-top: 0; }
+/* 사원증 앞·뒷면 단추와 뒷면(인사 기록부) (2026-11-06) */
+.gx-id-flip { align-self: center; min-height: var(--ctl-sm, 30px); padding: 0 12px; border: 1px solid var(--line); border-radius: 999px; background: var(--panel2); color: var(--dim); font: inherit; font-size: 12px; font-weight: 700; cursor: pointer; }
+.gx-id-flip:hover { border-color: var(--signal); color: var(--signal); }
+.gx-id.back .gx-id-rec { gap: 6px; }
 .gx-idbtn { display: none; overflow: hidden; padding: 0; }
 .gx-idbtn img { width: 100%; height: 100%; object-fit: cover; }
 .gx-idpop-card { position: relative; width: 300px; max-width: 100%; max-height: calc(100% - 8px); overflow-y: auto; }
@@ -3028,6 +3032,17 @@ button.gx-jr-row { cursor: pointer; } button.gx-jr-row:hover { border-color: var
 .gx-jr-main > small { font-size: 12.5px; color: var(--dim); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .gx-jr-who { display: flex; align-items: center; gap: 5px; min-width: 0; font-size: 12.5px; color: var(--sub); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .gx-jr-who em { font-style: normal; color: var(--dim); overflow: hidden; text-overflow: ellipsis; }
+/* 연대기 줄 (2026-11-06): 표식 · 머리/설명 · 종류. 일지 줄과 같은 카드 톤 */
+.gx-cr-row { display: grid; grid-template-columns: 34px minmax(0, 1fr) auto; gap: 12px; align-items: center; width: 100%; padding: 9px 14px 9px 10px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); color: var(--text); font: inherit; text-align: left; }
+button.gx-cr-row { cursor: pointer; } button.gx-cr-row:hover { border-color: var(--signal); }
+.gx-cr-row .gx-gmark { grid-row: auto; align-self: center; }
+.gx-cr-dot { width: 34px; height: 34px; border-radius: 10px; display: grid; place-items: center; background: var(--panel2); }
+.gx-cr-dot::after { content: ''; width: 10px; height: 10px; border-radius: 50%; background: var(--dim); }
+.gx-cr-dot.person::after { background: #F5B544; } .gx-cr-dot.faction::after { background: var(--signal); } .gx-cr-dot.rank::after { background: #5EEAD4; }
+.gx-cr-main { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.gx-cr-main b { font-size: 15px; font-weight: 800; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.gx-cr-main small { font-size: 12.5px; color: var(--dim); overflow-wrap: anywhere; }
+.gx-cr-kind { font-style: normal; font-size: 12px; color: var(--dim); white-space: nowrap; }
 .gx-face { width: 22px; height: 22px; flex: none; border: 1px solid var(--line); }
 
 /* 보고서 카드: 위에 CCTV 화면, 보고서 번호·CLOSED 도장 */
