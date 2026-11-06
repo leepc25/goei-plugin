@@ -20,10 +20,21 @@ export interface WikiSettings {
   refreshPrevious: boolean;
   chatTurns: number;
   referenceCount: number;
+  /** 주석: 번호에 올리면 뜨는 창 / 본문 안에 펼치기 (라이트보드 나무위키, 2026-11-06) */
+  footnotes: 'pop' | 'inline';
+  /** 그림: 끔 / 정보칸만 / 본문까지 (라이트보드 나무위키, 2026-11-06) */
+  images: 'off' | 'infobox' | 'body';
+  /** 자동 작성: 끔 / 창을 열 때 / 매 턴 (라이트보드 나무위키, 2026-11-06) */
+  auto: '0' | 'open' | 'turn';
+  autoTitle: 'model' | 'input';
+  autoQuery: string;
 }
 
 /** 원본 Settings 로어북 기본값 */
-export const WIKI_DEFAULTS: WikiSettings = { mode: 'expand', model: 'main', length: 'detailed', refreshPrevious: true, chatTurns: 8, referenceCount: 20 };
+export const WIKI_DEFAULTS: WikiSettings = {
+  mode: 'expand', model: 'main', length: 'detailed', refreshPrevious: true, chatTurns: 8, referenceCount: 20,
+  footnotes: 'pop', images: 'infobox', auto: '0', autoTitle: 'model', autoQuery: '',
+};
 
 export function wikiSettings(state: Record<string, unknown> | undefined): WikiSettings {
   const s = state ?? {};
@@ -36,6 +47,11 @@ export function wikiSettings(state: Record<string, unknown> | undefined): WikiSe
     refreshPrevious: s['$nw_refresh_previous'] !== '0',
     chatTurns: advNum(s, 'nw', 'turns'),
     referenceCount: advNum(s, 'nw', 'ref_count'),
+    footnotes: pick('$nw_footnotes', ['pop', 'inline'] as const, WIKI_DEFAULTS.footnotes),
+    images: pick('$nw_images', ['off', 'infobox', 'body'] as const, WIKI_DEFAULTS.images),
+    auto: pick('$nw_auto', ['0', 'open', 'turn'] as const, WIKI_DEFAULTS.auto),
+    autoTitle: pick('$nw_auto_title', ['model', 'input'] as const, WIKI_DEFAULTS.autoTitle),
+    autoQuery: String(s['$nw_auto_query'] ?? '').trim().slice(0, 80),
   };
 }
 
@@ -231,6 +247,10 @@ export interface WikiRequest {
   /** 이 문서에만 덧붙이는 지침 (작성·다시 쓰기 화면에서 적음) */
   docRequest?: string;
   direct: boolean;
+  /** 본문에 넣을 수 있는 그림 (에셋 이름·한글 이름). 참고 자료에 나온 것만 골라 보낸다 */
+  images?: { name: string; label: string }[];
+  /** 정보칸 인물 그림으로 고를 수 있는 표정 (그 인물의 그림이 있는 것만) */
+  moods?: string[];
 }
 
 export interface WikiPrompt {
@@ -259,6 +279,11 @@ export function wikiPrompt(src: RefSource, req: WikiRequest, s: WikiSettings, fa
   const system = [sec['NW.GUIDE'], sec[s.mode === 'faithful' ? 'NW.FAITHFUL' : 'NW.EXPAND'], sec[lengthKey], sec['NW.LINKS_OPEN'], sec['NW.FORMAT']];
   if (story && sec['NW.HISTORY']) system.push(sec['NW.HISTORY']);
   if (previous && sec['NW.PREVIOUS']) system.push(sec['NW.PREVIOUS']);
+  // 본문 그림·정보칸 표정 (라이트보드 나무위키 W3, 2026-11-06). 참고 자료나 제목에 나온 그림만, 30장까지
+  const pool = `${req.title}\n${refText(rows)}\n${story}`;
+  const images = (req.images ?? []).filter((x, i) => i === 0 || (x.label && pool.includes(x.label))).slice(0, 30);
+  if (images.length && sec['NW.IMAGES']) system.push(sec['NW.IMAGES'].replace('__NW_IMAGES__', images.map((x) => `- ${x.name} = ${x.label}`).join('\n')));
+  if (req.moods?.length && sec['NW.PORTRAIT']) system.push(sec['NW.PORTRAIT'].replace('__NW_MOODS__', req.moods.join(', ')));
   const language = genSettings(src.chat.scriptstate).language;
   if (language) system.push(language);
   let user = `문서 제목: ${req.title}\n\n[참고 자료]\n${refText(rows)}`;
@@ -332,6 +357,17 @@ export interface RenderOptions {
   photo?: string | null;
   /** 탈출법·금기 같은 정답 문단을 접어 둔다 (클리어 전 괴이 문서) */
   fold?: boolean;
+  /** 본문 [Image] 블록의 에셋 이름 → 주소. 없거나 아직 읽는 중이면 null (그 그림은 건너뛴다) */
+  image?: (name: string) => string | null;
+  /** 주석을 본문 안에 펼친다 */
+  inlineNotes?: boolean;
+}
+
+/** 여는 태그의 portrait_mood (정보칸 인물 그림 표정). 없으면 '' */
+export function portraitMood(body: string): string {
+  const open = /^<lightboard-namuwiki[^>]*>/.exec(body)?.[0] ?? '';
+  const m = attrs(open).portrait_mood ?? '';
+  return /^[a-z][a-z ]{0,20}$/i.test(m) ? m.trim().toLowerCase() : '';
 }
 
 /** 접어 둘 정답 문단 제목 (나무위키 스포일러 접기처럼 누르면 펼친다) */
@@ -385,6 +421,7 @@ export function renderArticle(body: string, o: RenderOptions): { html: string; t
       .replace(/\*\*([^*]+?)\*\*/g, '<b>$1</b>')
       .replace(/✂️([^✂]+?)✂️/g, '<s>$1</s>')
       .replace(/📌([^📌]+?)📌/gu, (_all, t: string) => {
+        if (o.inlineNotes) return `<span class="nw-fn-in">(${t})</span>`;
         notes.push(t);
         return `<sup class="nw-fn" data-fn="${notes.length}" role="button" tabindex="0">[${notes.length}]</sup>`;
       });
@@ -450,6 +487,12 @@ export function renderArticle(body: string, o: RenderOptions): { html: string; t
       case 'List':
         list.push(inline(b.text.trim()));
         break;
+      case 'Image': {
+        const f = Object.fromEntries(splitFields(b.text).map(field));
+        const url = f.Name && o.image ? o.image(f.Name.trim()) : null;
+        if (url) out.push(`<figure class="nw-fig"><img src="${esc(url)}" alt="${esc(f.Caption ?? '')}" loading="lazy">${f.Caption ? `<figcaption>${inline(f.Caption)}</figcaption>` : ''}</figure>`);
+        break;
+      }
       case 'Quote': {
         const parts = splitFields(b.text);
         const src = parts.slice(1).map(field).find(([k]) => k === 'Source')?.[1];
@@ -532,4 +575,37 @@ export function docSummary(body: string, max = 150): string {
   const cut = [...text].slice(0, max).join('');
   const end = Math.max(cut.lastIndexOf('. '), cut.lastIndexOf('다. '), cut.lastIndexOf('.'));
   return end > max * 0.5 ? cut.slice(0, end + 1) : `${cut}…`;
+}
+
+// ── 자동 작성 제목 고르기 (라이트보드 나무위키 W2, 2026-11-06) ──
+/** 후보 중 이번 이야기에 맞는 문서 제목 하나를 고르는 요청. 응답은 {"title":"…"} */
+export function wikiTitlePrompt(src: RefSource, candidates: string[], written: string[], names: Record<string, string>): CraftMessage[] {
+  const sec = policySections(src.char.globalLore, 'Wiki');
+  const rule = sec['NW.AUTO_TITLE'];
+  if (!rule) throw new WikiError('Wiki 로어북의 NW.AUTO_TITLE 섹션이 없어요.');
+  const n = trimTurns(wikiSettings(src.chat.scriptstate).chatTurns);
+  const story = n ? storyText(recentTurns(src.chat, n, genSettings(src.chat.scriptstate).userMessages)) : '';
+  let user = `[후보 제목]\n${candidates.map((t) => `- ${t}`).join('\n')}`;
+  if (written.length) user += `\n\n[이미 쓴 문서 — 되도록 피하고, 최근 이야기로 내용이 크게 달라졌을 때만]\n${written.map((t) => `- ${t}`).join('\n')}`;
+  if (story) user += `\n\n[최근 챗로그]\n${story}`;
+  return [
+    { role: 'system', content: factionCodesToNames(rule, names) },
+    { role: 'user', content: factionCodesToNames(user, names) },
+  ];
+}
+
+/** 제목 응답 읽기. 후보에 있는 제목만 받는다 */
+export function acceptTitle(raw: string, candidates: string[]): string {
+  const text = raw.replace(/<(think|thoughts|lb-process)\b[^>]*>[\s\S]*?<\/\1>/gi, '').trim();
+  const m = /\{[\s\S]*\}/.exec(text);
+  let title = '';
+  try {
+    title = String((JSON.parse(m?.[0] ?? '{}') as { title?: unknown }).title ?? '').trim();
+  } catch {
+    title = '';
+  }
+  if (!title) title = text.replace(/^["'\s]+|["'\s]+$/g, '').split('\n')[0].trim();
+  const hit = candidates.find((c) => c === title) ?? candidates.find((c) => c.includes(title) || title.includes(c));
+  if (!hit) throw new WikiError(`후보에 없는 제목이에요: ${title.slice(0, 40)}`);
+  return hit;
 }

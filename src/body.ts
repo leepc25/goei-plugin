@@ -23,6 +23,8 @@ import { buildRegistry } from './core/world/registry';
 import { wikiContextOn, wikiContextRules, wikiMainContext } from './core/wiki';
 import { chatPhase } from './core/start';
 import { autoRefresh, autoView } from './ui/phone';
+import { autoWriteWiki } from './ui/wiki';
+import { wikiSettings } from './core/wiki';
 import { autoRefreshGnet } from './ui/gnet';
 import { Joint } from './host/joint';
 import { prefetchFactions } from './ui/images';
@@ -478,7 +480,8 @@ async function onOutput(arg: { char: unknown; chat: unknown; characterIndex: num
     const phoneAuto = phoneSettings(now.scriptstate).auto;
     const gnetAuto = gnetSettings(now.scriptstate).auto;
     const viewAuto = viewSettings(now.scriptstate).auto === 'turn';
-    if (phoneAuto || gnetAuto || viewAuto) {
+    const wikiAuto = wikiSettings(now.scriptstate).auto === 'turn';
+    if (phoneAuto || gnetAuto || viewAuto || wikiAuto) {
       const fresh = async () => {
         const c = ((await risuai.getChatFromIndex(arg.characterIndex, arg.chatIndex)) as Chat | null) ?? now!;
         c.message ??= [];
@@ -488,6 +491,7 @@ async function onOutput(arg: { char: unknown; chat: unknown; characterIndex: num
         applyAdvanced(now!.scriptstate);
         await readPersona();
         const phoneFail = (error: unknown) => console.log(`[goei] 괴담톡 자동 확인 실패: ${error instanceof Error ? error.message : String(error)}`);
+        const wikiFail = (error: unknown) => console.log(`[goei] 위키 자동 작성 실패: ${error instanceof Error ? error.message : String(error)}`);
         const gnetFail = (error: unknown) => console.log(`[goei] 괴담넷 자동 새로고침 실패: ${error instanceof Error ? error.message : String(error)}`);
         // 둘 다 매 턴이고 같은 모델이면 모델 한 번으로 (원본 통합 자동 확인, 2026-10-21 사용자 요청으로 복원)
         const model = phoneSettings(now!.scriptstate).model;
@@ -498,11 +502,13 @@ async function onOutput(arg: { char: unknown; chat: unknown; characterIndex: num
             autoRefreshGnet(await fresh(), arg.messageIndex, false, joint).catch(gnetFail).finally(() => joint.done('gnet')),
           ]);
           if (viewAuto) await autoView(await fresh(), arg.messageIndex).catch(phoneFail);
+          if (wikiAuto) await autoWriteWiki(await fresh(), arg.messageIndex).catch(wikiFail);
           return;
         }
         if (phoneAuto) await autoRefresh(await fresh(), arg.messageIndex).catch(phoneFail);
         if (gnetAuto) await autoRefreshGnet(await fresh(), arg.messageIndex).catch(gnetFail);
         if (viewAuto) await autoView(await fresh(), arg.messageIndex).catch(phoneFail);
+        if (wikiAuto) await autoWriteWiki(await fresh(), arg.messageIndex).catch(wikiFail);
       })();
     }
   } catch (error) {

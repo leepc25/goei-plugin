@@ -6,8 +6,10 @@ import { buildRegistry, type Registry } from '../core/world/registry';
 import { hasBook, type RefSource } from '../core/refs';
 import {
   type WikiDoc, acceptArticle, baseDocs, canonicalTitle, deleteDoc, findDoc, listDocs, renderArticle, saveDoc, validTitle, wikiPrompt, wikiSettings, WikiError,
-  type WikiMeta, type WikiSettings, wikiContextOn,
+  type WikiMeta, type WikiSettings, wikiContextOn, portraitMood, wikiTitlePrompt, acceptTitle,
 } from '../core/wiki';
+import { lastReply } from '../core/phone';
+import { playerAgent } from '../core/player';
 import { generate as askModel } from '../host/llm';
 import { craftSettings } from '../core/craft';
 import { budgetFor, genSettings } from '../core/advanced';
@@ -22,7 +24,7 @@ import { drawerHtml } from './drawer';
 import { imageUrl } from './images';
 import { baseLink, basePic as baseArt } from './evpic';
 import { orgLoreName, orgLores, readDirectory } from '../core/world/directory';
-import { facePic, mainPic, moduleAssetStamp } from '../host/assets';
+import { assetNames, facePic, hasAsset, mainPic, moduleAssetStamp } from '../host/assets';
 import { readWorld, worldOn } from '../core/world/output';
 import { activeEvents } from '../core/world/engine';
 import { lastStatusFields } from '../core/world/tags';
@@ -187,7 +189,15 @@ async function generate(ctx: ChatContext, env: WikiEnv, title: string, regenerat
         return {};
       }
     })();
-    const prompt = fitPrompt(budgetFor(ctx.chat.scriptstate, 'nw'), () => wikiPrompt(source(ctx), { title, inherited, previous: previousDoc?.body ?? null, writingRequest, docRequest: docRequest.trim(), direct }, s, catalogNames, registry(ctx)));
+    // 그림 (라이트보드 나무위키 W3): 본문까지면 괴이·특수·거점·조직 그림 후보, 인물 문서면 정보칸 표정 후보
+    const subject = entryFor(ctx, title);
+    const images = s.images === 'body'
+      ? [...(subject && subject.cat !== 'ag' && subject.photo ? [subject] : []), ...entries(ctx).filter((e) => e.cat !== 'ag' && e.photo && e !== subject)]
+          .filter((e, i, arr) => arr.findIndex((x) => x.photo === e.photo) === i)
+          .map((e) => ({ name: e.photo.replace(/#.*$/, ''), label: e.name }))
+      : [];
+    const moods = s.images !== 'off' && subject?.cat === 'ag' ? portraitMoods(ctx, subject.photo) : [];
+    const prompt = fitPrompt(budgetFor(ctx.chat.scriptstate, 'nw'), () => wikiPrompt(source(ctx), { title, inherited, previous: previousDoc?.body ?? null, writingRequest, docRequest: docRequest.trim(), direct, images, moods }, s, catalogNames, registry(ctx)));
     let body: string;
     try {
       body = (await askModel(prompt.messages, s.model, (raw) => acceptArticle(raw, title, canon(ctx)), { ...genSettings(ctx.chat.scriptstate), reiterate: craftSettings(ctx.chat.scriptstate, 'nw').reiterate, state: ctx.chat.scriptstate })).value;
@@ -213,6 +223,73 @@ async function generate(ctx: ChatContext, env: WikiEnv, title: string, regenerat
     jobs.delete(key);
     await env.refresh();
   }
+}
+
+/** 그 인물의 표정 그림 이름들 (「영문명_default」 → 「영문명_표정」이 있는 것) */
+function portraitMoods(ctx: ChatContext, photo: string): string[] {
+  const base = photo.replace(/#.*$/, '').replace(/_default$/, '');
+  if (!base || base === photo) return [];
+  return assetNames(ctx.char).filter((n) => n.startsWith(`${base}_`)).map((n) => n.slice(base.length + 1)).filter((m) => m && m !== 'default' && /^[a-z ]+$/i.test(m)).sort();
+}
+
+// ── 자동 작성 (라이트보드 나무위키 W2, 2026-11-06) ──
+const quietEnv: WikiEnv = { render: () => {}, refresh: async () => {}, current: () => null };
+let liveEnv: WikiEnv | null = null;
+const NW_AUTO_LAST = '$nw_auto_last';
+
+/** 채팅 응답마다(「매 턴」) 또는 위키를 열 때(「창을 열 때」) 문서 하나를 저절로 쓴다. 같은 응답에는 한 번 */
+export async function autoWriteWiki(ctx: ChatContext, messageIndex: number, open = false): Promise<void> {
+  const s = wikiSettings(ctx.chat.scriptstate);
+  if (!(open ? s.auto === 'open' : s.auto === 'turn') || jobs.has(chatKey(ctx))) return;
+  const data = String(ctx.chat.message?.[messageIndex]?.data ?? '');
+  if (!data.trim()) return;
+  const stamp = `${messageIndex}:${data.length}`;
+  if (String(ctx.chat.scriptstate?.[NW_AUTO_LAST] ?? '') === stamp) return;
+  const saved = await updateChat(ctx.charIndex, ctx.chatIndex, (chat) => ({ ...chat, scriptstate: { ...(chat.scriptstate ?? {}), [NW_AUTO_LAST]: stamp } }));
+  if (!saved) return;
+  const cur = { ...ctx, chat: saved };
+  const env = liveEnv ?? quietEnv;
+  const showing = env.current();
+  const target = showing && chatKey(showing) === chatKey(cur) ? env : quietEnv;
+  const notice = wiki.notice;
+  try {
+    const title = s.autoTitle === 'input' ? (s.autoQuery ? canon(cur)(s.autoQuery) : '') : await pickTitle(cur);
+    if (!title) {
+      if (target !== quietEnv) wiki.notice = '자동 작성 제목이 비어 있어요. 위키 설정에서 적어 주세요.';
+      return;
+    }
+    const old = findDoc(cur.chat, title, cur.char.globalLore);
+    await generate(cur, target, title, !!old && !old.base);
+  } finally {
+    if (target === quietEnv) wiki.notice = notice;
+  }
+}
+
+/** 명부 항목 중에서 모델이 제목 하나를 고른다 (주인공이 맡은 인물은 뺀다) */
+async function pickTitle(ctx: ChatContext): Promise<string> {
+  const me = playerAgent(ctx.char.globalLore, ctx.chat.scriptstate);
+  const written = new Set(listDocs(ctx.chat, ctx.char.globalLore).filter((d) => !d.base).map((d) => d.title));
+  const candidates = [...new Set(entries(ctx).filter((e) => !(me && e.cat === 'ag' && e.name === me.name)).map((e) => e.title))];
+  if (!candidates.length) return '';
+  const names = (() => {
+    try {
+      return factionNames(parseCatalog(ctx.char.globalLore), String(ctx.chat.scriptstate?.['$st_faction'] ?? ''));
+    } catch {
+      return {};
+    }
+  })();
+  const s = wikiSettings(ctx.chat.scriptstate);
+  const { value } = await askModel(wikiTitlePrompt(source(ctx), candidates, [...written], names), s.model, (raw) => acceptTitle(raw, candidates), { ...genSettings(ctx.chat.scriptstate), state: ctx.chat.scriptstate });
+  return value;
+}
+
+/** 위키 탭을 열 때: 「창을 열 때」 설정이고 마지막 채팅 응답에 맞춰 아직 쓰지 않았으면 한 번 */
+export function wikiOpenCheck(ctx: ChatContext, env: WikiEnv): void {
+  liveEnv = env;
+  if (wikiSettings(ctx.chat.scriptstate).auto !== 'open') return;
+  const at = lastReply(ctx.chat);
+  if (at < 0) return;
+  void autoWriteWiki(ctx, at, true).catch((error) => console.log(`[goei] 위키 자동 작성 실패: ${error instanceof Error ? error.message : String(error)}`));
 }
 
 async function setVar(ctx: ChatContext, env: WikiEnv, key: string, value: string) {
@@ -548,6 +625,13 @@ function settingsView(ctx: ChatContext): string {
       ${line('모델', seg('wiki-model', s.model, [['main', '메인'], ['aux', '보조']]))}
       ${line('다시 쓸 때 이전 문서 참고', seg('wiki-refresh_previous', s.refreshPrevious ? '1' : '0', [['1', 'ON'], ['0', 'OFF']]))}
       ${line('채팅에 반영', seg('wiki-context', wikiContextOn(ctx.chat.scriptstate) ? '1' : '0', [['1', 'ON'], ['0', 'OFF']]), '채팅에 나온 문서가 채팅 요청에 참고로 붙어요')}
+      ${line('주석', seg('wiki-footnotes', s.footnotes, [['pop', '뜨는 창'], ['inline', '펼치기']]), '펼치기는 주석을 본문 안에 괄호로 둬요. 폰에서 읽기 편해요')}
+      ${line('그림', seg('wiki-images', s.images, [['off', '끔'], ['infobox', '정보칸만'], ['body', '본문까지']]), '본문까지면 괴이·특수·거점·조직 그림을 본문에 넣고, 인물 문서는 정보칸 표정을 모델이 골라요. 인물 그림은 본문에 넣지 않아요')}
+    </div></section>
+    <section class="ps-group"><h3>자동 작성</h3><div class="ps-rows">
+      ${line('자동 작성', seg('wiki-auto', s.auto, [['0', '끔'], ['open', '창을 열 때'], ['turn', '매 턴']]), '채팅이 진행되면 문서 하나를 저절로 써요. 문서가 길어 호출 하나가 커요')}
+      ${line('제목', seg('wiki-auto_title', s.autoTitle, [['model', '모델이 고름'], ['input', '직접 입력']]), '모델이 고름 = 명부 항목 중 이번 이야기에 맞는 것')}
+      ${s.autoTitle === 'input' ? line('직접 입력', `<input class="gx-search ps-text" data-change="wiki-auto_query" value="${esc(s.autoQuery)}" placeholder="문서 제목">`) : ''}
     </div></section>
     <section class="ps-group"><h3>공용 지침</h3><div class="ps-rows"><div class="ps-row">
       <textarea class="gx-search nw-reqbox" data-change="wiki-request" rows="3" placeholder="모든 문서에 덧붙일 말투·형식·관점">${esc(req)}</textarea></div></div></section>
@@ -608,8 +692,16 @@ function docView(ctx: ChatContext): string {
   const c = canon(ctx);
   const saved = new Set(listDocs(ctx.chat, ctx.char.globalLore).map((d) => d.title));
   const e = entryFor(ctx, doc.title);
-  const photo = e?.photo ? imageUrl(ctx.char, e.photo) : null;
-  const r = renderArticle(doc.body, { saved: (t) => saved.has(t), canon: c, photo, fold: spoilerFold(ctx, doc.title, e) });
+  const s = wikiSettings(ctx.chat.scriptstate);
+  // 정보칸 그림: 인물 문서는 모델이 고른 표정(그 그림이 있을 때만), 설정이 끔이면 없음
+  let pic = s.images === 'off' ? '' : e?.photo ?? '';
+  const mood = pic && e?.cat === 'ag' ? portraitMood(doc.body) : '';
+  if (mood && /_default$/.test(pic.replace(/#.*$/, '')) && hasAsset(ctx.char, pic.replace(/#.*$/, '').replace(/_default$/, `_${mood}`))) pic = pic.replace(/_default(#|$)/, `_${mood}$1`);
+  const photo = pic ? imageUrl(ctx.char, pic) : null;
+  const r = renderArticle(doc.body, {
+    saved: (t) => saved.has(t), canon: c, photo, fold: spoilerFold(ctx, doc.title, e), inlineNotes: s.footnotes === 'inline',
+    image: s.images === 'body' ? (name) => (hasAsset(ctx.char, name) ? imageUrl(ctx.char, name) : null) : undefined,
+  });
   const job = jobs.get(chatKey(ctx));
   // 상세·관련 문서: 사진이 붙은 칩, 아직 없는 문서는 흐리게
   const links = (label: string, list: string[]) =>
@@ -657,7 +749,8 @@ function paneHtml(ctx: ChatContext): string {
   return homeView(ctx);
 }
 
-export function wikiTab(ctx: ChatContext): string {
+export function wikiTab(ctx: ChatContext, env?: WikiEnv): string {
+  if (env) liveEnv = env;
   const fail = wiki.failure
     ? `<details class="nw-fail"><summary>최근 실패 원문 (${esc(wiki.failure.title)})</summary><p>${esc(wiki.failure.reason)}</p><textarea class="gx-search" rows="6" readonly>${esc(wiki.failure.raw)}</textarea></details>`
     : '';
@@ -959,7 +1052,14 @@ export async function handleWiki(action: string, value: string | undefined, ctx:
     case 'wiki-model':
     case 'wiki-refresh_previous':
     case 'wiki-context':
+    case 'wiki-footnotes':
+    case 'wiki-images':
+    case 'wiki-auto':
+    case 'wiki-auto_title':
       await setVar(ctx, env, `$nw_${action.slice(5)}`, v);
+      return true;
+    case 'wiki-auto_query':
+      await setVar(ctx, env, '$nw_auto_query', v.trim().slice(0, 80));
       return true;
     case 'wiki-settings':
       if (wiki.view === 'settings') go('home');

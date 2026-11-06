@@ -527,6 +527,10 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
 .nw-link:hover { text-decoration: underline; }
 .nw-fn { color: var(--signal); font-size: 12px; cursor: pointer; padding: 0 1px; border-radius: 4px; }
 .nw-fn:hover, .nw-fn:focus-visible { background: var(--accent-bg); outline: none; }
+.nw-fn-in { color: var(--sub); font-size: 0.92em; }
+.nw-fig { margin: 10px 0; }
+.nw-fig img { display: block; max-width: 100%; max-height: 320px; border-radius: 8px; border: 1px solid var(--line); }
+.nw-fig figcaption { margin-top: 4px; color: var(--sub); font-size: 12px; }
 .nw-doc { position: relative; }
 .nw-fnpop { position: absolute; z-index: 5; padding: 10px 12px; border: 1px solid var(--accent-line); border-radius: 10px; background: var(--panel); box-shadow: 0 8px 24px rgba(0, 0, 0, .35); font-size: 14px; line-height: 1.6; color: var(--text); pointer-events: none; }
 .nw-fnpop b { color: var(--signal); font-weight: 600; }
