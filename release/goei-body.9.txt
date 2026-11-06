@@ -1,4 +1,14 @@
-in(AGENT_MAX, Math.max(0, cur + (v.endsWith("+") ? 1 : -1)));
+          await save(ctx2, env3, (chat) => {
+            if (worldOn(chat)) return null;
+            const faction = String(chat.scriptstate?.["$st_faction"] ?? "");
+            return startWorldVars(parseCatalog(lore), worldSettings(lore, chat.scriptstate), faction, Math.random, String(chat.scriptstate?.["$st_player"] ?? ""));
+          });
+        }
+        return true;
+      case "set-agent":
+        await save(ctx2, env3, (chat) => {
+          const cur = basicSettings(lore, chat.scriptstate).agentLimit;
+          const next = Math.min(AGENT_MAX, Math.max(0, cur + (v.endsWith("+") ? 1 : -1)));
           if (next === cur) return null;
           const vars = withBasic(ctx2, chat, { agentLimit: next });
           if (worldOn(chat)) {
@@ -38,12 +48,16 @@ in(AGENT_MAX, Math.max(0, cur + (v.endsWith("+") ? 1 : -1)));
 
   // src/ui/morph.ts
   var KEEP = [".ph-drawer", ".gx-mbar"];
+  var committed = null;
+  function markCommitted(el) {
+    committed = el;
+  }
   function syncAttrs(a, b) {
     for (const { name } of [...a.attributes]) if (!b.hasAttribute(name)) a.removeAttribute(name);
     for (const { name, value } of [...b.attributes]) if (a.getAttribute(name) !== value) a.setAttribute(name, value);
   }
   function syncForm(a, b) {
-    const active3 = document.activeElement === a;
+    const active3 = document.activeElement === a && a !== committed;
     if (a instanceof HTMLInputElement && b instanceof HTMLInputElement) {
       if (a.type === "checkbox" || a.type === "radio") {
         if (a.checked !== b.hasAttribute("checked")) a.checked = b.hasAttribute("checked");
@@ -103,6 +117,7 @@ in(AGENT_MAX, Math.max(0, cur + (v.endsWith("+") ? 1 : -1)));
     const tpl = document.createElement("template");
     tpl.innerHTML = html;
     morphChildren(root3, tpl.content);
+    committed = null;
   }
 
   // src/ui/editor/index.ts
@@ -277,6 +292,7 @@ in(AGENT_MAX, Math.max(0, cur + (v.endsWith("+") ? 1 : -1)));
     });
     root.addEventListener("change", (ev) => {
       const el = ev.target;
+      markCommitted(el);
       if (el?.dataset?.input === "dir-crop-size") return render();
       if (el?.dataset?.change?.startsWith("ed-")) return void run3(el.dataset.change, el.value);
       if (el?.dataset?.change === "man-import-file") return void manageFile(el).then(() => render());
@@ -2766,15 +2782,4 @@ h4.nw-h { font-size: 17px; border-bottom-style: dashed; }
 .gn-chead-dm .gn-nick { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 /* 모바일: 여백을 줄여 한 화면에 더 많이 */
 @media (max-width: 760px), (max-height: 499px) and (pointer: coarse) {
-  .gn-inline .gn-doc { padding: 0 4px 4px; }
-  .gn-inline .gn-post-body { min-height: 0; padding: 10px 6px 12px; font-size: 15px; line-height: 1.65; }
-  .gn-inline .gn-csec { margin-top: 2px; }
-  .gn-inline .gn-chead { padding: 4px 4px 4px 6px; border-bottom-width: 1px; }
-  .gn-inline .gn-ccount { font-size: 14px; }
-  .gn-c { gap: 0 8px; padding-top: 6px; padding-bottom: 6px; }
-  .gn-c-who { min-height: 24px; font-size: 13.5px; }
-  .gn-c-body { font-size: 14.5px; line-height: 1.55; }
-  .gn-reply { min-height: 24px; padding: 0 8px; font-size: 12.5px; }
-  .gn-c-compose { padding: 6px 4px 8px calc(4px + var(--gn-depth, 1) * 14px); }
-}
-/* 설정 줄의 버튼 묶음이 길면 (괴담넷 사생활 다섯 
+  .gn-inline .gn-doc { 

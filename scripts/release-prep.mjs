@@ -10,7 +10,7 @@
 //   --dry                      무엇을 할지만 보이고 아무것도 바꾸지 않는다
 // 규칙: release/ 의 옛 조각·옛 pic 은 지우지 않는다(결과물 삭제 금지). 카드 빌드가 지운 pic 파일은 git 에서 되살린다.
 import { spawnSync } from 'node:child_process';
-import { copyFileSync, existsSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
+import { copyFileSync, existsSync, readFileSync, readdirSync, renameSync, writeFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -87,6 +87,16 @@ if (opt.card) {
   const files = readdirSync(dist).filter((f) => /^(goei-plugin\.js|goei-body\.(json|\d+\.txt)|goei-data-(world|install)\.(json|txt|\d+\.txt)|tok-o200k\.(json|\d+\.txt))$/.test(f));
   log(`④ dist → release 복사 ${files.length}개`);
   if (!opt.dry) for (const f of files) copyFileSync(resolve(dist, f), resolve(ROOT, 'release', f));
+}
+
+// ④-2 옛 시험 카드(.scratch/fixture)는 옆으로 치운다 — 판이 바뀐 뒤 옛 카드로 브라우저 시험을 돌리면 「판 맞춤」 경고로 실패한다 (2026-11-06 v0.20.9 때 30분 날림)
+{
+  const fx = resolve(ROOT, '.scratch/fixture');
+  if (existsSync(fx)) {
+    const old = resolve(ROOT, `.scratch/fixture_old_${Date.now()}`);
+    log(`④-2 옛 시험 카드 치움 .scratch/fixture → ${old.replace(ROOT + '/', '')} (다음 브라우저 시험이 새 판으로 다시 만든다)`);
+    if (!opt.dry) renameSync(fx, old);
+  }
 }
 
 // ⑤ 시험

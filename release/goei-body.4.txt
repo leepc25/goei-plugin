@@ -1,4 +1,12 @@
- };
+level >= 1;
+  var trimSecondary = () => level >= 2;
+  var trimRelated = () => level >= 3;
+  function trimTurns(n2) {
+    if (n2 <= 0) return 0;
+    return level < 4 ? n2 : Math.max(1, Math.floor(n2 / 2 ** (level - 3)));
+  }
+  var BudgetError = class extends Error {
+  };
   function promptTokens(p) {
     return p.messages.reduce((n2, m) => n2 + tokens(m.content), 0);
   }
@@ -2741,7 +2749,9 @@ The previous response was rejected and nothing was saved. Recreate the complete 
         const el = document.querySelector(`.gx-toast[data-toast="${key2}"]`);
         if (!el) return;
         el.classList.add("out");
-        setTimeout(() => el.remove(), 300);
+        setTimeout(() => {
+          if (el.matches(`.gx-toast[data-toast="${key2}"]`)) el.remove();
+        }, 300);
       }, ms);
       timers.set(key2, { text: text4, id });
     }
@@ -4030,8 +4040,4 @@ ${String(r.result ?? "").slice(0, 300)}`, String(r.result ?? ""));
           st.order = st.order.filter((x) => x !== v);
         });
         if (phone.room === v) Object.assign(phone, { view: phone.view === "room" ? "list" : phone.view, room: null });
-        return true;
-      case "ph-notice": {
-        const id = Number(v);
-        if (isPhone()) Object.assign(phone, { openNotice: phone.openNotice === id ? null : id, view: phone.view === "notice" ? "list" : phone.view });
-        else if (phone.view === "notice" && phone.openNotice === id) Object.assign(phone, { openNotice: null, view: "list" })
+        retu

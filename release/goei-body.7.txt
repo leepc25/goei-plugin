@@ -1,4 +1,4 @@
-a background figure.",
+in what order, what they consider irrelevant, and how they show feeling. Judge every cue by it. You never change `values`; durable changes shown in the chat go to `personality`. If `values` is thin, judge in this order: explicit settings in the record, reactions actually depicted in this chat, then a provisional reading of personality and background, and mark the provisional reading as such. Never invent a taste to suit the current target, never add a preference because it might be useful in a future scene, and never build a profile for a background figure.",
     "",
     "Keep these elements of a profile distinct when you reason and when you write `personality` or `relationship` entries:",
     "- **Scope of interest**: who can be an object of romantic or sexual interest at all. Having no such targets is valid. Being outside the scope does not remove friendship, respect, aesthetic appreciation or camaraderie.",
@@ -1889,18 +1889,4 @@ Return the JSON object.` }
           wiki.rewrite = null;
           break;
         }
-        const old = findDoc(ctx2.chat, v, ctx2.char.globalLore);
-        Object.assign(wiki, { rewrite: v, docReq: old?.meta?.docRequest ?? "", rewritePrev: wikiSettings(ctx2.chat.scriptstate).refreshPrevious });
-        break;
-      }
-      case "wiki-rw-prev":
-        wiki.rewritePrev = v === "1";
-        break;
-      case "wiki-rw-cancel":
-        Object.assign(wiki, { rewrite: null, docReq: "" });
-        break;
-      case "wiki-rw-go":
-        if (!v || wiki.rewrite !== v) break;
-        void generate3(ctx2, env3, v, true, wiki.docReq, wiki.rewritePrev);
-        break;
-      case "wi
+        const old = findDoc(ctx2.chat, v, ctx2.char.

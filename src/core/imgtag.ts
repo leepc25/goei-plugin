@@ -29,8 +29,11 @@ export function hasImgTag(text: string): boolean {
  *  나중에 「페르소나이름_표정」 에셋을 넣으면 그것이 먼저다 */
 const SELF = '{{source::user}}';
 
+/** 추가 표정 15종 (사용자 11-06, 이름에 띄어쓰기 있음) */
+export const ADDED_EMOTIONS = ['suspicious', 'worried', 'relieved', 'disgusted', 'determined', 'jealous', 'pleading', 'forced smiling', 'indifferent', 'guilty', 'pouting', 'angry smile', 'expressionless', 'tormented', 'crazy smile'];
+
 /** 카드 표정 세트 (assets/portraits). 에셋 목록을 못 읽었을 때는 이 세트의 표정만 믿는다 */
-export const EMOTIONS = new Set('default angry annoyed bored confused contemptuous crying curious dumbfounded embarrassed excited exhausted happy laughing lovestruck lustful nervous proud sad scared serious shy smile smirk smug surprised thinking'.split(' '));
+export const EMOTIONS = new Set([...'default angry annoyed bored confused contemptuous crying curious dumbfounded embarrassed excited exhausted happy laughing lovestruck lustful nervous proud sad scared serious shy smile smirk smug surprised thinking'.split(' '), ...ADDED_EMOTIONS]);
 
 /** 태그 → 에셋 이름. 목록에 없는 이름·표정은 null (칸을 그리지 않는다, 기본 그림으로 바꾸지 않는다. 사용자 2026-10-26).
  *  목록이 없으면 표정이 세트 안일 때만 태그를 믿는다. 페르소나 태그는 유저 사진 */

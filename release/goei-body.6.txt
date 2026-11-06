@@ -1,3 +1,18 @@
+v.slice(at + 1));
+        if (!o) break;
+        if (action === "dir-fac-hide") o.spec.hidden = arg === "0";
+        else if (action === "dir-fac-type") o.spec.type = arg;
+        else if (!o.faction) {
+          setPlayable(d, o, arg === "1");
+          if (arg === "1" && o.spec.playable && o.spec.code) stUi.sel = o.spec.code;
+          else if (arg === "0" && stUi.sel === o.spec.code) stUi.sel = "";
+        }
+        dirUi.done = "";
+        break;
+      }
+      case "dir-fac-patch": {
+        dirUi.busy = true;
+        env3.render();
         try {
           let missing = [];
           await updateCharacterLore(ctx2.charIndex, (lore) => {
@@ -2864,4 +2879,4 @@ ${rules2}`;
     "How well someone matches a person's taste, the personal affinity accumulated through experience, and the conduct the actual relationship permits are separate. A stranger may catch someone's attention without gaining trust or permission to approach. A long-cherished colleague may not fit someone's romantic taste. A person may feel drawn to someone while resenting or distrusting them. Never use one axis as a substitute for another. Read the person's base personality, social role, current circumstances and established relationships first; apply personal affinity, taste, intent and approach style on top of them. A person without special affinity may still be polite, make small talk, and cooperate at work. Curt behavior and personal hostility are different things.",
     "",
     "### 7.2 The person's profile (`values`, `personality`)",
-    "`values` is the stable judgment profile written at development time: what the person values, in what order, what they consider irrelevant, and how they show feeling. Judge every cue by it. You never change `values`; durable changes shown in the chat go to `personality`. If `values` is thin, judge in this order: explicit settings in the record, reactions actually depicted in this chat, then a provisional reading of personality and background, and mark the provisional reading as such. Never invent a taste to suit the current target, never add a preference because it might be useful in a future scene, and never build a profile for 
+    "`values` is the stable judgment profile written at development time: what the person values, 

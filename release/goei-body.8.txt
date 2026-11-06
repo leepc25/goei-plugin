@@ -1,4 +1,18 @@
-ki-delete":
+globalLore);
+        Object.assign(wiki, { rewrite: v, docReq: old?.meta?.docRequest ?? "", rewritePrev: wikiSettings(ctx2.chat.scriptstate).refreshPrevious });
+        break;
+      }
+      case "wiki-rw-prev":
+        wiki.rewritePrev = v === "1";
+        break;
+      case "wiki-rw-cancel":
+        Object.assign(wiki, { rewrite: null, docReq: "" });
+        break;
+      case "wiki-rw-go":
+        if (!v || wiki.rewrite !== v) break;
+        void generate3(ctx2, env3, v, true, wiki.docReq, wiki.rewritePrev);
+        break;
+      case "wiki-delete":
         if (wiki.confirmDelete !== v) {
           wiki.confirmDelete = v;
           break;
@@ -2995,14 +3009,3 @@ ${prettyJson(r.data ?? "")}`)}</textarea>` : ""}
           return true;
         }
         if (v === "on") {
-          await save(ctx2, env3, (chat) => {
-            if (worldOn(chat)) return null;
-            const faction = String(chat.scriptstate?.["$st_faction"] ?? "");
-            return startWorldVars(parseCatalog(lore), worldSettings(lore, chat.scriptstate), faction, Math.random, String(chat.scriptstate?.["$st_player"] ?? ""));
-          });
-        }
-        return true;
-      case "set-agent":
-        await save(ctx2, env3, (chat) => {
-          const cur = basicSettings(lore, chat.scriptstate).agentLimit;
-          const next = Math.m
