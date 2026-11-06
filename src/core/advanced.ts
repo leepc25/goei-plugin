@@ -9,7 +9,7 @@ export type AdvFeature = 'gn' | 'ph' | 'nw' | 'gen';
 export interface AdvItem {
   key: string;
   label: string;
-  type: 'num' | 'bool' | 'pick';
+  type: 'num' | 'bool' | 'pick' | 'text';
   def: number | string;
   min?: number;
   max?: number;
@@ -38,6 +38,17 @@ const TOK = '토큰';
 const budget = num('budget', '요청 토큰 상한', 0, 0, 200000, TOK, { zero: '공통', hint: '넘으면 2차 참조, 관련 로어북, 오래된 채팅 순으로 줄여요' });
 const turns = (def: number) => num('turns', '채팅 참고', def, 0, 200, '턴', { zero: '안 봄' });
 
+/** 생성 방식 (라이트보드 5.0.0 「생각보조」·「탈옥 (비망록)」·다시 보기, 2026-11-06 사용자). 기능마다 맨 위 묶음 */
+const craftGroup = (): AdvGroup => ({
+  title: '생성 방식',
+  items: [
+    { key: 'thoughts', label: '생각 단계', type: 'pick', def: 'off', opts: [['off', '안 함'], ['inner', '속으로만'], ['note', '적고 지움']], hint: '모델이 결과를 쓰기 전에 정해진 순서표대로 상황을 먼저 정리하게 해요. 적고 지움 = 짧게 적은 뒤 결과를 쓰고 플러그인이 생각 부분을 지워요(응답이 길어져 느려짐). 속으로만 = 순서표만 주고 적지 않게 해요' },
+    { key: 'memo', label: '비망록', type: 'pick', def: '0', opts: [['0', '끔'], ['1', '켬']], hint: '모델 거부를 줄이는 긴 앞글이에요(원본 라이트보드 「탈옥 (비망록)」). 요청마다 약 1만 자가 붙어 무거워요. 거부를 당할 때만 켜세요' },
+    num('reiterate', '다시 보기', 0, 0, 2, '회', { zero: '공통', hint: '0이면 생성 공통 값을 따라요' }),
+    { key: 'model_id', label: '전용 모델', type: 'text', def: '', hint: 'Risu 모델 ID를 적으면 이 기능만 그 모델로 불러요(라이트보드 「전용 모델」). 비우면 위 「모델」(메인·보조) 설정' },
+  ],
+});
+
 export const ADV: Record<AdvFeature, AdvGroup[]> = {
   gen: [
     {
@@ -48,6 +59,10 @@ export const ADV: Record<AdvFeature, AdvGroup[]> = {
         { key: 'retry_model', label: '재시도 모델', type: 'pick', def: 'same', opts: [['same', '같은 모델'], ['main', '메인'], ['aux', '보조']] },
         num('budget', '요청 토큰 상한', 0, 0, 200000, TOK, { zero: '제한 없음', hint: '괴담넷·괴담톡·위키 요청 하나의 상한. 기능마다 따로 정할 수도 있어요' }),
         num('ctx_total', '채팅 반영 총 상한', 0, 0, 200000, TOK, { zero: '제한 없음', hint: '괴담넷·괴담톡·위키 기록이 채팅 요청에 붙는 양의 합. 넘치면 기능별 반영 상한 비율로 나눠요' }),
+        // 라이트보드 5.0.0에서 옮김 (2026-11-06 사용자 「전부 넣어야지」)
+        num('reiterate', '다시 보기', 0, 0, 2, '회', { zero: '안 함', hint: '첫 응답을 받은 뒤 「지침과 형식을 빠짐없이 지켰나 다시 읽고, 괜찮으면 그대로, 아니면 고쳐서」를 이만큼 더 물어요. 형식·규칙을 더 잘 지키지만 한 번마다 호출이 하나 늘어요. 기능마다 따로 정할 수도 있어요' }),
+        { key: 'user_msgs', label: '유저 메시지', type: 'pick', def: '1', opts: [['1', '포함'], ['0', '빼기']], hint: '괴담넷·괴담톡·위키 요청에 넣는 최근 대화에 내가 쓴 메시지를 넣을지예요. 빼면 본편에 쓴 지시문이 게시판·톡·위키로 새지 않지만, 내 행동은 응답 문장으로만 짐작해요' },
+        num('concurrent', '동시 요청', 0, 0, 5, '개', { zero: '제한 없음', hint: '괴담넷·괴담톡·위키 요청을 한 번에 몇 개까지 보낼지예요. 넘으면 앞 요청이 끝날 때까지 기다려요. 느린 모델이나 요청 한도가 낮을 때 줄이세요. 인물 기록 요청은 세지 않아요' }),
       ],
     },
     {
@@ -58,6 +73,7 @@ export const ADV: Record<AdvFeature, AdvGroup[]> = {
     },
   ],
   gn: [
+    craftGroup(),
     {
       title: '참고 자료',
       chips: [chip('desc', '봇 설명', 1), chip('authors', '작가 노트', 1), chip('persona', '페르소나', 1), chip('active', '상시 로어북', 1), chip('related', '관련 로어북', 0), chip('secondary', '2차 참조', 0)],
@@ -102,6 +118,7 @@ export const ADV: Record<AdvFeature, AdvGroup[]> = {
     },
   ],
   ph: [
+    craftGroup(),
     {
       title: '참고 자료',
       chips: [chip('desc', '봇 설명', 1), chip('authors', '작가 노트', 1), chip('persona', '페르소나', 1), chip('active', '상시 로어북', 1), chip('related', '인물 로어북', 0, '$ph_related'), chip('secondary', '2차 참조', 0)],
@@ -141,6 +158,7 @@ export const ADV: Record<AdvFeature, AdvGroup[]> = {
     },
   ],
   nw: [
+    craftGroup(),
     {
       title: '참고 자료',
       chips: [chip('desc', '봇 설명', 1), chip('authors', '작가 노트', 1), chip('persona', '페르소나', 1), chip('active', '상시 로어북', 1), chip('related', '관련 로어북', 1), chip('secondary', '2차 참조', 1)],
@@ -167,6 +185,7 @@ export function advCheck(item: AdvItem, raw: unknown): string | null {
   if (!s || s === 'null') return null;
   if (item.type === 'bool') return s === '1' || s === '0' ? s : null;
   if (item.type === 'pick') return item.opts?.some(([v]) => v === s) ? s : null;
+  if (item.type === 'text') return s.slice(0, 120);
   const n = Number(s);
   return Number.isInteger(n) && n >= (item.min ?? 0) && n <= (item.max ?? Infinity) ? String(n) : null;
 }
@@ -220,6 +239,10 @@ export interface GenSettings {
   language: string | null;
   retries: number;
   retryModel: 'same' | 'main' | 'aux';
+  /** 최근 대화에 유저 메시지를 넣는지 */
+  userMessages: boolean;
+  /** 동시 요청 수 (0 = 제한 없음) */
+  concurrent: number;
 }
 
 const LANG: Record<string, string> = {
@@ -230,7 +253,10 @@ const LANG: Record<string, string> = {
 
 export function genSettings(state: State): GenSettings {
   const m = advValue(state, 'gen', 'retry_model');
-  return { language: LANG[advValue(state, 'gen', 'lang')] ?? null, retries: advNum(state, 'gen', 'retries'), retryModel: m === 'main' || m === 'aux' ? m : 'same' };
+  return {
+    language: LANG[advValue(state, 'gen', 'lang')] ?? null, retries: advNum(state, 'gen', 'retries'), retryModel: m === 'main' || m === 'aux' ? m : 'same',
+    userMessages: advValue(state, 'gen', 'user_msgs') !== '0', concurrent: advNum(state, 'gen', 'concurrent'),
+  };
 }
 
 // 깊은 곳(응답 검사, 저장 정리)에서 쓰는 상수 묶음은 지금 채팅 값으로 맞춰 둔다.

@@ -1,7 +1,7 @@
 // 시작값: 로어북 요원 시트(영어, #### 절) → 기록 칸. 절 단위 혼합 — Identity·Character 는 기록으로 옮기고(이야기로 바뀜),
 // Voice·Background·Abilities·Appearance 는 시트 원문을 그대로 본편에 둔다 (거의 안 바뀜, 사용자가 고치면 바로 반영).
 import { entryId, hash, plain } from './store';
-import type { Entry, Person, Register, SlotId } from './types';
+import { DEFAULT_AXES, EXPRESS_TO_AXIS, type Entry, type Person, type Register, type SlotId } from './types';
 
 /** 기록으로 옮기는 절 → 칸 */
 export const SEED_SECTIONS: Record<string, SlotId> = { Identity: 'identity', Character: 'personality' };
@@ -76,6 +76,11 @@ export function seedPerson(name: string, sheet: string | null, base: SeedBase = 
     address: base.address ?? { toUser: '', register: '존댓말' },
     express: base.express ?? 1,
     aliases: base.aliases ?? [],
+    // 성격 6축: 감정 표출성만 express 에서, 나머지 50. 갱신기가 한 번 시작값을 정하면 model 로 바뀐다
+    axes: { ...DEFAULT_AXES(), emotionalExpressiveness: EXPRESS_TO_AXIS[base.express ?? 1] },
+    axesFrom: 'default',
+    patterns: [],
+    candidates: {},
   };
   if (sheet) {
     const s = parseSheet(sheet);

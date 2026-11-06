@@ -5,6 +5,7 @@ import { peopleBlock, personBlock, rhythmBlock, unknownTo } from './inject';
 import { nameMatcher, scenePeople, entriesOf, type NameEntry } from './select';
 import { liveChanges, liveEntries, liveness, type Liveness } from './store';
 import { latestNote } from './updater';
+import { rhythmClock, rhythmClockLines } from './rhythm';
 import { factionNow, factionsBlock, sceneFactionCodes, userFactionOf } from './faction';
 import { messageText } from '../refs';
 import type { PeopleSettings } from './settings';
@@ -27,6 +28,8 @@ export interface RequestOpts {
   user?: string;
   /** 세력 코드 → 이름 (명부) */
   factionNames?: Record<string, string>;
+  /** 모델 Router 가 고른 장면 인물 (있으면 코드 Router 대신). 기록에 있는 이름만 */
+  people?: string[];
 }
 
 /** 장면 인물의 기록 블록 (본편용). 대상이 없으면 빈 문자열 */
@@ -34,7 +37,7 @@ export function peopleBlockFor(chat: Chat, o: RequestOpts): { text: string; peop
   if (!o.settings.on || o.settings.inject === 'off') return { text: '', people: [], sheets: [] };
   const names: NameEntry[] = entriesOf(o.store, o.extraNames ?? {});
   const match = nameMatcher(names);
-  const people = scenePeople(chat, o.store, match, { input: o.input });
+  const people = o.people?.length ? o.people.filter((n) => o.store.people[n]).slice(0, 6) : scenePeople(chat, o.store, match, { input: o.input });
   if (!people.length) return { text: '', people: [], sheets: [] };
   const live: Liveness = liveness(chat);
   const changes = liveChanges(o.store, live);
@@ -59,6 +62,9 @@ export function peopleBlockFor(chat: Chat, o: RequestOpts): { text: string; peop
         maxChars: Math.floor(o.settings.blockCap / people.length),
         taste: o.settings.features.has('taste'),
         openness: o.settings.features.has('openness'),
+        axes: o.settings.features.has('axes'),
+        features: o.settings.features,
+        qual: o.settings.qualitative,
       }),
     );
   }
@@ -66,7 +72,7 @@ export function peopleBlockFor(chat: Chat, o: RequestOpts): { text: string; peop
   if (o.settings.features.has('rhythm')) {
     const docs = Object.values(o.store.docs).filter((d) => d.type === 'rhythm').flatMap((d) => liveEntries(d.entries, live).slice(-1).map((e) => ({ key: d.key, text: e.text })));
     const note = o.settings.director === 'facts' ? latestNote(o.store, '@rhythm', live)?.now : null;
-    const rb = rhythmBlock(docs, note);
+    const rb = rhythmBlock(docs, note, rhythmClockLines(rhythmClock(o.store, chat, live)));
     if (rb) blocks.unshift(rb);
   }
   // 세력 평판 (기본 켬): 장면 세력(인물 소속 ∪ 최근 글에 나온 세력) 가운데 중립이 아닌 것만 한 줄씩, 맨 뒤에

@@ -1,8 +1,11 @@
 // 인물 기록 설정 (채팅별, scriptstate 변수 `$pp_*`. 괴담톡 설정과 같은 방식). 기본값은 설계 문서의 추천값.
 export const PP = (key: string) => `$pp_${key}`;
 
-export type Feature = 'affinity' | 'register' | 'perception' | 'perception_ext' | 'suspicion' | 'docs_event' | 'docs_location' | 'docs_faction' | 'docs_item' | 'npc_emotion' | 'taste' | 'openness' | 'rhythm' | 'faction_rep';
-export const FEATURES: Feature[] = ['affinity', 'register', 'perception', 'perception_ext', 'suspicion', 'docs_event', 'docs_location', 'docs_faction', 'docs_item', 'npc_emotion', 'taste', 'openness', 'rhythm', 'faction_rep'];
+export type Feature = 'axes' | 'affinity' | 'register' | 'perception' | 'perception_ext' | 'suspicion' | 'docs_event' | 'docs_location' | 'docs_faction' | 'docs_item' | 'npc_emotion' | 'taste' | 'openness' | 'rhythm' | 'faction_rep';
+/** 수치가 있는 기능. 수치를 끄면 정성 모드 (리수폿 qualitative): 점수 없이 글로만 */
+export type NumericFeature = 'affinity' | 'suspicion' | 'openness';
+export const NUMERIC_FEATURES: NumericFeature[] = ['affinity', 'suspicion', 'openness'];
+export const FEATURES: Feature[] = ['axes', 'affinity', 'register', 'perception', 'perception_ext', 'suspicion', 'docs_event', 'docs_location', 'docs_faction', 'docs_item', 'npc_emotion', 'taste', 'openness', 'rhythm', 'faction_rep'];
 
 export const PP_DEFAULTS: Record<string, string> = {
   on: '1',
@@ -19,11 +22,27 @@ export const PP_DEFAULTS: Record<string, string> = {
   director_len: 'short',
   director_timeout: '20',
   director_reuse: '1',
+  /** 리수폿 B: 자료가 모자라면 검색(채팅·로어북·위키)을 요청해 2차 호출. C: 켜진 기능마다 Director 적용 지침 */
+  director_search: '1',
+  director_features: '1',
+  /** 리수폿 A: 장면 인물 고르기. code = 이름이 나온 사람(비용 0), model = 보조 모델이 이름 목록을 보고 고름 (턴당 +1회) */
+  router: 'code',
+  router_timeout: '15',
+  /** 리수폿 J-2 단계별 모델: same = 갱신 모델과 같게. model_id_* = 전용 모델 ID (비면 메인·보조) */
+  model_director: 'same', model_router: 'same', model_tidy: 'same',
+  model_id_update: '', model_id_director: '', model_id_router: '', model_id_tidy: '',
+  /** 리수폿 J-3 하이파 참조: Risu HypaMemory 요약을 갱신기·Director 자료에 배경으로 넣음. 기본 끔 */
+  hypa: '0',
+  hypa_cap: '3000',
   speed: '1',
   /** 기준 메시지(또는 필드 장면) 하나 안의 변화 합 상한. 0 = 한도 없음. 인물 호감·세력 평판 공용 (리수폿 10) */
   turn_cap: '10',
+  /** 성격 6축·관찰 누적 (리수폿 People). 기본 켬 */
+  axes: '1',
   affinity: '1', register: '1', perception: '1', perception_ext: '1', suspicion: '1',
   docs_event: '1', docs_location: '1', docs_faction: '1', docs_item: '1', npc_emotion: '1',
+  /** 수치 사용 (1) / 정성 모드 (0). 호감·의심·음란도 (리수폿 E). 취향 띠는 호감 수치가 켜져 있을 때만 */
+  num_affinity: '1', num_suspicion: '1', num_openness: '1',
   /** 리수폿 선택 기능: 취향 띠·음란도·서사 리듬. 기본 끔 */
   taste: '0', openness: '0', rhythm: '0',
   /** 세력 평판 (docs/설계안_세력평판.md). 기본 켬. 본편 주입 켬. 구간 경계 [우호, 호의, 중립, 경계 하한]. 몹 목격 무게 half/full/off */
@@ -62,9 +81,25 @@ export interface PeopleSettings {
   directorLen: 'short' | 'normal';
   directorTimeout: number;
   directorReuse: boolean;
+  directorSearch: boolean;
+  directorFeatures: boolean;
+  router: 'code' | 'model';
+  routerTimeout: number;
+  /** 단계별 모델 (same 은 갱신 모델로 푼 값) 과 전용 모델 ID (비면 없음) */
+  stageModel: Record<Stage, 'main' | 'aux'>;
+  stageModelId: Record<Stage, string>;
+  hypa: boolean;
+  hypaCap: number;
+  /** 갱신기 절 덮어쓰기 (지금 지침 판 기준) 와 Director 기본 지침 덮어쓰기 */
+  promptOverrides: Record<string, string>;
+  directorPrompt: string;
   speed: number;
   turnCap: number;
   features: Set<Feature>;
+  /** 수치를 켠 기능 */
+  numeric: Set<NumericFeature>;
+  /** 켜져 있지만 수치를 끈 기능 (정성 모드) */
+  qualitative: Set<NumericFeature>;
   newPeople: 'auto' | 'confirm';
   twoTurn: boolean;
   prevPairs: number;
@@ -81,6 +116,19 @@ export interface PeopleSettings {
   parallel: boolean;
   keepRaw: boolean;
 }
+
+/** 리수폿 J-1 지침 편집: 절 본문 덮어쓰기 변수 (지침 판·절 이름별). director = 연출형 Director 기본 지침 */
+export const PS = (prompt: string, section: string) => `$pp_ps_${prompt}_${section}`;
+export const PS_PREFIX = '$pp_ps_';
+export function promptOverrides(state: Record<string, unknown> | undefined, prompt: string): Record<string, string> {
+  const out: Record<string, string> = {};
+  const head = `${PS_PREFIX}${prompt}_`;
+  for (const [k, v] of Object.entries(state ?? {})) if (k.startsWith(head) && typeof v === 'string' && v.trim()) out[k.slice(head.length)] = v;
+  return out;
+}
+
+export type Stage = 'update' | 'director' | 'router' | 'tidy';
+export const STAGES_ALL: Stage[] = ['update', 'director', 'router', 'tidy'];
 
 export function ppValue(state: Record<string, unknown> | undefined, key: string): string {
   const v = state?.[PP(key)];
@@ -106,9 +154,25 @@ export function peopleSettings(state: Record<string, unknown> | undefined): Peop
     directorLen: v('director_len') === 'normal' ? 'normal' : 'short',
     directorTimeout: num('director_timeout', 5, 120),
     directorReuse: v('director_reuse') !== '0',
+    directorSearch: v('director_search') !== '0',
+    directorFeatures: v('director_features') !== '0',
+    router: v('router') === 'model' ? 'model' : 'code',
+    routerTimeout: num('router_timeout', 5, 60),
+    stageModel: (() => {
+      const base = v('model') === 'main' ? 'main' : 'aux';
+      const pick = (k: string): 'main' | 'aux' => (v(k) === 'main' ? 'main' : v(k) === 'aux' ? 'aux' : base);
+      return { update: base, director: pick('model_director'), router: pick('model_router'), tidy: pick('model_tidy') };
+    })(),
+    stageModelId: { update: v('model_id_update').trim().slice(0, 120), director: v('model_id_director').trim().slice(0, 120), router: v('model_id_router').trim().slice(0, 120), tidy: v('model_id_tidy').trim().slice(0, 120) },
+    hypa: v('hypa') === '1',
+    hypaCap: num('hypa_cap', 500, 12000),
+    promptOverrides: promptOverrides(state, one('prompt', ['detailed', 'compact'] as const)),
+    directorPrompt: (typeof state?.[PS('director', 'base')] === 'string' ? String(state[PS('director', 'base')]) : '').trim().slice(0, 12000),
     speed: num('speed', 0.25, 4),
     turnCap: num('turn_cap', 0, 100),
-    features: new Set(FEATURES.filter((f) => v(f) === '1')),
+    features: new Set(FEATURES.filter((f) => v(f) === '1' && !(f === 'taste' && v('num_affinity') === '0'))),
+    numeric: new Set(NUMERIC_FEATURES.filter((f) => v(`num_${f}`) !== '0')),
+    qualitative: new Set(NUMERIC_FEATURES.filter((f) => v(f) === '1' && v(`num_${f}`) === '0')),
     newPeople: v('newpeople') === 'confirm' ? 'confirm' : 'auto',
     twoTurn: v('twoturn') !== '0',
     prevPairs: num('prev_pairs', 0, 3),

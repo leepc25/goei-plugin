@@ -70,14 +70,23 @@ export const GN_DEFAULTS: Record<string, string> = {
   keepown: '1', keepreplied: '0', context: '0', incoming: '1', incoming_chance: '100', lazy: '1',
   /** 게시판 성격: gal 괴담갤(일반 커뮤니티) / net 괴담넷(업계 관계자) / wpf 세정게(세계정치 게시판). 지침의 이용자 구성·기본 말투만 바뀐다 */
   style: 'net',
+  /** 일기·감정 게시판의 주인 (비우면 주인공). 라이트보드 미니보드 사전설정 「생각·감정」 (2026-11-06) */
+  who: '',
+  /** 주요 인물 닉네임 보존 (라이트보드 미니보드 keyFigures, 2026-11-06) */
+  keyfigures: '1',
+  /** 반응 그림 (라이트보드 미니콘, 2026-11-06). cons_list = 「이름 | 그림 주소」 줄들 */
+  cons: '0', cons_list: '',
 };
 
-export type GnetStyle = 'gal' | 'net' | 'wpf';
-export const GN_STYLE_NAME: Record<GnetStyle, string> = { gal: '괴담갤', net: '괴담넷', wpf: '세정게' };
+/** 게시판 성격. diary = 한 사람의 속마음 일기, emotion = 한 사람의 감정들이 쓰는 게시판 (라이트보드 미니보드 사전설정, 2026-11-06) */
+export type GnetStyle = 'gal' | 'net' | 'wpf' | 'diary' | 'emotion';
+export const GN_STYLE_NAME: Record<GnetStyle, string> = { gal: '괴담갤', net: '괴담넷', wpf: '세정게', diary: '일기장', emotion: '감정 게시판' };
 export function gnetStyle(state: Record<string, unknown> | undefined): GnetStyle {
   const v = String(state?.[CFG('style')] ?? '');
-  return v === 'gal' || v === 'wpf' ? v : 'net';
+  return v === 'gal' || v === 'wpf' || v === 'diary' || v === 'emotion' ? v : 'net';
 }
+/** 일기·감정 게시판이면 혼자 쓰는 게시판이라 선쪽지·사생활 규칙이 뜻이 없다 */
+export const innerBoard = (state: Record<string, unknown> | undefined): boolean => ['diary', 'emotion'].includes(gnetStyle(state));
 /** 메뉴·창 머리에 쓰는 게시판 이름 (설정에 따라) */
 export const gnetLabel = (state: Record<string, unknown> | undefined): string => GN_STYLE_NAME[gnetStyle(state)];
 /** 쪽지 보관 (원본 gnet_retention: 자동 정리 켬/끔, 상대별 상한) */
@@ -120,6 +129,8 @@ export interface GnetSettings {
   context: boolean;
   incoming: boolean;
   incomingChance: number;
+  keyFigures: boolean;
+  cons: boolean;
 }
 
 export function gnetVars(state: Record<string, unknown> | undefined): Record<string, unknown> {
@@ -151,9 +162,54 @@ export function gnetSettings(state: Record<string, unknown> | undefined): GnetSe
     keepOwn: s('keepown') === '1',
     keepReplied: s('keepreplied') === '1',
     context: s('context') === '0',
-    incoming: s('incoming') !== '0',
+    incoming: s('incoming') !== '0' && !innerBoard(state),
     incomingChance: Number.isFinite(chance) ? Math.max(0, Math.min(100, chance)) : 100,
+    keyFigures: s('keyfigures') !== '0',
+    cons: s('cons') === '1' && consList(state).length > 0,
   };
+}
+
+// ── 주요 인물 닉네임 보존 (라이트보드 미니보드 keyFigures, 2026-11-06) ──
+export const GN_KEYFIG = '$gn_keyfigures';
+export interface KeyFigure { keyFigure: string; nickname: string; note: string }
+
+export function keyFigures(state: Record<string, unknown> | undefined): KeyFigure[] {
+  try {
+    const v = JSON.parse(String(state?.[GN_KEYFIG] ?? '[]'));
+    return Array.isArray(v) ? v.filter((x) => x && typeof x.keyFigure === 'string' && x.keyFigure && typeof x.nickname === 'string') : [];
+  } catch {
+    return [];
+  }
+}
+
+/** 응답의 keyFigures를 저장된 것에 합친다 (같은 인물은 새 줄로 바꿈). 바뀐 게 없으면 null */
+export function mergeKeyFigures(state: Record<string, unknown> | undefined, rows: unknown): Record<string, string> | null {
+  if (!Array.isArray(rows) || !rows.length) return null;
+  const list = keyFigures(state);
+  let changed = false;
+  for (const r of rows as Record<string, unknown>[]) {
+    const keyFigure = String(r?.keyFigure ?? '').trim().slice(0, 80);
+    const nickname = String(r?.nickname ?? '').trim().slice(0, 80);
+    if (!keyFigure || !nickname) continue;
+    const row = { keyFigure, nickname, note: String(r?.note ?? '').trim().slice(0, 300) };
+    const i = list.findIndex((x) => x.keyFigure === keyFigure);
+    if (i < 0) list.push(row);
+    else if (list[i].nickname !== row.nickname || list[i].note !== row.note) list[i] = row;
+    else continue;
+    changed = true;
+  }
+  return changed ? { [GN_KEYFIG]: JSON.stringify(list.slice(-60)) } : null;
+}
+
+// ── 반응 그림 (라이트보드 미니콘, 2026-11-06). 글·댓글 안의 [콘:이름] 을 그림으로 ──
+export function consList(state: Record<string, unknown> | undefined): { name: string; src: string }[] {
+  const raw = String(state?.[CFG('cons_list')] ?? '');
+  const out: { name: string; src: string }[] = [];
+  for (const line of raw.split('\n')) {
+    const [name, src] = line.split('|').map((x) => x.trim());
+    if (name && src && /^[^\[\]:]{1,30}$/.test(name) && !out.some((c) => c.name === name)) out.push({ name, src });
+  }
+  return out.slice(0, 200);
 }
 
 export function userNick(state: Record<string, unknown> | undefined): string {

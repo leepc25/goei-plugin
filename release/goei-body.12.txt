@@ -1,0 +1,2354 @@
+   });
+      if (saved && closedAt >= 0) {
+        try {
+          await refreshStatusContext(ctx2.charIndex, ctx2.chatIndex, { chat: saved, char: ctx2.char });
+          if (chatCardsAt(saved, closedAt).length) await updateChat(ctx2.charIndex, ctx2.chatIndex, (cur) => ({ ...cur }));
+        } catch {
+        }
+      }
+      env3.setBusy(false);
+      await env3.refresh();
+    } catch (error) {
+      env3.setBusy(false);
+      env3.setNotice(error instanceof Error ? error.message : String(error));
+      env3.render();
+    }
+  }
+  function showOnMap(ctx2, key2) {
+    const x = readCtx(ctx2);
+    if (typeof x === "string" || !x.on) return false;
+    const ev = activeEvents(x.world).find((e) => e.key === key2);
+    if (!ev) return false;
+    field3.region = sidoOf(ev.loc);
+    field3.place = placeKey(ev, x.catalog);
+    field3.filter = "all";
+    field3.confirmEnd = null;
+    return true;
+  }
+  async function handleField(action, value, ctx2, env3, opening) {
+    const v = value ?? "";
+    switch (action) {
+      case "map-region":
+        field3.region = v === "01" || MAP_CODES.includes(v) ? v : "01";
+        field3.place = null;
+        field3.confirmEnd = null;
+        env3.render();
+        return true;
+      case "map-jump":
+      case "map-place": {
+        let v2 = value ?? "";
+        if (action === "map-jump") {
+          const [code2, key2] = v2.split("|");
+          if (!MAP_CODES.includes(code2) || !key2) return true;
+          field3.region = code2;
+          field3.mapq = "";
+          v2 = key2;
+        }
+        field3.confirmEnd = null;
+        if (action === "map-place" && isPC() && field3.place === v2 && sameTarget(field3.target, v2)) {
+          field3.place = null;
+          field3.target = null;
+          env3.render();
+          return true;
+        }
+        field3.place = v2;
+        const x = readCtx(ctx2);
+        const here = typeof x === "string" || !x.on ? [] : activeEvents(x.world).filter((e) => placeKey(e, x.catalog) === v2);
+        if (!here.length) field3.target = placeTarget(v2);
+        env3.render();
+        return true;
+      }
+      case "map-unplace":
+        field3.place = null;
+        field3.target = null;
+        field3.confirmEnd = null;
+        toStep("goal", env3);
+        return true;
+      case "map-filter":
+        field3.filter = ["all", "an", "in", "ms"].includes(v) ? v : "all";
+        env3.render();
+        return true;
+      case "pick-place":
+        if (isPC() && sameTarget(field3.target, v)) {
+          field3.target = null;
+          env3.render();
+          return true;
+        }
+        field3.target = placeTarget(v);
+        toStep("team", env3);
+        return true;
+      case "field-step":
+        toStep(v === "team" ? "team" : "goal", env3);
+        return true;
+      case "pick-event": {
+        const x = readCtx(ctx2);
+        if (typeof x === "string") return true;
+        const ev = activeEvents(x.world).find((e) => e.key === v);
+        if (!ev) return true;
+        if (sameTarget(field3.target, ev.key)) {
+          field3.target = null;
+          field3.confirmEnd = null;
+          env3.render();
+          return true;
+        }
+        field3.target = { type: "event", key: ev.key, kind: ev.kind, name: ev.name, loc: ev.loc };
+        field3.region = sidoOf(ev.loc);
+        field3.confirmEnd = null;
+        toStep("team", env3);
+        return true;
+      }
+      case "end-event":
+        if (field3.confirmEnd !== v) {
+          field3.confirmEnd = v;
+          env3.render();
+          return true;
+        }
+        field3.confirmEnd = null;
+        if (field3.target?.type === "event" && field3.target.key === v) field3.target = null;
+        await saveWorld(ctx2, env3, (w) => endEvent(w, v) ? null : "이미 끝났거나 바뀐 상황이에요.");
+        return true;
+      case "team-toggle": {
+        const tx = readCtx(ctx2);
+        if (typeof tx !== "string" && lockedState(tx, v)) return true;
+        const i = field3.team.indexOf(v);
+        if (i >= 0) field3.team.splice(i, 1);
+        else if (field3.team.length + field3.support < TEAM_MAX) field3.team.push(v);
+        env3.render();
+        return true;
+      }
+      case "support": {
+        const next = field3.support + (Number(v) > 0 ? 1 : -1);
+        if (next >= 0 && validTeam(field3.team.length, next)) field3.support = next;
+        env3.render();
+        return true;
+      }
+      case "depart":
+        await depart(ctx2, env3);
+        return true;
+      case "mission-kind":
+        if (v === "an" || v === "ms" || v === "lm") {
+          field3.mkind = v;
+          field3.query = "";
+        }
+        env3.render();
+        return true;
+      case "mission-open":
+        field3.mopen = field3.mopen === v ? "" : v;
+        env3.render();
+        return true;
+      case "mission-pick": {
+        const m = v.match(/^(an|ms|lm):([\s\S]*)$/);
+        const kind = m?.[1] ?? field3.mkind;
+        const name = m ? m[2] : v;
+        if (isPC() && field3.mname === name && field3.mpick === kind && field3.mopen !== `${kind}:${name}`) {
+          field3.mname = null;
+          env3.render();
+          return true;
+        }
+        await aimFlash(v);
+        field3.mname = name;
+        field3.mpick = kind;
+        toStep("team", env3);
+        return true;
+      }
+      case "mission-cancel":
+        if (v === "an" || v === "ms" || v === "in") await saveWorld(ctx2, env3, (w) => (cancelMission(w, v), null));
+        return true;
+      case "mission-unpick":
+        await aimFlash(v);
+        field3.mname = null;
+        toStep("goal", env3);
+        return true;
+      case "mission-send":
+        await sendMission(ctx2, env3, opening);
+        return true;
+    }
+    return false;
+  }
+
+  // src/ui/app.ts
+  var VEIL = { dark: "3, 7, 9", light: "20, 30, 28", paper: "40, 30, 15" };
+  function paintVeil(el, dim) {
+    const veil = VEIL[el.dataset.theme] ?? VEIL.dark;
+    el.style.background = `rgba(${veil}, ${dim / 100})`;
+  }
+  var root2 = null;
+  var view = { kind: "loading" };
+  var draft = { lang: "ko" };
+  var busy3 = false;
+  var notice = "";
+  var GNET_ON = true;
+  var TABS3 = ["board", "map", "mission", ...GNET_ON ? ["gnet"] : [], "phone", "wiki", "records"];
+  var tab = "board";
+  var repick = false;
+  var pickerPrefs = false;
+  var lastChat = "";
+  var env2 = {
+    render: () => render2(),
+    refresh: () => refresh2(),
+    close: () => close2(),
+    setNotice: (text4) => {
+      notice = text4;
+    },
+    setBusy: (on2) => {
+      busy3 = on2;
+    }
+  };
+  var wikiEnv = {
+    render: () => render2(),
+    refresh: () => refresh2(),
+    current: () => view.kind === "started" ? view.ctx : null
+  };
+  var gnetEnv = wikiEnv;
+  var settingsEnv = { render: () => render2(), refresh: () => refresh2() };
+  var peopleEnv = settingsEnv;
+  var recordsEnv = settingsEnv;
+  var shown = false;
+  var phoneEnv = {
+    render: () => render2(),
+    refresh: () => refresh2(),
+    visible: () => shown && tab === "phone" && view.kind === "started",
+    current: () => view.kind === "started" ? view.ctx : null,
+    close: async () => {
+      await close2();
+      await refresh2();
+    }
+  };
+  var esc31 = (s7) => String(s7 ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+  function ensureRoot2() {
+    if (root2) return root2;
+    setImageRedraw(() => {
+      if (view.kind === "picker") renderPicker();
+      else render2();
+      if (editorOpen()) render();
+    });
+    const style = document.createElement("style");
+    style.textContent = style_default2;
+    document.head.appendChild(style);
+    root2 = document.createElement("div");
+    root2.className = "gx";
+    document.body.appendChild(root2);
+    root2.addEventListener("toggle", (ev) => rememberPanel(ev.target), true);
+    const picker2 = document.createElement("input");
+    picker2.type = "file";
+    picker2.accept = "image/*";
+    picker2.multiple = true;
+    picker2.hidden = true;
+    document.body.appendChild(picker2);
+    let pickFor = "";
+    picker2.addEventListener("change", () => {
+      const files = [...picker2.files ?? []];
+      picker2.value = "";
+      if (files.length) void addPhotos(pickFor, files);
+    });
+    let downOutside = false;
+    root2.addEventListener("pointerdown", (ev) => downOutside = ev.target === root2);
+    root2.addEventListener("click", (ev) => {
+      const t = ev.target;
+      if (t === root2) {
+        if (downOutside) void run4("close");
+        downOutside = false;
+        return;
+      }
+      const pick3 = t.closest("[data-pick-photo]");
+      if (pick3) {
+        if (pick3.hasAttribute("disabled") || busy3) return;
+        pickFor = pick3.dataset.pickPhoto ?? "";
+        picker2.click();
+        return;
+      }
+      const zoom = t.closest("[data-zoom-photo]")?.querySelector("img");
+      if (zoom?.getAttribute("src")) return zoomPhoto(zoom.src, zoom.alt);
+      const pickMap = t.closest("[data-base-pick]");
+      if (pickMap) {
+        const img = pickMap.querySelector("img")?.getBoundingClientRect();
+        if (!img || !img.width || !img.height) return;
+        const x = (ev.clientX - img.left) / img.width * 100;
+        const y = (ev.clientY - img.top) / img.height * 100;
+        if (x < 0 || x > 100 || y < 0 || y > 100) return;
+        return void run4("dir-base-xy", `${x.toFixed(1)}|${y.toFixed(1)}|${pickMap.dataset.basePick}`);
+      }
+      const el = t.closest("[data-action]");
+      if (!el || el.hasAttribute("disabled")) return;
+      const names4 = el.dataset.take?.split(",") ?? [];
+      const val = (n2) => root2?.querySelector(`[name="${n2}"]`)?.value ?? "";
+      const take = !names4.length ? void 0 : names4.length > 1 ? JSON.stringify(names4.map(val)) : root2?.querySelector(`[name="${names4[0]}"]`)?.value;
+      void run4(el.dataset.action, take ?? el.dataset.value);
+    });
+    bindCropDrag(root2, render2);
+    root2.addEventListener("pointerdown", (ev) => {
+      const grip = ev.target.closest?.("[data-drag-agent]");
+      const row9 = grip?.closest("[data-agent-row]");
+      if (!grip || !row9 || !root2) return;
+      ev.preventDefault();
+      const box2 = root2;
+      const group5 = row9.dataset.agentGroup ?? "";
+      const rows2 = [...box2.querySelectorAll("[data-agent-row]")].filter((r) => r !== row9 && r.dataset.agentGroup === group5);
+      let drop = null;
+      const mark2 = (next) => {
+        drop?.el.classList.remove("drop-before", "drop-after");
+        drop = next;
+        drop?.el.classList.add(drop.after ? "drop-after" : "drop-before");
+      };
+      const move = (e) => {
+        let best = null;
+        let gap = Infinity;
+        for (const r of rows2) {
+          const b = r.getBoundingClientRect();
+          const d = Math.abs(e.clientY - (b.top + b.height / 2));
+          if (d < gap) [gap, best] = [d, { el: r, after: e.clientY > b.top + b.height / 2 }];
+        }
+        if (best?.el !== drop?.el || best?.after !== drop?.after) mark2(best);
+      };
+      row9.classList.add("dragging");
+      box2.classList.add("dir-dragging");
+      grip.setPointerCapture?.(ev.pointerId);
+      const up = () => {
+        grip.removeEventListener("pointermove", move);
+        grip.removeEventListener("pointerup", up);
+        grip.removeEventListener("pointercancel", up);
+        row9.classList.remove("dragging");
+        box2.classList.remove("dir-dragging");
+        const target = drop;
+        mark2(null);
+        if (target) void run4("dir-move", `${target.after ? "after" : "before"}|${grip.dataset.dragAgent}|${target.el.dataset.agentRow}`);
+      };
+      grip.addEventListener("pointermove", move);
+      grip.addEventListener("pointerup", up);
+      grip.addEventListener("pointercancel", up);
+    });
+    root2.addEventListener("change", (ev) => {
+      if (ev.target.dataset?.input === "dir-crop-size") render2();
+    });
+    const photoTarget = (el) => {
+      const box2 = el?.closest?.(".gn-pane, .gn-cpane, .gn-inline, .gn-composer, .ph-room");
+      return box2 ? box2.matches(".gn-pane, .gn-cpane, .gn-inline, .gn-composer") ? "gn" : "ph" : "";
+    };
+    const imageFiles = (list4) => [...list4 ?? []].map((x) => x instanceof File ? x : x.kind === "file" ? x.getAsFile() : null).filter((f) => !!f && f.type.startsWith("image/"));
+    if (!widthWatch) {
+      widthWatch = true;
+      matchMedia(PHONE_MQ).addEventListener?.("change", () => root2 && render2());
+      const frameWatch = () => {
+        if (!root2 || root2.style.display === "none") return;
+        const fr = frameState(getPrefs().frame, view.kind === "started");
+        if (root2.dataset.frame !== fr.kind || root2.dataset.frameHidden === "1" !== fr.hidden) render2();
+      };
+      window.addEventListener("resize", frameWatch);
+      document.addEventListener("fullscreenchange", frameWatch);
+    }
+    root2.addEventListener("paste", (ev) => {
+      const prefix = photoTarget(ev.target);
+      const files = imageFiles(ev.clipboardData?.items);
+      if (!prefix || !files.length) return;
+      ev.preventDefault();
+      void addPhotos(prefix, files);
+    });
+    root2.addEventListener("dragover", (ev) => {
+      if (photoTarget(ev.target) && ev.dataTransfer?.types.includes("Files")) ev.preventDefault();
+    });
+    root2.addEventListener("drop", (ev) => {
+      const prefix = photoTarget(ev.target);
+      if (!prefix || !ev.dataTransfer?.files.length) return;
+      ev.preventDefault();
+      const files = imageFiles(ev.dataTransfer.files);
+      if (files.length) void addPhotos(prefix, files);
+      else if (prefix === "gn") gnet.notice = "사진 파일만 끌어놓을 수 있어요.", render2();
+      else phone.notice = "사진 파일만 끌어놓을 수 있어요.", render2();
+    });
+    root2.addEventListener("keydown", (ev) => {
+      const el = ev.target;
+      if (ev.key === "Enter" && !ev.shiftKey && !ev.isComposing && el?.dataset?.input === "ph-draft" && matchMedia("(pointer: fine)").matches) {
+        const send2 = root2?.querySelector(".ph-send");
+        ev.preventDefault();
+        if (send2 && !send2.disabled) void run4("ph-send", send2.dataset.value);
+        return;
+      }
+      if (ev.key !== "Enter" || ev.isComposing || !el?.dataset?.enter) return;
+      ev.preventDefault();
+      void run4(el.dataset.enter, el.value);
+    });
+    root2.addEventListener("submit", (ev) => {
+      ev.preventDefault();
+      const form = ev.target;
+      const input3 = form.querySelector("input");
+      if (form.dataset.submit) void run4(form.dataset.submit, input3?.value ?? "");
+    });
+    root2.addEventListener("change", (ev) => panelChange(ev.target));
+    root2.addEventListener("input", (ev) => panelInput(ev.target));
+    bindAgentTips(root2);
+    bindPeopleStatus(() => {
+      if (shown && view.kind === "started") render2();
+    });
+    bindPeopleHold(root2);
+    document.addEventListener("keydown", (ev) => {
+      if (ev.key !== "Escape") return;
+      if (editorOpen()) return;
+      if (document.querySelector(".gx-rptpop")) return void handle2("rec-back");
+      const pop = document.querySelector(".gx-agpop");
+      if (pop) return void pop.remove();
+      if (evUi.pop || agUi.pop) {
+        evUi.pop = agUi.pop = "";
+        render2();
+        return;
+      }
+      void close2();
+    });
+    return root2;
+  }
+  function panelChange(el) {
+    if (el?.dataset?.change) void run4(el.dataset.change, el.dataset.key ? `${el.dataset.key}=${el.value}` : el.value);
+  }
+  function panelInput(el) {
+    if (el?.dataset?.input === "dim" && root2) {
+      paintVeil(root2, Number(el.value));
+      const out = el.parentElement?.querySelector("output");
+      if (out) out.textContent = `${el.value}%`;
+      return;
+    }
+    if (el?.dataset?.input === "pp-cap") {
+      const out = el.parentElement?.querySelector("output");
+      if (out) out.textContent = Number(el.value) === 0 ? "한도 없음" : `±${el.value}`;
+      return;
+    }
+    if (el?.dataset?.input === "pct" || el?.dataset?.input === "count") {
+      const out = el.parentElement?.querySelector("output");
+      if (out) out.textContent = `${el.value}${el.dataset.input === "pct" ? "%" : "개"}`;
+      return;
+    }
+    if (el?.dataset?.input === "wallet-q" && view.kind === "started") {
+      walletUi.q = el.value;
+      const box3 = root2?.querySelector(".gx-wt-list");
+      if (box3) box3.innerHTML = walletList(view.ctx);
+      return;
+    }
+    if (el?.dataset?.input === "rec-q" && view.kind === "started") {
+      recordsInput("rec-q", el.value);
+      const box3 = root2?.querySelector(".gx-jr-list");
+      if (box3) box3.innerHTML = journalList(view.ctx);
+      return;
+    }
+    if (el?.dataset?.input === "wiki-query" && view.kind === "started") {
+      wiki.query = el.value;
+      const box3 = root2?.querySelector(".nw .ph-content");
+      if (box3) box3.innerHTML = wikiList(view.ctx);
+      return;
+    }
+    if (el?.dataset?.input === "wiki-home-query" && view.kind === "started") {
+      wiki.homeQuery = el.value;
+      const box3 = root2?.querySelector(".nw-hero-res");
+      if (box3) box3.innerHTML = wikiHomeResults(view.ctx);
+      return;
+    }
+    if (el?.dataset?.input && wikiInput(el.dataset.input, el.value)) return;
+    if (el?.dataset?.input && peopleInput(el.dataset.input, el.value)) return;
+    if (el?.dataset?.input && imgInput(el.dataset.input, el.value)) return;
+    if (el?.dataset?.input === "gn-draft") return void (gnet.draft = el.value);
+    if (el?.dataset?.input === "gn-to") return void (gnet.to = el.value);
+    if (el?.dataset?.input === "gn-att") return void attachInput(gnet.attach, el.dataset.key, el.value);
+    if (el?.dataset?.input === "ph-query" && view.kind === "started") {
+      const box3 = root2?.querySelector(".ph-content");
+      if (box3) box3.innerHTML = phoneContent(view.ctx, el.value);
+      return;
+    }
+    if (el?.dataset?.input === "ph-pick-q" && view.kind === "started") {
+      phoneInput("ph-pick-q", el.value);
+      const box3 = root2?.querySelector(".ph-pick");
+      if (box3) box3.innerHTML = phonePickList(view.ctx);
+      return;
+    }
+    if (el?.dataset?.input === "dir-q" && (view.kind === "started" || view.kind === "picker")) {
+      dirUi.q = el.value;
+      const box3 = root2?.querySelector(".dir-list");
+      if (box3) box3.innerHTML = directoryList(view.ctx);
+      return;
+    }
+    if (el?.dataset?.input === "dir-crop-size") {
+      const key2 = el.dataset.key ?? "";
+      const [x, y] = cropValue(key2);
+      setCrop(key2, [x, y, Number(el.value)]);
+      const frame = root2?.querySelector("[data-crop] .dir-crop-frame");
+      if (frame) frame.style.width = `${el.value}%`;
+      return;
+    }
+    if (el?.dataset?.input === "dir-photo-q" && (view.kind === "started" || view.kind === "picker")) {
+      dirUi.pickQ = el.value;
+      const box3 = root2?.querySelector(".dir-pics");
+      if (box3) box3.innerHTML = directoryPhotoList(view.ctx);
+      return;
+    }
+    if (el?.dataset?.input === "dir-ext-q" && (view.kind === "started" || view.kind === "picker")) {
+      dirUi.addQ = el.value;
+      const box3 = root2?.querySelector(".dir-ext-list");
+      if (box3) box3.innerHTML = directoryExtList(view.ctx);
+      return;
+    }
+    if (el?.dataset?.input === "dir") return void directoryInput(el.dataset.key ?? "", el.value, root2?.querySelector(".dir-bar") ?? null);
+    if (el?.dataset?.input && phoneInput(el.dataset.input, el.value, el.dataset.key)) return;
+    if (el?.dataset?.input === "field-note") return void (field3.note = el.value);
+    if (el?.dataset?.input === "map-query" && view.kind === "started") {
+      const box3 = root2?.querySelector(".gx-mapsug");
+      if (box3) box3.innerHTML = mapSuggestFor(view.ctx, el.value);
+      return;
+    }
+    if (el?.dataset?.input === "start-note") {
+      const had = !!(draft.situation ?? "").trim();
+      draft.situation = el.value;
+      if (had !== !!el.value.trim()) root2?.querySelector(".gx-foot .gx-start")?.toggleAttribute("disabled", !el.value.trim() || busy3);
+      return;
+    }
+    if (el?.dataset?.input !== "mission-query") return;
+    field3.query = el.value;
+    const box2 = root2?.querySelector(".gx-mbox");
+    if (box2 && (view.kind === "started" || view.kind === "opening")) box2.innerHTML = missionList(view.ctx, view.kind === "opening");
+  }
+  async function addPhotos(prefix, files) {
+    if (view.kind !== "started") return;
+    const ui = prefix === "gn" ? gnet : prefix === "ph" ? phone : null;
+    if (!ui) return;
+    if (prefix === "gn" && !gnet.compose) return;
+    if (prefix === "ph") {
+      const r = readPhone(view.ctx.chat).rooms[phone.room ?? ""];
+      if (!r || !r.members.length || r.pending) return;
+    }
+    for (const file of files) {
+      if (ui.attach.length >= ATTACH_MAX) {
+        ui.notice = `첨부는 ${ATTACH_MAX}개까지예요.`;
+        break;
+      }
+      try {
+        const { asset, preview } = await savePhoto(file);
+        addPhoto(ui.attach, asset, preview);
+        ui.notice = "";
+      } catch (error) {
+        ui.notice = error instanceof Error ? error.message : String(error);
+        break;
+      }
+    }
+    render2();
+  }
+  var widthWatch = false;
+  async function openApp(opts = {}) {
+    ensureRoot2();
+    if (opts.quietIfNotLite) {
+      const ctx2 = await loadContext().catch(() => null);
+      if (!ctx2 || !isGoeiLore(ctx2.char.globalLore)) return;
+    }
+    view = { kind: "loading" };
+    notice = "";
+    render2();
+    shown = true;
+    if (root2) startCctvFx(root2);
+    await showWindow();
+    await refresh2();
+    void loadModuleAssets().then((changed) => {
+      if (shown && changed) render2();
+    });
+    void readUser().then((u) => {
+      if (shown && (u.name || u.photo)) render2();
+    });
+    void checkLatest(settingsEnv);
+  }
+  var installCtx = null;
+  async function openInstall() {
+    if (!shown) await openApp();
+    installCtx = await loadContext().catch(() => null);
+    if (!installCtx) {
+      ensureRoot2();
+      view = { kind: "error", message: "선택된 채팅이 없어요. 설치할 봇의 채팅을 연 뒤 다시 눌러 주세요." };
+      render2();
+      shown = true;
+      await showWindow();
+      return;
+    }
+    if (view.kind === "picker") pickerPrefs = true;
+    const host2 = {
+      ctx: () => view.kind === "started" || view.kind === "picker" || view.kind === "opening" ? view.ctx : installCtx,
+      refresh: async () => {
+        installCtx = await loadContext().catch(() => null) ?? installCtx;
+        if (shown) await refresh2();
+        if (view.kind === "picker") pickerPrefs = true;
+      },
+      theme: () => root2?.dataset.theme ?? getPrefs().theme ?? "dark",
+      handle: (a, v) => handle2(a, v),
+      input: panelInput,
+      change: panelChange,
+      canChat: () => view.kind === "started",
+      mobileNav: mobileNavHtml
+    };
+    await refreshInstall(installCtx);
+    openEditor(host2, "install");
+  }
+  async function openWiki2(title2) {
+    await openApp({ quietIfNotLite: true });
+    if (view.kind === "started") await handle2("wiki-goto", title2);
+  }
+  async function openRecords2(id) {
+    await openApp({ quietIfNotLite: true });
+    if (view.kind === "started") await handle2("rec-open", id);
+  }
+  async function refresh2() {
+    try {
+      const ctx2 = await loadContext();
+      if (ctx2) await prepareBaseDocs(ctx2.char.globalLore).catch(() => void 0);
+      if (!ctx2) {
+        view = { kind: "error", message: `선택된 채팅이 없어요. ${BRAND.name} 채팅을 연 뒤 다시 눌러 주세요.` };
+      } else {
+        const manifest = readManifest(ctx2.char.globalLore);
+        const phase = chatPhase(ctx2.chat);
+        if (manifest) {
+          applyAdvanced(ctx2.chat.scriptstate);
+          void readPersona();
+        }
+        const chatKey4 = `${ctx2.charIndex}:${ctx2.chatIndex}`;
+        if (chatKey4 !== lastChat) {
+          lastChat = chatKey4;
+          navHist.clear();
+          resetField(true);
+          resetWiki();
+          resetRecords();
+          resetGnet();
+          resetPhone();
+          resetSettings();
+          resetDirectory();
+          pickerPrefs = false;
+          repick = false;
+        }
+        const cur = currentChoice(ctx2.chat);
+        const facs = factionList(ctx2.char.globalLore);
+        const presetStaged = phase === "staged" && !!cur.faction && !!cur.fm && findScenario(cur.faction, cur.fm, facs)?.kind === "preset";
+        if (!manifest) view = { kind: "not-lite", name: String(ctx2.char.name ?? ""), goei: isGoeiLore(ctx2.char.globalLore) };
+        else if (phase === "started") view = { kind: "started", ctx: ctx2 };
+        else if (presetStaged && !repick) view = { kind: "opening", ctx: ctx2 };
+        else {
+          view = { kind: "picker", ctx: ctx2, manifest, staged: phase === "staged" };
+          draft = { faction: cur.faction ?? draft.faction, lang: cur.lang ?? draft.lang, fm: cur.fm ?? draft.fm, player: cur.player ?? draft.player ?? "" };
+          if (draft.faction && !facs.some((f) => f.code === draft.faction && !f.hidden)) draft = { lang: draft.lang };
+          const fsel = draft.faction ? findFaction(draft.faction, facs) : void 0;
+          if (fsel) {
+            const list4 = scenariosFor(fsel, draft.player, ctx2.char.globalLore);
+            if (!list4.some((x) => x.fm === draft.fm)) draft.fm = list4[0]?.fm ?? defaultScenario(fsel.code, facs);
+          }
+        }
+      }
+    } catch (error) {
+      view = { kind: "error", message: `채팅 정보를 읽지 못했어요: ${error instanceof Error ? error.message : String(error)}` };
+    }
+    render2();
+  }
+  async function close2() {
+    shown = false;
+    stopCctvFx();
+    await risuai.hideContainer();
+  }
+  async function stagedTheme(ctx2, value) {
+    if (value !== "light" && value !== "dark" && value !== "paper") return;
+    try {
+      const saved = await updateChat(
+        ctx2.charIndex,
+        ctx2.chatIndex,
+        (chat) => chatPhase(chat) === "started" || chat.scriptstate?.["$st_fixed_theme"] === value ? null : { ...chat, scriptstate: { ...chat.scriptstate ?? {}, $st_fixed_theme: value } }
+      );
+      if (saved) ctx2.chat = saved;
+    } catch (error) {
+      console.log(`[goei] 테마 저장 실패: ${error instanceof Error ? error.message : String(error)}`);
+    }
+    render2();
+  }
+  var run4 = (action, value) => handle2(action, value).catch((error) => console.log(`[goei] 조작 실패(${action}): ${error instanceof Error ? error.message : String(error)}`));
+  async function handle2(action, value) {
+    if (busy3) return;
+    if (evUi.pop && action !== "ev-pop" && action !== "end-event") evUi.pop = "";
+    if (agUi.pop && action !== "agent-info") agUi.pop = "";
+    if (action.startsWith("adv-") && (view.kind === "started" || view.kind === "picker" && pickerPrefs)) {
+      const feat = (value ?? "").split(/[:=]/)[0];
+      const scope = feat !== "gen" ? "chat" : view.kind === "started" ? settingsUi.scope === "defaults" ? "defaults" : "chat" : "defaults";
+      await handleAdvanced(action, value, view.ctx, { render: render2, refresh: refresh2 }, scope);
+      return;
+    }
+    const featCtx = view.kind === "started" || view.kind === "picker" && pickerPrefs && settingsUi.page ? view.ctx : null;
+    if (action === "wiki-back" && view.kind === "started" && !wiki.history.some((h) => h.view !== "home") && navHist.can(-1)) {
+      const run5 = navStep(-1);
+      return run5 ? run5() : render2();
+    }
+    if (featCtx && action.startsWith("wiki-") && await handleWiki(action, value, featCtx, wikiEnv)) return;
+    if (featCtx && action.startsWith("pp-") && await handlePeople(action, value, featCtx, peopleEnv)) return;
+    if (featCtx && (action.startsWith("rec-") || action.startsWith("jr-"))) {
+      if (action === "rec-back" && !await handleRecords(action, value, featCtx, recordsEnv)) {
+        const go2 = navStep(-1);
+        return go2 ? go2() : render2();
+      }
+      const switching = (action === "rec-open" || action === "rec-journal" || action === "rec-person" || action === "rec-people") && tab !== "records";
+      if (switching) {
+        tab = "records";
+        notice = "";
+        field3.confirmEnd = null;
+        resetSettings();
+      }
+      if (action !== "rec-back" && !await handleRecords(action, value, featCtx, recordsEnv) && switching) render2();
+      return;
+    }
+    if (action.startsWith("ip-") && await handleImgPrompt(action, value, { render: render2 })) return;
+    if (featCtx && action.startsWith("gn-") && await handleGnet(action, value, featCtx, gnetEnv)) return;
+    if (featCtx && action.startsWith("ph-") && await handlePhone(action, value, featCtx, phoneEnv)) return;
+    if (action === "ed-open") {
+      document.querySelectorAll(".gx-agpop").forEach((b) => b.remove());
+      if (!(view.kind === "started" || view.kind === "picker" || view.kind === "opening")) return;
+      if (view.kind === "picker") pickerPrefs = true;
+      settingsUi.scope = view.kind === "started" ? settingsUi.scope === "defaults" ? "defaults" : "chat" : "defaults";
+      openEditor({
+        ctx: () => view.kind === "started" || view.kind === "picker" || view.kind === "opening" ? view.ctx : null,
+        refresh: () => refresh2(),
+        theme: () => root2?.dataset.theme ?? "dark",
+        handle: (a, v) => handle2(a, v),
+        input: panelInput,
+        change: panelChange,
+        canChat: () => view.kind === "started",
+        mobileNav: mobileNavHtml
+      }, value || void 0);
+      return;
+    }
+    if (action === "install-open") {
+      await openInstall();
+      return;
+    }
+    if (action === "set-editor-width") {
+      await savePrefs((p) => ({ ...p, editorWidth: Math.max(50, Math.min(100, Number(value) || 90)) }));
+      return render2();
+    }
+    const FEAT_SET = { "gn-settings": "set:gnet", "ph-settings": "set:phone", "wiki-settings": "set:wiki" };
+    if (FEAT_SET[action]) return handle2("ed-open", FEAT_SET[action]);
+    if (action === "prefs-open" || action === "prefs-close") {
+      resetSettings();
+      resetDirectory();
+      settingsUi.scope = "defaults";
+      if (action === "prefs-open") return handle2("ed-open", "set:screen");
+      pickerPrefs = false;
+      return render2();
+    }
+    if ((view.kind === "started" || view.kind === "picker" && pickerPrefs) && action.startsWith("dir-")) {
+      if (action === "dir-save" || action === "dir-reset") settingsUi.confirm = "";
+      await handleDirectory(action, value, view.ctx, settingsEnv);
+      return;
+    }
+    if (view.kind === "picker" && pickerPrefs && (action.startsWith("set-") || action.startsWith("visit-"))) {
+      if (settingsUi.busy) return;
+      await handleSettings(action, value, view.ctx, settingsEnv, settingsUi.scope === "chat" ? "defaults" : settingsUi.scope);
+      if (action === "set-theme" && view.kind === "picker" && view.staged) await stagedTheme(view.ctx, value);
+      return;
+    }
+    if (view.kind === "started" && (action.startsWith("set-") || action.startsWith("visit-"))) {
+      const scope = action === "set-theme" ? "chat" : settingsUi.scope === "defaults" ? "defaults" : "chat";
+      if (!settingsUi.busy) await handleSettings(action, value, view.ctx, settingsEnv, scope);
+      return;
+    }
+    if (action === "upd-go") {
+      return handle2("ed-open", "set:update");
+    }
+    if (action.startsWith("upd-") && (view.kind === "started" || view.kind === "picker") && await handleUpdate(action, view.ctx, settingsEnv)) return;
+    if (action === "pick-event" && view.kind === "started" && tab !== "map") {
+      await aimFlash(value ?? "");
+      await handleField(action, value, view.ctx, env2, false);
+      if (field3.target?.type === "event" && field3.target.key === value && showOnMap(view.ctx, value ?? "")) {
+        tab = "map";
+        evUi.pop = "";
+        field3.step = "goal";
+        notice = "";
+        render2();
+      }
+      return;
+    }
+    if ((view.kind === "started" || view.kind === "opening") && await handleField(action, value, view.ctx, env2, view.kind === "opening")) return;
+    switch (action) {
+      case "close":
+        return close2();
+      case "faction": {
+        const facs = view.kind === "picker" ? factionList(view.ctx.char.globalLore) : SCENARIOS.factions;
+        const f = findFaction(value ?? "", facs);
+        if (!f) return;
+        if (draft.faction !== f.code) {
+          draft.fm = defaultScenario(f.code, facs);
+          draft.player = "";
+          if (f.group && view.kind === "picker") {
+            const first = playableAgents(view.ctx.char.globalLore, f.code)[0];
+            if (first) {
+              draft.player = first.id;
+              draft.fm = scenariosFor(f, first.id, view.ctx.char.globalLore)[0]?.fm;
+            }
+          }
+        }
+        draft.faction = f.code;
+        notice = "";
+        return renderPicker();
+      }
+      case "lang":
+        if (value === "ko" || value === "en") draft.lang = value;
+        return renderPicker();
+      case "fm":
+        draft.fm = Number(value);
+        notice = "";
+        return renderPicker();
+      case "player": {
+        if (view.kind !== "picker") return;
+        const lore = view.ctx.char.globalLore;
+        const f = draft.faction ? findFaction(draft.faction, factionList(lore)) : void 0;
+        if (f?.group && !value) return;
+        draft.player = value ?? "";
+        if (f) {
+          const list4 = scenariosFor(f, draft.player, lore);
+          if (!list4.some((x) => x.fm === draft.fm)) draft.fm = list4[0]?.fm;
+        }
+        notice = "";
+        return renderPicker();
+      }
+      case "start":
+        return start();
+      case "nav-tab":
+      case "tab":
+        if (action === "nav-tab" && value === tab && value !== "board" && !isPhone()) value = "board";
+        if (value === "settings") return handle2("ed-open", "set:screen");
+        if (value === "wallet") return openWallet();
+        if (value === "records" && tab !== "records") applyRecordsNav({ sub: "journal", view: "list", id: "" });
+        tab = TABS3.includes(value) ? value : "board";
+        notice = "";
+        field3.confirmEnd = null;
+        resetSettings();
+        render2();
+        if (view.kind === "started" && tab === "phone") openCheck(view.ctx, phoneEnv);
+        if (view.kind === "started" && tab === "gnet") gnetOpenCheck(view.ctx, gnetEnv);
+        if (view.kind === "started" && tab === "wiki") wikiOpenCheck(view.ctx, wikiEnv);
+        return;
+      case "nav-back":
+      case "nav-fwd": {
+        markUi.pop = false;
+        const run5 = navStep(action === "nav-back" ? -1 : 1);
+        return run5 ? run5() : render2();
+      }
+      case "mk-pop":
+        markUi.pop = !markUi.pop;
+        return render2();
+      case "mk-go": {
+        const m = marks()[Number(value)];
+        if (!m || view.kind !== "started") return;
+        markUi.pop = false;
+        closeDrawer("gx-bdrawer");
+        if (m.s.tab === "settings") return handle2("ed-open", "set:screen");
+        return applyNav(openable(view.ctx, m.s));
+      }
+      case "mk-here":
+      case "mk-add": {
+        if (view.kind !== "started") return;
+        const m = action === "mk-here" ? currentMark() : markCandidates(recentMarks(), currentMark())[Number(value)];
+        if (m) await addMark(m);
+        return render2();
+      }
+      case "mk-del":
+        await removeMarkAt(Number(value));
+        return render2();
+      case "feature-set":
+        if (value === "phone" || value === "wiki" || value === "people" || value === "image" || value === "gnet" && GNET_ON) return handle2("ed-open", `set:${value}`);
+        return;
+      case "ops-sel":
+        opsUi.sel = value ?? "";
+        field3.confirmEnd = null;
+        render2();
+        if (isPhone()) root2?.querySelector(".gx-opview")?.scrollIntoView({ block: "start", behavior: "smooth" });
+        return;
+      case "ops-mode":
+        opsUi.mode = value === "map" ? "map" : "feed";
+        return render2();
+      case "ev-pop":
+        evUi.pop = evUi.pop === value ? "" : value ?? "";
+        return render2();
+      case "board-map":
+        if (view.kind !== "started" || !showOnMap(view.ctx, value ?? "")) return;
+        tab = "map";
+        notice = "";
+        return render2();
+      case "id-card": {
+        if (view.kind !== "started") return;
+        showIdCard(idCard(view.ctx), (a, v) => void run4(a, v));
+        return;
+      }
+      case "wallet-pop":
+        return handle2("tab", "wallet");
+      case "wallet-filter":
+        walletUi.filter = value === "in" || value === "out" ? value : "all";
+        return render2();
+      case "wallet-open":
+        walletUi.open = walletUi.open === value ? null : value ?? null;
+        return render2();
+      case "wallet-edit":
+        if (view.kind !== "started" || !walletEditable(view.ctx.chat.scriptstate)) return;
+        walletUi.edit = !walletUi.edit;
+        walletUi.notice = "";
+        render2();
+        if (walletUi.edit) root2?.querySelector('[name="wt-adj"]')?.focus();
+        return;
+      case "wallet-del": {
+        if (view.kind !== "started" || !value || !walletEditable(view.ctx.chat.scriptstate)) return;
+        const ctx2 = view.ctx;
+        await updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => {
+          const w = readWallet(chat.scriptstate, getPrefs().walletStart ?? WALLET_START_DEFAULT);
+          return { ...chat, scriptstate: { ...chat.scriptstate ?? {}, ...walletVars(removeWalletEntry(w, value ?? "")) } };
+        });
+        return refresh2();
+      }
+      case "wallet-adj": {
+        if (view.kind !== "started" || !walletEditable(view.ctx.chat.scriptstate)) return;
+        const n2 = parseWon(value ?? "");
+        if (n2 === null) {
+          walletUi.notice = "금액을 읽을 수 없어요. 숫자 또는 「120만」처럼 적어 주세요.";
+          return render2();
+        }
+        const ctx2 = view.ctx;
+        await updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => {
+          const w = readWallet(chat.scriptstate, getPrefs().walletStart ?? WALLET_START_DEFAULT);
+          return { ...chat, scriptstate: { ...chat.scriptstate ?? {}, ...walletVars(adjustWallet(w, aliveAnchors(chat), n2)) } };
+        });
+        walletUi.notice = "";
+        walletUi.edit = false;
+        return refresh2();
+      }
+      case "agents-view":
+        if (value !== "wall" && value !== "list") return;
+        await savePrefs((p) => ({ ...p, agents: value === "list" ? "list" : void 0 }));
+        return render2();
+      case "agent-info":
+        agUi.pop = agUi.pop === value ? "" : value ?? "";
+        return render2();
+      case "agent-talk":
+        if (view.kind !== "started") return;
+        tab = "phone";
+        notice = "";
+        resetField();
+        if (!await openAgentDm(view.ctx, phoneEnv, value ?? "")) render2();
+        if (view.kind === "started") openCheck(view.ctx, phoneEnv);
+        return;
+      case "wiki-goto":
+        if (view.kind !== "started") return;
+        tab = "wiki";
+        resetWiki();
+        gnet.compose = null;
+        phone.view = phone.view === "room" ? "room" : "list";
+        resetField();
+        await handleWiki("wiki-write", value, view.ctx, wikiEnv);
+        return;
+      case "people-goto":
+        if (view.kind !== "started" || !value || !hasPersonRecord(view.ctx, value)) return;
+        tab = "records";
+        gnet.compose = null;
+        phone.view = phone.view === "room" ? "room" : "list";
+        resetField();
+        await handleRecords("rec-person", value, view.ctx, recordsEnv);
+        return;
+      case "repick":
+        repick = true;
+        notice = "";
+        return refresh2();
+      case "world-on":
+        return turnWorldOn();
+    }
+  }
+  async function start() {
+    if (view.kind !== "picker" || !draft.faction || draft.fm === void 0) return;
+    const { ctx: ctx2, manifest } = view;
+    busy3 = true;
+    notice = "";
+    render2();
+    try {
+      const choice = { faction: draft.faction, lang: draft.lang, fm: draft.fm, ...draft.player ? { player: draft.player } : {} };
+      const lore = ctx2.char.globalLore ?? [];
+      let world2 = null;
+      try {
+        if (basicDefaults(lore).anomalyOn) world2 = startWorldVars(parseCatalog(lore), worldDefaults(lore), effectiveFaction(lore, choice.faction, draft.player), Math.random, draft.player ?? "");
+      } catch (error) {
+        console.log(`[goei] 상황판 준비 실패: ${error instanceof Error ? error.message : String(error)}`);
+      }
+      const plan = planStart(choice, manifest, lore, ctx2.char.alternateGreetings?.length ?? 0, world2);
+      const situation = plan.kind === "direct" ? (draft.situation ?? "").trim() : "";
+      if (plan.kind === "direct" && !situation) throw new StartError("시작할 상황을 적어 주세요.");
+      setOpeningHint(plan.kind === "opening" ? plan.scene ?? null : null);
+      const saved = await updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => {
+        if (chatPhase(chat) === "started") throw new StartError("그새 대화가 시작됐어요. 새 채팅에서 다시 골라 주세요.");
+        const next = applyStart(chat, plan);
+        if (situation) next.message = [...next.message ?? [], newMessage2(startRecord(situation))];
+        const theme = getPrefs().theme ?? "dark";
+        return {
+          ...next,
+          scriptstate: { ...basicVars(basicDefaults(lore)), ...worldVarsOf(worldDefaults(lore)), $st_fixed_theme: theme, ...getPrefs().vars ?? {}, ...next.scriptstate ?? {} }
+        };
+      });
+      if (!saved) throw new StartError("저장하지 못했어요.");
+      if (plan.seedMissing.length) console.log(`[goei] 시작 자료 누락: ${plan.seedMissing.join(", ")}`);
+      busy3 = false;
+      repick = false;
+      settingsUi.scope = "chat";
+      pickerPrefs = false;
+      if (plan.kind === "preset") {
+        resetField(true);
+        return refresh2();
+      }
+      draft.situation = "";
+      if (situation && !await sendNow()) await markUnsent(ctx2.charIndex, ctx2.chatIndex).catch(() => {
+      });
+      await close2();
+      await refresh2();
+    } catch (error) {
+      busy3 = false;
+      notice = error instanceof Error ? error.message : String(error);
+      render2();
+    }
+  }
+  async function turnWorldOn() {
+    if (view.kind !== "started") return;
+    const { ctx: ctx2 } = view;
+    busy3 = true;
+    notice = "";
+    render2();
+    try {
+      const catalog = parseCatalog(ctx2.char.globalLore);
+      await updateChat(ctx2.charIndex, ctx2.chatIndex, (chat) => {
+        if (worldOn(chat)) return null;
+        const faction = String(chat.scriptstate?.["$st_faction"] ?? "");
+        return { ...chat, scriptstate: { ...chat.scriptstate ?? {}, ...startWorldVars(catalog, worldSettings(ctx2.char.globalLore, chat.scriptstate), faction, Math.random, String(chat.scriptstate?.["$st_player"] ?? "")) } };
+      });
+      busy3 = false;
+      await refresh2();
+    } catch (error) {
+      busy3 = false;
+      notice = error instanceof Error ? error.message : String(error);
+      render2();
+    }
+  }
+  var TAB_TITLE = {
+    board: "상황판",
+    map: "임무",
+    mission: "커스텀",
+    gnet: "괴담넷",
+    phone: "괴담톡",
+    wiki: "위키",
+    records: "기록",
+    settings: "설정"
+  };
+  function header(title2, extra = "", sub = "") {
+    return `<header class="gx-head">
+    <div class="gx-brand"><span class="gx-logo">${GHOST_ICON}</span><div><b>${esc31(title2)}</b>${sub ? `<small>${esc31(sub)}</small>` : ""}</div></div>
+    <div class="gx-head-act">${extra}<button class="gx-x" data-action="close" aria-label="닫기">${ICONS.close}</button></div>
+  </header>`;
+  }
+  function startedHeader(ctx2) {
+    return `<header class="gx-head">
+    <div class="gx-brand gx-tabhead"><span class="gx-logo">${GHOST_ICON}</span><div><b>${tab === "gnet" ? gnetLabel(ctx2.chat.scriptstate) : TAB_TITLE[tab]}</b></div></div>
+    <div class="gx-head-act">
+      ${walletHeadButton(ctx2)}
+      <button class="gx-x gx-recbtn${tab === "records" ? " on" : ""}" data-action="tab" data-value="records" aria-label="기록" title="기록">${ICONS.records}</button>
+      <button class="gx-x gx-idbtn" data-action="id-card" aria-label="내 ID카드">${userInfo().photo ? `<img src="${esc31(userInfo().photo)}" alt="">` : ICONS.idcard}</button>
+      <button class="gx-x" data-action="ed-open" data-value="set:screen" aria-label="설정">${ICONS.settings}${hasUpdate(ctx2) ? '<span class="gx-xdot" aria-label="새 버전"></span>' : ""}</button>
+      <button class="gx-x" data-action="close" aria-label="닫기">${ICONS.close}</button></div>
+  </header>`;
+  }
+  function renderPicker() {
+    const facs = root2?.querySelectorAll(".gx-facs .gx-fac");
+    const main = root2?.querySelector(".gx-body");
+    if (!root2 || view.kind !== "picker" || !facs?.length || !main || root2.querySelector(".gx-settings")) return render2();
+    const tpl = document.createElement("template");
+    tpl.innerHTML = body4();
+    const next = tpl.content.querySelectorAll(".gx-facs .gx-fac");
+    if (next.length !== facs.length) return render2();
+    next.forEach((b, i) => {
+      if (b.classList.contains("has-img") !== facs[i].classList.contains("has-img")) return void facs[i].replaceWith(b);
+      facs[i].className = b.className;
+      facs[i].setAttribute("aria-pressed", b.getAttribute("aria-pressed") ?? "false");
+    });
+    const sections3 = main.querySelectorAll(":scope > section");
+    const fresh = tpl.content.querySelectorAll(".gx-body > section");
+    if (sections3.length !== fresh.length) return render2();
+    for (let i = 1; i < sections3.length; i++) sections3[i].replaceWith(fresh[i]);
+    const foot = root2.querySelector(".gx-foot");
+    const nfoot = tpl.content.querySelector(".gx-foot");
+    if (foot && nfoot) foot.replaceWith(nfoot);
+    else return render2();
+  }
+  var INNER_SCROLL = ".gx-acards, .gx-sidecol, .gx-mbox, .gx-sits, .gx-bd-col > .gx-evcs, .nw-groups";
+  var PAGE_SCROLL = ".st-featpage .ph-form-body, .nw-pane .nw-doc";
+  var pageKey = () => `${tab}|${settingsUi.page}|${wiki.view}|${wiki.title}|${rec.sub}|${rec.view}|${rec.id}`;
+  function render2() {
+    if (!root2) return;
+    if (editorOpen() && editorOnSettings()) queueMicrotask(() => render());
+    const nav = view.kind === "started";
+    if (view.kind === "started") syncCloseToast(view.ctx.chat, render2);
+    const scroller = root2.querySelector(".gx-body");
+    const keep = scroller && root2.dataset.tab === tab ? scroller.scrollTop : 0;
+    const inner = root2.dataset.tab === tab ? [...root2.querySelectorAll(INNER_SCROLL)].map((el) => el.scrollTop) : [];
+    const pageKeep = root2.dataset.pk === pageKey() ? [...root2.querySelectorAll(PAGE_SCROLL)].map((el) => el.scrollTop) : [];
+    const log = root2.querySelector(".ph-log");
+    const logRoom = root2.dataset.room ?? "";
+    const logKeep = log && logRoom === (phone.room ?? "") ? log.scrollHeight - log.scrollTop - log.clientHeight < 60 ? -1 : log.scrollTop : -1;
+    const gnKey = `${gnet.sub}:${gnet.open}:${gnet.openDm}`;
+    const gnKeep = tab === "gnet" && root2.dataset.tab === "gnet" && root2.dataset.gn === gnKey ? [".gn .ph-content", ".gn-pane .gn-doc"].map((q) => root2.querySelector(q)?.scrollTop ?? 0) : null;
+    const act = document.activeElement;
+    const focusSel = act && root2.contains(act) && act.dataset?.input ? `[data-input="${CSS.escape(act.dataset.input)}"]${act.dataset.key ? `[data-key="${CSS.escape(act.dataset.key)}"]` : ""}` : "";
+    const caret = focusSel && typeof act.selectionStart === "number" ? [act.selectionStart, act.selectionEnd ?? act.selectionStart] : null;
+    root2.dataset.theme = themeOf();
+    const pf = getPrefs();
+    root2.dataset.nav = pf.nav ?? "left";
+    root2.dataset.wikiSide = pf.wikiSide ?? "right";
+    paintVeil(root2, pf.dim ?? DIM_DEFAULT);
+    const fr = frameState(pf.frame, nav);
+    root2.dataset.frame = fr.kind;
+    if (fr.hidden) root2.dataset.frameHidden = "1";
+    else delete root2.dataset.frameHidden;
+    const panel = `<div class="gx-panel${nav ? " has-nav" : " pre"}">${body4()}</div>`;
+    root2.innerHTML = fr.kind === "none" ? panel : frameHtml(fr.kind, !nav, panel);
+    if (dirUi.scrollTo) {
+      dirUi.scrollTo = "";
+      root2.querySelector(".dir-row.open")?.scrollIntoView({ block: "center" });
+    }
+    root2.dataset.tab = tab;
+    const toastEl = root2.querySelector(".gx-rectoast");
+    if (toastEl) {
+      toastEl.addEventListener("pointerenter", holdToast);
+      toastEl.addEventListener("pointerleave", () => releaseToast(render2));
+    }
+    if (focusSel) {
+      const el = [...root2.querySelectorAll(focusSel)].find((x) => x.offsetParent);
+      if (el) {
+        el.focus({ preventScroll: true });
+        if (caret) try {
+          el.setSelectionRange(caret[0], caret[1]);
+        } catch {
+        }
+      }
+    }
+    const next = root2.querySelector(".gx-body");
+    if (next && keep) next.scrollTop = keep;
+    if (inner.length) root2.querySelectorAll(INNER_SCROLL).forEach((el, i) => inner[i] && (el.scrollTop = inner[i]));
+    root2.dataset.pk = pageKey();
+    if (pageKeep.length) root2.querySelectorAll(PAGE_SCROLL).forEach((el, i) => pageKeep[i] && (el.scrollTop = pageKeep[i]));
+    const nlog = root2.querySelector(".ph-log");
+    root2.dataset.room = phone.room ?? "";
+    if (nlog) {
+      nlog.scrollTop = logKeep < 0 ? nlog.scrollHeight : logKeep;
+      if (logKeep < 0) nlog.querySelectorAll("img").forEach((img) => img.addEventListener("load", () => nlog.scrollTop = nlog.scrollHeight, { once: true }));
+    }
+    root2.dataset.gn = gnKey;
+    if (gnKeep) [".gn .ph-content", ".gn-pane .gn-doc"].forEach((q, i) => {
+      const el = root2.querySelector(q);
+      if (el && gnKeep[i]) el.scrollTop = gnKeep[i];
+    });
+    hydratePhotos(root2);
+    labelSwitches(root2);
+    bindMapZoom(root2);
+    bindMbar(root2, () => void run4("close"));
+    bindDrawer(root2, () => void run4("mk-pop"));
+    bindWikiSide(root2, (v) => void run4("wiki-list", v));
+    bindFootnotes(root2);
+    const stBar = root2.querySelector(".gx-settings > .st-scopebar");
+    if (stBar) stBar.parentElement.style.setProperty("--stbar", `${stBar.offsetHeight}px`);
+    bindSwipeBack(root2, navStep);
+    if (view.kind === "started") navHist.record(navState());
+    root2.querySelectorAll('.gx-nh[data-action^="nav-"]').forEach((b) => b.disabled = !navHist.can(b.dataset.action === "nav-back" ? -1 : 1));
+    setCurrentTheme(themeName(root2.dataset.theme));
+  }
+  function boardDrawer() {
+    if (!isPhone()) return "";
+    return drawerHtml(markSlots(), "", "gx-bdrawer");
+  }
+  var navHist = new NavHistory();
+  function openWallet() {
+    tab = "records";
+    notice = "";
+    field3.confirmEnd = null;
+    resetSettings();
+    applyRecordsNav({ sub: "wallet", view: "list", id: "" });
+    render2();
+  }
+  function navState() {
+    const s7 = { tab };
+    if (tab === "wiki") s7.w = { view: wiki.view, title: wiki.title, list: wiki.listOpen };
+    if (tab === "records") s7.r = recordsNav();
+    if (tab === "phone") s7.p = { sub: phone.sub, tab: phone.tab, view: phone.view, room: phone.room, n: phone.openNotice };
+    if (tab === "gnet") s7.g = { sub: gnet.sub, open: gnet.open, dm: gnet.openDm, s: gnet.settings, c: gnet.compose?.kind === "post" || gnet.compose?.kind === "newdm" ? gnet.compose : null };
+    if (tab === "map" || tab === "mission") s7.f = field3.step;
+    if (tab === "settings") s7.d = dirUi.open;
+    if (tab === "board" && agUi.pop) s7.a = agUi.pop;
+    return s7;
+  }
+  function markState(s7) {
+    const o = JSON.parse(JSON.stringify(s7));
+    if (o.w) o.w.list = false;
+    if (o.g) o.g.c = null;
+    if (o.p && o.p.view !== "room" && o.p.view !== "settings" && o.p.view !== "notice") Object.assign(o.p, { view: "list", room: null, n: null });
+    return o;
+  }
+  var PH_SUB = { contacts: "연락처", chats: "대화", notices: "공지" };
+  function markOf(raw) {
+    const s7 = markState(raw);
+    const ctx2 = view.kind === "started" ? view.ctx : null;
+    let name = s7.tab === "gnet" ? gnetLabel(ctx2?.chat.scriptstate) : TAB_TITLE[s7.tab];
+    if (s7.w) name = s7.w.view === "doc" || s7.w.view === "compose" ? s7.w.title || "위키" : s7.w.view === "settings" ? "위키 설정" : s7.w.view === "new" ? "위키 새 문서" : "위키 메인";
+    if (s7.r) name = recordsMarkName(s7.r, ctx2?.chat ?? null);
+    if (s7.p) {
+      const r = s7.p.view === "room" && s7.p.room && ctx2 ? readPhone(ctx2.chat).rooms[s7.p.room] : void 0;
+      name = r ? roomLabel(r) : s7.p.view === "settings" ? "괴담톡 설정" : `괴담톡 ${PH_SUB[s7.p.sub] ?? ""}`.trim();
+    }
+    if (s7.g) {
+      const post = s7.g.open !== null && ctx2 ? findPost(readGnet(ctx2.chat), s7.g.open) : void 0;
+      name = s7.g.s ? `${gnetLabel(ctx2?.chat.scriptstate)} 설정` : post ? post.title || `${gnetLabel(ctx2?.chat.scriptstate)} 글` : s7.g.dm ? `${s7.g.dm} 쪽지` : s7.g.sub === "dm" ? "괴담넷 쪽지" : "괴담넷";
+    }
+    if (s7.f === "team") name = `${name} 편성`;
+    if (s7.tab === "settings" && s7.d) name = "명부";
+    return { s: s7, name };
+  }
+  var plainBoard = (s7) => s7.tab === "board" && !s7.a;
+  function currentMark() {
+    const s7 = navState();
+    return plainBoard(s7) ? null : markOf(s7);
+  }
+  function recentMarks() {
+    const seen2 = /* @__PURE__ */ new Set();
+    return navHist.recent().filter((s7) => s7.tab !== "settings" && !plainBoard(s7)).map(markOf).filter((m) => {
+      const k = JSON.stringify(m.s);
+      return !seen2.has(k) && (seen2.add(k), true);
+    });
+  }
+  function openable(ctx2, s7) {
+    const o = JSON.parse(JSON.stringify(s7));
+    const legacy = o.tab === "wiki" && o.w ? legacyWikiNav(o.w.view, o.w.title) : null;
+    if (legacy) {
+      o.tab = "records";
+      o.r = legacy;
+      delete o.w;
+    }
+    if (o.tab === "wallet") {
+      o.tab = "records";
+      o.r = { sub: "wallet", view: "list", id: "" };
+    }
+    if (!TABS3.includes(o.tab)) o.tab = "board";
+    if (o.p?.room && !readPhone(ctx2.chat).rooms[o.p.room]) Object.assign(o.p, { view: "list", room: null });
+    return o;
+  }
+  function applyNav(s7) {
+    tab = s7.tab;
+    notice = "";
+    field3.confirmEnd = null;
+    if (s7.w) Object.assign(wiki, { view: s7.w.view, title: s7.w.title, listOpen: s7.w.list });
+    if (s7.r) applyRecordsNav(s7.r);
+    if (s7.p) Object.assign(phone, { sub: s7.p.sub, tab: s7.p.tab, view: s7.p.view, room: s7.p.room, openNotice: s7.p.n });
+    if (s7.g) Object.assign(gnet, { sub: s7.g.sub, open: s7.g.open, openDm: s7.g.dm, settings: s7.g.s, compose: s7.g.c });
+    if (s7.d !== void 0) dirUi.open = s7.d;
+    agUi.pop = s7.a ?? "";
+    if (s7.f && s7.f !== field3.step) return void run4("field-step", s7.f);
+    render2();
+  }
+  function navStep(dir2) {
+    const go2 = (action, value) => () => void run4(action, value);
+    if (view.kind === "picker") return dir2 < 0 && pickerPrefs ? go2("prefs-close") : null;
+    if (view.kind === "opening") return dir2 < 0 ? go2("repick") : null;
+    if (view.kind !== "started") return null;
+    if (evUi.pop && dir2 < 0) return () => void run4("ev-pop", evUi.pop);
+    if (agUi.pop && dir2 < 0) return () => void run4("agent-info", agUi.pop);
+    if (!navHist.can(dir2)) return null;
+    return () => {
+      const s7 = navHist.go(dir2);
+      if (s7) applyNav(s7);
+    };
+  }
+  function themeOf() {
+    const ctx2 = view.kind === "started" || view.kind === "opening" || view.kind === "picker" ? view.ctx : null;
+    const v = String(ctx2?.chat.scriptstate?.["$st_fixed_theme"] ?? "");
+    if (v === "light" || v === "paper" || v === "dark") return v;
+    if (view.kind === "picker") return getPrefs().theme ?? "dark";
+    return "light";
+  }
+  function startedBody(ctx2) {
+    switch (tab) {
+      case "map":
+        return mapTab(ctx2, env2, notice, busy3);
+      case "mission":
+        return missionTab(ctx2, false, notice, busy3);
+      case "wiki":
+        return wikiTab(ctx2, wikiEnv);
+      case "gnet":
+        return gnetTab(ctx2, gnetEnv);
+      case "phone":
+        return phoneTab(ctx2, phoneEnv);
+      case "records":
+        return recordsTab(ctx2);
+      case "settings": {
+        const html = settingsTab(ctx2, settingsUi.scope === "defaults" ? "chat" : settingsUi.scope);
+        return html.includes("ph-drawer") ? html : html + boardDrawer();
+      }
+      default:
+        return board(ctx2);
+    }
+  }
+  function body4() {
+    switch (view.kind) {
+      case "loading":
+        return `${header("불러오는 중")}<div class="gx-empty">채팅 정보를 읽는 중이에요…</div>`;
+      case "error":
+        return `${header("오류")}<div class="gx-empty">${esc31(view.message)}</div>`;
+      case "not-lite":
+        return `${header("연결 안 됨")}<div class="gx-empty">
+        <p><b>${esc31(view.name || "이 캐릭터")}</b>는 ${view.goei ? `${BRAND.name} 카드지만 Plugin manifest 가 없어요.` : `${BRAND.name} 카드가 아니에요.`}</p>
+        <p>${view.goei ? "설치 · 점검에서 매니페스트와 인사말을 다시 심으면 시작 화면이 열려요." : `이 봇에 ${BRAND.name}를 설치하면(설정 폴더·명부·인사말·사진·아이콘을 심어요) 여기서 바로 쓸 수 있어요. 기존 로어북·인사말·에셋은 그대로 둬요.`}</p>
+        <button class="gx-start" data-action="install-open">${view.goei ? "설치 · 점검 열기" : `이 봇에 ${BRAND.name} 설치`}</button>
+      </div>`;
+      case "started":
+        evSeenReset();
+        return `${tabs()}${startedHeader(view.ctx)}<div class="gx-content">${tab === "settings" ? "" : updateBanner(view.ctx)}${notice && tab !== "map" && tab !== "mission" ? `<div class="${noticeClass(notice)} gx-notice" role="alert">${esc31(notice)}</div>` : ""}${startedBody(view.ctx)}</div>${evPopup(boardClock(view.ctx))}${tab === "board" ? agentPopup((n2) => view.kind === "started" && hasPersonRecord(view.ctx, n2)) : ""}${markPop(currentMark(), recentMarks())}${closeToastHtml()}`;
+      case "opening":
+        return `${header("커스텀 임무 · 첫 장면 고르기", '<button class="gx-x" data-action="repick" aria-label="시작 설정 다시 고르기">' + ICONS.back + "</button>")}<div class="gx-content">${missionTab(view.ctx, true, notice, busy3)}</div>`;
+      case "picker":
+        return `${header(view.staged ? "다시 고르기" : "새 작전 준비", `<button class="gx-x" data-action="prefs-open" aria-label="설정">${ICONS.settings}${hasUpdate(view.ctx) ? '<span class="gx-xdot" aria-label="새 버전"></span>' : ""}</button>`, view.staged ? "첫 전송 전까지 다시 고를 수 있어요" : "")}<div class="gx-content">${updateBanner(view.ctx)}${picker()}</div>`;
+    }
+  }
+  function scenariosFor(f, player, lore) {
+    if (!player) return f.scenarios;
+    const own = agentScene(player, scenesOf(lore)) ? [playerScenario(playableAgents(lore, f.code).find((a) => a.id === player)?.name ?? "이 인물")] : [];
+    return [...own, ...f.scenarios.filter((x) => x.kind !== "opening")];
+  }
+  function picker() {
+    const facs = view.kind === "picker" ? factionList(view.ctx.char.globalLore) : SCENARIOS.factions;
+    const lore = view.kind === "picker" ? view.ctx.char.globalLore : void 0;
+    const f = draft.faction ? findFaction(draft.faction, facs) : void 0;
+    const list4 = f ? scenariosFor(f, draft.player, lore) : [];
+    const sc = f && draft.fm !== void 0 ? list4.find((x) => x.fm === draft.fm) : void 0;
+    const factions = facs.filter((x) => !x.hidden).map(
+      (x) => {
+        const img = view.kind === "picker" ? imageUrl(view.ctx.char, factionPic(view.ctx.char, x)) : null;
+        return `<button class="gx-fac${x.code === draft.faction ? " on" : ""}${img ? " has-img" : ""}" data-action="faction" data-value="${x.code}" aria-pressed="${x.code === draft.faction}">
+        ${img ? `<span class="gx-fac-img" style="background-image:url('${esc31(img)}')"></span>` : ""}<span class="gx-fac-txt"><b>${esc31(x.name)}</b><span>${esc31(x.blurb)}</span></span></button>`;
+      }
+    ).join("");
+    const langs = SCENARIOS.languages.map(
+      (l) => `<button class="gx-seg${l.code === draft.lang ? " on" : ""}" data-action="lang" data-value="${l.code}" aria-pressed="${l.code === draft.lang}">${esc31(l.label)}</button>`
+    ).join("");
+    const playing = !!draft.player;
+    const scenarios = f ? list4.map((s7, i) => {
+      return `<button class="gx-sc${s7.fm === draft.fm ? " on" : ""}" data-action="fm" data-value="${s7.fm}" aria-pressed="${s7.fm === draft.fm}">
+            <b>${String(i + 1).padStart(2, "0")}</b><span>${esc31(s7.label)}</span></button>`;
+    }).join("") : '<div class="gx-hint">소속을 고르면 상황이 표시돼요.</div>';
+    const hint = sc?.kind === "direct" ? `<label class="gx-note"><span>시작할 상황</span>
+          <textarea rows="4" data-input="start-note" placeholder="어디서 어떤 장면으로 시작할지 적어 주세요. 적은 내용으로 첫 장면이 시작돼요.">${esc31(draft.situation ?? "")}</textarea></label>` : sc?.kind === "preset" ? '<div class="gx-hint">출발을 누르면 이어서 목표와 동행을 골라요.</div>' : "";
+    const ready = !!(f && sc) && (sc.kind !== "direct" || !!(draft.situation ?? "").trim()) && !(f?.group && !playing);
+    const ctxP = view.kind === "picker" ? view.ctx : null;
+    const people = f && ctxP ? playableAgents(ctxP.char.globalLore, f.code) : [];
+    const me = userInfo();
+    const who = f ? `<div class="gx-who">${[
+      ...f.group ? [] : [`<button class="gx-whoc${!playing ? " on" : ""}" data-action="player" data-value="" aria-pressed="${!playing}">${me.photo ? `<span class="gx-ava"><img src="${esc31(me.photo)}" alt=""></span>` : `<span class="gx-ava"><span>${ICONS.idcard}</span></span>`}<span class="gx-whot"><b>내 페르소나</b></span></button>`],
+      ...people.map((a) => `<button class="gx-whoc${draft.player === a.id ? " on" : ""}" data-action="player" data-value="${esc31(a.id)}" aria-pressed="${draft.player === a.id}">${ctxP ? picAvatar(ctxP.char, facePic(ctxP.char, a, true), a.name) : ""}<span class="gx-whot"><b>${esc31(a.name)}</b>${a.rank ? `<small>${esc31(a.rank)}</small>` : ""}</span></button>`)
+    ].join("")}</div>${playing ? `<div class="gx-hint">고른 인물이 주인공이 돼요. ${list4.some((x) => x.fm === PLAYER_FM) ? "그 인물의 첫 장면이나 " : ""}직접 입력·커스텀 임무로 시작해요.</div>` : ""}` : '<div class="gx-hint">소속을 고르면 고를 수 있는 요원이 표시돼요.</div>';
+    const shown2 = list4.length;
+    return `<main class="gx-body">
+    <section><h2><i>1</i>어느 쪽에 설까요?</h2><div class="gx-facs">${factions}</div></section>
+    <section><h2><i>2</i>주인공</h2>${who}</section>
+    <section><h2><i>3</i>첫 장면${f ? `<small class="gx-h2-sub">${esc31(f.name)} · ${shown2}개</small>` : ""}</h2><div class="gx-scs">${scenarios}</div>${hint}</section>
+    <section><h2><i>4</i>언어</h2><div class="gx-segs">${langs}</div></section>
+  </main>
+  <footer class="gx-foot">
+    ${f && sc ? `<div class="gx-foot-sum">${esc31(f.name)}${playing ? ` · ${esc31(people.find((a) => a.id === draft.player)?.name ?? "")}` : ""} · ${String(list4.indexOf(sc) + 1).padStart(2, "0")} ${esc31(sc.label)}</div>` : ""}
+    ${notice ? `<div class="${noticeClass(notice)}" role="alert">${esc31(notice)}</div>` : ""}
+    <button class="gx-start" data-action="start" ${ready && !busy3 ? "" : "disabled"}>${busy3 ? "시작하는 중…" : "출 발"}</button>
+  </footer>`;
+  }
+  function tabs() {
+    const unreadPhone = view.kind === "started" && phoneUnread(view.ctx);
+    const cur = tab === "mission" ? "map" : tab;
+    const item2 = (id, label2, icon2, cls = "", badge3 = "") => `<button class="gx-nb${cls ? ` ${cls}` : ""}${cur === id ? " on" : ""}" data-action="${cls === "mob" ? "tab" : "nav-tab"}" data-value="${id}" aria-current="${tab === id ? "page" : "false"}">${icon2}<span>${label2}</span>${badge3}</button>`;
+    const ctx2 = view.kind === "started" ? view.ctx : null;
+    return `<nav class="gx-nav" aria-label="주요 화면">
+    ${ctx2 ? brand(ctx2) : ""}
+    ${item2("board", "상황판", ICONS.board)}
+    ${item2("map", "임무", ICONS.map, "desk")}
+    ${item2("map", "임무", ICONS.map, "mob")}
+    ${item2("phone", "괴담톡", ICONS.phone, "", unreadPhone ? '<span class="gx-nbadge dot" aria-label="새 메시지"></span>' : "")}
+    ${GNET_ON ? item2("gnet", gnetLabel(ctx2?.chat.scriptstate), ICONS.gnet) : ""}
+    ${item2("wiki", "위키", ICONS.wiki)}
+    ${item2("records", "기록", ICONS.records, "desk")}
+    <button class="gx-nb desk" data-action="ed-open" data-value="set:screen">${ICONS.settings}<span>설정</span>${ctx2 && hasUpdate(ctx2) ? '<span class="gx-nbadge dot" aria-label="새 버전"></span>' : ""}</button>
+    <span class="gx-nav-gap"></span>
+    ${ctx2 ? navHistBar(currentMark()) : ""}
+    ${mobileBar(item2, unreadPhone, ctx2)}
+  </nav>`;
+  }
+  function mobileBar(item2, unreadPhone, ctx2) {
+    return mbarHtml([
+      item2("wiki", "위키", ICONS.wiki),
+      item2("map", "임무", ICONS.map, "mob"),
+      item2("board", "상황판", ICONS.board, "home"),
+      item2("phone", "괴담톡", ICONS.phone, "", unreadPhone ? '<span class="gx-nbadge dot" aria-label="새 메시지"></span>' : ""),
+      ...GNET_ON ? [item2("gnet", gnetLabel(ctx2?.chat.scriptstate), ICONS.gnet)] : []
+    ]);
+  }
+  function mobileNavHtml() {
+    const ctx2 = view.kind === "started" ? view.ctx : null;
+    const unreadPhone = view.kind === "started" && phoneUnread(view.ctx);
+    const cur = tab === "mission" ? "map" : tab;
+    const item2 = (id, label2, icon2, cls = "", badge3 = "") => `<button class="gx-nb${cls ? ` ${cls}` : ""}${cur === id ? " on" : ""}" data-action="tab" data-value="${id}">${icon2}<span>${esc31(label2)}</span>${badge3}</button>`;
+    return `<nav class="gx-nav gw-nav">${mobileBar(item2, unreadPhone, ctx2)}</nav>`;
+  }
+  function brand(ctx2) {
+    return `<div class="gx-nav-brand">
+      ${idCard(ctx2)}
+    </div>`;
+  }
+  function idCard(ctx2) {
+    const facs = factionList(ctx2.char.globalLore);
+    const code2 = String(ctx2.chat.scriptstate?.["$st_faction"] ?? "") || currentChoice(ctx2.chat).faction || "";
+    const f = code2 ? findFaction(code2, facs) : void 0;
+    const img = f ? imageUrl(ctx2.char, factionPic(ctx2.char, f)) : null;
+    const w = worldOn(ctx2.chat) ? readWorld(ctx2.chat) : null;
+    const st = lastStatusFields((ctx2.chat.message ?? []).filter((m) => m.role === "char").slice(-6).map((m) => m.data));
+    const time2 = (w ? clock2(w.minute) : "") || [st?.date, st?.time].filter(Boolean).join(" ");
+    const weather = [st?.weather, st?.temp].filter(Boolean).join(" ");
+    const line2 = (label2, value) => value ? `<span class="gx-op-ln"><i>${label2}</i><em>${esc31(value)}</em></span>` : "";
+    const meta = time2 || weather ? `<span class="gx-op-meta"><span>${esc31(time2)}</span><span>${esc31(weather)}</span></span>` : "";
+    const status2 = line2("위치", st?.place ?? "") + line2("목표", st?.target ?? "") + meta || (w && w.minute === null ? '<span class="gx-op-wait">첫 응답 뒤에 위치·시각이 채워져요.</span>' : "");
+    const u = userInfo();
+    const pa = playerAgent(ctx2.char.globalLore, ctx2.chat.scriptstate);
+    const paPic = pa ? imageUrl(ctx2.char, facePic(ctx2.char, pa, true)) : null;
+    const name = pa?.name || u.name || "나";
+    const photoUrl2 = pa ? paPic : u.photo;
+    const photo = photoUrl2 ? `<span class="gx-id-photo"><img src="${esc31(photoUrl2)}" alt=""></span>` : `<span class="gx-id-photo none">${ICONS.idcard}</span>`;
+    const who = `<span class="gx-id-who"><b>${esc31(name)}</b><small>${esc31([f ? selfName(ctx2, f.code, f.name) : "소속 없음", pa?.rank ?? ""].filter(Boolean).join(" · "))}</small></span>`;
+    const bg = img ? `<span class="gx-id-bg" style="background-image:url('${esc31(img)}')"></span>` : "";
+    return `<div class="gx-id">${bg}
+      ${photo}
+      ${who}
+      ${status2 || walletChip(ctx2) ? `<span class="gx-op-st">${walletChip(ctx2)}${status2}</span>` : ""}
+    </div>`;
+  }
+  function walletChip(ctx2) {
+    if (colConfig(ctx2.chat.scriptstate).wallet === "off") return "";
+    const w = readWallet(ctx2.chat.scriptstate, getPrefs().walletStart ?? WALLET_START_DEFAULT);
+    return `<button class="gx-op-ln gx-wallet" data-action="tab" data-value="wallet" aria-label="잔고·가계부" title="가계부"><i>잔고</i><em>${esc31(formatWon(walletBalance(w, aliveAnchors(ctx2.chat))))}</em></button>`;
+  }
+  function selfName(ctx2, code2, name) {
+    const c = parseCatalog(ctx2.char.globalLore);
+    const outside = factionNames(c, void 0)[code2];
+    return outside && name === outside ? factionNames(c, code2)[code2] ?? name : name;
+  }
+  function clock2(minute) {
+    if (minute === null) return "";
+    const d = new Date(minute * 6e4);
+    const p = (n2) => String(n2).padStart(2, "0");
+    return `${d.getUTCFullYear()}.${p(d.getUTCMonth() + 1)}.${p(d.getUTCDate())} ${p(d.getUTCHours())}:${p(d.getUTCMinutes())}`;
+  }
+  function board(ctx2) {
+    if (!worldOn(ctx2.chat)) {
+      return `<div class="gx-empty"><p>이 채팅은 상황판 없이 시작했어요.</p>
+      <p class="gx-muted">켜면 괴이·사건·특수가 발생하고, 다음 응답부터 모델이 상황판 태그를 함께 적어요.</p>
+      ${notice ? `<div class="${noticeClass(notice)}" role="alert">${esc31(notice)}</div>` : ""}
+      <button class="gx-start" data-action="world-on" ${busy3 ? "disabled" : ""}>${busy3 ? "켜는 중…" : "상황판 켜기"}</button></div>${boardDrawer()}`;
+    }
+    let catalog;
+    try {
+      catalog = parseCatalog(ctx2.char.globalLore);
+    } catch (error) {
+      return `<div class="gx-empty">${esc31(error instanceof Error ? error.message : String(error))}</div>`;
+    }
+    const w = readWorld(ctx2.chat);
+    const faction = String(ctx2.chat.scriptstate?.["$st_faction"] ?? "");
+    const roster = rosterFor(w, catalog, faction, worldSettings(ctx2.char.globalLore, ctx2.chat.scriptstate).agent_limit);
+    const byName = new Map(roster.map((p) => [p.name, p]));
+    const keys = new Map(activeEvents(w).map((e) => [`${e.kind}${e.index}`, e.key]));
+    const display = factionNames(catalog, faction);
+    const ownName = display[faction] ?? "";
+    const names4 = (codes) => codesToNames(codes, catalog, faction).split(/\s*,\s*/).map((n2) => n2.trim());
+    const chips3 = (codes) => peopleChips(ctx2.char, names4(codes), byName, ownName);
+    const cards2 = [];
+    const add = (kind, i, locCode, c) => {
+      const key2 = keys.get(`${kind}${i}`);
+      if (!key2) return;
+      cards2.push({ ...c, kind, key: key2, id: key2, locCode, open: "board-map", confirmEnd: field3.confirmEnd === key2, selected: field3.target?.type === "event" && field3.target.key === key2, art: evArt(ctx2, c.name, kind, `${locName(locCode)} ${String(c.extra ?? "").replace(/<[^>]*>/g, " ")}`) });
+    };
+    const since = (m) => elapsedText(w.minute, m);
+    const sit = (t) => t ? `<span class="gx-evc-sit">${esc31(t)}</span>` : "";
+    const locText = (loc, m) => `${esc31(locName(loc))}${since(m) ? ` · ${since(m)}` : ""}`;
+    w.an.forEach((e, i) => add("an", i, e.loc, { name: e.name || "이름 미확인", grade: e.grade, loc: locText(e.loc, e.since), badge: e.exploring ? '<span class="gx-badge op">탐사 중</span>' : '<span class="gx-badge live">활성</span>', chips: chips3(e.deploy), extra: sit(e.situation) }));
+    w.inc.forEach((e, i) => add("in", i, e.loc, { name: e.name || "이름 미확인", loc: locText(e.loc, e.since), badge: '<span class="gx-badge hot">진행</span>', chips: chips3(e.deploy ?? ""), extra: sit(e.situation) }));
+    w.ms.forEach((e, i) => add("ms", i, e.loc, { name: e.name, loc: esc31(locName(e.loc)), badge: '<span class="gx-badge live">출현</span>', chips: chips3(e.visitors), extra: sit(e.situation) }));
+    for (const e of endedShown(w)) {
+      const name = e.name || "이름 미확인";
+      const rp = endedReport(ctx2.chat, e.kind, e.name, e.loc);
+      cards2.push({ kind: e.kind, name, grade: e.grade, loc: esc31(locName(e.loc)), badge: '<span class="gx-badge end">종료</span>', ended: true, id: `end:${e.kind}:${e.name}:${e.loc}`, locCode: e.loc, art: evArt(ctx2, name, e.kind), ...rp?.rpt ? { rpt: rp.rpt } : {}, ...rp?.mine ? { mine: true } : {} });
+    }
+    const sentTo = (codes, id) => (codes ?? "").split(",").map((x) => x.trim()).includes(id);
+    const deployedAt = (id) => w.an.find((e) => e.state === "활성" && sentTo(e.deploy, id))?.name ?? w.inc.find((e) => e.state === "진행" && sentTo(e.deploy, id))?.name ?? "";
+    const dir2 = readDirectory(ctx2.char.globalLore ?? []).agents;
+    const agents = roster.map((p) => {
+      const rec2 = w.agents[p.id];
+      const st = rec2?.st ?? "미정";
+      const c = agentContact(ctx2, p.id);
+      const big = p.english ? mainPic(ctx2.char, dir2.find((x) => x.english === p.english) ?? { english: p.english }) : "";
+      return {
+        id: p.id,
+        name: p.name,
+        english: p.english ?? "",
+        st: stLabel(st),
+        side: st === "작전투입" ? "op" : agentLocked(rec2) ? "lock" : "ok",
+        situation: rec2?.situation ?? "",
+        dept: p.department ?? "",
+        rank: p.rank ?? "",
+        face: avatar(ctx2.char, p.english, p.name, "sq"),
+        photo: big ? imageUrl(ctx2.char, big) : null,
+        deployed: st === "작전투입" ? deployedAt(p.id) : "",
+        wiki: c ? c.wiki : null
+      };
+    });
+    const promo = w.promoted.length ? `<p class="gx-hint">결번 충원: ${esc31(w.promoted.join(", "))}</p>` : "";
+    const live = (list4) => list4.filter((e) => e.state !== "발생대기").length;
+    const cnt = (cls, label2, n2) => `<em class="${cls}">${label2}<i>${n2}</i></em>`;
+    const limit = worldSettings(ctx2.char.globalLore, ctx2.chat.scriptstate).agent_limit;
+    const counts = cnt("an", "괴이", live(w.an)) + cnt("in", "사건", live(w.inc)) + cnt("ms", "특수", live(w.ms));
+    const clock3 = boardClock(ctx2);
+    return `<main class="gx-body gx-board">
+    ${opsBoard(cards2, { mapUrl: boardMapUrl(ctx2, env2), clock: clock3, counts, empty: "지금 발생한 상황이 없어요." })}
+    ${agentPanel2(agents, getPrefs().agents ?? "wall", { total: roster.length, org: findFaction(faction, factionList(ctx2.char.globalLore))?.affiliation ?? "", extra: promo, empty: limit === 0 ? "설정에서 요원 표시 인원을 0명으로 해 두었어요." : "이 소속에는 요원 명단이 없어요." })}
+  </main>${boardDrawer()}`;
+  }
+  function boardClock(ctx2) {
+    const st = lastStatusFields((ctx2.chat.message ?? []).filter((m) => m.role === "char").slice(-6).map((m) => m.data));
+    return [st?.date, st?.time].filter(Boolean).join(" ");
+  }
+
+  // src/loader/panel.ts
+  var PANEL_CSS = `
+.gl-back{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;padding:16px;background:rgba(5,8,10,.72);font:14px/1.5 system-ui,-apple-system,'Apple SD Gothic Neo','Malgun Gothic',sans-serif;color:#E6EEEC;box-sizing:border-box}
+.gl-card{display:flex;flex-direction:column;gap:10px;width:min(420px,100%);padding:20px;margin:0;border:1px solid #37464D;border-radius:14px;background:#232D32;box-sizing:border-box}
+.gl-card b{font-size:16px}
+.gl-card p{margin:0;color:#B5C4C0}
+.gl-msg{padding:8px 12px;border-radius:8px;background:#172328;color:#E6EEEC!important}
+.gl-act{display:flex;gap:8px;margin-top:6px}
+.gl-act button{flex:1;min-height:42px;padding:0 14px;border:1px solid #24343B;border-radius:10px;background:#172328;color:#E6EEEC;font:inherit;font-weight:700;cursor:pointer}
+.gl-act button.primary{border-color:#5EEAD4;background:#10302C;color:#5EEAD4}
+.gl-act button[disabled]{opacity:.5;cursor:default}
+@media (max-width:520px){.gl-back{align-items:flex-end}.gl-act{flex-direction:column}}
+`;
+
+  // src/host/datapanel.ts
+  var MARK2 = "data-gl-world";
+  var g = globalThis;
+  var current4 = () => document.querySelector(`[${MARK2}]`);
+  function closeWorldDataPanel(byUser = false) {
+    const root3 = current4();
+    if (!root3) return;
+    root3.remove();
+    g.__goeiBodyPanel = false;
+    if (byUser) g.__goeiWorldDismissed = true;
+    void risuai.hideContainer();
+  }
+  function showWorldDataPanel(reason2, prompt = false) {
+    const had = current4();
+    if (had) {
+      const msg2 = had.querySelector(".gl-msg");
+      if (msg2) msg2.hidden = false, msg2.textContent = reason2;
+      return;
+    }
+    if (!prompt && g.__goeiWorldDismissed) {
+      console.log(`[goei] 세계 자료 받기 창은 닫혀 있어 다시 띄우지 않아요 (카드를 다시 열면 띄움): ${reason2}`);
+      return;
+    }
+    delete g.__goeiWorldDismissed;
+    const root3 = document.createElement("div");
+    root3.setAttribute(MARK2, "1");
+    root3.innerHTML = `<style>${PANEL_CSS}</style><div class="gl-back"><div class="gl-card" role="dialog" aria-label="괴이 ː ANOMALY">
+      <b>괴이 ː ANOMALY</b>
+      <p>세계 자료(요원·조직·괴이 기록)를 받지 못했어요. 플러그인은 이 자료를 받아 둔 뒤에 켜져요. 네트워크를 확인하고 다시 받거나, 릴리스 zip에 든 goei-data-world.txt를 넣어 주세요.</p>
+      <p class="gl-msg"></p>
+      <div class="gl-act"><button class="primary" data-gl="get">다시 받기</button><button data-gl="file">파일로 넣기</button><button data-gl="close">닫기</button></div>
+    </div></div>`;
+    document.body.append(root3);
+    g.__goeiBodyPanel = true;
+    void risuai.showContainer("fullscreen");
+    const msg = root3.querySelector(".gl-msg");
+    const btns = [...root3.querySelectorAll("button")];
+    const say = (t) => (msg.hidden = !t, msg.textContent = t);
+    say(reason2);
+    const run5 = (job, busy4) => {
+      btns.forEach((b) => b.disabled = true);
+      say(busy4);
+      void job().then(() => done2(root3, say, btns)).catch((e) => {
+        say(e instanceof Error ? e.message : String(e));
+        btns.forEach((b) => b.disabled = false);
+      });
+    };
+    const picker2 = document.createElement("input");
+    picker2.type = "file";
+    picker2.accept = ".txt,.json";
+    picker2.hidden = true;
+    root3.append(picker2);
+    picker2.addEventListener("change", () => {
+      const f = picker2.files?.[0];
+      picker2.value = "";
+      if (f) run5(async () => installWorldFile(await f.text()), "넣는 중");
+    });
+    root3.addEventListener("click", (ev) => {
+      const act = ev.target.closest("[data-gl]")?.dataset.gl;
+      if (act === "close") closeWorldDataPanel(true);
+      else if (act === "file") picker2.click();
+      else if (act === "get") run5(() => loadWorldData(true).then(() => void 0), "받는 중");
+    });
+  }
+  function done2(root3, say, btns) {
+    if (typeof g.__goeiRelaunch === "function") {
+      closeWorldDataPanel();
+      g.__goeiRelaunch();
+      return;
+    }
+    say("받았어요. 카드를 다시 열거나 메시지를 보내면 켜져요.");
+    for (const b of btns) {
+      b.disabled = false;
+      if (b.dataset.gl !== "close") b.hidden = true;
+    }
+    root3.setAttribute("data-gl-done", "1");
+  }
+
+  // src/core/statusctx.ts
+  var STATUS_HEAD = "[Previous status]";
+  var NOTE = "This is the status line of the scene right before the next input; older status lines were removed from the history. Continue from it: advance the time, update the other fields, and output exactly one new [▣] line at the very end of your response.";
+  function lastStatusLine(messages) {
+    for (let i = messages.length - 1; i >= 0; i--) {
+      const m = messages[i];
+      if (m?.role !== "assistant" || typeof m.content !== "string") continue;
+      const tags = findStatusTags(m.content);
+      if (tags.length) return tags[tags.length - 1].raw.trim();
+    }
+    return null;
+  }
+  function stripStatusLines(messages) {
+    return messages.map((m) => {
+      if (m?.role !== "assistant" || typeof m.content !== "string") return m;
+      const tags = findStatusTags(m.content);
+      if (!tags.length) return m;
+      let c = m.content;
+      for (const t of tags) c = c.replace(t.raw, "");
+      return { ...m, content: c.replace(/[ \t]+\n/g, "\n").replace(/\n{3,}/g, "\n\n").trim() };
+    });
+  }
+  function statusBlock(line2, cols) {
+    const fields3 = cols?.length ? `Fields: ${cols.map((c) => colDef(c).label).join(" | ")}
+` : "";
+    return `${STATUS_HEAD}
+${line2}
+${fields3}${NOTE}`;
+  }
+  function rebuildStatusLine(line2, cols, fill3 = {}) {
+    const t = findStatusTags(line2)[0];
+    if (!t || !t.date) return line2;
+    const values = {
+      date: t.date,
+      time: t.time,
+      weather: t.weather,
+      temp: t.temp,
+      place: t.place,
+      target: t.target,
+      companions: t.companions.join(","),
+      deployed: t.deployed ? "투입" : "",
+      identity: t.identity || fill3.identity || "",
+      wallet: fill3.wallet !== void 0 && fill3.wallet !== null ? walletCell(fill3.wallet) : t.wallet
+    };
+    return formatStatusLine(values, cols);
+  }
+  function withIdentity(line2, identity) {
+    if (!identity) return line2;
+    const tags = findStatusTags(line2);
+    const t = tags[0];
+    if (!t || t.identity) return line2;
+    const cols = line2.replace(/^[[【［]\s*▣\s*[|｜]/, "").replace(/[\]】］]\s*$/, "").split(/[|｜]/).length;
+    if (cols !== 8) return line2;
+    return line2.replace(/[\]】］]\s*$/, `|${identity}]`);
+  }
+  function withStatusBlock(messages, identity = "", shape) {
+    if (messages.some((m) => typeof m?.content === "string" && m.content.startsWith(STATUS_HEAD))) return messages;
+    const line0 = lastStatusLine(messages);
+    if (!line0) return messages;
+    const line2 = shape ? rebuildStatusLine(line0, shape.cols, { identity, wallet: shape.wallet }) : withIdentity(line0, identity);
+    const out = stripStatusLines(messages);
+    const at = out.map((m) => m?.role).lastIndexOf("user");
+    const block2 = { role: "system", content: statusBlock(line2, shape?.cols) };
+    return at < 0 ? [...out, block2] : [...out.slice(0, at), block2, ...out.slice(at)];
+  }
+
+  // src/core/people/request.ts
+  function peopleBlockFor(chat, o) {
+    if (!o.settings.on || o.settings.inject === "off") return { text: "", people: [], sheets: [] };
+    const names4 = entriesOf(o.store, o.extraNames ?? {});
+    const match = nameMatcher(names4);
+    const people = o.people?.length ? o.people.filter((n2) => o.store.people[n2]).slice(0, 6) : scenePeople(chat, o.store, match, { input: o.input });
+    if (!people.length) return { text: "", people: [], sheets: [] };
+    const live = liveness(chat);
+    const changes = liveChanges(o.store, live);
+    const blocks = [];
+    const sheets = [];
+    for (const n2 of people) {
+      const p = o.store.people[n2];
+      const sheet = o.sheetOf(n2);
+      if (sheet) sheets.push(sheet);
+      const note = o.settings.director === "facts" ? latestNote(o.store, n2, live) : null;
+      blocks.push(
+        personBlock(p, o.store, live, changes, {
+          sheet,
+          mode: o.settings.inject,
+          unknown: o.settings.features.has("perception") ? unknownTo(p, o.store, live) : [],
+          user: o.user,
+          note,
+          temper: o.temperOf?.(n2),
+          speed: o.settings.speed,
+          turnCap: o.settings.turnCap,
+          // 본편 전체 예산을 장면 인물 수로 나눈다 (고정 절 원문은 예산 밖)
+          maxChars: Math.floor(o.settings.blockCap / people.length),
+          taste: o.settings.features.has("taste"),
+          openness: o.settings.features.has("openness"),
+          axes: o.settings.features.has("axes"),
+          features: o.settings.features,
+          qual: o.settings.qualitative
+        })
+      );
+    }
+    if (o.settings.features.has("rhythm")) {
+      const docs = Object.values(o.store.docs).filter((d) => d.type === "rhythm").flatMap((d) => liveEntries(d.entries, live).slice(-1).map((e) => ({ key: d.key, text: e.text })));
+      const note = o.settings.director === "facts" ? latestNote(o.store, "@rhythm", live)?.now : null;
+      const rb = rhythmBlock(docs, note, rhythmClockLines(rhythmClock(o.store, chat, live)));
+      if (rb) blocks.unshift(rb);
+    }
+    if (o.settings.features.has("faction_rep") && o.settings.factionInject) {
+      const list4 = Array.isArray(chat.message) ? chat.message : [];
+      const texts = [...o.input ? [o.input] : [], ...list4.slice(-2).map((m) => messageText(String(m.data ?? "")))];
+      const codes = sceneFactionCodes(o.store, people, texts, o.factionNames);
+      const uf = userFactionOf(o.store, chat);
+      const fb = factionsBlock(codes.map((c) => factionNow(o.store, c, changes, uf, o.settings, o.factionNames)), o.user);
+      if (fb) blocks.push(fb);
+    }
+    return { text: peopleBlock(blocks, o.settings.blockCap), people, sheets };
+  }
+  var squash4 = (s7) => s7.replace(/\s+/g, " ").trim();
+  function stripSheets(messages, sheets) {
+    if (!sheets.length) return messages;
+    const escRe2 = (t) => t.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const targets = sheets.map(squash4).filter(Boolean).map((t) => ({ t, re: new RegExp(t.split(" ").map(escRe2).join("\\s+")) }));
+    return messages.map((m) => {
+      if (typeof m?.content !== "string") return m;
+      let text4 = m.content;
+      let changed = false;
+      for (const { t, re } of targets) {
+        const i = text4.indexOf(t);
+        const next = i >= 0 ? text4.slice(0, i) + text4.slice(i + t.length) : text4.replace(re, "");
+        if (next !== text4) {
+          text4 = next;
+          changed = true;
+        }
+      }
+      return changed ? { ...m, content: text4.replace(/\n{3,}/g, "\n\n") } : m;
+    });
+  }
+  function insertBlock(messages, text4) {
+    if (!text4) return messages;
+    const at = messages.map((m) => m?.role).lastIndexOf("user");
+    const add = { role: "system", content: text4 };
+    return at < 0 ? [...messages, add] : [...messages.slice(0, at), add, ...messages.slice(at)];
+  }
+  function withPeopleBlock(messages, chat, o) {
+    const r = peopleBlockFor(chat, o);
+    if (!r.text) return messages;
+    const out = o.settings.inject === "split" || o.settings.inject === "record" ? stripSheets(messages, r.sheets) : messages;
+    return insertBlock(out, r.text);
+  }
+
+  // src/core/sanitize.ts
+  var PLUGIN_MARKERS = ["%%SCENE_CARD:", "%%/SCENE_CARD%%", "%%PHONE_CALL:", "%%/PHONE_CALL%%", "%%GOEI_START%%", "%%/GOEI_START%%", "%%GOEI_UNSENT%%", "%%SEED%%", "%%/SEED%%"];
+  var OPEN_RE2 = /%%(?:SCENE_CARD:[0-9a-f]*|PHONE_CALL:[0-9a-f]*|GOEI_START|SEED)%%[ \t]*(?:\r?\n)?/g;
+  var CLOSE_RE = /(?:\r?\n)?[ \t]*%%\/(?:SCENE_CARD|PHONE_CALL|GOEI_START|SEED)%%/g;
+  var UNSENT_RE2 = /(?:\r?\n)?[ \t]*%%GOEI_UNSENT%%/g;
+  function hasPluginMarkers(text4) {
+    return typeof text4 === "string" && text4.includes("%%") && PLUGIN_MARKERS.some((m) => text4.includes(m));
+  }
+  function stripMarkerText(text4) {
+    if (!hasPluginMarkers(text4)) return text4;
+    return text4.replace(OPEN_RE2, "").replace(CLOSE_RE, "").replace(UNSENT_RE2, "").replace(/\n{3,}/g, "\n\n");
+  }
+  function stripMarkers(messages, opts = {}) {
+    try {
+      if (!Array.isArray(messages)) return messages;
+      let changed = false;
+      const out = messages.map((m) => {
+        try {
+          const c = m?.content;
+          if (typeof c !== "string") return m;
+          let next = stripMarkerText(c);
+          if (opts.worldTags && m.role === "assistant") {
+            if (hasWorldTags(next)) next = cleanOutput(next);
+            if (hasUnlockTag(next)) next = stripUnlockTags(next);
+          }
+          if (next === c) return m;
+          changed = true;
+          return { ...m, content: next };
+        } catch {
+          return m;
+        }
+      });
+      return changed ? out : messages;
+    } catch {
+      return messages;
+    }
+  }
+
+  // src/body.ts
+  var PLUGIN_ID = "goei-plugin";
+  var WATCH_MS = 1e3;
+  var liteNow = false;
+  var faultOn = (name) => {
+    let on2 = false;
+    return on2;
+  };
+  var reason = (e) => e instanceof Error ? e.message : String(e);
+  async function onBeforeRequest(messages, type) {
+    if (type !== "model" || !Array.isArray(messages)) return messages;
+    if (faultOn("beforeRequest")) throw new Error("시험용 예외 주입(beforeRequest)");
+    const failed = [];
+    const step = (name, run5, fallback) => {
+      try {
+        if (faultOn(name)) throw new Error("시험용 예외 주입");
+        return run5();
+      } catch (error) {
+        failed.push(`${name}(${reason(error)})`);
+        return fallback;
+      }
+    };
+    const stepAsync = async (name, run5, fallback) => {
+      try {
+        if (faultOn(name)) throw new Error("시험용 예외 주입");
+        return await run5();
+      } catch (error) {
+        failed.push(`${name}(${reason(error)})`);
+        return fallback;
+      }
+    };
+    try {
+      setWaiting(true);
+      setOpeningHint(null);
+      messages = step("지시문·전화 풀기", () => unwrapCalls(unwrapScenes(messages).messages).messages, messages);
+      const marked = (t) => typeof t === "string" && (t.includes(UNSENT_MARK) || t.includes(START_MARK) || t.includes(SCENE_MARK));
+      if (messages.some((m) => marked(m?.content))) {
+        messages = step("시작 카드 표식", () => messages.map((m) => marked(m?.content) ? { ...m, content: stripSceneMark(stripStartCard(stripUnsentMark(m.content))) } : m), messages);
+      }
+      if (liteNow || messages.some((m) => typeof m?.content === "string" && imgTagsKnown(m.content, modulePicker()))) {
+        messages = step("옛 이미지 태그", () => stripOldImgTags(messages, getPrefs().imgSend ?? IMG_RECENT.def), messages);
+      }
+      let ctx2 = null;
+      if (liteNow) {
+        ctx2 = await stepAsync("채팅 읽기", () => loadContext(), null);
+        await stepAsync("유저 이름", () => readUser(), void 0);
+        messages = step("기록 태그 정리", () => stripHistoryTags(messages), messages);
+        if (ctx2) {
+          const c = ctx2;
+          messages = step("로어", () => fixLore(messages, c), messages);
+          messages = await stepAsync("주인공", () => withPlayer(messages, c), messages);
+          messages = step("명부 다듬기", () => trimRoster(messages), messages);
+          const mctx = step("참고 기록", () => moduleContext(sceneText2(messages), c), []);
+          if (mctx.length) {
+            const at = messages.map((m) => m?.role).lastIndexOf("user");
+            const add = mctx.map((t) => ({ role: "system", content: t }));
+            messages = at < 0 ? [...messages, ...add] : [...messages.slice(0, at), ...add, ...messages.slice(at)];
+          }
+          messages = step("상태창", () => withStatusBlock(messages, step("신분", () => knownIdentity(c), ""), step("상태창 모양", () => statusShape(c), void 0)), messages);
+          messages = await stepAsync("인물 기록", () => withPeople2(messages, c), messages);
+          messages = step("이미지 지침", () => withImgPrompt(messages, c), messages);
+        }
+      }
+      if (messages.some((m) => typeof m?.content === "string" && m.content.includes(SEED_OPEN))) {
+        const chat = ctx2?.chat ?? await stepAsync("시드 채팅 읽기", async () => await risuai.getChatFromIndex(await risuai.getCurrentCharacterIndex(), await risuai.getCurrentChatIndex()), null);
+        if (chat) messages = step("시드", () => processRequest(messages, chat).messages, messages);
+      }
+    } catch (error) {
+      failed.push(`전체(${reason(error)})`);
+    }
+    if (failed.length) console.log(`[goei] 요청 조립 실패: 단계 ${failed.join(" · ")} — 그 단계는 건너뛰고 표식만 지워 보냅니다`);
+    return sanitize(messages);
+  }
+  function sanitize(messages) {
+    return stripMarkers(messages, { worldTags: liteNow });
+  }
+  var userOrTag = () => userInfo().name || void 0;
+  function loreFor(char, chat0, input3) {
+    const chat = chat0.message?.some((m) => isSceneMessage(m.data)) ? { ...chat0, message: chat0.message.filter((m) => !isSceneMessage(m.data)) } : chat0;
+    const mode2 = advValue(chat.scriptstate, "gen", "lore_mode");
+    const player = playerAgent(char.globalLore, chat.scriptstate);
+    return computeLore(char.globalLore, chat, { ...loreOptions(char, chat, mode2, userOrTag()), input: input3, ...player ? { exclude: [player.lore] } : {} });
+  }
+  async function storeLore(charIndex, chatIndex, input3, known) {
+    let char = known?.char ?? await getChar(charIndex);
+    if (!char || !isGoeiLore(char.globalLore)) return;
+    const cur0 = known?.chat ?? await risuai.getChatFromIndex(charIndex, chatIndex);
+    const mode2 = advValue(cur0?.scriptstate, "gen", "lore_mode");
+    if (syncDecorators(char.globalLore, mode2)) {
+      await updateCharacterLore(charIndex, (lore) => {
+        const next = syncDecorators(withWorldLore(lore), mode2);
+        return next ? stripVirtual(next) : null;
+      });
+      char = await getChar(charIndex) ?? char;
+    }
+    if (!hasSlots(stripVirtual(char.globalLore ?? []))) return;
+    const c = char;
+    await updateChat(charIndex, chatIndex, (cur) => {
+      const got = loreFor(c, cur, input3);
+      if (!got || sameVars(cur.scriptstate, got.vars)) return null;
+      return { ...cur, scriptstate: { ...cur.scriptstate ?? {}, ...got.vars } };
+    });
+  }
+  async function onInput(text4) {
+    if (!liteNow || typeof text4 !== "string") return text4;
+    try {
+      await storeLore(await risuai.getCurrentCharacterIndex(), await risuai.getCurrentChatIndex(), text4);
+    } catch (error) {
+      console.log(`[goei] 로어북 고르기 실패: ${error instanceof Error ? error.message : String(error)}`);
+    }
+    return text4;
+  }
+  function greetingOf(char, chat) {
+    const first = chat.message?.[0];
+    if (first?.role === "char" && isSceneMessage(first.data)) return stripSceneMark(String(first.data));
+    const fm = Number(chat.fmIndex);
+    const alt = char.alternateGreetings;
+    const text4 = Number.isInteger(fm) && fm >= 0 ? alt?.[fm] : typeof char.firstMessage === "string" ? char.firstMessage : void 0;
+    return typeof text4 === "string" ? text4 : "";
+  }
+  function fixLore(messages, { char, chat }) {
+    const got = loreFor(char, chat);
+    const real = stripVirtual(char.globalLore ?? []);
+    if (hasSlots(real)) {
+      if (!got || sameVars(chat.scriptstate, got.vars)) return messages;
+      return patchSlots(messages, chat.scriptstate, got.vars).messages;
+    }
+    const parts = [];
+    const env3 = { vars: chat.scriptstate ?? {}, char: char.name, user: userOrTag() };
+    const cols = usedCols(colConfig(chat.scriptstate));
+    for (const b of ALWAYS_BOOKS) {
+      const e = (char.globalLore ?? []).find((x) => isVirtual(x) && x.comment === b.name);
+      if (e && typeof e.content === "string") parts.push({ order: b.order, text: evaluate(b.kind === "tag" ? fillStatusSection(e.content, cols) : e.content, env3) });
+    }
+    const seedRaw = String(chat.scriptstate?.["$seed_lore"] ?? "");
+    let seed2 = seedRaw && shouldKeepSeed(chat) && !real.some((e) => e.comment === "📕Start Lore") ? seedBody(seedRaw, env3) : "";
+    const me = playerAgent(char.globalLore, chat.scriptstate);
+    const mine = me ? (char.globalLore ?? []).find((e) => e.mode !== "folder" && e.comment === me.lore) : void 0;
+    if (seed2 && mine && typeof mine.content === "string") {
+      const text4 = stripDecorators(evaluate(mine.content, env3)).trim();
+      if (text4) seed2 = seed2.split(text4).join("").replace(/\n{3,}/g, "\n\n").trim();
+    }
+    if (seed2) parts.push({ order: 399, text: `${SEED_OPEN}
+${seed2}
+${SEED_CLOSE}` });
+    if (got) {
+      const picks = seed2 ? got.picks.filter((p) => !seed2.includes(stripDecorators(evaluate(p.entry.content, env3)).trim())) : got.picks;
+      const texts = picks.length === got.picks.length ? Object.fromEntries(LORE_KINDS.map((k) => [k, got.vars[slotVar(k)] ?? ""])) : slotTexts(picks, env3);
+      const note = activeAnomalyNote().trim();
+      if (note && texts.anomaly?.trim() && !texts.anomaly.includes(note)) texts.anomaly = `${note}
+
+${texts.anomaly}`;
+      parts.push(...slotParts(texts));
+    }
+    if (!messages.some((m) => typeof m?.content === "string" && m.content.includes(RP_HEAD))) parts.push({ order: 0, text: guidePrompt("RP") });
+    const first = chat.message?.find((m) => typeof m.data === "string" && m.data.trim())?.data;
+    return insertLoreBlock(messages, joinLoreBlock(parts), [greetingOf(char, chat), first ? messageText(first) : ""]);
+  }
+  async function withPlayer(messages, { char, chat }) {
+    const agent = playerAgent(char.globalLore, chat.scriptstate);
+    if (!agent) return messages;
+    const env3 = { vars: chat.scriptstate ?? {}, char: char.name, user: agent.name };
+    const out = applyPlayer(messages, playerBlock(char.globalLore, agent, env3), await readPersona(), userInfo().name, agent.name);
+    return basicSettings(char.globalLore, chat.scriptstate).assetPlayer ? out : hidePlayerTag(out, [agent.english]);
+  }
+  function statusShape({ chat }) {
+    const vars = chat.scriptstate ?? {};
+    const cfg = colConfig(vars);
+    const wallet = cfg.wallet !== "off" ? walletBalance(readWallet(vars, getPrefs().walletStart ?? WALLET_START_DEFAULT), aliveAnchors(chat)) : null;
+    return { cols: usedCols(cfg), wallet };
+  }
+  function knownIdentity({ chat }) {
+    if (!peopleSettings(chat.scriptstate).on) return "";
+    return identityText(peopleStore(chat).identity);
+  }
+  async function withPeople2(messages, { char, chat }) {
+    const settings = peopleSettings(chat.scriptstate);
+    if (!settings.on || settings.inject === "off") return messages;
+    const store = peopleStore(chat);
+    if (!Object.keys(store.people).length) return messages;
+    const me = playerAgent(char.globalLore, chat.scriptstate);
+    const lastUser = [...messages].reverse().find((m) => m?.role === "user");
+    const input3 = typeof lastUser?.content === "string" ? lastUser.content : "";
+    const user = me?.name || userInfo().name || "주인공";
+    const env3 = { vars: chat.scriptstate ?? {}, char: char.name, user: userOrTag() };
+    const sheetOf2 = (name) => {
+      const e = (char.globalLore ?? []).find((x) => x.mode !== "folder" && x.comment === name && typeof x.content === "string");
+      const text4 = e ? stripDecorators(evaluate(e.content, env3)).trim() : "";
+      return text4 || bookText({ char, chat }, name) || null;
+    };
+    const routed = await routerPeople(chat, store, input3, settings, me?.name ? [me.name] : []).catch(() => null);
+    const opts = { settings, store, sheetOf: sheetOf2, temperOf, extraNames: extraNames2(), input: input3, user, factionNames: factionNamesOf(char.globalLore), ...routed ? { people: routed } : {} };
+    let out = withPeopleBlock(messages, chat, opts);
+    if (settings.director === "scene") {
+      const { people } = peopleBlockFor(chat, opts);
+      const note = await directorNoteText(chat, store, people, input3, settings, user, char.globalLore).catch(() => "");
+      if (note) out = insertBlock(out, note);
+    }
+    return out;
+  }
+  function withImgPrompt(messages, { char, chat }) {
+    const s7 = basicSettings(char.globalLore, chat.scriptstate);
+    const out = stripImgLore(messages);
+    if (!s7.assetOn || s7.assetModel !== "main") return out;
+    const cfg = imgPromptConfig(getPrefs());
+    const me = playerAgent(char.globalLore, chat.scriptstate);
+    const names4 = imgCharacters(char.globalLore, cfg, { assetPlayer: s7.assetPlayer, playerEnglish: me?.english || void 0, userName: userInfo().name });
+    if (!names4.length) return out;
+    return [...out, { role: "system", content: buildImgPrompt(cfg, names4, s7.assetPlayer) }];
+  }
+  function moduleContext(scene, { char, chat }) {
+    const ss = chat.scriptstate;
+    const wantGnet = !!ss?.[GN_RAW] && gnetSettings(ss).enabled && gnetSettings(ss).context;
+    const wantPhone = (!!ss?.[PH_STATE] || !!ss?.[PH_BULLETINS]) && phoneSettings(ss).context;
+    const wantWiki = wikiContextOn(ss);
+    if (!wantGnet && !wantPhone && !wantWiki) return [];
+    applyAdvanced(ss);
+    const src = { char: { globalLore: char.globalLore }, chat };
+    const rules2 = { gnet: mainContextRules(src), phone: mainContextRules2(src), wiki: wikiContextRules(char.globalLore) };
+    const focus = makeFocus(scene, buildRegistry(char.globalLore));
+    const parts = [];
+    if (wantGnet && rules2.gnet) {
+      const st = readGnet(chat);
+      const own = CONTEXT.tokens;
+      if (st.posts.length || st.dms.length) parts.push({ cap: own, build: (cap) => withCap(CONTEXT, "tokens", cap, () => mainContext(st, userNick(ss), rules2.gnet, focus)) });
+    }
+    if (wantPhone && rules2.phone) {
+      try {
+        const st = readPhone(chat);
+        const notices = readBulletins(chat);
+        parts.push({ cap: HISTORY2.contextTokens, build: (cap) => withCap(HISTORY2, "contextTokens", cap, () => mainContext2(st, notices, phoneSettings(ss), rules2.phone, focus)) });
+      } catch (error) {
+        console.log(`[goei] 괴담톡 기록을 읽지 못했어요: ${error instanceof Error ? error.message : String(error)}`);
+      }
+    }
+    if (wantWiki && rules2.wiki) parts.push({ cap: advNum(ss, "nw", "ctx_tokens"), build: (cap) => wikiMainContext(chat, rules2.wiki, focus, cap) });
+    return fitTotal(parts, advNum(ss, "gen", "ctx_total")).filter(Boolean);
+  }
+  function withCap(box2, key2, cap, run5) {
+    const keep = box2[key2];
+    box2[key2] = cap;
+    try {
+      return run5();
+    } finally {
+      box2[key2] = keep;
+    }
+  }
+  function stripHistoryTags(messages) {
+    const dirty2 = (c) => typeof c === "string" && (hasWorldTags(c) || hasUnlockTag(c));
+    if (!messages.some((m) => m?.role === "assistant" && dirty2(m.content))) return messages;
+    return messages.map((m) => m?.role === "assistant" && dirty2(m.content) ? { ...m, content: stripUnlockTags(hasWorldTags(m.content) ? cleanOutput(m.content) : m.content) } : m);
+  }
+  async function applyUnlocks(char, charIndex, chatIndex, messageIndex) {
+    const lockable = new Set(readDirectory(char.globalLore).appendices.filter((r) => r.unlock).map((r) => r.lore));
+    return updateChat(charIndex, chatIndex, (cur) => {
+      const m = cur.message?.[messageIndex];
+      const text4 = typeof m?.data === "string" ? m.data : "";
+      if (!m || !hasUnlockTag(text4)) return null;
+      const got = unlockTags(text4).filter((n2) => lockable.has(n2));
+      const message = [...cur.message ?? []];
+      message[messageIndex] = { ...m, data: stripUnlockTags(text4) };
+      const ss = got.length ? { ...cur.scriptstate ?? {}, [UNLOCK_VAR]: unlockedValue([...readUnlocked(cur.scriptstate), ...got]) } : cur.scriptstate;
+      return { ...cur, message, scriptstate: ss };
+    });
+  }
+  async function onOutput(arg) {
+    setWaiting(false);
+    try {
+      const raw0 = arg.char;
+      const chat = arg.chat;
+      if (!raw0 || !chat || !isGoeiLore(raw0.globalLore)) return;
+      const char = { ...raw0, globalLore: withWorldLore(raw0.globalLore) };
+      const raw = chat.message?.[arg.messageIndex]?.data;
+      if (typeof raw !== "string") return;
+      let latest = null;
+      if (chat.scriptstate?.["$st_anomaly_on"] === "1") {
+        const catalog = parseCatalog(char.globalLore);
+        latest = await updateChat(
+          arg.characterIndex,
+          arg.chatIndex,
+          (cur) => processOutput(cur, arg.messageIndex, raw, catalog, worldSettings(char.globalLore, cur.scriptstate), Math.random)
+        );
+      }
+      if (hasUnlockTag(raw)) latest = await applyUnlocks(char, arg.characterIndex, arg.chatIndex, arg.messageIndex).catch(() => null) ?? latest;
+      const walletStart = getPrefs().walletStart ?? WALLET_START_DEFAULT;
+      if (colConfig(chat.scriptstate).wallet !== "off" && syncWalletToStatus(readWallet((latest ?? chat).scriptstate, walletStart), latest ?? chat)) {
+        latest = await updateChat(arg.characterIndex, arg.chatIndex, (cur) => {
+          const w = syncWalletToStatus(readWallet(cur.scriptstate, walletStart), cur);
+          return w ? { ...cur, scriptstate: { ...cur.scriptstate ?? {}, ...walletVars(w) } } : null;
+        }).catch(() => null) ?? latest;
+      }
+      let now = latest ?? await risuai.getChatFromIndex(arg.characterIndex, arg.chatIndex);
+      if (!now || chatPhase(now) !== "started") return;
+      now.message ??= [];
+      const missing = (ss) => {
+        const vars = { ...missingBasicVars(char.globalLore, ss), ...staleFactionVars(char.globalLore, ss) };
+        return Object.keys(vars).length ? vars : null;
+      };
+      if (missing(now.scriptstate)) {
+        now = await updateChat(arg.characterIndex, arg.chatIndex, (cur) => {
+          const vars = missing(cur.scriptstate);
+          return vars ? { ...cur, scriptstate: { ...cur.scriptstate ?? {}, ...vars } } : null;
+        }) ?? now;
+      }
+      await refreshStatusContext(arg.characterIndex, arg.chatIndex, { char, chat: now }).catch(() => {
+      });
+      if (latest && chatCardsAt(now, arg.messageIndex).length) now = await updateChat(arg.characterIndex, arg.chatIndex, (cur) => ({ ...cur })).catch(() => null) ?? now;
+      await storeLore(arg.characterIndex, arg.chatIndex, void 0, { char, chat: now }).catch(() => {
+      });
+      if (now.message.some((m) => typeof m.data === "string" && isUnsent(m.data))) now = await updateChat(arg.characterIndex, arg.chatIndex, clearUnsent) ?? now;
+      {
+        const pp = requestPeopleUpdate("turn").catch((error) => console.log(`[goei] 인물 기록 갱신 실패: ${error instanceof Error ? error.message : String(error)}`));
+        if (!peopleSettings(now.scriptstate).parallel) await pp;
+      }
+      await refreshStatusContext(arg.characterIndex, arg.chatIndex, { char, chat: now }).catch(() => {
+      });
+      await supplementAssets({ charIndex: arg.characterIndex, chatIndex: arg.chatIndex, lore: char.globalLore, chat: now, messageIndex: arg.messageIndex });
+      const phoneAuto = phoneSettings(now.scriptstate).auto;
+      const gnetAuto = gnetSettings(now.scriptstate).auto;
+      const viewAuto = viewSettings(now.scriptstate).auto === "turn";
+      const wikiAuto = wikiSettings(now.scriptstate).auto === "turn";
+      if (phoneAuto || gnetAuto || viewAuto || wikiAuto) {
+        const fresh = async () => {
+          const c = await risuai.getChatFromIndex(arg.characterIndex, arg.chatIndex) ?? now;
+          c.message ??= [];
+          return { charIndex: arg.characterIndex, chatIndex: arg.chatIndex, char, chat: c };
+        };
+        void (async () => {
+          applyAdvanced(now.scriptstate);
+          await readPersona();
+          const phoneFail = (error) => console.log(`[goei] 괴담톡 자동 확인 실패: ${error instanceof Error ? error.message : String(error)}`);
+          const wikiFail = (error) => console.log(`[goei] 위키 자동 작성 실패: ${error instanceof Error ? error.message : String(error)}`);
+          const gnetFail = (error) => console.log(`[goei] 괴담넷 자동 새로고침 실패: ${error instanceof Error ? error.message : String(error)}`);
+          const model2 = phoneSettings(now.scriptstate).model;
+          const fixed = featureModel(now.scriptstate, "ph");
+          if (phoneAuto && gnetAuto && gnetSettings(now.scriptstate).model === model2 && featureModel(now.scriptstate, "gn") === fixed) {
+            const joint = new Joint(model2, fixed);
+            await Promise.all([
+              autoRefresh(await fresh(), arg.messageIndex, void 0, joint).catch(phoneFail).finally(() => joint.done("phone")),
+              autoRefreshGnet(await fresh(), arg.messageIndex, false, joint).catch(gnetFail).finally(() => joint.done("gnet"))
+            ]);
+            if (viewAuto) await autoView(await fresh(), arg.messageIndex).catch(phoneFail);
+            if (wikiAuto) await autoWriteWiki(await fresh(), arg.messageIndex).catch(wikiFail);
+            return;
+          }
+          if (phoneAuto) await autoRefresh(await fresh(), arg.messageIndex).catch(phoneFail);
+          if (gnetAuto) await autoRefreshGnet(await fresh(), arg.messageIndex).catch(gnetFail);
+          if (viewAuto) await autoView(await fresh(), arg.messageIndex).catch(phoneFail);
+          if (wikiAuto) await autoWriteWiki(await fresh(), arg.messageIndex).catch(wikiFail);
+        })();
+      }
+    } catch (error) {
+      console.log(`[goei] 응답 처리 실패: ${error instanceof Error ? error.message : String(error)}`);
+    }
+  }
+  var escHtml = (s7) => s7.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+  function unsentRow() {
+    const p = cardPalette2();
+    unsentShown();
+    return `<span style="flex:1;color:${p.text}">전송 대기 · 채팅창의 전송 버튼으로 보내세요.</span><button type="button" data-goei-cancel="1" style="flex:none;padding:3px 12px;border:1px solid ${p.accentLine};border-radius:999px;background:transparent;color:${p.text};font:inherit;font-size:.92em;cursor:pointer">취소</button>`;
+  }
+  function sceneCardHtml(s7) {
+    const p = cardPalette2();
+    const unsent = s7.unsent ? `<span style="flex-basis:100%;display:flex;align-items:center;gap:10px;margin-top:4px;padding-top:6px;border-top:1px solid ${p.accentLine}">${unsentRow()}</span>` : "";
+    return `<div data-goei-card="scene" style="${cardStyle()}flex-wrap:wrap"><span style="color:${p.signal};font-weight:600">목표</span><span>${escHtml(s7.target)}</span><span style="opacity:.5">|</span><span style="color:${p.signal};font-weight:600">투입</span><span>${escHtml(s7.party)}</span>${unsent}</div>`;
+  }
+  function startCardHtml(body5, unsent) {
+    const p = cardPalette2();
+    const row9 = unsent ? `<span style="display:flex;align-items:center;gap:10px;margin-top:8px;padding-top:6px;border-top:1px solid ${p.accentLine}">${unsentRow()}</span>` : "";
+    return `<div data-goei-card="start" style="${cardStyle()}display:block"><span style="display:block;color:${p.signal};font-weight:600;margin-bottom:4px">첫 상황</span><span style="display:block;color:${p.text};white-space:pre-wrap">${escHtml(body5.trim())}</span>${row9}</div>`;
+  }
+  function unsentMarkHtml() {
+    return `<div data-goei-card="unsent" style="${cardStyle()}display:flex;margin-top:8px">${unsentRow()}</div>`;
+  }
+  function openingHintHtml() {
+    const p = cardPalette2();
+    openingShown();
+    return `<div data-goei-card="opening" style="${cardStyle()}display:flex;flex-wrap:wrap;margin-top:14px"><span style="flex:1 1 14em;color:${p.text}"><b style="color:${p.signal}">첫 행동</b> · 채팅창에 할 말이나 행동을 적고 전송하세요.</span><button type="button" data-goei-repick="1" style="flex:none;padding:3px 12px;border:1px solid ${p.accentLine};border-radius:999px;background:transparent;color:${p.text};font:inherit;font-size:.92em;cursor:pointer">재선택</button></div>`;
+  }
+  function callCardHtml(target) {
+    const p = cardPalette2();
+    return `<div data-goei-card="call" style="${cardStyle()}"><span aria-hidden="true">📞</span><span><b style="color:${p.signal}">${escHtml(target)}</b>에게 전화를 걸었다.</span></div>`;
+  }
+  function isLanding(text4) {
+    return text4.includes('data-goei="landing"') || text4.includes("ANOMALY SIMULATION") && text4.includes("버튼을 눌러 시작하세요");
+  }
+  function landingHtml2() {
+    return landingHtml(cardPalette2());
+  }
+  function cardPalette2() {
+    return cardPalette(currentTheme());
+  }
+  function cardStyle() {
+    const p = cardPalette2();
+    return `display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border:1px solid ${p.accentLine};border-radius:10px;background:${p.accentBg};color:${p.sub};font-size:.92em;line-height:1.5;`;
+  }
+  var assetsFirst = Promise.resolve();
+  async function onDisplay(text4) {
+    if (typeof text4 !== "string") return text4;
+    if (hasImgTag(text4) && !modulePicker()) await assetsFirst.catch(() => void 0);
+    return displayNow(text4);
+  }
+  async function redrawAfterLoad() {
+    try {
+      await assetsFirst;
+      if (isWaiting()) return;
+      const ctx2 = await loadContext();
+      if (!ctx2 || !isGoeiLore(ctx2.char.globalLore)) return;
+      if (!ctx2.chat.message.some((m) => typeof m.data === "string" && m.data.includes("<img="))) return;
+      await updateChat(ctx2.charIndex, ctx2.chatIndex, (cur) => ({ ...cur }));
+    } catch {
+    }
+  }
+  function displayNow(text4) {
+    const ours = liteNow || isLanding(text4) || text4.includes(UNSENT_MARK) || text4.includes(START_MARK) || text4.includes(SCENE_MARK) || hasStatusTag(text4) || hasSceneCard(text4) || hasCall(text4);
+    let out = text4;
+    if (isLanding(text4)) out = landingHtml2();
+    else {
+      if (out.includes(SCENE_MARK)) out = stripSceneMark(out);
+      if (liteNow && hasWorldTags(out)) out = cleanOutput(out);
+      if (liteNow && hasUnlockTag(out)) out = stripUnlockTags(out);
+      if (hasSceneCard(out)) out = renderSceneCards(out, sceneCardHtml);
+      if (hasCall(out)) out = renderCalls(out, callCardHtml);
+      if (out.includes(START_MARK)) out = renderStartCards(out, startCardHtml);
+      if (hasStatusTag(out)) out = renderStatus(out);
+      if (hasImgTag(out)) {
+        const pick3 = modulePicker();
+        const self = userInfo().name;
+        if (ours || imgTagsKnown(out, pick3, self)) out = renderImgTags(out, pick3, getPrefs().imgShow ?? IMG_RECENT.def, self);
+      }
+      if (out.includes(UNSENT_MARK)) out = renderUnsentMark(out, unsentMarkHtml());
+      if (wantsOpeningHint(text4)) out += openingHintHtml();
+    }
+    if (ours && !out.includes("data-goei-user")) out += USER_MARK;
+    return out;
+  }
+  async function readSnapshot(fab) {
+    const none2 = { charIndex: -1, chatIndex: -1, chatScreen: false };
+    try {
+      const charIndex = await risuai.getCurrentCharacterIndex();
+      if (!Number.isInteger(charIndex) || charIndex < 0) return none2;
+      const chatIndex = await risuai.getCurrentChatIndex();
+      const chatScreen = fab ? await fab.chatScreenVisible() : true;
+      return { charIndex, chatIndex: Number.isInteger(chatIndex) ? chatIndex : -1, chatScreen };
+    } catch {
+      return none2;
+    }
+  }
+  async function isLiteCharacter(charIndex) {
+    if (charIndex < 0) return false;
+    try {
+      const char = await getChar(charIndex);
+      const lite = isGoeiLore(char?.globalLore);
+      if (lite && char) prefetchFactions(char);
+      return lite;
+    } catch {
+      return false;
+    }
+  }
+  async function readTheme(snap) {
+    if (snap.chatIndex < 0) return;
+    const chat = await risuai.getChatFromIndex(snap.charIndex, snap.chatIndex);
+    if (!chat) return;
+    const on2 = chat.scriptstate?.["$st_asset_on"];
+    const changed = setImgHidden(on2 === void 0 || on2 === null || on2 === "" ? getPrefs().basic.assetOn === false : on2 === "0" || on2 === 0 || on2 === false);
+    const before = currentTheme();
+    setCurrentTheme(themeName(chat.scriptstate?.["$st_fixed_theme"], chat.message?.length ? "light" : themeName(getPrefs().theme)));
+    if (changed && currentTheme() === before) repaintTheme();
+  }
+  function startWatcher(fab) {
+    const state = new WatchState();
+    setInstalledHook(() => {
+      state.forget();
+    });
+    let stopped = false;
+    let timer4;
+    let shownChat = "";
+    const tick3 = async () => {
+      try {
+        const snap = await readSnapshot(fab);
+        const lite = state.needsCharacterCheck(snap) ? await isLiteCharacter(snap.charIndex) : void 0;
+        if (stopped) return;
+        const next = state.update(snap, lite);
+        liteNow = state.lite;
+        const chatKey4 = next.fabVisible ? `${snap.charIndex}:${snap.chatIndex}` : "";
+        if (next.fabVisible && (next.changed || chatKey4 !== shownChat)) {
+          await readTheme(snap).catch(() => {
+          });
+          await refreshStatusContext(snap.charIndex, snap.chatIndex).catch(() => {
+          });
+          await refreshOpeningHint(snap.charIndex, snap.chatIndex).catch(() => {
+          });
+        }
+        shownChat = chatKey4;
+        if (next.changed) await fab?.setVisible(next.fabVisible, next.intro);
+      } catch (error) {
+        console.log(`[goei] 채팅 감시 실패: ${error instanceof Error ? error.message : String(error)}`);
+      } finally {
+        if (!stopped) timer4 = setTimeout(() => void tick3(), WATCH_MS);
+      }
+    };
+    void tick3();
+    return () => {
+      stopped = true;
+      setInstalledHook(null);
+      clearTimeout(timer4);
+    };
+  }
+  async function start2(o = {}) {
+    void dropOldGame();
+    try {
+      await loadWorldData();
+    } catch (error) {
+      showWorldDataPanel(reason(error), !!o.prompt);
+      throw error;
+    }
+    await loadPrefs();
+    await loadStoredWikiPack();
+    await loadStoredTokenizer();
+    assetsFirst = loadModuleAssets();
+    void redrawAfterLoad();
+    setWikiOpener((title2) => void openWiki2(title2));
+    setRecordsOpener((id) => void openRecords2(id));
+    setRepickOpener(() => void openApp({ quietIfNotLite: true }));
+    let stopWatcher = null;
+    let fab = null;
+    try {
+      fab = await createFab(() => (fab?.endIntro(), void openApp({ quietIfNotLite: true })));
+      const f = fab;
+      void f.setTheme(currentTheme());
+      onThemeChange((t) => void f.setTheme(t).catch(() => {
+      }));
+      stopWatcher = startWatcher(fab);
+    } catch (error) {
+      console.log(`[goei] 플로팅 버튼을 만들지 못했어요: ${error instanceof Error ? error.message : String(error)}`);
+      fab = null;
+      stopWatcher = startWatcher(null);
+      await risuai.registerButton({ name: BRAND.name, icon: GHOST_ICON, iconType: "html", location: "chat", id: `${PLUGIN_ID}-chat` }, () => void openApp({ quietIfNotLite: true })).catch((e) => console.log(`[goei] 채팅 메뉴 단추를 두지 못했어요: ${e instanceof Error ? e.message : String(e)}`));
+    }
+    return {
+      beforeRequest: onBeforeRequest,
+      sanitize,
+      input: onInput,
+      output: onOutput,
+      display: onDisplay,
+      install: () => openInstall(),
+      unload: async () => {
+        stopWatcher?.();
+        await fab?.remove().catch(() => {
+        });
+      }
+    };
+  }
+
+  // src/body-entry.ts
+  globalThis.__goeiBody = { version: "0.21.0", start: start2 };
+})();

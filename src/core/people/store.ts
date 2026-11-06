@@ -3,7 +3,7 @@
 // 사라진 항목은 지우지 않는다 (화면에서 회색, 되살리기 가능).
 import type { Chat, ChatMessage } from '../types';
 import { messageText } from '../refs';
-import { PEOPLE_KEY, SLOTS, DOC_TYPES, REGISTERS, emptyStore, type Change, type Doc, type Entry, type PeopleStore, type Person, type Register, type SlotId } from './types';
+import { AXES, PEOPLE_KEY, SLOTS, DOC_TYPES, REGISTERS, DEFAULT_AXES, EXPRESS_TO_AXIS, emptyStore, expressOf, type Candidate, type Change, type Doc, type Entry, type LastRun, type Observation, type PeopleStore, type Person, type Register, type SlotId } from './types';
 
 /** 채팅 마지막 메시지 chatId (없으면 #순번): 기록의 기준 자리 */
 export function anchorOf(chat: Chat): string {
@@ -46,7 +46,18 @@ export function peopleStore(chat: Chat): PeopleStore {
       address: { toUser: str(p.address?.toUser), register: REGISTERS.includes(p.address?.register as Register) ? (p.address!.register as Register) : '존댓말', ...(p.address?.pin ? { pin: true } : {}) },
       express: ([0, 1, 2, 3] as const).includes(p.express as 0) ? (p.express as 0 | 1 | 2 | 3) : 1,
       aliases: Array.isArray(p.aliases) ? p.aliases.filter((a): a is string => typeof a === 'string') : [],
+      axes: DEFAULT_AXES(),
+      axesFrom: p.axesFrom === 'model' || p.axesFrom === 'manual' ? p.axesFrom : 'default',
+      patterns: Array.isArray(p.patterns) ? p.patterns.filter((t): t is string => typeof t === 'string').slice(0, 30) : [],
+      candidates: readCandidates(p.candidates),
+      ...(Number.isInteger(p.reviewTurn) ? { reviewTurn: p.reviewTurn as number } : {}),
     };
+    const me = out.people[name];
+    // 축: 저장된 것이 있으면 읽고, 없으면 express 에서 (감정 표출성만). express 는 늘 축에서 다시 계산
+    if (p.axes && typeof p.axes === 'object') {
+      for (const a of AXES) if ((p.axes as Record<string, unknown>)[a] !== undefined) me.axes[a] = Math.max(0, Math.min(100, Math.round(Number((p.axes as Record<string, unknown>)[a]) || 0)));
+    } else me.axes.emotionalExpressiveness = EXPRESS_TO_AXIS[me.express];
+    me.express = expressOf(me.axes);
   }
   for (const [k, d] of Object.entries(raw.docs ?? {})) {
     if (!d || !DOC_TYPES.includes(d.type) || typeof d.key !== 'string') continue;
@@ -60,9 +71,21 @@ export function peopleStore(chat: Chat): PeopleStore {
   out.folded = raw.folded && typeof raw.folded === 'object' ? Object.fromEntries(Object.entries(raw.folded).filter(([, v]) => typeof v === 'number')) as Record<string, number> : {};
   out.read = raw.read && typeof raw.read === 'object' ? Object.fromEntries(Object.entries(raw.read).filter(([, v]) => typeof v === 'string')) as Record<string, string> : {};
   out.pending = raw.pending && typeof raw.pending === 'object' ? (raw.pending as PeopleStore['pending']) : {};
+  if (raw.lastRun && typeof raw.lastRun === 'object' && Array.isArray(raw.lastRun.entries)) out.lastRun = raw.lastRun as LastRun;
   out.ignored = Array.isArray(raw.ignored) ? raw.ignored.filter((n): n is string => typeof n === 'string') : [];
   if (raw.identity && typeof raw.identity === 'object') out.identity = raw.identity;
   if (Array.isArray(raw.migrated)) out.migrated = raw.migrated.filter((m): m is string => typeof m === 'string');
+  return out;
+}
+
+function readCandidates(raw: unknown): Record<string, Candidate> {
+  const out: Record<string, Candidate> = {};
+  if (!raw || typeof raw !== 'object') return out;
+  for (const [id, c] of Object.entries(raw as Record<string, Partial<Candidate>>)) {
+    if (!c || typeof c !== 'object' || typeof c.pattern !== 'string' || typeof c.axis !== 'string') continue;
+    const evidence = Array.isArray(c.evidence) ? (c.evidence as Partial<Observation>[]).filter((e) => e && typeof e.id === 'string' && typeof e.anchor === 'string').map((e) => ({ id: e.id!, anchor: e.anchor!, seq: Number(e.seq) || 0, quote: str(e.quote), reason: str(e.reason), strength: Number(e.strength) || 0, confidence: Number(e.confidence) || 0, ...(e.void ? { void: true } : {}) })) : [];
+    out[id] = { id, axis: c.axis as Candidate['axis'], direction: (['up', 'down', 'new', 'weaken'] as const).includes(c.direction as 'up') ? (c.direction as Candidate['direction']) : 'up', pattern: c.pattern, evidence, status: (['collecting', 'approved', 'rejected', 'reverted'] as const).includes(c.status as 'collecting') ? (c.status as Candidate['status']) : 'collecting', at: str(c.at), ...(c.applied && typeof c.applied === 'object' ? { applied: c.applied } : {}) };
+  }
   return out;
 }
 
@@ -164,6 +187,62 @@ export function putDoc(store: PeopleStore, type: Doc['type'], key: string, entry
   if (d.entries.some((e) => e.id === entry.id)) return false;
   d.entries.push({ ...entry, text: plain(entry.text) });
   return true;
+}
+
+// ── 마지막 갱신 되돌리기 (리수폿 J-4): 갱신 전후 id 를 비교해 새로 생긴 것을 적어 두고, 되돌리면 전부 취소(void) ──
+export interface RunSnapshot { entries: Set<string>; docs: Set<string>; changes: Set<string>; observations: Set<string>; people: Set<string> }
+export function snapshotRun(store: PeopleStore): RunSnapshot {
+  const entries = new Set<string>();
+  const observations = new Set<string>();
+  for (const p of Object.values(store.people)) {
+    for (const [slot, list] of Object.entries(p.slots)) for (const e of list ?? []) entries.add(`${p.name}|${slot}|${e.id}`);
+    for (const c of Object.values(p.candidates ?? {})) for (const o of c.evidence) observations.add(`${p.name}|${c.id}|${o.id}`);
+  }
+  const docs = new Set<string>();
+  for (const d of Object.values(store.docs)) for (const e of d.entries) docs.add(`${d.key}|${e.id}`);
+  return { entries, docs, changes: new Set(store.log.map((c) => c.id)), observations, people: new Set(Object.keys(store.people)) };
+}
+/** 갱신 뒤: 전과 비교해 새로 생긴 것을 lastRun 에 적는다 (하나도 없으면 지움) */
+export function recordRun(store: PeopleStore, before: RunSnapshot, at: string): LastRun | undefined {
+  const after = snapshotRun(store);
+  const diff = (a: Set<string>, b: Set<string>) => [...b].filter((x) => !a.has(x));
+  const run: LastRun = {
+    at,
+    entries: diff(before.entries, after.entries).map((k) => { const [who, slot, id] = k.split('|'); return { who, slot, id }; }),
+    docs: diff(before.docs, after.docs).map((k) => { const i = k.lastIndexOf('|'); return { key: k.slice(0, i), id: k.slice(i + 1) }; }),
+    changes: diff(before.changes, after.changes),
+    observations: diff(before.observations, after.observations).map((k) => { const [who, cand, id] = k.split('|'); return { who, cand, id }; }),
+    newPeople: diff(before.people, after.people),
+  };
+  const n = run.entries.length + run.docs.length + run.changes.length + run.observations.length + run.newPeople.length;
+  if (n) store.lastRun = run;
+  else delete store.lastRun;
+  return store.lastRun;
+}
+/** 되돌리기: 마지막 갱신이 만든 항목·변경·관찰을 취소하고 새 인물을 지운다. 취소한 개수 */
+export function undoLastRun(store: PeopleStore): number {
+  const run = store.lastRun;
+  if (!run) return 0;
+  let n = 0;
+  for (const x of run.entries) {
+    const e = store.people[x.who]?.slots[x.slot as SlotId]?.find((e) => e.id === x.id);
+    if (e && !e.void) { e.void = true; n++; }
+  }
+  for (const x of run.docs) {
+    const e = Object.values(store.docs).find((d) => d.key === x.key)?.entries.find((e) => e.id === x.id);
+    if (e && !e.void) { e.void = true; n++; }
+  }
+  for (const id of run.changes) {
+    const c = store.log.find((c) => c.id === id);
+    if (c && !c.void) { c.void = true; n++; }
+  }
+  for (const x of run.observations) {
+    const o = store.people[x.who]?.candidates?.[x.cand]?.evidence.find((o) => o.id === x.id);
+    if (o && !o.void) { o.void = true; n++; }
+  }
+  for (const name of run.newPeople) if (store.people[name]) { delete store.people[name]; n++; }
+  delete store.lastRun;
+  return n;
 }
 
 export function putChange(store: PeopleStore, c: Change): boolean {

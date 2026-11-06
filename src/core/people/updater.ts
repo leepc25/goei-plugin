@@ -7,6 +7,9 @@ import { findStatusTags } from '../world/status';
 import { addressOf, affinityView, opennessOf, tasteOf } from './affinity';
 import { unknownTo } from './inject';
 import { seedPerson } from './seed';
+import { rhythmClock, rhythmClockLines, parseHookHead, turnAt, type RhythmClock } from './rhythm';
+import { axesView, ensureAxes, isAxis, isDirection, observe, readAxes, setAxes, pruneCandidates } from './axes';
+import { AXES } from './types';
 import { factionNow, knownFactionCodes, sceneFactionCodes, userFactionOf, factionName as factionNameOf } from './faction';
 import { factionCode } from './identity';
 import { mentionsAmount, parseWon } from '../wallet';
@@ -14,7 +17,7 @@ import { validateDebrief, type DebriefItem, type EndedNow } from '../journal/deb
 import { nameMatcher, scenePeople, entriesOf, type NameEntry } from './select';
 import { changeId, entryId, isAlive, liveChanges, liveEntries, liveness, markRead, messageKey, norm, plain, putChange, putDoc, putEntry, type Liveness } from './store';
 import type { Feature, PeopleSettings } from './settings';
-import { CUES, DOC_TYPES, FACTION_STAGES, OPENNESS_BASELINES, factionWho, OPENNESS_DELTAS, REGISTERS, RHYTHM_ENGAGEMENT, RHYTHM_HOOK_STAGES, RHYTHM_HOOK_TIERS, RHYTHM_PHASES, SLOTS, TASTE_MAX, TASTE_MIN, docFeature, opennessStage, type Change, type Cue, type DocType, type Entry, type PeopleStore, type Person, type Register, type SlotId } from './types';
+import { CUES, DOC_TYPES, FACTION_STAGES, OPENNESS_BASELINES, factionWho, OPENNESS_DELTAS, REGISTERS, RHYTHM_ENGAGEMENT, RHYTHM_HOOK_STAGES, RHYTHM_HOOK_TIERS, RHYTHM_PHASES, SLOTS, SLOT_META, TASTE_MAX, TASTE_MIN, docFeature, opennessStage, slotsFor, type Change, type Cue, type DocType, type Entry, type PeopleStore, type Person, type Register, type SlotId } from './types';
 
 const str = (v: unknown) => (typeof v === 'string' ? v : '');
 const msgs = (chat: Chat): ChatMessage[] => (Array.isArray(chat.message) ? chat.message : []);
@@ -63,6 +66,11 @@ export interface UpdateInput {
   /** 장면 세력 코드 (세력 평판 켜짐) */
   factions: string[];
   factionNames: Record<string, string>;
+  /** 리듬 시계 (기능 rhythm). 훅 행동 상한·새 훅 허용 검사용 */
+  clock?: RhythmClock;
+  /** 관계 재검토를 요청한 인물 (리수폿 G). 반영 뒤 reviewTurn 을 적는다 */
+  review: string[];
+  turn: number;
   /** 가계부 켜짐 (상태창 잔고 칸 사용): 거래 절을 읽는다 */
   wallet: boolean;
   /** 이 묶음에서 종료된 사건 (소감 절 켜짐이면 ≥1건, 아니면 빈 목록) */
@@ -91,12 +99,12 @@ export function recordChars(p: Person, live: Liveness): number {
   return SLOTS.reduce((n, s) => n + liveEntries(p.slots[s], live).reduce((m, e) => m + e.text.length, 0), 0);
 }
 
-export function personPayload(p: Person, live: Liveness, changes: Change[], unknown?: string[], extra: { taste?: boolean; openness?: boolean; turnCap?: number } = {}) {
-  const entries: Record<string, { id: string; text: string; target?: string; kind?: string }[]> = {};
-  for (const s of SLOTS) {
+export function personPayload(p: Person, live: Liveness, changes: Change[], unknown?: string[], extra: { taste?: boolean; openness?: boolean; axes?: boolean; turnCap?: number; slots?: SlotId[]; qual?: Set<string> } = {}) {
+  const entries: Record<string, { id: string; text: string; target?: string; kind?: string; pin?: true }[]> = {};
+  for (const s of extra.slots ?? SLOTS) {
     const list = liveEntries(p.slots[s], live);
     if (!list.length) continue;
-    entries[s] = list.map((e) => ({ id: e.id, text: e.text, ...(e.target ? { target: e.target } : {}), ...(e.kind ? { kind: e.kind } : {}) }));
+    entries[s] = list.map((e) => ({ id: e.id, text: e.text, ...(e.target ? { target: e.target } : {}), ...(e.kind ? { kind: e.kind } : {}), ...(e.pin ? { pin: true as const } : {}) }));
   }
   const aff = affinityView(p, changes, 0, { turnCap: extra.turnCap });
   const addr = addressOf(p, changes);
@@ -104,10 +112,12 @@ export function personPayload(p: Person, live: Liveness, changes: Change[], unkn
     name: p.name,
     aliases: p.aliases,
     express: p.express,
-    affinity_now: `${aff.stage.label}(${aff.stage.max})`,
+    ...(extra.qual?.has('affinity') ? {} : { affinity_now: `${aff.stage.label}(${aff.stage.max})` }),
     address_now: addr,
     ...(extra.taste ? { taste_now: tasteOf(p, changes) } : {}),
-    ...(extra.openness ? { openness_now: (() => { const v = opennessOf(p, changes); return v === null ? null : { value: v, stage: opennessStage(v).en }; })() } : {}),
+    ...(extra.openness && !extra.qual?.has('openness') ? { openness_now: (() => { const v = opennessOf(p, changes); return v === null ? null : { value: v, stage: opennessStage(v).en }; })() } : {}),
+    // 성격 6축 (기능 axes): 값·띠 설명, 아직 시작값이 없으면 axes_init_needed, 장기 변화
+    ...(extra.axes ? { axes: axesView(p.axes).map((a) => ({ axis: a.axis, value: a.value, band: a.band })), ...(p.axesFrom === 'default' ? { axes_init_needed: true } : {}), ...(p.patterns?.length ? { patterns: p.patterns } : {}) } : {}),
     entries,
     ...(unknown?.length ? { unknown_to: unknown } : {}),
   };
@@ -130,8 +140,14 @@ export interface BuildOpts {
   wallet?: number | null;
   /** 이 묶음에서 종료된 사건 (소감 자동 켜짐). 없거나 비면 소감 절·자료 없음 */
   ended?: EndedNow[];
+  /** 모델 Router 가 본 미등록 이름 (힌트). 자료 name_hints */
+  hints?: { name: string; aliases: string[]; quote: string }[];
+  /** 하이파 요약 (리수폿 J-3). 자료 memory: 배경일 뿐 근거 아님 */
+  memory?: string[];
 }
 
+/** 관계 재검토 간격 (턴). 리수폿 원문 20 */
+export const REVIEW_TURNS = 20;
 const SUSP_WEIGHT: Record<string, number> = { 약: 10, 중: 25, 강: 40, '-약': -10, '-중': -25, '-강': -40 };
 /** 의심 사례 요약: 같은 대상·종류의 살아 있는 항목을 한 사례로. score 는 코드가 단서 무게로 계산 */
 export function suspicionCases(p: Person, live: Liveness) {
@@ -221,21 +237,38 @@ export function buildUpdate(chat: Chat, store: PeopleStore, batch: number[], o: 
   // 세력 평판: 장면 세력(인물 소속 ∪ 글에 나온 세력)의 현재값
   const factionCodes = o.settings.features.has('faction_rep') ? sceneFactionCodes(store, chosen, texts, o.factionNames) : [];
   const userFaction = userFactionOf(store, chat);
+  const last = Math.max(...batch);
+  const turn = turnAt(chat, last);
+  // 리듬 시계 (리수폿 H): 코드가 턴을 세서 훅 회수 범위·새 훅 허용을 알려 준다
+  const clock = o.settings.features.has('rhythm') ? rhythmClock(store, chat, live, last) : undefined;
+  // 관계 재검토 (리수폿 G): 관계 기록이 20턴 이상 그대로인데 그 사이 겪은 일(행적·사건)이 있으면 한 번 되짚게 한다
+  const review = o.only?.length ? [] : chosen.filter((n) => {
+    const p = store.people[n];
+    const relTurn = Math.max(-1, ...['relationship', 'register.stage_assessment'].flatMap((k) => liveEntries(p.slots[k as SlotId], live).filter((e) => !e.target || e.target === '@user').map((e) => turnAt(chat, live.at.get(e.anchor) ?? 0))));
+    const since = Math.max(relTurn, p.reviewTurn ?? -1);
+    if (since < 0 || turn - since < REVIEW_TURNS) return false;
+    const after = (e: { anchor: string }) => turnAt(chat, live.at.get(e.anchor) ?? 0) > since;
+    return liveEntries(p.slots.history, live).some(after) || Object.values(store.docs).some((d) => d.type === 'event' && liveEntries(d.entries, live).some(after));
+  });
   const data = {
     request_ref: `pp_${Date.now().toString(36)}`,
-    cues: o.settings.features.has('affinity') ? CUES.map((c) => ({ name: c, meaning: CUE_MEANING[c] })) : [],
-    slots: SLOTS.filter((s) => s !== 'suspicion' || o.settings.features.has('suspicion')),
+    cues: o.settings.features.has('affinity') && !o.settings.qualitative.has('affinity') ? CUES.map((c) => ({ name: c, meaning: CUE_MEANING[c] })) : [],
+    slots: slotsFor(o.settings.features, o.settings.qualitative),
     doc_types: DOC_TYPES.filter((t) => o.settings.features.has(docFeature(t) as Feature)),
     people: chosen.map((n) => {
       const p = store.people[n];
-      return { ...personPayload(p, live, changes, wantNote || o.settings.features.has('perception') ? unknownTo(p, store, live) : undefined, { taste: o.settings.features.has('taste'), openness: o.settings.features.has('openness'), turnCap: o.settings.turnCap }), values: o.values[n] ?? '' };
+      return { ...personPayload(p, live, changes, wantNote || o.settings.features.has('perception') ? unknownTo(p, store, live) : undefined, { taste: o.settings.features.has('taste'), openness: o.settings.features.has('openness'), axes: o.settings.features.has('axes'), turnCap: o.settings.turnCap, slots: slotsFor(o.settings.features, o.settings.qualitative), qual: o.settings.qualitative }), values: o.values[n] ?? '' };
     }),
     known_names: Object.keys(store.people),
+    ...(o.hints?.length ? { name_hints: o.hints.filter((h) => !store.people[h.name]).slice(0, 4) } : {}),
+    ...(o.memory?.length ? { memory: o.memory } : {}),
     docs_now: DOC_TYPES.some((t) => o.settings.features.has(docFeature(t) as Feature))
       ? Object.values(store.docs).filter((d) => o.settings.features.has(docFeature(d.type) as Feature)).flatMap((d) => liveEntries(d.entries, live).map((e) => ({ type: d.type, key: d.key, id: e.id, text: e.text, ...(e.date ? { date: e.date } : {}), ...(e.place ? { place: e.place } : {}), ...(e.who?.length ? { who: e.who } : {}) })))
       : undefined,
-    suspicion_now: o.settings.features.has('suspicion') ? chosen.flatMap((n) => suspicionCases(store.people[n], live)) : undefined,
+    suspicion_now: o.settings.features.has('suspicion') && !o.settings.qualitative.has('suspicion') ? chosen.flatMap((n) => suspicionCases(store.people[n], live)) : undefined,
     npc_relations: o.settings.features.has('npc_emotion') ? true : undefined,
+    ...(clock ? { rhythm_clock: rhythmClockLines(clock) } : {}),
+    ...(review.length ? { relationship_review: review } : {}),
     factions_now: o.settings.features.has('faction_rep')
       ? factionCodes.map((c) => { const f = factionNow(store, c, changes, userFaction, o.settings, o.factionNames); return { code: f.code, name: f.name, value: f.value, stage: f.stage.label, stage_en: f.stage.id }; })
       : undefined,
@@ -252,7 +285,7 @@ export function buildUpdate(chat: Chat, store: PeopleStore, batch: number[], o: 
     ended_now: o.ended?.length ? o.ended : undefined,
     want: { new_people: true, next_note: wantNote, address: o.settings.features.has('register'), identity: true, transactions: typeof o.wallet === 'number', debriefs: !!o.ended?.length },
   };
-  return { system: o.system, data, indexes: batch, tags, people: chosen, confirmed: confirmedIdx, names: o.names, tidy: o.settings.tidy === 'same' ? over : [], factions: factionCodes, factionNames: o.factionNames ?? {}, wallet: typeof o.wallet === 'number', ended: o.ended ?? [] };
+  return { system: o.system, data, indexes: batch, tags, people: chosen, confirmed: confirmedIdx, names: o.names, tidy: o.settings.tidy === 'same' ? over : [], factions: factionCodes, factionNames: o.factionNames ?? {}, clock, review, turn, wallet: typeof o.wallet === 'number', ended: o.ended ?? [] };
 }
 
 // ── 지침 조립 ──
@@ -262,14 +295,35 @@ export function buildUpdate(chat: Chat, store: PeopleStore, batch: number[], o: 
 export const LANG_EN_RULE = [
   '## Record language',
   'Write every free-text field you produce in English even where this document says Korean: entry `text`, cue `reason`, new person `identity` and `speech`, doc `text`, suspicion text, debrief `text`, and `next_note`.',
-  'Keep exactly as the Korean source writes them: `name`, `aliases`, `key`, `target`, address terms and register words (존댓말/반말/혼합/하게체/하오체), `faction`, `rank`, the Korean prefixes [시작]/[단서]/[반응]/[해소] and 첫인상/현재 평가 labels, and every `quote`.',
+  'Keep exactly as the Korean source writes them: `name`, `aliases`, `key`, `target`, address terms and register words (존댓말/반말/혼합/하게체/하오체), `faction`, `rank`, the Korean prefixes [시작]/[단서]/[반응]/[해소], slot names, and every `quote`.',
 ].join('\n');
 
-export function assemblePrompt(text: string, enabled: Set<string>, userRules = '', lang: 'ko' | 'en' = 'ko'): string {
+/** 절 본문 (첫 번째 나오는 절 = 본문 절. 출력 계약 줄의 같은 이름 절은 두 번째) */
+export function sectionBody(text: string, name: string): string | null {
+  const m = new RegExp(`<<SECTION:${name}>>\\n([\\s\\S]*?)<<END:${name}>>`).exec(text);
+  return m ? m[1].replace(/\n$/, '') : null;
+}
+/** 절 덮어쓰기 (리수폿 J-1 지침 편집): 첫 번째(본문) 절만 바꾼다. 출력 계약 줄은 그대로 */
+export function overrideSections(text: string, overrides: Record<string, string>): string {
+  let out = text;
+  for (const [name, body] of Object.entries(overrides)) {
+    if (!/^[a-z_]+$/.test(name) || !body.trim()) continue;
+    out = out.replace(new RegExp(`<<SECTION:${name}>>\\n[\\s\\S]*?<<END:${name}>>`), () => `<<SECTION:${name}>>\n${body.trim()}\n<<END:${name}>>`);
+  }
+  return out;
+}
+
+export function assemblePrompt(text: string, enabled: Set<string>, userRules = '', lang: 'ko' | 'en' = 'ko', overrides: Record<string, string> = {}): string {
   const rules = (lang === 'en' ? `${LANG_EN_RULE}\n\n${userRules.trim()}` : userRules).trim();
   const on = new Set(enabled);
+  if (Object.keys(overrides).length) text = overrideSections(text, overrides);
   if (rules && text.includes('<<USER_RULES>>')) on.add('user_rules');
-  let out = text.replace(/<<SECTION:([a-z_]+)>>([\s\S]*?)<<END:\1>>/g, (_m, name: string, body: string) => (on.has(name) ? body : ''));
+  // 절은 겹칠 수 있다 (affinity 안에 affinity_num/affinity_qual). 바깥 절을 남기면 안쪽 절을 다시 본다
+  let out = text;
+  for (let prev = ''; prev !== out; ) {
+    prev = out;
+    out = out.replace(/<<SECTION:([a-z_]+)>>([\s\S]*?)<<END:\1>>/g, (_m, name: string, body: string) => (on.has(name) ? body : ''));
+  }
   out = out.replace('<<USER_RULES>>', () => rules).replace(/<<(?:SECTION|END):[a-z_]+>>/g, '').replace(/\n{3,}/g, '\n\n').trim();
   if (rules && !text.includes('<<USER_RULES>>')) out += `\n\n## User rules (appended by the user; they cannot change the output contract)\n${rules}`;
   return out;
@@ -278,6 +332,8 @@ export function assemblePrompt(text: string, enabled: Set<string>, userRules = '
 export function enabledSections(s: PeopleSettings): Set<string> {
   const on = new Set<string>();
   for (const f of s.features) on.add(f);
+  // 수치 모드·정성 모드 절 (리수폿 E): 기능이 켜져 있을 때 둘 중 하나만
+  for (const f of ['affinity', 'suspicion', 'openness'] as const) if (s.features.has(f)) on.add(s.qualitative.has(f) ? `${f}_qual` : `${f}_num`);
   if (s.director === 'facts') on.add('next_note');
   return on;
 }
@@ -306,6 +362,10 @@ export interface UpdateResult {
   transactions?: { amount: number | string; memo?: string | null; m: string; quote: string }[];
   /** 소감: 이번 턴 종료 사건의 담당 요원 소감 (사건당 1건) */
   debriefs?: { id: string; who: string; text: string }[];
+  /** 성격 관찰 (기능 axes): 축을 바꾸지 않고 「이 장면에서 이런 모습」만. 코드가 모아 검토로 띄운다 */
+  observations?: { who: string; axis: string; direction: string; pattern: string; reason?: string; strength?: number; confidence?: number; m: string; quote: string }[];
+  /** 성격 6축 시작값 (axes_init_needed 인 인물만, 한 번) */
+  axes_init?: { who: string; axes: Record<string, number>; m: string; quote: string }[];
 }
 
 /** JSON 하나만 꺼낸다 (코드 울타리·앞뒤 글 허용). 아니면 throw */
@@ -319,7 +379,7 @@ export function parseUpdate(raw: string): UpdateResult {
   const v = JSON.parse(t.slice(a, b + 1)) as unknown;
   if (!v || typeof v !== 'object' || Array.isArray(v)) throw new Error('JSON 객체가 아니에요');
   const r = v as UpdateResult;
-  for (const k of ['entries', 'cues', 'address', 'new_people', 'docs', 'suspicion', 'next_note', 'taste', 'openness', 'faction_cues', 'transactions', 'debriefs'] as const) {
+  for (const k of ['entries', 'cues', 'address', 'new_people', 'docs', 'suspicion', 'next_note', 'taste', 'openness', 'faction_cues', 'transactions', 'debriefs', 'observations', 'axes_init'] as const) {
     if (r[k] !== undefined && !Array.isArray(r[k])) throw new Error(`${k}는 목록이어야 해요`);
   }
   return r;
@@ -329,7 +389,7 @@ export function parseUpdate(raw: string): UpdateResult {
 
 export interface Dropped { kind: string; who?: string; reason: string; item: unknown }
 export interface ApplyReport {
-  applied: { entries: number; cues: number; address: number; docs: number; suspicion: number; newPeople: string[]; notes: number; identity: boolean; taste: number; openness: number; factions: number; transactions: number; debriefs?: number };
+  applied: { entries: number; cues: number; address: number; docs: number; suspicion: number; newPeople: string[]; notes: number; identity: boolean; taste: number; openness: number; factions: number; transactions: number; debriefs?: number; observations?: number; axesInit?: number };
   dropped: Dropped[];
   /** 「확인 필요」로 보류한 것 */
   held: Dropped[];
@@ -495,7 +555,8 @@ export function applyUpdate(store: PeopleStore, chat: Chat, input: UpdateInput, 
     newCount++;
   }
 
-  // 2. 칸 항목
+  // 2. 칸 항목 (켜진 기능의 칸만. 2026-11-06 「I」: 기능별 전용 칸)
+  const enabledSlots = slotsFor(ctx.settings.features, ctx.settings.qualitative);
   const perPerson = new Map<string, number>();
   for (const e of r.entries ?? []) {
     const who = nameOf(str(e?.who));
@@ -504,8 +565,8 @@ export function applyUpdate(store: PeopleStore, chat: Chat, input: UpdateInput, 
       continue;
     }
     const slot = e.slot as SlotId;
-    if (!SLOTS.includes(slot) || (slot === 'suspicion')) {
-      drop('entry', e, '없는 칸', who);
+    if (!enabledSlots.includes(slot) || slot === 'suspicion') {
+      drop('entry', e, enabledSlots.includes(slot) ? '의심은 suspicion 항목으로' : '없는 칸(또는 꺼진 기능의 칸)', who);
       continue;
     }
     // merge(정리)는 인용 없이 기준 메시지만, 그 밖은 인용이 원문에 있어야
@@ -573,6 +634,14 @@ export function applyUpdate(store: PeopleStore, chat: Chat, input: UpdateInput, 
       drop('entry', e, '본문 없음', who);
       continue;
     }
+    const meta = SLOT_META[slot];
+    // 대상 칸(첫인상·현재 평가·호칭 조건…)은 대상이 없으면 유저
+    const target = typeof e.target === 'string' && e.target ? (e.target === '@user' ? '@user' : nameOf(e.target) ?? plain(e.target, 40)) : meta.targeted && slot !== 'relationship' && slot !== 'speech' ? '@user' : undefined;
+    // 한 번 쓰면 안 고치는 칸(첫인상): 같은 대상에 이미 있으면 어떤 연산도 받지 않는다
+    if (meta.once && cur.some((x) => (x.target ?? '@user') === (target ?? '@user'))) {
+      drop('entry', e, '한 번 쓰면 고치지 않는 칸 (이미 있음)', who);
+      continue;
+    }
     let replaces: string | undefined;
     if (op === 'upsert') {
       const target = cur.find((x) => x.id === e.replace);
@@ -599,12 +668,81 @@ export function applyUpdate(store: PeopleStore, chat: Chat, input: UpdateInput, 
       continue;
     }
     const seq = nextSeq(ev.anchor);
-    const target = typeof e.target === 'string' && e.target ? (e.target === '@user' ? '@user' : nameOf(e.target) ?? plain(e.target, 40)) : undefined;
     if (putEntry(store, who, slot, { id: entryId(who, slot, ev.anchor, seq, text), text, src: 'story', anchor: ev.anchor, seq, quote: e.quote, ...(target ? { target } : {}), ...(replaces ? { replaces } : {}) })) report.applied.entries++;
   }
 
+  // 관계 재검토를 요청했으면 그 턴을 적는다 (20턴이 다시 쌓여야 또 요청)
+  for (const n of input.review ?? []) if (store.people[n]) store.people[n].reviewTurn = input.turn;
+
+  // 2b. 성격 6축 (기능 axes): 시작값은 axes_init_needed 인 인물만 한 번, 관찰은 후보에 모은다 (코드가 검토로 띄움, 축은 사용자 승인 뒤에만)
+  if (ctx.settings.features.has('axes')) {
+    const now = ctx.now ?? new Date().toISOString();
+    for (const p of Object.values(store.people)) ensureAxes(p);
+    report.applied.observations = 0;
+    report.applied.axesInit = 0;
+    for (const x of r.axes_init ?? []) {
+      const who = nameOf(str(x?.who));
+      if (!who) {
+        drop('axes_init', x, '명단에 없는 이름', str(x?.who));
+        continue;
+      }
+      const p = store.people[who];
+      if (p.axesFrom !== 'default') {
+        drop('axes_init', x, '이미 시작값이 있음', who);
+        continue;
+      }
+      const ev = evidence(x.m, x.quote);
+      if (typeof ev === 'string') {
+        drop('axes_init', x, ev, who);
+        continue;
+      }
+      const raw = x.axes && typeof x.axes === 'object' ? x.axes : null;
+      if (!raw || !AXES.every((a) => Number.isInteger(raw[a]) && raw[a] >= 0 && raw[a] <= 100)) {
+        drop('axes_init', x, '여섯 축 모두 0~100 정수여야 함', who);
+        continue;
+      }
+      setAxes(p, readAxes(raw), 'model');
+      report.applied.axesInit++;
+    }
+    const perWho = new Map<string, number>();
+    for (const x of r.observations ?? []) {
+      const who = nameOf(str(x?.who));
+      if (!who) {
+        drop('observation', x, '명단에 없는 이름', str(x?.who));
+        continue;
+      }
+      const axis = x.axis === 'pattern' ? 'pattern' : isAxis(x.axis) ? x.axis : null;
+      if (!axis) {
+        drop('observation', x, '없는 축', who);
+        continue;
+      }
+      if (!isDirection(x.direction) || (axis === 'pattern' ? !['new', 'weaken'].includes(x.direction) : !['up', 'down'].includes(x.direction))) {
+        drop('observation', x, '방향은 축이면 up|down, pattern 이면 new|weaken', who);
+        continue;
+      }
+      const ev = evidence(x.m, x.quote);
+      if (typeof ev === 'string') {
+        drop('observation', x, ev, who);
+        continue;
+      }
+      const n = (perWho.get(who) ?? 0) + 1;
+      if (n > 2) {
+        drop('observation', x, '인물당 2개 상한', who);
+        continue;
+      }
+      perWho.set(who, n);
+      const res = observe(store.people[who], { axis, direction: x.direction, pattern: str(x.pattern), anchor: ev.anchor, seq: nextSeq(ev.anchor), quote: x.quote, reason: str(x.reason) || str(x.pattern), strength: Number(x.strength ?? 50), confidence: Number(x.confidence ?? 50) }, now);
+      if (!res.ok) {
+        drop('observation', x, res.reason, who);
+        continue;
+      }
+      report.applied.observations++;
+    }
+    for (const p of Object.values(store.people)) pruneCandidates(p, live);
+  }
+
   // 3. 호감 계기
-  if (ctx.settings.features.has('affinity')) {
+  if (ctx.settings.features.has('affinity') && !ctx.settings.qualitative.has('affinity')) {
     const perCue = new Map<string, number>();
     const changes = liveChanges(store, live);
     for (const c of r.cues ?? []) {
@@ -677,7 +815,7 @@ export function applyUpdate(store: PeopleStore, chat: Chat, input: UpdateInput, 
   }
 
   // 3c. 음란도: 시작값은 표의 값 중 하나로 한 번만, 그 뒤는 새 반응마다 표의 변화량. 기준 메시지당 합 -5~+10 은 계산에서
-  if (ctx.settings.features.has('openness')) {
+  if (ctx.settings.features.has('openness') && !ctx.settings.qualitative.has('openness')) {
     const changes = liveChanges(store, live);
     const perWho = new Map<string, number>();
     const inited = new Set<string>();
@@ -760,11 +898,31 @@ export function applyUpdate(store: PeopleStore, chat: Chat, input: UpdateInput, 
   }
 
   // 5. 문서 (다시 읽기에서는 건너뜀)
+  let hookActions = 0;
   for (const d of ctx.only?.length ? [] : r.docs ?? []) {
     const type = d?.type as DocType;
     if (!DOC_TYPES.includes(type) || !ctx.settings.features.has(docFeature(type) as Feature)) {
       drop('doc', d, '없는 문서 종류 또는 꺼진 기능');
       continue;
+    }
+    // 리듬 시계 (리수폿 H): 훅 행동은 응답당 1개, 새 훅은 간격·동시 상한을 채울 때만
+    if (type === 'rhythm' && typeof d.key === 'string' && d.key.startsWith('hook:') && d.op !== 'remove' && input.clock) {
+      const isNew = !store.docs[`rhythm:${plain(d.key, 40)}`];
+      if (isNew && !input.clock.plantAllowed) {
+        drop('doc', d, `새 훅을 심을 수 없음 (${input.clock.plantBlocked})`, d.key);
+        continue;
+      }
+      const head = typeof d.text === 'string' ? parseHookHead(d.text) : null;
+      const prev = input.clock.hooks.find((h) => h.key === d.key);
+      const extendsNow = !!head?.ext && !prev?.extended;
+      if (extendsNow && prev?.extended) {
+        drop('doc', d, '연장은 한 번만', d.key);
+        continue;
+      }
+      if (++hookActions > 1) {
+        drop('doc', d, '응답당 훅 행동 1개', d.key);
+        continue;
+      }
     }
     const key = plain(d.key, 40);
     // 문서는 구간 전체를 요약한 것이라 인용이 없어도 받는다 (기준 메시지만 확정 구간이면). 인용이 있으면 원문에 있어야
@@ -807,7 +965,7 @@ export function applyUpdate(store: PeopleStore, chat: Chat, input: UpdateInput, 
   }
 
   // 6. 의심 (인물의 suspicion 칸, 대상·종류 있음)
-  if (ctx.settings.features.has('suspicion')) {
+  if (ctx.settings.features.has('suspicion') && !ctx.settings.qualitative.has('suspicion')) {
     for (const s of r.suspicion ?? []) {
       const who = nameOf(str(s?.who));
       if (!who) {
@@ -988,6 +1146,8 @@ export function clearStoryRecords(store: PeopleStore, who: string): number {
   const before = store.log.length;
   store.log = store.log.filter((c) => !(c.who === who && c.src === 'story'));
   n += before - store.log.length;
+  // 모으는 중·거절된 성격 변화 후보도 이야기 기록이라 지운다 (승인·되돌린 것은 사용자 결정이라 남김)
+  for (const [id, c] of Object.entries(p.candidates ?? {})) if (c.status === 'collecting' || c.status === 'rejected') { delete p.candidates[id]; n++; }
   return n;
 }
 
@@ -1006,7 +1166,7 @@ export function rhythmTextOk(key: string, text: string): boolean {
     return !!m && (RHYTHM_PHASES as readonly string[]).includes(m[1]) && (RHYTHM_ENGAGEMENT as readonly string[]).includes(m[2]);
   }
   if (key.startsWith('hook:')) {
-    const m = /^\[stage:([a-z_]+)\]\s*\[tier:([a-z]+)\]/.exec(text);
+    const m = /^\[stage:([a-z_]+)\]\s*\[tier:([a-z]+)\](?:\s*\[ext\])?/.exec(text);
     return !!m && (RHYTHM_HOOK_STAGES as readonly string[]).includes(m[1]) && (RHYTHM_HOOK_TIERS as readonly string[]).includes(m[2]);
   }
   return key === 'chapter' || key === 'arc' || key === 'pending';

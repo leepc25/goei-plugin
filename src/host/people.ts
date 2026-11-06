@@ -3,15 +3,17 @@
 import type { Chat } from '../core/types';
 import { bookText } from '../core/refs';
 import { generate, runModel, LlmError, type LlmMessage } from './llm';
-import { buildDirector, directorBlock, parseDirector, type DirectorNote } from '../core/people/director';
+import { buildDirector, buildDirectorPass2, directorBlock, parseDirectorAny, runSearches, type DirectorInput, type DirectorNote } from '../core/people/director';
 import { loadContext, updateChat, type ChatContext } from './risu';
 import { isWaiting, onWaiting } from './waiting';
-import { peopleStore, withPeople, splitUnread, unreadIndexes, messageKey, messageHash as messageHashOf, liveness } from '../core/people/store';
+import { peopleStore, withPeople, splitUnread, unreadIndexes, messageKey, messageHash as messageHashOf, liveness, recordRun, snapshotRun } from '../core/people/store';
+import { hypaSummaries } from '../core/people/hypa';
 import { applyUpdate, assemblePrompt, buildUpdate, clearStoryRecords, enabledSections, mentionIndexes, parseUpdate, planBatches, recordChars, type ApplyReport } from '../core/people/updater';
 import { applyConsolidate, buildConsolidate, parseConsolidate, type ConsolidateReport } from '../core/people/consolidate';
 import { peopleSettings, type PeopleSettings } from '../core/people/settings';
 import { seedPerson } from '../core/people/seed';
 import { nameMatcher } from '../core/people/select';
+import { buildRouter, parseRouter, type RouterHint } from '../core/people/router';
 import { allNames, seedBaseFor, valuesOf } from '../core/people/base';
 import { playerAgent } from '../core/player';
 import { promptFor } from '../core/people/prompt';
@@ -262,13 +264,13 @@ async function runOnce(reason: string, o: { manual?: boolean; scope?: RunScope }
       // 소감(debrief)은 2026-11-05 사용자 결정으로 뺌: 갱신기에 소감 절을 얹지 않는다 (코드 경로는 남김)
       const ended = [] as ReturnType<typeof endedNowOf>[];
       void batchKeys;
-      const input = buildUpdate(fresh.chat, curStore, batches[b], { settings, system: '', values: Object.fromEntries(input0Names(curStore).map((n) => [n, valuesOf(n)])), names: allNames(), exclude, factionNames: factionNamesOf(fresh.char.globalLore), only: o.scope?.only, wallet: balance, ended });
+      const input = buildUpdate(fresh.chat, curStore, batches[b], { settings, system: '', values: Object.fromEntries(input0Names(curStore).map((n) => [n, valuesOf(n)])), names: allNames(), hints: routerHintsNow(), memory: settings.hypa ? hypaSummaries(fresh.chat, settings.hypaCap) : [], exclude, factionNames: factionNamesOf(fresh.char.globalLore), only: o.scope?.only, wallet: balance, ended });
       // 지침은 자료를 본 뒤 조립한다 (저장 상한을 넘긴 인물이 있으면 정리 절을 켠다)
       const sections = enabledSections(settings);
       if (input.tidy.length) sections.add('tidy');
       if (walletOn) sections.add('wallet');
       if (ended.length) sections.add('debrief');
-      const system = assemblePrompt(promptFor(settings), sections, settings.rules, settings.lang);
+      const system = assemblePrompt(promptFor(settings), sections, settings.rules, settings.lang, settings.promptOverrides);
       input.system = system;
       if (!input.people.length) {
         // 장면 인물이 없으면 모델을 부르지 않고 읽음 표시만 (다시 읽기는 표시도 안 바꿈)
@@ -297,7 +299,7 @@ async function runOnce(reason: string, o: { manual?: boolean; scope?: RunScope }
         { role: 'system', content: system },
         { role: 'user', content: dataText },
       ];
-      const { raw, value } = await generate(messages, settings.model, parseUpdate, { retries: 1, retryModel: 'same', state: fresh.chat.scriptstate });
+      const { raw, value } = await generate(messages, settings.stageModel.update, parseUpdate, { retries: 1, retryModel: 'same', state: fresh.chat.scriptstate, staticModel: settings.stageModelId.update || undefined });
       diag.raw = raw;
       diag.outChars = raw.length;
       // 쓰기: 응답 대기 중이면 기다리고, 같은 채팅인지·메시지가 그대로인지 확인
@@ -307,6 +309,7 @@ async function runOnce(reason: string, o: { manual?: boolean; scope?: RunScope }
         if (chatId({ ...fresh, chat: cur }) !== id) return null;
         for (const [i, k] of keys) if (!cur.message[i] || messageKey(cur.message[i], i) !== k) return null;
         const s = peopleStore(cur);
+        const before = snapshotRun(s);
         const report = applyUpdate(s, cur, input, value, {
           settings,
           sheetOf: sheet,
@@ -318,6 +321,8 @@ async function runOnce(reason: string, o: { manual?: boolean; scope?: RunScope }
           debrief: ended.length > 0,
         });
         diag.report = report;
+        // 되돌리기용 (리수폿 J-4): 이 갱신이 새로 만든 것. 다시 읽기(only)는 적지 않는다
+        if (!o.scope?.only) recordRun(s, before, new Date().toISOString());
         let next = cur;
         if (report.wallet.length) {
           let w = readWallet(cur.scriptstate, walletStart);
@@ -435,7 +440,7 @@ async function consolidateInner(ctx: ChatContext, name: string, settings: People
       { role: 'system', content: input.system },
       { role: 'user', content: `Record to tidy:\n${dataText}\n\nReturn the JSON object.` },
     ];
-    const { raw, value } = await generate(messages, settings.model, parseConsolidate, { retries: 1, retryModel: 'same', state: ctx.chat.scriptstate });
+    const { raw, value } = await generate(messages, settings.stageModel.tidy, parseConsolidate, { retries: 1, retryModel: 'same', state: ctx.chat.scriptstate, staticModel: settings.stageModelId.tidy || undefined });
     diag.raw = raw;
     diag.outChars = raw.length;
     await waitNotBusy();
@@ -466,6 +471,48 @@ async function consolidateInner(ctx: ChatContext, name: string, settings: People
   }
 }
 
+// ── 모델 Router (본편 앞, 설정 router=model) ──
+
+let routerCache: { key: string; selected: string[] } | null = null;
+let routerHints: RouterHint[] = [];
+let routerSlowStreak = 0;
+/** 마지막 Router 가 본 미등록 이름 (갱신기 힌트) */
+export const routerHintsNow = (): RouterHint[] => routerHints;
+
+/** 모델이 고른 장면 인물. 실패·지연·빈 결과면 null (코드 Router 로). 입력·최근 글·명단이 같으면 재사용 */
+export async function routerPeople(chat: Chat, store: PeopleStore, input: string, settings: PeopleSettings, exclude: string[] = []): Promise<string[] | null> {
+  if (settings.router !== 'model' || routerSlowStreak >= 3 || !Object.keys(store.people).length) return null;
+  const names = allNames();
+  const built = buildRouter(chat, store, names, input, { exclude });
+  if (routerCache?.key === built.key) return routerCache.selected;
+  const t0 = Date.now();
+  const diag: DiagRun = { at: new Date().toISOString(), chat: '', reason: 'router', model: settings.stageModel.router, people: [], indexes: [], sizes: { system: built.system.length, data: JSON.stringify(built.data).length, span: 0 }, outChars: 0, ms: 0, ok: false };
+  try {
+    const raw = await Promise.race([
+      runModel([{ role: 'system', content: built.system }, { role: 'user', content: JSON.stringify(built.data) }], settings.stageModel.router, settings.stageModelId.router || undefined),
+      new Promise<never>((_, reject) => setTimeout(() => reject(new Error(`시간 제한 ${settings.routerTimeout}초`)), settings.routerTimeout * 1000)),
+    ]);
+    diag.raw = raw;
+    diag.outChars = raw.length;
+    const r = parseRouter(raw, store, names, built.max);
+    diag.people = r.selected;
+    diag.ok = true;
+    routerCache = { key: built.key, selected: r.selected };
+    routerHints = r.newCharacters;
+    routerSlowStreak = 0;
+    return r.selected.length ? r.selected : null;
+  } catch (error) {
+    diag.error = error instanceof Error ? error.message : String(error);
+    diag.stage = /시간 제한/.test(diag.error) ? 'model' : 'parse';
+    if (/시간 제한/.test(diag.error)) routerSlowStreak++;
+    console.log(`[goei] Router 생략 (코드 Router 로): ${diag.error}`);
+    return null;
+  } finally {
+    diag.ms = Date.now() - t0;
+    await pushDiag(diag, settings.keepRaw);
+  }
+}
+
 // ── 연출형 Director (본편 앞) ──
 
 let directorCache: { key: string; notes: DirectorNote[] } | null = null;
@@ -473,35 +520,45 @@ let directorSlowStreak = 0;
 export const directorPaused = () => directorSlowStreak >= 3;
 
 /** 연출형 메모 글. 시간 제한을 넘거나 실패하면 빈 문자열(본편을 막지 않는다). 입력·기록이 같으면 직전 메모 재사용 */
-export async function directorNoteText(chat: Chat, store: PeopleStore, people: string[], input: string, settings: PeopleSettings, user: string): Promise<string> {
+export async function directorNoteText(chat: Chat, store: PeopleStore, people: string[], input: string, settings: PeopleSettings, user: string, lore?: unknown): Promise<string> {
   if (settings.director !== 'scene' || directorPaused()) return '';
-  const built = buildDirector(chat, store, people, input, settings, Object.fromEntries(people.map((n) => [n, valuesOf(n)])));
+  const built = buildDirector(chat, store, people, input, settings, Object.fromEntries(people.map((n) => [n, valuesOf(n)])), settings.hypa ? hypaSummaries(chat, Math.min(settings.hypaCap, 2000)) : []);
   if (!built) return '';
   if (settings.directorReuse && directorCache?.key === built.key) return directorBlock(directorCache.notes, user);
-  const t0 = Date.now();
-  const diag: DiagRun = { at: new Date().toISOString(), chat: '', reason: 'director', model: settings.model, people, indexes: [], sizes: { system: built.system.length, data: JSON.stringify(built.data).length, span: 0 }, outChars: 0, ms: 0, ok: false };
-  try {
-    const raw = await Promise.race([
-      runModel([{ role: 'system', content: built.system }, { role: 'user', content: JSON.stringify(built.data) }], settings.model),
-      new Promise<never>((_, reject) => setTimeout(() => reject(new Error(`시간 제한 ${settings.directorTimeout}초`)), settings.directorTimeout * 1000)),
-    ]);
-    diag.raw = raw;
-    diag.outChars = raw.length;
-    const notes = parseDirector(raw, people, true);
-    directorCache = { key: built.key, notes };
-    directorSlowStreak = 0;
-    diag.ok = true;
-    return directorBlock(notes, user);
-  } catch (error) {
-    diag.error = error instanceof Error ? error.message : String(error);
-    diag.stage = /시간 제한/.test(diag.error) ? 'model' : 'parse';
-    if (/시간 제한/.test(diag.error)) directorSlowStreak++;
-    console.log(`[goei] Director 메모 생략: ${diag.error}`);
-    return '';
-  } finally {
-    diag.ms = Date.now() - t0;
-    await pushDiag(diag, settings.keepRaw);
+  // 1차: 메모 또는 검색 요청. 검색 요청이면 코드가 찾아서 2차 (리수폿 B). 각 호출에 시간 제한
+  const call = async (b: DirectorInput, reason: string, allowSearch: boolean) => {
+    const t0 = Date.now();
+    const diag: DiagRun = { at: new Date().toISOString(), chat: '', reason, model: settings.stageModel.director, people, indexes: [], sizes: { system: b.system.length, data: JSON.stringify(b.data).length, span: 0 }, outChars: 0, ms: 0, ok: false };
+    try {
+      const raw = await Promise.race([
+        runModel([{ role: 'system', content: b.system }, { role: 'user', content: JSON.stringify(b.data) }], settings.stageModel.director, settings.stageModelId.director || undefined),
+        new Promise<never>((_, reject) => setTimeout(() => reject(new Error(`시간 제한 ${settings.directorTimeout}초`)), settings.directorTimeout * 1000)),
+      ]);
+      diag.raw = raw;
+      diag.outChars = raw.length;
+      const r = parseDirectorAny(raw, people, true, allowSearch);
+      diag.ok = true;
+      return r;
+    } catch (error) {
+      diag.error = error instanceof Error ? error.message : String(error);
+      diag.stage = /시간 제한/.test(diag.error) ? 'model' : 'parse';
+      if (/시간 제한/.test(diag.error)) directorSlowStreak++;
+      console.log(`[goei] Director 메모 생략: ${diag.error}`);
+      return null;
+    } finally {
+      diag.ms = Date.now() - t0;
+      await pushDiag(diag, settings.keepRaw);
+    }
+  };
+  let r = await call(built, 'director', built.search);
+  if (r && 'need' in r) {
+    const found = runSearches(r.need, { chat, lore });
+    r = await call(buildDirectorPass2(built, found), 'director2', false);
   }
+  if (!r || !('notes' in r)) return '';
+  directorCache = { key: built.key, notes: r.notes };
+  directorSlowStreak = 0;
+  return directorBlock(r.notes, user);
 }
 
 /** 설정 요약 (화면용) */
